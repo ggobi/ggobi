@@ -21,6 +21,8 @@ struct _XMLUserData;
 
 struct _ggobid;
 
+#include "fileio.h"
+
 /*
   This is now changed so that datad is a class rather than a structure.
   The intention is that this allows us to create different derived classes
@@ -45,6 +47,8 @@ class datad {
      can be indexed in the list of data elements within the ggobid structure.
    */
  const gchar *name;
+ InputDescription *input;
+
  struct _ggobid *gg;  /*-- a pointer to the parent --*/
 
  gint nrows;

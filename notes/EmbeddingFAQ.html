@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title>Embedding ggobi FAQ</title>
+<link rel=stylesheet href="ggobi.css">
+</head>
+
+<body>
+<h1>Embedding ggobi FAQ</h1>
+
+<dl>
+
+  <dt>
+  <li><i class="question"> What are the basic steps in embedding ggobi into another
+      application?</i>
+  <dd>
+      Well, you first have to write code to initialize the ggobi
+      engine and then compile it and link against the ggobi library.
+      First you want to call the <pre>GGOBI(main)();</pre>
+      routine to create a ggobi instance and optionally pass it command line
+      arguments to initialize it with the appropriate state.
+      Next, compile the code, make certain to add the directory
+      containing <i class="file">GGobiAPI.h</i> to the list
+      of directories the pre-processor searches (ie. via the -I flag).
+      Finally, link against the ggobi library (add <code>-L&lt;wherever
+      libggobi.so is located&gt; -lggobi</code> to the link command).
+      Now, to get ggobi to respond to use actions, etc., make certain
+       to call <code>gtk_main()</code> at some suitable point
+      in your application. Integrating this with your event loop (if
+      you have one) can be complex.
+  <p>
+      Some examples of embedding ggobi in different programming environments
+      are provided in the <a href="R.html">R</a>, <a
+      href="Perl.html">Perl</a> and
+      <a href="Python.html">Python</a> interfaces.
+      
+  
+  <dt>
+  <li> In some situations I want to add additional items
+       to the menu on the main window of a gobbi instance, i.e. the
+      variable panel
+       window. How can I do that?
+  <dd> You can get access to the menu and all its sub-items
+       via the field <i>main_menu_factory</i>
+       object in the <i>ggobid</i> structure. This is a reference to a
+       <a href="http://www.gtk.org/doc/API/gtk/gtkitemfactory.html"><i>GtkItemFactory</i></a>
+       object  and one can use it to find the different elements. For
+      example, in the Python interface to ggobi, we add a Suspend
+      button to the <b>File</b> menu in the following way:
+<pre>
+  menu = GTK_MENU(gtk_item_factory_get_widget(gg->main_menu_factory, "/File"));
+  suspend = gtk_menu_item_new_with_label ("Suspend");
+  gtk_menu_append( GTK_MENU(menu), suspend);      
+</pre>
+       You can use this to get a reference to the different widgets
+      in the menu (i.e. menu items, menus and sub-menus, etc.)
+      and add, remove and change their characteristics.
+</dl>
+
+
+
+<hr>
+<address><a href="http://cm.bell-labs.com/stat/duncan">Duncan Temple Lang</a>
+<a href=mailto:duncan@research.bell-labs.com>&lt;duncan@research.bell-labs.com&gt;</a></address>
+<!-- hhmts start -->
+Last modified: Sun Nov  5 12:02:07 EST 2000
+<!-- hhmts end -->
+</body> </html>

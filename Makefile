@@ -51,6 +51,7 @@ SRC=ggobi.c datad.c make_ggobi.c color.c main_ui.c cpanel.c \
 \
  gtkextruler.c gtkexthruler.c gtkextvruler.c \
  mt19937-1.c \
+ fileio.c
 
 
 OB=ggobi.o datad.o make_ggobi.o color.o main_ui.o cpanel.o \
@@ -81,6 +82,7 @@ OB=ggobi.o datad.o make_ggobi.o color.o main_ui.o cpanel.o \
  ggobi-API.o \
  gtkextruler.o gtkexthruler.o gtkextvruler.o \
  mt19937-1.o  \
+ fileio.o
 
 
 # Needs to be \ for windows
@@ -193,7 +195,7 @@ endif
 
 
 # Emacs's tags for navigating through the source.
-TAGS etags:
+TAGS etags: $(SRC)
 	etags $(SRC)
 
 # The version for vi

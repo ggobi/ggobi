@@ -30,7 +30,7 @@ const gchar *GGOBI(getFileName)(ggobid *gg);
  rather than leaving it to the auto-detection,  use setDataMode()
  before calling this routine..
 */
-const gchar *GGOBI(setFileName) (const gchar *fileName, ggobid *gg);
+const gchar *GGOBI(setFileName) (const gchar *fileName, DataMode data_mode, ggobid *gg);
 
 /*
   Returns whether the data was read from a binary
@@ -49,7 +49,8 @@ extern DataMode GGOBI(setDataMode) (DataMode newMode, ggobid *gg);
  * of doubles, arranged by column. Hence the double* for now.
  * A double array (double **) would be useful also.
 */
-extern void GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames, gint nr, gint nc, datad *d, gboolean initPlot, ggobid *gg);
+extern void GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames, gint nr, gint nc,
+                             datad *d, gboolean initPlot, ggobid *gg, InputDescription *);
 
 
 /* Whether to get the transformed names or the regular ones. */

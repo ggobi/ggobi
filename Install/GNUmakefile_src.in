@@ -1,0 +1,130 @@
+TOP=..
+
+include $(TOP)/Makeconf
+
+XML_INC_DIRS=@XML_INC_DIRS@
+XML_LIB_DIRS=@XML_LIB_DIRS@
+
+MYSQL_INC_DIRS=@MYSQL_INC_DIRS@
+MYSQL_LIB_DIRS=@MYSQL_LIB_DIRS@
+
+
+SRC=\
+    array.c \
+    ash1d.c \
+    brush.c \
+    brush_api.c \
+    brush_bins.c \
+    brush_init.c \
+    brush_ui.c \
+    color.c \
+    color_ui.c \
+    cpanel.c \
+    cpp_ui.c \
+    ctour_ui.c \
+    datad.c \
+    display.c \
+    display_tree.c \
+    display_ui.c \
+    exclusion.c \
+    exclusion_ui.c \
+    ggobi-API.c \
+    ggobi.c \
+    gtkexthruler.c \
+    gtkextruler.c \
+    gtkextvruler.c \
+    identify.c \
+    identify_ui.c \
+    impute.c \
+    impute_ui.c \
+    io.c \
+    jitter.c \
+    jitter_ui.c \
+    limits.c \
+    lineedit.c \
+    lineedit_ui.c \
+    main_ui.c \
+    make_ggobi.c \
+    missing.c \
+    movepts.c \
+    movepts_ui.c \
+    mt19937-1.c \
+    noop-checkbutton.c \
+    p1d.c \
+    p1d_ui.c \
+    parcoords.c \
+    parcoords_ui.c \
+    pipeline.c \
+    pp_ui.c \
+    read_array.c \
+    read_data.c \
+    rotate_ui.c \
+    scale_api.c \
+    scale_click.c \
+    scale_drag.c \
+    scale_ui.c \
+    scatmat.c \
+    scatmat_ui.c \
+    scatterplot.c \
+    scatterplot_ui.c \
+    smooth_ui.c \
+    sp_plot.c \
+    sphere.c \
+    sphere_ui.c \
+    splot.c \
+    subset.c \
+    subset_ui.c \
+    svd.c \
+    texture.c \
+    tour.c \
+    tour1d.c \
+    tour1d_ui.c \
+    tour2d.c \
+    tour2d_ui.c \
+    transform.c \
+    transform_ui.c \
+    utils.c \
+    utils_gdk.c \
+    utils_ui.c \
+    varcircles.c \
+    varpanel_ui.c \
+    vartable.c \
+    vartable_ui.c \
+    vector.c \
+    win32_draw.c \
+    write_svg.c \
+    writedata.c \
+    writedata_ui.c \
+    xlines.c \
+    xyplot.c \
+    xyplot_ui.c \
+    @XML_SRC@ @MYSQL_SRC@
+
+ifdef USE_XML
+ XML_INC_DIRS=$(@XML_INC_DIRS@:%=-I%)
+endif
+
+ifdef USE_MYSQL
+ XML_INC_DIRS=$(@MYSQL_INC_DIRS@:%=-I%)
+endif
+
+OBJ=$(SRC:%.c=%.o)
+
+CFLAGS= -I../include -I../gtkext/include $(shell $(GTK_CONFIG) --cflags ) $(XML_INC_DIRS) $(MYSQL_INC_DIRS)
+
+LIBS=-L$(TOP)/lib -lgtkext $(shell $(GTK_CONFIG) --libs)
+
+ggobi $(TOP)/bin/ggobi: $(OBJ)
+	$(CC) $(LDFLAGS) -o $@ $(OBJ) $(LIBS)
+
+lib libggobi.so $(TOP)/lib/libggobi.so: $(OBJ:%.o=%.lo)
+	$(CC) $(SHLIB_LDFLAGS) -o $@ $(OBJ:%.o=%.lo) $(LIBS)
+
+
+%.lo:	%.c
+	$(CC) $(PIC_CFLAG) $(CFLAGS) -o $@ -c $<
+
+clean:
+	for f in $(OBJ) $(OBJ:%.o=%.lo) ; do \
+	  if test -f $$f ; then rm $$f ; fi \
+	done

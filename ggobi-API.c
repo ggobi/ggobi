@@ -47,14 +47,14 @@ void GGOBI(vardatum_free)(vartabled *var, ggobid *gg);
 const gchar *
 GGOBI(getFileName) (ggobid *gg)
 {
-  return(gg->filename);
+  return(gg->input->fileName);
 }
 
 const gchar *
-GGOBI(setFileName) (const gchar *fileName, ggobid *gg)
+GGOBI(setFileName) (const gchar *fileName, DataMode data_mode, ggobid *gg)
 {
  const gchar *old = g_strdup(GGOBI(getFileName)(gg));
- fileset_read_init(fileName, gg);
+ fileset_read_init(fileName, data_mode, gg);
  return(old);
 }
 
@@ -62,14 +62,15 @@ GGOBI(setFileName) (const gchar *fileName, ggobid *gg)
 DataMode
 GGOBI(getDataMode) (ggobid *gg)
 {
-  return(gg->data_mode);
+  return(gg->input->mode);
 }
 
 DataMode
 GGOBI(setDataMode) (DataMode newMode, ggobid *gg)
 {
-  DataMode old = gg->data_mode;
-  gg->data_mode = newMode;
+  DataMode old = gg->input->mode;
+  Options->data_mode = newMode;
+  gg->input->mode = newMode;
   return(old);
 }
 
@@ -150,7 +151,7 @@ GGOBI(destroyCurrentDisplay)(ggobid *gg)
 /*-- need two of these now, one to replace and one to append --*/
 void
 GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
-  gint nr, gint nc, datad *d, gboolean cleanup, ggobid *gg)
+  gint nr, gint nc, datad *d, gboolean cleanup, ggobid *gg, InputDescription *desc)
 {
   gint i, j;
   gchar *lbl;
@@ -195,6 +196,8 @@ GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
      d->raw.vals[i][j] = values[i + j*nr];
    }
   }
+
+  d->input = desc;
 
   /* Now recompute and display the top plot. */
   if (datad_init (d, gg, cleanup) != NULL) {
@@ -1008,7 +1011,7 @@ GGOBI(addVariable)(gdouble *vals, gint num, gchar *name, gboolean update,
        creation of a plot. Probably not, but just mention it here
        so we don't forget.
      */
-    GGOBI(setData)(vals, rnames, &name, num, 1, d, false, gg);
+    GGOBI(setData)(vals, rnames, &name, num, 1, d, false, gg, d->input);
   } else {
     if (num > d->nrows) {
       num =  d->nrows;
@@ -1204,7 +1207,7 @@ GGOBI(raiseWindow)(int which, gboolean raiseOrIcon, gboolean up, ggobid *gg)
 gchar *
 GGOBI(getDescription)(ggobid *gg)
 {
-  return(g_strdup(gg->filename));
+  return(g_strdup(gg->input->fileName));
 }
 
 /*

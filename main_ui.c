@@ -690,9 +690,9 @@ make_ui (ggobid *gg) {
   gtk_container_add (GTK_CONTAINER (window), vbox);
 
   gg->main_accel_group = gtk_accel_group_new ();
-  get_main_menu (menu_items, sizeof (menu_items) / sizeof (menu_items[0]),
-                 gg->main_accel_group, window,
-                 &gg->main_menubar, (gpointer) gg);
+  gg->main_menu_factory = get_main_menu (menu_items, sizeof (menu_items) / sizeof (menu_items[0]),
+                                  gg->main_accel_group, window,
+                                  &gg->main_menubar, (gpointer) gg);
 
   display_menu_init (gg);
 

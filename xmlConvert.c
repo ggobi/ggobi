@@ -30,7 +30,7 @@ main (gint argc, gchar *argv[])
   color_table_init (gg);
 
 
-  fileset_read (fileName, gg);
+  fileset_read (fileName, unknown_data, gg);
   d = (datad *)g_slist_nth_data(gg->d,0);
 
   if(0) {

@@ -59,6 +59,8 @@ typedef struct _XMLUserData {
   /* The ggobi instance that is being initialized. */
   ggobid *gg;
 
+  InputDescription *input;
+
   /* The current data object to which new records are added. */
   datad *current_data;
 
@@ -145,7 +147,7 @@ gboolean allocEdges(const CHAR **attrs, XMLParserData *data);
 gboolean addEdge(const CHAR **attrs, XMLParserData *data);
 gint rowId(const gchar *tmp, XMLParserData *data);
 
-gboolean data_xml_read (const gchar *filename, ggobid *gg);
+gboolean data_xml_read (InputDescription *desc, ggobid *gg);
 
 gboolean setHidden(const CHAR **attrs, XMLParserData *data, gint i, enum HiddenType);
 

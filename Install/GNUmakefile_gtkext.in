@@ -1,0 +1,34 @@
+TOP=../..
+
+include $(TOP)/Makeconf
+
+GTK_CONFIG=@GTK_CONFIG@
+CFLAGS=-I../include $(shell $(GTK_CONFIG) --cflags )
+
+PIC_CFLAG=-fPIC
+SHLIB_LDFLAGS=-shared
+
+SRC=\
+  gtkextruler.c \
+  gtkexthruler.c \
+  gtkextvruler.c 
+
+
+OBJ=$(SRC:%.c=%.o)
+
+libgtkext.so: $(OBJ:%.o=%.lo)
+	$(CC) $(SHLIB_LDFLAGS) -o $@ $(OBJ:%.o=%.lo) $(LIBS)
+
+$(TOP)/lib/libgtkext.so: libgtkext.so
+	$(MV) $^ $(@D)
+
+install: $(TOP)/lib/libgtkext.so
+  
+%.lo:	%.c
+	$(CC) $(PIC_CFLAG) $(CFLAGS) -o $@ -c $<
+
+
+clean:
+	for f in $(OBJ) $(OBJ:%.o=%.lo) ; do \
+	  if test -f $$f ; then rm $$f ; fi \
+	done

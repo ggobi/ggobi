@@ -34,34 +34,6 @@ stdin_empty (gint arg)
 }
 #endif
 
-void
-strip_suffixes (ggobid *gg)
-{
-/*
- * Find the name of the data file excluding certain suffixes:
- * .bin, .dat
-*/
-  gint i, nchars;
-  gboolean foundit = false;
-  gint nsuffixes = 3;
-  static gchar *suffix[] = {
-    ".bin",
-    ".xml",
-    ".dat"
-  };
-
-  for (i=0; i<nsuffixes; i++) {
-    nchars = strlen (gg->filename) - strlen (suffix[i]) ;
-    if (strcmp (suffix[i], (gchar *) &gg->filename[nchars]) == 0) {
-      gg->fname = g_strndup (gg->filename, nchars);
-      foundit = true;
-      break;
-    }
-  }
-
-  if (!foundit)
-    gg->fname = g_strdup (gg->filename);
-}
 
 static void
 read_binary (FILE *fp, datad *d, ggobid *gg)
@@ -222,7 +194,7 @@ row1_read (FILE *fp, gfloat *row1, gshort *row1_missing, datad *d, ggobid *gg) {
   return ncols;
 }
 
-static void
+static gboolean
 read_ascii (FILE *fp, datad *d, ggobid *gg)
 {
   gint j, jrows, nrows, jcols, fs;
@@ -275,7 +247,7 @@ read_ascii (FILE *fp, datad *d, ggobid *gg)
     } else if (fs < 0) {
       g_printerr ("Problem with input data\n");
       fclose (fp);
-      exit (0);
+      return(false);
     }
     else {
       nitems++;
@@ -327,7 +299,8 @@ read_ascii (FILE *fp, datad *d, ggobid *gg)
 
   d->nrows = nrows;
 
-  g_print ("size of data: %d x %d\n", d->nrows, d->ncols);
+  if(Options->verbose)
+    g_printerr("size of data: %d x %d\n", d->nrows, d->ncols);
 
   if (nitems != d->nrows * d->ncols) {
     g_printerr ("read_ascii: nrows*ncols != nitems read\n");
@@ -367,14 +340,49 @@ read_ascii (FILE *fp, datad *d, ggobid *gg)
     }
   }
 
+  return(true);
+}
+
+gboolean
+read_ascii_data(InputDescription *desc, ggobid *gg)
+{
+      datad *d; /* datad_new (gg);*/
+#ifdef USE_CLASSES
+      d  = new datad (gg);
+#else
+      d = datad_new (NULL, gg);
+#endif
+      if(array_read (d, desc, gg) == false) {
+  	/* Somewhere, we have to arrange to throw away the datad
+           and get it out of the list.
+         */
+	return(false);
+      }
+
+      d->nrows_in_plot = d->nrows;    /*-- for now --*/
+      d->nrgroups = 0;                /*-- for now --*/
+
+      missing_values_read (desc, true, d, gg);
+      
+      collabels_read (desc, true, d, gg);
+      rowlabels_read (desc, true, d, gg);
+      
+      point_glyphs_read (desc, true, d, gg);
+      point_colors_read (desc, true, d, gg);
+      hidden_read (desc, true, d, gg);
+    
+      edges_read (desc, true, d, gg);
+      line_colors_read (desc, true, d, gg);
+
+   return(true);
 }
 
 /*----------------------------------------------------------------------*/
 /*              End of section on reading ascii files                   */
 /*----------------------------------------------------------------------*/
 
-void
-array_read (datad *d, ggobid *gg)
+gboolean
+array_read (datad *d, InputDescription *desc, ggobid *gg)
 {
   gchar fname[128];
   FILE *fp;
@@ -383,7 +391,7 @@ array_read (datad *d, ggobid *gg)
  * Check file exists and open it - for stdin no open needs to be done
  * only assigning fp to be stdin.
 */
-  if (strcmp ((gchar *) gg->fname, "stdin") == 0) {
+  if (strcmp ((gchar *) desc->fileName, "stdin") == 0) {
     fp = stdin;
 
 #ifndef _WIN32
@@ -395,7 +403,7 @@ array_read (datad *d, ggobid *gg)
     signal (SIGALRM, stdin_empty);
 #endif
 
-    read_ascii (fp, d, gg);
+    return(read_ascii (fp, d, gg));
   }
   else
   {
@@ -403,30 +411,28 @@ array_read (datad *d, ggobid *gg)
      * Try fname.bin before fname, to see whether there is a binary
      * data file available.  If there is, call read_binary ().
     */
-    strcpy (fname, (gchar *) gg->fname);
-    strcat (fname, ".bin");
-
-    if ((fp = fopen (fname, "rb")) != NULL) {
-      read_binary (fp, d, gg);
-      d->name = g_strdup(fname);
-    }
-
-    /*
-     * If not, look for an ASCII file
-    */
-    else {
-      static gchar *suffixes[] = {"", ".dat"};
-      if ( (fp=open_ggobi_file_r (gg->fname, 2, suffixes, false)) != NULL) {
+    if(gg->input->mode == binary_data) {
+      if ((fp = fopen (desc->fileName, "rb")) != NULL) {
+        read_binary (fp, d, gg);
+        d->name = g_strdup(fname);
+      } else
+        return(false);
+    }  else {
+      if ( (fp = fopen(desc->fileName, "r")) != NULL) {
         read_ascii (fp, d, gg);
-        d->name = g_strdup(gg->fname);
+        d->name = g_strdup(gg->input->fileName);
       }
-      else
-        exit (1);
-        
+      else {
+        return(false);
+      }
     }
   }
+
+  return(true);
 }
 
+
+#ifdef UNUSED
 void
 find_root_name_of_data (gchar *fname, gchar *title)
 /*
@@ -446,4 +452,37 @@ find_root_name_of_data (gchar *fname, gchar *title)
 
   title = g_strdup_printf (pf);
 }
+#endif
 
+
+
+#ifdef USE_DEPRECATED
+void
+strip_suffixes (ggobid *gg)
+{
+/*
+ * Find the name of the data file excluding certain suffixes:
+ * .bin, .dat
+*/
+  gint i, nchars;
+  gboolean foundit = false;
+  gint nsuffixes = 3;
+  static gchar *suffix[] = {
+    ".bin",
+    ".xml",
+    ".dat"
+  };
+
+  for (i=0; i<nsuffixes; i++) {
+    nchars = strlen (gg->filename) - strlen (suffix[i]) ;
+    if (strcmp (suffix[i], (gchar *) &gg->filename[nchars]) == 0) {
+      gg->fname = g_strndup (gg->filename, nchars);
+      foundit = true;
+      break;
+    }
+  }
+
+  if (!foundit)
+    gg->fname = g_strdup (gg->filename);
+}
+#endif

@@ -167,7 +167,7 @@ void quick_message (gchar *message, gboolean modal) {
 }
 
 
-void
+GtkItemFactory *
 get_main_menu (GtkItemFactoryEntry menu_items[],
                gint nmenu_items,
                GtkAccelGroup *accel_group,
@@ -199,6 +199,8 @@ get_main_menu (GtkItemFactoryEntry menu_items[],
   if (mbar)
     /* Finally, return the actual menu bar created by the item factory. */
     *mbar = gtk_item_factory_get_widget (item_factory, "<main>");
+
+  return(item_factory);
 }
 
 void

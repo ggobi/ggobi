@@ -70,6 +70,8 @@ void endXMLElement(void *user_data, const CHAR *name);
 void Characters(void *user_data, const CHAR *ch, int len);
 
 
+const gchar *XMLSuffixes[] = {"", ".xml", ".xml.gz", ".xmlz"};
+
 const gchar * const xmlDataTagNames[] = {
                                           "ggobidata",
                                           "data",
@@ -108,19 +110,20 @@ const gchar * const xmlDataTagNames[] = {
 
 
 gboolean
-data_xml_read (const gchar *filename, ggobid *gg)
+data_xml_read (InputDescription *desc, ggobid *gg)
 {
  xmlSAXHandlerPtr xmlParserHandler;
  xmlParserCtxtPtr ctx = (xmlParserCtxtPtr) g_malloc(sizeof(xmlParserCtxtPtr));
  XMLParserData data;
  gboolean ok = false;  
- gchar *name = find_xml_file(filename, NULL, gg);
- 
+ gchar *name = g_strdup(desc->fileName); /* find_xml_file(desc->fileName, NULL, gg); */
+  
   if(name == NULL)
     return(false);
 
-  gg->filename = name;
-
+ if(strcmp(name, desc->fileName) != 0) {
+   g_printerr("Different input file name and resolved file name. Please report.\n");
+ }
 
   xmlParserHandler = (xmlSAXHandlerPtr) g_malloc(sizeof(xmlSAXHandler));
   /* Make certain this is initialized so that we don't have any references
@@ -132,9 +135,7 @@ data_xml_read (const gchar *filename, ggobid *gg)
   xmlParserHandler->endElement = endXMLElement;
   xmlParserHandler->characters = Characters;
 
-
   initParserData(&data, xmlParserHandler, gg);
-
 
   ctx = xmlCreateFileParserCtxt(name);
   if(ctx == NULL) {
@@ -143,6 +144,7 @@ data_xml_read (const gchar *filename, ggobid *gg)
   }
 
   ctx->userData = &data;
+  data.input = desc;
   ctx->sax = xmlParserHandler;
 
   xmlParseDocument(ctx);
@@ -878,7 +880,7 @@ find_xml_file(const gchar *filename, const gchar *dir, ggobid *gg)
   gchar* name = NULL;
   FILE *f;
   int dirlen = 0;
-  const gchar *suffixes[] = {"", ".xml", ".xml.gz", ".xmlz"};
+  char **suffixes = XMLSuffixes;
   int nsuffixes = sizeof(suffixes)/sizeof(suffixes[0]);
 
   if(dir)
@@ -892,7 +894,7 @@ find_xml_file(const gchar *filename, const gchar *dir, ggobid *gg)
 
   for(i = 0; i < nsuffixes;i++) {
     name = (char*) g_malloc(sizeof(char)*(dirlen + strlen(filename)+strlen(suffixes[i]) + 2));
-    sprintf(name,"%s%s%s", dirlen ? dir : "", filename,suffixes[i]);
+    sprintf(name,"%s/%s%s", dirlen ? dir : "", filename, suffixes[i]);
     if((f = fopen(name,"r")) != NULL) {
       fclose(f);
       break;
@@ -1067,7 +1069,7 @@ xmlParseColorMap(const gchar *fileName, int size, XMLParserData *data)
    
  char *tmp, *tmp1;
 
- tmp = getFileDirectory(data->gg->filename);
+ tmp = g_strdup(data->input->dirName);   /* getFileDirectory(data->input->filename); */
  tmp1 = find_xml_file(fileName, tmp, data->gg);
 
  if(tmp1) {
@@ -1087,6 +1089,7 @@ xmlParseColorMap(const gchar *fileName, int size, XMLParserData *data)
 
   data->reading_colormap_file_p = false;
 
+  addInputFile(data->input, tmp1);
   g_free(tmp1);
  }
 

@@ -15,6 +15,7 @@
 #include <string.h>
 #include <gtk/gtk.h>
 #include "vars.h"
+#include "gtkext.h"
 #include "externs.h"
 
 #define WIDTH   370

@@ -49,9 +49,9 @@ void modes_init (datad *d, ggobid* gg) {
 }
 
 gboolean
-fileset_read_init (gchar *ldata_in, ggobid *gg)
+fileset_read_init (gchar *ldata_in, DataMode data_mode, ggobid *gg)
 {
-  gboolean ans = fileset_read (ldata_in, gg);
+  gboolean ans = fileset_read (ldata_in, data_mode, gg);
   if (ans) {
     GSList *l;
     datad *d;
@@ -68,22 +68,32 @@ fileset_read_init (gchar *ldata_in, ggobid *gg)
 
 
 gboolean
-fileset_read (gchar *ldata_in, ggobid *gg)
+fileset_read (gchar *ldata_in, DataMode data_mode, ggobid *gg)
 {
-  extern DataMode data_mode_set (gchar *);
+  InputDescription *desc;
   gboolean ok = true;
-  gg->filename = g_strdup (ldata_in);
-  strip_suffixes (gg);  /*-- produces gg.fname, the root name --*/
+  /*  gg->filename = g_strdup (ldata_in); */
 
-  /*-- determine the data_mode based on the suffix of the input file --*/
-  if(gg->data_mode == unknown_data)
-     gg->data_mode = data_mode_set (gg->filename);
+  desc = fileset_generate(ldata_in, Options->data_mode);
 
-  switch (gg->data_mode) {
+  if(desc == NULL) {
+    g_printerr("Cannot locate the file %s\n", ldata_in); 
+    return(false);
+  }
+
+  if(desc->mode == unknown_data) {
+    g_printerr("Cannot determine the format of the data in file %s\n", desc->fileName); 
+    return(false);
+  }
+
+  gg->input = desc;
+
+  switch (desc->mode) {
     case xml_data:
 #ifdef USE_XML
-g_printerr ("reading xml\n");
-      ok = data_xml_read (gg->fname, gg);
+     ok = data_xml_read (desc, gg);
+#else
+    g_printerr("No support for reading XML\n");
 #endif
     break;
 
@@ -94,10 +104,13 @@ g_printerr ("reading xml\n");
       getDefaultValuesFromFile(ldata_in);
       ok = read_mysql_data(&DefaultMySQLInfo, FALSE, gg);
     }
+#else
+    g_printerr("No support for reading MySQL\n");
 #endif
     break;
 
     case binary_data:
+    g_printerr("No support for MySQL\n");
     break;
 
     case Sprocess_data:
@@ -105,32 +118,16 @@ g_printerr ("reading xml\n");
 
     case ascii_data:
     {
-      datad *d; /* datad_new (gg);*/
-g_printerr ("reading ascii\n");
-#ifdef USE_CLASSES
-      d  = new datad (gg);
-#else
-      d = datad_new (NULL, gg);
-#endif
-      array_read (d, gg);
-      d->nrows_in_plot = d->nrows;    /*-- for now --*/
-      d->nrgroups = 0;                /*-- for now --*/
-      missing_values_read (gg->fname, true, d, gg);
-      
-      collabels_read (gg->fname, true, d, gg);
-      rowlabels_read (gg->fname, true, d, gg);
-      
-      point_glyphs_read (gg->fname, true, d, gg);
-      point_colors_read (gg->fname, true, d, gg);
-      hidden_read (gg->fname, true, d, gg);
-    
-      edges_read (gg->fname, true, d, gg);
-      line_colors_read (gg->fname, true, d, gg);
+      read_ascii_data(desc, gg);
     }
     break;
+   default:
+     g_printerr("Unknown data type in fileset_read\n");
+     break;
+  }
 
-    case unknown_data:
-      break;
+  if(ok && Options->verbose) {
+    showInputDescription(desc, gg);
   }
 
   return ok;  /* need to check return codes of reading routines */
@@ -172,7 +169,7 @@ pipeline_init (datad *d, ggobid *gg)
 }
 
 void
-make_ggobi (gchar *ldata_in, gboolean processEvents, ggobid *gg) {
+make_ggobi (GGobiOptions *options, gboolean processEvents, ggobid *gg) {
   gboolean init_data = false;
 
   /*-- some initializations --*/
@@ -182,8 +179,8 @@ make_ggobi (gchar *ldata_in, gboolean processEvents, ggobid *gg) {
   color_table_init (gg);
   make_ui (gg);
 
-  if (ldata_in != NULL) {
-    if (fileset_read (ldata_in, gg) > 0) {
+  if (options->data_in != NULL) {
+    if (fileset_read (options->data_in, options->data_mode, gg) > 0) {
       init_data = true;
     }
   } else {

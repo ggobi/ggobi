@@ -19,6 +19,4 @@
 #include "datad.h"
 #include "ggobi.h"
 #include "display.h"
-#include "gtkexthruler.h"
-#include "gtkextvruler.h"
-#include "gtkextruler.h"
+

@@ -627,10 +627,26 @@ See also \SFunction{ggobi.setRowNames}.
 \subsection{getSmootherFunction.ggobi}
 \subsection{setSmootherFunction.ggobi}
 GGobi provides different smoothing algorithms.  However, it is
-impossible for it to provide all possible implementations.
-To allow others to provide their own, we allow
-an R function to be registered with the ggobi session
-so that 
+impossible for it to provide all possible implementations.  To allow
+others to provide their own, we allow an R function to be registered
+with the ggobi session so that it is called when the user slides the
+smoothing parameter backward and forward.  This, of course, is not as
+fast as implementations in C code.  But it is useful to allow one to
+experiment and get an impression of the results.
+The R function is called with three arguments:
+the x and y data values and the bandwith of the smoother,
+taken from the slider. The first two are numeric vectors of length $n$
+and the bandwidth is a scalar.
+One can register a function that performs the 
+smoothing and returns the predicted value something like:
+\begin{verbatim}
+ library(modreg)
+ function(x, y, w) {
+   predict(loess(y ~ x, data.frame(x=x, y = y), span = w))
+ }
+\end{verbatim}
+
+
 
 
 \subsection{ggobi}

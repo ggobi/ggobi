@@ -18,6 +18,8 @@
 
 #include "varseldata.h"
 
+#include "fileio.h"
+
 /*
  These are hooks for other applications (e.g. R) to 
  facilitate callbacks at a higher level that GTK events/signals.
@@ -60,6 +62,7 @@ struct _ggobid {
  /* main_ui */
  GtkWidget *control_panel[NMODES];
  GtkWidget *main_window, *main_menubar;
+  GtkItemFactory *main_menu_factory;
  GtkWidget *display_menu_item, *display_menu;  /*-- menu labelled 'Window' --*/
  GtkAccelGroup *main_accel_group;
  GtkWidget *mode_frame, *mode_item;
@@ -73,10 +76,10 @@ struct _ggobid {
 /*                      reading in the data                           */
 /*--------------------------------------------------------------------*/
 
- DataMode data_mode;
- gchar *data_in;
- gchar *filename;      /* full file name, including path */
- gchar *fname;         /* file name without suffix: .dat, .missing */
+  InputDescription *input;   /* Information about input files for the default data source,
+                                such as the name of the file, directory, data mode, extension,
+                                etc.
+                              */
 
 /*----------------------- pipeline ---------------------------------*/
 
@@ -340,6 +343,18 @@ struct _ggobid {
 
 
 }; /*  ggobid; */
+
+
+typedef struct {
+
+  gboolean verbose;
+
+  DataMode data_mode;
+
+  gchar *data_in;
+} GGobiOptions;
+
+extern GGobiOptions *Options;
 
 #endif
 

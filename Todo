@@ -1,3 +1,7 @@
+Check the fileselection dialog for read (filesel_ok) to ensure that
+the correct data mode is passed.  Take it out of ggobi.
+
+
 Bugs: 
 
   Set the brush to any region  (manually) and then reduce the

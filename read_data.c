@@ -48,25 +48,32 @@ rowlabels_alloc (datad *d, ggobid *gg)
 }
 
 gboolean
-rowlabels_read (gchar *ldata_in, gboolean init, datad *d, ggobid *gg)
+rowlabels_read (InputDescription *desc, gboolean init, datad *d, ggobid *gg)
 {
   gint i;
-  static gchar *suffixes[] = {
-    ".row", ".rowlab", ".case"
+  static const gchar *const suffixes[] = {
+    "row", "rowlab", "case"
   };
   gchar initstr[INITSTRSIZE];
   gchar *lbl;
   gint ncase;
-  gboolean found = false;
+  gboolean found = true;
   FILE *fp;
+
+  gint whichSuffix;
+  gchar *fileName;
 
   if (init)
     rowlabels_alloc (d, gg);
 
-  if (ldata_in != NULL && ldata_in != "" && strcmp (ldata_in,"stdin") != 0)
-    if ((fp = open_ggobi_file_r (ldata_in, 3, suffixes, true)) != NULL)
-      found = true;
+  fileName = findAssociatedFile(desc, suffixes, sizeof(suffixes)/sizeof(suffixes[0]), &whichSuffix, false);
+  if(fileName == NULL)
+    return(false);
 
+  if( ( fp = fopen(fileName, "r") ) == NULL ) {
+    g_free(fileName);
+    return(false);
+  }
   /*
    * Read in case labels or initiate them to generic if no label
    * file exists
@@ -115,7 +122,13 @@ rowlabels_read (gchar *ldata_in, gboolean init, datad *d, ggobid *gg)
     }
   }
 
-  return (found);
+
+  if(found) {
+    addInputSuffix(desc, suffixes[whichSuffix]);
+  }
+  g_free(fileName);
+
+ return (found);
 }
 
 /*------------------------------------------------------------------------*/
@@ -157,22 +170,30 @@ collabels_process_word (gchar *word, gint field, gint nvar, datad *d)
  * fields, which will contain min and max range values.
 */
 gboolean
-collabels_read (gchar *ldata_in, gboolean init, datad *d, ggobid *gg)
+collabels_read (InputDescription *desc, gboolean init, datad *d, ggobid *gg)
 {
-  static gchar *suffixes[] = {
-    ".col", ".column", ".collab", ".var"
+  static const gchar * const suffixes[] = {
+    "col", "column", "collab", "var"
   };
   gint j, nvar = 0;
-  gboolean found = false;
+  gboolean found = true;
   FILE *fp;
+
+  gchar *fileName;
+  int whichSuffix;
+
   gchar str[INITSTRSIZE];
 
-  /*
-   * Check if variable label file exists, and open if so.
-  */
-  if (ldata_in != NULL && ldata_in != "" && strcmp (ldata_in,"stdin") != 0)
-    if ((fp=open_ggobi_file_r (ldata_in, 4, suffixes, true)) != NULL)
-      found = true;
+
+  fileName = findAssociatedFile(desc, suffixes, sizeof(suffixes)/sizeof(suffixes[0]), &whichSuffix, false);
+  if(fileName == NULL)
+    return(false);
+
+  if( ( fp = fopen(fileName, "r") ) == NULL ) {
+    g_free(fileName);
+    return(false);
+  }
+
 
   /*
    * Read in variable labels or initiate them to generic if no label
@@ -253,6 +274,11 @@ collabels_read (gchar *ldata_in, gboolean init, datad *d, ggobid *gg)
     d->vartable[j].collab_tform = g_strdup (d->vartable[j].collab);
   }
 
+  if(found) {
+    addInputSuffix(desc, suffixes[whichSuffix]);
+  }
+  g_free(fileName);
+
   return (found);
 }
 
@@ -278,7 +304,7 @@ rgroups_read (gchar *ldata_in, gboolean init, datad *d, ggobid *gg)
  * Read in the grouping numbers for joint scaling of variables
 */
 {
-  gchar *suffixes[] = {".rgroups"};
+  gchar *suffixes[] = {"rgroups"};
   gint itmp, i, k;
   gboolean found = false;
   gboolean found_rg;
@@ -420,27 +446,34 @@ readGlyphErr (void) {
 /*------------------------------------------------------------------------*/
 
 gboolean
-point_glyphs_read (gchar *ldata_in, gboolean reinit, datad *d, ggobid *gg)
+point_glyphs_read (InputDescription *desc, gboolean reinit, datad *d, ggobid *gg)
 {
   gboolean ok = true;
-  gchar *suffixes[] = {".glyphs"};
+  static const gchar * const suffixes[] = {"glyphs"};
   gint i, k;
-  gboolean found = false;
+  gboolean found = true;
   FILE *fp;
   gint gid;
   glyphv glyph;
   gboolean use_defaults = false;
 
+  gchar *fileName;
+  int whichSuffix;
+
+
   if (reinit)
     br_glyph_ids_alloc (d);
 
-  if (ldata_in != NULL && ldata_in != "" && strcmp (ldata_in, "stdin") != 0)
-    if ((fp = open_ggobi_file_r (ldata_in, 1, suffixes, true)) != NULL)
-      found = true;
+  fileName = findAssociatedFile(desc, suffixes, sizeof(suffixes)/sizeof(suffixes[0]), &whichSuffix, false);
+  if(fileName == NULL)
+    found = false;
+
+  if( found && ( fp = fopen(fileName, "r") ) == NULL ) {
+    found = false;
+  }
 
   if (!found && reinit)
     br_glyph_ids_init (d, gg);
-
   else
   {
     enum { typeAndSize, glyphNumber } glyph_format;
@@ -524,6 +557,12 @@ point_glyphs_read (gchar *ldata_in, gboolean reinit, datad *d, ggobid *gg)
   if (!found || use_defaults)
     br_glyph_ids_init (d, gg);
 
+
+  if(found) {
+    addInputSuffix(desc, suffixes[whichSuffix]);
+  }
+  g_free(fileName);
+
   return (ok);
 }
 
@@ -545,21 +584,35 @@ mapGlyphName (const gchar *gtype)
 }
 
 gboolean
-point_colors_read (gchar *ldata_in, gboolean reinit, datad *d, ggobid *gg)
+point_colors_read (InputDescription *desc, gboolean reinit, datad *d, ggobid *gg)
 {
   gboolean ok = false;
-  gboolean found = false;
-  gchar *suffixes[] = {".colors"};
+  gboolean found = true;
+  const gchar * const suffixes[] = {"colors"};
   gint i, k, retval;
   FILE *fp;
   gint id;
+ 
+  gchar *fileName;
+  int whichSuffix;
+
 
   if (reinit)
     br_color_ids_alloc (d, gg);
 
-  if (ldata_in != NULL && ldata_in != "" && strcmp (ldata_in, "stdin") != 0) {
-    if ( (fp = open_ggobi_file_r (ldata_in, 1, suffixes, true)) != NULL)
-      found = true;
+
+  fileName = findAssociatedFile(desc, suffixes, sizeof(suffixes)/sizeof(suffixes[0]), &whichSuffix, false);
+
+  if(fileName) {
+    found = true;
+  } else
+    found = false;
+
+  if(found && ( fp = fopen(fileName, "r") ) == NULL ) {
+    g_free(fileName);
+    return(false);
+  }
+
 
     if (!found && reinit == true)
       ;  /* no need to init the ids */
@@ -583,10 +636,15 @@ point_colors_read (gchar *ldata_in, gboolean reinit, datad *d, ggobid *gg)
       }
       fclose (fp);
     }
-  }
+
 
   if (!ok)
     br_color_ids_init (d, gg);
+
+  if(found) {
+    addInputSuffix(desc, suffixes[whichSuffix]);
+  }
+  g_free(fileName);
 
   return (ok);
 }
@@ -596,24 +654,33 @@ point_colors_read (gchar *ldata_in, gboolean reinit, datad *d, ggobid *gg)
 /*------------------------------------------------------------------------*/
 
 gboolean
-line_colors_read (gchar *ldata_in, gboolean reinit, datad *d, ggobid *gg)
+line_colors_read (InputDescription *desc, gboolean reinit, datad *d, ggobid *gg)
 {
   gint i, id, retval;
-  gboolean ok = false;
+  gboolean ok = true;
   FILE *fp;
-  gchar *suffixes[] = {".linecolors"};
+  const gchar * const suffixes[] = {"linecolors"};
 
-  if (reinit)
-/*    br_line_color_alloc (gg);*/
+  gchar *fileName;
+  int whichSuffix;
+
+  if (reinit) {
+          /*    br_line_color_alloc (gg);*/
     br_line_vectors_check_size (gg->nedges, gg);
+  }
 
   if (!gg->mono_p) {
     /*
      * Check if line colors file exists.
     */
-    if (ldata_in != NULL && ldata_in != "" && strcmp (ldata_in, "stdin") != 0) {
-      if ( (fp=open_ggobi_file_r (ldata_in, 1, suffixes, true)) != NULL)
-          ok = true;
+
+     fileName = findAssociatedFile(desc, suffixes, sizeof(suffixes)/sizeof(suffixes[0]), &whichSuffix, false);
+     if(fileName == NULL)
+       ok = false;
+
+     if(ok &&  ( fp = fopen(fileName, "r") ) == NULL ) {
+       ok = false;
+     }
 
       if (!ok && reinit == true)
         ;  /* no need to init the ids */
@@ -632,12 +699,16 @@ line_colors_read (gchar *ldata_in, gboolean reinit, datad *d, ggobid *gg)
           }
 
           gg->line.color.els[i] = gg->line.color_now.els[i] =
-            gg->line.color_prev.els[i] = id;
+                                         gg->line.color_prev.els[i] = id;
           i++;
         }
         fclose(fp);
-      }
-    }
+        if(ok) {
+          addInputSuffix(desc, suffixes[whichSuffix]);
+        }
+      } 
+      if(fileName)
+        g_free(fileName);
   }
 
   if (!ok)
@@ -647,31 +718,32 @@ line_colors_read (gchar *ldata_in, gboolean reinit, datad *d, ggobid *gg)
 }
 
 gboolean
-edges_read (gchar *rootname, gboolean startup, datad *d, ggobid *gg)
+edges_read (InputDescription *desc, gboolean startup, datad *d, ggobid *gg)
   /* startup - Initializing ggobi? */
 {
   gint fs, nblocks, bsize = 500;
   gboolean ok = true;
   gint jlinks = 0;
   FILE *fp;
-  gchar *fname;
+  
+  if(desc->fileName == NULL || desc->fileName[0] == '\0' || strcmp (desc->fileName, "stdin") == 0)   
+    return(true);
+  else {
 
-  if ((rootname == NULL) || (strcmp (rootname, "") == 0) || 
-      strcmp (rootname, "stdin") == 0) {
-/*    edges_create (gg);*/  /*-- or maybe not --*/
-    return (ok);
-  } else {
-    fname = (gchar*) g_malloc (128 * sizeof (gchar));
-    /* This is for the in-process case */
-    if (rootname == (gchar *) NULL)
-      strcpy (fname, gg->filename);
-    /* This is for the startup case */
-    else
-      strcpy (fname, rootname);
-    strcat (fname, ".lines");
-  }
+   gchar *fileName;
+   int whichSuffix;
+   static const gchar * const suffixes[] = {"lines"};
 
-  if ((fp = fopen (fname, "r")) != NULL) {
+   fileName = findAssociatedFile(desc, suffixes, sizeof(suffixes)/sizeof(suffixes[0]), &whichSuffix, false);
+   if(fileName == NULL)
+    return(false);
+
+   if( ( fp = fopen(fileName, "r") ) == NULL ) {
+     g_free(fileName);
+     return(false);
+   }
+
+  if ((fp = fopen (fileName, "r")) != NULL) {
     gint a, b;
 
     gg->nedges = 0;
@@ -688,13 +760,13 @@ edges_read (gchar *rootname, gboolean startup, datad *d, ggobid *gg)
       else if (fs < 0) {
         ok = false;
         g_printerr ("Error in reading .lines file\n");
-        exit (1);
+        return(false);
       }
 
       if (a < 1 || b > d->nrows) {
         ok = false;
         g_printerr ("Entry in .lines file > number of rows or < 1\n");
-        exit (1);
+        return(false);
       }
       else {
         /*
@@ -725,15 +797,14 @@ edges_read (gchar *rootname, gboolean startup, datad *d, ggobid *gg)
     */
     if (fclose (fp) == EOF)
       g_printerr ("Error in closing .lines file");
-  }
-/*
- *else
- *  edges_create (gg);
-*/
 
-  if (fname != (gchar *) NULL)
-    g_free ((gpointer) fname);
-  return (ok);
+     addInputSuffix(desc, suffixes[whichSuffix]);
+   }
+
+    g_free(fileName);
+  }
+
+ return (ok);
 }
 
 
@@ -742,22 +813,28 @@ edges_read (gchar *rootname, gboolean startup, datad *d, ggobid *gg)
 /*------------------------------------------------------------------------*/
 
 gboolean
-hidden_read (gchar *ldata_in, gboolean reinit, datad *d, ggobid *gg)
+hidden_read (InputDescription *desc, gboolean reinit, datad *d, ggobid *gg)
 /*
  * Read in the hidden vector
 */
 {
-  gchar *suffixes[] = {".hide"};
+  static const gchar *const suffixes[] = {"hide"};
   gint itmp, i;
-  gboolean found = false;
+  gboolean found = true;
   FILE *fp;
+  gchar *fileName;
+  int whichSuffix;
 
   if (reinit)
     hidden_alloc (d);
 
-  if (ldata_in != NULL && ldata_in != "" && strcmp (ldata_in,"stdin") != 0)
-    if ((fp=open_ggobi_file_r (ldata_in, 1, suffixes, true)) != NULL)
-      found = true;
+  fileName = findAssociatedFile(desc, suffixes, sizeof(suffixes)/sizeof(suffixes[0]), &whichSuffix, false);
+  if(fileName == NULL)
+    found = false;
+
+  if( ( fp = fopen(fileName, "r") ) == NULL ) {
+    found = false;
+  }
 
   if (found) {
     i = 0;
@@ -767,13 +844,17 @@ hidden_read (gchar *ldata_in, gboolean reinit, datad *d, ggobid *gg)
       i++;
     }
   
-    if (i < d->nrows)
+    if (i < d->nrows) {
       g_printerr ("Problem in reading hide file; not enough rows\n");
-
+    } else
+       addInputSuffix(desc, suffixes[whichSuffix]);
   } else {
     if (reinit)
       hidden_init (d, gg);
   }
+
+  if(fileName) 
+    g_free(fileName);
 
   return (found);
 }
@@ -783,20 +864,26 @@ hidden_read (gchar *ldata_in, gboolean reinit, datad *d, ggobid *gg)
 /*------------------------------------------------------------------------*/
 
 
-void
-missing_values_read (gchar *ldata_in, gboolean init, datad *d, ggobid *gg)
+gboolean
+missing_values_read (InputDescription *desc, gboolean init, datad *d, ggobid *gg)
 {
-  gchar *suffixes[] = {".missing"};
+  static const gchar *const suffixes[] = {"missing"};
   gint i, j, ok, itmp, row, col;
   gint nmissing = 0;
   FILE *fp;
-  gboolean found = false;
+ 
+  gint whichSuffix;
+  gchar *fileName;
 
-  if (ldata_in != NULL && ldata_in != "" && strcmp (ldata_in,"stdin") != 0)
-    if ((fp=open_ggobi_file_r (ldata_in, 1, suffixes, true)) != NULL)
-      found = true;
+  fileName = findAssociatedFile(desc, suffixes, sizeof(suffixes)/sizeof(suffixes[0]), &whichSuffix, false);
+  if(fileName == NULL)
+    return(false);
 
-  if (found) {
+  if( ( fp = fopen(fileName, "r") ) == NULL ) {
+    g_free(fileName);
+    return(false);
+  }
+
     if (init || d->nmissing == 0)
       arrays_alloc (&d->missing, d->nrows, d->ncols);
 
@@ -813,12 +900,14 @@ missing_values_read (gchar *ldata_in, gboolean init, datad *d, ggobid *gg)
       if (i==d->nrows && j>0) ok = false;
 
       if (!ok) {
-        g_print ("Problem reading %s.missing", ldata_in);
+        g_print ("Problem reading %s", fileName);
         g_print (" at row %d, column %d.\n", i, j);
-        g_print ("Make sure dimensions of %s and %s.missing match\n",
-          ldata_in, ldata_in);
+        g_print ("Make sure dimensions of %s and %s match\n",
+                  desc->fileName, fileName);
         fclose (fp);
-        exit (1);
+
+        g_free(fileName);
+        return(false);
       }
 
       d->missing.vals[row][col] = itmp;
@@ -836,6 +925,10 @@ missing_values_read (gchar *ldata_in, gboolean init, datad *d, ggobid *gg)
     d->nmissing = nmissing;
 
     fclose (fp);
-  }
+    addInputSuffix(desc, suffixes[whichSuffix]);
+ 
+    g_free(fileName);
+
+ return(true);
 }
 

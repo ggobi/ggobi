@@ -1,27 +1,32 @@
-GTK_CONFIG=@GTK_CONFIG@
+# This is placed in the top-level directory
+# of the ggobi suite and is a convenience
+# for 
 
-XML_INC_DIRS=@XML_INC_DIRS@
-XML_LIB_DIRS=@XML_LIB_DIRS@
+TOP=@TOP@
 
-MYSQL_INC_DIRS=@MYSQL_INC_DIRS@
-MYSQL_LIB_DIRS=@MYSQL_LIB_DIRS@
+.PHONY:	lib
 
-PIC_CFLAG=-fPIC
-SHLIB_LDFLAGS=-shared
+UTILS=bin/xmlConvert
 
-SRC=$(shell ls *.c)
-OBJ=$(SRC:%.c=%.o)
+all: lib/libgtkext.so bin/ggobi @EMBED@ $(UTILS)
 
-CFLAGS= -I../include $(shell $(GTK_CONFIG) --cflags )
+lib/libgtkext.so:
+	$(MAKE) -C gtkext/src install
 
-LIBS=$(shell $(GTK_CONFIG) --libs)
+ggobi bin/ggobi: lib/libgtkext.so
+	$(MAKE) -C src ../bin/ggobi
 
-ggobi ../bin/ggobi: $(OBJ)
-	$(CC) $(LDFLAGS) -o $@ $(OBJ) $(LIBS)
-
-libggobi.so ../lib/libggobi.so: $(OBJ:%.o=%.lo)
-	$(CC) $(SHLIB_LDFLAGS) -o $@ $(OBJ:%.o=%.lo) $(LIBS)
+lib/libggobi.so:
+	$(MAKE) -C src ../lib/libggobi.so
 
 
-%.lo:	%.c
-	$(CC) $(PIC_CFLAG) $(CFLAGS) -o $@ -c $<
+bin/xmlConvert:
+	$(MAKE) -C src ../bin/xmlConvert
+
+
+clean:
+	for f in () ; do \
+	  $(MAKE) -C $$f clean ; \
+	done
+
+distclean: clean

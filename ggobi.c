@@ -19,16 +19,27 @@
 #include "vars.h"
 #include "externs.h"
 
+#include "version.h"
+static gchar *version_date = "October 10, 2000";
+
+
+static GGobiOptions options;
+GGobiOptions *Options;
+
+
 ggobid **all_ggobis;
 gint num_ggobis;
+gint totalNumGGobis;
 
-static gchar *version_date = "October 10, 2000";
 
 const gchar * const ViewTypes[] =
   {"Scatterplot", "Scatterplot Matrix", "Parallel Coordinates"};
 const gint ViewTypeIndices[] = {scatterplot, scatmat, parcoords};           
 const gchar *const ModeNames[] =
   {"ASCII", "binary", "R/S data", "XML", "MySQL", "Unknown"};
+
+
+void initOptions();
 
 gint
 parse_command_line (gint *argc, gchar **av, ggobid *gg)
@@ -44,16 +55,29 @@ parse_command_line (gint *argc, gchar **av, ggobid *gg)
      * -s:  ggobi initiated from inside S
     */
     if (strcmp (av[1], "-s") == 0)
-      gg->data_mode = Sprocess_data;
-
+      Options->data_mode = Sprocess_data;
+    else if (strcmp (av[1], "-ascii") == 0) {
+      Options->data_mode = ascii_data;
+    }
+    else if (strcmp (av[1], "-xml") == 0) {
 #ifdef USE_XML
-    else if (strcmp (av[1], "-xml") == 0)
-      gg->data_mode = xml_data;
-    else if (strcmp (av[1], "-v") == 0 || strcmp (av[1], "--validate") == 0) {
+      Options->data_mode = xml_data;
+#else
+      g_printerr("No xml support compiled for this version, ignoring %s\n", av[1]);
+#endif
+    } else if (strcmp (av[1], "-v") == 0 || strcmp (av[1], "--validate") == 0) {
+#ifdef USE_XML
       extern int xmlDoValidityCheckingDefaultValue;
       xmlDoValidityCheckingDefaultValue = 1;
-    }
+#else
+      g_printerr("No xml support compiled for this version, ignoring %s\n", av[1]);
 #endif
+   }
+
+   else if(strcmp(av[1], "-verbose") == 0) {
+      Options->verbose = true;
+   } 
+ 
 #ifdef USE_MYSQL
     else if (strcmp (av[1], "-mysql") == 0) {
       gg->data_mode = mysql_data;
@@ -86,9 +110,9 @@ parse_command_line (gint *argc, gchar **av, ggobid *gg)
 
   /* (gg->data_mode == ascii_data || gg->data_mode == binary_data) */
   if (*argc == 0)
-    gg->data_in = (stdin_p) ? g_strdup_printf ("stdin") : NULL;
+    Options->data_in = (stdin_p) ? g_strdup_printf ("stdin") : NULL;
   else
-    gg->data_in = g_strdup_printf (av[0]);
+    Options->data_in = g_strdup_printf (av[0]);
 
   return 1;
 }
@@ -179,10 +203,13 @@ ggobi_alloc()
   tmp->tour2d.idled = 0;
   tmp->tour1d.idled = 0;
 
+  totalNumGGobis++;
+
   all_ggobis = (ggobid **)
     g_realloc (all_ggobis, sizeof(ggobid*)*(num_ggobis+1));
   all_ggobis[num_ggobis] = tmp;
   num_ggobis++;
+  
 
   return (tmp);
 }
@@ -190,11 +217,12 @@ ggobi_alloc()
   /* Available so that we can call this from R
      without any confusion between which main().
    */
-gint GGOBI (main)(gint argc, gchar *argv[], gboolean processEvents)
+gint GGOBI(main)(gint argc, gchar *argv[], gboolean processEvents)
 {
-  extern void make_ggobi (gchar *, gboolean, ggobid *);
+  extern void make_ggobi (GGobiOptions *, gboolean, ggobid *);
   GdkVisual *vis;
   ggobid *gg;
+  initOptions();
 
   gtk_init (&argc, &argv);
 
@@ -202,22 +230,32 @@ gint GGOBI (main)(gint argc, gchar *argv[], gboolean processEvents)
 
   gg = ggobi_alloc();
 
+
   gg->mono_p = (vis->depth == 1 ||
                vis->type == GDK_VISUAL_STATIC_GRAY ||
                vis->type == GDK_VISUAL_GRAYSCALE);
 
-  g_print ("progname = %s\n", g_get_prgname());
-
-  gg->data_mode = unknown_data;
 
   parse_command_line (&argc, argv, gg);
-  g_print ("data_in = %s\n", gg->data_in);
 
-  make_ggobi (gg->data_in, processEvents, gg);
+  if(Options->verbose)
+    g_printerr("progname = %s\n", g_get_prgname());
 
-  g_free (gg->data_in);
+  if(Options->verbose)
+    g_printerr("data_in = %s\n", Options->data_in);
+
+  make_ggobi (Options, processEvents, gg);
+
+  g_free (Options->data_in);
 
   return (num_ggobis);
+}
+
+void
+initOptions()
+{
+  Options =  &options;
+  Options->data_mode = unknown_data;
 }
 
 
@@ -301,6 +339,18 @@ ggobi_get (gint which)
 {
  extern ggobid** all_ggobis;
  return (all_ggobis[which]);
+}
+
+gint
+ggobi_getIndex(ggobid *gg)
+{
+  int i;
+  for(i = 0; i < num_ggobis ; i++) {
+    if(all_ggobis[i] == gg)
+      return(i);
+  }
+
+ return(-1);
 }
 
 ggobid*
