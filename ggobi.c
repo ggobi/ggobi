@@ -88,53 +88,6 @@ parse_command_line (gint *argc, gchar **av, ggobid *gg)
     }
 
     /*
-     * -only n/N:  Draw a sample of n assuming there are N rows in the gg.
-     * -only a,n:  Starting with row a, read only n rows
-    */
-    else if (strcmp (av[1], "-only") == 0) {
-      gint n1 = -1, n2 = -1;
-      gchar spec[128];
-      gg->file_read_type = read_all;
-
-      /*
-       * we normally start at the first row of the file, and read until
-       * reaching EOF
-      */
-      gg->file_start_row = 0;
-      gg->file_length = 0;
-      gg->file_sample_size = 0;
-
-      strcpy (spec, av[2]);
-
-      if (strchr ((const gchar *) spec, '/') != NULL)
-        gg->file_read_type = draw_sample;
-      else if (strchr ((const gchar *) spec, ',') != NULL)
-        gg->file_read_type = read_block;
-
-      if (gg->file_read_type == read_all)
-        exit(0);
-
-      n1 = atoi (strtok (spec, ",/"));
-      n2 = atoi (strtok ((gchar *) NULL, ",/"));
-
-      if (n1 == -1 || n2 == -1)
-        exit(0);
-
-      if (gg->file_read_type == draw_sample) {
-        gg->file_sample_size = n1;
-        gg->file_length = n2;
-        g_printerr ("drawing a sample of %d of %d\n", n1, n2);
-      }
-      else if (gg->file_read_type == read_block) {
-        gg->file_start_row = n1 - 1;
-        gg->file_sample_size = n2;
-        g_printerr ("reading %d rows, starting with %d\n", n2, n1);
-      }
-
-	  av++; (*argc)--;
-    }
-
-    /*
      * -version:  print version date, return
     */
     else if (strcmp (av[1], "-version") == 0) {
@@ -261,7 +214,6 @@ gint GGOBI (main)(gint argc, gchar *argv[], gboolean processEvents)
   gg->std_type = 0;
   gg->data_mode = ascii;
   gg->nrows_in_plot = -1;
-  gg->file_read_type = read_all;
 
   parse_command_line (&argc, argv, gg);
   g_print ("data_in = %s\n", gg->data_in);

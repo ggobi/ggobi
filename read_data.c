@@ -78,20 +78,17 @@ rowlabels_read (gchar *ldata_in, gboolean init, ggobid *gg)
 
     k = 0;  /* k is the file row */
     while (fgets (initstr, INITSTRSIZE-1, fp) != NULL) {
-      if (gg->file_read_type == read_all || k == gg->file_rows_sampled[ncase])
-      {
-        len = MIN ((int) strlen (initstr), ROWLABLEN-1) ;
+      len = MIN ((int) strlen (initstr), ROWLABLEN-1) ;
 
-        /* trim trailing blanks, and eliminate the carriage return */
-        while (initstr[len-1] == ' ' || initstr[len-1] == '\n')
-          len-- ;
-        initstr[len] = '\0';
-        lbl = g_strdup (initstr);
-        g_array_append_val (gg->rowlab, lbl);
+      /* trim trailing blanks, and eliminate the carriage return */
+      while (initstr[len-1] == ' ' || initstr[len-1] == '\n')
+        len-- ;
+      initstr[len] = '\0';
+      lbl = g_strdup (initstr);
+      g_array_append_val (gg->rowlab, lbl);
   
-        if (ncase++ >= gg->nrows)
-          break;
-      }
+      if (ncase++ >= gg->nrows)
+        break;
       k++;  /* read the next row ... */
     }
   
@@ -113,13 +110,8 @@ rowlabels_read (gchar *ldata_in, gboolean init, ggobid *gg)
     if (init) {  /* apply defaults if initializing; else, do nothing */
 
       for (i=0; i<gg->nrows; i++) {
-        if (gg->file_read_type == read_all) {
-          lbl = g_strdup_printf ("%d", i+1);
-          g_array_append_val (gg->rowlab, lbl);
-        } else {
-          lbl = g_strdup_printf ("%ld", gg->file_rows_sampled[i]+1);
-          g_array_append_val (gg->rowlab, lbl);
-        }
+        lbl = g_strdup_printf ("%d", i+1);
+        g_array_append_val (gg->rowlab, lbl);
       }
     }
   }
@@ -280,7 +272,7 @@ rgroups_read (gchar *ldata_in, gboolean init, ggobid *gg)
   gboolean found = false;
   gboolean found_rg;
   FILE *fp;
-  glong *nels;
+  gint *nels;
   gint nr;
 
   if (gg->nrgroups > 0) rgroups_free (gg);
@@ -302,8 +294,8 @@ rgroups_read (gchar *ldata_in, gboolean init, ggobid *gg)
         rgroups_free (gg);
   
     /* rgroup_ids starts by containing the values in the file */
-    gg->rgroup_ids = (glong *) g_malloc (gg->nrows * sizeof (glong));
-    nels = (glong *) g_malloc (gg->nrows * sizeof (glong));
+    gg->rgroup_ids = (gint *) g_malloc (gg->nrows * sizeof (gint));
+    nels = (gint *) g_malloc (gg->nrows * sizeof (gint));
      
     i = 0;
     while ((fscanf (fp, "%d", &itmp) != EOF) && (i < gg->nrows))
@@ -328,8 +320,7 @@ rgroups_read (gchar *ldata_in, gboolean init, ggobid *gg)
     gg->rgroups = (rgroupd *) g_malloc (gg->nrows * sizeof (rgroupd));
     for (i=0; i<gg->nrows; i++) {
       nels[i] = gg->nrows/10;
-      gg->rgroups[i].els = (glong *)
-        g_malloc ((guint) nels[i] * sizeof (glong));
+      gg->rgroups[i].els = (gint *) g_malloc (nels[i] * sizeof (gint));
       gg->rgroups[i].nels = 0;
       gg->rgroups[i].included = true;
     }
@@ -351,9 +342,9 @@ rgroups_read (gchar *ldata_in, gboolean init, ggobid *gg)
           /* Reallocate els[k] if necessary */
           if (gg->rgroups[k].nels == nels[k]) {
             nels[k] *= 2;
-            gg->rgroups[k].els = (glong *)
+            gg->rgroups[k].els = (gint *)
               g_realloc ((gpointer) gg->rgroups[k].els,
-                (nels[k] * sizeof (glong)));
+                (nels[k] * sizeof (gint)));
           }
   
           /* Add the element, increment the element counter */
@@ -389,16 +380,16 @@ rgroups_read (gchar *ldata_in, gboolean init, ggobid *gg)
   
     /* Now reallocate the arrays within each rgroups structure */
     for (k=0; k<gg->nrgroups; k++) {
-      gg->rgroups[k].els = (glong *)
+      gg->rgroups[k].els = (gint *)
         g_realloc ((gpointer) gg->rgroups[k].els,
-          (gulong) (gg->rgroups[k].nels * sizeof (glong)));
+                    gg->rgroups[k].nels * sizeof (gint));
     }
   
     g_free ((gpointer) nels);
   }
 
   if (gg->nrgroups != 0)
-    g_printerr ("gg.nrgroups=%ld\n", gg->nrgroups);
+    g_printerr ("gg.nrgroups=%d\n", gg->nrgroups);
 
   return (found);
 }
@@ -473,51 +464,47 @@ point_glyphs_read (gchar *ldata_in, gboolean reinit, ggobid *gg)
         break;
       }
 
-      if (gg->file_read_type == read_all ||
-         (gg->file_rows_sampled != NULL && k == gg->file_rows_sampled[i]))
-      {
-        /*
-         * If the input is a single number on a line
-        */
-        if (glyph_format == glyphNumber) {
+      /*
+       * If the input is a single number on a line
+      */
+      if (glyph_format == glyphNumber) {
 
-          if (gid < 1 || gid > NGLYPHS) {
-            use_defaults = true;
-            break;
-          }
-
-          find_glyph_type_and_size (gid, &glyph);
-
-        /*
-         * Else if the input is a string and a number
-        */
-        } else {
-          glyph.type = mapGlyphName(gtype);
-
-          if(glyph.type == UNKNOWN_GLYPH) {
-            readGlyphErr ();
-            use_defaults = true;
-            break;
-          }
-
-          glyph.size = gsize;
-          if (gsize < 1 || gsize > 5) {
-            use_defaults = true;
-            readGlyphErr ();
-          }
-        }
-
-        if (use_defaults) {
+        if (gid < 1 || gid > NGLYPHS) {
+          use_defaults = true;
           break;
         }
 
-        gg->glyph_ids[i].type = gg->glyph_now[i].type =
-          gg->glyph_prev[i].type = glyph.type;
-        gg->glyph_ids[i].size = gg->glyph_now[i].size =
-          gg->glyph_prev[i].size = glyph.size;
+        find_glyph_type_and_size (gid, &glyph);
 
-        i++;  /* increment the array index */
+      /*
+       * Else if the input is a string and a number
+      */
+      } else {
+        glyph.type = mapGlyphName(gtype);
+
+        if (glyph.type == UNKNOWN_GLYPH) {
+          readGlyphErr ();
+          use_defaults = true;
+          break;
+        }
+
+        glyph.size = gsize;
+        if (gsize < 1 || gsize > 5) {
+          use_defaults = true;
+          readGlyphErr ();
+        }
       }
+
+      if (use_defaults) {
+        break;
+      }
+
+      gg->glyph_ids[i].type = gg->glyph_now[i].type =
+        gg->glyph_prev[i].type = glyph.type;
+      gg->glyph_ids[i].size = gg->glyph_now[i].size =
+        gg->glyph_prev[i].size = glyph.size;
+
+      i++;  /* increment the array index */
       k++;  /* increment the file's row counter */
     }
     g_free (gtype);
@@ -579,13 +566,9 @@ point_colors_read (gchar *ldata_in, gboolean reinit, ggobid *gg)
           break;
         }
 
-        if (gg->file_read_type == read_all ||
-           (gg->file_rows_sampled != NULL && k == gg->file_rows_sampled[i]))
-        {
-          gg->color_ids[i] = gg->color_now[i] = gg->color_prev[i] = id;
+        gg->color_ids[i] = gg->color_now[i] = gg->color_prev[i] = id;
 
-          i++;  /* increment the array index */
-        }
+        i++;  /* increment the array index */
         k++;  /* increment the file's row counter */
       }
       fclose (fp);
@@ -638,8 +621,8 @@ line_colors_read (gchar *ldata_in, gboolean reinit, ggobid *gg)
             break;
           }
 
-          gg->line.color.data[i] = gg->line.color_now.data[i] =
-            gg->line.color_prev.data[i] = id;
+          gg->line.color.vals[i] = gg->line.color_now.vals[i] =
+            gg->line.color_prev.vals[i] = id;
           i++;
         }
         fclose(fp);
@@ -665,7 +648,7 @@ segments_read (gchar *rootname, gboolean startup, ggobid *gg)
 
   if ((rootname == NULL) || (strcmp (rootname, "") == 0) || 
       strcmp (rootname, "stdin") == 0) {
-    segments_create (gg);
+/*    segments_create (gg);*/
     return (ok);
   } else {
     fname = g_malloc (128 * sizeof (gchar));
@@ -733,8 +716,10 @@ segments_read (gchar *rootname, gboolean startup, ggobid *gg)
     if (fclose (fp) == EOF)
       g_printerr ("Error in closing .lines file");
   }
-  else
-    segments_create (gg);
+/*
+ *else
+ *  segments_create (gg);
+*/
 
   if (fname != (gchar *) NULL)
     g_free ((gpointer) fname);
@@ -765,14 +750,11 @@ hidden_read (gchar *ldata_in, gboolean reinit, ggobid *gg)
       found = true;
 
   if (found) {
-    gint k = 0;  /* k is the file row, used if file_read_type != read_all */
     i = 0;
     while ((fscanf (fp, "%d", &itmp) != EOF) && (i < gg->nrows)) {
-      if (gg->file_read_type == read_all || k == gg->file_rows_sampled[i]) {
-        gg->hidden[i] = gg->hidden_now[i] = gg->hidden_prev[i] = (gboolean) itmp;
-        i++;
-      }
-      k++;
+      gg->hidden[i] = gg->hidden_now[i] = gg->hidden_prev[i] =
+        (gboolean) itmp;
+      i++;
     }
   
     if (i < gg->nrows)
@@ -799,9 +781,6 @@ missing_values_read (gchar *ldata_in, gboolean init, ggobid *gg)
   gint nmissing = 0;
   FILE *fp;
   gboolean found = false;
-
-  if (gg->file_read_type != read_all)
-    return;
 
   if (ldata_in != NULL && ldata_in != "" && strcmp (ldata_in,"stdin") != 0)
     if ((fp=open_ggobi_file_r (ldata_in, 1, suffixes, true)) != NULL)
@@ -832,7 +811,7 @@ missing_values_read (gchar *ldata_in, gboolean init, ggobid *gg)
         exit (1);
       }
 
-      gg->missing.data[row][col] = itmp;
+      gg->missing.vals[row][col] = itmp;
       if (itmp != 0) {
         nmissing++;
         gg->vardata[col].nmissing++;

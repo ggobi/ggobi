@@ -1,0 +1,121 @@
+<!--
+  The DTD for the GGobi input file format.
+  See data/flea.xml in the distribution for an example.
+-->
+
+<!-- The java parsers won't allow the use of +, so this bombs -->
+<!-- ENTITY % glyphTypes "( + | x | or | fr | oc | fc | . )" -->
+<!--
+ Defining plus as "&#43;" doesn't help; the parser still objects
+ to the + in the record definition.
+-->
+
+<!ENTITY % glyphTypes " plus | x | or | fr | oc | fc | . ">
+<!ENTITY % Boolean    " true | T | TRUE | false | F | FALSE ">
+
+<!ELEMENT description ( #PCDATA )>
+
+<!ELEMENT variables ( variable )*>
+<!-- Allows the name to be the only entry -->
+<!ELEMENT variable ( #PCDATA )>
+
+<!ELEMENT records ( record )*>
+<!ELEMENT record  ( #PCDATA )>
+
+<!-- "edges" would replace "segments", and edges can have variable names
+     and records -->
+<!-- ELEMENT edges ( edge )* -->
+<!-- ELEMENT edge EMPTY -->
+<!ELEMENT edgevariables ( edgevariable )*>
+<!ELEMENT edgevariable ( #PCDATA )>
+<!ELEMENT edgerecords ( edgerecord )*>
+<!ELEMENT edgerecord  ( #PCDATA )>
+<!ENTITY % lineTypes " solid | dot | dash ">
+<!-- -->
+
+<!-- ELEMENT ggobidata (description, (colormap)?,
+  variables, records,
+  (edges)*, (edgevariables)*, (edgerecords)*)
+-->
+<!ELEMENT ggobidata (description, (colormap)?,
+  variables, records,
+  (edgevariables)*, (edgerecords)*)
+>
+
+<!ELEMENT color ( #PCDATA) >
+<!-- id is a number or either of "fg" and "bg" -->
+<!ATTLIST color  
+       id CDATA     #IMPLIED
+       r  CDATA     #IMPLIED
+       g  CDATA     #IMPLIED
+       b  CDATA     #IMPLIED
+       range CDATA  #IMPLIED
+>
+      
+<!ELEMENT colormap (color)+ >
+<!ATTLIST colormap
+      size  CDATA  #REQUIRED
+      range CDATA  #IMPLIED
+      file  CDATA  #IMPLIED
+      type  CDATA  " xml | table "
+>
+         
+
+<!ATTLIST records
+     count CDATA  #REQUIRED
+>
+
+<!ATTLIST variable
+    name          NMTOKEN #IMPLIED
+    transformName NMTOKEN #IMPLIED
+    missingValue  CDATA   #IMPLIED
+    group         CDATA   #IMPLIED
+>
+
+<!ATTLIST record
+   label     NMTOKEN                   #REQUIRED
+   id        NMTOKEN                   #IMPLIED
+   color     CDATA                     #IMPLIED
+   glyphSize ( 0 | 1 | 2 | 3 | 4 | 5 ) #IMPLIED
+   glyphType ( %glyphTypes; )          #IMPLIED
+   hidden    (foo | bar)               "FALSE"
+   group     CDATA                     #IMPLIED
+>   
+
+<!-- ATTLIST edge
+   source      CDATA  #REQUIRED
+   destination CDATA  #REQUIRED
+   color       CDATA  #IMPLIED
+   width       CDATA  #IMPLIED
+-->
+
+<!ATTLIST edgevariables
+     count CDATA  #REQUIRED
+>
+<!ATTLIST edgevariable
+    name          NMTOKEN #IMPLIED
+    missingValue  CDATA   #IMPLIED
+>
+
+<!ATTLIST edgerecords
+   count CDATA  #REQUIRED
+>
+<!ATTLIST edgerecord
+   source      CDATA                     #REQUIRED
+   destination CDATA                     #REQUIRED
+   label       NMTOKEN                   #IMPLIED
+   id          NMTOKEN                   #IMPLIED
+   color       CDATA                     #IMPLIED
+   lineWidth   ( 0 | 1 | 2 | 3 | 4 | 5 ) #IMPLIED
+   lineType    ( %lineTypes; )           #IMPLIED
+   hidden      ( %Boolean; )             "FALSE"
+   group       CDATA                     #IMPLIED 
+>   
+
+<!ATTLIST ggobidata
+   numRecords   CDATA                     #REQUIRED 
+   missingValue CDATA                     #IMPLIED
+   color        CDATA                     #IMPLIED
+   glyphSize    ( 0 | 1 | 2 | 3 | 4 | 5 ) #IMPLIED
+   glyphType    ( %glyphTypes; )          #IMPLIED   
+>

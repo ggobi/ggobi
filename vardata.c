@@ -148,10 +148,10 @@ vardata_stats_set (ggobid *gg)
   */
 
   for (j=0; j<gg->ncols; j++) {
-    gg->vardata[j].lim_raw.min = gg->raw.data[0][j];
-    gg->vardata[j].lim_raw.max = gg->raw.data[0][j];
-    gg->vardata[j].lim_tform.min = gg->tform2.data[0][j];
-    gg->vardata[j].lim_tform.max = gg->tform2.data[0][j];
+    gg->vardata[j].lim_raw.min = gg->raw.vals[0][j];
+    gg->vardata[j].lim_raw.max = gg->raw.vals[0][j];
+    gg->vardata[j].lim_tform.min = gg->tform2.vals[0][j];
+    gg->vardata[j].lim_tform.max = gg->tform2.vals[0][j];
   }
 
   for (j=0; j<gg->ncols; j++) {
@@ -162,18 +162,18 @@ vardata_stats_set (ggobid *gg)
         ;
       else {
 
-        if (gg->raw.data[i][j] < gg->vardata[j].lim_raw.min)
-          gg->vardata[j].lim_raw.min = gg->raw.data[i][j];
-        else if (gg->raw.data[i][j] > gg->vardata[j].lim_raw.max)
-          gg->vardata[j].lim_raw.max = gg->raw.data[i][j];
+        if (gg->raw.vals[i][j] < gg->vardata[j].lim_raw.min)
+          gg->vardata[j].lim_raw.min = gg->raw.vals[i][j];
+        else if (gg->raw.vals[i][j] > gg->vardata[j].lim_raw.max)
+          gg->vardata[j].lim_raw.max = gg->raw.vals[i][j];
 
-        if (gg->tform2.data[i][j] < gg->vardata[j].lim_tform.min)
-          gg->vardata[j].lim_tform.min = gg->tform2.data[i][j];
-        else if (gg->tform2.data[i][j] > gg->vardata[j].lim_tform.max)
-          gg->vardata[j].lim_tform.max = gg->tform2.data[i][j];
+        if (gg->tform2.vals[i][j] < gg->vardata[j].lim_tform.min)
+          gg->vardata[j].lim_tform.min = gg->tform2.vals[i][j];
+        else if (gg->tform2.vals[i][j] > gg->vardata[j].lim_tform.max)
+          gg->vardata[j].lim_tform.max = gg->tform2.vals[i][j];
 
-        sumv[j] += gg->raw.data[i][j];
-        x[np] = gg->raw.data[i][j];
+        sumv[j] += gg->raw.vals[i][j];
+        x[np] = gg->raw.vals[i][j];
         np++;
       }
     }

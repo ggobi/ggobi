@@ -37,7 +37,6 @@ typedef struct {
  lcoords iscale;
  icoords ishift;
 
-
 /*
  * button and key event information
 */

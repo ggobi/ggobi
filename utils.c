@@ -395,7 +395,7 @@ address_check (ggobid *gg)
 {
   g_printerr ("::: vars.h :::\n");
   g_printerr ("data_mode %d world %d nseg %d rowlab %s jitfac %f\n",
-    gg->data_mode, (gint) gg->world.data[0][0], gg->nsegments,
+    gg->data_mode, (gint) gg->world.vals[0][0], gg->nsegments,
     g_array_index (gg->rowlab, gchar *, 0), gg->jitter.factor);
 
   return 1;

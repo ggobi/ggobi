@@ -81,10 +81,10 @@ p1d_reproject (splotd *sp, glong **world_data, ggobid *gg)
 
   if (display->missing_p) {
     for (i=0; i<gg->nrows_in_plot; i++)
-      yy[i] = (gfloat) gg->missing.data[gg->rows_in_plot[i]][jvar];
+      yy[i] = (gfloat) gg->missing.vals[gg->rows_in_plot[i]][jvar];
   } else {
     for (i=0; i<gg->nrows_in_plot; i++)
-      yy[i] = gg->tform2.data[gg->rows_in_plot[i]][jvar];
+      yy[i] = gg->tform2.vals[gg->rows_in_plot[i]][jvar];
   }
 
   p1d_spread_var (display, yy, sp, gg);
@@ -116,11 +116,11 @@ p1d_reproject (splotd *sp, glong **world_data, ggobid *gg)
     */
     if (!display->missing_p) {
       if (display->p1d_orientation == VERTICAL) {
-        sp->planar[m].x += gg->jitdata.data[m][jvar];
-        sp->planar[m].y -= gg->jitdata.data[m][jvar];
+        sp->planar[m].x += gg->jitdata.vals[m][jvar];
+        sp->planar[m].y -= gg->jitdata.vals[m][jvar];
       } else {
-        sp->planar[m].x -= gg->jitdata.data[m][jvar];
-        sp->planar[m].y += gg->jitdata.data[m][jvar];
+        sp->planar[m].x -= gg->jitdata.vals[m][jvar];
+        sp->planar[m].y += gg->jitdata.vals[m][jvar];
       }
     }
   }

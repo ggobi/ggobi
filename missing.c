@@ -28,7 +28,7 @@ missing_world_free (ggobid *gg)
 void
 missing_world_alloc (ggobid *gg)
 {
-  if (gg->missing_world.data != NULL) missing_world_free (gg);
+  if (gg->missing_world.vals != NULL) missing_world_free (gg);
 
   arrayl_alloc (&gg->missing_world, gg->nrows, gg->ncols);
   arrayl_alloc (&gg->missing_jitter, gg->nrows, gg->ncols);
@@ -57,11 +57,11 @@ missing_lim_set (ggobid *gg)
   gint i, j;
   gshort min, max;
 
-  min = max = gg->missing.data[0][0];
+  min = max = gg->missing.vals[0][0];
   for (i=0; i<gg->nrows; i++) {
     for (j=0; j<gg->ncols; j++) {
-      if (gg->missing.data[i][j] < min) min = gg->missing.data[i][j];
-      if (gg->missing.data[i][j] > max) max = gg->missing.data[i][j];
+      if (gg->missing.vals[i][j] < min) min = gg->missing.vals[i][j];
+      if (gg->missing.vals[i][j] > max) max = gg->missing.vals[i][j];
     }
   }
   gg->missing_lim.min = (gfloat) min;
@@ -85,12 +85,12 @@ missing_jitter_variable (gint jcol, ggobid *gg)
 
     if (gg->jitter.convex) {
       fworld = (gfloat)
-        (gg->missing_world.data[m][jcol] - gg->missing_jitter.data[m][jcol]);
+        (gg->missing_world.vals[m][jcol] - gg->missing_jitter.vals[m][jcol]);
       fjit = gg->missing_jitter_factor * (frand - fworld);
     } else
       fjit = gg->missing_jitter_factor * frand;
 
-    gg->missing_jitter.data[m][jcol] = (glong) fjit;
+    gg->missing_jitter.vals[m][jcol] = (glong) fjit;
   }
 }
 
@@ -127,11 +127,11 @@ missing_to_world (ggobid *gg)
   for (j=0; j<gg->ncols; j++) {
     for (i=0; i<gg->nrows_in_plot; i++) {
       m = gg->rows_in_plot[i];
-      ftmp = -1.0 + 2.0*(gg->missing.data[m][j] - min) / range;
-      gg->missing_world.data[m][j] = (glong) (precis * ftmp);
+      ftmp = -1.0 + 2.0*(gg->missing.vals[m][j] - min) / range;
+      gg->missing_world.vals[m][j] = (glong) (precis * ftmp);
 
       /* Add in the jitter values */
-      gg->missing_world.data[m][j] += gg->missing_jitter.data[m][j];
+      gg->missing_world.vals[m][j] += gg->missing_jitter.vals[m][j];
     }
   }
 }

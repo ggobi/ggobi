@@ -163,7 +163,7 @@ GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
        g_free (lbl);
      }
 
-     gg->raw.data[i][j] = values[i + j*nr];
+     gg->raw.vals[i][j] = values[i + j*nr];
    }
   }
 
@@ -372,7 +372,7 @@ GGOBI(getViewTypeName)(enum displaytyped type)
 const gfloat** 
 GGOBI(getRawData)(ggobid *gg)
 {
- return((const gfloat**) gg->raw.data);
+ return((const gfloat**) gg->raw.vals);
 }
 
 /*
@@ -382,7 +382,7 @@ GGOBI(getRawData)(ggobid *gg)
 const gfloat** 
 GGOBI(getTFormData)(ggobid *gg)
 {
- return((const gfloat **)gg->tform2.data);
+ return((const gfloat **)gg->tform2.vals);
 }
 
 
@@ -1023,8 +1023,8 @@ GGOBI(setVariableValues)(int whichVar, double *vals, int num, gboolean update, g
 {
   int i;
   for(i = 0; i < num; i++) {
-    gg->raw.data[i][whichVar] = gg->tform1.data[i][whichVar]  =
-             gg->tform2.data[i][whichVar] = vals[i];
+    gg->raw.vals[i][whichVar] = gg->tform1.vals[i][whichVar]  =
+             gg->tform2.vals[i][whichVar] = vals[i];
   }
 
 

@@ -58,9 +58,9 @@ impute_fixed (gint impute_type, ggobid *gg)
 
       for (i=0; i<gg->nrows_in_plot; i++) {
         m = gg->rows_in_plot[i];
-        if (!gg->missing.data[m][j]) {
-          if (gg->raw.data[m][j] > maxval) maxval = gg->raw.data[m][j];
-          if (gg->raw.data[m][j] < minval) minval = gg->raw.data[m][j];
+        if (!gg->missing.vals[m][j]) {
+          if (gg->raw.vals[m][j] > maxval) maxval = gg->raw.vals[m][j];
+          if (gg->raw.vals[m][j] < minval) minval = gg->raw.vals[m][j];
         }
       }
       range = maxval - minval;
@@ -73,8 +73,8 @@ impute_fixed (gint impute_type, ggobid *gg)
 
       for (i=0; i<gg->nrows_in_plot; i++) {
         m = gg->rows_in_plot[i];
-        if (gg->missing.data[m][j]) {
-          gg->raw.data[m][j] = gg->tform1.data[m][j] = gg->tform2.data[m][j] =
+        if (gg->missing.vals[m][j]) {
+          gg->raw.vals[m][j] = gg->tform1.vals[m][j] = gg->tform2.vals[m][j] =
             impval;
         }
       }
@@ -96,9 +96,9 @@ impute_fixed (gint impute_type, ggobid *gg)
         m = gg->rows_in_plot[i];
         for (k=0; k<nselected_cols; k++) {
           j = selected_cols[k];
-          if (gg->missing.data[m][j]) {
-            gg->raw.data[m][j] =
-              gg->tform1.data[m][j] = gg->tform2.data[m][j] = impval;
+          if (gg->missing.vals[m][j]) {
+            gg->raw.vals[m][j] =
+              gg->tform1.vals[m][j] = gg->tform2.vals[m][j] = impval;
           }
         }
       }
@@ -127,13 +127,13 @@ impute_single (gint *missv, gint nmissing, gint *presv, gint npresent,
       rrand = (gfloat) randvalue();
 
       if ( ((npresent - k) * rrand) < 1.0 ) {
-        gg->raw.data[missv[i]][col] = gg->raw.data[presv[k]][col];
+        gg->raw.vals[missv[i]][col] = gg->raw.vals[presv[k]][col];
         /*
          * This is the default -- transformations will be applied
          * later to those that need it.
         */
-        gg->tform1.data[missv[i]][col] = gg->tform1.data[presv[k]][col];
-        gg->tform2.data[missv[i]][col] = gg->tform2.data[presv[k]][col];
+        gg->tform1.vals[missv[i]][col] = gg->tform1.vals[presv[k]][col];
+        gg->tform2.vals[missv[i]][col] = gg->tform2.vals[presv[k]][col];
         break;
       }
     }
@@ -172,9 +172,9 @@ impute_random (ggobid *gg)
         */
         for (i=0; i<gg->nrows_in_plot; i++) {
           k = gg->rows_in_plot[i];
-          if (gg->clusterid.data[k] == n) { 
+          if (gg->clusterid.vals[k] == n) { 
             if (!gg->hidden_now[k]) {   /* ignore erased values altogether */
-              if (gg->missing.data[k][j])
+              if (gg->missing.vals[k][j])
                 missv[nmissing++] = k;
               else
                 presv[npresent++] = k;
@@ -197,7 +197,7 @@ impute_random (ggobid *gg)
       for (i=0; i<gg->nrows_in_plot; i++) {
         k = gg->rows_in_plot[i];
         if (!gg->hidden_now[k]) {   /* ignore erased values altogether */
-          if (gg->missing.data[k][j])
+          if (gg->missing.vals[k][j])
             missv[nmissing++] = k;
           else
             presv[npresent++] = k;

@@ -20,7 +20,6 @@ main(int argc, char *argv[])
 
   gg->data_mode = ascii;
   gg->nrows_in_plot = -1;
-  gg->file_read_type = read_all;
   gg->displays = NULL;
   gg->nrows = gg->ncols = 0;
   globals_init (gg); /*-- variables that don't depend on the data --*/

@@ -141,7 +141,7 @@ clusters_set (ggobid *gg) {
             gg->glyph_ids[i].size == gg->clusv[n].glyphsize &&
             gg->color_ids[i] == gg->clusv[n].color)
         {
-          gg->clusterid.data[i] = n;
+          gg->clusterid.vals[i] = n;
         }
       }
     }
@@ -157,7 +157,7 @@ clusters_set (ggobid *gg) {
   if (nclust > 1) {
     for (i=0; i<gg->nrows; i++) {
       if (gg->sampled[i]) {
-        k = gg->clusterid.data[i];
+        k = gg->clusterid.vals[i];
 
         gg->hidden[i] = gg->clusv[k].hidden;
         gg->included[i] = gg->clusv[k].included;

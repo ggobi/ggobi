@@ -157,7 +157,7 @@ write_xml_record(FILE *f, ggobid *gg, gint i)
   fprintf(f, ">\n");
 
   for(j = 0; j < gg->ncols; j++) {
-     writeFloat (f, gg->raw.data[i][j]);
+     writeFloat (f, gg->raw.vals[i][j]);
      if (j < gg->ncols-1 )
        fprintf(f, " ");
   }

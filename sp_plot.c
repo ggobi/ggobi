@@ -158,17 +158,17 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
         else if (!display->options.missings_show_p && gg->nmissing > 0) {
           switch (display->displaytype) {
             case parcoords:
-              if (gg->missing.data[m][sp->p1dvar])
+              if (gg->missing.vals[m][sp->p1dvar])
                 draw_case = false;
               break;
 
             case scatmat:
               if (sp->p1dvar != -1) {
-                if (gg->missing.data[m][sp->p1dvar])
+                if (gg->missing.vals[m][sp->p1dvar])
                   draw_case = false;
               } else {
-                if (gg->missing.data[m][sp->xyvars.x] ||
-                    gg->missing.data[m][sp->xyvars.y])
+                if (gg->missing.vals[m][sp->xyvars.x] ||
+                    gg->missing.vals[m][sp->xyvars.y])
                 {
                   draw_case = false;
                 }
@@ -511,25 +511,25 @@ splot_line_colors_used_get (splotd *sp, gint *ncolors_used,
    * currently in use into the line_colors_used[] vector.
   */
   *ncolors_used = 1;
-  colors_used[0] = gg->line.color_now.data[0];
+  colors_used[0] = gg->line.color_now.vals[0];
 
   if (display->options.segments_directed_show_p ||
       display->options.segments_undirected_show_p)
   {
     for (i=0; i<gg->nsegments; i++) {
-      if (gg->line.hidden_now.data[i])
+      if (gg->line.hidden_now.vals[i])
         new_color = false;
       else {
         new_color = true;
         for (k=0; k<*ncolors_used; k++) {
-          if (colors_used[k] == gg->line.color_now.data[i]) {
+          if (colors_used[k] == gg->line.color_now.vals[i]) {
             new_color = false;
             break;
           }
         }
       }
       if (new_color) {
-        colors_used[*ncolors_used] = gg->line.color_now.data[i];
+        colors_used[*ncolors_used] = gg->line.color_now.vals[i];
         (*ncolors_used)++;
       }
     }
@@ -560,7 +560,7 @@ segments_draw (splotd *sp, ggobid *gg)
       nl = 0;
 
       for (j=0; j<gg->nsegments; j++) {
-        if (gg->line.hidden_now.data[j]) {
+        if (gg->line.hidden_now.vals[j]) {
           doit = false;
         } else {
           from = gg->segment_endpoints[j].a - 1;
@@ -584,7 +584,7 @@ segments_draw (splotd *sp, ggobid *gg)
         }
 
         if (doit) {
-          if (gg->line.color_now.data[j] == current_color) {
+          if (gg->line.color_now.vals[j] == current_color) {
             sp->segments[nl].x1 = sp->screen[from].x;
             sp->segments[nl].y1 = sp->screen[from].y;
             sp->segments[nl].x2 = sp->screen[to].x;

@@ -76,20 +76,22 @@ read_mysql_data(MySQLLoginInfo *login, int init, ggobid *gg)
 
   /* This should go into its own routine in the core ggobi. */
   vgroups_sort(gg);
-  { int j;
+  { gint j;
     for (j=0; j<gg->ncols; j++)
       gg->vardata[j].groupid = gg->vardata[j].groupid_ori;
   }
 
-  segments_alloc(gg->nsegments, gg);
+  segments_alloc (gg->nsegments, gg);
 
-  if(gg->nsegments < 1)
-   segments_create(gg);
+/*
+ *if(gg->nsegments < 1)
+ * segments_create(gg);
+*/
 
 
     /* Now we have to read in the glyph and color data. */
-  if(init)
-    dataset_init(gg, true);
+  if (init)
+    dataset_init (gg, true);
 
   return(1); /* everything was ok*/
 }

@@ -373,17 +373,17 @@ splot_world_to_plane (cpaneld *cpanel, splotd *sp, ggobid *gg)
       switch (cpanel->projection) {
         case P1PLOT:
           p1d_reproject (sp,
-            (display->missing_p) ? gg->missing_world.data : gg->world.data, gg);
+            (display->missing_p) ? gg->missing_world.vals : gg->world.vals, gg);
           break;
 
         case XYPLOT:
           xy_reproject (sp,
-            (display->missing_p) ? gg->missing_world.data : gg->world.data, gg);
+            (display->missing_p) ? gg->missing_world.vals : gg->world.vals, gg);
           break;
 
         case TOUR2D:
           tour_reproject (sp,
-            (display->missing_p) ? gg->missing_world.data : gg->world.data, gg);
+            (display->missing_p) ? gg->missing_world.vals : gg->world.vals, gg);
           break;
       }
       break;
@@ -392,15 +392,15 @@ splot_world_to_plane (cpaneld *cpanel, splotd *sp, ggobid *gg)
 
       if (sp->p1dvar == -1)
         xy_reproject (sp,
-          (display->missing_p) ? gg->missing_world.data : gg->world.data, gg);
+          (display->missing_p) ? gg->missing_world.vals : gg->world.vals, gg);
       else
         p1d_reproject (sp,
-          (display->missing_p) ? gg->missing_world.data : gg->world.data, gg);
+          (display->missing_p) ? gg->missing_world.vals : gg->world.vals, gg);
       break;
 
     case parcoords:
       p1d_reproject (sp,
-        (display->missing_p) ? gg->missing_world.data : gg->world.data, gg);
+        (display->missing_p) ? gg->missing_world.vals : gg->world.vals, gg);
       break;
   }
 }
@@ -577,8 +577,8 @@ splot_plane_to_world (splotd *sp, gint ipt, ggobid *gg)
 
   switch (cpanel->projection) {
     case XYPLOT:
-      gg->world.data[ipt][sp->xyvars.x] = sp->planar[ipt].x;
-      gg->world.data[ipt][sp->xyvars.y] = sp->planar[ipt].y;
+      gg->world.vals[ipt][sp->xyvars.x] = sp->planar[ipt].x;
+      gg->world.vals[ipt][sp->xyvars.y] = sp->planar[ipt].y;
       break;
 
     default:

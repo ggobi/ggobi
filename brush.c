@@ -120,12 +120,12 @@ reinit_transient_brushing (ggobid *gg)
   }
   if (line_painting_p) {
     for (k=0; k<gg->nsegments; m++) {
-      gg->line.color_now.data[k] =
-        gg->line.color_prev.data[k] =
-        gg->line.color.data[k];
-      gg->line.hidden_now.data[k] =
-        gg->line.hidden_prev.data[k] =
-        gg->line.hidden.data[k];
+      gg->line.color_now.vals[k] =
+        gg->line.color_prev.vals[k] =
+        gg->line.color.vals[k];
+      gg->line.hidden_now.vals[k] =
+        gg->line.hidden_prev.vals[k] =
+        gg->line.hidden.vals[k];
     }
   }
 
@@ -671,12 +671,12 @@ void
 line_brush_undo (splotd *sp, ggobid *gg) {
   gint k;
   for (k=0; k<gg->nsegments; k++) {
-    gg->line.color.data[k] =
-      gg->line.color_now.data[k] =
-      gg->line.color_prev.data[k];
-    gg->line.hidden.data[k] =
-      gg->line.hidden_now.data[k] =
-      gg->line.hidden_prev.data[k];
+    gg->line.color.vals[k] =
+      gg->line.color_now.vals[k] =
+      gg->line.color_prev.vals[k];
+    gg->line.hidden.vals[k] =
+      gg->line.hidden_now.vals[k] =
+      gg->line.hidden_prev.vals[k];
   }
   splot_redraw (sp, FULL, gg);
 }
@@ -721,10 +721,10 @@ update_line_color_vectors (gint k, gboolean changed, ggobid *gg) {
 
 /* setting the value of doit */
   if (!changed) {
-    if (gg->line.xed_by_brush.data[k])
-      doit = (gg->line.color_now.data[k] != gg->color_id);
+    if (gg->line.xed_by_brush.vals[k])
+      doit = (gg->line.color_now.vals[k] != gg->color_id);
     else
-      doit = (gg->line.color_now.data[k] != gg->line.color.data[k]);
+      doit = (gg->line.color_now.vals[k] != gg->line.color.vals[k]);
   }
 /* */
 
@@ -732,16 +732,16 @@ update_line_color_vectors (gint k, gboolean changed, ggobid *gg) {
    * If doit is false, it's guaranteed that there will be no change.
   */
   if (doit) {
-    if (gg->line.xed_by_brush.data[k]) {
+    if (gg->line.xed_by_brush.vals[k]) {
       switch (cpanel->br_mode) {
         case BR_PERSISTENT:
-          gg->line.color.data[k] = gg->line.color_now.data[k] = gg->color_id;
+          gg->line.color.vals[k] = gg->line.color_now.vals[k] = gg->color_id;
           break;
         case BR_TRANSIENT:
-          gg->line.color_now.data[k] = gg->color_id;
+          gg->line.color_now.vals[k] = gg->color_id;
           break;
       }
-    } else gg->line.color_now.data[k] = gg->line.color.data[k];
+    } else gg->line.color_now.vals[k] = gg->line.color.vals[k];
   }
 
   return (doit);
@@ -782,10 +782,10 @@ update_line_hidden_vectors (gint k, gboolean changed, ggobid *gg) {
 
 /* setting the value of doit */
   if (!changed) {
-    if (gg->line.xed_by_brush.data[k])
-      doit = (gg->line.hidden_now.data[k] != true);
+    if (gg->line.xed_by_brush.vals[k])
+      doit = (gg->line.hidden_now.vals[k] != true);
     else
-      doit = (gg->line.hidden_now.data[k] != gg->line.hidden.data[k]);
+      doit = (gg->line.hidden_now.vals[k] != gg->line.hidden.vals[k]);
   }
 /* */
 
@@ -793,16 +793,16 @@ update_line_hidden_vectors (gint k, gboolean changed, ggobid *gg) {
    * If doit is false, it's guaranteed that there will be no change.
   */
   if (doit) {
-    if (gg->line.xed_by_brush.data[k]) {
+    if (gg->line.xed_by_brush.vals[k]) {
       switch (cpanel->br_mode) {
         case BR_PERSISTENT:
-          gg->line.hidden.data[k] = gg->line.hidden_now.data[k] = true;
+          gg->line.hidden.vals[k] = gg->line.hidden_now.vals[k] = true;
           break;
         case BR_TRANSIENT:
-          gg->line.hidden_now.data[k] = true;
+          gg->line.hidden_now.vals[k] = true;
           break;
       }
-    } else gg->line.hidden_now.data[k] = gg->line.hidden.data[k];
+    } else gg->line.hidden_now.vals[k] = gg->line.hidden.vals[k];
   }
 
   return (doit);
@@ -846,14 +846,14 @@ active_paint_lines (ggobid *gg)
   /* Zero out xed_by_brush[] before looping */
   gg->line.nxed_by_brush = 0;
   for (k=0; k<gg->nsegments; k++)
-    gg->line.xed_by_brush.data[k] = false;
+    gg->line.xed_by_brush.vals[k] = false;
  
   for (k=0; k<gg->nsegments; k++) {
 
     if (xed_by_brush (k, gg)) {
 
       gg->line.nxed_by_brush++ ;
-      gg->line.xed_by_brush.data[k] = true;
+      gg->line.xed_by_brush.vals[k] = true;
 
       /* brush other members of this line group */
       if (gg->nlgroups > 0) {
@@ -862,7 +862,7 @@ active_paint_lines (ggobid *gg)
         gp = gg->lgroup_ids[k];
         if (gp < gg->nlgroups) {
           for (p=0; p<gg->rgroups[gp].nels; p++) {
-              gg->xed_by_brush.data[gg->lgroups[gp].els[p]] = 1;
+              gg->xed_by_brush.vals[gg->lgroups[gp].els[p]] = 1;
           }
         }
 */

@@ -124,13 +124,13 @@ write_ascii_data (gchar *rootname, gint *rowv, gint nr, gint *colv, gint nc,
     g_free (message);
     return false;
   } else {
-    fdatap = (gg->save.stage == RAWDATA) ? gg->raw.data : gg->tform2.data;
+    fdatap = (gg->save.stage == RAWDATA) ? gg->raw.vals : gg->tform2.vals;
 
     for (i=0; i<nr; i++) {
       ir = rowv[i];
       for (j=0; j<nc; j++) {
         jc = colv[j];
-        if (gg->nmissing > 0 && gg->missing.data[ir][jc]) {
+        if (gg->nmissing > 0 && gg->missing.vals[ir][jc]) {
           if (gg->save.missing_ind == MISSINGSNA) {
             fprintf (fp, "NA ");
           }  else if (gg->save.missing_ind == MISSINGSDOT) {
@@ -315,7 +315,7 @@ ggobi_file_set_create (gchar *rootname, ggobid *gg)
     /*-- decide whether to save line colors --*/
     skipit = true;
     for (k=0; k<gg->nsegments; k++) {
-      if (gg->line.color_now.data[k] != 0) {
+      if (gg->line.color_now.vals[k] != 0) {
         skipit = false;
         break;
       }
@@ -366,7 +366,7 @@ ggobi_file_set_create (gchar *rootname, ggobid *gg)
       return false;
     } else {
       for (j=0; j<nr; j++)
-        fprintf (fp, "%ld ", gg->rgroup_ids[rowv[j]] + 1);
+        fprintf (fp, "%d ", gg->rgroup_ids[rowv[j]] + 1);
       fprintf (fp, "\n");
       fclose (fp);
     }
@@ -420,7 +420,7 @@ write_binary_data (gchar *rootname, gint *rowv, gint nr, gint *colv, gint nc,
     fwrite ((gchar *) &nr, sizeof (nr), 1, fp);
     fwrite ((gchar *) &nc, sizeof (nc), 1, fp);
 
-    datap = (gg->save.stage == RAWDATA) ? gg->raw.data : gg->tform2.data;
+    datap = (gg->save.stage == RAWDATA) ? gg->raw.vals : gg->tform2.vals;
 
     for (i=0; i<nr; i++) {
       ir = rowv[i];
@@ -430,7 +430,7 @@ write_binary_data (gchar *rootname, gint *rowv, gint nr, gint *colv, gint nc,
           jc = j;
         else
           jc = colv[j];  /* Write the columns as specified */
-        if (gg->nmissing > 0 && gg->missing.data[i][j])
+        if (gg->nmissing > 0 && gg->missing.vals[i][j])
           xfoo = FLT_MAX;
         else
           xfoo = datap[ir][jc];
@@ -656,7 +656,7 @@ linedata_get (endpointsd *tlinks, gshort *tcolors,
     if (start_a != -1 && start_b != -1) {  /* Both ends included */
       tlinks[nl].a = start_a + 1;
       tlinks[nl].b = start_b + 1;
-      tcolors[nl] = gg->line.color_now.data[k];
+      tcolors[nl] = gg->line.color_now.vals[k];
       nl++;
     }
   }
@@ -679,7 +679,7 @@ save_lines (gchar *rootname, gboolean lines_p, gboolean colors_p,
       nl = gg->nsegments;
       tlinks = gg->segment_endpoints;
       if (!gg->mono_p)
-        linecolors = gg->line.color_now.data;
+        linecolors = gg->line.color_now.vals;
 
     } else {
       /*
@@ -800,7 +800,7 @@ save_missing (gchar *rootname, gint *rowv, gint nr, gint *colv, gint nc,
           jc = j;
         else
           jc = colv[j];  /* Write the columns as specified */
-          fprintf (fp, "%d ", gg->missing.data[m][jc]);
+          fprintf (fp, "%d ", gg->missing.vals[m][jc]);
       }
       fprintf (fp, "\n");
     }

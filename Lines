@@ -67,6 +67,8 @@
 29477   6/21  added simple imputation of missing values
 29475   6/23  using var stat panel to specify vars for scatmat, parcoords
 29791   6/27  point motion (including undo) 
+30067   6/29  starting to add edge variables; working in read_xml.c
+29798   6/29  removed command line sampling; better to use R or a db
 
 note: There are about 40.8K lines in xgobi,
 subtracting the rpc, xgvis and tour code.

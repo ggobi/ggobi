@@ -5,7 +5,6 @@
 /* types.h */
 
 typedef enum {ascii, binary, Sprocess, xml, mysql} DataMode;
-typedef enum {read_all, read_block, draw_sample} FileReadType;
 typedef enum {PLUS=1, X, OR, FR, OC, FC, DOT,UNKNOWN_GLYPH} GlyphType;
 
 typedef struct {
@@ -30,35 +29,35 @@ typedef struct {
 /*-- arrays --*/
 /*-- floating point: for gg.raw_data, tform1, tform2 --*/
 typedef struct {
-  gfloat **data;
+  gfloat **vals;
   gint nrows, ncols;
 } array_f;
 /*-- short: for gg.missing --*/
 typedef struct {
-  gshort **data;
+  gshort **vals;
   gint nrows, ncols;
 } array_s;
 /*-- long: for gg.world, jitdata --*/
 typedef struct {
-  glong **data;
+  glong **vals;
   gint nrows, ncols;
 } array_l;
 
 /*-- vectors --*/
 typedef struct {
-  gfloat *data;
-  gint nels;
+  gfloat *vals;
+  glong nels;
 } vector_f;
 typedef struct {
-  gint *data;
+  gint *vals;
   gint nels;
 } vector_i;
 typedef struct {
-  gshort *data;
+  gshort *vals;
   gint nels;
 } vector_s;
 typedef struct {
-  gboolean *data;
+  gboolean *vals;
   gint nels;
 } vector_b;
 
@@ -139,9 +138,7 @@ typedef struct {
 
 /* row groups */
 typedef struct {
-  glong id;
-  gulong *els;
-  glong nels;
+  gint id, nels, *els;
   gboolean included;  /* for linked brushing */
   gboolean sampled;   /* for subsetting */
 } rgroupd;

@@ -174,15 +174,15 @@ sphere_varcovar_set (ggobid *gg)
     var = gg->sphere.spherevars[k];
 
     for (i=0; i<n; i++)
-      tmpf += gg->tform1.data[gg->rows_in_plot[i]][var];
+      tmpf += gg->tform1.vals[gg->rows_in_plot[i]][var];
     gg->sphere.tform1_mean[var] = tmpf / ((gfloat)n);
 
     tmpf = 0.;
     for (i=0; i<gg->ncols; i++) {
       for (j=0; j<n; j++) {
         tmpf = tmpf +
-          (gg->tform1.data[gg->rows_in_plot[j]][var] - gg->sphere.tform1_mean[var]) *
-          (gg->tform1.data[gg->rows_in_plot[j]][i] - gg->sphere.tform1_mean[i]);
+          (gg->tform1.vals[gg->rows_in_plot[j]][var] - gg->sphere.tform1_mean[var]) *
+          (gg->tform1.vals[gg->rows_in_plot[j]][i] - gg->sphere.tform1_mean[i]);
       }
       tmpf /= ((gfloat)(n - 1));
       gg->sphere.vc[var][i] = tmpf;
@@ -289,9 +289,9 @@ spherize_data (gint num_pcs, gint nsvars, gint *svars, ggobid *gg)
       tmpf = 0.;
       for (k=0; k<nsvars; k++) {
         tmpf = tmpf + gg->sphere.eigenvec[k][j] *
-          (gg->tform1.data[i][svars[k]] - gg->sphere.tform1_mean[svars[k]]);
+          (gg->tform1.vals[i][svars[k]] - gg->sphere.tform1_mean[svars[k]]);
       }
-      gg->tform2.data[i][svars[j]] = tmpf / gg->sphere.eigenval[j];
+      gg->tform2.vals[i][svars[j]] = tmpf / gg->sphere.eigenval[j];
     }
   }
 }

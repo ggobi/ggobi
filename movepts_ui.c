@@ -128,13 +128,13 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
         clusters_set (gg);
         if (gg->nclust > 1) {
           gint i, k, id = gg->app.nearest_point;
-          gfloat cur_clust = gg->clusterid.data[id];
+          gfloat cur_clust = gg->clusterid.vals[id];
           for (i=0; i<gg->nrows_in_plot; i++) {
             k = gg->rows_in_plot[i];
             if (k == id)
               ;
             else
-              if (gg->clusterid.data[k] == cur_clust)
+              if (gg->clusterid.vals[k] == cur_clust)
                 if (!gg->hidden_now[k])
                   move_pt_history_add (k, sp, gg);
           }

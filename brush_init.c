@@ -151,12 +151,12 @@ br_line_color_init (ggobid *gg)
 
   br_line_vectors_check_size (gg->nsegments, gg);
 
-  color = gg->line.color.data;
-  color_now = gg->line.color_now.data;
-  color_prev = gg->line.color_prev.data;
-  hidden = gg->line.hidden.data;
-  hidden_now = gg->line.hidden_now.data;
-  hidden_prev = gg->line.hidden_prev.data;
+  color = gg->line.color.vals;
+  color_now = gg->line.color_now.vals;
+  color_prev = gg->line.color_prev.vals;
+  hidden = gg->line.hidden.vals;
+  hidden_now = gg->line.hidden_now.vals;
+  hidden_prev = gg->line.hidden_prev.vals;
 
   for (j=0; j<gg->nsegments; j++) {
     color[j] = color_now[j] = color_prev[j] = gg->color_0;

@@ -376,8 +376,8 @@ sp_rewhisker (splotd *sp_prev, splotd *sp, splotd *sp_next, ggobid *gg) {
     /*-- .. also if we're not drawing missings, and an endpoint is missing --*/
     else if (!display->options.missings_show_p &&
           gg->nmissing > 0 &&
-          (gg->missing.data[i][sp->p1dvar] ||
-           gg->missing.data[i][sp_prev->p1dvar]))
+          (gg->missing.vals[i][sp->p1dvar] ||
+           gg->missing.vals[i][sp_prev->p1dvar]))
     {
       draw_whisker = false;
     }

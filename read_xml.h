@@ -9,7 +9,13 @@
 #include <parser.h>
 
 enum HiddenType {ROW, LINE};
-enum xmlDataState { TOP = 0, DESCRIPTION, RECORD, RECORDS, VARIABLES, VARIABLE, DATA, CONNECTIONS, CONNECTION, COLORMAP, COLOR, UNKNOWN};
+enum xmlDataState { TOP = 0, DESCRIPTION,
+  RECORD, RECORDS, VARIABLES, VARIABLE, DATA,
+/*-- this line will be deleted --*/
+  CONNECTIONS, CONNECTION,
+/* */
+  EDGERECORD, EDGERECORDS, EDGEVARIABLES, EDGEVARIABLE,
+  COLORMAP, COLOR, UNKNOWN};
 
 
 typedef struct {
@@ -26,15 +32,23 @@ typedef struct {
 
 typedef struct _XMLUserData {
   enum xmlDataState state;
-  int current_variable; /* Indexes the current variable. */
-  int current_record;   /* Indexes the record we are currently working on. */
-  int current_element;  /* Indexes the values within a record. */
-  int current_segment;  /* Current segment being added. */
+  gint current_variable; /* Indexes the current variable. */
+  gint current_record;   /* Indexes the record we are currently working on. */
+  gint current_element;  /* Indexes the values within a record. */
+/* this line will be deleted */
+  gint current_segment;  /* Current segment being added. */
+/* */
 
-  int current_color;    /* The index of the current element being processed in the colormap */
+  gint current_edgevariable;
+  gint current_edgerecord;
+  gint current_edgeelement;
+
+
+  gint current_color;    /* The index of the current element being processed in the colormap */
  
-  /* Flag that says we are reading color entries from another file via a sub-parser.
-     This allows us to reuse the same instance of user data and the same handlers.
+  /* Flag that says we are reading color entries from another file via a
+   * sub-parser.  This allows us to reuse the same instance of user data
+   * and the same handlers.
    */
   gboolean reading_colormap_file_p;
 
@@ -90,34 +104,39 @@ extern "C" {
 
 enum xmlDataState tagType(const gchar *name, gboolean endTag);
 gboolean newVariable(const CHAR **attrs, XMLParserData *data);
+gboolean newEdgeVariable(const CHAR **attrs, XMLParserData *data);
 gboolean setDatasetInfo(const CHAR **attrs, XMLParserData *data);
 gboolean allocVariables(const CHAR **attrs, XMLParserData *data);
-gboolean  newRecord(const CHAR **attrs, XMLParserData *data);
+gboolean allocEdgeVariables(const CHAR **attrs, XMLParserData *data);
+gboolean newRecord(const CHAR **attrs, XMLParserData *data);
+gboolean newEdgeRecord(const CHAR **attrs, XMLParserData *data);
 
-gboolean setRecordValues(XMLParserData *data, const CHAR *line, int len);
-gboolean setVariableName(XMLParserData *data, const CHAR *name, int len);
+gboolean setRecordValues(XMLParserData *data, const CHAR *line, gint len);
+gboolean setEdgeRecordValues(XMLParserData *data, const CHAR *line, gint len);
+gboolean setVariableName(XMLParserData *data, const CHAR *name, gint len);
+gboolean setEdgeVariableName(XMLParserData *data, const CHAR *name, gint len);
 
-const char *skipWhiteSpace(const CHAR *ch, int *len);
+const char *skipWhiteSpace(const CHAR *ch, gint *len);
 
-const gchar *getAttribute(const CHAR **attrs, char *name);
+const gchar *getAttribute(const CHAR **attrs, gchar *name);
 
 
-void xml_warning(const char *attribute, const char *value, const char *msg, XMLParserData *data);
+void xml_warning(const gchar *attribute, const gchar *value, const gchar *msg, XMLParserData *data);
 
 void initParserData(XMLParserData *data, xmlSAXHandlerPtr handler, ggobid *gg);
 
-gboolean setGlyph(const CHAR **attrs, XMLParserData *data, int i);
-gboolean setColor(const CHAR **attrs, XMLParserData *data, int i);
+gboolean setGlyph(const CHAR **attrs, XMLParserData *data, gint i);
+gboolean setColor(const CHAR **attrs, XMLParserData *data, gint i);
 
 gboolean allocSegments(const CHAR **attrs, XMLParserData *data);
 gboolean addConnection(const CHAR **attrs, XMLParserData *data);
-int rowId(const char *tmp, XMLParserData *data);
+gint rowId(const gchar *tmp, XMLParserData *data);
 
 gboolean data_xml_read(const gchar *filename, ggobid *gg);
 
-gboolean setHidden(const CHAR **attrs, XMLParserData *data, int i, enum HiddenType);
+gboolean setHidden(const CHAR **attrs, XMLParserData *data, gint i, enum HiddenType);
 
-gboolean setColorValue(XMLParserData *data, const CHAR *name, int len);
+gboolean setColorValue(XMLParserData *data, const CHAR *name, gint len);
 gboolean setColormapEntry(const CHAR **attrs, XMLParserData *data);
 gboolean setColorMap(const CHAR **attrs, XMLParserData *data);
 void setColorValues(GdkColor *color, double *values);

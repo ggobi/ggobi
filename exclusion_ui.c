@@ -45,7 +45,7 @@ hide_cluster_cb (GtkToggleButton *btn, gpointer cbd)
 
   for (i=0; i<gg->nrows; i++) {
     if (gg->sampled[i]) {
-      if (gg->clusterid.data[i] == k) {
+      if (gg->clusterid.vals[i] == k) {
         gg->hidden[i] = gg->hidden_now[i] = btn->active;
       }
     }
@@ -67,7 +67,7 @@ exclude_cluster_cb (GtkToggleButton *btn, gpointer cbd)
 
   for (i=0; i<gg->nrows; i++) {
     if (gg->sampled[i])  {
-      if (gg->clusterid.data[i] == k) {
+      if (gg->clusterid.vals[i] == k) {
         gg->included[i] = gg->included[i] = !btn->active;
       }
     }

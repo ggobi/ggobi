@@ -249,7 +249,7 @@ extern const gint ViewTypeIndeces[3];
 /*-- macros --*/
 
 #define EVENT_METHOD(i,x) GTK_WIDGET_CLASS(GTK_OBJECT(i)->klass)->x
-#define MISSING_P(i,j) (gg->missing.data[i][j] != 0)
+#define MISSING_P(i,j) (gg->missing.vals[i][j] != 0)
 
 
 #endif /* End of conditional definition. */

@@ -88,17 +88,17 @@ rejitter (ggobid *gg) {
       frand = jitter_randval (gg->jitter.type) * precis;
 
       /*
-       * The world.data used here is already jittered:
+       * The world.vals used here is already jittered:
        * subtract out the previous jittered value ...
       */
       if (gg->jitter.convex) {
-        fworld = (gfloat) (gg->world.data[m][k] - gg->jitdata.data[m][k]);
+        fworld = (gfloat) (gg->world.vals[m][k] - gg->jitdata.vals[m][k]);
         fjit = gg->vardata[k].jitter_factor * (frand - fworld);
       }
       else
         fjit = gg->vardata[k].jitter_factor * frand;
 
-      gg->jitdata.data[m][k] = (glong) fjit;
+      gg->jitdata.vals[m][k] = (glong) fjit;
     }
   }
   tform_to_world (gg);
