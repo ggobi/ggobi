@@ -358,6 +358,18 @@ GGOBI(newParCoords)(gint *vars, gint numVars, datad *d, ggobid *gg)
   return (display);
 }
 
+displayd * 
+GGOBI(newTimeSeries)(gint *yvars, gint numVars, datad *d, ggobid *gg) 
+{ 
+ displayd *display = NULL; 
+ 
+ display = display_alloc_init (tsplot, false, d, gg); 
+ display = tsplot_new (false, numVars, yvars, d, gg); 
+ display_add (display, gg); 
+ 
+ return (display);
+} 
+
 displayd* 
 GGOBI(createPlot)(int type, char **varnames)
 {

@@ -140,6 +140,7 @@ extern void GGOBI(setCaseName)(gint pt, const gchar *lbl, datad *d, ggobid *gg);
 extern displayd *GGOBI(newScatterplot)(gint ix, gint iy, datad *, ggobid *gg);
 extern displayd *GGOBI(newScatmat)(gint *rows, gint *columns, gint nr, gint nc, datad *, ggobid *gg);
 extern displayd *GGOBI(newParCoords)(gint *vars, gint num, datad *, ggobid *gg);
+extern displayd *GGOBI(newTimeSeries)(gint *yvars, gint numVars, datad *d, ggobid *gg);
 extern displayd *createPlot(gint type, gchar **varnames);
 
 
