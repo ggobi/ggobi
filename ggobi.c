@@ -23,8 +23,8 @@
 static gchar *version_date = "October 10, 2000";
 
 
-static GGobiOptions options;
-GGobiOptions *Options;
+static GGobiOptions sessionoptions;
+GGobiOptions *sessionOptions;
 
 
 ggobid **all_ggobis;
@@ -39,7 +39,7 @@ const gchar *const DataModeNames[] =
   {"ASCII", "binary", "R/S data", "XML", "MySQL", "Unknown"};
 
 
-void initOptions();
+void initSessionOptions();
 
 gint
 parse_command_line (gint *argc, gchar **av, ggobid *gg)
@@ -55,13 +55,13 @@ parse_command_line (gint *argc, gchar **av, ggobid *gg)
      * -s:  ggobi initiated from inside S
     */
     if (strcmp (av[1], "-s") == 0)
-      Options->data_mode = Sprocess_data;
+      sessionOptions->data_mode = Sprocess_data;
     else if (strcmp (av[1], "-ascii") == 0) {
-      Options->data_mode = ascii_data;
+      sessionOptions->data_mode = ascii_data;
     }
     else if (strcmp (av[1], "-xml") == 0) {
 #ifdef USE_XML
-      Options->data_mode = xml_data;
+      sessionOptions->data_mode = xml_data;
 #else
       g_printerr("No xml support compiled for this version, ignoring %s\n", av[1]);
 #endif
@@ -75,7 +75,7 @@ parse_command_line (gint *argc, gchar **av, ggobid *gg)
    }
 
    else if(strcmp(av[1], "-verbose") == 0) {
-      Options->verbose = true;
+      sessionOptions->verbose = true;
    } 
  
 #ifdef USE_MYSQL
@@ -110,9 +110,9 @@ parse_command_line (gint *argc, gchar **av, ggobid *gg)
 
   /* (gg->data_mode == ascii_data || gg->data_mode == binary_data) */
   if (*argc == 0)
-    Options->data_in = (stdin_p) ? g_strdup_printf ("stdin") : NULL;
+    sessionOptions->data_in = (stdin_p) ? g_strdup_printf ("stdin") : NULL;
   else
-    Options->data_in = g_strdup_printf (av[0]);
+    sessionOptions->data_in = g_strdup_printf (av[0]);
 
   return 1;
 }
@@ -222,9 +222,9 @@ gint GGOBI(main)(gint argc, gchar *argv[], gboolean processEvents)
   extern void make_ggobi (GGobiOptions *, gboolean, ggobid *);
   GdkVisual *vis;
   ggobid *gg;
-  initOptions();
-  Options->cmdArgs = argv;
-  Options->numArgs = argc;
+  initSessionOptions();
+  sessionOptions->cmdArgs = argv;
+  sessionOptions->numArgs = argc;
 
   gtk_init (&argc, &argv);
 
@@ -240,24 +240,24 @@ gint GGOBI(main)(gint argc, gchar *argv[], gboolean processEvents)
 
   parse_command_line (&argc, argv, gg);
 
-  if(Options->verbose)
+  if(sessionOptions->verbose)
     g_printerr("progname = %s\n", g_get_prgname());
 
-  if(Options->verbose)
-    g_printerr("data_in = %s\n", Options->data_in);
+  if(sessionOptions->verbose)
+    g_printerr("data_in = %s\n", sessionOptions->data_in);
 
-  make_ggobi (Options, processEvents, gg);
+  make_ggobi (sessionOptions, processEvents, gg);
 
-  /* g_free (Options->data_in); */
+  /* g_free (sessionOptions->data_in); */
 
   return (num_ggobis);
 }
 
 void
-initOptions()
+initSessionOptions()
 {
-  Options =  &options;
-  Options->data_mode = unknown_data;
+  sessionOptions = &sessionoptions;
+  sessionOptions->data_mode = unknown_data;
 }
 
 

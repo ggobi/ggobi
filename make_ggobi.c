@@ -74,7 +74,7 @@ fileset_read (const gchar *ldata_in, DataMode data_mode, ggobid *gg)
   gboolean ok = true;
   /*  gg->filename = g_strdup (ldata_in); */
 
-  desc = fileset_generate(ldata_in, Options->data_mode);
+  desc = fileset_generate(ldata_in, sessionOptions->data_mode);
 
   if(desc == NULL) {
     g_printerr("Cannot locate the file %s\n", ldata_in); 
@@ -126,7 +126,7 @@ fileset_read (const gchar *ldata_in, DataMode data_mode, ggobid *gg)
      break;
   }
 
-  if(ok && Options->verbose) {
+  if(ok && sessionOptions->verbose) {
     showInputDescription(desc, gg);
   }
 

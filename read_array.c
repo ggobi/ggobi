@@ -299,8 +299,8 @@ read_ascii (FILE *fp, datad *d, ggobid *gg)
 
   d->nrows = nrows;
 
-  if(Options->verbose)
-    g_printerr("size of data: %d x %d\n", d->nrows, d->ncols);
+  if(sessionOptions->verbose)
+    g_printerr ("size of data: %d x %d\n", d->nrows, d->ncols);
 
   if (nitems != d->nrows * d->ncols) {
     g_printerr ("read_ascii: nrows*ncols != nitems read\n");

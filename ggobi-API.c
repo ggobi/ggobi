@@ -69,7 +69,7 @@ DataMode
 GGOBI(setDataMode) (DataMode newMode, ggobid *gg)
 {
   DataMode old = gg->input->mode;
-  Options->data_mode = newMode;
+  sessionOptions->data_mode = newMode;
   gg->input->mode = newMode;
   return(old);
 }

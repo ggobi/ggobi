@@ -357,7 +357,7 @@ typedef struct {
   int numArgs;
 } GGobiOptions;
 
-extern GGobiOptions *Options;
+extern GGobiOptions *sessionOptions;
 
 #endif
 
