@@ -81,7 +81,7 @@ brush_reset_cb (GtkWidget *w, gpointer cbd)
         i = gg->rows_in_plot[m];
         gg->hidden[i] = gg->hidden_now[i] = false;
       }
-      displays_plot (NULL, gg);
+      displays_plot (NULL, FULL, gg);
       break;
     case 1:  /*-- reset point colors -- to what? --*/
       break;
@@ -92,7 +92,7 @@ brush_reset_cb (GtkWidget *w, gpointer cbd)
       for (k=0; k<gg->nsegments; k++) {
         gg->line.hidden_now.data[k] = gg->line.hidden.data[k] = false;
       }
-      displays_plot (NULL, gg);
+      displays_plot (NULL, FULL, gg);
       break;
     case 4:  /*-- reset line colors -- to what? --*/
       break;

@@ -50,7 +50,7 @@ hide_cluster_cb (GtkToggleButton *btn, gpointer cbd)
       }
     }
   }
-  displays_plot (NULL, gg);
+  displays_plot (NULL, FULL, gg);
 
   return false;
 }

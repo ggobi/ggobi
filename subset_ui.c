@@ -304,7 +304,8 @@ subset_window_open (ggobid *gg) {
     gtk_table_attach_defaults (GTK_TABLE (t), vb, 1,2,0,1);
 
     label = gtk_label_new ("Every n");
-    gtk_notebook_append_page (GTK_NOTEBOOK (gg->subset.ss_notebook), frame, label);
+    gtk_notebook_append_page (GTK_NOTEBOOK (gg->subset.ss_notebook),
+      frame, label);
 
 /*
  * Cases whose row label is one of the sticky labels
@@ -313,7 +314,8 @@ subset_window_open (ggobid *gg) {
     gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
     gtk_widget_set_usize (frame, 100, 75);
     label = gtk_label_new ("Sticky");
-    gtk_notebook_append_page (GTK_NOTEBOOK (gg->subset.ss_notebook), frame, label);
+    gtk_notebook_append_page (GTK_NOTEBOOK (gg->subset.ss_notebook),
+      frame, label);
 
 /*
  * Cases whose row label the specified row label

@@ -314,16 +314,10 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
   return;
 }
 
-/*
-void
-splot_draw_to_pixmap0 (splotd *sp, gboolean binned) 
-{
-  if (binned)
-    splot_draw_to_pixmap0_binned (sp);
-  else
-    splot_draw_to_pixmap0_unbinned (sp);
-}
-*/
+
+/*------------------------------------------------------------------------*/
+/*                   plot labels: variables, cases                        */
+/*------------------------------------------------------------------------*/
 
 static void
 splot_add_plot_labels (splotd *sp, ggobid *gg) {
@@ -386,9 +380,9 @@ splot_add_plot_labels (splotd *sp, ggobid *gg) {
   }
 }
 
-/*-- add the nearest_point label, plus a diamond for emphasis --*/
+/*-- add the nearest_point and sticky labels, plus a diamond for emphasis --*/
 void
-splot_add_point_label (splotd *sp, gint k, ggobid *gg) {
+splot_add_point_label (splotd *sp, gint k, gboolean nearest, ggobid *gg) {
   displayd *dsp = (displayd *) sp->displayptr;
   gint lbearing, rbearing, width, ascent, descent;
   GtkStyle *style = gtk_widget_get_style (sp->da);
@@ -397,39 +391,41 @@ splot_add_point_label (splotd *sp, gint k, ggobid *gg) {
   gchar *lbl;
 
   /*-- draw a thickened line to highlight the current case --*/
-  if (dsp->displaytype == parcoords) {
-    if (dsp->options.segments_show_p) {
-      gint n;
-      gdk_gc_set_line_attributes (gg->plot_GC,
-        3, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
-      gdk_gc_set_foreground (gg->plot_GC,
-        &gg->default_color_table[gg->color_now[k]]);
+  if (nearest) {
+    if (dsp->displaytype == parcoords) {
+      if (dsp->options.segments_show_p) {
+        gint n;
+        gdk_gc_set_line_attributes (gg->plot_GC,
+          3, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
+        gdk_gc_set_foreground (gg->plot_GC,
+          &gg->default_color_table[gg->color_now[k]]);
 
-      n = 2*k;
-      gdk_draw_line (sp->pixmap1, gg->plot_GC,
-        sp->whiskers[n].x1, sp->whiskers[n].y1,
-        sp->whiskers[n].x2, sp->whiskers[n].y2);
-      n++;
-      gdk_draw_line (sp->pixmap1, gg->plot_GC,
-        sp->whiskers[n].x1, sp->whiskers[n].y1,
-        sp->whiskers[n].x2, sp->whiskers[n].y2);
+        n = 2*k;
+        gdk_draw_line (sp->pixmap1, gg->plot_GC,
+          sp->whiskers[n].x1, sp->whiskers[n].y1,
+          sp->whiskers[n].x2, sp->whiskers[n].y2);
+        n++;
+        gdk_draw_line (sp->pixmap1, gg->plot_GC,
+          sp->whiskers[n].x1, sp->whiskers[n].y1,
+          sp->whiskers[n].x2, sp->whiskers[n].y2);
 
-      gdk_gc_set_line_attributes (gg->plot_GC,
-        0, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
-      gdk_gc_set_foreground (gg->plot_GC, &gg->accent_color);
+        gdk_gc_set_line_attributes (gg->plot_GC,
+          0, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
+        gdk_gc_set_foreground (gg->plot_GC, &gg->accent_color);
+      }
+    } else {  /*-- for any display other than the parcoords plot --*/
+
+      /*-- draw a diamond around the current case --*/
+      diamond[0].x = diamond[4].x = sp->screen[k].x - diamond_dim;
+      diamond[0].y = diamond[4].y = sp->screen[k].y;
+      diamond[1].x = sp->screen[k].x;
+      diamond[1].y = sp->screen[k].y - diamond_dim;
+      diamond[2].x = sp->screen[k].x + diamond_dim;
+      diamond[2].y = sp->screen[k].y;
+      diamond[3].x = sp->screen[k].x;
+      diamond[3].y = sp->screen[k].y + diamond_dim;
+      gdk_draw_lines (sp->pixmap1, gg->plot_GC, diamond, 5);
     }
-  } else {  /*-- for any display other than the parcoords plot --*/
-
-    /*-- draw a diamond around the current case --*/
-    diamond[0].x = diamond[4].x = sp->screen[k].x - diamond_dim;
-    diamond[0].y = diamond[4].y = sp->screen[k].y;
-    diamond[1].x = sp->screen[k].x;
-    diamond[1].y = sp->screen[k].y - diamond_dim;
-    diamond[2].x = sp->screen[k].x + diamond_dim;
-    diamond[2].y = sp->screen[k].y;
-    diamond[3].x = sp->screen[k].x;
-    diamond[3].y = sp->screen[k].y + diamond_dim;
-    gdk_draw_lines (sp->pixmap1, gg->plot_GC, diamond, 5);
   }
 
   /*-- add the label last so it will be in front of other markings --*/
@@ -444,20 +440,36 @@ splot_add_point_label (splotd *sp, gint k, ggobid *gg) {
       sp->screen[k].x+diamond_dim,
       sp->screen[k].y-diamond_dim,
       lbl);
-    gdk_draw_line (sp->pixmap1, gg->plot_GC,
-      sp->screen[k].x+diamond_dim, sp->screen[k].y-diamond_dim+1,
-      sp->screen[k].x+diamond_dim+width, sp->screen[k].y-diamond_dim+1);
+    if (nearest)
+      gdk_draw_line (sp->pixmap1, gg->plot_GC,
+        sp->screen[k].x+diamond_dim, sp->screen[k].y-diamond_dim+1,
+        sp->screen[k].x+diamond_dim+width, sp->screen[k].y-diamond_dim+1);
       
   } else {
     gdk_draw_string (sp->pixmap1, style->font, gg->plot_GC,
       sp->screen[k].x - width - diamond_dim,
       sp->screen[k].y - diamond_dim,
       lbl);
-    gdk_draw_line (sp->pixmap1, gg->plot_GC,
-      sp->screen[k].x - width - diamond_dim, sp->screen[k].y - diamond_dim+1,
-      sp->screen[k].x - diamond_dim, sp->screen[k].y - diamond_dim+1);
+    if (nearest)
+      gdk_draw_line (sp->pixmap1, gg->plot_GC,
+        sp->screen[k].x - width - diamond_dim, sp->screen[k].y - diamond_dim+1,
+        sp->screen[k].x - diamond_dim, sp->screen[k].y - diamond_dim+1);
   }
 }
+
+void
+splot_add_sticky_labels (splotd *sp, ggobid *gg) {
+  gint id;
+  GSList *l;
+
+  if (gg->sticky_ids != NULL && g_slist_length (gg->sticky_ids) > 0) {
+    for (l = gg->sticky_ids; l; l = l->next) {
+      id = GPOINTER_TO_INT (l->data);
+      splot_add_point_label (sp, id, false, gg);  /*-- false = !nearest --*/
+    }
+  }
+}
+
 
 void
 splot_draw_border (splotd *sp, ggobid *gg) {
@@ -646,6 +658,10 @@ splot_pixmap0_to_pixmap1 (splotd *sp, gboolean binned, ggobid *gg) {
   {
     splot_add_plot_labels (sp, gg);
   }
+
+
+  splot_add_sticky_labels (sp, gg);
+
 
   if (sp == gg->current_splot) {
     splot_draw_border (sp, gg);

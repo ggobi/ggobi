@@ -6,16 +6,30 @@
 #include "externs.h"
 
 
+static void
+id_remove_labels_cb (GtkWidget *w, ggobid *gg)
+{
+  g_slist_free (gg->sticky_ids);
+  gg->sticky_ids = (GSList *) NULL;
+  displays_plot (NULL, QUICK, gg);
+}
+static void
+id_all_sticky_cb (GtkWidget *w, ggobid *gg)
+{
+  gint i, m;
 
-static void id_remove_labels_cb (GtkButton *button)
-{
-  g_printerr("removing labels\n");
+  /*-- clear the list before adding to avoid redundant entries --*/
+  g_slist_free (gg->sticky_ids);
+  gg->sticky_ids = (GSList *) NULL;
+
+  for (m=0; m<gg->nrows_in_plot; m++) {
+    i = gg->rows_in_plot[m];
+    gg->sticky_ids = g_slist_append (gg->sticky_ids, GINT_TO_POINTER (i));
+  }
+  displays_plot (NULL, QUICK, gg);
 }
-static void id_all_sticky_cb ( GtkScale *scale )
-{
-  g_printerr("make all labels sticky\n");
-}
-static void identify_link_cb (GtkCheckMenuItem *w, gpointer cbd)
+static void
+identify_link_cb (GtkCheckMenuItem *w, gpointer cbd)
 {
   gchar *lbl = (gchar *) cbd;
   g_printerr("state: %d, cbd: %s\n", w->active, lbl);
@@ -39,7 +53,7 @@ displays_add_point_labels (splotd *splot, gint k, ggobid *gg) {
       if (sp != splot) {
         w = sp->da;
         splot_pixmap0_to_pixmap1 (sp, false, gg);
-        splot_add_point_label (sp, k, gg);
+        splot_add_point_label (sp, k, true, gg);  /*-- nearest = true --*/
         splot_pixmap1_to_window (sp, gg);
       }
     }
@@ -68,16 +82,15 @@ motion_notify_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 
     splot_pixmap0_to_pixmap1 (sp, false, gg);
 
-    if (k != -1)
-      splot_add_point_label (sp, k, gg);
+    if (k != -1)  /*-- nearest --*/
+      splot_add_point_label (sp, k, true, gg);
 
     splot_pixmap1_to_window (sp, gg);
     
     if (k != -1)
       displays_add_point_labels (sp, k, gg);
 
-
-    if(gg->identify_handler.handler) {
+    if (gg->identify_handler.handler) {
       (gg->identify_handler.handler)(gg->identify_handler.user_data,
         k, sp, w, gg);
     }
@@ -91,6 +104,38 @@ motion_notify_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 static gint
 button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
+/*
+ * If nearest_point is a member of gg->sticky_ids, remove it; if
+ * it isn't, add it.
+*/
+  ggobid *gg = GGobiFromSPlot (sp);
+  gint id;
+  gboolean id_in_list = false;
+  gpointer ptr;
+
+  if (gg->app.nearest_point != -1) {
+
+    if (g_slist_length (gg->sticky_ids) > 0) {
+      GSList *l;
+      for (l = gg->sticky_ids; l; l = l->next) {
+        id = GPOINTER_TO_INT (l->data);
+        if (id == gg->app.nearest_point) {
+          id_in_list = true;
+          ptr = l->data;
+          break;
+        }
+      }
+
+      if (id_in_list)
+        gg->sticky_ids = g_slist_remove (gg->sticky_ids, ptr);
+    }
+
+    if (!id_in_list) {
+      ptr = GINT_TO_POINTER (gg->app.nearest_point);
+      gg->sticky_ids = g_slist_append (gg->sticky_ids, ptr);
+    }
+  }
+
   return true;
 }
 
@@ -159,11 +204,11 @@ cpanel_identify_make(ggobid *gg) {
  * button for removing all labels
 */
   btn = gtk_button_new_with_label ("Remove labels");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS(gg->tips),
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
                         btn, "Remove all labels", NULL);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (id_remove_labels_cb),
-                      (gpointer) NULL);
+                      gg);
   gtk_box_pack_start (GTK_BOX (gg->control_panel[IDENT]),
                       btn, false, false, 1);
 
@@ -175,7 +220,7 @@ cpanel_identify_make(ggobid *gg) {
                         btn, "Make all labels sticky, or persistent", NULL);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (id_all_sticky_cb),
-                      (gpointer) NULL);
+                      (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (gg->control_panel[IDENT]),
                       btn, false, false, 1);
 

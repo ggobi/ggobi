@@ -217,7 +217,7 @@ color_changed_cb (GtkWidget *colorsel, ggobid *gg)
    * has been released:  update all plots.
   */
   if (!GTK_WIDGET_HAS_GRAB (wheel)) {
-    displays_plot ((splotd *) NULL, gg);
+    displays_plot ((splotd *) NULL, FULL, gg);
   }
 }
 

@@ -473,17 +473,17 @@ const gchar **const
 GGOBI(getGlyphTypeNames)(int *n)
 {
   *n = UNKNOWN_GLYPH-1; /* -1 since we start at 1 */
-  return(GlyphNames);
+  return (GlyphNames);
 }
 
 
 gchar const*
 GGOBI(getGlyphTypeName)(int type)
 {
- gchar const *ans;
+  gchar const *ans;
   ans = GlyphNames[type-1];
 
- return(ans);
+  return (ans);
 }
 
 
@@ -598,7 +598,7 @@ GGOBI(setCaseHiddens)(gint *pts, gint howMany, gboolean hidden_p, ggobid *gg)
   gint i;
   for (i = 0; i < howMany ; i++)
     GGOBI(setCaseHidden)(pts[i], hidden_p, gg);
-  displays_plot (NULL, gg);
+  displays_plot (NULL, FULL, gg);
 }
 
 gboolean

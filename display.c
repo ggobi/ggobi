@@ -29,6 +29,7 @@ DisplayOptions DefaultDisplayOptions = {
 /*----------------------------------------------------------------------*/
 
 /*-- replot all splots in display --*/
+/*-- type = EXPOSE, QUICK, BINNED, FULL --*/
 void
 display_plot (displayd *display, guint type, ggobid *gg) {
   GList *slist;
@@ -36,7 +37,24 @@ display_plot (displayd *display, guint type, ggobid *gg) {
 
   for (slist = display->splots; slist; slist = slist->next) {
     sp = (splotd *) slist->data;
-    splot_redraw (sp, type, gg);
+    if (sp != NULL)
+      splot_redraw (sp, type, gg); 
+  }
+}
+
+void
+display_plot_allbutone (displayd *display, splotd *splot, guint type,
+  ggobid *gg)
+{
+  GList *slist;
+  splotd *sp;
+
+  for (slist = display->splots; slist; slist = slist->next) {
+    sp = (splotd *) slist->data;
+    if (sp == NULL)
+      ;
+    else if (splot == NULL || sp != splot)
+      splot_redraw (sp, type, gg); 
   }
 }
 
@@ -191,7 +209,7 @@ display_create (guint action, ggobid *gg)
 }
 
 gint
-display_add(displayd *display, ggobid *gg)
+display_add (displayd *display, ggobid *gg)
 {
   splotd *prev_splot = gg->current_splot;
 
@@ -380,7 +398,7 @@ display_set_current (displayd *new_display, ggobid *gg)
    Caller must free the return value.
  */
 gchar *
-computeTitle(displayd *display, ggobid *gg)
+computeTitle (displayd *display, ggobid *gg)
 {
   int n;
   gchar *title = NULL, *tmp = NULL, *description;
@@ -412,33 +430,23 @@ computeTitle(displayd *display, ggobid *gg)
 }
 
 
-
-
-/* Some of these will probably be folded together eventually */
-
 /*
- * replot all splots in display -- except splot
- * if splot is NULL, replot everything
+ * replot all splots in display -- except splot, if present
 */
 void
-displays_plot (splotd *splot, ggobid *gg) {
-  GList *dlist, *slist;
+displays_plot (splotd *splot, gint type, ggobid *gg) {
+  GList *dlist;
   displayd *display;
-  splotd *sp;
 
   for (dlist = gg->displays; dlist; dlist = dlist->next) {
     display = (displayd *) dlist->data;
-    for (slist = display->splots; slist; slist = slist->next) {
-      sp = (splotd *) slist->data;
-      if (sp != NULL) {
-        if (splot == NULL || sp != splot) {
-          splot_redraw (sp, FULL, gg);
-        }
-      }
-    }
+
+    if (splot == NULL)
+      display_plot (display, type, gg);
+    else
+      display_plot_allbutone (display, splot, type, gg);
   }
 }
-
 
 /*-- reproject and replot all splots in display --*/
 void
@@ -488,7 +496,7 @@ displays_tailpipe (gint which, ggobid *gg) {
 }
 
 void
-display_window_init(displayd *display, int width, ggobid *gg)
+display_window_init (displayd *display, gint width, ggobid *gg)
 {
   display->window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_object_set_data (GTK_OBJECT (display->window),
@@ -499,5 +507,5 @@ display_window_init(displayd *display, int width, ggobid *gg)
   gtk_signal_connect (GTK_OBJECT (display->window), "delete_event",
                       GTK_SIGNAL_FUNC (display_delete_cb), (gpointer) display);
 
-  GGobi_widget_set(GTK_WIDGET(display->window), gg, true);
+  GGobi_widget_set (GTK_WIDGET (display->window), gg, true);
 }

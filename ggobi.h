@@ -67,7 +67,8 @@ typedef struct {
   facilitate callbacks at a higher level that GTK events/signals.
   This one is used for responding to identifying points.
  */
-typedef void (*IdentifyProc)(void *user_data, gint id, splotd *sp, GtkWidget *w, ggobid *gg);
+typedef void (*IdentifyProc)(void *user_data, gint id, splotd *sp,
+  GtkWidget *w, ggobid *gg);
 typedef struct {
   IdentifyProc handler;
   void *user_data;
@@ -214,14 +215,16 @@ struct _ggobid {
     gboolean jitter_p, lines_p;
   } save;
 
- /*
-  * identification
- */
- GSList *sticky_ids;
+  /*
+   * identification
+  */
+  GSList *sticky_ids;
 
- gint ntourvars;
- gint *tourvars;
-
+  /*
+   * touring
+  */
+  gint ntourvars;
+  gint *tourvars;
 
   GtkTooltips *tips;
 

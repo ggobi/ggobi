@@ -173,13 +173,13 @@ brush_motion (icoords *mouse, gboolean button1_p, gboolean button2_p,
         gg->nrgroups > 0)      /*-- a full redraw is required --*/
     {
       splot_redraw (sp, FULL, gg);
-      displays_plot (sp, gg);
+      displays_plot (sp, FULL, gg);
 
     } else {  /*-- if we can get away with binning --*/
 
       if (changed) {
         splot_redraw (sp, BINNED, gg);
-        displays_plot (sp, gg);
+        displays_plot (sp, FULL, gg);
       } else {  /*-- just redraw the brush --*/
         splot_redraw (sp, QUICK, gg);  
       }

@@ -64,22 +64,5 @@
 28579   6/7   fixed a few bugs in opening new data in midstream
 28650   6/20  added resetting variable transformations
 
-my personal target:  about 40.8K lines?  That's the number of lines in
-xgobi, subtracting the rpc, xgvis and tour code.
-
-scaling:    900
-rotation:  1700
-lines:     1300
-transform: 1400
-subset:     800
-smoothing: 1600
-jittering:  400
-exclusion:  900
-missing:   1300
-saving:    2300
-moving pts: 400
-
-total:    13,000
-
-tour:     19,000
-rpc:      10,000
+note: There are about 40.8K lines in xgobi,
+subtracting the rpc, xgvis and tour code.
