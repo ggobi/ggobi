@@ -602,9 +602,9 @@ setEdgePartners (XMLParserData *parserData)
     }
   }
 
-  for (i=0, k=0; i<e->edge.n; i++) {
-    g_free (ep[k].a);
-    g_free (ep[k].b);
+  for (i=0; i<n; i++) {
+    g_free (ep[i].a);
+    g_free (ep[i].b);
   }
   g_free (ep);
 }
