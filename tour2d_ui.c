@@ -82,13 +82,15 @@ static void pcaxes_cb (GtkToggleButton *button)
 
 static void tour2dpp_cb (GtkWidget *w, ggobid *gg) 
 {
-  g_printerr ("open projection pursuit panel\n");
+  #ifdef TOUR_PP_IMPLEMENTED
   tour2dpp_window_open (gg);
+  #endif
 }
 
 static void tour2dadv_cb (GtkWidget *w, ggobid *gg) {
-  g_printerr ("open advanced tour features panel\n");
+  #ifdef TOUR_ADV_IMPLEMENTED
   tour2dadv_window_open (gg);
+  #endif
 }
 
 static gchar *manip_lbl[] = {"Oblique", "Vert", "Horiz", "Radial",

@@ -84,12 +84,14 @@ hide_cb (GtkWidget *w ) {
 }
 
 static void ctourpp_cb (GtkWidget *w, ggobid *gg) {
-  g_printerr ("open projection pursuit panel\n");
+  #ifdef TOUR_PP_IMPLEMENTED
   ctourpp_window_open (gg);
+  #endif
 }
 static void ctouradv_cb (GtkWidget *w, gpointer dummy) {
-  g_printerr ("open advanced correlation tour features panel\n");
+  #ifdef TOUR_ADV_IMPLEMENTED
   ctouradv_window_open ();
+  #endif
 }
 
 static gchar *manip_lbl[] = {"Vertical", "Horizontal", "Comb",

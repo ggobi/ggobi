@@ -92,6 +92,8 @@ typedef struct {
  gfloat t1d_step; 
  gint t1d_nbins, t1d_nASHes;
  gboolean t1d_vert;
+ gint t1d_pp_indx;
+ gfloat t1d_pp_indxval;
 
 /*
  * corr tour

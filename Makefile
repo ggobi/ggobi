@@ -48,7 +48,15 @@ endif
 ifdef TS_EXTENSIONS_IMPLEMENTED
   CFLAGS+= -DTS_EXTENSIONS_IMPLEMENTED=1
 endif
-
+ifdef TOUR_PP_IMPLEMENTED
+  CFLAGS+= -TOUR_PP_IMPLEMENTED=1
+endif
+ifdef TOUR_PP_IMPLEMENTED
+  CFLAGS+= -TOUR_PP_IMPLEMENTED=1
+endif
+ifdef TOUR_ADV_IMPLEMENTED
+  CFLAGS+= -TOUR_ADV_IMPLEMENTED=1
+endif
 
 SHLIB_LDFLAGS= -shared
 SHARED_LD_FLAGS= -shared
@@ -83,6 +91,7 @@ SRC=ggobi.c datad.c make_ggobi.c color.c main_ui.c cpanel.c \
  ggobi-API.c \
  timeplot.c time_ui.c \
 \
+ eispack.c \
  gtkextruler.c gtkexthruler.c gtkextvruler.c \
  mt19937-1.c cokus.c \
  fileio.c \
@@ -117,6 +126,7 @@ OB=ggobi.o datad.o make_ggobi.o color.o main_ui.o cpanel.o \
  display_tree.o \
  ggobi-API.o \
  timeplot.o time_ui.o \
+ eispack.o \
  gtkextruler.o gtkexthruler.o gtkextvruler.o \
  fileio.o \
  print.o 

@@ -88,8 +88,9 @@ static void tour1d_vert_cb (GtkToggleButton *button, ggobid *gg)
 
 static void tour1dpp_cb (GtkWidget *w, ggobid *gg) 
 {
-  g_printerr ("open projection pursuit panel\n");
+  #ifdef TOUR_PP_IMPLEMENTED
   tour1dpp_window_open (gg);
+  #endif
 }
 
 void

@@ -7,239 +7,12 @@
 
 #include <math.h>
 #include <malloc.h>
+#include <stdlib.h>
 
 #include "vars.h"
 #include "externs.h"
 
-/* These should probably be put in global include files */
-/* Sigbert's structures for pp optimization */
-/*typedef struct {
-  gint min_neighbour, max_neighbour, dim, data_step, neighbour_step;
-  * temporary space *
-  gfloat *dist, *mean, *nmean, *fv1, *fv2, *ew, *ev, *cov;
-  gint *index;
-} subd_param;
-
-gint alloc_subd_p (subd_param *sp, gint nrows, gint ncols)
-{
-  * Some default values *
-  sp->min_neighbour  = 10;
-  sp->max_neighbour  = 30;
-  sp->dim            =  1;
-  sp->data_step      =  1;
-  sp->neighbour_step =  1;
-
-  * initialize temporary space *
-  sp->dist  = malloc (nrows*sizeof(gfloat));
-  sp->index = malloc (nrows*sizeof(gint));
-  sp->nmean = malloc (ncols*sizeof(gfloat));
-  sp->mean  = malloc (ncols*sizeof(gfloat));
-  sp->ew    = malloc (ncols*sizeof(gfloat));
-  sp->ev    = malloc (ncols*ncols*sizeof(gfloat));
-  sp->fv1   = malloc (ncols*sizeof(gfloat));
-  sp->fv2   = malloc (ncols*sizeof(gfloat));
-  sp->cov   = malloc (ncols*ncols*sizeof(gfloat));
-
-  return 0;
-}
-
-gint free_subd_p (subd_param *sp)
-{ 
-  free(sp->dist);
-  free(sp->index);
-  free(sp->nmean);
-  free(sp->mean);
-  free(sp->ew);
-  free(sp->ev);
-  free(sp->fv1);
-  free(sp->fv2);
-  free(sp->cov);
-
-  return 0;
-}
-*/
-
-/********************************************************************
-
-Index          : PCA-d
-Transformation : -
-Purpose        : computes the trace of the cov matrix of pdata
-Note           : Modifies pdata !
-
-*********************************************************************/
-
-void center (array_f *data)
-{ gint i, j;
-  gfloat mean;
-  for (i=0; i<data->ncols; i++)
-  { mean = 0.0;
-    for (j=0; j<data->nrows; j++)
-      mean += data->vals[j][i];
-    mean = mean/data->nrows;
-    for (j=0; j<data->nrows; j++)
-      data->vals[j][i] -= mean;
-  }
-}
-
-gint pca (array_f *pdata, void *param, gfloat *val)
-{ gint i, j;
-
-  center (pdata);
-
-  *val = 0.0;
-  for (i=0; i<pdata->ncols; i++)
-  { for (j=0; j<pdata->nrows; j++)
-      *val += pdata->vals[j][i]*pdata->vals[j][i];
-  }
-  *val /= (pdata->nrows-1);
-  printf ("PCA-Index=%f", *val); 
-  return (0);
-}
-
-gint alloc_optimize0_p (optimize0_param *op, gint nrows, gint ncols)
-{
-  op->temp_start     =  1;
-  op->temp_end       =  0.001;
-  op->cooling        =  0.999;
-  /* is equivalent to log(temp_end/temp_start)/log(cooling) projections */
-  op->heating        =  1;
-  op->restart        =  1;
-  op->success        =  0;
-  op->temp           =  1;
-  op->maxproj        =  op->restart*(1+log(op->temp_end/op->temp_start)/log(op->cooling)); /* :) */
-  printf("%d %d\n",nrows,ncols);
-  arrayf_init(&(op->proj_best));
-  arrayf_alloc(&(op->proj_best), ncols, 2);
-  arrayf_init(&(op->data));
-  arrayf_alloc(&(op->data), nrows, ncols);
-
-  return 0;
-}
-
-gint free_optimize0_p (optimize0_param *op, gint nrows, gint ncols)
-{ arrayf_free(&op->proj_best, ncols, 2);
-  arrayf_free(&op->data, nrows, ncols);
-  return 0;
-}
-
-/********************************************************************
-
-Index          : Discriminant
-Transformation : -
-Purpose        : Looks for the best projection to discriminate
-                 between groups.
-*********************************************************************/
-
-gint alloc_discriminant_p (discriminant_param *dp, gfloat *gdata, 
-  gint nrows, gint ncols)
-{ gint i, j, *groupval;
-
-  /* initialize data */ 
-  groupval = malloc (nrows*sizeof(gint));
-
-  dp->group    = malloc (nrows*sizeof(gint));
-  dp->ngroup   = malloc (nrows*sizeof(gint));
-
-  dp->groups = 0;
-  for (i=0; i<nrows; i++)
-  { for (j=0; j<dp->groups; j++)
-    { if (groupval[j]==gdata[i]) 
-      { dp->ngroup[j]++;
-        break;
-      }
-    }
-    if (j==dp->groups )
-    { groupval[j]  = gdata[i];
-      dp->ngroup[j] = 1;
-      dp->groups++;
-    }
-  }
-
-  printf("ngroups %d\n",dp->groups);
-
-  for (i=0; i<nrows; i++)
-  { for (j=0; j<dp->groups; j++)
-    { if (groupval[j]==gdata[i]) 
-        dp->group[i] = j;
-    }
-  }
-  /*
-  for (i=0; i<gdata->nrows; i++)
-    { sprintf (msg, "group[%i]=%i", i,dp->group[i]); print();}
-  */
-  free (groupval);
-
-  /* initialize temporary space */
-  dp->variance = malloc (nrows*sizeof(gfloat));
-  dp->mean     = malloc (nrows*ncols*sizeof(gfloat));
-  dp->ovmean   = malloc (ncols*sizeof(gfloat));
-
-  return 0;
-}
-
-gint free_discriminant_p (discriminant_param *dp)
-{ free(dp->group);
-  free(dp->ngroup);
-  free(dp->variance);
-  free(dp->mean);
-  free(dp->ovmean);
-
-  return 0;
-}
-
-gint discriminant (array_f *pdata, void *param, gfloat *val)
-{ 
-  discriminant_param *dp = (discriminant_param *) param;
-  gint i, k;
-  
-  for (i=0; i<dp->groups; i++)
-    for (k=0; k<pdata->ncols; k++)
-      dp->mean[k*pdata->nrows+i] = 0;
-
-  for (k=0; k<pdata->ncols; k++)
-    dp->ovmean[k] = 0;
-
-  for (i=0; i<pdata->nrows; i++)
-  { for (k=0; k<pdata->ncols; k++)
-    { dp->mean[k*pdata->nrows+dp->group[i]] += pdata->vals[i][k];  
-      dp->ovmean[k] += pdata->vals[i][k]; 
-    }
-  }
-
-  for (i=0; i<dp->groups; i++)
-    for (k=0; k<pdata->ncols; k++)
-    { dp->mean[k*pdata->nrows+i] /= dp->ngroup[i];
-    }
-
-  for (i=0; i<pdata->nrows; i++)
-  { for (k=0; k<pdata->ncols; k++)
-    { dp->variance[dp->group[i]] += 
-        (pdata->vals[i][k]-dp->mean[k*pdata->nrows+dp->group[i]])*
-(pdata->vals[i][k]-dp->mean[k*pdata->nrows+dp->group[i]]);
-    }
-  }
-
-  for (k=0; k<dp->groups; k++)
-  { dp->variance[k] /= dp->ngroup[k];
-  }
- 
-
-  *val = 0;
-  for (i=0; i<dp->groups; i++)
-  { for (k=0; k<pdata->ncols; k++)
-    *val += (dp->mean[k*pdata->nrows+i]-dp->ovmean[k])*
-            (dp->mean[k*pdata->nrows+i]-dp->ovmean[k]);
-  }
-  *val /= dp->groups;
-
-
-  for (k=0; k<dp->groups; k++)
-    *val /= dp->variance[k];
-
-  return (0);
-}
-
-/* end Sigbert's structures */
+#include "tour1d_pp.h"
 
 void
 alloc_tour1d (displayd *dsp, ggobid *gg)
@@ -568,14 +341,19 @@ tour1d_run(displayd *dsp, ggobid *gg)
     array_f, array_f, gint, gint);
   extern void copy_mat(gfloat **, gfloat **, gint, gint);
   datad *d = dsp->d;
-  /*  subd_param pm;*/
-  optimize0_param op;
+  cpaneld *cpanel = &dsp->cpanel;
+
+  subd_param sp; 
   discriminant_param dp;
-  gint i, j, kout;
+  optimize0_param op;
+  cartgini_param cgp;
+  cartentropy_param cep;
+  cartvariance_param cvp;
+  gint method, nrows, ncols, pdim;
   gfloat *gdata;
-  /*  extern gint pca(array_f *, void *, gfloat *);*/
-  /*  extern gint pca;*/
-  extern gint optimize0(optimize0_param *, gint (*) (array_f*, void*, gfloat*), void *);
+  gboolean revert_random = false;
+
+  gint i, j, kout;
 
   if (dsp->t1d.get_new_target)
     printf("1 basis method %d\n",dsp->t1d.target_basis_method);
@@ -598,31 +376,81 @@ tour1d_run(displayd *dsp, ggobid *gg)
       gt_basis(dsp->t1d.u1, dsp->t1d.nvars, dsp->t1d.vars, d->ncols, (gint) 1);
     }
     else if (dsp->t1d.target_basis_method == 1) {
-      alloc_optimize0_p(&op, d->nrows_in_plot, dsp->t1d.nvars);
-      for (i=0; i<d->nrows_in_plot; i++)
-        for (j=0; j<dsp->t1d.nvars; j++)
-          op.data.vals[i][j] = 
-            d->tform.vals[d->rows_in_plot[i]][dsp->t1d.vars.els[j]];
+      /* pp guided tour  */
+        alloc_optimize0_p(&op, dsp->t1d.nvars, 1);
+        arrayf_alloc_zero (&op.data, d->nrows_in_plot, dsp->t1d.nvars); 
+        for (i=0; i<d->nrows_in_plot; i++)
+          for (j=0; j<dsp->t1d.nvars; j++)
+            op.data.vals[i][j] = 
+              d->tform.vals[d->rows_in_plot[i]][dsp->t1d.vars.els[j]];
 
-      printf("Num clusters %d\n",d->nclusters);
-      gdata = malloc (d->nrows_in_plot*sizeof(gfloat));
-      for (i=0; i<d->nrows_in_plot; i++) {
-        gdata[i] = (gfloat) d->clusterid.els[d->rows_in_plot[i]];
-        printf("%f ",gdata[i]);
-      }
+	/* Only for testing */
+        nrows  = d->nrows_in_plot;
+        ncols  = dsp->t1d.nvars;
+        pdim   = 1;
+        gdata  = malloc (nrows*sizeof(gfloat));
+       
+        if (d->clusterid.els==NULL) printf ("No cluster information found\n");
+        for (i=0; i<nrows; i++)
+	{ if (d->clusterid.els!=NULL)
+            gdata[i] = d->clusterid.els[d->rows_in_plot[i]];
+          else
+            gdata[i] = 0;
+        }
+
+        switch (cpanel->t1d_pp_indx)
+        { case 10: /* SUB-d */
+            alloc_subd_p (&sp, nrows, pdim);
+            kout  = optimize0 (&op, subd, &sp);
+            free_subd_p (&sp);
+            break;
+          case 11: /* Discriminant */
+            alloc_discriminant_p (&dp, gdata, nrows, pdim);
+            kout = optimize0 (&op, discriminant, &dp);
+            free_discriminant_p (&dp);
+            break;
+          case 12: /* CartGini */
+            alloc_cartgini_p (&cgp, nrows, gdata);
+            kout = optimize0 (&op, cartgini, &cgp);
+            free_cartgini_p (&cgp);
+            break;
+          case 13: /* CartEntropy */
+            alloc_cartentropy_p (&cep, nrows, gdata);
+            kout = optimize0 (&op, cartentropy, &cep);
+            free_cartentropy_p (&cep);
+            break;
+          case 14: /* CartVariance */
+            alloc_cartvariance_p (&cvp, nrows, gdata);
+            kout = optimize0 (&op, cartvariance, &cvp);
+            free_cartvariance_p (&cvp);
+            break;
+          case 15: /* PCA */
+            kout = optimize0 (&op, pca, NULL);
+          default: 
+            revert_random = true;
+        }
+        free (gdata);
+        if (!revert_random) {
+          sleep(5);
+          for (i=0; i<d->ncols; i++)
+            for (j=0; j<d->ncols; j++)
+              dsp->t1d.u1.vals[i][j] = 0.0;
+          for (i=0; i<dsp->t1d.nvars; i++)
+            dsp->t1d.u1.vals[0][dsp->t1d.vars.els[i]] = 
+              op.proj_best.vals[i][0];
+          /* if the best projection is the same as the previous one, switch 
+            to a random projection */
+          if (!checkequiv(dsp->t1d.u0.vals, dsp->t1d.u1.vals, d->ncols, 1)) {
+            gt_basis(dsp->t1d.u1, dsp->t1d.nvars, dsp->t1d.vars, 
+              d->ncols, (gint) 1);
+            printf("Using random projection\n");
+          }
+	}
+        else
+          gt_basis(dsp->t1d.u1, dsp->t1d.nvars, dsp->t1d.vars, 
+            d->ncols, (gint) 1);
       
-      alloc_discriminant_p (&dp, gdata, d->nrows_in_plot, 1);
-      kout = optimize0(&op, &discriminant, &dp);
-      /*      kout  = optimize0 (&op, &pca, NULL);*/
-      for (i=0; i<d->ncols; i++)
-        for (j=0; j<d->ncols; j++)
-          dsp->t1d.u1.vals[i][j] = 0.0;
-      for (i=0; i<dsp->t1d.nvars; i++)
-        dsp->t1d.u1.vals[0][dsp->t1d.vars.els[i]] = op.proj_best.vals[i][0];
-      free_discriminant_p(&dp);
-      free_optimize0_p(&op, d->nrows_in_plot, dsp->t1d.nvars);
-      free(gdata);
-
+      free_optimize0_p(&op);
     }
     path(dsp->t1d.u0, dsp->t1d.u1, dsp->t1d.u, d->ncols, (gint) 1, dsp->t1d.v0,
       dsp->t1d.v1, dsp->t1d.v, dsp->t1d.lambda, dsp->t1d.tv, dsp->t1d.uvevec,

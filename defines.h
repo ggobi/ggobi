@@ -155,6 +155,12 @@ extern const gint ViewTypeIndeces[3];
 #define ENTROPY         7
 #define BIN_FTS         8
 #define BIN_ENTROPY     9
+#define SUBD           10
+#define LDA            11
+#define CART_GINI      12
+#define CART_ENTROPY   13
+#define CART_VAR       14
+#define PCA            15
 
 /*-- parallel coordinates, scatterplot matrices and tsplots  --*/
 #define VAR_REPLACE  0
