@@ -424,7 +424,7 @@ splot_add_edgeedit_cues (splotd *sp, GdkDrawable *drawable,
   displayd *display = sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
 
-  if (cpanel->ee_adding_p) {
+  if (cpanel->ee_adding_edges_p) {
 
     if (k != -1)
       splot_add_diamond_cue (k, sp, drawable, gg);
@@ -436,6 +436,8 @@ splot_add_edgeedit_cues (splotd *sp, GdkDrawable *drawable,
         sp->screen[ gg->edgeedit.a ].x, sp->screen[ gg->edgeedit.a ].y,
         sp->screen[ k ].x, sp->screen[ k ].y);
     }
+/*  not ready to support deleting
   } else if (cpanel->ee_deleting_p) {
+*/
   }
 }

@@ -64,9 +64,10 @@ typedef struct {
  gint id_display_type;
  enum idtargetd id_target_type;  /* points or edges */
 
- /*-- edge editing --*/
- gboolean ee_adding_p;
- gboolean ee_deleting_p;
+ /*-- edge editing -- including adding points --*/
+ gboolean ee_adding_edges_p;
+ gboolean ee_deleting_edges_p;  /*??*/
+ gboolean ee_adding_points_p;
 
  /*-- parallel coordinates --*/
  gint parcoords_selection_mode;

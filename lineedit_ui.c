@@ -17,18 +17,99 @@
 #include "vars.h"
 #include "externs.h"
 
+/*--------------------------------------------------------------------*/
+/*                 Dialog for adding records                          */
+/*--------------------------------------------------------------------*/
+
+static void
+add_record_dialog_cancel (GtkWidget *w, ggobid *gg) 
+{
+  GtkWidget *dialog = gtk_widget_get_toplevel (w);
+  gtk_widget_destroy (dialog);
+}
+
+static void
+add_record_dialog_apply (GtkWidget *w, ggobid *gg) 
+{
+  g_printerr ("add the record\n");
+}
+
+static void
+add_record_dialog_open (datad *d, datad *e, displayd *dsp, ggobid *gg)
+{
+  GtkWidget *dialog, *table;
+  GtkWidget *label, *entry, *w;
+  gchar *lbl;
+  cpaneld *cpanel = &dsp->cpanel;
+  GtkAttachOptions table_opt = GTK_SHRINK|GTK_FILL|GTK_EXPAND;
+
+  dialog = gtk_dialog_new ();
+  gtk_window_set_title (GTK_WINDOW(dialog), "Add a record");
+
+  table = gtk_table_new (2, 3, false);
+  gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->vbox), table);
+
+  w = gtk_label_new ("Record number");
+  gtk_misc_set_alignment (GTK_MISC (w), 1, .5);
+  gtk_table_attach (GTK_TABLE (table),
+    w, 0, 1, 0, 1, /* left right top bottom */
+    table_opt, table_opt, 1, 1);
+  lbl = g_strdup_printf ("%d",
+    (cpanel->ee_adding_edges_p)?e->nrows:d->nrows + 1);
+  w = gtk_label_new (lbl);
+  gtk_misc_set_alignment (GTK_MISC (w), .5, .5);
+  gtk_table_attach (GTK_TABLE (table),
+    w, 1, 2, 0, 1, table_opt, table_opt, 1, 1);
+  g_free (lbl);
+
+  w = gtk_label_new ("Record label");
+  gtk_misc_set_alignment (GTK_MISC (w), 1, .5);
+  gtk_table_attach (GTK_TABLE (table),
+    w, 0, 1, 1, 2, table_opt, table_opt, 1, 1);
+  entry = gtk_entry_new ();
+  gtk_widget_set_name (entry, "EE:rowlabel");
+  gtk_table_attach (GTK_TABLE (table),
+    entry, 1, 2, 1, 2, table_opt, table_opt, 1, 1);
+
+  w = gtk_label_new ("Record id");
+  gtk_misc_set_alignment (GTK_MISC (w), 1, .5);
+  gtk_table_attach (GTK_TABLE (table),
+    w, 0, 1, 2, 3, table_opt, table_opt, 1, 1);
+  entry = gtk_entry_new ();
+  gtk_widget_set_name (entry, "EE:recordid");
+  gtk_table_attach (GTK_TABLE (table),
+    entry, 1, 2, 2, 3,
+    table_opt, table_opt, 1, 1);
+
+  /*-- ok button --*/
+  w = gtk_button_new_with_label ("Apply");
+  gtk_signal_connect (GTK_OBJECT (w), "clicked",
+    GTK_SIGNAL_FUNC (add_record_dialog_apply), dsp);
+  gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->action_area), w);
+
+  /*-- cancel button --*/
+  w = gtk_button_new_with_label ("Close");
+  gtk_signal_connect (GTK_OBJECT (w), "clicked",
+    GTK_SIGNAL_FUNC (add_record_dialog_cancel), dsp);
+  gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->action_area), w);
+
+  gtk_widget_show_all (dialog);
+}
+
+
+
 
 /*--------------------------------------------------------------------*/
 /*          Respond to buttons and menus in the panel                 */
 /*--------------------------------------------------------------------*/
 
-static void addordelete_cb (GtkToggleButton *button, ggobid *gg)
+static void add_edges_or_points_cb (GtkToggleButton *button, ggobid *gg)
 {
   displayd *display = gg->current_display;
   cpaneld *cpanel = &display->cpanel;
 
-  cpanel->ee_adding_p = button->active;
-  cpanel->ee_deleting_p = !button->active;
+  cpanel->ee_adding_edges_p = button->active;
+  cpanel->ee_adding_points_p = !button->active;
 }
 static void undo_last_cb (GtkToggleButton *button)
 {
@@ -68,13 +149,10 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
   k = find_nearest_point (&sp->mousepos, sp, d, gg);
   d->nearest_point = k;
 
-  if (cpanel->ee_adding_p && k != d->nearest_point_prev) {
+  if (cpanel->ee_adding_edges_p && k != d->nearest_point_prev) {
     if (gg->edgeedit.a == -1) {  /*-- looking for starting point --*/
-
-      if (k != d->nearest_point_prev) {
+      if (k != d->nearest_point_prev)
         displays_plot (NULL, QUICK, gg);
-      }
-
     } else {  /*-- found starting point; looking for ending point --*/
 
       displays_plot (NULL, QUICK, gg);
@@ -109,6 +187,7 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   gboolean retval = true;
   ggobid *gg = GGobiFromSPlot (sp);
   displayd *display = sp->displayptr;
+  cpaneld *cpanel = &display->cpanel;
   datad *d = display->d;
   datad *e = display->e;
 
@@ -159,7 +238,12 @@ e:
   if e has variables, variable values -- we don't have a clue what to use
 */
 
+/*
     edge_add (gg->edgeedit.a, d->nearest_point, NULL, NULL, d, e, gg);
+*/
+
+    add_record_dialog_open (d, e, display, gg);
+
   }
   gg->edgeedit.a = -1;
 
@@ -185,10 +269,8 @@ edgeedit_event_handlers_toggle (splotd *sp, gboolean state) {
       "button_press_event", (GtkSignalFunc) button_press_cb, (gpointer) sp);
     sp->release_id = gtk_signal_connect (GTK_OBJECT (sp->da),
       "button_release_event", (GtkSignalFunc) button_release_cb, (gpointer) sp);
-    if (cpanel->ee_adding_p) {
-      sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
-        "motion_notify_event", (GtkSignalFunc) motion_notify_cb, (gpointer) sp);
-    }
+    sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
+      "motion_notify_event", (GtkSignalFunc) motion_notify_cb, (gpointer) sp);
 
   } else {
     disconnect_key_press_signal (sp);
@@ -207,27 +289,27 @@ cpanel_edgeedit_make (ggobid *gg) {
   gg->control_panel[EDGEED] = gtk_vbox_new (false, VBOX_SPACING);
   gtk_container_set_border_width (GTK_CONTAINER (gg->control_panel[EDGEED]), 5);
 
- /*-- Radio group in a box: add/delete buttons --*/
-  hb = gtk_hbox_new (true, 1);
+ /*-- Radio group in a box: add edges or points buttons --*/
+  hb = gtk_vbox_new (true, 1);
   gtk_container_set_border_width (GTK_CONTAINER (hb), 3);
   gtk_box_pack_start (GTK_BOX (gg->control_panel[EDGEED]), hb, false, false, 0);
 
-  radio1 = gtk_radio_button_new_with_label (NULL, "Add");
-  gtk_widget_set_name (radio1, "EDGEEDIT:add_radio_button");
+  radio1 = gtk_radio_button_new_with_label (NULL, "Add edges");
+  gtk_widget_set_name (radio1, "EDGEEDIT:add_edges_radio_button");
   GTK_TOGGLE_BUTTON (radio1)->active = true;
 
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), radio1,
     "Add new edges using the mouse", NULL);
   gtk_signal_connect (GTK_OBJECT (radio1), "toggled",
-                      GTK_SIGNAL_FUNC (addordelete_cb), gg);
+                      GTK_SIGNAL_FUNC (add_edges_or_points_cb), gg);
   gtk_box_pack_start (GTK_BOX (hb), radio1, false, false, 0);
 
   group = gtk_radio_button_group (GTK_RADIO_BUTTON (radio1));
 
-  radio2 = gtk_radio_button_new_with_label (group, "Delete");
-  gtk_widget_set_name (radio2, "EDGEEDIT:delete_radio_button");
+  radio2 = gtk_radio_button_new_with_label (group, "Add points");
+  gtk_widget_set_name (radio2, "EDGEEDIT:add_points_radio_button");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), radio2,
-    "Delete edges using the mouse", NULL);
+    "Add points using the mouse", NULL);
   gtk_box_pack_start (GTK_BOX (hb), radio2, false, false, 0);
 
 
@@ -250,8 +332,8 @@ cpanel_edgeedit_make (ggobid *gg) {
 void
 cpanel_edgeedit_init (cpaneld *cpanel, ggobid *gg)
 {
-  cpanel->ee_adding_p = true;
-  cpanel->ee_deleting_p = false;
+  cpanel->ee_adding_edges_p = true;
+  cpanel->ee_adding_points_p = false;
 }
 
 void
@@ -259,13 +341,13 @@ cpanel_edgeedit_set (cpaneld *cpanel, ggobid *gg) {
   GtkWidget *w;
 
   /*-- set the Drag or Click radio buttons --*/
-  if (cpanel->ee_adding_p) {
+  if (cpanel->ee_adding_edges_p) {
     w = widget_find_by_name (gg->control_panel[EDGEED],
-                             "EDGEEDIT:add_radio_button");
+                             "EDGEEDIT:add_edges_radio_button");
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(w), true);
   } else {
     w = widget_find_by_name (gg->control_panel[EDGEED],
-                             "EDGEEDIT:delete_radio_button");
+                             "EDGEEDIT:add_points_radio_button");
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(w), true);
   }
 }
