@@ -482,6 +482,12 @@ mode_activate (splotd *sp, gint m, gboolean state, ggobid *gg) {
       case BRUSH:
         brush_activate (state, d, gg);
       break;
+      case SCALE:
+      {
+        extern void scale_click_init (splotd *sp, ggobid *gg);
+        scale_click_init (sp, gg);
+      }
+      break;
       default:
       break;
     }

@@ -12,13 +12,8 @@
 #define TYPES_H
 
 #include <gtk/gtk.h>
-/* types.h */
 
 typedef enum {ascii_data, binary_data, Sprocess_data, xml_data, mysql_data, unknown_data, num_data_modes} DataMode;
-typedef enum {PLUS=1, X, OR, FR, OC, FC, DOT,UNKNOWN_GLYPH} GlyphType;
-
-typedef enum { RESET_UNHIDE_POINTS, RESET_POINT_COLORS, RESET_GLYPHS, 
-               RESET_UNHIDE_LINES, RESET_LINES, RESET_INIT_BRUSH} BrushReset;
 
 typedef struct {
     glong x, y;
@@ -35,9 +30,6 @@ typedef struct {
 typedef struct {
     gint a, b;
 } endpointsd;
-typedef struct {
-    gint x1, y1, x2, y2;
-} brush_coords;
 
 /*-- arrays --*/
 /*-- floating point: for gg.raw_data, tform1, tform2 --*/
@@ -79,86 +71,6 @@ typedef struct {  /*-- used for obtaining ranks --*/
   gint indx;
 } paird;
 
-/* column-wise data that will appear in the variable table */
-typedef struct {
- gchar *collab, *collab_tform;
- gint nmissing;
-
- /*-- reference variable:  jref=-1 except for cloned or sphered variables --*/
- gint jref;
-
- /*-- unadjusted, unaffected by imputation --*/
- gfloat mean, median;
-
- lims lim_raw;       /*-- range of the raw data          --*/
- lims lim_tform;     /*-- range of d->tform              --*/
-
- /*
-  * If the user has supplied limits, lim_specified_p = true
-  * and the limits are stored in lim_specified.{min,max}
- */
- gboolean lim_specified_p;
- lims lim_specified;
- lims lim_specified_tform;
-
- lims lim;      /*-- limits in use: lim_specified_tform or lim_tform --*/
-
- /*-- transformations --*/
- gint tform0;
- gfloat domain_incr;  /*-- stage 0 --*/
- gfloat (*domain_adj) (gfloat x, gfloat incr);
- gfloat (*inv_domain_adj) (gfloat x, gfloat incr);
- gint tform1;
- gfloat param;
- gint tform2;
-
- /*-- jittering --*/
- gfloat jitter_factor;
-
- /*-- in variable table --*/
- gboolean selected;
-
-} vartabled;
-
-
-/* these data types seem to be missing in gdk */
-typedef struct {
-  gint x, y;
-  gint width, height;
-} arcd; 
-typedef struct {
-  gint x, y;
-  gint width, height;
-} rectd; 
-
-/* cluster; to be used in Group Exclusion tool */
-typedef struct {
-  glong n;  /*-- Can I know the number of elements in this cluster? --*/
-  gint glyphtype, glyphsize;
-  gshort color;
-  gboolean hidden, included;
-  GtkWidget *da, *lbl, *hide_tgl, *exclude_tgl;
-} clusterd;
-
-/* glyph vectors */
-typedef struct {
-  gint type;
-  gint size;
-} glyphv;
-
-/* structure for binning the plot window */
-typedef struct {
-  gulong *els;
-  gint nels;
-  gint nblocks;  /* how many blocks have been allocated for els */
-} bin_struct;
-
-/* row groups */
-typedef struct {
-  gint id, nels, *els;
-  gboolean included;  /* for linked brushing */
-  gboolean sampled;   /* for subsetting */
-} rgroupd;
 
 
 /*-- used to keep track of history in moving points --*/

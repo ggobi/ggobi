@@ -13,6 +13,8 @@
 #define DATAD_H
 
 #include "defines.h"
+#include "brushing.h"
+#include "vartable.h"
 
 #ifdef USE_XML
 #include <parser.h>

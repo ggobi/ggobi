@@ -16,6 +16,7 @@
 #endif
 #include "vars.h"
 #include "externs.h"
+#include <math.h>
 
 /*
  * These should all be moved to cpanel.c, to be consistent.
@@ -74,6 +75,29 @@ zoom_reset_cb (GtkWidget *w, ggobid *gg) {
 /*--------------------------------------------------------------------*/
 
 void
+scale_click_init (splotd *sp, ggobid *gg)
+{
+  cpaneld *cpanel = &gg->current_display->cpanel;
+  gint pos = (gint)
+    (.1 * sqrt ((gdouble) (sp->max.x*sp->max.x + sp->max.y*sp->max.y)));
+
+  if (cpanel->scale_style != CLICK)
+    return;
+
+  switch (cpanel->scale_click_opt) {
+    case PAN:
+      sp->mousepos.x = sp->max.x/2 - pos;
+      sp->mousepos.y = sp->max.y/2 - pos;
+    break;
+    case ZOOM:
+      sp->mousepos.x = pos;
+      sp->mousepos.y = pos;
+    break;
+    default:
+  }
+}
+
+void
 scale_interaction_style_set (gint style, ggobid *gg) {
   cpaneld *cpanel = &gg->current_display->cpanel;
   gboolean click_p;
@@ -88,6 +112,9 @@ scale_interaction_style_set (gint style, ggobid *gg) {
   gtk_widget_set_sensitive (gg->scale.zoom_radio, click_p);
   gtk_widget_set_sensitive (gg->scale.pan_opt, click_p);
   gtk_widget_set_sensitive (gg->scale.zoom_opt, click_p);
+
+  if (click_p)
+    scale_click_init (gg->current_splot, gg);
 
   splot_redraw (gg->current_splot, QUICK, gg);
 }
@@ -105,6 +132,7 @@ void scale_clickoptions_set (gint click_opt, ggobid *gg) {
   cpaneld *cpanel = &gg->current_display->cpanel;
 
   cpanel->scale_click_opt = click_opt;
+  scale_click_init (gg->current_splot, gg);
 
   splot_redraw (gg->current_splot, QUICK, gg);
 }
@@ -255,6 +283,17 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   sp->mousepos_o.x = sp->mousepos.x = (gint) event->x;
   sp->mousepos_o.y = sp->mousepos.y = (gint) event->y;
 
+  /*
+   * This looks like a bug in the toolkit, to me:  if I release
+   * the button outside the plotting window but in some other ggobi
+   * window, eg inside the variable selection panel, I don't get the
+   * button release event.  This isn't a fix, but it allows the user
+   * to reset state.
+  */
+  if (sp->motion_id) {
+    gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
+    sp->motion_id = 0;
+  }
   sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
                                       "motion_notify_event",
                                       (GtkSignalFunc) motion_notify_cb,
@@ -270,7 +309,10 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   sp->mousepos.x = (gint) event->x;
   sp->mousepos.y = (gint) event->y;
 
-  gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
+  if (sp->motion_id) {
+    gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
+    sp->motion_id = 0;
+  }
 
   return retval;
 }
@@ -523,6 +565,7 @@ scale_click_zoom_rect_calc (splotd *sp, gint sc_zoom_opt, ggobid *gg) {
       break;
   }
 }
+
 
 void
 scaling_visual_cues_draw (splotd *sp, ggobid *gg) {

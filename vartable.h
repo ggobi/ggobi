@@ -29,4 +29,45 @@
 #define ADDVAR_ROWNOS   0
 #define ADDVAR_BGROUP   1
 
+/* column-wise data that will appear in the variable table */
+typedef struct {
+ gchar *collab, *collab_tform;
+ gint nmissing;
+
+ /*-- reference variable:  jref=-1 except for cloned or sphered variables --*/
+ gint jref;
+
+ /*-- unadjusted, unaffected by imputation --*/
+ gfloat mean, median;
+
+ lims lim_raw;       /*-- range of the raw data          --*/
+ lims lim_tform;     /*-- range of d->tform              --*/
+
+ /*
+  * If the user has supplied limits, lim_specified_p = true
+  * and the limits are stored in lim_specified.{min,max}
+ */
+ gboolean lim_specified_p;
+ lims lim_specified;
+ lims lim_specified_tform;
+
+ lims lim;      /*-- limits in use: lim_specified_tform or lim_tform --*/
+
+ /*-- transformations --*/
+ gint tform0;
+ gfloat domain_incr;  /*-- stage 0 --*/
+ gfloat (*domain_adj) (gfloat x, gfloat incr);
+ gfloat (*inv_domain_adj) (gfloat x, gfloat incr);
+ gint tform1;
+ gfloat param;
+ gint tform2;
+
+ /*-- jittering --*/
+ gfloat jitter_factor;
+
+ /*-- in variable table --*/
+ gboolean selected;
+
+} vartabled;
+
 #endif

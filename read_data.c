@@ -467,18 +467,18 @@ point_glyphs_read (InputDescription *desc, gboolean reinit,
   gboolean use_defaults = false;
 
   gchar *fileName;
-  int whichSuffix;
+  gint whichSuffix;
 
 
   if (reinit)
     br_glyph_ids_alloc (d);
 
-  fileName = findAssociatedFile(desc, suffixes,
+  fileName = findAssociatedFile (desc, suffixes,
     sizeof(suffixes)/sizeof(suffixes[0]), &whichSuffix, false);
-  if(fileName == NULL)
+  if (fileName == NULL)
     found = false;
 
-  if( found && ( fp = fopen(fileName, "r") ) == NULL ) {
+  if (found && ( fp = fopen(fileName, "r") ) == NULL ) {
     found = false;
   }
 
@@ -505,8 +505,11 @@ point_glyphs_read (InputDescription *desc, gboolean reinit,
         retval = fscanf (fp, "%d", &gid);
       } else {
         fscanf (fp, "%s", gtype);
+/*-- we're writing out size=1 for point glyphs, so this 'if' isn't right --*/
+/*
         gsize = 1;
         if (strcmp (gtype, ".") != 0)
+*/
           retval = fscanf (fp, "%d", &gsize);
       }
 

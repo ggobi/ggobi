@@ -169,11 +169,9 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
   gint ncolors_used;
   gushort colors_used[NCOLORS+2];
   GtkWidget *da = sp->da;
-#ifndef _WIN32
   displayd *display = (displayd *) sp->displayptr;
   datad *d = display->d;
   gboolean draw_case;
-#endif
   /*
    * since parcoords and tsplot each have their own weird way
    * of drawing line segments, it's necessary to get the point

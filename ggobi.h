@@ -13,6 +13,7 @@
 
 #include "defines.h"
 #include "types.h"
+#include "brushing.h"
 #include "display.h"
 #include "display_tree.h"
 
