@@ -62,11 +62,12 @@ AC_ARG_WITH(ggvis,
 AC_ARG_WITH(plugins, [--with-plugins          Enable all the plugins (no)], ENABLE_ALL_PLUGINS=1)
 
 
+dnl The user might have given us a list of the plugins directly as the value of --with-plugins="a b c"
+
 if test "$with_plugins" != "" && "$with_plugins" != "yes" && test "$with_plugins" != "y" &&  test "$with_plugins" != "no" && test "$with_plugins" != "n" ; then
  PLUGIN_DIRS=$with_plugins
  ENABLE_ALL_PLUGINS=0
 fi
-
 
 
 AC_ARG_WITH(R,     --with-R         Install the Rggobi package)
