@@ -353,7 +353,7 @@ JavaUnloadPlugin(gboolean initializing, GGobiPluginInfo *plugin)
 gboolean 
 JavaCreatePlugin(ggobid *gg, GGobiPluginInfo *info, PluginInstance *inst)
 {
-    jboolean ans = JNI_TRUE;
+    gboolean ans = true;
     jclass klass;
     JavaInputPluginData *data = (JavaInputPluginData *) info->data;
     jmethodID cid;
@@ -370,7 +370,7 @@ JavaCreatePlugin(ggobid *gg, GGobiPluginInfo *info, PluginInstance *inst)
     if(JVMENV ExceptionOccurred(env)) {
 	JVMENV ExceptionDescribe(env);
 	JVMENV ExceptionClear(env);
-        return(JNI_FALSE);
+        return(false);
     }
 
      /*  See if this class has a constructor that takes a single argument
@@ -394,7 +394,7 @@ JavaCreatePlugin(ggobid *gg, GGobiPluginInfo *info, PluginInstance *inst)
         if(cid == NULL) {
 	    fprintf(stderr, "Error constructing instance of %s. No default constructor(?)\n", data->className);
 	    JVMENV ExceptionClear(env);
-            return(JNI_FALSE);
+            return(false);
 	}
 	obj = JVMENV NewObject(env, klass, cid);
     }
@@ -412,6 +412,7 @@ JavaCreatePlugin(ggobid *gg, GGobiPluginInfo *info, PluginInstance *inst)
     } else {
         data->runTime = NULL;
 	g_free(data->runTime);
+        ans = false;
     }
 
     return(ans);

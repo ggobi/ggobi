@@ -257,6 +257,37 @@ change to support this.
 \end{description}
 
 
+\subsection{Dependencies between Plugins}
+As we develop more plugins, dependencies of one on the existence of
+another will emerge. There are slightly complicated issues of
+dynamically loading code that can be seen by another plugin in a
+portable fashion.  Leaving this aside, we have a more elementary
+problem that we want to ensure that one plugin is started before
+another is started.  (Simply link against a common library!) For
+example, any of the Java plugins must ensure that the JVM is running
+before access to the Java classes is made.  To do this, we support a
+list of plugin dependencies in the XML specification of a plugin.  One
+provides a list of the plugins which must be loaded and started before
+this plugin can be.  Each required plugin is identified by an XML
+element of the form
+\begin{verbatim}
+ <dependency name="name of other plugin"/>
+\end{verbatim}
+And each of these elements is enclosed within the
+\XMLTag{dependencies} element within the \XMLTag{plugin} tag.  The
+value of the \XMLAttribute{name} attribute should match the value of
+the \XMLAttribute{name} attribute used to identify the other plugin
+(i.e. in the \XMLTag{plugin} tag).
+
+When we attempt to load a plugin, we first iterate over the plugins on
+which it depends and ensure that they are loaded and initialized (i.e.
+call the routine identified by the plugin's \XMLAttribute{onLoad}
+attribute).
+
+Note that for Java plugins (identified by the \XMLAttribute{language}
+attribute of the \XMLTag{plugin} element being \texttt{"java"}), the
+dependency on the JVM is automatically generated.
+
 
 \section{Examples}
 

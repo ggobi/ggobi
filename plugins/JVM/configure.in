@@ -49,6 +49,11 @@ PWD=`pwd`
 
 LD_PATH=`${JAVA} -classpath . vendor java.library.path`
 LD_PATH="${LD_PATH}:${PWD}:${PWD}/../.."
+
+if test -n "${JAVA_GNOME_DIR}" ; then
+  LD_PATH="${LD_PATH}:${JAVA_GNOME_DIR}/lib"
+fi
+
 AC_SUBST(LD_PATH)
 
 AC_SUBST(PWD)

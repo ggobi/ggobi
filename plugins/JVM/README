@@ -4,6 +4,10 @@ developed in Java can be run via this plugin.
 
 Bindings for programming Gtk from within Java are available from
   http://java-gnome.sourceforge.net/
+There are some examples of using this in the Gtk/ directory and you
+can enable these by specifying the location of the java-gnome
+distribution when invoking configure, as in
+ ./configure --with-java-gnome.
 
 Hopefully this will serve as an example for embedding the Python and
 Perl interpreters in GGobi in the same manner to allow plugins to be
@@ -28,3 +32,6 @@ b) set your LD_LIBRARY_PATH  include the GGobi directory, this
 Assuming you have compiled this plugin, you can go ahead and run
 GGobi, e.g. 
       ../../ggobi ../../data/flea.xml 
+
+If you have enabled support for java-gnome, the appropriate directory
+will be added to the LD_LIBRARY_PATH setting also.

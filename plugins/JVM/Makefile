@@ -1,5 +1,7 @@
 PKG=JVM
 
+All:
+
 ifndef GGOBI_HOME
  GGOBI_HOME=../..
 endif

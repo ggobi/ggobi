@@ -35,7 +35,7 @@ void display_tree_delete_cb(GtkWidget *w, GdkEvent *event, ggobid *gg);
 int  tree_display_entry_remove(displayd *display, GtkWidget *w, ggobid *gg);
 int  tree_display_entry_remove_by_index(int which, GtkWidget *tree);
 
-void display_tree_display_child_select(GtkWidget *root_tree,displayd *display, ggobid *gg);
+void display_tree_display_child_select(GtkWidget *root_tree,displayd *display);
 
 void display_tree_splot_child_select(GtkWidget *root_tree, splotd *plot);
 
