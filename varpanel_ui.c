@@ -59,9 +59,6 @@ varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint btn,
       break;
   }
 
-  if (mode_get (gg) == BRUSH)
-    assign_points_to_bins (d, gg);
-
   varcircle_draw (jvar, d, gg);
   if (jvar_prev != -1)
     varcircle_draw (jvar_prev, d, gg);

@@ -3,7 +3,7 @@
 
 <ggobidata count="2">
 
-<data name="main">
+<data name="COI Nodes">
 <description>
 </description>
 <variables count="11">
@@ -1418,7 +1418,7 @@
 </records>
 </data>
 
-<data edges="T" nodeData="main">
+<data name="COI Edges" edges="T" nodeData="COI Nodes">
 <variables count="3">
   <variable>time</variable>
   <variable>dow</variable>

@@ -170,14 +170,6 @@ display_alloc_init (enum displaytyped type, gboolean missing_p,
   return (display);
 }
 
-/*
-*void
-*display_new (ggobid *gg, guint action, GtkWidget *widget)
-*{
-*  display_create (action, gg);
-*}
-*/
-
 displayd *
 display_create (gint displaytype, gboolean missing_p, datad *d, ggobid *gg)
 {
@@ -239,7 +231,7 @@ display_add (displayd *display, ggobid *gg)
 {
   splotd *prev_splot = gg->current_splot;
 
-  if(isEmbeddedDisplay(display) == false) {
+  if (isEmbeddedDisplay(display) == false) {
     GGobi_widget_set(display->window, gg, true);
     display_set_current (display, gg);
   }
@@ -312,7 +304,7 @@ display_free (displayd* display, gboolean force, ggobid *gg) {
     }
 
     count = g_list_length(display->splots);
-    if(isEmbeddedDisplay(display) == false) {
+    if (isEmbeddedDisplay (display) == false) {
       for (l=display->splots; count > 0 && l; l=l->next, count--) {
         sp = (splotd *) l->data;
         splot_free (sp, display, gg);
@@ -358,8 +350,9 @@ display_set_current (displayd *new_display, ggobid *gg)
 
   gtk_accel_group_unlock (gg->main_accel_group);
 
-  if (gg->firsttime == false &&  isEmbeddedDisplay(gg->current_display) == false) {
-
+  if (gg->firsttime == false &&
+      isEmbeddedDisplay (gg->current_display) == false)
+  {
     switch (gg->current_display->displaytype) {
       case scatterplot:
         gtk_window_set_title (GTK_WINDOW (gg->current_display->window),
@@ -383,16 +376,17 @@ display_set_current (displayd *new_display, ggobid *gg)
     }
   }
 
-  if(isEmbeddedDisplay(new_display) == false) {
-   title = computeTitle(new_display, gg);
-   if(title) {
+  if (isEmbeddedDisplay (new_display) == false) {
+   title = computeTitle (new_display, gg);
+   if (title) {
       gtk_window_set_title (GTK_WINDOW (new_display->window), title);   
       g_free(title); 
    }
 
   switch (new_display->displaytype) {
     case scatterplot:
-      scatterplot_main_menus_make (gg->main_accel_group, (GtkSignalFunc) mode_set_cb, gg, true);
+      scatterplot_main_menus_make (gg->main_accel_group,
+                                   (GtkSignalFunc) mode_set_cb, gg, true);
       gg->mode_item = submenu_make ("_View", 'V', gg->main_accel_group);
       gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_item),
                                  gg->app.scatterplot_mode_menu); 
@@ -452,16 +446,19 @@ computeTitle (displayd *display, ggobid *gg)
       break;
   }
 
- description = GGOBI(getDescription)(gg);
- n = strlen(tmp) + strlen(description) + 4;
- title = (gchar *)g_malloc(sizeof(gchar) * n);
- memset(title, '\0', n);
+  if (display->d->name != NULL) {
+    description = g_strdup(display->d->name);
+  } else {
+    description = GGOBI (getDescription)(gg);
+  }
 
- sprintf(title, "%s %s", description, tmp);
+  n = strlen (tmp) + strlen (description) + 4;
+  title = (gchar *) g_malloc(sizeof(gchar) * n);
+  memset (title, '\0', n);
+  sprintf (title, "%s %s", description, tmp);
+  g_free (description);
 
- g_free(description);
-
- return(title);
+  return (title);
 }
 
 
@@ -501,6 +498,15 @@ display_tailpipe (displayd *display, ggobid *gg) {
   splist = display->splots;
   while (splist) {
     sp = (splotd *) splist->data;
+
+/*-- update transient brushing; I will also need to un-brush some points --*/
+    if (display == gg->current_display &&
+        sp == gg->current_splot &&
+        mode_get (gg) == BRUSH)
+    {
+      datad *d = display->d;
+      assign_points_to_bins (d, gg);
+    }
 
     if (display->displaytype == scatterplot)
       ruler_ranges_set (display, sp, gg);
@@ -547,11 +553,11 @@ display_window_init (displayd *display, gint width, ggobid *gg)
 
 
 gboolean
-isEmbeddedDisplay(displayd *dpy)
+isEmbeddedDisplay (displayd *dpy)
 {
   gboolean ans = false;
-   if(dpy->embeddedIn != NULL)
-     ans = true;
+  if (dpy->embeddedIn != NULL)
+    ans = true;
 
- return(ans);
+  return(ans);
 }
