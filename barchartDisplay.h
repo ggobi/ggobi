@@ -2,8 +2,8 @@
 #define GGOBI_BARCHART_DISPLAY_H
 
 /**
- This defines a new class of display (GtkGGobiTimeSeriesDisplay)
- which is the top-level container for multiple time series plots.
+ This defines a new class of display (GtkGGobiBarchartDisplay)
+ which is the top-level container for barchart plots.
  This extends the windowed display class (GtkGGobiWindowDisplay).
 */
 

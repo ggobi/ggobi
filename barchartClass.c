@@ -133,24 +133,35 @@ void barchartDisplaySet(displayd * dpy, ggobid * gg)
 }
 
 
+/* This is for the barchart SPlot Class */
 static void barchartDestroy(GtkObject *obj)
 {
   barchartSPlotd * sp;
-  sp = GTK_GGOBI_BARCHART_SPLOT(obj);
-  barchart_free_structure(sp);
-  vectori_free (&sp->bar->index_to_rank);
-  g_free((gpointer) sp->bar);
 
-  {
-    GtkObjectClass *klass;
+  sp = GTK_GGOBI_BARCHART_SPLOT(obj);
+  if(sp && sp->bar) {
+	  GtkObjectClass *klass;
+                /* Goal here is to get the class object for the parent
+                   of the GTK_TYPE_GGOBI_EXTENDED_SPLOT class so that we can call its
+                   destroy method. */
 #ifdef GTK_2_0
-    klass = g_type_class_peek_parent(GTK_TYPE_GGOBI_EXTENDED_SPLOT);
+               /* Need to get the class of the barchart and then constrain it to the 
+                  extended splot class. */
+	  klass = g_type_class_peek_parent(GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT_GET_CLASS(obj)));
 #else
-    klass = gtk_type_parent_class(GTK_TYPE_GGOBI_EXTENDED_SPLOT);
+	  klass = gtk_type_parent_class(GTK_TYPE_GGOBI_EXTENDED_SPLOT);
 #endif
-    klass->destroy(GTK_OBJECT(sp));
+
+
+	  barchart_free_structure(sp);
+	  vectori_free (&sp->bar->index_to_rank);
+	  g_free((gpointer) sp->bar);
+	  sp->bar = NULL;
+
+	  klass->destroy(GTK_OBJECT(sp)); 
   }
 }
+
 
 void barchartPlaneToScreen(splotd * sp, datad * d, ggobid * gg)
 {
