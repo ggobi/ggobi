@@ -1,6 +1,28 @@
 \documentclass[11pt]{article}
 \usepackage{fullpage}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% If it turns out that I can use pdflatex, I can use jpeg graphics
+% files and go straight to pdf.
+
+\newif\ifpdf
+\ifx\pdfoutput\undefined
+  \pdffalse
+\else
+  \pdftrue
+\fi
+  
+\ifpdf
+  \pdfoutput=1
+  \usepackage[pdftex]{graphicx}  % uncomment if using graphicx
+  %  \usepackage[pdftex]{hyperref}  % uncomment if using hyperref
+\else
+  \usepackage{graphicx}  % uncomment if using graphicx
+  %  \usepackage{hyperref}  % uncomment if using hyperref
+\fi
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \hyphenation{XGobi}
 \hyphenation{ggobi}
 \hyphenation{di-men-sion-al two--di-men-sion-al}
@@ -9,6 +31,11 @@
 
 \parindent 0in
 \parskip 6pt
+
+% I'm taking text from the 1997 xgobi paper wherever possible.
+% (On fry, that's in /usr/dfs/papers/xgobi.1997/paper.tex)
+%
+%  slbl stands for 'section label'
 
 \begin {document}
 
@@ -54,11 +81,119 @@ be examined.
 
 \section{Introduction}
 
+This paper gives an overview of the layout and functionality of ggobi,
+which is a major step in the evolution of XGobi.  Those of you who are
+quite familiar with XGobi might want to skip to section
+\ref{slbl:xgobi}.
+
+GGobi can be used for simple tasks with virtually no instruction.  All
+that a user needs is some cursory knowledge of the developments in
+interactive statistical graphics of the last 15 years, as well as a
+willingness to experiment using the sample data provided and the
+tooltips.
+
+Still, it may be more efficient to acquire up front a basic understanding of
+the overall layout and functionality of the system.  The greatest
+success is obtained by users who have gained experience with the
+system and combine it with creativity and data analytic sophistication.
+
+We first describe the specifics of GGobi's layout and functionalities.
+Figure~1 shows a GGobi window, made using a version that was
+available in early 2001.
+
+\vbox{
+\vspace{.4in}
+\epsfxsize 6in \centerline{\epsfbox{figures/manual1.ps}}
+\vspace{.15in} \centerline{ \parbox{6in}
+{Figure~1: Layout of a GGobi session.  The display window contains a
+simple scatterplot.  Brushing has been used, and three different
+symbols are in use.
+}}
+\vspace{.4in}
+}
+
 \section{Layout and functionality}
+
 \subsection{The major functions}
 
+Across the top of the control panel in Figure 1 stretch a row of buttons for
+selecting major GGobi functions from pull-down menus.  Buttons
+named ``File'', ``Display,'' ``ViewMode'', ``Tools'', ``Options'' and
+``DisplayTree'' organize functions in menus.
+
+As expected, the ``File'' button opens a menu for selecting
+input/output functions as well as exiting.
+
+The ``Display'' button opens a manu for opening a new plotting
+window.  The display types are
+\begin{itemize}
+\itemsep 0em
+\item Scatterplot,
+\item Scatterplot matrix, 
+\item Parallel coordinates plot.
+\end{itemize}
+
+If the data has missing values, a scatterplot or scatterplot matrix
+of the ``missingness'' information can be opened.
+
+The ``ViewMode'' button opens a menu for selecting from GGobi's
+inventory of interactive graphics operations: 
+\begin{itemize}
+\itemsep 0em
+\item 1-D dotplots and average shifted histograms,
+\item 2-D XY-plots, 
+\item 1-D grand tours,
+\item 2-D grand tours,
+\item axis scaling, 
+\item brushing, 
+\item identification, 
+\item point motion.  
+\end{itemize}
+
+The unifying feature of these operations is that they take over the
+display area and dictate the mouse operations for directly
+manipulating the view.  Examples are mouse sweeps to control 3-D
+rotations, or moves of the brush when brushing.  These operations
+also determine the content of the control panel on the left of the
+window (see below).  Exactly one mode is selected at all times.
+``ViewModes'' will be discussed in greater detail in
+section~\ref{slbl:ViewModes}.
+
+The ``Tools'' button gives access to 
+\begin{itemize}
+\itemsep 0em
+\item a table of variable statistics with variable selection functionality,
+\item a variable transformation pipeline,
+\item an variable sphering panel,
+\item jittering controls,
+\item a panel for hiding groups of cases,
+\item subsetting functions for systematic and random subsampling, 
+\item assignment of a value to missings.
+
+\end{itemize}
+The division between ``ViewMode'' functions and ``Tools'' is somewhat
+arbitrary.  The ``ViewMode'' functions determine the mouse
+interactions in the display windows, while none of the ``Tools''
+does.  Furthermore, ``ViewMode'' functions populate the left hand
+control panel in the main GGobi window, while ``Tools'' create their
+own permanent control panels or views of the data in separate
+windows, as shown in figure~2.  For example, the variable selection
+and statistics ``Tool'' opens a table of data each variable, and the
+transformation ``Tool'' generates a transformation control window.
+
+The ``Options'' button allows users to set some options for the
+main control window:  whether tooltips are displayed, for instance,
+and whether the control panel is shown.
+
+The ``DisplayTree'' menu allows users to open a tree listing
+all the currently open display windows, each of which may contain
+several plots.
+
+In some ViewModes, an ``I/O'' menu appears, with options for
+reading and writing data pertaining to that mode.
+
 \subsection{Graphical displays}
-\label{slbl:GraphicalDisplays}   %  slbl stands for 'section label'
+\label{slbl:GraphicalDisplays}
 
 -- list the display types
 
@@ -79,6 +214,7 @@ and how they are selected
 \label{slbl:Integration}
 
 \section{View modes}
+\label{slbl:ViewModes}
 
 \subsection{1D plots}
 \subsection{XY plots}
@@ -110,6 +246,7 @@ and how they are selected
 \section{Implementation}
 
 \section{Differences from xgobi}
+\label{slbl:xgobi}
 
 \subsection {Multiple displays}
 
