@@ -40,7 +40,13 @@ varcircles_visibility_set (displayd *display, ggobid *gg)
                                 false, false, 2);
             gtk_box_reorder_child (GTK_BOX (d->vcirc_ui.table), box, n);
             gtk_widget_show_all (box);
-            gtk_widget_unref (box);
+#if GTK_MAJOR_VERSION == 1
+/*g_printerr ("ref_count: %d\n", GTK_OBJECT (box)->ref_count); */
+            if (GTK_OBJECT (box)->ref_count > 1)
+#else
+            if (G_OBJECT (box)->ref_count > 1)
+#endif
+              gtk_widget_unref (box);
           }
           n++;
  
