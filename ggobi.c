@@ -179,9 +179,16 @@ parse_command_line (gint *argc, gchar **av, ggobid *gg)
 #ifdef USE_XML
       sessionOptions->activeColorScheme = g_strdup(av[2]);
 #else
-      g_printerr ("-colorschemes not supported without XML\n"); fflush(stderr);
+      g_printerr ("-activeColorScheme not supported without XML\n"); fflush(stderr);
 #endif
       (*argc)--; av++;
+    } else if((ptr = getOptValue("activeColorScheme", av[1]))) {
+#ifdef USE_XML
+	sessionOptions->activeColorScheme = ptr;
+#else
+      g_printerr ("--activeColorScheme not supported without XML\n"); fflush(stderr);
+#endif
+
     }  else if(strcmp(av[1], "-datamode") == 0) {
       sessionOptions->data_type = g_strdup(av[2]);
       (*argc)--; av++;
