@@ -128,7 +128,7 @@ open_find_dialog (GtkWidget *window)
 
   gtk_widget_show_all (dialog);
 }
-static GtkItemFactoryEntry menu_items[] = {
+static GtkItemFactoryEntry menubar_items[] = {
   { "/_Edit",            NULL,     NULL,             0, "<Branch>" },
   { "/Edit/Find ...",
        NULL,    
@@ -224,7 +224,8 @@ create_ggobi_worksheet_window(ggobid *gg, PluginInstance *inst)
   gtk_container_add(GTK_CONTAINER(window), main_vbox);
 
 /* */
-  get_main_menu (menu_items, sizeof (menu_items) / sizeof (menu_items[0]),
+  get_main_menu (menubar_items,
+    sizeof (menubar_items) / sizeof (menubar_items[0]),
     gtk_accel_group_new(), window,
     &menubar, (gpointer) window);
   gtk_box_pack_start (GTK_BOX (main_vbox), menubar, false, false, 0);
@@ -431,8 +432,8 @@ add_ggobi_data(datad *data, GtkWidget *w)
     }
   }
 
-  /*-- Does this apply to the row titles?  Alas, no.  --*/
-/* GTK_SHEET_SET_FLAGS(sheet, GTK_SHEET_AUTORESIZE); */
+  /*-- Does this apply to the row or column titles?  Alas, no.  --*/
+  GTK_SHEET_SET_FLAGS(sheet, GTK_SHEET_AUTORESIZE);
 
   gtk_sheet_set_row_titles_width (sheet, maxwidth);
 }
