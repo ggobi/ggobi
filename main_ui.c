@@ -274,6 +274,10 @@ viewmode_activate (splotd *sp, PipelineMode m, gboolean state, ggobid *gg)
   displayd *display = (displayd *) sp->displayptr;
   RedrawStyle redraw_style = NONE;
 
+  /*-- for insurance, because sometimes scaling doesn't quit --*/
+  disconnect_motion_signal (sp);
+  /*-- --*/
+
   if (state == off) {
     switch (m) {
       case XYPLOT:
