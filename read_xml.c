@@ -231,7 +231,6 @@ startXMLElement(void *user_data, const CHAR *name, const CHAR **attrs)
      break;
    case DESCRIPTION:
      /* description text pending */
-     fprintf(stderr, "DESCRIPTION\n");
      break;
    case DATASET:
      setDataset(attrs, data);
@@ -1162,6 +1161,8 @@ getCurrentXMLData(XMLParserData* parserData)
     data = datad_new(NULL, parserData->gg);
     parserData->current_data = data;
   }
+  if(data->input == NULL)
+    data->input = parserData->input;
   return(data);
 }
 

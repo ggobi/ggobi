@@ -125,7 +125,7 @@ fileset_generate(char *fileName, DataMode guess)
    if(desc->fileName == NULL)
      guess = unknown_data;
  } else {
-   desc->fileName = fileName;
+   desc->fileName = g_strdup(fileName);
    desc->mode = guess;
    desc->mode = verifyDataMode(desc->fileName, desc->mode, desc);
    if(desc->mode == unknown_data) { 
