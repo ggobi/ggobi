@@ -29,6 +29,48 @@ Colors:
   a colorscheme and a colormap?  If not, let's just use one
   term.
 
+--------- notes on colors ---------------------------------------
+
+The following files and routines have code that doesn't make sense now,
+as we move to relying on colorschemes for all our color specification.
+
+RSGGobiCurrent.c
+  RS_GGOBI(getColorMap)(USER_OBJECT_ ggobiId)
+  RS_GGOBI(setColorMap)(USER_OBJECT_ vals, USER_OBJECT_ names, USER_OBJECT_ ggo
+biId)
+  GGOBI(setColorMap)(NUMERIC_DATA(vals), GET_LENGTH(vals)/3, gg);
+
+ggobi.dtd
+  colormap (I think)
+  specification of fg and bg colors
+
+read_xml.c
+  most anything with colormaps, 
+
+  setColorMap(attrs, data);
+  setColormapEntry(attrs, data);
+  setColorValue(XMLParserData *data, const xmlChar *line, gint len)
+  xmlParseColorMap(const gchar *fileName, gint size, XMLParserData *data)
+
+write_xml.c
+  some references to defaultColorName; I don't know what that is
+  gg->colorNames (no longer exist)
+  info->defaultColor (don't know what that is)
+
+color.c
+make_ggobi.c
+  these files make mention of
+    sessionOptions->info->bgColor
+  and I don't think that has meaning now.
+
+-----------------------------------------------------------------
+
+Adding data:  check for inconsistencies and redundancies in these
+routines:
+  ggobi-API.c (setData)
+  datad.c  (datad_create, datad_init)
+  missing.c (missings_datad_cb)
+
 Check the fileselection dialog for read (filesel_ok) to ensure that
 the correct data mode is passed.  Take it out of ggobi.
 
