@@ -9,12 +9,11 @@
 
 #define NCOLS_CLIST 9
 
-
-/*
- * this just hides, but maybe it should destroy -- do we allow
- * people to add more datad's when the program is running?
-*/
-void delete_cb (GtkWidget *cl, GdkEventButton *event, ggobid *gg)
+static void delete_cb (GtkWidget *cl, GdkEventButton *event, ggobid *gg)
+{
+  gtk_widget_hide (gg->vartable_ui.window);
+}
+static void hide_cb (GtkWidget *w, ggobid *gg)
 {
   gtk_widget_hide (gg->vartable_ui.window);
 }
@@ -300,7 +299,7 @@ vartable_open (ggobid *gg)
       "Close the window", NULL);
     gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 1);
     gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                        GTK_SIGNAL_FUNC (delete_cb), gg);
+                        GTK_SIGNAL_FUNC (hide_cb), gg);
 
     gtk_box_pack_start (GTK_BOX (vbox), hbox, false, false, 1);
   }

@@ -30,8 +30,8 @@ display_tree doesn't update itself when splots change
 when brushing or identifying in parcoords, use leave/enter events to
   change the current_splot.
 
-consider sphering data into new variables instead of overwriting
-the existing values -- that will test cloning!
+sphere data into new variables instead of overwriting
+  the existing values -- that will test cloning!
 
 keep working on array and vector management
 
@@ -51,6 +51,10 @@ old-style I/O -- the biggest part is now in place.  extend
   user options to write_xml.  Add the ability to extend the
   current file set by one or more files.  (wait until the
   dtd has been redesigned to handle multiple datad objects)
+
+  How do we write out missings in xml?
+  If all glyphs are the same, there's no need to write 
+    a glyph description in each record
 
 In progress:  writing out plots as .svg files
   work out how to do nested transformations for printing parcoords
