@@ -759,6 +759,12 @@ splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp,
     case scatterplot:
       p1d_ash_baseline_set (sp);
     break;
+    case scatmat:
+#ifdef BARCHART_IMPLEMENTED
+    case barchart:
+#endif
+    case unknown_display_type:
+    break;
   }
 }
 
