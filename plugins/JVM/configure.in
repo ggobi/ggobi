@@ -1,10 +1,12 @@
 AC_INIT(jvm.c)
 
-AC_ARG_ENABLE(debug,[--enable-debug   generate debugging output when running])
+AC_ARG_ENABLE(debug,[--enable-debug   generate debugging output when running], DEBUG=$withval, DEBUG="yes")
+AC_ARG_ENABLE(native,[--enable-native provide access to internal GGobi objects from Java code], NATIVE_ACCESS=$withval, NATIVE_ACCESS="yes")
 
 AC_PATH_PROG(GTK_CONFIG, gtk-config)
 AC_PATH_PROG(JAVA, java)
 AC_PATH_PROG(JAVAC, javac)
+AC_PATH_PROG(JAVAH, javah)
 
 if test -z "${JAVA}" ; then
  echo "Cannot find java, the executable for running classes/applications"
@@ -25,9 +27,12 @@ TMP=$LD_LIBRARY_PATH
 LD_LIBRARY_PATH=$TMP
 
 AC_SUBST(DEBUG)
+AC_SUBST(NATIVE_ACCESS)
+
 AC_SUBST(JNI_LIBS)
 AC_SUBST(JNI_INCLUDES)
 AC_SUBST(JAVAC)
+AC_SUBST(JAVAH)
 AC_SUBST(JAVA)
 
 AC_OUTPUT(local.config)

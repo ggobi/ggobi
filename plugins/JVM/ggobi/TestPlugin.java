@@ -23,6 +23,7 @@ public class TestPlugin
 	this();
 	System.err.println("In TestPlugin constructor with ggobi instance");
         gg = inst;
+	System.err.println("Description: " + gg.getDescription());
     }
 
     public boolean onCreate() {

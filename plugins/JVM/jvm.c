@@ -7,7 +7,6 @@ static JavaVM *jvm;
 
 #define CLASSPATH_OPT "-Djava.class.path="
 
-#define JVMENV (*env)->
 
 jobject runPlugin(const char * const klass, JNIEnv *env);
 gboolean initJVM(void);
@@ -254,14 +253,33 @@ JavaCreatePlugin(ggobid *gg, GGobiPluginInfo *info, PluginInstance *inst)
     jmethodID cid;
     jobject obj;
     JNIEnv *env = std_env;
+    jobject jgg;
+    jmethodID ggId;
 
     data->runTime = g_malloc(sizeof(JavaRunTimeData));
     memset(data->runTime, '\0',sizeof(JavaRunTimeData));
 
     klass = JVMENV FindClass(env, data->className);
 
-    cid = JVMENV GetMethodID(env, klass, "<init>","()V");
-    obj = JVMENV NewObject(env, klass, cid);
+     /*  See if this class has a constructor that takes a single argument
+         of class ggobi.ggobi.  If so, use that. Otherwise, use the default
+         constructor (i.e. no arguments) and the call onCreate (?).
+      */
+    cid = JVMENV GetMethodID(env, klass, "<init>","(Lggobi/ggobi;)V");
+    if(cid != NULL) {
+	jclass tmpClass = JVMENV FindClass(env, "ggobi/ggobi");
+        if(tmpClass == NULL) {
+            if(JVMENV ExceptionOccurred(env))
+		JVMENV ExceptionDescribe(env);
+            return(JNI_FALSE);
+	}
+	ggId = JVMENV GetMethodID(env, tmpClass, "<init>","(D)V");
+	jgg = JVMENV NewObject(env, tmpClass, ggId, (jdouble) (long) gg);    
+	obj = JVMENV NewObject(env, klass, cid, jgg);
+    } else {
+	cid = JVMENV GetMethodID(env, klass, "<init>","()V");
+	obj = JVMENV NewObject(env, klass, cid);
+    }
 
     if(obj) {
         JavaPluginInstance *tmp;

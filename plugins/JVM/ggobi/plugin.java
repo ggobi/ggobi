@@ -1,20 +1,18 @@
 package ggobi;
 
 /**
-     None of the methods take any arguments as they can and are expected to 
+     A basic interface for a GGobi plugin implemented in Java.
+     None of the methods currently take any arguments as they can and are expected to 
      store the state themselves.
+     The  onLoad and onUnload functionality should be provided as
+     static methods in a plugin class.
 */
 
 public interface plugin {
-
-    /*
- onLoad and onUnload are static methods in a class.
-     */
-
-
     /**
       This is essentially the constructor and can be deprecated
-      for Java.
+      for Java or may be changed to accept an object of class
+      ggobi.ggobi which is the proxy for the C-level GGobi instance (ggobid).
      */
     public boolean onCreate();
 

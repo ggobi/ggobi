@@ -1,12 +1,5 @@
 PKG=JVM
 
-All: $(PKG).so classes
-
-classes:
-	$(MAKE) -C ggobi classes
-
-$(PKG).so:
-
 ifndef GGOBI_HOME
  GGOBI_HOME=../..
 endif
@@ -17,6 +10,19 @@ include local.config
 ifdef ADMIN
  include Install/GNUmakefile.admin
 endif
+
+ifeq (${NATIVE_ACCESS},yes)
+ SRC=ggobiAccess
+ OTHERS=libJavaGGobi.so
+endif
+
+All: $(PKG).so classes $(OTHERS)
+
+classes:
+	$(MAKE) -C ggobi classes
+
+$(PKG).so:
+
 
 
 ifdef GGOBI_CONFIG
@@ -30,14 +36,16 @@ endif
 GTK_CONFIG=gtk-config
 EXTRA_LIBS=${JNI_LIBS:%=-L%} -ljvm -lhpi
 
-ifeq (${DEBUG},"yes")
+ifeq (${DEBUG},yes)
  DEBUG="-DJAVA_DEBUG=1"
 endif
 
 CFLAGS+=-g $(JNI_INCLUDES:%=-I%) $(GNOME_SUPPORT_INCLUDE_DIR:%=-I%) $(GGOBI_INCLUDE_DIR) $(shell $(GTK_CONFIG) --cflags) $(DEBUG)
 
 
-SRC=jvm
+SRC+=jvm
+
+
 OBJS=$(SRC:%=%.o)
 
 $(PKG).so: $(OBJS)
@@ -56,4 +64,11 @@ local.config: configure local.config.in
 configure: configure.in
 	autoconf
 
+
+ggobiAccess.o: ggobi_ggobi.h
+ggobi_%.h: ggobi/%.class
+	$(JAVAH) -classpath . $(subst .class,,$(subst /,., $<))
+
+libJavaGGobi.so: ggobiAccess.o
+	$(CC) -shared -o $@ ggobiAccess.o $(GGOBI_LIB) $(EXTRA_LIBS)  $(shell $(GTK_CONFIG) --libs)
 
