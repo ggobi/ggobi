@@ -10,6 +10,7 @@
 */
 
 #include <stdlib.h>
+#include <string.h>
 
 #include <gtk/gtk.h>
 #include "vars.h"
@@ -96,7 +97,6 @@ impute_fixed_cb (ImputeType impute_type, gfloat *val, ggobid *gg)
   gboolean ok = true;
 
   if (impute_type == IMP_ABOVE || impute_type == IMP_BELOW) {
-    gdouble drand;
 
     if (impute_type == IMP_ABOVE) {
       w = widget_find_by_name (gg->impute.window, "IMPUTE:entry_above");
