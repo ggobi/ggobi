@@ -393,7 +393,7 @@ static void
 vartable_subwindow_init (datad *d, ggobid *gg)
 {
   gint j, k;
-  GtkWidget *scrolled_window;
+  GtkWidget *scrolled_window, *ebox, *wlbl;
   gchar *lbl;
   gchar *titles[NCOLS_CLIST_REAL] = {
     "varno",          /*-- varno will be an invisible column --*/
@@ -457,8 +457,15 @@ vartable_subwindow_init (datad *d, ggobid *gg)
                                       k, true);
 
   gtk_container_add (GTK_CONTAINER (scrolled_window), d->vartable_clist[real]);
-  gtk_notebook_append_page (GTK_NOTEBOOK (nbook),
-    scrolled_window, gtk_label_new ("real"));
+  ebox = gtk_event_box_new ();
+  wlbl = (gtk_label_new("real"));
+  gtk_container_add (GTK_CONTAINER (ebox), wlbl);
+  gtk_widget_show(wlbl);
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), ebox,
+    "Table of statistics for real, integer and counter variables", NULL);
+  gtk_notebook_append_page (GTK_NOTEBOOK (nbook), scrolled_window, ebox);
+
+
   gtk_widget_set_usize (GTK_WIDGET (scrolled_window),
     d->vartable_clist[real]->requisition.width + 3 +
     GTK_SCROLLED_WINDOW (scrolled_window)->vscrollbar->requisition.width,
@@ -491,8 +498,14 @@ vartable_subwindow_init (datad *d, ggobid *gg)
 
   gtk_container_add (GTK_CONTAINER (scrolled_window),
     d->vartable_clist[categorical]);
-  gtk_notebook_append_page (GTK_NOTEBOOK (nbook),
-    scrolled_window, gtk_label_new ("categorical"));
+  ebox = gtk_event_box_new ();
+  wlbl = (gtk_label_new("categorical"));
+  gtk_container_add (GTK_CONTAINER (ebox), wlbl);
+  gtk_widget_show(wlbl);
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), ebox,
+    "Table of statistics for categorical variables", NULL);
+  gtk_notebook_append_page (GTK_NOTEBOOK (nbook), scrolled_window, ebox);
+
   /*-- 3 = COLUMN_INSET --*/
   gtk_widget_set_usize (GTK_WIDGET (scrolled_window),
     d->vartable_clist[categorical]->requisition.width + 3 +
@@ -512,7 +525,7 @@ vartable_subwindow_init (datad *d, ggobid *gg)
         vartable_row_append (j, d, gg);
     }
 
-    vartable_cells_set_by_var (j, d);  /*-- then opulate --*/
+    vartable_cells_set_by_var (j, d);  /*-- then populate --*/
   }
   
 
