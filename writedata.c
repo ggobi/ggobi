@@ -198,6 +198,7 @@ ggobi_file_set_create (gchar *rootname, datad *d, ggobid *gg)
 
 /* Step 1: verify that the rootname is writable */
 
+/*
   if ((fp = fopen (rootname, "w")) == NULL) {
     gchar *message = g_strdup_printf (
       "The file '%s' can not be opened for writing\n", rootname);
@@ -207,9 +208,9 @@ ggobi_file_set_create (gchar *rootname, datad *d, ggobid *gg)
   } else {
     fclose (fp);
   }
+*/
 
-
-  if(d == NULL)
+  if (d == NULL)
     d = (datad *) g_slist_nth_data(gg->d, 0);
 
 /* Determine the rows to be saved */
@@ -474,25 +475,30 @@ save_rowlabels (gchar *rootname, gint *rowv, gint nr, datad *d, ggobid *gg)
   gint i;
   FILE *fp;
   gchar *fname;
+  gint nels = d->rowlab->len;
 
-  fname = g_strdup_printf ("%s.row", rootname);
-  fp = fopen (fname, "w");
-  g_free (fname);
+  if (nels > 0) {
+    fname = g_strdup_printf ("%s.row", rootname);
+    fp = fopen (fname, "w");
+    g_free (fname);
 
-  if (fp == NULL) {
-    gchar *message = g_strdup_printf ("Failed to open %s.row for writing.\n",
-      rootname);
-    quick_message (message, false);
-    g_free (message);
-    return false;
+    if (fp == NULL) {
+      gchar *message = g_strdup_printf ("Failed to open %s.row for writing.\n",
+        rootname);
+      quick_message (message, false);
+      g_free (message);
+      return false;
+    }
+    else
+    {
+      for (i=0; i<nr; i++) {
+        fprintf (fp, "%s\n", 
+          (gchar *) g_array_index (d->rowlab, gchar *, rowv[i]));
+      }
+      fclose(fp);
+    }
   }
-  else
-  {
-    for (i=0; i<nr; i++)
-      fprintf (fp, "%s\n",  g_array_index (d->rowlab, gchar *, rowv[i]));
-    fclose(fp);
-    return true;
-  }
+  return true;
 }
 
 gboolean

@@ -404,4 +404,4 @@ int
 addInputFile(InputDescription *desc, const gchar *file) 
 {
   return(addInputSuffix(desc, file));  
- }
+}

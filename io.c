@@ -31,7 +31,6 @@ void
 filesel_ok (GtkWidget *w, GtkFileSelection *fs)
 {
   extern const gchar* const key_get (void);
-  datad *d = NULL; /* Need to set this somehow. */
   ggobid *gg = (ggobid *) gtk_object_get_data (GTK_OBJECT (fs), key_get());
   gchar *fname = gtk_file_selection_get_filename (GTK_FILE_SELECTION (fs));
   guint action = GPOINTER_TO_INT (gtk_object_get_data (GTK_OBJECT (fs),
@@ -52,30 +51,47 @@ filesel_ok (GtkWidget *w, GtkFileSelection *fs)
         case XMLDATA:
 #ifdef USE_XML
           /*-- if fname already contains ".xml", then don't add it --*/
-          if (g_strncasecmp (&fname[len-4], ".xml", 4) == 0)
+          if (len >= 4 && g_strncasecmp (&fname[len-4], ".xml", 4) == 0)
             filename = g_strdup (fname);
           else
             filename = g_strdup_printf ("%s.xml", fname);
 
-/*        write_xml ((const gchar *) g_strdup_printf ("%s.xml", fname), gg);*/
           write_xml ((const gchar *) filename, gg);
           g_free (filename);
 #endif
           break;
         case ASCIIDATA:
+        {
+          datad *d = NULL;
+          GSList *l = gg->d;
+          gchar *name;
+          gint k;
+          gint nd = g_slist_length (gg->d);
+          
           /*-- if fname already contains ".dat", then strip it off --*/
-          if (g_strncasecmp (&fname[len-4], ".dat", 4) == 0)
+          if (len >= 4 && g_strncasecmp (&fname[len-4], ".dat", 4) == 0)
             filename = g_strndup (fname, len-4);
           else
             filename = g_strdup (fname);
-          g_printerr ("filename=%s\n", filename);
-          d = g_slist_nth_data(gg->d, 0);
-          ggobi_file_set_create (filename, d, gg);
+
+          k = 0;
+          while (l) {
+            d = (datad *) l->data;
+            name = (nd > 1) ?
+              g_strdup_printf ("%s%d", filename, k) : g_strdup (filename);
+            ggobi_file_set_create (name, d, gg);
+            l = l->next;
+            k++;
+            g_free (name);
+          }
+
+
           g_free (filename);
           break;
-        case BINARYDATA:  /*-- not implemented --*/
+        }
+        case BINARYDATA:  /*-- not yet implemented --*/
           break;
-        case MYSQL_DATA:  /*-- not implemented --*/
+        case MYSQL_DATA:  /*-- never will be implemented --*/
           break;
       }
       break;

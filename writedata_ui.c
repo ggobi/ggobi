@@ -18,7 +18,11 @@
 static GtkWidget *window = NULL;
 
 static gchar *format_lbl[] =
-  {"XML", "File set (ascii)", "File set (binary)", "MySQL"};
+  {"XML", "File set (ascii)",
+#ifdef BINARY_IO_IMPLEMENTED
+"File set (binary)"
+#endif
+};
 void format_set (gint fmt, ggobid *gg) { gg->save.format = fmt; }
 static void format_set_cb (GtkWidget *w, gpointer cbd)
 {
