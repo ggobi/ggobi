@@ -52,6 +52,8 @@ splot_point_colors_used_get (splotd *sp, gint *ncolors_used,
       }
     } else {  /* used by plot_bins */
       gint ih, iv, j;
+      icoords *bin0 = &gg->plot.bin0;
+      icoords *bin1 = &gg->plot.bin1;
       /*
        * This has already been called in draw_to_pixmap0_binned, and
        * it shouldn't be called twice, because it is keeping track of
@@ -59,10 +61,10 @@ splot_point_colors_used_get (splotd *sp, gint *ncolors_used,
       */
       /*get_extended_brush_corners (&bin0, &bin1);*/
 
-      for (ih= gg->app.bin0.x; ih<= gg->app.bin1.x; ih++) {
-        for (iv=gg->app.bin0.y; iv<=gg->app.bin1.y; iv++) {
-          for (m=0; m<gg->br_binarray[ih][iv].nels; m++) {
-            j = gg->rows_in_plot[gg->br_binarray[ih][iv].els[m]];
+      for (ih= bin0->x; ih<= bin1->x; ih++) {
+        for (iv=bin0->y; iv<=bin1->y; iv++) {
+          for (m=0; m<gg->brush.binarray[ih][iv].nels; m++) {
+            j = gg->rows_in_plot[gg->brush.binarray[ih][iv].els[m]];
             if (gg->hidden_now[j]) {  /*-- if it's hidden, we don't care --*/
               new_color = false;
             } else {
@@ -214,6 +216,10 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
 #endif
   gint k;
   displayd *display = (displayd *) sp->displayptr;
+  icoords *bin0 = &gg->plot.bin0;
+  icoords *bin1 = &gg->plot.bin1;
+  icoords *loc0 = &gg->plot.loc0;
+  icoords *loc1 = &gg->plot.loc1;
 
   gushort current_color;
   static gint npoint_colors_used = 0;
@@ -227,28 +233,31 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
  * clear what's necessary.
 */
 
-  get_extended_brush_corners (&gg->app.bin0, &gg->app.bin1, gg);
+  get_extended_brush_corners (bin0, bin1, gg);
 
 /*
  * Determine locations of bin corners: upper left edge of loc0;
  * lower right edge of loc1.
 */
-  gg->app.loc0.x = (gint) ((gfloat) gg->app.bin0.x / (gfloat) gg->br_nbins * (sp->max.x+1.0));
-  gg->app.loc0.y = (gint) ((gfloat) gg->app.bin0.y / (gfloat) gg->br_nbins * (sp->max.y+1.0));
-  gg->app.loc1.x = (gint)
-    ((gfloat) (gg->app.bin1.x+1) / (gfloat) gg->br_nbins * (sp->max.x+1.0));
-  gg->app.loc1.y = (gint)
-    ((gfloat) (gg->app.bin1.y+1) / (gfloat) gg->br_nbins * (sp->max.y+1.0));
+  loc0->x = (gint)
+    ((gfloat) bin0->x / (gfloat) gg->brush.nbins * (sp->max.x+1.0));
+  loc0->y = (gint)
+    ((gfloat) bin0->y / (gfloat) gg->brush.nbins * (sp->max.y+1.0));
+  loc1->x = (gint)
+    ((gfloat) (bin1->x+1) / (gfloat) gg->brush.nbins * (sp->max.x+1.0));
+  loc1->y = (gint)
+    ((gfloat) (bin1->y+1) / (gfloat) gg->brush.nbins * (sp->max.y+1.0));
 
 /*
  * Clear an area a few pixels inside that region.  Watch out
  * for border effects.
 */
-  loc_clear0.x = (gg->app.bin0.x == 0) ? 0 : gg->app.loc0.x + BRUSH_MARGIN;
-  loc_clear0.y = (gg->app.bin0.y == 0) ? 0 : gg->app.loc0.y + BRUSH_MARGIN;
-  loc_clear1.x = (gg->app.bin1.x == gg->br_nbins-1) ? sp->max.x : gg->app.loc1.x - BRUSH_MARGIN;
-  loc_clear1.y = (gg->app.bin1.y == gg->br_nbins-1) ? sp->max.y : gg->app.loc1.y - BRUSH_MARGIN;
-
+  loc_clear0.x = (bin0->x == 0) ? 0 : loc0->x + BRUSH_MARGIN;
+  loc_clear0.y = (bin0->y == 0) ? 0 : loc0->y + BRUSH_MARGIN;
+  loc_clear1.x = (bin1->x == gg->brush.nbins-1) ? sp->max.x :
+                                               loc1->x - BRUSH_MARGIN;
+  loc_clear1.y = (bin1->y == gg->brush.nbins-1) ? sp->max.y :
+                                               loc1->y - BRUSH_MARGIN;
 
   gdk_gc_set_foreground (gg->plot_GC, &gg->bg_color);
   gdk_draw_rectangle (sp->pixmap0, gg->plot_GC,
@@ -273,12 +282,12 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
           &gg->default_color_table[current_color]);
 
 #ifdef _WIN32
-        win32_draw_to_pixmap_binned (&gg->app.bin0, &gg->app.bin1, current_color, sp);
+        win32_draw_to_pixmap_binned (bin0, bin1, current_color, sp);
 #else
-        for (ih=gg->app.bin0.x; ih<=gg->app.bin1.x; ih++) {
-          for (iv=gg->app.bin0.y; iv<=gg->app.bin1.y; iv++) {
-            for (m=0; m<gg->br_binarray[ih][iv].nels; m++) {
-              i = gg->rows_in_plot[gg->br_binarray[ih][iv].els[m]];
+        for (ih=bin0->x; ih<=bin1->x; ih++) {
+          for (iv=bin0->y; iv<=bin1->y; iv++) {
+            for (m=0; m<gg->brush.binarray[ih][iv].nels; m++) {
+              i = gg->rows_in_plot[gg->brush.binarray[ih][iv].els[m]];
               if (!gg->hidden_now[i] && gg->color_now[i] == current_color) {
                 draw_glyph (sp->pixmap0, &gg->glyph_now[i], sp->screen, i, gg);
 
@@ -591,6 +600,8 @@ splot_pixmap0_to_pixmap1 (splotd *sp, gboolean binned, ggobid *gg) {
   displayd *display = (displayd *) sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
   gint mode = mode_get (gg);
+  icoords *loc0 = &gg->plot.loc0;
+  icoords *loc1 = &gg->plot.loc1;
 
   if (!binned) {
     gdk_draw_pixmap (sp->pixmap1, gg->plot_GC, sp->pixmap0,
@@ -600,10 +611,10 @@ splot_pixmap0_to_pixmap1 (splotd *sp, gboolean binned, ggobid *gg) {
   }
   else
     gdk_draw_pixmap (sp->pixmap1, gg->plot_GC, sp->pixmap0,
-                      gg->app.loc0.x, gg->app.loc0.y,
-                      gg->app.loc0.x, gg->app.loc0.y,
-                      1 + gg->app.loc1.x - gg->app.loc0.x ,
-                      1 + gg->app.loc1.y - gg->app.loc0.y);
+                      loc0->x, loc0->y,
+                      loc0->x, loc0->y,
+                      1 + loc1->x - loc0->x ,
+                      1 + loc1->y - loc0->y);
 
   if (display->options.segments_directed_show_p ||
       display->options.segments_undirected_show_p)

@@ -204,7 +204,7 @@ scatterplot_new (gboolean missing_p, splotd *sp, ggobid *gg) {
     display->options.axes_center_p = true; 
    */
 
-  scatterplot_cpanel_init (&display->cpanel, XYPLOT);
+  scatterplot_cpanel_init (&display->cpanel, XYPLOT, gg);
 
   display_window_init(display, 3, gg);
 

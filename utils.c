@@ -462,7 +462,7 @@ address_check (ggobid *gg)
   g_printerr ("::: vars.h :::\n");
   g_printerr ("data_mode %d world %d nseg %d rowlab %s jitfac %f\n",
     gg->data_mode, (gint) gg->world.data[0][0], gg->nsegments,
-    gg->rowlab[0], gg->jitter_factor);
+    gg->rowlab[0], gg->jitter.factor);
 
   return 1;
 }

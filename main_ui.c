@@ -38,20 +38,20 @@ size_allocate_cb (GtkWidget *w, GdkEvent *event, ggobid *gg)
 
     /*-- Use the largest control panel, which is currently COTOUR --*/
     GtkWidget *largest_panel = gg->control_panel[COTOUR];
-    GtkWidget *mode_panel = gg->control_panel[gg->app.mode];
+    GtkWidget *mode_panel = gg->control_panel[gg->mode];
 
     /* remove the xyplot panel */
     gtk_widget_ref (mode_panel);
-    gtk_container_remove (GTK_CONTAINER (gg->app.mode_frame), mode_panel);
+    gtk_container_remove (GTK_CONTAINER (gg->mode_frame), mode_panel);
 
     /* add the largest panel and resize */
-    gtk_container_add (GTK_CONTAINER (gg->app.mode_frame), largest_panel);
+    gtk_container_add (GTK_CONTAINER (gg->mode_frame), largest_panel);
     gtk_container_check_resize (GTK_CONTAINER (w));
 
     /* remove the largest panel and restore the xyplot panel */
     gtk_widget_ref (largest_panel);
-    gtk_container_remove (GTK_CONTAINER (gg->app.mode_frame), largest_panel);
-    gtk_container_add (GTK_CONTAINER (gg->app.mode_frame), mode_panel);
+    gtk_container_remove (GTK_CONTAINER (gg->mode_frame), largest_panel);
+    gtk_container_add (GTK_CONTAINER (gg->mode_frame), mode_panel);
 
     /*-- widen the variable selection panel --*/
     varpanel_size_init (largest_panel->requisition.height, gg);
@@ -85,7 +85,7 @@ make_control_panels (ggobid *gg) {
 void
 main_display_options_cb (ggobid *gg, guint action, GtkCheckMenuItem *w) 
 {
-  if (gg->app.mode_frame == NULL)  /* so it isn't executed on startup */
+  if (gg->mode_frame == NULL)  /* so it isn't executed on startup */
     return;
   else
     g_printerr ("(main_display_options_cb) action = %d\n", action);
@@ -99,9 +99,9 @@ main_display_options_cb (ggobid *gg, guint action, GtkCheckMenuItem *w)
 
     case 1:
       if (w->active)
-        gtk_widget_hide (gg->app.mode_frame);
+        gtk_widget_hide (gg->mode_frame);
       else
-        gtk_widget_show (gg->app.mode_frame);
+        gtk_widget_show (gg->mode_frame);
       break;
 
     case 2:
@@ -148,12 +148,6 @@ main_display_options_cb (ggobid *gg, guint action, GtkCheckMenuItem *w)
 void
 mode_submenus_activate (splotd *sp, gint m, gboolean state, ggobid *gg)
 {
-  /*
-  extern GtkWidget *scale_reset_menu;
-  extern GtkWidget *brush_reset_menu, *brush_link_menu;
-  extern GtkWidget *identify_link_menu;
-  extern GtkWidget *rotation_io_menu, *tour2d_io_menu;
-  */
   static GtkWidget *reset_item = NULL;
   static GtkWidget *link_item = NULL;
   static GtkWidget *io_item = NULL;
@@ -209,10 +203,11 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state, ggobid *gg)
       case ROTATE:
         rotation_menus_make (gg);
 
-        io_item = submenu_make ("_I/O", 'I', gg->app.main_accel_group);
-        gtk_menu_item_set_submenu (GTK_MENU_ITEM (io_item), gg->app.rotation_io_menu); 
+        io_item = submenu_make ("_I/O", 'I', gg->main_accel_group);
+        gtk_menu_item_set_submenu (GTK_MENU_ITEM (io_item),
+                                   gg->app.rotation_io_menu); 
         if (firsttime_io) {
-          submenu_insert (io_item, gg->app.menubar, -1);
+          submenu_insert (io_item, gg->main_menubar, -1);
           firsttime_io = false;
         }
         break;
@@ -220,10 +215,11 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state, ggobid *gg)
       case TOUR2D:
         tour2d_menus_make (gg);
 
-        io_item = submenu_make ("_I/O", 'I', gg->app.main_accel_group);
-        gtk_menu_item_set_submenu (GTK_MENU_ITEM (io_item), gg->app.tour2d_io_menu); 
+        io_item = submenu_make ("_I/O", 'I', gg->main_accel_group);
+        gtk_menu_item_set_submenu (GTK_MENU_ITEM (io_item),
+                                   gg->app.tour2d_io_menu); 
         if (firsttime_io) {
-          submenu_insert (io_item, gg->app.menubar, -1);
+          submenu_insert (io_item, gg->main_menubar, -1);
           firsttime_io = false;
         }
         break;
@@ -231,11 +227,11 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state, ggobid *gg)
       case SCALE :
         scale_menus_make (gg);
 
-        reset_item = submenu_make ("_Reset", 'R', gg->app.main_accel_group);
+        reset_item = submenu_make ("_Reset", 'R', gg->main_accel_group);
         gtk_menu_item_set_submenu (GTK_MENU_ITEM (reset_item),
                                    gg->app.scale_reset_menu); 
         if (firsttime_reset) {
-          submenu_insert (reset_item, gg->app.menubar, -1);
+          submenu_insert (reset_item, gg->main_menubar, -1);
           firsttime_reset = false;
         }
         break;
@@ -243,19 +239,19 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state, ggobid *gg)
       case BRUSH :
         brush_menus_make (gg);
 
-        reset_item = submenu_make ("_Reset", 'R', gg->app.main_accel_group);
+        reset_item = submenu_make ("_Reset", 'R', gg->main_accel_group);
         gtk_menu_item_set_submenu (GTK_MENU_ITEM (reset_item),
-                                   gg->app.brush_reset_menu); 
+                                   gg->brush.brush_reset_menu); 
         if (firsttime_reset) {
-          submenu_insert (reset_item, gg->app.menubar, -1);
+          submenu_insert (reset_item, gg->main_menubar, -1);
           firsttime_reset = false;
         }
 
-        link_item = submenu_make ("_Link", 'L', gg->app.main_accel_group);
+        link_item = submenu_make ("_Link", 'L', gg->main_accel_group);
         gtk_menu_item_set_submenu (GTK_MENU_ITEM (link_item),
-                                   gg->app.brush_link_menu); 
+                                   gg->brush.brush_link_menu); 
         if (firsttime_link) {
-          submenu_insert (link_item, gg->app.menubar, -1);
+          submenu_insert (link_item, gg->main_menubar, -1);
           firsttime_link = false;
         }
 
@@ -264,11 +260,11 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state, ggobid *gg)
       case IDENT:
         identify_menus_make (gg);
 
-        link_item = submenu_make ("_Link", 'L', gg->app.main_accel_group);
+        link_item = submenu_make ("_Link", 'L', gg->main_accel_group);
         gtk_menu_item_set_submenu (GTK_MENU_ITEM (link_item),
                                    gg->app.identify_link_menu); 
         if (firsttime_link) {
-          submenu_insert (link_item, gg->app.menubar, -1);
+          submenu_insert (link_item, gg->main_menubar, -1);
           firsttime_link = false;
         }
         break;
@@ -279,11 +275,11 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state, ggobid *gg)
 
 gint
 mode_get (ggobid* gg) {
-  return gg->app.mode;
+  return gg->mode;
 }
 gint
 projection_get (ggobid* gg) {
-  return gg->app.projection;
+  return gg->projection;
 }
 
 
@@ -294,15 +290,16 @@ void
 mode_set (gint m, ggobid *gg) {
   displayd *display = gg->current_display;
 
-  gg->app.mode = m;
-  if (gg->app.mode != gg->app.prev_mode) {
+  gg->mode = m;
+  if (gg->mode != gg->prev_mode) {
     /* Add a reference to the widget so it isn't destroyed */
-    gtk_widget_ref (gg->control_panel[gg->app.prev_mode]);
-    gtk_container_remove (GTK_CONTAINER (gg->app.mode_frame),
-                          gg->control_panel[gg->app.prev_mode]);
+    gtk_widget_ref (gg->control_panel[gg->prev_mode]);
+    gtk_container_remove (GTK_CONTAINER (gg->mode_frame),
+                          gg->control_panel[gg->prev_mode]);
   
-    gtk_frame_set_label (GTK_FRAME (gg->app.mode_frame), mode_name[gg->app.mode]);
-    gtk_container_add (GTK_CONTAINER (gg->app.mode_frame), gg->control_panel[gg->app.mode]);
+    gtk_frame_set_label (GTK_FRAME (gg->mode_frame), mode_name[gg->mode]);
+    gtk_container_add (GTK_CONTAINER (gg->mode_frame),
+      gg->control_panel[gg->mode]);
   }
 
   /*
@@ -312,16 +309,16 @@ mode_set (gint m, ggobid *gg) {
    * value of projection is irrelevant.)
   */
   if (display->displaytype == scatterplot) {
-    if (gg->app.mode <= COTOUR)
-      gg->app.projection = display->cpanel.projection = gg->app.mode;
+    if (gg->mode <= COTOUR)
+      gg->projection = display->cpanel.projection = gg->mode;
 
-    if (gg->app.projection != gg->app.prev_projection) {
-      scatterplot_show_rulers (display, gg->app.projection);
-      gg->app.prev_projection = gg->app.projection;
+    if (gg->projection != gg->prev_projection) {
+      scatterplot_show_rulers (display, gg->projection);
+      gg->prev_projection = gg->projection;
     }
   }
 
-  gg->app.prev_mode = gg->app.mode;
+  gg->prev_mode = gg->mode;
 
 /*  varpanel_refresh ();*/
 }
@@ -388,15 +385,15 @@ mode_set_cb (GtkWidget *widget, gint action)
     displayd *display = gg->current_display;
 
     sp_event_handlers_toggle (sp, off);
-    mode_activate (sp, gg->app.mode, off, gg);
-    mode_submenus_activate (sp, gg->app.mode, off, gg);
+    mode_activate (sp, gg->mode, off, gg);
+    mode_submenus_activate (sp, gg->mode, off, gg);
 
     display->cpanel.mode = action;
     mode_set (action, gg);  /* mode = action */
 
     sp_event_handlers_toggle (sp, on);
-    mode_activate (sp, gg->app.mode, on, gg);
-    mode_submenus_activate (sp, gg->app.mode, on, gg);
+    mode_activate (sp, gg->mode, on, gg);
+    mode_submenus_activate (sp, gg->mode, on, gg);
 
     display_tailpipe (display, gg);
   }
@@ -565,19 +562,19 @@ void make_ui (ggobid *gg) {
   gtk_container_border_width (GTK_CONTAINER (vbox), 1);
   gtk_container_add (GTK_CONTAINER (window), vbox);
 
-  gg->app.main_accel_group = gtk_accel_group_new ();
+  gg->main_accel_group = gtk_accel_group_new ();
   get_main_menu (menu_items, sizeof (menu_items) / sizeof (menu_items[0]),
-                 gg->app.main_accel_group, window, &gg->app.menubar, (gpointer) gg);
+                 gg->main_accel_group, window, &gg->main_menubar, (gpointer) gg);
 
-  gtk_box_pack_start (GTK_BOX (vbox), gg->app.menubar, false, true, 0);
+  gtk_box_pack_start (GTK_BOX (vbox), gg->main_menubar, false, true, 0);
 
-  gtk_accel_group_lock (gg->app.main_accel_group);
+  gtk_accel_group_lock (gg->main_accel_group);
 
 /*
  * Step through the option menu, setting the values of toggle items
  * as appropriate.
 */
-  items = gtk_container_children (GTK_CONTAINER (gg->app.menubar));
+  items = gtk_container_children (GTK_CONTAINER (gg->main_menubar));
   while (items) {
     item = items->data;
     gtk_label_get (GTK_LABEL (GTK_MENU_ITEM (item)->item.bin.child ), &name);
@@ -616,13 +613,14 @@ void make_ui (ggobid *gg) {
  * Create a frame to hold the mode panels, set its label
  * and contents, using the default mode for the default display.
 */
-  gg->app.mode_frame = gtk_frame_new (mode_name[gg->app.mode]);
-  gtk_box_pack_start (GTK_BOX (hbox), gg->app.mode_frame, false, false, 3);
-  gtk_container_set_border_width (GTK_CONTAINER (gg->app.mode_frame), 3);
-  gtk_frame_set_shadow_type (GTK_FRAME (gg->app.mode_frame), GTK_SHADOW_IN);
+  gg->mode_frame = gtk_frame_new (mode_name[gg->mode]);
+  gtk_box_pack_start (GTK_BOX (hbox), gg->mode_frame, false, false, 3);
+  gtk_container_set_border_width (GTK_CONTAINER (gg->mode_frame), 3);
+  gtk_frame_set_shadow_type (GTK_FRAME (gg->mode_frame), GTK_SHADOW_IN);
 
   make_control_panels (gg);
-  gtk_container_add (GTK_CONTAINER (gg->app.mode_frame), gg->control_panel[gg->app.mode]);
+  gtk_container_add (GTK_CONTAINER (gg->mode_frame),
+    gg->control_panel[gg->mode]);
 
   /*-- Variable selection panel --*/
   make_varpanel (hbox, gg);

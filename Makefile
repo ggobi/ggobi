@@ -90,8 +90,6 @@ dm: $(OB)
 libGGobi.so: $(OB)
 	$(CC) -g $(SHARED_LD_FLAGS) -o $@ $(OB) $(XML_LIB_DIRS) $(XML_LIBS) `gtk-config --libs`
 
-lib: libGGobi.so
-
 clean: 
 	rm -f *.o ggobi libGGobi.so
 

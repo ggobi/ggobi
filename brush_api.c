@@ -21,9 +21,10 @@ void
 GGOBI(sizeBrush) (gint width, gint height, ggobid *gg)  /*-- resize brush without painting --*/
 {
   splotd *sp = gg->current_splot;
+  brush_coords *brush_pos = &gg->brush.brush_pos;
 
-  gg->app.brush_pos.x2 = gg->app.brush_pos.x1 + width;
-  gg->app.brush_pos.y2 = gg->app.brush_pos.y1 + height;
+  brush_pos->x2 = brush_pos->x1 + width;
+  brush_pos->y2 = brush_pos->y1 + height;
 
   splot_redraw (sp, QUICK, gg);  
 }

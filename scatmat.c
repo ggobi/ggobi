@@ -105,11 +105,9 @@ ggobid *gg)
     display = (displayd*) sub_plots[0]->displayptr;
   }
 
-  /*-- testing; dfs --*/
   display->p1d_orientation = HORIZONTAL;
-  /* */
 
-  scatmat_cpanel_init (&display->cpanel);
+  scatmat_cpanel_init (&display->cpanel, gg);
 
   display_window_init (display, 5, gg);
 

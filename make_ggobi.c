@@ -25,7 +25,7 @@ void globals_init (ggobid *gg) {
   arrayf_init (&gg->tform1);
   arrayf_init (&gg->tform2);
   arrayl_init (&gg->world);
-  arrayl_init (&gg->jitter);
+  arrayl_init (&gg->jitdata);
 
   arrays_init (&gg->missing);
   arrayl_init (&gg->missing_world);

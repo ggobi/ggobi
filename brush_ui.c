@@ -9,11 +9,6 @@
 #include "vars.h"
 #include "externs.h"
 
-static GtkWidget *mode_opt;
-static GtkWidget *cg_opt;
-static GtkWidget *scope_opt;
-static GtkWidget *brush_on_btn;
-
 static void brush_on_cb (GtkToggleButton *button, ggobid *gg)
 {
   cpaneld *cpanel = &gg->current_display->cpanel;
@@ -206,74 +201,74 @@ brush_menus_make (ggobid *gg) {
 /*
  * Reset menu
 */
-  gg->app.brush_reset_menu = gtk_menu_new ();
+  gg->brush.reset_menu = gtk_menu_new ();
 
   item = gtk_menu_item_new_with_label ("Reset point colors");
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (brush_reset_cb),
                       (gpointer) "pointcolors");
-  gtk_menu_append (GTK_MENU (gg->app.brush_reset_menu), item);
+  gtk_menu_append (GTK_MENU (gg->brush.reset_menu), item);
 
   item = gtk_menu_item_new_with_label ("Reset brush size");
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (brush_reset_cb),
                       (gpointer) "brushsize");
-  gtk_menu_append (GTK_MENU (gg->app.brush_reset_menu), item);
+  gtk_menu_append (GTK_MENU (gg->brush.reset_menu), item);
 
   item = gtk_menu_item_new_with_label ("Reset linecolors");
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (brush_reset_cb),
                       (gpointer) "linecolors");
-  gtk_menu_append (GTK_MENU (gg->app.brush_reset_menu), item);
+  gtk_menu_append (GTK_MENU (gg->brush.reset_menu), item);
 
   item = gtk_menu_item_new_with_label ("Reset glyphs");
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (brush_reset_cb),
                       (gpointer) "glyphs");
-  gtk_menu_append (GTK_MENU (gg->app.brush_reset_menu), item);
+  gtk_menu_append (GTK_MENU (gg->brush.reset_menu), item);
 
-  gtk_widget_show_all (gg->app.brush_reset_menu);
+  gtk_widget_show_all (gg->brush.reset_menu);
 
 /*
  * Link menu
 */
-  gg->app.brush_link_menu = gtk_menu_new ();
+  gg->brush.link_menu = gtk_menu_new ();
 
   item = gtk_check_menu_item_new_with_label ("Link points <-> points");
   gtk_signal_connect (GTK_OBJECT (item), "toggled",
                       GTK_SIGNAL_FUNC (brush_link_cb),
                       (gpointer) "p2p");
-  gtk_menu_append (GTK_MENU (gg->app.brush_link_menu), item);
+  gtk_menu_append (GTK_MENU (gg->brush.link_menu), item);
   gtk_check_menu_item_set_show_toggle (GTK_CHECK_MENU_ITEM (item), true);
 
   item = gtk_check_menu_item_new_with_label ("Link lines <-> lines");
   gtk_signal_connect (GTK_OBJECT (item), "toggled",
                       GTK_SIGNAL_FUNC (brush_link_cb),
                       (gpointer) "l2l");
-  gtk_menu_append (GTK_MENU (gg->app.brush_link_menu), item);
+  gtk_menu_append (GTK_MENU (gg->brush.link_menu), item);
   gtk_check_menu_item_set_show_toggle (GTK_CHECK_MENU_ITEM (item), true);
 
   item = gtk_check_menu_item_new_with_label ("Link points <-> lines");
   gtk_signal_connect (GTK_OBJECT (item), "toggled",
                       GTK_SIGNAL_FUNC (brush_link_cb),
                       (gpointer) "p2l");
-  gtk_menu_append (GTK_MENU (gg->app.brush_link_menu), item);
+  gtk_menu_append (GTK_MENU (gg->brush.link_menu), item);
   gtk_check_menu_item_set_show_toggle (GTK_CHECK_MENU_ITEM (item), true);
 
   item = gtk_check_menu_item_new_with_label ("Link color brushing");
   gtk_signal_connect (GTK_OBJECT (item), "toggled",
                       GTK_SIGNAL_FUNC (brush_link_cb),
                       (gpointer) "color");
-  gtk_menu_append (GTK_MENU (gg->app.brush_link_menu), item);
+  gtk_menu_append (GTK_MENU (gg->brush.link_menu), item);
   gtk_check_menu_item_set_show_toggle (GTK_CHECK_MENU_ITEM (item), true);
   item = gtk_check_menu_item_new_with_label ("Link glyph brushing");
   gtk_signal_connect (GTK_OBJECT (item), "toggled",
                       GTK_SIGNAL_FUNC (brush_link_cb),
                       (gpointer) "glyph");
-  gtk_menu_append (GTK_MENU (gg->app.brush_link_menu), item);
+  gtk_menu_append (GTK_MENU (gg->brush.link_menu), item);
   gtk_check_menu_item_set_show_toggle (GTK_CHECK_MENU_ITEM (item), true);
 
-  gtk_widget_show_all (gg->app.brush_link_menu);
+  gtk_widget_show_all (gg->brush.link_menu);
 }
 
 void
@@ -283,53 +278,55 @@ cpanel_brush_make (ggobid *gg) {
   gg->control_panel[BRUSH] = gtk_vbox_new (false, VBOX_SPACING);
   gtk_container_set_border_width (GTK_CONTAINER (gg->control_panel[BRUSH]), 5);
 
-  brush_on_btn = gtk_check_button_new_with_label ("Brush on");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), brush_on_btn,
+  gg->brush.brush_on_btn = gtk_check_button_new_with_label ("Brush on");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->brush.brush_on_btn,
     "Make the brush active or inactive", NULL);
-  gtk_signal_connect (GTK_OBJECT (brush_on_btn), "toggled",
+  gtk_signal_connect (GTK_OBJECT (gg->brush.brush_on_btn), "toggled",
                      GTK_SIGNAL_FUNC (brush_on_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (gg->control_panel[BRUSH]),
-                      brush_on_btn, false, false, 0);
+                      gg->brush.brush_on_btn, false, false, 0);
 
 /*
  * make an option menu for setting the brushing mode
 */
-  scope_opt = gtk_option_menu_new ();
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), scope_opt,
+  gg->brush.scope_opt = gtk_option_menu_new ();
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->brush.scope_opt,
     "Brush points only, lines only, or both points and lines", NULL);
   gtk_box_pack_start (GTK_BOX (gg->control_panel[BRUSH]),
-                      scope_opt, false, false, 0);
-  populate_option_menu (scope_opt, scope_lbl,
+                      gg->brush.scope_opt, false, false, 0);
+  populate_option_menu (gg->brush.scope_opt, scope_lbl,
                         sizeof (scope_lbl) / sizeof (gchar *),
                         brush_scope_set_cb, gg);
-  /* points only */
-  gtk_option_menu_set_history (GTK_OPTION_MENU (scope_opt), 0); 
+  /*-- initial value: points only --*/
+  gtk_option_menu_set_history (GTK_OPTION_MENU (gg->brush.scope_opt), 0); 
   
 /*
  * option menu for specifying whether to brush with color/glyph/both
 */
-  cg_opt = gtk_option_menu_new ();
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), cg_opt,
+  gg->brush.cg_opt = gtk_option_menu_new ();
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->brush.cg_opt,
     "Brush with color and glyph, color, glyph, glyph size; or hide", NULL);
   gtk_box_pack_start (GTK_BOX (gg->control_panel[BRUSH]),
-                      cg_opt, false, false, 0);
-  populate_option_menu (cg_opt, cg_lbl,
+                      gg->brush.cg_opt, false, false, 0);
+  populate_option_menu (gg->brush.cg_opt, cg_lbl,
                         sizeof (cg_lbl) / sizeof (gchar *),
                         brush_cg_cb, gg);
-  gtk_option_menu_set_history (GTK_OPTION_MENU (cg_opt), 0);  /* both */
+  /*-- initial value: both --*/
+  gtk_option_menu_set_history (GTK_OPTION_MENU (gg->brush.cg_opt), 0);
 
 /*
  * option menu for setting the brushing persistence
 */
-  mode_opt = gtk_option_menu_new ();
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), mode_opt,
+  gg->brush.mode_opt = gtk_option_menu_new ();
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->brush.mode_opt,
     "Persistent or transient brushing", NULL);
   gtk_box_pack_start (GTK_BOX (gg->control_panel[BRUSH]),
-                      mode_opt, false, false, 0);
-  populate_option_menu (mode_opt, mode_lbl,
+                      gg->brush.mode_opt, false, false, 0);
+  populate_option_menu (gg->brush.mode_opt, mode_lbl,
                         sizeof (mode_lbl) / sizeof (gchar *),
                         brush_mode_cb, gg);
-  gtk_option_menu_set_history (GTK_OPTION_MENU (mode_opt), 1);  /* transient */
+  /* initialize transient */
+  gtk_option_menu_set_history (GTK_OPTION_MENU (gg->brush.mode_opt), 1);
 
 
   btn = gtk_button_new_with_label ("Undo");
@@ -372,7 +369,7 @@ cpanel_brush_make (ggobid *gg) {
 /*--------------------------------------------------------------------*/
 
 void
-cpanel_brush_init (cpaneld *cpanel) {
+cpanel_brush_init (cpaneld *cpanel, ggobid *gg) {
   cpanel->brush_on_p = true;
 
   cpanel->br_mode = BR_TRANSIENT;
@@ -381,14 +378,14 @@ cpanel_brush_init (cpaneld *cpanel) {
 }
 
 void
-cpanel_brush_set (cpaneld *cpanel) {
-  GTK_TOGGLE_BUTTON (brush_on_btn)->active = cpanel->brush_on_p;
+cpanel_brush_set (cpaneld *cpanel, ggobid *gg) {
+  GTK_TOGGLE_BUTTON (gg->brush.brush_on_btn)->active = cpanel->brush_on_p;
 
-  gtk_option_menu_set_history (GTK_OPTION_MENU (mode_opt),
+  gtk_option_menu_set_history (GTK_OPTION_MENU (gg->brush.mode_opt),
                                cpanel->br_mode);
-  gtk_option_menu_set_history (GTK_OPTION_MENU (scope_opt),
+  gtk_option_menu_set_history (GTK_OPTION_MENU (gg->brush.scope_opt),
                                cpanel->br_scope);
-  gtk_option_menu_set_history (GTK_OPTION_MENU (cg_opt),
+  gtk_option_menu_set_history (GTK_OPTION_MENU (gg->brush.cg_opt),
                                cpanel->br_target);
 }
 

@@ -108,7 +108,7 @@ zero_tinc(displayd *dsp, ggobid *gg) {
    subset of variable might be used, or when there is new data. */
 
 void 
-cpanel_tour_init(cpaneld *cpanel) {
+cpanel_tour_init (cpaneld *cpanel, ggobid *gg) {
     cpanel->is_tour_paused = false;
     cpanel->is_tour_local_scan = false;
     cpanel->is_tour_stepping = false;
@@ -119,7 +119,7 @@ cpanel_tour_init(cpaneld *cpanel) {
 }
 
 void 
-display_tour_init(displayd *dsp, ggobid *gg) {
+display_tour_init (displayd *dsp, ggobid *gg) {
     gint i, j;
 
     alloc_tour(dsp, gg);

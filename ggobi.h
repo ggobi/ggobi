@@ -13,35 +13,12 @@ typedef enum {read_all, read_block, draw_sample} FileReadType;
 
 struct _ggobid;
 
-
 typedef struct {
- gint nspherevars;
- gint *spherevars;
- gint sphere_npcs;
-
- gfloat *eigenval;
- gfloat **eigenvec;
- gfloat **vc;
- gfloat *tform1_mean;
 } spherical;
 
 typedef struct {
 
  struct _ggobid *thisGG;
-
-  /* main_ui */
-  GtkWidget *menubar;
-  GtkAccelGroup *main_accel_group;
-
-  /* brush_ui */
-  GtkWidget *brush_reset_menu;
-  GtkWidget *brush_link_menu;
-
-  /* brush */
-  brush_coords brush_pos ;  
-
-  /* color_ui.c */
-  gint spacing;
 
   /* identify_ui.c */
   GtkWidget *identify_link_menu;
@@ -75,10 +52,6 @@ typedef struct {
   varseldatad vdata0;
   varseldatad vdata1;
 
-  GtkWidget *mode_item;
-  gboolean firsttime;  
-
-
   /* xyplot_ui */
   gboolean cycle_p;
   gint direction;
@@ -87,50 +60,12 @@ typedef struct {
   GtkWidget *vardata_window;
   GtkWidget *clist;
 
-  /* sp_plot.c */
-
-/*
- * The corners of the bin to be copied from pixmap0 to pixmap1.
- * They're defined in splot_draw_to_pixmap0_binned and used in
- * splot_pixmap0_to_pixmap1 when binned == true.
-*/
- icoords bin0, bin1;
- icoords loc0, loc1;
-
-  /* sphere_ui */
- GtkWidget *window;
- GtkAdjustment *npcs_adj;
- GtkWidget *totvar_entry, *condnum_entry;
- GtkWidget *sphere_apply_btn;
-
   /* scatterplot.c */
  GtkAccelGroup *sp_accel_group;
 
-  /* subset_ui*/
- gboolean rescale_p;
- GtkWidget *subset_window;
- GtkWidget *ss_notebook;
-
-/*-- the entry widgets from which to get values for sample, rowlab --*/
- GtkWidget *ss_random_entry, *ss_rowlab_entry;
-/*-- the adjustments from which to get values for blocksize, everyn --*/
- GtkAdjustment *ss_bstart_adj, *ss_bsize_adj;
- GtkAdjustment *ss_estart_adj, *ss_estep_adj;
-
-  /* ggobi.h */
- GtkWidget *stage0_opt, *stage1_opt, *stage2_opt;
- GtkAdjustment *boxcox_adj;
-
-  /* main_ui.c */
- gint mode , prev_mode;
- gint projection, prev_projection;
- GtkWidget *mode_frame;
-
-
-
-
-
 } GGobiApp;
+
+
 
 struct _ggobid {
 
@@ -140,14 +75,22 @@ struct _ggobid {
  GdkGC *selvarfg_GC, *selvarbg_GC;     /* white background, thick lines */
  GdkGC *unselvarfg_GC, *unselvarbg_GC; /* grey background, thin lines */
 
- GList *displays;
- displayd *current_display;
- splotd *current_splot; 
+  GList *displays;
+  displayd *current_display;
+  splotd *current_splot; 
 
- icoords mousepos, mousepos_o;
- gboolean mono_p;
+  icoords mousepos, mousepos_o;
+  gboolean mono_p;
 
- GtkWidget *control_panel[NMODES];
+  /* main_ui */
+  GtkWidget *control_panel[NMODES];
+  GtkWidget *main_menubar;
+  GtkAccelGroup *main_accel_group;
+  GtkWidget *mode_frame;
+  gint mode , prev_mode;
+  gint projection, prev_projection;
+  GtkWidget *mode_item;
+  gboolean firsttime;  
 
 /************************** Data variables *************************/
 
@@ -170,7 +113,7 @@ struct _ggobid {
  gint ncols, nrows;
 
  array_f raw, tform1, tform2;
- array_l world, jitter;
+ array_l world, jitdata;
 
 /* Missing values */
  gint nmissing;
@@ -198,6 +141,15 @@ struct _ggobid {
  vector_i clusterid;
  gboolean *included;
 
+  struct _Plot {
+    /*
+     * The corners of the bin to be copied from pixmap0 to pixmap1.
+     * They're defined in splot_draw_to_pixmap0_binned and used in
+     * splot_pixmap0_to_pixmap1 when binned == true.
+    */
+   icoords bin0, bin1;
+   icoords loc0, loc1;
+  } plot;
 
 /* Line groups */
  glong nlgroups;
@@ -239,19 +191,14 @@ struct _ggobid {
  gboolean *xed_by_brush;
  gushort *line_color, *line_color_now, *line_color_prev;
  gushort *line_hidden, *line_hidden_now, *line_hidden_prev;
- /* binning */
- gint br_nbins;
- bin_struct **br_binarray;
- icoords bin0, bin1;
 
- /*
-  * jittering
- */
- gfloat jitter_factor;
- gboolean jitter_type;
- gboolean jitter_vgroup;
- gboolean jitter_convex;
- gfloat *jitfacv;
+  struct _Jitter {
+    gfloat factor;
+    gboolean type;
+    gboolean vgroup;
+    gboolean convex;
+    gfloat *jitfacv;
+  } jitter;
 
  /*
   * identification
@@ -261,19 +208,15 @@ struct _ggobid {
  gint ntourvars;
  gint *tourvars;
 
-/************************** Display variables *************************/
 
   GtkTooltips *tips;
 
 /*
  * scaling
 */
- gint pan_or_zoom;
+  gint pan_or_zoom;
 
- GGobiApp app;
-
- spherical sphere;
-
+  GGobiApp app;
 
   struct _Ash {
      GtkWidget *type_opt;
@@ -287,15 +230,32 @@ struct _ggobid {
     GtkWidget *arrangement_box;
   } parcoords;
 
+  /* brushing */
+  struct _Brush_UI {
+    GtkWidget *reset_menu;
+    GtkWidget *link_menu;
+    GtkWidget *mode_opt;
+    GtkWidget *cg_opt;
+    GtkWidget *scope_opt;
+    GtkWidget *brush_on_btn;
+    brush_coords brush_pos ;  
+
+    /* binning */
+    gint nbins;
+    bin_struct **binarray;
+    icoords bin0, bin1;
+
+  } brush;
 
   struct _Color_UI {
-   GtkWidget *symbol_window;
-   GtkWidget *symbol_display;
+    GtkWidget *symbol_window;
+    GtkWidget *symbol_display;
 
-   GtkWidget *colorseldlg;
-   GtkWidget *bg_da, *accent_da, *fg_da[NCOLORS], *current_da;
+    GtkWidget *colorseldlg;
+    GtkWidget *bg_da, *accent_da, *fg_da[NCOLORS], *current_da;
 
-   gint margin;  /* between glyphs in the symbol_display */
+    gint spacing;
+    gint margin;  /* between glyphs in the symbol_display */
   } color_ui;
 
 
@@ -308,6 +268,38 @@ struct _ggobid {
     gint vnrows, vncols;
   } varpanel_ui;
 
+  struct _Transformation {
+    GtkWidget *stage0_opt, *stage1_opt, *stage2_opt;
+    GtkAdjustment *boxcox_adj;
+  } tform;
+
+  struct _Sphere {
+    /* sphering transformation */
+    GtkWidget *window;
+    GtkAdjustment *npcs_adj;
+    GtkWidget *totvar_entry, *condnum_entry;
+    GtkWidget *sphere_apply_btn;
+
+    gint nspherevars;
+    gint *spherevars;
+    gint sphere_npcs;
+
+    gfloat *eigenval;
+    gfloat **eigenvec;
+    gfloat **vc;
+    gfloat *tform1_mean;
+  } sphere;
+
+  struct _Subset {
+    gboolean rescale_p;
+    GtkWidget *subset_window;
+    GtkWidget *ss_notebook;
+    /*-- the entry widgets from which to get values for sample, rowlab --*/
+    GtkWidget *ss_random_entry, *ss_rowlab_entry;
+    /*-- the adjustments from which to get values for blocksize, everyn --*/
+    GtkAdjustment *ss_bstart_adj, *ss_bsize_adj;
+    GtkAdjustment *ss_estart_adj, *ss_estep_adj;
+  } subset;
 
   struct {
    varseldatad vdata0, vdata1;
@@ -336,13 +328,12 @@ struct _ggobid {
 
   gint tour_idled; 
 
+  struct _Write {
+
+
+  } write;
+
 }; /*  ggobid; */
-
-
-/* 
-  GGOBI_ ggobid gg;
- */
-/* extern ggobid gg; */
 
 
 #define GGOBI_H

@@ -36,39 +36,41 @@ static void
 find_selection_circle_pos (icoords *pos, ggobid *gg) {
   gint i;
   glyphv g;
+  gint spacing = gg->color_ui.spacing;
+  gint margin = gg->color_ui.margin;
 
   if (gg->glyph_id.type == POINT_GLYPH) {
-    pos->y = gg->color_ui.margin + 3/2;
-    pos->x = gg->app.spacing/2;
+    pos->y = margin + 3/2;
+    pos->x = spacing/2;
 
   } else {
 
     pos->y = 0;
     for (i=0; i<NGLYPHSIZES; i++) {
       g.size = i;
-      pos->y += (gg->color_ui.margin + ( (i==0) ? (3*g.size)/2 : 3*g.size ));
-      pos->x = gg->app.spacing + gg->app.spacing/2;
+      pos->y += (margin + ( (i==0) ? (3*g.size)/2 : 3*g.size ));
+      pos->x = spacing + spacing/2;
 
       if (gg->glyph_id.type == PLUS_GLYPH && gg->glyph_id.size == g.size)
         break;
 
-      pos->x += gg->app.spacing;
+      pos->x += spacing;
       if (gg->glyph_id.type == X_GLYPH && gg->glyph_id.size == g.size)
         break;
 
-      pos->x += gg->app.spacing;
+      pos->x += spacing;
       if (gg->glyph_id.type == OPEN_RECTANGLE && gg->glyph_id.size == g.size)
         break;
 
-      pos->x += gg->app.spacing;
+      pos->x += spacing;
       if (gg->glyph_id.type == FILLED_RECTANGLE && gg->glyph_id.size == g.size)
         break;
 
-      pos->x += gg->app.spacing;
+      pos->x += spacing;
       if (gg->glyph_id.type == OPEN_CIRCLE && gg->glyph_id.size == g.size)
         break;
 
-      pos->x += gg->app.spacing;
+      pos->x += spacing;
       if (gg->glyph_id.type == FILLED_CIRCLE && gg->glyph_id.size == g.size)
         break;
     }
@@ -81,8 +83,12 @@ redraw_symbol_display (GtkWidget *w, ggobid *gg) {
   gint i;
   glyphv g;
   icoords pos;
+  gint margin, spacing;
 
-  gg->app.spacing = w->allocation.width/NGLYPHTYPES;
+  gg->color_ui.spacing = w->allocation.width/NGLYPHTYPES;
+
+  margin = gg->color_ui.margin;
+  spacing = gg->color_ui.spacing;
 
   if (gg->plot_GC == NULL)
     init_plot_GC (w->window, gg);
@@ -96,36 +102,36 @@ redraw_symbol_display (GtkWidget *w, ggobid *gg) {
    * The factor of three is dictated by the sizing of circles
    *  ... this should no longer be true; it should be 2*width + 1
   */
-  pos.y = gg->color_ui.margin + 3/2;
-  pos.x = gg->app.spacing/2;
+  pos.y = margin + 3/2;
+  pos.x = spacing/2;
   gdk_draw_point (w->window, gg->plot_GC, pos.x, pos.y);
 
   pos.y = 0;
   for (i=0; i<NGLYPHSIZES; i++) {
     g.size = i;
-    pos.y += (gg->color_ui.margin + ( (i==0) ? (3*g.size)/2 : 3*g.size ));
-    pos.x = gg->app.spacing + gg->app.spacing/2;
+    pos.y += (margin + ( (i==0) ? (3*g.size)/2 : 3*g.size ));
+    pos.x = spacing + spacing/2;
 
     g.type = PLUS_GLYPH;
     draw_glyph (w->window, &g, &pos, 0, gg);
 
-    pos.x += gg->app.spacing;
+    pos.x += spacing;
     g.type = X_GLYPH;
     draw_glyph (w->window, &g, &pos, 0, gg);
 
-    pos.x += gg->app.spacing;
+    pos.x += spacing;
     g.type = OPEN_RECTANGLE;
     draw_glyph (w->window, &g, &pos, 0, gg);
 
-    pos.x += gg->app.spacing;
+    pos.x += spacing;
     g.type = FILLED_RECTANGLE;
     draw_glyph (w->window, &g, &pos, 0, gg);
 
-    pos.x += gg->app.spacing;
+    pos.x += spacing;
     g.type = OPEN_CIRCLE;
     draw_glyph (w->window, &g, &pos, 0, gg);
 
-    pos.x += gg->app.spacing;
+    pos.x += spacing;
     g.type = FILLED_CIRCLE;
     draw_glyph (w->window, &g, &pos, 0, gg);
   }
@@ -369,6 +375,8 @@ choose_glyph_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg) {
   gint i, dsq, nearest_dsq, type, size, rval = false;
   icoords pos, ev;
   splotd *sp = gg->current_splot;
+  gint spacing = gg->color_ui.spacing;
+  gint margin = gg->color_ui.margin;
 
   for (i=0; i<gg->nrows; i++) { 
     gg->glyph_prev[i].type = gg->glyph_ids[i].type;
@@ -378,8 +386,8 @@ choose_glyph_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg) {
   ev.x = (gint) event->x;
   ev.y = (gint) event->y;
 
-  pos.y = gg->color_ui.margin + 3/2;
-  pos.x = gg->app.spacing/2;
+  pos.y = margin + 3/2;
+  pos.x = spacing/2;
   g.type = POINT_GLYPH;
   g.size = 1;
   nearest_dsq = dsq = sqdist (pos.x, pos.y, ev.x, ev.y);
@@ -388,39 +396,39 @@ choose_glyph_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg) {
   pos.y = 0;
   for (i=0; i<NGLYPHSIZES; i++) {
     g.size = i;
-    pos.y += (gg->color_ui.margin + ( (i==0) ? (3*g.size)/2 : 3*g.size ));
-    pos.x = gg->app.spacing + gg->app.spacing/2;
+    pos.y += (margin + ( (i==0) ? (3*g.size)/2 : 3*g.size ));
+    pos.x = spacing + spacing/2;
 
     g.type = PLUS_GLYPH;
     if ( (dsq = sqdist (pos.x, pos.y, ev.x, ev.y)) < nearest_dsq ) {
       nearest_dsq = dsq; type = g.type; size = g.size;
     }
 
-    pos.x += gg->app.spacing;
+    pos.x += spacing;
     g.type = X_GLYPH;
     if ( (dsq = sqdist (pos.x, pos.y, ev.x, ev.y)) < nearest_dsq ) {
       nearest_dsq = dsq; type = g.type; size = g.size;
     }
 
-    pos.x += gg->app.spacing;
+    pos.x += spacing;
     g.type = OPEN_RECTANGLE;
     if ( (dsq = sqdist (pos.x, pos.y, ev.x, ev.y)) < nearest_dsq ) {
       nearest_dsq = dsq; type = g.type; size = g.size;
     }
 
-    pos.x += gg->app.spacing;
+    pos.x += spacing;
     g.type = FILLED_RECTANGLE;
     if ( (dsq = sqdist (pos.x, pos.y, ev.x, ev.y)) < nearest_dsq ) {
       nearest_dsq = dsq; type = g.type; size = g.size;
     }
 
-    pos.x += gg->app.spacing;
+    pos.x += spacing;
     g.type = OPEN_CIRCLE;
     if ( (dsq = sqdist (pos.x, pos.y, ev.x, ev.y)) < nearest_dsq ) {
       nearest_dsq = dsq; type = g.type; size = g.size;
     }
 
-    pos.x += gg->app.spacing;
+    pos.x += spacing;
     g.type = FILLED_CIRCLE;
     dsq = sqdist (pos.x, pos.y, ev.x, ev.y);
     if (dsq < nearest_dsq) {

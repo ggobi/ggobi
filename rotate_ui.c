@@ -262,7 +262,7 @@ cpanel_rotation_make (ggobid *gg) {
 /*--------------------------------------------------------------------*/
 
 void
-cpanel_rotation_init (cpaneld *cpanel) {
+cpanel_rotation_init (cpaneld *cpanel, ggobid *gg) {
  cpanel->ro_paused_p = false;
  cpanel->ro_axis = RO_OBLIQUE;
  cpanel->ro_type = RO_ROTATE;
@@ -270,7 +270,7 @@ cpanel_rotation_init (cpaneld *cpanel) {
 }
 
 void
-cpanel_rotation_set (cpaneld *cpanel) {
+cpanel_rotation_set (cpaneld *cpanel, ggobid *gg) {
 
   gtk_option_menu_set_history (GTK_OPTION_MENU (ro_type_opt),
                                cpanel->ro_type);

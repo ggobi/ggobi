@@ -74,7 +74,7 @@ rejitter (ggobid *gg) {
  * second on vgroups (if jitter_vgroup is True)
 */
   selected_cols = (gint *) g_malloc (gg->ncols * sizeof (gint));
-  nselected_cols = selected_cols_get (selected_cols, gg->jitter_vgroup, gg);
+  nselected_cols = selected_cols_get (selected_cols, gg->jitter.vgroup, gg);
   if (nselected_cols == 0)
     nselected_cols = plotted_cols_get (selected_cols, false, gg);
 
@@ -85,20 +85,20 @@ rejitter (ggobid *gg) {
       m = gg->rows_in_plot[i];
       /*-- jitter_one_value (m, k); --*/
 
-      frand = jitter_randval (gg->jitter_type) * precis;
+      frand = jitter_randval (gg->jitter.type) * precis;
 
       /*
        * The world.data used here is already jittered:
        * subtract out the previous jittered value ...
       */
-      if (gg->jitter_convex) {
-        fworld = (gfloat) (gg->world.data[m][k] - gg->jitter.data[m][k]);
+      if (gg->jitter.convex) {
+        fworld = (gfloat) (gg->world.data[m][k] - gg->jitdata.data[m][k]);
         fjit = gg->vardata[k].jitter_factor * (frand - fworld);
       }
       else
         fjit = gg->vardata[k].jitter_factor * frand;
 
-      gg->jitter.data[m][k] = (glong) fjit;
+      gg->jitdata.data[m][k] = (glong) fjit;
     }
   }
   tform_to_world (gg);
@@ -120,7 +120,7 @@ rejitter (ggobid *gg) {
 void
 jitter_value_set (gfloat value, ggobid *gg) {
   gint *cols = (gint *) g_malloc (gg->ncols * sizeof (gint));
-  gint ncols = selected_cols_get (cols, gg->jitter_vgroup, gg);
+  gint ncols = selected_cols_get (cols, gg->jitter.vgroup, gg);
   gint j;
 
   for (j=0; j<ncols; j++)

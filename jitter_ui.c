@@ -8,9 +8,9 @@ static GtkWidget *window = NULL;
 
 void
 jitter_vars_init (ggobid *gg) {
-  gg->jitter_type = UNIFORM;
-  gg->jitter_vgroup = true;
-  gg->jitter_convex = true;
+  gg->jitter.type = UNIFORM;
+  gg->jitter.vgroup = true;
+  gg->jitter.convex = true;
 }
 
 static void
@@ -46,14 +46,14 @@ static void type_cb (GtkWidget *w, gpointer cbd)
   ggobid *gg;
    gg = GGobiFromWidget(w, true);
 
-  gg->jitter_type = indx;
+  gg->jitter.type = indx;
   rejitter (gg);
 }
 
 static void
 vgroups_cb (GtkToggleButton *button, ggobid *gg)
 {
-  gg->jitter_vgroup = button->active;
+  gg->jitter.vgroup = button->active;
 }
 
 void

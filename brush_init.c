@@ -167,8 +167,8 @@ br_line_color_init (ggobid *gg)
 void
 brush_pos_init (ggobid *gg)
 {
-  gg->app.brush_pos.x1 = gg->app.brush_pos.y1 = 20;
-  gg->app.brush_pos.x2 = gg->app.brush_pos.y2 = 40;
+  gg->brush.brush_pos.x1 = gg->brush.brush_pos.y1 = 20;
+  gg->brush.brush_pos.x2 = gg->brush.brush_pos.y2 = 40;
 }
 
 /*----------------------------------------------------------------------*/
@@ -185,7 +185,7 @@ brush_alloc (ggobid *gg)
   gint i, iv, ih;
   gboolean initd = false;
 
-  gg->br_nbins = BRUSH_NBINS;
+  gg->brush.nbins = BRUSH_NBINS;
 
   gg->included = (gboolean *) g_realloc (gg->included, nr * sizeof (gboolean));
   gg->pts_under_brush = (gboolean *) g_realloc (gg->pts_under_brush,
@@ -203,16 +203,16 @@ brush_alloc (ggobid *gg)
 
   if (!initd) {
     /* binning the plot window; no need to realloc these */
-    gg->br_binarray = (bin_struct **)
-      g_malloc (gg->br_nbins * sizeof (bin_struct *));
-    for (ih=0; ih<gg->br_nbins; ih++) {
-      gg->br_binarray[ih] = (bin_struct *)
-        g_malloc (gg->br_nbins * sizeof (bin_struct));
+    gg->brush.binarray = (bin_struct **)
+      g_malloc (gg->brush.nbins * sizeof (bin_struct *));
+    for (ih=0; ih<gg->brush.nbins; ih++) {
+      gg->brush.binarray[ih] = (bin_struct *)
+        g_malloc (gg->brush.nbins * sizeof (bin_struct));
 
-      for (iv=0; iv<gg->br_nbins; iv++) {
-        gg->br_binarray[ih][iv].nels = 0;
-        gg->br_binarray[ih][iv].nblocks = 1;
-        gg->br_binarray[ih][iv].els = (gulong *)
+      for (iv=0; iv<gg->brush.nbins; iv++) {
+        gg->brush.binarray[ih][iv].nels = 0;
+        gg->brush.binarray[ih][iv].nblocks = 1;
+        gg->brush.binarray[ih][iv].els = (gulong *)
           g_malloc (BINBLOCKSIZE * sizeof (gulong));
       }
     }
@@ -233,12 +233,12 @@ brush_free (ggobid *gg)
 
   g_free ((gpointer) gg->pts_under_brush);
 
-  for (k=0; k<gg->br_nbins; k++) {
-    for (j=0; j<gg->br_nbins; j++)
-      g_free ((gpointer) gg->br_binarray[k][j].els);
-    g_free ((gpointer) gg->br_binarray[k]);
+  for (k=0; k<gg->brush.nbins; k++) {
+    for (j=0; j<gg->brush.nbins; j++)
+      g_free ((gpointer) gg->brush.binarray[k][j].els);
+    g_free ((gpointer) gg->brush.binarray[k]);
   }
-  g_free ((gpointer) gg->br_binarray);
+  g_free ((gpointer) gg->brush.binarray);
 }
 
 void
@@ -256,14 +256,14 @@ brush_init (ggobid *gg)
     /*
      * Used in binning the plot window
     */
-    gg->br_nbins = BRUSH_NBINS;
+    gg->brush.nbins = BRUSH_NBINS;
 
     /*
      * These are initialized so that the first merge_brushbins()
      * call will behave reasonably.
     */
-    gg->bin0.x = gg->bin1.x = BRUSH_NBINS;
-    gg->bin0.y = gg->bin1.y = BRUSH_NBINS;
+    gg->brush.bin0.x = gg->brush.bin1.x = BRUSH_NBINS;
+    gg->brush.bin0.y = gg->brush.bin1.y = BRUSH_NBINS;
 
     brush_alloc (gg);
 

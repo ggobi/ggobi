@@ -144,7 +144,7 @@ parcoords_new (gboolean missing_p, splotd **sub_plots, int numSubPlots, ggobid *
   }
 
 
-  parcoords_cpanel_init (&display->cpanel);
+  parcoords_cpanel_init (&display->cpanel, gg);
 
   display_window_init(display, 3, gg);
 

@@ -116,11 +116,11 @@ p1d_reproject (splotd *sp, glong **world_data, ggobid *gg)
     */
     if (!display->missing_p) {
       if (display->p1d_orientation == VERTICAL) {
-        sp->planar[m].x += gg->jitter.data[m][jvar];
-        sp->planar[m].y -= gg->jitter.data[m][jvar];
+        sp->planar[m].x += gg->jitdata.data[m][jvar];
+        sp->planar[m].y -= gg->jitdata.data[m][jvar];
       } else {
-        sp->planar[m].x -= gg->jitter.data[m][jvar];
-        sp->planar[m].y += gg->jitter.data[m][jvar];
+        sp->planar[m].x -= gg->jitdata.data[m][jvar];
+        sp->planar[m].y += gg->jitdata.data[m][jvar];
       }
     }
   }

@@ -285,29 +285,29 @@ display_set_current (displayd *new_display, ggobid *gg)
   if(new_display == NULL)
    return;
 
-  gtk_accel_group_unlock (gg->app.main_accel_group);
+  gtk_accel_group_unlock (gg->main_accel_group);
 
-  if (gg->app.firsttime == false) {
+  if (gg->firsttime == false) {
 
     switch (gg->current_display->displaytype) {
       case scatterplot:
         gtk_window_set_title (GTK_WINDOW (gg->current_display->window),
           (gg->current_display->missing_p) ? "scatterplot display (missings)" :
                                             "scatterplot display"); 
-        submenu_destroy (gg->app.mode_item);
+        submenu_destroy (gg->mode_item);
         break;
 
       case scatmat:
         gtk_window_set_title (GTK_WINDOW (gg->current_display->window),
           (gg->current_display->missing_p) ? "scatterplot matrix (missings)" :
                                          "scatterplot matrix"); 
-        submenu_destroy (gg->app.mode_item);
+        submenu_destroy (gg->mode_item);
         break;
 
       case parcoords:
         gtk_window_set_title (GTK_WINDOW (gg->current_display->window),
                               "parallel coordinates display");
-        submenu_destroy (gg->app.mode_item);
+        submenu_destroy (gg->mode_item);
         break;
     }
   }
@@ -319,11 +319,11 @@ display_set_current (displayd *new_display, ggobid *gg)
           "*** scatterplot display (missings) *** " :
           "*** scatterplot display ***"); 
 
-      scatterplot_main_menus_make (gg->app.main_accel_group, mode_set_cb, gg, true);
-      gg->app.mode_item = submenu_make ("_View", 'V', gg->app.main_accel_group);
-      gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->app.mode_item),
+      scatterplot_main_menus_make (gg->main_accel_group, mode_set_cb, gg, true);
+      gg->mode_item = submenu_make ("_View", 'V', gg->main_accel_group);
+      gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_item),
                                  gg->app.scatterplot_mode_menu); 
-      submenu_insert (gg->app.mode_item, gg->app.menubar, 2);
+      submenu_insert (gg->mode_item, gg->main_menubar, 2);
       break;
 
     case scatmat:
@@ -332,22 +332,22 @@ display_set_current (displayd *new_display, ggobid *gg)
           "*** scatterplot matrix (missings) *** " :
           "*** scatterplot matrix ***"); 
 
-      scatmat_main_menus_make (gg->app.main_accel_group, mode_set_cb, gg, true);
-      gg->app.mode_item = submenu_make ("_View", 'V', gg->app.main_accel_group);
-      gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->app.mode_item),
+      scatmat_main_menus_make (gg->main_accel_group, mode_set_cb, gg, true);
+      gg->mode_item = submenu_make ("_View", 'V', gg->main_accel_group);
+      gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_item),
                                  gg->app.scatmat_mode_menu); 
-      submenu_insert (gg->app.mode_item, gg->app.menubar, 2);
+      submenu_insert (gg->mode_item, gg->main_menubar, 2);
       break;
 
     case parcoords:
       gtk_window_set_title (GTK_WINDOW (new_display->window),
                             "*** parallel coordinates display ***");
 
-      parcoords_main_menus_make (gg->app.main_accel_group, mode_set_cb, gg, true);
-      gg->app.mode_item = submenu_make ("_View", 'V', gg->app.main_accel_group);
-      gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->app.mode_item),
+      parcoords_main_menus_make (gg->main_accel_group, mode_set_cb, gg, true);
+      gg->mode_item = submenu_make ("_View", 'V', gg->main_accel_group);
+      gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_item),
                                  gg->app.parcoords_mode_menu); 
-      submenu_insert (gg->app.mode_item, gg->app.menubar, 2);
+      submenu_insert (gg->mode_item, gg->main_menubar, 2);
       break;
   }
 
@@ -356,8 +356,8 @@ display_set_current (displayd *new_display, ggobid *gg)
 
   varpanel_refresh (gg);
 
-  gtk_accel_group_lock (gg->app.main_accel_group);
-  gg->app.firsttime = false;
+  gtk_accel_group_lock (gg->main_accel_group);
+  gg->firsttime = false;
 }
 
 /* Some of these will probably be folded together eventually */

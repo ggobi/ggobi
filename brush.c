@@ -29,24 +29,27 @@ brush_once (gboolean force, ggobid *gg)
  * bin0 is the bin which contains of the upper left corner of the
  * brush; bin1 is the one containing of the lower right corner.
 */
-  gint ulx = MIN (gg->app.brush_pos.x1, gg->app.brush_pos.x2);
-  gint uly = MIN (gg->app.brush_pos.y1, gg->app.brush_pos.y2);
-  gint lrx = MAX (gg->app.brush_pos.x1, gg->app.brush_pos.x2);
-  gint lry = MAX (gg->app.brush_pos.y1, gg->app.brush_pos.y2);
+  brush_coords *brush_pos = &gg->brush.brush_pos;
+  gint ulx = MIN (brush_pos->x1, brush_pos->x2);
+  gint uly = MIN (brush_pos->y1, brush_pos->y2);
+  gint lrx = MAX (brush_pos->x1, brush_pos->x2);
+  gint lry = MAX (brush_pos->y1, brush_pos->y2);
   gboolean changed = false;
   cpaneld *cpanel = &gg->current_display->cpanel;
+  icoords *bin0 = &gg->brush.bin0;
+  icoords *bin1 = &gg->brush.bin1;
 
-  if (!point_in_which_bin (ulx, uly, &gg->bin0.x, &gg->bin0.y, gg)) {
-    gg->bin0.x = MAX (gg->bin0.x, 0);
-    gg->bin0.x = MIN (gg->bin0.x, gg->br_nbins - 1);
-    gg->bin0.y = MAX (gg->bin0.y, 0);
-    gg->bin0.y = MIN (gg->bin0.y, gg->br_nbins - 1);
+  if (!point_in_which_bin (ulx, uly, &bin0->x, &bin0->y, gg)) {
+    bin0->x = MAX (bin0->x, 0);
+    bin0->x = MIN (bin0->x, gg->brush.nbins - 1);
+    bin0->y = MAX (bin0->y, 0);
+    bin0->y = MIN (bin0->y, gg->brush.nbins - 1);
   }
-  if (!point_in_which_bin (lrx, lry, &gg->bin1.x, &gg->bin1.y, gg)) {
-    gg->bin1.x = MAX (gg->bin1.x, 0);
-    gg->bin1.x = MIN (gg->bin1.x, gg->br_nbins - 1);
-    gg->bin1.y = MAX (gg->bin1.y, 0);
-    gg->bin1.y = MIN (gg->bin1.y, gg->br_nbins - 1);
+  if (!point_in_which_bin (lrx, lry, &bin1->x, &bin1->y, gg)) {
+    bin1->x = MAX (bin1->x, 0);
+    bin1->x = MIN (bin1->x, gg->brush.nbins - 1);
+    bin1->y = MAX (bin1->y, 0);
+    bin1->y = MIN (bin1->y, gg->brush.nbins - 1);
   }
 
 /*
@@ -127,15 +130,16 @@ reinit_transient_brushing (ggobid *gg)
 
 void
 brush_set_pos (gint x, gint y, ggobid *gg) {
-  gint xdist = gg->app.brush_pos.x2 - gg->app.brush_pos.x1 ;
-  gint ydist = gg->app.brush_pos.y2 - gg->app.brush_pos.y1 ;
+  brush_coords *brush_pos = &gg->brush.brush_pos;
+  gint xdist = brush_pos->x2 - brush_pos->x1 ;
+  gint ydist = brush_pos->y2 - brush_pos->y1 ;
   /*
    * (x2,y2) is the corner that's moving.
   */
-  gg->app.brush_pos.x1 = x - xdist ;
-  gg->app.brush_pos.x2 = x ;
-  gg->app.brush_pos.y1 = y - ydist ;
-  gg->app.brush_pos.y2 = y ;
+  brush_pos->x1 = x - xdist ;
+  brush_pos->x2 = x ;
+  brush_pos->y1 = y - ydist ;
+  brush_pos->y2 = y ;
 }
 
 
@@ -146,13 +150,14 @@ brush_motion (icoords *mouse, gboolean button1_p, gboolean button2_p,
   gboolean changed = false;
   splotd *sp = gg->current_splot;
   displayd *display = (displayd *) sp->displayptr;
+  brush_coords *brush_pos = &gg->brush.brush_pos;
 
   if (button1_p)
     brush_set_pos (mouse->x, mouse->y, gg);
 
   else if (button2_p) {
-    gg->app.brush_pos.x2 = mouse->x ;
-    gg->app.brush_pos.y2 = mouse->y ;
+    brush_pos->x2 = mouse->x ;
+    brush_pos->y2 = mouse->y ;
   }
 
 
@@ -189,11 +194,12 @@ under_brush (gint k, ggobid *gg)
 */
 {
   splotd *sp = gg->current_splot;
+  brush_coords *brush_pos = &gg->brush.brush_pos;
   gint pt;
-  gint x1 = MIN (gg->app.brush_pos.x1, gg->app.brush_pos.x2);
-  gint x2 = MAX (gg->app.brush_pos.x1, gg->app.brush_pos.x2);
-  gint y1 = MIN (gg->app.brush_pos.y1, gg->app.brush_pos.y2);
-  gint y2 = MAX (gg->app.brush_pos.y1, gg->app.brush_pos.y2);
+  gint x1 = MIN (brush_pos->x1, brush_pos->x2);
+  gint x2 = MAX (brush_pos->x1, brush_pos->x2);
+  gint y1 = MIN (brush_pos->y1, brush_pos->y2);
+  gint y2 = MAX (brush_pos->y1, brush_pos->y2);
 
   pt = (sp->screen[k].x <= x2 && sp->screen[k].y <= y2 &&
         sp->screen[k].x >= x1 && sp->screen[k].y >= y1) ? 1 : 0;
@@ -210,17 +216,20 @@ brush_boundaries_set (cpaneld *cpanel,
   icoords *obin0, icoords *obin1,
   icoords *imin, icoords *imax, ggobid *gg)
 {
+  icoords *bin0 = &gg->brush.bin0;
+  icoords *bin1 = &gg->brush.bin1;
+
   if (cpanel->br_mode == BR_TRANSIENT) {
-    imin->x = MIN (gg->bin0.x, obin0->x);
-    imin->y = MIN (gg->bin0.y, obin0->y);
-    imax->x = MAX (gg->bin1.x, obin1->x);
-    imax->y = MAX (gg->bin1.y, obin1->y);
+    imin->x = MIN (bin0->x, obin0->x);
+    imin->y = MIN (bin0->y, obin0->y);
+    imax->x = MAX (bin1->x, obin1->x);
+    imax->y = MAX (bin1->y, obin1->y);
   }
   else {
-    imin->x = gg->bin0.x;
-    imin->y = gg->bin0.y;
-    imax->x = gg->bin1.x;
-    imax->y = gg->bin1.y;
+    imin->x = bin0->x;
+    imin->y = bin0->y;
+    imax->x = bin1->x;
+    imax->y = bin1->y;
   }
 }
 
@@ -253,10 +262,11 @@ brush_draw_brush (splotd *sp, ggobid *gg) {
   gboolean line_painting_p =
      (cpanel->br_scope == BR_LINES || cpanel->br_scope == BR_PANDL);
 
-  gint x1 = MIN (gg->app.brush_pos.x1, gg->app.brush_pos.x2);
-  gint x2 = MAX (gg->app.brush_pos.x1, gg->app.brush_pos.x2);
-  gint y1 = MIN (gg->app.brush_pos.y1, gg->app.brush_pos.y2);
-  gint y2 = MAX (gg->app.brush_pos.y1, gg->app.brush_pos.y2);
+  brush_coords *brush_pos = &gg->brush.brush_pos;
+  gint x1 = MIN (brush_pos->x1, brush_pos->x2);
+  gint x2 = MAX (brush_pos->x1, brush_pos->x2);
+  gint y1 = MIN (brush_pos->y1, brush_pos->y2);
+  gint y2 = MAX (brush_pos->y1, brush_pos->y2);
 
   if (!gg->mono_p) {
     if ((gg->default_color_table[gg->color_id].red != gg->bg_color.red) ||
@@ -277,7 +287,7 @@ brush_draw_brush (splotd *sp, ggobid *gg) {
       x1, y1, (x2>x1)?(x2-x1):(x1-x2), (y2>y1)?(y2-y1):(y1-y2));
     /* Mark the corner to which the cursor will be attached */
     gdk_draw_rectangle (sp->pixmap1, gg->plot_GC, true,
-      gg->app.brush_pos.x2-1, gg->app.brush_pos.y2-1, 2, 2);
+      brush_pos->x2-1, brush_pos->y2-1, 2, 2);
 
     /*
      * highlight brush
@@ -288,7 +298,7 @@ brush_draw_brush (splotd *sp, ggobid *gg) {
 
       /* Mark the corner to which the cursor will be attached */
       gdk_draw_rectangle (sp->pixmap1, gg->plot_GC, true,
-        gg->app.brush_pos.x2-2, gg->app.brush_pos.y2-2, 4, 4);
+        brush_pos->x2-2, brush_pos->y2-2, 4, 4);
     }
   }
 
@@ -374,11 +384,11 @@ build_glyph_vectors (ggobid *gg)
 
   for (ih=imin.x; ih<=imax.x; ih++) {
     for (iv=imin.y; iv<=imax.y; iv++) {
-      for (m=0; m<gg->br_binarray[ih][iv].nels; m++) {
+      for (m=0; m<gg->brush.binarray[ih][iv].nels; m++) {
         /*
          * j is the row number; k is the index of rows_in_plot[]
         */
-        j = gg->rows_in_plot[ k = gg->br_binarray[ih][iv].els[m] ] ;
+        j = gg->rows_in_plot[ k = gg->brush.binarray[ih][iv].els[m] ] ;
 
 
         /* update the glyph vectors for every member of the row group */
@@ -397,10 +407,10 @@ build_glyph_vectors (ggobid *gg)
     }
   }
 
-  obin0.x = gg->bin0.x;
-  obin0.y = gg->bin0.y;
-  obin1.x = gg->bin1.x;
-  obin1.y = gg->bin1.y;
+  obin0.x = gg->brush.bin0.x;
+  obin0.y = gg->brush.bin0.y;
+  obin1.x = gg->brush.bin1.x;
+  obin1.y = gg->brush.bin1.y;
 
   return (changed);
 }
@@ -456,8 +466,8 @@ build_color_vectors (ggobid *gg)
 
   for (ih=imin.x; ih<=imax.x; ih++) {
     for (iv=imin.y; iv<=imax.y; iv++) {
-      for (m=0; m<gg->br_binarray[ih][iv].nels; m++) {
-        j = gg->rows_in_plot[ k = gg->br_binarray[ih][iv].els[m] ] ;
+      for (m=0; m<gg->brush.binarray[ih][iv].nels; m++) {
+        j = gg->rows_in_plot[ k = gg->brush.binarray[ih][iv].els[m] ] ;
         /*
          * k   raw index, based on nrows
          * j   index based on nrows_in_plot
@@ -478,10 +488,10 @@ build_color_vectors (ggobid *gg)
         }
       }
     }
-    obin0.x = gg->bin0.x;
-    obin0.y = gg->bin0.y;
-    obin1.x = gg->bin1.x;
-    obin1.y = gg->bin1.y;
+    obin0.x = gg->brush.bin0.x;
+    obin0.y = gg->brush.bin0.y;
+    obin1.x = gg->brush.bin1.x;
+    obin1.y = gg->brush.bin1.y;
   }
 
   return (changed);
@@ -542,8 +552,8 @@ build_hidden_vectors (ggobid *gg)
 
   for (ih=imin.x; ih<=imax.x; ih++) {
     for (iv=imin.y; iv<=imax.y; iv++) {
-      for (m=0; m<gg->br_binarray[ih][iv].nels; m++) {
-        j = gg->rows_in_plot[ k = gg->br_binarray[ih][iv].els[m] ] ;
+      for (m=0; m<gg->brush.binarray[ih][iv].nels; m++) {
+        j = gg->rows_in_plot[ k = gg->brush.binarray[ih][iv].els[m] ] ;
         /*
          * k   raw index, based on nrows
          * j   index based on nrows_in_plot
@@ -563,10 +573,10 @@ build_hidden_vectors (ggobid *gg)
         }
       }
     }
-    obin0.x = gg->bin0.x;
-    obin0.y = gg->bin0.y;
-    obin1.x = gg->bin1.x;
-    obin1.y = gg->bin1.y;
+    obin0.x = gg->brush.bin0.x;
+    obin0.y = gg->brush.bin0.y;
+    obin1.x = gg->brush.bin1.x;
+    obin1.y = gg->brush.bin1.y;
   }
 
   return (changed);
@@ -588,14 +598,14 @@ active_paint_points (ggobid *gg)
     gg->pts_under_brush[gg->rows_in_plot[j]] = 0;
  
   /*
-   * br_binarray[][] only represents the
+   * brush.binarray[][] only represents the
    * rows in rows_in_plot[] so there's no need to test for that.
   */
 
-  for (ih=gg->bin0.x; ih<=gg->bin1.x; ih++) {
-    for (iv=gg->bin0.y; iv<=gg->bin1.y; iv++) {
-      for (j=0; j<gg->br_binarray[ih][iv].nels; j++) {
-        pt = gg->rows_in_plot[gg->br_binarray[ih][iv].els[j]];
+  for (ih=gg->brush.bin0.x; ih<=gg->brush.bin1.x; ih++) {
+    for (iv=gg->brush.bin0.y; iv<=gg->brush.bin1.y; iv++) {
+      for (j=0; j<gg->brush.binarray[ih][iv].nels; j++) {
+        pt = gg->rows_in_plot[gg->brush.binarray[ih][iv].els[j]];
 
         if (under_brush (pt, gg)) {
 
@@ -673,11 +683,12 @@ xed_by_brush (gint k, ggobid *gg)
 */
 {
   splotd *sp = gg->current_splot;
+  brush_coords *brush_pos = &gg->brush.brush_pos;
   gboolean intersect;
-  glong x1 = gg->app.brush_pos.x1;
-  glong y1 = gg->app.brush_pos.y1;
-  glong x2 = gg->app.brush_pos.x2;
-  glong y2 = gg->app.brush_pos.y2;
+  glong x1 = brush_pos->x1;
+  glong y1 = brush_pos->y1;
+  glong x2 = brush_pos->x2;
+  glong y2 = brush_pos->y2;
 
   glong ax = sp->screen[gg->segment_endpoints[k].a - 1].x;
   glong ay = sp->screen[gg->segment_endpoints[k].a - 1].y;

@@ -133,7 +133,7 @@ cpanel_p1dplot_make (ggobid *gg) {
 
 /*-- for all plot modes, for now: it excludes the changing variable --*/
 void
-cpanel_p1d_init (cpaneld *cpanel) {
+cpanel_p1d_init (cpaneld *cpanel, ggobid *gg) {
   cpanel->nASHes = 20;
   cpanel->nbins = 200;
 }

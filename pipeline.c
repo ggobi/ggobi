@@ -23,7 +23,7 @@ pipeline_arrays_free (ggobid *gg)
   arrayf_free (&gg->tform2, 0, 0);
 
   arrayl_free (&gg->world, 0, 0);
-  arrayl_free (&gg->jitter, 0, 0);
+  arrayl_free (&gg->jitdata, 0, 0);
 
   g_free ((gpointer) gg->rows_in_plot);
   g_free ((gpointer) gg->sampled);
@@ -43,7 +43,7 @@ pipeline_arrays_alloc (ggobid *gg)
   arrayf_alloc (&gg->tform2, nr, nc);
 
   arrayl_alloc (&gg->world, nr, nc);
-  arrayl_alloc_zero (&gg->jitter, nr, nc);
+  arrayl_alloc_zero (&gg->jitdata, nr, nc);
 
   gg->rows_in_plot = (gint *) g_malloc (nr * sizeof (gint));
   gg->sampled = (gboolean *) g_malloc (nr * sizeof (gboolean));
@@ -64,12 +64,12 @@ pipeline_arrays_add_column (gint jvar, ggobid *gg)
   arrayf_add_cols (&gg->tform2, nc);
 
   arrayl_add_cols (&gg->world, nc);
-  arrayl_add_cols (&gg->jitter, nc);
+  arrayl_add_cols (&gg->jitdata, nc);
 
   for (i=0; i<nr; i++) {
     gg->raw.data[i][nc-1] = gg->tform1.data[i][nc-1] =
       gg->tform2.data[i][nc-1] = gg->raw.data[i][jvar];  /*-- no tform --*/
-    gg->jitter.data[i][nc-1] = 0;  /*-- no jitter --*/
+    gg->jitdata.data[i][nc-1] = 0;  /*-- no jitter --*/
   }
 
   /*-- world data is not populated --*/
@@ -382,7 +382,7 @@ tform_to_world (ggobid *gg)
       gg->world.data[m][j] = (glong) (precis * ftmp);
 
       /* Add in the jitter values */
-      gg->world.data[m][j] += gg->jitter.data[m][j];
+      gg->world.data[m][j] += gg->jitdata.data[m][j];
     }
   }
 }
