@@ -260,7 +260,7 @@ displayd* scatmat_new (gboolean, gint, gint *, gint, gint *, datad *, ggobid *);
 gboolean scatmat_varsel (cpaneld *, splotd *, gint, gint *, gint, gboolean, ggobid *);
 gboolean scatmat_varsel_simple (cpaneld *, splotd *, gint, gint *, ggobid *);
 void scatterplot_cpanel_init (cpaneld *, gint, ggobid *);
-gboolean scatterplot_event_handled (GtkWidget *, GdkEventKey *, cpaneld *, splotd *, ggobid *);
+gboolean splot_event_handled (GtkWidget *, GdkEventKey *, cpaneld *, splotd *, ggobid *);
 void scatterplot_main_menus_make (GtkAccelGroup *, GtkSignalFunc, ggobid *gg, gboolean);
 displayd* scatterplot_new (gboolean, splotd *sp, datad *d, ggobid *);
 void scatterplot_show_rulers (displayd *, gint);

@@ -92,7 +92,7 @@ scatmat_main_menus_make (GtkAccelGroup *accel_group, GtkSignalFunc func, ggobid 
   gg->app.scatmat_mode_menu = gtk_menu_new ();
 
   CreateMenuItem (gg->app.scatmat_mode_menu, "Scatterplot Matrix",
-    "^x", "", NULL, accel_group, func, useIds ? GINT_TO_POINTER (SCATMAT) : gg, gg);
+    "^e", "", NULL, accel_group, func, useIds ? GINT_TO_POINTER (SCATMAT) : gg, gg);
 
   /* Add a separator */
   CreateMenuItem (gg->app.scatmat_mode_menu, NULL,

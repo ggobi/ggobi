@@ -324,14 +324,16 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
 
                 /* parallel coordinate plot whiskers */
                 if (display->displaytype == parcoords) {
-                  n = 2*i;
-                  gdk_draw_line (sp->pixmap0, gg->plot_GC,
-                    sp->whiskers[n].x1, sp->whiskers[n].y1,
-                    sp->whiskers[n].x2, sp->whiskers[n].y2);
-                  n++;
-                  gdk_draw_line (sp->pixmap0, gg->plot_GC,
-                    sp->whiskers[n].x1, sp->whiskers[n].y1,
-                    sp->whiskers[n].x2, sp->whiskers[n].y2);
+                  if (display->options.edges_show_p) {
+                    n = 2*i;
+                    gdk_draw_line (sp->pixmap0, gg->plot_GC,
+                      sp->whiskers[n].x1, sp->whiskers[n].y1,
+                      sp->whiskers[n].x2, sp->whiskers[n].y2);
+                    n++;
+                    gdk_draw_line (sp->pixmap0, gg->plot_GC,
+                      sp->whiskers[n].x1, sp->whiskers[n].y1,
+                      sp->whiskers[n].x2, sp->whiskers[n].y2);
+                  }
                 }
               }
             }

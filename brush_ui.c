@@ -171,7 +171,7 @@ key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
   cpaneld *cpanel = &gg->current_display->cpanel;
 
   /*-- handle the keys for setting the mode and launching generic events --*/
-  if (scatterplot_event_handled (w, event, cpanel, sp, gg))
+  if (splot_event_handled (w, event, cpanel, sp, gg))
     return true;
 
   /*-- insert mode-specific key presses (if any) here --*/

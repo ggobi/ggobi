@@ -466,7 +466,7 @@ display_set_current (displayd *new_display, ggobid *gg)
       case tsplot:
         tsplot_main_menus_make (gg->main_accel_group,
                                    (GtkSignalFunc) mode_set_cb, gg, true);
-        gg->mode_item = submenu_make ("_View", 'V', gg->main_accel_group);
+        gg->mode_item = submenu_make ("_ViewMode", 'V', gg->main_accel_group);
         gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_item),
                                    gg->tsplot.mode_menu); 
         submenu_insert (gg->mode_item, gg->main_menubar, 2);
@@ -641,4 +641,33 @@ isEmbeddedDisplay (displayd *dpy)
     ans = true;
 
   return (ans);
+}
+
+/*
+ * Since display types are unfortunately not subclasses of display,
+ * we could use a method for figuring out which display types
+ * support which view modes
+*/
+gboolean
+display_type_handles_action (displayd *display, gint viewmode) {
+  gint dtype = display->displaytype;
+  gboolean handles = false;
+  gint v = viewmode;
+
+  if (dtype == scatterplot) { 
+    /*-- handles all view modes, but watch out for display types --*/
+    if (v != SCATMAT && v != PCPLOT && v != TSPLOT)
+      handles = true;
+  } else if (dtype == scatmat) {
+    if (v == SCALE || v == BRUSH || v == IDENT || v == MOVEPTS || v == SCATMAT)
+      handles = true;
+  } else if (dtype == parcoords) {
+    if (v == BRUSH || v == IDENT || v == PCPLOT)
+      handles = true;
+  } else if (dtype == tsplot) {
+    if (v == BRUSH || v == IDENT || v == TSPLOT)
+      handles = true;
+  }
+
+  return handles;
 }

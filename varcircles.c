@@ -337,7 +337,8 @@ varcircle_create (gint k, datad *d, ggobid *gg)
              | GDK_BUTTON_RELEASE_MASK);
 
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), da,
-    "Click to select; see menu", NULL);
+    "Click to select", NULL);
+    /*"Click to select; see menu", NULL);*/
   gtk_signal_connect (GTK_OBJECT (da), "expose_event",
     GTK_SIGNAL_FUNC (da_expose_cb), GINT_TO_POINTER (k));
   gtk_signal_connect (GTK_OBJECT (da), "button_press_event",

@@ -58,7 +58,6 @@ typedef struct {
 */
  gint p1dvar;
  vector_f p1d_data; /* the spreading data */
- /*gfloat *p1d_data;*/ 
  lims p1d_lim;      /* limits of the spreading data */
  gfloat p1d_mean;
 

@@ -154,18 +154,19 @@ tsplot_main_menus_make (GtkAccelGroup *accel_group, GtkSignalFunc func, ggobid *
   gg->tsplot.mode_menu = gtk_menu_new ();
 
   CreateMenuItem (gg->tsplot.mode_menu, "Time Series",
-    "^c", "", NULL, accel_group, func, useIds ? GINT_TO_POINTER (TSPLOT) : gg, gg);
+    "^v", "", NULL, accel_group, func,
+    useIds ? GINT_TO_POINTER (TSPLOT) : gg, gg);
 
   /* Add a separator */
   CreateMenuItem (gg->tsplot.mode_menu, NULL,
     "", "", NULL, NULL, NULL, NULL, gg);
 
   CreateMenuItem (gg->tsplot.mode_menu, "Brush",
-    "^b", "", NULL, accel_group, func, useIds ? GINT_TO_POINTER (BRUSH) : gg, gg);
+    "^b", "", NULL, accel_group, func,
+    useIds ? GINT_TO_POINTER (BRUSH) : gg, gg);
   CreateMenuItem (gg->tsplot.mode_menu, "Identify",
-    "^i", "", NULL, accel_group, func, useIds ? GINT_TO_POINTER (IDENT) : gg, gg);
-/*   CreateMenuItem (gg->tsplot.mode_menu, "Move Points", */
-/*     "^m", "", NULL, accel_group, func, useIds ? GINT_TO_POINTER (MOVEPTS) : gg, gg); */
+    "^i", "", NULL, accel_group, func,
+    useIds ? GINT_TO_POINTER (IDENT) : gg, gg);
 
   gtk_widget_show (gg->tsplot.mode_menu);
 }

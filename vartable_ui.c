@@ -38,7 +38,6 @@ clone_vars_cb (GtkWidget *w, ggobid *gg)
   datad *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
   gint *cols = (gint *) g_malloc (d->ncols * sizeof (gint));
   gint ncols = selected_cols_get (cols, d, gg);
-g_printerr ("ncols = %d\n", ncols);
 
   if (ncols > 0)
     clone_vars (cols, ncols, d, gg);

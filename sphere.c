@@ -93,7 +93,7 @@ spherize_set_pcvars (datad *d, ggobid *gg)
   gchar *row[] = {""};
   /*-- --*/
 
-g_printerr ("npcs=%d\n", d->sphere.npcs);
+/*g_printerr ("npcs=%d\n", d->sphere.npcs);*/
   if (d->sphere.npcs == 0)
     return;
 

@@ -102,13 +102,15 @@ splot_expose_cb (GtkWidget *w, GdkEventExpose *event, splotd *sp)
 
 /*-- this will be called by a key_press_cb for each scatterplot mode --*/
 gboolean
-scatterplot_event_handled (GtkWidget *w, GdkEventKey *event,
+splot_event_handled (GtkWidget *w, GdkEventKey *event,
   cpaneld *cpanel, splotd *sp, ggobid *gg)
 {
   static guint32 etime = (guint32) 0;
   gboolean common_event = true;
   extern gint GGOBI(full_mode_set)(gint action, ggobid *gg);
   gint action = -1;
+  displayd *display = (displayd *) sp->displayptr;
+  extern gboolean display_type_handles_action (displayd *, gint viewmode);
 
 /*
  * I can't say this is the best way to handle this bug, but it
@@ -140,6 +142,24 @@ scatterplot_event_handled (GtkWidget *w, GdkEventKey *event,
          cpanel, sp, gg, gg->NumberedKeyEventHandler->userData);
     }
   break;
+
+/*
+ * I'm not happy about these, since a display type is not a mode.
+ * Maybe I'll think of a better way some day.
+*/
+  case GDK_p:
+  case GDK_P:
+    action = PCPLOT;
+  break;
+  case GDK_v:
+  case GDK_V:
+    action = TSPLOT;
+  break;
+  case GDK_e:
+  case GDK_E:
+    action = SCATMAT;
+  break;
+/* */
 
   case GDK_d:
   case GDK_D:
@@ -182,7 +202,7 @@ scatterplot_event_handled (GtkWidget *w, GdkEventKey *event,
     common_event = false;
   }
 
-  if (action >= 0) {
+  if (action >= 0 && display_type_handles_action (display, action)) {
     etime = event->time;
     GGOBI(full_mode_set)(action, gg);
   }
@@ -199,35 +219,35 @@ sp_event_handlers_toggle (splotd *sp, gboolean state) {
   switch (m) {
     case P1PLOT:
       p1d_event_handlers_toggle (sp, state);
-      break;
+    break;
 
     case XYPLOT:
       xyplot_event_handlers_toggle (sp, state);
-      break;
+    break;
 
     case ROTATE:
       rotation_event_handlers_toggle (sp, state);
-      break;
+    break;
 
     case TOUR1D:
       tour1d_event_handlers_toggle (sp, state);
-      break;
+    break;
 
     case TOUR2D:
       tour2d_event_handlers_toggle (sp, state);
-      break;
+    break;
 
     case COTOUR:
       ctour_event_handlers_toggle (sp, state);
-      break;
+    break;
 
     case SCALE:
       scale_event_handlers_toggle (sp, state);
-      break;
+    break;
 
     case BRUSH:
       brush_event_handlers_toggle (sp, state);
-      break;
+    break;
 
     case IDENT:
       identify_event_handlers_toggle (sp, state);
@@ -235,11 +255,29 @@ sp_event_handlers_toggle (splotd *sp, gboolean state) {
 
     case LINEED:
       lineedit_event_handlers_toggle (sp, state);
-      break;
+    break;
 
     case MOVEPTS:
       movepts_event_handlers_toggle (sp, state);
-      break;
+    break;
+
+    case SCATMAT:
+      switch (sp->p1dvar) {
+        case -1:
+          xyplot_event_handlers_toggle (sp, state);
+        break;
+        default:
+          p1d_event_handlers_toggle (sp, state);
+      }
+    break;
+
+    case PCPLOT:
+      p1d_event_handlers_toggle (sp, state);
+    break;
+
+    case TSPLOT:
+      xyplot_event_handlers_toggle (sp, state);  /*-- ?? --*/
+    break;
 
     default:
       break;

@@ -68,7 +68,7 @@ key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
   cpaneld *cpanel = &gg->current_display->cpanel;
   
 /*-- add a key_press_cb in each mode, and let it begin with these lines --*/
-  if (scatterplot_event_handled (w, event, cpanel, sp, gg))
+  if (splot_event_handled (w, event, cpanel, sp, gg))
     return true;
 
   /*-- insert mode-specific key presses (if any) here --*/
@@ -183,7 +183,7 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
       splot_redraw (sp, QUICK, gg);  
     }
   } else {
-    g_printerr ("You can only move points in xyplot mode\n");
+    g_printerr ("You can only move points in an xy plot\n");
   }
 
   return true;

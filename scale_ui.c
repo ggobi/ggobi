@@ -160,7 +160,7 @@ key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
   cpaneld *cpanel = &gg->current_display->cpanel;
   
 /*-- add a key_press_cb in each mode, and let it begin with these lines --*/
-  if (scatterplot_event_handled (w, event, cpanel, sp, gg))
+  if (splot_event_handled (w, event, cpanel, sp, gg))
     return true;
 
   switch (cpanel->scale_style) {

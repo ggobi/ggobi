@@ -223,16 +223,6 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state, ggobid *gg)
       case MOVEPTS:
       break;
 
-/*
-I can't remember the rationale behind using these variables
-firsttime_io, firsttime_reset, firsttime_link, but at this
-point, it seems to be necessary to inset the submenu each time.
-Maybe I wasn't always destroying the submenu, but just
-hiding it?  Don't know.  I won't take these comments out until
-I've had the chance to do some more testing, though. -- dfs
-*/
-
-
       case ROTATE:
         rotation_menus_make (gg);
 
@@ -240,10 +230,7 @@ I've had the chance to do some more testing, though. -- dfs
           gg->main_accel_group);
         gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_menu.io_item),
           gg->app.rotation_io_menu); 
-/*        if (gg->mode_menu.firsttime_io) {*/
           submenu_insert (gg->mode_menu.io_item, gg->main_menubar, -1);
-/*          gg->mode_menu.firsttime_io = false;*/
-/*        }*/
       break;
 
       case TOUR1D:
@@ -253,10 +240,7 @@ I've had the chance to do some more testing, though. -- dfs
           gg->main_accel_group);
         gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_menu.io_item),
           gg->tour1d.io_menu); 
-/*        if (gg->mode_menu.firsttime_io) {*/
           submenu_insert (gg->mode_menu.io_item, gg->main_menubar, -1);
-/*          gg->mode_menu.firsttime_io = false;*/
-/*        }*/
       break;
 
       case TOUR2D:
@@ -266,10 +250,7 @@ I've had the chance to do some more testing, though. -- dfs
           gg->main_accel_group);
         gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_menu.io_item),
           gg->tour2d.io_menu); 
-/*        if (gg->mode_menu.firsttime_io) {*/
           submenu_insert (gg->mode_menu.io_item, gg->main_menubar, -1);
-/*          gg->mode_menu.firsttime_io = false;*/
-/*        }*/
       break;
 
       case COTOUR:
@@ -279,10 +260,7 @@ I've had the chance to do some more testing, though. -- dfs
           gg->main_accel_group);
         gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_menu.io_item),
           gg->tourcorr.io_menu); 
-/*        if (gg->mode_menu.firsttime_io) {*/
           submenu_insert (gg->mode_menu.io_item, gg->main_menubar, -1);
-/*          gg->mode_menu.firsttime_io = false;*/
-/*        }*/
       break;
 
       case SCALE :
@@ -292,10 +270,7 @@ I've had the chance to do some more testing, though. -- dfs
           gg->main_accel_group);
         gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_menu.reset_item),
           gg->scale.scale_reset_menu); 
-/*        if (gg->mode_menu.firsttime_reset) {*/
           submenu_insert (gg->mode_menu.reset_item, gg->main_menubar, -1);
-/*          gg->mode_menu.firsttime_reset = false;*/
-/*        }*/
       break;
 
       case BRUSH :
@@ -305,19 +280,13 @@ I've had the chance to do some more testing, though. -- dfs
           gg->main_accel_group);
         gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_menu.reset_item),
           gg->brush.reset_menu);
-/*        if (gg->mode_menu.firsttime_reset) {*/
           submenu_insert (gg->mode_menu.reset_item, gg->main_menubar, -1);
-/*          gg->mode_menu.firsttime_reset = false;*/
-/*        }*/
 
         gg->mode_menu.link_item = submenu_make ("_Link", 'L',
           gg->main_accel_group);
         gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_menu.link_item),
           gg->brush.link_menu); 
-/*        if (gg->mode_menu.firsttime_link) {*/
           submenu_insert (gg->mode_menu.link_item, gg->main_menubar, -1);
-/*          gg->mode_menu.firsttime_link = false;*/
-/*        }*/
       break;
 
       case IDENT:
@@ -327,10 +296,7 @@ I've had the chance to do some more testing, though. -- dfs
           gg->main_accel_group);
         gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_menu.link_item),
           gg->identify.link_menu); 
-/*        if (gg->mode_menu.firsttime_link) {*/
           submenu_insert (gg->mode_menu.link_item, gg->main_menubar, -1);
-/*          gg->mode_menu.firsttime_link = false;*/
-/*        }*/
       break;
     }
   }
