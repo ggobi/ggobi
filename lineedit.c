@@ -365,6 +365,30 @@ find_nearest_edge (splotd *sp, displayd *display, ggobid *gg)
         }
       }
     }
+
+    /* if this edge is bidirectional, figure out which segment
+       we really want to highlight.  Use the distance from the
+       mouse to the two endpoints to decide. */
+    if (lineid != -1) {
+      j = endpoints[lineid].jpartner;
+      if (j != -1 && !e->hidden_now.els[j]) {
+          
+        edge_endpoints_get (lineid, &from, &to, d, endpoints, e);
+       
+        a.x = sp->screen[from].x;
+        a.y = sp->screen[from].y;
+        b.x = sp->screen[to].x;
+        b.y = sp->screen[to].y;
+
+	if ((mpos->x - a.x) * (mpos->x - a.x) + 
+            (mpos->y - a.y) * (mpos->y - a.y) >
+            (mpos->x - b.x) * (mpos->x - b.x) +
+	    (mpos->y - b.y) * (mpos->y - b.y))
+        {
+	  lineid = j;
+        }
+      }		       
+    }
   }
   return(lineid);
 }
