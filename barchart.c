@@ -623,7 +623,7 @@ barchart_redraw(splotd * rawsp, datad * d, ggobid * gg, gboolean binned)
   barchart_recalc_group_counts(sp, d, gg);
 
 /* dfs: if there are hiddens, draw the entire rectangle in the shadow color */
-  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_hidden);
+  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_hidden); 
   for (i = 0; i < sp->bar->nbins; i++) {
     bin = &sp->bar->bins[i];
     if (bin->nhidden) {
@@ -632,7 +632,6 @@ barchart_redraw(splotd * rawsp, datad * d, ggobid * gg, gboolean binned)
     }
   }
 /* */
-
   for (j = 0; j < sp->bar->ncolors; j++) {
     gdk_gc_set_foreground(gg->plot_GC, &scheme->rgb[j]);
 
