@@ -139,11 +139,26 @@ The software can be obtained at www.graphviz.org, and some instructions
 for building it for ggobi are in the INSTALL file in the GraphLayout
 source directory.
 
-When you have built GraphLayout with the graphviz package, the plugin
-window will include a tab labelled ``graphviz,'' with a button for
-each of the two layout methods.  In each case, a new dataset with two
-variables is generated (the horizontal and vertical coordinates of
-the node positions).
+When you have built GraphLayout with the graphviz package, those
+layout methods will be available under the tabs labelled ``Neato'' and
+``Dot.''  With each method, a new dataset with two variables is generated
+(the horizontal and vertical coordinates of the node positions).
+
+\subsubsection{Neato parameters}
+
+The neato layout algorithm has some parameters.
+
+{\bf Dimension:}  Neato can produce layouts in the plane (by default),
+and it can also produce layouts in higher-dimensional spaces, up to 10d.
+
+{\bf Model:}  Neato can use one of two different models to compute the
+dissimilarity or distance matrix.  The default is the traditional graph
+distance, where the number of edges in the shortest path between two
+nodes is the distance between them.  When the ``circuit resistance''
+model  is selected, the distances are computed using a resistance circuit
+model. This distance reflects the normal graph distance between 2 nodes,
+but also considers the number of paths between them: The more paths,
+the smaller the distance.  This metric tends to emphasize clusters more.
 
 \subsubsection{Disjoint subgraphs}
 
