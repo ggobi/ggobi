@@ -21,12 +21,12 @@ gchar *
 datasetName(datad *d, int which)
 {
   gchar *lbl = (gchar *)NULL;
-   if(d->name && d->name[0])
-     lbl = g_strdup(d->name);
-   else
-     lbl = g_strdup_printf ("data matrix %d", which);
+  if (d->name && d->name[0])
+    lbl = g_strdup(d->name);
+  else
+    lbl = g_strdup_printf ("data matrix %d", which);
 
- return(lbl);
+  return(lbl);
 }
 
 void
@@ -62,7 +62,7 @@ display_menu_build (ggobid *gg)
 
       for (k=0; k<nd; k++) { 
         datad *d = (datad*) g_slist_nth_data (gg->d, k);
-	lbl = datasetName(d, k);
+        lbl = datasetName (d, k);
         item = CreateMenuItem (submenu, lbl,
           NULL, NULL, gg->display_menu, gg->main_accel_group,
           GTK_SIGNAL_FUNC (display_open_cb),
@@ -94,7 +94,7 @@ display_menu_build (ggobid *gg)
 
       for (k=0; k<nd; k++) { 
         datad *d = (datad*) g_slist_nth_data (gg->d, k);
-	lbl = datasetName(d, k);
+        lbl = datasetName (d, k);
         item = CreateMenuItem (submenu, lbl,
           NULL, NULL, gg->display_menu, gg->main_accel_group,
           GTK_SIGNAL_FUNC (display_open_cb),
@@ -126,7 +126,7 @@ display_menu_build (ggobid *gg)
 
       for (k=0; k<nd; k++) { 
         datad *d = (datad*) g_slist_nth_data (gg->d, k);
-	lbl = datasetName(d, k);
+        lbl = datasetName (d, k);
         item = CreateMenuItem (submenu, lbl,
           NULL, NULL, gg->display_menu, gg->main_accel_group,
           GTK_SIGNAL_FUNC (display_open_cb),

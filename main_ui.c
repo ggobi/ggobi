@@ -52,7 +52,9 @@ size_allocate_cb (GtkWidget *w, GdkEvent *event, ggobid *gg)
     gtk_container_add (GTK_CONTAINER (gg->mode_frame), mode_panel);
 
     /*-- widen the variable selection panel --*/
+/*
     varpanel_size_init (largest_panel->requisition.height, gg);
+*/
 
     initd = true;
   }
@@ -316,7 +318,7 @@ mode_set (gint m, ggobid *gg) {
 
   gg->prev_mode = gg->mode;
 
-/*  varpanel_refresh ();*/
+  varpanel_refresh (gg);
 }
 
 void

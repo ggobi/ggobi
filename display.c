@@ -241,6 +241,9 @@ display_create (gint displaytype, gboolean missing_p, datad *d, ggobid *gg)
 
   display_add (display, gg);
 
+g_printerr ("(display_create) calling varpanel_refresh\n");
+  varpanel_refresh (gg);
+
   return (display);
 }
 
@@ -434,10 +437,6 @@ display_set_current (displayd *new_display, ggobid *gg)
 
   gg->current_display = new_display;
   cpanel_set (gg->current_display, gg);
-
-/*
-  vartable_refresh (gg->current_display->d, gg);
-*/
 
   gtk_accel_group_lock (gg->main_accel_group);
   gg->firsttime = false;

@@ -160,13 +160,13 @@ splot_set_current (splotd *sp, gboolean state, ggobid *gg) {
     mode_activate (sp, cpanel->mode, state, gg);
     mode_submenus_activate (sp, cpanel->mode, state, gg);
 
+    /*
+     * this is now the only place varpanel_refresh is called in
+     * changing the current display and splot; we'll see if it's
+     * adequate
+    */
     if (state == on) {
-      /*
-       * this is now the only place vartable_refresh is called in
-       * changing the current display and splot; we'll see if it's
-       * adequate
-      */
-      vartable_refresh (gg->current_display->d, gg);
+      varpanel_refresh (gg);
     }
   }
 }
@@ -309,7 +309,7 @@ splot_new (displayd *display, gint width, gint height, ggobid *gg) {
   sp->pixmap0 = NULL;
   sp->pixmap1 = NULL;
   
-  splot_dimension_set(sp, width, height);
+  splot_dimension_set (sp, width, height);
 
   /*
    * Let it be possible to get a pointer to the splotd object 

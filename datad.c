@@ -67,15 +67,8 @@ datad_init (datad *d, ggobid *gg, gboolean cleanup)
   displayd *display = NULL;
   gint j;
 
-  /*
-   * the varpanel has to know how many circles and labels to destroy
-   * if new data is read in later
-  */
-  d->varpanel_ui.nvars = d->ncols;
-  vartable_layout_init (d, gg);
-  vartable_populate (d, gg);
+  varpanel_populate (d, gg);
 
-  
   vgroups_sort (d, gg);
   for (j=0; j<d->ncols; j++)
     d->vartable[j].groupid = d->vartable[j].groupid_ori;
@@ -94,6 +87,9 @@ datad_init (datad *d, ggobid *gg, gboolean cleanup)
     display_set_current (display, gg);
     gg->current_splot = (splotd *)
       g_list_nth_data (gg->current_display->splots, 0);
+
+g_printerr ("(datad_init) calling varpanel_refresh\n");
+    varpanel_refresh (gg);
   }
 
   return (display);

@@ -528,8 +528,10 @@ make_symbol_window (ggobid *gg) {
       height += (gg->color_ui.margin + 2*(i+2));
     height += gg->color_ui.margin;
 
-    gtk_drawing_area_size (GTK_DRAWING_AREA (gg->color_ui.symbol_display), width, height);
-    gtk_box_pack_start (GTK_BOX (vbox), gg->color_ui.symbol_display, false, false, 0);
+    gtk_drawing_area_size (GTK_DRAWING_AREA (gg->color_ui.symbol_display),
+      width, height);
+    gtk_box_pack_start (GTK_BOX (vbox), gg->color_ui.symbol_display,
+      false, false, 0);
 
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
       gg->color_ui.symbol_display, "Click to select glyph", NULL);

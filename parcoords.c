@@ -121,7 +121,7 @@ parcoords_reset_arrangement (displayd *display, gint arrangement, ggobid *gg) {
 
   display_tailpipe (display, gg);
 
-  vartable_refresh (display->d, gg);
+  varpanel_refresh (gg);
 }
 
 

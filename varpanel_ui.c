@@ -8,17 +8,33 @@
 #include "vars.h"
 #include "externs.h"
 
-#define VAR_CIRCLE_DIAM 40
-
-
-/* */
-static void varcircle_add (gint, gint, gint, datad *, ggobid *gg);
-static void varcircle_draw (gint, datad *, ggobid *gg); 
-/* */
 
 /*-------------------------------------------------------------------------*/
 /*                     Variable selection                                  */
 /*-------------------------------------------------------------------------*/
+
+gboolean
+varpanel_checkbutton_get_active (gint jvar, datad *d)
+{
+  gboolean active = false;
+
+  if (jvar >= 0 && jvar < d->ncols)
+    if (GTK_WIDGET_REALIZED (d->varpanel_ui.label[jvar]))
+      active = gtk_toggle_button_get_active (
+        GTK_TOGGLE_BUTTON (d->varpanel_ui.label[jvar]));
+
+  return active;
+}
+
+void
+varpanel_checkbutton_set_active (gint jvar, gboolean active, datad *d)
+{
+  if (jvar >= 0 && jvar < d->ncols)
+    if (GTK_WIDGET_REALIZED (d->varpanel_ui.label[jvar]))
+      gtk_toggle_button_set_active (
+        GTK_TOGGLE_BUTTON (d->varpanel_ui.label[jvar]), active);
+}
+
 
 void
 varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint btn,
@@ -38,32 +54,30 @@ varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint btn,
 
     case parcoords:
       redraw = parcoords_varsel (cpanel, sp, jvar, &jvar_prev, alt_mod, gg);
-      break;
+    break;
 
     case scatmat:
       redraw = scatmat_varsel (cpanel, sp, jvar, &jvar_prev, btn, alt_mod, gg);
-      break;
+    break;
 
-      case scatterplot:
-        switch (cpanel->projection) {
-          case P1PLOT:
-            redraw = p1d_varsel (sp, jvar, &jvar_prev, btn);
-            break;
-          case XYPLOT:
-            redraw = xyplot_varsel (sp, jvar, &jvar_prev, btn);
-            break;
-          case TOUR2D:
-            tour2d_varsel (gg, jvar, btn);
-            break;
-          default:
-            break;
-      }
-      break;
+    case scatterplot:
+      switch (cpanel->projection) {
+        case P1PLOT:
+          redraw = p1d_varsel (sp, jvar, &jvar_prev, btn);
+        break;
+        case XYPLOT:
+          redraw = xyplot_varsel (sp, jvar, &jvar_prev, btn);
+        break;
+        case TOUR2D:
+/*
+          tour2d_varsel (gg, jvar, btn);
+*/
+        break;
+        default:
+        break;
+    }
+    break;
   }
-
-  varcircle_draw (jvar, d, gg);
-  if (jvar_prev != -1)
-    varcircle_draw (jvar_prev, d, gg);
 
   /*-- overkill for scatmat: could redraw one row, one column --*/
   /*-- overkill for parcoords: need to redraw at most 3 plots --*/
@@ -410,9 +424,9 @@ variable_clone (gint jvar, const gchar *newName, gboolean update,
   datad *d, ggobid *gg) 
 {
   gint nc = d->ncols + 1;
-  gint i, j, k = 0;
+  gint j;
   
-  /*-- set a view of the data values before building the new circle --*/
+  /*-- set a view of the data values before adding the new label --*/
   vartable_row_append (d->ncols-1, d, gg);
   vartable_realloc (nc, d, gg);
   d->vartable[nc-1].collab =
@@ -420,44 +434,15 @@ variable_clone (gint jvar, const gchar *newName, gboolean update,
   d->vartable[nc-1].collab_tform =
     g_strdup (newName && newName[0] ? newName : d->vartable[jvar].collab);
 
-  /*
-   * Follow the algorithm by which the table has been populated
-  */
-  if (d->varpanel_ui.vnrows*d->varpanel_ui.vncols <= d->ncols) {
-    d->varpanel_ui.vnrows++;
-    gtk_table_resize (GTK_TABLE (d->varpanel_ui.table),
-                      d->varpanel_ui.vnrows, d->varpanel_ui.vncols);
+  for (j=0; j<d->ncols; j++) {
+    d->varpanel_ui.label = (GtkWidget **)
+      g_realloc (d->varpanel_ui.label, nc * sizeof (GtkWidget *));
   }
-
-  k = 0;
-  for (i=0; i<d->varpanel_ui.vnrows; i++) {
-    for (j=0; j<d->varpanel_ui.vncols; j++) {
-      if (k < d->ncols)
-        ;
-      else {
-        d->varpanel_ui.da = (GtkWidget **)
-          g_realloc (d->varpanel_ui.da, nc * sizeof (GtkWidget *));
-
-        d->varpanel_ui.da_pix = (GdkPixmap **)
-          g_realloc (d->varpanel_ui.da_pix, nc * sizeof (GdkPixmap *));
-        d->varpanel_ui.da_pix[nc-1] = NULL;
-
-        d->varpanel_ui.label = (GtkWidget **)
-          g_realloc (d->varpanel_ui.label, nc * sizeof (GtkWidget *));
-        varcircle_add (i, j, k, d, gg);
-      }
-      k++;
-      if (k == d->ncols+1) break;
-    }
-  }
-
 
   /*-- now the rest of the variables --*/
   d->vartable[nc-1].groupid = d->vartable[nc-1].groupid_ori =
     d->vartable[d->ncols-1].groupid + 1; 
-
   d->vartable[nc-1].jitter_factor = d->vartable[jvar].jitter_factor;
-
   d->vartable[nc-1].nmissing = d->vartable[jvar].nmissing;
 
   if(update) {
@@ -497,20 +482,83 @@ updateAddedColumn (gint nc, gint jvar, datad *d, ggobid *gg)
 
 /*-------------------------------------------------------------------------*/
 
-static gint
-varsel_cb (GtkWidget *w, GdkEvent *event, gpointer cbd)
-{
-  ggobid *gg = GGobiFromWidget(w, true);
+
+/*-- here's where we'd reset what's selected according to the current mode --*/
+void
+varpanel_refresh (ggobid *gg) {
+  gint j;
   displayd *display = gg->current_display;
-  datad *d = display->d;
-  cpaneld *cpanel = &gg->current_display->cpanel;
   splotd *sp = gg->current_splot;
-  gint jvar = GPOINTER_TO_INT (cbd);
+  cpaneld *cpanel = &display->cpanel;
+  gint nd = g_slist_length (gg->d);
+  gint k;
+
+  if (nd > 0 && sp != NULL) {
+
+    for (k=0; k<nd; k++) {
+      datad *d = (datad*) g_slist_nth_data (gg->d, k);
+      if (display->d != d)
+        ;  /*-- we will only deal with the current datad --*/
+      else {
+
+        switch (display->displaytype) {
+
+          case parcoords:
+            for (j=0; j<d->ncols; j++) {
+            }
+          break;
+
+          case scatmat:
+            for (j=0; j<d->ncols; j++) {
+            }
+          break;
+
+          case scatterplot:
+            switch (cpanel->projection) {
+              case P1PLOT:
+                for (j=0; j<d->ncols; j++)
+                  varpanel_checkbutton_set_active (j, (j == sp->p1dvar), d);
+              break;
+              case XYPLOT:
+                for (j=0; j<d->ncols; j++)
+                  varpanel_checkbutton_set_active (j,
+                    (j == sp->xyvars.x || j == sp->xyvars.y), d);
+              break;
+              default:
+              break;
+          }
+          break;
+        }
+      }
+    }
+  }
+}
+
+static gint
+varsel_cb (GtkWidget *w, GdkEvent *event, datad *d)
+{
+  ggobid *gg = GGobiFromWidget (w, true);
+  displayd *display = gg->current_display;
+  cpaneld *cpanel = &display->cpanel;
+  splotd *sp = gg->current_splot;
 
   if (event->type == GDK_BUTTON_PRESS) {
     GdkEventButton *bevent = (GdkEventButton *) event;
     gint button = bevent->button;
     gboolean alt_mod, shift_mod, ctrl_mod;
+    gint j, jvar;
+
+    /*-- respond only to button 1 and button 2 --*/
+    if (button != 1 && button != 2)
+      return false;
+
+    jvar = -1;
+    for (j=0; j<d->ncols; j++) {
+      if (d->varpanel_ui.label[j] == w) {
+        jvar = j;
+        break;
+      }
+    }
 
 /* looking for modifiers; don't know which ones we'll want */
     alt_mod = ((bevent->state & GDK_MOD1_MASK) == GDK_MOD1_MASK);
@@ -531,172 +579,16 @@ varsel_cb (GtkWidget *w, GdkEvent *event, gpointer cbd)
   return false;
 }
 
-
-void
-varcircle_draw (gint jvar, datad *d, ggobid *gg)
+static gint
+clicked_cb (GtkWidget *w, GdkEvent *event, datad *d)
 {
-  /*--  a single pixmap is shared among all variable circles --*/
-  gint r = VAR_CIRCLE_DIAM/2;
-  gint x,y;
-  gboolean chosen = false;
-  GList *l;
-  splotd *s;
-  splotd *sp = gg->current_splot;
-  displayd *display;
-  cpaneld *cpanel;
-
-  if (sp == NULL || jvar < 0 || jvar >= d->ncols)
-    return;  /*-- return --*/
-
-  display = (displayd *) sp->displayptr;
-
-  if (display == NULL || display->d != d)
-    return;  /*-- return --*/
-
-  cpanel = &display->cpanel;
-
-  if (gg->selvarfg_GC == NULL) 
-    init_var_GCs (d->varpanel_ui.da[jvar], gg);
-
-  if (d->varpanel_ui.da_pix[jvar] == NULL)
-    d->varpanel_ui.da_pix[jvar] = gdk_pixmap_new (
-      d->varpanel_ui.da[jvar]->window,
-      VAR_CIRCLE_DIAM+1, VAR_CIRCLE_DIAM+1, -1);
-
-  /*-- clear the pixmap --*/
-  gdk_draw_rectangle (d->varpanel_ui.da_pix[jvar], gg->unselvarbg_GC, true,
-                      0, 0, VAR_CIRCLE_DIAM+1, VAR_CIRCLE_DIAM+1);
-
-  /*-- add a filled circle for the background --*/
-  gdk_draw_arc (d->varpanel_ui.da_pix[jvar], gg->selvarbg_GC, true,
-                0, 0, VAR_CIRCLE_DIAM, VAR_CIRCLE_DIAM,
-                0, 64 * 360);
-
-  /*-- add the appropriate line --*/
-  switch (display->displaytype) {
-
-    case  parcoords:  /* only one mode, a 1d plot */
-      l = display->splots;
-      while (l) {
-        s = (splotd *) l->data;
-        if (s->p1dvar == jvar) {
-          if (display->p1d_orientation == HORIZONTAL)
-            gdk_draw_line (d->varpanel_ui.da_pix[jvar],
-              gg->selvarfg_GC, r, r, r+r, r);
-          else
-            gdk_draw_line (d->varpanel_ui.da_pix[jvar],
-              gg->selvarfg_GC, r, r, r, 0);
-          chosen = true;
-          break;
-        }
-        l = l->next;
-      }
-      break;
-
-    case  scatterplot:
-      switch (cpanel->projection) {
-        case P1PLOT:
-          if (jvar == sp->p1dvar) {
-            if (display->p1d_orientation == HORIZONTAL)
-              gdk_draw_line (d->varpanel_ui.da_pix[jvar],
-                gg->selvarfg_GC, r, r, r+r, r);
-            else
-              gdk_draw_line (d->varpanel_ui.da_pix[jvar],
-                gg->selvarfg_GC, r, r, r, 0);
-            chosen = true;
-          }
-          break;
-        case XYPLOT:
-          if (jvar == sp->xyvars.x) {
-            gdk_draw_line (d->varpanel_ui.da_pix[jvar],
-              gg->selvarfg_GC, r, r, r+r, r);
-            chosen = true;
-          } else if (jvar == sp->xyvars.y) {
-            gdk_draw_line (d->varpanel_ui.da_pix[jvar],
-              gg->selvarfg_GC, r, r, r, 0);
-            chosen = true;
-          }
-          break;
-        case TOUR2D:
-          x = (gint) (display->u[0][jvar]*(gfloat)r);
-          y = (gint) (display->u[1][jvar]*(gfloat)r);
-          gdk_draw_line (d->varpanel_ui.da_pix[jvar],
-            gg->selvarfg_GC, r, r, r+x, r-y);
-          chosen = true;
-          break;
-      }
-      break;
-
-    case  scatmat:
-      l = display->splots;
-      while (l) {
-        s = (splotd *) l->data;
-        if (s->p1dvar == -1) {
-          if (s->xyvars.x == jvar) {
-            gdk_draw_line (d->varpanel_ui.da_pix[jvar],
-              gg->selvarfg_GC, r, r, r+r, r);
-            chosen = true;
-          } else if (s->xyvars.y == jvar) {
-            gdk_draw_line (d->varpanel_ui.da_pix[jvar],
-              gg->selvarfg_GC, r, r, r, 0);
-            chosen = true;
-          }
-        }
-        l = l->next;
-      }
-      break;
-
-    default:
-      ;
-  }
-
-  /*
-   * add an open circle for the outline
-  */
-  if (chosen) {
-    gdk_draw_arc (d->varpanel_ui.da_pix[jvar],
-      gg->selvarfg_GC, false,
-      0, 0, VAR_CIRCLE_DIAM, VAR_CIRCLE_DIAM, 0, 64 * 360);
-  } else {
-    gdk_draw_arc (d->varpanel_ui.da_pix[jvar],
-      gg->unselvarfg_GC, false,
-      0, 0, VAR_CIRCLE_DIAM, VAR_CIRCLE_DIAM, 0, 64 * 360);
-  }
-
-
-  /*
-   * copy the pixmap to the window
-  */
-  gdk_draw_pixmap (d->varpanel_ui.da[jvar]->window, gg->unselvarfg_GC,
-    d->varpanel_ui.da_pix[jvar], 0, 0, 0, 0,
-    VAR_CIRCLE_DIAM+1, VAR_CIRCLE_DIAM+1);
-}
-
-void tour_draw_circles (datad *d, ggobid *gg)
-{
-  gint j;
-
-  for (j=0; j<d->ncols; j++) {
-    varcircle_draw (j, d, gg);
-  }
-}
-
-gboolean
-da_expose_cb (GtkWidget *w, GdkEventExpose *event, gpointer cbd)
-{
+/*
+ * The clicked signal is delivered after the pressed signal,
+ * apparently, so I can use this routine to clean up after
+ * the variable selection, resetting the state of each checkbox.
+*/
   ggobid *gg = GGobiFromWidget (w, true);
-  gint j = GPOINTER_TO_INT (cbd);
-  datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (w), "datad");
-
-  /* are there two gg assignments here? */
-  /*gg = ggobi_get (0);*/
-
-  if (d->varpanel_ui.da_pix[j] == NULL)
-    varcircle_draw (j, d, gg); 
-  else
-    gdk_draw_pixmap (d->varpanel_ui.da[j]->window, gg->unselvarfg_GC,
-      d->varpanel_ui.da_pix[j], 0, 0, 0, 0,
-      VAR_CIRCLE_DIAM+1, VAR_CIRCLE_DIAM+1);
+  varpanel_refresh (gg);
 
   return true;
 }
@@ -733,182 +625,47 @@ varpanel_make (GtkWidget *parent, ggobid *gg) {
 }
 
 
-static void
-varcircle_add (gint i, gint j, gint k, datad *d, ggobid *gg)
+/*-- create a column of check buttons? --*/
+void varpanel_populate (datad *d, ggobid *gg)
 {
-  GtkWidget *vb;
-
-  vb = gtk_vbox_new (false, 0);
-  gtk_container_border_width (GTK_CONTAINER (vb), 1);
-  gtk_widget_show (vb);
-
-  d->varpanel_ui.label[k] =
-    gtk_button_new_with_label (d->vartable[k].collab);
-
-  gtk_widget_show (d->varpanel_ui.label[k]);
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
-    d->varpanel_ui.label[k], "Click left to select", NULL);
-  gtk_container_add (GTK_CONTAINER (vb), d->varpanel_ui.label[k]);
-
-  gtk_signal_connect (GTK_OBJECT (d->varpanel_ui.label[k]),
-    "button_press_event",
-    GTK_SIGNAL_FUNC (popup_varmenu), GINT_TO_POINTER (k));
-
-  gtk_object_set_data (GTK_OBJECT (d->varpanel_ui.label[k]), "datad", d);
-  GGobi_widget_set (GTK_WIDGET (d->varpanel_ui.label[k]), gg, true);
-
-  /*
-   * a drawing area to contain the variable circle
-  */
-  d->varpanel_ui.da[k] = gtk_drawing_area_new ();
-  gtk_drawing_area_size (GTK_DRAWING_AREA (d->varpanel_ui.da[k]),
-                         VAR_CIRCLE_DIAM+2, VAR_CIRCLE_DIAM+2);
-  gtk_widget_set_events (d->varpanel_ui.da[k], GDK_EXPOSURE_MASK
-             | GDK_ENTER_NOTIFY_MASK
-             | GDK_LEAVE_NOTIFY_MASK
-             | GDK_BUTTON_PRESS_MASK
-             | GDK_BUTTON_RELEASE_MASK);
-
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
-    d->varpanel_ui.da[k], "Click to select; see menu", NULL);
-
-  gtk_signal_connect (GTK_OBJECT (d->varpanel_ui.da[k]), "expose_event",
-    GTK_SIGNAL_FUNC (da_expose_cb), GINT_TO_POINTER (k));
-  gtk_signal_connect (GTK_OBJECT (d->varpanel_ui.da[k]), "button_press_event",
-    GTK_SIGNAL_FUNC (varsel_cb), GINT_TO_POINTER (k));
-
-  gtk_object_set_data (GTK_OBJECT (d->varpanel_ui.da[k]), "datad", d);
-  GGobi_widget_set (GTK_WIDGET (d->varpanel_ui.da[k]), gg, true);
-
-  gtk_widget_show (d->varpanel_ui.da[k]);
-  gtk_container_add (GTK_CONTAINER (vb), d->varpanel_ui.da[k]);
-  gtk_table_attach (GTK_TABLE (d->varpanel_ui.table), vb, j, j+1, i, i+1,
-    GTK_FILL, GTK_FILL, 0, 0);
-}
-
-void
-vartable_clear (datad *d, ggobid *gg) {
   gint j;
-
-  for (j=0; j<d->varpanel_ui.nvars; j++) {
-    gtk_widget_destroy (d->varpanel_ui.da[j]);
-    gtk_widget_destroy (d->varpanel_ui.label[j]);
-  }
-
-  /*-- free when they've been alloc'ed before --*/
-  g_free (d->varpanel_ui.da);
-  g_free (d->varpanel_ui.label);
-}
-
-void
-varpanel_clear (ggobid *gg) {
-  GSList *l;
-  datad *d;
-  for (l = gg->d; l; l = l->next) {
-    d = (datad *) l->data;
-    vartable_clear (d, gg);
-  }
-}
-
-
-/*-- create a grid of buttons in the table --*/
-void vartable_populate (datad *d, ggobid *gg)
-{
-  gint i, j, k;
+  GtkWidget *ebox;
   GtkWidget *frame = gtk_frame_new (NULL);
+
   gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
   gtk_box_pack_start (GTK_BOX (gg->varpanel_ui.varpanel),
-                      frame, true, true, 2);
-  gtk_widget_show (frame);
+    frame, true, true, 2);
+
+  /*-- add an ebox to the frame --*/
+  ebox = gtk_event_box_new ();
+  gtk_container_add (GTK_CONTAINER (frame), ebox);
   
-  d->varpanel_ui.table = gtk_table_new (d->varpanel_ui.vnrows,
-                                        d->varpanel_ui.vncols, true);
-  gtk_container_add (GTK_CONTAINER (frame), d->varpanel_ui.table);
+  /*-- add a vbox to the ebox --*/
+  d->varpanel_ui.vbox = gtk_vbox_new (false, 0);
+  gtk_container_add (GTK_CONTAINER (ebox), d->varpanel_ui.vbox);
 
-  /*-- da and label are freed in varpanel_clear --*/
-
-  d->varpanel_ui.da = (GtkWidget **)
-    g_malloc (d->ncols * sizeof (GtkWidget *));
-
-  d->varpanel_ui.da_pix = (GdkPixmap **)
-    g_malloc (d->ncols * sizeof (GdkPixmap *));
-  for (j=0; j<d->ncols; j++) d->varpanel_ui.da_pix[j] = NULL;
+  gtk_widget_show_all (frame);
+  gdk_flush ();
 
   d->varpanel_ui.label = (GtkWidget **)
     g_malloc (d->ncols * sizeof (GtkWidget *));
-
-  k = 0;
-  for (i=0; i<d->varpanel_ui.vnrows; i++) {
-    for (j=0; j<d->varpanel_ui.vncols; j++) {
-      varcircle_add (i, j, k, d, gg);
-      k++;
-      if (k == d->ncols) break;
-    }
-  }
-
-  gtk_widget_show_all (d->varpanel_ui.table);
-}
-
-/*
- * Make the variable panel as square as possible, and lay it out
- * row-wise.
-*/
-void
-vartable_layout_init (datad *d, ggobid *gg) {
-
-  d->varpanel_ui.vnrows = (gint) sqrt ((gdouble) d->ncols);
-  d->varpanel_ui.vncols = d->varpanel_ui.vnrows;
-
-  while (d->varpanel_ui.vnrows*d->varpanel_ui.vncols < d->ncols) {
-    d->varpanel_ui.vnrows++;
-    if (d->varpanel_ui.vnrows*d->varpanel_ui.vncols < d->ncols)
-      d->varpanel_ui.vncols++;
-  }
-}
-
-
-void
-varpanel_size_init (gint cpanel_height, ggobid* gg)
-{
-/*
-  gint i;
-  GtkTable *t = GTK_TABLE (gg->varpanel_ui.varpanel);
-  GtkTableRowCol c, r;
-  gint width = 0, height = 0;
-  GtkWidget *vport = GTK_WIDGET
-    ((GTK_BIN (gg->varpanel_ui.scrolled_window))->child);
-*/
-
-  /*-- Find the width of the first few columns --*/
-/*
-  for (i=0; i<MIN (t->ncols, 3); i++) {
-    c = t->cols[i];
-    width += c.requisition + c.spacing;
-  }
-*/
-
-  /*-- Find the height of the first few rows --*/
-/*
-  for (i=0; i<MIN (t->nrows, 4); i++) {
-    r = t->rows[i];
-    height += r.requisition + r.spacing;
-  }
-
-  gtk_widget_set_usize (vport, width, MAX (height, cpanel_height));
-*/
-}
-
-void
-vartable_refresh (datad *d, ggobid *gg) {
-  gint j;
-
   for (j=0; j<d->ncols; j++) {
-    if (GTK_WIDGET_REALIZED (d->varpanel_ui.da[j])) {
-      varcircle_draw (j, d, gg);
-/*    gtk_widget_queue_draw (d->varpanel_ui.da[j]);*/
-    }
+    d->varpanel_ui.label[j] =
+      gtk_check_button_new_with_label (d->vartable[j].collab);
+    GGobi_widget_set (GTK_WIDGET (d->varpanel_ui.label[j]), gg, true);
+
+    gtk_signal_connect (GTK_OBJECT (d->varpanel_ui.label[j]),
+      "button_press_event", GTK_SIGNAL_FUNC (varsel_cb), d);
+    gtk_signal_connect (GTK_OBJECT (d->varpanel_ui.label[j]),
+      "clicked", GTK_SIGNAL_FUNC (clicked_cb), d);
+
+    gtk_box_pack_start (GTK_BOX (d->varpanel_ui.vbox),
+      d->varpanel_ui.label[j], true, true, 0);
+    gtk_widget_show (d->varpanel_ui.label[j]);
   }
+    
 }
+
 
 void
 varlabel_set (gint j, datad *d, ggobid *gg) {

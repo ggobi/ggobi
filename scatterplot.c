@@ -107,10 +107,26 @@ ruler_ranges_set (displayd *display, splotd *sp, ggobid *gg) {
 /*----------------------------------------------------------------------*/
 
 static GtkItemFactoryEntry menu_items[] = {
-  { "/_FFile",         NULL,     NULL,             0,             "<Branch>" },
-  { "/FFile/Print",    "",       (GtkItemFactoryCallback)display_print_cb, 0, "<Item>" },
-  { "/FFile/sep",      NULL,     NULL,             0, "<Separator>" },
-  { "/FFile/Close",    "",       (GtkItemFactoryCallback) display_close_cb, 0, "<Item>" },
+  {"/_FFile",        
+    NULL,    
+    NULL,            
+    0,            
+    "<Branch>" },
+  {"/FFile/Print",   
+    "",      
+    (GtkItemFactoryCallback)display_print_cb,
+    0,
+    "<Item>" },
+  {"/FFile/sep",     
+    NULL,    
+    NULL,            
+    0,
+    "<Separator>" },
+  {"/FFile/Close",   
+    "",      
+    (GtkItemFactoryCallback) display_close_cb,
+    0,
+    "<Item>" },
 };
 
 static void
@@ -204,7 +220,8 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
 
   gg->app.sp_accel_group = gtk_accel_group_new ();
   get_main_menu (menu_items, sizeof (menu_items) / sizeof (menu_items[0]),
-                 gg->app.sp_accel_group, display->window, &mbar, (gpointer) display);
+                 gg->app.sp_accel_group, display->window, &mbar,
+                 (gpointer) display);
   /*
    * After creating the menubar, and populating the file menu,
    * add the Display Options and Link menus another way
@@ -217,8 +234,8 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
   /*
    * Initialize a single splot
   */
-  if(sp == NULL) {
-   sp = splot_new (display, WIDTH, HEIGHT, gg);
+  if (sp == NULL) {
+    sp = splot_new (display, WIDTH, HEIGHT, gg);
   }
 
   display->splots = NULL;
@@ -278,7 +295,7 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
   gtk_widget_show (display->vrule);
   gtk_widget_show (table);
   gtk_widget_show_all (display->window);
-
+  
   ruler_ranges_set (display, sp, gg);
 
   return display;
