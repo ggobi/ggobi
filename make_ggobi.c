@@ -58,25 +58,29 @@ fileset_read_init (gchar *ldata_in, ggobid *gg)
  return (ans);
 } 
 
-void
+displayd *
 dataset_init(ggobid *gg, gboolean cleanup)
 {
-    displayd *display;
+    displayd *display = NULL;
 
     pipeline_init (gg);
 
     if(cleanup)
       display_free_all (gg);  /*-- destroy any existing displays --*/
 
-    /*-- initialize the first display --*/
-    display = scatterplot_new (false, NULL, gg);
-    /* Need to make certain this is the only one there.
-       See
-     */
-    gg->displays = g_list_append (gg->displays, (gpointer) display);
-    display_set_current (display, gg);
-    gg->current_splot = (splotd *)
+    if(gg->ncols > 1) {
+       /*-- initialize the first display --*/
+      display = scatterplot_new (false, NULL, gg);
+       /* Need to make certain this is the only one there.
+          See
+        */
+      gg->displays = g_list_append (gg->displays, (gpointer) display);
+      display_set_current (display, gg);
+      gg->current_splot = (splotd *)
       g_list_nth_data (gg->current_display->splots, 0);
+    }
+
+    return(display);
 }
 
 gboolean

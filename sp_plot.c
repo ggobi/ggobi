@@ -478,6 +478,9 @@ splot_line_colors_used_get (splotd *sp, gint *ncolors_used,
   gint i, k;
   displayd *display = (displayd *) sp->displayptr;
 
+  if(gg->nsegments == 0)
+    return;
+
   /*
    * Loop once through line_color_now[], collecting the colors
    * currently in use into the line_colors_used[] vector.

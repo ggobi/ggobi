@@ -294,6 +294,8 @@ display_free_all (ggobid *gg) {
 void
 display_set_current (displayd *new_display, ggobid *gg) 
 {
+  gchar *title;
+
   if(new_display == NULL)
    return;
 
@@ -324,13 +326,14 @@ display_set_current (displayd *new_display, ggobid *gg)
     }
   }
 
+  title = computeTitle(new_display, gg);
+  if(title) {
+      gtk_window_set_title (GTK_WINDOW (new_display->window), title);   
+      g_free(title); 
+  }
+
   switch (new_display->displaytype) {
     case scatterplot:
-      gtk_window_set_title (GTK_WINDOW (new_display->window),
-        (new_display->missing_p) ?
-          "*** scatterplot display (missings) *** " :
-          "*** scatterplot display ***"); 
-
       scatterplot_main_menus_make (gg->main_accel_group, mode_set_cb, gg, true);
       gg->mode_item = submenu_make ("_View", 'V', gg->main_accel_group);
       gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_item),
@@ -339,11 +342,6 @@ display_set_current (displayd *new_display, ggobid *gg)
       break;
 
     case scatmat:
-      gtk_window_set_title (GTK_WINDOW (new_display->window),
-        (new_display->missing_p) ?
-          "*** scatterplot matrix (missings) *** " :
-          "*** scatterplot matrix ***"); 
-
       scatmat_main_menus_make (gg->main_accel_group, mode_set_cb, gg, true);
       gg->mode_item = submenu_make ("_View", 'V', gg->main_accel_group);
       gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_item),
@@ -352,9 +350,6 @@ display_set_current (displayd *new_display, ggobid *gg)
       break;
 
     case parcoords:
-      gtk_window_set_title (GTK_WINDOW (new_display->window),
-                            "*** parallel coordinates display ***");
-
       parcoords_main_menus_make (gg->main_accel_group, mode_set_cb, gg, true);
       gg->mode_item = submenu_make ("_View", 'V', gg->main_accel_group);
       gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_item),
@@ -371,6 +366,46 @@ display_set_current (displayd *new_display, ggobid *gg)
   gtk_accel_group_lock (gg->main_accel_group);
   gg->firsttime = false;
 }
+
+/*
+   Creates a title string for a display window.
+
+   Caller must free the return value.
+ */
+gchar *
+computeTitle(displayd *display, ggobid *gg)
+{
+  int n;
+  gchar *title = NULL, *tmp = NULL, *description;
+
+  switch(display->displaytype) {
+    case scatterplot:
+       tmp = display->missing_p ?   "*** scatterplot display (missings) *** " 
+                                :   "*** scatterplot display ***";
+      break;
+    case scatmat:
+       tmp = display->missing_p ?   "*** scatterplot matrix (missings) *** " 
+                                :   "*** scatterplot matrix ***";
+      break;
+    case parcoords:
+       tmp = "*** parallel coordinates display *** " ;
+      break;
+  }
+
+ description = GGOBI(getDescription)(gg);
+ n = strlen(tmp) + strlen(description) + 4;
+ title = (gchar *)g_malloc(sizeof(gchar) * n);
+ memset(title, '\0', n);
+
+ sprintf(title, "%s %s", description, tmp);
+
+ g_free(description);
+
+ return(title);
+}
+
+
+
 
 /* Some of these will probably be folded together eventually */
 

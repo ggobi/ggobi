@@ -4,6 +4,10 @@
 \usepackage{pstricks}
 \input{pst-beta}
 
+\def\SFunction#1{{\texttt{\red #1}}}
+
+\def\note#1{\textsl{\red #1}}
+
 \title{Using the R-GGobi Link}
 \author{Andreas Buja \\
 Di Cook \\
@@ -40,6 +44,11 @@ application via the command line.  One can pass a vector of strings as
 arguments which are processed as command line arguments.  When
 specifying the name of a file, one can specify whether this is XML,
 ASCII or binary.
+
+\begin{verbatim}
+> ggobi()
+> ggobi.setData(data.frame(a=rnorm(100), b=runif(100))
+\end{verbatim}
 
 We can create a ggobi instance with no data and set the data in a
 later command.
@@ -140,6 +149,43 @@ One can (will be able to) set the brush location and size directly via
 a function call.  Additionally, one can control the glyph type, size
 and color for the points under the brush.
 
+One can use the programmatic interface to capture views and replay
+them.  For example, we might want to display the effect of identifying
+different groups of observations.
+\begin{verbatim}
+ views <- list(c(20,20, 100,100), c(400,300), c(300,150,40,40))
+ ggobi.setMode("Brush")
+ for(i in views) {
+   ggobi.setBrush(i)
+   print(ggobi.getSelectedIndices())
+   prompt()
+ }
+\end{verbatim}
+
+
+\section{Managing Windows}
+Because one can easily create multiple ggobi instances and many
+displays within each instance, managing the display windows can be
+difficult. Accordingly, we provide some facilities for
+programmatically controlling them.  The first set work on the
+displays.  The functions \SFunction{ggobi.getActivePlot} and
+\SFunction{ggobi.setActivePlot} operate on either a display or a
+display and sub-plot object.
+
+Firstly, one can move one or all of the windows within a ggobi
+instance to the background or foreground.  This uses the function
+\SFunction{ggobi.raisePlot} and the argument \SArg{raise} indicates
+whether the windows should be lowered or raised.  The former pushes
+them below all the other windows on the desktop.  The latter raises
+them above the other windows. The location of each window remains
+unaltered, and merely its ``depth'' or stacking order is changed.
+
+Similarly, one can iconify and de-iconify one or more windows.  The
+function \SFunction{ggobi.iconify} provides this functionality via the
+\SArg{icon} argument.
+
+
+
 
 \section{Callbacks}
 
@@ -197,7 +243,7 @@ that information in the environment.
 \begin{verbatim}
  handlerTemplate <- function(x,y, ggobi) {
    handler <- function(which) {
-     cat("Observation",which,"in", ggobi,"\n")    
+     cat("Observation", which, "in", ggobi,"\n")    
    }
 
    return(handler);
@@ -206,10 +252,9 @@ that information in the environment.
 Of course, we can do this for the ggobi instance
 as it stands now.
 
-
 To remove the handler
 \begin{verbatim}
-ggobi.setIdentifyHandler(NULL)
+ ggobi.setIdentifyHandler(NULL)
 \end{verbatim}
 
 See IdentifyProc in ggobi.h and add the appropriate set and get for
@@ -347,12 +392,6 @@ versions of \SFunction{dim}, \SFunction{ncol},
 \subsection{getColors}
 
 
-\subsection{set}
-
-
-\subsection{getGlyphs}
-
-
 \subsection{getSelectedIndices}
 This needs attention to access the correct
 variable in the xgobi structure.
@@ -367,28 +406,72 @@ and even plots within them inter- and intra- ggobi instance is most
 useful in a programmatic interface.
 
 \subsection{getDefaultGGobi}
-Return the index of the currently active or default ggobi instance.
-This is the ggobi instance which receives the commands by default.
-
-
 \subsection{setDefaultGGobi}
+Since there can be multiple ggobi instances, one must identify the
+instance to which instructions are directed.  To simplify this, R
+supports the notion of an active or default ggobi.  All functions that
+refer to a ggobi instance use the default ggobi if the \SArg{.gobi}
+argument is not specified.  This value is obtained via the function
+\SFunction{getDefaultGGobi}.
+
+When a new ggobi instance is created (see \SFunction{ggobi}), it
+becomes the default ggobi.  One can switch the active instance to
+another using the function \SFunction{setDefaultGGobi}.
+
+The return value from \SFunction{getDefaultGGobi} is an integer which
+is $1$-based.  This has class \texttt{"ggobi"}.
+
+The value can be passed directly to the functions \SFunction{.GGobiC}
+and \SFunction{.GGobiCall}.  It is automatically decremented by these
+to be $0$-based, corresponding to the C routines.
+
 
 \subsection{ggobi.getRowNames}
-Returns the observation labels for
-the specified ggobi instance.
+Returns the observation labels for the specified ggobi instance.
 
 See also \SFunction{ggobi.setRowNames}.
 
 \subsection{getSmootherFunction.ggobi}
+\subsection{ggobi.setSmootherFunction}
+GGobi provides different smoothing algorithms.  However, it is
+impossible for it to provide all possible implementations.
+To allow others to provide their own, we allow
+an R function to be registered with the ggobi session
+so that 
+
+
 \subsection{ggobi}
 This is the function that creates a ggobi instance.
 One specifies the name of a file or a data frame (or matrix).
 The newly created ggobi instance becomes the default
 
-See \SFunction{setDefaultGGobi}
+See \SFunction{setDefaultGGobi}.
+
 
 \subsection{ggobi.getActivePlot}
+\subsection{ggobi.setActivePlot}
+Each ggobi instance has one display that is considered active and
+within that display, a sub-plot on which brush and identify operations
+will take effect.  This is the active plot.  These two functions
+maniuplate the currently active plot.  The first returns an integer
+vector identifying the display and within-display plot that is
+considered active.  The second sets the active plot to the one
+identified by the integer pair.  In this case, the second element can
+be omitted or NA.
+
+
 \subsection{ggobi.getCurrentDisplayType}
+Each ggobi has a concept of an active window or display. Within each
+of these displays, there is one or more sub-plots.  This function
+returns the name of this active plot.  See
+\SFunction{ggobi.getViewTypes}.  Also, see
+\SFunction{ggobi.getActivePlot}.
+
+At present, the sub-plots in a display are all of the same type. As a
+result, the plot type is taken from the display.  When and if we allow
+non-homegeneous plot types within a display, we will have to modify
+how this routine is implemented.
+
 \subsection{ggobi.getDescription}
 This gives a brief description of the specified ggobi instance.  This
 gives the name of the file from which the data was read, the type of
@@ -417,27 +500,89 @@ variables. The names of the elements in this vector are the names of
 the variables. 
 
 
-What about subsets in effect when the display was
-created, etc.
+What about subsets in effect when the display was created, etc.  This
+doesn't really apply as the plots are updated when the set of hidden
+observations is modified.  If one wanted to display different views of
+the same data with a different collection of hidden variables, one
+could open multiple ggobi instances.
+
+Some of this might change when we experiment with moving these types
+of attributes (color, hidden, etc.) to sub-plot instances rather than
+having them globally in the ggobi instance.
 
 \subsection{ggobi.getFileName}
-Returns the name of the file
-from which the data in ggobi
-was read. If the data was explicitly
-set from 
+Returns the name of the file from which the data in ggobi was read. If
+the data was explicitly set from an R object, this returns a
+description supplied to the ggobi instance. The mode
+\SFunction{ggobi.getDescription()[["Data mode"]]} of the data can be
+used to determine whether the
 
 See also \SFunction{ggobi.getDescription}.
 
 \subsection{ggobi.getGlyphs}
-\subsection{ggobi.getSegments}
+Return a description of the glyph
+being used for each of the observations.
+
+Unimplemented.
+
+\subsection{ggobi.getLineSegments}
+\subsection{ggobi.setLineSegments}
+The first of these obtains an $r \times 2$ matrix where $r$ is the
+number of line segments in the ggobi instance.  Each element contains
+the indices of the observations which are connected.  The second
+function sets the connected observations.  The format is similar to
+the return value of \SFunction{ggobi.getLineSegments}.  A matrix with
+2 columns can be supplied to identify the observations to be connected
+by each line segment.  Alternatively, two integer vectors can be
+supplied.  One has the option to add the specified segments to the
+existing ones or replace the latter with the specified connections.
+
 \subsection{ggobi.getVariableIndex}
+This is used to map one or more names into the corresponding variable
+indices used by the ggobi instance.  It uses
+\SFunction{ggobi.getVariableNames} and matches each of the elements
+passed to it.
+The resulting values are based on a $1$-based
+counting scheme and must be decremented by $1$ for
+use in a \SFunction{.Call}.
+
 \subsection{ggobi.getVariableNames}
+Returns  a character vector 
+containing the names of the variables
+in the specified ggobi.
+
 \subsection{ggobi.getViewTypes}
+The Ggobi system supports several different plot types. This function
+returns a named integer vector. The names are descriptions of the
+types of plots.  The values in the vector are the symbolic constants
+used within the C code to identify the plot type.  These values are
+rarely used since functions to create instances of the different plot
+types are available.  See \SFunction{ggobi.scatmat},
+\SFunction{ggobi.scatterplot}, \SFunction{ggobi.parcoords}.
+
 \subsection{ggobi.parcoords}
 \subsection{ggobi.scatmat}
 \subsection{ggobi.scatterplot}
-\subsection{ggobi.setActivePlot}
+Each of these functions creates a new display/window and adds it to
+the specified ggobi instance.  Each provides a mechanism for
+specifying what variables should be contained in the plot and this
+provides greater specifiability than with the graphical interface.
+The specification of the variables can be done either by 
+name or by index.
+If using names, these should match
+\begin{itemize}
+\item{parcoords}
+This creates a Parallel Coordinates plot.
+The variable
+\end{itemize}
+
+
+
+
+
 \subsection{ggobi.setData}
+Specify a data frame or the name of a file
+
 \subsection{ggobi.setDataFile}
 \subsection{ggobi.setDataFrame}
 This sets the dataset for the particular ggobi instance to the
@@ -471,16 +616,36 @@ plots.
 The return value is a vector of the previous labels for the
 specified rows/observations.
 
-\subsection{setSmootherFunction.ggobi}
 
 
 
 
-\subsection{ggobi.symbol}
+\subsection{\SFunction{ggobi.getBrushSize},
+\SFunction{ggobi.setBrushSize},
+\SFunction{ggobi.getBrushLocation} \&
+\SFunction{ggobi.setBrushLocation}}
+
+
+\subsection{\SFunction{ggobi.close}}
+This destroys the specified ggobi instance, closing all its
+windows/displays and the main control-panel window.
+
+
+\section{Developer Functions}
+
+\subsection{.ggobi.symbol}
 This is of little or no interest to the regular user.  It is merely a
 function that takes the name of a C routine and maps it to the name of
 a routine in the GGobi chapter.  It does so by prefixing the name with
 the ``unique'' identifier \Escape{RS_GGOBI} in an effort to avoid
 symbol conflicts with other libraries.
+
+\subsection{\SFunction{.GGobiCall} \& \SFunction{.GGobiC}}
+
+There is an interesting ``bug'' in the \SFunction{.C} and
+\SFunction{.Call} functions. If one creates a wrapper as with
+\SFunction{.GGobiCall} and \SFunction{.GGobiC} and pass a named
+argument, the gets symbol name of the routine being invoke becomes
+corrupted.
 
 \end{document}

@@ -159,12 +159,12 @@ GGOBI(setData)(double *values, gchar **rownames, gchar **colnames, int nr, int n
 
 
    /* Now recompute and display the top plot. */
-  dataset_init(gg, false);
-
-  /* Have to patch up the displays list since we removed
-     every entry and that makes for meaningless entries.
-   */
-  gg->displays->next = NULL;
+  if(dataset_init(gg, false) != NULL) {
+      /* Have to patch up the displays list since we removed
+         every entry and that makes for meaningless entries.
+       */
+     gg->displays->next = NULL;
+  }
 }
 
 
@@ -712,6 +712,19 @@ GGOBI(getCurrentDisplayIndex)(ggobid *gg)
  return(g_list_index(gg->displays, gg->current_display));
 }
 
+gint
+GGOBI(getCurrentPlotIndex)(ggobid *gg)
+{
+ int val = -1;
+ displayd *d;
+  if(gg->current_splot) {
+    d = GGOBI(getCurrentDisplay)(gg);
+    val = g_list_index(d->splots, gg->current_splot);
+  }
+ 
+ return(val);
+}
+
 displayd *
 GGOBI(setCurrentDisplay)(int which, ggobid *gg)
 {
@@ -962,13 +975,28 @@ GGOBI(setBrushColor)(int cid, ggobid *gg)
 
 
 int
-GGOBI(addVariable)(double *vals, char *name, gboolean update, ggobid *gg)
+GGOBI(addVariable)(double *vals, int num, char *name, gboolean update, ggobid *gg)
 {
-
  int which;
+
+ if(gg->ncols < 1) {
+   int i;
+   gchar ** rnames = (gchar **)g_malloc(sizeof(gchar*) * num);
+   for(i = 0; i < num; i++) {
+     rnames[i] = g_malloc(sizeof(char)*7);
+     sprintf(rnames[i],"%d",i+1);
+   }
+   GGOBI(setData)(vals, rnames, &name, num, 1, gg);
+ } else {
+   if(num > gg->nrows) {
+     num =  gg->nrows;
+     /* Add a warning here. */
+   }
+
    variable_clone(0, name, true, gg);
    which = gg->ncols-1;
-   GGOBI(setVariableValues)(which, vals, gg->nrows, update, gg);
+   GGOBI(setVariableValues)(which, vals, num, update, gg);
+ }
 
    if(update)
     gdk_flush();
@@ -1050,7 +1078,7 @@ GGOBI(getVariableIndex)(const gchar *name, ggobid *gg)
 }
 
 void
-GGOBI(setPlotRange)(double *x, double *y, int displayNum, int plotNum, ggobid *gg)
+GGOBI(setPlotRange)(double *x, double *y, int displayNum, int plotNum, gboolean pixels, ggobid *gg)
 {
 extern void splot_zoom (splotd *sp, gfloat xsc, gfloat ysc, ggobid *gg);
   splotd *sp;
@@ -1059,7 +1087,13 @@ extern void splot_zoom (splotd *sp, gfloat xsc, gfloat ysc, ggobid *gg);
   display = GGOBI(getDisplay)(displayNum, gg);
   sp = GGOBI(getPlot)(display, plotNum);
 
-  splot_zoom(sp, *x, *y, gg);
+  if(pixels) {
+    
+  } else {
+
+    splot_zoom(sp, *x, *y, gg);
+  }
+
 
 
  /*
@@ -1087,6 +1121,59 @@ extern void splot_zoom (splotd *sp, gfloat xsc, gfloat ysc, ggobid *gg);
     }
   }
 */
-
 }
 
+
+/*
+  This handles the raising and lowering or the iconifying or de-iconifying
+  of one or more windows.
+  If which is negative, the operation applies to all the displays with the ggobid instance.
+  Otherwise, the operation applies just to the display indexed by which.
+
+  The two logical arguments indicate whether to raise/lower or iconify/deiconify.
+  Within these two operation types, the up argument indicates whether to 
+  raise or lower, an iconify or deiconify.
+ */
+gboolean
+GGOBI(raiseWindow)(int which, gboolean raiseOrIcon, gboolean up, ggobid *gg)
+{
+  displayd *display;
+  gboolean ok = false;
+  int start, end, i;
+
+  if(which < 0) {
+    start = 0;
+    end = g_list_length(gg->displays);
+  } else {
+    end = which+1;
+    start = which;
+  }
+
+     for(i = start; i < end; i++) {
+      display = g_list_nth_data(gg->displays, i);
+      if(raiseOrIcon) {
+        if(up) 
+          gdk_window_raise(display->window->window); 
+        else
+          gdk_window_lower(display->window->window); 
+      } else {
+        if(up) 
+          gtk_widget_hide_all(display->window); 
+        else
+          gtk_widget_show_all(display->window); 
+
+      }
+     }
+
+     ok = true;
+
+
+  gdk_flush();
+  return(ok);
+}
+
+gchar *
+GGOBI(getDescription)(ggobid *gg)
+{
+  return(g_strdup(gg->filename));
+}

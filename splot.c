@@ -160,14 +160,10 @@ splot_set_current (splotd *sp, gboolean state, ggobid *gg) {
   }
 }
 
-
-static gint
-splot_set_current_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
+void
+GGOBI(splot_set_current_full)(displayd *display, splotd *sp, ggobid *gg)
 {
-  ggobid *gg = GGobiFromSPlot(sp);
-  displayd *display = (displayd *) sp->displayptr; 
   splotd *sp_prev = gg->current_splot;
-
   if (sp != sp_prev) {
 
     splot_set_current (sp_prev, off, gg);
@@ -187,6 +183,15 @@ splot_set_current_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
     sp_prev->redraw_style = QUICK;
     gtk_widget_queue_draw (sp_prev->da);
   }
+
+}
+
+static gint
+splot_set_current_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
+{
+  ggobid *gg = GGobiFromSPlot(sp);
+  displayd *display = (displayd *) sp->displayptr; 
+  GGOBI(splot_set_current_full)(display, sp, gg);
 
   return false;  /* so that other button press handlers also get the event */
 }

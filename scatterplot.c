@@ -69,6 +69,9 @@ ruler_ranges_set (displayd *display, splotd *sp, ggobid *gg) {
   fcoords tfmin, tfmax;
   cpaneld *cpanel = &display->cpanel;
 
+  if(display->hrule == NULL)
+    return;
+
   scr.x = scr.y = 0;
   splot_screen_to_tform (cpanel, sp, &scr, &tfmin, gg);
 
@@ -191,6 +194,10 @@ scatterplot_new (gboolean missing_p, splotd *sp, ggobid *gg) {
   GtkWidget *table, *vbox;
   GtkWidget *mbar;
   displayd *display;
+
+  if(gg->ncols < 2)
+    return(NULL);
+
 
   if(sp == NULL) {
     display = display_alloc_init(scatterplot, missing_p, gg);

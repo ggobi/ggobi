@@ -168,9 +168,9 @@ extern displayd *GGOBI(getDisplay)(int which, ggobid *gg);
 extern DisplayOptions *GGOBI(getDisplayOptions)(int displayNum, ggobid *gg);
 
 
-extern displayd * GGOBI(getCurrentDisplay)();
-extern gint GGOBI(getCurrentDisplayIndex)();
-/* gint GGOBI(getCurrentPlot)(displayd *display); */
+extern displayd * GGOBI(getCurrentDisplay)(ggobid *gg);
+extern gint GGOBI(getCurrentDisplayIndex)(ggobid *gg);
+extern gint GGOBI(getCurrentPlotIndex)(ggobid *gg);
 
 extern displayd *GGOBI(setCurrentDisplay)(int which, ggobid *gg);
 
@@ -216,8 +216,14 @@ extern int GGOBI(removeVariableByIndex)(int which, ggobid *gg);
 
 extern gboolean GGOBI(setVariableValues)(int whichVar, double *vals, int num, gboolean update, ggobid *gg);
 
-extern int GGOBI(addVariable)(double *vals, char *name, gboolean update, ggobid *gg);
+/* Need len just in case there is no data in the instance*/
+extern int GGOBI(addVariable)(double *vals, int len, char *name, gboolean update, ggobid *gg);
 
 extern void GGOBI(update_data)(ggobid *gg);
+extern gboolean GGOBI(raiseWindow)(int which, gboolean raiseOrIcon, gboolean up, ggobid *gg);
+
+
+extern gchar *GGOBI(getDescription)(ggobid *gg);
+extern void GGOBI(splot_set_current_full)(displayd *display, splotd *sp, ggobid *gg);
 #endif /* End of conditional inclusion of entire file.*/
 
