@@ -12,7 +12,11 @@ Bugs:
 In progress, needing design discussions:
   should variable limits be disabled for transformed variables?
   deleting variables: how should plots behave? (disabled for now)
-    
+  line editing -- line drawing -- graphs   
+  Options on options menu
+
+sphere data into new variables instead of overwriting
+  the existing values -- that will test cloning!
 
 API code needed:
   sticky labels
@@ -47,9 +51,6 @@ Tour:
   1d tour
   correlation tour
   history controls
-
-sphere data into new variables instead of overwriting
-  the existing values -- that will test cloning!
 
 various stuff not yet implemented:
   1d, xy cycling  .... or run as a demo in R for now?

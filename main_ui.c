@@ -358,8 +358,10 @@ mode_set (gint m, ggobid *gg) {
      * Luckily, this isn't even possible if the current display
      * is scatmat or parcoords.
     */
-    if ((gg->mode == TOUR1D || gg->mode == TOUR2D || gg->mode == COTOUR) &&
-        (gg->prev_mode != TOUR1D && gg->prev_mode != TOUR2D && gg->prev_mode != COTOUR))
+    if ((gg->mode == TOUR1D || gg->mode == TOUR2D ||
+         gg->mode == COTOUR) &&
+        (gg->prev_mode != TOUR1D && gg->prev_mode != TOUR2D &&
+         gg->prev_mode != COTOUR))
     {
       for (l = gg->d; l; l = l->next) {
         d = (datad *) l->data;
@@ -378,8 +380,10 @@ mode_set (gint m, ggobid *gg) {
         if (GTK_OBJECT (d->varpanel_ui.table)->ref_count > 1)
           gtk_widget_unref (d->varpanel_ui.table);
       }
-    } else if ((gg->mode != TOUR1D && gg->mode != TOUR2D && gg->mode != COTOUR) &&
-               (gg->prev_mode == TOUR1D || gg->prev_mode == TOUR2D || gg->prev_mode == COTOUR))
+    } else if ((gg->mode != TOUR1D && gg->mode != TOUR2D &&
+                gg->mode != COTOUR) &&
+               (gg->prev_mode == TOUR1D || gg->prev_mode == TOUR2D ||
+                gg->prev_mode == COTOUR))
     {
       for (l = gg->d; l; l = l->next) {
         d = (datad *) l->data;

@@ -58,6 +58,7 @@ cpanel_xyplot_make (ggobid *gg) {
                      GTK_SIGNAL_FUNC (cycle_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (gg->control_panel[XYPLOT]), cycle_tgl,
     false, false, 3);
+  gtk_widget_set_sensitive (cycle_tgl, false);
 
 /*
  * make an option menu
@@ -86,6 +87,7 @@ cpanel_xyplot_make (ggobid *gg) {
                       cycle_sbar, false, false, 1);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), cycle_sbar,
     "Adjust cycling speed", NULL);
+  gtk_widget_set_sensitive (cycle_sbar, false);
 
   chdir_btn = gtk_button_new_with_label ("Change direction");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), chdir_btn,
@@ -94,6 +96,7 @@ cpanel_xyplot_make (ggobid *gg) {
                       chdir_btn, false, false, 1);
   gtk_signal_connect (GTK_OBJECT (chdir_btn), "clicked",
                       GTK_SIGNAL_FUNC (chdir_cb), gg);
+  gtk_widget_set_sensitive (chdir_btn, false);
 
   gtk_widget_show_all (gg->control_panel[XYPLOT]);
 }

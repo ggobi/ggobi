@@ -113,6 +113,7 @@ cpanel_p1dplot_make (ggobid *gg) {
                       GTK_SIGNAL_FUNC (cycle_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (gg->control_panel[P1PLOT]),
                       tgl, false, false, 1);
+  gtk_widget_set_sensitive (tgl, false);
 
   /* value, lower, upper, step_increment, page_increment, page_size */
   /* Note that the page_size value only makes a difference for
@@ -126,9 +127,9 @@ cpanel_p1dplot_make (ggobid *gg) {
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
     "Adjust cycling speed", NULL);
   scale_set_default_values (GTK_SCALE (sbar));
-
   gtk_box_pack_start (GTK_BOX (gg->control_panel[P1PLOT]), sbar,
     false, false, 1);
+  gtk_widget_set_sensitive (sbar, false);
 
   btn = gtk_button_new_with_label ("Change direction");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
@@ -137,6 +138,7 @@ cpanel_p1dplot_make (ggobid *gg) {
                       btn, false, false, 1);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (chdir_cb), gg);
+  gtk_widget_set_sensitive (btn, false);
 
   gtk_widget_show_all (gg->control_panel[P1PLOT]);
 }
