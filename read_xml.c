@@ -99,12 +99,33 @@ data_xml_read(const gchar *filename, ggobid *gg)
  xmlSAXHandlerPtr xmlParserHandler;
  xmlParserCtxtPtr ctx = (xmlParserCtxtPtr) g_malloc(sizeof(xmlParserCtxtPtr));
  XMLParserData data;
-  gchar* name = g_malloc(sizeof(char)* strlen(filename)+4);
-  sprintf(name,"%s%s", filename,".xml");
+  
+  int i;
+  gchar* name = NULL;
+  FILE *f;
+
+  const gchar *suffixes[] = {".xml", ".xml.gz"};
+  int nsuffixes = sizeof(suffixes)/sizeof(suffixes[0]);
+
+  for(i = 0; i < nsuffixes;i++) {
+    if(name) 
+      g_free(name);
+
+    name = g_malloc(sizeof(char)*(strlen(filename)+strlen(suffixes[i]) + 2));
+    sprintf(name,"%s%s", filename,suffixes[i]);
+    if((f = fopen(name,"r")) != NULL) {
+      fclose(f);
+      break;
+    }
+  }
 
   initParserData(&data, gg);
 
   xmlParserHandler = (xmlSAXHandlerPtr) g_malloc(sizeof(xmlSAXHandler));
+  /* Make certain this is initialized so that we don't have any references
+     to unwanted routines!
+   */
+  memset(xmlParserHandler, '\0', sizeof(xmlSAXHandler));
 
   xmlParserHandler->startElement = startXMLElement;
   xmlParserHandler->endElement = endXMLElement;
@@ -139,6 +160,7 @@ data_xml_read(const gchar *filename, ggobid *gg)
   if(gg->nsegments < 1)
    segments_create(gg);
 
+  g_free(name);
 
  return(1);
 }

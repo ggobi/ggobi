@@ -45,18 +45,21 @@ fileset_read_init (gchar *ldata_in, ggobid *gg)
 {
   gboolean ans = fileset_read (ldata_in, gg);
   if (ans) {
-    dataset_init(gg);
+    dataset_init(gg, true);
   }
 
  return (ans);
 } 
 
 void
-dataset_init(ggobid *gg)
+dataset_init(ggobid *gg, gboolean cleanup)
 {
     displayd *display;
 
     pipeline_init (gg);
+
+    if(cleanup)
+      display_free_all (gg);  /*-- destroy any existing displays --*/
 
     /*-- initialize the first display --*/
     display = scatterplot_new (false, NULL, gg);
@@ -72,13 +75,16 @@ dataset_init(ggobid *gg)
 gboolean
 fileset_read (gchar *ldata_in, ggobid *gg)
 {
+ gboolean ok;
   gg->filename = g_strdup (ldata_in);
   strip_suffixes (gg);  /*-- produces gg.fname, the root name --*/
 
   switch(gg->data_mode) {
    case xml:
-     data_xml_read(gg->fname, gg);
+#ifdef USE_XML
+     ok = data_xml_read(gg->fname, gg);
      break;
+#endif
    case ascii:
    case binary:
    case Sprocess:
@@ -102,7 +108,7 @@ fileset_read (gchar *ldata_in, ggobid *gg)
     break;
   }
 
- return true;  /* need to check return codes of reading routines */
+ return ok;  /* need to check return codes of reading routines */
 }
 
 void
@@ -141,8 +147,6 @@ pipeline_init (ggobid *gg)
 
 void
 make_ggobi (gchar *ldata_in, gboolean processEvents, ggobid *gg) {
-  displayd *display;
-
   /*-- some initializations --*/
   gg->displays = NULL;
   gg->nrows = gg->ncols = 0;
@@ -153,17 +157,7 @@ make_ggobi (gchar *ldata_in, gboolean processEvents, ggobid *gg) {
 
   if (ldata_in != NULL) {
     if (fileset_read (ldata_in, gg)) {
-      pipeline_init (gg);
-
-      display_free_all (gg);  /*-- destroy any existing displays --*/
-
-      /*-- initialize the first display --*/
-      display = scatterplot_new (false, NULL, gg);
-      gg->displays = g_list_append (gg->displays, (gpointer) display);
-
-      display_set_current (display, gg);
-      gg->current_splot = (splotd *)
-        g_list_nth_data (gg->current_display->splots, 0);
+      dataset_init(gg, true);
     }
   }
 

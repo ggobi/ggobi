@@ -140,7 +140,7 @@ GGOBI(setData)(double *values, gchar **rownames, gchar **colnames, int nr, int n
   }
 
    /* Now recompute and display the top plot. */
-  dataset_init(gg);
+  dataset_init(gg, false);
 
   /* Have to patch up the displays list since we removed
      every entry and that makes for meaningless entries.
