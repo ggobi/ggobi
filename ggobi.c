@@ -394,3 +394,23 @@ ValidateDatadRef(datad *d, ggobid *gg, gboolean fatal)
 
  return(NULL); 
 }
+
+
+
+displayd *
+ValidateDisplayRef(displayd *d, ggobid *gg, gboolean fatal)
+{
+  int i, n;
+  n = g_list_length(gg->displays);
+  for(i = 0; i < n ; i++) {
+   if(g_list_nth_data(gg->displays, i) == d)
+    return(d);
+  }
+
+  g_printerr("Incorrect reference to display.\n");
+
+ if (fatal)
+  exit(11);
+
+ return(NULL); 
+}

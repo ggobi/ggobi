@@ -12,16 +12,21 @@
 
 #define FILE_SEPARATOR '/'
 
+#ifdef USE_XML
 static char *XMLSuffixes[] = {"xml", "xml.gz","xmlz"};
+#endif
+
 char *ASCIISuffixes[]  = {"dat"};
 char *BinarySuffixes[] = {"bin"};
 
 
+#ifdef USE_XML
 ExtensionList xmlFileTypes = {
   xml_data, 
   NULL,
   0
 };
+#endif
 
 ExtensionList asciiFileTypes = {
   ascii_data,
@@ -197,10 +202,12 @@ DataMode
 verifyDataMode(const char *fileName, DataMode mode, InputDescription *desc)
 {
   switch(mode) {
+#ifdef USE_XML
     case xml_data:
     if(!isXMLFile(fileName, desc))
         mode = unknown_data;
      break;
+#endif
     case ascii_data:
     if(!isASCIIFile(fileName))
         mode = unknown_data;
@@ -221,8 +228,10 @@ guessDataMode(const char *fileName, InputDescription *desc)
   if(f == NULL)
     return(unknown_data);
 
+#ifdef USE_XML
   if(isXMLFile(fileName, desc))
     return(xml_data);
+#endif
 
   if(isASCIIFile(fileName))
     return(ascii_data);
@@ -230,6 +239,7 @@ guessDataMode(const char *fileName, InputDescription *desc)
   return(unknown_data);
 }
 
+#ifdef USE_XML
 gboolean
 isXMLFile(const char *fileName, InputDescription *desc)
 {
@@ -264,6 +274,7 @@ isXMLFile(const char *fileName, InputDescription *desc)
 
   return(false);
 }
+#endif
 
 gboolean
 isASCIIFile(const char *fileName)
@@ -293,16 +304,25 @@ initFileTypeGroups()
 {
   FileTypeGroups = g_slist_alloc();
 
+#ifdef USE_XML
   xmlFileTypes.extensions = XMLSuffixes;
   xmlFileTypes.len = 3;
+#endif
+
   asciiFileTypes.extensions = ASCIISuffixes;
   asciiFileTypes.len = 1;
+
+
   binaryFileTypes.extensions = BinarySuffixes;
   binaryFileTypes.len = 1;
 
+#ifdef USE_XML
   FileTypeGroups->data = (void *)&xmlFileTypes;
-  /*  g_slist_append(FileTypeGroups, &xmlFileTypes); */
   g_slist_append(FileTypeGroups, &asciiFileTypes);
+#else
+  FileTypeGroups->data = (void *)&asciiFileTypes;
+#endif
+
   g_slist_append(FileTypeGroups, &binaryFileTypes);
 
   return(FileTypeGroups);
