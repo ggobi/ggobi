@@ -1,0 +1,40 @@
+By default, this plugin knows about a single layout method, an
+implementation of a radial layout, in which it lays out the nodes in
+concentric circles, with the first node in the list appearing at the
+center.
+
+In order to use two more layout methods, pick up the graphviz package
+from www.graphviz.org.  I use the official AT&T release, but I hear
+the anonymous cvs release should also be fine.
+
+When you build it, instead of using configure and gmake, follow the
+instructions in graphviz/INSTALL.old, which does a better job of
+building the libraries we need.
+
+Even so, graphviz was not designed with this usage in mind, and until
+the graphviz authors catch up to us, the include files and libraries
+you need may end up in a few different directories.  Here's a portion
+of a local.config file that works on linux:
+
+GRAPHVIZ = 1
+GVIZ_ARCH=linux.i386
+GVIZ=/usr/local/lib/graphviz
+GVIZ_INC=$(GVIZ)/include
+GVIZ_LIB=$(GVIZ)/build/$(GVIZ_ARCH)/lib
+GVIZ_SRC=/usr/local/src/graphviz-1.8.5
+
+GVIZ_EXTLIB_INC=-I/usr/include/freetype2
+GVIZ_EXTLIB_LIB=-ljpeg -lpng -lfreetype -lz
+
+You can see how those are used in the GNUmakefile.
+
+Notice that I built the libraries to include jpeg, png, etc.  Here
+are your two options with respect to those graphics libraries:
+
+ 1. If you'd like to use some of the command-line graph layout and
+    drawing programs in the graphviz package (dot, neato, etc), then
+    you need to include those libraries so that the programs can
+    render layouts in jpeg, png, etc.
+ 2. If you don't expect to use those programs, then ggobi will be
+    doing all the drawing, and you can edit gvconfig.h to exclude 
+    the graphics libraries.
