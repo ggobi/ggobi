@@ -32,7 +32,7 @@ LDFLAGS+=$(GVIZ_EXTLIB_LIB)
 endif
 
 HEADERS=glayout defines
-SRC=glayout init spring radial graphviz
+SRC=glayout init radial graphviz
 OBJS=$(SRC:%=%.o)
 
 $(PKG).so: $(OBJS)
