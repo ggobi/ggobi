@@ -30,7 +30,7 @@ main (gint argc, gchar *argv[])
   globals_init (gg); /*-- variables that don't depend on the data --*/
   special_colors_init(gg);
 
-  fileset_read (fileName, gg);
+  fileset_read(fileName, sessionOptions->data_type, NULL, gg);
 
   memset(&info, '\0', sizeof(XmlWriteInfo));
   info.useDefault = true;

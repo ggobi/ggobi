@@ -613,6 +613,12 @@ GList *getInputPluginSelections(ggobid *gg);
 extern const gchar DefaultUnknownInputModeName[];
 	
 
+InputDescription *
+fileset_generate(const gchar * fileName,
+		 const gchar *modeName, 
+		 GGobiPluginInfo *plugin, 
+		 ggobid * gg);
+
 
 #include "GGobiEvents.h"
 

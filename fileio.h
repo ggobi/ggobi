@@ -68,9 +68,6 @@ gchar *computeExtension(const gchar *fileName);
 gchar *completeFileDesc(const gchar *fileName, InputDescription *desc);
 
 
-InputDescription* fileset_generate(const gchar *fileName, const gchar *modeName, ggobid *gg);
-
-
 gchar *findAssociatedFile(InputDescription *desc, const gchar * const *suffixes, gint numSuffixes, gint *which, gboolean isError);
 gint addInputSuffix(InputDescription *desc, const gchar *suffix);
 gint addInputFile(InputDescription *desc, const gchar *file);

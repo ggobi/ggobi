@@ -1,7 +1,22 @@
+
+
+
 Read Excel files directly via --datamode=excel and
 ExcelReader plugin on Windows.
 
-Support for reading CSV files.
+Support for reading CSV files (either using the CSV 
+or the ExcelReader plugin.)
+
+
+Input plugins can have multiple modeName tags within a modeNames tag.
+
+Input plugin modeName used as the target for --datamode=<name>
+
+"About plugins" display window separates the general and input plugins
+into separate pages.
+
+Select input plugin/mode from the File selection menu when opening a
+file.
 
 
 	

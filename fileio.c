@@ -102,7 +102,9 @@ isUnknownInputMode(const gchar *modeName)
 
 InputDescription *
 fileset_generate(const gchar * fileName,
-		 const gchar *modeName, ggobid * gg)
+		 const gchar *modeName, 
+		 GGobiPluginInfo *plugin, 
+		 ggobid * gg)
 {
   InputDescription *desc;
   DataMode guess = unknown_data;
@@ -115,6 +117,15 @@ fileset_generate(const gchar * fileName,
   gint numGroups;
   GSList *groups;
   gboolean isUnknownMode;
+
+#ifdef SUPPORT_PLUGINS
+  if(plugin) {
+	  InputDescription *desc;
+	  desc = callInputPluginGetDescription(fileName, modeName, plugin, gg);
+	  if(desc)
+            return(desc);
+  }
+#endif
 
   if (FileTypeGroups == NULL)
     initFileTypeGroups();
@@ -150,19 +161,10 @@ fileset_generate(const gchar * fileName,
         if ((isUnknownMode && handlesFile) 
              || pluginSupportsInputMode(modeName, plugin)) 
 	{
-          InputGetDescription f;
-	  if(info->get_description_f)
-    	      f = info->get_description_f;
-	  else
- 	      f = (InputGetDescription) getPluginSymbol(info->getDescription,
-							plugin->details);
-
-          if (f) {
-            InputDescription *desc;
-            desc = f(fileName, sessionOptions->data_type, gg, plugin);
-            if (desc)
-              return (desc);
-          }
+          InputDescription *desc;
+	  desc = callInputPluginGetDescription(fileName, modeName, plugin, gg);
+	  if(desc)
+  	     return(desc);
         }
       }
     }

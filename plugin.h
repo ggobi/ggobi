@@ -148,4 +148,7 @@ gboolean setLanguagePluginInfo(GGobiPluginDetails *details, const char *language
 
 gboolean pluginSupportsInputMode(const gchar *modeName, GGobiPluginInfo *pluginInfo);
 
+GGobiPluginInfo *getInputPluginByModeNameIndex(gint index);
+InputDescription *callInputPluginGetDescription(const gchar *fileName, const gchar *modeName, GGobiPluginInfo *info, ggobid *gg);
+
 #endif

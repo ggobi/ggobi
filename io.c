@@ -25,9 +25,13 @@
 #include "writedata.h"
 #include "write_xml.h"
 
+#include "plugin.h"
+
 #define READ_FILESET   0
 #define EXTEND_FILESET 1
 #define WRITE_FILESET  2
+
+
 
 void
 filesel_ok (GtkWidget *w, GtkFileSelection *fs)
@@ -40,6 +44,7 @@ filesel_ok (GtkWidget *w, GtkFileSelection *fs)
   gboolean firsttime;
   GtkWidget *combo;
 
+
   gg = (ggobid *) gtk_object_get_data (GTK_OBJECT (fs), key_get());
   fname = gtk_file_selection_get_filename (GTK_FILE_SELECTION (fs));
   action = GPOINTER_TO_INT (gtk_object_get_data (GTK_OBJECT (fs), "action"));
@@ -47,10 +52,15 @@ filesel_ok (GtkWidget *w, GtkFileSelection *fs)
 
   switch (action) {
     case READ_FILESET:
+    {
+      gint which;
+      GGobiPluginInfo *plugin;
       combo = (GtkWidget *)gtk_object_get_data(GTK_OBJECT(fs), "PluginTypeCombo");
       pluginModeName = gtk_editable_get_chars(GTK_EDITABLE(GTK_COMBO(combo)->entry), 0, -1);
+      which = *((gint *)gtk_object_get_data(GTK_OBJECT(fs), ".selectedElement"));
+      plugin = getInputPluginByModeNameIndex(which);
       firsttime = (g_slist_length (gg->d) == 0);
-      if (fileset_read_init (fname, pluginModeName, gg)) 
+      if (fileset_read_init (fname, pluginModeName, plugin, gg)) 
         /*-- destroy and rebuild the menu every time data is read in --*/
         display_menu_build (gg);
 
@@ -64,6 +74,7 @@ filesel_ok (GtkWidget *w, GtkFileSelection *fs)
       if (firsttime) {
         GGOBI(full_viewmode_set) (XYPLOT, gg);
       }
+    }
     break;
     case EXTEND_FILESET:  /*-- not yet enabled --*/
     break;
@@ -172,17 +183,34 @@ getFileSelectionWorkContainer(GtkWidget *fs)
        return(vbox);
 }
 
+static void
+filename_mode_selection_cb(GtkList *l, GtkWidget *el, GtkWidget *data)
+{
+    
+    gint *i = gtk_object_get_data(GTK_OBJECT(data), ".selectedElement");
+    if(i) {
+      *i = gtk_list_child_position(l, el);
+      fprintf(stderr, "Selected element %d\n", *i);fflush(stderr);
+    }
+}
+
+void
+free_gdata(GtkObject *src, gpointer data)
+{
+  g_free(data);
+}
+
 GtkWidget*
 createInputFileSelectionDialog(gchar *title, ggobid *gg, GtkWidget **ocombo)
 {
        GtkWidget *fs, *vbox, *combo, *box;
        GList *els;
+       gint *i;
 
        els = getInputPluginSelections(gg);
 
        fs = gtk_file_selection_new(title);
        vbox = getFileSelectionWorkContainer(fs);
-
 
        box = gtk_frame_new("Reader Type");
 
@@ -199,6 +227,17 @@ createInputFileSelectionDialog(gchar *title, ggobid *gg, GtkWidget **ocombo)
        gtk_box_pack_start(GTK_BOX(vbox), box, false, false, 3);
         /* Shouldn't need to do this if we had a real dialog with action area and work area. */
        gtk_box_reorder_child(GTK_BOX(vbox), combo, 4);
+
+       i = (gint *) g_malloc(sizeof(gint));
+/*XXX Need to free this when we destroy the fileselection widget */
+       gtk_signal_connect(GTK_OBJECT(fs), "destroy", free_gdata, i);
+
+       *i = -1;
+       gtk_object_set_data(GTK_OBJECT(fs), ".selectedElement", i);
+       gtk_signal_connect(GTK_OBJECT(GTK_COMBO(combo)->list), "select-child",
+			   filename_mode_selection_cb, fs);
+
+
 
        return(fs);
 }

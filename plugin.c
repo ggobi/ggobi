@@ -745,11 +745,60 @@ getInputPluginSelections(ggobid *gg)
        plugins = sessionOptions->info->inputPlugins;
        n = g_list_length(plugins);
        for(i = 0; i < n; i++) {
+           char buf[5000];
 	   plugin = g_list_nth_data(plugins, i);
-	   for(k = 0; k < plugin->info.i->numModeNames; k++)
-  	       els = g_list_append(els, plugin->info.i->modeNames[k]);
+	   for(k = 0; k < plugin->info.i->numModeNames; k++) {
+/*XXX Need to free this. Catch destruction of the associated GtkList and free the elements of this list. */
+   	       sprintf(buf, "%s (%s)", plugin->info.i->modeNames[k], plugin->details->name);
+  	       els = g_list_append(els, g_strdup(buf));
+	   }
        }
 
        return(els);
 }
+
+GGobiPluginInfo *
+getInputPluginByModeNameIndex(gint which)
+{
+   gint ctr = 1, numPlugins, i; /* Start at 1 since guess/unknown is 0. */
+   GList *plugins = sessionOptions->info->inputPlugins;
+   GGobiPluginInfo *plugin;
+
+   if(which < ctr)
+      return(NULL);
+
+   numPlugins = g_list_length(plugins);
+   for(i = 0; i < numPlugins ; i++) {
+       plugin = g_list_nth_data(plugins, i);
+       if(which >= ctr && which < ctr + plugin->info.i->numModeNames)
+          return(plugin);
+       ctr += plugin->info.i->numModeNames;
+   }
+   
+   return(NULL); /* Should never happen */
+}
+
+InputDescription *
+callInputPluginGetDescription(const gchar *fileName, const gchar *modeName, GGobiPluginInfo *plugin, ggobid *gg)
+{
+        GGobiInputPluginInfo *info;
+        InputGetDescription f;
+
+	info = plugin->info.i;
+	if(info->get_description_f)
+    	      f = info->get_description_f;
+	else
+	      f = (InputGetDescription) getPluginSymbol(info->getDescription,
+							plugin->details);
+
+	if (f) {
+            InputDescription *desc;
+            desc = f(fileName, modeName, gg, plugin);
+            if (desc)
+              return (desc);
+	}
+
+	return(NULL);
+}
+
 
