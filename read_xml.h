@@ -7,12 +7,15 @@
 #include <parser.h>
 
 enum HiddenType {ROW, LINE};
-enum xmlDataState { TOP = 0, DESCRIPTION,
+enum xmlDataState { 
+  TOP = 0, 
+  DATASET,
+  DESCRIPTION,
   RECORD, RECORDS, VARIABLES, VARIABLE, DATA,
   CONNECTIONS, CONNECTION,  /* edges */
   EDGERECORD, EDGERECORDS, EDGEVARIABLES, EDGEVARIABLE,
   COLORMAP, COLOR, UNKNOWN};
-
+typedef enum xmlDataState XmlTagType;
 
 typedef struct {
 
@@ -94,6 +97,12 @@ typedef struct _XMLUserData {
    */
   xmlSAXHandlerPtr handlers;
 
+
+  /*
+     The number of datasets to expect within the file.
+   */
+  int expectedDatasetCount;
+
 } XMLParserData;
 
 
@@ -101,21 +110,26 @@ typedef struct _XMLUserData {
 extern "C" {
 #endif
 
-enum xmlDataState tagType(const gchar *name, gboolean endTag);
+enum xmlDataState tagType(const CHAR *name, gboolean endTag);
 gboolean newVariable(const CHAR **attrs, XMLParserData *data);
 gboolean newEdgeVariable(const CHAR **attrs, XMLParserData *data);
 gboolean setDatasetInfo(const CHAR **attrs, XMLParserData *data);
+gboolean setGeneralInfo (const CHAR **attrs, XMLParserData *data);
 gboolean allocVariables(const CHAR **attrs, XMLParserData *data);
 gboolean allocEdgeVariables(const CHAR **attrs, XMLParserData *data);
 gboolean newRecord(const CHAR **attrs, XMLParserData *data);
 gboolean newEdgeRecord(const CHAR **attrs, XMLParserData *data);
+
+gboolean setDataset(const CHAR **attrs, XMLParserData *parserData);
 
 gboolean setRecordValues(XMLParserData *data, const CHAR *line, gint len);
 gboolean setEdgeRecordValues(XMLParserData *data, const CHAR *line, gint len);
 gboolean setVariableName(XMLParserData *data, const CHAR *name, gint len);
 gboolean setEdgeVariableName(XMLParserData *data, const CHAR *name, gint len);
 
-const char *skipWhiteSpace(const CHAR *ch, gint *len);
+gboolean setDefaultDatasetValues(const CHAR **attrs, XMLParserData *data);
+
+const CHAR *skipWhiteSpace(const CHAR *ch, gint *len);
 
 const gchar *getAttribute(const CHAR **attrs, gchar *name);
 
@@ -155,6 +169,9 @@ double asNumber(const char *sval);
 gboolean asLogical(const gchar *sval);
 
 datad *getCurrentXMLData(XMLParserData* parserData);
+
+gboolean readXMLRecord(const CHAR **attrs, XMLParserData *data);
+gboolean readXMLEdgeRecord(const CHAR **attrs, XMLParserData *data);
 
 #ifdef __cplusplus
 }

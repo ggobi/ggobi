@@ -72,6 +72,7 @@ void Characters(void *user_data, const CHAR *ch, int len);
 
 const gchar * const xmlDataTagNames[] = {
                                           "ggobidata",
+                                          "data",
                                           "description",
                                           "record",
                                           "records",
@@ -103,6 +104,7 @@ const gchar * const xmlDataTagNames[] = {
   xmlDocPtr doc;
     doc = xmlParseFile(name);
  */
+
 
 
 gboolean
@@ -210,37 +212,27 @@ startXMLElement(void *user_data, const CHAR *name, const CHAR **attrs)
    case VARIABLE:
      newVariable (attrs, data);
      break;
-   case TOP:
+   case RECORDS: /* Used to be DATASET */
      setDatasetInfo(attrs, data);
+     break;
+   case TOP:
+     setGeneralInfo(attrs, data);
      break;
    case RECORD:
      newRecord(attrs, data);
      break;
-   case CONNECTIONS:
-     allocEdges(attrs, data);
-     break;
-   case CONNECTION:
-     addEdge(attrs, data);
-     break;
-
-   case EDGERECORDS:
-/*     setDatasetEdgeInfo (attrs, data);*/
-     break;
-   case EDGERECORD:
-/*     newEdgeRecord (attrs, data);*/
-     break;
-   case EDGEVARIABLES:
-/*     allocEdgeVariables (attrs, data);*/
-     break;
-   case EDGEVARIABLE:
-/*     newEdgeVariable (attrs, data);*/
-     break;
-
    case COLORMAP:
      setColorMap(attrs, data);
      break;
    case COLOR:
      setColormapEntry(attrs, data);
+     break;
+   case DESCRIPTION:
+     /* description text pending */
+     fprintf(stderr, "DESCRIPTION\n");
+     break;
+   case DATASET:
+     setDataset(attrs, data);
      break;
    default:
      break;
@@ -287,12 +279,12 @@ endXMLElement(void *user_data, const CHAR *name)
 }
 
 
-enum xmlDataState
-tagType(const gchar *name, gboolean endTag)
+XmlTagType
+tagType(const CHAR *name, gboolean endTag)
 {
  int n = sizeof(xmlDataTagNames)/sizeof(xmlDataTagNames)[0] - 1; 
  int i;
- const gchar *tmp = name;
+ const gchar *tmp = (const gchar *)name;
  /*
   if(endTag) {
    tmp++;
@@ -301,7 +293,7 @@ tagType(const gchar *name, gboolean endTag)
 
   for(i = 0; i < n; i++) {
     if(strcmp(tmp, xmlDataTagNames[i]) == 0) {
-     return(i);
+     return((enum xmlDataState) i);
     }
   }
 
@@ -351,17 +343,17 @@ Characters(void *user_data, const CHAR *ch, int len)
  const CHAR *c;
  XMLParserData *data = (XMLParserData*)user_data;
 
- c = skipWhiteSpace(ch, &dlen);
+ c = (const CHAR *) skipWhiteSpace(ch, &dlen);
  if(dlen < 1 || c[0] == '\n')
   return;
 
  if(data->terminateStrings_p) {
-  tmp = g_malloc(sizeof(char)*(dlen+1));
+  tmp = (char *) g_malloc(sizeof(char)*(dlen+1));
 
   memcpy(tmp, c, dlen);
   memset(tmp+dlen, '\0', 1);
 
-  c = tmp;
+  c = (const CHAR *) tmp;
  }
 
 
@@ -372,16 +364,6 @@ Characters(void *user_data, const CHAR *ch, int len)
    case VARIABLE:
      setVariableName (data, c, dlen);
    break;
-
-/* populate */
-   case EDGERECORD:
-/*     setEdgeRecordValues (data, c, dlen);*/
-   break;
-   case EDGEVARIABLE:
-/*     setEdgeVariableName (data, c, dlen);*/
-   break;
-/* */
-
    case COLOR:
      setColorValue (data, c, dlen);
    default:
@@ -394,7 +376,7 @@ Characters(void *user_data, const CHAR *ch, int len)
  }
 }
 
-const char *
+const CHAR *
 skipWhiteSpace(const CHAR *ch, int *len)
 {
  const CHAR *tmp = ch;
@@ -409,14 +391,32 @@ return(tmp);
 }
 
 
+/**
+  Called in response to a ggobidata tag which contains
+  the different datasets. The count element here is the
+  number of datasets to expect.
+ */
+gboolean
+setGeneralInfo (const CHAR **attrs, XMLParserData *data)
+{
+  const char *tmp = getAttribute(attrs, "count");
+
+  if (tmp != NULL) {
+    data->expectedDatasetCount = asInteger(tmp);
+  }
+
+  return(true);
+}
+
+
 gboolean
 setDatasetInfo (const CHAR **attrs, XMLParserData *data)
 {
-  const char *tmp = getAttribute(attrs, "numRecords");
+  const char *tmp = getAttribute(attrs, "count");
   datad *d = getCurrentXMLData(data);
 
   if (tmp == NULL) {
-    g_printerr ("No numRecords attribute\n");
+    g_printerr ("No count attribute\n");
     exit(101);
   }
 
@@ -431,7 +431,36 @@ setDatasetInfo (const CHAR **attrs, XMLParserData *data)
   br_color_ids_alloc (d, data->gg);
   br_color_ids_init (d, data->gg);
 
-  tmp = getAttribute(attrs, "missingValue");
+  setDefaultDatasetValues(attrs, data);
+
+  if(tmp) {
+    arrayf_alloc (&d->raw, d->nrows, d->ncols);
+    hidden_alloc (d, data->gg);
+  }
+
+  data->current_variable = 0;
+  data->current_record = 0;
+  data->current_variable = 0;
+  data->current_element = 0;
+
+  if(d->edgeData) {
+    alloc_edgeIDs(d);
+  }
+
+
+  /*
+  setLineColor (attrs, data, -1);
+  setLineWidth (attrs, data, -1);  
+  */
+
+  return (true);
+}
+
+gboolean
+setDefaultDatasetValues(const CHAR **attrs, XMLParserData *data)
+{
+
+ const gchar * tmp = getAttribute(attrs, "missingValue");
   if(tmp != NULL) {
     data->NA_identifier = g_strdup(tmp);
   }
@@ -439,12 +468,7 @@ setDatasetInfo (const CHAR **attrs, XMLParserData *data)
   setGlyph (attrs, data, -1);  
   setColor (attrs, data, -1);
   setHidden (attrs, data, -1, ROW);
-  /*
-  setLineColor (attrs, data, -1);
-  setLineWidth (attrs, data, -1);  
-  */
-
-  return (true);
+ return(true);
 }
 
 int
@@ -463,8 +487,8 @@ getAttribute(const CHAR **attrs, char *name)
 {
  const CHAR **tmp = attrs;
  while(tmp && tmp[0]) {
-  if(strcmp(name, tmp[0]) == 0)
-      return(tmp[1]);
+  if(strcmp(name, (const char *)tmp[0]) == 0)
+      return((const gchar *)tmp[1]);
    tmp += 2;
  }
 
@@ -474,33 +498,9 @@ getAttribute(const CHAR **attrs, char *name)
 gboolean 
 newRecord(const CHAR **attrs, XMLParserData *data)
 {
-  const gchar *tmp;
-  gint i = data->current_record;
   datad *d = getCurrentXMLData(data);
 
-  data->current_element = 0;
-
-  tmp = getAttribute(attrs, "label");
-  if (tmp) {
-    gchar *stmp = g_strdup (tmp);
-    g_array_insert_val (d->rowlab, data->current_record, stmp);
-  }
-
-
-  setColor(attrs, data, i);
-  setGlyph(attrs, data, i);
-  setHidden(attrs, data, i, LINE);
- 
-  tmp = getAttribute(attrs, "id");
-  if(tmp) {
-    if(data->rowIds == NULL) {
-     data->rowIds = (gchar **) g_malloc(d->nrows * sizeof(gchar *));
-     memset(data->rowIds, '\0', d->nrows);
-    }
-
-    data->rowIds[i] = g_strdup(tmp);
-  }
-
+  d->readXMLRecord(attrs, data);
 
  return(true);
 }
@@ -518,13 +518,13 @@ setHidden(const CHAR **attrs, XMLParserData *data, int i, enum HiddenType type)
 
 
     if (i < 0) {
-     if (type == RECORD)
+     if (type == ROW)
        data->defaults.hidden = hidden;
      else {
        data->defaults.lineHidden = hidden;
      }     
     } else
-     if(type == RECORD)
+     if(type == ROW)
        d->hidden[i] = d->hidden_now[i] = d->hidden_prev[i] = hidden;
      else {
        gg->line.hidden.vals[i] = gg->line.hidden_now.vals[i] =
@@ -538,7 +538,7 @@ setHidden(const CHAR **attrs, XMLParserData *data, int i, enum HiddenType type)
 gboolean
 asLogical(const gchar *sval)
 {
- int i;
+ unsigned int i;
  gboolean val = false;
  const gchar *const trues[] = {"T","true", "True","1"};
   for(i = 0; i < sizeof(trues)/sizeof(trues[0]); i++) {
@@ -754,11 +754,12 @@ allocVariables (const CHAR **attrs, XMLParserData *data)
   d->ncols = asInteger(tmp);
 
   arrayf_alloc (&d->raw, d->nrows, d->ncols);
+  hidden_alloc (d, data->gg);
 
   vartable_alloc (d, data->gg);
   vartable_init (d, data->gg);
  
-  hidden_alloc (d, data->gg);
+
 
   return (true);
 }
@@ -805,255 +806,7 @@ setVariableName(XMLParserData *data, const CHAR *name, gint len)
 }
 
 
-/*
-  The edges tag should be told the number of edges 
-  being specified. This is read and the number of edges
-  in the ggobid structure is set to this.
 
-  Called for <edges> tag.
- */
-gboolean
-allocEdges (const CHAR **attrs, XMLParserData *data)
-{
-  const char *tmp = getAttribute (attrs, "count");
-  datad *d = getCurrentXMLData(data);
-
-  if (tmp) {
-    gint value = asInteger (tmp);
-    data->gg->nedges = value;
-    edges_alloc (value, d, data->gg);
-/*  br_line_color_alloc(data->gg);*/
-    br_line_color_init (data->gg);
-  }
-  return (tmp != NULL);
-}
-
-
-/*
-  Reads the specification of an edge.
-  Called for <edge> tag.
- */
-gboolean
-addEdge(const CHAR **attrs, XMLParserData *data)
-{
- int i = data->current_edge;
- gboolean ok = false;
- const char *tmp;
- int source=-1, dest=-1;
- int value;
-  tmp = getAttribute(attrs, "source");
-  if(tmp) {
-    source = rowId(tmp, data);
-  }
-  tmp = getAttribute(attrs, "destination");
-  if(tmp) {
-    dest = rowId(tmp, data);
-  }
-
-  ok = source > -1 && dest > -1;
-
-  if(ok) {
-    data->gg->edge_endpoints[i].a = MIN(source, dest) + 1;
-    data->gg->edge_endpoints[i].b = MAX(source, dest) + 1;
-  }
- 
-  value = data->defaults.lineColor;
-  tmp = getAttribute(attrs, "color");
-  if(tmp) {
-    value = asInteger(tmp);
-  }
-  if(value > -1 && value < NCOLORS) {
-    data->gg->line.color.vals[i] =
-      data->gg->line.color_now.vals[i] =
-      data->gg->line.color_prev.vals[i] = value;
-  }
-
- return(ok);
-}
-
-/*
-   Called in response to an <edgevariables> tag. (Note the plural.)
- */
-gboolean 
-allocEdgeVariables (const CHAR **attrs, XMLParserData *data)
-{
-  const char *tmp = getAttribute (attrs, "count");
-
-  if (tmp == NULL) {
-    g_printerr ("The edge variable attribute requires a count\n");
-    exit (101);
-  }
-
-/*
-  data->gg->edge.ncols = asInteger (tmp);
-
-  arrayf_alloc (&data->gg->raw, data->gg->nrows, data->d->ncols);
-  vartable_alloc (data->gg);
-  vartable_init (data->gg);
-  hidden_alloc (data->gg);
-*/
-
-  return (true);
-}
-
-/*
-   Called in response to an <edgevariable> tag.
- */
-
-gboolean
-newEdgeVariable (const CHAR **attrs, XMLParserData *data)
-{
-/*
-  const gchar *tmp;
-  tmp = getAttribute (attrs, "name");
-  if (tmp != NULL) {
-    gint k = data->current_edgevariable;
-    data->gg->edge.vartable[k].collab = g_strdup (tmp);
-    data->gg->edge.vartable[k].collab_tform = g_strdup (tmp);
-  }
-*/
-
-  return (true);
-}
-
-gboolean
-setDatasetEdgeInfo (const CHAR **attrs, XMLParserData *data)
-{
-  const gchar *tmp = getAttribute (attrs, "count");
-
-  if (tmp == NULL) {
-    g_printerr ("edgevariables has no count attribute\n");
-    exit(101);
-  }
-
-/*  I'm changing ggobi.h ...
-  data->gg->edge.n = asInteger (tmp);
-  data->gg->edge.n_in_plot = data->gg->edge.n;
-*/
-
-/*
-  rowlabels_alloc (data->gg);
-  br_glyph_ids_alloc (data->gg);
-  br_glyph_ids_init (data->gg);
-
-  br_color_ids_alloc (data->gg);
-  br_color_ids_init (data->gg);
-
-  tmp = getAttribute(attrs, "missingValue");
-  if (tmp != NULL) {
-    data->NA_identifier = g_strdup (tmp);
-  }
-
-  setGlyph (attrs, data, -1);  
-  setColor (attrs, data, -1);
-  setHidden (attrs, data, -1, ROW);
-*/
-
-  return (true);
-}
-
-gboolean 
-newEdgeRecord (const CHAR **attrs, XMLParserData *data)
-{
-/*
-  const gchar *tmp;
-  gint i = data->current_edgerecord;
-  data->current_edgeelement = 0;
-
-  tmp = getAttribute (attrs, "source");
-  if (tmp) {
-    gint k = atoi (tmp);
-    data->gg->edge.head.vals[i] = k;
-  }
-  tmp = getAttribute (attrs, "destination");
-  if (tmp) {
-    gint k = atoi (tmp);
-    data->gg->edge.tail.vals[i] = k;
-  }
-
-  tmp = getAttribute (attrs, "label");
-  if (tmp) {
-    gchar *stmp = g_strdup (tmp);
-    g_array_insert_val (data->gg->edge.lbl, i, stmp);
-  }
-*/
-
-/*
-  setColor (attrs, data, i);
-  setGlyph (attrs, data, i);
-  setHidden (attrs, data, i, LINE);
- 
-  tmp = getAttribute (attrs, "id");
-  if (tmp) {
-    if(data->rowIds == NULL) {
-      data->rowIds = (gchar **) g_malloc(data->gg->edge.n * sizeof (gchar *));
-      memset(data->rowIds, '\0', data->gg->edge.n);
-    }
-    data->rowIds[i] = g_strdup(tmp);
-  }
-*/
-
-/* Might also deal with group (lgroups), lineType, lineWidth */
-
-
-  return(true);
-}
-
-/*
-  Read the values for this record from free-formatted text. The entries
-  are white-space delimited. They should not have quotes or anything
-  that needs to be escaped.
-*/
-
-gboolean
-setEdgeRecordValues (XMLParserData *data, const CHAR *line, gint len)
-{
-/*
-  gint i = data->current_edgerecord;
-  gdouble value;
-  const gchar *tmp = strtok ((gchar*) line, " \t\n");
-
-  while (tmp) {
-    value = asNumber (tmp);
-    data->gg->edge.raw.vals[i][data->current_edgeelement++] = value;
-    tmp = strtok (NULL, " \t\n");
-  }
-*/
-
-  return (true);
-}
-
-/*
-  Reads the text in name and assigns it as the name of the
-  variable currently being read within the 
-  <variable> tag. The index for the variable is stored in 
-  data->current_variable.
-
-   Called when parsing free-formatted text within a <variable> tag.
- */
-gboolean
-setEdgeVariableName (XMLParserData *data, const CHAR *name, gint len)
-{
-/*
-  gchar *tmp = (gchar *) g_malloc (sizeof(gchar) * (len+1));
-  gint j = data->current_edgevariable;
-
-  tmp[len] = '\0';
-  memcpy (tmp, name, len);
-
-  if (data->gg->edge.vartable[j].collab != NULL) {
-    ;
-  }
-
-  data->gg->edge.vartable[j].collab = tmp;
-
-  if (data->gg->edge.vartable[j].collab_tform == NULL) {
-    data->gg->edge.vartable[j].collab_tform = g_strdup (tmp);
-  }
-*/
-
-  return (true);
-}
 
 /*------------------ end of edges section ------------------------------*/
 
@@ -1109,7 +862,7 @@ getFileDirectory(const gchar *filename)
   tmp =  strrchr(filename, DIR_SEPARATOR);
   if(tmp) {
     int n = tmp - filename + 2;
-    tmp = g_malloc(n*sizeof(char));
+    tmp = (char*) g_malloc(n*sizeof(char));
     memcpy(tmp, filename, n);
     tmp[n-1] = '\0';
   } else
@@ -1148,7 +901,7 @@ find_xml_file(const gchar *filename, const gchar *dir, ggobid *gg)
     dirlen = 0;
 
   for(i = 0; i < nsuffixes;i++) {
-    name = g_malloc(sizeof(char)*(dirlen + strlen(filename)+strlen(suffixes[i]) + 2));
+    name = (char*) g_malloc(sizeof(char)*(dirlen + strlen(filename)+strlen(suffixes[i]) + 2));
     sprintf(name,"%s%s%s", dirlen ? dir : "", filename,suffixes[i]);
     if((f = fopen(name,"r")) != NULL) {
       fclose(f);
@@ -1368,13 +1121,171 @@ asciiParseColorMap(const gchar *fileName, int size, XMLParserData *data)
 }
 
 
+gboolean
+setDataset(const CHAR **attrs, XMLParserData *parserData) 
+{
+  datad *data;
+  const gchar *tmp;
+  gchar *name;
+  tmp = getAttribute(attrs, (char*) "nodeData");
+
+#ifdef USE_CLASSES
+  if(tmp) {
+    data = new EdgeDatad(1);
+    //    data = new edgeDatad(parserData->gg);
+  } else 
+    data = new datad(parserData->gg);
+#else
+  data = datad_new(NULL, parserData->gg);
+  if(tmp) {
+    data->readXMLRecord = readXMLEdgeRecord;
+    data->edgeData = true;
+  } else {
+    data->readXMLRecord = readXMLRecord;
+    data->edgeData = false;
+  }
+#endif
+
+
+  tmp = getAttribute(attrs, (char *) "name");
+  if(tmp == NULL) {
+    name = (gchar *) malloc(sizeof(gchar)*8);
+    sprintf(name, "data%d", (int) g_slist_length(parserData->gg->d));
+  } else
+    name = g_strdup(tmp);
+ 
+  data->name = name;
+  parserData->current_data = data;
+   
+ return(true);
+}
+
+
 datad *
 getCurrentXMLData(XMLParserData* parserData)
 {
   datad *data = parserData->current_data;
   if(data == NULL) {
-    data = datad_new(parserData->gg);
+    data = datad_new(NULL, parserData->gg);
     parserData->current_data = data;
   }
   return(data);
 }
+
+#ifndef USE_CLASSES
+gboolean
+readXMLRecord(const CHAR **attrs, XMLParserData *data)
+{
+  datad *d = getCurrentXMLData(data);
+  const gchar *tmp;
+  gint i = data->current_record;
+
+  data->current_element = 0;
+
+  tmp = getAttribute(attrs, "label");
+  if (tmp) {
+    gchar *stmp = g_strdup (tmp);
+    g_array_insert_val (d->rowlab, data->current_record, stmp);
+  }
+
+
+  setColor(attrs, data, i);
+  setGlyph(attrs, data, i);
+  setHidden(attrs, data, i, LINE);
+ 
+  tmp = getAttribute(attrs, "id");
+  if(tmp) {
+    if(data->rowIds == NULL) {
+     data->rowIds = (gchar **) g_malloc(d->nrows * sizeof(gchar *));
+     memset(data->rowIds, '\0', d->nrows);
+    }
+
+    data->rowIds[i] = g_strdup(tmp);
+  }
+
+  return(true);
+}
+
+gboolean
+readXMLEdgeRecord(const CHAR **attrs, XMLParserData *data)
+{
+  const gchar *tmp;
+  gint index = data->current_record;
+  datad *d = getCurrentXMLData(data);
+
+  gboolean ans = readXMLRecord(attrs, data);
+
+    /* Now read the node source and destination pair. */
+  tmp = getAttribute(attrs, "source");   
+  if(tmp == (const gchar *)NULL || tmp[0] == (const gchar)NULL) {
+    char buf[512]; 
+    sprintf(buf,"No source attribute for record %d in edge data %s\n",index, d->name);
+    g_printerr (buf);
+    exit(103);
+  }
+  d->sourceID[index] = asInteger(tmp);
+
+  tmp = getAttribute(attrs, "destination");   
+  if(tmp == (const gchar *)NULL || tmp[0] == (const gchar)NULL) {
+    char buf[512]; 
+    sprintf(buf,"No destination attribute for record %d in edge data %s\n",index, d->name);
+    g_printerr (buf);
+    exit(103);
+  }
+  d->destinationID[index] = asInteger(tmp);
+  return(ans);
+}
+
+gint
+alloc_edgeIDs(datad *d)
+{
+  size_t sz = d->nrows * sizeof(guint);
+  d->sourceID = (guint *) g_malloc(sz);
+  memset(d->sourceID, '\0', sz);
+  d->destinationID = (guint *) g_malloc(sz);
+  memset(d->destinationID, '\0', sz);
+ return(d->nrows);
+}
+
+#else /* So using classes */
+gboolean
+datad::readXMLRecord(const CHAR **attrs, XMLParserData *data)
+{
+  const gchar *tmp;
+  gint i = data->current_record;
+
+  data->current_element = 0;
+
+  tmp = getAttribute(attrs, "label");
+  if (tmp) {
+    gchar *stmp = g_strdup (tmp);
+    g_array_insert_val (rowlab, data->current_record, stmp);
+  }
+
+
+  setColor(attrs, data, i);
+  setGlyph(attrs, data, i);
+  setHidden(attrs, data, i, LINE);
+ 
+  tmp = getAttribute(attrs, "id");
+  if(tmp) {
+    if(data->rowIds == NULL) {
+     data->rowIds = (gchar **) g_malloc(nrows * sizeof(gchar *));
+     memset(data->rowIds, '\0', nrows);
+    }
+
+    data->rowIds[i] = g_strdup(tmp);
+  }
+
+  return(true);
+}
+
+
+gboolean
+EdgeDatad::readXMLRecord(const CHAR **attrs, XMLParserData *data)
+{
+  datad::readXMLRecord(attrs, data);
+
+  return(true);
+}
+#endif
