@@ -22,15 +22,16 @@
 #include "externs.h"
 #include "writedata.h"
 
-gboolean write_binary_data (gchar *, gint *, gint, gint *, gint, datad *, ggobid *);
-gboolean write_ascii_data (gchar *, gint *, gint, gint *, gint, datad *, ggobid *);
-gboolean save_collabels (gchar *, gint *colv, gint nc, datad *, ggobid *);
-gboolean save_rowlabels (gchar *, gint *rowv, gint nr, datad *, ggobid *);
-gboolean brush_save_colors (gchar *, gint *, gint, datad *, ggobid *);
-gboolean brush_save_erase (gchar *, gint *, gint, datad *, ggobid *);
-gboolean brush_save_glyphs (gchar *, gint *, gint, datad *, ggobid *);
-gboolean save_lines (gchar *, gboolean, gboolean, gint *, gint, datad *d, ggobid *);
-gint linedata_get (endpointsd *, gshort *, gint *, gint, datad *, ggobid *);
+static gboolean write_binary_data (gchar *, gint *, gint, gint *, gint, datad *, ggobid *);
+static gboolean write_ascii_data (gchar *, gint *, gint, gint *, gint, datad *, ggobid *);
+static gboolean save_collabels (gchar *, gint *colv, gint nc, datad *, ggobid *);
+static gboolean save_rowlabels (gchar *, gint *rowv, gint nr, datad *, ggobid *);
+static gboolean brush_save_colors (gchar *, gint *, gint, datad *, ggobid *);
+static gboolean brush_save_erase (gchar *, gint *, gint, datad *, ggobid *);
+static gboolean brush_save_glyphs (gchar *, gint *, gint, datad *, ggobid *);
+static gboolean save_lines (gchar *, gboolean, gboolean, gint *, gint, datad *d, ggobid *);
+static gint linedata_get (endpointsd *, gshort *, gint *, gint, datad *, ggobid *);
+
 
 static gint
 set_rowv (gint *rowv, gchar *rootname, datad *d, ggobid *gg)
