@@ -400,8 +400,8 @@ createDataset(VARIANT *var, ggobid *gg)
 	  (int) dim[1][0], (int) dim[1][1]);fflush(stderr);
 #endif
 
+    /* Degenerate/empty range. */
   if(dim[0][0] == dim[0][1]) {
-    //    SafeArrayDestroyData(arr);
     return(NULL);
   }
 
@@ -419,6 +419,7 @@ createDataset(VARIANT *var, ggobid *gg)
   /* Loop over columns. */
   for(j = dim[1][0], col = 0;  j <= dim[1][1]; j++, col++) {
     variable = vartable_element_get (col, d);
+    
     indices[1] =j;
     for(ctr = 0, i = dim[0][0] + 1; i <= dim[0][1]; i++, ctr++) {
       indices[0] =i;
@@ -462,8 +463,8 @@ createDataset(VARIANT *var, ggobid *gg)
 
 	d->raw.vals[ctr][col] = val[0];
 	val[1]++;
-
-	//	fprintf(stderr, "Non number value %d %d\n", ctr+1, col+1);fflush(stderr);
+      } else {
+	fprintf(stderr, "Skipping entry (%d, %d)\n", ctr+1, col+1);fflush(stderr);
       }
 
       VariantClear(&value);
@@ -479,13 +480,18 @@ createDataset(VARIANT *var, ggobid *gg)
     gchar *varName = NULL;
     if(hasColNames) {
       indices[0] = dim[0][0];
+      indices[1] = col; // dim[0][0];
       SafeArrayGetElement(arr, indices, &value);
       if(V_VT(&value) == VT_BSTR)
          varName = g_strdup(FromBstr(V_BSTR(&value)));
+
+      VariantClear(&value);
     }
+
     if(!varName)
       varName = g_strdup_printf("Var %d", col+1);
-    GGOBI(setVariableName)(col, varName, true, d, gg);
+
+    GGOBI(setVariableName)(col, varName, false, d, gg);
   }
 
   datad_init(d, gg, 0);
