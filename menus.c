@@ -37,6 +37,10 @@ p1dplot_menus_make (ggobid *gg)
     GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
     GTK_WIDGET_VISIBLE (gg->viewmode_frame), gg);
 
+  CreateMenuCheck (gg->menus.options_menu, "Show status bar",
+    GTK_SIGNAL_FUNC (statusbar_show_cb), NULL,
+    gg->statusbar_p, gg);
+
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
     gg->menus.options_menu);
 }
@@ -57,6 +61,10 @@ xyplot_menus_make (ggobid *gg)
   CreateMenuCheck (gg->menus.options_menu, "Show control panel",
     GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
     GTK_WIDGET_VISIBLE (gg->viewmode_frame), gg);
+
+  CreateMenuCheck (gg->menus.options_menu, "Show status bar",
+    GTK_SIGNAL_FUNC (statusbar_show_cb), NULL,
+    gg->statusbar_p, gg);
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
     gg->menus.options_menu);
@@ -107,6 +115,10 @@ tour1d_menus_make (ggobid *gg) {
     GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
     GTK_WIDGET_VISIBLE (gg->viewmode_frame), gg);
 
+  CreateMenuCheck (gg->menus.options_menu, "Show status bar",
+    GTK_SIGNAL_FUNC (statusbar_show_cb), NULL,
+    gg->statusbar_p, gg);
+
   /* Add a separator before the mode-specific items */
   CreateMenuItem (gg->menus.options_menu, NULL,
     "", "", NULL, NULL, NULL, NULL, gg);
@@ -140,6 +152,10 @@ tour2d3_menus_make (ggobid *gg)
   CreateMenuCheck (gg->menus.options_menu, "Show control panel",
     GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
     GTK_WIDGET_VISIBLE (gg->viewmode_frame), gg);
+
+  CreateMenuCheck (gg->menus.options_menu, "Show status bar",
+    GTK_SIGNAL_FUNC (statusbar_show_cb), NULL,
+    gg->statusbar_p, gg);
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
     gg->menus.options_menu);
@@ -191,6 +207,10 @@ tour2d_menus_make (ggobid *gg)
   CreateMenuCheck (gg->menus.options_menu, "Show control panel",
     GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
     GTK_WIDGET_VISIBLE (gg->viewmode_frame), gg);
+
+  CreateMenuCheck (gg->menus.options_menu, "Show status bar",
+    GTK_SIGNAL_FUNC (statusbar_show_cb), NULL,
+    gg->statusbar_p, gg);
 
   /* Add a separator before the mode-specific items */
   CreateMenuItem (gg->menus.options_menu, NULL,
@@ -254,6 +274,10 @@ tourcorr_menus_make (ggobid *gg)
     GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
     GTK_WIDGET_VISIBLE (gg->viewmode_frame), gg);
 
+  CreateMenuCheck (gg->menus.options_menu, "Show status bar",
+    GTK_SIGNAL_FUNC (statusbar_show_cb), NULL,
+    gg->statusbar_p, gg);
+
   /* Add a separator before the mode-specific items */
   CreateMenuItem (gg->menus.options_menu, NULL,
     "", "", NULL, NULL, NULL, NULL, gg);
@@ -306,6 +330,10 @@ scale_menus_make (ggobid *gg) {
   CreateMenuCheck (gg->menus.options_menu, "Show control panel",
     GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
     GTK_WIDGET_VISIBLE (gg->viewmode_frame), gg);
+
+  CreateMenuCheck (gg->menus.options_menu, "Show status bar",
+    GTK_SIGNAL_FUNC (statusbar_show_cb), NULL,
+    gg->statusbar_p, gg);
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
     gg->menus.options_menu);
@@ -392,6 +420,10 @@ brush_menus_make (ggobid *gg)
     GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
     GTK_WIDGET_VISIBLE (gg->viewmode_frame), gg);
 
+  CreateMenuCheck (gg->menus.options_menu, "Show status bar",
+    GTK_SIGNAL_FUNC (statusbar_show_cb), NULL,
+    gg->statusbar_p, gg);
+
   /* Add a separator before the mode-specific items */
   CreateMenuItem (gg->menus.options_menu, NULL,
     "", "", NULL, NULL, NULL, NULL, NULL);
@@ -421,6 +453,10 @@ identify_menus_make (ggobid *gg)
     GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
     GTK_WIDGET_VISIBLE (gg->viewmode_frame), gg);
 
+  CreateMenuCheck (gg->menus.options_menu, "Show status bar",
+    GTK_SIGNAL_FUNC (statusbar_show_cb), NULL,
+    gg->statusbar_p, gg);
+
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
     gg->menus.options_menu);
 }
@@ -441,6 +477,10 @@ movepts_menus_make (ggobid *gg)
   CreateMenuCheck (gg->menus.options_menu, "Show control panel",
     GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
     GTK_WIDGET_VISIBLE (gg->viewmode_frame), gg);
+
+  CreateMenuCheck (gg->menus.options_menu, "Show status bar",
+    GTK_SIGNAL_FUNC (statusbar_show_cb), NULL,
+    gg->statusbar_p, gg);
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
     gg->menus.options_menu);
@@ -464,6 +504,10 @@ edgeedit_menus_make (ggobid *gg)
     GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
     GTK_WIDGET_VISIBLE (gg->viewmode_frame), gg);
 
+  CreateMenuCheck (gg->menus.options_menu, "Show status bar",
+    GTK_SIGNAL_FUNC (statusbar_show_cb), NULL,
+    gg->statusbar_p, gg);
+
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
     gg->menus.options_menu);
 
@@ -486,6 +530,10 @@ scatmat_menus_make (ggobid *gg)
     GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
     GTK_WIDGET_VISIBLE (gg->viewmode_frame), gg);
 
+  CreateMenuCheck (gg->menus.options_menu, "Show status bar",
+    GTK_SIGNAL_FUNC (statusbar_show_cb), NULL,
+    gg->statusbar_p, gg);
+
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
     gg->menus.options_menu);
 }
@@ -506,6 +554,10 @@ pcplot_menus_make (ggobid *gg)
   CreateMenuCheck (gg->menus.options_menu, "Show control panel",
     GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
     GTK_WIDGET_VISIBLE (gg->viewmode_frame), gg);
+
+  CreateMenuCheck (gg->menus.options_menu, "Show status bar",
+    GTK_SIGNAL_FUNC (statusbar_show_cb), NULL,
+    gg->statusbar_p, gg);
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
     gg->menus.options_menu);
