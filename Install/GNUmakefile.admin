@@ -18,14 +18,10 @@ DIRS=\
 
 DATA_SRC_FILES=\
    flea.col flea.colors flea.dat flea.doc flea.glyphs flea.row \
-   flea.xml \
-   pigs.xml \
-   ratcns.xml \
-   sat.xml \
+   roos.col roos.dat roos.doc roos.missing roos.row \
+   flea.xml pigs.xml ratcns.xml sat.xml sleep.xml \
    stdColorMap.xml \
-   ggobi.dtd \
-   sat.xml \
-   ratcns.xml 
+   ggobi.dtd
 
 # Note that COI which provides an example of an XML file containing
 # 2 data sets is not included. Can we ship it?

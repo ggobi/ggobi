@@ -1,0 +1,252 @@
+<?xml version="1.0"?>
+<!DOCTYPE ggobidata SYSTEM "ggobi.dtd">
+
+<ggobidata count="1">
+<data numRecords="62">
+
+<description>
+Data from which conclusions  were  drawn  in  the  article  "Sleep  in
+Mammals: Ecological and Constitutional Correlates" by Allison, T.  and
+Cicchetti, D. (1976), _Science_, November 12, vol. 194,  pp.  732-734.
+Includes brain and body  weight,  life  span,  gestation  time,  time
+sleeping, and predation and danger indices for 62 mammals.
+
+Variables below (from left to right) for Mammals Data Set:
+
+species of animal 
+body weight in kg 
+brain weight in g 
+slow wave ("nondreaming") sleep (hrs/day)
+paradoxical ("dreaming") sleep (hrs/day)
+total sleep (hrs/day)  (sum of slow wave and paradoxical sleep)
+maximum life span (years)
+gestation time (days)
+predation index (1-5)
+                1 = minimum (least likely to be preyed upon)
+                5 = maximum (most likely to be preyed upon)
+sleep exposure index (1-5)
+                1 = least exposed (e.g. animal sleeps in a
+                    well-protected den)
+                5 = most exposed
+overall danger index (1-5)
+                (based on the above two indices and other information)
+                1 = least danger (from other animals)
+                5 = most danger (from other animals)
+
+For more details, see
+
+Allison, Truett and Cicchetti, Domenic V. (1976), "Sleep  in  Mammals:
+Ecological and Constitutional  Correlates",  _Science_,  November  12,
+vol. 194, pp. 732-734.
+
+The above data set can be freely used for non-commercial purposes  and
+can be freely distributed (permission in  writing  obtained  from  Dr.
+Truett Allison).
+
+Submitted by Roger Johnson
+rjohnson@carleton.edu
+</description>
+
+<variables count="10">
+<variable>BodyWgt</variable>
+<variable>BrainWgt</variable>
+<variable>NonD</variable>
+<variable>Dream</variable>
+<variable>Sleep</variable>
+<variable>Span</variable>
+<variable>Gest</variable>
+<variable>Pred</variable>
+<variable>Exp</variable>
+<variable>Danger</variable>
+</variables>
+<records
+ count="62" glyph="fr 0" color="0" missingValue="na">
+<record label="African elephant">
+6654.000 5712.000 na na 3.300 38.600 645.000 3.000 5.000 3.000
+</record>
+<record label="African giant pouched rat">
+1.000 6.600 6.300 2.000 8.300 4.500 42.000 3.000 1.000 3.000
+</record>
+<record label="Arctic Fox">
+3.385 44.500 na na 12.500 14.000 60.000 1.000 1.000 1.000
+</record>
+<record label="Arctic ground squirrel">
+0.920 5.700 na na 16.500 na 25.000 5.000 2.000 3.000
+</record>
+<record label="Asian elephant">
+2547.000 4603.000 2.100 1.800 3.900 69.000 624.000 3.000 5.000 4.000
+</record>
+<record label="Baboon">
+10.550 179.500 9.100 0.700 9.800 27.000 180.000 4.000 4.000 4.000
+</record>
+<record label="Big brown bat">
+0.023 0.300 15.800 3.900 19.700 19.000 35.000 1.000 1.000 1.000
+</record>
+<record label="Brazilian tapir">
+160.000 169.000 5.200 1.000 6.200 30.400 392.000 4.000 5.000 4.000
+</record>
+<record label="Cat">
+3.300 25.600 10.900 3.600 14.500 28.000 63.000 1.000 2.000 1.000
+</record>
+<record label="Chimpanzee">
+52.160 440.000 8.300 1.400 9.700 50.000 230.000 1.000 1.000 1.000
+</record>
+<record label="Chinchilla">
+0.425 6.400 11.000 1.500 12.500 7.000 112.000 5.000 4.000 4.000
+</record>
+<record label="Cow">
+465.000 423.000 3.200 0.700 3.900 30.000 281.000 5.000 5.000 5.000
+</record>
+<record label="Desert hedgehog">
+0.550 2.400 7.600 2.700 10.300 na na 2.000 1.000 2.000
+</record>
+<record label="Donkey">
+187.100 419.000 na na 3.100 40.000 365.000 5.000 5.000 5.000
+</record>
+<record label="Eastern American mole">
+0.075 1.200 6.300 2.100 8.400 3.500 42.000 1.000 1.000 1.000
+</record>
+<record label="Echidna">
+3.000 25.000 8.600 0.000 8.600 50.000 28.000 2.000 2.000 2.000
+</record>
+<record label="European hedgehog">
+0.785 3.500 6.600 4.100 10.700 6.000 42.000 2.000 2.000 2.000
+</record>
+<record label="Galago">
+0.200 5.000 9.500 1.200 10.700 10.400 120.000 2.000 2.000 2.000
+</record>
+<record label="Genet">
+1.410 17.500 4.800 1.300 6.100 34.000 na 1.000 2.000 1.000
+</record>
+<record label="Giant armadillo">
+60.000 81.000 12.000 6.100 18.100 7.000 na 1.000 1.000 1.000
+</record>
+<record label="Giraffe">
+529.000 680.000 na 0.300 na 28.000 400.000 5.000 5.000 5.000
+</record>
+<record label="Goat">
+27.660 115.000 3.300 0.500 3.800 20.000 148.000 5.000 5.000 5.000
+</record>
+<record label="Golden hamster">
+0.120 1.000 11.000 3.400 14.400 3.900 16.000 3.000 1.000 2.000
+</record>
+<record label="Gorilla">
+207.000 406.000 na na 12.000 39.300 252.000 1.000 4.000 1.000
+</record>
+<record label="Gray seal">
+85.000 325.000 4.700 1.500 6.200 41.000 310.000 1.000 3.000 1.000
+</record>
+<record label="Gray wolf">
+36.330 119.500 na na 13.000 16.200 63.000 1.000 1.000 1.000
+</record>
+<record label="Ground squirrel">
+0.101 4.000 10.400 3.400 13.800 9.000 28.000 5.000 1.000 3.000
+</record>
+<record label="Guinea pig">
+1.040 5.500 7.400 0.800 8.200 7.600 68.000 5.000 3.000 4.000
+</record>
+<record label="Horse">
+521.000 655.000 2.100 0.800 2.900 46.000 336.000 5.000 5.000 5.000
+</record>
+<record label="Jaguar">
+100.000 157.000 na na 10.800 22.400 100.000 1.000 1.000 1.000
+</record>
+<record label="Kangaroo">
+35.000 56.000 na na na 16.300 33.000 3.000 5.000 4.000
+</record>
+<record label="Lesser short-tailed shrew">
+0.005 0.140 7.700 1.400 9.100 2.600 21.500 5.000 2.000 4.000
+</record>
+<record label="Little brown bat">
+0.010 0.250 17.900 2.000 19.900 24.000 50.000 1.000 1.000 1.000
+</record>
+<record label="Man">
+62.000 1320.000 6.100 1.900 8.000 100.000 267.000 1.000 1.000 1.000
+</record>
+<record label="Mole rat">
+0.122 3.000 8.200 2.400 10.600 na 30.000 2.000 1.000 1.000
+</record>
+<record label="Mountain beaver">
+1.350 8.100 8.400 2.800 11.200 na 45.000 3.000 1.000 3.000
+</record>
+<record label="Mouse">
+0.023 0.400 11.900 1.300 13.200 3.200 19.000 4.000 1.000 3.000
+</record>
+<record label="Musk shrew">
+0.048 0.330 10.800 2.000 12.800 2.000 30.000 4.000 1.000 3.000
+</record>
+<record label="N. American opossum">
+1.700 6.300 13.800 5.600 19.400 5.000 12.000 2.000 1.000 1.000
+</record>
+<record label="Nine-banded armadillo">
+3.500 10.800 14.300 3.100 17.400 6.500 120.000 2.000 1.000 1.000
+</record>
+<record label="Okapi">
+250.000 490.000 na 1.000 na 23.600 440.000 5.000 5.000 5.000
+</record>
+<record label="Owl monkey">
+0.480 15.500 15.200 1.800 17.000 12.000 140.000 2.000 2.000 2.000
+</record>
+<record label="Patas monkey">
+10.000 115.000 10.000 0.900 10.900 20.200 170.000 4.000 4.000 4.000
+</record>
+<record label="Phalanger">
+1.620 11.400 11.900 1.800 13.700 13.000 17.000 2.000 1.000 2.000
+</record>
+<record label="Pig">
+192.000 180.000 6.500 1.900 8.400 27.000 115.000 4.000 4.000 4.000
+</record>
+<record label="Rabbit">
+2.500 12.100 7.500 0.900 8.400 18.000 31.000 5.000 5.000 5.000
+</record>
+<record label="Raccoon">
+4.288 39.200 na na 12.500 13.700 63.000 2.000 2.000 2.000
+</record>
+<record label="Rat">
+0.280 1.900 10.600 2.600 13.200 4.700 21.000 3.000 1.000 3.000
+</record>
+<record label="Red fox">
+4.235 50.400 7.400 2.400 9.800 9.800 52.000 1.000 1.000 1.000
+</record>
+<record label="Rhesus monkey">
+6.800 179.000 8.400 1.200 9.600 29.000 164.000 2.000 3.000 2.000
+</record>
+<record label="Rock hyrax (Hetero">
+0.750 12.300 5.700 0.900 6.600 7.000 225.000 2.000 2.000 2.000
+</record>
+<record label="Rock hyrax (Procavia hab)">
+3.600 21.000 4.900 0.500 5.400 6.000 225.000 3.000 2.000 3.000
+</record>
+<record label="Roe deer">
+14.830 98.200 na na 2.600 17.000 150.000 5.000 5.000 5.000
+</record>
+<record label="Sheep">
+55.500 175.000 3.200 0.600 3.800 20.000 151.000 5.000 5.000 5.000
+</record>
+<record label="Slow loris">
+1.400 12.500 na na 11.000 12.700 90.000 2.000 2.000 2.000
+</record>
+<record label="Star nosed mole">
+0.060 1.000 8.100 2.200 10.300 3.500 na 3.000 1.000 2.000
+</record>
+<record label="Tenrec">
+0.900 2.600 11.000 2.300 13.300 4.500 60.000 2.000 1.000 2.000
+</record>
+<record label="Tree hyrax">
+2.000 12.300 4.900 0.500 5.400 7.500 200.000 3.000 1.000 3.000
+</record>
+<record label="Tree shrew">
+0.104 2.500 13.200 2.600 15.800 2.300 46.000 3.000 2.000 2.000
+</record>
+<record label="Vervet">
+4.190 58.000 9.700 0.600 10.300 24.000 210.000 4.000 3.000 4.000
+</record>
+<record label="Water opossum">
+3.500 3.900 12.800 6.600 19.400 3.000 14.000 2.000 1.000 1.000
+</record>
+<record label="Yellow-bellied marmot">
+4.050 17.000 na na na 13.000 38.000 3.000 1.000 1.000
+</record>
+</records>
+</data>
+</ggobidata>
