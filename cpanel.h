@@ -66,8 +66,8 @@ typedef struct {
  gint scale_zoom_opt;    /* Z_OBLIQUE, Z_ASPECT, Z_HORIZ, Z_VERT */
 
  /*-- identification --*/
- gint identify_display_type;
- enum idtargetd identify_target_type;  /* points or edges */
+ gint id_display_type;
+ enum idtargetd id_target_type;  /* points or edges */
 
  /*-- edge editing --*/
  gboolean ee_adding_p;

@@ -21,7 +21,7 @@ static void display_cb (GtkWidget *w, gpointer cbd)
 {
   ggobid *gg = GGobiFromWidget(w, true);
   cpaneld *cpanel = &gg->current_display->cpanel;
-  cpanel->identify_display_type = GPOINTER_TO_INT (cbd);
+  cpanel->id_display_type = GPOINTER_TO_INT (cbd);
   displays_plot (NULL, QUICK, gg);
 }
 
@@ -29,7 +29,7 @@ static void identify_target_cb (GtkWidget *w, gpointer cbd)
 {
   ggobid *gg = GGobiFromWidget(w, true);
   cpaneld *cpanel = &gg->current_display->cpanel;
-  cpanel->identify_target_type = (enum idtargetd) GPOINTER_TO_INT (cbd);
+  cpanel->id_target_type = (enum idtargetd) GPOINTER_TO_INT (cbd);
   displays_plot (NULL, QUICK, gg);
 }
 
@@ -47,7 +47,18 @@ recenter_cb (GtkWidget *w, ggobid *gg)
 static void
 id_remove_labels_cb (GtkWidget *w, ggobid *gg)
 {
-  datad *d = gg->current_display->d;
+  displayd *dsp = gg->current_display;
+  cpaneld *cpanel = &gg->current_display->cpanel;
+  datad *d;
+  gboolean ok = true;
+
+  if (cpanel->id_target_type == identify_points)
+    d = dsp->d;
+  else {
+    d = dsp->e;
+    ok = (d != NULL);
+  }
+
   g_slist_free (d->sticky_ids);
   d->sticky_ids = (GSList *) NULL;
 
@@ -63,8 +74,14 @@ static void
 id_all_sticky_cb (GtkWidget *w, ggobid *gg)
 {
   gint i, m;
-  datad *d = gg->current_display->d;
+  datad *d;
+  displayd *dsp = gg->current_display;
+  cpaneld *cpanel = &dsp->cpanel;
 
+  if (cpanel->id_target_type == identify_edges) {
+    if (dsp->e != NULL) d = dsp->e;
+  } else d = dsp->d;
+  
   /*-- clear the list before adding to avoid redundant entries --*/
   g_slist_free (d->sticky_ids);
   d->sticky_ids = (GSList *) NULL;
@@ -134,7 +151,7 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
     }
   }
 
-  if (cpanel->identify_target_type == identify_points) {
+  if (cpanel->id_target_type == identify_points) {
     k = find_nearest_point (&sp->mousepos, sp, d, gg);
     d->nearest_point = k;
 
@@ -187,14 +204,15 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
  * it isn't, add it.
 */
   ggobid *gg = GGobiFromSPlot(sp);
-  displayd *display = sp->displayptr;
-  cpaneld *cpanel = &display->cpanel;
+  displayd *dsp = sp->displayptr;
+  cpaneld *cpanel = &dsp->cpanel;
+  datad *d;
 
-  if (cpanel->identify_target_type == identify_points)
-    sticky_id_toggle (display->d, gg);
-  else 
-    if (display->e && display->e->edge.n)
-      sticky_id_toggle (display->e, gg);
+  if (cpanel->id_target_type == identify_edges) {
+    if (dsp->e != NULL) d = dsp->e;
+  } else d = dsp->d;
+
+  sticky_id_toggle (d, gg);
 
   return true;
 }
@@ -342,7 +360,7 @@ cpanel_identify_make(ggobid *gg) {
 void
 cpanel_identify_init (cpaneld *cpanel, ggobid *gg)
 {
-  cpanel->identify_display_type = ID_RECORD_LABEL;
+  cpanel->id_display_type = ID_RECORD_LABEL;
 }
 
 void
@@ -353,11 +371,11 @@ cpanel_identify_set (cpaneld *cpanel, ggobid *gg)
   w = widget_find_by_name (gg->control_panel[IDENT],
                            "IDENTIFY:display_option_menu");
   gtk_option_menu_set_history (GTK_OPTION_MENU(w),
-                               cpanel->identify_display_type);
+                               cpanel->id_display_type);
 
   w = widget_find_by_name (gg->control_panel[IDENT],
                            "IDENTIFY:target_option_menu");
   gtk_option_menu_set_history (GTK_OPTION_MENU(w),
-                               (gint) cpanel->identify_target_type);
+                               (gint) cpanel->id_target_type);
 }
 

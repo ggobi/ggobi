@@ -456,13 +456,13 @@ splot_add_point_label (gboolean nearest, gint k, splotd *sp,
     splot_text_extents (lbl, style, 
       &lbearing, &rbearing, &width, &ascent, &descent);
 
-    /*-- underline the nearest point label?  --*/
     if (sp->screen[k].x <= sp->max.x/2) {
       splot_draw_string (lbl,
         sp->screen[k].x+diamond_dim,
         sp->screen[k].y-diamond_dim,
         style, drawable, gg);
 
+      /*-- underline the nearest point label?  --*/
       if (nearest)
         gdk_draw_line (drawable, gg->plot_GC,
           sp->screen[k].x+diamond_dim,
@@ -490,6 +490,10 @@ splot_add_point_label (gboolean nearest, gint k, splotd *sp,
         (sp->max.x - width)/2,
         ascent + descent + 5,  /*-- the border is of width 3 --*/
         style, drawable, gg);
+      /*-- underline it there, too, for consistency --*/
+      gdk_draw_line (drawable, gg->plot_GC,
+        (sp->max.x - width)/2, ascent + descent + 5 + 1,
+        (sp->max.x - width)/2 + width, ascent + descent + 5 + 1);
     }
   }
 }
@@ -578,19 +582,19 @@ splot_add_record_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
   /*
      these are the cues added to
        nearest point and sticky guys    in identification
+       nearest edge and sticky guys     in identification
        nearest point                    in moving points
        source, maybe dest and edge      in edge editing
   */
 
   if (mode == IDENT) {
-    if (cpanel->identify_target_type == identify_points &&
+    if (cpanel->id_target_type == identify_points &&
         d->nearest_point != -1)
     {
       splot_add_identify_cues (sp, drawable, d->nearest_point, true, gg);
-    } else if (cpanel->identify_target_type == identify_edges && e &&
-               e->nearest_point != -1)
-    {
-      splot_add_identify_edge_cues (sp, drawable, e->nearest_point, true, gg);
+    } else if (cpanel->id_target_type == identify_edges && e) {
+      if (e->nearest_point != -1)
+        splot_add_identify_edge_cues (sp, drawable, e->nearest_point, true, gg);
     }
   }
   else if (mode == MOVEPTS)
@@ -600,14 +604,21 @@ splot_add_record_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
  
 
   /*-- and these are the sticky ids, added in all modes --*/
-  if (d->sticky_ids != NULL &&
-      g_slist_length (d->sticky_ids) > 0)
-  {
+  if (d->sticky_ids != NULL && g_slist_length (d->sticky_ids) > 0) {
     for (l = d->sticky_ids; l; l = l->next) {
       id = GPOINTER_TO_INT (l->data);
       if (!d->hidden_now.els[id])
         /*-- false = !nearest --*/
         splot_add_identify_cues (sp, drawable, id, false, gg);
+    }
+  }
+
+  if (e && e->sticky_ids != NULL && g_slist_length (e->sticky_ids) > 0) {
+    for (l = e->sticky_ids; l; l = l->next) {
+      id = GPOINTER_TO_INT (l->data);
+      if (!e->hidden_now.els[id])
+        /*-- false = !nearest --*/
+        splot_add_identify_edge_cues (sp, drawable, id, false, gg);
     }
   }
 }
@@ -880,38 +891,35 @@ splot_add_edge_label (splotd *sp, GdkDrawable *drawable, gint k,
 */
   if (draw_edge) {
 
+    /*-- add the label last so it will be in front of other markings --*/
+    lbl = identify_label_fetch (k, &dsp->cpanel, e, gg);
+    splot_text_extents (lbl, style, 
+      &lbearing, &rbearing, &width, &ascent, &descent);
+
+    if (sp->screen[a].x > sp->screen[b].x) {gint itmp=b; b=a; a=itmp;}
+    xp = (sp->screen[b].x - sp->screen[a].x)/2 + sp->screen[a].x;
+    if (sp->screen[a].y > sp->screen[b].y) {gint itmp=b; b=a; a=itmp;}
+    yp = (sp->screen[b].y - sp->screen[a].y)/2 + sp->screen[a].y;
+
+    splot_draw_string (lbl, xp, yp, style, drawable, gg);
+
     if (nearest) {
-      /*-- add the label last so it will be in front of other markings --*/
-      lbl = (gchar *) g_array_index (e->rowlab, gchar *, k);
-      splot_text_extents (lbl, style, 
-        &lbearing, &rbearing, &width, &ascent, &descent);
+      /*-- underline the label --*/
+      gdk_draw_line (drawable, gg->plot_GC,
+        xp, yp+1, xp+width, yp+1);
 
-      if (sp->screen[a].x > sp->screen[b].x) {gint itmp=b; b=a; a=itmp;}
-      xp = (sp->screen[b].x - sp->screen[a].x)/2 + sp->screen[a].x;
-      if (sp->screen[a].y > sp->screen[b].y) {gint itmp=b; b=a; a=itmp;}
-      yp = (sp->screen[b].y - sp->screen[a].y)/2 + sp->screen[a].y;
-
-      /*-- underline the nearest point label?  --*/
-      splot_draw_string (lbl, xp, yp, style, drawable, gg);
-    }
-
-    /*-- display the label in the top center of the window as well --*/
-    if (nearest) {
+      /*-- display it in the top center of the window --*/
       splot_draw_string (lbl,
         (sp->max.x - width)/2,
         ascent + descent + 5,  /*-- the border is of width 3 --*/
         style, drawable, gg);
+      /*-- underline it there, too, for consistency --*/
+      gdk_draw_line (drawable, gg->plot_GC,
+        (sp->max.x - width)/2, ascent + descent + 5 + 1,
+        (sp->max.x - width)/2 + width, ascent + descent + 5 + 1);
     }
   }
 }
-
-/*
- * I may want to break this up so it looks like add_identify_cues
-
-need two new routines:
-  splot_add_edge_highlight_cue
-  splot_add_edge_label
-*/
 
 void
 splot_add_identify_edge_cues (splotd *sp, GdkDrawable *drawable, gint k,
@@ -920,30 +928,19 @@ splot_add_identify_edge_cues (splotd *sp, GdkDrawable *drawable, gint k,
   displayd *dsp = (displayd *) sp->displayptr;
   datad *e = dsp->e;
   gboolean useDefault = false;
-/*
-  datad *d = dsp->d;
-  gboolean draw_edge;
-  gchar *lbl;
-  gint xp, yp;
-  colorschemed *scheme = gg->activeColorScheme;
-  gint lbearing, rbearing, width, ascent, descent;
-  GtkStyle *style = gtk_widget_get_style (sp->da);
-*/
 
   if (k >= e->edge.n) return;
 
   /*-- not yet using rowid.idv  -- huh? --*/
   if (e->hidden_now.els[k]) return;
 
-  if (nearest) {
-    if (GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
-      GtkGGobiExtendedSPlotClass *klass;
-      klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass);
-      if(klass->add_identify_edge_cues)
-        klass->add_identify_edge_cues(k, sp, drawable, gg);
-      else 
-        useDefault = true;
-    }
+  if (GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
+    GtkGGobiExtendedSPlotClass *klass;
+    klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass);
+    if(klass->add_identify_edge_cues)
+      klass->add_identify_edge_cues(k, sp, drawable, nearest, gg);
+    else 
+      useDefault = true;
   }
 
   if (useDefault) {
@@ -1037,7 +1034,7 @@ splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
     }
   }
   
-  if(GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
+  if (GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
     void (*f)(splotd *, GdkDrawable*, ggobid*);
     splotKlass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass);
     f = splotKlass->add_markup_cues;

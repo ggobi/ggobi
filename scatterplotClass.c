@@ -1379,7 +1379,6 @@ addMarkupCues(splotd *sp, GdkDrawable *drawable, ggobid *gg)
         display->options.edges_arrowheads_show_p ||
         display->options.edges_directed_show_p)
         if (e->nearest_point != -1)
-          /*splot_nearest_edge_highlight (sp, e->nearest_point, true, gg);*/
           splot_add_identify_edge_cues (sp, drawable, e->nearest_point,
             true, gg);
 }

@@ -271,70 +271,88 @@ gchar *
 identify_label_fetch (gint k, cpaneld *cpanel, datad *d, ggobid *gg)
 {
   gchar *lbl;
+  gint id_display_type = cpanel->id_display_type;
 
-  if (cpanel->identify_display_type == ID_RECORD_LABEL)
+/*
+ * How can I tell if the current page of the notebook
+ * corresponds to the data?
+*/
+  /*-- if categorical, use level name ... --*/
+  if (id_display_type == ID_VAR_LABELS) {
+    vartabled *vt;
+    GtkWidget *clist =
+      get_clist_from_object (GTK_OBJECT (gg->control_panel[IDENT]));
+    datad *clistd = (datad *) gtk_object_get_data (GTK_OBJECT(clist), "datad");
+
+    if (clistd != d) {
+/*
+g_printerr ("selected variables don't correspond to what is identified\n");
+*/
+      id_display_type = ID_RECORD_LABEL;
+      /*-- this will be caught below --*/
+
+    } else {
+      gint *vars = (gint *) g_malloc (d->ncols * sizeof(gint));
+      gint nvars = get_selections_from_clist (d->ncols, vars, clist, d);
+      gint j, lval;
+
+      for (j=0; j<nvars; j++) {
+        vt = vartable_element_get (vars[j], d);
+        if (vt == NULL) continue;
+        if (vt->vartype == categorical) {
+          /*
+           * since the level values can be any arbitrary integers,
+           * it's necessary to dig out the level name using the list
+           * of level values.
+          */
+          gint n, ktmp;
+          gint kval = (gint) d->tform.vals[k][vars[j]];
+          lval = -1;
+          for (n=0; n<vt->nlevels; n++) {
+            ktmp = vt->level_values[n];
+            if (ktmp == kval) {
+              lval = n;
+              break;
+            }
+          }
+        }
+        if (lval == -1) {
+          g_printerr ("The levels for %s aren't specified correctly\n",
+            vt->collab);
+          return NULL;
+        }
+  
+        if (j == 0) {
+          lbl = (vt->vartype == categorical) ?
+            g_strdup_printf ("%s=%s",
+              vt->collab_tform, vt->level_names[lval]) :
+            g_strdup_printf ("%s=%g",
+              vt->collab_tform, d->tform.vals[k][vars[j]]);
+        } else {
+          lbl = (vt->vartype == categorical) ?
+            g_strdup_printf ("%s, %s=%s",
+              lbl, vt->collab_tform, vt->level_names[lval]) :
+            g_strdup_printf ("%s, %s=%g",
+              lbl, vt->collab_tform, d->tform.vals[k][vars[j]]);
+        }
+      }
+      g_free (vars);
+    }
+  }
+
+  
+  if (id_display_type == ID_RECORD_LABEL)
     lbl = (gchar *) g_array_index (d->rowlab, gchar *, k);
 
-  else if (cpanel->identify_display_type == ID_RECORD_NO) {
+  else if (id_display_type == ID_RECORD_NO) {
     lbl = g_strdup_printf ("%d", k);
 
-  }  else if (cpanel->identify_display_type == ID_RECORD_ID) {
+  }  else if (id_display_type == ID_RECORD_ID) {
     if (d->rowIds && d->rowIds[k]) {
       lbl = g_strdup_printf ("%s", d->rowIds[k]);
     } else {
       lbl = g_strdup_printf ("%d", d->rowid.id.els[k]);
     }
-
-  /*-- if categorical, use level name ... --*/
-  } else if (cpanel->identify_display_type == ID_VAR_LABELS) {
-    vartabled *vt;
-    GtkWidget *clist =
-      get_clist_from_object (GTK_OBJECT (gg->control_panel[IDENT]));
-    gint *vars = (gint *) g_malloc (d->ncols * sizeof(gint));
-    gint nvars = get_selections_from_clist (d->ncols, vars, clist, d);
-    gint j, lval;
-
-    for (j=0; j<nvars; j++) {
-      vt = vartable_element_get (vars[j], d);
-      if (vt == NULL) continue;
-      if (vt->vartype == categorical) {
-        /*
-         * since the level values can be any arbitrary integers,
-         * it's necessary to dig out the level name using the list
-         * of level values.
-        */
-        gint n, ktmp;
-        gint kval = (gint) d->tform.vals[k][vars[j]];
-        lval = -1;
-        for (n=0; n<vt->nlevels; n++) {
-          ktmp = vt->level_values[n];
-          if (ktmp == kval) {
-            lval = n;
-            break;
-          }
-        }
-      }
-      if (lval == -1) {
-        g_printerr ("The levels for %s aren't specified correctly\n",
-          vt->collab);
-        return NULL;
-      }
-
-      if (j == 0) {
-        lbl = (vt->vartype == categorical) ?
-          g_strdup_printf ("%s=%s",
-            vt->collab_tform, vt->level_names[lval]) :
-          g_strdup_printf ("%s=%g",
-            vt->collab_tform, d->tform.vals[k][vars[j]]);
-      } else {
-        lbl = (vt->vartype == categorical) ?
-          g_strdup_printf ("%s, %s=%s",
-            lbl, vt->collab_tform, vt->level_names[lval]) :
-          g_strdup_printf ("%s, %s=%g",
-            lbl, vt->collab_tform, d->tform.vals[k][vars[j]]);
-      }
-    }
-    g_free (vars);
   }
 
   return lbl;
