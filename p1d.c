@@ -203,8 +203,8 @@ ash_baseline_set (icoords *baseline, splotd *sp)
   ftmp = -1 + 2.0 * (0 - sp->p1d.lim.min)/
                     (sp->p1d.lim.max - sp->p1d.lim.min);
 */
-  gtmp = -1 /* and the rest of the usual expression is 0 now */;
-  pl = precis * ftmp;
+  ftmp = -1 /* and the rest of the usual expression is 0 now */;
+  pl = (greal) (precis * ftmp);
 
 /*-- HORIZONTAL --*/
   gtmp = pl - sp->pmid.y;
