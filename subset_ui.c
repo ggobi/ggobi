@@ -23,9 +23,6 @@
 #define SS_STICKY 4
 #define SS_ROWLAB 5
 
-static void
-selection_made_cb (GtkWidget *clist, gint row, gint column, GdkEventButton *event, ggobid *);
-
 /*-- called when closed from the close button --*/
 static void close_btn_cb (GtkWidget *w, ggobid *gg) {
   gtk_widget_hide (gg->subset_ui.window);
@@ -178,12 +175,6 @@ subset_cb (GtkWidget *w, ggobid *gg)
   gboolean redraw;
   datad *d = datad_get_from_widget (w, gg);
   GtkWidget *entry, *tgl;
-  gchar *str;
-  greal min, max;
-  gboolean proceed = true;
-/*
-  gboolean casep;
-*/
 
   if (!d)
     return;
@@ -207,25 +198,7 @@ subset_cb (GtkWidget *w, ggobid *gg)
       redraw = subset_block (bstart-1, bsize, d, gg);
     break;
     case SS_RANGE:
-
-      entry = (GtkWidget *)
-        gtk_object_get_data (GTK_OBJECT(gg->subset_ui.window),
-        "SS:MIN_ENTRY");
-      if (entry) {
-        str = gtk_editable_get_chars (GTK_EDITABLE (entry), 0, -1);
-        min = atof (str);
-      } else proceed = false;
-
-      entry = (GtkWidget *)
-        gtk_object_get_data (GTK_OBJECT(gg->subset_ui.window),
-        "SS:MAX_ENTRY");
-      if (entry) {
-        str = gtk_editable_get_chars (GTK_EDITABLE (entry), 0, -1);
-        max = atof (str);
-      } else proceed = false;
-      if (proceed && d->subset.jvar >= 0)
-        redraw = subset_range (min, max, d->subset.jvar, d, gg);
-      else redraw = false;
+      redraw = subset_range (d, gg);
     break;
     case SS_EVERYN:
       estart = (gint) d->subset.estart_adj->value;
@@ -289,7 +262,6 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
   GtkWidget *button, *t;
   GtkWidget *vbox, *frame, *hb, *vb, *button_hbox, *close_hbox;
   GtkWidget *label, *btn, *spinbtn, *entry, *opt;
-  GtkWidget *varnotebook;
   datad *d;
   gchar *clist_titles[1] = {"datasets"};
 
@@ -442,49 +414,17 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
       /*---------------------------*/
       /*-- Points within a range --*/
       /*---------------------------*/
-      frame = gtk_frame_new ("Variable range");
+      frame = gtk_frame_new ("Variable limits");
       gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
 
-      hb = gtk_hbox_new (false, 2);
-      gtk_container_add (GTK_CONTAINER (frame), hb);
+      vb = gtk_vbox_new (false, 2);
+      gtk_container_add (GTK_CONTAINER (frame), vb);
 
-      varnotebook = create_variable_notebook (hb,
-        GTK_SELECTION_SINGLE, all_vartypes, all_datatypes,
-        (GtkSignalFunc) selection_made_cb, gg);
-      gtk_object_set_data (GTK_OBJECT(gg->subset_ui.window),
-        "SS:RANGE_NOTEBOOK", varnotebook);
+      gtk_box_pack_start (GTK_BOX (vb),
+        gtk_label_new ("Exclude data outside the user limits\nin the variable manipulation table"),
+        false, false, 0);
 
-      t = gtk_table_new (2, 2, true);
-      /*gtk_table_set_col_spacing (GTK_TABLE (t), 0, 20);*/
-      gtk_container_set_border_width (GTK_CONTAINER (t), 5);
-      gtk_box_pack_start (GTK_BOX (hb), t, false, false, 0);
-
-      /*-- min label and entry --*/
-      gtk_table_attach_defaults (GTK_TABLE (t),
-        gtk_label_new ("Minimum"), 0,1,0,1);
-
-      entry = gtk_entry_new ();
-      gtk_object_set_data (GTK_OBJECT(gg->subset_ui.window),
-        "SS:MIN_ENTRY", entry);
-      gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), entry,
-        "Type in the minimum value for the selected variable (using the transformed data if applicable)",
-        NULL);
-      gtk_table_attach_defaults (GTK_TABLE (t), entry, 1,2, 0,1);
-
-      /*-- max label and entry --*/
-      gtk_table_attach_defaults (GTK_TABLE (t),
-        gtk_label_new ("Maximum"), 0,1, 1,2);
-
-      entry = gtk_entry_new ();
-      gtk_object_set_data (GTK_OBJECT(gg->subset_ui.window),
-        "SS:MAX_ENTRY", entry);
-      gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), entry,
-        "Type in the maximum value for the selected variable (using the transformed data if applicable)",
-        NULL);
-      gtk_table_attach_defaults (GTK_TABLE (t), entry, 1,2, 1,2);
-
-
-      label = gtk_label_new ("Range");
+      label = gtk_label_new ("Limits");
       gtk_notebook_append_page (GTK_NOTEBOOK (gg->subset_ui.notebook),
         frame, label);
 
@@ -545,6 +485,14 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
       frame = gtk_frame_new ("Cases whose row label is sticky");
       gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
       gtk_widget_set_usize (frame, 100, 75);
+
+      vb = gtk_vbox_new (false, 2);
+      gtk_container_add (GTK_CONTAINER (frame), vb);
+
+      gtk_box_pack_start (GTK_BOX (vb),
+        gtk_label_new ("Include only those cases with a sticky label"),
+        false, false, 0);
+
       label = gtk_label_new ("Sticky");
       gtk_notebook_append_page (GTK_NOTEBOOK (gg->subset_ui.notebook),
         frame, label);
@@ -651,36 +599,5 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
 
     gtk_widget_show (gg->subset_ui.window);
     gdk_window_raise (gg->subset_ui.window->window);
-  }
-}
-
-/*------------  range setting ---------------------------*/
-
-static void
-selection_made_cb (GtkWidget *clist, gint row, gint column,
-  GdkEventButton *event, ggobid *gg)
-{
-  datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
-  vartabled *vt = vartable_element_get (row, d);
-  GtkWidget *entry;
-  gchar *txt;
-
-  d->subset.jvar = row;
-
-  /*-- update the values in the min and max entries in the 'range' tab --*/
-  entry = (GtkWidget *)
-    gtk_object_get_data (GTK_OBJECT(gg->subset_ui.window), "SS:MIN_ENTRY");
-  if (entry && vt) {
-    txt = g_strdup_printf ("%g", vt->lim_tform.min);
-    gtk_entry_set_text (GTK_ENTRY (entry), txt);
-    g_free (txt);
-  }
-
-  entry = (GtkWidget *)
-    gtk_object_get_data (GTK_OBJECT(gg->subset_ui.window), "SS:MAX_ENTRY");
-  if (entry && vt) {
-    txt = g_strdup_printf ("%g", vt->lim_tform.max);
-    gtk_entry_set_text (GTK_ENTRY (entry), txt);
-    g_free (txt);
   }
 }

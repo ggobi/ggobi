@@ -115,7 +115,6 @@ struct _datad {
 
   struct _Subset {
     gint random_n;
-    gint jvar;
     gint string_pos;
    /*-- adjustments from which to get values for blocksize, everyn --*/
     GtkAdjustment *bstart_adj, *bsize_adj;

@@ -24,7 +24,6 @@ subset_init (datad *d, ggobid *gg)
   gfloat fnr = (gfloat) d->nrows;
 
   d->subset.random_n = d->nrows;
-  d->subset.jvar = -1;
 
   d->subset.bstart_adj = (GtkAdjustment *)
     gtk_adjustment_new (1.0, 1.0, (fnr-2.0), 1.0, 5.0, 0.0);
@@ -145,24 +144,35 @@ subset_block (gint bstart, gint bsize, datad *d, ggobid *gg)
 }
 
 gboolean
-subset_range (greal min, greal max, gint j, datad *d, ggobid *gg)
+subset_range (datad *d, ggobid *gg)
 {
-  gint i;
-  gboolean subsetsize = 0;
+  gint i, j;
+  gint subsetsize = 0;
+  vartabled *vt;
+  gboolean add;
 
-  if (min <max) {
-    subset_clear (d, gg);
+  subset_clear (d, gg);
 
-    for (i=0; i<d->nrows; i++) {
-      if (d->tform.vals[i][j] >= min && d->tform.vals[i][j] <= max) {
-        add_to_subset (i, d, gg);
-        subsetsize++;
+  for (i=0; i<d->nrows; i++) {
+    add = true;
+    for (j=0; j<d->ncols; j++) {
+      vt = vartable_element_get (j, d);
+      if (vt->lim_specified_p) {
+        if (d->tform.vals[i][j] < vt->lim_specified.min ||
+            d->tform.vals[i][j] > vt->lim_specified.max)
+        {
+          add = false;
+        }
       }
+    }
+    if (add) {
+      add_to_subset (i, d, gg);
+      subsetsize++;
     }
   }
 
   if (subsetsize == 0)
-    quick_message ("The limits aren't correctly specified.", false);
+    quick_message ("Use the variable manipulation panel to set ranges.", false);
  
   return (subsetsize > 0);
 }
