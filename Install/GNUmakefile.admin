@@ -99,6 +99,11 @@ lgpl lgpl.tar.gz:
 $(TAR_FILE) tar $(PKG_NAME).tar.gz: createDist
 	(cd $(TMP_INSTALL_DIR)/.. ; $(TAR) zcvf $(CUR_DIR)/$(TAR_FILE) $(PKG_NAME))
 
+$(XML_TAR_FILE) xmlTar: createDist
+	cp $(LIBXML_TAR_FILE) $(TMP_INSTALL_DIR)/libxml.tar.gz
+	(cd $(TMP_INSTALL_DIR)/.. ; $(TAR) zcvf $(CUR_DIR)/$(XML_TAR_FILE) $(PKG_NAME))
+
+
 
 %.pdf: %.tex
 	(cd $(@D) ; TEXINPUTS=$(TEXINPUTS):$(OMEGA_HOME)/Docs:: ; export TEXINPUTS ; $(PDFLATEX) $(<F))

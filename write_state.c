@@ -9,7 +9,7 @@
 #include <math.h>
 
 
-#if USE_XML == 1
+#if XML_USE_CHILDS
 #define XML_DOC_ROOT(doc) (doc)->root
 #else
 #define XML_DOC_ROOT(doc) (doc)->children

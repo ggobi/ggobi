@@ -8,6 +8,7 @@
     with AT&T, you have an infringing copy of this software and cannot use
     it without violating AT&T's intellectual property rights.
 */
+
 #include <math.h>
 #include <string.h>
 #include <stdlib.h>
@@ -25,10 +26,6 @@
 #include "plugin.h"
 
 extern const gchar *const GlyphNames[];
-
-/*
-extern const gchar *GlyphNames[];
-*/
 
 
 void warning(const char *msg);
@@ -1273,7 +1270,7 @@ GGOBI(getDescription)(ggobid *gg)
   in the specified ggobid object.
  */
 int 
-GGOBI(datasetIndex)(const char *name,  ggobid *gg)
+GGOBI(datasetIndex)(const char *name,  const ggobid * const gg)
 {
   datad *d;
   int ctr = 0;
@@ -1400,3 +1397,26 @@ GGOBI(getVersionNumbers)()
 }
 
 
+datad *
+GGOBI(data_get)(int which, const ggobid * const gg)
+{
+   datad *data;
+
+     data = g_slist_nth_data(gg->d, which);
+
+     return(data);
+}
+
+datad *
+GGOBI(data_get_by_name)(const gchar * const name, const ggobid * const gg)
+{
+  int which;
+  datad *data = NULL;
+
+  which = GGOBI(datasetIndex)(name, gg);
+  if(which > -1) {
+     data = GGOBI(data_get)(which, gg);
+  }
+
+  return(NULL);
+}

@@ -16,6 +16,8 @@ AC_INIT(src/ggobi.c)
 # Get the version information.
 . src/VersionInfo
 
+TOP_DIR=`pwd`
+
 if test -d CVS ; then
  GGOBI_VERSION_STRING="CVS version (`date`)"
 fi
@@ -29,7 +31,9 @@ AC_ARG_ENABLE(debug, [--enable-debug Compile with debugging symbols])
 
 AC_ARG_WITH(prefix, [--with-prefix Specify where the files are to be installed (default /usr/local/).],INSTALL_DIR=${with_prefix},INSTALL_DIR="/usr/local")
 
-AC_ARG_WITH(xml, --with-xml Enable reading and writing of XML datasets.)
+AC_ARG_WITH(xml, --with-xml Enable reading and writing of XML datasets.,,with_xml="yes")
+LIBXML_VERSION="2.4.1"
+
 AC_ARG_WITH(mysql, --with-mysql Enable reading data from MySQL databases., USE_MYSQL=1)
 AC_ARG_WITH(R,--with-R Install the Rggobi package)
 AC_ARG_WITH(Python,--with-Python Install the Pythonggobi module)
@@ -40,7 +44,7 @@ AC_ARG_WITH(Perl,--with-Perl Install the Perlggobi module)
 
 AC_PATH_PROG(GTK_CONFIG, gtk-config, "<missing>", $PATH)
 
-if test "${GTK_CONFIG}" = "<missing>" ; then
+if test -z "${GTK_CONFIG}" || test "${GTK_CONFIG}" = "<missing>" ; then
  echo "Cannot find gtk-config"
  exit 1
 fi
@@ -99,28 +103,68 @@ AC_SUBST(OTHER_CFLAGS)
 AC_SUBST_FILE(c_rules_frag)
 
  dnl Start looking for the XML libraries.
-if test -n "${with_xml}" ; then
+
+if test -n "${with_xml}" && test "${with_xml}" != "no" ; then
+
+   dnl If the file libxml.tar.gz exists in this directory
+   dnl assume it is a libxml distribution that we will install
+   dnl locally
+ if test -f libxml.tar.gz && test -z "${XML_CONFIG}" ; then
+   echo "Building ggobi-specific version of libxml"
+   (gunzip -c libxml.tar.gz | tar xf -)
+   cd libxml2-${LIBXML_VERSION} 
+   echo "Configuring libxml, to be installed in ${TOP_DIR}/libxml-install"
+   ./configure --prefix=${TOP_DIR}/libxml-install
+   echo "Compiling libxml"
+   make 
+   echo "Installing libxml (locally)"
+   make install
+
+   XML_CONFIG=${TOP_DIR}/libxml-install/bin/xml2-config
+   echo "Using local xml2-config $XML_CONFIG"
+   dnl Set LOCAL_LIBXML_INSTALLATION so that we know where
+   dnl the libxml is when we install ggobi into a system
+   dnl location (rather than locally).
+   LOCAL_LIBXML_INSTALLATION="${TOP_DIR}/libxml-install"
+   cd ..
+ fi
 
  echo "with_xml: ${with_xml}"
 
- if test -z "${XML_CONFIG}" ; then
-  AC_PATH_PROG(XML_CONFIG, xml2-config)
-echo "Found xml-config version 2?"  
+dnl We can loop over the values passed to us in the value of with_xml:
+dnl  if test "${with_xml}" != "yes" ; then 
+dnl    for f in ${with_xml} ; do 
+dnl      echo $f
+dnl    done
+dnl  fi
+
+ if test -d "${with_xml}" && test -e ${with_xml}/entities.c ; then
+   echo "Using libxml distribution directory ${with_xml}"
+   if test -e "${with_xml}/xml2-config" ; then
+    XML_VERSION="2"
+   else
+    XML_VERSION="1"
+   fi
+ else 
   if test -z "${XML_CONFIG}" ; then
-    AC_PATH_PROG(XML_CONFIG, xml-config)
-    if test -n "${XML_CONFIG}" ; then
-      XML_VERSION="1"
-    fi
+   AC_PATH_PROG(XML_CONFIG, xml2-config)
+  
+   if test -z "${XML_CONFIG}" ; then
+     AC_PATH_PROG(XML_CONFIG, xml-config)
+     if test -n "${XML_CONFIG}" ; then
+       XML_VERSION="1"
+     fi
+   else
+      XML_VERSION="2"
+   fi
   else
-     XML_VERSION="2"
+    XML_VERSION=`${XML_CONFIG} --version | sed -e 's/\..*/\1/g'`
   fi
- else
-   XML_VERSION=`${XML_CONFIG} --version | sed -e 's/\..*/\1/g'`
  fi
  
  if test -n "${XML_CONFIG}" ; then
 
-echo  "Have xml-config: $XML_CONFIG"
+   echo  "Have xml-config: $XML_CONFIG"
    XML_INC_DIRS=`$XML_CONFIG --cflags`
    XML_LIB_DIRS=`$XML_CONFIG --libs`
    TMP="ok"
@@ -131,8 +175,21 @@ echo  "Have xml-config: $XML_CONFIG"
    dnl then use that as the setting for the include
    dnl and lib directory.
   if test -d ${with_xml} ; then
-    XML_INC_DIRS=${with_xml}
-    XML_LIB_DIRS="${with_xml} ${with_xml}/.libs"
+
+    # check if the user has given us the include directory rather than
+    # the top-level libxml distribution directory.
+
+   if test -e "${with_xml}/tree.h" ; then
+     with_xml=`cd ${with_xml}/.. ; pwd`
+   fi
+
+    XML_INC_DIRS="${with_xml}/include"
+    if test "${XML_VERSION}" != "1" ; then
+      XML_LINK_LIB="-lxml${XML_VERSION}"
+    else
+      XML_LINK_LIB="-lxml"
+    fi
+    XML_LIB_DIRS="-L${with_xml}/.libs ${XML_LINK_LIB} -lz"
       dnl Have to get a version that can be used in LD_LIBRARY_PATH,
       dnl i.e. with the spaces replaced by :
     XML_LIB_DIRS_PATH=`echo "${with_xml} ${with_xml}/.libs" | sed -e 's/[ \t]*/:/g'`
@@ -147,13 +204,13 @@ echo  "Have xml-config: $XML_CONFIG"
        TMP=""
        if test -f $f$ext/parser.h ; then
          TMP=$f$ext 
-         XML_INC_DIRS=${TMP}
+         XML_INC_DIRS="-I${TMP}"
        fi
 dnl      CPPFLAGS="${ORIG_CPPFLAGS} -I$f$ext"
 dnl      AC_CHECK_HEADER(parserInternals.h, XML_INC_DIRS=$f$ext)
 
       if test "${TMP}"  != "" ; then
-        echo "Found XML include file(s): $XML_INC_DIRS, $TMP"
+        echo "Found XML include file(s): $XML_INC_DIRS, ($TMP)"
         break
       fi
 
@@ -182,9 +239,21 @@ echo "XML Version := ${XML_VERSION}"
 dnl -DDIR_SEPARATOR=\"'/'\""
   fi
 
+  if test "${XML_VERSION}" = "1" ; then
+   echo "Need to check if old-style struct fields in effect (i.e. childs or children)."
+   AC_TRY_COMPILE([
+   #include <libxml/parser.h>
+   ],[
+      xmlNodePtr node;
+      node->childs == NULL;
+   ],[XML_CFLAG_DEFINES="${XML_CFLAG_DEFINES} -DXML_USE_CHILDS=1"; echo "Need to use childs!"],[echo "New style libxml!"])
+  fi
 fi
 
-if test -n "${with_R}" ; then
+
+
+
+if test -n "${with_R}" && test "${with_R}" != "no" ; then
 
   if test -d Rggobi ; then
     WITH_R=1
@@ -272,6 +341,11 @@ if test "${enable_embed}" = "yes" ; then
    EMBED="lib/libggobi.so"
 fi
 
+
+dnl At this point, we have done most of the system-specific computations
+dnl and are ready to start exporting the variables to be used in the different
+dnl compilation and executable scripts.
+
 GGOBI_ROOT=`pwd`
 AC_SUBST(GGOBI_ROOT)
 
@@ -319,7 +393,7 @@ AC_SUBST(PATCH_LEVEL)
 AC_SUBST(GTK_CONFIG)
 
 if test -n "${enable_debug}" && test "${enable_debug}" != "no" ;  then
- SRC_DEBUG=-g
+ SRC_DEBUG="-g"
 fi
 AC_SUBST(SRC_DEBUG)
 
@@ -333,12 +407,11 @@ AC_SUBST(PIC_CFLAG)
 AC_SUBST(SHLIB_LDFLAGS)
 AC_SUBST(LO_DIR)
 
-
 AC_SUBST(OS_INFO)
 AC_SUBST(GGOBI_VERSION_STRING)
 AC_SUBST(GGOBI_RELEASE_DATE)
 
-dnl These go into config.h as #define entries.
+ dnl These go into config.h as #define entries.
 AC_DEFINE_UNQUOTED(GGOBI_VERSION_STRING, "$GGOBI_VERSION_STRING")
 AC_DEFINE_UNQUOTED(GGOBI_RELEASE_DATE, "$GGOBI_RELEASE_DATE")
 AC_DEFINE_UNQUOTED(MAJOR_VERSION, $MAJOR_VERSION)
@@ -347,7 +420,10 @@ AC_DEFINE_UNQUOTED(PATCH_LEVEL, $PATCH_LEVEL)
 
 AC_CONFIG_HEADER(src/config.h)
 
+ dnl Process the different .in files, substituting the values computed here in the configuration
+ dnl script for the corresponding @variable@ in these files.
 AC_OUTPUT(Makeconf GNUmakefile src/GNUmakefile gtkext/src/GNUmakefile bin/setLD.csh  bin/setLD.bsh bin/ggobi bin/ggobi-config bugTemplate)
 
+dnl Ensure the resulting ggobi scripts executable.
 chmod +x bin/ggobi
 chmod +x bin/ggobi-config

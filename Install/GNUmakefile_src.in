@@ -30,9 +30,6 @@ SRC=\
     fileio.c \
     ggobi-API.c \
     ggobi.c \
-    gtkexthruler.c \
-    gtkextruler.c \
-    gtkextvruler.c \
     identify.c \
     identify_ui.c \
     impute.c \
@@ -119,7 +116,7 @@ SRC=\
 #    cokus.c \
 
 ifdef USE_XML
-# XML_INC_DIRS=$(foreach el,@XML_INC_DIRS@, -I$(el))
+ XML_INC_DIRS=$(foreach el,@XML_INC_DIRS@, $(el))
  XML_LIBS=$(foreach el,@XML_LIB_DIRS@, $(el))
 # -lxml2
 endif
@@ -142,7 +139,7 @@ lib libggobi.so $(TOP)/lib/libggobi.so: $(OBJ:%.o=%.lo)
 
 
 ../bin/xmlConvert xmlConvert: xmlConvert.o libggobi.so
-	$(CC) -o $@ xmlConvert.o -L$(TOP)/lib  -L. -lggobi -lgtkext
+	$(CC) -o $@ xmlConvert.o -L$(TOP)/lib  -L. -lggobi -lgtkext $(XML_LIBS)
 
 
 clean:

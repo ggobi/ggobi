@@ -7,7 +7,7 @@
 #include "fileio.h"
 
 
-#if USE_XML == 1
+#ifdef XML_USE_CHILDS
 # define XML_CHILDREN(node) (node)->childs
 #else
 # define XML_CHILDREN(node) (node)->children
