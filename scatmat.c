@@ -83,7 +83,8 @@ scatmat_display_menus_make (displayd *display, GtkAccelGroup *accel_group,
 
 
 displayd *
-scatmat_new (gboolean missing_p, splotd **sub_plots, int numRows, int numCols, ggobid *gg) 
+scatmat_new (gboolean missing_p, splotd **sub_plots, int numRows, int numCols,
+ggobid *gg) 
 {
   GtkWidget *vbox, *frame;
   GtkWidget *mbar;
@@ -94,8 +95,8 @@ scatmat_new (gboolean missing_p, splotd **sub_plots, int numRows, int numCols, g
   splotd *sp;
   displayd *display;
 
-  if(sub_plots == NULL) {
-    display = display_alloc_init(scatmat, missing_p, gg);
+  if (sub_plots == NULL) {
+    display = display_alloc_init (scatmat, missing_p, gg);
     /* What about the p1d_orientation here? */
     scatmat_nrows = scatmat_ncols = MIN (gg->ncols, MAXNVARS);
   } else { 
@@ -104,9 +105,13 @@ scatmat_new (gboolean missing_p, splotd **sub_plots, int numRows, int numCols, g
     display = (displayd*) sub_plots[0]->displayptr;
   }
 
+  /*-- testing; dfs --*/
+  display->p1d_orientation = HORIZONTAL;
+  /* */
+
   scatmat_cpanel_init (&display->cpanel);
 
-  display_window_init(display, 5, gg);
+  display_window_init (display, 5, gg);
 
 /*
  * Add the main menu bar

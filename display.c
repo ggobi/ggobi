@@ -133,17 +133,16 @@ display_delete_cb (GtkWidget *w, GdkEvent *event, displayd *display)
 void
 display_new (ggobid *gg, guint action, GtkWidget *widget)
 {
- 
- display_create(action, gg);
+ display_create (action, gg);
 }
 
 displayd *
-display_create(guint action, ggobid *gg)
+display_create (guint action, ggobid *gg)
 {
   displayd *display;
 
   if (gg->nrows == 0)  /*-- if used before we have data --*/
-    return(NULL);
+    return (NULL);
 
   /*
    * Turn off event handlers, remove submenus, and redraw the

@@ -26,6 +26,9 @@ scatmat_cpanel_init (cpaneld* cpanel) {
   cpanel->mode = SCATMAT;
   cpanel->projection = XYPLOT;  /*-- does it need a projection? --*/
 
+  /*-- testing; dfs --*/
+  cpanel->parcoords_selection_mode = VAR_REPLACE;
+
   /*-- 1d plots --*/
   cpanel->p1d_type = ASH;
   cpanel_p1d_init (cpanel);

@@ -1,13 +1,5 @@
 Bugs: 
 
-  the axes aren't being initialized properly for cloned variables.
-  reading from stdin in stopped working
-  scatterplot matrix:  ASH is vertical instead of horizontal
-                       replacement mode isn't working
-                       maybe its cpanel isn't initialized correctly?
-  the brush isn't redrawing when a new color is selected
-  closing the 'choose symbol' window dumps core
-
 various stuff not yet implemented: 
   1d, xy cycling
   window closings
@@ -87,3 +79,7 @@ Rotation
 
 ! Erase/hiding/exclusion  (done; could use a redo button)
 !   fix up for api
+
+! closing the 'choose symbol' window dumps core
+! the brush isn't redrawing when a new color is selected
+! the axes aren't being initialized properly for cloned variables.

@@ -135,7 +135,6 @@ parse_command_line (gint *argc, gchar **av, ggobid *gg)
   (*argc)--;
   av++;
 
-
 /*
  * Test the values
 */
