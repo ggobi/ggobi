@@ -15,7 +15,7 @@
  Jittering:  d->jitdata is added directly to world data, so the
    appropriate values of jitdata should be divided by PRECISION1
    and then added to tform where we're using that; where we're using
-   planar, they can be added directly.
+   planar, we're ok, because planar already includes jittering.
  Shift and scale:  see splot_plane_to_screen in splot.c
    Take care of shifting by describing only those points that
      are within the viewing area.
@@ -272,7 +272,11 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
       fprintf (fp, "%g,", d->tform.vals[i][sp->p1dvar]);
     } else if (projection == XYPLOT) {
       fprintf (fp, "%g,", d->tform.vals[i][sp->xyvars.x]);
-    } else {
+      /*  Is this how to add jittering to tform?
+      fprintf (fp, "%g,", d->tform.vals[i][sp->xyvars.x] +
+	       d->jitdata.vals[i][sp->xyvars.x] / precis);
+      */
+    } else {  /* planar already includes jitdata! */
       fprintf (fp, "%g,", sp->planar[i].x);
     }
   }
@@ -475,6 +479,35 @@ describe_scatmat_display (FILE *fp, ggobid *gg, displayd *display,
   CLOSE_LIST(fp);  /* plots */
 }
 
+
+void
+describe_parcoords_display (FILE *fp, ggobid *gg, displayd *display, 
+		      dspdescd *desc)
+{
+  GList *l;
+  splotd *sp;
+  gint ncols;
+
+  ncols = g_list_length (display->splots);
+
+  OPEN_NAMED_LIST(fp, "plots");
+  fprintf (fp, "count = %d", ncols);
+  ADD_COMMA(fp);
+
+  /* We seem to be working through the plots row-wise, but I don't
+  think that's something we can count on.  I hope we can make use of
+  the axis labels to figure out which plot belongs where.  Otherwise,
+  I'll have to add a position indicator to each plot. */
+
+  for (l = display->splots; l; l = l->next) {
+    sp = (splotd *) l->data;
+    describe_scatterplot_plot (fp, gg, display, sp, desc);
+    ADD_COMMA(fp);
+  }
+
+  CLOSE_LIST(fp);  /* plots */
+}
+
 void
 desc_setup (dspdescd *desc)
 {
@@ -531,10 +564,11 @@ desc_write_cb (GtkWidget *btn, PluginInstance *inst)
     /* ncols: display is symmetric */
     fprintf (fp, "ncols = %d,", g_list_length (display->scatmat_cols));
     describe_scatmat_display (fp, gg, display, desc);
-  /*
   } else if (GTK_IS_GGOBI_PARCOORDS_DISPLAY(display)) {
-    xmlSetProp (display_node, "type", "parcoords");
-    describe_parcoords_display (gg, display, desc, display_node);
+    fprintf (fp, "type='parcoords',");
+    fprintf (fp, "ncols = %d,", g_list_length (display->splots));
+    describe_parcoords_display (fp, gg, display, desc);
+  /*
   } else if (GTK_IS_GGOBI_TIME_SERIES_DISPLAY(display)) {
     xmlSetProp (display_node, "type", "timeseries");
     describe_time_series_display (gg, display, desc, display_node);
