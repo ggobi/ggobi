@@ -1,0 +1,1061 @@
+<?xml version="1.0"?>
+<!DOCTYPE ggobidata SYSTEM "ggobi.dtd">
+
+<ggobidata count="2">
+<data name="People">
+<description>
+</description>
+<variables count="2">
+<variable>A</variable>
+<variable>B</variable>
+</variables>
+<records count="140" glyph="fr 1" color="0">
+<record id="0" label="Abraham" >
+1.000 1.000
+</record>
+<record id="2" label="Abigail" >
+2.000 0.000
+</record>
+<record id="21" label="Alex">
+1.000 0.000
+</record>
+<record id="33" label="Amanda">
+0.000 0.000
+</record>
+<record id="45" label="Anthony">
+0.000 0.000
+</record>
+<record id="48" label="Banquo">
+1.000 0.000
+</record>
+<record id="49" label="Beatrice">
+1.000 0.000
+</record>
+<record id="60" label="Billie">
+0.000 0.000
+</record>
+<record id="66" label="Brad">
+1.000 0.000
+</record>
+<record id="76" label="Brian">
+0.000 0.000
+</record>
+<record id="88" label="Caitlin">
+0.000 0.000
+</record>
+<record id="116" label="Caliban">
+1.000 0.000
+</record>
+<record id="119" label="Cameron">
+1.000 0.000
+</record>
+<record id="127" label="Charity">
+0.000 0.000
+</record>
+<record id="130" label="Clarice">
+0.000 0.000
+</record>
+<record id="134" label="Daniel">
+1.000 0.000
+</record>
+<record id="141" label="Demetrius">
+1.000 0.000
+</record>
+<record id="166" label="Desdemona">
+2.000 0.000
+</record>
+<record id="171" label="Devon">
+2.000 0.000
+</record>
+<record id="174" label="Dwight">
+2.000 0.000
+</record>
+<record id="186" label="Dogberry">
+1.000 0.000
+</record>
+<record id="209" label="Eduardo">
+0.000 0.000
+</record>
+<record id="211" label="Elena">
+2.000 0.000
+</record>
+<record id="213" label="Emma">
+0.000 0.000
+</record>
+<record id="221" label="Erica">
+1.000 0.000
+</record>
+<record id="222" label="Eugene">
+1.000 0.000
+</record>
+<record id="224" label="Festus">
+1.000 0.000
+</record>
+<record id="235" label="Finian">
+1.000 0.000
+</record>
+<record id="247" label="Flo">
+1.000 0.000
+</record>
+<record id="279" label="Francois">
+1.000 0.000
+</record>
+<record id="314" label="Frida">
+2.000 0.000
+</record>
+<record id="320" label="Gabriel">
+2.000 0.000
+</record>
+<record id="331" label="Giovanni">
+1.000 0.000
+</record>
+<record id="352" label="Graham">
+2.000 0.000
+</record>
+<record id="362" label="Gwen">
+0.000 0.000
+</record>
+<record id="373" label="Guido">
+0.000 0.000
+</record>
+<record id="386" label="Hannah">
+0.000 0.000
+</record>
+<record id="387" label="Henry">
+1.000 0.000
+</record>
+<record id="390" label="Holden">
+1.000 0.000
+</record>
+<record id="403" label="Horatio">
+1.000 0.000
+</record>
+<record id="407" label="Hunter">
+1.000 0.000
+</record>
+<record id="418" label="Iago">
+0.000 0.000
+</record>
+<record id="435" label="Imogene">
+2.000 0.000
+</record>
+<record id="472" label="Ivy">
+2.000 0.000
+</record>
+<record id="473" label="Jacqueline">
+2.000 0.000
+</record>
+<record id="474" label="Jared">
+2.000 0.000
+</record>
+<record id="476" label="Jasmine">
+2.000 0.000
+</record>
+<record id="481" label="Jean-Luc">
+2.000 0.000
+</record>
+<record id="484" label="Jenna">
+0.000 0.000
+</record>
+<record id="495" label="Jesus">
+0.000 0.000
+</record>
+<record id="496" label="Josef">
+0.000 0.000
+</record>
+<record id="522" label="Jude">
+0.000 0.000
+</record>
+<record id="553" label="Julia">
+1.000 0.000
+</record>
+<record id="572" label="Justin">
+0.000 0.000
+</record>
+<record id="596" label="Katherine">
+1.000 0.000
+</record>
+<record id="600" label="Kelly">
+0.000 0.000
+</record>
+<record id="601" label="Kevin">
+1.000 0.000
+</record>
+<record id="605" label="Kirk">
+1.000 0.000
+</record>
+<record id="607" label="Kyle">
+0.000 0.000
+</record>
+<record id="608" label="Kazuko">
+0.000 0.000
+</record>
+<record id="609" label="Kelsey">
+0.000 0.000
+</record>
+<record id="610" label="Kenneth">
+0.000 0.000
+</record>
+<record id="636" label="Kevin">
+0.000 0.000
+</record>
+<record id="652" label="Kitty">
+0.000 0.000
+</record>
+<record id="682" label="Laertes">
+1.000 0.000
+</record>
+<record id="716" label="Lancelot">
+0.000 0.000
+</record>
+<record id="717" label="Laurel">
+1.000 0.000
+</record>
+<record id="723" label="Leigh">
+1.000 0.000
+</record>
+<record id="727" label="Lennox">
+0.000 0.000
+</record>
+<record id="733" label="Liza">
+1.000 0.000
+</record>
+<record id="734" label="Mack">
+1.000 0.000
+</record>
+<record id="738" label="Malvolio">
+0.000 0.000
+</record>
+<record id="752" label="Malcolm">
+1.000 0.000
+</record>
+<record id="765" label="Marcus">
+0.000 0.000
+</record>
+<record id="767" label="Maria">
+2.000 0.000
+</record>
+<record id="769" label="Nancy">
+0.000 0.000
+</record>
+<record id="780" label="Nandini">
+1.000 0.000
+</record>
+<record id="783" label="Nate">
+0.000 0.000
+</record>
+<record id="791" label="Norman">
+2.000 0.000
+</record>
+<record id="800" label="Nikki">
+1.000 0.000
+</record>
+<record id="803" label="Oberon">
+1.000 0.000
+</record>
+<record id="825" label="Olivia">
+0.000 0.000
+</record>
+<record id="868" label="Opal">
+1.000 0.000
+</record>
+<record id="871" label="Orlando">
+1.000 0.000
+</record>
+<record id="881" label="Oswald">
+1.000 0.000
+</record>
+<record id="897" label="Padma">
+0.000 0.000
+</record>
+<record id="900" label="Paige">
+0.000 0.000
+</record>
+<record id="902" label="Paris">
+2.000 0.000
+</record>
+<record id="912" label="Patrick">
+2.000 0.000
+</record>
+<record id="914" label="Pearl">
+1.000 0.000
+</record>
+<record id="915" label="Prospero">
+1.000 0.000
+</record>
+<record id="919" label="Pierre">
+0.000 0.000
+</record>
+<record id="928" label="Philip">
+1.000 0.000
+</record>
+<record id="932" label="Quentin">
+2.000 0.000
+</record>
+<record id="933" label="Rachel">
+1.000 0.000
+</record>
+<record id="936" label="Reginald">
+2.000 0.000
+</record>
+<record id="948" label="Reuben">
+0.000 0.000
+</record>
+<record id="949" label="Rex">
+0.000 0.000
+</record>
+<record id="957" label="Richard">
+1.000 0.000
+</record>
+<record id="958" label="Rocco">
+1.000 0.000
+</record>
+<record id="991" label="Samuel">
+2.000 0.000
+</record>
+<record id="994" label="Seton">
+2.000 0.000
+</record>
+<record id="995" label="Shane">
+0.000 0.000
+</record>
+<record id="1002" label="Sierra">
+2.000 0.000
+</record>
+<record id="1003" label="Silvius">
+0.000 0.000
+</record>
+<record id="1004" label="Timon">
+1.000 0.000
+</record>
+<record id="1007" label="Tiffany">
+0.000 0.000
+</record>
+<record id="1008" label="Toby">
+0.000 0.000
+</record>
+<record id="1018" label="Trevor">
+2.000 0.000
+</record>
+<record id="1019" label="Trixie">
+2.000 0.000
+</record>
+<record id="1021" label="Ursula">
+0.000 0.000
+</record>
+<record id="1047" label="Vanessa">
+1.000 0.000
+</record>
+<record id="1074" label="Victoria">
+2.000 0.000
+</record>
+<record id="1081" label="Vivian">
+0.000 0.000
+</record>
+<record id="1082" label="Vincent">
+0.000 0.000
+</record>
+<record id="1089" label="Walter">
+0.000 0.000
+</record>
+<record id="1097" label="Warren">
+2.000 0.000
+</record>
+<record id="1101" label="Willis">
+1.000 0.000
+</record>
+<record id="1108" label="Xavier">
+0.000 0.000
+</record>
+<record id="1135" label="Yvette">
+2.000 0.000
+</record>
+<record id="1139" label="Zachary">
+2.000 0.000
+</record>
+<record id="1140" label="Zander">
+2.000 0.000
+</record>
+<record id="1144" label="Zane">
+0.000 0.000
+</record>
+<record id="1155" label="Sven">
+1.000 0.000
+</record>
+<record id="1162" label="Susan">
+0.000 0.000
+</record>
+<record id="1164" label="Seth">
+1.000 1.000
+</record>
+<record id="1185" label="Sybil">
+0.000 0.000
+</record>
+<record id="1206" label="Sydney">
+1.000 0.000
+</record>
+<record id="1211" label="Teresa">
+1.000 0.000
+</record>
+<record id="1238" label="Thurio">
+1.000 0.000
+</record>
+<record id="1243" label="Tiffany">
+0.000 0.000
+</record>
+<record id="1249" label="Justin">
+0.000 0.000
+</record>
+<record id="1250" label="Juno">
+0.000 0.000
+</record>
+<record id="1264" label="Leopold">
+2.000 0.000
+</record>
+<record id="1289" label="Mamie">
+2.000 0.000
+</record>
+<record id="1314" label="Carol">
+1.000 0.000
+</record>
+<record id="1317" label="Jasper">
+0.000 0.000
+</record>
+<record id="1328" label="Gordon">
+0.000 1.000
+</record>
+<record id="1337" label="Douglas">
+0.000 0.000
+</record>
+<record id="1338" label="Stephen">
+1.000 0.000
+</record>
+</records>
+</data>
+<data name="Contacts">
+<description>
+</description>
+<variables count="2">
+<variable>weight</variable>
+<variable>center triangle</variable>
+</variables>
+<records
+ count="205" glyph="fr 1" color="0">
+<record source="33" destination="716" >
+673.600 0.000
+</record>
+<record source="45" destination="803" >
+0.900 0.000
+</record>
+<record source="48" destination="116" >
+10.100 1.000
+</record>
+<record source="48" destination="247" >
+33.900 0.000
+</record>
+<record source="48" destination="352" >
+8.100 0.000
+</record>
+<record source="48" destination="472" >
+0.300 0.000
+</record>
+<record source="48" destination="473" >
+2.000 0.000
+</record>
+<record source="48" destination="474" >
+2.600 0.000
+</record>
+<record source="48" destination="522" >
+13.400 0.000
+</record>
+<record source="48" destination="1018" >
+1.600 0.000
+</record>
+<record source="48" destination="1139" >
+9.600 0.000
+</record>
+<record source="49" destination="221" >
+9.900 0.000
+</record>
+<record source="49" destination="279" >
+7.900 0.000
+</record>
+<record source="49" destination="995" >
+0.400 0.000
+</record>
+<record source="49" destination="1097" >
+1.000 0.000
+</record>
+<record source="49" destination="0" >
+51.000 0.000
+</record>
+<record source="49" destination="1264" >
+1.400 0.000
+</record>
+<record source="60" destination="803" >
+30.400 0.000
+</record>
+<record source="66" destination="803" >
+58.100 0.000
+</record>
+<record source="76" destination="914" >
+0.500 0.000
+</record>
+<record source="88" destination="33" >
+1651.300 0.000
+</record>
+<record source="88" destination="127" >
+1.400 0.000
+</record>
+<record source="88" destination="484" >
+3700.200 0.000
+</record>
+<record source="88" destination="572" >
+2305.000 0.000
+</record>
+<record source="88" destination="636" >
+2410.800 0.000
+</record>
+<record source="88" destination="716" >
+2987.900 0.000
+</record>
+<record source="88" destination="825" >
+1567.000 0.000
+</record>
+<record source="88" destination="900" >
+2879.400 0.000
+</record>
+<record source="88" destination="928" >
+6.700 0.000
+</record>
+<record source="88" destination="994" >
+91.500 0.000
+</record>
+<record source="88" destination="1007" >
+20122.199 0.000
+</record>
+<record source="88" destination="1008" >
+2808.800 0.000
+</record>
+<record source="88" destination="1089" >
+3899.700 0.000
+</record>
+<record source="88" destination="1101" >
+11.000 0.000
+</record>
+<record source="88" destination="1144" >
+344.000 0.000
+</record>
+<record source="88" destination="0" >
+62.400 0.000
+</record>
+<record source="88" destination="1238" >
+36.400 0.000
+</record>
+<record source="116" destination="2" >
+5.900 0.000
+</record>
+<record source="116" destination="1019" >
+6.100 0.000
+</record>
+<record source="127" destination="88" >
+72.300 0.000
+</record>
+<record source="130" destination="803" >
+1.100 0.000
+</record>
+<record source="134" destination="601" >
+0.200 0.000
+</record>
+<record source="141" destination="601" >
+118.800 0.000
+</record>
+<record source="209" destination="390" >
+10.200 0.000
+</record>
+<record source="213" destination="780" >
+8.300 0.000
+</record>
+<record source="221" destination="49" >
+1.000 0.000
+</record>
+<record source="221" destination="279" >
+9.400 0.000
+</record>
+<record source="222" destination="224" >
+186.200 0.000
+</record>
+<record source="235" destination="596" >
+21.000 0.000
+</record>
+<record source="279" destination="221" >
+10.000 0.000
+</record>
+<record source="331" destination="48" >
+0.600 0.000
+</record>
+<record source="362" destination="936" >
+28.700 0.000
+</record>
+<record source="373" destination="390" >
+2.900 0.000
+</record>
+<record source="386" destination="791" >
+0.100 0.000
+</record>
+<record source="390" destination="211" >
+13.900 0.000
+</record>
+<record source="390" destination="481" >
+5.800 0.000
+</record>
+<record source="390" destination="1002" >
+0.300 0.000
+</record>
+<record source="407" destination="780" >
+2.000 0.000
+</record>
+<record source="418" destination="596" >
+22.400 0.000
+</record>
+<record source="435" destination="914" >
+24.300 0.000
+</record>
+<record source="484" destination="88" >
+116.600 0.000
+</record>
+<record source="484" destination="572" >
+452.700 0.000
+</record>
+<record source="484" destination="825" >
+407.600 0.000
+</record>
+<record source="484" destination="994" >
+240.000 0.000
+</record>
+<record source="484" destination="1144" >
+129.800 0.000
+</record>
+<record source="495" destination="780" >
+0.900 0.000
+</record>
+<record source="496" destination="914" >
+0.300 0.000
+</record>
+<record source="572" destination="484" >
+323.900 0.000
+</record>
+<record source="572" destination="825" >
+730.200 0.000
+</record>
+<record source="572" destination="1089" >
+237.400 0.000
+</record>
+<record source="596" destination="222" >
+96.100 0.000
+</record>
+<record source="596" destination="224" >
+212.700 0.000
+</record>
+<record source="596" destination="235" >
+16.800 0.000
+</record>
+<record source="596" destination="723" >
+19.500 0.000
+</record>
+<record source="596" destination="991" >
+23.600 0.000
+</record>
+<record source="596" destination="1003" >
+39.400 0.000
+</record>
+<record source="596" destination="1004" >
+111.400 0.000
+</record>
+<record source="596" destination="0" >
+1.600 1.000
+</record>
+<record source="596" destination="1337" >
+17.600 0.000
+</record>
+<record source="596" destination="1338" >
+92.900 0.000
+</record>
+<record source="636" destination="484" >
+1007.700 0.000
+</record>
+<record source="636" destination="825" >
+349.100 0.000
+</record>
+<record source="636" destination="994" >
+12.700 0.000
+</record>
+<record source="636" destination="1144" >
+227.200 0.000
+</record>
+<record source="652" destination="803" >
+47.000 0.000
+</record>
+<record source="716" destination="33" >
+884.100 0.000
+</record>
+<record source="717" destination="596" >
+202.000 0.000
+</record>
+<record source="727" destination="224" >
+23.800 0.000
+</record>
+<record source="727" destination="596" >
+58.300 0.000
+</record>
+<record source="727" destination="610" >
+0.600 0.000
+</record>
+<record source="733" destination="596" >
+34.800 0.000
+</record>
+<record source="734" destination="596" >
+32.600 0.000
+</record>
+<record source="734" destination="1162" >
+118.500 0.000
+</record>
+<record source="738" destination="803" >
+3.800 0.000
+</record>
+<record source="752" destination="553" >
+395.500 0.000
+</record>
+<record source="752" destination="914" >
+0.100 0.000
+</record>
+<record source="769" destination="390" >
+3.000 0.000
+</record>
+<record source="780" destination="166" >
+0.400 0.000
+</record>
+<record source="780" destination="314" >
+3.200 0.000
+</record>
+<record source="780" destination="476" >
+11.000 0.000
+</record>
+<record source="780" destination="767" >
+0.900 0.000
+</record>
+<record source="780" destination="902" >
+0.500 0.000
+</record>
+<record source="780" destination="1074" >
+0.800 0.000
+</record>
+<record source="780" destination="1135" >
+10.700 0.000
+</record>
+<record source="780" destination="1140" >
+0.200 0.000
+</record>
+<record source="780" destination="1289" >
+22.500 0.000
+</record>
+<record source="783" destination="601" >
+15.500 0.000
+</record>
+<record source="791" destination="186" >
+8.600 0.000
+</record>
+<record source="791" destination="387" >
+28.000 0.000
+</record>
+<record source="791" destination="390" >
+14.600 1.000
+</record>
+<record source="791" destination="607" >
+2.300 0.000
+</record>
+<record source="791" destination="608" >
+4.800 0.000
+</record>
+<record source="791" destination="609" >
+22.700 0.000
+</record>
+<record source="791" destination="610" >
+12.600 0.000
+</record>
+<record source="791" destination="1155" >
+5.900 0.000
+</record>
+<record source="791" destination="0" >
+241.300 1.000
+</record>
+<record source="800" destination="320" >
+0.800 0.000
+</record>
+<record source="803" destination="116" >
+63.800 1.000
+</record>
+<record source="803" destination="403" >
+22.700 0.000
+</record>
+<record source="803" destination="596" >
+13.500 1.000
+</record>
+<record source="803" destination="600" >
+24.400 0.000
+</record>
+<record source="803" destination="601" >
+96.500 1.000
+</record>
+<record source="803" destination="605" >
+28.300 0.000
+</record>
+<record source="803" destination="1135" >
+8.400 0.000
+</record>
+<record source="803" destination="0" >
+54.700 1.000
+</record>
+<record source="803" destination="1328" >
+81.000 0.000
+</record>
+<record source="825" destination="33" >
+216.500 0.000
+</record>
+<record source="825" destination="116" >
+12.100 0.000
+</record>
+<record source="825" destination="716" >
+311.000 0.000
+</record>
+<record source="825" destination="1089" >
+248.200 0.000
+</record>
+<record source="868" destination="601" >
+2.700 0.000
+</record>
+<record source="871" destination="601" >
+178.000 0.000
+</record>
+<record source="881" destination="596" >
+80.000 0.000
+</record>
+<record source="897" destination="936" >
+2.700 0.000
+</record>
+<record source="900" destination="572" >
+261.200 0.000
+</record>
+<record source="900" destination="825" >
+191.800 0.000
+</record>
+<record source="900" destination="1007" >
+4837.900 0.000
+</record>
+<record source="900" destination="1008" >
+2229.300 0.000
+</record>
+<record source="900" destination="1089" >
+314.000 0.000
+</record>
+<record source="914" destination="21" >
+9.500 0.000
+</record>
+<record source="914" destination="435" >
+0.800 0.000
+</record>
+<record source="914" destination="553" >
+48.200 0.000
+</record>
+<record source="914" destination="752" >
+8.200 0.000
+</record>
+<record source="914" destination="765" >
+13.000 0.000
+</record>
+<record source="914" destination="912" >
+30.100 0.000
+</record>
+<record source="914" destination="932" >
+8.000 0.000
+</record>
+<record source="914" destination="957" >
+61.000 0.000
+</record>
+<record source="914" destination="1164" >
+59.300 0.000
+</record>
+<record source="914" destination="0" >
+106.000 0.000
+</record>
+<record source="915" destination="119" >
+0.800 0.000
+</record>
+<record source="915" destination="435" >
+18.600 0.000
+</record>
+<record source="915" destination="682" >
+0.500 0.000
+</record>
+<record source="915" destination="752" >
+48.200 0.000
+</record>
+<record source="915" destination="957" >
+2.000 0.000
+</record>
+<record source="915" destination="958" >
+69.400 0.000
+</record>
+<record source="915" destination="1164" >
+5.300 0.000
+</record>
+<record source="915" destination="0" >
+0.200 0.000
+</record>
+<record source="919" destination="915" >
+0.300 0.000
+</record>
+<record source="919" destination="936" >
+0.200 0.000
+</record>
+<record source="928" destination="88" >
+51.000 0.000
+</record>
+<record source="933" destination="88" >
+174.300 0.000
+</record>
+<record source="936" destination="171" >
+0.600 0.000
+</record>
+<record source="936" destination="174" >
+1.900 0.000
+</record>
+<record source="948" destination="936" >
+24.100 0.000
+</record>
+<record source="949" destination="936" >
+2.400 0.000
+</record>
+<record source="994" destination="88" >
+46.600 0.000
+</record>
+<record source="994" destination="994" >
+34.000 0.000
+</record>
+<record source="1004" destination="224" >
+28.800 0.000
+</record>
+<record source="1004" destination="596" >
+28.900 0.000
+</record>
+<record source="1021" destination="936" >
+3.900 0.000
+</record>
+<record source="1047" destination="800" >
+19.300 0.000
+</record>
+<record source="1081" destination="390" >
+1.000 0.000
+</record>
+<record source="1082" destination="390" >
+3.000 0.000
+</record>
+<record source="1089" destination="572" >
+225.500 0.000
+</record>
+<record source="1101" destination="88" >
+73.400 0.000
+</record>
+<record source="1108" destination="116" >
+38.900 0.000
+</record>
+<record source="1108" destination="791" >
+40.000 0.000
+</record>
+<record source="1108" destination="1108" >
+171.700 0.000
+</record>
+<record source="1108" destination="1338" >
+145.300 0.000
+</record>
+<record source="1144" destination="88" >
+213.700 0.000
+</record>
+<record source="1144" destination="636" >
+266.800 0.000
+</record>
+<record source="1162" destination="596" >
+16.500 0.000
+</record>
+<record source="1162" destination="733" >
+1.600 0.000
+</record>
+<record source="1162" destination="734" >
+20.400 0.000
+</record>
+<record source="0" destination="48" >
+102.800 1.000
+</record>
+<record source="0" destination="116" >
+212.800 1.000
+</record>
+<record source="0" destination="390" >
+78.000 1.000
+</record>
+<record source="0" destination="601" >
+122.400 1.000
+</record>
+<record source="0" destination="780" >
+86.300 0.000
+</record>
+<record source="0" destination="791" >
+32.900 0.000
+</record>
+<record source="0" destination="800" >
+78.800 0.000
+</record>
+<record source="0" destination="914" >
+122.200 0.000
+</record>
+<record source="0" destination="936" >
+154.500 0.000
+</record>
+<record source="1185" destination="791" >
+11.700 0.000
+</record>
+<record source="1206" destination="780" >
+19.400 0.000
+</record>
+<record source="1211" destination="791" >
+0.400 0.000
+</record>
+<record source="1238" destination="88" >
+91.200 0.000
+</record>
+<record source="1243" destination="88" >
+96.400 0.000
+</record>
+<record source="1249" destination="800" >
+12.600 0.000
+</record>
+<record source="1250" destination="390" >
+22.000 0.000
+</record>
+<record source="1314" destination="390" >
+4.000 0.000
+</record>
+<record source="1317" destination="914" >
+2.800 0.000
+</record>
+<record source="1317" destination="933" >
+2.000 0.000
+</record>
+<record source="1317" destination="936" >
+2.400 0.000
+</record>
+<record source="1317" destination="958" >
+0.800 0.000
+</record>
+</records>
+</data>
+</ggobidata>
