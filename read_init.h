@@ -56,9 +56,7 @@ typedef struct _GGobiInitInfo {
 } GGobiInitInfo;
 
 GGobiInitInfo *read_init_file(const gchar *filename, GGobiInitInfo *info);
-#ifdef USE_XML
 xmlNode *getXMLDocElement(const xmlDocPtr doc, const gchar *tagName);
 xmlNode *getXMLElement(const xmlNodePtr doc, const gchar *tagName);
-#endif
 
 #endif /* end of GGOBI_READ_INIT_H */

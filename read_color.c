@@ -14,9 +14,7 @@
 #include "read_xml.h"
 
 /*
-#if USE_XML == 1
 extern int xmlDoValidityCheckingDefaultValue;
-#endif
 */
 
 colorschemed *process_colorscheme(xmlNodePtr root, xmlDocPtr doc);
@@ -44,7 +42,7 @@ read_colorscheme(gchar *fileName, GList **list)
   if(doc == NULL)
       return(NULL);
 
-   /* If this is a colormaps archive, then process each one individually. */
+   /* If this is a colorschemes archive, then process each one individually. */
 
   node = xmlDocGetRootElement(doc);
   if(strcmp((char *)node->name, "colormap") == 0) {
@@ -206,24 +204,24 @@ gint
 getForegroundColor(gint index, xmlNodePtr node, xmlDocPtr doc,
   colorschemed *scheme)
 {
-    gint value;
-    gchar *name;
-    xmlChar* ptr;
-    value = getColor(node, doc, &(scheme->data[index]), &scheme->rgb[index]);
+  gint value;
+  gchar *name;
+  xmlChar* ptr;
+  value = getColor(node, doc, &(scheme->data[index]), &scheme->rgb[index]);
 
-    ptr =  xmlGetProp(node, (xmlChar *) "name");
-    {
-      gchar *tmp;
-      tmp = name = (gchar *) g_malloc(sizeof(gchar) * (strlen(ptr) + 1));
-      while(ptr[0]) {
-	  *tmp++ = *ptr++;
-      }
-      tmp[0] = '\0';
+  ptr =  xmlGetProp(node, (xmlChar *) "name");
+  {
+    gchar *tmp;
+    tmp = name = (gchar *) g_malloc(sizeof(gchar) * (strlen(ptr) + 1));
+    while(ptr[0]) {
+    *tmp++ = *ptr++;
     }
+    tmp[0] = '\0';
+  }
 
-    g_array_append_val(scheme->colorNames, name);
+  g_array_append_val(scheme->colorNames, name);
 
-    return(value);
+  return(value);
 }
 
 gint

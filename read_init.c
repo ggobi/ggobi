@@ -4,11 +4,6 @@
 #include "read_init.h"
 #include "read_xml.h" /* for asNumber() */
 
-#if USE_XML == 1
-extern int xmlDoValidityCheckingDefaultValue;
-#endif
-
-
 #ifdef USE_GNOME_XML
 #include <gnome-xml/parser.h>
 #include <gnome-xml/tree.h>
@@ -29,7 +24,7 @@ extern int xmlDoValidityCheckingDefaultValue;
 
 #include "externs.h"
 
-gint getPreviousFiles(const xmlDocPtr doc, GGobiInitInfo *info);
+gint     getPreviousFiles(const xmlDocPtr doc, GGobiInitInfo *info);
 DataMode getPreviousInput(xmlNode *node, InputDescription *input);
 DataMode getInputType(xmlNode *node);
 
@@ -59,7 +54,6 @@ GSList *getPluginDependencies(xmlNodePtr node, GGobiPluginDetails *info, xmlDocP
 
 
 gint getPreviousGGobiDisplays(const xmlDocPtr doc, GGobiInitInfo *info);
-gint getPreviousDisplays(xmlNodePtr node, GGobiDescription *desc);
 GGobiDisplayDescription* getDisplayDescription(xmlNodePtr node);
 enum displaytyped getDisplayType(const xmlChar *type);
 gint getPreferences(const xmlDocPtr doc, GGobiInitInfo *info);
@@ -191,8 +185,9 @@ getPreferences(const xmlDocPtr doc, GGobiInitInfo *info)
   }
 
   info->createInitialScatterPlot = getLogicalPreference(node, "autoplot", true);
-   /* If we autoplot, then we will by default expect there to be at least one plot,
-      so our default value for allowNoDisplays is the negation of autoplot. */
+   /* If we autoplot, then we will by default expect there to be
+      at least one plot, so our default value for allowNoDisplays
+      is the negation of autoplot. */
   info->allowCloseLastDisplay = getLogicalPreference(node, "allowNoDisplays", !info->createInitialScatterPlot);
 
   info->quitWithNoGGobi = getLogicalPreference(node, "quitOnLastGGobi", info->allowCloseLastDisplay);

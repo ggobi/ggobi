@@ -383,7 +383,6 @@ GGobiPluginInfo *
 runInteractiveInputPlugin(ggobid *gg)
 {
   GGobiPluginInfo* plugin = NULL;
-#ifdef USE_XML
   GList *l = sessionOptions->info->inputPlugins;
 
   for(; l; l = l->next) {
@@ -408,7 +407,6 @@ runInteractiveInputPlugin(ggobid *gg)
       }
     }
   }
-#endif
 
   return(plugin); 
 }
