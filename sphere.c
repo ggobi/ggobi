@@ -89,6 +89,10 @@ spherize_set_pcvars (datad *d, ggobid *gg)
   gint ncols_prev = d->ncols;
   gint j, k;
   gchar *lbl;
+  /*-- for newvar_add.. the variable notebooks --*/
+  gchar *vname;
+  gdouble *dtmp;
+
   /*-- for updating the clist --*/
   vartabled *vt;
   GtkCList *clist = GTK_CLIST (gg->sphere_ui.clist);
@@ -105,7 +109,14 @@ spherize_set_pcvars (datad *d, ggobid *gg)
     vectori_copy (&d->sphere.vars, &d->sphere.vars_sphered);  /* from, to */
 
     vectori_realloc (&d->sphere.pcvars, d->sphere.npcs);
-    clone_vars (d->sphere.vars.els, d->sphere.npcs, d, gg);
+
+    dtmp = (gdouble *) g_malloc0 (d->nrows * sizeof (gfloat));
+    for (j=0; j<d->sphere.npcs; j++) {
+      vname = g_strdup_printf ("PC%d", j+1);
+      newvar_add_with_values (dtmp, d->nrows, vname, d, gg);
+      g_free (vname);
+    }
+    g_free (dtmp);
 
     for (j=ncols_prev, k=0; j<d->ncols; j++) {
       d->sphere.pcvars.els[k++] = j;
@@ -134,7 +145,16 @@ spherize_set_pcvars (datad *d, ggobid *gg)
     vectori_copy (&d->sphere.vars, &d->sphere.vars_sphered);  /* from, to */
 
     vectori_realloc (&d->sphere.pcvars, d->sphere.npcs);
+/*
     clone_vars (d->sphere.vars.els, d->sphere.npcs, d, gg);
+*/
+    dtmp = (gdouble *) g_malloc0 (d->nrows * sizeof (gfloat));
+    for (j=0; j<d->sphere.npcs; j++) {
+      vname = g_strdup_printf ("PC%d", j+1);
+      newvar_add_with_values (dtmp, d->nrows, vname, d, gg);
+      g_free (vname);
+    }
+    g_free (dtmp);
 
     for (j=ncols_prev, k=0; j<d->ncols; j++) {
       d->sphere.pcvars.els[k++] = j;
@@ -152,6 +172,10 @@ spherize_set_pcvars (datad *d, ggobid *gg)
     /*-- then behave as above, when the lengths were the same --*/
     if (d->sphere.vars_sphered.nels != d->sphere.vars.nels)
       vectori_realloc (&d->sphere.vars_sphered, d->sphere.vars.nels);
+
+    /*-- should I also realloc pcvars? --*/
+    vectori_realloc (&d->sphere.pcvars, d->sphere.npcs);
+
     vectori_copy (&d->sphere.vars, &d->sphere.vars_sphered);  /* from, to */
 
     g_free (cols);
@@ -166,7 +190,7 @@ spherize_set_pcvars (datad *d, ggobid *gg)
 
   /*-- clear the clist --*/
   gtk_clist_clear (clist);
-  /*-- add the new labels to the clist --*/
+  /*-- add the new labels to the 'sphered variables' clist --*/
   gtk_clist_freeze (clist);
   for (j=0; j<d->sphere.vars_sphered.nels; j++) {
     vt = vartable_element_get (d->sphere.vars_sphered.els[j], d);
@@ -182,7 +206,8 @@ spherize_set_pcvars (datad *d, ggobid *gg)
 /*      changed when the spin button is reset                              */
 /*-------------------------------------------------------------------------*/
 
-void pca_diagnostics_set (datad *d, ggobid *gg) {
+void pca_diagnostics_set (datad *d, ggobid *gg)
+{
 /*
  * Compute and set the total variance and the condition number
  * of the principal components analysis
@@ -249,7 +274,8 @@ npcs_get (datad *d, ggobid *gg)
 /*-------------------------------------------------------------------------*/
 
 void
-spherevars_set (ggobid *gg) {
+spherevars_set (ggobid *gg)
+{
   gint j, nvars, *vars;
   datad *d;
   GtkWidget *clist;

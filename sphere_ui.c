@@ -182,10 +182,18 @@ sphere_apply_cb (GtkWidget *w, ggobid *gg) {
       vartable_limits_set (d);
       vartable_stats_set (d);
 
+/*
+  gboolean rval = false;
+  GtkWidget *clist = get_clist_from_object (GTK_OBJECT(gg->sphere_ui.window));
+      gtk_signal_emit_by_name (GTK_OBJECT (clist),
+        "expose_event",
+        (gpointer) gg, (gpointer) &rval);
+*/
+
       tform_to_world (d, gg);
       displays_tailpipe (FULL, gg);
     }
-  }
+  }  /*-and send an expose event to the clist--*/
 }
 
 /*

@@ -147,6 +147,10 @@ newvar_add_with_values (gdouble *vals, gint nvals, gchar *vname,
   /*-- --*/
 
   addvar_propagate (d_ncols_prev, 1, d, gg);
+
+  /*-- emit variable_added signal --*/
+  gtk_signal_emit (GTK_OBJECT (gg->main_window),
+                   GGobiSignals[VARIABLE_ADDED_SIGNAL], vt, gg); 
 }
 
 void
