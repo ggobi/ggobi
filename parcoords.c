@@ -126,7 +126,7 @@ parcoords_reset_arrangement (displayd *display, gint arrangement, ggobid *gg) {
 
 #define MAXNPCPLOTS 5
 displayd *
-parcoords_new (gboolean missing_p, splotd **sub_plots, int numSubPlots, ggobid *gg) 
+parcoords_new (gboolean missing_p, gint nvars, gint *vars, ggobid *gg) 
 {
   GtkWidget *vbox, *frame;
   GtkWidget *mbar;
@@ -135,14 +135,14 @@ parcoords_new (gboolean missing_p, splotd **sub_plots, int numSubPlots, ggobid *
   gint nplots;
   displayd *display;
 
-  if(sub_plots == NULL) {
-     nplots = MIN (gg->ncols, MAXNPCPLOTS);
-     display = display_alloc_init(parcoords, missing_p, gg);
+  display = display_alloc_init (parcoords, missing_p, gg);
+  if (nvars == 0) {
+    nplots = MIN (gg->ncols, MAXNPCPLOTS);
+    for (i=0; i<nplots; i++)
+      vars[i] = i;
   } else {
-     nplots = numSubPlots;
-     display = (displayd *) sub_plots[0]->displayptr;
+    nplots = nvars;
   }
-
 
   parcoords_cpanel_init (&display->cpanel, gg);
 
@@ -157,7 +157,7 @@ parcoords_new (gboolean missing_p, splotd **sub_plots, int numSubPlots, ggobid *
 
   gg->parcoords.pc_accel_group = gtk_accel_group_new ();
   get_main_menu (menu_items, sizeof (menu_items) / sizeof (menu_items[0]),
-                 gg->parcoords.pc_accel_group, display->window, &mbar, (gpointer) display);
+    gg->parcoords.pc_accel_group, display->window, &mbar, (gpointer) display);
 
   /*
    * After creating the menubar, and populating the file menu,
@@ -186,17 +186,20 @@ parcoords_new (gboolean missing_p, splotd **sub_plots, int numSubPlots, ggobid *
   display->splots = NULL;
 
   for (i=0; i<nplots; i++) {
-    if(sub_plots == NULL) {
+    sp = splot_new (display, WIDTH, HEIGHT, gg);
+    sp->p1dvar = vars[i]; 
+
+/*
+    if (sub_plots == NULL) {
       sp = splot_new (display, WIDTH, HEIGHT, gg);
-       /*
-        * instead of maintaining a list, each plot knows its variable
-        */
       sp->p1dvar = i; 
     } else
        sp = sub_plots[i];
+*/
 
     display->splots = g_list_append (display->splots, (gpointer) sp);
-    gtk_box_pack_start (GTK_BOX (gg->parcoords.arrangement_box), sp->da, true, true, 0);
+    gtk_box_pack_start (GTK_BOX (gg->parcoords.arrangement_box),
+      sp->da, true, true, 0);
   }
 
   gtk_widget_show_all (display->window);

@@ -63,8 +63,8 @@ jitter_randval (gint type)
 
 void
 rejitter (ggobid *gg) {
-  gint *selected_cols;
-  gint i, j, k, m, nselected_cols = 0;
+  gint *selected_cols, nselected_cols = 0;
+  gint i, j, k, m;
   gfloat frand, fworld, fjit;
   gfloat precis = (gfloat) PRECISION1;
 

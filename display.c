@@ -146,6 +146,26 @@ display_delete_cb (GtkWidget *w, GdkEvent *event, displayd *display)
 /*                   End callbacks                                      */
 /*----------------------------------------------------------------------*/
 
+displayd *
+display_alloc_init (enum displaytyped type, gboolean missing_p, ggobid *gg)
+{
+  displayd *display = (displayd *) g_malloc (sizeof (displayd));
+  display->displaytype = type; 
+  display->missing_p = missing_p;
+
+  display->p1d_orientation = VERTICAL;
+
+    /* Copy in the contents of DefaultOptions to create
+       an indepedently modifiable configuration copied from
+       the current template.
+     */
+  display->options = DefaultDisplayOptions;
+
+  display->ggobi = gg;
+
+  return (display);
+}
+
 void
 display_new (ggobid *gg, guint action, GtkWidget *widget)
 {
@@ -156,9 +176,14 @@ displayd *
 display_create (guint action, ggobid *gg)
 {
   displayd *display;
+  gint *selected_vars, nselected_vars = 0;
 
   if (gg->nrows == 0)  /*-- if used before we have data --*/
     return (NULL);
+
+  /*-- find out what variable are selected in the var statistics panel --*/
+  selected_vars = (gint *) g_malloc (gg->ncols * sizeof (gint));
+  nselected_vars = selected_cols_get (selected_vars, false, gg);
 
   /*
    * Turn off event handlers, remove submenus, and redraw the
@@ -173,7 +198,9 @@ display_create (guint action, ggobid *gg)
       break;
 
     case 1:
-      display = scatmat_new (false, NULL, 0, 0, gg);
+      display = scatmat_new (false,
+        nselected_vars, selected_vars, nselected_vars, selected_vars,
+        gg);
       break;
 
     case 2:
@@ -185,7 +212,7 @@ display_create (guint action, ggobid *gg)
       */
       /* vardialog_open (gg, "Select variables for plotting"); */
 
-      display = parcoords_new (false, NULL, 0, gg);
+      display = parcoords_new (false, nselected_vars, selected_vars, gg);
       break;
 
     case 3:  /*-- scatterplot of missing values --*/
@@ -196,7 +223,9 @@ display_create (guint action, ggobid *gg)
 
     case 4:  /*-- scatterplot matrix of missing values --*/
       if (gg->nmissing)
-        display = scatmat_new (true, NULL, 0, 0, gg);
+        display = scatmat_new (true,
+          nselected_vars, selected_vars, nselected_vars, selected_vars,
+          gg);
       break;
 
     default:

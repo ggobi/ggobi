@@ -170,37 +170,16 @@ scatterplot_display_menus_make (displayd *display,
 
 
 displayd *
-display_alloc_init(enum displaytyped type, gboolean missing_p, ggobid *gg)
-{
-  displayd *display = (displayd *) g_malloc (sizeof (displayd));
-  display->displaytype = type; 
-  display->missing_p = missing_p;
-
-  display->p1d_orientation = VERTICAL;
-
-    /* Copy in the contents of DefaultOptions to create
-       an indepedently modifiable configuration copied from
-       the current template.
-     */
-  display->options = DefaultDisplayOptions;
-
-  display->ggobi = gg;
-
-  return (display);
-}
-
-displayd *
 scatterplot_new (gboolean missing_p, splotd *sp, ggobid *gg) {
   GtkWidget *table, *vbox;
   GtkWidget *mbar;
   displayd *display;
 
-  if(gg->ncols < 2)
-    return(NULL);
+  if (gg->ncols < 2)
+    return (NULL);
 
-
-  if(sp == NULL) {
-    display = display_alloc_init(scatterplot, missing_p, gg);
+  if (sp == NULL) {
+    display = display_alloc_init (scatterplot, missing_p, gg);
   } else {
    display = (displayd*) sp->displayptr;
   }

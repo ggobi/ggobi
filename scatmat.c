@@ -81,9 +81,10 @@ scatmat_display_menus_make (displayd *display, GtkAccelGroup *accel_group,
   gtk_widget_show (submenu);
 }
 
-
 displayd *
-scatmat_new (gboolean missing_p, splotd **sub_plots, gint numRows, gint numCols,
+scatmat_new (gboolean missing_p,
+  gint numRows, gint *rows,
+  gint numCols, gint *cols,
   ggobid *gg) 
 {
   GtkWidget *vbox, *frame;
@@ -95,14 +96,14 @@ scatmat_new (gboolean missing_p, splotd **sub_plots, gint numRows, gint numCols,
   splotd *sp;
   displayd *display;
 
-  if (sub_plots == NULL) {
-    display = display_alloc_init (scatmat, missing_p, gg);
-    /* What about the p1d_orientation here? */
+  display = display_alloc_init (scatmat, missing_p, gg);
+  if (numRows == 0 || numCols == 0) {
     scatmat_nrows = scatmat_ncols = MIN (gg->ncols, MAXNVARS);
+    for (j=0; j<scatmat_nrows; j++)
+      rows[j] = cols[j] = j;
   } else { 
     scatmat_nrows = numRows;
     scatmat_ncols = numCols;
-    display = (displayd*) sub_plots[0]->displayptr;
   }
 
   display->p1d_orientation = HORIZONTAL;
@@ -159,15 +160,10 @@ scatmat_new (gboolean missing_p, splotd **sub_plots, gint numRows, gint numCols,
   ctr = 0;
   for (i=0; i<scatmat_ncols; i++) {
     for (j=0; j<scatmat_nrows; j++, ctr++) {
-      if(sub_plots == NULL) {
-        sp = splot_new (display, width, height, gg);
-        sp->xyvars.x = i; 
-        sp->xyvars.y = j; 
-        sp->p1dvar = (i == j) ? j : -1;
-      } else {
-        sp = sub_plots[ctr];
-        splot_dimension_set(sp, width, height);
-      }
+      sp = splot_new (display, width, height, gg);
+      sp->xyvars.x = rows[i]; 
+      sp->xyvars.y = cols[j]; 
+      sp->p1dvar = (rows[i] == cols[j]) ? cols[j] : -1;
 
       display->splots = g_list_append (display->splots, (gpointer) sp);
 
