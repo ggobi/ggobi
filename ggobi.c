@@ -406,6 +406,9 @@ ggobi_alloc(ggobid *tmp)
 void
 ggobiInit(int *argc, char **argv[])
 {
+  if(ExtendedDisplayTypes) 
+    return;
+
   gtk_init (argc, argv);
  
   GTK_TYPE_GGOBI;
