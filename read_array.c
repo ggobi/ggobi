@@ -404,9 +404,7 @@ read_ascii (FILE *fp)
   /*-- Read in the first row of the data and calculate ncols. --*/
   xg.ncols = row1_read (fp, row1, row1_missing);
 
-/*
- * Once the number of columns is known, allocate vardata.
-*/
+  /*-- Once the number of columns is known, allocate vardata. --*/
   vardata_alloc ();
   vardata_init ();
 
@@ -435,7 +433,7 @@ read_ascii (FILE *fp)
     }
   }
 
-/*-- copy the values in row1 to the main array --*/
+  /*-- copy the values in row1 to the main array --*/
   for (j=0; j<xg.ncols; j++)
     xg.raw_data[0][j] = row1[j];
   if (xg.nmissing > 0) {
@@ -525,9 +523,7 @@ read_ascii (FILE *fp)
     }
   }
 
-/*
- * Close the data file
-*/
+  /*-- Close the data file --*/
   if (fclose (fp) == EOF)
     g_printerr ("read_ascii: error in fclose");
 

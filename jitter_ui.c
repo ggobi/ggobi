@@ -60,6 +60,9 @@ jitter_popup_open () {
   GtkWidget *sbar, *opt;
   GtkObject *adj;
 
+  if (xg.nrows == 0)  /*-- if used before we have data --*/
+    return;
+
   if (window == NULL) {
 
     jitter_vars_init ();

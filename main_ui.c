@@ -68,7 +68,6 @@ size_allocate_cb (GtkWidget *w, GdkEvent *event)
 void
 make_control_panels () {
 
-/* rename these:  cpanel_blahblah_make */
   cpanel_p1dplot_make ();
   cpanel_xyplot_make ();
   cpanel_rotation_make ();
@@ -389,15 +388,72 @@ mode_set_cb (gpointer cbd, guint action, GtkWidget *widget)
   }
 }
 
+/*-- these will be moved to another file eventually, I'm sure --*/
+
+extern gboolean fileset_read (gchar *);
+void
+filesel_ok (GtkWidget *w, GtkFileSelection *fs)
+{
+  gchar *fname = gtk_file_selection_get_filename (GTK_FILE_SELECTION (fs));
+  guint action = GPOINTER_TO_INT (gtk_object_get_data (GTK_OBJECT (fs),
+                 "action"));
+g_printerr ("fname=%s, action=%d\n", fname, action);
+
+  switch (action) {
+    case 0:  /*-- input: read a new set of files --*/
+      if (fileset_read (fname)) {
+        displayd *display;
+
+        pipeline_init ();
+
+        /*-- initialize the first display --*/
+        display = scatterplot_new (false);
+        displays = g_list_append (displays, (gpointer) display);
+        display_set_current (display);
+        current_splot = (splotd *) g_list_nth_data (current_display->splots, 0);
+      }
+      break;
+    case 1:  /*-- output: extend the current file set --*/
+      break;
+    case 2:  /*-- output: create a new file set --*/
+      break;
+  }
+}
+
+void
+filename_get (gpointer data, guint action, GtkWidget *w) {
+
+  GtkWidget *fs = gtk_file_selection_new ("read ggobi data");
+  gtk_file_selection_hide_fileop_buttons (GTK_FILE_SELECTION (fs));
+  gtk_object_set_data (GTK_OBJECT (fs), "action", GINT_TO_POINTER (action));
+
+  gtk_signal_connect (GTK_OBJECT (GTK_FILE_SELECTION (fs)->ok_button),
+                      "clicked", GTK_SIGNAL_FUNC (filesel_ok), (gpointer) fs);
+                            
+  /*-- Ensure that the dialog box is destroyed. --*/
+    
+  gtk_signal_connect_object (GTK_OBJECT (GTK_FILE_SELECTION (fs)->ok_button),
+                             "clicked", GTK_SIGNAL_FUNC (gtk_widget_destroy),
+                             (gpointer) fs);
+
+  gtk_signal_connect_object (GTK_OBJECT (GTK_FILE_SELECTION(fs)->cancel_button),
+                             "clicked", GTK_SIGNAL_FUNC (gtk_widget_destroy),
+                             (gpointer) fs);
+    
+  gtk_widget_show (fs);
+}
+
 static GtkItemFactoryEntry menu_items[] = {
-  { "/_File",        NULL,     NULL,          0, "<Branch>" },
-  { "/File/Read",    NULL,     NULL,          0 },
-  { "/File/Save (extend file set)",   
-                      NULL,     NULL,          0 },
-  { "/File/Save (new file set)",   
-                      NULL,     NULL,          0 },
-  { "/File/Print",   NULL,     NULL,          0 },
-  { "/File/sep",     NULL,     NULL,          0, "<Separator>" },
+  { "/_File",            NULL,     NULL,          0, "<Branch>" },
+  { "/File/Read ...",    NULL,     filename_get,     0 },
+  { "/File/Save (extend file set) ...",   
+                         NULL,     filename_get,     1 },
+  { "/File/Save (new file set) ...",   
+                         NULL,     filename_get,     2 },
+
+  { "/File/sep",         NULL,     NULL,          0, "<Separator>" },
+  { "/File/Print",       NULL,     NULL,          0 },
+  { "/File/sep",         NULL,     NULL,          0, "<Separator>" },
   { "/File/Quit",    "<ctrl>Q",     gtk_main_quit, 0 },
 
   { "/_Window",                            NULL,   
@@ -545,10 +601,7 @@ void make_ui () {
   make_control_panels ();
   gtk_container_add (GTK_CONTAINER (mode_frame), control_panel[mode]);
 
-  /*
-   * Variable selection panel
-  */
-  init_varpanel_layout ();
+  /*-- Variable selection panel --*/
   make_varpanel (hbox);
 
   gtk_widget_show_all (hbox);

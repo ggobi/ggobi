@@ -35,7 +35,7 @@ color_table_init () {
     xg.default_color_table[i].blue  = (guint16) (default_rgb[i][2]*65535.0);
   }
 
-  gdk_colormap_alloc_colors(cmap, xg.default_color_table, NCOLORS,
+  gdk_colormap_alloc_colors (cmap, xg.default_color_table, NCOLORS,
     writeable, best_match, success);
 
   xg.ncolors = NCOLORS;  /* add foreground and background once I know them */
@@ -49,7 +49,7 @@ color_table_init () {
       xg.default_color_table[i].red =   (guint16) 65535;
       xg.default_color_table[i].green = (guint16) 65535;
       xg.default_color_table[i].blue =  (guint16) 65535;
-      if (gdk_colormap_alloc_color(cmap, &xg.default_color_table[i],
+      if (gdk_colormap_alloc_color (cmap, &xg.default_color_table[i],
         writeable, best_match) == false)
       {
         g_printerr("Unable to allocate colors, not even white!\n");

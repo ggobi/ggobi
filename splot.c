@@ -317,11 +317,14 @@ splot_new (displayd *display, gint width, gint height) {
   sp->pixmap0 = NULL;
   sp->pixmap1 = NULL;
 
+/*  splot_p1d_init ();*/
   sp->p1dvar = 0;
 
+/*  splot_xyplot_init ();*/
   sp->xyvars.x = 0;
   sp->xyvars.y = 1;
 
+/*  splot_scale_init ();*/
   sp->scale.x = sp->scale.y = .7;
   sp->tour_scale.x = sp->tour_scale.y = .6;
 

@@ -114,6 +114,9 @@ display_new (gpointer cbd, guint action, GtkWidget *widget)
   displayd *display;
   splotd *prev_splot = current_splot;
 
+  if (xg.nrows == 0)  /*-- if used before we have data --*/
+    return;
+
   /*
    * Turn off event handlers, remove submenus, and redraw the
    * previous plot without a border.

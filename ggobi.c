@@ -30,9 +30,9 @@ parse_command_line (gint *argc, gchar **av)
       xg.data_mode = Sprocess;
 
     /*
-     * -t:  accept input from stdin
+     * -:  look to stdin for the input data
     */
-    else if (strcmp (av[1], "-t") == 0) {
+    else if (strcmp (av[1], "-") == 0) {
       stdin_p = true;
     }
 

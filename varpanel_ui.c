@@ -612,14 +612,29 @@ varcircle_add (gint i, gint j, gint k)
     GTK_FILL, GTK_FILL, 0, 0);
 }
 
-void
-make_varpanel (GtkWidget *parent) {
+/*-- create a grid of buttons in the table --*/
+void varpanel_populate ()
+{
   gint i, j, k;
 
-  selvarfg_GC = NULL;
+  /*-- realloc in case they've been alloc'ed before --*/
+  da = (GtkWidget **) g_realloc (da, xg.ncols * sizeof (GtkWidget *));
+  varlabel = (GtkWidget **) g_realloc (varlabel,
+                                       xg.ncols * sizeof (GtkWidget *));
+  k = 0;
+  for (i=0; i<vnrows; i++) {
+    for (j=0; j<vncols; j++) {
+      varcircle_add (i, j, k);
+      k++;
+      if (k == xg.ncols) break;
+    }
+  }
+}
 
-  da = (GtkWidget **) g_malloc (xg.ncols * sizeof (GtkWidget *));
-  varlabel = (GtkWidget **) g_malloc (xg.ncols * sizeof (GtkWidget *));
+void
+make_varpanel (GtkWidget *parent) {
+
+  selvarfg_GC = NULL;
 
   varpanel_accel_group = gtk_accel_group_new ();
 
@@ -637,17 +652,8 @@ make_varpanel (GtkWidget *parent) {
     GTK_SCROLLED_WINDOW (scrolled_window), varpanel);
   gtk_widget_show (varpanel);
 
-  /*
-   * create a grid of buttons in the table
-  */
-  k = 0;
-  for (i=0; i<vnrows; i++) {
-    for (j=0; j<vncols; j++) {
-      varcircle_add (i, j, k);
-      k++;
-      if (k == xg.ncols) break;
-    }
-  }
+  varpanel_layout_init ();
+  varpanel_populate ();
 
   gtk_widget_show_all (scrolled_window);
 }
@@ -657,7 +663,7 @@ make_varpanel (GtkWidget *parent) {
  * row-wise.
 */
 void
-init_varpanel_layout () {
+varpanel_layout_init () {
 
   vnrows = (gint) sqrt ((gdouble) xg.ncols);
   vncols = vnrows;

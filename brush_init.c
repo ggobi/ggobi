@@ -215,6 +215,10 @@ brush_init ()
   static gboolean firsttime = true;
   int i;
 
+  xg.glyph_id.type = xg.glyph_0.type = FILLED_CIRCLE;
+  xg.glyph_id.size = xg.glyph_0.size = 3;
+  xg.color_id = xg.color_0 = 0;
+
   if (firsttime) {
     brush_pos_init ();
 

@@ -125,6 +125,9 @@ open_subset_popup () {
   GtkAdjustment *adj;
   gfloat fnr = (gfloat) xg.nrows;
 
+  if (xg.nrows == 0)  /*-- if used before we have data --*/
+    return;
+
   if (window == NULL) {
     
     window = gtk_window_new (GTK_WINDOW_TOPLEVEL);

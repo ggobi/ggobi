@@ -78,6 +78,9 @@ open_transform_popup () {
   GtkWidget *vbox, *frame, *hb, *vb, *btn;
   GtkWidget *spinner;
 
+  if (xg.nrows == 0)  /*-- if used before we have data --*/
+    return;
+
   if (window == NULL) {
     
     window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
