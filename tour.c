@@ -5,6 +5,7 @@
 #include <strings.h>
 #endif
 #include <math.h>
+#include <stdlib.h>
 
 #include "vars.h"
 #include "externs.h"
@@ -19,39 +20,39 @@ alloc_tour (displayd *dsp, ggobid *gg)
 /* ncols x ncols */
 /* first index is the projection dimension, second index is the num vars */
 
-  dsp->u0 = (gfloat **) g_malloc((gint) nc * sizeof(gfloat *));
+  dsp->u0 = (gfloat **) g_malloc(nc * sizeof(gfloat *));
   for (i=0; i<nc; i++)
     dsp->u0[i] = (gfloat *) g_malloc0(nc * sizeof(gfloat));
 
-  dsp->u1 = (gfloat **) g_malloc((gint) nc * sizeof(gfloat *));
+  dsp->u1 = (gfloat **) g_malloc(nc * sizeof(gfloat *));
   for (i=0; i<nc; i++)
     dsp->u1[i] = (gfloat *) g_malloc0(nc * sizeof(gfloat));
 
-  dsp->u = (gfloat **) g_malloc((gint) nc * sizeof(gfloat *));
+  dsp->u = (gfloat **) g_malloc(nc * sizeof(gfloat *));
   for (i=0; i<nc; i++)
     dsp->u[i] = (gfloat *) g_malloc0(nc * sizeof(gfloat));
 
-  dsp->uold = (gfloat **) g_malloc((gint) nc * sizeof(gfloat *));
+  dsp->uold = (gfloat **) g_malloc(nc * sizeof(gfloat *));
   for (i=0; i<nc; i++)
     dsp->uold[i] = (gfloat *) g_malloc0(nc * sizeof(gfloat));
 
-  dsp->v0 = (gfloat **) g_malloc((gint) nc * sizeof(gfloat *));
+  dsp->v0 = (gfloat **) g_malloc(nc * sizeof(gfloat *));
   for (i=0; i<nc; i++)
     dsp->v0[i] = (gfloat *) g_malloc0(nc * sizeof(gfloat));
 
-  dsp->v1 = (gfloat **) g_malloc((gint) nc * sizeof(gfloat *));
+  dsp->v1 = (gfloat **) g_malloc(nc * sizeof(gfloat *));
   for (i=0; i<nc; i++)
     dsp->v1[i] = (gfloat *) g_malloc0(nc * sizeof(gfloat));
 
-  dsp->v = (gfloat **) g_malloc((gint) nc * sizeof(gfloat *));
+  dsp->v = (gfloat **) g_malloc(nc * sizeof(gfloat *));
   for (i=0; i<nc; i++)
     dsp->v[i] = (gfloat *) g_malloc0(nc * sizeof(gfloat));
 
-  dsp->uvevec = (gfloat **) g_malloc((gint) nc * sizeof(gfloat *));
+  dsp->uvevec = (gfloat **) g_malloc(nc * sizeof(gfloat *));
   for (i=0; i<nc; i++)
     dsp->uvevec[i] = (gfloat *) g_malloc0(nc * sizeof(gfloat));
 
-  dsp->tv = (gfloat **) g_malloc((gint) nc * sizeof(gfloat *));
+  dsp->tv = (gfloat **) g_malloc(nc * sizeof(gfloat *));
   for (i=0; i<nc; i++)
     dsp->tv[i] = (gfloat *) g_malloc0(nc * sizeof(gfloat));
 
@@ -436,7 +437,7 @@ void path(displayd *dsp, gint nd) {
           pairs[i].f = (gfloat) dsp->lambda[i];
           pairs[i].indx = i;
         }
-        qsort ((gchar *) pairs, dsp->lambda, sizeof (paird), pcompare);
+        qsort ((gchar *) pairs, (size_t) dsp->lambda, sizeof (paird), pcompare);
 
        /*-- sort the eigenvalues and eigenvectors into temporary arrays --*/
        for (i=0; i<nd; i++) {
