@@ -172,8 +172,8 @@ dialog_range_set (GtkWidget *w, ggobid *gg)
   val_str = gtk_editable_get_chars (GTK_EDITABLE (umax_entry),
     0, -1);
   if (val_str != NULL && strlen (val_str) > 0) {
-    g_free (val_str);
     max_val = (gfloat) atof (val_str);
+    g_free (val_str);
     max_p = true;
   }
 
@@ -914,8 +914,8 @@ vartable_open (ggobid *gg)
     vartable_subwindow_init (d, gg);
   }
 
-  /*-- listen for datad_added events on main_window --*/
-  gtk_signal_connect (GTK_OBJECT (gg->main_window),
+  /*-- listen for datad_added events --*/
+  gtk_signal_connect (GTK_OBJECT (gg),
     "datad_added", GTK_SIGNAL_FUNC (vartable_notebook_adddata_cb),
      GTK_OBJECT (gg->vartable_ui.notebook));
 
