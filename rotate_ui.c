@@ -10,7 +10,10 @@
 */
 
 #include <gtk/gtk.h>
+#ifdef USE_STRINGS_H
 #include <strings.h>
+#endif
+
 #include "vars.h"
 #include "externs.h"
 

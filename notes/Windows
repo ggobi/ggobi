@@ -1,0 +1,36 @@
+export PATH=$PATH:/gtk/src/glib:/gtk/src/intl:/gtk/src/gtk+/gdk:/gtk/src/gtk+/gtk:/gtk/src/glib/gmodule
+
+
+There are issues with integrating the event handling into the R main
+parse-eval-print loop.  At present, we can hijack the TclTk
+event handler function pointer. This is done by setting the variable
+
+
+Note that in the future, we will try to introduce changes to the
+Windows version of R which allows one to add new event handlers that
+are called at the end of each iteration of the the event loop.
+
+
+
+
+
+
+  gtk_main();
+  if(_beginthread(GtkEventThreadHandler, 0, NULL) == -1) {
+    char buf[400];
+    sprintf(buf,"Cannot start Gtk event handling thread");
+    Rf_error(buf);
+  }
+#endif
+void
+R_gtk_handle_events()
+{
+  RS_GGOBI(limited_event_handle)(-1);
+}
+
+void __cdecl 
+GtkEventThreadHandler(void *display)
+{
+  fprintf(stderr, "Starting event handling thread\n");fflush(stderr);
+  gtk_main();
+}

@@ -9,7 +9,11 @@
     it without violating AT&T's intellectual property rights.
 */
 #include <stdlib.h>
+
+#ifdef USE_STRINGS_H		    
 #include <strings.h>
+#endif
+
 #include <gtk/gtk.h>
 
 #include "vars.h"

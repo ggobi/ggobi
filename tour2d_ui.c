@@ -1,6 +1,9 @@
 /* tour2d_ui.c */
 
+#ifdef USE_STRINGS_H
 #include <strings.h>
+#endif
+
 #include <gtk/gtk.h>
 
 #include "vars.h"

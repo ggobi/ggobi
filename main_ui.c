@@ -9,7 +9,9 @@
     it without violating AT&T's intellectual property rights.
 */
 
+#ifdef USE_STRINGS_H
 #include <strings.h>
+#endif
 #include <gtk/gtk.h>
 
 #include "vars.h"
@@ -542,6 +544,7 @@ static GtkItemFactoryEntry menu_items[] = {
 };
 
 
+#ifndef AS_GGOBI_LIBRARY
 /*
   Wrapper for gtk_main_quit so that we can override this in
   other applications to avoid quitting when the user selects
@@ -552,6 +555,8 @@ quit_ggobi(ggobid *gg, gint action, GtkWidget *w)
 {
   gtk_main_quit();
 }
+
+#endif
 
 void 
 make_ui (ggobid *gg) {
