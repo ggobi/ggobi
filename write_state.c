@@ -43,32 +43,30 @@ saveDOMToFile(xmlDocPtr doc, const char *fileName)
     int status;
 
     xmlIndentTreeOutput = TRUE;
-    if(sessionOptions->info->compress > 0 || USE_XML == 1) {
-	int compressionLevel;
-	compressionLevel = xmlGetDocCompressMode(doc);
-	xmlSetDocCompressMode(doc, sessionOptions->info->compress);
-	status = xmlSaveFile(fileName, doc);
-	xmlSetDocCompressMode(doc, compressionLevel);
+    if(sessionOptions->info->compress > 0) {
+        int compressionLevel;
+        compressionLevel = xmlGetDocCompressMode(doc);
+        xmlSetDocCompressMode(doc, sessionOptions->info->compress);
+        status = xmlSaveFile(fileName, doc);
+        xmlSetDocCompressMode(doc, compressionLevel);
     }
-#if USE_XML==2
     else {
-	xmlChar *mem;
-	int size;
-	FILE *f;
-	xmlDocDumpFormatMemoryEnc(doc, &mem, &size, NULL, TRUE);
-	if( (f = fopen(fileName, "w"))) {
-	    fprintf(f, "%s", mem);
-	    status = 1;
-	    fclose(f);
-	}
-	xmlFree(mem);
+        xmlChar *mem;
+        int size;
+        FILE *f;
+        xmlDocDumpFormatMemoryEnc(doc, &mem, &size, NULL, TRUE);
+        if( (f = fopen(fileName, "w"))) {
+            fprintf(f, "%s", mem);
+            status = 1;
+            fclose(f);
+        }
+        xmlFree(mem);
     }
-#endif
 
     if(status < 0) {
         char buf[1000];
-	sprintf(buf, "%s\n%s", "Couldn't save session in file ", fileName);
-	quick_message(buf, true);
+        sprintf(buf, "%s\n%s", "Couldn't save session in file ", fileName);
+        quick_message(buf, true);
     }
     return(status > 0);
 }
@@ -141,8 +139,8 @@ create_ggobi_xml(ggobid *gg, xmlDocPtr doc)
 
  if(doc == NULL) {
           /* Create the document */
-	doc = xmlNewDoc("1.0");
-	XML_DOC_ROOT(doc) = xmlNewDocNode(doc, NULL, "ggobi", NULL);
+        doc = xmlNewDoc("1.0");
+        XML_DOC_ROOT(doc) = xmlNewDocNode(doc, NULL, "ggobi", NULL);
  }
 
  el = els;
@@ -364,21 +362,21 @@ create_plugin_xml(GGobiPluginInfo *plugin,  xmlNodePtr doc)
     xmlNodePtr node, el;
 
     node = xmlNewChild(doc, NULL, 
-		       plugin->type == GENERAL_PLUGIN ? "plugin" : "inputPlugin", NULL);
+                       plugin->type == GENERAL_PLUGIN ? "plugin" : "inputPlugin", NULL);
 
     xmlSetProp(node, "name", plugin->details->name);
     if(plugin->details->language)
-	xmlSetProp(node, "language", plugin->details->language);
+        xmlSetProp(node, "language", plugin->details->language);
 
     if(plugin->type == INPUT_PLUGIN) {
-	xmlSetProp(node, "interactive", plugin->info.i->interactive ? "TRUE" : "FALSE");
+        xmlSetProp(node, "interactive", plugin->info.i->interactive ? "TRUE" : "FALSE");
     }
 
     el = xmlNewChild(node, NULL, "description", plugin->details->description);
     el = xmlNewChild(node, NULL, "author", plugin->details->author);
 
     if(plugin->type == INPUT_PLUGIN) {
-	xmlSetProp(node, "modeName", plugin->info.i->modeName);
+        xmlSetProp(node, "modeName", plugin->info.i->modeName);
     }    
 
     el = xmlNewChild(node, NULL, "dll", NULL);
@@ -386,25 +384,25 @@ create_plugin_xml(GGobiPluginInfo *plugin,  xmlNodePtr doc)
 
     el = xmlNewChild(el, NULL, "init", NULL);
     if(plugin->details->onLoad)
-	xmlSetProp(el, "onLoad", plugin->details->onLoad);
+        xmlSetProp(el, "onLoad", plugin->details->onLoad);
     if(plugin->details->onUnload)
-	xmlSetProp(el, "onUnload", plugin->details->onUnload);
+        xmlSetProp(el, "onUnload", plugin->details->onUnload);
 
     
     if(plugin->type == GENERAL_PLUGIN) {
-	GGobiGeneralPluginInfo *info = plugin->info.g;
-	if(info->onCreate)
-	    xmlSetProp(el, "onCreate", info->onCreate);
-	if(info->onClose)
-	    xmlSetProp(el, "onClose", info->onClose);
-	if(info->onUpdateDisplay)
-	    xmlSetProp(el, "onUpdateDisplay", info->onUpdateDisplay);
+        GGobiGeneralPluginInfo *info = plugin->info.g;
+        if(info->onCreate)
+            xmlSetProp(el, "onCreate", info->onCreate);
+        if(info->onClose)
+            xmlSetProp(el, "onClose", info->onClose);
+        if(info->onUpdateDisplay)
+            xmlSetProp(el, "onUpdateDisplay", info->onUpdateDisplay);
     } else {
-	GGobiInputPluginInfo *info = plugin->info.i;
-	if(info->read_symbol_name)
-	    xmlSetProp(el, "read", info->read_symbol_name);
-	if(info->getDescription)
-	    xmlSetProp(el, "description", info->getDescription);
+        GGobiInputPluginInfo *info = plugin->info.i;
+        if(info->read_symbol_name)
+            xmlSetProp(el, "read", info->read_symbol_name);
+        if(info->getDescription)
+            xmlSetProp(el, "description", info->getDescription);
     }
 
     
