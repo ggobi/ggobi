@@ -15,6 +15,7 @@
 #endif
 
 #include <string.h>
+#include <ctype.h>
 
 #include "GGobiAPI.h"
 
@@ -354,16 +355,49 @@ gboolean isURL(const gchar * fileName)
 gboolean isASCIIFile(const gchar * fileName)
 {
   FILE *f;
-  gdouble val;
+  gchar word[128];
+  gboolean isascii = true;
+
   f = fopen(fileName, "r");
   if (f == NULL)
     return (false);
 
+/*
+  gdouble val;
   if (fscanf(f, "%lf", &val) == 0) {
     return (false);
   }
+*/
+/*
+ * This would be easy, but the ascii files might begin with
+ * a missing value: NA, na, or even "."
+*/
 
-  return (true);
+  if (fscanf(f, "%s", word) == 0)
+    return (false);
+  else {
+    if (strcmp (word, "NA") == 0 ||
+        strcmp (word, "na") == 0 ||
+        strcmp (word, ".") == 0)
+      ;  /* this might represent a missing value; could be ok */
+    else {
+      /*
+       * At worst, the word could begin with sign-decimalpoint
+      */
+      if (strlen(word) == 1 && !isdigit((int)word[0])) {
+        isascii = false;
+      } else if (strlen(word) == 2 && !isdigit((int)word[0]) &&
+                                      !isdigit((int)word[1])) {
+        isascii = false;
+      } else if (strlen(word) > 2 && !isdigit((int)word[0]) &&
+                                     !isdigit((int)word[1]) &&
+                                     !isdigit((int)word[2])) {
+        isascii = false;
+      }
+    }
+  }
+
+  return (isascii);
 }
 
 DataMode
