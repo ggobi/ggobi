@@ -11,6 +11,8 @@ extern "C" {
 #endif
 
 /* sort +1 */
+void       brush_reset_cb (GtkWidget *w, gpointer cbd);
+void       brush_update_set_cb (GtkCheckMenuItem *w, guint action);
 void       arrayd_add_cols (array_d *, gint);
 void       arrayd_add_rows (array_d *, gint);
 void       arrayd_alloc (array_d *, gint, gint);
