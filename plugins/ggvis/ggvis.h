@@ -4,6 +4,38 @@
 
 typedef enum {deflt, within, between, anchorscales, anchorfixed} MDSGroupInd;
 
+typedef struct _noded {
+  gint i;
+  GList *edges;  /*-- integers only, I think --*/
+  GList *connectedNodes;  /*-- noded's --*/
+
+/*  for showing/hiding trailing nodes and edges, I think
+  gboolean onRing_p;
+  gboolean expanded_p;
+  gboolean homeNode_p;
+  gint homeNode;
+  gint subtreeRootNode;
+*/
+
+  /*-- indexes of reference nodes --*/
+  struct _noded *parentNode;
+
+  gint nStepsToLeaf;
+  gint nStepsToCenter;
+  gint subtreeSize;
+  gint nChildren;
+
+  gdouble span, theta;
+  fcoords pos;
+} noded;
+
+typedef struct {
+  noded centerNode;
+  gint nStepsToLeaf;
+  gint nStepsToCenter;
+  noded *nodes;
+} radiald;
+
 typedef struct {
 
 /*
@@ -60,6 +92,8 @@ typedef struct {
 
   gint metric_nonmetric;
   gint KruskalShepard_classic;
+
+  radiald *radial;  /*-- data required for radial layout --*/
 
 } ggvisd;
 

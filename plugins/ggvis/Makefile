@@ -9,7 +9,7 @@ endif
 -include local.config
 -include $(GGOBI_HOME)/local.config
 
-OBJS=ggvis.o init.o cmds.o spring.o
+OBJS=ggvis.o init.o cmds.o spring.o radial.o
 
 ggvis.so: $(OBJS)
 	$(CC) -g -shared $(OBJS) -o $@ $(EXTRA_LIBS) -L$(GGOBI_HOME) -lggobi `gtk-config --libs` 

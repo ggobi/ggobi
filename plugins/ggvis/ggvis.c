@@ -151,6 +151,35 @@ set_dist_matrix_from_edges (datad *d, datad *e, ggobid *gg, ggvisd *ggv)
   scale_array_max (&ggv->dist, nNodes, nNodes);
 }
 
+static void radial_cb (GtkButton *button, PluginInstance *inst)
+{
+  ggobid *gg = inst->gg;
+  ggvisd *ggv = GGVisFromInst (inst);
+  datad *d = gg->current_display->d;
+  datad *e = gg->current_display->e;
+  extern void initLayout (ggobid *gg, ggvisd *ggv, datad *d, datad *e);
+  extern void setParentNodes (ggvisd *ggv, datad *d);
+  extern void setNChildren (ggvisd *ggv, datad *d);
+  extern gint setSubtreeSize (noded *, ggvisd *, datad *);
+  extern void setSubtreeSpans (ggvisd *, datad *);
+
+  if (d == NULL || e == NULL)
+    return;
+
+  initLayout (gg, ggv, d, e);
+
+  /*-- initial default:  let the first node be the center node --*/
+  ggv->radial->centerNode = ggv->radial->nodes[0];
+  ggv->radial->centerNode.i = 0;
+
+  setParentNodes (ggv, d);
+  setNChildren (ggv, d);
+  setSubtreeSize (&ggv->radial->centerNode, ggv, d);
+
+  setSubtreeSpans (ggv, d);
+
+  setNodePositions ( );
+}
 
 static void cmds_cb (GtkButton *button, PluginInstance *inst)
 {
@@ -237,8 +266,10 @@ g_printerr ("through spring_once (ten times)\n");
 GtkWidget *
 create_ggvis_window(ggobid *gg, PluginInstance *inst)
 {
-  GtkWidget *window, *main_vbox, *btn;
+  GtkWidget *window, *main_vbox, *notebook, *label, *frame, *vbox, *btn;
 
+  /*-- I will probably have to get hold of this window, after which
+       I can name all the other widgets --*/
   window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
   gtk_window_set_title(GTK_WINDOW(window), "ggvis");
@@ -249,15 +280,51 @@ create_ggvis_window(ggobid *gg, PluginInstance *inst)
   gtk_container_set_border_width (GTK_CONTAINER(main_vbox),0); 
   gtk_container_add (GTK_CONTAINER(window), main_vbox);
 
+  notebook = gtk_notebook_new ();
+  gtk_notebook_set_tab_pos (GTK_NOTEBOOK (notebook),
+    GTK_POS_TOP);
+  gtk_box_pack_start (GTK_BOX (main_vbox), notebook, false, false, 2);
+
+  /*-- network tab --*/
+  frame = gtk_frame_new ("Network layout");
+  gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
+
+  vbox = gtk_vbox_new (false, 5);
+  gtk_container_set_border_width (GTK_CONTAINER(vbox), 5); 
+  gtk_container_add (GTK_CONTAINER(frame), vbox);
+
   btn = gtk_button_new_with_label ("cmds");
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (cmds_cb), inst);
-  gtk_box_pack_start (GTK_BOX (main_vbox), btn, false, false, 3);
+  gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 3);
 
   btn = gtk_button_new_with_label ("spring");
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (spring_cb), inst);
-  gtk_box_pack_start (GTK_BOX (main_vbox), btn, false, false, 3);
+  gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 3);
+
+  label = gtk_label_new ("Network");
+  gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
+                            frame, label);
+
+  /*-- radial tab --*/
+  frame = gtk_frame_new ("Radial layout");
+  gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
+
+  vbox = gtk_vbox_new (false, 5);
+  gtk_container_set_border_width (GTK_CONTAINER(vbox), 5); 
+  gtk_container_add (GTK_CONTAINER(frame), vbox);
+
+  btn = gtk_button_new_with_label ("apply");
+  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+                      GTK_SIGNAL_FUNC (radial_cb), inst);
+  gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 3);
+
+  label = gtk_label_new ("Radial");
+  gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
+                            frame, label);
+
+  /*-- --*/
 
   gtk_widget_show_all (window);
 

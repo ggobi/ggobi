@@ -51,4 +51,6 @@ ggvis_init (ggvisd *ggv) {
 
   ggv->metric_nonmetric = METRIC;
   ggv->KruskalShepard_classic = KRUSKALSHEPARD;
+
+  ggv->radial = NULL;
 }
