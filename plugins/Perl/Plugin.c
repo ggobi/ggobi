@@ -79,6 +79,16 @@ Perl_onLoad(gboolean initializing, GGobiPluginInfo *plugin)
 }
 
 
+/**
+  This is called when reading the definition of a plugin that uses
+  this Perl language plugin. This must extract the information 
+  for the plugin that is particular to Perl and substitute the
+  methods for the plugin with C-level routines which GGobi can 
+  call to communicate with the Perl object that is the plugin.
+  So we extract the name of the Perl module to load when the plugin 
+  is first loaded; the name of the class from which to instantiate the plugin;
+  the 
+ */
 gboolean
 Perl_processPlugin(xmlNodePtr node, GGobiPluginInfo *plugin, GGobiPluginType type,
                     GGobiPluginInfo *langPlugin, GGobiInitInfo *info)
@@ -111,18 +121,46 @@ Perl_processPlugin(xmlNodePtr node, GGobiPluginInfo *plugin, GGobiPluginType typ
     return(true);
 }
 
-PerlPluginInstData *
-initializePerlPlugin(PerlPluginData *details, ggobid *gg, PluginInstance *inst)
-{
-    PerlPluginInstData *instData;
-    char *cmd;
-    char *moduleName = details->moduleName;
 
-    instData = (PerlPluginInstData *) malloc(sizeof(PerlPluginInstData));
+gboolean
+PerlDestroyPlugin(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
+{
+    gboolean status = true;
+    PerlPluginInstData *instData;
+    instData = (PerlPluginInstData *) inst->data;
+
+    fprintf(stderr, "Reference counts: gg = %ld, plugin = %ld, obj = %ld\n",
+                    SvREFCNT(instData->ggobiRef),
+                    SvREFCNT(instData->pluginInstanceRef),
+                    SvREFCNT(instData->perlObj));
+
+    SvREFCNT_dec(instData->ggobiRef);    
+    SvREFCNT_dec(instData->pluginInstanceRef);    
+    SvREFCNT_dec(instData->perlObj);    
+
+    return(status);
+}
+
+gboolean
+PerlUpdateDisplayMenu(ggobid *gg, PluginInstance *inst)
+{
+    gboolean status = true;
+    return(status);
+}
+
+gboolean
+PerlLoadPlugin(gboolean initializing, GGobiPluginInfo *plugin)
+{
+    gboolean status = true;
+    PerlPluginData *data = (PerlPluginData *) plugin->data;
+    char *cmd;
+    char *moduleName;
+
+    moduleName = data->moduleName;
+    fprintf(stderr, "Loading perl plugin: module name %s\n", data->moduleName);
 
     /* load the Perl module, create the ggobi and plugin instance references
        as Perl objects. */
-
 #if 0
     require_pv(moduleName);
 #else
@@ -134,6 +172,31 @@ initializePerlPlugin(PerlPluginData *details, ggobid *gg, PluginInstance *inst)
     if(SvTRUE(ERRSV)) {
 	fprintf(stderr, "Failed to load the perl module %s\n", moduleName);
     }
+    return(status);
+}
+
+gboolean
+PerlUnloadPlugin(gboolean quitting, GGobiPluginInfo *plugin)
+{
+    gboolean status = true;
+    return(status);
+}
+
+
+/**
+ This is called when we create an instance of a GGobi plugin implemented via a Perl class
+ using the generic Perl language plugin.
+ We load the module associated with the plugin.
+ Then we create reference objects in Perl to the C-level data structures for
+ the ggobid and plugin instances.
+ These are held around for the duration of the plugin.
+ */
+PerlPluginInstData *
+initializePerlPlugin(PerlPluginData *details, ggobid *gg, PluginInstance *inst)
+{
+    PerlPluginInstData *instData;
+
+    instData = (PerlPluginInstData *) malloc(sizeof(PerlPluginInstData));
 
        /* create the references */
     instData->ggobiRef = createPerlReferenceObject(gg, "GGobi::GGobiRef");
@@ -196,7 +259,6 @@ PerlCreatePlugin(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
     PerlPluginData *data = (PerlPluginData *) plugin->data;
     PerlPluginInstData *instData;
     gboolean status = false;
-    char *className = inst->info->info.g->onCreate;  
 
     inst->data = instData = initializePerlPlugin(data, gg, inst);
 
@@ -256,26 +318,26 @@ Perl_getUnnamedArguments(GSList *args)
 {
     int n, i;
     GSList *tmp;
-    AV *ans;
-    SV *el;
+    AV *arr;
+    SV *el, *ans;
 
     if(args == NULL || (n = g_slist_length(args)) == 0)
 	return(&sv_undef);
 
     tmp = args;
 
-    ans = newAV();
-    av_extend(ans, n); 
+    arr = newAV();
+    av_extend(arr, n); 
 
     for(i = 0; i < n; i++) {
 	if(tmp->data) {
 	    el = newSVpv((char *) tmp->data, 0);
 	    SvREFCNT_inc(el);
-	    av_push(ans, el);
+	    av_push(arr, el);
 	}
 	tmp = tmp->next;
     }
-    ans = newRV_noinc(ans);
+    ans = newRV_noinc((SV *)arr);
 
     return((SV *) ans);
 }
@@ -300,46 +362,17 @@ SV *
 Perl_getNamedArguments(GHashTable *table)
 {
     int n;
-    HV *ans;
-
+    HV *hash;
+    SV *ans;
     if(!table || (n = g_hash_table_size(table)) < 1)
 	return(&sv_undef);
 
-    ans = newHV();
+    hash = newHV();
 
-    g_hash_table_foreach(table, (GHFunc) collectHashElement, (gpointer) ans);
+    g_hash_table_foreach(table, (GHFunc) collectHashElement, (gpointer) hash);
 
-    fprintf(stderr, "Ref count %ld\n", SvREFCNT(ans));
-    ans = newRV_noinc(ans);
-
+    ans = newRV_noinc((SV*) hash);
 
     return((SV *) ans);
 }
 
-gboolean
-PerlDestroyPlugin(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
-{
-    gboolean status = true;
-    return(status);
-}
-
-gboolean
-PerlUpdateDisplayMenu(ggobid *gg, PluginInstance *inst)
-{
-    gboolean status = true;
-    return(status);
-}
-
-gboolean
-PerlLoadPlugin(gboolean initializing, GGobiPluginInfo *plugin)
-{
-    gboolean status = true;
-    return(status);
-}
-
-gboolean
-PerlUnloadPlugin(gboolean quitting, GGobiPluginInfo *plugin)
-{
-    gboolean status = true;
-    return(status);
-}
