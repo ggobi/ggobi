@@ -344,6 +344,7 @@ tour1d_varsel (gint jvar, gint button, datad *d, ggobid *gg)
 {
   displayd *dsp = gg->current_display;
   gchar *label = g_strdup("PP index: (0.0) 0.0000 (0.0)");
+  splotd *sp = gg->current_splot;
 
 /*-- any button --*/
   if (d->vcirc_ui.jcursor == GDK_HAND2) {
@@ -362,7 +363,10 @@ tour1d_varsel (gint jvar, gint button, datad *d, ggobid *gg)
       dsp->t1d_indx_min, dsp->t1d_ppindx_mat[dsp->t1d_ppindx_count], 
       dsp->t1d_indx_max);
       gtk_label_set_text(GTK_LABEL(dsp->t1d_pplabel),label);
+
     }
+    /* Reinits the vertical height for the ashes */
+    sp->tour1d.initmax = true;
   }
 }
 
@@ -396,15 +400,17 @@ tour1d_projdata(splotd *sp, greal **world_data, datad *d, ggobid *gg)
   do_ash1d (yy, d->nrows_in_plot,
             cpanel->t1d.nbins, cpanel->t1d.nASHes,
             sp->p1d.spread_data.els, &min, &max, &mean);
-/*
-  if (sp->tour1d.firsttime) {
-    sp->tour1d.keepmin = 0.0;    let this be zero for consistency
-    sp->tour1d.keepmax = max;    ... and this isn't currently used
-    sp->tour1d.firsttime = false;   ... so this isn't needed
-  }
-*/
 
-  max = 2*mean;  /* try letting the max for scaling depend on the mean */
+  if (sp->tour1d.initmax) {
+    sp->tour1d.keepmin = 0.0;    /* let this be zero for consistency */
+    sp->tour1d.keepmax = max;    
+    sp->tour1d.initmax = false;  
+  }
+  else
+    if (max > sp->tour1d.keepmax) sp->tour1d.keepmax = max;
+
+  /*max = 2*mean;  * try letting the max for scaling depend on the mean */
+  max = sp->tour1d.keepmax;
   if (cpanel->t1d.vert) {
     for (i=0; i<d->nrows_in_plot; i++) {
       sp->planar[i].x = (greal) (precis*(-1.0+2.0*
@@ -617,6 +623,7 @@ void tour1d_reinit(ggobid *gg)
   gint i, j;
   displayd *dsp = gg->current_display;
   datad *d = dsp->d;
+  splotd *sp = gg->current_splot;
 
   for (i=0; i<1; i++) {
     for (j=0; j<d->ncols; j++) {
@@ -626,6 +633,9 @@ void tour1d_reinit(ggobid *gg)
     dsp->t1d.Fa.vals[i][dsp->t1d.active_vars.els[i]] = 1.;
     dsp->t1d.F.vals[i][dsp->t1d.active_vars.els[i]] = 1.;
   }
+
+  /* Reinits the vertical height for the ashes */
+  sp->tour1d.initmax = true;
 
   dsp->t1d.get_new_target = true;
 
