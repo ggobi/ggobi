@@ -51,10 +51,10 @@ extern "C" {
 #endif
 gfloat no_change (gfloat x, gfloat incr) { return x; }
 gfloat negate (gfloat x, gfloat incr)    { return -x; }
-gfloat raise_min_to_0 (gfloat x, gfloat incr) { return (x + incr); }
-gfloat raise_min_to_1 (gfloat x, gfloat incr) { return (x + incr + 1.0); }
-gfloat inv_raise_min_to_0 (gfloat x, gfloat incr) { return (x - incr); }
-gfloat inv_raise_min_to_1 (gfloat x, gfloat incr) { return (x - incr - 1.0); }
+gfloat raise_min_to_0 (gfloat x, gfloat incr) { return (x - incr); }
+gfloat raise_min_to_1 (gfloat x, gfloat incr) { return (x - incr + 1.0); }
+gfloat inv_raise_min_to_0 (gfloat x, gfloat incr) { return (x + incr); }
+gfloat inv_raise_min_to_1 (gfloat x, gfloat incr) { return (x + incr - 1.0); }
 #ifdef __cplusplus
 }
 #endif
@@ -179,13 +179,13 @@ transform0_values_set (gint tform0, gint j, datad *d, ggobid *gg)
     break;
 
     case RAISE_MIN_TO_0:
-      domain_incr = fabs (vt->lim_raw.min);
+      domain_incr = vt->lim_raw.min;
       domain_adj = raise_min_to_0;
       inv_domain_adj = inv_raise_min_to_0;
     break;
 
     case RAISE_MIN_TO_1:
-      domain_incr = fabs (vt->lim_raw.min);
+      domain_incr = vt->lim_raw.min;
       domain_adj = raise_min_to_1;
       inv_domain_adj = inv_raise_min_to_1;
     break;
