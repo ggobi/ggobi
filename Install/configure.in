@@ -491,14 +491,12 @@ AC_SUBST(INSTALL_DIR)
 AC_OUTPUT(Makeconf GNUmakefile src/GNUmakefile gtkext/src/GNUmakefile bin/setLD.csh  bin/setLD.bsh bin/ggobi bin/ggobi-config bugTemplate share/ggobirc local.config share/tools/plugin)
 
 
-
 cp src/config.h include/GGobiConfig.h
 
 dnl Ensure the resulting ggobi scripts executable.
 chmod +x bin/ggobi
 chmod +x bin/ggobi-config
-
-chmod +x bin/plugin
+chmod +x share/tools/plugin
 
 if test -n "${PLUGIN_DIRS}" ; then
  echo "Enabling plugins"
