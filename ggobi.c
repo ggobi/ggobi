@@ -593,7 +593,7 @@ process_initialization_files()
       sessionOptions->initializationFile = g_strdup(fileName);
   }
      
-  if(fileName) {
+  if(fileName && canRead(fileName)) {
     info = read_init_file(fileName, sessionOptions->info);
     /* sessionOptions->info = info; */
   }
