@@ -311,10 +311,6 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
 
       gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (gg->subset_ui.bstart), false);
 #if GTK_MAJOR_VERSION == 1
-/*
- * The documentation suggests that this should still be present
- * in gtk2, but it isn't there.
-*/
       gtk_spin_button_set_shadow_type (GTK_SPIN_BUTTON (gg->subset_ui.bstart),
                                        GTK_SHADOW_OUT);
 #endif
@@ -332,10 +328,6 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
       gg->subset_ui.bsize = gtk_spin_button_new (d->subset.bsize_adj, 0, 0);
       gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (gg->subset_ui.bsize), false);
 #if GTK_MAJOR_VERSION == 1
-/*
- * The documentation suggests that this should still be present
- * in gtk2, but it isn't there.
-*/
       gtk_spin_button_set_shadow_type (GTK_SPIN_BUTTON (gg->subset_ui.bsize),
                                        GTK_SHADOW_OUT);
 #endif
@@ -369,10 +361,6 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
       gg->subset_ui.estart = gtk_spin_button_new (d->subset.estart_adj, 0, 0);
       gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (gg->subset_ui.estart), false);
 #if GTK_MAJOR_VERSION == 1
-/*
- * The documentation suggests that this should still be present
- * in gtk2, but it isn't there.
-*/
       gtk_spin_button_set_shadow_type (GTK_SPIN_BUTTON (gg->subset_ui.estart),
                                        GTK_SHADOW_OUT);
 #endif
@@ -390,10 +378,6 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
       gg->subset_ui.estep = gtk_spin_button_new (d->subset.estep_adj, 0, 0);
       gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (gg->subset_ui.estep), false);
 #if GTK_MAJOR_VERSION == 1
-/*
- * The documentation suggests that this should still be present
- * in gtk2, but it isn't there.
-*/
       gtk_spin_button_set_shadow_type (GTK_SPIN_BUTTON (gg->subset_ui.estep),
                                        GTK_SHADOW_OUT);
 #endif

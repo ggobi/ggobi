@@ -249,10 +249,6 @@ transform_window_open (ggobid *gg)
 
     gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinner), false);
 #if GTK_MAJOR_VERSION == 1
-/*
- * The documentation suggests that this should still be present
- * in gtk2, but it isn't there.
-*/
     gtk_spin_button_set_shadow_type (GTK_SPIN_BUTTON (spinner),
                                      GTK_SHADOW_OUT);
 #endif
