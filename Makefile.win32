@@ -101,9 +101,14 @@ endif
 
 LIBS=$(LIB_DIRS:%=-L%) -lgdk -lgtk -lglib-2.0
 
+USE_DLL=1
+ifdef USE_DLL
+ggobi: $(DLL) ggobiMain.o
+	$(CC) $(DEBUG) -o ggobi ggobiMain.o -L. -lggobi ${EXTRA_LIBS} $(LIBS) $(XML_LIBS)  -lm 
+else
 ggobi: $(OB)
 	$(CC) $(DEBUG) -o ggobi $(OB) -L. ${EXTRA_LIBS} $(LIBS) $(XML_LIBS)  -lm 
-                
+endif                
 
 dll: $(DLL)
 lib: $(LIB)
