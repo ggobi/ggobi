@@ -366,7 +366,6 @@ varpanel_refresh (ggobid *gg) {
               /* varpanel_checkbutton_set_active (j, false, d); */
               varpanel_toggle_set_active (VARSEL_X, j, false, d);
               varpanel_toggle_set_active (VARSEL_Y, j, false, d);
-              varpanel_widget_set_visible (VARSEL_Y, j, false, d);
             }
 
             l = display->splots;
