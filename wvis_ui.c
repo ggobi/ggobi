@@ -23,6 +23,8 @@
 #include "vars.h"
 #include "externs.h"
 
+#include "colorscheme.h"
+
 static gint xmargin = 20;
 static gint ymargin = 20;
 
@@ -381,6 +383,11 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg)
   datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
   gint selected_var = get_one_selection_from_clist (clist);
 
+  if(selected_var < 0) {
+        /* We might note the change or issue a warning that 
+           no variable is selected. */
+      return(0);
+  }
   record_colors_reset (selected_var, d, gg);
   clusters_set (d, gg);
   displays_plot (NULL, FULL, gg);
@@ -949,12 +956,12 @@ wvis_window_open (ggobid *gg) {
   GtkWidget *frame2, *vbs, *menu;
   GList *l;
   colorschemed *scheme;
-  static gchar *colorscaletype_lbl[] = {
+  static gchar *colorscaletype_lbl[UNKNOWN_COLOR_TYPE] = {
     "--- DIVERGING ---",
     "--- SEQUENTIAL ---",
     "--- SPECTRAL ---",
     "--- QUALITATIVE ---"};
-  gint n, ncolorscaletype_lbl = 4;
+  gint n, ncolorscaletype_lbl = sizeof(colorscaletype_lbl)/sizeof(colorscaletype_lbl[0]);
 #endif
   static gchar *const binning_method_lbl[] = {
     "Constant bin width",
@@ -1043,7 +1050,7 @@ wvis_window_open (ggobid *gg) {
     for (n=0; n<ncolorscaletype_lbl; n++) {
       colorscheme_add_to_menu (menu, colorscaletype_lbl[n], NULL,
         NULL, notebook, gg);
-      for (l = sessionOptions->colorSchemes; l; l = l->next) {
+      for (l = gg->colorSchemes; l; l = l->next) {
         scheme = (colorschemed *) l->data;
         if (scheme->type == n)
           colorscheme_add_to_menu (menu, scheme->name, scheme,
