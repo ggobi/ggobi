@@ -163,6 +163,21 @@ different groups of observations.
 \end{verbatim}
 
 
+\section{Creating New Windows and Plots}
+See \file{RSCreatePlot.c} for some details.
+
+The graphical user interface for ggobi allows one to create new
+windows and groups or collections of plots.  These collections are
+defined by the menu or button that is used to generate them and offers
+little in the way of allowing the user to specify what the type or
+content of the individual elements of the collection are.  In R, we
+have a programming language and so we can use it to allow the user
+create these groups of plots and to add them to a particular window.
+
+There are a variety of different ways we can interface to creating
+individual and groups of plots.
+
+
 \section{Managing Windows}
 Because one can easily create multiple ggobi instances and many
 displays within each instance, managing the display windows can be
