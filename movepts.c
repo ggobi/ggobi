@@ -113,30 +113,29 @@ move_pt (gint id, gint x, gint y, splotd *sp, datad *d, ggobid *gg) {
   /* run the pipeline backwards for case 'id' */
   splot_reverse_pipeline (sp, id, &gg->movepts.eps, horiz, vert, gg);
 
+  /* Let this work even if all points are the same glyph and color */
   if (gg->movepts.cluster_p) {
-    if (d->nclusters > 1) {
-      gint cur_clust = d->clusterid.els[id];
+    gint cur_clust = d->clusterid.els[id];
 
-      /*
-       * Move all points which belong to the same cluster
-       * as the selected point.
-      */
-      for (i=0; i<d->nrows_in_plot; i++) {
-        k = d->rows_in_plot[i];
-        if (k == id)
-          ;
-        else {
-          if (d->clusterid.els[k] == cur_clust) {
-            if (!d->hidden_now.els[k]) { /* ignore erased values altogether */
-              if (horiz)
-                sp->planar[k].x += gg->movepts.eps.x;
-              if (vert)
-                sp->planar[k].y += gg->movepts.eps.y;
+    /*
+     * Move all points which belong to the same cluster
+     * as the selected point.
+    */
+    for (i=0; i<d->nrows_in_plot; i++) {
+      k = d->rows_in_plot[i];
+      if (k == id)
+        ;
+      else {
+        if (d->clusterid.els[k] == cur_clust) {
+          if (!d->hidden_now.els[k]) { /* ignore erased values altogether */
+            if (horiz)
+              sp->planar[k].x += gg->movepts.eps.x;
+            if (vert)
+              sp->planar[k].y += gg->movepts.eps.y;
 
-              /*-- run only the latter portion of the reverse pipeline --*/
-              splot_plane_to_world (sp, k, gg);
-              world_to_raw (k, sp, d, gg);
-            }
+            /*-- run only the latter portion of the reverse pipeline --*/
+            splot_plane_to_world (sp, k, gg);
+            world_to_raw (k, sp, d, gg);
           }
         }
       }
