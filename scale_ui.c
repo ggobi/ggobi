@@ -215,11 +215,13 @@ key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
           }
           break;
         case ZOOM:
-          if (event->keyval == GDK_greater) {
+          /* zoom in if > or . */
+          if (event->keyval == GDK_greater || event->keyval == GDK_period) {
             zoom_step (sp, cpanel->scale_zoom_opt, ZOOM_IN,
               &gg->scale.click_rect, gg);
             redraw = true;
-          } else if (event->keyval == GDK_less) {
+          /* zoom out if < or , */
+          } else if (event->keyval == GDK_less || event->keyval == GDK_comma) {
             zoom_step (sp, cpanel->scale_zoom_opt, ZOOM_OUT,
               &gg->scale.click_rect, gg);
             redraw = true;
@@ -511,7 +513,7 @@ scale_click_zoom_rect_calc (splotd *sp, gint sc_zoom_opt, ggobid *gg) {
   switch (sc_zoom_opt) {
     case Z_OBLIQUE:
       /* -- use the values just calculated --*/
-      break;
+    break;
 
     case Z_ASPECT:
       /*-- force the rectangle to be square --*/
@@ -519,18 +521,18 @@ scale_click_zoom_rect_calc (splotd *sp, gint sc_zoom_opt, ggobid *gg) {
         MAX (gg->scale.click_rect.x, gg->scale.click_rect.y);
       gg->scale.click_rect.width = 2 * (mid.x - gg->scale.click_rect.x);
       gg->scale.click_rect.height = 2 * (mid.y - gg->scale.click_rect.y);
-      break;
+    break;
 
     case Z_HORIZ:
       /*-- override the vertical position and height --*/
       gg->scale.click_rect.y = 0;
       gg->scale.click_rect.height = sp->max.y;
-      break;
+    break;
     case Z_VERT:
       /*-- override the horizontal position and width --*/
       gg->scale.click_rect.x = 0;
       gg->scale.click_rect.width = sp->max.x;
-      break;
+    break;
   }
 }
 
@@ -593,7 +595,6 @@ cpanel_scale_set (cpaneld *cpanel, ggobid *gg) {
   else
     w = widget_find_by_name (gg->control_panel[SCALE],
                              "SCALE:click_radio_button");
-
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(w), true);
 
   /*-- set the Pan or Zoom radio buttons --*/
