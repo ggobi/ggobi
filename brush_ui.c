@@ -132,7 +132,7 @@ brush_link_cb (GtkCheckMenuItem *w, gpointer cbd)
   g_printerr ("state: %d, cbd: %s\n", w->active, lbl);
 }
 
-/* Options from the Display options menu in the main menubar */
+/* Options from the Options menu in the main menubar */
 void
 brush_options_cb (gpointer data, guint action, GtkCheckMenuItem *w)
 {

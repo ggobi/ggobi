@@ -18,7 +18,7 @@
 
 
 /*--------------------------------------------------------------------*/
-/*                   Display section                                  */
+/*                   Options section                                  */
 /*--------------------------------------------------------------------*/
 
 static GtkItemFactoryEntry menu_items[] = {
@@ -38,9 +38,9 @@ parcoords_display_menus_make (displayd *display,
   GtkWidget *submenu;
 
 /*
- * Display options menu
+ * Options menu
 */
-  submenu = submenu_make ("_Display", 'D', accel_group);
+  submenu = submenu_make ("_Options", 'O', accel_group);
   options_menu = gtk_menu_new ();
 
   CreateMenuCheck (display, options_menu, "Show points",
@@ -176,7 +176,7 @@ parcoords_new (gboolean missing_p, gint nvars, gint *vars,
 
   /*
    * After creating the menubar, and populating the file menu,
-   * add the Display Options and Link menus another way
+   * add the Options and Link menus another way
   */
   parcoords_display_menus_make (display, gg->parcoords.pc_accel_group,
                                 (GtkSignalFunc) display_options_cb, mbar, gg);

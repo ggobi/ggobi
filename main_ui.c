@@ -565,48 +565,48 @@ static GtkItemFactoryEntry menu_items[] = {
  * this code in display.c actually corresponds to the "Window" menu,
  * not this one, which is really just display options.
 */
-  { "/_Display", NULL, NULL, 0, "<Branch>" },
-  { "/Display/Show tooltips",  
+  { "/_Options", NULL, NULL, 0, "<Branch>" },
+  { "/Options/Show tooltips",  
        "<ctrl>t",   
        (GtkItemFactoryCallback) main_display_options_cb,
        0,
        "<CheckItem>" },
-  { "/Display/Show control _panel",  
+  { "/Options/Show control _panel",  
        "<ctrl>p",   
        (GtkItemFactoryCallback) main_display_options_cb,
        1,
        "<CheckItem>" },
-  { "/Display/Show _axes",  
+  { "/Options/Show _axes",  
        "<ctrl>a",   
        (GtkItemFactoryCallback) main_display_options_cb,
        2,
        "<CheckItem>" },
-  { "/Display/Lay out variable circles by _row",  
+  { "/Options/Lay out variable circles by _row",  
        "<ctrl>r",   
        (GtkItemFactoryCallback) main_display_options_cb,
        3,
        "<CheckItem>" },
-  { "/Display/sep",  
+  { "/Options/sep",  
        NULL,    
        NULL,         
        0,
        "<Separator>" },
 
-  { "/Display/Brushing", NULL, NULL, 0, "<Branch>" },
-  { "/Display/Brushing/Brush jumps to cursor",  
+  { "/Options/Brushing", NULL, NULL, 0, "<Branch>" },
+  { "/Options/Brushing/Brush jumps to cursor",  
        NULL ,       
        (GtkItemFactoryCallback) brush_options_cb,
        0,
        "<CheckItem>" },
-  { "/Display/Brushing/Update linked brushing continuously",  
+  { "/Options/Brushing/Update linked brushing continuously",  
        NULL ,      
        (GtkItemFactoryCallback) brush_options_cb,
        1,
        "<CheckItem>" },
 
 
-  {"/_Plots", NULL, NULL, 0, "<Branch>"},
-  { "/Plots/Displays",    
+  {"/Dis_playTree", NULL, NULL, 0, "<Branch>"},
+  { "/DisplayTree/Displays",    
        NULL, 
        (GtkItemFactoryCallback) show_display_tree,
        2},
@@ -681,7 +681,7 @@ make_ui (ggobid *gg) {
   while (items) {
     item = (GtkWidget *) items->data;
     gtk_label_get (GTK_LABEL (GTK_MENU_ITEM (item)->item.bin.child ), &name);
-    if (strcmp (name, "Display") == 0) {
+    if (strcmp (name, "Options") == 0) {
       submenu = GTK_MENU_ITEM (item)->submenu;
       subitems = gtk_container_children (GTK_CONTAINER (submenu));
       while (subitems) {

@@ -418,7 +418,7 @@ display_set_current (displayd *new_display, ggobid *gg)
       case scatterplot:
         scatterplot_main_menus_make (gg->main_accel_group,
                                      (GtkSignalFunc) mode_set_cb, gg, true);
-        gg->mode_item = submenu_make ("_View", 'V', gg->main_accel_group);
+        gg->mode_item = submenu_make ("_ViewMode", 'V', gg->main_accel_group);
         gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_item),
                                    gg->app.scatterplot_mode_menu); 
         submenu_insert (gg->mode_item, gg->main_menubar, 2);
@@ -427,7 +427,7 @@ display_set_current (displayd *new_display, ggobid *gg)
       case scatmat:
         scatmat_main_menus_make (gg->main_accel_group,
           (GtkSignalFunc) mode_set_cb, gg, true);
-        gg->mode_item = submenu_make ("_View", 'V', gg->main_accel_group);
+        gg->mode_item = submenu_make ("_ViewMode", 'V', gg->main_accel_group);
         gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_item),
                                    gg->app.scatmat_mode_menu); 
         submenu_insert (gg->mode_item, gg->main_menubar, 2);
@@ -436,7 +436,7 @@ display_set_current (displayd *new_display, ggobid *gg)
       case parcoords:
         parcoords_main_menus_make (gg->main_accel_group,
                                    (GtkSignalFunc) mode_set_cb, gg, true);
-        gg->mode_item = submenu_make ("_View", 'V', gg->main_accel_group);
+        gg->mode_item = submenu_make ("_ViewMode", 'V', gg->main_accel_group);
         gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_item),
                                    gg->parcoords.mode_menu); 
         submenu_insert (gg->mode_item, gg->main_menubar, 2);

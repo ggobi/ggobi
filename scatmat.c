@@ -56,9 +56,9 @@ scatmat_display_menus_make (displayd *display, GtkAccelGroup *accel_group,
   GtkWidget *submenu;
 
 /*
- * Display options menu
+ * Options menu
 */
-  submenu = submenu_make ("_Display", 'D', accel_group);
+  submenu = submenu_make ("_Options", 'O', accel_group);
   options_menu = gtk_menu_new ();
 
   CreateMenuCheck (display, options_menu, "Show points",
@@ -144,7 +144,7 @@ scatmat_new (gboolean missing_p,
                  (gpointer) display);
   /*
    * After creating the menubar, and populating the file menu,
-   * add the Display Options and Link menus another way
+   * add the Options and Link menus another way
   */
   scatmat_display_menus_make (display, scatmat_accel_group,
                                (GtkSignalFunc) display_options_cb, mbar, gg);
@@ -569,7 +569,7 @@ createScatmatWindow(gint nrows, gint ncols, displayd *display, ggobid *gg, gbool
                  (gpointer) display);
   /*
    * After creating the menubar, and populating the file menu,
-   * add the Display Options and Link menus another way
+   * add the Options and Link menus another way
   */
   scatmat_display_menus_make (display, scatmat_accel_group,
                                (GtkSignalFunc) display_options_cb, mbar, gg);

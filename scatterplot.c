@@ -112,7 +112,7 @@ ruler_ranges_set (displayd *display, splotd *sp, ggobid *gg) {
 }
 
 /*----------------------------------------------------------------------*/
-/*                          Display section                             */
+/*                          Options section                             */
 /*----------------------------------------------------------------------*/
 
 static GtkItemFactoryEntry menu_items[] = {
@@ -148,9 +148,9 @@ scatterplot_display_menus_make (displayd *display,
   GtkWidget *submenu;
 
 /*
- * Display options menu
+ * Options menu
 */
-  submenu = submenu_make ("_Display", 'D', accel_group);
+  submenu = submenu_make ("_Options", 'O', accel_group);
   options_menu = gtk_menu_new ();
 
   CreateMenuCheck (display, options_menu, "Show points",
@@ -233,7 +233,7 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
                  (gpointer) display);
   /*
    * After creating the menubar, and populating the file menu,
-   * add the Display Options and Link menus another way
+   * add the Options and Link menus another way
   */
   scatterplot_display_menus_make (display, gg->app.sp_accel_group,
    (GtkSignalFunc) display_options_cb, mbar, gg);

@@ -152,7 +152,8 @@ display_menu_build (ggobid *gg)
     } else {  /*-- prepare the menu for multiple data matrices --*/
 
       submenu = gtk_menu_new ();
-      anchor = CreateMenuItem (gg->display_menu, "New parallel coordinates plot",
+      anchor = CreateMenuItem (gg->display_menu,
+        "New parallel coordinates plot",
         NULL, NULL, gg->main_menubar, NULL, NULL, NULL, NULL);
 
       for (k=0; k<nd; k++) { 
@@ -237,15 +238,8 @@ display_menu_open (GtkWidget *w, GdkEvent *event, ggobid *gg)
 void
 display_menu_init (ggobid *gg)
 {
-  gg->display_menu_item = submenu_make ("_Window", 'W',
+  gg->display_menu_item = submenu_make ("_Display", 'D',
     gg->main_accel_group);
-
-/*-- part of the popup menu strategy; now abandoned --*/
-/*
-  gtk_signal_connect (GTK_OBJECT (gg->display_menu_item),
-    "button_press_event",
-    GTK_SIGNAL_FUNC (display_menu_open), (gpointer) gg);
-*/
 
   gtk_widget_show (gg->display_menu_item);
 
