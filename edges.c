@@ -163,9 +163,10 @@ datad *setDisplayEdge(displayd * dpy, datad * e)
   if(resolveEdgePoints(e, dpy->d)) {
     dpy->e = e;
      /*XXX  This needs to be more general, working on all displays.
-            Need to emit an event and have the displays respond to it by checking
-            whether the edgeset_add returns true. */
-    scatterplot_display_edge_menu_update(dpy, e->gg->app.sp_accel_group, display_options_cb, e->gg);
+            Need to emit an event and have the displays respond to it by
+            checking whether the edgeset_add returns true. */
+    scatterplot_display_edge_menu_update(dpy, e->gg->app.sp_accel_group,
+      display_options_cb, e->gg);
   }
 
   for (l = dpy->splots; l; l = l->next) {
@@ -224,14 +225,14 @@ void edgeset_add_cb(GtkWidget * w, datad * e)
   display_plot(display, FULL, gg);   /*- moving edge drawing */
 
   /*
-   * If no edge options is true, then turn on undirected edges.
-   */
+   * If no edge option is true, then turn on undirected edges.
+  */
   if (!display->options.edges_undirected_show_p &&
       !display->options.edges_directed_show_p &&
       !display->options.edges_arrowheads_show_p)
   {
     GtkWidget *ww = widget_find_by_name(display->edge_menu,
-                                        "DISPLAY MENU: show undirected edges");
+      "DISPLAYMENU:edges_u");
     if (ww) {
       gtk_check_menu_item_set_active((GtkCheckMenuItem *) ww, true);
     }
@@ -333,6 +334,8 @@ do_resolveEdgePoints(datad *e, datad *d, gboolean compute)
   endpointsd *ans = NULL;
   DatadEndpoints *ptr;
   GList *tmp;
+
+
   if(e->edge.n < 1)
     return(NULL);
 
@@ -352,10 +355,17 @@ do_resolveEdgePoints(datad *e, datad *d, gboolean compute)
   /* So no entry in the table yet. So compute the endpoints and add that to the table. */
   if(ans == NULL && compute) {
      /* resolve the endpoints */
+/*
+g_printerr ("resolving %s on %s (%d)\n", e->name, d->name, compute);
+g_printerr ("   creating a new match\n");
+*/
     ans = computeResolvedEdgePoints(e, d);
     ptr = (DatadEndpoints *) g_malloc(sizeof(DatadEndpoints));
     ptr->data = d;
     ptr->endpoints = (ans == &DegenerateEndpoints) ? NULL : ans;
+/*
+g_printerr ("   %d %d\n", ptr->endpoints[0].a, ptr->endpoints[0].b);
+*/
     e->edge.endpointList = g_list_append(e->edge.endpointList, ptr);
   }
 

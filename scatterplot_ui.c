@@ -143,7 +143,9 @@ scatterplot_display_edge_menu_update (displayd *display,
       item = CreateMenuItem (display->edge_menu, lbl,
         NULL, NULL, NULL, gg->main_accel_group,
         NULL, NULL, gg);
+/*
       gtk_widget_set_sensitive (item, false);
+*/
       g_free (lbl);
     }
 
@@ -182,28 +184,24 @@ scatterplot_display_edge_menu_update (displayd *display,
      * I may want to change that, but leave it for now.
     */
     item = CreateMenuCheck (display->edge_menu,
-      "Show edges (undirected)",
+      "Show undirected edges",
       display_options_cb, GINT_TO_POINTER (DOPT_EDGES_U),
       display->options.edges_undirected_show_p, gg);
-    gtk_widget_set_name (item, "DISPLAY MENU: show undirected edges");
+    gtk_widget_set_name (item, "DISPLAYMENU:edges_u");
     gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
 
     item = CreateMenuCheck (display->edge_menu,
-      "Show 'arrowheads' (for directed edges)",
-      display_options_cb, GINT_TO_POINTER (DOPT_EDGES_A),
-      display->options.edges_arrowheads_show_p, gg);
-    gtk_widget_set_name (item, "DISPLAY MENU: show arrowheads");
-    gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
-
-    /* Add a separator */
-    CreateMenuItem (display->edge_menu, NULL, "", "",
-                    NULL, NULL, NULL, NULL, gg);
-
-    item = CreateMenuCheck (display->edge_menu,
-      "Show directed edges (both edges and 'arrowheads')",
+      "Show directed edges (edges and 'arrowheads')",
       display_options_cb, GINT_TO_POINTER (DOPT_EDGES_D),
       display->options.edges_directed_show_p, gg);
-    gtk_widget_set_name (item, "DISPLAY MENU: show directed edges");
+    gtk_widget_set_name (item, "DISPLAYMENU:edges_d");
+    gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
+
+    item = CreateMenuCheck (display->edge_menu,
+      "Show 'arrowheads' only",
+      display_options_cb, GINT_TO_POINTER (DOPT_EDGES_A),
+      display->options.edges_arrowheads_show_p, gg);
+    gtk_widget_set_name (item, "DISPLAYMENU:edges_a");
     gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
 
     gtk_menu_item_set_submenu (GTK_MENU_ITEM (display->edge_item),

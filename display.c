@@ -97,6 +97,52 @@ display_plot_allbutone (displayd *display, splotd *splot,
 /*           Callbacks common to multiple display types                 */
 /*----------------------------------------------------------------------*/
 
+static void
+display_edges_directed_show (displayd *display, gboolean show)
+{
+  GtkWidget *w = widget_find_by_name (display->edge_menu,
+    "DISPLAYMENU:edges_d");
+
+  if (!show && display->options.edges_directed_show_p && w) {
+    gtk_check_menu_item_set_active ((GtkCheckMenuItem *) w, false);
+    display->options.edges_directed_show_p = false;
+  }
+}
+static void
+display_edges_undirected_show (displayd *display, gboolean show)
+{
+  GtkWidget *w;
+
+  if (!show) {
+    if (display->options.edges_undirected_show_p) { 
+      if ((w = widget_find_by_name (display->edge_menu,
+        "DISPLAYMENU:edges_u")) != NULL)
+      {
+        gtk_check_menu_item_set_active ((GtkCheckMenuItem *) w, false);
+        display->options.edges_undirected_show_p = false;
+      }
+    }
+  } else {
+  }
+}
+static void
+display_edges_arrowheads_show (displayd *display, gboolean show)
+{
+  GtkWidget *w;
+
+  if (!show) {
+    if (display->options.edges_arrowheads_show_p) { 
+      if ((w = widget_find_by_name (display->edge_menu,
+        "DISPLAYMENU:edges_a")) != NULL)
+      {
+        gtk_check_menu_item_set_active ((GtkCheckMenuItem *) w, false);
+        display->options.edges_arrowheads_show_p = false;
+
+      }
+    }
+  }
+}
+
 void
 display_options_cb (GtkCheckMenuItem *w, guint action) 
 {
@@ -111,50 +157,41 @@ display_options_cb (GtkCheckMenuItem *w, guint action)
       display->options.points_show_p = w->active;
       display_plot (display, FULL, gg);
     break;
-    case DOPT_EDGES_U:  /*-- undirected: edges only --*/
-      if (display->e == NULL) edgeset_add (display);
-      if (display->e != NULL) {
-        title = computeTitle (false, gg->current_display, gg);
-        if (title) {
-          gtk_window_set_title (GTK_WINDOW (GTK_GGOBI_WINDOW_DISPLAY(display)->window), title);
-          g_free (title); 
-        }
 
-        display->options.edges_undirected_show_p = w->active;
-        if (!w->active && display->options.edges_directed_show_p) { 
-          ww = widget_find_by_name (display->edge_menu,
-            "DISPLAY MENU: show directed edges");
-          if (ww) {
-            gtk_check_menu_item_set_active ((GtkCheckMenuItem *) ww, false);
-          }
-        }
+    case DOPT_EDGES_U:  /*-- undirected: edges only --*/
+/* Problem:  edgeset_add calls setDisplayEdge, which updates this
+   very menu, so that the item we clicked on is destroyed before we
+   finish handling the event we received on it.  One upshot of this
+   is that the checkbox isn't set correctly.
+   However ... if I don't add the edgeset until after all the options
+   have been correctly set, the problem vanishes!  -- dfs
+*/
+
+      display->options.edges_undirected_show_p = w->active;
+      if (w->active) {
+        display_edges_directed_show (display, false);
+        display_edges_arrowheads_show (display, false);
       }
 
-      display_plot (display, FULL, gg);
-    break;
-    case DOPT_EDGES_A:  /*-- arrowheads only --*/
       if (display->e == NULL) edgeset_add (display);
       if (display->e != NULL) {
         title = computeTitle (false, gg->current_display, gg);
         if (title) {
           gtk_window_set_title (GTK_WINDOW (GTK_GGOBI_WINDOW_DISPLAY(display)->window), title);
           g_free (title); 
-        }
-        display->options.edges_arrowheads_show_p = w->active;
-        gtk_object_set_data (GTK_OBJECT (w), "propagate",
-          GINT_TO_POINTER(false));
-        if (!w->active && display->options.edges_directed_show_p) { 
-          ww = widget_find_by_name (display->edge_menu,
-            "DISPLAY MENU: show directed edges");
-          if (ww) {
-            gtk_check_menu_item_set_active ((GtkCheckMenuItem *) ww, false);
-          }
         }
       }
 
       display_plot (display, FULL, gg);
     break;
     case DOPT_EDGES_D:  /*-- directed: both edges and arrowheads --*/
+
+      display->options.edges_directed_show_p = w->active;
+      if (w->active) {
+        display_edges_undirected_show (display, false);
+        display_edges_arrowheads_show (display, false);
+      }
+
       if (display->e == NULL) edgeset_add (display);
       if (display->e != NULL) {
         title = computeTitle (false, gg->current_display, gg);
@@ -162,26 +199,30 @@ display_options_cb (GtkCheckMenuItem *w, guint action)
           gtk_window_set_title (GTK_WINDOW (GTK_GGOBI_WINDOW_DISPLAY(display)->window), title);
           g_free (title); 
         }
-
-        display->options.edges_directed_show_p = w->active;
-        if (!w->active && display->options.edges_undirected_show_p) { 
-          ww = widget_find_by_name (display->edge_menu,
-            "DISPLAY MENU: show undirected edges");
-          if (ww) {
-            gtk_check_menu_item_set_active ((GtkCheckMenuItem *) ww, false);
-          }
-        }
-        if (!w->active && display->options.edges_arrowheads_show_p) { 
-          ww = widget_find_by_name (display->edge_menu,
-            "DISPLAY MENU: show arrowheads");
-          if (ww) {
-            gtk_check_menu_item_set_active ((GtkCheckMenuItem *) ww, false);
-          }
-        }
       }
 
       display_plot (display, FULL, gg);
     break;
+    case DOPT_EDGES_A:  /*-- arrowheads only --*/
+      display->options.edges_arrowheads_show_p = w->active;
+      if (w->active) {
+        display_edges_directed_show (display, false);
+        display_edges_undirected_show (display, false);
+      }
+
+      if (display->e == NULL) edgeset_add (display);
+      if (display->e != NULL) {
+        title = computeTitle (false, gg->current_display, gg);
+        if (title) {
+          gtk_window_set_title (GTK_WINDOW (GTK_GGOBI_WINDOW_DISPLAY(display)->window), title);
+          g_free (title); 
+        }
+      }
+
+
+      display_plot (display, FULL, gg);
+    break;
+
     case DOPT_WHISKERS:
       display->options.whiskers_show_p = w->active;
       display_plot (display, FULL, gg);
@@ -767,8 +808,7 @@ display_copy_edge_options (displayd *dsp, displayd *dspnew)
 
   dspnew->options.edges_undirected_show_p =
     dsp->options.edges_undirected_show_p;
-  item = widget_find_by_name (dspnew->edge_menu,
-            "DISPLAY MENU: show undirected edges");
+  item = widget_find_by_name (dspnew->edge_menu, "DISPLAYMENU:edges_u");
   if (item) {
     gtk_check_menu_item_set_active ((GtkCheckMenuItem *) item,
       dspnew->options.edges_undirected_show_p);
@@ -776,16 +816,14 @@ display_copy_edge_options (displayd *dsp, displayd *dspnew)
 
   dspnew->options.edges_directed_show_p =
     dsp->options.edges_directed_show_p;
-  item = widget_find_by_name (dspnew->edge_menu,
-            "DISPLAY MENU: show directed edges");
+  item = widget_find_by_name (dspnew->edge_menu, "DISPLAYMENU:edges_d");
   if (item)
     gtk_check_menu_item_set_active ((GtkCheckMenuItem *) item,
       dspnew->options.edges_directed_show_p);
 
   dspnew->options.edges_arrowheads_show_p =
     dsp->options.edges_arrowheads_show_p;
-  item = widget_find_by_name (dspnew->edge_menu,
-            "DISPLAY MENU: show arrowheads");
+  item = widget_find_by_name (dspnew->edge_menu, "DISPLAYMENU:edges_a");
   if (item)
     gtk_check_menu_item_set_active ((GtkCheckMenuItem *) item,
       dspnew->options.edges_arrowheads_show_p);
