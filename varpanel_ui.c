@@ -112,9 +112,13 @@ varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint btn,
       switch (cpanel->projection) {
         case P1PLOT:
           redraw = p1d_varsel (sp, jvar, &jvar_prev, btn);
+          if (viewmode_get (gg) == BRUSH && cpanel->br_mode == BR_TRANSIENT)
+            reinit_transient_brushing (display, gg);
         break;
         case XYPLOT:
           redraw = xyplot_varsel (sp, jvar, &jvar_prev, btn);
+          if (viewmode_get (gg) == BRUSH && cpanel->br_mode == BR_TRANSIENT)
+            reinit_transient_brushing (display, gg);
         break;
         case TOUR2D:
           tour2d_varsel (jvar, btn, d, gg);
@@ -145,13 +149,13 @@ varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint btn,
 
   /*-- overkill for scatmat: could redraw one row, one column --*/
   /*-- overkill for parcoords: need to redraw at most 3 plots --*/
-/* this is redrawing before it has the new window sizes, so the
- * lines aren't right */
   if (redraw) {
-
-    /*-- do we need a call to brush_once here? --*/
-
     display_tailpipe (display, FULL, gg);
+
+    if (viewmode_get (gg) == BRUSH) {
+      display_tailpipe (display, NONE, gg);
+      brush_once_and_redraw (sp, display, gg);
+    }
   }
 }
 
