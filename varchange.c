@@ -276,6 +276,10 @@ delete_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
 
   keepers = g_malloc ((d->ncols-ncols) * sizeof (gint));
   nkeepers = find_keepers (d->ncols, ncols, cols, keepers);
+  if (nkeepers == -1) {
+    g_free (keepers);
+/**/return false;
+  }
 
   for (j=0; j<ncols; j++) {
     vartable_element_remove (cols[j], d);

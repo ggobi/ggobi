@@ -449,7 +449,7 @@ find_keepers (gint ncols_current, gint nc, gint *cols, gint *keepers)
 
   if (nkeepers != ncols_current - nc) {
     g_printerr ("your logic is wrong! nc = %d, nc_to_delete = %d, but ncols_to_keep = %d\n",ncols_current, nc, nkeepers);
-    exit (1);
+    nkeepers = -1;
   }
 
   return nkeepers;
