@@ -71,6 +71,8 @@ datad_new(datad *d, ggobid *gg)
   d->nclusters = 0;
   d->nearest_point = -1;
 
+  d->missings_show_p = true;
+
   return (d);
 }
 
