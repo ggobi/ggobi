@@ -580,7 +580,7 @@ GGobi_addToolsMenuItem (gchar *lbl, ggobid *gg)
   GtkWidget *entry = NULL, *tools_menu = NULL;
   GtkItemFactory *factory;
 
-  factory = gg->main_menu_factory; /*   gtk_item_factory_from_path ("<main>"); */
+  factory = gg->main_menu_factory; /* gtk_item_factory_from_path ("<main>"); */
   tools_menu = gtk_item_factory_get_widget (factory, "<main>/Tools");
 
   if (tools_menu != NULL) {
@@ -590,8 +590,6 @@ GGobi_addToolsMenuItem (gchar *lbl, ggobid *gg)
         entry = gtk_menu_item_new_with_label (lbl);
         gtk_widget_show (entry);
 
-        /* Add a separator */
-        CreateMenuItem (tools_menu, NULL, "", "", NULL, NULL, NULL, NULL, gg);
         gtk_menu_append (GTK_MENU (tools_menu), entry);
       }
     }
