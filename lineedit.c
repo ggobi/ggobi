@@ -28,7 +28,7 @@ gboolean record_add (eeMode mode, gint a, gint b, gchar *lbl, gchar *id,
   splotd *sp;
   displayd *dsp;
   datad *dtarget = d;
-  greal *raw = NULL;
+  greal *raw = NULL, x;
   vartabled *vt;
   gboolean found_missings = false;
 
@@ -56,14 +56,25 @@ gboolean record_add (eeMode mode, gint a, gint b, gchar *lbl, gchar *id,
     g_free (stmp);
   }
 
+/*
+  * this may still need tuning, because added records with
+  * categorical variables should have values
+  * that match one of the existing level values, and we're
+  * not testing for that yet.
+*/
   if (dtarget->ncols) {
     raw = (greal *) g_malloc (dtarget->ncols * sizeof(greal));
     for (j=0; j<dtarget->ncols; j++) {
+      vt = vartable_element_get (j, dtarget);
       if (strcmp (vals[j], "NA") == 0) {  /*-- got a missing --*/
         raw[j] = (greal) 0.0;  /*-- or what? --*/
         found_missings = true;
       } else {
-        raw[j] = (greal) atof (vals[j]);
+        x = (greal) atof (vals[j]);
+        if (vt->vartype == categorical)
+          raw[j] = (greal) floor(x + .5);
+        else
+          raw[j] = x;
       }
     }
   }
@@ -520,7 +531,7 @@ fetch_default_record_values (gchar **vals, datad *dtarget, displayd *display,
       raw, &eps, dtarget, gg->current_splot, gg);
     for (j=0; j<dtarget->ncols; j++) {
       /*-- if variable j is categorical, make it an integer --*/
-      /* it may have to be forced to one of the existing level values ... */
+      /* see longer remark in record_add */
       vt = vartable_element_get (j, dtarget);
       if (vt->vartype == categorical)
         vals[j] = g_strdup_printf ("%d", (gint) floor(raw[j]+.5));
