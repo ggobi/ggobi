@@ -9,7 +9,7 @@ CC = gcc
 # This defaults to $(CC) and is reset to CXX by any optional 
 # segment that needs to use C++, e.g  USE_MYSQL 
 LD=$(CXX)
-#LD=$(CC)
+LD=$(CC)
 
 CFLAGS= -g -ansi -Wall -fpic
 CXXFLAGS=$(CFLAGS)
@@ -125,7 +125,7 @@ dm: $(OB)
 
 lib: libGGobi.so
 libGGobi.so: $(OB)
-	$(CC) -g $(SHARED_LD_FLAGS) -o $@ $(OB) $(XML_LIB_DIRS) $(XML_LIBS) `gtk-config --libs`
+	$(CC) -g $(SHARED_LD_FLAGS) -o $@ $(OB) $(XML_LIB_DIRS:%=-L%) $(XML_LIBS) `gtk-config --libs`
 
 clean: 
 	rm -f *.o ggobi libGGobi.so
