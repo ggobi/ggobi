@@ -307,6 +307,7 @@ write_xml_record (FILE *f, datad *d, ggobid *gg, gint i,
     }
   }
 
+
   if (!xmlWriteInfo->useDefault ||
       xmlWriteInfo->defaultColor != d->color.els[i])
   {
@@ -405,8 +406,19 @@ write_xml_edges (FILE *f, datad *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
   gint i;
   if (d->edge.n < 1)
     return(true);
-
-  fprintf(f, "<edges count=\"%d\" name=\"%s\">\n", d->edge.n, d->name);
+  /*
+  fprintf(f, "<edges count=\"%d\" name=\"%s\">\n", d->edge.n,
+  d->name); There seems to be a need to write the defaults in the case
+  where we started with ascii data and added edges; in this case the
+  edges are written as <edges> rather than as a new datad, and maybe
+  that's the problem.   dfs
+  */
+  fprintf(f, 
+    "<edges count=\"%d\" name=\"%s\" color=\"%d\" glyphType=\"%s\" glyphSize=\"%s\">\n",
+	  d->edge.n, d->name, 
+          xmlWriteInfo->defaultColor,
+	  xmlWriteInfo->defaultGlyphTypeName, 
+          xmlWriteInfo->defaultGlyphSizeName);
 
   for(i = 0; i < d->edge.n; i++) {
     fprintf(f, "<edge");
