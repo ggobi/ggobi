@@ -217,6 +217,7 @@ GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
   br_color_ids_init (d, gg);
 
   hidden_alloc (d);
+  hidden_init(d);
 
   for (j = 0; j < nc ; j++) {
     vt = vartable_element_get (j, d);
