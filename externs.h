@@ -413,6 +413,7 @@ void       splot_set_plot_center (splotd *);
 void       splot_world_to_plane (cpaneld *, splotd *, ggobid *);
 void       splot_zoom (splotd *sp, gfloat xsc, gfloat ysc, ggobid *) ;
 gint       sqdist (gint, gint, gint, gint);
+void       sticky_id_link_by_id (gint, gint, datad *, ggobid *);
 void       sticky_id_toggle (datad *, ggobid *);
 gint       strToInteger (const gchar *tmp);
 void       strip_suffixes (ggobid *);
@@ -684,6 +685,7 @@ displayd *barchart_new_with_vars(gboolean missing_p, gint nvars, gint *vars, dat
 #ifdef WIN32
 void win32_draw_to_pixmap_binned (icoords *, icoords *, gint, splotd *, ggobid *gg);
 void win32_draw_to_pixmap_unbinned (gint, splotd *, ggobid *gg);
+void win32_drawing_arrays_free (splotd *sp);
 #endif
 
 #ifdef __cplusplus

@@ -81,16 +81,18 @@ drawing_arrays_alloc (splotd *sp, datad *d, ggobid *gg) {
   sp->win32.npoints = n;
 }
 
-static void
-drawing_arrays_free (splotd *sp){
-  g_free ((gpointer) sp->win32.points);
-  g_free ((gpointer) sp->win32.segs);
-  g_free ((gpointer) sp->win32.whisker_segs);
-  g_free ((gpointer) sp->win32.ash_segs);
-  g_free ((gpointer) sp->win32.open_rects);
-  g_free ((gpointer) sp->win32.filled_rects);
-  g_free ((gpointer) sp->win32.open_arcs);
-  g_free ((gpointer) sp->win32.filled_arcs);
+void
+win32_drawing_arrays_free (splotd *sp){
+  if (sp->win32.npoints) {
+    g_free ((gpointer) sp->win32.points);
+    g_free ((gpointer) sp->win32.segs);
+    g_free ((gpointer) sp->win32.whisker_segs);
+    g_free ((gpointer) sp->win32.ash_segs);
+    g_free ((gpointer) sp->win32.open_rects);
+    g_free ((gpointer) sp->win32.filled_rects);
+    g_free ((gpointer) sp->win32.open_arcs);
+    g_free ((gpointer) sp->win32.filled_arcs);
+  }
 }
 
 void

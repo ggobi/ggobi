@@ -465,6 +465,10 @@ splot_free (splotd *sp, displayd *display, ggobid *gg)
   g_free ((gpointer) sp->screen);
   vectorf_free (&sp->p1d.spread_data);
 
+#ifdef WIN32
+  win32_drawing_arrays_free (sp);
+#endif
+
   if(GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
      gtk_object_destroy(GTK_OBJECT(sp));
   } else
