@@ -209,15 +209,6 @@ parse_command_line (gint *argc, gchar **av)
   return 1;
 }
 
-gint GGOBI(main)(gint argc, gchar *argv[], gboolean processEvents);
-
-gint 
-main(gint argc, gchar *argv[])
-{ 
- GGOBI(main)(argc, argv, true);
- return (0);
-}
-
 gint
 ggobi_remove (ggobid *gg)
 { 
@@ -746,14 +737,20 @@ process_initialization_files()
       tmp = getenv("HOME");
       if(tmp) {
         sprintf(buf, "%s/.ggobirc", tmp);
-        fileName = buf;
-      } else {
+	if(canRead(buf))
+          fileName = buf;
+        else 
+          fileName = NULL;
+      }
+
+      if(!fileName) {
         gchar *v;
         tmp = g_strdup(sessionOptions->cmdArgs[0]);
         v = strrchr(tmp, DIR_SEPARATOR);
         if(v) {
           v[1] = '\0';
-        }
+        } else
+          tmp[0] = '\0';
         sprintf(buf, "%sggobirc",tmp);
         fileName = buf;
         g_free(tmp);
@@ -767,6 +764,7 @@ process_initialization_files()
     info = read_init_file(fileName, sessionOptions->info);
     /* sessionOptions->info = info; */
   }
+
   if(sessionOptions->pluginFiles) {
     GSList *el = sessionOptions->pluginFiles;
     while(el) {
@@ -774,6 +772,12 @@ process_initialization_files()
        el = el->next;
     }
   }
+}
+
+GGobiOptions *
+GGOBI_getSessionOptions()
+{
+  return(sessionOptions);
 }
 
 
