@@ -76,7 +76,12 @@ sphere_clist_size_alloc_cb (GtkWidget *w, GdkEvent *event, ggobid *gg)
     GtkStyle *style;
     GtkCList *clist = GTK_CLIST (w);
     style = gtk_widget_get_style (w);
-    gdk_text_extents (style->font,
+    gdk_text_extents (
+#if GTK_MAJOR_VERSION == 2
+      gtk_style_get_font (style),
+#else
+      style->font,
+#endif
       "arbitrary string", strlen ("arbitrary string"),
       &lbearing, &rbearing, &width, &ascent, &descent);
     fheight = ascent + descent;
@@ -300,7 +305,12 @@ scree_expose_cb (GtkWidget *w, GdkEventConfigure *event, ggobid *gg)
 
       tickmk = g_strdup_printf ("%d", j+1);
       gdk_draw_string (gg->sphere_ui.scree_pixmap,
-        style->font, gg->plot_GC, xpos, hgt-margin/2, tickmk);
+#if GTK_MAJOR_VERSION == 2
+        gtk_style_get_font (style),
+#else
+        style->font,
+#endif
+        gg->plot_GC, xpos, hgt-margin/2, tickmk);
       g_free (tickmk);
 
       if (j>0) 
@@ -471,8 +481,14 @@ sphere_panel_open (ggobid *gg)
     spinner = gtk_spin_button_new (GTK_ADJUSTMENT (gg->sphere_ui.npcs_adj),
                                    0, 0);
     gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinner), false);
+#if GTK_MAJOR_VERSION == 1
+/*
+ * The documentation suggests that this should still be present
+ * in gtk2, but it isn't there.
+*/
     gtk_spin_button_set_shadow_type (GTK_SPIN_BUTTON (spinner),
                                      GTK_SHADOW_OUT);
+#endif
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), spinner,
       "Specify the number of principal components",
       NULL);
