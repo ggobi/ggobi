@@ -1,0 +1,61 @@
+<ggobidata count="2">
+
+<data name="Customers">
+<description>
+
+The maximum use of linking given only two datasets:
+  grouping of cases in Customers
+  drawing edges in Customers, linking to cases in Calls
+  grouping of cases in Calls
+
+Records in A are customers, grouped into fraudiness categories
+  Edge records in A are phone calls, grouped by the language of the call
+
+</description>
+<variables count="2">
+  <variable>biz/res</variable>
+  <variable>usage</variable>
+</variables>
+<records  count="5">
+<record category="high">    8 7  </record>
+<record category="medium">  4 8  </record>
+<record category="high">    8 7  </record>
+<record category="low">    17 2  </record>
+<record category="medium"> 11 8  </record>
+</records>
+
+<edges count="5">
+<edge id="1" category="english" source="1" destination="2"> </edge>
+<edge id="2" category="french"  source="2" destination="3"> </edge>
+<edge id="3" category="french"  source="2" destination="4"> </edge>
+<edge id="4" category="hindi"   source="3" destination="4"> </edge>
+<edge id="5" category="other"   source="2" destination="4"> </edge>
+</edges>
+
+</data>
+
+<data name="Calls" edgeData="T" edges="Customers">  <!-- edges in Customers -->
+<description>
+
+Records in Calls are data on the phone calls
+Suppose they're grouped by some other categorical variable:
+  800, collect, other.
+
+I don't even know if we want to support such complexity, but let's
+consider it.
+
+</description>
+<variables count="3">
+  <variable>timeofday</variable>
+  <variable>nseconds</variable>
+</variables>
+<records count="5">
+<record id="1" category="800">     42 1  1 </record>
+<record id="2" category="collect">  7 1  1 </record>
+<record id="3" category="800">     17 0 na </record>
+<record id="4" category="collect"> 12 0  0 </record>
+<record id="5" category="other">   11 3  2 </record>
+</records>
+</data>
+</ggobidata>
+
