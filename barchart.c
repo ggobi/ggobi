@@ -79,7 +79,8 @@ barchart_new_with_vars(gboolean missing_p, gint nvars, gint *vars, datad * d, gg
 
 
 displayd *
-createBarchart(gboolean missing_p, splotd * sp, gint var, datad * d, ggobid * gg)
+createBarchart(gboolean missing_p, splotd * sp, gint var, datad * d,
+  ggobid * gg)
 {
   GtkWidget *table, *vbox;
   displayd *display;
@@ -266,6 +267,11 @@ barchart_recalc_group_counts(barchartSPlotd * sp, datad * d, ggobid * gg)
     if (d->nmissing > 0 && !d->missings_show_p
         && MISSING_P(m, GTK_GGOBI_SPLOT(sp)->p1dvar))
       continue;
+
+    /*-- skip hiddens? --*/
+    if (d->hidden_now.els[m]) {
+      continue;
+    }
 
     bin = GTK_GGOBI_SPLOT(sp)->planar[m].x;
 /* dfs */
@@ -601,6 +607,18 @@ barchart_redraw(splotd * rawsp, datad * d, ggobid * gg, gboolean binned)
   colorschemed *scheme = gg->activeColorScheme;
   barchartSPlotd *sp = GTK_GGOBI_BARCHART_SPLOT(rawsp);
 
+/* dfs */
+/*
+  In case we're passively responding to hide brushing, adding this
+  line works but is unappealing.  It recalculates the counts, and
+  then rescales using the max of the counts.  It would look quite
+  nice if the rescaling didn't occur, probably.  So it should scale
+  using the maximum counts if no cases were hidden, but then draw
+  using the count of visible cases.
+*/
+  barchart_recalc_counts(sp, d, gg);
+/*-- --*/
+
   barchart_recalc_group_counts(sp, d, gg);
 
   for (j = 0; j < sp->bar->ncolors; j++) {
@@ -847,6 +865,10 @@ void barchart_recalc_counts(barchartSPlotd * sp, datad * d, ggobid * gg)
           && MISSING_P(m, rawsp->p1dvar))
         continue;
 
+      /*-- skip hiddens? --*/
+      if (d->hidden_now.els[m])
+        continue;
+
       bin = sp->bar->index_to_rank[i];
       if ((bin >= 0) && (bin < sp->bar->nbins)) {
         sp->bar->bins[bin].count++;
@@ -867,6 +889,13 @@ void barchart_recalc_counts(barchartSPlotd * sp, datad * d, ggobid * gg)
 
     while ((yy < sp->bar->breaks[0] + sp->bar->offset) &&
            (rank < d->nrows_in_plot - 1)) {
+
+      /*-- skip hiddens? --*/
+      if (d->hidden_now.els[ d->rows_in_plot[index] ]) {
+        rank++;
+        continue;
+      }
+
       /*rawsp->planar[index].x = -1;*/ /* maybe not, dfs */
       rawsp->planar[ d->rows_in_plot[index] ].x = -1;
       rank++;
@@ -874,6 +903,7 @@ void barchart_recalc_counts(barchartSPlotd * sp, datad * d, ggobid * gg)
       /*yy = d->tform.vals[index][rawsp->p1dvar];*/ /* maybe not, dfs */
       yy = d->tform.vals[ d->rows_in_plot[index] ][rawsp->p1dvar];
     }
+
     if (rank > 0) {
       sp->bar->low_pts_missing = TRUE;
       if (sp->bar->low_bin == NULL)
@@ -887,6 +917,13 @@ void barchart_recalc_counts(barchartSPlotd * sp, datad * d, ggobid * gg)
     while (rank < d->nrows_in_plot) {
       index = sp->bar->index_to_rank[rank];
       /*yy = d->tform.vals[index][rawsp->p1dvar];*/ /* maybe not, dfs*/
+
+      /*-- skip hiddens? --*/
+      if (d->hidden_now.els[ d->rows_in_plot[index] ]) {
+        rank++;
+        continue;
+      }
+
       yy = d->tform.vals[ d->rows_in_plot[index] ][rawsp->p1dvar];
       while ((bin < sp->bar->nbins) &&
              (sp->bar->breaks[bin + 1] + sp->bar->offset < yy)) {
@@ -974,12 +1011,10 @@ void barchart_recalc_dimensions(splotd * rawsp, datad * d, ggobid * gg)
     sp->bar->bins[i].planar.x = -1;
     if (vtx->vartype == categorical) {
 /* dfs */
-      {
       gfloat ftmp;
       ftmp = -1.0 + 2.0*((greal)sp->bar->bins[i].value - rawsp->p1d.lim.min)
         / rdiff;
       sp->bar->bins[i].planar.y = (greal) (PRECISION1 * ftmp);
-      }
 /* --- */
 #ifdef PREV
       index = sp->bar->bins[i].index;
@@ -1070,6 +1105,13 @@ void barchart_recalc_dimensions(splotd * rawsp, datad * d, ggobid * gg)
     gint maxheight;
     gint yoffset;
     gint n = d->nrows_in_plot;
+
+    /*-- ignore hiddens here? --*/
+/*
+    for (i=0; i<d->nrows_in_plot; i++)
+      if (d->hidden_now.els[d->rows_in_plot[i]])
+        n--;
+*/
 
     scale_y = SCALE_DEFAULT;
     maxheight = (rawsp->max.y - (sp->bar->nbins - 1) * bindist) * scale_y;
@@ -1163,6 +1205,11 @@ gboolean barchart_active_paint_points(splotd * rawsp, datad * d)
     if (d->nmissing > 0 && !d->missings_show_p
         && MISSING_P(m, rawsp->p1dvar))
       continue;
+
+    /*-- skip hiddens? --*/
+    if (d->hidden_now.els[m]) {
+      continue;
+    }
 
     /*-- dfs -- this seems to assume that the values of planar begin at 0,
          which may not be true ... this change makes it work for categorical,
