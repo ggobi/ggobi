@@ -44,7 +44,7 @@ void symbol_link_by_id (gboolean persistentp, gint k, datad * sd, ggobid * gg)
         continue;        /*-- skip the originating datad --*/
 
       i = -1;
-      if(sd->rowIds) {
+      if(sd->rowIds && d->idTable) {
          gpointer ptr = g_hash_table_lookup(d->idTable, sd->rowIds[id]);
          if(ptr) {
            i = * ((guint *)ptr);
