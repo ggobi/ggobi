@@ -33,13 +33,16 @@ void
 filesel_ok (GtkWidget *w, GtkFileSelection *fs)
 {
   extern const gchar* const key_get (void);
-  ggobid *gg = (ggobid *) gtk_object_get_data (GTK_OBJECT (fs), key_get());
-  gchar *fname = gtk_file_selection_get_filename (GTK_FILE_SELECTION (fs));
-  guint action = GPOINTER_TO_INT (gtk_object_get_data (GTK_OBJECT (fs),
-                 "action"));
-  guint len = strlen (fname);
+  const gchar *fname;
+  ggobid *gg;
+  guint action, len;
   gchar *filename;
   gboolean firsttime;
+
+  gg = (ggobid *) gtk_object_get_data (GTK_OBJECT (fs), key_get());
+  fname = gtk_file_selection_get_filename (GTK_FILE_SELECTION (fs));
+  action = GPOINTER_TO_INT (gtk_object_get_data (GTK_OBJECT (fs), "action"));
+  len = strlen (fname);
 
   switch (action) {
     case READ_FILESET:

@@ -889,7 +889,7 @@ show_plugin_list(ggobid *gg, gint action, GtkWidget *w)
 void
 store_session_in_file(GtkWidget *btn, GtkWidget *selector)
 {
-  gchar *fileName;
+  const gchar *fileName;
   ggobid *gg;
 
   fileName = gtk_file_selection_get_filename(GTK_FILE_SELECTION(selector));
