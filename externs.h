@@ -563,13 +563,9 @@ void cpanel_barchart_make (ggobid *gg);
 void cpanel_barchart_set (cpaneld *cpanel, ggobid *gg);
 #endif
 
-/*
- * In order to test the win32 drawing code, I need access
- * to these functions.  -dfs
-*/
+#ifdef WIN32
 void win32_draw_to_pixmap_binned (icoords *, icoords *, gint, splotd *, ggobid *gg);
 void win32_draw_to_pixmap_unbinned (gint, splotd *, ggobid *gg);
-#ifdef WIN32
 #endif
 
 void showInputDescription(InputDescription *desc, ggobid *gg);
