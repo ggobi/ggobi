@@ -33,12 +33,18 @@ lib/libggobi.so lib: $(GTK_EXT)
 bin/xmlConvert:
 	$(MAKE) -C src ../bin/xmlConvert
 
-# Should use install command.
-install:
-	echo "Installation into a system directory is not implemented yet"
+HEADER_FILES=$(wildcard include/*.h) 
 
-	#cp bin/xmlConvert  bin/ggobi bin/ggobi.bin $(INSTALL_DIR)/bin
-	#cp lib/libggobi.so $(INSTALL_DIR)/lib
+# Should use install command.
+install: bin/ggobi.bin
+	if test -n "${EMBED_LIB}" ; then  \
+	  $(INSTALL) $(INSTALL_FLAGS) $(EMBED_LIB) $(libdir) ;\
+	fi
+	$(INSTALL) bin/ggobi-config $(bindir)
+	$(INSTALL) bin/ggobi $(bindir)
+	if ! test -d $(includedir) ; then $(INSTALL) -d $(includedir) ; fi
+	$(INSTALL) $(INSTALL_FLAGS) $(HEADER_FILES) $(includedir)
+
 
 Rggobi: @EMBED_LIB@
 	(GGOBI_ROOT=`pwd` ; export GGOBI_ROOT ; @R_BIN@ INSTALL -c @R_PKG_DIR@ $@)

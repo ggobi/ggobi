@@ -103,6 +103,9 @@ if test -n  "${UNAME}" ; then
  OS_INFO=`uname -a`
 fi
 
+AC_PATH_PROG(INSTALL, install)
+AC_SUBST(INSTALL)
+
 
 DEFAULT_LIB_DIRS="/usr/lib /usr/local/lib /opt/lib"
 DEFAULT_INC_DIRS="/usr/include /usr/local/include /usr/local/src/include /usr/include/gnome-xml"
@@ -509,6 +512,7 @@ else
  INSTALL_DIR=$prefix
 fi
 AC_SUBST(INSTALL_DIR)
+
 
  dnl Process the different .in files, substituting the values computed here in the configuration
  dnl script for the corresponding @variable@ in these files.

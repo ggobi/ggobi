@@ -1,6 +1,7 @@
 # This is placed in the top-level directory
 # of the ggobi suite and is a convenience
 # for 
+# This is never used?
 
 .PHONY:	lib
 
@@ -9,4 +10,7 @@ ggobi bin/ggobi:
 
 lib libggobi.so lib/libggobi.so:
 	$(MAKE) -C src ../lib/libggobi.so
+
+install: bin/ggobi lib/libggobi.so
+
 

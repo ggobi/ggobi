@@ -22,6 +22,18 @@ OTHER_CFLAGS=@OTHER_CFLAGS@
 
 MV=@MV@
 
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+includedir=@includedir@
+libdir=@libdir@
+sysconfdir=@sysconfdir@
+includedir=@includedir@/ggobi
+bindir=@bindir@
+
+INSTALL=@INSTALL@
+
+EMBED_LIB=@EMBED_LIB@
+
 LO_DIR=@LO_DIR@
 
 %.o: %.c
