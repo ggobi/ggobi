@@ -184,6 +184,7 @@ struct _ggobid {
 /*------------------------- writing out data ---------------------------*/
 
  struct _Save {
+   GtkWidget *window;
    gint format, stage, row_ind, column_ind, missing_ind;
    gboolean jitter_p, edges_p;
  } save;

@@ -15,8 +15,6 @@
 
 #include "writedata.h"
 
-static GtkWidget *window = NULL;
-
 static gchar *format_lbl[] =
   {"XML", "File set (ascii)",
 #ifdef BINARY_IO_IMPLEMENTED
@@ -85,7 +83,7 @@ static void edgesp_set_cb (GtkWidget *w, gpointer cbd)
   edgesp_set ((gboolean ) GPOINTER_TO_INT (cbd), gg);
 }
 
-/*-- called when closed from the button --*/
+/*-- called when closed from the button -- what button? --*/
 /*
 static void
 close_cb (GtkWidget *w) {
@@ -94,9 +92,9 @@ close_cb (GtkWidget *w) {
 }
 */
 /*-- called when closed from the window manager --*/
-static void delete_cb (GtkWidget *w, GdkEvent *event) {
-  gtk_widget_destroy (window);
-  window = NULL;
+static void delete_cb (GtkWidget *w, GdkEvent *event, ggobid *gg) {
+  gtk_widget_destroy (gg->save.window);
+  gg->save.window = NULL;
 }
 
 void
@@ -104,20 +102,20 @@ writeall_window_open (ggobid *gg) {
   GtkWidget *vbox, *table, *opt, *btn;
   gint j;
 
-  if (window == NULL) {
+  if (gg->save.window == NULL) {
 
-    window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-    gtk_signal_connect (GTK_OBJECT (window), "delete_event",
+    gg->save.window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+    gtk_signal_connect (GTK_OBJECT (gg->save.window), "delete_event",
                         GTK_SIGNAL_FUNC (delete_cb), (gpointer) gg);
-    gtk_window_set_title (GTK_WINDOW (window), "create ggobi file set");
+    gtk_window_set_title (GTK_WINDOW (gg->save.window), "create ggobi file set");
     
-    gtk_container_set_border_width (GTK_CONTAINER (window), 10);
+    gtk_container_set_border_width (GTK_CONTAINER (gg->save.window), 10);
 
     vbox = gtk_vbox_new (false, VBOX_SPACING);
-    gtk_container_add (GTK_CONTAINER (window), vbox);
+    gtk_container_add (GTK_CONTAINER (gg->save.window), vbox);
 
     table = gtk_table_new (7, 2, false);
-/*    gtk_container_add (GTK_CONTAINER (window), table);*/
+/*    gtk_container_add (GTK_CONTAINER (gg->save.window), table);*/
     gtk_box_pack_start (GTK_BOX (vbox), table,
       false, false, 3);
 
@@ -272,9 +270,9 @@ Add a button to open a file selection box; see filename_get in main_ui.c
                         GTK_SIGNAL_FUNC (filename_get_w), gg);
 
 
-    gtk_widget_show_all (window);
+    gtk_widget_show_all (gg->save.window);
   }
 
-  gdk_window_raise (window->window);
+  gdk_window_raise (gg->save.window->window);
 }
 

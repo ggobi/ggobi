@@ -69,6 +69,8 @@ void globals_init (ggobid *gg) {
 
   gg->d = NULL;
 
+  gg->save.window = NULL;
+
        /*-- If this signal has not been initialized yet, do it now --*/
   if (gtk_signal_lookup ("datad_added", GTK_TYPE_WIDGET) == 0) {
     GGobiSignals[DATAD_ADDED_SIGNAL] =
