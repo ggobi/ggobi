@@ -221,7 +221,6 @@ cpanel_parcoords_make (ggobid *gg) {
 /*--------------------------------------------------------------------*/
 
 
-
 /*
   The useIds indicates whether the callback data should be integers
   identifying the menu item or the global gg.
@@ -229,11 +228,11 @@ cpanel_parcoords_make (ggobid *gg) {
   See scatmat_mode_menu_make and scatterplot_mode_menu_make.
  */
 void
-parcoords_mode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func, ggobid *gg, gboolean useIds) {
+parcoords_mode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func,
+  ggobid *gg, gboolean useIds)
+{
 
-/*
- * I/O menu
-*/
+  /*-- I/O menu --*/
   gg->parcoords.mode_menu = gtk_menu_new ();
 
   CreateMenuItem (gg->parcoords.mode_menu, "Parallel Coordinates",
@@ -258,29 +257,6 @@ parcoords_mode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func, ggobid
 */
 
   gtk_widget_show (gg->parcoords.mode_menu);
-}
-
-void
-pcplot_menus_make (ggobid *gg)
-{
-/*
- * Options menu
-*/
-  gg->menus.options_item = submenu_make ("_Options", 'O',
-    gg->main_accel_group);
-  gg->menus.options_menu = gtk_menu_new ();
-
-  CreateMenuCheck (gg->menus.options_menu, "Show tooltips",
-    GTK_SIGNAL_FUNC (tooltips_show_cb), NULL,
-    GTK_TOOLTIPS (gg->tips)->enabled, gg);
-
-  CreateMenuCheck (gg->menus.options_menu, "Show control panel",
-    GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
-    GTK_WIDGET_VISIBLE (gg->mode_frame), gg);
-
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
-    gg->menus.options_menu);
-  submenu_insert (gg->menus.options_item, gg->main_menubar, OPTIONS_MENU_POS);
 }
 
 /*--------------------------------------------------------------------*/

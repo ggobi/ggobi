@@ -257,11 +257,10 @@ cpanel_movepts_make (ggobid *gg) {
   GtkWidget *btn, *opt, *box, *hb, *lbl;
   
   gg->control_panel[MOVEPTS] = gtk_vbox_new (false, VBOX_SPACING);
-  gtk_container_set_border_width (GTK_CONTAINER (gg->control_panel[MOVEPTS]), 5);
+  gtk_container_set_border_width (GTK_CONTAINER (gg->control_panel[MOVEPTS]),
+                                  5);
 
-/*
- * option menu: direction of motion 
-*/
+  /*-- option menu: direction of motion --*/
   hb = gtk_vbox_new (false, 0);
   gtk_box_pack_start (GTK_BOX (gg->control_panel[MOVEPTS]),
                       hb, false, false, 0);
@@ -279,9 +278,7 @@ cpanel_movepts_make (ggobid *gg) {
                         (GtkSignalFunc) mdir_cb, gg);
   gtk_box_pack_start (GTK_BOX (hb), opt, false, false, 0);
 
-/*
- * Use group toggle
-*/
+  /*-- Use group toggle --*/
   btn = gtk_check_button_new_with_label ("Move brush group");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Move all points with the same symbol", NULL);
@@ -290,9 +287,7 @@ cpanel_movepts_make (ggobid *gg) {
   gtk_box_pack_start (GTK_BOX (gg->control_panel[MOVEPTS]),
     btn, false, false, 1);
 
-/*
- * Box to hold reset buttons
-*/
+  /*-- Box to hold reset buttons --*/
   box = gtk_hbox_new (true, 2);
 
   btn = gtk_button_new_with_label ("Reset all");
@@ -314,33 +309,4 @@ cpanel_movepts_make (ggobid *gg) {
 
   gtk_widget_show_all (gg->control_panel[MOVEPTS]);
 }
-
-
-/*--------------------------------------------------------------------*/
-/*                   Resetting the main menubar                       */
-/*--------------------------------------------------------------------*/
-
-void
-movepts_menus_make (ggobid *gg) {
-/*
- * Options menu
-*/
-  gg->menus.options_item = submenu_make ("_Options", 'O',
-    gg->main_accel_group);
-  gg->menus.options_menu = gtk_menu_new ();
-
-  CreateMenuCheck (gg->menus.options_menu, "Show tooltips",
-    GTK_SIGNAL_FUNC (tooltips_show_cb), NULL,
-    GTK_TOOLTIPS (gg->tips)->enabled, gg);
-
-  CreateMenuCheck (gg->menus.options_menu, "Show control panel",
-    GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
-    GTK_WIDGET_VISIBLE (gg->mode_frame), gg);
-
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
-    gg->menus.options_menu);
-  submenu_insert (gg->menus.options_item, gg->main_menubar, OPTIONS_MENU_POS);
-}
-
-
 

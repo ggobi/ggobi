@@ -57,6 +57,7 @@ SHARED_LD_FLAGS= -shared
 LDFLAGS=
 
 SRC=ggobi.c datad.c make_ggobi.c color.c main_ui.c splash.c cpanel.c \
+ menus.c \
  utils.c utils_ui.c utils_gdk.c array.c vector.c \
  read_array.c read_data.c io.c writedata_ui.c writedata.c write_svg.c \
  limits.c pipeline.c missing.c \
@@ -96,6 +97,7 @@ SRC=ggobi.c datad.c make_ggobi.c color.c main_ui.c splash.c cpanel.c \
 
 
 OB=ggobi.o datad.o make_ggobi.o color.o main_ui.o splash.o cpanel.o \
+ menus.o \
  utils.o utils_ui.o utils_gdk.o array.o vector.o \
  read_array.o read_data.o io.o writedata_ui.o writedata.o write_svg.o \
  limits.o pipeline.o missing.o \

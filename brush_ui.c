@@ -20,7 +20,8 @@
 #include "vars.h"
 #include "externs.h"
 
-static void brush_update_set_cb (GtkCheckMenuItem *w, guint action) 
+/*-- called from Options menu --*/
+void brush_update_set_cb (GtkCheckMenuItem *w, guint action) 
 {
   ggobid *gg = GGobiFromWidget(GTK_WIDGET(w), true);
   gg->brush.updateAlways_p = !gg->brush.updateAlways_p;
@@ -113,7 +114,7 @@ static void cluster_window_cb (GtkToggleButton *button, ggobid *gg)
 */
 
 /* Actions from the Reset menu in the main menubar */
-static void
+void
 brush_reset_cb (GtkWidget *w, gpointer cbd)
 {
   ggobid *gg = GGobiFromWidget (w, true);
@@ -325,98 +326,6 @@ brush_event_handlers_toggle (splotd *sp, gboolean state) {
 /*--------------------------------------------------------------------*/
 /*                   Resetting the main menubar                       */
 /*--------------------------------------------------------------------*/
-
-void
-brush_menus_make (ggobid *gg) {
-  GtkWidget *item;
-
-/*
- * Reset menu
-*/
-  gg->menus.reset_menu = gtk_menu_new ();
-
-  item = gtk_menu_item_new_with_label ("Show all points");
-  GGobi_widget_set (item, gg, true);
-  gtk_signal_connect (GTK_OBJECT (item), "activate",
-                      GTK_SIGNAL_FUNC (brush_reset_cb),
-                      (gpointer) GINT_TO_POINTER (0));
-  gtk_menu_append (GTK_MENU (gg->menus.reset_menu), item);
-
-/*
-  item = gtk_menu_item_new_with_label ("Reset point colors");
-  GGobi_widget_set (item, gg, true);
-  gtk_signal_connect (GTK_OBJECT (item), "activate",
-                      GTK_SIGNAL_FUNC (brush_reset_cb),
-                      (gpointer) GINT_TO_POINTER (1));
-  gtk_menu_append (GTK_MENU (gg->menus.reset_menu), item);
-
-  item = gtk_menu_item_new_with_label ("Reset glyphs");
-  GGobi_widget_set (item, gg, true);
-  gtk_signal_connect (GTK_OBJECT (item), "activate",
-                      GTK_SIGNAL_FUNC (brush_reset_cb),
-                      (gpointer) GINT_TO_POINTER (2));
-  gtk_menu_append (GTK_MENU (gg->menus.reset_menu), item);
-*/
-
-  item = gtk_menu_item_new_with_label ("Show all edges");
-  GGobi_widget_set (item, gg, true);
-  gtk_signal_connect (GTK_OBJECT (item), "activate",
-                      GTK_SIGNAL_FUNC (brush_reset_cb),
-                      (gpointer) GINT_TO_POINTER (3));
-  gtk_menu_append (GTK_MENU (gg->menus.reset_menu), item);
-
-/*
-  item = gtk_menu_item_new_with_label ("Reset edgecolors");
-  GGobi_widget_set (item, gg, true);
-  gtk_signal_connect (GTK_OBJECT (item), "activate",
-                      GTK_SIGNAL_FUNC (brush_reset_cb),
-                      (gpointer) GINT_TO_POINTER(4));
-  gtk_menu_append (GTK_MENU (gg->menus.reset_menu), item);
-*/
-
-  item = gtk_menu_item_new_with_label ("Reset brush size");
-  GGobi_widget_set (item, gg, true);
-  gtk_signal_connect (GTK_OBJECT (item), "activate",
-                      GTK_SIGNAL_FUNC (brush_reset_cb),
-                      (gpointer) GINT_TO_POINTER (5));
-  gtk_menu_append (GTK_MENU (gg->menus.reset_menu), item);
-
-  gtk_widget_show_all (gg->menus.reset_menu);
-
-
-  gg->menus.reset_item = submenu_make ("_Reset", 'R',
-    gg->main_accel_group);
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.reset_item),
-    gg->menus.reset_menu);
-  submenu_insert (gg->menus.reset_item, gg->main_menubar, 4);
-
-/*
- * Options menu
-*/
-  gg->menus.options_item = submenu_make ("_Options", 'O',
-    gg->main_accel_group);
-  gg->menus.options_menu = gtk_menu_new ();
-
-  CreateMenuCheck (gg->menus.options_menu, "Show tooltips",
-    GTK_SIGNAL_FUNC (tooltips_show_cb), NULL,
-    GTK_TOOLTIPS (gg->tips)->enabled, gg);
-
-  CreateMenuCheck (gg->menus.options_menu, "Show control panel",
-    GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
-    GTK_WIDGET_VISIBLE (gg->mode_frame), gg);
-
-  /* Add a separator before the mode-specific items */
-  CreateMenuItem (gg->menus.options_menu, NULL,
-    "", "", NULL, NULL, NULL, NULL, NULL);
-
-  CreateMenuCheck (gg->menus.options_menu, "Update brushing continuously",
-    GTK_SIGNAL_FUNC (brush_update_set_cb), NULL,
-    gg->brush.updateAlways_p, gg);
-
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
-    gg->menus.options_menu);
-  submenu_insert (gg->menus.options_item, gg->main_menubar, OPTIONS_MENU_POS);
-}
 
 void
 cpanel_brush_make (ggobid *gg) {

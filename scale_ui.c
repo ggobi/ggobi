@@ -359,65 +359,6 @@ scale_event_handlers_toggle (splotd *sp, gboolean state) {
   }
 }
 
-
-/*--------------------------------------------------------------------*/
-/*                   Resetting the main menubar                       */
-/*--------------------------------------------------------------------*/
-
-void
-scale_menus_make (ggobid *gg) {
-  GtkWidget *item;
-
-/*
- * Reset menu
-*/
-  gg->menus.reset_menu = gtk_menu_new ();
-
-  item = gtk_menu_item_new_with_label ("Reset pan");
-  gtk_signal_connect (GTK_OBJECT (item), "activate",
-                      GTK_SIGNAL_FUNC (pan_reset_cb),
-                      (gpointer) gg);
-  gtk_menu_append (GTK_MENU (gg->menus.reset_menu), item);
-
-  item = gtk_menu_item_new_with_label ("Reset zoom");
-  gtk_signal_connect (GTK_OBJECT (item), "activate",
-                      GTK_SIGNAL_FUNC (zoom_reset_cb),
-                      (gpointer) gg);
-  gtk_menu_append (GTK_MENU (gg->menus.reset_menu), item);
-
-  gtk_widget_show_all (gg->menus.reset_menu);
-
-  gg->menus.reset_item = submenu_make ("_Reset", 'R',
-    gg->main_accel_group);
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.reset_item),
-    gg->menus.reset_menu); 
-  submenu_insert (gg->menus.reset_item, gg->main_menubar, 4);
-
-/*
- * Options menu
-*/
-
-  gg->menus.options_item = submenu_make ("_Options", 'O',
-    gg->main_accel_group);
-  gg->menus.options_menu = gtk_menu_new ();
-
-  CreateMenuCheck (gg->menus.options_menu, "Show tooltips",
-    GTK_SIGNAL_FUNC (tooltips_show_cb), NULL,
-    GTK_TOOLTIPS (gg->tips)->enabled, gg);
-
-  CreateMenuCheck (gg->menus.options_menu, "Show control panel",
-    GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
-    GTK_WIDGET_VISIBLE (gg->mode_frame), gg);
-
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
-    gg->menus.options_menu);
-  submenu_insert (gg->menus.options_item, gg->main_menubar, OPTIONS_MENU_POS);
-}
-
-/*--------------------------------------------------------------------*/
-/*                   End of main menubar section                      */
-/*--------------------------------------------------------------------*/
-
 void
 cpanel_scale_make (ggobid *gg) {
   GtkWidget *frame, *f, *vbox, *hbox, *vb, *lbl;
@@ -427,9 +368,7 @@ cpanel_scale_make (ggobid *gg) {
   gg->control_panel[SCALE] = gtk_vbox_new (false, VBOX_SPACING);
   gtk_container_set_border_width (GTK_CONTAINER (gg->control_panel[SCALE]), 5);
 
-/*
- * frame for arrow keys
-*/
+
   frame = gtk_frame_new ("Interaction style");
   gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
   gtk_box_pack_start (GTK_BOX (gg->control_panel[SCALE]),
@@ -455,9 +394,7 @@ cpanel_scale_make (ggobid *gg) {
     NULL);
   gtk_box_pack_start (GTK_BOX (hbox), radio2, TRUE, TRUE, 0);
 
-/*
- * frame and vbox for click-style controls
-*/
+  /*-- frame and vbox for click-style controls --*/
   frame = gtk_frame_new ("Click-style controls");
   gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
   gtk_box_pack_start (GTK_BOX (gg->control_panel[SCALE]),

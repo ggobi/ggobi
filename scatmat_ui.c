@@ -95,42 +95,25 @@ scatmat_mode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func, ggobid *
   gg->app.scatmat_mode_menu = gtk_menu_new ();
 
   CreateMenuItem (gg->app.scatmat_mode_menu, "Scatterplot Matrix",
-    "^e", "", NULL, accel_group, func, useIds ? GINT_TO_POINTER (SCATMAT) : gg, gg);
+    "^e", "", NULL, accel_group, func,
+    useIds ? GINT_TO_POINTER (SCATMAT) : gg, gg);
 
   /* Add a separator */
   CreateMenuItem (gg->app.scatmat_mode_menu, NULL,
     "", "", NULL, NULL, NULL, NULL, gg);
 
   CreateMenuItem (gg->app.scatmat_mode_menu, "Scale",
-    "^s", "", NULL, accel_group, func, useIds ? GINT_TO_POINTER (SCALE) : gg, gg);
+    "^s", "", NULL, accel_group, func,
+    useIds ? GINT_TO_POINTER (SCALE) : gg, gg);
   CreateMenuItem (gg->app.scatmat_mode_menu, "Brush",
-    "^b", "", NULL, accel_group, func, useIds ? GINT_TO_POINTER (BRUSH) : gg, gg);
+    "^b", "", NULL, accel_group, func,
+    useIds ? GINT_TO_POINTER (BRUSH) : gg, gg);
   CreateMenuItem (gg->app.scatmat_mode_menu, "Identify",
-    "^i", "", NULL, accel_group, func, useIds ? GINT_TO_POINTER (IDENT) : gg, gg);
+    "^i", "", NULL, accel_group, func,
+    useIds ? GINT_TO_POINTER (IDENT) : gg, gg);
   CreateMenuItem (gg->app.scatmat_mode_menu, "Move Points",
-    "^m", "", NULL, accel_group, func, useIds ? GINT_TO_POINTER (MOVEPTS) : gg, gg);
+    "^m", "", NULL, accel_group, func,
+    useIds ? GINT_TO_POINTER (MOVEPTS) : gg, gg);
 
   gtk_widget_show (gg->app.scatmat_mode_menu);
-}
-
-void
-scatmat_menus_make (ggobid *gg) {
-/*
- * Options menu
-*/
-  gg->menus.options_item = submenu_make ("_Options", 'O',
-    gg->main_accel_group);
-  gg->menus.options_menu = gtk_menu_new ();
-
-  CreateMenuCheck (gg->menus.options_menu, "Show tooltips",
-    GTK_SIGNAL_FUNC (tooltips_show_cb), NULL,
-    GTK_TOOLTIPS (gg->tips)->enabled, gg);
-
-  CreateMenuCheck (gg->menus.options_menu, "Show control panel",
-    GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
-    GTK_WIDGET_VISIBLE (gg->mode_frame), gg);
-
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
-    gg->menus.options_menu);
-  submenu_insert (gg->menus.options_item, gg->main_menubar, OPTIONS_MENU_POS);
 }

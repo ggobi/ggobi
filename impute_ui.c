@@ -106,10 +106,10 @@ impute_window_open (ggobid *gg) {
       "For which variables should imputation be performed?",
       NULL);
     populate_option_menu (opt, whichvars_lbl,
-      sizeof (whichvars_lbl) / sizeof (gchar *), (GtkSignalFunc) whichvars_set_cb, gg);
+      sizeof (whichvars_lbl) / sizeof (gchar *),
+      (GtkSignalFunc) whichvars_set_cb, gg);
     gtk_box_pack_start (GTK_BOX (vbox), opt, false, false, 2);
     
-
     /*-- Create a new notebook, place the position of the tabs --*/
     gg->impute.notebook = gtk_notebook_new ();
     gtk_notebook_set_tab_pos (GTK_NOTEBOOK (gg->impute.notebook),

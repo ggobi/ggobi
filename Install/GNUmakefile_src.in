@@ -47,6 +47,7 @@ SRC=\
     lineedit_ui.c \
     main_ui.c \
     make_ggobi.c \
+    menus.c \
     missing.c \
     movepts.c \
     movepts_ui.c \

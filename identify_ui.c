@@ -188,30 +188,8 @@ identify_event_handlers_toggle (splotd *sp, gboolean state) {
 
 
 /*----------------------------------------------------------------------*/
-/*                   Resetting the main menubar                         */
+/*                   Making the control panel                           */
 /*----------------------------------------------------------------------*/
-
-void
-identify_menus_make (ggobid *gg) {
-/*
- * Options menu
-*/
-  gg->menus.options_item = submenu_make ("_Options", 'O',
-    gg->main_accel_group);
-  gg->menus.options_menu = gtk_menu_new ();
-
-  CreateMenuCheck (gg->menus.options_menu, "Show tooltips",
-    GTK_SIGNAL_FUNC (tooltips_show_cb), NULL,
-    GTK_TOOLTIPS (gg->tips)->enabled, gg);
-
-  CreateMenuCheck (gg->menus.options_menu, "Show control panel",
-    GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
-    GTK_WIDGET_VISIBLE (gg->mode_frame), gg);
-
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
-    gg->menus.options_menu);
-  submenu_insert (gg->menus.options_item, gg->main_menubar, OPTIONS_MENU_POS);
-}
 
 void
 cpanel_identify_make(ggobid *gg) {

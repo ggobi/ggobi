@@ -17,7 +17,7 @@ CFLAGS= -O2 -ansi -Wall  -mno-cygwin -mpentium \
 
 
 SRC= ggobi.c make_ggobi.c color.c main_ui.c cpanel.c utils.c array.c vector.c \
- splash.c \
+ menus.c splash.c \
  read_array.c read_data.c io.c writedata_ui.c writedata.c \
  pipeline.c missing.c \
  scatterplot.c scatterplot_ui.c \
@@ -46,7 +46,7 @@ SRC= ggobi.c make_ggobi.c color.c main_ui.c cpanel.c utils.c array.c vector.c \
  limits.c timeplot.c  edges.c
 
 OB=ggobi.o make_ggobi.o color.o main_ui.o cpanel.o array.o vector.o \
- splash.o \
+ menus.o splash.o \
  utils_ui.o utils.o utils_gdk.o \
  read_array.o read_data.o io.o writedata_ui.o writedata.o \
  pipeline.o missing.o \

@@ -30,7 +30,6 @@ splot_configure_cb (GtkWidget *w, GdkEventConfigure *event, splotd *sp)
   displayd *display = (displayd *) sp->displayptr; 
   cpaneld *cpanel = &display->cpanel;
   datad *d = display->d;
-/*  gfloat ftmp;*/
   gg = sp->displayptr->ggobi;
 
   /*
