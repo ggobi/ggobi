@@ -769,26 +769,26 @@ top of the ViewMode menu.
 The 1D plot can be displayed in two ways:  as a textured dot plot
 or an average shifted histogram, or ASH.
 
-The textured dot plot uses a method described in
-\cite{TukeyTukey90}.  This method spreads the data laterally by
-amounts that are partly constrained and partly random, resulting in a
-fairly smooth spreading of the points and minimizing artifacts of the
-plotting method, such as stripes, clusters, or gaps.
+The textured dot plot uses a method described in \cite{TukeyTukey90}.
+This method spreads the data laterally by amounts that are partly
+constrained and partly random, resulting in a fairly smooth spreading
+of the points and minimizing artifacts of the plotting method, such as
+stripes, clusters, or gaps.
 
-The ASH is due to Scott (\cite{Scott92}),
-and the code is also his.  In this method, several histograms are
-calculated using the same bin width but different origins, and the
-averaged results are plotted.  His algorithm has two key parameters: 
-the number of bins, which controls the bin width, and the number of
-histograms to be computed.
-In ggobi, the number of bins is held constant (at 200), while the
-smoothing parameter available on the console controls the number of
-histograms (which ranges from 1 to 50).
+The ASH is due to Scott (\cite{Scott92}), and the code is also his.
+In this method, several histograms are calculated using the same bin
+width but different origins, and the averaged results are plotted.
+His algorithm has two key parameters: the number of bins, which controls
+the bin width, and the number of histograms to be computed.  In ggobi,
+the number of bins is held constant (at 200), while the smoothing
+parameter available on the console controls the number of histograms
+(which ranges from 1 to 50).  The effect is a smoothed histogram ~--~
+a histogram that allows us to retain case identity so that the plots
+can be linked case by case to other scatterplots.
 
-Line segments can be added that run between
-the plotted point and the baseline of the ASH.  This is helpful
-when the smoothing parameter is low, because it helps your eye
-make out the the shape of the ASH.
+Line segments can be added that run between the plotted point and the
+baseline of the ASH.  This is helpful when the smoothing parameter is low,
+because it helps your eye make out the the shape of the ASH.
 
 The 1D plot will be arranged horizontally if you select a variable
 with a left click, and vertically if you use a middle or right click.
@@ -1554,15 +1554,16 @@ that allows subsets to be specified in one of six ways.
 \\{\bf Consecutive block}:  Specify the first and last row of the block.
      (The two controls in the second row control the increment used
      in the control in the first row.)
-\\{\bf Range}:  Select a variable and specify a minimum and maximum
-     value.
+\\{\bf Limits}:  Use the limits defined by the user in the variable
+     manipulation table to define the subset.
 \\{\bf Every nth case}:  Specify the interval and the first row.
 \\{\bf Sticky labels}:  All cases with a ``sticky'' label will
   be in the subset.  If no points have a sticky label, this
   will have no effect. (See {\em Identification} for a description
   of sticky labels.)
-\\{\bf Row labels}: Type in a row label, and all cases with that
-  label will be in the subset.
+\\{\bf Row labels}: Type in a string, and specify where it should
+  fall (or not fall) in the row labels, and whether case should
+  be ignored.  Matches will be included in the subset.
 
 Select one of those six, then click on {\bf Subset} in the
 bottom row of the panel.  If you want to re-include all rows, 
