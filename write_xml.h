@@ -12,6 +12,20 @@
 extern "C" {
 #endif
 
+  /*
+    An instance of this structure is passed to all the routines
+    that are called when writing the XML representation of a
+    ggobid object (its datad elements). 
+    Thus it can be used to store additional information that
+    may be needed by the output engine for particular elements
+    and attributes.
+    For example, we might add the description text here.
+    Also, we might add the precision (number of digits after
+    the decimal point) here and look at it in writeFloat().
+    Or we might have an `inline' field to indicate whether the colormap
+    should be output directly into the file/stream or separately.
+    So basically, this can also hold options.
+   */
 
 typedef struct {
 
