@@ -23,7 +23,7 @@ graphact_init (graphactd *ga) {
 
   /*-- finding neighborhoods --*/
   ga->neighbors_find_p = false;
-  ga->nbor_radius = 1;
+  ga->neighborhood_depth = 1;
 }
 
 void

@@ -50,16 +50,6 @@ show_graphact_window (GtkWidget *widget, PluginInstance *inst)
     window = create_graphact_window (inst->gg, inst);
     gtk_object_set_data (GTK_OBJECT (window), "graphactd", ga);
 
-#ifdef HIGHLIGHTSTICKY
-/*-- Can't do this here until I have an agnostic highlight function --*/
-void highlight_edges_cb (GtkButton *button, PluginInstance *inst);
-  gtk_signal_connect (GTK_OBJECT(inst->gg),
-    "sticky_point_added", highlight_sticky_edges, inst);
-  gtk_signal_connect (GTK_OBJECT(inst->gg),
-    "sticky_point_removed", highlight_sticky_edges, inst);
-#endif
-
-
   } else {
     gtk_widget_show_now ((GtkWidget*) inst->data);
   }
@@ -128,10 +118,12 @@ graphact_clist_datad_added_cb (ggobid *gg, datad *d, void *clist)
   gtk_widget_show_all (swin);
 }
 
+static const gchar *const neighborhood_depth_lbl[] = {
+  " 1 ", " 2 "};
 GtkWidget *
 create_graphact_window(ggobid *gg, PluginInstance *inst)
 {
-  GtkWidget *window, *main_vbox, *notebook, *label, *frame, *vbox, *btn;
+  GtkWidget *window, *main_vbox, *notebook, *label, *frame, *vbox, *btn, *opt;
   GtkTooltips *tips = gtk_tooltips_new ();
   /*-- for lists of datads --*/
   gchar *clist_titles[2] = {"node sets", "edge sets"};
@@ -140,7 +132,6 @@ create_graphact_window(ggobid *gg, PluginInstance *inst)
   gchar *row[1];
   GSList *l;
   graphactd *ga = graphactFromInst (inst);
-  GtkObject *adj;
 
   /*-- I will probably have to get hold of this window, after which
        I can name all the other widgets --*/
@@ -260,13 +251,19 @@ create_graphact_window(ggobid *gg, PluginInstance *inst)
 
   vbox = gtk_vbox_new (false, 1);
   gtk_container_add (GTK_CONTAINER(frame), vbox);
+/*
+ checkbox:  Neighborhood finder on or off
+ button: restore all nodes and edges
+ option menu taking the values {1,2} for the radius of the path to be reported
+ button: label all nodes and edges?
+*/
 
   hbox = gtk_hbox_new (true, 10);
   gtk_box_pack_start (GTK_BOX (vbox), hbox, false, false, 2);
 
   btn = gtk_check_button_new_with_label ("Show neighbors");
   gtk_signal_connect (GTK_OBJECT (btn), "toggled",
-    GTK_SIGNAL_FUNC (show_neighbors_cb), inst);
+    GTK_SIGNAL_FUNC (show_neighbors_toggle_cb), inst);
   gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 2);
 
   btn = gtk_button_new_with_label ("Show all");
@@ -274,13 +271,17 @@ create_graphact_window(ggobid *gg, PluginInstance *inst)
     GTK_SIGNAL_FUNC (ga_nodes_show_cb), inst);  /*-- show all nodes --*/
   gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 2);
 
-/*
- checkbox:  Neighborhood finder on or off
- button: restore all nodes and edges
- slider taking the values {1,2} or {2,4} for the radius or diameter
-    of the path to be reported
- button: label all nodes and edges
-*/
+
+  hbox = gtk_hbox_new (true, 10);
+  gtk_box_pack_start (GTK_BOX (vbox), hbox, false, false, 2);
+  label = gtk_label_new ("Depth:");
+  gtk_misc_set_alignment (GTK_MISC (label), 0, 1);
+  gtk_box_pack_start (GTK_BOX (hbox), label, false, false, 0);
+  opt = gtk_option_menu_new ();
+  gtk_box_pack_start (GTK_BOX (hbox), opt, false, false, 0);
+  populate_option_menu (opt, (gchar**) neighborhood_depth_lbl,
+    sizeof (neighborhood_depth_lbl) / sizeof (gchar *),
+    (GtkSignalFunc) neighborhood_depth_cb, "PluginInst", inst);
 
   label = gtk_label_new ("Neighbors");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), frame, label);

@@ -18,7 +18,7 @@ typedef struct {
 
   /*-- finding neighborhoods --*/
   gboolean neighbors_find_p;
-  gint nbor_radius;
+  gint neighborhood_depth;
 
 } graphactd;
 
@@ -29,7 +29,8 @@ graphactd * graphactFromInst (PluginInstance *inst);
 void ga_leaf_hide_cb (GtkWidget *btn, PluginInstance *inst);
 void ga_nodes_show_cb (GtkWidget *btn, PluginInstance *inst);
 void count_visible_edges (PluginInstance *inst);
-void show_neighbors_cb (GtkToggleButton *button, PluginInstance *inst);
+void show_neighbors_toggle_cb (GtkToggleButton *button, PluginInstance *inst);
+void neighborhood_depth_cb (GtkWidget *w, gpointer cbd);
 
 #define GLAYOUT_H
 #endif
