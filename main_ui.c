@@ -327,6 +327,7 @@ mode_set (gint m) {
 
 void
 mode_activate (splotd *sp, gint m, gboolean state) {
+  extern void tour_func (gboolean);
 
   if (state == off) {
 
@@ -341,6 +342,7 @@ mode_activate (splotd *sp, gint m, gboolean state) {
         break;
 
       case TOUR2D:
+        tour_func (off);
         break;
 
       case SCALE:
@@ -362,6 +364,7 @@ mode_activate (splotd *sp, gint m, gboolean state) {
         break;
 
       case TOUR2D:
+        tour_func (on);
         break;
 
       case SCALE:

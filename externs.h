@@ -227,3 +227,4 @@ extern gboolean xyplot_varsel (splotd *, gint, gint *, gint);
 extern void zoom_by_drag (splotd *);
 extern void zoom_step (splotd *, gint, gint, rectd *);
 extern void tour_do_step (displayd *);
+extern void display_tour_init (displayd *);

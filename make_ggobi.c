@@ -142,12 +142,12 @@ make_ggobi (gchar *data_in, gboolean processEvents) {
     }
   }
 
-  pthread_create (&tour2d_tid, NULL, tour_thread, NULL);
+/*  pthread_create (&tour2d_tid, NULL, tour_thread, NULL);*/
 
   if (processEvents) {
-    gdk_threads_enter ();
+/*    gdk_threads_enter ();*/
     gtk_main ();
-    gdk_threads_leave ();
+/*    gdk_threads_leave ();*/
   }
 }
 

@@ -639,3 +639,35 @@ g_printerr ("(tour_thread)\n");
   return (NULL);
 }
 
+static int tour_idle = 0;
+gint
+tour_idle_func (gpointer idled)
+{
+  displayd *dsp = current_display;
+  cpaneld *cpanel = &dsp->cpanel;
+  gboolean doit = !cpanel->is_tour_paused;
+
+  if (doit)
+    run_tour (current_display);
+
+  return (doit);
+}
+
+void tour_func (gboolean state)
+{
+/*-- gtk_idle_add --*/
+/*
+  if (state)
+    tour_idle = gtk_idle_add_priority (G_PRIORITY_LOW,
+                                       (GtkFunction) tour_idle_func, NULL);
+  else {
+    gtk_idle_remove (tour_idle);
+    tour_idle = 0;
+  }
+*/
+
+   if (state)
+     tour_idle = gtk_timeout_add (40, tour_idle_func, NULL);
+   else
+     gtk_timeout_remove (tour_idle);
+}
