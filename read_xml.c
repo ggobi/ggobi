@@ -96,18 +96,18 @@ const gchar * const xmlDataTagNames[] = {
   "variable",
   "colormap",
   "color",
-/* variables */
+        /* variables */
   "realvariable",
   "categoricalvariable",
   "integervariable",
   "countervariable",
   "levels",
   "level",
-/* color scheme */
+        /* color scheme */
   "activeColorScheme",
-/* brushing attributes: color first; later, glyph type and size */
+        /* brushing attributes: color first; later, glyph type and size */
   "brush",
-/* data values */
+        /* data values */
   "real",
   "int",
   "string",
@@ -261,6 +261,8 @@ initParserData(XMLParserData *data, xmlSAXHandlerPtr handler, ggobid *gg)
   data->autoLevels = NULL;
 
   data->usesStringIds = false;
+
+  data->idNamesTable = NULL;
 }
 
 void 
@@ -479,8 +481,24 @@ resetRecordInfo(XMLParserData *data)
 {
   if(data->recordString)
     g_free(data->recordString);
+
   data->recordString = NULL;
   data->recordStringLength = 0;
+}
+
+void
+resolveEdgeIds(XMLParserData *parserData)
+{
+  if(parserData->edge_sources) {
+
+  }
+
+}
+
+void 
+resolveAllEdgeIds(XMLParserData *parserData)
+{
+	parserData;
 }
 
 void endXMLElement(void *user_data, const xmlChar *name)
@@ -489,9 +507,14 @@ void endXMLElement(void *user_data, const xmlChar *name)
   enum xmlDataState type = tagType(name, true);
 
   switch(type) {
+    case EDGES:
+      resolveEdgeIds(data);
     case DATASET:
       releaseCurrentDataInfo(data);
     break;
+    case EDGE:
+      data->current_record++;
+      break;
     case RECORD:
       setRecordValues(data, data->recordString, data->recordStringLength);
       data->current_record++;
@@ -533,6 +556,10 @@ void endXMLElement(void *user_data, const xmlChar *name)
     break;
     case CATEGORICAL_LEVEL:
     break;
+    case TOP:
+         /* resolve all the edges */
+      resolveAllEdgeIds(data);      
+      break;
     default:
       data = NULL; /* just any code so we can stop.*/
     break;
@@ -1665,6 +1692,8 @@ setDataset(const xmlChar **attrs, XMLParserData *parserData, enum xmlDataState t
   data->name = name;
   parserData->current_data = data;
 
+  parserData->edge_sources = parserData->edge_dests = NULL;
+
   if(type == EDGES) {
     setDatasetInfo(attrs, parserData);
   }
@@ -1686,6 +1715,26 @@ getCurrentXMLData(XMLParserData* parserData)
   return(data);
 }
 
+
+void
+setEdge(gint start, gint end, gint i, datad *d)
+{
+    gint k;
+    /*-- if encountering the first edge, allocate endpoints array --*/
+    if (d->edge.n == 0) 
+      edges_alloc (d->nrows, d);
+
+    d->edge.endpoints[i].a = start;
+    d->edge.endpoints[i].b = end;
+    d->edge.endpoints[i].jpartner = -1;  /*-- default value --*/
+    for (k=0; k<i; k++) {
+      if (d->edge.endpoints[k].a == end && d->edge.endpoints[k].b == start) {
+        d->edge.endpoints[i].jpartner = k;
+        d->edge.endpoints[k].jpartner = i;
+      }
+    }
+}
+
 gboolean
 readXMLRecord(const xmlChar **attrs, XMLParserData *data)
 {
@@ -1693,7 +1742,6 @@ readXMLRecord(const xmlChar **attrs, XMLParserData *data)
   const gchar *tmp;
   gchar *stmp;
   gint i = data->current_record;
-  gint k;
   gint start, end;
 
   data->current_element = 0;
@@ -1747,7 +1795,7 @@ readXMLRecord(const xmlChar **attrs, XMLParserData *data)
     if(data->usesStringIds) {
       ptr = (guint *) g_malloc(sizeof(guint));
       ptr[0] = i;
-      g_hash_table_insert(data->idTable, dupTmp = g_strdup(tmp), ptr);
+      g_hash_table_insert(data->idTable, dupTmp = intern(data, tmp), ptr);
       d->rowIds[i] = dupTmp;
     } else {
       value = strToInteger (tmp);
@@ -1770,29 +1818,43 @@ readXMLRecord(const xmlChar **attrs, XMLParserData *data)
   /* Read the edge source and destination pair if, present. */
   tmp = getAttribute(attrs, "source");   
   if (tmp != (const gchar *) NULL) {
+
+   if(data->usesStringIds) {
+     if(data->edge_sources == NULL) {
+        data->edge_sources = (gchar **) g_malloc(sizeof(gchar *) * d->nrows);
+        data->edge_dests = (gchar **) g_malloc(sizeof(gchar *) * d->nrows);
+     }
+       
+     data->edge_sources[data->current_record] = intern(data, tmp);
+     data->edge_dests[data->current_record] = intern(data, getAttribute(attrs, "destination"));
+   } else {
     start = strToInteger(tmp);
     tmp = getAttribute(attrs, "destination");   
     if (tmp != (const gchar *) NULL) {
       end = strToInteger(tmp);
-
-      /*-- if encountering the first edge, allocate endpoints array --*/
-      if (d->edge.n == 0) {
-        edges_alloc (d->nrows, d);
-      }
-
-      d->edge.endpoints[i].a = start;
-      d->edge.endpoints[i].b = end;
-      d->edge.endpoints[i].jpartner = -1;  /*-- default value --*/
-      for (k=0; k<i; k++) {
-        if (d->edge.endpoints[k].a == end && d->edge.endpoints[k].b == start) {
-          d->edge.endpoints[i].jpartner = k;
-          d->edge.endpoints[k].jpartner = i;
-        }
-      }
+      setEdge(start, end, i, d);
     }
+   }
   }
 
   return(true);
+}
+
+char * const
+intern(XMLParserData *data, const char * const el)
+{
+ char * ans;
+
+ if(data->idNamesTable == NULL) {
+   data->idNamesTable = g_hash_table_new(g_str_hash, g_str_equal);  
+ }
+
+ ans = g_hash_table_lookup(data->idNamesTable, el);
+ if(!ans) {
+   ans = g_strdup(el);
+   g_hash_table_insert(data->idNamesTable, ans, ans);
+ }
+ return(ans);
 }
 
 
@@ -1952,36 +2014,3 @@ getRowLabsFromTable(GHashTable *tbl, gchar **names)
   return(names);
 }
 
-
-
-#ifdef USE_ROW_ID
-static gint
-rowId (const gchar *tmp, XMLParserData *data)
-{
-  gint value = -1; /*  = strToInteger(tmp) - 1; */
-
-  if (value < 0) {
-   /* Now look up the ids for the rows. */
-   if(data->idTable) {
-     gpointer ptr = g_hash_table_lookup(data->idTable, tmp);
-     if(ptr)
-       value = *((guint *) ptr);
-   }
-
-#if 0
-   gint i;
-   datad *d = getCurrentXMLData(data);
-   for (i=0; i < d->nrows; i++) {
-     if (strcmp (tmp, g_array_index (d->rowlab, gchar *, i)) == 0 ||
-         (data->rowIds != NULL && data->rowIds[i] &&
-          strcmp(tmp, data->rowIds[i]) == 0))
-      {
-        value = i;
-        break;
-      }
-    }
-#endif 
-  }
-  return (value);
-}
-#endif

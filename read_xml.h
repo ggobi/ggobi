@@ -99,8 +99,13 @@ typedef struct _XMLUserData {
      Currently these are used to verify that the id's are unique
      within a dataset.
    */
+  GHashTable *idNamesTable;
+
   GHashTable *idTable;
   gboolean usesStringIds;
+
+  gchar **edge_sources;
+  gchar **edge_dests;
 
   gint recordLabelsVariable;
 
@@ -198,6 +203,8 @@ extern "C" {
   datad *getCurrentXMLData(XMLParserData * parserData);
 
   gboolean readXMLRecord(const xmlChar ** attrs, XMLParserData * data);
+
+  char * const intern(XMLParserData *, const char * const el);
 
 #ifdef __cplusplus
 }
