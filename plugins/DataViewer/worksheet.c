@@ -520,7 +520,13 @@ cell_changed(GtkSheet *sheet, gint row, gint column, datad *data)
     if (val) {
       value = strtod(val, &tmp);
       if(val == tmp) {
-        fprintf(stderr, "Error in strtod: %d\n", errno);fflush(stderr);
+/*
+ * This error message is trigged by resizing a column width when a
+ * cell is selected, or even by selecting a cell.  These are not
+ * errors.
+        fprintf(stderr, "Error in strtod: %d\n", errno);
+        fflush(stderr);
+*/
         return;
       }
 
@@ -539,11 +545,11 @@ cell_changed(GtkSheet *sheet, gint row, gint column, datad *data)
 void
 identify_cell(ggobid *gg, splotd *sp, gint id, datad *d, GtkSheet *sheet)
 {
-    if(id < 0)
-	return;
+  if(id < 0)
+    return;
 
-    gtk_sheet_moveto(sheet, id, 2, 0.5, 0.5);
-    gtk_sheet_select_row(sheet, id);
+  gtk_sheet_moveto(sheet, id, 2, 0.5, 0.5);
+  gtk_sheet_select_row(sheet, id);
 }
 
 
@@ -555,25 +561,24 @@ identify_cell(ggobid *gg, splotd *sp, gint id, datad *d, GtkSheet *sheet)
 void
 move_point_value(GtkWidget *w, splotd *sp, GGobiPointMoveEvent *ev, ggobid *gg, GtkSheet *sheet)
 {
+  int cols[2];
+  int n = 2, i;
+  char buf[20];
+  if(ev->id < 0)
+    return;
 
-    int cols[2];
-    int n = 2, i;
-    char buf[20];
-    if(ev->id < 0)
-	return;
+  if(GTK_IS_GGOBI_PARCOORDS_SPLOT(sp)) {
+    cols[0] = sp->p1dvar;
+    n = 1;
+  } else {
+    cols[0] = sp->xyvars.x;
+    cols[1] = sp->xyvars.y;
+  }
 
-    if(GTK_IS_GGOBI_PARCOORDS_SPLOT(sp)) {
-	    cols[0] = sp->p1dvar;
-	    n = 1;
-    } else {
-	    cols[0] = sp->xyvars.x;
-	    cols[1] = sp->xyvars.y;
-    }
-
-    for(i = 0; i < n ; i++) {
-	sprintf(buf, "%f", sp->displayptr->d->raw.vals[ev->id][cols[i]]);
-	gtk_sheet_set_cell(sheet, ev->id, cols[i], GTK_JUSTIFY_CENTER, buf);
-    }
+  for(i = 0; i < n ; i++) {
+    sprintf(buf, "%f", sp->displayptr->d->raw.vals[ev->id][cols[i]]);
+    gtk_sheet_set_cell(sheet, ev->id, cols[i], GTK_JUSTIFY_CENTER, buf);
+  }
 }
 
 
@@ -583,15 +588,15 @@ move_point_value(GtkWidget *w, splotd *sp, GGobiPointMoveEvent *ev, ggobid *gg, 
 void
 color_row(GtkSheet *sheet, gint row, gint ncols, GdkColor *col)
 {
-    GtkSheetRange range;
-    range.row0 = row;
-    range.col0 = 0;
-    range.rowi = row+1;/* row or row+1*/
-    range.coli = ncols-1;
+  GtkSheetRange range;
+  range.row0 = row;
+  range.col0 = 0;
+  range.rowi = row+1;/* row or row+1*/
+  range.coli = ncols-1;
 
-    if(col == NULL)
-	col = &red;
-    gtk_sheet_range_set_foreground(sheet, &range, col);
+  if(col == NULL)
+    col = &red;
+  gtk_sheet_range_set_foreground(sheet, &range, col);
 }
 
 /**
@@ -601,15 +606,14 @@ color_row(GtkSheet *sheet, gint row, gint ncols, GdkColor *col)
 void
 brush_change(ggobid *gg, splotd *sp, GdkEventMotion *ev, datad *d, GtkSheet *sheet)
 {
- /* datad *d = sp->displayptr->d; */
- int nr, i;
-      nr = d->npts_under_brush;
-      for(i = 0 ; i < d->nrows ; i++) {
-	  if(d->pts_under_brush.els[i]) {
-	      color_row(sheet, i, d->ncols, &red);
-	  } else
-	      color_row(sheet, i, d->ncols, &black);
-
-      }
+  /* datad *d = sp->displayptr->d; */
+  int nr, i;
+  nr = d->npts_under_brush;
+  for (i = 0 ; i < d->nrows ; i++) {
+    if(d->pts_under_brush.els[i])
+      color_row(sheet, i, d->ncols, &red);
+    else
+      color_row(sheet, i, d->ncols, &black);
+  }
 }
 
