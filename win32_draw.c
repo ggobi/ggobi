@@ -17,13 +17,14 @@
 /*
  * Batched drawing:   I may need to continue drawing this
  * way to achieve adequate speed in Windows.
+ *
+ * ... But I see I'm only able to do batched drawing for
+ * plusses, x'es and points.  That's not very interesting.
 */
 
-/*  Just to see if it compiles, at least ...
-#define WIN32 1
-*/
 #ifdef WIN32
 
+static void drawing_arrays_alloc (splotd *sp, datad *d, ggobid *gg);
 static void build_circle (icoords *, gint, arcd *, gint, gshort);
 static void build_plus (icoords *, gint, GdkSegment *, gint, gshort);
 static void build_rect (icoords *, gint, rectd *, gint, gshort);
@@ -33,7 +34,7 @@ static void build_ash_segs (gint, gint *nsegs, splotd *sp);
 
 /*
  * ... just noticed these:  should they become part of the splotd
- * instead of sitting her as statics?  I think so.
+ * instead of sitting here as statics?  I think so.
  * 
 */
 static gint maxn = 0;
@@ -47,9 +48,10 @@ static arcd       *open_arcs;
 static arcd       *filled_arcs;
 
 static void
-drawing_arrays_alloc (datad *d, ggobid *gg) {
+drawing_arrays_alloc (splotd *sp, datad *d, ggobid *gg) {
   if (maxn == 0) {
     maxn = d->nrows;
+
     points = (GdkPoint *) g_malloc (maxn * sizeof (GdkPoint));
     segs = (GdkSegment *) g_malloc (2 * maxn * sizeof (GdkSegment));
     whisker_segs = (GdkSegment *) g_malloc (2 * maxn * sizeof (GdkSegment));
@@ -120,6 +122,27 @@ void
 build_plus (icoords *pos, gint nrow, GdkSegment *segv, gint nplus, gshort size)
 {
   gshort x = (gshort) pos[nrow].x;
+
+/*
+  gboolean append;
+
+  append = (sp->win32->segs.len < nplus+1);
+  segp = (append) ? (GdkSegment *) g_malloc (sizeof (GdkSegment)) :
+                    (GdkSegment *) &sp->win32->segs.data[nplus];
+  segp->x1 = x - size;
+  segp->x2 = x + size;
+  segp->y1 = segp->y2 = (gshort) pos[nrow].y;
+  if (append) g_array_append_val (sp->win32->segs, segp);
+
+  nplus++;
+  append = (sp->win32->segs.len < nplus+1);
+  segp = (append) ? (GdkSegment *) g_malloc (sizeof (GdkSegment)) :
+                    (GdkSegment *) &sp->win32->segs.data[nplus];
+  segp->x1 = segp->x2 = x;
+  segp->y1 = (gshort) pos[nrow].y - size;
+  segp->y2 = (gshort) pos[nrow].y + size;
+  if (append) g_array_append_val (sp->win32->segs, segp);
+*/
 
   segv[nplus].x1 = x - size;
   segv[nplus].x2 = x + size;
@@ -265,8 +288,8 @@ build_ash_segs (gint i, gint *nsegs, splotd *sp)
   *nsegs += 1;
 }
 
-void
-draw_glyphs (GdkDrawable *drawable,
+static void
+draw_glyphs (splotd *sp, GdkDrawable *drawable,
   GdkPoint *points,    gint np,
   GdkSegment *segs,    gint ns,
   rectd *open_rects,   gint nr_open,
@@ -309,15 +332,11 @@ win32_draw_to_pixmap_unbinned (gint current_color, splotd *sp, ggobid *gg)
   npt = nseg = nr_open = nr_filled = nc_open = nc_filled = 0;
 
   if (maxn != d->ncols)
-    drawing_arrays_alloc (d, gg);
+    drawing_arrays_alloc (sp, d, gg);
 
   for (i=0; i<d->nrows_in_plot; i++) {
     m = d->rows_in_plot[i];
-/*
-  gboolean draw_case;
-    draw_case = splot_plot_case (m, d, sp, display, gg);
-    if (draw_case && d->color_now.els[m] == current_color) {
-*/
+
     if (d->color_now.els[m] == current_color &&
         splot_plot_case (m, d, sp, display, gg))
     {
@@ -344,7 +363,7 @@ win32_draw_to_pixmap_unbinned (gint current_color, splotd *sp, ggobid *gg)
     gdk_draw_segments (sp->pixmap0, gg->plot_GC, whisker_segs, nwhisker_segs);
   if (nash_segs)
     gdk_draw_segments (sp->pixmap0, gg->plot_GC, ash_segs, nash_segs);
-  draw_glyphs (sp->pixmap0,
+  draw_glyphs (sp, sp->pixmap0,
     points, npt,           segs, nseg,
     open_rects, nr_open,   filled_rects, nr_filled,
     open_arcs, nc_open,    filled_arcs, nc_filled,
@@ -370,9 +389,6 @@ win32_draw_to_pixmap_binned (icoords *bin0, icoords *bin1,
         if (d->color_now.els[j] == current_color &&
             splot_plot_case (j, d, sp, display, gg))
         {
-/*
-        if (!d->hidden_now.els[j] && d->color_now.els[j] == current_color) {
-*/
           build_glyph (&d->glyph_now.els[j], sp->screen, j,
             points, &npt,           segs, &nseg,
             open_rects, &nr_open,   filled_rects, &nr_filled,
@@ -388,7 +404,7 @@ win32_draw_to_pixmap_binned (icoords *bin0, icoords *bin1,
     }
   }
   gdk_draw_segments (sp->pixmap0, gg->plot_GC, whisker_segs, nwhisker_segs);
-  draw_glyphs (sp->pixmap0,
+  draw_glyphs (sp, sp->pixmap0,
     points, npt,           segs, nseg,
     open_rects, nr_open,   filled_rects, nr_filled,
     open_arcs, nc_open,    filled_arcs, nc_filled,
