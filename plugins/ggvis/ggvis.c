@@ -397,7 +397,6 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gtk_signal_connect (GTK_OBJECT (ggv->dissim->da), "button_release_event",
     GTK_SIGNAL_FUNC(ggv_histogram_button_release_cb), inst);
 
-  gtk_widget_set_events (ggv->dissim->da, GDK_EXPOSURE_MASK);
   gtk_box_pack_start (GTK_BOX (vb), ggv->dissim->da, true, true, 2);
 
 

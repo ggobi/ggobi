@@ -41,7 +41,6 @@ ggv_histogram_configure_cb (GtkWidget *w, GdkEventExpose *event,
   dissimd *D = ggv->dissim;
   ggobid *gg = inst->gg;
   gboolean retval = true;
-g_printerr ("(histogram_configure)\n");
 
   if (ggv == NULL)  /*-- too early to configure --*/
     return retval;
@@ -153,7 +152,7 @@ draw_grip_control (ggvisd *ggv, ggobid *gg) {
   gint min_grip_pos = xmin - HISTOGRAM_HMARGIN/2;
   gint max_grip_pos = xmax + HISTOGRAM_HMARGIN/2;
 
-  if (D->lgrip_pos == -1 && D->rgrip_pos == -1) {
+  if (D->lgrip_pos == -1 && D->rgrip_pos == -1) {  /* first time */
     D->lgrip_pos = min_grip_pos;
     D->rgrip_pos = max_grip_pos;
   }
@@ -162,7 +161,7 @@ draw_grip_control (ggvisd *ggv, ggobid *gg) {
 
   gdk_draw_line (D->pix, gg->plot_GC, min_grip_pos, ypos, max_grip_pos, ypos);
 
-  D->lgrip_pos = D->lgrip_pos - HISTOGRAM_GRIP_SIZE/2;
+  D->lgrip.x = D->lgrip_pos - HISTOGRAM_GRIP_SIZE/2;
   D->lgrip.y = ypos - HISTOGRAM_GRIP_SIZE/2;
   D->lgrip.width = D->lgrip.height = HISTOGRAM_GRIP_SIZE;
 
@@ -190,6 +189,8 @@ histogram_draw (ggvisd *ggv, ggobid *gg)
   gint lbearing, rbearing, strwidth, ascent, descent;
 
   if (D->pix == NULL)
+    return;
+  if (ggv->trans_dist.nels == 0)
     return;
 
   histogram_pixmap_clear (ggv, gg);
@@ -225,7 +226,10 @@ histogram_draw (ggvisd *ggv, ggobid *gg)
       ymax);
 
 
-  str = g_strdup_printf ("%2.2f", trans_dist_max);
+  if (trans_dist_max == DBL_MIN)  /*-- not initialized -- why? --*/
+    str = g_strdup_printf ("%s", "??");
+  else
+    str = g_strdup_printf ("%2.2f", trans_dist_max);
   gdk_text_extents (
 #if GTK_MAJOR_VERSION == 2
     gtk_style_get_font (style),
@@ -246,7 +250,10 @@ histogram_draw (ggvisd *ggv, ggobid *gg)
     str);
   g_free (str);
 
-  str = g_strdup_printf ("%2.2f", trans_dist_min);
+  if (trans_dist_min == DBL_MAX)  /*-- not initialized -- why? --*/
+    str = g_strdup_printf ("%s", "??");
+  else
+    str = g_strdup_printf ("%2.2f", trans_dist_min);
   gdk_text_extents (
 #if GTK_MAJOR_VERSION == 2
     gtk_style_get_font (style),
@@ -307,7 +314,6 @@ set_threshold (ggvisd *ggv)
 
   ggv->mds_threshold_low  = D->low  * ggv->Dtarget_max;
   ggv->mds_threshold_high = D->high * ggv->Dtarget_max;
-g_printerr ("D->low = %2.5f, D->high = %2.5f \n", D->low, D->high);
 }
 
 /* ARGSUSED */
@@ -397,7 +403,7 @@ static void
 histogram_bins_reset (ggvisd *ggv)
 {
   dissimd *D = ggv->dissim;
-  gint i, j, k;
+  gint i, k;
   gdouble fac, t_d, t_delta;
   GtkWidget *da = D->da;
   gint xmin = HISTOGRAM_HMARGIN;
@@ -409,7 +415,6 @@ histogram_bins_reset (ggvisd *ggv)
   /* fix any rounding errors */
   pwidth = D->nbins * HISTOGRAM_BWIDTH; 
   xmax = xmin + pwidth;
-g_printerr ("(histogram_bins_reset) pwidth = %d nbins %d\n", pwidth, D->nbins);
 
   /* map trans_dist[i] to [0,1] and sort into bins */
   trans_dist_min = DBL_MAX; trans_dist_max = DBL_MIN;
@@ -417,8 +422,6 @@ g_printerr ("(histogram_bins_reset) pwidth = %d nbins %d\n", pwidth, D->nbins);
 /*
  * Probably I can initialize trans_dist before mds_once is run
 */
-g_printerr ("trans_dist initialized? nels %d\n",
-ggv->trans_dist.nels);
   if (ggv->trans_dist.nels > 0) {
     for (i=0; i<ggv->Dtarget.nrows*ggv->Dtarget.ncols; i++) {
       t_d = ggv->trans_dist.els[i];
@@ -427,31 +430,12 @@ ggv->trans_dist.nels);
         if (t_d < trans_dist_min) trans_dist_min = t_d;
       }
     }
-  } else if (ggv->Dtarget.nrows > 0 && ggv->Dtarget.ncols > 0) {
-    for (i=0; i<ggv->Dtarget.nrows; i++) {
-      for (j=0; j<ggv->Dtarget.ncols; j++) {
-        t_d = ggv->Dtarget.vals[i][j];
-        if (t_d != DBL_MAX) {
-          if (t_d > trans_dist_max) {
-            trans_dist_max = t_d;
-g_printerr ("changing max: %f\n", trans_dist_max);
-          }
-          if (t_d < trans_dist_min) {
-            trans_dist_min = t_d;
-g_printerr ("changing min: %f\n", trans_dist_min);
-          }
-        }
-      }
-    }
-  } else return;
-
-g_printerr ("min %f max %f\n", trans_dist_min, trans_dist_max);
+  } else g_printerr ("trans_dist not initialized\n");
 
   /* in case trans_dist is constant and t_delta would be zero */
   t_delta = MAX(trans_dist_max-trans_dist_min, 1E-100);
   /* so rounding off results is strictly < thr_nbins */
   fac = (double)D->nbins * 0.999999;  
-g_printerr ("nbins %d bin allocation %d\n", D->nbins, D->bins.nels);
 
   D->nbins = MIN (D->nbins, D->bins.nels);
   for (i=0; i<D->nbins; i++)
@@ -492,8 +476,6 @@ ggv_histogram_init (ggvisd *ggv, ggobid *gg)
   vectorb_alloc (&D->bars_included, 100);
   for (i=0; i<100; i++) D->bars_included.els[i] = true;
   vectori_alloc (&D->bins, 100);
-
-g_printerr ("(histogram_init)\n");
 }
 
 void

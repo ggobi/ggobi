@@ -12,7 +12,7 @@
 #define HISTOGRAM_WIDTH     250
 #define HISTOGRAM_HEIGHT    100
 #define HISTOGRAM_VMARGIN     5
-#define HISTOGRAM_HMARGIN    15
+#define HISTOGRAM_HMARGIN    16  /* should be an even number */
 #define HISTOGRAM_GRIP_SPACE 20
 #define HISTOGRAM_GRIP_SIZE  10  /* should be even number */
 #define HISTOGRAM_BWIDTH      5

@@ -193,6 +193,7 @@ static void
 trans_dist_init_defaults (ggvisd *ggv)
 {
   gint i, j, IJ;;
+g_printerr ("(trans_dist_init_defaults)\n");
 
   vectord_realloc (&ggv->trans_dist, ggv->ndistances);
   for (i=0; i<ggv->Dtarget.nrows; i++) {

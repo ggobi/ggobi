@@ -32,7 +32,7 @@ ggvis_init (ggvisd *ggv)
   ggv->dissim->low = 0.;
   ggv->dissim->high = 1.;
   ggv->dissim->lgrip_pos = -1;
-  ggv->dissim->lgrip_pos = -1;
+  ggv->dissim->rgrip_pos = -1;
   ggv->dissim->bars = NULL;
   vectorb_init_null (&ggv->dissim->bars_included);
   vectori_init_null (&ggv->dissim->bins);
