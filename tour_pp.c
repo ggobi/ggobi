@@ -99,8 +99,8 @@ gint realloc_optimize0_p (optimize0_param *op, gint ncols, vector_i pcols)
 
     arrayf_delete_cols(&op->proj_best, ncolsdel, cols);
     arrayf_delete_cols(&op->data, ncolsdel, cols);
+    g_free (cols);
   }
-  g_free(cols);
 
   return 0;
 }
