@@ -323,6 +323,7 @@ display_alloc_init (enum displaytyped type, gboolean missing_p,
   display->tc2_manip_var = -1;
 
   display->t1d_window = NULL;
+  display->t2d_window = NULL;
   display->t1d_pp_pixmap = NULL;
   display->t2d_pp_pixmap = NULL;
 
@@ -410,7 +411,8 @@ display_add (displayd *display, ggobid *gg)
   display_add_tree(display, -1, gg->display_tree.tree, gg);
 
   if(g_list_length(display->splots)) {
-     gg->current_splot = (splotd *) g_list_nth_data (gg->current_display->splots, 0);
+     gg->current_splot = (splotd *)
+       g_list_nth_data (gg->current_display->splots, 0);
      display->current_splot = gg->current_splot;
      splot_set_current (gg->current_splot, on, gg);
   }
@@ -516,6 +518,8 @@ display_free_all (ggobid *gg) {
   {
     /*    display = (displayd *) dlist->data; */
     display = (displayd*) g_list_nth_data (gg->displays,count-1);
+    if (display == NULL)
+      break;
 
     if(display->t1d.idled)
       gtk_idle_remove(display->t1d.idled);
