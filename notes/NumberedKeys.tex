@@ -1,0 +1,209 @@
+\documentclass{article}
+\usepackage{fullpage}
+\input{WebMacros}
+\input{CMacros}
+\input{SMacros}
+\def\Key#1{\texttt{#1}}
+\title{Programmable Event Handlers for Keys in ggobi}
+\author{Duncan Temple Lang \\
+Debby Swayne}
+\begin{document}
+\maketitle
+
+The idea is to allow ggobi users that interact with ggobi via a
+programming interface to register a routine or handler for key press
+events involving the numbered keys. They can program responses for
+specific keys 0, 1, $\ldots$, 9, essentially treating them as ``hot
+keys''.  They customize the actions associated with these keys by
+registering a C routine that is called by ggobi when one of these keys
+is pressed. The routine is given all the event information and any
+data registered with it when it was set that paramterizes it.
+
+
+\section{An R Interface}
+Let's start with how the user might work with this facility.
+Suppose she wants to have the following function (omitting many of the details)
+\begin{verbatim}
+function(key, plot=NULL, ggobi=NULL, event=NULL) {
+  # get the data from the plot
+ getSelectedIndices.ggobi(data, .gobi=ggobi)
+}
+\end{verbatim}
+invoked each time key \Key{0} is pressed.
+She can associated this function with that key
+by calling the function
+\SFunction{addNumberedKeyHandler.ggobi}.
+\begin{verbatim}
+addNumberedKeyHandler("0" = function(key, plot=NULL, ggobi=NULL, event=NULL) {
+  # get the data from the plot
+ getSelectedIndices.ggobi(data, .gobi=ggobi)
+})
+\end{verbatim}
+(Note that we can of course use anonymous functions, i.e. ones not
+bound to a name within the R session).
+
+What this invocation does is to fetch the generic S handler registered
+with the specific ggobi and add this handler to its list.
+As such, nothing has happened other than the association between the
+key \Key{0} and the function has been stored in a S list.
+However, that handler has also been registered with the ggobi instance
+and will be notified of any key press events. When ggobi handles one
+of these key events, it calls the C-level handler associated with this
+R handler. That in turn dispatches a call to the R function within
+the R handler object which looks through its list of handler functions
+registered by the user and invokes the appropriate one.
+
+Handlers can be registered by name corresponding to the key number.
+Additionally, one can register a general or default handler that will
+be invoked if there is no specific handler for that key.  For example,
+if we register handler functions for keys \Key{0} and \Key{1}, and no
+others, and we receive an event for \Key{2}, it will be ignored.
+However, if we register a default handler, it will be invoked for an
+event on any of the keys \Key{2}, $\ldots$, \Key{9}.  If we
+subsequently register a handler for \Key{2}, then the default will
+apply only to keys \Key{3}, $\ldots$, \Key{9}.  Similarly, if we
+remove a handler for \Key{1}, the default will apply to all keys
+except \Key{0}. This matching is done when the key event occurs.
+
+
+\begin{verbatim}
+> handler <- NumberedKeyHandler.ggobi()
+> handler$addDefaultHandler(function(key, plot=NULL, ggobi=NULL, ev=NULL) {
+    cat("Default key handler",key,"\n")
+  })
+> handler$defaultHandler()
+function(key, plot=NULL, ggobi=NULL, ev=NULL){ cat("Default key handler",key,"\n")}
+> handler$addHandlers("0"=function(key,plot=NULL,ggobi=NULL, ev=NULL){
+    cat("In R key handler",key,"\n")
+  })
+> handler$handlers()
+$"0"
+function(key,plot=NULL,ggobi=NULL, ev=NULL){cat("In R key handler",key,"\n")}
+
+> handler$addHandlers("1"=function(key,plot=NULL,ggobi=NULL, ev=NULL){cat("In R key handler",key,"\n")})
+> handler$handlers()
+$"0"
+function(key,plot=NULL,ggobi=NULL, ev=NULL){cat("In R key handler",key,"\n")}
+
+$"1"
+function(key,plot=NULL,ggobi=NULL, ev=NULL){cat("In R key handler",key,"\n")}
+
+> handler$removeHandlers("1")
+> handler$handlers()
+$"0"
+function(key,plot=NULL,ggobi=NULL, ev=NULL){cat("In R key handler",key,"\n")}
+
+> 
+No xml support compiled for this version, ignoring -xml
+> 
+\end{verbatim}
+
+
+Note that one doesn't have to create the key-specific or default
+handlers before registering the general R handler with the ggobi
+instance. Instead, one can register the handler and then retrieve it
+later and add to it. 
+For example, in the following, we 
+create a ggobi instance and then
+an instance of the general handler.
+This has no handlers at this point, but 
+we register it any way.
+\begin{verbatim}
+> gg <-ggobi(system.file("data", "flea.dat"), "-a")
+No xml support compiled for this version, ignoring -xml
+> h <- NumberedKeyHandler.ggobi()
+> registerNumberedKeyHandler.ggobi(h)
+NULL
+\end{verbatim}
+
+Now, we can add a default handler function
+and have it invoked by pressing some of the keys while
+the mouse is in the scatterplot.
+\begin{verbatim}
+> h$addDefaultHandler(function(key, plot=NULL, ggobi=NULL, ev=NULL){ cat("Hi there from key",key,"\n")})
+> 
+Hi there from key 0 
+Hi there from key 9 
+Hi there from key 2 
+\end{verbatim}
+The output is being generated by the default handler.
+
+Now, we can add some key-specific handlers or replace the 
+default handler.
+\begin{verbatim}
+ h$addHandlers("0"=function(key, plot=NULL, ggobi=NULL, ev=NULL){ cat("This is key 0\n")})
+\end{verbatim}
+Now, pressing \Key{1} and \Key{0} in that order gives
+\begin{verbatim}
+Hi there from key 1 
+This is key 0
+\end{verbatim}
+
+In this way, the handler acts like a pointer or reference in C in that
+its contents are directly modifiable at any time without making
+another copy of the object.
+
+If we had not explicitly assigned the general handler to the variable
+\Svariable{h}, we could retrieve it.  We can do so by getting the
+currently registered key handler via the function
+\SFunction{.GetNumberedKeyHandler.ggobi()}. (Its lengthy and odd name
+implies one should not need to call it frequently.)  This can even
+implicitly create and register a handler instance.
+
+
+\section{Real Examples}
+
+Debby - this spot has your name written all over it ;-)
+
+\section{C-level API and Internals}
+
+Each \CStruct{ggobid} has its own \CStruct{KeyEventHandler} reference.
+This is set to \CNull{} by default and until somebody registers a
+routine to handle these number key presses. They do so via the routine
+in the ggobi API named
+\Croutine{GGOBI(registerNumberedKeyEventHandler)}.  This takes a C
+routine that will be called when an event occurs, some user data that
+can be used to parameterize that routine and will be passed to it when
+a key is pressed, and finally a (human-readable) description so that
+others can find out about the handler that is registered.
+
+At any time, they can un-register the handler by calling
+\Croutine{GGOBI(removeNumberedKeyEventHandler)}.  The handler
+structure (\CStruct{KeyEventHandler}) that was active/registered
+before the call is returned. It is the duty of the caller to free
+that.  It is not discarded at this point since the user may want to
+keep it for a period and re-register it. It was allocated via
+\Croutine{g_malloc} and the description string was allocated via
+\Croutine{g_strdup}.
+
+There are several additional fields that one might not expect in the
+\CStruct{KeyEventHandler}.  The language field is used to determine
+what type of handler routine is registered. This is useful when we can
+optionally register C, R, Python, Perl, etc. handlers.  The
+\Cfield{releaseData} may or may not be relevant, but is intended as a
+hook so that on can free the \Cfield{userData} structure when one
+replaces and discards a previously registered key event handler.
+
+
+Sychronization is, as always, a problem. The user must ensure that she
+does not invoke one of the handlers (by pressing a key) while R is
+evaluating another expression.
+
+
+\section{Developer Tests}
+
+If one compiles ggobi with the pre-processor definition for
+\CppSymbol{TEST_KEYS}, then a numbered key handler will be registered
+for each ggobi instance that is created.  The handler displays
+information about which key was pressed (i.e. its internal code) and a
+string that was registered as user data. After 4 invocations of this
+handler, it removes itself, thus testing the remove facility.
+You can compile this test without modifying the Makefile
+by simply invoking \executable{gmake} as
+\begin{verbatim}
+ gmake TEST_KEYS=1
+\end{verbatim}
+
+\end{document}
+
+
