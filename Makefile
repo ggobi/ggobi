@@ -15,7 +15,7 @@ CC = gcc
 LD=$(CXX)
 LD=$(CC)
 
-CFLAGS= -g2 -ansi -Wall -fpic -DHAVE_CONFIG_H
+CFLAGS= -g2 -ansi -Wall -pedantic -fpic -DHAVE_CONFIG_H
 CXXFLAGS=$(CFLAGS)
 
 ifdef TEST_KEYS
