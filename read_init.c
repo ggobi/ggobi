@@ -131,6 +131,8 @@ getPreferences(const xmlDocPtr doc, GGobiInitInfo *info)
   xmlNode *node, *el;
   /*gint n, i;*/
   node = getXMLDocElement(doc, "preferences");
+  if(!node)
+      return(-1);
 
     /* Don't read this setting if the user has specified a value in
        the command line argument. */
