@@ -369,7 +369,7 @@ ValidateGGobiRef(ggobid *gg, gboolean fatal)
     return(gg);
   }
 
-  g_printerr(stderr, "Incorrect reference to ggobid.\n");
+  g_printerr("Incorrect reference to ggobid.\n");
 
  if (fatal)
   exit(10);
@@ -377,3 +377,20 @@ ValidateGGobiRef(ggobid *gg, gboolean fatal)
  return(NULL);
 }
 
+datad *
+ValidateDatadRef(datad *d, ggobid *gg, gboolean fatal)
+{
+  int i, n;
+  n = g_slist_length(gg->d);
+  for(i = 0; i < n ; i++) {
+   if(g_slist_nth_data(gg->d, i) == d)
+    return(d);
+  }
+
+  g_printerr("Incorrect reference to datad.\n");
+
+ if (fatal)
+  exit(11);
+
+ return(NULL); 
+}

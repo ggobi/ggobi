@@ -23,6 +23,7 @@ ggobid* GGobiFromSPlot (splotd *sp);
 ggobid* GGobiFromWidget (GtkWidget *w, gboolean);
 ggobid* GGobiFromWindow (GdkWindow *w);
 void GGobi_widget_set (GtkWidget *, ggobid *gg, gboolean isWindow);
+datad * ValidateDatadRef(datad *d, ggobid *gg, gboolean fatal);
 ggobid* ValidateGGobiRef (ggobid *gg, gboolean fatal);
 gboolean array_read (datad *, InputDescription *,  ggobid *);
 void arrayf_add_cols (array_f *, gint);
