@@ -198,34 +198,35 @@ display_options_cb (GtkCheckMenuItem *w, guint action)
 
     case DOPT_AXES:
       display->options.axes_show_p = w->active;
-      if(GTK_IS_GGOBI_EXTENDED_DISPLAY_CLASS(display)) {
+
+      if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
         GtkGGobiExtendedDisplayClass *klass;
-	klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
-	if(klass->set_show_axes_option)
-   	   klass->set_show_axes_option(display, w->active);
+        klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
+        if(klass->set_show_axes_option)
+          klass->set_show_axes_label_option(display, w->active);
       }
     break;
 
     case DOPT_AXESLAB:
       display->options.axes_label_p = w->active;
 
-      if(GTK_IS_GGOBI_EXTENDED_DISPLAY_CLASS(display)) {
+      if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
         GtkGGobiExtendedDisplayClass *klass;
-	klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
-	if(klass->set_show_axes_label_option)
-   	   klass->set_show_axes_label_option(display, w->active);
+        klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
+        if(klass->set_show_axes_label_option)
+          klass->set_show_axes_label_option(display, w->active);
       }      
     break;
 
     case DOPT_AXESVALS:
       display->options.axes_values_p = w->active;
 
-      if(GTK_IS_GGOBI_EXTENDED_DISPLAY_CLASS(display)) {
+      if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
         GtkGGobiExtendedDisplayClass *klass;
-	klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
-	if(klass->set_show_axes_values_option)
-   	   klass->set_show_axes_values_option(display, w->active);
-      }      
+        klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
+        if(klass->set_show_axes_values_option)
+          klass->set_show_axes_values_option(display, w->active);
+      }
     break;
 
 /* unused
