@@ -134,7 +134,7 @@ fileset_read (gchar *ldata_in, ggobid *gg)
      point_colors_read (gg->fname, true, gg);
      hidden_read (gg->fname, true, gg);
     
-     segments_read (gg->fname, true, gg);
+     edges_read (gg->fname, true, gg);
      line_colors_read (gg->fname, true, gg);
      break;
   }

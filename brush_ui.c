@@ -89,7 +89,7 @@ brush_reset_cb (GtkWidget *w, gpointer cbd)
       break;
 
     case 3:  /*-- un-hide all lines --*/
-      for (k=0; k<gg->nsegments; k++) {
+      for (k=0; k<gg->nedges; k++) {
         gg->line.hidden_now.vals[k] = gg->line.hidden.vals[k] = false;
       }
       displays_plot (NULL, FULL, gg);

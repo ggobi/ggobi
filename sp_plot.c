@@ -7,7 +7,7 @@
 #include "vars.h"
 #include "externs.h"
 
-void segments_draw (splotd *, ggobid *gg);
+void edges_draw (splotd *, ggobid *gg);
 #ifdef _WIN32
 extern void win32_draw_to_pixmap_binned (icoords *, icoords *, gint, splotd *, ggobid *gg);
 extern void win32_draw_to_pixmap_unbinned (gint, splotd *, ggobid *gg);
@@ -186,7 +186,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
 
           /*-- parallel coordinate plot whiskers --*/
           if (display->displaytype == parcoords) {
-            if (display->options.segments_show_p) {
+            if (display->options.edges_show_p) {
               n = 2*m;
               gdk_draw_line (sp->pixmap0, gg->plot_GC,
                 sp->whiskers[n].x1, sp->whiskers[n].y1,
@@ -393,7 +393,7 @@ splot_add_point_label (splotd *sp, gint k, gboolean nearest, ggobid *gg) {
   /*-- draw a thickened line to highlight the current case --*/
   if (nearest) {
     if (dsp->displaytype == parcoords) {
-      if (dsp->options.segments_show_p) {
+      if (dsp->options.edges_show_p) {
         gint n;
         gdk_gc_set_line_attributes (gg->plot_GC,
           3, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
@@ -503,7 +503,7 @@ splot_line_colors_used_get (splotd *sp, gint *ncolors_used,
   gint i, k;
   displayd *display = (displayd *) sp->displayptr;
 
-  if(gg->nsegments == 0)
+  if(gg->nedges == 0)
     return;
 
   /*
@@ -513,10 +513,10 @@ splot_line_colors_used_get (splotd *sp, gint *ncolors_used,
   *ncolors_used = 1;
   colors_used[0] = gg->line.color_now.vals[0];
 
-  if (display->options.segments_directed_show_p ||
-      display->options.segments_undirected_show_p)
+  if (display->options.edges_directed_show_p ||
+      display->options.edges_undirected_show_p)
   {
-    for (i=0; i<gg->nsegments; i++) {
+    for (i=0; i<gg->nedges; i++) {
       if (gg->line.hidden_now.vals[i])
         new_color = false;
       else {
@@ -537,7 +537,7 @@ splot_line_colors_used_get (splotd *sp, gint *ncolors_used,
 }
 
 void
-segments_draw (splotd *sp, ggobid *gg)
+edges_draw (splotd *sp, ggobid *gg)
 {
   gint j, k;
   gint from, to;
@@ -559,12 +559,12 @@ segments_draw (splotd *sp, ggobid *gg)
       current_color = line_colors_used[k];
       nl = 0;
 
-      for (j=0; j<gg->nsegments; j++) {
+      for (j=0; j<gg->nedges; j++) {
         if (gg->line.hidden_now.vals[j]) {
           doit = false;
         } else {
-          from = gg->segment_endpoints[j].a - 1;
-          to = gg->segment_endpoints[j].b - 1;
+          from = gg->edge_endpoints[j].a - 1;
+          to = gg->edge_endpoints[j].b - 1;
           doit = (!gg->hidden_now[from] && !gg->hidden_now[to]);
 
         /* If not plotting imputed values, and one is missing, skip it */
@@ -585,12 +585,12 @@ segments_draw (splotd *sp, ggobid *gg)
 
         if (doit) {
           if (gg->line.color_now.vals[j] == current_color) {
-            sp->segments[nl].x1 = sp->screen[from].x;
-            sp->segments[nl].y1 = sp->screen[from].y;
-            sp->segments[nl].x2 = sp->screen[to].x;
-            sp->segments[nl].y2 = sp->screen[to].y;
+            sp->edges[nl].x1 = sp->screen[from].x;
+            sp->edges[nl].y1 = sp->screen[from].y;
+            sp->edges[nl].x2 = sp->screen[to].x;
+            sp->edges[nl].y2 = sp->screen[to].y;
 
-            if (display->options.segments_directed_show_p) {
+            if (display->options.edges_directed_show_p) {
               /*
                * Add thick piece of the lines to suggest a directional arrow
               */
@@ -609,9 +609,9 @@ segments_draw (splotd *sp, ggobid *gg)
         gdk_gc_set_foreground (gg->plot_GC,
           &gg->default_color_table[current_color]);
 
-      gdk_draw_segments (sp->pixmap1, gg->plot_GC, sp->segments, nl);
+      gdk_draw_segments (sp->pixmap1, gg->plot_GC, sp->edges, nl);
 
-      if (display->options.segments_directed_show_p) {
+      if (display->options.edges_directed_show_p) {
         gdk_draw_segments (sp->pixmap1, gg->plot_GC, sp->arrowheads, nl);
       }
     }
@@ -644,12 +644,12 @@ splot_pixmap0_to_pixmap1 (splotd *sp, gboolean binned, ggobid *gg) {
                       1 + loc1->x - loc0->x ,
                       1 + loc1->y - loc0->y);
 
-  if (display->options.segments_directed_show_p ||
-      display->options.segments_undirected_show_p)
+  if (display->options.edges_directed_show_p ||
+      display->options.edges_undirected_show_p)
   {
     if (display->displaytype == scatterplot || display->displaytype == scatmat)
     {
-        segments_draw (sp, gg);
+        edges_draw (sp, gg);
     }
   }
      

@@ -119,7 +119,7 @@ reinit_transient_brushing (ggobid *gg)
     }
   }
   if (line_painting_p) {
-    for (k=0; k<gg->nsegments; m++) {
+    for (k=0; k<gg->nedges; m++) {
       gg->line.color_now.vals[k] =
         gg->line.color_prev.vals[k] =
         gg->line.color.vals[k];
@@ -167,9 +167,9 @@ brush_motion (icoords *mouse, gboolean button1_p, gboolean button2_p,
 
   if (cpanel->brush_on_p) {
     changed = brush_once (false, gg);
-    if (display->options.segments_undirected_show_p ||
-        display->options.segments_directed_show_p ||
-        display->options.segments_show_p ||
+    if (display->options.edges_undirected_show_p ||
+        display->options.edges_directed_show_p ||
+        display->options.edges_show_p ||
         gg->nrgroups > 0)      /*-- a full redraw is required --*/
     {
       splot_redraw (sp, FULL, gg);
@@ -670,7 +670,7 @@ line_brush_prev_vectors_update (ggobid *gg) {
 void
 line_brush_undo (splotd *sp, ggobid *gg) {
   gint k;
-  for (k=0; k<gg->nsegments; k++) {
+  for (k=0; k<gg->nedges; k++) {
     gg->line.color.vals[k] =
       gg->line.color_now.vals[k] =
       gg->line.color_prev.vals[k];
@@ -694,10 +694,10 @@ xed_by_brush (gint k, ggobid *gg)
   glong x2 = gg->brush.brush_pos.x2;
   glong y2 = gg->brush.brush_pos.y2;
 
-  glong ax = sp->screen[gg->segment_endpoints[k].a - 1].x;
-  glong ay = sp->screen[gg->segment_endpoints[k].a - 1].y;
-  glong bx = sp->screen[gg->segment_endpoints[k].b - 1].x;
-  glong by = sp->screen[gg->segment_endpoints[k].b - 1].y;
+  glong ax = sp->screen[gg->edge_endpoints[k].a - 1].x;
+  glong ay = sp->screen[gg->edge_endpoints[k].a - 1].y;
+  glong bx = sp->screen[gg->edge_endpoints[k].b - 1].x;
+  glong by = sp->screen[gg->edge_endpoints[k].b - 1].y;
 
   glong x, y;
   extern gint lines_intersect (glong, glong, glong, glong, 
@@ -753,7 +753,7 @@ build_line_color_vectors (ggobid *gg)
   gint k;
   gboolean changed = false;
 
-  for (k=0; k<gg->nsegments; k++) {
+  for (k=0; k<gg->nedges; k++) {
 
     /* update the line color vectors for every member of the line group */
     if (gg->nlgroups > 0) {
@@ -814,7 +814,7 @@ build_line_hidden_vectors (ggobid *gg)
   gint k;
   gboolean changed = false;
 
-  for (k=0; k<gg->nsegments; k++) {
+  for (k=0; k<gg->nedges; k++) {
 
     /* update the line hidden vectors for every member of the line group */
     if (gg->nlgroups > 0) {
@@ -845,10 +845,10 @@ active_paint_lines (ggobid *gg)
 
   /* Zero out xed_by_brush[] before looping */
   gg->line.nxed_by_brush = 0;
-  for (k=0; k<gg->nsegments; k++)
+  for (k=0; k<gg->nedges; k++)
     gg->line.xed_by_brush.vals[k] = false;
  
-  for (k=0; k<gg->nsegments; k++) {
+  for (k=0; k<gg->nedges; k++) {
 
     if (xed_by_brush (k, gg)) {
 

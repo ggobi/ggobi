@@ -42,7 +42,7 @@
 
    When we encounter the end of a tag/element,  the routine
    endXMLElement is called. We use this to increment counters indicating
-   which record, variable or segment is next in the stream. These are 
+   which record, variable or edge is next in the stream. These are 
    quasi-global variables that are parser-instance specific and a
    necessary consquence of the event-driven style of parsing.
 
@@ -78,15 +78,13 @@ const gchar * const xmlDataTagNames[] = {
                                           "variables",
                                           "variable",
                                           "data",
-/*-- these two lines will be deleted --*/
-                                          "segments",
-                                          "segment",
-/* */
 
-                                          "edgevariables",
-                                          "edgevariable",
+                                          "edges",
+                                          "edge",
                                           "edgerecord",
                                           "edgerecords",
+                                          "edgevariables",
+                                          "edgevariable",
 
                                           "colormap",
                                           "color",
@@ -120,7 +118,6 @@ data_xml_read(const gchar *filename, ggobid *gg)
     return(false);
 
   gg->filename = name;
-
 
 
   xmlParserHandler = (xmlSAXHandlerPtr) g_malloc(sizeof(xmlSAXHandler));
@@ -166,12 +163,6 @@ data_xml_read(const gchar *filename, ggobid *gg)
       gg->vardata[j].groupid = gg->vardata[j].groupid_ori;
   }
 
-/*-- these lines will be deleted --- come to think of it, why default edges? */
-/*
- *if (gg->nsegments < 1)
- * segments_create(gg);
-*/
-
   return (ok);
 }
 
@@ -182,9 +173,7 @@ initParserData(XMLParserData *data, xmlSAXHandlerPtr handler, ggobid *gg)
   data->current_record = 0;
   data->current_variable = 0;
   data->current_element = 0;
-/* this line will be deleted */
-  data->current_segment = 0;
-/* */
+  data->current_edge = 0;
 
   data->current_edgevariable = 0;
   data->current_edgerecord = 0;
@@ -227,16 +216,13 @@ startXMLElement(void *user_data, const CHAR *name, const CHAR **attrs)
    case RECORD:
      newRecord(attrs, data);
      break;
-/*-- these lines will be deleted --*/
    case CONNECTIONS:
-     allocSegments(attrs, data);
+     allocEdges(attrs, data);
      break;
    case CONNECTION:
-     addConnection(attrs, data);
+     addEdge(attrs, data);
      break;
-/* */
 
-/* populate */
    case EDGERECORDS:
 /*     setDatasetEdgeInfo (attrs, data);*/
      break;
@@ -244,10 +230,10 @@ startXMLElement(void *user_data, const CHAR *name, const CHAR **attrs)
 /*     newEdgeRecord (attrs, data);*/
      break;
    case EDGEVARIABLES:
-     allocEdgeVariables (attrs, data);
+/*     allocEdgeVariables (attrs, data);*/
      break;
    case EDGEVARIABLE:
-     newEdgeVariable (attrs, data);
+/*     newEdgeVariable (attrs, data);*/
      break;
 
    case COLORMAP:
@@ -277,9 +263,8 @@ endXMLElement(void *user_data, const CHAR *name)
      break;
 /* these lines will be deleted */
    case CONNECTION:
-     data->current_segment++;
+     data->current_edge++;
      break;
-/* */
 
 /* populate */
    case EDGERECORD:
@@ -390,10 +375,10 @@ Characters(void *user_data, const CHAR *ch, int len)
 
 /* populate */
    case EDGERECORD:
-     setEdgeRecordValues (data, c, dlen);
+/*     setEdgeRecordValues (data, c, dlen);*/
    break;
    case EDGEVARIABLE:
-     setEdgeVariableName (data, c, dlen);
+/*     setEdgeVariableName (data, c, dlen);*/
    break;
 /* */
 
@@ -496,8 +481,6 @@ newRecord(const CHAR **attrs, XMLParserData *data)
   if (tmp) {
     gchar *stmp = g_strdup (tmp);
     g_array_insert_val (data->gg->rowlab, data->current_record, stmp);
-/*    g_free (stmp);*/
-/*  data->gg->rowlab[data->current_record] = g_strdup(tmp);*/
   }
 
 
@@ -783,7 +766,7 @@ gboolean
 setVariableName(XMLParserData *data, const CHAR *name, gint len)
 {
   gchar *tmp = (gchar *) g_malloc (sizeof(gchar) * (len+1));
-  gint j = data->current_edgevariable;
+  gint j = data->current_variable;
 
   tmp[len] = '\0';
   memcpy (tmp, name, len);
@@ -812,21 +795,21 @@ setVariableName(XMLParserData *data, const CHAR *name, gint len)
 
 
 /*
-  The segments tag should be told the number of segments 
-  being specified. This is read and the number of segments
+  The edges tag should be told the number of edges 
+  being specified. This is read and the number of edges
   in the ggobid structure is set to this.
 
-  Called for <segments> tag.
+  Called for <edges> tag.
  */
 gboolean
-allocSegments(const CHAR **attrs, XMLParserData *data)
+allocEdges (const CHAR **attrs, XMLParserData *data)
 {
   const char *tmp = getAttribute (attrs, "count");
 
   if (tmp) {
     gint value = asInteger (tmp);
-    data->gg->nsegments = value;
-    segments_alloc (value, data->gg);
+    data->gg->nedges = value;
+    edges_alloc (value, data->gg);
 /*  br_line_color_alloc(data->gg);*/
     br_line_color_init (data->gg);
   }
@@ -835,13 +818,13 @@ allocSegments(const CHAR **attrs, XMLParserData *data)
 
 
 /*
-  Reads the specification of a segment.
-  Called for <segment> tag.
+  Reads the specification of an edge.
+  Called for <edge> tag.
  */
 gboolean
-addConnection(const CHAR **attrs, XMLParserData *data)
+addEdge(const CHAR **attrs, XMLParserData *data)
 {
- int i = data->current_segment;
+ int i = data->current_edge;
  gboolean ok = false;
  const char *tmp;
  int source=-1, dest=-1;
@@ -858,8 +841,8 @@ addConnection(const CHAR **attrs, XMLParserData *data)
   ok = source > -1 && dest > -1;
 
   if(ok) {
-    data->gg->segment_endpoints[i].a = MIN(source, dest) + 1;
-    data->gg->segment_endpoints[i].b = MAX(source, dest) + 1;
+    data->gg->edge_endpoints[i].a = MIN(source, dest) + 1;
+    data->gg->edge_endpoints[i].b = MAX(source, dest) + 1;
   }
  
   value = data->defaults.lineColor;
@@ -877,11 +860,6 @@ addConnection(const CHAR **attrs, XMLParserData *data)
 }
 
 /*
-   Reads the number of variables in the dataset from the attributes
-   and allocates space for them in the ggobid structure.
-   At this point, we have the number of records and variables
-   and can initialize the data areas of the ggobid structure.
-
    Called in response to an <edgevariables> tag. (Note the plural.)
  */
 gboolean 
@@ -894,9 +872,9 @@ allocEdgeVariables (const CHAR **attrs, XMLParserData *data)
     exit (101);
   }
 
+/*
   data->gg->edge.ncols = asInteger (tmp);
 
-/*
   arrayf_alloc (&data->gg->raw, data->gg->nrows, data->gg->ncols);
   vardata_alloc (data->gg);
   vardata_init (data->gg);
@@ -907,24 +885,21 @@ allocEdgeVariables (const CHAR **attrs, XMLParserData *data)
 }
 
 /*
-   Read the declaration of an edge variable, gathering its information
-   from the specified attributes.
-   This includes its name, transformation name, etc.
-
    Called in response to an <edgevariable> tag.
  */
 
 gboolean
 newEdgeVariable (const CHAR **attrs, XMLParserData *data)
 {
+/*
   const gchar *tmp;
-
   tmp = getAttribute (attrs, "name");
   if (tmp != NULL) {
     gint k = data->current_edgevariable;
     data->gg->edge.vardata[k].collab = g_strdup (tmp);
     data->gg->edge.vardata[k].collab_tform = g_strdup (tmp);
   }
+*/
 
   return (true);
 }
@@ -939,8 +914,10 @@ setDatasetEdgeInfo (const CHAR **attrs, XMLParserData *data)
     exit(101);
   }
 
+/*  I'm changing ggobi.h ...
   data->gg->edge.n = asInteger (tmp);
-  data->gg->edge.n_in_plot = data->gg->edge.n;  /*-- for now --*/
+  data->gg->edge.n_in_plot = data->gg->edge.n;
+*/
 
 /*
   rowlabels_alloc (data->gg);
@@ -966,6 +943,7 @@ setDatasetEdgeInfo (const CHAR **attrs, XMLParserData *data)
 gboolean 
 newEdgeRecord (const CHAR **attrs, XMLParserData *data)
 {
+/*
   const gchar *tmp;
   gint i = data->current_edgerecord;
   data->current_edgeelement = 0;
@@ -986,6 +964,7 @@ newEdgeRecord (const CHAR **attrs, XMLParserData *data)
     gchar *stmp = g_strdup (tmp);
     g_array_insert_val (data->gg->edge.lbl, i, stmp);
   }
+*/
 
 /*
   setColor (attrs, data, i);
@@ -1017,6 +996,7 @@ newEdgeRecord (const CHAR **attrs, XMLParserData *data)
 gboolean
 setEdgeRecordValues (XMLParserData *data, const CHAR *line, gint len)
 {
+/*
   gint i = data->current_edgerecord;
   gdouble value;
   const gchar *tmp = strtok ((gchar*) line, " \t\n");
@@ -1026,6 +1006,7 @@ setEdgeRecordValues (XMLParserData *data, const CHAR *line, gint len)
     data->gg->edge.raw.vals[i][data->current_edgeelement++] = value;
     tmp = strtok (NULL, " \t\n");
   }
+*/
 
   return (true);
 }
@@ -1041,30 +1022,23 @@ setEdgeRecordValues (XMLParserData *data, const CHAR *line, gint len)
 gboolean
 setEdgeVariableName (XMLParserData *data, const CHAR *name, gint len)
 {
+/*
   gchar *tmp = (gchar *) g_malloc (sizeof(gchar) * (len+1));
   gint j = data->current_edgevariable;
 
   tmp[len] = '\0';
   memcpy (tmp, name, len);
 
-  /* Handle the case where we have multiple calls to the characters
-     handler for the same variable because the data is split
-   */
   if (data->gg->edge.vardata[j].collab != NULL) {
-    /* need to append tmp to the existing value.*/
+    ;
   }
 
   data->gg->edge.vardata[j].collab = tmp;
 
-  /* Note that if we do have multiple calls to this for the same
-     variable then we cannot handle the case where the 
-     user does not specify the transformation variable
-     unless we use a flag in XMLParserData. This is
-     variable_transform_name_as_attribute.
-   */
   if (data->gg->edge.vardata[j].collab_tform == NULL) {
     data->gg->edge.vardata[j].collab_tform = g_strdup (tmp);
   }
+*/
 
   return (true);
 }
@@ -1079,7 +1053,6 @@ rowId (const gchar *tmp, XMLParserData *data)
    /* Now look up the ids for the rows. */
    gint i;
    for (i=0; i < data->gg->nrows; i++) {
-/*   if (strcmp(tmp,data->gg->rowlab[i]) == 0*/
      if (strcmp (tmp, g_array_index (data->gg->rowlab, gchar *, i)) == 0 ||
          (data->rowIds != NULL && data->rowIds[i] &&
           strcmp(tmp,data->rowIds[i]) == 0))

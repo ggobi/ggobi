@@ -314,7 +314,7 @@ ggobi_file_set_create (gchar *rootname, ggobid *gg)
 
     /*-- decide whether to save line colors --*/
     skipit = true;
-    for (k=0; k<gg->nsegments; k++) {
+    for (k=0; k<gg->nedges; k++) {
       if (gg->line.color_now.vals[k] != 0) {
         skipit = false;
         break;
@@ -635,10 +635,10 @@ linedata_get (endpointsd *tlinks, gshort *tcolors,
   gint i, k;
   gint a, b, start_a, start_b;
 
-  for (k=0; k<gg->nsegments; k++) {
+  for (k=0; k<gg->nedges; k++) {
     start_a = start_b = -1;
-    a = gg->segment_endpoints[k].a - 1;
-    b = gg->segment_endpoints[k].b - 1;
+    a = gg->edge_endpoints[k].a - 1;
+    b = gg->edge_endpoints[k].b - 1;
     for (i=0; i<nr; i++) {
       if (rowv[i] == a) {
         start_a = i;
@@ -676,8 +676,8 @@ save_lines (gchar *rootname, gboolean lines_p, gboolean colors_p,
   if (lines_p || colors_p) {
 
     if (nr == gg->nrows) {
-      nl = gg->nsegments;
-      tlinks = gg->segment_endpoints;
+      nl = gg->nedges;
+      tlinks = gg->edge_endpoints;
       if (!gg->mono_p)
         linecolors = gg->line.color_now.vals;
 
@@ -687,9 +687,9 @@ save_lines (gchar *rootname, gboolean lines_p, gboolean colors_p,
        * Determine the number of links to be saved -- may as
        * well build a temporary links structure to use, actually.
       */
-      tlinks = (endpointsd *) g_malloc (gg->nsegments * sizeof (endpointsd));
+      tlinks = (endpointsd *) g_malloc (gg->nedges * sizeof (endpointsd));
       if (!gg->mono_p)
-        linecolors = (gshort *) g_malloc (gg->nsegments * sizeof (gshort));
+        linecolors = (gshort *) g_malloc (gg->nedges * sizeof (gshort));
       nl = linedata_get (tlinks, linecolors, rowv, nr, gg);
     }
   }

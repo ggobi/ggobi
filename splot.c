@@ -203,7 +203,7 @@ splot_set_current_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 void
 splot_alloc (splotd *sp, displayd *display, ggobid *gg) {
   gint nr = gg->nrows;
-  gint nl = gg->nsegments;
+  gint nl = gg->nedges;
 
   sp->planar = (lcoords *) g_malloc (nr * sizeof (lcoords));
   sp->screen = (icoords *) g_malloc (nr * sizeof (icoords));
@@ -220,11 +220,11 @@ splot_alloc (splotd *sp, displayd *display, ggobid *gg) {
 
   switch (display->displaytype) {
     case scatterplot:
-      sp->segments = (GdkSegment *) g_malloc (nl * sizeof (GdkSegment));
+      sp->edges = (GdkSegment *) g_malloc (nl * sizeof (GdkSegment));
       sp->arrowheads = (GdkSegment *) g_malloc (nl * sizeof (GdkSegment));
       break;
     case scatmat:
-      sp->segments = (GdkSegment *) g_malloc (nl * sizeof (GdkSegment));
+      sp->edges = (GdkSegment *) g_malloc (nl * sizeof (GdkSegment));
       sp->arrowheads = (GdkSegment *) g_malloc (nl * sizeof (GdkSegment));
       break;
     case parcoords:
@@ -234,11 +234,11 @@ splot_alloc (splotd *sp, displayd *display, ggobid *gg) {
 }
 
 void
-splot_segments_realloc (splotd *sp, ggobid *gg) {
-  sp->segments = (GdkSegment *) g_realloc ((gpointer) sp->segments,
-    gg->nsegments * sizeof (GdkSegment));
+splot_edges_realloc (splotd *sp, ggobid *gg) {
+  sp->edges = (GdkSegment *) g_realloc ((gpointer) sp->edges,
+    gg->nedges * sizeof (GdkSegment));
   sp->arrowheads = (GdkSegment *) g_realloc ((gpointer) sp->arrowheads,
-    gg->nsegments * sizeof (GdkSegment));
+    gg->nedges * sizeof (GdkSegment));
 }
 
 void
@@ -252,11 +252,11 @@ splot_free (splotd *sp, displayd *display, ggobid *gg) {
 
   switch (display->displaytype) {
     case scatterplot:
-      g_free ((gpointer) sp->segments);
+      g_free ((gpointer) sp->edges);
       g_free ((gpointer) sp->arrowheads);
       break;
     case scatmat:
-      g_free ((gpointer) sp->segments);
+      g_free ((gpointer) sp->edges);
       g_free ((gpointer) sp->arrowheads);
       break;
     case parcoords:

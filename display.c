@@ -12,9 +12,9 @@ extern void vardialog_open (ggobid *gg, gchar *title);
 
 DisplayOptions DefaultDisplayOptions = {
                                          true,  /* points_show_p */
-                                         false, /* segments_directed_show_p */
-                                         false, /* segments_undirected_show_p */
-                                         true,  /* segments_show_p*/
+                                         false, /* edges_directed_show_p */
+                                         false, /* edges_undirected_show_p */
+                                         true,  /* edges_show_p*/
                                          true,  /* missings_show_p  */
                                          false, /* gridlines_show_p */
                                          true,  /* axes_show_p */
@@ -75,15 +75,15 @@ display_options_cb (GtkCheckMenuItem *w, guint action)
       display_plot (display, FULL, gg);
       break;
     case DOPT_SEGS_D:
-      display->options.segments_directed_show_p = w->active;
+      display->options.edges_directed_show_p = w->active;
       display_plot (display, QUICK, gg);
       break;
     case DOPT_SEGS_U:
-      display->options.segments_undirected_show_p = w->active;
+      display->options.edges_undirected_show_p = w->active;
       display_plot (display, QUICK, gg);
       break;
     case DOPT_SEGS:
-      display->options.segments_show_p = w->active;
+      display->options.edges_show_p = w->active;
       display_plot (display, FULL, gg);
       break;
     case DOPT_MISSINGS:  /*-- only in scatmat and parcoords --*/

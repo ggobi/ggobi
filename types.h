@@ -155,9 +155,9 @@ typedef struct {
 */
 typedef struct {
  gboolean points_show_p;              /* scatterplot, scatmat, parcoords */
- gboolean segments_directed_show_p;   /* scatterplot, scatmat */
- gboolean segments_undirected_show_p; /* scatterplot, scatmat */
- gboolean segments_show_p;            /* parcoords */
+ gboolean edges_directed_show_p;      /* scatterplot, scatmat */
+ gboolean edges_undirected_show_p;    /* scatterplot, scatmat */
+ gboolean edges_show_p;               /* parcoords */
  gboolean missings_show_p;            /* scatterplot, scatmat, parcoords */
 
  gboolean gridlines_show_p;           /* scatterplot, scatmat, parcoords */

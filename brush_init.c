@@ -149,7 +149,7 @@ br_line_color_init (ggobid *gg)
   gshort *color, *color_now, *color_prev;
   gboolean *hidden, *hidden_now, *hidden_prev;
 
-  br_line_vectors_check_size (gg->nsegments, gg);
+  br_line_vectors_check_size (gg->nedges, gg);
 
   color = gg->line.color.vals;
   color_now = gg->line.color_now.vals;
@@ -158,7 +158,7 @@ br_line_color_init (ggobid *gg)
   hidden_now = gg->line.hidden_now.vals;
   hidden_prev = gg->line.hidden_prev.vals;
 
-  for (j=0; j<gg->nsegments; j++) {
+  for (j=0; j<gg->nedges; j++) {
     color[j] = color_now[j] = color_prev[j] = gg->color_0;
     hidden[j] = hidden_now[j] = hidden_prev[j] = false;
   }

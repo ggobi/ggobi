@@ -595,7 +595,7 @@ line_colors_read (gchar *ldata_in, gboolean reinit, ggobid *gg)
 
   if (reinit)
 /*    br_line_color_alloc (gg);*/
-    br_line_vectors_check_size (gg->nsegments, gg);
+    br_line_vectors_check_size (gg->nedges, gg);
 
   if (!gg->mono_p) {
     /*
@@ -613,7 +613,7 @@ line_colors_read (gchar *ldata_in, gboolean reinit, ggobid *gg)
         */
 
         i = 0;
-        while (i < gg->nsegments) {
+        while (i < gg->nedges) {
           retval = fscanf (fp, "%d", &id);
           if (retval <= 0 || id < 0 || id >= NCOLORS) {
             ok = false;
@@ -637,7 +637,7 @@ line_colors_read (gchar *ldata_in, gboolean reinit, ggobid *gg)
 }
 
 gboolean
-segments_read (gchar *rootname, gboolean startup, ggobid *gg)
+edges_read (gchar *rootname, gboolean startup, ggobid *gg)
   /* startup - Initializing ggobi? */
 {
   gint fs, nblocks, bsize = 500;
@@ -648,7 +648,7 @@ segments_read (gchar *rootname, gboolean startup, ggobid *gg)
 
   if ((rootname == NULL) || (strcmp (rootname, "") == 0) || 
       strcmp (rootname, "stdin") == 0) {
-/*    segments_create (gg);*/
+/*    edges_create (gg);*/
     return (ok);
   } else {
     fname = g_malloc (128 * sizeof (gchar));
@@ -664,11 +664,11 @@ segments_read (gchar *rootname, gboolean startup, ggobid *gg)
   if ((fp = fopen (fname, "r")) != NULL) {
     gint a, b;
 
-    gg->nsegments = 0;
+    gg->nedges = 0;
     /*
      * Allocate space for <bsize> connecting lines.
     */
-    segments_alloc (bsize, gg);
+    edges_alloc (bsize, gg);
     nblocks = 1;
     while (1)
     {
@@ -691,21 +691,21 @@ segments_read (gchar *rootname, gboolean startup, ggobid *gg)
          * Sort lines data such that a <= b
         */
         if (a <= b) {
-          gg->segment_endpoints[gg->nsegments].a = a;
-          gg->segment_endpoints[gg->nsegments].b = b;
+          gg->edge_endpoints[gg->nedges].a = a;
+          gg->edge_endpoints[gg->nedges].b = b;
         } else {
-          gg->segment_endpoints[gg->nsegments].a = b;
-          gg->segment_endpoints[gg->nsegments].b = a;
+          gg->edge_endpoints[gg->nedges].a = b;
+          gg->edge_endpoints[gg->nedges].b = a;
         }
 
-        (gg->nsegments)++;
+        (gg->nedges)++;
         jlinks++;
         if (jlinks == bsize) {
           /*
            * Allocate space for <bsize> more connecting links.
           */
           nblocks++;
-          segments_alloc (nblocks*bsize, gg);
+          edges_alloc (nblocks*bsize, gg);
           jlinks = 0;
         }
       }
@@ -718,7 +718,7 @@ segments_read (gchar *rootname, gboolean startup, ggobid *gg)
   }
 /*
  *else
- *  segments_create (gg);
+ *  edges_create (gg);
 */
 
   if (fname != (gchar *) NULL)

@@ -10,20 +10,20 @@
 
 /*
  * The brushing arrays are handled in brush_init.c, and the
- * segments and arrowheads arrays are handled in splot.c
+ * edges and arrowheads arrays are handled in splot.c
 */
 
 void
-segments_alloc (gint nsegs, ggobid *gg)
+edges_alloc (gint nsegs, ggobid *gg)
 {
-  gg->segment_endpoints = (endpointsd *)
-    g_realloc (gg->segment_endpoints, nsegs * sizeof (endpointsd));
+  gg->edge_endpoints = (endpointsd *)
+    g_realloc (gg->edge_endpoints, nsegs * sizeof (endpointsd));
 }
 
 void
-segments_free (ggobid *gg)
+edges_free (ggobid *gg)
 {
-  g_free ((gpointer) gg->segment_endpoints);
+  g_free ((gpointer) gg->edge_endpoints);
 }
 
 /* --------------------------------------------------------------- */
@@ -31,17 +31,17 @@ segments_free (ggobid *gg)
 /* --------------------------------------------------------------- */
 
 void
-segments_create (ggobid *gg)
+edges_create (ggobid *gg)
 {
   gint i;
 
-  gg->nsegments = gg->nrows - 1;
-  gg->segment_endpoints = (endpointsd *)
-    g_realloc ((gpointer) gg->segment_endpoints,
-    gg->nsegments * sizeof (endpointsd));
+  gg->nedges = gg->nrows - 1;
+  gg->edge_endpoints = (endpointsd *)
+    g_realloc ((gpointer) gg->edge_endpoints,
+    gg->nedges * sizeof (endpointsd));
 
-  for (i=0; i<gg->nsegments; i++) {
-    gg->segment_endpoints[i].a = i+1;
-    gg->segment_endpoints[i].b = i+2;
+  for (i=0; i<gg->nedges; i++) {
+    gg->edge_endpoints[i].a = i+1;
+    gg->edge_endpoints[i].b = i+2;
   }
 }

@@ -31,8 +31,8 @@ write_xml_stream(FILE *f, ggobid *gg, const gchar *filename)
   write_xml_description(f, gg);
   write_xml_variables(f, gg);
   write_xml_records(f, gg);
-/*-- skip for now, because there's no need to write the default segments --*/
-/*    write_xml_segments(f, gg);*/
+/*-- skip for now, because there's no need to write the default edges --*/
+/*    write_xml_edges(f, gg);*/
   write_dataset_footer(f, gg);
 
   return(true);
@@ -167,28 +167,28 @@ write_xml_record(FILE *f, ggobid *gg, gint i)
 }
 
 gboolean
-write_xml_segments(FILE *f, ggobid *gg)
+write_xml_edges(FILE *f, ggobid *gg)
 {
  int i;
- if(gg->nsegments < 1)
+ if(gg->nedges < 1)
   return(true);
 
- fprintf(f, "<segments count=%d>\n", gg->nsegments);
- for(i = 0; i < gg->nsegments; i++) {
-  write_xml_segment(f, gg, i);
+ fprintf(f, "<edges count=%d>\n", gg->nedges);
+ for(i = 0; i < gg->nedges; i++) {
+  write_xml_edge(f, gg, i);
   fprintf(f, "\n");
  }
- fprintf(f, "/segments>\n");
+ fprintf(f, "/edges>\n");
 
  return(true);
 }
 
 gboolean
-write_xml_segment(FILE *f, ggobid *gg, int i)
+write_xml_edge(FILE *f, ggobid *gg, int i)
 {
- fprintf(f, "<segment ");
- fprintf(f, "source=\"%d\" destination=\"%d\"", gg->segment_endpoints[i].a
-                                              , gg->segment_endpoints[i].b);
+ fprintf(f, "<edge ");
+ fprintf(f, "source=\"%d\" destination=\"%d\"", gg->edge_endpoints[i].a
+                                              , gg->edge_endpoints[i].b);
  fprintf(f, " />");
 
  return(true);

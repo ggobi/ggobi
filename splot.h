@@ -20,7 +20,7 @@ typedef struct {
   * line segments in scatterplot and scatmat
  */
  GdkSegment *arrowheads;
- GdkSegment *segments;
+ GdkSegment *edges;
 
  /*
   * line segments in parallel coordinates plot

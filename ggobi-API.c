@@ -606,31 +606,12 @@ GGOBI(getCaseHiddens)(gint *pts, gint howMany, ggobid *gg)
 }
 
 /*-------------------------------------------------------------------------*/
-/*        setting and getting segments                                     */
+/*        setting and getting edges                                        */
 /*-------------------------------------------------------------------------*/
-
-/*
-  The additional argument update allows one to pre-allocate
-  an entire block for segment_endpoints and then write into
-  it, rather than reallocate the vector for each new segment.
-  
-  To do this, the value of update should be false.
- */
-void
-GGOBI(setObservationSegment)(gint x, gint y, ggobid *gg, gboolean update)
-{
-  if(GGOBI(isConnectedSegment)(x, y, gg) == false) {
-    if(update)
-      segments_alloc(gg->nsegments+1, gg);
-    gg->segment_endpoints[gg->nsegments].a = x;
-    gg->segment_endpoints[gg->nsegments].b = y;
-    gg->nsegments++;
-  }
-}
 
 
 gboolean 
-GGOBI(isConnectedSegment)(gint a, gint b, ggobid *gg)
+GGOBI(isConnectedEdge)(gint a, gint b, ggobid *gg)
 {
   gint tmp, i;
 
@@ -640,12 +621,12 @@ GGOBI(isConnectedSegment)(gint a, gint b, ggobid *gg)
      b = tmp;
   }
 
-  for(i = 0; i < gg->nsegments ; i++) {
+  for(i = 0; i < gg->nedges ; i++) {
     
-    if(gg->segment_endpoints[i].a == a && gg->segment_endpoints[i].b == b)
+    if(gg->edge_endpoints[i].a == a && gg->edge_endpoints[i].b == b)
        return(true);
 
-    if(gg->segment_endpoints[i].a > a) {
+    if(gg->edge_endpoints[i].a > a) {
       return(false);
     } 
   }
@@ -653,18 +634,37 @@ GGOBI(isConnectedSegment)(gint a, gint b, ggobid *gg)
  return(false);
 }
 
+/*
+  The additional argument update allows one to pre-allocate
+  an entire block for edge_endpoints and then write into
+  it, rather than reallocate the vector for each new edge.
+  
+  To do this, the value of update should be false.
+ */
+void
+GGOBI(setObservationEdge)(gint x, gint y, ggobid *gg, gboolean update)
+{
+  if (GGOBI(isConnectedEdge)(x, y, gg) == false) {
+    if (update)
+      edges_alloc (gg->nedges+1, gg);
+    gg->edge_endpoints[gg->nedges].a = x;
+    gg->edge_endpoints[gg->nedges].b = y;
+    gg->nedges++;
+  }
+}
+
 
 gboolean 
 GGOBI(getShowLines)()
 {
- return(GGOBI(getDefaultDisplayOptions)()->segments_directed_show_p);
+ return(GGOBI(getDefaultDisplayOptions)()->edges_directed_show_p);
 }
 
 
 gboolean GGOBI(setShowLines)(gboolean val)
 {
  gboolean old = GGOBI(getShowLines)();
- GGOBI(getDefaultDisplayOptions)()->segments_directed_show_p = val;
+ GGOBI(getDefaultDisplayOptions)()->edges_directed_show_p = val;
 
  return(old);
 }

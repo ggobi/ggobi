@@ -20,7 +20,7 @@ typedef struct {
   void *user_data;
 } IdentifyHandler;
 
-typedef struct {
+typedef struct /*-- datad --*/ {
  gint ncols, nrows;
  vardatad *vardata;
  GArray *rowlab;
@@ -59,7 +59,7 @@ typedef struct {
  gint *rgroup_ids;
  rgroupd *rgroups;
 
- /*--------------------------- jittering --------------------------------*/
+ /*------------------------ jittering --------------------------------*/
 
  struct _Jitterd {
    gfloat factor;
@@ -69,7 +69,7 @@ typedef struct {
    gfloat *jitfacv;
  } jitter;
 
-/*-------------------------- brushing ----------------------------------*/
+/*------------------------ brushing ----------------------------------*/
 
  gint npts_under_brush;
  gboolean *pts_under_brush;
@@ -79,26 +79,53 @@ typedef struct {
  gboolean *hidden, *hidden_now, *hidden_prev;
  bin_struct **binarray;
 
-/*------------------------ identification ------------------------------*/
+/*---------------------- identification ------------------------------*/
 
  GSList *sticky_ids;
 
-/*---------------------- moving points ---------------------------------*/
+/*-------------------- moving points ---------------------------------*/
 
  GSList *movepts_history;  /*-- a list of elements of type celld --*/
 
-/*------------------- variable selection panel -------------------------*/
+/*----------------- variable selection panel -------------------------*/
 
  struct _Varpaneld {
    GtkWidget **da, **label;
    gint vnrows, vncols, nvars;
  } varpanel;
 
+/*-------------------- transformation --------------------------------*/
+
+ gint std_type;  /* Can be 0, 1 or 2 */
+
+ struct _Transformation_d {
+   GtkWidget *stage0_opt, *stage1_opt, *stage2_opt;
+   GtkAdjustment *boxcox_adj;
+ } tform;
+
+ struct _Sphere_d {
+   /* sphering transformation */
+   GtkWidget *window;
+   GtkAdjustment *npcs_adj;
+   GtkWidget *totvar_entry, *condnum_entry;
+   GtkWidget *sphere_apply_btn;
+
+   gint nspherevars;
+   gint *spherevars;
+   gint sphere_npcs;
+
+   gfloat *eigenval;
+   gfloat **eigenvec;
+   gfloat **vc;
+   gfloat *tform1_mean;
+ } sphere;
+
 } datad;
+
 
 struct _ggobid;
 
-typedef struct {
+typedef struct /*-- ggobi --*/ {
 
  struct _ggobid *thisGG;
 
@@ -137,16 +164,16 @@ struct _ggobid {
  gboolean close_pending;
  IdentifyHandler identify_handler;
 
-/*----------------------------------------------------------------------*/
-/*                        reading in the data                           */
-/*----------------------------------------------------------------------*/
+/*--------------------------------------------------------------------*/
+/*                      reading in the data                           */
+/*--------------------------------------------------------------------*/
 
  DataMode data_mode;
  gchar *data_in;
  gchar *filename;      /* full file name, including path */
  gchar *fname;         /* file name without suffix: .dat, .missing */
 
- /* gboolean: does this data contain only one variable? False by default */
+ /* gboolean: does the data contain only one column? False by default */
  gboolean single_column;
 
 /*----------------------- pipeline ---------------------------------*/
@@ -193,55 +220,10 @@ struct _ggobid {
  gint *rgroup_ids;
  rgroupd *rgroups;
 
-/*---------------------- transformation --------------------------------*/
-
- gint std_type;  /* Can be 0, 1 or 2 */
-
- struct _Transformation {
-   GtkWidget *stage0_opt, *stage1_opt, *stage2_opt;
-   GtkAdjustment *boxcox_adj;
- } tform;
-
- struct _Sphere {
-   /* sphering transformation */
-   GtkWidget *window;
-   GtkAdjustment *npcs_adj;
-   GtkWidget *totvar_entry, *condnum_entry;
-   GtkWidget *sphere_apply_btn;
-
-   gint nspherevars;
-   gint *spherevars;
-   gint sphere_npcs;
-
-   gfloat *eigenval;
-   gfloat **eigenvec;
-   gfloat **vc;
-   gfloat *tform1_mean;
- } sphere;
-
 /*---------------- segments; edges ---------------------------------*/
 
- /*-- data on edges; edge pipeline --*/
- struct _EdgeData {
-   datad d;
-
-   gint n, n_in_plot, ncols;  /*-- number of edges and edge variables --*/
-   gboolean *sampled;
-   vardatad *vardata;  /*-- include this in gg.vartable? --*/
-   GArray *lbl;        /*-- we certainly could have edge labels --*/
-   array_f raw, tform1, tform2;
-   array_l world, jitdata;
-
-/* this isn't really part of the edgedata -- ie, it's not parallel
-   to the regular data.  Rather it's part of the graph data.
-*/
-   vector_i head, tail;  /*-- vectors of length n --*/
-
- } edge;
-
- /*-- would these two be superseceded by the preceding? --*/
- gint nsegments;
- endpointsd *segment_endpoints;
+ gint nedges;
+ endpointsd *edge_endpoints;
 
  /*-- line brushing --*/
  struct _LineData {
@@ -257,9 +239,9 @@ struct _ggobid {
  rgroupd *lgroups;  /* id, nels, *els */
 
 
-/*----------------------------------------------------------------------*/
-/*                           color                                      */
-/*----------------------------------------------------------------------*/
+/*--------------------------------------------------------------------*/
+/*                         color                                      */
+/*--------------------------------------------------------------------*/
 
  gint ncolors;
  GdkColor *default_color_table, *color_table;  /* brushing colors */
@@ -315,21 +297,21 @@ struct _ggobid {
    gfloat *gy;
  } p1d;
 
-/*---------------------- 2d plotting -----------------------------------*/
+/*-------------------- 2d plotting -----------------------------------*/
 
  struct _XYPlot {
    gboolean cycle_p;
    gint direction;
  } xyplot;
 
-/*------------------------ touring -------------------------------------*/
+/*---------------------- touring -------------------------------------*/
 
  struct _Tour2d {
    GtkWidget *io_menu;
    gint idled; 
  } tour2d;
 
-/*---------------------- parallel coordinates --------------------------*/
+/*-------------------- parallel coordinates --------------------------*/
 
  struct _Parcoords {
    GtkAccelGroup *pc_accel_group;
@@ -337,7 +319,7 @@ struct _ggobid {
    GtkWidget *mode_menu;
  } parcoords;
 
-/*-------------------------- brushing ----------------------------------*/
+/*------------------------ brushing ----------------------------------*/
 
  gint npts_under_brush;
  gboolean *pts_under_brush;
@@ -374,14 +356,14 @@ struct _ggobid {
   icoords loc0, loc1;
  } plot;
 
-/*------------------------ identification ------------------------------*/
+/*---------------------- identification ------------------------------*/
 
  struct _Identify {
    GSList *sticky_ids;
    GtkWidget *link_menu;
  } identify;
 
-/*----------------------- submenu management ---------------------------*/
+/*--------------------- submenu management ---------------------------*/
 
  struct _Mode_SubMenu {
    GtkWidget *reset_item;
@@ -394,7 +376,7 @@ struct _ggobid {
   
  } mode_menu;
 
-/*---------------------- transformation --------------------------------*/
+/*-------------------- transformation --------------------------------*/
 
  gint std_type;  /* Can be 0, 1 or 2 */
 
@@ -420,20 +402,20 @@ struct _ggobid {
    gfloat *tform1_mean;
  } sphere;
 
-/*---------------------- subsetting ------------------------------------*/
+/*-------------------- subsetting ------------------------------------*/
 
  struct _Subset {
    gboolean rescale_p;
    GtkWidget *window;
    GtkWidget *notebook;
-   /*-- the entry widgets from which to get values for sample, rowlab --*/
+   /*-- entry widgets from which to get values for sample, rowlab --*/
    GtkWidget *random_entry, *rowlab_entry;
-   /*-- the adjustments from which to get values for blocksize, everyn --*/
+   /*-- adjustments from which to get values for blocksize, everyn --*/
    GtkAdjustment *bstart_adj, *bsize_adj;
    GtkAdjustment *estart_adj, *estep_adj;
  } subset;
 
-/*---------------------- scaling ---------------------------------------*/
+/*-------------------- scaling ---------------------------------------*/
 
  struct _Scale {
    GtkWidget *scale_reset_menu;
@@ -442,7 +424,7 @@ struct _ggobid {
    rectd click_rect;
  } scale;
 
-/*---------------------- imputation ------------------------------------*/
+/*-------------------- imputation ------------------------------------*/
 
  struct _Impute {
    gboolean rescale_p, vgroup_p;
@@ -453,7 +435,7 @@ struct _ggobid {
    GtkWidget *entry_above, *entry_below, *entry_val;
  } impute;
 
-/*---------------------- moving points ---------------------------------*/
+/*-------------------- moving points ---------------------------------*/
 
  struct _MovePts {
    gboolean cluster_p;
@@ -463,7 +445,7 @@ struct _ggobid {
  } movepts;
 
 
-/*------------------- variable selection panel -------------------------*/
+/*----------------- variable selection panel -------------------------*/
 
  struct _Varpanel_ui {
    GtkWidget *varpanel;
@@ -474,7 +456,7 @@ struct _ggobid {
    gint vnrows, vncols, nvars;
  } varpanel_ui;
 
-/*------------------- variable selection menus -------------------------*/
+/*----------------- variable selection menus -------------------------*/
 
  struct {
   varseldatad vdata0, vdata1;
@@ -500,7 +482,7 @@ struct _ggobid {
   varseldatad vdata0, vdata1, vdata2, vdata3;
  } scatmat_menu;
 
-/*----------------------------------------------------------------------*/
+/*--------------------------------------------------------------------*/
 
 }; /*  ggobid; */
 

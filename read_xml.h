@@ -11,9 +11,7 @@
 enum HiddenType {ROW, LINE};
 enum xmlDataState { TOP = 0, DESCRIPTION,
   RECORD, RECORDS, VARIABLES, VARIABLE, DATA,
-/*-- this line will be deleted --*/
-  CONNECTIONS, CONNECTION,
-/* */
+  CONNECTIONS, CONNECTION,  /* edges */
   EDGERECORD, EDGERECORDS, EDGEVARIABLES, EDGEVARIABLE,
   COLORMAP, COLOR, UNKNOWN};
 
@@ -36,7 +34,7 @@ typedef struct _XMLUserData {
   gint current_record;   /* Indexes the record we are currently working on. */
   gint current_element;  /* Indexes the values within a record. */
 /* this line will be deleted */
-  gint current_segment;  /* Current segment being added. */
+  gint current_edge;  /* Current edge being added. */
 /* */
 
   gint current_edgevariable;
@@ -83,7 +81,7 @@ typedef struct _XMLUserData {
   DataOptions defaults;
 
   /* Local set of record identifiers that are used here
-     for matching purposes when specifying segments.
+     for matching purposes when specifying edges.
      These are not set in the ggobid structure and 
      are different from the record's label attribute.
    */
@@ -128,8 +126,8 @@ void initParserData(XMLParserData *data, xmlSAXHandlerPtr handler, ggobid *gg);
 gboolean setGlyph(const CHAR **attrs, XMLParserData *data, gint i);
 gboolean setColor(const CHAR **attrs, XMLParserData *data, gint i);
 
-gboolean allocSegments(const CHAR **attrs, XMLParserData *data);
-gboolean addConnection(const CHAR **attrs, XMLParserData *data);
+gboolean allocEdges(const CHAR **attrs, XMLParserData *data);
+gboolean addEdge(const CHAR **attrs, XMLParserData *data);
 gint rowId(const gchar *tmp, XMLParserData *data);
 
 gboolean data_xml_read(const gchar *filename, ggobid *gg);

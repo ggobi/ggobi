@@ -217,10 +217,10 @@ extern void scatterplot_main_menus_make (GtkAccelGroup *, GtkSignalFunc, ggobid 
 extern displayd* scatterplot_new (gboolean, splotd *sp, ggobid *gg);
 extern void scatterplot_show_rulers (displayd *, gint);
 extern gboolean scree_mapped_p (void);
-extern void segments_alloc (gint, ggobid *gg);
-extern void segments_create (ggobid *gg);
-extern void segments_free (ggobid *gg);
-extern gboolean segments_read (gchar *, gboolean, ggobid *gg);
+extern void edges_alloc (gint, ggobid *gg);
+extern void edges_create (ggobid *gg);
+extern void edges_free (ggobid *gg);
+extern gboolean edges_read (gchar *, gboolean, ggobid *gg);
 extern gint selected_cols_get (gint *, gboolean, ggobid *gg);
 extern void smooth_window_open (ggobid *gg);
 extern void sp_event_handlers_toggle (splotd *, gboolean);

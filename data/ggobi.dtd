@@ -16,10 +16,10 @@
 <!ELEMENT records ( record )*>
 <!ELEMENT record  ( #PCDATA )>
 
-<!ELEMENT segments ( segment )*>
-<!ELEMENT segment EMPTY>
+<!ELEMENT edges ( edge )*>
+<!ELEMENT edge EMPTY>
 
-<!ELEMENT ggobidata (description, (colormap)?, variables, records, (segments)*)>
+<!ELEMENT ggobidata (description, (colormap)?, variables, records, (edges)*)>
 
 <!ELEMENT color ( #PCDATA) >
 <!-- id is a number or either of "fg" and "bg" -->
@@ -63,7 +63,7 @@
    group     CDATA                     #IMPLIED
 >   
 
-<!ATTLIST segment
+<!ATTLIST edge
    source      CDATA  #REQUIRED
    destination CDATA  #REQUIRED
    color       CDATA  #IMPLIED
