@@ -211,7 +211,13 @@ if test -n "${with_xml}" && test "${with_xml}" != "no" ; then
    dnl locally
    dnl Can override the use of libxml.tar.gz  by setting XML_CONFIG
    dnl environment variable.
- if test -r libxml.tar.gz && test -z "${XML_CONFIG}" ; then
+ if test -r libxml.tar.gz ; then
+
+  if test -x libxml-install/bin/xml2-config ; then
+    AC_PATH_PROG(XML_CONFIG, xml2-config,, ./libxml-install/bin:$PATH)
+  fi
+
+  if test -z "${XML_CONFIG}" ; then
    echo "Building ggobi-specific version of libxml"
    (gunzip -c libxml.tar.gz | tar xf -)
    LIBXML_VERSION=`tar tzvf libxml.tar.gz | head -n 1 | sed 's/^.*libxml2-//' | sed 's|/$||'`
@@ -231,6 +237,9 @@ if test -n "${with_xml}" && test "${with_xml}" != "no" ; then
    LOCAL_LIBXML_INSTALLATION="${TOP_DIR}/libxml-install"
    XML_LIB_DIRS_PATH=${LOCAL_LIBXML_INSTALLATION}/lib   
    cd ..
+  else
+   echo "Using previously compiled ggobi-specific version of libxml in libxml-install/"
+  fi
  fi
 
  echo "with_xml: ${with_xml}"
@@ -262,7 +271,7 @@ dnl  fi
       XML_VERSION="2"
    fi
   else
-    XML_VERSION=`${XML_CONFIG} --version | sed -e 's/\..*/\1/g'`
+    XML_VERSION=`${XML_CONFIG} --version | sed -e 's/\..*//g'`
   fi
  fi
  
