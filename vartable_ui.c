@@ -381,7 +381,6 @@ vartable_open (ggobid *gg)
      "N missing"};
   GSList *l;
   datad *d;
-  GtkWidget *labelw;
   gint n;
 
   /*-- if new datad's have been added, the user has to reopen the window --*/
@@ -418,9 +417,8 @@ vartable_open (ggobid *gg)
     gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled_window),
       GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
 
-    labelw = (g_slist_length (gg->d) > 1) ? gtk_label_new (d->name) : NULL;
     gtk_notebook_append_page (GTK_NOTEBOOK (gg->vartable_ui.notebook),
-                              scrolled_window, labelw);
+                              scrolled_window, gtk_label_new (d->name));
 
     gtk_widget_show (scrolled_window);
 

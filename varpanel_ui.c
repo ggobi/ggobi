@@ -334,7 +334,6 @@ varpanel_clear (datad *d, ggobid *gg)
 void varpanel_populate (datad *d, ggobid *gg)
 {
   gint j;
-  GtkWidget *labelw;
 
   /*-- we don't know the length of gg->d when the notebook is created --*/
   gtk_notebook_set_show_tabs (GTK_NOTEBOOK (gg->varpanel_ui.notebook),
@@ -345,9 +344,8 @@ void varpanel_populate (datad *d, ggobid *gg)
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (d->varpanel_ui.swin),
     GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
 
-  labelw = gtk_label_new (d->name);
   gtk_notebook_append_page (GTK_NOTEBOOK (gg->varpanel_ui.notebook),
-                            d->varpanel_ui.swin, labelw);
+                            d->varpanel_ui.swin, gtk_label_new (d->name));
 
 
   /*-- add an ebox to the scrolled window: needed for tooltips? --*/
