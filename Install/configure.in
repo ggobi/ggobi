@@ -31,24 +31,34 @@ AC_ARG_ENABLE(debug, [--enable-debug          Compile with debugging symbols])
 
 dnl AC_ARG_WITH(prefix, [--with-prefix          Specify where the files are to be installed (default /usr/local/).],INSTALL_DIR=${with_prefix},INSTALL_DIR="/usr/local")
 
-AC_ARG_WITH(xml, --with-xml          Enable reading and writing of XML datasets (yes),,with_xml="yes")
+AC_ARG_WITH(xml,
+  --with-xml          Enable reading and writing of XML datasets (yes),,with_xml="yes")
 
-AC_ARG_WITH(mysql, --with-mysql          Enable plugin for reading data from MySQL databases, 
-              MYSQL_PLUGIN=1; PLUGIN_DIRS="MySQL"; ENABLE_PLUGINS=1)
+AC_ARG_WITH(mysql,
+  --with-mysql        Enable plugin for reading data from MySQL databases, 
+  MYSQL_PLUGIN=1; PLUGIN_DIRS="MySQL"; ENABLE_PLUGINS=1)
 
-AC_ARG_WITH(postgres, --with-postgres          Enable plugin reading data from Postgres databases., 
-             POSTGRES_PLUGIN=1; PLUGIN_DIRS="${PLUGIN_DIRS} Postgres"; ENABLE_PLUGINS=1)
-AC_ARG_WITH(dataviewer, --with-dataviewer          Enable plugin for viewig data in a datagrid., 
-              DATAVIEWER_PLUGIN=1;  PLUGIN_DIRS="${PLUGIN_DIRS} DataViewer"; ENABLE_PLUGINS=1)
-AC_ARG_WITH(fileselector,--with-fileselector          Enable GtkExtra file selector plugin, 
-              FILESELECTOR_PLUGIN=1;  PLUGIN_DIRS="${PLUGIN_DIRS} FileSelect" ; ENABLE_PLUGINS=1)
+AC_ARG_WITH(postgres,
+  --with-postgres          Enable plugin reading data from Postgres databases., 
+  POSTGRES_PLUGIN=1; PLUGIN_DIRS="${PLUGIN_DIRS} Postgres"; ENABLE_PLUGINS=1)
+
+AC_ARG_WITH(dataviewer,
+  --with-dataviewer          Enable plugin for viewig data in a datagrid., 
+  DATAVIEWER_PLUGIN=1;  PLUGIN_DIRS="${PLUGIN_DIRS} DataViewer"; ENABLE_PLUGINS=1)
+AC_ARG_WITH(fileselector,
+  --with-fileselector          Enable GtkExtra file selector plugin, 
+  FILESELECTOR_PLUGIN=1;  PLUGIN_DIRS="${PLUGIN_DIRS} FileSelect" ; ENABLE_PLUGINS=1)
+
+AC_ARG_WITH(ggvis,
+  --with-ggvis          Enable ggvis graph layout plugin, 
+  GGVIS_PLUGIN=1;  PLUGIN_DIRS="${PLUGIN_DIRS} ggvis" ; ENABLE_PLUGINS=1)
 
 
 AC_ARG_WITH(plugins, [--with-plugins          Enable all the plugins (no)], ENABLE_ALL_PLUGINS=1)
 
-AC_ARG_WITH(R,--with-R          Install the Rggobi package)
-AC_ARG_WITH(Python,--with-Python          Install the Pythonggobi module)
-AC_ARG_WITH(Perl,--with-Perl          Install the Perlggobi module)
+AC_ARG_WITH(R,     --with-R         Install the Rggobi package)
+AC_ARG_WITH(Python,--with-Python    Install the Pythonggobi module)
+AC_ARG_WITH(Perl,  --with-Perl      Install the Perlggobi module)
 
  dnl Check for gtk-config.
  dnl We are not going anywhere without that.
@@ -408,7 +418,8 @@ if test -n "${ENABLE_ALL_PLUGINS}" ; then
  POSTGRES_PLUGIN=1
  DATAVIEWER_PLUGIN=1
  FILESELECTOR_PLUGIN=1
- PLUGIN_DIRS="MySQL Postgres DataViewer FileSelect"
+ GGVIS_PLUGIN=1
+ PLUGIN_DIRS="MySQL Postgres DataViewer FileSelect ggvis"
 fi
 
 if test -n "${PLUGIN_DIRS}" ; then
@@ -440,6 +451,12 @@ else
  fileselect_xml=/dev/null
 fi
 
+if test -n "$GGVIS_PLUGIN" ; then 
+ ggvis_xml=plugins/ggvis/plugin.xml
+else
+ ggvis_xml=/dev/null
+fi
+
 if test -n "${PLUGIN_DIRS}" ; then
  testInput_xml=plugins/TestInput/plugin.xml
  testPlugin_xml=plugins/TestPlugin/plugin.xml
@@ -452,6 +469,7 @@ AC_SUBST_FILE(mysql_xml)
 AC_SUBST_FILE(postgres_xml)
 AC_SUBST_FILE(dataviewer_xml)
 AC_SUBST_FILE(fileselect_xml)
+AC_SUBST_FILE(ggvis_xml)
 AC_SUBST_FILE(testInput_xml)
 AC_SUBST_FILE(testPlugin_xml)
 
