@@ -538,6 +538,8 @@ void       transform_variable (gint, gint, gfloat, gint, datad *, ggobid *);
 void       transform_window_open (ggobid *);
 gboolean   update_color_vectors (gint i, gboolean changed, gboolean *hit_by_brush, datad *d, ggobid *gg);
 gboolean   update_glyph_vectors (gint i, gboolean changed, gboolean *hit_by_brush, datad *d, ggobid *gg);
+gboolean   update_hidden_vectors (gint i, gboolean changed, gboolean *hit_by_brush, datad *d, ggobid *gg);
+gboolean  update_selected_vectors (gint i, gboolean changed, gboolean *hit_by_brush, datad *d, ggobid *gg);
 void       varcircle_label_set (gint jvar, datad *d);
 void       varcircle_label_set (gint, datad *);
 void       varcircles_add (gint ncols, datad *, ggobid *);
