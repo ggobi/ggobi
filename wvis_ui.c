@@ -490,10 +490,16 @@ selection_made_cb (GtkWidget *clist, gint row, gint column,
 {
   gboolean rval = false;
   datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
+  GtkWidget *btn;
 
   bin_counts_reset (row, d, gg);
   gtk_signal_emit_by_name (GTK_OBJECT (gg->wvis.da), "expose_event",
     (gpointer) gg, (gpointer) &rval);
+
+  /*-- get the apply button, make it sensitive --*/
+  btn = widget_find_by_name (gg->wvis.window, "WVIS:apply");
+  if (btn)
+    gtk_widget_set_sensitive (btn, true);
 }
 
 static void scale_apply_cb (GtkWidget *w, ggobid* gg)
@@ -681,10 +687,13 @@ wvis_window_open (ggobid *gg) {
     btn = gtk_button_new_with_label ("Apply");
     gtk_object_set_data (GTK_OBJECT (btn), "notebook", notebook);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-      "Apply the color scale", NULL);
+      "Apply the color scale, using the values of the variable selected in the notebook above",
+      NULL);
     gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 0);
     gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                         GTK_SIGNAL_FUNC (scale_apply_cb), gg);
+    gtk_widget_set_name (btn, "WVIS:apply");
+    gtk_widget_set_sensitive (btn, false);
 
     /*-- add a close button --*/
     gtk_box_pack_start (GTK_BOX (vbox), gtk_hseparator_new(),
