@@ -8,9 +8,6 @@
 #include "externs.h"
 
 /*
-The memory bug is fixed.  whew.
-
-The labels are not being updated.
 When I go from 2 to 3 variables, I don't get a third variable
   in the table or the checkbox list.
 */
@@ -67,6 +64,19 @@ sphere_malloc (gint nc, datad *d, ggobid *gg)
 /*         test the number of variables sphered last time                  */
 /*-------------------------------------------------------------------------*/
 
+void
+variable_set_label (datad *d, gint j, gchar *lbl) 
+{
+  extern void vartable_collab_set_by_var (gint j, datad *d);
+  extern void varcircle_label_set (gint jvar, datad *d);
+
+  d->vartable[j].collab = g_strdup (lbl);
+  d->vartable[j].collab_tform = g_strdup (lbl);
+  vartable_collab_set_by_var (j, d);
+  varlabel_set (j, d);         /*-- checkboxes --*/
+  varcircle_label_set (j, d);  /*-- variable circles --*/
+}
+
 /*
  * before spherizing 
  * if (npcvars > 0 && npcvars != npcs) {
@@ -81,6 +91,7 @@ spherize_set_pcvars (datad *d, ggobid *gg)
 {
   gint ncols_prev = d->ncols;
   gint j, k;
+  gchar *lbl;
 
   if (d->sphere.npcs == 0)
     return;
@@ -89,14 +100,23 @@ spherize_set_pcvars (datad *d, ggobid *gg)
   if (d->sphere.pcvars.vals == NULL) {
     vectori_realloc (&d->sphere.pcvars, d->sphere.npcs);
     clone_vars (d->sphere.vars.vals, d->sphere.npcs, d, gg);
-    for (j=ncols_prev, k=0; j<d->ncols; j++)
+    for (j=ncols_prev, k=0; j<d->ncols; j++) {
       d->sphere.pcvars.vals[k++] = j;
+      lbl = g_strdup_printf ("PC%d", k);
+      variable_set_label (d, j, lbl);
+      g_free (lbl);
+    }
   } else if (d->sphere.pcvars.nels == 0) {  /*-- an oddball case --*/
     vectori_free (&d->sphere.pcvars);
     vectori_realloc (&d->sphere.pcvars, d->sphere.npcs);
     clone_vars (d->sphere.vars.vals, d->sphere.npcs, d, gg);
-    for (j=ncols_prev, k=0; j<d->ncols; j++)
+    for (j=ncols_prev, k=0; j<d->ncols; j++) {
       d->sphere.pcvars.vals[k++] = j;
+      lbl = g_strdup_printf ("PC%d", k);
+      variable_set_label (d, j, lbl);
+      g_free (lbl);
+    }
+  } else {
   }
 }
 

@@ -15,7 +15,7 @@ static void tour2dadv_window_open (ggobid *gg);
   g_printerr ("speed=%d\n", speed);
 }*/
 static void speed_set_cb (GtkAdjustment *adj, ggobid *gg) {
-  extern void speed_set(gint, ggobid *);
+  extern void speed_set (gint, ggobid *);
 
   speed_set ((gint)adj->value, gg);
 }

@@ -712,10 +712,10 @@ void tform_label_update (gint jcol, datad *d, ggobid *gg)
   collab_tform_update (jcol, d, gg);
 
   /*-- update the displayed checkbox label --*/
-  varlabel_set (jcol, d, gg);
+  varlabel_set (jcol, d);
 
   /*-- update the displayed variable circle labels --*/
-  /*-- need a routine here --*/
+  varcircle_label_set (jcol, d);
 
   /*-- update the variable statistics table --*/
   vartable_collab_tform_set_by_var (jcol, d);

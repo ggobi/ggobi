@@ -47,7 +47,7 @@ checkbox_get_nth (gint jvar, datad *d)
 }
 
 void
-varlabel_set (gint jvar, datad *d, ggobid *gg)
+varlabel_set (gint jvar, datad *d)
 {
   GtkWidget *w = checkbox_get_nth (jvar, d);
   gtk_label_set_text (GTK_LABEL (GTK_BIN (w)->child),

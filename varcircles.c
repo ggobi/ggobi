@@ -162,6 +162,16 @@ varcircles_layout_reset (gint ncols, datad *d, ggobid *gg) {
   }
 }
 
+void
+varcircle_label_set (gint j, datad *d)
+{
+  GtkWidget *w = (GtkWidget *) g_slist_nth_data (d->varpanel_ui.label, j);
+
+  g_assert (w != NULL);
+
+  gtk_label_set_text (GTK_LABEL (GTK_BIN(w)->child), d->vartable[j].collab);
+}
+
 /*-- create a grid of buttons in the table --*/
 void
 varcircles_populate (datad *d, ggobid *gg)

@@ -101,6 +101,7 @@
 34875   10/10 reading in new data works now -- if surprisingly
 35277   10/18 working on transformation and sphering
 35334   10/18 Di committed the 1d tour
+35373   10/19 labels update correctly on transformation and sphering
               
 
 note: There are about 40.8K lines in xgobi,

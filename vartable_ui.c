@@ -543,6 +543,15 @@ vartable_open (ggobid *gg)
 /*                 set values in the table                                 */
 /*-------------------------------------------------------------------------*/
 
+/*-- sets the name of the un-transformed variable --*/
+void
+vartable_collab_set_by_var (gint j, datad *d)
+{
+  if (d->vartable_clist != NULL)
+    gtk_clist_set_text (GTK_CLIST (d->vartable_clist), j,
+      CLIST_VARNAME, d->vartable[j].collab);
+}
+
 /*-- sets the name of the transformed variable --*/
 void
 vartable_collab_tform_set_by_var (gint j, datad *d)

@@ -52,6 +52,7 @@ saving plots as .svg files
     and scatmat plots
 
 Tour:
+  dumps core in cloning (and therefore in sphering)
   rulers
   axes
   put arrays and vectors into the standard routines that debby has developed.
