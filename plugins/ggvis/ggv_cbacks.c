@@ -577,7 +577,9 @@ void ggv_dims_cb (GtkAdjustment *adj, PluginInstance *inst)
         dtmp[i] = 2 * (randvalue() - .5);  /* on [-1, 1] */
       for (j=ggv->dim; j<dim; j++) {
         vname = g_strdup_printf ("Pos%d", j+1);
-        newvar_add_with_values (dtmp, d->nrows, vname, d, gg);
+        newvar_add_with_values (dtmp, d->nrows, vname,
+          real, 0, (gchar **) NULL, (gint *) NULL, (gint *) NULL,
+        d, gg);
         g_free (vname);
       }
       g_free (dtmp);
