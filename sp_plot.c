@@ -124,7 +124,7 @@ splot_plot_case (gint m, datad *d, splotd *sp, displayd *display, ggobid *gg)
       case scatterplot:
         break;
       default:
-	break;
+        break;
     }
   }
   return draw_case;
@@ -1048,11 +1048,11 @@ void
 splot_pixmap1_to_window (splotd *sp, ggobid *gg) {
   GtkWidget *w = sp->da;
 #if 0
-      if(gg->plot_GC == NULL) {
-	  init_plot_GC(w->window, gg);
-	 fprintf(stderr, "Mmmm");
-         return;
-      }
+  if(gg->plot_GC == NULL) {
+    init_plot_GC(w->window, gg);
+    fprintf(stderr, "Mmmm");
+    return;
+  }
 #endif
   gdk_draw_pixmap (sp->da->window, gg->plot_GC, sp->pixmap1,
                    0, 0, 0, 0,
@@ -1125,6 +1125,8 @@ static void splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
   gfloat dst;
   gint textheight = 0;
   gchar *varlab;
+  gint dawidth = sp->da->allocation.width;
+  gint daheight = sp->da->allocation.height;
 
   if (!dsp->options.axes_show_p)
     return;
@@ -1133,167 +1135,151 @@ static void splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
     gdk_gc_set_foreground (gg->plot_GC, &gg->accent_color);
     switch (proj) {
       case TOUR1D:
-        /*-- use stringheight to place the labels --*/
+        /*-- use string height to place the labels --*/
         gdk_text_extents (style->font, "yA", strlen("yA"),
           &lbearing, &rbearing, &width, &ascent, &descent);
         textheight = ascent + descent;
-/*
- * instead of the rectangle, try drawing just the limits
-*/
+
+        /*-- draw vertical lines to mark the min and max positions --*/
         gdk_draw_line(drawable, gg->plot_GC,
-          sp->da->allocation.width/2-sp->da->allocation.width/4,
-          sp->da->allocation.height - textheight*d->ncols - 10,
-          sp->da->allocation.width/2-sp->da->allocation.width/4,
-          sp->da->allocation.height);
+          dawidth/4, daheight - textheight*d->ncols - 10,
+          dawidth/4, daheight);
         gdk_draw_line(drawable, gg->plot_GC,
-          3*sp->da->allocation.width/4,
-          sp->da->allocation.height - textheight*d->ncols - 10,
-          3*sp->da->allocation.width/4,
-          sp->da->allocation.height);
+          3*dawidth/4, daheight - textheight*d->ncols - 10,
+          3*dawidth/4, daheight);
+
+        gdk_gc_set_line_attributes(gg->plot_GC, 2, GDK_LINE_SOLID, 
+          GDK_CAP_ROUND, GDK_JOIN_ROUND);
 
         for (j=0; j<d->ncols; j++) {
-          ix = sp->da->allocation.width/2 + 
-            (gint) (dsp->t1d.u.vals[0][j]*
-            (gfloat) sp->da->allocation.width/4);
-          iy = sp->da->allocation.height - 10 - (d->ncols-1-j)*textheight;
-          gdk_gc_set_line_attributes(gg->plot_GC, 2, GDK_LINE_SOLID, 
-            GDK_CAP_ROUND, GDK_JOIN_ROUND);
+          ix = dawidth/2 + (gint) (dsp->t1d.u.vals[0][j]*(gfloat) dawidth/4);
+          iy = daheight - 10 - (d->ncols-1-j)*textheight;
           gdk_draw_line(drawable, gg->plot_GC,
-            sp->da->allocation.width/2,sp->da->allocation.height - 10 - 
-            (d->ncols-1-j)*textheight, ix, iy);
-          gdk_gc_set_line_attributes(gg->plot_GC, 1, GDK_LINE_SOLID, 
-            GDK_CAP_ROUND, GDK_JOIN_ROUND);
-/*
-          gdk_draw_rectangle(drawable, gg->plot_GC, FALSE, 
-            sp->da->allocation.width/2-sp->da->allocation.width/4,
-            sp->da->allocation.height - 10*d->ncols-10,
-            2*sp->da->allocation.width/4,  
-            10*d->ncols+10);
-*/
-
+            dawidth/2, daheight - 10 - (d->ncols-1-j)*textheight,
+            ix, iy);
 /*
  * An experiment:  add the labels only for those variables with
  * non-zero multipliers.  Add them on the right if positive, on
  * the left if negative.
 */
-          if (ix != sp->da->allocation.width/2) {
+          if (ix != dawidth/2) {
             gdk_text_extents (style->font, 
               d->vartable[j].collab_tform,
               strlen (d->vartable[j].collab_tform),
               &lbearing, &rbearing, &width, &ascent, &descent);
             gdk_draw_string (drawable, style->font, gg->plot_GC,
-              (ix > sp->da->allocation.width/2) ?
-              sp->da->allocation.width/2+sp->da->allocation.width/4+10 :
-              sp->da->allocation.width/4 - width -10,
+              (ix > dawidth/2) ? 3*dawidth/4 + 10 : dawidth/4 - width -10,
               iy, d->vartable[j].collab_tform);
           }
-	    }     
+        }     
+        gdk_gc_set_line_attributes(gg->plot_GC, 1, GDK_LINE_SOLID, 
+          GDK_CAP_ROUND, GDK_JOIN_ROUND);
       break;
       case TOUR2D:
         gdk_draw_arc(drawable,gg->plot_GC,FALSE,
-          10, sp->da->allocation.height-sp->da->allocation.height/4-10,
-          sp->da->allocation.width/4,sp->da->allocation.height/4,0,360*64);
+          10, 3*daheight/4 - 10,
+          dawidth/4, daheight/4, 0,360*64);
+
+        gdk_gc_set_line_attributes(gg->plot_GC, 2, GDK_LINE_SOLID, 
+          GDK_CAP_ROUND, GDK_JOIN_ROUND);
         for (j=0; j<d->ncols; j++) {
-          ix = sp->da->allocation.width/8 + 10 +
-            (gint) (dsp->t2d.u.vals[0][j]*
-            (gfloat) sp->da->allocation.width/8);
-          iy = sp->da->allocation.height - 10 - (sp->da->allocation.height/8 + 
-            (gint) (dsp->t2d.u.vals[1][j]*
-            (gfloat) sp->da->allocation.height/8));
-          gdk_gc_set_line_attributes(gg->plot_GC, 2, GDK_LINE_SOLID, 
-            GDK_CAP_ROUND, GDK_JOIN_ROUND);
+          ix = dawidth/8 + 10 +
+            (gint) (dsp->t2d.u.vals[0][j]* (gfloat) dawidth/8);
+          iy = daheight - 10 - (daheight/8 + 
+            (gint) (dsp->t2d.u.vals[1][j]* (gfloat) daheight/8));
           gdk_draw_line(drawable, gg->plot_GC,
-            sp->da->allocation.width/8+10,
-            sp->da->allocation.height-sp->da->allocation.height/8-10,
+            dawidth/8+10, daheight-daheight/8-10,
             ix, iy);
-          gdk_gc_set_line_attributes(gg->plot_GC, 1, GDK_LINE_SOLID, 
-            GDK_CAP_ROUND, GDK_JOIN_ROUND);
-          if (abs(ix - 10 - sp->da->allocation.width/8) > 5 ||
-	      abs(iy + 10 - (sp->da->allocation.height-
-              sp->da->allocation.height/8)) > 5)
+          if (abs(ix - 10 - dawidth/8) > 5 ||
+              abs(iy + 10 - (daheight- daheight/8)) > 5)
           {
             varlab = g_strdup_printf("%d",j+1);
             gdk_text_extents (style->font, 
-              varlab,
-              strlen (varlab),
+              varlab, strlen (varlab),
               &lbearing, &rbearing, &width, &ascent, &descent);
-            ix = ix - 10 - sp->da->allocation.width/8;
-            iy = iy - 
-              (sp->da->allocation.height-sp->da->allocation.height/8-10);
+            ix = ix - 10 - dawidth/8;
+            iy = iy - (daheight - daheight/8 - 10);
             dst = sqrt(ix*ix + iy*iy);
-            ix = 10 + sp->da->allocation.width/8 + 
-               (gint) ((gfloat) ix / dst *
-               (gfloat) sp->da->allocation.width/8);
-            iy = sp->da->allocation.height - 10 - 
-               sp->da->allocation.height/8 + 
-               (gint) ((gfloat) iy / dst *
-               (gfloat) sp->da->allocation.height/8);
-            if (ix < sp->da->allocation.width/8+10)
+            ix = 10 + dawidth/8 + 
+               (gint) ((gfloat) ix / dst * (gfloat) dawidth/8);
+            iy = daheight - 10 - 
+               daheight/8 + (gint) ((gfloat) iy / dst * (gfloat) daheight/8);
+            if (ix < dawidth/8+10)
               ix -= width;
             else
               ix += width;
-            if (iy < sp->da->allocation.height-sp->da->allocation.height/8-10)
+            if (iy < daheight-daheight/8-10)
               iy -= 3;
             else
               iy += (8);
             gdk_draw_string (drawable, style->font, gg->plot_GC,
               ix, iy,
               varlab);
-	  }
-	}     
-        break;
+          }
+        }
+        gdk_gc_set_line_attributes(gg->plot_GC, 0, GDK_LINE_SOLID, 
+          GDK_CAP_ROUND, GDK_JOIN_ROUND);
+      break;
       case COTOUR:
+        /*-- use string height to place the labels --*/
+        gdk_text_extents (style->font, "yA", strlen("yA"),
+          &lbearing, &rbearing, &width, &ascent, &descent);
+        textheight = ascent + descent;
+
+        /*-- draw vertical lines to mark the min and max positions --*/
+        gdk_draw_line(drawable, gg->plot_GC,
+          dawidth/4, daheight - textheight*d->ncols - 10,
+          dawidth/4, daheight);
+        gdk_draw_line(drawable, gg->plot_GC,
+          3*dawidth/4, daheight - textheight*d->ncols - 10,
+          3*dawidth/4, daheight);
+
+        /*-- draw horizontal lines to mark the min and max positions --*/
+        gdk_draw_line(drawable, gg->plot_GC,
+          0,                   daheight/4,
+          textheight*d->ncols, daheight/4);
+        gdk_draw_line(drawable, gg->plot_GC,
+          0,                   3*daheight/4,
+          textheight*d->ncols, 3*daheight/4);
+
+        gdk_gc_set_line_attributes(gg->plot_GC, 2, GDK_LINE_SOLID, 
+          GDK_CAP_ROUND, GDK_JOIN_ROUND);
+
         for (j=0; j<d->ncols; j++) {
           /* horizontal */
-          ix = sp->da->allocation.width/2 + 
+          ix = dawidth/2 + 
             (gint) (dsp->tcorr1.u.vals[0][j]*
-            (gfloat) sp->da->allocation.width/4);
-          iy = sp->da->allocation.height - 10 - (d->ncols-1-j)*10;
-          gdk_gc_set_line_attributes(gg->plot_GC, 2, GDK_LINE_SOLID, 
-            GDK_CAP_ROUND, GDK_JOIN_ROUND);
+            (gfloat) dawidth/4);
+          iy = daheight - 10 - (d->ncols-1-j)*textheight;
           gdk_draw_line(drawable, gg->plot_GC,
-            sp->da->allocation.width/2,sp->da->allocation.height - 10 - 
-            (d->ncols-1-j)*10, ix, iy);
+            dawidth/2,daheight - 10 - 
+            (d->ncols-1-j)*textheight, ix, iy);
           gdk_gc_set_line_attributes(gg->plot_GC, 1, GDK_LINE_SOLID, 
             GDK_CAP_ROUND, GDK_JOIN_ROUND);
-          gdk_draw_rectangle(drawable, gg->plot_GC, FALSE, 
-            sp->da->allocation.width/2-sp->da->allocation.width/4,
-            sp->da->allocation.height - 10*d->ncols-10,
-            2*sp->da->allocation.width/4,  
-            10*d->ncols+10);
+
           gdk_text_extents (style->font, 
             d->vartable[j].collab_tform,
             strlen (d->vartable[j].collab_tform),
             &lbearing, &rbearing, &width, &ascent, &descent);
           gdk_draw_string (drawable, style->font, gg->plot_GC,
-            sp->da->allocation.width/2+sp->da->allocation.width/4+10,
+            dawidth/2+dawidth/4+10,
             iy, d->vartable[j].collab_tform);
-	  
+  
           /* vertical */
-          ix = 10 + j*10;
-          iy = sp->da->allocation.height - (sp->da->allocation.height/2 + 
+          ix = 10 + j*textheight;
+          iy = daheight - (daheight/2 + 
             (gint) (dsp->tcorr2.u.vals[0][j]*
-            (gfloat) sp->da->allocation.height/4));
+            (gfloat) daheight/4));
           gdk_gc_set_line_attributes(gg->plot_GC, 2, GDK_LINE_SOLID, 
             GDK_CAP_ROUND, GDK_JOIN_ROUND);
           gdk_draw_line(drawable, gg->plot_GC,
-            10+j*10,sp->da->allocation.height/2,
+            10+j*textheight,daheight/2,
             ix, iy);
-          gdk_gc_set_line_attributes(gg->plot_GC, 1, GDK_LINE_SOLID, 
-            GDK_CAP_ROUND, GDK_JOIN_ROUND);
-          gdk_draw_rectangle(drawable, gg->plot_GC, FALSE, 
-            0, sp->da->allocation.height - 
-            sp->da->allocation.height/2-sp->da->allocation.height/4,
-            10*d->ncols+10,
-            2*sp->da->allocation.height/4);
-	  /*          gdk_text_extents (style->font, 
-            d->vartable[j].collab_tform,
-            strlen (d->vartable[j].collab_tform),
-            &lbearing, &rbearing, &width, &ascent, &descent);
-          gdk_draw_string (drawable, style->font, gg->plot_GC,
-            ix + 5, iy + 5,
-            d->vartable[j].collab_tform);*/
-	}     
+
+          /*-- can't add vertical variable labels --*/
+        }     
+        gdk_gc_set_line_attributes(gg->plot_GC, 0, GDK_LINE_SOLID, 
+          GDK_CAP_ROUND, GDK_JOIN_ROUND);
         break;
     }
   }
