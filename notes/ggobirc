@@ -98,10 +98,10 @@
      </dll>
 </plugin>
 
-<plugin name="ggvis" load="immediate"><!-- load may be on demand. -->
+<plugin name="GraphLayout" load="immediate"><!-- load may be on demand. -->
    <description>For graph layout and manipulation.</description>
    <author>Deborah Swayne</author>
-   <dll name="plugins/ggvis/ggvis.so">
+   <dll name="plugins/GraphLayout/GraphLayout">
     <init onCreate="addToToolsMenu" onClose="closeWindow" />
   </dll>
 </plugin>
