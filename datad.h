@@ -250,7 +250,7 @@ void freeLevelHashEntry(gpointer key, gpointer value, gpointer data);
 typedef enum {no_edgesets, edgesets_only, all_datatypes} datatyped;
 
 extern endpointsd *resolveEdgePoints(datad *e, datad *d);
-extern gboolean edge_add (gint, gint, datad *, datad *);
+void unresolveAllEdgePoints(datad *e);
 
 void datad_record_ids_set(datad *d, gchar **ids, gboolean duplicate);
 

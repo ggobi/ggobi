@@ -61,9 +61,9 @@ br_glyph_ids_add (datad *d, ggobid *gg)
 {
   gint i, nprev = d->glyph.nels;
 
-  vectorg_alloc (&d->glyph, d->nrows);
-  vectorg_alloc (&d->glyph_now, d->nrows);
-  vectorg_alloc (&d->glyph_prev, d->nrows);
+  vectorg_realloc (&d->glyph, d->nrows);
+  vectorg_realloc (&d->glyph_now, d->nrows);
+  vectorg_realloc (&d->glyph_prev, d->nrows);
 
   for (i=nprev; i<d->nrows; i++) {
     d->glyph.els[i].type = d->glyph_now.els[i].type =

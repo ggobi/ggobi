@@ -145,19 +145,21 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
       return false;
     }
 
+    /*-- Open a dialog window to ask for label and maybe rowId --*/
+    /*-- just use defaults for the moment --*/
 
     /*-- Add the new edge to e --*/
-/* Ask the user for information before adding?
-d:  We're not making any changes to d.
+/*
+
+d:  We're not making any changes to d when we add an edge.
 
 e:
   record label
   if e has rowIds, a rowId
   if e has variables, variable values -- we don't have a clue what to use
 */
-/*
-    edge_add (gg->edgeedit.a, d->nearest_point, d, e);
-*/
+
+    edge_add (gg->edgeedit.a, d->nearest_point, NULL, NULL, d, e, gg);
   }
   gg->edgeedit.a = -1;
 

@@ -205,24 +205,20 @@ datad_record_ids_set(datad *d, gchar **ids, gboolean duplicate)
   }
 }
 
-/* Add some number of record ids */
+/* Add a record id */
 void
-datad_record_ids_add (gchar **ids, gint nprev, datad *d)
+datad_record_id_add (gchar *id, datad *d)
 {
   gint i, *index;
   gchar *tmp;
 
   d->rowIds = (gchar **) g_realloc (d->rowIds, sizeof(gchar *) * d->nrows);
-  for (i=nprev; i<d->nrows; i++) {
-    tmp = g_strdup(ids[i]);
-    index = (guint *) g_malloc(sizeof(guint));
-    *index = i;
-    g_hash_table_insert (d->idTable, tmp, index);
-    d->rowIds[i] = tmp;
 
-    g_free (index);
-    g_free (tmp);
-  }
+  index = (guint *) g_malloc(sizeof(guint));
+  *index = i;
+  g_hash_table_insert (d->idTable, tmp, index);
+  d->rowIds[d->nrows-1] = id;
+  g_free (index);
 }
 
 /*

@@ -49,35 +49,90 @@ void edges_free(datad * d, ggobid * gg)
   Allocate space for another edge observation and set the
   locations of the rows.
  */
-gboolean edge_add(gint a, gint b, datad * d, datad * e)
+gboolean edge_add (gint a, gint b, gchar *lbl, gchar *id, datad * d, datad * e,
+  ggobid *gg)
 {
-  /*-- check whether (a,b) exists before adding?  Not for the moment --*/
-
-g_printerr ("(edge_add) not yet adding edges\n");
-return false;
-
-/*
+  gchar *s1, *s2;
   gint n = e->edge.n;
-  edges_alloc(e->edge.n + 1, e);
+  GList *l, *sl;
+  splotd *sp;
+  displayd *dsp;
+
+/*-- while the code is evolving ... --*/
+g_printerr ("lbl %s\n", lbl);
+g_printerr ("id %s\n", id);
+
+  g_assert (e->edge.n == e->nrows);
+
+  /*-- eventually check whether a->b already exists before adding --*/
+
+  /*-- Here's what the datad needs --*/
+/*
+ * some of this can be encapsulated as datad_record_add, as long
+ * as problems with the sequence of operations don't arise.
+*/
+  e->nrows += 1;
+
+  /*-- add a row label --*/
+  if (!lbl) s1 = g_strdup_printf ("%d", n+1);
+  rowlabel_add ((lbl)?lbl:s1, e);  /*-- don't free s1 --*/
+
+  /*-- if necessary, add an id --*/
+  if (e->idTable) {
+    if (!id) s2 = g_strdup_printf ("%d", n+1);
+    datad_record_id_add (s2, e);  /*-- don't free s2 --*/
+  }
+
+  pipeline_arrays_check_dimensions (e);
+  rows_in_plot_set (e, gg);
+
+  /*-- allocate and initialize brushing arrays --*/
+  br_glyph_ids_add (e, gg);
+  br_color_ids_add (e, gg);
+  br_hidden_alloc (e);
+  vectorb_realloc (&e->pts_under_brush, e->nrows);
+  clusters_set (e, gg);
+
+  if (e->nmissing)
+    arrays_add_rows (&e->missing, e->nrows);
+
+  edges_alloc(e->nrows, e);
   e->edge.sym_endpoints[n].a = g_strdup (d->rowIds[a]);
   e->edge.sym_endpoints[n].b = g_strdup (d->rowIds[b]);
-  e->edge.endpoints[n].jpartner = -1;  XXX
-*/
+  e->edge.sym_endpoints[n].jpartner = -1; /* XXX */
+  unresolveAllEdgePoints(e);
+  resolveEdgePoints (e, d);
 
-  /*pipeline_arrays_add_row (n+1, e); */
-
-/*XXX This should be done on all the datasets and the symbolic datapoints too perhaps. */
 /*
-  resolveEdgePoints(e, d);
-  ... this won't recalculate the endpoints; find out from Duncan what to do ..
-
 DTL: So need to call unresolveEdgePoints(e, d) to remove it from the 
      list of previously resolved entries.
-     Can do better by just re-allocing the endpoints in the DatadEndpoints struct
-     and putting the new entry into that, except we have to check it resolves
-     correctly, etc. So unresolveEdgePoints() will just cause entire collection
-     to be recomputed.
+     Can do better by just re-allocing the endpoints in the
+     DatadEndpoints struct and putting the new entry into that,
+     except we have to check it resolves correctly, etc. So
+     unresolveEdgePoints() will just cause entire collection to be
+     recomputed.
 */
+
+/*
+ * This will be handled with signals, where each splotd listens
+ * for (maybe) point_added or edge_added events.
+*/
+
+  for (l=gg->displays; l; l=l->next) {
+    dsp = (displayd *) l->data;
+    if (dsp->e == e) {
+      for (sl = dsp->splots; sl; sl = sl->next) {
+        sp = (splotd *) sl->data;
+        if (sp != NULL)
+          splot_edges_realloc (n, sp, e);
+      }
+    }
+  }
+  /*-- I need to reallocate whiskers for some displays --*/
+
+  displays_tailpipe (FULL, gg);
+
+  /*-- I don't yet know what I need to reallocate for the tour --*/
 
   return true;
 }
@@ -330,10 +385,11 @@ cleanEdgePoint(gpointer data, gpointer userData)
 void
 unresolveAllEdgePoints(datad *e)
 {
-   if(e->edge.endpointList) {
-      g_list_foreach(e->edge.endpointList, cleanEdgePoint, NULL);
-      g_list_free(e->edge.endpointList);
-   }
+  if(e->edge.endpointList) {
+    g_list_foreach(e->edge.endpointList, cleanEdgePoint, NULL);
+    g_list_free(e->edge.endpointList);
+    e->edge.endpointList = NULL;
+  }
 }
 
 

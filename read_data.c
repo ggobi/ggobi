@@ -79,10 +79,9 @@ rowlabels_alloc (datad *d)
 }
 
 void
-rowlabels_add (gchar **labels, gint nnewlabels, datad *d) 
+rowlabel_add (gchar *label, datad *d) 
 {
-  d->rowlab = g_array_append_vals (d->rowlab, (gconstpointer) labels,
-    nnewlabels);
+  g_array_append_val (d->rowlab, label);
 
   g_assert (d->rowlab->len == d->nrows);
 }
