@@ -38,7 +38,7 @@ splot_configure_cb (GtkWidget *w, GdkEventConfigure *event, splotd *sp)
    * drawing_area has been properly sized.  Maybe I'm not executing
    * calls in the proper order?  This protects me in the meantime.
   */
-  if (w->allocation.width == 1 || w->allocation.height == 1)
+  if (w->allocation.width < 2 || w->allocation.height < 2)
     return false;
 
   /*
@@ -85,7 +85,7 @@ splot_expose_cb (GtkWidget *w, GdkEventExpose *event, splotd *sp)
   /*-- sanity checks --*/
   if (sp->pixmap0 == NULL || sp->pixmap1 == NULL)
     return retval;
-  if (w->allocation.width == 1 || w->allocation.height == 1)
+  if (w->allocation.width < 2 || w->allocation.height < 2)
     return retval;
 
   splot_redraw (sp, sp->redraw_style, gg);

@@ -38,20 +38,14 @@
  <display type="parcoords" data="1">
    <variable name="tars1" />
    <variable name="tars2" />
-<!--
-   <variable name="head" />
--->
  </display>
 
  <display type="scatmatrix" data="1">
    <variable name="tars1" />
    <variable name="tars2" />
    <variable name="aede1" /> 
-<!-- 
--->
  </display>
-<!--
- -->
+
 </ggobi>
 </ggobis>
 

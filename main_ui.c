@@ -709,6 +709,7 @@ load_previous_file(GtkWidget *w, gpointer cbd)
     for (i = 0; i < n ; i++) {    
       dpy = (GGobiDisplayDescription*) g_list_nth_data(gdesc->displays, i);
       createDisplayFromDescription(gg, dpy);
+      gg->current_splot = NULL;
     }
   } 
 }
