@@ -70,6 +70,30 @@ e:
 
   } else if (cpanel->ee_adding_points_p) {
 
+    greal *raw = NULL;
+    GList *list;
+    GtkTableChild *child;
+    GtkWidget *entry;
+    gchar *lbl;
+
+    if (d->ncols) {
+      GtkWidget *table = widget_find_by_name (GTK_DIALOG(dialog)->vbox,
+        "EE:tablev");
+      raw = (greal *) g_malloc (d->ncols * sizeof(greal));
+
+      for (list = GTK_TABLE(table)->children; list; list = list->next) {
+        child = (GtkTableChild *) list->data;
+        if (child->top_attach == 1) {
+          entry = child->widget;
+          lbl = gtk_editable_get_chars (GTK_EDITABLE(entry), 0, -1);
+          raw[child->left_attach] = (greal) atof (lbl);
+g_printerr ("raw[%d] = %f\n", child->left_attach, raw[child->left_attach]); 
+        }
+      }
+    
+      record_add (-1, -1, label, id, raw, d, e, gg);
+      g_free (raw);
+    }
   }
 
   gg->edgeedit.a = -1;
@@ -162,9 +186,16 @@ add_record_dialog_open (datad *d, datad *e, displayd *dsp, ggobid *gg)
     gint j;
     vartabled *vt;
     GtkWidget *tablev;
+    greal *raw = (greal *) g_malloc0 (dtarget->ncols * sizeof(greal));
+
+    extern void pt_screen_to_raw (icoords *screen, greal *raw,
+      datad *d, splotd *sp, ggobid *gg);
+
+    pt_screen_to_raw (&gg->current_splot->mousepos, raw,
+      dtarget, gg->current_splot, gg);
 
     tablev = gtk_table_new (2, dtarget->ncols, false);
-    gtk_widget_set_name (entry, "EE:tablev");
+    gtk_widget_set_name (tablev, "EE:tablev");
     gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->vbox), tablev);
 
     for (j=0; j<dtarget->ncols; j++) {
@@ -174,8 +205,11 @@ add_record_dialog_open (datad *d, datad *e, displayd *dsp, ggobid *gg)
         w, j, j+1, 0, 1, table_opt, table_opt, 1, 1);
 
       entry = gtk_entry_new ();
+      lbl = g_strdup_printf ("%g", raw[j]);
+      gtk_entry_set_text (GTK_ENTRY (entry), lbl);
       gtk_table_attach (GTK_TABLE (tablev),
         entry, j, j+1, 1, 2, table_opt, table_opt, 1, 1);
+      g_free (lbl);
     }
   }
 
@@ -452,3 +486,20 @@ cpanel_edgeedit_set (cpaneld *cpanel, ggobid *gg) {
   }
 }
 
+/*--------------------------------------------------------------------*/
+
+RedrawStyle
+edgeedit_activate (gboolean state, displayd *display, ggobid *gg)
+{
+  cpaneld *cpanel = &display->cpanel;
+  RedrawStyle redraw_style = QUICK;
+
+  if (state) {
+    if (cpanel->ee_adding_points_p)
+      splot_cursor_set (GDK_CROSSHAIR, gg->current_splot);
+  }
+  else
+    splot_cursor_set ((gint)NULL, gg->current_splot);
+
+  return redraw_style;
+}

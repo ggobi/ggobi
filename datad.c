@@ -211,13 +211,12 @@ void
 datad_record_id_add (gchar *id, datad *d)
 {
   gint i, *index;
-  gchar *tmp;
 
   d->rowIds = (gchar **) g_realloc (d->rowIds, sizeof(gchar *) * d->nrows);
 
   index = (guint *) g_malloc(sizeof(guint));
   *index = i;
-  g_hash_table_insert (d->idTable, tmp, index);
+  g_hash_table_insert (d->idTable, id, index);
   d->rowIds[d->nrows-1] = id;
   g_free (index);
 }

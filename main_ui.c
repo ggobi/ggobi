@@ -364,6 +364,9 @@ viewmode_activate (splotd *sp, PipelineMode m, gboolean state, ggobid *gg)
         disconnect_motion_signal (sp);
         /*-- --*/
       break;
+      case EDGEED:
+        redraw_style = edgeedit_activate (state, display, gg);
+      break;
       default:
       break;
     }
@@ -396,6 +399,9 @@ viewmode_activate (splotd *sp, PipelineMode m, gboolean state, ggobid *gg)
       break;
       case SCALE:
         scale_click_init (sp, gg);
+      break;
+      case EDGEED:
+        redraw_style = edgeedit_activate (state, display, gg);
       break;
       default:
       break;

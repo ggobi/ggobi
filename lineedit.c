@@ -16,6 +16,148 @@
 #include "vars.h"
 #include "externs.h"
 
+/*--------------------------------------------------------------------*/
+
+/* XXX I can't add an edge to a newly added point.  Figure out why not. */
+
+gboolean record_add (gint a, gint b, gchar *lbl, gchar *id, greal *raw,
+  datad * d, datad * e, ggobid *gg)
+{
+  gchar *s1, *s2;
+  gint j;
+  GList *l, *sl;
+  splotd *sp;
+  displayd *dsp;
+  datad *dtarget = d;
+  gboolean edge_record_p = false;
+
+  /*-- eventually check whether a->b already exists before adding --*/
+  if (a >= 0 && b >= 0 && a != b) {
+    dtarget = e;
+    edge_record_p = true;
+    g_assert (e->edge.n == e->nrows);
+  }
+
+  /*-- Here's what the datad needs --*/
+/*
+ * some of this can be encapsulated as datad_record_add, as long
+ * as problems with the sequence of operations don't arise.
+*/
+  dtarget->nrows += 1;
+
+  /*-- add a row label --*/
+  if (!lbl) s1 = g_strdup_printf ("%d", dtarget->nrows);
+  rowlabel_add ((lbl)?lbl:s1, dtarget);  /*-- don't free s1 --*/
+
+  /*-- if necessary, add an id --*/
+  if (dtarget->idTable) {
+    if (!id) s2 = g_strdup_printf ("%d", dtarget->nrows);
+    datad_record_id_add ((id)?id:s2, dtarget);  /*-- don't free s2 --*/
+  }
+
+  pipeline_arrays_check_dimensions (dtarget);
+  rows_in_plot_set (dtarget, gg);
+
+  /*-- allocate and initialize brushing arrays --*/
+  br_glyph_ids_add (dtarget, gg);
+  br_color_ids_add (dtarget, gg);
+  br_hidden_alloc (dtarget);
+  vectorb_realloc (&dtarget->pts_under_brush, dtarget->nrows);
+  clusters_set (dtarget, gg);
+
+  if (dtarget->nmissing)
+    arrays_add_rows (&dtarget->missing, dtarget->nrows);
+
+  /*-- read in the data, push it through the first part of the pipeline --*/
+  if (dtarget->ncols) {
+    for (j=0; j<dtarget->ncols; j++) {
+      dtarget->raw.vals[dtarget->nrows-1][j] = 
+        dtarget->tform.vals[dtarget->nrows-1][j] = raw[j];
+      tform_to_world_by_var (j, dtarget, gg);
+    }
+  }
+
+  if (edge_record_p) {
+    edges_alloc(e->nrows, e);
+    e->edge.sym_endpoints[dtarget->nrows-1].a = g_strdup (d->rowIds[a]);
+    e->edge.sym_endpoints[dtarget->nrows-1].b = g_strdup (d->rowIds[b]);
+    e->edge.sym_endpoints[dtarget->nrows-1].jpartner = -1; /* XXX */
+    unresolveAllEdgePoints(e);
+    resolveEdgePoints (e, d);
+  } else {
+    GList *l;
+    datad *dd;
+    for (l=gg->d; l; l=l->next) {
+      dd = (datad *) l->data;
+      if (dd != dtarget && dd->edge.n > 0) {
+        if (hasEdgePoints (dd, dtarget)) {
+          unresolveAllEdgePoints (dd);
+          resolveEdgePoints (dd, dtarget);
+        }
+      }
+    }
+  }
+
+/*
+DTL: So need to call unresolveEdgePoints(e, d) to remove it from the 
+     list of previously resolved entries.
+     Can do better by just re-allocing the endpoints in the
+     DatadEndpoints struct and putting the new entry into that,
+     except we have to check it resolves correctly, etc. So
+     unresolveEdgePoints() will just cause entire collection to be
+     recomputed.
+*/
+
+/*
+ * This will be handled with signals, where each splotd listens
+ * for (maybe) point_added or edge_added events.
+*/
+  if (edge_record_p) {
+    for (l=gg->displays; l; l=l->next) {
+      dsp = (displayd *) l->data;
+      if (dsp->e == e) {
+        for (sl = dsp->splots; sl; sl = sl->next) {
+          sp = (splotd *) sl->data;
+          if (sp != NULL)
+            splot_edges_realloc (dtarget->nrows-1, sp, e);
+        }
+      }
+    }
+  }
+
+  if (dtarget->ncols) {
+    for (l=gg->displays; l; l=l->next) {
+      dsp = (displayd *) l->data;
+      if (dsp->d == dtarget) {
+        for (sl = dsp->splots; sl; sl = sl->next) {
+          sp = (splotd *) sl->data;
+          if (sp != NULL)
+            splot_points_realloc (dtarget->nrows-1, sp, d);
+          
+          /*-- this is only necessary if there are variables, I think --*/
+          if (GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
+            GtkGGobiExtendedSPlotClass *klass;
+            klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass);
+            if(klass->alloc_whiskers)
+              sp->whiskers = klass->alloc_whiskers(sp->whiskers, sp,
+                d->nrows, d);
+          }
+        }
+      }
+    }
+  }
+/*  */
+
+  displays_tailpipe (FULL, gg);
+
+  /*-- I don't yet know what I need to reallocate for the tour --*/
+
+  return true;
+}
+
+
+/*--------------------------------------------------------------------*/
+
 void
 edgeedit_init (ggobid *gg)
 {
@@ -108,4 +250,86 @@ find_nearest_edge (splotd *sp, displayd *display, ggobid *gg)
     }
   }
   return(lineid);
+}
+
+
+/*--------------------------------------------------------------------*/
+/* Reverse pipeline code for populating the table of variable values  */
+/*--------------------------------------------------------------------*/
+
+void
+pt_screen_to_plane (icoords *screen, gcoords *planar, splotd *sp)
+{
+  gfloat scale_x, scale_y;
+  greal precis = (greal) PRECISION1;
+
+  scale_x = sp->scale.x;
+  scale_y = sp->scale.y;
+  scale_x /= 2;
+  sp->iscale.x = (greal) sp->max.x * scale_x;
+  scale_y /= 2;
+  sp->iscale.y = -1 * (greal) sp->max.y * scale_y;
+
+  screen->x -= sp->max.x/2;
+  planar->x = (greal) screen->x * precis / sp->iscale.x ;
+  planar->x += (greal) sp->pmid.x;
+
+  screen->y -= sp->max.y/2;
+  planar->y = (greal) screen->y * precis / sp->iscale.y ;
+  planar->y += (greal) sp->pmid.y;
+}
+
+void
+pt_plane_to_world (splotd *sp, gcoords *planar, greal *world) 
+{ 
+  displayd *display = (displayd *) sp->displayptr;
+  cpaneld *cpanel = &display->cpanel;
+
+  if (cpanel->projection == P1PLOT) {
+    if (display->p1d_orientation == VERTICAL)
+      world[0] = planar->y;
+    else
+      world[0] = planar->x;
+  } else {
+    world[0] = planar->x;
+    world[1] = planar->y;
+  }
+}
+
+void
+pt_world_to_raw_by_var (gint j, greal *world, greal *raw, datad *d)
+{
+  gfloat precis = PRECISION1;
+  gfloat ftmp, rdiff;
+  gfloat x;
+  vartabled *vt = vartable_element_get (j, d);
+
+  rdiff = vt->lim.max - vt->lim.min;
+
+  ftmp = (gfloat) (world[j]) / precis;
+  x = (ftmp + 1.0) * .5 * rdiff;
+  x += vt->lim.min;
+
+  raw[j] = x;
+}
+
+void
+pt_screen_to_raw (icoords *screen, greal *raw,
+  datad *d, splotd *sp, ggobid *gg)
+{
+  gint j;
+  gcoords planar;
+  greal *world = (greal *) g_malloc0 (d->ncols * sizeof(greal));
+
+  pt_screen_to_plane (screen, &planar, sp);
+  pt_plane_to_world (sp, &planar, world); 
+
+  /*
+   * These values aren't right yet, but maybe they're good enough to
+   * get me started.
+  */
+  for (j=0; j<d->ncols; j++)
+    pt_world_to_raw_by_var (j, world, raw, d);
+
+  g_free (world);
 }
