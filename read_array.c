@@ -350,7 +350,6 @@ read_ascii_input_description(const char * const fileName, const char * const mod
   desc->desc_read_input = &read_ascii;	
   completeFileDesc(fileName, desc);
 
-
   return(desc);
 }
 

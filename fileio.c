@@ -329,6 +329,10 @@ gchar *completeFileDesc(const gchar * fileName, InputDescription * desc)
     }
   }
 
+  if (!desc->baseName) {
+    desc->baseName = g_strdup(fileName);
+  }
+
   /* Now compute the directory name. */
   if (desc->baseName) {
     tmp = strrchr(desc->baseName, G_DIR_SEPARATOR);

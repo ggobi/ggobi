@@ -175,6 +175,10 @@ gboolean read_input(InputDescription * desc, ggobid * gg)
   default:
      /* Usethe plugin structure. */
     if (desc->desc_read_input) {
+#if 0
+      if(!desc->baseName) 
+	completeFileDesc(desc->fileName, desc);
+#endif
       ok = desc->desc_read_input(desc, gg, NULL);
     } else
       g_printerr("Unknown data type in read_input\n");
