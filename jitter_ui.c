@@ -25,7 +25,6 @@ jitter_cb (GtkButton *button, ggobid *gg)
     return;
   }
 
-
   rejitter (d, gg);
 }
 
@@ -138,9 +137,7 @@ jitter_window_open (ggobid *gg) {
       vbox = gtk_vbox_new (false, 2);
       gtk_container_add (GTK_CONTAINER (gg->jitter_ui.window), vbox);
 
-/*
- * vbox for label and rangewidget
-*/
+      /*-- vbox for label and rangewidget --*/
       vb = gtk_vbox_new (true, 2);
       gtk_box_pack_start (GTK_BOX (vbox), vb, false, false, 1);
 
@@ -161,9 +158,7 @@ jitter_window_open (ggobid *gg) {
       gtk_scale_set_value_pos (GTK_SCALE (sbar), GTK_POS_BOTTOM);
       gtk_box_pack_start (GTK_BOX (vb), sbar, false, false, 0);
 
-/*
- * Rejitter button
-*/
+      /*-- Rejitter button --*/
       btn = gtk_button_new_with_label ("Jitter");
       gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
         "Rejitter the data", NULL);
@@ -171,21 +166,16 @@ jitter_window_open (ggobid *gg) {
                          GTK_SIGNAL_FUNC (jitter_cb), (gpointer) gg);
       gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 3);
 
-/*
- * option menu
-*/
+      /*-- option menu --*/
       opt = gtk_option_menu_new ();
       gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
         "The jittering is either distributed uniform or normal", NULL);
-      gtk_box_pack_start (GTK_BOX (vbox),
-                          opt, false, false, 0);
+      gtk_box_pack_start (GTK_BOX (vbox), opt, false, false, 0);
       populate_option_menu (opt, type_lbl,
                             sizeof (type_lbl) / sizeof (gchar *),
                             type_cb, gg);
 
-/*
- * Jitter vgroups toggle
-*/
+      /*-- Jitter vgroups toggle --*/
       tgl = gtk_check_button_new_with_label ("Jitter vgroup");
       gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), tgl,
         "Jitter each variable in the variable groups of this plot's selected variables",
@@ -194,9 +184,8 @@ jitter_window_open (ggobid *gg) {
                          GTK_SIGNAL_FUNC (vgroups_cb), (gpointer) gg);
       gtk_box_pack_start (GTK_BOX (vbox), tgl,
         false, false, 3);
-/*
- * Close button
-*/
+
+      /*-- Close button --*/
       btn = gtk_button_new_with_label ("Close");
       gtk_signal_connect_object (GTK_OBJECT (btn), "clicked",
                                  GTK_SIGNAL_FUNC (close_cb),

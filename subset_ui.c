@@ -124,10 +124,6 @@ void set_block_incr_cb (GtkAdjustment *adj, GtkSpinButton *spin )
 
 /*------------------------------------------------------------------*/
 
-/*
- * note that this uses d->nrows.  What happens if it remains open
- * and the value of d is reset?
-*/
 void
 subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
 
@@ -187,9 +183,7 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
       gtk_box_pack_start (GTK_BOX (vbox), gg->subset_ui.notebook,
         false, false, 2);
     
-/*
- * Random sample without replacement
-*/
+      /*-- Random sample without replacement --*/
       frame = gtk_frame_new ("Random sample without replacement");
       gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
 

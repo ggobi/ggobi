@@ -66,6 +66,7 @@ selection_made (GtkWidget *cl, gint row, gint column,
   gchar *varno_str;
   datad *d = gg->current_display->d;
 
+g_printerr ("calilng selection_made\n");
   gtk_clist_get_text (GTK_CLIST (d->vardata_clist), row, 0, &varno_str);
   varno = (gint) atoi (varno_str);
   d->vardata[varno].selected = true;
@@ -83,7 +84,6 @@ deselection_made (GtkWidget *cl, gint row, gint column,
   gtk_clist_get_text (GTK_CLIST (d->vardata_clist), row, 0, &varno_str);
   varno = (gint) atoi (varno_str);
   d->vardata[varno].selected = false;
-  g_printerr ("deselected row= %d, varno= %d\n", row, varno);
 
   return;
 }
@@ -175,19 +175,25 @@ vartable_open (ggobid *gg)
     gtk_container_set_border_width (GTK_CONTAINER (vbox), 5);
     gtk_container_add (GTK_CONTAINER (gg->vardata_window), vbox);
     gtk_widget_show (vbox);
-    
+
+/*
+ * Tried embedding a vbox in the scrolled window, but I might
+ * instead need multiple scrolled windows, one for each d.
+*/
+
     /* Create a scrolled window to pack the CList widget into */
     scrolled_window = gtk_scrolled_window_new (NULL, NULL);
     gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled_window),
       GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
-
     gtk_box_pack_start (GTK_BOX (vbox), scrolled_window, TRUE, TRUE, 0);
     gtk_widget_show (scrolled_window);
 
+/*
     vb = gtk_vbox_new (false, 5);
     gtk_container_set_border_width (GTK_CONTAINER (vb), 5);
     gtk_container_add (GTK_CONTAINER (scrolled_window), vb);
     gtk_widget_show (vb);
+*/
 
     for (l = gg->d; l; l = l->next) {
       d = (datad *) l->data;
@@ -237,13 +243,13 @@ vartable_open (ggobid *gg)
       /* It isn't necessary to shadow the border, but it looks nice :) */
       gtk_clist_set_shadow_type (GTK_CLIST (d->vardata_clist), GTK_SHADOW_OUT);
 
-      gtk_box_pack_start (GTK_BOX (vb), d->vardata_clist, TRUE, TRUE, 0);
-/*    gtk_container_add (GTK_CONTAINER (scrolled_window), d->vardata_clist);*/
+   /* gtk_box_pack_start (GTK_BOX (vbox), d->vardata_clist, TRUE, TRUE, 0);*/
+      gtk_container_add (GTK_CONTAINER (scrolled_window), d->vardata_clist);
       gtk_widget_show (d->vardata_clist);
     }
 
+    /*-- 3 = COLUMN_INSET --*/
     gtk_widget_set_usize (GTK_WIDGET (scrolled_window),
-                                         /*-- 3 = COLUMN_INSET --*/
       d->vardata_clist->requisition.width + 3 +
       GTK_SCROLLED_WINDOW (scrolled_window)->vscrollbar->requisition.width,
       150);

@@ -120,8 +120,11 @@ rejitter (datad *d, ggobid *gg) {
 void
 jitter_value_set (gfloat value, datad *d, ggobid *gg) {
   gint *cols = (gint *) g_malloc (d->ncols * sizeof (gint));
-  gint ncols = selected_cols_get (cols, d->jitter.vgroup, d, gg);
   gint j;
+  gint ncols = selected_cols_get (cols, d->jitter.vgroup, d, gg);
+
+  if (ncols == 0)
+    ncols = plotted_cols_get (cols, false, d, gg);
 
   for (j=0; j<ncols; j++)
     d->vardata[cols[j]].jitter_factor = value;

@@ -332,12 +332,16 @@ selected_cols_get (gint *cols, gboolean add_vgroups, datad *d, ggobid *gg)
 /*
  * When there aren't any columns in the variable statistics table,
  * this is how we find out which columns are selected for plotting.
+ * 
+ * I was selecting them in the variable table, and then clearing
+ * the table afterwards, but I don't like that -- it triggers callbacks
+ * in a mysterious way.
 */
 gint
 plotted_cols_get (gint *cols, gboolean add_vgroups, datad *d, ggobid *gg) 
 {
   gint mode = mode_get (gg);
-  gint j, ncols;
+  gint j, ncols = 0;
   splotd *sp = gg->current_splot;
   displayd *display = (displayd *) sp->displayptr;
 
@@ -347,11 +351,11 @@ plotted_cols_get (gint *cols, gboolean add_vgroups, datad *d, ggobid *gg)
       case scatterplot:
         switch (mode) {
           case P1PLOT:
-            vartable_select_var (sp->p1dvar, true, d, gg);
+            cols[ncols++] = sp->p1dvar;
             break;
           case XYPLOT:
-            vartable_select_var (sp->xyvars.x, true, d, gg);
-            vartable_select_var (sp->xyvars.y, true, d, gg);
+            cols[ncols++] = sp->xyvars.x;
+            cols[ncols++] = sp->xyvars.y;
             break;
         }
         break;
@@ -361,14 +365,6 @@ plotted_cols_get (gint *cols, gboolean add_vgroups, datad *d, ggobid *gg)
         break;
     }
   }
-
-  ncols = selected_cols_get (cols, add_vgroups, d, gg);
-
-  /*
-   * Having highlighted the plotted variables in the variable table
-   * we now deselect them
-  */
-  vartable_unselect_all (gg);
 
   return ncols;
 }
