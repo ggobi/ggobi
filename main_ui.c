@@ -467,12 +467,11 @@ procs_activate (gboolean state, displayd *display, ggobid *gg)
 void
 mode_activate (splotd *sp, gint m, gboolean state, ggobid *gg) {
   displayd *display = (displayd *) sp->displayptr;
-  datad *d = display->d;
 
   if (state == off) {
     switch (m) {
       case BRUSH:
-        brush_activate (state, d, gg);
+        brush_activate (state, display, gg);
       break;
       default:
       break;
@@ -480,7 +479,7 @@ mode_activate (splotd *sp, gint m, gboolean state, ggobid *gg) {
   } else if (state == on) {
     switch (m) {
       case BRUSH:
-        brush_activate (state, d, gg);
+        brush_activate (state, display, gg);
       break;
       case SCALE:
       {

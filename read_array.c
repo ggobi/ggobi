@@ -372,9 +372,6 @@ read_ascii_data(InputDescription *desc, ggobid *gg)
   point_colors_read (desc, true, d, gg);
   hidden_read (desc, true, d, gg);
     
-  if (d->edge.n > 0)
-    edge_colors_read (desc, true, d, gg);
-
   return (true);
 }
 

@@ -29,13 +29,15 @@ static void brush_on_cb (GtkToggleButton *button, ggobid *gg)
 static void brush_undo_cb (GtkToggleButton *button, ggobid *gg)
 {
   cpaneld *cpanel = &gg->current_display->cpanel;
-  datad *d = gg->current_display->d;
   splotd *sp = gg->current_splot;
+  displayd *display = sp->displayptr;
+  datad *d = display->d;
+  datad *e = display->e;
 
   if (cpanel->br_scope == BR_POINTS || cpanel->br_scope == BR_PANDE)
-    point_brush_undo (sp, d, gg);
+    brush_undo (sp, d, gg);
   if (cpanel->br_scope == BR_EDGES || cpanel->br_scope == BR_PANDE)
-    edge_brush_undo (sp, d, gg);
+    brush_undo (sp, e, gg);
 
   /*-- when rows_in_plot changes ... --*/
   rows_in_plot_set (d, gg);
@@ -79,13 +81,13 @@ static gchar *mode_lbl[] = {"Persistent", "Transient"};
 static void brush_mode_cb (GtkWidget *w, gpointer cbd)
 {
   ggobid *gg = GGobiFromWidget (w, true);
+  splotd *sp = gg->current_splot;
   cpaneld *cpanel = &gg->current_display->cpanel;
   gint prev_mode = cpanel->br_mode;
-  cpanel->br_mode = GPOINTER_TO_INT (cbd);
 
+  cpanel->br_mode = GPOINTER_TO_INT (cbd);
   if (cpanel->br_mode == BR_PERSISTENT && cpanel->br_mode != prev_mode) {
-    datad *d = gg->current_display->d;
-    brush_once (false, d, gg);
+    brush_once (false, sp, gg);
   }
 }
 
@@ -123,6 +125,7 @@ brush_reset(ggobid *gg, gint action)
 {
   gint m, i, k;
   datad *d = gg->current_display->d;
+  datad *e = gg->current_display->e;
 
   switch (action) {
     case RESET_UNHIDE_POINTS:  /*-- un-hide all points --*/
@@ -139,8 +142,8 @@ brush_reset(ggobid *gg, gint action)
       break;
 
     case RESET_UNHIDE_EDGES:  /*-- un-hide all edges --*/
-      for (k=0; k<d->edge.n; k++) {
-        d->edge.hidden_now.els[k] = d->edge.hidden.els[k] = false;
+      for (k=0; k<e->edge.n; k++) {
+        e->hidden_now.els[k] = e->hidden.els[k] = false;
       }
       displays_plot (NULL, FULL, gg);
       break;
@@ -149,7 +152,7 @@ brush_reset(ggobid *gg, gint action)
       break;
 
     case RESET_INIT_BRUSH:  /*-- reset brush size --*/
-      brush_pos_init (d);
+      brush_pos_init (gg->current_splot);
       splot_redraw (gg->current_splot, QUICK, gg);
       break;
   }
@@ -201,14 +204,12 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, cpaneld *cpanel)
   gboolean button1_p, button2_p;
   ggobid *gg = GGobiFromWidget (w, true);
   splotd *sp = gg->current_splot;
-  displayd *display = gg->current_display;
-  datad *d = display->d;
 
   /*-- get the mouse position and find out which buttons are pressed --*/
   mousepos_get_motion (w, event, &button1_p, &button2_p, sp);
 
   if (button1_p || button2_p)
-    brush_motion (&sp->mousepos, button1_p, button2_p, cpanel, d, gg);
+    brush_motion (&sp->mousepos, button1_p, button2_p, cpanel, sp, gg);
 
   return true;
 }
@@ -221,17 +222,19 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   gboolean retval = true;
   gboolean button1_p, button2_p;
   ggobid *gg = GGobiFromSPlot(sp);
-  datad *d;
+  datad *d, *e;
   gint grab_ok;
 
-
   gg->current_splot = sp;
-  gg->current_display = (displayd *) sp->displayptr;
+  gg->current_display = sp->displayptr;
   cpanel = &gg->current_display->cpanel;
   d = gg->current_display->d;
+  e = gg->current_display->e;
 
-  point_brush_prev_vectors_update (d, gg);
-  edge_brush_prev_vectors_update (d, gg);
+
+  brush_prev_vectors_update (d, gg);
+  if (e != NULL)
+    brush_prev_vectors_update (e, gg);
 
   mousepos_get_pressed (w, event, &button1_p, &button2_p, sp);
 
@@ -249,9 +252,9 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 
   GGobi_widget_set(sp->da, gg, true);
 
-  brush_set_pos ((gint) event->x, (gint) event->y, d, gg);
+  brush_set_pos ((gint) event->x, (gint) event->y, sp);
 
-  brush_motion (&sp->mousepos, button1_p, button2_p, cpanel, d, gg);
+  brush_motion (&sp->mousepos, button1_p, button2_p, cpanel, sp, gg);
 
   return retval;
 }

@@ -35,12 +35,13 @@ struct _displayd {
  GList *splots;  /* doubly linked list of splots */
 
  datad *d;  /*-- pointer to a particular gg->d[] --*/
+ datad *e;  /*-- pointer to a particular gg->d[] --*/
 
 /* Missing values */
  gboolean missing_p;  /* false by default */
 
 /*
- * Actually, this is going to need to be a pair of vectors
+ * Actually, this might need to be a pair of vectors
  * or linked lists, corresponding to the number of plots in
  * the display.  But let's be lazy for the moment.
 */

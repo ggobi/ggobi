@@ -454,6 +454,8 @@ splot_new (displayd *display, gint width, gint height, ggobid *gg) {
   sp->da = gtk_drawing_area_new ();
   sp->pixmap0 = NULL;
   sp->pixmap1 = NULL;
+
+  brush_pos_init (sp);
   
   splot_dimension_set (sp, width, height);
 

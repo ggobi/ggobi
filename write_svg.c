@@ -50,6 +50,7 @@ splot_write_svg (splotd *sp, ggobid *gg)
   GtkWidget *da = sp->da;
   displayd *display = (displayd *) sp->displayptr;
   datad *d = display->d;
+  datad *e = display->e;
   gboolean draw_case;
   icoords minpix, maxpix;
   gchar *cx;
@@ -123,7 +124,7 @@ splot_write_svg (splotd *sp, ggobid *gg)
 
   /*-- draw points --*/
   if (!gg->mono_p) {
-    splot_point_colors_used_get (sp, &ncolors_used, colors_used, false, gg);
+    splot_colors_used_get (sp, &ncolors_used, colors_used, d, gg);
 
     /*
      * Now loop through colors_used[], plotting the points of each
@@ -159,10 +160,8 @@ splot_write_svg (splotd *sp, ggobid *gg)
   if (!gg->mono_p) {
     gint j, nl, to, from;
     gboolean doit;
-    extern void splot_line_colors_used_get (splotd *sp, gint *ncolors_used,
-      gushort *colors_used, datad *, ggobid *gg);
 
-    splot_line_colors_used_get (sp, &ncolors_used, colors_used, d, gg);
+    splot_colors_used_get (sp, &ncolors_used, colors_used, e, gg);
 
     /*
      * Now loop through colors_used[], plotting the points of each
@@ -174,16 +173,16 @@ splot_write_svg (splotd *sp, ggobid *gg)
       cx = hexcolor (&gg->default_color_table[current_color]);
       nl = 0;
 
-      for (j=0; j<d->edge.n; j++) {
-        if (d->edge.hidden_now.els[j]) {
+      for (j=0; j<e->edge.n; j++) {
+        if (e->hidden_now.els[j]) {
           doit = false;
         } else {
-          from = d->edge.endpoints[j].a - 1;
-          to = d->edge.endpoints[j].b - 1;
+          from = e->edge.endpoints[j].a - 1;
+          to = e->edge.endpoints[j].b - 1;
           doit = (!d->hidden_now.els[from] && !d->hidden_now.els[to]);
         }
         if (doit) {
-          if (d->edge.color_now.els[j] == current_color) {
+          if (e->color_now.els[j] == current_color) {
             fprintf (f,
               "<path style=\"stroke: %s\" d=\"M %d %d L %d %d z\"/>\n",
               cx,

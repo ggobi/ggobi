@@ -199,7 +199,7 @@ extern splotd *GGOBI(getPlot)(displayd *display, gint which);
 
 
 extern void GGOBI(moveBrush) (gint ulx, gint uly, ggobid *gg);
-extern void GGOBI(sizeBrush) (gint width, gint height, ggobid *gg);
+extern void GGOBI(sizeBrush) (gint width, gint height, splotd *, ggobid *gg);
 
 extern int GGOBI(getNumGGobis)();
 
@@ -218,11 +218,11 @@ void GGOBI(setIdentifyHandler)(IdentifyProc proc,  void *data, ggobid *gg);
 
 extern void GGOBI(getBrushGlyph)(gint *type, gint *size, ggobid *gg);
 
-void GGOBI(getBrushSize)(gint *w, gint *h, datad *, ggobid *gg);
-void GGOBI(getBrushLocation)(gint *x, gint *y, datad *, ggobid *gg);
+void GGOBI(getBrushSize)(gint *w, gint *h, ggobid *gg);
+void GGOBI(getBrushLocation)(gint *x, gint *y, ggobid *gg);
 
-void GGOBI(setBrushSize)(gint w, gint h, datad *, ggobid *gg);
-void GGOBI(setBrushLocation)(gint x, gint y, datad *, ggobid *gg);
+void GGOBI(setBrushSize)(gint w, gint h, ggobid *gg);
+void GGOBI(setBrushLocation)(gint x, gint y, ggobid *gg);
 
 extern splotd *GGOBI(getSPlot)(gint which, displayd *display);
 

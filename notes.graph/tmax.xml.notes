@@ -38,12 +38,10 @@ How does this work:
   in the absence of categorical variables, or when no categorical
     variable has been specified for linking, linking is done
     according to id -- and an id is unique within a dataset.  (this
-    allows related datasets of different sizes to be linked 1-to-1)
-
-  i'm not sure how the node-edge relationships should be specified,
-    but some displays need to have a pointer to one of each:  ie,
-    scatterplot displays of Customer points need pointers to two
-    datasets:  Customer points and Call edges.
+    allows related datasets of different sizes to be linked 1-to-1).
+    to unlink a dataset, don't provide any id:  no default ids
+    will be assigned.
+    
 
 1. in the interface
 
@@ -66,12 +64,3 @@ How does this work:
   every datad structure will serve either for node data, edge data or both.
      if it contains only node data or if it contains edges without
      variables, lots of pointers remain null.
-
-  can i specify up front that some pairs of datasets are not linked?
-    in this example, can I say that the records in Calls are not linked
-    to the records in Customers?  if that's true, then when i'm 
-    brushing in the absence of a categorical variable, i don't have
-    to search among Customers for the set of ids that i just painted.
-    it would be like having an exclusion list.  maybe if the lookup
-    function is fast enough, that isn't necessary.
-    

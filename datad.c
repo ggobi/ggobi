@@ -58,12 +58,14 @@ datad_new(datad *d, ggobid *gg)
   vectori_init (&d->rowid.id);
 
   /*-- edges --*/
-  vectors_init (&d->edge.color);
-  vectors_init (&d->edge.color_now);
-  vectors_init (&d->edge.color_prev);
-  vectorb_init (&d->edge.hidden);
-  vectorb_init (&d->edge.hidden_now);
-  vectorb_init (&d->edge.hidden_prev);
+/*
+ *vectors_init (&d->edge.color);
+ *vectors_init (&d->edge.color_now);
+ *vectors_init (&d->edge.color_prev);
+ *vectorb_init (&d->edge.hidden);
+ *vectorb_init (&d->edge.hidden_now);
+ *vectorb_init (&d->edge.hidden_prev);
+*/
   vectorb_init (&d->edge.xed_by_brush);
 
   sphere_init (d);

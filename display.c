@@ -170,7 +170,8 @@ display_print_cb (displayd *display, guint action, GtkWidget *w)
   }
 
   if(DefaultPrintHandler.callback)
-    (*DefaultPrintHandler.callback)(gg->printOptions, display, display->ggobi, &DefaultPrintHandler);
+    (*DefaultPrintHandler.callback)(gg->printOptions, display,
+      display->ggobi, &DefaultPrintHandler);
 }
 
 /*-- Called when a plot window is closed from the menu --*/

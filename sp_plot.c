@@ -26,13 +26,11 @@ extern void win32_draw_to_pixmap_unbinned (gint, splotd *, ggobid *gg);
 
 /* colors_used now contains integers, 0:ncolors-1 */
 void
-splot_point_colors_used_get (splotd *sp, gint *ncolors_used,
-  gushort *colors_used, gboolean binned, ggobid *gg) 
+splot_colors_used_get (splotd *sp, gint *ncolors_used,
+  gushort *colors_used, datad *d, ggobid *gg) 
 {
   gboolean new_color;
   gint i, k, m;
-  displayd *display = (displayd *) sp->displayptr;
-  datad *d = display->d;
 
   *ncolors_used = 0;
           
@@ -40,59 +38,25 @@ splot_point_colors_used_get (splotd *sp, gint *ncolors_used,
    * Loop once through d->color_now[], collecting the colors currently
    * in use into the colors_used[] vector.
   */
-  if (!binned) {
-    for (i=0; i<d->nrows_in_plot; i++) {
-      m = d->rows_in_plot[i];
-      if (d->hidden_now.els[m]) {  /*-- if it's hidden, we don't care --*/
-        new_color = false;
-      } else {
-        new_color = true;
-        for (k=0; k<*ncolors_used; k++) {
-          if (colors_used[k] == d->color_now.els[m]) {
-            new_color = false;
-            break;
-          }
+  for (i=0; i<d->nrows_in_plot; i++) {
+    m = d->rows_in_plot[i];
+    if (d->hidden_now.els[m]) {  /*-- if it's hidden, we don't care --*/
+      new_color = false;
+    } else {
+      new_color = true;
+      for (k=0; k<*ncolors_used; k++) {
+        if (colors_used[k] == d->color_now.els[m]) {
+          new_color = false;
+          break;
         }
-      }
-      if (new_color) {
-        colors_used[*ncolors_used] = d->color_now.els[m];
-        (*ncolors_used)++;
       }
     }
-  } else {  /* used by plot_bins */
-    gint ih, iv, j;
-    icoords *bin0 = &gg->plot.bin0;
-    icoords *bin1 = &gg->plot.bin1;
-    /*
-     * This has already been called in draw_to_pixmap0_binned, and
-     * it shouldn't be called twice, because it is keeping track of
-     * previous values.
-    */
-    /*get_extended_brush_corners (&bin0, &bin1);*/
-
-    for (ih= bin0->x; ih<= bin1->x; ih++) {
-      for (iv=bin0->y; iv<=bin1->y; iv++) {
-        for (m=0; m<d->brush.binarray[ih][iv].nels; m++) {
-          j = d->rows_in_plot[d->brush.binarray[ih][iv].els[m]];
-          if (d->hidden_now.els[j]) {  /*-- if it's hidden, we don't care --*/
-            new_color = false;
-          } else {
-            new_color = true;
-            for (k=0; k<*ncolors_used; k++) {
-              if (colors_used[k] == d->color_now.els[j]) {
-                new_color = false;
-                break;
-              }
-            }
-          }
-          if (new_color) {
-            colors_used[*ncolors_used] = d->color_now.els[j];
-            (*ncolors_used)++;
-          }
-        }
-      }
+    if (new_color) {
+      colors_used[*ncolors_used] = d->color_now.els[m];
+      (*ncolors_used)++;
     }
   }
+
   /*
    * Make sure that the current brushing color is
    * last in the list, so that it is drawn on top of
@@ -194,7 +158,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
                       da->allocation.height);
 
   if (!gg->mono_p && loop_over_points) {
-    splot_point_colors_used_get (sp, &ncolors_used, colors_used, false, gg);
+    splot_colors_used_get (sp, &ncolors_used, colors_used, d, gg);
 
     /*
      * Now loop through colors_used[], plotting the points of each
@@ -276,7 +240,7 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
  * clear what's necessary.
 */
 
-  get_extended_brush_corners (bin0, bin1, d, gg);
+  get_extended_brush_corners (bin0, bin1, d, sp);
 
 /*
  * Determine locations of bin corners: upper left edge of loc0;
@@ -312,8 +276,7 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
   if (display->options.points_show_p) {
     if (!gg->mono_p) {
 
-      splot_point_colors_used_get (sp, &ncolors_used, colors_used, true, gg); 
-                                                            /* true = binned */
+      splot_colors_used_get (sp, &ncolors_used, colors_used, d, gg); 
 
       /*
        * Now loop through colors_used[], plotting the points of each
@@ -569,43 +532,6 @@ splot_draw_border (splotd *sp, ggobid *gg) {
 /*                   line drawing routines                                */
 /*------------------------------------------------------------------------*/
 
-void
-splot_line_colors_used_get (splotd *sp, gint *ncolors_used,
- gushort *colors_used, datad *d, ggobid *gg)
-{
-  gboolean new_color;
-  gint i, k;
-  displayd *display = (displayd *) sp->displayptr;
-
-  /*
-   * Loop once through line_color_now[], collecting the colors
-   * currently in use into the line_colors_used[] vector.
-  */
-  *ncolors_used = 1;
-  colors_used[0] = d->edge.color_now.els[0];
-
-  if (display->options.edges_directed_show_p ||
-      display->options.edges_undirected_show_p)
-  {
-    for (i=0; i<d->edge.n; i++) {
-      if (d->edge.hidden_now.els[i])
-        new_color = false;
-      else {
-        new_color = true;
-        for (k=0; k<*ncolors_used; k++) {
-          if (colors_used[k] == d->edge.color_now.els[i]) {
-            new_color = false;
-            break;
-          }
-        }
-      }
-      if (new_color) {
-        colors_used[*ncolors_used] = d->edge.color_now.els[i];
-        (*ncolors_used)++;
-      }
-    }
-  }
-}
 
 void
 edges_draw (splotd *sp, ggobid *gg)
@@ -619,13 +545,18 @@ edges_draw (splotd *sp, ggobid *gg)
   gboolean doit;
   displayd *display = (displayd *) sp->displayptr;
   datad *d = display->d;
+  datad *e = display->e;
 
-  if (d->edge.n == 0) {
+  if (e->edge.n == 0) {
 /**/return;
   }
 
   if (!gg->mono_p) {
-    splot_line_colors_used_get (sp, &ncolors_used, colors_used, d, gg);
+    if (display->options.edges_directed_show_p ||
+        display->options.edges_undirected_show_p)
+    {
+      splot_colors_used_get (sp, &ncolors_used, colors_used, e, gg);
+    }
 
     /*
      * Now loop through colors_used[], plotting the glyphs of each
@@ -635,12 +566,12 @@ edges_draw (splotd *sp, ggobid *gg)
       current_color = colors_used[k];
       nl = 0;
 
-      for (j=0; j<d->edge.n; j++) {
-        if (d->edge.hidden_now.els[j]) {
+      for (j=0; j<e->edge.n; j++) {
+        if (e->hidden_now.els[j]) {
           doit = false;
         } else {
-          from = d->edge.endpoints[j].a - 1;
-          to = d->edge.endpoints[j].b - 1;
+          from = e->edge.endpoints[j].a - 1;
+          to = e->edge.endpoints[j].b - 1;
           doit = (!d->hidden_now.els[from] && !d->hidden_now.els[to]);
 
         /* If not plotting imputed values, and one is missing, skip it */
@@ -651,7 +582,7 @@ edges_draw (splotd *sp, ggobid *gg)
         }
 
         if (doit) {
-          if (d->edge.color_now.els[j] == current_color) {
+          if (e->color_now.els[j] == current_color) {
 
             if (display->options.edges_undirected_show_p) {
               sp->edges[nl].x1 = sp->screen[from].x;
@@ -773,6 +704,7 @@ splot_pixmap1_to_window (splotd *sp, ggobid *gg) {
 
 void
 splot_redraw (splotd *sp, gint redraw_style, ggobid *gg) {
+
 
   /*-- sometimes the first draw happens before configure is called --*/
   if (sp->da == NULL || sp->pixmap0 == NULL) {

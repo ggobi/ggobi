@@ -876,63 +876,63 @@ GGOBI(setIdentifyHandler)(IdentifyProc proc,  void *data, ggobid *gg)
 
 
 void
-GGOBI(getBrushSize)(gint *w, gint *h, datad *d, ggobid *gg)
+GGOBI(getBrushSize)(gint *w, gint *h, ggobid *gg)
 {
-  *w = ABS(d->brush_pos.x1 - d->brush_pos.x2);
-  *h = ABS(d->brush_pos.y1 - d->brush_pos.y2);
+ splotd *sp = gg->current_splot;
+
+  *w = ABS(sp->brush_pos.x1 - sp->brush_pos.x2);
+  *h = ABS(sp->brush_pos.y1 - sp->brush_pos.y2);
 }
 
 void
-GGOBI(getBrushLocation)(gint *x, gint *y, datad *d, ggobid *gg)
+GGOBI(getBrushLocation)(gint *x, gint *y, ggobid *gg)
 {
-  *x = MIN(d->brush_pos.x1, d->brush_pos.x2);
-  *y = MIN(d->brush_pos.y1, d->brush_pos.y2);
+ splotd *sp = gg->current_splot;
+
+  *x = MIN(sp->brush_pos.x1, sp->brush_pos.x2);
+  *y = MIN(sp->brush_pos.y1, sp->brush_pos.y2);
 }
 
 void
-redraw (datad *d, ggobid *gg)
+redraw (splotd *sp, ggobid *gg)
 {
-  /*
- active_paint_lines(gg);
- active_paint_lines(gg);
-  */
-  brush_once (true, d, gg);
-  display_plot (gg->current_display, FULL, gg);
+  brush_once (true, sp, gg);
+  display_plot (sp->displayptr, FULL, gg);
 }
 
 
-void GGOBI(setBrushSize)(int w, int h, datad *d, ggobid *gg)
+void GGOBI(setBrushSize)(int w, int h, ggobid *gg)
 {
-  d->brush_pos.x1 = MIN(d->brush_pos.x1, d->brush_pos.x2);
-  d->brush_pos.y1 = MIN(d->brush_pos.y1, d->brush_pos.y2);
+ splotd *sp = gg->current_splot;
+ displayd *display = sp->displayptr;
 
-  d->brush_pos.x2 =  d->brush_pos.x1 + w;
-  d->brush_pos.y2 =  d->brush_pos.y1 + h;
+  sp->brush_pos.x1 = MIN(sp->brush_pos.x1, sp->brush_pos.x2);
+  sp->brush_pos.y1 = MIN(sp->brush_pos.y1, sp->brush_pos.y2);
 
-  brush_once (true, d, gg);
-  redraw (d, gg);
-  display_plot (gg->current_display, FULL, gg);
+  sp->brush_pos.x2 =  sp->brush_pos.x1 + w;
+  sp->brush_pos.y2 =  sp->brush_pos.y1 + h;
+
+  brush_once (true, sp, gg);
+  redraw (sp, gg);
+  display_plot (display, FULL, gg);
 }
 
 
-void GGOBI(setBrushLocation)(gint x, gint y, datad *d, ggobid *gg)
+void GGOBI(setBrushLocation)(gint x, gint y, ggobid *gg)
 {
  gint wd, ht;
- GGOBI(getBrushSize)(&wd, &ht, d, gg);
+ splotd *sp = gg->current_splot;
+
+  GGOBI(getBrushSize)(&wd, &ht, gg);
  
- d->brush_pos.x1 = x;
- d->brush_pos.y1 = y;
+  sp->brush_pos.x1 = x;
+  sp->brush_pos.y1 = y;
+  sp->brush_pos.x2 = x + wd;
+  sp->brush_pos.y2 = y + ht;
 
- d->brush_pos.x2 = x + wd;
- d->brush_pos.y2 = y + ht;
+  brush_once (true, sp, gg);
 
- /*
- GGOBI(setBrushSize)(wd, ht, gg);
- */
-
-  brush_once (true, d, gg);
-
-  redraw (d, gg);
+  redraw (sp, gg);
 }
 
 gboolean

@@ -177,7 +177,7 @@ ggobi_file_set_create (gchar *rootname, datad *d, ggobid *gg)
   gint *rowv, *colv;
   gchar *fname;
   FILE *fp;
-  gint i, j, k;
+  gint i, j;
   gboolean skipit;
 
   /*
@@ -323,26 +323,6 @@ ggobi_file_set_create (gchar *rootname, datad *d, ggobid *gg)
         g_free ((gchar *) colv);
         return false;
       }
-    }
-  }
-
-/* Save lines -- and line colors */
-  if (gg->save.lines_p) {
-
-    /*-- decide whether to save line colors --*/
-    skipit = true;
-    for (k=0; k<d->edge.n; k++) {
-      if (d->edge.color_now.els[k] != 0) {
-        skipit = false;
-        break;
-      }
-    }
-
-    fprintf(stderr, ".. saving %s.lines ...\n", rootname);
-    if (!save_lines (rootname, true, !skipit, rowv, nr, d, gg)) {
-      g_free ((gchar *) rowv);
-      g_free ((gchar *) colv);
-      return false;
     }
   }
 
@@ -619,148 +599,6 @@ brush_save_erase (gchar *rootname, gint *rowv, gint nr, datad *d, ggobid *gg)
   return true;
 }
 
-/*------------------------------------------------------------------------*/
-/*                 Saving lines and line attributes                       */
-/*------------------------------------------------------------------------*/
-
-gint
-linedata_get (endpointsd *tlinks, gshort *tcolors,
-  gint *rowv, gint nr, datad *d, ggobid *gg)
-{
-/*
- * For each end of the link, determine whether the
- * point is included or not.  This could be darn slow.
- * Rely on a < b.
-*/
-  gint nl = 0;
-  gint i, k;
-  gint a, b, start_a, start_b;
-
-  for (k=0; k<d->edge.n; k++) {
-    start_a = start_b = -1;
-    a = d->edge.endpoints[k].a - 1;
-    b = d->edge.endpoints[k].b - 1;
-    for (i=0; i<nr; i++) {
-      if (rowv[i] == a) {
-        start_a = i;
-        break;
-      }
-    }
-    if (start_a != -1) {
-      for (i=start_a; i<nr; i++) {
-        if (rowv[i] == b) {
-          start_b = i;
-          break;
-        }
-      }
-    }
-    if (start_a != -1 && start_b != -1) {  /* Both ends included */
-      tlinks[nl].a = start_a + 1;
-      tlinks[nl].b = start_b + 1;
-      tcolors[nl] = d->edge.color_now.els[k];
-      nl++;
-    }
-  }
-  return (nl);
-}
-
-gboolean
-save_lines (gchar *rootname, gboolean lines_p, gboolean colors_p,
-  gint *rowv, gint nr, datad *d, ggobid *gg)
-{
-  gchar *fname;
-  gint k, nl;
-  FILE *fp;
-  endpointsd *tlinks;
-  gshort *edgecolors;
-
-  if (lines_p || colors_p) {
-
-    if (nr == d->nrows) {
-      nl = d->edge.n;
-      tlinks = d->edge.endpoints;
-      if (!gg->mono_p)
-        edgecolors = d->edge.color_now.els;
-
-    } else {
-      /*
-       *
-       * Determine the number of links to be saved -- may as
-       * well build a temporary links structure to use, actually.
-      */
-      tlinks = (endpointsd *) g_malloc (d->edge.n * sizeof (endpointsd));
-      if (!gg->mono_p)
-        edgecolors = (gshort *) g_malloc (d->edge.n * sizeof (gshort));
-      nl = linedata_get (tlinks, edgecolors, rowv, nr, d, gg);
-    }
-  }
-
-  /*-- save the lines themselves --*/
-  if (lines_p) {
-
-    fname = g_strdup_printf ("%s.lines", rootname);
-    fp = fopen (fname, "w");
-    g_free (fname);
-
-    if (fp == NULL) {
-      gchar *message = g_strdup_printf (
-        "The file '%s.lines' can not be opened for writing\n", rootname);
-      quick_message (message, false);
-      g_free (message);
-      if (nr != d->nrows) {
-        g_free (tlinks);
-        if (!gg->mono_p)
-          g_free (edgecolors);
-      }
-      return false;
-
-    } else {
-
-      for (k=0; k<nl; k++)
-        fprintf (fp, "%d %d\n", tlinks[k].a, tlinks[k].b);
-
-      if (nr != d->nrows) {
-        g_free ((gchar *) tlinks);
-      }
-      fclose (fp);
-    }
-  }
-
-
-  /*-- save the line colors --*/
-  if (colors_p && !gg->mono_p) {
-
-    fname = g_strdup_printf ("%s.edgecolors", rootname);
-    fp = fopen (fname, "w");
-    g_free (fname);
-
-    if (fp == NULL) {
-      gchar *message = g_strdup_printf (
-        "The file '%s.edgecolors' can not be opened for writing\n", rootname);
-      quick_message (message, false);
-      g_free (message);
-      if (nr != d->nrows) {
-        g_free (tlinks);
-        g_free (edgecolors);
-      }
-      return false;
-
-    } else {
-
-      for (k=0; k<nl; k++)
-        fprintf (fp, "%d\n", edgecolors[k]);
-  
-      if (nr != d->nrows)
-        g_free ((gchar *) edgecolors);
-      fclose (fp);
-    }
-  }
-
-  return true;
-}
-
-/*------------------------------------------------------------------------*/
-/*                 End of lines section                                   */
 /*------------------------------------------------------------------------*/
 
 gboolean

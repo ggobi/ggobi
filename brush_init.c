@@ -126,52 +126,18 @@ hidden_init (datad *d, ggobid *gg)
 void
 br_edge_vectors_free (datad *d, ggobid *gg)
 {
-  vectors_free (&d->edge.color);
-  vectors_free (&d->edge.color_now);
-  vectors_free (&d->edge.color_prev);
-  vectorb_free (&d->edge.hidden);
-  vectorb_free (&d->edge.hidden_now);
-  vectorb_free (&d->edge.hidden_prev);
   vectorb_free (&d->edge.xed_by_brush);
 }
 
 gboolean
 br_edge_vectors_check_size (gint ns, datad *d, ggobid *gg) {
-  gboolean same =
-    (d->edge.color.nels != ns) ||
-    (d->edge.color_now.nels != ns) ||
-    (d->edge.color_prev.nels != ns) ||
-    (d->edge.hidden.nels != ns) ||
-    (d->edge.hidden_now.nels != ns) ||
-    (d->edge.hidden_prev.nels != ns);
+  gboolean same = (d->edge.xed_by_brush.nels != ns);
 
-  /*-- assume these vectors are always of the same size --*/
-  if (d->edge.color.nels != ns) {
-    vectors_realloc (&d->edge.color, ns);
-    vectors_realloc (&d->edge.color_now, ns);
-    vectors_realloc (&d->edge.color_prev, ns);
-    vectorb_realloc (&d->edge.hidden, ns);
-    vectorb_realloc (&d->edge.hidden_now, ns);
-    vectorb_realloc (&d->edge.hidden_prev, ns);
+  if (!same) {
     vectorb_realloc (&d->edge.xed_by_brush, ns);
   }
 
   return same;
-}
-
-void
-br_edge_color_init (datad *d, ggobid *gg)
-{
-  gint j;
-
-  br_edge_vectors_check_size (d->edge.n, d, gg);
-
-  for (j=0; j<d->edge.n; j++) {
-    d->edge.color.els[j] = d->edge.color_now.els[j] =
-      d->edge.color_prev.els[j] = gg->color_0;
-    d->edge.hidden.els[j] = d->edge.hidden_now.els[j] =
-      d->edge.hidden_prev.els[j] = false;
-  }
 }
 
 /*-------------------------------------------------------------------------*/
@@ -179,10 +145,10 @@ br_edge_color_init (datad *d, ggobid *gg)
 /*-------------------------------------------------------------------------*/
 
 void
-brush_pos_init (datad *d)
+brush_pos_init (splotd *sp)
 {
-  d->brush_pos.x1 = d->brush_pos.y1 = 20;
-  d->brush_pos.x2 = d->brush_pos.y2 = 40;
+  sp->brush_pos.x1 = sp->brush_pos.y1 = 20;
+  sp->brush_pos.x2 = sp->brush_pos.y2 = 40;
 }
 
 /*----------------------------------------------------------------------*/
@@ -261,8 +227,6 @@ brush_init (datad *d, ggobid *gg)
   gg->color_id = 0;
   gg->color_0 = 4;
 
-  brush_pos_init (d);
-
   /*
    * Used in binning the plot window
   */
@@ -280,8 +244,11 @@ brush_init (datad *d, ggobid *gg)
 }
 
 void
-brush_activate (gboolean state, datad *d, ggobid *gg)
+brush_activate (gboolean state, displayd *display, ggobid *gg)
 {
+  datad *d = display->d;
+  datad *e = display->e;
+
   if (state)
     assign_points_to_bins (d, gg);
 
@@ -290,7 +257,7 @@ brush_activate (gboolean state, datad *d, ggobid *gg)
      * If transient brushing, restore the color of the transiently
      * brushed points to their previous color
     */
-    extern void reinit_transient_brushing (datad *, ggobid *);
-    reinit_transient_brushing (d, gg);
+    extern void reinit_transient_brushing (datad *, datad *e, ggobid *);
+    reinit_transient_brushing (d, e, gg);
   }
 }

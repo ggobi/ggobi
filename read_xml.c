@@ -524,20 +524,10 @@ setHidden(const CHAR **attrs, XMLParserData *data, int i, enum HiddenType type)
   if(tmp) {
     gboolean hidden = asLogical(tmp);
 
-
     if (i < 0) {
-     if (type == ROW)
-       data->defaults.hidden = hidden;
-     else {
-       data->defaults.edgeHidden = hidden;
-     }     
+      data->defaults.hidden = hidden;
     } else
-     if(type == ROW)
-       d->hidden.els[i] = d->hidden_now.els[i] = d->hidden_prev.els[i] = hidden;
-     else {
-       d->edge.hidden.els[i] = d->edge.hidden_now.els[i] =
-         d->edge.hidden_prev.els[i] = hidden;
-     }
+      d->hidden.els[i] = d->hidden_now.els[i] = d->hidden_prev.els[i] = hidden;
   }
 
  return(tmp != NULL);

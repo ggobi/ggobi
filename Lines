@@ -117,6 +117,8 @@
 41495   4/21  Added xyplot cycling; various bug fixes
 41894   4/26  Major redesign of hiding/exclusion/rescaling
 45808   4/30  Di checked in a LOT of tour code
+45654   5/2   preparation for changes: edges/linking/categorical variables
+45127   5/3   ditto
 
 note: There are about 40.8K lines in xgobi,
        subtracting the rpc, xgvis and tour code.

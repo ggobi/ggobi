@@ -58,7 +58,7 @@ class datad {
 
  /*-- row ids to support generalized linking --*/
  struct _RowID {
-   vector_i id;       /*-- indices into rowid_names_uniq --*/
+   vector_i id;
  } rowid;
  /*-- --*/
 
@@ -124,18 +124,20 @@ class datad {
 
 /*------------------------ brushing ----------------------------------*/
 
- brush_coords brush_pos;  
+ /*-- it's odd to have these in datad; let me think about that --*/
  gint npts_under_brush;
  vector_b pts_under_brush;
- vector_s color, color_now, color_prev;  /* 0:ncolors-1 */
- vector_b hidden, hidden_now, hidden_prev;
- glyphv *glyph, *glyph_now, *glyph_prev;
-
  struct _BrushBins {
    gint nbins;
    bin_struct **binarray;
    icoords bin0, bin1;
  } brush;
+ /*-- --*/
+
+ vector_s color, color_now, color_prev;
+ vector_b hidden, hidden_now, hidden_prev;
+ glyphv *glyph, *glyph_now, *glyph_prev;
+
 
 /*---------------------- identification ------------------------------*/
 
@@ -197,13 +199,10 @@ class datad {
 
    gint *nxed_by_brush;
    vector_b xed_by_brush;
-   vector_s color, color_now, color_prev;
-   vector_b hidden, hidden_now, hidden_prev;
-
-   gint ngroups;
-   gint *group_ids;
-   groupd *groups;  /* id, nels, *els */
-
+/*  -- not necessary!  uses the same color vectors as the points --
+ * vector_s color, color_now, color_prev;
+ * vector_b hidden, hidden_now, hidden_prev;
+*/
  } edge;
 
 /*------------------------------------------------------------------------*/

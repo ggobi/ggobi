@@ -240,34 +240,6 @@ display_menu_build (ggobid *gg)
                              gg->display_menu);
 }
 
-/*
- * This was part of the popup menu solution, but that is unsatisfactory
- * because then the menu isn't visible when the mouse floats over the
- * menu bar.  Instead I need to destroy it and rebuild it whenever the
- * length or composition of gg->d changes.  At the moment, it's just
- * being built once.
-*/
-/*
-static gint
-display_menu_open (GtkWidget *w, GdkEvent *event, ggobid *gg)
-{
-  GtkWidget *display_menu;
-
-  if (event->type == GDK_BUTTON_PRESS) {
-    GdkEventButton *bevent = (GdkEventButton *) event;
-    if (bevent->button == 1) {
-      display_menu = display_menu_build (gg);
-      gtk_menu_popup (GTK_MENU (display_menu), NULL, NULL,
-        position_popup_menu, gg,
-        bevent->button, bevent->time);
-
-      return true;
-    }
-  }
-  return false;
-}
-*/
-
 void
 display_menu_init (ggobid *gg)
 {

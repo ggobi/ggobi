@@ -38,7 +38,7 @@ assign_points_to_bins (datad *d, ggobid *gg)
         sp->screen[i].y >=0 && sp->screen[i].y <= sp->max.y)
     {
       if (point_in_which_bin (sp->screen[i].x, sp->screen[i].y,
-        &ih, &iv, d, gg))
+        &ih, &iv, d, sp))
       {
         /* See whether it's necessary to allocate more space for elements */
         if (d->brush.binarray[ih][iv].nels ==
@@ -65,11 +65,11 @@ assign_points_to_bins (datad *d, ggobid *gg)
 }
 
 void
-get_extended_brush_corners (icoords *bin0, icoords *bin1, datad *d, ggobid *gg)
+get_extended_brush_corners (icoords *bin0, icoords *bin1, datad *d, splotd *sp)
 {
   static brush_coords obrush;
   static gboolean initd = false;
-  brush_coords *brush_pos = &d->brush_pos;
+  brush_coords *brush_pos = &sp->brush_pos;
   gint x1 = MIN (brush_pos->x1, brush_pos->x2);
   gint y1 = MIN (brush_pos->y1, brush_pos->y2);
   gint x2 = MAX (brush_pos->x1, brush_pos->x2);
@@ -96,7 +96,7 @@ get_extended_brush_corners (icoords *bin0, icoords *bin1, datad *d, ggobid *gg)
 
   if (!point_in_which_bin (MIN (x1, ox1) - 2*BRUSH_MARGIN,
                            MIN (y1, oy1) - 2*BRUSH_MARGIN,
-                           &bin0->x, &bin0->y, d, gg) )
+                           &bin0->x, &bin0->y, d, sp) )
   {
     bin0->x = MAX (bin0->x, 0);
     bin0->x = MIN (bin0->x, d->brush.nbins - 1);
@@ -105,7 +105,7 @@ get_extended_brush_corners (icoords *bin0, icoords *bin1, datad *d, ggobid *gg)
   }
   if (!point_in_which_bin(MAX (x2, ox2) + 2*BRUSH_MARGIN,
                           MAX (y2, oy2) + 2*BRUSH_MARGIN,
-                          &bin1->x, &bin1->y, d, gg) )
+                          &bin1->x, &bin1->y, d, sp) )
   {
     bin1->x = MAX (bin1->x, 0);
     bin1->x = MIN (bin1->x, d->brush.nbins - 1);
@@ -120,10 +120,9 @@ get_extended_brush_corners (icoords *bin0, icoords *bin1, datad *d, ggobid *gg)
 }
 
 gboolean
-point_in_which_bin (gint x, gint y, gint *ih, gint *iv, datad *d, ggobid *gg)
+point_in_which_bin (gint x, gint y, gint *ih, gint *iv, datad *d, splotd *sp)
 {
   gboolean inwindow = true;
-  splotd *sp = gg->current_splot;
 
   *ih = (gint) ((gfloat) d->brush.nbins * (gfloat) x / (sp->max.x+1.0));
   *iv = (gint) ((gfloat) d->brush.nbins * (gfloat) y / (sp->max.y+1.0));
