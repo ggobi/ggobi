@@ -233,6 +233,14 @@ write_xml_records(FILE *f, datad *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
     xmlWriteInfo->defaultGlyphSizeName);
    fprintf(f, " color=\"%s\"", xmlWriteInfo->defaultColorName);
  }
+
+ if (d->nmissing > 0) {
+   if (gg->save.missing_ind == MISSINGSNA)
+     fprintf(f, " missingValue=\"%s\"", "na");
+   else if (gg->save.missing_ind == MISSINGSDOT)
+     fprintf(f, " missingValue=\"%s\"", ".");
+   /*-- otherwise write the "imputed" value --*/
+ }
  fprintf(f, ">\n");
 
 
@@ -256,7 +264,8 @@ write_xml_records(FILE *f, datad *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 }
 
 gboolean
-write_xml_record (FILE *f, datad *d, ggobid *gg, gint i, XmlWriteInfo *xmlWriteInfo)
+write_xml_record (FILE *f, datad *d, ggobid *gg, gint i,
+  XmlWriteInfo *xmlWriteInfo)
 {
   gint j;
   gchar *gstr, *gtypestr = NULL;
@@ -345,9 +354,19 @@ write_xml_record (FILE *f, datad *d, ggobid *gg, gint i, XmlWriteInfo *xmlWriteI
 
   if (gg->save.column_ind == ALLCOLS) {
     for(j = 0; j < d->ncols; j++) {
-      /*writeFloat (f, d->raw.vals[i][j]);*/
-      writeFloat (f, (gg->save.stage == TFORMDATA) ? d->tform.vals[i][j] :
-                                                     d->raw.vals[i][j]);
+      /*-- if missing, figure out what to write --*/
+      if (d->nmissing > 0 && d->missing.vals[i][j] &&
+        gg->save.missing_ind != MISSINGSIMPUTED)
+      {
+        if (gg->save.missing_ind == MISSINGSNA) {
+          fprintf (f, "na ");
+        }  else if (gg->save.missing_ind == MISSINGSDOT) {
+          fprintf (f, ". ");
+        } 
+      } else {  /*-- if not missing, just write the data --*/
+        writeFloat (f, (gg->save.stage == TFORMDATA) ? d->tform.vals[i][j] :
+                                                       d->raw.vals[i][j]);
+      }
       if (j < d->ncols-1 )
         fprintf(f, " ");
      }
@@ -356,9 +375,19 @@ write_xml_record (FILE *f, datad *d, ggobid *gg, gint i, XmlWriteInfo *xmlWriteI
     gint *cols = (gint *) g_malloc (d->ncols * sizeof (gint));
     gint ncols = selected_cols_get (cols, d, gg);
     for(j = 0; j < ncols; j++) {
-      /*writeFloat (f, d->raw.vals[i][cols[j]]);*/
-      writeFloat (f, (gg->save.stage == TFORMDATA) ? d->tform.vals[i][j] :
-                                                     d->raw.vals[i][cols[j]]);
+      if (d->nmissing > 0 && d->missing.vals[i][j] &&
+        gg->save.missing_ind != MISSINGSIMPUTED)
+      {
+        if (gg->save.missing_ind == MISSINGSNA) {
+          fprintf (f, "NA ");
+        }  else if (gg->save.missing_ind == MISSINGSDOT) {
+          fprintf (f, ". ");
+        } 
+      } else {
+
+        writeFloat (f, (gg->save.stage == TFORMDATA) ? d->tform.vals[i][j] :
+                                                       d->raw.vals[i][cols[j]]);
+      } 
       if (j < ncols-1 )
         fprintf(f, " ");
      }
