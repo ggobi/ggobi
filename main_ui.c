@@ -697,14 +697,11 @@ make_ui (ggobid *gg)
   GGobi_widget_set (window, gg, true);
 
 #ifdef TEST_GGOBI_EVENTS
-  gtk_signal_connect (GTK_OBJECT(gg),
-   "splot_new", test_new_plot_cb, (gpointer) "A new plot");
-  gtk_signal_connect(GTK_OBJECT(gg),
-   "datad_added", test_data_add_cb, NULL);
-  gtk_signal_connect(GTK_OBJECT(gg),
-   "sticky_point_added", test_sticky_points, NULL);
-  gtk_signal_connect(GTK_OBJECT(gg),
-   "sticky_point_removed", test_sticky_points, NULL);
+/*  gtk_signal_connect (GTK_OBJECT(gg), "splot_new", test_new_plot_cb, (gpointer) "A new plot"); */
+  gtk_signal_connect_object(GTK_OBJECT(gg), "splot_new", test_new_plot_cb, (gpointer) "A new plot");
+  gtk_signal_connect(GTK_OBJECT(gg), "datad_added", test_data_add_cb, NULL);
+  gtk_signal_connect(GTK_OBJECT(gg), "sticky_point_added", test_sticky_points, NULL);
+  gtk_signal_connect(GTK_OBJECT(gg), "sticky_point_removed", test_sticky_points, NULL);
 #endif
 
 /*
@@ -718,10 +715,10 @@ make_ui (ggobid *gg)
 /*gtk_window_set_policy (GTK_WINDOW (window), allow_shrink, allow_grow, auto_shrink);*/
   gtk_window_set_policy (GTK_WINDOW (window), false,        true,       false);
 
-  gtk_signal_connect(GTK_OBJECT (window), "delete_event",
-                     GTK_SIGNAL_FUNC (ggobi_close), gg);
-  gtk_signal_connect(GTK_OBJECT (window), "destroy_event",
-                     GTK_SIGNAL_FUNC (ggobi_close), gg); 
+  gtk_signal_connect_object(GTK_OBJECT (window), "delete_event",
+                            GTK_SIGNAL_FUNC (ggobi_close), gg);
+  gtk_signal_connect_object(GTK_OBJECT (window), "destroy_event",
+                            GTK_SIGNAL_FUNC (ggobi_close), gg); 
 
   gtk_container_set_border_width (GTK_CONTAINER (window), 10);
 
