@@ -206,6 +206,7 @@ cpanel_identify_make(ggobid *gg) {
 
  /*-- button for removing all labels --*/
   btn = gtk_button_new_with_label ("Remove labels");
+  gtk_widget_set_name (btn, "IDENTIFY:remove_sticky_labels");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
                         btn, "Remove all labels", NULL);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
