@@ -80,7 +80,7 @@ cat << \EOF > ${c_rules_frag}
 
 EOF
 else
-   dnl assume Solari's cc compiler
+   dnl assume the Solaris cc compiler
  PIC_CFLAG=-KPIC
  OTHER_CFLAGS="-DG_INLINE_FUNC=extern"
  SHLIB_LDFLAGS=-G
@@ -103,19 +103,43 @@ if test -n "${with_xml}" ; then
 
  echo "with_xml: ${with_xml}"
 
+ if test -z "${XML_CONFIG}" ; then
+  AC_PATH_PROG(XML_CONFIG, xml2-config)
+echo "Found xml-config version 2?"  
+  if test -z "${XML_CONFIG}" ; then
+    AC_PATH_PROG(XML_CONFIG, xml-config)
+    if test -n "${XML_CONFIG}" ; then
+      XML_VERSION="1"
+    fi
+  else
+     XML_VERSION="2"
+  fi
+ else
+   XML_VERSION=`${XML_CONFIG} --version | sed -e 's/\..*/\1/g'`
+ fi
+ 
+ if test -n "${XML_CONFIG}" ; then
+
+echo  "Have xml-config: $XML_CONFIG"
+   XML_INC_DIRS=`$XML_CONFIG --cflags`
+   XML_LIB_DIRS=`$XML_CONFIG --libs`
+   TMP="ok"
+
+ else  dnl So we have to find the xml installation files ourselves.
+
    dnl If the user gave us a --with-xml=value,
    dnl then use that as the setting for the include
    dnl and lib directory.
- if test -d ${with_xml} ; then
-  XML_INC_DIRS=${with_xml}
-  XML_LIB_DIRS="${with_xml} ${with_xml}/.libs"
-   dnl Have to get a version that can be used in LD_LIBRARY_PATH,
-   dnl i.e. with the spaces replaced by :
-  XML_LIB_DIRS_PATH=`echo "${with_xml} ${with_xml}/.libs" | sed -e 's/[ \t]*/:/g'`
- fi
+  if test -d ${with_xml} ; then
+    XML_INC_DIRS=${with_xml}
+    XML_LIB_DIRS="${with_xml} ${with_xml}/.libs"
+      dnl Have to get a version that can be used in LD_LIBRARY_PATH,
+      dnl i.e. with the spaces replaced by :
+    XML_LIB_DIRS_PATH=`echo "${with_xml} ${with_xml}/.libs" | sed -e 's/[ \t]*/:/g'`
+  fi
 
 
-  dnl Now find the libxml-1.8.*
+       dnl Now find the libxml-1.8.*
 
    ORIG_CPPFLAGS=$CPPFLAGS
    for f in $XML_INC_DIRS ${DEFAULT_INC_DIRS} ; do 
@@ -139,9 +163,9 @@ dnl      AC_CHECK_HEADER(parserInternals.h, XML_INC_DIRS=$f$ext)
      fi
    done
 
-
   dnl now we should test for the library.
 
+  fi dnl end of else part of if test -n ${XML_CONFIG} ; ...
 
   if test "${TMP}" = "" ; then
     echo "Cannot find the XML header files. Please specify these via"
@@ -149,12 +173,15 @@ dnl      AC_CHECK_HEADER(parserInternals.h, XML_INC_DIRS=$f$ext)
     exit 2
   else
     XML_UTILS=xmlConvert
-    USE_XML="USE_XML=1"
-    XML_SRC="read_xml.c write_xml.c read_init.c"
-    XML_CFLAG_DEFINES="-DUSE_XML=1"
+    XML_CFLAG_DEFINES="-DUSE_XML=${XML_VERSION} -DSUPPORT_PLUGINS=1 -DSUPPORT_INIT_FILES=1"
+    USE_XML="USE_XML=${XML_VERSION}"
+    XML_SRC="read_xml.c write_xml.c read_init.c plugin.c write_state.c"
+echo "USE_XML := ${USE_XML}"
+echo "XML Version := ${XML_VERSION}"
     enable_embed="yes"
 dnl -DDIR_SEPARATOR=\"'/'\""
   fi
+
 fi
 
 if test -n "${with_R}" ; then

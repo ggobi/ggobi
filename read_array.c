@@ -329,11 +329,9 @@ gboolean
 read_ascii_data(InputDescription *desc, ggobid *gg)
 {
   datad *d; /* datad_new (gg);*/
-#ifdef USE_CLASSES
-  d  = new datad (gg);
-#else
+
   d = datad_new (NULL, gg);
-#endif
+
   if (array_read (d, desc, gg) == false) {
     /* Somewhere, we have to arrange to throw away the datad
      * and get it out of the list.

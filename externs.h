@@ -6,9 +6,7 @@
 #include "defines.h"
 #endif
 
-#ifdef USE_CLASSES
-datad *datad_new (ggobid *);
-#endif
+
 
 datad *datad_new(datad *d, ggobid *gg);
 

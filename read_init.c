@@ -37,7 +37,7 @@ GGobiPluginInfo *processPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr d
 gint getPreviousGGobiDisplays(const xmlDocPtr doc, GGobiInitInfo *info);
 gint getPreviousDisplays(xmlNodePtr node, GGobiDescription *desc);
 GGobiDisplayDescription* getDisplayDescription(xmlNodePtr node);
-enum displaytyped getDisplayType(const CHAR *type);
+enum displaytyped getDisplayType(const xmlChar *type);
 
 
 GGobiInitInfo *
@@ -152,8 +152,8 @@ getPreviousInput(xmlNode *node, InputDescription *input)
 DataMode
 getInputType(xmlNode *node)
 {
-  const CHAR *tag;
-  const CHAR *mode;
+  const xmlChar *tag;
+  const xmlChar *mode;
   DataMode val = unknown_data;
 
   tag = node->name;
@@ -226,8 +226,9 @@ getDisplayDescription(xmlNodePtr node)
 {
   GGobiDisplayDescription *dpy;
   xmlNodePtr el;
-  gint i;
-  CHAR *tmp;
+  int i;
+  xmlChar *tmp;
+
 
   dpy = (GGobiDisplayDescription*) g_malloc(sizeof(GGobiDisplayDescription*));
   dpy->type = getDisplayType(xmlGetProp(node, "type"));
@@ -260,7 +261,7 @@ getDisplayDescription(xmlNodePtr node)
 }
 
 enum displaytyped
-getDisplayType(const CHAR *type)
+getDisplayType(const xmlChar *type)
 {
   enum displaytyped val = unknown_display_type;
   if(strcmp(type, "scatterplot") == 0) 
@@ -319,7 +320,7 @@ processPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr doc)
 {
   xmlNodePtr el;
   gboolean load;
-  const CHAR *tmp;
+  const xmlChar *tmp;
   GGobiPluginInfo *plugin;
   xmlChar * val;
 

@@ -201,71 +201,23 @@ struct _datad {
 
 /*------------------------------------------------------------------------*/
 
-#ifdef USE_CLASSES
- public:
-   datad () {};
-   datad (struct _ggobid *gg);
-
-
-   /* The following are methods that one might want to override in order to 
-      modify how records are handled.
-      As more are needed, migrate the bodies of the C routines in
-      read_xml.c, etc.  to here.
-    */
-#ifdef USE_XML
-  virtual gboolean readXMLRecord(const CHAR **attrs, struct _XMLUserData *data);
-#endif
-
-#else /* if !USE_CLASSES */
 
       /* Instead of a method, use a function pointer which can be set
          for the different types.
        */
 #ifdef USE_XML
-   gboolean (*readXMLRecord)(const CHAR **attrs, struct _XMLUserData *data);
+   gboolean (*readXMLRecord)(const xmlChar **attrs, struct _XMLUserData *data);
 #endif 
 
    gboolean edgeData;
 
    struct _datad *nodeData; 
-
-#endif /* end ifdef USE_CLASSES else */
 };
 
-#ifndef USE_CLASSES
 typedef struct _datad datad;
 gint alloc_edgeIDs(datad *d);
-#endif
 
 
 extern datad *datad_new (datad *, struct _ggobid *);
-
-#ifdef USE_CLASSES
-class EdgeDatad : public datad 
-{
- public:
-  EdgeDatad() : datad() { }
-
-  EdgeDatad(struct _ggobid *gg) : datad(gg) { 
-  }
-
-
-#if 1
-#ifdef USE_XML
-  gboolean readXMLRecord(const CHAR **attrs, XMLParserData *data);
-#endif
-#endif
-
- protected:
-
-/*
-  int *sourceID;
-  int *destinationID;
-*/
-  datad *nodeData;
-};
-#endif
-
-
 
 #endif

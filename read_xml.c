@@ -68,9 +68,9 @@
 #include "GGobiAPI.h"
 
 
-void startXMLElement(void *user_data, const CHAR *name, const CHAR **attrs);
-void endXMLElement(void *user_data, const CHAR *name);
-void Characters(void *user_data, const CHAR *ch, int len);
+void startXMLElement(void *user_data, const xmlChar *name, const xmlChar **attrs);
+void endXMLElement(void *user_data, const xmlChar *name);
+void Characters(void *user_data, const xmlChar *ch, int len);
 
 
 const gchar *XMLSuffixes[] = {"", ".xml", ".xml.gz", ".xmlz"};
@@ -192,7 +192,7 @@ initParserData(XMLParserData *data, xmlSAXHandlerPtr handler, ggobid *gg)
 }
 
 void 
-startXMLElement(void *user_data, const CHAR *name, const CHAR **attrs)
+startXMLElement(void *user_data, const xmlChar *name, const xmlChar **attrs)
 {
  XMLParserData *data = (XMLParserData*)user_data;
  enum xmlDataState type = tagType(name, false);
@@ -245,7 +245,7 @@ startXMLElement(void *user_data, const CHAR *name, const CHAR **attrs)
 }
 
 int
-setLevelIndex(const CHAR **attrs, XMLParserData *data)
+setLevelIndex(const xmlChar **attrs, XMLParserData *data)
 {
     const char *tmp = getAttribute(attrs, "value");
 
@@ -258,7 +258,7 @@ setLevelIndex(const CHAR **attrs, XMLParserData *data)
 }
 
 void
-categoricalLevels(const CHAR **attrs, XMLParserData *data)
+categoricalLevels(const xmlChar **attrs, XMLParserData *data)
 {
     datad *d = getCurrentXMLData(data);
     vartabled *el = &(d->vartable[data->current_variable]);
@@ -289,7 +289,7 @@ addLevel(XMLParserData *data, const char *c, int len)
 }
 
 
-void endXMLElement(void *user_data, const CHAR *name)
+void endXMLElement(void *user_data, const xmlChar *name)
 {
  XMLParserData *data = (XMLParserData*)user_data;
  enum xmlDataState type = tagType(name, true);
@@ -325,7 +325,7 @@ void endXMLElement(void *user_data, const CHAR *name)
 
 
 XmlTagType
-tagType(const CHAR *name, gboolean endTag)
+tagType(const xmlChar *name, gboolean endTag)
 {
  gint n = sizeof(xmlDataTagNames)/sizeof(xmlDataTagNames)[0] - 1; 
  gint i;
@@ -381,14 +381,14 @@ tagType(const CHAR *name, gboolean endTag)
    is passed can work with it more easily.
  */
 void 
-Characters(void *user_data, const CHAR *ch, int len)
+Characters(void *user_data, const xmlChar *ch, int len)
 {
  char *tmp;
  int dlen = len;
- const CHAR *c;
+ const xmlChar *c;
  XMLParserData *data = (XMLParserData*)user_data;
 
- c = (const CHAR *) skipWhiteSpace(ch, &dlen);
+ c = (const xmlChar *) skipWhiteSpace(ch, &dlen);
  if(dlen < 1 || c[0] == '\n')
   return;
 
@@ -398,7 +398,7 @@ Characters(void *user_data, const CHAR *ch, int len)
   memcpy(tmp, c, dlen);
   memset(tmp+dlen, '\0', 1);
 
-  c = (const CHAR *) tmp;
+  c = (const xmlChar *) tmp;
  }
 
 
@@ -427,10 +427,10 @@ Characters(void *user_data, const CHAR *ch, int len)
  }
 }
 
-const CHAR *
-skipWhiteSpace(const CHAR *ch, int *len)
+const xmlChar *
+skipWhiteSpace(const xmlChar *ch, int *len)
 {
- const CHAR *tmp = ch;
+ const xmlChar *tmp = ch;
   while(*len >= 0) {
    if(*len == 0 || (tmp[0] != ' ' && tmp[0] != '\t' && tmp[0] != '\n'))
     break;
@@ -448,7 +448,7 @@ return(tmp);
   number of datasets to expect.
  */
 gboolean
-setGeneralInfo (const CHAR **attrs, XMLParserData *data)
+setGeneralInfo (const xmlChar **attrs, XMLParserData *data)
 {
   const char *tmp = getAttribute(attrs, "count");
 
@@ -461,7 +461,7 @@ setGeneralInfo (const CHAR **attrs, XMLParserData *data)
 
 
 gboolean
-setDatasetInfo (const CHAR **attrs, XMLParserData *data)
+setDatasetInfo (const xmlChar **attrs, XMLParserData *data)
 {
   const char *tmp = getAttribute(attrs, "count");
   datad *d = getCurrentXMLData(data);
@@ -500,7 +500,7 @@ setDatasetInfo (const CHAR **attrs, XMLParserData *data)
 }
 
 gboolean
-setDefaultDatasetValues(const CHAR **attrs, XMLParserData *data)
+setDefaultDatasetValues(const xmlChar **attrs, XMLParserData *data)
 {
 
  const gchar * tmp = getAttribute(attrs, "missingValue");
@@ -526,9 +526,9 @@ strToInteger(const gchar *tmp)
 
 
 const gchar *
-getAttribute(const CHAR **attrs, char *name)
+getAttribute(const xmlChar **attrs, char *name)
 {
- const CHAR **tmp = attrs;
+ const xmlChar **tmp = attrs;
  while(tmp && tmp[0]) {
   if(strcmp(name, (const char *)tmp[0]) == 0)
       return((const gchar *)tmp[1]);
@@ -539,7 +539,7 @@ getAttribute(const CHAR **attrs, char *name)
 }
 
 gboolean 
-newRecord(const CHAR **attrs, XMLParserData *data)
+newRecord(const xmlChar **attrs, XMLParserData *data)
 {
   datad *d = getCurrentXMLData(data);
 
@@ -549,7 +549,7 @@ newRecord(const CHAR **attrs, XMLParserData *data)
 }
 
 gboolean
-setHidden(const CHAR **attrs, XMLParserData *data, int i)
+setHidden(const xmlChar **attrs, XMLParserData *data, int i)
 {
   const char *tmp;
   datad *d = getCurrentXMLData(data);
@@ -582,7 +582,7 @@ asLogical(const gchar *sval)
 }
 
 gboolean
-setColor(const CHAR **attrs, XMLParserData *data, int i)
+setColor(const xmlChar **attrs, XMLParserData *data, int i)
 {
   const gchar *tmp;
   gint value = data->defaults.color;
@@ -607,7 +607,7 @@ setColor(const CHAR **attrs, XMLParserData *data, int i)
 }
 
 gboolean
-setGlyph(const CHAR **attrs, XMLParserData *data, gint i)
+setGlyph(const xmlChar **attrs, XMLParserData *data, gint i)
 {
   const gchar *tmp;
   gint value;
@@ -698,7 +698,7 @@ xml_warning(const gchar *attribute, const gchar *value, const gchar *msg,
 */
 
 gboolean
-setRecordValues (XMLParserData *data, const CHAR *line, gint len)
+setRecordValues (XMLParserData *data, const xmlChar *line, gint len)
 {
   gdouble value;
   const gchar *tmp = strtok((gchar*) line, " \t\n");
@@ -732,7 +732,7 @@ asNumber(const char *sval)
  */
 
 gboolean
-newVariable(const CHAR **attrs, XMLParserData *data, const CHAR *tagName)
+newVariable(const xmlChar **attrs, XMLParserData *data, const xmlChar *tagName)
 {
   const gchar *tmp;
   datad *d = getCurrentXMLData(data);
@@ -769,7 +769,7 @@ newVariable(const CHAR **attrs, XMLParserData *data, const CHAR *tagName)
     Called in response to a <variables> tag. (Note the plural.)
  */
 gboolean 
-allocVariables (const CHAR **attrs, XMLParserData *data)
+allocVariables (const xmlChar **attrs, XMLParserData *data)
 {
   const gchar *tmp = getAttribute (attrs, "count");
   datad *d = getCurrentXMLData(data);
@@ -800,7 +800,7 @@ allocVariables (const CHAR **attrs, XMLParserData *data)
    Called when parsing free-formatted text within a <variable> tag.
  */
 gboolean
-setVariableName(XMLParserData *data, const CHAR *name, gint len)
+setVariableName(XMLParserData *data, const xmlChar *name, gint len)
 {
   gchar *tmp = (gchar *) g_malloc (sizeof(gchar) * (len+1));
   gint j = data->current_variable;
@@ -863,9 +863,9 @@ rowId (const gchar *tmp, XMLParserData *data)
  For debugging.
 */
 void
-showAttributes (const CHAR **attrs)
+showAttributes (const xmlChar **attrs)
 {
-  const CHAR **tmp;
+  const xmlChar **tmp;
   tmp = attrs;
   while (tmp && tmp[0]) {
     g_printerr ("\t %s=%s\n", tmp[0], tmp[1]);
@@ -953,7 +953,7 @@ find_xml_file(const gchar *filename, const gchar *dir, ggobid *gg)
   for the specification of an external file.
  */
 gboolean
-setColorMap(const CHAR **attrs, XMLParserData *data)
+setColorMap(const xmlChar **attrs, XMLParserData *data)
 {
  const gchar *tmp, *file; 
  int size = 0;
@@ -1006,7 +1006,7 @@ setColorMap(const CHAR **attrs, XMLParserData *data)
 }
 
 gboolean
-setColormapEntry(const CHAR **attrs, XMLParserData *data)
+setColormapEntry(const xmlChar **attrs, XMLParserData *data)
 {
  const gchar * const names[] = {"r", "g", "b"};
  double vals[3] = {-1., -1. , -1.};
@@ -1069,7 +1069,7 @@ setColormapEntry(const CHAR **attrs, XMLParserData *data)
   An RGB value in simple text form.
  */
 gboolean
-setColorValue(XMLParserData *data, const CHAR *line, int len)
+setColorValue(XMLParserData *data, const xmlChar *line, int len)
 {
 
  double values[3] = {-1, -1, -1};
@@ -1158,18 +1158,16 @@ asciiParseColorMap(const gchar *fileName, int size, XMLParserData *data)
 
 
 gboolean
-setDataset(const CHAR **attrs, XMLParserData *parserData) 
+setDataset(const xmlChar **attrs, XMLParserData *parserData) 
 {
   datad *data;
   gchar *name;
   const gchar *tmp;
 
-#ifdef USE_CLASSES
-  data = new datad(parserData->gg);
-#else
+
   data = datad_new(NULL, parserData->gg);
   data->readXMLRecord = readXMLRecord;
-#endif
+
 
 
   tmp = getAttribute(attrs, (char *) "name");
@@ -1199,9 +1197,8 @@ getCurrentXMLData(XMLParserData* parserData)
   return(data);
 }
 
-#ifndef USE_CLASSES
 gboolean
-readXMLRecord(const CHAR **attrs, XMLParserData *data)
+readXMLRecord(const xmlChar **attrs, XMLParserData *data)
 {
   datad *d = getCurrentXMLData(data);
   const gchar *tmp;
@@ -1271,46 +1268,5 @@ readXMLRecord(const CHAR **attrs, XMLParserData *data)
   return(true);
 }
 
-#else /* So using classes */
-gboolean
-datad::readXMLRecord(const CHAR **attrs, XMLParserData *data)
-{
-  const gchar *tmp;
-  gint i = data->current_record;
-
-  data->current_element = 0;
-
-  tmp = getAttribute(attrs, "label");
-  if (tmp) {
-    gchar *stmp = g_strdup (tmp);
-    g_array_insert_val (rowlab, data->current_record, stmp);
-  }
 
 
-  setColor(attrs, data, i);
-  setGlyph(attrs, data, i);
-  setHidden(attrs, data, i);
- 
-  tmp = getAttribute(attrs, "id");
-  if(tmp) {
-    if(data->rowIds == NULL) {
-     data->rowIds = (gchar **) g_malloc(nrows * sizeof(gchar *));
-     memset(data->rowIds, '\0', nrows);
-    }
-
-    data->rowIds[i] = g_strdup(tmp);
-  }
-
-  return(true);
-}
-
-/*
-gboolean
-EdgeDatad::readXMLRecord(const CHAR **attrs, XMLParserData *data)
-{
-  datad::readXMLRecord(attrs, data);
-
-  return(true);
-}
-*/
-#endif

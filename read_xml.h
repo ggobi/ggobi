@@ -107,36 +107,36 @@ typedef struct _XMLUserData {
 extern "C" {
 #endif
 
-enum xmlDataState tagType(const CHAR *name, gboolean endTag);
-gboolean newVariable(const CHAR **attrs, XMLParserData *data, const CHAR *tagName);
-gboolean newEdgeVariable(const CHAR **attrs, XMLParserData *data);
-gboolean setDatasetInfo(const CHAR **attrs, XMLParserData *data);
-gboolean setGeneralInfo (const CHAR **attrs, XMLParserData *data);
-gboolean allocVariables(const CHAR **attrs, XMLParserData *data);
-gboolean newRecord(const CHAR **attrs, XMLParserData *data);
-gboolean setDataset(const CHAR **attrs, XMLParserData *parserData);
+enum xmlDataState tagType(const xmlChar *name, gboolean endTag);
+gboolean newVariable(const xmlChar **attrs, XMLParserData *data, const xmlChar *tagName);
+gboolean newEdgeVariable(const xmlChar **attrs, XMLParserData *data);
+gboolean setDatasetInfo(const xmlChar **attrs, XMLParserData *data);
+gboolean setGeneralInfo (const xmlChar **attrs, XMLParserData *data);
+gboolean allocVariables(const xmlChar **attrs, XMLParserData *data);
+gboolean newRecord(const xmlChar **attrs, XMLParserData *data);
+gboolean setDataset(const xmlChar **attrs, XMLParserData *parserData);
 
-gboolean setRecordValues(XMLParserData *data, const CHAR *line, gint len);
-gboolean setVariableName(XMLParserData *data, const CHAR *name, gint len);
+gboolean setRecordValues(XMLParserData *data, const xmlChar *line, gint len);
+gboolean setVariableName(XMLParserData *data, const xmlChar *name, gint len);
 
-gboolean setDefaultDatasetValues(const CHAR **attrs, XMLParserData *data);
+gboolean setDefaultDatasetValues(const xmlChar **attrs, XMLParserData *data);
 
-const CHAR *skipWhiteSpace(const CHAR *ch, gint *len);
+const xmlChar *skipWhiteSpace(const xmlChar *ch, gint *len);
 
-const gchar *getAttribute(const CHAR **attrs, gchar *name);
+const gchar *getAttribute(const xmlChar **attrs, gchar *name);
 
 
 void xml_warning(const gchar *attribute, const gchar *value, const gchar *msg, XMLParserData *data);
 
 void initParserData(XMLParserData *data, xmlSAXHandlerPtr handler, ggobid *gg);
 
-gboolean setGlyph(const CHAR **attrs, XMLParserData *data, gint i);
-gboolean setColor(const CHAR **attrs, XMLParserData *data, gint i);
+gboolean setGlyph(const xmlChar **attrs, XMLParserData *data, gint i);
+gboolean setColor(const xmlChar **attrs, XMLParserData *data, gint i);
 
 
 
-void categoricalLevels(const CHAR **attrs, XMLParserData *data);
-int setLevelIndex(const CHAR **attrs, XMLParserData *data);
+void categoricalLevels(const xmlChar **attrs, XMLParserData *data);
+int setLevelIndex(const xmlChar **attrs, XMLParserData *data);
 void addLevel(XMLParserData *data, const char *c, int len);
 
 
@@ -144,11 +144,11 @@ gint rowId(const gchar *tmp, XMLParserData *data);
 
 gboolean data_xml_read (InputDescription *desc, ggobid *gg);
 
-gboolean setHidden(const CHAR **attrs, XMLParserData *data, gint i);
+gboolean setHidden(const xmlChar **attrs, XMLParserData *data, gint i);
 
-gboolean setColorValue(XMLParserData *data, const CHAR *name, gint len);
-gboolean setColormapEntry(const CHAR **attrs, XMLParserData *data);
-gboolean setColorMap(const CHAR **attrs, XMLParserData *data);
+gboolean setColorValue(XMLParserData *data, const xmlChar *name, gint len);
+gboolean setColormapEntry(const xmlChar **attrs, XMLParserData *data);
+gboolean setColorMap(const xmlChar **attrs, XMLParserData *data);
 void setColorValues(GdkColor *color, double *values);
 
 gboolean registerColorMap(ggobid *gg);
@@ -167,7 +167,7 @@ gboolean asLogical(const gchar *sval);
 
 datad *getCurrentXMLData(XMLParserData* parserData);
 
-gboolean readXMLRecord(const CHAR **attrs, XMLParserData *data);
+gboolean readXMLRecord(const xmlChar **attrs, XMLParserData *data);
 
 #ifdef __cplusplus
 }

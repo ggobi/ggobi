@@ -6,11 +6,11 @@
 HINSTANCE ggobi_dlopen(const char *name, GGobiPluginInfo *plugin);
 void ggobi_dlerror(char *buf, GGobiPluginInfo *plugin);
 
-static Dynload unix = { ggobi_dlopen, 
+static Dynload unixDynload = { ggobi_dlopen, 
                         dlclose, 
                         dlsym,  /* warning because we use const char * */
                         ggobi_dlerror};
-Dynload *dynload = &unix;
+Dynload *dynload = &unixDynload;
 
 
 
