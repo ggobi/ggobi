@@ -345,7 +345,7 @@ void varpanel_populate (datad *d, ggobid *gg)
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (d->varpanel_ui.swin),
     GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
 
-  labelw = (g_slist_length (gg->d) > 1) ? gtk_label_new (d->name) : NULL;
+  labelw = gtk_label_new (d->name);
   gtk_notebook_append_page (GTK_NOTEBOOK (gg->varpanel_ui.notebook),
                             d->varpanel_ui.swin, labelw);
 
