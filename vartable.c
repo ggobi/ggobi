@@ -247,7 +247,7 @@ vartable_free (datad *d)
 }
 
 void
-vartable_alloc (datad *d)
+vartable_alloc (datad *d)  /* weird -- nothing is allocated here --*/
 {
   if (d->vartable != NULL)
     vartable_free (d);
@@ -304,6 +304,8 @@ vartabled *
 vartable_element_new (datad *d) 
 {
   vartabled *vt = (vartabled *) g_malloc (sizeof (vartabled));
+
+  vt->d = d;
 
   vt->selected = false;
   vt->nmissing = 0;
