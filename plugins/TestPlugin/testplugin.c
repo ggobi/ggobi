@@ -23,6 +23,9 @@ gboolean
 load(gboolean initializing, GGobiPluginInfo *plugin)
 {
     fprintf(stderr, "loading the test plugin\n");fflush(stderr);
+#if 1
+    fprintf(stderr, "Session Options: %p\n", (void *) GGOBI_getSessionOptions());fflush(stderr);
+#endif
     return(true);
 }
 
