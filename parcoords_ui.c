@@ -45,7 +45,7 @@ static void type_cb (GtkWidget *w, gpointer cbd)
   display_tailpipe (gg->current_display, gg);
 }
 
-static gchar *selection_mode_lbl[] = {"Replace", "Insert", "Append"};
+static gchar *selection_mode_lbl[] = {"Replace", "Insert", "Append", "Delete"};
 static void selection_mode_cb (GtkWidget *w, gpointer cbd)
 {
   ggobid *gg = GGobiFromWidget(w, true);

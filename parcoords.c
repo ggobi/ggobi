@@ -266,8 +266,9 @@ parcoords_varsel (cpaneld *cpanel, splotd *sp,
  * We don't care what the current splot, and we don't use the
  * argument sp.
 */
-  if (parcoords_var_selected (jvar, display)) {
-
+  if (parcoords_var_selected (jvar, display) &&
+      cpanel->parcoords_selection_mode == VAR_DELETE)
+  {
     /* If jvar is one of the plotted variables, its corresponding plot */
     splotd *jvar_sp = NULL;
 
@@ -327,7 +328,7 @@ parcoords_varsel (cpaneld *cpanel, splotd *sp,
       nplots--;
     }
 
-  } else {
+  } else if (!parcoords_var_selected (jvar, display)) {
 
     if (cpanel->parcoords_selection_mode == VAR_REPLACE) {
 

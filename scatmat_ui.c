@@ -22,7 +22,7 @@
 /*                       Callbacks                                      */
 /*----------------------------------------------------------------------*/
 
-static gchar *selection_mode_lbl[] = {"Replace", "Insert", "Append"};
+static gchar *selection_mode_lbl[] = {"Replace", "Insert", "Append", "Delete"};
 static void selection_mode_cb (GtkWidget *w, gpointer cbd)
 {
   gint indx = GPOINTER_TO_INT (cbd);
@@ -38,6 +38,9 @@ static void selection_mode_cb (GtkWidget *w, gpointer cbd)
       break;
     case 2:
       cpanel->scatmat_selection_mode = VAR_APPEND;
+      break;
+    case 3:
+      cpanel->scatmat_selection_mode = VAR_DELETE;
       break;
   }
 }

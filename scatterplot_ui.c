@@ -39,11 +39,6 @@ scatterplot_main_menus_make (GtkAccelGroup *accel_group, GtkSignalFunc func,
   CreateMenuItem (gg->app.scatterplot_mode_menu, "XYPlot",
     "^x", "", NULL, accel_group, func,
     useIds ? GINT_TO_POINTER  (XYPLOT) : gg, gg);
-/*
-  CreateMenuItem (gg->app.scatterplot_mode_menu, "Rotation",
-    "^r", "", NULL, accel_group, func,
-    useIds ? GINT_TO_POINTER  (ROTATE) : gg, gg);
-*/
 
   CreateMenuItem (gg->app.scatterplot_mode_menu, "1D Tour",
     "^g", "", NULL, accel_group, func,

@@ -323,7 +323,9 @@ scatmat_varsel_simple (cpaneld *cpanel, splotd *sp, gint jvar,
  * If jvar is selected, delete a row and a column.  Delete the
  * variable that's selected; we have no interest in the current splot.
 */
-  if (scatmat_var_selected (jvar, display)) {
+  if (scatmat_var_selected (jvar, display) &&
+      cpanel->scatmat_selection_mode == VAR_DELETE)
+  {
     /* if jvar is one of the plotted variables, its row and column */
     gint jvar_rc = g_list_index (display->scatmat_cols, GINT_TO_POINTER (jvar));
 
@@ -397,7 +399,7 @@ scatmat_varsel_simple (cpaneld *cpanel, splotd *sp, gint jvar,
  * Otherwise, replace, insert or append a row <and> a column --
  * depending on the value of scatmat_selection_mode.
 */
-  else {
+  else if (!scatmat_var_selected (jvar, display)) {
 
     /* the row and column of gg.current_splot */
     gint sprow = 1, spcol = -1;
