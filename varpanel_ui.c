@@ -135,6 +135,9 @@ varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint btn,
 /* this is redrawing before it has the new window sizes, so the
  * lines aren't right */
   if (redraw) {
+
+    /*-- do we need a call to brush_once here? --*/
+
     display_tailpipe (display, gg);
   }
 }

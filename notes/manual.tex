@@ -124,6 +124,108 @@ symbols are in use.
 \vspace{.4in}
 }
 
+\section{Tutorial}
+
+Several sample data files are included with the ggobi distribution,
+in a directory called {\bf data,} and there you will find the file
+{\bf pigs.xml}, on a dataset on pig production in the United Kingdom,
+taken from Data by Andrews and Herzberg.  Start ggobi for the 
+pigs data by typing:
+
+\begin{quote}
+ggobi pigs
+\end{quote}
+
+Two windows will appear, the ggobi control panel and a scatterplot,
+as shown in Figure \ref{}.
+
+The control panel has a panel of ViewMode controls on the left and a
+variable selection region on the right.  You can see that the
+scatterplot contains a 2-dimensional projection of the data, a plot
+of YEAR vs TIME.  Move the mouse to one of the variable labels in the
+variable selection region, and leave it in place until the tooltip
+appears, explaining how to select new variables for the plot.   Begin
+to get a feeling for the data by looking at several of the 2d plots:
+profit vs herdsz, herdsz vs time.
+
+Some of the variables are not self-explanatory, and here's
+what they mean:
+
+\begin {itemize}
+\item GILTS: number of sows ``in pig'' (reproducing) for the first time
+\item PROFIT: ratio of price to an index of feed price
+\item S/HERDSZ: ratio of the number of breeding pigs slaughtered to the total
+      breeding herd size
+\item PRODUCTION: number of pigs slaughtered that were reared for meat
+\end {itemize}
+
+Next, get acquainted with the main menubar for the control panel by
+exploring each of its menus.  Pay particular attention to the
+Display, ViewMode and Tools menus.
+
+\begin {itemize}
+\item The Display menu is the interface for opening new plotting
+  windows.
+\item The ViewMode menu is the interface for specifying both the
+  projection (1d, 2d, 3d or higher) and mouse interactions (for scaling
+  the plot, highlighting points, and so on) for the current plot.
+\item The Tools menu lets you open other windows to manipulate
+  characteristics of the data and the view.
+\end {itemize}
+
+Using the Display menu, open another scatterplot display. Notice that
+the new window has a narrow white band drawn around the outside of
+the plotting area:  that means that the new window is now the
+``current display'' and its plot is the ``current plot.''  Click in
+plotting region of the other scatterplot to make it the current plot,
+and now notice what happens in the variable selection region of the
+control panel when you do that:  it should always show which
+variables are plotted in the current plot.
+
+Now set up a plot of GILTS vs HERDSZ in the first scatterplot, and
+PROFIT vs HERDSZ in the second, and make that the current plot.
+Using the ViewMode menu, choose {\bf Brush.}   The pink rectangle
+that appears in the window is the ``paintbrush,'' and dragging it
+over points changes their color.  Use the left button to drag it and
+the middle or right button to resize it.  Make it almost as wide as
+the window and about a quarter as tall, and paint first the
+profitable herds, and then the unprofitable ones.  While you do that,
+keep an eye on the of GILTS vs HERDSZ, and notice where the painted
+points fall in that scatterplot.  Using two linked 2d plots is one
+way to explore the relationship among three variables.
+
+Look at the buttons and menus inside the leftmost portion of the
+ggobi control panel.  Notice that they're contained by a frame
+labelled ``Brush,'' which is the ViewMode of the current plot.  This
+frame contains most of the brushing controls, which are described in
+the section \ref{slbl:Brush}.  A few of the brushing controls,
+though, are in the main menubar: in the Reset menu and at the bottom
+of the Options menu.
+
+Next use the Tools menu to open the {\bf Variable manipulation tool},
+a very frequently-used part of the ggobi interface.  It contains a
+table with a few basic statistics for each variable, and the buttons
+below the table allow you to set variable limits, add new variables,
+and a few other things.  Try clicking the mouse in the table -- 
+you can select row of the table at a time, or use the control and
+shift keys as modifiers to select more than one variable.  Hold the
+control key down while clicking to select variables that are not
+contiguous in the table; use the shift key if you want to select
+a contiguous range of variables. 
+
+You select variables in this fashion when you want to use one of
+the tools to operate on them.  For example, select just the GILTS
+variable, and then click on 'Clone' at the bottom of the tool.
+You have just added a duplicate of the GILTS variable to the dataset,
+and you'll see it at the bottom of the table in this tool, and in
+the variable selection region of the ggobi control panel, too.
+Select that new GILTS variable in the {\bf Variable manipulation tool},
+then return to the Tools menu and open the {\bf Variable transformation
+tool.}
+
+[etc, do a transformation]
+
+
 \section{Layout and functionality}
 
 \subsection{The major functions}
@@ -174,7 +276,7 @@ section~\ref{slbl:ViewModes}.
 The ``Tools'' button gives access to 
 \begin{itemize}
 \itemsep 0em
-\item a table of variable statistics with variable selection functionality,
+\item a variable manipulation table,
 \item a variable transformation pipeline,
 \item an variable sphering panel,
 \item jittering controls,
@@ -189,8 +291,8 @@ interactions in the display windows, while none of the ``Tools''
 does.  Furthermore, ``ViewMode'' functions populate the left hand
 control panel in the main ggobi window, while ``Tools'' create their
 own permanent control panels or views of the data in separate
-windows, as shown in figure~2.  For example, the variable selection
-and statistics ``Tool'' opens a table of data each variable, and the
+windows, as shown in figure~2.  For example, the variable
+manipulation ``Tool'' opens a table of data each variable, and the
 transformation ``Tool'' generates a transformation control window.
 
 The ``Options'' button allows users to set some options for the
@@ -381,7 +483,7 @@ The pan and zoom options allow it to be constrained so that only
 one axis is affected, convenient for browsing one variable at a time.
 
 \subsection{Brush: Linked brushing of points and lines}
-\label{slbl:Color}
+\label{slbl:Brush}
 
 Brushing is often performed when only a single display is visible,
 but it is most interesting and useful to perform brushing with more
@@ -492,10 +594,10 @@ labels at once by clicking on {\bf Make all sticky}.
 
 \newpage
 \section{Tools}
-\subsection{Variable selection and statistics table}
-\label{slbl:VarStats}
+\subsection{Variable manipulation tool}
+\label{slbl:VarManip}
 
-This important table is opened by selecting the first entry on the
+This powerful tool is opened by selecting the first entry on the
 {\bf Tools} menu.  It has several important functions:
 \begin{itemize}
 \itemsep 0em
@@ -536,8 +638,7 @@ random noise to be added to selected variables.
 
 First specify the variables you wish to jitter.  By default, the
 variables plotted in the current display will be affected; if you
-wish to select others, use the {\bf Variable selection and
-statistics} tool.
+wish to select others, use the {\bf Variable manipulation tool.}
 
 Choose between uniform and random jitter, and then set the degree of
 jitter using the slider.  To rejitter without changing the degree of
@@ -576,7 +677,7 @@ button to perform the imputation or assignment of values.
 \label{slbl:Sphering}
 
 The {\em Sphering} panel starts by displaying a scree plot for the
-currently selected variables (see section \ref{slbl:VarStats}).  If the
+currently selected variables (see section \ref{slbl:VarManip}).  If the
 scree plot doesn't reflect the variables you want to sphere, then open
 the Variable statistics panel, select the variables of interest, and
 click on {\em Update scree plot}.
@@ -761,17 +862,14 @@ The basics of the user interface haven't changed, though:
 click with the left button to select a variable to be plotted
 horizontally and the middle (or right) button to plot vertically.
 
-\subsection {The variable selection and statistics table}
+\subsection {The variable manipulation tool}
 
-There's a second panel that has variable selection functions called
-the {\bf Variable selection and statistics table}; it's opened by
-selecting the first entry on the {\bf Tools} menu.  This table
-displays a handful of useful statistics for each variable, and it is
-also used to select variables -- not for plotting, but to be operated
-on by other tools.  Several of the tools, such as variable
-transformation and jittering, will operate on the plotted variables
-in the current display by default.  However, if any rows in this
-table are highlighted, then all selected variables will be affected.
+The table in the {\bf Variable manipulation tool} can also be used to
+select variables -- not for plotting, but to be operated on by other
+tools.  Several of the tools, such as variable transformation and
+jittering, will operate on the plotted variables in the current
+display by default.  However, if any rows in this table are
+highlighted, then all selected variables will be affected.
 
 This table can also be used to specify limits for variables or groups
 of variables, and so we have dispensed with the {\em .vgroups}
@@ -780,7 +878,7 @@ functionality in xgobi.
 Variable cloning is another new feature: it appears as a button
 on the variable selection and statistics table.
 
-For more detail on this table, see section \ref{slbl:VarStats}.
+For more detail on this table, see section \ref{slbl:VarManip}.
 
 \subsection{Changes in ViewModes and Tools}
 
@@ -790,7 +888,7 @@ xgobi.  Open the {\bf Choose Symbol} panel, and then double-click on
 any element of the color palette to bring up a color selection widget
 with access to the full color map.  Notice that you can change the
 background color as well as any of the foreground colors.
-%See section \ref{slbl:Color}.
+%See section \ref{slbl:Brush}.
 
 {\bf Scale} has also changed -- the direct manipulation shifting and
 scaling methods work as they did in xgobi, though you now specify

@@ -22,7 +22,6 @@ static void
 id_remove_labels_cb (GtkWidget *w, ggobid *gg)
 {
   datad *d = gg->current_display->d;
-
   g_slist_free (d->sticky_ids);
   d->sticky_ids = (GSList *) NULL;
   displays_plot (NULL, QUICK, gg);
@@ -122,6 +121,7 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
   return true;  /* no need to propagate the event */
 }
 
+static gint
 button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
 /*

@@ -814,14 +814,14 @@ transform (gint stage, gint tform_type, gfloat param, datad *d, ggobid *gg)
   for (k=0; k<ncols; k++)
     transform_variable (stage, tform_type, param, cols[k], d, gg);
 
-  g_free ((gpointer) cols);
-
   limits_set (false, true, d, gg);  
   for (k=0; k<ncols; k++) {
-    vartable_limits_set_by_var (k, d);
-    vartable_stats_set_by_var (k, d);
-    tform_to_world_by_var (k, d, gg);
+    vartable_limits_set_by_var (cols[k], d);
+    vartable_stats_set_by_var (cols[k], d);
+    tform_to_world_by_var (cols[k], d, gg);
   }
+  g_free ((gpointer) cols);
+
 
   /*
    * there's no need to reproject if the variables just transformed

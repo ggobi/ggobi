@@ -261,7 +261,6 @@ brush_activate (gboolean state, displayd *display, ggobid *gg)
      * If transient brushing, restore the color of the transiently
      * brushed points to their previous color
     */
-    extern void reinit_transient_brushing (displayd *, ggobid *);
     reinit_transient_brushing (display, gg);
   }
 }

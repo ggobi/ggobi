@@ -14,6 +14,7 @@ extern "C" {
 #endif
 
 /* sort +1 */
+void reinit_transient_brushing (displayd *, ggobid *);
 datad * ValidateDatadRef (datad *d, ggobid *gg, gboolean fatal);
 ggobid * ggobi_get (gint);
 GtkWidget * widget_find_by_name (GtkWidget *, gchar *);
