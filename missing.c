@@ -133,12 +133,11 @@ void missings_datad_cb (GtkWidget *w, ggobid *gg)
       /*-- categorical variable definitions --*/
       vtnew->categorical_p = true;
       vtnew->nlevels = 2;
-      vtnew->level_values = NULL;
-      vtnew->level_names = g_array_new (false, false, sizeof (gchar *));
+      vtnew->level_values = (int*) g_malloc(sizeof(int) * 2);
+      vtnew->level_names = (char **) g_malloc(sizeof(char *) * 2);
       for (i=0; i<2; i++) {
-        vtnew->level_values = g_list_append (vtnew->level_values,
-          GINT_TO_POINTER(i));
-        g_array_append_val (vtnew->level_names, lnames[i]);
+        vtnew->level_values[i] = i;
+        vtnew->level_names[i] = g_strdup(lnames[i]);
       }
 
       /*-- prepare to jitter, and set limits to [0,1] --*/

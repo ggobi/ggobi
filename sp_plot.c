@@ -875,7 +875,7 @@ splot_add_record_label (gboolean nearest, gint k, splotd *sp,
         gint kval = (gint) d->tform.vals[k][vars[j]];
         lval = -1;
         for (n=0; n<vt->nlevels; n++) {
-          ktmp = GPOINTER_TO_INT (g_list_nth_data (vt->level_values, n));
+          ktmp = vt->level_values[n];
           if (ktmp == kval) {
             lval = n;
             break;
@@ -890,75 +890,15 @@ splot_add_record_label (gboolean nearest, gint k, splotd *sp,
 
       if (j == 0) {
         lbl = (vt->categorical_p) ?
-          g_strdup_printf ("%s=%s", vt->collab_tform,
-            (gchar *) g_array_index (vt->level_names, gchar *, lval)) :
-          g_strdup_printf ("%s=%g", vt->collab_tform,
-            d->tform.vals[k][vars[j]]);
+                g_strdup_printf ("%s=%s", vt->collab_tform, vt->level_names[lval]) :
+   	        g_strdup_printf ("%s=%g", vt->collab_tform, d->tform.vals[k][vars[j]]);
       } else {
         lbl = (vt->categorical_p) ?
-          g_strdup_printf ("%s, %s=%s", lbl,
-            vt->collab_tform,
-            (gchar *) g_array_index (vt->level_names, gchar *, lval)) :
-          g_strdup_printf ("%s, %s=%g", lbl,
-            vt->collab_tform,
-            d->tform.vals[k][vars[j]]);
+          g_strdup_printf ("%s, %s=%s", lbl, vt->collab_tform, vt->level_names[lval]) :
+          g_strdup_printf ("%s, %s=%g", lbl, vt->collab_tform, d->tform.vals[k][vars[j]]);
       }
     }
   }
-/*
-  else {
-    switch (proj) {
-      case P1PLOT:
-        lbl = g_strdup_printf ("%g", d->tform.vals[k][sp->p1dvar]);
-      break;
-      case XYPLOT:
-        lbl = g_strdup_printf ("%g, %g",
-          d->tform.vals[k][sp->xyvars.x], d->tform.vals[k][sp->xyvars.y]);
-      break;
-
-      case TOUR1D:
-        for (j=0; j<dsp->t1d.nactive; j++) {
-          if (j == 0)
-            lbl = g_strdup_printf ("%g",
-              d->tform.vals[k][dsp->t1d.active_vars.els[j]]);
-          else
-            lbl = g_strdup_printf ("%s, %g", lbl,
-              d->tform.vals[k][dsp->t1d.active_vars.els[j]]);
-        }
-      break;
-
-      case TOUR2D:
-        for (j=0; j<dsp->t2d.nactive; j++) {
-          if (j == 0)
-            lbl = g_strdup_printf ("%g",
-              d->tform.vals[k][dsp->t2d.active_vars.els[j]]);
-          else
-            lbl = g_strdup_printf ("%s, %g", lbl,
-              d->tform.vals[k][dsp->t2d.active_vars.els[j]]);
-        }
-      break;
-
-      case COTOUR:
-        for (j=0; j<dsp->tcorr1.nactive; j++) {
-          if (j == 0)
-            lbl = g_strdup_printf ("%g",
-              d->tform.vals[k][dsp->tcorr1.active_vars.els[j]]);
-          else
-            lbl = g_strdup_printf ("%s, %g", lbl,
-              d->tform.vals[k][dsp->tcorr1.active_vars.els[j]]);
-        }
-        for (j=0; j<dsp->tcorr2.nactive; j++) {
-          if (j == 0)
-            lbl = g_strdup_printf ("%s; %g", lbl,
-              d->tform.vals[k][dsp->tcorr2.active_vars.els[j]]);
-          else
-            lbl = g_strdup_printf ("%s, %g", lbl,
-              d->tform.vals[k][dsp->tcorr2.active_vars.els[j]]);
-        }
-      break;
-    }
-  }
-*/
 
   /*
    * if displaying 'variable labels' and no variable is selected,

@@ -1497,14 +1497,10 @@ GGobi_setSessionOptions(GGobiOptions *opts)
 const gchar *
 GGobi_getLevelName(vartabled *vt, double value)
 {
-    GList *el = vt->level_values;
-
     int which = 0;
-    while(el) {
-	if((int) value == (int) el->data)
-	    return(g_array_index(vt->level_names, gchar*, which));
-	el = el->next;
-	which++;
+    for(which = 0; which < vt->nlevels; which++) {
+	if(vt->level_values[which] == (int) value)
+	    return(vt->level_names[which]);
     }
 
     return(NULL);

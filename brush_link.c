@@ -301,7 +301,6 @@ build_symbol_vectors_by_var (cpaneld *cpanel, datad *d, ggobid *gg)
   gint jlinkby;
   /*-- for other datad's --*/
   GSList *l;
-  GList *lv;
   datad *dd;
   vartabled *vtt;
   gboolean changed = false;
@@ -315,9 +314,10 @@ build_symbol_vectors_by_var (cpaneld *cpanel, datad *d, ggobid *gg)
  * brush moves.
 */
   level_value_max = d->linkvar_vt->nlevels;
-  for (lv = d->linkvar_vt->level_values; lv; lv = lv->next) {
-    level_value = GPOINTER_TO_INT (lv->data);
-    if (level_value > level_value_max) level_value_max = level_value;
+  for (i = 0; i < d->linkvar_vt->nlevels; i++) {
+    level_value = d->linkvar_vt->level_values[i];
+    if(level_value > level_value_max)
+	level_value_max = level_value;
   }
     
   vectorb_init_null (&levelv);

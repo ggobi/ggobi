@@ -147,14 +147,7 @@ processResult(PGresult *result, ggobid *gg)
       for(j = 0; j < nc; j++) {
 	  if(i == 0) {
 	  tmp = PQfname(result, j);
-#if 0
-	  vartabled *vt;
-	  vt = vartable_element_get (j, d);
-	  vt->collab = g_strdup(tmp);
-	  vt->collab_tform = g_strdup(tmp);
-#else
 	  GGOBI(setVariableName)(j, g_strdup(tmp), false, d, gg);
-#endif
 	  }
 
 	  tmp  = PQgetvalue(result, i, j);

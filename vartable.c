@@ -272,13 +272,16 @@ vartable_copy_var (gint jfrom, gint jto, datad *d)
 
   vt_to->categorical_p = vt_from->categorical_p;
   vt_to->nlevels = vt_from->nlevels;
-  vt_to->level_values = NULL;
-  vt_to->level_names = g_array_new (false, false, sizeof (gchar *));
+  if(vt_from->nlevels && vt_from->categorical_p) {
+      vt_to->level_values = (int*) g_malloc(sizeof(int) * vt_from->nlevels);
+      vt_to->level_names =  (gchar **) g_malloc(sizeof(gchar *) * vt_from->nlevels);
+  } else {
+      vt_to->level_values = NULL;
+      vt_to->level_names = NULL;
+  }
   for (k=0; k<vt_to->nlevels; k++) {
-    vt_to->level_values = g_list_append (vt_to->level_values,
-      g_list_nth_data (vt_from->level_values, k));
-    g_array_append_val (vt_to->level_names, 
-      g_array_index (vt_from->level_names, gchar *, k));
+      vt_to->level_values[k] = vt_from->level_values[k];
+      vt_to->level_names[k] = g_strdup(vt_from->level_names[k]);
   }
 
   vt_to->mean = vt_from->mean;

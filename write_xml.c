@@ -148,8 +148,8 @@ write_xml_variable(FILE *f, datad *d, ggobid *gg, gint j,
     fprintf(f, "    <levels count=\"%d\">\n", vt->nlevels);
     for (k=0; k<vt->nlevels; k++) {
       fprintf(f, "      <level value=\"%d\"> %s </level>\n",
-        GPOINTER_TO_INT (g_list_nth_data (vt->level_values, k)),
-        g_array_index (vt->level_names, gchar *, k));
+	      vt->level_values[k],
+              vt->level_names[k]);
     }
     fprintf(f, "    </levels>\n");
     fprintf(f, "  </categoricalvariable>");

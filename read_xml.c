@@ -69,6 +69,9 @@
 #include "GGobiAPI.h"
 
 
+/* Make unstatic/global if need arises. */
+static gboolean checkLevelValue(vartabled *vt, double value);
+
 void startXMLElement(void *user_data, const xmlChar *name, const xmlChar **attrs);
 void endXMLElement(void *user_data, const xmlChar *name);
 void Characters(void *user_data, const xmlChar *ch, gint len);
@@ -295,19 +298,18 @@ setLevelIndex(const xmlChar **attrs, XMLParserData *data)
   data->current_level++; /*-- current_level here ranges from 0 : nlevels-1 --*/
 
 /*-- dfs: placeholder for proper debugging --*/
-  if (g_list_length (el->level_values) == el->nlevels)
+  if (data->current_level >=  el->nlevels) {
+/*XXX Put in a more terminal error! */
     g_printerr ("trouble: adding too many levels to %s\n", el->collab);
+  }
 /* */
 
+  itmp = data->current_level;
   if (tmp != NULL) {
     itmp = strToInteger (tmp);
     if (itmp < 0) g_printerr ("trouble: levels must be >= 0\n");
-    el->level_values = g_list_append (el->level_values,
-      GINT_TO_POINTER(itmp));
-  } else {
-    el->level_values = g_list_append (el->level_values,
-      GINT_TO_POINTER(data->current_level));
   }
+  el->level_values[data->current_level] = itmp;
  
   return(data->current_level);
 }
@@ -322,11 +324,13 @@ categoricalLevels(const xmlChar **attrs, XMLParserData *data)
 
   if (tmp != NULL) {
     el->nlevels = strToInteger(tmp);
-    el->level_values = NULL;
-    el->level_names = g_array_new (false, false, sizeof(gchar *));       
-/*
-    g_array_set_size(el->level_names, el->nlevels);
-*/
+    if(el->nlevels > 0) {
+	el->level_values = (gint *) g_malloc(el->nlevels * sizeof(int)); 
+	el->level_names = (gchar **) g_malloc(el->nlevels * sizeof(gchar *));       
+    } else {
+	el->level_values = NULL;
+	el->level_names  = NULL;
+    }
   }
 
   data->current_level = -1; /* We'll increment the first one. */
@@ -346,10 +350,11 @@ addLevel(XMLParserData *data, const gchar *c, gint len)
   gchar *val = g_strdup(c);
 
 /*-- dfs: placeholder for proper debugging --*/
-  if (el->level_names->len == el->nlevels)
+  if (data->current_level >= el->nlevels)
     g_printerr ("trouble: adding too many levels to %s\n", el->collab);
 
-  g_array_append_val(el->level_names, val);
+/*XXX check not off by one! If so, probably increment data->current_level. */
+  el->level_names[data->current_level] = g_strdup(val);
 }
 
 void
@@ -863,6 +868,11 @@ setRecordValues (XMLParserData *data, const xmlChar *line, gint len)
 
     } else {
       value = asNumber (tmp);
+      if(vt->categorical_p && checkLevelValue(vt, value) == false) {
+            /* add the name of the variable and the record number to this message! */
+/*XXX */
+	  g_printerr("incorrect level in record %d, variable %s the XML input file\n", (int) data->current_record + 1, vt->collab);
+      }
       d->raw.vals[data->current_record][data->current_element] = value;
     }
 
@@ -1522,3 +1532,14 @@ readXMLRecord(const xmlChar **attrs, XMLParserData *data)
 }
 
 
+gboolean
+checkLevelValue(vartabled *vt, double value)
+{
+    int i;
+    for(i = 0; i < vt->nlevels; i++) {
+	if(vt->level_values[i] == (int) value)
+	    return(true);
+    }
+
+    return(false);
+}

@@ -602,11 +602,10 @@ void barchart_splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *
  
 
   if (vtx->categorical_p) {
-    if (vtx->level_names->len == vtx->nlevels) {
       gint i;
       gchar catname[100];
-      for (i=0; i < vtx->level_names->len; i++) {
-        strcpy (catname, (gchar *) g_array_index(vtx->level_names,gchar *,i));
+      for (i=0; i < vtx->nlevels; i++) {
+        strcpy (catname, vtx->level_names[i]);
 
         gdk_draw_string (drawable,
 #if GTK_MAJOR_VERSION == 2
@@ -618,7 +617,6 @@ void barchart_splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *
           sp->bar->bins[i].rect.x+2,
           sp->bar->bins[i].rect.y + sp->bar->bins[i].rect.height/2 + 2,
           catname);
-      }
     } 
   }
 }
@@ -1201,7 +1199,7 @@ void barchart_add_bar_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
 	    char *levelName;
             vartabled *var;
 	    var = (vartabled *) g_slist_nth_data(sp->displayptr->d->vartable, sp->p1dvar);
-	    levelName = g_array_index(var->level_names, gchar *, i-1);
+	    levelName = var->level_names[i-1];
 	    sprintf(string,"%ld point%s for level %s", sp->bar->bins[i-1].count,
 		    sp->bar->bins[i-1].count == 1 ? "" : "s", levelName);
 	}

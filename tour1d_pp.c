@@ -790,7 +790,6 @@ void t1d_ppdraw(gfloat pp_indx_val, ggobid *gg)
   gint j;
   static gboolean init = true;
   gchar *label = g_strdup("PP index: (0.0) 0.0000 (0.0)");
-  gboolean at_max = false;
 
   if (init) {
     t1d_clear_ppda(gg);
