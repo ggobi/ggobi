@@ -93,7 +93,9 @@ struct _ggobid {
 
  GGobiApp app;
 
- GSList *d;  /*-- first is default: cases, nodes; second might be edges --*/
+
+ GSList *d; /* Datasets (datad elements) */ 
+            /*-- first is default: cases, nodes; second might be edges --*/
 
  /* main_ui */
  GtkWidget *control_panel[NMODES];
