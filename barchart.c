@@ -156,8 +156,8 @@ createBarchart(gboolean missing_p, splotd * sp, gint var, datad * d,
    * drawing area, a motion_notify_event is passed to the
    * appropriate event handler for the ruler.
    */
-  display->hrule = gtk_ext_hruler_new();
 #ifndef GTK_2_0
+  display->hrule = gtk_ext_hruler_new();
   gtk_signal_connect_object(GTK_OBJECT(sp->da), "motion_notify_event",
     (GtkSignalFunc) EVENT_METHOD(display->hrule, motion_notify_event),
     GTK_OBJECT(display->hrule));
@@ -177,8 +177,8 @@ createBarchart(gboolean missing_p, splotd * sp, gint var, datad * d,
    * the drawing area, a motion_notify_event is passed to the
    * appropriate event handler for the ruler.
    */
-  display->vrule = gtk_ext_vruler_new();
 #ifndef GTK_2_0
+  display->vrule = gtk_ext_vruler_new();
   gtk_signal_connect_object(GTK_OBJECT(sp->da),
     "motion_notify_event",
     (GtkSignalFunc) EVENT_METHOD(display->vrule, motion_notify_event),
