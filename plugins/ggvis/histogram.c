@@ -156,9 +156,6 @@ draw_grip_control (ggvisd *ggv, ggobid *gg) {
   gint min_grip_pos = xmin - HISTOGRAM_HMARGIN/2;
   gint max_grip_pos = xmax + HISTOGRAM_HMARGIN/2;
 
-  if (gg->plot_GC == NULL)
-    init_plot_GC (D->pix, gg);
-
   if (D->lgrip_pos == -1 && D->rgrip_pos == -1) {  /* first time */
     D->lgrip_pos = min_grip_pos;
     D->rgrip_pos = max_grip_pos;
@@ -166,12 +163,15 @@ draw_grip_control (ggvisd *ggv, ggobid *gg) {
 
   ypos = da->allocation.height - HISTOGRAM_VMARGIN - HISTOGRAM_GRIP_HEIGHT/2;
 
-  gdk_gc_set_foreground (gg->plot_GC, &gg->mediumgray);
-  gdk_draw_line (D->pix, gg->plot_GC, min_grip_pos, ypos, max_grip_pos, ypos);
+  if (gg->rectangle_GC == NULL)
+    gg->rectangle_GC = gdk_gc_new(da->window);
 
-  draw_3drectangle (D->pix, D->lgrip_pos, ypos,
+  gdk_gc_set_foreground (gg->rectangle_GC, &gg->mediumgray);
+  gdk_draw_line (D->pix, gg->rectangle_GC, min_grip_pos, ypos, max_grip_pos, ypos);
+
+  draw_3drectangle (da, D->pix, D->lgrip_pos, ypos,
     HISTOGRAM_GRIP_WIDTH, HISTOGRAM_GRIP_HEIGHT, gg);
-  draw_3drectangle (D->pix, D->rgrip_pos, ypos,
+  draw_3drectangle (da, D->pix, D->rgrip_pos, ypos,
     HISTOGRAM_GRIP_WIDTH, HISTOGRAM_GRIP_HEIGHT, gg);
 }
 

@@ -239,7 +239,7 @@ void       displays_plot (splotd *, RedrawStyle, ggobid *);
 void       displays_tailpipe (RedrawStyle, ggobid *);
 gint       do_ash1d (gfloat *, gint, gint, gint, gfloat *, gfloat *, gfloat *, gfloat *);
 void       do_last_increment (vector_f, vector_f, gfloat, gint);
-void       draw_3drectangle (GdkDrawable *drawable, gint x, gint y, gint width, gint height, ggobid *gg);
+void       draw_3drectangle (GtkWidget *w, GdkDrawable *drawable, gint x, gint y, gint width, gint height, ggobid *gg);
 void       draw_glyph (GdkDrawable *, glyphd *, icoords *, gint, ggobid *);
 gint       dsvd (gdouble **a, gint m, gint n, gfloat *w, gdouble **v);
 PipelineMode projection_get (ggobid *);

@@ -545,7 +545,7 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
   y = ymargin + 10;
   for (k=0; k<scheme->n-1; k++) {
     x = xmargin + gg->wvis.pct[k] * (w->allocation.width - 2*xmargin);
-    draw_3drectangle (pix, x, y, 20, 10, gg);
+    draw_3drectangle (w, pix, x, y, 20, 10, gg);
     y += hgt;
   }
 
