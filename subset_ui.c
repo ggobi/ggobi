@@ -21,6 +21,8 @@
 #define SS_STICKY 3
 #define SS_ROWLAB 4
 
+extern void subset_init (datad *d, ggobid *gg);
+
 /*-- called when closed from the close button --*/
 static void close_btn_cb (GtkWidget *w, ggobid *gg) {
   gtk_widget_hide (gg->subset_ui.window);
@@ -31,25 +33,39 @@ close_wmgr_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg) {
   gtk_widget_hide (gg->subset_ui.window);
 }
 
-static void
-rescale_cb (GtkButton *button, ggobid *gg)
+static datad *
+datad_get_from_widget (GtkWidget *w, ggobid *gg)
 {
-  datad *d = gg->current_display->d;
-  /* 
-   * if datad has changed, refuse to do anything until the
-   * user has closed and reopened subset_ui.window.
-  */
-  if (gg->subset_ui.d != d) {
-    g_printerr ("Close and reopen this window, please\n");
-    return;
+  datad *d = NULL;
+
+  if (g_slist_length (gg->d) == 0)
+    ;
+  else if (g_slist_length (gg->d) == 1) 
+    d = gg->d->data;
+  else {
+    GtkWidget *clist = (GtkWidget *)
+      gtk_object_get_data (GTK_OBJECT (w), "datad_clist");
+    if (clist) {
+      gint kd = get_one_selection_from_clist (clist);  /* in utils_ui.c */
+      if (kd >= 0) d = (datad *) g_slist_nth_data (gg->d, kd);
+    }
   }
 
-  limits_set (true, true, d, gg);
-  vartable_limits_set (d);
-  vartable_stats_set (d);
+  return d;
+}
 
-  tform_to_world (d, gg);
-  displays_tailpipe (REDISPLAY_ALL, FULL, gg);
+static void
+rescale_cb (GtkWidget *w, ggobid *gg)
+{
+  datad *d = datad_get_from_widget (w, gg);
+  if (d) {
+    limits_set (true, true, d, gg);
+    vartable_limits_set (d);
+    vartable_stats_set (d);
+
+    tform_to_world (d, gg);
+    displays_tailpipe (REDISPLAY_ALL, FULL, gg);
+  }
 }
 
 static void
@@ -60,16 +76,10 @@ subset_cb (GtkWidget *w, ggobid *gg)
   gint bstart, bsize;
   gint estart, estep;
   gboolean redraw;
-  datad *d = gg->current_display->d;
+  datad *d = datad_get_from_widget (w, gg);
 
-  /* 
-   * if datad has changed, refuse to do anything until the
-   * user has closed and reopened subset_ui.window.
-  */
-  if (gg->subset_ui.d != d) {
-    g_printerr ("Close and reopen this window, please\n");
+  if (!d)
     return;
-  }
 
   subset_type = 
     gtk_notebook_get_current_page (GTK_NOTEBOOK (gg->subset_ui.notebook));
@@ -109,15 +119,7 @@ subset_cb (GtkWidget *w, ggobid *gg)
 
 static void
 include_all_cb (GtkWidget *w, ggobid *gg) {
-  datad *d = gg->current_display->d;
-  /* 
-   * if datad has changed, refuse to do anything until the
-   * user has closed and reopened subset_ui.window.
-  */
-  if (gg->subset_ui.d != d) {
-    g_printerr ("Close and reopen this window, please\n");
-    return;
-  }
+  datad *d = datad_get_from_widget (w, gg);
 
   if (d != NULL) {
     subset_include_all (d, gg);
@@ -155,10 +157,14 @@ void
 subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
 
   GtkWidget *button, *t;
-  GtkWidget *vbox, *frame, *hb, *vb;
+  GtkWidget *vbox, *frame, *hb, *vb, *button_hbox, *close_hbox;
   GtkWidget *label, *btn;
   datad *d;
   gboolean firsttime = false;  /*-- first time for this d? --*/
+
+  GtkWidget *swin, *clist;
+  gchar *row[1];
+  GSList *l;
 
   /*-- if used before we have data, bail out --*/
   if (gg->d == NULL || g_slist_length (gg->d) == 0) 
@@ -166,13 +172,14 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
 
   else {
 
-    d = gg->current_display->d;
+    d = gg->d->data;
     gg->subset_ui.d = d;
 
     /*
      * if this particular datad object hasn't been the active one
      * during subsetting, initialize all its GtkAdjustments.
     */
+/*
     if (d->subset.bstart_adj == NULL) {
       gfloat fnr = (gfloat) d->nrows;
       firsttime = true;
@@ -192,6 +199,7 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
       d->subset.estep_adj = (GtkAdjustment *)
         gtk_adjustment_new (fnr/10.0, 1.0, fnr-1, 1.0, 5.0, 0.0);
     }
+*/
 
     if (gg->subset_ui.window == NULL) {
     
@@ -205,6 +213,32 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
 
       vbox = gtk_vbox_new (false, 2);
       gtk_container_add (GTK_CONTAINER (gg->subset_ui.window), vbox);
+
+
+      /* Create a scrolled window to pack the CList widget into */
+      swin = gtk_scrolled_window_new (NULL, NULL);
+      gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (swin),
+        GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
+
+      clist = gtk_clist_new (1);
+      gtk_clist_set_selection_mode (GTK_CLIST (clist),
+        GTK_SELECTION_SINGLE);
+/*
+      gtk_signal_connect (GTK_OBJECT (clist), "select_row",
+                         NULL, gg);
+*/
+      for (l = gg->d; l; l = l->next) {
+        d = (datad *) l->data;
+        subset_init (d, gg);
+        row[0] = g_strdup (d->name);
+        gtk_clist_append (GTK_CLIST (clist), row);
+        g_free (row[0]);
+      }
+      gtk_clist_select_row (GTK_CLIST(clist), 0, 0);
+      gtk_container_add (GTK_CONTAINER (swin), clist);
+      gtk_box_pack_start (GTK_BOX (vbox), swin, false, false, 2);
+
+      d = gg->d->data;
     
       /* Create a new notebook, place the position of the tabs */
       gg->subset_ui.notebook = gtk_notebook_new ();
@@ -408,45 +442,46 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
                                 frame, label);
 
       /*-- hbox to hold a few buttons --*/
-      hb = gtk_hbox_new (true, 2);
+      button_hbox = gtk_hbox_new (true, 2);
 
-      gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 2);
+      gtk_box_pack_start (GTK_BOX (vbox), button_hbox, false, false, 2);
 
       button = gtk_button_new_with_label ("Subset");
       gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), button,
         "Draw a new subset and update all plots", NULL);
-      gtk_signal_connect (GTK_OBJECT (button),
-                          "clicked",
-                          GTK_SIGNAL_FUNC (subset_cb),
-                          (gpointer) gg);
-      gtk_box_pack_start (GTK_BOX (hb), button, true, true, 2);
+      gtk_object_set_data (GTK_OBJECT (button), "datad_clist", clist);
+      gtk_signal_connect (GTK_OBJECT (button), "clicked",
+                          GTK_SIGNAL_FUNC (subset_cb), (gpointer) gg);
+      gtk_box_pack_start (GTK_BOX (button_hbox), button, true, true, 2);
 
       button = gtk_button_new_with_label ("Rescale");
       gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), button,
         "Rescale the data after choosing a new subset", NULL);
+      gtk_object_set_data (GTK_OBJECT (button), "datad_clist", clist);
       gtk_signal_connect (GTK_OBJECT (button), "clicked",
                           GTK_SIGNAL_FUNC (rescale_cb), (gpointer) gg);
-      gtk_box_pack_start (GTK_BOX (hb), button, true, true, 2);
+      gtk_box_pack_start (GTK_BOX (button_hbox), button, true, true, 2);
     
       button = gtk_button_new_with_label ("Include all");
       gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), button,
         "Stop subsetting: include all cases and update all plots", NULL);
-      gtk_signal_connect (GTK_OBJECT (button),
-                          "clicked",
-                          GTK_SIGNAL_FUNC (include_all_cb),
-                          (gpointer) gg);
-      gtk_box_pack_start (GTK_BOX (hb), button, true, true, 2);
+      gtk_object_set_data (GTK_OBJECT (button), "datad_clist", clist);
+      gtk_signal_connect (GTK_OBJECT (button), "clicked",
+                          GTK_SIGNAL_FUNC (include_all_cb), (gpointer) gg);
+      gtk_box_pack_start (GTK_BOX (button_hbox), button, true, true, 2);
 
-      /*-- Close button --*/
+      /*-- Separator --*/
       gtk_box_pack_start (GTK_BOX (vbox), gtk_hseparator_new(),
         false, true, 2);
-      hb = gtk_hbox_new (false, 2);
-      gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 1);
+
+      /*-- Close button --*/
+      close_hbox = gtk_hbox_new (false, 2);
+      gtk_box_pack_start (GTK_BOX (vbox), close_hbox, false, false, 1);
 
       btn = gtk_button_new_with_label ("Close");
       gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                           GTK_SIGNAL_FUNC (close_btn_cb), (ggobid *) gg);
-      gtk_box_pack_start (GTK_BOX (hb), btn, true, false, 0);
+      gtk_box_pack_start (GTK_BOX (close_hbox), btn, true, false, 0);
 
     }  /*-- if window == NULL --*/
 
@@ -492,7 +527,13 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
       g_strdup_printf ("%d", d->nrows));
     /*-- --*/
 
-    gtk_widget_show_all (gg->subset_ui.window);
+    if (g_slist_length (gg->d) > 1) 
+      gtk_widget_show_all (swin);
+    gtk_widget_show (vbox);
+    gtk_widget_show_all (button_hbox);
+    gtk_widget_show_all (close_hbox);
+    gtk_widget_show_all (gg->subset_ui.notebook);
+    gtk_widget_show (gg->subset_ui.window);
   }
 
   gdk_window_raise (gg->subset_ui.window->window);
