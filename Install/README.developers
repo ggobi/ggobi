@@ -120,7 +120,7 @@ It's best to do this on some machine that has pdflatex and xml2.
    # These are the arguments that worked for me -- dfs
    make TAR_FILE=/usr/dfs/ggobi/ggobi/ggobi_0.97-0.tar.gz \
     XML_TAR_FILE=/usr/dfs/ggobi/ggobi/ggobi-xml_0.97-0.tar.gz \
-    RGGOBI_TAR_FILE=/usr/dfs/ggobi/Rggobi_0.4-1.tar.gz
+    RGGOBI_TAR_FILE=/usr/dfs/ggobi/Rggobi_0.51-0.tar.gz
 
 R-GGobi Installation from cvs
 =============================
@@ -135,12 +135,12 @@ install it
 
 1. if it's a local install
 
- R CMD INSTALL -l /usr/dfs/ggobi/R Rggobi_0.3-0.tar.gz
+ R CMD INSTALL -l /usr/dfs/ggobi/R Rggobi_0.51-0.tar.gz
  > library(Rggobi, lib.loc = ".")
 
 2. if it's in the R home
 
- R CMD INSTALL Rggobi_0.3-0.tar.gz
+ R CMD INSTALL Rggobi_0.51-0.tar.gz
  > library(Rggobi)
 
 Omegahat include files:

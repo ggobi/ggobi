@@ -43,15 +43,15 @@ AC_ARG_WITH(postgres,
   POSTGRES_PLUGIN=1; PLUGIN_DIRS="${PLUGIN_DIRS} Postgres"; ENABLE_PLUGINS=1)
 
 AC_ARG_WITH(dataviewer,
-  --with-dataviewer          Enable plugin for viewig data in a datagrid., 
+  --with-dataviewer          Enable plugin for viewing data in a datagrid., 
   DATAVIEWER_PLUGIN=1;  PLUGIN_DIRS="${PLUGIN_DIRS} DataViewer"; ENABLE_PLUGINS=1)
 AC_ARG_WITH(fileselector,
   --with-fileselector          Enable GtkExtra file selector plugin, 
-  FILESELECTOR_PLUGIN=1;  PLUGIN_DIRS="${PLUGIN_DIRS} FileSelect" ; ENABLE_PLUGINS=1)
+  FILESELECTOR_PLUGIN=1;  PLUGIN_DIRS="${PLUGIN_DIRS} FileSelect"; ENABLE_PLUGINS=1)
 
-AC_ARG_WITH(ggvis,
-  --with-ggvis          Enable ggvis graph layout plugin, 
-  GGVIS_PLUGIN=1;  PLUGIN_DIRS="${PLUGIN_DIRS} ggvis" ; ENABLE_PLUGINS=1)
+AC_ARG_WITH(GraphLayout,
+  --with-graphlayout          Enable GraphLayout plugin, 
+  GRAPHLAYOUT_PLUGIN=1;  PLUGIN_DIRS="${PLUGIN_DIRS} GraphLayout"; ENABLE_PLUGINS=1)
 
 
 AC_ARG_WITH(plugins, [--with-plugins          Enable all the plugins (no)], ENABLE_ALL_PLUGINS=1)
@@ -448,8 +448,8 @@ if test -n "${ENABLE_ALL_PLUGINS}" && test ${ENABLE_ALL_PLUGINS} -gt 0 ; then
  POSTGRES_PLUGIN=1
  DATAVIEWER_PLUGIN=1
  FILESELECTOR_PLUGIN=1
- GGVIS_PLUGIN=1
- PLUGIN_DIRS="ImageLib MySQL Postgres DataViewer FileSelect ggvis Perl R JVM Help"
+ GRAPHLAYOUT_PLUGIN=1
+ PLUGIN_DIRS="ImageLib MySQL Postgres DataViewer FileSelect GraphLayout Perl R JVM Help"
 fi
 
 if test -n "${PLUGIN_DIRS}" ; then
@@ -481,10 +481,10 @@ else
  fileselect_xml=/dev/null
 fi
 
-if test -n "$GGVIS_PLUGIN" ; then 
- ggvis_xml=plugins/ggvis/plugin.xml
+if test -n "$GRAPHLAYOUT_PLUGIN" ; then 
+ graphlayout_xml=plugins/GraphLayout/GraphLayout.xml
 else
- ggvis_xml=/dev/null
+ graphlayout_xml=/dev/null
 fi
 
 if test -n "${PLUGIN_DIRS}" ; then
@@ -499,7 +499,7 @@ AC_SUBST_FILE(mysql_xml)
 AC_SUBST_FILE(postgres_xml)
 AC_SUBST_FILE(dataviewer_xml)
 AC_SUBST_FILE(fileselect_xml)
-AC_SUBST_FILE(ggvis_xml)
+AC_SUBST_FILE(graphlayout_xml)
 AC_SUBST_FILE(testInput_xml)
 AC_SUBST_FILE(testPlugin_xml)
 

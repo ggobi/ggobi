@@ -38,7 +38,7 @@ one can enable when compiling ggobi.
   e) Python interface
       (allowing ggobi to be controlled from Python)       
 
-  f) Perl   interface
+  f) Perl interface
       (allowing ggobi to be controlled from Perl)       
 
 There is also optional support for reading data directly from a MySQL
@@ -118,7 +118,7 @@ e) R interface
 Install R after downloading and following instructions from
   http://www.R-project.org
 
-From the ggobi web site, download Rggobi_0.4-1.tar.gz.
+From the ggobi web site, download Rggobi_0.51-0.tar.gz.
 
 Set various system parameters:
 
@@ -141,7 +141,7 @@ Set a symbolic link to the ggobi library and the gtkext library in the
 
 Install the Rggobi library:
 
-% R CMD INSTALL Rggobi_0.1.tar.gz
+% R CMD INSTALL Rggobi_0.51-0.tar.gz
 
 which will create a directory called Rggobi in the
 /usr/local/lib/R/library directory.

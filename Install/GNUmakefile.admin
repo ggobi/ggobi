@@ -18,7 +18,7 @@ DIRS=\
 
 TOOLS=Install/plugin.in
 
-PLUGIN_DIRS=ImageLib MySQL Postgres DataViewer FileSelector TestInput TestPlugin R ggvis JVM 
+PLUGIN_DIRS=ImageLib MySQL Postgres DataViewer FileSelector TestInput TestPlugin R GraphLayout JVM 
 #Help
 
 
