@@ -26,6 +26,10 @@ endif
 GGOBI_CFLAGS=$(shell cd $(GGOBI_HOME) ; make cflags)
 # CFLAGS+=-INLINE:=ON
 
+ifdef BARCHART_IMPLEMENTED
+  CFLAGS+= -DBARCHART_IMPLEMENTED
+endif
+
 ifdef GTK_EXTRA_CONFIG
  GTKEXTRA_INCLUDES=$(shell $(GTK_EXTRA_CONFIG) --cflags)
  EXTRA_LIBS=$(shell $(GTK_EXTRA_CONFIG) --libs)
