@@ -29,8 +29,8 @@
 
 #ifdef USE_XML
 #include "read_init.h"
-#include "colorscheme.h"
 #endif
+#include "colorscheme.h"
 
 #ifdef WIN32
 #define DIR_SEPARATOR '\\'
@@ -299,6 +299,25 @@ DummyKeyTest(guint keyval, GtkWidget *w, GdkEventKey *event,  cpaneld *cpanel, s
 }
 #endif
 
+/**
+  Find the color scheme element in the list with the specified
+  name.
+ */
+colorschemed *
+findColorSchemeByName(GList *schemes, const gchar *name)
+{
+  colorschemed *s;
+  gint i, n;
+
+  n = g_list_length(schemes);
+  for(i = 0; i < n; i++) {
+   s = (colorschemed *)g_list_nth_data(schemes, i);
+   if(strcmp(name, s->name) == 0)
+       return(s);
+  }
+  return(NULL);
+}
+
 ggobid*
 ggobi_alloc()
 {
@@ -338,17 +357,25 @@ ggobi_alloc()
   tmp->printOptions = NULL;
   tmp->pluginInstances = NULL;
 
+/*
 #ifdef USE_XML
+*/
   tmp->colorSchemes = sessionOptions->colorSchemes;
-
-  if(sessionOptions->activeColorScheme)
-      tmp->activeColorScheme = findColorSchemeByName(tmp->colorSchemes,
-        sessionOptions->activeColorScheme);
+  if (sessionOptions->activeColorScheme)
+    tmp->activeColorScheme = findColorSchemeByName(tmp->colorSchemes,
+      sessionOptions->activeColorScheme);
   else {
+    /*-- use "Spectrum 7" by default, if it's present --*/
+    sessionOptions->activeColorScheme = "Spectrum 7";
+    tmp->activeColorScheme = findColorSchemeByName(tmp->colorSchemes,
+      sessionOptions->activeColorScheme);
+    if (!tmp->activeColorScheme)
       tmp->activeColorScheme = (colorschemed *)
-	                         g_list_nth_data(tmp->colorSchemes, 0);
+        g_list_nth_data(tmp->colorSchemes, 0);
   }
+/*
 #endif
+*/
 
   totalNumGGobis++;
 
@@ -408,8 +435,9 @@ GGOBI(main)(gint argc, gchar *argv[], gboolean processEvents)
   if(sessionOptions->colorSchemes == NULL) {
       /* Debby, create the default color scheme from the built-in data 
          and append. */
-      colorschemed *scheme = NULL;
+      colorschemed *scheme = default_scheme_init();
       sessionOptions->colorSchemes = g_list_append(sessionOptions->colorSchemes, scheme);
+      sessionOptions->activeColorScheme = scheme->name;
   }
   
 

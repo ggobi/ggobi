@@ -270,10 +270,10 @@ startXMLElement(void *user_data, const xmlChar *name, const xmlChar **attrs)
       newRecord(attrs, data);
     break;
     case COLORMAP:
-      setColorMap(attrs, data);
+      /*setColorMap(attrs, data);*/  /* requires some thought ... */
     break;
     case COLOR:
-      setColormapEntry(attrs, data);
+      /*setColormapEntry(attrs, data);*/  /* ditto .... */
     break;
     case DESCRIPTION:
       /* description text pending */
@@ -1172,7 +1172,6 @@ setColorMap(const xmlChar **attrs, XMLParserData *data)
   * This appends the colors, but I don't want to allow more than
   * MAXNCOLORS colors no matter what the user asks for, so I'll be
   * ignoring some of the colors in the set.  -- dfs
- */
   if(size > 0 || file) {
     ggobid *gg = data->gg;
     if(file) {
@@ -1191,6 +1190,7 @@ setColorMap(const xmlChar **attrs, XMLParserData *data)
       memset(gg->colorNames, '\0', size * sizeof (gchar *));
     }
   }
+ */
 
   return(true);
 }
@@ -1211,21 +1211,21 @@ setColormapEntry(const xmlChar **attrs, XMLParserData *data)
   if(tmp) {
     if(strcmp("bg",tmp) == 0) {
       which = -1;
-      color = &data->gg->bg_color;
+      /*color = &data->gg->bg_color;*/  /* replaced using activeColorScheme*/
     }
     else  if(strcmp("fg",tmp) == 0) {
       which = -1;
-      color = &data->gg->bg_color;
+      /*color = &data->gg->bg_color;*/   /* ditto */
     }
     else {
        /* Note that we set the current color to this index.
           Thus we can skip values, etc.
         */
       which = data->current_color = strToInteger(tmp) - 1;
-      color = data->gg->color_table + which;
+      /*color = data->gg->color_table + which;*/   /* ditto */
     }
   } else {
-    color = data->gg->color_table + data->current_color;
+    /*color = data->gg->color_table + data->current_color;*/ /* ditto */
   }
 
   for(i = 0; i < 3; i++) {
@@ -1239,10 +1239,10 @@ setColormapEntry(const xmlChar **attrs, XMLParserData *data)
   }
 
   if(which > -1 &&
-     which < data->gg->ncolors &&
+     /*which < data->gg->ncolors &&*/ /* ditto */
      (tmp = getAttribute(attrs, "name") ) )
   {
-    data->gg->colorNames[which] = g_strdup(tmp);
+    /*data->gg->colorNames[which] = g_strdup(tmp);*/ /* ditto*/
   }
 
   if(ok) {
@@ -1264,7 +1264,7 @@ setColormapEntry(const xmlChar **attrs, XMLParserData *data)
 gboolean
 setColorValue(XMLParserData *data, const xmlChar *line, gint len)
 {
-
+/*
   gdouble values[3] = {-1, -1, -1};
   gint which = 0;
   const gchar *tmp = strtok((gchar*) line, " \t\n");
@@ -1279,6 +1279,7 @@ setColorValue(XMLParserData *data, const xmlChar *line, gint len)
   if(which == 3)
     setColorValues(color, values);
 
+*/
   return(true); 
 }
 
@@ -1328,7 +1329,11 @@ xmlParseColorMap(const gchar *fileName, gint size, XMLParserData *data)
 
   g_free(tmp);
 
+/* doesn't use schemes */
+/*
   return(size == data->gg->ncolors);
+*/
+  return (size);
 }
 
 

@@ -447,6 +447,7 @@ void barchart_allocate_structure (splotd *sp, datad *d) {
   gint i, nbins;
   ggobid *gg = GGobiFromSPlot(sp);
   vtx = vartable_element_get (sp->p1dvar, d);
+  colorschemed *scheme = gg->activeColorScheme;
 
   if (sp->bar->new_nbins < 0) {
     if (vtx->categorical_p) {
@@ -473,7 +474,7 @@ void barchart_allocate_structure (splotd *sp, datad *d) {
 /* allocate space */
   sp->bar->bins = (bind *) g_malloc (nbins * sizeof (bind));
   sp->bar->cbins = (bind **) g_malloc (nbins * sizeof (bind *));
-  sp->bar->ncolors = gg->ncolors;
+  sp->bar->ncolors = scheme->n;
   sp->bar->bar_hit = (gboolean *) g_malloc ((nbins+2) * sizeof(gboolean));
   sp->bar->old_bar_hit = (gboolean *) g_malloc ((nbins+2) * sizeof(gboolean));
 
@@ -514,11 +515,12 @@ void barchart_init_categorical (splotd *sp, datad *d) {
 
 void barchart_redraw (splotd *sp, datad *d, ggobid *gg) {
   gint i, j;
+  colorschemed *scheme = gg->activeColorScheme;
 
   barchart_recalc_group_counts (sp, d, gg);
 
   for (j=0; j<sp->bar->ncolors; j++) {
-    gdk_gc_set_foreground (gg->plot_GC, &gg->color_table[j]);
+    gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[j]);
 
     for (i=0; i<sp->bar->nbins; i++) {
       if (sp->bar->cbins[i][j].count>0)
@@ -531,7 +533,7 @@ void barchart_redraw (splotd *sp, datad *d, ggobid *gg) {
 /* draw overflow bins if necessary */
   if (sp->bar->high_pts_missing) {
     for (j=0; j<sp->bar->ncolors; j++) {
-      gdk_gc_set_foreground (gg->plot_GC, &gg->color_table[j]);
+      gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[j]);
 
       if (sp->bar->col_high_bin[j].count>0) {
         gdk_draw_rectangle  (sp->pixmap0, gg->plot_GC, TRUE,
@@ -542,7 +544,7 @@ void barchart_redraw (splotd *sp, datad *d, ggobid *gg) {
   }
   if (sp->bar->low_pts_missing) {
     for (j=0; j<sp->bar->ncolors; j++) {
-      gdk_gc_set_foreground (gg->plot_GC, &gg->color_table[j]);
+      gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[j]);
 
       if (sp->bar->col_low_bin[j].count>0) {
         gdk_draw_rectangle  (sp->pixmap0, gg->plot_GC, TRUE,
@@ -555,7 +557,7 @@ void barchart_redraw (splotd *sp, datad *d, ggobid *gg) {
 
 
 /* mark empty bins with a small circle */
-  gdk_gc_set_foreground (gg->plot_GC, &gg->accent_color);
+  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
   for (i=0; i<sp->bar->nbins; i++) {
     if (sp->bar->bins[i].count==0) {
       gint radius = sp->bar->bins[i].rect.height/4;
@@ -682,8 +684,10 @@ void barchart_recalc_counts (splotd *sp, datad *d, ggobid *gg) {
     }
     if (rank > 0) {
       sp->bar->low_pts_missing = TRUE;
-      if (sp->bar->low_bin == NULL) sp->bar->low_bin = (bind *) g_malloc (sizeof(bind));
-      if (sp->bar->col_low_bin == NULL) sp->bar->col_low_bin = (bind *) g_malloc (sp->bar->ncolors*sizeof(bind));
+      if (sp->bar->low_bin == NULL)
+        sp->bar->low_bin = (bind *) g_malloc (sizeof(bind));
+      if (sp->bar->col_low_bin == NULL)
+        sp->bar->col_low_bin = (bind *) g_malloc (sp->bar->ncolors*sizeof(bind));
       sp->bar->low_bin->count = rank;
     }
     bin = 0;
@@ -1036,18 +1040,21 @@ barchart_scaling_visual_cues_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg
 
 }
 
-void button_draw_with_shadows (GdkPoint *region, GdkDrawable *drawable, ggobid *gg) {
+void
+button_draw_with_shadows (GdkPoint *region, GdkDrawable *drawable, ggobid *gg) {
+  colorschemed *scheme = gg->activeColorScheme;
+
   gdk_gc_set_foreground (gg->plot_GC, &gg->wvis.gray3);
     gdk_draw_polygon (drawable,gg->plot_GC,TRUE,region,3);
 
 /* dark shadows */
-  gdk_gc_set_foreground (gg->plot_GC, &gg->bg_color);
+  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_bg);
 
   gdk_draw_polygon (drawable,gg->plot_GC,FALSE, region, 3);
   gdk_draw_line (drawable,gg->plot_GC, region[0].x, region[2].y, region[2].x, region[2].y);
 
 /* light shadows */
-  gdk_gc_set_foreground (gg->plot_GC, &gg->accent_color);
+  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
 
   gdk_draw_line (drawable,gg->plot_GC, region[0].x,region[0].y,region[1].x,region[1].y);
   gdk_draw_line (drawable,gg->plot_GC, region[1].x,region[1].y,region[2].x,region[2].y);
@@ -1146,9 +1153,10 @@ void barchart_add_bar_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
   gint i, nbins;
   gchar string[100];
   icoords mousepos = sp->mousepos;
+  colorschemed *scheme = gg->activeColorScheme;
 
   nbins = sp->bar->nbins;
-  gdk_gc_set_foreground (gg->plot_GC, &gg->accent_color);
+  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
 
 
   if (sp->bar->low_pts_missing && sp->bar->bar_hit[0]) {

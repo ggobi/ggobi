@@ -131,5 +131,9 @@
 49871   8/31  linking by categorical variable seems to work.
 52542   10/31 color scales, for one ...
 
+2002
+
+58056   1/15  signal handlers, improvements in tour code, ...
+
 note: There are about 40.8K lines in xgobi,
        subtracting the rpc, xgvis and tour code.

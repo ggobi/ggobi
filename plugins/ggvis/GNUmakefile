@@ -77,8 +77,8 @@ configure: configure.in
 	autoconf
 
 clean:
-	-rm $(OBJS)
+	-rm -f $(OBJS)
 
 distclean: clean
-	-rm $(PKG).so local.config
-	-rm configure config.status config.cache config.log
+	-rm -f $(PKG).so local.config
+	-rm -f configure config.status config.cache config.log

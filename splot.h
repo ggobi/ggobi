@@ -88,13 +88,11 @@ typedef struct {
  struct {gint x, y, z;} spinvars;
 #endif
 
-#ifdef BARCHART_IMPLEMENTED
 /*
  * barcharts and histograms
 */
  barchartd *bar;
 
-#endif
 } splotd;
 
 

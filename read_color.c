@@ -13,9 +13,11 @@
 #include "read_init.h"
 #include "read_xml.h"
 
+/*
 #if USE_XML == 1
 extern int xmlDoValidityCheckingDefaultValue;
 #endif
+*/
 
 colorschemed *process_colorscheme(xmlNodePtr root, xmlDocPtr doc);
 colorscaletype getColorSchemeType(const xmlChar *type);
@@ -77,6 +79,9 @@ process_colorscheme(xmlNodePtr root, xmlDocPtr doc)
   xmlChar *val;
 
   scheme = (colorschemed*) g_malloc(sizeof(colorschemed));
+  scheme->rgb = NULL;
+  scheme->rgb_bg.pixel = -1;
+  scheme->rgb_accent.pixel = -1;
 
   scheme->name = g_strdup((gchar *) xmlGetProp(root, (xmlChar *) "name"));
   scheme->type = getColorSchemeType(xmlGetProp(root, (xmlChar *) "type"));
@@ -257,21 +262,3 @@ getColor(xmlNodePtr node, xmlDocPtr doc, gfloat **original, GdkColor *col)
 }
 
 
-/**
-  Find the color scheme element in the list with the specified
-  name.
- */
-colorschemed *
-findColorSchemeByName(GList *schemes, const gchar *name)
-{
-  colorschemed *s;
-  int i, n;
-
-  n = g_list_length(schemes);
-  for(i = 0; i < n; i++) {
-   s = (colorschemed *)g_list_nth_data(schemes, i);
-   if(strcmp(name, s->name) == 0)
-       return(s);
-  }
-  return(NULL);
-}

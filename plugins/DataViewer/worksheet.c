@@ -45,7 +45,7 @@ gboolean
 addToMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 {
   GtkWidget *entry;
-  extern GtkWidget *GGobi_addToolsMenuItem (const char *label, ggobid *gg);
+  extern GtkWidget *GGobi_addToolsMenuItem (gchar *label, ggobid *gg);
 
   inst->data = NULL;
   inst->info = plugin;

@@ -208,7 +208,6 @@ typedef struct {
 
 extern DisplayOptions DefaultDisplayOptions;
 
-#ifdef BARCHART_IMPLEMENTED
 /* bin struct for bins in Barcharts, histograms, ... */
 typedef struct
 {
@@ -255,9 +254,6 @@ typedef struct
 
  gint *index_to_rank;
 } barchartd;
-
-#endif
-
 
 #define TYPES_H
 

@@ -35,7 +35,6 @@ wvis_init (ggobid  *gg)
   gg->wvis.binning_method = WVIS_EQUAL_WIDTH_BINS;
   gg->wvis.update_method = WVIS_UPDATE_ON_MOUSE_UP;
 
-  gg->wvis.color_table = NULL;
   gg->wvis.scheme = NULL;
   gg->wvis.GC = NULL;
 

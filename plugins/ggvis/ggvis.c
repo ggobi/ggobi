@@ -23,7 +23,7 @@ addToToolsMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
   inst->info = plugin;
   inst->gg = gg;
 
-  entry = GGobi_addToolsMenuItem (lbl, gg);
+  entry = GGobi_addToolsMenuItem ((gchar *)lbl, gg);
   gtk_signal_connect (GTK_OBJECT(entry), "activate",
                       GTK_SIGNAL_FUNC (show_ggvis_window), inst);
   return(true);

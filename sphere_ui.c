@@ -273,15 +273,16 @@ scree_expose_cb (GtkWidget *w, GdkEventConfigure *event, ggobid *gg)
   gint wid = w->allocation.width, hgt = w->allocation.height;
   gint *sphvars, nels;
   gfloat *evals;
+  colorschemed *scheme = gg->activeColorScheme;
 
   CHECK_GG (gg);
 
   /* clear the pixmap */
-  gdk_gc_set_foreground (gg->plot_GC, &gg->bg_color);
+  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_bg);
   gdk_draw_rectangle (gg->sphere_ui.scree_pixmap, gg->plot_GC,
                       true, 0, 0, wid, hgt);
 
-  gdk_gc_set_foreground (gg->plot_GC, &gg->accent_color);
+  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
   gdk_draw_line (gg->sphere_ui.scree_pixmap, gg->plot_GC,
     margin, hgt - margin,
     wid - margin, hgt - margin);

@@ -495,7 +495,7 @@ GGobi_addDisplayMenuItem (const gchar *label, ggobid *gg)
 }
 
 GtkWidget *
-GGobi_addToolsMenuItem (const gchar *label, ggobid *gg)
+GGobi_addToolsMenuItem (gchar *lbl, ggobid *gg)
 {
   GtkWidget *entry = NULL, *tools_menu = NULL;
   GtkItemFactory *factory;
@@ -503,14 +503,18 @@ GGobi_addToolsMenuItem (const gchar *label, ggobid *gg)
   factory = gtk_item_factory_from_path ("<main>");
   tools_menu = gtk_item_factory_get_widget (factory, "<main>/Tools");
 
-  if (tools_menu != NULL && label != (gchar *)NULL && strlen(label) > 0) {
+  if (tools_menu != NULL) {
+    /*-- purify goes crazy here, and I have no idea why -- dfs --*/
+    if (lbl != (gchar *)NULL) {
+      if (strlen(lbl) > 0) {
+        entry = gtk_menu_item_new_with_label (lbl);
+        gtk_widget_show (entry);
 
-    entry = gtk_menu_item_new_with_label (label);
-    gtk_widget_show (entry);
-
-    /* Add a separator */
-    CreateMenuItem (tools_menu, NULL, "", "", NULL, NULL, NULL, NULL, gg);
-    gtk_menu_append (GTK_MENU (tools_menu), entry);
+        /* Add a separator */
+        CreateMenuItem (tools_menu, NULL, "", "", NULL, NULL, NULL, NULL, gg);
+        gtk_menu_append (GTK_MENU (tools_menu), entry);
+      }
+    }
   }
 
   return (entry);

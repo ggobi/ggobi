@@ -368,6 +368,7 @@ brush_draw_brush (splotd *sp, GdkDrawable *drawable, datad *d, ggobid *gg) {
   cpaneld *cpanel = &display->cpanel;
   gboolean point_painting_p = (cpanel->br_point_targets != BR_OFF);
   gboolean edge_painting_p = (cpanel->br_edge_targets != BR_OFF);
+  colorschemed *scheme = gg->activeColorScheme;
 
   brush_coords *brush_pos = &sp->brush_pos;
   gint x1 = MIN (brush_pos->x1, brush_pos->x2);
@@ -376,15 +377,14 @@ brush_draw_brush (splotd *sp, GdkDrawable *drawable, datad *d, ggobid *gg) {
   gint y2 = MAX (brush_pos->y1, brush_pos->y2);
 
   if (!gg->mono_p) {
-    if ((gg->color_table[gg->color_id].red != gg->bg_color.red) ||
-        (gg->color_table[gg->color_id].blue != gg->bg_color.blue) ||
-        (gg->color_table[gg->color_id].green != gg->bg_color.green))
+    if ((scheme->rgb[gg->color_id].red != scheme->rgb_bg.red) ||
+        (scheme->rgb[gg->color_id].blue != scheme->rgb_bg.blue) ||
+        (scheme->rgb[gg->color_id].green != scheme->rgb_bg.green))
     {
-      gdk_gc_set_foreground (gg->plot_GC,
-                             &gg->color_table[gg->color_id]);
+      gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[gg->color_id]);
     } else {
       gdk_gc_set_foreground (gg->plot_GC,
-                             &gg->accent_color);
+                             &scheme->rgb_accent);
     }
   }
 

@@ -74,10 +74,8 @@ typedef struct {
  gint tsplot_selection_mode;
  gint tsplot_arrangement;  /* arrange plots in a row or column*/
 
-#ifdef BARCHART_IMPLEMENTED
  /*-- barchart --*/
  gint barchart_display_mode;
-#endif
 
 
  /*-- scatterplot matrix --*/

@@ -286,16 +286,17 @@ void t2d_optimz(gint optimz_on, gboolean *nt, gint *bm, displayd *dsp) {
 void t2d_clear_pppixmap(ggobid *gg)
 {
   displayd *dsp = gg->current_display;
+  colorschemed *scheme = gg->activeColorScheme;
   gint margin=10;
   gint wid = dsp->t2d_ppda->allocation.width, 
     hgt = dsp->t2d_ppda->allocation.height;
 
   /* clear the pixmap */
-  gdk_gc_set_foreground (gg->plot_GC, &gg->bg_color);
+  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_bg);
   gdk_draw_rectangle (dsp->t2d_pp_pixmap, gg->plot_GC,
                       true, 0, 0, wid, hgt);
 
-  gdk_gc_set_foreground (gg->plot_GC, &gg->accent_color);
+  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
   gdk_draw_line (dsp->t2d_pp_pixmap, gg->plot_GC,
     margin, hgt - margin,
     wid - margin, hgt - margin);
@@ -351,6 +352,7 @@ void t2d_ppdraw_all(gint wid, gint hgt, gint margin, ggobid *gg)
 void t2d_ppdraw(gfloat pp_indx_val, ggobid *gg)
 {
   displayd *dsp = gg->current_display;
+  colorschemed *scheme = gg->activeColorScheme;
   gint margin=10;
   gint wid = dsp->t2d_ppda->allocation.width, 
     hgt = dsp->t2d_ppda->allocation.height;
@@ -376,7 +378,7 @@ void t2d_ppdraw(gfloat pp_indx_val, ggobid *gg)
     dsp->t2d_indx_min, dsp->t2d_ppindx_mat[dsp->t2d_ppindx_count], dsp->t2d_indx_max);
   gtk_label_set_text(GTK_LABEL(dsp->t2d_pplabel),label);
 
-  gdk_gc_set_foreground (gg->plot_GC, &gg->accent_color);
+  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
   if (dsp->t2d_ppindx_count == 0) 
   {
     dsp->t2d_ppindx_count++;

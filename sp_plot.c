@@ -16,6 +16,7 @@
 #include <gtk/gtk.h>
 #include "vars.h"
 #include "externs.h"
+#include "colorscheme.h"
 
 static void splot_draw_border (splotd *, GdkDrawable *, ggobid *);
 static void edges_draw (splotd *, GdkDrawable *, ggobid *gg);
@@ -93,10 +94,6 @@ splot_plot_case (gint m, datad *d, splotd *sp, displayd *display, ggobid *gg)
   draw_case = true;
   if (d->hidden_now.els[m]) {
     draw_case = false;
-/*
- *} else if (d->color_now.els[m] >= gg->ncolors) {
- *  draw_case = false;
-*/
 
   /*-- can prevent drawing of missings for parcoords or scatmat plots --*/
   } else if (!display->options.missings_show_p && d->nmissing > 0) {
@@ -184,6 +181,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
   datad *d = display->d;
   gboolean draw_case;
   gint dtype = display->displaytype;
+  colorschemed *scheme = gg->activeColorScheme;
 
   /*
    * since parcoords and tsplot each have their own weird way
@@ -208,7 +206,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
   }
 
   /* clear the pixmap */
-  gdk_gc_set_foreground (gg->plot_GC, &gg->bg_color);
+  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_bg);
   gdk_draw_rectangle (sp->pixmap0, gg->plot_GC,
                       TRUE, 0, 0,
                       da->allocation.width,
@@ -235,7 +233,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
     */
     for (k=0; k<ncolors_used; k++) {
       current_color = colors_used[k];
-      gdk_gc_set_foreground (gg->plot_GC, &gg->color_table[current_color]);
+      gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[current_color]);
 
 #ifdef WIN32
       win32_draw_to_pixmap_unbinned (current_color, sp, gg);
@@ -246,6 +244,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
       }
       else {
 #endif
+
       for (i=0; i<d->nrows_in_plot; i++) {
         m = d->rows_in_plot[i];
         draw_case = splot_plot_case (m, d, sp, display, gg);
@@ -312,6 +311,7 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
   cpaneld *cpanel = &display->cpanel;
   gint proj = cpanel->projection;
   datad *d = display->d;
+  colorschemed *scheme = gg->activeColorScheme;
   icoords *bin0 = &gg->plot.bin0;
   icoords *bin1 = &gg->plot.bin1;
   icoords *loc0 = &gg->plot.loc0;
@@ -368,7 +368,7 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
   loc_clear1.y = (bin1->y == d->brush.nbins-1) ? sp->max.y :
                                                loc1->y - BRUSH_MARGIN;
 
-  gdk_gc_set_foreground (gg->plot_GC, &gg->bg_color);
+  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_bg);
   gdk_draw_rectangle (sp->pixmap0, gg->plot_GC,
                       true,  /* fill */
                       loc_clear0.x, loc_clear0.y,
@@ -386,7 +386,7 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
       */
       for (k=0; k<ncolors_used; k++) {
         current_color = colors_used[k];
-        gdk_gc_set_foreground (gg->plot_GC, &gg->color_table[current_color]);
+        gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[current_color]);
 
 #ifdef WIN32
         win32_draw_to_pixmap_binned (bin0, bin1, current_color, sp, gg);
@@ -448,6 +448,7 @@ splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
   gint dtype = display->displaytype;
   datad *d = display->d;
   vartabled *vt, *vtx, *vty;
+  colorschemed *scheme = gg->activeColorScheme;
 
   gboolean proceed = (cpanel->projection == XYPLOT ||
                       cpanel->projection == P1PLOT ||
@@ -460,7 +461,7 @@ splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
   if (!proceed)
     return;
 
-  gdk_gc_set_foreground (gg->plot_GC, &gg->accent_color);
+  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
 
   if (dtype == scatterplot || dtype == scatmat) {
     if ((dtype == scatterplot && cpanel->projection == XYPLOT) ||
@@ -552,13 +553,14 @@ splot_add_whisker_cues (gint k, splotd *sp, GdkDrawable *drawable, ggobid *gg)
   gint n;
   displayd *display = sp->displayptr;
   datad *d = display->d;
+  colorschemed *scheme = gg->activeColorScheme;
 
   if (k < 0 || k >= d->nrows) return;
 
   if (display->options.whiskers_show_p) {
     gdk_gc_set_line_attributes (gg->plot_GC,
       3, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
-    gdk_gc_set_foreground (gg->plot_GC, &gg->color_table[d->color_now.els[k]]);
+    gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[ d->color_now.els[k] ]);
 
     n = 2*k;
     gdk_draw_line (drawable, gg->plot_GC,
@@ -583,6 +585,7 @@ splot_add_diamond_cue (gint k, splotd *sp, GdkDrawable *drawable, ggobid *gg)
   datad *d = sp->displayptr->d;
   gint diamond_dim = DIAMOND_DIM;
   GdkPoint diamond[5];
+  colorschemed *scheme = gg->activeColorScheme;
 
   if (k < 0 || k >= d->nrows) return;
 
@@ -595,7 +598,7 @@ splot_add_diamond_cue (gint k, splotd *sp, GdkDrawable *drawable, ggobid *gg)
   diamond[3].x = sp->screen[k].x;
   diamond[3].y = sp->screen[k].y + diamond_dim;
 
-  gdk_gc_set_foreground (gg->plot_GC, &gg->accent_color);
+  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
   gdk_draw_lines (drawable, gg->plot_GC, diamond, 5);
 }
 
@@ -761,6 +764,7 @@ splot_add_identify_cues (splotd *sp, GdkDrawable *drawable,
   gint k, gboolean nearest, ggobid *gg)
 {
   displayd *dsp = (displayd *) sp->displayptr;
+  colorschemed *scheme = gg->activeColorScheme;
 
   if (nearest) {
     if (dsp->displaytype == parcoords) {
@@ -770,7 +774,7 @@ splot_add_identify_cues (splotd *sp, GdkDrawable *drawable,
     }
   }
 
-  gdk_gc_set_foreground (gg->plot_GC, &gg->accent_color);
+  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
   splot_add_record_label (nearest, k, sp, drawable, gg);
 }
 
@@ -877,6 +881,7 @@ edges_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg)
   gint nels = d->rowid.idv.nels;
   gint lwidth, ltype;
   GlyphType gtype;
+  colorschemed *scheme = gg->activeColorScheme;
 
   if (e == (datad *) NULL || e->edge.n == 0) {
 /**/return;
@@ -894,7 +899,7 @@ edges_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg)
 
     gint symbols_used[NGLYPHSIZES][NEDGETYPES][MAXNCOLORS];
     gint nl = 0;
-    gint ncolors = MIN(MAXNCOLORS, gg->ncolors);
+    gint ncolors = MIN(MAXNCOLORS, scheme->n);
     gint k_prev = -1, n_prev = -1, p_prev = -1;
 
     endpoints = e->edge.endpoints;
@@ -1030,7 +1035,7 @@ edges_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg)
             }  /*-- end of looping through edges --*/
 
             if (p_prev == -1 || p_prev != p) {  /* color */
-              gdk_gc_set_foreground (gg->plot_GC, &gg->color_table[p]);
+              gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[p]);
             }
 
             lwidth = (k<3) ? 0 : (k-2)*2;
@@ -1092,6 +1097,7 @@ splot_nearest_edge_highlight (splotd *sp, gint k, gboolean nearest, ggobid *gg) 
   gchar *lbl;
   gint xp, yp;
   gboolean draw_edge;
+  colorschemed *scheme = gg->activeColorScheme;
 
   if (k >= e->edge.n)
     return;
@@ -1111,7 +1117,8 @@ splot_nearest_edge_highlight (splotd *sp, gint k, gboolean nearest, ggobid *gg) 
 
     gdk_gc_set_line_attributes (gg->plot_GC,
       3, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
-    gdk_gc_set_foreground (gg->plot_GC, &gg->color_table[e->color_now.els[k]]);
+    gdk_gc_set_foreground (gg->plot_GC,
+      &scheme->rgb[ e->color_now.els[k] ]);
 
     gdk_draw_line (sp->pixmap1, gg->plot_GC,
       sp->screen[a].x, sp->screen[a].y,
@@ -1119,7 +1126,7 @@ splot_nearest_edge_highlight (splotd *sp, gint k, gboolean nearest, ggobid *gg) 
 
     gdk_gc_set_line_attributes (gg->plot_GC,
       0, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
-    gdk_gc_set_foreground (gg->plot_GC, &gg->accent_color);
+    gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
 
     if (nearest) {
       /*-- add the label last so it will be in front of other markings --*/
@@ -1151,8 +1158,10 @@ splot_nearest_edge_highlight (splotd *sp, gint k, gboolean nearest, ggobid *gg) 
 static void
 splot_draw_border (splotd *sp, GdkDrawable *drawable, ggobid *gg)
 {
+  colorschemed *scheme = gg->activeColorScheme;
+
   if (sp != NULL && sp->da != NULL && sp->da->window != NULL) {
-    gdk_gc_set_foreground (gg->plot_GC, &gg->accent_color);
+    gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
     gdk_gc_set_line_attributes (gg->plot_GC,
       3, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
 
@@ -1288,12 +1297,13 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
   gchar lbl[3];
   gint axindent = 20;
   vartabled *vt;
+  colorschemed *scheme = gg->activeColorScheme;
 
   if (!dsp->options.axes_show_p)
     return;
   
   if (sp != NULL && sp->da != NULL && sp->da->window != NULL) {
-    gdk_gc_set_foreground (gg->plot_GC, &gg->accent_color);
+    gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
     switch (proj) {
       case TOUR1D:
         /*-- use string height to place the labels --*/

@@ -28,7 +28,7 @@ main (gint argc, gchar *argv[])
 
   gg->displays = NULL;
   globals_init (gg); /*-- variables that don't depend on the data --*/
-  color_table_init (gg);
+  tour_manip_colors_init (gg);  /*-- move to tour code --*/
 
   fileset_read (fileName, gg);
 

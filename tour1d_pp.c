@@ -631,16 +631,17 @@ void t1d_optimz(gint optimz_on, gboolean *nt, gint *bm) {
 void t1d_clear_pppixmap(ggobid *gg)
 {
   displayd *dsp = gg->current_display;
+  colorschemed *scheme = gg->activeColorScheme;
   gint margin=10;
   gint wid = dsp->t1d_ppda->allocation.width, 
     hgt = dsp->t1d_ppda->allocation.height;
 
   /* clear the pixmap */
-  gdk_gc_set_foreground (gg->plot_GC, &gg->bg_color);
+  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_bg);
   gdk_draw_rectangle (dsp->t1d_pp_pixmap, gg->plot_GC,
                       true, 0, 0, wid, hgt);
 
-  gdk_gc_set_foreground (gg->plot_GC, &gg->accent_color);
+  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
   gdk_draw_line (dsp->t1d_pp_pixmap, gg->plot_GC,
     margin, hgt - margin,
     wid - margin, hgt - margin);
@@ -697,6 +698,7 @@ void t1d_ppdraw_all(gint wid, gint hgt, gint margin, ggobid *gg)
 void t1d_ppdraw(gfloat pp_indx_val, ggobid *gg)
 {
   displayd *dsp = gg->current_display;
+  colorschemed *scheme = gg->activeColorScheme;
   gint margin=10;
   gint wid = dsp->t1d_ppda->allocation.width, 
     hgt = dsp->t1d_ppda->allocation.height;
@@ -723,7 +725,7 @@ void t1d_ppdraw(gfloat pp_indx_val, ggobid *gg)
     dsp->t1d_indx_max);
   gtk_label_set_text(GTK_LABEL(dsp->t1d_pplabel),label);
 
-  gdk_gc_set_foreground (gg->plot_GC, &gg->accent_color);
+  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
   if (dsp->t1d_ppindx_count == 0) 
   {
     dsp->t1d_ppindx_count++;

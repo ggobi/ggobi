@@ -178,17 +178,26 @@ ggobi: $(OB) $(EXTRA_OB)
 	$(LD) $(OB) $(EXTRA_OB) $(LDFLAGS) -o ggobi $(XML_LIBS) $(MYSQL_LIBS)  $(EXTRA_LIBS) `gtk-config --cflags --libs`  $(DL_RESOLVE_PATH)
 
 
-pure: ggobi.o $(OB)
-	purify -cache-dir=/tmp  -always-use-cache-dir=yes \
+pure: ggobi.o $(OB) $(EXTRA_OB)
+	purify.new -cache-dir=/tmp  -always-use-cache-dir=yes \
 	-user-path=/usr/dfs/ggobi/ggobi:/usr/dfs/ggobi/ggobi/plugins/ggvis \
-	$(LD) $(OB) $(LDFLAGS) -o ggobi \
+	$(LD) $(OB) $(EXTRA_OB) $(LDFLAGS) -o ggobi \
 	/usr/dfs/ggobi/ggobi/plugins/ggvis/ggvis.o \
 	/usr/dfs/ggobi/ggobi/plugins/ggvis/cmds.o \
 	/usr/dfs/ggobi/ggobi/plugins/ggvis/init.o \
 	/usr/dfs/ggobi/ggobi/plugins/ggvis/radial.o \
 	/usr/dfs/ggobi/ggobi/plugins/ggvis/spring.o \
-	$(XML_LIBS) $(MYSQL_LIBS) `gtk-config --cflags --libs`  $(DL_RESOLVE_PATH)
+	/usr/dfs/cc/lib/libxml2.so \
+	$(MYSQL_LIBS) \
+	/usr/dfs/cc/lib/libgtk.so \
+	/usr/dfs/cc/lib/libgdk.so \
+	/usr/dfs/cc/lib/libgmodule.so \
+	/usr/dfs/cc/lib/libglib.so \
+	-lXext -lX11 -lm \
+	$(DL_RESOLVE_PATH)
 
+	#$(XML_LIBS) \
+	#`gtk-config --cflags --libs` \
 
 %.sched: %.c
 	$(CC) -dS -c $(CFLAGS) -I. `gtk-config --cflags` $*.c

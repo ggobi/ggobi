@@ -15,6 +15,8 @@ extern "C" {
 #endif
 
 /* sort +1 */
+void colorscheme_init (colorschemed *scheme);
+void symbol_window_redraw (ggobid *);
 void gt_basis (array_d, gint, vector_i, gint, gint);
 void splot_cursor_set (gint jcursor, splotd *sp);
 gchar *datasetName (datad *d, ggobid *gg);
@@ -27,6 +29,7 @@ GtkWidget * widget_find_by_name (GtkWidget *, gchar *);
 displayd *ValidateDisplayRef(displayd *d, ggobid *gg, gboolean fatal);
 displayd *createDisplayFromDescription (ggobid *, GGobiDisplayDescription *desc);
 GtkItemFactory *get_main_menu (GtkItemFactoryEntry[], gint, GtkAccelGroup *, GtkWidget  *, GtkWidget **, gpointer);
+GtkWidget *GGobi_addToolsMenuItem (gchar *label, ggobid *gg);
 vartabled *vartable_element_get (gint j, datad *d);
 vartabled *vartable_element_get_by_name (gchar *collab, datad *d);
 gint vartable_index_get_by_name (gchar *collab, datad *d);
@@ -75,23 +78,6 @@ void arrays_free (array_s *, gint, gint);
 void arrays_init_null (array_s *);
 void arrays_zero (array_s *);
 void assign_points_to_bins (datad *, ggobid *);
-#ifdef BARCHART_IMPLEMENTED
-void barchart_add_bar_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg);
-void barchart_clean_init (splotd *sp);
-void barchart_cpanel_init (cpaneld *, ggobid *);
-void barchart_free_structure (splotd *sp);
-gboolean barchart_identify_bars (icoords mousepos, splotd *sp, datad *d, ggobid *gg);
-void barchart_init_vectors(splotd *sp);
-void barchart_mode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func, ggobid *gg, gboolean useIds);
-displayd *barchart_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg);
-void barchart_recalc_group_dimensions (splotd *sp, ggobid *gg);
-void barchart_recalc_counts (splotd *sp, datad *d, ggobid *gg);
-void barchart_recalc_dimensions (splotd *sp, datad *d, ggobid *gg);
-void barchart_redraw (splotd *sp, datad *d, ggobid *gg);
-
-void cpanel_barchart_set (cpaneld *cpanel, ggobid *gg);
-void cpanel_barchart_make (ggobid *gg);
-#endif
 void br_color_ids_alloc (datad *, ggobid *);
 void br_color_ids_init (datad *, ggobid *);
 void br_edge_color_alloc (ggobid *);
@@ -122,7 +108,7 @@ void cluster_window_open (ggobid *);
 void clusters_set (datad *, ggobid *);
 void collab_tform_update (gint j, datad *d, ggobid *gg);
 gboolean collabels_read (InputDescription *desc, gboolean, datad *, ggobid *);
-void color_table_init (ggobid *);
+void tour_manip_colors_init (ggobid *);
 gchar* computeTitle (gboolean, displayd *, ggobid *);
 void copy_mat(gdouble **, gdouble **, gint, gint);
 void cpanel_brush_init (cpaneld *, ggobid *);
@@ -230,6 +216,7 @@ void hidden_init (datad *, ggobid *);
 gboolean hidden_read (InputDescription *desc, gboolean, datad *, ggobid *);
 void identify_event_handlers_toggle (splotd *, gboolean);
 gboolean impute_fixed (gint, gint nvars, gint *vars, datad *, ggobid *);
+colorschemed * default_scheme_init ();
 void impute_random (datad *, gint nvars, gint *vars, ggobid *);
 void impute_window_open (ggobid *);
 void init_plot_GC (GdkWindow *, ggobid *);
@@ -505,6 +492,23 @@ extern gboolean tsplot_varsel (cpaneld *, splotd *, gint, gint, gint *, ggobid *
 gboolean ggobi_close (ggobid *gg, GdkEvent *ev, GtkObject *w);
 gint ggobi_remove_by_index (ggobid *gg, gint which);
 gint ggobi_remove (ggobid *);
+
+#ifdef BARCHART_IMPLEMENTED
+void barchart_add_bar_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg);
+void barchart_clean_init (splotd *sp);
+void barchart_cpanel_init (cpaneld *, ggobid *);
+void barchart_free_structure (splotd *sp);
+gboolean barchart_identify_bars (icoords mousepos, splotd *sp, datad *d, ggobid *gg);
+void barchart_init_vectors(splotd *sp);
+void barchart_mode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func, ggobid *gg, gboolean useIds);
+displayd *barchart_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg);
+void barchart_recalc_group_dimensions (splotd *sp, ggobid *gg);
+void barchart_recalc_counts (splotd *sp, datad *d, ggobid *gg);
+void barchart_recalc_dimensions (splotd *sp, datad *d, ggobid *gg);
+void barchart_redraw (splotd *sp, datad *d, ggobid *gg);
+void cpanel_barchart_set (cpaneld *cpanel, ggobid *gg);
+void cpanel_barchart_make (ggobid *gg);
+#endif
 
 
 void showInputDescription(InputDescription *desc, ggobid *gg);

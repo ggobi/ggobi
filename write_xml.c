@@ -427,14 +427,14 @@ updateXmlWriteInfo(datad *d, ggobid *gg, XmlWriteInfo *info)
   int i, n, numGlyphSizes;
   gint *colorCounts, *glyphTypeCounts, *glyphSizeCounts, count;
   gchar *str;
+  gint ncolors = gg->activeColorScheme->n;
 
-  colorCounts = g_malloc(sizeof(gint) * gg->ncolors);
+  colorCounts = g_malloc(sizeof(gint) * ncolors);
   glyphTypeCounts = g_malloc(sizeof(gint) * UNKNOWN_GLYPH);
-  /*numGlyphSizes = 7;*/
-  numGlyphSizes = 8;  /*-- NGLYPHSIZES --*/
+  numGlyphSizes = NGLYPHSIZES;
   glyphSizeCounts = g_malloc(sizeof(gint) * numGlyphSizes);
 
-  memset(colorCounts, '\0', sizeof(gint) * gg->ncolors);
+  memset(colorCounts, '\0', sizeof(gint) * ncolors);
   memset(glyphTypeCounts, '\0', sizeof(gint) * UNKNOWN_GLYPH);
   memset(glyphSizeCounts, '\0', sizeof(gint) * numGlyphSizes);
 
@@ -446,7 +446,7 @@ updateXmlWriteInfo(datad *d, ggobid *gg, XmlWriteInfo *info)
   }
 
   count = -1;
-  for(i = 0 ; i < gg->ncolors; i++) {
+  for(i = 0 ; i < ncolors; i++) {
     if(colorCounts[i] > count) {
       info->defaultColor = i;
       count= colorCounts[i];
@@ -469,12 +469,16 @@ updateXmlWriteInfo(datad *d, ggobid *gg, XmlWriteInfo *info)
     }
   }
 
+/*
   if(gg->colorNames && (str = gg->colorNames[info->defaultColor]) && str[0])
     info->defaultColorName = g_strdup(str);
   else {
+*/
     info->defaultColorName = str = g_malloc(5 * sizeof(char));
     sprintf(str, "%d", info->defaultColor);
+/*
   }
+*/
 
   info->defaultGlyphSizeName = str = g_malloc(5 * sizeof(char));
   sprintf(str, "%d", info->defaultGlyphSize);

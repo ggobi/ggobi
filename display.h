@@ -74,8 +74,8 @@ struct _displayd {
 
 /*
  * Tour display
- */
   gint tour_idled;
+*/
 
 /*
  * Manipulation Vars

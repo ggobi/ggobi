@@ -63,6 +63,7 @@ void
 clusters_set (datad *d, ggobid *gg) {
   gint i, j, k, m;
   gint n, nclusters;
+  colorschemed *scheme = gg->activeColorScheme;
 
   nclusters = symbol_table_populate (d);
 
@@ -77,7 +78,7 @@ clusters_set (datad *d, ggobid *gg) {
   n = 0;
   for (j=0; j<NGLYPHTYPES; j++) {
     for (k=0; k<NGLYPHSIZES; k++) {
-      for (m=0; m<gg->ncolors; m++) {
+      for (m=0; m<scheme->n; m++) {
         if (d->symbol_table[j][k][m].n > 0) {
           d->clusv[n].glyphtype = j;  g_assert (j>=0 && j<NGLYPHTYPES);
           d->clusv[n].glyphsize = k;  g_assert (k>=0 && k<NGLYPHSIZES);

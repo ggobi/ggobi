@@ -97,7 +97,6 @@ typedef struct {
 /*                          functions                                   */
 /*----------------------------------------------------------------------*/
 
-GtkWidget *GGobi_addToolsMenuItem (const gchar *label, ggobid *gg);
 void ggvis_init (ggvisd *);
 void initLayout (ggobid *gg, ggvisd *ggv, datad *d, datad *e);
 void setParentNodes (ggvisd *ggv, datad *d);

@@ -42,14 +42,14 @@ Reading in new data
 In progress, needing design discussions:
   Deleting variables: how should plots behave? (disabled for now)
     [If plotted, give a warning; otherwise, proceed]
-  Should the variable stats table open by default when other tools open?
-
-various stuff not yet implemented:
-  Options on options menu
-  1d cycling 
-
 Graphs
   line editing  <- depends on the ability to add a record
+
+Bugs:
+  moving jittered points is very weird.
+
+various stuff not yet implemented:
+  1d cycling 
 
 API code needed:
   sticky labels
@@ -69,10 +69,6 @@ I/O -- the biggest part is now in place.  extend
 Variable manipulation table
   If a variable is categorical, show the mapping between its
     numerical values and its level names.  Another popup?
-
-From John Plummer: 
-  Let any variable be the label used in identification -- ?
-    (dfs)This makes sense for categorical variables for sure ...
 
 saving plots as .svg files
   work out how to do nested transformations for printing parcoords
@@ -105,7 +101,7 @@ Tour (dfs):
     current tour projection.  (Clarification:  from what data
     do I construct the new variable(s)?  How many are there?)
 
-when brushing or identifying in parcoords, use leave/enter events to
+When brushing or identifying in parcoords, use leave/enter events to
   change the current_splot?
   
 Scaling:
@@ -262,3 +258,6 @@ Food for thought:
 ! It's no longer possible to read an ascii file that doesn't
 !   have the .dat suffix -- I regard this as a bug.
 
+! From John Plummer: 
+!   Let any variable be the label used in identification -- ?
+!     (dfs)This makes sense for categorical variables for sure ...

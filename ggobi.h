@@ -155,11 +155,6 @@ struct _ggobid {
 /*                         color                                      */
 /*--------------------------------------------------------------------*/
 
- gint ncolors;
- gchar **colorNames;
- GdkColor *color_table;      /* brushing colors */
- GdkColor bg_color;          /* background color */
- GdkColor accent_color;      /* color for axes and labels */
  GdkColor vcirc_freeze_color, vcirc_manip_color;  /* for variable circles */
  gshort color_id, color_0;   /* 0:ncolors-1 */
  gboolean mono_p;
@@ -246,7 +241,6 @@ struct _ggobid {
    GtkWidget *mode_menu;
  } tsplot;
 
-#ifdef BARCHART_IMPLEMENTED
 /*----------------------- barchart------------------------------------*/
 
  struct _BARCHART {
@@ -254,7 +248,6 @@ struct _ggobid {
    GtkWidget *arrangement_box;
    GtkWidget *mode_menu;
  } barchart;
-#endif
 
 /*------------------------ brushing ----------------------------------*/
 
@@ -336,8 +329,11 @@ struct _ggobid {
    GdkColor gray1, gray2, gray3;
 
    colorschemed *scheme;  /*-- current color scheme --*/
+   
+/*
    gint ncolors;    
    GdkColor *color_table, bg_color, accent_color;
+*/
    GdkGC *GC;
 
    gfloat *pct;

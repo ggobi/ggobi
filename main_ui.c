@@ -639,10 +639,10 @@ static GtkItemFactoryEntry menu_items[] = {
 void
 quit_ggobi(ggobid *gg, gint action, GtkWidget *w)
 {
+#ifdef SUPPORT_PLUGINS
   extern void closePlugins(ggobid *gg);
   gint n, i;
   ggobid *el;
-#ifdef SUPPORT_PLUGINS
   n = GGobi_getNumGGobis();
   for(i = 0; i < n ; i++) {
     el = GGobi_ggobi_get(i);
@@ -845,8 +845,8 @@ create_ggobi(InputDescription *desc)
 
      /*-- some initializations --*/
   gg->displays = NULL;
-  globals_init (gg); /*-- variables that don't depend on the data --*/
-  color_table_init (gg);
+  globals_init (gg);      /*-- variables that don't depend on the data --*/
+  tour_manip_colors_init (gg); /*-- move to the tour code --*/
   make_ui (gg);
   gg->input = desc;
 

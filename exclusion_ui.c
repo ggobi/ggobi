@@ -58,16 +58,17 @@ cluster_symbol_show (GtkWidget *w, GdkEventExpose *event, gpointer cbd)
   icoords pos;
   glyphd g;
   datad *d = datad_get_from_notebook (gg->cluster_ui.notebook, gg);
+  colorschemed *scheme = gg->activeColorScheme;
 
   /*-- fill in the background color --*/
-  gdk_gc_set_foreground (gg->plot_GC, &gg->bg_color);
+  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_bg);
   gdk_draw_rectangle (w->window, gg->plot_GC,
                       true, 0, 0,
                       w->allocation.width, w->allocation.height);
 
   /*-- draw the appropriate symbol in the appropriate color --*/
   gdk_gc_set_foreground (gg->plot_GC,
-                        &gg->color_table[d->clusv[k].color]);
+                        &scheme->rgb[d->clusv[k].color]);
   g.type = d->clusv[k].glyphtype;
   g.size = d->clusv[k].glyphsize;
 

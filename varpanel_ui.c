@@ -463,12 +463,14 @@ varpanel_make (GtkWidget *parent, ggobid *gg) {
     GTK_POS_TOP);
   gtk_signal_connect (GTK_OBJECT (gg->varpanel_ui.notebook), "switch-page",
     GTK_SIGNAL_FUNC (varpanel_switch_page_cb), gg);
-#ifdef DATAD_ADDED_SIGNAL_IMPLEMENTED
+
 /*-- listen for datad_added events on main_window --*/
+#ifdef DATAD_ADDED_SIGNAL_IMPLEMENTED
   gtk_signal_connect_object (GTK_OBJECT (gg->main_window),
     "datad_added", GTK_SIGNAL_FUNC (datad_added_cb),
      GTK_OBJECT (gg->varpanel_ui.notebook));
 #endif
+
   gtk_box_pack_start (GTK_BOX (parent), gg->varpanel_ui.notebook,
     true, true, 2);
 

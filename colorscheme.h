@@ -17,7 +17,7 @@ typedef struct {
   gint n;               /*-- n <= MAXNCOLORS --*/
   gfloat **data;        /*-- the data in the colortable, in its
                              original system and dimensions --*/
-  GdkColor *rgb;         /*-- the data converted to rgb, nx3 --*/
+  GdkColor *rgb;         /*-- the data converted to rgb, of length n --*/
   GArray *colorNames;   /*-- in case we have them --*/
 
   gfloat *bg;           /*-- high-contrast background color, rgb --*/

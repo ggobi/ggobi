@@ -23,7 +23,9 @@
 #include "externs.h"
 #include "display.h"
 
+#ifdef SUPPORT_PLUGINS
 #include "plugin.h"
+#endif
 
 extern const gchar *const GlyphNames[];
 
@@ -612,6 +614,11 @@ GGOBI(setCaseGlyphs)(gint *ids, gint n, gint type, gint size,
 void 
 GGOBI(setCaseColor)(gint pt, gint colorIndex, datad *d, ggobid *gg)
 {
+  colorschemed *scheme = gg->activeColorScheme;
+
+  /*-- temporary fix --*/
+  if (colorIndex < 0 || colorIndex > scheme->n-1)
+    colorIndex = 0;
   d->color.els[pt] = d->color_now.els[pt] = colorIndex;
 }
 
@@ -835,14 +842,14 @@ GGOBI(getNumGGobis)()
  return (num_ggobis);
 }
 
-
+/* This needs to use colorschemes if we want to use it */
 gboolean
 GGOBI(setColorMap)(double *vals, int nr, ggobid *gg)
 {
+/*
  gint i;
 
-
- gg->color_table = (GdkColor*)
+ gg->color_table = (GdkColor*)   --color_table no longer exists--
    g_realloc (gg->color_table, sizeof(GdkColor) * nr);
  gg->ncolors = nr;
 
@@ -853,13 +860,17 @@ GGOBI(setColorMap)(double *vals, int nr, ggobid *gg)
  }
 
  return(GGOBI(registerColorMap)(gg));
+*/
+  return false;
 }
 
 
 
+/* This needs to use colorschemes if we want to use it */
 gboolean
 GGOBI(registerColorMap)(ggobid *gg)
 {
+/*
   gboolean *success;
   GdkColormap *cmap = gdk_colormap_get_system ();
 
@@ -870,6 +881,8 @@ GGOBI(registerColorMap)(ggobid *gg)
   g_free(success);
 
  return(true);
+*/
+  return false;
 }
 
 
@@ -885,7 +898,8 @@ gboolean
 GGOBI(close)(ggobid *gg, gboolean closeWindow)
 {
   gboolean val = true;
-g_printerr ("close_pending %d  gg %d\n", gg->close_pending, (gint)gg);
+/* this is printing out as something in the hundreds; I don't get it -- dfs */
+g_printerr ("close_pending %d \n", gg->close_pending);
   if (gg->close_pending)
     return (false);
 
@@ -1064,7 +1078,7 @@ gint
 GGOBI(setBrushColor)(gint cid, ggobid *gg)
 {
   gint old = gg->color_id;
-  if(cid > -1 && cid < gg->ncolors)
+  if(cid > -1 && cid < gg->activeColorScheme->n)
     gg->color_id = cid;
 
   return(old);
@@ -1079,8 +1093,9 @@ GGOBI(getBrushColor)(ggobid *gg)
 const gchar *const 
 GGOBI(getColorName)(gint cid, ggobid *gg, gboolean inDefault)
 {
-  if(gg->colorNames && cid > -1 && cid < gg->ncolors) {
-    return(gg->colorNames[cid]);
+  if(cid >= 0 && cid < gg->activeColorScheme->n) {
+    return((gchar *) g_array_index (gg->activeColorScheme->colorNames,
+                                    gchar *, cid));
   }
 
  return(NULL);

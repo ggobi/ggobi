@@ -905,7 +905,7 @@ vartable_open (ggobid *gg)
     vartable_subwindow_init (d, gg);
   }
 
-  /*-- listen for variable_added events on main_window --*/
+  /*-- listen for datad_added events on main_window --*/
   gtk_signal_connect (GTK_OBJECT (gg->main_window),
     "datad_added", GTK_SIGNAL_FUNC (vartable_notebook_adddata_cb),
      GTK_OBJECT (gg->vartable_ui.notebook));

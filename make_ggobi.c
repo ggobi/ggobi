@@ -23,7 +23,9 @@
 #include "read_xml.h"
 #endif
 
+#ifdef SUPPORT_PLUGINS
 #include "plugin.h"
+#endif
 
 #ifdef USE_MYSQL
 #include "read_mysql.h"
@@ -312,12 +314,18 @@ make_ggobi (GGobiOptions *options, gboolean processEvents, ggobid *gg)
   gg->displays = NULL;
   
   globals_init (gg); /*-- variables that don't depend on the data --*/
-  color_table_init (gg);
-#ifdef USE_XML
-  if(sessionOptions->info && sessionOptions->info->bgColor) {
-      gg->bg_color = *(sessionOptions->info->bgColor);
-  }
-#endif
+
+  tour_manip_colors_init (gg);
+
+/* eliminated in favor of activeColorScheme */
+/*
+*#ifdef USE_XML
+*  if(sessionOptions->info && sessionOptions->info->bgColor) {
+*      gg->bg_color = *(sessionOptions->info->bgColor);
+*  }
+*#endif
+*/
+
   wvis_init (gg);
   make_ui (gg);
 
@@ -335,7 +343,9 @@ make_ggobi (GGobiOptions *options, gboolean processEvents, ggobid *gg)
 #ifdef SUPPORT_PLUGINS
     if(runInteractiveInputPlugin(gg) == NULL) {
       if(sessionOptions->data_type)
-        fprintf(stderr, "No available plugin to handle input mode %s\n", sessionOptions->data_type);fflush(stderr);
+        fprintf(stderr, "No available plugin to handle input mode %s\n",
+          sessionOptions->data_type);
+        fflush(stderr);
       }
 #endif
   }

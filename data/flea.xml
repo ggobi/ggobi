@@ -21,7 +21,7 @@ and Ch. heikertingeri, and 6 measurements on each.
 <variables count="7">
   <realvariable name="tars1" />
   <realvariable name="tars2" />
-  <realvariable name="head"  />
+  <realvariable name="head" />
   <realvariable name="aede1" />
   <realvariable name="aede2" />
   <realvariable name="aede3" />
@@ -163,97 +163,97 @@ and Ch. heikertingeri, and 6 measurements on each.
 <record label="Heptapot." color="4">
 135 127 52 140 10 108 2
 </record>
-<record label="Heikert." color="7">
+<record label="Heikert." color="0">
 186 107 49 120 14 84 3
 </record>
-<record label="Heikert." color="7">
+<record label="Heikert." color="0">
 211 122 49 123 16 95 3
 </record>
-<record label="Heikert." color="7">
+<record label="Heikert." color="0">
 201 114 47 130 14 74 3
 </record>
-<record label="Heikert." color="7">
+<record label="Heikert." color="0">
 242 131 54 131 16 90 3
 </record>
-<record label="Heikert." color="7">
+<record label="Heikert." color="0">
 184 108 43 116 16 75 3
 </record>
-<record label="Heikert." color="7">
+<record label="Heikert." color="0">
 211 118 51 122 15 90 3
 </record>
-<record label="Heikert." color="7">
+<record label="Heikert." color="0">
 217 122 49 127 15 73 3
 </record>
-<record label="Heikert." color="7">
+<record label="Heikert." color="0">
 223 127 51 132 16 84 3
 </record>
-<record label="Heikert." color="7">
+<record label="Heikert." color="0">
 208 125 50 125 14 88 3
 </record>
-<record label="Heikert." color="7">
+<record label="Heikert." color="0">
 199 124 46 119 13 78 3
 </record>
-<record label="Heikert." color="7">
+<record label="Heikert." color="0">
 211 129 49 122 13 83 3
 </record>
-<record label="Heikert." color="7">
+<record label="Heikert." color="0">
 218 126 49 120 15 85 3
 </record>
-<record label="Heikert." color="7">
+<record label="Heikert." color="0">
 203 122 49 119 14 73 3
 </record>
-<record label="Heikert." color="7">
+<record label="Heikert." color="0">
 192 116 49 123 15 90 3
 </record>
-<record label="Heikert." color="7">
+<record label="Heikert." color="0">
 195 123 47 125 15 77 3
 </record>
-<record label="Heikert." color="7">
+<record label="Heikert." color="0">
 211 122 48 125 14 73 3
 </record>
-<record label="Heikert." color="7">
+<record label="Heikert." color="0">
 187 123 47 129 14 75 3
 </record>
-<record label="Heikert." color="7">
+<record label="Heikert." color="0">
 192 109 46 130 13 90 3
 </record>
-<record label="Heikert." color="7">
+<record label="Heikert." color="0">
 223 124 53 129 13 82 3
 </record>
-<record label="Heikert." color="7">
+<record label="Heikert." color="0">
 188 114 48 122 12 74 3
 </record>
-<record label="Heikert." color="7">
+<record label="Heikert." color="0">
 216 120 50 129 15 86 3
 </record>
-<record label="Heikert." color="7">
+<record label="Heikert." color="0">
 185 114 46 124 15 92 3
 </record>
-<record label="Heikert." color="7">
+<record label="Heikert." color="0">
 178 119 47 120 13 78 3
 </record>
-<record label="Heikert." color="7">
+<record label="Heikert." color="0">
 187 111 49 119 16 66 3
 </record>
-<record label="Heikert." color="7">
+<record label="Heikert." color="0">
 187 112 49 119 14 55 3
 </record>
-<record label="Heikert." color="7">
+<record label="Heikert." color="0">
 201 130 54 133 13 84 3
 </record>
-<record label="Heikert." color="7">
+<record label="Heikert." color="0">
 187 120 47 121 15 86 3
 </record>
-<record label="Heikert." color="7">
+<record label="Heikert." color="0">
 210 119 50 128 14 68 3
 </record>
-<record label="Heikert." color="7">
+<record label="Heikert." color="0">
 196 114 51 129 14 86 3
 </record>
-<record label="Heikert." color="7">
+<record label="Heikert." color="0">
 195 110 49 124 13 89 3
 </record>
-<record label="Heikert." color="7">
+<record label="Heikert." color="0">
 187 124 49 129 14 88 3
 </record>
 </records>
