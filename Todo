@@ -5,26 +5,38 @@ various stuff not yet implemented:
   1d, xy cycling
   window closings
   sticky labels
+
+  brush_pos should be per-display.  when brushing or identifying in
+  parcoords, use leave/enter events to change the current_splot.
+
+array and vector management
+
+color:  allow additional colormaps -- .cmap file
   
 Scaling:
   take advantage of the cleverness of the axes:  l to shift, m/r to scale
   couple that with a thumbnail view that sits just below the scaling controls
 
-Imputation of missing values
+Imputation of missing values -- only the simple-minded stuff, and leave
+  the rest to R
+
+allow initializing parcoords and scatmat plots from selected vars
 
 Use a set of decoration arrays (points and lines) instead of nlinkable
 
-Smoothing
+Smoothing -- to take advantage of the R loess code
+  wait until we think about decoration?
 
 API code
 
+line type brushing
+
 Move points
 Line editing
-Rotation
 
-I/O
+old-style I/O
 
-Other displays
+Rotation -- maybe never
 
 Graphs
   Edges with data: a separate region of the variable selection panel

@@ -66,7 +66,7 @@ ifdef USE_XML
  XML_SRC= read_xml.c write_xml.c
  XML_OB= read_xml.o write_xml.o
 
- CFLAGS+= -I$(XML_INC_DIRS) -DUSE_XML=1
+ CFLAGS+= $(XML_INC_DIRS) -DUSE_XML=1
  OB+= $(XML_OB)
 
  XML_LIBS=-lxml -lz
@@ -107,11 +107,12 @@ etags:
 tags:
 	tags $(SRC)
 
+# If USE_XML, may need to add XML_LIB_DIRS and XML_INC_DIRS
 local.config:
 	@echo "# Whether to enable support for reading XML data" > $@
-	@echo "# USE_XML=1" > $@
-	@echo "# Location of dmalloc" > $@
-	@echo "# DM=1" > $@
+	@echo "# USE_XML=1" >> $@
+	@echo "# Location of dmalloc" >> $@
+	@echo "# DM=1" >> $@
 
 
 ifdef USE_XML
