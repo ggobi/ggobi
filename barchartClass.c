@@ -8,8 +8,31 @@
 #include "externs.h"
 
 
-gint
-barchart_is_variable_plotted(gint *cols, gint ncols, displayd *display)
+ /* Making these available to ggobiClass.c */
+static gboolean barchartVarSel(displayd *display, splotd *sp, gint jvar, gint btn, cpaneld *cpanel, ggobid *gg);
+static gint barchartVarIsPlotted(displayd *dpy, gint *cols, gint ncols, datad *d);
+static gboolean barchartCPanelSet(displayd *dpy, cpaneld *cpanel, ggobid *gg);
+static void barchartDisplaySet(displayd *dpy, ggobid *gg);
+static void barchartDestroy(barchartSPlotd *sp);
+static void barchartPlaneToScreen(splotd *sp, datad *d, ggobid *gg);
+
+static gboolean barchart_build_symbol_vectors (datad *d, ggobid *gg);
+static void barchartVarpanelRefresh(displayd *display, splotd *sp, datad *d);
+static gboolean barchartHandlesAction(displayd *dpy, PipelineMode mode);
+static void barchartVarpanelTooltipsSet(displayd *dpy, ggobid *gg, GtkWidget *wx, GtkWidget *wy, GtkWidget *label);
+static gint barchartPlottedColsGet(displayd *display, gint *cols, datad *d, ggobid *gg);
+static GtkWidget *barchartCPanelWidget(displayd *dpy, gint viewmode, gchar **modeName, ggobid *gg);
+static GtkWidget *barchartMenusMake(displayd *dpy, PipelineMode viewMode, ggobid *gg);
+static gboolean barchartEventHandlersToggle(displayd *dpy, splotd *sp, gboolean state, gint viewMode);
+static gint  barchartSPlotKeyEventHandler(displayd *dpy, splotd *sp, gint keyval);
+
+
+
+/*XX This doesn't seem to be used. 
+
+*/
+static gint
+barchart_is_variable_plotted(displayd *display, gint *cols, gint ncols, datad *d)
 {
     int j;
     ggobid *gg = display->d->gg;
@@ -27,7 +50,7 @@ barchart_is_variable_plotted(gint *cols, gint ncols, displayd *display)
 
 
 /* barchart splot methods*/
-gchar *
+static gchar *
 barchart_tree_label(splotd *sp, datad *d, ggobid *gg)
 {
     vartabled *vt;
@@ -167,7 +190,7 @@ barchartHandlesAction(displayd *dpy, PipelineMode mode)
 /*                      Barchart: Options menu                        */
 /*--------------------------------------------------------------------*/
 
-void
+static void
 barchart_menus_make (ggobid *gg)
 {
   gg->menus.options_menu = gtk_menu_new ();
@@ -253,4 +276,64 @@ barchartSPlotKeyEventHandler(displayd *dpy, splotd *sp, gint keyval)
 }
 
 
+
+void 
+barchartDisplayClassInit(GtkGGobiBarChartDisplayClass *klass)
+{
+    klass->parent_class.treeLabel = klass->parent_class.titleLabel = "Barchart";
+    klass->parent_class.create = barchart_new;
+    klass->parent_class.variable_select = barchartVarSel;
+    klass->parent_class.variable_plotted_p = barchartVarIsPlotted;
+    klass->parent_class.cpanel_set = barchartCPanelSet;
+    klass->parent_class.display_unset = NULL;
+    klass->parent_class.display_set = barchartDisplaySet;
+    klass->parent_class.variable_plotted_p = barchart_is_variable_plotted;
+
+    klass->parent_class.build_symbol_vectors = barchart_build_symbol_vectors;
+
+    klass->parent_class.ruler_ranges_set = ruler_ranges_set;
+
+    klass->parent_class.varpanel_refresh = barchartVarpanelRefresh;
+
+    klass->parent_class.handles_action = barchartHandlesAction;
+
+    klass->parent_class.xml_describe = NULL;
+
+    klass->parent_class.varpanel_tooltips_set = barchartVarpanelTooltipsSet;
+
+    klass->parent_class.plotted_vars_get = barchartPlottedColsGet;
+
+    klass->parent_class.menus_make = barchartMenusMake;
+
+    klass->parent_class.viewmode_control_box = barchartCPanelWidget;
+
+    klass->parent_class.allow_reorientation = false;
+
+    klass->parent_class.binning_ok = false;
+    klass->parent_class.event_handlers_toggle = barchartEventHandlersToggle;
+    klass->parent_class.splot_key_event_handler = barchartSPlotKeyEventHandler;
+}
+
+void 
+barchartSPlotClassInit(GtkGGobiBarChartSPlotClass *klass)
+{
+      /* barcharts need more attention than redrawing the brush */
+    klass->extendedSPlotClass.splot.redraw = FULL;
+    klass->extendedSPlotClass.tree_label = barchart_tree_label;
+
+    klass->extendedSPlotClass.identify_notify = barchart_identify_bars;
+    klass->extendedSPlotClass.add_markup_cues =  barchart_add_bar_cues;
+    klass->extendedSPlotClass.add_scaling_cues = barchart_scaling_visual_cues_draw;
+    klass->extendedSPlotClass.add_plot_labels = barchart_splot_add_plot_labels;
+    klass->extendedSPlotClass.redraw = barchart_redraw;
+
+    klass->extendedSPlotClass.world_to_plane = barchart_recalc_dimensions;
+    klass->extendedSPlotClass.plane_to_screen = barchartPlaneToScreen;
+
+    klass->extendedSPlotClass.active_paint_points = barchart_active_paint_points;
+
+    GTK_OBJECT_CLASS(klass)->destroy = barchartDestroy;
+}
+
 #endif /* BARCHART_IMPLEMENTED */
+

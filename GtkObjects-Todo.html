@@ -17,6 +17,12 @@ i.e. barchart display, time series.
 
 
 <dl>
+  <li> getDisplayType in XML read_init. Needs to use the Gtk type
+      name.
+  <li> createDisplayFromDescription needs to handle extended types.
+  
+  <dt> plotted() doesn't call the variable_plotted_p method.
+  <dd>
   <dt> the tsplot_... in cpaneld ?
   <dd>
       Seems like it should go into the display.
@@ -134,9 +140,6 @@ i.e. barchart display, time series.
       and  splot_draw_to_pixmap0_unbinned.
 
 
-  <li> getDisplayType in XML read_init. Needs to use the Gtk type
-      name.
-  <li> createDisplayFromDescription needs to handle extended types.
 </ul>
 
 
@@ -197,6 +200,6 @@ i.e. barchart display, time series.
 <address><a href="http://cm.bell-labs.com/stat/duncan">Duncan Temple Lang</a>
 <a href=mailto:duncan@research.bell-labs.com>&lt;duncan@research.bell-labs.com&gt;</a></address>
 <!-- hhmts start -->
-Last modified: Sun May 26 10:05:11 EDT 2002
+Last modified: Sun May 26 11:18:07 EDT 2002
 <!-- hhmts end -->
 </body> </html>

@@ -5,6 +5,19 @@
 #include "externs.h"
 
 
+static void tsWorldToPlane(splotd *sp, datad *d, ggobid *gg);
+static void tsDestroy(splotd *sp);
+static void tsWithinPlaneToScreen(splotd *sp, displayd *display, datad *d, ggobid *gg);
+static gboolean tsDrawEdge_p(splotd *sp, gint m, datad *d, datad *e, ggobid *gg);
+static gboolean tsDrawCase_p(splotd *sp, gint m, datad *d, ggobid *gg);
+static void tsAddPlotLabels(splotd *sp, GdkDrawable *drawable, ggobid *gg) ;
+static void tsWithinDrawBinned(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc);
+static void tsShowWhiskers(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc);
+static GdkSegment * tsAllocWhiskers(splotd *sp, gint nrows, datad *d);
+static gchar *tsTreeLabel(splotd *sp, datad *d, ggobid *gg);
+
+
+
 void
 tsWorldToPlane(splotd *sp, datad *d, ggobid *gg)
 {
@@ -142,4 +155,69 @@ tsTreeLabel(splotd *sp, datad *d, ggobid *gg)
    sprintf(buf, "%s", vty->collab);
 
    return(buf);
+}
+
+
+void 
+timeSeriesSPlotClassInit(GtkGGobiBarChartSPlotClass *klass)
+{
+#if 0
+      /* barcharts need more attention than redrawing the brush */
+    klass->extendedSPlotClass.splot.redraw = FULL;
+
+    klass->extendedSPlotClass.identify_notify = barchart_identify_bars;
+    klass->extendedSPlotClass.add_markup_cues =  barchart_add_bar_cues;
+    klass->extendedSPlotClass.add_scaling_cues = barchart_scaling_visual_cues_draw;
+    klass->extendedSPlotClass.add_plot_labels = barchart_splot_add_plot_labels;
+    klass->extendedSPlotClass.redraw = barchart_redraw;
+
+    klass->extendedSPlotClass.active_paint_points = barchart_active_paint_points;
+#endif
+    klass->extendedSPlotClass.tree_label = tsTreeLabel;
+
+    klass->extendedSPlotClass.within_draw_to_binned = tsWithinDrawBinned;
+    klass->extendedSPlotClass.within_draw_to_unbinned = tsShowWhiskers;
+
+    klass->extendedSPlotClass.draw_edge_p = tsDrawEdge_p;
+    klass->extendedSPlotClass.draw_case_p = tsDrawCase_p;
+
+    klass->extendedSPlotClass.add_plot_labels = tsAddPlotLabels;
+
+    klass->extendedSPlotClass.sub_plane_to_screen = tsWithinPlaneToScreen;
+    klass->extendedSPlotClass.alloc_whiskers = tsAllocWhiskers;
+
+    klass->extendedSPlotClass.world_to_plane = tsWorldToPlane;
+    GTK_OBJECT_CLASS(klass)->destroy = tsDestroy;
+}
+
+
+void 
+timeSeriesClassInit(GtkGGobiTimeSeriesDisplayClass *klass)
+{
+    klass->parent_class.treeLabel =  klass->parent_class.titleLabel = "Time Series";
+    klass->parent_class.create = timeSeriesDisplayCreate;
+    klass->parent_class.variable_select = tsplot_varsel;
+    klass->parent_class.variable_plotted_p = tsplotIsVarPlotted;
+    klass->parent_class.cpanel_set = tsplotCPanelSet;
+    klass->parent_class.display_unset = NULL;
+    klass->parent_class.display_set = tsplotDisplaySet;
+    klass->parent_class.varpanel_refresh = tsplotVarpanelRefresh;
+
+    klass->parent_class.handles_action = tsplotHandlesAction;
+
+    klass->parent_class.xml_describe = add_xml_tsplot_variables;
+
+    klass->parent_class.varpanel_tooltips_set = tsplotVarpanelTooltipsSet;
+    klass->parent_class.plotted_vars_get = tsplotPlottedColsGet;
+
+
+    klass->parent_class.viewmode_control_box = tsplotCPanelWidget;
+    klass->parent_class.menus_make = tsplotMenusMake;
+
+    klass->parent_class.event_handlers_toggle = tsplotEventHandlersToggle;
+
+    klass->parent_class.splot_key_event_handler = tsplotSPlotKeyEventHandler;
+
+
+    klass->parent_class.add_plot_labels = NULL; 
 }

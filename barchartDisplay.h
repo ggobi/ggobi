@@ -62,27 +62,10 @@ typedef  struct {
 extern void barchart_display_menus_make (displayd *display, GtkAccelGroup *, GtkSignalFunc, ggobid *);
 extern splotd *gtk_barchart_splot_new(displayd *dpy, gint width, gint height, ggobid *gg);
 
+/* Make these available to ggobiClass.c. 
+  (Could put the _get_type routines in the barchartClass.h file.) */
 
-  /* Methods for barchart splot. */
-gchar *barchart_tree_label(splotd *sp, datad *d, ggobid *gg);
-
-
- /* Making these available to ggobiClass.c */
-gboolean barchartVarSel(displayd *display, splotd *sp, gint jvar, gint btn, cpaneld *cpanel, ggobid *gg);
-gint barchartVarIsPlotted(displayd *dpy, gint *cols, gint ncols, datad *d);
-gboolean barchartCPanelSet(displayd *dpy, cpaneld *cpanel, ggobid *gg);
-void barchartDisplaySet(displayd *dpy, ggobid *gg);
-void barchartDestroy(barchartSPlotd *sp);
-void barchartPlaneToScreen(splotd *sp, datad *d, ggobid *gg);
-
-gboolean barchart_build_symbol_vectors (datad *d, ggobid *gg);
-void barchartVarpanelRefresh(displayd *display, splotd *sp, datad *d);
-gboolean barchartHandlesAction(displayd *dpy, PipelineMode mode);
-void barchartVarpanelTooltipsSet(displayd *dpy, ggobid *gg, GtkWidget *wx, GtkWidget *wy, GtkWidget *label);
-gint barchartPlottedColsGet(displayd *display, gint *cols, datad *d, ggobid *gg);
-GtkWidget *barchartCPanelWidget(displayd *dpy, gint viewmode, gchar **modeName, ggobid *gg);
-GtkWidget *barchartMenusMake(displayd *dpy, PipelineMode viewMode, ggobid *gg);
-gboolean barchartEventHandlersToggle(displayd *dpy, splotd *sp, gboolean state, gint viewMode);
-gint  barchartSPlotKeyEventHandler(displayd *dpy, splotd *sp, gint keyval);
+void barchartSPlotClassInit(GtkGGobiBarChartSPlotClass *klass);
+void barchartDisplayClassInit(GtkGGobiBarChartDisplayClass *klass);
 #endif
 

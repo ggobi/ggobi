@@ -200,10 +200,10 @@ typedef struct
 
     gboolean loop_over_points; 	/* See splot_draw_to_pixmap0_unbinned. */
 
-    gchar const *  treeLabel ;
+    gchar * const treeLabel;
     gchar * const (*tree_label)(displayd *dpy);
 
-    gchar const *  titleLabel;
+    gchar * titleLabel;
     const gchar * const (*title_label)(displayd *dpy);
 
     displayd *(*create)(gboolean missing_p, splotd *sp, datad *d, ggobid *gg);
