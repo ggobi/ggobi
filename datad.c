@@ -155,9 +155,10 @@ datad_init (datad *d, ggobid *gg, gboolean cleanup)
 
     /*-- initialize the first display --*/
     if(sessionOptions->info->createInitialScatterPlot) {
-/*XX allow this to be specified as a gtk type name on the command line, initialization file, etc.
-  and invoke the corresponding create() method. */
-    display = scatterplot_new (false, NULL, d, gg);
+/*XXX allow this to be specified as a gtk type name on the command
+      line, initialization file, etc.  and invoke the corresponding
+      create() method. */
+      display = scatterplot_new (false, NULL, d, gg);
         /* Need to make certain this is the only one there. */
 
       if (display != NULL) {
@@ -191,6 +192,7 @@ datad *
 datad_get_from_notebook (GtkWidget *notebook, ggobid *gg) {
   gint nd = g_slist_length (gg->d);
   datad *d;
+  datatyped dtype;
 
   if (nd == 1) {
     return (datad *) gg->d->data;
@@ -198,19 +200,26 @@ datad_get_from_notebook (GtkWidget *notebook, ggobid *gg) {
     gint k, n;
     GtkNotebook *nb = GTK_NOTEBOOK (notebook);
     gint indx = gtk_notebook_get_current_page (nb);
+    dtype = (vartyped) gtk_object_get_data (GTK_OBJECT(notebook), "datatype");
+
     /*
      * k indexes gg->d
      * n indexes the notebook pages, so it increments only if d has variables
     */
     for (k = 0, n = 0; k < nd; k++) {
       d = (datad *) g_slist_nth_data (gg->d, k);
-      if (n == indx)
-        return (d);
-      if (datad_has_variables (d))
-        n++;
-    }
 
-    /*return ((datad *) g_slist_nth_data (gg->d, indx));*/
+      if ((dtype == all_datatypes) ||
+          (dtype == no_edgesets && d->edge.n == 0) ||
+          (dtype == edgesets_only && d->edge.n > 0))
+      {
+        if (datad_has_variables(d)) {
+          if (n == indx)
+            return (d);
+          n++;
+        }
+      }
+    }
   }
 
   return ((datad *) NULL);
