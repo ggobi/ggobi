@@ -2,16 +2,6 @@
 #include "plugin.h"
 #include "externs.h"
 
-struct PluginTarget {
- ggobid *gg;
- GGobiPluginInfo *info;
-} target;
-gboolean
-regPlugin(void *n)
-{
-  registerPlugin(target.gg, target.info);
-  return(false);
-}
 
 void
 loadPluginFromFile(GtkWidget *btn, ggobid *gg)
@@ -27,12 +17,7 @@ loadPluginFromFile(GtkWidget *btn, ggobid *gg)
 
  plugin = readPluginFile(fileName, sessionOptions->info);
  if(plugin) {
-#if 1
-   target.gg = gg; target.info = plugin;
-   gtk_timeout_add(1, regPlugin, NULL);
-#else
    registerPlugin(gg, plugin); 
-#endif
  }
 
  gtk_widget_hide(fileSelect);
