@@ -736,7 +736,7 @@ asNumber(const char *sval)
 gboolean
 newVariable(const xmlChar **attrs, XMLParserData *data, const xmlChar *tagName)
 {
-  const gchar *tmp;
+  const gchar *tmp, *tmp1;
   datad *d = getCurrentXMLData(data);
   vartabled *el = vartable_element_get (data->current_variable, d);
 
@@ -753,6 +753,25 @@ newVariable(const xmlChar **attrs, XMLParserData *data, const xmlChar *tagName)
    if (data->variable_transform_name_as_attribute == false)
       el->collab_tform = g_strdup(tmp);
  }
+
+ tmp = getAttribute(attrs, "min");
+ tmp1 = getAttribute(attrs, "max");
+ if(tmp && tmp1) {
+     double mn, mx;
+     mn = asNumber(tmp);
+     mx = asNumber(tmp);
+     el->lim_specified.min = mn < mx ? mn : mx;
+     el->lim_specified.max = mn > mx ? mn : mx;
+     /* ? */
+     el->lim_specified_tform.min = el->lim_specified.min;
+     el->lim_specified_tform.max = el->lim_specified.max;
+
+     if(mn > mx) {
+	 fprintf(stderr, "Minimum is greater than maximum for variable %s\n", el->collab);fflush(stderr);
+     }
+     el->lim_specified_p = true;
+ }
+
 
  if (strcmp(tagName, "categoricalvariable") == 0) {
      el->categorical_p = true;
