@@ -11,7 +11,7 @@
 
 \begin{document}
 
-\title{ggvis: multidimensional scaling as a plugin in {\tt ggobi}}
+\title{Introduction to ggvis: multidimensional scaling as a plugin in {\tt ggobi}}
 \author{Deborah F. Swayne and Andreas Buja}
 \maketitle
 
@@ -55,56 +55,86 @@ In a ggobi scatterplot display, use the {\bf Edges} menu to
 display the edges, and maybe the ``arrowheads'' which indicate
 edge direction.
 
-\section{Specifying the datasets}
+\section{Initiating ggvis}
 
-Initiate the plugin by selecting the ``ggvis (MDS) ...'' item on ggobi's
-Tools menu.  The ggvis control panel starts with a ``notebook''
-widget with three tabs.  The first tab, ``Specify datasets,'' contains
+Initiate the plugin by selecting the ``ggvis (MDS) ...'' item on
+ggobi's Tools menu.  The ggvis control panel starts with a
+``notebook'' widget with four tabs.  In most cases, you will be
+able to jump straight to the last tab, {\em Run}, and start
+ggvis, but we will discuss the settings in each tab with reference
+to two sample datasets.
+
+The {\em snetwork.xml} data supplied with ggobi portrays a simple
+social network, and we can use ggvis to lay out its graph.  The {\em
+morsecodes.xml} data is the result of an experiment about rates of
+confusion of Morse codes which are interpreted as dissimilarities
+among pairs of symbols, and we can use ggvis to explore these
+dissimilarities.  For both of these sets of data, the defaults that
+ggvis infers and displays in the first three notebook tabs are
+correct.
+
+\subsection{Specifying the datasets}
+
+The first tab, ``Datasets,'' contains
 two lists, one for datasets which can supply nodes and one for datasets
 which can supply edges.  In most cases, only one choice is possible,
 but more complex arrangements can occur.
 
-The {\em snetwork.xml} data supplied with ggobi (which portrays a
-simple social network) has exactly one set of nodes and one set of
+The social network data has exactly one set of nodes and one set of
 edges.  For this data, there are no choices to be made, and you can
 simply move on to run multidimensional scaling.
 
-The {\em morsecodes.xml} data (the results of an experiment about
-rates of confusion of Morse codes) has two sets of edges.  The first
-one, ``distance,'' supplies the distances to be used in determining
-the point positions.  The second set, ``edges,'' is a set of edges
-that can be used for display, because it emphasizes the structure of
-of the data.
+The Morse code data has two sets of edges.  The first one,
+``distance,'' supplies the distances to be used in determining the
+point positions.  The second set, ``edges,'' is a set of edges that
+can be used for display, because it emphasizes the structure of of
+the data.
 
 Once the nodes and edges have been specified, move to the next tab.
 
-\section{Definition of D}
+\subsection{Task}
 
-In the next step, the target distance matrix D must be specified, either
-simply from a set of unweighted edges or from a set of edges together with
-a variable of weights.
+Under the next tab are some parameters which define the task
+you're performing, and perhaps set some options.  First, the program
+wants to know whether you're going to perform {\em Dissimilarity
+analysis}, as you would with the Morse code data, or {\em Graph
+layout}, as you would with the social network data.  ggvis has
+attempted, in a primitive way, to guess which task you're doing:
+If you have included an edge set named ``dist,'' ``distance,'' or
+``dissim,'' then ggvis guesses that you are interested in
+dissimilarity analysis; otherwise, it guesses that you're going
+to lay out a graph.  You may override that guess here.
 
-For the social network data, the distances will simply be the minimum
-number of edges traversed in traveling between a pair of nodes.  (Edge
-direction is ignored.)  Specify ``Unweighted,'' activate ``Complete
-distances'' so the matrix will be populated with distances between
-pairs of nodes that do not share an edge, and click ``Populate D.''
+If you are in fact planning to lay out a graph, then you have two more
+choices to make.  In the simplest graph layout situation, as in the
+case of the social network example, the pairwise distances are simply
+defined as the minimum number of edges traversed in traveling between
+any pair of nodes.  (Edge direction is ignored.)  By supplying edges,
+you have specified the pairwise distances for only those nodes that
+are directly connected; select {\em Complete graph distances} so that
+the remaining pairwise distances will be calculated.
 
-For the {\em morsecodes} data, we actually began with a confusion
+Your second choice is whether to supply a vector of edge weights,
+which you can do by supplying a weighting variable in the edge
+dataset.  The social network example includes no edge weights.
+
+\subsection{Dist}
+
+The next tab is where you will specify the source of pairwise
+distances (for dissimilarity analysis) or edge weights (for
+weighted graph layout).
+
+For the {\em morsecodes} data, the target distance matrix is a confusion
 matrix representing the fraction of times that one character in the
-Morse code was confused with another in an experiment.  We had to
-translate that matrix into a set of edges and and a weighting variable
-(named {\b D}) so that it would correspond to data structures ggobi
-expects.  So that ggvis can turn it back into a matrix again, select
-``D from variable'' in the option menu, click on ``D'' in the list of
-variables, and do not activate ``Complete distances'' before clicking
-``Populate D.''
+Morse code was confused with another in an experiment.  For ggvis,
+we have represented that as an edge variable called {\bf D}, which
+you will see has been selected by default.
+
+\subsection{Run}
 
 Once the target distance matrix D has been populated, a new
 scatterplot display appears.  Proceed to the next tab, ``Run,''
 to begin running the multidimensional scaling algorithm.
-
-\section{Running MDS}
 
 Before clicking on the ``Run MDS'' button, choose the dimension
 of the space into which you want to project the data.  Both the
@@ -115,6 +145,8 @@ look in the plane.
 You can now click on the ``Run MDS'' button to start the
 algorithm.  You may want to start with a large step size, and
 then reduce the step size as the layout converges.
+
+\section {Controlling MDS}
 
 The sliders below the histogram of the target distances are quite
 useful in tuning the layout.  Increasing the exponent of {\bf D}
@@ -127,6 +159,15 @@ written, but we can refer you to documentation for the older {\em
 xgvis} (\cite{xgvis_jcgs2002},
 http://www.research.att.com/areas/stat/xgobi/), which was used with
 xgobi, ggobi's predecessor.
+
+\section {Comparing sets of distances or edge weights}
+
+If your input data contains two vectors of distances of edge weights,
+then you can pause MDS, back up to the {\em Dist} tab, select an
+alternative variable, and then begin to run MDS once more.  The points
+in the plot in the MDS window will smoothly migrate to their new
+positions.
+
 
 \section{Manipulations}
 
