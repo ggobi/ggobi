@@ -565,7 +565,8 @@ viewmode_submenus_update (PipelineMode prev_mode, ggobid *gg)
   PipelineMode mode = viewmode_get (gg);
 
   /*-- remove any previous submenus --*/
-  if (mode_has_options_menu (prev_mode)) {
+  /* if the menu should be there and it really is there ... */
+  if (mode_has_options_menu (prev_mode) && gg->menus.options_item) {
     gtk_menu_item_remove_submenu (GTK_MENU_ITEM (gg->menus.options_item));
     /*-- destroy menu items if called for --*/
     if (!mode_has_options_menu (mode)) {
@@ -604,7 +605,8 @@ viewmode_submenus_update (PipelineMode prev_mode, ggobid *gg)
     }
     }*//* di hasn't filled these in yet*/
 
-  if (mode_has_reset_menu (prev_mode)) {
+  /* if the menu should be there and it really is there ... */
+  if (mode_has_reset_menu (prev_mode) && gg->menus.reset_item) {
     gtk_menu_item_remove_submenu (GTK_MENU_ITEM (gg->menus.reset_item));
     if (!mode_has_reset_menu (mode)) {
       if (gg->menus.reset_item != NULL) {
