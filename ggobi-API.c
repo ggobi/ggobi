@@ -428,22 +428,25 @@ warning(const char *msg)
 }
 
 
+/*-------------------------------------------------------------------------*/
+/*     setting and getting point glyph types and sizes                     */
+/*-------------------------------------------------------------------------*/
 
 gint *
 GGOBI(getGlyphTypes)(int *n)
 {
- static gint *glyphIds = NULL;
- *n = UNKNOWN_GLYPH-1; /* -1 since we start at 1 */
+  static gint *glyphIds = NULL;
+  *n = UNKNOWN_GLYPH-1; /* -1 since we start at 1 */
 
   if(glyphIds == NULL){
-   int i;
-   glyphIds = (gint*) g_malloc(*n* sizeof(gint));
-   for(i = 0; i < *n ; i++) {
-    glyphIds[i] = mapGlyphName(GlyphNames[i]);
-   }
+    gint i;
+    glyphIds = (gint*) g_malloc(*n * sizeof(gint));
+    for(i = 0; i < *n ; i++) {
+      glyphIds[i] = mapGlyphName(GlyphNames[i]);
+    }
   }
 
- return(glyphIds);
+  return(glyphIds);
 }
 
 const gchar **const
@@ -479,8 +482,8 @@ GGOBI(getCaseGlyphTypes)(gint *ids, gint n, ggobid *gg)
 gint 
 GGOBI(getCaseGlyphType)(gint id, ggobid *gg)
 {
- int index = gg->rows_in_plot[id];
-  return(gg->glyph_ids[index].type);
+  int index = gg->rows_in_plot[id];
+  return(gg->glyph_now[index].type);
 }
 
 gint *
@@ -498,19 +501,19 @@ GGOBI(getCaseGlyphSizes)(gint *ids, gint n, ggobid *gg)
 gint 
 GGOBI(getCaseGlyphSize)(gint id, ggobid *gg)
 {
- int index = gg->rows_in_plot[id];
+  gint index = gg->rows_in_plot[id];
 
-  return(gg->glyph_ids[index].size);
+  return(gg->glyph_now[index].size);
 }
 
 
 void 
 GGOBI(setCaseGlyph)(gint index, gint type, gint size, ggobid *gg)
 {
-  if(size > -1)
-   gg->glyph_ids[index].size = size;
-  if(type > -1)
-   gg->glyph_ids[index].type = type;
+  if (size > -1)
+   gg->glyph_ids[index].size = gg->glyph_now[index].size = size;
+  if (type > -1)
+   gg->glyph_ids[index].type = gg->glyph_now[index].type = type;
 }
 
 void 
@@ -521,11 +524,14 @@ GGOBI(setCaseGlyphs)(gint *ids, gint n, gint type, gint size, ggobid *gg)
    GGOBI(setCaseGlyph)(ids[i], type, size, gg);
 }
 
+/*-------------------------------------------------------------------------*/
+/*               setting and getting point colors                          */
+/*-------------------------------------------------------------------------*/
 
 void 
 GGOBI(setCaseColor)(gint pt, gint colorIndex, ggobid *gg)
 {
- gg->color_ids[pt] = gg->color_now[pt] = colorIndex;
+  gg->color_ids[pt] = gg->color_now[pt] = colorIndex;
 }
 
 void 
@@ -540,7 +546,7 @@ GGOBI(setCaseColors)(gint *pts, gint howMany, gint colorindx, ggobid *gg)
 gint 
 GGOBI(getCaseColor) (gint pt, ggobid *gg)
 {
-  return(gg->color_ids[pt]);
+  return(gg->color_now[pt]);
 }
 
 gint *
@@ -555,7 +561,45 @@ GGOBI(getCaseColors)(gint *pts, gint howMany, ggobid *gg)
  return(ans);
 }
 
+/*-------------------------------------------------------------------------*/
+/*        setting and getting the point hidden state                       */
+/*-------------------------------------------------------------------------*/
 
+void 
+GGOBI(setCaseHidden)(gint pt, gboolean hidden_p, ggobid *gg)
+{
+  gg->hidden[pt] = gg->hidden_now[pt] = hidden_p;
+}
+
+void 
+GGOBI(setCaseHiddens)(gint *pts, gint howMany, gboolean hidden_p, ggobid *gg)
+{
+ gint i;
+ for (i = 0; i < howMany ; i++)
+   GGOBI(setCaseHidden)(pts[i], hidden_p, gg);
+}
+
+gboolean
+GGOBI(getCaseHidden) (gint pt, ggobid *gg)
+{
+  return (gg->hidden_now[pt]);
+}
+
+gboolean *
+GGOBI(getCaseHiddens)(gint *pts, gint howMany, ggobid *gg)
+{
+ gint i;
+ gboolean *ans = (gboolean *) g_malloc (howMany * sizeof(gboolean));
+
+ for(i = 0; i < howMany ; i++)
+  ans[i] = GGOBI(getCaseHidden)(pts[i], gg);
+
+ return (ans);
+}
+
+/*-------------------------------------------------------------------------*/
+/*        setting and getting segments                                     */
+/*-------------------------------------------------------------------------*/
 
 void
 GGOBI(setObservationSegment)(gint x, gint y, ggobid *gg)

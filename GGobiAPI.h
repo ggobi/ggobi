@@ -128,7 +128,7 @@ extern displayd *GGOBI(newScatmat)(gint *rows, gint *columns, int nr, int nc, gg
 extern displayd *GGOBI(newParCoords)(gint *vars, int num, ggobid *gg);
 extern displayd *createPlot(int type, char **varnames);
 
-
+/*-- point glyph types and sizes --*/
 extern gint *GGOBI(getGlyphTypes)(int *n);
 extern const gchar **const GGOBI(getGlyphTypeNames)(int *n);
 
@@ -138,16 +138,22 @@ extern gint GGOBI(getCaseGlyphType)(gint id, ggobid *gg);
 extern gint *GGOBI(getCaseGlyphSizes)(gint *, gint n, ggobid *gg);
 extern gint GGOBI(getCaseGlyphSize)(gint id, ggobid *gg);
 
-
 extern void GGOBI(setCaseGlyph) (gint pt, gint type, gint size, ggobid *gg);
 extern void GGOBI(setCaseGlyphs) (gint *pts, gint n, gint type, gint size, ggobid *gg);
 
-
+/*-- point colors --*/
 extern gint GGOBI(getCaseColor) (gint pt, ggobid *gg);
 extern gint * GGOBI(getCaseColors) (gint *pts, gint howMany, ggobid *gg);
 
 extern void GGOBI(setCaseColor)(gint pt, gint colorIndex, ggobid *gg);
 extern void GGOBI(setCaseColors)(gint *pts, gint howMany, gint colorindx, ggobid *gg);
+
+/*-- point hidden state --*/
+extern gboolean GGOBI(getCaseHidden) (gint pt, ggobid *gg);
+extern gboolean * GGOBI(getCaseHiddens) (gint *pts, gint howMany, ggobid *gg);
+
+extern void GGOBI(setCaseHidden)(gint pt, gboolean hidden_p, ggobid *gg);
+extern void GGOBI(setCaseHiddens)(gint *pts, gint howMany, gboolean hidden_p, ggobid *gg);
 
 extern gboolean  GGOBI(isConnectedSegment)(gint a, gint b, ggobid *gg);
 extern void GGOBI(setObservationSegment)(gint x, gint y, ggobid *gg);
