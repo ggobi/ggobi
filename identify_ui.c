@@ -22,6 +22,7 @@ static void display_cb (GtkWidget *w, gpointer cbd)
   ggobid *gg = GGobiFromWidget(w, true);
   cpaneld *cpanel = &gg->current_display->cpanel;
   cpanel->identify_display_type = GPOINTER_TO_INT (cbd);
+  displays_plot (NULL, QUICK, gg);
 }
 
 static void
