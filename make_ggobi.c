@@ -202,7 +202,10 @@ read_input(InputDescription *desc, ggobid *gg)
       ok = read_ascii_data(desc, gg);
     break;
     default:
-      g_printerr("Unknown data type in fileset_read\n");
+	if(desc->read_input) {
+	    ok = desc->read_input(desc, gg);
+	} else
+	    g_printerr("Unknown data type in read_input\n");
     break;
   }
 

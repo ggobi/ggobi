@@ -796,6 +796,7 @@ create_ggobi(InputDescription *desc)
   globals_init (gg); /*-- variables that don't depend on the data --*/
   color_table_init (gg);
   make_ui (gg);
+  gg->input = desc;
 
   read_input(desc, gg);
 

@@ -386,6 +386,11 @@ struct _ggobid {
 
  GList *colorSchemes;
  colorschemed *activeColorScheme;
+
+ void *userData; /** A place to hang data for a host application, plugin, etc. 
+                     Since plugins, etc. may also use this, we might want 
+                     a hashtable here similar to pthread's thread-specific data. */
+
 }; /*  ggobid; */
 
 #ifdef USE_XML

@@ -962,6 +962,14 @@ extern GtkWidget *GGobi_addDisplayMenuItem(const char *label, ggobid *gg);
  */
 ggobid* ggobi_alloc();
 
+/**
+ */
+ggobid *create_ggobi(InputDescription *desc);
+
+/**
+ */
+datad* datad_create(int nr, int nc, ggobid *gg);
+
 #ifdef __cplusplus
 }
 #endif

@@ -56,6 +56,39 @@ datad_new(datad *d, ggobid *gg)
   return (d);
 }
 
+/**
+ Creates and initializes the datad object.
+ */
+datad*
+datad_create(int nr, int nc, ggobid *gg)
+{
+  datad *d;
+  d = datad_new(NULL, gg);
+  d->ncols = nc;
+  d->nrows = nr;
+
+  d->nrows_in_plot = d->nrows;  /*-- for now --*/
+
+  d->rows_in_plot = NULL;
+
+  arrayf_alloc(&d->raw, nr, nc);
+
+  rowlabels_alloc (d, gg);
+
+  vartable_alloc (d);
+  vartable_init (d);
+
+  br_glyph_ids_alloc (d);
+  br_glyph_ids_init (d, gg);
+
+  br_color_ids_alloc (d, gg);
+  br_color_ids_init (d, gg);
+
+
+  hidden_alloc (d);
+
+  return(d);
+}
 void
 datad_free (datad *d, ggobid *gg) {
   arrayf_free (&d->raw, 0, 0);

@@ -5,7 +5,8 @@
 extern "C" {
 #endif
 
-typedef struct {
+typedef struct _InputDescription InputDescription;
+struct _InputDescription {
  gchar *fileName;       /* the name of the file to read, fully expanded */
  gchar *baseName;       /* With the extension removed. */
  gchar *givenExtension; /* the extension of the file to be read,
@@ -20,7 +21,8 @@ typedef struct {
  GSList *extensions;     /* a collection of file extension names and modes. */
 
  void *userData;
-} InputDescription;
+ gboolean (*read_input)(InputDescription *desc, struct _ggobid *gg);
+};
 
 typedef struct {
   DataMode mode;         /* The mode or format style to which the extensions

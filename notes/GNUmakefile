@@ -7,7 +7,7 @@ ifndef LATEX
 endif
 
 ifndef PDFLATEX
- PDFLATEX=latex
+ PDFLATEX=pdflatex
 endif
 
 ifndef BIBTEX
@@ -18,7 +18,7 @@ endif
 # Run it twice to get cross-references correct.
 %.dvi: %.tex
 	(TEXINPUTS=$(TEXINPUTS):$(OMEGA_HOME)/Docs:: ; export TEXINPUTS ; $(LATEX) $<)
-	$(BIBTEX) $*
+	-$(BIBTEX) $*
 	(TEXINPUTS=$(TEXINPUTS):$(OMEGA_HOME)/Docs:: ; export TEXINPUTS ; $(LATEX) $<)
 
 %.ps: %.dvi
@@ -26,4 +26,5 @@ endif
 
 %.pdf: %.tex
 	(TEXINPUTS=$(TEXINPUTS):$(OMEGA_HOME)/Docs:: ; export TEXINPUTS ; $(PDFLATEX) $<)
+	-$(BIBTEX) $*
 	(TEXINPUTS=$(TEXINPUTS):$(OMEGA_HOME)/Docs:: ; export TEXINPUTS ; $(PDFLATEX) $<)
