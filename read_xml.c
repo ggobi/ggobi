@@ -1884,7 +1884,7 @@ setEdge(gint start, gint end, gint i, datad *d)
 {
   /*-- if encountering the first edge, allocate endpoints array --*/
   if (d->edge.n == 0) 
-    edges_alloc (d->nrows, d, true);
+    edges_alloc (d->nrows, d);
 }
 
 gboolean

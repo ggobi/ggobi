@@ -746,7 +746,7 @@ GGOBI(setObservationEdge)(gint x, gint y, datad *d, ggobid *gg, gboolean update)
 {
   if (GGOBI(isConnectedEdge)(x, y, d, gg) == false) {
     if (update)
-      edges_alloc (d->edge.n+1, d, true);
+      edges_alloc (d->edge.n+1, d);
     d->edge.endpoints[d->edge.n].a = x;
     d->edge.endpoints[d->edge.n].b = y;
     d->edge.n++;

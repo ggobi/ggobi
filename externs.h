@@ -224,7 +224,7 @@ PipelineMode projection_get (ggobid *);
 PipelineMode viewmode_get (ggobid *);
 void       edgeedit_event_handlers_toggle (splotd *, gboolean);
 gboolean   edge_endpoints_get (gint k, gint *a, gint *b, datad *d, endpointsd *endpoints, datad *e);
-void       edges_alloc (gint, datad *, gboolean old);
+void       edges_alloc (gint, datad *);
 void       edges_create (datad *, ggobid *);
 void       edges_free (datad *, ggobid *);
 gboolean   edges_read (InputDescription *desc, gboolean, datad *, ggobid *);
