@@ -1213,6 +1213,10 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
         for (j=0; j<d->ncols; j++) {
           ix = dawidth/2 + (gint) (dsp->t1d.F.vals[0][j]*(gfloat) dawidth/4);
           iy = daheight - 10 - (d->ncols-1-j)*textheight;
+          if (j == dsp->t1d_manip_var)
+            gdk_gc_set_foreground(gg->plot_GC, &gg->vcirc_manip_color);
+          else
+            gdk_gc_set_foreground(gg->plot_GC, &scheme->rgb_accent);
           gdk_draw_line(drawable, gg->plot_GC,
             dawidth/2, daheight - 10 - (d->ncols-1-j)*textheight,
             ix, iy);
@@ -1259,6 +1263,10 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
             (gint) (dsp->t2d.F.vals[1][j]* (gfloat) daheight/8));
           gdk_gc_set_line_attributes(gg->plot_GC, 2, GDK_LINE_SOLID, 
             GDK_CAP_ROUND, GDK_JOIN_ROUND);
+          if (j == dsp->t2d_manip_var)
+            gdk_gc_set_foreground(gg->plot_GC, &gg->vcirc_manip_color);
+          else
+            gdk_gc_set_foreground(gg->plot_GC, &scheme->rgb_accent);
           gdk_draw_line(drawable, gg->plot_GC,
             dawidth/8+axindent, daheight-daheight/8-axindent,
             ix, iy);
@@ -1272,6 +1280,9 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
 	        } else {
               varlab = g_strdup_printf ("%d",j+1);
 	        }
+            if (j == dsp->t2d_manip_var) 
+              varlab = g_strdup_printf ("%5.4f",
+                dsp->t2d.F.vals[0][dsp->t2d_manip_var]);
 
             gdk_text_extents (
 #if GTK_MAJOR_VERSION == 2
@@ -1306,6 +1317,7 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
               style->font,
 #endif
               gg->plot_GC, ix, iy, varlab);
+
             g_free (varlab);
           }
         }
@@ -1355,6 +1367,10 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
             (gint) (dsp->tcorr1.F.vals[0][j]*
             (gfloat) dawidth/4);
           iy = daheight - 10 - (d->ncols-1-j)*textheight;
+          if (j == dsp->tc1_manip_var)
+            gdk_gc_set_foreground(gg->plot_GC, &gg->vcirc_manip_color);
+          else
+            gdk_gc_set_foreground(gg->plot_GC, &scheme->rgb_accent);
           gdk_draw_line(drawable, gg->plot_GC,
             dawidth/2,daheight - 10 - 
             (d->ncols-1-j)*textheight, ix, iy);
@@ -1386,6 +1402,10 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
             (gfloat) daheight/4));
           gdk_gc_set_line_attributes(gg->plot_GC, 2, GDK_LINE_SOLID, 
             GDK_CAP_ROUND, GDK_JOIN_ROUND);
+          if (j == dsp->tc2_manip_var)
+            gdk_gc_set_foreground(gg->plot_GC, &gg->vcirc_manip_color);
+          else
+            gdk_gc_set_foreground(gg->plot_GC, &scheme->rgb_accent);
           gdk_draw_line(drawable, gg->plot_GC,
             10+j*textheight,daheight/2,
             ix, iy);
