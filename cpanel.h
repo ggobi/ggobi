@@ -46,18 +46,12 @@ typedef struct {
    guint32 cycle_delay;
  } xyplot;
 
- /*-- rotation --*/
-/*
- gint ro_type, ro_axis, ro_direction;
- gboolean ro_paused_p;
-*/
 
  /*-- brushing --*/
  gboolean brush_on_p;
  gint br_mode;
  gint br_linkby;
  BrushTargetType br_point_targets, br_edge_targets;
-
 
  /*-- scaling --*/
  gint scale_style;       /* DRAG or CLICK */
