@@ -265,6 +265,9 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
    */
   if (display->displaytype == scatterplot && d->ncols > 2) {
     display_tour2d_init(display, gg);
+  }
+
+  if (display->displaytype == scatterplot && d->ncols > 1) {
     display_tour1d_init(display, gg);
   }
 

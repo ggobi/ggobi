@@ -194,9 +194,6 @@ set_tour1dvar(ggobid *gg, gint jvar)
   gint j, jtmp, k;
   gboolean selected=false;
   displayd *dsp = gg->current_display;
-  extern void zero_tau(displayd *, ggobid *);
-  extern void zero_tinc(displayd *, ggobid *);
-  extern void init_basis(displayd *, ggobid *);
 
   for (j=0; j<dsp->t1d.nvars; j++)
     if (jvar == dsp->t1d.vars.els[j])
@@ -326,12 +323,6 @@ tour1d_run(displayd *dsp, ggobid *gg)
   extern void copy_mat(gfloat **, gfloat **, gint, gint);
   datad *d = dsp->d;
 
-  /*  printf("u \n");
-  gint i;
-  for (i=0; i<d->ncols; i++)
-    printf("%f ",dsp->u[0][i]);
-  printf("\n");*/
-
   if (!dsp->t1d.get_new_target && 
       !reached_target(dsp->t1d.nsteps, dsp->t1d.stepcntr)) {
     increment_tour(dsp->t1d.tinc, dsp->t1d.tau, &dsp->t1d.nsteps, 
@@ -342,7 +333,7 @@ tour1d_run(displayd *dsp, ggobid *gg)
   else { /* do final clean-up and get new target */
     if (!dsp->t1d.get_new_target)
       do_last_increment(dsp->t1d.tinc, dsp->t1d.tau, (gint) 1);
-    copy_mat(dsp->u0.vals, dsp->u.vals, d->ncols, 1);
+    copy_mat(dsp->t1d.u0.vals, dsp->t1d.u.vals, d->ncols, 1);
     tour_reproject(dsp->t1d.tinc, dsp->t1d.v, dsp->t1d.v0, dsp->t1d.v1,
       dsp->t1d.u, dsp->t1d.uvevec, d->ncols, (gint) 1);
     gt_basis(dsp->t1d.u1, dsp->t1d.nvars, dsp->t1d.vars, d->ncols, (gint) 1);

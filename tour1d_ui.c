@@ -14,11 +14,12 @@
    subset of variable might be used, or when there is new data. */
 
 void 
-cpanel_tour1d_init (cpaneld *cpanel, ggobid *gg) {
+cpanel_t1d_init (cpaneld *cpanel, ggobid *gg) {
   cpanel->t1d_paused = false;
   cpanel->t1d_step = TOURSTEP0;
   cpanel->t1d_nASHes = 20;
   cpanel->t1d_nbins = 200;
+  cpanel->t1d_vert = false;
 }
 
 /*-- scatterplot only; need a different routine for parcoords --*/
@@ -84,12 +85,6 @@ static void t1d_ash_sm_cb (GtkAdjustment *adj, ggobid *gg)
 static void tour1d_vert_cb (GtkToggleButton *button, ggobid *gg)
 {
   tour1d_vert (&gg->current_display->cpanel, button->active);
-}
-
-void cpanel_t1d_init (cpaneld *cpanel, ggobid *gg) {
-  cpanel->t1d_nASHes = 20;
-  cpanel->t1d_nbins = 200;
-  cpanel->t1d_vert = false;
 }
 
 void
