@@ -137,7 +137,10 @@ gboolean record_add (eeMode mode, gint a, gint b, gchar *lbl, gchar *id,
 
   /*-- allocate and initialize brushing arrays --*/
   br_glyph_ids_add (dtarget, gg);
+  /*-- this is adding the brushing color when it should use the color
+    of the points, really --*/
   br_color_ids_add (dtarget, gg);
+  dtarget->color.els[dtarget->nrows-1] = dtarget->color_now.els[dtarget->nrows-1]= d->color.els[a];
   br_hidden_alloc (dtarget);
   vectorb_realloc (&dtarget->pts_under_brush, dtarget->nrows);
   clusters_set (dtarget, gg);
