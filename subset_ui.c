@@ -55,6 +55,54 @@ datad_get_from_widget (GtkWidget *w, ggobid *gg)
 }
 
 static void
+set_adjustment (GtkWidget *w, GtkAdjustment *adj_new)
+{
+  GtkAdjustment *adj_current;
+  GtkSpinButton *btn;
+  if (w) {
+    btn = GTK_SPIN_BUTTON (w);
+    adj_current = gtk_spin_button_get_adjustment (btn);
+    if ((gint)adj_current != (gint)adj_new) {
+      gtk_object_ref (GTK_OBJECT(adj_current));
+      gtk_spin_button_set_adjustment (btn, adj_new);
+    }
+  }
+}
+
+static void
+subset_display_update (datad *d, ggobid *gg)
+{
+  /*
+   * If this is a different d than was used the last time
+   * the subset panel was opened, attach the right adjustments
+   * to the spin_buttons.
+  */
+  set_adjustment (gg->subset_ui.bstart, d->subset.bstart_adj);
+  set_adjustment (gg->subset_ui.bsize, d->subset.bsize_adj);
+  set_adjustment (gg->subset_ui.estart, d->subset.estart_adj);
+  set_adjustment (gg->subset_ui.estep, d->subset.estep_adj);
+
+  /*-- ... and set the values of the text entries, too --*/
+  if (gg->subset_ui.random_entry)
+    gtk_entry_set_text (GTK_ENTRY (gg->subset_ui.random_entry),
+      g_strdup_printf ("%d", d->subset.random_n));
+  if (gg->subset_ui.nrows_entry)
+    gtk_entry_set_text (GTK_ENTRY (gg->subset_ui.nrows_entry),
+      g_strdup_printf ("%d", d->nrows));
+  /*-- --*/
+}
+
+
+static void
+subset_datad_set_cb (GtkWidget *cl, gint row, gint column,
+  GdkEventButton *event, ggobid *gg)
+{
+  datad *d = g_slist_nth_data (gg->d, row);
+  if (d)
+    subset_display_update (d, gg);
+}
+
+static void
 rescale_cb (GtkWidget *w, ggobid *gg)
 {
   datad *d = datad_get_from_widget (w, gg);
@@ -171,10 +219,10 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
       clist = gtk_clist_new (1);
       gtk_clist_set_selection_mode (GTK_CLIST (clist),
         GTK_SELECTION_SINGLE);
-/*
       gtk_signal_connect (GTK_OBJECT (clist), "select_row",
-                         NULL, gg);
-*/
+                         subset_datad_set_cb, gg);
+      /*-- --*/
+
       for (l = gg->d; l; l = l->next) {
         d = (datad *) l->data;
         subset_init (d, gg);
@@ -394,27 +442,7 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
 
     }  /*-- if window == NULL --*/
 
-    /*
-     * In case this is a different d than was used the last time
-     * the subset panel was opened, attach the right adjustments
-     * to the spin_buttons.
-    */
-    gtk_spin_button_set_adjustment (GTK_SPIN_BUTTON (gg->subset_ui.bstart),
-                                    d->subset.bstart_adj);
-    gtk_spin_button_set_adjustment (GTK_SPIN_BUTTON (gg->subset_ui.bsize),
-                                    d->subset.bsize_adj);
-                                   
-    gtk_spin_button_set_adjustment (GTK_SPIN_BUTTON (gg->subset_ui.estart),
-                                    d->subset.estart_adj);
-    gtk_spin_button_set_adjustment (GTK_SPIN_BUTTON (gg->subset_ui.estep),
-                                    d->subset.estep_adj);
-
-    /*-- ... and set the values of the text entries, too --*/
-    gtk_entry_set_text (GTK_ENTRY (gg->subset_ui.random_entry),
-      g_strdup_printf ("%d", d->subset.random_n));
-    gtk_entry_set_text (GTK_ENTRY (gg->subset_ui.nrows_entry),
-      g_strdup_printf ("%d", d->nrows));
-    /*-- --*/
+    subset_display_update (d, gg);
 
     if (g_slist_length (gg->d) > 1) 
       gtk_widget_show_all (swin);
