@@ -25,7 +25,7 @@ ash_smoothness_cb (GtkAdjustment *adj, ggobid *gg)
   cpanel->p1d.nASHes = (gint)
     ((gfloat) cpanel->p1d.nbins * (adj->value / 2.0));
 
-  display_tailpipe (gg->current_display, gg);
+  display_tailpipe (gg->current_display, FULL, gg);
 }
 
 static gchar *arrangement_lbl[] = {"Row", "Column"};
@@ -48,7 +48,7 @@ static void type_cb (GtkWidget *w, gpointer cbd)
     cpanel = &gg->current_display->cpanel;
   cpanel->p1d.type = GPOINTER_TO_INT (cbd);
 
-  display_tailpipe (gg->current_display, gg);
+  display_tailpipe (gg->current_display, FULL, gg);
 }
 
 static gchar *selection_mode_lbl[] = {"Replace", "Insert", "Append", "Delete"};

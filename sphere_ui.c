@@ -188,7 +188,7 @@ sphere_apply_cb (GtkWidget *w, ggobid *gg) {
       vartable_stats_set (d);
 
       tform_to_world (d, gg);
-      displays_tailpipe (REDISPLAY_PRESENT, gg);
+      displays_tailpipe (REDISPLAY_PRESENT, FULL, gg);
     }
   }
 }

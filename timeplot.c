@@ -110,7 +110,7 @@ tsplot_reset_arrangement (displayd *display, gint arrangement, ggobid *gg) {
 
   gtk_widget_show_all (gg->tsplot.arrangement_box);
 
-  display_tailpipe (display, gg);
+  display_tailpipe (display, FULL, gg);
 
   varpanel_refresh (gg);
 }

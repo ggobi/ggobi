@@ -111,7 +111,7 @@ rejitter (datad *d, ggobid *gg) {
   }
   tform_to_world (d, gg);
   /*-- do not redisplay the missing values displays --*/
-  displays_tailpipe (REDISPLAY_PRESENT, gg);
+  displays_tailpipe (REDISPLAY_PRESENT, FULL, gg);
 
   g_free ((gpointer) selected_cols);
 }

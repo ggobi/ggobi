@@ -1006,7 +1006,7 @@ splot_pixmap0_to_pixmap1 (splotd *sp, gboolean binned, ggobid *gg) {
 }
 
 static void
-splot_draw_to_pixmap1 (splotd *sp, ggobid *gg)
+splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
 {
   displayd *display = (displayd *) sp->displayptr;
   datad *e = display->e;
@@ -1026,26 +1026,26 @@ splot_draw_to_pixmap1 (splotd *sp, ggobid *gg)
     }
   }
      
-  splot_add_plot_labels (sp, sp->pixmap1, gg);  /*-- axis labels --*/
+  splot_add_plot_labels (sp, drawable, gg);  /*-- axis labels --*/
 
   /*-- identify, move points, edge editing --*/
-  splot_add_point_cues (sp, sp->pixmap1, gg);  
+  splot_add_point_cues (sp, drawable, gg);  
 
   if (sp == gg->current_splot) {
-    splot_draw_border (sp, sp->pixmap1, gg);
+    splot_draw_border (sp, drawable, gg);
 
     if (mode == BRUSH) {
-      brush_draw_brush (sp, sp->pixmap1, d, gg);
-      brush_draw_label (sp, sp->pixmap1, d, gg);
+      brush_draw_brush (sp, drawable, d, gg);
+      brush_draw_label (sp, drawable, d, gg);
     } else if (mode == SCALE) {
-      scaling_visual_cues_draw (sp, sp->pixmap1, gg);
+      scaling_visual_cues_draw (sp, drawable, gg);
     }
   }
 }
 
 
 void
-splot_pixmap1_to_window (splotd *sp, ggobid *gg) {
+splot_pixmap_to_window (splotd *sp, GdkPixmap *pixmap, ggobid *gg) {
   GtkWidget *w = sp->da;
 #if 0
   if(gg->plot_GC == NULL) {
@@ -1054,61 +1054,10 @@ splot_pixmap1_to_window (splotd *sp, ggobid *gg) {
     return;
   }
 #endif
-  gdk_draw_pixmap (sp->da->window, gg->plot_GC, sp->pixmap1,
+  gdk_draw_pixmap (sp->da->window, gg->plot_GC, pixmap,
                    0, 0, 0, 0,
                    w->allocation.width,
                    w->allocation.height);
-}
-
-/*------------------------------------------------------------------------*/
-/*                   convenience routine                                  */
-/*------------------------------------------------------------------------*/
-
-void
-splot_redraw (splotd *sp, RedrawStyle redraw_style, ggobid *gg) {
-
-  /*-- sometimes the first draw happens before configure is called --*/
-  if (sp == NULL || sp->da == NULL || sp->pixmap0 == NULL) {
-    return;
-  }
-
-  switch (redraw_style) {
-    case FULL:
-      splot_draw_to_pixmap0_unbinned (sp, gg);
-      splot_pixmap0_to_pixmap1 (sp, false, gg);  /* false = not binned */
-      splot_draw_to_pixmap1 (sp, gg);
-    break;
-    case QUICK:
-      splot_pixmap0_to_pixmap1 (sp, false, gg);  /* false = not binned */
-      splot_draw_to_pixmap1 (sp, gg);
-    break;
-
-    case BINNED:
-      splot_draw_to_pixmap0_binned (sp, gg);
-      splot_pixmap0_to_pixmap1 (sp, true, gg);  /* true = binned */
-      splot_draw_to_pixmap1 (sp, gg);
-    break;
-
-    case EXPOSE:
-    break;
-
-    case NONE:
-    break;
-  }
-
-  if (redraw_style != NONE) {
-    splot_pixmap1_to_window (sp, gg);
-
-    /*
-     * Somehow the very first window is initially drawn without a border. 
-     * I ought to be able to fix that more nicely some day, but in the
-     * meantime, what's an extra rectangle?
-    */
-    if (sp == gg->current_splot) 
-      splot_draw_border (sp, sp->da->window, gg);
-  }
-
-  sp->redraw_style = EXPOSE;
 }
 
 /*------------------------------------------------------------------------*/
@@ -1283,4 +1232,61 @@ static void splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
         break;
     }
   }
+}
+
+/*------------------------------------------------------------------------*/
+/*                   convenience routine                                  */
+/*------------------------------------------------------------------------*/
+
+void
+splot_redraw (splotd *sp, RedrawStyle redraw_style, ggobid *gg) {
+
+  /*-- sometimes the first draw happens before configure is called --*/
+  if (sp == NULL || sp->da == NULL || sp->pixmap0 == NULL) {
+    return;
+  }
+
+  switch (redraw_style) {
+    case FULL:  /*-- FULL_2PIXMAP --*/
+      splot_draw_to_pixmap0_unbinned (sp, gg);
+      splot_pixmap0_to_pixmap1 (sp, false, gg);  /* false = not binned */
+      splot_add_markup_to_pixmap (sp, sp->pixmap1, gg);
+      splot_pixmap_to_window (sp, sp->pixmap1, gg);
+    break;
+    case QUICK:
+      splot_pixmap0_to_pixmap1 (sp, false, gg);  /* false = not binned */
+      splot_add_markup_to_pixmap (sp, sp->pixmap1, gg);
+      splot_pixmap_to_window (sp, sp->pixmap1, gg);
+    break;
+
+    case BINNED:
+      splot_draw_to_pixmap0_binned (sp, gg);
+      splot_pixmap0_to_pixmap1 (sp, true, gg);  /* true = binned */
+      splot_add_markup_to_pixmap (sp, sp->pixmap1, gg);
+      splot_pixmap_to_window (sp, sp->pixmap1, gg);
+    break;
+
+    case FULL_1PIXMAP:  /*-- to optimize motion --*/
+      splot_draw_to_pixmap0_unbinned (sp, gg);
+      splot_add_markup_to_pixmap (sp, sp->pixmap0, gg);
+      splot_pixmap_to_window (sp, sp->pixmap0, gg);
+    break;
+
+    case EXPOSE:
+      splot_pixmap_to_window (sp, sp->pixmap1, gg);
+    break;
+
+    case NONE:
+    break;
+  }
+
+  /*
+   * Somehow the very first window is initially drawn without a border. 
+   * I ought to be able to fix that more nicely some day, but in the
+   * meantime, what's an extra rectangle?
+  */
+  if (sp == gg->current_splot && redraw_style != NONE) 
+    splot_draw_border (sp, sp->da->window, gg);
+
+  sp->redraw_style = EXPOSE;
 }

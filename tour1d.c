@@ -212,6 +212,11 @@ void tour1d_pause (cpaneld *cpanel, gboolean state, ggobid *gg) {
   cpanel->t1d_paused = state;
 
   tour1d_func (!cpanel->t1d_paused, gg->current_display, gg);
+
+  if (cpanel->t1d_paused) {
+    /*-- whenever motion stops, we need a FULL redraw --*/
+    display_tailpipe (gg->current_display, FULL, gg);
+  }
 }
 
 void 
@@ -468,7 +473,7 @@ tour1d_run(displayd *dsp, ggobid *gg)
     }
   }
   /*  tour_reproject(dsp, 2);*/
-  display_tailpipe (dsp, gg);
+  display_tailpipe (dsp, FULL, gg);
 
   varcircles_refresh (d, gg);
 
@@ -532,7 +537,7 @@ void tour1d_reinit(ggobid *gg)
 
   dsp->t1d.get_new_target = true;
 
-  display_tailpipe (dsp, gg);
+  display_tailpipe (dsp, FULL, gg);
 
   varcircles_refresh (d, gg);
 }
@@ -598,10 +603,8 @@ tour1d_manip_init(gint p1, gint p2, splotd *sp)
       dontdoit = true;
   }
 
-  if (dontdoit) {
-    if (sp->motion_id)
-      gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
-  }
+  if (dontdoit)
+    disconnect_motion_signal (sp);
 }
 
 void
@@ -667,12 +670,11 @@ tour1d_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
          xsinphi * dsp->t1d_manbasis.vals[1][j];
     }
  
-    display_tailpipe (dsp, gg);
+    display_tailpipe (dsp, FULL, gg);
     varcircles_refresh (d, gg);
   }
   else {
-    if (sp->motion_id)
-      gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
+    disconnect_motion_signal (sp);
     copy_mat(dsp->t1d.u0.vals, dsp->t1d.u.vals, d->ncols, 1);
     dsp->t1d.get_new_target = true;
     if (!cpanel->t1d_paused)
@@ -689,16 +691,18 @@ tour1d_manip_end(splotd *sp)
   ggobid *gg = GGobiFromSPlot(sp);
   extern void copy_mat(gfloat **, gfloat **, gint, gint);
 
-  if (sp->motion_id)
-    gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
+  disconnect_motion_signal (sp);
 
   copy_mat(dsp->t1d.u0.vals, dsp->t1d.u.vals, d->ncols, 1);
   dsp->t1d.get_new_target = true;
 
   /* need to turn on tour? */
-  if (!cpanel->t1d_paused)
+  if (!cpanel->t1d_paused) {
     tour1d_pause(cpanel, T1DOFF, gg);
 
+    /*-- whenever motion stops, we need a FULL redraw --*/
+    display_tailpipe (gg->current_display, FULL, gg);
+  }
 }
 
 #undef T1DON

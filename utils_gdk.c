@@ -102,12 +102,12 @@ mousepos_get_pressed (GtkWidget *w, GdkEventButton *event,
 {
   ggobid *gg = GGobiFromSPlot (sp);
   gint grab_ok;
+  GdkModifierType state;
 
   *btn1_down_p = false;
   *btn2_down_p = false;
 
-  sp->mousepos.x = (gint) event->x;
-  sp->mousepos.y = (gint) event->y;
+  gdk_window_get_pointer (w->window, &sp->mousepos.x, &sp->mousepos.y, &state);
 
   grab_ok = gdk_pointer_grab (sp->da->window,
     false,
@@ -138,7 +138,9 @@ mousepos_get_motion (GtkWidget *w, GdkEventMotion *event,
   *btn2_down_p = false;
 
   /*-- that is, if using motion hints --*/
+/*
   if (event->is_hint) {
+*/
 
     gdk_window_get_pointer (w->window, &sp->mousepos.x, &sp->mousepos.y,
       &state);
@@ -149,6 +151,7 @@ mousepos_get_motion (GtkWidget *w, GdkEventMotion *event,
     else if ((state & GDK_BUTTON3_MASK) == GDK_BUTTON3_MASK)
       *btn2_down_p = true;
 
+/*
   } else {
 
     sp->mousepos.x = (gint) event->x;
@@ -160,6 +163,7 @@ mousepos_get_motion (GtkWidget *w, GdkEventMotion *event,
     else if ((event->state & GDK_BUTTON3_MASK) == GDK_BUTTON3_MASK)
       *btn2_down_p = true;
   }
+*/
 
   if (*btn1_down_p) gg->buttondown = 1;
   else if (*btn2_down_p) gg->buttondown = 2;

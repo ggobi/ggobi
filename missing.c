@@ -165,5 +165,5 @@ missing_rejitter (datad *d, ggobid *gg) {
   missing_to_world (d, gg);
 
   /*-- redisplay only the missings displays --*/
-  displays_tailpipe (REDISPLAY_MISSING, gg); 
+  displays_tailpipe (REDISPLAY_MISSING, FULL, gg); 
 }

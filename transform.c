@@ -831,5 +831,5 @@ transform (gint stage, gint tform_type, gfloat param, datad *d, ggobid *gg)
    * are not currently displayed, but we're doing it anyway.
   */
   /*-- do not redisplay the missing values displays --*/
-  displays_tailpipe (REDISPLAY_PRESENT, gg);
+  displays_tailpipe (REDISPLAY_PRESENT, FULL, gg);
 }

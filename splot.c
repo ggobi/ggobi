@@ -502,6 +502,8 @@ splot_new (displayd *display, gint width, gint height, ggobid *gg) {
              | GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK);
 
 
+
+
 /*
  * Initialize the data portion of the splot object
 */
@@ -867,4 +869,39 @@ splot_reverse_pipeline (splotd *sp, gint ipt, lcoords *eps,
   /*-- for bivariate plots only --*/
   /*-- in pipeline.c since it applies to the front of the pipeline --*/
   world_to_raw (ipt, sp, d, gg);
+}
+
+/* ---------------------------------------------------------------------*/
+/*          Pack up some of short signal routines                       */
+/* ---------------------------------------------------------------------*/
+
+/*-- this one isn't attached to sp->da, but we'll bundle it anyway --*/
+void
+disconnect_key_press_signal (splotd *sp) {
+  displayd *display = sp->displayptr;
+  if (sp->key_press_id) {
+    gtk_signal_disconnect (GTK_OBJECT (display->window), sp->key_press_id);
+    sp->key_press_id = 0;
+  }
+}
+void
+disconnect_button_press_signal (splotd *sp) {
+  if (sp->press_id) {
+    gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->press_id);
+    sp->press_id = 0;
+  }
+}
+void
+disconnect_button_release_signal (splotd *sp) {
+  if (sp->release_id) {
+    gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->release_id);
+    sp->release_id = 0;
+  }
+}
+void
+disconnect_motion_signal (splotd *sp) {
+  if (sp->motion_id) {
+    gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
+    sp->motion_id = 0;
+  }
 }

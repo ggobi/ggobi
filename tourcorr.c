@@ -315,6 +315,11 @@ void tourcorr_pause (cpaneld *cpanel, gboolean state, ggobid *gg)
 
   tourcorr_func (!cpanel->tcorr1_paused, gg->current_display, gg);
   tourcorr_func (!cpanel->tcorr2_paused, gg->current_display, gg);
+
+  if (cpanel->tcorr1_paused && cpanel->tcorr2_paused) {
+    /*-- whenever motion stops, we need a FULL redraw --*/
+    display_tailpipe (gg->current_display, FULL, gg);
+  }
 }
 
 void 
@@ -561,7 +566,7 @@ tourcorr_run(displayd *dsp, ggobid *gg)
     }
   }
   
-  display_tailpipe (dsp, gg);
+  display_tailpipe (dsp, FULL, gg);
 
   varcircles_refresh (d, gg);
 }
@@ -662,7 +667,7 @@ void tourcorr_reinit(ggobid *gg)
   dsp->tcorr1.stepcntr = 0;
   dsp->tcorr2.stepcntr = 0;
 
-  display_tailpipe (dsp, gg);
+  display_tailpipe (dsp, FULL, gg);
 
   varcircles_refresh (d, gg);
 
@@ -745,8 +750,7 @@ tourcorr_manip_init(gint p1, gint p2, splotd *sp)
   } 
 
   if (dontdoit) {
-    if (sp->motion_id)
-      gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
+    disconnect_motion_signal (sp);
   }
 }
 
@@ -858,12 +862,11 @@ tourcorr_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
          ysinphi * dsp->tc2_manbasis.vals[1][j];
     }
 
-    display_tailpipe (dsp, gg);
+    display_tailpipe (dsp, FULL, gg);
     varcircles_refresh (d, gg);
   }
   else {
-    if (sp->motion_id)
-      gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
+    disconnect_motion_signal (sp);
     copy_mat(dsp->tcorr1.u0.vals, dsp->tcorr1.u.vals, d->ncols, 1);
     copy_mat(dsp->tcorr2.u0.vals, dsp->tcorr2.u.vals, d->ncols, 1);
     dsp->tcorr1.get_new_target = true;
@@ -882,8 +885,7 @@ tourcorr_manip_end(splotd *sp)
   ggobid *gg = GGobiFromSPlot(sp);
   extern void copy_mat(gfloat **, gfloat **, gint, gint);
 
-  if (sp->motion_id)
-    gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
+  disconnect_motion_signal (sp);
 
   copy_mat(dsp->tcorr1.u0.vals, dsp->tcorr1.u.vals, d->ncols, 1);
   copy_mat(dsp->tcorr2.u0.vals, dsp->tcorr2.u.vals, d->ncols, 1);
@@ -891,8 +893,12 @@ tourcorr_manip_end(splotd *sp)
   dsp->tcorr2.get_new_target = true;
 
   /* need to turn on tour? */
-  if (!cpanel->tcorr1_paused && !cpanel->tcorr2_paused)
+  if (!cpanel->tcorr1_paused && !cpanel->tcorr2_paused) {
     tourcorr_func(CTON, gg->current_display, gg);
+
+    /*-- whenever motion stops, we need a FULL redraw --*/
+    display_tailpipe (gg->current_display, FULL, gg);
+  }
 
 }
 

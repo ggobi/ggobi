@@ -239,6 +239,11 @@ void tour2d_pause (cpaneld *cpanel, gboolean state, ggobid *gg) {
   cpanel->t2d_paused = state;
 
   tour2d_func (!cpanel->t2d_paused, gg->current_display, gg);
+
+  if (cpanel->t2d_paused) {
+    /*-- whenever motion stops, we need a FULL redraw --*/
+    display_tailpipe (gg->current_display, FULL, gg);
+  }
 }
 
 void 
@@ -458,7 +463,8 @@ tour2d_run(displayd *dsp, ggobid *gg)
     }
   }
   
-  display_tailpipe (dsp, gg);
+  /*display_tailpipe (dsp, FULL, gg);*/
+  display_tailpipe (dsp, FULL_1PIXMAP, gg);
   varcircles_refresh (d, gg);
 }
 
@@ -520,7 +526,7 @@ void tour2d_reinit(ggobid *gg)
 
   dsp->t2d.get_new_target = true;
 
-  display_tailpipe (dsp, gg);
+  display_tailpipe (dsp, FULL, gg);
 
   varcircles_refresh (d, gg);
 }
@@ -604,11 +610,8 @@ tour2d_manip_init(gint p1, gint p2, splotd *sp)
     }
   }
 
-  if (dontdoit) {
-    if (sp->motion_id)
-      gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
-  }
-
+  if (dontdoit)
+    disconnect_motion_signal (sp);
 }
 
 void
@@ -778,7 +781,8 @@ tour2d_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
           dsp->t2d_manbasis.vals[2][j]*dsp->t2d_mvar_3dbasis.vals[1][2];
       }
     }
-    display_tailpipe (dsp, gg);
+    /*display_tailpipe (dsp, FULL, gg);*/
+    display_tailpipe (dsp, FULL_1PIXMAP, gg);
     varcircles_refresh (d, gg);
   }
 }
@@ -791,17 +795,19 @@ tour2d_manip_end(splotd *sp)
   cpaneld *cpanel = &dsp->cpanel;
   ggobid *gg = GGobiFromSPlot(sp);
   extern void copy_mat(gfloat **, gfloat **, gint, gint);
-
-  if (sp->motion_id)
-    gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
+ 
+  disconnect_motion_signal (sp);
 
   copy_mat(dsp->t2d.u0.vals, dsp->t2d.u.vals, d->ncols, 2);
   dsp->t2d.get_new_target = true;
 
   /* need to turn on tour? */
-  if (!cpanel->t2d_paused)
+  if (!cpanel->t2d_paused) {
     tour2d_func(T2DON, gg->current_display, gg);
 
+    /*-- whenever motion stops, we need a FULL redraw --*/
+    display_tailpipe (gg->current_display, FULL, gg);
+  }
 }
 
 #undef T2DON

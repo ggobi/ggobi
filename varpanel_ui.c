@@ -150,7 +150,7 @@ varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint btn,
 
     /*-- do we need a call to brush_once here? --*/
 
-    display_tailpipe (display, gg);
+    display_tailpipe (display, FULL, gg);
   }
 }
 

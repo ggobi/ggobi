@@ -25,7 +25,7 @@ static void type_cb (GtkWidget *w, gpointer cbd)
   cpaneld *cpanel = &gg->current_display->cpanel;
   cpanel->p1d.type = GPOINTER_TO_INT (cbd);
 
-  display_tailpipe (gg->current_display, gg);
+  display_tailpipe (gg->current_display, FULL, gg);
 }
 
 static void ash_smoothness_cb (GtkAdjustment *adj, ggobid *gg) 
@@ -37,7 +37,7 @@ static void ash_smoothness_cb (GtkAdjustment *adj, ggobid *gg)
     ((gfloat) cpanel->p1d.nbins * (adj->value / 2.0));
 
   if (cpanel->p1d.type == ASH)
-    display_tailpipe (gg->current_display, gg);
+    display_tailpipe (gg->current_display, FULL, gg);
 }
 
 static void cycle_cb (GtkToggleButton *button, ggobid* gg)
@@ -83,10 +83,7 @@ p1d_event_handlers_toggle (splotd *sp, gboolean state) {
                                            (GtkSignalFunc) key_press_cb,
                                            (gpointer) sp);
   } else {
-    if (sp->key_press_id) {
-      gtk_signal_disconnect (GTK_OBJECT (display->window), sp->key_press_id);
-      sp->key_press_id = 0;
-    }
+    disconnect_key_press_signal (sp);
   }
 }
 

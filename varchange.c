@@ -424,9 +424,6 @@ delete_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
 
   /*-- run the first part of the pipeline  --*/
   tform_to_world (d, gg);
-/*
-  displays_tailpipe (REDISPLAY_ALL, gg);
-*/
 
   return true;
 }

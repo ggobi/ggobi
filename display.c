@@ -686,7 +686,7 @@ displays_plot (splotd *splot, RedrawStyle type, ggobid *gg) {
 
 /*-- reproject and replot all splots in display --*/
 void
-display_tailpipe (displayd *display, ggobid *gg) {
+display_tailpipe (displayd *display, RedrawStyle type, ggobid *gg) {
   GList *splist = display->splots;
   splotd *sp;
   cpaneld *cpanel;
@@ -715,14 +715,14 @@ display_tailpipe (displayd *display, ggobid *gg) {
     if (display->displaytype == scatterplot)
       ruler_ranges_set (false, display, sp, gg);
 
-    splot_redraw (sp, FULL, gg);
+    splot_redraw (sp, type, gg);
     splist = splist->next;
   }
 }
 
 /*-- Reproject and plot all plots in all displays: modulo missingness --*/
 void
-displays_tailpipe (gint which, ggobid *gg) {
+displays_tailpipe (gint which, RedrawStyle type, ggobid *gg) {
   GList *dlist;
   displayd *display;
   gboolean redisplay = true;
@@ -736,7 +736,7 @@ displays_tailpipe (gint which, ggobid *gg) {
     }
 
     if (redisplay)
-      display_tailpipe (display, gg);
+      display_tailpipe (display, type, gg);
   }
 }
 

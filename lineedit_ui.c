@@ -93,13 +93,12 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   ggobid *gg = GGobiFromSPlot(sp);
   displayd *display = sp->displayptr;
   datad *d = display->d;
+  gboolean button1_p, button2_p;
+  mousepos_get_pressed (w, event, &button1_p, &button2_p, sp);
 
   gg->current_splot = sp;
   gg->current_display = display;
   
-  sp->mousepos.x = (gint) event->x;
-  sp->mousepos.y = (gint) event->y;
-
   gg->edgeedit.a = d->nearest_point;
 
   return true;
@@ -171,22 +170,10 @@ edgeedit_event_handlers_toggle (splotd *sp, gboolean state) {
     }
 
   } else {
-    if (sp->key_press_id) {
-      gtk_signal_disconnect (GTK_OBJECT (display->window), sp->key_press_id);
-      sp->key_press_id = 0;
-    }
-    if (sp->press_id) {
-      gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->press_id);
-      sp->press_id = 0;
-    }
-    if (sp->release_id) {
-      gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->release_id);
-      sp->release_id = 0;
-    }
-    if (sp->motion_id) {
-      gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
-      sp->motion_id = 0;
-    }
+    disconnect_key_press_signal (sp);
+    disconnect_button_press_signal (sp);
+    disconnect_button_release_signal (sp);
+    disconnect_motion_signal (sp);
   }
 }
 

@@ -29,7 +29,7 @@ static void rescale_cb (GtkButton *button, ggobid *gg)
   vartable_stats_set (d);
 
   tform_to_world (d, gg);
-  displays_tailpipe (REDISPLAY_ALL, gg);
+  displays_tailpipe (REDISPLAY_ALL, FULL, gg);
 }
 static void group_cb (GtkToggleButton *button, ggobid *gg)
 {
@@ -58,7 +58,7 @@ impute_cb (GtkWidget *w, ggobid *gg) {
 
   if (redraw) {
     tform_to_world (d, gg);
-    displays_tailpipe (REDISPLAY_ALL, gg);
+    displays_tailpipe (REDISPLAY_ALL, FULL, gg);
   }
 }
 

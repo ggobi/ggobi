@@ -32,7 +32,7 @@ static void reset_all_cb (GtkButton *button, ggobid *gg)
     tform_to_world (d, gg);
   }
 
-  displays_tailpipe (REDISPLAY_ALL, gg);
+  displays_tailpipe (REDISPLAY_ALL, FULL, gg);
 }
 
 static void undo_last_cb (GtkButton *button, ggobid *gg)
@@ -43,7 +43,7 @@ static void undo_last_cb (GtkButton *button, ggobid *gg)
   movepts_history_delete_last (d, gg);
   movepts_history_delete_last (d, gg);
   tform_to_world (d, gg);
-  displays_tailpipe (REDISPLAY_ALL, gg);
+  displays_tailpipe (REDISPLAY_ALL, FULL, gg);
 }
 
 static void move_cluster_cb (GtkWidget *w, ggobid *gg)
@@ -215,7 +215,6 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
     gdk_pointer_ungrab (event->time);  /*-- grabbed in mousepos_get_pressed --*/
   }
 
-  /*displays_tailpipe (REDISPLAY_ALL, gg);*/
   displays_plot (NULL, QUICK, gg);
 
   return retval;
@@ -243,22 +242,10 @@ movepts_event_handlers_toggle (splotd *sp, gboolean state) {
                                         (GtkSignalFunc) motion_notify_cb,
                                         (gpointer) sp);
   } else {
-    if (sp->key_press_id) {
-      gtk_signal_disconnect (GTK_OBJECT (display->window), sp->key_press_id);
-      sp->key_press_id = 0;
-    }
-    if (sp->press_id) {
-      gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->press_id);
-      sp->press_id = 0;
-    }
-    if (sp->release_id) {
-      gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->release_id);
-      sp->release_id = 0;
-    }
-    if (sp->motion_id) {
-      gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
-      sp->motion_id = 0;
-    }
+    disconnect_key_press_signal (sp);
+    disconnect_button_press_signal (sp);
+    disconnect_button_release_signal (sp);
+    disconnect_motion_signal (sp);
   }
 }
 

@@ -78,7 +78,7 @@ static void t1d_ash_sm_cb (GtkAdjustment *adj, ggobid *gg)
   /*-- adj->value ranges from .01 to .5; min value for nASHes = 1 --*/
   cpanel->t1d_nASHes = (gint) ((gfloat) cpanel->t1d_nbins * (adj->value / 2.0));
 
-  display_tailpipe (gg->current_display, gg);
+  display_tailpipe (gg->current_display, FULL, gg);
 }
 
 static void tour1d_vert_cb (GtkToggleButton *button, ggobid *gg)
@@ -506,13 +506,14 @@ key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
 }
 
 static gint
-motion_notify_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
+motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
 {
   ggobid *gg = GGobiFromSPlot(sp);
   extern void tour1d_manip(gint, gint, splotd *, ggobid *);
+  gboolean button1_p, button2_p;
 
-  sp->mousepos.x = (gint) event->x;
-  sp->mousepos.y = (gint) event->y;
+  mousepos_get_motion (w, event, &button1_p, &button2_p, sp);
+
   tour1d_manip(sp->mousepos.x, sp->mousepos.y, sp, gg);
 
   return true;
@@ -522,17 +523,8 @@ static gint
 button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
   extern void tour1d_manip_init(gint, gint, splotd *);
-  gint grab_ok;
-
-  grab_ok = gdk_pointer_grab (sp->da->window,
-    false,
-    (GdkEventMask) (GDK_POINTER_MOTION_MASK|GDK_BUTTON_RELEASE_MASK),
-    (GdkWindow *) NULL,
-    (GdkCursor *) NULL,
-    event->time);
-
-  sp->mousepos.x = (gint) event->x;
-  sp->mousepos.y = (gint) event->y;
+  gboolean button1_p, button2_p;
+  mousepos_get_pressed (w, event, &button1_p, &button2_p, sp);
 
   sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
                                       "motion_notify_event",
@@ -548,9 +540,9 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
   extern void tour1d_manip_end(splotd *);
   gboolean retval = true;
+  GdkModifierType state;
 
-  sp->mousepos.x = (gint) event->x;
-  sp->mousepos.y = (gint) event->y;
+  gdk_window_get_pointer (w->window, &sp->mousepos.x, &sp->mousepos.y, &state);
 
   tour1d_manip_end(sp);
 
@@ -577,17 +569,8 @@ tour1d_event_handlers_toggle (splotd *sp, gboolean state) {
                                          (GtkSignalFunc) button_release_cb,
                                          (gpointer) sp);
   } else {
-    if (sp->key_press_id) {
-      gtk_signal_disconnect (GTK_OBJECT (display->window), sp->key_press_id);
-      sp->key_press_id = 0;
-    }
-    if (sp->press_id) {
-      gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->press_id);
-      sp->press_id = 0;
-    }
-    if (sp->release_id) {
-      gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->release_id);
-      sp->release_id = 0;
-    }
+    disconnect_key_press_signal (sp);
+    disconnect_button_press_signal (sp);
+    disconnect_button_release_signal (sp);
   }
 }

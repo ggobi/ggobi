@@ -233,7 +233,7 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
                                      (GtkSignalFunc) motion_notify_cb,
                                      (gpointer) cpanel);
 
-  brush_set_pos ((gint) event->x, (gint) event->y, sp);
+  brush_set_pos ((gint) sp->mousepos.x, (gint) sp->mousepos.y, sp);
   brush_motion (&sp->mousepos, button1_p, button2_p, cpanel, sp, gg);
 
   return retval;
@@ -247,13 +247,13 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   cpaneld *cpanel = &display->cpanel;
   datad *d = display->d;
   gboolean retval = true;
+  GdkModifierType state;
 
   gg->buttondown = 0;
 
-  sp->mousepos.x = (gint) event->x;
-  sp->mousepos.y = (gint) event->y;
+  gdk_window_get_pointer (w->window, &sp->mousepos.x, &sp->mousepos.y, &state);
 
-  gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
+  disconnect_motion_signal (sp);
   gdk_pointer_ungrab (event->time);  /*-- grabbed in mousepos_get_pressed --*/
 
   if (cpanel->br_mode == BR_PERSISTENT) {
@@ -294,18 +294,9 @@ brush_event_handlers_toggle (splotd *sp, gboolean state) {
                                         (GtkSignalFunc) button_release_cb,
                                         (gpointer) sp);
   } else {
-    if (sp->key_press_id) {
-      gtk_signal_disconnect (GTK_OBJECT (display->window), sp->key_press_id);
-      sp->key_press_id = 0;
-    }
-    if (sp->press_id) {
-      gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->press_id);
-      sp->press_id = 0;
-    }
-    if (sp->release_id) {
-      gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->release_id);
-      sp->release_id = 0;
-    }
+    disconnect_key_press_signal (sp);
+    disconnect_button_press_signal (sp);
+    disconnect_button_release_signal (sp);
   }
 }
 

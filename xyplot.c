@@ -135,7 +135,7 @@ cycle_fixedx (splotd *sp, displayd *display, datad *d, ggobid *gg)
     jvar_prev = sp->xyvars.y;
     if (xyplot_varsel (sp, varno, &jvar_prev, 2)) {
       varpanel_refresh (gg);
-      display_tailpipe (display, gg);
+      display_tailpipe (display, FULL, gg);
     }
   }
 }
@@ -174,7 +174,7 @@ cycle_fixedy (splotd *sp, displayd *display, datad *d, ggobid *gg)
     jvar_prev = sp->xyvars.x;
     if (xyplot_varsel (sp, varno, &jvar_prev, 1))
       varpanel_refresh (gg);
-      display_tailpipe (display, gg);
+      display_tailpipe (display, FULL, gg);
   }
 }
 
@@ -235,7 +235,7 @@ cycle_xy (splotd *sp, displayd *display, datad *d, ggobid *gg)
 
   if (redraw) {
     varpanel_refresh (gg);
-    display_tailpipe (display, gg);
+    display_tailpipe (display, FULL, gg);
   }
 }
 

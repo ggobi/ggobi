@@ -291,32 +291,15 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
   gboolean retval = true;
   ggobid *gg = GGobiFromSPlot(sp);
-  gint grab_ok;
+  gboolean button1_p, button2_p;
+  mousepos_get_pressed (w, event, &button1_p, &button2_p, sp);
 
   gg->current_splot = sp;
   gg->current_display = (displayd *) sp->displayptr;
 
-  sp->mousepos_o.x = sp->mousepos.x = (gint) event->x;
-  sp->mousepos_o.y = sp->mousepos.y = (gint) event->y;
+  sp->mousepos_o.x = sp->mousepos.x;
+  sp->mousepos_o.y = sp->mousepos.y;
 
-  grab_ok = gdk_pointer_grab (sp->da->window,
-    false,
-    (GdkEventMask) (GDK_POINTER_MOTION_MASK|GDK_BUTTON_RELEASE_MASK),
-    (GdkWindow *) NULL,
-    (GdkCursor *) NULL,
-    event->time);
-
-  /*
-   * This looks like a bug in the toolkit, to me:  if I release
-   * the button outside the plotting window but in some other ggobi
-   * window, eg inside the variable selection panel, I don't get the
-   * button release event.  This isn't a fix, but it allows the user
-   * to reset state.
-  if (sp->motion_id) {
-    gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
-    sp->motion_id = 0;
-  }
-  */
   sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
                                       "motion_notify_event",
                                       (GtkSignalFunc) motion_notify_cb,
@@ -329,17 +312,14 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
   gboolean retval = true;
   ggobid *gg = GGobiFromSPlot (sp);
+  GdkModifierType state;
 
   gg->buttondown = 0;
 
-  sp->mousepos.x = (gint) event->x;
-  sp->mousepos.y = (gint) event->y;
+  gdk_window_get_pointer (w->window, &sp->mousepos.x, &sp->mousepos.y, &state);
 
   gdk_pointer_ungrab (event->time);
-  if (sp->motion_id) {
-    gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
-    sp->motion_id = 0;
-  }
+  disconnect_motion_signal (sp);
 
   return retval;
 }
@@ -362,18 +342,9 @@ scale_event_handlers_toggle (splotd *sp, gboolean state) {
                                          (GtkSignalFunc) button_release_cb,
                                          (gpointer) sp);
   } else {
-    if (sp->key_press_id) {
-      gtk_signal_disconnect (GTK_OBJECT (display->window), sp->key_press_id);
-      sp->key_press_id = 0;
-    }
-    if (sp->press_id) {
-      gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->press_id);
-      sp->press_id = 0;
-    }
-    if (sp->release_id) {
-      gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->release_id);
-      sp->release_id = 0;
-    }
+    disconnect_key_press_signal (sp);
+    disconnect_button_press_signal (sp);
+    disconnect_button_release_signal (sp);
   }
 }
 

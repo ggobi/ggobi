@@ -408,7 +408,7 @@ GGOBI(full_pipeline_mode_set)(gint action, ggobid *gg)
       pipeline_mode_submenus_update (prev_pipeline_mode, gg);
 
       /*-- redraw this display --*/
-      display_tailpipe (display, gg);
+      display_tailpipe (display, FULL, gg);
 
       /*-- redraw as needed for transient brushing and identify --*/
       if (redraw_style != NONE) {
