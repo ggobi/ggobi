@@ -50,7 +50,7 @@ C_SRC_FILES=$(SRC) $(XML_SRC) xmlConvert.c
 
 C_HEADER_FILES=\
   GGobiAPI brushing cpanel datad defines display display_tree \
-  externs ggobi noop-checkbutton read_xml  \
+  externs ggobi noop-toggle read_xml  \
   splot types vars varseldata write_xml writedata vartable gtkext fileio \
   print tour1d_pp tour2d_pp tour_pp splash read_init write_state \
   plugin colorscheme \
