@@ -4,10 +4,11 @@ else
  setenv LD_LIBRARY_PATH @GGOBI_ROOT@/lib:@XML_LIB_DIRS_PATH@
 endif
 
-set OS=`/usr/common/gnu/bin/uname`
-if (${OS} == "IRIX64") then
- if(${?LD_LIBRARYN32_PATH}) then
-   setenv LD_LIBRARYN32_PATH @GGOBI_ROOT@/lib:@XML_LIB_DIRS_PATH@:${LD_LIBRARYN32_PATH}:
+set OS=`@UNAME@`
+if ("${OS}" == "IRIX64") then
+ if(${?LD_LIBRARYN32_PATH}) 
+ then
+   setenv LD_LIBRARYN32_PATH @GGOBI_ROOT@/lib:@XML_LIB_DIRS_PATH@:${LD_LIBRARYN32_PATH}
  else
    setenv LD_LIBRARYN32_PATH @GGOBI_ROOT@/lib:@XML_LIB_DIRS_PATH@
  endif
