@@ -79,13 +79,7 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
   }
 
   visible = (glong *) g_malloc (d->nrows_in_plot * sizeof (glong));
-  nvisible = 0;
-  for (m=0; m<d->nrows_in_plot; m++) {
-    i = d->rows_in_plot[m];
-    if (!d->hidden.els[i]) {
-      visible[nvisible++] = i;
-    }
-  }
+  nvisible = visible_set (visible, d);
 
   if (strcmp (gtk_widget_get_name (button), "neato") == 0)
     layout_type = NEATO_LAYOUT;
@@ -227,12 +221,10 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
 
   values = (gdouble *) g_malloc (nvisible * nc * sizeof(gdouble));
   rownames = (gchar **) g_malloc (nvisible * sizeof(gchar *));
-  for (m=0; m<nvisible; m++) {
-    i = visible[m];
+  for (i=0; i<nvisible; i++) {
+    rownames[i] = (gchar *) g_array_index (d->rowlab, gchar *, visible[i]);
     for (k=0; k<dim; k++)
-      values[m + k*nvisible] = (gdouble) pos[i][k];
-
-    rownames[m] = (gchar *) g_array_index (d->rowlab, gchar *, i);
+      values[i + k*nvisible] = (gdouble) pos[i][k];
   }
 
   colnames = (gchar **) g_malloc (nc * sizeof(gchar *));
@@ -287,19 +279,10 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
 */
   }
 
-/*
-    name = g_strdup_printf ("x");
-    newvar_add_with_values (x, d->nrows, name, d, gg);
-    g_free (name);
-
-    name = g_strdup_printf ("y");
-    newvar_add_with_values (y, d->nrows, name, d, gg);
-    g_free (name);
-*/
-
   for (i=0; i<nvisible; i++)
     g_free (pos[i]);
   g_free (pos);
+  g_free (visible);
   agclose (graph);
 }
 
