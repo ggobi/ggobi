@@ -224,7 +224,7 @@ key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
     /*-- turn pause on and off --*/
     GtkWidget *pause_button = NULL;
     pause_button = widget_find_by_name (gg->control_panel[TOUR2D3],
-      "TOUR2D:pause_button");
+      "TOUR2D3:pause_button");
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pause_button),
       !cpanel->t2d3.paused);
   }
