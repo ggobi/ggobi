@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+
+<ggobidata ids="alpha">
+<data name="topology">
+<variables count="3">
+ <realvariable name="X"/>
+ <realvariable name="Y"/>
+ <realvariable name="Packet count"/>
+</variables>
+<records count="10">
+  <record id="BS A" glyphType="plus">.25 .75 100</record>
+  <record id="BS B" glyphType="plus">.75 .75 60</record>
+  <record id="BS C" glyphType="plus">.75 .25 120</record>
+  <record id="BS D" glyphType="plus">.25 .25 30</record>
+
+  <record id="node 1">.20 .85 30</record>
+  <record id="node 2">.30 .65 30</record>
+
+  <record id="node 3">.70 .80 30</record>
+
+  <record id="node 4">.70 .30 30</record>
+
+  <record id="node 5">.20 .30 30</record>
+  <record id="node 6">.30 .20 30</record>
+
+</records>
+</data>
+
+<edges name="connections" count="6">
+<edge source="node 1" destination="BS A"/>
+<edge source="node 2" destination="BS A"/>
+
+<edge source="node 3" destination="BS B"/>
+
+<edge source="node 4" destination="BS C"/>
+
+<edge source="node 5" destination="BS D"/>
+<edge source="node 6" destination="BS D" />
+</edges>
+
+</ggobidata>
