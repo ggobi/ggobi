@@ -259,7 +259,7 @@ writeall_window_open (ggobid *gg) {
       1, 2, j, j+1, GTK_FILL, GTK_FILL, 5, 0);
 
 /*
-Add a button to open a file selection box; see filename_get in main_ui.c
+ * Add a button to open a file selection box; see filename_get_* in io.c
 */
     btn = gtk_button_new_with_label ("Save ...");
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
