@@ -8,7 +8,7 @@
 
 #include "varseldata.h"
 
-typedef enum {ascii, binary, xml, mysql} DataMode;
+typedef enum {ascii, binary, Sprocess, xml, mysql} DataMode;
 typedef enum {read_all, read_block, draw_sample} FileReadType;
 
 struct _ggobid;

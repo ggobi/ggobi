@@ -221,6 +221,7 @@ key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
       break;
 
     default:
+      break;
   } /*-- end switch (scale_style) --*/
 
   /*-- redisplay this plot --*/

@@ -7,7 +7,9 @@
 #include "defines.h"
 #include "display.h"
 
-
+#ifdef __cplusplus 
+extern "C" {
+#endif
 /*
   The routines that copy values into an array
   may not be suitable for large datasets.
@@ -225,5 +227,10 @@ extern gboolean GGOBI(raiseWindow)(int which, gboolean raiseOrIcon, gboolean up,
 
 extern gchar *GGOBI(getDescription)(ggobid *gg);
 extern void GGOBI(splot_set_current_full)(displayd *display, splotd *sp, ggobid *gg);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif /* End of conditional inclusion of entire file.*/
 

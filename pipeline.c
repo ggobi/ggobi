@@ -272,7 +272,6 @@ median_largest_dist (gfloat **data, gint *cols, gint ncols,
   gdouble dx, sumdist, lgdist = 0.0;
   gfloat *x, fmedian;
   gdouble dmedian = 0;
-  extern gint fcompare (const void *, const void *);
 
   np = ncols * gg->nrows_in_plot;
   x = (gfloat *) g_malloc (np * sizeof (gfloat));

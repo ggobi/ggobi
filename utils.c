@@ -17,6 +17,14 @@ extern void srand48 (glong);
 extern double drand48 (void);
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#ifdef __cplusplus
+}
+#endif
+
 gint
 sqdist (gint x1, gint y1, gint x2, gint y2) {
   return ((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1));
@@ -171,11 +179,12 @@ glyphIDfromName (gchar *glyphName) {
 
 gint
 glyphNames (gchar **names) {
-  gint i;
+  unsigned int i;
   static gchar* gnames[] =
-    {"plus", "x", "openrectangle", "filledrectangle", "opencircle",
+    {"plus", "x", "openrectangle",  "filledrectangle", "opencircle",
     "filledcircle", "point"};
-  for (i=0; i<7; i++) names[i] = gnames[i];
+  for (i=0; i < sizeof(gnames)/sizeof(gnames[0]); i++) 
+       names[i] = gnames[i];
   return (7);
 }
 

@@ -9,6 +9,7 @@
 #include <gtk/gtk.h>
 
 #include "ggobi.h"
+#include "externs.h"
 
 extern gdouble randvalue (void);
 
@@ -175,7 +176,7 @@ textur (gfloat *yy, gfloat *shft, gint ny, gint option, gfloat del, gint stages,
   gint i, ii;
   gint *indx;
   gfloat *xx;
-  extern gint fcompare (const void *, const void *);
+
 
 /*
  * Force initialization on first calls to next5.

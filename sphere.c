@@ -7,15 +7,6 @@
 #include "vars.h"
 #include "externs.h"
 
-/* */
-
-/*-- these will all be moved to externs.h --*/
-extern gint dsvd (float **, int, int, float *, float **);
-extern void sphere_totvar_set  (gfloat);
-extern void sphere_condnum_set  (gfloat);
-extern void transform2_values_set (gint, gint, ggobid *gg);
-extern void sphere_enable (gboolean);
-/* */
 
 /*-------------------------------------------------------------------------*/
 /*      dynamic memory allocation routines                                 */
@@ -77,11 +68,10 @@ void pca_diagnostics_set (ggobid *gg) {
   for (j=0; j<gg->sphere.nspherevars; j++)
     ftmp2 += gg->sphere.eigenval[j];
 
-  sphere_totvar_set (ftmp1/ftmp2);
-  sphere_condnum_set (gg->sphere.eigenval[0]/gg->sphere.eigenval[gg->sphere.sphere_npcs-1]);
+  sphere_totvar_set (ftmp1/ftmp2, gg);
+  sphere_condnum_set (gg->sphere.eigenval[0]/gg->sphere.eigenval[gg->sphere.sphere_npcs-1], gg);
 }
 
-extern gboolean scree_mapped_p (void);
 
 void sphere_npcs_set (gint n, ggobid *gg) {
   gg->sphere.sphere_npcs = n;
@@ -90,18 +80,18 @@ void sphere_npcs_set (gint n, ggobid *gg) {
 
   if (gg->sphere.sphere_npcs<1) {
      quick_message ("Need to choose at least 1 PC.", false);
-     sphere_enable (false);
+     sphere_enable (false, gg);
 
   } else if (gg->sphere.sphere_npcs > gg->sphere.nspherevars) {
      gchar *msg = g_strdup_printf ("Need to choose at most %d PCs.\n",
        gg->sphere.nspherevars);
      quick_message (msg, false);
-     sphere_enable (false);
+     sphere_enable (false, gg);
      g_free (msg);
 
   } else {
     pca_diagnostics_set (gg);
-    sphere_enable (true);
+    sphere_enable (true, gg);
   }
 }
 gint sphere_npcs_get (ggobid *gg)

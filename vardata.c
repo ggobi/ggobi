@@ -7,6 +7,14 @@
 #include "vars.h"
 #include "externs.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+extern gfloat no_change (gfloat);
+#ifdef __cplusplus
+}
+#endif
+
 void vardata_alloc (ggobid *gg)
 {
   if (gg->vardata != NULL)
@@ -21,7 +29,6 @@ void vardata_realloc (gint n, ggobid *gg)
     n * sizeof (vardatad));
 }
 
-extern gfloat no_change (gfloat);
 
 void vardata_init (ggobid *gg)
 {
@@ -133,7 +140,6 @@ vardata_stats_set (ggobid *gg)
   gint j, i, m, np;
   gfloat *sumv = (gfloat *) g_malloc0 (gg->ncols * sizeof (gfloat));
   gfloat *x = (gfloat *) g_malloc (gg->nrows * sizeof (gfloat));
-  extern gint fcompare (const void *, const void *);
 
   /*
    * this could be done with less code, but this 

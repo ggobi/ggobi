@@ -105,11 +105,17 @@ fileset_read (gchar *ldata_in, ggobid *gg)
      break;
    case mysql:
 #ifdef USE_MYSQL
-     ok = read_mysql_data (NULL, gg);
+{
+  extern MySQLLoginInfo DefaultMySQLInfo;
+     getDefaultValuesFromFile(ldata_in);
+     ok = read_mysql_data(&DefaultMySQLInfo, FALSE, gg);
+}
 #endif
     break;
 
    case binary:
+     break;
+   case Sprocess:
      break;
 
    case ascii:
@@ -181,13 +187,14 @@ make_ggobi (gchar *ldata_in, gboolean processEvents, ggobid *gg) {
   make_ui (gg);
 
   if (ldata_in != NULL) {
-    if (fileset_read (ldata_in, gg)) {
-      dataset_init (gg, true);
+    if (fileset_read (ldata_in, gg) > 0) {
+      dataset_init(gg, true);
+
     }
   } else {
 #ifdef USE_MYSQL
-    if (gg->data_mode == mysql) {
-      GGOBI(get_mysql_login_info)(gg);
+    if(gg->data_mode == mysql) {
+      GGOBI(get_mysql_login_info)(NULL, gg);
     }
 #endif
   }

@@ -3,6 +3,7 @@
 #include <gtk/gtk.h>
 #include <vars.h>
 
+#include "externs.h"
 
 /*-------------------------------------------------------------------------*/
 /*                     floating point array management                     */

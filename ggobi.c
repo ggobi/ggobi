@@ -30,11 +30,21 @@ parse_command_line (gint *argc, gchar **av, ggobid *gg)
  * Now parse the command line.
 */
   for ( ; *argc>1 && av[1][0]=='-'; (*argc)--,av++) {
-   
-    if (strcmp (av[1], "-xml") == 0)
+    /*
+     * -s:  ggobi initiated from inside S
+    */
+    if (strcmp (av[1], "-s") == 0)
+      gg->data_mode = Sprocess;
+
+#ifdef USE_XML
+    else if (strcmp (av[1], "-xml") == 0)
       gg->data_mode = xml;
-    else if (strcmp (av[1], "-mysql") == 0)
+#endif
+#ifdef USE_MYSQL
+    else if (strcmp (av[1], "-mysql") == 0) {
       gg->data_mode = mysql;
+    }
+#endif
 
     /*
      * -:  look to stdin for the input data

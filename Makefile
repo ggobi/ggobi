@@ -1,8 +1,16 @@
+ggobi:
+
+
 EXTRAS = -Wpointer-arith -Wcast-qual -Wcast-align
 
 include local.config
 
 CC = gcc
+
+# This defaults to $(CC) and is reset to CXX by any optional 
+# segment that needs to use C++, e.g  USE_MYSQL 
+LD=$(CC)
+
 CFLAGS= -g -ansi -Wall -fpic
 SHARED_LD_FLAGS= -shared
 LDFLAGS=
@@ -75,17 +83,23 @@ ifdef USE_XML
  OB+= $(XML_OB)
 
  XML_LIBS=-lxml -lz
+
+main_ui.o: write_xml.h
+read_xml.o: read_xml.h
 endif
 
 ifdef USE_MYSQL
- CFLAGS+= -I$(MYSQL_INCLUDE_DIRS) -DUSE_MYSQL=1 -Wall
- MYSQL_LIBS=-lmysqlclient $(MYSQL_LIB_DIRS:%=-L%) $(MYSQL_LIB_DIRS:%=-Xlinker -rpath -Xlinker %)
+ CFLAGS+= -I$(MYSQL_INCLUDE_DIRS) -DUSE_MYSQL=1 -Wall -I$(PROPERTIES_INCLUDE_DIR)
+ MYSQL_LIBS=-lProps -lmysqlclient $(MYSQL_LIB_DIRS:%=-L%) $(MYSQL_LIB_DIRS:%=$(DL_RESOLVE_FLAG) %) $(PROPERTIES_LIB_DIR:%=$(DL_RESOLVE_FLAG) %) $(PROPERTIES_LIB_DIR:%=-L%)
+
  SRC+=read_mysql.c
  OB+=read_mysql.o
+  LD=$(CXX)
 endif
 
 ggobi: $(OB)
-	$(CC) $(OB) $(LDFLAGS) -o ggobi $(XML_LIB_DIRS) $(XML_LIBS) $(MYSQL_LIBS) `gtk-config --libs`
+	$(LD) $(OB) $(LDFLAGS) -o ggobi $(XML_LIB_DIRS:%=-L%) $(XML_LIBS) $(MYSQL_LIBS) `gtk-config --cflags --libs` $(XML_LIB_DIRS:%=$(DL_RESOLVE_FLAG) %)
+
 
 pure: ggobi.o $(OB)
 	purify -cache-dir=/tmp  -always-use-cache-dir=yes \
@@ -141,12 +155,15 @@ endif
 
 ifdef USE_MYSQL
 read_mysql.o: read_mysql.c read_mysql.h
+	$(CXX) `gtk-config --cflags` $(CFLAGS) -c $<
 
 sql: read_mysql.o
 	$(CC) -o $@ read_mysql.o $(MYSQL_LIBS)
 
 sqldep:
 	$(CC) -M $(CFLAGS) read_mysql.c
+
+make_ggobi.o: read_mysql.h
 endif
 
 # include .depends

@@ -106,14 +106,14 @@ static gint gtk_ext_ruler_leave_notify(GtkWidget *widget,GdkEventCrossing *event
 
 
 static void
-gtk_ext_ruler_class_init (GtkExtRulerClass *class)
+gtk_ext_ruler_class_init(GtkExtRulerClass *klass)
 {
     GtkObjectClass *object_class;
     GtkWidgetClass *widget_class;
     gint i;
     
-    object_class = (GtkObjectClass*) class;
-    widget_class = (GtkWidgetClass*) class;
+    object_class = (GtkObjectClass*) klass;
+    widget_class = (GtkWidgetClass*) klass;
     
     parent_class = gtk_type_class (gtk_widget_get_type ());
     
@@ -124,12 +124,12 @@ gtk_ext_ruler_class_init (GtkExtRulerClass *class)
     widget_class->enter_notify_event = gtk_ext_ruler_enter_notify;
     widget_class->leave_notify_event = gtk_ext_ruler_leave_notify;
     
-    class->draw_ticks = NULL;
-    class->draw_pos = NULL;
-    class->range_changed = NULL;
+    klass->draw_ticks = NULL;
+    klass->draw_pos = NULL;
+    klass->range_changed = NULL;
     
     for(i=2; i<10; i++)
-	class->log29[i-2] = log10((gdouble)i);
+	klass->log29[i-2] = log10((gdouble)i);
     
     ext_ruler_signals[RANGE_CHANGED] = 
 	gtk_signal_new( "range_changed",
@@ -363,7 +363,6 @@ gtk_ext_ruler_make_pixmap (GtkExtRuler *ruler)
 void
 gtk_ext_ruler_calc_scale (GtkExtRuler *ruler, gchar direction)
 {
-
     GtkWidget *widget;
     GdkGC *gc, *bg_gc;
     GdkFont *font;
@@ -397,7 +396,7 @@ gtk_ext_ruler_calc_scale (GtkExtRuler *ruler, gchar direction)
 	height = widget->allocation.width - ythickness * 2;
 	size = width;
     } else
-	g_warning("Unknown direction '%c' (this is a bug in "__FUNCTION__")",direction);
+	g_warning("Unknown direction '%c' (this is a bug in gtk_ext_ruler_calc_scale()",direction);
 
     xf = ruler->upper;
     xi = ruler->lower;
@@ -423,7 +422,8 @@ gtk_ext_ruler_calc_scale (GtkExtRuler *ruler, gchar direction)
 	    sprintf (unit_str, "  %G ", x0+ndiv*div);
 	    text_width2 = strlen (unit_str) * digit_height + 1;
 	    text_width = MAX(text_width1,text_width2);
-	    if(n>1) ndiv = myrint(size / text_width);
+	    if(n > 1) 
+               ndiv = myrint(size / text_width);
 	}
 	wsubdiv = subdiv/dx*size; 
       

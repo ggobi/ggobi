@@ -36,8 +36,11 @@ options_cb(gpointer data, guint action, GtkCheckMenuItem *w) {
 
     case 1:
     case 2:
+    default:
+      fprintf(stderr, "Unhandled switch-case in options_cb\n");
   }
 }
+
 static void
 line_options_cb(gpointer data, guint action, GtkCheckMenuItem *w) {
   g_printerr ("action = %d\n", action);
@@ -46,6 +49,8 @@ line_options_cb(gpointer data, guint action, GtkCheckMenuItem *w) {
     case 0:
     case 1:
     case 2:
+    default:
+      fprintf(stderr, "Unhandled switch-case in line_options_cb\n");
   }
 }
 static void
@@ -56,6 +61,8 @@ bitmap_size_cb(gpointer data, guint action, GtkCheckMenuItem *w) {
     case 0:
     case 1:
     case 2:
+    default:
+      fprintf(stderr, "Unhandled switch-case in bitmap_size_cb\n");
   }
 }
 static void
@@ -68,6 +75,9 @@ replot_freq_cb(gpointer data, guint action, GtkCheckMenuItem *w) {
     case 4:
     case 8:
     case 16:
+      break;
+    default:
+      fprintf(stderr, "Unhandled switch-case in replot_freq_cb\n");
   }
 }
 static void

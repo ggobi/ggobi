@@ -8,7 +8,7 @@
  */
 
 gboolean
-write_xml (const gchar *filename, ggobid *gg)
+write_xml(const gchar *filename, ggobid *gg)
 {
   FILE *f;
   gboolean ok = false;

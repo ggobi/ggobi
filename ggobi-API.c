@@ -10,16 +10,28 @@
 #include "externs.h"
 #include "display.h"
 
+extern const gchar *const GlyphNames[];
+
+/*
 extern const gchar *GlyphNames[];
+*/
+
 
 void warning(const char *msg);
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 void GGOBI(displays_release)(ggobid *gg);
 void GGOBI(display_release)(displayd *display, ggobid *gg);
 void GGOBI(splot_release)(splotd *sp, displayd *display, ggobid *gg);
 void GGOBI(data_release)(ggobid *gg);
 void GGOBI(vardata_free)(ggobid *gg);
 void GGOBI(vardatum_free)(vardatad *var, ggobid *gg);
+
+#ifdef __cplusplus
+}
+#endif
 
 const gchar *
 GGOBI(getFileName) (ggobid *gg)
@@ -217,7 +229,7 @@ GGOBI(splot_release)(splotd *sp, displayd *display, ggobid *gg)
 void
 GGOBI(data_release)(ggobid *gg)
 {
-  if (gg->rowlab) {
+ if (gg->rowlab) {
     rowlabels_free (gg);
     gg->rowlab = NULL;
   }
@@ -1086,7 +1098,6 @@ GGOBI(getVariableIndex)(const gchar *name, ggobid *gg)
 void
 GGOBI(setPlotRange)(double *x, double *y, int displayNum, int plotNum, gboolean pixels, ggobid *gg)
 {
-extern void splot_zoom (splotd *sp, gfloat xsc, gfloat ysc, ggobid *gg);
   splotd *sp;
   displayd *display;
 

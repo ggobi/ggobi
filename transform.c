@@ -32,6 +32,10 @@ static gfloat  boxcoxparam = 1.0;
 static gint    tform2 = NO_TFORM2;
 /* */
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 gfloat no_change (gfloat x)      { return x; }
 gfloat negate (gfloat x)         { return -x; }
 
@@ -42,6 +46,9 @@ static gfloat (*domain_adj) (gfloat x) = no_change;
 gfloat inv_raise_min_to_0 (gfloat x) { return (x - domain_incr); }
 gfloat inv_raise_min_to_1 (gfloat x) { return (x - domain_incr - 1.0); }
 static gfloat (*inv_domain_adj) (gfloat x) = no_change;
+#ifdef __cplusplus
+}
+#endif
 
 gint
 cols_in_group (gint *cols, gint varno, ggobid *gg) 
@@ -96,7 +103,7 @@ median (gfloat **data, gint jcol, ggobid *gg)
   gint i, m, np = gg->nrows_in_plot;
   gfloat *x;
   gdouble dmedian = 0;
-  extern gint fcompare (const void *, const void *);
+
 
   x = (gfloat *) g_malloc (gg->nrows_in_plot * sizeof (gfloat));
   for (i=0; i<np; i++) {
@@ -539,6 +546,8 @@ transform2_apply (gint tform_type, gint jcol, ggobid *gg)
     case PERMUTE:
     case SORT:
     case SPHERE:
+    default:
+      fprintf(stderr, "Unhandled switch-case in transform2_apply\n");
   }
   return tform_ok;
 }

@@ -200,7 +200,7 @@ scatmat_varsel (cpaneld *cpanel, splotd *sp,
   gint jvar, gint *jvar_prev, gint button, gboolean alt_mod, ggobid *gg)
 {
   gboolean redraw = true;
-  gboolean delete = false;
+  gboolean Delete = false;
   gint k, width, height;
   GList *l;
   splotd *s, *sp_new;
@@ -267,14 +267,14 @@ scatmat_varsel (cpaneld *cpanel, splotd *sp,
 
       l = (GTK_TABLE (display->table))->children;
       while (l) {
-        delete = false;
+        Delete = false;
         child = (GtkTableChild *) l->data;
         l = l->next;
         da = child->widget;
 
         if (button == 1) {
           if (child->left_attach == jvar_col)
-            delete = true;
+            Delete = true;
           else if (child->left_attach > jvar_col) {  /* if to the right */
             child->left_attach--;
             child->right_attach--;
@@ -282,14 +282,14 @@ scatmat_varsel (cpaneld *cpanel, splotd *sp,
 
         } else if (button == 2 || button == 3) {
           if (child->top_attach == jvar_row) {
-            delete = true;
+            Delete = true;
           } else if (child->top_attach > jvar_row) {  /* if below */
             child->top_attach--;
             child->bottom_attach--;
           }
         }
 
-        if (delete) {
+        if (Delete) {
           s = (splotd *) gtk_object_get_data (GTK_OBJECT (da), "splotd");
           display->splots = g_list_remove (display->splots,
                                            (gpointer) s);

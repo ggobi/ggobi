@@ -26,18 +26,38 @@ typedef struct {
   char *socket;
   unsigned int   flags;
 
-  const char *dataQuery;
-  const char *segmentsQuery;
-  const char *colorQuery;
+  char *dataQuery;
+  char *segmentsQuery;
+  char *appearanceQuery;
+  char *colorQuery;
   
 } MySQLLoginInfo;
 
-int read_mysql_data(MySQLLoginInfo *login, ggobid *gg);
-MYSQL *GGOBI(mysql_connect)(MySQLLoginInfo *login, ggobid *gg);
-int  GGOBI(get_mysql_data)(MYSQL *conn, const char *query, ggobid *gg);
-void GGOBI(mysql_warning)(const char *msg, MYSQL *conn, ggobid *gg);
-int GGOBI(register_mysql_data)(MYSQL *conn, MYSQL_RES *res, int preFetched, ggobid *gg);
-MySQLGUIInput *GGOBI(get_mysql_login_info)(ggobid *gg);
-/* This should go somewhere else. */
-void GGOBI(setDimensions)(int nrow, int ncol, ggobid *gg);
+/* Must correspond the fieldNames in read_mysql.c */
+typedef enum {HOST,USER, PASSWORD, DATABASE, PORT, SOCKET, FLAGS, MISS, 
+              DATA_QUERY, SEGMENTS_QUERY, APPEARANCE_QUERY, COLOR_QUERY} 
+           MySQLInfoElement;
+
+#ifdef __cplusplus 
+extern "C" {
+#endif
+
+  int read_mysql_data(MySQLLoginInfo *login, int init, ggobid *gg);
+  MYSQL *GGOBI(mysql_connect)(MySQLLoginInfo *login, ggobid *gg);
+  int  GGOBI(get_mysql_data)(MYSQL *conn, const char *query, ggobid *gg);
+  void GGOBI(mysql_warning)(const char *msg, MYSQL *conn, ggobid *gg);
+  int GGOBI(register_mysql_data)(MYSQL *conn, MYSQL_RES *res, int preFetched, ggobid *gg);
+  MySQLGUIInput *GGOBI(get_mysql_login_info)(MySQLLoginInfo *info, ggobid *gg);
+
+        /* This should go somewhere else. */
+  void GGOBI(setDimensions)(int nrow, int ncol, ggobid *gg);
+
+  int getDefaultValuesFromFile(char *fileName);
+  int setMySQLLoginElement(MySQLInfoElement i, char *val, MySQLLoginInfo *info);
+  MySQLInfoElement getMySQLLoginElementIndex(const char *name);
+
+#ifdef __cplusplus 
+}
+#endif
+
 #endif

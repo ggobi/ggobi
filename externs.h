@@ -3,6 +3,10 @@
 
 #include <stdio.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern ggobid *ValidateGGobiRef (ggobid *gg, gboolean fatal);
 extern displayd *display_create(guint action, ggobid *gg);
 extern displayd *parcoords_new (gboolean missing_p, splotd **sub_plots, gint numSubPlots, ggobid *gg);
@@ -104,8 +108,10 @@ extern void displays_plot (splotd *sp, ggobid *gg);
 extern void displays_tailpipe (gint, ggobid *gg);
 extern gint do_ash1d (gfloat *, gint, gint, gint, gfloat *, gfloat *, gfloat *);
 extern void draw_glyph (GdkDrawable *, glyphv *, icoords *, gint, ggobid *gg);
+extern gint dsvd (gfloat **a, gint m, gint n, gfloat *w, gfloat **v);
 extern void eigenvals_get (gfloat *, ggobid *gg);
 extern void exclusion_window_open (ggobid *gg);
+extern gint fcompare (const void *x1, const void *x2);
 extern gboolean fileset_read (gchar *, ggobid *gg);
 extern gboolean fileset_read_init (gchar *ldata_in, ggobid *gg);
 extern void find_glyph_type_and_size (gint, glyphv *);
@@ -152,6 +158,7 @@ extern void mode_submenus_activate (splotd *, gint, gboolean, ggobid *gg);
 extern void mousepos_get_motion (GtkWidget *, GdkEventMotion *, gboolean *, gboolean *, ggobid *gg);
 extern void mousepos_get_pressed (GtkWidget *, GdkEventButton *, gboolean *, gboolean *, ggobid *gg);
 extern void movepts_event_handlers_toggle (splotd *, gboolean);
+extern gdouble myrint (gdouble x);
 extern gint nspherevars_get (ggobid *gg);
 extern gint nvgroups (ggobid *gg);
 extern FILE* open_ggobi_file_r (gchar *, gint, gchar **, gboolean);
@@ -187,6 +194,7 @@ extern void rnorm2 (gdouble *, gdouble *);
 extern void rotation_event_handlers_toggle (splotd *, gboolean);
 extern void rotation_menus_make (ggobid *gg);
 extern void rowlabels_alloc (ggobid *gg) ;
+extern void rowlabels_free (ggobid *gg) ;
 extern gboolean rowlabels_read (gchar *, gboolean, ggobid *gg);
 extern void rows_in_plot_set (ggobid *gg);
 extern void ruler_ranges_set (displayd *, splotd *, ggobid *gg);
@@ -201,6 +209,7 @@ extern void scatterplot_cpanel_init (cpaneld *, gint, ggobid *);
 extern void scatterplot_main_menus_make (GtkAccelGroup *, GtkSignalFunc, ggobid *gg, gboolean);
 extern displayd* scatterplot_new (gboolean, splotd *sp, ggobid *gg);
 extern void scatterplot_show_rulers (displayd *, gint);
+extern gboolean scree_mapped_p (void);
 extern void segments_alloc (gint, ggobid *gg);
 extern void segments_create (ggobid *gg);
 extern void segments_free (ggobid *gg);
@@ -210,9 +219,13 @@ extern void smooth_window_open (ggobid *gg);
 extern void sp_event_handlers_toggle (splotd *, gboolean);
 extern void sp_whiskers_make (splotd *, displayd *, ggobid *gg);
 extern void sphere_apply_cb (ggobid *gg);
+extern void sphere_condnum_set (gfloat x, ggobid* gg);
+extern void sphere_enable (gboolean sens, ggobid* gg);
 extern gint sphere_npcs_get (ggobid *gg);
 extern void sphere_npcs_set (gint, ggobid *gg);
 extern void sphere_panel_open (ggobid *gg);
+extern gboolean sphere_svd (ggobid *gg);
+extern void sphere_totvar_set (gfloat x, ggobid* gg);
 extern void sphere_transform_set (ggobid *gg);
 extern gint spherevars_get (gint *, ggobid *gg);
 extern void spherevars_set (ggobid *gg);
@@ -232,6 +245,7 @@ extern void splot_screen_to_tform (cpaneld *, splotd *, icoords *, fcoords *, gg
 extern void splot_set_current (splotd *, gboolean, ggobid *gg);
 extern void splot_set_plot_center (splotd *);
 extern void splot_world_to_plane (cpaneld *, splotd *, ggobid *gg);
+extern void splot_zoom (splotd *sp, gfloat xsc, gfloat ysc, ggobid *gg) ;
 extern gint sqdist (gint, gint, gint, gint);
 extern void strip_suffixes (ggobid *gg);
 extern void submenu_append (GtkWidget *, GtkWidget *);
@@ -250,6 +264,7 @@ extern void tour_do_step (displayd *, ggobid *gg);
 extern void tour_reproject (splotd *, glong **, ggobid *gg);
 extern void transform (gint, gint, gfloat, ggobid *gg);
 extern void transform_opt_menus_set_history (gint, ggobid *gg);
+extern void transform2_values_set (gint tform_type, gint jcol, ggobid *gg);
 extern void transform_values_init (gint j, ggobid *gg);
 extern void transform_variable (gint, gint, gfloat, gint, ggobid *);
 extern void transform_window_open (ggobid *gg);
@@ -305,6 +320,10 @@ int ggobi_remove (ggobid *gg);
 
 extern void variable_clone (gint, const gchar *, gboolean, ggobid *);
 extern gboolean updateAddedColumn (gint nc, gint jvar, ggobid *gg);
+
+#ifdef __cplusplus
+}
+#endif
 
 #include "GGobiAPI.h"
 

@@ -6,6 +6,7 @@
 
 #include <glib.h>
 
+
 #define true 1
 #define false 0
 #ifndef iabs
@@ -19,9 +20,17 @@
 #endif
 
 /* functions */
+#ifdef __cplusplus 
+extern "C" {
+#endif
+
 gint bin1 (gfloat *, gint, gfloat *, gint, gint *);
 gint ash1 (gint, gint *, gint, gfloat *, gfloat *, gfloat *,
   gfloat *, gfloat *);
+
+#ifdef __cplusplus
+}
+#endif
 /* */
 
 

@@ -84,6 +84,9 @@ typedef struct _XMLUserData {
 } XMLParserData;
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 enum xmlDataState tagType(const gchar *name, gboolean endTag);
 gboolean newVariable(const CHAR **attrs, XMLParserData *data);
@@ -132,5 +135,9 @@ gchar *getFileDirectory(const gchar *filename);
 int asInteger(const gchar *tmp);
 double asNumber(const char *sval);
 gboolean asLogical(const gchar *sval);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

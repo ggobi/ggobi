@@ -24,7 +24,6 @@ const gchar * const GlyphNames[] = {
 /*------------------------------------------------------------------------*/
 
 void rowlabels_free (ggobid *gg) {
-
 /*
   gint i;
   for (i=0; i<gg->nrows; i++)
