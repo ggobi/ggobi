@@ -1503,3 +1503,73 @@ GGobi_getLevelName(vartabled *vt, double value)
 
   return(NULL);
 }
+
+/* sets the tour projection matrix, F */
+gboolean
+GGOBI(setTour2DProjectionMatrix)(gdouble *Fvalues, gint ncols, gint ndim, 
+  gboolean vals_scaled, ggobid *gg)
+{
+  PipelineMode vm = viewmode_get(gg);
+  displayd *dsp = gg->current_display; 
+  cpaneld *cpanel = &dsp->cpanel;
+  datad *d = dsp->d;
+  gboolean candoit = true;
+  gint i, j;
+
+  if ((ncols != d->ncols) || ndim != 2) candoit = false;
+
+  if (candoit) {
+    /* Set the scatterplot display mode to be tour2d */
+    if (vm != TOUR2D) {
+      /* Needs to be filled in */
+    }
+
+    /* Pause the tour */
+    if (!cpanel->t2d.paused)
+      tour2d_pause(cpanel, true, gg);
+
+    /* Set the projection vector F */
+    for (i=0; i<ndim; i++) 
+      for (j=0; j<ncols; j++)
+        dsp->t2d.F.vals[i][j] = Fvalues[i+j*2];
+
+    /* If the values are scaled, then we need to multiply
+       them by the tform data, else we multiply them by the 
+       world data */
+    if (vals_scaled) {
+      /* Needs to be filled in */
+    }
+    else {
+      display_tailpipe (dsp, FULL, gg);
+      varcircles_refresh (d, gg);
+    }
+  }
+    
+  return(candoit);
+}
+
+const gdouble** 
+GGOBI(getTour2DProjectionMatrix)(gint ncols, gint ndim, gboolean vals_scaled, 
+  ggobid *gg)
+{
+  displayd *dsp = gg->current_display; 
+  datad *d = dsp->d;
+  gdouble **Fvals;
+  gint i, j;
+
+  ncols = d->ncols;
+  ndim = 2;
+
+  Fvals = (gdouble**) g_malloc (sizeof(gdouble*)*ncols);
+
+  if (vals_scaled) {
+    /* run the F values through the reverse pipeline */
+  } 
+  else {
+    for (i=0; i<ndim; i++) 
+      for (j=0; j<ncols; j++)
+        Fvals[i][j] = dsp->t2d.F.vals[i][j];
+  }
+
+  return ((const gdouble **) Fvals);
+}
