@@ -125,8 +125,6 @@ main_display_options_cb (ggobid *gg, guint action, GtkCheckMenuItem *w)
 
   if (gg->mode_frame == NULL)  /* so it isn't executed on startup */
     return;
-  else
-    g_printerr ("(main_display_options_cb) action = %d\n", action);
 
   switch (action) {
 
@@ -137,9 +135,9 @@ main_display_options_cb (ggobid *gg, guint action, GtkCheckMenuItem *w)
 
     case 1:
       if (w->active)
-        gtk_widget_hide (gg->mode_frame);
-      else
         gtk_widget_show (gg->mode_frame);
+      else
+        gtk_widget_hide (gg->mode_frame);
       break;
 
     case 2:

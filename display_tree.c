@@ -125,6 +125,7 @@ gtk_signal_connect (GTK_OBJECT(item), "select",
 void
 display_tree_delete_cb(GtkWidget *w, GdkEvent *event, ggobid *gg) 
 {
+ gtk_widget_destroy (gg->display_tree.window);
  gg->display_tree.tree = NULL;
  gg->display_tree.numItems = -1;
 }
@@ -210,6 +211,43 @@ splot_tree_label(splotd *splot, gint ctr, enum displaytyped type,
 
   switch (type) {
     case scatterplot:
+    {
+     displayd *display = (displayd *) splot->displayptr; 
+     cpaneld *cpanel = &display->cpanel;
+
+     switch (cpanel->projection) {
+        case P1PLOT:
+        case TOUR1D:
+          n = strlen (d->vartable[splot->p1dvar].collab);
+          buf = (gchar*) g_malloc(n* sizeof (gchar*));
+          sprintf(buf, "%s", d->vartable[splot->p1dvar].collab);
+        break;
+
+        case XYPLOT:
+          n = strlen (d->vartable[splot->xyvars.x].collab) +
+              strlen (d->vartable[splot->xyvars.y].collab) + 5;
+          buf = (gchar*) g_malloc (n * sizeof (gchar*));
+          sprintf (buf, "%s v %s",
+            d->vartable[splot->xyvars.x].collab,
+            d->vartable[splot->xyvars.y].collab);
+        break;
+
+        case TOUR2D:
+          n = strlen ("in grand tour");
+          buf = (gchar*) g_malloc (n * sizeof (gchar*));
+          sprintf (buf, "%s", "in grand tour");
+        break;
+
+        case COTOUR:
+          n = strlen ("in correlation tour");
+          buf = (gchar*) g_malloc (n * sizeof (gchar*));
+          sprintf (buf, "%s", "in correlation tour");
+        break;
+        default:
+        break;
+     }
+    }
+    break;
     case scatmat:
       n = strlen (d->vartable[splot->xyvars.x].collab) +
           strlen (d->vartable[splot->xyvars.y].collab) + 5;
@@ -224,9 +262,9 @@ splot_tree_label(splotd *splot, gint ctr, enum displaytyped type,
       sprintf(buf, "%s", d->vartable[splot->p1dvar].collab);
      break;
     case tsplot:
-      n = strlen (d->vartable[splot->p1dvar].collab);
+      n = strlen (d->vartable[splot->xyvars.y].collab);
       buf = (gchar*) g_malloc(n* sizeof (gchar*));
-      sprintf(buf, "%s", d->vartable[splot->p1dvar].collab);
+      sprintf(buf, "%s", d->vartable[splot->xyvars.y].collab);
      break;
   }
 
