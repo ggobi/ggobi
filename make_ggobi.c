@@ -38,13 +38,13 @@ guint GGobiSignals[MAX_GGOBI_SIGNALS];
  */
 
 void
-gtk_marshal_NONE__INT_POINTER_POINTER_POINTER(GtkObject *object, GtkSignalFunc func,
-                                               gpointer func_data, GtkArg *args)
+gtk_marshal_NONE__INT_POINTER_POINTER_POINTER(GtkObject *object,
+  GtkSignalFunc func, gpointer func_data, GtkArg *args)
 {
     (func)(object, GTK_VALUE_INT(args[0]), GTK_VALUE_POINTER(args[1]),
-                   GTK_VALUE_POINTER(args[2]),GTK_VALUE_POINTER(args[3]), func_data);
+                   GTK_VALUE_POINTER(args[2]),GTK_VALUE_POINTER(args[3]),
+                   func_data);
 }
-
 
 
 gboolean read_input(InputDescription *desc, ggobid *gg);
@@ -76,47 +76,46 @@ void globals_init (ggobid *gg) {
   }
 
   if (gtk_signal_lookup ("brush_motion", GTK_TYPE_WIDGET) == 0) {
-      GGobiSignals[BRUSH_MOTION_SIGNAL] = 
-       gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_WIDGET),
-					"brush_motion", GTK_RUN_LAST|GTK_RUN_ACTION,
-                                        gtk_marshal_NONE__POINTER_POINTER_POINTER, GTK_TYPE_NONE, 3,
-                                        GTK_TYPE_POINTER, GTK_TYPE_POINTER, GTK_TYPE_POINTER);
+    GGobiSignals[BRUSH_MOTION_SIGNAL] = 
+      gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_WIDGET),
+        "brush_motion", GTK_RUN_LAST|GTK_RUN_ACTION,
+        gtk_marshal_NONE__POINTER_POINTER_POINTER, GTK_TYPE_NONE, 3,
+        GTK_TYPE_POINTER, GTK_TYPE_POINTER, GTK_TYPE_POINTER);
   }
 
   if (gtk_signal_lookup ("move_point", GTK_TYPE_WIDGET) == 0) {
-      GGobiSignals[POINT_MOVE_SIGNAL] = 
-       gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_WIDGET),
-					"move_point", GTK_RUN_LAST|GTK_RUN_ACTION,
-                                        gtk_marshal_NONE__POINTER_POINTER_POINTER, GTK_TYPE_NONE, 3,
-                                        GTK_TYPE_POINTER, GTK_TYPE_POINTER, GTK_TYPE_POINTER);
+    GGobiSignals[POINT_MOVE_SIGNAL] = 
+      gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_WIDGET),
+        "move_point", GTK_RUN_LAST|GTK_RUN_ACTION,
+        gtk_marshal_NONE__POINTER_POINTER_POINTER, GTK_TYPE_NONE, 3,
+        GTK_TYPE_POINTER, GTK_TYPE_POINTER, GTK_TYPE_POINTER);
   }
 
   if (gtk_signal_lookup ("identify_point", GTK_TYPE_WIDGET) == 0) {
-      GGobiSignals[IDENTIFY_POINT_SIGNAL] = 
-       gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_WIDGET),
-					"identify_point", GTK_RUN_LAST|GTK_RUN_ACTION,
-                                        gtk_marshal_NONE__POINTER_POINTER_POINTER, GTK_TYPE_NONE, 3,
-                                        GTK_TYPE_POINTER, GTK_TYPE_POINTER, GTK_TYPE_POINTER);
+    GGobiSignals[IDENTIFY_POINT_SIGNAL] = 
+      gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_WIDGET),
+        "identify_point", GTK_RUN_LAST|GTK_RUN_ACTION,
+        gtk_marshal_NONE__POINTER_POINTER_POINTER, GTK_TYPE_NONE, 3,
+        GTK_TYPE_POINTER, GTK_TYPE_POINTER, GTK_TYPE_POINTER);
   }
 
-    /* This should be for a ggobi datad rather than a widget. Make that a GtkObject and give it
-       a type. */
+    /* This should be for a ggobi datad rather than a widget. Make that a
+       GtkObject and give it a type. */
   if (gtk_signal_lookup ("select_variable", GTK_TYPE_WIDGET) == 0) {
-      GGobiSignals[VARIABLE_SELECTION_SIGNAL] = 
-       gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_WIDGET),
-					"select_variable", GTK_RUN_LAST|GTK_RUN_ACTION,
-                                        gtk_marshal_NONE__INT_POINTER_POINTER_POINTER, GTK_TYPE_NONE, 4,
-                                        GTK_TYPE_INT, GTK_TYPE_POINTER, GTK_TYPE_POINTER, GTK_TYPE_POINTER);
+    GGobiSignals[VARIABLE_SELECTION_SIGNAL] = 
+      gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_WIDGET),
+        "select_variable", GTK_RUN_LAST|GTK_RUN_ACTION,
+        gtk_marshal_NONE__INT_POINTER_POINTER_POINTER, GTK_TYPE_NONE, 4,
+       GTK_TYPE_INT, GTK_TYPE_POINTER, GTK_TYPE_POINTER, GTK_TYPE_POINTER);
   }
 
   if (gtk_signal_lookup ("splot_new", GTK_TYPE_WIDGET) == 0) {
-      GGobiSignals[SPLOT_NEW_SIGNAL] = 
-       gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_WIDGET),
-					"splot_new", GTK_RUN_LAST|GTK_RUN_ACTION,
-                                        gtk_marshal_NONE__POINTER_POINTER, GTK_TYPE_NONE, 2,
-                                        GTK_TYPE_POINTER, GTK_TYPE_POINTER);
+    GGobiSignals[SPLOT_NEW_SIGNAL] = 
+      gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_WIDGET),
+        "splot_new", GTK_RUN_LAST|GTK_RUN_ACTION,
+        gtk_marshal_NONE__POINTER_POINTER, GTK_TYPE_NONE, 2,
+        GTK_TYPE_POINTER, GTK_TYPE_POINTER);
   }
-
 
   if (gtk_signal_lookup ("variable_added", GTK_TYPE_WIDGET) == 0) {
     GGobiSignals[VARIABLE_ADDED_SIGNAL] =
@@ -228,10 +227,10 @@ read_input(InputDescription *desc, ggobid *gg)
       ok = read_ascii_data(desc, gg);
     break;
     default:
-	if(desc->desc_read_input) {
-	    ok = desc->desc_read_input(desc, gg, NULL);
-	} else
-	    g_printerr("Unknown data type in read_input\n");
+      if(desc->desc_read_input) {
+        ok = desc->desc_read_input(desc, gg, NULL);
+      } else
+        g_printerr("Unknown data type in read_input\n");
     break;
   }
 
@@ -311,9 +310,9 @@ make_ggobi (GGobiOptions *options, gboolean processEvents, ggobid *gg)
     }
   } else {
 #ifdef SUPPORT_PLUGINS
-      if(runInteractiveInputPlugin(gg) == NULL) {
-        if(sessionOptions->data_type)
-	  fprintf(stderr, "No available plugin to handle input mode %s\n", sessionOptions->data_type);fflush(stderr);
+    if(runInteractiveInputPlugin(gg) == NULL) {
+      if(sessionOptions->data_type)
+        fprintf(stderr, "No available plugin to handle input mode %s\n", sessionOptions->data_type);fflush(stderr);
       }
 #endif
   }

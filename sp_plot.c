@@ -640,10 +640,8 @@ splot_add_record_label (gboolean nearest, gint k, splotd *sp,
 
     for (j=0; j<nvars; j++) {
       vt = vartable_element_get (vars[j], d);
-
-      if (vt->categorical_p) {
+      if (vt->categorical_p)
         lval = (gint) d->tform.vals[k][vars[j]] - 1;
-       }
 
       if (j == 0) {
         lbl = (vt->categorical_p) ?
