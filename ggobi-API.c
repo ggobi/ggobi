@@ -203,9 +203,11 @@ GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
   arrayf_alloc(&d->raw, nr, nc);
 
   if(ids) {
+    d->rowid.maxId = ids[0];
     rowids_alloc(d);
     for(j = 0; j < nr; j++) {
       d->rowid.id.els[j] = (gint) ids[j];
+      if (ids[j] > d->rowid.maxId) d->rowid.maxId = (gint) ids[j];
     }
   }
 
