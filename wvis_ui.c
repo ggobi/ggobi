@@ -942,10 +942,11 @@ wvis_window_open (ggobid *gg) {
   GtkWidget *vbox;
   GtkWidget *frame1, *vb1, *hb;
   GtkWidget *notebook;
-  GtkWidget *btn, *vb;
+  GtkWidget *btn, *vb, *opt;
+
 #ifdef USE_XML
   /*-- for colorscales --*/
-  GtkWidget *frame2, *vbs, *opt, *menu;
+  GtkWidget *frame2, *vbs, *menu;
   GList *l;
   colorschemed *scheme;
   static gchar *colorscaletype_lbl[] = {

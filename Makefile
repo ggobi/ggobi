@@ -100,7 +100,7 @@ SRC=array.c ash1d.c \
 \
  gtkextruler.c gtkexthruler.c gtkextvruler.c \
  mt19937-1.c cokus.c \
- fileio.c plugin.c print.c \
+ fileio.c print.c \
  xlines.c
 
 OB=array.o ash1d.o \
@@ -133,7 +133,7 @@ OB=array.o ash1d.o \
  xyplot.o xyplot_ui.o \
 \
  gtkextruler.o gtkexthruler.o gtkextvruler.o \
- fileio.o plugin.o print.o \
+ fileio.o print.o \
  xlines.o 
 
 
@@ -144,8 +144,8 @@ ifdef TEST_EVENTS
 endif
 
 ifdef USE_XML
- XML_SRC= read_xml.c write_xml.c  read_init.c write_state.c read_color.c
- XML_OB= read_xml.o write_xml.o read_init.o write_state.o read_color.o
+ XML_SRC= read_xml.c write_xml.c  read_init.c write_state.c read_color.c plugin.c
+ XML_OB= read_xml.o write_xml.o read_init.o write_state.o read_color.o plugin.o
 
 # XML_FLAGS+= -DSUPPORT_PLUGINS=1 -DSUPPORT_INIT_FILES=1
  CFLAGS+= $(XML_INC_DIRS:%=-I%) -DUSE_XML=$(USE_XML) $(XML_FLAGS) -DSUPPORT_PLUGINS=1 -DSUPPORT_INIT_FILES=1

@@ -179,6 +179,7 @@ registerPlugins(ggobid *gg, GList *plugins)
   return(ok);
 }
 
+
 gboolean 
 pluginsUpdateDisplayMenu(ggobid *gg, GList *plugins)
 {
