@@ -124,7 +124,7 @@ process_colorscheme(xmlNodePtr root, xmlDocPtr doc)
 
   node = getXMLElement(root, "description");
   val = xmlNodeListGetString(doc, XML_CHILDREN(node), 1);
-  scheme->description = g_strdup((gchar *) val);
+  scheme->description = g_strdup(g_strstrip ((gchar *) val));
   g_free (val);
 
   node = getXMLElement(root, "foreground");
