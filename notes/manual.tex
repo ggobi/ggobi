@@ -1101,24 +1101,28 @@ menu bar contains these items:
 \end{tabbing}
 %
 
-% dfs here %
 \subsection{Identification}
 \label{slbl:Identify}
 
-This mode is used to display labels near points in the plotting
-window.  The labels are taken from the file of row or case labels
-supplied by the user; if the file is not present, the row number of
-each case is used.  To see these labels, simply move the cursor
-inside the plotting window.  The label of the point nearest the
-cursor is displayed.
+This mode is used to display labels near points in the plotting window.
+To see these labels, simply move the cursor inside the plotting window.
+The label of the point nearest the cursor is displayed.
+
+By default, the labels are taken from the case (record) labels supplied
+by the user either in ascii or in XML; if such a label is not present,
+the row number of each case is used.   As an alternative, you can also
+display the {\it point coordinates}: the values of the variables in the
+current projection.
 
 Identification in one window is instantly reflected in all linked windows.
+[Some thought is required before deciding how or whether this view mode
+should reflect the linking rules used in brushing.]
 
 To cause a label to become ``sticky,'' click left when the target
-label is printed.  The printing style changes and the label now
+label is displayed.  The printing style changes and the label now
 remains printed as the cursor moves off, and even remains printed as
 you leave the {\bf Identify} mode.  It is possible to rescale or
-rotate data, and the sticky labels will continue to be printed next
+rotate data, and the sticky labels will continue to be displayed next
 to their associated points.
 
 To cause a label to become ``unsticky,'' return to the {\bf Identify}
@@ -1133,6 +1137,19 @@ Control-{\em I} with the focus in the console.
 
 \subsection{Move Points}
 \label{slbl:MovePoints}
+
+In this mode, points or groups of points can be moved.  Move
+the cursor in the window until it's nearest to the point you
+want to move, then press any mouse button and drag until the
+point is where you want.
+
+The {\bf Direction of motion} menu allows the movement to be
+constrained.  If the {\bf Move brush group} checkbox is
+checked, then all points with the same glyph and color as
+the selected point will be moved with it.
+
+The {\bf Undo last} and {\bf Reset all} buttons allow movement
+to be reversed.
 
 To activate this view mode from the keyboard, type {\em m} or {\em M}
 with the focus in the plot window, or type Control-{\em m} or
@@ -1156,9 +1173,11 @@ This powerful tool is opened by selecting the first entry on the
 \item adding other new variables.
 \end{itemize}
 
-Its first purpose is to display a few statistics for each variable:
-the current variable transformation (if any); the minimum, maximum,
-mean, and median of the raw data; the number of missing values per variable.
+Its first purpose is to report information about each variable:
+whether the variable is categorical (and if so, the number of levels
+it has), the current variable transformation (if any); the minimum,
+maximum, mean, and median of the raw data; the number of missing values
+per variable.
 
 You can also use it to select variables -- not for plotting, but to
 specify subsets when launching a parallel coordinates or scatterplot
@@ -1168,8 +1187,9 @@ highlighted.
 
 These selected variables will also respond to operations contained
 within this panel:  you can reset the variable ranges that are used
-for projecting the data into the plotting window.  This is especially
-useful for a data set where several of the variables have the same units.
+for projecting the data into the plotting window.  This allows
+variables with the same units or potential range (such as percentages)
+to use the same range, and facilitiates visual comparisons.
 
 The selected variables can also be cloned, and the new variables
 you create will be added to the table as well as the main control panel.
@@ -1178,7 +1198,8 @@ you create will be added to the table as well as the main control panel.
 There's another way to add new variables, and that relies on the {\em New
 ...} button, which brings up a small panel.  Use that panel to specify
 the variable's name and to set its values:  either the row numbers or
-a set of integers reflecting the groups currently defined by brushing.
+a set of integers reflecting the assignment of a group identifier to each
+combination of point color and glyph.
 
 \subsection{Variable transformation tool}
 \label{slbl:VarTransform}
@@ -1193,8 +1214,7 @@ previous stage.  It's equally acceptable to use any or all of them.
 You can think of stage 0 as a domain adjustment stage:  if a variable
 has negative values, for instance, many transformation functions
 can't be applied to it, so you may need to add an increment to each
-value.  The transformations in the next two stages don't have such
-neat definitions. 
+value.
 
 Stage 1 transformations include the Box-Cox family of linear
 transformations \( T(X)~=~(X ^ \lambda - 1) / \lambda\) \cite{BoxCox64},
@@ -1205,14 +1225,12 @@ increase or decrease the parameter.
 Many of the stage 2
 transformations are not linear; they include sorting and ranking.
 
+% di: have a look at this, please? %
 \subsection{Sphering}
 \label{slbl:Sphering}
 
-The {\em Sphering} panel starts by displaying a scree plot for the
-currently selected variables (see section \ref{slbl:VarManip}).  If the
-scree plot doesn't reflect the variables you want to sphere, then open
-the Variable statistics panel, select the variables of interest, and
-click on {\em Update scree plot}.
+To sphere one or more variables, first select the variables in the list
+at the top of the window, then click on {\bf Update scree plot}.
 
 It's advisable to standardize the variables first, so a label at the top
 of the panel reminds you if they aren't.  In that case, open the {\em
@@ -1236,6 +1254,7 @@ sphering} to create new variables and add them ggobi's variable selection
 panels.  The names of the selected variables will be added to the
 ``sphered variables'' to help you remember which variables you sphered.
 
+% dfs here %
 \subsection{Jittering}
 
 Select {\em Variable jittering ...} to open a panel that allows
