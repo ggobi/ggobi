@@ -82,15 +82,16 @@
     <init onUpdateDisplayMenu="addBarplotMenuItems" />
   </dll>
 </plugin>
- <plugin name="test plugin" load="immediate">
+
+<plugin name="test plugin" load="immediate">
    <description>Test of the plugin mechanism.</description>
      <author>Duncan Temple Lang</author>
      <dll name="plugins/TestPlugin/TestPlugin">
       <init onCreate="init" onClose="close" onLoad="load" onUnload="unload" />
      </dll>
- </plugin>
+</plugin>
 
- <inputPlugin name="postgres">
+ <inputPlugin name="postgres" interactive="true">
   <description>Reads data from a Postgres DBMS</description>
    <author>Duncan Temple Lang</author>
      <dll name="plugins/Postgres/Postgres"> 
@@ -99,6 +100,14 @@
      </dll>
  </inputPlugin>
 
+ <inputPlugin name="mysql" interactive="true">
+  <description>Reads data from a MySQL DBMS</description>
+   <author>Duncan Temple Lang</author>
+     <dll name="plugins/MySQL/MySQL"> 
+       <modeName>mysql</modeName>
+       <init description="mysql_input_description"/>
+     </dll>
+ </inputPlugin>
 
  <inputPlugin name="testInput">
   <description>Generates random data via an input plugin</description>

@@ -1,0 +1,105 @@
+<!-- 
+  This is the DTD for the GGobi initialization file.
+ -->
+
+<!ENTITY % Boolean         " true | T | TRUE | false | F | FALSE ">
+<!ENTITY % PluginElements "(description, (version)?, author,dll)">
+
+<!ELEMENT description #PCDATA>
+<!ELEMENT author      #PCDATA>
+<!ELEMENT dll         ((modename)?,init)>
+<!ATTLIST dll
+   name CDATA #REQUIRED
+>
+
+
+<!ELEMENT init        EMPTY>
+<!ATTLIST init
+   onCreate    CDATA #IMPLIED
+   onClose     CDATA #IMPLIED
+   onLoad      CDATA #IMPLIED
+   onUnLoad    CDATA #IMPLIED
+   description CDATA #IMPLIED
+>
+
+<!ELEMENT inputPlugin  %PluginElements; >
+<!ATTLIST inputPlugin
+    name        CDATA     #REQUIRED
+    interactive %Boolean;  #IMPLIED
+>
+
+<!ELEMENT plugin  %PluginElements;>
+<!ATTLIST plugin
+    name        CDATA     #REQUIRED
+>
+
+
+<!ELEMENT display (variable)*>
+<!ATTLIST display 
+   type CDATA #REQUIRED
+   data CDATA #IMPLIED
+>
+
+<!ELEMENT ggobi (display)*>
+<!ATTLIST ggobi
+    id  ID  #REQUIRED
+>
+
+<!ELEMENT ggobis (ggobi)*>
+
+<!ELEMENT host name>
+<!ELEMENT name PCDATA>
+
+<!ELEMENT login PCDATA>
+<!ELEMENT query PCDATA>
+
+<!ELEMENT database (host,login,query)>
+<!ATTLIST database
+    id CDATA #REQUIRED
+>
+
+<!ELEMENT url EMPTY> 
+<!ATTLIST url
+  name CDATA #REQUIRED
+  id   CDATA #REQUIRED
+  mode CDATA #IMPLIED
+>
+
+<!ELEMENT file EMPTY> 
+<!ATTLIST file
+  name CDATA #REQUIRED
+  id   CDATA #REQUIRED
+  mode CDATA #IMPLIED
+>
+
+
+<!ELEMENT preferences (browser*,colorschemes*,background*,foreground*,glyph*)>
+<!ELEMENT browser (executable,args)>
+<!ELEMENT args (arg)*>
+<!ELEMENT executable PCDATA>
+
+<!ELEMENT colorschemes (colorscheme)*>
+<!ATTLIST colorschemes 
+    file CDATA #IMPLIED
+>
+
+<!ELEMENT background (color)>
+<!ELEMENT foreground (color)>
+
+<!ELEMENT color (red,green,blue)>
+<!ATTLIST color
+   max CDATA #IMPLIED
+>
+
+<!ELEMENT glyph EMPTY>
+<!ATTLIST glyph
+  type CDATA #IMPLIED
+  size CDATA #IMPLIED
+>
+
+<!ELEMENT previousFiles (file|url|database)*>
+<!ATTLIST previousFiles
+   count CDATA #IMPLIED
+>
+
+<!ELEMENT ggobirc (preferences?, previousFiles, ggobis, plugins)>
