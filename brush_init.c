@@ -96,6 +96,11 @@ hidden_alloc (ggobid *gg)
   gg->hidden = (gboolean *) g_malloc (gg->nrows * sizeof (gboolean));
   gg->hidden_now = (gboolean *) g_malloc (gg->nrows * sizeof (gboolean));
   gg->hidden_prev = (gboolean *) g_malloc (gg->nrows * sizeof (gboolean));
+ 
+  memset(gg->hidden,'\0',sizeof(gboolean)*gg->nrows);
+  memset(gg->hidden_now,'\0',sizeof(gboolean)*gg->nrows);
+  memset(gg->hidden_prev,'\0',sizeof(gboolean)*gg->nrows);
+
 }
 void
 hidden_init (ggobid *gg)

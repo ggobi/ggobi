@@ -855,8 +855,66 @@ void GGOBI(setBrushLocation)(int x, int y, ggobid *gg)
  redraw(gg);
 }
 
+/*
+  Returns the dimensions of the specified
+  splot in pixels which can then be used for
+  specifying.
+ */
 void
 GGOBI(getPlotPixelSize)(int *w, int *h, splotd *sp)
 {
+  /* Temp */
+  *w = -1; *h = -1;
+}
 
+
+splotd *
+GGOBI(getSPlot)(int which, displayd *display)
+{
+  splotd *sp = (splotd*) g_list_nth_data(display->splots, which);
+  return(sp);
+}
+
+
+gint
+GGOBI(setMode)(const gchar *name, ggobid *gg)
+{
+  int old = mode_get(gg);
+  int newMode =   GGOBI(getModeId)(name);
+  if(newMode > -1)
+    GGOBI(full_mode_set)(newMode, gg);
+
+  return(old);
+}
+
+gint
+GGOBI(getModeId)(const gchar *name)
+{
+  int n, i;
+  const gchar *const *names = GGOBI(getModeNames)(&n);
+ 
+  for(i = 0; i < n; i++) {
+    if(strcmp(names[i],name) == 0)
+      return(i);
+  }
+
+  return(-1);
+}
+
+const gchar *
+GGOBI(getModeName)(int which)
+{ 
+  int n;
+  const gchar *const *names = GGOBI(getModeNames)(&n);
+  return(names[which]);
+}
+
+int 
+GGOBI(setBrushColor)(int cid, ggobid *gg)
+{
+  int old = gg->color_id;
+  if(cid > -1 && cid < gg->ncolors)
+    gg->color_id = cid;
+
+  return(old);
 }

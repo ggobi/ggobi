@@ -8,11 +8,15 @@
 #include "display_tree.h"
 
 
+/* Key for storing a reference to a ggobid instance
+   in a widget so that we can retrieve it within
+   a callback.
+*/
 const gchar * const GGobiGTKey = "GGobi";
 
 
 
-static char *mode_name[] = {
+const char *const GGOBI(ModeNames)[] = {
   "1D Plot",
   "XYPlot",
   "Rotation",
@@ -27,6 +31,8 @@ static char *mode_name[] = {
   "Scatmat",
   "Parcoords",
 };
+
+const char *const *mode_name = GGOBI(ModeNames);
 
 /* w is the toplevel window */
 static gint
@@ -373,6 +379,12 @@ void
 mode_set_cb (GtkWidget *widget, gint action)
 {
   ggobid *gg = GGobiFromWidget(widget,true);
+  GGOBI(full_mode_set)(action, gg);
+}
+
+int
+GGOBI(full_mode_set)(int action, ggobid *gg)
+{
   if (gg->current_display != NULL && gg->current_splot != NULL) {
     splotd *sp = gg->current_splot;
     displayd *display = gg->current_display;
@@ -389,8 +401,11 @@ mode_set_cb (GtkWidget *widget, gint action)
     mode_submenus_activate (sp, gg->mode, on, gg);
 
     display_tailpipe (display, gg);
-  }
+    return(action);
+  } else
+    return(-1);
 }
+
 
 /*-- these will be moved to another file eventually, I'm sure --*/
 
@@ -714,4 +729,13 @@ ValidateGGobiRef(ggobid *gg, gboolean fatal)
   exit(10);
 
  return(NULL);
+}
+
+
+const gchar * const* 
+GGOBI(getModeNames)(int *n)
+{
+  /*  extern const gchar *const* GGOBI(ModeNames); */
+  *n = sizeof(GGOBI(ModeNames))/sizeof(GGOBI(ModeNames)[0]);
+  return(GGOBI(ModeNames));
 }

@@ -199,6 +199,14 @@ void GGOBI(getBrushLocation)(int *x, int *y, ggobid *gg);
 void GGOBI(setBrushSize)(int w, int h, ggobid *gg);
 void GGOBI(setBrushLocation)(int x, int y, ggobid *gg);
 
+extern splotd *GGOBI(getSPlot)(int which, displayd *display);
 
+extern const gchar * const* GGOBI(getModeNames)();
+extern gint GGOBI(getModeId)(const gchar *name);
+extern gint GGOBI(setMode)(const gchar *name, ggobid *gg);
+extern const gchar *GGOBI(getModeName)(int which);
+extern int GGOBI(full_mode_set)(int action, ggobid *gg);
+
+extern int GGOBI(setBrushColor)(int cid, ggobid *gg);
 #endif /* End of conditional inclusion of entire file.*/
 
