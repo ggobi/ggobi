@@ -43,6 +43,8 @@ ExtensionList binaryFileTypes = {
 GSList *FileTypeGroups = NULL;
 
 
+gboolean isURL(const gchar *fileName);
+
 
 InputDescription*
 fileset_generate(const char *fileName, DataMode guess)
@@ -61,6 +63,14 @@ fileset_generate(const char *fileName, DataMode guess)
 
 
   if(stat(fileName, &buf) != 0) {
+
+    if(isURL(fileName)) {
+      desc->mode = xml_data;
+      desc->fileName = g_strdup(fileName);
+      completeFileDesc(fileName, desc);
+      return(desc);
+    }
+
    /* Ok, so the user didn't give a full name and wants us to guess.  
       So we will look through the collections of format types and within
       each of these search through the different extensions for that type.
@@ -424,4 +434,11 @@ int
 addInputFile(InputDescription *desc, const gchar *file) 
 {
   return(addInputSuffix(desc, file));  
+}
+
+
+gboolean
+isURL(const gchar *fileName)
+{
+ return((strncmp(fileName, "http:", 5) == 0 || strncmp(fileName, "ftp:", 4) == 0));
 }
