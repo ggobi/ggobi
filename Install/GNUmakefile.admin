@@ -31,7 +31,7 @@ DATA_SRC_FILES=\
    flea.xml pigs.xml ratcns.xml sat.xml sleep.xml eies.xml buckyball.xml \
    stdColorMap.xml prim7.xml olive.col olive.dat olive.row olive.xml \
    places.xml algal-bloom.xml snetwork.xml \
-   laser.col laser.dat laser.doc laser.xml \
+   laser.col laser.dat laser.doc laser.xml Shipman.xml \
    ggobi.dtd
 
 
