@@ -56,7 +56,9 @@ C_HEADER_FILES=\
   tour1d_pp tour2d_pp tour_pp splash read_init \
   tsdisplay tsPlot vartable write_state \
   print \
-  dbms dbms_ui
+  dbms dbms_ui \
+  scatterplotClass \
+  scatmatClass parcoordsClass
 
 Install/configure: Install/configure.in
 	(cd Install ; autoconf)
