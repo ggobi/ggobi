@@ -120,6 +120,7 @@ typedef struct
 #define GTK_TYPE_GGOBI_EXTENDED_SPLOT           (gtk_ggobi_extended_splot_get_type())
 #define GTK_GGOBI_EXTENDED_SPLOT(obj)	        (GTK_CHECK_CAST ((obj), GTK_TYPE_GGOBI_EXTENDED_SPLOT, extendedSPlotd))
 #define GTK_GGOBI_EXTENDED_SPLOT_CLASS(klass)	(GTK_CHECK_CLASS_CAST ((klass), GTK_TYPE_GGOBI_EXTENDED_SPLOT, GtkGGobiExtendedSPlotClass))
+
 #define GTK_IS_GGOBI_EXTENDED_SPLOT(obj)	 (GTK_CHECK_TYPE ((obj), GTK_TYPE_GGOBI_EXTENDED_SPLOT))
 #define GTK_IS_GGOBI_EXTENDED_SPLOT_CLASS(klass) (GTK_CHECK_CLASS_TYPE ((klass), GTK_TYPE_GGOBI_EXTENDED_SPLOT))
 
@@ -180,4 +181,5 @@ typedef struct
 
 
 void splot_init(splotd *sp, displayd *display, gint width, gint height, struct _ggobid *gg);
+
 #endif

@@ -459,6 +459,16 @@ GGOBI(main)(gint argc, gchar *argv[], gboolean processEvents)
   return (num_ggobis);
 }
 
+/*XX
+ This might usefully be changed to workd directly from the
+ XML tree and avoid having the GGobiDisplayDescription.
+ As we include more information (e.g. brushing information)
+ we end up copying it for little reason. 
+ However, this works for the restore file, but not necessarily
+ the initialization file as we won't have created the ggobid
+ when we read that. We could just re-parse the file and find the
+ appropriate node. Probably the wisest.
+*/
 gboolean
 processRestoreFile(const gchar * const fileName, ggobid *gg)
 {

@@ -201,6 +201,7 @@ add_xml_display(displayd *dpy, xmlDocPtr doc)
   gchar buf[20];
   GtkArg arg;
   gint i;
+  int ctr = 0;
   char *props[] = {"width", "height"};
 
     /* Create a display tag with attributes `type' and `data'
@@ -215,6 +216,16 @@ add_xml_display(displayd *dpy, xmlDocPtr doc)
      xmlSetProp(node, "active",  "true");
   }
 
+    /* Index of the active plot within this display (regardless of whether the
+       display is active). */
+  for(plots = dpy->splots; plots; plots = plots->next, ctr++) {
+     if(dpy->current_splot == plots->data) {
+         sprintf(buf, "%d", ctr);
+         xmlSetProp(node, "activePlotIndex", buf);
+         break;
+     }
+  }
+   
   /* write the width and height information so we can restore these.
      Currently, the query only returns -1! */
 
@@ -229,7 +240,6 @@ add_xml_display(displayd *dpy, xmlDocPtr doc)
   if(GTK_IS_GGOBI_EXTENDED_DISPLAY(dpy)) {
     GtkGGobiExtendedDisplayClass *klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(dpy)->klass);
     if(klass->xml_describe) {
-/*XX Need to be able to identify the active splotd. */
       klass->xml_describe(node, plots, dpy);
     } else {
       xmlSetProp(node, "unsupported", "true");

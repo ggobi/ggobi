@@ -217,12 +217,29 @@ void datad_instance_init(datad * d)
 
 /******************************************************/
 
-static void gtk_ggobi_display_class_init(GtkGGobiDisplayClass * klass)
+#ifdef TEST_DESTROY
+static void
+testDisplayDestroy(GtkObject *obj)
 {
+  GtkObjectClass *klass;
+  g_print("In testDisplayDestroy\n");
+    klass = GTK_OBJECT_CLASS(gtk_type_class(GTK_TYPE_VBOX));
+    if(klass->destroy)
+       klass->destroy(obj);
 
 }
+#endif
 
-static void display_init(displayd * display)
+static void 
+gtk_ggobi_display_class_init(GtkGGobiDisplayClass * klass)
+{
+#ifdef TEST_DESTROY /* Just here to test the destroy mechanism is working. */
+  GTK_OBJECT_CLASS(klass)->destroy = testDisplayDestroy;
+#endif
+}
+
+static void 
+display_init(displayd * display)
 {
 
   display->e = NULL;
@@ -292,23 +309,58 @@ GtkType gtk_ggobi_window_display_get_type(void)
 
 /***************************/
 
-static void gtk_splot_init(splotd * sp)
+static void 
+gtk_splot_init(splotd * sp)
 {
   sp->da = (GtkWidget *) & sp->canvas;
 
   sp->pixmap0 = NULL;
   sp->pixmap1 = NULL;
   sp->redraw_style = FULL;
+
+  sp->whiskers = NULL;
+
 /*sp->tour1d.firsttime = true; *//* Ensure that the 1D tour should be initialized. */
 }
 
-static void splotClassInit(GtkGGobiSPlotClass * klass)
+static void
+splotDestroy(GtkObject *obj)
+{
+    GtkObjectClass *klass;
+#if 0
+    splotd *sp = GTK_GGOBI_SPLOT(obj);
+     /* Can't we just do this in the extended display class, or even the displayd class itself. */
+    if(sp->whiskers) {
+      g_free ((gpointer) sp->whiskers);
+      sp->whiskers = NULL;
+    }
+    if (sp->edges != NULL) {
+      g_free ((gpointer) sp->edges);
+      sp->edges = NULL;
+    }
+    if (sp->arrowheads != NULL) {
+      g_free ((gpointer) sp->arrowheads);
+      sp->arrowheads = NULL;
+    }
+
+    sp->da = NULL;
+#endif
+
+    klass = GTK_OBJECT_CLASS(gtk_type_class(GTK_TYPE_DRAWING_AREA));
+    if(klass->destroy)
+       klass->destroy(obj);
+}
+
+static void 
+splotClassInit(GtkGGobiSPlotClass * klass)
 {
   klass->redraw = QUICK;
+  GTK_OBJECT_CLASS(klass)->destroy = splotDestroy;
 }
 
 
-GtkType gtk_ggobi_splot_get_type(void)
+GtkType 
+gtk_ggobi_splot_get_type(void)
 {
   static GtkType data_type = 0;
 
@@ -330,18 +382,11 @@ GtkType gtk_ggobi_splot_get_type(void)
   return data_type;
 }
 
-void
-extendedSPlotFree(splotd *sp)
-{
-  if (sp->edges != NULL) g_free ((gpointer) sp->edges);
-  if (sp->arrowheads != NULL) g_free ((gpointer) sp->arrowheads);
-}
 
 static void 
 extendedSPlotClassInit(GtkGGobiExtendedSPlotClass * klass)
 {
   klass->tree_label = NULL;
-  GTK_OBJECT_CLASS(klass)->destroy = extendedSPlotFree;
 }
 
 GtkType gtk_ggobi_extended_splot_get_type(void)

@@ -2,7 +2,6 @@
 
 #include <string.h>
 #include "write_state.h"
-
 #include "externs.h"
 
 static gboolean
@@ -87,15 +86,6 @@ drawCase_p(splotd *sp, gint m, datad *d, ggobid *gg)
 {
   return(!d->missing.vals[m][sp->p1dvar]);
 }
-
-/*XXX*/
-static void
-parcoordsDestroy(parcoordsSPlotd *sp)
-{
-     /* Can't we just do this in the extended display class, or even the displayd class itself. */
-    g_free ((gpointer) GTK_GGOBI_SPLOT(sp)->whiskers);
-}
-
 
 void
 withinDrawBinned(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc)
@@ -371,8 +361,6 @@ parcoordsDisplayClassInit(GtkGGobiParCoordsDisplayClass *klass)
 /* splot_key_event_handler */
 
   klass->parent_class.add_plot_labels = addPlotLabels;
-
-  GTK_OBJECT_CLASS(klass)->destroy = parcoordsDestroy;
 }
 
 void
@@ -392,6 +380,7 @@ parcoordsSPlotClassInit(GtkGGobiParCoordsSPlotClass *klass)
    klass->parent_class.within_draw_to_binned = withinDrawBinned;
    klass->parent_class.within_draw_to_unbinned = withinDrawUnbinned;
 }
+
 
 splotd *
 gtk_parcoords_splot_new(displayd *dpy, gint width, gint height, ggobid *gg)

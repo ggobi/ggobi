@@ -309,6 +309,13 @@ display_add (displayd *display, ggobid *gg)
   PipelineMode prev_viewmode = viewmode_get (gg);
   displayd *oldDisplay = gg->current_display;
 
+   /* This is a safety test to avoid having a display be entered twice.
+      Deactivate if we want to be slightly more efficient.             */  
+  if(g_list_find(gg->displays, display)) {
+    g_printerr("Display has already been added to the displays list of this ggobi\n");
+    return(-1);
+  }
+
   if (GTK_IS_GGOBI_WINDOW_DISPLAY(display)) {
     GGobi_widget_set(GTK_GGOBI_WINDOW_DISPLAY(display)->window, gg, true);
     if(g_list_length(display->splots))
@@ -354,8 +361,8 @@ display_add (displayd *display, ggobid *gg)
  * current_display and current_splot if necessary.
 */ 
 void
-display_free (displayd* display, gboolean force, ggobid *gg) {
-  GList *l;
+display_free (displayd* display, gboolean force, ggobid *gg) 
+{
   splotd *sp = NULL;
   extern gint num_ggobis;
   gint count;
@@ -423,15 +430,22 @@ display_free (displayd* display, gboolean force, ggobid *gg) {
     }
 
     count = g_list_length (display->splots);
+
     if (GTK_IS_GGOBI_WINDOW_DISPLAY(display)) {
+/*XX
+      GList *l;
       for (l=display->splots; count > 0 && l; l=l->next, count--) {
         sp = (splotd *) l->data;
         splot_free (sp, display, gg);
       }
+*/
 
      gtk_widget_destroy (GTK_GGOBI_WINDOW_DISPLAY(display)->window);
     }
-    g_free (display);
+#if 0 /*XX */
+    gtk_object_destroy(GTK_OBJECT(display));
+#endif
+
   } else
     quick_message ("Sorry, you can't delete the only display\n", false);
 }

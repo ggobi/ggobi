@@ -289,15 +289,14 @@ scatmat_add_plot (gint xvar, gint yvar, gint col, gint row,
   sp_new->p1dvar = (sp_new->xyvars.x == sp_new->xyvars.y) ? xvar : -1;
 
   gtk_table_attach (GTK_TABLE (display->table),
-    sp_new->da, col, col+1, row, row+1,
-    (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND), 
-    (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND),
-    1, 1);
+		    sp_new->da, col, col+1, row, row+1,
+		    (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND), 
+		    (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND),
+		    1, 1);
   gtk_widget_show (sp_new->da);
 
   /* We don't care where, I think */
-  display->splots = g_list_append (display->splots,
-    (gpointer) sp_new);
+  display->splots = g_list_append (display->splots, (gpointer) sp_new);
 
   return sp_new;
 }

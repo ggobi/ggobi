@@ -370,10 +370,10 @@ displayd *
 GGOBI(newScatmat) (gint *rows, gint *columns, gint nr, gint nc,
   datad *d, ggobid *gg)
 {
-  displayd *display;  /* = display_alloc_init (scatmat, false, d, gg); Done in scatmat_new() */
+  displayd *display; 
 
   display = scatmat_new (false, nr, rows, nc, columns, d, gg);
-  display_add (display, gg);
+/*XX  display_add (display, gg); the caller should add this display. */
 
   return (display);
 }
