@@ -1,0 +1,104 @@
+\documentclass{article}
+
+\usepackage{fullpage}
+\usepackage{times}
+
+\usepackage{}
+
+\input{WebMacros}
+\def\MakeVariable#1{\Escape{#1}}
+\title{Integrating \Cplus{} in GGobi}
+\begin{document}
+\maketitle
+To read default parameters for specifying the SQL connection and query
+for a dataset (see DBMS in this directory), I needed to read a
+properties file similar to Java's (and more the more ubiquitous)
+format
+\begin{verbatim}
+  name: value
+\end{verbatim}
+To do this, I developed some \Cplus{} code in a separate library which
+will be part of Omegahat, released under the BSD or GPL license.
+Now, two issues arise: a) How do we integrate
+a separate library, and b) how do we integrate an
+additional language for the compilation?
+
+The difficulties associated with a)  include
+\begin{itemize}
+\item we may need a particular version of the library
+and we cannot use any arbitrary version
+because it may beincompatible.
+\item if we copy the code into this source tree,
+fixes made to the source tree of that library will not
+be reflected here.
+\item by keeping things separate, we complicate 
+the distribution.
+\end{itemize}
+Basically, the issue is having two independent development branches.
+Given that we ``know'' the owners of these libraries, we should keep
+them separate and distribute them within the same package or bundle.
+Changes made to a ggobi version of another library should be reported
+back to that development team.  It is much the same as the libxml from
+Daniel Veillard.
+
+
+The reasons for wanting to introduce \Cplus{} include
+\begin{enumerate}
+\item It is a superset of C and more strict.  So it catches oddities
+in C and at least makes one aware of them.  In a sense it is a very
+strong form of gcc's -Wall argument.
+\item The OOP approach simplifies certain
+idioms and additionally helps to group
+\item Other libraries become available (e.g. this graph library
+I mentioned before and am looking for).
+\item It is a useful thing to be compatible with.  Since we are
+providing an API, we should allow people to access it in other
+languages that can communicate with C.  \Cplus{} is the obvious and
+easy one.
+\item Symbol conflicts are reduced because of class names being
+`mangled' into the symbol name.  Additionally, polymorphism allows us
+to use the same name for routines that take different arguments. This
+makes the API more natural.
+\end{enumerate}
+
+\begin{enumerate}
+\item It requires an additional component for compiling from
+source. On Windows this might be an issue, but supplying binaries may
+be more effective anyway. Additionally, the cygwin tools should be
+available for compilation (if we assume gtk) and hence egcs will be
+present on the machine.
+
+\item It complicates linking.
+
+\item There are issues with the gtk header files.
+
+\end{enumerate}
+
+
+\section{What is Involved}
+Basically, the steps involved are as follows.
+\begin{itemize}
+\item Declare all routines as being external
+of type/mode C.
+The header files simply need 
+
+\begin{verbatim}
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
+    ...
+
+#ifdef __cplusplus
+ }
+#endif
+\end{verbatim}
+\item Change the makefile to link with the \Cplus{} compiler (g++, CC,
+etc.)  I have introduced an LD argument which takes on the value of
+the variable \MakeVariable{CC} if we are not using \Cplus{} code.  If
+we are (currently if we are \MakeVariable{USE_MySQL} is defined), then
+it takes the value of the \MakeVariable{CXX}
+\item The purely \C{} source files need not be compiled with g++ or
+CC. The linker will handle the symbol resolution correctly.
+\end{itemize}
+\end{document}

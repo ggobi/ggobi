@@ -1,6 +1,18 @@
 \documentclass{article}
+\input{WebMacros}
+
+\usepackage{fullpage}
+\usepackage{times}
+\def\SqlKeyword#1{\textbf{#1}}
+\def\URL#1{\texttt{#1}}
+
+\title{GGobi and Database Management Systems from GGobi\\ 
+Reading data from MySQL
+}
+
 
 \begin{document}
+\maketitle
 
 \begin{abstract}
   A common source of data is Database Management Systems (DBMS), and
@@ -52,19 +64,103 @@ using the \flag{-mysql}.
 \begin{verbatim}
  ggobi -mysql
 \end{verbatim}
-(No argument should be specified after the 
-\flag{-mysql} argument.)
+No value need be specified with this flag.  However, if a filename is given,
+the values for establishing the database connection and performing the
+query are read from that file.  The file is a property file consisting
+of \texttt{name: value} pairs.  The entries have the same names as
+those values presented in the GUI described below.  See
+\ref{tab:mysqlLogin}.  Any white-space is trimmed away from the
+values. An example of such a file is given
+in figure \ref{fig:mysqlInputs}.
+\begin{figure}[htbp]
+  \begin{center}
+    \leavevmode
+\begin{verbatim}
+Host:        tuolomne
+User:        duncan
+Database:    ggobi
+Data query:  SELECT * from flea;
+#Password: 
+Color query: Hi there
+\end{verbatim}    
+    \caption{Default SQL Connections}
+    \label{fig:mysqlInputs}
+  \end{center}
+\end{figure}
 
-In this case, a dialog is displayed that allows one to specify any and
-all of the details about the database and the data that one wants.
-The fields are described in table \
+
+
+This approach allows one to store symbolic information about how to
+obtain the data.  For basic security reasons, the password used to
+access the dataset should not be stored in this file.  In the case
+that it is, it is read and used directly to establish a connection.
+If it is omitted from the file, a GUI dialog (described below) is
+displayed that allows one to interactively set all the values
+governing the SQL connection. The values from the fields specified in
+the properties file will be inserted as defaults in the GUI.  The user
+need only fill in the password to complete the connection.  In the
+rare circumstances that no password is needed (e.g. for convenient
+public access to the database), simply providing an empty value for
+the Password property is adequate to indicate that a connection should
+be attempted with no password.
 
 
 
+In the case that the \flag{-mysql} is specified with no filename a
+dialog window is displayed that allows one to interactively specify
+any and all of the details about the database and the data that one
+wants.  The fields are described in table \ref{tab:mysqlLogin}
 
-\section{Default Settings}
+\begin{table}[htbp]
+  \begin{center}
+    \leavevmode
+\begin{tabular}{ll}\label{tab:mysqlLogin}
+host & the name or IP address of the host 
+machine on which the MySQL server (daemon)
+is running.\\
+user &  the login name to use when creating the
+connection with the database. This is not a login
+for the machine, but for the database. This
+is created by the database adminstrator
+using the \SqlKeyword{GRANT} command in SQL. \\
+password & the password required for the
+specified user on that database server.
+This is also set by the administrator
+when granting access to a database and/or table.
+\\
+database &   Identifies
+which database (collection of tables) within
+the database server you wish to access. \\
 
-\section{Describing the Source of the Data}
+port & Identifies the port on the host machine on which the database
+server is receiving connections.  It is unlikely that you will have to
+set this. It is only used when the database server has been customized
+to run on a non-standard port. \\ 
+
+socket & ? \\
+flags &  ? \\
+Data query & the SQL query that is sent to
+the server which generates 
+a table (result set) which is  treated
+as the raw data.  \\
+Segments query &  an SQL query
+determining which observations are connect.
+The result should be a table with $2$ columns
+and the entries should identify 
+the observations by index (starting at $1$).
+ \\
+
+Color query & this is an SQL query that returns a table of RGB values.
+A fourth column, if present, should contain the names by which color
+values can be referenced.
+\end{tabular}
+    \caption{SQL Parameters}
+    \label{tab:mysqlLogin}
+  \end{center}
+\end{table}
+The non-data queries are not implemented yet.  It would be useful to
+integrate the data sources so that appearance was specified locally,
+but the actual data values were queried via SQL.
 
 
 \end{document}
