@@ -38,11 +38,10 @@ scatterplot_mode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func,
     useIds ? GINT_TO_POINTER  (XYPLOT) : gg, gg);
 
   CreateMenuItem (gg->app.scatterplot_mode_menu, "1D Tour",
-    "^g", "", NULL, accel_group, func,
-    useIds ? GINT_TO_POINTER  (TOUR1D) : gg, gg);
-
-  CreateMenuItem (gg->app.scatterplot_mode_menu, "2D Tour",
     "^t", "", NULL, accel_group, func,
+    useIds ? GINT_TO_POINTER  (TOUR1D) : gg, gg);
+  CreateMenuItem (gg->app.scatterplot_mode_menu, "2D Tour",
+    "^g", "", NULL, accel_group, func,
     useIds ? GINT_TO_POINTER  (TOUR2D) : gg, gg);
   CreateMenuItem (gg->app.scatterplot_mode_menu, "2x1D Tour",
     "^c", "", NULL, accel_group, func,

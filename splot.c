@@ -176,12 +176,12 @@ splot_event_handled (GtkWidget *w, GdkEventKey *event,
   case GDK_X:
     action = XYPLOT;
   break;
-  case GDK_g:
-  case GDK_G:
-    action = TOUR1D;
-  break;
   case GDK_t:
   case GDK_T:
+    action = TOUR1D;
+  break;
+  case GDK_g:
+  case GDK_G:
     action = TOUR2D;
   break;
   case GDK_c:
