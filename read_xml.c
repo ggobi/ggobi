@@ -534,7 +534,7 @@ resolveEdgeIds(XMLParserData *parserData)
 void 
 resolveAllEdgeIds(XMLParserData *parserData)
 {
-   parserData;
+
 }
 
 void endXMLElement(void *user_data, const xmlChar *name)
@@ -567,7 +567,7 @@ void endXMLElement(void *user_data, const xmlChar *name)
     case STRING:
     /* This is the individual setRecordValue(), i.e. not with an 's' at the end.
     */
-      setRecordValue(data->recordString, data->current_data, data);
+      setRecordValue((const char *) data->recordString, data->current_data, data);
       data->current_element++;
     break;
     case VARIABLE:
