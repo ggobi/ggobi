@@ -8,6 +8,15 @@
 #include "plugin.h"
 #include "graphact.h"
 
+/*
+My earlier strategy of using 'visibleEdges' fails because it
+doesn't take into account the case where there's a single in
+edge and a single out edge, but the endpoint is the same.  In
+other words, it looks like two edges in the code but one edge
+on the screen.
+*/
+
+#if 0
 void
 count_visible_edges (PluginInstance *inst)
 {
@@ -66,6 +75,7 @@ for (i=0; i<ga->nnodes; i++)
     ga->nOutEdgesVisible.els[i]);
 */
 }
+#endif
 
 void
 hide_inEdge (gint i, PluginInstance *inst)
@@ -96,9 +106,10 @@ hide_inEdge (gint i, PluginInstance *inst)
       symbol_link_by_id (true, i, d, gg);
       symbol_link_by_id (true, edgeid, e, gg);
     }
-
+    /*
     ga->nInEdgesVisible.els[i] = 0;   
     ga->nOutEdgesVisible.els[a]--;
+    */
   }
 }
 void
@@ -127,9 +138,10 @@ hide_outEdge (gint i, PluginInstance *inst)
 
     if (!gg->linkby_cv && nd > 1) 
       symbol_link_by_id (true, i, d, gg);
-
+    /*
     ga->nOutEdgesVisible.els[i] = 0;   
     ga->nInEdgesVisible.els[b]--;
+    */
   }
 }
 
@@ -139,11 +151,20 @@ ga_leaf_hide_cb (GtkWidget *btn, PluginInstance *inst)
   ggobid *gg = inst->gg;
   graphactd *ga = graphactFromInst (inst);
   datad *d = ga->d;
+  datad *e = ga->e;
   gboolean changing;
   gboolean need_to_link_p = false;
-  gint nvisible;
+  /*  gint nvisible; */
   gint i, m;
+  endpointsd *endpoints;
 
+  endpoints = resolveEdgePoints(e, d);
+  if (endpoints == NULL) {
+    g_printerr ("failed to resolve edges. d: %s, e: %s\n", d->name, e->name);
+/**/return;
+  }
+
+/*
   count_visible_edges (inst);
 
   while (changing) {
@@ -152,7 +173,7 @@ ga_leaf_hide_cb (GtkWidget *btn, PluginInstance *inst)
     for (m=0; m<d->nrows_in_plot; m++) {
       i = d->rows_in_plot.els[m];
       if (ga->nInEdgesVisible.els[i] + ga->nOutEdgesVisible.els[i] == 1) {
-        /*-- leaf node; hide the node and the edge;  decrease a counter --*/
+        *-- leaf node; hide the node and the edge;  decrease a counter --*
         if (ga->nInEdgesVisible.els[i] == 1) {
           hide_inEdge (i, inst);
         } else {
@@ -167,6 +188,48 @@ ga_leaf_hide_cb (GtkWidget *btn, PluginInstance *inst)
       }
     }
     if (nvisible < 2) break;
+  }
+*/
+
+  while (changing) {
+    gint ida, a, idb, b;
+    changing = false;
+    for (m=0; m<d->nrows_in_plot; m++) {
+      i = d->rows_in_plot.els[m];
+      if (!d->hidden_now.els[i]) {
+        if (ga->inEdges[i].nels <= 1 && ga->outEdges[i].nels <= 1) {
+          /* is this the same edge in the other direction? */
+          if (ga->inEdges[i].nels == 1 && ga->outEdges[i].nels == 1) {
+            ida = ga->inEdges[i].els[0];
+            a = endpoints[ida].a;
+            idb = ga->outEdges[i].els[0];
+            b = endpoints[idb].b;
+            if (a == b) {
+              if (e->sampled.els[ida] && !e->hidden_now.els[ida] &&
+                 !d->hidden_now.els[a])
+              {
+                hide_inEdge (i, inst);
+                changing = true;
+              }
+              if (e->sampled.els[idb] && !e->hidden_now.els[idb] &&
+                 !d->hidden_now.els[b])
+              {
+                hide_outEdge (i, inst);
+                changing = true;
+              }
+            }
+          /* or a singleton in one direction or the other? */
+  	  } else if (ga->inEdges[i].nels == 1) {
+	    hide_inEdge (i, inst);
+            changing = true;
+          } else {
+	    hide_outEdge (i, inst);
+            changing = true;
+          }
+        }
+	if (changing) need_to_link_p = true;  
+      }
+    }
   }
 
   if (need_to_link_p) {

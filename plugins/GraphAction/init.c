@@ -18,8 +18,10 @@ graphact_init (graphactd *ga) {
   ga->inEdges = NULL;
   ga->outEdges = NULL;
 
+  /*
   vectori_init_null (&ga->nOutEdgesVisible);
   vectori_init_null (&ga->nInEdgesVisible);
+  */
 
   /*-- finding neighborhoods --*/
   ga->neighbors_find_p = false;

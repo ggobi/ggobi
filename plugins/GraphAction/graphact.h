@@ -10,9 +10,10 @@ typedef struct {
   gint nedges;
   vector_i *inEdges;  /*-- one vector per node, each element an integer --*/
   vector_i *outEdges; /*-- one vector per node, each element an integer --*/
-
+  /*
   vector_i nInEdgesVisible;
   vector_i nOutEdgesVisible;
+  */
 
   GtkWidget *window;
 
