@@ -888,6 +888,10 @@ edges_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg)
               }
             }  /*-- end of looping through edges --*/
 
+            if (p_prev == -1 || p_prev != p) {  /* color */
+              gdk_gc_set_foreground (gg->plot_GC, &gg->color_table[p]);
+            }
+
             if (edges_show_p) {
               gint lwidth = (k<3) ? 0 : (k-2)*2;
               gchar dash_list[2];
@@ -916,13 +920,8 @@ edges_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg)
                 gdk_gc_set_line_attributes (gg->plot_GC, lwidth,
                   (gint) ltype, GDK_CAP_BUTT, GDK_JOIN_ROUND);
               }
-              if (p_prev == -1 || p_prev != p) {  /* color */
-                gdk_gc_set_foreground (gg->plot_GC, &gg->color_table[p]);
-              }
 
               gdk_draw_segments (drawable, gg->plot_GC, sp->edges, nl);
-
-              k_prev = k; n_prev = n; p_prev = p;
             }
 
             if (arrowheads_show_p) {
@@ -932,6 +931,8 @@ edges_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg)
               gdk_gc_set_line_attributes (gg->plot_GC,
                 0, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
             }
+
+            k_prev = k; n_prev = n; p_prev = p;
           }
         }
       }
