@@ -17,16 +17,23 @@
 #include <string.h>
 #include <math.h>
 
-#include "noop-checkbutton.h"
+/* #include "noop-checkbutton.h" */
+#include "noop-toggle.h"
 
 #include "vars.h"
 #include "externs.h"
 
+#define VARSEL_X 0
+#define VARSEL_Y 1
+#define VARSEL_LABEL 2
+static gchar *varpanel_names[] = {"xtoggle", "ytoggle", "label"};
 
 /*-------------------------------------------------------------------------*/
 /*                         utilities                                       */
 /*-------------------------------------------------------------------------*/
 
+
+/*
 void
 checkbox_delete_nth (gint jvar, datad *d)
 {
@@ -38,8 +45,63 @@ checkbox_delete_nth (gint jvar, datad *d)
     gtk_widget_destroy (w);
   }
 }
+*/
 
+/*-- return the hbox --*/
+static GtkWidget *
+varpanel_container_get_nth (gint jvar, datad *d)
+{
+  GtkWidget *w;
+  w = (GtkWidget *) g_slist_nth_data (d->vcbox_ui.box, jvar);
+  return w;
+}
+GtkWidget *
+varpanel_widget_get_nth (gint jbutton, gint jvar, datad *d)
+{
+  GtkWidget *box, *child;
+  box = (GtkWidget *) varpanel_container_get_nth (jvar, d);
+  child = (GtkWidget *) gtk_object_get_data (GTK_OBJECT (box),
+    varpanel_names[jbutton]);
+  return child;
+}
+void
+varpanel_label_set (gint j, datad *d)
+{
+  GtkWidget *label = varpanel_widget_get_nth (VARSEL_LABEL, j, d);
+  vartabled *vt = vartable_element_get (j, d);
 
+  gtk_label_set_text (GTK_LABEL (GTK_BIN (label)->child), vt->collab_tform);
+}
+
+GtkWidget *
+varpanel_widget_set_visible (gint jbutton, gint jvar, gboolean show, datad *d)
+{
+  GtkWidget *box, *child;
+  gboolean visible;
+
+  box = (GtkWidget *) varpanel_container_get_nth (jvar, d);
+  child = (GtkWidget *) gtk_object_get_data (GTK_OBJECT (box),
+    varpanel_names[jbutton]);
+
+  visible = GTK_WIDGET_VISIBLE (child);
+  if (visible != show) {
+    if (show) gtk_widget_show (child);
+    else gtk_widget_hide (child);
+  }
+  
+  return child;
+}
+void
+varpanel_delete_nth (gint jvar, datad *d)
+{
+  GtkWidget *box = varpanel_container_get_nth (jvar, d);
+  if (box != NULL) {
+    d->vcbox_ui.box = g_slist_remove (d->vcbox_ui.box, (gpointer) box);
+    gtk_widget_destroy (box);
+  }
+}
+
+/*
 GtkWidget *
 checkbox_get_nth (gint jvar, datad *d)
 {
@@ -47,20 +109,15 @@ checkbox_get_nth (gint jvar, datad *d)
   w = (GtkWidget *) g_slist_nth_data (d->vcbox_ui.checkbox, jvar);
   return w;
 }
+*/
 
-void
-varlabel_set (gint j, datad *d)
-{
-  GtkWidget *w = checkbox_get_nth (j, d);
-  vartabled *vt = vartable_element_get (j, d);
-  gtk_label_set_text (GTK_LABEL (GTK_BIN (w)->child), vt->collab_tform);
-}
 
 
 /*-------------------------------------------------------------------------*/
 /*                     Variable selection                                  */
 /*-------------------------------------------------------------------------*/
 
+/*
 void
 varpanel_checkbutton_set_active (gint jvar, gboolean active, datad *d)
 {
@@ -80,7 +137,30 @@ varpanel_checkbutton_set_active (gint jvar, gboolean active, datad *d)
     }
   }
 }
+*/
 
+void
+varpanel_toggle_set_active (gint jbutton, gint jvar, gboolean active, datad *d)
+{
+  gboolean active_prev;
+  GtkWidget *w;
+
+
+  if (jvar >= 0 && jvar < d->ncols) {
+    w = varpanel_widget_get_nth (jbutton, jvar, d);
+
+    if (w && GTK_WIDGET_REALIZED (w)) {
+
+      active_prev = GTK_TOGGLE_BUTTON (w)->active;
+
+      if (active != active_prev) {
+        /*GTK_TOGGLE_BUTTON (w)->active = active;*/
+        /*gtk_widget_queue_draw (w);*/
+        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(w), active);
+      }
+    }
+  }
+}
 
 void
 varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint btn,
@@ -236,6 +316,7 @@ varpanel_refresh (ggobid *gg) {
   cpaneld *cpanel = &display->cpanel;
   gint nd = g_slist_length (gg->d);
   gint k;
+  GList *l;
 
   if (nd > 0 && sp != NULL) {
 
@@ -248,61 +329,79 @@ varpanel_refresh (ggobid *gg) {
         switch (display->displaytype) {
 
           case parcoords:
-          {
-            GList *l;
-            for (j=0; j<d->ncols; j++)
-              varpanel_checkbutton_set_active (j, false, d);
+            for (j=0; j<d->ncols; j++) {
+              /* varpanel_checkbutton_set_active (j, false, d); */
+              varpanel_toggle_set_active (VARSEL_X, j, false, d);
+              varpanel_toggle_set_active (VARSEL_Y, j, false, d);
+              varpanel_widget_set_visible (VARSEL_Y, j, false, d);
+            }
 
             l = display->splots;
             while (l) {
               j = ((splotd *) l->data)->p1dvar;
-              varpanel_checkbutton_set_active (j, true, d);
+              /* varpanel_checkbutton_set_active (j, true, d); */
+              varpanel_toggle_set_active (VARSEL_X, j, true, d);
               l = l->next;
             }
-          }
           break;
 
           case scatmat:
-          {
-            GList *l;
-            for (j=0; j<d->ncols; j++)
-              varpanel_checkbutton_set_active (j, false, d);
+            for (j=0; j<d->ncols; j++) {
+              /* varpanel_checkbutton_set_active (j, false, d); */
+              varpanel_toggle_set_active (VARSEL_X, j, false, d);
+              varpanel_toggle_set_active (VARSEL_Y, j, false, d);
+              varpanel_widget_set_visible (VARSEL_Y, j, false, d);
+            }
             l = display->scatmat_cols;  /*-- assume rows = cols --*/
             while (l) {
               j = GPOINTER_TO_INT (l->data);
-              varpanel_checkbutton_set_active (j, true, d);
+              /* varpanel_checkbutton_set_active (j, true, d); */
+              varpanel_toggle_set_active (VARSEL_X, j, true, d);
               l = l->next;
             }
-          }
           break;
 
           case tsplot:
-          {
-            GList *l;
-            for (j=0; j<d->ncols; j++)
-              varpanel_checkbutton_set_active (j, false, d);
+            for (j=0; j<d->ncols; j++) {
+              /* varpanel_checkbutton_set_active (j, false, d); */
+              varpanel_toggle_set_active (VARSEL_X, j, false, d);
+              varpanel_toggle_set_active (VARSEL_Y, j, false, d);
+              varpanel_widget_set_visible (VARSEL_Y, j, false, d);
+            }
 
             l = display->splots;
             while (l) {
               j = ((splotd *) l->data)->xyvars.y;
-              varpanel_checkbutton_set_active (j, true, d);
+              /* varpanel_checkbutton_set_active (j, true, d); */
+              varpanel_toggle_set_active (VARSEL_Y, j, true, d);
               j = ((splotd *) l->data)->xyvars.x;
-              varpanel_checkbutton_set_active (j, true, d);
+              /* varpanel_checkbutton_set_active (j, true, d); */
+              varpanel_toggle_set_active (VARSEL_X, j, true, d);
               l = l->next;
             }
-          }
           break;
 
           case scatterplot:
             switch (cpanel->projection) {
               case P1PLOT:
-                for (j=0; j<d->ncols; j++)
-                  varpanel_checkbutton_set_active (j, (j == sp->p1dvar), d);
+                for (j=0; j<d->ncols; j++) {
+                /* varpanel_checkbutton_set_active (j, (j == sp->p1dvar), d); */
+                  varpanel_toggle_set_active (VARSEL_Y, j, false, d);
+                  varpanel_widget_set_visible (VARSEL_Y, j, false, d);
+
+                  varpanel_toggle_set_active (VARSEL_X, j, j == sp->p1dvar, d);
+                }
               break;
               case XYPLOT:
-                for (j=0; j<d->ncols; j++)
-                  varpanel_checkbutton_set_active (j,
-                    (j == sp->xyvars.x || j == sp->xyvars.y), d);
+                for (j=0; j<d->ncols; j++) {
+                  /* varpanel_checkbutton_set_active (j, */
+                  /*   (j == sp->xyvars.x || j == sp->xyvars.y), d); */
+                  varpanel_toggle_set_active (VARSEL_X, j, 
+                    (j == sp->xyvars.x), d);
+                  varpanel_widget_set_visible (VARSEL_Y, j, true, d);
+                  varpanel_toggle_set_active (VARSEL_Y, j, 
+                    (j == sp->xyvars.y), d);
+                }
               break;
               /*-- to pacify compiler --*/
               case NULLMODE:
@@ -329,7 +428,8 @@ varpanel_refresh (ggobid *gg) {
 #ifdef BARCHART_IMPLEMENTED
           case barchart:
             for (j=0; j<d->ncols; j++)
-              varpanel_checkbutton_set_active (j, (j == sp->p1dvar), d);
+              /* varpanel_checkbutton_set_active (j, (j == sp->p1dvar), d); */
+              varpanel_toggle_set_active (VARSEL_X, j, (j == sp->p1dvar), d);
           break;
 #endif
 
@@ -349,6 +449,7 @@ varsel_cb (GtkWidget *w, GdkEvent *event, datad *d)
   displayd *display = gg->current_display;
   cpaneld *cpanel = &display->cpanel;
   splotd *sp = gg->current_splot;
+  gint xory;
 
   if (d != display->d)
     return true;
@@ -361,11 +462,24 @@ varsel_cb (GtkWidget *w, GdkEvent *event, datad *d)
 
     jvar = -1;
     for (j=0; j<d->ncols; j++) {
-      if (checkbox_get_nth (j, d) == w) {
+      /*if (checkbox_get_nth (j, d) == w) {*/
+      if (varpanel_widget_get_nth (VARSEL_X, j, d) == w) {
+        xory = VARSEL_X;
+        jvar = j;
+        break;
+      } else if (varpanel_widget_get_nth (VARSEL_Y, j, d) == w) {
+        xory = VARSEL_Y;
+        jvar = j;
+        break;
+      } else if (varpanel_widget_get_nth (VARSEL_LABEL, j, d) == w) {
+        xory = -1;
         jvar = j;
         break;
       }
     }
+   /*-- emulate the old behavior by translating xory into button --*/
+   if (xory > -1)
+     button = (xory == VARSEL_X) ? 1 : 2;
 
 /* looking for modifiers; don't know which ones we'll want */
     alt_mod = ((bevent->state & GDK_MOD1_MASK) == GDK_MOD1_MASK);
@@ -386,6 +500,7 @@ varsel_cb (GtkWidget *w, GdkEvent *event, datad *d)
 /*                  adding and deleting variables                          */
 /*-------------------------------------------------------------------------*/
 
+/*
 static void
 varpanel_checkbox_add (gint j, datad *d, ggobid *gg) 
 {
@@ -407,26 +522,76 @@ varpanel_checkboxes_add (gint nc, datad *d, ggobid *gg)
   gint j;
   gint n = g_slist_length (d->vcbox_ui.checkbox);
   
-  /*-- create the variable checkboxes --*/
+  *-- create the variable checkboxes --*
   for (j=n; j<nc; j++)
     varpanel_checkbox_add (j, d, gg);
 }
+*/
 
+static void
+varpanel_add_row (gint j, datad *d, ggobid *gg) 
+{
+  vartabled *vt = vartable_element_get (j, d);
+  GtkWidget *box, *xw, *yw, *label;
+
+  box = gtk_hbox_new (false, 2);
+  gtk_box_pack_start (GTK_BOX (d->vcbox_ui.vbox),
+    box, false, false, 0);
+
+  xw = gtk_noop_toggle_button_new_with_label (" X ");
+  gtk_box_pack_start (GTK_BOX (box), xw, false, false, 2);
+  GGobi_widget_set (xw, gg, true);
+  gtk_object_set_data (GTK_OBJECT(box), varpanel_names[VARSEL_X], xw);
+  gtk_signal_connect (GTK_OBJECT (xw),
+    "button_press_event", GTK_SIGNAL_FUNC (varsel_cb), d);
+
+  yw = gtk_noop_toggle_button_new_with_label (" Y ");
+  gtk_box_pack_start (GTK_BOX (box), yw, false, false, 2);
+  GGobi_widget_set (yw, gg, true);
+  gtk_object_set_data (GTK_OBJECT(box), varpanel_names[VARSEL_Y], yw);
+  gtk_signal_connect (GTK_OBJECT (yw),
+    "button_press_event", GTK_SIGNAL_FUNC (varsel_cb), d);
+
+  /*-- the label is actually a button, with the old behavior --*/
+  label = gtk_button_new_with_label (vt->collab);
+  gtk_button_set_relief (GTK_BUTTON (label), GTK_RELIEF_NONE);
+  GGobi_widget_set (label, gg, true);
+  gtk_object_set_data (GTK_OBJECT(box), varpanel_names[VARSEL_LABEL], label);
+  gtk_signal_connect (GTK_OBJECT (label),
+    "button_press_event", GTK_SIGNAL_FUNC (varsel_cb), d);
+  gtk_box_pack_start (GTK_BOX (box), label, false, false, 2);
+
+  d->vcbox_ui.box = g_slist_append (d->vcbox_ui.box, box);
+  gtk_widget_show_all (box);
+}
+
+void
+varpanel_widgets_add (gint nc, datad *d, ggobid *gg) 
+{
+  gint j;
+  gint n = g_slist_length (d->vcbox_ui.box);
+  
+  /*-- create the variable widgets --*/
+  for (j=n; j<nc; j++)
+    varpanel_add_row (j, d, gg);
+}
 
 /*-- delete nc checkboxes, starting at jcol --*/
+/*
 void
 varpanel_checkboxes_delete (gint nc, gint jcol, datad *d) {
   gint j;
   GtkWidget *w;
 
-  if (nc > 0 && nc < d->ncols) {  /*-- forbid deleting every checkbox --*/
+  if (nc > 0 && nc < d->ncols) {  *-- forbid deleting every checkbox --*
     for (j=jcol; j<jcol+nc; j++) {
       w = checkbox_get_nth (jcol, d);
       d->vcbox_ui.checkbox = g_slist_remove (d->vcbox_ui.checkbox, w);
-      gtk_widget_destroy (w);  /*-- maybe not necessary? --*/
+      gtk_widget_destroy (w);  *-- maybe not necessary? --*
     }
   }
 }
+*/
 
 /*-------------------------------------------------------------------------*/
 /*                  initialize and populate the var panel                  */
@@ -473,7 +638,7 @@ varpanel_clear (datad *d, ggobid *gg)
 
 
 /*-- for each datad, a scrolled window, vbox, and column of check buttons --*/
-void varpanel_checkboxes_populate (datad *d, ggobid *gg)
+void varpanel_populate (datad *d, ggobid *gg)
 {
   gint j, nd;
 
@@ -506,10 +671,14 @@ void varpanel_checkboxes_populate (datad *d, ggobid *gg)
     gtk_widget_show_all (d->varpanel_ui.ebox);
     gdk_flush ();
 
+/*
     d->vcbox_ui.checkbox = NULL;
-
     for (j=0; j<d->ncols; j++)
       varpanel_checkbox_add (j, d, gg);
+*/
+    d->vcbox_ui.box = NULL;
+    for (j=0; j<d->ncols; j++)
+      varpanel_add_row (j, d, gg);
   }
 }
 
@@ -538,6 +707,7 @@ GGOBI(selectScatterplotX) (gint jvar, ggobid *gg)
 /*                    context-sensitive tooltips                           */
 /*-------------------------------------------------------------------------*/
 
+/*
 void
 varpanel_tooltips_set (ggobid *gg) 
 {
@@ -547,10 +717,10 @@ varpanel_tooltips_set (ggobid *gg)
   gint nd = g_slist_length (gg->d);
   datad *d;
 
-  /*-- for each datad --*/
+  // for each datad 
   for (k=0; k<nd; k++) {
     d = (datad*) g_slist_nth_data (gg->d, k);
-    /*-- for each variable --*/
+    // for each variable
     for (j=0; j<d->ncols; j++) {
       if (checkbox_get_nth (j, d) == NULL)
         break;
@@ -610,7 +780,7 @@ varpanel_tooltips_set (ggobid *gg)
                 "Click to select a variable to be available for touring",
                 NULL);
             break;
-            /*-- to pacify compiler if we change these to an enum --*/
+            //-- to pacify compiler if we change these to an enum 
             case ROTATE:
             case SCALE:
             case BRUSH:
@@ -634,6 +804,147 @@ varpanel_tooltips_set (ggobid *gg)
                 "Click to replace a variable",
                 NULL);
 
+        break;
+#endif
+
+        case unknown_display_type:
+        break;
+      }
+    }
+  }
+}
+*/
+
+
+void
+varpanel_tooltips_set (ggobid *gg) 
+{
+  displayd *display = gg->current_display;
+  gint projection = projection_get (gg);
+  gint j, k;
+  gint nd = g_slist_length (gg->d);
+  datad *d;
+  GtkWidget *wx, *wy, *label;
+
+  /*-- for each datad --*/
+  for (k=0; k<nd; k++) {
+    d = (datad*) g_slist_nth_data (gg->d, k);
+    /*-- for each variable --*/
+    for (j=0; j<d->ncols; j++) {
+      if ((wx = varpanel_widget_get_nth (VARSEL_X, j, d)) == NULL)
+        break;
+      wy = varpanel_widget_get_nth (VARSEL_Y, j, d);
+      label = varpanel_widget_get_nth (VARSEL_LABEL, j, d);
+      
+      switch (display->displaytype) {
+
+        case parcoords:
+          gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
+            "Select to replace/insert/append a variable, or to delete it",
+            NULL);
+          gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
+            "Click to replace/insert/append a variable, or to delete it",
+            NULL);
+        break;
+
+        case scatmat:
+          gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
+            "Select to replace/insert/append a variable, or to delete it",
+            NULL);
+          gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
+            "Click to replace/insert/append a variable, or to delete it",
+            NULL);
+        break;
+
+        case tsplot:
+          gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
+            "Select to replace the horizontal (time) variable.",
+            NULL);
+          gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wy,
+            "Select to replace/insert/append/delete another variable.",
+            NULL);
+          gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
+            "Click left to replace the horizontal (time) variable.  Click middle to replace/insert/append/delete another variable.",
+            NULL);
+        break;
+
+        case scatterplot:
+          switch (projection) {
+            case P1PLOT:
+              gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
+                "Select to plot horizontally",
+                NULL);
+              gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wy,
+                "Select to plot vertically",
+                NULL);
+              gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
+                "Click left to plot horizontally, right or middle to plot vertically",
+                NULL);
+            break;
+            case XYPLOT:
+              gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
+                "Press to select the horizontally plotted variable",
+                NULL);
+              gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wy,
+                "Press to select the vertically plotted variable",
+                NULL);
+              gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
+                "Click left to select the horizontal variable, middle for vertical",
+                NULL);
+
+            break;
+            case TOUR2D:
+              gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
+                "Click to select a variable to be available for touring",
+                NULL);
+              gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
+                "Click to select a variable to be available for touring",
+                NULL);
+            break;
+            case TOUR1D:
+              gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
+                "Click to select a variable to be available for touring",
+                NULL);
+              gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
+                "Click to select a variable to be available for touring",
+                NULL);
+            break;
+            case COTOUR:
+              gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
+                "Click to select a variable to be toured horizontally",
+                NULL);
+              gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wy,
+                "Click to select a variable to be toured vertically",
+                NULL);
+              gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
+                "Click to select a variable to be available for touring",
+                NULL);
+            break;
+            /*-- to pacify compiler if we change these to an enum --*/
+            case ROTATE:
+            case SCALE:
+            case BRUSH:
+            case IDENT:
+            case EDGEED:
+            case MOVEPTS:
+            case SCATMAT:
+            case PCPLOT:
+            case TSPLOT:
+#ifdef BARCHART_IMPLEMENTED
+            case BARCHART:
+#endif
+            break;
+        }
+        break;
+
+#ifdef BARCHART_IMPLEMENTED
+        case barchart:
+          gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
+            "Click to replace a variable",
+            NULL);
+          gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
+            "Click to replace a variable",
+            NULL);
         break;
 #endif
 

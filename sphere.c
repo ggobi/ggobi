@@ -70,7 +70,8 @@ variable_set_label (datad *d, gint j, gchar *lbl)
   vt->collab = g_strdup (lbl);
   vt->collab_tform = g_strdup (lbl);
   vartable_collab_set_by_var (j, d);
-  varlabel_set (j, d);         /*-- checkboxes --*/
+  /*varlabel_set (j, d);*/         /*-- checkboxes --*/
+  varpanel_label_set (j, d);   /*-- checkboxes --*/
   varcircle_label_set (j, d);  /*-- variable circles --*/
 }
 

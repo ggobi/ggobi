@@ -125,13 +125,16 @@ GGOBI(setVariableName)(gint j, gchar *name, gboolean transformed,
   if (transformed)
     vt->collab_tform = g_strdup(name);
   else {
+/*
     extern GtkWidget *checkbox_get_nth (gint, datad *);
     GtkWidget *w;
-    vt->collab = g_strdup(name);
-    vt->collab_tform = g_strdup(name);
     w = checkbox_get_nth (j, d);
     if(w)
 	gtk_object_set (GTK_OBJECT(w), "label", name, NULL);
+*/
+    vt->collab = g_strdup(name);
+    vt->collab_tform = g_strdup(name);
+    varpanel_label_set (j, d);
   }
 }
 

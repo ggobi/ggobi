@@ -73,7 +73,7 @@ SRC=array.c ash1d.c \
  impute.c impute_ui.c io.c jitter.c jitter_ui.c \
  limits.c lineedit.c lineedit_ui.c \
  main_ui.c make_ggobi.c menus.c missing.c \
- movepts.c movepts_ui.c noop-checkbutton.c \
+ movepts.c movepts_ui.c noop-toggle.c \
  p1d.c p1d_ui.c parcoords.c parcoords_ui.c pipeline.c \
  ppcorr_ui.c \
  read_array.c read_data.c record_id.c rotate_ui.c \
@@ -107,7 +107,7 @@ OB=array.o ash1d.o \
  impute.o impute_ui.o io.o jitter.o jitter_ui.o \
  limits.o lineedit.o lineedit_ui.o \
  main_ui.o make_ggobi.o menus.o missing.o \
- movepts.o movepts_ui.o noop-checkbutton.o \
+ movepts.o movepts_ui.o noop-toggle.o \
  p1d.o p1d_ui.o parcoords.o parcoords_ui.o pipeline.o \
  ppcorr_ui.o \
  read_array.o read_data.o record_id.o rotate_ui.o \

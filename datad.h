@@ -134,11 +134,10 @@ struct _datad {
 
  struct _Varpanel_cboxd {
    GtkWidget *swin;
-   GtkWidget *vbox;      /*-- child of swin --*/
-   GSList *checkbox;     /*-- single column of checkboxes --*/
-
-   /*-- preparing to switch from checkboxes to toggle widgets --*/
-   GSList *xtoggle, *ytoggle, *varlab;
+   GtkWidget *vbox;        /*-- child of swin --*/
+   /*GSList *checkbox;*/   /*-- single column of checkboxes --*/
+   /*-- switching from checkboxes to two toggle widgets and a label --*/
+   GSList *box;   /*-- single column of hboxes --*/
 
  } vcbox_ui;
  struct _Varpanel_circd {

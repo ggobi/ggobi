@@ -68,7 +68,8 @@ addvar_propagate (gint ncols_prev, gint ncols, datad *d, ggobid *gg)
   }
 
   /*-- variable checkboxes and circles --*/
-  varpanel_checkboxes_add (d->ncols, d, gg);
+  /*varpanel_checkboxes_add (d->ncols, d, gg);*/
+  varpanel_widgets_add (d->ncols, d, gg);
   varcircles_add (d->ncols, d, gg);
 }
 
@@ -442,7 +443,8 @@ delete_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
 
   /*-- delete checkboxes --*/
   for (j=ncols-1; j>=0; j--) {
-    checkbox_delete_nth (cols[j], d);
+    /*checkbox_delete_nth (cols[j], d);*/
+    varpanel_delete_nth (cols[j], d);
   }
 
   /*-- delete variable circles --*/

@@ -10,6 +10,18 @@
 extern "C" {
 #endif
 
+/*
+void       checkbox_delete_nth (gint jvar, datad *);
+void       varlabel_set (gint, datad *);
+void       varpanel_checkboxes_add (gint, datad *d, ggobid *gg);
+void       varpanel_checkboxes_populate (datad *, ggobid *);
+*/
+
+void       varpanel_label_set (gint, datad *);
+void       varpanel_delete_nth (gint jvar, datad *d);
+void       varpanel_widgets_add (gint nc, datad *d, ggobid *gg);
+void       varpanel_populate (datad *, ggobid *);
+
 /* sort +1 */
 void       brush_reset_cb (GtkWidget *w, gpointer cbd);
 void       brush_update_set_cb (GtkCheckMenuItem *w, guint action);
@@ -72,7 +84,6 @@ void       brush_set_pos (gint, gint, splotd *);
 void       brush_undo (splotd *, datad *, ggobid *);
 gboolean   build_symbol_vectors_by_var (cpaneld *, datad *, ggobid *);
 gdouble    calc_norm (gdouble *x, gint n);
-void       checkbox_delete_nth (gint jvar, datad *);
 gboolean   checkequiv(gdouble **u0, gdouble **u1, gint nc, gint nd);
 void       clone_vars (gint *cols, gint ncols, datad *, ggobid *);
 void       cluster_free (gint, datad *, ggobid *);
@@ -435,9 +446,6 @@ void       vardialog_open (ggobid *, gchar *title);
 void       variable_clone (gint, const gchar *, gboolean, datad *, ggobid *);
 void       variable_notebook_subwindow_add (datad *d, GtkSignalFunc func, GtkWidget *notebook, ggobid *gg); gint alloc_optimize0_p (optimize0_param *op, gint nrows, gint ncols, gint ndim);
 void       variable_notebook_varchange_cb (GtkObject *obj, vartabled *vt, ggobid *gg, GtkWidget *notebook);
-void       varlabel_set (gint, datad *);
-void       varpanel_checkboxes_add (gint, datad *d, ggobid *gg);
-void       varpanel_checkboxes_populate (datad *, ggobid *);
 void       varpanel_clear (datad *, ggobid *);
 void       varpanel_make (GtkWidget *, ggobid *);
 void       varpanel_refresh (ggobid *);
