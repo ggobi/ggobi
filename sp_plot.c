@@ -217,7 +217,8 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
 
   if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
    displayKlass =  GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
-   loop_over_points = display->options.points_show_p || displayKlass->loop_over_points;
+   loop_over_points = display->options.points_show_p ||
+                      displayKlass->loop_over_points;
   } else
    loop_over_points = display->options.points_show_p;
 
@@ -1093,14 +1094,17 @@ splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
   gint proj = cpanel->projection;
 
 /*-- moving this section breaks splot_redraw (QUICK) for adding edges --*/
-  if (display->options.edges_undirected_show_p ||
-      display->options.edges_arrowheads_show_p ||
-      display->options.edges_directed_show_p)
-  {
-    if ((GTK_IS_GGOBI_EXTENDED_DISPLAY(display)  
-	  && GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass)->show_edges_p)) {
-      if (e->nearest_point != -1)
-        splot_nearest_edge_highlight (sp, e->nearest_point, true, gg);
+  if (e) {
+    if (display->options.edges_undirected_show_p ||
+        display->options.edges_arrowheads_show_p ||
+        display->options.edges_directed_show_p)
+    {
+      if ((GTK_IS_GGOBI_EXTENDED_DISPLAY(display)  
+	    && GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass)->show_edges_p))
+      {
+        if (e->nearest_point != -1)
+          splot_nearest_edge_highlight (sp, e->nearest_point, true, gg);
+      }
     }
   }
   

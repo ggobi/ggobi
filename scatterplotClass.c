@@ -1369,11 +1369,12 @@ addMarkupCues(splotd *sp, GdkDrawable *drawable, ggobid *gg)
 /* See splot_add_markup_to_pixmap */
   displayd *display = sp->displayptr;
   datad *e = display->e;
-  if (display->options.edges_undirected_show_p ||
-      display->options.edges_arrowheads_show_p ||
-      display->options.edges_directed_show_p)
-      if (e->nearest_point != -1)
-        splot_nearest_edge_highlight (sp, e->nearest_point, true, gg);
+  if (e)
+    if (display->options.edges_undirected_show_p ||
+        display->options.edges_arrowheads_show_p ||
+        display->options.edges_directed_show_p)
+        if (e->nearest_point != -1)
+          splot_nearest_edge_highlight (sp, e->nearest_point, true, gg);
 }
 
 void
