@@ -137,16 +137,19 @@ GtkWidget *
 create_glayout_window(ggobid *gg, PluginInstance *inst)
 {
   GtkWidget *window, *main_vbox, *notebook, *label, *frame, *vbox, *btn;
-  GtkWidget *hb, *entry, *hscale, *vb, *opt, *apply_btn;
+  GtkWidget *hb, *entry;
+#ifdef GRAPHVIZ
+  GtkWidget *hscale, *vb, *opt, *apply_btn, *varnotebook;
+  GtkObject *adj;
+#endif
   GtkTooltips *tips = gtk_tooltips_new ();
   /*-- for lists of datads --*/
   gchar *clist_titles[2] = {"node sets", "edge sets"};
   datad *d;
-  GtkWidget *hbox, *swin, *clist, *varnotebook;
+  GtkWidget *hbox, *swin, *clist;
   gchar *row[1];
   GSList *l;
   glayoutd *gl = glayoutFromInst (inst);
-  GtkObject *adj;
 
   /*-- I will probably have to get hold of this window, after which
        I can name all the other widgets --*/
@@ -288,6 +291,7 @@ create_glayout_window(ggobid *gg, PluginInstance *inst)
 */
   frame = gtk_frame_new ("Neato layout");
   gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
+#ifdef GRAPHVIZ
 
   hbox = gtk_hbox_new (false, 5);
   gtk_container_set_border_width (GTK_CONTAINER(hbox), 5); 
@@ -312,11 +316,9 @@ Add an option:  Model either 'circuit resistance' or 'shortest path'
     "Fix one of the axes during plot cycling or let them both float", NULL);
 */
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
-#ifdef GRAPHVIZ
   populate_option_menu (opt, (gchar**) neato_model_lbl,
     sizeof (neato_model_lbl) / sizeof (gchar *),
     (GtkSignalFunc) neato_model_cb, "PluginInst", inst);
-#endif
 
   /*-- neato scale --*/
   vb = gtk_vbox_new (false, 0);
@@ -327,10 +329,8 @@ Add an option:  Model either 'circuit resistance' or 'shortest path'
   gtk_box_pack_start (GTK_BOX (vb), label, false, false, 3);
 
   adj = gtk_adjustment_new ((gfloat)gl->neato_dim, 2.0, 11.0, 1.0, 1.0, 1.0);
-#ifdef GRAPHVIZ
   gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
     GTK_SIGNAL_FUNC (neato_dim_cb), inst);
-#endif
   hscale = gtk_hscale_new (GTK_ADJUSTMENT (adj));
   gtk_widget_set_usize (GTK_WIDGET (hscale), 150, 30);
 
@@ -345,12 +345,8 @@ Add an option:  Model either 'circuit resistance' or 'shortest path'
 
   apply_btn = gtk_button_new_with_label ("apply");
   gtk_widget_set_name (apply_btn, "neato");
-#ifdef GRAPHVIZ
   gtk_signal_connect (GTK_OBJECT (apply_btn), "clicked",
                       GTK_SIGNAL_FUNC (dot_neato_layout_cb), (gpointer) inst);
-#else
-  gtk_widget_set_sensitive (apply_btn, false);
-#endif
   gtk_box_pack_start (GTK_BOX (vbox), apply_btn, false, false, 3);
 
 
@@ -363,10 +359,8 @@ Add an option:  Model either 'circuit resistance' or 'shortest path'
   gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), btn,
     "Have neato use edge length in determining node positions, and use the selected variable as a source of lengths.  Edge lengths must be >= 1.0.",
     NULL);
-#ifdef GRAPHVIZ
   gtk_signal_connect (GTK_OBJECT (btn), "toggled",
     GTK_SIGNAL_FUNC (neato_use_edge_length_cb), inst);
-#endif
   gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 2);
 
   /*-- include only edge sets.  --*/
@@ -374,6 +368,9 @@ Add an option:  Model either 'circuit resistance' or 'shortest path'
     GTK_SELECTION_SINGLE, all_vartypes, edgesets_only,
     (GtkSignalFunc) NULL, inst->gg);
   gtk_object_set_data (GTK_OBJECT(apply_btn), "notebook", varnotebook);
+#else
+  gtk_container_add (GTK_CONTAINER(frame), gtk_label_new ("Not enabled"));
+#endif
 
   label = gtk_label_new ("Neato");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), frame, label);
@@ -385,23 +382,22 @@ Add an option:  Model either 'circuit resistance' or 'shortest path'
   frame = gtk_frame_new ("Dot layout");
   gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
 
+#ifdef GRAPHVIZ
   vbox = gtk_vbox_new (false, 5);
   gtk_container_set_border_width (GTK_CONTAINER(vbox), 5); 
   gtk_container_add (GTK_CONTAINER(frame), vbox);
 
   btn = gtk_button_new_with_label ("apply");
   gtk_widget_set_name (btn, "dot");
-#ifdef GRAPHVIZ
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
     GTK_SIGNAL_FUNC (dot_neato_layout_cb), (gpointer) inst);
-#else
-  gtk_widget_set_sensitive (btn, false);
-#endif
   gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 3);
+#else
+  gtk_container_add (GTK_CONTAINER(frame), gtk_label_new ("Not enabled"));
+#endif
 
   label = gtk_label_new ("Dot");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), frame, label);
-
 
   gtk_widget_show_all (window);
 

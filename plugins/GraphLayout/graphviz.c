@@ -38,11 +38,9 @@ test_edge_length (Agraph_t *graph, glayoutd *gl, ggobid *gg)
   for (i=0; i<e->edge.n; i++) {
     edge_endpoints_get (i, &a, &b, d, endpoints, e);
 
-    /*a = d->rowid.idv.els[e->edge.endpoints[i].a];*/
     name = (gchar *) g_array_index (d->rowlab, gchar *, a);
     tail = agfindnode (graph, name);
 
-    /*b = d->rowid.idv.els[e->edge.endpoints[i].b];*/
     name = (gchar *) g_array_index (d->rowlab, gchar *, b);
     head = agfindnode (graph, name);
 
@@ -59,7 +57,8 @@ test_edge_length (Agraph_t *graph, glayoutd *gl, ggobid *gg)
 
 void neato_model_cb (GtkWidget *w, gpointer cbd)
 {
-  PluginInstance *inst = (PluginInstance *) gtk_object_get_data (GTK_OBJECT (w),
+  PluginInstance *inst = (PluginInstance *) 
+    gtk_object_get_data (GTK_OBJECT (w),
     "PluginInst");
   glayoutd *gl = glayoutFromInst (inst);
   gl->neato_model = GPOINTER_TO_INT (cbd);
@@ -232,11 +231,9 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
 /* still need a test for edge visibility */
     edge_endpoints_get (i, &a, &b, d, endpoints, e);
 
-    /*a = d->rowid.idv.els[e->edge.endpoints[i].a];*/
     name = (gchar *) g_array_index (d->rowlab, gchar *, a);
     tail = agfindnode (graph, name);
 
-    /*b = d->rowid.idv.els[e->edge.endpoints[i].b];*/
     name = (gchar *) g_array_index (d->rowlab, gchar *, b);
     head = agfindnode (graph, name);
 
@@ -416,9 +413,7 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
 
   for (i=0; i<nvisible; i++) {
     g_free (pos[i]);
-    /*g_free (rowids[i]);*/
   }
-  /*g_free (rowids);*/
   g_free (pos);
   g_free (visible);
   agclose (graph);
