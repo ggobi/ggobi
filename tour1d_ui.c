@@ -469,7 +469,7 @@ static void tour1dadv_window_open (ggobid *gg) {
     /*-- Close button --*/
     btn = gtk_button_new_with_label ("Close");
     gtk_signal_connect_object (GTK_OBJECT (btn), "clicked",
-                   (GtkSignalFunc) GTK_SIGNAL_FUNC (hide_cb), (GtkObject*) window);
+      (GtkSignalFunc) GTK_SIGNAL_FUNC (hide_cb), (GtkObject*) window);
     gtk_box_pack_start (GTK_BOX (vbox), btn, false, true, 2);
   }
 

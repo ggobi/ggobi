@@ -670,7 +670,6 @@ tourcorr_manip_init(gint p1, gint p2, splotd *sp)
   gfloat ftmp, tol = 0.01; 
   gboolean dontdoit = false;
   extern void gram_schmidt(gfloat *, gfloat*, gint);
-  extern void copy_mat(gfloat **, gfloat **, gint, gint);
 
   dsp->tc1_phi = 0.;
   dsp->tc2_phi = 0.;
@@ -718,7 +717,7 @@ tourcorr_manip_init(gint p1, gint p2, splotd *sp)
   {
     gram_schmidt(dsp->tc1_manbasis.vals[0],  dsp->tc1_manbasis.vals[1],
       d->ncols);
-    ftmp = calc_norm(dsp->tc1_manbasis.vals[1], d->ncols);
+    ftmp = calc_norm (dsp->tc1_manbasis.vals[1], d->ncols);
     if (ftmp < tol)
       dontdoit = true;
   }
@@ -867,7 +866,6 @@ tourcorr_manip_end(splotd *sp)
   datad *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
   ggobid *gg = GGobiFromSPlot(sp);
-  extern void copy_mat(gfloat **, gfloat **, gint, gint);
 
   if (sp->motion_id)
     gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);

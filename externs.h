@@ -14,6 +14,9 @@ extern "C" {
 #endif
 
 /* sort +1 */
+gboolean checkequiv(gfloat **u0, gfloat **u1, gint nc, gint nd);
+void copy_mat(gfloat **, gfloat **, gint, gint);
+float calc_norm (gfloat *x, gint n);
 void rowids_alloc (datad *, ggobid *);
 datad * ValidateDatadRef (datad *d, ggobid *gg, gboolean fatal);
 ggobid * ggobi_get (gint);

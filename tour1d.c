@@ -8,6 +8,7 @@
 #include <math.h>
 #include <malloc.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "vars.h"
 #include "externs.h"
@@ -339,7 +340,6 @@ tour1d_run(displayd *dsp, ggobid *gg)
     vector_f, vector_f, gint *, gint *, gfloat *, gfloat);
   extern void tour_reproject(vector_f, array_f, array_f, array_f, 
     array_f, array_f, gint, gint);
-  extern void copy_mat(gfloat **, gfloat **, gint, gint);
   datad *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
 
@@ -349,7 +349,7 @@ tour1d_run(displayd *dsp, ggobid *gg)
   cartgini_param cgp;
   cartentropy_param cep;
   cartvariance_param cvp;
-  gint method, nrows, ncols, pdim;
+  gint nrows, ncols, pdim;
   gfloat *gdata;
   gboolean revert_random = false;
 

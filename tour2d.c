@@ -302,7 +302,6 @@ tour2d_run(displayd *dsp, ggobid *gg)
     vector_f, vector_f, gint *, gint *, gfloat *, gfloat);
   extern void tour_reproject(vector_f, array_f, array_f, array_f, 
     array_f, array_f, gint, gint);
-  extern void copy_mat(gfloat **, gfloat **, gint, gint);
   datad *d = dsp->d;
   gint i, nv;
 
