@@ -20,7 +20,7 @@ endif
 
 CFLAGS+= -g -Wall $(PERL_CFLAGS) $(GGOBI_INCLUDE_DIR) $(shell $(GTK_CONFIG) --cflags)
 
-SRC=Plugin XSInit
+SRC=Plugin XSInit InputPlugin ConvertUtils
 OBJS=$(SRC:%=%.o)
 
 GGOBI_XS_SO=$(shell pwd)/blib/arch/auto/GGobi/GGobi.so

@@ -51,7 +51,7 @@ GGobi - Interface from Perl to native GGobi code
 
 =head2 EXPORT
 
-None by default.
+    numDataSets(GGobi::GGobiRef);
 
 
 =head1 AUTHOR

@@ -5,7 +5,15 @@
 #include "ggobi.h"
 #include "GGobiAPI.h"
 
-extern ggobid *all_ggobis[];
+ggobid *
+asGGobi(SV *pgg)
+{
+        unsigned long p;
+        ggobid *gg;
+	p = ((unsigned long) SvUV(SvRV(pgg)));
+        gg = (ggobid *)	p;
+        return(gg);
+}
 
 MODULE = plugin PACKAGE = GGobi PREFIX = PERL_GGobi_
 
@@ -17,9 +25,7 @@ numDataSets(pgg)
 	PREINIT:
 	ggobid *gg;
 	int n;
-        unsigned long p;
 	PPCODE:
-	p = ((unsigned long) SvUV(SvRV(pgg)));
-        gg = (ggobid *)	p;
+        gg = asGGobi(pgg);
 	n = g_slist_length(gg->d);
 	XPUSHs(sv_2mortal(newSVuv(n)));
