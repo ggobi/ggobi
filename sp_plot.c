@@ -125,10 +125,11 @@ splot_plot_edge (gint m, gboolean ignore_hidden, datad *d, datad *e,
        over rows_in_plot, but maybe we're not always --*/
   draw_edge = true;
 
-  if (!e->sampled.els[m]) {
+  if (a == -1 || b == -1)
     draw_edge = false;
-
-  } else if (ignore_hidden && e->hidden_now.els[m]) {
+  else if (!e->sampled.els[m])
+    draw_edge = false;
+  else if (ignore_hidden && e->hidden_now.els[m]) {
     draw_edge = false;
 
   } else if (!splot_plot_case (a, true, d, sp, display, gg) ||
@@ -1246,6 +1247,7 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
               gg->plot_GC,
               (ix > dawidth/2) ? 3*dawidth/4 + 10 : dawidth/4 - width -10,
               iy, varlab);
+            g_free (varlab);
           }
         }     
         gdk_gc_set_line_attributes(gg->plot_GC, 1, GDK_LINE_SOLID, 
@@ -1543,6 +1545,7 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
             10+j*textheight,daheight/2,
             ix, iy);
 
+          g_free (varlab);
           /*-- can't add vertical variable labels --*/
         }     
         gdk_gc_set_line_attributes(gg->plot_GC, 0, GDK_LINE_SOLID, 
