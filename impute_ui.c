@@ -67,7 +67,7 @@ impute_window_open (ggobid *gg) {
   GtkWidget *label;
   datad *d = gg->current_display->d;
 
-  if (d->nrows == 0)  /*-- if used before we have data --*/
+  if (d == NULL)  /*-- if used before we have data --*/
     return;
 
   if (gg->impute.window == NULL) {
