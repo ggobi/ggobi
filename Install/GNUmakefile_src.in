@@ -56,8 +56,10 @@ SRC=\
     parcoords_ui.c \
     pipeline.c \
     ppcorr_ui.c \
+    rb.c \
     read_array.c \
     read_data.c \
+    read_excel.c \
     scale_api.c \
     scale_click.c \
     scale_drag.c \

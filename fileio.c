@@ -27,7 +27,7 @@ static gchar *XMLSuffixes[] = { "xml", "xml.gz", "xmlz" };
 
 gchar *ASCIISuffixes[] = { "dat" };
 gchar *BinarySuffixes[] = { "bin" };
-
+gchar *ExcelSuffixes[] = { "asc", "csv", "txt" };
 
 ExtensionList xmlFileTypes = {
   xml_data,
@@ -47,6 +47,12 @@ ExtensionList binaryFileTypes = {
   0
 };
 
+ExtensionList excelFileTypes = {
+  excel_data,
+  NULL,
+  0
+  };
+
 GSList *FileTypeGroups = NULL;
 
 /*--------------------------------------------------------------------*/
@@ -56,6 +62,9 @@ GSList *FileTypeGroups = NULL;
 GSList *initFileTypeGroups(void)
 {
   FileTypeGroups = g_slist_alloc();
+
+  excelFileTypes.extensions = ExcelSuffixes;
+  excelFileTypes.len = 3;
 
   xmlFileTypes.extensions = XMLSuffixes;
   xmlFileTypes.len = 3;
@@ -71,6 +80,8 @@ GSList *initFileTypeGroups(void)
   g_slist_append(FileTypeGroups, &asciiFileTypes);
 
   g_slist_append(FileTypeGroups, &binaryFileTypes);
+
+  g_slist_append(FileTypeGroups, &excelFileTypes);
 
   return (FileTypeGroups);
 }
@@ -456,6 +467,39 @@ gboolean isXMLFile(const gchar * fileName, InputDescription * desc)
 }
 
 
+gboolean isExcelFile(const gchar * fileName)
+{
+  char tmp[20];
+  char extention[20];
+  int len;
+  int i,inx,inx2;
+  memset(tmp,'\0',20);
+  memset(extention,'\0',20);	
+  len = strlen(fileName);
+  inx = 0;
+  for(i=len-1;i>=0;i--)
+  {
+    if(fileName[i] == '.')
+      break;
+    tmp[inx] = fileName[i];
+    inx++;
+  }
+  tmp[inx] = '\0';
+  inx2 = 0;
+  for(i=inx-1;i>=0;i--)
+  {
+    extention[inx2] = tmp[i];
+    inx2++;
+  }
+  if(
+  (strcmp(extention, "asc") == 0) ||
+  (strcmp(extention, "txt") == 0) ||
+  (strcmp(extention, "csv") == 0))
+    return true;
+  else
+    return false;
+}
+
 DataMode guessDataMode(const gchar * fileName, InputDescription * desc)
 {
   FILE *f;
@@ -469,6 +513,9 @@ DataMode guessDataMode(const gchar * fileName, InputDescription * desc)
 
   if (isASCIIFile(fileName))
     return (ascii_data);
+
+  if (isExcelFile(fileName))
+      return (excel_data);
 
   return (unknown_data);
 }

@@ -177,6 +177,11 @@ gboolean read_input(InputDescription * desc, ggobid * gg)
   case ascii_data:
     ok = read_ascii_data(desc, gg);
     break;
+
+  case excel_data:
+    ok = read_excel_data(desc, gg);
+    break;
+
   default:
     if (desc->desc_read_input) {
       ok = desc->desc_read_input(desc, gg, NULL);

@@ -99,6 +99,7 @@ SRC=array.c ash1d.c \
  parcoords.c parcoords_ui.c parcoordsClass.c pipeline.c plugin.c \
  ppcorr_ui.c \
  read_array.c read_color.c read_data.c read_init.c read_xml.c \
+ read_excel.c rb.c \
  scale_api.c scale_click.c scale_drag.c scale_ui.c \
  scatmat.c scatmat_ui.c scatmatClass.c \
  scatterplot.c scatterplot_ui.c scatterplotClass.c \

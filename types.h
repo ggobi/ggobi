@@ -21,7 +21,7 @@
 */
 typedef gfloat greal;
 
-typedef enum {ascii_data, binary_data, Sprocess_data, xml_data, mysql_data, url_data, unknown_data, num_data_modes} DataMode;
+typedef enum {ascii_data, binary_data, Sprocess_data, xml_data, mysql_data, url_data,  excel_data, unknown_data, num_data_modes} DataMode;
 
 typedef enum {NONE, EXPOSE, QUICK, BINNED, FULL, FULL_1PIXMAP} RedrawStyle;
 
