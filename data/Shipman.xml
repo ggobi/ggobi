@@ -2,6 +2,7 @@
 <!DOCTYPE ggobidata SYSTEM "ggobi.dtd">
 
 <ggobidata>
+<brush color="4" glyph="fc 3" />
 
 <data>
 <description>
