@@ -1,0 +1,9 @@
+layout.c:
+  illustrates how to combine GGobi plots and displays
+  into a customized GUI rather than the separate window approach
+  that GGobi uses.
+
+myggobi.cc:
+  intended to provide an example illustrating using GGobi
+  in a C++ application.
+  
