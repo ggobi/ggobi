@@ -176,6 +176,7 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
   scatterplot_cpanel_init (&display->cpanel,
     (d->ncols >= 2) ? XYPLOT : P1PLOT, gg);
 
+
   display_window_init (display, 3, gg);  /*-- 3 = width = any small int --*/
 
   /*-- Add the main menu bar --*/

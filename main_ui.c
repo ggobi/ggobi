@@ -406,7 +406,6 @@ GGOBI(full_mode_set)(gint action, ggobid *gg)
     if (projection_ok (action, display)) {
       sp_event_handlers_toggle (sp, off);
       redraw_style = mode_activate (sp, gg->mode, off, gg);
-      /*mode_submenus_activate (sp, gg->mode, off, gg);*/
       procs_activate (off, display, gg);
 
       display->cpanel.mode = action;
@@ -414,7 +413,6 @@ GGOBI(full_mode_set)(gint action, ggobid *gg)
 
       sp_event_handlers_toggle (sp, on);
       mode_activate (sp, gg->mode, on, gg);
-      /*mode_submenus_activate (sp, gg->mode, on, gg);*/
       procs_activate (on, display, gg);
 
       /*

@@ -337,10 +337,11 @@ gint
 display_add (displayd *display, ggobid *gg)
 {
   splotd *prev_splot = gg->current_splot;
+  gint prev_mode = mode_get (gg);
 
   if (isEmbeddedDisplay(display) == false) {
     GGobi_widget_set(display->window, gg, true);
-    display_set_current (display, gg);
+    display_set_current (display, gg);  /*-- this may initialize the mode --*/
   }
   gg->displays = g_list_append (gg->displays, (gpointer) display);
 
@@ -351,15 +352,19 @@ display_add (displayd *display, ggobid *gg)
     g_list_nth_data (gg->current_display->splots, 0);
   splot_set_current (gg->current_splot, on, gg);
 
+
   /*
    * The current display types start without signal handlers, but
    * I may need to add handlers later for some unforeseen display.
   */
   mode_set (gg->current_display->cpanel.mode, gg);  /* don't activate */
 
-  /*
-   * Make sure the border for the previous plot is turned off
-  */
+
+  /*-- if starting from the API, the first mode menu needs to be shown --*/
+  if (prev_mode == NULLMODE)
+      mode_submenus_update (prev_mode, mode_get(gg), gg);
+
+  /*-- Make sure the border for the previous plot is turned off --*/
   if (prev_splot != NULL) {
     prev_splot->redraw_style = QUICK;
     gtk_widget_queue_draw (prev_splot->da);
