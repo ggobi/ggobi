@@ -544,13 +544,13 @@ spherize_data (vector_i *svars, vector_i *pcvars, datad *d, ggobid *gg)
     for (j=0; j<pcvars->nels; j++) {
       tmpf = 0.;
       for (k=0; k<svars->nels; k++) {
-        if (d->sphere.vars_stdized)
+        if (d->sphere.vars_stdized) {
           tmpf = tmpf + (gfloat) eigenvec[k][j] *
-            (d->tform.vals[i][svars->els[k]] - tform_mean[svars->els[k]]) /
-            tform_stddev[svars->els[k]];
-        else
+            (d->tform.vals[i][svars->els[k]] - tform_mean[k]) / tform_stddev[k];
+        } else {
           tmpf = tmpf + (gfloat) eigenvec[k][j] *
-            (d->tform.vals[i][svars->els[k]] - tform_mean[svars->els[k]]);
+            (d->tform.vals[i][svars->els[k]] - tform_mean[k]);
+        }
       }
       b[j] = tmpf / eigenval[j]; 
     }
