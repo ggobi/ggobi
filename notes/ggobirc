@@ -32,6 +32,8 @@
     <color max="1"><red>1</red><green>0</green><blue>0</blue></color>
   </foreground>
   <glyph type="x" size="2" />
+  <tourSpeed>50</tourSpeed>
+  <tour1dSpeed>40</tour1dSpeed>
 </preferences>
 
 <previousFiles count="4">
