@@ -149,6 +149,13 @@ vcl_variable1_set_cb (GtkWidget *cl, gint row, gint column,
   vcld *vcl = vclFromInst (inst);
   vcl->var1 = row;
 }
+static void
+vcl_variable2_set_cb (GtkWidget *cl, gint row, gint column,
+  GdkEventButton *event, PluginInstance *inst)
+{
+  vcld *vcl = vclFromInst (inst);
+  vcl->var2 = row;
+}
 
 
 void
@@ -276,12 +283,12 @@ create_vcl_window(vcld *vcl, PluginInstance *inst)
 
   gtk_box_pack_start (GTK_BOX (main_vbox), hbox, true, true, 2);
 
-/*-- Covariate --*/
+/*-- Covariates --*/
 
   hbox = gtk_hbox_new (false, 2);
   gtk_container_set_border_width (GTK_CONTAINER (hbox), 2);
 
-  frame = gtk_frame_new("Variable");
+  frame = gtk_frame_new("Variable 1");
   gtk_container_set_border_width (GTK_CONTAINER (frame), 2);
   gtk_box_pack_start (GTK_BOX (hbox), frame, true, true, 2);
   vb = gtk_vbox_new (false, 2);
@@ -297,6 +304,34 @@ create_vcl_window(vcld *vcl, PluginInstance *inst)
   gtk_clist_set_selection_mode(GTK_CLIST(clist), GTK_SELECTION_SINGLE);
   gtk_signal_connect (GTK_OBJECT (clist), "select_row",
 		      GTK_SIGNAL_FUNC (vcl_variable1_set_cb), inst);
+  for (j=0; j<vcl->dsrc->ncols; j++) {
+    vt = vartable_element_get (j, vcl->dsrc);
+    row[0] = g_strdup (vt->collab);
+    gtk_clist_append (GTK_CLIST (clist), row);
+    g_free (row[0]);
+  }
+  gtk_clist_select_row (GTK_CLIST(clist), 2, 0);  /* assumes 3
+						     variables */
+  gtk_container_add (GTK_CONTAINER (swin), clist);
+  gtk_box_pack_start (GTK_BOX (vb), swin, true, true, 2);
+
+
+  frame = gtk_frame_new("Variable 2");
+  gtk_container_set_border_width (GTK_CONTAINER (frame), 2);
+  gtk_box_pack_start (GTK_BOX (hbox), frame, true, true, 2);
+  vb = gtk_vbox_new (false, 2);
+  gtk_container_set_border_width (GTK_CONTAINER (vb), 5);
+  gtk_container_add (GTK_CONTAINER(frame), vb);
+
+  swin = gtk_scrolled_window_new (NULL, NULL);
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (swin),
+    GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
+ 
+  clist = gtk_clist_new(1);
+  gtk_widget_set_name(clist, "VAR2");
+  gtk_clist_set_selection_mode(GTK_CLIST(clist), GTK_SELECTION_SINGLE);
+  gtk_signal_connect (GTK_OBJECT (clist), "select_row",
+		      GTK_SIGNAL_FUNC (vcl_variable2_set_cb), inst);
   for (j=0; j<vcl->dsrc->ncols; j++) {
     vt = vartable_element_get (j, vcl->dsrc);
     row[0] = g_strdup (vt->collab);

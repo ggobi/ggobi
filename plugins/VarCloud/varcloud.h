@@ -6,7 +6,7 @@
 typedef struct {
 
   datad *dsrc;
-  gint xcoord, ycoord, var1;
+  gint xcoord, ycoord, var1, var2;
 
   GtkTooltips *tips;
 
