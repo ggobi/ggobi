@@ -15,6 +15,7 @@ enum xmlDataState {
   RECORD, RECORDS, VARIABLES, VARIABLE,
   COLORMAP, COLOR,
   REAL_VARIABLE, CATEGORICAL_VARIABLE,
+  INTEGER_VARIABLE, COUNTER_VARIABLE,
   CATEGORICAL_LEVELS, CATEGORICAL_LEVEL,
   COLORSCHEME,
   BRUSHSTYLE,
@@ -100,6 +101,8 @@ typedef struct _XMLUserData {
   gint recordLabelsVariable;
 
   GHashTable **autoLevels;
+
+  gint counterVariableIndex;
 
   /* Reference to the handlers being used as callbacks.
      Need this so that we can re-specify it when creating

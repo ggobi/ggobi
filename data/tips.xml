@@ -6,7 +6,7 @@
 <description>
 </description>
 <variables count="8">
-  <realvariable name="OBS"/>
+  <integervariable name="OBS"/>
   <realvariable name="TOTBILL"/>
   <realvariable name="TIP"/>
   <categoricalvariable name="SEX">

@@ -11,11 +11,16 @@
   source CDATA #IMPLIED
 >  
 
-<!ELEMENT variables ( variable|realvariable|categoricalvariable )*>
+<!ELEMENT variables ( variable|realvariable|categoricalvariable|integervariable|countervariable )*>
 
 <!-- Allows the name to be the only entry -->
 <!ELEMENT variable ( #PCDATA )>
-<!ELEMENT realvariable ( (description)?,(quickHelp)?)>
+<!ELEMENT realvariable ( (description)?,(quickHelp)? )>
+
+<!ELEMENT categoricalvariable (description?, quickHelp?, levels)?>
+<!ELEMENT countervariable EMPTY>
+<!ELEMENT integervariable (description?, quickHelp?)>
+
 
 <!ELEMENT level (#PCDATA)>
 <!ATTLIST level
@@ -29,7 +34,6 @@
 
 <!ELEMENT quickHelp (#PCDATA)>
 
-<!ELEMENT categoricalvariable (levels)?>
 
 <!ELEMENT records ( record )*>
 <!ELEMENT record  (#PCDATA|int|real|na|string)*>
@@ -48,6 +52,7 @@
     g        CDATA  #IMPLIED
     b        CDATA  #IMPLIED
     range    CDATA  #IMPLIED
+    name     CDATA  #IMPLIED
 >
 
 <!ELEMENT activeColorScheme ( #PCDATA ) >
@@ -85,14 +90,25 @@
   count CDATA #REQUIRED
 >
 
-<!ATTLIST variable
-    name          NMTOKEN #IMPLIED
+<!ENTITY % VariableAttributes "name          NMTOKEN #IMPLIED
     nickname      NMTOKEN #IMPLIED
     transformName NMTOKEN #IMPLIED
     missingValue  CDATA   #IMPLIED
     min           CDATA   #IMPLIED
-    max           CDATA   #IMPLIED
+    max           CDATA   #IMPLIED">
+
+<!ATTLIST variable
+  %VariableAttributes;
 >
+
+<!ATTLIST integervariable
+  %VariableAttributes;
+>
+
+<!ATTLIST countervariable
+  %VariableAttributes;
+>
+
 
 <!ATTLIST realvariable
     name          CDATA   #IMPLIED
@@ -113,6 +129,7 @@
     min           CDATA   #IMPLIED
     max           CDATA   #IMPLIED
     levels        CDATA   "auto"
+    count         CDATA   #IMPLIED
 >
 
 <!ATTLIST record

@@ -99,6 +99,8 @@ const gchar * const xmlDataTagNames[] = {
 /* variables */
   "realvariable",
   "categoricalvariable",
+  "integervariable",
+  "countervariable",
   "levels",
   "level",
 /* color scheme */
@@ -271,8 +273,13 @@ startXMLElement(void *user_data, const xmlChar *name, const xmlChar **attrs)
     break;
     case VARIABLE:
     case REAL_VARIABLE:
+    case INTEGER_VARIABLE:
     case CATEGORICAL_VARIABLE:
       newVariable (attrs, data, name);
+    break;
+    case COUNTER_VARIABLE:
+      newVariable (attrs, data, name);
+      data->counterVariableIndex = data->current_variable;
     break;
 
     case CATEGORICAL_LEVELS:
@@ -498,6 +505,8 @@ void endXMLElement(void *user_data, const xmlChar *name)
     case VARIABLE:
     case REAL_VARIABLE:
     case CATEGORICAL_VARIABLE:
+    case COUNTER_VARIABLE:
+    case INTEGER_VARIABLE:
       data->current_variable++;
     break;
     case COLOR:
@@ -974,6 +983,11 @@ setRecordValue(const char *tmp, datad *d, XMLParserData *data)
 {
    gdouble value;
    vartabled *vt;
+
+   if(data->counterVariableIndex > -1 && data->current_element == data->counterVariableIndex) {
+      d->raw.vals[data->current_record][data->current_element] = data->current_record + 1;      
+      data->current_element++;
+   }
 
     /* If reading past the last column or row, stop */
     if (data->current_record >= d->raw.nrows ||
@@ -1630,6 +1644,7 @@ setDataset(const xmlChar **attrs, XMLParserData *parserData)
   data = gtk_ggobi_data_new(parserData->gg);
 
   data->readXMLRecord = readXMLRecord;
+  parserData->counterVariableIndex = -1;
 
   tmp = getAttribute(attrs, (gchar *) "name");
   if(tmp == NULL) {

@@ -6,7 +6,8 @@
 <data name="Customers">
 <description>
 </description>
-<variables count="4">
+<variables count="5">
+ <countervariable name="Count"/>
  <realvariable name="avgusage" />
  <realvariable name="foo" />
  <categoricalvariable name="fraudp">
