@@ -88,6 +88,10 @@ ifdef USE_XML
  CFLAGS+= $(XML_INC_DIRS:%=-I%) -DUSE_XML=1
  OB+= $(XML_OB)
 
+ifdef DL_RESOLVE_FLAG
+ DL_RESOLVE_PATH+=$(XML_LIB_DIRS:%=$(DL_RESOLVE_FLAG) %)
+endif
+
  XML_LIBS=-lxml -lz
 
 main_ui.o: write_xml.h
@@ -104,7 +108,7 @@ ifdef USE_MYSQL
 endif
 
 ggobi: $(OB)
-	$(LD) $(OB) $(LDFLAGS) -o ggobi $(XML_LIB_DIRS:%=-L%) $(XML_LIBS) $(MYSQL_LIBS) `gtk-config --cflags --libs` $(XML_LIB_DIRS:%=$(DL_RESOLVE_FLAG) %)
+	$(LD) $(OB) $(LDFLAGS) -o ggobi $(XML_LIB_DIRS:%=-L%) $(XML_LIBS) $(MYSQL_LIBS) `gtk-config --cflags --libs`  $(DL_RESOLVE_PATH)
 
 
 pure: ggobi.o $(OB)
@@ -126,7 +130,7 @@ dm: $(OB)
 
 lib: libGGobi.so
 libGGobi.so: $(OB)
-	$(CC) -g $(SHARED_LD_FLAGS) -o $@ $(OB) $(XML_LIB_DIRS:%=-L%) $(XML_LIBS) `gtk-config --libs`
+	$(CC) -g $(SHARED_LD_FLAGS) -o $@ $(OB) $(XML_LIB_DIRS:%=-L%) $(XML_LIBS) `gtk-config --libs` $(DL_RESOLVE_PATH)
 
 clean: 
 	rm -f *.o ggobi libGGobi.so
@@ -160,7 +164,7 @@ local.config:
 
 ifdef USE_XML
 xmlConvert: xmlConvert.o libGGobi.so
-	$(CC) -o $@ xmlConvert.o $(XML_LIBS) $(XML_LIB_DIRS:%=-L%) -L. -lGGobi 
+	$(CC) -o $@ xmlConvert.o $(XML_LIBS) $(XML_LIB_DIRS:%=-L%) -L. -lGGobi $(DL_RESOLVE_PATH)
 
 make_ggobi.o: read_xml.h
 endif
