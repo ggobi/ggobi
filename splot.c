@@ -133,9 +133,11 @@ scatterplot_event_handled (GtkWidget *w, GdkEventKey *event,
   case GDK_7:
   case GDK_8:
   case GDK_9:
-    if(gg->NumberedKeyEventHandler != NULL && gg->NumberedKeyEventHandler->handlerRoutine) {
-      (gg->NumberedKeyEventHandler->handlerRoutine)(event->keyval, w, event, cpanel, sp, gg, 
-                                                     gg->NumberedKeyEventHandler->userData);
+    if (gg->NumberedKeyEventHandler != NULL &&
+        gg->NumberedKeyEventHandler->handlerRoutine)
+    {
+      (gg->NumberedKeyEventHandler->handlerRoutine)(event->keyval, w, event,
+         cpanel, sp, gg, gg->NumberedKeyEventHandler->userData);
     }
   break;
 

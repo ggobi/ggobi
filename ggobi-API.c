@@ -567,7 +567,6 @@ GGOBI(setCaseGlyphs)(gint *ids, gint n, gint type, gint size,
 void 
 GGOBI(setCaseColor)(gint pt, gint colorIndex, datad *d, ggobid *gg)
 {
-if (pt < 5)
   d->color_ids.els[pt] = d->color_now.els[pt] = colorIndex;
 }
 
