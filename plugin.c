@@ -1,13 +1,12 @@
 #include "plugin.h"
 
 #include <stdio.h>
+#include <string.h>
 
 HINSTANCE ggobi_dlopen(const char *name, GGobiPluginDetails *plugin);
 void ggobi_dlerror(char *buf, GGobiPluginDetails *plugin);
 
 #ifdef WIN32
-
-#include <string.h>
 
 int ggobi_dlclose(HINSTANCE handle);
 DLFUNC ggobi_dlsym(HINSTANCE handle, const char *name);
