@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE ggobidata SYSTEM "ggobi.dtd">
 
-<ggobidata numRecords="74" color="2" glyph="+ 3" missingValue="NA">
+<ggobidata numRecords="74" color="2" glyph="plus 3" missingValue="NA">
 <description source="ftp://...">
 This data is from a paper by A. A. Lubischew, "On the Use of
 Discriminant Functions in Taxonomy", Biometrics, Dec 1962, pp.455-477.
@@ -32,7 +32,7 @@ and Ch. heikertingeri, and 6 measurements on each.
   <variable>aede3</variable>
 </variables>
 <records>
-<record label="Concinna" color="2" glyph="+ 3">
+<record label="Concinna" color="2" glyph="plus 3">
 191 131 53 150 15 104
 </record>
 <record id="temp" label="Concinna" color="2">

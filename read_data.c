@@ -15,7 +15,8 @@
 
 /* Make certain this matches GlyphTypes. */
 const gchar * const GlyphNames[] = {
-          "+", "x", "or", "fr", "oc", "fc", ".", ""
+/*          "+", "x", "or", "fr", "oc", "fc", ".", ""*/
+          "plus", "x", "or", "fr", "oc", "fc", ".", ""
         };
 
 
@@ -408,7 +409,8 @@ readGlyphErr (void) {
   g_printerr ("with the number between 1 and %d; using defaults,\n",
     NGLYPHS);
   g_printerr ("or a string and a number, with the string being one of\n");
-  g_printerr ("+, x, or, fr, oc, fc, .  and the number between 1 and %d.\n",
+  g_printerr ("plus, x, or, fr, oc, fc, .  and the number between 1 and %d.\n",
+/*  g_printerr ("+, x, or, fr, oc, fc, .  and the number between 1 and %d.\n",*/
     NGLYPHSIZES);
 }
 
@@ -529,35 +531,20 @@ point_glyphs_read (gchar *ldata_in, gboolean reinit, ggobid *gg)
 }
 
 GlyphType 
-mapGlyphName(const gchar *gtype)
+mapGlyphName (const gchar *gtype)
 {
- GlyphType type;
- int i;
+  GlyphType type;
+  int i;
+
   type = UNKNOWN_GLYPH;
-  for(i = 0; i < sizeof(GlyphNames)/sizeof(GlyphNames[0]) - 1; i++) {
-    if(strcmp(gtype, GlyphNames[i]) == 0) {
+  for (i = 0; i < sizeof (GlyphNames)/sizeof (GlyphNames[0]) - 1; i++) {
+    if (strcmp(gtype, GlyphNames[i]) == 0) {
      type = i+1;
      break;
     }
   }
-  /*
-  if (strcmp (gtype, "+") == 0)
-    glyph.type = 1;
-  else if (g_strcasecmp (gtype, "x") == 0)
-    glyph.type = 2;
-  else if (g_strcasecmp (gtype, "or") == 0)
-    glyph.type = 3;
-  else if (g_strcasecmp (gtype, "fr") == 0)
-    glyph.type = 4;
-  else if (g_strcasecmp (gtype, "oc") == 0)
-    glyph.type = 5;
-  else if (g_strcasecmp (gtype, "fc") == 0)
-    glyph.type = 6;
-  else if (g_strcasecmp (gtype, ".") == 0)
-    glyph.type = 7;
-  */
 
- return(type);
+  return(type);
 }
 
 gboolean

@@ -561,7 +561,8 @@ brush_save_glyphs (gchar *rootname, gint *rowv, gint nr, ggobid *gg)
     for (i=0; i<nr; i++) {
       switch (gg->glyph_ids[i].type) {
         case PLUS_GLYPH:
-          gstr = "+";
+/*          gstr = "+";*/
+          gstr = "plus";
           break;
         case X_GLYPH:
           gstr = "x";
