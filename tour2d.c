@@ -106,17 +106,19 @@ tour2d_run(displayd *dsp, ggobid *gg)
 
   if (!dsp->tour_get_new_target && !reached_target(dsp)) {
     increment_tour(dsp, 2);
+    tour_reproject(dsp, 2);
   }
   else { /* do final clean-up and get new target */
     if (!dsp->tour_get_new_target)
       do_last_increment(dsp, (gint) 2);
     copy_mat(dsp->u0, dsp->u, d->ncols, 2);
+    tour_reproject(dsp, 2);
     gt_basis(dsp, gg, (gint) 2);
     path(dsp, (gint) 2);
     dsp->tour_get_new_target = false;
   }
   
-  tour_reproject(dsp, (gint) 2);
+  /*  tour_reproject(dsp, 2);*/
   display_tailpipe (dsp, gg);
 }
 

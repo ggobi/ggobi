@@ -186,7 +186,7 @@ display_tour_init (displayd *dsp, ggobid *gg) {
 
   zero_tau(dsp, gg);
   dsp->dv = 1.0;
-  dsp->delta = cpanel->tour_step*M_PI_2/15.0;
+  dsp->delta = cpanel->tour_step*M_PI_2/10.0;
   dsp->tour_nsteps = 0; 
   dsp->tour_stepcntr = 0;
 
@@ -309,6 +309,29 @@ gboolean matmult_utv(gfloat **ut, gfloat **vt, gint ur, gint uc,
       ot[k][j] = 0.0;
       for (i=0; i<ur; i++) {
         ot[k][j] += ut[j][i]*vt[k][i];
+      }
+    }
+  }
+
+  return(ok);
+}
+
+/* matrix multiplication UV */
+gboolean matmult_uvt(gfloat **ut, gfloat **vt, gint ur, gint uc, 
+  gint vr, gint vc, gfloat **ot) {
+  gint i, j, k;
+  gboolean ok = true;
+
+  if (uc != vc) {
+    ok = false;
+    return(ok);
+  }
+
+  for (j=0; j<ur; j++) {
+    for (k=0; k<vr; k++) {
+      ot[k][j] = 0.0;
+      for (i=0; i<uc; i++) {
+        ot[k][j] += ut[i][j]*vt[i][k];
       }
     }
   }
@@ -521,7 +544,15 @@ void path(displayd *dsp, gint nd) {
 	}
       }
 
-      matmult_utv(dsp->uvevec, dsp->v, nc, nd, nc, nd, dsp->u);
+      matmult_uvt(dsp->v, dsp->uvevec, nc, nd, nd, nd, dsp->u);
+
+      /* orthonormal to correct round-off errors */
+      for (i=0; i<nd; i++)
+        norm(dsp->u[i], nc); 
+
+      for (k=0; k<nd-1; k++)
+        for (j=k+1; j<nd; j++)
+          gram_schmidt(dsp->u[k], dsp->u[j], nc);
 
       /* Calculate Euclidean norm of principal angles.*/
       dsp->dv = 0.0;
@@ -540,8 +571,8 @@ void path(displayd *dsp, gint nd) {
     else {
       for (i=0; i<nd; i++)
 	dsp->tau[i] = 0.0;
-      copy_mat(dsp->u0, dsp->v0, nc, nd);
-      copy_mat(dsp->u0, dsp->v1, nc, nd);
+      copy_mat(dsp->v0, dsp->u0, nc, nd);
+      copy_mat(dsp->v1, dsp->u0, nc, nd);
       dsp->tour_nsteps = 0;
     }
 
@@ -559,7 +590,7 @@ void tour_reproject(displayd *dsp, gint nd)
 {
   datad *d = dsp->d;
   gint nc = d->ncols;
-  gint i, j;
+  gint i, j, k;
   gdouble tmpd1, tmpd2, tmpd;
   gfloat **ptinc = (gfloat **) g_malloc (2 * sizeof (gfloat *));
 
@@ -580,7 +611,22 @@ void tour_reproject(displayd *dsp, gint nd)
     }
   }
 
-  matmult_utv(dsp->uvevec, dsp->v, nc, nd, nc, nd, dsp->u);
+  matmult_uvt(dsp->v, dsp->uvevec, nc, nd, nd, nd, dsp->u);
+
+  /* orthonormal to correct round-off errors */
+  for (i=0; i<nd; i++)
+    norm(dsp->u[i], nc); 
+
+  for (k=0; k<nd-1; k++)
+    for (j=k+1; j<nd; j++)
+      gram_schmidt(dsp->u[k], dsp->u[j], nc);
+
+  /*    printf("v, u \n");
+    for (i=0; i<d->ncols; i++) {
+      for (j=0; j<2; j++)
+        printf("%f %f ",dsp->v[j][i],dsp->u[j][i]);
+      printf("\n");
+    }*/
 
 }
 
@@ -592,6 +638,11 @@ increment_tour(displayd *dsp, gint nd)
   gboolean attheend = false;
 
   dsp->tour_stepcntr++;
+
+  /*  printf("tinc ");
+  for (i=0; i<nd; i++)
+    printf("%f ",dsp->tinc[i]);
+  printf("\n");*/
 
   for (i=0; i<nd; i++) 
     if (dsp->tinc[i] > dsp->tau[i]) {
@@ -659,7 +710,7 @@ void speed_set (gint slidepos, ggobid *gg) {
       cpanel->tour_step = sqrt((double)(slidepos-80)) + 0.0375;
   }
   /*  dsp->delta = cpanel->tour_step/dsp->dv;*/
-  dsp->delta = cpanel->tour_step*M_PI_2/15.0;
+  dsp->delta = cpanel->tour_step*M_PI_2/10.0;
 }
 
 void
