@@ -10,10 +10,15 @@ ifndef PDFLATEX
  PDFLATEX=latex
 endif
 
+ifndef BIBTEX
+ BIBTEX=bibtex
+endif
+
 
 # Run it twice to get cross-references correct.
 %.dvi: %.tex
 	(TEXINPUTS=$(TEXINPUTS):$(OMEGA_HOME)/Docs:: ; export TEXINPUTS ; $(LATEX) $<)
+	$(BIBTEX) $*
 	(TEXINPUTS=$(TEXINPUTS):$(OMEGA_HOME)/Docs:: ; export TEXINPUTS ; $(LATEX) $<)
 
 %.ps: %.dvi

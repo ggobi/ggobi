@@ -1,0 +1,124 @@
+\documentclass{article}
+\input{WebMacros}
+\input{CMacros}
+\usepackage{times}
+\usepackage{fullpage}
+
+\bibliographystyle{plain}
+
+\def\SignalName#1{\textbf{"\Escape{#1}"}}
+\def\GGobiPlugin#1{\textsl{\Escape{#1}}}
+\title{Events in GGobi}
+\author{
+Duncan Temple Lang \\
+Debby Swayne
+}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+  When embedding GGobi within other applications or writing extensions
+  for GGobi using the plugin mechanism, it is convenient to be
+  informed of certain changes to a ggobi instace.  Specifically, it is
+  useful to know when a new dataset or a variable within a dataset is
+  added; when a new plot is created; when a point is moved, or
+  identified; or when the brushing region is moved or resized.
+  We describe how to use the basic event mechanism in GGobi
+  to have callbacks for these types of events.
+  Examples can be found in the GGobi plugin for Gnumeric.
+\end{abstract}
+
+\section{Motivation}
+When we embed GGobi in other applications, those applications may need
+to know when a new plot in GGobi is created so that they can draw on
+it, add it to a list of windows under its control, or simply register
+event handlers for it.  Similarly, we might want to link the brushing
+or point identification in GGobi to displays in the host application.
+
+Plugins within GGobi may also want this dynamic information.  For
+example, using the data grid provided by the \GGobiPlugin{DataViewer}
+plugin, we might want to highlight the row in the grid corresponding
+to the point that has just been identified.  Also, when a new dataset
+is added to a ggobi instance, the plugin might want to menu items for
+that new dataset.
+
+Some examples can be found in the code for the GGobi plugin for
+Gnumeric, specifically in \file{Gnumeric/ggobiPlugin.c}.
+
+We do not want developers to have to add their code to GGobi to be
+informed of these events.  Rather we want them to treat it as a
+library and for them to be able to ``anonymously'' be informed of the
+events. We do this using signals and callbacks (or listeners).  GGobi
+simply broadcasts when an event occurs.  Other code will have
+registered to be notified of such broadcasts and that code will be
+called. These callback routines can then take any action based on the
+event to update themselves.
+
+\section{The Events}
+GGobi provides a growing list of internal events that it broadcasts to
+interested parties. It uses the Gtk signal mechanism to manage the
+notification to ``listeners''.  The events currently supported are
+described in the following list.  Currently, all callbacks have no
+return value.  This means that the callbacks cannot influence what
+ggobi will do. In other words, we tell people of an event but don't
+ask for their opinion.
+
+We tend to use \Croutine{gtk_signal_connect_object} to register a
+callback or handler for these events.  This arranges for the user data
+given in this call to be passed as the first argument to the callback.
+The routine \Croutine{gtk_signal_connect} puts it as the last
+argument. See \cite{pennington99} or \cite{gtkTutorial}.
+The 
+
+\begin{description}
+\item[new data] The \SignalName{datad_added} signal is generated each
+  time a dataset is created and added to a GGobi instance.  Callbacks
+for this event are given two arguments
+in addition to the user-defined data provided when
+one registers the callback.
+\begin{verbatim}
+ void (*callback)(void *userData, datad *data, ggobid *gg);
+\end{verbatim}
+\item[brush movement] 
+The signal name is \SignalName{brush_motion}.
+This event is generated when the user moves (or
+  resizes?)  the brushing region within a plot.  The callback is
+  passed the ggobi instance, the splot in which the event occurred and
+  a reference to the low-level event so that one can have access to
+  all the information about where the mouse is, etc.
+\begin{verbatim}
+ void (*callback)(void *userData, ggobid *, splotd *sp, GdkEventMotion *);
+\end{verbatim}
+
+\item[point identification] The \SignalName{identify_point} event is
+generated when the user is in Identify mode in GGobi, and specifically
+each time a different point is identified. By this we meant that the
+user is moving the mouse around and identifies a different point than
+the previously identified record.  The callback is given three
+arguments: the plot in which the identification took place, a
+reference to the \CStruct{GdkEventMotion} event, and the GGobi
+instance.
+\begin{verbatim}
+ void (*callback)(void *userData, splotd *sp, GdkMotionEvent *ev, ggobid *gg);
+\end{verbatim}
+
+\item[new plot] The signal name is \SignalName{splot_new}.  This is
+called when a new `plot' is created.  This occurs for each plot within
+a \CStruct{displayd}.  This callback has two system arguments: the
+plot and the ggobi instance.  From the plot, one can access the
+\CStruct{displayd}.
+\begin{verbatim}
+ void (*callback)(void *userData, splotd *sp, ggobid *gg);
+\end{verbatim}
+
+\item[variable added] The signal name is \SignalName{variable_added}.
+This is generated when a new variable is added to a dataset in a ggobi
+instance.
+\begin{verbatim}
+void (*callback)(void *userData, vartabled *var, ggobid *gg);
+\end{verbatim}
+\end{description}
+
+\bibliography{gtk}
+
+\end{document}
