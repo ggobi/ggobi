@@ -66,8 +66,8 @@ typedef struct {
  vector_f p1d_data; /* the spreading data */
  lims p1d_lim;      /* limits of the spreading data */
  gfloat p1d_mean;
- /*-- line segments in parallel coordinates plot --*/
- GArray *p1d_segs;
+ /*-- line segments in ASHes --*/
+ icoords ash_baseline;  /*-- for drawing segments from point to baseline --*/
  
 
 /*
