@@ -930,11 +930,13 @@ newVariable(const xmlChar **attrs, XMLParserData *data, const xmlChar *tagName)
   vartabled *el = vartable_element_get (data->current_variable, d);
 
   data->variable_transform_name_as_attribute = false;
+/*  we don't know what to do with this information yet
   tmp = getAttribute(attrs, "transformName");
   if (tmp) {
     data->variable_transform_name_as_attribute = true;
     el->collab_tform = g_strdup(tmp);
   }
+*/
 
   tmp = getAttribute(attrs, "name");
   /*-- invent a variable name here if the user didn't supply one  */
@@ -1039,6 +1041,7 @@ setVariableName(XMLParserData *data, const xmlChar *name, gint len)
   gchar *tmp = (gchar *) g_malloc (sizeof(gchar) * (len+1));
   datad *d = getCurrentXMLData(data);
   vartabled *el = vartable_element_get (data->current_variable, d);
+  gchar *lbl = g_strdup_printf ("Var %d", data->current_variable);
 
   tmp[len] = '\0';
   memcpy (tmp, name, len);
@@ -1058,7 +1061,9 @@ setVariableName(XMLParserData *data, const xmlChar *name, gint len)
      unless we use a flag in XMLParserData. This is
      variable_transform_name_as_attribute.
    */
-  if (el->collab_tform == NULL) {
+  /* problem: this is never NULL, it's either 'Var n' or something specified */
+  /*if (el->collab_tform == NULL) {*/
+  if (strcmp (el->collab_tform, lbl) == 0) {
     el->collab_tform = g_strdup (tmp);
   }
 
