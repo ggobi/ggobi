@@ -230,7 +230,7 @@ build_glyph (glyphd *gl, icoords *xypos, gint jpos,
       build_circle (xypos, jpos, filledarcv, *nc_filled, size);
       (*nc_filled)++;
     break;
-    case DOT:
+    case DOT_GLYPH:
       build_point (xypos, jpos, pointv, *np);
       (*np)++;
     break;

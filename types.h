@@ -31,7 +31,7 @@ enum {VARSEL_X, VARSEL_Y, VARSEL_Z, VARSEL_LABEL};
 /* For use in the sticky_point_added and sticky_point_removed events. */
 typedef enum {STICKY, UNSTICKY} PointIdentifyState;
 
-typedef enum {DOT=0, PLUS, X, OC, OR, FC, FR, UNKNOWN_GLYPH} GlyphType;
+typedef enum {DOT_GLYPH=0, PLUS, X, OC, OR, FC, FR, UNKNOWN_GLYPH} GlyphType;
 
 typedef struct {
   GlyphType type;

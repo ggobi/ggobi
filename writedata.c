@@ -544,7 +544,7 @@ brush_save_glyphs (gchar *rootname, gint *rowv, gint nr, datad *d, ggobid *gg)
         case FC:
           gstr = "fc";
         break;
-        case DOT:
+        case DOT_GLYPH:
           gstr = ".";
         break;
         case UNKNOWN_GLYPH:

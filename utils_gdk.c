@@ -88,7 +88,7 @@ draw_glyph (GdkDrawable *drawable, glyphd *gl, icoords *xypos, gint jpos, ggobid
         xypos[jpos].x - size, xypos[jpos].y - size,
         2*size, 2*size, 0, (gshort) 23040);
     break;
-    case DOT:
+    case DOT_GLYPH:
       gdk_draw_point (drawable, gg->plot_GC, xypos[jpos].x, xypos[jpos].y);
     break;
     case UNKNOWN_GLYPH:

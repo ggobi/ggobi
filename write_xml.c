@@ -346,7 +346,7 @@ write_xml_record (FILE *f, datad *d, ggobid *gg, gint i,
       case FC:
         gtypestr = "fc";
       break;
-      case DOT:
+      case DOT_GLYPH:
         gtypestr = ".";
       break;
       case UNKNOWN_GLYPH:

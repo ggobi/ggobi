@@ -42,7 +42,7 @@ choose_glyph_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg)
 
   pos.y = margin + 3/2;
   pos.x = spacing/2;
-  g.type = DOT;
+  g.type = DOT_GLYPH;
   g.size = 1;
   nearest_dsq = dsq = sqdist (pos.x, pos.y, ev.x, ev.y);
   type = g.type; size = g.size;
@@ -106,7 +106,7 @@ find_symbol_selection_circle_pos (icoords *pos, ggobid *gg) {
   gint spacing = gg->color_ui.spacing;
   gint margin = gg->color_ui.margin;
 
-  if (gg->glyph_id.type == DOT) {
+  if (gg->glyph_id.type == DOT_GLYPH) {
     pos->y = margin + 3/2;
     pos->x = spacing/2;
 
@@ -243,7 +243,7 @@ find_line_selection_pos (icoords *pos, ggobid *gg) {
   gint spacing = gg->color_ui.spacing;
   gint margin = gg->color_ui.margin;
 
-  if (gg->glyph_id.type == DOT) {
+  if (gg->glyph_id.type == DOT_GLYPH) {
     pos->x = spacing + spacing/2;
     pos->y = margin;
   } else {

@@ -161,7 +161,7 @@ glyphIDfromName (gchar *glyphName) {
   else if (g_strcasecmp (glyphName, "x") == 0)
     id = X;
   else if (g_strcasecmp (glyphName, "point") == 0)
-    id = DOT;
+    id = DOT_GLYPH;
   else if ((g_strcasecmp (glyphName, "open rectangle") == 0) ||
            (g_strcasecmp (glyphName, "open_rectangle") == 0) ||
            (g_strcasecmp (glyphName, "openrectangle") == 0))
