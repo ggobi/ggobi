@@ -34,7 +34,10 @@ various stuff not yet implemented:
 
 Graphs
   line type brushing
-  line editing
+  line editing  <- depends on the ability to add a record
+
+For subsetting et al
+  add an option menu allowing the selection of a datad
 
 API code needed:
   sticky labels

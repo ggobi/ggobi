@@ -299,6 +299,8 @@ struct _ggobid {
 
 /*-------------------- subsetting ------------------------------------*/
 
+ /*-- all the widgets here except the window should be removed
+      from this file and retrieved by name instead.  --*/
  struct _SubsetUI {
    GtkWidget *window;
    GtkWidget *notebook;
@@ -312,6 +314,14 @@ struct _ggobid {
    /*-- a pointer to be compared with current_display->d --*/
    datad *d;
  } subset_ui;
+
+/*---------------- brushing by weights -------------------------------*/
+
+ struct _WeightedVis {
+   GtkWidget *window;
+   datad *d;
+
+ } wvis_ui;
 
 /*-------------------- scaling ---------------------------------------*/
 

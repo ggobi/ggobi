@@ -240,9 +240,9 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
       gtk_notebook_append_page (GTK_NOTEBOOK (gg->subset_ui.notebook),
                                 frame, label);
       
-/*
- * Consecutive block
-*/
+      /*-----------------------*/
+      /*-- Consecutive block --*/
+      /*-----------------------*/
       frame = gtk_frame_new ("Consecutive block");
       gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
 
@@ -251,9 +251,7 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
       gtk_container_set_border_width (GTK_CONTAINER (t), 5);
       gtk_container_add (GTK_CONTAINER (frame), t);
 
-    /*
-     * Block subsetting: First case  (bstart)
-    */
+      /*-- Block subsetting: First case (bstart) --*/
       vb = gtk_vbox_new (false, 3);
       label = gtk_label_new ("First case:");
       gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
@@ -269,9 +267,7 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
       gtk_box_pack_start (GTK_BOX (vb), gg->subset_ui.bstart, false, false, 0);
       gtk_table_attach_defaults (GTK_TABLE (t), vb, 0,1,0,1);
 
-    /*
-     * Block subsetting: blocksize  (bsize)
-    */
+      /*-- Block subsetting: blocksize (bsize) --*/
       vb = gtk_vbox_new (false, 2);
       label = gtk_label_new ("Blocksize:");
       gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
@@ -286,9 +282,7 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
       gtk_box_pack_start (GTK_BOX (vb), gg->subset_ui.bsize, false, false, 0);
       gtk_table_attach_defaults (GTK_TABLE (t), vb, 1,2,0,1);
 
-    /*
-     * Block subsetting: First case increment (bstart_incr)
-    */
+      /*-- Block subsetting: First case increment (bstart_incr) --*/
       vb = gtk_vbox_new (false, 2);
       label = gtk_label_new ("Set the increment:");
       gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
@@ -308,9 +302,7 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
                           false, false, 0);
       gtk_table_attach_defaults (GTK_TABLE (t), vb, 0,1,1,2);
 
-    /*
-     * Block subsetting: Blocksize increment (bsize_incr)
-    */
+      /*-- Block subsetting: Blocksize increment (bsize_incr) --*/
       vb = gtk_vbox_new (false, 2);
       label = gtk_label_new ("Set the increment:");
       gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
@@ -334,9 +326,9 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
       gtk_notebook_append_page (GTK_NOTEBOOK (gg->subset_ui.notebook),
                                 frame, label);
 
-/*
- * Every nth case
-*/
+      /*--------------------*/
+      /*-- Every nth case --*/
+      /*--------------------*/
       frame = gtk_frame_new ("Every nth case");
       gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
 
@@ -345,7 +337,7 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
       gtk_container_set_border_width (GTK_CONTAINER (t), 5);
       gtk_container_add (GTK_CONTAINER (frame), t);
 
-      /* everyn subsetting: start */
+      /*-- everyn subsetting: start --*/
       vb = gtk_vbox_new (false, 3);
       label = gtk_label_new ("First case:");
       gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
@@ -360,7 +352,7 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
       gtk_box_pack_start (GTK_BOX (vb), gg->subset_ui.estart, false, false, 0);
       gtk_table_attach_defaults (GTK_TABLE (t), vb, 0,1,0,1);
 
-      /* everyn subsetting: stepsize */
+      /*-- everyn subsetting: stepsize --*/
       vb = gtk_vbox_new (false, 2);
       label = gtk_label_new ("N:");
       gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
@@ -379,9 +371,9 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
       gtk_notebook_append_page (GTK_NOTEBOOK (gg->subset_ui.notebook),
         frame, label);
 
-/*
- * Cases whose row label is one of the sticky labels
-*/
+      /*-------------------------------------------------------*/
+      /*-- Cases whose row label is one of the sticky labels --*/
+      /*-------------------------------------------------------*/
       frame = gtk_frame_new ("Cases whose row label is sticky");
       gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
       gtk_widget_set_usize (frame, 100, 75);
@@ -389,9 +381,9 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
       gtk_notebook_append_page (GTK_NOTEBOOK (gg->subset_ui.notebook),
         frame, label);
 
-/*
- * Cases whose row label the specified row label
-*/
+      /*------------------------------------------------------*/
+      /*-- Cases whose row label is the specified row label --*/
+      /*------------------------------------------------------*/
       frame = gtk_frame_new ("Cases with specified row label");
       gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
 
@@ -413,10 +405,7 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
       gtk_notebook_append_page (GTK_NOTEBOOK (gg->subset_ui.notebook),
                                 frame, label);
 
-/* 
- * hbox to hold a few buttons
-*/
-    
+      /*-- hbox to hold a few buttons --*/
       hb = gtk_hbox_new (true, 2);
 
       gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 2);
@@ -461,7 +450,6 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
                           GTK_SIGNAL_FUNC (set_block_incr_cb),
                           (gpointer) gg->subset_ui.bsize);
     }
-
 
     /*
      * In case this is a different d than was used the last time

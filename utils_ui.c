@@ -219,9 +219,8 @@ populate_option_menu (GtkWidget *opt_menu, gchar **lbl, gint nitems,
     gtk_signal_connect (GTK_OBJECT (menuitem), "activate",
       GTK_SIGNAL_FUNC (func), GINT_TO_POINTER (i));
 
-   GGobi_widget_set (menuitem, gg, true);
+    GGobi_widget_set (menuitem, gg, true);
   }
-
 
   gtk_option_menu_set_menu (GTK_OPTION_MENU (opt_menu), menu);
 }

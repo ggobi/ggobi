@@ -50,85 +50,78 @@ endif
 ifdef ROTATION_IMPLEMENTED
   CFLAGS+= -DROTATION_IMPLEMENTED=1
 endif
+ifdef WEIGHTEDVIS_IMPLEMENTED
+  CFLAGS+= -DWEIGHTEDVIS_IMPLEMENTED=1
+endif
 
 SHLIB_LDFLAGS= -shared
 SHARED_LD_FLAGS= -shared
 LDFLAGS=
 
-SRC=ggobi.c datad.c make_ggobi.c color.c main_ui.c splash.c cpanel.c \
- menus.c \
- utils.c utils_ui.c utils_gdk.c array.c vector.c \
- read_array.c read_data.c io.c writedata_ui.c writedata.c write_svg.c \
- limits.c pipeline.c missing.c \
- scatterplot.c scatterplot_ui.c \
- splot.c sp_plot.c win32_draw.c \
- display.c display_ui.c \
- p1d_ui.c p1d.c ash1d.c texture.c \
- xyplot_ui.c xyplot.c \
- rotate_ui.c \
- tour1d_ui.c tour1d.c tour1d_pp.c tour1d_pp_ui.c \
- tour2d_ui.c tour2d.c tour.c pp_ui.c \
- tourcorr_ui.c tourcorr.c ppcorr_ui.c \
- brush_ui.c brush.c brush_init.c brush_bins.c brush_api.c color_ui.c xlines.c \
- brush_link.c \
- exclusion_ui.c exclusion.c record_id.c \
- scale_ui.c scale_drag.c scale_click.c scale_api.c \
- identify_ui.c identify.c \
- edges.c lineedit_ui.c lineedit.c \
- movepts_ui.c movepts.c \
- parcoords_ui.c parcoords.c \
- scatmat_ui.c scatmat.c \
- varpanel_ui.c noop-checkbutton.c vartable_ui.c vartable.c varchange.c \
- varcircles.c \
- transform_ui.c transform.c sphere_ui.c sphere.c svd.c \
- subset_ui.c subset.c jitter_ui.c jitter.c smooth_ui.c \
- impute_ui.c impute.c \
- display_tree.c \
- ggobi-API.c \
- timeplot.c time_ui.c \
+SRC=array.c ash1d.c \
+ brush_api.c brush_bins.c brush.c brush_init.c brush_link.c brush_ui.c \
+ color.c color_ui.c cpanel.c \
+ datad.c display.c display_tree.c display_ui.c \
+ edges.c exclusion.c exclusion_ui.c \
+ ggobi-API.c ggobi.c identify.c identify_ui.c \
+ impute.c impute_ui.c io.c jitter.c jitter_ui.c \
+ limits.c lineedit.c lineedit_ui.c \
+ main_ui.c make_ggobi.c menus.c missing.c \
+ movepts.c movepts_ui.c noop-checkbutton.c \
+ p1d.c p1d_ui.c parcoords.c parcoords_ui.c pipeline.c \
+ ppcorr_ui.c pp_ui.c \
+ read_array.c read_data.c record_id.c rotate_ui.c \
+ scale_api.c scale_click.c scale_drag.c scale_ui.c \
+ scatmat.c scatmat_ui.c scatterplot.c scatterplot_ui.c \
+ smooth_ui.c sphere.c sphere_ui.c splash.c \
+ splot.c sp_plot.c subset.c subset_ui.c svd.c \
+ texture.c timeplot.c time_ui.c \
+ tour1d.c tour1d_pp.c tour1d_pp_ui.c tour1d_ui.c \
+ tour2d.c tour2d_ui.c tour.c tourcorr.c tourcorr_ui.c \
+ transform.c transform_ui.c \
+ utils.c utils_gdk.c utils_ui.c \
+ varchange.c varcircles.c varpanel_ui.c vartable.c vartable_ui.c \
+ vector.c wvis_ui.c win32_draw.c \
+ writedata.c writedata_ui.c write_svg.c \
+ xyplot.c xyplot_ui.c \
 \
  eispack.c \
  gtkextruler.c gtkexthruler.c gtkextvruler.c \
  mt19937-1.c cokus.c \
- fileio.c \
- print.c \
- plugin.c
+ fileio.c plugin.c print.c \
+ xlines.c 
 
-OB=ggobi.o datad.o make_ggobi.o color.o main_ui.o splash.o cpanel.o \
- menus.o \
- utils.o utils_ui.o utils_gdk.o array.o vector.o \
- read_array.o read_data.o io.o writedata_ui.o writedata.o write_svg.o \
- limits.o pipeline.o missing.o \
- scatterplot.o scatterplot_ui.o \
- splot.o sp_plot.o win32_draw.o \
- display.o display_ui.o \
- p1d_ui.o p1d.o ash1d.o texture.o \
- xyplot_ui.o xyplot.o \
- rotate_ui.o \
- tour2d_ui.o tour2d.o tour.o pp_ui.o tour1d_ui.o tour1d.o tour1d_pp.o tour1d_pp_ui.o \
- tourcorr_ui.o tourcorr.o ppcorr_ui.o \
- brush_ui.o brush.o brush_init.o brush_bins.o brush_api.o color_ui.o xlines.o \
- brush_link.o \
- exclusion_ui.o exclusion.o record_id.o \
- scale_ui.o scale_drag.o scale_click.o scale_api.o \
- identify_ui.o identify.o \
- edges.o lineedit_ui.o lineedit.o \
- movepts_ui.o movepts.o \
- parcoords_ui.o parcoords.o \
- scatmat_ui.o scatmat.o \
- varpanel_ui.o noop-checkbutton.o vartable_ui.o vartable.o varchange.o \
- varcircles.o \
- transform_ui.o transform.o sphere_ui.o sphere.o svd.o \
- subset_ui.o subset.o jitter_ui.o jitter.o smooth_ui.o \
- impute_ui.o impute.o \
- display_tree.o \
- ggobi-API.o \
- timeplot.o time_ui.o \
+OB=array.o ash1d.o \
+ brush_api.o brush_bins.o brush.o brush_init.o brush_link.o brush_ui.o \
+ color.o color_ui.o cpanel.o \
+ datad.o display.o display_tree.o display_ui.o \
+ edges.o exclusion.o exclusion_ui.o \
+ ggobi-API.o ggobi.o identify.o identify_ui.o \
+ impute.o impute_ui.o io.o jitter.o jitter_ui.o \
+ limits.o lineedit.o lineedit_ui.o \
+ main_ui.o make_ggobi.o menus.o missing.o \
+ movepts.o movepts_ui.o noop-checkbutton.o \
+ p1d.o p1d_ui.o parcoords.o parcoords_ui.o pipeline.o \
+ ppcorr_ui.o pp_ui.o \
+ read_array.o read_data.o record_id.o rotate_ui.o \
+ scale_api.o scale_click.o scale_drag.o scale_ui.o \
+ scatmat.o scatmat_ui.o scatterplot.o scatterplot_ui.o \
+ smooth_ui.o sphere.o sphere_ui.o splash.o \
+ splot.o sp_plot.o subset.o subset_ui.o svd.o \
+ texture.o timeplot.o time_ui.o \
+ tour1d.o tour1d_pp.o tour1d_pp_ui.o tour1d_ui.o \
+ tour2d.o tour2d_ui.o tour.o tourcorr.o tourcorr_ui.o \
+ transform.o transform_ui.o \
+ utils.o utils_gdk.o utils_ui.o \
+ varchange.o varcircles.o varpanel_ui.o vartable.o vartable_ui.o \
+ vector.o wvis_ui.o win32_draw.o \
+ writedata.o writedata_ui.o write_svg.o \
+ xyplot.o xyplot_ui.o \
+\
  eispack.o \
  gtkextruler.o gtkexthruler.o gtkextvruler.o \
- fileio.o \
- print.o  \
- plugin.o
+ fileio.o plugin.o print.o \
+ xlines.o 
 
 
 ifdef USE_XML
