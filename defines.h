@@ -284,8 +284,12 @@ typedef enum {NULLMODE = -1,
 #define IMP_ABOVE  3
 
 /*-- color by variable --*/
-#define EQUAL_WIDTH_BINS 0
-#define EQUAL_COUNT_BINS 1
+#define WVIS_EQUAL_WIDTH_BINS 0
+#define WVIS_EQUAL_COUNT_BINS 1
+
+#define WVIS_UPDATE_ON_MOUSE_UP  0
+#define WVIS_UPDATE_CONTINUOUSLY 1
+/*--                   --*/
 
 /*-- macros --*/
 
