@@ -21,7 +21,7 @@
 #define OPEN 0
 #define FILL 1
 
-#define MAXNCOLORS 10
+#define MAXNCOLORS 15
 
 /* br_mode */
 #define BR_PERSISTENT 0
