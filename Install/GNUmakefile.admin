@@ -63,7 +63,7 @@ C_HEADER_FILES=\
   dbms dbms_ui \
   scatterplotClass \
   scatmatClass parcoordsClass  \
-  GGobiEvents
+  GGobiEvents tour \
 
 ifdef GTK_2
  C_HEADER_FILES+=marshal
@@ -79,8 +79,10 @@ LGPL_SRC=$(GTK_EXTRA_SRC) mt19937ar.c cokus.c
 
 
 createDist: Install/configure $(DOC_FILES) $(DATA_FILES) CmdArgHelp.c
+ifndef DONT_REMOVE_EXISTING_FILES
 	if test -d $(TMP_INSTALL_DIR) ; then rm -fr $(TMP_INSTALL_DIR) ; fi
-	mkdir -p $(TMP_INSTALL_DIR)
+endif
+	-mkdir -p $(TMP_INSTALL_DIR)
 ifndef NO_XGOBI_GROUP
 	chgrp xgobi $(TMP_INSTALL_DIR) ; chmod g+ws $(TMP_INSTALL_DIR) ;
 endif
