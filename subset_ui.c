@@ -283,7 +283,7 @@ subset_window_open (ggobid *gg, guint action, GtkWidget *w) {
       gtk_window_set_title (GTK_WINDOW (gg->subset_ui.window),
         "subset data");
       gtk_signal_connect (GTK_OBJECT (gg->subset_ui.window),
-        "delete_event", GTK_SIGNAL_FUNC (close_wmgr_cb), NULL);
+        "delete_event", GTK_SIGNAL_FUNC (close_wmgr_cb), (gpointer) gg);
   
       gtk_container_set_border_width (GTK_CONTAINER (gg->subset_ui.window), 5);
 
