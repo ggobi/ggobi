@@ -62,7 +62,7 @@ canRead(const char * const fileName)
   val = (stat(fileName, &buf) == 0);
 #else
   gint ft=0;
-  val = (access(fileName, ft) != 0);
+  val = (access(fileName, ft) == 0);
 #endif
 
   return(val);
@@ -86,6 +86,7 @@ load_plugin_library(GGobiPluginDetails *plugin)
 	  fprintf(stderr, "can't locate plugin library %s:\n", plugin->dllName);fflush(stderr);      
       if(fileName != plugin->dllName)
 	  g_free(fileName);
+      plugin->loaded = true;
     return(NULL);
   }
 
@@ -110,7 +111,7 @@ load_plugin_library(GGobiPluginDetails *plugin)
 DLFUNC 
 getPluginSymbol(const char *name, GGobiPluginDetails *plugin)
 {
-  if(plugin->library == NULL) {
+  if(plugin->library == NULL && plugin->loaded == false) {
      plugin->library = load_plugin_library(plugin);   
   }
   return(dynload->resolve(plugin->library, name));

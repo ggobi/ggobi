@@ -283,7 +283,10 @@ make_ggobi (GGobiOptions *options, gboolean processEvents, ggobid *gg)
     }
   } else {
 #ifdef SUPPORT_PLUGINS
-      runInteractiveInputPlugin(gg);
+      if(runInteractiveInputPlugin(gg) == NULL) {
+        if(sessionOptions->data_type)
+	  fprintf(stderr, "No available plugin to handle input mode %s\n", sessionOptions->data_type);fflush(stderr);
+      }
 #endif
   }
 

@@ -52,7 +52,9 @@ SRC= ggobi.c make_ggobi.c color.c main_ui.c cpanel.c utils.c array.c vector.c \
 \
  read_color.c read_init.c \
  wvis_ui.c write_state.c \
- plugin.c
+ plugin.c \
+ wvis.c \
+ dbms.c dbms_ui.c 
 
 # pp_ui.c
 
@@ -96,7 +98,9 @@ OB=ggobi.o make_ggobi.o color.o main_ui.o cpanel.o array.o vector.o \
  cokus.o \
  read_color.o read_init.o \
  wvis_ui.o write_state.o  \
- plugin.o 
+ plugin.o  \
+ wvis.o \
+ dbms.o dbms_ui.o
 
 # eispack.o
 # pp_ui.o

@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE ggobirc>
 <ggobirc>
-
 <preferences>
   <browser>
     <executable>netscape</executable>

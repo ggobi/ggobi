@@ -26,6 +26,9 @@ Source: "C:\cygwin\home\duncan\Projects\ggobi\data\*.*"; DestDir: "{app}\data"; 
 Source: "C:\cygwin\home\duncan\Projects\ggobi\notes\*.html"; DestDir: "{app}\Docs"; CopyMode: alwaysoverwrite
 Source: "C:\cygwin\home\duncan\Projects\ggobi\notes\ggobi.ico"; DestDir: "{app}"; CopyMode: alwaysoverwrite
 
+Source: "C:\cygwin\home\duncan\Projects\ggobi\notes\ggobirc"; DestDir: "{app}"; CopyMode: alwaysoverwrite
+Source: "C:\cygwin\home\duncan\Projects\ggobi\notes\colorschemes.xml"; DestDir: "{app}\share"; CopyMode: alwaysoverwrite
+
 Source: "C:\cygwin\home\duncan\Projects\ggobi\*.h"; DestDir: "{app}\include"; CopyMode: alwaysoverwrite
 
 Source: "C:\cygwin\home\duncan\Projects\ggobi\libggobi.a"; DestDir: "{app}\lib"; CopyMode: alwaysoverwrite
