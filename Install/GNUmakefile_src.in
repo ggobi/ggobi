@@ -28,6 +28,7 @@ SRC=\
     display_ui.c \
     exclusion.c \
     exclusion_ui.c \
+    fileio.c \
     ggobi-API.c \
     ggobi.c \
     gtkexthruler.c \
@@ -121,6 +122,9 @@ lib libggobi.so $(TOP)/lib/libggobi.so: $(OBJ:%.o=%.lo)
 	$(CC) $(SHLIB_LDFLAGS) -o $@ $(OBJ:%.o=%.lo) $(LIBS)
 
 
+../bin/xmlConvert xmlConvert: xmlConvert.o libggobi.so
+	$(CC) -o $@ xml	-L$(TOP)/lib  -lggobi
+
 %.lo:	%.c
 	$(CC) $(PIC_CFLAG) $(CFLAGS) -o $@ -c $<
 
@@ -128,3 +132,4 @@ clean:
 	for f in $(OBJ) $(OBJ:%.o=%.lo) ; do \
 	  if test -f $$f ; then rm $$f ; fi \
 	done
+

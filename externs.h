@@ -411,7 +411,8 @@ int ggobi_remove (ggobid *);
 
 
 void showInputDescription(InputDescription *desc, ggobid *gg);
-
+void initSessionOptions();
+gint parse_command_line (gint *argc, gchar **av, ggobid *gg);
 #ifdef __cplusplus
 }
 #endif

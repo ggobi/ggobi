@@ -1,3 +1,8 @@
+
+If read xml file from a URL, then want to compute the relative files
+by filling out the InputDescription. See fileset_generate....
+
+
 Fix the names and ids in the color map specification. Need to
 determine what is the relationship between these.
 

@@ -37,8 +37,8 @@ AC_ARG_WITH(mysql, --with-mysql Enable reading data from MySQL databases., USE_M
 
 
 
-if test -n "${USE_XML}" ; then
 
+if test -n "${USE_XML}" ; then
 
  dnl echo "with_xml: ${with_xml}"
 
@@ -72,7 +72,7 @@ dnl      AC_CHECK_HEADER(parserInternals.h, XML_INC_DIRS=$f$ext)
    done
 
  fi
-
+  XML_UTILS=xmlConvert
 fi
 
 
@@ -144,6 +144,7 @@ AC_SUBST(MV)
 
 AC_SUBST(TOP)
 
+AC_SUBST(XML_UTILS)
 AC_SUBST(USE_XML)
 AC_SUBST(USE_MYSQL)
 

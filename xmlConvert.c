@@ -12,36 +12,28 @@ gint
 main (gint argc, gchar *argv[])
 {
   ggobid *gg;
-  datad *d;
   char *fileName;
-  gchar *tmpname;
+  XmlWriteInfo info;
   gtk_init (&argc, &argv);
   gg = ggobi_alloc ();
 
+  initSessionOptions();
+  sessionOptions->cmdArgs = argv;
+  sessionOptions->numArgs = argc;
 
-  fileName = gg->data_in = argv[1];
-  gg->data_mode = ascii_data;
- 
-  fileName = gg->data_in = argv[2];
-  gg->data_mode = xml_data;
+  parse_command_line(&argc, argv, gg);
+
+  fileName = argv[1];
 
   gg->displays = NULL;
   globals_init (gg); /*-- variables that don't depend on the data --*/
   color_table_init (gg);
 
-
   fileset_read (fileName, unknown_data, gg);
-  d = (datad *)g_slist_nth_data(gg->d,0);
 
-  if(0) {
-    tmpname = (gchar*) g_malloc(sizeof(gchar)*strlen(gg->fname)+5);
-    sprintf (tmpname, "%s%s", gg->fname, ".tmp");
-    write_xml (tmpname, gg);
-    g_free (tmpname);
-  }
-  else {
-    write_xml_stream (stdout, gg, NULL);
-  }
+  memset(&info, '\0', sizeof(XmlWriteInfo));
+  info.useDefault = true;
+  write_xml_stream (stdout, gg, NULL, &info);
 
   return(0);
 }

@@ -7,8 +7,11 @@
   (More likely to be correct than writing a Perl script!)
  */
 
+
+XmlWriteInfo *updateXmlWriteInfo(datad *d, ggobid *gg, XmlWriteInfo *info);
+
 gboolean
-write_xml (const gchar *filename,  ggobid *gg)
+write_xml (const gchar *filename,  ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 {
   FILE *f;
   gboolean ok = false;
@@ -21,45 +24,47 @@ write_xml (const gchar *filename,  ggobid *gg)
    return (false);
   }
 
-  write_xml_stream (f, gg, filename);
+  write_xml_stream (f, gg, filename, xmlWriteInfo);
 
   fclose(f);
   return ok;
 }
 
 gboolean
-write_xml_stream (FILE *f, ggobid *gg, const gchar *filename)
+write_xml_stream (FILE *f, ggobid *gg, const gchar *filename, XmlWriteInfo *xmlWriteInfo)
 {
  gint numDatasets, i;
  datad *d;
   numDatasets = g_slist_length(gg->d);
-  write_xml_header (f, -1, gg);
+  write_xml_header (f, -1, gg, xmlWriteInfo);
 
   for(i = 0; i < numDatasets; i++) {
     d = (datad *) g_slist_nth_data(gg->d, i);
-    write_xml_dataset(f, d, gg);
+    if(xmlWriteInfo->useDefault)
+      updateXmlWriteInfo(d, gg, xmlWriteInfo);
+    write_xml_dataset(f, d, gg, xmlWriteInfo);
   }
 
-  write_xml_footer(f, gg);
+  write_xml_footer(f, gg, xmlWriteInfo);
   return(true);
 }
 
 gboolean
-write_xml_dataset(FILE *f, datad *d, ggobid *gg)
+write_xml_dataset(FILE *f, datad *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 {
-    write_dataset_header (f, d, gg);
-    write_xml_description (f, gg);
-    write_xml_variables (f, d, gg);
-    write_xml_records (f, d, gg);
+    write_dataset_header (f, d, gg, xmlWriteInfo);
+    write_xml_description (f, gg, xmlWriteInfo);
+    write_xml_variables (f, d, gg, xmlWriteInfo);
+    write_xml_records (f, d, gg, xmlWriteInfo);
     /*-- skip for now, because there's no need to write the default edges --*/
     /*    write_xml_edges(f, gg);*/
-    write_dataset_footer(f, gg);
+    write_dataset_footer(f, gg, xmlWriteInfo);
 
   return(true);
 }
 
 gboolean
-write_xml_header (FILE *f, int numDatasets, ggobid *gg)
+write_xml_header (FILE *f, int numDatasets, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 {
 
  fprintf(f, "<?xml version=\"1.0\"?>");
@@ -78,7 +83,7 @@ write_xml_header (FILE *f, int numDatasets, ggobid *gg)
 }
 
 gboolean
-write_xml_description (FILE *f, ggobid *gg)
+write_xml_description (FILE *f, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 {
  fprintf(f,"<description>\n");
 
@@ -89,13 +94,13 @@ write_xml_description (FILE *f, ggobid *gg)
 }
 
 gboolean
-write_xml_variables (FILE *f, datad *d, ggobid *gg)
+write_xml_variables (FILE *f, datad *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 {
   gint i;
   fprintf(f,"<variables count=\"%d\">\n", d->ncols); 
 
   for(i = 0; i < d->ncols; i++) {
-    write_xml_variable (f, d, gg, i);
+    write_xml_variable (f, d, gg, i, xmlWriteInfo);
     fprintf(f,"\n");
   }
 
@@ -105,7 +110,7 @@ write_xml_variables (FILE *f, datad *d, ggobid *gg)
 }
 
 gboolean
-write_xml_variable(FILE *f, datad *d, ggobid *gg, gint i)
+write_xml_variable(FILE *f, datad *d, ggobid *gg, gint i, XmlWriteInfo *xmlWriteInfo)
 {
 /*
    fprintf(f, "<variable");
@@ -124,14 +129,19 @@ write_xml_variable(FILE *f, datad *d, ggobid *gg, gint i)
 }
 
 gboolean
-write_xml_records(FILE *f, datad *d, ggobid *gg)
+write_xml_records(FILE *f, datad *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 {
  int i;
  fprintf(f, "<records\n");
  fprintf(f, " count=\"%d\"", d->nrows);
+ if(xmlWriteInfo->useDefault) {
+   fprintf(f, " glyphSize=\"%s\"", xmlWriteInfo->defaultGlyphSizeName);
+   fprintf(f, " glyphType=\"%s\"", xmlWriteInfo->defaultGlyphTypeName);
+   fprintf(f, " color=\"%s\"", xmlWriteInfo->defaultColorName);
+ }
  fprintf(f, ">\n");
  for(i = 0; i < d->nrows; i++) {
-  write_xml_record(f, d, gg, i);
+  write_xml_record(f, d, gg, i, xmlWriteInfo);
   fprintf(f, "\n");
  }
  fprintf(f, "</records>\n");
@@ -140,7 +150,7 @@ write_xml_records(FILE *f, datad *d, ggobid *gg)
 }
 
 gboolean
-write_xml_record (FILE *f, datad *d, ggobid *gg, gint i)
+write_xml_record (FILE *f, datad *d, ggobid *gg, gint i, XmlWriteInfo *xmlWriteInfo)
 {
   gint j;
   gchar *gstr;
@@ -150,14 +160,18 @@ write_xml_record (FILE *f, datad *d, ggobid *gg, gint i)
        && (gstr = (gchar *) g_array_index (d->rowlab, gchar *, i))) {  
      fprintf(f, " label=\"%s\"", gstr);
   }
+
+ if(!xmlWriteInfo->useDefault || xmlWriteInfo->defaultColor != d->color_ids.els[i]) {
   fprintf(f, " color=\"%d\"", d->color_ids.els[i]);
+ }
+
 /*
   fprintf(f, " glyphSize=\"%d\"", d->glyph_ids[i].size);
   fprintf(f, " glyphType=\"%d\"", d->glyph_ids[i].type);
 */
+ if(!xmlWriteInfo->useDefault || (xmlWriteInfo->defaultGlyphType != d->glyph_ids[i].type)) {
   switch (d->glyph_ids[i].type) {
     case PLUS_GLYPH:
-/*      gstr = "+";*/
       gstr = "plus";
       break;
     case X_GLYPH:
@@ -180,9 +194,15 @@ write_xml_record (FILE *f, datad *d, ggobid *gg, gint i)
       break;
   }
 
-  fprintf(f, " glyph=\"%s %d\"", gstr, d->glyph_ids[i].size);
+  fprintf(f, " glyphType=\"%s\"", gstr);
+ }
 
-  fprintf(f, ">\n");
+ if(!xmlWriteInfo->useDefault || (xmlWriteInfo->defaultGlyphSize != d->glyph_ids[i].size)) {
+  fprintf(f, " glyphSize=\"%d\"", d->glyph_ids[i].size);
+ }
+
+
+ fprintf(f, ">\n");
 
   for(j = 0; j < d->ncols; j++) {
      writeFloat (f, d->raw.vals[i][j]);
@@ -195,7 +215,7 @@ write_xml_record (FILE *f, datad *d, ggobid *gg, gint i)
 }
 
 gboolean
-write_xml_edges (FILE *f, ggobid *gg)
+write_xml_edges (FILE *f, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 {
  int i;
  if(gg->nedges < 1)
@@ -203,7 +223,7 @@ write_xml_edges (FILE *f, ggobid *gg)
 
  fprintf(f, "<edges count=%d>\n", gg->nedges);
  for(i = 0; i < gg->nedges; i++) {
-  write_xml_edge(f, gg, i);
+  write_xml_edge(f, gg, i, xmlWriteInfo);
   fprintf(f, "\n");
  }
  fprintf(f, "/edges>\n");
@@ -212,7 +232,7 @@ write_xml_edges (FILE *f, ggobid *gg)
 }
 
 gboolean
-write_xml_edge(FILE *f, ggobid *gg, int i)
+write_xml_edge(FILE *f, ggobid *gg, int i, XmlWriteInfo *xmlWriteInfo)
 {
  fprintf(f, "<edge ");
  fprintf(f, "source=\"%d\" destination=\"%d\"", gg->edge_endpoints[i].a
@@ -229,7 +249,7 @@ writeFloat(FILE *f, double value)
 }
 
 gboolean
-write_dataset_header (FILE *f, datad *d, ggobid *gg)
+write_dataset_header (FILE *f, datad *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 {
  fprintf(f,"<data ");
  fprintf(f, "numRecords=\"%d\"", d->nrows);
@@ -239,15 +259,78 @@ write_dataset_header (FILE *f, datad *d, ggobid *gg)
 }
 
 gboolean
-write_dataset_footer(FILE *f, ggobid *gg)
+write_dataset_footer(FILE *f, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 {
  fprintf(f,"</data>\n");
  return(true);
 }
 
 gboolean
-write_xml_footer(FILE *f, ggobid *gg)
+write_xml_footer(FILE *f, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 {
  fprintf(f,"</ggobidata>\n");
  return(true);
+}
+
+XmlWriteInfo *
+updateXmlWriteInfo(datad *d, ggobid *gg, XmlWriteInfo *info)
+{
+  int i, n, numGlyphSizes;
+  gint *colorCounts, *glyphTypeCounts, *glyphSizeCounts, count;
+  gchar *str;
+
+  colorCounts = g_malloc(sizeof(gint) * gg->ncolors);
+  glyphTypeCounts = g_malloc(sizeof(gint) * UNKNOWN_GLYPH);
+  numGlyphSizes = 7;
+  glyphSizeCounts = g_malloc(sizeof(gint) * numGlyphSizes);
+
+  memset(colorCounts, '\0', sizeof(gint) * gg->ncolors);
+  memset(glyphTypeCounts, '\0', sizeof(gint) * UNKNOWN_GLYPH);
+  memset(glyphSizeCounts, '\0', sizeof(gint) * numGlyphSizes);
+
+  n = GGOBI(nrecords)(d);
+  for(i = 0 ; i < n ; i++) {
+    colorCounts[d->color_ids.els[i]]++;
+    glyphSizeCounts[d->glyph_ids[i].size]++;
+    glyphTypeCounts[d->glyph_ids[i].type]++;
+  }
+
+  count = -1;
+  for(i = 0 ; i < gg->ncolors; i++) {
+    if(colorCounts[i] > count) {
+      info->defaultColor = i;
+      count= colorCounts[i];
+    }
+  }
+
+  count = -1;
+  for(i = 0 ; i < UNKNOWN_GLYPH; i++) {
+    if(glyphTypeCounts[i] > count) {
+      info->defaultGlyphType = i;
+      count= glyphTypeCounts[i];
+    }
+  }
+
+  count = -1;
+  for(i = 0 ; i < numGlyphSizes; i++) {
+    if(glyphSizeCounts[i] > count) {
+      info->defaultGlyphSize = i;
+      count= glyphSizeCounts[i];
+    }
+  }
+
+  if(gg->colorNames && (str = gg->colorNames[info->defaultColor]) && str[0])
+    info->defaultColorName = g_strdup(str);
+  else {
+    info->defaultColorName = str = g_malloc(5 * sizeof(char));
+    sprintf(str, "%d", info->defaultColor);
+  }
+
+  info->defaultGlyphSizeName = str = g_malloc(5 * sizeof(char));
+  sprintf(str, "%d", info->defaultGlyphSize);
+
+  str = GGOBI(getGlyphTypeName)(info->defaultGlyphType);  
+  info->defaultGlyphTypeName = g_strdup(str);
+
+  return(info);
 }

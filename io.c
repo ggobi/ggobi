@@ -50,14 +50,20 @@ filesel_ok (GtkWidget *w, GtkFileSelection *fs)
       switch (gg->save.format) {
         case XMLDATA:
 #ifdef USE_XML
+         {
+           XmlWriteInfo info;
+
           /*-- if fname already contains ".xml", then don't add it --*/
           if (len >= 4 && g_strncasecmp (&fname[len-4], ".xml", 4) == 0)
             filename = g_strdup (fname);
           else
             filename = g_strdup_printf ("%s.xml", fname);
 
-          write_xml ((const gchar *) filename, gg);
+          memset(&info, '0',sizeof(XmlWriteInfo));
+          info.useDefault = true;
+          write_xml ((const gchar *) filename, gg, &info);
           g_free (filename);
+	 }
 #endif
           break;
         case ASCIIDATA:

@@ -37,12 +37,13 @@ DOC_TEX_FILES=\
 
 DOC_FILES=$(DOC_TEX_FILES:%=notes/%.pdf) notes/ggobi.css notes/EmbeddingFAQ.html notes/plotLayout.html $(shell find notes -name '*.jpg')
 
-C_SRC_FILES=$(SRC) $(XML_SRC) 
+C_SRC_FILES=$(SRC) $(XML_SRC) xmlConvert.c
 
 C_HEADER_FILES=\
   GGobiAPI cpanel datad defines display display_tree \
   externs ggobi noop-checkbutton read_mysql read_xml  \
-  splot types vars varseldata write_xml writedata vartable gtkext.h
+  splot types vars varseldata write_xml writedata vartable gtkext fileio version
+
 Install/configure: Install/configure.in
 	(cd Install ; autoconf)
 

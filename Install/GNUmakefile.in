@@ -6,7 +6,9 @@ TOP=@TOP@
 
 .PHONY:	lib
 
-UTILS=bin/xmlConvert
+XML_UTILS=@XML_UTILS@
+
+UTILS=$(XML_UTILS:%=bin/%)
 
 all: lib/libgtkext.so bin/ggobi @EMBED@ $(UTILS)
 
