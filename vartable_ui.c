@@ -74,7 +74,8 @@ dialog_range_set (GtkWidget *w, ggobid *gg)
       gtk_clist_set_text (clist, j, CLIST_USER_MIN,
         g_strdup_printf("%8.3f", val));
     }
-  }
+  } else
+    gtk_clist_set_text (clist, j, CLIST_USER_MIN, g_strdup (""));
 
   /*-- maximum --*/
   val_str = gtk_entry_get_text (GTK_ENTRY (gg->vartable_ui.umax));
@@ -89,7 +90,8 @@ dialog_range_set (GtkWidget *w, ggobid *gg)
       gtk_clist_set_text (clist, j, CLIST_USER_MAX,
         g_strdup_printf("%8.3f", val));
     }
-  }
+  } else
+    gtk_clist_set_text (clist, j, CLIST_USER_MAX, g_strdup (""));
 
   g_free (cols);
   gtk_widget_destroy (dialog);
@@ -283,32 +285,36 @@ vartable_row_append (gint j, datad *d, ggobid *gg)
     row = (gchar **) g_malloc (NCOLS_CLIST * sizeof (gchar *));
 
     if (j == -1) {
-      row[0] = g_strdup_printf ("%d", 0);
-      row[1] = g_strdup ("");
-      row[2] = g_strdup ("");
-      row[3] = g_strdup_printf ("%8.3f", 0.0);
-      row[4] = g_strdup_printf ("%8.3f", 0.0);
-      row[5] = g_strdup_printf ("%8.3f", 0.0);
-      row[6] = g_strdup_printf ("%8.3f", 0.0);
-      row[7] = g_strdup_printf ("%8.3f", 0.0);
-      row[8] = g_strdup_printf ("%8.3f", 0.0);
-      row[9] = g_strdup_printf ("%d", 0);
+      row[CLIST_VARNO] = g_strdup_printf ("%d", 0);
+      row[CLIST_VARNAME] = g_strdup ("");
+      row[CLIST_TFORM] = g_strdup ("");
+      row[CLIST_USER_MIN] = g_strdup_printf ("%8.3f", 0.0);
+      row[CLIST_USER_MAX] = g_strdup_printf ("%8.3f", 0.0);
+      row[CLIST_DATA_MIN] = g_strdup_printf ("%8.3f", 0.0);
+      row[CLIST_DATA_MAX] = g_strdup_printf ("%8.3f", 0.0);
+      row[CLIST_MEAN] = g_strdup_printf ("%8.3f", 0.0);
+      row[CLIST_MEDIAN] = g_strdup_printf ("%8.3f", 0.0);
+      row[CLIST_NMISSING] = g_strdup_printf ("%d", 0);
     } else {
-      row[0] = g_strdup_printf ("%d", j);
-      row[1] = g_strdup (d->vartable[j].collab);
-      row[2] = g_strdup ("");
+      row[CLIST_VARNO] = g_strdup_printf ("%d", j);
+      row[CLIST_VARNAME] = g_strdup (d->vartable[j].collab);
+      row[CLIST_TFORM] = g_strdup ("");
       if (d->vartable[j].lim_specified_p) {
-        row[3] = g_strdup_printf ("%8.3f", d->vartable[j].lim_specified.min);
-        row[4] = g_strdup_printf ("%8.3f", d->vartable[j].lim_specified.max);
+        row[CLIST_USER_MIN] = g_strdup_printf ("%8.3f",
+          d->vartable[j].lim_specified.min);
+        row[CLIST_USER_MAX] = g_strdup_printf ("%8.3f",
+          d->vartable[j].lim_specified.max);
       } else {
-        row[3] = g_strdup ("");
-        row[4] = g_strdup ("");
+        row[CLIST_USER_MIN] = g_strdup ("");
+        row[CLIST_USER_MAX] = g_strdup ("");
       }
-      row[5] = g_strdup_printf ("%8.3f", d->vartable[j].lim_raw.min);
-      row[6] = g_strdup_printf ("%8.3f", d->vartable[j].lim_raw.max);
-      row[7] = g_strdup_printf ("%8.3f", d->vartable[j].mean);
-      row[8] = g_strdup_printf ("%8.3f", d->vartable[j].median);
-      row[9] = g_strdup_printf ("%d", d->vartable[j].nmissing);
+      row[CLIST_DATA_MIN] = g_strdup_printf ("%8.3f",
+        d->vartable[j].lim_raw.min);
+      row[CLIST_DATA_MAX] = g_strdup_printf ("%8.3f",
+        d->vartable[j].lim_raw.max);
+      row[CLIST_MEAN] = g_strdup_printf ("%8.3f", d->vartable[j].mean);
+      row[CLIST_MEDIAN] = g_strdup_printf ("%8.3f", d->vartable[j].median);
+      row[CLIST_NMISSING] = g_strdup_printf ("%d", d->vartable[j].nmissing);
     }
 
     gtk_clist_append ((GtkCList *) d->vartable_clist, row);
@@ -384,7 +390,8 @@ vartable_open (ggobid *gg)
           k, GTK_JUSTIFY_RIGHT);
 
       /*-- make the first column invisible --*/
-      gtk_clist_set_column_visibility (GTK_CLIST (d->vartable_clist), 0, false);
+      gtk_clist_set_column_visibility (GTK_CLIST (d->vartable_clist),
+        CLIST_VARNO, false);
 
       /*-- set the column width automatically --*/
       for (k=0; k<NCOLS_CLIST; k++)
