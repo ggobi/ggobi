@@ -267,6 +267,7 @@ void ggv_compute_Dtarget_cb (GtkWidget *button, PluginInstance *inst)
   GtkWidget *window, *entry;
   gchar *lbl;
 
+
   /* This was set in the first clist in the preceding tab */
   if (ggv->dsrc == NULL || ggv->dsrc->rowIds == NULL) {
     g_printerr ("node set not correctly specified\n");
@@ -292,9 +293,7 @@ void ggv_compute_Dtarget_cb (GtkWidget *button, PluginInstance *inst)
          necessarily the edgeset to be displayed (eg, morsecode) --*/
 /* can override the setting of the second clist in the preceding tab */
     ggv->e = gtk_object_get_data (GTK_OBJECT(clist), "datad");
-g_printerr ("e name = %s\n", ggv->e->name);
     if (ggv->e == NULL) {
-g_printerr ("e is null\n");
       quick_message ("I can't identify a set of edges", false);
       return;
     }
@@ -441,7 +440,7 @@ void mds_reinit_cb (PluginInstance *inst, guint action, GtkWidget *w)
   ggv_pos_reinit (ggv);
   update_ggobi (ggv, gg);
 }
-/*void mds_scramble_cb (GtkWidget *btn, PluginInstance *inst)*/
+
 void mds_scramble_cb (PluginInstance *inst, guint action, GtkWidget *w)
 {
   ggvisd *ggv = ggvisFromInst (inst);
@@ -554,7 +553,6 @@ void ggv_stepsize_cb (GtkAdjustment *adj, PluginInstance *inst)
 {
   ggvisd *ggv = ggvisFromInst (inst);
   ggv->stepsize = adj->value;
- g_printerr ("stepsize = %f\n", ggv->stepsize);
 }
 
 void ggv_dims_cb (GtkAdjustment *adj, PluginInstance *inst)
@@ -588,8 +586,8 @@ void ggv_dims_cb (GtkAdjustment *adj, PluginInstance *inst)
       }
       g_free (dtmp);
       ggv->maxdim = MAX(ggv->dim, dim);
-      ggv->dim = dim;
     }
+    ggv->dim = dim;
   }
 
   if (ggv->dpos) {
@@ -696,7 +694,6 @@ void ggv_kruskal_cb (GtkWidget *w, gpointer cbd)
   ggvisd *ggv = ggvisFromInst (inst);
 
   ggv->KruskalShepard_classic = (MDSKSInd) GPOINTER_TO_INT (cbd);
- g_printerr ("KruskalShepardInd = %d\n", ggv->KruskalShepard_classic);
 }
 
 
