@@ -1017,7 +1017,7 @@ wvis_window_open (ggobid *gg)
           colorscheme_add_to_menu (menu, scheme->name, scheme,
             (GtkSignalFunc) colorscheme_set_cb, notebook, gg);
 	  if(strcmp(scheme->name, gg->activeColorScheme->name) == 0) {
-/*XX Fix this - off by some quantity because Debby didn't use trees. ! */
+/*XX Fix this - off by some quantity because Debby didn't use trees. :-) */
 	      currentSelection = i + 2;
 	  }
 	}
