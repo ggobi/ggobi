@@ -21,7 +21,7 @@ extern DisplayTree display_tree;
 GtkWidget *display_add_tree(displayd *display, gint entry, GtkWidget *tree, ggobid *gg);
 
 gchar *display_tree_label(displayd *display);
-GtkTree *plot_tree_display(ggobid *);
+GtkTree *plot_tree_display(ggobid *gg);
 
 /*
 void show_display_tree (gpointer cbd, guint action, GtkWidget *widget);
