@@ -28,7 +28,27 @@
 <h2><a name="ggobi">Stand-alone ggobi</a></h2>
 <dl>
   <dt>
+  <li> On Windows, I get the following error
+<pre>
+"gdk-ERROR *.*: Palettized display (256-colour) mode not supported on Windows. aborting..."
+</pre>
+      How can I fix this?
+      
+  <dd> This is because you the color model in
+      the Display setting of the Control Panel is set to use
+       256 colors. You should change this to something like 24 bit
+       color or at least 8 bit color.
+
+
+  <dt>
+  <li> When I tell ggobi to read a particular XML file,
+       it says it cannot locate it.  What's the problem?
   <dd>
+      The first thing in the file must be
+<pre>
+<?xml version="1.0">      
+</pre>
+      
 </dl>
 
 <h2><a name="ggobiAPI">ggobi API</a></h2>
@@ -80,6 +100,6 @@
 <hr>
 <address></address>
 <!-- hhmts start -->
-Last modified: Fri Apr 13 18:06:18 EDT 2001
+Last modified: Thu May 17 13:11:50 EDT 2001
 <!-- hhmts end -->
 </body> </html>
