@@ -57,11 +57,15 @@ static void brush_undo_cb(GtkToggleButton * button, ggobid * gg)
 
   displays_plot(NULL, FULL, gg);
 }
-
-
+/*
+The select mode has some unpleasant behavior, basically because I'm
+just re-using the hidden vectors.  I have no desire to add another
+set of vectors, though, so I'll just turn it off for now.
 static gchar *point_targets_lbl[] =
-{ "Off", "Color and glyph", "Color only", "Glyph only", "Shadow", "Select"
-};
+{ "Off", "Color and glyph", "Color only", "Glyph only", "Shadow", "Select"};
+*/
+static gchar *point_targets_lbl[] =
+{ "Off", "Color and glyph", "Color only", "Glyph only", "Shadow"};
 static void
 brush_point_targets_cb (GtkWidget * w, gpointer cbd)
 {
