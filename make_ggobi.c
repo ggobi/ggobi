@@ -127,8 +127,8 @@ pipeline_init (datad *d, ggobid *gg)
   /*-- some initializations --*/
   modes_init (d, gg);
 /*
+  varpanel_clear (gg);
   varpanel_layout_init (d, gg);
-  varpanel_clear (d, gg);
   varpanel_populate (d, gg);
 */
 

@@ -157,17 +157,17 @@ extern gboolean * GGOBI(getCaseHiddens) (gint *pts, gint howMany, datad *, ggobi
 extern void GGOBI(setCaseHidden)(gint pt, gboolean hidden_p, datad *, ggobid *gg);
 extern void GGOBI(setCaseHiddens)(gint *pts, gint howMany, gboolean hidden_p, datad *, ggobid *gg);
 
-extern gboolean  GGOBI(isConnectedSegment)(gint a, gint b, ggobid *gg);
-extern void GGOBI(setObservationSegment)(gint x, gint y, ggobid *gg, gboolean update);
+extern gboolean  GGOBI(isConnectedEdge)(gint a, gint b, ggobid *gg);
+extern void GGOBI(setObservationEdge)(gint x, gint y, ggobid *gg, gboolean update);
 
 extern gboolean GGOBI(getShowLines)();
 extern gboolean GGOBI(setShowLines)(gboolean val);
 
 extern DisplayOptions *GGOBI(getDefaultDisplayOptions)();
 
-extern displayd *GGOBI(getDisplay)(int which, ggobid *gg);
+extern displayd *GGOBI(getDisplay)(gint which, ggobid *gg);
 
-extern DisplayOptions *GGOBI(getDisplayOptions)(int displayNum, ggobid *gg);
+extern DisplayOptions *GGOBI(getDisplayOptions)(gint displayNum, ggobid *gg);
 
 
 extern displayd * GGOBI(getCurrentDisplay)(ggobid *gg);

@@ -120,6 +120,7 @@ ggobi.sched: $(OB)
 dm: $(OB)
 	$(CC) `gtk-config --cflags` $(OB) -o ggobi `gtk-config --libs` -L$(DM) -ldmalloc
 
+lib: libGGobi.so
 libGGobi.so: $(OB)
 	$(CC) -g $(SHARED_LD_FLAGS) -o $@ $(OB) $(XML_LIB_DIRS) $(XML_LIBS) `gtk-config --libs`
 

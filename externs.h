@@ -290,7 +290,7 @@ extern void vardata_realloc (gint, datad *, ggobid *);
 extern void vardata_stats_set (datad *, ggobid *);
 extern void varlabel_set (gint, datad *, ggobid *);
 extern void varpanel_add_data (datad *, ggobid *);
-extern void varpanel_clear (datad *, ggobid *);
+extern void varpanel_clear (ggobid *);
 extern void varpanel_make (GtkWidget *, ggobid *);
 extern void varpanel_size_init (gint, ggobid *);
 extern void vartable_layout_init (datad *, ggobid *);

@@ -724,7 +724,7 @@ varcircle_add (gint i, gint j, gint k, datad *d, ggobid *gg)
 }
 
 void
-varpanel_clear (datad *d, ggobid *gg) {
+vartable_clear (datad *d, ggobid *gg) {
   gint j;
 
   for (j=0; j<d->varpanel_ui.nvars; j++) {
@@ -736,6 +736,17 @@ varpanel_clear (datad *d, ggobid *gg) {
   g_free (d->varpanel_ui.da);
   g_free (d->varpanel_ui.label);
 }
+
+void
+varpanel_clear (ggobid *gg) {
+  GSList *l;
+  datad *d;
+  for (l = gg->d; l; l = l->next) {
+    d = (datad *) l->data;
+    vartable_clear (d, gg);
+  }
+}
+
 
 /*-- create a grid of buttons in the table --*/
 void vartable_populate (datad *d, ggobid *gg)
