@@ -34,9 +34,6 @@ pipeline_arrays_free (datad *d, ggobid *gg)
 
   /*-- should these be freed here as well? --*/
   vectori_free (&d->clusterid);
-/*
- * vectori_free (&d->rowid);
-*/
 
   vectori_free (&d->rows_in_plot);
   vectorb_free (&d->sampled);
@@ -116,7 +113,7 @@ pipeline_arrays_check_dimensions (datad *d)
 
   /*-- d->rows_in_plot --*/
   if (d->rows_in_plot.nels < d->nrows)
-    arrayg_add_rows (&d->rows_in_plot, d->nrows);
+    vectori_realloc (&d->rows_in_plot, d->nrows);
 }
 
 /*-------------------------------------------------------------------------*/
