@@ -33,6 +33,8 @@ cpanel_t2d_init (cpaneld *cpanel, ggobid *gg) {
   cpanel->t2d_path_len = 1.;
   cpanel->t2d_slidepos = 10.;/* If this is changed, it needs to be 
      changed in th cpanel_tour2d_make routine also. */
+
+  cpanel->t2d_pp_indx = 0;
 }
 
 void

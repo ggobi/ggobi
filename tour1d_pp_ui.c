@@ -44,17 +44,16 @@ close_wmgr_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg) {
 }
 
 static void
-options_cb(gpointer data, guint action, GtkCheckMenuItem *w) {
-  ggobid *gg = GGobiFromWidget (GTK_WIDGET(w), true);
+options_cb(ggobid *gg, guint action, GtkCheckMenuItem *w) {
   displayd *dsp = gg->current_display; 
 
   switch (action) {
 
     case 0:
       if (w->active)
-        gtk_widget_hide (dsp->t1d_control_frame);
-      else
         gtk_widget_show (dsp->t1d_control_frame);
+      else
+        gtk_widget_hide (dsp->t1d_control_frame);
       break;
 
     case 1:
@@ -208,6 +207,7 @@ static GtkItemFactoryEntry menu_items[] = {
   { "/_Options",      NULL,         NULL, 0, "<Branch>" },
   { "/Options/Show controls",  
          "v",         (GtkItemFactoryCallback) options_cb, 0, "<CheckItem>" },
+/*
   { "/Options/Show lines",  
          "",         (GtkItemFactoryCallback) options_cb, 1, "<CheckItem>" },
   { "/Options/Show points",  
@@ -240,6 +240,7 @@ static GtkItemFactoryEntry menu_items[] = {
          "" ,        (GtkItemFactoryCallback) replot_freq_cb, 8, "/Options/Replot frequency/1" },
   { "/Options/Replot frequency/16",  
          "" ,        (GtkItemFactoryCallback) replot_freq_cb, 16,"/Options/Replot frequency/1" },
+*/
 };
 
 void
@@ -248,6 +249,9 @@ tour1dpp_window_open (ggobid *gg) {
   /*GtkWidget *da, *label, *entry;*/
   displayd *dsp = gg->current_display;
   datad *d = dsp->d;
+  /*-- to initialize the checkboxes in the menu --*/
+  GtkItemFactory *factory;
+  GtkWidget *item;
 
   if (dsp->t1d_window == NULL) {
 
@@ -267,9 +271,10 @@ tour1dpp_window_open (ggobid *gg) {
     gtk_container_add (GTK_CONTAINER (dsp->t1d_window), vbox);
 
     dsp->t1d_pp_accel_group = gtk_accel_group_new ();
-    get_main_menu (menu_items, sizeof (menu_items) / sizeof (menu_items[0]),
-                   dsp->t1d_pp_accel_group, dsp->t1d_window, &dsp->t1d_mbar,
-                   (gpointer) gg);
+    factory = get_main_menu (menu_items,
+      sizeof (menu_items) / sizeof (menu_items[0]),
+      dsp->t1d_pp_accel_group, dsp->t1d_window, &dsp->t1d_mbar,
+      (gpointer) gg);
     gtk_box_pack_start (GTK_BOX (vbox), dsp->t1d_mbar, false, true, 0);
 
 /*
@@ -400,11 +405,21 @@ tour1dpp_window_open (ggobid *gg) {
 
     gtk_container_add (GTK_CONTAINER (frame), dsp->t1d_ppda);
 
+    gtk_widget_show_all (dsp->t1d_window);
+
+    /*-- Set the appropriate check menu items to true. -- dfs --*/
+    item = gtk_item_factory_get_widget (factory, "/Options/Show controls");
+    gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (item), true);
+/* comment out until the options are implemented
+    item = gtk_item_factory_get_widget (factory, "/Options/Show lines");
+    gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (item), true);
+    item = gtk_item_factory_get_widget (factory, "/Options/Show points");
+    gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (item), true);
+*/
   }
 
   alloc_optimize0_p(&dsp->t1d_pp_op, d->nrows_in_plot, dsp->t1d.nvars, 1);
-
-  gtk_widget_show_all (dsp->t1d_window);
+  gtk_widget_show (dsp->t1d_window);
 }
 
 #undef SUBD           

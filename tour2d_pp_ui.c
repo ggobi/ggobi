@@ -47,17 +47,16 @@ hide_cb (GtkWidget *w) {
 */
 
 static void
-options_cb(gpointer data, guint action, GtkCheckMenuItem *w) {
-  ggobid *gg = GGobiFromWidget (GTK_WIDGET(w), true);
+options_cb(ggobid *gg, guint action, GtkCheckMenuItem *w) {
   displayd *dsp = gg->current_display; 
   
   switch (action) {
 
     case 0:
       if (w->active)
-        gtk_widget_hide (dsp->t2d_control_frame);
-      else
         gtk_widget_show (dsp->t2d_control_frame);
+      else
+        gtk_widget_hide (dsp->t2d_control_frame);
       break;
 
     case 1:
@@ -69,7 +68,6 @@ options_cb(gpointer data, guint action, GtkCheckMenuItem *w) {
 
 static void
 line_options_cb(gpointer data, guint action, GtkCheckMenuItem *w) {
-  g_printerr ("action = %d\n", action);
 
   switch (action) {
     case 0:
@@ -82,7 +80,6 @@ line_options_cb(gpointer data, guint action, GtkCheckMenuItem *w) {
 
 static void
 bitmap_size_cb(gpointer data, guint action, GtkCheckMenuItem *w) {
-  g_printerr ("action = %d\n", action);
 
   switch (action) {
     case 0:
@@ -94,7 +91,6 @@ bitmap_size_cb(gpointer data, guint action, GtkCheckMenuItem *w) {
 }
 static void
 replot_freq_cb(gpointer data, guint action, GtkCheckMenuItem *w) {
-  g_printerr ("action = %d\n", action);
 
   switch (action) {
     case 1:
@@ -218,6 +214,8 @@ static GtkItemFactoryEntry menu_items[] = {
   { "/_Options",      NULL,         NULL, 0, "<Branch>" },
   { "/Options/Show controls",  
          "v",         (GtkItemFactoryCallback) options_cb, 0, "<CheckItem>" },
+/* -- comment the rest out for now -- */
+/*
   { "/Options/Show lines",  
          "",         (GtkItemFactoryCallback) options_cb, 1, "<CheckItem>" },
   { "/Options/Show points",  
@@ -250,6 +248,7 @@ static GtkItemFactoryEntry menu_items[] = {
          "" ,        (GtkItemFactoryCallback) replot_freq_cb, 8, "/Options/Replot frequency/1" },
   { "/Options/Replot frequency/16",  
          "" ,        (GtkItemFactoryCallback) replot_freq_cb, 16,"/Options/Replot frequency/1" },
+*/
 };
 
 void
@@ -261,6 +260,9 @@ tour2dpp_window_open (ggobid *gg) {
   datad *d = dsp->d;
   gint i, j;
   gboolean vars_sphered = true;
+  /*-- to initialize the checkboxes in the menu --*/
+  GtkItemFactory *factory;
+  GtkWidget *item;
 
   /* check if selected variables are sphered beforeing allowing window
      to popup */
@@ -303,10 +305,12 @@ tour2dpp_window_open (ggobid *gg) {
       gtk_container_add (GTK_CONTAINER (dsp->t2d_window), vbox);
 
       dsp->t2d_pp_accel_group = gtk_accel_group_new ();
-      get_main_menu (menu_items, sizeof (menu_items) / sizeof (menu_items[0]),
-                     dsp->t2d_pp_accel_group, dsp->t2d_window, &dsp->t2d_mbar,
-                     (gpointer) gg);
+      factory = get_main_menu (menu_items,
+        sizeof (menu_items) / sizeof (menu_items[0]),
+        dsp->t2d_pp_accel_group, dsp->t2d_window, &dsp->t2d_mbar,
+        (gpointer) gg);
       gtk_box_pack_start (GTK_BOX (vbox), dsp->t2d_mbar, false, true, 0);
+
 
 /*
  * Divide the window:  controls on the left, plot on the right
@@ -442,11 +446,20 @@ tour2dpp_window_open (ggobid *gg) {
                           (gpointer) gg);
   
       gtk_container_add (GTK_CONTAINER (frame), dsp->t2d_ppda);
+      gtk_widget_show_all (dsp->t2d_window);
 
+      /*-- Set the appropriate check menu items to true. -- dfs --*/
+      item = gtk_item_factory_get_widget (factory, "/Options/Show controls");
+      gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (item), true);
+/* comment out until the options are implemented
+      item = gtk_item_factory_get_widget (factory, "/Options/Show lines");
+      gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (item), true);
+      item = gtk_item_factory_get_widget (factory, "/Options/Show points");
+      gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (item), true);
+*/
     }
 
     alloc_optimize0_p(&dsp->t2d_pp_op, d->nrows_in_plot, dsp->t2d.nvars, 2);
-
     gtk_widget_show_all (dsp->t2d_window);
   }
 }
