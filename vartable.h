@@ -33,6 +33,7 @@ typedef struct {
  struct datad *d;  /*-- I want a pointer back to its parent datad --*/
 
  gchar *collab, *collab_tform;
+ gchar *nickname;   /*-- very short name to use in tour axis labels --*/
  gint nmissing;
 
  /*-- is this variable categorical? --*/
