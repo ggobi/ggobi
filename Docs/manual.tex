@@ -383,8 +383,7 @@ The display types include
 \item time series plots.
 \end{itemize}
 
-If the data has missing values, a scatterplot or scatterplot matrix
-of the ``missingness'' information can be opened.  Each display type
+Each display type
 is discussed in section ~\ref{DisplayTypes}.
 
 The {\bf ViewMode} menu contains items to set the projection 
@@ -567,19 +566,6 @@ and the behavior of the checkboxes depends on the state of the
   right on the variable checkbox for the variable you want to
   delete.  (This applies to vertically plotted variables only.)
 \end{itemize}
-
-\subsubsection{Missing values displays}
-\label{slbl:MissingData}
-
-When your data includes missing values, two additional display types
-are available.  The missing values scatterplot and scatterplot matrix
-display not the data itself but the ``missingness'' for each point, namely
-a jittered scatterplot of indicator variables encoding the presence or
-absence of values for each variable.  Examining a number of views in one
-of these displays allows us to explore the joint distribution of missing
-values across variables.  Since these displays are linked to all others,
-brushing the missings in a missing values display allows us to explore
-the association between missing values and the variables.
 
 \section{Data format}
 \label{slbl:DataFormat}
@@ -1433,6 +1419,26 @@ if the feature you see is still there in repeated subsamples, there's
 a good chance it's not just an artifact of visualization.
 
 \subsection{Controls for missing data}
+
+When your data includes missing values, you can add a new dataset to the
+current ggobi using the button at the top of the {\bf Missing data} tool.
+The resulting dataset has the same number of rows as the original,
+but it may have fewer variables, since it only uses those variables
+which actually have missing values.  It has the same variable names,
+row labels, glyphs and colors as the original.  The difference is this:
+if the original data in position $i,j$ is missing, the new dataset's
+value is $1.0$; otherwise it's $0.0$.
+
+Once the new dataset has been created, plots of missingness information
+can be launched and linked to plots of the data.  The missings plots
+are pre-jittered to spread the points; the degree of jittering can
+be later adjusted with the jittering tool.
+
+Linking missings plots to displays of the data allows us to explore the
+joint distribution of missing values across variables.
+
+\subsubsection{Imputation}
+
 %
 By default, missing values are assigned the value $0$, but you
 may sometimes find that to be an inconvenient choice.  Use the
