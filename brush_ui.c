@@ -237,6 +237,7 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, cpaneld *cpanel)
 static gint
 button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
+  displayd *display;
   cpaneld *cpanel;
   gboolean retval = true;
   gboolean button1_p, button2_p;
@@ -246,12 +247,13 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 
   gg->current_splot = sp->displayptr->current_splot = sp;
   gg->current_display = sp->displayptr;
-  cpanel = &gg->current_display->cpanel;
-  d = gg->current_display->d;
-  e = gg->current_display->e;
+  display = gg->current_display;
+  cpanel = &display->cpanel;
+  d = display->d;
+  e = display->e;
 
   /*-- set the value of the boolean gg->linkby_cv --*/
-  linking_method_set (gg->current_display, d, gg);
+  linking_method_set (display, d, gg);
 
   brush_prev_vectors_update (d, gg);
   if (e != NULL)
@@ -266,17 +268,12 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 
   brush_set_pos ((gint) sp->mousepos.x, (gint) sp->mousepos.y, sp);
   /*
-   * We can't just use brush_motion() here, because we need to
-   * make certain that the current splot is redrawn without
-   * binning.   That's because if some other plot is also in
-   * transient brushing, the points under its brush need to be
-   * redrawn in this splot.
-   * So we replicate a few lines of code from brush_motion()
-   * here and force a complete redraw of all displays.
+   * We might need to make certain that the current splot is
+   * redrawn without binning, in case some other plot is also in
+   * transient brushing.
   */
   if (cpanel->brush_on_p) {
-    brush_once (false, sp, gg);
-    displays_plot (NULL, FULL, gg);  
+    brush_once_and_redraw (false, sp, display, gg);  /* no binning */
   } else {
     splot_redraw (sp, QUICK, gg);
   }

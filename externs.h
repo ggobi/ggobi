@@ -80,7 +80,7 @@ void brush_event_handlers_toggle (splotd *, gboolean);
 void brush_init (datad *, ggobid *);
 void brush_motion (icoords *, gboolean, gboolean, cpaneld *, splotd *, ggobid *);
 gboolean brush_once (gboolean force, splotd *, ggobid *);
-void brush_once_and_redraw (splotd *sp, displayd *display, ggobid *gg);
+void brush_once_and_redraw (gboolean binningp, splotd *sp, displayd *display, ggobid *gg);
 void brush_options_cb (gpointer, guint, GtkCheckMenuItem *);
 void brush_pos_init (splotd *);
 void brush_prev_vectors_update (datad *, ggobid *);

@@ -55,26 +55,38 @@ brush_once (gboolean force, splotd *sp, ggobid *gg)
   datad *e = display->e;
 
   brush_coords *brush_pos = &sp->brush_pos;
-  gint ulx = MIN (brush_pos->x1, brush_pos->x2);
-  gint uly = MIN (brush_pos->y1, brush_pos->y2);
-  gint lrx = MAX (brush_pos->x1, brush_pos->x2);
-  gint lry = MAX (brush_pos->y1, brush_pos->y2);
-  gboolean changed = false;
-  cpaneld *cpanel = &display->cpanel;
+
   icoords *bin0 = &d->brush.bin0;
   icoords *bin1 = &d->brush.bin1;
 
-  if (!point_in_which_bin (ulx, uly, &bin0->x, &bin0->y, d, sp)) {
-    bin0->x = MAX (bin0->x, 0);
-    bin0->x = MIN (bin0->x, d->brush.nbins - 1);
-    bin0->y = MAX (bin0->y, 0);
-    bin0->y = MIN (bin0->y, d->brush.nbins - 1);
-  }
-  if (!point_in_which_bin (lrx, lry, &bin1->x, &bin1->y, d, sp)) {
-    bin1->x = MAX (bin1->x, 0);
-    bin1->x = MIN (bin1->x, d->brush.nbins - 1);
-    bin1->y = MAX (bin1->y, 0);
-    bin1->y = MIN (bin1->y, d->brush.nbins - 1);
+  gboolean changed = false;
+  cpaneld *cpanel = &display->cpanel;
+
+  if (force) {  /*-- force the bin to be the entire screen --*/
+    bin0->x = 0;
+    bin0->y = 0;
+    bin1->x = d->brush.nbins - 1;
+    bin1->y = d->brush.nbins - 1;
+
+  } else {
+
+    gint ulx = MIN (brush_pos->x1, brush_pos->x2);
+    gint uly = MIN (brush_pos->y1, brush_pos->y2);
+    gint lrx = MAX (brush_pos->x1, brush_pos->x2);
+    gint lry = MAX (brush_pos->y1, brush_pos->y2);
+
+    if (!point_in_which_bin (ulx, uly, &bin0->x, &bin0->y, d, sp)) {
+      bin0->x = MAX (bin0->x, 0);
+      bin0->x = MIN (bin0->x, d->brush.nbins - 1);
+      bin0->y = MAX (bin0->y, 0);
+      bin0->y = MIN (bin0->y, d->brush.nbins - 1);
+    }
+    if (!point_in_which_bin (lrx, lry, &bin1->x, &bin1->y, d, sp)) {
+      bin1->x = MAX (bin1->x, 0);
+      bin1->x = MIN (bin1->x, d->brush.nbins - 1);
+      bin1->y = MAX (bin1->y, 0);
+      bin1->y = MIN (bin1->y, d->brush.nbins - 1);
+    }
   }
 
 /*
@@ -182,7 +194,6 @@ brush_set_pos (gint x, gint y, splotd *sp) {
 static gboolean
 binning_permitted (displayd *display, ggobid *gg)
 {
-  /*datad *d = display->d;*/
   datad *e = display->e;
   gboolean permitted = true;
   gint type = display->displaytype;
@@ -210,30 +221,30 @@ binning_permitted (displayd *display, ggobid *gg)
 }
 
 void
-brush_once_and_redraw (splotd *sp, displayd *display, ggobid *gg) 
+brush_once_and_redraw (gboolean binningp, splotd *sp, displayd *display,
+  ggobid *gg) 
 {
   cpaneld *cpanel = &display->cpanel;
   gboolean changed = false;
 
   if (cpanel->brush_on_p) {
-    changed = brush_once (false, sp, gg);
+    changed = brush_once (!binningp, sp, gg);
 
-    if (!binning_permitted (display, gg)) {
-      splot_redraw (sp, FULL, gg);  
-      if (gg->brush.updateAlways_p)
-        displays_plot (sp, FULL, gg);  
-
-    } else {  /*-- if we can get away with binning --*/
-
+    if (binningp && binning_permitted (display, gg)) {
       if (changed) {
         splot_redraw (sp, BINNED, gg);
-
-        if (gg->brush.updateAlways_p)
+        if (gg->brush.updateAlways_p) {
           displays_plot (sp, FULL, gg);
+        }
 
       } else {  /*-- just redraw the brush --*/
         splot_redraw (sp, QUICK, gg);  
       }
+
+    } else {  /* no binning */
+      splot_redraw (sp, FULL, gg);  
+      if (gg->brush.updateAlways_p)
+        displays_plot (sp, FULL, gg);  
     }
 
   } else {  /*-- we're not brushing, and we just need to redraw the brush --*/
@@ -275,7 +286,7 @@ brush_motion (icoords *mouse, gboolean button1_p, gboolean button2_p,
     brush_pos->y2 = mouse->y ;
   }
 
-  brush_once_and_redraw (sp, display, gg);
+  brush_once_and_redraw (true, sp, display, gg);  /* binning permitted */
 }
 
 

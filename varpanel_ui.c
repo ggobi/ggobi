@@ -154,7 +154,7 @@ varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint btn,
 
     if (viewmode_get (gg) == BRUSH) {
       display_tailpipe (display, NONE, gg);
-      brush_once_and_redraw (sp, display, gg);
+      brush_once_and_redraw (true, sp, display, gg); /* binning ok */
     }
   }
 }
