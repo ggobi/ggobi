@@ -7,6 +7,8 @@
 #include "vars.h"
 #include "externs.h"
 
+#include <string.h> /* for memset() */
+
 /* external variables */
 
 /*-------------------------------------------------------------------------*/
@@ -185,8 +187,8 @@ brush_alloc (datad *d, ggobid *gg)
  * Dynamically allocate arrays.
 */
 {
-  guint nr = (guint) d->nrows;
-  gint i, iv, ih;
+  guint nr = (guint) d->nrows, i;
+  gint iv, ih;
   gboolean initd = false;
 
   d->brush.nbins = BRUSH_NBINS;
