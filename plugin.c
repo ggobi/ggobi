@@ -179,7 +179,8 @@ getPluginSymbol(const char *name, GGobiPluginDetails *plugin)
      lib = NULL;
   else if(plugin->library == NULL && plugin->loaded != DL_LOADED) {
      lib = plugin->library = load_plugin_library(plugin, true);   
-  } 
+  }  else
+     lib = plugin->library;
 
   return(dynload->resolve(lib, tmp));
 }
