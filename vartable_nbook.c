@@ -22,7 +22,6 @@
 #include <string.h> /* for strcmp() */
 
 extern GtkWidget * vartable_buttonbox_build (ggobid *gg);
-
 static void vartable_subwindow_init (datad *d, ggobid *gg);
 
 static void close_wmgr_cb (GtkWidget *cl, GdkEventButton *event, ggobid *gg)
@@ -426,6 +425,7 @@ vartable_subwindow_init (datad *d, ggobid *gg)
    * We're showing all datasets for now, whether they have variables
    * or not.  That could change.
   */
+  gtk_object_set_data(GTK_OBJECT(nbook), "datad", d);  /*setdata*/
   gtk_notebook_append_page (GTK_NOTEBOOK (gg->vartable_ui.notebook),
     nbook, gtk_label_new (lbl));
   g_free (lbl);
@@ -487,7 +487,7 @@ vartable_subwindow_init (datad *d, ggobid *gg)
   /*-- set the column width automatically --*/
   for (k=0; k<NCOLS_CLIST_CAT; k++)
     gtk_clist_set_column_auto_resize (GTK_CLIST (d->vartable_clist[categorical]),
-                                      k, true);
+      k, true);
 
   gtk_container_add (GTK_CONTAINER (scrolled_window),
     d->vartable_clist[categorical]);

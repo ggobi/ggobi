@@ -332,16 +332,17 @@ variable_notebook_subwindow_add (datad *d, GtkSignalFunc func,
   swin = gtk_scrolled_window_new (NULL, NULL);
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (swin),
     GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
+
+  gtk_object_set_data(GTK_OBJECT(swin), "datad", d);  /*setdata*/
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
-                            swin, gtk_label_new (d->name));
+    swin, gtk_label_new (d->name));
 
   /* add the CList */
   clist = gtk_clist_new (1);
   gtk_clist_set_selection_mode (GTK_CLIST (clist), mode);
   gtk_object_set_data (GTK_OBJECT (clist), "datad", d);
   gtk_signal_connect (GTK_OBJECT (clist), "select_row",
-                     GTK_SIGNAL_FUNC (func),
-                     gg);
+    GTK_SIGNAL_FUNC (func), gg);
 
   for (j=0; j<d->ncols; j++) {
     vt = vartable_element_get (j, d);

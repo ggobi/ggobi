@@ -190,22 +190,31 @@ datad_init (datad *d, ggobid *gg, gboolean cleanup)
 */
 datad *
 datad_get_from_notebook (GtkWidget *notebook, ggobid *gg) {
+  datad *d = NULL;
   gint nd = g_slist_length (gg->d);
-  datad *d;
-  datatyped dtype;
 
   if (nd == 1) {
-    return (datad *) gg->d->data;
+    d = gg->d->data;
   } else {
-    gint k, n;
     GtkNotebook *nb = GTK_NOTEBOOK (notebook);
     gint indx = gtk_notebook_get_current_page (nb);
-    dtype = (vartyped) gtk_object_get_data (GTK_OBJECT(notebook), "datatype");
+    GtkWidget *page = gtk_notebook_get_nth_page (nb, indx);
+
+    /*
+     * Assume that each notebook page has a datad attached.
+    */
+    if (page) {
+      d = gtk_object_get_data (GTK_OBJECT(page), "datad");
+    }
 
     /*
      * k indexes gg->d
      * n indexes the notebook pages, so it increments only if d has variables
     */
+/*
+    gint k, n;
+  datatyped dtype;
+    dtype = (vartyped) gtk_object_get_data (GTK_OBJECT(notebook), "datatype");
     for (k = 0, n = 0; k < nd; k++) {
       d = (datad *) g_slist_nth_data (gg->d, k);
 
@@ -215,14 +224,16 @@ datad_get_from_notebook (GtkWidget *notebook, ggobid *gg) {
       {
         if (datad_has_variables(d)) {
           if (n == indx)
-            return (d);
+             return (d);
           n++;
         }
       }
     }
+  return ((datad *) NULL);
+*/
   }
 
-  return ((datad *) NULL);
+  return d;
 }
 
 gint
