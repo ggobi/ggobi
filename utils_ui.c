@@ -427,6 +427,7 @@ create_variable_notebook (GtkWidget *box, GtkSelectionMode mode,
         vt = vartable_element_get (j, d);
         row[0] = g_strdup_printf (vt->collab_tform);
         gtk_clist_append (GTK_CLIST (clist), row);
+        g_free (row[0]);
       }
       gtk_container_add (GTK_CONTAINER (swin), clist);
     }

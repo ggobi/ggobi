@@ -71,6 +71,7 @@ process_colorscheme(xmlNodePtr root, xmlDocPtr doc)
   colorschemed *scheme;
   xmlNodePtr node;
   const xmlChar *tmp;
+  xmlChar *val;
 
   scheme = (colorschemed*) g_malloc(sizeof(colorschemed));
 
@@ -96,9 +97,9 @@ process_colorscheme(xmlNodePtr root, xmlDocPtr doc)
     scheme->n = (gint) asNumber(tmp);
 
   node = getXMLElement(root, "description");
-  scheme->description = g_strdup(xmlNodeListGetString(doc,
-                                 XML_CHILDREN(node),
-                                 1));
+  val = xmlNodeListGetString(doc, XML_CHILDREN(node), 1);
+  scheme->description = g_strdup(val);
+  g_free (val);
 
   node = getXMLElement(root, "foreground");
   getForegroundColors(node, doc, scheme);
@@ -228,6 +229,7 @@ getColor(xmlNodePtr node, xmlDocPtr doc, gfloat **original, GdkColor *col,
     if(tmp->type != XML_TEXT_NODE) {
       val = xmlNodeListGetString(doc, XML_CHILDREN(tmp), 1);
       vals[i] = asNumber(val) * max;
+      g_free (val);
       i++;
     }
     tmp = tmp->next;

@@ -1222,6 +1222,7 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
             gdk_draw_string (drawable, style->font, gg->plot_GC,
               ix, iy,
               varlab);
+            g_free (varlab);
           }
         }
         gdk_gc_set_line_attributes(gg->plot_GC, 0, GDK_LINE_SOLID, 

@@ -401,6 +401,7 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
 
     y += hgt;
   }
+  g_free (points);
 
   /*-- draw the light shadows --*/
   y = ymargin + 10;
@@ -431,6 +432,7 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
 
     y += hgt;
   }
+  g_free (points);
 
   /*-- add the variable limits in the top margin --*/
   if (d && selected_var != -1) {

@@ -365,7 +365,7 @@ open_range_set_dialog (GtkWidget *w, ggobid *gg)
     okay_btn);
 
   /*-- cancel button --*/
-  cancel_btn = gtk_button_new_with_label ("Cancel");
+  cancel_btn = gtk_button_new_with_label ("Close");
   gtk_signal_connect (GTK_OBJECT (cancel_btn), "clicked",
     GTK_SIGNAL_FUNC (dialog_range_cancel), gg);
   gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->action_area),
@@ -502,7 +502,7 @@ open_newvar_dialog (GtkWidget *w, ggobid *gg)
     okay_btn);
 
   /*-- cancel button --*/
-  cancel_btn = gtk_button_new_with_label ("Cancel");
+  cancel_btn = gtk_button_new_with_label ("Close");
   gtk_signal_connect (GTK_OBJECT (cancel_btn), "clicked",
     GTK_SIGNAL_FUNC (dialog_newvar_cancel), gg);
   gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->action_area),
@@ -598,7 +598,7 @@ open_rename_dialog (GtkWidget *w, ggobid *gg)
     okay_btn);
 
   /*-- cancel button --*/
-  cancel_btn = gtk_button_new_with_label ("Cancel");
+  cancel_btn = gtk_button_new_with_label ("Close");
   gtk_signal_connect (GTK_OBJECT (cancel_btn), "clicked",
     GTK_SIGNAL_FUNC (dialog_newvar_cancel), gg);
   gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->action_area),
@@ -1018,26 +1018,31 @@ void
 vartable_limits_set_by_var (gint j, datad *d)
 {
   vartabled *vt;
+  gchar *stmp;
 
   if (d->vartable_clist != NULL) {
     vt = vartable_element_get (j, d);
 
+    stmp = g_strdup_printf ("%8.3f", vt->lim_display.min);
     gtk_clist_set_text (GTK_CLIST (d->vartable_clist), j,
-      CLIST_DATA_MIN,
-      g_strdup_printf ("%8.3f", vt->lim_display.min));
+      CLIST_DATA_MIN, stmp);
+    g_free (stmp);
 
+    stmp = g_strdup_printf ("%8.3f", vt->lim_display.max);
     gtk_clist_set_text (GTK_CLIST (d->vartable_clist), j,
-      CLIST_DATA_MAX,
-      g_strdup_printf ("%8.3f", vt->lim_display.max));
+      CLIST_DATA_MAX, stmp);
+    g_free (stmp);
 
     if (vt->lim_specified_p) {
+      stmp = g_strdup_printf ("%8.3f", vt->lim_specified.min);
       gtk_clist_set_text (GTK_CLIST (d->vartable_clist), j,
-        CLIST_USER_MIN,
-        g_strdup_printf ("%8.3f", vt->lim_specified.min));
+        CLIST_USER_MIN, stmp);
+      g_free (stmp);
 
+      stmp = g_strdup_printf ("%8.3f", vt->lim_specified.max);
       gtk_clist_set_text (GTK_CLIST (d->vartable_clist), j,
-        CLIST_USER_MAX,
-        g_strdup_printf ("%8.3f", vt->lim_specified.max));
+        CLIST_USER_MAX, stmp);
+      g_free (stmp);
     }
   }
 }
@@ -1054,15 +1059,25 @@ vartable_limits_set (datad *d)
 void
 vartable_stats_set_by_var (gint j, datad *d) {
   vartabled *vt;
+  gchar *stmp;
 
   if (d->vartable_clist != NULL) {
     vt = vartable_element_get (j, d);
+
+    stmp = g_strdup_printf ("%8.3f", vt->mean);
     gtk_clist_set_text (GTK_CLIST (d->vartable_clist), j,
-      CLIST_MEAN, g_strdup_printf ("%8.3f", vt->mean));
+      CLIST_MEAN, stmp);
+    g_free (stmp);
+
+    stmp = g_strdup_printf ("%8.3f", vt->median);
     gtk_clist_set_text (GTK_CLIST (d->vartable_clist), j,
-      CLIST_MEDIAN, g_strdup_printf ("%8.3f", vt->median));
+      CLIST_MEDIAN, stmp);
+    g_free (stmp);
+
+    stmp = g_strdup_printf ("%d", vt->nmissing);
     gtk_clist_set_text (GTK_CLIST (d->vartable_clist), j,
-      CLIST_NMISSING, g_strdup_printf ("%d", vt->nmissing));
+      CLIST_NMISSING, stmp);
+    g_free (stmp);
   }
 }
 void

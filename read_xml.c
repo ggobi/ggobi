@@ -166,6 +166,7 @@ data_xml_read (InputDescription *desc, ggobid *gg)
   ctx = xmlCreateFileParserCtxt(name);
   if(ctx == NULL) {
    xml_warning("File error:", name, "Can't open file ", &data);
+   g_free (name);
    return(false);
   }
 
@@ -182,6 +183,7 @@ data_xml_read (InputDescription *desc, ggobid *gg)
   xmlFreeParserCtxt(ctx);
 
   g_free(xmlParserHandler);
+  g_free (name);
 
   {
     GSList *l;

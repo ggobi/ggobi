@@ -5,6 +5,8 @@ compiler -- glib, gtk, and ggobi.  That means that it's necessary to
 construct a separate tree for glib and gtk that have been compiled
 with cc, and build ggobi against those.
 
+Sources are in /usr/dfs/src.
+
 Step 1: glib
 
 CC=/usr/bin/cc ./configure --prefix=/usr/dfs/cc 

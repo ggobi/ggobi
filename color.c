@@ -218,6 +218,7 @@ init_var_GCs (GtkWidget *w, ggobid *gg) {
     0, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
   gdk_gc_set_foreground (gg->manipvarfg_GC, &gg->vcirc_manip_color);
 
+  g_free (style);
 }
 
 /*-------------------------------------------------------------------*/
