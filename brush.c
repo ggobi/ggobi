@@ -242,12 +242,11 @@ brush_motion (icoords *mouse, gboolean button1_p, gboolean button2_p,
     brush_pos->y2 = mouse->y ;
   }
 
-/*-- drawing over the top won't work if erasing or glyph brushing --*/
 
   if (cpanel->brush_on_p) {
     changed = brush_once (false, sp, gg);
-    if (!binning_permitted (display)) {
 
+    if (!binning_permitted (display)) {
       splot_redraw (sp, FULL, gg);  
       if (gg->brush.updateAlways_p)
         displays_plot (sp, FULL, gg);  
@@ -532,9 +531,12 @@ update_color_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
 /* setting the value of doit */
   if (!changed) {
     if (hit_by_brush[i])
-      doit = (d->color_now.els[i] != gg->color_id);
+      /*-- if persistent, compare against color instead of color_now --*/
+      doit = (cpanel->br_mode == BR_TRANSIENT) ?
+               (d->color_now.els[i] != gg->color_id) :
+               (d->color.els[i] != gg->color_id);
     else
-      doit = (d->color_now.els[i] != d->color.els[i]);
+      doit = (d->color_now.els[i] != d->color.els[i]);  /*-- ?? --*/
   }
 /* */
 

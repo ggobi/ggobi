@@ -162,14 +162,14 @@ brush_reset(ggobid *gg, gint action)
 }
 
 /* Options from the Options menu in the main menubar */
+/*
 void
 brush_options_cb (gpointer data, guint action, GtkCheckMenuItem *w)
 {
-/*
  * action 1 : Update linked brushing continuously
-*/
   g_printerr ("action: %d, state: %d\n", action,  w->active);
 }
+*/
 
 /*--------------------------------------------------------------------*/
 /*      Handling keyboard and mouse events in the plot window         */
@@ -413,7 +413,7 @@ cpanel_brush_make (ggobid *gg) {
 /*
  * button for opening symbol panel
 */
-  btn = gtk_button_new_with_label ("Choose symbol ...");
+  btn = gtk_button_new_with_label ("Choose color & glyph ...");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Open panel for choosing color and glyph", NULL);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
@@ -434,7 +434,7 @@ cpanel_brush_make (ggobid *gg) {
                       btn, false, false, 1);
 
 /*-- button for opening clusters table --*/
-  btn = gtk_button_new_with_label ("Case clusters ...");
+  btn = gtk_button_new_with_label ("Color & glyph groups ...");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Open tools panel for hiding or excluding brushed groups",
     NULL);

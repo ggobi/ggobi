@@ -353,7 +353,7 @@ cluster_window_open (ggobid *gg) {
     gtk_signal_connect (GTK_OBJECT (gg->cluster_ui.window), "delete_event",
                         GTK_SIGNAL_FUNC (delete_cb), (gpointer) gg);
     gtk_window_set_title (GTK_WINDOW (gg->cluster_ui.window),
-      "ggobi case clusters");
+      "case clusters");
   }
 
   vbox = gtk_vbox_new (false, 5);

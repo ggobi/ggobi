@@ -498,7 +498,7 @@ static GtkItemFactoryEntry menu_items[] = {
 
   /*-- Tools that apply to cases --*/
   { "/Tools/sep",     NULL, NULL, 0, "<Separator>" },
-  { "/Tools/Case clusters ...", 
+  { "/Tools/Color & glyph groups ...", 
        NULL,        
        (GtkItemFactoryCallback) cluster_window_open,
        0,
