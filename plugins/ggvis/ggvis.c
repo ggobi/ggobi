@@ -323,12 +323,12 @@ create_ggvis_window(ggobid *gg, PluginInstance *inst)
 
   btn = gtk_button_new_with_label ("cmds");
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                      GTK_SIGNAL_FUNC (cmds_cb), inst);
+                      GTK_SIGNAL_FUNC (cmds_cb), (gpointer) inst);
   gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 3);
 
   btn = gtk_button_new_with_label ("spring");
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                      GTK_SIGNAL_FUNC (mds_spring_cb), inst);
+                      GTK_SIGNAL_FUNC (mds_spring_cb), (gpointer) inst);
   gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 3);
 
   label = gtk_label_new ("Network");
