@@ -113,7 +113,7 @@ writeall_window_open (ggobid *gg) {
       "Save the data in XML or in a ggobi file set (data in ascii or binary",
       NULL);
     populate_option_menu (opt, format_lbl,
-      sizeof (format_lbl) / sizeof (gchar *), format_set_cb, gg);
+      sizeof (format_lbl) / sizeof (gchar *), (GtkSignalFunc) format_set_cb, gg);
     gtk_option_menu_set_history (GTK_OPTION_MENU (opt),
       XMLDATA);
 
@@ -130,7 +130,7 @@ writeall_window_open (ggobid *gg) {
       "Save raw or transformed data",
       NULL);
     populate_option_menu (opt, stage_lbl,
-      sizeof (stage_lbl) / sizeof (gchar *), stage_set_cb, gg);
+      sizeof (stage_lbl) / sizeof (gchar *), (GtkSignalFunc) stage_set_cb, gg);
     gtk_option_menu_set_history (GTK_OPTION_MENU (opt),
       TFORMDATA);
 
@@ -166,7 +166,7 @@ writeall_window_open (ggobid *gg) {
       "Specify which rows should be written out",
       NULL);
     populate_option_menu (opt, rowdata_lbl,
-      sizeof (rowdata_lbl) / sizeof (gchar *), rowind_set_cb, gg);
+      sizeof (rowdata_lbl) / sizeof (gchar *), (GtkSignalFunc) rowind_set_cb, gg);
     gtk_option_menu_set_history (GTK_OPTION_MENU (opt),
       ALLROWS);
 
@@ -183,7 +183,7 @@ writeall_window_open (ggobid *gg) {
       "Specify which variables should be written out",
       NULL);
     populate_option_menu (opt, columndata_lbl,
-      sizeof (columndata_lbl) / sizeof (gchar *), columnind_set_cb, gg);
+      sizeof (columndata_lbl) / sizeof (gchar *), (GtkSignalFunc) columnind_set_cb, gg);
     gtk_option_menu_set_history (GTK_OPTION_MENU (opt),
       ALLCOLS);
 
@@ -200,7 +200,7 @@ writeall_window_open (ggobid *gg) {
       "Specify how to write out missing data",
       NULL);
     populate_option_menu (opt, missing_lbl,
-      sizeof (missing_lbl) / sizeof (gchar *), missingind_set_cb, gg);
+      sizeof (missing_lbl) / sizeof (gchar *), (GtkSignalFunc) missingind_set_cb, gg);
     gtk_option_menu_set_history (GTK_OPTION_MENU (opt),
       MISSINGSNA);
 
@@ -217,7 +217,7 @@ writeall_window_open (ggobid *gg) {
       "Include line segments?",
       NULL);
     populate_option_menu (opt, lines_lbl,
-      sizeof (lines_lbl) / sizeof (gchar *), linesp_set_cb, gg);
+      sizeof (lines_lbl) / sizeof (gchar *), (GtkSignalFunc) linesp_set_cb, gg);
     gtk_option_menu_set_history (GTK_OPTION_MENU (opt),
       false);
 

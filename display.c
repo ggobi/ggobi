@@ -8,6 +8,8 @@
 
 #include "display_tree.h"
 
+#include <string.h> /* for memset */
+
 DisplayOptions DefaultDisplayOptions = {
                                          true,  /* points_show_p */
                                          false, /* edges_directed_show_p */
@@ -293,7 +295,7 @@ display_free (displayd* display, gboolean force, ggobid *gg) {
 
     /*-- list length only has to be >=0 because a display was just removed --*/
     if (display == gg->current_display && (g_list_length (gg->displays) > 0)) {
-      display_set_current (g_list_nth_data (gg->displays, 0), gg);
+      display_set_current ((displayd *) g_list_nth_data (gg->displays, 0), gg);
       gg->current_splot = (splotd *)
         g_list_nth_data (gg->current_display->splots, 0);
       splot_set_current (gg->current_splot, on, gg);
@@ -382,7 +384,7 @@ display_set_current (displayd *new_display, ggobid *gg)
 
   switch (new_display->displaytype) {
     case scatterplot:
-      scatterplot_main_menus_make (gg->main_accel_group, mode_set_cb, gg, true);
+      scatterplot_main_menus_make (gg->main_accel_group, (GtkSignalFunc) mode_set_cb, gg, true);
       gg->mode_item = submenu_make ("_View", 'V', gg->main_accel_group);
       gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_item),
                                  gg->app.scatterplot_mode_menu); 
@@ -390,7 +392,7 @@ display_set_current (displayd *new_display, ggobid *gg)
       break;
 
     case scatmat:
-      scatmat_main_menus_make (gg->main_accel_group, mode_set_cb, gg, true);
+      scatmat_main_menus_make (gg->main_accel_group, (GtkSignalFunc) mode_set_cb, gg, true);
       gg->mode_item = submenu_make ("_View", 'V', gg->main_accel_group);
       gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_item),
                                  gg->app.scatmat_mode_menu); 
@@ -398,7 +400,7 @@ display_set_current (displayd *new_display, ggobid *gg)
       break;
 
     case parcoords:
-      parcoords_main_menus_make (gg->main_accel_group, mode_set_cb, gg, true);
+      parcoords_main_menus_make (gg->main_accel_group, (GtkSignalFunc) mode_set_cb, gg, true);
       gg->mode_item = submenu_make ("_View", 'V', gg->main_accel_group);
       gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_item),
                                  gg->parcoords.mode_menu); 
@@ -424,7 +426,8 @@ gchar *
 computeTitle (displayd *display, ggobid *gg)
 {
   gint n;
-  gchar *title = NULL, *tmp = NULL, *description;
+  gchar *title = NULL, *description;
+  const char *tmp = NULL;
 
   switch(display->displaytype) {
     case scatterplot:

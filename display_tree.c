@@ -152,7 +152,7 @@ gtk_signal_connect (GTK_OBJECT(tree), "select_child",
 */
       /* Here do the plots within the display. */
   for (slist = display->splots; slist ; slist = slist->next, ctr++) {
-    sp = slist->data;
+    sp = (splotd *) slist->data;
     item = gtk_tree_item_new_with_label (splot_tree_label (sp,
       ctr, display->displaytype, d, gg));
 

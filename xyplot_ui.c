@@ -61,7 +61,7 @@ cpanel_xyplot_make (ggobid *gg) {
     false, false, 0);
   populate_option_menu (opt, (gchar**) fix_axis_lbl,
                         sizeof (fix_axis_lbl) / sizeof (gchar *),
-                        fix_axis_cb, gg);
+                        (GtkSignalFunc) fix_axis_cb, gg);
   
   /* value, lower, upper, step_increment, page_increment, page_size */
   /* Note that the page_size value only makes a difference for

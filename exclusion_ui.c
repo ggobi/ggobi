@@ -119,7 +119,7 @@ exclusion_cluster_add (gint k, datad *d, ggobid *gg) {
   GGobi_widget_set (d->clusv[k].da, gg, true);
   gtk_table_attach (GTK_TABLE (d->exclusion_table),
     d->clusv[k].da,
-    0, 1, k+1, k+2, 0, 0, 5, 2);  /*-- don't fill --*/
+    0, 1, k+1, k+2, (GtkAttachOptions)0, (GtkAttachOptions)0, 5, 2);  /*-- don't fill --*/
 
   d->clusv[k].hide_tgl = gtk_check_button_new ();
   GTK_TOGGLE_BUTTON (d->clusv[k].hide_tgl)->active = d->clusv[k].hidden;

@@ -47,8 +47,8 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   gg->current_splot = sp;
   gg->current_display = (displayd *) sp->displayptr;
 
-  sp->mousepos.x = event->x;
-  sp->mousepos.y = event->y;
+  sp->mousepos.x = (gint) event->x;
+  sp->mousepos.y = (gint) event->y;
 
   sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
                                       "motion_notify_event",
@@ -63,8 +63,8 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
   gboolean retval = true;
 
-  sp->mousepos.x = event->x;
-  sp->mousepos.y = event->y;
+  sp->mousepos.x = (gint) event->x;
+  sp->mousepos.y = (gint) event->y;
 
   gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
 

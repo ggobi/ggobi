@@ -89,8 +89,8 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 
   g_printerr ("rotate button_press: %d\n", event->button);
 
-  sp->mousepos.x = event->x;
-  sp->mousepos.y = event->y;
+  sp->mousepos.x = (gint) event->x;
+  sp->mousepos.y = (gint) event->y;
 
   sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
                                       "motion_notify_event",
@@ -104,8 +104,8 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
   gboolean retval = true;
 
-  sp->mousepos.x = event->x;
-  sp->mousepos.y = event->y;
+  sp->mousepos.x = (gint) event->x;
+  sp->mousepos.y = (gint) event->y;
 
   gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
 
@@ -239,7 +239,7 @@ cpanel_rotation_make (ggobid *gg) {
                       ro_type_opt, false, false, 0);
   populate_option_menu (ro_type_opt, type_lbl,
                         sizeof (type_lbl) / sizeof (gchar *),
-                        type_cb, gg);
+                        (GtkSignalFunc) type_cb, gg);
 
 /*
  * option menu: y/x/oblique axis
@@ -251,7 +251,7 @@ cpanel_rotation_make (ggobid *gg) {
                       ro_axis_opt, false, false, 0);
   populate_option_menu (ro_axis_opt, axis_lbl,
                         sizeof (axis_lbl) / sizeof (gchar *),
-                        axis_cb, gg);
+                        (GtkSignalFunc) axis_cb, gg);
   gtk_widget_show_all (gg->control_panel[ROTATE]);
 }
 

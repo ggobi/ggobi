@@ -15,8 +15,14 @@ extern gint _finite (gdouble);
 #define SIGNUM(x) (((x)<0.0)?(-1.0):(((x)>0.0)?(1.0):(0.0)))
 
 /* */
+#ifdef __cplusplus
+extern "C" {
+#endif
 extern gint finite (gdouble);  /*-- defined in math.h, but being ignored --*/
 extern gdouble erf (gdouble);  /*-- defined in math.h, but being ignored --*/
+#ifdef __cplusplus
+}
+#endif
 /* */
 
 static gchar *domain_error_message = "Data outside the domain of function.";

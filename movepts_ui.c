@@ -43,7 +43,7 @@ static gchar *mdir_lbl[] = {"Both", "Vertical", "Horizontal"};
 static void mdir_cb (GtkWidget *w, gpointer cbd)
 {
   ggobid *gg = GGobiFromWidget (w, true);
-  gg->movepts.direction = GPOINTER_TO_INT (cbd);
+  gg->movepts.direction = (enum directiond) GPOINTER_TO_INT (cbd);
 }
 
 /*--------------------------------------------------------------------*/
@@ -126,8 +126,8 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   if ((display->displaytype == scatterplot && cpanel->projection == XYPLOT) ||
       (display->displaytype == scatmat && sp->p1dvar == -1))
   {
-    sp->mousepos.x = event->x;
-    sp->mousepos.y = event->y;
+    sp->mousepos.x = (gint) event->x;
+    sp->mousepos.y = (gint) event->y;
     sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
                                         "motion_notify_event",
                                         (GtkSignalFunc) motion_notify_cb,
@@ -174,8 +174,8 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   gg->current_splot = sp;
 
   if (cpanel->projection == XYPLOT) {
-    sp->mousepos.x = event->x;
-    sp->mousepos.y = event->y;
+    sp->mousepos.x = (gint) event->x;
+    sp->mousepos.y = (gint) event->y;
     if (sp->motion_id)
       gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
   }
@@ -226,7 +226,7 @@ cpanel_movepts_make (ggobid *gg) {
     NULL);
   populate_option_menu (opt, mdir_lbl,
                         sizeof (mdir_lbl) / sizeof (gchar *),
-                        mdir_cb, gg);
+                        (GtkSignalFunc) mdir_cb, gg);
   gtk_box_pack_start (GTK_BOX (hb), opt, false, false, 0);
 
 /*

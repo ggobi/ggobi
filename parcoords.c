@@ -14,9 +14,9 @@
 
 static GtkItemFactoryEntry menu_items[] = {
   { "/_FFile",         NULL,     NULL,     0,                    "<Branch>" },
-  { "/FFile/Print",    "",       display_print_cb, 0, "<Item>" },
+  { "/FFile/Print",    "",       (GtkItemFactoryCallback) display_print_cb, 0, "<Item>" },
   { "/FFile/sep",      NULL,     NULL,     0, "<Separator>" },
-  { "/FFile/Close",    "",       display_close_cb, 0, "<Item>" },
+  { "/FFile/Close",    "",       (GtkItemFactoryCallback) display_close_cb, 0, "<Item>" },
 };
 /* The rest of the menus will be appended once the menubar is created */
 
@@ -166,7 +166,7 @@ parcoords_new (gboolean missing_p, gint nvars, gint *vars,
    * add the Display Options and Link menus another way
   */
   parcoords_display_menus_make (display, gg->parcoords.pc_accel_group,
-                                display_options_cb, mbar, gg);
+                                (GtkSignalFunc) display_options_cb, mbar, gg);
   gtk_box_pack_start (GTK_BOX (vbox), mbar, false, true, 0);
 
 

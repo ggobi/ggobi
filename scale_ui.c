@@ -243,8 +243,8 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   gg->current_splot = sp;
   gg->current_display = (displayd *) sp->displayptr;
 
-  sp->mousepos_o.x = sp->mousepos.x = event->x;
-  sp->mousepos_o.y = sp->mousepos.y = event->y;
+  sp->mousepos_o.x = sp->mousepos.x = (gint) event->x;
+  sp->mousepos_o.y = sp->mousepos.y = (gint) event->y;
 
   sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
                                       "motion_notify_event",
@@ -258,8 +258,8 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
   gboolean retval = true;
 
-  sp->mousepos.x = event->x;
-  sp->mousepos.y = event->y;
+  sp->mousepos.x = (gint) event->x;
+  sp->mousepos.y = (gint) event->y;
 
   gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
 
@@ -416,7 +416,7 @@ cpanel_scale_make (ggobid *gg) {
   gtk_box_pack_end (GTK_BOX (vb), gg->scale.pan_opt, false, false, 0);
   populate_option_menu (gg->scale.pan_opt, panoptions_lbl,
                         sizeof (panoptions_lbl) / sizeof (gchar *),
-                        panoptions_cb, gg);
+                        (GtkSignalFunc) panoptions_cb, gg);
 /*
  * zooming controls
 */
@@ -435,7 +435,7 @@ cpanel_scale_make (ggobid *gg) {
   gtk_box_pack_end (GTK_BOX (vb), gg->scale.zoom_opt, false, false, 0);
   populate_option_menu (gg->scale.zoom_opt, zoomoptions_lbl,
                         sizeof (zoomoptions_lbl) / sizeof (gchar *),
-                        zoomoptions_cb, gg);
+                        (GtkSignalFunc) zoomoptions_cb, gg);
 
   /*-- start with dragging on by default --*/
 /*

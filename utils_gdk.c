@@ -93,8 +93,8 @@ mousepos_get_pressed (GtkWidget *w, GdkEventButton *event,
   *btn1_down_p = false;
   *btn2_down_p = false;
 
-  sp->mousepos.x = event->x;
-  sp->mousepos.y = event->y;
+  sp->mousepos.x = (gint) event->x;
+  sp->mousepos.y = (gint) event->y;
   if ((event->state & GDK_BUTTON1_MASK) == GDK_BUTTON1_MASK)
     *btn1_down_p = true;
   else if ((event->state & GDK_BUTTON2_MASK) == GDK_BUTTON2_MASK)
@@ -126,8 +126,8 @@ mousepos_get_motion (GtkWidget *w, GdkEventMotion *event,
 
   } else {
 
-    sp->mousepos.x = event->x;
-    sp->mousepos.y = event->y;
+    sp->mousepos.x = (gint) event->x;
+    sp->mousepos.y = (gint) event->y;
     if ((event->state & GDK_BUTTON1_MASK) == GDK_BUTTON1_MASK)
       *btn1_down_p = true;
     else if ((event->state & GDK_BUTTON2_MASK) == GDK_BUTTON2_MASK)

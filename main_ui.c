@@ -408,37 +408,37 @@ GGOBI(full_mode_set)(int action, ggobid *gg)
 extern void display_write_svg (ggobid *);
 static GtkItemFactoryEntry menu_items[] = {
   { "/_File",            NULL,     NULL,             0, "<Branch>" },
-  { "/File/Read ...",    NULL,     filename_get_r,   0 },
+  { "/File/Read ...",    NULL,     (GtkItemFactoryCallback) filename_get_r,   0 },
 /*
  *{ "/File/Save (extend file set) ...",   
  *                       NULL,     filename_get,     1 },
 */
   { "/File/Save (new file set) ...",   
-                         NULL,     writeall_window_open,     2 },
+                         NULL,     (GtkItemFactoryCallback) writeall_window_open,     2 },
 
   { "/File/sep",         NULL,     NULL,          0, "<Separator>" },
-  { "/File/Print",       NULL,     display_write_svg,          0 },
+  { "/File/Print",       NULL,     (GtkItemFactoryCallback) display_write_svg,          0 },
   { "/File/sep",         NULL,     NULL,          0, "<Separator>" },
-  { "/File/Quit",    "<ctrl>Q",     quit_ggobi,  0 },
+  { "/File/Quit",    "<ctrl>Q",    (GtkItemFactoryCallback) quit_ggobi,  0 },
 
   { "/_Tools",        NULL,         NULL, 0, "<Branch>" },
   { "/Tools/Variable selection and statistics ...", 
-                      NULL,         vartable_open,    0, NULL },
+                      NULL,         (GtkItemFactoryCallback) vartable_open,    0, NULL },
   { "/Tools/Variable transformation ...", 
-                      NULL,         transform_window_open, 0, NULL },
+                      NULL,         (GtkItemFactoryCallback) transform_window_open, 0, NULL },
   { "/Tools/Variable jittering ...", 
-                      NULL,         jitter_window_open,    0, NULL },
+                      NULL,         (GtkItemFactoryCallback) jitter_window_open,    0, NULL },
   { "/Tools/sep",     NULL, NULL, 0, "<Separator>" },
   { "/Tools/Case hiding and exclusion ...", 
-                      NULL,         exclusion_window_open, 0, NULL },
+                      NULL,         (GtkItemFactoryCallback) exclusion_window_open, 0, NULL },
   { "/Tools/Case subsetting and sampling ...", 
-                      NULL,         subset_window_open,    0, NULL },
+                      NULL,         (GtkItemFactoryCallback) subset_window_open,    0, NULL },
   { "/Tools/sep",     NULL, NULL, 0, "<Separator>" },
   { "/Tools/Smooth ...", 
-                      NULL,         smooth_window_open,    0, NULL },
+                      NULL,         (GtkItemFactoryCallback) smooth_window_open,    0, NULL },
 
   { "/Tools/Impute missing values ...", 
-                      NULL,         impute_window_open,    0, NULL },
+                      NULL,         (GtkItemFactoryCallback) impute_window_open,    0, NULL },
 
 /*
  * this code in display.c actually corresponds to the "Window" menu,
@@ -446,22 +446,22 @@ static GtkItemFactoryEntry menu_items[] = {
 */
   { "/_Display",      NULL,         NULL, 0, "<Branch>" },
   { "/Display/Show tooltips",  
-                      "<ctrl>t",    main_display_options_cb, 0, "<CheckItem>" },
+                      "<ctrl>t",    (GtkItemFactoryCallback) main_display_options_cb, 0, "<CheckItem>" },
   { "/Display/Show control _panel",  
-                      "<ctrl>p",    main_display_options_cb, 1, "<CheckItem>" },
+                      "<ctrl>p",    (GtkItemFactoryCallback) main_display_options_cb, 1, "<CheckItem>" },
   { "/Display/sep",   NULL,     NULL,          0, "<Separator>" },
 
   { "/Display/Brushing",  
                       NULL ,        NULL, 0, "<Branch>" },
   { "/Display/Brushing/Brush jumps to cursor",  
-                      NULL ,        brush_options_cb, 0, "<CheckItem>" },
+                      NULL ,        (GtkItemFactoryCallback) brush_options_cb, 0, "<CheckItem>" },
   { "/Display/Brushing/Update linked brushing continuously",  
-                      NULL ,        brush_options_cb, 1, "<CheckItem>" },
+                      NULL ,        (GtkItemFactoryCallback) brush_options_cb, 1, "<CheckItem>" },
 
 
   {"/_Plots", NULL, NULL, 0, "<Branch>"},
   { "/Plots/Displays",    
-          NULL,  show_display_tree, 2},
+          NULL,  (GtkItemFactoryCallback) show_display_tree, 2},
 
 
   { "/_Help",         NULL,         NULL, 0, "<LastBranch>" },
@@ -530,13 +530,13 @@ make_ui (ggobid *gg) {
 */
   items = gtk_container_children (GTK_CONTAINER (gg->main_menubar));
   while (items) {
-    item = items->data;
+    item = (GtkWidget *) items->data;
     gtk_label_get (GTK_LABEL (GTK_MENU_ITEM (item)->item.bin.child ), &name);
     if (strcmp (name, "Display") == 0) {
       submenu = GTK_MENU_ITEM (item)->submenu;
       subitems = gtk_container_children (GTK_CONTAINER (submenu));
       while (subitems) {
-        item = subitems->data;
+        item = (GtkWidget*) subitems->data;
 
         if (GTK_IS_CHECK_MENU_ITEM (item)) {
           gtk_label_get (GTK_LABEL (GTK_MENU_ITEM (item)->item.bin.child),

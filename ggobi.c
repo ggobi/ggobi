@@ -85,7 +85,7 @@ parse_command_line (gint *argc, gchar **av, ggobid *gg)
 
 gint GGOBI(main)(gint argc, gchar *argv[], gboolean processEvents);
 
-gint main (gint argc, gchar *argv[])
+int main (gint argc, gchar *argv[])
 { 
  GGOBI(main)(argc, argv, true);
  return (0);
@@ -119,7 +119,7 @@ ggobi_remove_by_index (ggobid *gg, gint which)
   /* Now patch up the array so that it has the correct number of elements. */
   num_ggobis--;
   if(num_ggobis > 0)
-    all_ggobis = g_realloc (all_ggobis, sizeof(ggobid*) * num_ggobis);
+    all_ggobis = (ggobid**) g_realloc (all_ggobis, sizeof(ggobid*) * num_ggobis);
   else
     all_ggobis = NULL;
 
@@ -139,7 +139,7 @@ ggobi_alloc()
 {
  ggobid *tmp;
 
-  tmp = g_malloc (sizeof (ggobid));
+  tmp = (ggobid*) g_malloc (sizeof (ggobid));
 
   memset (tmp, '\0', sizeof (ggobid));
   tmp->xyplot.direction = FORWARD;
@@ -157,7 +157,7 @@ ggobi_alloc()
   tmp->color_ui.margin = 10;
   tmp->tour2d.idled = 0;
 
-  all_ggobis = g_realloc (all_ggobis, sizeof(ggobid*)*(num_ggobis+1));
+  all_ggobis = (ggobid **) g_realloc (all_ggobis, sizeof(ggobid*)*(num_ggobis+1));
   all_ggobis[num_ggobis] = tmp;
   num_ggobis++;
 

@@ -58,7 +58,7 @@ cpanel_scatmat_make (ggobid *gg) {
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
   populate_option_menu (opt, selection_mode_lbl,
                         sizeof (selection_mode_lbl) / sizeof (gchar *),
-                        selection_mode_cb, gg);
+                        (GtkSignalFunc) selection_mode_cb, gg);
 
   gtk_widget_show_all (gg->control_panel[SCATMAT]);
 }

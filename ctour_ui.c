@@ -123,7 +123,7 @@ cpanel_ctour_make (ggobid *gg) {
   gtk_container_add (GTK_CONTAINER (vb), manip_opt);
   populate_option_menu (manip_opt, manip_lbl,
                         sizeof (manip_lbl) / sizeof (gchar *),
-                        manip_cb, gg);
+                        (GtkSignalFunc) manip_cb, gg);
 
 /*
  * path length option menu 
@@ -142,7 +142,7 @@ cpanel_ctour_make (ggobid *gg) {
   gtk_container_add (GTK_CONTAINER (vb), pathlen_opt);
   populate_option_menu (pathlen_opt, pathlen_lbl,
                         sizeof (pathlen_lbl) / sizeof (gchar *),
-                        pathlen_cb, gg);
+                        (GtkSignalFunc) pathlen_cb, gg);
 
 /*
  * Sync Axes toggle
@@ -219,7 +219,7 @@ ctouradv_window_open (void) {
 */
     btn = gtk_button_new_with_label ("Close");
     gtk_signal_connect_object (GTK_OBJECT (btn), "clicked",
-                   GTK_SIGNAL_FUNC (hide_cb), (gpointer) window);
+                   GTK_SIGNAL_FUNC (hide_cb), (GtkObject*) window);
     gtk_box_pack_start (GTK_BOX (vbox), btn, false, true, 2);
   }
 
@@ -245,8 +245,8 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   gg->current_splot = sp;
   gg->current_display = (displayd *) sp->displayptr;
 
-  sp->mousepos.x = event->x;
-  sp->mousepos.y = event->y;
+  sp->mousepos.x = (gint) event->x;
+  sp->mousepos.y = (gint) event->y;
 
   sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
                                       "motion_notify_event",
@@ -260,8 +260,8 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
   gboolean retval = true;
 
-  sp->mousepos.x = event->x;
-  sp->mousepos.y = event->y;
+  sp->mousepos.x = (gint) event->x;
+  sp->mousepos.y = (gint) event->y;
 
   gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
 

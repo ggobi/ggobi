@@ -9,6 +9,7 @@
 #include "externs.h"
 
 #include "writedata.h"
+#include "write_xml.h"
 
 #define READ_FILESET   0
 #define EXTEND_FILESET 1
@@ -83,11 +84,11 @@ filename_get_configure (GtkWidget *fs, guint type, ggobid *gg) {
     
   gtk_signal_connect_object (GTK_OBJECT (GTK_FILE_SELECTION (fs)->ok_button),
                              "clicked", GTK_SIGNAL_FUNC (gtk_widget_destroy),
-                             (gpointer) fs);
+                             (GtkObject*) fs);
 
   gtk_signal_connect_object (GTK_OBJECT (GTK_FILE_SELECTION(fs)->cancel_button),
-                             "clicked", GTK_SIGNAL_FUNC (gtk_widget_destroy),
-                             (gpointer) fs);
+                             "clicked", (GtkSignalFunc) GTK_SIGNAL_FUNC (gtk_widget_destroy),
+                             (GtkObject*) fs);
 }
 
 /*--------------------------------------------------------------------------*/

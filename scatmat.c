@@ -14,9 +14,9 @@ static GtkAccelGroup *scatmat_accel_group;
 
 static GtkItemFactoryEntry menu_items[] = {
   { "/_FFile",         NULL,     NULL,     0,                    "<Branch>" },
-  { "/FFile/Print",    "",       display_print_cb, 0, "<Item>" },
+  { "/FFile/Print",    "",       (GtkItemFactoryCallback) display_print_cb, 0, "<Item>" },
   { "/FFile/sep",      NULL,     NULL,     0, "<Separator>" },
-  { "/FFile/Close",    "",       display_close_cb, 0, "<Item>" },
+  { "/FFile/Close",    "",       (GtkItemFactoryCallback) display_close_cb, 0, "<Item>" },
 };
 
 static void
@@ -128,7 +128,7 @@ scatmat_new (gboolean missing_p,
    * add the Display Options and Link menus another way
   */
   scatmat_display_menus_make (display, scatmat_accel_group,
-                               display_options_cb, mbar, gg);
+                               (GtkSignalFunc) display_options_cb, mbar, gg);
   gtk_box_pack_start (GTK_BOX (vbox), mbar, false, true, 0);
 
 /*
@@ -168,7 +168,8 @@ scatmat_new (gboolean missing_p,
       display->splots = g_list_append (display->splots, (gpointer) sp);
 
       gtk_table_attach (GTK_TABLE (display->table), sp->da, i, i+1, j, j+1,
-        GTK_SHRINK|GTK_FILL|GTK_EXPAND, GTK_SHRINK|GTK_FILL|GTK_EXPAND,
+        (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND), 
+        (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND),
         1, 1);
       gtk_widget_show (sp->da);
     }
@@ -433,7 +434,8 @@ scatmat_varsel (cpaneld *cpanel, splotd *sp,
 
           gtk_table_attach (GTK_TABLE (display->table),
             sp_new->da, col, col+1, k, k+1,
-            GTK_SHRINK|GTK_FILL|GTK_EXPAND, GTK_SHRINK|GTK_FILL|GTK_EXPAND,
+            (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND), 
+            (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND),
             1, 1);
           gtk_widget_show (sp_new->da);
 
@@ -463,7 +465,8 @@ scatmat_varsel (cpaneld *cpanel, splotd *sp,
 
           gtk_table_attach (GTK_TABLE (display->table),
             sp_new->da, k, k+1, row, row+1,
-            GTK_SHRINK|GTK_FILL|GTK_EXPAND, GTK_SHRINK|GTK_FILL|GTK_EXPAND,
+            (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND), 
+            (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND),
             1, 1);
           gtk_widget_show (sp_new->da);
 

@@ -86,7 +86,7 @@ smooth_window_open (ggobid *gg) {
     gtk_box_pack_start (GTK_BOX (vbox), opt, false, false, 0);
     populate_option_menu (opt, smoother_lbl,
                           sizeof (smoother_lbl) / sizeof (gchar *),
-                          smoother_cb, gg);
+                          (GtkSignalFunc) smoother_cb, gg);
 
 /*
  * vbox for label and rangewidget

@@ -173,7 +173,7 @@ jitter_window_open (ggobid *gg) {
       gtk_box_pack_start (GTK_BOX (vbox), opt, false, false, 0);
       populate_option_menu (opt, type_lbl,
                             sizeof (type_lbl) / sizeof (gchar *),
-                            type_cb, gg);
+                            (GtkSignalFunc) type_cb, gg);
 
       /*-- Jitter vgroups toggle --*/
       tgl = gtk_check_button_new_with_label ("Jitter vgroup");
@@ -188,8 +188,8 @@ jitter_window_open (ggobid *gg) {
       /*-- Close button --*/
       btn = gtk_button_new_with_label ("Close");
       gtk_signal_connect_object (GTK_OBJECT (btn), "clicked",
-                                 GTK_SIGNAL_FUNC (close_cb),
-                                 (gpointer) gg->jitter_ui.window);
+                                 (GtkSignalFunc) GTK_SIGNAL_FUNC (close_cb),
+                                 (GtkObject*) gg->jitter_ui.window);
       gtk_box_pack_start (GTK_BOX (vbox), btn, false, true, 2);
     }
 

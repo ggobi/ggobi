@@ -108,9 +108,9 @@ ruler_ranges_set (displayd *display, splotd *sp, ggobid *gg) {
 
 static GtkItemFactoryEntry menu_items[] = {
   { "/_FFile",         NULL,     NULL,             0,             "<Branch>" },
-  { "/FFile/Print",    "",       display_print_cb, 0, "<Item>" },
+  { "/FFile/Print",    "",       (GtkItemFactoryCallback)display_print_cb, 0, "<Item>" },
   { "/FFile/sep",      NULL,     NULL,             0, "<Separator>" },
-  { "/FFile/Close",    "",       display_close_cb, 0, "<Item>" },
+  { "/FFile/Close",    "",       (GtkItemFactoryCallback) display_close_cb, 0, "<Item>" },
 };
 
 static void
@@ -210,7 +210,7 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
    * add the Display Options and Link menus another way
   */
   scatterplot_display_menus_make (display, gg->app.sp_accel_group,
-    display_options_cb, mbar, gg);
+   (GtkSignalFunc) display_options_cb, mbar, gg);
   gtk_box_pack_start (GTK_BOX (vbox), mbar, false, true, 0);
 
 
@@ -234,8 +234,8 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
   gtk_box_pack_start (GTK_BOX (vbox), table, true, true, 0);
   gtk_table_attach (GTK_TABLE (table),
                     sp->da, 1, 2, 0, 1,
-                    GTK_SHRINK|GTK_EXPAND|GTK_FILL,
-                    GTK_SHRINK|GTK_EXPAND|GTK_FILL,
+                    (GtkAttachOptions) (GTK_SHRINK|GTK_EXPAND|GTK_FILL),
+                    (GtkAttachOptions) (GTK_SHRINK|GTK_EXPAND|GTK_FILL),
                     0, 0 );
 
 
@@ -251,7 +251,8 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
 
   gtk_table_attach (GTK_TABLE (table),
                     display->hrule, 1, 2, 1, 2,
-                    GTK_EXPAND|GTK_SHRINK|GTK_FILL, GTK_FILL,
+                    (GtkAttachOptions) (GTK_EXPAND|GTK_SHRINK|GTK_FILL), 
+                    (GtkAttachOptions) GTK_FILL,
                     0, 0);
 
   /*
@@ -268,7 +269,8 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
 
   gtk_table_attach (GTK_TABLE (table),
                     display->vrule, 0, 1, 0, 1,
-                    GTK_FILL, GTK_EXPAND|GTK_SHRINK|GTK_FILL,
+                    (GtkAttachOptions) GTK_FILL, 
+                    (GtkAttachOptions) (GTK_EXPAND|GTK_SHRINK|GTK_FILL),
                     0, 0 );
 
   gtk_widget_show (sp->da);

@@ -128,7 +128,7 @@ cpanel_tour2d_make (ggobid *gg) {
   gtk_box_pack_end (GTK_BOX (vb), manip_opt, false, false, 0);
   populate_option_menu (manip_opt, manip_lbl,
                         sizeof (manip_lbl) / sizeof (gchar *),
-                        manip_cb, gg);
+                        (GtkSignalFunc) manip_cb, gg);
 
 /*
  * PC Axes toggle
@@ -307,7 +307,7 @@ static void tour2dadv_window_open (ggobid *gg) {
     gtk_box_pack_end (GTK_BOX (hb), pathlen_opt, false, false, 0);
     populate_option_menu (pathlen_opt, pathlen_lbl,
                           sizeof (pathlen_lbl) / sizeof (gchar *),
-                          pathlen_cb, gg);
+                          (GtkSignalFunc) pathlen_cb, gg);
 
     /*-- interpolation option menu inside hbox --*/
     hb = gtk_hbox_new (false, 0);
@@ -322,7 +322,7 @@ static void tour2dadv_window_open (ggobid *gg) {
     gtk_box_pack_end (GTK_BOX (hb), opt, false, false, 0);
     populate_option_menu (opt, interp_lbl,
                           sizeof (interp_lbl) / sizeof (gchar *),
-                          interp_cb, gg);
+                          (GtkSignalFunc) interp_cb, gg);
 
 /*-- tour history functions: vbox to be placed in the notebook page --*/
     vb = gtk_vbox_new (true, 0);
@@ -439,7 +439,7 @@ static void tour2dadv_window_open (ggobid *gg) {
     /*-- Close button --*/
     btn = gtk_button_new_with_label ("Close");
     gtk_signal_connect_object (GTK_OBJECT (btn), "clicked",
-                   GTK_SIGNAL_FUNC (hide_cb), (gpointer) window);
+                   (GtkSignalFunc) GTK_SIGNAL_FUNC (hide_cb), (GtkObject*) window);
     gtk_box_pack_start (GTK_BOX (vbox), btn, false, true, 2);
   }
 
@@ -475,8 +475,8 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   gg->current_splot = sp;
   gg->current_display = (displayd *) sp->displayptr;
 
-  sp->mousepos.x = event->x;
-  sp->mousepos.y = event->y;
+  sp->mousepos.x = (gint) event->x;
+  sp->mousepos.y = (gint) event->y;
 
   sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
                                       "motion_notify_event",
@@ -490,8 +490,8 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
   gboolean retval = true;
 
-  sp->mousepos.x = event->x;
-  sp->mousepos.y = event->y;
+  sp->mousepos.x = (gint) event->x;
+  sp->mousepos.y = (gint) event->y;
 
   gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
 

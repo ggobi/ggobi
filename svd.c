@@ -20,6 +20,15 @@
 
 #define SIGN(a, b) ((b) >= 0.0 ? fabs(a) : -fabs(a))
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+gint dsvd (gfloat **a, gint m, gint n, gfloat *w, gfloat **v);
+#ifdef __cplusplus
+}
+#endif
+
 static gdouble PYTHAG (gdouble a, gdouble b)
 {
   gdouble at = fabs(a), bt = fabs(b), ct, result;

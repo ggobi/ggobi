@@ -424,7 +424,7 @@ point_glyphs_read (gchar *ldata_in, gboolean reinit, datad *d, ggobid *gg)
   {
     enum { typeAndSize, glyphNumber } glyph_format;
     gint c, retval, gsize;
-    gchar *gtype = g_malloc (16 * sizeof (gchar));
+    gchar *gtype = (gchar *) g_malloc (16 * sizeof (gchar));
 
     /*
      * For the first row, find out if we're going to be reading
@@ -515,7 +515,7 @@ mapGlyphName (const gchar *gtype)
   type = UNKNOWN_GLYPH;
   for (i = 0; i < sizeof (GlyphNames)/sizeof (GlyphNames[0]) - 1; i++) {
     if (strcmp(gtype, GlyphNames[i]) == 0) {
-     type = i+1;
+     type = (GlyphType) (i+1);
      break;
     }
   }
@@ -640,7 +640,7 @@ edges_read (gchar *rootname, gboolean startup, datad *d, ggobid *gg)
 /*    edges_create (gg);*/  /*-- or maybe not --*/
     return (ok);
   } else {
-    fname = g_malloc (128 * sizeof (gchar));
+    fname = (gchar*) g_malloc (128 * sizeof (gchar));
     /* This is for the in-process case */
     if (rootname == (gchar *) NULL)
       strcpy (fname, gg->filename);

@@ -459,7 +459,7 @@ const gchar **const
 GGOBI(getGlyphTypeNames)(gint *n)
 {
   *n = UNKNOWN_GLYPH-1; /* -1 since we start at 1 */
-  return (GlyphNames);
+  return ((const gchar **const) GlyphNames);
 }
 
 
@@ -987,7 +987,7 @@ GGOBI(addVariable)(gdouble *vals, gint num, gchar *name, gboolean update,
     gint i;
     gchar ** rnames = (gchar **)g_malloc(sizeof(gchar*) * num);
     for(i = 0; i < num; i++) {
-      rnames[i] = g_malloc (sizeof (gchar)*7);
+      rnames[i] = (gchar *) g_malloc (sizeof (gchar)*7);
       sprintf(rnames[i],"%d",i+1);
     }
     GGOBI(setData)(vals, rnames, &name, num, 1, d, gg);
@@ -1153,7 +1153,7 @@ GGOBI(raiseWindow)(int which, gboolean raiseOrIcon, gboolean up, ggobid *gg)
   }
 
      for(i = start; i < end; i++) {
-      display = g_list_nth_data(gg->displays, i);
+      display = (displayd *) g_list_nth_data(gg->displays, i);
       if(raiseOrIcon) {
         if(up) 
           gdk_window_raise(display->window->window); 

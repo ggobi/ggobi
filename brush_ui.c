@@ -174,7 +174,7 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 
   GGobi_widget_set(sp->da, gg, true);
 
-  brush_set_pos (event->x, event->y, gg);
+  brush_set_pos ((gint) event->x, (gint) event->y, gg);
 
   brush_motion (&sp->mousepos, button1_p, button2_p, cpanel, gg);
 
@@ -186,8 +186,8 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
   gboolean retval = true;
 
-  sp->mousepos.x = event->x;
-  sp->mousepos.y = event->y;
+  sp->mousepos.x = (gint) event->x;
+  sp->mousepos.y = (gint) event->y;
 
   gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
 
@@ -348,7 +348,7 @@ cpanel_brush_make (ggobid *gg) {
                       gg->brush.scope_opt, false, false, 0);
   populate_option_menu (gg->brush.scope_opt, scope_lbl,
                         sizeof (scope_lbl) / sizeof (gchar *),
-                        brush_scope_set_cb, gg);
+                        (GtkSignalFunc) brush_scope_set_cb, gg);
   /*-- initial value: points only --*/
   gtk_option_menu_set_history (GTK_OPTION_MENU (gg->brush.scope_opt), 0); 
   
@@ -362,7 +362,7 @@ cpanel_brush_make (ggobid *gg) {
                       gg->brush.cg_opt, false, false, 0);
   populate_option_menu (gg->brush.cg_opt, cg_lbl,
                         sizeof (cg_lbl) / sizeof (gchar *),
-                        brush_cg_cb, gg);
+                        (GtkSignalFunc) brush_cg_cb, gg);
   /*-- initial value: both --*/
   gtk_option_menu_set_history (GTK_OPTION_MENU (gg->brush.cg_opt), 0);
 
@@ -376,7 +376,7 @@ cpanel_brush_make (ggobid *gg) {
                       gg->brush.mode_opt, false, false, 0);
   populate_option_menu (gg->brush.mode_opt, mode_lbl,
                         sizeof (mode_lbl) / sizeof (gchar *),
-                        brush_mode_cb, gg);
+                        (GtkSignalFunc) brush_mode_cb, gg);
   /* initialize transient */
   gtk_option_menu_set_history (GTK_OPTION_MENU (gg->brush.mode_opt), 1);
 

@@ -39,7 +39,16 @@
 #include <gtk/gtk.h>
 #include "gtkexthruler.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern gdouble myrint (gdouble);
+
+#ifdef __cplusplus
+}
+#endif
+
 
 #define RULER_HEIGHT          14
 #define MINIMUM_INCR          5
@@ -163,7 +172,7 @@ gtk_ext_hruler_draw_ticks (GtkExtRuler *ruler)
     height = widget->allocation.height - ythickness * 2;
    
     gtk_paint_box (widget->style, ruler->backing_store,
-		   widget->state, GTK_SHADOW_OUT, 
+		   (GtkStateType) widget->state, GTK_SHADOW_OUT, 
 		   NULL, widget, "hruler",
 		   0, 0, 
 		   widget->allocation.width, widget->allocation.height);
@@ -194,7 +203,7 @@ gtk_ext_hruler_draw_ticks (GtkExtRuler *ruler)
     {
     case GTK_EXT_RULER_LINEAR:
 	for(x=x0,rx=rx0,rxl=rx0; x<xf; x+=div,rx+=rdiv) {
-	    wx = myrint(x);
+	    wx = (gint) myrint(x);
 	    length = 10;
 	    if(wx>=0) {
 		if(facing_down) {
@@ -226,7 +235,7 @@ gtk_ext_hruler_draw_ticks (GtkExtRuler *ruler)
 				 unit_str);
 	    for(subx=x; subx<x+div; subx+=subdiv) {
 		length=5;
-		wx = myrint(subx);
+		wx = (gint) myrint(subx);
 		if(wx>=0) {
 		    if(facing_down) {
 			gdk_draw_line (ruler->backing_store, gc,
@@ -260,7 +269,7 @@ gtk_ext_hruler_draw_ticks (GtkExtRuler *ruler)
 	if(div<10) break; 
 
 	for(x=x0,rx=rx0; x<xf; x+=div,rx++) {
-	    wx = myrint(x);
+	    wx = (gint) myrint(x);
 	    length = 10;
 	    if(wx>=0) {
 		if(facing_down) {
@@ -292,7 +301,7 @@ gtk_ext_hruler_draw_ticks (GtkExtRuler *ruler)
 		if(x1>xf) break;
 		if(x1>=0) {
 		    length = 3;
-		    wx = myrint(x1);
+		    wx = (gint) myrint(x1);
 		    if(facing_down)
 			gdk_draw_line (ruler->backing_store, gc,
 				       wx, height + ythickness, 
@@ -396,9 +405,9 @@ static gint gtk_ext_hruler_drag_start(GtkWidget *widget, GdkEventButton *event)
     ruler->lower1 = ruler->lower;
     ruler->upper1 = ruler->upper;
     if(!forwarded) {
-	gdk_pointer_grab(widget->window,FALSE,
-			 GDK_POINTER_MOTION_MASK|GDK_BUTTON_RELEASE_MASK,
-			 NULL,NULL,event->time);
+	gdk_pointer_grab(widget->window, FALSE,
+			 (GdkEventMask) (GDK_POINTER_MOTION_MASK|GDK_BUTTON_RELEASE_MASK),
+			 NULL, NULL, event->time);
 	if(ruler->sync_flags&GTK_EXT_RULER_SYNC_ABSOLUTE && ruler->sync_ruler)
 	    gtk_ext_ruler_set_range(GTK_EXT_RULER (ruler->sync_ruler),ruler->lower,ruler->upper);
 	if(ruler->sync_flags&GTK_EXT_RULER_SYNC_DRAG && ruler->sync_ruler) {
@@ -456,7 +465,7 @@ gtk_ext_hruler_motion_notify (GtkWidget      *widget,
     if (event->is_hint) 
 	gdk_window_get_pointer (widget->window, &x, NULL, NULL);
     else
-	x = event->x;
+	x = (gint) event->x;
 
     ruler->position = ruler->lower + ((ruler->upper - ruler->lower) * x) / 
 	widget->allocation.width;

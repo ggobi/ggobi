@@ -25,7 +25,7 @@ optimize_cb (GtkToggleButton  *w) {
 static GtkItemFactoryEntry menu_items[] = {
   { "/_File",         NULL,         NULL, 0, "<Branch>" },
   { "/File/Close",  
-         "",         hide_cb,        0, "<Item>" },
+         "",         (GtkItemFactoryCallback) hide_cb,        0, "<Item>" },
 };
 
 void

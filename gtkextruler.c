@@ -48,7 +48,17 @@ static gint gtk_ext_ruler_expose        (GtkWidget      *widget,
 					 GdkEventExpose *event);
 static void gtk_ext_ruler_make_pixmap   (GtkExtRuler       *ruler);
 
-extern gdouble myrint (gdouble);
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+extern gdouble myrint(gdouble);
+
+#ifdef __cplusplus
+}
+#endif
+
 
 static GtkWidgetClass *parent_class;
 enum { RANGE_CHANGED , LAST_SIGNAL };    
@@ -115,7 +125,7 @@ gtk_ext_ruler_class_init(GtkExtRulerClass *klass)
     object_class = (GtkObjectClass*) klass;
     widget_class = (GtkWidgetClass*) klass;
     
-    parent_class = gtk_type_class (gtk_widget_get_type ());
+    parent_class = (GtkWidgetClass *) gtk_type_class (gtk_widget_get_type ());
     
     widget_class->realize = gtk_ext_ruler_realize;
     widget_class->unrealize = gtk_ext_ruler_unrealize;
@@ -133,7 +143,7 @@ gtk_ext_ruler_class_init(GtkExtRulerClass *klass)
     
     ext_ruler_signals[RANGE_CHANGED] = 
 	gtk_signal_new( "range_changed",
-			GTK_RUN_ACTION|GTK_RUN_NO_RECURSE,
+			(GtkSignalRunType) (GTK_RUN_ACTION|GTK_RUN_NO_RECURSE),
 			object_class->type,
 			GTK_SIGNAL_OFFSET (GtkExtRulerClass,range_changed),
 			gtk_marshal_NONE__NONE,
@@ -423,7 +433,7 @@ gtk_ext_ruler_calc_scale (GtkExtRuler *ruler, gchar direction)
 	    text_width2 = strlen (unit_str) * digit_height + 1;
 	    text_width = MAX(text_width1,text_width2);
 	    if(n > 1) 
-               ndiv = myrint(size / text_width);
+               ndiv = (gint) myrint(size / text_width);
 	}
 	wsubdiv = subdiv/dx*size; 
       

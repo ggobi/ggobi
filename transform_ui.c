@@ -139,7 +139,7 @@ transform_window_open (ggobid *gg)
       NULL);
     populate_option_menu (gg->tform_ui.stage0_opt, stage0_lbl,
                           sizeof (stage0_lbl) / sizeof (gchar *),
-                          stage0_cb, gg);
+                          (GtkSignalFunc) stage0_cb, gg);
     gtk_container_add (GTK_CONTAINER (frame), gg->tform_ui.stage0_opt);
 
     /*
@@ -159,7 +159,7 @@ transform_window_open (ggobid *gg)
       NULL);
     populate_option_menu (gg->tform_ui.stage1_opt, stage1_lbl,
                           sizeof (stage1_lbl) / sizeof (gchar *),
-                          stage1_cb, gg);
+                          (GtkSignalFunc) stage1_cb, gg);
     gtk_box_pack_start (GTK_BOX (vb), gg->tform_ui.stage1_opt, true, false, 1);
 
     hb = gtk_vbox_new (false, 2);  /*-- changed from hbox to vbox --*/
@@ -195,7 +195,7 @@ transform_window_open (ggobid *gg)
       "Stage 3: Permutation, sorting, and sphering", NULL);
     populate_option_menu (gg->tform_ui.stage2_opt, stage2_lbl,
                           sizeof (stage2_lbl) / sizeof (gchar *),
-                          stage2_cb, gg);
+                          (GtkSignalFunc) stage2_cb, gg);
     gtk_container_add (GTK_CONTAINER (frame), gg->tform_ui.stage2_opt);
 
     /*

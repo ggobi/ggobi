@@ -328,7 +328,7 @@ splot_new (displayd *display, gint width, gint height, ggobid *gg) {
 
   splot_alloc (sp, display, gg);
 
-  sp->displayptr = (gpointer) display;
+  sp->displayptr = display;
   sp->pixmap0 = NULL;
   sp->pixmap1 = NULL;
 

@@ -88,7 +88,7 @@ cpanel_parcoords_make (ggobid *gg) {
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
   populate_option_menu (opt, arrangement_lbl,
                         sizeof (arrangement_lbl) / sizeof (gchar *),
-                        arrangement_cb, gg);
+                        (GtkSignalFunc) arrangement_cb, gg);
 /*
  * option menu: selection mode
 */
@@ -106,7 +106,7 @@ cpanel_parcoords_make (ggobid *gg) {
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
   populate_option_menu (opt, selection_mode_lbl,
                         sizeof (selection_mode_lbl) / sizeof (gchar *),
-                        selection_mode_cb, gg);
+                        (GtkSignalFunc) selection_mode_cb, gg);
 
 /*
  * option menu
@@ -124,7 +124,7 @@ cpanel_parcoords_make (ggobid *gg) {
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
   populate_option_menu (opt, type_lbl,
                         sizeof (type_lbl) / sizeof (gchar *),
-                        type_cb, gg);
+                        (GtkSignalFunc) type_cb, gg);
   /*-- this should be set to the value of cpanel->p1d_type --*/
   gtk_option_menu_set_history (GTK_OPTION_MENU (opt), DOTPLOT);
 
@@ -170,7 +170,7 @@ cpanel_parcoords_make (ggobid *gg) {
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
   populate_option_menu (opt, showcases_lbl,
                         sizeof (showcases_lbl) / sizeof (gchar *),
-                        showcases_cb, gg);
+                        (GtkSignalFunc) showcases_cb, gg);
 
 /*
  * Variable scales
@@ -190,7 +190,7 @@ cpanel_parcoords_make (ggobid *gg) {
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
   populate_option_menu (opt, varscale_lbl,
                         sizeof (varscale_lbl) / sizeof (gchar *),
-                        varscale_cb, gg);
+                        (GtkSignalFunc) varscale_cb, gg);
 
   gtk_widget_show_all (gg->control_panel[PCPLOT]);
 }

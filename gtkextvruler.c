@@ -40,7 +40,18 @@
 #include <gtk/gtk.h>
 #include "gtkextvruler.h"
 
-extern gdouble myrint (gdouble);
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+extern gdouble myrint (gdouble); 
+
+#ifdef __cplusplus
+}
+#endif
+
+
 
 #define RULER_WIDTH           14
 #define MINIMUM_INCR          5
@@ -141,7 +152,7 @@ gtk_ext_vruler_motion_notify (GtkWidget      *widget,
     if (event->is_hint)
 	gdk_window_get_pointer (widget->window, NULL, &y, NULL);
     else
-	y = event->y;
+	y = (gint) event->y;
 
     ruler->position = ruler->lower + ((ruler->upper - ruler->lower) * y) / widget->allocation.height;
 
@@ -197,7 +208,7 @@ gtk_ext_vruler_draw_ticks (GtkExtRuler *ruler)
     height = widget->allocation.width - ythickness * 2;
 
     gtk_paint_box (widget->style, ruler->backing_store,
-		   widget->state, GTK_SHADOW_OUT, 
+		   (GtkStateType) widget->state, GTK_SHADOW_OUT, 
 		   NULL, widget, "vruler",
 		   0, 0, 
 		   widget->allocation.width, widget->allocation.height);
@@ -224,7 +235,7 @@ gtk_ext_vruler_draw_ticks (GtkExtRuler *ruler)
     {
     case GTK_EXT_RULER_LINEAR:
 	for(y=y0,ry=ry0,ryl=ry0; y<yf; y+=div,ry+=rdiv) {
-	    wy = width - myrint(y);
+	    wy = width - (gint) myrint(y);
 	    length = 10;
 	    gdk_draw_line (ruler->backing_store, gc,
 			   height + xthickness - length, wy,
@@ -251,7 +262,7 @@ gtk_ext_vruler_draw_ticks (GtkExtRuler *ruler)
 	    for(suby=y; suby<y+div; suby+=subdiv) 
 	    {
 		length=5;
-		wy = width - myrint(suby);
+		wy = width - (gint) myrint(suby);
 		gdk_draw_line (ruler->backing_store, gc,
 			       height + xthickness - length, wy,
 			       height + xthickness, wy);
@@ -270,7 +281,7 @@ gtk_ext_vruler_draw_ticks (GtkExtRuler *ruler)
 	if(div<10) break; 
 	
 	for(y=y0,ry=ry0; y<yf; y+=div,ry++) {
-	    wy = width - myrint(y);
+	    wy = width - (gint) myrint(y);
 	    length = 10;
 	    gdk_draw_line (ruler->backing_store, gc,
 			   height + xthickness - length, wy,
@@ -295,7 +306,7 @@ gtk_ext_vruler_draw_ticks (GtkExtRuler *ruler)
 		if(y1>yf) break;
 		if(y1>=0) {
 		    length = 3;
-		    wy = width - myrint(y1);
+		    wy = width - (gint) myrint(y1);
 		    gdk_draw_line (ruler->backing_store, gc,
 				   height + xthickness - length, wy,
 				   height + xthickness, wy);	    
@@ -381,7 +392,7 @@ static gint gtk_ext_vruler_drag_start(GtkWidget *widget, GdkEventButton *event)
     ruler->lower1 = ruler->lower;
     ruler->upper1 = ruler->upper;
     gdk_pointer_grab(widget->window,FALSE,
-		     GDK_POINTER_MOTION_MASK|GDK_BUTTON_RELEASE_MASK,
+		     (GdkEventMask) (GDK_POINTER_MOTION_MASK|GDK_BUTTON_RELEASE_MASK),
 		     NULL,NULL,event->time);
     return FALSE;
 }

@@ -64,7 +64,7 @@ cpanel_p1dplot_make (ggobid *gg) {
                       gg->ash.type_opt, false, false, 0);
   populate_option_menu (gg->ash.type_opt, type_lbl,
                         sizeof (type_lbl) / sizeof (gchar *),
-                        type_cb, gg);
+                        (GtkSignalFunc) type_cb, gg);
 /*
  * ASH smoothness
 */
