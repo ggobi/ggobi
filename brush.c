@@ -262,23 +262,28 @@ update_glyph_arrays (gint i, gboolean changed) {
     if (xg.under_new_brush[i]) {
       switch (cpanel->br_mode) {
         case BR_UNDO:
-          changed = changed || (xg.glyph_now[i].type != xg.glyph_prev[i].type);
           changed = changed || (xg.glyph_now[i].size != xg.glyph_prev[i].size);
+          if (cpanel->br_cg != BR_GSIZE)  /*-- ... if not ignoring type --*/
+            changed = changed ||
+                      (xg.glyph_now[i].type != xg.glyph_prev[i].type);
           break;
 
         case BR_PERSISTENT:
-          changed = changed || (xg.glyph_now[i].type != xg.glyph_id.type);
           changed = changed || (xg.glyph_now[i].size != xg.glyph_id.size);
+          if (cpanel->br_cg != BR_GSIZE)  /*-- ... if not ignoring type --*/
+            changed = changed || (xg.glyph_now[i].type != xg.glyph_id.type);
           break;
 
         case BR_TRANSIENT:
-          changed = changed || (xg.glyph_now[i].type != xg.glyph_id.type);
           changed = changed || (xg.glyph_now[i].size != xg.glyph_id.size);
+          if (cpanel->br_cg != BR_GSIZE)  /*-- ... if not ignoring type --*/
+            changed = changed || (xg.glyph_now[i].type != xg.glyph_id.type);
           break;
       }
     } else {
-      changed = changed || (xg.glyph_now[i].type != xg.glyph_ids[i].type);
       changed = changed || (xg.glyph_now[i].size != xg.glyph_ids[i].size);
+      if (cpanel->br_cg != BR_GSIZE)  /*-- ... if not ignoring type --*/
+        changed = changed || (xg.glyph_now[i].type != xg.glyph_ids[i].type);
     }
 
     doit = changed;
@@ -289,23 +294,27 @@ update_glyph_arrays (gint i, gboolean changed) {
     if (xg.under_new_brush[i]) {
       switch (cpanel->br_mode) {
         case BR_UNDO:
-          xg.glyph_ids[i].type = xg.glyph_now[i].type = xg.glyph_prev[i].type;
           xg.glyph_ids[i].size = xg.glyph_now[i].size = xg.glyph_prev[i].size;
+          if (cpanel->br_cg != BR_GSIZE)  /*-- ... if not ignoring type --*/
+            xg.glyph_ids[i].type = xg.glyph_now[i].type = xg.glyph_prev[i].type;
           break;
 
         case BR_PERSISTENT:
-          xg.glyph_ids[i].type = xg.glyph_now[i].type = xg.glyph_id.type;
           xg.glyph_ids[i].size = xg.glyph_now[i].size = xg.glyph_id.size;
+          if (cpanel->br_cg != BR_GSIZE)  /*-- ... if not ignoring type --*/
+            xg.glyph_ids[i].type = xg.glyph_now[i].type = xg.glyph_id.type;
           break;
 
         case BR_TRANSIENT:
-          xg.glyph_now[i].type = xg.glyph_id.type;
           xg.glyph_now[i].size = xg.glyph_id.size;
+          if (cpanel->br_cg != BR_GSIZE)  /*-- ... if not ignoring type --*/
+            xg.glyph_now[i].type = xg.glyph_id.type;
           break;
       }
     } else {
-      xg.glyph_now[i].type = xg.glyph_ids[i].type;
       xg.glyph_now[i].size = xg.glyph_ids[i].size;
+      if (cpanel->br_cg != BR_GSIZE)  /*-- ... if not ignoring type --*/
+        xg.glyph_now[i].type = xg.glyph_ids[i].type;
     }
   }
 
@@ -534,8 +543,11 @@ active_paint_points ()
     if (cpanel->br_cg == BR_COLOR || cpanel->br_cg == BR_CANDG)
       changed = build_color_vectors () || changed;
 
-    if (cpanel->br_cg == BR_GLYPH || cpanel->br_cg == BR_CANDG)
+    if (cpanel->br_cg == BR_GLYPH || cpanel->br_cg == BR_GSIZE ||
+        cpanel->br_cg == BR_CANDG)
+    {
       changed = build_glyph_vectors () || changed;
+    }
   }
 
   return (changed);

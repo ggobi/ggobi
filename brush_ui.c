@@ -30,7 +30,7 @@ static void brush_scope_cb (GtkWidget *w, gpointer cbd)
 }
 
 static gchar *cg_lbl[] =
-  {"Color and glyph", "Color only", "Glyph only"};
+  {"Color and glyph", "Color only", "Glyph only", "Glyph size only"};
 static void brush_cg_cb (GtkWidget *w, gpointer cbd)
 {
   cpaneld *cpanel = &current_display->cpanel;

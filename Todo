@@ -10,21 +10,10 @@ Scaling:
   take advantage of the cleverness of the axes:  l to shift, m/r to scale
   couple that with a thumbnail that sits just below the scaling controls
 
-Brushing:
-  for dealing with weighted data, handle the case where the users
-  either 
-    (1) supply input data with a wider range of sizes, or
-    (2) set the glyph sizes from outside (eg, R) to a wider
-        range of sizes
 
-  further, add to the list of
-    color and glyph
-    color only
-    glyph only
-    glyph size only
+! add "size only" to the list of color and glyph, color only, etc.
 
-Rename gtour_ui.c to tour2d_ui.c
-
+! Rename gtour_ui.c to tour2d_ui.c
 
 ! Use a notebook for the advanced tour panel
 

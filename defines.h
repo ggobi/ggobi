@@ -101,7 +101,8 @@ enum displaytyped {scatterplot, scatmat, parcoords};
 /* br_cg */
 #define BR_CANDG 0  /* color and glyph */
 #define BR_COLOR 1
-#define BR_GLYPH 2
+#define BR_GLYPH 2  /*-- glyph type and size --*/
+#define BR_GSIZE 3  /*-- glyph size only --*/
 /* for binning the screen */
 #define BRUSH_NBINS  20
 #define BRUSH_MARGIN 10
