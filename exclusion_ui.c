@@ -493,7 +493,7 @@ static void
 exclusion_notebook_adddata_cb (ggobid *gg, datad * d, void* notebook)
 {
   cluster_window_open (gg);
-  return true;  /* risky -- will this prevent other guys from getting it?  --*/
+  return;  /* Should this return a boolean? */
 }
 
 CHECK_EVENT_SIGNATURE(exclusion_notebook_adddata_cb, datad_added_f)

@@ -187,7 +187,7 @@ display_datad_added_cb (ggobid *gg, datad *d, void *win)
   /*-- this is all true even when the display is first opened --*/
   if (display->window && GTK_WIDGET_REALIZED (display->window)) {
       scatterplot_display_edge_menu_update (GTK_GGOBI_DISPLAY(display),
-        gg->app.sp_accel_group, display_options_cb, gg);
+        gg->app.sp_accel_group, GTK_SIGNAL_FUNC(display_options_cb), gg);
   }
 }
 
@@ -228,7 +228,7 @@ GGOBI(edge_menus_update)(ggobid *gg)
         GTK_IS_GGOBI_SCATTERPLOT_DISPLAY(display))
     {
       scatterplot_display_edge_menu_update (GTK_GGOBI_DISPLAY(display),
-        gg->app.sp_accel_group, display_options_cb, gg);
+        gg->app.sp_accel_group, GTK_SIGNAL_FUNC(display_options_cb), gg);
     }
   }
 }

@@ -229,12 +229,13 @@ createInputFileSelectionDialog(gchar *title, ggobid *gg, GtkWidget **ocombo)
 
        i = (gint *) g_malloc(sizeof(gint));
 /*XXX Need to free this when we destroy the fileselection widget */
-       gtk_signal_connect(GTK_OBJECT(fs), "destroy", free_gdata, i);
+       gtk_signal_connect(GTK_OBJECT(fs), "destroy", 
+         GTK_SIGNAL_FUNC(free_gdata), i);
 
        *i = -1;
        gtk_object_set_data(GTK_OBJECT(fs), ".selectedElement", i);
        gtk_signal_connect(GTK_OBJECT(GTK_COMBO(combo)->list), "select-child",
-			   filename_mode_selection_cb, fs);
+         GTK_SIGNAL_FUNC(filename_mode_selection_cb), fs);
 
 
 

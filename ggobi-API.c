@@ -204,7 +204,7 @@ static const gchar * const DefaultRowNames = NULL;
 const gchar ** const
 getDefaultRowNamesPtr()
 {
-  return(&DefaultRowNames);
+  return((const gchar ** const) &DefaultRowNames);
 }
 
 void
@@ -213,7 +213,7 @@ setRowNames(datad *d, gchar **rownames)
     int i;
     gchar *lbl;
     for (i = 0; i < d->nrows ; i++) {
-        lbl = (rownames != &DefaultRowNames && rownames != (gchar **) NULL && rownames[i] != (gchar *) NULL) ?
+        lbl = (rownames != (gchar **) &DefaultRowNames && rownames != (gchar **) NULL && rownames[i] != (gchar *) NULL) ?
           g_strdup (rownames[i]) : g_strdup_printf ("%d", i+1);
         g_array_append_val (d->rowlab, lbl);
     }
@@ -1221,7 +1221,7 @@ addVariableInternal(gdouble *vals, gint num, gchar *name,
 		    gboolean update, datad *d, ggobid *gg)
 {
   if (d->ncols < 1) {
-    gchar ** rnames = &DefaultRowNames; 
+    gchar ** rnames = (gchar **) &DefaultRowNames; 
     /* May want the final false here to be true as it causes the 
        creation of a plot. Probably not, but just mention it here
        so we don't forget.

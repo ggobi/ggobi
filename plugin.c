@@ -739,7 +739,7 @@ getInputPluginSelections(ggobid *gg)
        GGobiPluginInfo *plugin;
        int i, n, k;
 
-       els = g_list_append(els, DefaultUnknownInputModeName);
+       els = g_list_append(els, (gpointer)DefaultUnknownInputModeName);
        plugins = sessionOptions->info->inputPlugins;
        n = g_list_length(plugins);
        for(i = 0; i < n; i++) {

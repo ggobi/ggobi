@@ -38,19 +38,19 @@ getDBMSCommandLineArgs(DBMSLoginInfo *login)
     const char * tmp;
     tmp = getCommandLineArgValue("Host");
     if(tmp)
-	setDBMSLoginElement(HOST, tmp, login);
+	setDBMSLoginElement(HOST, (char *)tmp, login);
 
     tmp = getCommandLineArgValue("User");
     if(tmp)
-	setDBMSLoginElement(USER, tmp, login);
+	setDBMSLoginElement(USER, (char *)tmp, login);
 
     tmp = getCommandLineArgValue("Database");
     if(tmp)
-	setDBMSLoginElement(DATABASE, tmp, login);
+	setDBMSLoginElement(DATABASE, (char *)tmp, login);
 
     tmp = getCommandLineArgValue("DataQuery");
     if(tmp)
-	setDBMSLoginElement(DATA_QUERY, tmp, login);
+	setDBMSLoginElement(DATA_QUERY, (char *)tmp, login);
 
     return(login);
 }

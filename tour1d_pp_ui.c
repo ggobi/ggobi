@@ -292,7 +292,7 @@ tour1dpp_window_open (ggobid *gg) {
                         GTK_SIGNAL_FUNC (close_wmgr_cb), (gpointer) dsp);
     /*gtk_window_set_policy (GTK_WINDOW (dsp->t1d_window), true, true, false);*/
     gtk_signal_connect (GTK_OBJECT(d), "rows_in_plot_changed",
-      reset_pp, gg);
+      GTK_SIGNAL_FUNC(reset_pp), gg);
 
     gtk_container_set_border_width (GTK_CONTAINER (dsp->t1d_window), 10);
 
