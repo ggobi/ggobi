@@ -564,7 +564,7 @@ make_ui (ggobid *gg) {
 
   window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gg->app.main_window = window;
-  GGobi_widget_set(window, gg, true);
+  GGobi_widget_set (window, gg, true);
 
   gtk_window_set_policy (GTK_WINDOW (window), true, true, false);
 
@@ -701,15 +701,15 @@ GGobiFromDisplay(displayd *display)
 
 
 void
-GGobi_widget_set(GtkWidget *w, ggobid *gg, gboolean asIs)
+GGobi_widget_set (GtkWidget *w, ggobid *gg, gboolean asIs)
 {
- GtkObject *obj;
-  if(asIs)
-    obj = GTK_OBJECT(w);
+  GtkObject *obj;
+  if (asIs)
+    obj = GTK_OBJECT (w);
   else 
-    obj = GTK_OBJECT(gtk_widget_get_parent_window(w));
+    obj = GTK_OBJECT (gtk_widget_get_parent_window (w));
 
-  gtk_object_set_data(obj, GGobiGTKey, gg);
+  gtk_object_set_data (obj, GGobiGTKey, gg);
 }
 
 

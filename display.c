@@ -107,22 +107,19 @@ void
 display_print_cb (displayd *display, guint action, GtkWidget *w) {
 }
 
-/*
-  Called when a plot window is closed via the "Close"
-  menu item.
- */
+/*-- Called when a plot window is closed from the menu --*/
 void
 display_close_cb (displayd *display, guint action, GtkWidget *w) 
 {
-  ggobid *gg = GGobiFromDisplay(display);
-
+  ggobid *gg = GGobiFromDisplay (display);
   display_free (display, false, gg);
 }
 
+/*-- Called when a window is deleted from the window manager --*/
 void
 display_delete_cb (GtkWidget *w, GdkEvent *event, displayd *display) 
 {
-  ggobid *gg = GGobiFromWidget(w, true);
+  ggobid *gg = GGobiFromWidget (w, true);
   display_free (display, false, gg);
 }
 

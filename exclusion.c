@@ -14,7 +14,6 @@ cluster_free (gint k, ggobid *gg) {
   }
 }
 
-
 void
 clusters_set (ggobid *gg) {
   gint i, k, n, j;
@@ -24,8 +23,10 @@ clusters_set (ggobid *gg) {
   gint nglyphs_used, ncolors_used;
   gint nclust = 1;  /* There can never be 0 clusters */
 
-  /*-- this is the groups variable and should become part of ggobi.h --*/
-
+  /*
+   *  clusterid is the groups vector: an integer for each case,
+   *  indicating its cluster membership
+  */
   if (gg->clusterid.nels != gg->nrows) {
     vectori_realloc_zero (&gg->clusterid, gg->nrows);
   }
@@ -165,9 +166,7 @@ clusters_set (ggobid *gg) {
     }
   }
 
-  /*-- realloc to any free extra clusters that may have been allocated --*/
-  for (n=nclust; n<(ncolors_used * nglyphs_used); n++)
-    cluster_free (k, gg);
+  /*-- realloc to free any free extra clusters that may have been allocated --*/
   gg->clusv = (clusterd *) g_realloc ((gpointer) gg->clusv,
     nclust * sizeof (clusterd));
 }

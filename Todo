@@ -18,6 +18,8 @@ various stuff not yet implemented:
   brush_pos should be per-display.  when brushing or identifying in
   parcoords, use leave/enter events to change the current_splot.
 
+  exclusion:  rebuilding the table on the fly
+
 array and vector management
 
 color:  allow additional colormaps -- .cmap file
