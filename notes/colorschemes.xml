@@ -749,7 +749,8 @@
 <description>
  This scheme has 5 continuous shades, with the first one
  fading into the background, and 2 colors that can be
- used for highlighting.
+ used for highlighting.  (Yellow might not be a good
+ choice, and the darkest blue could be darker.  -- dfs)
 </description>
 <foreground>
   <color name="White">
@@ -767,8 +768,8 @@
   <color name="Dark blue">
     <red>0.408</red><green>0.447</green><blue>0.631</blue>
   </color>
-  <color name="Yellow">
-    <red>0.988</red><green>0.988</green><blue>0.000</blue>
+  <color name="Gold">
+    <red>1.000</red><green>0.900</green><blue>0.000</blue>
   </color>
   <color name="Red">
     <red>0.890</red><green>0.196</green><blue>0.122</blue>
