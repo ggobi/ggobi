@@ -359,10 +359,10 @@ addLevel(XMLParserData *data, const gchar *c, gint len)
 void
 resetRecordInfo(XMLParserData *data)
 {
-    if(data->recordString)
-	g_free(data->recordString);
-    data->recordString = NULL;
-    data->recordStringLength = 0;
+  if(data->recordString)
+    g_free(data->recordString);
+  data->recordString = NULL;
+  data->recordStringLength = 0;
 }
 
 void endXMLElement(void *user_data, const xmlChar *name)
@@ -372,9 +372,9 @@ void endXMLElement(void *user_data, const xmlChar *name)
 
   switch(type) {
     case RECORD:
-	setRecordValues(data, data->recordString, data->recordStringLength);
-	data->current_record++;
-        resetRecordInfo(data);
+      setRecordValues(data, data->recordString, data->recordStringLength);
+      data->current_record++;
+      resetRecordInfo(data);
     break;
     case VARIABLE:
     case REAL_VARIABLE:
@@ -481,7 +481,7 @@ Characters(void *user_data, const xmlChar *ch, gint len)
 
   switch(data->state) {
     case RECORD:
-	/* Now we call
+        /* Now we call
             setRecordValues (data, c, dlen); 
            after gathering the entire string for the record so that we
            don't get bizarre splits such as  "1.3 1.4 1"  followed by ".4..."
@@ -525,12 +525,14 @@ skipWhiteSpace(const xmlChar *ch, gint *len)
 void
 cumulateRecordData(XMLParserData *data, const xmlChar *ch, gint len)
 {
-    data->recordString = (xmlChar *) g_realloc(data->recordString, (len + data->recordStringLength + 1)* sizeof(xmlChar));
-    memcpy(data->recordString + data->recordStringLength, ch, len * sizeof(xmlChar));
-    data->recordStringLength += len;
-    data->recordString[data->recordStringLength] = '\0';
+  data->recordString = (xmlChar *) g_realloc(data->recordString,
+    (len + data->recordStringLength + 1) * sizeof(xmlChar));
+  memcpy(data->recordString + data->recordStringLength, ch,
+    len * sizeof(xmlChar));
+  data->recordStringLength += len;
+  data->recordString[data->recordStringLength] = '\0';
 
-    return;
+  return;
 }
 
 
@@ -762,7 +764,7 @@ setGlyph(const xmlChar **attrs, XMLParserData *data, gint i)
         value = atoi(next);
         if(i < 0) { 
           if(data->defaults.glyphSize < 0) 
-	        data->defaults.glyphSize = value;
+            data->defaults.glyphSize = value;
         } else
           d->glyph.els[i].size = d->glyph_now.els[i].size =
             d->glyph_prev.els[i].size = value;     
