@@ -39,7 +39,7 @@ p1d_spread_var (displayd *display, gfloat *yy, splotd *sp, ggobid *gg) {
       sp->p1d_lim.min = FORGETITAXIS_MIN ;
       sp->p1d_lim.max = FORGETITAXIS_MAX ;
 
-      textur (yy, sp->p1d_data, gg->nrows_in_plot, option, del, stages);
+      textur (yy, sp->p1d_data, gg->nrows_in_plot, option, del, stages, gg);
       break;
 
     case ASH:

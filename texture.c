@@ -182,7 +182,7 @@ textur (gfloat *yy, gfloat *shft, gint ny, gint option, gfloat del, gint stages,
  * gy is needed solely for the psort routine:  psort is used by
  * qsort to put an index vector in the order that yy will assume.
 */
-  gg->app.gy = (gfloat *) g_malloc (ny * sizeof (gfloat));
+   gg->app.gy = (gfloat *) g_malloc (ny * sizeof (gfloat));
   xx = (gfloat *) g_malloc (ny * sizeof (gfloat));
 
   for (i=0; i<ny; i++)
