@@ -545,7 +545,11 @@ getGGobiHomeFromRegistry()
 }
 #endif
 
-/*XXX Make certain there is a / at the end of the string. */
+
+/*
+ Computes where GGobi directory is located.
+ Ensures that there is a trailing / at the end.
+*/
 static gchar *
 computeGGobiHome(char *str)
 {
@@ -574,6 +578,7 @@ computeGGobiHome(char *str)
   if(tmp[strlen(tmp)-1] == G_DIR_SEPARATOR)
      dir = g_strdup(tmp);
   else {
+       /* Make certain there is a / at the end of the string. */
      dir = (char *) g_malloc( (strlen(tmp) + 2)*sizeof(char));
      sprintf(dir, "%s%c", tmp, G_DIR_SEPARATOR);
   }
