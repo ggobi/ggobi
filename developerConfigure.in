@@ -17,5 +17,8 @@ if test -e config.h ;  then
  rm config.h
 fi 
 
-mv Install/config.h .
+if test -e Install/config.h ; then
+  mv Install/config.h .
+fi
+
 AC_OUTPUT()
