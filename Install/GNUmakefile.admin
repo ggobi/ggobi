@@ -47,7 +47,7 @@ DOC_TEX_FILES=\
 
 DOC_EXTENSION=pdf
 
-DOC_FILES=$(DOC_TEX_FILES:%=Docs/%.$(DOC_EXTENSION)) Docs/ggobi.css Docs/EmbeddingFAQ.html Docs/plotLayout.html $(shell find notes -name '*.jpg') Docs/commandArgs.html
+DOC_FILES=$(DOC_TEX_FILES:%=Docs/%.$(DOC_EXTENSION)) Docs/ggobi.css Docs/EmbeddingFAQ.html Docs/plotLayout.html $(shell find notes -name '*.jpg') Docs/commandArgs.html ACKNOWLEDGEMENTS
 
 C_SRC_FILES=$(SRC) $(XML_SRC) ggobiMain.c xmlConvert.c
 
