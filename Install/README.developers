@@ -128,7 +128,7 @@ It's best to do this on some machine that has pdflatex and xml2.
   # Also, comment out in Install/GNUmakefile.admin any packages
   #  that you just can't figure out how to build.
 
-  make ADMIN=1 tar
+  make ADMIN=1 tar NO_XGOBI_GROUP=1
 
   # Point to the libxml source from xmlsoft.org
   make ADMIN=1 LIBXML_TAR_FILE=/usr/dfs/src/libxml2-2.4.16.tar.gz xmlTar
