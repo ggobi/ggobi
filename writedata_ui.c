@@ -50,7 +50,7 @@ static void jitterp_set_cb (GtkWidget *w, gpointer cbd)
 
 static gchar *rowdata_lbl[] = {"All cases",
                                "Displayed cases",
-                               "Labeled cases"};
+                               /*"Labeled cases"*/};
 void rowind_set (gint ind, ggobid *gg) { gg->save.row_ind = ind; }
 static void rowind_set_cb (GtkWidget *w, gpointer cbd)
 {
@@ -181,7 +181,8 @@ writeall_window_open (ggobid *gg) {
       "Specify which rows should be written out",
       NULL);
     populate_option_menu (opt, rowdata_lbl,
-      sizeof (rowdata_lbl) / sizeof (gchar *), (GtkSignalFunc) rowind_set_cb, gg);
+      sizeof (rowdata_lbl) / sizeof (gchar *),
+      (GtkSignalFunc) rowind_set_cb, gg);
     gtk_option_menu_set_history (GTK_OPTION_MENU (opt),
       ALLROWS);
 
