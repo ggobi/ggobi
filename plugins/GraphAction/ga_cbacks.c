@@ -389,6 +389,25 @@ void show_neighbors_sticky_cb (ggobid *gg, gint index, gint state,
   gint nd = g_slist_length (gg->d);
   gint i;
   endpointsd *endpoints;
+  /*datad *d = ga->d;*/
+  enum {GRAPH_VIEW, EDGE_DATA_VIEW} idview;
+  displayd *display = gg->current_display;
+
+  /* 
+     If I'm in the graph (map) view, display->d = ga->d
+     and display->e = ga->e.
+
+     If I'm in the scatterplot of the edge data (variogram cloud),
+     then display->d = ga->e.  Don't do anything with this one for
+     now.
+ */
+  if (display->d == ga->d) {
+    idview = GRAPH_VIEW;
+  } else if (display->d == ga->e) {
+    idview = EDGE_DATA_VIEW;
+  }
+  if (idview == EDGE_DATA_VIEW)
+/**/return;
 
   endpoints = resolveEdgePoints(e, d);
   if (endpoints == NULL) {
@@ -398,6 +417,7 @@ void show_neighbors_sticky_cb (ggobid *gg, gint index, gint state,
 
   if (index == -1)
     return;
+
 
 /*
  * This is now being executed in the same way whether 'index' is
