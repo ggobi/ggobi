@@ -318,6 +318,7 @@ static void ruler_shift_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
   ggobid *gg = display->ggobi;
   gboolean button1_p, button2_p;
   gint direction = (w == display->hrule) ? HORIZONTAL : VERTICAL;
+  gboolean redraw = false;
 
   /*-- find out if any buttons are pressed --*/
   mousepos_get_motion (w, event,  &button1_p, &button2_p, sp);
@@ -334,6 +335,7 @@ static void ruler_shift_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
       sp->pmid.x -= ((dx * PRECISION1) / sp->iscale.x);
       /* */
       drag_start_x = event->x;
+      redraw = true;
     } else {
       gfloat scale_y;
       gint dy = -1 * (gint) (event->y - drag_start_y);
@@ -346,23 +348,60 @@ static void ruler_shift_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
       /* */
 
       drag_start_y = event->y;
+      redraw = true;
     }
 
-/*
- In motion_notify in scale_ui.c, ruler_ranges_set is also
- executed, but I presumably don't have to do that here.
-*/
-    splot_plane_to_screen (display, &display->cpanel, sp, gg);
-    splot_redraw (sp, FULL, gg);
   } else if (button2_p) {
+    gint npix = 5;
 
-/*
- * Something extra is required here, because the rulers only
- * scale if button3 is down, not if button2 is down.
-*/
+    /*-- lifting code from zoom_by_drag as much as possible --*/
+    if (direction == HORIZONTAL) {
+      gfloat *scale_x;
+      icoords mid;
+      fcoords scalefac;
 
-g_printerr ("zooming not yet implemented\n");
+      mid.x = sp->max.x / 2;
+      scalefac.x = 1.0;
+      scale_x = (cpanel->projection == TOUR2D) ? &sp->tour_scale.x :
+                                                 &sp->scale.x;
+      if (ABS(event->x - mid.x) >= npix) {
+        scalefac.x = 
+          (gfloat) (event->x - mid.x) / (gfloat) (drag_start_x - mid.x);
+        if (*scale_x * scalefac.x >= SCALE_MIN)
+          *scale_x = *scale_x * scalefac.x;
 
+        drag_start_x = event->x;
+        redraw = true;
+      }
+
+    } else {
+      gfloat *scale_y;
+      icoords mid;
+      fcoords scalefac;
+
+      mid.y = sp->max.y / 2;
+      scalefac.y = 1.0;
+      scale_y = (cpanel->projection == TOUR2D) ? &sp->tour_scale.y :
+                                                 &sp->scale.y;
+      if (ABS(event->y - mid.y) >= npix) {
+        scalefac.y = 
+          (gfloat) (event->y - mid.y) / (gfloat) (drag_start_y - mid.y);
+        if (*scale_y * scalefac.y >= SCALE_MIN)
+          *scale_y = *scale_y * scalefac.y;
+
+        drag_start_y = event->y;
+        redraw = true;
+      }
+    }
   }
 
+  /*
+   * In motion_notify in scale_ui.c, ruler_ranges_set is also
+   * executed, but I presumably don't have to do that here, as
+   * long as these processes remain adequately in sync.
+  */
+  if (redraw) {
+    splot_plane_to_screen (display, &display->cpanel, sp, gg);
+    splot_redraw (sp, FULL, gg);
+  }
 }
