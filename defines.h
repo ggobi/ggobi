@@ -272,14 +272,14 @@ typedef enum {NULLMODE = -1,
 #define ZOOM_IN  0
 #define ZOOM_OUT 1
 
-#define P_OBLIQUE 0
-#define P_HORIZ   1
-#define P_VERT    2
+#define P_HORIZ   0
+#define P_VERT    1
+#define P_OBLIQUE 2
 
-#define Z_OBLIQUE 0
-#define Z_ASPECT  1
-#define Z_HORIZ   2
-#define Z_VERT    3
+#define Z_ASPECT  0
+#define Z_HORIZ   1
+#define Z_VERT    2
+#define Z_OBLIQUE 3
 
 /*-- imputation --*/
 #define IMP_RANDOM 0

@@ -157,7 +157,7 @@ static void clickoptions_cb (GtkToggleButton *w, ggobid *gg)
   scale_clickoptions_set (scale_click_opt, gg);
 }
 
-static gchar *panoptions_lbl[] = {"Oblique", "Horiz only", "Vert only"};
+static gchar *panoptions_lbl[] = {"Horiz only", "Vert only", "Oblique"};
 void panoptions_set (gint pan_opt, ggobid *gg) {
   cpaneld *cpanel = &gg->current_display->cpanel;
   cpanel->scale_pan_opt = pan_opt;
@@ -169,10 +169,10 @@ static void panoptions_cb (GtkWidget *w, gpointer cbd)
 
   panoptions_set (pan_opt, gg);
 }
-static gchar *zoomoptions_lbl[] = {"Oblique",
-                                   "Fixed aspect",
+static gchar *zoomoptions_lbl[] = {"Fixed aspect",
                                    "Horiz only",
-                                   "Vert only"};
+                                   "Vert only",
+                                   "Oblique"};
 void zoomoptions_set (gint zoom_opt, ggobid *gg) {
   cpaneld *cpanel = &gg->current_display->cpanel;
   cpanel->scale_zoom_opt = zoom_opt;
