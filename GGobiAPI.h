@@ -987,6 +987,13 @@ const gchar *GGobi_getLevelName(vartabled *vt, double value);
 
 colorschemed *alloc_colorscheme();
 
+/**
+  Compute and update the bi-directional link information for the collection
+  of edges. This simply fixes up the internal data structure in `edge' given
+  the basic edge connections by pairs of records.
+ */
+void GGobi_cleanUpEdgeRelationships(struct _EdgeData *edge, int startPosition);
+
 #ifdef __cplusplus
 }
 #endif

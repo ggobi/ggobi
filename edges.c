@@ -65,7 +65,7 @@ edge_add (gint a, gint b, datad *d, datad *e)
 
   e->edge.endpoints[n].a = d->rowid.idv.els[a];
   e->edge.endpoints[n].b = d->rowid.idv.els[b];
-
+/*XXX don't we need to do something with jpartner, etc. */
   return true;
 }
 
@@ -158,3 +158,18 @@ edgeset_add_cb (GtkWidget *w, datad *e) {
   }
 }
 
+void
+GGobi_cleanUpEdgeRelationships(struct _EdgeData *edge, int startPosition)
+{
+    int k, i, start, end;
+    for(i = startPosition; i < edge->n; i++) {
+	end = edge->endpoints[i].b;
+	start = edge->endpoints[i].a;
+	for (k=0; k<i; k++) {
+	    if (edge->endpoints[k].a == end && edge->endpoints[k].b == start) {
+		edge->endpoints[i].jpartner = k;
+		edge->endpoints[k].jpartner = i;
+	    }
+	}
+    }
+}
