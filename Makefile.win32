@@ -15,9 +15,12 @@ LOCAL_INCLUDES=.
 # -g -ggdb
 DEBUG=-g
 #DEBUG=-O2
+
+DEFINES=-DGGOBI_MAIN
+
 CFLAGS= $(DEBUG) -ansi -Wall  -mno-cygwin -mpentium \
          -fnative-struct -mwindows   $(INCLUDES:%=-I%) \
-         -DWIN32=1
+         -DWIN32=1 
 
 
 SRC=array.c ash1d.c \
@@ -55,7 +58,7 @@ SRC=array.c ash1d.c \
  xlines.c xyplot.c xyplot_ui.c \
 \
  mt19937ar.c cokus.c \
- print.c s_erf.c
+ print.c s_erf.c 
 
 
 SRC+=gtkextruler.c gtkexthruler.c gtkextvruler.c 
@@ -152,7 +155,7 @@ endif
 #     -L ../gtk-win/pthreads 
 
 .c.o:
-	$(CC) -c $(CFLAGS)  $(INC)  $*.c
+	$(CC) -c $(CFLAGS) $(DEFINES) $(INC)  $*.c
 
 # Emacs's tags for navigating through the source.
 etags:

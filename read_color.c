@@ -34,8 +34,10 @@ read_colorscheme(gchar *fileName, GList **list)
   xmlNodePtr node;
   colorschemed *scheme;
 
-  if(!canRead(fileName) && !(strncmp("http", fileName, 4) == 0 || strncmp("ftp", fileName, 3) == 0))
+  if(!canRead(fileName) && !(strncmp("http", fileName, 4) == 0 || strncmp("ftp", fileName, 3) == 0)) {
+    fprintf(stderr, "Couldn't read colorscheme from %s\n", fileName);fflush(stderr);
       return(NULL);
+  }
 
 /*  xmlSubstituteEntitiesDefault(1);    */
   doc = xmlParseFile(fileName); 
@@ -64,6 +66,9 @@ read_colorscheme(gchar *fileName, GList **list)
       node = node->next;
   }
   xmlFreeDoc(doc);
+
+  if(sessionOptions->verbose == GGOBI_VERBOSE)
+     g_printerr("Read colorscheme from %s\n", fileName);
 
   return(scheme);
 }

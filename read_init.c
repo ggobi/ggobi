@@ -62,15 +62,22 @@ GGobiInitInfo *
 read_init_file(const gchar *filename, GGobiInitInfo *info)
 {
   xmlDocPtr  doc;
-  gchar *fileName;
+  gchar *fileName = NULL;
   gint oldValiditySetting = xmlDoValidityCheckingDefaultValue;
 
   xmlSubstituteEntitiesDefault(1);   
-  xmlDoValidityCheckingDefaultValue = false;
+#ifndef WIN32
+  xmlDoValidityCheckingDefaultValue = false; 
+#endif
+
+  if(sessionOptions->verbose == GGOBI_VERBOSE)
+    g_printerr("Reading initialization file %s\n", filename);
+
   fileName = g_strdup(filename);
   doc = xmlParseFile(fileName); 
-  if(doc == NULL)
+  if(doc == NULL) {
       return(info);
+  }
   if(info == NULL)
       info = (GGobiInitInfo *) g_malloc(sizeof(GGobiInitInfo));
 
@@ -86,7 +93,9 @@ read_init_file(const gchar *filename, GGobiInitInfo *info)
   getPlugins(doc, info);
 #endif
 
+#ifndef WIN32
   xmlDoValidityCheckingDefaultValue = oldValiditySetting;
+#endif
   /* Causes a crash when started with -init notes/ggobirc,
      but not if there is a -colorschemes filename
      g_free(fileName); 

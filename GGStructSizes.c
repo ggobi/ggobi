@@ -6,7 +6,9 @@ typedef struct {
   const char * const name;
 } GGobi_StructSize;
 
+#ifdef USE_DBMS
 #include "dbms.h"
+#endif
 
 #define GG_StructEntry(type) {sizeof(type), #type}
 
@@ -16,8 +18,10 @@ static const GGobi_StructSize  ggobiStructs[] = {
 	GG_StructEntry(displayd),
 	GG_StructEntry(splotd), 
 	GG_StructEntry(vartabled),
-	GG_StructEntry(GGobiOptions),
-	GG_StructEntry(DBMSLoginInfo)
+	GG_StructEntry(GGobiOptions)
+#ifdef USE_DBMS
+	,GG_StructEntry(DBMSLoginInfo)
+#endif
 };
 
 extern const GGobi_StructSize *GGOBI(getStructs)(int *n);
