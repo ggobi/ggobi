@@ -41,6 +41,30 @@ void sphere_variance_set (gfloat x, datad *d, ggobid* gg)
 /*                          callbacks                                      */
 /*-------------------------------------------------------------------------*/
 
+static gint
+sphere_clist_size_alloc_cb (GtkWidget *w, GdkEvent *event, ggobid *gg)
+{
+  if (!widget_initialized (w)) {
+    gint fheight;
+    gint lbearing, rbearing, width, ascent, descent;
+    GtkStyle *style;
+    GtkCList *clist = GTK_CLIST (w);
+    style = gtk_widget_get_style (w);
+    gdk_text_extents (style->font,
+      "arbitrary string", strlen ("arbitrary string"),
+      &lbearing, &rbearing, &width, &ascent, &descent);
+    fheight = ascent + descent;
+
+    gtk_widget_set_usize (w, -1,
+      4*fheight + 3*1 +  /*-- 1 = CELL_SPACING --*/
+      clist->column_title_area.height);
+
+    widget_initialize (w, true);
+  }
+
+  return true;
+}
+
 static void
 deleteit (ggobid *gg) {
   GSList *l;
@@ -272,7 +296,7 @@ void scree_plot_make (ggobid *gg)
 void
 sphere_panel_open (ggobid *gg)
 {
-  GtkWidget *frame0, *main_vbox, *vbox, *table, *frame, *clist, *hbox;
+  GtkWidget *frame0, *main_vbox, *vbox, *table, *frame, *hbox;
   GtkWidget *label;
   GtkWidget *spinner;
   datad *d = gg->current_display->d;
@@ -442,20 +466,27 @@ sphere_panel_open (ggobid *gg)
                         GTK_SIGNAL_FUNC (sphere_apply_cb), gg);
 
     /*-- list to show the currently sphered variables --*/
-    /*-- I've asked the list  how to specify the number of visible rows --*/
+    /*-- I've asked the mailing list how to specify the number of visible rows --*/
     {
       gchar *titles[1] = {"sphered variables"};
-      gint k;
-      gchar *row[] = {""};
-      clist = gtk_clist_new_with_titles (1, titles);
-      gtk_clist_column_titles_passive (GTK_CLIST (clist));
-      for (k=0; k<4; k++)
-        gtk_clist_append ((GtkCList *) clist, row);
+      GtkWidget *scrolled_window = gtk_scrolled_window_new (NULL, NULL);
 
-      gtk_box_pack_start (GTK_BOX (vbox), clist,
-        false, false, 0);
+      gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled_window),
+        GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
+      gtk_box_pack_start (GTK_BOX (vbox), scrolled_window,
+        true, true, 0);
+
+      gg->sphere_ui.clist = gtk_clist_new_with_titles (1, titles);
+      gtk_signal_connect (GTK_OBJECT (gg->sphere_ui.clist),
+                          "size_allocate",
+                          (GtkSignalFunc) sphere_clist_size_alloc_cb,
+                          (gpointer) gg);
+      gtk_clist_column_titles_passive (GTK_CLIST (gg->sphere_ui.clist));
+      widget_initialize (gg->sphere_ui.clist, false);
+
+      gtk_container_add (GTK_CONTAINER (scrolled_window),
+        gg->sphere_ui.clist);
     }
-
 
     gg->sphere_ui.restore_btn = gtk_button_new_with_label ("Restore scree plot");
     gtk_box_pack_start (GTK_BOX (vbox), gg->sphere_ui.restore_btn,

@@ -78,7 +78,7 @@ variable_set_label (datad *d, gint j, gchar *lbl)
 }
 
 /*
- * before spherizing 
+ * before sphering 
  * if (npcvars > 0 && npcvars != npcs) {
  *   delete the variables in sphere.pcvars (or just as many as needed?)
  *   add npcs new variables (or ditto?); populate pcvars 
@@ -92,32 +92,68 @@ spherize_set_pcvars (datad *d, ggobid *gg)
   gint ncols_prev = d->ncols;
   gint j, k;
   gchar *lbl;
+  /*-- for updating the clist --*/
+  GtkCList *clist = GTK_CLIST (gg->sphere_ui.clist);
+  gchar *row[] = {""};
+  /*-- --*/
 
   if (d->sphere.npcs == 0)
     return;
 
-  /*-- the null case: spherizing for the first time --*/
-  if (d->sphere.pcvars.vals == NULL) {
+  /*-- the null case: sphering for the first time --*/
+  if (d->sphere.pcvars.vals == NULL || d->sphere.pcvars.nels == 0) {
+    vectori_realloc (&d->sphere.vars_sphered, d->sphere.vars.nels);
+    vectori_copy (&d->sphere.vars, &d->sphere.vars_sphered);  /* from, to */
+
     vectori_realloc (&d->sphere.pcvars, d->sphere.npcs);
     clone_vars (d->sphere.vars.vals, d->sphere.npcs, d, gg);
+
     for (j=ncols_prev, k=0; j<d->ncols; j++) {
       d->sphere.pcvars.vals[k++] = j;
       lbl = g_strdup_printf ("PC%d", k);
       variable_set_label (d, j, lbl);
       g_free (lbl);
     }
-  } else if (d->sphere.pcvars.nels == 0) {  /*-- an oddball case --*/
-    vectori_free (&d->sphere.pcvars);
+
+/*  I can't remember what this case was intended to cover
+  } else if (d->sphere.pcvars.nels == 0) {
     vectori_realloc (&d->sphere.pcvars, d->sphere.npcs);
+    vectori_copy (&d->sphere.vars, &d->sphere.vars_sphered);
+
+    vectori_realloc (&d->sphere.vars_sphered, d->sphere.vars.nels);
     clone_vars (d->sphere.vars.vals, d->sphere.npcs, d, gg);
-    for (j=ncols_prev, k=0; j<d->ncols; j++) {
-      d->sphere.pcvars.vals[k++] = j;
+    for (j=ncols_prev, k=0; j<d->ncols; j++, k++) {
+      d->sphere.pcvars.vals[k] = j;
       lbl = g_strdup_printf ("PC%d", k);
       variable_set_label (d, j, lbl);
       g_free (lbl);
     }
-  } else {
+*/
+
+  /*-- sphering after the first time --*/
+  } else if (d->sphere.pcvars.nels == d->sphere.npcs) {
+    /*-- no need for any reallocation or relabelling, very neat --*/
+    vectori_copy (&d->sphere.vars, &d->sphere.vars_sphered);  /* from, to */
+
+  } else if (d->sphere.pcvars.nels < d->sphere.npcs) {
+    /*-- add just the additional required variables? --*/
+    /*-- or delete them all and then add fresh? --*/
+
+  } else if (d->sphere.pcvars.nels > d->sphere.npcs) {
+    /*-- delete variables --*/
   }
+
+
+  /*-- clear the clist --*/
+  gtk_clist_clear (clist);
+  /*-- add the new labels to the clist --*/
+  gtk_clist_freeze (clist);
+  for (j=0; j<d->sphere.vars_sphered.nels; j++) {
+    row[0] = g_strdup (d->vartable[d->sphere.vars_sphered.vals[j]].collab);
+    gtk_clist_append (clist, row);
+    g_free (row[0]);
+  }
+  gtk_clist_thaw (clist);
 }
 
 /*-------------------------------------------------------------------------*/
@@ -239,13 +275,12 @@ eigenvec_set (datad *d, ggobid *gg)
 {
   gint i, j;
   gint nels = d->sphere.vars.nels;
-  gfloat **evec = d->sphere.eigenvec.vals;
+  gfloat **eigenvec = d->sphere.eigenvec.vals;
   gfloat **vc = d->sphere.vc.vals;
-  gint *vars = d->sphere.vars.vals;
 
   for (i=0; i<nels; i++)
     for (j=0; j<nels; j++)
-      evec[i][j] = vc[vars[i]][vars[j]];
+      eigenvec[i][j] = vc[i][j];
 }
 
 
@@ -268,7 +303,7 @@ sphere_varcovar_set (datad *d, ggobid *gg)
     g_assert (k < d->sphere.tform_mean.nels);
 
 /*
- * This may not be necessary:  isn't this information
+ * This may not be necessary:  isn't tform_mean already
  * stored in vartabled?  dfs ...  Yes, but Andreas thinks
  * maybe it shouldn't be.
 */

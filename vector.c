@@ -256,6 +256,7 @@ void
 vectorb_copy (vector_b *vecp_from, vector_b *vecp_to)
 {
   gint i;
+
   if (vecp_from->nels == vecp_to->nels)
     for (i=0; i<vecp_from->nels; i++)
       vecp_to->vals[i] = vecp_from->vals[i];
@@ -334,6 +335,7 @@ void
 vectors_copy (vector_s *vecp_from, vector_s *vecp_to)
 {
   gint i;
+
   if (vecp_from->nels == vecp_to->nels)
     for (i=0; i<vecp_from->nels; i++)
       vecp_to->vals[i] = vecp_from->vals[i];

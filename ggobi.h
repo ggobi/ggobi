@@ -268,12 +268,13 @@ struct _ggobid {
 
  struct _Sphere {
    GtkWidget *window;
+   GtkWidget *scree_da;
+   GdkPixmap *scree_pixmap;
+
    GtkObject *npcs_adj;
    GtkWidget *stdized_entry, *variance_entry, *condnum_entry;
    GtkWidget *apply_btn, *restore_btn;
-
-   GtkWidget *scree_da;
-   GdkPixmap *scree_pixmap;
+   GtkWidget *clist;
 
    /*-- a pointer to be compared with current_display->d --*/
    datad *d;

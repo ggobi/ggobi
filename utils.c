@@ -229,6 +229,29 @@ g_list_replace_nth (GList *list, gpointer item, gint indx) {
 }
 
 /*-----------------------------------------------------------------------*/
+/*        figuring out if a widget has been initialized:                 */
+/*-----------------------------------------------------------------------*/
+
+/*
+ * This pair of routines is useful if a widget needs some kind of
+ * configuration when it is mapped for the very first time.
+*/
+
+gboolean
+widget_initialized (GtkWidget *w) {
+  gboolean initd = GPOINTER_TO_INT (gtk_object_get_data (GTK_OBJECT (w),
+    "initialized"));
+
+  return (initd != NULL && initd == true) ? true : false;
+}
+void
+widget_initialize (GtkWidget *w, gboolean initd) {
+  gtk_object_set_data (GTK_OBJECT (w),
+    "initialized",
+    GINT_TO_POINTER (initd));
+}
+
+/*-----------------------------------------------------------------------*/
 /*  a routine gtk should have for finding out which option is selected   */
 /*-----------------------------------------------------------------------*/
 
