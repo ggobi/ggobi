@@ -92,9 +92,21 @@ void missings_datad_cb (GtkWidget *w, ggobid *gg)
      * have ids, they need to be assigned.
     */
     if (d->rowid.id.nels == 0) {
+      /*-- find the highest id among all datads to avoid overlap --*/
+      GSList *l;
+      datad *dd;
+      gint start = 0;
+      for (l = gg->d; l; l = l->next) {
+        dd = (datad *) l->data;
+        if (dd->rowid.id.nels != 0) {
+          start = MAX (start, dd->rowid.id.els[ dd->rowid.id.nels-1 ]);
+        }
+      }
+      start += 1;
+
       rowids_alloc (d);
       for (i=0; i<d->nrows; i++)
-        d->rowid.id.els[i] = i;
+        d->rowid.id.els[i] = start + i;
       rowidv_init (d);
     }
     rowids_alloc (dnew);
