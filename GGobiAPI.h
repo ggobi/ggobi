@@ -974,6 +974,13 @@ datad* datad_create(int nr, int nc, ggobid *gg);
 void GGobi_setSessionOptions(GGobiOptions *opts);
 
 
+
+/**
+
+ */
+
+const gchar *GGobi_getLevelName(vartabled *vt, double value);
+
 #ifdef __cplusplus
 }
 #endif

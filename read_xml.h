@@ -88,6 +88,8 @@ typedef struct _XMLUserData {
    */
   gchar **rowIds;
 
+  gint recordLabelsVariable;
+
   /* Reference to the handlers being used as callbacks.
      Need this so that we can re-specify it when creating
      new sub-parsers.

@@ -226,6 +226,8 @@ initParserData(XMLParserData *data, xmlSAXHandlerPtr handler, ggobid *gg)
 #endif
   data->defaults.edgeWidth = -1;  /*-- this has no home in ggobi --*/
   data->defaults.hidden = false;
+
+  data->recordLabelsVariable = -1;
 }
 
 void 
@@ -767,16 +769,18 @@ setRecordValues (XMLParserData *data, const xmlChar *line, gint len)
   gdouble value;
   const gchar *tmp = strtok((gchar*) line, " \t\n");
   datad *d = getCurrentXMLData(data);
-  vartabled *vt;
+  vartabled *vt = NULL;
 
   while (tmp) {
+
+    vt = vartable_element_get (data->current_element, d);
+
     if (data->NA_identifier && strcmp (tmp, data->NA_identifier) == 0) {
       if (d->nmissing == 0) {
         arrays_alloc (&d->missing, d->nrows, d->ncols);
         arrays_zero (&d->missing);
       }
       d->missing.vals[data->current_record][data->current_element] = 1;
-      vt = vartable_element_get (data->current_element, d);
       vt->nmissing++;
       d->raw.vals[data->current_record][data->current_element] = 0;
       d->nmissing++;
@@ -784,6 +788,31 @@ setRecordValues (XMLParserData *data, const xmlChar *line, gint len)
     } else {
       value = asNumber (tmp);
       d->raw.vals[data->current_record][data->current_element] = value;
+    }
+        /* If the dataset is using one of the variables as the row labels,
+           the resolve the name.
+         */
+    if(data->recordLabelsVariable == data->current_element) {
+	char *tmp1;
+         /* If this is a categorical, lookup the level id. */
+        char buf[100];
+	if(d->missing.vals && d->missing.vals[data->current_record][data->current_element]) {
+	    sprintf(buf, "%s", "NA");
+	    tmp1 = g_strdup(buf);
+	}
+	else {
+	    if(vt && vt->categorical_p) {
+                 /* To be correct, we need to match the level_values and find the
+                    corresponding entry. */
+                tmp1 = GGobi_getLevelName(vt, value);
+                if(tmp1)
+		    tmp1 = g_strdup(tmp1);
+	    } else {
+		sprintf(buf, "%f", value);
+		tmp1 = g_strdup(buf);
+	    }
+	}
+	g_array_insert_val(d->rowlab, data->current_record, tmp1);
     }
     data->current_element++;
     tmp = strtok (NULL, " \t\n");
@@ -831,6 +860,11 @@ newVariable(const xmlChar **attrs, XMLParserData *data, const xmlChar *tagName)
    el->collab = g_strdup(tmp);
    if (data->variable_transform_name_as_attribute == false)
       el->collab_tform = g_strdup(tmp);
+ }
+
+ tmp = getAttribute(attrs, "recordLabel");
+ if (tmp != NULL) {
+     data->recordLabelsVariable = data->current_variable;
  }
 
  tmp = getAttribute(attrs, "min");
@@ -1256,7 +1290,6 @@ xmlParseColorMap(const gchar *fileName, gint size, XMLParserData *data)
 gboolean
 asciiParseColorMap(const gchar *fileName, gint size, XMLParserData *data)
 {
-
  return(false);
 }
 
@@ -1311,9 +1344,13 @@ readXMLRecord(const xmlChar **attrs, XMLParserData *data)
 
   tmp = getAttribute(attrs, "label");
   if(!tmp) {
-      /* Length is to hold the current record number as a string. */
-    stmp = g_malloc(sizeof(gchar) * 10);
-    g_snprintf(stmp, 9, "%d", i);
+      if(data->recordLabelsVariable > -1) {
+	  /* Wait until we have read the specific values! */
+      } else {
+	  /* Length is to hold the current record number as a string. */
+	  stmp = g_malloc(sizeof(gchar) * 10);
+	  g_snprintf(stmp, 9, "%d", i);
+      }
   } else
     stmp = g_strdup (tmp);
 
