@@ -577,8 +577,7 @@ void ggv_dims_cb (GtkAdjustment *adj, PluginInstance *inst)
 
     if (ggv->running_p) mds_func (false, inst);
   
-    if (dim > ggv->dim) {  /*-- add variables as needed --*/
-
+    if (dim > ggv->maxdim) {  /*-- add variables as needed --*/
       arrayd_add_cols (&ggv->pos, dim);
       vectord_realloc (&ggv->pos_mean, dim);
 
@@ -593,11 +592,10 @@ void ggv_dims_cb (GtkAdjustment *adj, PluginInstance *inst)
         g_free (vname);
       }
       g_free (dtmp);
-
+      ggv->maxdim = MAX(ggv->dim, dim);
+      ggv->dim = dim;
     }
   }
-
-  ggv->dim = dim;
 
   if (ggv->dpos) {
     if (running) mds_func (true, inst);
