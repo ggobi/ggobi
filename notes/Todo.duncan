@@ -1,0 +1,16 @@
+
+Abstraction of the projection pursuit (from xgobi and with Di) so that
+one can add new ones without explicitly adding it to the ggobi
+code. Via dlopen() and linking.
+
+Printing of plots via R and also SVG.
+See Printing.tex.
+
+Support for ggobi on Windows via Rterm's event loop.
+
+
+Tour API and support code for the Rggobi package.
+
+Documentation of API.
+
+Random numbers from R

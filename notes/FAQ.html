@@ -1,6 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
 <html> <head>
 <title>ggobi FAQ</title>
+<link rel=stylesheet href="ggobi.css">
 </head>
 
 <body>
@@ -48,7 +49,11 @@
 <dl>
   <dt>
   <li> Why do I see <code>G_INLINE_FUNC</code> in the compilation?
-  <dd> This is
+  <dd> This is a mechanism to help the header files in the <i>glib</i> library
+       to compile inlined functions. Do a web search on
+       <code>G_INLINE_FUNC</code> to find out more information.
+       See the next question for symptoms of what can go wrong if this
+      is not defined when it is needed.    
 
   <dt>
   <li> I get error messages when compiling the C code
@@ -75,6 +80,6 @@
 <hr>
 <address></address>
 <!-- hhmts start -->
-Last modified: Fri Mar  9 06:14:33 EST 2001
+Last modified: Fri Apr 13 18:06:18 EDT 2001
 <!-- hhmts end -->
 </body> </html>
