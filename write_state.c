@@ -255,18 +255,17 @@ add_xml_scatterplot_variables(xmlNodePtr node, GList *plots, displayd *dpy)
   Returns the name.
  */
 
-const char *
+xmlNodePtr
 XML_addVariable(xmlNodePtr node, gint j, datad *d)
 {
   extern vartabled * vartable_element_get (gint, datad *);
-  const char *name;
+  xmlNodePtr newNode;
   vartabled *vt = vartable_element_get (j, d);
 
-  node = xmlNewChild(node, NULL,"variable", NULL);
-  name = vt->collab;
-  xmlSetProp(node, "name", name);
+  newNode = xmlNewChild(node, NULL,"variable", NULL);
+  xmlSetProp(newNode, "name", vt->collab);
 
-  return(name);   
+  return(newNode);   
 }
 
 /*
