@@ -160,6 +160,20 @@ GGobi_setMissingValueIdentifier(MissingValue_p f)
 }
 
 
+const gchar * DefaultRowNames = NULL;
+
+void
+setRowNames(datad *d, gchar **rownames)
+{
+    int i;
+    gchar *lbl;
+    for (i = 0; i < d->nrows ; i++) {
+        lbl = (rownames != &DefaultRowNames && rownames != NULL && rownames[i] != NULL) ?
+          g_strdup (rownames[i]) : g_strdup_printf ("%d", i+1);
+        g_array_append_val (d->rowlab, lbl);
+    }
+}
+
 /*
   An initial attempt to allow new data to be introduced
   to the Ggobi session, replacing the existing contents.
@@ -255,13 +269,8 @@ GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
    }
   } 
 
-  if(rownames && d->rowlab->len == 0) {
-    for (i = 0; i < nr ; i++) {
-        lbl = (rownames != NULL && rownames[i] != NULL) ?
-          g_strdup (rownames[i]) : g_strdup_printf ("%d", i+1);
-        g_array_append_val (d->rowlab, lbl);
-    }
-  }
+  if(rownames && d->rowlab->len == 0) 
+    setRowNames(d, rownames);
 
 
   /* Now recompute and display the top plot. */
@@ -1160,24 +1169,15 @@ gint
 GGOBI(addVariable)(gdouble *vals, gint num, gchar *name,
   gboolean update, datad *d, ggobid *gg)
 {
-  gint i;
 
   if (d->ncols < 1) {
-    gchar ** rnames = (gchar **)g_malloc(sizeof(gchar*) * num);
-    for (i = 0; i < num; i++) {
-      rnames[i] = (gchar *) g_malloc (sizeof (gchar)*7);
-      rnames[i] = g_strdup_printf ("%d", i+1);
-/*    sprintf(rnames[i],"%d",i+1);*/
-    }
+    gchar ** rnames = &DefaultRowNames;
     /* May want the final false here to be true as it causes the 
        creation of a plot. Probably not, but just mention it here
        so we don't forget.
      */
     GGOBI(setData)(vals, rnames, &name, num, 1, d, false, gg, NULL, false, d->input);
-    for (i = 0; i < num; i++)
-      g_free (rnames[i]);
-    g_free (rnames);
-  } else {
+  } else { 
     if (num > d->nrows) {
       num = d->nrows;
       /* Add a warning here. */
@@ -1213,29 +1213,15 @@ GGOBI(addCategoricalVariable)(gdouble *vals, gint num, gchar *name,
 
 
   if (d->ncols < 1) {
-    gchar ** rnames = NULL;
-    if(!d->rowlab || d->rowlab->len == 0) {
-      rnames = (gchar **)g_malloc(sizeof(gchar*) * num);
-      for (i = 0; i < num; i++) 
-        rnames[i] = g_strdup_printf ("%d", i+1);
-    }
-
+    gchar ** rnames = &DefaultRowNames; 
     /* May want the final false here to be true as it causes the 
        creation of a plot. Probably not, but just mention it here
        so we don't forget.
      */
     GGOBI(setData)(NULL, rnames, &name, num, d->ncols, d, false, gg, NULL, false, d->input); 
     datad_init(d, gg, false);
-
-    if(rnames) {
-      for (i = 0; i < num; i++)
-         g_free (rnames[i]);
-      g_free (rnames);
-    }
-
   }
 
-  /* else*/ {
     if (num > d->nrows) {
       num =  d->nrows;
       /* Add a warning here. */
@@ -1243,7 +1229,6 @@ GGOBI(addCategoricalVariable)(gdouble *vals, gint num, gchar *name,
     newvar_add_with_values (vals, num, name,
       categorical, numLevels, levels, values, counts,
       d, gg);
-  }
 
   if(update)
     gdk_flush();
