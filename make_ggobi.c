@@ -212,8 +212,31 @@ void pipeline_init(datad * d, ggobid * gg)
   arrayf_copy(&d->raw, &d->tform);
 
   limits_set(true, true, d, gg);
+
   vartable_limits_set(d);   /*-- does this do something here?  --*/
   vartable_stats_set(d);   /*-- does this do something here?  --*/
+
+  /*
+   * If there are missings, they've been initialized with a value
+   * of 0.  Here, re-set that value to 15% below the minimum for each
+   * variable.  (dfs -- done at Di's request, September 2004)
+  */
+
+  if (d->nmissing > 0) {
+    gint j;
+    vartabled *vt;
+    gint vars[1];
+    for (j=0; j<d->ncols; j++) {
+      vt = vartable_element_get (j, d);
+      if (vt->nmissing) {
+        vars[0] = j;
+        impute_fixed (IMP_BELOW, 15.0, 1, vars, d, gg);
+      }
+    }
+    limits_set (true, true, d, gg);
+    vartable_limits_set(d);
+    vartable_stats_set(d);
+  }
 
   tform_to_world(d, gg);
 }
