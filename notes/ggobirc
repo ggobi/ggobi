@@ -134,6 +134,26 @@
        <init description="test_input_description" />
      </dll>
  </inputPlugin>
+
+<plugin name="JVM" load="immediate">
+   <description>Loads the Java Virtual Machine for use by other plugins</description>
+   <author>Duncan Temple Lang</author>
+   <dll name="plugins/JVM/JVM.so">
+    <init onLoad="loadJVM" />
+  </dll>
+</plugin>
+
+ <inputPlugin name="javaRandom" language="java" class="ggobi/RandomPlugin" interactive="true">
+  <description>Generates random data via a Java input plugin</description>
+   <author>Duncan Temple Lang</author>
+   <modeName>jrand</modeName>
+ </inputPlugin>
+
+ <plugin name="javaTest" language="java" class="ggobi/TestPlugin">
+  <description>Test for using Java plugins</description>
+   <author>Duncan Temple Lang</author>
+ </plugin>
+
 </plugins>
 </ggobirc>
 
