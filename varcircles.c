@@ -341,6 +341,19 @@ varcircle_draw (gint jvar, datad *d, ggobid *gg)
 
     case  scatterplot:
       switch (cpanel->projection) {
+        case TOUR1D:
+          x = 0;
+          y = (gint) (display->u[0][jvar]*(gfloat)r);
+          gdk_draw_line (d->varpanel_ui.da_pix[jvar],
+            gg->selvarfg_GC, r, r, r+x, r-y);
+
+          for (k=0; k<display->ntour_vars; k++) {
+            if (display->tour_vars[k] == jvar) {
+              chosen = true;
+              break;
+            }
+          }
+          break;
         case TOUR2D:
           x = (gint) (display->u[0][jvar]*(gfloat)r);
           y = (gint) (display->u[1][jvar]*(gfloat)r);
@@ -535,6 +548,12 @@ popup_varmenu (GtkWidget *w, GdkEvent *event, gpointer cbd)
 
         case scatterplot:
           switch (projection) {
+            case TOUR1D:
+              tour_menu = tour1d_menu_build (jvar, d, gg);
+              gtk_menu_popup (GTK_MENU (tour_menu), NULL, NULL,
+                position_popup_menu, NULL,
+                bevent->button, bevent->time);
+              break;
             case TOUR2D:
             case COTOUR:
               tour_menu = tour2d_menu_build (jvar, d, gg);

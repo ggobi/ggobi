@@ -23,6 +23,7 @@ const char *const GGOBI(ModeNames)[] = {
   "1D Plot",
   "XYPlot",
   "Rotation",
+  "1D Tour",
   "2D Tour",
   "Correlation Tour",
   "Scale",
@@ -76,6 +77,7 @@ make_control_panels (ggobid *gg) {
   cpanel_p1dplot_make (gg);
   cpanel_xyplot_make (gg);
   cpanel_rotation_make (gg);
+  cpanel_tour1d_make (gg);
   cpanel_tour2d_make (gg);
   cpanel_ctour_make (gg);
 
@@ -184,6 +186,10 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state, ggobid *gg)
         submenu_destroy (gg->mode_menu.io_item);
         break;
 
+      case TOUR1D:
+        submenu_destroy (gg->mode_menu.io_item);
+        break;
+
       case TOUR2D:
         submenu_destroy (gg->mode_menu.io_item);
         break;
@@ -224,6 +230,19 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state, ggobid *gg)
           submenu_insert (gg->mode_menu.io_item, gg->main_menubar, -1);
           gg->mode_menu.firsttime_io = false;
         }
+        break;
+
+      case TOUR1D:
+        tour1d_menus_make (gg);
+
+	/*        gg->mode_menu.io_item = submenu_make ("_I/O", 'I',
+          gg->main_accel_group);
+        gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_menu.io_item),
+          gg->tour1d.io_menu); 
+        if (gg->mode_menu.firsttime_io) {
+          submenu_insert (gg->mode_menu.io_item, gg->main_menubar, -1);
+          gg->mode_menu.firsttime_io = false;
+        }*/
         break;
 
       case TOUR2D:
@@ -339,8 +358,8 @@ mode_set (gint m, ggobid *gg) {
      * Luckily, this isn't even possible if the current display
      * is scatmat or parcoords.
     */
-    if ((gg->mode == TOUR2D || gg->mode == COTOUR) &&
-        (gg->prev_mode != TOUR2D && gg->prev_mode != COTOUR))
+    if ((gg->mode == TOUR1D || gg->mode == TOUR2D || gg->mode == COTOUR) &&
+        (gg->prev_mode != TOUR1D && gg->prev_mode != TOUR2D && gg->prev_mode != COTOUR))
     {
       for (l = gg->d; l; l = l->next) {
         d = (datad *) l->data;
@@ -359,8 +378,8 @@ mode_set (gint m, ggobid *gg) {
         if (GTK_OBJECT (d->varpanel_ui.table)->ref_count > 1)
           gtk_widget_unref (d->varpanel_ui.table);
       }
-    } else if ((gg->mode != TOUR2D && gg->mode != COTOUR) &&
-               (gg->prev_mode == TOUR2D || gg->prev_mode == COTOUR))
+    } else if ((gg->mode != TOUR1D && gg->mode != TOUR2D && gg->mode != COTOUR) &&
+               (gg->prev_mode == TOUR1D || gg->prev_mode == TOUR2D || gg->prev_mode == COTOUR))
     {
       for (l = gg->d; l; l = l->next) {
         d = (datad *) l->data;
@@ -414,6 +433,10 @@ mode_activate (splotd *sp, gint m, gboolean state, ggobid *gg) {
       case ROTATE:
         break;
 
+      case TOUR1D:
+        tour1d_func (off, gg);
+        break;
+
       case TOUR2D:
         tour2d_func (off, gg);
         break;
@@ -434,6 +457,10 @@ mode_activate (splotd *sp, gint m, gboolean state, ggobid *gg) {
       case MOVEPTS:
       case COTOUR:
       case ROTATE:
+        break;
+
+      case TOUR1D:
+        tour1d_func (on, gg);
         break;
 
       case TOUR2D:

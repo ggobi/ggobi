@@ -190,8 +190,8 @@ display_tour_init (displayd *dsp, ggobid *gg) {
   zero_tau(dsp, gg);
   dsp->dv = 1.0;
   dsp->delta = cpanel->tour_step*M_PI_2/10.0;
-  dsp->tour_nsteps = 0; 
-  dsp->tour_stepcntr = 0;
+  dsp->tour_nsteps = 1; 
+  dsp->tour_stepcntr = 1;
 
   dsp->tour_idled = 0;
   dsp->tour_get_new_target = true;
@@ -406,6 +406,16 @@ void path(displayd *dsp, gint nd) {
   gint dI; /* dimension of intersection of base pair */
   gfloat **ptinc = (gfloat **) g_malloc (2 * sizeof (gfloat *));
 
+  printf("u0 \n");
+  for (i=0; i<d->ncols; i++)
+    printf("%f ",dsp->u0[0][i]);
+  printf("\n");
+
+  printf("u1 \n");
+  for (i=0; i<d->ncols; i++)
+    printf("%f ",dsp->u1[0][i]);
+  printf("\n");
+
   /* 2 is hard-wired because it relates to cos, sin
                          and nothing else. */
   for (i=0; i<2; i++) 
@@ -564,7 +574,7 @@ void path(displayd *dsp, gint nd) {
       dsp->dv = (gfloat)sqrt((gdouble)dsp->dv);
 
       /* Reset increment counters.*/
-      dsp->tour_nsteps = (gint) floor((gdouble)(dsp->dv/dsp->delta));
+      dsp->tour_nsteps = (gint) floor((gdouble)(dsp->dv/dsp->delta))+1;
       /*      for (i=1; i<nd; i++) {
 	if ((gint) floor((gdouble)(dG/delta)) < nsteps) 
 	  nsteps = (gint) floor((gdouble)(dG/delta));
@@ -711,15 +721,15 @@ void speed_set (gint slidepos, ggobid *gg) {
     else if ((slidepos >= 50) && (slidepos < 90))
       cpanel->tour_step = pow((double)(slidepos-50)/100.,(double)1.5) + 0.0225;
     else
-      cpanel->tour_step = pow((double)(slidepos-50)/100.,(double)10) + 0.1868;
-      /*      cpanel->tour_step = sqrt((double)(slidepos-50)) + 0.0375;*/
+      /*      cpanel->tour_step = pow((double)(slidepos-50)/100.,(double)10) + 0.1868;*/
+      cpanel->tour_step = sqrt((double)(slidepos-50)) + 0.1868;
   }
   /*  dsp->delta = cpanel->tour_step/dsp->dv;*/
   dsp->delta = cpanel->tour_step*M_PI_2/10.0;
 
   fracpath = dsp->tour_stepcntr/dsp->tour_nsteps;
 
-  dsp->tour_nsteps = (gint) floor((gdouble)(dsp->dv/dsp->delta));
+  dsp->tour_nsteps = (gint) floor((gdouble)(dsp->dv/dsp->delta))+1;
   dsp->tour_stepcntr = (gint) floor(fracpath*dsp->tour_nsteps);
 }
 
@@ -773,9 +783,11 @@ gt_basis (displayd *dsp, ggobid *gg, gint nd)
     /*
      * Orthogonalize the basis on the first using Gram-Schmidt
     */
-    for (k=0; k<nd-1; k++)
-      for (j=k+1; j<nd; j++)
-        gram_schmidt(dsp->u1[k], dsp->u1[j], d->ncols);
+    if (nd > 1) {
+      for (k=0; k<nd-1; k++)
+        for (j=k+1; j<nd; j++)
+          gram_schmidt(dsp->u1[k], dsp->u1[j], d->ncols);
+    }
   }
   else
   {

@@ -67,22 +67,23 @@ extern const gint ViewTypeIndeces[3];
 #define REDISPLAY_PRESENT 2
 
 /* modes */
-#define NMODES 12
+#define NMODES 13
 
 #define P1PLOT   0
 #define XYPLOT   1
 #define ROTATE   2
-#define TOUR2D   3
-#define COTOUR   4
+#define TOUR1D   3
+#define TOUR2D   4
+#define COTOUR   5
 
-#define SCALE    5
-#define BRUSH    6
-#define IDENT    7
-#define LINEED   8
-#define MOVEPTS  9
+#define SCALE    6
+#define BRUSH    7
+#define IDENT    8
+#define LINEED   9
+#define MOVEPTS  10
 
-#define SCATMAT 10
-#define PCPLOT  11
+#define SCATMAT 11
+#define PCPLOT  12
 /* */
 
 #define TEXTURE 0

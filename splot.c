@@ -126,6 +126,10 @@ sp_event_handlers_toggle (splotd *sp, gboolean state) {
       rotation_event_handlers_toggle (sp, state);
       break;
 
+    case TOUR1D:
+      tour1d_event_handlers_toggle (sp, state);
+      break;
+
     case TOUR2D:
       tour2d_event_handlers_toggle (sp, state);
       break;
@@ -406,8 +410,13 @@ splot_world_to_plane (cpaneld *cpanel, splotd *sp, ggobid *gg)
             d, gg);
           break;
 
+        case TOUR1D:
+            tour1d_projdata(sp,
+            (display->missing_p) ? d->missing_world.vals : d->world.vals,
+            d, gg);
+          break;
+
         case TOUR2D:
-	  /*          tour_reproject (sp,*/
             tour2d_projdata(sp,
             (display->missing_p) ? d->missing_world.vals : d->world.vals,
             d, gg);
@@ -502,6 +511,7 @@ splot_screen_to_tform (cpaneld *cpanel, splotd *sp, icoords *scr,
 
   g_return_if_fail (cpanel->projection == XYPLOT ||
                     cpanel->projection == P1PLOT ||
+                    cpanel->projection == TOUR1D ||
                     cpanel->projection == TOUR2D);
 
 /*
@@ -568,6 +578,10 @@ splot_screen_to_tform (cpaneld *cpanel, splotd *sp, icoords *scr,
       ftmp = world.y / precis;
       tfd->y = (ftmp + 1.0) * .5 * rdiff;
       tfd->y += min;
+      break;
+
+
+    case TOUR2D:
       break;
 
     default:
