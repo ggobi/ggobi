@@ -75,20 +75,21 @@ dataset_init(ggobid *gg, gboolean cleanup)
 gboolean
 fileset_read (gchar *ldata_in, ggobid *gg)
 {
-  gboolean ok;
+  gboolean ok = true;
   gg->filename = g_strdup (ldata_in);
   strip_suffixes (gg);  /*-- produces gg.fname, the root name --*/
 
-  switch(gg->data_mode) {
+  switch (gg->data_mode) {
    case xml:
 #ifdef USE_XML
-     ok = data_xml_read(gg->fname, gg);
+     ok = data_xml_read (gg->fname, gg);
 #endif
      break;
-   case ascii:
-     break;
    case binary:
+     break;
    case Sprocess:
+     break;
+   case ascii:
      array_read (gg);
      gg->nrows_in_plot = gg->nrows;  /*-- for now --*/
      gg->nrgroups = 0;              /*-- for now --*/
