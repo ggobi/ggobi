@@ -224,7 +224,7 @@ void       GGobi_widget_set (GtkWidget *, ggobid *gg, gboolean isWindow);
 GList*     g_list_remove_nth (GList *, gint);
 GList*     g_list_replace_nth (GList *, gpointer, gint);
 void       globals_init (ggobid *);
-void       gram_schmidt (gdouble *, gdouble*, gint);
+gboolean   gram_schmidt (gdouble *, gdouble*, gint);
 void       gt_basis (array_d, gint, vector_i, gint, gint);
 void       hidden_alloc (datad *);
 void       hidden_init (datad *, ggobid *);

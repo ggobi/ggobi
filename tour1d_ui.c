@@ -374,7 +374,7 @@ static void hide_cb (GtkWidget *w ) {
 #endif
 
 #ifdef TOUR_ADV_IMPLEMENTED
-static GtkWidget *window = NULL;
+static GtkWidget *window = NULL; /* Note to self - this should be removed */
 static void tour1dadv_window_open (ggobid *gg) {
   GtkWidget *vbox, *box, *btn, *opt, *tgl, *entry;
   GtkWidget *pathlen_opt, *vb, *hb, *lbl, *sbar, *notebook;

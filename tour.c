@@ -79,12 +79,13 @@ inner_prod(gdouble *x1, gdouble *x2, gint n)
 }
 
 /* orthonormalizes vector 2 on vector */
-void
+gboolean
 gram_schmidt(gdouble *x1, gdouble *x2, gint n)
 {
   gint j;
   gdouble ip;
   gdouble tol=0.99;
+  gboolean ok = true;
 
   ip = inner_prod(x1, x2, n);
 
@@ -93,7 +94,10 @@ gram_schmidt(gdouble *x1, gdouble *x2, gint n)
       x2[j] = x2[j] - ip*x1[j];
     norm(x2, n);
   }
+  else if (fabs(ip) > 1.0-tol) 
+    ok = false;    /* If the two vectors are close to being equal */
 
+  return(ok);
 }
 
 /* checks columns of matrix are orthonormal */
@@ -386,7 +390,8 @@ g_printerr ("\n");*/
           norm(Ga.vals[j], datadim);
         for (i=0; i<projdim-1; i++) {
           for (j=i+1; j<projdim; j++)
-            gram_schmidt(Ga.vals[i], Ga.vals[j], datadim);
+            if (!gram_schmidt(Ga.vals[i], Ga.vals[j], datadim))
+              g_printerr("");/*Ga[%d] equivalent to Ga[%d]\n",i,j);*/
 	}
         
         /* Rotate Fz to get Gz */
@@ -403,17 +408,20 @@ g_printerr ("\n");*/
           norm(Gz.vals[j], datadim);
         for (i=0; i<projdim-1; i++) {
           for (j=i+1; j<projdim; j++)
-            gram_schmidt(Gz.vals[i], Gz.vals[j], datadim);
+            if (!gram_schmidt(Gz.vals[i], Gz.vals[j], datadim))
+              g_printerr("");/*Gz[%d] equivalent to Gz[%d]\n",i,j);*/
 	}
 
         /* orthonormalize Gz on Ga to make a frame of rotation */
         for (i=0; i<projdim; i++)
-          gram_schmidt(Ga.vals[i], Gz.vals[i], datadim);
+          if (!gram_schmidt(Ga.vals[i], Gz.vals[i], datadim))
+            g_printerr("");/*Ga[%d] equivalent to Gz[%d]\n",i,i);*/
         for (j=0; j<projdim; j++)
           norm(Gz.vals[j], datadim);
         for (i=0; i<projdim-1; i++) {
           for (j=i+1; j<projdim; j++)
-            gram_schmidt(Gz.vals[i], Gz.vals[j], datadim);
+            if (!gram_schmidt(Gz.vals[i], Gz.vals[j], datadim))
+              g_printerr("");/*Gz[%d] equivalent to Gz[%d]\n",i,j);*/
 	}
 
       }
@@ -451,7 +459,8 @@ g_printerr ("\n");*/
 
       for (k=0; k<projdim-1; k++)
         for (j=k+1; j<projdim; j++)
-          gram_schmidt(F.vals[k], F.vals[j], datadim);
+          if (!gram_schmidt(F.vals[k], F.vals[j], datadim))
+            g_printerr("");/*F[%d] equivalent to F[%d]\n",k,j);*/
 
       /* Calculate Euclidean norm of principal angles.*/
       tmpd = 0.0;
@@ -551,7 +560,8 @@ void tour_reproject(vector_f tinc, array_d G, array_d Ga, array_d Gz,
 
   for (k=0; k<projdim; k++)
     for (j=k+1; j<projdim; j++)
-      gram_schmidt(F.vals[k], F.vals[j], datadim);
+      if (!gram_schmidt(F.vals[k], F.vals[j], datadim))
+        g_printerr("");/*F[%d] equivalent to F[%d]\n",k,j);*/
 
   for (j=0; j<2; j++)
     g_free (ptinc[j]);
@@ -749,7 +759,8 @@ gt_basis (array_d Fz, gint nactive, vector_i active_vars,
     if (projdim > 1) {
       for (k=0; k<projdim-1; k++)
         for (j=k+1; j<projdim; j++)
-          gram_schmidt(Fz.vals[k], Fz.vals[j], datadim);
+          if (!gram_schmidt(Fz.vals[k], Fz.vals[j], datadim))
+            g_printerr("");/*Fz[%d] equivalent to Fz[%d]\n",k,j);*/
     }
   }
   else /* if there is only one variable */

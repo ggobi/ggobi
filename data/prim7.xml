@@ -1526,31 +1526,22 @@
 </variables>
 <records count="9" glyph="fc 4" color="6">
 <record source="30" destination="333" label="0">
-
 </record>
 <record source="30" destination="392" label="1" color="1">
-
 </record>
 <record source="30" destination="471" label="2">
-
 </record>
 <record source="30" destination="492" label="3" color="1">
-
 </record>
 <record source="108" destination="333" label="4" color="4">
-
 </record>
 <record source="173" destination="333" label="5" color="4">
-
 </record>
 <record source="262" destination="471" label="6" color="0">
-
 </record>
 <record source="295" destination="471" label="7" color="0">
-
 </record>
 <record source="333" destination="471" label="8">
-
 </record>
 </records>
 </data>

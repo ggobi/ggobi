@@ -128,7 +128,7 @@ typedef struct {
 /*-- tour elements --*/
 typedef struct {
   gint datadim, projdim, nactive;
-  vector_i active_vars;
+  vector_i active_vars, active_vars_p;
   array_d Fa, Fz, F, Ga, Gz, G, Va, Vz, tv;
   vector_f lambda, tau, tinc;
   gfloat dist_az, delta, tang;

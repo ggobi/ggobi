@@ -134,17 +134,17 @@ saving plots as .svg files
     and scatmat plots
 
 Tour:
-  dumps core in cloning (and therefore in sphering)
+!  dumps core in cloning (and therefore in sphering)
   rulers
   axes
-  put arrays and vectors into the standard routines that debby has developed.
-  tour data structure
-  why is there whip-spin?
+!  put arrays and vectors into the standard routines that debby has developed.
+!  tour data structure
+!  why is there whip-spin?
   tour API
   PP
-  manual controls
-  1d tour
-  correlation tour
+!  manual controls
+! 1d tour
+!  correlation tour
   history controls
 
 Tour (dfs):

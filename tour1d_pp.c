@@ -272,6 +272,13 @@ gint zero (gdouble *ptr, gint length)
   return (0);
 }
 
+void zero_int(int *mem, int size)
+{
+  int i;
+  for(i=0; i<size; i++)
+  mem[i] =0;
+}
+  
 gint compute_groups (gint *group, gint *ngroup, gint *groups, 
   gint nrows, gfloat *gdata)
 { 
@@ -491,6 +498,96 @@ Purpose        : Looks for the best split in 1d-projected data.
 
 *********************************************************************/
 
+void swap_group(array_f *pdata, gint *group, int i, int j)
+{
+  int temp1,k; 
+  double temp2;
+
+  temp1 = group[i];
+  group[i] = group[j];
+  group[j] = temp1;
+  for(k=0; k<pdata->ncols; k++)
+  { temp2 = pdata->vals[i][k];   
+        pdata->vals[i][k] = pdata->vals[j][k];
+        pdata->vals[j][k] = temp2;
+  }
+
+}
+
+void sort_group(array_f *pdata, gint *group, int left, int right)
+{
+  int i, last;
+                                
+  if(left >= right) return;
+  swap_group(pdata, group, left, (left+right)/2);
+  last = left;   
+  for(i=left+1; i<=right; i++)
+    if(group[i] < group[left])
+      swap_group(pdata, group, ++last,i);
+  swap_group(pdata, group, left, last);
+  sort_group(pdata, group, left, last-1);
+  sort_group(pdata, group, last+1,right);
+}       
+
+void swap_data(double *x, int *index,int i, int j)
+{
+  int temp1; double temp2;
+  
+  temp1 = index[i];
+  index[i] = index[j];
+  index[j] = temp1;
+  temp2 = x[i];
+  x[i]= x[j];
+  x[j] = temp2;
+}
+
+void sort_data(double *x, int *index,int left, int right)
+{
+  int i, last;
+                                
+  if(left >= right) return;
+  swap_data(x,index,left,(left+right)/2);
+  last = left;   
+  for(i=left+1; i<=right; i++)
+    if(x[i] < x[left])
+      swap_data(x,index,++last,i);
+  swap_data(x,index, left, last);
+  sort_data(x,index, left, last-1);
+  sort_data(x,index,last+1,right);
+}       
+
+void countgroup(int *group, int *gps, int n)
+{
+  int temp,i;
+  int groups = *gps;
+
+  temp = group[0]; 
+  groups=1; 
+
+  for(i=1; i<n; i++) 
+    if (group[i] != temp) 
+      (groups)++; 
+  temp = group[i];
+
+  *gps = groups;
+}
+
+void countngroup(int *group, int *ngroup, int n)
+{
+  int temp,i,j;
+
+  temp= group[0]; 
+  ngroup[0] = 1; 
+  j=0; 
+  for(i=1; i<n; i++) 
+  {	
+    if (group[i] != temp) 
+      temp = group[i]; j++;
+    (ngroup[j]) ++; 
+  } 
+
+}
+
 gint alloc_cartgini_p (cartgini_param *dp, gint nrows, gfloat *gdata)
 { /* initialize data */
 
@@ -509,11 +606,11 @@ gint alloc_cartgini_p (cartgini_param *dp, gint nrows, gfloat *gdata)
 
 gint free_cartgini_p (cartgini_param *dp)
 { 
-  free (dp->ngroup);
   free (dp->group);
+  free (dp->ngroup);
   free (dp->x);
-  free (dp->index);
   free (dp->nright);
+  free (dp->index);
 
   return 0;
 }
@@ -521,7 +618,7 @@ gint free_cartgini_p (cartgini_param *dp)
 gint cartgini (array_f *pdata, void *param, gfloat *val)
 { 
   cartgini_param *dp = (cartgini_param *) param;
-  gint i, k, n, p;
+  gint i, k, n, p, g = dp->groups, left, right;
   gfloat dev, prob;
 
   n = pdata->nrows;
@@ -529,17 +626,48 @@ gint cartgini (array_f *pdata, void *param, gfloat *val)
   if (p != 1) 
     return(-1);
 
-  for (i=0; i<n; i++) { 
+/* Sort pdata by group */ 
+  right = pdata->nrows-1;
+  left = 0;
+  sort_group(pdata,dp->group,left,right);
+
+/* data relocation and make index */ 
+
+  zero(dp->x,n);
+  zero_int(dp->index,n);
+
+  for (i=0; i<n; i++) {	
     dp->x[i] = pdata->vals[i][0];
-    /*    dp->index[i] = pdata->group[i];*/
-    dp->index[i] = i;
+    dp->index[i] = dp->group[i];
   }
 
-  /* Sort observations from lowest to highest */
-  base = dp->x;
-  qsort (dp->index, n, sizeof(gint), smallest);
- 
-  *val = 2;
+  left=0;
+  right=n-1;
+  sort_data(dp->x, dp->index,left,right) ;
+
+ /* Calculate gini index */
+	
+  zero_int(dp->nright,g);
+  *val = 1;
+  for (i=0; i<g; i++) {	
+    dp->nright[i] = 0;
+    *val -= (((double)dp->ngroup[i])/((double)n))*
+      (((double)dp->ngroup[i])/((double)n));
+  }
+  for (i=0; i<n-1; i++)  {
+    (dp->nright[(dp->index[i]-1)])++;
+    dev=2;
+    for (k=0; k<g; k++) {
+      prob = ((double) dp->nright[k])/((double)(i+1));
+      dev -= prob*prob;
+      prob = ((double) (dp->ngroup[k]-dp->nright[k]))/((double)(n-i-1));
+      dev -= prob*prob;
+    }
+    if (dev<*val) *val = dev;
+  } 
+  *val *= -1;
+
+  /*  *val = 2;
   for (i=0; i<dp->groups; i++) { 
     dp->nright[i] = 0;
     *val -= (dp->ngroup[i]/n)*(dp->ngroup[i]/n);
@@ -558,7 +686,7 @@ gint cartgini (array_f *pdata, void *param, gfloat *val)
     if (dev<*val) *val = dev;
   }
 
-  *val *= -1;
+  *val *= -1;*/
   /*  printf ("Index=%f\n", *val);*/
 /*  sprintf (msg, "Index=%f", *val);print();              */
 
@@ -891,8 +1019,8 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, ggobid *gg)
   gint kout, nrows = d->nrows_in_plot, pdim = 1;
   /*  subd_param sp; */
   discriminant_param dp;
-  /*  cartgini_param cgp;
-      cartentropy_param cep;*/
+  cartgini_param cgp;
+  /*    cartentropy_param cep;*/
   cartvariance_param cvp;
   gfloat *gdata;
   gint i, j;
@@ -949,16 +1077,19 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, ggobid *gg)
         kout = optimize0 (&dsp->t1d_pp_op, discriminant, &dp);
       free_discriminant_p (&dp);
       break;
-      /*    case CART_GINI: 
+    case CART_GINI: 
       alloc_cartgini_p (&cgp, nrows, gdata);
-      dsp->t1d.ppval = t1d_calc_indx (d->tform, 
+      /*      dsp->t1d.ppval = t1d_calc_indx (d->tform, 
         dsp->t1d.F, d->rows_in_plot, d->nrows, d->ncols,
+        cartgini, &cgp);*/
+      dsp->t1d.ppval = t1d_calc_indx (dsp->t1d_pp_op.pdata, 
+        d->rows_in_plot, d->nrows, d->ncols,
         cartgini, &cgp);
       if (basismeth == 1)
         kout = optimize0 (&dsp->t1d_pp_op, cartgini, &cgp);
-      free_cartgini_p (&cgp);
+      /*      free_cartgini_p (&cgp);*/
       break;
-    case CART_ENTROPY: 
+      /*    case CART_ENTROPY: 
       alloc_cartentropy_p (&cep, nrows, gdata);
       dsp->t1d.ppval = t1d_calc_indx (d->tform, 
         dsp->t1d.F, d->rows_in_plot, d->nrows, d->ncols, 

@@ -76,6 +76,7 @@ alloc_tour2d (displayd *dsp, ggobid *gg)
   arrayd_alloc(&dsp->t2d.tv, 2, nc);
 
   vectori_alloc(&dsp->t2d.active_vars, nc);
+  vectori_alloc(&dsp->t2d.active_vars_p, nc);
   vectorf_alloc(&dsp->t2d.lambda, nc);
   vectorf_alloc(&dsp->t2d.tau, nc);
   vectorf_alloc(&dsp->t2d.tinc, nc);
@@ -108,6 +109,7 @@ tour2d_realloc_down (gint nc, gint *cols, datad *d, ggobid *gg)
       arrayd_delete_cols (&dsp->t2d.tv, nc, cols);
 
       vectori_delete_els (&dsp->t2d.active_vars, nc, cols);
+      vectori_delete_els (&dsp->t2d.active_vars_p, nc, cols);
       vectorf_delete_els (&dsp->t2d.lambda, nc, cols);
       vectorf_delete_els (&dsp->t2d.tau, nc, cols);
       vectorf_delete_els (&dsp->t2d.tinc, nc, cols);
@@ -145,6 +147,7 @@ free_tour2d(displayd *dsp)
   /*  gint nc = d->ncols;*/
 
   vectori_free(&dsp->t2d.active_vars);
+  vectori_free(&dsp->t2d.active_vars_p);
   vectorf_free(&dsp->t2d.lambda);
   vectorf_free(&dsp->t2d.tau);
   vectorf_free(&dsp->t2d.tinc);
@@ -182,15 +185,21 @@ display_tour2d_init (displayd *dsp, ggobid *gg) {
     /* Initialize starting subset of active variables */
   if (nc < 8) {
     dsp->t2d.nactive = nc;
-    for (j=0; j<nc; j++)
+    for (j=0; j<nc; j++) {
       dsp->t2d.active_vars.els[j] = j;
+      dsp->t2d.active_vars_p.els[j] = 1;
+    }
   }
   else {
     dsp->t2d.nactive = 3;
-    for (j=0; j<3; j++)
+    for (j=0; j<3; j++) {
       dsp->t2d.active_vars.els[j] = j;
-    for (j=3; j<nc; j++)
+      dsp->t2d.active_vars_p.els[j] = 1;
+    }
+    for (j=3; j<nc; j++) {
       dsp->t2d.active_vars.els[j] = 0;
+      dsp->t2d.active_vars_p.els[j] = 0;
+    }
   }
 
   /* declare starting base as first p chosen variables */
@@ -286,6 +295,7 @@ tour2dvar_set (gint jvar, ggobid *gg)
         arrayd_copy(&dsp->t2d.Fa, &dsp->t2d.F);
 /*        copy_mat(dsp->t2d.F.vals, dsp->t2d.Fa.vals, d->ncols, 2);*/
       }
+      dsp->t2d.active_vars_p.els[jvar] = 0;
     }
   }
   else { /* not active, so add the variable */
@@ -310,6 +320,7 @@ tour2dvar_set (gint jvar, ggobid *gg)
       dsp->t2d.active_vars.els[jtmp] = jvar;
     }
     dsp->t2d.nactive++;
+    dsp->t2d.active_vars_p.els[jvar] = 1;
   }
 
   dsp->t2d.get_new_target = true;
@@ -635,14 +646,30 @@ tour2d_manip_init(gint p1, gint p2, splotd *sp)
   datad *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
   ggobid *gg = GGobiFromSPlot(sp);
-  gint j, k;
+  gint i, j, k;
   gint n1vars = dsp->t2d.nactive;
-  gfloat ftmp, tol = 0.01; 
+  gfloat ftmp, tol = 0.05; 
   gdouble dtmp1;
 
   /* need to turn off tour */
   if (!cpanel->t2d.paused)
     tour2d_func(T2DOFF, gg->current_display, gg);
+
+  /* If de-selected variables are still fading out of the tour
+     we will need to take them out before starting manipulation */
+  for (j=0; j<d->ncols; j++)
+    if (dsp->t2d.active_vars_p.els[j] == 0) {
+       if (dsp->t2d.F.vals[0][j] > 0.0) 
+         dsp->t2d.F.vals[0][j] = 0.0;
+       if (dsp->t2d.F.vals[1][j] > 0.0)
+         dsp->t2d.F.vals[1][j] = 0.0;
+    }
+  norm(dsp->t2d.F.vals[0],d->ncols);
+  norm(dsp->t2d.F.vals[1],d->ncols);
+  if (!gram_schmidt(dsp->t2d.F.vals[0], dsp->t2d.F.vals[1],
+    d->ncols))
+    g_printerr("");/*t2d.F[0] equivalent to t2d.F[1]\n");*/
+  
 
   dsp->t2d_manipvar_inc = false;
   dsp->t2d_pos1 = dsp->t2d_pos1_old = p1;
@@ -687,31 +714,110 @@ tour2d_manip_init(gint p1, gint p2, splotd *sp)
        column 1 (0) or 2(1). If they are then we'll have to randomly
        generate a new column 3. If not then we orthonormalize column 3
        on the other two. */
-    if ((inner_prod(dsp->t2d_manbasis.vals[0],dsp->t2d_manbasis.vals[2],
-       d->ncols)>1.0-tol) || (inner_prod(dsp->t2d_manbasis.vals[1],
-       dsp->t2d_manbasis.vals[2],d->ncols)>1.0-tol))
-      ftmp = 0.0;
-    else {
-      gram_schmidt(dsp->t2d_manbasis.vals[0],  dsp->t2d_manbasis.vals[1],
-		   d->ncols); /* this might not be necessary */
-      gram_schmidt(dsp->t2d_manbasis.vals[0],  dsp->t2d_manbasis.vals[2],
-        d->ncols);
-      gram_schmidt(dsp->t2d_manbasis.vals[1],  dsp->t2d_manbasis.vals[2],
-        d->ncols);
+    while (!gram_schmidt(dsp->t2d_manbasis.vals[0],  dsp->t2d_manbasis.vals[2],
+        d->ncols))
+    {
+       gt_basis(dsp->t2d.tv, dsp->t2d.nactive, dsp->t2d.active_vars, 
+        d->ncols, (gint) 1);
+      for (j=0; j<d->ncols; j++) 
+        dsp->t2d_manbasis.vals[2][j] = dsp->t2d.tv.vals[0][j];
+    }
+    while (!gram_schmidt(dsp->t2d_manbasis.vals[1],  dsp->t2d_manbasis.vals[2],
+        d->ncols))
+    {
+       gt_basis(dsp->t2d.tv, dsp->t2d.nactive, dsp->t2d.active_vars, 
+        d->ncols, (gint) 1);
+      for (j=0; j<d->ncols; j++) 
+        dsp->t2d_manbasis.vals[2][j] = dsp->t2d.tv.vals[0][j];
+    }
+    while (!gram_schmidt(dsp->t2d_manbasis.vals[0],  dsp->t2d_manbasis.vals[1],
+        d->ncols))
+    {
+       gt_basis(dsp->t2d.tv, dsp->t2d.nactive, dsp->t2d.active_vars, 
+        d->ncols, (gint) 1);
+      for (j=0; j<d->ncols; j++) 
+        dsp->t2d_manbasis.vals[1][j] = dsp->t2d.tv.vals[0][j];
+    }
+    /* This is innocuous, if the vectors are orthnormal nothing gets changed.
+       But it protects against the case when vectors 0,1 were not
+       orthonormal and a new vector 1 was generated, it checks the o.n.
+       of all 3 vectors again. */
+    gram_schmidt(dsp->t2d_manbasis.vals[0],  dsp->t2d_manbasis.vals[1],
+		 d->ncols);
+    gram_schmidt(dsp->t2d_manbasis.vals[0],  dsp->t2d_manbasis.vals[2],
+		 d->ncols);
+    gram_schmidt(dsp->t2d_manbasis.vals[1],  dsp->t2d_manbasis.vals[2],
+		 d->ncols);
+
+    /*    ftmp = 0.0;
+    while (ftmp < tol) {
+    if ((fabs(inner_prod(dsp->t2d_manbasis.vals[0],dsp->t2d_manbasis.vals[2],
+       d->ncols))>1.0-tol) || 
+       (fabs(inner_prod(dsp->t2d_manbasis.vals[1],
+       dsp->t2d_manbasis.vals[2],d->ncols))>1.0-tol))
+    {
+      gt_basis(dsp->t2d.tv, dsp->t2d.nactive, dsp->t2d.active_vars, 
+        d->ncols, (gint) 1);
+      for (j=0; j<d->ncols; j++) 
+        dsp->t2d_manbasis.vals[2][j] = dsp->t2d.tv.vals[0][j];
+	g_printerr("0 manbasis2: ");
+        for (i=0; i<3; i++)
+          g_printerr("%f ",dsp->t2d_manbasis.vals[2][i]);
+	  g_printerr("\n");
+      if (!gram_schmidt(dsp->t2d_manbasis.vals[0],  dsp->t2d_manbasis.vals[2],
+        d->ncols)) 
+        g_printerr("t2d_manbasis[0] equivalent to t2d_manbasis[2]\n");
+      if (!gram_schmidt(dsp->t2d_manbasis.vals[1],  dsp->t2d_manbasis.vals[2],
+        d->ncols))
+        g_printerr("t2d_manbasis[1] equivalent to t2d_manbasis[2]\n");
+
+        g_printerr("1 manbasis0: ");
+        for (i=0; i<3; i++)
+          g_printerr("%f ",dsp->t2d_manbasis.vals[0][i]);
+        g_printerr("\n");
+        g_printerr("1 manbasis1: ");
+        for (i=0; i<3; i++)
+          g_printerr("%f ",dsp->t2d_manbasis.vals[1][i]);
+        g_printerr("\n");
+        g_printerr("1 manbasis2: ");
+        for (i=0; i<3; i++)
+          g_printerr("%f ",dsp->t2d_manbasis.vals[2][i]);
+	  g_printerr("\n");
       ftmp = calc_norm (dsp->t2d_manbasis.vals[2], d->ncols);
     }
-
-    while (ftmp < tol) {
-        gt_basis(dsp->t2d.tv, dsp->t2d.nactive, dsp->t2d.active_vars, 
-          d->ncols, (gint) 1);
-        for (j=0; j<d->ncols; j++) 
-          dsp->t2d_manbasis.vals[2][j] = dsp->t2d.tv.vals[0][j];
-        gram_schmidt(dsp->t2d_manbasis.vals[0],  dsp->t2d_manbasis.vals[2],
-          d->ncols);
-        gram_schmidt(dsp->t2d_manbasis.vals[1],  dsp->t2d_manbasis.vals[2],
-          d->ncols);
-        ftmp = calc_norm (dsp->t2d_manbasis.vals[2], d->ncols);
+    else if (fabs(inner_prod(dsp->t2d_manbasis.vals[0],
+      dsp->t2d_manbasis.vals[1],d->ncols))>1.0-tol) 
+    {
+      printf("1 = 0\n");
+      gt_basis(dsp->t2d.tv, dsp->t2d.nactive, dsp->t2d.active_vars, 
+        d->ncols, (gint) 1);
+      for (j=0; j<d->ncols; j++) 
+        dsp->t2d_manbasis.vals[1][j] = dsp->t2d.tv.vals[0][j];
+      if (!gram_schmidt(dsp->t2d_manbasis.vals[0],  dsp->t2d_manbasis.vals[1],
+		   d->ncols))
+        g_printerr("t2d_manbasis[0] equivalent to t2d_manbasis[1]\n"); * this might not be necessary *
+      if (!gram_schmidt(dsp->t2d_manbasis.vals[0],  dsp->t2d_manbasis.vals[2],
+        d->ncols))
+        g_printerr("t2d_manbasis[0] equivalent to t2d_manbasis[2]\n");
+      if (!gram_schmidt(dsp->t2d_manbasis.vals[1],  dsp->t2d_manbasis.vals[2],
+        d->ncols))
+        g_printerr("t2d_manbasis[1] equivalent to t2d_manbasis[2]\n");
+      ftmp = calc_norm (dsp->t2d_manbasis.vals[1], d->ncols);
+    }      
+    else {
+      printf("ok\n");
+      if (!gram_schmidt(dsp->t2d_manbasis.vals[0],  dsp->t2d_manbasis.vals[2],
+        d->ncols))
+        g_printerr("t2d_manbasis[0] equivalent to t2d_manbasis[2]\n");
+      if (!gram_schmidt(dsp->t2d_manbasis.vals[1],  dsp->t2d_manbasis.vals[2],
+        d->ncols))
+        g_printerr("t2d_manbasis[1] equivalent to t2d_manbasis[2]\n");
+      ftmp = calc_norm (dsp->t2d_manbasis.vals[2], d->ncols);
     }
+    }*/
+
+    /*    while (ftmp < tol) {
+	  }*/
 
     dsp->t2d_no_dir_flag = false;
     if (cpanel->t2d.manip_mode == MANIP_RADIAL)
@@ -898,12 +1004,15 @@ tour2d_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
       norm(dsp->t2d_mvar_3dbasis.vals[0],3); /* just in case */
       norm(dsp->t2d_mvar_3dbasis.vals[1],3); /* seems to work ok without */
       norm(dsp->t2d_mvar_3dbasis.vals[2],3); /* this */
-      gram_schmidt(dsp->t2d_mvar_3dbasis.vals[0], 
-        dsp->t2d_mvar_3dbasis.vals[1], 3);
-      gram_schmidt(dsp->t2d_mvar_3dbasis.vals[0], 
-        dsp->t2d_mvar_3dbasis.vals[2], 3);
-      gram_schmidt(dsp->t2d_mvar_3dbasis.vals[1], 
-        dsp->t2d_mvar_3dbasis.vals[2], 3);
+      if (!gram_schmidt(dsp->t2d_mvar_3dbasis.vals[0], 
+        dsp->t2d_mvar_3dbasis.vals[1], 3))
+        g_printerr("");/*t2d_mvar[0] equivalent to t2d_mvar[1]\n");*/
+      if (!gram_schmidt(dsp->t2d_mvar_3dbasis.vals[0], 
+        dsp->t2d_mvar_3dbasis.vals[2], 3))
+	g_printerr("");/*t2d_mvar[0] equivalent to t2d_mvar[2]\n");*/
+      if (!gram_schmidt(dsp->t2d_mvar_3dbasis.vals[1], 
+        dsp->t2d_mvar_3dbasis.vals[2], 3))
+        g_printerr("");/*t2d_mvar[1] equivalent to t2d_mvar[2]\n");*/
 
       /* Generate the projection of the data corresponding to 
          the 3D rotation in the manip space. */
@@ -920,7 +1029,52 @@ tour2d_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
       }
       norm(dsp->t2d.F.vals[0], d->ncols);
       norm(dsp->t2d.F.vals[1], d->ncols);
-      gram_schmidt(dsp->t2d.F.vals[0], dsp->t2d.F.vals[1], d->ncols);
+      /*      if (calc_norm(dsp->t2d.F.vals[0], d->ncols)>1.01) {
+	g_printerr("1 F0 out of bounds\n");
+        g_printerr("F0: ");
+        for (i=0; i<3; i++)
+          g_printerr("%f ",dsp->t2d.F.vals[0][i]);
+        g_printerr("\n");
+        g_printerr("F1: ");
+        for (i=0; i<3; i++)
+          g_printerr("%f ",dsp->t2d.F.vals[1][i]);
+        g_printerr("\n");
+        g_printerr("manbasis0: ");
+        for (i=0; i<3; i++)
+          g_printerr("%f ",dsp->t2d_manbasis.vals[0][i]);
+        g_printerr("\n");
+        g_printerr("manbasis1: ");
+        for (i=0; i<3; i++)
+          g_printerr("%f ",dsp->t2d_manbasis.vals[1][i]);
+        g_printerr("\n");
+        g_printerr("manbasis2: ");
+        for (i=0; i<3; i++)
+          g_printerr("%f ",dsp->t2d_manbasis.vals[2][i]);
+        g_printerr("\n");
+        g_printerr("m3dvar0: ");
+        for (i=0; i<3; i++)
+          g_printerr("%f ",dsp->t2d_mvar_3dbasis.vals[0][i]);
+        g_printerr("\n");
+        g_printerr("m3dvar1: ");
+        for (i=0; i<3; i++)
+          g_printerr("%f ",dsp->t2d_mvar_3dbasis.vals[1][i]);
+        g_printerr("\n");
+        g_printerr("m3dvar2: ");
+        for (i=0; i<3; i++)
+          g_printerr("%f ",dsp->t2d_mvar_3dbasis.vals[2][i]);
+        g_printerr("\n");
+        g_printerr("distx %f disty %f\n",distx,disty);
+      }
+      if (calc_norm(dsp->t2d.F.vals[1], d->ncols)>1.01) 
+      g_printerr("1 F1 out of bounds\n");*/
+      if (!gram_schmidt(dsp->t2d.F.vals[0], dsp->t2d.F.vals[1], d->ncols))
+        g_printerr("");/*t2d.F[0] equivalent to t2d.F[2]\n");*/
+
+      /*      if (calc_norm(dsp->t2d.F.vals[0], d->ncols)>1.0) 
+	g_printerr("F0 out of bounds\n");
+      if (calc_norm(dsp->t2d.F.vals[1], d->ncols)>1.0) 
+	g_printerr("F1 out of bounds\n");
+      */
     }
 
     display_tailpipe (dsp, FULL, gg);
