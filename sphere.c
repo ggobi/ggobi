@@ -120,7 +120,9 @@ g_printerr ("npcs=%d\n", d->sphere.npcs);
     dtmp = (gdouble *) g_malloc0 (d->nrows * sizeof (gdouble));
     for (j=0; j<d->sphere.npcs; j++) {
       vname = g_strdup_printf ("PC%d", j+1);
-      newvar_add_with_values (dtmp, d->nrows, vname, d, gg);
+      newvar_add_with_values (dtmp, d->nrows, vname,
+        real, 0, (gchar **) NULL, (gint *) NULL, (gint *) NULL,
+      d, gg);
       g_free (vname);
     }
     g_free (dtmp);
