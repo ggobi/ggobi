@@ -19,13 +19,16 @@ alloc_tour (displayd *dsp, ggobid *gg)
   gint nc = d->ncols;
   gint i;
 
+  arrayf_init(&dsp->u0);
+  arrayf_alloc(&dsp->u0, nc, nc);
+
 /* ncols x ncols */
 /* first index is the projection dimension, second index is the num vars */
 
-  dsp->u0 = (gfloat **) g_malloc(nc * sizeof(gfloat *));
+  /*  dsp->u0 = (gfloat **) g_malloc(nc * sizeof(gfloat *));
   for (i=0; i<nc; i++)
     dsp->u0[i] = (gfloat *) g_malloc0(nc * sizeof(gfloat));
-
+    */
   dsp->u1 = (gfloat **) g_malloc(nc * sizeof(gfloat *));
   for (i=0; i<nc; i++)
     dsp->u1[i] = (gfloat *) g_malloc0(nc * sizeof(gfloat));
@@ -78,12 +81,14 @@ free_tour(displayd *dsp)
   g_free((gpointer) dsp->tau);
   g_free((gpointer) dsp->tinc);
 
+  arrayf_free(dsp->u0, 0, 0);
+
   for (k=0; k<nc; k++)
     g_free((gpointer) dsp->u[k]);
   g_free((gpointer) dsp->u);
-  for (k=0; k<nc; k++)
+  /*  for (k=0; k<nc; k++)
     g_free((gpointer) dsp->u0[k]);
-  g_free((gpointer) dsp->u0);
+  g_free((gpointer) dsp->u0);*/
   for (k=0; k<nc; k++)
     g_free((gpointer) dsp->u1[k]);
   g_free((gpointer) dsp->u1);
