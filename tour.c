@@ -13,8 +13,6 @@ alloc_tour(displayd *dsp)
   gint nc = xg.ncols;
   gint i;
 
-  g_printerr("in alloc_tour \n");
-
 /* 2 x ncols */
 
   dsp->u0 = (gfloat **) g_malloc((gint) 2 * sizeof(gfloat *));
@@ -111,8 +109,6 @@ zero_tinc(displayd *dsp) {
 
 void 
 cpanel_tour_init(cpaneld *cpanel) {
-    g_printerr("in cpanel_tour_init\n");
-
     cpanel->is_tour_paused = false;
     cpanel->is_tour_local_scan = false;
     cpanel->is_tour_stepping = false;
@@ -125,8 +121,6 @@ cpanel_tour_init(cpaneld *cpanel) {
 void 
 display_tour_init(displayd *dsp) {
     gint i, j;
-
-  g_printerr("in display_tour_init\n");
 
     alloc_tour(dsp);
  
@@ -163,9 +157,6 @@ display_tour_init(displayd *dsp) {
     zero_tau(dsp);
     dsp->delta = 0.0;
     dsp->dv = 1.0;
-  g_printerr("%f \n",dsp->tau[0]);
-  g_printerr("%f \n",dsp->delta);
-
 }
 
 void
@@ -181,7 +172,6 @@ tour_reproject (splotd *sp, glong **world_data)
   gint costi[2], sinti[2];
   displayd *dsp = (displayd *) sp->displayptr;
 
-  g_printerr("in tour_reproject\n");
   for (i=0; i<2; i++)
   {
     costf[i] = (gfloat) cos( (gdouble) dsp->tinc[i]);
@@ -218,9 +208,6 @@ tour_reproject (splotd *sp, glong **world_data)
       sp->planar[i].y += (gint)(dsp->u[1][j]*world_data[i][j]);
     }
   }
-  g_printerr("%f \n",dsp->tau[0]);
-  g_printerr("%f \n",dsp->tau[1]);
-
 }
 
 void
@@ -228,9 +215,8 @@ do_last_increment(displayd *dsp, cpaneld *cpanel)
 {
   gboolean doit = false;
 
-  g_printerr("in do_last-increment\n");
   if ((dsp->tinc[0] != cpanel->tour_path_len*dsp->tau[0]) ||
-    (dsp->tinc[1] != cpanel->tour_path_len*dsp->tau[1]))
+      (dsp->tinc[1] != cpanel->tour_path_len*dsp->tau[1]))
   {
     dsp->tinc[0] = cpanel->tour_path_len*dsp->tau[0];
     dsp->tinc[1] = cpanel->tour_path_len*dsp->tau[1];
@@ -346,7 +332,6 @@ check_proximity(gfloat **base1, gfloat **base2, gint n)
   gint i, indic = 0;
   gfloat tol = 0.001;
 
-  g_printerr("in check_proximity\n");
   for (i=0; i<n; i++)
   {
     diff = base1[0][i] - base2[0][i];
@@ -371,7 +356,6 @@ gt_basis(displayd *dsp)
   gint j, check = 1;
   gdouble frunif[2];
   gdouble r, fac, frnorm[2];
-  g_printerr("in gt_basis\n");
 
 /*
  * Method suggested by Press, Flannery, Teukolsky, and Vetterling (1986)
@@ -424,7 +408,6 @@ basis_dir_ang(displayd *dsp)
   gint k;
   gint n = xg.ncols;
   static gfloat angle_tol = 0.001;
-  g_printerr("in basis_dir_ang\n");
 
 /* calculate values to minimize angle between two base pairs */
   x = sq_inner_prod(dsp->u0[0], dsp->u1[0], n) +
@@ -439,8 +422,6 @@ basis_dir_ang(displayd *dsp)
     inner_prod(dsp->u0[0], dsp->u1[1], n) *
     inner_prod(dsp->u0[1], dsp->u1[1], n);
 
-  g_printerr("x,y %f %f\n",x,y);
-
 /* calculate angles of rotation from bases (u) to princ dirs (v) */
   if (fabs(x) < angle_tol)
   {
@@ -453,8 +434,6 @@ basis_dir_ang(displayd *dsp)
     dsp->ts[1] = dsp->ts[0] + M_PI_2;
   }
 
-  g_printerr("s %f %f\n",dsp->ts[0],dsp->ts[1]);
-
 /* calculate cosines and sines of s */
   for (k=0; k<2; k++)
   {
@@ -463,8 +442,6 @@ basis_dir_ang(displayd *dsp)
     dsp->icoss[k] = (gint) (dsp->coss[k] * PRECISION2);
     dsp->isins[k] = (gint) (dsp->sins[k] * PRECISION2);
   }
-  g_printerr("sins,coss %f %f\n",dsp->sins[0],dsp->coss[0]);
-
 }
 
 void
@@ -473,7 +450,6 @@ princ_dirs(displayd *dsp)
   gint j;
   gint n = xg.ncols;
   
-  g_printerr("in princ_dirs\n");
 /* calculate first princ dirs */ /* if there are frozen vars u0 won't
                                      have norm 1, but since this is just
                                      rotation it should be ok */
@@ -503,7 +479,6 @@ princ_angs(displayd *dsp, cpaneld *cpanel)
   gfloat tmpf1, tmpf2;
   gfloat tol2 = 0.01;
   static gfloat angle_tol = 0.001;
-  g_printerr("in princ_angs\n");
 
 /*
  * if the norms vanish need to regenerate another basis and new
@@ -534,7 +509,6 @@ princ_angs(displayd *dsp, cpaneld *cpanel)
     tmpf2 = -1.0;
   dsp->tau[0] = (gfloat) acos((gdouble) tmpf1);
   dsp->tau[1] = (gfloat) acos((gdouble) tmpf2);
-  g_printerr("tau %f %f\n",dsp->tau[0],dsp->tau[1]);
 
   if ((dsp->tau[0] < tol2) && (dsp->tau[1] < tol2))
   {
@@ -562,8 +536,6 @@ princ_angs(displayd *dsp, cpaneld *cpanel)
   dsp->dv = sqrt(dsp->tau[0]*dsp->tau[0] + dsp->tau[1]*dsp->tau[1]);
   dsp->delta = cpanel->tour_step/dsp->dv;
   
-  g_printerr("dv, delta %f %f\n",dsp->dv,dsp->delta);
-
   /* orthogonalize v1 wrt v0 by Gram-Schmidt and normalize */
   if (dsp->tau[0] > angle_tol)
     gram_schmidt(dsp->v0[0], dsp->v1[0], n);
@@ -573,7 +545,6 @@ princ_angs(displayd *dsp, cpaneld *cpanel)
 
 void
 geodesic_tour_path(displayd *dsp, cpaneld *cpanel) {
-  g_printerr("in geodesic_tour_path\n");
   basis_dir_ang(dsp);
   princ_dirs(dsp);
   princ_angs(dsp, cpanel);
@@ -582,15 +553,12 @@ geodesic_tour_path(displayd *dsp, cpaneld *cpanel) {
 void
 determine_endbasis_and_path(displayd *dsp, cpaneld *cpanel)
 {
-  g_printerr("in determine_endbasis\n");
   /* general scan tour */
     if (!check_proximity(dsp->u, dsp->u0, xg.ncols))
     {
       init_basis(dsp);
-      g_printerr("in determine_endbasis 2\n");
     }
     gt_basis(dsp);
-    g_printerr("%f %f\n",dsp->u1[0][0],dsp->u1[0][1]);
 
 /*
  * Calculate path.
@@ -602,7 +570,6 @@ determine_endbasis_and_path(displayd *dsp, cpaneld *cpanel)
 void
 increment_tour(displayd *dsp)
 {
-  g_printerr("in increment tour\n");
   display_tailpipe (dsp);
 
   /*  tour_var_lines(xg);*/
@@ -613,58 +580,62 @@ check_tour(displayd *dsp, cpaneld *cpanel)
 {
   gint return_val = 1;
 
-  g_printerr("in check tour 1:  %f %f\n",dsp->delta, cpanel->tour_path_len);
-  g_printerr("%f \n",dsp->tau[0]);
-  g_printerr("%f \n",dsp->tau[1]);
-
   dsp->tinc[0] += (dsp->delta * dsp->tau[0]);
   dsp->tinc[1] += (dsp->delta * dsp->tau[1]);
-  g_printerr("in check tour 2\n");
+
   if ((dsp->tinc[0] > cpanel->tour_path_len*dsp->tau[0]) || 
     (dsp->tinc[1] > cpanel->tour_path_len*dsp->tau[1]) ||
     ((dsp->tinc[0] == cpanel->tour_path_len*dsp->tau[0]) && 
     (dsp->tinc[1] == cpanel->tour_path_len*dsp->tau[1])))
       return_val = 0;
-  g_printerr("in check tour 3\n");
 
-  return(return_val);
+  return (return_val);
 }
 
 void
-run_tour(displayd *dsp)
+run_tour (displayd *dsp)
 {
   cpaneld *cpanel = &dsp->cpanel;
 
-  g_printerr("in run_tour %d\n",cpanel->is_tour_stepping);
 /*
  * This controls the tour, effectively. It checks if we are at the end of 
  * the current path, if not then increments the tour a step.
 */
-  if (check_tour(dsp, cpanel))
-  {
-    g_printerr("incrementing...\n");
-
+  if (check_tour(dsp, cpanel)) {
     increment_tour(dsp);
   }
 /*
  * Calculation of new path for various different modes.
 */
-  else
-  {
+  else {
 /*
  * Do a final projection into the ending plane if just finished a tour
 */
-      g_printerr("getting new basis and calculating path\n");
-
       do_last_increment(dsp, cpanel);
-
       determine_endbasis_and_path(dsp, cpanel);
   }
 }
 
 void 
 tour_do_step (displayd *dsp) {
-  g_printerr("in tour_do_step %f %f \n",dsp->tau[0], dsp->delta);
   run_tour (dsp);
+}
+
+void *
+tour_thread (void *args)
+{
+  displayd *dsp = current_display;
+  cpaneld *cpanel = &dsp->cpanel;
+g_printerr ("(tour_thread)\n");
+
+  while (true) {
+    if (mode_get () == TOUR2D && !cpanel->is_tour_paused) {
+      gdk_threads_enter ();
+      run_tour (current_display);
+      gdk_threads_leave ();
+    }
+  }
+
+  return (NULL);
 }
 

@@ -174,6 +174,7 @@ gint XGOBI (main)(gint argc, gchar *argv[], gboolean processEvents)
   extern void make_ggobi (gchar *, gboolean);
   GdkVisual *vis;
 
+  g_thread_init (NULL);
   gtk_init (&argc, &argv);
 
   vis = gdk_visual_get_system ();
@@ -182,7 +183,6 @@ gint XGOBI (main)(gint argc, gchar *argv[], gboolean processEvents)
             vis->type == GDK_VISUAL_STATIC_GRAY ||
             vis->type == GDK_VISUAL_GRAYSCALE);
 
-  
   g_print ("progname = %s\n", g_get_prgname());
 
   xg.std_type = 0;

@@ -57,15 +57,15 @@ OB=ggobi.o make_ggobi.o color.o main_ui.o cpanel.o utils.o array.o \
 
 
 ggobi: $(OB)
-	$(CC) `gtk-config --cflags` $(OB) -o ggobi `gtk-config --libs`
+	$(CC) $(OB) -o ggobi `gtk-config --cflags --libs gthread`
 
 pure: ggobi.o $(OB)
 	purify -cache-dir=/tmp  -always-use-cache-dir=yes \
-	${CC} `gtk-config --cflags` -o ggobi $(OB) `gtk-config --libs`
+	${CC} -o ggobi $(OB) `gtk-config --cflags --libs gthread`
 
 
 libGGobi.so: $(OB)
-	$(CC) $(SHARED_LD_FLAGS) -o $@ $(OB) `gtk-config --libs`
+	$(CC) $(SHARED_LD_FLAGS) -o $@ $(OB) `gtk-config --libs gthread`
 
 clean: 
 	rm -f *.o ggobi libGGobi.so

@@ -1,7 +1,8 @@
 /* tour2d_ui.c */
 
-#include <gtk/gtk.h>
 #include <strings.h>
+#include <pthread.h>
+#include <gtk/gtk.h>
 
 #include "vars.h"
 #include "externs.h"
@@ -20,10 +21,26 @@ static void scale_set_default_values (GtkScale *scale )
   gtk_range_set_update_policy (GTK_RANGE (scale), GTK_UPDATE_CONTINUOUS);
   gtk_scale_set_draw_value (scale, false);
 }
-static void pause_cb (GtkToggleButton *button)
-{
-  g_printerr ("tour2d pause: %d\n", button->active);
+
+void tour2d_pause (cpaneld *cpanel, gboolean state) {
+  extern void *tour_thread (void *);
+  extern pthread_t tour2d_tid;
+
+  cpanel->is_tour_paused = state;
+
+g_printerr ("(pause) state=%d\n", state);
+  if (state) {
+    pthread_cancel (tour2d_tid);
+  } else {
+    pthread_create (&tour2d_tid, NULL, tour_thread, NULL);
+  }
 }
+
+static void tour2d_pause_cb (GtkToggleButton *button)
+{
+  tour2d_pause (&current_display->cpanel, button->active);
+}
+
 static void reinit_cb (GtkWidget *w) {
   g_printerr ("reinit\n");
 }
@@ -87,7 +104,7 @@ cpanel_tour2d_make () {
   gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips), btn,
     "Stop tour motion temporarily", NULL);
   gtk_signal_connect (GTK_OBJECT (btn), "toggled",
-                     GTK_SIGNAL_FUNC (pause_cb), (gpointer) NULL);
+                     GTK_SIGNAL_FUNC (tour2d_pause_cb), (gpointer) NULL);
   gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
 
   btn = gtk_button_new_with_label ("Reinit");

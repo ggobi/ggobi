@@ -3,11 +3,16 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <pthread.h>
 
 #include <gtk/gtk.h>
 
 #include "vars.h"
 #include "externs.h"
+
+pthread_t tour2d_tid;
+extern void * tour_thread ();
+
 
 /*-- initialize variables which don't depend on the size of the data --*/
 void globals_init () {
@@ -137,7 +142,12 @@ make_ggobi (gchar *data_in, gboolean processEvents) {
     }
   }
 
- if (processEvents)
-  gtk_main ();
+  pthread_create (&tour2d_tid, NULL, tour_thread, NULL);
+
+  if (processEvents) {
+    gdk_threads_enter ();
+    gtk_main ();
+    gdk_threads_leave ();
+  }
 }
 

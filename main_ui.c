@@ -1,12 +1,10 @@
 /* main_ui.c */
 
-#include <gtk/gtk.h>
 #include <strings.h>
+#include <gtk/gtk.h>
 
 #include "vars.h"
 #include "externs.h"
-
-
 #include "display_tree.h"
 
 static gint mode = XYPLOT, prev_mode = XYPLOT;
@@ -329,6 +327,7 @@ mode_set (gint m) {
 
 void
 mode_activate (splotd *sp, gint m, gboolean state) {
+
   if (state == off) {
 
     switch (m) {
@@ -339,7 +338,11 @@ mode_activate (splotd *sp, gint m, gboolean state) {
       case MOVEPTS:
       case COTOUR:
       case ROTATE:
+        break;
+
       case TOUR2D:
+        break;
+
       case SCALE:
       case IDENT:
         break;
@@ -356,7 +359,11 @@ mode_activate (splotd *sp, gint m, gboolean state) {
       case MOVEPTS:
       case COTOUR:
       case ROTATE:
+        break;
+
       case TOUR2D:
+        break;
+
       case SCALE:
       case IDENT:
         break;
