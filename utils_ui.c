@@ -231,6 +231,7 @@ submenu_insert (GtkWidget *item, GtkWidget * mbar, gint pos) {
     GSList *children;
     children = (GSList *) gtk_container_children (GTK_CONTAINER (mbar));
     pos = g_slist_length (children) - 1;
+    g_slist_free (children);
   }
 
   gtk_menu_bar_insert (GTK_MENU_BAR (mbar), item, pos);

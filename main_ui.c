@@ -544,6 +544,7 @@ void make_ui () {
   gg.tips = gtk_tooltips_new ();
 
   window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+g_printerr ("TOPLEVEL: %d\n", (gint) window);
   gtk_window_set_policy (GTK_WINDOW (window), true, true, false);
 
   gtk_signal_connect (GTK_OBJECT (window), "delete_event",
@@ -594,11 +595,13 @@ void make_ui () {
         }
         subitems = subitems->next;
       }
+      g_list_free (subitems);
       break;  /* Finished with options menu */
     }
 
     items = items->next;
   }
+  g_list_free (items);
 /* */
 
   hbox = gtk_hbox_new (false, 0);

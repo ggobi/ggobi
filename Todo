@@ -9,15 +9,17 @@ Scaling:
 
 Imputation of missing values
 
-Erase/hiding/exclusion  (could use a redo button; no big deal)
+Erase/hiding/exclusion  (done; could use a redo button)
+  fix up for api
 
-Leave rgroups alone, but use a decoration array instead of nlinkable?
+Use a set of decoration arrays (points and lines) instead of nlinkable
 
 Smoothing
 
 API code
 
 Line brushing
+
 Line editing
 Move points
 
