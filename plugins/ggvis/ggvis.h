@@ -9,13 +9,14 @@
 #define NSTRESSVALUES    1000
 #define STRESSPLOT_MARGIN  10
 
-#define HISTOGRAM_WIDTH     250
-#define HISTOGRAM_HEIGHT    100
-#define HISTOGRAM_VMARGIN     5
-#define HISTOGRAM_HMARGIN    16  /* should be an even number */
-#define HISTOGRAM_GRIP_SPACE 20
-#define HISTOGRAM_GRIP_SIZE  10  /* should be even number */
-#define HISTOGRAM_BWIDTH      5
+#define HISTOGRAM_WIDTH      250
+#define HISTOGRAM_HEIGHT     100
+#define HISTOGRAM_VMARGIN      5
+#define HISTOGRAM_HMARGIN     24  /* should be an even number */
+#define HISTOGRAM_GRIP_SPACE  10
+#define HISTOGRAM_GRIP_HEIGHT 10  /* should be even number */
+#define HISTOGRAM_GRIP_WIDTH  20  /* should be even number */
+#define HISTOGRAM_BWIDTH       5
 
 typedef int (*CompareFunc)(const void *, const void *);
 
@@ -34,7 +35,6 @@ typedef struct {
   GdkPixmap *pix;
   gdouble low, high;
   gint lgrip_pos, rgrip_pos;
-  GdkRectangle lgrip, rgrip;
   gint lgrip_down, rgrip_down;
   GdkRectangle *bars;
   vector_b bars_included;

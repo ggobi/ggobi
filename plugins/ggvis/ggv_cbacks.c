@@ -193,7 +193,6 @@ static void
 trans_dist_init_defaults (ggvisd *ggv)
 {
   gint i, j, IJ;;
-g_printerr ("(trans_dist_init_defaults)\n");
 
   vectord_realloc (&ggv->trans_dist, ggv->ndistances);
   for (i=0; i<ggv->Dtarget.nrows; i++) {
@@ -454,7 +453,12 @@ void ggv_Dtarget_power_cb (GtkAdjustment *adj, PluginInstance *inst)
   ggobid *gg = inst->gg;
   ggvisd *ggv = ggvisFromInst (inst);
   ggv->mds_Dtarget_power = adj->value;
- g_printerr ("mds_Dtarget_power = %f\n", ggv->mds_Dtarget_power);
+
+  if (!ggv->dpos) {
+    /*-- initialize, allocate and populate dpos --*/
+    ggv_datad_create (ggv->dsrc, ggv->e, gg->current_display, ggv, gg);
+    ggv_pos_init (ggv);
+  }
 
 /*
   if (metric_nonmetric == METRIC) {

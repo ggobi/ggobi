@@ -602,7 +602,9 @@ mds_once (gboolean doit, ggvisd *ggv, ggobid *gg)
   if (ggv->trans_dist.nels < ggv->ndistances) {
     /* transformation of raw_dist */
     vectord_realloc (&ggv->trans_dist, ggv->ndistances);
-    /* distances of configuration points */
+  }
+  /* distances of configuration points */
+  if (ggv->config_dist.nels < ggv->ndistances) {
     vectord_realloc (&ggv->config_dist, ggv->ndistances);
   }
   /* initialize everytime we come thru because missings may change

@@ -139,7 +139,6 @@ histogram_make (ggvisd *ggv)
 
 void
 draw_grip_control (ggvisd *ggv, ggobid *gg) {
-  /*GdkRectangle grips[2];*/
   gint ypos;
   GtkWidget *da = ggv->dissim->da;
   dissimd *D = ggv->dissim;
@@ -157,22 +156,15 @@ draw_grip_control (ggvisd *ggv, ggobid *gg) {
     D->rgrip_pos = max_grip_pos;
   }
 
-  ypos = da->allocation.height - HISTOGRAM_VMARGIN - HISTOGRAM_GRIP_SIZE/2;
+  ypos = da->allocation.height - HISTOGRAM_VMARGIN - HISTOGRAM_GRIP_HEIGHT/2;
 
+  gdk_gc_set_foreground (gg->plot_GC, &gg->mediumgray);
   gdk_draw_line (D->pix, gg->plot_GC, min_grip_pos, ypos, max_grip_pos, ypos);
 
-  D->lgrip.x = D->lgrip_pos - HISTOGRAM_GRIP_SIZE/2;
-  D->lgrip.y = ypos - HISTOGRAM_GRIP_SIZE/2;
-  D->lgrip.width = D->lgrip.height = HISTOGRAM_GRIP_SIZE;
-
-  D->rgrip.x = D->rgrip_pos - HISTOGRAM_GRIP_SIZE/2;
-  D->rgrip.y = ypos - HISTOGRAM_GRIP_SIZE/2;
-  D->rgrip.width = D->rgrip.height = HISTOGRAM_GRIP_SIZE;
-  
-  gdk_draw_rectangle (D->pix, gg->plot_GC, true,
-    D->lgrip.x, D->lgrip.y, D->lgrip.width, D->lgrip.height);
-  gdk_draw_rectangle (D->pix, gg->plot_GC, true,
-    D->rgrip.x, D->rgrip.y, D->rgrip.width, D->rgrip.height);
+  draw_3drectangle (D->pix, D->lgrip_pos, ypos,
+    HISTOGRAM_GRIP_WIDTH, HISTOGRAM_GRIP_HEIGHT, gg);
+  draw_3drectangle (D->pix, D->rgrip_pos, ypos,
+    HISTOGRAM_GRIP_WIDTH, HISTOGRAM_GRIP_HEIGHT, gg);
 }
 
 static void
@@ -345,13 +337,13 @@ ggv_histogram_motion_cb (GtkWidget *w, GdkEventMotion *xmotion,
     return false;
 
   if (D->lgrip_down &&
-      x + HISTOGRAM_GRIP_SIZE < D->rgrip_pos &&
+      x + HISTOGRAM_GRIP_WIDTH < D->rgrip_pos &&
       x >= min_grip_pos)
   {
     D->lgrip_pos = x;
   }
   else if (D->rgrip_down &&
-           x > D->lgrip_pos + HISTOGRAM_GRIP_SIZE &&
+           x > D->lgrip_pos + HISTOGRAM_GRIP_WIDTH &&
            x <= max_grip_pos)
   {
     D->rgrip_pos = x;
@@ -387,13 +379,13 @@ ggv_histogram_button_press_cb (GtkWidget *w, GdkEventButton *evnt,
 
   gdk_window_get_pointer (w->window, &x, &y, &state);
 
-  if (x >= D->lgrip_pos - HISTOGRAM_GRIP_SIZE/2 &&
-      x <= D->lgrip_pos + HISTOGRAM_GRIP_SIZE/2)
+  if (x >= D->lgrip_pos - HISTOGRAM_GRIP_WIDTH/2 &&
+      x <= D->lgrip_pos + HISTOGRAM_GRIP_WIDTH/2)
   {
     D->lgrip_down = true;
   }
-  else if (x >= D->rgrip_pos - HISTOGRAM_GRIP_SIZE/2 &&
-           x <= D->rgrip_pos + HISTOGRAM_GRIP_SIZE/2)
+  else if (x >= D->rgrip_pos - HISTOGRAM_GRIP_WIDTH/2 &&
+           x <= D->rgrip_pos + HISTOGRAM_GRIP_WIDTH/2)
   {
     D->rgrip_down = true;
   }
