@@ -37,9 +37,7 @@ const char *const GGOBI(OpModeNames)[] = {
   "XYPlot",
   "Rotation",
   "1D Tour",
-#ifdef ROTATION_IMPLEMENTED
   "Rotation",
-#endif
   "2D Tour",
   "Correlation Tour",
   "Scale",
@@ -70,10 +68,8 @@ make_control_panels (ggobid *gg)
 {
   cpanel_p1dplot_make (gg);
   cpanel_xyplot_make (gg);
-#ifdef ROTATION_IMPLEMENTED
-  cpanel_tour2d3_make (gg);
-#endif
   cpanel_tour1d_make (gg);
+  cpanel_tour2d3_make (gg);
   cpanel_tour2d_make (gg);
   cpanel_ctour_make (gg);
 
@@ -295,19 +291,17 @@ static void
 procs_activate (gboolean state, displayd *display, ggobid *gg)
 {
   switch (gg->viewmode) {
-#ifdef ROTATION_IMPLEMENTED
+    case TOUR1D:
+      if (!display->cpanel.t1d.paused)
+        tour1d_func (state, display, gg);
+    break;
     case TOUR2D3:
       if (!display->cpanel.t2d3.paused)
         tour2d3_func (state, display, gg);
     break;
-#endif
     case TOUR2D:
       if (!display->cpanel.t2d.paused)
         tour2d_func (state, display, gg);
-    break;
-    case TOUR1D:
-      if (!display->cpanel.t1d.paused)
-        tour1d_func (state, display, gg);
     break;
     case COTOUR:
       if (!display->cpanel.tcorr1.paused)
@@ -330,12 +324,10 @@ viewmode_activate (splotd *sp, PipelineMode m, gboolean state, ggobid *gg)
       case XYPLOT:
         xyplot_activate (state, display, gg);
       break;
-#ifdef ROTATION_IMPLEMENTED
       case TOUR2D3:
         if (cpanel->t2d3.manip_mode != MANIP_OFF)
           splot_cursor_set ((gint) NULL, sp);
       break;
-#endif
       case TOUR2D:
         if (cpanel->t2d.manip_mode != MANIP_OFF)
           splot_cursor_set ((gint) NULL, sp);
@@ -366,12 +358,10 @@ viewmode_activate (splotd *sp, PipelineMode m, gboolean state, ggobid *gg)
       case XYPLOT:
         xyplot_activate (state, display, gg);
       break;
-#ifdef ROTATION_IMPLEMENTED
       case TOUR2D3:
         if (cpanel->t2d3.manip_mode != MANIP_OFF)
           splot_cursor_set (GDK_HAND2, sp);
       break;
-#endif
       case TOUR2D:
         if (cpanel->t2d.manip_mode != MANIP_OFF)
           splot_cursor_set (GDK_HAND2, sp);
@@ -422,12 +412,10 @@ projection_ok (gint m, displayd *display)
         if (d->ncols < 2)
           ok = false;
       break;
-#ifdef ROTATION_IMPLEMENTED
       case TOUR2D3:
         if (d->ncols < MIN_NVARS_FOR_TOUR2D3)
           ok = false;
       break;
-#endif
       case TOUR1D:
         if (d->ncols < MIN_NVARS_FOR_TOUR1D)
           ok = false;

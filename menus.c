@@ -648,11 +648,9 @@ viewmode_submenus_update (PipelineMode prev_mode, displayd *prev_display, ggobid
       tour1d_menus_make (gg);
     break;
 
-#ifdef ROTATION_IMPLEMENTED
     case TOUR2D3:
       tour2d3_menus_make (gg);
     break;
-#endif
 
     case TOUR2D:
       tour2d_menus_make (gg);

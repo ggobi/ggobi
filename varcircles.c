@@ -36,7 +36,7 @@ g_printerr ("0: nboxes = %d\n", g_slist_length (d->vcirc_ui.vb));
 */
 
   switch (projection) {
-#ifdef ROTATION_IMPLEMENTED
+
     case TOUR2D3:
       for (j=0; j<d->ncols; j++) {
         box = varcircles_get_nth (VB, j, d);
@@ -65,7 +65,6 @@ g_printerr ("0: nboxes = %d\n", g_slist_length (d->vcirc_ui.vb));
         }
       }
     break;
-#endif
 
     case TOUR1D:
       for (j=0; j<d->ncols; j++) {

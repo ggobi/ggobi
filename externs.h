@@ -10,26 +10,6 @@
 extern "C" {
 #endif
 
-#ifdef ROTATION_IMPLEMENTED
-void       cpanel_t2d3_init (cpaneld *, ggobid *);
-void       cpanel_tour2d3_make (ggobid *);
-void       cpanel_tour2d3_set (cpaneld *, ggobid *);
-void       display_tour2d3_init (displayd *, ggobid *);
-void       display_tour2d3_init_null (displayd *, ggobid *);
-void       tour2d3_event_handlers_toggle (splotd *, gboolean state);
-void       tour2d3_func (gboolean state, displayd *, ggobid *);
-void       tour2d3_manip (gint, gint, splotd *, ggobid *);
-void       tour2d3_manip_end (splotd *);
-void       tour2d3_manip_init (gint, gint, splotd *);
-void       tour2d3_menus_make (ggobid *);
-void       tour2d3_pause (cpaneld *, gint, ggobid *);
-void       tour2d3_projdata (splotd *, greal **world_data, datad *, ggobid *);
-void       tour2d3_realloc_up (gint nc, datad *d, ggobid *gg);
-void       tour2d3_reinit (ggobid *);
-void       tour2d3_scramble (ggobid *);
-void       tour2d3_speed_set (gint, ggobid *);
-gboolean   tour2d3_varsel (GtkWidget *, gint jvar, gint toggle, gint btn, datad *, ggobid *);
-#endif
 
 RedrawStyle brush_activate (gboolean, displayd *, ggobid *);
 RedrawStyle identify_activate (gint, displayd *, ggobid *);
@@ -163,11 +143,14 @@ void       cpanel_set (displayd *, ggobid *);
 void       cpanel_show_cb (GtkCheckMenuItem *w, guint action);
 void       cpanel_t1d_init (cpaneld *, ggobid *);
 void       cpanel_t2d_init (cpaneld *, ggobid *);
+void       cpanel_t2d3_init (cpaneld *, ggobid *);
 void       cpanel_tcorr_init (cpaneld *, ggobid *);
 void       cpanel_tour1d_make (ggobid *);
 void       cpanel_tour1d_set (cpaneld *, ggobid *);
 void       cpanel_tour2d_make (ggobid *);
 void       cpanel_tour2d_set (cpaneld *, ggobid *);
+void       cpanel_tour2d3_make (ggobid *);
+void       cpanel_tour2d3_set (cpaneld *, ggobid *);
 void       cpanel_tourcorr_set (cpaneld *, ggobid *);
 void       cpanel_xyplot_init (cpaneld *, ggobid *);
 void       cpanel_xyplot_make (ggobid *);
@@ -212,6 +195,8 @@ void       display_tour1d_init (displayd *dsp, ggobid *gg);
 void       display_tour1d_init_null (displayd *dsp, ggobid *gg);
 void       display_tour2d_init (displayd *dsp, ggobid *gg);
 void       display_tour2d_init_null (displayd *dsp, ggobid *gg);
+void       display_tour2d3_init (displayd *, ggobid *);
+void       display_tour2d3_init_null (displayd *, ggobid *);
 void       display_tourcorr_init (displayd *dsp, ggobid *gg);
 void       display_tourcorr_init_null (displayd *dsp, ggobid *gg);
 gboolean   display_type_handles_action (displayd *, PipelineMode m);
@@ -475,6 +460,19 @@ void       tour2d_scramble (ggobid *);
 void       tour2d_speed_set (gint, ggobid *);
 gboolean   tour2d_varsel (GtkWidget *, gint jvar, gint toggle, gint btn, datad *, ggobid *);
 void       tour2dpp_window_open (ggobid *);
+void       tour2d3_event_handlers_toggle (splotd *, gboolean state);
+void       tour2d3_func (gboolean state, displayd *, ggobid *);
+void       tour2d3_manip (gint, gint, splotd *, ggobid *);
+void       tour2d3_manip_end (splotd *);
+void       tour2d3_manip_init (gint, gint, splotd *);
+void       tour2d3_menus_make (ggobid *);
+void       tour2d3_pause (cpaneld *, gint, ggobid *);
+void       tour2d3_projdata (splotd *, greal **world_data, datad *, ggobid *);
+void       tour2d3_realloc_up (gint nc, datad *d, ggobid *gg);
+void       tour2d3_reinit (ggobid *);
+void       tour2d3_scramble (ggobid *);
+void       tour2d3_speed_set (gint, ggobid *);
+gboolean   tour2d3_varsel (GtkWidget *, gint jvar, gint toggle, gint btn, datad *, ggobid *);
 void       tour_do_step (displayd *, ggobid *);
 void       tour_manip_colors_init (ggobid *);
 void       tour_reproject (vector_f, array_d, array_d, array_d, array_d, array_d, gint, gint);

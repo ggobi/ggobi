@@ -125,13 +125,11 @@ typedef struct
 */
  icoords xyvars;
 
-#ifdef ROTATION_IMPLEMENTED
 /*-- rotation implemented as a limited tour2d --*/
  struct _tour2d3 {
    greal maxscreen;
    gboolean initmax;
  } tour2d3;
-#endif
 
 } splotd;
 

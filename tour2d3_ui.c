@@ -22,7 +22,6 @@
    called once, when a new tour is started since a new
    subset of variable might be used, or when there is new data. */
 
-#ifdef ROTATION_IMPLEMENTED
 
 void 
 cpanel_t2d3_init (cpaneld *cpanel, ggobid *gg) {
@@ -307,4 +306,3 @@ tour2d3_event_handlers_toggle (splotd *sp, gboolean state) {
     disconnect_button_release_signal (sp);
   }
 }
-#endif

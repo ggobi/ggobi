@@ -412,11 +412,7 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
     }
   }
 
-#ifdef ROTATION_IMPLEMENTED
   if (proj == TOUR1D || proj == TOUR2D3 || proj == TOUR2D || proj == COTOUR) {
-#else
-  if (proj == TOUR1D || proj == TOUR2D || proj == COTOUR) {
-#endif
     splot_draw_tour_axes(sp, sp->pixmap0, gg);
   }
 
@@ -1141,11 +1137,7 @@ splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
     }
   }
 
-#ifdef ROTATION_IMPLEMENTED
   if (proj == TOUR1D || proj == TOUR2D3 || proj == TOUR2D || proj == COTOUR) {
-#else
-  if (proj == TOUR1D || proj == TOUR2D || proj == COTOUR) {
-#endif
     splot_draw_tour_axes(sp, drawable, gg);
   }
 }
@@ -1257,7 +1249,7 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
         gdk_gc_set_line_attributes(gg->plot_GC, 1, GDK_LINE_SOLID, 
           GDK_CAP_ROUND, GDK_JOIN_ROUND);
       break;
-#ifdef ROTATION_IMPLEMENTED
+
       case TOUR2D3:
         /* draws circle */
         gdk_draw_arc(drawable,gg->plot_GC,FALSE,
@@ -1358,7 +1350,7 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
           GDK_CAP_ROUND, GDK_JOIN_ROUND);
 
       break;
-#endif
+
       case TOUR2D:
         /* draws circle */
         gdk_draw_arc(drawable,gg->plot_GC,FALSE,

@@ -8,7 +8,6 @@
     with AT&T, you have an infringing copy of this software and cannot use
     it without violating AT&T's intellectual property rights.
 */
-#ifdef ROTATION_IMPLEMENTED
 
 #include <gtk/gtk.h>
 #ifdef USE_STRINGS_H
@@ -1121,4 +1120,3 @@ tour2d3_manip_end(splotd *sp)
 #undef T2D3ON
 #undef T2D3OFF
 
-#endif

@@ -113,7 +113,6 @@ struct _displayd {
  tour t1d;
  gboolean t1d_axes;
 
-#ifdef ROTATION_IMPLEMENTED
 /*-- rotation: 2d tour, constrained to 3 variables --*/
  tour t2d3;
  gboolean t2d3_axes;
@@ -124,7 +123,6 @@ struct _displayd {
  gfloat t2d3_rx, t2d3_ry;
  gboolean t2d3_no_dir_flag;
  gboolean t2d3_manipvar_inc;
-#endif
 
 /*-- 2d tour --*/
  tour t2d;
@@ -287,12 +285,9 @@ typedef struct
     void (*select_X)(GtkWidget *, displayd *, gint, ggobid *);
 
     void (*tour1d_realloc)(displayd *, gint, datad *);
+    void (*tour2d3_realloc)(displayd *, gint, datad *);
     void (*tour2d_realloc)(displayd *, gint, datad *);
     void (*tourcorr_realloc)(displayd *, gint, datad *);
-
-#ifdef ROTATION_IMPLEMENTED
-    void (*tour2d3_realloc)(displayd *, gint, datad *);
-#endif
 
     void (*set_show_axes_option)(displayd *, gboolean);
     void (*set_show_axes_label_option)(displayd *, gboolean);

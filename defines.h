@@ -64,10 +64,7 @@ enum directiond {both, vertical, horizontal};
 /* modes */
 typedef enum {NULLMODE = -1,
                P1PLOT, XYPLOT, TOUR1D,
-#ifdef ROTATION_IMPLEMENTED
-               TOUR2D3,
-#endif
-               TOUR2D, COTOUR,
+               TOUR2D3, TOUR2D, COTOUR,
                SCALE, BRUSH, IDENT, EDGEED, MOVEPTS,
                SCATMAT, PCPLOT,
                EXTENDED_DISPLAY_MODE,
@@ -128,10 +125,7 @@ typedef enum {NULLMODE = -1,
                                 /* at least 1 vert, at least 1 horiz */
 #define MIN_NVARS_FOR_TOUR2D 3  /* require: 3 in subset, 2 active */
 #define MIN_NVARS_FOR_TOUR1D 2  /* require: 2 in subset, 1 active */
-
-#ifdef ROTATION_IMPLEMENTED
 #define MIN_NVARS_FOR_TOUR2D3 3  /* exactly 3 in subset, 3 active */
-#endif
 
 #define TOURSTEP0 0.003
 #define TOUR_LS_IN 0

@@ -103,7 +103,6 @@ typedef struct {
    gint manip_mode;
  } t2d;
 
-#ifdef ROTATION_IMPLEMENTED
  /*-- rotation control pane --*/
  struct _Tour2D3CPanel {
    gboolean paused;
@@ -111,7 +110,6 @@ typedef struct {
    gfloat slidepos;
    gint manip_mode;
  } t2d3;
-#endif
 
  /*-- 1d tour control panel --*/
  struct _Tour1DCpanel {

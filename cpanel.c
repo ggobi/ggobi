@@ -27,9 +27,7 @@ scatterplot_cpanel_init (cpaneld *cpanel, PipelineMode initial_mode,
   cpanel->p1d.type = ASH;
   cpanel_p1d_init (cpanel, gg);
   cpanel_xyplot_init (cpanel, gg);
-#ifdef ROTATION_IMPLEMENTED
   cpanel_t2d3_init (cpanel, gg);
-#endif
   cpanel_t2d_init (cpanel, gg);
   cpanel_t1d_init (cpanel, gg);
   cpanel_tcorr_init (cpanel, gg);

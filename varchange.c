@@ -44,11 +44,9 @@ addvar_pipeline_realloc (datad *d, ggobid *gg)
   arrayf_add_cols (&d->raw, d->ncols);
   arrayf_add_cols (&d->tform, d->ncols);
 
-#ifdef ROTATION_IMPLEMENTED
-  tour2d3_realloc_up (d->ncols, d, gg);
-#endif
-  tour2d_realloc_up (d->ncols, d, gg);
   tour1d_realloc_up (d->ncols, d, gg);
+  tour2d3_realloc_up (d->ncols, d, gg);
+  tour2d_realloc_up (d->ncols, d, gg);
   tourcorr_realloc_up (d->ncols, d, gg);
 
   missing_arrays_add_cols (d, gg);
