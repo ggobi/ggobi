@@ -6,20 +6,21 @@
 #include "ggobi.h"
 #include "vars.h"
 
-/* Global variable for the */
+/* Global variables for the window containing a tree listing
+   plots within displays */
 typedef struct {
 
   GtkWidget *window;
   GtkWidget *tree;
-  int numItems;
+  gint numItems;
 
 } DisplayTree;
 
 extern DisplayTree display_tree;
 
-GtkWidget *display_add_tree(displayd *display, int entry, GtkWidget *tree, ggobid *gg);
+GtkWidget *display_add_tree(displayd *display, gint entry, GtkWidget *tree, ggobid *gg);
 
-char *display_tree_label(displayd *display);
+gchar *display_tree_label(displayd *display);
 GtkTree *plot_tree_display(ggobid *);
 
 /*
@@ -28,12 +29,12 @@ void show_display_tree (gpointer cbd, guint action, GtkWidget *widget);
 void show_display_tree (ggobid *gg, GtkWidget *widget);
 
 GtkWidget *splot_subtree_create(displayd *display, ggobid *gg);
-char *splot_tree_label (splotd *, gint, enum displaytyped, datad *, ggobid *);
+gchar *splot_tree_label (splotd *, gint, enum displaytyped, datad *, ggobid *);
 
 void display_tree_delete_cb(GtkWidget *w, GdkEvent *event, ggobid *gg);
 
-int  tree_display_entry_remove(displayd *display, GtkWidget *w, ggobid *gg);
-int  tree_display_entry_remove_by_index(int which, GtkWidget *tree);
+gint  tree_display_entry_remove(displayd *display, GtkWidget *w, ggobid *gg);
+gint  tree_display_entry_remove_by_index(gint which, GtkWidget *tree);
 
 void display_tree_display_child_select(GtkWidget *root_tree,displayd *display);
 
