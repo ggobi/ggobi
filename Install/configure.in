@@ -455,7 +455,7 @@ if test -n "${ENABLE_ALL_PLUGINS}" && test ${ENABLE_ALL_PLUGINS} -gt 0 ; then
  DATAVIEWER_PLUGIN=1
  FILESELECTOR_PLUGIN=1
  GRAPHLAYOUT_PLUGIN=1
- GGGVIS_PLUGIN=1
+ GGVIS_PLUGIN=1
  PLUGIN_DIRS="ImageLib MySQL Postgres DataViewer FileSelect GraphLayout ggvis Perl R JVM Help"
 fi
 
