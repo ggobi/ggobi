@@ -180,6 +180,7 @@ identify_event_handlers_toggle (splotd *sp, gboolean state) {
     disconnect_key_press_signal (sp);
     disconnect_button_press_signal (sp);
     disconnect_button_release_signal (sp);
+    disconnect_motion_signal (sp);
   }
 }
 
