@@ -272,13 +272,17 @@ void tour2d_pause (cpaneld *cpanel, gboolean state, ggobid *gg) {
 }
 
 /*-- add/remove jvar to/from the subset of variables that <may> be active --*/
-void 
+gboolean
 tour2d_subset_var_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
 {
   gboolean in_subset = dsp->t2d.subset_vars_p.els[jvar];
   gint j, k;
   gboolean changed = false;
 
+  /*
+   * require 3 variables in the subset, though only 2 are
+   *   required in active_vars
+  */
   if (in_subset) {
     if (dsp->t2d.nsubset > MIN_NVARS_FOR_TOUR2D) {
       dsp->t2d.subset_vars_p.els[jvar] = false;
@@ -296,6 +300,8 @@ tour2d_subset_var_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
     for (j=0, k=0; j<d->ncols; j++)
       if (dsp->t2d.subset_vars_p.els[j])
         dsp->t2d.subset_vars.els[k++] = j;
+
+  return changed;
 }
 
 /*-- add or remove jvar from the set of active variables --*/
@@ -365,10 +371,11 @@ tour2d_manip_var_set (gint j, ggobid *gg)
   dsp->t2d_manip_var = j;    
 }
 
-void
+gboolean
 tour2d_varsel (GtkWidget *w, gint jvar, gint button, datad *d, ggobid *gg)
 {
   displayd *dsp = gg->current_display;
+  gboolean changed = true;
   splotd *sp = gg->current_splot;
 
   if (GTK_IS_TOGGLE_BUTTON(w)) {
@@ -377,13 +384,15 @@ tour2d_varsel (GtkWidget *w, gint jvar, gint button, datad *d, ggobid *gg)
     */
     gboolean fade = gg->tour2d.fade_vars;
 
-    tour2d_subset_var_set(jvar, d, dsp, gg);
-    varcircles_visibility_set (dsp, gg);
+    changed = tour2d_subset_var_set(jvar, d, dsp, gg);
+    if (changed) {
+      varcircles_visibility_set (dsp, gg);
 
-    /*-- now add/remove the variable to/from the active set, too --*/
-    gg->tour2d.fade_vars = false;
-    tour2d_active_var_set (jvar, d, dsp, gg);
-    gg->tour2d.fade_vars = fade;
+      /*-- now add/remove the variable to/from the active set, too --*/
+      gg->tour2d.fade_vars = false;
+      tour2d_active_var_set (jvar, d, dsp, gg);
+      gg->tour2d.fade_vars = fade;
+    }
 
   } else if (GTK_IS_DRAWING_AREA(w)) {
     
@@ -406,6 +415,8 @@ tour2d_varsel (GtkWidget *w, gint jvar, gint button, datad *d, ggobid *gg)
     }
   }
   sp->tour1d.initmax = true;
+
+  return changed;
 }
 
 void

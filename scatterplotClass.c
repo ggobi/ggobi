@@ -163,14 +163,15 @@ variableSelect(GtkWidget *w, displayd *display, splotd *sp, gint jvar, gint btn,
     break;
     case XYPLOT:
       redraw = xyplot_varsel (sp, jvar, &jvar_prev, btn);
-      if (viewmode_get (gg) == BRUSH && cpanel->br_mode == BR_TRANSIENT)
-        reinit_transient_brushing (display, gg);
+      if (redraw)
+        if (viewmode_get (gg) == BRUSH && cpanel->br_mode == BR_TRANSIENT)
+          reinit_transient_brushing (display, gg);
     break;
     case TOUR2D:
-      tour2d_varsel (w, jvar, btn, display->d, gg);
+      redraw = tour2d_varsel (w, jvar, btn, display->d, gg);
     break;
     case TOUR1D:
-      tour1d_varsel (w, jvar, btn, display->d, gg);
+      redraw = tour1d_varsel (w, jvar, btn, display->d, gg);
     break;
     case COTOUR:
       tourcorr_varsel (w, jvar, btn, display->d, gg);

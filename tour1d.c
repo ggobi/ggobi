@@ -277,13 +277,17 @@ void tour1d_pause (cpaneld *cpanel, gboolean state, ggobid *gg) {
 }
 
 /*-- add/remove jvar to/from the subset of variables that <may> be active --*/
-void 
+static gboolean
 tour1d_subset_var_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
 {
   gboolean in_subset = dsp->t1d.subset_vars_p.els[jvar];
   gint j, k;
   gboolean changed = false;
 
+  /*
+   * require 2 variables in the subset, though only 1 is
+   *   required in active_vars
+  */
   if (in_subset) {
     if (dsp->t1d.nsubset > MIN_NVARS_FOR_TOUR1D) {
       dsp->t1d.subset_vars_p.els[jvar] = false;
@@ -301,6 +305,8 @@ tour1d_subset_var_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
     for (j=0, k=0; j<d->ncols; j++)
       if (dsp->t1d.subset_vars_p.els[j])
         dsp->t1d.subset_vars.els[k++] = j;
+
+  return changed;
 }
 
 void 
@@ -371,12 +377,13 @@ tour1d_manip_var_set (gint j, gint btn, ggobid *gg)
     dsp->t1d_manip_var = j;    
 }
 
-void
+gboolean
 tour1d_varsel (GtkWidget *w, gint jvar, gint button, datad *d, ggobid *gg)
 {
   displayd *dsp = gg->current_display;
   gchar *label = g_strdup("PP index: (0.0) 0.0000 (0.0)");
   splotd *sp = gg->current_splot;
+  gboolean redraw = true;
 
   if (GTK_IS_TOGGLE_BUTTON(w)) {
     /*
@@ -384,13 +391,15 @@ tour1d_varsel (GtkWidget *w, gint jvar, gint button, datad *d, ggobid *gg)
     */
     gboolean fade = gg->tour1d.fade_vars;
 
-    tour1d_subset_var_set (jvar, d, dsp, gg);
-    varcircles_visibility_set (dsp, gg);
+    redraw = tour1d_subset_var_set (jvar, d, dsp, gg);
+    if (redraw) {
+      varcircles_visibility_set (dsp, gg);
 
-    /*-- now add/remove the variable to/from the active set, too --*/
-    gg->tour1d.fade_vars = false;
-    tour1d_active_var_set (jvar, d, dsp, gg);
-    gg->tour1d.fade_vars = fade;
+      /*-- now add/remove the variable to/from the active set, too --*/
+      gg->tour1d.fade_vars = false;
+      tour1d_active_var_set (jvar, d, dsp, gg);
+      gg->tour1d.fade_vars = fade;
+    }
 
   } else if (GTK_IS_DRAWING_AREA(w)) {
 
@@ -417,6 +426,8 @@ tour1d_varsel (GtkWidget *w, gint jvar, gint button, datad *d, ggobid *gg)
       sp->tour1d.initmax = true;
     }
   }
+
+  return redraw;
 }
 
 void
