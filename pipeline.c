@@ -19,8 +19,7 @@ pipeline_arrays_free (datad *d, ggobid *gg)
  * Dynamically free arrays used in data pipeline.
 */
 {
-  arrayf_free (&d->tform1, 0, 0);
-  arrayf_free (&d->tform2, 0, 0);
+  arrayf_free (&d->tform, 0, 0);
 
   arrayl_free (&d->world, 0, 0);
   arrayl_free (&d->jitdata, 0, 0);
@@ -37,10 +36,9 @@ pipeline_arrays_alloc (datad *d, ggobid *gg)
 {
   gint nc = d->ncols, nr = d->nrows;
 
-  if (d->tform1.vals != NULL) pipeline_arrays_free (d, gg);
+  if (d->tform.vals != NULL) pipeline_arrays_free (d, gg);
 
-  arrayf_alloc (&d->tform1, nr, nc);
-  arrayf_alloc (&d->tform2, nr, nc);
+  arrayf_alloc (&d->tform, nr, nc);
 
   arrayl_alloc (&d->world, nr, nc);
   arrayl_alloc_zero (&d->jitdata, nr, nc);
@@ -60,16 +58,16 @@ pipeline_arrays_add_column (gint jvar, datad *d, ggobid *gg)
   register gint i;
 
   arrayf_add_cols (&d->raw, nc);
-  arrayf_add_cols (&d->tform1, nc);
-  arrayf_add_cols (&d->tform2, nc);
+  arrayf_add_cols (&d->tform, nc);
 
   arrayl_add_cols (&d->world, nc);
   arrayl_add_cols (&d->jitdata, nc);
 
   for (i=0; i<nr; i++) {
-    d->raw.vals[i][nc-1] = d->tform1.vals[i][nc-1] =
-      d->tform2.vals[i][nc-1] = d->raw.vals[i][jvar];  /*-- no tform --*/
-    d->jitdata.vals[i][nc-1] = 0;  /*-- no jitter --*/
+    /*-- no tform --*/
+    d->raw.vals[i][nc-1] = d->tform.vals[i][nc-1] = d->raw.vals[i][jvar];
+    /*-- no jitter --*/
+    d->jitdata.vals[i][nc-1] = 0; 
   }
 
   /*-- world data is not populated --*/
@@ -155,7 +153,7 @@ vartable_lim_tform_gp_set (datad *d, ggobid *gg)
         cols[ncols++] = j;
     }
 
-    min_max (d->tform2.vals, cols, ncols, &min, &max, d, gg);
+    min_max (d->tform.vals, cols, ncols, &min, &max, d, gg);
     limits_adjust (&min, &max);
     for (n=0; n<ncols; n++) {
       d->vartable[cols[n]].lim_tform_gp.min = min;
@@ -175,12 +173,12 @@ vartable_lim_update (datad *d, ggobid *gg)
   gint nvgr = nvgroups (d, gg);
 
   /* 
-   * First update the limits taken from the tform2 data. 
+   * First update the limits taken from the tform data. 
   */
   vartable_lim_tform_gp_set (d, gg);
 
   /*
-   * Take tform2[][], one variable group at a time, and generate
+   * Take tform[][], one variable group at a time, and generate
    * the min and max for each variable group (and thus for each
    * column).
   */
@@ -196,15 +194,15 @@ vartable_lim_update (datad *d, ggobid *gg)
     {
       case 0:
         /*-- isn't this already done? --*/
-/*      min_max (gg->tform2, cols, ncols, &min, &max);*/
+/*      min_max (gg->tform, cols, ncols, &min, &max);*/
         min = d->vartable[cols[0]].lim_tform_gp.min;
         max = d->vartable[cols[0]].lim_tform_gp.max;
         break;
       case 1:
-        mean_largest_dist (d->tform2.vals, cols, ncols, &min, &max, d, gg);
+        mean_largest_dist (d->tform.vals, cols, ncols, &min, &max, d, gg);
         break;
       case 2:
-        median_largest_dist (d->tform2.vals, cols, ncols, &min, &max, d, gg);
+        median_largest_dist (d->tform.vals, cols, ncols, &min, &max, d, gg);
         break;
     }
 
@@ -363,7 +361,7 @@ void
 tform_to_world (datad *d, ggobid *gg)
 {
 /*
- * Take tform2[][], one column at a time, and generate
+ * Take tform[][], one column at a time, and generate
  * world_data[]
 */
   gint i, j, m;
@@ -378,7 +376,7 @@ tform_to_world (datad *d, ggobid *gg)
 
     for (i=0; i<d->nrows_in_plot; i++) {
       m = d->rows_in_plot[i];
-      ftmp = -1.0 + 2.0*(d->tform2.vals[m][j] - min) / range;
+      ftmp = -1.0 + 2.0*(d->tform.vals[m][j] - min) / range;
       d->world.vals[m][j] = (glong) (precis * ftmp);
 
       /* Add in the jitter values */
@@ -435,9 +433,7 @@ world_to_raw_by_var (gint pt, gint var, displayd *display, datad *d, ggobid *gg)
   x = (ftmp + 1.0) * .5 * rdiff;
   x += min;
 
-  d->raw.vals[pt][var] =
-    d->tform1.vals[pt][var] =
-    d->tform2.vals[pt][var] = x;
+  d->raw.vals[pt][var] = d->tform.vals[pt][var] = x;
 }
 
   /*

@@ -150,8 +150,8 @@ vartable_stats_set (datad *d, ggobid *gg)
   for (j=0; j<d->ncols; j++) {
     d->vartable[j].lim_raw.min = d->raw.vals[0][j];
     d->vartable[j].lim_raw.max = d->raw.vals[0][j];
-    d->vartable[j].lim_tform.min = d->tform2.vals[0][j];
-    d->vartable[j].lim_tform.max = d->tform2.vals[0][j];
+    d->vartable[j].lim_tform.min = d->tform.vals[0][j];
+    d->vartable[j].lim_tform.max = d->tform.vals[0][j];
   }
 
   for (j=0; j<d->ncols; j++) {
@@ -167,10 +167,10 @@ vartable_stats_set (datad *d, ggobid *gg)
         else if (d->raw.vals[i][j] > d->vartable[j].lim_raw.max)
           d->vartable[j].lim_raw.max = d->raw.vals[i][j];
 
-        if (d->tform2.vals[i][j] < d->vartable[j].lim_tform.min)
-          d->vartable[j].lim_tform.min = d->tform2.vals[i][j];
-        else if (d->tform2.vals[i][j] > d->vartable[j].lim_tform.max)
-          d->vartable[j].lim_tform.max = d->tform2.vals[i][j];
+        if (d->tform.vals[i][j] < d->vartable[j].lim_tform.min)
+          d->vartable[j].lim_tform.min = d->tform.vals[i][j];
+        else if (d->tform.vals[i][j] > d->vartable[j].lim_tform.max)
+          d->vartable[j].lim_tform.max = d->tform.vals[i][j];
 
         sumv[j] += d->raw.vals[i][j];
         x[np] = d->raw.vals[i][j];

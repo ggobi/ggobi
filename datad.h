@@ -43,7 +43,7 @@ class datad {
  GtkWidget *vartable_clist;
  gboolean single_column;
 
- array_f raw, tform1, tform2;
+ array_f raw, tform;
  array_l world, jitdata;
 
  /*----------------------- missing values ---------------------------*/
@@ -137,7 +137,7 @@ class datad {
    gfloat *eigenval;
    gfloat **eigenvec;
    gfloat **vc;
-   gfloat *tform1_mean;
+   gfloat *tform_mean;
  } sphere;
 
 

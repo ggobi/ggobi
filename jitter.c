@@ -1,6 +1,6 @@
 /* jitter.c */
 /*
- * Contains jittering routines for tform2; see missing.c for the
+ * Contains jittering routines for tform; see missing.c for the
  * jittering routines for missing data.
 */
 

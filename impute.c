@@ -74,8 +74,7 @@ impute_fixed (gint impute_type, datad *d, ggobid *gg)
       for (i=0; i<d->nrows_in_plot; i++) {
         m = d->rows_in_plot[i];
         if (d->missing.vals[m][j]) {
-          d->raw.vals[m][j] = d->tform1.vals[m][j] = d->tform2.vals[m][j] =
-            impval;
+          d->raw.vals[m][j] = d->tform.vals[m][j] = impval;
         }
       }
     }
@@ -97,8 +96,7 @@ impute_fixed (gint impute_type, datad *d, ggobid *gg)
         for (k=0; k<nselected_cols; k++) {
           j = selected_cols[k];
           if (d->missing.vals[m][j]) {
-            d->raw.vals[m][j] =
-              d->tform1.vals[m][j] = d->tform2.vals[m][j] = impval;
+            d->raw.vals[m][j] = d->tform.vals[m][j] = impval;
           }
         }
       }
@@ -132,8 +130,7 @@ impute_single (gint *missv, gint nmissing, gint *presv, gint npresent,
          * This is the default -- transformations will be applied
          * later to those that need it.
         */
-        d->tform1.vals[missv[i]][col] = d->tform1.vals[presv[k]][col];
-        d->tform2.vals[missv[i]][col] = d->tform2.vals[presv[k]][col];
+        d->tform.vals[missv[i]][col] = d->tform.vals[presv[k]][col];
         break;
       }
     }

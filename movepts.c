@@ -76,8 +76,7 @@ movepts_history_delete_last (datad *d, ggobid *gg)
     if (cell->i > -1 && cell->i < d->nrows_in_plot) {
       if (cell->j > -1 && cell->j < d->ncols) {
         d->raw.vals[cell->i][cell->j] =
-          d->tform1.vals[cell->i][cell->j] =
-          d->tform2.vals[cell->i][cell->j] = cell->val;
+          d->tform.vals[cell->i][cell->j] = cell->val;
       }
     }
 

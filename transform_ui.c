@@ -53,11 +53,7 @@ void boxcox_cb (GtkAdjustment *adj, ggobid *gg)
   transform (1, BOXCOX, adj->value, d, gg);
 }
 
-static gchar *stage2_lbl[] = {"No transformation",
-                              "Standardize",
-                              "Permute",
-                              "Sort",
-                              "Sphere ..."};
+static gchar *stage2_lbl[] = {"No transformation", "Standardize"};
 static void stage2_cb (GtkWidget *w, gpointer cbd)
 {
   ggobid *gg = GGobiFromWidget(w, true);

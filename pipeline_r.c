@@ -25,14 +25,10 @@ world_to_raw_by_var (gint pt, gint var)
   */
   ftmp = (gfloat)(gg.world.data[pt][var] - gg.jitter.data[pt][var]) / precis;
 
-  gg.tform2.data[pt][var] = (ftmp + 1.0) * .5 * rdiff;
-  gg.tform2.data[pt][var] += gg.lim[var].min;
+  gg.tform.data[pt][var] = (ftmp + 1.0) * .5 * rdiff;
+  gg.tform.data[pt][var] += gg.lim[var].min;
 
-  /*-- no transformations will be supported --*/
-  gg.tform1.data[pt][var] = gg.tform2.data[pt][var];
-  gg.tform1.data[pt][var] += gg.lim[var].min;
-
-  gg.raw.data[pt][var] = gg.tform2.data[pt][var];
+  gg.raw.data[pt][var] = gg.tform.data[pt][var];
 }
 
 void

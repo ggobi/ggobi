@@ -1,7 +1,7 @@
 /* p1d.c */
 /*
  * The 1d plots use the values of world_data (or missing_world_data)
- * for the variable of interest, but they use tform2 (or missing)
+ * for the variable of interest, but they use tform (or missing)
  * to do the spreading calculations, which are done in floating point.
  *
  * At the very end, to deal with jittering, they remove the jitter
@@ -86,7 +86,7 @@ p1d_reproject (splotd *sp, glong **world_data, datad *d, ggobid *gg)
       yy[i] = (gfloat) d->missing.vals[d->rows_in_plot[i]][jvar];
   } else {
     for (i=0; i<d->nrows_in_plot; i++)
-      yy[i] = d->tform2.vals[d->rows_in_plot[i]][jvar];
+      yy[i] = d->tform.vals[d->rows_in_plot[i]][jvar];
   }
 
   p1d_spread_var (display, yy, sp, d, gg);

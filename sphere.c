@@ -29,7 +29,7 @@ sphere_malloc (datad *d, ggobid *gg)
   for (j=0; j<d->ncols; j++)
     d->sphere.vc[j] = (gfloat *) g_malloc0 (d->ncols * sizeof (gfloat));
 
-  d->sphere.tform1_mean = (gfloat *) g_malloc0 (d->ncols * sizeof (gfloat));
+  d->sphere.tform_mean = (gfloat *) g_malloc0 (d->ncols * sizeof (gfloat));
 }
 
 void
@@ -47,7 +47,7 @@ sphere_free (datad *d, ggobid *gg) {
     g_free ((gpointer) d->sphere.vc[j]);
   g_free ((gpointer) d->sphere.vc);
 
-  g_free ((gpointer) d->sphere.tform1_mean);
+  g_free ((gpointer) d->sphere.tform_mean);
 }
 
 /*-------------------------------------------------------------------------*/
@@ -183,15 +183,15 @@ sphere_varcovar_set (datad *d, ggobid *gg)
 
     tmpf = 0.;
     for (i=0; i<n; i++)
-      tmpf += d->tform1.vals[d->rows_in_plot[i]][var];
-    d->sphere.tform1_mean[var] = tmpf / ((gfloat)n);
+      tmpf += d->tform.vals[d->rows_in_plot[i]][var];
+    d->sphere.tform_mean[var] = tmpf / ((gfloat)n);
 
     tmpf = 0.;
     for (i=0; i<d->ncols; i++) {
       for (j=0; j<n; j++) {
         tmpf = tmpf +
-        (d->tform1.vals[d->rows_in_plot[j]][var] - d->sphere.tform1_mean[var]) *
-        (d->tform1.vals[d->rows_in_plot[j]][i] - d->sphere.tform1_mean[i]);
+        (d->tform.vals[d->rows_in_plot[j]][var] - d->sphere.tform_mean[var]) *
+        (d->tform.vals[d->rows_in_plot[j]][i] - d->sphere.tform_mean[i]);
       }
       tmpf /= ((gfloat)(n - 1));
       d->sphere.vc[var][i] = d->sphere.vc[i][var] = tmpf;
@@ -300,9 +300,9 @@ spherize_data (gint num_pcs, gint nsvars, gint *svars, datad *d, ggobid *gg)
       tmpf = 0.;
       for (k=0; k<nsvars; k++) {
         tmpf = tmpf + d->sphere.eigenvec[k][j] *
-          (d->tform1.vals[i][svars[k]] - d->sphere.tform1_mean[svars[k]]);
+          (d->tform.vals[i][svars[k]] - d->sphere.tform_mean[svars[k]]);
       }
-      d->tform2.vals[i][svars[j]] = tmpf / d->sphere.eigenval[j];
+      d->tform.vals[i][svars[j]] = tmpf / d->sphere.eigenval[j];
     }
   }
 }

@@ -124,7 +124,7 @@ write_ascii_data (gchar *rootname, gint *rowv, gint nr, gint *colv, gint nc,
     g_free (message);
     return false;
   } else {
-    fdatap = (gg->save.stage == RAWDATA) ? d->raw.vals : d->tform2.vals;
+    fdatap = (gg->save.stage == RAWDATA) ? d->raw.vals : d->tform.vals;
 
     for (i=0; i<nr; i++) {
       ir = rowv[i];
@@ -425,7 +425,7 @@ write_binary_data (gchar *rootname, gint *rowv, gint nr, gint *colv, gint nc,
     fwrite ((gchar *) &nr, sizeof (nr), 1, fp);
     fwrite ((gchar *) &nc, sizeof (nc), 1, fp);
 
-    datap = (gg->save.stage == RAWDATA) ? d->raw.vals : d->tform2.vals;
+    datap = (gg->save.stage == RAWDATA) ? d->raw.vals : d->tform.vals;
 
     for (i=0; i<nr; i++) {
       ir = rowv[i];

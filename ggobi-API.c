@@ -363,7 +363,7 @@ GGOBI(getRawData)(datad *d, ggobid *gg)
 const gfloat** 
 GGOBI(getTFormData)(datad *d, ggobid *gg)
 {
-  return ((const gfloat **) d->tform2.vals);
+  return ((const gfloat **) d->tform.vals);
 }
 
 
@@ -1008,8 +1008,7 @@ GGOBI(setVariableValues)(gint whichVar, gdouble *vals, gint num,
 {
   gint i;
   for (i = 0; i < num; i++) {
-    d->raw.vals[i][whichVar] = d->tform1.vals[i][whichVar]  =
-             d->tform2.vals[i][whichVar] = vals[i];
+    d->raw.vals[i][whichVar] = d->tform.vals[i][whichVar] = vals[i];
   }
 
   if(update) {

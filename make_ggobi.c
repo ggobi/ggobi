@@ -132,8 +132,7 @@ pipeline_init (datad *d, ggobid *gg)
   modes_init (d, gg);
 
   /*-- run the first half of the pipeline --*/
-  arrayf_copy (&d->raw, &d->tform1);
-  arrayf_copy (&d->tform1, &d->tform2);
+  arrayf_copy (&d->raw, &d->tform);
 
   vartable_stats_set (d, gg);
 
