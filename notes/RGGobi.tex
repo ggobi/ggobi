@@ -123,21 +123,35 @@ and even plots within them inter- and intra- ggobi instance is most
 useful in a programmatic interface.
 
 \subsection{getDefaultGGobi}
-Return the index of the currently active
-or default ggobi instance.
-This is the ggobi instance which 
-receives the commands by default.
+Return the index of the currently active or default ggobi instance.
+This is the ggobi instance which receives the commands by default.
 
 
 \subsection{setDefaultGGobi}
 
-\subsection{getRowNames}
-\subsection{getRowNames}
+\subsection{ggobi.getRowNames}
+Returns the observation labels for
+the specified ggobi instance.
+
+See also \SFunction{ggobi.setRowNames}.
+
 \subsection{getSmootherFunction.ggobi}
 \subsection{ggobi}
+This is the function that creates a ggobi instance.
+One specifies the name of a file or a data frame (or matrix).
+The newly created ggobi instance becomes the default
+
+See \SFunction{setDefaultGGobi}
+
 \subsection{ggobi.getActivePlot}
 \subsection{ggobi.getCurrentDisplayType}
 \subsection{ggobi.getDescription}
+This gives a brief description of the specified ggobi instance.  This
+gives the name of the file from which the data was read, the type of
+file format (e.g. xml, ascii, binary) and the dimensions of the data.
+
+See also \SFunction{getNumGGobis}.
+
 \subsection{ggobi.getDisplayOptions}
 This returns the current settings of the values that control how new
 plots are displayed.  Each ggobi instance has a set of options which
@@ -148,7 +162,28 @@ of those values currently in existence.
 
 
 \subsection{ggobi.getDisplays}
+Returns a list describing each display (or window) of plots within the
+specified ggobi instance.  Each element in the list identifies a
+display and gives the title of the window, the type of the plot(s)
+contained in the display (since they are currently homogeneous) and a
+list describing each of the plots.  The plot description depends on
+the type of plot. Generally it contains a list of the variables within
+that plot.  This is an integer vector giving the indeces of the
+variables. The names of the elements in this vector are the names of
+the variables. 
+
+
+What about subsets in effect when the display was
+created, etc.
+
 \subsection{ggobi.getFileName}
+Returns the name of the file
+from which the data in ggobi
+was read. If the data was explicitly
+set from 
+
+See also \SFunction{ggobi.getDescription}.
+
 \subsection{ggobi.getGlyphs}
 \subsection{ggobi.getSegments}
 \subsection{ggobi.getVariableIndex}

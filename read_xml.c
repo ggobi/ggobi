@@ -90,6 +90,11 @@ const gchar * const xmlDataTagNames[] = {
   We also need a version that takes a FILE*
   and reads from it. This is so that we can
   handle reading from standard input.
+
+  The DOM style parsing can be initiated very simply.
+
+  xmlDocPtr doc;
+    doc = xmlParseFile(name);
  */
 
 
@@ -99,25 +104,13 @@ data_xml_read(const gchar *filename, ggobid *gg)
  xmlSAXHandlerPtr xmlParserHandler;
  xmlParserCtxtPtr ctx = (xmlParserCtxtPtr) g_malloc(sizeof(xmlParserCtxtPtr));
  XMLParserData data;
-  
-  int i;
-  gchar* name = NULL;
-  FILE *f;
+ gboolean ok = false;  
+ gchar *name = find_xml_file(filename, gg);
+ 
+  if(name == NULL)
+    return(false);
 
-  const gchar *suffixes[] = {".xml", ".xml.gz"};
-  int nsuffixes = sizeof(suffixes)/sizeof(suffixes[0]);
-
-  for(i = 0; i < nsuffixes;i++) {
-    if(name) 
-      g_free(name);
-
-    name = g_malloc(sizeof(char)*(strlen(filename)+strlen(suffixes[i]) + 2));
-    sprintf(name,"%s%s", filename,suffixes[i]);
-    if((f = fopen(name,"r")) != NULL) {
-      fclose(f);
-      break;
-    }
-  }
+  gg->filename = name;
 
   initParserData(&data, gg);
 
@@ -140,17 +133,20 @@ data_xml_read(const gchar *filename, ggobid *gg)
   ctx->userData = &data;
   ctx->sax = xmlParserHandler;
 
-  /*
- xmlDocPtr doc;
-    doc = xmlParseFile(name);
-  */
-
   xmlParseDocument(ctx);
 
   ctx->sax = NULL;
   xmlFreeParserCtxt(ctx);
 
+  g_free(xmlParserHandler);
 
+
+  ok = (gg->ncols > 0 && gg->nrows >0);
+
+  /* Now perform the necessary computations to bring the entire
+     ggobid structure into synch with the newly read data.
+     This should be moved somewhere more reasonable 
+   */
   vgroups_sort(gg);
   { int j;
   for (j=0; j<gg->ncols; j++)
@@ -160,9 +156,8 @@ data_xml_read(const gchar *filename, ggobid *gg)
   if(gg->nsegments < 1)
    segments_create(gg);
 
-  g_free(name);
 
- return(1);
+ return(ok);
 }
 
 void
@@ -745,4 +740,39 @@ showAttributes(const CHAR **attrs)
   fprintf(stderr, "\t %s=%s\n", tmp[0], tmp[1]);
   tmp += 2;
  }
+}
+
+
+gchar *
+find_xml_file(const gchar *filename, ggobid *gg)
+{
+  int i;
+  gchar* name = NULL;
+  FILE *f;
+
+  const gchar *suffixes[] = {".xml", ".xml.gz", ".xmlz"};
+  int nsuffixes = sizeof(suffixes)/sizeof(suffixes[0]);
+
+  for(i = 0; i < nsuffixes;i++) {
+    name = g_malloc(sizeof(char)*(strlen(filename)+strlen(suffixes[i]) + 2));
+    sprintf(name,"%s%s", filename,suffixes[i]);
+    if((f = fopen(name,"r")) != NULL) {
+      fclose(f);
+      break;
+    }
+    if(name) {
+      g_free(name);
+      name = NULL;
+    }
+  }
+
+  if(name == NULL) {
+    /* If we can't find the file, then we should return the filename
+       as it might be an http or ftp prefix. Could check this. Later,
+       when we know more about the possibilities to expect.
+     */
+    name = g_strdup(filename);
+  }
+
+ return(name);
 }

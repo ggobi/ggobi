@@ -127,7 +127,17 @@ GGOBI(setData)(double *values, gchar **rownames, gchar **colnames, int nr, int n
   vardata_alloc(gg);
   vardata_init(gg);
 
+  br_glyph_ids_alloc(gg);
+  br_glyph_ids_init(gg);
+
+  br_color_ids_alloc(gg);
+  br_color_ids_init(gg);
+
+
+  hidden_alloc(gg);
+
   for(j = 0; j < nc ; j++) {
+   gg->vardata[j].groupid_ori = j;
    gg->vardata[j].collab = g_strdup(colnames[j]);
    gg->vardata[j].collab_tform = g_strdup(colnames[j]);
    for(i = 0; i < nr ; i++) {
@@ -138,6 +148,13 @@ GGOBI(setData)(double *values, gchar **rownames, gchar **colnames, int nr, int n
      gg->raw.data[i][j] = values[i + j*nr];
    }
   }
+
+  vgroups_sort(gg);
+  { int j;
+  for (j=0; j<gg->ncols; j++)
+    gg->vardata[j].groupid = gg->vardata[j].groupid_ori;
+  }
+
 
    /* Now recompute and display the top plot. */
   dataset_init(gg, false);

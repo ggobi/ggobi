@@ -21,12 +21,12 @@
   Returns 
   This is not a copy of the value used by ggobi.
  */
-const gchar *GGOBI(getFileName)();
+const gchar *GGOBI(getFileName)(ggobid *gg);
 /*
   Returns whether the data was read from a binary
   or ASCII file.
  */
-extern DataMode GGOBI(getDataMode)();
+extern DataMode GGOBI(getDataMode)(ggobid *gg);
 extern const gchar * const GGOBI(getDataModeDescription)(DataMode mode);
 
 /*
@@ -150,7 +150,7 @@ extern void GGOBI(setCaseColor)(gint pt, gint colorIndex, ggobid *gg);
 extern void GGOBI(setCaseColors)(gint *pts, gint howMany, gint colorindx, ggobid *gg);
 
 extern gboolean  GGOBI(isConnectedSegment)(gint a, gint b, ggobid *gg);
-extern void setObservationSegment(gint x, gint y, ggobid *gg);
+extern void GGOBI(setObservationSegment)(gint x, gint y, ggobid *gg);
 
 extern gboolean GGOBI(getShowLines)();
 extern gboolean GGOBI(setShowLines)(gboolean val);

@@ -75,4 +75,6 @@ int rowId(const char *tmp, XMLParserData *data);
 
 gboolean data_xml_read(const gchar *filename, ggobid *gg);
 
+gchar *find_xml_file(const gchar *filename, ggobid *gg);
+
 #endif

@@ -82,7 +82,24 @@ A final benefit to using XML is that we have support for reading
 compressed files.  The XML parser we employ (Daniel Veillard's libxml)
 can parse XML directly from compressed files.  For large datasets,
 this is convenient as we don't have to uncompress the files before
-using them.
+using them.  You can try this feature by using GNU zip (gzip)
+to compress the file flea.xml in the \directory{data}
+directory and starting the ggobi application
+\begin{verbatim}
+  ggobi -x data/flea
+\end{verbatim}
+This searches for a file named data/flea.xml and if this is not found,
+\file{data/flea.xml.gz} and then \file{data/flea.xmlz}.  The parser
+automatically determines whether it is compressed or not.  This
+support can be turned off.
+
+Note also that the XML parsing library has support for reading files
+via ftp and http.
+\begin{verbatim}
+  ggobi -x http://www.omegahat.org/ggobi/flea.xml
+\end{verbatim}
+
+
 
 Being able to specify file-specific defaults allows one to easily
 change the characterstics of the plots without excessive editing of
