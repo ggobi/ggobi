@@ -323,8 +323,8 @@ varpanel_clear (datad *d, ggobid *gg)
   {
     pages = gtk_container_children (GTK_CONTAINER (gg->varpanel_ui.notebook));
     npages = g_list_length (pages);
-    for (k=0; k<npages; k++)
-      gtk_notebook_remove_page (GTK_NOTEBOOK (gg->varpanel_ui.notebook), k);
+    for (k=0; k< npages; k++)
+      gtk_notebook_remove_page (GTK_NOTEBOOK (gg->varpanel_ui.notebook), 0);
   }
 }
 
