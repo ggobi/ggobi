@@ -26,8 +26,8 @@ Step 3: ggobi
 
 export CC=/usr/bin/cc
 export GLIB_CONFIG=/usr/dfs/cc/bin/glib-config
-LD_LIBRARY_PATH=/usr/dfs/cc/lib:/usr/common/lib:/usr/lib32
-LD_LIBRARYN32_PATH=/usr/dfs/cc/lib:/usr/common/lib:/usr/lib32
+LD_LIBRARY_PATH=/usr/dfs/cc/lib:/usr/common/lib:/usr/lib32:/usr/dfs/ggobi/ggobi
+LD_LIBRARYN32_PATH=$LD_LIBRARY_PATH
 PATH=/usr/dfs/cc/bin:$PATH
 export GTK_CONFIG=/usr/dfs/cc/bin/gtk-config
 
@@ -40,9 +40,48 @@ local.config
 plugin directories
   GTK_CONFIG=/usr/dfs/cc/bin/gtk-config
 
+# vanilla
+pure: ggobi.o $(OB) $(EXTRA_OB)
+	purify.new -cache-dir=/usr/dfs/tmp -always-use-cache-dir=yes \
+	-user-path=/usr/dfs/ggobi/ggobi \
+	$(LD) $(OB) $(EXTRA_OB) \
+	$(LDFLAGS) -o ggobi \
+	/usr/dfs/cc/lib/libxml2.so \
+	`gtk-config --libs`
 
-	#-user-path=/usr/dfs/ggobi/ggobi:/usr/dfs/ggobi/ggobi/plugins/ggvis \
-	#ggvis.o cmds.o init.o radial.o spring.o \
+# GraphLayout  w/o graphviz
+LDFLAGS+=-L$(GVLIB) -ldot -lneato -lpack -ldotneato -lgraph -lpathplan
+LDFLAGS+=$(GVLIB)/libgd.a
+LDFLAGS+=-L$(GVLIB) -lcdt $(GVIZ_EXTLIB_LIB)
+pure: ggobi.o $(OB) $(EXTRA_OB)
+	purify.new -cache-dir=/usr/dfs/tmp -always-use-cache-dir=yes \
+	-user-path=/usr/dfs/ggobi/ggobi:/usr/dfs/ggobi/ggobi/plugins/GraphLayout \
+	$(LD) $(OB) $(EXTRA_OB) \
+	/usr/dfs/ggobi/ggobi/plugins/GraphLayout/glayout.o \
+	/usr/dfs/ggobi/ggobi/plugins/GraphLayout/graphviz.o \
+	/usr/dfs/ggobi/ggobi/plugins/GraphLayout/init.o \
+	/usr/dfs/ggobi/ggobi/plugins/GraphLayout/radial.o \
+	$(LDFLAGS) -o ggobi \
+	/usr/dfs/cc/lib/libxml2.so \
+	`gtk-config --libs`
 
 	#-user-path=/usr/dfs/ggobi/ggobi:/usr/dfs/ggobi/ggobi/plugins/mstree \
     #gg_mst.o mem-std.o mst-prim.o mstree.o pq-bin-heap.o \
+
+# ggvis
+pure: ggobi.o $(OB) $(EXTRA_OB)
+	purify.new -cache-dir=/usr/dfs/tmp -always-use-cache-dir=yes \
+	-user-path=/usr/dfs/ggobi/ggobi:/usr/dfs/ggobi/ggobi/plugins/ggvis \
+	$(LD) $(OB) $(EXTRA_OB) \
+	/usr/dfs/ggobi/ggobi/plugins/ggvis/ggvis.o \
+	/usr/dfs/ggobi/ggobi/plugins/ggvis/Dtarget.o \
+	/usr/dfs/ggobi/ggobi/plugins/ggvis/ggv_cbacks.o \
+	/usr/dfs/ggobi/ggobi/plugins/ggvis/init.o \
+	/usr/dfs/ggobi/ggobi/plugins/ggvis/mds.o \
+	/usr/dfs/ggobi/ggobi/plugins/ggvis/stressplot.o \
+	/usr/dfs/ggobi/ggobi/plugins/ggvis/histogram.o \
+	/usr/dfs/ggobi/ggobi/plugins/ggvis/ggv_utils.o \
+	/usr/dfs/ggobi/ggobi/plugins/ggvis/ggv_qsort.o \
+	$(LDFLAGS) -o ggobi \
+	/usr/dfs/cc/lib/libxml2.so \
+	`gtk-config --libs`
