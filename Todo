@@ -15,8 +15,6 @@ From John Plummer:
   Reset->'show all points' doesn't override the clusters tool.  
     What to do?
   Let any variable be the label used in identification
-  Add a close button or menu item to each tool.
-
 
 Bugs: 
 
@@ -26,6 +24,10 @@ Bugs:
    not "brushed."
 
   is adding and removing plots in scatmat still problematic?
+
+If a new datad is added, the transformation, jittering, and 
+  brush_by_variable tools are not going to show it in their
+  notebooks.
 
 Reading in new data
   add an option:  add a new datad or replace an existing one
@@ -43,9 +45,6 @@ various stuff not yet implemented:
 Graphs
   line type brushing
   line editing  <- depends on the ability to add a record
-
-For subsetting et al
-  add an option menu allowing the selection of a datad
 
 API code needed:
   sticky labels
@@ -209,4 +208,9 @@ Food for thought:
 
 ! Moving points
 !   add point labels as in xgobi
+
+! Add a close button or menu item to each tool.
+
+!For subsetting et al
+!  add an option menu allowing the selection of a datad
 
