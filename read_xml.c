@@ -310,7 +310,7 @@ setColorScheme(const xmlChar **attrs, XMLParserData *data)
    tmp = getAttribute(attrs, "file");
    if(tmp) {
        /* process this file to append its color schemes into the global list. */
-       read_colorscheme(tmp, &(data->gg->colorSchemes));
+       read_colorscheme(tmp, &data->gg->colorSchemes); 
    }
 
    tmp = getAttribute(attrs, "name");
@@ -318,14 +318,14 @@ setColorScheme(const xmlChar **attrs, XMLParserData *data)
        /* resolve the color scheme by name */
 
      colorschemed *scheme;
-      scheme = findColorSchemeByName(sessionOptions->colorSchemes, tmp);
+      scheme = findColorSchemeByName(data->gg->colorSchemes, tmp);
       if(scheme) {
 	  data->gg->activeColorScheme = scheme;
 	  colorscheme_init(scheme);
       } else
-	  ggobi_XML_error_handler(data, "Invalid colorscheme name %s. No such scheme.", tmp);
+	  ggobi_XML_error_handler(data, "Invalid colorscheme name %s. No such scheme.\n", tmp);
    } else {
-	  ggobi_XML_error_handler(data, "No colorscheme name specified");
+	  ggobi_XML_error_handler(data, "No colorscheme name specified\n");
    }
 }
 

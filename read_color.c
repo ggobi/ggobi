@@ -199,7 +199,6 @@ getForegroundColor(gint index, xmlNodePtr node, xmlDocPtr doc,
     xmlChar* ptr;
     value = getColor(node, doc, &(scheme->data[index]), &scheme->rgb[index]);
 
-#if 0
     ptr =  xmlGetProp(node, (xmlChar *) "name");
     {
       gchar *tmp;
@@ -209,10 +208,7 @@ getForegroundColor(gint index, xmlNodePtr node, xmlDocPtr doc,
       }
       tmp[0] = '\0';
     }
-#else
-    name = g_strdup("Foo");
-#endif
-/*XXX*/    
+
     g_array_append_val(scheme->colorNames, name);
 
     return(value);
