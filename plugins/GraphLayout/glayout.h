@@ -70,6 +70,7 @@ void spring_once (gint ndims, datad *d, datad *e, array_d *dist, array_d *pos);
 #endif
 
 #ifdef GRAPHVIZ
+void neato_dim_cb (GtkAdjustment *adj, PluginInstance *inst);
 void dot_neato_layout_cb (GtkWidget *, PluginInstance *inst);
 #endif
 

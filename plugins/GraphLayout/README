@@ -4,8 +4,8 @@ concentric circles, with the first node in the list appearing at the
 center.
 
 In order to use two more layout methods, pick up the graphviz package
-from www.graphviz.org/pub/graphviz.  I just (September 9, 2002) tested
-the build process using graphviz-current.tar.gz, and it's working well.
+from www.graphviz.org/pub/graphviz.  I just (October 3, 2002) tested
+the build process using graphviz-1.8.10.tar.gz, and it's working well.
 
 When you build it, instead of using configure and gmake, follow the
 instructions in graphviz/INSTALL.old, which does a better job of building

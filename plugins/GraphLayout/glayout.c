@@ -14,7 +14,6 @@ void       close_glayout_window(GtkWidget *w, PluginInstance *inst);
 GtkWidget *create_glayout_window(ggobid *gg, PluginInstance *inst);
 void       show_glayout_window (GtkWidget *widget, PluginInstance *inst);
 
-void       neato_dim_cb (GtkAdjustment *adj, PluginInstance *inst);
 
 gboolean
 addToToolsMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
@@ -340,8 +339,10 @@ create_glayout_window(ggobid *gg, PluginInstance *inst)
 
   /*-- neato scale --*/
   adj = gtk_adjustment_new ((gfloat)gl->neato_dim, 2.0, 11.0, 1.0, 1.0, 1.0);
+#ifdef GRAPHVIZ
   gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
     GTK_SIGNAL_FUNC (neato_dim_cb), inst);
+#endif
   hscale = gtk_hscale_new (GTK_ADJUSTMENT (adj));
   gtk_widget_set_usize (GTK_WIDGET (hscale), 150, 30);
 
