@@ -36,7 +36,6 @@ static void build_ash_segs (gint, gint *nsegs, splotd *sp);
  * ... just noticed these:  should they become part of the splotd
  * instead of sitting here as statics?  I think so.
  * 
-*/
 static gint maxn = 0;
 static GdkPoint   *points;
 static GdkSegment *segs;
@@ -46,44 +45,52 @@ static rectd      *open_rects;
 static rectd      *filled_rects;
 static arcd       *open_arcs;
 static arcd       *filled_arcs;
+*/
 
 static void
 drawing_arrays_alloc (splotd *sp, datad *d, ggobid *gg) {
-  if (maxn == 0) {
-    maxn = d->nrows;
+  gint n = d->nrows;
 
-    points = (GdkPoint *) g_malloc (maxn * sizeof (GdkPoint));
-    segs = (GdkSegment *) g_malloc (2 * maxn * sizeof (GdkSegment));
-    whisker_segs = (GdkSegment *) g_malloc (2 * maxn * sizeof (GdkSegment));
-    ash_segs = (GdkSegment *) g_malloc (maxn * sizeof (GdkSegment));
-    open_rects = (rectd *) g_malloc (maxn * sizeof (rectd));
-    filled_rects = (rectd *) g_malloc (maxn * sizeof (rectd));
-    open_arcs = (arcd *) g_malloc (maxn * sizeof (arcd));
-    filled_arcs = (arcd *) g_malloc (maxn * sizeof (arcd));
+  if (sp->win32.npoints == 0) {
+    sp->win32.points = (GdkPoint *) g_malloc (n * sizeof (GdkPoint));
+    sp->win32.segs = (GdkSegment *) g_malloc (2 * n * sizeof (GdkSegment));
+    sp->win32.whisker_segs = (GdkSegment *) g_malloc (2*n*sizeof (GdkSegment));
+    sp->win32.ash_segs = (GdkSegment *) g_malloc (n * sizeof (GdkSegment));
+    sp->win32.open_rects = (rectd *) g_malloc (n * sizeof (rectd));
+    sp->win32.filled_rects = (rectd *) g_malloc (n * sizeof (rectd));
+    sp->win32.open_arcs = (arcd *) g_malloc (n * sizeof (arcd));
+    sp->win32.filled_arcs = (arcd *) g_malloc (n * sizeof (arcd));
   } else {
-    maxn = d->nrows;
-    points = (GdkPoint *) g_realloc (points, maxn * sizeof (GdkPoint));
-    segs = (GdkSegment *) g_realloc (segs, 2 * maxn * sizeof (GdkSegment));
-    whisker_segs = (GdkSegment *)
-      g_realloc (whisker_segs, 2 * maxn * sizeof (GdkSegment));
-    ash_segs = (GdkSegment *) g_realloc (ash_segs, maxn * sizeof (GdkSegment));
-    open_rects = (rectd *) g_realloc (open_rects, maxn * sizeof (rectd));
-    filled_rects = (rectd *) g_realloc (filled_rects, maxn * sizeof (rectd));
-    open_arcs = (arcd *) g_realloc (open_arcs, maxn * sizeof (arcd));
-    filled_arcs = (arcd *) g_realloc (filled_arcs, maxn * sizeof (arcd));
+    sp->win32.points = (GdkPoint *)
+      g_realloc (sp->win32.points, n * sizeof (GdkPoint));
+    sp->win32.segs = (GdkSegment *)
+      g_realloc (sp->win32.segs, 2 * n * sizeof (GdkSegment));
+    sp->win32.whisker_segs = (GdkSegment *)
+      g_realloc (sp->win32.whisker_segs, 2 * n * sizeof (GdkSegment));
+    sp->win32.ash_segs = (GdkSegment *)
+      g_realloc (sp->win32.ash_segs, n * sizeof (GdkSegment));
+    sp->win32.open_rects = (rectd *)
+      g_realloc (sp->win32.open_rects, n * sizeof (rectd));
+    sp->win32.filled_rects = (rectd *)
+      g_realloc (sp->win32.filled_rects, n * sizeof (rectd));
+    sp->win32.open_arcs = (arcd *)
+      g_realloc (sp->win32.open_arcs, n * sizeof (arcd));
+    sp->win32.filled_arcs = (arcd *)
+      g_realloc (sp->win32.filled_arcs, n * sizeof (arcd));
   }
+  sp->win32.npoints = n;
 }
 
 static void
-drawing_arrays_free (){
-  g_free ((gpointer) points);
-  g_free ((gpointer) segs);
-  g_free ((gpointer) whisker_segs);
-  g_free ((gpointer) ash_segs);
-  g_free ((gpointer) open_rects);
-  g_free ((gpointer) filled_rects);
-  g_free ((gpointer) open_arcs);
-  g_free ((gpointer) filled_arcs);
+drawing_arrays_free (splotd *sp){
+  g_free ((gpointer) sp->win32.points);
+  g_free ((gpointer) sp->win32.segs);
+  g_free ((gpointer) sp->win32.whisker_segs);
+  g_free ((gpointer) sp->win32.ash_segs);
+  g_free ((gpointer) sp->win32.open_rects);
+  g_free ((gpointer) sp->win32.filled_rects);
+  g_free ((gpointer) sp->win32.open_arcs);
+  g_free ((gpointer) sp->win32.filled_arcs);
 }
 
 void
@@ -247,23 +254,23 @@ build_whisker_segs (gint j, gint *nwhisker_segs, splotd *sp) {
   gint n;
   if (display->displaytype == parcoords){
     n = 2*j;
-    whisker_segs[*nwhisker_segs].x1 = sp->whiskers[n].x1;
-    whisker_segs[*nwhisker_segs].y1 = sp->whiskers[n].y1;
-    whisker_segs[*nwhisker_segs].x2 = sp->whiskers[n].x2;
-    whisker_segs[*nwhisker_segs].y2 = sp->whiskers[n].y2;
+    sp->win32.whisker_segs[*nwhisker_segs].x1 = sp->whiskers[n].x1;
+    sp->win32.whisker_segs[*nwhisker_segs].y1 = sp->whiskers[n].y1;
+    sp->win32.whisker_segs[*nwhisker_segs].x2 = sp->whiskers[n].x2;
+    sp->win32.whisker_segs[*nwhisker_segs].y2 = sp->whiskers[n].y2;
     n++;
     *nwhisker_segs += 1;
-    whisker_segs[*nwhisker_segs].x1 = sp->whiskers[n].x1;
-    whisker_segs[*nwhisker_segs].y1 = sp->whiskers[n].y1;
-    whisker_segs[*nwhisker_segs].x2 = sp->whiskers[n].x2;
-    whisker_segs[*nwhisker_segs].y2 = sp->whiskers[n].y2;
+    sp->win32.whisker_segs[*nwhisker_segs].x1 = sp->whiskers[n].x1;
+    sp->win32.whisker_segs[*nwhisker_segs].y1 = sp->whiskers[n].y1;
+    sp->win32.whisker_segs[*nwhisker_segs].x2 = sp->whiskers[n].x2;
+    sp->win32.whisker_segs[*nwhisker_segs].y2 = sp->whiskers[n].y2;
     *nwhisker_segs += 1;
   }
   else if (display->displaytype == tsplot) {
-    whisker_segs[*nwhisker_segs].x1 = sp->whiskers[j].x1;
-    whisker_segs[*nwhisker_segs].y1 = sp->whiskers[j].y1;
-    whisker_segs[*nwhisker_segs].x2 = sp->whiskers[j].x2;
-    whisker_segs[*nwhisker_segs].y2 = sp->whiskers[j].y2; 
+    sp->win32.whisker_segs[*nwhisker_segs].x1 = sp->whiskers[j].x1;
+    sp->win32.whisker_segs[*nwhisker_segs].y1 = sp->whiskers[j].y1;
+    sp->win32.whisker_segs[*nwhisker_segs].x2 = sp->whiskers[j].x2;
+    sp->win32.whisker_segs[*nwhisker_segs].y2 = sp->whiskers[j].y2; 
     *nwhisker_segs += 1; 
   }
 }
@@ -274,15 +281,15 @@ build_ash_segs (gint i, gint *nsegs, splotd *sp)
   displayd *display = (displayd *) sp->displayptr;
 
   if (display->p1d_orientation == HORIZONTAL) {
-    ash_segs[*nsegs].x1 = sp->screen[i].x;
-    ash_segs[*nsegs].y1 = sp->screen[i].y;
-    ash_segs[*nsegs].x2 = sp->screen[i].x;
-    ash_segs[*nsegs].y2 = sp->p1d.ash_baseline.y;
+    sp->win32.ash_segs[*nsegs].x1 = sp->screen[i].x;
+    sp->win32.ash_segs[*nsegs].y1 = sp->screen[i].y;
+    sp->win32.ash_segs[*nsegs].x2 = sp->screen[i].x;
+    sp->win32.ash_segs[*nsegs].y2 = sp->p1d.ash_baseline.y;
   } else {
-    ash_segs[*nsegs].x1 = sp->screen[i].x;
-    ash_segs[*nsegs].y1 = sp->screen[i].y;
-    ash_segs[*nsegs].x2 = sp->p1d.ash_baseline.x;
-    ash_segs[*nsegs].y2 = sp->screen[i].y;
+    sp->win32.ash_segs[*nsegs].x1 = sp->screen[i].x;
+    sp->win32.ash_segs[*nsegs].y1 = sp->screen[i].y;
+    sp->win32.ash_segs[*nsegs].x2 = sp->p1d.ash_baseline.x;
+    sp->win32.ash_segs[*nsegs].y2 = sp->screen[i].y;
   }
 
   *nsegs += 1;
@@ -331,7 +338,7 @@ win32_draw_to_pixmap_unbinned (gint current_color, splotd *sp, ggobid *gg)
 
   npt = nseg = nr_open = nr_filled = nc_open = nc_filled = 0;
 
-  if (maxn != d->ncols)
+  if (sp->win32.npoints < d->nrows)
     drawing_arrays_alloc (sp, d, gg);
 
   for (i=0; i<d->nrows_in_plot; i++) {
@@ -342,9 +349,9 @@ win32_draw_to_pixmap_unbinned (gint current_color, splotd *sp, ggobid *gg)
     {
       if (display->options.points_show_p) {
         build_glyph (&d->glyph_now.els[m], sp->screen, m,
-          points, &npt,           segs, &nseg,
-          open_rects, &nr_open,   filled_rects, &nr_filled,
-          open_arcs, &nc_open,    filled_arcs, &nc_filled);
+          sp->win32.points, &npt,           sp->win32.segs, &nseg,
+          sp->win32.open_rects, &nr_open,   sp->win32.filled_rects, &nr_filled,
+          sp->win32.open_arcs, &nc_open,    sp->win32.filled_arcs, &nc_filled);
 
         if ((dtype == parcoords || dtype == tsplot) &&
             display->options.whiskers_show_p)
@@ -360,13 +367,14 @@ win32_draw_to_pixmap_unbinned (gint current_color, splotd *sp, ggobid *gg)
     }
   }
   if (nwhisker_segs)
-    gdk_draw_segments (sp->pixmap0, gg->plot_GC, whisker_segs, nwhisker_segs);
+    gdk_draw_segments (sp->pixmap0, gg->plot_GC,
+      sp->win32.whisker_segs, nwhisker_segs);
   if (nash_segs)
-    gdk_draw_segments (sp->pixmap0, gg->plot_GC, ash_segs, nash_segs);
+    gdk_draw_segments (sp->pixmap0, gg->plot_GC, sp->win32.ash_segs, nash_segs);
   draw_glyphs (sp, sp->pixmap0,
-    points, npt,           segs, nseg,
-    open_rects, nr_open,   filled_rects, nr_filled,
-    open_arcs, nc_open,    filled_arcs, nc_filled,
+    sp->win32.points, npt,           sp->win32.segs, nseg,
+    sp->win32.open_rects, nr_open,   sp->win32.filled_rects, nr_filled,
+    sp->win32.open_arcs, nc_open,    sp->win32.filled_arcs, nc_filled,
     gg);
 }
 
@@ -390,9 +398,12 @@ win32_draw_to_pixmap_binned (icoords *bin0, icoords *bin1,
             splot_plot_case (j, false, d, sp, display, gg))
         {
           build_glyph (&d->glyph_now.els[j], sp->screen, j,
-            points, &npt,           segs, &nseg,
-            open_rects, &nr_open,   filled_rects, &nr_filled,
-            open_arcs, &nc_open,    filled_arcs, &nc_filled);
+            sp->win32.points, &npt,          
+            sp->win32.segs, &nseg,
+            sp->win32.open_rects, &nr_open,  
+            sp->win32.filled_rects, &nr_filled,
+            sp->win32.open_arcs, &nc_open,   
+            sp->win32.filled_arcs, &nc_filled);
 
           if (display->displaytype == parcoords ||
               display->displaytype == tsplot)
@@ -403,11 +414,12 @@ win32_draw_to_pixmap_binned (icoords *bin0, icoords *bin1,
       }
     }
   }
-  gdk_draw_segments (sp->pixmap0, gg->plot_GC, whisker_segs, nwhisker_segs);
+  gdk_draw_segments (sp->pixmap0, gg->plot_GC,
+    sp->win32.whisker_segs, nwhisker_segs);
   draw_glyphs (sp, sp->pixmap0,
-    points, npt,           segs, nseg,
-    open_rects, nr_open,   filled_rects, nr_filled,
-    open_arcs, nc_open,    filled_arcs, nc_filled,
+    sp->win32.points, npt,           sp->win32.segs, nseg,
+    sp->win32.open_rects, nr_open,   sp->win32.filled_rects, nr_filled,
+    sp->win32.open_arcs, nc_open,    sp->win32.filled_arcs, nc_filled,
     gg);
 }
 #endif

@@ -131,6 +131,20 @@ typedef struct
    gboolean initmax;
  } tour2d3;
 
+#ifdef WIN32
+ struct _win32 {
+   gint       npoints;
+   GdkPoint   *points;
+   GdkSegment *segs;
+   GdkSegment *whisker_segs;
+   GdkSegment *ash_segs;
+   rectd      *open_rects;
+   rectd      *filled_rects;
+   arcd       *open_arcs;
+   arcd       *filled_arcs;
+ } win32;
+#endif
+
 } splotd;
 
 

@@ -514,6 +514,9 @@ splot_init(splotd *sp, displayd *display, gint width, gint height, ggobid *gg)
   GGobi_widget_set (sp->da, gg, true);
 
 
+#if GTK_MAJOR_VERSION == 2
+  gtk_widget_set_double_buffered(sp->da, false);
+#endif
   gtk_signal_connect (GTK_OBJECT (sp->da),
                       "expose_event",
                       (GtkSignalFunc) splot_expose_cb,
@@ -530,8 +533,6 @@ splot_init(splotd *sp, displayd *display, gint width, gint height, ggobid *gg)
   gtk_widget_set_events (sp->da, GDK_EXPOSURE_MASK
              | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK
              | GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK);
-
-
 
 
 /*
@@ -567,6 +568,10 @@ splot_init(splotd *sp, displayd *display, gint width, gint height, ggobid *gg)
   sp->tour2d.initmax = true;
   sp->tourcorr.initmax = true;
 
+#ifdef WIN32
+  sp->win32.npoints = 0;
+#endif
+
   gtk_signal_emit(GTK_OBJECT(gg), GGobiSignals[SPLOT_NEW_SIGNAL], sp);
 }
 
@@ -599,7 +604,8 @@ splot_world_to_plane (cpaneld *cpanel, splotd *sp, ggobid *gg)
 */
 
   if(GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
-      GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass)->world_to_plane(sp, d, gg);
+    GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass)->world_to_plane(sp,
+      d, gg);
   }
 }
 
