@@ -31,6 +31,22 @@
 
 guint GGobiSignals[MAX_GGOBI_SIGNALS];
 
+
+/*
+  This is for handling the event calls for variable selection. Gtk doesn't have
+  a marshalling function of the appropriate form!
+ */
+
+void
+gtk_marshal_NONE__INT_POINTER_POINTER_POINTER(GtkObject *object, GtkSignalFunc func,
+                                               gpointer func_data, GtkArg *args)
+{
+    (func)(object, GTK_VALUE_INT(args[0]), GTK_VALUE_POINTER(args[1]),
+                   GTK_VALUE_POINTER(args[2]),GTK_VALUE_POINTER(args[3]), func_data);
+}
+
+
+
 gboolean read_input(InputDescription *desc, ggobid *gg);
 
 /*-- initialize variables which don't depend on the size of the data --*/
@@ -81,6 +97,16 @@ void globals_init (ggobid *gg) {
 					"identify_point", GTK_RUN_LAST|GTK_RUN_ACTION,
                                         gtk_marshal_NONE__POINTER_POINTER_POINTER, GTK_TYPE_NONE, 3,
                                         GTK_TYPE_POINTER, GTK_TYPE_POINTER, GTK_TYPE_POINTER);
+  }
+
+    /* This should be for a ggobi datad rather than a widget. Make that a GtkObject and give it
+       a type. */
+  if (gtk_signal_lookup ("select_variable", GTK_TYPE_WIDGET) == 0) {
+      GGobiSignals[VARIABLE_SELECTION_SIGNAL] = 
+       gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_WIDGET),
+					"select_variable", GTK_RUN_LAST|GTK_RUN_ACTION,
+                                        gtk_marshal_NONE__INT_POINTER_POINTER_POINTER, GTK_TYPE_NONE, 4,
+                                        GTK_TYPE_INT, GTK_TYPE_POINTER, GTK_TYPE_POINTER, GTK_TYPE_POINTER);
   }
 
   if (gtk_signal_lookup ("splot_new", GTK_TYPE_WIDGET) == 0) {
@@ -248,6 +274,8 @@ pipeline_init (datad *d, ggobid *gg)
   tform_to_world (d, gg);
 }
 
+
+
 /*
  * the first display is initialized in datad_init, so turn on
  * event handlers there as well
@@ -297,7 +325,6 @@ make_ggobi (GGobiOptions *options, gboolean processEvents, ggobid *gg)
 #endif
 
   start_ggobi(gg, init_data, true);
-
 
   if (processEvents) {
     gtk_main ();

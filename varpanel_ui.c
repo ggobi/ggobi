@@ -22,6 +22,7 @@
 #include "vars.h"
 #include "externs.h"
 
+
 /*-------------------------------------------------------------------------*/
 /*                         utilities                                       */
 /*-------------------------------------------------------------------------*/
@@ -146,6 +147,9 @@ varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint btn,
     case unknown_display_type:
     break;
   }
+
+    /* Change the source object for this event to something more meaningful! */
+  gtk_signal_emit(GTK_OBJECT(gg->main_window), GGobiSignals[VARIABLE_SELECTION_SIGNAL], jvar, display->d, sp, gg);
 
   /*-- overkill for scatmat: could redraw one row, one column --*/
   /*-- overkill for parcoords: need to redraw at most 3 plots --*/

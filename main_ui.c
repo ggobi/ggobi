@@ -26,6 +26,10 @@
 #endif
 
 
+#ifdef TEST_GGOBI_EVENTS
+#include "testEvents.h"
+#endif
+
 const char *const GGOBI(OpModeNames)[] = {
   "1D Plot",
   "XYPlot",
@@ -625,6 +629,11 @@ make_ui (ggobid *gg) {
   window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gg->main_window = window;
   GGobi_widget_set (window, gg, true);
+
+#ifdef TEST_GGOBI_EVENTS
+  gtk_signal_connect_object(GTK_OBJECT(gg->main_window), "splot_new", test_new_plot_cb, (gpointer) "A new plot");
+  gtk_signal_connect(GTK_OBJECT(gg->main_window), "datad_added", test_data_add_cb, NULL);
+#endif
 
   gtk_window_set_policy (GTK_WINDOW (window), true, true, false);
 

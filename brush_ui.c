@@ -239,13 +239,6 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, cpaneld *cpanel)
   return true;
 }
 
-#if TEST_BRUSH_MOTION_CB 
-void
-test_brush_motion_cb(char *userData, ggobid *gg, splotd *sp, GdkEventMotion *ev)
-{
-    fprintf(stderr, "brush motion callback (gg) %p (sp) %p (ev) %p, (userData) %s\n", gg, sp, ev, userData);fflush(stderr);
-}
-#endif
 
 /*-- response to the mouse click event --*/
 static gint

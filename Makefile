@@ -132,6 +132,12 @@ OB=array.o ash1d.o \
  xlines.o 
 
 
+ifdef TEST_EVENTS
+  SRC+=  testEvents.c
+  OB+= testEvents.o
+  CFLAGS+= -DTEST_GGOBI_EVENTS -DTEST_BRUSH_MOTION_CB=1
+endif
+
 ifdef USE_XML
  XML_SRC= read_xml.c write_xml.c  read_init.c write_state.c read_color.c
  XML_OB= read_xml.o write_xml.o read_init.o write_state.o read_color.o

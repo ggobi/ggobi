@@ -350,6 +350,7 @@ ggobi_alloc()
   return (tmp);
 }
 
+
   /* Available so that we can call this from R
      without any confusion between which main().
    */
@@ -400,6 +401,7 @@ GGOBI(main)(gint argc, gchar *argv[], gboolean processEvents)
 
   return (num_ggobis);
 }
+
 
 void
 initSessionOptions()

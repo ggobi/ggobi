@@ -17,6 +17,53 @@
 
  */
 
+void
+update_display_tree_plots_by_variable(DisplayTree *tree, gint whichVar, datad *d, splotd *sp, ggobid *gg, GtkWidget *w)
+{
+    displayd *dpy = sp->displayptr;
+    int i, n;
+
+    GtkWidget *subTree;
+    GList *kids;
+
+    n = g_list_length(gg->displays);
+    for(i =0; i < n; i++) {
+        dpy = (displayd *) g_list_nth_data(gg->displays, i);
+	if(sp->displayptr == dpy) 
+	    break;
+    }
+
+    if(i == n) {
+	return;/*XXX give a warning message that this should never have happened! */
+    }
+
+      /* 
+        Now we know the particular element of the tree corresponding
+        to the display. So, this is a container with a single child
+        which is a GtkTreeItem object. We ask it for its subtree,
+        then we get its children. And now we loop over the splotd's
+        in the display and update the label in the corresponding
+        child in this containers children. Each child is a GtkTreeItem.
+       */    
+    kids = gtk_container_children(GTK_CONTAINER(tree->tree));
+    subTree = (GtkWidget*) g_list_nth_data(kids, i);
+    
+    kids = gtk_container_children(GTK_CONTAINER(GTK_TREE_ITEM_SUBTREE(GTK_TREE_ITEM(subTree))));
+
+
+    n = g_list_length(dpy->splots);
+    for(i = 0; i < n; i++) {
+	GtkWidget *tmp;
+        splotd *sp;
+	char *lab;
+        sp = (splotd*) g_list_nth_data(dpy->splots, i);
+        tmp = (GtkWidget *) g_list_nth_data(kids, i);
+        tmp = (GtkWidget *) g_list_nth_data(gtk_container_children(GTK_CONTAINER(tmp)), 0);
+	lab = splot_tree_label(sp, i, dpy->displaytype, dpy->d, gg);
+        gtk_label_set_text(GTK_LABEL(tmp), lab);
+	g_free(lab);
+    }
+}
 
 
 /*
@@ -42,7 +89,7 @@ plot_tree_display(ggobid *gg)
  GList *dlist;
  displayd *display;
 
- GtkWidget *tree;
+ GtkWidget *tree, *sw;
  GtkWidget *plot_tree_window;
  gint numItems;
 
@@ -55,6 +102,11 @@ plot_tree_display(ggobid *gg)
  if(gg->display_tree.tree == NULL) {
   plot_tree_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
   gtk_window_set_title(GTK_WINDOW(plot_tree_window), "GGobi Displays");
+  gtk_widget_set_usize(plot_tree_window, 250, 300);
+
+  gtk_signal_connect_object(GTK_OBJECT(gg->main_window), "select_variable",
+                             update_display_tree_plots_by_variable, (gpointer) &gg->display_tree);
+
  } else {
 
   fprintf(stderr,
@@ -75,15 +127,18 @@ plot_tree_display(ggobid *gg)
 
   numItems = 0;
   for (dlist = gg->displays; dlist; dlist = dlist->next, numItems++) {
+    GtkWidget *sub;
     display = (displayd *) dlist->data;
-    display_add_tree(display, numItems, tree, gg);
+    sub = display_add_tree(display, numItems, tree, gg);
   }
 
   /*
  gtk_signal_connect (GTK_OBJECT(tree), "select_child",
                       GTK_SIGNAL_FUNC(display_tree_child_select), NULL);
   */
- gtk_container_add(GTK_CONTAINER( plot_tree_window ), tree);
+ sw = gtk_scrolled_window_new(NULL, NULL);
+ gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(sw), tree);
+ gtk_container_add(GTK_CONTAINER( plot_tree_window ), sw);
  gtk_widget_show_all(plot_tree_window);
 
 
@@ -240,7 +295,7 @@ splot_tree_label(splotd *splot, gint ctr, enum displaytyped type,
 
           n = strlen (vtx->collab) + strlen (vty->collab) + 5;
           buf = (gchar*) g_malloc (n * sizeof (gchar*));
-          sprintf (buf, "%s v %s", vtx->collab, vtx->collab);
+          sprintf (buf, "%s v %s", vtx->collab, vty->collab);
         break;
 
         case TOUR2D:
@@ -362,7 +417,9 @@ display_tree_display_child_select(GtkWidget *item, displayd *display)
       sp = (splotd *) g_list_nth_data (display->splots, 0);
       GGOBI(splot_set_current_full) (display, sp, gg);
     }
-  }  
+  }
+
+  gtk_widget_show(display->window);  
 }
 
 /*

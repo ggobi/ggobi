@@ -68,7 +68,7 @@ callback or handler for these events.  This arranges for the user data
 given in this call to be passed as the first argument to the callback.
 The routine \Croutine{gtk_signal_connect} puts it as the last
 argument. See \cite{pennington99} or \cite{gtkTutorial}.
-The 
+
 
 \begin{description}
 \item[new data] The \SignalName{datad_added} signal is generated each
@@ -77,7 +77,7 @@ for this event are given two arguments
 in addition to the user-defined data provided when
 one registers the callback.
 \begin{verbatim}
- void (*callback)(void *userData, datad *data, ggobid *gg);
+ void (*callback)(void *userData, datad *data, ggobid *gg, GtkWidget *w);
 \end{verbatim}
 \item[brush movement] 
 The signal name is \SignalName{brush_motion}.
@@ -87,7 +87,7 @@ This event is generated when the user moves (or
   a reference to the low-level event so that one can have access to
   all the information about where the mouse is, etc.
 \begin{verbatim}
- void (*callback)(void *userData, ggobid *, splotd *sp, GdkEventMotion *);
+ void (*callback)(void *userData, ggobid *, splotd *sp, GdkEventMotion *, GtkWidget *w);
 \end{verbatim}
 
 \item[point identification] The \SignalName{identify_point} event is
@@ -99,7 +99,17 @@ arguments: the plot in which the identification took place, a
 reference to the \CStruct{GdkEventMotion} event, and the GGobi
 instance.
 \begin{verbatim}
- void (*callback)(void *userData, splotd *sp, GdkMotionEvent *ev, ggobid *gg);
+ void (*callback)(void *userData, splotd *sp, GdkMotionEvent *ev, ggobid *gg, GtkWidget *w);
+\end{verbatim}
+
+\item[move point]
+The \SignalName{move_point} signal is raised as the user drags a point on a plot
+thus changing its values.
+This can be used to track those changes, updating other dependent data,
+displays, etc.
+The form of the handler function should be:
+\begin{verbatim}
+void (*callback)(void *userData, ggobid *gg, splotd *sp, GdkEvetMotion* ev, GtkWidget *w,);
 \end{verbatim}
 
 \item[new plot] The signal name is \SignalName{splot_new}.  This is
@@ -108,16 +118,31 @@ a \CStruct{displayd}.  This callback has two system arguments: the
 plot and the ggobi instance.  From the plot, one can access the
 \CStruct{displayd}.
 \begin{verbatim}
- void (*callback)(void *userData, splotd *sp, ggobid *gg);
+ void (*callback)(void *userData, splotd *sp, ggobid *gg, GtkWidget *mainWin);
 \end{verbatim}
 
 \item[variable added] The signal name is \SignalName{variable_added}.
 This is generated when a new variable is added to a dataset in a ggobi
 instance.
 \begin{verbatim}
-void (*callback)(void *userData, vartabled *var, ggobid *gg);
+void (*callback)(void *userData, vartabled *var, ggobid *gg, GtkWidget *mainWin);
+\end{verbatim}
+
+\item[variable selected] The signal \SignalName{select_variable} is
+generated when the user clicks on the variable panel in the main
+window to select a variable.  This can be used to monitor changes to
+the variables displayed in plots, etc.
+\begin{verbatim}
+void (*callback)(void *userData, gint whichVar, datad *d, splotd *sp, 
+                   ggobid *gg, GtkWidget *mainWin);
 \end{verbatim}
 \end{description}
+
+\section{Testing Events}
+Some very simple examples are provided in \file{testEvents.c} and can
+be activated by defining the pre-processor symbol
+\Cpp{TEST_GGOBI_EVENTS} to any non-zero value. (Actually it just has
+to be defined.)
 
 \bibliography{gtk}
 
