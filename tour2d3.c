@@ -87,6 +87,7 @@ alloc_tour2d3 (displayd *dsp, ggobid *gg)
 
   vectorf_alloc(&dsp->t2d3.lambda, nc);
   vectorf_alloc_zero(&dsp->t2d3.tau, nc);
+  vectorf_alloc_zero(&dsp->t2d3.tau, nc);
   vectorf_alloc(&dsp->t2d3.tinc, nc);
 
   /* manipulation variables */
@@ -197,12 +198,16 @@ display_tour2d3_init (displayd *dsp, ggobid *gg) {
  * subset_vars.els[2] = VARSEL_Z
 */
   dsp->t2d3.nsubset = dsp->t2d3.nactive = 3;
+  for (j=0; j<nc; j++) {
+    dsp->t2d3.subset_vars.els[j] = dsp->t2d3.active_vars.els[j] = 0;
+    dsp->t2d3.subset_vars_p.els[j] = dsp->t2d3.active_vars_p.els[j] = false;
+  }
   for (j=0; j<3; j++) {
     dsp->t2d3.subset_vars.els[j] = dsp->t2d3.active_vars.els[j] = j;
     dsp->t2d3.subset_vars_p.els[j] = dsp->t2d3.active_vars_p.els[j] = true;
   }
 
-  /* declare starting base as first p chosen variables */
+  /* declare starting base as first 2 chosen variables */
   for (i=0; i<2; i++)
     for (j=0; j<nc; j++)
       dsp->t2d3.Fa.vals[i][j] = dsp->t2d3.Fz.vals[i][j] = 
@@ -461,6 +466,8 @@ void tour2d3_scramble(ggobid *gg)
     d->ncols, (gint) 2);
   arrayd_copy(&dsp->t2d3.Fa, &dsp->t2d3.F);
 
+  dsp->t2d3.tau.els[0] = 0.0;
+  dsp->t2d3.tau.els[1] = 0.0;
   dsp->t2d3.get_new_target = true;
 
   display_tailpipe (dsp, FULL, gg);
@@ -615,6 +622,8 @@ void tour2d3_reinit(ggobid *gg)
       dsp->t2d3.Gz.vals[i][dsp->t2d3.active_vars.els[i]] = 1.0;
   }
 
+  dsp->t2d3.tau.els[0] = 0.0;
+  dsp->t2d3.tau.els[1] = 0.0;
   dsp->t2d3.get_new_target = true;
   sp->tour2d3.initmax = true;
 

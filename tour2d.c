@@ -330,8 +330,8 @@ tour2d_active_var_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
         gt_basis(dsp->t2d.Fa, dsp->t2d.nactive, dsp->t2d.active_vars, 
           d->ncols, (gint) 2);
         arrayd_copy(&dsp->t2d.Fa, &dsp->t2d.F);
-/*        copy_mat(dsp->t2d.F.vals, dsp->t2d.Fa.vals, d->ncols, 2);*/
       }
+
       dsp->t2d.active_vars_p.els[jvar] = false;
     }
   }
@@ -472,7 +472,9 @@ void tour2d_scramble(ggobid *gg)
   gt_basis(dsp->t2d.Fa, dsp->t2d.nactive, dsp->t2d.active_vars, 
     d->ncols, (gint) 2);
   arrayd_copy(&dsp->t2d.Fa, &dsp->t2d.F);
-  /*  copy_mat(dsp->t2d.F.vals, dsp->t2d.Fa.vals, d->ncols, 2);*/
+
+  dsp->t2d.tau.els[0] = 0.0;
+  dsp->t2d.tau.els[1] = 0.0;
 
   dsp->t2d.get_new_target = true;
 
@@ -710,6 +712,9 @@ void tour2d_reinit(ggobid *gg)
     dsp->t2d.Fa.vals[i][dsp->t2d.active_vars.els[i]] = 1.;
     dsp->t2d.F.vals[i][dsp->t2d.active_vars.els[i]] = 1.;
     }*/
+
+  dsp->t2d.tau.els[0] = 0.0;
+  dsp->t2d.tau.els[1] = 0.0;
 
   dsp->t2d.get_new_target = true;
 
