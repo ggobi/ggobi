@@ -558,6 +558,9 @@ splot_init(splotd *sp, displayd *display, gint width, gint height, ggobid *gg)
   sp->release_id = 0;
   sp->motion_id = 0;
 
+/* tour1d inits */
+  sp->tour1d.initmax = true;
+
   gtk_signal_emit(GTK_OBJECT(gg), GGobiSignals[SPLOT_NEW_SIGNAL], sp, gg);
 }
 
