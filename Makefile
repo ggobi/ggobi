@@ -148,7 +148,7 @@ ifdef USE_XML
  XML_OB= read_xml.o write_xml.o read_init.o write_state.o read_color.o
 
 # XML_FLAGS+= -DSUPPORT_PLUGINS=1 -DSUPPORT_INIT_FILES=1
- CFLAGS+= $(XML_INC_DIRS:%=-I%) -DUSE_XML=$(USE_XML) $(XML_FLAGS) -DSUPPORT_PLUGINS=1 -DSUPPORT_INIT_FILES=1
+ CFLAGS+= $(XML_INC_DIRS:%=%) -DUSE_XML=$(USE_XML) $(XML_FLAGS) -DSUPPORT_PLUGINS=1 -DSUPPORT_INIT_FILES=1
 
  SRC+=$(XML_SRC)
  OB+= $(XML_OB)
@@ -271,6 +271,9 @@ datad.o read_xml.o: datad.c datad.h
 ../bin/ggobi: ggobi
 	cp ggobi $@
 
+
+cflags:
+	@echo "$(CFLAGS)"
 
 print.o: print.c print.h
 
