@@ -465,7 +465,7 @@ static gboolean nclusters_changed(ggobid * gg)
 }
 
 
-void cluster_table_update(datad * d, ggobid * gg)
+void cluster_table_update (datad * d, ggobid * gg)
 {
   if (gg->cluster_ui.window == NULL) {
     ;
@@ -482,7 +482,6 @@ static gint
 exclusion_notebook_adddata_cb (ggobid *gg, datad * d, void* notebook)
 {
   /*cluster_table_update(d, gg);*/
-g_printerr ("adddata_cb called for %s\n", d->name);
 
   cluster_window_open (gg);
   return true;  /* risky -- will this prevent other guys from getting it?  --*/
