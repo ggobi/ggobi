@@ -1194,13 +1194,18 @@ menu bar contains these items:
 
 This mode is used to display labels near points in the plotting window.
 To see these labels, simply move the cursor inside the plotting window.
-The label of the point nearest the cursor is displayed.
+The label of the point nearest the cursor is displayed.  The possible
+labels are
 
-By default, the labels are taken from the case (record) labels supplied
-by the user either in ascii or in XML; if such a label is not present,
-the row number of each case is used.   As an alternative, you can also
-display the {\it point coordinates}: the values of the variables in the
-current projection.
+\begin{itemize} \itemsep 0em
+\item the record (case) label supplied by the user either in ASCII
+      or XML (the default),
+\item the record number (the backup default in case no record label was
+      supplied),
+\item a list of variables and variable values, where the variables are
+      specified in the list widget above, or
+\item the record id (if none was supplied, the record number is used).
+\end{itemize}
 
 Identification in one window is instantly reflected in all linked windows.
 [Some thought is required before deciding how or whether this view mode
@@ -1252,8 +1257,7 @@ Control-{\em M} with the focus in the console.
 
 This powerful tool is opened by selecting the first entry on the
 {\bf Tools} menu.  It has several important functions:
-\begin{itemize}
-\itemsep 0em
+\begin{itemize} \itemsep 0em
 \item the display of variable statistics,
 \item variable subset selection for launching multi-plot displays,
 \item setting variable ranges,
