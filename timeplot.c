@@ -255,7 +255,6 @@ tsplot_varsel (GtkWidget *w, displayd *display, splotd *sp, gint jvar,
   GtkWidget *box, *da;
   gfloat ratio = 1.0;
 
-
   /* The index of gg.current_splot */
   gint sp_indx = g_list_index (gg->current_display->splots, sp);
 
@@ -269,7 +268,7 @@ tsplot_varsel (GtkWidget *w, displayd *display, splotd *sp, gint jvar,
    *  if left button click, the x variable no matter what
    *  selection_mode prevails.
   */
-  if (mouse == 1) {
+  if (toggle == VARSEL_X || mouse == 1) {
     l = display->splots;
     s = (splotd *) l->data;
     if (s->xyvars.x == jvar) redraw=false;  /*-- this is already the x var --*/
@@ -281,7 +280,7 @@ tsplot_varsel (GtkWidget *w, displayd *display, splotd *sp, gint jvar,
       }
     }
 
-  } else if (mouse == 2 || mouse == 3) {
+  } else if (toggle == VARSEL_Y || mouse == 2 || mouse == 3) {
 
     if (tsplot_var_selected (jvar, display)) {
 
