@@ -16,6 +16,12 @@
  *    dfs, 10/30/2001
 */
 
+/*
+ * Something here should respond to a variable transformation event,
+ * I think.  We don't yet have such an event, so I won't spend the 
+ * time now to work out what the response should be.  dfs 9/10/2002
+*/
+
 #include <string.h>
 #include <stdlib.h>
 
@@ -420,7 +426,7 @@ bin_boundaries_set (gint selected_var, datad *d, ggobid *gg)
 
     /*-- sort the selected variable --*/
     for (i=0; i<d->nrows_in_plot; i++) {
-      pairs[i].f = d->raw.vals[d->rows_in_plot[i]][varno];
+      pairs[i].f = d->tform.vals[d->rows_in_plot[i]][varno];
       pairs[i].indx = d->rows_in_plot[i];
     }
     qsort ((gchar *) pairs, d->nrows_in_plot, sizeof (paird), pcompare);
