@@ -1,3 +1,7 @@
+Fix the names and ids in the color map specification. Need to
+determine what is the relationship between these.
+
+
 When we add a dataset after loading the first one (i.e. in a separate
 action) the first tab of the notebook does not have the correct labe
 (it appears as Page 1).

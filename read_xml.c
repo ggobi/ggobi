@@ -1180,15 +1180,20 @@ readXMLRecord(const CHAR **attrs, XMLParserData *data)
 {
   datad *d = getCurrentXMLData(data);
   const gchar *tmp;
+  gchar *stmp;
   gint i = data->current_record;
 
   data->current_element = 0;
 
   tmp = getAttribute(attrs, "label");
-  if (tmp) {
-    gchar *stmp = g_strdup (tmp);
+  if(!tmp) {
+      /* Length is to hold the current record number as a string. */
+    stmp = g_malloc(sizeof(gchar) * 10);
+    g_snprintf(stmp, 9, "%d", i);
+  } else
+    stmp = g_strdup (tmp);
+
     g_array_insert_val (d->rowlab, data->current_record, stmp);
-  }
 
 
   setColor(attrs, data, i);
