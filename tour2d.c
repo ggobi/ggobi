@@ -351,30 +351,29 @@ tour2d_do_step(displayd *dsp, ggobid *gg)
 }
 
 gint
-tour2d_idle_func (ggobid *gg)
+tour2d_idle_func (displayd *dsp)
 {
-  displayd *dsp = gg->current_display;
+  ggobid *gg = GGobiFromDisplay (dsp);
   cpaneld *cpanel = &dsp->cpanel;
   gboolean doit = !cpanel->t2d_paused;
 
   if (doit) {
-    tour2d_run(dsp, gg);
+    tour2d_run (dsp, gg);
     gdk_flush ();
   }
 
   return (doit);
 }
 
-void tour2d_func (gboolean state, ggobid *gg)
+void tour2d_func (gboolean state, displayd *dsp, ggobid *gg)
 {
-  displayd *dsp = gg->current_display; 
-
   if (state) {
     dsp->t2d.idled = gtk_idle_add_priority (G_PRIORITY_LOW,
-                                   (GtkFunction) tour2d_idle_func, gg);
+                                   (GtkFunction) tour2d_idle_func, dsp);
     gg->tour2d.idled = 1;
   } else {
-    gtk_idle_remove (dsp->t2d.idled);
+    if (dsp->t2d.idled)
+      gtk_idle_remove (dsp->t2d.idled);
     gg->tour2d.idled = 0;
   }
 

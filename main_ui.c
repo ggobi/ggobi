@@ -431,16 +431,8 @@ mode_activate (splotd *sp, gint m, gboolean state, ggobid *gg) {
       case MOVEPTS:
       case COTOUR:
       case ROTATE:
-        break;
-
       case TOUR1D:
-	    tour1d_func (off, gg);
-        break;
-
       case TOUR2D:
-	    tour2d_func (off, gg);
-        break;
-
       case SCALE:
       case IDENT:
         break;
@@ -457,16 +449,8 @@ mode_activate (splotd *sp, gint m, gboolean state, ggobid *gg) {
       case MOVEPTS:
       case COTOUR:
       case ROTATE:
-        break;
-
       case TOUR1D:
-        tour1d_func (on, gg);
-        break;
-
       case TOUR2D:
-        tour2d_func (on, gg);
-        break;
-
       case SCALE:
       case IDENT:
         break;
@@ -491,6 +475,7 @@ GGOBI(full_mode_set)(int action, ggobid *gg)
   if (gg->current_display != NULL && gg->current_splot != NULL) {
     splotd *sp = gg->current_splot;
     displayd *display = gg->current_display;
+    gint prev_mode = gg->mode;
 
     sp_event_handlers_toggle (sp, off);
     mode_activate (sp, gg->mode, off, gg);
@@ -498,6 +483,32 @@ GGOBI(full_mode_set)(int action, ggobid *gg)
 
     display->cpanel.mode = action;
     mode_set (action, gg);  /* mode = action */
+
+    /*
+     * Turn the tour procs on and off here
+    */
+
+    if (gg->mode == TOUR2D || prev_mode == TOUR2D) {
+      /*-- if turning on the 2d tour --*/
+      if (gg->mode == TOUR2D && prev_mode != TOUR2D) {
+        if (!display->cpanel.t2d_paused)
+          tour2d_func (on, display, gg);
+      /*-- if turning off the 2d tour --*/
+      } else if (prev_mode == TOUR2D && gg->mode != TOUR2D) {
+        tour2d_func (off, display, gg);
+      }
+    }
+
+    if (gg->mode == TOUR1D || prev_mode == TOUR1D) {
+      /*-- if turning on the 1d tour --*/
+      if (gg->mode == TOUR1D && prev_mode != TOUR1D) {
+        if (!display->cpanel.t1d_paused)
+          tour1d_func (on, display, gg);
+      /*-- if turning off the 1d tour --*/
+      } else if (prev_mode == TOUR1D && gg->mode != TOUR1D) {
+        tour1d_func (off, display, gg);
+      }
+    }
 
     sp_event_handlers_toggle (sp, on);
     mode_activate (sp, gg->mode, on, gg);

@@ -8,7 +8,6 @@ EXTRAS = -Wpointer-arith -Wcast-qual -Wcast-align
 
 # used to comment out sections of code for incompletely
 # implemented or buggy functionality
-TOUR1D_IMPLEMENTED=1
 CORRELATION_TOUR_IMPLEMENTED=0
 BINARY_IO_IMPLEMENTED=0
 INFERENCE_IMPLEMENTED=0

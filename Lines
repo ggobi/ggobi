@@ -105,6 +105,7 @@
 35468   10/19 the clist on the sphere panel now initializes correctly
 35665   10/23 more routines in vector.c to support tour reallocation
 35729   10/23 progress in sphering; bug fixes in delete_vars
+37183   12/4  I don't know!
 
 note: There are about 40.8K lines in xgobi,
        subtracting the rpc, xgvis and tour code.

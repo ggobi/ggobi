@@ -59,7 +59,7 @@ static void scale_set_default_values (GtkScale *scale )
 void tour2d_pause (cpaneld *cpanel, gboolean state, ggobid *gg) {
   cpanel->t2d_paused = state;
 
-  tour2d_func (!cpanel->t2d_paused, gg);
+  tour2d_func (!cpanel->t2d_paused, gg->current_display, gg);
 }
 
 static void tour2d_pause_cb (GtkToggleButton *button, ggobid *gg)
