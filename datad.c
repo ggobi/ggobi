@@ -24,8 +24,7 @@ datad *
 datad_new(datad *d, ggobid *gg)
 { 
   if (d == NULL) {
-    d = (datad *) g_malloc (sizeof (datad));
-    memset(d, '\0', sizeof(datad));
+    d = (datad *) gtk_type_new(GTK_TYPE_GGOBI_DATA);
   }
 
   datad_instance_init(d);
