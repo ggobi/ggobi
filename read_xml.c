@@ -250,7 +250,7 @@ setLevelIndex(const CHAR **attrs, XMLParserData *data)
     const char *tmp = getAttribute(attrs, "value");
 
     if (tmp != NULL) {
-	data->current_level = asInteger(tmp);
+	data->current_level = strToInteger(tmp);
     } else
 	data->current_level++;
 
@@ -266,7 +266,7 @@ categoricalLevels(const CHAR **attrs, XMLParserData *data)
     const char *tmp = getAttribute(attrs, "count");
 
     if (tmp != NULL) {
-	el->nlevels = asInteger(tmp);
+	el->nlevels = strToInteger(tmp);
         el->levels = g_array_new(false, false, sizeof(gchar *));       
         g_array_set_size(el->levels, el->nlevels);
     }
@@ -453,7 +453,7 @@ setGeneralInfo (const CHAR **attrs, XMLParserData *data)
   const char *tmp = getAttribute(attrs, "count");
 
   if (tmp != NULL) {
-    data->expectedDatasetCount = asInteger(tmp);
+    data->expectedDatasetCount = strToInteger(tmp);
   }
 
   return(true);
@@ -471,7 +471,7 @@ setDatasetInfo (const CHAR **attrs, XMLParserData *data)
     exit(101);
   }
 
-  d->nrows = asInteger(tmp);
+  d->nrows = strToInteger(tmp);
   d->nrows_in_plot = d->nrows;  /*-- for now --*/
   d->nrgroups = 0;              /*-- for now --*/
 
@@ -515,7 +515,7 @@ setDefaultDatasetValues(const CHAR **attrs, XMLParserData *data)
 }
 
 gint
-asInteger(const gchar *tmp)
+strToInteger(const gchar *tmp)
 {
  gint value;
 
@@ -590,7 +590,7 @@ setColor(const CHAR **attrs, XMLParserData *data, int i)
 
   tmp = getAttribute(attrs, "color");
   if(tmp) {
-    value = asInteger(tmp);
+    value = strToInteger(tmp);
   }
 
   if(value < 0 || value > NCOLORS) {
@@ -616,7 +616,7 @@ setGlyph(const CHAR **attrs, XMLParserData *data, gint i)
   value = data->defaults.glyphSize;
   tmp = getAttribute(attrs, "glyphSize");
   if (tmp) {
-   value = asInteger(tmp);
+   value = strToInteger(tmp);
   }
 
   if (value < 0 || value > NGLYPHSIZES) {
@@ -634,7 +634,7 @@ setGlyph(const CHAR **attrs, XMLParserData *data, gint i)
   value = data->defaults.glyphType;
   tmp = getAttribute(attrs, "glyphType");
   if(tmp) {
-   value = asInteger(tmp);
+   value = strToInteger(tmp);
   }
 
   if(value < 0 || value > NGLYPHS) {
@@ -779,7 +779,7 @@ allocVariables (const CHAR **attrs, XMLParserData *data)
     exit(101);
   }
 
-  d->ncols = asInteger(tmp);
+  d->ncols = strToInteger(tmp);
 
   arrayf_alloc (&d->raw, d->nrows, d->ncols);
   hidden_alloc (d);
@@ -961,7 +961,7 @@ setColorMap(const CHAR **attrs, XMLParserData *data)
  file = getAttribute(attrs, "file");
 
  if(tmp)
-   size = asInteger(tmp);
+   size = strToInteger(tmp);
  else {
   if(file == NULL)
    return(false);
@@ -1026,7 +1026,7 @@ setColormapEntry(const CHAR **attrs, XMLParserData *data)
        /* Note that we set the current color to this index.
           Thus we can skip values, etc.
         */
-     which = data->current_color = asInteger(tmp) - 1;
+     which = data->current_color = strToInteger(tmp) - 1;
      color = data->gg->default_color_table + which;
    }
  } else {
@@ -1236,7 +1236,7 @@ readXMLRecord(const CHAR **attrs, XMLParserData *data)
     }
 
     data->rowIds[i] = g_strdup(tmp);
-    d->rowid.id.els[i] = asInteger (tmp);
+    d->rowid.id.els[i] = strToInteger (tmp);
   }
 
 /*
@@ -1248,28 +1248,10 @@ readXMLRecord(const CHAR **attrs, XMLParserData *data)
   /* Read the edge source and destination pair if, present. */
   tmp = getAttribute(attrs, "source");   
   if (tmp != (const gchar *) NULL) {
-/*
-  if(tmp == (const gchar *)NULL || tmp[0] == (const gchar)NULL) {
-    char buf[512]; 
-    sprintf(buf,"No source attribute for record %d in edge data %s\n",
-      i, d->name);
-    g_printerr (buf);
-    exit(103);
-  }
-*/
-    start = asInteger(tmp);
+    start = strToInteger(tmp);
     tmp = getAttribute(attrs, "destination");   
     if (tmp != (const gchar *) NULL) {
-/*
-  if(tmp == (const gchar *)NULL || tmp[0] == (const gchar)NULL) {
-    char buf[512]; 
-    sprintf(buf,"No destination attribute for record %d in edge data %s\n",
-      i, d->name);
-    g_printerr (buf);
-    exit(103);
-  }
-*/
-      end = asInteger(tmp);
+      end = strToInteger(tmp);
 
       /*-- if encountering the first edge, allocate endpoints array --*/
       if (d->edge.n == 0) {

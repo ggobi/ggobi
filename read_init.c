@@ -233,7 +233,7 @@ getDisplayDescription(xmlNodePtr node)
   dpy->type = getDisplayType(xmlGetProp(node, "type"));
   tmp = xmlGetProp(node, "data");
   if(tmp) {
-    dpy->data = asInteger(tmp) - 1;
+    dpy->data = strToInteger(tmp) - 1;
   } else
     dpy->data = 0;
 

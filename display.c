@@ -67,8 +67,9 @@ display_plot (displayd *display, guint type, ggobid *gg) {
 
   for (slist = display->splots; slist; slist = slist->next) {
     sp = (splotd *) slist->data;
-    if (sp != NULL)
+    if (sp != NULL) {
       splot_redraw (sp, type, gg); 
+    }
   }
 }
 
@@ -635,8 +636,9 @@ displays_plot (splotd *splot, gint type, ggobid *gg) {
   for (dlist = gg->displays; dlist; dlist = dlist->next) {
     display = (displayd *) dlist->data;
 
-    if (splot == NULL)
+    if (splot == NULL) {
       display_plot (display, type, gg);
+    }
     else
       display_plot_allbutone (display, splot, type, gg);
   }

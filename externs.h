@@ -18,7 +18,7 @@ extern "C" {
 
 /* sort +1 */
 displayd *createDisplayFromDescription (ggobid *, GGobiDisplayDescription *desc);
-gint asInteger (const gchar *tmp);
+gint strToInteger (const gchar *tmp);
 gboolean edgeset_add (displayd *);
 void splash_show (ggobid *gg, guint action, GtkWidget *w);
 datad * ValidateDatadRef (datad *d, ggobid *gg, gboolean fatal);
