@@ -374,13 +374,12 @@ ggobi_alloc()
     g_printerr ("failed to find color scheme\n");
     exit(0);
   } else colorscheme_init (tmp->activeColorScheme);
-/*
-Something like this is required, but all the necessary vectors
-have not yet been created.
-  if (!colors_remap (tmp->activeColorScheme, tmp))
-    exit;
-*/
-  
+    /*
+     * the number of colors in use will be tested against the
+     * scheme->n the first time we plot, and the color ids will
+     * be adjusted if necessary.
+    */
+
   totalNumGGobis++;
 
   all_ggobis = (ggobid **)

@@ -85,6 +85,33 @@ datad_colors_used_get (gint *ncolors_used, gushort *colors_used,
   return (maxcolorid);
 }
 
+static void
+splot_check_colors (gushort maxcolorid, gint *ncolors_used,
+  gushort *colors_used, datad *d, ggobid *gg)
+{
+  colorschemed *scheme = gg->activeColorScheme;
+  gchar *message;
+
+  if (maxcolorid >= scheme->n) {
+    /* force a remapping even if the number of colors is too large */
+    if (*ncolors_used > scheme->n) {
+      message = g_strdup_printf ("The number of colors in use (%d) is greater than than\nthe number of colors in the current scheme (%d).\nColors are being reassigned.", *ncolors_used, scheme->n);
+      quick_message (message, false);
+      g_free (message);
+    }
+    else {
+      message = g_strdup_printf ("The largest color id in use (%d) is too large for\nthe number of colors in the current scheme (%d).\nColors are being reassigned.", maxcolorid, scheme->n);
+      quick_message (message, false);
+      g_free (message);
+   }
+
+    colors_remap (scheme, true, gg);
+    /* repeat to get the remapped values */
+    datad_colors_used_get (ncolors_used, colors_used, d, gg);
+  }
+}
+
+
 gboolean
 splot_plot_case (gint m, datad *d, splotd *sp, displayd *display, ggobid *gg)
 {
@@ -226,22 +253,8 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
 
   if (!gg->mono_p && loop_over_points) {
     maxcolorid = datad_colors_used_get (&ncolors_used, colors_used, d, gg);
+    splot_check_colors (maxcolorid, &ncolors_used, colors_used, d, gg);
 
-    if (maxcolorid >= scheme->n) {
-      /* force a remapping even if the number of colors is too large */
-      if (ncolors_used > scheme->n)
-        quick_message ("The number of colors in use is greater than than\nthe number of colors in the current scheme.\nColors are being reassigned.",
-          false);
-      else
-        quick_message ("The largest color id in use is too large for\nthe number of colors in the current scheme.\nColors are being reassigned.",
-          false);
-
-      colors_remap (scheme, true, gg);
-      /* repeat to get the correct values */
-      datad_colors_used_get (&ncolors_used, colors_used, d, gg);
-    }
-
-      
     /*
      * Now loop through colors_used[], plotting the points of each
      * color.  This avoids the need to reset the foreground so often.
@@ -332,6 +345,7 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
   icoords *bin1 = &gg->plot.bin1;
   icoords *loc0 = &gg->plot.loc0;
   icoords *loc1 = &gg->plot.loc1;
+  gushort maxcolorid;
 
   gushort current_color;
   gint ncolors_used;
@@ -394,7 +408,8 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
   if (display->options.points_show_p) {
     if (!gg->mono_p) {
 
-      datad_colors_used_get (&ncolors_used, colors_used, d, gg); 
+      maxcolorid = datad_colors_used_get (&ncolors_used, colors_used, d, gg);
+      splot_check_colors (maxcolorid, &ncolors_used, colors_used, d, gg);
 
       /*
        * Now loop through colors_used[], plotting the points of each
