@@ -225,19 +225,16 @@ typedef struct
 */
 typedef struct {
  gboolean points_show_p;              /* scatterplot, scatmat, parcoords */
+ gboolean axes_show_p;                /* scatterplot, scatmat, parcoords */
+ gboolean axes_label_p;               /* scatterplot; tour */
+ gboolean axes_values_p;              /* scatterplot; tour */
  
- /*-- two options here may be plenty --*/
  gboolean edges_undirected_show_p;    /* scatterplot */
  gboolean edges_arrowheads_show_p;    /* scatterplot */
  gboolean edges_directed_show_p;      /* scatterplot: both of the above */
- /*-- --*/
 
  gboolean whiskers_show_p;            /* parcoords, time series */
 
-
- gboolean axes_show_p;                /* scatterplot, scatmat, parcoords */
- gboolean axes_label_p;               /* scatterplot */
- gboolean axes_values_p;              /* scatterplot */
 /* unused
  gboolean missings_show_p;            * scatterplot, scatmat, parcoords *
  gboolean axes_center_p;              * scatterplot *
