@@ -50,7 +50,6 @@ static void brush_undo_cb(GtkToggleButton * button, ggobid * gg)
   rows_in_plot_set(d, gg);
   assign_points_to_bins(d, gg);
   clusters_set(d, gg);
-
   /*-- --*/
 
   if (gg->cluster_ui.window != NULL)
@@ -246,7 +245,7 @@ static gint key_press_cb(GtkWidget * w, GdkEventKey * event, splotd * sp)
 }
 
 static gint
-motion_notify_cb(GtkWidget * w, GdkEventMotion * event, cpaneld * cpanel)
+motion_notify_cb(GtkWidget *w, GdkEventMotion *event, cpaneld *cpanel)
 {
   gboolean button1_p, button2_p;
   ggobid *gg = GGobiFromWidget(w, true);
@@ -355,23 +354,32 @@ button_release_cb(GtkWidget * w, GdkEventButton * event, splotd * sp)
  */
 
     /*-- If we've also been brushing an edge set, set its clusters --*/
+/*
     if (display->e != NULL && cpanel->br_edge_targets != br_off) {
       clusters_set(display->e, gg);
     }
+*/
     /*-- If we've been brushing by variable, set everybody's clusters --*/
-    if (cpanel->br_linkby == BR_LINKBYVAR) {
+    /*if (cpanel->br_linkby == BR_LINKBYVAR) {*/
+
+    /*
+     * Since any datad might be linked to this one, reset
+     * everybody's clusters until more elaborate tests are
+     * necessary.
+    */
+    {
       GSList *l;
       datad *dd;
       for (l = gg->d; l; l = l->next) {
         dd = (datad *) l->data;
         if (dd != d) {
-          clusters_set(dd, gg);
+          clusters_set (dd, gg);
         }
       }
     }
 
     /*-- this updates the tables for every datad --*/
-    cluster_table_update(d, gg);
+    cluster_table_update (d, gg);
   }
 
   /*-- if we're only doing linked brushing on mouse up, do it now --*/
