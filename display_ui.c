@@ -174,7 +174,8 @@ buildExtendedDisplayMenu(ggobid *gg, gint nd, datad *d0)
         /*-- add an item for each datad with variables --*/
         if (g_slist_length (d->vartable) > 0) {
           lbl = datasetName (d, gg);
-          cbdata = (ExtendedDisplayCreateData *) g_malloc(sizeof(ExtendedDisplayCreateData*));
+          cbdata = (ExtendedDisplayCreateData *)
+            g_malloc(sizeof(ExtendedDisplayCreateData));
           cbdata->d = d;
           cbdata->klass = klass;
           item = CreateMenuItem (submenu, lbl,
