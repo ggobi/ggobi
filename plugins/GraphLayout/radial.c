@@ -301,6 +301,7 @@ void radial_cb (GtkButton *button, PluginInstance *inst)
 
   dnew = datad_create (nvisible, nc, gg);
   dnew->name = g_strdup ("radial");
+  dnew->nickname = g_strdup ("rad");
 
   GGOBI(setData) (values, rownames, colnames, nvisible, nc, dnew, false,
     gg, rowids, desc);
