@@ -393,7 +393,6 @@ splot_world_to_plane (cpaneld *cpanel, splotd *sp, ggobid *gg)
 {
   displayd *display = (displayd *) sp->displayptr;
   datad *d = display->d;
-g_printerr ("inside splot_world_to_plane\n");
 
   switch (display->displaytype) {
 

@@ -27,21 +27,16 @@
 
 
 GtkWidget *
-checkbox_get_nth (gint jvar, datad *d) {
+checkbox_get_nth (gint jvar, datad *d)
+{
   GtkWidget *w;
-  gint j, n;
-
-  if ((n = g_slist_length (d->varpanel_ui.checkbox)) < jvar+1) {
-    for (j=n; j<d->ncols; j++)
-      varpanel_checkbox_add (j, d, d->gg);
-  }
-
   w = (GtkWidget *) g_slist_nth_data (d->varpanel_ui.checkbox, jvar);
   return w;
 }
 
 void
-varlabel_set (gint jvar, datad *d, ggobid *gg) {
+varlabel_set (gint jvar, datad *d, ggobid *gg)
+{
   GtkWidget *w = checkbox_get_nth (jvar, d);
   gtk_label_set_text (GTK_LABEL (GTK_BIN (w)->child),
                       d->vartable[jvar].collab_tform);

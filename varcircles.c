@@ -129,7 +129,6 @@ varcircles_layout_reset (gint ncols, datad *d, ggobid *gg) {
   left_attach = top_attach = 0;
   for (j=0; j<ncols; j++) {
     vb = varcircles_get_nth (VB, j, d);
-/*    vb = d->varpanel_ui.vb[j];*/
 
     /*-- attach the first one at 0,0 --*/
     gtk_table_attach (GTK_TABLE (d->varpanel_ui.table),
@@ -156,7 +155,8 @@ varcircles_layout_reset (gint ncols, datad *d, ggobid *gg) {
 }
 
 /*-- create a grid of buttons in the table --*/
-void varcircles_populate (datad *d, ggobid *gg)
+void
+varcircles_populate (datad *d, ggobid *gg)
 {
   gint i, j, k;
   GtkWidget *vb;
@@ -187,7 +187,8 @@ void varcircles_populate (datad *d, ggobid *gg)
 }
 
 void
-varcircles_delete (gint nc, gint jvar, datad *d, ggobid *gg) {
+varcircles_delete (gint nc, gint jvar, datad *d, ggobid *gg)
+{
   gint j;
   GtkWidget *w;
   GdkPixmap *pix;
@@ -326,11 +327,6 @@ varcircle_create (gint k, datad *d, ggobid *gg)
   gtk_object_set_data (GTK_OBJECT (da), "datad", d);
   GGobi_widget_set (GTK_WIDGET (da), gg, true);
   gtk_container_add (GTK_CONTAINER (vb), da);
-
-/*
-  d->varpanel_ui.da_pix = g_slist_append (d->varpanel_ui.da_pix,
-    gdk_pixmap_new (da->window, VAR_CIRCLE_DIAM+1, VAR_CIRCLE_DIAM+1, -1));
-*/
 
   gtk_widget_show_all (vb);
   return (vb);
@@ -491,20 +487,10 @@ varcircles_add (gint nc, datad *d, ggobid *gg)
 {
   gint j;
   GtkWidget *vb;
+  gint n = g_slist_length (d->varpanel_ui.vb);
   
-/*
-  d->varpanel_ui.vb = (GtkWidget **)
-    g_realloc (d->varpanel_ui.vb, nc * sizeof (GtkWidget *));
-  d->varpanel_ui.da = (GtkWidget **)
-    g_realloc (d->varpanel_ui.da, nc * sizeof (GtkWidget *));
-  d->varpanel_ui.da_pix = (GdkPixmap **)
-    g_realloc (d->varpanel_ui.da_pix, nc * sizeof (GdkPixmap *));
-  d->varpanel_ui.label = (GtkWidget **)
-    g_realloc (d->varpanel_ui.label, nc * sizeof (GtkWidget *));
-*/
-
   /*-- create the variable circles --*/
-  for (j=d->ncols; j<nc; j++)
+  for (j=n; j<nc; j++)
     vb = varcircle_create (j, d, gg);
   varcircles_layout_reset (nc, d, gg);
 

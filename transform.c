@@ -145,6 +145,16 @@ transform_values_init (gint j, datad *d, ggobid *gg)
   d->vartable[j].domain_adj = no_change;
   d->vartable[j].inv_domain_adj = no_change;
 }
+void
+transform_values_copy (gint jfrom, gint jto, datad *d) 
+{
+  d->vartable[jto].tform1 = d->vartable[jfrom].tform1;
+  d->vartable[jto].tform2 = d->vartable[jfrom].tform2;
+  d->vartable[jto].domain_incr = d->vartable[jfrom].domain_incr;
+  d->vartable[jto].param = d->vartable[jfrom].param;
+  d->vartable[jto].domain_adj = d->vartable[jfrom].domain_adj;
+  d->vartable[jto].inv_domain_adj = d->vartable[jfrom].inv_domain_adj;
+}
 
 void
 transform0_values_set (gint tform0, gint jcol, datad *d, ggobid *gg)

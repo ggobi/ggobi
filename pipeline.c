@@ -55,6 +55,7 @@ pipeline_arrays_alloc (datad *d, ggobid *gg)
   d->sampled = (gboolean *) g_malloc (nr * sizeof (gboolean));
 }
 
+/*-- reallocate tour arrays as needed here? --*/
 static void
 pipeline_arrays_check_dimensions (datad *d)
 {

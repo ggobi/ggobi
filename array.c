@@ -119,29 +119,29 @@ arrayf_add_cols (array_f *arrp, gint nc)
   }
 }
 
-/*-- eliminate nc columns, starting at column jcol --*/
+/*-- eliminate the nc columns contained in *cols --*/
 void
-arrayf_delete_cols (array_f *arrp, gint nc, gint jcol)
+arrayf_delete_cols (array_f *arrp, gint nc, gint *cols)
 {
-  gint i, j, k;
+  gint i, k;
+  gint jto, jfrom;
+  gint *keepers = g_malloc ((arrp->ncols-nc) * sizeof (gint));
+  gint nkeepers = find_keepers (arrp->ncols, nc, cols, keepers);
 
-  if (nc > 0 && nc < arrp->ncols) {  /*-- forbid deleting every column --*/
+  if (nc > 0 && nkeepers > 0) {
 
-    gint ncols_new = arrp->ncols - nc;
-
-    if (jcol + nc <= arrp->ncols-1) {  /*-- copy before reallocating --*/
-      for (j=jcol+nc, k=jcol; j<arrp->ncols; j++, k++) {
-        /*-- copy column j into column k --*/
-        for (i=0; i<arrp->nrows; i++)
-          arrp->vals[i][k] = arrp->vals[i][j];
-      }
+    /*-- copy before reallocating --*/
+    for (k=0; k<nkeepers-1; k++) {
+      jto = keepers[k];
+      jfrom = keepers[k+1];
+      for (i=0; i<arrp->nrows; i++)
+        arrp->vals[i][jto] = arrp->vals[i][jto];
     }
 
     for (i=0; i<arrp->nrows; i++)
       arrp->vals[i] = (gfloat *) g_realloc (arrp->vals[i],
-                                            ncols_new * sizeof (gfloat));
-
-    arrp->ncols -= nc;
+                                            nkeepers * sizeof (gfloat));
+    arrp->ncols = nkeepers;
   }
 }
 
@@ -271,26 +271,6 @@ arrays_add_cols (array_s *arrp, gint nc)
 void
 arrays_delete_cols (array_s *arrp, gint nc, gint jcol)
 {
-  gint i, j, k;
-
-  if (nc > 0 && nc < arrp->ncols) {  /*-- forbid deleting every column --*/
-
-    gint ncols_new = arrp->ncols - nc;
-
-    if (jcol + nc <= arrp->ncols-1) {  /*-- copy before reallocating --*/
-      for (j=jcol+nc, k=jcol; j<arrp->ncols; j++, k++) {
-        /*-- copy column j into column k --*/
-        for (i=0; i<arrp->nrows; i++)
-          arrp->vals[i][k] = arrp->vals[i][j];
-      }
-    }
-
-    for (i=0; i<arrp->nrows; i++)
-      arrp->vals[i] = (gshort *) g_realloc (arrp->vals[i],
-                                            ncols_new * sizeof (gshort));
-
-    arrp->ncols -= nc;
-  }
 }
 
 /*-------------------------------------------------------------------------*/
@@ -401,24 +381,4 @@ arrayl_add_cols (array_l *arrp, gint nc)
 void
 arrayl_delete_cols (array_l *arrp, gint nc, gint jcol)
 {
-  gint i, j, k;
-
-  if (nc > 0 && nc < arrp->ncols) {  /*-- forbid deleting every column --*/
-
-    gint ncols_new = arrp->ncols - nc;
-
-    if (jcol + nc <= arrp->ncols-1) {  /*-- copy before reallocating --*/
-      for (j=jcol+nc, k=jcol; j<arrp->ncols; j++, k++) {
-        /*-- copy column j into column k --*/
-        for (i=0; i<arrp->nrows; i++)
-          arrp->vals[i][k] = arrp->vals[i][j];
-      }
-    }
-
-    for (i=0; i<arrp->nrows; i++)
-      arrp->vals[i] = (glong *) g_realloc (arrp->vals[i],
-                                           ncols_new * sizeof (glong));
-
-    arrp->ncols -= nc;
-  }
 }

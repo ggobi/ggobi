@@ -93,17 +93,24 @@ plotted_cols_get (gint *cols, datad *d, ggobid *gg)
 /*-------------------------------------------------------------------------*/
 /*                         memory management                               */
 /*-------------------------------------------------------------------------*/
+
+static void
+vartable_free_var (gint j, datad *d)
+{
+  if (d->vartable[j].collab != NULL)
+    g_free (d->vartable[j].collab);
+  if (d->vartable[j].collab_tform != NULL)
+    g_free (d->vartable[j].collab_tform);
+}
+
 static void
 vartable_free (datad *d)
 {
-   gint j;
-   for (j=0; j<d->ncols; j++) {
-     if (d->vartable[j].collab != NULL)
-       g_free (d->vartable[j].collab);
-     if (d->vartable[j].collab_tform != NULL)
-       g_free (d->vartable[j].collab_tform);
-   }
-   g_free ((gpointer) d->vartable);
+  gint j;
+  for (j=0; j<d->ncols; j++) {
+    vartable_free_var (j, d);
+  }
+  g_free ((gpointer) d->vartable);
 }
 
 void
@@ -115,10 +122,60 @@ vartable_alloc (datad *d)
   d->vartable = (vartabled *) g_malloc (d->ncols * sizeof (vartabled));
 }
 
-void vartable_realloc (gint n, datad *d, ggobid *gg)
+void
+vartable_realloc (gint n, datad *d)
 {
   d->vartable = (vartabled *) g_realloc ((gpointer) d->vartable,
     n * sizeof (vartabled));
+}
+
+void
+vartable_copy_var (gint jfrom, gint jto, datad *d)
+{
+  void transform_values_copy (gint jfrom, gint jto, datad *d);
+
+  d->vartable[jto].jref = d->vartable[jfrom].jref;
+
+  d->vartable[jto].collab = g_strdup (d->vartable[jfrom].collab);
+  d->vartable[jto].collab_tform = g_strdup (d->vartable[jfrom].collab_tform);
+
+  d->vartable[jto].mean = d->vartable[jfrom].mean;
+  d->vartable[jto].median = d->vartable[jfrom].median;
+  d->vartable[jto].lim.min =
+    d->vartable[jto].lim_raw.min =
+    d->vartable[jto].lim_tform.min = d->vartable[jfrom].lim_tform.min;
+  d->vartable[jto].lim.max =
+    d->vartable[jto].lim_raw.max =
+    d->vartable[jto].lim_tform.max = d->vartable[jfrom].lim_tform.max;
+
+  transform_values_copy (jfrom, jto, d);
+
+  vartable_free_var (jfrom, d);
+}
+
+/*-- eliminate the ncol columns in cols --*/
+void
+delete_vars (gint ncols, gint *cols, datad *d) 
+{
+  gint *keepers = g_malloc ((d->ncols-ncols) * sizeof (gint));
+  gint nkeepers = find_keepers (d->ncols, ncols, cols, keepers);
+  g_printerr ("not yet implemented\n");
+
+  /*-- delete rows from clist --*/
+  /*-- delete elements from d->vartable array --*/
+
+  /*-- delete columns from pipeline arrays --*/
+
+  /*-- delete checkboxes --*/
+  /*-- delete variable circles --*/
+
+  /*-- d->ncols -= ncols; --*/
+
+/*
+        vartable_copy_var (j, k, d);
+        vartable_free_var (j);
+    vartable_realloc (ncols_new, d);
+*/
 }
 
 /*-------------------------------------------------------------------------*/
@@ -242,7 +299,6 @@ vartable_update_cloned_var (gint n, gint jvar, datad *d, ggobid *gg)
 {
   if (n >= 0 && jvar > n) {
     d->vartable[jvar].jref = n;
-    /*-- check this: I don't think it's working --*/
     d->vartable[jvar].collab = g_strdup (d->vartable[n].collab_tform);
     d->vartable[jvar].collab_tform = g_strdup (d->vartable[n].collab_tform);
     d->vartable[jvar].mean = d->vartable[n].mean;
@@ -265,7 +321,7 @@ clone_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
   gint i, k, n, jvar;
   gint d_ncols_prev = d->ncols;
 
-  vartable_realloc (d->ncols+ncols, d, gg);
+  vartable_realloc (d->ncols+ncols, d);
   for (k=0; k<ncols; k++) {
     n = cols[k];       /*-- variable being cloned --*/
     jvar = d->ncols+k; /*-- its new index --*/
@@ -301,7 +357,7 @@ clone_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
     vartable_row_append (jvar, d, gg);
   }
   /*-- --*/
-  /*-- missing_arrays_add_column (jvar, d, gg); */
+  missing_arrays_add_cols (jvar, d, gg);
 
   /*-- variable checkboxes --*/
   for (k=0; k<ncols; k++) {
@@ -310,12 +366,5 @@ clone_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
   }
 
   /*-- variable circles --*/
-/*
   varcircles_add (d->ncols, d, gg);
-*/
-}
-
-void delete_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
-{
-  g_printerr ("not yet implemented\n");
 }

@@ -324,3 +324,30 @@ address_check (datad *d, ggobid *gg)
 
   return 1;
 }
+
+/* ---------------------------------------------------------------------*/
+/*     Used in deleting: figure out which elements to keep              */
+/* ---------------------------------------------------------------------*/
+
+gint
+find_keepers (gint ncols_current, gint nc, gint *cols, gint *keepers)
+{
+  gint nkeepers;
+  gint j, k;
+
+  j = nkeepers = k = 0;
+  while (j < ncols_current) {
+    while (j < cols[k] && j < ncols_current) {
+      keepers[nkeepers++] = j++;
+    }
+    k++;
+    j++;
+  }
+  if (nkeepers != ncols_current - nc) {
+    g_printerr ("your logic is wrong! ncols_to_keep = %d\n", nkeepers);
+    exit (1);
+  }
+
+  return nkeepers;
+}
+

@@ -44,14 +44,12 @@ missing_world_alloc (datad *d, ggobid *gg)
 }
 
 void
-missing_arrays_add_column (gint jvar, datad *d, ggobid *gg)
+missing_arrays_add_cols (gint jvar, datad *d, ggobid *gg)
 {
-  gint nc = d->ncols + 1;
-
-  if (d->nmissing > 0) {
-    arrays_add_cols (&d->missing, nc);
-    arrayl_add_cols (&d->missing_jitter, nc);
-    arrayl_add_cols (&d->missing_world, nc);
+  if (d->nmissing > 0 && d->missing.ncols < d->ncols) {
+    arrays_add_cols (&d->missing, d->ncols);
+    arrayl_add_cols (&d->missing_jitter, d->ncols);
+    arrayl_add_cols (&d->missing_world, d->ncols);
   }
 }
 
