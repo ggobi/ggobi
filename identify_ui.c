@@ -71,7 +71,7 @@ key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
   return true;
 }
 
-static void
+void
 displays_add_point_labels (splotd *splot, gint k, ggobid *gg) {
   GList *dlist, *slist;
   displayd *display;
@@ -108,9 +108,7 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
 
   gdk_gc_set_foreground (gg->plot_GC, &gg->accent_color);
   mousepos_get_motion (w, event, &button1_p, &button2_p, sp);
-/*
-  gdk_window_get_pointer (w->window, &sp->mousepos.x, &sp->mousepos.y, NULL);
-*/
+
   k = find_nearest_point (&sp->mousepos, sp, d, gg);
   d->nearest_point = k;
 
@@ -127,7 +125,8 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
       displays_add_point_labels (sp, k, gg);
 
     if (gg->identify_handler.handler) {
-      (gg->identify_handler.handler)(gg->identify_handler.user_data, k, sp, w, gg);
+      (gg->identify_handler.handler)(gg->identify_handler.user_data,
+        k, sp, w, gg);
     }
 
     d->nearest_point_prev = k;

@@ -6,8 +6,6 @@ by filling out the InputDescription. See fileset_generate....
 Fix the names and ids in the color map specification. Need to
 determine what is the relationship between these.
 
-Handle user-specified color maps
-
 Check the fileselection dialog for read (filesel_ok) to ensure that
 the correct data mode is passed.  Take it out of ggobi.
 
@@ -24,13 +22,9 @@ Bugs:
 Reading in new data
   add an option:  add a new datad or replace an existing one
 
-Variable statistics table
-  Should it open by default when other tools open?
-  Let the currently plotted variables be selected by default
-    when it is opened.
-
 In progress, needing design discussions:
   Deleting variables: how should plots behave? (disabled for now)
+  Should the variable stats table open by default when other tools open?
 
 various stuff not yet implemented:
   Options on options menu
@@ -38,9 +32,6 @@ various stuff not yet implemented:
   some window closings  (display tree ok; check others)
   "row groups" are only partially implemented
   1d, xy cycling  .... or run as a demo in R for now? (disabled for now)
-
-Moving points
-  add point labels as in xgobi
 
 Graphs
   Edges with data: a separate region of the variable selection panel
@@ -86,32 +77,24 @@ Tour:
   correlation tour
   history controls
 
-A thought about tour variable selection:  could icons help with
-the trickier parts of the interface? -- ie, to select the frozen
-variable, click on an icon of icicles, the cursor changes to an
-icicle, the user clicks on a variable.  An icon of a hand might work
-for the manipulation variable.
-
-
-display_tree doesn't update itself when splots change
 
 keep working on array and vector management
 
 when brushing or identifying in parcoords, use leave/enter events to
-  change the current_splot.
+  change the current_splot?
   
 Scaling:
   take advantage of the cleverness of the axes:  l to shift, m/r to scale
   couple that with a thumbnail view that sits just below the scaling controls
 
-Smoothing -- to take advantage of the R loess code
-  wait until we think about decoration?
+Smoothing -- as a demo, at least, of the use of R
 
 Food for thought:
   * Use a set of decoration arrays (points and lines) instead of nlinkable
   * Categorical data?  Better labelling, at least?
   * maps; data as polygons -- for summer 2001?
-  * Do we need rotation any more?
+  * Do we need rotation at all?
+  * Should we restore erasing?  How do we sync it with the panel?
 
 ! it now works to start ggobi without an argument; a necessary step
 ! in the API preparation.
@@ -220,3 +203,7 @@ Food for thought:
 ! When we add a dataset after loading the first one (i.e. in a separate
 ! action) the first tab of the notebook does not have the correct labe
 ! (it appears as Page 1).
+
+! Moving points
+!   add point labels as in xgobi
+
