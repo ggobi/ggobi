@@ -203,7 +203,7 @@ display_options_cb (GtkCheckMenuItem *w, guint action)
         GtkGGobiExtendedDisplayClass *klass;
         klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
         if(klass->set_show_axes_option)
-          klass->set_show_axes_label_option(display, w->active);
+          klass->set_show_axes_option(display, w->active);
       }
     break;
 
