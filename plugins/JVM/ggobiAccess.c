@@ -37,13 +37,14 @@ Java_ggobi_ggobi_getDescription(JNIEnv *env, jobject jgg)
 jstring
 Java_ggobi_datad_getName(JNIEnv *env, jobject obj)
 {
-  jstring str;
+  jstring str = NULL;
   datad *d = (datad*) getAddressInst(env, obj);
   if(!d) {
       return(NULL);
   }
 
-  str = JVMENV NewStringUTF(env, d->name);
+  if(d->name)
+      str = JVMENV NewStringUTF(env, d->name);
   return(str);
 }
 

@@ -34,7 +34,7 @@ static JavaVM *jvm;
 #define CLASSPATH_OPT "-Djava.class.path="
 
 
-gboolean initJVM(void);
+gboolean initJVM(GGobiPluginInfo *info);
 jobject  runPlugin(const char * const klass, JNIEnv *env);
 char *   getInputDescription(JavaInputPluginData *rt, JNIEnv *env);
 jboolean getDims(int *nrow, int *ncol, JavaRunTimeData *rt, JNIEnv *env);
@@ -46,14 +46,14 @@ jboolean getDims(int *nrow, int *ncol, JavaRunTimeData *rt, JNIEnv *env);
  */
 gboolean loadJVM(gboolean initializing, GGobiPluginInfo *pluginInfo)
 {
-    return(initJVM());
+    return(initJVM(pluginInfo));
 } 
 
 /**
   This actually starts the Virtual Machine.
  
  */
-gboolean initJVM()
+gboolean initJVM(GGobiPluginInfo *info)
 {
   jboolean status = JNI_FALSE;
   JavaVMInitArgs vm2_args;
@@ -65,7 +65,12 @@ gboolean initJVM()
   /* This is the default classpath. Need to modify this to be dynamically 
      specified by the plugin information.
    */
-  char *classpath="plugins/JVM";
+  char *classpath = NULL;
+  if(info->details->namedArgs)
+      classpath = (char *) g_hash_table_lookup(info->details->namedArgs, "classpath");
+
+  if(!classpath)
+    classpath = "plugins/JVM";
 
   /* Prepare the arguments used to initialize the JVM. Note we only get one chance. */
     vm_args = (JavaVMInitArgs *) &vm2_args;
@@ -176,7 +181,8 @@ gboolean init = true;
   to be read in by the Input Plugin for the given file and data mode.
   It starts by creating the Java object for this plugin instance and
   calling its constructor with two arguments: the file name and the 
-  data mode name.
+  data mode name. Then it asks for the brief description for the 
+  input.
  */
 InputDescription *
 JavaGetInputDescription(const char * const fileName, const char * const modeName,
@@ -219,7 +225,8 @@ JavaGetInputDescription(const char * const fileName, const char * const modeName
 /**
   This is the routine that calls the Java method getSourceDescription()
   for the plugin object and gets a brief description of the plugin data
-  source. The idea is that this description can be used in the 
+  source. The idea is that this description can be used in the menus
+  of GGobi and other places where brevity is imperative.
  */
 char *
 getInputDescription(JavaInputPluginData *data, JNIEnv *env)
@@ -243,6 +250,10 @@ getInputDescription(JavaInputPluginData *data, JNIEnv *env)
 }
 
 
+
+/**
+  Routine to get the number of rows and variables in the dataset being read.
+ */
 jboolean
 getDims(int *nrow, int *ncol, JavaRunTimeData *rt, JNIEnv *env)
 {
@@ -259,7 +270,19 @@ getDims(int *nrow, int *ncol, JavaRunTimeData *rt, JNIEnv *env)
 
 
 
+/*****************************************************************************
 
+  These routines provide the mechanism for the generic plugin.
+
+ *****************************************************************************/
+
+
+/**
+ The onLoad() method for the Java plugin that is called when the plugin is
+ loaded. If the plugin class has a static method named onLoad that takes no 
+ arguments and returns a boolean value, it is called.
+
+ */
 gboolean
 JavaLoadPlugin(gboolean initializing, GGobiPluginInfo *plugin)
 {

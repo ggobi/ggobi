@@ -47,6 +47,13 @@ gboolean loadPluginLibrary(GGobiPluginDetails *plugin, GGobiPluginInfo *realPlug
 void *getPluginLanguage(xmlNodePtr node, GGobiInputPluginInfo *gplugin,  GGobiPluginType type, GGobiInitInfo *info);
 #endif
 
+GHashTable *getPluginNamedOptions(xmlNodePtr node, GGobiPluginInfo *info, xmlDocPtr doc);
+GSList *getPluginUnnamedArguments(xmlNodePtr node, GGobiPluginInfo *info, xmlDocPtr doc);
+gboolean getPluginOptions(xmlNodePtr node, GGobiPluginInfo *info, xmlDocPtr doc);
+
+
+GSList *getPluginDependencies(xmlNodePtr node, GGobiPluginInfo *info, xmlDocPtr doc);
+
 
 gint getPreviousGGobiDisplays(const xmlDocPtr doc, GGobiInitInfo *info);
 gint getPreviousDisplays(xmlNodePtr node, GGobiDescription *desc);
@@ -460,6 +467,10 @@ getPlugins(xmlDocPtr doc, GGobiInitInfo *info)
 
 #define GET_PROP_VALUE(field,name) plugin->field = ((tmp = (char *) xmlGetProp(c, name)) != NULL) ? g_strdup(tmp) : NULL
 
+
+/**
+  Get all the configuration values and optional settings for this plugin.
+ */
 GGobiPluginInfo *
 processPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr doc)
 {
@@ -474,6 +485,10 @@ processPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr doc)
   load = getPluginDetails(node, plugin->details, doc);
 
   getPluginSymbols(node, plugin, doc);
+  getPluginOptions(node, plugin, doc);
+
+  plugin->details->depends = getPluginDependencies(node, plugin, doc);
+
 
      /* Weird casting going on here to avoid a void*. */
   getPluginLanguage(node, (GGobiInputPluginInfo*) plugin, GENERAL_PLUGIN, info);
@@ -484,6 +499,109 @@ processPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr doc)
 
   return(plugin);
 }
+
+/**
+  Pick up and store the named and unnamed arguments for this plugin.
+  These will be interpreted in a plugin-specific manner.
+ */
+gboolean
+getPluginOptions(xmlNodePtr node, GGobiPluginInfo *info, xmlDocPtr doc)
+{
+   xmlNodePtr c;
+   c = getXMLElement(node, "options");
+   if(!c)
+       return(false);
+
+   info->details->args = getPluginUnnamedArguments(c, info, doc);
+   info->details->namedArgs = getPluginNamedOptions(c, info, doc);
+
+   return(true);
+}
+
+/**
+  Collect the options for the plugin  that are enclosed within a
+  <args></args> element of the form <arg>value</arg>.  The different 
+  `value's are stored in a simple single-linked list.
+ */
+GSList *
+getPluginUnnamedArguments(xmlNodePtr node, GGobiPluginInfo *info, xmlDocPtr doc)
+{
+    GSList *l = NULL;
+    xmlNodePtr c, el;
+    c = getXMLElement(node, "args");
+    if(!c)
+	return(NULL);
+
+    el = XML_CHILDREN(c);
+    while(el) {
+        if(el->type != XML_TEXT_NODE && el->type != XML_COMMENT_NODE) {
+	    xmlChar *val;
+	    val = xmlNodeListGetString(doc, XML_CHILDREN(el), 1);
+	    l = g_slist_append(l, g_strdup(val));
+	}
+        el = el->next;
+    }
+    return(l);
+}
+
+
+/**
+  Collect the elements in the <options><named>...</named></options>
+  into a hashtable with elements indexed by 
+  the name of the element and value  being the string contents of that element.
+  Each element is assumed to be a simple text element.
+ */
+GHashTable *
+getPluginNamedOptions(xmlNodePtr node, GGobiPluginInfo *info, xmlDocPtr doc)
+{
+    GHashTable *tbl;
+    xmlNodePtr c, el;
+    c = getXMLElement(node, "named");
+    if(!c)
+	return(NULL);    
+
+    tbl = g_hash_table_new(g_str_hash, g_str_equal);
+    el = XML_CHILDREN(c);
+    while(el) {
+        if(el->type != XML_TEXT_NODE && el->type != XML_COMMENT_NODE) {
+	    xmlChar *val;
+	    val = xmlNodeListGetString(doc, XML_CHILDREN(el), 1);
+	    g_hash_table_insert(tbl, g_strdup(el->name), g_strdup(val));
+	}
+	el = el->next;
+    }
+    return(tbl);
+}
+
+
+/**
+  Pick up the names of all the plugins on which this one depends.
+  Then when we load this plugin, we will ensure that those plugins
+  are also loaded.
+ */
+GSList *
+getPluginDependencies(xmlNodePtr node, GGobiPluginInfo *info, xmlDocPtr doc)
+{
+   GSList *list = NULL;
+   xmlNodePtr c, el;
+   c = getXMLElement(node, "dependencies");
+   if(!c)
+       return(NULL);
+ 
+    el = XML_CHILDREN(c);
+    while(el) {
+        if(el->type != XML_TEXT_NODE && el->type != XML_COMMENT_NODE) {
+	    xmlChar *val;
+            val = xmlGetProp(el, "name");
+            if(val) {
+                list = g_slist_append(list, g_strdup(val));
+	    }
+	}
+        el = el->next;
+    }
+    return(list);
+}
+
 
 void
 getPluginSymbols(xmlNodePtr node, GGobiPluginInfo *plugin, xmlDocPtr doc)
@@ -629,7 +747,8 @@ getPluginLanguage(xmlNodePtr node,GGobiInputPluginInfo *iplugin, GGobiPluginType
                   details->onLoad = g_strdup("JavaLoadPlugin");
                   details->onUnload = g_strdup("JavaUnloadPlugin");
 
-                  details->depends = g_list_append(details->depends, tmp);
+		  /*    details->depends = g_slist_append(details->depends, tmp); */
+		  details->depends = g_slist_append(details->depends, g_strdup(jdetails->name));
 	      }
 	  }
       }

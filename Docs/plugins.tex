@@ -506,6 +506,44 @@ implementing an input plugin in Java, Python or Plugin.  In such a
 case, we have a well defined \C-level interface and we can invoke the
 corresponding methods in the class of the corresponding language.
 
+\section{Plugin Arguments}
+It would be convenient to be able to parameterize a plugin at
+run-time, or specifically when it is created, by providing parameters
+to it.  We can do this in the initialization file using special XML
+tags within the \XMLTag{plugin} element.  We identify two types of
+arguments: named and unnamed.  Unnamed arguments are specified within
+a \XMLTag{args} tag with each value enclosed within an \XMLTag{arg}
+element.  These are given to each plugin instance as
+individual string values.
+For example,
+\begin{verbatim}
+ <plugin>
+  <options>
+   <args>
+    <arg>-init</arg>
+    <arg>value</arg>
+   </args>
+  </options>
+ </plugin>
+\end{verbatim}
+is given as two separate elements
+\texttt{"-init"} and \texttt{"value"}.
+
+The named arguments are enclosed within a \XMLTag{named} tag, itself
+enclosed within the \XMLTag{options} element.
+In the example,
+\begin{verbatim}
+ <options>
+  <named>
+   <classpath>.:/home/duncan/Projects/org/..</classpath>
+  </named>
+ </options>
+\end{verbatim}
+the name-value pair is available as an entry in
+a Gnome hashtable.
+
+
+
 
 
 \begin{comment}

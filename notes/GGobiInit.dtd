@@ -3,7 +3,7 @@
  -->
 
 <!ENTITY % Boolean         " true | T | TRUE | false | F | FALSE ">
-<!ENTITY % PluginElements "(description, (version)?, author,dll)">
+<!ENTITY % PluginElements "(description, (version)?,author,dll,(dependencies)?)">
 
 <!ELEMENT modename PCDATA>
 
@@ -55,6 +55,11 @@
     immediate   %Boolean;  #IMPLIED
 >
 
+<!ELEMENT dependencies (dependency)*>
+<!ELEMENT dependency   EMPTY>
+<!ATTLIST dependency
+     name   CDATA   #REQUIRED
+>
 
 <!ELEMENT display (variable)*>
 <!ATTLIST display 

@@ -27,7 +27,10 @@ typedef struct {
     char *onUnload; 
 
     char *language;
-    GList *depends;
+    GSList *depends;
+
+    GSList *args;
+    GHashTable *namedArgs;
 
 } GGobiPluginDetails;
 
