@@ -203,19 +203,16 @@ write_xml_records(FILE *f, datad *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
  gint i, m, n;
 
 
-/*
- * if saving visible records only, find out how many there are
-*/
+ /*-- figure out how many records we're about to save.  --*/
  if (gg->save.row_ind == ALLROWS)
    n = d->nrows;
  else if (gg->save.row_ind == DISPLAYEDROWS) {
    n = 0;
    for (i=0; i<d->nrows_in_plot; i++) {
      if (!d->hidden.els[ d->rows_in_plot[i] ]) {
-       if (d->edge.n == d->nrows) {
-         if (d->edge.n == d->nrows)
-           if (write_edge_record_p (i, d, gg))
-             n++;
+       if (d->edge.n == d->nrows) {  /* ie, if this datad has edges? */
+         if (write_edge_record_p (i, d, gg))
+           n++;
        } else {
          n++;
        }
@@ -251,7 +248,7 @@ write_xml_records(FILE *f, datad *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
      write_xml_record (f, d, gg, i, xmlWriteInfo);
      fprintf(f, "\n");
    }
- } else {
+ } else {  /*-- if displaying visible rows only --*/
    for (i=0; i<d->nrows_in_plot; i++) {
      m = d->rows_in_plot[i];
      if (!d->hidden.els[m]) {
@@ -272,7 +269,8 @@ write_xml_record (FILE *f, datad *d, ggobid *gg, gint i,
   gint j;
   gchar *gstr, *gtypestr = NULL;
 
-  if (d->edge.n == d->nrows) {
+  /*-- we only need this test if we're not only saving visible cases --*/
+  if (d->edge.n == d->nrows && gg->save.row_ind == DISPLAYEDROWS) {
     if (!write_edge_record_p (i, d, gg))
       return false;
   }
