@@ -1,3 +1,5 @@
+statusbar is now non-editable by the user.
+
 parcoords_new and tsplot_new become *_with_vars
 and the original versions  take an exta argument
  - displayd.

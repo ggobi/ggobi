@@ -406,9 +406,15 @@ gboolean isASCIIFile(const gchar * fileName, ggobid *gg, GGobiPluginInfo *plugin
   gchar word[128];
   gboolean isascii = true;
 
+  if(!canRead(fileName)) {
+     gchar buf[256];
+     sprintf(buf, "%s.dat", fileName);
+     return(isASCIIFile(buf, gg, plugin));
+  }
+
   f = fopen(fileName, "r");
-  if (f == NULL)
-    return (false);
+  if(!f)
+     return(false);
 
 /*
   gdouble val;
@@ -468,7 +474,6 @@ isXMLFile(const gchar * fileName, ggobid *gg, GGobiPluginInfo *info)
   FILE *f;
   gint c;
   gchar *tmp;
-  gboolean status;
 
   if(isURL(fileName))
     return(true);

@@ -1,5 +1,5 @@
 Provide a screen to provide information about the source of
-the data (e.g. filename, mode).
+the data (e.g. filename, mode). - now in the status bar.
 
 Get rid of the hard coded arrays of mode names, display types, 
 etc. if they are now dynamically computed. (for extensibility)

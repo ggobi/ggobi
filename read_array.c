@@ -345,7 +345,11 @@ read_ascii_input_description(const char * const fileName, const char * const mod
   desc = (InputDescription*) g_malloc(sizeof(InputDescription));
   memset(desc, '\0', sizeof(InputDescription));
 
-  desc->fileName = g_strdup(fileName);
+  if(!canRead(fileName)) {
+     desc->fileName = g_malloc((strlen(fileName) + 5) * sizeof(gchar));
+     sprintf(desc->fileName, "%s.dat", fileName);
+  } else
+     desc->fileName = g_strdup(fileName);
   desc->mode = ascii_data;
   desc->desc_read_input = &read_ascii;	
   completeFileDesc(fileName, desc);

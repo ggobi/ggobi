@@ -124,8 +124,8 @@ gg_write_to_statusbar (gchar *message, ggobid *gg)
     /*-- by default, describe the current datad --*/
     datad *d = datad_get_from_notebook (gg->varpanel_ui.notebook, gg);
     if (d) {
-      gchar *msg = g_strdup_printf ("%s: %d x %d",
-        d->name, d->nrows, d->ncols);
+      gchar *msg = g_strdup_printf ("%s: %d x %d  (%s)",
+        d->name, d->nrows, d->ncols, gg->input->fileName);
       gtk_entry_set_text (GTK_ENTRY(entry), msg);
       g_free (msg);
     }
@@ -776,6 +776,7 @@ make_ui (ggobid *gg)
 
   /*-- status bar --*/
   entry = gtk_entry_new ();
+  gtk_editable_set_editable(GTK_EDITABLE(entry), false);
   gtk_object_set_data (GTK_OBJECT(gg->main_window), "MAIN:STATUSBAR", entry);
   gtk_box_pack_start (GTK_BOX (vbox), entry, false, false, 0);
   /*--            --*/

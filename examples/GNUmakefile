@@ -15,3 +15,6 @@ endif
 
 layout: layout.o
 	$(CC) -o $@ $^ $(LIBS)
+
+mygobi: mygobi.o
+	$(CC) -o $@ $^ $(LIBS)
