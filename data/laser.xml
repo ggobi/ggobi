@@ -1,0 +1,228 @@
+<?xml version="1.0"?>
+<!DOCTYPE ggobidata SYSTEM "ggobi.dtd">
+
+<ggobidata count="1">
+<data numRecords="64">
+<description>
+This data came from an investigation of an experimental laser at
+Bellcore.  It was a tunable laser, in the sense that both its
+wavelength and power output were controllable.
+
+Rotation helped the experimental physicists to characterize the
+laser, which turned out not to be a very good one, due to its
+unstable operating region.
+
+The variables are:
+
+  If     Ir     power   lambda
+
+If and Ir are currents applied to the front and rear of the laser.
+Power and lambda are the output power and wavelength. 
+
+This data initially came to the statistics research group when
+Janette Cooper asked Paul Tukey to help her analyze the data
+she had collected to describe the laser.
+</description>
+<variables count="4">
+<variable>ifront</variable>
+<variable>iback</variable>
+<variable>power</variable>
+<variable>lambda</variable>
+</variables>
+<records
+ count="64" glyph="fr 1" color="5">
+<record label="1">
+12.000 70.000 -38.300 1579.100
+</record>
+<record label="2">
+13.000 70.000 -38.100 1579.100
+</record>
+<record label="3">
+15.000 70.000 -36.500 1579.100
+</record>
+<record label="4">
+19.000 70.000 -35.100 1579.000
+</record>
+<record label="5">
+20.000 70.000 -35.100 1577.800
+</record>
+<record label="6">
+20.000 70.000 -35.100 1578.100
+</record>
+<record label="7">
+26.000 70.000 -34.200 1578.000
+</record>
+<record label="8">
+30.000 70.000 -32.600 1578.000
+</record>
+<record label="9">
+13.000 60.000 -40.900 1578.800
+</record>
+<record label="10">
+14.000 60.000 -39.800 1578.900
+</record>
+<record label="11">
+19.000 60.000 -37.000 1578.800
+</record>
+<record label="12">
+21.000 60.000 -36.100 1577.800
+</record>
+<record label="13">
+24.000 60.000 -35.400 1577.900
+</record>
+<record label="14">
+40.000 60.000 -35.400 1577.900
+</record>
+<record label="15">
+15.000 50.000 -45.700 1578.600
+</record>
+<record label="16">
+20.000 50.000 -40.400 1578.600
+</record>
+<record label="17">
+21.000 50.000 -37.400 1577.700
+</record>
+<record label="18">
+25.000 50.000 -36.000 1577.800
+</record>
+<record label="19">
+30.000 50.000 -34.100 1577.800
+</record>
+<record label="20">
+40.000 50.000 -31.200 1577.800
+</record>
+<record label="21">
+50.000 50.000 -29.500 1577.700
+</record>
+<record label="22">
+22.000 40.000 -40.300 1577.500
+</record>
+<record label="23">
+24.000 40.000 -39.500 1577.600
+</record>
+<record label="24">
+31.000 40.000 -36.100 1577.600
+</record>
+<record label="25">
+48.000 40.000 -30.900 1577.600
+</record>
+<record label="26">
+55.000 40.000 -29.700 1577.600
+</record>
+<record label="27">
+56.000 40.000 -29.500 1577.600
+</record>
+<record label="28">
+57.000 40.000 -29.900 1575.700
+</record>
+<record label="29">
+57.000 40.000 -29.900 1577.200
+</record>
+<record label="30">
+60.000 40.000 -29.500 1575.700
+</record>
+<record label="31">
+60.000 40.000 -29.500 1577.200
+</record>
+<record label="32">
+27.000 30.000 -46.200 1577.400
+</record>
+<record label="33">
+32.000 30.000 -41.000 1577.400
+</record>
+<record label="34">
+37.000 30.000 -38.200 1577.300
+</record>
+<record label="35">
+41.000 30.000 -36.200 1577.300
+</record>
+<record label="36">
+46.000 30.000 -33.900 1577.300
+</record>
+<record label="37">
+47.000 30.000 -34.100 1575.400
+</record>
+<record label="38">
+49.000 30.000 -34.300 1575.500
+</record>
+<record label="39">
+52.000 30.000 -35.100 1575.600
+</record>
+<record label="40">
+54.000 30.000 -35.500 1575.600
+</record>
+<record label="41">
+56.000 30.000 -36.000 1575.500
+</record>
+<record label="42">
+59.000 30.000 -36.200 1575.500
+</record>
+<record label="43">
+60.000 30.000 -35.600 1575.500
+</record>
+<record label="44">
+60.000 30.000 -35.600 1577.100
+</record>
+<record label="45">
+61.000 30.000 -34.500 1575.500
+</record>
+<record label="46">
+61.000 30.000 -34.500 1577.100
+</record>
+<record label="47">
+64.000 30.000 -33.500 1575.600
+</record>
+<record label="48">
+64.000 30.000 -33.500 1577.200
+</record>
+<record label="49">
+68.000 30.000 -31.700 1575.700
+</record>
+<record label="50">
+68.000 30.000 -31.700 1577.400
+</record>
+<record label="51">
+70.000 30.000 -31.100 1575.700
+</record>
+<record label="52">
+70.000 30.000 -31.100 1577.400
+</record>
+<record label="53">
+52.000 20.000 -44.500 1575.200
+</record>
+<record label="54">
+53.000 20.000 -42.600 1575.200
+</record>
+<record label="55">
+54.000 20.000 -38.500 1576.900
+</record>
+<record label="56">
+55.000 20.000 -36.600 1577.000
+</record>
+<record label="57">
+56.000 20.000 -35.200 1577.100
+</record>
+<record label="58">
+58.000 20.000 -33.900 1577.200
+</record>
+<record label="59">
+64.000 20.000 -31.800 1577.300
+</record>
+<record label="60">
+67.000 20.000 -31.000 1577.400
+</record>
+<record label="61">
+70.000 20.000 -30.000 1577.500
+</record>
+<record label="62">
+74.000 20.000 -29.800 1577.600
+</record>
+<record label="63">
+78.000 20.000 -29.400 1577.700
+</record>
+<record label="64">
+85.000 20.000 -28.700 1577.800
+</record>
+</records>
+</data>
+</ggobidata>

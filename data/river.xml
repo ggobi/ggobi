@@ -1,0 +1,406 @@
+<?xml version="1.0"?>
+<!DOCTYPE ggobidata SYSTEM "ggobi.dtd">
+
+<ggobidata count="1">
+<data numRecords="128">
+<description>
+Andreas says: The river data I got from Don Percival, Applied Physics
+Lab, Seattle, but I wouldn't know whether he is the proper source.
+What you need to know: the data are monthly average river flow level
+of Willamette River in Oregon.  I don't know anymore the particular
+years.
+</description>
+<variables count="3">
+<variable>Time</variable>
+<variable>Flow</variable>
+<variable>Lag1</variable>
+</variables>
+<records
+ count="128" glyph="fr 1" color="5">
+<record label="1">
+1.000 8.954 8.954
+</record>
+<record label="2">
+2.000 9.494 8.954
+</record>
+<record label="3">
+3.000 10.194 9.494
+</record>
+<record label="4">
+4.000 10.957 10.194
+</record>
+<record label="5">
+5.000 11.078 10.957
+</record>
+<record label="6">
+6.000 10.982 11.078
+</record>
+<record label="7">
+7.000 10.490 10.982
+</record>
+<record label="8">
+8.000 10.275 10.490
+</record>
+<record label="9">
+9.000 10.166 10.275
+</record>
+<record label="10">
+10.000 9.235 10.166
+</record>
+<record label="11">
+11.000 8.565 9.235
+</record>
+<record label="12">
+12.000 8.511 8.565
+</record>
+<record label="13">
+13.000 10.121 8.511
+</record>
+<record label="14">
+14.000 11.185 10.121
+</record>
+<record label="15">
+15.000 10.935 11.185
+</record>
+<record label="16">
+16.000 11.180 10.935
+</record>
+<record label="17">
+17.000 10.957 11.180
+</record>
+<record label="18">
+18.000 10.568 10.957
+</record>
+<record label="19">
+19.000 10.140 10.568
+</record>
+<record label="20">
+20.000 9.995 10.140
+</record>
+<record label="21">
+21.000 9.142 9.995
+</record>
+<record label="22">
+22.000 8.612 9.142
+</record>
+<record label="23">
+23.000 8.389 8.612
+</record>
+<record label="24">
+24.000 8.388 8.389
+</record>
+<record label="25">
+25.000 9.975 8.388
+</record>
+<record label="26">
+26.000 10.268 9.975
+</record>
+<record label="27">
+27.000 11.051 10.268
+</record>
+<record label="28">
+28.000 10.517 11.051
+</record>
+<record label="29">
+29.000 10.969 10.517
+</record>
+<record label="30">
+30.000 10.431 10.969
+</record>
+<record label="31">
+31.000 10.410 10.431
+</record>
+<record label="32">
+32.000 10.080 10.410
+</record>
+<record label="33">
+33.000 9.589 10.080
+</record>
+<record label="34">
+34.000 9.409 9.589
+</record>
+<record label="35">
+35.000 8.587 9.409
+</record>
+<record label="36">
+36.000 8.532 8.587
+</record>
+<record label="37">
+37.000 8.401 8.532
+</record>
+<record label="38">
+38.000 8.295 8.401
+</record>
+<record label="39">
+39.000 9.696 8.295
+</record>
+<record label="40">
+40.000 11.410 9.696
+</record>
+<record label="41">
+41.000 11.216 11.410
+</record>
+<record label="42">
+42.000 10.417 11.216
+</record>
+<record label="43">
+43.000 10.047 10.417
+</record>
+<record label="44">
+44.000 10.374 10.047
+</record>
+<record label="45">
+45.000 10.134 10.374
+</record>
+<record label="46">
+46.000 9.142 10.134
+</record>
+<record label="47">
+47.000 8.697 9.142
+</record>
+<record label="48">
+48.000 9.047 8.697
+</record>
+<record label="49">
+49.000 9.874 9.047
+</record>
+<record label="50">
+50.000 11.420 9.874
+</record>
+<record label="51">
+51.000 10.782 11.420
+</record>
+<record label="52">
+52.000 11.207 10.782
+</record>
+<record label="53">
+53.000 10.273 11.207
+</record>
+<record label="54">
+54.000 10.290 10.273
+</record>
+<record label="55">
+55.000 9.499 10.290
+</record>
+<record label="56">
+56.000 9.645 9.499
+</record>
+<record label="57">
+57.000 9.204 9.645
+</record>
+<record label="58">
+58.000 8.791 9.204
+</record>
+<record label="59">
+59.000 9.013 8.791
+</record>
+<record label="60">
+60.000 9.221 9.013
+</record>
+<record label="61">
+61.000 9.586 9.221
+</record>
+<record label="62">
+62.000 9.804 9.586
+</record>
+<record label="63">
+63.000 10.516 9.804
+</record>
+<record label="64">
+64.000 10.024 10.516
+</record>
+<record label="65">
+65.000 9.966 10.024
+</record>
+<record label="66">
+66.000 10.754 9.966
+</record>
+<record label="67">
+67.000 10.245 10.754
+</record>
+<record label="68">
+68.000 10.096 10.245
+</record>
+<record label="69">
+69.000 9.381 10.096
+</record>
+<record label="70">
+70.000 8.837 9.381
+</record>
+<record label="71">
+71.000 8.880 8.837
+</record>
+<record label="72">
+72.000 9.706 8.880
+</record>
+<record label="73">
+73.000 10.474 9.706
+</record>
+<record label="74">
+74.000 11.503 10.474
+</record>
+<record label="75">
+75.000 11.589 11.503
+</record>
+<record label="76">
+76.000 10.626 11.589
+</record>
+<record label="77">
+77.000 10.658 10.626
+</record>
+<record label="78">
+78.000 10.540 10.658
+</record>
+<record label="79">
+79.000 10.286 10.540
+</record>
+<record label="80">
+80.000 10.007 10.286
+</record>
+<record label="81">
+81.000 9.297 10.007
+</record>
+<record label="82">
+82.000 8.781 9.297
+</record>
+<record label="83">
+83.000 8.835 8.781
+</record>
+<record label="84">
+84.000 8.912 8.835
+</record>
+<record label="85">
+85.000 10.184 8.912
+</record>
+<record label="86">
+86.000 10.641 10.184
+</record>
+<record label="87">
+87.000 10.033 10.641
+</record>
+<record label="88">
+88.000 9.880 10.033
+</record>
+<record label="89">
+89.000 11.278 9.880
+</record>
+<record label="90">
+90.000 10.429 11.278
+</record>
+<record label="91">
+91.000 9.787 10.429
+</record>
+<record label="92">
+92.000 9.458 9.787
+</record>
+<record label="93">
+93.000 8.811 9.458
+</record>
+<record label="94">
+94.000 8.651 8.811
+</record>
+<record label="95">
+95.000 8.802 8.651
+</record>
+<record label="96">
+96.000 9.164 8.802
+</record>
+<record label="97">
+97.000 9.395 9.164
+</record>
+<record label="98">
+98.000 10.460 9.395
+</record>
+<record label="99">
+99.000 11.100 10.460
+</record>
+<record label="100">
+100.000 11.167 11.100
+</record>
+<record label="101">
+101.000 10.491 11.167
+</record>
+<record label="102">
+102.000 10.091 10.491
+</record>
+<record label="103">
+103.000 10.024 10.091
+</record>
+<record label="104">
+104.000 9.525 10.024
+</record>
+<record label="105">
+105.000 9.023 9.525
+</record>
+<record label="106">
+106.000 8.733 9.023
+</record>
+<record label="107">
+107.000 8.824 8.733
+</record>
+<record label="108">
+108.000 9.072 8.824
+</record>
+<record label="109">
+109.000 10.437 9.072
+</record>
+<record label="110">
+110.000 10.387 10.437
+</record>
+<record label="111">
+111.000 10.852 10.387
+</record>
+<record label="112">
+112.000 10.913 10.852
+</record>
+<record label="113">
+113.000 9.936 10.913
+</record>
+<record label="114">
+114.000 10.263 9.936
+</record>
+<record label="115">
+115.000 10.024 10.263
+</record>
+<record label="116">
+116.000 9.451 10.024
+</record>
+<record label="117">
+117.000 8.810 9.451
+</record>
+<record label="118">
+118.000 8.616 8.810
+</record>
+<record label="119">
+119.000 8.892 8.616
+</record>
+<record label="120">
+120.000 9.706 8.892
+</record>
+<record label="121">
+121.000 9.598 9.706
+</record>
+<record label="122">
+122.000 9.705 9.598
+</record>
+<record label="123">
+123.000 9.638 9.705
+</record>
+<record label="124">
+124.000 10.682 9.638
+</record>
+<record label="125">
+125.000 10.659 10.682
+</record>
+<record label="126">
+126.000 10.701 10.659
+</record>
+<record label="127">
+127.000 10.417 10.701
+</record>
+<record label="128">
+128.000 10.200 10.417
+</record>
+</records>
+</data>
+</ggobidata>

@@ -1,0 +1,18 @@
+This data came from an investigation of an experimental laser at
+Bellcore.  It was a tunable laser, in the sense that both its
+wavelength and power output were controllable.
+
+Rotation helped the experimental physicists to characterize the
+laser, which turned out not to be a very good one, due to its
+unstable operating region.
+
+The variables are:
+
+  If     Ir     power   lambda
+
+If and Ir are currents applied to the front and rear of the laser.
+Power and lambda are the output power and wavelength. 
+
+This data initially came to the statistics research group when
+Janette Cooper asked Paul Tukey to help her analyze the data
+she had collected to describe the laser.
