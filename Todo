@@ -12,10 +12,15 @@ Bugs:
 
  adding and removing plots in scatmat continues to be problematic
 
+ opening a new set of data is also problematic:  it's not clearing
+ the variable selection panel, and it whines about not wanting to
+ eliminate the last display.
+
 various stuff not yet implemented: 
   1d, xy cycling
   window closings
-  sticky labels
+  sticky labels (because I don't know how to do it -- maybe just draw
+    a box around the label?  or underline it?)
 
   brush_pos should be per-display.  when brushing or identifying in
   parcoords, use leave/enter events to change the current_splot.
@@ -48,7 +53,7 @@ line type brushing
 Move points
 Line editing
 
-old-style I/O
+old-style I/O -- the biggest part is now in place
 
 Rotation -- maybe never
 

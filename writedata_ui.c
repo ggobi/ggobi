@@ -35,7 +35,7 @@ static void jitterp_set_cb (GtkWidget *w, gpointer cbd)
 
 static gchar *rowdata_lbl[] = {"All cases",
                                "Displayed cases",
-                               "Labeled cases"
+                               "Labeled cases",
                                "Specified cases"};
 void rowind_set (gint ind, ggobid *gg) { gg->save.row_ind = ind; }
 static void rowind_set_cb (GtkWidget *w, gpointer cbd)

@@ -242,7 +242,7 @@ strip_blanks (gchar *str)
 }
 
 gboolean
-create_ggobi_file_set (gchar *rootname, ggobid *gg)
+ggobi_file_set_create (gchar *rootname, ggobid *gg)
 {
   gint nr, nc, nvgr;
   gint *rowv, *colv;

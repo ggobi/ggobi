@@ -60,6 +60,7 @@
 26249   5/14  added some vector types
 26435   5/15  globalized scaling
 26528   5/15  first version of the scaling api
+28544   6/6   lots of io added -- ability to save a file set, with options
 
 my personal target:  about 40.8K lines?  That's the number of lines in
 xgobi, subtracting the rpc, xgvis and tour code.
