@@ -77,6 +77,9 @@ rejitter (gint *selected_cols, gint nselected_cols, datad *d, ggobid *gg) {
   greal precis = (gfloat) PRECISION1;
   vartabled *vt;
 
+  g_assert (d->jitdata.nrows == d->nrows);
+  g_assert (d->jitdata.ncols == d->ncols);
+
   for (j=0; j<nselected_cols; j++) {
     k = selected_cols[j];
     vt = vartable_element_get (k, d);

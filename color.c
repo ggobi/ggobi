@@ -331,6 +331,8 @@ datad_colors_used_get (gint *ncolors_used, gushort *colors_used,
 
   if (d == NULL || d->nrows == 0)
 /**/return -1;
+
+  g_assert (d->color.nels == d->nrows);
           
   n = 0;  /*-- *ncolors_used --*/
 

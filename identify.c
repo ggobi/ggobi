@@ -22,8 +22,9 @@ find_nearest_point (icoords *lcursor_pos, splotd *splot, datad *d, ggobid *gg)
 */
   gint i, k, sqdist, near, xdist, ydist, npoint;
 
-  npoint = -1;
+  g_assert (d->hidden.nels == d->nrows);
 
+  npoint = -1;
   near = 20*20;  /* If nothing is close, don't show any label */
 
   for (i=0; i<d->nrows_in_plot; i++) {

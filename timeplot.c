@@ -52,16 +52,6 @@ tsplot_display_menus_make (displayd *display,
       func, GINT_TO_POINTER (DOPT_WHISKERS), on, gg);
   gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
 
-  /* Add a separator */
-/* unused
-
-  CreateMenuItem (options_menu, NULL, "", "", NULL, NULL, NULL, NULL, gg);
-
-  item = CreateMenuCheck (options_menu, "Double buffer",
-    func, GINT_TO_POINTER (DOPT_BUFFER), on, gg);
-  gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
-*/
-
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (submenu), options_menu);
   submenu_append (submenu, mbar);
 
@@ -427,6 +417,11 @@ tsplot_rewhisker (splotd *sp, ggobid *gg)
   displayd *display = (displayd *) sp->displayptr;
   datad *d = display->d;
   gboolean draw_whisker;
+
+  if (d->nmissing) {
+    g_assert (d->missing.nrows == d->nrows);
+    g_assert (d->missing.ncols == d->ncols);
+  }
 
   for (k=0; k<(d->nrows_in_plot-1); k++) {
     i = d->rows_in_plot.els[k];

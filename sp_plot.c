@@ -112,6 +112,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
 #endif
 
   GtkGGobiExtendedSPlotClass *klass = NULL;
+  GtkGGobiExtendedDisplayClass *displayKlass = NULL;
 
   /*
    * since parcoords and tsplot each have their own weird way
@@ -121,9 +122,9 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
   */
   gboolean loop_over_points;
 
-  GtkGGobiExtendedDisplayClass *displayKlass = NULL;
+  g_assert (d->hidden.nels == d->nrows);
 
-  if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
+  if (GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
    displayKlass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
    loop_over_points = display->options.points_show_p ||
                       displayKlass->loop_over_points;

@@ -108,6 +108,8 @@ void
 brush_prev_vectors_update (datad *d, ggobid *gg) {
   gint m, i;
 
+  g_assert (d->color.nels == d->nrows);
+
   if (d->color_prev.nels < d->nrows) {
     vectors_realloc (&d->color_prev, d->nrows);
     vectorb_realloc (&d->hidden_prev, d->nrows);
@@ -128,6 +130,8 @@ brush_undo (splotd *sp, datad *d, ggobid *gg) {
   gint m, i;
   if(!d)
     return;
+
+  g_assert (d->color.nels == d->nrows);
 
   for (m=0; m<d->nrows_in_plot; m++) {
     i = d->rows_in_plot.els[m];
@@ -154,6 +158,8 @@ reinit_transient_brushing (displayd *dsp, ggobid *gg)
   cpaneld *cpanel = &dsp->cpanel;
   gboolean point_painting_p = (cpanel->br_point_targets != br_off);
   gboolean edge_painting_p = (cpanel->br_edge_targets != br_off);
+
+  g_assert (d->color.nels == d->nrows);
 
   if (point_painting_p) {
     for (m=0; m<d->nrows_in_plot; m++) {
@@ -735,6 +741,8 @@ active_paint_points (splotd *sp, datad *d, ggobid *gg)
   cpaneld *cpanel = &display->cpanel;
   gint (*f)(splotd *sp, datad *, ggobid *) = NULL;
 
+  g_assert (d->pts_under_brush.nels == d->nrows);
+
   if (GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
     f = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass)->active_paint_points;
     if(f)
@@ -907,6 +915,8 @@ active_paint_edges (splotd *sp, datad *e, ggobid *gg)
   gboolean changed;
   displayd *display = sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
+
+  g_assert (e->edge.xed_by_brush.nels == e->edge.n);
 
   /* Zero out xed_by_brush[] before looping */
   e->edge.nxed_by_brush = 0;

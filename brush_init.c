@@ -45,6 +45,8 @@ br_glyph_ids_init (datad *d, ggobid *gg)
 {
   gint i;
 
+  g_assert (d->glyph.nels == d->nrows);
+
   for (i=0; i<d->nrows; i++) {
     d->glyph.els[i].type = d->glyph_now.els[i].type =
       d->glyph_prev.els[i].type = gg->glyph_0.type;
@@ -84,6 +86,8 @@ br_color_ids_init (datad *d, ggobid *gg)
 {
   gint i;
 
+  g_assert (d->color.nels == d->nrows);
+
   for (i=0; i<d->nrows; i++)
     d->color.els[i] = d->color_now.els[i] = d->color_prev.els[i] =
       gg->color_0;
@@ -105,6 +109,8 @@ void
 hidden_init (datad *d)
 {
   gint i;
+
+  g_assert (d->hidden.nels == d->nrows);
 
   for (i=0; i<d->nrows; i++)
     d->hidden.els[i] = d->hidden_now.els[i] = d->hidden_prev.els[i] = false;

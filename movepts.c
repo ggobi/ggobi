@@ -102,6 +102,9 @@ move_pt (gint id, gint x, gint y, splotd *sp, datad *d, ggobid *gg) {
   gint i, k;
   gboolean horiz, vert;
 
+  g_assert (d->clusterid.nels == d->nrows);
+  g_assert (d->hidden.nels == d->nrows);
+
   horiz = gg->movepts.direction == horizontal || gg->movepts.direction == both;
   vert = gg->movepts.direction == vertical || gg->movepts.direction == both;
 

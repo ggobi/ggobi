@@ -31,6 +31,9 @@ impute_fixed (gint impute_type, gint nvars, gint *vars, datad *d, ggobid *gg)
     return false;
   }
 
+  g_assert (d->missing.nrows == d->nrows);
+  g_assert (d->missing.ncols == d->ncols);
+
   if (impute_type == IMP_ABOVE || impute_type == IMP_BELOW) {
 
     if (impute_type == IMP_ABOVE)

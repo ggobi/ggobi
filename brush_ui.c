@@ -87,6 +87,9 @@ brush_point_targets_cb (GtkWidget * w, gpointer cbd)
   if (cpanel->br_point_targets == br_select) {
     gint i, m;
     datad *d = gg->current_display->d;
+
+    g_assert (d->hidden.nels == d->nrows);
+
     for (i=0; i<d->nrows_in_plot; i++) {
       m = d->rows_in_plot.els[i];
       d->hidden_now.els[m] = d->hidden.els[m] = true;
@@ -120,6 +123,9 @@ static void brush_edge_targets_cb(GtkWidget * w, gpointer cbd)
   if (cpanel->br_edge_targets == br_select) {
     gint i, m;
     datad *e = gg->current_display->e;
+
+    g_assert (e->hidden.nels == e->nrows);
+
     if (e) {
       for (i=0; i<e->nrows_in_plot; i++) {
         m = e->rows_in_plot.els[i];
@@ -199,6 +205,9 @@ void brush_reset(ggobid * gg, gint action)
   datad *d = display->d;
   datad *e = display->e;
   cpaneld *cpanel = &display->cpanel;
+
+  g_assert (d->hidden.nels == d->nrows);
+  g_assert (e->hidden.nels == e->nrows);
 
   switch (action) {
   case RESET_UNHIDE_POINTS:   /*-- un-hide all points --*/

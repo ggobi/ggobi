@@ -679,6 +679,8 @@ scatterplotMovePointsButtonCb(displayd *display, splotd *sp, GtkWidget *w, GdkEv
 {
   datad *d = gg->current_display->d;
 
+  g_assert (d->clusterid.nels == d->nrows);
+
   if (d->nearest_point != -1) {
     movepts_history_add (d->nearest_point, sp, d, gg);
 
@@ -1128,8 +1130,8 @@ treeLabel(splotd *splot, datad *d, ggobid *gg)
 static void
 subPlaneToScreen(splotd *sp, displayd *dpy, datad *d, ggobid *gg)
 {
-      ash_baseline_set (&sp->p1d.ash_baseline, sp);
-      ash_baseline_set (&sp->tour1d.ash_baseline, sp);
+  ash_baseline_set (&sp->p1d.ash_baseline, sp);
+  ash_baseline_set (&sp->tour1d.ash_baseline, sp);
 }
 
 static void
@@ -1330,14 +1332,11 @@ static void
 addPlotLabels(splotd *sp, GdkDrawable *drawable, ggobid *gg)
 {
 /* Same as scatmat... */
-    cpaneld *cpanel = &(sp->displayptr->cpanel);
-    if(cpanel->projection == XYPLOT)
-      scatterXYAddPlotLabels(sp, drawable, gg->plot_GC);
-    else if(cpanel->projection == P1PLOT)
+  cpaneld *cpanel = &(sp->displayptr->cpanel);
+  if(cpanel->projection == XYPLOT)
+    scatterXYAddPlotLabels(sp, drawable, gg->plot_GC);
+  else if(cpanel->projection == P1PLOT)
     scatter1DAddPlotLabels(sp, drawable, gg->plot_GC);
-
-
-
 }
 
 static void

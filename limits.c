@@ -128,6 +128,9 @@ static void
 limits_raw_set (datad *d, ggobid *gg) {
   gint j;
 
+  g_assert (d->raw.nrows == d->nrows);
+  g_assert (d->raw.ncols == d->ncols);
+
   for (j=0; j<d->ncols; j++)
     limits_raw_set_by_var (j, d, gg);
 }
@@ -223,6 +226,9 @@ static void
 limits_tform_set (datad *d, ggobid *gg) {
   gint j;
 
+  g_assert (d->tform.nrows == d->nrows);
+  g_assert (d->tform.ncols == d->ncols);
+
   for (j=0; j<d->ncols; j++) {
     limits_tform_set_by_var (j, d, gg);
   }
@@ -301,6 +307,9 @@ recenter_data (gint i, datad *d, ggobid *gg) {
   vartabled *vt;
   greal x;
   gint j;
+
+  g_assert (d->tform.nrows == d->nrows);
+  g_assert (d->tform.ncols == d->ncols);
 
   for (j=0; j<d->ncols; j++) {
     vt = vartable_element_get (j, d);
