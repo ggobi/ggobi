@@ -46,7 +46,6 @@ rowidv_init (datad *d) {
      * to dimension rowid.idv
     */
     gint nels = 1 + d->rowid.id.els[ d->rowid.id.nels-1 ]; 
-g_printerr ("(rowidv_init) nels = %d\n", nels);
 
     vectori_alloc (&d->rowid.idv, nels);
     for (i=0; i<nels; i++)
