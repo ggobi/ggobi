@@ -126,7 +126,8 @@ gg_write_to_statusbar (gchar *message, ggobid *gg)
     /*-- by default, describe the current datad --*/
     datad *d = datad_get_from_notebook (gg->varpanel_ui.notebook, gg);
     if (d) {
-      gchar *msg = g_strdup_printf ("%s:%dx%d\n", d->name, d->nrows, d->ncols);
+      gchar *msg = g_strdup_printf ("%s: %d x %d\n",
+        d->name, d->nrows, d->ncols);
       gtk_entry_set_text (GTK_ENTRY(entry), msg);
       g_free (msg);
     }
