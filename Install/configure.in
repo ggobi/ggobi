@@ -1,6 +1,6 @@
 dnl This is the configuration script for ggobi
 dnl to be used when installing it. (It is not 
-dnl necessarily used by in development versions.)
+dnl necessarily used in development versions.)
 
 dnl This tries to find the optional elements
 dnl of ggobi such as
@@ -204,7 +204,7 @@ dnl      AC_CHECK_HEADER(mysql.h, MYSQL_INC_DIRS=$f$ext)
      done
    done
 
- fi
+ fi # end of test -z "${MYSQL_INC_DIRS}"
 
 
 
@@ -220,10 +220,15 @@ dnl      AC_CHECK_HEADER(mysql.h, MYSQL_INC_DIRS=$f$ext)
      echo "Using libmysql from ${LIBS}"
    fi
 
-  fi
+ fi
 
   USE_MYSQL="USE_MYSQL=1"
+  MYSQL_DEPENDS="lib/libProps.so"
+else
+  MYSQL_DEPENDS=""
 fi
+
+AC_SUBST(MYSQL_DEPENDS)
 
 TOP=`pwd`
 MV=mv

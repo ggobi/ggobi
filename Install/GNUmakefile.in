@@ -16,10 +16,10 @@ all: lib/libgtkext.so bin/ggobi.bin @EMBED@ $(UTILS) @PACKAGES@
 lib/libgtkext.so:
 	$(MAKE) -C gtkext/src install
 
-ggobi bin/ggobi.bin: lib/libgtkext.so
+ggobi bin/ggobi.bin: lib/libgtkext.so @MYSQL_DEPENDS@
 	$(MAKE) -C src ../bin/ggobi.bin
 
-lib/libggobi.so lib: lib/libgtkext.so
+lib/libggobi.so lib: lib/libgtkext.so @MYSQL_DEPENDS@
 	$(MAKE) -C src ../lib/libggobi.so
 
 
