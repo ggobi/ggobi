@@ -1,0 +1,69 @@
+<!--
+  The DTD for the GGobi input file format.
+  See data/flea.xml in the distribution for an example.
+ -->
+
+<!ELEMENT description ( #PCDATA )>
+
+<!ELEMENT variables ( variable )*>
+
+<!-- Allows the name to be the only entry -->
+<!ELEMENT variable ( #PCDATA )>
+
+<!ELEMENT records ( record )*>
+<!ELEMENT record  ( #PCDATA )>
+
+<!-- "edges" would replace "segments", and edges can have variable names
+     and records -->
+<!ELEMENT edges ( edge )*>
+<!ELEMENT edge EMPTY>
+<!ELEMENT edgevariables ( edgevariable )*>
+<!ELEMENT edgevariable ( #PCDATA )>
+<!ELEMENT edgerecords ( edgerecord )*>
+<!ELEMENT edgerecord  ( #PCDATA )>
+<!ENTITY % lineTypes " solid | dot | dash ">
+<!-- -->         
+
+<!ATTLIST records
+     count CDATA  #REQUIRED
+>
+
+<!ATTLIST variable
+    name          NMTOKEN #IMPLIED
+    transformName NMTOKEN #IMPLIED
+    missingValue  CDATA   #IMPLIED
+    group         CDATA   #IMPLIED
+>
+
+<!ATTLIST record
+   label     NMTOKEN                   #REQUIRED
+   id        NMTOKEN                   #IMPLIED
+   color     CDATA                     #IMPLIED
+   glyphSize ( 0 | 1 | 2 | 3 | 4 | 5 ) #IMPLIED
+   group     CDATA                     #IMPLIED
+>   
+
+
+<!ATTLIST edge
+   source      CDATA  #REQUIRED
+   destination CDATA  #REQUIRED
+   color       CDATA  #IMPLIED
+   width       CDATA  #IMPLIED
+>
+
+<!ATTLIST edgerecords
+   count CDATA  #REQUIRED
+>
+
+<!ATTLIST edgevariable
+    name          NMTOKEN #IMPLIED
+    missingValue  CDATA   #IMPLIED
+>
+
+<!ATTLIST edgerecord
+   label     NMTOKEN                   #REQUIRED
+   id        NMTOKEN                   #IMPLIED
+   color     CDATA                     #IMPLIED
+   lineWidth ( 0 | 1 | 2 | 3 | 4 | 5 ) #IMPLIED
+   group     CDATA                     #IMPLIED 
+>   

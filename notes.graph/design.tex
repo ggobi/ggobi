@@ -1,0 +1,406 @@
+\documentclass[11pt]{article}
+
+\setlength{\topmargin}{-0.25in}
+\setlength{\textheight}{9in}
+\setlength{\textwidth}{7.25in}
+\setlength{\oddsidemargin}{-.4in}
+
+\begin{document}
+
+\begin{center}
+\LARGE{ Design of interactive graph visualization software }
+\end{center}
+\centerline {\today}
+
+\parindent 0in
+\parskip 6 pt
+
+\section {The data}
+
+We are interested in the interactive exploratory data analysis of
+communications transaction data.  For these transactions, there
+is always a source and destination, which can be telephone
+numbers, email addresses, or IP addresses.  We probably have some
+data on the vertices (biz/res indicator, whether the phone
+number or email address belongs to an AT\&T customer, fraud risk,
+port number, IP address prefix, NPA, NXX).  We may also have data
+on the edges (transaction start and end times, volume of
+transaction data).
+
+Usually a single transaction involves only two nodes, but
+sometimes more nodes are involved, as in the case of 800 and
+credit card calls.
+
+\subsection {Communities of interest among telephone customers}
+
+We construct community of interest graphs for records of
+telephone calls as follows:  start from one phone number, add all
+calls made to and from that number, and then add a second ring of
+calls to and from those numbers.
+
+Node variables can include: bizosity in and out, usage in and out,
+800 usage, international usage, frequency in and out, a fraudiness
+rating, whether the number is AT\&T customer,  ...  (Add definitions)
+
+Likely edge variables are the time stamp and duration in seconds.
+
+These are things we might be interested in learning about the data:
+
+\begin{itemize} \itemsep 0em
+\item Questions on nodes
+
+  \begin{itemize} \itemsep 0em
+  \item Which numbers have high bizosity ratings?  Which numbers make
+    most of their calls to high bizosity numbers?  Receive their calls
+    from high bizosity numbers?
+  \item For a given node, identify its strongly connected component. 
+    (A strongly connected component is one in which all nodes can
+    reach all others by a {\em directed} path.  It can have only one,
+    and it can be found by depth first search.)
+  \item If we also had fraud data on each node, we would want to look for
+    fraudsters that we didn't previously know.  We'd do that by
+    looking for low-risk nodes which share an edge with at least one
+    high-risk node.
+  \item We might also want to identify new chat lines, by looking for
+    nodes with overlapping transactions.
+  \end {itemize}
+
+\item Questions on edges
+  \begin{itemize} \itemsep 0em
+  \item Who talks the most often?  Who has the longest calls
+  \item Are there groups of calls that cluster by time?
+  \end{itemize}
+
+\end{itemize}
+
+We are also interested in comparing pairs of COI graphs.  One
+purpose for this comparison is to identify people who have moved:
+We'll compare COI data for an account that was just closed
+with a new account bearing a similar customer name.  Are there
+visual comparisons that can supplement the use of distance
+metrics?  We might display all nodes that two graphs have in
+common, together with each node that shares an edge with
+one of the common nodes.
+
+We are also investigating the use of graph comparison for
+identifying subscription wireless fraud.  Once a wireless phone
+number has been identified as fraudulent, it is quickly cut off.
+If a new number appears shortly thereafter which has similar
+behavior, then it too may be fradulent.
+
+\subsection {Netflow data}
+
+The Netflow data is the closest thing we've got to ``call-level''
+measurement of IP traffic.  Each flow corresponds to a set of packets
+between the same two end-points, measured at the same location, and
+occurring close together in time.  By end-points, we mean the same pair
+of IP addresses and same port numbers (TCP or UDP connection).  There 
+are four levels of hierarchy for each end-point, and this hierarchy
+can be used to aggregate the data in different ways:
+
+\begin{itemize} \itemsep 0em
+  \item TCP/UDP end-point: IP address and port number (e.g., 1.2.3.4, port 80)
+  \item Host: IP address (1.2.3.4)
+  \item Network address: IP subnet (1.2.3.0/24; e.g., 1.2.3.*)
+  \item Domain: autonomous system number (AS 7018)
+\end{itemize}
+
+Each flow (or edge) has a start and end time, and consists
+of a certain number of bytes and packets.  Other edge
+variables are protocol, type of service, and sequence number.
+
+For each node, we know the IP address, interface number, port,
+and autonomous system number (domain) for the IP address,
+
+\subsection {Using netflow data to study the network}
+
+
+\subsection {Using netflow data to study customer behavior}
+
+Since the AT\&T netflow data includes traffic between Worldnet
+customers and web sites, we can use the data in an indirect
+fashion to study the relationships between customers and web
+sites.
+
+We can build a graph in which vertices are web sites and edges
+indicate a relationship between a pair of web sites.  These edges
+would be inferred from customer behavior as follows:  We can
+identify web sites that are visited by a particular customer
+within some fixed time interval -- say, 5 minutes -- to place
+an edge between the two vertices.
+
+The definition of an edge in this example is much different than
+in the previous examples, since it's inferred rather than
+immediately present in the data.  Note also that these edges are
+not directed, which is probably unusual for transaction data.
+
+The definition of these edges is a slippery thing, since a web
+page may contain multiple URLs, and we don't want to be misled by
+such things as advertising servers like Doubleclick and caching
+services like Akamai -- this is not data that captures anything
+useful about the customer request!
+
+There's ambiguity at the user end, too, since the customer IP
+addresses are assigned only for the duration of a particular
+session, and one may want to distinguish the sessions of two
+different customers, one of whom logs in just as the other logs
+out.
+
+It would be interesting to look at relationships between classes
+of web hosts, such as bookstores (Amazon, Barnes \& Noble, Borders,
+et al).  Do customers move from one to another, doing comparison
+shopping?  Do we want to aggregate all bookstores into a single
+node?
+
+We also want to identify relationships between unlike hosts -- do
+people frequently check the news and then the weather?  Are there
+customer trends we could spot in these graphs -- are Worldnet
+customers now investigating online banks in greater numbers?
+
+It would be important to be able to erase both the extremely busy
+sites (CNN, Amazon, weather.com), since they would clutter and
+dominate the graph.  This same problem exists for telephone
+calling data (1.800.CALL.ATT, for instance, receives many more
+calls than most other numbers!), but it's much worse for web
+sites.  We would also want to have ways to avoid the extremely
+rarely visited sites.
+
+Each edge could have a distance variable indicating some measure
+of the strength of the relationship between the two web sites --
+it might be defined by the number of customers who visited both.
+The ideal layout algorithm for this data would be something like
+multidimensional scaling, which would attempt to position the
+vertices such that those distances were replicated on the
+screen.
+
+The set of complementary graphs could also be interesting:  in
+this case, the nodes would be {\em customer} IP addresses (or
+customer ids, if we can make that translation), and the inferred
+links would connect customers who visited the same sites.  This
+is more obviously analogous to the community-of-interest graphs
+for telephone call data described above, in which we can look for
+customers with similar interests and behavior.
+
+
+\section{Layout}
+
+Since we are thinking of the exploratory data analysis on-line,
+we are more interested in layout algorithms that are fast than
+those that are perfect.  We will probably draw only straight-line
+edges, and our layout algorithms probably won't attempt to minimize
+edge crossings.
+
+
+\begin{itemize} \itemsep 0em
+\item Layout types
+   \begin{itemize} \itemsep 0em
+   \item layouts in 2d, 3d, and higher
+   \item hierarchical, non-hierarchical layouts
+   \item concentric circles (or spheres)
+   \item hyperbolic graphs
+   \item iterative layouts, like multidimensional scaling in xgvis
+
+   \item constrained layouts
+     \begin{itemize} \itemsep 0em
+     \item place related nodes near each other: in the
+           netflow case, big sources could be close
+     \item place nodes on a map
+     \end{itemize}
+   \end{itemize}
+
+ \item Multiple unconnected graphs: display in the same window?
+   Could treat as separate graphs, partition the screen and lay
+   out each graph separately.  The screen partitioning may need
+   to be fluid, since we don't know a priori how much space each
+   graph will need.
+
+ \item Layout interactions
+   \begin{itemize} \itemsep 0em
+   \item Reset the center node 
+   \item Move nodes and edges to adjust the layout
+   \end{itemize}
+
+\end{itemize}
+
+\section{Thinning or expanding the graph}
+
+\begin{itemize} \itemsep 0em
+\item Thinning
+   \begin{itemize} \itemsep 0em
+   \item Reset display thresholds
+     \begin{itemize} \itemsep 0em
+     \item eliminate transactions (edges) based on some edge variable:
+           length, size, cost
+     \item eliminate nodes based on some node variable: risk, ?
+     \end{itemize}
+   \item Aggregate
+     \begin{itemize} \itemsep 0em
+     \item interactively: by selection
+     \item logically: by node variable (prefix, NPA) or edge
+           variable (duration)
+     \item automatically: set thresholds such that if there are
+           too many nodes to lay out, automatic aggregation will
+           occur.
+     \end{itemize}
+   \end{itemize}
+
+\item Expansion
+   \begin{itemize} \itemsep 0em
+   \item Add the transactions for a selected node --
+       requires some database connection
+   \item Deaggregation: a logical zoom into an aggregate node
+   \end{itemize}
+
+\end{itemize}
+   
+\section {Representation}
+
+\begin{itemize} \itemsep 0em
+
+\item Note: the edge that's drawn represents some number of
+  transactions, in different directions, and needs to be
+  distinguished from the ``edge'' that exists in the data.
+
+\item Edge direction can be distinguished by drawing the line in
+  two sections, using proportional coloring of the line, or
+  proportional length and thickness of the two sections.
+
+\item Edge color or thickness can represent
+
+  \begin{itemize} \itemsep 0em
+  \item whether the edge is within the current time window
+  \item the sum (mean, median) of any edge variable (size, duration)
+  \item the value of any edge variable
+  \end{itemize}
+
+\item  Node color or size can represent
+  \begin{itemize} \itemsep 0em
+  \item the number of simultaneous transactions
+  \item the node degree (in-degree, out-degree)
+  \item the value of any node variable
+  \end{itemize}
+
+\end {itemize}
+
+
+\section{Interaction with the graph}
+
+\begin{itemize} \itemsep 0em
+\item Direct manipulation
+
+  \begin{itemize} \itemsep 0em
+  \item select a node or set of nodes, an edge or set of edges to
+    \begin{itemize} \itemsep 0em
+     \item zoom and pan
+     \item highlight (paint)
+     \item adjust the layout (see layout interactions)
+     \item hide, aggregate, expand (see thinning or expanding)
+     \item apply some algorithm to the selected set, such as 
+           reporting the average transaction size
+     \end{itemize}
+
+
+ \end{itemize}
+
+\item Interaction via menus (indirect manipulation)
+
+  \begin{itemize} \itemsep 0em
+   \item ask for a new layout
+   \item display some label next to each edge or node,
+         changing the type of data to be displayed
+  \end{itemize}
+
+\end{itemize}
+
+
+\section {Linked views}
+
+\begin{itemize} \itemsep 0em
+
+\item scatterplots/scatmats/parcoords plots of node or edge data
+  \begin{itemize} \itemsep 0em
+  \item use node or edge variables to highlight (or hide) some of
+        the graph: big sources, low-traffic edges, ...
+  \item note: when linking from a scatterplot of edge data to the
+        graph, we might make a translation that painting a point
+        with a bigger glyph is equivalent to painting an edge with
+        a wider line
+  \end{itemize}
+
+\item seecalls view
+
+\item other graphs:
+  \begin{itemize} \itemsep 0em
+  \item the same nodes in different time periods, linked by node
+  \item different nodes in the same time period, possibly linked by time
+  \item how would one diff a pair of graphs?  and how would one
+        display the result?
+  \end{itemize}
+
+\end{itemize}
+
+
+\section {Time}
+
+ One way to manage time:  lay out the graph for all data, but
+   show or highlight the nodes and edges that fall within a time window,
+   Scroll or step through the window using a scrollbar or spinner.
+   (When edges are aggregates, this may be tricky.)
+ 
+ When we ask "tell me everybody who has called this guy", we might
+  like to say "during the current time window" or "in the entire db"
+
+\section {Presentation}
+
+\begin{itemize} \itemsep 0em
+\item Generate images for use in browsers -- simple jpegs,
+  active images
+\item Annotation: labelling graphs is tricky!
+\end {itemize}
+
+
+\section {Implementation}
+
+There are two possibilities we're pursuing in parallel:
+implementing graph visualization as a module in ORCA and inside ggobi.
+
+
+\begin{itemize} \itemsep 0em
+\item ORCA  
+  \begin{itemize} \itemsep 0em
+  \item Pros
+    \begin{itemize} \itemsep 0em
+    \item appealing programming environment, java
+    \item easy linking to a variety of plot types
+    \end{itemize}
+  \item Cons
+    \begin{itemize} \itemsep 0em
+    \item slow; just about unusable on fry
+    \item no command line interface
+    \end{itemize}
+  \end{itemize}
+
+\item ggobi
+  \begin{itemize} \itemsep 0em
+  \item Pros
+    \begin{itemize} \itemsep 0em
+    \item embeddable in R; command line available
+      \begin{itemize} \itemsep 0em
+      \item talk to a database 
+      \item use algorithms in R to thin the graph, find strongly connected
+        components, etc.
+      \end{itemize}
+    \item attractive C++ graph component library available (GGCL)
+    \item easy linking to scatterplot, scatmat, parcoords plot
+    \item good performance
+    \end{itemize}
+  \item Cons
+    \begin{itemize} \itemsep 0em
+    \item not quite as portable as java code?
+    \item headed for obsolence once java gets up to speed?
+    \end{itemize}
+  \end{itemize}
+\end{itemize}
+    
+
+\end{document}
