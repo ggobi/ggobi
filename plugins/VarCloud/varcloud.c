@@ -10,9 +10,10 @@
 
 #include "GGStructSizes.c"
 
-void       close_vcl_window(GtkWidget *w, PluginInstance *inst);
-void       create_vcl_window(vcld *vcl, PluginInstance *inst);
-void       show_vcl_window (GtkWidget *widget, PluginInstance *inst);
+void    vcl_window_closed(GtkWidget *w, PluginInstance *inst);
+void    close_vcl_window_cb(GtkWidget *w, PluginInstance *inst);
+void    create_vcl_window(vcld *vcl, PluginInstance *inst);
+void    show_vcl_window (GtkWidget *widget, PluginInstance *inst);
 
 gboolean
 addToToolsMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
@@ -181,7 +182,7 @@ create_vcl_window(vcld *vcl, PluginInstance *inst)
   gtk_window_set_title(GTK_WINDOW(window),
     "VarCloud");
   gtk_signal_connect (GTK_OBJECT (window), "destroy",
-    GTK_SIGNAL_FUNC (close_vcl_window), inst);
+    GTK_SIGNAL_FUNC (vcl_window_closed), inst);
 
   main_vbox = gtk_vbox_new (false, 1);
   gtk_container_set_border_width (GTK_CONTAINER(main_vbox), 5); 
@@ -348,31 +349,49 @@ create_vcl_window(vcld *vcl, PluginInstance *inst)
 
 /*-- Run controls --*/
 
-  /*-- run --*/
-  btn = gtk_button_new_with_label ("Launch variogram cloud plot");
-  gtk_widget_set_name (btn, "Launch");
+  hbox = gtk_hbox_new (false, 2);
+  gtk_container_set_border_width (GTK_CONTAINER (hbox), 2);
+  gtk_box_pack_start (GTK_BOX (main_vbox), hbox, false, false, 2);
 
-  gtk_box_pack_start (GTK_BOX (main_vbox), btn, false, false, 2);
+  /*-- run --*/
+  btn = gtk_button_new_with_label ("Var cloud");
+  gtk_widget_set_name (btn, "VarCloud");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (vcl->tips), btn,
+    "Launch variogram cloud plot, using Variable 1", NULL);
+  gtk_box_pack_start (GTK_BOX (hbox), btn, true, false, 2);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
     GTK_SIGNAL_FUNC (launch_varcloud_cb), inst);
+
+  btn = gtk_button_new_with_label ("Cross-var cloud");
+  gtk_widget_set_name (btn, "Cross");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (vcl->tips), btn,
+    "Launch cross-variogram cloud plot, using Variables 1 and 2", NULL);
+  gtk_box_pack_start (GTK_BOX (hbox), btn, true, false, 2);
+  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+    GTK_SIGNAL_FUNC (launch_varcloud_cb), inst);
+
+
+  btn = gtk_button_new_with_label ("Close");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (vcl->tips), btn,
+    "Close this window", NULL);
+  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+		      GTK_SIGNAL_FUNC (close_vcl_window_cb), inst); 
+  gtk_box_pack_start (GTK_BOX (main_vbox), btn, false, false, 2);
+
 
   gtk_widget_show_all (window);
 }
 
-
-void close_vcl_window(GtkWidget *w, PluginInstance *inst)
-{
-}
-
-/*
- * This one is called when ggobi shuts down; it doesn't
- * need to do much of anything, I think.  
- */
-void closeWindow(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
+void freePlugin(ggobid *gg, PluginInstance *inst)
 {
   if (inst->data) {
     inst->data = NULL;
   }
+}
+
+void vcl_window_closed(GtkWidget *w, PluginInstance *inst)
+{
+  freePlugin (inst->gg, inst);
 }
 
 void

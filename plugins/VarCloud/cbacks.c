@@ -32,13 +32,18 @@ launch_varcloud_cb (GtkWidget *w, PluginInstance *inst)
   gint var1 = vcl->var1, var2 = vcl->var2;
   gdouble xci, xcj, yci, ycj;
   gchar *lbl;
+  gchar *name = gtk_widget_get_name (w);
 
   /*
-     If vcl->var1 == vcl->var2, this is a one-variable variogram cloud
-     plot.  Otherwise, it's a cross-variogram cloud plot. ... Or
-     perhaps we'll end up redesigning the interface to be more
-     specific -- separate buttons might be nice.
+     If widget name is 'Cross', this should be a cross-variogram
+     cloud plot; make sure that vcl->var1 != vcl->var2.
   */
+  if (strcmp (name, "Cross") == 0) {
+    if (var1 == var2) {
+      quick_message("For a cross-variogram plot, Variable 1 should be different from Variable 2", false);
+/**/  return;
+    }
+  } else var2 = var1;
 
   if (d->nrows <= 1)
     return;
@@ -168,4 +173,16 @@ launch_varcloud_cb (GtkWidget *w, PluginInstance *inst)
   g_free (recordids);
 
 
+}
+
+
+void
+close_vcl_window_cb (GtkWidget *w, PluginInstance *inst)
+{
+  extern void freePlugin(ggobid *, PluginInstance *);
+  ggobid *gg = inst->gg;
+  GtkWidget *window = (GtkWidget *) inst->data;
+  gtk_widget_destroy (window);
+
+  freePlugin(gg, inst);
 }
