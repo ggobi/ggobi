@@ -713,8 +713,8 @@
 <colormap name="New 6" ncolors="6"
           type="qualitative" system="rgb">
 <description>
-  From Cindy Brewer, a qualitative color scheme ranging
-  including pink, yellow, light green, green, and blue
+  ??? dfs wonders where this one came from.  The color names
+  don't have much to do with the colors.
 </description>
 <foreground>
   <color max="255" name="Pink">
@@ -744,6 +744,44 @@
 </annotations>
 </colormap>
 
+<colormap name="Hybrid 7" ncolors="7"
+          type="qualitative" system="rgb">
+<description>
+ This scheme has 5 continuous shades, with the first one
+ fading into the background, and 2 colors that can be
+ used for highlighting.
+</description>
+<foreground>
+  <color name="White">
+    <red>1.000</red><green>1.000</green><blue>1.000</blue>
+  </color>
+  <color name="Very pale blue">
+    <red>0.784</red><green>0.906</green><blue>0.925</blue>
+  </color>
+  <color name="Pale blue">
+    <red>0.525</red><green>0.765</green><blue>0.859</blue>
+  </color>
+  <color name="Blue">
+    <red>0.373</red><green>0.627</green><blue>0.796</blue>
+  </color>
+  <color name="Dark blue">
+    <red>0.408</red><green>0.447</green><blue>0.631</blue>
+  </color>
+  <color name="Yellow">
+    <red>0.988</red><green>0.988</green><blue>0.000</blue>
+  </color>
+  <color name="Red">
+    <red>0.890</red><green>0.196</green><blue>0.122</blue>
+  </color>
+</foreground> 
+<background>
+ <color><red>1.000</red><green>1.000</green><blue>1.000</blue></color>
+</background>
+<annotations>
+ <color><red>0.000</red><green>0.000</green><blue>0.000</blue></color>
+</annotations>
+</colormap>
+
 <!-- Spectral schemes, adjusted by Cindy -->
 
 <colormap name="Spectrum 7" ncolors="7"
@@ -752,25 +790,25 @@
   From Cindy Brewer, a spectrum
 </description>
 <foreground>
-  <color name="B">
+  <color name="Red">
     <red>0.890</red><green>0.196</green><blue>0.122</blue>
   </color>
-  <color name="B">
+  <color name="Orange">
     <red>1.000</red><green>0.549</green><blue>0.000</blue>
   </color>
-  <color name="B">
+  <color name="Gold">
     <red>0.988</red><green>0.839</green><blue>0.051</blue>
   </color>
-  <color name="B">
+  <color name="Yellow">
     <red>0.988</red><green>0.988</green><blue>0.000</blue>
   </color>
-  <color name="B">
+  <color name="Green Yellow">
     <red>0.604</red><green>0.824</green><blue>0.294</blue>
   </color>
-  <color name="B">
+  <color name="Teal">
     <red>0.235</red><green>0.690</green><blue>0.616</blue>
   </color>
-  <color name="B">
+  <color name="Blue">
     <red>0.149</red><green>0.482</green><blue>0.671</blue>
   </color>
 </foreground> 
