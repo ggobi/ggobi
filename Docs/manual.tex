@@ -1228,15 +1228,27 @@ menu bar includes this item:
 When the brushing mode is active, the Reset Menu in the main
 menu bar contains these items:
 
-\begin{tabbing}
- {\bf Show all points} \hspace{.5in} \= Make all points visible. \\
- {\bf Show all edges} \> Make all edges visible. \\
- {\bf Reset brush size} \> Reset the brush to its default size and position. \\
-%{\bf Reset point colors} \> Restore all points to the default color. \\
-%{\bf Reset glyphs} \> Restore all points to the default glyph. \\
-%{\bf Reset edge colors} \> Restore all edges to the default color. \\
-\end{tabbing}
-%
+\begin{itemize}
+ \item Exclude shadowed points in current display: Excluded points
+       aren't drawn, and the views are scaled without them.  Excluding
+       a lot of points from large data sets can improve the performance
+       of many operations.
+ \item Include shadowed points in current display: Redraw these points
+       as shadows, and include them in view scaling.
+ \item Un-shadow all points in current display: Restore the points to
+       their usual colors.
+ \item Exclude shadowed edges in current display: As is the case with
+       points, excluding a lot of edges from large data sets can
+       improve performance.
+ \item Include shadowed edges in current display: Redraw these edges
+       as shadows.
+ \item Un-shadow all edges in current display: Restore the edges to their
+       usual colors.
+ \item Reset brush size: Reset the brush to its default size and position.
+\end{itemize}
+The first few items in that list may affect more than the current
+display.  Because they really operate on the {\em data} in the current
+display, all other displays showing the same data will also respond.
 
 \subsection{Identification}
 \label{slbl:Identify}
@@ -1536,7 +1548,9 @@ dialog, probably, and an 'undo' button should be added.)
 The {\bf Exclude shadows} button at the bottom of the window will
 exclude all shadow-brushed points from consideration in the
 displays:  the views will be scaled without those points, and they
-won't be drawn.  The {\bf Include shadows} button will bring those
+won't be drawn.  (Excluding a lot of points from large data sets can
+improve the performance of many operations.)
+The {\bf Include shadows} button will bring those
 points back into the plot, and they'll be drawn in the shadow color
 as before.
 
