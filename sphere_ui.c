@@ -413,8 +413,7 @@ sphere_panel_open (ggobid *gg)
       NULL);
     gtk_signal_connect (GTK_OBJECT (btn), "toggled",
                         (GtkSignalFunc) vars_stdized_cb, (gpointer) gg);
-    gtk_box_pack_start (GTK_BOX (vbox), btn,
-      true, true, 1);
+    gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 1);
 
     /*-- update scree plot when n selected vars changes --*/
     btn = gtk_button_new_with_label ("Update scree plot");
@@ -592,8 +591,34 @@ sphere_panel_open (ggobid *gg)
       "notebook", notebook);
   }
 
-  gtk_widget_show_all (gg->sphere_ui.window);
+  gtk_widget_show_all (vbox);
   gdk_flush ();
+
+  gtk_widget_show_all (gg->sphere_ui.window);
+
+/*-- play around with making this notebook larger --*/
+  if (g_list_length (GTK_NOTEBOOK(notebook)->children) > 0) {
+    gint page;
+    GtkWidget *swin, *clist;
+    GtkAdjustment *adj;
+    page = gtk_notebook_get_current_page (GTK_NOTEBOOK (notebook));
+    swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), page);
+    if (swin) {
+      adj = gtk_scrolled_window_get_vadjustment (GTK_SCROLLED_WINDOW (swin));
+      clist = GTK_BIN (swin)->child;
+      if (clist->allocation.height < adj->upper) {
+        gint sz = MIN(clist->allocation.height*2, adj->upper);
+        gtk_widget_set_usize (clist, -1, sz);
+      }
+      /*
+      g_printerr ("value %f lower %f upper %f size %f\n", 
+        adj->value, adj->lower, adj->upper, adj->page_size);
+      g_printerr ("swin height %d\n", swin->allocation.height);
+      g_printerr ("clist height %d\n", clist->allocation.height);
+      */
+    }
+  }
+/*--  --*/
 
   scree_plot_make (gg);
 }
