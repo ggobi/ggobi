@@ -135,6 +135,6 @@
 
 58056   1/15  signal handlers, improvements in tour code, ...
 58519   3/6   missings become a new datad; rulers are now responsive, ...
-
-note: There are about 40.8K lines in xgobi,
-       subtracting the rpc, xgvis and tour code.
+58585   3/7   Di updated the tour code -- sneaking up on a release.
+58848   3/11  Fixed some sphering bugs, added lines to ASHes.
+59003   3/12  1d plot cycling
