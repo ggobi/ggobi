@@ -303,7 +303,10 @@ display_alloc_init (enum displaytyped type, gboolean missing_p,
   displayd *display = (displayd *) g_malloc (sizeof (displayd));
   display->displaytype = type; 
 
-  display->p1d_orientation = HORIZONTAL;
+  if (type == scatterplot)
+    display->p1d_orientation = HORIZONTAL;
+  else if (type == parcoords)
+    display->p1d_orientation = VERTICAL;
 
   /* Copy in the contents of DefaultOptions to create
      an indepedently modifiable configuration copied from
