@@ -11,6 +11,8 @@ endif
 -include local.config
 -include $(GGOBI_HOME)/local.config
 
+include ../GNUmakefile.plugin
+
 ifdef WIN32
   GGOBI_MAKEFILE=-f Makefile.win32
 endif
@@ -41,6 +43,7 @@ $(PKG).dll: $(OBJS) $(PKG).def
 #	$(CC) -shared -o $@ $(OBJS) $(GGOBI_LIB) $(shell $(GTK_CONFIG) --libs) $(XML_LIB_DIRS=%-L%) $(LDFLAGS)
 endif
 
+ggvis.so: $(OBJS)
 
 tmp:
 	@echo "$(XML_LIBS)"
