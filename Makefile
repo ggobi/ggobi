@@ -143,7 +143,7 @@ ifdef USE_MYSQL
   LD=$(CXX)
 endif
 
-OB=mt19937-1.o cokus.o  
+OB+=mt19937-1.o cokus.o  
 
 ggobi: $(OB)
 	$(LD) $(OB) $(LDFLAGS) -o ggobi $(XML_LIBS) $(MYSQL_LIBS) `gtk-config --cflags --libs`  $(DL_RESOLVE_PATH)
