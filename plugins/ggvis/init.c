@@ -9,8 +9,11 @@
 #include "ggvis.h"
 
 void
-ggvis_init (ggvisd *ggv)
+ggvis_init (ggvisd *ggv, ggobid *gg)
 {
+  datad *d;
+  GSList *l;
+
   /*-- initialize the datad pointers --*/
   ggv->dsrc = NULL;
   ggv->dpos = NULL;
@@ -38,6 +41,7 @@ ggvis_init (ggvisd *ggv)
   vectori_init_null (&ggv->dissim->bins);
 
   ggv->dim = 3;
+  ggv->maxdim = 3;
 
   ggv->stepsize = 0.02;
   ggv->dist_power = 1.0;
@@ -60,8 +64,26 @@ ggvis_init (ggvisd *ggv)
 
   ggv->num_active_dist = 0;
 
+  /* Assume that we're doing graph layout */
+  ggv->mds_task = GraphLayout;
   ggv->Dtarget_source = LinkDist;
-  ggv->complete_Dtarget = false;
+  ggv->complete_Dtarget = true;
+  /* 
+     Then loop over datads, looking for one devoted to specifying
+     dissimilarities for MDS
+  */
+  for (l = gg->d; l; l = l->next) {
+    d = l->data;
+    if (d->edge.n > 0) {
+      if (g_strcasecmp (d->name, "dist") == 0 ||
+          g_strcasecmp (d->name, "distance") == 0 ||
+          g_strcasecmp (d->name, "dissim") == 0)
+      { /* then we're in the MDS case */
+        ggv->mds_task = DissimAnalysis;
+        break;
+      }
+    }
+  }
 
   ggv->group_p = false;
   ggv->group_ind = within;

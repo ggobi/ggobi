@@ -31,6 +31,7 @@ typedef enum {within, between, anchorscales, anchorfixed} MDSGroupInd;
 typedef enum {metric, nonmetric} MDSMetricInd;
 typedef enum {KruskalShepard, classic} MDSKSInd;
 typedef enum {LinkDist, VarValues} MDSDtargetSource;
+typedef enum {DissimAnalysis, GraphLayout} MDSTask;
 
 #define EXCLUDED 0
 #define INCLUDED 1
@@ -107,7 +108,9 @@ typedef struct {
 /* callbacks written */
   MDSMetricInd metric_nonmetric;
   MDSKSInd KruskalShepard_classic;
+  MDSTask mds_task;  /* DissimAnalysis or GraphLayout */
   MDSDtargetSource Dtarget_source;
+  GtkCList *clist_dist;
   gboolean complete_Dtarget;
 
   gboolean group_p;
@@ -124,7 +127,7 @@ typedef struct {
 /*                          functions                                   */
 /*----------------------------------------------------------------------*/
 
-void ggvis_init (ggvisd *);
+void ggvis_init (ggvisd *, ggobid *gg);
 ggvisd* ggvisFromInst (PluginInstance *inst);
 void mds_run_cb (GtkToggleButton *btn, PluginInstance *inst);
 void mds_step_cb (GtkWidget *btn, PluginInstance *inst);
@@ -133,14 +136,17 @@ void mds_scramble_cb (PluginInstance *inst, guint action, GtkWidget *w);
 void mds_reset_params_cb (PluginInstance *inst, guint action, GtkWidget *w);
 void update_ggobi (ggvisd *ggv, ggobid *gg);
 
-void ggv_dsource_cb (GtkWidget *w, gpointer cbd);
+/*void ggv_dsource_cb (GtkWidget *w, gpointer cbd);*/
 void ggv_complete_distances_cb (GtkToggleButton *button, PluginInstance *inst);
+void ggv_edge_weights_cb (GtkToggleButton *button, PluginInstance *inst);
 void ggv_brush_groupsp_cb (GtkToggleButton *button, PluginInstance *inst);
 void ggv_brush_groups_opt_cb (GtkWidget *w, gpointer cbd);
 void ggv_compute_Dtarget_cb (GtkWidget *button, PluginInstance *inst);
 
 gint ggv_stressplot_configure_cb (GtkWidget *, GdkEventExpose *, PluginInstance *);
 gint ggv_stressplot_expose_cb (GtkWidget *, GdkEventExpose *, PluginInstance *);
+
+void ggv_task_cb (GtkToggleButton *button, PluginInstance *inst);
 
 gint ggv_histogram_configure_cb (GtkWidget *, GdkEventExpose *, PluginInstance *);
 gint ggv_histogram_expose_cb (GtkWidget *, GdkEventExpose *, PluginInstance *);

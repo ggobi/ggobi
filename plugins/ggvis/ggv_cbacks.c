@@ -218,9 +218,41 @@ ggv_pos_reinit (ggvisd *ggv)
   ggv_center_scale_pos_all (ggv);
 }
 
+void ggv_task_cb (GtkToggleButton *button, PluginInstance *inst)
+{
+  GtkWidget *w, *window;
+
+  ggvisd *ggv = ggvisFromInst (inst); 
+  window = (GtkWidget *) inst->data;
+
+  if (button->active) {
+    if (strcmp (gtk_widget_get_name (GTK_WIDGET(button)), "MDS") == 0) {
+      ggv->mds_task = DissimAnalysis;
+    } else {
+      ggv->mds_task = GraphLayout;
+      /* Set Dtarget_source and complete_Dtarget based on the widgets */
+      /*
+      w = widget_find_by_name (window, "MDS_WEIGHTS");
+      gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(w), 
+        ggv->Dtarget_source == VarValues);
+      w = widget_find_by_name (window, "MDS_COMPLETE");
+      gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(w), 
+        ggv->complete_Dtarget);
+      */
+    }
+
+    w = widget_find_by_name (window, "MDS_WEIGHTS");
+    gtk_widget_set_sensitive (w, ggv->mds_task == GraphLayout);
+    w = widget_find_by_name (window, "MDS_COMPLETE");
+    gtk_widget_set_sensitive (w, ggv->mds_task == GraphLayout);
+
+    if (ggv->mds_task == DissimAnalysis)
+      gtk_clist_select_row (ggv->clist_dist, 0, 0);
+  }
+}
+
 /*
  * Definition of D
-*/
 void ggv_dsource_cb (GtkWidget *w, gpointer cbd)
 {
   PluginInstance *inst = (PluginInstance *)
@@ -229,10 +261,19 @@ void ggv_dsource_cb (GtkWidget *w, gpointer cbd)
 
   ggv->Dtarget_source = (MDSDtargetSource) GPOINTER_TO_INT (cbd);
 }
+*/
 void ggv_complete_distances_cb (GtkToggleButton *button, PluginInstance *inst)
 {
   ggvisd *ggv = ggvisFromInst (inst);
   ggv->complete_Dtarget = button->active;
+}
+void ggv_edge_weights_cb (GtkToggleButton *button, PluginInstance *inst)
+{
+  ggvisd *ggv = ggvisFromInst (inst);
+
+  ggv->Dtarget_source = (MDSDtargetSource) button->active;
+  if (ggv->Dtarget_source == VarValues)
+    gtk_clist_select_row (ggv->clist_dist, 0, 0);
 }
 
 /*
@@ -283,7 +324,7 @@ void ggv_compute_Dtarget_cb (GtkWidget *button, PluginInstance *inst)
   /*-- allocate Dtarget --*/
   arrayd_alloc (&ggv->Dtarget, dsrc->nrows, dsrc->nrows);
 
-  if (ggv->Dtarget_source == VarValues) {
+  if (ggv->mds_task == DissimAnalysis || ggv->Dtarget_source == VarValues) {
     clist = get_clist_from_object (GTK_OBJECT (button));
     if (!clist) {
       quick_message ("I can't identify a set of edges", false);
@@ -403,8 +444,57 @@ void mds_run_cb (GtkToggleButton *btn, PluginInstance *inst)
   gboolean state = btn->active;
 
   if (ggv->Dtarget.nrows == 0) {
-    quick_message ("I can't identify a distance matrix", false);
-    return;
+    /* construct a distance matrix before running mds */
+    gint selected_var = -1;
+    datad *dsrc;
+
+    /* These were set in the first clist in the first tab */
+    /* Make sure the node set is present and can support edges */
+    if (ggv->dsrc == NULL || ggv->dsrc->rowIds == NULL) {
+      g_printerr ("node set not correctly specified\n");
+      return;
+    }
+    /* Make sure there's an edge set */
+    if (ggv->e == NULL || ggv->e->edge.n == 0) {
+      g_printerr ("edge set not correctly specified\n");
+      return;
+    }
+
+    dsrc = ggv->dsrc;
+
+     /*-- allocate Dtarget --*/
+    arrayd_alloc (&ggv->Dtarget, dsrc->nrows, dsrc->nrows);
+
+    if (ggv->mds_task == DissimAnalysis || ggv->Dtarget_source == VarValues) {
+ 
+      /* can override the setting of the second clist in the preceding tab */
+      ggv->e = gtk_object_get_data (GTK_OBJECT(ggv->clist_dist), "datad");
+      if (ggv->e == NULL) {
+        quick_message ("I can't identify a set of edges", false);
+        return;
+      }
+      selected_var = get_one_selection_from_clist (GTK_WIDGET(ggv->clist_dist),
+        ggv->e);
+      if (selected_var == -1) {
+        quick_message ("Please specify a variable", false);
+        return;
+      }
+    }
+
+    /*-- initalize Dtarget --*/
+    ggv_init_Dtarget (selected_var, ggv);
+    ggv_compute_Dtarget (selected_var, ggv);
+
+    if (ggv->Dtarget.nrows == 0) {
+      quick_message ("I can't identify a distance matrix", false);
+      return;
+    }
+
+    g_printerr ("%d x %d\n", ggv->Dtarget.nrows, ggv->Dtarget.ncols);
+
+    trans_dist_init_defaults (ggv);
+    /*-- open display --*/
+    mds_open_display (inst);
   }
 
   mds_func (state, inst);

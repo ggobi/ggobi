@@ -64,7 +64,8 @@ ggv_compute_Dtarget (gint selected_var, ggvisd *ggv)
     for (i = 0; i < e->edge.n; i++) {
       end1 = endpoints[i].a;
       end2 = endpoints[i].b;
-      Dvals[end1][end2] = (ggv->Dtarget_source == VarValues) ?
+      Dvals[end1][end2] = 
+       (ggv->mds_task == DissimAnalysis || ggv->Dtarget_source == VarValues) ?
         e->tform.vals[i][selected_var] : 1.0;
     }
   } else {  /*-- complete Dtarget using a shortest path algorithm --*/
@@ -78,7 +79,8 @@ ggv_compute_Dtarget (gint selected_var, ggvisd *ggv)
         /*end2 = dsrc->rowid.idv.els[endpoints[i].b];*/
         end1 = endpoints[i].a;
         end2 = endpoints[i].b;
-        d12 = (ggv->Dtarget_source == VarValues) ?
+        d12 = 
+          (ggv->mds_task == DissimAnalysis || ggv->Dtarget_source == VarValues) ?
           e->tform.vals[i][selected_var] : 1.0;
         if (d12 < 0) {
           g_printerr ("Re-setting negative dissimilarity to zero: index %d, value %f\n",

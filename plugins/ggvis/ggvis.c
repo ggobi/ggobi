@@ -82,14 +82,24 @@ static GtkItemFactoryEntry menu_items[] = {
        0 },
   };
 
-static const gchar *const dsource_lbl[] = {"Unweighted", "D from variable"};
+static const gchar *const dsource_lbl[] = {
+  "Unweighted graph dist", 
+  "D from variable"
+};
 static const gchar *const metric_lbl[] = {"Metric MDS", "Nonmetric MDS"};
 static const gchar *const kruskal_lbl[] = {"Kruskal", "Classic"};
+/*
 static const gchar *const groups_lbl[] = {
   "Within groups",
   "Between groups",
   "Anchors scale",
   "Anchors fixed"};
+*/
+static const gchar *const groups_lbl[] = {
+  "Use all distances",
+  "Use distances within groups",
+  "Use distances between groups",
+};
 static const gchar *const constrained_lbl[] = {
   "No variables frozen",
   "First variable frozen",
@@ -106,7 +116,7 @@ show_ggvis_window (GtkWidget *widget, PluginInstance *inst)
   if (inst->data == NULL) {
     ggvisd *ggv = (ggvisd *) g_malloc (sizeof (ggvisd));
 
-    ggvis_init (ggv);
+    ggvis_init (ggv, inst->gg);
     ggv_histogram_init (ggv, inst->gg);
 
     create_ggvis_window (ggv, inst);
@@ -189,12 +199,14 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   GtkWidget *window, *main_vbox, *vbox_params;
   GtkWidget *notebook, *varnotebook, *opt, *metric_opt;
   GtkWidget *label, *frame, *btn, *vbox, *hbox, *vb, *hscale, *table, *hb;
+  GtkWidget *radio1, *radio2, *radio3;
+  /* GtkWidget *radio4; */
+  GSList *group;
   GtkObject *adj, *Dtarget_adj, *isotonic_mix_adj;
   gint top;
   GtkAccelGroup *ggv_accel_group;
   GtkWidget *menubar;
   GtkTooltips *tips;
-  GtkWidget *entry;
   /*-- for lists of datads --*/
   gchar *clist_titles[2] = {"node sets", "edge sets"};
   datad *d;
@@ -299,10 +311,173 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gtk_container_add (GTK_CONTAINER (swin), clist);
   gtk_box_pack_start (GTK_BOX (hbox), swin, true, true, 2);
 
-
-
   label = gtk_label_new ("Specify datasets");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), hbox, label);
+
+/*-- TaskDef controls --*/
+/*
+  vbox = gtk_vbox_new (false, 1);
+  gtk_container_set_border_width (GTK_CONTAINER (vbox), 5);
+
+  table = gtk_table_new (4, 4, false);
+  gtk_container_set_border_width (GTK_CONTAINER (table), 2);
+
+  gtk_table_attach (GTK_TABLE (table),
+    gtk_label_new ("Graph completion"),
+    2, 4, 0, 1,
+    (GtkAttachOptions) (GTK_FILL|GTK_EXPAND), 
+    (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
+    1, 1);
+  gtk_table_attach (GTK_TABLE (table),
+    gtk_label_new ("No"),
+    2, 3, 1, 2,
+    (GtkAttachOptions) (GTK_FILL|GTK_EXPAND), 
+    (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
+    1, 1);
+  gtk_table_attach (GTK_TABLE (table),
+    gtk_label_new ("Yes"),
+    3, 4, 1, 2,
+    (GtkAttachOptions) (GTK_FILL|GTK_EXPAND), 
+    (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
+    1, 1);
+
+  gtk_table_attach (GTK_TABLE (table),
+    gtk_label_new ("Weights"),
+    0, 1, 2, 4,
+    (GtkAttachOptions) (GTK_FILL|GTK_EXPAND), 
+    (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
+    1, 1);
+  gtk_table_attach (GTK_TABLE (table),
+    gtk_label_new ("Yes"),
+    1, 2, 2, 3,
+    (GtkAttachOptions) (GTK_FILL|GTK_EXPAND), 
+    (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
+    1, 1);
+  gtk_table_attach (GTK_TABLE (table),
+    gtk_label_new ("No"),
+    1, 2, 3, 4,
+    (GtkAttachOptions) (GTK_FILL|GTK_EXPAND), 
+    (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
+    1, 1);
+
+  radio1 = gtk_radio_button_new_with_label (NULL, "MDS");
+  group = gtk_radio_button_group (GTK_RADIO_BUTTON (radio1));
+  radio2 = gtk_radio_button_new_with_label (group, "graph layout"); 
+  radio3 = gtk_radio_button_new_with_label (group, "graph layout"); 
+  radio4 = gtk_radio_button_new_with_label (group, "graph layout"); 
+
+  gtk_table_attach (GTK_TABLE (table), radio1, 2, 3, 2, 3,
+    (GtkAttachOptions) (GTK_FILL|GTK_EXPAND), 
+    (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
+    1, 1);
+  gtk_table_attach (GTK_TABLE (table), radio2, 3, 4, 2, 3,
+    (GtkAttachOptions) (GTK_FILL|GTK_EXPAND), 
+    (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
+    1, 1);
+  gtk_table_attach (GTK_TABLE (table), radio3,  2, 3, 3, 4,
+    (GtkAttachOptions) (GTK_FILL|GTK_EXPAND), 
+    (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
+    1, 1);
+  gtk_table_attach (GTK_TABLE (table), radio4, 3, 4, 3, 4,
+    (GtkAttachOptions) (GTK_FILL|GTK_EXPAND), 
+    (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
+    1, 1);
+
+
+  gtk_box_pack_start (GTK_BOX (vbox), table, false, false, 1);
+
+  label = gtk_label_new ("Task:Take 1");
+  gtk_notebook_append_page (GTK_NOTEBOOK (notebook), vbox, label);
+*/
+
+/*-- TaskDef controls --*/
+/*
+  vbox = gtk_vbox_new (false, 1);
+  gtk_container_set_border_width (GTK_CONTAINER (vbox), 5);
+
+  radio1 = gtk_radio_button_new_with_label (NULL, "MDS");
+  group = gtk_radio_button_group (GTK_RADIO_BUTTON (radio1));
+  radio2 = gtk_radio_button_new_with_label (group, "graph layout: without weights, with distance completion"); 
+  radio3 = gtk_radio_button_new_with_label (group, "graph layout: with weights, with distance completion"); 
+  radio4 = gtk_radio_button_new_with_label (group, "graph layout: without weights, without distance completion"); 
+
+  gtk_box_pack_start (GTK_BOX (vbox), radio1, true, true, 2);
+  gtk_box_pack_start (GTK_BOX (vbox), radio2, true, true, 2);
+  gtk_box_pack_start (GTK_BOX (vbox), radio3, true, true, 2);
+  gtk_box_pack_start (GTK_BOX (vbox), radio4, true, true, 2);
+
+  label = gtk_label_new ("Task: Take 2");
+  gtk_notebook_append_page (GTK_NOTEBOOK (notebook), vbox, label);
+ */
+  /*-- TaskDef controls --*/
+
+  vbox = gtk_hbox_new (false, 1);
+  gtk_container_set_border_width (GTK_CONTAINER (vbox), 5);
+
+  frame = gtk_frame_new ("Task Definition");
+  gtk_container_set_border_width (GTK_CONTAINER (frame), 1);
+  gtk_box_pack_start (GTK_BOX (vbox), frame, true, true, 2);
+
+  vb = gtk_vbox_new (false, 1);
+  gtk_container_set_border_width (GTK_CONTAINER (vb), 3);
+  gtk_container_add (GTK_CONTAINER(frame), vb);
+
+  radio1 = gtk_radio_button_new_with_label (NULL, "MDS");
+  gtk_widget_set_name (GTK_WIDGET(radio1), "MDS");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), radio1,
+    "Perform multidimensional scaling (MDS) for the purpose of dissimilarity analysis; dissimilarities (distances) are provided as an edge variable.",
+    NULL);
+  group = gtk_radio_button_group (GTK_RADIO_BUTTON (radio1));
+  radio2 = gtk_radio_button_new_with_label (group, "Graph Layout");
+  gtk_widget_set_name (GTK_WIDGET(radio2), "GRAPH_LAYOUT");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), radio2,
+    "Perform multidimensional scaling (MDS) for the purpose of laying out a graph.",
+    NULL);
+
+  GTK_TOGGLE_BUTTON(radio1)->active = (ggv->mds_task == DissimAnalysis);
+  GTK_TOGGLE_BUTTON(radio2)->active = (ggv->mds_task == GraphLayout);
+
+  gtk_signal_connect (GTK_OBJECT (radio1), "toggled",
+    GTK_SIGNAL_FUNC (ggv_task_cb), inst);
+  gtk_signal_connect (GTK_OBJECT (radio2), "toggled",
+    GTK_SIGNAL_FUNC (ggv_task_cb), inst);
+
+  gtk_box_pack_start (GTK_BOX (vb), radio1, true, true, 2);
+  gtk_box_pack_start (GTK_BOX (vb), radio2, true, true, 2);
+
+  frame = gtk_frame_new ("Graph Layout Options");
+  gtk_container_set_border_width (GTK_CONTAINER (frame), 1);
+  gtk_box_pack_start (GTK_BOX (vbox), frame, true, true, 2);
+
+  vb = gtk_vbox_new (false, 1);
+  gtk_container_set_border_width (GTK_CONTAINER (vb), 3);
+  gtk_container_add (GTK_CONTAINER(frame), vb);
+
+  btn = gtk_check_button_new_with_label ("Use edge weights");
+  gtk_widget_set_name (GTK_WIDGET(btn), "MDS_WEIGHTS");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), btn,
+    "The distance matrix for a graph is the minimum number of edges connecting any pair of nodes.  These distances can be weighted if an edge variable is supplied.",
+    NULL);
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (btn), false);
+  gtk_widget_set_sensitive (btn, ggv->mds_task == GraphLayout);
+  gtk_signal_connect (GTK_OBJECT (btn), "toggled",
+    GTK_SIGNAL_FUNC (ggv_edge_weights_cb), inst);
+  gtk_box_pack_start (GTK_BOX (vb), btn, true, true, 2);
+
+  btn = gtk_check_button_new_with_label ("Complete graph distances");
+  gtk_widget_set_name (GTK_WIDGET(btn), "MDS_COMPLETE");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), btn,
+    "Fill in a missing D[i,j] using a shortest path algorithm when a path exists from i to j; if not checked, D[i,j] is treated as missing.",
+    NULL);
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(btn),
+    ggv->Dtarget_source == LinkDist);
+  gtk_widget_set_sensitive (btn, (ggv->mds_task == GraphLayout));
+  gtk_signal_connect (GTK_OBJECT (btn), "toggled",
+    GTK_SIGNAL_FUNC (ggv_complete_distances_cb), inst);
+  gtk_box_pack_start (GTK_BOX (vb), btn, true, true, 2);
+
+  label = gtk_label_new ("Task");
+  gtk_notebook_append_page (GTK_NOTEBOOK (notebook), vbox, label);
 
 /*-- "Definition of D" controls --*/
 
@@ -313,6 +488,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gtk_box_pack_start (GTK_BOX (hbox), vbox, false, false, 2);
 
   /*-- Option menu: Use edge distances or an edge variable --*/
+  /*
   opt = gtk_option_menu_new ();
   gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), opt,
     "To define the distance matrix D, use unweighted edges (typical for graphs) or the edge variable selected at right (typical for MDS data and weighted graphs)",
@@ -321,7 +497,9 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
     sizeof (dsource_lbl) / sizeof (gchar *),
     (GtkSignalFunc) ggv_dsource_cb, "PluginInst", inst);
   gtk_box_pack_start (GTK_BOX (vbox), opt, false, false, 2);
+  */
 
+  /*
   btn = gtk_check_button_new_with_label ("Complete distances ");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), btn,
     "Fill in a missing D[i,j] using a shortest path algorithm when a path exists from i to j; by default, D[i,j] is treated as missing.",
@@ -329,12 +507,17 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gtk_signal_connect (GTK_OBJECT (btn), "toggled",
     GTK_SIGNAL_FUNC (ggv_complete_distances_cb), inst);
   gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 2);
+  */
 
   /*-- include only edge sets.  --*/
+  /* Can I initialize this so that the first variable is selected? */
   varnotebook = create_variable_notebook (hbox,
     GTK_SELECTION_SINGLE, all_vartypes, edgesets_only,
     (GtkSignalFunc) NULL, inst->gg);
-
+  swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK (varnotebook), 0);
+  ggv->clist_dist = (GtkCList *) GTK_BIN(swin)->child;
+  if (ggv->mds_task == DissimAnalysis)
+    gtk_clist_select_row (ggv->clist_dist, 0, 0);
 
   /*-- Report on D --*/
   hb = gtk_hbox_new (false, 1);
@@ -343,7 +526,6 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   /*
    * create this button after the varnotebook, because it's
    *   necessary to get hold of the notebook in the button callback
-  */
   btn = gtk_button_new_with_label ("Populate D");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), btn,
     "Compute the new target distance matrix D.",
@@ -358,8 +540,9 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gtk_entry_set_editable (GTK_ENTRY (entry), false);
   gtk_entry_set_text (GTK_ENTRY (entry), "(uninitialized)");
   gtk_box_pack_start (GTK_BOX (hb), entry, false, false, 2);
+  */
 
-  label = gtk_label_new ("Definition of D");
+  label = gtk_label_new ("Dist");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), hbox, label);
 
 /*-- Run controls --*/
@@ -394,19 +577,10 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
     1, 1);
 
-  hbox = gtk_hbox_new (false, 1);
-  gtk_box_pack_start (GTK_BOX (vbox), hbox, false, false, 2);
-
   /* Run, step, reinit and scramble in an hbox */
 
-  /*-- run --*/
-  btn = gtk_check_button_new_with_label ("Run MDS");
-  gtk_widget_set_name (btn, "RunMDS");
-  gtk_widget_set_sensitive (btn, false);
-  gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 2);
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-    GTK_SIGNAL_FUNC (mds_run_cb), inst);
-
+  hbox = gtk_hbox_new (false, 1);
+  gtk_box_pack_start (GTK_BOX (vbox), hbox, false, false, 2);
 
   adj = gtk_adjustment_new (0.01, 0.0001, 0.2, 0.02, 0.2, 0.10);
   gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
@@ -422,10 +596,19 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
 
   btn = gtk_button_new_with_label ("Step");
   gtk_widget_set_name (btn, "Step");
-  gtk_widget_set_sensitive (btn, false);
+  gtk_widget_set_sensitive (btn, false);  /* make sensitive after
+					     running */
   gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 2);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
     GTK_SIGNAL_FUNC (mds_step_cb), inst);
+
+  /*-- run --*/
+  btn = gtk_check_button_new_with_label ("Run MDS");
+  gtk_widget_set_name (btn, "RunMDS");
+  /*gtk_widget_set_sensitive (btn, false);*/
+  gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 2);
+  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+    GTK_SIGNAL_FUNC (mds_run_cb), inst);
 
   label = gtk_label_new ("Run");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), vbox, label);
@@ -654,19 +837,55 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   vbox = gtk_vbox_new (false, 2);
   gtk_container_set_border_width (GTK_CONTAINER (vbox), 5);
   gtk_container_add (GTK_CONTAINER(frame), vbox);
-
+  /*
   btn = gtk_check_button_new_with_label ("Use brush groups");
   gtk_signal_connect (GTK_OBJECT (btn), "toggled",
     GTK_SIGNAL_FUNC (ggv_brush_groupsp_cb), inst);
   gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 2);
-
+  */
+  /*
   opt = gtk_option_menu_new ();
   populate_option_menu (opt, (gchar**) groups_lbl,
     sizeof (groups_lbl) / sizeof (gchar *),
     (GtkSignalFunc) ggv_brush_groups_opt_cb, "PluginInst", inst);
   gtk_box_pack_start (GTK_BOX (vbox), opt, false, false, 2);
+  */
+
+  radio1 = gtk_radio_button_new_with_label (NULL, groups_lbl[0]);
+  GTK_TOGGLE_BUTTON (radio1)->active = TRUE;
+  gtk_box_pack_start (GTK_BOX (vbox), radio1, TRUE, TRUE, 0);
+
+  group = gtk_radio_button_group (GTK_RADIO_BUTTON (radio1));
+  radio2 = gtk_radio_button_new_with_label (group, groups_lbl[1]);
+  gtk_box_pack_start (GTK_BOX (vbox), radio2, TRUE, TRUE, 0);
+  radio3 = gtk_radio_button_new_with_label (group, groups_lbl[2]);
+  gtk_box_pack_start (GTK_BOX (vbox), radio3, TRUE, TRUE, 0);
 
   label = gtk_label_new ("Groups");
+  gtk_notebook_append_page (GTK_NOTEBOOK (notebook), frame, label);
+
+  /*-- Anchor tab --*/
+  frame = gtk_frame_new ("Anchor");
+  gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
+
+  hbox = gtk_hbox_new (false, 2);
+  gtk_container_set_border_width (GTK_CONTAINER (hbox), 5);
+  gtk_container_add (GTK_CONTAINER(frame), hbox);
+
+  vbox = gtk_vbox_new (false, 2);
+  gtk_box_pack_start (GTK_BOX (hbox), vbox, false, false, 0);
+
+  radio1 = gtk_radio_button_new_with_label (NULL, "No anchor");
+  GTK_TOGGLE_BUTTON (radio1)->active = TRUE;
+  gtk_box_pack_start (GTK_BOX (vbox), radio1, TRUE, TRUE, 0);
+
+  group = gtk_radio_button_group (GTK_RADIO_BUTTON (radio1));
+  radio2 = gtk_radio_button_new_with_label (group, "Scaled");
+  gtk_box_pack_start (GTK_BOX (vbox), radio2, TRUE, TRUE, 0);
+  radio3 = gtk_radio_button_new_with_label (group, "Fixed");
+  gtk_box_pack_start (GTK_BOX (vbox), radio3, TRUE, TRUE, 0);
+
+  label = gtk_label_new ("Anchor");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), frame, label);
 
   /*-- Sensitivity Analysis --*/
