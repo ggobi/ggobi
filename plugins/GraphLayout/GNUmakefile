@@ -35,9 +35,18 @@ endif
 
 
 ifdef GRAPHVIZ
+
+ifndef GRAPHVIZ_INCLUDES
+   GRAPHVIZ_INCLUDES= $(shell $(DOTNEATO_CONFIG) --cflags)
+endif
+
+ifndef GRAPHVIZ_LIBS
+ GRAPHVIZ_LIBS= $(shell $(DOTNEATO_CONFIG) --libs)
+endif
+
  CFLAGS+=-Wno-unknown-pragmas
- CFLAGS+=-DGRAPHVIZ=1 $(shell $(DOTNEATO_CONFIG) --cflags)
- LDFLAGS+=$(shell $(DOTNEATO_CONFIG) --libs)
+ CFLAGS+=-DGRAPHVIZ=1 $(GRAPHVIZ_INCLUDES)
+ LDFLAGS+=$(GRAPHVIZ_LIBS)
 endif
 
 ifdef WITH_R

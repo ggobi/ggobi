@@ -25,7 +25,7 @@ gboolean isVTNumber(VARIANT *v);
 
 #define MY_V_DISPATCH(v)  V_DISPATCH(v)
 
-void readDataFile(gchar *fileName, InputDescription *desc, ggobid *gg);
+gboolean readDataFile(gchar *fileName, InputDescription *desc, ggobid *gg);
 
 extern void COMError(HRESULT hr);
 extern void GetScodeString(HRESULT hr, LPTSTR buf, int bufSize);
@@ -99,8 +99,8 @@ releaseVariants(VARIANT *vars, int n, gboolean release)
   }
 }
 
-/* datad * */
-void
+/* datad* */
+gboolean
 readDataFile(gchar *fileName, InputDescription *desc, ggobid *gg)
 {
   HRESULT hr;
@@ -117,6 +117,7 @@ readDataFile(gchar *fileName, InputDescription *desc, ggobid *gg)
   
   if(FAILED(hr)) {
     Error("Can't get Excel's class ID");
+    return(false);
   }
 
   if(fileName && fileName[0])
@@ -129,6 +130,7 @@ readDataFile(gchar *fileName, InputDescription *desc, ggobid *gg)
   if(FAILED(hr)) {
     COMError(hr);
     Error("Can't create Excel instance");
+    return(false);
   }
 
   IDispatch *books = getWorkbooks(iface);
@@ -249,12 +251,16 @@ getProperty(IDispatch *iface, BSTR name, VARIANT *v)
   HRESULT hr;
   DISPPARAMS params = {NULL, NULL, 0, 0};
   hr = iface->GetIDsOfNames(IID_NULL, &name, 1, LOCALE_USER_DEFAULT, &mid);
-  if(FAILED(hr))
+  if(FAILED(hr)) {
     Error("Can't get id of name");
+    return(S_FALSE);
+  }
 
   hr = iface->Invoke(mid, IID_NULL, LOCALE_USER_DEFAULT, INVOKE_PROPERTYGET, &params, v, NULL, NULL);
-  if(FAILED(hr))
-    Error("Can't get property");
+  if(FAILED(hr)) {
+    Error("Can't get property"); 
+    return(S_FALSE);
+  }
 
   return(hr);
 }
@@ -280,6 +286,7 @@ call(IDispatch *iface, BSTR name, VARIANT *args, int numArgs)
  hr = iface->Invoke(mid, IID_NULL, LOCALE_USER_DEFAULT, INVOKE_FUNC | INVOKE_PROPERTYGET, &params, &v, NULL, NULL);
  if(FAILED(hr)) {
     COMError(hr);
+    return(NULL);
  }
 
  IDispatch *ans = NULL;

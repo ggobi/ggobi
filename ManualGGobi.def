@@ -140,3 +140,6 @@ GGobi_getExtendedDisplayTypes
 GGobi_raiseWindow
 
 datad_record_ids_set
+
+read_xml_input_description
+

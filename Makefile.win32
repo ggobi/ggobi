@@ -293,9 +293,11 @@ tmp/ggobirc: notes/ggobirc-windows
 	if test ! -d tmp ; then mkdir tmp ; fi
 	cp notes/ggobirc-windows tmp/ggobirc
 
+include VersionInfo
+
 installer: tmp/ggobirc libs ggobi.iss ggobi.exe libggobi.a ggobi.dll
 	$(INNO) $(INNO_FLAGS) ggobi.iss
-	mv Output/setup.exe Output/ggobi.exe
+	mv Output/setup.exe Output/ggobi_${MAJOR_VERSION}.${MINOR_VERSION}-${PATCH_LEVEL}.exe
 
 # xmlConvert
 winggobi.zip: ggobi 

@@ -159,6 +159,8 @@ read_xml_input_description(const char * const fileName, const char * const modeN
   desc = (InputDescription*) g_malloc(sizeof(InputDescription));
   memset(desc, '\0', sizeof(InputDescription));
 
+  fprintf(stderr, "read_xml_input_description\n");fflush(stderr);
+
   desc->fileName = g_strdup(fileName);
   desc->mode = isURL(fileName) ? url_data : xml_data;
   desc->desc_read_input = &read_xml;	

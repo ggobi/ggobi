@@ -678,17 +678,16 @@ createGGobiInputPluginInfo(GGobiInputPluginInfo *info, GGobiPluginDetails *detai
   static HINSTANCE ggobiLibrary = NULL;
  
   if(!details->dllName && !details->library) {
-    g_printerr("Using ggobi as library\n");
+
     if(!ggobiLibrary) {
       ggobiLibrary = ggobi_dlopen(sessionOptions->cmdArgs[0], details);
-      g_printerr("Loaded ggobi as library %p\n", ggobiLibrary);
+
       if(!ggobiLibrary) {
 	char buf[1000];
 	g_printerr("Failed to load ggobi as library\n");
 	ggobi_dlerror(buf, plugin);
 	g_printerr(buf);
-      } else
-         g_printerr("Loaded ggobi as library\n");
+      }
     }
 
     details->library = ggobiLibrary;
@@ -747,6 +746,7 @@ getInputPluginSelections(ggobid *gg)
        for(i = 0; i < n; i++) {
            char buf[5000];
 	   plugin = g_list_nth_data(plugins, i);
+
 	   for(k = 0; k < plugin->info.i->numModeNames; k++) {
 /*XXX Need to free this. Catch destruction of the associated GtkList and free the elements of this list. */
    	       sprintf(buf, "%s (%s)", plugin->info.i->modeNames[k], plugin->details->name);
@@ -784,6 +784,10 @@ callInputPluginGetDescription(const gchar *fileName, const gchar *modeName, GGob
         GGobiInputPluginInfo *info;
         InputGetDescription f;
 
+	if(sessionOptions->verbose == GGOBI_VERBOSE) { 
+	  g_printerr("Checking input plugin %s.\n", plugin->details->name);   
+	}
+
 	info = plugin->info.i;
 	if(info->get_description_f)
     	      f = info->get_description_f;
@@ -796,6 +800,8 @@ callInputPluginGetDescription(const gchar *fileName, const gchar *modeName, GGob
             desc = f(fileName, modeName, gg, plugin);
             if (desc)
               return (desc);
+	} else if(sessionOptions->verbose == GGOBI_VERBOSE) { 
+		g_printerr("No handler routine for plugin %s.: %s\n", plugin->details->name, info->getDescription);   
 	}
 
 	return(NULL);
