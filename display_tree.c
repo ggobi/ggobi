@@ -27,6 +27,9 @@ update_display_tree_plots_by_variable(ggobid *gg, datad *d, gint whichVar, splot
     GtkWidget *subTree;
     GList *kids;
 
+    if (tree->tree == NULL)
+      return;
+
     n = g_list_length(gg->displays);
     for(i =0; i < n; i++) {
         dpy = (displayd *) g_list_nth_data(gg->displays, i);
