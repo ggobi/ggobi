@@ -447,9 +447,24 @@ void radial_center_set_cb (ggobid *gg, gint index,
     "CENTERNODE");
 
   if (state == STICKY && index >= 0) {
+    /*-- remove all sticky labels but the last one --*/
+    gint i, nsticky = g_slist_length (d->sticky_ids);
+    for (i = 0; i<nsticky-1; i++) {
+      d->sticky_ids = g_slist_remove (d->sticky_ids,
+      g_slist_nth_data (d->sticky_ids, 0));
+        sticky_id_link_by_id (STICKY_REMOVE, 0, d, gg);
+      gtk_signal_emit(GTK_OBJECT(gg),
+        GGobiSignals[STICKY_POINT_REMOVED_SIGNAL], 0,
+        (gint) UNSTICKY, d);
+    }
+
     gtk_entry_set_text (GTK_ENTRY (entry),
       (gchar *) g_array_index (d->rowlab, gchar *, index));
     gl->centerNodeIndex = index;
+
+    if (gl->radialAutoUpdate) {
+       do_radial(gl, gl->dsrc, gl->e, gg->current_display, gg);
+    }
   }
 }
 
@@ -499,10 +514,6 @@ void radial_highlight_sticky_edges (ggobid *gg, gint index, gint state,
       e->glyph.els[k].size = e->glyph_now.els[k].size = gg->glyph_id.size;
       e->glyph.els[k].type = e->glyph_now.els[k].type = gg->glyph_id.type;
     } else {
-/*
-      gint a = d->rowid.idv.els[e->edge.endpoints[k].a];
-      gint b = d->rowid.idv.els[e->edge.endpoints[k].b];
-*/
       gint a, b;
       endpointsd *endpoints;
       endpoints = resolveEdgePoints(e, d);
@@ -870,11 +881,10 @@ setNodePositions (glayoutd *gl, datad *d) {
 }
 
 void
-do_radial_plugin(PluginInstance *inst, gint center, datad *d, datad *e, displayd *dsp, ggobid *gg)
+do_radial_plugin (PluginInstance *inst, gint center, datad *d, datad *e, displayd *dsp, ggobid *gg)
 {
    glayoutd *gl;
    gl = glayoutFromInst (inst);
-
 
    if(!gl) {
     gl = (glayoutd *) g_malloc (sizeof (glayoutd));

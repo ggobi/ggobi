@@ -111,13 +111,11 @@ glayout_clist_datad_added_cb (ggobid *gg, datad *d, void *clist)
    * node set and an edge set. ???
    */
   if (strcmp (clname, "nodeset") == 0 && d->rowIds) {
-    g_printerr ("adding node set %s\n", d->name);
     row[0] = g_strdup (d->name);
     gtk_clist_append (GTK_CLIST (GTK_OBJECT(clist)), row);
     g_free (row[0]);
   }
   if (strcmp (clname, "edgeset") == 0) {
-    g_printerr ("adding edge set %s\n", d->name);
     if (d->edge.n > 0) {
       g_printerr ("... with %d edges\n", d->edge.n);
       row[0] = g_strdup (d->name);
