@@ -40,10 +40,10 @@ tsplot_display_menus_make (displayd *display,
     func, GINT_TO_POINTER (DOPT_POINTS), on, gg);
   CreateMenuCheck (display, options_menu, "Show lines",
     func, GINT_TO_POINTER (DOPT_SEGS), on, gg);
+/*
   CreateMenuCheck (display, options_menu, "Show missings",
     func, GINT_TO_POINTER (DOPT_MISSINGS), on, gg);
-  CreateMenuCheck (display, options_menu, "Show gridlines",
-    func, GINT_TO_POINTER (DOPT_GRIDLINES), off, gg);
+*/
   CreateMenuCheck (display, options_menu, "Show axes",
     func, GINT_TO_POINTER (DOPT_AXES), on, gg);
 

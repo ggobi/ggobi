@@ -176,8 +176,6 @@ scatterplot_display_menus_make (displayd *display,
   CreateMenuCheck (display, options_menu, "Show missings",
     func, GINT_TO_POINTER (DOPT_MISSINGS), on, gg);
 */
-  CreateMenuCheck (display, options_menu, "Show gridlines",
-    func, GINT_TO_POINTER (DOPT_GRIDLINES), off, gg);
 
   /* Add a separator */
   CreateMenuItem (options_menu, NULL, "", "", NULL, NULL, NULL, NULL, gg);

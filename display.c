@@ -28,7 +28,6 @@ DisplayOptions DefaultDisplayOptions = {
                                          false, /* edges_undirected_show_p */
                                          true,  /* edges_show_p*/
                                          true,  /* missings_show_p  */
-                                         false, /* gridlines_show_p */
                                          true,  /* axes_show_p */
                                          true,  /* axes_center_p */
                                          true,  /* double_buffer_p */
@@ -142,9 +141,6 @@ display_options_cb (GtkCheckMenuItem *w, guint action)
 
         display_plot (display, FULL, gg);
       }
-      break;
-    case DOPT_GRIDLINES:
-      display->options.gridlines_show_p = w->active;
       break;
     case DOPT_AXES:
       display->options.axes_show_p = w->active;

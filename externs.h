@@ -147,6 +147,7 @@ void draw_glyph (GdkDrawable *, glyphv *, icoords *, gint, ggobid *);
 gint dsvd (gfloat **a, gint m, gint n, gfloat *w, gfloat **v);
 void edges_alloc (gint, datad *, ggobid *);
 void edges_create (datad *, ggobid *);
+void edges_create_defaults (datad *d, ggobid *gg);
 void edges_free (datad *, ggobid *);
 gboolean edges_read (InputDescription *desc, gboolean, datad *, ggobid *);
 void eigenvals_get (gfloat *, datad *);

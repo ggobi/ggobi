@@ -189,7 +189,6 @@ typedef struct {
  gboolean edges_show_p;               /* parcoords */
  gboolean missings_show_p;            /* scatterplot, scatmat, parcoords */
 
- gboolean gridlines_show_p;           /* scatterplot, scatmat, parcoords */
  gboolean axes_show_p;                /* scatterplot, scatmat, parcoords */
  gboolean axes_center_p;              /* scatterplot */
 

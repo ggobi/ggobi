@@ -115,9 +115,6 @@ main_display_options_cb (ggobid *gg, guint action, GtkCheckMenuItem *w)
     break;
 
 /*
-    case 3:
-      g_printerr ("toggle gridlines\n");
-      break;
     case 4:
       g_printerr ("toggle centering axes\n");
       break;

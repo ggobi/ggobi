@@ -464,8 +464,12 @@ open_rename_dialog (GtkWidget *w, ggobid *gg)
   selected_vars = (gint *) g_malloc (d->ncols * sizeof (gint));
   nselected_vars = selected_cols_get (selected_vars, d, gg);
 
-  if (nselected_vars == 0)
-    return;
+  if (nselected_vars == 0) {
+    gchar *message = g_strdup_printf ("You must select one variable.\n");
+    quick_message (message, false);
+    g_free (message);
+/**/return;
+  }
 
   dialog = gtk_dialog_new ();
   gtk_window_set_title (GTK_WINDOW (dialog), "Rename one variable");

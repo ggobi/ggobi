@@ -108,16 +108,14 @@ fileset_read (const gchar *ldata_in, DataMode data_mode, ggobid *gg)
     break;
 
     case binary_data:
-    g_printerr("No support for MySQL\n");
+      g_printerr("No support for MySQL\n");
     break;
 
     case Sprocess_data:
     break;
 
     case ascii_data:
-    {
       read_ascii_data(desc, gg);
-    }
     break;
    default:
      g_printerr("Unknown data type in fileset_read\n");

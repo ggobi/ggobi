@@ -35,7 +35,8 @@ static void ash_smoothness_cb (GtkAdjustment *adj, ggobid *gg)
   /*-- adj->value ranges from .01 to .5; min value for nASHes = 1 --*/
   cpanel->nASHes = (gint) ((gfloat) cpanel->nbins * (adj->value / 2.0));
 
-  display_tailpipe (gg->current_display, gg);
+  if (cpanel->p1d_type == ASH)
+    display_tailpipe (gg->current_display, gg);
 }
 
 static void cycle_cb (GtkToggleButton *button, ggobid* gg)

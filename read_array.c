@@ -346,35 +346,38 @@ read_ascii (FILE *fp, datad *d, ggobid *gg)
 gboolean
 read_ascii_data(InputDescription *desc, ggobid *gg)
 {
-      datad *d; /* datad_new (gg);*/
+  datad *d; /* datad_new (gg);*/
 #ifdef USE_CLASSES
-      d  = new datad (gg);
+  d  = new datad (gg);
 #else
-      d = datad_new (NULL, gg);
+  d = datad_new (NULL, gg);
 #endif
-      if (array_read (d, desc, gg) == false) {
-        /* Somewhere, we have to arrange to throw away the datad
-         * and get it out of the list.
-        */
-        return(false);
-      }
+  if (array_read (d, desc, gg) == false) {
+    /* Somewhere, we have to arrange to throw away the datad
+     * and get it out of the list.
+    */
+    return(false);
+  }
 
-      d->nrows_in_plot = d->nrows;    /*-- for now --*/
-      d->nrgroups = 0;                /*-- for now --*/
+  d->nrows_in_plot = d->nrows;    /*-- for now --*/
+  d->nrgroups = 0;                /*-- for now --*/
 
-      missing_values_read (desc, true, d, gg);
+  missing_values_read (desc, true, d, gg);
       
-      collabels_read (desc, true, d, gg);
-      rowlabels_read (desc, true, d, gg);
+  collabels_read (desc, true, d, gg);
+  rowlabels_read (desc, true, d, gg);
       
-      point_glyphs_read (desc, true, d, gg);
-      point_colors_read (desc, true, d, gg);
-      hidden_read (desc, true, d, gg);
+  point_glyphs_read (desc, true, d, gg);
+  point_colors_read (desc, true, d, gg);
+  hidden_read (desc, true, d, gg);
     
-      edges_read (desc, true, d, gg);
-      line_colors_read (desc, true, d, gg);
+  /*-- if reading lines failed for any reason, construct default edges --*/
+  if (edges_read (desc, true, d, gg) == false || d->nedges == 0) {
+    edges_create_defaults (d, gg);
+  }
+  line_colors_read (desc, true, d, gg);
 
-   return (true);
+  return (true);
 }
 
 /*----------------------------------------------------------------------*/

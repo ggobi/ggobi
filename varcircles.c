@@ -452,7 +452,7 @@ varcircle_create (gint k, datad *d, ggobid *gg)
   lbl = gtk_button_new_with_label (d->vartable[k].collab);
   d->vcirc_ui.label = g_slist_append (d->vcirc_ui.label, lbl);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
-    lbl, "Click left to select or deselect", NULL);
+    lbl, "Click left on the circle to select or deselect", NULL);
   gtk_object_set_data (GTK_OBJECT (lbl), "datad", d);
   GGobi_widget_set (GTK_WIDGET (lbl), gg, true);
   gtk_container_add (GTK_CONTAINER (vb), lbl);

@@ -97,6 +97,14 @@ datad_init (datad *d, ggobid *gg, gboolean cleanup)
     varpanel_clear (d, gg);
   }
 
+  /*-- if no edges were supplied, initialize with defaults --*/
+  if (d->nedges == 0) {
+    edges_create_defaults (d, gg);
+    br_line_color_init (d, gg);
+  }
+  /*-- --*/
+
+
   varpanel_checkboxes_populate (d, gg);    /*-- checkboxes --*/
   varcircles_populate (d, gg);  /*-- circles: build but don't show --*/
 

@@ -677,7 +677,6 @@ line_colors_read (InputDescription *desc, gboolean reinit, datad *d, ggobid *gg)
   int whichSuffix;
 
   if (reinit) {
-    /*  br_line_color_alloc (gg); */
     br_line_vectors_check_size (d->nedges, d, gg);
   }
 
@@ -744,7 +743,7 @@ edges_read (InputDescription *desc, gboolean startup, datad *d, ggobid *gg)
       desc->fileName[0] == '\0' ||
       strcmp (desc->fileName, "stdin") == 0)   
   {
-    return(true);
+    return (true);
 
   } else {
 
@@ -823,14 +822,6 @@ edges_read (InputDescription *desc, gboolean startup, datad *d, ggobid *gg)
 
     g_free(fileName);
   }
-
-  /*-- if reading lines failed for any reason, construct default edges --*/
-/*
-  if (!ok) {
-    extern void edges_create_defaults (datad *d, ggobid *gg);
-    edges_create_defaults (d, gg);
-  }
-*/
 
   return (ok);
 }
