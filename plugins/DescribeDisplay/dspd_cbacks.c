@@ -22,7 +22,6 @@
    Scaling:  sp->scale.{x,y}
       screen=(planar - pmid) * (max*(scale/2)) / PRECISION1
       screen += max/2
-  Tour:  Waiting to hear from Di about the appropriate data structures.
 */
 
 /* In sp_plot_edges.c */
@@ -175,10 +174,10 @@ scale_convert (splotd *sp, gint ival, gint max, greal mid, gint scale)
       # the parameters corresponding to the current projection
       p1dparams = list(label="", orientation=""),
       xyparams = list(xlabel="", ylabel="",),
-      tour1d.params = list(label="", ),
-      tour2d.params = list(labels="", ),
-      tour3d.params = list(labels="", ),
-      tour2by1d.params = list(),
+      tour1dparams = list(F, labels, ranges),
+      tour2dparams = list(F, labels, ranges),
+      tour3dparams = list(F, labels, ranges),
+      tour2x1dparams = list(xF, xlabels, xranges, yF, ylabels, yranges),
 */
 void
 describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
@@ -367,12 +366,76 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
     fprintf (fp, "ylabel='%s',", vt->collab_tform);
     CLOSE_LIST(fp);  /* xyplotparams */
   } else if (projection == TOUR1D) {
+    /* F, variable labels, variable lims */
+    OPEN_NAMED_LIST(fp, "tour1dparams");
+    /* F */
+    OPEN_NAMED_C(fp, "F");
+    for (k=0; k<display->t1d.nsubset; k++) {
+      j = display->t1d.subset_vars.els[k];
+      fprintf (fp, "%.3f,", display->t1d.F.vals[0][j]);
+    }
+    CLOSE_C(fp);
+    ADD_COMMA(fp);
+    /* variable labels */
+    OPEN_NAMED_C(fp, "labels");
+    for (k=0; k<display->t1d.nsubset; k++) {
+      j = display->t1d.subset_vars.els[k];
+      vt = vartable_element_get (j, d);
+      fprintf (fp, "'%s',", vt->collab_tform);
+    }
+    CLOSE_C(fp);
+    ADD_COMMA(fp);
+    /* variable ranges */
+    OPEN_NAMED_LIST(fp, "ranges");
+    for (k=0; k<display->t1d.nsubset; k++) {
+      j = display->t1d.subset_vars.els[k];
+      vt = vartable_element_get (j, d);
+      OPEN_C(fp);
+      fprintf (fp, "%.3f, %.3f", vt->lim.min, vt->lim.max);
+      CLOSE_C(fp);
+      ADD_COMMA(fp);
+    }
+    CLOSE_LIST(fp);  /* tour1d ranges */
+    CLOSE_LIST(fp);  /* tour1dparams */
   } else if (projection == TOUR2D3) {
+    /* F, variable labels, variable lims */
+    OPEN_NAMED_LIST(fp, "tour2d3params");
+    /* F */
+    OPEN_NAMED_C(fp, "F");
+    for (k=0; k<display->t2d3.nsubset; k++) {
+      j = display->t2d3.subset_vars.els[k];
+      fprintf (fp, "%.3f,", display->t2d3.F.vals[0][j]);
+    }
+    for (k=0; k<display->t2d3.nsubset; k++) {
+      j = display->t2d3.subset_vars.els[k];
+      fprintf (fp, "%.3f,", display->t2d3.F.vals[1][j]);
+    }
+    CLOSE_C(fp);
+    ADD_COMMA(fp);
+    /* variable labels */
+    OPEN_NAMED_C(fp, "labels");
+    for (k=0; k<display->t2d3.nsubset; k++) {
+      j = display->t2d3.subset_vars.els[k];
+      vt = vartable_element_get (j, d);
+      fprintf (fp, "'%s',", vt->collab_tform);
+    }
+    CLOSE_C(fp);
+    ADD_COMMA(fp);
+    /* variable ranges */
+    OPEN_NAMED_LIST(fp, "ranges");
+    for (k=0; k<display->t2d3.nsubset; k++) {
+      j = display->t2d3.subset_vars.els[k];
+      vt = vartable_element_get (j, d);
+      OPEN_C(fp);
+      fprintf (fp, "%.3f, %.3f", vt->lim.min, vt->lim.max);
+      CLOSE_C(fp);
+      ADD_COMMA(fp);
+    }
+    CLOSE_LIST(fp);  /* tour2d3 ranges */
+    CLOSE_LIST(fp);  /* tour2d3params */
   } else if (projection == TOUR2D) {
-    /* n, F, variable labels, variable lims */
+    /* F, variable labels, variable lims */
     OPEN_NAMED_LIST(fp, "tour2dparams");
-    /* n */
-    fprintf (fp, "n=%d,", display->t2d.nsubset);
     /* F */
     OPEN_NAMED_C(fp, "F");
     for (k=0; k<display->t2d.nsubset; k++) {
@@ -383,7 +446,7 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
       j = display->t2d.subset_vars.els[k];
       fprintf (fp, "%.3f,", display->t2d.F.vals[1][j]);
     }
-    CLOSE_C(fp);
+    CLOSE_C(fp);  /* F */
     ADD_COMMA(fp);
     /* variable labels */
     OPEN_NAMED_C(fp, "labels");
@@ -392,7 +455,7 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
       vt = vartable_element_get (j, d);
       fprintf (fp, "'%s',", vt->collab_tform);
     }
-    CLOSE_C(fp);
+    CLOSE_C(fp); /* labels */
     ADD_COMMA(fp);
     /* variable ranges */
     OPEN_NAMED_LIST(fp, "ranges");
@@ -404,10 +467,72 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
       CLOSE_C(fp);
       ADD_COMMA(fp);
     }
-    CLOSE_C(fp);
-
+    CLOSE_LIST(fp);   /* tour2d ranges */
     CLOSE_LIST(fp);  /* tour2dparams */
   } else if (projection == COTOUR) {
+    /* xF, x variable labels, x variable lims; ditto for y */
+    OPEN_NAMED_LIST(fp, "tour2x1dparams");
+    /* xF */
+    OPEN_NAMED_C(fp, "xF");
+    for (k=0; k<display->tcorr1.nsubset; k++) {
+      j = display->tcorr1.subset_vars.els[k];
+      fprintf (fp, "%.3f,", display->tcorr1.F.vals[0][j]);
+    }
+    CLOSE_C(fp);
+    ADD_COMMA(fp);
+    /* variable labels */
+    OPEN_NAMED_C(fp, "xlabels");
+    for (k=0; k<display->tcorr1.nsubset; k++) {
+      j = display->tcorr1.subset_vars.els[k];
+      vt = vartable_element_get (j, d);
+      fprintf (fp, "'%s',", vt->collab_tform);
+    }
+    CLOSE_C(fp);
+    ADD_COMMA(fp);
+    /* x variable ranges */
+    OPEN_NAMED_LIST(fp, "xranges");
+    for (k=0; k<display->tcorr1.nsubset; k++) {
+      j = display->tcorr1.subset_vars.els[k];
+      vt = vartable_element_get (j, d);
+      OPEN_C(fp);
+      fprintf (fp, "%.3f, %.3f", vt->lim.min, vt->lim.max);
+      CLOSE_C(fp);
+      ADD_COMMA(fp);
+    }
+    CLOSE_LIST(fp);  /* tour2x1d, x ranges */
+
+    ADD_COMMA(fp);  ADD_CR(fp);
+
+    /* yF */
+    OPEN_NAMED_C(fp, "yF");
+    for (k=0; k<display->tcorr2.nsubset; k++) {
+      j = display->tcorr2.subset_vars.els[k];
+      fprintf (fp, "%.3f,", display->tcorr2.F.vals[0][j]);
+    }
+    CLOSE_C(fp);
+    ADD_COMMA(fp);
+    /* y variable labels */
+    OPEN_NAMED_C(fp, "ylabels");
+    for (k=0; k<display->tcorr2.nsubset; k++) {
+      j = display->tcorr2.subset_vars.els[k];
+      vt = vartable_element_get (j, d);
+      fprintf (fp, "'%s',", vt->collab_tform);
+    }
+    CLOSE_C(fp);
+    ADD_COMMA(fp);
+    /* y variable ranges */
+    OPEN_NAMED_LIST(fp, "yranges");
+    for (k=0; k<display->tcorr2.nsubset; k++) {
+      j = display->tcorr2.subset_vars.els[k];
+      vt = vartable_element_get (j, d);
+      OPEN_C(fp);
+      fprintf (fp, "%.3f, %.3f", vt->lim.min, vt->lim.max);
+      CLOSE_C(fp);
+      ADD_COMMA(fp);
+    }
+    CLOSE_LIST(fp);  /* tour2x1d, y ranges */
+
+    CLOSE_LIST(fp);  /* tour2x1dparams */
   }
   ADD_COMMA(fp);
 
