@@ -372,7 +372,7 @@ void t2d_ppdraw(gfloat pp_indx_val, ggobid *gg)
 
   if (dsp->t2d_indx_min == dsp->t2d_indx_max) dsp->t2d_indx_min *= 0.9999;
 
-  g_strdup_printf (label,"PP index: (%3.1f) %5.3f (%3.1f)",
+  label = g_strdup_printf ("PP index: (%3.1f) %5.3f (%3.1f)",
     dsp->t2d_indx_min, dsp->t2d_ppindx_mat[dsp->t2d_ppindx_count], dsp->t2d_indx_max);
   gtk_label_set_text(GTK_LABEL(dsp->t2d_pplabel),label);
 
