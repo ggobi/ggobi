@@ -679,10 +679,10 @@ setGlyph(const xmlChar **attrs, XMLParserData *data, gint i)
     if (tmp)
       xml_warning ("glyphSize", tmp, "Out of range", data);
   } else {
-   if (i < 0)
-     data->defaults.glyphSize = value;
-   else
-     d->glyph.els[i].size = d->glyph_now.els[i].size 
+     if (i < 0) {
+      data->defaults.glyphSize = value;
+    } else
+      d->glyph.els[i].size = d->glyph_now.els[i].size 
              = d->glyph_prev.els[i].size = value;
   }
 
@@ -723,18 +723,21 @@ setGlyph(const xmlChar **attrs, XMLParserData *data, gint i)
               d->glyph_prev.els[i].type = value;       
       } else {
         value = atoi(next);
-        if(i < 0)
-          data->defaults.glyphSize = value;
-        else
+        if(i < 0) { 
+          if(data->defaults.glyphSize < 0) 
+	    data->defaults.glyphSize = value;
+        } else
           d->glyph.els[i].size = d->glyph_now.els[i].size =
             d->glyph_prev.els[i].size = value;     
       }
      j++;
      next = strtok(NULL, " ");
     }
-
   }
 
+  if(i < 0) {
+    fprintf(stderr, "default glyph size %d\n",value);fflush(stderr);
+  }
   return (value != -1);
 }
 

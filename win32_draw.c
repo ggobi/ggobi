@@ -150,7 +150,7 @@ build_rect (icoords *pos, gint nrow, rectd * rectv, gint nrect, gshort size)
 {
   rectv[nrect].x = (gushort) (pos[nrow].x - size);
   rectv[nrect].y = (gushort) (pos[nrow].y - size);
-  rectv[nrect].width = rectv[nrect].height = 2*size;
+  rectv[nrect].width = rectv[nrect].height = 2*(size+1);
 }
 
 void

@@ -22,20 +22,24 @@ Name: "desktopicon"; Description: "Create a &desktop icon"; GroupDescription: "A
 [Files]
 Source: "C:\cygwin\home\duncan\Projects\ggobi\ggobi.exe"; DestDir: "{app}"; CopyMode: alwaysoverwrite
 Source: "C:\cygwin\home\duncan\libs\*.*"; DestDir: "{app}"; CopyMode: alwaysoverwrite
-; Source: "C:\cygwin\home\duncan\libs\lib\*.dll"; DestDir: "{app}"; CopyMode: alwaysoverwrite
-Source: "C:\cygwin\home\duncan\Projects\ggobi\data\*.*"; DestDir: "{app}"; CopyMode: alwaysoverwrite
+Source: "C:\cygwin\home\duncan\Projects\ggobi\data\*.*"; DestDir: "{app}\data"; CopyMode: alwaysoverwrite
 Source: "C:\cygwin\home\duncan\Projects\ggobi\notes\*.html"; DestDir: "{app}\Docs"; CopyMode: alwaysoverwrite
+Source: "C:\cygwin\home\duncan\Projects\ggobi\notes\ggobi.ico"; DestDir: "{app}"; CopyMode: alwaysoverwrite
+
 
 [INI]
 Filename: "{app}\ggobi.url"; Section: "InternetShortcut"; Key: "URL"; String: "http://www.ggobi.org"
 
 [Icons]
-Name: "{group}\ggobi"; Filename: "{app}\ggobi.exe"
+Name: "{group}\ggobi"; Filename: "{app}\ggobi.exe"; IconFilename: "{app}\ggobi.ico"
 Name: "{group}\ggobi on the Web"; Filename: "{app}\ggobi.url"
-Name: "{userdesktop}\ggobi"; Filename: "{app}\ggobi.exe"; MinVersion: 4,4; Tasks: desktopicon
+Name: "{userdesktop}\ggobi"; Filename: "{app}\ggobi.exe"; IconFilename: "{app}\ggobi.ico"; MinVersion: 4,4; Tasks: desktopicon
+;Name: "{userdesktop}\ggobi"; Filename: "{app}\ggobi.exe"; IconFilename: "C:\WINDOWS\WINUPD.ICO"; MinVersion: 4,4; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\ggobi.exe"; Parameters: "flea.xml"; Description: "Launch ggobi"; Flags: nowait postinstall skipifsilent runminimized
+; Must put the "" around the data file since otherwise app may get broken into
+; multiple words such as c:\Program Files\data\flea.xml, counting as two arguments!
+Filename: "{app}\ggobi.exe"; Parameters: """{app}\data\flea.xml"""; Description: "Launch ggobi"; Flags: nowait postinstall skipifsilent runminimized
 
 [UninstallDelete]
 Type: files; Name: "{app}\ggobi.url"

@@ -14,7 +14,9 @@ include local.config
   # change this to .
 LOCAL_INCLUDES=../include
 # -g -ggdb
-CFLAGS= -O2 -ansi -Wall  -mno-cygwin -mpentium \
+DEBUG=-g
+#DEBUG=-O2
+CFLAGS= $(DEBUG) -ansi -Wall  -mno-cygwin -mpentium \
          -fnative-struct -mwindows   $(INCLUDES:%=-I%) \
          -DWIN32=1
 
@@ -124,7 +126,7 @@ DEF=$(DLL:.dll=.def)
 LIBS= -L$(GDK_LIB_DIR) -L$(GTK_LIB_DIR) -L$(GLIB_LIB_DIR) -lgdk-1.3 -lgtk-1.3 -lglib-1.3 
 
 ggobi: $(OB)
-	$(CC) -o ggobi $(OB) $(LIBS) $(XML_LIBS) -lm 
+	$(CC) $(DEBUG) -o ggobi $(OB) $(LIBS) $(XML_LIBS) -lm 
                 
 
 dll: $(DLL)
