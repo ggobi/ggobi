@@ -39,6 +39,9 @@ typedef struct _XMLUserData {
 
   gint current_color;    /* The index of the current element
                             being processed in the colormap */
+
+    xmlChar *recordString;
+    int recordStringLength;
  
   /* Flag that says we are reading color entries from another file via a
    * sub-parser.  This allows us to reuse the same instance of user data

@@ -72,6 +72,7 @@
 void startXMLElement(void *user_data, const xmlChar *name, const xmlChar **attrs);
 void endXMLElement(void *user_data, const xmlChar *name);
 void Characters(void *user_data, const xmlChar *ch, gint len);
+void cumulateRecordData(XMLParserData *data, const xmlChar *ch, gint len);
 
 const gchar *XMLSuffixes[] = {"", ".xml", ".xml.gz", ".xmlz"};
 
@@ -229,6 +230,9 @@ initParserData(XMLParserData *data, xmlSAXHandlerPtr handler, ggobid *gg)
   data->defaults.hidden = false;
 
   data->recordLabelsVariable = -1;
+
+  data->recordString = NULL;
+  data->recordStringLength = 0;
 }
 
 void 
@@ -352,6 +356,14 @@ addLevel(XMLParserData *data, const gchar *c, gint len)
   g_array_append_val(el->level_names, val);
 }
 
+void
+resetRecordInfo(XMLParserData *data)
+{
+    if(data->recordString)
+	g_free(data->recordString);
+    data->recordString = NULL;
+    data->recordStringLength = 0;
+}
 
 void endXMLElement(void *user_data, const xmlChar *name)
 {
@@ -360,7 +372,9 @@ void endXMLElement(void *user_data, const xmlChar *name)
 
   switch(type) {
     case RECORD:
-      data->current_record++;
+	setRecordValues(data, data->recordString, data->recordStringLength);
+	data->current_record++;
+        resetRecordInfo(data);
     break;
     case VARIABLE:
     case REAL_VARIABLE:
@@ -467,7 +481,12 @@ Characters(void *user_data, const xmlChar *ch, gint len)
 
   switch(data->state) {
     case RECORD:
-      setRecordValues (data, c, dlen);
+	/* Now we call
+            setRecordValues (data, c, dlen); 
+           after gathering the entire string for the record so that we
+           don't get bizarre splits such as  "1.3 1.4 1"  followed by ".4..."
+         */
+        cumulateRecordData(data, c, dlen);
     break;
     case VARIABLE:
     case CATEGORICAL_VARIABLE:
@@ -502,6 +521,17 @@ skipWhiteSpace(const xmlChar *ch, gint *len)
 
   return(tmp);
 }
+
+void
+cumulateRecordData(XMLParserData *data, const xmlChar *ch, gint len)
+{
+    data->recordString = (xmlChar *) g_realloc(data->recordString, (len + data->recordStringLength + 1)* sizeof(xmlChar));
+    memcpy(data->recordString + data->recordStringLength, ch, len * sizeof(xmlChar));
+    data->recordStringLength += len;
+
+    return;
+}
+
 
 
 /**
@@ -759,7 +789,6 @@ xml_warning(const gchar *attribute, const gchar *value, const gchar *msg,
   are white-space delimited. They should not have quotes or anything
   that needs to be escaped.
 */
-
 gboolean
 setRecordValues (XMLParserData *data, const xmlChar *line, gint len)
 {
