@@ -87,18 +87,6 @@ typedef enum {NULLMODE = -1,
 #define XFIXED  1
 #define YFIXED  2
 
-/*
- * rotation only
-*/
-#define RO_OBLIQUE 0
-#define RO_XAXIS   1
-#define RO_YAXIS   2
-
-#define RO_ROTATE 0
-#define RO_ROCK   1
-#define RO_INTERP 2
-/* */
-
 
 #define MAXNCOLS 500
 
