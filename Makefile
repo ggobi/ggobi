@@ -22,6 +22,10 @@ ifdef TEST_KEYS
  CFLAGS+= -DTEST_KEYS=1
 endif
 
+ifndef DOXYGEN
+  DOXYGEN=doxygen
+endif
+
 # used to comment out sections of code for incompletely
 # implemented or buggy functionality
 ifdef BINARY_IO_IMPLEMENTED
@@ -265,5 +269,8 @@ print.o: print.c print.h
 
 %.d: %.c
 	$(CC) -M $(CFLAGS) -I. `gtk-config --cflags` $< > $@
+
+apiDoc: Install/apiDocConfig
+	$(DOXYGEN) Install/apiDocConfig
 
 # DO NOT DELETE
