@@ -6,12 +6,18 @@
 
 extern "C" { 
 #include "ggobi.h"
+  //#include "externs.h"
 #include "GGobiAPI.h"
 #include "plugin.h"
+
+displayd*  datad_init (datad *, ggobid *, gboolean);
+
+extern const gchar **getDefaultRowNamesPtr();
 
 InputDescription *ExcelDataDescription(const char * const fileName, const char * const modeName, ggobid *gg, GGobiPluginInfo *info);
 gboolean onLoad(gboolean initializing, GGobiPluginInfo *plugin);
 }
+
 
 extern void COMError(HRESULT hr);
 extern void GetScodeString(HRESULT hr, LPTSTR buf, int bufSize);
@@ -205,7 +211,7 @@ createDataset(VARIANT *var, ggobid *gg)
     arr = V_ARRAY(var);
 
   long lb, ub;
-  long i, j, ctr;
+  long i, j, ctr, col;
   UINT numDim = SafeArrayGetDim(arr);
   fprintf(stderr, "Num. dimension %d\n", (int) numDim);
   long dim[2][2];
@@ -213,30 +219,41 @@ createDataset(VARIANT *var, ggobid *gg)
   for(i = 0; i < numDim; i++) {
     SafeArrayGetLBound(arr, i+1, &dim[i][0]);
     SafeArrayGetUBound(arr, i+1, &dim[i][1]);
-    fprintf(stderr, "Dimension %d: %ld %ld\n", i, dim[i][0], dim[i][1]);
+    fprintf(stderr, "Dimension %d: %ld %ld\n", i, dim[i][0], dim[i][1]);fflush(stderr);
   }
 
   datad *d = NULL;
-  d = datad_new(d, gg);
-  d->nrows = dim[0][1] - dim[0][0]; // + 1;
-  d->ncols = dim[1][1] - dim[1][0] + 1;
 
-  fprintf(stderr, "Dimensions %d x %d\n", d->nrows, d->ncols);
+  int nrow = dim[0][1] - dim[0][0]; // currently skipping the first row.
+  int ncol =  dim[1][1] - dim[1][0] + 1;
+  fprintf(stderr, "Dimensions %d x %d\n", nrow, ncol);fflush(stderr);
+
+  //  d = datad_new(d, gg);
+  //  gdouble *vals = (gdouble *)g_malloc(sizeof(double) * nrow);
+  d = datad_create(nrow, ncol, gg);
+
+  fprintf(stderr, "Created the dataset %d\n", d->nrows);fflush(stderr);
 
   long indices[2];
-  gdouble *vals = (gdouble *)g_malloc(sizeof(double) * d->nrows);
-  for(j = dim[1][0];  j <= dim[1][1]; j++) {
+
+  for(j = dim[1][0], col = 0;  j <= dim[1][1]; j++, col++) {
     for(ctr = 0, i = dim[0][0] + 1; i <= dim[0][1]; i++, ctr++) {
       indices[0] =i;
       indices[1] =j;
       SafeArrayGetElement(arr, indices, &value);
-      vals[ctr] = asReal(&value);
+      d->raw.vals[ctr][col] = asReal(&value);
     }
+    GGOBI(setVariableName)(col, g_strdup_printf("Var %d", col+1), true, d, gg);
+#if 0
     fprintf(stderr, "Variable....\n");
-    int varId = GGOBI(addVariable)(vals, d->nrows, g_strdup_printf("Var %d", j+1), true, d, gg);
+    int varId = GGOBI(addVariable)(vals, nrow, g_strdup_printf("Var %d", j+1), true, d, gg);
     fprintf(stderr, "Variable %d\n", varId);
+#endif
   }
-  g_free(vals);
+
+  datad_init(d, gg, 0);
+
+  //  g_free(vals);
 
  return(0);
 }
