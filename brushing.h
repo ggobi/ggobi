@@ -47,8 +47,13 @@
 typedef enum {SOLID, WIDE_DASH, NARROW_DASH} EdgeType;
 /*-- --*/
 
-typedef enum { RESET_UNHIDE_POINTS, RESET_POINT_COLORS, RESET_GLYPHS, 
-               RESET_UNHIDE_EDGES, RESET_EDGES, RESET_INIT_BRUSH} BrushReset;
+typedef enum { RESET_UNHIDE_POINTS, RESET_UNHIDE_EDGES, BRUSH_RESET_SCALE,
+               RESET_INIT_BRUSH,
+               RESET_POINT_COLORS,  /* unused */
+               RESET_POINT_GLYPHS,  /* unused */
+               RESET_EDGE_COLORS,   /* unused */
+               RESET_EDGE_TYPES,   /* unused */
+             } BrushReset;
 
 typedef struct {
     gint x1, y1, x2, y2;

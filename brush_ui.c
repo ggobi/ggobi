@@ -151,9 +151,9 @@ brush_reset(ggobid *gg, gint action)
 
   switch (action) {
     case RESET_UNHIDE_POINTS:  /*-- un-hide all points --*/
-      for (i=0; i<d->nrows; i++) {
+      for (i=0; i<d->nrows; i++)
         d->hidden.els[i] = d->hidden_now.els[i] = false;
-      }
+      rows_in_plot_set (d, gg);
 
       /*-- code borrowed from exclusion_ui.c, the 'show' routine --*/
       clusters_set (d, gg);
@@ -162,13 +162,14 @@ brush_reset(ggobid *gg, gint action)
       tform_to_world (d, gg);
       displays_tailpipe (FULL, gg);
       /*-- --*/
-      break;
+    break;
 
     case RESET_UNHIDE_EDGES:  /*-- un-hide all edges --*/
       if (e != NULL) {
-        for (k=0; k<e->edge.n; k++) {
+        for (k=0; k<e->edge.n; k++)
           e->hidden_now.els[k] = e->hidden.els[k] = false;
-        }
+        rows_in_plot_set (e, gg);
+
         /*-- code borrowed from exclusion_ui.c, the 'show' routine --*/
         clusters_set (e, gg);
         cluster_table_labels_update (e, gg);
@@ -177,7 +178,16 @@ brush_reset(ggobid *gg, gint action)
         displays_tailpipe (FULL, gg);
         /*-- --*/
       }
-      break;
+    break;
+
+    case BRUSH_RESET_SCALE:  /* reset view scale after hiding or unhiding */
+      limits_set (true, true, d, gg);  
+      vartable_limits_set (d);
+      vartable_stats_set (d);
+
+      tform_to_world (d, gg);
+      displays_tailpipe (FULL, gg);
+    break;
 
     case RESET_INIT_BRUSH:  /*-- reset brush size --*/
       brush_pos_init (gg->current_splot);
@@ -188,12 +198,14 @@ brush_reset(ggobid *gg, gint action)
       } else {
         splot_redraw (gg->current_splot, QUICK, gg);
       }
-      break;
+    break;
+
 
     case RESET_POINT_COLORS:  /*-- reset point colors -- to what? --*/
-    case RESET_GLYPHS:  /*-- reset point glyphs -- to what? --*/
-    case RESET_EDGES:  /*-- reset edge colors -- to what? --*/
-      break;
+    case RESET_POINT_GLYPHS:  /*-- reset point glyphs -- to what? --*/
+    case RESET_EDGE_COLORS:  /*-- reset edge colors -- to what? --*/
+    case RESET_EDGE_TYPES:  /*-- reset edge colors -- to what? --*/
+    break;
   }
 }
 

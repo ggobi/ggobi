@@ -301,8 +301,6 @@ void
 brush_menus_make (ggobid *gg)
 {
   GtkWidget *item;
-  void brush_reset_cb (GtkWidget *w, gpointer cbd);
-  void brush_update_set_cb (GtkCheckMenuItem *w, guint action);
 
   /*-- Reset menu --*/
   gg->menus.reset_menu = gtk_menu_new ();
@@ -311,10 +309,38 @@ brush_menus_make (ggobid *gg)
   GGobi_widget_set (item, gg, true);
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (brush_reset_cb),
-                      (gpointer) GINT_TO_POINTER (0));
+                      (gpointer) GINT_TO_POINTER (RESET_UNHIDE_POINTS));
   gtk_menu_append (GTK_MENU (gg->menus.reset_menu), item);
 
-/*
+
+  item = gtk_menu_item_new_with_label ("Show all edges");
+  GGobi_widget_set (item, gg, true);
+  gtk_signal_connect (GTK_OBJECT (item), "activate",
+                      GTK_SIGNAL_FUNC (brush_reset_cb),
+                      (gpointer) GINT_TO_POINTER (RESET_UNHIDE_EDGES));
+  gtk_menu_append (GTK_MENU (gg->menus.reset_menu), item);
+
+  item = gtk_menu_item_new_with_label ("Rescale");
+  GGobi_widget_set (item, gg, true);
+  gtk_signal_connect (GTK_OBJECT (item), "activate",
+                      GTK_SIGNAL_FUNC (brush_reset_cb),
+                      (gpointer) GINT_TO_POINTER (BRUSH_RESET_SCALE));
+  gtk_menu_append (GTK_MENU (gg->menus.reset_menu), item);
+
+  item = gtk_menu_item_new_with_label ("Reset brush size");
+  GGobi_widget_set (item, gg, true);
+  gtk_signal_connect (GTK_OBJECT (item), "activate",
+                      GTK_SIGNAL_FUNC (brush_reset_cb),
+                      (gpointer) GINT_TO_POINTER (RESET_INIT_BRUSH));
+  gtk_menu_append (GTK_MENU (gg->menus.reset_menu), item);
+
+/* item = gtk_menu_item_new_with_label ("Reset edgecolors");
+  GGobi_widget_set (item, gg, true);
+  gtk_signal_connect (GTK_OBJECT (item), "activate",
+                      GTK_SIGNAL_FUNC (brush_reset_cb),
+                      (gpointer) GINT_TO_POINTER(4));
+  gtk_menu_append (GTK_MENU (gg->menus.reset_menu), item);
+
   item = gtk_menu_item_new_with_label ("Reset point colors");
   GGobi_widget_set (item, gg, true);
   gtk_signal_connect (GTK_OBJECT (item), "activate",
@@ -330,28 +356,6 @@ brush_menus_make (ggobid *gg)
   gtk_menu_append (GTK_MENU (gg->menus.reset_menu), item);
 */
 
-  item = gtk_menu_item_new_with_label ("Show all edges");
-  GGobi_widget_set (item, gg, true);
-  gtk_signal_connect (GTK_OBJECT (item), "activate",
-                      GTK_SIGNAL_FUNC (brush_reset_cb),
-                      (gpointer) GINT_TO_POINTER (3));
-  gtk_menu_append (GTK_MENU (gg->menus.reset_menu), item);
-
-/*
-  item = gtk_menu_item_new_with_label ("Reset edgecolors");
-  GGobi_widget_set (item, gg, true);
-  gtk_signal_connect (GTK_OBJECT (item), "activate",
-                      GTK_SIGNAL_FUNC (brush_reset_cb),
-                      (gpointer) GINT_TO_POINTER(4));
-  gtk_menu_append (GTK_MENU (gg->menus.reset_menu), item);
-*/
-
-  item = gtk_menu_item_new_with_label ("Reset brush size");
-  GGobi_widget_set (item, gg, true);
-  gtk_signal_connect (GTK_OBJECT (item), "activate",
-                      GTK_SIGNAL_FUNC (brush_reset_cb),
-                      (gpointer) GINT_TO_POINTER (5));
-  gtk_menu_append (GTK_MENU (gg->menus.reset_menu), item);
 
   gtk_widget_show_all (gg->menus.reset_menu);
 
