@@ -401,17 +401,19 @@ display_add (displayd *display, ggobid *gg)
 
   if (isEmbeddedDisplay(display) == false) {
     GGobi_widget_set(display->window, gg, true);
-    display_set_current (display, gg);  /*-- this may initialize the mode --*/
+    if(g_list_length(display->splots))
+          display_set_current (display, gg);  /*-- this may initialize the mode --*/
   }
   gg->displays = g_list_append (gg->displays, (gpointer) display);
 
     /* If the tree of displays is active, add this to it. */
   display_add_tree(display, -1, gg->display_tree.tree, gg);
 
-  gg->current_splot = (splotd *)
-    g_list_nth_data (gg->current_display->splots, 0);
-  display->current_splot = gg->current_splot;
-  splot_set_current (gg->current_splot, on, gg);
+  if(g_list_length(display->splots)) {
+     gg->current_splot = (splotd *) g_list_nth_data (gg->current_display->splots, 0);
+     display->current_splot = gg->current_splot;
+     splot_set_current (gg->current_splot, on, gg);
+  }
 
 
   /*
@@ -466,7 +468,8 @@ display_free (displayd* display, gboolean force, ggobid *gg) {
 
     /*-- if the current_display was just removed, assign a new one --*/
     /*-- list length only has to be >=0 because a display was just removed --*/
-    if (display == gg->current_display && (g_list_length (gg->displays) > 0)) {
+    if (display == gg->current_display) {
+     if(g_list_length (gg->displays) > 0) {
       dsp = (displayd *) g_list_nth_data (gg->displays, 0);
       display_set_current (dsp, gg);
 
@@ -479,6 +482,10 @@ display_free (displayd* display, gboolean force, ggobid *gg) {
         sp->redraw_style = QUICK;
         gtk_widget_queue_draw (sp->da);
       }
+     } else {
+	 gg->current_display = NULL;
+         gg->current_splot = NULL;
+     }
     }
 
     count = g_list_length (display->splots);
@@ -543,7 +550,7 @@ display_set_current (displayd *new_display, ggobid *gg)
 
   gtk_accel_group_unlock (gg->main_accel_group);
 
-  if (gg->firsttime == false &&
+  if (gg->firsttime == false && gg->current_display &&
       isEmbeddedDisplay (gg->current_display) == false)
   {
     title = computeTitle (false, gg->current_display, gg);
