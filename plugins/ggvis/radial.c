@@ -9,6 +9,83 @@
 #include "plugin.h"
 #include "ggvis.h"
 
+
+/*-----------------------------------------------------------------*/
+/*                   callbacks                                     */
+/*-----------------------------------------------------------------*/
+
+void radial_cb (GtkButton *button, PluginInstance *inst)
+{
+  ggobid *gg = inst->gg;
+  ggvisd *ggv = GGVisFromInst (inst);
+  datad *d = gg->current_display->d;
+  datad *e = gg->current_display->e;
+
+  if (d == NULL || e == NULL)
+    return;
+
+  initLayout (gg, ggv, d, e);
+
+  /*-- initial default:  let the first node be the center node --*/
+  ggv->radial->centerNode = &ggv->radial->nodes[0];
+  ggv->radial->centerNode->i = 0;
+
+  setParentNodes (ggv, d);
+  setNChildren (ggv, d);
+  setSubtreeSize (ggv->radial->centerNode, ggv, d);
+
+  setSubtreeSpans (ggv, d);  /*-- ok --*/
+
+  setNodePositions (ggv, d);
+
+/*-- add two variables and put in the new values --*/
+  {
+    gint i, k;
+    gdouble *x = g_malloc0 (d->nrows * sizeof (gdouble));
+    gdouble *y = g_malloc0 (d->nrows * sizeof (gdouble));
+    gchar *name;
+
+    /*-- here's a problem: if nrows != nrows_in_plot, this won't
+         do the right thing --*/
+    for (i=0; i<d->nrows; i++) {
+      x[i] = ggv->radial->nodes[i].pos.x;
+      y[i] = ggv->radial->nodes[i].pos.y;
+    }
+
+    name = g_strdup_printf ("x");
+    newvar_add_with_values (x, d->nrows, name, d, gg);
+    g_free (name);
+    g_free (x);
+    name = g_strdup_printf ("y");
+    newvar_add_with_values (y, d->nrows, name, d, gg);
+    g_free (name);
+    g_free (y);
+  }
+}
+
+/*-- this should be in radial.c or radial_ui.c --*/
+void highlight_edges_cb (GtkButton *button, PluginInstance *inst)
+{
+  ggobid *gg = inst->gg;
+  ggvisd *ggv = GGVisFromInst (inst);
+  datad *d = gg->current_display->d;
+  datad *e = gg->current_display->e;
+
+/*
+for each sticky label index k in d
+  for each edge
+    if a == k || b == k
+      highlight the edge in e -- for starters
+    else unhighlight the edge
+
+in the long term, there could be a nicer way to do this:
+  let's add two events to ggobi: edge becomes sticky and
+  edge becomes unsticky
+*/
+}
+
+/*-----------------------------------------------------------------*/
+
 /*
  * Initialize a couple of values for each node.
 */

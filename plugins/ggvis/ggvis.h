@@ -1,6 +1,7 @@
 #ifndef GGVIS_H
 
 #include "defines.h"
+#include "plugin.h"
 
 typedef enum {deflt, within, between, anchorscales, anchorfixed} MDSGroupInd;
 
@@ -96,6 +97,23 @@ typedef struct {
   radiald *radial;  /*-- data required for radial layout --*/
 
 } ggvisd;
+
+
+/*----------------------------------------------------------------------*/
+/*                          functions                                   */
+/*----------------------------------------------------------------------*/
+
+GtkWidget *GGobi_addToolsMenuItem (const gchar *label, ggobid *gg);
+void ggvis_init (ggvisd *);
+void initLayout (ggobid *gg, ggvisd *ggv, datad *d, datad *e);
+void setParentNodes (ggvisd *ggv, datad *d);
+void setNChildren (ggvisd *ggv, datad *d);
+gint setSubtreeSize (noded *, ggvisd *, datad *);
+void setSubtreeSpans (ggvisd *, datad *);
+void setNodePositions (ggvisd *, datad *);
+void radial_cb (GtkButton *button, PluginInstance *inst);
+void highlight_edges_cb (GtkButton *button, PluginInstance *inst);
+ggvisd * GGVisFromInst (PluginInstance *inst);
 
 #define GGVIS_H
 #endif

@@ -8,17 +8,15 @@
 #include "plugin.h"
 #include "ggvis.h"
 
-
-ggvisd *   GGVisFromInst (PluginInstance *inst);
 void       close_ggvis_window(GtkWidget *w, PluginInstance *inst);
 GtkWidget *create_ggvis_window(ggobid *gg, PluginInstance *inst);
 void       show_ggvis_window (GtkWidget *widget, PluginInstance *inst);
+
 
 gboolean
 addToToolsMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 {
   GtkWidget *entry;
-  extern GtkWidget *GGobi_addToolsMenuItem (const gchar *label, ggobid *gg);
 
   inst->data = NULL;
   inst->info = plugin;
@@ -42,7 +40,6 @@ show_ggvis_window (GtkWidget *widget, PluginInstance *inst)
   if (inst->data == NULL) {
     GtkWidget *window;
     ggvisd *ggv = (ggvisd *) g_malloc (sizeof (ggvisd));
-    extern void ggvis_init (ggvisd *);
 
     ggvis_init (ggv);
 
@@ -151,63 +148,7 @@ set_dist_matrix_from_edges (datad *d, datad *e, ggobid *gg, ggvisd *ggv)
   scale_array_max (&ggv->dist, nNodes, nNodes);
 }
 
-void radial_cb (GtkButton *button, PluginInstance *inst)
-{
-  ggobid *gg = inst->gg;
-  ggvisd *ggv = GGVisFromInst (inst);
-  datad *d = gg->current_display->d;
-  datad *e = gg->current_display->e;
-  extern void initLayout (ggobid *gg, ggvisd *ggv, datad *d, datad *e);
-  extern void setParentNodes (ggvisd *ggv, datad *d);
-  extern void setNChildren (ggvisd *ggv, datad *d);
-  extern gint setSubtreeSize (noded *, ggvisd *, datad *);
-  extern void setSubtreeSpans (ggvisd *, datad *);
-  extern void setNodePositions (ggvisd *, datad *);
-
-  if (d == NULL || e == NULL)
-    return;
-
-  initLayout (gg, ggv, d, e);
-
-  /*-- initial default:  let the first node be the center node --*/
-  ggv->radial->centerNode = &ggv->radial->nodes[0];
-  ggv->radial->centerNode->i = 0;
-
-  setParentNodes (ggv, d);
-  setNChildren (ggv, d);
-  setSubtreeSize (ggv->radial->centerNode, ggv, d);
-
-  setSubtreeSpans (ggv, d);  /*-- ok --*/
-
-  setNodePositions (ggv, d);
-
-/*-- add two variables and put in the new values --*/
-  {
-    gint i, k;
-    gdouble *x = g_malloc0 (d->nrows * sizeof (gdouble));
-    gdouble *y = g_malloc0 (d->nrows * sizeof (gdouble));
-    gchar *name;
-
-    /*-- here's a problem: if nrows != nrows_in_plot, this won't
-         do the right thing --*/
-    for (i=0; i<d->nrows; i++) {
-      x[i] = ggv->radial->nodes[i].pos.x;
-      y[i] = ggv->radial->nodes[i].pos.y;
-    }
-
-    name = g_strdup_printf ("x");
-    newvar_add_with_values (x, d->nrows, name, d, gg);
-    g_free (name);
-    g_free (x);
-    name = g_strdup_printf ("y");
-    newvar_add_with_values (y, d->nrows, name, d, gg);
-    g_free (name);
-    g_free (y);
-  }
-
-
-}
-
+/*-- move this to cmds_ui.c? --*/
 static void cmds_cb (GtkButton *button, PluginInstance *inst)
 {
   ggobid *gg = inst->gg;
@@ -259,6 +200,7 @@ g_printerr ("through cmds\n");
   }
 }
 
+/*-- move this to cmds_ui.c? --*/
 static void mds_spring_cb (GtkButton *button, PluginInstance *inst)
 {
   ggobid *gg = inst->gg;
@@ -305,7 +247,7 @@ create_ggvis_window(ggobid *gg, PluginInstance *inst)
                       GTK_SIGNAL_FUNC (close_ggvis_window), inst);
 
   main_vbox = gtk_vbox_new (FALSE,1);
-  gtk_container_set_border_width (GTK_CONTAINER(main_vbox),0); 
+  gtk_container_set_border_width (GTK_CONTAINER(main_vbox), 5); 
   gtk_container_add (GTK_CONTAINER(window), main_vbox);
 
   notebook = gtk_notebook_new ();
@@ -346,6 +288,12 @@ create_ggvis_window(ggobid *gg, PluginInstance *inst)
   btn = gtk_button_new_with_label ("apply");
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (radial_cb), inst);
+  gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 3);
+
+  /*-- highlight the edges connected to nodes with sticky labels --*/
+  btn = gtk_button_new_with_label ("highlight edges");
+  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+                      GTK_SIGNAL_FUNC (highlight_edges_cb), inst);
   gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 3);
 
   label = gtk_label_new ("Radial");
