@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+#include <values.h>
 
 #include <gtk/gtk.h>
 #include "vars.h"
@@ -25,9 +26,18 @@
 extern "C" {
 #endif
 
+/*
+ * We can either use the Mersenne Twister code in mt19937-1.c
+ * or the rewrite by Shawn Cokus in cokus.c.
+*/
+#define COKUS
+#ifdef COKUS
+extern void seedMT(guint32);
+extern guint32 randomMT(void);
+#else
 extern void sgenrand (unsigned long);
 extern double genrand (void);
-extern void lsgenrand(unsigned long seed_array);
+#endif
 
 #ifdef __cplusplus
 }
@@ -40,21 +50,34 @@ sqdist (gint x1, gint y1, gint x2, gint y2) {
 
 void
 init_random_seed () {
+#ifdef COKUS
+  seedMT ((guint32) time ((glong *) 0));
+#else
   sgenrand ((glong) time ((glong *) 0));
+#endif
 }
 
 
 /* returns a random number on [0.0,1.0] */
 gdouble
 randvalue (void) {
+#ifdef COKUS
+  return (.5 * (gdouble) randomMT() / (gdouble) MAXLONG);
+#else
   return (genrand ());   
+#endif
 }
 
 /*-- returns two random numbers on [-1,1] --*/
 void
 rnorm2 (gdouble *drand, gdouble *dsave) {
+#ifdef COKUS
+  *drand = (gdouble) randomMT () / (gdouble) MAXLONG - 1.0;
+  *dsave = (gdouble) randomMT () / (gdouble) MAXLONG - 1.0;
+#else
   *drand = 2.0 * genrand () - 1.0;
   *dsave = 2.0 * genrand () - 1.0;
+#endif
 }
 
 gint

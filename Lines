@@ -109,6 +109,8 @@
 37950   12/18 Nicholas's time series code?
 39312   2/15  lots of tour code; a few new event handlers
 39684   2/23  lots of variable selection code and a few bug fixes
+40256   4/3   ??
+40460   4/11  Keeping both the original mt and cokus rng's for now.
 
 note: There are about 40.8K lines in xgobi,
        subtracting the rpc, xgvis and tour code.

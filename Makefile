@@ -64,7 +64,7 @@ SRC=ggobi.c datad.c make_ggobi.c color.c main_ui.c cpanel.c \
  timeplot.c time_ui.c \
 \
  gtkextruler.c gtkexthruler.c gtkextvruler.c \
- mt19937-1.c \
+ mt19937-1.c cokus.c \
  fileio.c
 
 
@@ -96,7 +96,7 @@ OB=ggobi.o datad.o make_ggobi.o color.o main_ui.o cpanel.o \
  ggobi-API.o \
  timeplot.o time_ui.o \
  gtkextruler.o gtkexthruler.o gtkextvruler.o \
- mt19937-1.o  \
+ mt19937-1.o cokus.o  \
  fileio.o
 
 ifdef USE_XML
