@@ -2,7 +2,7 @@
 <!DOCTYPE ggobidata SYSTEM "ggobi.dtd">
 
 <ggobidata count="1">
-<data numRecords="128">
+<data name="river flow">
 <description>
 Andreas says: The river data I got from Don Percival, Applied Physics
 Lab, Seattle, but I wouldn't know whether he is the proper source.

@@ -2,7 +2,7 @@
 <!DOCTYPE ggobidata SYSTEM "ggobi.dtd">
 
 <ggobidata count="1">
-<data numRecords="62">
+<data name="sleep">
 
 <description>
 Data from which conclusions  were  drawn  in  the  article  "Sleep  in
