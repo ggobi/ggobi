@@ -1,5 +1,9 @@
 /*-- write_svg.c: routines for saving a display as an svg file --*/
 
+#include <gtk/gtk.h>
+#include "vars.h"
+#include "externs.h"
+
 gchar *hexcolor (GdkColor *color) {
   gulong val = 0;
   gchar buf[32];
@@ -33,19 +37,76 @@ splot_write_svg (splotd *sp, ggobid *gg)
   gint i, m;
 #endif
   gushort current_color;
-  static gint npoint_colors_used = 0;
-  static gushort point_colors_used[NCOLORS+2];
+  gint npoint_colors_used = 0;
+  gushort point_colors_used[NCOLORS+2];
   GtkWidget *da = sp->da;
   displayd *display = (displayd *) sp->displayptr;
   datad *d = display->d;
   gboolean draw_case;
+  icoords minpix, maxpix;
 
   FILE *f = fopen ("foo.svg", "w");
 
   svg_write_header (f);
+
   fprintf (f, "<svg width=\"%dpx\" height=\"%dpx\">\n",
     da->allocation.width, da->allocation.height);
-  fprintf (f, "<g>\n");
+
+  /*
+   * I want to know the minimum and maximum horizontal and
+   * vertical pixel position for the plotted data.
+  */
+  maxpix.x = maxpix.y = 0;
+  minpix.x = da->allocation.width;
+  minpix.y = da->allocation.height;
+  for (i=0; i<d->nrows_in_plot; i++) {
+    m = d->rows_in_plot[i];
+    draw_case = splot_plot_case (m, d, sp, display, gg);
+    if (draw_case) {
+      if (sp->screen[m].x > 0 && sp->screen[m].x < da->allocation.width) {
+        if (sp->screen[m].x < minpix.x)
+          minpix.x = sp->screen[m].x;
+        if (sp->screen[m].x > maxpix.x)
+          maxpix.x = sp->screen[m].x;
+      }
+      if (sp->screen[m].y > 0 && sp->screen[m].y < da->allocation.height) {
+        if (sp->screen[m].y < minpix.y)
+          minpix.y = sp->screen[m].y;
+        if (sp->screen[m].y > maxpix.y)
+          maxpix.y = sp->screen[m].y;
+      }
+    }
+  }
+
+  /*
+   * I'll shift enough to preserve about 20 pixels for
+   * labelling on the left; and then scale enough to preserve
+   * space on the bottom.  This could be really elaborate, but
+   * this will get us started.
+  */
+  fprintf (f, "<g transform=\"translate(%d, %d) scale (%f)\">\n",
+    MIN (20, minpix.x), 0,
+    (gfloat) da->allocation.height / (gfloat) (da->allocation.height + 20));
+
+  /*-- x axis --*/
+  fprintf (f,
+    "<path style=\"stroke: #000000\" d=\"M %d %d L %d %d z\"/>\n",
+    minpix.x, maxpix.y, maxpix.x, maxpix.y);
+/*
+<path style="stroke: #000000" d="M 60 360 L 60 350 z"/>
+<path style="stroke: #000000" d="M 60 350 L 340 350 z"/>
+<path style="stroke: #000000" d="M 340 350 L 340 360 z"/>
+*/
+
+  /*-- y axis --*/
+  fprintf (f,
+    "<path style=\"stroke: #000000\" d=\"M %d %d L %d %d z\"/>\n",
+    minpix.x, minpix.y, minpix.x, maxpix.y);
+/*
+<path style="stroke: #000000" d="M 40 60 L 50 60 z"/>
+<path style="stroke: #000000" d="M 50 60 L 50 340 z"/>
+<path style="stroke: #000000" d="M 50 340 L 40 340 z"/>
+*/
 
   if (!gg->mono_p) {
     splot_point_colors_used_get (sp, &npoint_colors_used,
@@ -59,48 +120,19 @@ splot_write_svg (splotd *sp, ggobid *gg)
     for (k=0; k<npoint_colors_used; k++) {
       current_color = point_colors_used[k];
 
+
 #ifdef _WIN32
 #else
       for (i=0; i<d->nrows_in_plot; i++) {
         m = d->rows_in_plot[i];
-
-        /*-- determine whether case m should be plotted --*/
-        draw_case = true;
-        if (d->hidden_now[m])
-          draw_case = false;
-
-        /*-- can prevent drawing of missings for parcoords or scatmat plots --*/
-        else if (!display->options.missings_show_p && d->nmissing > 0) {
-          switch (display->displaytype) {
-            case parcoords:
-              if (d->missing.vals[m][sp->p1dvar])
-                draw_case = false;
-              break;
-
-            case scatmat:
-              if (sp->p1dvar != -1) {
-                if (d->missing.vals[m][sp->p1dvar])
-                  draw_case = false;
-              } else {
-                if (d->missing.vals[m][sp->xyvars.x] ||
-                    d->missing.vals[m][sp->xyvars.y])
-                {
-                  draw_case = false;
-                }
-              }
-              break;
-
-            case scatterplot:
-              break;
-          }
-        }
+        draw_case = splot_plot_case (m, d, sp, display, gg);
 
         if (draw_case && d->color_now[m] == current_color) {
           if (display->options.points_show_p) {
             gchar *cx = hexcolor (&gg->default_color_table[current_color]);
-            fprintf (f, "<circle style=\"fill: %s; stroke: %s\"\n", cx, cx);
+            fprintf (f, "<circle style=\"fill: %s; stroke: %s\"", cx, cx);
             /*-- write out sp->screen values --*/
-            fprintf (f, "cx=\"%d\" cy=\"%d\" r=\"%d\"/>\n",
+            fprintf (f, " cx=\"%d\" cy=\"%d\" r=\"%d\"/>\n",
               sp->screen[m].x, sp->screen[m].y, 5);
           }
         }

@@ -16,7 +16,7 @@ LDFLAGS=
 
 SRC=ggobi.c datad.c make_ggobi.c color.c main_ui.c cpanel.c \
  utils.c utils_ui.c utils_gdk.c array.c vector.c mt19937-1.c \
- read_array.c read_data.c io.c writedata_ui.c writedata.c \
+ read_array.c read_data.c io.c writedata_ui.c writedata.c write_svg.c \
  pipeline.c missing.c \
  scatterplot.c scatterplot_ui.c \
  splot.c sp_plot.c win32_draw.c \
@@ -45,7 +45,7 @@ SRC=ggobi.c datad.c make_ggobi.c color.c main_ui.c cpanel.c \
 
 OB=ggobi.o datad.o make_ggobi.o color.o main_ui.o cpanel.o \
  utils.o utils_ui.o utils_gdk.o array.o vector.o mt19937-1.o \
- read_array.o read_data.o io.o writedata_ui.o writedata.o \
+ read_array.o read_data.o io.o writedata_ui.o writedata.o write_svg.o \
  pipeline.o missing.o \
  scatterplot.o scatterplot_ui.o \
  splot.o sp_plot.o win32_draw.o \

@@ -250,18 +250,21 @@ win32_draw_to_pixmap_unbinned (gint current_color, splotd *sp, ggobid *gg)
 {
   displayd *display = (displayd *) sp->displayptr;
   datad *d = display->d;
-  gint m, j;
+  gint i, m;
   gint npt, nseg, nr_open, nr_filled, nc_open, nc_filled;
   gint nwhisker_segs = 0;
+  gboolean draw_case;
 
   npt = nseg = nr_open = nr_filled = nc_open = nc_filled = 0;
 
   if (maxn != d->ncols)
     drawing_arrays_alloc (d, gg);
 
-  for (m=0; m<d->nrows_in_plot; m++) {
-    j = d->rows_in_plot[m];
-    if (!d->hidden_now[j] && d->color_now[j] == current_color) {
+  for (i=0; i<d->nrows_in_plot; i++) {
+    m = d->rows_in_plot[i];
+    draw_case = splot_plot_case (m, d, sp, display, gg);
+
+    if (draw_case && d->color_now[j] == current_color) {
       if (display->options.points_show_p) {
         build_glyph (&d->glyph_now[j], sp->screen, j,
           points, &npt,           segs, &nseg,

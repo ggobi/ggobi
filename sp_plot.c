@@ -15,7 +15,7 @@ extern void win32_draw_to_pixmap_unbinned (gint, splotd *, ggobid *gg);
 
 
 /* colors_used now contains integers, 0:ncolors-1 */
-static void
+void
 splot_point_colors_used_get (splotd *sp, gint *ncolors_used,
   gushort *colors_used, gboolean binned, ggobid *gg) 
 {
@@ -106,6 +106,45 @@ splot_point_colors_used_get (splotd *sp, gint *ncolors_used,
   }
 }
 
+gboolean
+splot_plot_case (gint m, datad *d, splotd *sp, displayd *display, ggobid *gg)
+{
+  gboolean draw_case;
+
+  /*-- determine whether case m should be plotted --*/
+  draw_case = true;
+  if (d->hidden_now[m])
+    draw_case = false;
+
+  /*-- can prevent drawing of missings for parcoords or scatmat plots --*/
+  else if (!display->options.missings_show_p && d->nmissing > 0) {
+    switch (display->displaytype) {
+      case parcoords:
+        if (d->missing.vals[m][sp->p1dvar])
+          draw_case = false;
+        break;
+
+      case scatmat:
+        if (sp->p1dvar != -1) {
+          if (d->missing.vals[m][sp->p1dvar])
+            draw_case = false;
+        } else {
+          if (d->missing.vals[m][sp->xyvars.x] ||
+              d->missing.vals[m][sp->xyvars.y])
+          {
+            draw_case = false;
+          }
+        }
+        break;
+
+      case scatterplot:
+        break;
+    }
+  }
+  return draw_case;
+}
+
+
 void
 splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
 {
@@ -114,8 +153,8 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
   gint i, m, n;
 #endif
   gushort current_color;
-  static gint npoint_colors_used = 0;
-  static gushort point_colors_used[NCOLORS+2];
+  gint npoint_colors_used = 0;
+  gushort point_colors_used[NCOLORS+2];
   GtkWidget *da = sp->da;
   displayd *display = (displayd *) sp->displayptr;
   datad *d = display->d;
@@ -150,37 +189,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, ggobid *gg)
 #else
       for (i=0; i<d->nrows_in_plot; i++) {
         m = d->rows_in_plot[i];
-
-        /*-- determine whether case m should be plotted --*/
-        draw_case = true;
-        if (d->hidden_now[m])
-          draw_case = false;
-
-        /*-- can prevent drawing of missings for parcoords or scatmat plots --*/
-        else if (!display->options.missings_show_p && d->nmissing > 0) {
-          switch (display->displaytype) {
-            case parcoords:
-              if (d->missing.vals[m][sp->p1dvar])
-                draw_case = false;
-              break;
-
-            case scatmat:
-              if (sp->p1dvar != -1) {
-                if (d->missing.vals[m][sp->p1dvar])
-                  draw_case = false;
-              } else {
-                if (d->missing.vals[m][sp->xyvars.x] ||
-                    d->missing.vals[m][sp->xyvars.y])
-                {
-                  draw_case = false;
-                }
-              }
-              break;
-
-            case scatterplot:
-              break;
-          }
-        }
+        draw_case = splot_plot_case (m, d, sp, display, gg);
 
         if (draw_case && d->color_now[m] == current_color) {
           if (display->options.points_show_p)

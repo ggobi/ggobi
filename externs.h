@@ -7,6 +7,8 @@
 extern "C" {
 #endif
 
+extern gboolean splot_plot_case (gint m, datad *, splotd *, displayd *, ggobid *);
+extern void splot_point_colors_used_get (splotd *, gint *ncolors_used, gushort *colors_used, gboolean binned, ggobid *); 
 extern displayd * datad_init (datad *, ggobid *, gboolean);
 extern datad * datad_new (ggobid *);
 extern GtkWidget* CreateMenuCheck (displayd *, GtkWidget *, gchar *, GtkSignalFunc, gpointer, gboolean, ggobid *);
