@@ -15,9 +15,15 @@ endif
 
 include $(GGOBI_HOME)/plugins/GNUmakefile.PluginAdmin
 
-createDist:: $(DOCS:%=Docs/%)
+ifndef NO_DOCS
+ DEPS=$(DOCS:%=Docs/%)
+endif
+
+createDist:: $(DEPS)
 	if test ! -d $(INSTALL_DIR)/$(DIR_NAME)/R ; then mkdir $(INSTALL_DIR)/$(DIR_NAME)/R ; fi
 	cp $(R_SRC:%=R/%) $(INSTALL_DIR)/$(DIR_NAME)/R
 	if test ! -d $(INSTALL_DIR)/$(DIR_NAME)/Docs ; then mkdir $(INSTALL_DIR)/$(DIR_NAME)/Docs ; fi
+ifndef NO_DOCS	
 	cp $(DOCS:%=Docs/%) $(INSTALL_DIR)/$(DIR_NAME)/Docs
+endif
 	cp $(RS_COMMON_H) $(INSTALL_DIR)/$(DIR_NAME)

@@ -2,6 +2,8 @@
 
 GGOBI_HOME=${GGOBI_HOME-@GGOBI_HOME@}
 
+export GGOBI_HOME
+
 . ${GGOBI_HOME}/bin/setLD.bsh
 
 ${GGOBI_HOME}/bin/ggobi.bin "$@"

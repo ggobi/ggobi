@@ -1,3 +1,8 @@
+ifndef GGOBI_HOME
+  GGOBI_HOME=../..
+endif
+
+-include $(GGOBI_HOME)/local.config
 -include local.config
 
 

@@ -14,4 +14,4 @@ configure: configure.in
 	autoconf
 
 %.pdf: %.tex
-	(TEXINPUTS=.:$(OMEGA_HOME)/Docs:: export TEXINPUTS ; cd $(@D) ; pdflatex $(<F))
+	(TEXINPUTS=.:$(OMEGA_HOME)/Docs:: export TEXINPUTS ; cd $(@D) ; $(PDFLATEX) $(<F))

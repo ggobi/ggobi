@@ -4,7 +4,7 @@ endif
 
 DIR_NAME=ggvis
 
-include $(GGOBI_HOME)/plugins/GNUmakefile.Plugin
+include $(GGOBI_HOME)/plugins/GNUmakefile.PluginAdmin
 
 createDist::
 	if test ! -d $(INSTALL_DIR)/$(DIR_NAME); then mkdir $(INSTALL_DIR)/$(DIR_NAME)/R ; fi

@@ -373,7 +373,7 @@ displayd *
 GGOBI(newScatmat) (gint *rows, gint *columns, gint nr, gint nc,
   datad *d, ggobid *gg)
 {
-  displayd *display = display_alloc_init (scatmat, false, d, gg);
+  displayd *display;  /* = display_alloc_init (scatmat, false, d, gg); Done in scatmat_new() */
 
   display = scatmat_new (false, nr, rows, nc, columns, d, gg);
   display_add (display, gg);
