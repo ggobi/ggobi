@@ -875,7 +875,7 @@ edges_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg)
   endpointsd *endpoints;
   gboolean edges_show_p, arrowheads_show_p;
   gint nels = d->rowid.idv.nels;
-  gint ltype, gtype;
+  gint lwidth, ltype, gtype;
 
   if (e == (datad *) NULL || e->edge.n == 0) {
 /**/return;
@@ -925,7 +925,8 @@ edges_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg)
 /*
  * It would be nice to draw the edges using the current color and
  * glyph last, but it's not obvious how to set that up in this scheme.
- * Should I skip them on the way through and then draw them at the end?
+ * I could skip them on the way through and then draw them at the end,
+ * I think.
 */
     for (k=0; k<NGLYPHSIZES; k++) {
       for (n=0; n<NEDGETYPES; n++) {
@@ -979,23 +980,45 @@ edges_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg)
                 {
 
                   if (edges_show_p) {
-                    sp->edges[nl].x1 = sp->screen[a].x;
-                    sp->edges[nl].y1 = sp->screen[a].y;
-                    sp->edges[nl].x2 = sp->screen[b].x;
-                    sp->edges[nl].y2 = sp->screen[b].y;
+                    if (endpoints[j].jpartner == -1) {
+                      sp->edges[nl].x1 = sp->screen[a].x;
+                      sp->edges[nl].y1 = sp->screen[a].y;
+                      sp->edges[nl].x2 = sp->screen[b].x;
+                      sp->edges[nl].y2 = sp->screen[b].y;
+                    } else {
+                      sp->edges[nl].x1 = sp->screen[a].x;
+                      sp->edges[nl].y1 = sp->screen[a].y;
+                      sp->edges[nl].x2 = sp->screen[a].x +
+                        (sp->screen[b].x - sp->screen[a].x) / 2;
+                      sp->edges[nl].y2 = sp->screen[a].y +
+                        (sp->screen[b].y - sp->screen[a].y) / 2;
+                    }
                   }
 
                   if (arrowheads_show_p) {
                     /*
                      * Add thick piece of the lines to suggest a
-                     * directional arrow
+                     * directional arrow.  How thick should it be
+                     * compared to the current line thickness?
                     */
-                    sp->arrowheads[nl].x1 =
-                      (gint) (.2*sp->screen[a].x + .8*sp->screen[b].x);
-                    sp->arrowheads[nl].y1 =
-                      (gint) (.2*sp->screen[a].y + .8*sp->screen[b].y);
-                    sp->arrowheads[nl].x2 = sp->screen[b].x;
-                    sp->arrowheads[nl].y2 = sp->screen[b].y;
+                    if (endpoints[j].jpartner == -1) {
+                      sp->arrowheads[nl].x1 =
+                        (gint) (.2*sp->screen[a].x + .8*sp->screen[b].x);
+                      sp->arrowheads[nl].y1 =
+                        (gint) (.2*sp->screen[a].y + .8*sp->screen[b].y);
+                      sp->arrowheads[nl].x2 = sp->screen[b].x;
+                      sp->arrowheads[nl].y2 = sp->screen[b].y;
+                    } else {  /*-- draw the partner's arrowhead --*/
+                      gint jp = endpoints[j].jpartner;
+                      gint ja = endpoints[jp].a;
+                      gint jb = endpoints[jp].b;
+                      sp->arrowheads[nl].x1 =
+                        (gint) (.2*sp->screen[ja].x + .8*sp->screen[jb].x);
+                      sp->arrowheads[nl].y1 =
+                        (gint) (.2*sp->screen[ja].y + .8*sp->screen[jb].y);
+                      sp->arrowheads[nl].x2 = sp->screen[jb].x;
+                      sp->arrowheads[nl].y2 = sp->screen[jb].y;
+                    }
                   }
                   nl++;
                 }
@@ -1006,10 +1029,9 @@ edges_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg)
               gdk_gc_set_foreground (gg->plot_GC, &gg->color_table[p]);
             }
 
+            lwidth = (k<3) ? 0 : (k-2)*2;
             if (edges_show_p) {
-              gint lwidth = (k<3) ? 0 : (k-2)*2;
               gchar dash_list[2];
-              gint ltype;
 
               if (n_prev == -1 || n_prev != n) {  /* type */
                 switch (n) {
@@ -1040,7 +1062,7 @@ edges_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg)
 
             if (arrowheads_show_p) {
               gdk_gc_set_line_attributes (gg->plot_GC,
-                3, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
+                lwidth+2, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
               gdk_draw_segments (drawable, gg->plot_GC, sp->arrowheads, nl);
               gdk_gc_set_line_attributes (gg->plot_GC,
                 0, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);

@@ -730,8 +730,18 @@ setGlyph(const xmlChar **attrs, XMLParserData *data, gint i)
   /*-- glyphType  0:6 --*/
   value = data->defaults.glyphType;
   tmp = getAttribute(attrs, "glyphType");
-  if(tmp) {
-   value = strToInteger(tmp);
+  if (tmp) {
+    /*
+     * make sure this attribute is an integer; if someone puts a
+     * string here, like "plus" or "fc", value = 0 and the mistake
+     * isn't caught later when value is tested.
+    */
+    if (tmp[0] < '0' || tmp[0] > '6') {
+      g_printerr ("%s is an illegal value for glyphType; it must be on [0,6]\n",
+        tmp);
+      exit(101);
+    }
+    value = strToInteger(tmp);
   }
 
   if(value < 0 || value >= NGLYPHTYPES) {
@@ -745,6 +755,7 @@ setGlyph(const xmlChar **attrs, XMLParserData *data, gint i)
            d->glyph_prev.els[i].type = value;
   }
 
+  /*-- glyph:  strings like "plus 3" or "." --*/
   tmp = getAttribute(attrs, "glyph");
   if(tmp != NULL) {
     const gchar *next;
@@ -1379,6 +1390,7 @@ readXMLRecord(const xmlChar **attrs, XMLParserData *data)
   const gchar *tmp;
   gchar *stmp;
   gint i = data->current_record;
+  gint k;
   gint start, end;
 
   data->current_element = 0;
@@ -1442,6 +1454,13 @@ readXMLRecord(const xmlChar **attrs, XMLParserData *data)
 
       d->edge.endpoints[i].a = start;
       d->edge.endpoints[i].b = end;
+      d->edge.endpoints[i].jpartner = -1;  /*-- default value --*/
+      for (k=0; k<i; k++) {
+        if (d->edge.endpoints[k].a == end && d->edge.endpoints[k].b == start) {
+          d->edge.endpoints[i].jpartner = k;
+          d->edge.endpoints[k].jpartner = i;
+        }
+      }
     }
   }
 

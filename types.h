@@ -26,19 +26,25 @@ typedef struct {
 } glyphd;
 
 typedef struct {
-    glong x, y;
+  glong x, y;
 } lcoords;
 typedef struct {
-    gint x, y;
+  gint x, y;
 } icoords;
 typedef struct {
-    gfloat x, y;
+  gfloat x, y;
 } fcoords;
 typedef struct {
-    gfloat min, max;
+  gfloat min, max;
 } lims;
 typedef struct {
-    gint a, b;
+  gint a, b;
+  /* 
+   * by default, jpartner = -1, but if this edge is one of a
+   * bidirectional pair, jpartner is the index of the edge going
+   * in the other direction.
+  */
+  gint jpartner;
 } endpointsd;
 
 /*-- arrays --*/
