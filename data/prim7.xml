@@ -2,7 +2,7 @@
 <!DOCTYPE ggobidata SYSTEM "ggobi.dtd">
 
 <ggobidata count="2">
-<data name="prim7" numRecords="500">
+<data name="prim7">
 <description>
 </description>
 <variables count="7">
@@ -1518,7 +1518,7 @@
 </records>
 </data>
 
-<data name="model" numRecords="9">
+<data name="model">
 <description>
 The edges in this data set correspond to the underlying
 geometric structure of the data.

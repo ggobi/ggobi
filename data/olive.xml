@@ -2,11 +2,10 @@
 <!DOCTYPE ggobidata SYSTEM "ggobi.dtd">
 
 <ggobidata count="1">
-<data name="olive oil" numRecords="572">
+<data name="olive oil">
 <description>
 </description>
 <variables count="10">
-
   <categoricalvariable name="Region">
     <levels count="3">
       <level value="1"> 1 </level>
@@ -27,18 +26,16 @@
       <level value="9"> Umbria </level>
     </levels>
   </categoricalvariable>
-
-<realvariable name="palmitic" />
-<realvariable name="palmitoleic" />
-<realvariable name="stearic" />
-<realvariable name="oleic" />
-<realvariable name="linoleic" />
-<realvariable name="linolenic" />
-<realvariable name="arachidic" />
-<realvariable name="eicosenoic" />
-</variables>
-<records
- count="572" glyph="fc 2" color="1">
+  <realvariable name="palmitic" />
+  <realvariable name="palmitoleic" />
+  <realvariable name="stearic" />
+  <realvariable name="oleic" />
+  <realvariable name="linoleic" />
+  <realvariable name="linolenic" />
+  <realvariable name="arachidic" />
+  <realvariable name="eicosenoic" />
+  </variables>
+<records count="572" glyph="fr 1" color="1">
 <record label="North-Apulia">
 1.000 1.000 1075.000 75.000 226.000 7823.000 672.000 36.000 60.000 29.000
 </record>

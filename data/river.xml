@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE ggobidata SYSTEM "ggobi.dtd">
 
-<ggobidata count="1">
+<ggobidata count="2">
 <data name="river flow">
 <description>
 Andreas says: The river data I got from Don Percival, Applied Physics
@@ -17,390 +17,395 @@ years.
 </variables>
 <records
  count="128" glyph="fr 1" color="5">
-<record label="1">
-1.000 8.954 8.954
+<record id="1" label="1"> 1.000 8.954 8.954
 </record>
-<record label="2">
-2.000 9.494 8.954
+<record id="2" label="2"> 2.000 9.494 8.954
 </record>
-<record label="3">
-3.000 10.194 9.494
+<record id="3" label="3"> 3.000 10.194 9.494
 </record>
-<record label="4">
-4.000 10.957 10.194
+<record id="4" label="4"> 4.000 10.957 10.194
 </record>
-<record label="5">
-5.000 11.078 10.957
+<record id="5" label="5"> 5.000 11.078 10.957
 </record>
-<record label="6">
-6.000 10.982 11.078
+<record id="6" label="6"> 6.000 10.982 11.078
 </record>
-<record label="7">
-7.000 10.490 10.982
+<record id="7" label="7"> 7.000 10.490 10.982
 </record>
-<record label="8">
-8.000 10.275 10.490
+<record id="8" label="8"> 8.000 10.275 10.490
 </record>
-<record label="9">
-9.000 10.166 10.275
+<record id="9" label="9"> 9.000 10.166 10.275
 </record>
-<record label="10">
-10.000 9.235 10.166
+<record id="10" label="10"> 10.000 9.235 10.166
 </record>
-<record label="11">
-11.000 8.565 9.235
+<record id="11" label="11"> 11.000 8.565 9.235
 </record>
-<record label="12">
-12.000 8.511 8.565
+<record id="12" label="12"> 12.000 8.511 8.565
 </record>
-<record label="13">
-13.000 10.121 8.511
+<record id="13" label="13"> 13.000 10.121 8.511
 </record>
-<record label="14">
-14.000 11.185 10.121
+<record id="14" label="14"> 14.000 11.185 10.121
 </record>
-<record label="15">
-15.000 10.935 11.185
+<record id="15" label="15"> 15.000 10.935 11.185
 </record>
-<record label="16">
-16.000 11.180 10.935
+<record id="16" label="16"> 16.000 11.180 10.935
 </record>
-<record label="17">
-17.000 10.957 11.180
+<record id="17" label="17"> 17.000 10.957 11.180
 </record>
-<record label="18">
-18.000 10.568 10.957
+<record id="18" label="18"> 18.000 10.568 10.957
 </record>
-<record label="19">
-19.000 10.140 10.568
+<record id="19" label="19"> 19.000 10.140 10.568
 </record>
-<record label="20">
-20.000 9.995 10.140
+<record id="20" label="20"> 20.000 9.995 10.140
 </record>
-<record label="21">
-21.000 9.142 9.995
+<record id="21" label="21"> 21.000 9.142 9.995
 </record>
-<record label="22">
-22.000 8.612 9.142
+<record id="22" label="22"> 22.000 8.612 9.142
 </record>
-<record label="23">
-23.000 8.389 8.612
+<record id="23" label="23"> 23.000 8.389 8.612
 </record>
-<record label="24">
-24.000 8.388 8.389
+<record id="24" label="24"> 24.000 8.388 8.389
 </record>
-<record label="25">
-25.000 9.975 8.388
+<record id="25" label="25"> 25.000 9.975 8.388
 </record>
-<record label="26">
-26.000 10.268 9.975
+<record id="26" label="26"> 26.000 10.268 9.975
 </record>
-<record label="27">
-27.000 11.051 10.268
+<record id="27" label="27"> 27.000 11.051 10.268
 </record>
-<record label="28">
-28.000 10.517 11.051
+<record id="28" label="28"> 28.000 10.517 11.051
 </record>
-<record label="29">
-29.000 10.969 10.517
+<record id="29" label="29"> 29.000 10.969 10.517
 </record>
-<record label="30">
-30.000 10.431 10.969
+<record id="30" label="30"> 30.000 10.431 10.969
 </record>
-<record label="31">
-31.000 10.410 10.431
+<record id="31" label="31"> 31.000 10.410 10.431
 </record>
-<record label="32">
-32.000 10.080 10.410
+<record id="32" label="32"> 32.000 10.080 10.410
 </record>
-<record label="33">
-33.000 9.589 10.080
+<record id="33" label="33"> 33.000 9.589 10.080
 </record>
-<record label="34">
-34.000 9.409 9.589
+<record id="34" label="34"> 34.000 9.409 9.589
 </record>
-<record label="35">
-35.000 8.587 9.409
+<record id="35" label="35"> 35.000 8.587 9.409
 </record>
-<record label="36">
-36.000 8.532 8.587
+<record id="36" label="36"> 36.000 8.532 8.587
 </record>
-<record label="37">
-37.000 8.401 8.532
+<record id="37" label="37"> 37.000 8.401 8.532
 </record>
-<record label="38">
-38.000 8.295 8.401
+<record id="38" label="38"> 38.000 8.295 8.401
 </record>
-<record label="39">
-39.000 9.696 8.295
+<record id="39" label="39"> 39.000 9.696 8.295
 </record>
-<record label="40">
-40.000 11.410 9.696
+<record id="40" label="40"> 40.000 11.410 9.696
 </record>
-<record label="41">
-41.000 11.216 11.410
+<record id="41" label="41"> 41.000 11.216 11.410
 </record>
-<record label="42">
-42.000 10.417 11.216
+<record id="42" label="42"> 42.000 10.417 11.216
 </record>
-<record label="43">
-43.000 10.047 10.417
+<record id="43" label="43"> 43.000 10.047 10.417
 </record>
-<record label="44">
-44.000 10.374 10.047
+<record id="44" label="44"> 44.000 10.374 10.047
 </record>
-<record label="45">
-45.000 10.134 10.374
+<record id="45" label="45"> 45.000 10.134 10.374
 </record>
-<record label="46">
-46.000 9.142 10.134
+<record id="46" label="46"> 46.000 9.142 10.134
 </record>
-<record label="47">
-47.000 8.697 9.142
+<record id="47" label="47"> 47.000 8.697 9.142
 </record>
-<record label="48">
-48.000 9.047 8.697
+<record id="48" label="48"> 48.000 9.047 8.697
 </record>
-<record label="49">
-49.000 9.874 9.047
+<record id="49" label="49"> 49.000 9.874 9.047
 </record>
-<record label="50">
-50.000 11.420 9.874
+<record id="50" label="50"> 50.000 11.420 9.874
 </record>
-<record label="51">
-51.000 10.782 11.420
+<record id="51" label="51"> 51.000 10.782 11.420
 </record>
-<record label="52">
-52.000 11.207 10.782
+<record id="52" label="52"> 52.000 11.207 10.782
 </record>
-<record label="53">
-53.000 10.273 11.207
+<record id="53" label="53"> 53.000 10.273 11.207
 </record>
-<record label="54">
-54.000 10.290 10.273
+<record id="54" label="54"> 54.000 10.290 10.273
 </record>
-<record label="55">
-55.000 9.499 10.290
+<record id="55" label="55"> 55.000 9.499 10.290
 </record>
-<record label="56">
-56.000 9.645 9.499
+<record id="56" label="56"> 56.000 9.645 9.499
 </record>
-<record label="57">
-57.000 9.204 9.645
+<record id="57" label="57"> 57.000 9.204 9.645
 </record>
-<record label="58">
-58.000 8.791 9.204
+<record id="58" label="58"> 58.000 8.791 9.204
 </record>
-<record label="59">
-59.000 9.013 8.791
+<record id="59" label="59"> 59.000 9.013 8.791
 </record>
-<record label="60">
-60.000 9.221 9.013
+<record id="60" label="60"> 60.000 9.221 9.013
 </record>
-<record label="61">
-61.000 9.586 9.221
+<record id="61" label="61"> 61.000 9.586 9.221
 </record>
-<record label="62">
-62.000 9.804 9.586
+<record id="62" label="62"> 62.000 9.804 9.586
 </record>
-<record label="63">
-63.000 10.516 9.804
+<record id="63" label="63"> 63.000 10.516 9.804
 </record>
-<record label="64">
-64.000 10.024 10.516
+<record id="64" label="64"> 64.000 10.024 10.516
 </record>
-<record label="65">
-65.000 9.966 10.024
+<record id="65" label="65"> 65.000 9.966 10.024
 </record>
-<record label="66">
-66.000 10.754 9.966
+<record id="66" label="66"> 66.000 10.754 9.966
 </record>
-<record label="67">
-67.000 10.245 10.754
+<record id="67" label="67"> 67.000 10.245 10.754
 </record>
-<record label="68">
-68.000 10.096 10.245
+<record id="68" label="68"> 68.000 10.096 10.245
 </record>
-<record label="69">
-69.000 9.381 10.096
+<record id="69" label="69"> 69.000 9.381 10.096
 </record>
-<record label="70">
-70.000 8.837 9.381
+<record id="70" label="70"> 70.000 8.837 9.381
 </record>
-<record label="71">
-71.000 8.880 8.837
+<record id="71" label="71"> 71.000 8.880 8.837
 </record>
-<record label="72">
-72.000 9.706 8.880
+<record id="72" label="72"> 72.000 9.706 8.880
 </record>
-<record label="73">
-73.000 10.474 9.706
+<record id="73" label="73"> 73.000 10.474 9.706
 </record>
-<record label="74">
-74.000 11.503 10.474
+<record id="74" label="74"> 74.000 11.503 10.474
 </record>
-<record label="75">
-75.000 11.589 11.503
+<record id="75" label="75"> 75.000 11.589 11.503
 </record>
-<record label="76">
-76.000 10.626 11.589
+<record id="76" label="76"> 76.000 10.626 11.589
 </record>
-<record label="77">
-77.000 10.658 10.626
+<record id="77" label="77"> 77.000 10.658 10.626
 </record>
-<record label="78">
-78.000 10.540 10.658
+<record id="78" label="78"> 78.000 10.540 10.658
 </record>
-<record label="79">
-79.000 10.286 10.540
+<record id="79" label="79"> 79.000 10.286 10.540
 </record>
-<record label="80">
-80.000 10.007 10.286
+<record id="80" label="80"> 80.000 10.007 10.286
 </record>
-<record label="81">
-81.000 9.297 10.007
+<record id="81" label="81"> 81.000 9.297 10.007
 </record>
-<record label="82">
-82.000 8.781 9.297
+<record id="82" label="82"> 82.000 8.781 9.297
 </record>
-<record label="83">
-83.000 8.835 8.781
+<record id="83" label="83"> 83.000 8.835 8.781
 </record>
-<record label="84">
-84.000 8.912 8.835
+<record id="84" label="84"> 84.000 8.912 8.835
 </record>
-<record label="85">
-85.000 10.184 8.912
+<record id="85" label="85"> 85.000 10.184 8.912
 </record>
-<record label="86">
-86.000 10.641 10.184
+<record id="86" label="86"> 86.000 10.641 10.184
 </record>
-<record label="87">
-87.000 10.033 10.641
+<record id="87" label="87"> 87.000 10.033 10.641
 </record>
-<record label="88">
-88.000 9.880 10.033
+<record id="88" label="88"> 88.000 9.880 10.033
 </record>
-<record label="89">
-89.000 11.278 9.880
+<record id="89" label="89"> 89.000 11.278 9.880
 </record>
-<record label="90">
-90.000 10.429 11.278
+<record id="90" label="90"> 90.000 10.429 11.278
 </record>
-<record label="91">
-91.000 9.787 10.429
+<record id="91" label="91"> 91.000 9.787 10.429
 </record>
-<record label="92">
-92.000 9.458 9.787
+<record id="92" label="92"> 92.000 9.458 9.787
 </record>
-<record label="93">
-93.000 8.811 9.458
+<record id="93" label="93"> 93.000 8.811 9.458
 </record>
-<record label="94">
-94.000 8.651 8.811
+<record id="94" label="94"> 94.000 8.651 8.811
 </record>
-<record label="95">
-95.000 8.802 8.651
+<record id="95" label="95"> 95.000 8.802 8.651
 </record>
-<record label="96">
-96.000 9.164 8.802
+<record id="96" label="96"> 96.000 9.164 8.802
 </record>
-<record label="97">
-97.000 9.395 9.164
+<record id="97" label="97"> 97.000 9.395 9.164
 </record>
-<record label="98">
-98.000 10.460 9.395
+<record id="98" label="98"> 98.000 10.460 9.395
 </record>
-<record label="99">
-99.000 11.100 10.460
+<record id="99" label="99"> 99.000 11.100 10.460
 </record>
-<record label="100">
-100.000 11.167 11.100
+<record id="100" label="100"> 100.000 11.167 11.100
 </record>
-<record label="101">
-101.000 10.491 11.167
+<record id="101" label="101"> 101.000 10.491 11.167
 </record>
-<record label="102">
-102.000 10.091 10.491
+<record id="102" label="102"> 102.000 10.091 10.491
 </record>
-<record label="103">
-103.000 10.024 10.091
+<record id="103" label="103"> 103.000 10.024 10.091
 </record>
-<record label="104">
-104.000 9.525 10.024
+<record id="104" label="104"> 104.000 9.525 10.024
 </record>
-<record label="105">
-105.000 9.023 9.525
+<record id="105" label="105"> 105.000 9.023 9.525
 </record>
-<record label="106">
-106.000 8.733 9.023
+<record id="106" label="106"> 106.000 8.733 9.023
 </record>
-<record label="107">
-107.000 8.824 8.733
+<record id="107" label="107"> 107.000 8.824 8.733
 </record>
-<record label="108">
-108.000 9.072 8.824
+<record id="108" label="108"> 108.000 9.072 8.824
 </record>
-<record label="109">
-109.000 10.437 9.072
+<record id="109" label="109"> 109.000 10.437 9.072
 </record>
-<record label="110">
-110.000 10.387 10.437
+<record id="110" label="110"> 110.000 10.387 10.437
 </record>
-<record label="111">
-111.000 10.852 10.387
+<record id="111" label="111"> 111.000 10.852 10.387
 </record>
-<record label="112">
-112.000 10.913 10.852
+<record id="112" label="112"> 112.000 10.913 10.852
 </record>
-<record label="113">
-113.000 9.936 10.913
+<record id="113" label="113"> 113.000 9.936 10.913
 </record>
-<record label="114">
-114.000 10.263 9.936
+<record id="114" label="114"> 114.000 10.263 9.936
 </record>
-<record label="115">
-115.000 10.024 10.263
+<record id="115" label="115"> 115.000 10.024 10.263
 </record>
-<record label="116">
-116.000 9.451 10.024
+<record id="116" label="116"> 116.000 9.451 10.024
 </record>
-<record label="117">
-117.000 8.810 9.451
+<record id="117" label="117"> 117.000 8.810 9.451
 </record>
-<record label="118">
-118.000 8.616 8.810
+<record id="118" label="118"> 118.000 8.616 8.810
 </record>
-<record label="119">
-119.000 8.892 8.616
+<record id="119" label="119"> 119.000 8.892 8.616
 </record>
-<record label="120">
-120.000 9.706 8.892
+<record id="120" label="120"> 120.000 9.706 8.892
 </record>
-<record label="121">
-121.000 9.598 9.706
+<record id="121" label="121"> 121.000 9.598 9.706
 </record>
-<record label="122">
-122.000 9.705 9.598
+<record id="122" label="122"> 122.000 9.705 9.598
 </record>
-<record label="123">
-123.000 9.638 9.705
+<record id="123" label="123"> 123.000 9.638 9.705
 </record>
-<record label="124">
-124.000 10.682 9.638
+<record id="124" label="124"> 124.000 10.682 9.638
 </record>
-<record label="125">
-125.000 10.659 10.682
+<record id="125" label="125"> 125.000 10.659 10.682
 </record>
-<record label="126">
-126.000 10.701 10.659
+<record id="126" label="126"> 126.000 10.701 10.659
 </record>
-<record label="127">
-127.000 10.417 10.701
+<record id="127" label="127"> 127.000 10.417 10.701
 </record>
-<record label="128">
-128.000 10.200 10.417
+<record id="128" label="128"> 128.000 10.200 10.417
 </record>
 </records>
 </data>
+
+<data>
+<records count="127">
+<record source="1" destination="2" />
+<record source="2" destination="3" />
+<record source="3" destination="4" />
+<record source="4" destination="5" />
+<record source="5" destination="6" />
+<record source="6" destination="7" />
+<record source="7" destination="8" />
+<record source="8" destination="9" />
+<record source="9" destination="10" />
+<record source="10" destination="11" />
+<record source="11" destination="12" />
+<record source="12" destination="13" />
+<record source="13" destination="14" />
+<record source="14" destination="15" />
+<record source="15" destination="16" />
+<record source="16" destination="17" />
+<record source="17" destination="18" />
+<record source="18" destination="19" />
+<record source="19" destination="20" />
+<record source="20" destination="21" />
+<record source="21" destination="22" />
+<record source="22" destination="23" />
+<record source="23" destination="24" />
+<record source="24" destination="25" />
+<record source="25" destination="26" />
+<record source="26" destination="27" />
+<record source="27" destination="28" />
+<record source="28" destination="29" />
+<record source="29" destination="30" />
+<record source="30" destination="31" />
+<record source="31" destination="32" />
+<record source="32" destination="33" />
+<record source="33" destination="34" />
+<record source="34" destination="35" />
+<record source="35" destination="36" />
+<record source="36" destination="37" />
+<record source="37" destination="38" />
+<record source="38" destination="39" />
+<record source="39" destination="40" />
+<record source="40" destination="41" />
+<record source="41" destination="42" />
+<record source="42" destination="43" />
+<record source="43" destination="44" />
+<record source="44" destination="45" />
+<record source="45" destination="46" />
+<record source="46" destination="47" />
+<record source="47" destination="48" />
+<record source="48" destination="49" />
+<record source="49" destination="50" />
+<record source="50" destination="51" />
+<record source="51" destination="52" />
+<record source="52" destination="53" />
+<record source="53" destination="54" />
+<record source="54" destination="55" />
+<record source="55" destination="56" />
+<record source="56" destination="57" />
+<record source="57" destination="58" />
+<record source="58" destination="59" />
+<record source="59" destination="60" />
+<record source="60" destination="61" />
+<record source="61" destination="62" />
+<record source="62" destination="63" />
+<record source="63" destination="64" />
+<record source="64" destination="65" />
+<record source="65" destination="66" />
+<record source="66" destination="67" />
+<record source="67" destination="68" />
+<record source="68" destination="69" />
+<record source="69" destination="70" />
+<record source="70" destination="71" />
+<record source="71" destination="72" />
+<record source="72" destination="73" />
+<record source="73" destination="74" />
+<record source="74" destination="75" />
+<record source="75" destination="76" />
+<record source="76" destination="77" />
+<record source="77" destination="78" />
+<record source="78" destination="79" />
+<record source="79" destination="80" />
+<record source="80" destination="81" />
+<record source="81" destination="82" />
+<record source="82" destination="83" />
+<record source="83" destination="84" />
+<record source="84" destination="85" />
+<record source="85" destination="86" />
+<record source="86" destination="87" />
+<record source="87" destination="88" />
+<record source="88" destination="89" />
+<record source="89" destination="90" />
+<record source="90" destination="91" />
+<record source="91" destination="92" />
+<record source="92" destination="93" />
+<record source="93" destination="94" />
+<record source="94" destination="95" />
+<record source="95" destination="96" />
+<record source="96" destination="97" />
+<record source="97" destination="98" />
+<record source="98" destination="99" />
+<record source="99" destination="100" />
+<record source="100" destination="101" />
+<record source="101" destination="102" />
+<record source="102" destination="103" />
+<record source="103" destination="104" />
+<record source="104" destination="105" />
+<record source="105" destination="106" />
+<record source="106" destination="107" />
+<record source="107" destination="108" />
+<record source="108" destination="109" />
+<record source="109" destination="110" />
+<record source="110" destination="111" />
+<record source="111" destination="112" />
+<record source="112" destination="113" />
+<record source="113" destination="114" />
+<record source="114" destination="115" />
+<record source="115" destination="116" />
+<record source="116" destination="117" />
+<record source="117" destination="118" />
+<record source="118" destination="119" />
+<record source="119" destination="120" />
+<record source="120" destination="121" />
+<record source="121" destination="122" />
+<record source="122" destination="123" />
+<record source="123" destination="124" />
+<record source="124" destination="125" />
+<record source="125" destination="126" />
+<record source="126" destination="127" />
+<record source="127" destination="128" />
+</records>
+</data>
+
 </ggobidata>
