@@ -704,9 +704,15 @@ active_paint_points (datad *d, ggobid *gg)
       for (j=0; j<d->brush.binarray[ih][iv].nels; j++) {
         pt = d->rows_in_plot[d->brush.binarray[ih][iv].els[j]];
 
-        if (under_brush (pt, sp)) {
-          d->npts_under_brush++ ;    /*-- this is just boolean, really **/
-          d->pts_under_brush.els[pt] = 1;
+        /*
+         * if a case is hidden, or it's missing and we aren't
+         * displaying missings, don't count it as being under the brush.
+        */
+        if (splot_plot_case (pt, d, sp, display, gg)) {
+          if (under_brush (pt, sp)) {
+            d->npts_under_brush++ ;    /*-- this is just boolean, really **/
+            d->pts_under_brush.els[pt] = 1;
+          }
         }
       }
     }
