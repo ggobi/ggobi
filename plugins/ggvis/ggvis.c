@@ -49,7 +49,7 @@ void
 show_ggvis_window(PluginInstance *inst, GtkWidget *widget)
 {
   if (g_slist_length(inst->gg->d) < 1) {
-    fprintf(stderr, "No datasets to show\n");fflush(stderr);
+    g_printerr ("No datasets to show\n");
     return;
   }
 
@@ -166,7 +166,7 @@ set_dist_matrix_from_edges (datad *d, datad *e, ggobid *gg, ggvisd *ggv)
 }
 
 
-static void test_cb (GtkButton *button, PluginInstance *inst)
+static void cmds_cb (GtkButton *button, PluginInstance *inst)
 {
   ggobid *gg = inst->gg;
   ggvisd *ggv = GGVisFromInst (inst);
@@ -199,10 +199,6 @@ g_printerr ("distance matrix allocated, populated and scaled\n");
   cmds (&ggv->dist, &ggv->pos);
 g_printerr ("through cmds\n");
 
-/*-- add a couple of rounds of spring therapy --*/
-  spring_once (3, d, e, &ggv->dist, &ggv->pos);
-g_printerr ("through spring_once (ten times)\n");
-
 /*-- add three variables and put in the new values --*/
   {
     gint k;
@@ -221,6 +217,37 @@ g_printerr ("through spring_once (ten times)\n");
   }
 }
 
+static void spring_cb (GtkButton *button, PluginInstance *inst)
+{
+  ggobid *gg = inst->gg;
+  ggvisd *ggv = GGVisFromInst (inst);
+  gint i, j, jvar;
+  gchar *name;
+
+  datad *d = gg->current_display->d;
+  datad *e = gg->current_display->e;
+  if (d == NULL || e == NULL)
+    return;
+
+/*-- add a couple of rounds of spring therapy --*/
+  spring_once (3, d, e, &ggv->dist, &ggv->pos);
+g_printerr ("through spring_once (ten times)\n");
+
+  for (j=0; j<3; j++) {
+    name = g_strdup_printf ("Pos%d", j);
+    jvar = vartable_index_get_by_name (name, d);
+    g_free (name);
+    if (jvar >= 0) {
+      for (i=0; i<d->nrows; i++) {
+        d->raw.vals[i][jvar] = d->tform.vals[i][jvar] = ggv->pos.vals[i][j];
+      }
+      limits_set_by_var (jvar, true, true, d, gg);
+      tform_to_world_by_var (jvar, d, gg);
+    }
+  }
+  displays_tailpipe (REDISPLAY_ALL, FULL, gg);
+}
+
 GtkWidget *
 create_ggvis_window(ggobid *gg, PluginInstance *inst)
 {
@@ -236,9 +263,14 @@ create_ggvis_window(ggobid *gg, PluginInstance *inst)
   gtk_container_set_border_width (GTK_CONTAINER(main_vbox),0); 
   gtk_container_add (GTK_CONTAINER(window), main_vbox);
 
-  btn = gtk_button_new_with_label ("test");
+  btn = gtk_button_new_with_label ("cmds");
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                      GTK_SIGNAL_FUNC (test_cb), inst);
+                      GTK_SIGNAL_FUNC (cmds_cb), inst);
+  gtk_box_pack_start (GTK_BOX (main_vbox), btn, false, false, 3);
+
+  btn = gtk_button_new_with_label ("spring");
+  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+                      GTK_SIGNAL_FUNC (spring_cb), inst);
   gtk_box_pack_start (GTK_BOX (main_vbox), btn, false, false, 3);
 
   gtk_widget_show_all (window);

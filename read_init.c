@@ -98,7 +98,7 @@ gint
 getPreferences(const xmlDocPtr doc, GGobiInitInfo *info)
 {
   xmlNode *node, *el;
-  gint n, i;
+  /*gint n, i;*/
   node = getXMLDocElement(doc, "preferences");
 
   el = getXMLElement(node, "colorschemes");
@@ -110,7 +110,7 @@ getPreferences(const xmlDocPtr doc, GGobiInitInfo *info)
 
   el = getXMLElement(node, "background");
   if(el) {
-      char *tmp;
+      /*char *tmp;*/
       el = getXMLElement(el, "color");
       info->bgColor = (GdkColor *) g_malloc(sizeof(GdkColor));
       getColor(el, doc, NULL, info->bgColor);

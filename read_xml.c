@@ -735,7 +735,6 @@ setGlyph(const xmlChar **attrs, XMLParserData *data, gint i)
     }
   }
 
-
   return (value != -1);
 }
 

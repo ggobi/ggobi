@@ -6,16 +6,16 @@ ggobi:
 
 include local.config
 
-#CC = gcc
-CC = cc
+CC = gcc
+#CC = cc
 
 # This defaults to $(CC) and is reset to CXX by any optional 
 # segment that needs to use C++, e.g  USE_MYSQL 
 LD=$(CXX)
 LD=$(CC)
 
-#CFLAGS= -g2 -ansi -Wall -fpic -DHAVE_CONFIG_H
-CFLAGS= -g -ansi -DHAVE_CONFIG_H  # when using Irix cc
+CFLAGS= -g2 -ansi -Wall -fpic -DHAVE_CONFIG_H
+#CFLAGS= -g -ansi -DHAVE_CONFIG_H  # when using Irix cc
 CXXFLAGS=$(CFLAGS)
 
 ifdef TEST_KEYS
@@ -91,8 +91,7 @@ SRC=array.c ash1d.c \
  gtkextruler.c gtkexthruler.c gtkextvruler.c \
  mt19937-1.c cokus.c \
  fileio.c plugin.c print.c \
- xlines.c \
- ui_utils.c
+ xlines.c
 
 OB=array.o ash1d.o \
  brush_api.o brush_bins.o brush.o brush_init.o brush_link.o brush_ui.o \
@@ -124,8 +123,7 @@ OB=array.o ash1d.o \
 \
  gtkextruler.o gtkexthruler.o gtkextvruler.o \
  fileio.o plugin.o print.o \
- xlines.o  \
- ui_utils.o
+ xlines.o 
 
 
 ifdef USE_XML

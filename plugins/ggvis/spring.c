@@ -27,7 +27,7 @@ spring_once (gint ndims, datad *d, datad *e, array_d *dist, array_d *pos)
 {
   gint nNodes = d->nrows;
   gint nEdges = e->edge.n;
-  gint dim, iter, i, j, k, a, b;
+  gint dim0, dim1, iter, i, j, k, a, b;
   gdouble **dv = dist->vals;
   gdouble dx, dy, dst, xf, yf, f, el;
   endpointsd *endpoints = e->edge.endpoints;
@@ -49,8 +49,9 @@ spring_once (gint ndims, datad *d, datad *e, array_d *dist, array_d *pos)
   gdouble stepsize = .125;
   gdouble edgelength = .05/sqrt((gdouble)nNodes);
 
-  for (dim = 1; dim < ndims; dim++) {
-
+  for (dim1 = 1; dim1 < ndims; dim1++) {
+  for (dim0 = 0; dim0 < dim1-1; dim0++) {
+  
   for (iter = 0; iter < 10; iter++) {
 
       /* compute attractions between adjacent nodes using
@@ -61,10 +62,10 @@ spring_once (gint ndims, datad *d, datad *e, array_d *dist, array_d *pos)
       b = endpoints[i].b;
 
       /*-- this does the first two dimensions only; test this first --*/
-      dx = pos->vals[b][dim-1] - pos->vals[a][dim-1];
-      dy = pos->vals[b][dim] - pos->vals[a][dim];
-
+      dx = pos->vals[b][dim0] - pos->vals[a][dim0];
+      dy = pos->vals[b][dim1] - pos->vals[a][dim1];
       dst = sqrt(dx*dx + dy*dy);
+
       xf = 0.;
       yf = 0.;
       if (dst > 0.) {
@@ -101,8 +102,8 @@ spring_once (gint ndims, datad *d, datad *e, array_d *dist, array_d *pos)
       for (j = 0 ; j < nNodes; j++) {
         if (i == j)
           continue;
-        dx = pos->vals[i][dim-1] - pos->vals[j][dim-1];
-        dy = pos->vals[i][dim] - pos->vals[j][dim];
+        dx = pos->vals[i][dim0] - pos->vals[j][dim0];
+        dy = pos->vals[i][dim1] - pos->vals[j][dim1];
         dst = dx*dx + dy*dy;
         if (dst > 0.) {
           xf += (dx / dst);
@@ -128,11 +129,12 @@ spring_once (gint ndims, datad *d, datad *e, array_d *dist, array_d *pos)
     for (i = 0; i < nNodes; i++) {
       fx[i] = MAX(MIN(fx[i], 2.), -2.);
       fy[i] = MAX(MIN(fy[i], 2.), -2.);
-      pos->vals[i][dim-1] += stepsize*fx[i];
-      pos->vals[i][dim] += stepsize*fy[i];
+      pos->vals[i][dim0] += stepsize*fx[i];
+      pos->vals[i][dim1] += stepsize*fy[i];
       fx[i] /= 2.;
       fy[i] /= 2.;
     }
+  }
   }
   }
 
