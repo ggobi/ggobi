@@ -160,8 +160,8 @@ GGOBI(destroyCurrentDisplay)(ggobid *gg)
 /*-- need two of these now, one to replace and one to append --*/
 void
 GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
-  gint nr, gint nc, datad *d, gboolean cleanup, ggobid *gg,
-  InputDescription *desc)
+                gint nr, gint nc, datad *d, gboolean cleanup, ggobid *gg,
+                int *ids,  InputDescription *desc)
 {
   gint i, j;
   gchar *lbl;
@@ -172,10 +172,14 @@ GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
       /* Release all the displays associated with this datad
          and then release all the GUI components and memory
          for this datad.
+
+         This may need some reworking in order to release
+         exactly the right things, no more and no less.
        */
       GGOBI(displays_release)(gg);
       varpanel_clear(d, gg);
       GGOBI(data_release)(d, gg); 
+      submenu_destroy (gg->viewmode_item);
   }
 
   d->input = desc;
@@ -192,6 +196,13 @@ GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
   d->rows_in_plot = NULL;
 
   arrayf_alloc(&d->raw, nr, nc);
+
+  if(ids) {
+      rowids_alloc(d);
+      for(j = 0; j < nr; j++) {
+	  d->rowid.id.els[j] = ids[j];
+      }
+  }
 
   rowlabels_alloc (d, gg);
 
@@ -1085,7 +1096,7 @@ GGOBI(addVariable)(gdouble *vals, gint num, gchar *name, gboolean update,
        creation of a plot. Probably not, but just mention it here
        so we don't forget.
      */
-    GGOBI(setData)(vals, rnames, &name, num, 1, d, false, gg, d->input);
+    GGOBI(setData)(vals, rnames, &name, num, 1, d, false, gg, NULL, d->input);
     for (i = 0; i < num; i++)
       g_free (rnames[i]);
     g_free (rnames);
