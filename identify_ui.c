@@ -74,14 +74,12 @@ displays_add_point_cues (splotd *splot, gint k, ggobid *gg) {
   GList *dlist, *slist;
   displayd *display;
   splotd *sp;
-  GtkWidget *w;
 
   for (dlist = gg->displays; dlist; dlist = dlist->next) {
     display = (displayd *) dlist->data;
     for (slist = display->splots; slist; slist = slist->next) {
       sp = (splotd *) slist->data;
       if (sp != splot) {
-        w = sp->da;
         splot_redraw (sp, QUICK, gg);
       }
     }
@@ -225,8 +223,9 @@ cpanel_identify_make(ggobid *gg) {
  * button for making all labels sticky
 */
   btn = gtk_button_new_with_label ("Make all sticky");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS(gg->tips),
-                        btn, "Make all labels sticky, or persistent", NULL);
+  gtk_tooltips_set_tip (GTK_TOOLTIPS(gg->tips), btn,
+    "Make all labels sticky, or persistent (to make the nearest point label sticky, click middle or right in the plot)",
+    NULL);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (id_all_sticky_cb),
                       (gpointer) gg);
