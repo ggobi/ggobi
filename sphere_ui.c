@@ -161,6 +161,7 @@ sphere_apply_cb (GtkWidget *w, ggobid *gg) {
   datad *d = datad_get_from_window (gg->sphere_ui.window);
 
   if (d == NULL) return;
+  if (d->sphere.eigenval.els == NULL) return;
   
   firstpc = d->sphere.eigenval.els[0];
   lastpc = d->sphere.eigenval.els[d->sphere.npcs-1];
