@@ -758,35 +758,32 @@ The subsetting on \SVariable{g}
 is short-hand for 
 \begin{verbatim}
  getDatasetReference.ggobi(1, .gobi=g)
-\end{verbatim}
+\end{verbatim}%$
 
 
 \subsection{getGlyphs.ggobi}
 Return a description of the glyph
 being used for each of the observations.
 
-Unimplemented.
 
-\subsection{getLineSegments.ggobi}
-\subsection{setLineSegments.ggobi}
+\subsection{getEdges.ggobi}
+\subsection{setEdgets.ggobi}
 The first of these obtains an $r \times 2$ matrix where $r$ is the
-number of line segments in the ggobi instance.  Each element contains
+number of edges in the given dataset.  Each element contains
 the indices of the observations which are connected.  The second
 function sets the connected observations.  The format is similar to
-the return value of \SFunction{getLineSegments.ggobi}.  A matrix with
+the return value of \SFunction{getEdges.ggobi}.  A matrix with
 2 columns can be supplied to identify the observations to be connected
 by each line segment.  Alternatively, two integer vectors can be
-supplied.  One has the option to add the specified segments to the
+supplied.  The user has the option to add the specified segments to the
 existing ones or replace the latter with the specified connections.
 
 \subsection{getVariableIndex.ggobi}
 This is used to map one or more names into the corresponding variable
 indices used by the ggobi instance.  It uses
 \SFunction{getVariableNames.ggobi} and matches each of the elements
-passed to it.
-The resulting values are based on a $1$-based
-counting scheme and must be decremented by $1$ for
-use in a \SFunction{.Call}.
+passed to it.  The resulting values are based on a $1$-based counting
+scheme and must be decremented by $1$ for use in a \SFunction{.Call}.
 
 \subsection{getVariableNames.ggobi}
 Returns  a character vector containing the names of the variables in

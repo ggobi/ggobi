@@ -96,7 +96,6 @@ show_fileselector(InputDescription *desc, ggobid *gg)
     getcwd(buf, sizeof(buf));
     data->cwd = g_strdup(buf);
 
-
     gtk_icon_file_selection_show_tree(GTK_ICON_FILESEL(w), TRUE); 
 
     type = gtk_file_list_add_type
