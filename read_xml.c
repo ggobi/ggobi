@@ -102,7 +102,8 @@ void
 ggobi_XML_warning_handler(void *data, const gchar *msg, ...)
 {
   xmlParserCtxtPtr p = (xmlParserCtxtPtr) ((XMLParserData*) data)->parser;
-  fprintf(stderr, "Warning from XML parsing [%d, %d]: %s", p->input->line, p->input->col, msg);
+  fprintf(stderr, "Warning from XML parsing [%d, %d]: %s",
+    p->input->line, p->input->col, msg);
 /*
   fprintf(stderr, msg, ...); 
 */
@@ -205,7 +206,7 @@ data_xml_read (InputDescription *desc, ggobid *gg)
 void
 initParserData(XMLParserData *data, xmlSAXHandlerPtr handler, ggobid *gg)
 {
-  data->gg=gg;
+  data->gg = gg;
   data->current_record = 0;
   data->current_variable = 0;
   data->current_element = 0;
@@ -709,7 +710,9 @@ setGlyph(const xmlChar **attrs, XMLParserData *data, gint i)
   gint value;
   datad *d = getCurrentXMLData(data);
 
-  /*-- glyphSize  0:7 --*/
+/*
+ * glyphSize  0:7
+*/
   value = data->defaults.glyphSize;
   tmp = getAttribute(attrs, "glyphSize");
   if (tmp) {
@@ -720,14 +723,21 @@ setGlyph(const xmlChar **attrs, XMLParserData *data, gint i)
     if (tmp)
       xml_warning ("glyphSize", tmp, "Out of range", data);
   } else {
-     if (i < 0) {
-       data->defaults.glyphSize = value;
-     } else
-       d->glyph.els[i].size = d->glyph_now.els[i].size 
-             = d->glyph_prev.els[i].size = value;
+    if (i < 0) {
+      data->defaults.glyphSize = value;
+    } else {
+      /*
+       * note that even if defaults.glyphSize was set below, during
+       * the 'glyph' section, the values for record i are assigned here.
+      */
+      d->glyph.els[i].size = d->glyph_now.els[i].size 
+            = d->glyph_prev.els[i].size = value;
+    }
   }
 
-  /*-- glyphType  0:6 --*/
+/*
+ * glyphType  0:6
+*/
   value = data->defaults.glyphType;
   tmp = getAttribute(attrs, "glyphType");
   if (tmp) {
@@ -743,19 +753,25 @@ setGlyph(const xmlChar **attrs, XMLParserData *data, gint i)
     }
     value = strToInteger(tmp);
   }
-
   if(value < 0 || value >= NGLYPHTYPES) {
     if(tmp)
       xml_warning("glyphType", tmp, "Out of range", data);
   } else {
-    if(i < 0)
+    if(i < 0) {
       data->defaults.glyphType = value;
-    else
+    } else {
+      /*
+       * note that even if defaults.glyphType was set below, during
+       * the 'glyph' section, the values for record i are assigned here.
+      */
       d->glyph.els[i].type = d->glyph_now.els[i].type = 
            d->glyph_prev.els[i].type = value;
+    }
   }
 
-  /*-- glyph:  strings like "plus 3" or "." --*/
+/*
+ * glyph:  strings like "plus 3" or "."
+*/
   tmp = getAttribute(attrs, "glyph");
   if(tmp != NULL) {
     const gchar *next;
@@ -766,22 +782,23 @@ setGlyph(const xmlChar **attrs, XMLParserData *data, gint i)
     while(next) {
       if(j == 0) {
         value = mapGlyphName(next);
-        if(i < 0)
+        if(i < 0) {
           data->defaults.glyphType = value;
-        else
+        } else {
           d->glyph.els[i].type = d->glyph_now.els[i].type =
               d->glyph_prev.els[i].type = value;       
+        }
       } else {
         value = atoi(next);
-        if(i < 0) { 
-          if(data->defaults.glyphSize < 0) 
-            data->defaults.glyphSize = value;
-        } else
+        if(i < 0) {
+          data->defaults.glyphSize = value;
+        } else {
           d->glyph.els[i].size = d->glyph_now.els[i].size =
             d->glyph_prev.els[i].size = value;     
-     }
-     j++;
-     next = strtok(NULL, " ");
+        }
+      }
+      j++;
+      next = strtok(NULL, " ");
     }
   }
 
@@ -1426,7 +1443,7 @@ readXMLRecord(const xmlChar **attrs, XMLParserData *data)
       /* Length is to hold the current record number as a string. */
       stmp = g_malloc(sizeof(gchar) * 10);
       g_snprintf(stmp, 9, "%d", i);
-      }
+    }
   } else
     stmp = g_strdup (tmp);
 
