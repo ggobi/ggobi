@@ -1,15 +1,12 @@
-<ggobidata count="1">
+<ggobidata count="2">
 
-<data name="COI Nodes">
+<data name="COI Nodes" points="T" edges="F" edgesIn="COI Edges">
 <description>
-
-One dataset, points and edges.  It doesn't need to be
-two datasets because we have no data on the edges.
 
 </description>
 <variables count="2">
-  <variable>biz_in</variable>
-  <variable>biz_out</variable>
+  <realvariable>biz_in</realvariable>
+  <realvariable>biz_out</realvariable>
 </variables>
 <records  count="5">
 <record label="2012175830">  8 7  </record>
@@ -18,15 +15,19 @@ two datasets because we have no data on the edges.
 <record label="2014128020">  9 9  </record>
 <record label="2016011778">  8 10 </record>
 </records>
-
-<edges count="4">
-<edge source="1" destination="2"> </edge>
-<edge source="2" destination="3"> </edge>
-<edge source="3" destination="4"> </edge>
-<edge source="2" destination="4"> </edge>
-</edges>
-
 </data>
+
+<!-- -------------------------------------------------------- -->
+
+<data name="COI Edges" points="F" edges="F" edgeEndpointsIn="COI Nodes">
+
+<records count="4">
+<record source="1" destination="2"> </record>
+<record source="2" destination="3"> </record>
+<record source="3" destination="4"> </record>
+<record source="2" destination="4"> </record>
+</edges>
+</records>
 
 </data>
 </ggobidata>

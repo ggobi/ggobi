@@ -1,0 +1,77 @@
+
+This file contains the xml format discussed on 5/1, which describes
+how to handle 
+  * grouping data within a single datasets
+  * m to n linking of cases between two or more datasets
+  * adding edges, with or without associated data
+  * linking nodes to edges, either singly or by group
+  * handling categorical data
+
+There are two datasets here.
+
+Customers has three variables:
+  usage as a continuous variable
+  probability of being a fraudster
+  customer's status as business/residential user
+  
+
+It has a case-edge relationship with Calls: ie, its cases
+correspond to the edges in Calls.
+
+Calls has four variables:
+  length of the call in seconds
+  start time of the call
+  type of call as a categorical variable: 800, collect, etc
+  probability of being fraudulent
+
+
+How does this work:
+
+0. in the xml
+
+  edge records are specified just like any other records, but they have
+    a source and a destination in addition to the other attributes.  
+
+  categories to be used for linking are specified as categorical
+    variables, rather than using special tags as we were planning.
+
+  in the absence of categorical variables, or when no categorical
+    variable has been specified for linking, linking is done
+    according to id -- and an id is unique within a dataset.  (this
+    allows related datasets of different sizes to be linked 1-to-1)
+
+  i'm not sure how the node-edge relationships should be specified,
+    but some displays need to have a pointer to one of each:  ie,
+    scatterplot displays of Customer points need pointers to two
+    datasets:  Customer points and Call edges.
+
+1. in the interface
+
+  categorical data can be plotted either in scatterplots or
+    (in principle) in special categorical data displays.
+    it will continue to be stored in raw_data (etc) in floating
+    point.
+
+  linking will be done as follows:  if categorical variable j is
+    specified as a linking variable, then brushing a point or an edge
+    will cause will cause all entities sharing level k of categorical
+    variable j to be painted, whether they're points or edges.
+    if no categorical variable is specified, linking is by id.
+
+  there will be no more default edges.  anyone wanting edges has
+    to say so.
+
+2. at the C level
+
+  every datad structure will serve either for node data, edge data or both.
+     if it contains only node data or if it contains edges without
+     variables, lots of pointers remain null.
+
+  can i specify up front that some pairs of datasets are not linked?
+    in this example, can I say that the records in Calls are not linked
+    to the records in Customers?  if that's true, then when i'm 
+    brushing in the absence of a categorical variable, i don't have
+    to search among Customers for the set of ids that i just painted.
+    it would be like having an exclusion list.  maybe if the lookup
+    function is fast enough, that isn't necessary.
+    
