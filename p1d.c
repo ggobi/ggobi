@@ -197,10 +197,12 @@ p1d_ash_baseline_set (splotd *sp)
   glong pl, ltmp;
   gint iscr;
 
+/*
   ftmp = -1 + 2.0 * (0 - sp->p1d_lim.min)/
                     (sp->p1d_lim.max - sp->p1d_lim.min);
+*/
+  ftmp = -1 /* and the rest of the usual expression is 0 now */;
   pl = (glong) (precis * ftmp);
-
 
 /*-- HORIZONTAL --*/
   ltmp = pl - sp->pmid.y;
