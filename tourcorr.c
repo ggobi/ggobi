@@ -21,28 +21,28 @@ alloc_tourcorr (displayd *dsp, ggobid *gg)
 
   /* first index is the projection dimensions, second dimension is ncols */
   arrayf_init(&dsp->tcorr1.u0);
-  arrayf_alloc(&dsp->tcorr1.u0, 1, nc);
+  arrayf_alloc(&dsp->tcorr1.u0, 2, nc);
 
   arrayf_init(&dsp->tcorr1.u1);
-  arrayf_alloc(&dsp->tcorr1.u1, 1, nc);
+  arrayf_alloc(&dsp->tcorr1.u1, 2, nc);
 
   arrayf_init(&dsp->tcorr1.u);
-  arrayf_alloc(&dsp->tcorr1.u, 1, nc);
+  arrayf_alloc(&dsp->tcorr1.u, 2, nc);
 
   arrayf_init(&dsp->tcorr1.v0);
-  arrayf_alloc(&dsp->tcorr1.v0, 1, nc);
+  arrayf_alloc(&dsp->tcorr1.v0, 2, nc);
 
   arrayf_init(&dsp->tcorr1.v1);
-  arrayf_alloc(&dsp->tcorr1.v1, 1, nc);
+  arrayf_alloc(&dsp->tcorr1.v1, 2, nc);
 
   arrayf_init(&dsp->tcorr1.v);
-  arrayf_alloc(&dsp->tcorr1.v, 1, nc);
+  arrayf_alloc(&dsp->tcorr1.v, 2, nc);
 
   arrayf_init(&dsp->tcorr1.uvevec);
-  arrayf_alloc(&dsp->tcorr1.uvevec, 1, nc);
+  arrayf_alloc(&dsp->tcorr1.uvevec, 2, nc);
 
   arrayf_init(&dsp->tcorr1.tv);
-  arrayf_alloc(&dsp->tcorr1.tv, 1, nc);
+  arrayf_alloc(&dsp->tcorr1.tv, 2, nc);
 
   vectori_init(&dsp->tcorr1.vars);
   vectori_alloc(&dsp->tcorr1.vars, nc);
@@ -55,34 +55,34 @@ alloc_tourcorr (displayd *dsp, ggobid *gg)
 
   /* manipulation controls */
   arrayf_init(&dsp->tc1_manbasis);
-  arrayf_alloc(&dsp->tc1_manbasis,2,nc);
+  arrayf_alloc(&dsp->tc1_manbasis, 2, nc);
   arrayf_init(&dsp->tc2_manbasis);
-  arrayf_alloc(&dsp->tc2_manbasis,2,nc);
+  arrayf_alloc(&dsp->tc2_manbasis, 2, nc);
 
   /* first index is the projection dimensions, second dimension is ncols */
   arrayf_init(&dsp->tcorr2.u0);
-  arrayf_alloc(&dsp->tcorr2.u0, 1, nc);
+  arrayf_alloc(&dsp->tcorr2.u0, 2, nc);
 
   arrayf_init(&dsp->tcorr2.u1);
-  arrayf_alloc(&dsp->tcorr2.u1, 1, nc);
+  arrayf_alloc(&dsp->tcorr2.u1, 2, nc);
 
   arrayf_init(&dsp->tcorr2.u);
-  arrayf_alloc(&dsp->tcorr2.u, 1, nc);
+  arrayf_alloc(&dsp->tcorr2.u, 2, nc);
 
   arrayf_init(&dsp->tcorr2.v0);
-  arrayf_alloc(&dsp->tcorr2.v0, 1, nc);
+  arrayf_alloc(&dsp->tcorr2.v0, 2, nc);
 
   arrayf_init(&dsp->tcorr2.v1);
-  arrayf_alloc(&dsp->tcorr2.v1, 1, nc);
+  arrayf_alloc(&dsp->tcorr2.v1, 2, nc);
 
   arrayf_init(&dsp->tcorr2.v);
-  arrayf_alloc(&dsp->tcorr2.v, 1, nc);
+  arrayf_alloc(&dsp->tcorr2.v, 2, nc);
 
   arrayf_init(&dsp->tcorr2.uvevec);
-  arrayf_alloc(&dsp->tcorr2.uvevec, 1, nc);
+  arrayf_alloc(&dsp->tcorr2.uvevec, 2, nc);
 
   arrayf_init(&dsp->tcorr2.tv);
-  arrayf_alloc(&dsp->tcorr2.tv, 1, nc);
+  arrayf_alloc(&dsp->tcorr2.tv, 2, nc);
 
   vectori_init(&dsp->tcorr2.vars);
   vectori_alloc(&dsp->tcorr2.vars, nc);
@@ -855,7 +855,8 @@ tourcorr_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
     copy_mat(dsp->tcorr2.u0.vals, dsp->tcorr2.u.vals, d->ncols, 1);
     dsp->tcorr1.get_new_target = true;
     dsp->tcorr2.get_new_target = true;
-    tourcorr_pause(cpanel, CTOFF, gg);
+    if (!cpanel->tcorr1_paused && !cpanel->tcorr2_paused)
+      tourcorr_pause(cpanel, CTOFF, gg);
   }
 }
 
@@ -866,6 +867,7 @@ tourcorr_manip_end(splotd *sp)
   datad *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
   ggobid *gg = GGobiFromSPlot(sp);
+  extern void copy_mat(gfloat **, gfloat **, gint, gint);
 
   if (sp->motion_id)
     gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
@@ -876,7 +878,8 @@ tourcorr_manip_end(splotd *sp)
   dsp->tcorr2.get_new_target = true;
 
   /* need to turn on tour? */
-  tourcorr_pause(cpanel, CTOFF, gg);
+  if (!cpanel->tcorr1_paused && !cpanel->tcorr2_paused)
+    tourcorr_pause(cpanel, CTOFF, gg);
 
 }
 

@@ -326,6 +326,14 @@ static gint
 button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
   extern void tourcorr_manip_init(gint, gint, splotd *);
+  gint grab_ok;
+
+  grab_ok = gdk_pointer_grab (sp->da->window,
+    false,
+    (GdkEventMask) (GDK_POINTER_MOTION_MASK|GDK_BUTTON_RELEASE_MASK),
+    (GdkWindow *) NULL,
+    (GdkCursor *) NULL,
+    event->time);
 
   sp->mousepos.x = (gint) event->x;
   sp->mousepos.y = (gint) event->y;
@@ -349,6 +357,8 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   sp->mousepos.y = (gint) event->y;
 
   tourcorr_manip_end(sp);
+
+  gdk_pointer_ungrab (event->time);
 
   return retval;
 }
