@@ -745,6 +745,13 @@ splot_pixmap0_to_pixmap1 (splotd *sp, gboolean binned, ggobid *gg) {
   datad *d = display->d;
   gint mode = mode_get (gg);
 
+#if 0
+      if(gg->plot_GC == NULL) {
+	  init_plot_GC(w->window, gg);
+	  fprintf(stderr, "Mmmm\n");
+	  return;
+      }
+#endif
   if (!binned) {
     gdk_draw_pixmap (sp->pixmap1, gg->plot_GC, sp->pixmap0,
                      0, 0, 0, 0,
@@ -791,6 +798,13 @@ splot_pixmap0_to_pixmap1 (splotd *sp, gboolean binned, ggobid *gg) {
 void
 splot_pixmap1_to_window (splotd *sp, ggobid *gg) {
   GtkWidget *w = sp->da;
+#if 0
+      if(gg->plot_GC == NULL) {
+	  init_plot_GC(w->window, gg);
+	 fprintf(stderr, "Mmmm");
+         return;
+      }
+#endif
   gdk_draw_pixmap (sp->da->window, gg->plot_GC, sp->pixmap1,
                    0, 0, 0, 0,
                    w->allocation.width,

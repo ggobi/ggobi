@@ -73,6 +73,15 @@ extern const gint ViewTypeIndeces[3];
 #define REDISPLAY_PRESENT 2
 
 /* modes */
+
+
+typedef enum {NULLMODE = -1, 
+               P1PLOT, XYPLOT, ROTATE, TOUR1D, TOUR2D, COTOUR,
+               SCALE, BRUSH, IDENT, EDGEED, MOVEPTS, 
+               SCATMAT, PCPLOT, TSPLOT,
+               NMODES} PipelineMode;
+#if 0
+
 #define NMODES 14  /*-- exclude NULLMODE --*/
 
 #define NULLMODE -1
@@ -93,6 +102,7 @@ extern const gint ViewTypeIndeces[3];
 #define SCATMAT 11
 #define PCPLOT  12
 #define TSPLOT  13
+#endif
 /* */
 
 #define TEXTURE 0

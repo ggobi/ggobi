@@ -116,7 +116,7 @@ struct _ggobid {
 
 /*----------------------- pipeline ---------------------------------*/
 
- gint mode, prev_mode;
+ PipelineMode mode, prev_mode;
  gint projection, prev_projection;
 
  struct _VarTableUI {

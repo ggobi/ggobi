@@ -270,6 +270,8 @@ datad.o read_xml.o: datad.c datad.h
 
 print.o: print.c print.h
 
+%.o: %.d
+
 %.d: %.c
 	$(CC) -M $(CFLAGS) -I. `gtk-config --cflags` $< > $@
 

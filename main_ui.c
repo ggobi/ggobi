@@ -689,19 +689,18 @@ load_previous_file(GtkWidget *w, gpointer cbd)
   GGobiDescription *gdesc;
   ggobid *gg;
 
-  gg = GGobiFromWidget(w, false);
-  gdesc = (GGobiDescription*) cbd;
-  desc =  &(gdesc->input);
+   gg = GGobiFromWidget(w, false);
+   gdesc = (GGobiDescription*) cbd;
+   desc =  &(gdesc->input);
 
-  fprintf(stderr, "Number of displays %d\n", g_list_length(gdesc->displays));
+   if(g_slist_length(gg->d) > 0)
+      create_ggobi(desc);
+   else {
+      read_input(desc, gg);
+       /* Need to avoid the initial scatterplot. */
+      start_ggobi(gg, true, gdesc->displays == NULL);
+   }
 
-  if(g_slist_length(gg->d) > 0)
-     create_ggobi(desc);
-  else {
-    read_input(desc, gg);
-     /* Need to avoid the initial scatterplot. */
-    start_ggobi(gg, true, gdesc->displays == NULL);
-  }
 
   if (gdesc->displays) {
     gint i, n;
