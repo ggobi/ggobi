@@ -189,7 +189,7 @@ parse_command_line (gint *argc, gchar **av, ggobid *gg)
   if (*argc == 0)
     sessionOptions->data_in = (stdin_p) ? g_strdup_printf ("stdin") : NULL;
   else
-    sessionOptions->data_in = g_strdup_printf (av[0]);
+    sessionOptions->data_in = g_strdup(av[0]);
 
   return 1;
 }
