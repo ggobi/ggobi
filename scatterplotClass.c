@@ -847,9 +847,7 @@ cpanelSet(displayd *dpy, cpaneld *cpanel, ggobid *gg)
 
       cpanel_brush_set (cpanel, gg);
       cpanel_scale_set (cpanel, gg);
-#ifdef EDIT_EDGES_IMPLEMENTED
       cpanel_edgeedit_set (cpanel, gg);
-#endif
       cpanel_identify_set (cpanel, gg);
 
       return(true);

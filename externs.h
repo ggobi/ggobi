@@ -13,13 +13,14 @@ extern "C" {
 #endif
 
 RedrawStyle brush_activate (gboolean, displayd *, ggobid *);
+RedrawStyle edgeedit_activate (gboolean state, displayd *display, ggobid *gg);
 RedrawStyle identify_activate (gint, displayd *, ggobid *);
 RedrawStyle p1d_activate (gint, displayd *, ggobid *);
 RedrawStyle viewmode_activate (splotd *, PipelineMode, gboolean, ggobid *);
 RedrawStyle xyplot_activate (gint, displayd *, ggobid *);
 
 /* sort -t":" -k1.12 */
-RedrawStyle edgeedit_activate (gboolean state, displayd *display, ggobid *gg);
+void       edgeedit_init (ggobid * gg);
 GtkWidget* CreateMenuCheck (GtkWidget *, gchar *, GtkSignalFunc, gpointer, gboolean, ggobid *);
 GtkWidget* CreateMenuItem (GtkWidget *, gchar *, gchar *, gchar *, GtkWidget *, GtkAccelGroup *, GtkSignalFunc, gpointer, ggobid *) ;
 ggobid*    GGobiFromDisplay (displayd *display);

@@ -208,12 +208,10 @@ splot_event_handled (GtkWidget *w, GdkEventKey *event,
   case GDK_I:
     action = IDENT;
   break;
-#ifdef EDIT_EDGES_IMPLEMENTED
   case GDK_e:
   case GDK_E:
     action = EDGEED;
   break;
-#endif
   case GDK_m:
   case GDK_M:
     action = MOVEPTS;
@@ -702,7 +700,11 @@ splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp,
 /* 
  * In order to compute the limits for the rulers, I need to
  * run a pair of points through the reverse pipeline -- but
- * without have any impact on the pipeline data structures.
+ * without having any impact on the pipeline data structures.
+ *
+ * This should probably be replaced with pt_screen_to_raw
+ * in lineedit.c.  I just have to make sure the results are
+ * consistent. -- dfs
 */
 void
 splot_screen_to_tform (cpaneld *cpanel, splotd *sp, icoords *scr,

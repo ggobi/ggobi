@@ -579,9 +579,7 @@ mode_has_options_menu (gint mode, displayd *prev_display, ggobid *gg)
   return (mode == P1PLOT || mode == XYPLOT || mode == SCALE  ||
           mode == BRUSH  || mode == TOUR1D || mode == TOUR2D ||
           mode == COTOUR || mode == IDENT  ||
-#ifdef EDIT_EDGES_IMPLEMENTED
           mode == EDGEED ||
-#endif
           mode == MOVEPTS ||
           mode == SCATMAT || mode == PCPLOT  || mode == EXTENDED_DISPLAY_MODE);
 }
@@ -689,11 +687,9 @@ viewmode_submenus_update (PipelineMode prev_mode, displayd *prev_display,
     case XYPLOT:
       xyplot_menus_make (gg);
     break;
-#ifdef EDIT_EDGES_IMPLEMENTED
     case EDGEED:
       edgeedit_menus_make (gg);
     break;
-#endif
     case MOVEPTS:
       movepts_menus_make (gg);
     break;

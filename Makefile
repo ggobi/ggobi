@@ -66,9 +66,6 @@ endif
 ifdef SMOOTH_IMPLEMENTED
   CFLAGS+= -DSMOOTH_IMPLEMENTED=1
 endif
-ifdef EDIT_EDGES_IMPLEMENTED
-  CFLAGS+= -DEDIT_EDGES_IMPLEMENTED=1
-endif
 ifdef PRINTING_IMPLEMENTED
   CFLAGS+= -DPRINTING_IMPLEMENTED=1
 endif
@@ -160,11 +157,12 @@ ggobi: $(OB) $(EXTRA_OB)
 
 pure: ggobi.o $(OB) $(EXTRA_OB)
 	purify -cache-dir=/usr/dfs/tmp -always-use-cache-dir=yes \
-	-user-path=/usr/dfs/ggobi/ggobi:/usr/dfs/ggobi/ggobi/plugins/GraphAction \
+	-user-path=/usr/dfs/ggobi/ggobi:/usr/dfs/ggobi/ggobi/plugins/GraphLayout \
 	$(LD) $(OB) $(EXTRA_OB) \
-	/usr/dfs/ggobi/ggobi/plugins/GraphAction/graphact.o \
-	/usr/dfs/ggobi/ggobi/plugins/GraphAction/init.o \
-	/usr/dfs/ggobi/ggobi/plugins/GraphAction/ga_cbacks.o \
+	/usr/dfs/ggobi/ggobi/plugins/GraphLayout/glayout.o \
+	/usr/dfs/ggobi/ggobi/plugins/GraphLayout/graphviz.o \
+	/usr/dfs/ggobi/ggobi/plugins/GraphLayout/init.o \
+	/usr/dfs/ggobi/ggobi/plugins/GraphLayout/radial.o \
 	$(LDFLAGS) -o ggobi \
 	/usr/dfs/cc/lib/libxml2.so \
 	`gtk-config --libs`

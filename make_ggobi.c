@@ -91,10 +91,7 @@ void globals_init(ggobid * gg)
 /*-- initialize variables which DO depend on the size of the data --*/
 static void viewmodes_init(datad * d, ggobid * gg)
 {
-#ifdef EDIT_EDGES_IMPLEMENTED
-  extern void edgeedit_init(ggobid * gg);
   edgeedit_init(gg);
-#endif
   brush_init(d, gg);
 }
 

@@ -73,9 +73,7 @@ make_control_panels (ggobid *gg)
   cpanel_brush_make (gg);
   cpanel_scale_make (gg);
   cpanel_identify_make (gg);
-#ifdef EDIT_EDGES_IMPLEMENTED
   cpanel_edgeedit_make (gg);
-#endif
   cpanel_movepts_make (gg);
 
 

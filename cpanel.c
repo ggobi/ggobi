@@ -34,9 +34,7 @@ scatterplot_cpanel_init (cpaneld *cpanel, PipelineMode initial_mode,
 
   cpanel_brush_init (cpanel, gg);
   cpanel_scale_init (cpanel, gg);
-#ifdef EDIT_EDGES_IMPLEMENTED
   cpanel_edgeedit_init (cpanel, gg);
-#endif
   cpanel_identify_init (cpanel, gg);
 }
 

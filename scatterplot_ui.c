@@ -65,11 +65,9 @@ scatterplot_mode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func,
   CreateMenuItem (gg->app.scatterplot_mode_menu, "Identify",
     "^i", "", NULL, accel_group, func,
     useIds ? GINT_TO_POINTER (IDENT) : gg, gg);
-#ifdef EDIT_EDGES_IMPLEMENTED
   CreateMenuItem (gg->app.scatterplot_mode_menu, "Edit edges",
     "^e", "", NULL, accel_group, func,
     useIds ? GINT_TO_POINTER (EDGEED) : gg, gg);
-#endif
   CreateMenuItem (gg->app.scatterplot_mode_menu, "Move Points",
     "^m", "", NULL, accel_group, func,
     useIds ? GINT_TO_POINTER (MOVEPTS) : gg, gg);
