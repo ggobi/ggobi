@@ -1,0 +1,27 @@
+To configure this for development testing, you need only create a file
+named local.config in this directory and populate it with the
+variables that locate the gtkextra distribution. If you have installed
+gtkextra (via make install in that distribution's directory), you need
+only specify the location of the gtkextra-config executable. From
+that, we can determine the location of the header files and the
+libraries. 
+
+Alternatively, if you have not installed gtkextra, you will need to
+specify the values for the variables GTKEXTRA_LIB_DIR and
+GTEXTRA_INCLUDES.  GTKEXTRA_LIB_DIR should be the name of the
+directory in which the libgtkextra.so (or .a) file is located.
+For example,
+ GTKEXTRA_LIB_DIR=-I/home3/duncan/gtkextra-0.99-14/.libs
+We take care of adding the necessary flags for linking the library.
+
+GTKEXTRA_INCLUDES should contain the
+-I/directory/for/gtkextra/includes so that we can find the file
+`gtkextra/gtksheet.h'. Also, you can add any other pre-processor
+symbol definitions, etc.
+For example,
+ GTKEXTRA_INCLUDES=-I/home3/duncan/gtkextra-0.99-14
+
+If you don't install gtextra, or you install it in a non-standard
+location, you may have to set the environment variable LD_LIBRARY_PATH
+so that when GGobi attempts to load the plugin shared libraries, it
+can find all the dependencies.
