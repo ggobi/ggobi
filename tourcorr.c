@@ -21,28 +21,28 @@ alloc_tourcorr (displayd *dsp, ggobid *gg)
 
   /* first index is the projection dimensions, second dimension is ncols */
   arrayf_init(&dsp->tcorr1.u0);
-  arrayf_alloc(&dsp->tcorr1.u0, nc, nc);
+  arrayf_alloc(&dsp->tcorr1.u0, 1, nc);
 
   arrayf_init(&dsp->tcorr1.u1);
-  arrayf_alloc(&dsp->tcorr1.u1, nc, nc);
+  arrayf_alloc(&dsp->tcorr1.u1, 1, nc);
 
   arrayf_init(&dsp->tcorr1.u);
-  arrayf_alloc(&dsp->tcorr1.u, nc, nc);
+  arrayf_alloc(&dsp->tcorr1.u, 1, nc);
 
   arrayf_init(&dsp->tcorr1.v0);
-  arrayf_alloc(&dsp->tcorr1.v0, nc, nc);
+  arrayf_alloc(&dsp->tcorr1.v0, 1, nc);
 
   arrayf_init(&dsp->tcorr1.v1);
-  arrayf_alloc(&dsp->tcorr1.v1, nc, nc);
+  arrayf_alloc(&dsp->tcorr1.v1, 1, nc);
 
   arrayf_init(&dsp->tcorr1.v);
-  arrayf_alloc(&dsp->tcorr1.v, nc, nc);
+  arrayf_alloc(&dsp->tcorr1.v, 1, nc);
 
   arrayf_init(&dsp->tcorr1.uvevec);
-  arrayf_alloc(&dsp->tcorr1.uvevec, nc, nc);
+  arrayf_alloc(&dsp->tcorr1.uvevec, 1, nc);
 
   arrayf_init(&dsp->tcorr1.tv);
-  arrayf_alloc(&dsp->tcorr1.tv, nc, nc);
+  arrayf_alloc(&dsp->tcorr1.tv, 1, nc);
 
   vectori_init(&dsp->tcorr1.vars);
   vectori_alloc(&dsp->tcorr1.vars, nc);
@@ -61,28 +61,28 @@ alloc_tourcorr (displayd *dsp, ggobid *gg)
 
   /* first index is the projection dimensions, second dimension is ncols */
   arrayf_init(&dsp->tcorr2.u0);
-  arrayf_alloc(&dsp->tcorr2.u0, nc, nc);
+  arrayf_alloc(&dsp->tcorr2.u0, 1, nc);
 
   arrayf_init(&dsp->tcorr2.u1);
-  arrayf_alloc(&dsp->tcorr2.u1, nc, nc);
+  arrayf_alloc(&dsp->tcorr2.u1, 1, nc);
 
   arrayf_init(&dsp->tcorr2.u);
-  arrayf_alloc(&dsp->tcorr2.u, nc, nc);
+  arrayf_alloc(&dsp->tcorr2.u, 1, nc);
 
   arrayf_init(&dsp->tcorr2.v0);
-  arrayf_alloc(&dsp->tcorr2.v0, nc, nc);
+  arrayf_alloc(&dsp->tcorr2.v0, 1, nc);
 
   arrayf_init(&dsp->tcorr2.v1);
-  arrayf_alloc(&dsp->tcorr2.v1, nc, nc);
+  arrayf_alloc(&dsp->tcorr2.v1, 1, nc);
 
   arrayf_init(&dsp->tcorr2.v);
-  arrayf_alloc(&dsp->tcorr2.v, nc, nc);
+  arrayf_alloc(&dsp->tcorr2.v, 1, nc);
 
   arrayf_init(&dsp->tcorr2.uvevec);
-  arrayf_alloc(&dsp->tcorr2.uvevec, nc, nc);
+  arrayf_alloc(&dsp->tcorr2.uvevec, 1, nc);
 
   arrayf_init(&dsp->tcorr2.tv);
-  arrayf_alloc(&dsp->tcorr2.tv, nc, nc);
+  arrayf_alloc(&dsp->tcorr2.tv, 1, nc);
 
   vectori_init(&dsp->tcorr2.vars);
   vectori_alloc(&dsp->tcorr2.vars, nc);
@@ -245,7 +245,7 @@ display_tourcorr_init (displayd *dsp, ggobid *gg) {
     dsp->tcorr2.vars.els[j] = j+2;
 
   /* declare starting vertical base as first variable */
-  for (i=0; i<nc; i++)
+  for (i=0; i<1; i++)
     for (j=0; j<nc; j++)
       dsp->tcorr1.u0.vals[i][j] = dsp->tcorr1.u1.vals[i][j] = 
         dsp->tcorr1.u.vals[i][j] = 
@@ -253,7 +253,7 @@ display_tourcorr_init (displayd *dsp, ggobid *gg) {
 
   dsp->tcorr1.u.vals[0][dsp->tcorr1.vars.els[0]] = 1.0;
 
-  for (i=0; i<nc; i++)
+  for (i=0; i<1; i++)
     for (j=0; j<nc; j++)
       dsp->tcorr2.u0.vals[i][j] = dsp->tcorr2.u1.vals[i][j] = 
         dsp->tcorr2.u.vals[i][j] = 
@@ -476,13 +476,10 @@ tourcorr_run(displayd *dsp, ggobid *gg)
   extern void tour_reproject(vector_f, array_f, array_f, array_f, 
     array_f, array_f, gint, gint);
   extern void copy_mat(gfloat **, gfloat **, gint, gint);
+  gint i, nv;
 
   if (!dsp->tcorr1.get_new_target && 
       !reached_target(dsp->tcorr1.nsteps, dsp->tcorr1.stepcntr)) {
-
-    /*  if (!dsp->tcorr1.get_new_target && !dsp->tcorr2.get_new_target && 
-       (!reached_target(dsp->tcorr1.nsteps, dsp->tcorr1.stepcntr) ||
-       !reached_target(dsp->tcorr2.nsteps, dsp->tcorr2.stepcntr))) {*/
 
     increment_tour(dsp->tcorr1.tinc, dsp->tcorr1.tau, &dsp->tcorr1.nsteps, 
       &dsp->tcorr1.stepcntr, dsp->tcorr1.dv, dsp->tcorr1.delta, (gint) 1);
@@ -498,17 +495,25 @@ tourcorr_run(displayd *dsp, ggobid *gg)
       }
     
     copy_mat(dsp->tcorr1.u0.vals, dsp->tcorr1.u.vals, d->ncols, 1);
-
-    gt_basis(dsp->tcorr1.u1, dsp->tcorr1.nvars, dsp->tcorr1.vars, d->ncols, 
-      (gint) 1);
-    path(dsp->tcorr1.u0, dsp->tcorr1.u1, dsp->tcorr1.u, d->ncols, (gint) 1, 
+    nv = 0;
+    for (i=0; i<d->ncols; i++) 
+      if (fabs(dsp->tcorr1.u0.vals[0][i]) > 0.01) {
+        nv++;
+      }
+    if (nv == 1 && dsp->tcorr1.nvars == 1) /* only generate new dir if num of
+					   active/used variables is > 1 */
+      dsp->tcorr1.get_new_target = true;
+    else {
+      gt_basis(dsp->tcorr1.u1, dsp->tcorr1.nvars, dsp->tcorr1.vars, d->ncols, 
+        (gint) 1);
+      path(dsp->tcorr1.u0, dsp->tcorr1.u1, dsp->tcorr1.u, d->ncols, (gint) 1, 
        dsp->tcorr1.v0, dsp->tcorr1.v1, dsp->tcorr1.v, dsp->tcorr1.lambda, 
        dsp->tcorr1.tv, dsp->tcorr1.uvevec,
        dsp->tcorr1.tau, dsp->tcorr1.tinc, &dsp->tcorr1.nsteps, 
        &dsp->tcorr1.stepcntr, 
        &dsp->tcorr1.dv, dsp->tcorr1.delta);
-
-    dsp->tcorr1.get_new_target = false;
+      dsp->tcorr1.get_new_target = false;
+    }
   }
 
   if (!dsp->tcorr2.get_new_target && 
@@ -526,16 +531,24 @@ tourcorr_run(displayd *dsp, ggobid *gg)
         dsp->tcorr2.v1, dsp->tcorr2.u, dsp->tcorr2.uvevec, d->ncols, (gint) 1);
     }
     copy_mat(dsp->tcorr2.u0.vals, dsp->tcorr2.u.vals, d->ncols, 1);
-
-    gt_basis(dsp->tcorr2.u1, dsp->tcorr2.nvars, dsp->tcorr2.vars, d->ncols, 
-      (gint) 1);
-    path(dsp->tcorr2.u0, dsp->tcorr2.u1, dsp->tcorr2.u, d->ncols, (gint) 1, 
-      dsp->tcorr2.v0, dsp->tcorr2.v1, dsp->tcorr2.v, dsp->tcorr2.lambda, 
-      dsp->tcorr2.tv, dsp->tcorr2.uvevec,
-      dsp->tcorr2.tau, dsp->tcorr2.tinc, &dsp->tcorr2.nsteps, 
-      &dsp->tcorr2.stepcntr, &dsp->tcorr2.dv, dsp->tcorr2.delta);
-
-    dsp->tcorr2.get_new_target = false;
+    nv = 0;
+    for (i=0; i<d->ncols; i++) 
+      if (fabs(dsp->tcorr2.u0.vals[0][i]) > 0.01) {
+        nv++;
+      }
+    if (nv == 1 && dsp->tcorr2.nvars == 1) /* only generate new dir if num of
+					   active/used variables is > 1 */
+      dsp->tcorr2.get_new_target = true;
+    else {
+      gt_basis(dsp->tcorr2.u1, dsp->tcorr2.nvars, dsp->tcorr2.vars, d->ncols, 
+        (gint) 1);
+      path(dsp->tcorr2.u0, dsp->tcorr2.u1, dsp->tcorr2.u, d->ncols, (gint) 1, 
+        dsp->tcorr2.v0, dsp->tcorr2.v1, dsp->tcorr2.v, dsp->tcorr2.lambda, 
+        dsp->tcorr2.tv, dsp->tcorr2.uvevec,
+        dsp->tcorr2.tau, dsp->tcorr2.tinc, &dsp->tcorr2.nsteps, 
+        &dsp->tcorr2.stepcntr, &dsp->tcorr2.dv, dsp->tcorr2.delta);
+      dsp->tcorr2.get_new_target = false;
+    }
   }
   
   display_tailpipe (dsp, gg);

@@ -18,28 +18,28 @@ alloc_tour2d (displayd *dsp, ggobid *gg)
 
   /* first index is the projection dimensions, second dimension is ncols */
   arrayf_init(&dsp->t2d.u0);
-  arrayf_alloc(&dsp->t2d.u0, nc, nc);
+  arrayf_alloc(&dsp->t2d.u0, 2, nc);
 
   arrayf_init(&dsp->t2d.u1);
-  arrayf_alloc(&dsp->t2d.u1, nc, nc);
+  arrayf_alloc(&dsp->t2d.u1, 2, nc);
 
   arrayf_init(&dsp->t2d.u);
-  arrayf_alloc(&dsp->t2d.u, nc, nc);
+  arrayf_alloc(&dsp->t2d.u, 2, nc);
 
   arrayf_init(&dsp->t2d.v0);
-  arrayf_alloc(&dsp->t2d.v0, nc, nc);
+  arrayf_alloc(&dsp->t2d.v0, 2, nc);
 
   arrayf_init(&dsp->t2d.v1);
-  arrayf_alloc(&dsp->t2d.v1, nc, nc);
+  arrayf_alloc(&dsp->t2d.v1, 2, nc);
 
   arrayf_init(&dsp->t2d.v);
-  arrayf_alloc(&dsp->t2d.v, nc, nc);
+  arrayf_alloc(&dsp->t2d.v, 2, nc);
 
   arrayf_init(&dsp->t2d.uvevec);
-  arrayf_alloc(&dsp->t2d.uvevec, nc, nc);
+  arrayf_alloc(&dsp->t2d.uvevec, 2, nc);
 
   arrayf_init(&dsp->t2d.tv);
-  arrayf_alloc(&dsp->t2d.tv, nc, nc);
+  arrayf_alloc(&dsp->t2d.tv, 2, nc);
 
   vectori_init(&dsp->t2d.vars);
   vectori_alloc(&dsp->t2d.vars, nc);
@@ -127,35 +127,6 @@ free_tour2d(displayd *dsp)
   arrayf_free(&dsp->t2d.uvevec, 0, 0);
   arrayf_free(&dsp->t2d.tv, 0, 0);
 
-  /*  for (k=0; k<nc; k++)
-    g_free((gpointer) dsp->u[k]);
-  g_free((gpointer) dsp->u);
-  for (k=0; k<nc; k++)
-    g_free((gpointer) dsp->u0[k]);
-  g_free((gpointer) dsp->u0);
-  for (k=0; k<nc; k++)
-    g_free((gpointer) dsp->u1[k]);
-  g_free((gpointer) dsp->u1);
-  for (k=0; k<nc; k++)
-    g_free((gpointer) dsp->uold[k]);
-  g_free((gpointer) dsp->uold);
-
-  for (k=0; k<nc; k++)
-    g_free((gpointer) dsp->v0[k]);
-  g_free((gpointer) dsp->v0);
-  for (k=0; k<nc; k++)
-    g_free((gpointer) dsp->v1[k]);
-  g_free((gpointer) dsp->v1);
-  for (k=0; k<nc; k++)
-    g_free((gpointer) dsp->v[k]);
-  g_free((gpointer) dsp->v);
-  for (k=0; k<nc; k++)
-    g_free((gpointer) dsp->uvevec[k]);
-  g_free((gpointer) dsp->uvevec);
-  for (k=0; k<nc; k++)
-    g_free((gpointer) dsp->tv[k]);
-  g_free((gpointer) dsp->tv);*/
-
 }
 
 void 
@@ -176,12 +147,12 @@ display_tour2d_init (displayd *dsp, ggobid *gg) {
   dsp->t2d.vars.els[2] = 2;*/
 
   /* declare starting base as first p chosen variables */
-  for (i=0; i<nc; i++)
+  for (i=0; i<2; i++)
     for (j=0; j<nc; j++)
       dsp->t2d.u0.vals[i][j] = dsp->t2d.u1.vals[i][j] = dsp->t2d.u.vals[i][j] = 
         dsp->t2d.v0.vals[i][j] = dsp->t2d.v1.vals[i][j] = 0.0;
 
-  for (i=0; i<nc; i++)
+  for (i=0; i<2; i++)
   {
     dsp->t2d.u1.vals[i][dsp->t2d.vars.els[i]] =
       dsp->t2d.u0.vals[i][dsp->t2d.vars.els[i]] = 
@@ -333,6 +304,7 @@ tour2d_run(displayd *dsp, ggobid *gg)
     array_f, array_f, gint, gint);
   extern void copy_mat(gfloat **, gfloat **, gint, gint);
   datad *d = dsp->d;
+  gint i, nv;
 
   if (!dsp->t2d.get_new_target && 
        !reached_target(dsp->t2d.nsteps, dsp->t2d.stepcntr)) {
@@ -348,12 +320,23 @@ tour2d_run(displayd *dsp, ggobid *gg)
 	  dsp->t2d.u, dsp->t2d.uvevec, d->ncols, (gint) 2);
     }
     copy_mat(dsp->t2d.u0.vals, dsp->t2d.u.vals, d->ncols, 2);
-    gt_basis(dsp->t2d.u1, dsp->t2d.nvars, dsp->t2d.vars, d->ncols, (gint) 2);
-    path(dsp->t2d.u0, dsp->t2d.u1, dsp->t2d.u, d->ncols, (gint) 2, dsp->t2d.v0,
+    nv = 0;
+    for (i=0; i<d->ncols; i++)
+      if (fabs(dsp->t2d.u0.vals[0][i]) > 0.01 || 
+          fabs(dsp->t2d.u0.vals[1][i]) > 0.01) {
+        nv++;
+      }
+    if (nv <= 2 && dsp->t2d.nvars <= 2) /* only generate new dir if num of
+					   active/used variables is > 2 */
+      dsp->t2d.get_new_target = true;
+    else {
+      gt_basis(dsp->t2d.u1, dsp->t2d.nvars, dsp->t2d.vars, d->ncols, (gint) 2);
+      path(dsp->t2d.u0, dsp->t2d.u1, dsp->t2d.u, d->ncols, (gint) 2, dsp->t2d.v0,
       dsp->t2d.v1, dsp->t2d.v, dsp->t2d.lambda, dsp->t2d.tv, dsp->t2d.uvevec,
       dsp->t2d.tau, dsp->t2d.tinc, &dsp->t2d.nsteps, &dsp->t2d.stepcntr, 
       &dsp->t2d.dv, dsp->t2d.delta);
-    dsp->t2d.get_new_target = false;
+      dsp->t2d.get_new_target = false;
+    }
   }
   
   display_tailpipe (dsp, gg);

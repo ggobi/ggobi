@@ -353,10 +353,8 @@ tour1d_run(displayd *dsp, ggobid *gg)
   gfloat *gdata;
   gboolean revert_random = false;
 
-  gint i, j, kout;
+  gint i, j, kout, nv;
 
-  if (dsp->t1d.get_new_target)
-    printf("1 basis method %d\n",dsp->t1d.target_basis_method);
   if (!dsp->t1d.get_new_target && 
       !reached_target(dsp->t1d.nsteps, dsp->t1d.stepcntr)) {
     increment_tour(dsp->t1d.tinc, dsp->t1d.tau, &dsp->t1d.nsteps, 
@@ -371,94 +369,102 @@ tour1d_run(displayd *dsp, ggobid *gg)
         dsp->t1d.u, dsp->t1d.uvevec, d->ncols, (gint) 1);
     }
     copy_mat(dsp->t1d.u0.vals, dsp->t1d.u.vals, d->ncols, 1);
-    printf("basis method %d\n",dsp->t1d.target_basis_method);
-    if (dsp->t1d.target_basis_method == 0) {
-      gt_basis(dsp->t1d.u1, dsp->t1d.nvars, dsp->t1d.vars, d->ncols, (gint) 1);
-    }
-    else if (dsp->t1d.target_basis_method == 1) {
-      /* pp guided tour  */
-        alloc_optimize0_p(&op, dsp->t1d.nvars, 1);
-        arrayf_alloc_zero (&op.data, d->nrows_in_plot, dsp->t1d.nvars); 
-        for (i=0; i<d->nrows_in_plot; i++)
-          for (j=0; j<dsp->t1d.nvars; j++)
-            op.data.vals[i][j] = 
-              d->tform.vals[d->rows_in_plot[i]][dsp->t1d.vars.els[j]];
+    nv = 0;
+    for (i=0; i<d->ncols; i++)
+      if (fabs(dsp->t1d.u0.vals[0][i]) > 0.01) {
+        nv++;
+      }
+    if (nv == 1 && dsp->t1d.nvars == 1) /* only generate new dir if num of
+					   active/used variables is > 2 */
+      dsp->t1d.get_new_target = true;
+    else {
+      if (dsp->t1d.target_basis_method == 0) {
+        gt_basis(dsp->t1d.u1, dsp->t1d.nvars, dsp->t1d.vars, d->ncols, (gint) 1);
+      }
+      else if (dsp->t1d.target_basis_method == 1) {
+        /* pp guided tour  */
+          alloc_optimize0_p(&op, dsp->t1d.nvars, 1);
+          arrayf_alloc_zero (&op.data, d->nrows_in_plot, dsp->t1d.nvars); 
+          for (i=0; i<d->nrows_in_plot; i++)
+            for (j=0; j<dsp->t1d.nvars; j++)
+              op.data.vals[i][j] = 
+                d->tform.vals[d->rows_in_plot[i]][dsp->t1d.vars.els[j]];
 
-	/* Only for testing */
-        nrows  = d->nrows_in_plot;
-        ncols  = dsp->t1d.nvars;
-        pdim   = 1;
-        gdata  = malloc (nrows*sizeof(gfloat));
+          /* Only for testing */
+          nrows  = d->nrows_in_plot;
+          ncols  = dsp->t1d.nvars;
+          pdim   = 1;
+          gdata  = malloc (nrows*sizeof(gfloat));
        
-        if (d->clusterid.els==NULL) printf ("No cluster information found\n");
-        for (i=0; i<nrows; i++)
-	{ if (d->clusterid.els!=NULL)
-            gdata[i] = d->clusterid.els[d->rows_in_plot[i]];
-          else
-            gdata[i] = 0;
-        }
+          if (d->clusterid.els==NULL) printf ("No cluster information found\n");
+          for (i=0; i<nrows; i++)
+	  { if (d->clusterid.els!=NULL)
+              gdata[i] = d->clusterid.els[d->rows_in_plot[i]];
+            else
+              gdata[i] = 0;
+          }
 
-        switch (cpanel->t1d_pp_indx)
-        { case 10: /* SUB-d */
-            alloc_subd_p (&sp, nrows, pdim);
-            kout  = optimize0 (&op, subd, &sp);
-            free_subd_p (&sp);
-            break;
-          case 11: /* Discriminant */
-            alloc_discriminant_p (&dp, gdata, nrows, pdim);
-            kout = optimize0 (&op, discriminant, &dp);
-            free_discriminant_p (&dp);
-            break;
-          case 12: /* CartGini */
-            alloc_cartgini_p (&cgp, nrows, gdata);
-            kout = optimize0 (&op, cartgini, &cgp);
-            free_cartgini_p (&cgp);
-            break;
-          case 13: /* CartEntropy */
-            alloc_cartentropy_p (&cep, nrows, gdata);
-            kout = optimize0 (&op, cartentropy, &cep);
-            free_cartentropy_p (&cep);
-            break;
-          case 14: /* CartVariance */
-            alloc_cartvariance_p (&cvp, nrows, gdata);
-            kout = optimize0 (&op, cartvariance, &cvp);
-            free_cartvariance_p (&cvp);
-            break;
-          case 15: /* PCA */
-            kout = optimize0 (&op, pca, NULL);
-          default: 
-            revert_random = true;
+          switch (cpanel->t1d_pp_indx)
+          { case 10: /* SUB-d */
+              alloc_subd_p (&sp, nrows, pdim);
+              kout  = optimize0 (&op, subd, &sp);
+              free_subd_p (&sp);
+              break;
+            case 11: /* Discriminant */
+              alloc_discriminant_p (&dp, gdata, nrows, pdim);
+              kout = optimize0 (&op, discriminant, &dp);
+              free_discriminant_p (&dp);
+              break;
+            case 12: /* CartGini */
+              alloc_cartgini_p (&cgp, nrows, gdata);
+              kout = optimize0 (&op, cartgini, &cgp);
+              free_cartgini_p (&cgp);
+              break;
+            case 13: /* CartEntropy */
+              alloc_cartentropy_p (&cep, nrows, gdata);
+              kout = optimize0 (&op, cartentropy, &cep);
+              free_cartentropy_p (&cep);
+              break;
+            case 14: /* CartVariance */
+              alloc_cartvariance_p (&cvp, nrows, gdata);
+              kout = optimize0 (&op, cartvariance, &cvp);
+              free_cartvariance_p (&cvp);
+              break;
+            case 15: /* PCA */
+              kout = optimize0 (&op, pca, NULL);
+            default: 
+              revert_random = true;
+          }
+          free (gdata);
+          if (!revert_random) {
+            sleep(5);
+            for (i=0; i<d->ncols; i++)
+              for (j=0; j<d->ncols; j++)
+                dsp->t1d.u1.vals[i][j] = 0.0;
+            for (i=0; i<dsp->t1d.nvars; i++)
+              dsp->t1d.u1.vals[0][dsp->t1d.vars.els[i]] = 
+                op.proj_best.vals[i][0];
+            /* if the best projection is the same as the previous one, switch 
+              to a random projection */
+            if (!checkequiv(dsp->t1d.u0.vals, dsp->t1d.u1.vals, d->ncols, 1)) {
+              gt_basis(dsp->t1d.u1, dsp->t1d.nvars, dsp->t1d.vars, 
+                d->ncols, (gint) 1);
+              printf("Using random projection\n");
+            }
         }
-        free (gdata);
-        if (!revert_random) {
-          sleep(5);
-          for (i=0; i<d->ncols; i++)
-            for (j=0; j<d->ncols; j++)
-              dsp->t1d.u1.vals[i][j] = 0.0;
-          for (i=0; i<dsp->t1d.nvars; i++)
-            dsp->t1d.u1.vals[0][dsp->t1d.vars.els[i]] = 
-              op.proj_best.vals[i][0];
-          /* if the best projection is the same as the previous one, switch 
-            to a random projection */
-          if (!checkequiv(dsp->t1d.u0.vals, dsp->t1d.u1.vals, d->ncols, 1)) {
+          else
             gt_basis(dsp->t1d.u1, dsp->t1d.nvars, dsp->t1d.vars, 
               d->ncols, (gint) 1);
-            printf("Using random projection\n");
-          }
-	}
-        else
-          gt_basis(dsp->t1d.u1, dsp->t1d.nvars, dsp->t1d.vars, 
-            d->ncols, (gint) 1);
-      
-      free_optimize0_p(&op);
+        
+        free_optimize0_p(&op);
+      }
+      path(dsp->t1d.u0, dsp->t1d.u1, dsp->t1d.u, d->ncols, (gint) 1, dsp->t1d.v0,
+        dsp->t1d.v1, dsp->t1d.v, dsp->t1d.lambda, dsp->t1d.tv, dsp->t1d.uvevec,
+        dsp->t1d.tau, dsp->t1d.tinc, &dsp->t1d.nsteps, &dsp->t1d.stepcntr, 
+        &dsp->t1d.dv, dsp->t1d.delta);
+      dsp->t1d.get_new_target = false;
     }
-    path(dsp->t1d.u0, dsp->t1d.u1, dsp->t1d.u, d->ncols, (gint) 1, dsp->t1d.v0,
-      dsp->t1d.v1, dsp->t1d.v, dsp->t1d.lambda, dsp->t1d.tv, dsp->t1d.uvevec,
-      dsp->t1d.tau, dsp->t1d.tinc, &dsp->t1d.nsteps, &dsp->t1d.stepcntr, 
-      &dsp->t1d.dv, dsp->t1d.delta);
-    dsp->t1d.get_new_target = false;
   }
-  
   /*  tour_reproject(dsp, 2);*/
   display_tailpipe (dsp, gg);
 
