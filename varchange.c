@@ -111,7 +111,7 @@ newvar_add (gint vtype, gchar *vname, datad *d, ggobid *gg)
 
   /*-- emit variable_added signal --*/
   gtk_signal_emit (GTK_OBJECT (gg->main_window),
-    gg->signal_variable_added, gg); 
+                      GGobiSignals[VARIABLE_ADDED_SIGNAL], vt, gg); 
 }
 
 /*

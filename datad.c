@@ -113,16 +113,7 @@ datad_init (datad *d, ggobid *gg, gboolean cleanup)
 
   varpanel_refresh (gg);
 
-#ifdef DATAD_ADDED_SIGNAL_IMPLEMENTED
-  /*g_printerr ("emitting datad_added signal\n");*/
-  gtk_signal_emit (GTK_OBJECT (gg->main_window), gg->signal_datad_added, gg); 
-  /*{
-    gboolean rval = false;
-    g_printerr ("emitting datad_added signal by name\n");
-    gtk_signal_emit_by_name (GTK_OBJECT (gg->main_window), "datad_added", 
-      gg, &rval);
-  }*/
-#endif
+  gtk_signal_emit (GTK_OBJECT (gg->main_window), GGobiSignals[DATAD_ADDED_SIGNAL], d, gg); 
 
   return (display);
 }

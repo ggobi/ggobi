@@ -151,7 +151,6 @@ move_pt (gint id, gint x, gint y, splotd *sp, datad *d, ggobid *gg) {
       /* Now notify anyone who is interested in this move. */
       GGobiPointMoveEvent ev;
       ev.id = id;
-      ev.value = d->raw.vals[0][id];
       ev.d = d;
       gtk_signal_emit(GTK_OBJECT(sp->da), GGobiSignals[POINT_MOVE_SIGNAL], sp, &ev, gg);
   }

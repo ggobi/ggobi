@@ -48,18 +48,17 @@ void globals_init (ggobid *gg) {
 
   gg->d = NULL;
 
-#ifdef DATAD_ADDED_SIGNAL_IMPLEMENTED
-  /*-- If this signal has not been initialized yet, do it now --*/
+       /*-- If this signal has not been initialized yet, do it now --*/
   if (gtk_signal_lookup ("datad_added", GTK_TYPE_WIDGET) == 0) {
-    gg->signal_datad_added =
+    GGobiSignals[DATAD_ADDED_SIGNAL] =
       gtk_object_class_user_signal_new (gtk_type_class (GTK_TYPE_WIDGET),
         "datad_added",
         GTK_RUN_LAST | GTK_RUN_ACTION,
-        gtk_marshal_NONE__POINTER,
-        GTK_TYPE_NONE, 1,
-        GTK_TYPE_POINTER);
+        gtk_marshal_NONE__POINTER_POINTER,
+        GTK_TYPE_NONE, 2,
+        GTK_TYPE_POINTER, GTK_TYPE_POINTER);
   }
-#endif
+
   if (gtk_signal_lookup ("brush_motion", GTK_TYPE_WIDGET) == 0) {
       GGobiSignals[BRUSH_MOTION_SIGNAL] = 
        gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_WIDGET),
@@ -94,13 +93,13 @@ void globals_init (ggobid *gg) {
 
 
   if (gtk_signal_lookup ("variable_added", GTK_TYPE_WIDGET) == 0) {
-    gg->signal_variable_added =
+    GGobiSignals[VARIABLE_ADDED_SIGNAL] =
       gtk_object_class_user_signal_new (gtk_type_class (GTK_TYPE_WIDGET),
         "variable_added",
         GTK_RUN_LAST | GTK_RUN_ACTION,
-        gtk_marshal_NONE__POINTER,
-        GTK_TYPE_NONE, 1,
-        GTK_TYPE_POINTER);
+        gtk_marshal_NONE__POINTER_POINTER,
+        GTK_TYPE_NONE, 2,
+        GTK_TYPE_POINTER, GTK_TYPE_POINTER);
   }
 }
 
