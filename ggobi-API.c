@@ -259,7 +259,7 @@ GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
   br_hidden_alloc (d);
   br_hidden_init(d);
 
-  if(d->vartable) {
+  if(values && d->vartable) {
       /* the person who created the datad is taking care of populating it.*/
    for (j = 0; j < nc ; j++) {
     vt = vartable_element_get (j, d);
@@ -276,10 +276,12 @@ GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
         /* g_free (lbl); */
       }
 
-      if(GGobiMissingValue && GGobiMissingValue(values[i + j*nr]))
+      if(values) {
+        if(GGobiMissingValue && GGobiMissingValue(values[i + j*nr]))
          setMissingValue(i, j, d, vt);
-      else
+        else
          d->raw.vals[i][j] = values[i + j*nr];
+      }
     }
    }
   } 
@@ -297,14 +299,12 @@ GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
          This looks very dangerous. Should use g_list_remove();
        */
     gg->displays->next = NULL;
-
   }
   display_menu_build (gg);
 }
 
 
 /* These are all for freeing the currently held data. */
-
 void
 GGOBI(displays_release)(ggobid *gg)
 {
@@ -1186,45 +1186,10 @@ GGOBI(getColorName)(gint cid, ggobid *gg, gboolean inDefault)
 }
 
 
-/*-- this is really addRealVariable --*/
-gint
-GGOBI(addVariable)(gdouble *vals, gint num, gchar *name,
-  gboolean update, datad *d, ggobid *gg)
-{
-  if (d->ncols < 1) {
-    gchar ** rnames = &DefaultRowNames;
-    /* May want the final false here to be true as it causes the 
-       creation of a plot. Probably not, but just mention it here so we don't forget.  */
-
-    GGOBI(setData)(NULL, rnames, &name, num, d->ncols, d, false, gg, NULL, false, d->input);
-    datad_init(d, gg, false);
-  } 
-
-  if (num > d->nrows) {
-      num = d->nrows;
-      /* Add a warning here. */
-  }
-    newvar_add_with_values (vals, num, name,
-      real, 0, NULL, NULL, NULL,
-      d, gg);
-
-  if (update)
-    gdk_flush();
-
-  return (d->ncols - 1);  /*-- incremented by clone_vars --*/
-}
-
-/*
-It's hard to get the sequence right of adding a variable, updating its
-data, updating the variable table structure, setting the variable's type,
-emitting an event saying that a variable has been added, and updating the
-GUI.   ....  This works for now, but the code is not pretty.  We're making
-only very limted use of the event we emit.    dfs  2/7
-*/
-gint
-GGOBI(addCategoricalVariable)(gdouble *vals, gint num, gchar *name,
-  gchar **levels, gint *values, gint *counts, gint numLevels,
-  gboolean update, datad *d, ggobid *gg)
+static gint
+addVariableInternal(gdouble *vals, gint num, gchar *name,
+		    gchar **levels, gint *values, gint *counts, gint numLevels,
+		    gboolean update, datad *d, ggobid *gg)
 {
   if (d->ncols < 1) {
     gchar ** rnames = &DefaultRowNames; 
@@ -1248,6 +1213,30 @@ GGOBI(addCategoricalVariable)(gdouble *vals, gint num, gchar *name,
     gdk_flush();
 
   return(d->ncols-1);
+}
+
+/*-- this is really addRealVariable --*/
+gint
+GGOBI(addVariable)(gdouble *vals, gint num, gchar *name,
+		   gboolean update, datad *d, ggobid *gg)
+{
+  return(addVariableInternal(vals, num, name, NULL, NULL, NULL, 0, update, d, gg));
+}
+
+/*
+It's hard to get the sequence right of adding a variable, updating its
+data, updating the variable table structure, setting the variable's type,
+emitting an event saying that a variable has been added, and updating the
+GUI.   ....  This works for now, but the code is not pretty.  We're making
+only very limted use of the event we emit.    dfs  2/7
+*/
+gint
+GGOBI(addCategoricalVariable)(gdouble *vals, gint num, gchar *name,
+			      gchar **levels, gint *values, gint *counts, gint numLevels,
+			      gboolean update, datad *d, ggobid *gg)
+{
+
+  return(addVariableInternal(vals, num, name, levels, values, counts, numLevels, update, d, gg));
 }
 
 
