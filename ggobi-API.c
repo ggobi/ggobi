@@ -741,14 +741,14 @@ GGOBI(setObservationEdge)(gint x, gint y, datad *d, ggobid *gg, gboolean update)
 gboolean 
 GGOBI(getShowLines)()
 {
- return(GGOBI(getDefaultDisplayOptions)()->edges_directed_show_p);
+ return(GGOBI(getDefaultDisplayOptions)()->edges_undirected_show_p);
 }
 
 
 gboolean GGOBI(setShowLines)(gboolean val)
 {
  gboolean old = GGOBI(getShowLines)();
- GGOBI(getDefaultDisplayOptions)()->edges_directed_show_p = val;
+ GGOBI(getDefaultDisplayOptions)()->edges_undirected_show_p = val;
 
  return(old);
 }
