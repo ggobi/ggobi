@@ -140,9 +140,31 @@ addPlugin(GGobiPluginInfo *info, GtkWidget *list)
 }
 
 
-/*
 
- */
+void
+closePlugins(ggobid *gg)
+{
+    GList *el, *tmp;
+    PluginInstance *plugin;
+
+    el = gg->pluginInstances;
+    while(el) { 
+        plugin = (PluginInstance *) el->data;
+        if(plugin->info->onClose) {
+	  DLFUNC f =  getPluginSymbol(plugin->info->onClose, plugin->info);
+          f(gg, plugin);
+	}
+        tmp = el;
+	el = el->next;
+        g_free(plugin);    
+/*        g_free(tmp); */
+    }
+    gg->pluginInstances = NULL;
+}
+
+
+
+/***************************************************************************/
 
 
 

@@ -22,6 +22,8 @@
 #include "externs.h"
 #include "display.h"
 
+#include "plugin.h"
+
 extern const gchar *const GlyphNames[];
 
 /*
@@ -840,6 +842,9 @@ GGOBI(registerColorMap)(ggobid *gg)
  return(true);
 }
 
+
+
+
 /*
   Whether to destory the window or not.
   If this is being called from an event handler
@@ -855,6 +860,12 @@ GGOBI(close)(ggobid *gg, gboolean closeWindow)
     return (false);
 
   gg->close_pending = true;
+
+  /* close plugin instances */
+#if 1
+  closePlugins(gg);
+#endif
+
   display_free_all (gg);
 
   if (closeWindow && gg->main_window)
@@ -869,6 +880,7 @@ GGOBI(close)(ggobid *gg, gboolean closeWindow)
   /* Now fix up the list of ggobi's */
   return (ggobi_remove(gg) != -1);
 }
+
 
 void
 GGOBI(setIdentifyHandler)(IdentifyProc proc,  void *data, ggobid *gg)

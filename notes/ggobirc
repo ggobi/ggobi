@@ -53,7 +53,7 @@
    <description>Displays datasets in data grid.</description>
    <author>Duncan Temple Lang</author>
    <dll name="plugins/DataViewer/DataViewer.so">
-     <init onCreate="addToMenu" />
+     <init onCreate="addToMenu"  onClose="closeWindow" />
    </dll>
  </plugin>
 </plugins>

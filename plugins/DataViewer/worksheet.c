@@ -2,6 +2,8 @@
 #include "ggobi.h"
 #include "GGobiAPI.h"
 
+#include <stdio.h>
+
 #include "plugin.h"
 
 #include "gtksheet.h"
@@ -191,4 +193,12 @@ add_ggobi_data(datad *data, GtkWidget *w)
 void close_worksheet_window(GtkWidget *w, PluginInstance *inst)
 {
     inst->data = NULL;
+}
+
+void closeWindow(ggobid *gg, PluginInstance *inst)
+{
+    if(inst->data) {
+      gtk_signal_disconnect_by_func(GTK_OBJECT(inst->data),GTK_SIGNAL_FUNC (close_worksheet_window), inst);
+      gtk_widget_destroy((GtkWidget*) inst->data);
+    }
 }

@@ -21,6 +21,7 @@ extern int xmlDoValidityCheckingDefaultValue;
 #include <string.h>
 
 #include "plugin.h"
+#include "GGobiAPI.h"
 
 int getPreviousFiles(const xmlDocPtr doc, GGobiInitInfo *info);
 xmlNode *getXMLElement(const xmlDocPtr doc, const char *tagName);
@@ -224,9 +225,16 @@ getDisplayDescription(xmlNodePtr node)
  GGobiDisplayDescription *dpy;
  xmlNodePtr el;
  int i;
+ CHAR *tmp;
 
  dpy = (GGobiDisplayDescription*) g_malloc(sizeof(GGobiDisplayDescription*));
  dpy->type = getDisplayType(xmlGetProp(node, "type"));
+ tmp = xmlGetProp(node, "data");
+ if(tmp) {
+   dpy->data = asInteger(tmp) - 1;
+ } else
+     dpy->data = 0;
+
  dpy->numVars = 0;
  
  if(dpy->type == unknown_display_type) {
@@ -256,7 +264,7 @@ getDisplayType(const CHAR *type)
     enum displaytyped val = unknown_display_type;
        if(strcmp(type, "scatterplot") == 0) 
 	   val = scatterplot;
-       else if(strcmp(type, "scatmat") == 0)
+       else if(strcmp(type, "scatmatrix") == 0)
 	   val = scatmat;
        else if(strcmp(type, "parcoords") == 0)
 	   val = parcoords;
@@ -298,6 +306,9 @@ getPlugins(xmlDocPtr doc, GGobiInitInfo *info)
   This handles the details of a <plugin> tag,
   reading the description, author, etc.
  */
+
+#define GET_PROP_VALUE(field,name) plugin->field = ((tmp = (char *) xmlGetProp(c, name)) != NULL) ? g_strdup(tmp) : NULL
+
 GGobiPluginInfo *
 processPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr doc)
 {
@@ -308,6 +319,11 @@ processPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr doc)
   xmlChar * val;
 
     plugin = (GGobiPluginInfo *) g_malloc(sizeof(GGobiPluginInfo));
+
+    plugin->onLoad = NULL;
+    plugin->onCreate = NULL;
+    plugin->onClose = NULL;
+    plugin->onUnload = NULL;
 
     tmp = xmlGetProp(node, "name");
     if(tmp) {
@@ -334,8 +350,14 @@ processPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr doc)
 		  xmlNodePtr c = el->children;
                   while(c) {
                       if(el->type != XML_TEXT_NODE && strcmp(c->name, "init") == 0) {
+                          GET_PROP_VALUE(onLoad, "onLoad");
+                          GET_PROP_VALUE(onCreate, "onCreate");
+                          GET_PROP_VALUE(onClose, "onClose");
+                          GET_PROP_VALUE(onUnload, "onUnload");
+/*
                           plugin->onLoad = g_strdup((char *) xmlGetProp(c, "onLoad"));
                           plugin->onCreate = g_strdup((char *) xmlGetProp(c, "onCreate"));
+*/
 			  break;
 		      }
 		      c = c->next;
@@ -362,4 +384,50 @@ processPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr doc)
     }
 
    return(plugin);
+}
+
+int resolveVariableName(const char *name, datad *d);
+
+displayd *
+createDisplayFromDescription(ggobid *gg, GGobiDisplayDescription *desc) 
+{
+    displayd *dpy;
+    datad *data;
+    gint *vars, i;
+
+    data = (datad*) gg->d->data;
+
+    vars = (gint*) g_malloc(sizeof(gint) * desc->numVars);
+    for(i = 0; i < desc->numVars; i++)
+      vars[i] = resolveVariableName(desc->varNames[i], data);
+    switch(desc->type) {
+	case scatterplot:
+	    dpy = GGOBI(newScatterplot)(vars[0], vars[1], data, gg);
+          break;
+	case parcoords:
+            dpy = GGOBI(newParCoords)(vars, desc->numVars, data, gg);
+          break;
+	case scatmat:
+            dpy = GGOBI(newScatmat)(vars, vars, desc->numVars, desc->numVars, data, gg);
+          break;
+	case tsplot:
+            dpy = GGOBI(newTimeSeries)(vars, desc->numVars, data, gg);
+          break;
+    }
+
+  g_free(vars);
+
+  return(dpy);
+}
+
+int
+resolveVariableName(const char *name, datad *d)
+{ 
+    int i;
+    for(i = 0; i < d->ncols; i++) {
+	if(strcmp(d->vartable[i].collab, name) == 0)
+	    return(i);
+    }
+
+    return(-1);
 }

@@ -25,6 +25,8 @@ typedef struct {
 
 typedef gboolean (*OnLoad)(gboolean initializing, GGobiPluginInfo *plugin);
 typedef gboolean (*OnCreate)(ggobid *gg, GGobiPluginInfo *plugin);
+typedef gboolean (*OnClose)(ggobid *gg, GGobiPluginInfo *plugin);
+typedef gboolean (*OnUnload)(gboolean quitting, GGobiPluginInfo *plugin);
 
 
 typedef struct {
@@ -53,4 +55,6 @@ gboolean registerPlugins(ggobid *gg, GList *plugins);
 
 int      GGOBI_addPluginInstance(PluginInstance *inst, ggobid *gg);
 gboolean GGOBI_removePluginInstance(PluginInstance *inst, ggobid *gg);
+
+void closePlugins(ggobid *gg);
 #endif
