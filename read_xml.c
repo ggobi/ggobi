@@ -83,59 +83,55 @@ void setMissingValue(XMLParserData *data, datad *d, vartabled *vt);
 const gchar *XMLSuffixes[] = {"", ".xml", ".xml.gz", ".xmlz"};
 
 const gchar * const xmlDataTagNames[] = {
-                                          "ggobidata",
-                                          "data",        /* DATASET */
-                                          "description",
-                                          "record",
-                                          "records",
-                                          "variables",
-                                          "variable",
-                                          "colormap",
-                                          "color",
+  "ggobidata",
+  "data",        /* DATASET */
+  "description",
+  "record",
+  "records",
+  "variables",
+  "variable",
+  "colormap",
+  "color",
 /* New for handling categorical variables. */
-                                          "realvariable",
-                                          "categoricalvariable",
-                                          "levels",
-                                          "level",
-					  "activeColorScheme",
-					  "real",
-					  "int",
-					  "na",
-                                          ""
-                                         };
-
-
-
-
+  "realvariable",
+  "categoricalvariable",
+  "levels",
+  "level",
+  "activeColorScheme",
+  "real",
+  "int",
+  "na",
+  ""
+  };
 
 void
 ggobi_XML_warning_handler(void *data, const gchar *msg, ...)
 {
-    va_list ap;
-    xmlParserCtxtPtr p = (xmlParserCtxtPtr) ((XMLParserData*) data)->parser;
+  va_list ap;
+  xmlParserCtxtPtr p = (xmlParserCtxtPtr) ((XMLParserData*) data)->parser;
 
-    va_start(ap, msg);
-    fprintf(stderr, "Warning from XML parsing [%d, %d]: ",
-	    (int) p->input->line, (int) p->input->col);
+  va_start(ap, msg);
+  fprintf(stderr, "Warning from XML parsing [%d, %d]: ",
+    (int) p->input->line, (int) p->input->col);
 
-    vfprintf(stderr, msg, ap); 
+  vfprintf(stderr, msg, ap); 
 
-    fflush(stderr);  
+  fflush(stderr);  
 }
 
 void
 ggobi_XML_error_handler(void *data, const gchar *msg, ...)
 {
-    va_list ap;
-    xmlParserCtxtPtr p = (xmlParserCtxtPtr) ((XMLParserData*) data)->parser;
+  va_list ap;
+  xmlParserCtxtPtr p = (xmlParserCtxtPtr) ((XMLParserData*) data)->parser;
 
-    fprintf(stderr, "Error in XML parsing [line %d, column %d]: ",
-  	      (int) p->input->line, (int) p->input->col);
+  fprintf(stderr, "Error in XML parsing [line %d, column %d]: ",
+    (int) p->input->line, (int) p->input->col);
 
-    va_start(ap, msg);
-    vfprintf(stderr, msg, ap); 
+  va_start(ap, msg);
+  vfprintf(stderr, msg, ap); 
 
-    fflush(stderr);
+  fflush(stderr);
 }
 
 
@@ -258,8 +254,8 @@ startXMLElement(void *user_data, const xmlChar *name, const xmlChar **attrs)
 
   switch (type) {
     case COLORSCHEME:
-	setColorScheme(attrs, data);
-	break;
+      setColorScheme(attrs, data);
+    break;
     case VARIABLES:
       allocVariables (attrs, data);
     break;
@@ -301,7 +297,7 @@ startXMLElement(void *user_data, const xmlChar *name, const xmlChar **attrs)
     case REAL:   
     case INT:   
     case NA:   
-	break;
+    break;
     default:
       fprintf(stderr, "Unrecognized XML state %s\n", name); fflush(stderr);    
     break;
@@ -311,12 +307,12 @@ startXMLElement(void *user_data, const xmlChar *name, const xmlChar **attrs)
 void
 setColorScheme(const xmlChar **attrs, XMLParserData *data)
 {
-   const gchar *tmp;
+  const gchar *tmp;
 
-   tmp = getAttribute(attrs, "file");
-   if(tmp) {
-       /* process this file to append its color schemes into the global list. */
-       read_colorscheme(tmp, &data->gg->colorSchemes); 
+  tmp = getAttribute(attrs, "file");
+  if(tmp) {
+     /* process this file to append its color schemes into the global list. */
+     read_colorscheme(tmp, &data->gg->colorSchemes); 
    }
 
    tmp = getAttribute(attrs, "name");
@@ -324,15 +320,16 @@ setColorScheme(const xmlChar **attrs, XMLParserData *data)
        /* resolve the color scheme by name */
 
      colorschemed *scheme;
-      scheme = findColorSchemeByName(data->gg->colorSchemes, tmp);
-      if(scheme) {
-	  data->gg->activeColorScheme = scheme;
-	  colorscheme_init(scheme);
-      } else
-	  ggobi_XML_error_handler(data, "Invalid colorscheme name %s. No such scheme.\n", tmp);
-   } else {
-	  ggobi_XML_error_handler(data, "No colorscheme name specified\n");
-   }
+     scheme = findColorSchemeByName(data->gg->colorSchemes, tmp);
+     if(scheme) {
+       data->gg->activeColorScheme = scheme;
+       colorscheme_init(scheme);
+     } else
+       ggobi_XML_error_handler(data,
+         "Invalid colorscheme name %s. No such scheme.\n", tmp);
+  } else {
+     ggobi_XML_error_handler(data, "No colorscheme name specified\n");
+  }
 }
 
 gint
@@ -343,7 +340,7 @@ setLevelIndex(const xmlChar **attrs, XMLParserData *data)
   datad *d = getCurrentXMLData(data);
   vartabled *el = vartable_element_get (data->current_variable, d);
 
-  data->current_level++; /*-- current_level here ranges from 0 : nlevels-1 --*/
+  data->current_level++; /*-- current_level here ranges from 0 to nlevels-1 --*/
 
 /*-- dfs: placeholder for proper debugging --*/
   if (data->current_level >=  el->nlevels) {
@@ -356,7 +353,7 @@ setLevelIndex(const xmlChar **attrs, XMLParserData *data)
   if (tmp != NULL) {
     itmp = strToInteger (tmp);
     if (itmp < 0) 
-	g_printerr ("trouble: levels must be >= 0\n");
+      g_printerr ("trouble: levels must be >= 0\n");
   }
   el->level_values[data->current_level] = itmp;
  
@@ -374,11 +371,11 @@ categoricalLevels(const xmlChar **attrs, XMLParserData *data)
   if (tmp != NULL) {
     el->nlevels = strToInteger(tmp);
     if(el->nlevels > 0) {
-	el->level_values = (gint *) g_malloc(el->nlevels * sizeof(int)); 
-	el->level_names = (gchar **) g_malloc(el->nlevels * sizeof(gchar *));       
+      el->level_values = (gint *) g_malloc(el->nlevels * sizeof(gint)); 
+      el->level_names = (gchar **) g_malloc(el->nlevels * sizeof(gchar *)); 
     } else {
-	el->level_values = NULL;
-	el->level_names  = NULL;
+      el->level_values = NULL;
+      el->level_names  = NULL;
     }
   }
 
@@ -427,9 +424,9 @@ void endXMLElement(void *user_data, const xmlChar *name)
       resetRecordInfo(data);
     break;
     case NA:
-        setMissingValue(data, getCurrentXMLData(data), NULL);
-	data->current_element++; 
-	break;
+      setMissingValue(data, getCurrentXMLData(data), NULL);
+      data->current_element++; 
+    break;
     case REAL:
     case INT:
       setRecordValues(data, data->recordString, data->recordStringLength);
@@ -744,13 +741,19 @@ setColor(const xmlChar **attrs, XMLParserData *data, gint i)
   const gchar *tmp;
   gint value = data->defaults.color;
   datad *d = getCurrentXMLData(data);
+  colorschemed *scheme = data->gg->activeColorScheme;
 
   tmp = getAttribute(attrs, "color");
   if(tmp) {
     value = strToInteger(tmp);
   }
 
-  if(value < 0 || value > MAXNCOLORS) {
+/*
+ * this is testing against MAXNCOLORS, but it should test against the
+ * current scheme
+*/
+  /*if(value < 0 || value > MAXNCOLORS) {*/
+  if(value < 0 || value >= scheme->n) {
     if(tmp)
       xml_warning("color", tmp, "Out of range", data);
   } else {
@@ -882,16 +885,16 @@ xml_warning(const gchar *attribute, const gchar *value, const gchar *msg,
 void
 setMissingValue(XMLParserData *data, datad *d, vartabled *vt)
 {
-      if (d->nmissing == 0) {
-        arrays_alloc (&d->missing, d->nrows, d->ncols);
-        arrays_zero (&d->missing);
-      }
-      d->missing.vals[data->current_record][data->current_element] = 1;
-      if(vt == NULL)
-	  vt = vartable_element_get (data->current_element, d);
-      vt->nmissing++;
-      d->raw.vals[data->current_record][data->current_element] = 0;
-      d->nmissing++;
+  if (d->nmissing == 0) {
+    arrays_alloc (&d->missing, d->nrows, d->ncols);
+    arrays_zero (&d->missing);
+  }
+  d->missing.vals[data->current_record][data->current_element] = 1;
+  if(vt == NULL)
+    vt = vartable_element_get (data->current_element, d);
+  vt->nmissing++;
+  d->raw.vals[data->current_record][data->current_element] = 0;
+  d->nmissing++;
 
 }
 
@@ -932,15 +935,15 @@ setRecordValues (XMLParserData *data, const xmlChar *line, gint len)
           (strcasecmp (tmp, "na") == 0 || strcmp (tmp, ".") == 0)) ||
         (data->NA_identifier && strcmp (tmp, data->NA_identifier) == 0))
     {
-	setMissingValue(data, d, vt);
+      setMissingValue(data, d, vt);
     } else {
       value = asNumber (tmp);
       if(vt->categorical_p && checkLevelValue(vt, value) == false) {
             /* add the name of the variable and the record number to this message! */
-	 ggobi_XML_error_handler(data, 
-				 "incorrect level in record %d, variable `%s', dataset `%s' in the XML input file\n", 
-				 (int) data->current_record + 1, vt->collab,
-				 data->current_data->name ? data->current_data->name : "");
+        ggobi_XML_error_handler(data, 
+          "incorrect level in record %d, variable `%s', dataset `%s' in the XML input file\n", 
+          (int) data->current_record + 1, vt->collab,
+          data->current_data->name ? data->current_data->name : "");
       }
       d->raw.vals[data->current_record][data->current_element] = value;
     }
@@ -1532,7 +1535,7 @@ readXMLRecord(const xmlChar **attrs, XMLParserData *data)
   if(!tmp) {
     if(data->recordLabelsVariable > -1) {
       /* Wait until we have read the specific values! */
-      } else {
+    } else {
       /* Length is to hold the current record number as a string. */
       stmp = g_malloc(sizeof(gchar) * 10);
       g_snprintf(stmp, 9, "%d", i);
@@ -1604,11 +1607,11 @@ readXMLRecord(const xmlChar **attrs, XMLParserData *data)
 gboolean
 checkLevelValue(vartabled *vt, double value)
 {
-    int i;
-    for(i = 0; i < vt->nlevels; i++) {
-	if(vt->level_values[i] == (int) value)
-	    return(true);
-    }
+  int i;
+  for(i = 0; i < vt->nlevels; i++) {
+    if(vt->level_values[i] == (int) value)
+      return(true);
+  }
 
-    return(false);
+  return(false);
 }
