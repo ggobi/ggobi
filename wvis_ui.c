@@ -16,20 +16,8 @@
 #include "vars.h"
 #include "externs.h"
 
-/*-- these will probably all become members of gg->wvis */
-static GtkWidget *da;
-static GdkPixmap *pix;
-
-static gfloat *pct;
-static gint npct = 0;
-static gint nearest_color = -1;
 static gint xmargin = 20;
 static gint ymargin = 20;
-
-static gint motion_notify_id = 0;
-static icoords mousepos;
-static gint nearest_color;
-/* */
 
 static void
 delete_cb (GtkWidget *w, GdkEventButton *event, gpointer data)
@@ -49,22 +37,27 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, ggobid *gg)
   gboolean rval = false;
   gfloat val;
 
+  icoords *mousepos = &gg->wvis.mousepos;
+  gint nearest_color = gg->wvis.nearest_color;
+
   gdk_window_get_pointer (w->window, &pos.x, &pos.y, &state);
 
-  if (pos.x != mousepos.x) {
+  if (pos.x != mousepos->x) {
     val = (gfloat) (pos.x - xmargin) /
           (gfloat) (w->allocation.width - 2*xmargin);
 
     /*-- don't allow it to cross its neighbors' boundaries --*/
-    if (val >= pct[nearest_color-1] && val <= pct[nearest_color+1]) {
-      pct[nearest_color] = val;
+    if (val >= gg->wvis.pct[nearest_color-1] &&
+        val <= gg->wvis.pct[nearest_color+1])
+    {
+      gg->wvis.pct[nearest_color] = val;
       gtk_signal_emit_by_name (GTK_OBJECT (w), "expose_event",
         "expose_event",
         (gpointer) gg, (gpointer) &rval);
     }
   }
 
-  mousepos.x = pos.x;  
+  mousepos->x = pos.x;  
 
   return true;
 }
@@ -80,6 +73,9 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg)
   gint dist = w->allocation.width*w->allocation.width +
               w->allocation.height*w->allocation.height;
 
+  gfloat *pct = gg->wvis.pct;
+  gint *nearest_color = &gg->wvis.nearest_color;
+
   gdk_window_get_pointer (w->window, &pos.x, &pos.y, &state);
 
   /*-- find nearest slider --*/
@@ -94,21 +90,21 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg)
     y += hgt;
   }
 
-  nearest_color = nearest;
+  *nearest_color = nearest;
 
-  if (nearest_color != -1)
-    motion_notify_id = gtk_signal_connect (GTK_OBJECT (w),
-                       "motion_notify_event",
-                       (GtkSignalFunc) motion_notify_cb,
-                       (gpointer) gg);
+  if (*nearest_color != -1)
+    gg->wvis.motion_notify_id = gtk_signal_connect (GTK_OBJECT (w),
+                                "motion_notify_event",
+                                (GtkSignalFunc) motion_notify_cb,
+                                (gpointer) gg);
   return true;
 }
 
 static gint
 button_release_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg)
 {
-  gtk_signal_disconnect (GTK_OBJECT (w), motion_notify_id);
-  motion_notify_id = 0;
+  gtk_signal_disconnect (GTK_OBJECT (w), gg->wvis.motion_notify_id);
+  gg->wvis.motion_notify_id = 0;
 
   return true;
 }
@@ -117,14 +113,26 @@ static gint
 da_configure_cb (GtkWidget *w, GdkEventConfigure *event, ggobid *gg)
 {
   /*-- Create new backing pixmaps of the appropriate size --*/
-  if (pix != NULL)
-    gdk_pixmap_unref (pix);
-  pix = gdk_pixmap_new (w->window,
+  if (gg->wvis.pix != NULL)
+    gdk_pixmap_unref (gg->wvis.pix);
+  gg->wvis.pix = gdk_pixmap_new (w->window,
     w->allocation.width, w->allocation.height, -1);
 
   gtk_widget_queue_draw (w);
 
   return false;
+}
+
+void
+wvis_init (ggobid  *gg)
+{
+  gg->wvis.window = NULL;
+  gg->wvis.npct = 0;
+  gg->wvis.nearest_color = -1;
+  gg->wvis.motion_notify_id = 0;
+  gg->wvis.mousepos.x = -1;
+  gg->wvis.mousepos.y = -1;
+  gg->wvis.pix = NULL;
 }
 
 static void
@@ -149,13 +157,17 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
   GList *selection = GTK_CLIST (clist)->selection;
   gint selected_var = -1;
 
+  GtkWidget *da = gg->wvis.da;
+  GdkPixmap *pix = gg->wvis.pix;
+
   if (selection) selected_var = (gint) selection->data;
 
-  if (npct != gg->ncolors) {
-    npct = gg->ncolors;
-    pct = (gfloat *) g_realloc (pct, npct * sizeof (npct));
-    for (k=0; k<npct; k++) {
-      pct[k] = (gfloat) (k+1) /  (gfloat) npct;
+  if (gg->wvis.npct != gg->ncolors) {
+    gg->wvis.npct = gg->ncolors;
+    gg->wvis.pct = (gfloat *) g_realloc (gg->wvis.pct,
+      gg->wvis.npct * sizeof (gg->wvis.npct));
+    for (k=0; k<gg->wvis.npct; k++) {
+      gg->wvis.pct[k] = (gfloat) (k+1) /  (gfloat) gg->wvis.npct;
     }
   }
 
@@ -175,7 +187,7 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
   /*-- draw the color bars --*/
   x0 = xmargin;
   for (k=0; k<gg->ncolors; k++) {
-    x1 = xmargin + pct[k] * (w->allocation.width - 2*xmargin);
+    x1 = xmargin + gg->wvis.pct[k] * (w->allocation.width - 2*xmargin);
     gdk_gc_set_foreground (gg->plot_GC, &gg->color_table[k]);
     gdk_draw_rectangle (pix, gg->plot_GC,
                         TRUE, x0, ymargin, x1 - x0, height);
@@ -195,7 +207,7 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
   y = ymargin + 10;
   gdk_gc_set_foreground (gg->plot_GC, &gray2);
   for (k=0; k<gg->ncolors-1; k++) {
-    x = xmargin + pct[k] * (w->allocation.width - 2*xmargin);
+    x = xmargin + gg->wvis.pct[k] * (w->allocation.width - 2*xmargin);
     gdk_draw_rectangle (pix, gg->plot_GC,
                         TRUE, x-10, y-5, 20, 10);
     y += hgt;
@@ -207,7 +219,7 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
   points = (GdkPoint *) g_malloc (7 * sizeof (GdkPoint));
   gdk_gc_set_foreground (gg->plot_GC, &gray1);
   for (k=0; k<gg->ncolors-1; k++) {
-    x = xmargin + pct[k] * (w->allocation.width - 2*xmargin);
+    x = xmargin + gg->wvis.pct[k] * (w->allocation.width - 2*xmargin);
 
     points [0].x = x - 10;
     points [0].y = y + 5;
@@ -237,7 +249,7 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
   points = (GdkPoint *) g_malloc (7 * sizeof (GdkPoint));
   gdk_gc_set_foreground (gg->plot_GC, &gray3);
   for (k=0; k<gg->ncolors-1; k++) {
-    x = xmargin + pct[k] * (w->allocation.width - 2*xmargin);
+    x = xmargin + gg->wvis.pct[k] * (w->allocation.width - 2*xmargin);
 
     points [0].x = x - 10;  /*-- lower left --*/
     points [0].y = y + 4;
@@ -279,11 +291,11 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
     gdk_gc_set_foreground (gg->plot_GC, &gg->accent_color);
     y = ymargin;
     for (k=0; k<gg->ncolors-1; k++) {
-      val = min + pct[k] * (max - min);
+      val = min + gg->wvis.pct[k] * (max - min);
       str = g_strdup_printf ("%3.3g", val);
       gdk_text_extents (style->font, str, strlen(str),
         &lbearing, &rbearing, &width, &ascent, &descent);
-      x = xmargin + pct[k] * (w->allocation.width - 2*xmargin);
+      x = xmargin + gg->wvis.pct[k] * (w->allocation.width - 2*xmargin);
       gdk_draw_string (pix, style->font, gg->plot_GC,
         x - width/2,
         y - 2,
@@ -307,6 +319,8 @@ static void wvis_setdata_cb (GtkWidget *w, datad *d)
   gint j;
   gchar *row[1];
 
+  GtkWidget *da = gg->wvis.da;
+
   gtk_clist_clear (GTK_CLIST (clist));
 
   gtk_clist_freeze (GTK_CLIST (clist));
@@ -327,7 +341,7 @@ selection_made_cb (GtkWidget *cl, gint row, gint column,
   GdkEventButton *event, ggobid *gg)
 {
   gboolean rval = false;
-  gtk_signal_emit_by_name (GTK_OBJECT (da), "expose_event",
+  gtk_signal_emit_by_name (GTK_OBJECT (gg->wvis.da), "expose_event",
     "expose_event",
     (gpointer) gg, (gpointer) &rval);
 }
@@ -351,7 +365,7 @@ static void scale_apply_cb (GtkButton *w, ggobid* gg)
       i = d->rows_in_plot[m];
 
       for (k=0; k<gg->ncolors; k++) {
-        val = min + pct[k] * (max - min);
+        val = min + gg->wvis.pct[k] * (max - min);
         if (d->tform.vals[i][selected_var] <= val) {
           d->color_now.els[i] = k;
           break;
@@ -372,17 +386,17 @@ wvis_window_open (ggobid *gg, guint action, GtkWidget *w) {
   datad *d;
   gchar *row[1];
 
-  if (gg->wvis_ui.window == NULL) {
+  if (gg->wvis.window == NULL) {
 
-    gg->wvis_ui.window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_title (GTK_WINDOW (gg->wvis_ui.window),
+    gg->wvis.window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+    gtk_window_set_title (GTK_WINDOW (gg->wvis.window),
       "brushing by weights");
-    gtk_signal_connect (GTK_OBJECT (gg->wvis_ui.window),
+    gtk_signal_connect (GTK_OBJECT (gg->wvis.window),
       "delete_event", GTK_SIGNAL_FUNC (delete_cb), NULL);
 
     vbox = gtk_vbox_new (false, 0);
     gtk_container_set_border_width (GTK_CONTAINER (vbox), 3);
-    gtk_container_add (GTK_CONTAINER (gg->wvis_ui.window), vbox);
+    gtk_container_add (GTK_CONTAINER (gg->wvis.window), vbox);
 
     /*-- defined here rather than later so that it can be used in the menu --*/
     clist = gtk_clist_new (1);
@@ -456,29 +470,29 @@ wvis_window_open (ggobid *gg, guint action, GtkWidget *w) {
     /*-- now we get fancy:  draw the scale, with glyphs and colors --*/
     vb = gtk_vbox_new (false, 0);
     gtk_box_pack_start (GTK_BOX (vbox), vb, true, true, 0);
-    da = gtk_drawing_area_new ();
-    gtk_drawing_area_size (GTK_DRAWING_AREA (da), 400, 200);
-    gtk_object_set_data (GTK_OBJECT (da), "clist", clist);
-    gtk_box_pack_start (GTK_BOX (vb), da, true, true, 0);
+    gg->wvis.da = gtk_drawing_area_new ();
+    gtk_drawing_area_size (GTK_DRAWING_AREA (gg->wvis.da), 400, 200);
+    gtk_object_set_data (GTK_OBJECT (gg->wvis.da), "clist", clist);
+    gtk_box_pack_start (GTK_BOX (vb), gg->wvis.da, true, true, 0);
 
-    gtk_signal_connect (GTK_OBJECT (da),
+    gtk_signal_connect (GTK_OBJECT (gg->wvis.da),
                         "configure_event",
                         (GtkSignalFunc) da_configure_cb,
                         (gpointer) gg);
-    gtk_signal_connect (GTK_OBJECT (da),
+    gtk_signal_connect (GTK_OBJECT (gg->wvis.da),
                         "expose_event",
                         (GtkSignalFunc) da_expose_cb,
                         (gpointer) gg);
-    gtk_signal_connect (GTK_OBJECT (da),
+    gtk_signal_connect (GTK_OBJECT (gg->wvis.da),
                         "button_press_event",
                         (GtkSignalFunc) button_press_cb,
                         (gpointer) gg);
-    gtk_signal_connect (GTK_OBJECT (da),
+    gtk_signal_connect (GTK_OBJECT (gg->wvis.da),
                         "button_release_event",
                         (GtkSignalFunc) button_release_cb,
                         (gpointer) gg);
 
-    gtk_widget_set_events (da, GDK_EXPOSURE_MASK
+    gtk_widget_set_events (gg->wvis.da, GDK_EXPOSURE_MASK
                | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK
                | GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK);
 
@@ -490,8 +504,8 @@ wvis_window_open (ggobid *gg, guint action, GtkWidget *w) {
     gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                         GTK_SIGNAL_FUNC (scale_apply_cb), gg);
 
-    gtk_widget_show_all (gg->wvis_ui.window);
+    gtk_widget_show_all (gg->wvis.window);
   }
 
-  gdk_window_raise (gg->wvis_ui.window->window);
+  gdk_window_raise (gg->wvis.window->window);
 }

@@ -193,12 +193,14 @@ void
 make_ggobi (GGobiOptions *options, gboolean processEvents, ggobid *gg) 
 {
   gboolean init_data = false;
+  extern void wvis_init (ggobid *gg);
 
      /*-- some initializations --*/
   gg->displays = NULL;
   
   globals_init (gg); /*-- variables that don't depend on the data --*/
   color_table_init (gg);
+  wvis_init (gg);
   make_ui (gg);
 
   if (options->data_in != NULL) {

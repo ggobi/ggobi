@@ -319,9 +319,17 @@ struct _ggobid {
 
  struct _WeightedVis {
    GtkWidget *window;
-   datad *d;  /*-- won't be needed, I don't think --*/
+   GtkWidget *da;
+   GdkPixmap *pix;
 
- } wvis_ui;
+   gfloat *pct;
+   gint npct;
+   gint nearest_color;
+
+   gint motion_notify_id;
+   icoords mousepos;
+
+ } wvis;
 
 /*-------------------- scaling ---------------------------------------*/
 
