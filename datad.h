@@ -25,15 +25,8 @@ struct _ggobid;
 
 #include "fileio.h"
 
-/*
-  This is now changed so that datad is a class rather than a structure.
-  The intention is that this allows us to create different derived classes
-  which can read their data in different ways. For example, we may read node
-  records in one way (i.e. what attributes they expect) and edge records
-  in another. 
+typedef struct _datad datad;
 
-  See the methods at the bottom of the class definition.
- */
 struct _datad {
 
   /* All the variables are left public since this the way they were in the
@@ -198,20 +191,15 @@ struct _datad {
 
 /*------------------------------------------------------------------------*/
 
-
       /* Instead of a method, use a function pointer which can be set
          for the different types.
        */
 #ifdef USE_XML
    gboolean (*readXMLRecord)(const xmlChar **attrs, struct _XMLUserData *data);
 #endif 
-
-   gboolean edgeData;
-
-   struct _datad *nodeData; 
 };
 
-typedef struct _datad datad;
+
 gint alloc_edgeIDs(datad *d);
 
 
