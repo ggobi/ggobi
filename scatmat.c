@@ -190,11 +190,11 @@ scatmat_new (gboolean missing_p,
   display->scatmat_cols = NULL;
   for (j=0; j<scatmat_ncols; j++)
     display->scatmat_cols = g_list_append (display->scatmat_cols,
-                                           GINT_TO_POINTER (j));
+                                           GINT_TO_POINTER (cols[j]));
   display->scatmat_rows = NULL;
   for (i=0; i<scatmat_nrows; i++)
     display->scatmat_rows = g_list_append (display->scatmat_rows,
-                                           GINT_TO_POINTER (i));
+                                           GINT_TO_POINTER (cols[i]));
 
   gtk_widget_show (display->table);
 

@@ -463,13 +463,6 @@ static GtkItemFactoryEntry menu_items[] = {
 
   { "/File/sep",         NULL,     NULL,          0, "<Separator>" },
 
-#ifdef PRINTING_IMPLEMENTED
-  { "/File/sep",         NULL,     NULL,          0, "<Separator>" },
-  { "/File/Print",
-       NULL,    
-       (GtkItemFactoryCallback) display_write_svg,         
-       0 },
-#endif
 #ifdef USE_XML
   { "/File/sep",         NULL,     NULL,          0, "<Separator>" },
   { "/File/Store session",   
@@ -477,17 +470,20 @@ static GtkItemFactoryEntry menu_items[] = {
        (GtkItemFactoryCallback) store_session, 
        0 },
 #endif
-
+#ifdef PRINTING_IMPLEMENTED
+  { "/File/sep",         NULL,     NULL,          0, "<Separator>" },
+  { "/File/Print",
+       NULL,    
+       (GtkItemFactoryCallback) display_write_svg,         
+       0 },
+#endif
 
   { "/File/sep",         NULL,     NULL,          0, "<Separator>" },
-
   { "/File/Quit",   
        "<ctrl>Q",   
        (GtkItemFactoryCallback) quit_ggobi, 
        0 },
 
-
-  { "/File/sep",         NULL,     NULL,          0, "<Separator>" },
 
   { "/_Tools",        NULL,         NULL, 0, "<Branch>" },
   { "/Tools/Variable manipulation ...", 
