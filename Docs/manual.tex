@@ -689,6 +689,31 @@ specification, such as
 % \item the colormap to be used in brushing.
 \end{itemize}
 
+\subsection {Excel-formatted text dump}
+\label{slbl:excel}
+
+GGobi reads data text-dumped from Excel, with ``,'' used as the
+delimiter and no quotes on the text. GGobi will look for file
+extensions of the form {\tt .csv, .asc} or {\tt .txt}. An example file
+is:
+
+\begin{verbatim}
+,Var1,Var2,Var3
+A,1,F,9
+C,2,G,NA
+D,-1,NA,3
+E,.,F,7
+F,1,F,-5
+\end{verbatim}
+
+The first row are column labels, and note that it begins with
+``,'' indicating that the first column contains the row labels.
+
+Categorical variables are automatically converted to appropriate
+format for categorical variables in GGobi. Missing values need to be
+denoted with a ``.'', ``NA'' or ``.''. There are 3 test data sets to
+play with in the distribution, all aptly called {\tt test*.csv}.
+
 % Should this be moved to a section on plugins?
 \subsection {Database access}
 \label{slbl:MySQL}
