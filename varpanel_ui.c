@@ -400,6 +400,13 @@ varpanel_addvar_cb (ggobid *gg, vartabled *vt, gint which,
   varcircles_add (d->ncols, d, gg);
 
   /*-- make sure the right toggle widgets and circles are showing --*/
+/* this gives the wrong result when the variable being added is
+not displayed in the current display.  And I don't know what the mode
+is for the other datad.  This suggests that I have to run these two
+routines whenever the tab changes in the variable selection panel.
+But even then it may not correspond to the current display.  So it
+really suggests that the variable selection panel has to keep track of
+its own projection.  Add a variable to varpanel_ui in datad.h? -- dfs */
   varpanel_refresh (gg->current_display, gg);
   varcircles_visibility_set (gg->current_display, gg);
 }
