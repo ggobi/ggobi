@@ -45,6 +45,9 @@
 #define BRUSH_NBINS  20
 #define BRUSH_MARGIN 10
 #define BINBLOCKSIZE 50
+/* br_linkby */
+#define BR_LINKBYID   0
+#define BR_LINKBYVAR  1
 /* */
 
 typedef enum {PLUS=1, X, OR, FR, OC, FC, DOT, UNKNOWN_GLYPH} GlyphType;

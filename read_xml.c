@@ -267,8 +267,9 @@ categoricalLevels(const xmlChar **attrs, XMLParserData *data)
 
   if (tmp != NULL) {
     el->nlevels = strToInteger(tmp);
-    el->levels = g_array_new(false, false, sizeof(gchar *));       
-    g_array_set_size(el->levels, el->nlevels);
+    el->level_values = (gint *) g_malloc (el->nlevels * sizeof(gint));
+    el->level_names = g_array_new(false, false, sizeof(gchar *));       
+    g_array_set_size(el->level_names, el->nlevels);
   }
 
   data->current_level = -1; /* We'll increment the first one. */
@@ -287,7 +288,7 @@ addLevel(XMLParserData *data, const gchar *c, gint len)
 
   gchar *val = g_strdup(c);
 /*    g_array_append_val(el->levels, c); */
-  g_array_insert_val(el->levels, data->current_level, val);
+  g_array_insert_val(el->level_names, data->current_level, val);
 }
 
 

@@ -94,6 +94,15 @@ static void brush_mode_cb (GtkWidget *w, gpointer cbd)
   }
 }
 
+static gchar *linkby_lbl[] = {"Link by ID", "Link by variable"};
+static void brush_linkby_cb (GtkWidget *w, gpointer cbd)
+{
+  ggobid *gg = GGobiFromWidget (w, true);
+  cpaneld *cpanel = &gg->current_display->cpanel;
+
+  cpanel->br_linkby = GPOINTER_TO_INT (cbd);
+}
+
 static void open_symbol_window_cb (GtkWidget *w, ggobid *gg) 
 {
   make_symbol_window (gg);
@@ -316,7 +325,7 @@ brush_event_handlers_toggle (splotd *sp, gboolean state) {
 void
 cpanel_brush_make (ggobid *gg) {
   GtkWidget *btn;
-  GtkWidget *mode_option_menu, *targets_option_menu;
+  GtkWidget *option_menu;
   GtkWidget *vb, *lbl;
   
   gg->control_panel[BRUSH] = gtk_vbox_new (false, VBOX_SPACING);
@@ -332,23 +341,6 @@ cpanel_brush_make (ggobid *gg) {
                       btn, false, false, 0);
 
 /*
- * make an option menu for setting the brushing mode
-  scope_option_menu = gtk_option_menu_new ();
-  gtk_widget_set_name (scope_option_menu, "BRUSH:scope_option_menu");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), scope_option_menu,
-    "Brush points only, edges only, or both points and edges", NULL);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[BRUSH]),
-                      scope_option_menu, false, false, 0);
-  populate_option_menu (scope_option_menu, scope_lbl,
-                        sizeof (scope_lbl) / sizeof (gchar *),
-                        (GtkSignalFunc) brush_scope_set_cb, gg);
-*/
-  /*-- initial value: points only --*/
-/*
-  gtk_option_menu_set_history (GTK_OPTION_MENU (scope_option_menu), 0); 
-*/
-  
-/*
  * option menu for specifying whether to brush with color/glyph/both
 */
   vb = gtk_vbox_new (false, 0);
@@ -359,17 +351,16 @@ cpanel_brush_make (ggobid *gg) {
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
   gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
 
-  targets_option_menu = gtk_option_menu_new ();
-  gtk_widget_set_name (targets_option_menu, "BRUSH:point_targets_option_menu");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), targets_option_menu,
+  option_menu = gtk_option_menu_new ();
+  gtk_widget_set_name (option_menu, "BRUSH:point_targets_option_menu");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), option_menu,
     "Brushing points: what characteristics, if any, should respond?", NULL);
-  gtk_box_pack_start (GTK_BOX (vb),
-                      targets_option_menu, false, false, 0);
-  populate_option_menu (targets_option_menu, point_targets_lbl,
+  gtk_box_pack_start (GTK_BOX (vb), option_menu, false, false, 0);
+  populate_option_menu (option_menu, point_targets_lbl,
                         sizeof (point_targets_lbl) / sizeof (gchar *),
                         (GtkSignalFunc) brush_point_targets_cb, gg);
   /*-- initial value: both --*/
-  gtk_option_menu_set_history (GTK_OPTION_MENU (targets_option_menu), 1);
+  gtk_option_menu_set_history (GTK_OPTION_MENU (option_menu), 1);
 
 
 /*-- new, for edges --*/
@@ -381,33 +372,33 @@ cpanel_brush_make (ggobid *gg) {
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
   gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
 
-  targets_option_menu = gtk_option_menu_new ();
-  gtk_widget_set_name (targets_option_menu, "BRUSH:edge_targets_option_menu");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), targets_option_menu,
+  /*-- option menu:  Off, color&line, color only, ... --*/
+  option_menu = gtk_option_menu_new ();
+  gtk_widget_set_name (option_menu, "BRUSH:edge_targets_option_menu");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), option_menu,
     "Brushing edges: what characteristics, if any, should respond?", NULL);
-  gtk_box_pack_start (GTK_BOX (vb),
-                      targets_option_menu, false, false, 0);
-  populate_option_menu (targets_option_menu, edge_targets_lbl,
+  gtk_box_pack_start (GTK_BOX (vb), option_menu, false, false, 0);
+  populate_option_menu (option_menu, edge_targets_lbl,
                         sizeof (edge_targets_lbl) / sizeof (gchar *),
                         (GtkSignalFunc) brush_edge_targets_cb, gg);
   /*-- initial value: off --*/
-  gtk_option_menu_set_history (GTK_OPTION_MENU (targets_option_menu), 0);
+  gtk_option_menu_set_history (GTK_OPTION_MENU (option_menu), 0);
 
 
 /*
  * option menu for setting the brushing persistence
 */
-  mode_option_menu = gtk_option_menu_new ();
-  gtk_widget_set_name (mode_option_menu, "BRUSH:mode_option_menu");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), mode_option_menu,
+  option_menu = gtk_option_menu_new ();
+  gtk_widget_set_name (option_menu, "BRUSH:mode_option_menu");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), option_menu,
     "Persistent or transient brushing", NULL);
   gtk_box_pack_start (GTK_BOX (gg->control_panel[BRUSH]),
-                      mode_option_menu, false, false, 0);
-  populate_option_menu (mode_option_menu, mode_lbl,
+                      option_menu, false, false, 0);
+  populate_option_menu (option_menu, mode_lbl,
                         sizeof (mode_lbl) / sizeof (gchar *),
                         (GtkSignalFunc) brush_mode_cb, gg);
   /* initialize transient */
-  gtk_option_menu_set_history (GTK_OPTION_MENU (mode_option_menu), 1);
+  gtk_option_menu_set_history (GTK_OPTION_MENU (option_menu), 1);
 
 
   btn = gtk_button_new_with_label ("Undo");
@@ -419,9 +410,7 @@ cpanel_brush_make (ggobid *gg) {
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (brush_undo_cb), gg);
 
-/*
- * button for opening symbol panel
-*/
+ /*-- button for opening symbol panel --*/
   btn = gtk_button_new_with_label ("Choose color & glyph ...");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Open panel for choosing color and glyph", NULL);
@@ -430,6 +419,20 @@ cpanel_brush_make (ggobid *gg) {
                       (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (gg->control_panel[BRUSH]),
                       btn, false, false, 1);
+
+  /*-- option menu:  link by id, link by variable --*/
+  option_menu = gtk_option_menu_new ();
+  gtk_widget_set_name (option_menu, "BRUSH:linkby_option_menu");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), option_menu,
+    "Link by id (specified in XML), or link using the categorical variable selected in the variable manipulation tool",
+    NULL);
+  gtk_box_pack_start (GTK_BOX (gg->control_panel[BRUSH]),
+                      option_menu, false, false, 0);
+  populate_option_menu (option_menu, linkby_lbl,
+                        sizeof (linkby_lbl) / sizeof (gchar *),
+                        (GtkSignalFunc) brush_linkby_cb, gg);
+  /*-- initial value: link by id --*/
+  gtk_option_menu_set_history (GTK_OPTION_MENU (option_menu), 0);
 
 /*-- button for opening 'brush by variable' panel --*/
   btn = gtk_button_new_with_label ("Brush by variable ...");
@@ -474,7 +477,7 @@ cpanel_brush_init (cpaneld *cpanel, ggobid *gg) {
 void
 cpanel_brush_set (cpaneld *cpanel, ggobid *gg) {
   GtkWidget *btn;
-  GtkWidget *mode_option_menu;
+  GtkWidget *mode_option_menu, *linkby_option_menu;
   GtkWidget *edge_targets_option_menu, *point_targets_option_menu;
 
   btn = widget_find_by_name (gg->control_panel[BRUSH],
@@ -482,7 +485,9 @@ cpanel_brush_set (cpaneld *cpanel, ggobid *gg) {
   GTK_TOGGLE_BUTTON (btn)->active = cpanel->brush_on_p;
 
   mode_option_menu = widget_find_by_name (gg->control_panel[BRUSH],
-                                          "BRUSH:mode_option_menu");
+    "BRUSH:mode_option_menu");
+  linkby_option_menu = widget_find_by_name (gg->control_panel[BRUSH],
+    "BRUSH:linkby_option_menu");
   point_targets_option_menu = widget_find_by_name (gg->control_panel[BRUSH],
     "BRUSH:point_targets_option_menu");
   edge_targets_option_menu = widget_find_by_name (gg->control_panel[BRUSH],
@@ -490,6 +495,8 @@ cpanel_brush_set (cpaneld *cpanel, ggobid *gg) {
 
   gtk_option_menu_set_history (GTK_OPTION_MENU (mode_option_menu),
                                cpanel->br_mode);
+  gtk_option_menu_set_history (GTK_OPTION_MENU (linkby_option_menu),
+                               cpanel->br_linkby);
   gtk_option_menu_set_history (GTK_OPTION_MENU (point_targets_option_menu),
                                cpanel->br_point_targets);
   gtk_option_menu_set_history (GTK_OPTION_MENU (edge_targets_option_menu),

@@ -36,7 +36,8 @@ typedef struct {
  /*-- is this variable categorical? --*/
  gboolean categorical_p;
  gint nlevels;
- GArray *levels;
+ gint *level_values;
+ GArray *level_names;  /*-- strings --*/
 
  /*-- reference variable:  jref=-1 except for cloned or sphered variables --*/
  gint jref;

@@ -175,9 +175,7 @@ ggobi_file_set_create (gchar *rootname, datad *d, ggobid *gg)
 {
   gint nr, nc;
   gint *rowv, *colv;
-  gchar *fname;
-  FILE *fp;
-  gint i, j;
+  gint i;
   gboolean skipit;
 
   /*
@@ -326,28 +324,9 @@ ggobi_file_set_create (gchar *rootname, datad *d, ggobid *gg)
     }
   }
 
-/* Save rgroups */
-  if (d->nrgroups > 0) {
-    sprintf (fname, "%s.rgroups", rootname);
-    if ( (fp = fopen (fname, "w")) == NULL) {
-      gchar *message = g_strdup_printf (
-        "The file '%s' can not be opened for writing\n", fname);
-      quick_message (message, false);
-      g_free (message);
-      g_free ((gchar *) rowv);
-      g_free ((gchar *) colv);
-      return false;
-    } else {
-      for (j=0; j<nr; j++)
-        fprintf (fp, "%d ", d->rgroup_ids[rowv[j]] + 1);
-      fprintf (fp, "\n");
-      fclose (fp);
-    }
-  }
-
 /*
  * Continue saving files: .doc?
- * Don't bother with .missing, .nlinkable
+ * Don't bother with .missing
 */
 
   g_free ((char *) rowv);
