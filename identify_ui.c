@@ -146,6 +146,8 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
       GGobiPointMoveEvent ev;
       ev.d = d;
       ev.id = k;
+      /* This will become an event on the datad when we move to
+         Gtk objects (soon now!) */
       gtk_signal_emit(GTK_OBJECT(w), GGobiSignals[IDENTIFY_POINT_SIGNAL],
         sp, &ev, gg); 
     }
@@ -186,21 +188,13 @@ identify_event_handlers_toggle (splotd *sp, gboolean state) {
   
   if (state == on) {
     sp->key_press_id = gtk_signal_connect (GTK_OBJECT (display->window),
-                                           "key_press_event",
-                                           (GtkSignalFunc) key_press_cb,
-                                           (gpointer) sp);
+      "key_press_event", (GtkSignalFunc) key_press_cb, (gpointer) sp);
     sp->press_id = gtk_signal_connect (GTK_OBJECT (sp->da),
-                                       "button_press_event",
-                                       (GtkSignalFunc) button_press_cb,
-                                       (gpointer) sp);
+      "button_press_event", (GtkSignalFunc) button_press_cb, (gpointer) sp);
     sp->release_id = gtk_signal_connect (GTK_OBJECT (sp->da),
-                                         "button_release_event",
-                                         (GtkSignalFunc) button_release_cb,
-                                         (gpointer) sp);
+      "button_release_event", (GtkSignalFunc) button_release_cb, (gpointer) sp);
     sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
-                                        "motion_notify_event",
-                                        (GtkSignalFunc) motion_notify_cb,
-                                        (gpointer) sp);
+      "motion_notify_event", (GtkSignalFunc) motion_notify_cb, (gpointer) sp);
   } else {
     disconnect_key_press_signal (sp);
     disconnect_button_press_signal (sp);
@@ -217,7 +211,8 @@ identify_event_handlers_toggle (splotd *sp, gboolean state) {
 static gchar *display_lbl[] = {
   "Case label",
   "Variable labels",
-  "Point coords"};
+  /*"Point coords"*/
+  };
 void
 cpanel_identify_make(ggobid *gg) {
   GtkWidget *btn, *opt;
@@ -238,7 +233,9 @@ cpanel_identify_make(ggobid *gg) {
   opt = gtk_option_menu_new ();
   gtk_widget_set_name (opt, "IDENTIFY:display_option_menu");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-    "Display either case label or coordinates of nearest point", NULL);
+    /*"Display either case label or coordinates of nearest point", NULL);*/
+    "Display a label constructed using variables selected in the list above",
+    NULL);
   gtk_box_pack_start (GTK_BOX (gg->control_panel[IDENT]),
                       opt, false, false, 0);
   populate_option_menu (opt, display_lbl,

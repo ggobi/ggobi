@@ -830,7 +830,7 @@ splot_add_record_label (gboolean nearest, gint k, splotd *sp,
 {
   displayd *dsp = sp->displayptr;
   cpaneld *cpanel = &dsp->cpanel;
-  gint proj = cpanel->projection;
+  /*gint proj = cpanel->projection;*/
   datad *d = dsp->d;
   gint j;
   gint lbearing, rbearing, width, ascent, descent;
@@ -864,22 +864,49 @@ splot_add_record_label (gboolean nearest, gint k, splotd *sp,
 
     for (j=0; j<nvars; j++) {
       vt = vartable_element_get (vars[j], d);
-      if (vt->categorical_p)
-        lval = (gint) d->tform.vals[k][vars[j]] - 1;
+      if (vt == NULL) continue;
+      if (vt->categorical_p) {
+        /*
+         * since the level values can be any arbitrary integers,
+         * it's necessary to dig out the level name using the list
+         * of level values.
+        */
+        gint n, ktmp;
+        gint kval = (gint) d->tform.vals[k][vars[j]];
+        lval = -1;
+        for (n=0; n<vt->nlevels; n++) {
+          ktmp = GPOINTER_TO_INT (g_list_nth_data (vt->level_values, n));
+          if (ktmp == kval) {
+            lval = n;
+            break;
+          }
+        }
+      }
+      if (lval == -1) {
+        g_printerr ("The levels for %s aren't specified correctly\n",
+          vt->collab);
+        return;
+      }
 
       if (j == 0) {
         lbl = (vt->categorical_p) ?
-          g_strdup_printf ("%s",
+          g_strdup_printf ("%s=%s", vt->collab_tform,
             (gchar *) g_array_index (vt->level_names, gchar *, lval)) :
-          g_strdup_printf ("%g", d->tform.vals[k][vars[j]]);
+          g_strdup_printf ("%s=%g", vt->collab_tform,
+            d->tform.vals[k][vars[j]]);
       } else {
         lbl = (vt->categorical_p) ?
-          g_strdup_printf ("%s, %s", lbl,
+          g_strdup_printf ("%s, %s=%s", lbl,
+            vt->collab_tform,
             (gchar *) g_array_index (vt->level_names, gchar *, lval)) :
-          g_strdup_printf ("%s, %g", lbl, d->tform.vals[k][vars[j]]);
+          g_strdup_printf ("%s, %s=%g", lbl,
+            vt->collab_tform,
+            d->tform.vals[k][vars[j]]);
       }
     }
-  } else {
+  }
+/*
+  else {
     switch (proj) {
       case P1PLOT:
         lbl = g_strdup_printf ("%g", d->tform.vals[k][sp->p1dvar]);
@@ -931,6 +958,7 @@ splot_add_record_label (gboolean nearest, gint k, splotd *sp,
       break;
     }
   }
+*/
 
   /*
    * if displaying 'variable labels' and no variable is selected,
