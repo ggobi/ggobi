@@ -339,8 +339,9 @@ variable_notebook_subwindow_add (datad *d, GtkSignalFunc func,
  * size of the space we're working in -- maybe this will become an
  * argument.
 */
-  gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
-    swin, gtk_label_new (d->nickname)); 
+  gtk_notebook_append_page (GTK_NOTEBOOK (notebook), swin,
+    (d->nickname != NULL) ?
+      gtk_label_new (d->nickname) : gtk_label_new (d->name)); 
 
   /* add the CList */
   clist = gtk_clist_new (1);
@@ -356,7 +357,7 @@ variable_notebook_subwindow_add (datad *d, GtkSignalFunc func,
         (vtype == integer && vt->vartype == integer) ||
         (vtype == real && vt->vartype == real))
     {
-      row[0] = g_strdup (vt->collab_tform);
+      row[0] = g_strdup (vt->collab);
       gtk_clist_append (GTK_CLIST (clist), row);
       g_free (row[0]);
     }
@@ -479,14 +480,17 @@ variable_notebook_varchange_cb (ggobid *gg, vartabled *vt, gint which,
     gchar *row[1];
     vartabled *vt;
     clist = GTK_BIN (swin)->child;
+
+    gtk_clist_freeze (GTK_CLIST(clist));
     gtk_clist_clear (GTK_CLIST (clist));
     for (j=0; j<d->ncols; j++) {
       vt = vartable_element_get (j, d);
       if (vt) {
-        row[0] = g_strdup_printf (vt->collab_tform);
+        row[0] = g_strdup_printf (vt->collab);
         gtk_clist_append (GTK_CLIST (clist), row);
       }
     }
+    gtk_clist_thaw (GTK_CLIST(clist));
   }
 }
 
@@ -512,6 +516,7 @@ create_variable_notebook (GtkWidget *box, GtkSelectionMode mode,
 
   /* Create a notebook, set the position of the tabs */
   notebook = gtk_notebook_new ();
+  /* gtk_notebook_set_homogeneous_tabs (GTK_NOTEBOOK (notebook), true); */
   gtk_notebook_set_tab_pos (GTK_NOTEBOOK (notebook), GTK_POS_TOP);
   gtk_notebook_set_show_tabs (GTK_NOTEBOOK (notebook), nd > 1);
   gtk_box_pack_start (GTK_BOX (box), notebook, true, true, 2);
