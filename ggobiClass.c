@@ -198,6 +198,10 @@ GtkType gtk_ggobi_data_get_type(void)
 {
   static GtkType data_type = 0;
 
+#ifdef DEBUGGING_PLUGINS
+  fprintf(stderr, "gtk_ggobi_data_get_type\n");fflush(stderr);
+#endif
+
   if (!data_type) {
     static const GtkTypeInfo data_info = {
       "GtkGGobiData",
@@ -209,7 +213,9 @@ GtkType gtk_ggobi_data_get_type(void)
       /* reserved_2 */ NULL,
       (GtkClassInitFunc) NULL,
     };
-
+#ifdef DEBUGGIN_PLUGINS
+    fprintf(stderr, "Registering data type\n");fflush(stderr);
+#endif
     data_type = gtk_type_unique(gtk_object_get_type(), &data_info);
   }
 
