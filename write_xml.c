@@ -185,9 +185,12 @@ write_edge_record_p (gint i, datad *e, ggobid *gg)
         if (d->rowid.idv.nels > e->edge.endpoints[i].a &&
             d->rowid.idv.nels > e->edge.endpoints[i].b)
         {
-          a = d->rowid.idv.els[e->edge.endpoints[i].a];
-          b = d->rowid.idv.els[e->edge.endpoints[i].b];
-          if (!d->sampled.els[a] || !d->sampled.els[b] ||
+/*
+ *        a = d->rowid.idv.els[e->edge.endpoints[i].a];
+ *        b = d->rowid.idv.els[e->edge.endpoints[i].b];
+*/
+          if (!edge_endpoints_get (i, &a, &b, d, e->edge.endpoints) ||
+              !d->sampled.els[a] || !d->sampled.els[b] ||
               d->hidden.els[a] || d->hidden.els[b])
           {
             save_case = false;

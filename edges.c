@@ -167,3 +167,19 @@ GGobi_cleanUpEdgeRelationships(struct _EdgeData *edge, int startPosition)
     }
   }
 }
+
+/* --------------------------------------------------------------- */
+/*                          Utilities                              */
+/* --------------------------------------------------------------- */
+
+gboolean
+edge_endpoints_get (gint k, gint *a, gint *b, datad *d, endpointsd *endpoints)
+{
+  gboolean ok;
+
+  *a = d->rowid.idv.els[endpoints[k].a];
+  *b = d->rowid.idv.els[endpoints[k].b];
+  ok = (*a >= 0 && *a < d->nrows && *b >= 0 && *b < d->nrows);
+
+  return ok;
+}

@@ -98,6 +98,33 @@ draw_glyph (GdkDrawable *drawable, glyphd *gl, icoords *xypos, gint jpos, ggobid
 }
 
 void
+splot_text_extents (gchar *text, GtkStyle *style,
+  gint *lbearing, gint *rbearing, gint *width, gint *ascent, gint *descent)
+{
+  gdk_text_extents (
+#if GTK_MAJOR_VERSION == 2
+    gtk_style_get_font (style),
+#else
+    style->font,
+#endif
+    text, strlen(text),
+    lbearing, rbearing, width, ascent, descent);
+}
+
+void
+splot_draw_string (gchar *text, gint xpos, gint ypos,
+  GtkStyle *style, GdkDrawable *drawable, ggobid *gg)
+{
+  gdk_draw_string (drawable,
+#if GTK_MAJOR_VERSION == 2
+    gtk_style_get_font (style),
+#else
+    style->font,
+#endif
+    gg->plot_GC, xpos, ypos, text);
+}
+
+void
 mousepos_get_pressed (GtkWidget *w, GdkEventButton *event,
                       gboolean *btn1_down_p, gboolean *btn2_down_p, splotd *sp)
 {
