@@ -82,12 +82,14 @@ const gchar * const xmlDataTagNames[] = {
                                           "variable",
                                           "data",
 
+/*
                                           "edges",
                                           "edge",
                                           "edgerecord",
                                           "edgerecords",
                                           "edgevariables",
                                           "edgevariable",
+*/
 
                                           "colormap",
                                           "color",
@@ -175,11 +177,13 @@ initParserData(XMLParserData *data, xmlSAXHandlerPtr handler, ggobid *gg)
   data->current_record = 0;
   data->current_variable = 0;
   data->current_element = 0;
-  data->current_edge = 0;
 
+/* dfs -- no such thing as an edge record now
+  data->current_edge = 0;
   data->current_edgevariable = 0;
   data->current_edgerecord = 0;
   data->current_edgeelement = 0;
+*/
 
   data->current_data = NULL;
 
@@ -193,9 +197,11 @@ initParserData(XMLParserData *data, xmlSAXHandlerPtr handler, ggobid *gg)
   data->defaults.color = -1;
   data->defaults.glyphType = -1;
   data->defaults.glyphSize = -1;
-  data->defaults.edgeWidth = -1;
+  data->defaults.edgeWidth = -1;  /*-- this has no home in ggobi yet --*/
+/*
   data->defaults.edgeColor = -1;
   data->defaults.edgeHidden = false;
+*/
   data->defaults.hidden = false;
 }
 
@@ -254,16 +260,16 @@ endXMLElement(void *user_data, const CHAR *name)
    case VARIABLE:
      data->current_variable++;
      break;
-/* these lines will be deleted */
+
+/*
    case CONNECTION:
      data->current_edge++;
      break;
-
-/* populate */
    case EDGERECORD:
      break;
    case EDGEVARIABLE:
      break;
+*/
 
    case COLOR:
      data->current_color++;
@@ -427,7 +433,7 @@ setDatasetInfo (const CHAR **attrs, XMLParserData *data)
   d->nrgroups = 0;              /*-- for now --*/
 
   rowlabels_alloc (d, data->gg);
-  rowids_alloc (d, data->gg);  /* dfs */
+  d->rowid.id.els = NULL;  /*-- dfs; alloc only if ids are present --*/
   br_glyph_ids_alloc (d);
   br_glyph_ids_init (d, data->gg);
 
@@ -446,22 +452,6 @@ setDatasetInfo (const CHAR **attrs, XMLParserData *data)
   data->current_variable = 0;
   data->current_element = 0;
 
-/*
- * I have just realized that this is wrong.  EdgeData doesn't
- * have edges!  It's linked to other data that <does> have
- * edges.  What a gaffe.
-*/
-  if(d->edgeData) {
-    /*alloc_edgeIDs(d);*/
-    edges_alloc (d->nrows, d);  /* dfs */
-  }
-
-
-  /*
-  setLineColor (attrs, data, -1);
-  setLineWidth (attrs, data, -1);  
-  */
-
   return (true);
 }
 
@@ -476,7 +466,7 @@ setDefaultDatasetValues(const CHAR **attrs, XMLParserData *data)
 
   setGlyph (attrs, data, -1);  
   setColor (attrs, data, -1);
-  setHidden (attrs, data, -1, ROW);
+  setHidden (attrs, data, -1);
  return(true);
 }
 
@@ -515,7 +505,7 @@ newRecord(const CHAR **attrs, XMLParserData *data)
 }
 
 gboolean
-setHidden(const CHAR **attrs, XMLParserData *data, int i, enum HiddenType type)
+setHidden(const CHAR **attrs, XMLParserData *data, int i)
 {
   const char *tmp;
   datad *d = getCurrentXMLData(data);
@@ -792,10 +782,7 @@ setVariableName(XMLParserData *data, const CHAR *name, gint len)
   return (true);
 }
 
-
-
-
-/*------------------ end of edges section ------------------------------*/
+/*----------------------------------------------------------------------*/
 
 gint
 rowId (const gchar *tmp, XMLParserData *data)
@@ -1119,25 +1106,26 @@ gboolean
 setDataset(const CHAR **attrs, XMLParserData *parserData) 
 {
   datad *data;
-  const gchar *tmp;
   gchar *name;
-  tmp = getAttribute(attrs, (char*) "nodeData");
+  const gchar *tmp;
+
 
 #ifdef USE_CLASSES
-  if(tmp) {
-    data = new EdgeDatad(1);
-    //    data = new edgeDatad(parserData->gg);
-  } else 
+  // tmp = getAttribute(attrs, (char*) "nodeData");*/
+  //if(tmp) {
+    // data = new EdgeDatad(1);
+    // data = new edgeDatad(parserData->gg);
+  //} else 
     data = new datad(parserData->gg);
 #else
   data = datad_new(NULL, parserData->gg);
-  if(tmp) {
-    data->readXMLRecord = readXMLEdgeRecord;
-    data->edgeData = true;
-  } else {
+  /*if(tmp) {*/
+  /*  data->readXMLRecord = readXMLEdgeRecord;*/
+  /*  data->edgeData = true;*/
+  /*} else {*/
     data->readXMLRecord = readXMLRecord;
-    data->edgeData = false;
-  }
+    /*data->edgeData = false;*/
+  /*}*/
 #endif
 
 
@@ -1176,6 +1164,7 @@ readXMLRecord(const CHAR **attrs, XMLParserData *data)
   const gchar *tmp;
   gchar *stmp;
   gint i = data->current_record;
+  gint start, end;
 
   data->current_element = 0;
 
@@ -1189,10 +1178,14 @@ readXMLRecord(const CHAR **attrs, XMLParserData *data)
 
   g_array_insert_val (d->rowlab, data->current_record, stmp);
 
-
   setColor(attrs, data, i);
   setGlyph(attrs, data, i);
-  setHidden(attrs, data, i, EDGE);
+  setHidden(attrs, data, i);
+
+/*
+ * Probably something's missing here:  if any record has an
+ * id, then does every record need one?  I think so.  -- dfs
+*/
  
   tmp = getAttribute(attrs, "id");
   if(tmp) {
@@ -1200,19 +1193,60 @@ readXMLRecord(const CHAR **attrs, XMLParserData *data)
      data->rowIds = (gchar **) g_malloc(d->nrows * sizeof(gchar *));
      memset(data->rowIds, '\0', d->nrows);
     }
+    if (d->rowid.id.els == NULL) {
+      rowids_alloc (d);
+    }
 
     data->rowIds[i] = g_strdup(tmp);
-
     d->rowid.id.els[i] = asInteger (tmp);
-  } else {
+  }
 
-    d->rowid.id.els[i] = i;
+/*
+ * Probably something's missing here:  if edges should be
+ * present, then every record should have a source and an
+ * endpoint, and there's no validation going on now. --dfs
+*/
 
+  /* Read the edge source and destination pair if, present. */
+  tmp = getAttribute(attrs, "source");   
+  if (tmp != (const gchar *) NULL) {
+/*
+  if(tmp == (const gchar *)NULL || tmp[0] == (const gchar)NULL) {
+    char buf[512]; 
+    sprintf(buf,"No source attribute for record %d in edge data %s\n",
+      i, d->name);
+    g_printerr (buf);
+    exit(103);
+  }
+*/
+    start = asInteger(tmp);
+    tmp = getAttribute(attrs, "destination");   
+    if (tmp != (const gchar *) NULL) {
+/*
+  if(tmp == (const gchar *)NULL || tmp[0] == (const gchar)NULL) {
+    char buf[512]; 
+    sprintf(buf,"No destination attribute for record %d in edge data %s\n",
+      i, d->name);
+    g_printerr (buf);
+    exit(103);
+  }
+*/
+      end = asInteger(tmp);
+
+      /*-- if encountering the first edge, allocate endpoints array --*/
+      if (d->edge.n == 0) {
+        edges_alloc (d->nrows, d);
+      }
+
+      d->edge.endpoints[i].a = start;
+      d->edge.endpoints[i].b = end;
+    }
   }
 
   return(true);
 }
 
+/*
 gboolean
 readXMLEdgeRecord(const CHAR **attrs, XMLParserData *data)
 {
@@ -1223,11 +1257,11 @@ readXMLEdgeRecord(const CHAR **attrs, XMLParserData *data)
 
   gboolean ans = readXMLRecord(attrs, data);
 
-    /* Now read the node source and destination pair. */
   tmp = getAttribute(attrs, "source");   
   if(tmp == (const gchar *)NULL || tmp[0] == (const gchar)NULL) {
     char buf[512]; 
-    sprintf(buf,"No source attribute for record %d in edge data %s\n",index, d->name);
+    sprintf(buf,"No source attribute for record %d in edge data %s\n",
+      index, d->name);
     g_printerr (buf);
     exit(103);
   }
@@ -1236,39 +1270,23 @@ readXMLEdgeRecord(const CHAR **attrs, XMLParserData *data)
   tmp = getAttribute(attrs, "destination");   
   if(tmp == (const gchar *)NULL || tmp[0] == (const gchar)NULL) {
     char buf[512]; 
-    sprintf(buf,"No destination attribute for record %d in edge data %s\n",index, d->name);
+    sprintf(buf,"No destination attribute for record %d in edge data %s\n",
+      index, d->name);
     g_printerr (buf);
     exit(103);
   }
   end = asInteger(tmp);
 
-  if (start > end) {
-    d->edge.endpoints[index].a = end;
-    d->edge.endpoints[index].b = start;
-  } else {
-    d->edge.endpoints[index].a = start;
-    d->edge.endpoints[index].b = end;
-  }
+  if (d->edge.n == 0)
+    edges_alloc (d->nrows, d);
 
-/*
-  d->sourceid.id.els[index] = asInteger(tmp);
-  d->destid.id.els[index] = asInteger(tmp);
-*/
+  d->edge.endpoints[index].a = start;
+  d->edge.endpoints[index].b = end;
+
   return(ans);
 }
-
-/*
-gint
-alloc_edgeIDs(datad *d)
-{
-  size_t sz = d->nrows * sizeof(guint);
-  d->sourceID = (guint *) g_malloc(sz);
-  memset(d->sourceID, '\0', sz);
-  d->destinationID = (guint *) g_malloc(sz);
-  memset(d->destinationID, '\0', sz);
- return(d->nrows);
-}
 */
+
 
 #else /* So using classes */
 gboolean
@@ -1288,7 +1306,7 @@ datad::readXMLRecord(const CHAR **attrs, XMLParserData *data)
 
   setColor(attrs, data, i);
   setGlyph(attrs, data, i);
-  setHidden(attrs, data, i, EDGE);
+  setHidden(attrs, data, i);
  
   tmp = getAttribute(attrs, "id");
   if(tmp) {
@@ -1303,7 +1321,7 @@ datad::readXMLRecord(const CHAR **attrs, XMLParserData *data)
   return(true);
 }
 
-
+/*
 gboolean
 EdgeDatad::readXMLRecord(const CHAR **attrs, XMLParserData *data)
 {
@@ -1311,4 +1329,5 @@ EdgeDatad::readXMLRecord(const CHAR **attrs, XMLParserData *data)
 
   return(true);
 }
+*/
 #endif

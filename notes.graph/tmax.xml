@@ -32,7 +32,7 @@
 
 <!-- -------------------------------------------------------- -->
 
-<data name="Calls" nodes="T" edges="T">
+<data name="Calls" points="T" edges="T">
 <description>
 
 </description>

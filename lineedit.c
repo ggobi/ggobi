@@ -25,6 +25,7 @@
 void
 edges_alloc (gint nsegs, datad *d)
 {
+  d->edge.n = nsegs;
   d->edge.endpoints = (endpointsd *)
     g_realloc (d->edge.endpoints, nsegs * sizeof (endpointsd));
 }
@@ -33,6 +34,7 @@ void
 edges_free (datad *d, ggobid *gg)
 {
   g_free ((gpointer) d->edge.endpoints);
+  d->edge.n = 0;
 }
 
 /* --------------------------------------------------------------- */

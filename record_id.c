@@ -18,14 +18,14 @@
 /*                   Memory allocation, initialization                */
 /*--------------------------------------------------------------------*/
 
-void rowids_free (datad *d, ggobid *gg)
+void rowids_free (datad *d)
 {
   vectori_free (&d->rowid.id);
 }
 
 
 void
-rowids_alloc (datad *d, ggobid *gg) 
+rowids_alloc (datad *d) 
 {
   vectori_alloc (&d->rowid.id, d->nrows);
 }

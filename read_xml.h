@@ -6,14 +6,14 @@
 /*#include <libxml/parser.h>*/
 #include <parser.h>
 
-enum HiddenType {ROW, EDGE};
+/*enum HiddenType {ROW, EDGE};*/
 enum xmlDataState { 
   TOP = 0, 
   DATASET,
   DESCRIPTION,
   RECORD, RECORDS, VARIABLES, VARIABLE, DATA,
   CONNECTIONS, CONNECTION,  /* edges */
-  EDGERECORD, EDGERECORDS, EDGEVARIABLES, EDGEVARIABLE,
+  /*EDGERECORD, EDGERECORDS, EDGEVARIABLES, EDGEVARIABLE,*/
   COLORMAP, COLOR, UNKNOWN};
 typedef enum xmlDataState XmlTagType;
 
@@ -22,9 +22,9 @@ typedef struct {
   int color;
   int glyphType;
   int glyphSize;
-  int edgeColor;
-  int edgeWidth;
-  int edgeHidden;
+  /*int edgeColor;*/
+  int edgeWidth;  /*-- this has no home in ggobi yet --*/
+  /*int edgeHidden;*/
   int hidden;
 
 } DataOptions;
@@ -35,12 +35,14 @@ typedef struct _XMLUserData {
   gint current_record;   /* Indexes the record we are currently working on. */
   gint current_element;  /* Indexes the values within a record. */
 /* this line will be deleted */
-  gint current_edge;  /* Current edge being added. */
+  /*gint current_edge*/;  /* Current edge being added. */
 /* */
 
+/* dfs
   gint current_edgevariable;
   gint current_edgerecord;
   gint current_edgeelement;
+*/
 
 
   gint current_color;    /* The index of the current element being processed in the colormap */
@@ -118,16 +120,19 @@ gboolean newEdgeVariable(const CHAR **attrs, XMLParserData *data);
 gboolean setDatasetInfo(const CHAR **attrs, XMLParserData *data);
 gboolean setGeneralInfo (const CHAR **attrs, XMLParserData *data);
 gboolean allocVariables(const CHAR **attrs, XMLParserData *data);
-gboolean allocEdgeVariables(const CHAR **attrs, XMLParserData *data);
+/*gboolean allocEdgeVariables(const CHAR **attrs, XMLParserData *data);*/
 gboolean newRecord(const CHAR **attrs, XMLParserData *data);
+/*
 gboolean newEdgeRecord(const CHAR **attrs, XMLParserData *data);
-
+gboolean setEdgeRecordValues(XMLParserData *data, const CHAR *line, gint len);
+*/
 gboolean setDataset(const CHAR **attrs, XMLParserData *parserData);
 
 gboolean setRecordValues(XMLParserData *data, const CHAR *line, gint len);
-gboolean setEdgeRecordValues(XMLParserData *data, const CHAR *line, gint len);
 gboolean setVariableName(XMLParserData *data, const CHAR *name, gint len);
+/*
 gboolean setEdgeVariableName(XMLParserData *data, const CHAR *name, gint len);
+*/
 
 gboolean setDefaultDatasetValues(const CHAR **attrs, XMLParserData *data);
 
@@ -143,13 +148,15 @@ void initParserData(XMLParserData *data, xmlSAXHandlerPtr handler, ggobid *gg);
 gboolean setGlyph(const CHAR **attrs, XMLParserData *data, gint i);
 gboolean setColor(const CHAR **attrs, XMLParserData *data, gint i);
 
-gboolean allocEdges(const CHAR **attrs, XMLParserData *data);
-gboolean addEdge(const CHAR **attrs, XMLParserData *data);
+/*
+*gboolean allocEdges(const CHAR **attrs, XMLParserData *data);
+*gboolean addEdge(const CHAR **attrs, XMLParserData *data);
+*/
 gint rowId(const gchar *tmp, XMLParserData *data);
 
 gboolean data_xml_read (InputDescription *desc, ggobid *gg);
 
-gboolean setHidden(const CHAR **attrs, XMLParserData *data, gint i, enum HiddenType);
+gboolean setHidden(const CHAR **attrs, XMLParserData *data, gint i);
 
 gboolean setColorValue(XMLParserData *data, const CHAR *name, gint len);
 gboolean setColormapEntry(const CHAR **attrs, XMLParserData *data);
@@ -173,7 +180,9 @@ gboolean asLogical(const gchar *sval);
 datad *getCurrentXMLData(XMLParserData* parserData);
 
 gboolean readXMLRecord(const CHAR **attrs, XMLParserData *data);
+/*
 gboolean readXMLEdgeRecord(const CHAR **attrs, XMLParserData *data);
+*/
 
 #ifdef __cplusplus
 }
