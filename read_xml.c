@@ -220,13 +220,8 @@ initParserData(XMLParserData *data, xmlSAXHandlerPtr handler, ggobid *gg)
   data->rowIds = NULL;
   data->handlers = handler;
   data->defaults.color = -1;
-#ifndef SUPPORT_PLUGINS
-  data->defaults.glyphType = -1;
-  data->defaults.glyphSize = -1;
-#else
   data->defaults.glyphType = sessionOptions->info->glyph.type;
   data->defaults.glyphSize = sessionOptions->info->glyph.size;
-#endif
   data->defaults.edgeWidth = -1;  /*-- this has no home in ggobi --*/
   data->defaults.hidden = false;
 
@@ -780,7 +775,7 @@ setGlyph(const xmlChar **attrs, XMLParserData *data, gint i)
     next = strtok((gchar *)tmp, " ");
     j = 0;
     while(next) {
-      if(j == 0) {
+      if(j == 0) {  /* type */
         value = mapGlyphName(next);
         if(i < 0) {
           data->defaults.glyphType = value;
@@ -788,10 +783,15 @@ setGlyph(const xmlChar **attrs, XMLParserData *data, gint i)
           d->glyph.els[i].type = d->glyph_now.els[i].type =
               d->glyph_prev.els[i].type = value;       
         }
-      } else {
+      } else {  /* size */
         value = atoi(next);
         if(i < 0) {
-          data->defaults.glyphSize = value;
+          if (value >= 0 && value < NGLYPHTYPES) {
+            data->defaults.glyphSize = value;
+          } else {
+            xml_warning("File error:", next, "glyph improperly specified",
+              data);
+          }
         } else {
           d->glyph.els[i].size = d->glyph_now.els[i].size =
             d->glyph_prev.els[i].size = value;     
