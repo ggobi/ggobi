@@ -314,7 +314,7 @@ struct _ggobid {
 /*----------------- variable selection panel -------------------------*/
 
  struct _Varpanel_ui {
-   GtkWidget *varpanel;
+   GtkWidget *varpanel;  /*-- a vbox --*/
    GtkWidget *scrolled_window;
    GtkAccelGroup *varpanel_accel_group;
  } varpanel_ui;

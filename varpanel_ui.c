@@ -425,7 +425,7 @@ variable_clone (gint jvar, const gchar *newName, gboolean update,
   */
   if (d->varpanel_ui.vnrows*d->varpanel_ui.vncols <= d->ncols) {
     d->varpanel_ui.vnrows++;
-    gtk_table_resize (GTK_TABLE (gg->varpanel_ui.varpanel),
+    gtk_table_resize (GTK_TABLE (d->varpanel_ui.table),
                       d->varpanel_ui.vnrows, d->varpanel_ui.vncols);
   }
 
@@ -437,6 +437,11 @@ variable_clone (gint jvar, const gchar *newName, gboolean update,
       else {
         d->varpanel_ui.da = (GtkWidget **)
           g_realloc (d->varpanel_ui.da, nc * sizeof (GtkWidget *));
+
+        d->varpanel_ui.da_pix = (GdkPixmap **)
+          g_realloc (d->varpanel_ui.da_pix, nc * sizeof (GdkPixmap *));
+        d->varpanel_ui.da_pix[nc-1] = NULL;
+
         d->varpanel_ui.label = (GtkWidget **)
           g_realloc (d->varpanel_ui.label, nc * sizeof (GtkWidget *));
         varcircle_add (i, j, k, d, gg);
@@ -900,9 +905,9 @@ vartable_refresh (datad *d, ggobid *gg) {
   for (j=0; j<d->ncols; j++) {
     if (GTK_WIDGET_REALIZED (d->varpanel_ui.da[j])) {
       varcircle_draw (j, d, gg);
+/*    gtk_widget_queue_draw (d->varpanel_ui.da[j]);*/
     }
   }
-/*      gtk_widget_queue_draw (d->varpanel_ui.da[j]);*/
 }
 
 void
