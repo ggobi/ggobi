@@ -69,6 +69,7 @@ SRC=\
     scatterplot_ui.c \
     smooth_ui.c \
     sp_plot.c \
+    sp_plot_edges.c \
     sphere.c \
     sphere_ui.c \
     splash.c \
