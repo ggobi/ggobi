@@ -170,7 +170,7 @@ struct _datad {
    vector_i pcvars; /*-- vars into which sphered data is written --*/
 
    vector_f eigenval;
-   array_f eigenvec;
+   array_d eigenvec;
    array_f vc;
    vector_f tform_mean;
    vector_f tform_stddev;

@@ -20,7 +20,7 @@ sphere_init (datad *d) {
   vectori_init_null (&d->sphere.pcvars);
   vectorf_init_null (&d->sphere.eigenval);
 
-  arrayf_init_null (&d->sphere.eigenvec);
+  arrayd_init_null (&d->sphere.eigenvec);
   arrayf_init_null (&d->sphere.vc);
 
   vectorf_init_null (&d->sphere.tform_mean);
@@ -34,7 +34,7 @@ sphere_free (datad *d) {
   vectori_free (&d->sphere.vars);
   vectorf_free (&d->sphere.eigenval);
 
-  arrayf_free (&d->sphere.eigenvec, 0, 0);
+  arrayd_free (&d->sphere.eigenvec, 0, 0);
   arrayf_free (&d->sphere.vc, 0, 0);
 
   vectorf_free (&d->sphere.tform_mean);
@@ -51,7 +51,7 @@ sphere_malloc (gint nc, datad *d, ggobid *gg)
     vectori_alloc_zero (&d->sphere.vars, nc);
     vectorf_alloc_zero (&d->sphere.eigenval, nc);
 
-    arrayf_alloc_zero (&d->sphere.eigenvec, nc, nc);
+    arrayd_alloc_zero (&d->sphere.eigenvec, nc, nc);
     arrayf_alloc_zero (&d->sphere.vc, nc, nc);
 
     vectorf_alloc_zero (&d->sphere.tform_mean, nc);
@@ -307,7 +307,7 @@ eigenval_zero (datad *d)
 void
 eigenvec_zero (datad *d, ggobid *gg)
 {
-  arrayf_zero (&d->sphere.eigenvec);
+  arrayd_zero (&d->sphere.eigenvec);
 }
 
 /*
@@ -321,7 +321,7 @@ eigenvec_set (datad *d, ggobid *gg)
 {
   gint i, j;
   gint nels = d->sphere.vars.nels;
-  gfloat **eigenvec = d->sphere.eigenvec.vals;
+  gdouble **eigenvec = d->sphere.eigenvec.vals;
   gfloat **vc = d->sphere.vc.vals;
 
   for (i=0; i<nels; i++)
@@ -389,7 +389,7 @@ sphere_varcovar_set (datad *d, ggobid *gg)
  * is within tol of being equal to the identity matrix
 */
 gboolean
-vc_identity_p (gfloat **matrx, gint n)
+vc_identity_p (gdouble **matrx, gint n)
 {
   gint i, j;
   gboolean retn_val = true;
@@ -397,11 +397,11 @@ vc_identity_p (gfloat **matrx, gint n)
 
   for (i=0; i<n; i++) {
     for (j=0; j<n; j++) {
-      if ((i==j) && (fabs ((gdouble)(1.000-matrx[i][j])) > tol)) {
+      if ((i==j) && (fabs ((1.000-matrx[i][j])) > tol)) {
         retn_val = false;
         break;
       }
-      else if ((i!=j) && (fabs ((gdouble)matrx[i][j]) > tol)) {
+      else if ((i!=j) && (fabs (matrx[i][j]) > tol)) {
         retn_val = false;
         break;
       }
@@ -422,7 +422,7 @@ gboolean sphere_svd (datad *d, ggobid *gg)
 {
   gint i, j, k, rank;
   gint nels = d->sphere.vars.nels;
-  gfloat **eigenvec = d->sphere.eigenvec.vals;
+  gdouble **eigenvec = d->sphere.eigenvec.vals;
   /*  gfloat **eigenvec = d->sphere.vc.vals;*/
   gfloat *eigenval = d->sphere.eigenval.els;
 
@@ -430,10 +430,10 @@ gboolean sphere_svd (datad *d, ggobid *gg)
   paird *pairs = (paird *) g_malloc (nels * sizeof (paird));
   /*-- scratch vector and array --*/
   gfloat *e = (gfloat *) g_malloc (nels * sizeof (gfloat));
-  gfloat **b = (gfloat **) g_malloc (nels * sizeof (gfloat *));
+  gdouble **b = (gdouble **) g_malloc (nels * sizeof (gdouble *));
 
   for (j=0; j<nels; j++)
-    b[j] = (gfloat *) g_malloc0 (nels * sizeof (gfloat));
+    b[j] = (gdouble *) g_malloc0 (nels * sizeof (gdouble));
 
   if (!vc_equals_I) {
     eigenval_zero (d);  /*-- zero out the vector of eigenvalues --*/
@@ -487,7 +487,7 @@ spherize_data (vector_i *svars, vector_i *pcvars, datad *d, ggobid *gg)
 
   gfloat *tform_mean = d->sphere.tform_mean.els;
   gfloat *tform_stddev = d->sphere.tform_stddev.els;
-  gfloat **eigenvec = d->sphere.eigenvec.vals;
+  gdouble **eigenvec = d->sphere.eigenvec.vals;
   gfloat *eigenval = d->sphere.eigenval.els;
 
   for (m=0; m<d->nrows_in_plot; m++) {
