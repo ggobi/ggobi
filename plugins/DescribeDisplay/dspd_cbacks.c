@@ -83,13 +83,14 @@ describe_colorscheme (FILE *fp, ggobid *gg)
 
   OPEN_NAMED_LIST(fp, "foregroundColors");
   for (i=0; i<scheme->n; i++) {
-    OPEN_C(fp);
+    OPEN_C(fp);  /* one foreground color */
     describe_color (fp, scheme->rgb[i]);
-    CLOSE_C(fp); ADD_COMMA(fp);
+    CLOSE_C(fp);  /* one foreground color */
+    ADD_COMMA(fp);
   }
-  CLOSE_LIST(fp); /* close foregroundColors */
+  CLOSE_LIST(fp); /* foregroundColors */
 
-  CLOSE_LIST(fp); /* close colormap */
+  CLOSE_LIST(fp); /* colormap */
   ADD_COMMA(fp);
   ADD_CR(fp);
 }
@@ -108,7 +109,7 @@ describe_sticky_labels (FILE *fp, datad *d, cpaneld *cpanel)
     GSList *l;
     OPEN_NAMED_LIST(fp, "stickylabels");
     for (l = d->sticky_ids; l; l = l->next) {
-      OPEN_LIST(fp);
+      OPEN_LIST(fp);  /* one sticky label */
       j = GPOINTER_TO_INT (l->data);
       fprintf (fp, "index=%d", j);
       ADD_COMMA(fp);
@@ -125,10 +126,10 @@ describe_sticky_labels (FILE *fp, datad *d, cpaneld *cpanel)
           fprintf (fp, "%s", "");
         }
       }
-      CLOSE_LIST(fp);
+      CLOSE_LIST(fp);  /* one sticky label */
       ADD_COMMA(fp);  /* an extra comma seems to do no harm */
     }
-    CLOSE_LIST(fp);
+    CLOSE_LIST(fp);  /* stickylabels */
   }
 }
 
@@ -353,14 +354,14 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
     OPEN_NAMED_LIST(fp, "p1plotparams");
     vt = vartable_element_get (sp->p1dvar, d);
     fprintf (fp, "label='%s'", vt->collab_tform);
-    CLOSE_LIST(fp);
+    CLOSE_LIST(fp); /* p1plotparams */
   } else if (projection == XYPLOT) {
     OPEN_NAMED_LIST(fp, "xyplotparams");
     vt = vartable_element_get (sp->xyvars.x, d);
     fprintf (fp, "xlabel='%s',", vt->collab_tform);
     vt = vartable_element_get (sp->xyvars.y, d);
     fprintf (fp, "ylabel='%s',", vt->collab_tform);
-    CLOSE_LIST(fp);
+    CLOSE_LIST(fp);  /* xyplotparams */
   } else if (projection == TOUR1D) {
   } else if (projection == TOUR2D3) {
   } else if (projection == TOUR2D) {
@@ -386,8 +387,7 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
          display->options.edges_arrowheads_show_p ||
 	 display->options.edges_directed_show_p))
     {
-      fprintf (fp, "edges = ");
-      OPEN_LIST(fp);
+      OPEN_NAMED_LIST(fp, "edges");
 
       for (i=0; i<e->edge.n; i++) {
         /*
@@ -398,7 +398,7 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
         if (!splot_plot_edge (i, d, e, sp, display, gg))
           continue;
 
-        OPEN_LIST(fp);
+        OPEN_LIST(fp);  /* one edge */
 
         /* source and destination */
         edge_endpoints_get (i, &a, &b, d, endpoints, e);
@@ -414,14 +414,14 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
         fprintf (fp, "hidden=%d",
           splot_hidden_edge (i, d, e, sp, display, gg));
 
-        CLOSE_LIST(fp);
+        CLOSE_LIST(fp);  /* one edge */
         ADD_COMMA(fp);
       }
       /* sticky labels */
       describe_sticky_labels (fp, e, cpanel);
     }
-    CLOSE_LIST(fp);
-    ADD_COMMA(fp);
+    CLOSE_LIST(fp);  /* edges */
+    ADD_COMMA(fp); ADD_CR(fp);
   }
 
   CLOSE_LIST(fp); /* plot */
@@ -439,7 +439,7 @@ describe_scatterplot_display (FILE *fp, ggobid *gg, displayd *display,
 
   describe_scatterplot_plot (fp, gg, display, sp, desc);
 
-  CLOSE_LIST(fp);
+  CLOSE_LIST(fp);  /* plots */
 }
 
 
@@ -453,8 +453,7 @@ describe_scatmat_display (FILE *fp, ggobid *gg, displayd *display,
 
   ncols = g_list_length (display->scatmat_cols);
 
-  fprintf (fp, "plots = ");
-  OPEN_LIST(fp);
+  OPEN_NAMED_LIST(fp, "plots");
   fprintf (fp, "count = %d", ncols * ncols);
   ADD_COMMA(fp);
 
@@ -472,6 +471,8 @@ describe_scatmat_display (FILE *fp, ggobid *gg, displayd *display,
     describe_scatterplot_plot (fp, gg, display, sp, desc);
     ADD_COMMA(fp);
   }
+
+  CLOSE_LIST(fp);  /* plots */
 }
 
 void
@@ -528,7 +529,7 @@ desc_write_cb (GtkWidget *btn, PluginInstance *inst)
   } else if (GTK_IS_GGOBI_SCATMAT_DISPLAY(display)) {
     fprintf (fp, "type='scatmat',");
     /* ncols: display is symmetric */
-    fprintf (fp, "ncols = %d", g_list_length (display->scatmat_cols));
+    fprintf (fp, "ncols = %d,", g_list_length (display->scatmat_cols));
     describe_scatmat_display (fp, gg, display, desc);
   /*
   } else if (GTK_IS_GGOBI_PARCOORDS_DISPLAY(display)) {
