@@ -50,7 +50,7 @@
 \title {{\tt ggobi} Manual}
 \author{
 Deborah F. Swayne, AT\&T Labs -- Research \\
-Dianne Cook, Iowa State University \\
+Di Cook, Iowa State University \\
 Andreas Buja, AT\&T Labs -- Research \\
 Duncan Temple Lang, Lucent Bell Labs
 }
@@ -276,10 +276,13 @@ displays.
 \end{figure}
 
 Now look at the plot of linoleic vs eicosenoic. Open up the {\bf
-Color \& glyph groups ...} tool, and use the Hide and Show buttons to
-make groups of points invisible and then visible again (Figure
-\ref{fig5}). Finally, use these controls to hide the cases from
-geographic region 1, and then {\bf Rescale} the plot.
+Color \& glyph groups ...} tool, and experiment with it:  Use the
+``Shadow'' toggle buttons to have groups of points drawn in a dim
+color, and then use ``Exclude shadows'' to exclude them altogether,
+and ``Include shadows'' to re-include them.  (Figure \ref{fig5}).
+Finally, use these controls to shadow brush the cases from geographic
+region 1, and then use {\bf Exclude shadows} to remove them from
+consideration.
 
 \begin{figure}[htp]
 \hbox{\pdfimage width 3in {Figures/olive-brush3.jpg}\pdfimage width 3.5in {Figures/olive-brush4.jpg}}
@@ -424,7 +427,7 @@ The {\bf Tools} menu gives access to
 \item a panel for selecting a new color scheme for drawing, and
  then for automatically brushing points and edges by mapping the
  color scheme onto a selected varriable.
-\item a panel for hiding groups of cases,
+\item a panel for brushing and excluding groups of cases,
 \item subsetting functions for systematic and random subsampling, 
 \item a tool for managing missing values.
 \end{itemize}
@@ -1111,9 +1114,10 @@ If {\bf Point brushing} is in any state but {\it Off}, the brush has a
 rectangular outline.  As the brush is moved across the points, any
 points contained by the brush are affected.  You may be changing the
 color, glyph shape, glyph size, or the ``visible'' state of the point,
-depending on the menu setting.  The brushing style called ``Hide'' 
+depending on the menu setting.  The brushing style called ``Shadow'' 
 deserves a few words: When it is selected, the brushed points are drawn
-in a kind of shadow color, very close to the background color.  The
+in a color that's very close to the background color \cite{BeckerCleveland87}. 
+The
 are de-emphasized but they provide context for the rest of the data.
 ``Select'' does the opposite: de-emphasizing all the points that aren't
 brushed.
@@ -1511,12 +1515,10 @@ variables yet.
 
 The {\bf Color \& glyph groups} tool displays a table.  Each unique
 symbol in the data (combination of color and glyph) occupies a row,
-and for each row there are three buttons:  {\bf H} is a toggle button
-that ``hides'' or shows all points drawn in the chosen symbol.  The three
-remaining columns report the number of cases ``hidden,'' the number
-shown, and the sum.  The word ``hide'' is enclosed in quotation marks
-because ``hidden'' points are actually drawn in a color that's very
-close to the background color.
+and for each row has a toggle button that shadow brushes all points
+drawn in the corresponding symbol.  The three remaining columns
+report the number of cases shadow brushed, the rest of the cases, and
+the total number of cases in the group.
 
 Clicking on one of the little symbol displays will assign the
 currently selected color and/or glyph (depending on the state of the
@@ -1527,11 +1529,12 @@ likely that someone might do that by mistake, and unlikely that they
 would do it deliberately.  (That choice should be resolved by a
 dialog, probably, and an 'undo' button should be added.)
 
-The {\bf Exclude hidden} button at the bottom of the window will exclude
-all hidden points from consideration in the displays:  the views will be
-scaled without those points, and they won't be drawn.  The {\bf Include
-hidden} button will bring those points back into the plot, and they'll
-be drawn in the shadow color as before.
+The {\bf Exclude shadows} button at the bottom of the window will
+exclude all shadow-brushed points from consideration in the
+displays:  the views will be scaled without those points, and they
+won't be drawn.  The {\bf Include shadows} button will bring those
+points back into the plot, and they'll be drawn in the shadow color
+as before.
 
 The {\bf Update} button updates the contents of the table in case it
 isn't responding properly to changes in the displays as you continue
@@ -1787,7 +1790,7 @@ Once that launch occurred, the resulting process was utterly independent
 of its parent.  The XGobi authors did some experiments in the early 90s
 to achieve a more intimate connection, but made little headway with S,
 though interprocess communication was used successfully with ArcView
-(\cite{SwayneBujaHubbell91,SMCM97}).
+\cite{SwayneBujaHubbell91,SMCM97}.
 
 With ggobi, that problem has been solved, and it's now possible
 to have real-time integration between ggobi and a variety of
