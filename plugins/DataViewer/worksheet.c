@@ -29,7 +29,7 @@ GtkWidget* create_ggobi_sheet(datad *data, ggobid *gg);
 void update_cell(gint row, gint column, double value, datad *data);
 void cell_changed(GtkSheet *sheet, gint row, gint column, datad *data);
 
-void brush_change(GtkWidget *w, ggobid *gg, splotd *sp, GdkEventMotion *ev, GtkSheet *sheet);
+void brush_change(ggobid *gg, splotd *sp, GdkEventMotion *ev, datad *d, GtkSheet *sheet);
 void move_point_value(GtkWidget *w, splotd *sp, GGobiPointMoveEvent *ev, ggobid *gg, GtkSheet *sheet);
 void monitor_new_plot(GtkWidget *w, splotd *sp, ggobid *gg, GtkSheet *sheet);
 void identify_cell(ggobid *gg, splotd *sp, gint id, datad *d, GtkSheet *sheet);
@@ -586,9 +586,9 @@ color_row(GtkSheet *sheet, gint row, gint ncols, GdkColor *col)
  Really want the identity of the point that was added or discarded.
  */
 void
-brush_change(GtkWidget *w, ggobid *gg, splotd *sp, GdkEventMotion *ev, GtkSheet *sheet)
+brush_change(ggobid *gg, splotd *sp, GdkEventMotion *ev, datad *d, GtkSheet *sheet)
 {
- datad *d = sp->displayptr->d;
+ /* datad *d = sp->displayptr->d; */
  int nr, i;
       nr = d->npts_under_brush;
       for(i = 0 ; i < d->nrows ; i++) {
