@@ -384,6 +384,7 @@ GGOBI(full_viewmode_set)(gint action, ggobid *gg)
  * Because of that, we don't put them in viewmode_activate.
 */
   PipelineMode prev_viewmode = gg->viewmode;
+  gboolean reinit_transient_p = false;
 
   if (gg->current_display != NULL && gg->current_splot != NULL) {
     splotd *sp = gg->current_splot;
@@ -405,6 +406,7 @@ GGOBI(full_viewmode_set)(gint action, ggobid *gg)
       procs_activate (on, display, gg);
       if (gg->viewmode != BRUSH && prev_viewmode == BRUSH) {
         if (cpanel->br_mode == BR_TRANSIENT) {
+          reinit_transient_p = true;
           reinit_transient_brushing (display, gg);
         }
       }
@@ -419,8 +421,8 @@ GGOBI(full_viewmode_set)(gint action, ggobid *gg)
       display_tailpipe (display, FULL, gg);
 
       /*-- redraw as needed for transient brushing and identify --*/
-      if (redraw_style != NONE) {
-        displays_plot (sp, redraw_style, gg);
+      if (redraw_style != NONE || reinit_transient_p) {
+        displays_plot (sp, FULL, gg);
       }
 
 /**/  return (action);
