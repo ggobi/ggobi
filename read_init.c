@@ -26,7 +26,6 @@ extern int xmlDoValidityCheckingDefaultValue;
 #include "externs.h"
 
 gint getPreviousFiles(const xmlDocPtr doc, GGobiInitInfo *info);
-xmlNode *getXMLElement(const xmlDocPtr doc, const char *tagName);
 DataMode getPreviousInput(xmlNode *node, InputDescription *input);
 DataMode getInputType(xmlNode *node);
 
@@ -67,9 +66,15 @@ read_init_file(const char *filename)
 
     /* Find a node with a secified tag Name */
 xmlNode *
-getXMLElement(const xmlDocPtr doc, const char *tagName)
+getXMLDocElement(const xmlDocPtr doc, const char *tagName)
 {
   xmlNode *node = xmlDocGetRootElement(doc);
+  return(getXMLElement(node, tagName));
+}
+
+xmlNode *
+getXMLElement(xmlNodePtr node, const char *tagName)
+{
   node = XML_CHILDREN(node);
   while(node) {
     if(strcmp(node->name, tagName) == 0) {
@@ -86,7 +91,7 @@ getPreviousFiles(const xmlDocPtr doc, GGobiInitInfo *info)
 {
   xmlNode *node, *el;
   gint n, i;
-  node = getXMLElement(doc, "previousFiles");
+  node = getXMLDocElement(doc, "previousFiles");
 
   n = 0;
   el = XML_CHILDREN(node);
@@ -101,8 +106,8 @@ getPreviousFiles(const xmlDocPtr doc, GGobiInitInfo *info)
 
   el = XML_CHILDREN(node);
   for(i = 0; el ; el = el->next) {
+    memset((void*) info->descriptions+i, '\0', sizeof(GGobiDescription)); 
     if(el->type != XML_TEXT_NODE) {
-   
       getPreviousInput(el, &(info->descriptions[i].input));
       i++;
     }
@@ -119,7 +124,8 @@ getPreviousInput(xmlNode *node, InputDescription *input)
    input->mode = mode;
    if((tmp = xmlGetProp(node, "name"))) {
      input->fileName = g_strdup(tmp);
-   }
+   } else 
+     input->fileName = NULL;
 
 
    /* This shold be connected to 
@@ -183,7 +189,7 @@ getPreviousGGobiDisplays(const xmlDocPtr doc, GGobiInitInfo *info)
   xmlNode *node, *el;
   GGobiDescription *desc;
   gint i;
-  node = getXMLElement(doc, "ggobis"); 
+  node = getXMLDocElement(doc, "ggobis"); 
   el = XML_CHILDREN(node);
   i = 0;
   while(el) {
@@ -289,7 +295,7 @@ getPlugins(xmlDocPtr doc, GGobiInitInfo *info)
   xmlNode *node, *el;
   GGobiPluginInfo *plugin;
 
-  node = getXMLElement(doc, "plugins");
+  node = getXMLDocElement(doc, "plugins");
 
   info->plugins = NULL;
 

@@ -27,6 +27,7 @@
 
 #ifdef USE_XML
 #include "read_init.h"
+#include "colorscheme.h"
 #endif
 
 static GGobiOptions sessionoptions;
@@ -114,6 +115,16 @@ parse_command_line (gint *argc, gchar **av, ggobid *gg)
         fprintf(stderr, "-init not supported without XML\n");fflush(stderr);
 #endif
         (*argc)--; av++;
+    } else if(strcmp(av[1],"-colorschemes") == 0) {
+#ifdef USE_XML
+
+	read_colorscheme(av[2], &(sessionOptions->colorSchemes));       
+	fprintf(stderr, "# color schemes %d\n", g_list_length(sessionOptions->colorSchemes));
+#else
+        fprintf(stderr, "-colorschemes not supported without XML\n");fflush(stderr);
+#endif
+        (*argc)--; av++;
+
     }
   }
 

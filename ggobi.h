@@ -20,6 +20,7 @@
 
 #include "fileio.h"
 
+#include "colorscheme.h"
 
 /*
  These are hooks for other applications (e.g. R) to 
@@ -369,6 +370,8 @@ struct _ggobid {
  PrintOptions *printOptions;
  GList *pluginInstances;
 
+ GList *colorschemes;
+ colorschemed *activeColorScheme;
 }; /*  ggobid; */
 
 #ifdef USE_XML
@@ -387,6 +390,8 @@ typedef struct {
 #ifdef USE_XML
   struct _GGobiInitInfo *info;
   gchar *initializationFile;
+
+  GList *colorSchemes;
 #endif
 } GGobiOptions;
 
