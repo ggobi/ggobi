@@ -235,6 +235,7 @@ GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
     vt->collab = (colnames != NULL && colnames[j] != NULL) ?
       g_strdup(colnames[j]) : g_strdup_printf("V%d", j+1);
     vt->collab_tform = g_strdup (vt->collab);
+    vt->nickname = g_strndup (vt->collab, 2);
 
     for (i = 0; i < nr ; i++) {
       if (j == 0) {
