@@ -26,8 +26,8 @@ Step 3: ggobi
 
 export CC=/usr/bin/cc
 export GLIB_CONFIG=/usr/dfs/cc/bin/glib-config
-LD_LIBRARY_PATH=/usr/dfs/cc/lib:$LD_LIBRARY_PATH
-LD_LIBRARYN32_PATH=/usr/dfs/cc/lib:$LD_LIBRARYN32_PATH
+LD_LIBRARY_PATH=/usr/dfs/cc/lib:/usr/common/lib:/usr/lib32
+LD_LIBRARYN32_PATH=/usr/dfs/cc/lib:/usr/common/lib:/usr/lib32
 PATH=/usr/dfs/cc/bin:$PATH
 export GTK_CONFIG=/usr/dfs/cc/bin/gtk-config
 
@@ -40,3 +40,9 @@ local.config
 plugin directories
   GTK_CONFIG=/usr/dfs/cc/bin/gtk-config
 
+
+	#-user-path=/usr/dfs/ggobi/ggobi:/usr/dfs/ggobi/ggobi/plugins/ggvis \
+	#ggvis.o cmds.o init.o radial.o spring.o \
+
+	#-user-path=/usr/dfs/ggobi/ggobi:/usr/dfs/ggobi/ggobi/plugins/mstree \
+    #gg_mst.o mem-std.o mst-prim.o mstree.o pq-bin-heap.o \
