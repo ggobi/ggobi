@@ -180,8 +180,14 @@ varcircles_layout_reset (gint ncols, datad *d, ggobid *gg)
       vb,
       left_attach, left_attach+1, top_attach, top_attach+1,
       GTK_FILL, GTK_FILL, 0, 0);
-    if (GTK_OBJECT (vb)->ref_count > 1)
-      gtk_widget_unref (vb);
+
+#if GTK_MAJOR_VERSION == 1
+      if (GTK_OBJECT (vb)->ref_count > 1)
+        gtk_widget_unref (vb);
+#else
+      if (G_OBJECT (vb)->ref_count > 1)
+        gtk_widget_unref (vb);
+#endif
 
     if (gg->varpanel_ui.layoutByRow) {
       left_attach++; 

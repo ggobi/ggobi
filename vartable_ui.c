@@ -311,8 +311,13 @@ open_range_set_dialog (GtkWidget *w, ggobid *gg)
 
   umin = gtk_entry_new ();
   gtk_widget_set_usize (umin,
-                        gdk_string_width (umin->style->font,
-                        "0000000000"), -1);
+#if GTK_MAJOR_VERSION == 2
+    gdk_string_width (gtk_style_get_font (umin->style), 
+#else
+    gdk_string_width (umin->style->font,
+#endif
+      "0000000000"), -1);
+
   gtk_widget_set_name (umin, "umin_entry");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), umin,
     "Minimum for the selected variable(s)", NULL);
@@ -327,8 +332,13 @@ open_range_set_dialog (GtkWidget *w, ggobid *gg)
 
   umax = gtk_entry_new ();
   gtk_widget_set_usize (umax,
-                        gdk_string_width (umax->style->font,
-                        "0000000000"), -1);
+#if GTK_MAJOR_VERSION == 2
+    gdk_string_width (gtk_style_get_font (umax->style), 
+#else
+    gdk_string_width (umax->style->font,
+#endif
+      "0000000000"), -1);
+
   gtk_widget_set_name (umax, "umax_entry");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), umax,
     "Maximum for the selected variable(s)", NULL);
