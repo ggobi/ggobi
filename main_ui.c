@@ -34,6 +34,7 @@ const char *const GGOBI(OpModeNames)[] = {
 
   "Scatmat",
   "Parcoords",
+  "TSplot",
 };
 
 static const char *const *mode_name = GGOBI(OpModeNames);
@@ -89,6 +90,7 @@ make_control_panels (ggobid *gg) {
 
   cpanel_parcoords_make (gg);
   cpanel_scatmat_make (gg);
+  cpanel_tsplot_make (gg);
 }
 
 
@@ -175,6 +177,7 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state, ggobid *gg)
     switch (m) {
       case PCPLOT:
       case P1PLOT:
+      case TSPLOT:
       case XYPLOT:
       case LINEED:
       case MOVEPTS:
@@ -212,6 +215,7 @@ mode_submenus_activate (splotd *sp, gint m, gboolean state, ggobid *gg)
       case PCPLOT:
       case P1PLOT:
       case XYPLOT:
+      case TSPLOT:
       case COTOUR:
       case LINEED:
       case MOVEPTS:
@@ -426,6 +430,7 @@ mode_activate (splotd *sp, gint m, gboolean state, ggobid *gg) {
     switch (m) {
       case PCPLOT:
       case P1PLOT:
+      case TSPLOT:
       case XYPLOT:
       case LINEED:
       case MOVEPTS:
@@ -444,6 +449,7 @@ mode_activate (splotd *sp, gint m, gboolean state, ggobid *gg) {
     switch (m) {
       case PCPLOT:
       case P1PLOT:
+      case TSPLOT:
       case XYPLOT:
       case LINEED:
       case MOVEPTS:

@@ -146,6 +146,12 @@ splot_plot_case (gint m, datad *d, splotd *sp, displayd *display, ggobid *gg)
         }
         break;
 
+      case tsplot:
+        if (d->missing.vals[m][sp->xyvars.y]|| 
+            d->missing.vals[m][sp->xyvars.x])
+          draw_case = false;
+        break;
+
       case scatterplot:
         break;
     }
@@ -402,7 +408,19 @@ splot_add_plot_labels (splotd *sp, ggobid *gg) {
       sp->max.y - 5,
       d->vartable[ sp->p1dvar ].collab_tform);
 
+  } else if (dtype ==tsplot) {
+
+    gdk_text_extents (style->font,
+      d->vartable[ sp->xyvars.y ].collab_tform,
+      strlen (d->vartable[ sp->xyvars.y ].collab_tform),
+      &lbearing, &rbearing, &width, &ascent, &descent);
+    gdk_draw_string (sp->pixmap1, style->font, gg->plot_GC,
+      5,
+      sp->max.y - 5,
+      d->vartable[ sp->xyvars.y ].collab_tform);
+
   }
+
 }
 
 /*-- add the nearest_point and sticky labels, plus a diamond for emphasis --*/
@@ -686,6 +704,7 @@ splot_pixmap0_to_pixmap1 (splotd *sp, gboolean binned, ggobid *gg) {
   if (cpanel->projection == XYPLOT ||
       cpanel->projection == P1PLOT ||
       cpanel->projection == PCPLOT ||
+      cpanel->projection == TSPLOT ||
       cpanel->projection == SCATMAT)
   {
     splot_add_plot_labels (sp, gg);

@@ -104,6 +104,10 @@ varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint btn,
       redraw = scatmat_varsel_simple (cpanel, sp, jvar, &jvar_prev, gg);
     break;
 
+    case tsplot:
+      redraw = tsplot_varsel (cpanel, sp, btn, jvar, &jvar_prev, gg);
+    break;
+
     case scatterplot:
       switch (cpanel->projection) {
         case P1PLOT:
@@ -179,6 +183,23 @@ varpanel_refresh (ggobid *gg) {
             l = display->scatmat_cols;  /*-- assume rows = cols --*/
             while (l) {
               j = GPOINTER_TO_INT (l->data);
+              varpanel_checkbutton_set_active (j, true, d);
+              l = l->next;
+            }
+          }
+          break;
+
+          case tsplot:
+          {
+            GList *l;
+            for (j=0; j<d->ncols; j++)
+              varpanel_checkbutton_set_active (j, false, d);
+
+            l = display->splots;
+            while (l) {
+              j = ((splotd *) l->data)->xyvars.y;
+              varpanel_checkbutton_set_active (j, true, d);
+              j = ((splotd *) l->data)->xyvars.x;
               varpanel_checkbutton_set_active (j, true, d);
               l = l->next;
             }
@@ -422,6 +443,14 @@ varpanel_tooltips_set (ggobid *gg)
           gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->varpanel_ui.tips),
             checkbox_get_nth (j, d),
             "Click to replace/insert/append a variable, or to delete it",
+            NULL);
+        break;
+
+        case tsplot:
+          gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->varpanel_ui.tips),
+            checkbox_get_nth (j, d),  
+            "Click left to replace/insert/append a variable, or to delete it. 
+            Click middle to replace rigid variable",
             NULL);
         break;
 

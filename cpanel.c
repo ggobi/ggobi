@@ -62,6 +62,21 @@ parcoords_cpanel_init (cpaneld* cpanel, ggobid *gg) {
 }
 
 void
+tsplot_cpanel_init (cpaneld* cpanel, ggobid *gg) {
+  cpanel->mode = TSPLOT;
+  cpanel->projection = XYPLOT;  /*-- does it need a projection? --*/
+
+  /*-- 1d plots --*/
+  cpanel->p1d_type = DOTPLOT;
+  cpanel_p1d_init (cpanel, gg);
+
+  cpanel->tsplot_selection_mode = VAR_REPLACE;
+  cpanel->tsplot_arrangement = ARRANGE_COL;
+
+  cpanel_brush_init (cpanel, gg);
+}
+
+void
 cpanel_set (displayd *display, ggobid *gg) {
   cpaneld *cpanel = &display->cpanel;
 
@@ -76,6 +91,9 @@ cpanel_set (displayd *display, ggobid *gg) {
       break;
     case parcoords:
       /*cpanel_p1d_set (cpanel);  write cpanel_parcoords_set (cpanel) */
+      cpanel_brush_set (cpanel, gg);
+      break;
+    case tsplot:
       cpanel_brush_set (cpanel, gg);
       break;
   }

@@ -45,7 +45,7 @@
 /*-- used in movepts --*/
 enum directiond {both, vertical, horizontal};
 
-enum displaytyped {scatterplot, scatmat, parcoords};
+enum displaytyped {scatterplot, scatmat, parcoords, tsplot};
 extern const gchar* const ViewTypes[3];
 extern const gint ViewTypeIndeces[3];
 
@@ -67,7 +67,7 @@ extern const gint ViewTypeIndeces[3];
 #define REDISPLAY_PRESENT 2
 
 /* modes */
-#define NMODES 13
+#define NMODES 14
 
 #define P1PLOT   0
 #define XYPLOT   1
@@ -84,6 +84,7 @@ extern const gint ViewTypeIndeces[3];
 
 #define SCATMAT 11
 #define PCPLOT  12
+#define TSPLOT  13
 /* */
 
 #define TEXTURE 0

@@ -119,6 +119,7 @@ sp_event_handlers_toggle (splotd *sp, gboolean state) {
   switch (m) {
     case PCPLOT:
     case P1PLOT:
+    case TSPLOT:
     case XYPLOT:
       break;
 
@@ -457,6 +458,12 @@ splot_world_to_plane (cpaneld *cpanel, splotd *sp, ggobid *gg)
 
     case parcoords:
       p1d_reproject (sp,
+        (display->missing_p) ? d->missing_world.vals : d->world.vals,
+        d, gg);
+      break;
+
+    case tsplot:
+      xy_reproject (sp,
         (display->missing_p) ? d->missing_world.vals : d->world.vals,
         d, gg);
       break;

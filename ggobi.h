@@ -209,6 +209,14 @@ struct _ggobid {
    GtkWidget *mode_menu;
  } parcoords;
 
+/*---------------------time series------------------------------------*/  
+
+ struct _TSPLOT {
+   GtkAccelGroup *pc_accel_group;
+   GtkWidget *arrangement_box;
+   GtkWidget *mode_menu;
+ } tsplot;
+
 /*------------------------ brushing ----------------------------------*/
 
  glyphv glyph_id, glyph_0;

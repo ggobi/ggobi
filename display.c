@@ -128,6 +128,15 @@ display_options_cb (GtkCheckMenuItem *w, guint action)
           }
         }
 
+        if (display->displaytype == tsplot) {
+          GList *splist;
+          splotd *sp;
+          for (splist = display->splots; splist; splist = splist->next) {
+            sp = (splotd *) splist->data;
+            sp_whiskers_make (sp, display, gg);
+          }
+        }
+
         display_plot (display, FULL, gg);
       }
       break;
@@ -243,6 +252,10 @@ display_create (gint displaytype, gboolean missing_p, datad *d, ggobid *gg)
       /* vardialog_open (gg, "Select variables for plotting"); */
 
       display = parcoords_new (false, nselected_vars, selected_vars, d, gg);
+      break;
+
+    case 3:
+      display = tsplot_new (false, nselected_vars, selected_vars, d, gg);
       break;
 
     default:
@@ -407,6 +420,10 @@ display_set_current (displayd *new_display, ggobid *gg)
       case parcoords:
         submenu_destroy (gg->mode_item);
         break;
+
+      case tsplot:
+        submenu_destroy (gg->mode_item);
+        break;
     }
   }
 
@@ -444,6 +461,16 @@ display_set_current (displayd *new_display, ggobid *gg)
                                    gg->parcoords.mode_menu); 
         submenu_insert (gg->mode_item, gg->main_menubar, 2);
         break;
+
+      case tsplot:
+        tsplot_main_menus_make (gg->main_accel_group,
+                                   (GtkSignalFunc) mode_set_cb, gg, true);
+        gg->mode_item = submenu_make ("_View", 'V', gg->main_accel_group);
+        gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->mode_item),
+                                   gg->tsplot.mode_menu); 
+        submenu_insert (gg->mode_item, gg->main_menubar, 2);
+        break;
+
     }
   }
 
@@ -490,6 +517,13 @@ computeTitle (gboolean current_p, displayd *display, ggobid *gg)
        else 
          tmp = "parallel coordinates display " ;
       break;
+    case tsplot:
+       if (current_p)
+         tmp = "*** time series display *** " ;
+       else 
+         tmp = "time series display display " ;
+      break;
+
   }
 
   if (display->d->name != NULL) {

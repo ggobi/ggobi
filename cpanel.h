@@ -63,6 +63,13 @@ typedef struct {
  gint parcoords_arrangement;  /* arrange plots in a row or a column */
 
 /*
+ * time series
+*/
+
+ gint tsplot_selection_mode;
+ gint tsplot_arrangement;  /* arrange plots in a row or column*/
+
+/*
  * scatterplot matrix
 */
  gint scatmat_selection_mode;

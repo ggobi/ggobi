@@ -58,6 +58,7 @@ SRC=ggobi.c datad.c make_ggobi.c color.c main_ui.c cpanel.c \
  impute_ui.c impute.c \
  display_tree.c \
  ggobi-API.c \
+ timeplot.c time_ui.c \
 \
  gtkextruler.c gtkexthruler.c gtkextvruler.c \
  mt19937-1.c \
@@ -90,6 +91,7 @@ OB=ggobi.o datad.o make_ggobi.o color.o main_ui.o cpanel.o \
  impute_ui.o impute.o \
  display_tree.o \
  ggobi-API.o \
+ timeplot.o time_ui.o \
  gtkextruler.o gtkexthruler.o gtkextvruler.o \
  mt19937-1.o  \
  fileio.o

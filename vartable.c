@@ -121,6 +121,17 @@ plotted_cols_get (gint *cols, datad *d, ggobid *gg)
       }
     }
     break;
+    case tsplot:
+    {
+      GList *l;
+      splotd *s;
+      for (l=display->splots; l; l=l->next) {
+        s = (splotd *) l->data;
+        if (!array_contains (cols, ncols, sp->xyvars.y))
+          cols[ncols++] = sp->xyvars.y;
+      }
+    }
+    break;
   }
 
   return ncols;
@@ -328,6 +339,9 @@ delete_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
       break;
 
       case parcoords:
+      break;
+
+      case tsplot:
       break;
     }
   }

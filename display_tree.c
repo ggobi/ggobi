@@ -187,6 +187,9 @@ display_tree_label(displayd *display)
     case parcoords:
       val = "Parallel Coordinates";
      break;
+    case tsplot:
+      val = "Time Series";
+     break;
   }
 
  return(val);
@@ -215,6 +218,11 @@ splot_tree_label(splotd *splot, gint ctr, enum displaytyped type,
         d->vartable[splot->xyvars.y].collab);
      break;
     case parcoords:
+      n = strlen (d->vartable[splot->p1dvar].collab);
+      buf = (gchar*) g_malloc(n* sizeof (gchar*));
+      sprintf(buf, "%s", d->vartable[splot->p1dvar].collab);
+     break;
+    case tsplot:
       n = strlen (d->vartable[splot->p1dvar].collab);
       buf = (gchar*) g_malloc(n* sizeof (gchar*));
       sprintf(buf, "%s", d->vartable[splot->p1dvar].collab);
