@@ -897,8 +897,7 @@ gboolean
 GGOBI(close)(ggobid *gg, gboolean closeWindow)
 {
   gboolean val = true;
-/* this is printing out as something in the hundreds; I don't get it -- dfs */
-g_printerr ("close_pending %d \n", gg->close_pending);
+
   if (gg->close_pending)
     return (false);
 
@@ -911,7 +910,6 @@ g_printerr ("close_pending %d \n", gg->close_pending);
 
   display_free_all (gg);
 
-g_printerr ("closeWindow %d\n", closeWindow);
   if (closeWindow && gg->main_window)
     gtk_widget_destroy (gg->main_window);
 

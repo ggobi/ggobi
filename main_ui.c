@@ -33,44 +33,28 @@
 #include "testEvents.h"
 #endif
 
+
+const char *const GGOBI(OpModeNames)[] = {
+  "1D Plot",
+  "XYPlot",
+  "Rotation",
+  "1D Tour",
+  "2D Tour",
+  "Correlation Tour",
+  "Scale",
+  "Brush",
+  "Identify",
+  "Edit Edges",
+  "Move Points",
+
+  "Scatmat",
+  "Parcoords",
+  "TSplot",
 #ifdef BARCHART_IMPLEMENTED
-const char *const GGOBI(OpModeNames)[] = {
-  "1D Plot",
-  "XYPlot",
-  "Rotation",
-  "1D Tour",
-  "2D Tour",
-  "Correlation Tour",
-  "Scale",
-  "Brush",
-  "Identify",
-  "Edit Edges",
-  "Move Points",
-
-  "Scatmat",
-  "Parcoords",
-  "TSplot",
-  "Barchart",
-};
-#else
-const char *const GGOBI(OpModeNames)[] = {
-  "1D Plot",
-  "XYPlot",
-  "Rotation",
-  "1D Tour",
-  "2D Tour",
-  "Correlation Tour",
-  "Scale",
-  "Brush",
-  "Identify",
-  "Edit Edges",
-  "Move Points",
-
-  "Scatmat",
-  "Parcoords",
-  "TSplot",
-};
+  "Barchart"
 #endif
+};
+
 
 static const char *const *viewmode_name = GGOBI(OpModeNames);
 

@@ -843,8 +843,7 @@ getPluginLanguage(xmlNodePtr node, GGobiPluginInfo *plugin,
     GGobiLanguagePluginData *d;
     ProcessPluginInfo f;
 
-    /*-- question:  how can this be anything but NULL?  -- dfs --*/
-    if(d == NULL) {
+    if(langPlugin == NULL) {
       fprintf(stderr, "No language plugin %s\n", (char *) tmp); fflush(stderr);
       return(false);
     }
