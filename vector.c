@@ -417,7 +417,7 @@ void vectorg_zero (vector_g *vecp)
 {
   gint i;
   for (i=0; i<vecp->nels; i++) {
-    vecp->els[i].type = POINT_GLYPH;
+    vecp->els[i].type = DOT;
     vecp->els[i].size = 0;
   }
 }

@@ -24,10 +24,9 @@
 
 /* Make certain this matches GlyphType. */
 const gchar * const GlyphNames[] = {
-/*        ".", "plus", "x", "or", "fr", "oc", "fc", "" */
+/*        ".", "+", "x", "or", "fr", "oc", "fc", "" */
           ".", "plus", "x", "or", "fr", "oc", "fc", ""
         };
-
 
 
 gchar *

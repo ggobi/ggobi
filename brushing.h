@@ -42,8 +42,6 @@
 #define BR_LINKBYVAR  1
 /* */
 
-typedef enum {DOT=0, PLUS, X, OR, FR, OC, FC, UNKNOWN_GLYPH} GlyphType;
-
 /*-- for edge brushing:  all sizes, 3 types for now --*/
 #define NEDGETYPES 3
 typedef enum {SOLID, WIDE_DASH, NARROW_DASH} EdgeType;

@@ -21,10 +21,12 @@ typedef enum {NONE, EXPOSE, QUICK, BINNED, FULL, FULL_1PIXMAP} RedrawStyle;
 /* For use in the sticky_point_added and sticky_point_removed events. */
 typedef enum {STICKY, UNSTICKY} PointIdentifyState;
 
-typedef struct {
-  gint type, size;
-} glyphd;
+typedef enum {DOT=0, PLUS, X, OR, FR, OC, FC, UNKNOWN_GLYPH} GlyphType;
 
+typedef struct {
+  GlyphType type;
+  gint size;
+} glyphd;
 typedef struct {
   glong x, y;
 } lcoords;

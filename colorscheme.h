@@ -34,5 +34,4 @@ gint getColor(xmlNodePtr node, xmlDocPtr doc, gfloat **original, GdkColor *col);
 #endif
 
 colorschemed *read_colorscheme(char *fileName, GList **);
-
 #endif
