@@ -5,6 +5,7 @@
 DBMSLoginInfo DefaultDBMSInfo;
 
 void updateDBMSLoginInfo(DBMSLoginInfo *login, GHashTable *tbl);
+DBMSLoginInfo *getDBMSCommandLineArgs(DBMSLoginInfo *login);
 
 /*
   Optionally allocate and initialize the MySQLLoginInfo
@@ -25,8 +26,34 @@ initDBMSLoginInfo(DBMSLoginInfo *login, GHashTable *tbl)
       updateDBMSLoginInfo(login, tbl);
   }
 
+  getDBMSCommandLineArgs(login);
+
   return(login);
 }
+
+DBMSLoginInfo *
+getDBMSCommandLineArgs(DBMSLoginInfo *login)
+{
+    const char * tmp;
+    tmp = getCommandLineArgValue("Host");
+    if(tmp)
+	setDBMSLoginElement(HOST, tmp, login);
+
+    tmp = getCommandLineArgValue("User");
+    if(tmp)
+	setDBMSLoginElement(USER, tmp, login);
+
+    tmp = getCommandLineArgValue("Database");
+    if(tmp)
+	setDBMSLoginElement(DATABASE, tmp, login);
+
+    tmp = getCommandLineArgValue("DataQuery");
+    if(tmp)
+	setDBMSLoginElement(DATA_QUERY, tmp, login);
+
+    return(login);
+}
+
 
 void
 DBMSLoginInfoTableUpdate(gpointer key, gpointer value, gpointer userData)
@@ -85,7 +112,7 @@ getDBMSLoginElementIndex(const char *name)
 }
 
 int 
-setDBMSLoginElement(DBMSInfoElement i, char *val, DBMSLoginInfo *info)
+setDBMSLoginElement(DBMSInfoElement i, char * const val, DBMSLoginInfo *info)
 {
    switch(i) {
      case HOST:

@@ -516,5 +516,9 @@ extern guint GGobiSignals[MAX_GGOBI_SIGNALS];
  */
 datad *setDisplayEdge(displayd *dpy, datad *e);
 
+
+gchar *getOptValue(const char * const name, const char * const value);
+const char *getCommandLineArgValue(const char *name);
+
 #endif
 

@@ -35,7 +35,6 @@ extern "C" {
   void GGOBI(setDimensions)(int nrow, int ncol, ggobid *gg);
 
   int getDefaultValuesFromFile(char *fileName);
-  int setDBMSLoginElement(DBMSInfoElement i, char *val, DBMSLoginInfo *info);
   DBMSInfoElement getDBMSLoginElementIndex(const char *name);
 
 

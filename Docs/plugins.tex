@@ -90,6 +90,15 @@ should be something like the following in figure \ref{xmlFormat}.
  <plugin name="Data Viewer" load="immediate">
    <description>Displays datasets in data grid.</description>
    <author>Duncan Temple Lang</author>
+   <options>
+    <named>
+     <background>red</background>
+     <nrows>20</nrows>
+    </named>
+    <args>
+      <arg>--no-menu</arg>
+    </args>
+   </options>
    <dll name="plugins/DataViewer/DataViewer">
      <init onCreate="addToMenu"  onClose="closeWindow" />
    </dll>
@@ -148,6 +157,71 @@ or unloaded from the GGobi session.
   \end{center}
 \end{table}
 
+\subsection{``Command Line Arguments'' for Plugins}
+The user can specify options in the XML stanza to paramterize or
+customize the run-time behaviour and appearance of the plugin.  These
+are specified within an \XMLTag{options} tag and come in two forms.
+The first is a collection of named arguments given as a sequence of
+tags each containing some text.  The idea is quite simple. These
+arguments are stored in a table where the value within the tag is
+stored by name, with the associated name being taken as the name of
+the XML tag.  These tags are located within the \XMLTag{named} element
+and are analogous to the command line arguments of the form
+\begin{verbatim}
+--name=value
+\end{verbatim}
+or to property files of the form
+\begin{verbatim}
+name: value
+\end{verbatim}
+In our example above (figure \ref{fix:xmlRegistration}), the table
+would have two entries with names \texttt{"background"} and
+\texttt{"nrows"}.  The values \texttt{"red"} and \texttt{"20"} are
+the associated values stored in the table.
+
+The second form of arguments is a simple list of values, without
+names.  These are given as a sequence of \XMLTag{arg} elements within
+a \XMLTag{args} tag inside the \XMLTag{options} element.  The
+values are collected into a linked list.
+
+Both collections of arguments (named and unnamed) are available to the
+plugin when it is initialized. They are stored in the
+\CStruct{GGobiPluginDetails} structure associated with the plugin.
+Each plugin can process them in any way it pleases.  Additionally, the
+plugin is entitled to re-read the initialization file and find its own
+stanza should it want to process the user's specifications itself.
+This might be useful if the plugin wants additional input in an
+extended XML format.
+
+Specifying the values in the initialization file works well when the
+values are to be used across different GGobi sessions.  However, when
+we want to customize the particular session we have to do so through
+GUI controls, etc.  However, the plugins do have access to the command
+line arguments used when invoking GGobi.  So, a plugin can process
+these to override any values in the XML options.  This is highly
+plugin-specific and again, a plugin can do what it wants with these
+inputs.  The C routine \Croutine{getCommandLineArgValue} is available
+to get the value of a \verb+--var=name+ by giving the key \verb+key+
+in much the same way as looking up the table of named arguments.
+
+The command line arguments are stored in the
+\CVariable{sessionOptions} variable, having been processed by both
+GGobi and Gtk with some values potentially removed.  So name conflicts
+for arguments is a problem.  We recommend moving to a convention that
+identifies that a collection of arguments are for a particular plugin
+by using the flag
+\begin{verbatim}
+ --myPlugin
+\end{verbatim}
+where \textit{myPlugin} is the name of the plugin.
+
+For an example of processing XML-supplied arguments and the GGobi
+command line arguments, see the Postgres and MySQL input plugins and
+the JVM plugin.
+
+
+
+
 \section{Adding Controls \& Menus}
 Many plugins are dormant extensions to GGobi's functionality. In other
 words, when a plugin instance is created, it doesn't create plots,
@@ -186,7 +260,7 @@ change to support this.
 
 \section{Examples}
 
-There are currently three examples of plugins in the GGobi source
+There are currently several examples of plugins in the GGobi source
 within the \dir{plugins} directory.  The \dir{DataViewer} plugin
 provides a datagrid for viewing the data in a GGobi instance.  This
 adds a new menu to the GGobi main window/control panel.  The user
@@ -200,6 +274,9 @@ to the Display menu for the different datasets.
 
 A test/diagnostic plugin is available in the \dir{TestPlugin}
 that illustrates how to use each of the $5$ callbacks.
+
+The JVM plugin provides Java support for GGobi, allowing one to
+implement plugins using the Java programming language.
 
 \section{Potential Plugin Projects}
 

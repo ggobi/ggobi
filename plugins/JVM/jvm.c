@@ -16,6 +16,8 @@
 #include "jvm.h"
 #include "GGobiAPI.h"
 
+#include <stdlib.h> /* for getenv */
+
 
 /**
  The default Java context in which to execute calls.
@@ -62,14 +64,27 @@ gboolean initJVM(GGobiPluginInfo *info)
   char *ptr;
   jint res;
 
-  /* This is the default classpath. Need to modify this to be dynamically 
-     specified by the plugin information.
+  /* We look for the class path setting in several places, stopping when we first
+     find a non-null value.
+     We look 
+      a) in the command line arguments for a --classpath=value setting.
+      b) in the plugin options for a classpath entry
+      c) the environment variable CLASSPATH
+      d) and finally we assume we are running in the ggobi development library!!!
+         (this works for us :-))
    */
   char *classpath = NULL;
-  if(info->details->namedArgs)
+
+  classpath = getCommandLineArgValue("classpath");
+
+  if(classpath == NULL && info->details->namedArgs)
       classpath = (char *) g_hash_table_lookup(info->details->namedArgs, "classpath");
 
-  if(!classpath)
+  if(!classpath) {
+    classpath = getenv("CLASSPATH");
+  }
+
+  if(!classpath) 
     classpath = "plugins/JVM";
 
   /* Prepare the arguments used to initialize the JVM. Note we only get one chance. */
