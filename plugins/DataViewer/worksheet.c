@@ -161,8 +161,6 @@ create_ggobi_sheet(datad *data, ggobid *gg)
 
   connect_to_existing_displays(gg, GTK_SHEET(sheet));
 
-  color_row(GTK_SHEET(sheet), 2, 3, &red);
-
   return(scrolled_window);
 }
 
@@ -175,6 +173,11 @@ connect_to_splot(splotd *sp, GtkSheet *sheet)
 }
 
 
+/**
+  Loops over the splotd's in the display and register signal handlers
+  for this sheet. Perhaps this should do it based on the data in the 
+  display being the same as the data in the sheet!
+ */
 void
 connect_to_display(displayd *dpy, GtkSheet *sheet)
 {
@@ -190,6 +193,11 @@ connect_to_display(displayd *dpy, GtkSheet *sheet)
 }
 
 
+/**
+  Iterate over the current collection of displays in the ggobi instance
+  and within each of those, iterate over the plots and register signal
+  handlers for the different GGobi events.
+ */
 void
 connect_to_existing_displays(ggobid *gg, GtkSheet *sheet)
 {
@@ -204,13 +212,20 @@ connect_to_existing_displays(ggobid *gg, GtkSheet *sheet)
 }
 
 
+/**
+  Monitor any new plots that are created and register signal callbacks
+  for those.
+ */ 
 void
 monitor_new_plot(GtkWidget *w, splotd *sp, ggobid *gg, GtkSheet *sheet)
 {
     connect_to_splot(sp, sheet);
 }
 
-
+/**
+  Populate the worksheet (given by w) with the contents of the
+  given data set (data).
+ */
 void 
 add_ggobi_data(datad *data, GtkWidget *w)
 {
@@ -240,11 +255,17 @@ add_ggobi_data(datad *data, GtkWidget *w)
   }
 }
 
+/**
+ 
+ */
 void close_worksheet_window(GtkWidget *w, PluginInstance *inst)
 {
   inst->data = NULL;
 }
 
+/**
+
+ */
 void closeWindow(ggobid *gg, PluginInstance *inst)
 {
   if(inst->data) {
@@ -254,6 +275,9 @@ void closeWindow(ggobid *gg, PluginInstance *inst)
   }
 }
 
+/**
+
+ */
 void
 update_cell(gint row, gint column, double value, datad *data)
 {
@@ -263,6 +287,11 @@ update_cell(gint row, gint column, double value, datad *data)
 }
 
 
+/**
+ Callback for when the contents of a cell have changed.
+ This updates the corresponding entry in the ggobi dataset
+ and redraws all the plots.
+ */
 void
 cell_changed(GtkSheet *sheet, gint row, gint column, datad *data)
 {
@@ -281,6 +310,12 @@ cell_changed(GtkSheet *sheet, gint row, gint column, datad *data)
 #endif
 }
 
+
+/**
+  Callback for identifying points in a ggobi plot.
+  This identifies the observation/record by scrolling to that value
+  and selecting that row.
+ */
 void
 identify_cell(GtkWidget *w, splotd *sp, GGobiPointMoveEvent *ev, ggobid *gg, GtkSheet *sheet)
 {
@@ -291,6 +326,12 @@ identify_cell(GtkWidget *w, splotd *sp, GGobiPointMoveEvent *ev, ggobid *gg, Gtk
     gtk_sheet_select_row(sheet, ev->id);
 }
 
+
+/**
+ Called by ggobi when the user drags a point to change its value. This
+ updates the value in the appropriate cell of the worksheet to reflect
+ the new value.
+ */
 void
 move_point_value(GtkWidget *w, splotd *sp, GGobiPointMoveEvent *ev, ggobid *gg, GtkSheet *sheet)
 {
@@ -318,6 +359,9 @@ move_point_value(GtkWidget *w, splotd *sp, GGobiPointMoveEvent *ev, ggobid *gg, 
 }
 
 
+/**
+ Changes the foreground color of the specified row.
+ */
 void
 color_row(GtkSheet *sheet, gint row, gint ncols, GdkColor *col)
 {
@@ -327,9 +371,15 @@ color_row(GtkSheet *sheet, gint row, gint ncols, GdkColor *col)
     range.rowi = row+1;/* row or row+1*/
     range.coli = ncols-1;
 
+    if(col == NULL)
+	col = &red;
     gtk_sheet_range_set_foreground(sheet, &range, col);
 }
 
+/**
+
+ Really want the identity of the point that was added or discarded.
+ */
 void
 brush_change(GtkWidget *w, ggobid *gg, splotd *sp, GdkEventMotion *ev, GtkSheet *sheet)
 {
