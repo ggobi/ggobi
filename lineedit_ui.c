@@ -130,7 +130,7 @@ add_record_dialog_open (datad *d, datad *e, displayd *dsp, ggobid *gg)
   gtk_misc_set_alignment (GTK_MISC (w), 1, .5);
   gtk_table_attach (GTK_TABLE (table),
     w, 0, 1, row, row+1, table_opt, table_opt, 1, 1);
-  lbl = g_strdup_printf ("%d", dtarget->nrows + 1);
+  lbl = g_strdup_printf ("%d", dtarget->nrows);
   w = gtk_label_new (lbl);
   gtk_misc_set_alignment (GTK_MISC (w), .5, .5);
   gtk_table_attach (GTK_TABLE (table),
@@ -143,6 +143,7 @@ add_record_dialog_open (datad *d, datad *e, displayd *dsp, ggobid *gg)
     gtk_misc_set_alignment (GTK_MISC (w), 1, .5);
     gtk_table_attach (GTK_TABLE (table),
       w, 0, 1, row, row+1, table_opt, table_opt, 1, 1);
+    /* This label should include both the rowlab and the rowId */
     lbl = (gchar *) g_array_index (d->rowlab, gchar *, gg->edgeedit.a);
     w = gtk_label_new (lbl);
     gtk_misc_set_alignment (GTK_MISC (w), .5, .5);
@@ -350,10 +351,9 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   cpaneld *cpanel = &display->cpanel;
   datad *d = display->d;
   datad *e = display->e;
-  gint which_button = 1;
+  gint i, which_button = 1;
 
-void
-record_add_defaults (datad *d, datad *e, displayd *display, ggobid *gg);
+  void record_add_defaults (datad *d, datad *e, displayd *display, ggobid *gg);
 
   if ((event->state & GDK_BUTTON1_MASK) == GDK_BUTTON1_MASK)
     which_button = 1;
@@ -380,11 +380,25 @@ record_add_defaults (datad *d, datad *e, displayd *display, ggobid *gg);
         gg->edgeedit.a >= 0 &&
         d->nearest_point != gg->edgeedit.a)
     {
+      /*-- Add rowids to d if necessary --*/
+      if (d->rowIds == NULL) {
+        gchar **rowids = (gchar **) g_malloc (d->nrows * sizeof(gchar *));
+        for (i=0; i<d->nrows; i++)
+          rowids[i] = g_strdup_printf ("%d", i);
+        datad_record_ids_set (d, rowids, true);
+        for (i=0; i<d->nrows; i++)
+          g_free (rowids[i]);
+        g_free (rowids);
+      }
+
       if (e == NULL) {
-        /*-- Initialize a new edge set --*/
-        g_printerr ("Not yet initializing a new edge set\n");
-        gdk_pointer_ungrab (event->time);
-        return false;
+        /*-- initialize e, the new datad --*/
+        e = datad_create (0, 0, gg);
+        e->name = g_strdup ("edges");
+        /* Add it to the display */
+        /*setDisplayEdge (display, e);*/  /* doesn't work, actually */
+        display->e = e;
+        display->options.edges_directed_show_p = true;
       }
 
       if (which_button == 1)

@@ -34,6 +34,7 @@ gboolean record_add (eeMode mode, gint a, gint b, gchar *lbl, gchar *id,
 
   /*-- eventually check whether a->b already exists before adding --*/
   if (mode == ADDING_EDGES) {
+
     g_assert (e->edge.n == e->nrows);
     g_assert (a >= 0 && b >= 0 && a != b);
 
@@ -151,6 +152,13 @@ gboolean record_add (eeMode mode, gint a, gint b, gchar *lbl, gchar *id,
     e->edge.sym_endpoints[dtarget->nrows-1].jpartner = -1; /* XXX */
     unresolveAllEdgePoints(e);
     resolveEdgePoints (e, d);
+    /*
+     * If this is the first edge in the edge set, do something to
+     * make it show up in the display menu.
+     */
+    if (e->nrows == 1)
+      GGOBI(edge_menus_update)(gg);
+
   } else {
     GSList *l;
     datad *dd;
@@ -178,7 +186,7 @@ DTL: So need to call unresolveEdgePoints(e, d) to remove it from the
 /*
  * This will be handled with signals, where each splotd listens
  * for (maybe) point_added or edge_added events.
- * New bug: sp->bar needs to be reinitialized.  This code need
+ * New bug: sp->bar needs to be reinitialized.  This code needs
  * to be class-sensitive, and it isn't.
 */
 /* could put some code in splot_record_add  */
@@ -225,6 +233,9 @@ DTL: So need to call unresolveEdgePoints(e, d) to remove it from the
   }
 /*  */
 
+  /* Adding the first edge: This is almost working, but the edge menu
+     isn't being initialized, and the edges don't appear */
+    
 
   displays_tailpipe (FULL, gg);
 
