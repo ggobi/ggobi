@@ -442,10 +442,12 @@ void radial_center_set_cb (ggobid *gg, gint index,
   gint state, datad *d, PluginInstance *inst)
 {
   glayoutd *gl = glayoutFromInst (inst);
+  GtkWidget *entry;
+
   if (gl == NULL || gl->window == NULL)
     return;
 
-  GtkWidget *entry = (GtkWidget *) gtk_object_get_data (GTK_OBJECT(gl->window),
+  entry = (GtkWidget *) gtk_object_get_data (GTK_OBJECT(gl->window),
     "CENTERNODE");
   if (entry == NULL)
     return;
