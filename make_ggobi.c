@@ -363,6 +363,10 @@ make_ggobi (GGobiOptions *options, gboolean processEvents, ggobid *gg)
 
   start_ggobi(gg, init_data, sessionOptions->info->createInitialScatterPlot);
 
+  if(sessionOptions->restoreFile) {
+    processRestoreFile(sessionOptions->restoreFile, gg);
+  }
+
   if (processEvents) {
     gtk_main ();
   }

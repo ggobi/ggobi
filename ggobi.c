@@ -205,6 +205,9 @@ parse_command_line (gint *argc, gchar **av)
       sessionOptions->data_type = ptr;
     }  else if(strcmp(av[1], "--keepalive") == 0) {
 	sessionOptions->info->quitWithNoGGobi = !sessionOptions->info->quitWithNoGGobi;
+    } else if(strcmp(av[1], "-restore") == 0) {
+        sessionOptions->restoreFile = g_strdup(av[2]);
+        (*argc)--; av++;
     }
   }
 
@@ -471,6 +474,36 @@ GGOBI(main)(gint argc, gchar *argv[], gboolean processEvents)
   /* g_free (sessionOptions->data_in); */
 
   return (num_ggobis);
+}
+
+gboolean
+processRestoreFile(const gchar * const fileName, ggobid *gg)
+{
+  xmlDocPtr doc;
+  xmlNodePtr node;
+  GGobiDescription desc;
+  GList *el;
+  doc = xmlParseFile(fileName); 
+  if(!doc)
+    return(false);
+
+  node = xmlDocGetRootElement(doc);
+/* getXMLDocElement(doc, "ggobi");  */
+  if(!node)
+    return(false);
+
+  getPreviousDisplays(node, &desc);
+
+  el = desc.displays;
+  while(el) {
+    displayd *dpy;
+    GGobiDisplayDescription *dpyDesc;
+    dpyDesc = (GGobiDisplayDescription *) el->data;
+    dpy = createDisplayFromDescription(gg, dpyDesc);    
+    el = el->next;
+  }
+
+  return(true);
 }
 
 
