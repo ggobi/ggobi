@@ -253,7 +253,7 @@ GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
 
 
   /* Now recompute and display the top plot. */
-  if (datad_init (d, gg, cleanup) != NULL) {
+  if (nc > 0 && datad_init (d, gg, cleanup) != NULL) {
       /* Have to patch up the displays list since we removed
          every entry and that makes for meaningless entries.
  
@@ -1159,6 +1159,41 @@ GGOBI(addVariable)(gdouble *vals, gint num, gchar *name, gboolean update,
 
   return (d->ncols - 1);  /*-- incremented by clone_vars --*/
 }
+
+gint
+GGOBI(addCategoricalVariable)(gdouble *vals, gint num, gchar *name, gchar **levels, gint *values, gint *counts, gint numLevels,
+			      gboolean update, datad *d, ggobid *gg)
+{
+  int ans;
+  vartabled *vt;
+  ans = GGOBI(addVariable)(vals, num, name, false, d, gg);
+  vt = vartable_element_get(ans, d);
+  if(vt) {
+     int i;
+     vt->vartype = categorical;
+     vt->nlevels = numLevels;
+     vt->level_names = (gchar **) g_malloc(sizeof(gchar*) * numLevels);
+     vt->level_values = (gint *) g_malloc(sizeof(gint) * numLevels);
+     vt->level_counts = (gint *) g_malloc(sizeof(gint) * numLevels);
+     for(i = 0 ; i < numLevels; i++) {
+        vt->level_names[i] = g_strdup(levels[i]);
+	if(counts)
+ 	    vt->level_counts[i] = counts[i];
+	if(values)
+   	    vt->level_values[i] = values[i];
+     }
+     if(!counts) {
+        for(i = 0; i < num ; i++) {
+    	   vt->level_counts[i];
+	}
+     }
+  }
+  if(update)
+    gdk_flush();
+
+  return(ans);
+}
+
 
 /*
   The idea of the update argument is that we can defer recomputing

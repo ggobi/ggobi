@@ -857,6 +857,10 @@ extern gboolean GGobi_setVariableValues(gint whichVar, gdouble *vals, gint num, 
  */
 extern int GGobi_addVariable(gdouble *vals, gint len, gchar *name, gboolean update, datad *d, ggobid *gg);
 
+extern int GGobi_addCategoricalVariable(gdouble *vals, gint len, gchar *name, 
+                                        gchar **levels, gint *values, gint *counts, gint numLevels, 
+                                        gboolean update, datad *d, ggobid *gg);
+
 /**
   @ingroup Data
   Recompute the derived transformations for the specified dataset, updating plots
@@ -998,6 +1002,7 @@ void GGobi_cleanUpEdgeRelationships(struct _EdgeData *edge, int startPosition);
 
 typedef int (*MissingValue_p)(double);
 MissingValue_p GGobi_setMissingValueIdentifier(MissingValue_p f);
+extern MissingValue_p GGobiMissingValue;
 
 #ifdef __cplusplus
 }

@@ -152,12 +152,18 @@ newvar_add_with_values (gdouble *vals, gint nvals, gchar *vname,
   d->ncols += 1;
   addvar_pipeline_realloc (d, gg);
 
-  for (i=0; i<d->nrows; i++)
-    d->raw.vals[i][jvar] = d->tform.vals[i][jvar] = (gfloat) vals[i];
+  vt = vartable_element_get (jvar, d);
+
+  for (i=0; i<d->nrows; i++) {
+      if(GGobiMissingValue && GGobiMissingValue(vals[i]))
+         setMissingValue(i, jvar, d, vt);
+      else
+	  d->raw.vals[i][jvar] = d->tform.vals[i][jvar] = (gfloat) vals[i];
+  }
   
   /*-- update the vartable struct --*/
   limits_set_by_var (jvar, true, true, d, gg);
-  vt = vartable_element_get (jvar, d);
+
   vt->collab = vt->collab_tform = g_strdup (vname);
   /*-- --*/
 
