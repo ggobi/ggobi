@@ -205,7 +205,7 @@ startXMLElement(void *user_data, const CHAR *name, const CHAR **attrs)
 
  data->state = type;
 
- switch(type) {
+ switch (type) {
    case VARIABLES:
      allocVariables (attrs, data);
      break;

@@ -125,8 +125,8 @@ class datad {
    GtkWidget **da, **label;
    GdkPixmap **da_pix;
 */
-   GtkWidget *vbox;     /*-- vbox inside a frame --*/
-   GtkWidget **label;   /*-- single column of checkboxes --*/
+   GtkWidget *vbox;        /*-- vbox inside a frame --*/
+   GtkWidget **checkbox;   /*-- single column of checkboxes --*/
  } varpanel_ui;
 
 /*-------------------- transformation --------------------------------*/

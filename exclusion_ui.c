@@ -101,7 +101,10 @@ exclusion_cluster_add (gint k, datad *d, ggobid *gg) {
   gint dawidth = 2*NGLYPHSIZES+1 + 10;  /*-- use margin = 5 --*/
 
   d->clusv[k].da = gtk_drawing_area_new ();
-  gtk_object_set_data (GTK_OBJECT (d->varpanel_ui.label[k]), "datad", d);
+/*-- this makes no sense -- dfs, August 28th --*/
+/*
+ *gtk_object_set_data (GTK_OBJECT (d->varpanel_ui.checkbox[k]), "datad", d);
+*/
   gtk_drawing_area_size (GTK_DRAWING_AREA (d->clusv[k].da),
     dawidth, dawidth);
 

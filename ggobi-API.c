@@ -89,7 +89,7 @@ GGOBI(setVariableName)(gint jvar, gchar *name, gboolean transformed,
     d->vartable[jvar].collab_tform = g_strdup(name);
   else {
     d->vartable[jvar].collab = g_strdup(name);
-    gtk_object_set (GTK_OBJECT(d->varpanel_ui.label[jvar]),
+    gtk_object_set (GTK_OBJECT(d->varpanel_ui.checkbox[jvar]),
       "label", name, NULL);
    }
 }

@@ -10,6 +10,7 @@
 #include "vars.h"
 #include "externs.h"
 
+static void varpanel_checkbox_add (gint j, datad *d, ggobid *gg);
 
 /*-------------------------------------------------------------------------*/
 /*                     Variable selection                                  */
@@ -21,8 +22,8 @@ varpanel_checkbutton_set_active (gint jvar, gboolean active, datad *d)
   gboolean active_prev;
 
   if (jvar >= 0 && jvar < d->ncols) {
-    GtkWidget *w = GTK_WIDGET (d->varpanel_ui.label[jvar]);
-    if (GTK_WIDGET_REALIZED (d->varpanel_ui.label[jvar])) {
+    GtkWidget *w = GTK_WIDGET (d->varpanel_ui.checkbox[jvar]);
+    if (GTK_WIDGET_REALIZED (d->varpanel_ui.checkbox[jvar])) {
 
       active_prev = GTK_TOGGLE_BUTTON (w)->active;
       GTK_TOGGLE_BUTTON (w)->active = active;
@@ -121,7 +122,7 @@ p1d_menu_build (gint jvar, datad *d, ggobid *gg)
   gg->p1d_menu.vdata1.btn = 2;
 
   menu = gtk_menu_new ();
-  gtk_object_set_data (GTK_OBJECT (menu), "top", d->varpanel_ui.label[jvar]);
+  gtk_object_set_data (GTK_OBJECT (menu), "top", d->varpanel_ui.checkbox[jvar]);
 
   CreateMenuItem (menu, "Select X    L",
     NULL, NULL, gg->varpanel_ui.varpanel, gg->varpanel_ui.varpanel_accel_group,
@@ -150,7 +151,7 @@ xyplot_menu_build (gint jvar, datad *d, ggobid *gg)
   gg->xyplot_menu.vdata1.gg = gg;
 
   menu = gtk_menu_new ();
-  gtk_object_set_data (GTK_OBJECT (menu), "top", d->varpanel_ui.label[jvar]);
+  gtk_object_set_data (GTK_OBJECT (menu), "top", d->varpanel_ui.checkbox[jvar]);
 
   CreateMenuItem (menu, "Select X    L",
     NULL, NULL, gg->varpanel_ui.varpanel, gg->varpanel_ui.varpanel_accel_group,
@@ -183,7 +184,7 @@ rotation_menu_build (gint jvar, datad *d, ggobid *gg)
     gg->rotation_menu.vdata0.gg = gg;
 
   menu = gtk_menu_new ();
-  gtk_object_set_data (GTK_OBJECT (menu), "top", d->varpanel_ui.label[jvar]);
+  gtk_object_set_data (GTK_OBJECT (menu), "top", d->varpanel_ui.checkbox[jvar]);
 
   CreateMenuItem (menu, "Select X  L",
     NULL, NULL, gg->varpanel_ui.varpanel,
@@ -224,7 +225,7 @@ tour2d_menu_build (gint jvar, datad *d, ggobid *gg)
     gg->tour2d_menu.vdata0.gg = gg;
 
   menu = gtk_menu_new ();
-  gtk_object_set_data (GTK_OBJECT (menu), "top", d->varpanel_ui.label[jvar]);
+  gtk_object_set_data (GTK_OBJECT (menu), "top", d->varpanel_ui.checkbox[jvar]);
 
   CreateMenuItem (menu, "Tour   L,M",
     NULL, NULL, gg->varpanel_ui.varpanel, gg->varpanel_ui.varpanel_accel_group,
@@ -269,7 +270,7 @@ parcoords_menu_build (gint jvar, datad *d, ggobid *gg)
   gg->parcoords_menu.vdata1.gg = gg->parcoords_menu.vdata0.gg = gg;
 
   menu = gtk_menu_new ();
-  gtk_object_set_data (GTK_OBJECT (menu), "top", d->varpanel_ui.label[jvar]);
+  gtk_object_set_data (GTK_OBJECT (menu), "top", d->varpanel_ui.checkbox[jvar]);
 
   CreateMenuItem (menu, "Select Y      M,R",
     NULL, NULL, gg->varpanel_ui.varpanel,
@@ -311,7 +312,7 @@ scatmat_menu_build (gint jvar, datad *d, ggobid *gg)
     gg->scatmat_menu.vdata0.gg = gg;
 
   menu = gtk_menu_new ();
-  gtk_object_set_data (GTK_OBJECT (menu), "top", d->varpanel_ui.label[jvar]);
+  gtk_object_set_data (GTK_OBJECT (menu), "top", d->varpanel_ui.checkbox[jvar]);
 
   CreateMenuItem (menu, "Select row  L",
     NULL, NULL, gg->varpanel_ui.varpanel,
@@ -423,7 +424,7 @@ variable_clone (gint jvar, const gchar *newName, gboolean update,
   datad *d, ggobid *gg) 
 {
   gint nc = d->ncols + 1;
-  gint j;
+/*  gint j;*/
   
   /*-- set a view of the data values before adding the new label --*/
   vartable_row_append (d->ncols-1, d, gg);
@@ -433,10 +434,9 @@ variable_clone (gint jvar, const gchar *newName, gboolean update,
   d->vartable[nc-1].collab_tform =
     g_strdup (newName && newName[0] ? newName : d->vartable[jvar].collab);
 
-  for (j=0; j<d->ncols; j++) {
-    d->varpanel_ui.label = (GtkWidget **)
-      g_realloc (d->varpanel_ui.label, nc * sizeof (GtkWidget *));
-  }
+  d->varpanel_ui.checkbox = (GtkWidget **)
+    g_realloc (d->varpanel_ui.checkbox, nc * sizeof (GtkWidget *));
+  varpanel_checkbox_add (nc-1, d, gg);
 
   /*-- now the rest of the variables --*/
   d->vartable[nc-1].groupid = d->vartable[nc-1].groupid_ori =
@@ -444,7 +444,7 @@ variable_clone (gint jvar, const gchar *newName, gboolean update,
   d->vartable[nc-1].jitter_factor = d->vartable[jvar].jitter_factor;
   d->vartable[nc-1].nmissing = d->vartable[jvar].nmissing;
 
-  if(update) {
+  if (update) {
     updateAddedColumn (nc, jvar, d, gg);
   }
 
@@ -576,7 +576,7 @@ varsel_cb (GtkWidget *w, GdkEvent *event, datad *d)
 
     jvar = -1;
     for (j=0; j<d->ncols; j++) {
-      if (d->varpanel_ui.label[j] == w) {
+      if (d->varpanel_ui.checkbox[j] == w) {
         jvar = j;
         break;
       }
@@ -632,6 +632,20 @@ varpanel_make (GtkWidget *parent, ggobid *gg) {
   gtk_widget_show_all (gg->varpanel_ui.scrolled_window);
 }
 
+static void
+varpanel_checkbox_add (gint j, datad *d, ggobid *gg) 
+{
+  d->varpanel_ui.checkbox[j] =
+    gtk_noop_check_button_new_with_label (d->vartable[j].collab);
+  GGobi_widget_set (GTK_WIDGET (d->varpanel_ui.checkbox[j]), gg, true);
+
+  gtk_signal_connect (GTK_OBJECT (d->varpanel_ui.checkbox[j]),
+    "button_press_event", GTK_SIGNAL_FUNC (varsel_cb), d);
+
+  gtk_box_pack_start (GTK_BOX (d->varpanel_ui.vbox),
+    d->varpanel_ui.checkbox[j], true, true, 0);
+  gtk_widget_show (d->varpanel_ui.checkbox[j]);
+}
 
 /*-- create a column of check buttons? --*/
 void varpanel_populate (datad *d, ggobid *gg)
@@ -655,19 +669,23 @@ void varpanel_populate (datad *d, ggobid *gg)
   gtk_widget_show_all (frame);
   gdk_flush ();
 
-  d->varpanel_ui.label = (GtkWidget **)
+  d->varpanel_ui.checkbox = (GtkWidget **)
     g_malloc (d->ncols * sizeof (GtkWidget *));
-  for (j=0; j<d->ncols; j++) {
-    d->varpanel_ui.label[j] =
-      gtk_noop_check_button_new_with_label (d->vartable[j].collab);
-    GGobi_widget_set (GTK_WIDGET (d->varpanel_ui.label[j]), gg, true);
 
-    gtk_signal_connect (GTK_OBJECT (d->varpanel_ui.label[j]),
+  for (j=0; j<d->ncols; j++) {
+    varpanel_checkbox_add (j, d, gg);
+/*
+    d->varpanel_ui.checkbox[j] =
+      gtk_noop_check_button_new_with_label (d->vartable[j].collab);
+    GGobi_widget_set (GTK_WIDGET (d->varpanel_ui.checkbox[j]), gg, true);
+
+    gtk_signal_connect (GTK_OBJECT (d->varpanel_ui.checkbox[j]),
       "button_press_event", GTK_SIGNAL_FUNC (varsel_cb), d);
 
     gtk_box_pack_start (GTK_BOX (d->varpanel_ui.vbox),
-      d->varpanel_ui.label[j], true, true, 0);
-    gtk_widget_show (d->varpanel_ui.label[j]);
+      d->varpanel_ui.checkbox[j], true, true, 0);
+    gtk_widget_show (d->varpanel_ui.checkbox[j]);
+*/
   }
     
 }
@@ -675,7 +693,7 @@ void varpanel_populate (datad *d, ggobid *gg)
 
 void
 varlabel_set (gint j, datad *d, ggobid *gg) {
-  gtk_label_set_text (GTK_LABEL (GTK_BIN (d->varpanel_ui.label[j])->child),
+  gtk_label_set_text (GTK_LABEL (GTK_BIN (d->varpanel_ui.checkbox[j])->child),
     d->vartable[j].collab_tform);
 }
 
