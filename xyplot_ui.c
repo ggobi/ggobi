@@ -20,27 +20,45 @@
 static const gchar *const fix_axis_lbl[] = {"No fixed axes", "Fix X", "Fix Y"};
 static void fix_axis_cb (GtkWidget *w, gpointer cbd)
 {
-  gint indx = GPOINTER_TO_INT (cbd);
-  g_printerr ("cbd: %s\n", fix_axis_lbl[indx]);
+  ggobid *gg = GGobiFromWidget (w, true);
+  gg->xyplot.cycle_axis = GPOINTER_TO_INT (cbd);
 }
 
 static void cycle_cb (GtkToggleButton *button, ggobid *gg)
 {
+  extern GtkFunction xycycle_func (ggobid *gg);
   gg->xyplot.cycle_p = button->active;
+
+  if (gg->xyplot.cycle_p) {
+    gg->xyplot.cycle_id = gtk_timeout_add (gg->xyplot.cycle_delay,
+      (GtkFunction) xycycle_func, (gpointer) gg);
+    gg->xyplot.cycle_p = true;
+  } else {
+    gtk_timeout_remove (gg->xyplot.cycle_id);
+    gg->xyplot.cycle_id = 0;
+    gg->xyplot.cycle_p = false;
+  }
 }
-static void scale_set_default_values (GtkScale *scale )
+static void scale_set_default_values (GtkScale *scale)
 {
   gtk_range_set_update_policy (GTK_RANGE (scale), GTK_UPDATE_CONTINUOUS);
   gtk_scale_set_draw_value (scale, false);
 }
 
-static void cycle_speed_cb (GtkAdjustment *adj, gpointer cbd) {
-  g_printerr ("%d\n", ((gint) adj->value));
+static void cycle_speed_cb (GtkAdjustment *adj, ggobid *gg) {
+  extern GtkFunction xycycle_func (ggobid *gg);
+
+  gg->xyplot.cycle_delay = -1 * (guint32) adj->value;
+  if (gg->xyplot.cycle_p) {
+    gtk_timeout_remove (gg->xyplot.cycle_id);
+    gg->xyplot.cycle_id = gtk_timeout_add (gg->xyplot.cycle_delay,
+    (GtkFunction) xycycle_func, (gpointer) gg);
+  }
 }
 
 static void chdir_cb (GtkButton *button, ggobid* gg)
 {
-  gg->xyplot.direction = -1 * gg->xyplot.direction;
+  gg->xyplot.cycle_dir = -1 * gg->xyplot.cycle_dir;
 }
 
 /*--------------------------------------------------------------------*/
@@ -96,7 +114,6 @@ cpanel_xyplot_make (ggobid *gg) {
                      GTK_SIGNAL_FUNC (cycle_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (gg->control_panel[XYPLOT]), cycle_tgl,
     false, false, 3);
-  gtk_widget_set_sensitive (cycle_tgl, false);
 
 /*
  * make an option menu
@@ -114,9 +131,11 @@ cpanel_xyplot_make (ggobid *gg) {
   /* Note that the page_size value only makes a difference for
    * scrollbar widgets, and the highest value you'll get is actually
    * (upper - page_size). */
-  adj = gtk_adjustment_new (1.0, 0.0, 100.0, 1.0, 1.0, 0.0);
+  gg->xyplot.cycle_delay = 1000;
+  adj = gtk_adjustment_new (-1.0 * gg->xyplot.cycle_delay,
+    -5000.0, -250.0, 100.0, 1000.0, 0.0);
   gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
-                      GTK_SIGNAL_FUNC (cycle_speed_cb), NULL);
+                      GTK_SIGNAL_FUNC (cycle_speed_cb), gg);
 
   cycle_sbar = gtk_hscale_new (GTK_ADJUSTMENT (adj));
   scale_set_default_values (GTK_SCALE (cycle_sbar));
@@ -125,7 +144,6 @@ cpanel_xyplot_make (ggobid *gg) {
                       cycle_sbar, false, false, 1);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), cycle_sbar,
     "Adjust cycling speed", NULL);
-  gtk_widget_set_sensitive (cycle_sbar, false);
 
   chdir_btn = gtk_button_new_with_label ("Change direction");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), chdir_btn,
@@ -134,7 +152,6 @@ cpanel_xyplot_make (ggobid *gg) {
                       chdir_btn, false, false, 1);
   gtk_signal_connect (GTK_OBJECT (chdir_btn), "clicked",
                       GTK_SIGNAL_FUNC (chdir_cb), gg);
-  gtk_widget_set_sensitive (chdir_btn, false);
 
   gtk_widget_show_all (gg->control_panel[XYPLOT]);
 }

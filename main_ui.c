@@ -554,7 +554,7 @@ static GtkItemFactoryEntry menu_items[] = {
        0 },
 
   { "/_Tools",        NULL,         NULL, 0, "<Branch>" },
-  { "/Tools/Variable selection and statistics ...", 
+  { "/Tools/Variable manipulation ...", 
        NULL,        
        (GtkItemFactoryCallback) vartable_open,   
        0,

@@ -195,6 +195,8 @@ struct _ggobid {
  struct _P1D {
    GtkObject *cycle_speed_adj;
    gboolean cycle_p;
+   gint cycle_id;
+   gint cycle_dir;
    /*-- texture --*/
    gfloat *gy;
  } p1d;
@@ -203,7 +205,10 @@ struct _ggobid {
 
  struct _XYPlot {
    gboolean cycle_p;
-   gint direction;
+   gint cycle_axis;
+   gint cycle_id;
+   gint cycle_dir;
+   guint32 cycle_delay;
  } xyplot;
 
 /*---------------------- touring -------------------------------------*/

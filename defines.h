@@ -107,6 +107,13 @@ extern const gint ViewTypeIndeces[3];
 #define BACKWARD -1
 
 /*
+ * cycling
+*/
+#define NOFIXED 0
+#define XFIXED  1
+#define YFIXED  2
+
+/*
  * rotation only
 */
 #define RO_OBLIQUE 0

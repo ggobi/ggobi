@@ -345,7 +345,6 @@ parcoords_varsel (cpaneld *cpanel, splotd *sp,
     } else {
 
       /*-- prepare to reset the current plot --*/
-/*-- dfs: add this to timeplot.c --*/
       sp_event_handlers_toggle (sp, off);
 
       /*-- keep the window from growing by shrinking all plots --*/
@@ -387,7 +386,6 @@ parcoords_varsel (cpaneld *cpanel, splotd *sp,
       }
 
       gg->current_splot = sp_new;
-/*-- dfs: add this to timeplot.c --*/
       sp_event_handlers_toggle (sp_new, on);
       redraw = true;
     }

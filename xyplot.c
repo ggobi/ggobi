@@ -61,3 +61,163 @@ xy_reproject (splotd *sp, glong **world_data, datad *d, ggobid *gg)
   }
 }
 
+/*--------------------------------------------------------------------*/
+/*                            Cycling                                 */
+/*--------------------------------------------------------------------*/
+
+void
+cycle_fixedx (splotd *sp, displayd *display, datad *d, ggobid *gg)
+{
+  gint varno, jvar_prev;
+
+  if (gg->xyplot.cycle_dir == 1) {
+    varno = sp->xyvars.y + 1;
+
+    if (varno == sp->xyvars.x)
+       varno++;
+
+    if (varno == d->ncols) {
+      varno = 0;
+      if (varno == sp->xyvars.x)
+         varno++;
+    }
+  } else {
+    varno = sp->xyvars.y - 1;
+
+    if (varno == sp->xyvars.x)
+       varno--;
+
+    if (varno < 0) {
+      varno = d->ncols-1;
+      if (varno == sp->xyvars.x)
+         varno--;
+    }
+  }
+
+  if (varno != sp->xyvars.y) {
+    jvar_prev = sp->xyvars.y;
+    if (xyplot_varsel (sp, varno, &jvar_prev, 2)) {
+      varpanel_refresh (gg);
+      display_tailpipe (display, gg);
+    }
+  }
+}
+
+void
+cycle_fixedy (splotd *sp, displayd *display, datad *d, ggobid *gg)
+{
+  gint varno, jvar_prev;
+
+  if (gg->xyplot.cycle_dir == 1) {
+    varno = sp->xyvars.x + 1;
+
+    if (varno == sp->xyvars.y)
+       varno++;
+
+    if (varno == d->ncols) {
+      varno = 0;
+      if (varno == sp->xyvars.y)
+        varno++;
+    }
+  } else {
+    varno = sp->xyvars.x - 1;
+
+    if (varno == sp->xyvars.y)
+       varno--;
+
+    if (varno < 0) {
+      varno = d->ncols-1;
+      if (varno == sp->xyvars.y)
+        varno--;
+    }
+  }
+
+  if (varno != sp->xyvars.x) {
+    jvar_prev = sp->xyvars.x;
+    if (xyplot_varsel (sp, varno, &jvar_prev, 1))
+      varpanel_refresh (gg);
+      display_tailpipe (display, gg);
+  }
+}
+
+void
+cycle_xy (splotd *sp, displayd *display, datad *d, ggobid *gg)
+{
+  gint jx, jy;
+  gint jvar_prev;
+  gboolean redraw = false;
+
+  jx = sp->xyvars.x;
+  jy = sp->xyvars.y;
+
+  if (gg->xyplot.cycle_dir == 1) {
+
+    if ((jx == d->ncols-1) ||
+        (jx == d->ncols-2 && jy == d->ncols-1) )
+    {
+      jx = 0;
+      jy = jx+1;
+    }
+    else if (jy < jx) {
+      jy = jx+1;
+    }
+    else if (jy == d->ncols-1) {
+      jx++;
+      jy = jx+1;
+    }
+    else
+      jy++;
+
+  } else {
+
+    if ( jx == 0 || (jx == 1 && jy == 0) ) {
+      jx = d->ncols-1;
+      jy = jx-1;
+    }
+    else if (jy > jx) {
+      jy = jx-1;
+    }
+    else if (jy == 0) {
+      jx--;
+      jy = jx-1;
+    }
+    else
+      jy--;
+  }
+
+  if (jx != sp->xyvars.x) {
+    jvar_prev = sp->xyvars.x;
+    redraw = xyplot_varsel (sp, jx, &jvar_prev, 1);
+  }
+  if (jy != sp->xyvars.y) {
+    jvar_prev = sp->xyvars.y;
+    redraw = redraw | xyplot_varsel (sp, jy, &jvar_prev, 2);
+  }
+
+  if (redraw) {
+    varpanel_refresh (gg);
+    display_tailpipe (display, gg);
+  }
+}
+
+gint
+xycycle_func (ggobid *gg)
+{
+  displayd *display = gg->current_display;
+  datad *d = gg->current_display->d;
+  splotd *sp = gg->current_splot;
+  
+  switch (gg->xyplot.cycle_axis) {
+    case XFIXED:
+      cycle_fixedx (sp, display, d, gg);
+    break;
+    case YFIXED:
+      cycle_fixedy (sp, display, d, gg);
+    break;
+    default:
+      cycle_xy (sp, display, d, gg);
+  }
+
+  return true;
+}
+

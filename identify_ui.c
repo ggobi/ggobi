@@ -85,7 +85,8 @@ displays_add_point_labels (splotd *splot, gint k, ggobid *gg) {
       if (sp != splot) {
         w = sp->da;
         splot_pixmap0_to_pixmap1 (sp, false, gg);
-        splot_add_point_label (sp, k, true, gg);  /*-- nearest = true --*/
+        if (k!= -1)
+          splot_add_point_label (sp, k, true, gg);  /*-- nearest = true --*/
         splot_pixmap1_to_window (sp, gg);
       }
     }
@@ -121,8 +122,8 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
 
     splot_pixmap1_to_window (sp, gg);
     
-    if (k != -1)
-      displays_add_point_labels (sp, k, gg);
+    /* every time it changed, whether k==-1 or not */
+    displays_add_point_labels (sp, k, gg);
 
     if (gg->identify_handler.handler) {
       (gg->identify_handler.handler)(gg->identify_handler.user_data,
