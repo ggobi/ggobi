@@ -35,9 +35,11 @@ initR(GGobiPluginInfo *pluginfo)
   argv[1] = g_strdup("--slave");
     Rf_initEmbeddedR(argc, argv);
 
-  init = (char *) g_hash_table_lookup(pluginfo->details->namedArgs, "init");
-  if(init && init[0]) {
-     (void) Rg_evalCmd(init);
+  if(pluginfo->details->namedArgs) {
+      init = (char *) g_hash_table_lookup(pluginfo->details->namedArgs, "init");
+      if(init && init[0]) {
+	  (void) Rg_evalCmd(init);
+      }
   }
 
   return(true);
