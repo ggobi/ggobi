@@ -248,14 +248,18 @@ spherevars_set (ggobid *gg) {
   datad *d;
   GtkWidget *clist;
 
-  if (gg->sphere_ui.window == NULL) return;
-
-  clist = get_clist_from_object (GTK_OBJECT(gg->sphere_ui.window));
-  if (clist == NULL) return;
-
-  d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
-  vars = (gint *) g_malloc (d->ncols * sizeof(gint));
-  nvars = get_selections_from_clist (d->ncols, vars, clist);
+  if (gg->sphere_ui.window == NULL) {
+    d = gg->current_display->d;
+    if (d == NULL) return;
+    vars = (gint *) g_malloc (d->ncols * sizeof(gint));
+    nvars = 0;  /*-- initially, no variables are selected --*/
+  } else {
+    clist = get_clist_from_object (GTK_OBJECT(gg->sphere_ui.window));
+    if (clist == NULL) return;
+    d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
+    vars = (gint *) g_malloc (d->ncols * sizeof(gint));
+    nvars = get_selections_from_clist (d->ncols, vars, clist);
+  }
 
   if (d->sphere.vars.els == NULL || d->sphere.vars.nels != nvars) {
     sphere_malloc (nvars, d, gg);
