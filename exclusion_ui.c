@@ -170,7 +170,6 @@ exclusion_window_open (ggobid *gg) {
 
     clusters_set (gg);
 
-g_printerr ("gg=%d\n", (gint)gg);
     exclusion_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     gtk_signal_connect (GTK_OBJECT (exclusion_window), "delete_event",
                         GTK_SIGNAL_FUNC (delete_cb), (gpointer) gg);

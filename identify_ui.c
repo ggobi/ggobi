@@ -78,7 +78,8 @@ motion_notify_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 
 
     if(gg->identify_handler.handler) {
-      (gg->identify_handler.handler)(gg->identify_handler.user_data, k, sp, w, gg);
+      (gg->identify_handler.handler)(gg->identify_handler.user_data,
+        k, sp, w, gg);
     }
 
     gg->app.nearest_point_prev = k;

@@ -8,7 +8,7 @@
 
 #define WIDTH 200
 #define HEIGHT 200
-#define MAXNVARS 9   /* only used to set up the initial matrix */
+#define MAXNVARS 4   /* only used to set up the initial matrix */
 
 static GtkAccelGroup *scatmat_accel_group;
 
@@ -83,8 +83,8 @@ scatmat_display_menus_make (displayd *display, GtkAccelGroup *accel_group,
 
 
 displayd *
-scatmat_new (gboolean missing_p, splotd **sub_plots, int numRows, int numCols,
-ggobid *gg) 
+scatmat_new (gboolean missing_p, splotd **sub_plots, gint numRows, gint numCols,
+  ggobid *gg) 
 {
   GtkWidget *vbox, *frame;
   GtkWidget *mbar;
