@@ -397,17 +397,17 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   vbox = gtk_vbox_new (false, 1);
   gtk_box_pack_start (GTK_BOX (hbox), vbox, false, false, 2);
 
-  /*-- Option menu: Use edge distances or an edge variable --*/
-
   /*-- include only edge sets.  --*/
   varnotebook = create_variable_notebook (hbox,
     GTK_SELECTION_SINGLE, all_vartypes, edgesets_only,
     (GtkSignalFunc) NULL, inst->gg);
   swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK (varnotebook), 0);
-  ggv->clist_dist = (GtkCList *) GTK_BIN(swin)->child;
-  /* Initialize, selecting first variable */
-  if (ggv->mds_task == DissimAnalysis)
-    gtk_clist_select_row (ggv->clist_dist, 0, 0);
+  if (swin != NULL) {
+    ggv->clist_dist = (GtkCList *) GTK_BIN(swin)->child;
+    /* Initialize, selecting first variable */
+    if (ggv->mds_task == DissimAnalysis)
+      gtk_clist_select_row (ggv->clist_dist, 0, 0);
+  } else ggv->clist_dist = (GtkCList *) NULL;
 
   /*-- Report on D --*/
   hb = gtk_hbox_new (false, 1);

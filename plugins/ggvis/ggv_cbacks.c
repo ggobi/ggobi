@@ -354,7 +354,8 @@ void mds_run_cb (GtkToggleButton *btn, PluginInstance *inst)
     }
     dsrc = ggv->dsrc;
     /* Make sure there's an edge set */
-    ggv->e = gtk_object_get_data (GTK_OBJECT(ggv->clist_dist), "datad");
+    if (ggv->clist_dist != (GtkCList *) NULL)
+      ggv->e = gtk_object_get_data (GTK_OBJECT(ggv->clist_dist), "datad");
     if (ggv->e == NULL || ggv->e->edge.n == 0) {
       g_printerr ("edge set not correctly specified\n");
       return;
