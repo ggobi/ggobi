@@ -389,21 +389,22 @@ tsplot_varsel (cpaneld *cpanel, splotd *sp, gint button,
 
 static void
 tsplot_rewhisker (splotd *sp, ggobid *gg) {
-  gint i, k;
+  gint i, k, n;
   displayd *display = (displayd *) sp->displayptr;
   datad *d = display->d;
   gboolean draw_whisker;
 
   for (k=0; k<(d->nrows_in_plot-1); k++) {
     i = d->rows_in_plot[k];
+    n = d->rows_in_plot[k+1];
     
     /*-- .. also if we're not drawing missings, and an endpoint is missing --*/
     if (!display->options.missings_show_p &&
           d->nmissing > 0 &&
           (d->missing.vals[i][sp->xyvars.x] || 
            d->missing.vals[i][sp->xyvars.y] ||
-           d->missing.vals[i+1][sp->xyvars.x] || 
-           d->missing.vals[i+1][sp->xyvars.y]))
+           d->missing.vals[n][sp->xyvars.x] || 
+           d->missing.vals[n][sp->xyvars.y]))
     {
       draw_whisker = false;
     }
@@ -413,8 +414,8 @@ tsplot_rewhisker (splotd *sp, ggobid *gg) {
     if (draw_whisker) {
       sp->whiskers[i].x1 = sp->screen[i].x;
       sp->whiskers[i].y1 = sp->screen[i].y;
-      sp->whiskers[i].x2 = sp->screen[i+1].x;
-      sp->whiskers[i].y2 = sp->screen[i+1].y;
+      sp->whiskers[i].x2 = sp->screen[n].x;
+      sp->whiskers[i].y2 = sp->screen[n].y;
     }      
   }
 }
