@@ -1,6 +1,8 @@
 #include "ggobi.h"
 #include "colorscheme.h"
 
+#include <string.h>
+
 #ifdef USE_GNOME_XML
 #include <gnome-xml/parser.h>
 #include <gnome-xml/tree.h>

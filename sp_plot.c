@@ -473,20 +473,20 @@ splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
     if (l->data == sp) {
       vtx = vartable_element_get (sp->xyvars.x, d);
       gdk_text_extents (style->font, 
-        vt->collab_tform, strlen (vt->collab_tform),
+        vtx->collab_tform, strlen (vtx->collab_tform),
         &lbearing, &rbearing, &width, &ascent, &descent);
       gdk_draw_string (drawable, style->font, gg->plot_GC,
         sp->max.x - width - 5,
         sp->max.y - 5,
-        vt->collab_tform);
+        vtx->collab_tform);
     }
     vty = vartable_element_get (sp->xyvars.y, d);
     gdk_text_extents (style->font, 
-      vt->collab_tform, strlen (vt->collab_tform),
+      vty->collab_tform, strlen (vty->collab_tform),
       &lbearing, &rbearing, &width, &ascent, &descent);
     gdk_draw_string (drawable, style->font, gg->plot_GC,
       5, 5 + ascent + descent,
-      vt->collab_tform);
+      vty->collab_tform);
   }
 
 }

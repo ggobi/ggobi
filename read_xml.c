@@ -1002,7 +1002,8 @@ find_xml_file(const gchar *filename, const gchar *dir, ggobid *gg)
     dirlen = 0;
 
   for(i = 0; i < nsuffixes;i++) {
-    name = (char*) g_malloc(sizeof(char)*(dirlen + strlen(filename)+strlen(suffixes[i]) + 2));
+    name = (char*) g_malloc(sizeof(char) *
+      (dirlen + strlen(filename)+strlen(suffixes[i]) + 2));
     sprintf(name,"%s/%s%s", dirlen ? dir : "", filename, suffixes[i]);
     if((f = fopen(name,"r")) != NULL) {
       fclose(f);
@@ -1251,7 +1252,7 @@ setDataset(const xmlChar **attrs, XMLParserData *parserData)
     sprintf(name, "data%d", (int) g_slist_length(parserData->gg->d));
   } else
     name = g_strdup(tmp);
- 
+
   data->name = name;
   parserData->current_data = data;
 
@@ -1305,7 +1306,7 @@ readXMLRecord(const xmlChar **attrs, XMLParserData *data)
   tmp = getAttribute(attrs, "id");
   if(tmp) {
     if (data->rowIds == NULL) {
-/*-- dfs;  when can data->rowIds be freed? --*/
+/*-- dfs;  when should data->rowIds be freed?  in endXMLElement? --*/
      data->rowIds = (gchar **) g_malloc(d->nrows * sizeof(gchar *));
      memset(data->rowIds, '\0', d->nrows);
     }

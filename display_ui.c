@@ -52,7 +52,7 @@ void
 display_menu_build (ggobid *gg)
 {
   GtkWidget *item;
-  gint nd = g_slist_length (gg->d);
+  gint nd;
   datad *d0;
   gint k;
   GtkWidget *submenu, *anchor;
@@ -60,6 +60,8 @@ display_menu_build (ggobid *gg)
 
   if(gg == NULL || gg->d == NULL)
       return;
+
+  nd = ndatad_with_vars_get (gg);
 
   d0 = (datad *) gg->d->data;
   if (gg->display_menu != NULL)
