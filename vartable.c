@@ -269,6 +269,9 @@ vartable_copy_var (gint jfrom, gint jto, datad *d)
   vt_to->collab = g_strdup (vt_from->collab);
   vt_to->collab_tform = g_strdup (vt_from->collab_tform);
 
+  vt_to->categorical_p = vt_from->categorical_p;
+  vt_to->nlevels = vt_from->nlevels;
+
   vt_to->mean = vt_from->mean;
   vt_to->median = vt_from->median;
   vt_to->lim.min =
