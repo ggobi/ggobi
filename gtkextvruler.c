@@ -117,9 +117,9 @@ gtk_ext_vruler_class_init (GtkExtVRulerClass *klass)
 
 /*
  * (dfs) If I want to disable the response, I just do this:
-*/
     widget_class->button_press_event = NULL;
     widget_class->button_release_event = NULL;
+*/
 /* */
 
     ruler_class->draw_ticks = gtk_ext_vruler_draw_ticks;
