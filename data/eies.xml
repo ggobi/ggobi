@@ -1,0 +1,291 @@
+<?xml version="1.0"?>
+<!DOCTYPE ggobidata SYSTEM "ggobi2.dtd">
+
+<ggobidata count="2">
+
+<data name="Attributes">
+<description>
+This is a subset of the "EIES data" found here:
+  http://www.heinz.cmu.edu/project/INSNA/data_inf.html
+restructured for ggobi.
+
+The first dataset is the attributes of 32 people.  These variables
+are described in the Soc.Meth (1990) paper.    (So says the original
+documentation -- I don't know what paper that is, or who the author
+is.) I'm using only two variables:  number of citations and the
+discipline.   The people whose discipline is 4 either have have 
+discipline label, or their label is communications or psychology.
+
+To these I've added a position worked out so as to spread the data in
+some reasonable fashion.  (No layout software was used.)
+
+The relations included in the original dataset are these:
+acquaintanceship measured at 2 points in time, and total number of
+messages sent.
+
+         4 - Close personal friend
+         3 - Friend
+         2 - Person I've met
+         1 - Person I've heared of, but not met
+         0 - Unknown name or no reply
+
+In order to have a manageable number of links, I've only included
+a link where the relationship in each direction at time T1 is 3 or 4,
+and I've generated two variables from that:  a's relationship to b,
+and b's relationship to a.
+</description>
+
+<variables count="4">
+  <realvariable name="x" />
+  <realvariable name="y" />
+  <realvariable name="citations" />
+  <categoricalvariable name="discipline">
+    <levels count="4">
+      <level value="1"> sociology </level>
+      <level value="2"> anthropology </level>
+      <level value="3"> math or stat </level>
+      <level value="4"> other </level>
+    </levels>
+  </categoricalvariable>
+</variables>
+<records count="32">
+<record id="1">
+37.3016 3.01215 	 19        1
+</record>
+<record id="2">
+46.7853 3.93015 	  3        2
+</record>
+<record id="3">
+171.074 2.383 	170        4
+</record>
+<record id="4">
+21.8777 0.678101 	 23        1
+</record>
+<record id="5">
+-24.0256 2.27322 	 16        4
+</record>
+<record id="6">
+-36.2225 2.57315 	 6         4
+</record>
+<record id="7">
+-16.4978 1.31467 	 1         4
+</record>
+<record id="8">
+-19.1074 0.70932 	 9         2
+</record>
+<record id="9">
+-26.355 3.29065 	 6         2
+</record>
+<record id="10">
+175.375 1.40247 	 40        1
+</record>
+<record id="11">
+49.4986 4.03653 	 15        1
+</record>
+<record id="12">
+189.766 0.930237 	 54        1
+</record>
+<record id="13">
+-22.2357 1.69516 	 4         2
+</record>
+<record id="14">
+138.794 2.46347 	 46        1
+</record>
+<record id="15">
+154.934 3.19507 	 17        1
+</record>
+<record id="16">
+84.642 2.84387 	 32        3
+</record>
+<record id="17">
+125.881 3.41461 	 23        4
+</record>
+<record id="18">
+0 3.01947 	  1        1
+</record>
+<record id="19">
+22.5989 1.09512 	 34        1
+</record>
+<record id="20">
+148.122 0.597626 	 64        1
+</record>
+<record id="21">
+90.271 3.87201 	 11        3
+</record>
+<record id="22">
+13.6288 1.95856 	 11        1
+</record>
+<record id="23">
+160.672 1.98053 	 31        1
+</record>
+<record id="24">
+109.747 1.32932 	 18        1
+</record>
+<record id="25">
+194.384 3.31216 	  4        1
+</record>
+<record id="26">
+5.02197 2.63898 	  0        1
+</record>
+<record id="27">
+-26.1786 2.03171 	  4        3
+</record>
+<record id="28">
+-23.0606 1.15125 	 56        1
+</record>
+<record id="29">
+85 1.89273 	 12        1
+</record>
+<record id="30">
+26.5417 4.24142 	  2        2
+</record>
+<record id="31">
+21.1618 3.31216 	  0        4
+</record>
+<record id="32">
+10.0439 3.91211 	  1        2
+</record>
+</records>
+
+</data>
+
+<data name="Acquaintanceship at T1">
+<description>
+</description>
+<variables count="2">
+  <realvariable name="a knows b"/>
+  <realvariable name="b knows a"/>
+</variables>
+<records count="43">
+<record source="1" destination="2">
+4 4 
+</record>
+<record source="1" destination="18">
+3 4 
+</record>
+<record source="1" destination="26">
+3 4 
+</record>
+<record source="1" destination="31">
+4 4 
+</record>
+<record source="2" destination="9">
+4 4 
+</record>
+<record source="2" destination="11">
+3 3 
+</record>
+<record source="2" destination="21">
+3 3 
+</record>
+<record source="2" destination="30">
+3 4 
+</record>
+<record source="2" destination="31">
+4 4 
+</record>
+<record source="2" destination="32">
+4 3 
+</record>
+<record source="3" destination="14">
+4 4 
+</record>
+<record source="3" destination="23">
+4 4 
+</record>
+<record source="4" destination="19">
+4 4 
+</record>
+<record source="7" destination="13">
+3 3 
+</record>
+<record source="9" destination="22">
+3 3 
+</record>
+<record source="9" destination="32">
+4 4 
+</record>
+<record source="10" destination="12">
+3 3 
+</record>
+<record source="10" destination="20">
+3 3 
+</record>
+<record source="10" destination="23">
+4 4 
+</record>
+<record source="13" destination="27">
+4 4 
+</record>
+<record source="14" destination="15">
+3 3 
+</record>
+<record source="14" destination="16">
+4 3 
+</record>
+<record source="14" destination="17">
+3 3 
+</record>
+<record source="14" destination="20">
+3 3 
+</record>
+<record source="14" destination="22">
+4 3 
+</record>
+<record source="14" destination="24">
+3 3 
+</record>
+<record source="14" destination="25">
+3 3 
+</record>
+<record source="14" destination="29">
+4 3 
+</record>
+<record source="16" destination="21">
+4 4 
+</record>
+<record source="16" destination="22">
+3 3 
+</record>
+<record source="16" destination="24">
+3 3 
+</record>
+<record source="17" destination="21">
+3 3 
+</record>
+<record source="18" destination="31">
+4 3 
+</record>
+<record source="19" destination="22">
+3 3 
+</record>
+<record source="20" destination="22">
+4 3 
+</record>
+<record source="20" destination="24">
+3 3 
+</record>
+<record source="20" destination="25">
+3 4 
+</record>
+<record source="21" destination="22">
+3 3 
+</record>
+<record source="21" destination="25">
+3 3 
+</record>
+<record source="22" destination="24">
+4 4 
+</record>
+<record source="22" destination="29">
+4 4 
+</record>
+<record source="24" destination="25">
+3 4 
+</record>
+<record source="24" destination="29">
+4 3 
+</record>
+</records>
+</data>
+</ggobidata>

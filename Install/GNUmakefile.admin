@@ -19,7 +19,7 @@ DIRS=\
 DATA_SRC_FILES=\
    flea.col flea.colors flea.dat flea.doc flea.glyphs flea.row \
    roos.col roos.dat roos.doc roos.missing roos.row \
-   flea.xml pigs.xml ratcns.xml sat.xml sleep.xml \
+   flea.xml pigs.xml ratcns.xml sat.xml sleep.xml eies.xml \
    stdColorMap.xml \
    ggobi.dtd
 
