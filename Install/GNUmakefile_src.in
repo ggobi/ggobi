@@ -76,6 +76,8 @@ SRC=\
     subset_ui.c \
     svd.c \
     texture.c \
+    timeplot.c \
+    time_ui.c \
     tour.c \
     tour1d.c \
     tour1d_ui.c \
@@ -100,8 +102,6 @@ SRC=\
     xlines.c \
     xyplot.c \
     xyplot_ui.c \
-    @TOUR_SRC@ \
-    @TIME_SERIES_SRC@ \
     @XML_SRC@ @MYSQL_SRC@
 
 

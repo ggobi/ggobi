@@ -1,4 +1,4 @@
-/* ctour_ui.c */
+/* tourcorr_ui.c */
 /*
     This software may only be used by you under license from AT&T Corp.
     ("AT&T").  A copy of AT&T's Source Code Agreement is available at
