@@ -139,3 +139,5 @@ clean:
 	  if test -f $$f ; then rm $$f ; fi \
 	done
 
+TAGS:
+	etags $(SRC) $(find ../include -name '*.h')
