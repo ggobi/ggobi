@@ -5,7 +5,8 @@
 
 #include "ggobi.h"
 
-#include <libxml/parser.h>
+/*#include <libxml/parser.h>*/
+#include <parser.h>
 
 enum xmlDataState { TOP = 0, DESCRIPTION, RECORD, RECORDS, VARIABLES, VARIABLE, DATA, CONNECTIONS, CONNECTION, UNKNOWN};
 

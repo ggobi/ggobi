@@ -17,6 +17,10 @@ and Ch. heikertingeri, and 6 measurements on each.
     5 = the front angle of the aedeagus ( 1 unit = 7.5 degrees).
     6 = the aedeagus width from the side in microns.
 </description>
+<colormap file="defaultColormap" type="xml">
+<color>.5 .5 0 </color>
+<color id="2" r=".5" g=".5" b="0" />
+</colormap>
 <variables count="6">
   <variable>tars1</variable>
   <variable>tars2</variable>

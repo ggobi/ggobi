@@ -19,8 +19,23 @@
 <!ELEMENT segments ( segment )*>
 <!ELEMENT segment EMPTY>
 
-<!ELEMENT ggobidata (description, variables, records, (segments)*)
+<!ELEMENT ggobidata (description, (colormap)?, variables, records, (segments)*)
 
+<!ELEMENT color ( #PCDATA) >
+<!ATTLIST color  
+       id CDATA #IMPLIED
+       r  CDATA #IMPLIED
+       g  CDATA #IMPLIED
+       b  CDATA #IMPLIED
+>
+      
+<!ELEMENT colormap (color)+ >
+<!ATTLIST colormap
+      range CDATA  #IMPLIED
+      file CDATA   #IMPLIED
+      type CDATA   (xml | table)
+>
+         
 
 <!ATTLIST records
      count CDATA  #REQUIRED

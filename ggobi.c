@@ -40,6 +40,7 @@ parse_command_line (gint *argc, gchar **av, ggobid *gg)
 
     else if (strcmp (av[1], "-x") == 0)
       gg->data_mode = xml;
+
     /*
      * -:  look to stdin for the input data
     */

@@ -1,3 +1,6 @@
+/*#include <libxml/parserInternals.h>*/
+#include <parserInternals.h>
+
 /*
    This is a SAX based parser for reading a single input file
    formatted in XML for the DTD specified in ggobi.dtd.
@@ -49,13 +52,7 @@
    state of the parsing. This was set at the start of each tag/element
    in startXMLElement. 
  
-  
-  
- 
- 
  */
-
-#include <libxml/parserInternals.h>
 
 #include <stdlib.h>
 #include <string.h>

@@ -66,12 +66,10 @@ ifdef USE_XML
  XML_SRC= read_xml.c write_xml.c
  XML_OB= read_xml.o write_xml.o
 
- CFLAGS+= -I/home/duncan/XML -DUSE_XML=1
+ CFLAGS+= -I$(XML_INC_DIRS) -DUSE_XML=1
  OB+= $(XML_OB)
 
  XML_LIBS=-lxml -lz
- XML_LIB_DIRS=-L/home/duncan/XML/libxml
-
 endif
 
 ggobi: $(OB)
@@ -85,10 +83,10 @@ pure: ggobi.o $(OB)
 dm: $(OB)
 	$(CC) `gtk-config --cflags` $(OB) -o ggobi `gtk-config --libs` -L$(DM) -ldmalloc
 
-# No gthread here in the call to gtk-config.
-# R is not compiled for threads.
 libGGobi.so: $(OB)
 	$(CC) -g $(SHARED_LD_FLAGS) -o $@ $(OB) $(XML_LIB_DIRS) $(XML_LIBS) `gtk-config --libs`
+
+lib: libGGobi.so
 
 clean: 
 	rm -f *.o ggobi libGGobi.so
