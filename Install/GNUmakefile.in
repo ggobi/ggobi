@@ -3,20 +3,21 @@
 # for 
 
 TOP=@TOP@
-
-.PHONY:	lib
+INSTALL=@INSTALL_DIR@
 
 XML_UTILS=@XML_UTILS@
 
 UTILS=$(XML_UTILS:%=bin/%)
 
-all: lib/libgtkext.so bin/ggobi @EMBED@ $(UTILS)
+all: lib/libgtkext.so bin/ggobi.bin @EMBED@ $(UTILS) @PACKAGES@
+
+.PHONY:	lib Rggobi Pythonggobi Perlggobi
 
 lib/libgtkext.so:
 	$(MAKE) -C gtkext/src install
 
-ggobi bin/ggobi: lib/libgtkext.so
-	$(MAKE) -C src ../bin/ggobi
+ggobi bin/ggobi.bin: lib/libgtkext.so
+	$(MAKE) -C src ../bin/ggobi.bin
 
 lib/libggobi.so:
 	$(MAKE) -C src ../lib/libggobi.so
@@ -25,9 +26,14 @@ lib/libggobi.so:
 bin/xmlConvert:
 	$(MAKE) -C src ../bin/xmlConvert
 
+install:
+	cp ggobi $(INSTALL_DIR)/bin
+
+Rggobi: lib/libggobi.so
+	(GGOBI_ROOT=`pwd` ; export GGOBI_ROOT ; @R_BIN@ INSTALL -c @R_PKG_DIR@ $@)
 
 clean:
-	for f in () ; do \
+	for f in (src gtkext/src) ; do \
 	  $(MAKE) -C $$f clean ; \
 	done
 

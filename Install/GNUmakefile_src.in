@@ -102,20 +102,21 @@ SRC=\
     @XML_SRC@ @MYSQL_SRC@
 
 ifdef USE_XML
- XML_INC_DIRS=$(@XML_INC_DIRS@:%=-I%)
+ XML_INC_DIRS=$(foreach el,@XML_INC_DIRS@, -I$(el))
+ XML_LIBS=$(foreach el,@XML_LIB_DIRS@, -L$(el)) -lxml
 endif
 
 ifdef USE_MYSQL
- XML_INC_DIRS=$(@MYSQL_INC_DIRS@:%=-I%)
+ MYSQL_INC_DIRS=$(@MYSQL_INC_DIRS@:%=-I%)
 endif
 
 OBJ=$(SRC:%.c=%.o)
 
-CFLAGS= -I../include -I../gtkext/include $(shell $(GTK_CONFIG) --cflags ) $(XML_INC_DIRS) $(MYSQL_INC_DIRS)
+CFLAGS= -I../include -I../gtkext/include $(shell $(GTK_CONFIG) --cflags ) $(XML_INC_DIRS) $(MYSQL_INC_DIRS) @XML_CFLAG_DEFINES@
 
-LIBS=-L$(TOP)/lib -lgtkext $(shell $(GTK_CONFIG) --libs)
+LIBS=-L$(TOP)/lib -lgtkext $(XML_LIBS) $(shell $(GTK_CONFIG) --libs)
 
-ggobi $(TOP)/bin/ggobi: $(OBJ)
+ggobi $(TOP)/bin/ggobi.bin: $(OBJ)
 	$(CC) $(LDFLAGS) -o $@ $(OBJ) $(LIBS)
 
 lib libggobi.so $(TOP)/lib/libggobi.so: $(OBJ:%.o=%.lo)
@@ -123,7 +124,7 @@ lib libggobi.so $(TOP)/lib/libggobi.so: $(OBJ:%.o=%.lo)
 
 
 ../bin/xmlConvert xmlConvert: xmlConvert.o libggobi.so
-	$(CC) -o $@ xml	-L$(TOP)/lib  -lggobi
+	$(CC) -o $@ xmlConvert.o -L$(TOP)/lib  -L. -lggobi -lgtkext
 
 %.lo:	%.c
 	$(CC) $(PIC_CFLAG) $(CFLAGS) -o $@ -c $<
