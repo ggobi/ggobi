@@ -1,0 +1,95 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20000303 Stylable//EN"
+"http://www.w3.org/TR/2000/03/WD-SVG-20000303/DTD/svg-20000303-exchange.dtd">
+
+<svg width="400px" height="400px">
+<g transform="translate(20, 0) scale (0.952381)">
+
+<path style="stroke: #000000" d="M 60 360 L 60 350 z"/>
+<path style="stroke: #000000" d="M 60 350 L 340 350 z"/>
+<path style="stroke: #000000" d="M 340 350 L 340 360 z"/>
+<text x="50" y="375" > 122 </text>
+<text x="330" y="375" > 242 </text>
+
+<path style="stroke: #000000" d="M 40 60 L 50 60 z"/>
+<path style="stroke: #000000" d="M 50 60 L 50 340 z"/>
+<path style="stroke: #000000" d="M 50 340 L 40 340 z"/>
+<text x="15" y="65" > 107 </text>
+<text x="15" y="345" > 146 </text>
+
+<circle style="fill: #ff8c00; stroke: #ff8c00" cx="220" cy="167" r="5"/>
+<circle style="fill: #ff8c00; stroke: #ff8c00" cx="206" cy="146" r="5"/>
+<circle style="fill: #ff8c00; stroke: #ff8c00" cx="241" cy="124" r="5"/>
+<circle style="fill: #ff8c00; stroke: #ff8c00" cx="179" cy="196" r="5"/>
+<circle style="fill: #ff8c00; stroke: #ff8c00" cx="174" cy="261" r="5"/>
+<circle style="fill: #ff8c00; stroke: #ff8c00" cx="148" cy="261" r="5"/>
+<circle style="fill: #ff8c00; stroke: #ff8c00" cx="213" cy="146" r="5"/>
+<circle style="fill: #ff8c00; stroke: #ff8c00" cx="209" cy="182" r="5"/>
+<circle style="fill: #ff8c00; stroke: #ff8c00" cx="181" cy="167" r="5"/>
+<circle style="fill: #ff8c00; stroke: #ff8c00" cx="155" cy="282" r="5"/>
+<circle style="fill: #ff8c00; stroke: #ff8c00" cx="218" cy="81" r="5"/>
+<circle style="fill: #ff8c00; stroke: #ff8c00" cx="181" cy="167" r="5"/>
+<circle style="fill: #ff8c00; stroke: #ff8c00" cx="244" cy="174" r="5"/>
+<circle style="fill: #ff8c00; stroke: #ff8c00" cx="218" cy="153" r="5"/>
+<circle style="fill: #ff8c00; stroke: #ff8c00" cx="200" cy="174" r="5"/>
+<circle style="fill: #ff8c00; stroke: #ff8c00" cx="204" cy="167" r="5"/>
+<circle style="fill: #ff8c00; stroke: #ff8c00" cx="188" cy="196" r="5"/>
+<circle style="fill: #ff8c00; stroke: #ff8c00" cx="190" cy="203" r="5"/>
+<circle style="fill: #ff8c00; stroke: #ff8c00" cx="265" cy="103" r="5"/>
+<circle style="fill: #ff8c00; stroke: #ff8c00" cx="200" cy="239" r="5"/>
+<circle style="fill: #ff8c00; stroke: #ff8c00" cx="209" cy="131" r="5"/>
+<circle style="fill: #ffff00; stroke: #ffff00" cx="144" cy="95" r="5"/>
+<circle style="fill: #ffff00; stroke: #ffff00" cx="116" cy="253" r="5"/>
+<circle style="fill: #ffff00; stroke: #ffff00" cx="127" cy="174" r="5"/>
+<circle style="fill: #ffff00; stroke: #ffff00" cx="60" cy="296" r="5"/>
+<circle style="fill: #ffff00; stroke: #ffff00" cx="97" cy="239" r="5"/>
+<circle style="fill: #ffff00; stroke: #ffff00" cx="83" cy="282" r="5"/>
+<circle style="fill: #ffff00; stroke: #ffff00" cx="81" cy="196" r="5"/>
+<circle style="fill: #ffff00; stroke: #ffff00" cx="90" cy="225" r="5"/>
+<circle style="fill: #ffff00; stroke: #ffff00" cx="67" cy="253" r="5"/>
+<circle style="fill: #ffff00; stroke: #ffff00" cx="78" cy="246" r="5"/>
+<circle style="fill: #ffff00; stroke: #ffff00" cx="78" cy="167" r="5"/>
+<circle style="fill: #ffff00; stroke: #ffff00" cx="97" cy="196" r="5"/>
+<circle style="fill: #ffff00; stroke: #ffff00" cx="78" cy="275" r="5"/>
+<circle style="fill: #ffff00; stroke: #ffff00" cx="109" cy="225" r="5"/>
+<circle style="fill: #ffff00; stroke: #ffff00" cx="134" cy="138" r="5"/>
+<circle style="fill: #ffff00; stroke: #ffff00" cx="118" cy="160" r="5"/>
+<circle style="fill: #ffff00; stroke: #ffff00" cx="104" cy="167" r="5"/>
+<circle style="fill: #ffff00; stroke: #ffff00" cx="81" cy="275" r="5"/>
+<circle style="fill: #ffff00; stroke: #ffff00" cx="111" cy="239" r="5"/>
+<circle style="fill: #ffff00; stroke: #ffff00" cx="95" cy="60" r="5"/>
+<circle style="fill: #ffff00; stroke: #ffff00" cx="109" cy="253" r="5"/>
+<circle style="fill: #ffff00; stroke: #ffff00" cx="90" cy="196" r="5"/>
+<circle style="fill: #99cc33; stroke: #99cc33" cx="209" cy="340" r="5"/>
+<circle style="fill: #99cc33; stroke: #99cc33" cx="267" cy="232" r="5"/>
+<circle style="fill: #99cc33; stroke: #99cc33" cx="244" cy="289" r="5"/>
+<circle style="fill: #99cc33; stroke: #99cc33" cx="340" cy="167" r="5"/>
+<circle style="fill: #99cc33; stroke: #99cc33" cx="204" cy="332" r="5"/>
+<circle style="fill: #99cc33; stroke: #99cc33" cx="267" cy="261" r="5"/>
+<circle style="fill: #99cc33; stroke: #99cc33" cx="281" cy="232" r="5"/>
+<circle style="fill: #99cc33; stroke: #99cc33" cx="295" cy="196" r="5"/>
+<circle style="fill: #99cc33; stroke: #99cc33" cx="260" cy="210" r="5"/>
+<circle style="fill: #99cc33; stroke: #99cc33" cx="239" cy="217" r="5"/>
+<circle style="fill: #99cc33; stroke: #99cc33" cx="267" cy="182" r="5"/>
+<circle style="fill: #99cc33; stroke: #99cc33" cx="283" cy="203" r="5"/>
+<circle style="fill: #99cc33; stroke: #99cc33" cx="248" cy="232" r="5"/>
+<circle style="fill: #99cc33; stroke: #99cc33" cx="223" cy="275" r="5"/>
+<circle style="fill: #99cc33; stroke: #99cc33" cx="230" cy="225" r="5"/>
+<circle style="fill: #99cc33; stroke: #99cc33" cx="267" cy="232" r="5"/>
+<circle style="fill: #99cc33; stroke: #99cc33" cx="211" cy="225" r="5"/>
+<circle style="fill: #99cc33; stroke: #99cc33" cx="223" cy="325" r="5"/>
+<circle style="fill: #99cc33; stroke: #99cc33" cx="295" cy="217" r="5"/>
+<circle style="fill: #99cc33; stroke: #99cc33" cx="213" cy="289" r="5"/>
+<circle style="fill: #99cc33; stroke: #99cc33" cx="279" cy="246" r="5"/>
+<circle style="fill: #99cc33; stroke: #99cc33" cx="206" cy="289" r="5"/>
+<circle style="fill: #99cc33; stroke: #99cc33" cx="190" cy="253" r="5"/>
+<circle style="fill: #99cc33; stroke: #99cc33" cx="211" cy="311" r="5"/>
+<circle style="fill: #99cc33; stroke: #99cc33" cx="211" cy="304" r="5"/>
+<circle style="fill: #99cc33; stroke: #99cc33" cx="244" cy="174" r="5"/>
+<circle style="fill: #99cc33; stroke: #99cc33" cx="211" cy="246" r="5"/>
+<circle style="fill: #99cc33; stroke: #99cc33" cx="265" cy="253" r="5"/>
+<circle style="fill: #99cc33; stroke: #99cc33" cx="232" cy="289" r="5"/>
+<circle style="fill: #99cc33; stroke: #99cc33" cx="230" cy="318" r="5"/>
+<circle style="fill: #99cc33; stroke: #99cc33" cx="211" cy="217" r="5"/>
+</g>
+</svg>

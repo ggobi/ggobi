@@ -1,0 +1,99 @@
+# Without R
+explore variables pairwise
+bring up parcoords plot; brush
+  downlight pink observations
+
+ggobi ("/usr/dfs/biopharm/ratcns")
+
+ratcns <- ggobi.getData()
+
+# to extend the R ui:
+#   edit the api files in ggobi
+#   edit RSGGobiCurrent.c in RS
+#   edit ggobi.S in RS/Src
+#
+# Look at the functional groups one at a time by hiding
+# all the cases not in the selected group.
+#
+# Another possibility might be to change the glyph type
+# for all groups but one to the point glyph; that won't
+# help with the parallel coordinates plot, though.
+#
+
+Func.Class.1 <- ratcns[,10]
+Func.Class.2 <- ratcns[,11]
+showClass <- function (n, .gobi=getDefaultGGobi()) {
+   N <- length(Func.Class.2)
+   tmp <- logical(N)
+   if (n != -1) {
+     tmp[Func.Class.2 != n] <- T
+   }
+   ggobi.setHiddenCases(tmp, .gobi)
+}
+
+#
+# cycle through classes
+#
+for (i in 1:14) {
+ showClass(i)
+ system("sleep 1")
+}
+showClass (-1)
+
+#
+# Don't forget that you want to cluster without the
+# last variables.  And you want to take the variable Cluster
+# out of the data.
+#
+dst <- dist(ratcns[,1:9])
+hc <- hclust(dst, "w")
+x11()
+plot.hclust (hc)
+cvar <- cutree (hc, 5)
+
+ggobi.addVariable (cvar, "cluster")
+showClust <- function (n, .gobi=getDefaultGGobi()) {
+   N <- length(cvar)
+   tmp <- logical(N)
+   tmp[cvar != n] <- T
+   ggobi.setHiddenCases(tmp, .gobi)
+}
+
+#
+# This should work if I can turn off identify.hclust properly,
+# with a middle click.
+#
+showClust <- function (hc, .gobi=getDefaultGGobi()) {
+  cl <- identify.hclust (hc, n=1)
+  which <- cl[[1]]
+  ggobi.setHiddenCases (which, .gobi)
+}
+#
+# cycle through clusters
+#
+for (k in 1:10)
+for (i in 1:5) {
+ showClust(i)
+ system("sleep 2")
+}
+}
+showClass (-1)
+
+
+#
+# identification
+#
+idfunc <- function (i) {
+  if (i >= 0) {
+    k <- i+1
+    print(k)
+    print(ratcns[k,1:9])
+  }
+}
+ggobi.setIdentifyHandler (function (i) {idfunc(i)});
+
+
+# principal components
+pc <- prcomp(ratcns[,1:9], center=T, scale=F)
+for (i in 1:9)
+  ggobi.addVariable (pc$x[,i], paste("pc",i))

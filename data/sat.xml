@@ -3,8 +3,40 @@
 
 <ggobidata>
 <data name="SAT scores">
+
 <description>
+SAT Scores
+
+Many administrators, teachers and parents perceive a "crisis in
+education" in the USA. Learned skills and test scores suggest lower
+achievement by students both over time and compared to their
+counterparts around the world. Much of the concern is whether our
+children will be able to compete in a global economy if they are
+underprepared to meet the challenges of the coming decades.
+
+Using the SAT scores of high school children as a measure of
+educational achievement, does it appear that the level of financial
+resources committed to schools in the U.S. influence educational
+success? What does influence SAT scores of U.S. students?
+
+The data contains 51 observations on the states and 10 variables for
+the school year 1988-1989. The variables in order are:
+
+  OBS    record number in file
+  SAT    Average combined verbal/math score (400-1600)
+  EXPEND Total expenditure for elementary and secondary public education
+           used for instructional, noninstructional and support services
+           in thousands of dollars.
+  PERPUPIL Total amount ($) per pupil
+  ENROLL   Enrollment, Fall 1988
+  TEACHERS Total number of teachers, measured in full-time equivalents
+  ATTEND   Average daily attendance
+  RATIO    Pupil/Teacher ratio
+  SALARY   Average teacher salary
+  COMPUTER Total number of personal computers
+  STATE    State, in alphabetical order
 </description>
+
 <variables count="10">
  <variable>STATE</variable>
  <variable>SAT</variable>
