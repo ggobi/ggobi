@@ -24,9 +24,8 @@ endif
 #GGOBI_LIB=-L$(GGOBI_LIB_DIR) -lggobi
 GGOBI_LIB=
 
-
 HEADERS=ggvis defines
-SRC=ggvis init ggv_cbacks stressplot histogram mds ggv_qsort ggv_utils
+SRC=ggvis init ggv_cbacks stressplot histogram mds ggv_qsort ggv_utils Dtarget
 OBJS=$(SRC:%=%.o)
 
 $(PKG).so: $(OBJS)
