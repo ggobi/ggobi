@@ -98,7 +98,11 @@ parse_command_line (gint *argc, gchar **av)
     /*
      * -s:  ggobi initiated from inside S
     */
-    if (strcmp (av[1], "-s") == 0)
+    if (strcmp (av[1], "--help") == 0 || strcmp (av[1], "-help") == 0) {
+	showHelp();
+        exit(0);
+    }
+    else if (strcmp (av[1], "-s") == 0)
       sessionOptions->data_mode = Sprocess_data;
     else if (strcmp (av[1], "-ascii") == 0) {
       sessionOptions->data_mode = ascii_data;
@@ -125,7 +129,7 @@ parse_command_line (gint *argc, gchar **av)
    else if(strcmp(av[1], "--silent") == 0  || strcmp(av[1], "-silent") == 0)  {
       sessionOptions->verbose = GGOBI_SILENT;
    } 
- #ifdef USE_MYSQL
+#ifdef USE_MYSQL
     else if (strcmp (av[1], "-mysql") == 0) {
     }
 #endif
@@ -142,7 +146,6 @@ parse_command_line (gint *argc, gchar **av)
     else if (strcmp (av[1], "-version") == 0) {
       g_printerr ("This version of GGobi is dated %s\n", GGOBI(getVersionDate()));
       exit (0);
-
     } else if (strcmp (av[1], "--version") == 0) {
       g_printerr ("%s\n", GGOBI(getVersionString()));
       exit (0);
@@ -188,7 +191,6 @@ parse_command_line (gint *argc, gchar **av)
 #else
       g_printerr ("--activeColorScheme not supported without XML\n"); fflush(stderr);
 #endif
-
     }  else if(strcmp(av[1], "-datamode") == 0) {
       sessionOptions->data_type = g_strdup(av[2]);
       (*argc)--; av++;

@@ -14,6 +14,9 @@ ifndef BIBTEX
  BIBTEX=bibtex
 endif
 
+ifndef XSLT
+ XSLT=xsltproc
+endif
 
 # Run it twice to get cross-references correct.
 %.dvi: %.tex
@@ -28,3 +31,7 @@ endif
 	(TEXINPUTS=$(TEXINPUTS):$(OMEGA_HOME)/Docs:: ; export TEXINPUTS ; $(PDFLATEX) $<)
 	-$(BIBTEX) $*
 	(TEXINPUTS=$(TEXINPUTS):$(OMEGA_HOME)/Docs:: ; export TEXINPUTS ; $(PDFLATEX) $<)
+
+
+commandArgs.html: commandArgs.xml ../share/XSL/commandArgs.xsl
+	$(XSLT)  ../share/XSL/commandArgs.xsl commandArgs.xml > $@

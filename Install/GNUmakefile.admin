@@ -46,7 +46,7 @@ DOC_TEX_FILES=\
 
 DOC_EXTENSION=pdf
 
-DOC_FILES=$(DOC_TEX_FILES:%=Docs/%.$(DOC_EXTENSION)) Docs/ggobi.css Docs/EmbeddingFAQ.html Docs/plotLayout.html $(shell find notes -name '*.jpg')
+DOC_FILES=$(DOC_TEX_FILES:%=Docs/%.$(DOC_EXTENSION)) Docs/ggobi.css Docs/EmbeddingFAQ.html Docs/plotLayout.html $(shell find notes -name '*.jpg') Docs/commandArgs.html
 
 C_SRC_FILES=$(SRC) $(XML_SRC) xmlConvert.c 
 
@@ -67,7 +67,7 @@ LGPL_HEADERS:=$(GTK_EXTRA_SRC:%.c=%.h)
 LGPL_SRC=$(GTK_EXTRA_SRC) mt19937ar.c cokus.c
 
 
-createDist: Install/configure $(DOC_FILES) $(DATA_FILES)
+createDist: Install/configure $(DOC_FILES) $(DATA_FILES) CmdArgHelp.c
 	if test -d $(TMP_INSTALL_DIR) ; then rm -fr $(TMP_INSTALL_DIR) ; fi
 	mkdir -p $(TMP_INSTALL_DIR)
 	chgrp xgobi $(TMP_INSTALL_DIR) ; chmod g+ws $(TMP_INSTALL_DIR) ;
@@ -90,7 +90,7 @@ createDist: Install/configure $(DOC_FILES) $(DATA_FILES)
 	if test -n "${DOC_FILES}" ; then cp $(DOC_FILES) $(TMP_INSTALL_DIR)/Docs ; fi
 	cp $(DATA_FILES) $(TMP_INSTALL_DIR)/data
 	cp notes/ggobirc $(TMP_INSTALL_DIR)/examples
-	cp $(C_SRC_FILES) $(TMP_INSTALL_DIR)/src
+	cp $(C_SRC_FILES) CmdArgHelp.c $(TMP_INSTALL_DIR)/src
 	cp $(C_HEADER_FILES:%=%.h) $(TMP_INSTALL_DIR)/include
 	cp $(LGPL_SRC) $(TMP_INSTALL_DIR)/gtkext/src
 	cp $(LGPL_HEADERS) $(TMP_INSTALL_DIR)/gtkext/include

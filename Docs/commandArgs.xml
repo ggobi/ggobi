@@ -1,0 +1,185 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE commandArguments>
+
+<arguments>
+
+<arg name="help" type="gnu" novalue="true">
+<description>
+ask for the list of command line arguments accepted
+by GGobi and a brief description of each.
+</description>
+<quickHelp>
+display help on the console
+</quickHelp>
+</arg>
+
+<arg name="s">
+<description>
+specifies the input mode as being S data, i.e. coming from an S process.
+</description>
+<quickHelp>
+use S as the data mode
+</quickHelp>
+</arg>
+
+<arg name="ascii">
+<description>
+specifies the input mode as being ASCII, the old-style xgobi format
+in which the data, variable names, record labels, colors, etc.
+are given in separate but parallel files identified by 
+particular extensions.
+</description>
+<quickHelp>
+use the xgobi-style ASCII data mode
+</quickHelp>
+</arg>
+
+<arg name="xml">
+<description>
+specifies the input mode as being XML, the new style GGobi format
+which allows multiple self-contained datasets
+to be included in a single file, URI, string, etc.
+</description>
+<quickHelp>
+use XML data format
+</quickHelp>
+</arg>
+
+<arg name="mysql" group="input" ignored="true" broken="true">
+<description>
+currently ignored. Intended to specify
+that one should use the MySQL plugin to read
+the data. This is now done via
+<argRef name="datamode" />
+</description>
+<quickHelp>
+ignored. See --datamode.
+</quickHelp>
+</arg>
+
+
+<arg name="validate">
+<description>
+activate validation mode when reading XML input.
+This is only supported if configured with support
+for XML.
+</description>
+<quickHelp>
+validate XML datasets during input
+</quickHelp>
+</arg>
+
+<arg name="v" alias="validate" />
+
+<arg name="verbose" type="both" novalue="true"><!-- both -verbose value-->
+                                               <!-- and - -verbose=value -->
+<description>
+set the level of diagnostic output to high
+which means that GGobi will print a lot of messages
+to the console indicating what it is currently doing.
+This is useful for debugging.
+</description>
+<quickHelp>
+display verbose diagnostic output on console
+</quickHelp>
+</arg>
+<arg name="V" alias="verbose"/>
+
+<arg name="silent" type="both" novalue="true">
+<description>
+set the diagnostic output to off so that very few
+messages are printed to the screen.
+</description>
+<quickHelp>
+display little or no diagnostic output
+</quickHelp>
+</arg>
+
+
+<arg name="version" type="both" novalue="true">
+<description>
+print the version information on the console.
+This should be used when submitting a bug report.
+</description>
+<quickHelp>
+display version information
+</quickHelp>
+</arg>
+
+<arg name="init" type="gnu">
+<description>
+specify the name of the initialization file
+from which to read preferences, available plugins,
+etc.
+</description>
+<requires name="XML"/>
+<quickHelp>
+name of initialization file
+</quickHelp>
+</arg>
+
+<arg name="noinit">
+<description>
+specifies that no initialization file should be used.
+</description>
+<quickHelp>
+don't read any initialization files
+</quickHelp>
+</arg>
+
+<arg name="colorschemes" type="both">
+<description>
+specify the name of the XML source file or URL from
+which to read the session-wide colorschemes to use within GGobi.
+</description>
+<quickHelp>
+name of XML file containing color scheme descriptions.
+</quickHelp>
+<requires name="XML"/>
+</arg>
+
+<arg name="activeColorScheme" type="both">
+<description>
+specify the name of the active/default colorscheme to use
+in a newly created GGobi.
+The value should exactly match the name of
+the desired colorscheme given in the XML file.
+</description>
+<quickHelp>
+name of the default color scheme to use
+</quickHelp>
+</arg>
+
+<arg name="datamode" type="both">
+<description>
+specifies the mode for reading the data.
+This gives the input mechanism a hint and
+can also be used to identify a particular input plugin
+by giving its <xml:elementName>modeName</xml:elementName>
+value.
+</description>
+<quickHelp>
+specify datamode (for plugins)
+</quickHelp>
+</arg>
+
+<arg name="keepalive" action="toggle">
+<description>
+toggles whether to quit when there are no GGobi
+instances remaining. 
+By default, this is true. So specifying this argument
+turns it off and means that the GGobi session
+will persist eventhough there are no GGobis and
+no way for the user to interact with the session
+via a GUI. This is for use
+when embedding GGobi within other applications
+and/or  languages, e.g. <url href="http://www.ggobi.org/RSggobi">RSggobi</url>
+</description>
+<quickHelp>
+don't terminate if no GGobi windows are open
+</quickHelp>
+</arg>
+
+</arguments>
+

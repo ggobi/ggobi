@@ -115,7 +115,8 @@ SRC=array.c ash1d.c \
 \
  mt19937ar.c cokus.c \
  fileio.c print.c \
- xlines.c
+ xlines.c \
+ help.c
 
 OB=array.o ash1d.o \
  barchart.o barchart_ui.o \
@@ -148,6 +149,7 @@ OB=array.o ash1d.o \
 \
  fileio.o print.o \
  xlines.o \
+ help.o
 
 ifdef GTK_2
  SRC+=marshal.c
@@ -326,6 +328,27 @@ print.o: print.c print.h
 	$(CC) -E $(CFLAGS) -I. $(GTK_CFLAGS) $< > $@
 
 
+ifndef R
+  # how to invoke R.
+ R=R
+endif
+
+USE_R_XSL=1
+
+ifndef XSLT
+ XSLT=xsltproc
+endif
+
+help.o: CmdArgHelp.c
+
+# One can also use the XSL mechanism
+# as in
+CmdArgHelp.c: share/R/commandArgs.S Docs/commandArgs.xml
+ifdef USE_R_XSL
+	echo 'source("share/R/commandArgs.S") ; cat(createCmdArgHelp(getArgInfo("Docs/commandArgs.xml")), file="$@")' | $(R) --vanilla 
+else
+	 $(XSLT) share/XSL/CmdArgHelp.xsl Docs/commandArgs.xml > $@
+endif
 
 # Where is the output?
 apiDoc: Install/apiDocConfig

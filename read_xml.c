@@ -296,7 +296,9 @@ startXMLElement(void *user_data, const xmlChar *name, const xmlChar **attrs)
 
     case REAL:   
     case INT:   
-    case NA:   
+    case NA:  
+	if(data->recordString)
+	    setRecordValues(data, data->recordString, data->recordStringLength);
     break;
     default:
       fprintf(stderr, "Unrecognized XML state %s\n", name); fflush(stderr);    
