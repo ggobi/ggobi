@@ -16,6 +16,8 @@
 
 #include "vartable.h"
 
+#include <string.h> /* for strcmp() */
+
 #ifdef MULTIPLE_CLISTS
 #define NCOLS_CAT 9
 #endif
@@ -359,7 +361,7 @@ vartable_subwindow_init (datad *d, ggobid *gg)
 void
 vartable_open (ggobid *gg)
 {                                  
-  GtkWidget *vbox, *hbox, *hb, *btn;
+  GtkWidget *vbox, *hbox;
   GSList *l;
   datad *d;
 

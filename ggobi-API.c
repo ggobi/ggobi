@@ -937,14 +937,14 @@ GGOBI(close)(ggobid *gg, gboolean closeWindow)
   return(val);
 }
 
-
+#ifdef EXPLICIT_IDENTIFY_HANDLER 
 void
 GGOBI(setIdentifyHandler)(IdentifyProc proc,  void *data, ggobid *gg)
 {
   gg->identify_handler.handler = proc;
   gg->identify_handler.user_data = data;
 }
-
+#endif
 
 void
 GGOBI(getBrushSize)(gint *w, gint *h, ggobid *gg)

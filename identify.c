@@ -133,7 +133,7 @@ identify_link_by_id (gint k, datad *source_d, ggobid *gg)
       if (d->rowid.id.nels > 0 && d->rowid.idv.nels > id) {
         /*-- i is the row number, irrespective of rows_in_plot --*/
         i = d->rowid.idv.els[id];
-        if (id < 0)   /*-- then no cases in d have this id --*/
+        if (i < 0)   /*-- then no cases in d have this id --*/
           ;
 
         else {

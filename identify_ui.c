@@ -152,10 +152,12 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
   if (k != d->nearest_point_prev) {
     displays_plot (NULL, QUICK, gg);
 
+#ifdef EXPLICIT_IDENTIFY_HANDLER 
     if (gg->identify_handler.handler) {
       (gg->identify_handler.handler)(gg->identify_handler.user_data,
         k, sp, w, gg);
     }
+#endif
 
     {
       GGobiPointMoveEvent ev;

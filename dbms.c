@@ -1,6 +1,7 @@
 #include "dbms_ui.h"
 
 #include <stdlib.h>
+#include <string.h> /* memset() */
 
 DBMSLoginInfo DefaultDBMSInfo;
 

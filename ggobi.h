@@ -136,7 +136,9 @@ struct _ggobid {
   gboolean firsttime;
 
   gboolean close_pending;
+#ifdef EXPLICIT_IDENTIFY_HANDLER 
   IdentifyHandler identify_handler;
+#endif
 
 /*--------------------------------------------------------------------*/
 /*                      reading in the data                           */
