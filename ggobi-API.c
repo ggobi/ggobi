@@ -56,6 +56,14 @@ GGOBI(getDataMode) (ggobid *gg)
   return(gg->data_mode);
 }
 
+DataMode
+GGOBI(setDataMode) (DataMode newMode, ggobid *gg)
+{
+  DataMode old = gg->data_mode;
+  gg->data_mode = newMode;
+  return(old);
+}
+
 const gchar * const 
 GGOBI(getDataModeDescription)(DataMode mode)
 {
@@ -161,6 +169,7 @@ GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
 
   br_color_ids_alloc (d, gg);
   br_color_ids_init (d, gg);
+
 
   hidden_alloc (d);
 
