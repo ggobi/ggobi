@@ -264,7 +264,8 @@ ggobi_remove_by_index (ggobid *gg, gint which)
     gg->d = g_slist_remove (gg->d, d);
   }
 
-  g_free (gg);
+  gtk_object_destroy(GTK_OBJECT(gg));
+/*  g_free (gg); */
 
   return (which);
 }
@@ -313,9 +314,11 @@ ggobid* /*XXX should be void. Change when gtk-object setup settles. */
 ggobi_alloc(ggobid *tmp)
 {
   if(tmp == NULL) {
-      /* Should never happen in new GtkObject-based version. */
-      tmp = (ggobid*) g_malloc (sizeof (ggobid));
-      memset (tmp, '\0', sizeof (ggobid)); 
+      /* Should never happen in new GtkObject-based version. 
+	 tmp = (ggobid*) g_malloc (sizeof (ggobid));
+	 memset (tmp, '\0', sizeof (ggobid)); 
+      */
+	tmp = gtk_type_new(GTK_TYPE_GGOBI);
   }
 
   tmp->firsttime = true;

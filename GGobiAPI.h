@@ -988,7 +988,7 @@ void GGobi_setSessionOptions(GGobiOptions *opts);
 Set the fatal error handler so that host applications
 can control how to recover from GGobi "exceptions"
  */
-void GGOBI(setErrorHandlers)(FatalErrorHandler *err);
+void GGOBI(setErrorHandlers)(FatalErrorHandler err);
 
 /**
 

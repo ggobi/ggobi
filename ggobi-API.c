@@ -41,14 +41,14 @@ void GGOBI(splot_release)(splotd *sp, displayd *display, ggobid *gg);
 void GGOBI(data_release)(datad *, ggobid *gg);
 void GGOBI(vartable_free)(datad *, ggobid *gg);
 void GGOBI(vardatum_free)(vartabled *var, ggobid *gg);
-void GGOBI(setErrorHandlers)(FatalErrorHandler *err);
+void GGOBI(setErrorHandlers)(FatalErrorHandler err);
 #ifdef __cplusplus
 }
 #endif
 
 
 void
-GGOBI(setErrorHandlers)(FatalErrorHandler *err)
+GGOBI(setErrorHandlers)(FatalErrorHandler err)
 {
     if(!err)
        return;
@@ -1226,8 +1226,6 @@ GGOBI(addCategoricalVariable)(gdouble *vals, gint num, gchar *name,
   gchar **levels, gint *values, gint *counts, gint numLevels,
   gboolean update, datad *d, ggobid *gg)
 {
-  gint i;
-
   if (d->ncols < 1) {
     gchar ** rnames = &DefaultRowNames; 
     /* May want the final false here to be true as it causes the 

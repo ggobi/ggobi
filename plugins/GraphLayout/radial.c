@@ -842,7 +842,25 @@ setNodePositions (glayoutd *gl, datad *d) {
   setChildNodePositions (gl->radial->centerNode, gl, d);
 }
 
+void
+do_radial_plugin(PluginInstance *inst, gint center, datad *d, datad *e, displayd *dsp, ggobid *gg)
+{
+   glayoutd *gl;
+   gl = glayoutFromInst (inst);
 
+
+   if(!gl) {
+    gl = (glayoutd *) g_malloc (sizeof (glayoutd));
+    glayout_init (gl);
+    inst->data = gl;
+   } 
+
+   gl->dsrc = d;
+   gl->e = e;
+   gl->centerNodeIndex = center;
+
+   do_radial(gl, d, e, dsp, gg);
+}
 
 #ifdef WITH_R
 #ifdef NEW
