@@ -420,25 +420,25 @@ varcircle_draw (gint jvar, datad *d, ggobid *gg)
       switch (cpanel->projection) {
         case TOUR1D:
           x = 0;
-          y = (gint) (display->u.vals[0][jvar]*(gfloat)r);
+          y = (gint) (display->t1d.u.vals[0][jvar]*(gfloat)r);
           gdk_draw_line (da_pix,
             gg->selvarfg_GC, r, r, r+x, r-y);
 
-          for (k=0; k<display->ntour_vars; k++) {
-            if (display->tour_vars.els[k] == jvar) {
+          for (k=0; k<display->t1d.nvars; k++) {
+            if (display->t1d.vars.els[k] == jvar) {
               chosen = true;
               break;
             }
           }
           break;
         case TOUR2D:
-          x = (gint) (display->u.vals[0][jvar]*(gfloat)r);
-          y = (gint) (display->u.vals[1][jvar]*(gfloat)r);
+          x = (gint) (display->t2d.u.vals[0][jvar]*(gfloat)r);
+          y = (gint) (display->t2d.u.vals[1][jvar]*(gfloat)r);
           gdk_draw_line (da_pix,
             gg->selvarfg_GC, r, r, r+x, r-y);
 
-          for (k=0; k<display->ntour_vars; k++) {
-            if (display->tour_vars.els[k] == jvar) {
+          for (k=0; k<display->t2d.nvars; k++) {
+            if (display->t2d.vars.els[k] == jvar) {
               chosen = true;
               break;
             }

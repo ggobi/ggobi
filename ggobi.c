@@ -177,6 +177,7 @@ ggobi_alloc()
 
   tmp->color_ui.margin = 10;
   tmp->tour2d.idled = 0;
+  tmp->tour1d.idled = 0;
 
   all_ggobis = (ggobid **)
     g_realloc (all_ggobis, sizeof(ggobid*)*(num_ggobis+1));

@@ -10,60 +10,270 @@
 #include "vars.h"
 #include "externs.h"
 
+void
+alloc_tour2d (displayd *dsp, ggobid *gg)
+{
+  datad *d = dsp->d;
+  gint nc = d->ncols;
+
+  /* first index is the projection dimensions, second dimension is ncols */
+  arrayf_init(&dsp->t2d.u0);
+  arrayf_alloc(&dsp->t2d.u0, nc, nc);
+
+  arrayf_init(&dsp->t2d.u1);
+  arrayf_alloc(&dsp->t2d.u1, nc, nc);
+
+  arrayf_init(&dsp->t2d.u);
+  arrayf_alloc(&dsp->t2d.u, nc, nc);
+
+  arrayf_init(&dsp->t2d.v0);
+  arrayf_alloc(&dsp->t2d.v0, nc, nc);
+
+  arrayf_init(&dsp->t2d.v1);
+  arrayf_alloc(&dsp->t2d.v1, nc, nc);
+
+  arrayf_init(&dsp->t2d.v);
+  arrayf_alloc(&dsp->t2d.v, nc, nc);
+
+  arrayf_init(&dsp->t2d.uvevec);
+  arrayf_alloc(&dsp->t2d.uvevec, nc, nc);
+
+  arrayf_init(&dsp->t2d.tv);
+  arrayf_alloc(&dsp->t2d.tv, nc, nc);
+
+  vectori_init(&dsp->t2d.vars);
+  vectori_alloc(&dsp->t2d.vars, nc);
+  vectorf_init(&dsp->t2d.lambda);
+  vectorf_alloc(&dsp->t2d.lambda, nc);
+  vectorf_init(&dsp->t2d.tau);
+  vectorf_alloc(&dsp->t2d.tau, nc);
+  vectorf_init(&dsp->t2d.tinc);
+  vectorf_alloc(&dsp->t2d.tinc, nc);
+
+}
+
+/*-- eliminate the nc columns contained in *cols --*/
+void
+tour2d_realloc_down (gint nc, gint *cols, datad *d, ggobid *gg)
+{
+  displayd *dsp;
+  GList *l;
+  for (l=gg->displays; l; l=l->next) {
+    dsp = (displayd *) l->data;
+    if (dsp->d == d) {
+      arrayf_delete_cols (&dsp->t2d.u0, nc, cols);
+      arrayf_delete_cols (&dsp->t2d.u1, nc, cols);
+      arrayf_delete_cols (&dsp->t2d.u, nc, cols);
+      arrayf_delete_cols (&dsp->t2d.v0, nc, cols);
+      arrayf_delete_cols (&dsp->t2d.v1, nc, cols);
+      arrayf_delete_cols (&dsp->t2d.v, nc, cols);
+      arrayf_delete_cols (&dsp->t2d.uvevec, nc, cols);
+      arrayf_delete_cols (&dsp->t2d.tv, nc, cols);
+
+      vectori_delete_els (&dsp->t2d.vars, nc, cols);
+      vectorf_delete_els (&dsp->t2d.lambda, nc, cols);
+      vectorf_delete_els (&dsp->t2d.tau, nc, cols);
+      vectorf_delete_els (&dsp->t2d.tinc, nc, cols);
+    }
+  }
+}
+
+/*-- append columns for a total of nc columns --*/
+void
+tour2d_realloc_up (gint nc, datad *d, ggobid *gg)
+{
+  displayd *dsp;
+  GList *l;
+  for (l=gg->displays; l; l=l->next) {
+    dsp = (displayd *) l->data;
+    if (dsp->d == d) {
+      arrayf_add_cols (&dsp->t2d.u0, nc);
+      arrayf_add_cols (&dsp->t2d.u1, nc);
+      arrayf_add_cols (&dsp->t2d.u, nc);
+      arrayf_add_cols (&dsp->t2d.v0, nc);
+      arrayf_add_cols (&dsp->t2d.v1, nc);
+      arrayf_add_cols (&dsp->t2d.v, nc);
+      arrayf_add_cols (&dsp->t2d.uvevec, nc);
+      arrayf_add_cols (&dsp->t2d.tv, nc);
+
+      vectori_realloc (&dsp->t2d.vars, nc);
+      vectorf_realloc (&dsp->t2d.lambda, nc);
+      vectorf_realloc (&dsp->t2d.tau, nc);
+      vectorf_realloc (&dsp->t2d.tinc, nc);
+    }
+  }
+}
+
+void
+free_tour2d(displayd *dsp)
+{
+  /*  gint k;*/
+  /*  datad *d = dsp->d;*/
+  /*  gint nc = d->ncols;*/
+
+  vectori_free(&dsp->t2d.vars);
+  vectorf_free(&dsp->t2d.lambda);
+  vectorf_free(&dsp->t2d.tau);
+  vectorf_free(&dsp->t2d.tinc);
+
+  arrayf_free(&dsp->t2d.u0, 0, 0);
+  arrayf_free(&dsp->t2d.u1, 0, 0);
+  arrayf_free(&dsp->t2d.u, 0, 0);
+
+  arrayf_free(&dsp->t2d.v0, 0, 0);
+  arrayf_free(&dsp->t2d.v1, 0, 0);
+  arrayf_free(&dsp->t2d.v, 0, 0);
+
+  arrayf_free(&dsp->t2d.uvevec, 0, 0);
+  arrayf_free(&dsp->t2d.tv, 0, 0);
+
+  /*  for (k=0; k<nc; k++)
+    g_free((gpointer) dsp->u[k]);
+  g_free((gpointer) dsp->u);
+  for (k=0; k<nc; k++)
+    g_free((gpointer) dsp->u0[k]);
+  g_free((gpointer) dsp->u0);
+  for (k=0; k<nc; k++)
+    g_free((gpointer) dsp->u1[k]);
+  g_free((gpointer) dsp->u1);
+  for (k=0; k<nc; k++)
+    g_free((gpointer) dsp->uold[k]);
+  g_free((gpointer) dsp->uold);
+
+  for (k=0; k<nc; k++)
+    g_free((gpointer) dsp->v0[k]);
+  g_free((gpointer) dsp->v0);
+  for (k=0; k<nc; k++)
+    g_free((gpointer) dsp->v1[k]);
+  g_free((gpointer) dsp->v1);
+  for (k=0; k<nc; k++)
+    g_free((gpointer) dsp->v[k]);
+  g_free((gpointer) dsp->v);
+  for (k=0; k<nc; k++)
+    g_free((gpointer) dsp->uvevec[k]);
+  g_free((gpointer) dsp->uvevec);
+  for (k=0; k<nc; k++)
+    g_free((gpointer) dsp->tv[k]);
+  g_free((gpointer) dsp->tv);*/
+
+}
+
+void 
+display_tour2d_init (displayd *dsp, ggobid *gg) {
+  gint i, j;
+  datad *d = dsp->d;
+  cpaneld *cpanel = &dsp->cpanel;
+  gint nc = d->ncols;
+
+  alloc_tour2d(dsp, gg);
+ 
+    /* Initialize starting subset of active variables */
+  dsp->t2d.nvars = nc;
+  for (j=0; j<nc; j++)
+    dsp->t2d.vars.els[j] = j;
+  /*  dsp->t2d.vars.els[0] = 0;
+  dsp->t2d.vars.els[1] = 1;
+  dsp->t2d.vars.els[2] = 2;*/
+
+  /* declare starting base as first p chosen variables */
+  for (i=0; i<nc; i++)
+    for (j=0; j<nc; j++)
+      dsp->t2d.u0.vals[i][j] = dsp->t2d.u1.vals[i][j] = dsp->t2d.u.vals[i][j] = 
+        dsp->t2d.v0.vals[i][j] = dsp->t2d.v1.vals[i][j] = 0.0;
+
+  for (i=0; i<nc; i++)
+  {
+    dsp->t2d.u1.vals[i][dsp->t2d.vars.els[i]] =
+      dsp->t2d.u0.vals[i][dsp->t2d.vars.els[i]] = 
+      dsp->t2d.u.vals[i][dsp->t2d.vars.els[i]] =
+      dsp->t2d.v0.vals[i][dsp->t2d.vars.els[i]] = 
+      dsp->t2d.v1.vals[i][dsp->t2d.vars.els[i]] = 1.0;
+  }
+
+  /*  dsp->ts[0] = 0;
+  dsp->ts[1] = M_PI_2;
+  dsp->coss[0] = 1.0;
+  dsp->coss[1] = 0.0;
+  dsp->sins[1] = 1.0;
+  dsp->sins[0] = 0.0;
+  dsp->icoss[0] = PRECISION2;
+  dsp->icoss[1] = 0;
+  dsp->isins[1] = PRECISION2;
+  dsp->isins[0] = 0;*/
+
+  /*  zero_tau(dsp, gg);*/
+  dsp->t2d.dv = 1.0;
+  dsp->t2d.delta = cpanel->t2d_step*M_PI_2/10.0;
+  dsp->t2d.nsteps = 1; 
+  dsp->t2d.stepcntr = 1;
+
+  dsp->t2d.idled = 0;
+  dsp->t2d.get_new_target = true;
+}
+
+void tour2d_speed_set(gint slidepos, ggobid *gg) {
+  displayd *dsp = gg->current_display; 
+  cpaneld *cpanel = &dsp->cpanel;
+  extern void speed_set (gint, gfloat *, gfloat *, gfloat, gint *, gint *);
+
+  speed_set(slidepos, &cpanel->t2d_step, &dsp->t2d.delta,  dsp->t2d.dv,
+    &dsp->t2d.nsteps, &dsp->t2d.stepcntr);
+}
+
 void 
 set_tour2dvar(ggobid *gg, gint jvar)
 {
   gint j, jtmp, k;
   gboolean selected=false;
   displayd *dsp = gg->current_display;
-  extern void zero_tau(displayd *, ggobid *);
+  /*  extern void zero_tau(displayd *, ggobid *);
   extern void zero_tinc(displayd *, ggobid *);
-  extern void init_basis(displayd *, ggobid *);
+  extern void init_basis(displayd *, ggobid *);*/
 
-  for (j=0; j<dsp->ntour_vars; j++)
-    if (jvar == dsp->tour_vars.els[j])
+  for (j=0; j<dsp->t2d.nvars; j++)
+    if (jvar == dsp->t2d.vars.els[j])
       selected = true;
 
-  /* deselect var if ntour_vars > 2 */
+  /* deselect var if t2d.nvars > 2 */
   if (selected) {
-    if (dsp->ntour_vars > 2) {
-      for (j=0; j<dsp->ntour_vars; j++) {
-        if (jvar == dsp->tour_vars.els[j]) 
+    if (dsp->t2d.nvars > 2) {
+      for (j=0; j<dsp->t2d.nvars; j++) {
+        if (jvar == dsp->t2d.vars.els[j]) 
           break;
       }
-      if (j<dsp->ntour_vars-1) {
-        for (k=j; k<dsp->ntour_vars-1; k++){
-          dsp->tour_vars.els[k] = dsp->tour_vars.els[k+1];
+      if (j<dsp->t2d.nvars-1) {
+        for (k=j; k<dsp->t2d.nvars-1; k++){
+          dsp->t2d.vars.els[k] = dsp->t2d.vars.els[k+1];
 	}
       }
-      dsp->ntour_vars--;
+      dsp->t2d.nvars--;
     }
   }
   else { /* not selected, so add the variable */
-    if (jvar > dsp->tour_vars.els[dsp->ntour_vars-1]) {
-      dsp->tour_vars.els[dsp->ntour_vars] = jvar;
+    if (jvar > dsp->t2d.vars.els[dsp->t2d.nvars-1]) {
+      dsp->t2d.vars.els[dsp->t2d.nvars] = jvar;
     }
-    else if (jvar < dsp->tour_vars.els[0]) {
-      for (j=dsp->ntour_vars; j>0; j--) {
-          dsp->tour_vars.els[j] = dsp->tour_vars.els[j-1];
+    else if (jvar < dsp->t2d.vars.els[0]) {
+      for (j=dsp->t2d.nvars; j>0; j--) {
+          dsp->t2d.vars.els[j] = dsp->t2d.vars.els[j-1];
       }
-      dsp->tour_vars.els[0] = jvar;
+      dsp->t2d.vars.els[0] = jvar;
     }
     else {
-      for (j=0; j<dsp->ntour_vars-1; j++) {
-        if (jvar > dsp->tour_vars.els[j] && jvar < dsp->tour_vars.els[j+1]) {
+      for (j=0; j<dsp->t2d.nvars-1; j++) {
+        if (jvar > dsp->t2d.vars.els[j] && jvar < dsp->t2d.vars.els[j+1]) {
           jtmp = j+1;
           break;
 	}
       }
-      for (j=dsp->ntour_vars-1;j>=jtmp; j--) 
-          dsp->tour_vars.els[j+1] = dsp->tour_vars.els[j];
-      dsp->tour_vars.els[jtmp] = jvar;
+      for (j=dsp->t2d.nvars-1;j>=jtmp; j--) 
+          dsp->t2d.vars.els[j+1] = dsp->t2d.vars.els[j];
+      dsp->t2d.vars.els[jtmp] = jvar;
     }
-    dsp->ntour_vars++;
+    dsp->t2d.nvars++;
   }
 
-  dsp->tour_get_new_target = true;
+  dsp->t2d.get_new_target = true;
 }
 
 void
@@ -86,8 +296,8 @@ tour2d_projdata(splotd *sp, glong **world_data, datad *d, ggobid *gg) {
     sp->planar[i].y = 0;
     for (j=0; j<d->ncols; j++)
     {
-      sp->planar[i].x += (gint)(dsp->u.vals[0][j]*world_data[i][j]);
-      sp->planar[i].y += (gint)(dsp->u.vals[1][j]*world_data[i][j]);
+      sp->planar[i].x += (gint)(dsp->t2d.u.vals[0][j]*world_data[i][j]);
+      sp->planar[i].y += (gint)(dsp->t2d.u.vals[1][j]*world_data[i][j]);
     }
   }
 }
@@ -95,30 +305,40 @@ tour2d_projdata(splotd *sp, glong **world_data, datad *d, ggobid *gg) {
 void
 tour2d_run(displayd *dsp, ggobid *gg)
 {
-  extern gboolean reached_target(displayd *);
-  extern void increment_tour(displayd *, gint);
-  extern void do_last_increment(displayd *, gint);
-  extern void gt_basis(displayd *, ggobid *, gint);
-  extern void path(displayd *, gint);
-  extern void tour_reproject(displayd *, gint);
-  extern void copy_mat(gfloat **, gfloat**, gint, gint);
+  extern gboolean reached_target(gint, gint);
+  extern void increment_tour(vector_f, vector_f, gint *, gint *, gfloat, 
+    gfloat, gint);
+  extern void do_last_increment(vector_f, vector_f, gint);
+  extern void gt_basis(array_f, gint, vector_i, gint, gint);
+  extern void path(array_f, array_f, array_f, gint, gint, array_f, 
+    array_f, array_f, vector_f, array_f, array_f,
+    vector_f, vector_f, gint *, gint *, gfloat *, gfloat);
+  extern void tour_reproject(vector_f, array_f, array_f, array_f, 
+    array_f, array_f, gint, gint);
+  extern void copy_mat(gfloat **, gfloat **, gint, gint);
   datad *d = dsp->d;
 
-  if (!dsp->tour_get_new_target && !reached_target(dsp)) {
-    increment_tour(dsp, 2);
-    tour_reproject(dsp, 2);
+  if (!dsp->t2d.get_new_target && 
+       !reached_target(dsp->t2d.nsteps, dsp->t2d.stepcntr)) {
+    increment_tour(dsp->t2d.tinc, dsp->t2d.tau, &dsp->t2d.nsteps, 
+      &dsp->t2d.stepcntr, dsp->t2d.dv, dsp->t2d.delta, (gint) 2);
+    tour_reproject(dsp->t2d.tinc, dsp->t2d.v, dsp->t2d.v0, dsp->t2d.v1, 
+      dsp->t2d.u, dsp->t2d.uvevec, d->ncols, (gint) 2);
   }
   else { /* do final clean-up and get new target */
-    if (!dsp->tour_get_new_target)
-      do_last_increment(dsp, (gint) 2);
-    copy_mat(dsp->u0.vals, dsp->u.vals, d->ncols, 2);
-    tour_reproject(dsp, 2);
-    gt_basis(dsp, gg, (gint) 2);
-    path(dsp, (gint) 2);
-    dsp->tour_get_new_target = false;
+    if (!dsp->t2d.get_new_target)
+      do_last_increment(dsp->t2d.tinc, dsp->t2d.tau, (gint) 2);
+    copy_mat(dsp->t2d.u0.vals, dsp->t2d.u.vals, d->ncols, 2);
+    tour_reproject(dsp->t2d.tinc, dsp->t2d.v, dsp->t2d.v0, dsp->t2d.v1,
+      dsp->t2d.u, dsp->t2d.uvevec, d->ncols, (gint) 2);
+    gt_basis(dsp->t2d.u1, dsp->t2d.nvars, dsp->t2d.vars, d->ncols, (gint) 2);
+    path(dsp->t2d.u0, dsp->t2d.u1, dsp->t2d.u, d->ncols, (gint) 2, dsp->t2d.v0,
+      dsp->t2d.v1, dsp->t2d.v, dsp->t2d.lambda, dsp->t2d.tv, dsp->t2d.uvevec,
+      dsp->t2d.tau, dsp->t2d.tinc, &dsp->t2d.nsteps, &dsp->t2d.stepcntr, 
+      &dsp->t2d.dv, dsp->t2d.delta);
+    dsp->t2d.get_new_target = false;
   }
   
-  /*  tour_reproject(dsp, 2);*/
   display_tailpipe (dsp, gg);
 
   varcircles_refresh (d, gg);
@@ -135,7 +355,7 @@ tour2d_idle_func (ggobid *gg)
 {
   displayd *dsp = gg->current_display;
   cpaneld *cpanel = &dsp->cpanel;
-  gboolean doit = !cpanel->tour_paused_p;
+  gboolean doit = !cpanel->t2d_paused;
 
   if (doit) {
     tour2d_run(dsp, gg);
@@ -150,11 +370,11 @@ void tour2d_func (gboolean state, ggobid *gg)
   displayd *dsp = gg->current_display; 
 
   if (state) {
-    dsp->tour_idled = gtk_idle_add_priority (G_PRIORITY_LOW,
+    dsp->t2d.idled = gtk_idle_add_priority (G_PRIORITY_LOW,
                                    (GtkFunction) tour2d_idle_func, gg);
     gg->tour2d.idled = 1;
   } else {
-    gtk_idle_remove (dsp->tour_idled);
+    gtk_idle_remove (dsp->t2d.idled);
     gg->tour2d.idled = 0;
   }
 
@@ -168,19 +388,21 @@ void tour2d_func (gboolean state, ggobid *gg)
 
 void tour2d_reinit(ggobid *gg)
 {
-  int i, j;
+  int i, j, m;
   displayd *dsp = gg->current_display;
 
   for (i=0; i<2; i++) {
-    for (j=0; j<dsp->ntour_vars; j++) {
-      dsp->u0.vals[i][j] = 0.;
-      dsp->u.vals[i][j] = 0.;
+    for (j=0; j<dsp->t2d.nvars; j++) {
+      m = dsp->t2d.vars.els[j];
+      dsp->t2d.u0.vals[i][m] = 0.;
+      dsp->t2d.u.vals[i][m] = 0.;
     }
-    dsp->u0.vals[i][i] = 1.;
-    dsp->u.vals[i][i] = 1.;
+    m = dsp->t2d.vars.els[i];
+    dsp->t2d.u0.vals[i][m] = 1.;
+    dsp->t2d.u.vals[i][m] = 1.;
   }
 
-  dsp->tour_get_new_target = true;
+  dsp->t2d.get_new_target = true;
 
 }
 

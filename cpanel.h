@@ -68,21 +68,25 @@ typedef struct {
  gint scatmat_selection_mode;
 
 /*
- * touring
+ * 2d touring
 */
- gboolean tour_paused_p;
- gboolean tour_local_scan_p;
- gboolean tour_stepping_p;
- gboolean tour_backtracking_p;
- gfloat tour_step; 
- gint tour_ls_dir;
- gfloat tour_path_len;
+ gboolean t2d_paused;
+ gboolean t2d_local_scan;
+ gboolean t2d_stepping;
+ gboolean t2d_backtracking;
+ gfloat t2d_step; 
+ gint t2d_ls_dir;
+ gfloat t2d_path_len;
 
 /*
  * 1d tour
 */
+ gboolean t1d_paused;
+ gfloat t1d_step; 
  gint t1d_nbins, t1d_nASHes;
  gboolean t1d_vert;
+
+/* tour variables are in display.h */
 
 } cpaneld;
 

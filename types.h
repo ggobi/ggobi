@@ -164,6 +164,18 @@ typedef struct {
   gfloat val;
 } celld;
 
+/*-- tour elements --*/
+typedef struct {
+  gint nvars;
+  vector_i vars;
+  array_f u0, u1, u, uold, v0, v1, v, uvevec, tv;
+  vector_f lambda, tau, tinc;
+  gfloat dv, delta;
+  gint idled;
+  gboolean get_new_target;
+  gint nsteps, stepcntr;
+} tour;
+
 /*
  * display options
 */

@@ -83,12 +83,12 @@ plotted_cols_get (gint *cols, datad *d, ggobid *gg)
           cols[ncols++] = sp->xyvars.y;
         break;
         case TOUR1D:
-          for (k=0; k<display->ntour_vars; k++)
-            cols[ncols++] = display->tour_vars.els[k];
+          for (k=0; k<display->t1d.nvars; k++)
+            cols[ncols++] = display->t1d.vars.els[k];
         break;
          case TOUR2D:
-          for (k=0; k<display->ntour_vars; k++)
-            cols[ncols++] = display->tour_vars.els[k];
+          for (k=0; k<display->t2d.nvars; k++)
+            cols[ncols++] = display->t2d.vars.els[k];
         break;
       }
     break;
@@ -251,7 +251,8 @@ delete_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
   /*-- delete columns from pipeline arrays --*/
   arrayf_delete_cols (&d->raw, ncols, cols);
   arrayf_delete_cols (&d->tform, ncols, cols);
-  tour_realloc_down (ncols, cols, d, gg);
+  tour2d_realloc_down (ncols, cols, d, gg);
+  tour1d_realloc_down (ncols, cols, d, gg);
   if (d->nmissing)
     arrays_delete_cols (&d->missing, ncols, cols);
 
@@ -296,14 +297,28 @@ delete_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
         /*-- make sure tour_vars are reasonable --*/
         n = 0;
         vars = (gint *)
-          g_malloc (MIN (display->ntour_vars, d->ncols) * sizeof (gint));
-        for (j=0; j<display->ntour_vars; j++)
-          if (display->tour_vars.els[j] < d->ncols-1)
-            vars[n++] = display->tour_vars.els[j];
+          g_malloc (MIN (display->t2d.nvars, d->ncols) * sizeof (gint));
+        for (j=0; j<display->t2d.nvars; j++)
+          if (display->t2d.vars.els[j] < d->ncols-1)
+            vars[n++] = display->t2d.vars.els[j];
 
         for (j=0; j<n; j++)
-          display->tour_vars.els[j] = vars[j];
-        display->ntour_vars = n;
+          display->t2d.vars.els[j] = vars[j];
+        display->t2d.nvars = n;
+
+        g_free (vars);
+
+        /*-- make sure tour_vars are reasonable --*/
+        n = 0;
+        vars = (gint *)
+          g_malloc (MIN (display->t1d.nvars, d->ncols) * sizeof (gint));
+        for (j=0; j<display->t1d.nvars; j++)
+          if (display->t1d.vars.els[j] < d->ncols-1)
+            vars[n++] = display->t1d.vars.els[j];
+
+        for (j=0; j<n; j++)
+          display->t1d.vars.els[j] = vars[j];
+        display->t1d.nvars = n;
 
         g_free (vars);
       break;
@@ -491,7 +506,8 @@ clone_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
   arrayf_add_cols (&d->raw, d->ncols);
   arrayf_add_cols (&d->tform, d->ncols);
 
-  tour_realloc_up (d->ncols, d, gg);
+  tour2d_realloc_up (d->ncols, d, gg);
+  tour1d_realloc_up (d->ncols, d, gg);
 
   for (k=0; k<ncols; k++) {
     n = cols[k];              /*-- variable being cloned --*/

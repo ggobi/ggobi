@@ -262,8 +262,10 @@ scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) {
   /* 
    * Initialize tour
    */
-  if (display->displaytype == scatterplot && d->ncols > 2) 
-    display_tour_init(display, gg);
+  if (display->displaytype == scatterplot && d->ncols > 2) {
+    display_tour2d_init(display, gg);
+    display_tour1d_init(display, gg);
+  }
 
   table = gtk_table_new (3, 2, false);  /* rows, columns, homogeneous */
   gtk_box_pack_start (GTK_BOX (vbox), table, true, true, 0);

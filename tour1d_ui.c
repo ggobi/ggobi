@@ -9,15 +9,41 @@
 #include "vars.h"
 #include "externs.h"
 
+/* This function initializes the tour variables - it should only be
+   called more than once, when a new tour is started since a new
+   subset of variable might be used, or when there is new data. */
+
+void 
+cpanel_tour1d_init (cpaneld *cpanel, ggobid *gg) {
+  cpanel->t1d_paused = false;
+  cpanel->t1d_step = TOURSTEP0;
+  cpanel->t1d_nASHes = 20;
+  cpanel->t1d_nbins = 200;
+}
+
+/*-- scatterplot only; need a different routine for parcoords --*/
+void
+cpanel_tour1d_set (cpaneld *cpanel, ggobid* gg)
+/*
+ * To handle the case where there are multiple scatterplots
+ * which may have different tour options and parameters selected
+*/
+{
+  /*-- speed --*/
+  /*-- paused --*/
+  /*-- manual manip --*/
+  /*-- PC axes --*/
+  /*-- backtracking --*/
+  /*-- local scan --*/
+  /*-- path len... --*/
+}
+
 static void tour1dadv_window_open (ggobid *gg);
 
-/*void speed_set (gint speed) {
-  g_printerr ("speed=%d\n", speed);
-}*/
-static void speed_set_cb (GtkAdjustment *adj, ggobid *gg) {
-  extern void speed_set(gint, ggobid *);
+static void speed1d_set_cb (GtkAdjustment *adj, ggobid *gg) {
+  extern void tour1d_speed_set (gint, ggobid *);
 
-  speed_set ((gint)adj->value, gg);
+  tour1d_speed_set ((gint)adj->value, gg);
 }
 
 /*-- not a callback, but an initialization routine for the scrollbar --*/
@@ -28,9 +54,9 @@ static void scale_set_default_values (GtkScale *scale )
 }
 
 void tour1d_pause (cpaneld *cpanel, gboolean state, ggobid *gg) {
-  cpanel->tour_paused_p = state;
+  cpanel->t1d_paused = state;
 
-  tour1d_func (!cpanel->tour_paused_p, gg);
+  tour1d_func (!cpanel->t1d_paused, gg);
 }
 
 static void tour1d_pause_cb (GtkToggleButton *button, ggobid *gg)
@@ -86,7 +112,7 @@ cpanel_tour1d_make (ggobid *gg) {
    * (upper - page_size). */
   adj = gtk_adjustment_new (10.0, 0.0, 100.0, 1.0, 1.0, 0.0);
   gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
-                      GTK_SIGNAL_FUNC (speed_set_cb), (gpointer) gg);
+                      GTK_SIGNAL_FUNC (speed1d_set_cb), (gpointer) gg);
 
   sbar = gtk_hscale_new (GTK_ADJUSTMENT (adj));
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,

@@ -88,6 +88,21 @@ struct _displayd {
 */
   gint ncorrvars_x, *corrvars_x, ncorrvars_y, *corrvars_y;
 
+/*
+ * 2d tour
+*/
+ tour t2d;
+
+/*
+ * 1d tour
+*/
+ tour t1d;
+
+/*
+ * corr tour
+*/
+ tour tcor1, tcor2;
+
   struct _ggobid *ggobi;
 
 };  /* displayd; */
