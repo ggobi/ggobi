@@ -267,15 +267,16 @@ completeFileDesc(const gchar *fileName, InputDescription *desc)
 #endif
 
        /* Now compute the directory name. */
-  tmp = strrchr(desc->baseName, G_DIR_SEPARATOR);
-  if(tmp) {
-    n = (tmp - desc->baseName) + 1;
-    desc->dirName = g_malloc(sizeof(char) * n);
-    g_snprintf(desc->dirName, n, "%s", desc->baseName);
-  } else {
-    desc->dirName = g_strdup(desc->baseName);
+  if(desc->baseName) {
+      tmp = strrchr(desc->baseName, G_DIR_SEPARATOR);
+      if(tmp) {
+	  n = (tmp - desc->baseName) + 1;
+	  desc->dirName = g_malloc(sizeof(char) * n);
+	  g_snprintf(desc->dirName, n, "%s", desc->baseName);
+      } else {
+	  desc->dirName = g_strdup(desc->baseName);
+      }
   }
-
   return(tmp);
 }
 
