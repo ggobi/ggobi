@@ -349,7 +349,7 @@ void scree_plot_make (ggobid *gg)
 void
 sphere_panel_open (ggobid *gg)
 {
-  GtkWidget *frame0, *vbox, *vb, *hb, *table, *frame, *hbox;
+  GtkWidget *frame0, *vbox, *vb, *hb, *table, *frame;
   GtkWidget *label;
   GtkWidget *spinner;
   datad *d;
@@ -395,7 +395,18 @@ sphere_panel_open (ggobid *gg)
     notebook = create_variable_notebook (vbox, GTK_SELECTION_EXTENDED,
       (GtkSignalFunc) NULL, gg);
 
-    /*-- element 1: update scree plot when n selected vars changes --*/
+    /*-- use correlation matrix? --*/
+    btn = gtk_check_button_new_with_label ("Use correlation matrix");
+    gtk_widget_set_name (btn, "SPHERE:std_button");
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
+      "When this button is checked the correlation matrix is used to generate the PCs, otherwise the variance-covariance matrix is used",
+      NULL);
+    gtk_signal_connect (GTK_OBJECT (btn), "toggled",
+                        (GtkSignalFunc) vars_stdized_cb, (gpointer) gg);
+    gtk_box_pack_start (GTK_BOX (vbox), btn,
+      true, true, 1);
+
+    /*-- update scree plot when n selected vars changes --*/
     btn = gtk_button_new_with_label ("Update scree plot");
     GGobi_widget_set (btn, gg, true);
     gtk_box_pack_start (GTK_BOX (vbox), btn,
@@ -406,28 +417,7 @@ sphere_panel_open (ggobid *gg)
     gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                         GTK_SIGNAL_FUNC (scree_update_cb), gg);
 
-    hbox = gtk_hbox_new (false, 2);
-    gtk_box_pack_start (GTK_BOX (vbox), hbox, false, false, 0);
-
-    btn = gtk_check_button_new_with_label ("Use correlation matrix");
-    gtk_widget_set_name (btn, "SPHERE:std_button");
-    /*    gtk_box_pack_start (GTK_BOX (hbox),
-      gtk_label_new ("Variables standardized?"),
-      false, false, 0);
-    gg->sphere_ui.stdized_entry = gtk_entry_new ();
-    gtk_entry_set_editable (GTK_ENTRY (gg->sphere_ui.stdized_entry), false);*/
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-      "When this button is checked the correlation matrix is used to generate the PCs, otherwise the variance-covariance matrix is used",
-      NULL);
-    /*    gtk_entry_set_text (GTK_ENTRY (gg->sphere_ui.stdized_entry), "-");*/
-    gtk_signal_connect (GTK_OBJECT (btn),
-                        "toggled",
-                        (GtkSignalFunc) vars_stdized_cb,
-                        (gpointer) gg);
-    gtk_box_pack_start (GTK_BOX (hbox), btn,
-      true, true, 1);
-
-    /*-- element 2 of vbox: scree plot --*/
+    /*-- scree plot --*/
     frame = gtk_frame_new ("Scree plot");
     gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
     gtk_container_set_border_width (GTK_CONTAINER (frame), 2);
