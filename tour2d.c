@@ -120,6 +120,8 @@ tour2d_run(displayd *dsp, ggobid *gg)
   
   /*  tour_reproject(dsp, 2);*/
   display_tailpipe (dsp, gg);
+
+  varcircles_refresh (d, gg);
 }
 
 void

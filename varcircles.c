@@ -6,9 +6,7 @@
 
 #define VAR_CIRCLE_DIAM 40
 
-extern void varpanel_add_data (datad *, ggobid *);
 extern void varpanel_clear (ggobid *);
-extern void varpanel_size_init (gint, ggobid *);
 
 static void varcircle_add (gint, gint, gint, datad *, ggobid *gg);
 static void varcircle_draw (gint, datad *, ggobid *gg); 
@@ -17,6 +15,8 @@ static gboolean da_expose_cb (GtkWidget *, GdkEventExpose *, gpointer cbd);
 
 /*
  * Just to get going, use a fixed value: vncols = 5
+ *  make this a display option, and make use of the size of
+ *  the scrolled window
  *
  * lay it out row-wise.
 */
@@ -69,36 +69,6 @@ void varcircles_populate (datad *d, ggobid *gg)
   gtk_widget_show_all (d->varpanel_ui.table);
 }
 
-void
-varpanel_size_init (gint cpanel_height, ggobid* gg)
-{
-/*
-  gint i;
-  GtkTable *t = GTK_TABLE (gg->varpanel_ui.varpanel);
-  GtkTableRowCol c, r;
-  gint width = 0, height = 0;
-  GtkWidget *vport = GTK_WIDGET
-    ((GTK_BIN (gg->varpanel_ui.scrolled_window))->child);
-*/
-
-  /*-- Find the width of the first few columns --*/
-/*
-  for (i=0; i<MIN (t->ncols, 3); i++) {
-    c = t->cols[i];
-    width += c.requisition + c.spacing;
-  }
-*/
-
-  /*-- Find the height of the first few rows --*/
-/*
-  for (i=0; i<MIN (t->nrows, 4); i++) {
-    r = t->rows[i];
-    height += r.requisition + r.spacing;
-  }
-
-  gtk_widget_set_usize (vport, width, MAX (height, cpanel_height));
-*/
-}
 
 void
 varcircles_clear (ggobid *gg) {
@@ -116,6 +86,50 @@ varcircles_clear (ggobid *gg) {
     g_free (d->varpanel_ui.da);
     g_free (d->varpanel_ui.label);
   }
+}
+
+/*-- responds to a button_press_event --*/
+static gint
+varcircle_sel_cb (GtkWidget *w, GdkEvent *event, gint jvar)
+{
+  ggobid *gg = GGobiFromWidget (w, true);
+  displayd *display = gg->current_display;
+  cpaneld *cpanel = &display->cpanel;
+  splotd *sp = gg->current_splot;
+  datad *d = datad_get_from_notebook (gg->varpanel_ui.notebook, gg);
+
+  if (d != display->d)
+    return true;
+
+  if (event->type == GDK_BUTTON_PRESS) {
+    GdkEventButton *bevent = (GdkEventButton *) event;
+    gint button = bevent->button;
+    gboolean alt_mod, shift_mod, ctrl_mod;
+
+    /*-- respond only to button 1 and button 2 --*/
+    if (button != 1 && button != 2)
+      return false;
+
+/* looking for modifiers; don't know which ones we'll want */
+    alt_mod = ((bevent->state & GDK_MOD1_MASK) == GDK_MOD1_MASK);
+    shift_mod = ((bevent->state & GDK_SHIFT_MASK) == GDK_SHIFT_MASK);
+    ctrl_mod = ((bevent->state & GDK_CONTROL_MASK) == GDK_CONTROL_MASK);
+/* */
+
+/*
+    if (ctrl_mod) {
+      variable_clone (jvar, NULL, true, d, gg);
+      return (true);
+    }
+*/
+    
+    /*-- general variable selection --*/
+    varsel (cpanel, sp, jvar, button, alt_mod, ctrl_mod, shift_mod, d, gg);
+    varcircles_refresh (d, gg);
+    return true;
+  }
+
+  return false;
 }
 
 static void
@@ -161,10 +175,9 @@ varcircle_add (gint i, gint j, gint k, datad *d, ggobid *gg)
 
   gtk_signal_connect (GTK_OBJECT (d->varpanel_ui.da[k]), "expose_event",
     GTK_SIGNAL_FUNC (da_expose_cb), GINT_TO_POINTER (k));
-/*
+
   gtk_signal_connect (GTK_OBJECT (d->varpanel_ui.da[k]), "button_press_event",
-    GTK_SIGNAL_FUNC (varsel_cb), GINT_TO_POINTER (k));
-*/
+    GTK_SIGNAL_FUNC (varcircle_sel_cb), GINT_TO_POINTER (k));
 
   gtk_object_set_data (GTK_OBJECT (d->varpanel_ui.da[k]), "datad", d);
   GGobi_widget_set (GTK_WIDGET (d->varpanel_ui.da[k]), gg, true);
@@ -176,7 +189,7 @@ varcircle_add (gint i, gint j, gint k, datad *d, ggobid *gg)
 }
 
 void
-vartable_refresh (datad *d, ggobid *gg) {
+varcircles_refresh (datad *d, ggobid *gg) {
   gint j;
 
   for (j=0; j<d->ncols; j++) {
@@ -189,13 +202,13 @@ vartable_refresh (datad *d, ggobid *gg) {
 void
 varcircle_draw (gint jvar, datad *d, ggobid *gg)
 {
-  /*--  a single pixmap is shared among all variable circles --*/
   gint r = VAR_CIRCLE_DIAM/2;
   gint x,y;
   gboolean chosen = false;
   splotd *sp = gg->current_splot;
   displayd *display;
   cpaneld *cpanel;
+  gint k;
 
   if (sp == NULL || jvar < 0 || jvar >= d->ncols)
     return;  /*-- return --*/
@@ -234,7 +247,13 @@ varcircle_draw (gint jvar, datad *d, ggobid *gg)
           y = (gint) (display->u[1][jvar]*(gfloat)r);
           gdk_draw_line (d->varpanel_ui.da_pix[jvar],
             gg->selvarfg_GC, r, r, r+x, r-y);
-          chosen = true;
+
+          for (k=0; k<display->ntour_vars; k++) {
+            if (display->tour_vars[k] == jvar) {
+              chosen = true;
+              break;
+            }
+          }
           break;
       }
       break;

@@ -320,6 +320,7 @@ extern void varlabel_set (gint, datad *, ggobid *);
 extern void varpanel_make (GtkWidget *, ggobid *);
 extern void varpanel_populate (datad *, ggobid *);
 extern void varpanel_refresh (ggobid *);
+extern void varcircles_refresh (datad *, ggobid *);
 extern void vartable_alloc (datad *d, ggobid *);
 extern void vartable_init (datad *d, ggobid *);
 extern void vartable_lim_update (datad *d, ggobid *);

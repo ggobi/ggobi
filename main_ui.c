@@ -62,11 +62,6 @@ size_allocate_cb (GtkWidget *w, GdkEvent *event, ggobid *gg)
     gtk_container_remove (GTK_CONTAINER (gg->mode_frame), largest_panel);
     gtk_container_add (GTK_CONTAINER (gg->mode_frame), mode_panel);
 
-    /*-- widen the variable selection panel --*/
-/*
-    varpanel_size_init (largest_panel->requisition.height, gg);
-*/
-
     initd = true;
   }
 
@@ -313,16 +308,34 @@ mode_set (gint m, ggobid *gg) {
       gg->control_panel[gg->mode]);
 
 
-/*-- experimenting with the variable circles --*/
-    /*-- if coming into a 2dtour mode from p1d or xyplot ... --*/
+/*
+ * This section is going to get awfully ugly as we add more
+ * alternatives to checkboxes and variable circles; it may
+ * need some rethinking.
+*/
+
+    /* 
+     * If moving between modes whose variable selection interface
+     * differs, swap in the correct display.
+     *
+     * Luckily, this isn't even possible if the current display
+     * is scatmat or parcoords.
+    */
     if ((gg->mode == TOUR2D || gg->mode == COTOUR) &&
         (gg->prev_mode != TOUR2D && gg->prev_mode != COTOUR))
     {
       for (l = gg->d; l; l = l->next) {
         d = (datad *) l->data;
+        /*
+         * add a reference to the vbox (so it won't disappear),
+         * then remove it from the ebox.
+        */
         gtk_widget_ref (d->varpanel_ui.vbox);
         gtk_container_remove (GTK_CONTAINER (d->varpanel_ui.ebox),
                               d->varpanel_ui.vbox);
+        /*
+         * Now add the table of variable circles to the ebox
+        */
         gtk_container_add (GTK_CONTAINER (d->varpanel_ui.ebox),
                            d->varpanel_ui.table);
       }

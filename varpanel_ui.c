@@ -80,7 +80,6 @@ varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint btn,
         break;
         case TOUR2D:
           tour2d_varsel (gg, jvar, btn);
-
         break;
         default:
         break;
@@ -323,7 +322,7 @@ varpanel_checkbox_add (gint j, datad *d, ggobid *gg)
     "button_press_event", GTK_SIGNAL_FUNC (varsel_cb), d);
 
   gtk_box_pack_start (GTK_BOX (d->varpanel_ui.vbox),
-    d->varpanel_ui.checkbox[j], true, true, 0);
+    d->varpanel_ui.checkbox[j], false, false, 0);
   gtk_widget_show (d->varpanel_ui.checkbox[j]);
 }
 
