@@ -23,12 +23,7 @@
 #include "externs.h"
 
 
-#if 0
-#define VARSEL_X 0
-#define VARSEL_Y 1
-#define VARSEL_LABEL 2
-#endif
-static gchar *varpanel_names[] = {"xtoggle", "ytoggle", "label"};
+static gchar *varpanel_names[] = {"xtoggle", "ytoggle", "ztoggle", "label"};
 
 /*-------------------------------------------------------------------------*/
 /*                         utilities                                       */
@@ -79,6 +74,7 @@ varpanel_widget_set_visible (gint jbutton, gint jvar, gboolean show, datad *d)
   
   return child;
 }
+
 void
 varpanel_delete_nth (gint jvar, datad *d)
 {
@@ -108,8 +104,6 @@ varpanel_toggle_set_active (gint jbutton, gint jvar, gboolean active, datad *d)
       active_prev = GTK_TOGGLE_BUTTON (w)->active;
 
       if (active != active_prev) {
-        /*GTK_TOGGLE_BUTTON (w)->active = active;*/
-        /*gtk_widget_queue_draw (w);*/
         gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(w), active);
       }
     }
@@ -216,7 +210,7 @@ varsel_cb (GtkWidget *w, GdkEvent *event, datad *d)
   displayd *display = gg->current_display;
   cpaneld *cpanel = &display->cpanel;
   splotd *sp = gg->current_splot;
-  gint xory;
+  gint xyz;
 
   if (d != display->d)
     return true;
@@ -230,22 +224,26 @@ varsel_cb (GtkWidget *w, GdkEvent *event, datad *d)
     jvar = -1;
     for (j=0; j<d->ncols; j++) {
       if (varpanel_widget_get_nth (VARSEL_X, j, d) == w) {
-        xory = VARSEL_X;
+        xyz = VARSEL_X;
         jvar = j;
         break;
       } else if (varpanel_widget_get_nth (VARSEL_Y, j, d) == w) {
-        xory = VARSEL_Y;
+        xyz = VARSEL_Y;
+        jvar = j;
+        break;
+      } else if (varpanel_widget_get_nth (VARSEL_Z, j, d) == w) {
+        xyz = VARSEL_Z;
         jvar = j;
         break;
       } else if (varpanel_widget_get_nth (VARSEL_LABEL, j, d) == w) {
-        xory = -1;
+        xyz = -1;
         jvar = j;
         break;
       }
     }
-   /*-- emulate the old behavior by translating xory into button --*/
-   if (xory > -1)
-     button = (xory == VARSEL_X) ? 1 : 2;
+   /*-- emulate the old behavior by translating xyz into button --*/
+   if (xyz > -1)
+     button = xyz;
 
 /* looking for modifiers; don't know which ones we'll want */
     alt_mod = ((bevent->state & GDK_MOD1_MASK) == GDK_MOD1_MASK);
@@ -270,7 +268,7 @@ static void
 varpanel_add_row (gint j, datad *d, ggobid *gg) 
 {
   vartabled *vt = vartable_element_get (j, d);
-  GtkWidget *box, *xw, *yw, *label;
+  GtkWidget *box, *xw, *yw, *zw, *label;
 
   box = gtk_hbox_new (false, 2);
   gtk_box_pack_start (GTK_BOX (d->vcbox_ui.vbox),
@@ -288,6 +286,13 @@ varpanel_add_row (gint j, datad *d, ggobid *gg)
   GGobi_widget_set (yw, gg, true);
   gtk_object_set_data (GTK_OBJECT(box), varpanel_names[VARSEL_Y], yw);
   gtk_signal_connect (GTK_OBJECT (yw),
+    "button_press_event", GTK_SIGNAL_FUNC (varsel_cb), d);
+
+  zw = gtk_noop_toggle_button_new_with_label (" Z ");
+  gtk_box_pack_start (GTK_BOX (box), zw, false, false, 2);
+  GGobi_widget_set (zw, gg, true);
+  gtk_object_set_data (GTK_OBJECT(box), varpanel_names[VARSEL_Z], zw);
+  gtk_signal_connect (GTK_OBJECT (zw),
     "button_press_event", GTK_SIGNAL_FUNC (varsel_cb), d);
 
   /*-- the label is actually a button, with the old behavior --*/
@@ -435,7 +440,7 @@ varpanel_tooltips_set (displayd *display, ggobid *gg)
 {
   gint j;
   datad *d = display->d;
-  GtkWidget *wx, *wy, *label;
+  GtkWidget *wx, *wy, *wz, *label;
 
   /*-- for each variable, current datad only --*/
   for (j=0; j<d->ncols; j++) {
@@ -443,12 +448,13 @@ varpanel_tooltips_set (displayd *display, ggobid *gg)
       break;
 
     wy = varpanel_widget_get_nth (VARSEL_Y, j, d);
+    wz = varpanel_widget_get_nth (VARSEL_Z, j, d);
     label = varpanel_widget_get_nth (VARSEL_LABEL, j, d);
     
     if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
        GtkGGobiExtendedDisplayClass *klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
        if(klass->varpanel_tooltips_set)
-         klass->varpanel_tooltips_set(display, gg, wx, wy, label);
+         klass->varpanel_tooltips_set(display, gg, wx, wy, wz, label);
     }
   }
 }

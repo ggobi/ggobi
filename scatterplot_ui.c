@@ -40,6 +40,11 @@ scatterplot_mode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func,
   CreateMenuItem (gg->app.scatterplot_mode_menu, "1D Tour",
     "^t", "", NULL, accel_group, func,
     useIds ? GINT_TO_POINTER  (TOUR1D) : gg, gg);
+#ifdef ROTATION_IMPLEMENTED
+  CreateMenuItem (gg->app.scatterplot_mode_menu, "Rotation",
+    "^r", "", NULL, accel_group, func,
+    useIds ? GINT_TO_POINTER  (TOUR2D3) : gg, gg);
+#endif
   CreateMenuItem (gg->app.scatterplot_mode_menu, "2D Tour",
     "^g", "", NULL, accel_group, func,
     useIds ? GINT_TO_POINTER  (TOUR2D) : gg, gg);

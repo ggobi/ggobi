@@ -43,6 +43,10 @@ setShowAxesLabelOption(displayd *display, gboolean active)
 {
   if(display->cpanel.projection == TOUR2D)
      display_plot (display, FULL, display->ggobi);  
+#ifdef ROTATION_IMPLEMENTED
+  else if (display->cpanel.projection == TOUR2D3)
+     display_plot (display, FULL, display->ggobi);  
+#endif
 }
 
 static void
@@ -50,6 +54,10 @@ setShowAxesValuesOption(displayd *display, gboolean active)
 {
   if(display->cpanel.projection == TOUR2D)
      display_plot (display, FULL, display->ggobi);  
+#ifdef ROTATION_IMPLEMENTED
+  else if (display->cpanel.projection == TOUR2D3)
+     display_plot (display, FULL, display->ggobi);  
+#endif
 }
 
 static void
@@ -70,9 +78,12 @@ setShowAxesOption(displayd *display, gboolean active)
           scatterplot_show_hrule (display, active);
       }
     case TOUR1D:
+#ifdef ROTATION_IMPLEMENTED
+    case TOUR2D3:
+#endif
     case TOUR2D:
     case COTOUR:
-      display_plot (display, FULL, display->ggobi); /* di changed QUICK to FULL */
+      display_plot (display, FULL, display->ggobi);
     break;
     default:
     break;
@@ -98,10 +109,12 @@ varpanelRefresh(displayd *display, splotd *sp, datad *d)
   switch (cpanel->projection) {
     case P1PLOT:
       for (j=0; j<d->ncols; j++) {
+        varpanel_toggle_set_active (VARSEL_X, j, j == sp->p1dvar, d);
+
         varpanel_toggle_set_active (VARSEL_Y, j, false, d);
         varpanel_widget_set_visible (VARSEL_Y, j, false, d);
-
-        varpanel_toggle_set_active (VARSEL_X, j, j == sp->p1dvar, d);
+        varpanel_toggle_set_active (VARSEL_Z, j, false, d);
+        varpanel_widget_set_visible (VARSEL_Z, j, false, d);
       }
     break;
     case XYPLOT:
@@ -111,6 +124,9 @@ varpanelRefresh(displayd *display, splotd *sp, datad *d)
         varpanel_widget_set_visible (VARSEL_Y, j, true, d);
         varpanel_toggle_set_active (VARSEL_Y, j, 
           (j == sp->xyvars.y), d);
+
+        varpanel_toggle_set_active (VARSEL_Z, j, false, d);
+        varpanel_widget_set_visible (VARSEL_Z, j, false, d);
       }
     break;
 
@@ -119,17 +135,40 @@ varpanelRefresh(displayd *display, splotd *sp, datad *d)
         varpanel_toggle_set_active (VARSEL_X, j, false, d);
         varpanel_toggle_set_active (VARSEL_Y, j, false, d);
         varpanel_widget_set_visible (VARSEL_Y, j, false, d);
+        varpanel_toggle_set_active (VARSEL_Z, j, false, d);
+        varpanel_widget_set_visible (VARSEL_Z, j, false, d);
       }
       for (j=0; j<display->t1d.nsubset; j++) {
         varpanel_toggle_set_active (VARSEL_X,
           display->t1d.subset_vars.els[j], true, d);
       }
     break;
+#ifdef ROTATION_IMPLEMENTED
+    case TOUR2D3:
+      for (j=0; j<d->ncols; j++) {
+        varpanel_toggle_set_active (VARSEL_X, j, false, d);
+        varpanel_toggle_set_active (VARSEL_Y, j, false, d);
+        varpanel_widget_set_visible (VARSEL_Y, j, true, d);
+        varpanel_toggle_set_active (VARSEL_Z, j, false, d);
+        varpanel_widget_set_visible (VARSEL_Z, j, true, d);
+      }
+
+      varpanel_toggle_set_active (VARSEL_X,
+          display->t2d3.subset_vars.els[0], true, d);
+      varpanel_toggle_set_active (VARSEL_Y,
+          display->t2d3.subset_vars.els[1], true, d);
+      varpanel_toggle_set_active (VARSEL_Z,
+          display->t2d3.subset_vars.els[2], true, d);
+    break;
+    break;
+#endif
     case TOUR2D:
       for (j=0; j<d->ncols; j++) {
         varpanel_toggle_set_active (VARSEL_X, j, false, d);
         varpanel_toggle_set_active (VARSEL_Y, j, false, d);
         varpanel_widget_set_visible (VARSEL_Y, j, false, d);
+        varpanel_toggle_set_active (VARSEL_Z, j, false, d);
+        varpanel_widget_set_visible (VARSEL_Z, j, false, d);
       }
       for (j=0; j<display->t2d.nsubset; j++) {
         varpanel_toggle_set_active (VARSEL_X,
@@ -141,6 +180,8 @@ varpanelRefresh(displayd *display, splotd *sp, datad *d)
         varpanel_toggle_set_active (VARSEL_X, j, false, d);
         varpanel_toggle_set_active (VARSEL_Y, j, false, d);
         varpanel_widget_set_visible (VARSEL_Y, j, true, d);
+        varpanel_toggle_set_active (VARSEL_Z, j, false, d);
+        varpanel_widget_set_visible (VARSEL_Z, j, false, d);
       }
       for (j=0; j<display->tcorr1.nsubset; j++) {
         varpanel_toggle_set_active (VARSEL_X,
@@ -174,11 +215,16 @@ variableSelect(GtkWidget *w, displayd *display, splotd *sp, gint jvar, gint btn,
         if (viewmode_get (gg) == BRUSH && cpanel->br_mode == BR_TRANSIENT)
           reinit_transient_brushing (display, gg);
     break;
-    case TOUR2D:
-      redraw = tour2d_varsel (w, jvar, btn, display->d, gg);
-    break;
     case TOUR1D:
       redraw = tour1d_varsel (w, jvar, btn, display->d, gg);
+    break;
+#ifdef ROTATION_IMPLEMENTED
+    case TOUR2D3:
+      redraw = tour2d3_varsel (w, jvar, btn, display->d, gg);
+    break;
+#endif
+    case TOUR2D:
+      redraw = tour2d_varsel (w, jvar, btn, display->d, gg);
     break;
     case COTOUR:
       redraw = tourcorr_varsel (w, jvar, btn, display->d, gg);
@@ -198,98 +244,118 @@ varcircleDraw(displayd *display, gint jvar, GdkPixmap *da_pix, ggobid *gg)
   cpaneld *cpanel = &display->cpanel;
   gboolean chosen = false;
 
-      switch (cpanel->projection) {
-        case TOUR1D:
-          x = (gint) (display->t1d.F.vals[0][jvar]*(gfloat)r);
-          y = 0;
-          gdk_draw_line (da_pix,
-            gg->selvarfg_GC, r, r, r+x, r-y);
+  switch (cpanel->projection) {
+    case TOUR1D:
+      x = (gint) (display->t1d.F.vals[0][jvar]*(gfloat)r);
+      y = 0;
+      gdk_draw_line (da_pix,
+        gg->selvarfg_GC, r, r, r+x, r-y);
 
-          if (jvar == display->t1d_manip_var) {
-            gdk_draw_arc (da_pix, gg->manipvarfg_GC, false,
-              5, 5, VAR_CIRCLE_DIAM-10, VAR_CIRCLE_DIAM-10, 150*64, 60*64);
-            gdk_draw_arc (da_pix, gg->manipvarfg_GC, false,
-              5, 5, VAR_CIRCLE_DIAM-10, VAR_CIRCLE_DIAM-10, 330*64, 60*64);
-          }
-
-          for (k=0; k < display->t1d.nactive; k++) {
-            if (display->t1d.active_vars.els[k] == jvar) {
-              chosen = true;
-              break;
-            }
-          }
-        break;
-        case TOUR2D:
-          x = (gint) (display->t2d.F.vals[0][jvar]*(gfloat)r);
-          y = (gint) (display->t2d.F.vals[1][jvar]*(gfloat)r);
-          gdk_draw_line (da_pix,
-            gg->selvarfg_GC, r, r, r+x, r-y);
-
-          if (jvar == display->t2d_manip_var) {
-            gdk_draw_arc (da_pix, gg->manipvarfg_GC, false,
-              5, 5, VAR_CIRCLE_DIAM-10, VAR_CIRCLE_DIAM-10, 0*64, 360*64);
-          }
-
-          for (k=0; k<display->t2d.nactive; k++) {
-            if (display->t2d.active_vars.els[k] == jvar) {
-              chosen = true;
-              break;
-            }
-          }
-        break;
-        case COTOUR:
-          /*          for (i=0; i<display->tcorr1.nactive; i++)
-            if (jvar == display->tcorr1.active_vars.els[i]) {
-              xvar = true;
-              break;
-            }*/
-          /*          if (xvar) {*/
-          x = (gint) (display->tcorr1.F.vals[0][jvar]*(gfloat)r);
-          y = (gint) (display->tcorr2.F.vals[0][jvar]*(gfloat)r);
-          gdk_draw_line (da_pix, gg->selvarfg_GC, r, r, r+x, r-y);
-
-          if (jvar == display->tc1_manip_var) {
-            gdk_draw_arc (da_pix, gg->manipvarfg_GC, false,
-              5, 5, VAR_CIRCLE_DIAM-10, VAR_CIRCLE_DIAM-10, 150*64, 60*64);
-            gdk_draw_arc (da_pix, gg->manipvarfg_GC, false,
-              5, 5, VAR_CIRCLE_DIAM-10, VAR_CIRCLE_DIAM-10, 330*64, 60*64);
-          }
-          if (jvar == display->tc2_manip_var) {
-            gdk_draw_arc (da_pix, gg->manipvarfg_GC, false,
-              5, 5, VAR_CIRCLE_DIAM-10, VAR_CIRCLE_DIAM-10, 60*64, 60*64);
-            gdk_draw_arc (da_pix, gg->manipvarfg_GC, false,
-              5, 5, VAR_CIRCLE_DIAM-10, VAR_CIRCLE_DIAM-10, 240*64, 60*64);
-          }
-
-          for (k=0; k<display->tcorr1.nactive; k++) {
-            if (display->tcorr1.active_vars.els[k] == jvar) {
-              chosen = true;
-              break;
-            }
-          }
-          for (k=0; k<display->tcorr2.nactive; k++) {
-            if (display->tcorr2.active_vars.els[k] == jvar) {
-              chosen = true;
-              break;
-            }
-          }
-        break;
-
-        /*      } 
-          else {
-
-            x = 0;
-            y = (gint) (display->tcorr2.F.vals[0][jvar]*(gfloat)r);
-            gdk_draw_line (da_pix,
-              gg->selvarfg_GC, r, r, r+x, r-y);
-
-          }*/
-
-        default:
-        break;
+      if (jvar == display->t1d_manip_var) {
+        gdk_draw_arc (da_pix, gg->manipvarfg_GC, false,
+          5, 5, VAR_CIRCLE_DIAM-10, VAR_CIRCLE_DIAM-10, 150*64, 60*64);
+        gdk_draw_arc (da_pix, gg->manipvarfg_GC, false,
+          5, 5, VAR_CIRCLE_DIAM-10, VAR_CIRCLE_DIAM-10, 330*64, 60*64);
       }
 
-      return(chosen);
+      for (k=0; k < display->t1d.nactive; k++) {
+        if (display->t1d.active_vars.els[k] == jvar) {
+          chosen = true;
+          break;
+        }
+      }
+    break;
+#ifdef ROTATION_IMPLEMENTED
+    case TOUR2D3:
+      x = (gint) (display->t2d3.F.vals[0][jvar]*(gfloat)r);
+      y = (gint) (display->t2d3.F.vals[1][jvar]*(gfloat)r);
+      gdk_draw_line (da_pix,
+        gg->selvarfg_GC, r, r, r+x, r-y);
+
+      if (jvar == display->t2d3_manip_var) {
+        gdk_draw_arc (da_pix, gg->manipvarfg_GC, false,
+          5, 5, VAR_CIRCLE_DIAM-10, VAR_CIRCLE_DIAM-10, 0*64, 360*64);
+      }
+
+      for (k=0; k<display->t2d3.nactive; k++) {
+        if (display->t2d3.active_vars.els[k] == jvar) {
+          chosen = true;
+          break;
+        }
+      }
+    break;
+#endif
+    case TOUR2D:
+      x = (gint) (display->t2d.F.vals[0][jvar]*(gfloat)r);
+      y = (gint) (display->t2d.F.vals[1][jvar]*(gfloat)r);
+      gdk_draw_line (da_pix,
+        gg->selvarfg_GC, r, r, r+x, r-y);
+
+      if (jvar == display->t2d_manip_var) {
+        gdk_draw_arc (da_pix, gg->manipvarfg_GC, false,
+          5, 5, VAR_CIRCLE_DIAM-10, VAR_CIRCLE_DIAM-10, 0*64, 360*64);
+      }
+
+      for (k=0; k<display->t2d.nactive; k++) {
+        if (display->t2d.active_vars.els[k] == jvar) {
+          chosen = true;
+          break;
+        }
+      }
+    break;
+    case COTOUR:
+      /*          for (i=0; i<display->tcorr1.nactive; i++)
+        if (jvar == display->tcorr1.active_vars.els[i]) {
+          xvar = true;
+          break;
+        }*/
+      /*          if (xvar) {*/
+      x = (gint) (display->tcorr1.F.vals[0][jvar]*(gfloat)r);
+      y = (gint) (display->tcorr2.F.vals[0][jvar]*(gfloat)r);
+      gdk_draw_line (da_pix, gg->selvarfg_GC, r, r, r+x, r-y);
+
+      if (jvar == display->tc1_manip_var) {
+        gdk_draw_arc (da_pix, gg->manipvarfg_GC, false,
+          5, 5, VAR_CIRCLE_DIAM-10, VAR_CIRCLE_DIAM-10, 150*64, 60*64);
+        gdk_draw_arc (da_pix, gg->manipvarfg_GC, false,
+          5, 5, VAR_CIRCLE_DIAM-10, VAR_CIRCLE_DIAM-10, 330*64, 60*64);
+      }
+      if (jvar == display->tc2_manip_var) {
+        gdk_draw_arc (da_pix, gg->manipvarfg_GC, false,
+          5, 5, VAR_CIRCLE_DIAM-10, VAR_CIRCLE_DIAM-10, 60*64, 60*64);
+        gdk_draw_arc (da_pix, gg->manipvarfg_GC, false,
+          5, 5, VAR_CIRCLE_DIAM-10, VAR_CIRCLE_DIAM-10, 240*64, 60*64);
+      }
+
+      for (k=0; k<display->tcorr1.nactive; k++) {
+        if (display->tcorr1.active_vars.els[k] == jvar) {
+          chosen = true;
+          break;
+        }
+      }
+      for (k=0; k<display->tcorr2.nactive; k++) {
+        if (display->tcorr2.active_vars.els[k] == jvar) {
+          chosen = true;
+          break;
+        }
+      }
+    break;
+
+    /*      } 
+      else {
+
+        x = 0;
+        y = (gint) (display->tcorr2.F.vals[0][jvar]*(gfloat)r);
+        gdk_draw_line (da_pix,
+          gg->selvarfg_GC, r, r, r+x, r-y);
+
+      }*/
+
+    default:
+    break;
+  }
+
+  return(chosen);
 }
 
 static void
@@ -516,38 +582,46 @@ worldToRaw(displayd *display, splotd *sp, gint pt, datad *d, ggobid *gg)
   cpaneld *cpanel = &display->cpanel;
   PipelineMode proj = cpanel->projection;
   gint j;
-    switch (proj) {
-      case P1PLOT:
-        if (display->p1d_orientation == VERTICAL)
-          world_to_raw_by_var (pt, sp->p1dvar, display, d, gg);
-        else
-          world_to_raw_by_var (pt, sp->p1dvar, display, d, gg);
-      break;
-      case XYPLOT:
-        world_to_raw_by_var (pt, sp->xyvars.x, display, d, gg);
-        world_to_raw_by_var (pt, sp->xyvars.y, display, d, gg);
-      break;
-      case TOUR2D:
-        for (j=0; j<display->t2d.nactive; j++)
-          world_to_raw_by_var (pt, display->t2d.active_vars.els[j],
-            display, d, gg);
-      break;
-      case TOUR1D:
-        for (j=0; j<display->t1d.nactive; j++)
-          world_to_raw_by_var (pt, display->t1d.active_vars.els[j],
-            display, d, gg);
-      break;
-      case COTOUR:
-        for (j=0; j<display->tcorr1.nactive; j++)
-          world_to_raw_by_var (pt, display->tcorr1.active_vars.els[j],
-            display, d, gg);
-        for (j=0; j<display->tcorr2.nactive; j++)
-          world_to_raw_by_var (pt, display->tcorr2.active_vars.els[j],
-            display, d, gg);
-      break;
-      default:
-      break;
-    }
+
+  switch (proj) {
+    case P1PLOT:
+      if (display->p1d_orientation == VERTICAL)
+        world_to_raw_by_var (pt, sp->p1dvar, display, d, gg);
+      else
+        world_to_raw_by_var (pt, sp->p1dvar, display, d, gg);
+    break;
+    case XYPLOT:
+      world_to_raw_by_var (pt, sp->xyvars.x, display, d, gg);
+      world_to_raw_by_var (pt, sp->xyvars.y, display, d, gg);
+    break;
+    case TOUR1D:
+      for (j=0; j<display->t1d.nactive; j++)
+        world_to_raw_by_var (pt, display->t1d.active_vars.els[j],
+          display, d, gg);
+    break;
+#ifdef ROTATION_IMPLEMENTED
+    case TOUR2D3:
+      for (j=0; j<display->t2d3.nactive; j++)
+        world_to_raw_by_var (pt, display->t2d3.active_vars.els[j],
+          display, d, gg);
+    break;
+#endif
+    case TOUR2D:
+      for (j=0; j<display->t2d.nactive; j++)
+        world_to_raw_by_var (pt, display->t2d.active_vars.els[j],
+          display, d, gg);
+    break;
+    case COTOUR:
+      for (j=0; j<display->tcorr1.nactive; j++)
+        world_to_raw_by_var (pt, display->tcorr1.active_vars.els[j],
+          display, d, gg);
+      for (j=0; j<display->tcorr2.nactive; j++)
+        world_to_raw_by_var (pt, display->tcorr2.active_vars.els[j],
+          display, d, gg);
+    break;
+    default:
+    break;
+  }
 }
 
 
@@ -647,8 +721,12 @@ viewmodeSet(displayd *display, ggobid *gg)
 static gboolean
 varpanelHighd(displayd *display)
 {
-  gint projection = display->cpanel.projection;
-  return(projection == TOUR1D || projection == TOUR2D || projection == COTOUR);
+  gint proj = display->cpanel.projection;
+#ifdef ROTATION_IMPLEMENTED
+  return(proj == TOUR1D || proj == TOUR2D3 || proj == TOUR2D || proj == COTOUR);
+#else
+  return(proj == TOUR1D || proj == TOUR2D || proj == COTOUR);
+#endif
 }
 
 displayd *
@@ -707,16 +785,17 @@ cpanelSet(displayd *dpy, cpaneld *cpanel, ggobid *gg)
 
       cpanel_p1d_set (cpanel, gg);
       cpanel_xyplot_set (cpanel, gg);
-#ifdef ROTATION_IMPLEMENTED
-      cpanel_rotation_set (cpanel, gg);
-#endif
-      cpanel_brush_set (cpanel, gg);
-      cpanel_scale_set (cpanel, gg);
       cpanel_tour1d_set (cpanel, gg);
+#ifdef ROTATION_IMPLEMENTED
+      cpanel_tour2d3_set (cpanel, gg);
+#endif
       if (dpy->d->ncols >= MIN_NVARS_FOR_TOUR2D)
         cpanel_tour2d_set (cpanel, gg);
       if (dpy->d->ncols >= MIN_NVARS_FOR_COTOUR)
         cpanel_tourcorr_set (cpanel, gg);
+
+      cpanel_brush_set (cpanel, gg);
+      cpanel_scale_set (cpanel, gg);
 #ifdef EDIT_EDGES_IMPLEMENTED
       cpanel_edgeedit_set (cpanel, gg);
 #endif
@@ -751,121 +830,149 @@ static gint
 plotted(displayd *display, gint *cols, gint ncols, datad *d)
 {
   gint j, k;
-        splotd *sp = (splotd *) display->splots->data;  /*-- only one splot --*/
-        gint projection = projection_get (display->ggobi);
+  splotd *sp = (splotd *) display->splots->data;  /*-- only one splot --*/
+  gint projection = projection_get (display->ggobi);
 
-        switch (projection) {
-          case P1PLOT:
-            for (j=0; j<ncols; j++) {
-              if (sp->p1dvar == cols[j]) {
-                return(sp->p1dvar);
-              }
-            }
-          break;
-          case XYPLOT:
-            for (j=0; j<ncols; j++) {
-              if (sp->xyvars.x == cols[j]) {
-                return(sp->xyvars.x);
-              }
-              if (sp->xyvars.y == cols[j]) {
-                return(sp->xyvars.y);
-              }
-            }
-          break;
-          case TOUR1D:
-            for (j=0; j<ncols; j++) {
-              for (k=0; k<display->t1d.nactive; k++) {
-                if (display->t1d.active_vars.els[k] == cols[j]) {
-                  return(display->t1d.active_vars.els[k]);
-                }
-              }
-            }
-          break;
-          case TOUR2D:
-            for (j=0; j<ncols; j++) {
-              for (k=0; k<display->t2d.nactive; k++) {
-                if (display->t2d.active_vars.els[k] == cols[j]) {
-                  return(display->t2d.active_vars.els[k]);
-                }
-              }
-            }
-          break;
-          case COTOUR:
-            for (j=0; j<ncols; j++) {
-              for (k=0; k<display->tcorr1.nactive; k++) {
-                if (display->tcorr1.active_vars.els[k] == cols[j]) {
-                  return(display->tcorr1.active_vars.els[k]);
-                }
-              }
-              for (k=0; k<display->tcorr2.nactive; k++) {
-                if (display->tcorr2.active_vars.els[k] == cols[j]) {
-                  return(display->tcorr2.active_vars.els[k]);
-                }
-              }
-            }
-          break;
+  switch (projection) {
+    case P1PLOT:
+      for (j=0; j<ncols; j++) {
+        if (sp->p1dvar == cols[j]) {
+          return(sp->p1dvar);
         }
+      }
+    break;
+    case XYPLOT:
+      for (j=0; j<ncols; j++) {
+        if (sp->xyvars.x == cols[j]) {
+          return(sp->xyvars.x);
+        }
+        if (sp->xyvars.y == cols[j]) {
+          return(sp->xyvars.y);
+        }
+      }
+    break;
+    case TOUR1D:
+      for (j=0; j<ncols; j++) {
+        for (k=0; k<display->t1d.nactive; k++) {
+          if (display->t1d.active_vars.els[k] == cols[j]) {
+            return(display->t1d.active_vars.els[k]);
+          }
+        }
+      }
+    break;
+#ifdef ROTATION_IMPLEMENTED
+    case TOUR2D3:
+      for (j=0; j<ncols; j++) {
+        for (k=0; k<display->t2d3.nactive; k++) {
+          if (display->t2d3.active_vars.els[k] == cols[j]) {
+            return(display->t2d3.active_vars.els[k]);
+          }
+        }
+      }
+    break;
+#endif
+    case TOUR2D:
+      for (j=0; j<ncols; j++) {
+        for (k=0; k<display->t2d.nactive; k++) {
+          if (display->t2d.active_vars.els[k] == cols[j]) {
+            return(display->t2d.active_vars.els[k]);
+          }
+        }
+      }
+    break;
+    case COTOUR:
+      for (j=0; j<ncols; j++) {
+        for (k=0; k<display->tcorr1.nactive; k++) {
+          if (display->tcorr1.active_vars.els[k] == cols[j]) {
+            return(display->tcorr1.active_vars.els[k]);
+          }
+        }
+        for (k=0; k<display->tcorr2.nactive; k++) {
+          if (display->tcorr2.active_vars.els[k] == cols[j]) {
+            return(display->tcorr2.active_vars.els[k]);
+          }
+        }
+      }
+    break;
+  }
 
   return(-1);
 }
 
 
 static void
-varpanelTooltipsReset(displayd *display, ggobid *gg, GtkWidget *wx, GtkWidget *wy, GtkWidget *label)
+varpanelTooltipsReset(displayd *display, ggobid *gg, GtkWidget *wx, GtkWidget *wy, GtkWidget *wz, GtkWidget *label)
 {
   gint projection = projection_get (gg);
-        switch (projection) {
-          case P1PLOT:
-            gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
-              "Select to plot",
-              NULL);
-            gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
-              "Click left to plot horizontally, right or middle to plot vertically",
-              NULL);
-          break;
-          case XYPLOT:
-            gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
-              "Press to select the horizontally plotted variable",
-              NULL);
-            gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wy,
-              "Press to select the vertically plotted variable",
-              NULL);
-            gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
-              "Click left to select the horizontal variable, middle for vertical",
-              NULL);
 
-          break;
-          case TOUR2D:
-            gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
-              "Click to select a variable to be available for touring",
-              NULL);
-            gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
-              "Click to select a variable to be available for touring",
-              NULL);
-          break;
-          case TOUR1D:
-            gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
-              "Click to select a variable to be available for touring",
-              NULL);
-            gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
-              "Click to select a variable to be available for touring",
-              NULL);
-          break;
-          case COTOUR:
-            gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
-              "Click to select a variable to be toured horizontally",
-              NULL);
-            gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wy,
-              "Click to select a variable to be toured vertically",
-              NULL);
-            gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
-              "Click to select a variable to be available for touring",
-              NULL);
-          break;
-          /*-- to pacify compiler if we change these to an enum --*/
-          default:
-          break;
-      }
+  switch (projection) {
+    case P1PLOT:
+      gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
+        "Select to plot",
+        NULL);
+      gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
+        "Click left to plot horizontally, right or middle to plot vertically",
+        NULL);
+    break;
+    case XYPLOT:
+      gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
+        "Press to select the horizontally plotted variable",
+        NULL);
+      gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wy,
+        "Press to select the vertically plotted variable",
+        NULL);
+      gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
+        "Click left to select the horizontal variable, middle for vertical",
+        NULL);
+
+    break;
+    case TOUR1D:
+      gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
+        "Click to select a variable to be available for touring",
+        NULL);
+      gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
+        "Click to select a variable to be available for touring",
+        NULL);
+    break;
+#ifdef ROTATION_IMPLEMENTED
+    case TOUR2D3:
+      gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
+        "Click to select a variable to be available for rotation",
+        NULL);
+      gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wy,
+        "Click to select a variable to be available for rotation",
+        NULL);
+      gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wz,
+        "Click to select a variable to be available for rotation",
+        NULL);
+      gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
+        "Click to select a variable to be available for rotation",
+        NULL);
+    break;
+#endif
+    case TOUR2D:
+      gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
+        "Click to select a variable to be available for touring",
+        NULL);
+      gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
+        "Click to select a variable to be available for touring",
+        NULL);
+    break;
+    case COTOUR:
+      gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
+        "Click to select a variable to be toured horizontally",
+        NULL);
+      gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wy,
+        "Click to select a variable to be toured vertically",
+        NULL);
+      gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
+        "Click to select a variable to be available for touring",
+        NULL);
+    break;
+    /*-- to pacify compiler if we change these to an enum --*/
+    default:
+    break;
+  }
 }
 
 static gint 
@@ -874,32 +981,40 @@ plottedVarsGet(displayd *display, gint *cols, datad *d, ggobid *gg)
   PipelineMode mode = viewmode_get (gg);
   gint ncols = 0, k;
   splotd *sp = gg->current_splot;
-       switch (mode) {
-        case P1PLOT:
-          cols[ncols++] = sp->p1dvar;
-        break;
-        case XYPLOT:
-          cols[ncols++] = sp->xyvars.x;
-          cols[ncols++] = sp->xyvars.y;
-        break;
-        case TOUR1D:
-          for (k=0; k<display->t1d.nactive; k++)
-            cols[ncols++] = display->t1d.active_vars.els[k];
-        break;
-         case TOUR2D:
-          for (k=0; k<display->t2d.nactive; k++)
-            cols[ncols++] = display->t2d.active_vars.els[k];
-        break;
-        case COTOUR:
-          for (k=0; k<display->tcorr1.nactive; k++)
-            cols[ncols++] = display->tcorr1.active_vars.els[k];
-          for (k=0; k<display->tcorr2.nactive; k++)
-            cols[ncols++] = display->tcorr2.active_vars.els[k];
-        break;
-        default:
-        break;
-      }
-       return(ncols);
+
+  switch (mode) {
+    case P1PLOT:
+      cols[ncols++] = sp->p1dvar;
+    break;
+    case XYPLOT:
+      cols[ncols++] = sp->xyvars.x;
+      cols[ncols++] = sp->xyvars.y;
+    break;
+    case TOUR1D:
+      for (k=0; k<display->t1d.nactive; k++)
+        cols[ncols++] = display->t1d.active_vars.els[k];
+    break;
+#ifdef ROTATION_IMPLEMENTED
+    case TOUR2D3:
+      for (k=0; k<display->t2d3.nactive; k++)
+        cols[ncols++] = display->t2d3.active_vars.els[k];
+    break;
+#endif
+    case TOUR2D:
+      for (k=0; k<display->t2d.nactive; k++)
+        cols[ncols++] = display->t2d.active_vars.els[k];
+    break;
+    case COTOUR:
+      for (k=0; k<display->tcorr1.nactive; k++)
+        cols[ncols++] = display->tcorr1.active_vars.els[k];
+      for (k=0; k<display->tcorr2.nactive; k++)
+        cols[ncols++] = display->tcorr2.active_vars.els[k];
+    break;
+    default:
+    break;
+  }
+  
+  return(ncols);
 }
 
 /*
@@ -919,45 +1034,53 @@ add_xml_scatterplot_variables(xmlNodePtr node, GList *plots, displayd *dpy)
 static gchar *
 treeLabel(splotd *splot, datad *d, ggobid *gg)
 {
-     gchar *buf = NULL;
-     displayd *display = (displayd *) splot->displayptr; 
-     cpaneld *cpanel = &display->cpanel;
-     vartabled *vt, *vtx, *vty;
-     gint n;
+  gchar *buf = NULL;
+  displayd *display = (displayd *) splot->displayptr; 
+  cpaneld *cpanel = &display->cpanel;
+  vartabled *vt, *vtx, *vty;
+  gint n;
 
-     switch (cpanel->projection) {
-        case P1PLOT:
-        case TOUR1D:
-          vt = vartable_element_get (splot->p1dvar, d);
-          n = strlen (vt->collab);
-          buf = (gchar*) g_malloc(n* sizeof (gchar*));
-          sprintf(buf, "%s", vt->collab);
-        break;
+  switch (cpanel->projection) {
+     case P1PLOT:
+     case TOUR1D:
+       vt = vartable_element_get (splot->p1dvar, d);
+       n = strlen (vt->collab);
+       buf = (gchar*) g_malloc(n* sizeof (gchar*));
+       sprintf(buf, "%s", vt->collab);
+     break;
 
-        case XYPLOT:
-          vtx = vartable_element_get (splot->xyvars.x, d);
-          vty = vartable_element_get (splot->xyvars.y, d);
+     case XYPLOT:
+       vtx = vartable_element_get (splot->xyvars.x, d);
+       vty = vartable_element_get (splot->xyvars.y, d);
 
-          n = strlen (vtx->collab) + strlen (vty->collab) + 5;
-          buf = (gchar*) g_malloc (n * sizeof (gchar*));
-          sprintf (buf, "%s v %s", vtx->collab, vty->collab);
-        break;
+       n = strlen (vtx->collab) + strlen (vty->collab) + 5;
+       buf = (gchar*) g_malloc (n * sizeof (gchar*));
+       sprintf (buf, "%s v %s", vtx->collab, vty->collab);
+     break;
 
-        case TOUR2D:
-          n = strlen ("in grand tour");
-          buf = (gchar*) g_malloc (n * sizeof (gchar*));
-          sprintf (buf, "%s", "in grand tour");
-        break;
+     case TOUR2D:
+       n = strlen ("in grand tour");
+       buf = (gchar*) g_malloc (n * sizeof (gchar*));
+       sprintf (buf, "%s", "in grand tour");
+     break;
 
-        case COTOUR:
-          n = strlen ("in correlation tour");
-          buf = (gchar*) g_malloc (n * sizeof (gchar*));
-          sprintf (buf, "%s", "in correlation tour");
-        break;
-        default:
-        break;
-     }
-     return(buf);
+#ifdef ROTATION_IMPLEMENTED
+     case TOUR2D3:
+       n = strlen ("in rotation");
+       buf = (gchar*) g_malloc (n * sizeof (gchar*));
+       sprintf (buf, "%s", "in grand tour");
+     break;
+#endif
+
+     case COTOUR:
+       n = strlen ("in correlation tour");
+       buf = (gchar*) g_malloc (n * sizeof (gchar*));
+       sprintf (buf, "%s", "in correlation tour");
+     break;
+     default:
+     break;
+  }
+  return(buf);
 }
 
 
@@ -972,6 +1095,7 @@ static void
 worldToPlane(splotd *sp, datad *d, ggobid *gg)
 {
   cpaneld *cpanel = &(sp->displayptr->cpanel);
+
   switch (cpanel->projection) {
     case P1PLOT:
       p1d_reproject (sp, d->world.vals, d, gg);
@@ -985,6 +1109,11 @@ worldToPlane(splotd *sp, datad *d, ggobid *gg)
       tour1d_projdata (sp, d->world.vals, d, gg);
     break;
 
+#ifdef ROTATION_IMPLEMENTED
+    case TOUR2D3:
+      tour2d3_projdata(sp, d->world.vals, d, gg);
+    break;
+#endif
     case TOUR2D:
       tour2d_projdata(sp, d->world.vals, d, gg);
     break;
@@ -1002,71 +1131,85 @@ static gboolean
 drawCase(splotd *sp, gint m, datad *d, ggobid *gg)
 {
   gboolean draw_case = true;
-        gint proj = projection_get (gg);
-        switch (proj) {
-          case P1PLOT:
-            if (d->missing.vals[m][sp->p1dvar])
-              draw_case = false;
-          break;
-          case XYPLOT:
-            if (d->missing.vals[m][sp->xyvars.x])
-              draw_case = false;
-            else if (d->missing.vals[m][sp->xyvars.y])
-              draw_case = false;
-          break;
-          case TOUR1D:
-            if (d->missing.vals[m][sp->displayptr->t1d.active_vars.els[m]])
-              draw_case = false;
-          break;
+  gint proj = projection_get (gg);
 
-          case TOUR2D:
-            if (d->missing.vals[m][sp->displayptr->t2d.active_vars.els[m]])
-              draw_case = false;
-          break;
+  switch (proj) {
+    case P1PLOT:
+      if (d->missing.vals[m][sp->p1dvar])
+        draw_case = false;
+    break;
+    case XYPLOT:
+      if (d->missing.vals[m][sp->xyvars.x])
+        draw_case = false;
+      else if (d->missing.vals[m][sp->xyvars.y])
+        draw_case = false;
+    break;
+    case TOUR1D:
+      if (d->missing.vals[m][sp->displayptr->t1d.active_vars.els[m]])
+        draw_case = false;
+    break;
+#ifdef ROTATION_IMPLEMENTED
+    case TOUR2D3:
+      if (d->missing.vals[m][sp->displayptr->t2d3.active_vars.els[m]])
+        draw_case = false;
+    break;
+#endif
+    case TOUR2D:
+      if (d->missing.vals[m][sp->displayptr->t2d.active_vars.els[m]])
+        draw_case = false;
+    break;
 
-          case COTOUR:
-            if (d->missing.vals[m][sp->displayptr->tcorr1.active_vars.els[m]])
-              draw_case = false;
-            else if (d->missing.vals[m][sp->displayptr->tcorr2.active_vars.els[m]])
-              draw_case = false;
-          break;
-        }
+    case COTOUR:
+      if (d->missing.vals[m][sp->displayptr->tcorr1.active_vars.els[m]])
+        draw_case = false;
+      else if (d->missing.vals[m][sp->displayptr->tcorr2.active_vars.els[m]])
+        draw_case = false;
+    break;
+  }
+
   return(draw_case);
 }
 
 static gboolean
 drawEdge(splotd *sp, gint m, datad *d, datad *e, ggobid *gg) 
 {
-       gboolean draw_edge = true;
-       gint proj = projection_get (gg);
-        switch (proj) {
-          case P1PLOT:
-            if (e->missing.vals[m][sp->p1dvar])
-              draw_edge = false;
-          break;
-          case XYPLOT:
-            if (e->missing.vals[m][sp->xyvars.x])
-              draw_edge = false;
-            else if (e->missing.vals[m][sp->xyvars.y])
-              draw_edge = false;
-          break;
-          case TOUR1D:
-            if (e->missing.vals[m][sp->displayptr->t1d.active_vars.els[m]])
-              draw_edge = false;
-          break;
+  gboolean draw_edge = true;
+  gint proj = projection_get (gg);
 
-          case TOUR2D:
-            if (e->missing.vals[m][sp->displayptr->t2d.active_vars.els[m]])
-              draw_edge = false;
-          break;
+  switch (proj) {
+    case P1PLOT:
+      if (e->missing.vals[m][sp->p1dvar])
+        draw_edge = false;
+    break;
+    case XYPLOT:
+      if (e->missing.vals[m][sp->xyvars.x])
+        draw_edge = false;
+      else if (e->missing.vals[m][sp->xyvars.y])
+        draw_edge = false;
+    break;
+    case TOUR1D:
+      if (e->missing.vals[m][sp->displayptr->t1d.active_vars.els[m]])
+        draw_edge = false;
+    break;
 
-          case COTOUR:
-            if (e->missing.vals[m][sp->displayptr->tcorr1.active_vars.els[m]])
-              draw_edge = false;
-            else if (e->missing.vals[m][sp->displayptr->tcorr2.active_vars.els[m]])
-              draw_edge = false;
-          break;
-        }
+#ifdef ROTATION_IMPLEMENTED
+    case TOUR2D3:
+      if (e->missing.vals[m][sp->displayptr->t2d3.active_vars.els[m]])
+        draw_edge = false;
+    break;
+#endif
+    case TOUR2D:
+      if (e->missing.vals[m][sp->displayptr->t2d.active_vars.els[m]])
+        draw_edge = false;
+    break;
+
+    case COTOUR:
+      if (e->missing.vals[m][sp->displayptr->tcorr1.active_vars.els[m]])
+        draw_edge = false;
+      else if (e->missing.vals[m][sp->displayptr->tcorr2.active_vars.els[m]])
+        draw_edge = false;
+    break;
+  }
   return(draw_edge);
 }
 

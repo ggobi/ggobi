@@ -184,6 +184,12 @@ splot_event_handled (GtkWidget *w, GdkEventKey *event,
   case GDK_T:
     action = TOUR1D;
   break;
+#ifdef ROTATION_IMPLEMENTED
+  case GDK_r:
+  case GDK_R:
+    action = TOUR2D3;
+  break;
+#endif
   case GDK_g:
   case GDK_G:
     action = TOUR2D;
@@ -240,8 +246,9 @@ sp_event_handlers_toggle (splotd *sp, gboolean state)
   if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
     GtkGGobiExtendedDisplayClass *klass;
     klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
-    if(klass->event_handlers_toggle && klass->event_handlers_toggle(display, sp, state, m) == false)
+    if(klass->event_handlers_toggle && klass->event_handlers_toggle(display, sp, state, m) == false) {
       return;
+    }
   }
 
   switch (m) {
@@ -253,12 +260,6 @@ sp_event_handlers_toggle (splotd *sp, gboolean state)
       xyplot_event_handlers_toggle (sp, state);
     break;
 
-#ifdef ROTATION_IMPLEMENTED
-    case ROTATE:
-      rotation_event_handlers_toggle (sp, state);
-    break;
-#endif
-
     case SCALE:
       scale_event_handlers_toggle (sp, state);
     break;
@@ -267,6 +268,11 @@ sp_event_handlers_toggle (splotd *sp, gboolean state)
       tour1d_event_handlers_toggle (sp, state);
     break;
 
+#ifdef ROTATION_IMPLEMENTED
+    case TOUR2D3:
+      tour2d3_event_handlers_toggle (sp, state);
+    break;
+#endif
     case TOUR2D:
       tour2d_event_handlers_toggle (sp, state);
     break;
@@ -560,6 +566,9 @@ splot_init(splotd *sp, displayd *display, gint width, gint height, ggobid *gg)
 
 /* tour inits */
   sp->tour1d.initmax = true;
+#ifdef ROTATION_IMPLEMENTED
+  sp->tour2d3.initmax = true;
+#endif
   sp->tour2d.initmax = true;
   sp->tourcorr.initmax = true;
 
@@ -682,11 +691,20 @@ splot_screen_to_tform (cpaneld *cpanel, splotd *sp, icoords *scr,
   gfloat scale_x, scale_y;
   vartabled *vt, *vtx, *vty;
 
+#ifdef ROTATION_IMPLEMENTED
+  g_return_if_fail (cpanel->projection == XYPLOT ||
+                    cpanel->projection == P1PLOT ||
+                    cpanel->projection == TOUR1D ||
+                    cpanel->projection == TOUR2D3 ||
+                    cpanel->projection == TOUR2D ||
+                    cpanel->projection == COTOUR);
+#else
   g_return_if_fail (cpanel->projection == XYPLOT ||
                     cpanel->projection == P1PLOT ||
                     cpanel->projection == TOUR1D ||
                     cpanel->projection == TOUR2D ||
                     cpanel->projection == COTOUR);
+#endif
 
 
   scale_x = sp->scale.x;
@@ -752,16 +770,12 @@ splot_screen_to_tform (cpaneld *cpanel, splotd *sp, icoords *scr,
       tfd->y += min;
     break;
 
-
-    case TOUR2D:
-    break;
-
     case TOUR1D:
-    break;
-
+#ifdef ROTATION_IMPLEMENTED
+    case TOUR2D3:
+#endif
+    case TOUR2D:
     case COTOUR:
-    break;
-
     default:
     break;
   }
@@ -849,6 +863,19 @@ splot_plane_to_world (splotd *sp, gint ipt, ggobid *gg)
     }
     break;
 
+#ifdef ROTATION_IMPLEMENTED
+    case TOUR2D3:
+    {
+      gint j, var;
+      for (j=0; j<display->t2d3.nactive; j++) {
+        var = display->t2d3.active_vars.els[j];
+        d->world.vals[ipt][var] += 
+         (gg->movepts.eps.x * (greal) display->t2d3.F.vals[0][var] +
+          gg->movepts.eps.y * (greal) display->t2d3.F.vals[1][var]);
+      }
+    }
+    break;
+#endif
     case TOUR2D:
     {
       gint j, var;

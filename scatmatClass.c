@@ -10,10 +10,10 @@
 static gboolean
 cpanelSet(displayd *dpy, cpaneld *cpanel, ggobid *gg)
 {
-      cpanel_scatmat_set (cpanel, gg);
-      cpanel_brush_set (cpanel, gg);
-      cpanel_identify_set (cpanel, gg);
-      return(true);
+  cpanel_scatmat_set (cpanel, gg);
+  cpanel_brush_set (cpanel, gg);
+  cpanel_identify_set (cpanel, gg);
+  return(true);
 }
 
 static void
@@ -75,32 +75,35 @@ variableSelect(GtkWidget *w, displayd *dpy, splotd *sp, gint jvar, gint btn, cpa
 static void 
 varpanelRefresh(displayd *display, splotd *sp, datad *d)
 {
-	gint j;
-	GList *l;
+  gint j;
+  GList *l;
 
-        for (j=0; j<d->ncols; j++) {
-          varpanel_toggle_set_active (VARSEL_X, j, false, d);
-          varpanel_toggle_set_active (VARSEL_Y, j, false, d);
-          varpanel_widget_set_visible (VARSEL_Y, j, false, d);
-        }
-        l = display->scatmat_cols;  /*-- assume rows = cols --*/
-        while (l) {
-          j = GPOINTER_TO_INT (l->data);
-          varpanel_toggle_set_active (VARSEL_X, j, true, d);
-          l = l->next;
-        }
+  for (j=0; j<d->ncols; j++) {
+    varpanel_toggle_set_active (VARSEL_X, j, false, d);
+
+    varpanel_toggle_set_active (VARSEL_Y, j, false, d);
+    varpanel_widget_set_visible (VARSEL_Y, j, false, d);
+    varpanel_toggle_set_active (VARSEL_Z, j, false, d);
+    varpanel_widget_set_visible (VARSEL_Z, j, false, d);
+  }
+  l = display->scatmat_cols;  /*-- assume rows = cols --*/
+  while (l) {
+    j = GPOINTER_TO_INT (l->data);
+    varpanel_toggle_set_active (VARSEL_X, j, true, d);
+    l = l->next;
+  }
 }
 
 
 static void
-varpanelTooltipsSet(displayd *display, ggobid *gg, GtkWidget *wx, GtkWidget *wy, GtkWidget *label)
+varpanelTooltipsSet(displayd *display, ggobid *gg, GtkWidget *wx, GtkWidget *wy, GtkWidget *wz, GtkWidget *label)
 {
-        gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
-          "Select to replace/insert/append a variable, or to delete it",
-          NULL);
-        gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
-          "Click to replace/insert/append a variable, or to delete it",
-          NULL);
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
+    "Select to replace/insert/append a variable, or to delete it",
+    NULL);
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
+    "Click to replace/insert/append a variable, or to delete it",
+    NULL);
 }
 
 static gint

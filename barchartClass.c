@@ -26,7 +26,7 @@ static void barchartVarpanelRefresh(displayd * display, splotd * sp,
 static gboolean barchartHandlesAction(displayd * dpy, PipelineMode mode);
 static void barchartVarpanelTooltipsSet(displayd * dpy, ggobid * gg,
                                         GtkWidget * wx, GtkWidget * wy,
-                                        GtkWidget * label);
+                                        GtkWidget *wz, GtkWidget * label);
 static gint barchartPlottedColsGet(displayd * display, gint * cols,
                                    datad * d, ggobid * gg);
 static GtkWidget *barchartCPanelWidget(displayd * dpy, gint viewmode,
@@ -180,8 +180,11 @@ void barchartVarpanelRefresh(displayd * display, splotd * sp, datad * d)
   gint j;
   for (j = 0; j < d->ncols; j++) {
     varpanel_toggle_set_active(VARSEL_X, j, (j == sp->p1dvar), d);
+
     varpanel_toggle_set_active(VARSEL_Y, j, false, d);
     varpanel_widget_set_visible(VARSEL_Y, j, false, d);
+    varpanel_toggle_set_active(VARSEL_Z, j, false, d);
+    varpanel_widget_set_visible(VARSEL_Z, j, false, d);
   }
 }
 
@@ -216,7 +219,7 @@ static void barchart_menus_make(ggobid * gg)
 
 void
 barchartVarpanelTooltipsSet(displayd * dpy, ggobid * gg, GtkWidget * wx,
-                            GtkWidget * wy, GtkWidget * label)
+                            GtkWidget * wy, GtkWidget *wz, GtkWidget * label)
 {
   gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), wx,
                        "Click to replace a variable", NULL);

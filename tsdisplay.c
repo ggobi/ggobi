@@ -27,53 +27,54 @@ timeSeriesDisplayCreate(gboolean missing_p, splotd *sp, datad *d, ggobid *gg)
 gint
 tsplotIsVarPlotted(displayd *display, gint *cols, gint ncols, datad *d)
 {
-	GList *l;
-	splotd *sp;
-	int j;
+  GList *l;
+  splotd *sp;
+  int j;
 
-        for (l = display->splots; l; l = l->next) {
-          sp = (splotd *) l->data;
+  for (l = display->splots; l; l = l->next) {
+    sp = (splotd *) l->data;
 
-          for (j=0; j<ncols; j++) {
-            if (sp->xyvars.x == cols[j]) {
-              return(sp->xyvars.x);
-            }
-            if (sp->xyvars.y == cols[j]) {
-              return(sp->xyvars.y);
-            }
-          }
-        }
+    for (j=0; j<ncols; j++) {
+      if (sp->xyvars.x == cols[j]) {
+        return(sp->xyvars.x);
+      }
+      if (sp->xyvars.y == cols[j]) {
+        return(sp->xyvars.y);
+      }
+    }
+  }
 
-	return(-1);
+  return(-1);
 }
 
 gboolean
 tsplotCPanelSet(displayd *dpy, cpaneld *cpanel, ggobid *gg)
 { 
-      GtkWidget *w;
-      w = GTK_GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget;
-      if(!w) {
-        GTK_GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget = w =  cpanel_tsplot_make(gg);
-      }
-/* Can actually be more efficient here by storing the option menu used in tsplot_set
+  GtkWidget *w;
+  w = GTK_GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget;
+  if(!w) {
+    GTK_GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget = w =  cpanel_tsplot_make(gg);
+  }
+/* Can actually be more efficient here by storing the option menu used
+   in tsplot_set
    and avoid looking it up each time. Store it in the displayd object. */
-      cpanel_tsplot_set (cpanel, w, gg);
-      cpanel_brush_set (cpanel, gg);
-      cpanel_identify_set (cpanel, gg);
+  cpanel_tsplot_set (cpanel, w, gg);
+  cpanel_brush_set (cpanel, gg);
+  cpanel_identify_set (cpanel, gg);
 
-      return(true);
+  return(true);
 }
 
 void
 tsplotDisplaySet(displayd *dpy, ggobid *gg)
 {
-        tsplot_mode_menu_make (gg->main_accel_group,
-			       (GtkSignalFunc) viewmode_set_cb, gg, true);
-        gg->viewmode_item = submenu_make ("_ViewMode", 'V',
-					  gg->main_accel_group);
-        gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->viewmode_item),
-                                   gg->tsplot.mode_menu); 
-        submenu_insert (gg->viewmode_item, gg->main_menubar, 2);
+  tsplot_mode_menu_make (gg->main_accel_group,
+    (GtkSignalFunc) viewmode_set_cb, gg, true);
+  gg->viewmode_item = submenu_make ("_ViewMode", 'V',
+    gg->main_accel_group);
+  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->viewmode_item),
+                             gg->tsplot.mode_menu); 
+  submenu_insert (gg->viewmode_item, gg->main_menubar, 2);
 }
 
 
@@ -83,20 +84,23 @@ tsplotVarpanelRefresh(displayd *display, splotd *sp, datad *d)
 {
   gint j;
   GList *l;
-       for (j=0; j<d->ncols; j++) {
-          varpanel_toggle_set_active (VARSEL_X, j, false, d);
-          varpanel_toggle_set_active (VARSEL_Y, j, false, d);
-          varpanel_widget_set_visible (VARSEL_Y, j, true, d);
-        }
 
-        l = display->splots;
-        while (l) {
-          j = ((splotd *) l->data)->xyvars.y;
-          varpanel_toggle_set_active (VARSEL_Y, j, true, d);
-          j = ((splotd *) l->data)->xyvars.x;
-          varpanel_toggle_set_active (VARSEL_X, j, true, d);
-          l = l->next;
-        }
+  for (j=0; j<d->ncols; j++) {
+     varpanel_toggle_set_active (VARSEL_X, j, false, d);
+     varpanel_toggle_set_active (VARSEL_Y, j, false, d);
+     varpanel_widget_set_visible (VARSEL_Y, j, true, d);
+     varpanel_toggle_set_active (VARSEL_Z, j, false, d);
+     varpanel_widget_set_visible (VARSEL_Z, j, false, d);
+   }
+
+   l = display->splots;
+   while (l) {
+     j = ((splotd *) l->data)->xyvars.y;
+     varpanel_toggle_set_active (VARSEL_Y, j, true, d);
+     j = ((splotd *) l->data)->xyvars.x;
+     varpanel_toggle_set_active (VARSEL_X, j, true, d);
+     l = l->next;
+   }
 }
 
 gboolean
@@ -128,41 +132,41 @@ add_xml_tsplot_variables(xmlNodePtr node, GList *plots, displayd *dpy)
 
 
 void
-tsplotVarpanelTooltipsSet(displayd *dpy, ggobid *gg, GtkWidget *wx, GtkWidget *wy, GtkWidget *label)
+tsplotVarpanelTooltipsSet(displayd *dpy, ggobid *gg, GtkWidget *wx, GtkWidget *wy, GtkWidget *wz, GtkWidget *label)
 {
-        gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
-          "Select to replace the horizontal (time) variable.",
-          NULL);
-        gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wy,
-          "Select to replace/insert/append/delete a Y variable.",
-          NULL);
-        gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
-          "Click left to replace the horizontal (time) variable.  Click middle or right to replace/insert/append/delete a Y variable.",
-          NULL);
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
+    "Select to replace the horizontal (time) variable.",
+    NULL);
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wy,
+    "Select to replace/insert/append/delete a Y variable.",
+    NULL);
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
+    "Click left to replace the horizontal (time) variable.  Click middle or right to replace/insert/append/delete a Y variable.",
+    NULL);
 }
 
 
 gint
 tsplotPlottedColsGet(displayd *display, gint *cols, datad *d, ggobid *gg)
 {
-      GList *l;
-      splotd *s;
-      gint ncols = 0;
+  GList *l;
+  splotd *s;
+  gint ncols = 0;
 
-      for (l=display->splots; l; l=l->next) {
-        s = (splotd *) l->data;
-        if (!array_contains (cols, ncols, s->xyvars.y))
-          cols[ncols++] = s->xyvars.y;
-      }
-      return(ncols);
+  for (l=display->splots; l; l=l->next) {
+    s = (splotd *) l->data;
+    if (!array_contains (cols, ncols, s->xyvars.y))
+      cols[ncols++] = s->xyvars.y;
+  }
+  return(ncols);
 }
 
 
 GtkWidget *
 tsplotMenusMake(displayd *dpy, PipelineMode viewMode, ggobid *gg)
 {
-      tsplot_menus_make (gg);
-      return(NULL);
+  tsplot_menus_make (gg);
+  return(NULL);
 }
 
 
@@ -254,13 +258,13 @@ tsplot_menus_make (ggobid *gg)
   gg->menus.options_menu = gtk_menu_new ();
 
   CreateMenuCheck (gg->menus.options_menu, "Show tooltips",
-		   GTK_SIGNAL_FUNC (tooltips_show_cb), NULL,
-		   GTK_TOOLTIPS (gg->tips)->enabled, gg);
+    GTK_SIGNAL_FUNC (tooltips_show_cb), NULL,
+    GTK_TOOLTIPS (gg->tips)->enabled, gg);
 
   CreateMenuCheck (gg->menus.options_menu, "Show control panel",
-		   GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
-		   GTK_WIDGET_VISIBLE (gg->viewmode_frame), gg);
+    GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
+    GTK_WIDGET_VISIBLE (gg->viewmode_frame), gg);
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
-			     gg->menus.options_menu);
+     gg->menus.options_menu);
 }

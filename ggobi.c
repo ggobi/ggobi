@@ -357,6 +357,10 @@ ggobi_alloc(ggobid *tmp)
   tmp->tourcorr.fade_vars = true;
   tmp->brush.updateAlways_p = true;
 
+#ifdef ROTATION_IMPLEMENTED
+  tmp->tour2d3.idled = 0;
+#endif
+
   tmp->printOptions = NULL;
   tmp->pluginInstances = NULL;
 

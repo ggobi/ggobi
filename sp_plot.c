@@ -412,7 +412,11 @@ splot_draw_to_pixmap0_binned (splotd *sp, ggobid *gg)
     }
   }
 
+#ifdef ROTATION_IMPLEMENTED
+  if (proj == TOUR1D || proj == TOUR2D3 || proj == TOUR2D || proj == COTOUR) {
+#else
   if (proj == TOUR1D || proj == TOUR2D || proj == COTOUR) {
+#endif
     splot_draw_tour_axes(sp, sp->pixmap0, gg);
   }
 
@@ -1137,7 +1141,11 @@ splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
     }
   }
 
+#ifdef ROTATION_IMPLEMENTED
+  if (proj == TOUR1D || proj == TOUR2D3 || proj == TOUR2D || proj == COTOUR) {
+#else
   if (proj == TOUR1D || proj == TOUR2D || proj == COTOUR) {
+#endif
     splot_draw_tour_axes(sp, drawable, gg);
   }
 }
@@ -1249,6 +1257,76 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
         gdk_gc_set_line_attributes(gg->plot_GC, 1, GDK_LINE_SOLID, 
           GDK_CAP_ROUND, GDK_JOIN_ROUND);
       break;
+#ifdef ROTATION_IMPLEMENTED
+      case TOUR2D3:
+        /* draws circle */
+        gdk_draw_arc(drawable,gg->plot_GC,FALSE,
+          axindent, 3*daheight/4 - axindent,
+          dawidth/4, daheight/4, 0,360*64);
+
+        /* draw the axes and labels */
+        for (j=0; j<d->ncols; j++) {
+          ix = dawidth/8 + axindent +
+            (gint) (dsp->t2d3.F.vals[0][j]* (gfloat) dawidth/8);
+          iy = daheight - axindent - (daheight/8 + 
+            (gint) (dsp->t2d3.F.vals[1][j]* (gfloat) daheight/8));
+          gdk_gc_set_line_attributes(gg->plot_GC, 2, GDK_LINE_SOLID, 
+            GDK_CAP_ROUND, GDK_JOIN_ROUND);
+          gdk_draw_line(drawable, gg->plot_GC,
+            dawidth/8+axindent, daheight-daheight/8-axindent,
+            ix, iy);
+
+          if (abs(ix - axindent - dawidth/8) > 5 ||
+              abs(iy + axindent - (daheight- daheight/8)) > 5)
+          {
+            if (dsp->options.axes_label_p) {
+              vt = vartable_element_get (j, d);
+              varlab = g_strdup (vt->nickname);
+	        } else {
+              varlab = g_strdup_printf ("%d",j+1);
+	        }
+
+            gdk_text_extents (
+#if GTK_MAJOR_VERSION == 2
+              gtk_style_get_font (style),
+#else
+              style->font,
+#endif
+              varlab, strlen(varlab),
+              &lbearing, &rbearing, &width, &ascent, &descent);
+
+            textheight = ascent+descent;
+            ix = ix - axindent - dawidth/8;
+            iy = iy - (daheight - daheight/8 - axindent);
+            dst = sqrt(ix*ix + iy*iy);
+            ix = axindent + dawidth/8 + 
+               (gint) ((gfloat) ix / dst * (gfloat) dawidth/8);
+            iy = daheight - axindent - 
+               daheight/8 + (gint) ((gfloat) iy / dst * (gfloat) daheight/8);
+            if (ix < dawidth/8+axindent)
+              ix -= width;
+            else
+              ix += (width/2);
+            if (iy < daheight-daheight/8-axindent)
+              iy -= (textheight/2);
+            else
+              iy += (textheight);
+
+            gdk_draw_string (drawable,
+#if GTK_MAJOR_VERSION == 2
+              gtk_style_get_font (style),
+#else
+              style->font,
+#endif
+              gg->plot_GC, ix, iy, varlab);
+            g_free (varlab);
+          }
+        }
+        gdk_gc_set_line_attributes(gg->plot_GC, 0, GDK_LINE_SOLID, 
+          GDK_CAP_ROUND, GDK_JOIN_ROUND);
+
+      break;
+#endif
       case TOUR2D:
         /* draws circle */
         gdk_draw_arc(drawable,gg->plot_GC,FALSE,

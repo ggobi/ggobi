@@ -37,6 +37,9 @@ const char *const GGOBI(OpModeNames)[] = {
   "XYPlot",
   "Rotation",
   "1D Tour",
+#ifdef ROTATION_IMPLEMENTED
+  "Rotation",
+#endif
   "2D Tour",
   "Correlation Tour",
   "Scale",
@@ -68,7 +71,7 @@ make_control_panels (ggobid *gg)
   cpanel_p1dplot_make (gg);
   cpanel_xyplot_make (gg);
 #ifdef ROTATION_IMPLEMENTED
-  cpanel_rotation_make (gg);
+  cpanel_tour2d3_make (gg);
 #endif
   cpanel_tour1d_make (gg);
   cpanel_tour2d_make (gg);
@@ -292,6 +295,12 @@ static void
 procs_activate (gboolean state, displayd *display, ggobid *gg)
 {
   switch (gg->viewmode) {
+#ifdef ROTATION_IMPLEMENTED
+    case TOUR2D3:
+      if (!display->cpanel.t2d3.paused)
+        tour2d3_func (state, display, gg);
+    break;
+#endif
     case TOUR2D:
       if (!display->cpanel.t2d.paused)
         tour2d_func (state, display, gg);
@@ -319,29 +328,27 @@ viewmode_activate (splotd *sp, PipelineMode m, gboolean state, ggobid *gg)
   if (state == off) {
     switch (m) {
       case XYPLOT:
-      {
         xyplot_activate (state, display, gg);
-      }
+      break;
+#ifdef ROTATION_IMPLEMENTED
+      case TOUR2D3:
+        if (cpanel->t2d3.manip_mode != MANIP_OFF)
+          splot_cursor_set ((gint) NULL, sp);
+      break;
+#endif
+      case TOUR2D:
+        if (cpanel->t2d.manip_mode != MANIP_OFF)
+          splot_cursor_set ((gint) NULL, sp);
+      break;
+      case COTOUR:
+        if (cpanel->tcorr.manip_mode != MANIP_OFF)
+          splot_cursor_set ((gint) NULL, sp);
       break;
       case BRUSH:
         redraw_style = brush_activate (state, display, gg);
       break;
       case IDENT:
-      {
         redraw_style = identify_activate (state, display, gg);
-      }
-      break;
-      case TOUR2D:
-      {
-        if (cpanel->t2d.manip_mode != MANIP_OFF)
-          splot_cursor_set ((gint) NULL, sp);
-      }
-      break;
-      case COTOUR:
-      {
-        if (cpanel->tcorr.manip_mode != MANIP_OFF)
-          splot_cursor_set ((gint) NULL, sp);
-      }
       break;
       case SCALE:
         /*-- for insurance, because sometimes scaling doesn't quit --*/
@@ -354,23 +361,17 @@ viewmode_activate (splotd *sp, PipelineMode m, gboolean state, ggobid *gg)
   } else if (state == on) {
     switch (m) {
       case P1PLOT:
-      {
         p1d_activate (state, display, gg);
-      }
       break;
       case XYPLOT:
-      {
         xyplot_activate (state, display, gg);
-      }
       break;
-      case BRUSH:
-        redraw_style = brush_activate (state, display, gg);
+#ifdef ROTATION_IMPLEMENTED
+      case TOUR2D3:
+        if (cpanel->t2d3.manip_mode != MANIP_OFF)
+          splot_cursor_set (GDK_HAND2, sp);
       break;
-      case SCALE:
-      {
-        scale_click_init (sp, gg);
-      }
-      break;
+#endif
       case TOUR2D:
         if (cpanel->t2d.manip_mode != MANIP_OFF)
           splot_cursor_set (GDK_HAND2, sp);
@@ -378,6 +379,13 @@ viewmode_activate (splotd *sp, PipelineMode m, gboolean state, ggobid *gg)
       case COTOUR:
         if (cpanel->tcorr.manip_mode != MANIP_OFF)
           splot_cursor_set (GDK_HAND2, sp);
+      break;
+
+      case BRUSH:
+        redraw_style = brush_activate (state, display, gg);
+      break;
+      case SCALE:
+        scale_click_init (sp, gg);
       break;
       default:
       break;
@@ -406,24 +414,30 @@ projection_ok (gint m, displayd *display)
   /*-- if the mode is a projection-setting mode ... --*/
   if (m <= COTOUR) {
     switch (m) {
-      case COTOUR:
-        if (d->ncols < MIN_NVARS_FOR_COTOUR)
-          ok = false;
-      break;
-      case TOUR2D:
-        if (d->ncols < MIN_NVARS_FOR_TOUR2D)
-          ok = false;
-      break;
-      case TOUR1D:
-        if (d->ncols < MIN_NVARS_FOR_TOUR1D)
+      case P1PLOT:
+        if (d->ncols < 1)
           ok = false;
       break;
       case XYPLOT:
         if (d->ncols < 2)
           ok = false;
       break;
-      case P1PLOT:
-        if (d->ncols < 1)
+#ifdef ROTATION_IMPLEMENTED
+      case TOUR2D3:
+        if (d->ncols < MIN_NVARS_FOR_TOUR2D3)
+          ok = false;
+      break;
+#endif
+      case TOUR1D:
+        if (d->ncols < MIN_NVARS_FOR_TOUR1D)
+          ok = false;
+      break;
+      case TOUR2D:
+        if (d->ncols < MIN_NVARS_FOR_TOUR2D)
+          ok = false;
+      break;
+      case COTOUR:
+        if (d->ncols < MIN_NVARS_FOR_COTOUR)
           ok = false;
       break;
       default:

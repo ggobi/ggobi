@@ -31,6 +31,37 @@ varcircles_visibility_set (displayd *display, ggobid *gg)
   gint n = 0;
 
   switch (projection) {
+#ifdef ROTATION_IMPLEMENTED
+    case TOUR2D3:
+      for (j=0; j<d->ncols; j++) {
+        box = varcircles_get_nth (VB, j, d);
+        /* if in the subset but not among the children, pack and unref */
+        if (display->t2d3.subset_vars_p.els[j]) {
+          if (g_list_index (children, box) == -1) {
+            gtk_box_pack_start (GTK_BOX (d->vcirc_ui.table), box,
+                                false, false, 2);
+            gtk_box_reorder_child (GTK_BOX (d->vcirc_ui.table), box, n);
+            gtk_widget_show_all (box);
+#if GTK_MAJOR_VERSION == 1
+            if (GTK_OBJECT (box)->ref_count > 1)
+#else
+            if (G_OBJECT (box)->ref_count > 1)
+#endif
+              gtk_widget_unref (box);
+          }
+          n++;
+
+        /* if not in the subset but among the children, ref and remove */
+        } else { 
+          if (g_list_index (children, box) >= 0) {
+            gtk_widget_ref (box);
+            gtk_container_remove (GTK_CONTAINER (d->vcirc_ui.table), box);
+          }
+        }
+      }
+    break;
+#endif
+
     case TOUR1D:
       for (j=0; j<d->ncols; j++) {
         box = varcircles_get_nth (VB, j, d);
@@ -58,6 +89,7 @@ varcircles_visibility_set (displayd *display, ggobid *gg)
         }
       }
     break;
+
     case TOUR2D:
       for (j=0; j<d->ncols; j++) {
         box = varcircles_get_nth (VB, j, d);
@@ -86,11 +118,7 @@ varcircles_visibility_set (displayd *display, ggobid *gg)
         }
       }
     break;
-/*
- * I now have to handle the case that I'm removing one from (eg)
- * the horizontal subset and simultaneously adding it to the
- * vertical subset?
-*/
+
     case COTOUR:
       for (j=0; j<d->ncols; j++) {
         box = varcircles_get_nth (VB, j, d);

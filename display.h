@@ -109,21 +109,28 @@ struct _displayd {
   gboolean t2d_no_dir_flag;
   gfloat t2d_rx, t2d_ry;
 
-/*
- * 2d tour
-*/
- tour t2d;
- gboolean t2d_axes;
-
-/*
- * 1d tour
-*/
+/*-- 1d tour --*/
  tour t1d;
  gboolean t1d_axes;
 
-/*
- * corr tour
-*/
+#ifdef ROTATION_IMPLEMENTED
+/*-- rotation: 2d tour, constrained to 3 variables --*/
+ tour t2d3;
+ gboolean t2d3_axes;
+ gint t2d3_manip_var;
+ array_d t2d3_manbasis, t2d3_mvar_3dbasis;
+ array_d t2d3_Rmat1, t2d3_Rmat2;
+ gint t2d3_pos1_old, t2d3_pos1, t2d3_pos2_old, t2d3_pos2;
+ gfloat t2d3_rx, t2d3_ry;
+ gboolean t2d3_no_dir_flag;
+ gboolean t2d3_manipvar_inc;
+#endif
+
+/*-- 2d tour --*/
+ tour t2d;
+ gboolean t2d_axes;
+
+/*-- corr tour --*/
  tour tcorr1, tcorr2;
  gboolean tcorr_axes;
 
@@ -254,7 +261,7 @@ typedef struct
 	/* Probably should arrange for displayd to come first and no need to pass the splots. */
     void (*xml_describe)(xmlNodePtr node, GList *splots, displayd *dpy);
 
-    void (*varpanel_tooltips_set)(displayd *dpy, ggobid *gg, GtkWidget *wx, GtkWidget *wy, GtkWidget *label);
+    void (*varpanel_tooltips_set)(displayd *dpy, ggobid *gg, GtkWidget *wx, GtkWidget *wy, GtkWidget *wz, GtkWidget *label);
 
     gint (*plotted_vars_get)(displayd *display, gint *cols, datad *d, ggobid *gg);
 
@@ -282,6 +289,10 @@ typedef struct
     void (*tour1d_realloc)(displayd *, gint, datad *);
     void (*tour2d_realloc)(displayd *, gint, datad *);
     void (*tourcorr_realloc)(displayd *, gint, datad *);
+
+#ifdef ROTATION_IMPLEMENTED
+    void (*tour2d3_realloc)(displayd *, gint, datad *);
+#endif
 
     void (*set_show_axes_option)(displayd *, gboolean);
     void (*set_show_axes_label_option)(displayd *, gboolean);

@@ -230,6 +230,12 @@ struct _ggobid {
 
 /*---------------------- touring -------------------------------------*/
 
+#ifdef ROTATION_IMPLEMENTED
+  struct _Tour2d3 {
+    gint idled;
+  } tour2d3;
+#endif
+
   struct _Tour2d {
     gint idled;
     gboolean fade_vars;

@@ -206,8 +206,11 @@ varpanelRefresh(displayd *display, splotd *sp, datad *d)
 	GList *l;
         for (j=0; j<d->ncols; j++) {
           varpanel_toggle_set_active (VARSEL_X, j, false, d);
+
           varpanel_toggle_set_active (VARSEL_Y, j, false, d);
           varpanel_widget_set_visible (VARSEL_Y, j, false, d);
+          varpanel_toggle_set_active (VARSEL_Z, j, false, d);
+          varpanel_widget_set_visible (VARSEL_Z, j, false, d);
         }
 
         l = display->splots;
@@ -219,14 +222,14 @@ varpanelRefresh(displayd *display, splotd *sp, datad *d)
 }
 
 static void
-varpanelTooltipsSet(displayd *dpy, ggobid *gg, GtkWidget *wx, GtkWidget *wy, GtkWidget *label)
+varpanelTooltipsSet(displayd *dpy, ggobid *gg, GtkWidget *wx, GtkWidget *wy, GtkWidget *xz, GtkWidget *label)
 {
-        gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
-          "Select to replace/insert/append a variable, or to delete it",
-          NULL);
-        gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
-          "Click to replace/insert/append a variable, or to delete it",
-          NULL);
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
+    "Select to replace/insert/append a variable, or to delete it",
+    NULL);
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
+    "Click to replace/insert/append a variable, or to delete it",
+    NULL);
 }
 
 

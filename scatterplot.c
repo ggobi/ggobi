@@ -85,6 +85,9 @@ scatterplot_show_rulers (displayd *display, gint projection)
       scatterplot_show_hrule (display, true);
     break;
 
+#ifdef ROTATION_IMPLEMENTED
+    case TOUR2D3:
+#endif
     case TOUR1D:
     case TOUR2D:
     case COTOUR:
@@ -313,6 +316,12 @@ createScatterplot(gboolean missing_p, splotd *sp, gint numVars, gint *vars, data
     display_tour1d_init_null (display, gg);
     if (d->ncols >= MIN_NVARS_FOR_TOUR1D)
       display_tour1d_init (display, gg);
+
+#ifdef ROTATION_IMPLEMENTED
+    display_tour2d3_init_null (display, gg);
+    if (d->ncols >= MIN_NVARS_FOR_TOUR2D3)
+      display_tour2d3_init (display, gg);
+#endif
 
     display_tour2d_init_null (display, gg);
     if (d->ncols >= MIN_NVARS_FOR_TOUR2D)

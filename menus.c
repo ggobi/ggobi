@@ -124,6 +124,28 @@ tour1d_menus_make (ggobid *gg) {
 }
 
 /*--------------------------------------------------------------------*/
+/*                  Rotation: I/O and Options menus                   */
+/*--------------------------------------------------------------------*/
+
+void
+tour2d3_menus_make (ggobid *gg)
+{
+  /*-- Options menu --*/
+  gg->menus.options_menu = gtk_menu_new ();
+
+  CreateMenuCheck (gg->menus.options_menu, "Show tooltips",
+    GTK_SIGNAL_FUNC (tooltips_show_cb), NULL,
+    GTK_TOOLTIPS (gg->tips)->enabled, gg);
+
+  CreateMenuCheck (gg->menus.options_menu, "Show control panel",
+    GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
+    GTK_WIDGET_VISIBLE (gg->viewmode_frame), gg);
+
+  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
+    gg->menus.options_menu);
+}
+
+/*--------------------------------------------------------------------*/
 /*                   Tour 2D: I/O and Options menus                   */
 /*--------------------------------------------------------------------*/
 
@@ -173,10 +195,6 @@ tour2d_menus_make (ggobid *gg)
   /* Add a separator before the mode-specific items */
   CreateMenuItem (gg->menus.options_menu, NULL,
     "", "", NULL, NULL, NULL, NULL, gg);
-
-  CreateMenuCheck (gg->menus.options_menu, "Lay out variable circles by row",
-    GTK_SIGNAL_FUNC (varcircles_layout_cb), NULL,
-    gg->varpanel_ui.layoutByRow, gg);
 
   CreateMenuCheck (gg->menus.options_menu, "Fade variables on de-selection",
     GTK_SIGNAL_FUNC (tour2d_fade_vars_cb), NULL,
@@ -544,7 +562,9 @@ viewmode_submenus_update (PipelineMode prev_mode, displayd *prev_display, ggobid
 
   /*-- remove any previous submenus --*/
   /* if the menu should be there and it really is there ... */
-  if (mode_has_options_menu (prev_mode, prev_display, gg) && gg->menus.options_item) {
+  if (mode_has_options_menu (prev_mode, prev_display, gg) &&
+      gg->menus.options_item)
+  {
     gtk_menu_item_remove_submenu (GTK_MENU_ITEM (gg->menus.options_item));
     /*-- destroy menu items if called for --*/
     if (!mode_has_options_menu (mode, gg->current_display, gg)) {
@@ -624,14 +644,15 @@ viewmode_submenus_update (PipelineMode prev_mode, displayd *prev_display, ggobid
       movepts_menus_make (gg);
     break;
 
-#ifdef ROTATION_IMPLEMENTED
-    case ROTATE:
-    break;
-#endif
-
     case TOUR1D:
       tour1d_menus_make (gg);
     break;
+
+#ifdef ROTATION_IMPLEMENTED
+    case TOUR2D3:
+      tour2d3_menus_make (gg);
+    break;
+#endif
 
     case TOUR2D:
       tour2d_menus_make (gg);
@@ -653,7 +674,6 @@ viewmode_submenus_update (PipelineMode prev_mode, displayd *prev_display, ggobid
       identify_menus_make (gg);
     break;
 
-    case ROTATE:
     case EDGEED:
     case NULLMODE:
     case NMODES:  /*-- why is this part of the enum? --*/

@@ -85,75 +85,75 @@ SHARED_LD_FLAGS= -shared
 LDFLAGS=
 
 SRC=array.c ash1d.c \
- barchart.c barchart_ui.c \
+ barchart.c barchart_ui.c barchartClass.c \
  brush_api.c brush_bins.c brush.c brush_init.c brush_link.c brush_ui.c \
  color.c color_ui.c cpanel.c \
  datad.c display.c display_tree.c display_ui.c \
- edges.c exclusion.c exclusion_ui.c \
- ggobi-API.c ggobi.c identify.c identify_ui.c \
+ edges.c exclusion.c exclusion_ui.c extendedDisplay.c fileio.c \
+ ggobi-API.c ggobi.c ggobiClass.c \
+ help.c identify.c identify_ui.c \
  impute.c impute_ui.c io.c jitter.c jitter_ui.c \
  limits.c lineedit.c lineedit_ui.c \
  main_ui.c make_ggobi.c menus.c missing.c \
  movepts.c movepts_ui.c noop-toggle.c \
- p1d.c p1d_ui.c parcoords.c parcoords_ui.c pipeline.c \
+ p1d.c p1d_ui.c \
+ parcoords.c parcoords_ui.c parcoordsClass.c pipeline.c \
  ppcorr_ui.c \
- read_array.c read_data.c record_id.c rotate_ui.c \
+ read_array.c read_data.c record_id.c  \
  scale_api.c scale_click.c scale_drag.c scale_ui.c \
- scatmat.c scatmat_ui.c scatterplot.c scatterplot_ui.c \
+ scatmat.c scatmat_ui.c scatmatClass.c \
+ scatterplot.c scatterplot_ui.c scatterplotClass.c \
  smooth_ui.c sphere.c sphere_ui.c splash.c \
  splot.c sp_plot.c subset.c subset_ui.c svd.c \
- texture.c timeplot.c time_ui.c \
+ texture.c timeplot.c time_ui.c tsdisplay.c tsPlot.c \
  tour1d.c tour1d_pp.c tour1d_pp_ui.c tour1d_ui.c tour_pp.c\
  tour2d.c tour2d_ui.c tour2d_pp.c tour2d_pp_ui.c \
+ tour2d3.c tour2d3_ui.c \
  tour.c tourcorr.c tourcorr_ui.c \
  transform.c transform_ui.c \
  utils.c utils_gdk.c utils_ui.c \
  varchange.c varcircles.c varpanel_ui.c vartable.c vartable_ui.c \
  vector.c wvis.c wvis_ui.c win32_draw.c \
  writedata.c writedata_ui.c write_svg.c \
- xyplot.c xyplot_ui.c \
+ xlines.c xyplot.c xyplot_ui.c \
 \
  mt19937ar.c cokus.c \
- fileio.c print.c \
- xlines.c \
- help.c \
- ggobiClass.c extendedDisplay.c barchartClass.c tsdisplay.c \
- tsPlot.c parcoordsClass.c scatterplotClass.c scatmatClass.c
+ print.c
 
 OB=array.o ash1d.o \
- barchart.o barchart_ui.o \
+ barchart.o barchart_ui.o barchartClass.o \
  brush_api.o brush_bins.o brush.o brush_init.o brush_link.o brush_ui.o \
  color.o color_ui.o cpanel.o \
  datad.o display.o display_tree.o display_ui.o \
- edges.o exclusion.o exclusion_ui.o \
- ggobi-API.o ggobi.o identify.o identify_ui.o \
+ edges.o exclusion.o exclusion_ui.o extendedDisplay.o fileio.o \
+ ggobi-API.o ggobi.o ggobiClass.o \
+ help.o identify.o identify_ui.o \
  impute.o impute_ui.o io.o jitter.o jitter_ui.o \
  limits.o lineedit.o lineedit_ui.o \
  main_ui.o make_ggobi.o menus.o missing.o \
  movepts.o movepts_ui.o noop-toggle.o \
- p1d.o p1d_ui.o parcoords.o parcoords_ui.o pipeline.o \
+ p1d.o p1d_ui.o \
+ parcoords.o parcoords_ui.o parcoordsClass.o pipeline.o \
  ppcorr_ui.o \
- read_array.o read_data.o record_id.o rotate_ui.o \
+ read_array.o read_data.o record_id.o \
  scale_api.o scale_click.o scale_drag.o scale_ui.o \
- scatmat.o scatmat_ui.o scatterplot.o scatterplot_ui.o \
+ scatmat.o scatmat_ui.o scatmatClass.o \
+ scatterplot.o scatterplot_ui.o scatterplotClass.o \
  smooth_ui.o sphere.o sphere_ui.o splash.o \
  splot.o sp_plot.o subset.o subset_ui.o svd.o \
- texture.o timeplot.o time_ui.o \
+ texture.o timeplot.o time_ui.o tsdisplay.o tsPlot.o \
  tour1d.o tour1d_pp.o tour1d_pp_ui.o tour1d_ui.o tour_pp.o\
  tour2d.o tour2d_ui.o tour2d_pp.o tour2d_pp_ui.o \
+ tour2d3.o tour2d3_ui.o \
  tour.o tourcorr.o tourcorr_ui.o \
  transform.o transform_ui.o \
  utils.o utils_gdk.o utils_ui.o \
  varchange.o varcircles.o varpanel_ui.o vartable.o vartable_ui.o \
  vector.o wvis.o wvis_ui.o win32_draw.o \
  writedata.o writedata_ui.o write_svg.o \
- xyplot.o xyplot_ui.o \
+ xlines.o xyplot.o xyplot_ui.o \
 \
- fileio.o print.o \
- xlines.o \
- help.o \
- ggobiClass.o extendedDisplay.o barchartClass.o tsdisplay.o \
- tsPlot.o parcoordsClass.o scatterplotClass.o scatmatClass.o
+ print.o
 
 ifdef GTK_2
  SRC+=marshal.c
@@ -171,29 +171,24 @@ ifdef TEST_EVENTS
   CFLAGS+= -DTEST_GGOBI_EVENTS -DTEST_BRUSH_MOTION_CB=1
 endif
 
-ifdef USE_XML
- XML_SRC= read_xml.c write_xml.c  read_init.c write_state.c read_color.c plugin.c
- XML_OB= read_xml.o write_xml.o read_init.o write_state.o read_color.o plugin.o
+XML_SRC= read_xml.c write_xml.c  read_init.c write_state.c read_color.c plugin.c
+XML_OB= read_xml.o write_xml.o read_init.o write_state.o read_color.o plugin.o
 
 # XML_FLAGS+= -DSUPPORT_PLUGINS=1 -DSUPPORT_INIT_FILES=1
- CFLAGS+= $(XML_INC_DIRS:%=-I%) -DUSE_XML=$(USE_XML) $(XML_FLAGS) -DSUPPORT_PLUGINS=1 -DSUPPORT_INIT_FILES=1
-
+CFLAGS+= $(XML_INC_DIRS:%=-I%) $(XML_FLAGS) -DSUPPORT_PLUGINS=1 -DSUPPORT_INIT_FILES=1
 CFLAGS+=$(DEFINES)
 
- SRC+=$(XML_SRC)
- OB+= $(XML_OB)
+SRC+=$(XML_SRC)
+OB+= $(XML_OB)
 
 ifdef DL_RESOLVE_FLAG
  DL_RESOLVE_PATH+=$(XML_LIB_DIRS:%=$(DL_RESOLVE_FLAG) %)
 endif
-ifeq ($(USE_XML),2)
- XML_LIB_NO=2
-endif
- XML_LIBS=$(XML_LIB_DIRS:%=-L%) -lxml$(XML_LIB_NO) -lz 
+XML_LIB_NO=2
+XML_LIBS=$(XML_LIB_DIRS:%=-L%) -lxml$(XML_LIB_NO) -lz 
 
 main_ui.o: write_xml.h
 read_xml.o: read_xml.h
-endif
 
 OB+=mt19937ar.o cokus.o  
 
@@ -275,22 +270,18 @@ include depends
 endif
 
 
-# If USE_XML, may need to add XML_LIB_DIRS and XML_INC_DIRS
 local.config:
-	@echo "# Whether to enable support for reading XML data" > $@
-	@echo "# USE_XML=1" >> $@
+	@echo "# Where to find XML libraries" > $@
 	@echo "# XML_INC_DIRS=" >> $@
 	@echo "# XML_LIB_DIRS=" >> $@
 	@echo "# Location of dmalloc" >> $@
 	@echo "# DM=1" >> $@
 
 
-ifdef USE_XML
 xmlConvert: xmlConvert.o libggobi.so
 	$(CC) -g -o $@ xmlConvert.o $(XML_LIBS) $(XML_LIB_DIRS:%=-L%) -L. -lggobi $(DL_RESOLVE_PATH) -lgtk
 
 make_ggobi.o: read_xml.h
-endif
 
 dbms_ui.o: dbms_ui.c dbms_ui.h dbms.h
 dbms.c: dbms.h  ggobi.h
