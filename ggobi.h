@@ -360,20 +360,12 @@ struct _ggobid {
    varseldatad vdata0, vdata1, vdata2, vdata3;
   } scatmat_menu;
 
-
   gint tour_idled; 
-
-  struct _Write {
-
-
-  } write;
-
 
   gboolean close_pending;
 
   IdentifyHandler identify_handler;
 }; /*  ggobid; */
-
 
 #define GGOBI_H
 

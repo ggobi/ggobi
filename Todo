@@ -1,5 +1,14 @@
 Bugs: 
-  none I need to deal with at the moment
+ Set the brush to any region  (manually) and then
+  reduce the size of the window.  
+  Note that the brush size stays fixed and is not scaled
+  and points enter the region but are not "brushed"
+     
+ there seems to be rounding error in the pipeline. 
+ Create a scatterplot, and then resize to something very small.
+ Then open it up again to the original size approximately
+ and all the points will have gravitated towards the 0,0 
+ (upper left) corner.
 
 various stuff not yet implemented: 
   1d, xy cycling
