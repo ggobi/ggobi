@@ -585,6 +585,7 @@ static GtkItemFactoryEntry menu_items[] = {
        (GtkItemFactoryCallback) impute_window_open,   
        0,
        NULL },
+  { "/Tools/sep",     NULL, NULL, 0, "<Separator>" },  /*-- before plugins --*/
 
   {"/Dis_playTree", NULL, NULL, 0, "<Branch>"},
   { "/DisplayTree/Displays",    
