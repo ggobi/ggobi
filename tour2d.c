@@ -318,7 +318,7 @@ tour2dvar_set (gint jvar, ggobid *gg)
       {
         gt_basis(dsp->t2d.Fa, dsp->t2d.nactive, dsp->t2d.active_vars, 
           d->ncols, (gint) 2);
-        arrayd_copy(&dsp->t2d.Fa.vals, &dsp->t2d.F.vals);
+        arrayd_copy(&dsp->t2d.Fa, &dsp->t2d.F);
 	/*        copy_mat(dsp->t2d.F.vals, dsp->t2d.Fa.vals, d->ncols, 2);*/
       }
     }
@@ -405,7 +405,7 @@ void tour2d_scramble(ggobid *gg)
 
   gt_basis(dsp->t2d.Fa, dsp->t2d.nactive, dsp->t2d.active_vars, 
     d->ncols, (gint) 2);
-  arrayd_copy(&dsp->t2d.Fa.vals, &dsp->t2d.F.vals);
+  arrayd_copy(&dsp->t2d.Fa, &dsp->t2d.F);
   /*  copy_mat(dsp->t2d.F.vals, dsp->t2d.Fa.vals, d->ncols, 2);*/
 
   dsp->t2d.nsteps = 1; 
@@ -508,7 +508,7 @@ tour2d_run(displayd *dsp, ggobid *gg)
 	}
       }
     }
-    arrayd_copy(&dsp->t2d.F.vals, &dsp->t2d.Fa.vals);
+    arrayd_copy(&dsp->t2d.F, &dsp->t2d.Fa);
     if (nv == 0 && dsp->t2d.nactive <= 2) /* only generate new dir if num of
                                            active/used variables is > 2 -
                                            this code allows for motion to
@@ -570,7 +570,7 @@ tour2d_run(displayd *dsp, ggobid *gg)
         if (pathprob == 1) {
           gt_basis(dsp->t2d.Fa, dsp->t2d.nactive, dsp->t2d.active_vars, 
             d->ncols, (gint) 2);
-          arrayd_copy(&dsp->t2d.Fa.vals, &dsp->t2d.F.vals);
+          arrayd_copy(&dsp->t2d.Fa, &dsp->t2d.F);
 	  /*          copy_mat(dsp->t2d.F.vals, dsp->t2d.Fa.vals, d->ncols, 2);*/
 	}
         else if (pathprob == 2) {
@@ -915,7 +915,7 @@ tour2d_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
               dsp->t2d_Rmat2.vals[k][j]);
           dsp->t2d_Rmat1.vals[i][j] = dtmp1;
         }
-      arrayd_copy(&dsp->t2d_Rmat1.vals, &dsp->t2d_mvar_3dbasis.vals);
+      arrayd_copy(&dsp->t2d_Rmat1, &dsp->t2d_mvar_3dbasis);
       /*      copy_mat(dsp->t2d_mvar_3dbasis.vals, dsp->t2d_Rmat1.vals, 3, 3);*/
   
       gram_schmidt(dsp->t2d_mvar_3dbasis.vals[0], 
@@ -954,7 +954,7 @@ tour2d_manip_end(splotd *sp)
 
   disconnect_motion_signal (sp);
 
-  arrayd_copy(&dsp->t2d.F.vals, &dsp->t2d.Fa.vals);
+  arrayd_copy(&dsp->t2d.F, &dsp->t2d.Fa);
   /*  copy_mat(dsp->t2d.Fa.vals, dsp->t2d.F.vals, d->ncols, 2);*/
   dsp->t2d.get_new_target = true;
 
