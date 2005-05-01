@@ -793,4 +793,7 @@ desc_write_cb (GtkWidget *btn, PluginInstance *inst)
   CLOSE_LIST(fp);
 
   fclose(fp);
+
+  gtk_widget_hide(desc->window);
+  /* Put a message in the status bar saying it was done. */
 }

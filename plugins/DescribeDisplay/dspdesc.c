@@ -14,6 +14,8 @@ void       close_dspdesc_window(GtkWidget *w, PluginInstance *inst);
 GtkWidget *create_dspdesc_window(ggobid *gg, PluginInstance *inst);
 void       show_dspdesc_window(GtkWidget *widget, PluginInstance *inst);
 
+static void window_close_cb(GtkWidget *btn, PluginInstance *inst);
+
 extern void desc_write_cb (GtkWidget *btn, PluginInstance *inst);
 
 void
@@ -24,6 +26,10 @@ dspdesc_init (dspdescd *desc)
 }
 
 
+/*
+  Should it not (also?) go on the display's File menu?
+  The action is for the display.
+*/
 gboolean
 addToToolsMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 {
@@ -130,10 +136,9 @@ create_dspdesc_window(ggobid *gg, PluginInstance *inst)
   btn = gtk_button_new_with_label ("Close");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), btn,
     "Close this window", NULL);
-  /*
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
     GTK_SIGNAL_FUNC (window_close_cb), inst);
-  */
+
   gtk_box_pack_start (GTK_BOX (hb), btn, false, false, 2);
 
   gtk_widget_show_all (window);
@@ -141,6 +146,14 @@ create_dspdesc_window(ggobid *gg, PluginInstance *inst)
   return(window);
 }
 
+void
+window_close_cb(GtkWidget *btn, PluginInstance *inst)
+{
+	if(inst->data) {
+	    dspdescd *desc = (dspdescd *) inst->data;
+     	    gtk_widget_hide(desc->window);
+	}
+}
 
 void close_dspdesc_window(GtkWidget *w, PluginInstance *inst)
 {
