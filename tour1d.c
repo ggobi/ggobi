@@ -15,8 +15,8 @@
 #endif
 
 #include <math.h>
-#ifndef Darwin
-#include <malloc.h>
+#if !defined __APPLE__ && !defined __GNUC__
+#include <malloc.h> /* Do we really need this?*/
 #endif
 #include <stdlib.h>
 #include <unistd.h>

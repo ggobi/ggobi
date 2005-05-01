@@ -28,7 +28,7 @@ The authors can be contacted at the following email addresses:
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#ifndef Darwin
+#if !defined __APPLE__ && !defined __GNUC__
 #include <malloc.h>
 #endif
 
@@ -169,7 +169,7 @@ void center (array_f *data)
   }
 }
 
-gint pca (array_f *pdata, void *param, gfloat *val)
+gint pca (array_f *pdata, void *param, gfloat *val, gpointer userData)
 { gint i, j;
 
   center (pdata);
@@ -799,8 +799,7 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
           &dsp->t1d_pp_param);
       break;
     case PCA: 
-      dsp->t1d.ppval = t1d_calc_indx (dsp->t1d_pp_op.pdata, 
-        pca, NULL);
+      dsp->t1d.ppval = t1d_calc_indx (dsp->t1d_pp_op.pdata, pca, NULL);
       if (basismeth == 1)
         kout = optimize0 (&dsp->t1d_pp_op, pca, NULL);
       break;
