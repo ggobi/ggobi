@@ -92,7 +92,9 @@ ifdef TOUR_ADV_IMPLEMENTED
 endif
 
 SHLIB_LDFLAGS= -shared
-SHARED_LD_FLAGS= -shared
+ifndef SHARED_LD_FLAGS
+  SHARED_LD_FLAGS= -shared
+endif
 LDFLAGS=
 
 SRC=array.c ash1d.c \
