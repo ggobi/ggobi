@@ -803,6 +803,7 @@ vartable_stats_set_by_var (gint j, datad *d) {
             rownum, CAT_CLIST_NMISSING, stmp);
           g_free (stmp);
         }
+        break;  /* I <think> I want to break here.  dfs 5/8/2005 */
 
       case integer:
       case counter:
