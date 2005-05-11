@@ -41,7 +41,7 @@ DATA_SRC_FILES=\
 
 DATA_FILES=$(DATA_SRC_FILES:%=data/%)  notes/colorschemes.xml
 
-LICENSES= LGPL.txt license.html license.txt minterms.html minterms.txt
+LICENSES= LGPL.txt CPLicense.html CPLicense.txt 
 
 DOC_TEX_FILES=\
     manual DBMS Embedded RGGobi XML \
