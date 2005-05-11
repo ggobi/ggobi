@@ -1,6 +1,7 @@
+/* scatterplotClass.h */
+
 #ifndef SCATTERPLOT_CLASS_H
 #define SCATTERPLOT_CLASS_H
-
 
 #include "ggobi.h"
 

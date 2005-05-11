@@ -1,3 +1,5 @@
+/* tsPlot.c */
+
 #include "ggobi.h"
 #include "tsdisplay.h"
 

@@ -1,3 +1,5 @@
+/* barchartDisplay.h */
+ 
 #ifndef GGOBI_BARCHART_DISPLAY_H
 #define GGOBI_BARCHART_DISPLAY_H
 

@@ -50,10 +50,10 @@ list(
       # the parameters corresponding to the current projection
       p1dparams = list(label="", orientation=""),
       xyparams = list(xlabel="", ylabel="",),
-      tour1d.params = list(label="", ),
-      tour2d.params = list(labels="", ),
-      tour3d.params = list(labels="", ),
-      tour2by1d.params = list(),
+      tour1dparams = list(F, labels, ranges),
+      tour2dparams = list(F, labels, ranges),
+      tour3dparams = list(F, labels, ranges),
+      tour2by1dparams = list(xF, xlabels, xranges, yF, ylabels, yranges),
     # Another plot ...
     list( )
   )

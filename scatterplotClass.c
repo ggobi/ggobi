@@ -1,3 +1,5 @@
+/* scatterplotClass.c */
+
 #include "ggobi.h"
 #include "scatterplotClass.h"
 #include "externs.h"

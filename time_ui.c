@@ -1,4 +1,3 @@
-
 /* time_ui.c */
 
 #include <gtk/gtk.h>

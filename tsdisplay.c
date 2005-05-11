@@ -1,3 +1,5 @@
+/* tsdisplay.c */
+
 #include "ggobi.h"
 #include "tsdisplay.h"
 

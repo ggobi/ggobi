@@ -1,3 +1,5 @@
+/* write_state.c */
+
 /*
  This is used to display the state of a ggobi instance and its sub-elements:
  its displays, their splots in XML format.

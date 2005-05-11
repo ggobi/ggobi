@@ -1,3 +1,5 @@
+/* extendedDisplay.c */
+
 #include "ggobi.h"
 #include "display.h"
 

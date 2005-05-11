@@ -175,7 +175,7 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
   Agraph_t *graph;
   gdouble **pos;
   gint layout_type = DOT_LAYOUT;
-  static GVC_t *gvc; /* temporary, for graphviz-1.12 */
+  static GVC_t *gvc; 
 /*-- to add the new datad --*/
   gint m, nvisible, nc;
   InputDescription *desc = NULL;

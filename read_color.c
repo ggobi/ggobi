@@ -1,3 +1,5 @@
+/* read_color.c */
+
 #include "ggobi.h"
 
 #include <string.h>

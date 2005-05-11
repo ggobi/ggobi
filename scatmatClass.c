@@ -1,3 +1,5 @@
+/* scatmatClass.c */
+
 #include "scatmatClass.h"
 #include <gtk/gtk.h>
 

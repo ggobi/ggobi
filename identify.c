@@ -1,13 +1,4 @@
 /* identify.c */
-/*
-    This software may only be used by you under license from AT&T Corp.
-    ("AT&T").  A copy of AT&T's Source Code Agreement is available at
-    AT&T's Internet website having the URL:
-    <http://www.research.att.com/areas/stat/ggobi/license.html>
-    If you received this software without first entering into a license
-    with AT&T, you have an infringing copy of this software and cannot use
-    it without violating AT&T's intellectual property rights.
-*/
 
 #include <gtk/gtk.h>
 
@@ -296,8 +287,8 @@ g_printerr ("selected variables don't correspond to what is identified\n");
     }
   }
 
-  
-  if (id_display_type == ID_RECORD_LABEL)
+  /* Should check here that d->rowlab is long enough */
+  if (id_display_type == ID_RECORD_LABEL) 
     lbl = (gchar *) g_array_index (d->rowlab, gchar *, k);
 
   else if (id_display_type == ID_RECORD_NO) {

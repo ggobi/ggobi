@@ -1,3 +1,5 @@
+/* GGobiEvents.h */
+
 #ifndef GGOBI_EVENTS_H
 #define GGOBI_EVENTS_H
 

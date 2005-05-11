@@ -1,3 +1,5 @@
+/* write_xml.c */
+
 #include "write_xml.h"
 /*
   Takes the current data in the specified ggobid structure

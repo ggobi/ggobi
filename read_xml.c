@@ -1,3 +1,5 @@
+/* read_xml.c */
+
 #include <libxml/parserInternals.h>
 
 /*
@@ -595,8 +597,8 @@ setEdgePartners (XMLParserData *parserData)
   /*-- Assume that we have no edges from i to i --*/
 
   /*
-   *  Before setting partners, check for duplicate edges.  If we find
-   *  one, bail out -- we don't handle them correctly, and we don't
+   * Before setting partners, check for duplicate edges.  If we find
+   * one, bail out -- we don't handle them correctly, and we don't
    * want them around.
   */
 

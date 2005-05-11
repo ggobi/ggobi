@@ -1,13 +1,4 @@
 /* varchange.c: add or delete variables, including cloning */
-/*
-    This software may only be used by you under license from AT&T Corp.
-    ("AT&T").  A copy of AT&T's Source Code Agreement is available at
-    AT&T's Internet website having the URL:
-    <http://www.research.att.com/areas/stat/ggobi/license.html>
-    If you received this software without first entering into a license
-    with AT&T, you have an infringing copy of this software and cannot use
-    it without violating AT&T's intellectual property rights.
-*/
 
 #include <string.h>
 #include <stdlib.h>
@@ -94,10 +85,10 @@ addvar_propagate (gint ncols_prev, gint ncols_added, datad *d, ggobid *gg)
 
 void
 newvar_add_with_values (gdouble *vals, gint nvals, gchar *vname,
-			vartyped type,
-			/*-- if categorical, we need ... --*/
-			gint nlevels, gchar **level_names, gint *level_values, gint *level_counts,
-			datad *d, ggobid *gg)
+ vartyped type,
+ /*-- if categorical, we need ... --*/
+ gint nlevels, gchar **level_names, gint *level_values, gint *level_counts,
+ datad *d, ggobid *gg)
 {
   gint i;
   gint d_ncols_prev = d->ncols;
@@ -107,8 +98,8 @@ newvar_add_with_values (gdouble *vals, gint nvals, gchar *vname,
   if (nvals != d->nrows)
     return;
 
-  /* Create a new element in the vartable list iff we need to. Otherwise use the one in the
-     current position. */
+  /* Create a new element in the vartable list iff we need
+     to. Otherwise use the one in the current position. */
   if(jvar >= g_slist_length(d->vartable))
     vartable_element_new (d);
 

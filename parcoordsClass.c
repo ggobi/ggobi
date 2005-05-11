@@ -1,3 +1,5 @@
+/* parcoordsClass.c */
+
 #include "parcoordsClass.h"
 
 #include <string.h>
@@ -124,6 +126,7 @@ void
 withinDrawUnbinned(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc)
 {
  displayd *display = sp->displayptr;
+
  if (display->options.whiskers_show_p) {
 	 gint n = 2*m;
 	 gdk_draw_line (drawable, gc,
@@ -340,11 +343,10 @@ parcoordsDisplayClassInit(GtkGGobiParCoordsDisplayClass *klass)
   klass->parent_class.options_menu_p = true;
 
   klass->parent_class.loop_over_points = true;
-
   klass->parent_class.titleLabel = "Parallel Coordinates Display";
   klass->parent_class.treeLabel = "Parallel Coordinates";
 
-  /* No create method, just createWIthVars. */
+  /* No create method, just createWithVars. */
   klass->parent_class.createWithVars = parcoords_new_with_vars;
 
   klass->parent_class.variable_select = variableSelect;

@@ -1,3 +1,5 @@
+/* read_init.h */
+
 #ifndef GGOBI_READ_INIT_H
 #define GGOBI_READ_INIT_H
 

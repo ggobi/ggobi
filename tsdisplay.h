@@ -1,3 +1,5 @@
+/* tsdisplay.h */
+
 #ifndef GGOBI_TSDISPLAY_H
 #define GGOBI_TSDISPLAY_H
 

@@ -1,3 +1,5 @@
+/* GtkSignalDef.c */
+
 #define gtk_object_class_user_signal_new g_signal_new
 /* see ggobiClass.c for the new signatures that need to be replicated here. */
 

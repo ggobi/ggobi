@@ -49,7 +49,6 @@ void reset_pp(datad *d, gint nprev, gint b, ggobid *gg, void *data)
   GList *l;
   for (l=gg->displays; l; l=l->next) {
     dsp = (displayd *) l->data;
-
     if (dsp->t1d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t1d_window)) {
       free_optimize0_p(&dsp->t1d_pp_op);
       alloc_optimize0_p(&dsp->t1d_pp_op, d->nrows_in_plot, dsp->t1d.nactive, 

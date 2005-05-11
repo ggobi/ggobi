@@ -1,3 +1,5 @@
+/* scatmatClass.h */
+
 #ifndef SCATMAT_CLASS_H
 #define SCATMAT_CLASS_H
 

@@ -1,13 +1,4 @@
 /* sp_plot.c */
-/*
-    This software may only be used by you under license from AT&T Corp.
-    ("AT&T").  A copy of AT&T's Source Code Agreement is available at
-    AT&T's Internet website having the URL:
-    <http://www.research.att.com/areas/stat/ggobi/license.html>
-    If you received this software without first entering into a license
-    with AT&T, you have an infringing copy of this software and cannot use
-    it without violating AT&T's intellectual property rights.
-*/
 
 #include <string.h>
 #include <math.h>
@@ -779,6 +770,8 @@ splot_add_record_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
   else if (mode == MOVEPTS)
      splot_add_movepts_cues (sp, drawable, d->nearest_point, true, gg);
   else if (mode == EDGEED)
+    /* If I want to draw in the color of nearest_point, I should pass
+       it in here -- dfs*/
     splot_add_edgeedit_cues (sp, drawable, d->nearest_point, true, gg);
  
 

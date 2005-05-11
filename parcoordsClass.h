@@ -1,3 +1,5 @@
+/* parcoordsClass.h */
+
 #ifndef PARCOORDS_CLASS_H
 #define PARCOORDS_CLASS_H
 

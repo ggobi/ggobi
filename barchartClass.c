@@ -1,3 +1,6 @@
+/* barchartClass.c */
+
+
 #include "ggobi.h"
 #include "barchartDisplay.h"
 

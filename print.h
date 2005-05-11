@@ -1,3 +1,5 @@
+/* print.h */
+
 #ifndef GGOBI_PRINT_H
 #define GGOBI_PRINT_H
 
@@ -8,7 +10,6 @@
 
 #include "ggobi.h"
 #include "types.h"
-
 
 
 typedef struct _OutputDescription {

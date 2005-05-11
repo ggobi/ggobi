@@ -1,3 +1,5 @@
+/* print.c */
+
 #include "print.h"
 
 #include <gtk/gtk.h>

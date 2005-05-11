@@ -5,48 +5,51 @@ compiler -- glib, gtk, and ggobi.  That means that it's necessary to
 construct a separate tree for glib and gtk that have been compiled
 with cc, and build ggobi against those.
 
-Sources are in /usr/dfs/src.
+Sources are in /home/dfs/src.
 
 Step 1: glib
 
-CC=/usr/bin/cc ./configure --prefix=/usr/dfs/cc 
+CC=/usr/bin/cc ./configure --prefix=/home/dfs/cc 
 make install
 
 Step 2: gtk
 
-export GLIB_CONFIG=/usr/dfs/cc/bin/glib-config
-LD_LIBRARY_PATH=/usr/dfs/cc/lib:$LD_LIBRARY_PATH
-LD_LIBRARYN32_PATH=/usr/dfs/cc/lib:$LD_LIBRARYN32_PATH
-PATH=/usr/dfs/cc/bin:$PATH
+export GLIB_CONFIG=/home/dfs/cc/bin/glib-config
+LD_LIBRARY_PATH=/home/dfs/cc/lib:$LD_LIBRARY_PATH
+LD_LIBRARYN32_PATH=/home/dfs/cc/lib:$LD_LIBRARYN32_PATH
+PATH=/home/dfs/cc/bin:$PATH
 export CC=/usr/bin/cc
-./configure --prefix=/usr/dfs/cc
+./configure --prefix=/home/dfs/cc
 make install
 
 Step 3: ggobi
 
 export CC=/usr/bin/cc
-export GLIB_CONFIG=/usr/dfs/cc/bin/glib-config
-LD_LIBRARY_PATH=/usr/dfs/cc/lib:/usr/common/lib:/usr/lib32:/usr/dfs/ggobi/ggobi
+export GLIB_CONFIG=/home/dfs/cc/bin/glib-config
+LD_LIBRARY_PATH=/home/dfs/cc/lib:/usr/common/lib:/usr/lib32:/home/dfs/ggobi/sgi
 LD_LIBRARYN32_PATH=$LD_LIBRARY_PATH
-PATH=/usr/dfs/cc/bin:$PATH
-export GTK_CONFIG=/usr/dfs/cc/bin/gtk-config
+PATH=/home/dfs/cc/bin:$PATH
+export GTK_CONFIG=/home/dfs/cc/bin/gtk-config
 
 Makefile:
   CC=cc
   CFLAGS
 local.config
   use XML libraries compiled with cc
+ggobi.h
+  Look for Darwin and do what the comment says
+
 
 plugin directories
-  GTK_CONFIG=/usr/dfs/cc/bin/gtk-config
+  GTK_CONFIG=/home/dfs/cc/bin/gtk-config
 
 # vanilla
 pure: ggobi.o $(OB) $(EXTRA_OB)
-	purify.new -cache-dir=/usr/dfs/tmp -always-use-cache-dir=yes \
-	-user-path=/usr/dfs/ggobi/ggobi \
+	purify.new -cache-dir=/home/dfs/tmp -always-use-cache-dir=yes \
+	-user-path=/home/dfs/ggobi/ggobi \
 	$(LD) $(OB) $(EXTRA_OB) \
 	$(LDFLAGS) -o ggobi \
-	/usr/dfs/cc/lib/libxml2.so \
+	/home/dfs/cc/lib/libxml2.so \
 	`gtk-config --libs`
 
 # GraphLayout  w/o graphviz
@@ -54,34 +57,46 @@ LDFLAGS+=-L$(GVLIB) -ldot -lneato -lpack -ldotneato -lgraph -lpathplan
 LDFLAGS+=$(GVLIB)/libgd.a
 LDFLAGS+=-L$(GVLIB) -lcdt $(GVIZ_EXTLIB_LIB)
 pure: ggobi.o $(OB) $(EXTRA_OB)
-	purify.new -cache-dir=/usr/dfs/tmp -always-use-cache-dir=yes \
-	-user-path=/usr/dfs/ggobi/ggobi:/usr/dfs/ggobi/ggobi/plugins/GraphLayout \
+	purify.new -cache-dir=/home/dfs/tmp -always-use-cache-dir=yes \
+	-user-path=/home/dfs/ggobi/ggobi:/home/dfs/ggobi/ggobi/plugins/GraphLayout \
 	$(LD) $(OB) $(EXTRA_OB) \
-	/usr/dfs/ggobi/ggobi/plugins/GraphLayout/glayout.o \
-	/usr/dfs/ggobi/ggobi/plugins/GraphLayout/graphviz.o \
-	/usr/dfs/ggobi/ggobi/plugins/GraphLayout/init.o \
-	/usr/dfs/ggobi/ggobi/plugins/GraphLayout/radial.o \
+	/home/dfs/ggobi/ggobi/plugins/GraphLayout/glayout.o \
+	/home/dfs/ggobi/ggobi/plugins/GraphLayout/graphviz.o \
+	/home/dfs/ggobi/ggobi/plugins/GraphLayout/init.o \
+	/home/dfs/ggobi/ggobi/plugins/GraphLayout/radial.o \
 	$(LDFLAGS) -o ggobi \
-	/usr/dfs/cc/lib/libxml2.so \
+	/home/dfs/cc/lib/libxml2.so \
 	`gtk-config --libs`
 
-	#-user-path=/usr/dfs/ggobi/ggobi:/usr/dfs/ggobi/ggobi/plugins/mstree \
+	#-user-path=/home/dfs/ggobi/ggobi:/home/dfs/ggobi/ggobi/plugins/mstree \
     #gg_mst.o mem-std.o mst-prim.o mstree.o pq-bin-heap.o \
 
 # ggvis
 pure: ggobi.o $(OB) $(EXTRA_OB)
-	purify.new -cache-dir=/usr/dfs/tmp -always-use-cache-dir=yes \
-	-user-path=/usr/dfs/ggobi/ggobi:/usr/dfs/ggobi/ggobi/plugins/ggvis \
+	purify.new -cache-dir=/home/dfs/tmp -always-use-cache-dir=yes \
+	-user-path=/home/dfs/ggobi/ggobi:/home/dfs/ggobi/ggobi/plugins/ggvis \
 	$(LD) $(OB) $(EXTRA_OB) \
-	/usr/dfs/ggobi/ggobi/plugins/ggvis/ggvis.o \
-	/usr/dfs/ggobi/ggobi/plugins/ggvis/Dtarget.o \
-	/usr/dfs/ggobi/ggobi/plugins/ggvis/ggv_cbacks.o \
-	/usr/dfs/ggobi/ggobi/plugins/ggvis/init.o \
-	/usr/dfs/ggobi/ggobi/plugins/ggvis/mds.o \
-	/usr/dfs/ggobi/ggobi/plugins/ggvis/stressplot.o \
-	/usr/dfs/ggobi/ggobi/plugins/ggvis/histogram.o \
-	/usr/dfs/ggobi/ggobi/plugins/ggvis/ggv_utils.o \
-	/usr/dfs/ggobi/ggobi/plugins/ggvis/ggv_qsort.o \
+	/home/dfs/ggobi/ggobi/plugins/ggvis/ggvis.o \
+	/home/dfs/ggobi/ggobi/plugins/ggvis/Dtarget.o \
+	/home/dfs/ggobi/ggobi/plugins/ggvis/ggv_cbacks.o \
+	/home/dfs/ggobi/ggobi/plugins/ggvis/init.o \
+	/home/dfs/ggobi/ggobi/plugins/ggvis/mds.o \
+	/home/dfs/ggobi/ggobi/plugins/ggvis/stressplot.o \
+	/home/dfs/ggobi/ggobi/plugins/ggvis/histogram.o \
+	/home/dfs/ggobi/ggobi/plugins/ggvis/ggv_utils.o \
+	/home/dfs/ggobi/ggobi/plugins/ggvis/ggv_qsort.o \
 	$(LDFLAGS) -o ggobi \
-	/usr/dfs/cc/lib/libxml2.so \
+	/home/dfs/cc/lib/libxml2.so \
+	`gtk-config --libs`
+
+# VarCloud -- this should use sgi, but it doesn't yet ...
+pure: ggobi.o $(OB) $(EXTRA_OB)
+	purify.new -cache-dir=/home/dfs/tmp -always-use-cache-dir=yes \
+	-user-path=/home/dfs/ggobi/ggobi:/home/dfs/ggobi/ggobi/plugins/ggvis \
+	$(LD) $(OB) $(EXTRA_OB) \
+	/home/dfs/ggobi/ggobi/plugins/VarCloud/varcloud.o \
+	/home/dfs/ggobi/ggobi/plugins/VarCloud/init.o \
+	/home/dfs/ggobi/ggobi/plugins/VarCloud/cbacks.o \
+	$(LDFLAGS) -o ggobi \
+	/home/dfs/cc/lib/libxml2.so \
 	`gtk-config --libs`

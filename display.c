@@ -1,13 +1,4 @@
 /* display.c */
-/*
-    This software may only be used by you under license from AT&T Corp.
-    ("AT&T").  A copy of AT&T's Source Code Agreement is available at
-    AT&T's Internet website having the URL:
-    <http://www.research.att.com/areas/stat/ggobi/license.html>
-    If you received this software without first entering into a license
-    with AT&T, you have an infringing copy of this software and cannot use
-    it without violating AT&T's intellectual property rights.
-*/
 
 #include <gtk/gtk.h>
 #ifdef USE_STRINGS_H
@@ -166,11 +157,10 @@ display_options_cb (GtkCheckMenuItem *w, guint action)
 
 
 /*
-
-We need to allow people to programmatically change a setting and force the update. 
-The current framework is all based on GUI events and so we don't update the GUI components 
-here as we assume they are set appropriately.  A Model View Controller approach is needed.
-
+We need to allow people to programmatically change a setting and force
+the update.  The current framework is all based on GUI events and so
+we don't update the GUI components here as we assume they are set
+appropriately.  A Model View Controller approach is needed.
 */
 void
 set_display_option(gboolean active, guint action, displayd *display, ggobid *gg)

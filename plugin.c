@@ -1,3 +1,5 @@
+/* plugin.c */
+
 #include "plugin.h"
 
 #include <stdio.h>

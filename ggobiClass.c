@@ -1,3 +1,5 @@
+/* ggobiClass.c */
+
 #include <string.h>
 
 #include "ggobi.h"

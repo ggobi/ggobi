@@ -1,3 +1,5 @@
+/* externs.h */
+
 #ifndef GGOBI_S_H
 #define GGOBI_S_H
 

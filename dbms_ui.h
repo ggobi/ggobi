@@ -1,3 +1,5 @@
+/* dbms_ui.h */
+
 #ifndef DBMS_UI_H
 #define DBMS_UI_H
 

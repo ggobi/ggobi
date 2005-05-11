@@ -5,6 +5,5 @@
 #include "gtkextvruler.h"
 #include "gtkextruler.h"
 
-
 #endif
 

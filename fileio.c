@@ -1,3 +1,5 @@
+/* fileio.c */
+
 #include "ggobi.h"
 
 #include <stdlib.h>

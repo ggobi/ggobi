@@ -1,13 +1,5 @@
 /*-- types.h --*/
-/*
-    This software may only be used by you under license from AT&T Corp.
-    ("AT&T").  A copy of AT&T's Source Code Agreement is available at
-    AT&T's Internet website having the URL:
-    <http://www.research.att.com/areas/stat/ggobi/license.html>
-    If you received this software without first entering into a license
-    with AT&T, you have an infringing copy of this software and cannot use
-    it without violating AT&T's intellectual property rights.
-*/
+
 #ifndef TYPES_H
 #define TYPES_H
 
@@ -71,19 +63,15 @@ typedef struct {
 /* The symbolic edge description which keeps the endpoints as record ids */
 typedef gchar *RecordKey;
 typedef struct {
-
   RecordKey a;
   RecordKey b;
   gint jpartner;
-
 } SymbolicEndpoints;
 typedef struct {
   gchar *a;
   gchar *b;
   gint jcase;
 } SortableEndpoints;
-
-
 typedef struct {
   endpointsd *endpoints;
   struct _datad *data;

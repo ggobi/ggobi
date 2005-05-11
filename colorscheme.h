@@ -1,3 +1,5 @@
+/* colorscheme.h */
+
 #ifndef GGOBI_COLOR_SCHEME_H
 #define GGOBI_COLOR_SCHEME_H
 

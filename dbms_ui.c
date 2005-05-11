@@ -1,3 +1,5 @@
+/* dbms_ui.c */
+
 #include "dbms_ui.h"
 
 #ifdef USE_PROPERTIES

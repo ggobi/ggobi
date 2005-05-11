@@ -1,3 +1,5 @@
+/* GGobiAPI.h */
+
 #ifndef GGOBI_API_H
 #define GGOBI_API_H
 

@@ -1,3 +1,5 @@
+/* plugin.h */
+
 #ifndef GGOBI_PLUGIN_H
 #define GGOBI_PLUGIN_H
 

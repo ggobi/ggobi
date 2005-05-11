@@ -1,3 +1,5 @@
+/* GGStructSizes.c */
+
 #ifndef GGStructSizes_C
 #define GGStructSizes_C
 

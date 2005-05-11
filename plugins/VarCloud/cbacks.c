@@ -18,6 +18,9 @@ void
 launch_varcloud_cb (GtkWidget *w, PluginInstance *inst)
 /*
  * Create a new datad containing the pairwise distance variables.
+ * Juergen says there should be points corresponding to the edges {i=j}.
+ * I haven't added them yet, but I could do so -- they don's have to be
+ * linked to any edges, I don't think.
 */
 {
   vcld *vcl = vclFromInst (inst);

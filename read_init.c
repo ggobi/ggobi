@@ -1,3 +1,5 @@
+/* read_init.c */
+
 /*
   Reads initialization file.
  */
