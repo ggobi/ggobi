@@ -90,7 +90,7 @@ uninstall:
 	$(RM) $(bindir)/ggobi
 	$(RM) -fr $(includedir)
 
-ggobirc: Plugins
+ggobirc: buildPlugins
 	echo "<ggobirc>" > $@
 	echo "<plugins>" >> $@ 
 	for i in $(PLUGIN_DIRS) ; do \
