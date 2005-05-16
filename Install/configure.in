@@ -51,6 +51,7 @@ AC_ARG_WITH(postgres,
 AC_ARG_WITH(dataviewer,
   --with-dataviewer          Enable plugin for viewing data in a datagrid., 
   DATAVIEWER_PLUGIN=1;  PLUGIN_DIRS="${PLUGIN_DIRS} DataViewer"; ENABLE_PLUGINS=1)
+
 AC_ARG_WITH(fileselector,
   --with-fileselector          Enable GtkExtra file selector plugin, 
   FILESELECTOR_PLUGIN=1;  PLUGIN_DIRS="${PLUGIN_DIRS} FileSelect"; ENABLE_PLUGINS=1)
@@ -63,12 +64,13 @@ AC_ARG_WITH(ggvis,
   --with-ggvis          Enable ggvis plugin, 
   [GGVIS_PLUGIN=1;  PLUGIN_DIRS="${PLUGIN_DIRS} ggvis"; ENABLE_PLUGINS=1])
 
+AC_ARG_WITH(graphaction,
+  --with-graphaction          Enable graph operations plugin, 
+  [GRAPHACTION_PLUGIN=1;  PLUGIN_DIRS="${PLUGIN_DIRS} GraphAction"; ENABLE_PLUGINS=1])
+
 AC_ARG_WITH(varcloud,
   --with-varcloud          Enable variogram cloud plugin, 
   [VARCLOUD_PLUGIN=1;  PLUGIN_DIRS="${PLUGIN_DIRS} VarCloud"; ENABLE_PLUGINS=1])
-AC_ARG_WITH(graphaction,
-  --with-graphaction          Enable graph operations plugin, 
-  [VARCLOUD_PLUGIN=1;  PLUGIN_DIRS="${PLUGIN_DIRS} GraphAction"; ENABLE_PLUGINS=1])
 AC_ARG_WITH(plugins, [--with-plugins          Enable all the plugins (no)], ENABLE_ALL_PLUGINS=1)
 
 
