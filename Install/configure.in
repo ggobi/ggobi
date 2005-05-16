@@ -451,7 +451,7 @@ if test -n "${with_R}" && test "${with_R}" != "no"  ; then
 
   if test -d Rggobi ; then
     WITH_R=1
-    AC_PATH_PROG(R_BIN,R,[Cannot find the R executable])
+    AC_PATH_PROG(R_BIN,R,[echo "Cannot find the R executable"])
     if test -d $with_R ; then
       R_PKG_DIR="-l $with_R"
     fi
