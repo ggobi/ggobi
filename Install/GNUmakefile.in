@@ -92,11 +92,13 @@ uninstall:
 
 ggobirc: buildPlugins
 	echo "<ggobirc>" > $@
-	echo "<plugins>" >> $@ 
+	echo "<plugins>" >> $@
+ifneq (${PLUGIN_DIRS},)
 	for i in $(PLUGIN_DIRS) ; do \
 	  echo "" >> $@ ; \
 	  cat plugins/$$i/plugin.xml >> $@ ; \
 	done
+endif
 	echo "</plugins>" >> $@ 
 	echo "</ggobirc>" >> $@
 
