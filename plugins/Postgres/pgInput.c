@@ -1,5 +1,6 @@
 #include "libpq-fe.h"
 #include "ggobi.h"
+#include "externs.h"
 
 #include "GGobiAPI.h"
 
@@ -78,7 +79,7 @@ read_postgres_data(DBMSLoginInfo *info, gboolean init, ggobid *gg)
     datad *d;
     conn = makeConnection(info);    
     if(!conn) {
-	quick_message("You haven't specified a data query!");
+	quick_message("You haven't specified a data query!", false);
 	return(-1);
     }
 
