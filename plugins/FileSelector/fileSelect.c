@@ -3,6 +3,7 @@
 #include "icon.xpm"
 
 #include <stdio.h>
+#include <string.h>
 
 #ifndef WIN32
 #include <unistd.h>
@@ -26,7 +27,7 @@ get_description(const char *const fileName, const char *const modeName,
   InputDescription *desc;
 
   desc = (InputDescription*) g_malloc(sizeof(InputDescription));
-  memset(desc, '\0', sizeof(InputDescription));
+  memset((char *)desc, '\0', sizeof(InputDescription));
 
   desc->fileName = g_strdup("File selection");
   desc->mode = unknown_data;
@@ -41,13 +42,12 @@ ok_clicked(GtkWidget *widget, DialogInput *data)
   GtkIconFileSel *filesel;
   gchar *path;
   gchar *file;
-  char *buf;
 
   filesel = GTK_ICON_FILESEL(data->w);
-  path = gtk_file_list_get_path(GTK_FILE_LIST(filesel->file_list));
-  file = gtk_file_list_get_filename(GTK_FILE_LIST(filesel->file_list));
+  path = (gchar *)gtk_file_list_get_path(GTK_FILE_LIST(filesel->file_list));
+  file = (gchar *)gtk_file_list_get_filename(GTK_FILE_LIST(filesel->file_list));
 
- data->desc->fileName = g_malloc(sizeof(gchar) *(strlen(path) + strlen(file) + 1));
+  data->desc->fileName = g_malloc(sizeof(gchar) *(strlen(path) + strlen(file) + 1));
   sprintf(data->desc->fileName, "%s%s", path, file);
 
 
@@ -81,7 +81,7 @@ cancel_clicked(GtkWidget *widget, DialogInput *data)
 gboolean
 show_fileselector(InputDescription *desc, ggobid *gg, GGobiPluginInfo *info)
 {
-    GtkWidget *w, *dlg;
+    GtkWidget *w;
     gint type;
     DialogInput *data;
     char buf[1000];
