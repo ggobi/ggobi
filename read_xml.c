@@ -688,6 +688,9 @@ void endXMLElement(void *user_data, const xmlChar *name)
     break;
 
     case EDGE:
+      if (data->current_element < data->current_data->ncols) {
+        ggobi_XML_error_handler (data, "Not enough elements\n");
+      }
       data->current_record++;
     break;
     case RECORD:
@@ -697,6 +700,9 @@ void endXMLElement(void *user_data, const xmlChar *name)
          tag in the case where record elements have been individually
          tagged, and it does that without confusion. */
       setRecordValues(data, data->recordString, data->recordStringLength);
+      if (data->current_element < data->current_data->ncols) {
+        ggobi_XML_error_handler (data, "Not enough elements\n");
+      }
       data->current_record++;
       resetRecordInfo(data);
     break;
@@ -1342,19 +1348,20 @@ setRecordValues (XMLParserData *data, const xmlChar *line, gint len)
   tmp = strtok((gchar*) line, " \t\n");
 
   while (tmp && (tmp < (gchar *) (line + len))) {
+    /*
+    g_printerr("current element %d token %s\n", data->current_element,
+    tmp);
+    */
     if(setRecordValue(tmp, d, data) == false)
         return(false);
     data->current_element++;
     tmp = strtok (NULL, " \t\n");
   }
+  /*
   if (data->current_element < d->ncols) {
     ggobi_XML_error_handler (data, "Not enough elements\n");
-    /*
-    g_printerr ("Record %d has insufficient elements: %d < %d\n",
-		data->current_record, data->current_element,
-		d->ncols);
-    */
   }
+  */
 
 
   applyRandomUniforms(d, data);
