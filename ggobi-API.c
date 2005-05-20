@@ -670,23 +670,48 @@ GGOBI(getCaseGlyphSize)(gint id, datad *d, ggobid *gg)
   return (d->glyph_now.els[index].size);
 }
 
-
 void 
 GGOBI(setCaseGlyph)(gint index, gint type, gint size, datad *d, ggobid *gg)
 {
-  if (size > -1)
-    d->glyph.els[index].size = d->glyph_now.els[index].size = size;
-  if (type > -1)
-    d->glyph.els[index].type = d->glyph_now.els[index].type = type;
+  if (type > -1) {
+    if (type >= NGLYPHTYPES)
+      g_printerr ("Illegal glyph type: %d\n", type);
+    else
+      d->glyph.els[index].type = d->glyph_now.els[index].type = type;
+  }
+
+  if (size > -1) {
+    if (size >= NGLYPHSIZES)
+      g_printerr ("Illegal glyph size: %d\n", size);
+    else
+      d->glyph.els[index].size = d->glyph_now.els[index].size = size;
+  }
 }
 
 void 
 GGOBI(setCaseGlyphs)(gint *ids, gint n, gint type, gint size,
   datad *d, ggobid *gg)
 {
-  gint i;
-  for(i = 0; i < n ; i++)
-    GGOBI(setCaseGlyph)(ids[i], type, size, d, gg);
+  gint i, doit = 1;
+  /*
+   * Make sure glyphs are legal before assigning.  (It's safe to
+   * ignore values of -1, because those are likely to be deliberately
+   * set by the calling routine as an indication to do nothing.)
+   * Do the check here to avoid generating large numbers of
+   * error messages.
+   */
+  if (type >= NGLYPHTYPES) {
+    g_printerr ("Illegal glyph type: %d\n", type);
+    doit = 0;
+  }
+  if (size >= NGLYPHSIZES) {
+    g_printerr ("Illegal glyph size: %d\n", size);
+    doit = 0;
+  }
+  
+  if (doit)
+    for(i = 0; i < n ; i++)
+      GGOBI(setCaseGlyph)(ids[i], type, size, d, gg);
 }
 
 /*-------------------------------------------------------------------------*/
