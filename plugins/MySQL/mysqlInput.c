@@ -3,6 +3,7 @@
 #include "ggobi.h"
 #include "GGobiAPI.h"
 #include "dbms_ui.h"
+#include "externs.h"
 
 #include "plugin.h"
 
@@ -137,7 +138,6 @@ query(const char * const query, MYSQL *conn, ggobid *gg)
 {
   MYSQL_RES *res;
   int status;
-  char *msg;
 
   status =  mysql_query(conn, query);
 
