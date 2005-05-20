@@ -7,7 +7,7 @@
 
 #include "plugin.h"
 
-#include "gtkextra/gtksheet.h"
+#include <gtkextra/gtksheet.h>
 
 #include <stdlib.h>
 #include <strings.h>
@@ -470,8 +470,9 @@ add_ggobi_data(datad *data, GtkWidget *w)
   }
 
   /*-- Does this apply to the row or column titles?  Alas, no.  --*/
+  /* This now triggers a compile error.
   GTK_SHEET_SET_FLAGS(sheet, GTK_SHEET_AUTORESIZE);
-
+  */
   gtk_sheet_set_row_titles_width (sheet, maxwidth);
 }
 
