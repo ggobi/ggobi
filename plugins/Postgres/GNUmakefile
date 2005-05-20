@@ -15,9 +15,11 @@ PG_LIB_DIR=$(shell $(PG_CONFIG) --libdir)
 ifdef GGOBI_CONFIG
  GGOBI_INCLUDE_DIR=$(shell $(GGOBI_CONFIG) --cflags)
  GGOBI_LIB=$(shell $(GGOBI_CONFIG) --libs)
+ CFLAGS+=$(shell $(GGOBI_CONFIG) --cflags) $(GGOBI_INCLUDE_DIR)
 else
  GGOBI_INCLUDE_DIR=-I../..
  GGOBI_LIB=-L../.. -lggobi
+ CFLAGS+=$(shell cd $(GGOBI_HOME) ; $(MAKE) cflags $(GGOBI_MAKEFILE)) $(GGOBI_INCLUDE_DIR)
 endif
 
 
