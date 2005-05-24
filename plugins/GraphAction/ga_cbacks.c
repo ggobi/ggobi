@@ -197,7 +197,9 @@ ga_leaf_hide_cb (GtkWidget *btn, PluginInstance *inst)
     for (m=0; m<d->nrows_in_plot; m++) {
       i = d->rows_in_plot.els[m];
       if (!d->hidden_now.els[i]) {
-        if (ga->inEdges[i].nels <= 1 && ga->outEdges[i].nels <= 1) {
+        if (ga->inEdges[i].nels == 0 && ga->outEdges[i].nels == 0) {
+          ;
+        } else if (ga->inEdges[i].nels <= 1 && ga->outEdges[i].nels <= 1) {
           /* is this the same edge in the other direction? */
           if (ga->inEdges[i].nels == 1 && ga->outEdges[i].nels == 1) {
             ida = ga->inEdges[i].els[0];
@@ -222,7 +224,7 @@ ga_leaf_hide_cb (GtkWidget *btn, PluginInstance *inst)
   	  } else if (ga->inEdges[i].nels == 1) {
 	    hide_inEdge (i, inst);
             changing = true;
-          } else {
+          } else if (ga->outEdges[i].nels == 1) {
 	    hide_outEdge (i, inst);
             changing = true;
           }
