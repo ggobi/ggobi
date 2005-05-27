@@ -385,6 +385,8 @@ create_vcl_window(vcld *vcl, PluginInstance *inst)
 void freePlugin(ggobid *gg, PluginInstance *inst)
 {
   if (inst->data) {
+    GtkWidget *window = (GtkWidget *) inst->data;
+    gtk_widget_destroy (window);
     inst->data = NULL;
   }
 }

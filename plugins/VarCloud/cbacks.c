@@ -184,8 +184,6 @@ close_vcl_window_cb (GtkWidget *w, PluginInstance *inst)
 {
   extern void freePlugin(ggobid *, PluginInstance *);
   ggobid *gg = inst->gg;
-  GtkWidget *window = (GtkWidget *) inst->data;
-  gtk_widget_destroy (window);
 
   freePlugin(gg, inst);
 }
