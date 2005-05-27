@@ -460,7 +460,8 @@ closePlugins(ggobid *gg)
     plugin = (PluginInstance *) el->data;
     if(plugin->info->info.g->onClose) {
       DLFUNC f =  getPluginSymbol(plugin->info->info.g->onClose, plugin->info->details);
-      f(gg, plugin->info, plugin);
+      if (f)
+        f(gg, plugin->info, plugin);
     }
     tmp = el;
     el = el->next;
