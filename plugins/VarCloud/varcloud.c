@@ -401,3 +401,9 @@ vcl_free (vcld *vcl) {
 
   g_free (vcl);
 }
+
+void closeWindow(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
+{
+  freePlugin (gg, inst);
+}
+
