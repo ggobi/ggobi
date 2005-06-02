@@ -1,6 +1,5 @@
 #ifndef GLAYOUT_H
 
-#include "defines.h"
 #include "plugin.h"
 
 typedef enum {deflt, within, between, anchorscales, anchorfixed} MDSGroupInd;
