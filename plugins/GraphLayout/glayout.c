@@ -429,6 +429,75 @@ Add an option:  Model either 'circuit resistance' or 'shortest path'
   label = gtk_label_new ("Dot");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), frame, label);
 
+/*
+ * fdp tab
+*/
+  frame = gtk_frame_new ("fdp layout");
+  gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
+
+#ifdef GRAPHVIZ
+  vbox = gtk_vbox_new (false, 5);
+  gtk_container_set_border_width (GTK_CONTAINER(vbox), 5); 
+  gtk_container_add (GTK_CONTAINER(frame), vbox);
+
+  btn = gtk_button_new_with_label ("apply");
+  gtk_widget_set_name (btn, "fdp");
+  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+    GTK_SIGNAL_FUNC (dot_neato_layout_cb), (gpointer) inst);
+  gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 3);
+#else
+  gtk_container_add (GTK_CONTAINER(frame), gtk_label_new ("Not enabled"));
+#endif
+
+  label = gtk_label_new ("FDP");
+  gtk_notebook_append_page (GTK_NOTEBOOK (notebook), frame, label);
+
+/*
+ * twopi tab
+*/
+  frame = gtk_frame_new ("twopi layout");
+  gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
+
+#ifdef GRAPHVIZ
+  vbox = gtk_vbox_new (false, 5);
+  gtk_container_set_border_width (GTK_CONTAINER(vbox), 5); 
+  gtk_container_add (GTK_CONTAINER(frame), vbox);
+
+  btn = gtk_button_new_with_label ("apply");
+  gtk_widget_set_name (btn, "twopi");
+  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+    GTK_SIGNAL_FUNC (dot_neato_layout_cb), (gpointer) inst);
+  gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 3);
+#else
+  gtk_container_add (GTK_CONTAINER(frame), gtk_label_new ("Not enabled"));
+#endif
+
+  label = gtk_label_new ("Twopi");
+  gtk_notebook_append_page (GTK_NOTEBOOK (notebook), frame, label);
+
+/*
+ * circo tab
+*/
+  frame = gtk_frame_new ("circo layout");
+  gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
+
+#ifdef GRAPHVIZ
+  vbox = gtk_vbox_new (false, 5);
+  gtk_container_set_border_width (GTK_CONTAINER(vbox), 5); 
+  gtk_container_add (GTK_CONTAINER(frame), vbox);
+
+  btn = gtk_button_new_with_label ("apply");
+  gtk_widget_set_name (btn, "circo");
+  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+    GTK_SIGNAL_FUNC (dot_neato_layout_cb), (gpointer) inst);
+  gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 3);
+#else
+  gtk_container_add (GTK_CONTAINER(frame), gtk_label_new ("Not enabled"));
+#endif
+
+  label = gtk_label_new ("Circo");
+  gtk_notebook_append_page (GTK_NOTEBOOK (notebook), frame, label);
+
   gtk_widget_show_all (window);
 
   return(window);
