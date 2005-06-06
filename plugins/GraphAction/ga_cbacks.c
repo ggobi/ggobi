@@ -26,6 +26,10 @@ count_visible_edges (PluginInstance *inst)
   gint m, i, k, a, b, edgeid;
   endpointsd *endpoints;
 
+  if (e == NULL) {
+    quick_message ("You haven't designated a set of edges.", false);
+/**/return;
+  }
   endpoints = resolveEdgePoints(e, d);
   if (endpoints == NULL) {
     g_printerr ("failed to resolve edges. d: %s, e: %s\n", d->name, e->name);
@@ -88,6 +92,10 @@ hide_inEdge (gint i, PluginInstance *inst)
   gint nd = g_slist_length (gg->d);
   endpointsd *endpoints;
 
+  if (e == NULL) {
+    quick_message ("You haven't designated a set of edges.", false);
+/**/return;
+  }
   endpoints = resolveEdgePoints(e, d);
   if (endpoints == NULL) {
     g_printerr ("failed to resolve edges. d: %s, e: %s\n", d->name, e->name);
@@ -123,6 +131,10 @@ hide_outEdge (gint i, PluginInstance *inst)
   gint nd = g_slist_length (gg->d);
   endpointsd *endpoints;
 
+  if (e == NULL) {
+    quick_message ("You haven't designated a set of edges.", false);
+/**/return;
+  }
   endpoints = resolveEdgePoints(e, d);
   if (endpoints == NULL) {
     g_printerr ("failed to resolve edges. d: %s, e: %s\n", d->name, e->name);
@@ -154,10 +166,13 @@ ga_leaf_hide_cb (GtkWidget *btn, PluginInstance *inst)
   datad *e = ga->e;
   gboolean changing;
   gboolean need_to_link_p = false;
-  /*  gint nvisible; */
   gint i, m;
   endpointsd *endpoints;
 
+  if (e == NULL) {
+    quick_message ("You haven't designated a set of edges.", false);
+/**/return;
+  }
   endpoints = resolveEdgePoints(e, d);
   if (endpoints == NULL) {
     g_printerr ("failed to resolve edges. d: %s, e: %s\n", d->name, e->name);
@@ -252,6 +267,10 @@ ga_orphans_hide_cb (GtkWidget *btn, PluginInstance *inst)
   endpointsd *endpoints;
   gint nd = g_slist_length (gg->d);
 
+  if (e == NULL) {
+    quick_message ("You haven't designated a set of edges.", false);
+/**/return;
+  }
   endpoints = resolveEdgePoints(e, d);
   if (endpoints == NULL) {
     g_printerr ("failed to resolve edges. d: %s, e: %s\n", d->name, e->name);
@@ -349,6 +368,11 @@ show_neighbors (gint nodeid, gint edgeid, gint depth,
   gint a, b, neighbor, k, eid;
   graphactd *ga = (graphactd *) inst->data;
   endpointsd *endpoints;
+
+  if (e == NULL) {
+    quick_message ("You haven't designated a set of edges.", false);
+/**/return;
+  }
   endpoints = resolveEdgePoints(e, d);
   if (endpoints == NULL) {
     g_printerr ("failed to resolve edges. d: %s, e: %s\n", d->name, e->name);
@@ -394,6 +418,11 @@ void show_neighbors_sticky_cb (ggobid *gg, gint index, gint state,
   /*datad *d = ga->d;*/
   enum {GRAPH_VIEW, EDGE_DATA_VIEW} idview;
   displayd *display = gg->current_display;
+
+  if (e == NULL) {
+    quick_message ("You haven't designated a set of edges.", false);
+/**/return;
+  }
 
   /* 
      If I'm in the graph (map) view, display->d = ga->d
@@ -468,3 +497,33 @@ show_neighbors_toggle_cb (GtkToggleButton *button, PluginInstance *inst)
   }
 }
 
+/*--------- Tidy -------------*/
+void
+ga_edge_tidy_cb (GtkWidget *w, PluginInstance *inst)
+{
+  graphactd *ga = (graphactd *) inst->data;
+  datad *d = ga->d;
+  datad *e = ga->e;
+  endpointsd *endpoints;
+  gint a, b, k;
+
+  /* Loop over edges.  If either endpoint is hidden, hide the edge */
+
+  if (e == NULL) {
+    quick_message ("You haven't designated a set of edges.", false);
+/**/return;
+  }
+  endpoints = resolveEdgePoints(e, d);
+  if (endpoints == NULL) {
+    g_printerr ("failed to resolve edges. d: %s, e: %s\n", d->name, e->name);
+/**/return;
+  }
+
+  for (k=0; k<e->edge.n; k++) {
+    edge_endpoints_get (k, &a, &b, d, endpoints, e);
+    if (d->hidden_now.els[a] || d->hidden_now.els[b]) {
+      e->hidden_now.els[k] = true;
+    }
+  }
+  displays_tailpipe (FULL, inst->gg);
+}
