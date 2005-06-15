@@ -18,7 +18,7 @@ HERDSZ: breeding herd size
 
 </description>
 <variables count="11">
-<realvariable name="TIME" />
+<realvariable name="TIME" time="true" />
 <realvariable name="YEAR" />
 <realvariable name="QUARTER" />
 <realvariable name="Q1" />

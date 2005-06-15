@@ -10,7 +10,7 @@
 </description>
 <variables count="9">
  <realvariable name="nseconds" />
- <realvariable name="whatever" />
+ <realvariable name="whatever" time="yes" />
  <randomuniformvariable name="u1" />
  <randomuniformvariable name="u2" />
  <categoricalvariable name="fraudp">

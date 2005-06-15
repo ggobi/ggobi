@@ -13,7 +13,7 @@ contains measurements from 5 locations (0deg/110W, 2S/110W,
 1997 (El Nino). There are missing values in this data set.
 </description>
 <variables count="8">
-<realvariable name="Year" nickname="Yr" />
+<realvariable name="Year" nickname="Yr" time="yes"/>
 <realvariable name="Latitude" nickname="La" />
 <realvariable name="Longitude" nickname="Lo" />
 <realvariable name="Sea Surface Temp" nickname="ST" />

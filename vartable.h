@@ -27,7 +27,8 @@ typedef enum {ADDVAR_ROWNOS = 0, ADDVAR_BGROUP} NewVariableType;
 extern const double AddVarRowNumbers;
 extern const double AddVarBrushGroup;
 
-typedef enum {real, categorical, integer, counter, uniform, all_vartypes} vartyped;
+typedef enum {real, categorical, integer, counter, uniform,  all_vartypes} vartyped;
+
 
 /*
  * a vartabled object is not a table, but rather an entry in
@@ -44,6 +45,8 @@ typedef struct {
 
  /*-- is this variable categorical? --*/
  vartyped vartype;
+ gboolean isTime;
+
  /*-- categorical_p --*/
  gint nlevels;
  gint *level_values;

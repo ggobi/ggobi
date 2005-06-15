@@ -1,3 +1,11 @@
+When reading categorical variables, check the values
+are in the levels or signal an error.
+  e.g. a typo.
+
+
+Time series doesn't work for categorical variables as the x variable.
+
+
 When compiling Rggobi, ensure that the versions of Gtk are the same.
 
 

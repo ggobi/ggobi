@@ -149,7 +149,7 @@ tsplot_new(displayd *display, gboolean missing_p, gint nvars, gint *vars, datad 
   GtkWidget *vbox, *frame;
   GtkWidget *mbar, *w;
   GtkItemFactory *factory;
-  gint i;
+  gint i, timeVariable, cur;
   splotd *sp;
   gint nplots;
 
@@ -158,14 +158,41 @@ tsplot_new(displayd *display, gboolean missing_p, gint nvars, gint *vars, datad 
 
   display_set_values(display, d, gg);
 
+  timeVariable = 0;
+
   if (nvars == 0) {
+
+      /* See if there is a variable which has been marked as isTime and use the first of 
+         these as the horizontal axis. */
+    for(i = 0; i < d->ncols; i++) {
+	vartabled *el;
+	el = vartable_element_get(i, d);
+	if(el->isTime) {
+	    timeVariable = i;
+	    break;
+	}
+    }
+
     nplots = MIN ((d->ncols-1), sessionOptions->info->numTimePlotVars);
     if(nplots < 0)
       nplots = d->ncols;
-    for (i=1; i<nplots; i++)
-      vars[i] = i;
+
+    for (i=1, cur = 0; i < nplots; i++, cur++) {
+
+	/* Check that we are not setting a variable to the timeVariable
+	   but also that we have enough variables. */
+	if(cur == timeVariable) {
+	    if(cur < d->ncols-1) {
+		vars[i] = ++cur;
+	    }
+	} else
+	    vars[i] = cur;
+    }
+
+
   } else {
     nplots = nvars;
+    timeVariable =vars[0];
   }
 
   tsplot_cpanel_init (&display->cpanel, gg);
@@ -220,11 +247,14 @@ tsplot_new(displayd *display, gboolean missing_p, gint nvars, gint *vars, datad 
 
   display->splots = NULL;
 
+
   for (i=1; i < nplots; i++) {
     sp = gtk_time_series_splot_new(display, 2.5*WIDTH, HEIGHT, gg);
 
     sp->xyvars.y = vars[i];
-    sp->xyvars.x = 0;
+    sp->xyvars.x = timeVariable;
+
+    g_printerr("time %d %d\n", vars[i], timeVariable); 
 
 /*
     if (sub_plots == NULL) {

@@ -1478,6 +1478,13 @@ newVariable(const xmlChar **attrs, XMLParserData *data, const xmlChar *tagName)
     el->vartype = uniform;
   } /* real by default */
 
+
+  tmp = getAttribute(attrs, "time");
+  if(tmp && (strcmp(tmp, "yes") == 0 || strcmp(tmp, "true") == 0)) {
+      el->isTime = true;
+  }
+
+
   return (true);
 }
 

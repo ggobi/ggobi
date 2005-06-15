@@ -8,9 +8,20 @@
  the levels="auto" attribute for a categoricalvariable
  element. It also uses the string element to identify these values.
 </description>
-<variables count="5">
+<variables count="7">
  <realvariable name="nseconds" />
  <realvariable name="whatever" />
+ <categoricalvariable name="day" time="yes">
+   <levels count="7">
+     <level value="0">Monday</level>
+     <level value="1">Tuesday</level>
+     <level value="2">Wednesday</level>
+     <level value="3">Thursday</level>
+     <level value="4">Friday</level>
+     <level value="5">Saturday</level>
+     <level value="6">Sunday</level>
+   </levels>
+ </categoricalvariable>
  <categoricalvariable name="fraudp">
    <levels count="3">
      <level value="0"> low </level>
@@ -26,17 +37,19 @@
    </levels>
  </categoricalvariable>
  <categoricalvariable name="name" levels="auto" />
+ <integervariable name="month" time="yes" />
 </variables>
 
 <records count="7">
- <record id="a1" label="a1"> 0 10  0 0 <string>AB C</string></record>
- <record id="b2"> 1  20 0 1 <string>DEF</string> </record>
- <record id="c3"> 2  30 1 2 <string>GHI</string> </record>
- <record id="d4"> 3  40 2 1 <string>J</string> </record>
- <record id="e5"> 4  50 2 2 <string>KLM</string> </record>
- <record id="f6"> 5  60 2 1 <string>NOP QRST</string> </record>
+ <record id="a1" label="a1"> 0 10 <string>Monday</string> 0 0 <string>AB C</string> 0</record>
+ <record id="b2"> 1  20 <string>Tuesday</string> 0 1 <string>DEF</string> 1</record>
+ <record id="c3"> 2  30 <string>Wednesay</string> 1 2 <string>GHI</string> 2</record>
+ <record id="d4"> 3  40 <string>Thursday</string> 2 1 <string>J</string> 3</record>
+ <record id="e5"> 4  50 <string>Friday</string> 2 2 <string>KLM</string> 4</record>
+ <record id="f6"> 5  60 <string>Saturday</string> 2 1 <string>NOP QRST</string> 5</record>
  <record id="g7"><real>6</real>
- <real>70</real><int>2</int><int>2</int><string>Happy Birthday</string></record>
+ <real>70</real><string>Sunday</string><int>2</int><int>2</int><string>Happy
+ Birthday</string><int>7</int></record>
 </records>
 </data>
 
