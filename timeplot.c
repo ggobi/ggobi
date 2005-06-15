@@ -254,8 +254,6 @@ tsplot_new(displayd *display, gboolean missing_p, gint nvars, gint *vars, datad 
     sp->xyvars.y = vars[i];
     sp->xyvars.x = timeVariable;
 
-    g_printerr("time %d %d\n", vars[i], timeVariable); 
-
 /*
     if (sub_plots == NULL) {
       sp = splot_new (display, WIDTH, HEIGHT, gg);
