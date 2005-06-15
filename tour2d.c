@@ -343,7 +343,8 @@ static void tour2d_speed_set_display(gfloat slidepos, displayd *dsp)
   speed_set(slidepos, &cpanel->t2d.step, &dsp->t2d.delta);
 }
 
-void tour2d_pause (cpaneld *cpanel, gboolean state, displayd *dsp, ggobid *gg) {
+void tour2d_pause (cpaneld *cpanel, gboolean state, displayd *dsp, ggobid *gg) 
+{
   if (dsp == NULL)
     return;
 

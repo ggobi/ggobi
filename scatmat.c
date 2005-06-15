@@ -593,8 +593,10 @@ scatmat_varsel_simple (cpaneld *cpanel, splotd *sp, gint jvar,
     }
 
     if (sprow != spcol) {
-      g_printerr ("Please select one of the plots on the diagonal\n");
-/**/  return false;
+/*XXX */
+	gg_write_to_statusbar("Please select one of the plots on the diagonal", gg);
+/*      g_printerr ("Please select one of the plots on the diagonal\n"); */
+	return false;
     }
 
     if (cpanel->scatmat_selection_mode == VAR_REPLACE) {

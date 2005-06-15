@@ -1,3 +1,6 @@
+Interface to allow R function as a the metric for projection pursuit.
+  What I added in Dec. at the MSRI workshop.
+
 When reading categorical variables, check the values
 are in the levels or signal an error.
   e.g. a typo.
