@@ -1,10 +1,12 @@
+Paused tours  were causing problems with consuming large amount of
+	cycles. This seems to be fixed now.
+
 time variables  In the XML files, one can specify that a variable can
 	be used as a time variable using an attribute time.  The value
 	of the attribute should be "yes" or "true".  (No upper case!)
 	Such variables can then be identified when creating a time
 	series plot.
 	
-
 
 statusbar is now non-editable by the user.
 
