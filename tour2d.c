@@ -350,6 +350,19 @@ void tour2d_pause (cpaneld *cpanel, gboolean state, displayd *dsp, ggobid *gg)
 
   cpanel->t2d.paused = state;
 
+  /* This condition is experimental and is used to avoid the case
+      where we have an XY plot in paused tour mode and we create a new
+      plot.  When that happens, the initialization of that new plot
+      in cpanel_tour2d_set sets the pause button which triggers
+      this routine to be invoked as part of the callback.  
+      Since the paused state is 0, we end up  calling tour2d_func
+      with state = 1 which means turn it on.  And so the tour
+      is active for that new display!  And we consume CPU cycles
+      galore.  DTL.
+      */
+  if(state == 0 && dsp->t2d.idled == 0)
+      return;
+
   tour2d_func (!cpanel->t2d.paused, dsp, gg);
 
   if (cpanel->t2d.paused) {
@@ -796,8 +809,9 @@ void tour2d_func (gboolean state, displayd *dsp, ggobid *gg)
     if (dsp->t2d.idled == 0) {
       dsp->t2d.idled = gtk_idle_add_priority (G_PRIORITY_LOW,
                                    (GtkFunction) tour2d_idle_func, dsp);
+
+      gg->tour2d.idled = 1;
     }
-    gg->tour2d.idled = 1;
   } else {
     if (dsp->t2d.idled != 0) {
       gtk_idle_remove (dsp->t2d.idled);

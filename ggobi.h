@@ -41,6 +41,8 @@ struct _ggobid;
 
 #include "colorscheme.h"
 
+
+
 /*
  These are hooks for other applications (e.g. R) to 
  facilitate callbacks at a higher level that GTK events/signals.
@@ -253,7 +255,6 @@ struct _ggobid {
   } xyplot;
 
 /*---------------------- touring -------------------------------------*/
-
 
 #ifndef NEW_TOUR_CLASSES
   struct _Tour2d3 {

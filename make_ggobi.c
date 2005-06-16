@@ -88,6 +88,7 @@ void globals_init(ggobid * gg)
 
   gg->statusbar_p = true;
 
+
 #ifndef GTK_2_0
 #else
 #include "GtkSignalDef.c"
