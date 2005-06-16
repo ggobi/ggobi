@@ -42,6 +42,7 @@ GtkType gtk_ggobi_display_get_type();
 enum { TOUR_STEP_SIGNAL, 
        MAX_GGOBI_DISPLAY_SIGNALS};
 
+
 typedef struct _GtkGGobiDisplayClass
 {
   GtkVBoxClass parent_class;
@@ -249,10 +250,10 @@ typedef struct
 
 
     gchar * treeLabel;
-    gchar * const (*tree_label)(displayd *dpy);
+    gchar const * (*tree_label)(displayd *dpy);
 
     gchar * titleLabel;
-    gchar * const (*title_label)(displayd *dpy);
+    gchar const *  (*title_label)(displayd *dpy);
 
     displayd *(*create)(gboolean missing_p, splotd *sp, datad *d, ggobid *gg);
     displayd *(*createWithVars)(gboolean missing_p, gint nvars, gint *vars, datad *d, ggobid *gg);
@@ -329,8 +330,8 @@ typedef struct {
 void display_set_values(displayd *display, datad *d, ggobid *gg);
 
  /* For the extended cases. */
-const gchar * const gtk_display_tree_label(displayd *dpy);
-const gchar * const gtk_display_title_label(displayd *dpy);
+const gchar const * gtk_display_tree_label(displayd *dpy);
+const gchar const * gtk_display_title_label(displayd *dpy);
 
 
 displayd *gtk_ggobi_display_new(gboolean missing_p, datad *d, ggobid *gg);
