@@ -68,7 +68,7 @@ gboolean setup_category(datad* d, gint* text_table, Tree* text_category)
       /* Debugging, dfs */
 #ifdef DEBUG_READ_CSV
       if (vt->nlevels > 0) {
-	g_printerr ("nlevels: %d\n", vt->nlevels);
+	g_printerr ("var: %d  nlevels: %d\n", i, vt->nlevels);
 	{
 	  gint k;
 	  for (k=0; k<vt->nlevels; k++)
@@ -164,8 +164,12 @@ static gboolean read_excel(datad* d, FILE* fp, gint* text_table, Tree* text_cate
       while(true)
       {
         ch = fgetc(fp);
-        if((ch == DELIMITER)||(ch == 10)||(ch == 13))
+        if((ch == DELIMITER)||(ch == '\r')||(ch == '\n'))
         {
+	  if (strlen(tmp) == 0) {
+            g_printerr ("Can't read data -- this file may be dos-formatted\n");
+            exit(0);
+          }
           if(is_num(tmp))
           {
             /* This is numeric value */
