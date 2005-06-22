@@ -121,14 +121,13 @@ We begin with a tutorial, and move on to describe GGobi in detail.
 Several sample data files are included with the GGobi distribution, in
 a directory called {\bf data,} and there you will find the file {\bf
 olive.xml}, a dataset on olive oil samples from Italy \cite{FALT83}.
-This data set takes advantage of an XML input/output format, a feature
-in GGobi that wasn't available in XGobi.  The olive oil data consists
-of the percentage composition of 8 fatty acids (palmitic, palmitoleic,
-stearic, oleic, linoleic, linolenic, arachidic, eicosenoic) found in the
-lipid fraction of 572 Italian olive oils. There are 9 collection areas,
-4 from southern Italy (North and South Apulia, Calabria, Sicily), two
-from Sardinia (Inland and Coastal) and 3 from northern Italy (Umbria,
-East and West Liguria).
+This data set uses an XML format.  The olive oil data consists of the
+percentage composition of 8 fatty acids (palmitic, palmitoleic,
+stearic, oleic, linoleic, linolenic, arachidic, eicosenoic) found in
+the lipid fraction of 572 Italian olive oils. There are 9 collection
+areas, 4 from southern Italy (North and South Apulia, Calabria,
+Sicily), two from Sardinia (Inland and Coastal) and 3 from northern
+Italy (Umbria, East and West Liguria).
 
 The data is part of a quality control study of olive oils. It is proposed
 that the olive oils from different regions have different fatty acid
@@ -1202,31 +1201,32 @@ video} button allows you to swap the background and accent colors.
 \subsubsection{Link by ID or by variable}
 \label{LinkingRules}
 
-This option menu is used to define which of two linking rules is to
-be used.  The default rule, {\it Link by ID}, dictates that points
-representing records that have the same {\it id}, as specified in the XML
-description (or in the API), will respond identically to brushing events.
-Ids are unique within a dataset, so this rule has no effect when only
-a single dataset is being studied.
+The default linking rule is to link by case id: that is, points
+representing records that have the same {\it id}, as specified in the
+XML description (or in the API), will respond identically to brushing
+events.  When no id has been provided, the record number becomes the
+case id by default.
 
-The second rule, {\it Link by variable}, uses the levels of a categorical
-variable to link points.  To choose a variable, open the {\bf variable
-manipulation} tool, and select a categorical variable.  Now when a
-case is brushed in one display, all cases with the same value of the
-categorical variable will change accordingly, in this and all other
-displays. 
+The second rule is to {\it Link by variable}, which uses the levels of
+a categorical variable to link points.  The candidate variables, if
+any, are named in the list widget under the {\em Undo} button.
+Now when a case is brushed in one display, all cases with the same
+value of the categorical variable will change accordingly, in this and
+all other displays.
 
 For example, look at the {\em algal-bloom.xml} data supplied with
-GGobi.  It contains four datasets, one of which contains the levels
-of a factorial experimental, while another represents the response.
-Both include the same categorical variables.  Open two scatterplots,
-one for each of those two datasets.  In the measurements display, plot
+GGobi.  It contains four datasets, one of which contains the levels of
+a factorial experimental, while another represents the response.  Both
+include the same categorical variables.  Open two scatterplots, one
+for each of those two datasets.  In the measurements display, plot
 algal count against day.  In the plot of experimental conditions, plot
 the level of phosphorus against the level of carbon.  Prepare to brush
-in the plot of experimental conditions.  Choose brushing by variable,
-and select ``Carbon.''  Highlighting the low values of carbon, note that
-all of the points highlighted in the measurements display are among the
-lowest in algal count.
+in the plot of experimental conditions.  Choose {\it Link by Carbon}
+as the linking rule: Note that you have to select brushing and set the
+linking rule twice, once when each scatterplot is the current plot.
+Highlighting the low values of carbon, note that all of the points
+highlighted in the measurements display are among the lowest in algal
+count.
 
 \subsubsection{Color schemes ...}
 
