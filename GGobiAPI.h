@@ -65,7 +65,8 @@ extern "C" {
   @see GGobi_getVersionString()
   @see GGobi_getVersionNumbers()
 */
-extern  char const * GGOBI(getVersionDate)(void);
+/*extern char const * GGOBI(getVersionDate)(void);*/
+extern char * const GGOBI(getVersionDate)(void);
 
 /**
  @ingroup Version
@@ -74,7 +75,8 @@ extern  char const * GGOBI(getVersionDate)(void);
   This is useful for determining if certain features are available,
   bugs have been fixed, etc. 
 */
-extern  char const * GGobi_getVersionString();
+/*extern  char const * GGobi_getVersionString();*/
+extern char * const GGobi_getVersionString();
 
 /**
  @ingroup Version
@@ -84,7 +86,8 @@ extern  char const * GGobi_getVersionString();
   These can be used to determine the characteristics
   of this version of the GGobi software.
 */
-extern  int const * GGobi_getVersionNumbers();
+/*extern  int const * GGobi_getVersionNumbers();*/
+extern int * const GGobi_getVersionNumbers();
 
 
 /**
@@ -122,7 +125,8 @@ extern DataMode GGobi_getDataMode(ggobid *gg);
 /**
  @ingroup GGobi
  */
-extern const gchar const * GGobi_getDataModeDescription(DataMode mode);
+/*extern const gchar const * GGobi_getDataModeDescription(DataMode mode);*/
+extern const gchar * const GGobi_getDataModeDescription(DataMode mode);
 
 /**
  @ingroup GGobi
@@ -391,7 +395,8 @@ extern gint *GGobi_getGlyphTypes(gint *n);
   is contained in the value of the argument (n).
  @ingroup Glyphs
  */
-extern const gchar * const * GGobi_getGlyphTypeNames(gint *n);
+/*extern const gchar * const * GGobi_getGlyphTypeNames(gint *n);*/
+extern const gchar ** const GGobi_getGlyphTypeNames(gint *n);
 
 /**
  Get the symbolic name of the glyph corresponding to the
@@ -706,7 +711,8 @@ gboolean GGobi_registerColorMap(ggobid *gg);
  @param inDefault
  @param gg
  */
-extern const gchar const * GGobi_getColorName(gint cid, ggobid *gg, gboolean inDefault);
+/*extern const gchar const * GGobi_getColorName(gint cid, ggobid *gg, gboolean inDefault);*/
+extern const gchar * const GGobi_getColorName(gint cid, ggobid *gg, gboolean inDefault);
 
 
 
