@@ -429,6 +429,9 @@ struct _ggobid {
   GList *colorSchemes;
   colorschemed *activeColorScheme;
 
+
+  GSList *viewModeRadioGroup;
+
   void *userData;/** A place to hang data for a host application, plugin, etc. 
                      Since plugins, etc. may also use this, we might want 
                      a hashtable here similar to pthread's thread-specific data. */
@@ -438,8 +441,7 @@ struct _ggobid {
 #include "read_init.h"
 
 
-typedef enum { GGOBI_SILENT, GGOBI_CHATTY,
-      GGOBI_VERBOSE } GGobiOutputLevel;
+typedef enum { GGOBI_SILENT, GGOBI_CHATTY, GGOBI_VERBOSE } GGobiOutputLevel;
 
 /**
   @defgroup SessionOptions Session Options
@@ -527,6 +529,9 @@ typedef struct {
 
   gfloat defaultTourSpeed;
   gfloat defaultTour1dSpeed;
+
+
+  gboolean useRadioMenuItems;
 
 } GGobiOptions;
 
