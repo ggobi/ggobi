@@ -19,6 +19,13 @@
 #include "vars.h"
 #include "externs.h"
 
+
+GtkWidget *
+CreateMenuItemWithCheck (GtkWidget *menu,
+			 gchar *szName, gchar *szAccel, gchar *szTip,
+			 GtkWidget *win_main, GtkAccelGroup *accel_group,
+			 GtkSignalFunc func, gpointer data, ggobid *gg, gboolean check);
+
 /*
  * Taken from 'Developing Linux Applications with GTK+ and GDK'
  * by Eric Harlow.
@@ -44,11 +51,27 @@ CreateMenuItem (GtkWidget *menu,
   GtkWidget *win_main, GtkAccelGroup *accel_group,
   GtkSignalFunc func, gpointer data, ggobid *gg)
 {
+    return(CreateMenuItemWithCheck(menu, szName, szAccel, szTip,
+				   win_main, accel_group, func, data, gg, false));
+}
+
+GtkWidget *
+CreateMenuItemWithCheck (GtkWidget *menu,
+  gchar *szName, gchar *szAccel, gchar *szTip,
+  GtkWidget *win_main, GtkAccelGroup *accel_group,
+  GtkSignalFunc func, gpointer data, ggobid *gg, gboolean check)
+{
   GtkWidget *menuitem;
+
+  if(check && gg->viewModeRadioGroup == NULL) {
+     menuitem = gtk_radio_menu_item_new(gg->viewModeRadioGroup);
+     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(menuitem), TRUE);
+     gg->viewModeRadioGroup = gtk_radio_menu_item_group (GTK_RADIO_MENU_ITEM (menuitem));
+  }
 
   /* --- If there's a name, create the item and add the signal handler --- */
   if (szName && strlen (szName)) {
-    menuitem = gtk_menu_item_new_with_label (szName);
+    menuitem = check ? gtk_radio_menu_item_new_with_label(gg->viewModeRadioGroup, szName) : gtk_menu_item_new_with_label (szName);
     if(func)
       gtk_signal_connect (GTK_OBJECT (menuitem), "activate",
 			  GTK_SIGNAL_FUNC (func), data);
@@ -57,8 +80,11 @@ CreateMenuItem (GtkWidget *menu,
 
   } else {
     /* --- Create a separator --- */
-    menuitem = gtk_menu_item_new ();
+    menuitem = check ? gtk_radio_menu_item_new(gg->viewModeRadioGroup) : gtk_menu_item_new ();
   }
+
+  if(check)
+     gg->viewModeRadioGroup = gtk_radio_menu_item_group (GTK_RADIO_MENU_ITEM (menuitem));
 
   /* --- Add menu item to the menu and show it. --- */
   gtk_menu_append (GTK_MENU (menu), menuitem);
