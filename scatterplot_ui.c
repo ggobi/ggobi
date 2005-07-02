@@ -26,6 +26,7 @@ void
 scatterplot_mode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func,
 			    ggobid *gg, gboolean useIds)
 {
+  GtkWidget *item;
 
   /*-- ViewMode menu --*/
   gg->app.scatterplot_mode_menu = gtk_menu_new ();
@@ -61,21 +62,31 @@ scatterplot_mode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func,
   CreateMenuItem (gg->app.scatterplot_mode_menu, "INTERACTION MODES:",
     "", "", NULL, NULL, NULL, NULL, gg);
 
-  CreateMenuItem (gg->app.scatterplot_mode_menu, "Scale",
+  CreateMenuItemWithCheck (gg->app.scatterplot_mode_menu, "Scale",
     "^s", "", NULL, accel_group, func,
-    useIds ? GINT_TO_POINTER (SCALE) : gg, gg);
-  CreateMenuItem (gg->app.scatterplot_mode_menu, "Brush",
+    useIds ? GINT_TO_POINTER (SCALE) : gg, gg, sessionOptions->useRadioMenuItems);
+  CreateMenuItemWithCheck (gg->app.scatterplot_mode_menu, "Brush",
     "^b", "", NULL, accel_group, func,
-    useIds ? GINT_TO_POINTER (BRUSH) : gg, gg);
-  CreateMenuItem (gg->app.scatterplot_mode_menu, "Identify",
+    useIds ? GINT_TO_POINTER (BRUSH) : gg, gg, sessionOptions->useRadioMenuItems);
+  CreateMenuItemWithCheck (gg->app.scatterplot_mode_menu, "Identify",
     "^i", "", NULL, accel_group, func,
-    useIds ? GINT_TO_POINTER (IDENT) : gg, gg);
-  CreateMenuItem (gg->app.scatterplot_mode_menu, "Edit edges",
+    useIds ? GINT_TO_POINTER (IDENT) : gg, gg, sessionOptions->useRadioMenuItems);
+  CreateMenuItemWithCheck (gg->app.scatterplot_mode_menu, "Edit edges",
     "^e", "", NULL, accel_group, func,
-    useIds ? GINT_TO_POINTER (EDGEED) : gg, gg);
-  CreateMenuItem (gg->app.scatterplot_mode_menu, "Move Points",
+    useIds ? GINT_TO_POINTER (EDGEED) : gg, gg, sessionOptions->useRadioMenuItems);
+  CreateMenuItemWithCheck (gg->app.scatterplot_mode_menu, "Move Points",
     "^m", "", NULL, accel_group, func,
-    useIds ? GINT_TO_POINTER (MOVEPTS) : gg, gg);
+    useIds ? GINT_TO_POINTER (MOVEPTS) : gg, gg, sessionOptions->useRadioMenuItems);
+
+
+  if(sessionOptions->useRadioMenuItems) {
+     item = CreateMenuItemWithCheck (gg->app.scatterplot_mode_menu, "Off",
+				  "^o", "", NULL, accel_group, func,
+				  useIds ? GINT_TO_POINTER (XYPLOT) : gg, gg, sessionOptions->useRadioMenuItems);
+
+     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), true);
+  }
+
 
   gtk_widget_show (gg->app.scatterplot_mode_menu);
 }
