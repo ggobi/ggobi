@@ -86,11 +86,11 @@ canRead(const char * const fileName)
 gboolean
 GGobi_checkPlugin(GGobiPluginDetails *plugin)
 {
- gboolean (*f)(void);
+ gboolean (*f)(const GGobiPluginDetails *);
  gboolean ok = true;
- f = (gboolean (*)(void)) getPluginSymbol("checkGGobiStructSizes", plugin);
+ f = (gboolean (*)(const GGobiPluginDetails *plugin)) getPluginSymbol("checkGGobiStructSizes", plugin);
  if(f) {
-   if(!(ok = f())) 
+   if(!(ok = f(plugin))) 
      g_printerr("Problems with plugin %s. Incosistent view of ggobi's data structures.\n", plugin->name);
    else if(sessionOptions->verbose == GGOBI_VERBOSE)
      g_printerr("plugin %s appears consistent with ggobi structures.\n", plugin->name);   
