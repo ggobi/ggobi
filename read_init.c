@@ -1065,6 +1065,7 @@ createExtendedDisplay(const gchar * const type, gint *vars, gint numVars, datad 
   if(!dpy)
     return(NULL);
 
+/*XXX does this get done via a callback. */
   display_add(dpy, gg);
 
   return(dpy);
