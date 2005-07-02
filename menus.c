@@ -728,10 +728,13 @@ viewmode_submenus_update (PipelineMode prev_mode, displayd *prev_display,
     break;
 
     case NULLMODE:
-    case NMODES:  /*-- why is this part of the enum? --*/
+    break;
 
-    default:
+    case NMODES:  /*-- why is this part of the enum? Compiler warnings otherwise. --*/
+    break;	    
+
     case EXTENDED_DISPLAY_MODE:
+    default:
     {
       displayd *dpy = gg->current_display;
       if(GTK_IS_GGOBI_EXTENDED_DISPLAY(dpy)) {
