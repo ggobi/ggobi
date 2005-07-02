@@ -232,7 +232,13 @@ getPreferences(const xmlDocPtr doc, GGobiInitInfo *info)
     }
   }
 
+  /* Whether to use check menu items. 
+XXX should this be in info or sessionOptions.
+  */
+  sessionOptions->useRadioMenuItems = getLogicalPreference(node, "useRadioMenuItems", false);
+
   info->createInitialScatterPlot = getLogicalPreference(node, "autoplot", true);
+
    /* If we autoplot, then we will by default expect there to be
       at least one plot, so our default value for allowNoDisplays
       is the negation of autoplot. */

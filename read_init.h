@@ -70,6 +70,11 @@ typedef struct _GGobiInitInfo {
 
     gchar   *sessionFile;
     gint     compress;
+
+#if 0
+    gboolean  useRadioMenuItems;
+#endif
+
 } GGobiInitInfo;
 
 GGobiInitInfo *read_init_file(const gchar *filename, GGobiInitInfo *info);
