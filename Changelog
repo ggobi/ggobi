@@ -1,15 +1,28 @@
 July 2005
+
+
 Two routines added to the "API": ggobi_data_set_var_type and ggobi_data_set_time_var to allow
  for users to specify the type of a variable and whether it is a time variable or not.
 
 
-internal:
+Menu item added to each display to bring the associated control panel to the foreground.
+
+Option to use check menu items for the interactive modes for a display, i.e. Scale, Brush, Identify, ...
+This gives a visual display of what is the currently active mode and also a way to turn it off
+directly rather than requiring to switch to a different, display-dependent mode, e.g. XYPlot.
+  In ggobirc as <useRadioMenuItems on="true" />
+
+
+
+Internal changes
    removed (ifdef'ed away) the calls to display_add() for each of the display types.
    These resulted in display_add being called twice: there and via the extended_display_open_cb.
    This fixes the message about "Display has already been added...." appearing.
 
+   Information about mismatching structure sizes for plugins and "modules" (i.e. Rggobi) announce  which 
+   module is complaining.  (Added the GGobiPluginDetails to the call to checkGGobiStructSizes().)
 
-Menu item added to each display to bring the associated control panel to the foreground.
+
 
 
 June 2005

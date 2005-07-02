@@ -9,6 +9,7 @@
     </args>
   </browser>
 
+  <useRadioMenuItems on="true" />
   <autoplot on="true" />
   <allowNoDisplays on="true" />
   <quitOnLastGGobi on="true" />
