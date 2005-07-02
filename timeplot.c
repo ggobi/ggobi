@@ -37,6 +37,7 @@ static GtkItemFactoryEntry menu_items[] = {
   { "/File/Print",    "",       (GtkItemFactoryCallback) display_print_cb, 0, "<Item>" },
   { "/File/sep",      NULL,     NULL,     0, "<Separator>" },
 #endif
+  {"/File/Control Panel", "", (GtkItemFactoryCallback) show_display_control_panel_cb, 0, "<Item>" },
   { "/File/Close",    "",       (GtkItemFactoryCallback) display_close_cb, 0, "<Item>" },
 };
 /* The rest of the menus will be appended once the menubar is created */

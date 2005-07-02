@@ -2,6 +2,6 @@
    <description>generate variogram scatterplot</description>
    <author>Deborah Swayne and Juergen Symanzik</author>
    <dll name="plugins/VarCloud/VarCloud">
-    <init onCreate="addToToolsMenu" onClose="closeWindow" />
+    <init onCreate="addToToolsMenu" onClose="closeWindow"/>
   </dll>
 </plugin>

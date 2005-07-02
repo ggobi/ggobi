@@ -428,6 +428,16 @@ display_close_cb (displayd *display, guint action, GtkWidget *w)
   display_free (display, false, gg);
 }
 
+
+void
+show_display_control_panel_cb(displayd *display, guint action, GtkWidget *w) 
+{
+  ggobid *gg = GGobiFromDisplay (display);
+  /* gtk_window_present(GTK_WINDOW(gg->main_window()));*/
+  gdk_window_raise(gg->main_window->window);
+}
+
+
 /*-- Called when a window is deleted from the window manager --*/
 void
 display_delete_cb (GtkWidget *w, GdkEvent *event, displayd *display) 

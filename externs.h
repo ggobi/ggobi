@@ -237,6 +237,7 @@ void       display_plot (displayd *display, RedrawStyle type, ggobid *);
 void       display_print_cb (displayd *d, guint, GtkWidget *);
 void       display_set_current (displayd *, ggobid *);
 void       display_set_position (windowDisplayd *d, ggobid *gg);
+void       show_display_control_panel_cb(displayd *display, guint action, GtkWidget *w);
 void       display_t1d_init (displayd *, ggobid *);
 void       display_t2d_init (displayd *, ggobid *);
 void       display_tailpipe (displayd *, RedrawStyle, ggobid *);

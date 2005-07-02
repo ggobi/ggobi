@@ -1,3 +1,5 @@
+Menu item added to each display to bring the associated control panel to the foreground.
+
 Paused tours  were causing problems with consuming large amount of
 	cycles. This seems to be fixed now.
 

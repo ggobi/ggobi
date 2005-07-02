@@ -530,12 +530,12 @@ pages any more!
   gtk_widget_show (scrolled_window);
 
   /*-- populate the tables --*/
-  for (j=0 ; j<d->ncols ; j++) {
+  for (j = 0 ; j < d->ncols ; j++) {
     vt = vartable_element_get (j, d);
 
     vartable_row_append (j, d, gg);    /*-- append a generic row --*/
     if (vt->vartype == categorical) {
-      for (k=0; k<vt->nlevels; k++)
+      for (k = 0; k < vt->nlevels ; k++)
         vartable_row_append (j, d, gg);
     }
 
@@ -823,7 +823,7 @@ vartable_stats_set_by_var (gint j, datad *d) {
             g_strdup("") : g_strdup_printf ("%8.3f", vt->mean);
           gtk_clist_set_text (GTK_CLIST (d->vartable_clist[real]),
             rownum, REAL_CLIST_MEAN, stmp);
-          g_free (stmp);
+          g_free (stmp); 
 
           /*-- for counter variables, don't display the median --*/
           stmp = (vt->vartype == counter) ?
