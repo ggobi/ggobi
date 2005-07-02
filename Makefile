@@ -12,13 +12,17 @@ endif
 
 ggobi:
 
+ifndef CC
 CC = gcc
 #CC = cc
+endif
+
 
 # This defaults to $(CC) and is reset to CXX by any optional 
 # segment that needs to use C++, e.g  USE_MYSQL 
 LD=$(CXX)
 LD=$(CC)
+
 
 CFLAGS+= -g -g2 -Wall -fPIC -DHAVE_GGOBI_CONFIG_H $(EXTRA_CFLAGS)
 #CFLAGS= -g -w -DHAVE_CONFIG_H # when using Irix cc, suppress warnings
