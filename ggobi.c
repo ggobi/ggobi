@@ -44,6 +44,9 @@
 #define DIR_SEPARATOR '/'
 #endif
 
+
+#include "plugin.h" /* For registerDefaultPlugin. */
+
 static GGobiOptions sessionoptions;
 GGobiOptions *sessionOptions;
 
@@ -637,6 +640,8 @@ initSessionOptions(int argc, char **argv)
   sessionOptions->info->numScatMatrixVars = MAXNVARS;
   sessionOptions->info->numParCoordsVars = MAXNPCPLOTS;
   sessionOptions->info->numTimePlotVars = MAXNTSPLOTS;
+
+  sessionOptions->useRadioMenuItems = false;
 
   tmp = g_malloc(sizeof(gchar) * (strlen(sessionOptions->ggobiHome) + strlen("data/colorschemes.xml") + 2));
   sprintf(tmp, "%s%s%c%s", sessionOptions->ggobiHome,
