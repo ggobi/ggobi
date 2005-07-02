@@ -58,6 +58,7 @@ gboolean   array_contains (gint* arr, gint n, gint el);
 void       edgeedit_init (ggobid * gg);
 GtkWidget* CreateMenuCheck (GtkWidget *, gchar *, GtkSignalFunc, gpointer, gboolean, ggobid *);
 GtkWidget* CreateMenuItem (GtkWidget *, gchar *, gchar *, gchar *, GtkWidget *, GtkAccelGroup *, GtkSignalFunc, gpointer, ggobid *) ;
+GtkWidget* CreateMenuItemWithCheck (GtkWidget *, gchar *, gchar *, gchar *, GtkWidget *, GtkAccelGroup *, GtkSignalFunc, gpointer, ggobid *, gboolean check) ;
 ggobid*    GGobiFromDisplay (displayd *display);
 ggobid*    GGobiFromSPlot (splotd *sp);
 ggobid*    GGobiFromWidget (GtkWidget *w, gboolean);
