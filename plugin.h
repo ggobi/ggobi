@@ -167,4 +167,7 @@ gboolean pluginSupportsInputMode(const gchar *modeName, GGobiPluginInfo *pluginI
 GGobiPluginInfo *getInputPluginByModeNameIndex(gint index);
 InputDescription *callInputPluginGetDescription(const gchar *fileName, const gchar *modeName, GGobiPluginInfo *info, ggobid *gg);
 
+
+void registerDefaultPlugins(GGobiInitInfo *info);
+
 #endif
