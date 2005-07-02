@@ -1,8 +1,12 @@
 July 2005
 
+Drag and drop for parallel coordinates displays.  One can drag a "panel" onto another panel
+and currently they get swapped in position.  Different strategies for inserting the initial
+panel beside the target one and moving those in between is easily done also.
+
 
 Two routines added to the "API": ggobi_data_set_var_type and ggobi_data_set_time_var to allow
- for users to specify the type of a variable and whether it is a time variable or not.
+for users to specify the type of a variable and whether it is a time variable or not.
 
 
 Menu item added to each display to bring the associated control panel to the foreground.

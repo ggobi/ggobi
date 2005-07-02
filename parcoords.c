@@ -136,7 +136,46 @@ parcoords_reset_arrangement (displayd *display, gint arrangement, ggobid *gg) {
 }
 
 
+void
+start_parcoords_drag(GtkWidget *src, GdkDragContext *ctxt, GtkSelectionData *data, guint info, guint time, gpointer udata)
+{
+   gtk_selection_data_set(data, GDK_SELECTION_TYPE_STRING, 8, (gchar *) src, sizeof(splotd *)); 
+
+}
+
+void
+receive_parcoords_drag(GtkWidget *src, GdkDragContext *context, int x, int y, const GtkSelectionData *data,   unsigned int info, unsigned int event_time, gpointer *udata)
+{
+   splotd *to = GTK_GGOBI_SPLOT(src);
+   splotd *from;
+   displayd *display;
+   guint tmp;
+   display = to->displayptr;
+
+#if 0
+   from = (splotd *) data->data;/*XXX Want a proper, robust and portable way to do this. */
+#endif
+
+   from = GTK_GGOBI_SPLOT(gtk_drag_get_source_widget(context));
+
+   if(from->displayptr != display) {
+      gg_write_to_statusbar("the source and destination of the parallel coordinate plots are not from the same display.\n", display->ggobi);
+      return;
+   }
+
+   tmp = to->p1dvar;
+   to->p1dvar = from->p1dvar;
+   from->p1dvar = tmp;
+
+   display_tailpipe (display, FULL, display->ggobi);
+   varpanel_refresh (display, display->ggobi);
+
+}
+
+
+
 #define MAXNPCPLOTS 5
+
 
 displayd *
 parcoords_new_with_vars(gboolean missing_p, gint nvars, gint *vars,
@@ -261,6 +300,19 @@ parcoords_new (displayd *display, gboolean missing_p, gint nvars, gint *vars,
     display->splots = g_list_append (display->splots, (gpointer) sp);
     gtk_box_pack_start (GTK_BOX (gg->parcoords.arrangement_box),
       sp->da, true, true, 0);
+
+#ifdef PARCOORDS_DRAG_AND_DROP
+ {
+    static GtkTargetEntry target = {"text/plain", GTK_TARGET_SAME_APP, 1001};
+
+    gtk_drag_source_set(GTK_WIDGET(sp), GDK_BUTTON1_MASK, &target, 1, GDK_ACTION_COPY);
+    gtk_signal_connect(GTK_OBJECT(sp), "drag_data_get",  start_parcoords_drag, NULL);
+
+
+    gtk_drag_dest_set(GTK_WIDGET(sp), GTK_DEST_DEFAULT_ALL /* DROP */ , &target, 1, GDK_ACTION_COPY /*MOVE*/);
+    gtk_signal_connect(GTK_OBJECT(sp), "drag_data_received",  receive_parcoords_drag, NULL);
+ }
+#endif
   }
 
   if(GTK_GGOBI_WINDOW_DISPLAY(display)->window)
@@ -271,6 +323,8 @@ parcoords_new (displayd *display, gboolean missing_p, gint nvars, gint *vars,
 
   return display;
 }
+
+
 
 static gboolean
 parcoords_var_selected (gint jvar, displayd *display)
