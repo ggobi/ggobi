@@ -1,7 +1,22 @@
+July 2005
+Two routines added to the "API": ggobi_data_set_var_type and ggobi_data_set_time_var to allow
+ for users to specify the type of a variable and whether it is a time variable or not.
+
+
+internal:
+   removed (ifdef'ed away) the calls to display_add() for each of the display types.
+   These resulted in display_add being called twice: there and via the extended_display_open_cb.
+   This fixes the message about "Display has already been added...." appearing.
+
+
 Menu item added to each display to bring the associated control panel to the foreground.
+
+
+June 2005
 
 Paused tours  were causing problems with consuming large amount of
 	cycles. This seems to be fixed now.
+
 
 time variables  In the XML files, one can specify that a variable can
 	be used as a time variable using an attribute time.  The value
@@ -9,6 +24,13 @@ time variables  In the XML files, one can specify that a variable can
 	Such variables can then be identified when creating a time
 	series plot.
 	
+
+
+
+
+
+
+
 
 statusbar is now non-editable by the user.
 
