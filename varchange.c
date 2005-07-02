@@ -352,3 +352,42 @@ delete_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
   return true;
 }
 
+
+vartyped
+ggobi_data_set_var_type(datad *d, int which, vartyped value)
+{
+    vartabled *vt;
+    vartyped old;
+
+    if(value < real || value >= all_vartypes)
+        return(all_vartypes);
+
+    vt = vartable_element_get(which, d);
+    if(!vt) {
+         return(all_vartypes);
+    }
+
+    old = vt->vartype;
+    vt->vartype = value;
+
+    return(old);
+}
+
+
+gboolean
+ggobi_data_set_time_var(datad *d, int which, gboolean value)
+{
+    vartabled *vt;
+    gboolean old;
+
+    vt = vartable_element_get(which, d);
+    if(!vt) {
+         return(all_vartypes);
+    }
+
+    old = vt->isTime;
+    vt->isTime = value;
+
+    return(old);
+}
+

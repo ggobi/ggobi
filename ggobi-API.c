@@ -446,7 +446,10 @@ GGOBI(newScatterplot) (gint ix, gint iy, datad *d, ggobid *gg)
   vars[0] = ix;
   vars[1] = iy;
   display = scatterplot_new_with_vars(false, 2, vars, d, gg);
-  display_add (display, gg);
+#ifdef FORCE_ADD_DISPLAY
+  display_add (display, gg); 
+#endif
+
 
   return (display);
 }
@@ -458,7 +461,9 @@ GGOBI(newScatmat) (gint *rows, gint *columns, gint nr, gint nc,
   displayd *display; 
 
   display = scatmat_new (NULL, false, nr, rows, nc, columns, d, gg);
+#ifdef FORCE_ADD_DISPLAY
   display_add (display, gg); /*XX  the caller should add this display. */
+#endif
 
   return (display);
 }
@@ -469,7 +474,10 @@ GGOBI(newParCoords)(gint *vars, gint numVars, datad *d, ggobid *gg)
   displayd *display = NULL;
 
   display = parcoords_new (display, false, numVars, vars, d, gg);
-  display_add (display, gg);
+#ifdef FORCE_ADD_DISPLAY
+  display_add (display, gg); /*XX  the caller should add this display. */
+#endif
+
 
   return (display);
 }
@@ -480,7 +488,9 @@ GGOBI(newTimeSeries)(gint *yvars, gint numVars, datad *d, ggobid *gg)
   displayd *display = NULL; 
  
   display = tsplot_new (display, false, numVars, yvars, d, gg); 
-  display_add (display, gg); 
+#ifdef FORCE_ADD_DISPLAY
+  display_add (display, gg); /*XX  the caller should add this display. */
+#endif
  
   return (display);
 } 

@@ -294,6 +294,8 @@ gint       get_one_selection_from_clist (GtkWidget *clist, datad *);
 gint       get_selections_from_clist (gint maxnvars, gint *vars, GtkWidget *clist, datad *);
 void       gg_write_to_statusbar (gchar *message, ggobid *gg);
 ggobid*    ggobi_alloc (ggobid *tmp);
+gboolean   ggobi_data_set_time_var(datad *d, int which, gboolean value);
+vartyped   ggobi_data_set_var_type(datad *d, int which, vartyped value);
 gboolean   ggobi_file_set_create (gchar *rootname, datad *, ggobid *);
 ggobid*    ggobi_get (gint);
 gint       ggobi_getIndex(ggobid *gg);
