@@ -1,5 +1,15 @@
 <plugin name="PluginMenu" load="immediate">
    <description>Provides a simple popup menu on certain plot panels.</description>
+   <documentation> 
+      This plugin, at its simplest, provides a menu on each panel in a
+      display. The menu provides facilities that are specific to the
+      type of panel and plot.
+      For example, on a parallel coordinates plot panel, we would have 
+      menu items to remove the panel, add a new panel with a selection
+      of the variables in the dataset or the ones that are not 
+      currently in the display, or switch variable to one that is not
+      in the plot.
+   </documentation>
    <author>Duncan Temple Lang</author>
    <dll name="plugins/PlotMenu/PlotMenu.so">
     <init onLoad="onLoadPlotMenu" />

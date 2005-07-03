@@ -13,7 +13,7 @@ endif
 ifdef ADMIN
  include Install/GNUmakefile.admin
 else
-include $(GGOBI_HOME)/plugins/GNUmakefile.plugin
+ include $(GGOBI_HOME)/plugins/GNUmakefile.plugin
 endif
 
 
