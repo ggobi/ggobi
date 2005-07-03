@@ -343,19 +343,38 @@ parcoords_var_selected (gint jvar, displayd *display)
   return selected;
 }
 
+
 gboolean
 parcoords_varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint *jvar_prev,
   ggobid *gg)
 {
+   gboolean status = false;
+   ParCoordsSelectionMode mode;
+   gboolean isVarSelected;
+
+   mode = cpanel->parcoords_selection_mode;
+   isVarSelected = parcoords_var_selected (jvar, gg->current_display);
+
+   if((mode == VAR_DELETE && isVarSelected) || !isVarSelected)
+        status = parcoords_add_delete_splot(cpanel, sp, jvar, jvar_prev, gg, gg->current_display, mode);
+
+   return(status);
+}
+
+
+gboolean
+parcoords_add_delete_splot(cpaneld *cpanel, splotd *sp, gint jvar, gint *jvar_prev, ggobid *gg, displayd *display, ParCoordsSelectionMode selMode)
+{
+
   gboolean redraw = true;
-  gint nplots = g_list_length (gg->current_display->splots);
+  gint nplots = g_list_length (display->splots);
   gint k, width, height;
   gint jvar_indx, new_indx;
   GList *l;
   splotd *s, *sp_new;
   GtkWidget *box, *w;
   gfloat ratio = 1.0;
-  displayd *display = gg->current_display;
+
 
   /* The index of gg.current_splot */
   gint sp_indx = g_list_index (display->splots, sp);
@@ -367,8 +386,7 @@ parcoords_varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint *jvar_prev,
   splot_get_dimensions (sp, &width, &height);
 
   /*-- VAR_DELETE  --*/
-  if (cpanel->parcoords_selection_mode == VAR_DELETE &&
-      parcoords_var_selected (jvar, display))
+  if (selMode == VAR_DELETE)
   {
     /* If jvar is one of the plotted variables, its corresponding plot */
     splotd *jvar_sp = NULL;
@@ -435,9 +453,9 @@ parcoords_varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint *jvar_prev,
     }
 
   /*-- VAR_REPLACE or VAR_INSERT or VAR_APPEND  --*/
-  } else if (!parcoords_var_selected (jvar, display)) {
+  } else /* */ {
 
-    if (cpanel->parcoords_selection_mode == VAR_REPLACE) {
+    if (selMode == VAR_REPLACE) {
 
       *jvar_prev = sp->p1dvar;
       sp->p1dvar = jvar;
