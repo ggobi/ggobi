@@ -9,9 +9,20 @@
       of the variables in the dataset or the ones that are not 
       currently in the display, or switch variable to one that is not
       in the plot.
+      
+      This plugin replicates the code in the control panel, but is
+      less modal and provides a different interface. It reduces the need
+      to use the control panel.   The code is also simpler, and it
+      should be easier to add new interface elements here than within
+      the GGobi code itself.
    </documentation>
+
    <author>Duncan Temple Lang</author>
+   <email>duncan@wald.ucdavis.edu</email>
+
    <dll name="plugins/PlotMenu/PlotMenu.so">
+
     <init onLoad="onLoadPlotMenu" />
+
   </dll>
 </plugin>

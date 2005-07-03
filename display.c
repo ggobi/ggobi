@@ -536,6 +536,8 @@ display_add (displayd *display, ggobid *gg)
     gtk_widget_queue_draw (prev_splot->da);
   }
 
+  gtk_signal_emit(GTK_OBJECT(gg), GGobiSignals[DISPLAY_NEW_SIGNAL], display);
+
   return (g_list_length (gg->displays));
 }
 

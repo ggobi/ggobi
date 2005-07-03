@@ -205,6 +205,17 @@ void gtk_ggobi_class_init(GtkGGobiClass * klass)
       GTK_TYPE_NONE, 1, 
       GTK_TYPE_GGOBI_DATA);  /* datad pointer */
   }
+
+
+  if (gtk_signal_lookup("display_new", GTK_TYPE_GGOBI) == 0) {
+    GGobiSignals[DISPLAY_NEW_SIGNAL] = 
+    gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_GGOBI), 
+      "display_new",
+      GTK_RUN_LAST | GTK_RUN_ACTION, 
+      gtk_marshal_NONE__POINTER,
+      GTK_TYPE_NONE, 1, 
+      GTK_TYPE_GGOBI_DISPLAY);  /* displayd pointer */
+  }
 #endif /* GTK_2_0 */
 }
 
