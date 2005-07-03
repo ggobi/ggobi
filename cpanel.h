@@ -91,8 +91,8 @@ typedef struct {
  eeMode ee_mode;
 
  /*-- parallel coordinates --*/
- gint parcoords_selection_mode;
- gint parcoords_arrangement;  /* arrange plots in a row or a column */
+ ParCoordsSelectionMode parcoords_selection_mode;
+ ParCoordsArrangeMode parcoords_arrangement;  /* arrange plots in a row or a column */
 
  /*-- time series --*/
 /*XX*/

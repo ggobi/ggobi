@@ -166,14 +166,9 @@ typedef enum {NULLMODE = -1,
 #define PCA            15*/
 
 /*-- parallel coordinates, scatterplot matrices and tsplots  --*/
-#define VAR_REPLACE  0
-#define VAR_INSERT   1
-#define VAR_APPEND   2
-#define VAR_DELETE   3
-#define VAR_OVERLAY  4
+typedef enum {VAR_REPLACE, VAR_INSERT, VAR_APPEND, VAR_DELETE, VAR_OVERLAY} ParCoordsSelectionMode;
+typedef enum {ARRANGE_ROW, ARRANGE_COL} ParCoordsArrangeMode;
 
-#define ARRANGE_ROW 0
-#define ARRANGE_COL 1
 
 #define DEFINES_H
 
