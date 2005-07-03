@@ -110,6 +110,8 @@ typedef struct _PrintOptions PrintOptions;
 
 GtkType gtk_ggobi_get_type(void);
 
+#define   GTK_TYPE_GGOBI gtk_ggobi_get_type()
+
 typedef struct _GtkGGobiClass {
   GtkObjectClass parent_class;
 } GtkGGobiClass;
