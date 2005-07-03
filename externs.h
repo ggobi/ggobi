@@ -805,5 +805,6 @@ InputDescription *read_ascii_input_description(const char * const fileName, cons
 
 
 void resetDataMode();
+vartabled *vartable_element_get(gint i, datad *d);
 
 #endif

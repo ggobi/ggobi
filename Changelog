@@ -1,5 +1,10 @@
 July 2005
 
+The 'PlotMenu' plug-in provides the infrastructure for adding pop-menus for splot's, i.e. panels on displays.
+These are potentially contentious, but are convenient at least for sophisticated users. As plugins,
+they work well as an optional add-on.  We can add functionality to this module and splot's as desired.
+
+
 Drag and drop for parallel coordinates displays.  One can drag a "panel" onto another panel
 and currently they get swapped in position.  Different strategies for inserting the initial
 panel beside the target one and moving those in between is easily done also.
