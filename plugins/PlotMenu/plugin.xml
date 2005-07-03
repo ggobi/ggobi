@@ -1,0 +1,7 @@
+<plugin name="PluginMenu" load="immediate">
+   <description>Provides a simple popup menu on certain plot panels.</description>
+   <author>Duncan Temple Lang</author>
+   <dll name="plugins/PlotMenu/PlotMenu.so">
+    <init onLoad="onLoadPlotMenu" />
+  </dll>
+</plugin>
