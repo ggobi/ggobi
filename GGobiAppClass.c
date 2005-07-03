@@ -1,4 +1,5 @@
 #include "GGobiApp.h"
+#include "ggobi.h"
 
 void gtk_ggobi_app_class_init(GtkGGobiAppClass * klass);
 void ggobi_app_init(GtkGGobiApp *app);
