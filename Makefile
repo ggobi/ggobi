@@ -24,7 +24,7 @@ LD=$(CXX)
 LD=$(CC)
 
 
-CFLAGS+= -g -g2 -Wall -fPIC -DHAVE_GGOBI_CONFIG_H $(EXTRA_CFLAGS)
+CFLAGS+= -g -g2 -Wall -fPIC -DHAVE_GGOBI_CONFIG_H -DPARCOORDS_DRAG_AND_DROP=1  $(EXTRA_CFLAGS)
 #CFLAGS= -g -w -DHAVE_CONFIG_H # when using Irix cc, suppress warnings
 CXXFLAGS=$(CFLAGS)
 
