@@ -2,8 +2,7 @@
 #define GGOBI_APP_H
 
 
-#include "ggobi.h"
-
+#include <gtk/gtk.h>
 
 extern GtkType gtk_ggobi_app_get_type(void);
 
