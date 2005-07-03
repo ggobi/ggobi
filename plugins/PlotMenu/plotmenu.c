@@ -5,6 +5,7 @@
 
 
 #include "parcoordsClass.h"
+#include "scatterplotClass.h"
 #include "externs.h"
 
 /*
@@ -20,7 +21,9 @@
 gint showMenu(GtkWidget *src, GdkEvent *event, GtkMenu *menu);
 
 gint createParcoordsMenu(GtkWidget *menu, splotd *sp, ggobid *gg);
+gint createXYPlotMenu(GtkWidget *menu, splotd *sp, ggobid *gg);
 
+int addVariableElements(GtkWidget *menu, datad *d, splotd *sp, GtkSignalFunc f);
 /*
 
  */
@@ -35,6 +38,8 @@ newSplotEvent(ggobid *gg, splotd *sp, gpointer udata)
 
     if(GTK_IS_GGOBI_PARCOORDS_SPLOT(sp)) {
        createParcoordsMenu(menu, sp, gg);
+    } else if(GTK_IS_GGOBI_SCATTER_SPLOT(sp) && GTK_IS_GGOBI_SCATTERPLOT_DISPLAY(GTK_GGOBI_SPLOT(sp)->displayptr)) {
+       createXYPlotMenu(menu, sp, gg);
     } else {
 
         item = gtk_menu_item_new_with_label("Add");
@@ -113,14 +118,76 @@ switchParCoordsVariable(GtkWidget *src, ParCoordsPanelID *p)
 
 
 
+void
+switchXYPlotVariable(GtkWidget *src, ParCoordsPanelID *p, gboolean x)
+{
+  displayd *display = p->sp->displayptr;
+  ggobid *gg = display->ggobi;
+  if(x)
+    p->sp->xyvars.x = p->id;
+  else
+    p->sp->xyvars.y = p->id;
+
+  display_tailpipe (display, FULL, gg);
+
+  varpanel_refresh (display, gg);  
+}
+
+void
+switchXPlotVariable(GtkWidget *src, ParCoordsPanelID *p)
+{
+  switchXYPlotVariable(src, p, true);
+}
+void
+switchYPlotVariable(GtkWidget *src, ParCoordsPanelID *p)
+{
+  switchXYPlotVariable(src, p, false);
+}
+
+
+
 gint
 createParcoordsMenu(GtkWidget *menu, splotd *sp, ggobid *gg)
 {
    datad *d = sp->displayptr->d;
+
+   addVariableElements(menu, d, sp, switchParCoordsVariable);
+
+   return(d->ncols);
+}
+
+
+
+gint
+createXYPlotMenu(GtkWidget *menu, splotd *sp, ggobid *gg)
+{
+   datad *d = sp->displayptr->d;
+   GtkWidget *el, *submenu;
+
+   el = gtk_menu_item_new_with_label("X");
+   submenu = gtk_menu_new();
+   addVariableElements(submenu, d, sp, switchXPlotVariable);
+   gtk_menu_append(GTK_MENU(menu), el); 
+   gtk_menu_item_set_submenu(GTK_MENU_ITEM(el), submenu);
+
+   el = gtk_menu_item_new_with_label("Y");
+   submenu = gtk_menu_new();
+   addVariableElements(submenu, d, sp, switchYPlotVariable);
+   gtk_menu_append(GTK_MENU(menu), el); 
+   gtk_menu_item_set_submenu(GTK_MENU_ITEM(el), submenu);
+   
+
+
+   return(d->ncols);
+}
+
+
+int
+addVariableElements(GtkWidget *menu, datad *d, splotd *sp, GtkSignalFunc f)
+{
    vartabled *el;
    GtkWidget *item;
    int i;
-
    for(i = 0; i < d->ncols; i++) {
       ParCoordsPanelID *id;
 
@@ -130,10 +197,9 @@ createParcoordsMenu(GtkWidget *menu, splotd *sp, ggobid *gg)
 
 
       id = (ParCoordsPanelID *) g_malloc(sizeof(ParCoordsPanelID));
-      id->sp =  sp;				 
-      id->id = i;
-      gtk_signal_connect(GTK_OBJECT(item), "activate", switchParCoordsVariable, id);
-   }
+      id->sp =  sp;  id->id = i;
 
+      gtk_signal_connect(GTK_OBJECT(item), "activate", f, id);
+   }
    return(d->ncols);
 }
