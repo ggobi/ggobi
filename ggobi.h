@@ -102,16 +102,11 @@ typedef struct {
 
   GtkAccelGroup *sp_accel_group; /*-- sp = scatterplot here --*/
 
-} GGobiApp;
+} GGobiMenus;
 
 typedef struct _PrintOptions PrintOptions;
 
 
-#define GTK_TYPE_GGOBI		 (gtk_ggobi_get_type ())
-#define GTK_GGOBI(obj)		 (GTK_CHECK_CAST ((obj), GTK_TYPE_GGOBI, ggobid))
-#define GTK_GGOBI_CLASS(klass)	 (GTK_CHECK_CLASS_CAST ((klass), GTK_TYPE_GGOBI, GtkGGobiClass))
-#define GTK_IS_GGOBI(obj)	 (GTK_CHECK_TYPE ((obj), GTK_TYPE_GGOBI))
-#define GTK_IS_GGOBI_CLASS(klass) (GTK_CHECK_CLASS_TYPE ((klass), GTK_TYPE_GGOBI))
 
 GtkType gtk_ggobi_get_type(void);
 
@@ -138,7 +133,7 @@ struct _ggobid {
   splotd *current_splot;
   gint buttondown;/*-- can be 0, 1, 2, or 3; could be useful in drawing --*/
 
-  GGobiApp app;
+  GGobiMenus app;
 
   GSList *d;                    /* Datasets (datad elements) */
             /*-- first is default: cases, nodes; second might be edges --*/
@@ -634,6 +629,10 @@ fileset_generate(const gchar * fileName,
 #ifndef GTK_2_0
 #define GTK_OBJECT_GET_CLASS(obj)  (GTK_OBJECT(obj))->klass
 #endif
+
+#include "GGobiApp.h"
+GtkGGobiApp *getGGobiApp();
+
 
 
 #ifdef __cplusplus

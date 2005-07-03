@@ -101,7 +101,9 @@ ifndef SHARED_LD_FLAGS
 endif
 LDFLAGS=
 
-SRC=array.c ash1d.c \
+SRC=\
+ GGobiAppClass.c \
+ array.c ash1d.c \
  barchart.c barchart_ui.c barchartClass.c \
  brush_api.c brush_bins.c brush.c brush_init.c brush_link.c brush_ui.c \
  color.c color_ui.c cpanel.c \
@@ -137,7 +139,7 @@ SRC=array.c ash1d.c \
  xlines.c xyplot.c xyplot_ui.c \
 \
  mt19937ar.c cokus.c \
- print.c
+ print.c 
 
 
 ifdef GTK_2

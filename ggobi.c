@@ -23,6 +23,8 @@
 #include <string.h>
 #include <gtk/gtk.h>
 
+#include "GGobiApp.h"
+
 #include "ggobi.h"
 
 #include "vars.h"
@@ -46,6 +48,9 @@
 
 
 #include "plugin.h" /* For registerDefaultPlugin. */
+
+
+GtkGGobiApp *GGobiApp;
 
 static GGobiOptions sessionoptions;
 GGobiOptions *sessionOptions;
@@ -83,6 +88,14 @@ const gint ViewTypeIndices[];
 FatalErrorHandler FatalError = &exit;
 
 static gchar *computeGGobiHome(char *str);
+
+
+
+GtkGGobiApp *
+getGGobiApp()
+{
+   return(GGobiApp);
+}
 
 
 gchar *
@@ -418,16 +431,28 @@ ggobi_alloc(ggobid *tmp)
     g_strdup("A string for the key handler"),"Test handler", NULL, tmp, C);
 #endif
 
+  gtk_signal_emit_by_name(GTK_OBJECT(GGobiApp), "new_ggobi", tmp);
+
   return (tmp);
 }
 
 void
 ggobiInit(int *argc, char **argv[])
 {
+
+
   if(ExtendedDisplayTypes) 
     return;
 
   gtk_init (argc, argv);
+
+  GGobiApp = gtk_type_new(GTK_TYPE_GGOBI_APP);
+
+#ifdef TEST_GGOBI_APPP
+/*XXX FIX */
+  GGOBI(registerNumberedKeyEventHandler)(DummyKeyTest,
+    g_strdup("A string for the key handler"),"Test handler", NULL, tmp, C);
+#endif
 
   initSessionOptions(*argc, *argv);
  
