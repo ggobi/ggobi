@@ -41,7 +41,8 @@ Creating new modules
 Logon with ssh to www.ggobi.org and change directory to 
   ~xgobi/CVSRoot
 
-Then do 
+Using a new module called "papers" as the example, do 
+   mkdir papers
    chgrp -R xgobi papers
    chmod -R g+w papers
 

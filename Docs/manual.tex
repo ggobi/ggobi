@@ -1204,18 +1204,19 @@ video} button allows you to swap the background and accent colors.
 \subsubsection{Link by ID or by variable}
 \label{LinkingRules}
 
-The default linking rule is to link by case id: that is, points
-representing records that have the same {\it id}, as specified in the
-XML description (or in the API), will respond identically to brushing
-events.  When no id has been provided, the record number becomes the
-case id by default.
+This option menu is used to define which of two linking rules is to
+be used.  The default rule, {\it Link by ID}, dictates that points
+representing records that have the same {\it id}, as specified in the XML
+description (or in the API), will respond identically to brushing events.
+Ids are unique within a dataset, so this rule has no effect when only
+a single dataset is being studied.
 
-The second rule is to {\it Link by variable}, which uses the levels of
-a categorical variable to link points.  The candidate variables, if
-any, are named in the list widget under the {\em Undo} button.
-Now when a case is brushed in one display, all cases with the same
-value of the categorical variable will change accordingly, in this and
-all other displays.
+The second rule, {\it Link by variable}, uses the levels of a
+categorical variable to link points.  To choose a variable, select a
+categorical variable from the {\it Linking rule} list.  Now when a
+case is brushed in one display, all cases with the same value of the
+categorical variable will change accordingly, in this and all other
+displays.
 
 For example, look at the {\em algal-bloom.xml} data supplied with
 GGobi.  It contains four datasets, one of which contains the levels of

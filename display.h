@@ -127,6 +127,7 @@ struct _displayd {
 /*-- 1d tour --*/
  tour t1d;
  gboolean t1d_axes;
+ gboolean t1d_video;
 
 /*-- rotation: 2d tour, constrained to 3 variables --*/
  tour t2d3;
@@ -142,10 +143,12 @@ struct _displayd {
 /*-- 2d tour --*/
  tour t2d;
  gboolean t2d_axes;
+ gboolean t2d_video;
 
 /*-- corr tour --*/
  tour tcorr1, tcorr2;
  gboolean tcorr_axes;
+ gboolean tourcorr_video;
 
 /* projection pursuit */
  GtkWidget *t1d_pplabel, *t2d_pplabel;

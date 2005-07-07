@@ -266,6 +266,8 @@ display_tour2d_init (displayd *dsp, ggobid *gg) {
   dsp->t2d.idled = 0;
   dsp->t2d.get_new_target = true;
 
+  dsp->t2d_video = false;
+
   /* manip */
   dsp->t2d_manip_var = 0;
 
@@ -345,6 +347,8 @@ static void tour2d_speed_set_display(gfloat slidepos, displayd *dsp)
 
 void tour2d_pause (cpaneld *cpanel, gboolean state, displayd *dsp, ggobid *gg) 
 {
+  gboolean pausedp = cpanel->t2d.paused;
+
   if (dsp == NULL)
     return;
 
@@ -352,15 +356,15 @@ void tour2d_pause (cpaneld *cpanel, gboolean state, displayd *dsp, ggobid *gg)
 
   /* This condition is experimental and is used to avoid the case
       where we have an XY plot in paused tour mode and we create a new
-      plot.  When that happens, the initialization of that new plot
-      in cpanel_tour2d_set sets the pause button which triggers
-      this routine to be invoked as part of the callback.  
-      Since the paused state is 0, we end up  calling tour2d_func
-      with state = 1 which means turn it on.  And so the tour
-      is active for that new display!  And we consume CPU cycles
-      galore.  DTL.
-      */
-  if(state == 0 && dsp->t2d.idled == 0)
+      plot.  When that happens, the initialization of that new plot in
+      cpanel_tour2d_set sets the pause button which triggers this
+      routine to be invoked as part of the callback.  Since the paused
+      state is 0, we end up calling tour2d_func with state = 1 which
+      means turn it on.  And so the tour is active for that new
+      display!  And we consume CPU cycles galore.  DTL.  */
+
+  /*  if(state == 0 && dsp->t2d.idled == 0) */
+  if(pausedp == 0 && state == 0 && dsp->t2d.idled == 0)
       return;
 
   tour2d_func (!cpanel->t2d.paused, dsp, gg);
@@ -781,6 +785,7 @@ g_printerr ("\n");
   
   display_tailpipe (dsp, FULL_1PIXMAP, gg);
   varcircles_refresh (d, gg);
+  if (dsp->t2d_video) tour2d_write_video(gg);
 }
 
 void
@@ -864,6 +869,54 @@ void tour2d_reinit(ggobid *gg)
 
   if (dsp->t2d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t2d_window)) 
     t2d_pp_reinit(dsp, gg);
+}
+
+void tour2d_snap(ggobid *gg)
+{
+  displayd *dsp = gg->current_display;
+  splotd *sp = gg->current_splot;
+  datad *d = dsp->d;
+  gint j;
+  gdouble rnge;
+  vartabled *vt;
+
+  for (j=0; j<d->ncols; j++) {
+    vt = vartable_element_get (j, d);
+    rnge = vt->lim.max - vt->lim.min;
+    fprintf(stdout,"%f %f %f %f \n", dsp->t2d.F.vals[0][j], 
+      dsp->t2d.F.vals[1][j],dsp->t2d.F.vals[0][j]/rnge*sp->scale.x,
+      dsp->t2d.F.vals[1][j]/rnge*sp->scale.y);
+  }
+}
+
+void tour2d_video(ggobid *gg)
+{
+  displayd *dsp = gg->current_display;
+  if (dsp == NULL)
+    return;
+
+  dsp->t2d_video = !dsp->t2d_video;
+}
+
+void tour2d_write_video(ggobid *gg) 
+{
+  displayd *dsp = gg->current_display;
+  splotd *sp = gg->current_splot;
+  datad *d = dsp->d;
+  gint j;
+  vartabled *vt;
+  gdouble rnge;
+
+  /*  g_printerr("%f %f\n",sp->scale.x, sp->scale.y);*/
+  for (j=0; j<d->ncols; j++) {
+    vt = vartable_element_get (j, d);
+    rnge = vt->lim.max - vt->lim.min;
+    fprintf(stdout,"%f %f %f %f\n", dsp->t2d.F.vals[0][j], 
+      dsp->t2d.F.vals[1][j], dsp->t2d.F.vals[0][j]/rnge*sp->scale.x,
+      dsp->t2d.F.vals[1][j]/rnge*sp->scale.y);
+    /*    g_printerr("%f %f %f %f\n", dsp->t2d.F.vals[0][j], dsp->t2d.F.vals[1][j],
+	  vt->lim.min, vt->lim.max);*/
+  }
 }
 
 /* Variable manipulation */

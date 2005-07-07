@@ -96,6 +96,16 @@ static void tourcorr_scramble_cb (GtkWidget *w, ggobid *gg) {
   tourcorr_scramble(gg);
 }
 
+static void tourcorr_snap_cb (GtkWidget *w, ggobid *gg) {
+
+  tourcorr_snap(gg);
+}
+
+static void tourcorr_video_cb (GtkToggleButton *button, ggobid *gg)
+{
+  tourcorr_video(gg);
+}
+
 /*
 static void syncaxes_cb (GtkToggleButton *button)
 {
@@ -213,6 +223,26 @@ cpanel_ctour_make (ggobid *gg) {
   gtk_box_pack_start (GTK_BOX (gg->control_panel[COTOUR]),
     box, false, false, 1);
 
+/*
+ * snapshot and video stream controls
+ */
+  box = gtk_hbox_new (true, 2);
+
+  btn = gtk_button_new_with_label ("Snap");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
+    "Take a snapshot of this frame to re-generate plot outside ggobi", NULL);
+  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+                     GTK_SIGNAL_FUNC (tourcorr_snap_cb), (gpointer) gg);
+  gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
+
+  btn = gtk_check_button_new_with_label ("Video");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
+    "Save sequence of projection frames out to file", NULL);
+  gtk_signal_connect (GTK_OBJECT (btn), "toggled",
+                     GTK_SIGNAL_FUNC (tourcorr_video_cb), (gpointer) gg);
+  gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
+
+  gtk_box_pack_start (GTK_BOX (gg->control_panel[COTOUR]), box, false, false, 1);
 
 /*
  * manipulation option menu with label

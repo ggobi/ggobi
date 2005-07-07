@@ -129,7 +129,11 @@ getDBMSLoginElementIndex(const char *name)
 }
 
 int 
+<<<<<<< dbms.c
+setDBMSLoginElement(DBMSInfoElement i, const char * val, DBMSLoginInfo *info)
+=======
 setDBMSLoginElement(DBMSInfoElement i, char * val, DBMSLoginInfo *info)
+>>>>>>> 1.8
 {
 /* Arrange to have this done by the caller -- it causes a fatal error
    on Suns. */

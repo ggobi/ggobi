@@ -400,7 +400,7 @@ startXMLElement(void *user_data, const xmlChar *name, const xmlChar **attrs)
     case STRING:   
     case NA:  
       if(data->recordString) { 
-        setRecordValues(data, data->recordString, data->recordStringLength);
+        setRecordValues(data, data->recordString, data->recordStringLength, -1);
         if(type != NA && type != STRING)
           data->current_element++;
         resetRecordInfo(data);
@@ -675,15 +675,14 @@ void endXMLElement(void *user_data, const xmlChar *name)
     {
       datad *d = getCurrentXMLData(data);
 
+      setEdgePartners(data);
+      releaseCurrentDataInfo(data);
       if (data->current_record < d->nrows) {
         g_printerr ("There are fewer records than declared for '%s': %d < %d.\n",
           d->name, data->current_record, d->nrows);
-	releaseCurrentDataInfo(data);
         (*FatalError)(101);
       }
 
-      setEdgePartners(data);
-      releaseCurrentDataInfo(data);
     }
     break;
 
@@ -699,10 +698,7 @@ void endXMLElement(void *user_data, const xmlChar *name)
 	 elements to it.  I believe it also handles the </record>
          tag in the case where record elements have been individually
          tagged, and it does that without confusion. */
-      setRecordValues(data, data->recordString, data->recordStringLength);
-      if (data->current_element < data->current_data->ncols) {
-        ggobi_XML_error_handler (data, "Not enough elements\n");
-      }
+      setRecordValues(data, data->recordString, data->recordStringLength, -1);
       data->current_record++;
       resetRecordInfo(data);
     break;
@@ -1336,10 +1332,14 @@ setRecordValue(const char *tmp, datad *d, XMLParserData *data)
   that needs to be escaped.
 */
 gboolean
-setRecordValues (XMLParserData *data, const xmlChar *line, gint len)
+setRecordValues (XMLParserData *data, const xmlChar *line, gint len, gint ncols)
 {
   const gchar *tmp;
   datad *d = getCurrentXMLData(data);
+
+  if (ncols == -1) {
+    ncols = d->ncols;
+  }
 
   if(!line) {
      applyRandomUniforms(d, data);
@@ -1356,12 +1356,17 @@ setRecordValues (XMLParserData *data, const xmlChar *line, gint len)
         return(false);
     data->current_element++;
     tmp = strtok (NULL, " \t\n");
+    /*    printf("%d %d \n",data->current_record,ncols);*/
   }
-  /*
-  if (data->current_element < d->ncols) {
+  if (data->current_element < ncols) {
     ggobi_XML_error_handler (data, "Not enough elements\n");
+    /*    printf("%d %d \n",data->current_record,data->current_element);*/
+    /*
+    g_printerr ("Record %d has insufficient elements: %d < %d\n",
+		data->current_record, data->current_element,
+		d->ncols);
+    */
   }
-  */
 
 
   applyRandomUniforms(d, data);

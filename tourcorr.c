@@ -355,6 +355,8 @@ display_tourcorr_init (displayd *dsp, ggobid *gg) {
   dsp->tcorr1.idled = 0;
   dsp->tcorr1.get_new_target = true;
 
+  dsp->tourcorr_video = false;
+
   /* vertical */
   dsp->tcorr2.dist_az = 0.0;
   dsp->tcorr2.delta = cpanel->tcorr2.step*M_PI_2/10.0; 
@@ -1094,6 +1096,7 @@ tourcorr_run(displayd *dsp, ggobid *gg)
   display_tailpipe (dsp, FULL, gg);
 
   varcircles_refresh (d, gg);
+  if (dsp->tourcorr_video) tourcorr_write_video(gg);
 }
 
 void
@@ -1202,6 +1205,48 @@ void tourcorr_scramble(ggobid *gg)
   display_tailpipe (dsp, FULL, gg);
 
   varcircles_refresh (d, gg);
+}
+
+void tourcorr_snap(ggobid *gg)
+{
+  displayd *dsp = gg->current_display;
+  splotd *sp = gg->current_splot;
+  datad *d = dsp->d;
+  gint j;
+  gdouble rnge;
+  vartabled *vt;
+
+  for (j=0; j<d->ncols; j++) {
+    vt = vartable_element_get (j, d);
+    rnge = vt->lim.max - vt->lim.min;
+    g_printerr("%f %f\n", dsp->tcorr1.F.vals[0][j]/rnge*sp->scale.x,
+	     dsp->tcorr2.F.vals[0][j]/rnge*sp->scale.y);
+  }
+}
+
+void tourcorr_video(ggobid *gg)
+{
+  displayd *dsp = gg->current_display;
+  if (dsp == NULL)
+    return;
+
+  dsp->tourcorr_video = !dsp->tourcorr_video;
+}
+
+void tourcorr_write_video(ggobid *gg) 
+{
+  displayd *dsp = gg->current_display;
+  splotd *sp = gg->current_splot;
+  datad *d = dsp->d;
+  gint j;
+  vartabled *vt;
+
+  g_printerr("%f %f\n",sp->scale.x, sp->scale.y);
+  for (j=0; j<d->ncols; j++) {
+    vt = vartable_element_get (j, d);
+    g_printerr("%f %f %f %f\n", dsp->tcorr1.F.vals[0][j], 
+      dsp->tcorr2.F.vals[0][j], vt->lim.min, vt->lim.max);
+  }
 }
 
 /* Variable manipulation */

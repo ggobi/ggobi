@@ -109,6 +109,20 @@ static void scramble_cb (GtkWidget *w, ggobid *gg) {
   g_printerr ("pcaxes: %d\n", button->active);
 }*/
 
+static void t2d_snap_cb (GtkWidget *w, ggobid *gg) {
+
+  tour2d_snap(gg);
+}
+
+static void t2d_video_cb (GtkToggleButton *button, ggobid *gg)
+{
+  tour2d_video(gg);
+}
+
+/*static void pcaxes_cb (GtkToggleButton *button)
+{
+  g_printerr ("pcaxes: %d\n", button->active);
+}*/
 
 static void tour2dpp_cb (GtkWidget *w, ggobid *gg) 
 {
@@ -201,6 +215,27 @@ cpanel_tour2d_make (ggobid *gg) {
     "Reset projection to random value", NULL);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                      GTK_SIGNAL_FUNC (scramble_cb), (gpointer) gg);
+  gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
+
+  gtk_box_pack_start (GTK_BOX (gg->control_panel[TOUR2D]), box, false, false, 1);
+
+/*
+ * snapshot and video stream controls
+ */
+  box = gtk_hbox_new (true, 2);
+
+  btn = gtk_button_new_with_label ("Snap");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
+    "Take a snapshot of this frame to re-generate plot outside ggobi", NULL);
+  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+                     GTK_SIGNAL_FUNC (t2d_snap_cb), (gpointer) gg);
+  gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
+
+  btn = gtk_check_button_new_with_label ("Video");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
+    "Save sequence of projection frames out to file", NULL);
+  gtk_signal_connect (GTK_OBJECT (btn), "toggled",
+                     GTK_SIGNAL_FUNC (t2d_video_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
 
   gtk_box_pack_start (GTK_BOX (gg->control_panel[TOUR2D]), box, false, false, 1);

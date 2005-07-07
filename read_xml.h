@@ -159,7 +159,7 @@ extern "C" {
   gboolean setBrushStyle(const xmlChar ** attrs, XMLParserData * parserData);
 
   gboolean setRecordValues(XMLParserData * data, const xmlChar * line,
-                           gint len);
+                           gint len, gint ncols);
   gboolean setVariableName(XMLParserData * data, const xmlChar * name,
                            gint len);
 

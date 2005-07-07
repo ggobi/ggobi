@@ -81,7 +81,7 @@ Input:  pdata   projected data
 Output: val     the index-value
         
 The return value should be zero, otherwise the optimization routine
-assume an error has occured during computation of the index. 
+assumes an error has occurred during computation of the index. 
 
 *********************************************************************/
 
