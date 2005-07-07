@@ -64,6 +64,7 @@ ggobid*    GGobiFromSPlot (splotd *sp);
 ggobid*    GGobiFromWidget (GtkWidget *w, gboolean);
 ggobid*    GGobiFromWindow (GdkWindow *w);
 GtkWidget* GGobi_addToolsMenuItem (gchar *label, ggobid *gg);
+gboolean   GGobi_addToolsMenuWidget(GtkWidget *entry, ggobid *gg);
 void       GGobi_widget_set (GtkWidget *, ggobid *gg, gboolean isWindow);
 datad*     ValidateDatadRef (datad *d, ggobid *gg, gboolean fatal);
 displayd*  ValidateDisplayRef(displayd *d, ggobid *gg, gboolean fatal);

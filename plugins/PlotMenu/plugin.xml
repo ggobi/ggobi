@@ -1,4 +1,4 @@
-<plugin name="PluginMenu" load="immediate">
+<plugin name="PlotMenu" load="immediate">
    <description>Provides a simple popup menu on certain plot panels.</description>
    <documentation> 
       This plugin, at its simplest, provides a menu on each panel in a

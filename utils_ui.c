@@ -637,8 +637,9 @@ GGobi_addDisplayMenuItem (const gchar *label, ggobid *gg)
   return(entry);
 }
 
-GtkWidget *
-GGobi_addToolsMenuItem (gchar *lbl, ggobid *gg)
+
+gboolean
+GGobi_addToolsMenuWidget(GtkWidget *entry, ggobid *gg)
 {
   GtkWidget *entry = NULL, *tools_menu = NULL;
   GtkItemFactory *factory;
@@ -647,16 +648,27 @@ GGobi_addToolsMenuItem (gchar *lbl, ggobid *gg)
   tools_menu = gtk_item_factory_get_widget (factory, "<main>/Tools");
 
   if (tools_menu != NULL) {
-    /*-- purify goes crazy here, and I have no idea why -- dfs --*/
-    if (lbl != (gchar *)NULL) {
-      if (strlen(lbl) > 0) {
-        entry = gtk_menu_item_new_with_label (lbl);
-        gtk_widget_show (entry);
+      gtk_menu_append (GTK_MENU (tools_menu), entry);
+  } else
+      return(false);
 
-        gtk_menu_append (GTK_MENU (tools_menu), entry);
-      }
-    }
+  return(true);
+}
+
+GtkWidget *
+GGobi_addToolsMenuItem (gchar *lbl, ggobid *gg)
+{
+  GtkWidget *entry;
+  if(!lbl) {
+      return(NULL);
   }
+
+    /*-- purify goes crazy here, and I have no idea why -- dfs --*/
+  entry = gtk_menu_item_new_with_label (lbl);
+  if(GGobi_addToolsMenuWidget(entry, gg) == false) {
+      gtk_widget_destroy(entry);
+  } else
+      gtk_widget_show (entry);
 
   return (entry);
 }
