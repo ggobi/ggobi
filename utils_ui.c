@@ -641,7 +641,7 @@ GGobi_addDisplayMenuItem (const gchar *label, ggobid *gg)
 gboolean
 GGobi_addToolsMenuWidget(GtkWidget *entry, ggobid *gg)
 {
-  GtkWidget *entry = NULL, *tools_menu = NULL;
+  GtkWidget *tools_menu = NULL;
   GtkItemFactory *factory;
 
   factory = gg->main_menu_factory; /* gtk_item_factory_from_path ("<main>"); */
