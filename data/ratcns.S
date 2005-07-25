@@ -1,123 +1,88 @@
-ask <- function() {invisible(readline())}
+# Without R
+# explore variables pairwise
+# brush each of the four main functional groups (automated brushing works)
+# bring up parcoords plot
+# use shadow brushing to look at each group one at a time.
 
-cateval <- function (cmd) {
-  cat ("> ", cmd, "\n")
-  #eval(parse(text=cmd), envir=.GlobalEnv)
-  eval.parent(parse(text=cmd))
-}
+g = ggobi ("/home/dfs/ggobi/ggobi/data/ratcns.xml")
 
-showCases <- function (n, v) {
-   tmp <- logical( length(v) )
+#
+# Look at the functional groups one at a time by hiding
+# all the cases not in the selected group.
+#
+
+ratcns <- ggobi.getData()
+Func.Class.1 <- ratcns[,10]
+Func.Class.2 <- ratcns[,11]
+showClass <- function (n, .gobi=getDefaultGGobi()) {
+   N <- length(Func.Class.2)
+   tmp <- logical(N)
    if (n != -1) {
-     tmp[v != n] <- T
+     tmp[Func.Class.2 != n] <- T
    }
-   setHiddenCases.ggobi(tmp, 1:length(v), .data=1)
+   setHiddenCases.ggobi(tmp)
 }
 
-ratcns.intro <- function () {
+#
+# cycle through classes
+#
+for (i in 1:14) {
+ showClass(i)
+ system("sleep 1")
+}
+showClass (-1)
 
- #cat ("> library(Rggobi)\n")
- cat ("#  Start ggobi, giving it an xml file as an argument\n")
- cateval ("g <- ggobi(\"/home/dfs/ggobi/ggobi/data/ratcns\")")
+#
+# Don't forget that you want to cluster without the
+# last variables.  And you want to take the variable Cluster
+# out of the data.
+#
+dst <- dist(ratcns[,1:9])
+hc <- hclust(dst, "w")
+x11()
+plot (hc)
+cvar <- cutree (hc, 5)
 
- ask()
- cat ("#  Save the data in R, and define a few variables\n")
- cateval ("ratcns <- getData.ggobi()")
- cateval ("ngenes <- dim(ratcns)[1]")
- cateval ("FuncClass1 <- ratcns[,10]")
- cateval ("FuncClass2 <- ratcns[,11]")
+addVariable.ggobi (cvar, "cluster")
+showClust <- function (n, .gobi=getDefaultGGobi()) {
+   N <- length(cvar)
+   tmp <- logical(N)
+   tmp[cvar != n] <- T
+   setHiddenCases.ggobi(tmp)
+}
 
- ask()
- cat ("# Paint the points according to the main functional classes\n")
- cateval ("colors <- FuncClass1")
- cateval ("colors[FuncClass1 == 2] <- 3")
- cateval ("colors[FuncClass1 == 3] <- 5")
- cateval ("colors[FuncClass1 == 4] <- 7")
- cateval ("setColors.ggobi (colors)")
-
- ask()
- cat ("# Open a parallel coordinates display of the 9 stages\n")
- cateval ("parcoords.ggobi(getVariableNames.ggobi()[1:9])")
-
- ask()
- cat ("# Explore the functional classes:\n")
- cat ("# Define the function showCases to show specified cases\n")
- cat ("#   using setHiddenCases.ggobi (logical)\n")
-
- ask()
- cat ("# Loop twice over the 4 main functional classes\n")
- cat ("> for (j in 1:2) {\n")
- cat (">   for (i in 1:length(unique(sort(FuncClass2)))) {\n")
- cat (">    showCases(i, FuncClass2)\n")
- cat (">    system(\"sleep 2\")\n")
- cat (">   }\n")
- cat ("> }\n")
- cat ("> showCases(-1, FuncClass2)\n")
-
- ask()
- v <- FuncClass1
- for (j in 1:2) {
-   for (i in 1:length(unique(sort(v)))) {
-    showCases(i, v)
-    system("sleep 1")
-   }
+#
+# cycle through clusters n times
+#
+n = 3
+for (k in 1:n) {
+ for (i in 1:5) {
+  showClust(i)
+  system("sleep 2")
  }
- showCases (-1, v)
 }
+showClass (-1)
 
-ratcns.cluster <- function() {
- ratcns <- getData.ggobi()
 
- ask()
- cat ("# To cluster the data, start by constructing a distance matrix\n")
- cateval ("dst <- dist(ratcns[,1:9])")
-
- ask()
- cat ("# Perform a hierarchical cluster analysis\n")
- cateval ("hc <- hclust(dst, \"w\")")
-
- ask()
- cat ("# Using R's graphical methods, plot the cluster tree\n")
- cateval ("x11()")
- cateval ("plot.hclust (hc)")
-
- ask()
- cat ("# Cut the tree, specifying 5 clusters, and save the result\n")
- cateval ("cvar <- cutree (hc, 5)")
-
- ask()
- cat ("# Add the variable to ggobi\n")
- cateval ("addVariable.ggobi (cvar, \"cluster\")")
-
- ask()
- cat ("# Using showCases, as defined earlier, explore the clusters\n")
- cat ("# cycling twice through the 5 clusters\n")
- cat ("> for (k in 1:2) {\n")
- cat (" for (i in 1:5) {\n")
- cat ("  showCases (i, cvar)\n")
- cat ("  system(\"sleep 2\")\n")
- cat (" }\n")
- cat ("}\n")
- cat ("showCases (-1, cvar)\n")
-
- ask()
- for (k in 1:2) {
-  for (i in 1:5) {
-   showCases (i, cvar)
-   system("sleep 2")
+#
+# identification
+#
+idfunc <- function (i, display) {
+  if (i >= 0) {
+    k <- i+1
+    print(k)
+    print(ratcns[k,1:9])
   }
- }
- showCases (-1, cvar)
+}
+g$setIdentifyHandler(idfunc)
+g$setMode("Identify")
+
+
+# principal components
+pc <- prcomp(ratcns[,1:9], center=T, scale=F)
+for (i in 1:3) {
+  name = paste("PC",i)
+  addVariable.ggobi (as.numeric(pc$x[,i]), name)
 }
 
-ratcns.identify <- function () {
- ratcns <<- getData.ggobi()
 
- ask()
- cat ("# Define a function to respond to ggobi's identify event\n")
- cateval ("idfunc <- function (i, .ggobi) {if (i >= 0) {print(ratcns[i+1,1:9])}}")
-
- ask()
- cat ("# Attach the function to the event\n")
- cateval ("setIdentifyHandler.ggobi (idfunc)")
-}
