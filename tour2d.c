@@ -53,6 +53,7 @@ extern gdouble erf (gdouble);  /*-- not defined on all unixes --*/
 #define T2DOFF false
 
 static void tour2d_speed_set_display(gfloat slidepos, displayd *dsp);
+void tour2d_write_video(ggobid *gg);
 
 void
 display_tour2d_init_null (displayd *dsp, ggobid *gg)

@@ -53,7 +53,7 @@ extern gdouble erf (gdouble);  /*-- not defined on all unixes --*/
 #define T1DOFF false
 
 static void tour1d_speed_set_display(gfloat slidepos, displayd *dsp); 
-
+void tour1d_write_video(ggobid *gg);
 
 #ifdef TESTING_TOUR_STEP
 void tour1d_step_cb(displayd *dsp, tour td, gint projdim, ggobid *gg,

@@ -30,6 +30,7 @@
 static void tourcorr_active_horvar_set (gint jvar, datad *, displayd *, ggobid *);
 static void tourcorr_active_vervar_set (gint jvar, datad *, displayd *, ggobid *);
 static void tourcorr_active_var_set (gint jvar, datad *d, displayd *dsp, ggobid *gg);
+void tourcorr_write_video(ggobid *gg);
 
 void
 display_tourcorr_init_null (displayd *dsp, ggobid *gg)
