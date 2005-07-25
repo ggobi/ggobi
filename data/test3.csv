@@ -4,4 +4,4 @@ Lamb,2,Animal,15,Y,200
 Little,3,Word,5,Y,200
 Muffett,4,Person,30,N,100
 Spider,5,Animal,20,N,100
-Web,6,Inanimate,10,N,100
+Web,6,Inanimate,10,N,1e2

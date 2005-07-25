@@ -31,9 +31,9 @@
  <record id="2" color="1">  3.3  <na/> 2   0  </record>
  <record id="3" color="0">  4    4   <na/> 1  </record>
  <record id="5" color="0">  5    5     0   1  </record>
- <record id="12" color="0">  5.8  6     1   2  </record>
+ <record id="12" color="0"> 5.8  6     1   2  </record>
  <record id="7" color="0">  6.0  6     2   2  </record>
- <record id="11" color="0">  6.2  6     0   2  </record>
+ <record id="11" color="0"> 6.2  6     0   2  </record>
 </records>
 
 </data>

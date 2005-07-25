@@ -28,14 +28,13 @@
 </variables>
 
 <records count="7">
- <record id="a1" label="a1"> 42 4870  0 0 <string>AB C</string></record>
+ <record id="a1"> <real>42</real> <real>4870</real> <int>0</int><int>0</int> <string>AB C</string></record>
  <record id="b2"> 42 4880  0 1 <string>DEF</string> </record>
  <record id="c3">  7 4890  1 2 <string>GHI</string> </record>
  <record id="d4"> 12 5000  2 1 <string>J</string> </record>
  <record id="e5"> 18 5100  2 2 <string>KLM</string> </record>
  <record id="f6"> 12 5000  2 1 <string>NOP QRST</string> </record>
- <record id="g7"><real>18</real>
- <real>5200</real><int>2</int><int>2</int><string>Happy Birthday</string></record>
+ <record id="g7"><real>18</real> <real>5200</real><int>2</int><int>2</int><string>Happy Birthday</string></record>
 </records>
 </data>
 </ggobidata>

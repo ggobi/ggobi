@@ -18,7 +18,7 @@ ratcns.intro <- function () {
 
  #cat ("> library(Rggobi)\n")
  cat ("#  Start ggobi, giving it an xml file as an argument\n")
- cateval ("g <- ggobi(\"/usr/dfs/ggobi/ggobi/data/ratcns\")")
+ cateval ("g <- ggobi(\"/home/dfs/ggobi/ggobi/data/ratcns\")")
 
  ask()
  cat ("#  Save the data in R, and define a few variables\n")
