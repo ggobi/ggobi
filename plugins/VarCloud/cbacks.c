@@ -167,6 +167,8 @@ launch_varcloud_cb (GtkWidget *w, PluginInstance *inst)
     /* Now why does this new display have an Edges menu?  Something is
        still wrong with record ids, I fear. */
     dspnew = GGOBI(newScatterplot) (0, 1, dnew, gg);
+    display_add(dspnew, gg);
+    varpanel_refresh(dspnew, gg);
     display_tailpipe (dspnew, FULL, gg);
   }
 
