@@ -310,7 +310,7 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
     }
 
     twopi_cleanup(graph);
-
+   
   } else if (layout_type == FDP_LAYOUT) {  /* could use fdp_dim */
     void fdpLayout(graph_t * g);
     fdp_init_graph(graph);
@@ -398,8 +398,6 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
   }
 
 
-
-
 /*
  * create a new datad with the new variables.  include only
  * those nodes that are visible.  these needs some more testing ...
@@ -475,13 +473,21 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
 /*
  * open a new scatterplot with the new data, and display edges
  * as they're displayed in the current datad.
-*/
+*/ 
+
+  /* dfs -- in imitation of code in display_ui.c, maybe not needed */
+  splot_set_current (gg->current_splot, off, gg);   
+  /* */
+
   opts = GGOBI(getDefaultDisplayOptions)();
   opts->axes_show_p = false;
   opts->edges_undirected_show_p = true;
   dspnew = GGOBI(newScatterplot) (0, 1, dnew, gg);
   opts->axes_show_p = true;  /*-- restore it --*/
   opts->edges_undirected_show_p = false;
+
+  display_add(dspnew, gg);
+  varpanel_refresh(dspnew, gg);
 
   setDisplayEdge (dspnew, e);
 

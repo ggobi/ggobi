@@ -127,6 +127,9 @@ ggv_datad_create (datad *dsrc, datad *e, displayd *dsp, PluginInstance *inst)
 */
   dspnew = GGOBI(newScatterplot) (0, 1, dnew, gg);
   
+  display_add(dspnew, gg);
+  varpanel_refresh(dspnew, gg);
+
   display_tailpipe (dspnew, FULL, gg);
 
   ggv->dpos = dnew;

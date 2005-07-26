@@ -89,8 +89,10 @@ create_shepard_data_cb (PluginInstance *inst, guint action, GtkWidget *w)
 
     GGOBI(setData) (values, rownames, colnames, n, nc, dnew,
       false, gg, /*rowids*/NULL, false, desc);  /*no rowids to start */
-    dspnew = GGOBI(newScatterplot) (0, 1, dnew, gg);
-    display_tailpipe (dspnew, FULL, gg);
+    dspnew = GGOBI(newScatterplot) (0, 1, dnew, gg); 
+    display_add(dspnew, gg);
+    varpanel_refresh(dspnew, gg);
+   display_tailpipe (dspnew, FULL, gg);
   }
 
   g_free (rownames);

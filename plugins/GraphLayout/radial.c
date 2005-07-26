@@ -406,6 +406,9 @@ do_radial(glayoutd *gl, datad *d, datad *e, displayd *dsp, ggobid *gg)
     opts->axes_show_p = true;  /*-- restore it --*/
     opts->edges_undirected_show_p = false;
 
+  display_add(dspnew, gg);
+  varpanel_refresh(dspnew, gg);
+
     setDisplayEdge (dspnew, e);
   }
 
