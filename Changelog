@@ -1,41 +1,63 @@
 July 2005
 
-New signal added for the creation of a new displayd object. This is emitted after the display is fully constructed 
-and is being registered.  We will miss a display if it is constructed separately and not explicitly added to the
-collection of known displays.  But that currently never happens and will be rare even when we instantiate the
-classes outside of the ggobi control panel, e.g. in RGtk.
+Fixed a bug in linking brushing by variable that was causing the wrong
+variable to be designated the linking variable.
+
+Fixed a (very recent) bug in the GraphLayout and ggvis plugins which
+caused new windows to be imperfectly linked to the brethren.
+
+Added new graphviz layout algorithms to the GraphLayout plugin.
 
 
-The 'PlotMenu' plug-in provides the infrastructure for adding pop-menus for splot's, i.e. panels on displays.
-These are potentially contentious, but are convenient at least for sophisticated users. As plugins,
-they work well as an optional add-on.  We can add functionality to this module and splot's as desired.
+New signal added for the creation of a new displayd object. This is
+emitted after the display is fully constructed and is being
+registered.  We will miss a display if it is constructed separately
+and not explicitly added to the collection of known displays.  But
+that currently never happens and will be rare even when we instantiate
+the classes outside of the ggobi control panel, e.g. in RGtk.
 
 
-Drag and drop for parallel coordinates displays.  One can drag a "panel" onto another panel
-and currently they get swapped in position.  Different strategies for inserting the initial
-panel beside the target one and moving those in between is easily done also.
+The 'PlotMenu' plug-in provides the infrastructure for adding
+pop-menus for splot's, i.e. panels on displays.  These are potentially
+contentious, but are convenient at least for sophisticated users. As
+plugins, they work well as an optional add-on.  We can add
+functionality to this module and splot's as desired.
 
 
-Two routines added to the "API": ggobi_data_set_var_type and ggobi_data_set_time_var to allow
-for users to specify the type of a variable and whether it is a time variable or not.
+Drag and drop for parallel coordinates displays.  One can drag a
+"panel" onto another panel and currently they get swapped in position.
+Different strategies for inserting the initial panel beside the target
+one and moving those in between is easily done also.
 
 
-Menu item added to each display to bring the associated control panel to the foreground.
-
-Option to use check menu items for the interactive modes for a display, i.e. Scale, Brush, Identify, ...
-This gives a visual display of what is the currently active mode and also a way to turn it off
-directly rather than requiring to switch to a different, display-dependent mode, e.g. XYPlot.
-  In ggobirc as <useRadioMenuItems on="true" />
+Two routines added to the "API": ggobi_data_set_var_type and
+ggobi_data_set_time_var to allow for users to specify the type of a
+variable and whether it is a time variable or not.
 
 
+Menu item added to each display to bring the associated control panel
+to the foreground.
 
-Internal changes
-   removed (ifdef'ed away) the calls to display_add() for each of the display types.
-   These resulted in display_add being called twice: there and via the extended_display_open_cb.
-   This fixes the message about "Display has already been added...." appearing.
+Option to use check menu items for the interactive modes for a
+display, i.e. Scale, Brush, Identify, ...  This gives a visual display
+of what is the currently active mode and also a way to turn it off
+directly rather than requiring to switch to a different,
+display-dependent mode, e.g. XYPlot.  In ggobirc as <useRadioMenuItems
+on="true" />
 
-   Information about mismatching structure sizes for plugins and "modules" (i.e. Rggobi) announce  which 
-   module is complaining.  (Added the GGobiPluginDetails to the call to checkGGobiStructSizes().)
+
+
+Internal changes 
+   removed (ifdef'ed away) the calls to display_add()
+   for each of the display types.  These resulted in display_add being
+   called twice: there and via the extended_display_open_cb.  This
+   fixes the message about "Display has already been added...."
+   appearing.
+
+   Information about mismatching structure sizes for plugins and
+   "modules" (i.e. Rggobi) announce which module is complaining.
+   (Added the GGobiPluginDetails to the call to
+   checkGGobiStructSizes().)
 
 
 
