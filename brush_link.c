@@ -14,6 +14,8 @@
  *   Andreas Buja        andreas.buja@wharton.upenn.edu
 */
 
+#include <string.h>
+
 #include <gtk/gtk.h>
 #include "vars.h"
 #include "externs.h"
@@ -342,20 +344,34 @@ linking_method_set_cb (GtkWidget *cl, gint row, gint column,
   cpanel->br.linkby_page = gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook));
 
   if (row <= 0) {
-    /*cpanel->br_linkby = BR_LINKBYID;*/
     gg->linkby_cv = false;
     return;  /* link by case id; done */
   } else {
     gpointer ptr = gtk_clist_get_row_data (GTK_CLIST(cl), row);
     gint jvar = GPOINTER_TO_INT(ptr);
     vartabled *vt;
+    gchar *rowtext, *varname;
+    gboolean ok;
+    gint j;
 
-    /*cpanel->br_linkby = BR_LINKBYVAR;*/
-    gg->linkby_cv = true;
-    if (d->linkvar_vt == NULL || d->linkvar_vt != vt) {
-      vt = vartable_element_get(jvar, d);
-      d->linkvar_vt = vt;
+
+    /* I need to get the text in the row and strip out "Link by ".
+     * That will give me the variable name */
+    ok = gtk_clist_get_text (GTK_CLIST(cl), row, 0, &rowtext);
+    if (ok) {
+      varname = &rowtext[8];
+      for (j=0; j<d->ncols; j++) {
+        vt = vartable_element_get (j, d);
+        if (vt && vt->vartype == categorical) {
+          if (strcmp(vt->collab_tform, varname) == 0) {
+            jvar = j;
+            gg->linkby_cv = true;
+            d->linkvar_vt = vt;
+          }
+        }
+      }
     }
+
   }
 }
 
