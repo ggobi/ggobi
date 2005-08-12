@@ -22,7 +22,7 @@
 #include "vars.h"
 #include "externs.h"
 
-static gchar *display_mode_lbl[] = { "Barchart", "Spineplot" };
+static gchar *display_mode_lbl[] = { "Bars", "Spines" };
 
 static gboolean barchart_scale(gboolean button1_p, gboolean button2_p,
                                splotd * sp);
@@ -69,7 +69,7 @@ GtkWidget *cpanel_barchart_make(ggobid * gg)
   opt = gtk_option_menu_new();
   gtk_widget_set_name(opt, "BARCHART:displ_mode_option_menu");
   gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), opt,
-    "some sensible text about spine plots and barcharts",
+    "switch between height (bars) and width (spines) to represent count",
     NULL);
   gtk_box_pack_start(GTK_BOX(vb), opt, false, false, 0);
   populate_option_menu(opt, display_mode_lbl,
@@ -102,12 +102,22 @@ GtkWidget *barchart_mode_menu_make(GtkAccelGroup * accel_group,
      except for a way to return the value from here. */
   menu = gtk_menu_new();
 
-  CreateMenuItem(menu, "Barchart",
+  CreateMenuItem (menu, "PROJECTION MODES:",
+    "", "", NULL, NULL, NULL, NULL, gg);
+
+  CreateMenuItem(menu, "1D Plot",
                  "^h", "", NULL, accel_group, func,
                  useIds ? GINT_TO_POINTER(EXTENDED_DISPLAY_MODE) : gg, gg);
 
+  CreateMenuItem(menu, "1D Tour",
+                 "^t", "", NULL, accel_group, func,
+                 useIds ? GINT_TO_POINTER(TOUR1D) : gg, gg);
+  /*             useIds ? GINT_TO_POINTER(EXTENDED_DISPLAY_MODE) : gg, gg);*/
+
   /* Add a separator */
   CreateMenuItem(menu, NULL, "", "", NULL, NULL, NULL, NULL, gg);
+  CreateMenuItem (menu, "INTERACTION MODES:",
+    "", "", NULL, NULL, NULL, NULL, gg);
 
   CreateMenuItem(menu, "Scale",
                  "^s", "", NULL, accel_group, func,

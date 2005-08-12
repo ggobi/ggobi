@@ -204,6 +204,54 @@ free_tour1d(displayd *dsp)
   arrayd_free(&dsp->t1d_manbasis, 0, 0);
 }
 
+void tour1d_snap(ggobid *gg)
+{
+  displayd *dsp = gg->current_display;
+  splotd *sp = gg->current_splot;
+  datad *d = dsp->d;
+  gint j;
+  gdouble rnge;
+  vartabled *vt;
+
+  for (j=0; j<d->ncols; j++) {
+    vt = vartable_element_get (j, d);
+    rnge = vt->lim.max - vt->lim.min;
+    fprintf(stdout,"%f %f \n", dsp->t1d.F.vals[0][j], 
+      dsp->t1d.F.vals[0][j]/rnge*sp->scale.x);
+  }
+}
+
+void tour1d_video(ggobid *gg)
+{
+  displayd *dsp = gg->current_display;
+  if (dsp == NULL)
+    return;
+
+  dsp->t1d_video = !dsp->t1d_video;
+}
+
+void tour1d_write_video(ggobid *gg) 
+{
+  displayd *dsp = gg->current_display;
+  splotd *sp = gg->current_splot;
+  datad *d = dsp->d;
+  gint j;
+  gdouble rnge;
+  vartabled *vt;
+  gfloat ppval;
+
+  if (dsp->t1d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t1d_window))
+    ppval = dsp->t1d.ppval;
+  else
+    ppval = 0.;
+  for (j=0; j<d->ncols; j++) {
+    vt = vartable_element_get (j, d);
+    rnge = vt->lim.max - vt->lim.min;
+    fprintf(stdout,"%f %f %f \n", dsp->t1d.F.vals[0][j], 
+      dsp->t1d.F.vals[0][j]/rnge*sp->scale.x, ppval);
+  }
+}
+
 void 
 display_tour1d_init (displayd *dsp, ggobid *gg) 
 {
@@ -887,50 +935,6 @@ void tour1d_scramble(ggobid *gg)
 
   if (dsp->t1d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t1d_window)) 
     t1d_pp_reinit(dsp, gg);
-}
-
-void tour1d_snap(ggobid *gg)
-{
-  displayd *dsp = gg->current_display;
-  splotd *sp = gg->current_splot;
-  datad *d = dsp->d;
-  gint j;
-  gdouble rnge;
-  vartabled *vt;
-
-  for (j=0; j<d->ncols; j++) {
-    vt = vartable_element_get (j, d);
-    rnge = vt->lim.max - vt->lim.min;
-    fprintf(stdout,"%f %f \n", dsp->t1d.F.vals[0][j], 
-      dsp->t1d.F.vals[0][j]/rnge*sp->scale.x);
-  }
-}
-
-void tour1d_video(ggobid *gg)
-{
-  displayd *dsp = gg->current_display;
-  if (dsp == NULL)
-    return;
-
-  dsp->t1d_video = !dsp->t1d_video;
-}
-
-void tour1d_write_video(ggobid *gg) 
-{
-  displayd *dsp = gg->current_display;
-  splotd *sp = gg->current_splot;
-  datad *d = dsp->d;
-  gint j;
-  gdouble rnge;
-  vartabled *vt;
-
-  g_printerr("%f \n",sp->scale.x);
-  for (j=0; j<d->ncols; j++) {
-    vt = vartable_element_get (j, d);
-    rnge = vt->lim.max - vt->lim.min;
-    fprintf(stdout,"%f %f \n", dsp->t1d.F.vals[0][j], 
-      dsp->t1d.F.vals[0][j]/rnge*sp->scale.x);
-  }
 }
 
 void tour1d_vert(cpaneld *cpanel, gboolean state)

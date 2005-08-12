@@ -977,6 +977,132 @@ tourcorr_projdata(splotd *sp, greal **world_data, datad *d, ggobid *gg) {
   }
 }
 
+void tourcorr_snap(ggobid *gg)
+{
+  displayd *dsp = gg->current_display;
+  splotd *sp = gg->current_splot;
+  datad *d = dsp->d;
+  gint j;
+  gdouble rnge;
+  vartabled *vt;
+
+  for (j=0; j<d->ncols; j++) {
+    vt = vartable_element_get (j, d);
+    rnge = vt->lim.max - vt->lim.min;
+    g_printerr("%f %f\n", dsp->tcorr1.F.vals[0][j]/rnge*sp->scale.x,
+	     dsp->tcorr2.F.vals[0][j]/rnge*sp->scale.y);
+  }
+}
+
+void tourcorr_video(ggobid *gg)
+{
+  displayd *dsp = gg->current_display;
+  if (dsp == NULL)
+    return;
+
+  dsp->tourcorr_video = !dsp->tourcorr_video;
+}
+
+void tourcorr_write_video(ggobid *gg) 
+{
+  displayd *dsp = gg->current_display;
+  splotd *sp = gg->current_splot;
+  datad *d = dsp->d;
+  gint j;
+  vartabled *vt;
+
+  g_printerr("%f %f\n",sp->scale.x, sp->scale.y);
+  for (j=0; j<d->ncols; j++) {
+    vt = vartable_element_get (j, d);
+    g_printerr("%f %f %f %f\n", dsp->tcorr1.F.vals[0][j], 
+      dsp->tcorr2.F.vals[0][j], vt->lim.min, vt->lim.max);
+  }
+}
+
+/* Variable manipulation */
+void
+tourcorr_manip_init(gint p1, gint p2, splotd *sp) 
+{
+  displayd *dsp = (displayd *) sp->displayptr;
+  datad *d = dsp->d;
+  cpaneld *cpanel = &dsp->cpanel;
+  ggobid *gg = GGobiFromSPlot(sp);
+  gint j;
+  gint n1vars = dsp->tcorr1.nactive, n2vars = dsp->tcorr2.nactive;
+  gboolean dontdoit = false;
+
+  /* need to turn off tour */
+  if (!cpanel->tcorr1.paused && !cpanel->tcorr2.paused) {
+    tourcorr_func(CTOFF, gg->current_display, gg);
+  }
+
+  dsp->tc1_phi = 0.;
+  dsp->tc2_phi = 0.;
+
+  /* gets mouse position */
+  dsp->tc1_pos = dsp->tc1_pos_old = p1;
+  dsp->tc2_pos = dsp->tc2_pos_old = p2;
+
+  /* initializes indicator for manip var being one of existing vars */
+  dsp->tc1_manipvar_inc = false;
+  dsp->tc2_manipvar_inc = false;
+
+  /* check if manip var is one of existing vars */
+  /* n1vars, n2vars is the number of variables, excluding the
+     manip var in hor and vert directions */
+  for (j=0; j<dsp->tcorr1.nactive; j++)
+    if (dsp->tcorr1.active_vars.els[j] == dsp->tc1_manip_var) {
+      dsp->tc1_manipvar_inc = true;
+      n1vars--;
+    }
+  for (j=0; j<dsp->tcorr2.nactive; j++)
+    if (dsp->tcorr2.active_vars.els[j] == dsp->tc2_manip_var) {
+      dsp->tc2_manipvar_inc = true;
+      n2vars--;
+    }
+
+  /* make manip basis, from existing projection */
+  /* 0 will be the remainder of the projection, and
+     1 will be the indicator vector for the manip var */
+  for (j=0; j<d->ncols; j++) {
+    dsp->tc1_manbasis.vals[0][j] = dsp->tcorr1.F.vals[0][j];
+    dsp->tc1_manbasis.vals[1][j] = 0.;
+  }
+  for (j=0; j<d->ncols; j++) {
+    dsp->tc2_manbasis.vals[0][j] = dsp->tcorr2.F.vals[0][j];
+    dsp->tc2_manbasis.vals[1][j] = 0.;
+  }
+  dsp->tc1_manbasis.vals[1][dsp->tc1_manip_var]=1.;
+  dsp->tc2_manbasis.vals[1][dsp->tc2_manip_var]=1.;
+
+  if (n1vars > 0)
+  {
+    while (!gram_schmidt(dsp->tc1_manbasis.vals[0],  dsp->tc1_manbasis.vals[1],
+      d->ncols))
+    {
+       gt_basis(dsp->tcorr1.tv, dsp->tcorr1.nactive, dsp->tcorr1.active_vars, 
+        d->ncols, (gint) 1);
+      for (j=0; j<d->ncols; j++) 
+        dsp->tc1_manbasis.vals[1][j] = dsp->tcorr1.tv.vals[0][j];
+    }
+  }
+  if (n2vars > 0)
+  {
+    while (!gram_schmidt(dsp->tc2_manbasis.vals[0],  dsp->tc2_manbasis.vals[1],
+      d->ncols))
+    {
+       gt_basis(dsp->tcorr2.tv, dsp->tcorr2.nactive, dsp->tcorr2.active_vars, 
+        d->ncols, (gint) 1);
+      for (j=0; j<d->ncols; j++) 
+        dsp->tc2_manbasis.vals[1][j] = dsp->tcorr2.tv.vals[0][j];
+    }
+  } 
+
+  if (dontdoit) {
+    disconnect_motion_signal (sp);
+  }
+}
+
 void
 tourcorr_run(displayd *dsp, ggobid *gg)
 {
@@ -1206,132 +1332,6 @@ void tourcorr_scramble(ggobid *gg)
   display_tailpipe (dsp, FULL, gg);
 
   varcircles_refresh (d, gg);
-}
-
-void tourcorr_snap(ggobid *gg)
-{
-  displayd *dsp = gg->current_display;
-  splotd *sp = gg->current_splot;
-  datad *d = dsp->d;
-  gint j;
-  gdouble rnge;
-  vartabled *vt;
-
-  for (j=0; j<d->ncols; j++) {
-    vt = vartable_element_get (j, d);
-    rnge = vt->lim.max - vt->lim.min;
-    g_printerr("%f %f\n", dsp->tcorr1.F.vals[0][j]/rnge*sp->scale.x,
-	     dsp->tcorr2.F.vals[0][j]/rnge*sp->scale.y);
-  }
-}
-
-void tourcorr_video(ggobid *gg)
-{
-  displayd *dsp = gg->current_display;
-  if (dsp == NULL)
-    return;
-
-  dsp->tourcorr_video = !dsp->tourcorr_video;
-}
-
-void tourcorr_write_video(ggobid *gg) 
-{
-  displayd *dsp = gg->current_display;
-  splotd *sp = gg->current_splot;
-  datad *d = dsp->d;
-  gint j;
-  vartabled *vt;
-
-  g_printerr("%f %f\n",sp->scale.x, sp->scale.y);
-  for (j=0; j<d->ncols; j++) {
-    vt = vartable_element_get (j, d);
-    g_printerr("%f %f %f %f\n", dsp->tcorr1.F.vals[0][j], 
-      dsp->tcorr2.F.vals[0][j], vt->lim.min, vt->lim.max);
-  }
-}
-
-/* Variable manipulation */
-void
-tourcorr_manip_init(gint p1, gint p2, splotd *sp) 
-{
-  displayd *dsp = (displayd *) sp->displayptr;
-  datad *d = dsp->d;
-  cpaneld *cpanel = &dsp->cpanel;
-  ggobid *gg = GGobiFromSPlot(sp);
-  gint j;
-  gint n1vars = dsp->tcorr1.nactive, n2vars = dsp->tcorr2.nactive;
-  gboolean dontdoit = false;
-
-  /* need to turn off tour */
-  if (!cpanel->tcorr1.paused && !cpanel->tcorr2.paused) {
-    tourcorr_func(CTOFF, gg->current_display, gg);
-  }
-
-  dsp->tc1_phi = 0.;
-  dsp->tc2_phi = 0.;
-
-  /* gets mouse position */
-  dsp->tc1_pos = dsp->tc1_pos_old = p1;
-  dsp->tc2_pos = dsp->tc2_pos_old = p2;
-
-  /* initializes indicator for manip var being one of existing vars */
-  dsp->tc1_manipvar_inc = false;
-  dsp->tc2_manipvar_inc = false;
-
-  /* check if manip var is one of existing vars */
-  /* n1vars, n2vars is the number of variables, excluding the
-     manip var in hor and vert directions */
-  for (j=0; j<dsp->tcorr1.nactive; j++)
-    if (dsp->tcorr1.active_vars.els[j] == dsp->tc1_manip_var) {
-      dsp->tc1_manipvar_inc = true;
-      n1vars--;
-    }
-  for (j=0; j<dsp->tcorr2.nactive; j++)
-    if (dsp->tcorr2.active_vars.els[j] == dsp->tc2_manip_var) {
-      dsp->tc2_manipvar_inc = true;
-      n2vars--;
-    }
-
-  /* make manip basis, from existing projection */
-  /* 0 will be the remainder of the projection, and
-     1 will be the indicator vector for the manip var */
-  for (j=0; j<d->ncols; j++) {
-    dsp->tc1_manbasis.vals[0][j] = dsp->tcorr1.F.vals[0][j];
-    dsp->tc1_manbasis.vals[1][j] = 0.;
-  }
-  for (j=0; j<d->ncols; j++) {
-    dsp->tc2_manbasis.vals[0][j] = dsp->tcorr2.F.vals[0][j];
-    dsp->tc2_manbasis.vals[1][j] = 0.;
-  }
-  dsp->tc1_manbasis.vals[1][dsp->tc1_manip_var]=1.;
-  dsp->tc2_manbasis.vals[1][dsp->tc2_manip_var]=1.;
-
-  if (n1vars > 0)
-  {
-    while (!gram_schmidt(dsp->tc1_manbasis.vals[0],  dsp->tc1_manbasis.vals[1],
-      d->ncols))
-    {
-       gt_basis(dsp->tcorr1.tv, dsp->tcorr1.nactive, dsp->tcorr1.active_vars, 
-        d->ncols, (gint) 1);
-      for (j=0; j<d->ncols; j++) 
-        dsp->tc1_manbasis.vals[1][j] = dsp->tcorr1.tv.vals[0][j];
-    }
-  }
-  if (n2vars > 0)
-  {
-    while (!gram_schmidt(dsp->tc2_manbasis.vals[0],  dsp->tc2_manbasis.vals[1],
-      d->ncols))
-    {
-       gt_basis(dsp->tcorr2.tv, dsp->tcorr2.nactive, dsp->tcorr2.active_vars, 
-        d->ncols, (gint) 1);
-      for (j=0; j<d->ncols; j++) 
-        dsp->tc2_manbasis.vals[1][j] = dsp->tcorr2.tv.vals[0][j];
-    }
-  } 
-
-  if (dontdoit) {
-    disconnect_motion_signal (sp);
-  }
 }
 
 void

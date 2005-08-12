@@ -157,6 +157,11 @@ createBarchart(displayd *display, gboolean missing_p, splotd * sp, gint var, dat
   display->splots = NULL;
   display->splots = g_list_append(display->splots, (gpointer) sp);
 
+  /*-- Initialize tours if possible --*/
+  display_tour1d_init_null (display, gg);
+  if (d->ncols >= MIN_NVARS_FOR_TOUR1D)
+    display_tour1d_init (display, gg);
+
   table = gtk_table_new(3, 2, false);   /* rows, columns, homogeneous */
   gtk_box_pack_start(GTK_BOX(vbox), table, true, true, 0);
   gtk_table_attach(GTK_TABLE(table),

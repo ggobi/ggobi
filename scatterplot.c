@@ -334,7 +334,7 @@ createScatterplot(displayd *display, gboolean missing_p, splotd *sp, gint numVar
     display_tourcorr_init_null (display, gg);
     if (d->ncols >= MIN_NVARS_FOR_COTOUR)
       display_tourcorr_init (display, gg);
-  }
+ }
 
   table = gtk_table_new (3, 2, false);  /* rows, columns, homogeneous */
   gtk_box_pack_start (GTK_BOX (vbox), table, true, true, 0);

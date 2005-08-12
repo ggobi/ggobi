@@ -616,6 +616,54 @@ void tour2d_scramble(ggobid *gg)
   varcircles_refresh (d, gg);
 }
 
+void tour2d_snap(ggobid *gg)
+{
+  displayd *dsp = gg->current_display;
+  splotd *sp = gg->current_splot;
+  datad *d = dsp->d;
+  gint j;
+  gdouble rnge;
+  vartabled *vt;
+
+  for (j=0; j<d->ncols; j++) {
+    vt = vartable_element_get (j, d);
+    rnge = vt->lim.max - vt->lim.min;
+    fprintf(stdout,"%f %f %f %f \n", dsp->t2d.F.vals[0][j], 
+      dsp->t2d.F.vals[1][j],dsp->t2d.F.vals[0][j]/rnge*sp->scale.x,
+      dsp->t2d.F.vals[1][j]/rnge*sp->scale.y);
+  }
+}
+
+void tour2d_video(ggobid *gg)
+{
+  displayd *dsp = gg->current_display;
+  if (dsp == NULL)
+    return;
+
+  dsp->t2d_video = !dsp->t2d_video;
+}
+
+void tour2d_write_video(ggobid *gg) 
+{
+  displayd *dsp = gg->current_display;
+  splotd *sp = gg->current_splot;
+  datad *d = dsp->d;
+  gint j;
+  vartabled *vt;
+  gdouble rnge;
+
+  /*  g_printerr("%f %f\n",sp->scale.x, sp->scale.y);*/
+  for (j=0; j<d->ncols; j++) {
+    vt = vartable_element_get (j, d);
+    rnge = vt->lim.max - vt->lim.min;
+    fprintf(stdout,"%f %f %f %f\n", dsp->t2d.F.vals[0][j], 
+      dsp->t2d.F.vals[1][j], dsp->t2d.F.vals[0][j]/rnge*sp->scale.x,
+      dsp->t2d.F.vals[1][j]/rnge*sp->scale.y);
+    /*    g_printerr("%f %f %f %f\n", dsp->t2d.F.vals[0][j], dsp->t2d.F.vals[1][j],
+	  vt->lim.min, vt->lim.max);*/
+  }
+}
+
 void
 tour2d_run(displayd *dsp, ggobid *gg)
 {
@@ -870,54 +918,6 @@ void tour2d_reinit(ggobid *gg)
 
   if (dsp->t2d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t2d_window)) 
     t2d_pp_reinit(dsp, gg);
-}
-
-void tour2d_snap(ggobid *gg)
-{
-  displayd *dsp = gg->current_display;
-  splotd *sp = gg->current_splot;
-  datad *d = dsp->d;
-  gint j;
-  gdouble rnge;
-  vartabled *vt;
-
-  for (j=0; j<d->ncols; j++) {
-    vt = vartable_element_get (j, d);
-    rnge = vt->lim.max - vt->lim.min;
-    fprintf(stdout,"%f %f %f %f \n", dsp->t2d.F.vals[0][j], 
-      dsp->t2d.F.vals[1][j],dsp->t2d.F.vals[0][j]/rnge*sp->scale.x,
-      dsp->t2d.F.vals[1][j]/rnge*sp->scale.y);
-  }
-}
-
-void tour2d_video(ggobid *gg)
-{
-  displayd *dsp = gg->current_display;
-  if (dsp == NULL)
-    return;
-
-  dsp->t2d_video = !dsp->t2d_video;
-}
-
-void tour2d_write_video(ggobid *gg) 
-{
-  displayd *dsp = gg->current_display;
-  splotd *sp = gg->current_splot;
-  datad *d = dsp->d;
-  gint j;
-  vartabled *vt;
-  gdouble rnge;
-
-  /*  g_printerr("%f %f\n",sp->scale.x, sp->scale.y);*/
-  for (j=0; j<d->ncols; j++) {
-    vt = vartable_element_get (j, d);
-    rnge = vt->lim.max - vt->lim.min;
-    fprintf(stdout,"%f %f %f %f\n", dsp->t2d.F.vals[0][j], 
-      dsp->t2d.F.vals[1][j], dsp->t2d.F.vals[0][j]/rnge*sp->scale.x,
-      dsp->t2d.F.vals[1][j]/rnge*sp->scale.y);
-    /*    g_printerr("%f %f %f %f\n", dsp->t2d.F.vals[0][j], dsp->t2d.F.vals[1][j],
-	  vt->lim.min, vt->lim.max);*/
-  }
 }
 
 /* Variable manipulation */

@@ -58,7 +58,12 @@ static gboolean barchartEventHandlersToggle(displayd * dpy, splotd * sp,
 static gint barchartSPlotKeyEventHandler(displayd * dpy, splotd * sp,
                                          gint keyval);
 
-
+static gboolean
+varpanelHighd(displayd *display)
+{
+  gint proj = display->cpanel.projection;
+  return(proj == TOUR1D || proj == TOUR2D3 || proj == TOUR2D || proj == COTOUR);
+}
 
 static gint
 barchart_is_variable_plotted(displayd * display, gint * cols, gint ncols,
@@ -395,6 +400,7 @@ void barchartDisplayClassInit(GtkGGobiBarChartDisplayClass * klass)
 
   klass->parent_class.ruler_ranges_set = ruler_ranges_set;
 
+  klass->parent_class.varpanel_highd = varpanelHighd;
   klass->parent_class.varpanel_refresh = barchartVarpanelRefresh;
 
   klass->parent_class.handles_action = barchartHandlesAction;

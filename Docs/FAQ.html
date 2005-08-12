@@ -10,7 +10,7 @@
 <h2>Contents</h2>
 <dl>
   <dt>
-  <li> <a href="#ggobi">ggobi</a>
+  <li> <a href="#ggobi">Stand-alone ggobi</a>
   <dd>
   <dt>
   <li> <a href="#ggobiAPI">Embeddable ggobi API</a>
@@ -28,6 +28,54 @@
 <h2><a name="ggobi">Stand-alone ggobi</a></h2>
 <dl>
   <dt>
+<li> When running ggobi on linux I get:
+   <pre>
+[dicook@localhost ggobi]$ ggobi data/flea.xml 
+error on loading plugin 
+library /home/dicook/ggobi-cvs/ggobi/plugins/GraphLayout/GraphLayout.so 
+(/home/dicook/ggobi-cvs/ggobi/plugins/GraphLayout/GraphLayout.so): 
+libggobi.so: cannot open shared object file: No such file or directory
+error on loading plugin 
+library /home/dicook/ggobi-cvs/ggobi/plugins/GraphAction/GraphAction 
+(/home/dicook/ggobi-cvs/ggobi/plugins/GraphAction/GraphAction.so): 
+libggobi.so: cannot open shared object file: No such file or directory
+error on loading plugin 
+library /home/dicook/ggobi-cvs/ggobi/plugins/ggvis/ggvis.so 
+(/home/dicook/ggobi-cvs/ggobi/plugins/ggvis/ggvis.so): libggobi.so: cannot 
+open shared object file: No such file or directory
+
+I've got GGOBI_ROOT set, and just set GGOBI_HOME. Nothing works. The so files 
+are there:
+
+[dicook@localhost ggobi]$ 
+ls /home/dicook/ggobi-cvs/ggobi/plugins/GraphLayout/GraphLayout.so
+324 /home/dicook/ggobi-cvs/ggobi/plugins/GraphLayout/GraphLayout.so*
+
+[dicook@localhost ggobi]$ ls /home/dicook/ggobi-cvs/ggobi/libggobi.so 
+12368 /home/dicook/ggobi-cvs/ggobi/libggobi.so*
+   </pre>
+<dd> Set your LD_LIBRARY_PATH to include the directory
+where libggobi.so lives.
+<br>
+<dt>
+<li> When running ggobi on linux I get:
+<pre>
+[dicook@localhost handbook]$ ggobi ../../ggobi-cvs/ggobi/data/flea
+Inconsistent struct sizes for ggobid: 824 != 820
+Inconsistent struct sizes for displayd: 3004 != 2992
+Inconsistent struct sizes for vartabled: 144 != 140
+Inconsistent struct sizes for GGobiOptions: 68 != 64
+Inconsistent struct sizes for ggobid: 824 != 820
+Inconsistent struct sizes for displayd: 3004 != 2992
+Inconsistent struct sizes for vartabled: 144 != 140
+Inconsistent struct sizes for GGobiOptions: 68 != 64
+Inconsistent struct sizes for ggobid: 824 != 820
+Inconsistent struct sizes for displayd: 3004 != 2992
+Inconsistent struct sizes for vartabled: 144 != 140
+Inconsistent struct sizes for GGobiOptions: 68 != 64
+</pre>
+   <dd> The plugins need to be compiled against the latest libggobi.so
+   <dt>
   <li> On Windows, I get the following error
 <pre>
 "gdk-ERROR *.*: Palettized display (256-colour) mode not supported on Windows. aborting..."
