@@ -62,9 +62,6 @@ static const GtkItemFactoryEntry menu_items[] = {
    NULL,
    0,
    "<Separator>"},
-  {"/File/Control Panel",   "",      
-    (GtkItemFactoryCallback) show_display_control_panel_cb,
-   0, "<Item>" },
   {"/File/Close",
    "",
    (GtkItemFactoryCallback) display_close_cb,
@@ -247,13 +244,17 @@ void barchart_clean_init(barchartSPlotd * sp)
   for (i = 0; i < sp->bar->nbins; i++) {
     sp->bar->bins[i].count = 0;
     sp->bar->bins[i].nhidden = 0;
-    for (j = 0; j < sp->bar->ncolors; j++) {
+    sp->bar->bar_hit[i] = FALSE;
+    sp->bar->old_bar_hit[i] = FALSE;
+   for (j = 0; j < sp->bar->ncolors; j++) {
       sp->bar->cbins[i][j].count = 0;
       sp->bar->cbins[i][j].rect.width = 1;
     }
   }
   for (i = 0; i < sp->bar->nbins + 2; i++)
     sp->bar->bar_hit[i] = sp->bar->old_bar_hit[i] = false;
+  sp->bar->old_nbins = -1;  
+
 /* */
 
   barchart_set_initials(sp, d);
@@ -344,7 +345,7 @@ void barchart_recalc_group_dimensions(barchartSPlotd * sp, ggobid * gg)
     }
     xoffset += colorwidth;
 
-/* then all other colors follow in the order of the colortable */
+/* then all other colors follow in the order of the color table */
     for (j = 0; j < sp->bar->ncolors; j++) {
       if (j != gg->color_id) {
         colorwidth = 0;
@@ -470,8 +471,11 @@ void rectangle_inset(gbind * bin)
    framed rectangles differ by one pixel in each dimension */
 
   bin->rect.height += 1;
+  if (bin->rect.height < 1) bin->rect.height = 1;	/* set minimal height */
   bin->rect.x += 1;
   bin->rect.width += 1;
+
+  if (bin->rect.width < 1) bin->rect.width = 1;		/* set minimal width */
 }
 
 void barchart_init_vectors(barchartSPlotd * sp)
@@ -626,7 +630,7 @@ void barchart_init_categorical(barchartSPlotd * sp, datad * d)
 
   maxheight = max - min;
 
-  rawsp->scale.y = SCALE_DEFAULT * maxheight / (maxheight + mindist);
+  rawsp->scale.y = (1-(1.0-SCALE_DEFAULT)/2) * maxheight / (maxheight + mindist);
 }
 
 
@@ -759,6 +763,17 @@ barchart_splot_add_plot_labels(splotd * sp, GdkDrawable * drawable,
 
 /* dfs */
     gint level;
+    gint lbearing, rbearing, width, ascent, descent, textheight;
+    
+    splot_text_extents ("yA", style, 
+          &lbearing, &rbearing, &width, &ascent, &descent);
+        textheight = ascent + descent;
+    
+ /* is there enough space for labels? If not - return */
+    if (!bsp->bar->is_spine) {
+        if (bsp->bar->bins[1].rect.height < textheight) return;
+    }
+    
     for (i = 0; i < bsp->bar->nbins; i++) {
       level = checkLevelValue (vtx, (gdouble) bsp->bar->bins[i].value);
       catname = g_strdup_printf ("%s",
@@ -800,6 +815,8 @@ void barchart_set_breakpoints(gfloat width, barchartSPlotd * sp, datad * d)
 
   for (i = 0; i <= sp->bar->nbins; i++) {
     sp->bar->breaks[i] = rawsp->p1d.lim.min + width * i;
+    sp->bar->old_bar_hit[i] = FALSE;
+    sp->bar->bar_hit[i] = FALSE;
   }
 
 }
@@ -884,8 +901,8 @@ void barchart_recalc_counts(barchartSPlotd * sp, datad * d, ggobid * gg)
 
   g_assert (sp->bar->index_to_rank.nels == d->nrows_in_plot);
 
-  if (!vtx->vartype == categorical)
-    rawsp->scale.y = SCALE_DEFAULT;
+  if (vtx->vartype != categorical)
+    rawsp->scale.y = 1-(1-SCALE_DEFAULT)/2;
   for (i = 0; i < sp->bar->nbins; i++) {
     sp->bar->bins[i].count = 0;
     sp->bar->bins[i].nhidden = 0;
@@ -1114,7 +1131,7 @@ void barchart_recalc_dimensions(splotd * rawsp, datad * d, ggobid * gg)
 
     if (sp->bar->high_pts_missing) {
       gbind *hbin = sp->bar->high_bin;
-      hbin->rect.height = minwidth;
+      hbin->rect.height = sp->bar->bins[0].rect.height;
       hbin->rect.x = 10;
       hbin->rect.width = MAX(1,
         (gint) ((gfloat) (rawsp->max.x - 2 * hbin->rect.x)
@@ -1124,9 +1141,9 @@ void barchart_recalc_dimensions(splotd * rawsp, datad * d, ggobid * gg)
         sp->bar->bins[i].rect.y - 2 * sp->bar->bins[i].rect.height - 1;
     }
 
-    minwidth = (gint) (0.9 * minwidth);
+    minwidth = MAX((gint) (0.9 * minwidth),0);
     for (i = 0; i < sp->bar->nbins; i++) {
-      if (!vtx->vartype == categorical)
+      if (vtx->vartype != categorical)
         sp->bar->bins[i].rect.y -= sp->bar->bins[i].rect.height;
       else {
         sp->bar->bins[i].rect.height = minwidth;
@@ -1140,7 +1157,7 @@ void barchart_recalc_dimensions(splotd * rawsp, datad * d, ggobid * gg)
     gint yoffset;
     gint n = d->nrows_in_plot;
 
-    scale_y = SCALE_DEFAULT;
+    scale_y = 1-(1-SCALE_DEFAULT)/2;
     maxheight = (rawsp->max.y - (sp->bar->nbins - 1) * bindist) * scale_y;
     yoffset = (gint) (rawsp->max.y * .5 * (1 + scale_y));
 
@@ -1189,6 +1206,7 @@ gboolean barchart_active_paint_points(splotd * rawsp, datad * d, ggobid *gg)
   gint i, m, indx;
   GdkRectangle brush_rect;
   GdkRectangle dummy;
+  GdkRectangle *rect;
   gint x1 = MIN(brush_pos->x1, brush_pos->x2);
   gint x2 = MAX(brush_pos->x1, brush_pos->x2);
   gint y1 = MIN(brush_pos->y1, brush_pos->y2);
@@ -1204,22 +1222,20 @@ gboolean barchart_active_paint_points(splotd * rawsp, datad * d, ggobid *gg)
   brush_rect.width = x2 - x1;
   brush_rect.height = y2 - y1;
 
-
   for (i = 0; i < sp->bar->nbins; i++) {
-    hits[i + 1] =
-        gdk_rectangle_intersect(&sp->bar->bins[i].rect, &brush_rect,
+    hits[i + 1] = rect_intersect(&sp->bar->bins[i].rect, &brush_rect,
                                 &dummy);
   }
   if (sp->bar->high_pts_missing)
     hits[sp->bar->nbins + 1] =
-        gdk_rectangle_intersect(&sp->bar->high_bin->rect, &brush_rect,
+        rect_intersect(&sp->bar->high_bin->rect, &brush_rect,
                                 &dummy);
   else
     hits[sp->bar->nbins + 1] = FALSE;
 
   if (sp->bar->low_pts_missing)
     hits[0] =
-        gdk_rectangle_intersect(&sp->bar->low_bin->rect, &brush_rect,
+        rect_intersect(&sp->bar->low_bin->rect, &brush_rect,
                                 &dummy);
   else
     hits[0] = FALSE;
@@ -1398,7 +1414,7 @@ barchart_scaling_visual_cues_draw(splotd * rawsp, GdkDrawable * drawable,
   barchartSPlotd *sp = GTK_GGOBI_BARCHART_SPLOT(rawsp);
   vtx = vartable_element_get(GTK_GGOBI_SPLOT(sp)->p1dvar, d);
 
-  if (!vtx->vartype == categorical) {
+  if (vtx->vartype != categorical) {
 /* calculate & draw anchor_rgn */
     gint y = sp->bar->bins[0].rect.y + sp->bar->bins[0].rect.height;
     gint x = sp->bar->bins[0].rect.x;
@@ -1489,6 +1505,24 @@ barchart_display_menus_make(displayd * display,
   gtk_widget_show(topmenu);
 }
 
+gboolean rect_intersect(GdkRectangle *rect1, GdkRectangle *rect2, GdkRectangle *dest)
+{
+    gint right, bottom;
+    icoords pt;
+
+// horizontal intersection
+    pt.x = dest->x = MAX(rect1->x,rect2->x);
+    right = MIN(rect1->x+rect1->width,rect2->x+rect2->width);
+    dest->width = MAX(0,right-dest->x);
+
+// vertical intersection
+    pt.y = dest->y = MAX(rect1->y,rect2->y);
+    bottom = MIN(rect1->y+rect1->height,rect2->y+rect2->height);
+    dest->height = MAX(0,bottom-dest->y);
+    
+    return (pt_in_rect(pt, *rect1) && pt_in_rect(pt, *rect2));
+}
+
 gboolean pt_in_rect(icoords pt, GdkRectangle rect)
 {
   return ((pt.x >= rect.x) && (pt.x <= rect.x + rect.width)
@@ -1525,8 +1559,14 @@ barchart_identify_bars(icoords mousepos, splotd * rawsp, datad * d,
 
 /* are those bars the same as last time? */
   stop = FALSE;
-  for (i = 0; (i < nbins + 2) && !stop; i++)
-    stop = (sp->bar->bar_hit[i] != sp->bar->old_bar_hit[i]);
+
+  if (sp->bar->old_nbins == sp->bar->nbins) {
+    for (i = 0; (i < nbins + 2) && !stop; i++)
+      stop = (sp->bar->bar_hit[i] != sp->bar->old_bar_hit[i]);
+
+  } else {
+    sp->bar->old_nbins = sp->bar->nbins;
+  }
 
   sp->bar->same_hits = !stop;
 
@@ -1564,6 +1604,7 @@ barchart_add_bar_cues(splotd * rawsp, GdkDrawable * drawable, ggobid * gg)
   gdk_gc_set_foreground(gg->plot_GC, &scheme->rgb_accent);
 
   if (sp->bar->low_pts_missing && sp->bar->bar_hit[0]) {
+  /*	*/
     string = g_strdup_printf ("%ld point%s < %.2f", sp->bar->low_bin->count,
       sp->bar->low_bin->count == 1 ? "" : "s",
       sp->bar->breaks[0] + sp->bar->offset);
@@ -1603,14 +1644,14 @@ barchart_add_bar_cues(splotd * rawsp, GdkDrawable * drawable, ggobid * gg)
                 sp->bar->bins[j].count == 1 ? "" : "s");
         } else {
           levelName = var->level_names[level];
-          string = g_strdup_printf ("%ld point%s for level %s",
+          string = g_strdup_printf ("%ld point%s in %s",
                 sp->bar->bins[j].count,
                 sp->bar->bins[j].count == 1 ? "" : "s", levelName);
         }
 /* --- */
 #ifdef PREV
         levelName = var->level_names[i - 1];
-        sprintf(string, "%ld point%s for level %s",
+        sprintf(string, "%ld point%s in %s",
                 sp->bar->bins[i - 1].count,
                 sp->bar->bins[i - 1].count == 1 ? "" : "s", levelName);
 #endif

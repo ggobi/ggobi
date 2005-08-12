@@ -279,6 +279,7 @@ typedef struct
  gboolean *bar_hit;
  gboolean *old_bar_hit;
  gboolean same_hits;
+ gint old_nbins;
 
  vector_i index_to_rank;
 } barchartd;

@@ -180,14 +180,14 @@ static gint key_press_cb(GtkWidget * w, GdkEventKey * event, splotd * sp)
   /*-- insert mode-specific key presses (if any) here --*/
   switch (event->keyval) {
   case GDK_plus:
-    if (!vtx->vartype == categorical) {
+    if (vtx->vartype != categorical) {
       bsp->bar->new_nbins = bsp->bar->nbins + 1;
       reallocate = TRUE;
     }
     break;
 
   case GDK_minus:
-    if (!vtx->vartype == categorical) {
+    if (vtx->vartype != categorical) {
       if (bsp->bar->nbins > 2) {
         bsp->bar->new_nbins = bsp->bar->nbins - 1;
         reallocate = TRUE;
@@ -258,14 +258,14 @@ mouse_motion_notify_cb(GtkWidget * w, GdkEventMotion * event, splotd * sp)
 
     region = gdk_region_polygon(bsp->bar->anchor_rgn, 3, GDK_WINDING_RULE);
     if (gdk_region_point_in(region, sp->mousepos.x, sp->mousepos.y)) {
-      splot_cursor_set(GDK_SPIDER, sp);
+      splot_cursor_set(GDK_HAND2, sp);
       cursor_set = TRUE;
     }
     gdk_region_destroy(region);
 
     region = gdk_region_polygon(bsp->bar->offset_rgn, 3, GDK_WINDING_RULE);
     if (gdk_region_point_in(region, sp->mousepos.x, sp->mousepos.y)) {
-      splot_cursor_set(GDK_UMBRELLA, sp);
+      splot_cursor_set(GDK_SPIDER, sp);
       cursor_set = TRUE;
     }
     gdk_region_destroy(region);

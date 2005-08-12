@@ -209,7 +209,7 @@ void barchartWorldToPlane (splotd *sp, datad *d, ggobid *gg)
 {
   barchartSPlotd *bsp = GTK_GGOBI_BARCHART_SPLOT(sp);
 
-  barchart_clean_init(bsp);
+  /*  barchart_clean_init(bsp);*/
   barchart_recalc_counts(bsp, d, gg);
 }
 
