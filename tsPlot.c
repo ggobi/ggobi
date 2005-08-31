@@ -250,7 +250,7 @@ timeSeriesClassInit(GtkGGobiTimeSeriesDisplayClass *klass)
     klass->parent_class.display_set = tsplotDisplaySet;
     klass->parent_class.varpanel_refresh = tsplotVarpanelRefresh;
 
-    klass->parent_class.handles_action = tsplotHandlesAction;
+    klass->parent_class.handles_interaction = tsplotHandlesInteraction;
 
     klass->parent_class.xml_describe = add_xml_tsplot_variables;
 
@@ -258,12 +258,12 @@ timeSeriesClassInit(GtkGGobiTimeSeriesDisplayClass *klass)
     klass->parent_class.plotted_vars_get = tsplotPlottedColsGet;
 
 
-    klass->parent_class.viewmode_control_box = tsplotCPanelWidget;
+    klass->parent_class.imode_control_box = tsplotCPanelWidget;
     klass->parent_class.menus_make = tsplotMenusMake;
 
     klass->parent_class.event_handlers_toggle = tsplotEventHandlersToggle;
 
-    klass->parent_class.splot_key_event_handler = tsplotSPlotKeyEventHandler;
+    klass->parent_class.splot_key_event_handled = tsplotKeyEventHandled;
 
 
     klass->parent_class.add_plot_labels = NULL; 

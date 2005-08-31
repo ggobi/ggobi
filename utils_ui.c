@@ -22,9 +22,10 @@
 
 GtkWidget *
 CreateMenuItemWithCheck (GtkWidget *menu,
-			 gchar *szName, gchar *szAccel, gchar *szTip,
-			 GtkWidget *win_main, GtkAccelGroup *accel_group,
-			 GtkSignalFunc func, gpointer data, ggobid *gg, gboolean check);
+ gchar *szName, gchar *szAccel, gchar *szTip,
+ GtkWidget *win_main, GtkAccelGroup *accel_group,
+ GtkSignalFunc func, gpointer data, ggobid *gg,
+ GSList *radiogroup, gboolean check);
 
 /*
  * Taken from 'Developing Linux Applications with GTK+ and GDK'
@@ -51,27 +52,28 @@ CreateMenuItem (GtkWidget *menu,
   GtkWidget *win_main, GtkAccelGroup *accel_group,
   GtkSignalFunc func, gpointer data, ggobid *gg)
 {
-    return(CreateMenuItemWithCheck(menu, szName, szAccel, szTip,
-				   win_main, accel_group, func, data, gg, false));
+  return(CreateMenuItemWithCheck(menu, szName, szAccel, szTip,
+    win_main, accel_group, func, data, gg, NULL, false));
 }
 
 GtkWidget *
 CreateMenuItemWithCheck (GtkWidget *menu,
   gchar *szName, gchar *szAccel, gchar *szTip,
   GtkWidget *win_main, GtkAccelGroup *accel_group,
-  GtkSignalFunc func, gpointer data, ggobid *gg, gboolean check)
+  GtkSignalFunc func, gpointer data, ggobid *gg, 
+  GSList *RadioGroup, gboolean check)
 {
   GtkWidget *menuitem;
 
-  if(check && gg->viewModeRadioGroup == NULL) {
-     menuitem = gtk_radio_menu_item_new(gg->viewModeRadioGroup);
+  if(check && RadioGroup == NULL) {
+     menuitem = gtk_radio_menu_item_new(RadioGroup);
      gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(menuitem), TRUE);
-     gg->viewModeRadioGroup = gtk_radio_menu_item_group (GTK_RADIO_MENU_ITEM (menuitem));
+     RadioGroup = gtk_radio_menu_item_group (GTK_RADIO_MENU_ITEM (menuitem));
   }
 
   /* --- If there's a name, create the item and add the signal handler --- */
   if (szName && strlen (szName)) {
-    menuitem = check ? gtk_radio_menu_item_new_with_label(gg->viewModeRadioGroup, szName) : gtk_menu_item_new_with_label (szName);
+    menuitem = check ? gtk_radio_menu_item_new_with_label(RadioGroup, szName) : gtk_menu_item_new_with_label (szName);
     if(func)
       gtk_signal_connect (GTK_OBJECT (menuitem), "activate",
 			  GTK_SIGNAL_FUNC (func), data);
@@ -80,22 +82,16 @@ CreateMenuItemWithCheck (GtkWidget *menu,
 
   } else {
     /* --- Create a separator --- */
-    menuitem = check ? gtk_radio_menu_item_new(gg->viewModeRadioGroup) : gtk_menu_item_new ();
+    menuitem = check ? gtk_radio_menu_item_new(RadioGroup) : gtk_menu_item_new ();
   }
 
+
   if(check)
-     gg->viewModeRadioGroup = gtk_radio_menu_item_group (GTK_RADIO_MENU_ITEM (menuitem));
+     RadioGroup = gtk_radio_menu_item_group (GTK_RADIO_MENU_ITEM (menuitem));
 
   /* --- Add menu item to the menu and show it. --- */
   gtk_menu_append (GTK_MENU (menu), menuitem);
   gtk_widget_show (menuitem);
-
-  if (szName && szAccel && accel_group == NULL) {
-/*
-    accel_group = gtk_accel_group_new ();
-    gtk_accel_group_attach (accel_group, GTK_OBJECT (win_main));
-*/
-  }
 
   /* --- If there was an accelerator --- */
   if (szAccel && accel_group) {
@@ -103,6 +99,9 @@ CreateMenuItemWithCheck (GtkWidget *menu,
       gtk_widget_add_accelerator (menuitem, "activate", accel_group,
         szAccel[1], GDK_CONTROL_MASK,
         GTK_ACCEL_VISIBLE);
+      /* How can I find out if there's an item already using this
+	 signal?  Sheesh, nothing seems to work. */
+
     } else {                  /* alt-keypress */
       gtk_widget_add_accelerator (menuitem, "activate", accel_group,
         szAccel[0], GDK_MOD1_MASK,
@@ -304,10 +303,13 @@ submenu_append (GtkWidget *item, GtkWidget * mbar) {
 
 void
 submenu_destroy (GtkWidget *item)
-{
-  if (item != NULL) {
-    gtk_menu_item_remove_submenu (GTK_MENU_ITEM (item));
-    gtk_widget_hide (item);
+{ 
+  if (item != NULL && GTK_IS_WIDGET(item)) {
+    if (GTK_IS_MENU_ITEM(item)) {
+      GtkMenuItem *menu_item = GTK_MENU_ITEM (item);
+      if (menu_item->submenu)
+        gtk_widget_destroy (menu_item->submenu);
+    }
     gtk_widget_destroy (item);
   }
 }

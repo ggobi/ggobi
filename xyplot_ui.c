@@ -118,14 +118,20 @@ xyplot_event_handlers_toggle (splotd *sp, gboolean state) {
 
 void
 cpanel_xyplot_make (ggobid *gg) {
+  modepaneld *panel;
   GtkWidget *frame, *vb, *cycle_tgl, *chdir_btn, *cycle_sbar, *opt;
 
-  gg->control_panel[XYPLOT] = gtk_vbox_new (false, VBOX_SPACING);
-  gtk_container_set_border_width (GTK_CONTAINER (gg->control_panel[XYPLOT]), 5);
+  /* Make a panel, and add it to the GList gg->control_panels. */
+
+  panel = (modepaneld *) g_malloc(sizeof(modepaneld));
+  gg->control_panels = g_list_append(gg->control_panels, (gpointer) panel);
+  panel->name = g_strdup(GGOBI(getPModeName)(XYPLOT));
+  panel->w = gtk_vbox_new (false, VBOX_SPACING);
+  gtk_container_set_border_width (GTK_CONTAINER (panel->w), 5);
 
   frame = gtk_frame_new ("Plot cycling");
   gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[XYPLOT]), frame,
+  gtk_box_pack_start (GTK_BOX (panel->w), frame,
     false, false, 3);
 
   vb = gtk_vbox_new (false, VBOX_SPACING);
@@ -181,7 +187,8 @@ cpanel_xyplot_make (ggobid *gg) {
   gtk_signal_connect (GTK_OBJECT (chdir_btn), "clicked",
                       GTK_SIGNAL_FUNC (chdir_cb), gg);
 
-  gtk_widget_show_all (gg->control_panel[XYPLOT]);
+
+  gtk_widget_show_all (panel->w);
 }
 
 /*--------------------------------------------------------------------*/
@@ -205,17 +212,23 @@ cpanel_xyplot_set (displayd *display, cpaneld *cpanel, ggobid* gg)
  * which may have different xyplot cycling options and parameters selected
 */
 {
-  GtkWidget *w;
+  GtkWidget *pnl, *w;
 
-  /*-- Cycling on or off --*/
-  w = widget_find_by_name (gg->control_panel[XYPLOT], "XYPLOT:cycle_toggle");
-  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(w), cpanel->xyplot.cycle_p);
+  pnl = (GtkWidget *) mode_panel_get_by_name(GGOBI(getPModeName)(XYPLOT), gg);
 
-  /*-- Cycling speed --*/
-  gtk_adjustment_set_value (GTK_ADJUSTMENT (gg->xyplot.cycle_delay_adj),
-    -1 * (gfloat) cpanel->xyplot.cycle_delay);
+  if (pnl) {
 
-  /*-- Cycling axis --*/
-  w = widget_find_by_name (gg->control_panel[XYPLOT], "XYPLOT:cycle_axis");
-  gtk_option_menu_set_history (GTK_OPTION_MENU(w), cpanel->xyplot.cycle_axis);
+    /*-- Cycling on or off --*/
+    w = widget_find_by_name (pnl, "XYPLOT:cycle_toggle");
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(w), 
+      cpanel->xyplot.cycle_p);
+
+    /*-- Cycling speed --*/
+    gtk_adjustment_set_value (GTK_ADJUSTMENT (gg->xyplot.cycle_delay_adj),
+      -1 * (gfloat) cpanel->xyplot.cycle_delay);
+
+    /*-- Cycling axis --*/
+    w = widget_find_by_name (pnl, "XYPLOT:cycle_axis");
+    gtk_option_menu_set_history (GTK_OPTION_MENU(w), cpanel->xyplot.cycle_axis);
+  }
 }

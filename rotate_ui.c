@@ -165,11 +165,15 @@ rotation_menus_make (ggobid *gg) {
 
 void
 cpanel_rotation_make (ggobid *gg) {
+  modepaneld *panel;
   GtkWidget *btn, *sbar, *box;
   GtkObject *adj;
   
-  gg->control_panel[ROTATE] = gtk_vbox_new (false, VBOX_SPACING);
-  gtk_container_set_border_width (GTK_CONTAINER (gg->control_panel[ROTATE]), 5);
+  panel = (modepaneld *) g_malloc(sizeof(modepaneld));
+  g_list_append(gg->control_panels, (gpointer) panel);
+  panel->name = g_strdup("Rotation");
+  panel->w = gtk_vbox_new (false, VBOX_SPACING);
+  gtk_container_set_border_width (GTK_CONTAINER (panel->w), 5);
 
 /*
  * speed scrollbar
@@ -187,7 +191,7 @@ cpanel_rotation_make (ggobid *gg) {
     "Adjust speed of rotation", NULL);
   scale_set_default_values (GTK_SCALE (sbar));
 
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[ROTATE]), sbar,
+  gtk_box_pack_start (GTK_BOX (panel->w), sbar,
     false, false, 1);
 
 /*
@@ -209,7 +213,7 @@ cpanel_rotation_make (ggobid *gg) {
                      GTK_SIGNAL_FUNC (reinit_cb), (gpointer) NULL);
   gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
 
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[ROTATE]), box, false, false, 1);
+  gtk_box_pack_start (GTK_BOX (panel->w), box, false, false, 1);
 
 /*
  * Button to change direction
@@ -217,7 +221,7 @@ cpanel_rotation_make (ggobid *gg) {
   btn = gtk_button_new_with_label ("Change direction");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Change direction of rotation", NULL);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[ROTATE]), btn, false, false, 1);
+  gtk_box_pack_start (GTK_BOX (panel->w), btn, false, false, 1);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (chdir_cb), gg);
 
@@ -228,7 +232,7 @@ cpanel_rotation_make (ggobid *gg) {
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), ro_type_opt,
     "Rotate freely, rock locally, or interpolate between two orthogonal projections",
     NULL);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[ROTATE]),
+  gtk_box_pack_start (GTK_BOX (panel->w),
                       ro_type_opt, false, false, 0);
   populate_option_menu (ro_type_opt, type_lbl,
                         sizeof (type_lbl) / sizeof (gchar *),
@@ -240,12 +244,12 @@ cpanel_rotation_make (ggobid *gg) {
   ro_axis_opt = gtk_option_menu_new ();
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), ro_axis_opt,
     "Choose axis of rotation",   NULL);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[ROTATE]),
+  gtk_box_pack_start (GTK_BOX (panel->w),
                       ro_axis_opt, false, false, 0);
   populate_option_menu (ro_axis_opt, axis_lbl,
                         sizeof (axis_lbl) / sizeof (gchar *),
                         (GtkSignalFunc) axis_cb, gg);
-  gtk_widget_show_all (gg->control_panel[ROTATE]);
+  gtk_widget_show_all (panel->w);
 }
 
 /*--------------------------------------------------------------------*/

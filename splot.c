@@ -67,7 +67,7 @@ splot_configure_cb (GtkWidget *w, GdkEventConfigure *event, splotd *sp)
   sp->pixmap1 = gdk_pixmap_new (w->window,
     w->allocation.width, w->allocation.height, -1);
 
-  if (cpanel->viewmode == BRUSH) {
+  if (cpanel->imode == BRUSH) {
     sp->brush_pos.x1 = (gint) ((gfloat) sp->brush_pos.x1 *
       (gfloat) (w->allocation.width) / (gfloat) (sp->max.x));
     sp->brush_pos.x2 = (gint) ((gfloat) sp->brush_pos.x2 *
@@ -84,7 +84,7 @@ splot_configure_cb (GtkWidget *w, GdkEventConfigure *event, splotd *sp)
 
   splot_plane_to_screen (display, cpanel, sp, gg);
 
-  if (cpanel->viewmode == BRUSH) {
+  if (cpanel->imode == BRUSH) {
     assign_points_to_bins (d, gg);
   }
 
@@ -119,7 +119,6 @@ splot_event_handled (GtkWidget *w, GdkEventKey *event,
 {
   static guint32 etime = (guint32) 0;
   gboolean common_event = true;
-  gint action = -1;
   displayd *display = (displayd *) sp->displayptr;
 
 /*
@@ -137,182 +136,79 @@ splot_event_handled (GtkWidget *w, GdkEventKey *event,
   if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
     GtkGGobiExtendedDisplayClass *klass;
     klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display));
-    if(klass->splot_key_event_handler) 
-         action = klass->splot_key_event_handler(display, sp, event->keyval);
-  }
-
-  if(action < 0) {
-    switch (event->keyval) {
-    case GDK_0:
-    case GDK_1:
-    case GDK_2:
-    case GDK_3:
-    case GDK_4:
-    case GDK_5:
-    case GDK_6:
-    case GDK_7:
-    case GDK_8:
-    case GDK_9:
-      if (gg->NumberedKeyEventHandler != NULL &&
-          gg->NumberedKeyEventHandler->handlerRoutine)
-      {
-        (gg->NumberedKeyEventHandler->handlerRoutine)(event->keyval, w, event,
-           cpanel, sp, gg, gg->NumberedKeyEventHandler->userData);
-      }
-    break;
-
-/*
- * I'm not happy about these, since a display type is not a mode.
- * Maybe I'll think of a better way some day.
-*/
-    case GDK_l:
-    case GDK_L:
-      action = PCPLOT;
-    break;
-
-    case GDK_a:
-    case GDK_A:
-      action = SCATMAT;
-    break;
-/* */
-
-    case GDK_d:
-    case GDK_D:
-      action = P1PLOT;
-    break;
-    case GDK_x:
-    case GDK_X:
-      action = XYPLOT;
-    break;
-    case GDK_t:
-    case GDK_T:
-      action = TOUR1D;
-    break;
-    case GDK_r:
-    case GDK_R:
-      action = TOUR2D3;
-    break;
-    case GDK_g:
-    case GDK_G:
-      action = TOUR2D;
-    break;
-    case GDK_c:
-    case GDK_C:
-      action = COTOUR;
-    break;
-    case GDK_s:
-    case GDK_S:
-      action = SCALE;
-    break;
-    case GDK_b:
-    case GDK_B:
-      action = BRUSH;
-    break;
-    case GDK_i:
-    case GDK_I:
-      action = IDENT;
-    break;
-    case GDK_e:
-    case GDK_E:
-      action = EDGEED;
-    break;
-    case GDK_m:
-    case GDK_M:
-      action = MOVEPTS;
-    break;
-    default:
-      common_event = false;
+    if (klass->splot_key_event_handled) {
+      common_event = klass->splot_key_event_handled(w, display, sp,
+        event, gg);
     }
   }
-
-  if (action >= 0 &&
-      display_type_handles_action (display, (PipelineMode) action))
-  {
-    etime = event->time;
-    GGOBI(full_viewmode_set)((PipelineMode) action, gg);
-  }
+  etime = event->time;
 
   return common_event;
 }
 
 
 void
-sp_event_handlers_toggle (splotd *sp, gboolean state) 
+sp_event_handlers_toggle (splotd *sp, gboolean state, ProjectionMode pmode, InteractionMode imode) 
 {
   displayd *display = (displayd *) sp->displayptr;
-  gint m = display->cpanel.viewmode;
 
+  /* scatmat and parcoords are handling everything now and returning
+     false; ts and barchart are handling their own and then returning
+     to the switch statement; scatterplot doesn't have one of these
+     routines yet.  dfs 8/31/2005
+ */
   if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
     GtkGGobiExtendedDisplayClass *klass;
     klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display));
-    if(klass->event_handlers_toggle && klass->event_handlers_toggle(display, sp, state, m) == false) {
+    if(klass->event_handlers_toggle && klass->event_handlers_toggle(display, sp, state, pmode, imode) == false) {
       return;
     }
   }
 
-  switch (m) {
+  switch (imode) {
+  case DEFAULT_IMODE:
+  switch (pmode) {
     case P1PLOT:
       p1d_event_handlers_toggle (sp, state);
     break;
-
     case XYPLOT:
       xyplot_event_handlers_toggle (sp, state);
     break;
-
-    case SCALE:
-      scale_event_handlers_toggle (sp, state);
-    break;
-
     case TOUR1D:
       tour1d_event_handlers_toggle (sp, state);
     break;
-
     case TOUR2D3:
       tour2d3_event_handlers_toggle (sp, state);
     break;
-
     case TOUR2D:
       tour2d_event_handlers_toggle (sp, state);
     break;
-
     case COTOUR:
       ctour_event_handlers_toggle (sp, state);
     break;
-
-    case BRUSH:
-      brush_event_handlers_toggle (sp, state);
-    break;
-
-    case IDENT:
-      identify_event_handlers_toggle (sp, state);
-    break;
-
-    case EDGEED:
-      edgeedit_event_handlers_toggle (sp, state);
-    break;
-
-    case MOVEPTS:
-      movepts_event_handlers_toggle (sp, state);
-    break;
-
-    case SCATMAT:
-      switch (sp->p1dvar) {
-        case -1:
-          xyplot_event_handlers_toggle (sp, state);
-        break;
-        default:
-          p1d_event_handlers_toggle (sp, state);
-      }
-    break;
-
-    case PCPLOT:
-      p1d_event_handlers_toggle (sp, state);
-    break;
-
-
     default:
-      break;
+    break;
   }
+  break;
+  case SCALE:
+      scale_event_handlers_toggle (sp, state);
+  break;
+  case BRUSH:
+      brush_event_handlers_toggle (sp, state);
+  break;
+  case IDENT:
+      identify_event_handlers_toggle (sp, state);
+  break;
+  case EDGEED:
+      edgeedit_event_handlers_toggle (sp, state);
+  break;
+  case MOVEPTS:
+      movepts_event_handlers_toggle (sp, state);
+  break;
+  default:
+  break;
+  }
+
 }
 
 void
@@ -324,8 +220,8 @@ splot_set_current (splotd *sp, gboolean state, ggobid *gg) {
     displayd *display = (displayd *) sp->displayptr;
     cpaneld *cpanel = &display->cpanel;
 
-    sp_event_handlers_toggle (sp, state);
-    viewmode_activate (sp, cpanel->viewmode, state, gg);
+    sp_event_handlers_toggle (sp, state, cpanel->pmode, cpanel->imode);
+    imode_activate (sp, cpanel->pmode, cpanel->imode, state, gg);
 
     /*
      * this is now the only place varpanel_refresh is called in
@@ -345,7 +241,8 @@ GGOBI(splot_set_current_full)(displayd *display, splotd *sp, ggobid *gg)
   /*-- display and cpanel for outgoing current_splot --*/
   displayd *display_prev = NULL;
   cpaneld *cpanel = NULL;
-  PipelineMode prev_viewmode = gg->viewmode;
+  ProjectionMode pmode_prev = gg->pmode;
+  InteractionMode imode_prev = gg->imode;
 
   if (sp != sp_prev) {
     if (sp_prev != NULL) {
@@ -375,7 +272,7 @@ GGOBI(splot_set_current_full)(displayd *display, splotd *sp, ggobid *gg)
     gg->current_splot = sp->displayptr->current_splot = sp;
     splot_set_current (sp, on, gg);
 
-    viewmode_submenus_update (prev_viewmode, display_prev, gg);
+    main_miscmenus_update (pmode_prev, imode_prev, display_prev, gg);
 
     /*
      * if the previous splot is in transient brushing mode, a FULL
@@ -385,11 +282,12 @@ GGOBI(splot_set_current_full)(displayd *display, splotd *sp, ggobid *gg)
      *
      * otherwise, just redraw the borders of the two affected splots
     */
-    if (prev_viewmode == NULLMODE || cpanel == NULL)
+    if (imode_prev == NULL_IMODE || cpanel == NULL)
       displays_plot (NULL, FULL, gg);
-    if (prev_viewmode == BRUSH && cpanel->br.mode == BR_TRANSIENT)
+
+    if (imode_prev == BRUSH && cpanel->br.mode == BR_TRANSIENT)
       displays_plot (NULL, FULL, gg);
-    else if (prev_viewmode == IDENT)
+    else if (imode_prev == IDENT)
       displays_plot (NULL, QUICK, gg);
     else {
       /* remove border from the previous splot */
@@ -728,6 +626,7 @@ splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp,
  * in lineedit.c.  I just have to make sure the results are
  * consistent. -- dfs
 */
+/*
 void
 splot_screen_to_tform (cpaneld *cpanel, splotd *sp, icoords *scr,
   fcoords *tfd, ggobid *gg)
@@ -740,13 +639,12 @@ splot_screen_to_tform (cpaneld *cpanel, splotd *sp, icoords *scr,
   gfloat scale_x, scale_y;
   vartabled *vt, *vtx, *vty;
 
-  g_return_if_fail (cpanel->projection == XYPLOT ||
-                    cpanel->projection == P1PLOT ||
-                    cpanel->projection == TOUR1D ||
-                    cpanel->projection == TOUR2D3 ||
-                    cpanel->projection == TOUR2D ||
-                    cpanel->projection == COTOUR);
-
+  g_return_if_fail (cpanel->pmode == XYPLOT ||
+                    cpanel->pmode == P1PLOT ||
+                    cpanel->pmode == TOUR1D ||
+                    cpanel->pmode == TOUR2D3 ||
+                    cpanel->pmode == TOUR2D ||
+                    cpanel->pmode == COTOUR);
 
   scale_x = sp->scale.x;
   scale_y = sp->scale.y;
@@ -755,19 +653,19 @@ splot_screen_to_tform (cpaneld *cpanel, splotd *sp, icoords *scr,
   scale_y /= 2;
   sp->iscale.y = -1 * (greal) sp->max.y * scale_y;
 
-/*
+*
  * screen to plane 
-*/
+*
   planar.x = (scr->x - sp->max.x/2) * precis / sp->iscale.x ;
   planar.x += sp->pmid.x;
   planar.y = (scr->y - sp->max.y/2) * precis / sp->iscale.y ;
   planar.y += sp->pmid.y;
 
-/*
+*
  * plane to world
-*/
+*
 
-  switch (cpanel->projection) {
+  switch (cpanel->pmode) {
     case P1PLOT:
       vt = vartable_element_get (sp->p1dvar, d);
       max = vt->lim.max;
@@ -775,13 +673,11 @@ splot_screen_to_tform (cpaneld *cpanel, splotd *sp, icoords *scr,
       rdiff = max - min;
 
       if (display->p1d_orientation == HORIZONTAL) {
-        /* x */
         world.x = planar.x;
         ftmp = world.x / precis;
         tfd->x = (ftmp + 1.0) * .5 * rdiff;
         tfd->x += min;
       } else {
-        /* y */
         world.y = planar.y;
         ftmp = world.y / precis;
         tfd->y = (ftmp + 1.0) * .5 * rdiff;
@@ -790,7 +686,6 @@ splot_screen_to_tform (cpaneld *cpanel, splotd *sp, icoords *scr,
     break;
 
     case XYPLOT:
-      /* x */
       vtx = vartable_element_get (sp->xyvars.x, d);
       max = vtx->lim.max;
       min = vtx->lim.min;
@@ -800,7 +695,6 @@ splot_screen_to_tform (cpaneld *cpanel, splotd *sp, icoords *scr,
       tfd->x = (ftmp + 1.0) * .5 * rdiff;
       tfd->x += min;
 
-      /* y */
       vty = vartable_element_get (sp->xyvars.y, d);
       max = vty->lim.max;
       min = vty->lim.min;
@@ -811,14 +705,11 @@ splot_screen_to_tform (cpaneld *cpanel, splotd *sp, icoords *scr,
       tfd->y += min;
     break;
 
-    case TOUR1D:
-    case TOUR2D3:
-    case TOUR2D:
-    case COTOUR:
     default:
     break;
   }
 }
+*/
 
 /*
  * The remainder of the reverse pipeline routines operate on
@@ -869,7 +760,7 @@ splot_plane_to_world (splotd *sp, gint ipt, ggobid *gg)
   cpaneld *cpanel = &display->cpanel;
   datad *d = display->d;
 
-  switch (cpanel->projection) {
+  switch (cpanel->pmode) {
     case P1PLOT:
       if (display->p1d_orientation == VERTICAL)
         d->world.vals[ipt][sp->p1dvar] = (greal) sp->planar[ipt].y;

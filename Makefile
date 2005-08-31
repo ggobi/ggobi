@@ -24,7 +24,8 @@ LD=$(CXX)
 LD=$(CC)
 
 
-CFLAGS+= -g -g2 -Wall -fPIC -DHAVE_GGOBI_CONFIG_H -DPARCOORDS_DRAG_AND_DROP=1  $(EXTRA_CFLAGS)
+#CFLAGS+= -g -g2 -Wall -fPIC -DHAVE_GGOBI_CONFIG_H -DPARCOORDS_DRAG_AND_DROP=1  $(EXTRA_CFLAGS)
+CFLAGS+= -g -g2 -Wall -fPIC -DHAVE_GGOBI_CONFIG_H $(EXTRA_CFLAGS)
 #CFLAGS= -g -w -DHAVE_CONFIG_H # when using Irix cc, suppress warnings
 CXXFLAGS=$(CFLAGS)
 
@@ -115,8 +116,9 @@ SRC=\
  limits.c lineedit.c lineedit_ui.c \
  main_ui.c make_ggobi.c menus.c missing.c \
  movepts.c movepts_ui.c noop-toggle.c \
+ parcoords.c parcoords_ui.c parcoordsClass.c \
  p1d.c p1d_ui.c \
- parcoords.c parcoords_ui.c parcoordsClass.c pipeline.c plugin.c \
+ pipeline.c plugin.c \
  ppcorr_ui.c \
  read_array.c read_color.c read_data.c read_init.c read_xml.c \
  read_excel.c rb.c \
@@ -125,7 +127,8 @@ SRC=\
  scatterplot.c scatterplot_ui.c scatterplotClass.c \
  smooth_ui.c sphere.c sphere_ui.c splash.c \
  splot.c sp_plot.c sp_plot_axes.c sp_plot_edges.c subset.c subset_ui.c svd.c \
- texture.c timeplot.c time_ui.c tsdisplay.c tsPlot.c \
+ texture.c \
+ timeplot.c time_ui.c tsdisplay.c tsPlot.c \
  tour1d.c tour1d_pp.c tour1d_pp_ui.c tour1d_ui.c tour_pp.c\
  tour2d.c tour2d_ui.c tour2d_pp.c tour2d_pp_ui.c \
  tour2d3.c tour2d3_ui.c \

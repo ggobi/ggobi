@@ -473,16 +473,20 @@ edgeedit_event_handlers_toggle (splotd *sp, gboolean state) {
 
 void
 cpanel_edgeedit_make (ggobid *gg) {
+  modepaneld *panel;
   GtkWidget *hb, *radio1, *radio2;
   GSList *group;
   
-  gg->control_panel[EDGEED] = gtk_vbox_new (false, VBOX_SPACING);
-  gtk_container_set_border_width (GTK_CONTAINER (gg->control_panel[EDGEED]), 5);
+  panel = (modepaneld *) g_malloc(sizeof(modepaneld));
+  gg->control_panels = g_list_append(gg->control_panels, (gpointer) panel);
+  panel->name = g_strdup(GGOBI(getIModeName)(EDGEED));
+  panel->w = gtk_vbox_new (false, VBOX_SPACING);
+  gtk_container_set_border_width (GTK_CONTAINER (panel->w), 5);
 
  /*-- Radio group in a box: add edges or points buttons --*/
   hb = gtk_vbox_new (true, 1);
   gtk_container_set_border_width (GTK_CONTAINER (hb), 3);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[EDGEED]), hb, false, false, 0);
+  gtk_box_pack_start (GTK_BOX (panel->w), hb, false, false, 0);
 
   radio1 = gtk_radio_button_new_with_label (NULL, "Add edges");
   gtk_widget_set_name (radio1, "EDGEEDIT:add_edges_radio_button");
@@ -508,13 +512,13 @@ cpanel_edgeedit_make (ggobid *gg) {
   btn = gtk_button_new_with_label ("Undo");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Undo last action", NULL);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[EDGEED]),
+  gtk_box_pack_start (GTK_BOX (panel->w),
                       btn, false, false, 1);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (undo_last_cb), NULL);
   */		      
 
-  gtk_widget_show_all (gg->control_panel[EDGEED]);
+  gtk_widget_show_all (panel->w);
 }
 
 /*--------------------------------------------------------------------*/
@@ -530,15 +534,14 @@ cpanel_edgeedit_init (cpaneld *cpanel, ggobid *gg)
 void
 cpanel_edgeedit_set (displayd *display, cpaneld *cpanel, ggobid *gg) {
   GtkWidget *w;
+  GtkWidget *panel = mode_panel_get_by_name(GGOBI(getIModeName)(EDGEED), gg);
 
   /*-- set the Drag or Click radio buttons --*/
   if (cpanel->ee_mode == ADDING_EDGES) {
-    w = widget_find_by_name (gg->control_panel[EDGEED],
-                             "EDGEEDIT:add_edges_radio_button");
+    w = widget_find_by_name (panel, "EDGEEDIT:add_edges_radio_button");
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(w), true);
   } else {
-    w = widget_find_by_name (gg->control_panel[EDGEED],
-                             "EDGEEDIT:add_points_radio_button");
+    w = widget_find_by_name (panel, "EDGEEDIT:add_points_radio_button");
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(w), true);
   }
 }

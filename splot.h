@@ -182,7 +182,8 @@ typedef struct
 
    gboolean (*redraw)(splotd *, datad *, ggobid *, gboolean binned);
 
-   void (*world_to_plane)(splotd *, datad *, ggobid *);
+  void (*screen_to_tform)(cpaneld *, splotd *, icoords *, fcoords *, ggobid *);
+  void (*world_to_plane)(splotd *, datad *, ggobid *);
 
 	/** Convenience to be called within the standard loop */
    void (*sub_plane_to_screen)(splotd *sp, displayd *dpy, datad *d, ggobid *gg);

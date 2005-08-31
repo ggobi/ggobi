@@ -28,37 +28,34 @@
 extern "C" {
 #endif
 
+GtkWidget * mode_panel_get_by_name(const gchar *, ggobid *);
+InteractionMode imode_get(ggobid *);
+ProjectionMode pmode_get(ggobid *);
+void pmode_set_cb (GtkWidget *widget, gint action);
+void imode_set_cb (GtkWidget *widget, gint action);
+void main_miscmenus_update (ProjectionMode, InteractionMode, displayd *, ggobid *gg);
+void viewmode_set(ProjectionMode, InteractionMode, ggobid *);
+gint GGOBI(full_viewmode_set)(ProjectionMode, InteractionMode, ggobid*);
+
 RedrawStyle brush_activate (gboolean, displayd *, ggobid *);
 RedrawStyle edgeedit_activate (gboolean state, displayd *display, ggobid *gg);
 RedrawStyle identify_activate (gint, displayd *, ggobid *);
 RedrawStyle p1d_activate (gint, displayd *, ggobid *);
-RedrawStyle viewmode_activate (splotd *, PipelineMode, gboolean, ggobid *);
+RedrawStyle imode_activate (splotd *, ProjectionMode, InteractionMode, gboolean, ggobid *);
 RedrawStyle xyplot_activate (gint, displayd *, ggobid *);
+
 
 /* reverse pipeline */
 void pt_screen_to_plane (icoords *screen, gint id, gboolean horiz, gboolean vert, gcoords *eps, gcoords *planar, splotd *sp);
 void pt_plane_to_world (splotd *sp, gcoords *planar, gcoords *eps, greal *world);
 void pt_world_to_raw_by_var (gint j, greal *world, greal *raw, datad *d);
 
-/*-- this is the one that's used for axes and by the barchart --*/
-void splot_screen_to_tform (cpaneld *, splotd *, icoords *, fcoords *, ggobid *);
-/*-- these aren't used, but the classes think they are .. or are they? --*/
-/*
-void world_to_raw_by_var (gint pt, gint j, displayd *display, datad *d, ggobid *gg);
-void world_to_raw (gint, splotd *, datad *, ggobid *);
-*/
-
-/* no longer used
-void splot_plane_to_world (splotd *, gint, ggobid *);
-void splot_reverse_pipeline (splotd *, gint, gcoords *, gboolean, gboolean, ggobid *);
-*/
-
 /* sort -t":" -k1.12 */
 gboolean   array_contains (gint* arr, gint n, gint el);
 void       edgeedit_init (ggobid * gg);
 GtkWidget* CreateMenuCheck (GtkWidget *, gchar *, GtkSignalFunc, gpointer, gboolean, ggobid *);
 GtkWidget* CreateMenuItem (GtkWidget *, gchar *, gchar *, gchar *, GtkWidget *, GtkAccelGroup *, GtkSignalFunc, gpointer, ggobid *) ;
-GtkWidget* CreateMenuItemWithCheck (GtkWidget *, gchar *, gchar *, gchar *, GtkWidget *, GtkAccelGroup *, GtkSignalFunc, gpointer, ggobid *, gboolean check) ;
+GtkWidget* CreateMenuItemWithCheck (GtkWidget *, gchar *, gchar *, gchar *, GtkWidget *, GtkAccelGroup *, GtkSignalFunc, gpointer, ggobid *, GSList *, gboolean check) ;
 ggobid*    GGobiFromDisplay (displayd *display);
 ggobid*    GGobiFromSPlot (splotd *sp);
 ggobid*    GGobiFromWidget (GtkWidget *w, gboolean);
@@ -185,7 +182,7 @@ void       cpanel_scale_init (cpaneld *, ggobid *);
 void       cpanel_scale_make (ggobid *);
 void       cpanel_scale_set (displayd *, cpaneld *, ggobid *);
 void       cpanel_scatmat_init (cpaneld *, ggobid *);
-void       cpanel_scatmat_make (ggobid *);
+GtkWidget *cpanel_scatmat_make (ggobid *);
 void       cpanel_scatmat_set (displayd *, cpaneld *, ggobid *);
 void       cpanel_set (displayd *, ggobid *);
 void       cpanel_show_cb (GtkCheckMenuItem *w, guint action);
@@ -251,7 +248,9 @@ void       display_tour2d_init (displayd *dsp, ggobid *gg);
 void       display_tour2d_init_null (displayd *dsp, ggobid *gg);
 void       display_tourcorr_init (displayd *dsp, ggobid *gg);
 void       display_tourcorr_init_null (displayd *dsp, ggobid *gg);
-gboolean   display_type_handles_action (displayd *, PipelineMode m);
+gboolean   display_type_handles_projection (displayd *, ProjectionMode);
+gboolean     display_type_handles_interaction (displayd *, InteractionMode);
+
 void       display_window_init (windowDisplayd *, gint, ggobid *);
 void       display_write_svg (ggobid *);
 void       displays_plot (splotd *, RedrawStyle, ggobid *);
@@ -262,8 +261,10 @@ void       do_last_increment (vector_f, vector_f, gfloat, gint);
 void       draw_3drectangle (GtkWidget *w, GdkDrawable *drawable, gint x, gint y, gint width, gint height, ggobid *gg);
 void       draw_glyph (GdkDrawable *, glyphd *, icoords *, gint, ggobid *);
 gint       dsvd (gdouble **a, gint m, gint n, gfloat *w, gdouble **v);
-PipelineMode projection_get (ggobid *);
-PipelineMode viewmode_get (ggobid *);
+
+ProjectionMode pmode_get (ggobid *);
+InteractionMode imode_get (ggobid *);
+
 gboolean   edge_add (gint, gint, gchar *, gchar *, datad *, datad *, ggobid *);
 gboolean   edge_endpoints_get (gint k, gint *a, gint *b, datad *d, endpointsd *endpoints, datad *e);
 void       edgeedit_event_handlers_toggle (splotd *, gboolean);
@@ -358,7 +359,9 @@ void       pan_by_drag (splotd *, ggobid *);
 void       pan_step (splotd *, gint, ggobid *);
 void       pan_step_key (splotd *sp, guint keyval, ggobid *gg);
 void       parcoords_cpanel_init (cpaneld*, ggobid *);
-void       parcoords_mode_menu_make (GtkAccelGroup *, GtkSignalFunc, ggobid *, gboolean);
+GtkWidget *parcoords_pmode_menu_make (GtkAccelGroup *, GtkSignalFunc, ggobid *, gboolean);
+GtkWidget *parcoords_imode_menu_make (GtkAccelGroup *, GtkSignalFunc, ggobid *, gboolean);
+
 displayd*  parcoords_new_with_vars (gboolean, gint, gint *, datad *, ggobid *);
 displayd*  parcoords_new (displayd *dpy, gboolean, gint, gint *, datad *, ggobid *);
 void       parcoords_reset_arrangement (displayd *, gint, ggobid *);
@@ -380,7 +383,8 @@ gboolean   point_in_which_bin (gint, gint, gint *, gint *, datad *, splotd *);
 void       populate_option_menu (GtkWidget *, gchar **, gint, GtkSignalFunc, gchar *key, gpointer);
 void       position_popup_menu (GtkMenu *menu, gint *px, gint *py, gpointer);
 gboolean   processRestoreFile(const gchar * const fileName, ggobid *gg);
-void       procs_activate (gboolean state, displayd *display, ggobid *gg);
+void       procs_activate(gboolean state, ProjectionMode pmode, displayd *display, ggobid *gg);
+gboolean   projection_ok (ProjectionMode m, displayd *display);
 void       quick_message (const gchar * const, gboolean);
 void       quit_ggobi(ggobid *gg, gint action, GtkWidget *w);
 gdouble    randvalue (void);
@@ -407,14 +411,19 @@ void       scale_event_handlers_toggle (splotd *, gboolean);
 void       scale_set_default_values (GtkScale *scale);
 void       scaling_visual_cues_draw (splotd *, GdkDrawable *, ggobid *);
 void       scatmat_cpanel_init (cpaneld *, ggobid *);
-void       scatmat_mode_menu_make (GtkAccelGroup *, GtkSignalFunc, ggobid *gg, gboolean);
+GtkWidget *scatmat_imode_menu_make (GtkAccelGroup *, GtkSignalFunc, ggobid *gg, gboolean);
 displayd*  scatmat_new (displayd *, gboolean, gint, gint *, gint, gint *, datad *, ggobid *);
 gboolean   scatmat_varsel (GtkWidget *, cpaneld *, splotd *, gint, gint, gint *, gint, gboolean, ggobid *);
 gboolean   scatmat_varsel_simple (cpaneld *, splotd *, gint, gint *, ggobid *);
-void       scatterplot_cpanel_init (cpaneld *, PipelineMode, ggobid *);
+
+void       scatterplot_cpanel_init (cpaneld *, ProjectionMode, InteractionMode, ggobid *); 
+
 void       scatterplot_display_edge_menu_update (displayd *, GtkAccelGroup *accel_group, GtkSignalFunc func, ggobid *gg);
 void       scatterplot_display_menus_make (displayd *display, GtkAccelGroup *, GtkSignalFunc, ggobid *);
 void       scatterplot_mode_menu_make (GtkAccelGroup *, GtkSignalFunc, ggobid *gg, gboolean);
+GtkWidget *scatterplot_pmode_menu_make (GtkAccelGroup *, GtkSignalFunc, ggobid *gg, gboolean);
+GtkWidget *scatterplot_imode_menu_make (GtkAccelGroup *, GtkSignalFunc, ggobid *gg, gboolean);
+
 displayd*  scatterplot_new (gboolean, splotd *sp, datad *d, ggobid *);
 void       scatterplot_show_hrule (displayd *, gboolean show);
 void       scatterplot_show_rulers (displayd *, gint);
@@ -424,7 +433,7 @@ void       scree_plot_make (ggobid *);
 gint       selected_cols_get (gint *, datad *d, ggobid *);
 void       showInputDescription(InputDescription *desc, ggobid *gg);
 void       smooth_window_open (ggobid *);
-void       sp_event_handlers_toggle (splotd *, gboolean);
+void       sp_event_handlers_toggle (splotd *, gboolean, ProjectionMode, InteractionMode);
 void       sp_whiskers_make (splotd *, displayd *, ggobid *);
 void       special_colors_init (ggobid *);
 void       speed_set (gfloat, gfloat *, gfloat *);
@@ -688,9 +697,7 @@ void       vectors_free (vector_s *);
 void       vectors_init_null (vector_s *);
 void       vectors_realloc (vector_s *, gint);
 void       vectors_realloc_zero (vector_s *, gint);
-void       viewmode_set (PipelineMode, ggobid *);
-void       viewmode_set_cb (GtkWidget  *, gint);
-void       viewmode_submenus_update (PipelineMode prev_mode, displayd *, ggobid *);
+
 GtkWidget* widget_find_by_name (GtkWidget *, gchar *);
 void       widget_initialize (GtkWidget *w, gboolean initd);
 gboolean   widget_initialized (GtkWidget *w);
@@ -710,8 +717,9 @@ void       zoom_step (splotd *, gint, gint, rectd *, ggobid*);
 GtkWidget* cpanel_tsplot_make (ggobid *);
 void      cpanel_tsplot_set (displayd *, cpaneld *, GtkWidget *, ggobid *);
 void      tsplot_cpanel_init (cpaneld*, ggobid *);
-void      tsplot_menus_make (ggobid *gg);
-void      tsplot_mode_menu_make (GtkAccelGroup *, GtkSignalFunc, ggobid *gg, gboolean);
+void      tsplot_menus_make (displayd *, ggobid *gg);
+GtkWidget *tsplot_pmode_menu_make (GtkAccelGroup *, GtkSignalFunc, ggobid *gg, gboolean);
+GtkWidget *tsplot_imode_menu_make (GtkAccelGroup *, GtkSignalFunc, ggobid *gg, gboolean);
 displayd* tsplot_new (displayd *, gboolean, gint, gint *, datad *, ggobid *);
 displayd *tsplot_new_with_vars (gboolean missing_p, gint nvars, gint *vars, datad *d, ggobid *gg) ;
 void      tsplot_reset_arrangement (displayd *, gint, ggobid *);
@@ -732,11 +740,12 @@ gboolean barchart_active_paint_points (splotd *sp, datad *, ggobid *);
 void barchart_add_bar_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg);
 void barchart_clean_init (barchartSPlotd *sp);
 void barchart_cpanel_init (cpaneld *, ggobid *);
-void barchart_event_handlers_toggle (splotd *, gboolean state);
+void barchart_event_handlers_toggle (displayd *, splotd *, gboolean state, ProjectionMode, InteractionMode);
 void barchart_free_structure (barchartSPlotd *sp);
 gboolean barchart_identify_bars (icoords mousepos, splotd *sp, datad *d, ggobid *gg);
 void barchart_init_vectors(barchartSPlotd *sp);
-GtkWidget *barchart_mode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func, ggobid *gg, gboolean useIds);
+GtkWidget *barchart_pmode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func, ggobid *gg, gboolean useIds);
+GtkWidget *barchart_imode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func, ggobid *gg, gboolean useIds);
 displayd *barchart_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg);
 void barchart_recalc_counts (barchartSPlotd *sp, datad *d, ggobid *gg);
 void barchart_recalc_dimensions (splotd *sp, datad *d, ggobid *gg);

@@ -16,6 +16,7 @@
 
 #include "scatmatClass.h"
 #include <gtk/gtk.h>
+#include <gdk/gdkkeysyms.h>
 
 #include <math.h>
 #include <string.h>
@@ -167,22 +168,104 @@ add_xml_scatmat_variables(xmlNodePtr node, GList *plots, displayd *dpy)
   }
 }
 
-static void
-displaySet(displayd *display, ggobid *gg)
+gboolean
+scatmatEventHandlersToggle(displayd * dpy, splotd * sp, gboolean state,
+                            ProjectionMode pmode, InteractionMode imode)
 {
-        scatmat_mode_menu_make (gg->main_accel_group,
-          (GtkSignalFunc) viewmode_set_cb, gg, true);
-        gg->viewmode_item = submenu_make ("_ViewMode", 'V',
-          gg->main_accel_group);
-        gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->viewmode_item),
-                                   gg->app.scatmat_mode_menu); 
-        submenu_insert (gg->viewmode_item, gg->main_menubar, 2);
+  switch (imode) {
+  case DEFAULT_IMODE:
+      switch (sp->p1dvar) {
+        case -1:
+          xyplot_event_handlers_toggle (sp, state);
+        break;
+        default:
+          p1d_event_handlers_toggle (sp, state);
+      }
+  break;
+  case SCALE:
+      scale_event_handlers_toggle (sp, state);
+  break;
+  case BRUSH:
+      brush_event_handlers_toggle (sp, state);
+  break;
+  case IDENT:
+      identify_event_handlers_toggle (sp, state);
+  break;
+  default:
+  break;
+  }
+
+  return (false);
 }
 
 static gboolean
-handlesAction(displayd *display, PipelineMode v)
+scatmatKeyEventHandled(GtkWidget *w, displayd *display, splotd * sp, GdkEventKey *event, ggobid *gg)
 {
-   return(v == SCALE || v == BRUSH || v == IDENT || v == MOVEPTS || v == SCATMAT);
+  gboolean ok = true;
+  ProjectionMode pmode = NULL_PMODE;
+  InteractionMode imode = DEFAULT_IMODE;
+
+  switch (event->keyval) {
+    case GDK_h:
+    case GDK_H:
+      pmode = EXTENDED_DISPLAY_PMODE;
+    break;
+
+    case GDK_s:
+    case GDK_S:
+      imode = SCALE;
+    break;
+    case GDK_b:
+    case GDK_B:
+      imode = BRUSH;
+    break;
+    case GDK_i:
+    case GDK_I:
+      imode = IDENT;
+    break;
+
+    default:
+      ok = false;
+    break;
+  }
+
+  if (ok) {
+    GGOBI(full_viewmode_set)(pmode, imode, gg);
+  }
+
+  return ok;
+}
+
+static void
+displaySet(displayd *display, ggobid *gg)
+{
+  GtkWidget *imode_menu;
+
+  imode_menu = scatmat_imode_menu_make (gg->imode_accel_group,
+    (GtkSignalFunc) imode_set_cb, gg, true);
+  gg->imode_item = submenu_make ("_Interaction", 'I',
+    gg->main_accel_group);
+  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->imode_item),
+    imode_menu); 
+  submenu_insert (gg->imode_item, gg->main_menubar, 3);
+}
+
+static gboolean
+handlesInteraction(displayd *display, InteractionMode v)
+{
+  return(v == SCALE || v == BRUSH || v == IDENT || /*v == MOVEPTS ||*/
+          v == DEFAULT_IMODE);
+}
+
+static GtkWidget *
+scatmatCPanelWidget(displayd *dpy, gchar **modeName, ggobid *gg)
+{
+  GtkWidget *w = GTK_GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget;
+  if(!w) {
+   GTK_GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget = w = cpanel_scatmat_make(gg);
+  }
+  *modeName = "Scatterplot Matrix";
+  return(w);
 }
 
 void
@@ -190,7 +273,10 @@ scatmatDisplayClassInit(GtkGGobiScatmatDisplayClass *klass)
 {
 	klass->parent_class.show_edges_p = true;
 	klass->parent_class.treeLabel = klass->parent_class.titleLabel = "Scatterplot Matrix";
+
 	klass->parent_class.cpanel_set = cpanelSet;
+        klass->parent_class.imode_control_box = scatmatCPanelWidget;
+
 	klass->parent_class.xml_describe = add_xml_scatmat_variables;
 	klass->parent_class.move_points_motion_cb = movePointsMotionCb;
 	klass->parent_class.move_points_button_cb = movePointsButtonCb;
@@ -204,7 +290,10 @@ scatmatDisplayClassInit(GtkGGobiScatmatDisplayClass *klass)
 	klass->parent_class.plotted_vars_get = plottedVarsGet;
 	klass->parent_class.createWithVars = createWithVars;
 	klass->parent_class.display_set = displaySet;
-	klass->parent_class.handles_action = handlesAction;
+	klass->parent_class.handles_interaction = handlesInteraction;
+
+  klass->parent_class.event_handlers_toggle = scatmatEventHandlersToggle;
+  klass->parent_class.splot_key_event_handled = scatmatKeyEventHandled;
 }
 
 

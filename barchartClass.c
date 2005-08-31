@@ -24,6 +24,7 @@
 #include <string.h>
 
 #include "externs.h"
+#include <gdk/gdkkeysyms.h>
 
 
  /* Making these available to ggobiClass.c */
@@ -43,25 +44,25 @@ void barchart_recalc_counts(barchartSPlotd * sp, datad * d, ggobid * gg);
 static gboolean barchart_build_symbol_vectors(cpaneld *, datad *, ggobid *);
 static void barchartVarpanelRefresh(displayd * display, splotd * sp,
                                     datad * d);
-static gboolean barchartHandlesAction(displayd * dpy, PipelineMode mode);
+static gboolean barchartHandlesInteraction(displayd * dpy, gint action);
 static void barchartVarpanelTooltipsSet(displayd * dpy, ggobid * gg,
                                         GtkWidget * wx, GtkWidget * wy,
                                         GtkWidget *wz, GtkWidget * label);
 static gint barchartPlottedColsGet(displayd * display, gint * cols,
                                    datad * d, ggobid * gg);
-static GtkWidget *barchartCPanelWidget(displayd * dpy, gint viewmode,
+static GtkWidget *barchartCPanelWidget(displayd * dpy,
                                        gchar ** modeName, ggobid * gg);
-static GtkWidget *barchartMenusMake(displayd * dpy, PipelineMode viewMode,
-                                    ggobid * gg);
+static GtkWidget *barchartMenusMake(displayd * dpy, ggobid * gg);
 static gboolean barchartEventHandlersToggle(displayd * dpy, splotd * sp,
-                                            gboolean state, gint viewMode);
-static gint barchartSPlotKeyEventHandler(displayd * dpy, splotd * sp,
-                                         gint keyval);
+                                            gboolean state, ProjectionMode,
+                                            InteractionMode);
+static gboolean barchartKeyEventHandled(GtkWidget *, displayd *, splotd *,
+					GdkEventKey *, ggobid *);
 
 static gboolean
 varpanelHighd(displayd *display)
 {
-  gint proj = display->cpanel.projection;
+  gint proj = display->cpanel.pmode;
   return(proj == TOUR1D || proj == TOUR2D3 || proj == TOUR2D || proj == COTOUR);
 }
 
@@ -148,13 +149,22 @@ gboolean barchartCPanelSet(displayd * dpy, cpaneld * cpanel, ggobid * gg)
 
 void barchartDisplaySet(displayd * dpy, ggobid * gg)
 {
-  GtkWidget *menu;
-  menu = barchart_mode_menu_make(gg->main_accel_group,
-                                 (GtkSignalFunc) viewmode_set_cb, gg,
+  GtkWidget *pmode_menu, *imode_menu;
+
+  imode_menu = barchart_pmode_menu_make(gg->pmode_accel_group,
+                                 (GtkSignalFunc) pmode_set_cb, gg,
                                  true);
-  gg->viewmode_item = submenu_make("_ViewMode", 'V', gg->main_accel_group);
-  gtk_menu_item_set_submenu(GTK_MENU_ITEM(gg->viewmode_item), menu);
-  submenu_insert(gg->viewmode_item, gg->main_menubar, 2);
+  gg->pmode_item = submenu_make("_View", 'V', gg->main_accel_group);
+  gtk_menu_item_set_submenu(GTK_MENU_ITEM(gg->pmode_item), pmode_menu);
+  submenu_insert(gg->pmode_item, gg->main_menubar, 2);
+
+  imode_menu = barchart_imode_menu_make(gg->imode_accel_group,
+                                 (GtkSignalFunc) imode_set_cb, gg,
+                                 true);
+  gg->imode_item = submenu_make("_Interaction", 'I', gg->main_accel_group);
+  gtk_menu_item_set_submenu(GTK_MENU_ITEM(gg->imode_item), imode_menu);
+  submenu_insert(gg->imode_item, gg->main_menubar, 3);
+
 }
 
 
@@ -279,10 +289,11 @@ void barchartVarpanelRefresh(displayd * display, splotd * sp, datad * d)
   }
 }
 
-gboolean barchartHandlesAction(displayd * dpy, PipelineMode mode)
+gboolean barchartHandlesInteraction(displayd * dpy, gint action)
 {
-  return (mode == SCALE || mode == BRUSH || mode == IDENT
-          || mode == EXTENDED_DISPLAY_MODE);
+  InteractionMode imode = (InteractionMode) action;
+  return (imode == SCALE || imode == BRUSH || imode == IDENT
+          || imode == DEFAULT_IMODE);
 }
 
 
@@ -291,7 +302,8 @@ gboolean barchartHandlesAction(displayd * dpy, PipelineMode mode)
 /*                      Barchart: Options menu                        */
 /*--------------------------------------------------------------------*/
 
-static void barchart_menus_make(ggobid * gg)
+/* delete dfs -- change this to option_items_add , which adds nothing */
+static void barchart_menus_make(displayd *display, ggobid * gg)
 {
   gg->menus.options_menu = gtk_menu_new();
 
@@ -301,7 +313,7 @@ static void barchart_menus_make(ggobid * gg)
 
   CreateMenuCheck(gg->menus.options_menu, "Show control panel",
                   GTK_SIGNAL_FUNC(cpanel_show_cb), NULL,
-                  GTK_WIDGET_VISIBLE(gg->viewmode_frame), gg);
+                  GTK_WIDGET_VISIBLE(gg->imode_frame), gg);
 
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(gg->menus.options_item),
                             gg->menus.options_menu);
@@ -329,16 +341,14 @@ barchartPlottedColsGet(displayd * display, gint * cols, datad * d,
 }
 
 
-GtkWidget *barchartMenusMake(displayd * dpy, PipelineMode viewMode,
-                             ggobid * gg)
+GtkWidget *barchartMenusMake(displayd * dpy, ggobid * gg)
 {
-  barchart_menus_make(gg);
+  barchart_menus_make(dpy, gg);
   return (NULL);
 }
 
 
-GtkWidget *barchartCPanelWidget(displayd * dpy, gint viewmode,
-                                gchar ** modeName, ggobid * gg)
+GtkWidget *barchartCPanelWidget(displayd * dpy, gchar ** modeName, ggobid * gg)
 {
   GtkWidget *w = GTK_GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget;
   if (!w) {
@@ -349,39 +359,128 @@ GtkWidget *barchartCPanelWidget(displayd * dpy, gint viewmode,
   return (w);
 }
 
-
 gboolean
 barchartEventHandlersToggle(displayd * dpy, splotd * sp, gboolean state,
-                            gint viewMode)
+                            ProjectionMode pmode, InteractionMode imode)
 {
-  if (viewMode == SCALE) {
+  if (imode == SCALE) {
     barchart_scale_event_handlers_toggle(sp, state);
     return (true);
   }
 
-  if (viewMode != EXTENDED_DISPLAY_MODE && viewMode != SCALE)
+  if (imode != DEFAULT_IMODE && imode != SCALE)
     return (true);
 
-  barchart_event_handlers_toggle(sp, state);
+  barchart_event_handlers_toggle(dpy, sp, state, pmode, imode);
   return (true);
 }
 
-#include <gdk/gdkkeysyms.h>
 
-gint barchartSPlotKeyEventHandler(displayd * dpy, splotd * sp, gint keyval)
+static gboolean
+barchartKeyEventHandled(GtkWidget *w, displayd *display, splotd * sp, GdkEventKey *event, ggobid *gg)
 {
-  gint action = -1;
-  switch (keyval) {
+  gboolean ok = true;
+  ProjectionMode pmode = NULL_PMODE;
+  InteractionMode imode = DEFAULT_IMODE;
+
+  switch (event->keyval) {
     case GDK_h:
     case GDK_H:
-      action = EXTENDED_DISPLAY_MODE;
+      pmode = EXTENDED_DISPLAY_PMODE;
     break;
+    case GDK_t:
+    case GDK_T:
+      pmode = TOUR1D;
+    break;
+
+    case GDK_s:
+    case GDK_S:
+      imode = SCALE;
+    break;
+    case GDK_b:
+    case GDK_B:
+      imode = BRUSH;
+    break;
+    case GDK_i:
+    case GDK_I:
+      imode = IDENT;
+    break;
+
+    default:
+      ok = false;
+    break;
+  }
+
+  if (ok) {
+    GGOBI(full_viewmode_set)(pmode, imode, gg);
+  }
+
+  return ok;
+}
+
+/* This is an abbreviated version of the scatterplot version */
+void
+barchartScreenToTform(cpaneld *cpanel, splotd *sp, icoords *scr,
+		   fcoords *tfd, ggobid *gg)
+{
+  gcoords planar, world;
+  greal precis = (greal) PRECISION1;
+  greal ftmp, max, min, rdiff;
+  displayd *display = (displayd *) sp->displayptr;
+  datad *d = display->d;
+  gfloat scale_x, scale_y;
+  vartabled *vt;
+
+  scale_x = sp->scale.x;
+  scale_y = sp->scale.y;
+  scale_x /= 2;
+  sp->iscale.x = (greal) sp->max.x * scale_x;
+  scale_y /= 2;
+  sp->iscale.y = -1 * (greal) sp->max.y * scale_y;
+
+/*
+ * screen to plane 
+*/
+  planar.x = (scr->x - sp->max.x/2) * precis / sp->iscale.x ;
+  planar.x += sp->pmid.x;
+  planar.y = (scr->y - sp->max.y/2) * precis / sp->iscale.y ;
+  planar.y += sp->pmid.y;
+
+/*
+ * plane to world
+*/
+
+  switch (cpanel->pmode) {
+  case TOUR1D:
+    break;
+
+    /* Sheesh, I haven't even decided what I want the pmode to be */  
+  case EXTENDED_DISPLAY_PMODE:
+  case DEFAULT_PMODE:
+      vt = vartable_element_get (sp->p1dvar, d);
+      max = vt->lim.max;
+      min = vt->lim.min;
+      rdiff = max - min;
+
+      if (display->p1d_orientation == HORIZONTAL) {
+        /* x */
+        world.x = planar.x;
+        ftmp = world.x / precis;
+        tfd->x = (ftmp + 1.0) * .5 * rdiff;
+        tfd->x += min;
+      } else {
+        /* y */
+        world.y = planar.y;
+        ftmp = world.y / precis;
+        tfd->y = (ftmp + 1.0) * .5 * rdiff;
+        tfd->y += min;
+      }
+    break;
+
     default:
     break;
   }
-  return (action);
 }
-
 
 void barchartDisplayClassInit(GtkGGobiBarChartDisplayClass * klass)
 {
@@ -403,7 +502,7 @@ void barchartDisplayClassInit(GtkGGobiBarChartDisplayClass * klass)
   klass->parent_class.varpanel_highd = varpanelHighd;
   klass->parent_class.varpanel_refresh = barchartVarpanelRefresh;
 
-  klass->parent_class.handles_action = barchartHandlesAction;
+  klass->parent_class.handles_interaction = barchartHandlesInteraction;
 
   klass->parent_class.xml_describe = NULL;
 
@@ -413,14 +512,14 @@ void barchartDisplayClassInit(GtkGGobiBarChartDisplayClass * klass)
 
   klass->parent_class.menus_make = barchartMenusMake;
 
-  klass->parent_class.viewmode_control_box = barchartCPanelWidget;
+  klass->parent_class.imode_control_box = barchartCPanelWidget;
 
   klass->parent_class.allow_reorientation = false;
 
   klass->parent_class.binning_ok = false;
   klass->parent_class.event_handlers_toggle = barchartEventHandlersToggle;
-  klass->parent_class.splot_key_event_handler =
-      barchartSPlotKeyEventHandler;
+  klass->parent_class.splot_key_event_handled =
+      barchartKeyEventHandled;
 }
 
 void barchartSPlotClassInit(GtkGGobiBarChartSPlotClass * klass)
@@ -437,9 +536,7 @@ void barchartSPlotClassInit(GtkGGobiBarChartSPlotClass * klass)
       barchart_splot_add_plot_labels;
   klass->extendedSPlotClass.redraw = barchart_redraw;
 
-/*
-  klass->extendedSPlotClass.world_to_plane = barchart_recalc_dimensions;
-*/
+  klass->extendedSPlotClass.screen_to_tform = barchartScreenToTform;
   klass->extendedSPlotClass.world_to_plane = barchartWorldToPlane;
   klass->extendedSPlotClass.plane_to_screen = barchartPlaneToScreen;
 

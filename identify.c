@@ -230,15 +230,15 @@ identify_label_fetch (gint k, cpaneld *cpanel, datad *d, ggobid *gg)
 */
   /*-- if categorical, use level name ... --*/
   if (id_display_type == ID_VAR_LABELS) {
+    GtkWidget *pnl = mode_panel_get_by_name(GGOBI(getIModeName)(IDENT), gg);
     vartabled *vt;
-    GtkWidget *clist =
-      get_clist_from_object (GTK_OBJECT (gg->control_panel[IDENT]));
-    datad *clistd = (datad *) gtk_object_get_data (GTK_OBJECT(clist), "datad");
+    GtkWidget *clist;
+    datad *clistd;
+
+    clist = get_clist_from_object (GTK_OBJECT (pnl));
+    clistd = (datad *) gtk_object_get_data (GTK_OBJECT(clist), "datad");
 
     if (clistd != d) {
-/*
-g_printerr ("selected variables don't correspond to what is identified\n");
-*/
       id_display_type = ID_RECORD_LABEL;
       /*-- this will be caught below --*/
 

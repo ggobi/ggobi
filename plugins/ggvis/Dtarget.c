@@ -20,7 +20,7 @@ ggv_init_Dtarget (gint selected_var, ggvisd *ggv)
 
   /*-- initalize Dtarget --*/
   infinity = (gdouble) (2 * ggv->Dtarget.nrows);
-  if (selected_var >= 0) {
+  if (selected_var >= 0 && selected_var < e->tform.ncols) {
     for (i=0; i<e->edge.n; i++) {
       if (e->tform.vals[i][selected_var] > infinity) {
         infinity = e->tform.vals[i][selected_var];

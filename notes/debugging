@@ -1,6 +1,7 @@
 run ggobi in the debugger like this:
 
 run --sync --g-fatal-warnings [datafile]
+run --sync --g-fatal-warnings data/flea.xml
 
 This causes it to break when the first gtk/gdk error occurs,
 so the backtrace will be informative.

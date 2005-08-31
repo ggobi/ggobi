@@ -87,18 +87,22 @@ static void varscale_cb (GtkWidget *w, gpointer cbd)
 GtkWidget *
 cpanel_parcoords_make (ggobid *gg) 
 {
+  modepaneld *panel;
   GtkWidget *vbox, *vb, *lbl, *sbar, *opt;
   GtkObject *adj;
-  GtkWidget *panel;
 
-  panel = gtk_vbox_new (false, VBOX_SPACING);
-  gtk_container_set_border_width (GTK_CONTAINER (panel), 5);
+  panel = (modepaneld *) g_malloc(sizeof(modepaneld));
+  gg->control_panels = g_list_append(gg->control_panels, (gpointer) panel);
+  panel->name = g_strdup("PCPLOT");
+
+  panel->w = gtk_vbox_new (false, VBOX_SPACING);
+  gtk_container_set_border_width (GTK_CONTAINER (panel->w), 5);
 
 /*
  * arrangement of plots, row or column
 */
   vb = gtk_vbox_new (false, 0);
-  gtk_box_pack_start (GTK_BOX (panel), vb, false, false, 0);
+  gtk_box_pack_start (GTK_BOX (panel->w), vb, false, false, 0);
 
   lbl = gtk_label_new ("Plot arrangement:");
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
@@ -118,7 +122,7 @@ cpanel_parcoords_make (ggobid *gg)
  * option menu: selection mode
 */
   vb = gtk_vbox_new (false, 0);
-  gtk_box_pack_start (GTK_BOX (panel), vb, false, false, 0);
+  gtk_box_pack_start (GTK_BOX (panel->w), vb, false, false, 0);
 
   lbl = gtk_label_new ("Selection mode:");
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
@@ -137,7 +141,7 @@ cpanel_parcoords_make (ggobid *gg)
  * option menu
 */
   vb = gtk_vbox_new (false, 0);
-  gtk_box_pack_start (GTK_BOX (panel), vb, false, false, 0);
+  gtk_box_pack_start (GTK_BOX (panel->w), vb, false, false, 0);
 
   lbl = gtk_label_new ("Spreading method:");
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
@@ -157,7 +161,7 @@ cpanel_parcoords_make (ggobid *gg)
  * ASH smoothness
 */
   vbox = gtk_vbox_new (false, 0);
-  gtk_box_pack_start (GTK_BOX (panel), vbox,
+  gtk_box_pack_start (GTK_BOX (panel->w), vbox,
     false, false, 0);
 
   lbl = gtk_label_new ("ASH smoothness:"),
@@ -221,10 +225,9 @@ cpanel_parcoords_make (ggobid *gg)
     (GtkSignalFunc) varscale_cb, "GGobi", gg);
 */
 
-  gtk_widget_show_all (panel);
+  gtk_widget_show_all (panel->w);
 
-  gg->control_panel[PCPLOT] = panel;
-  return(panel);
+  return(panel->w);
 }
 
 
@@ -239,36 +242,39 @@ cpanel_parcoords_make (ggobid *gg)
   At present, this is always false.
   See scatmat_mode_menu_make and scatterplot_mode_menu_make.
  */
-void
-parcoords_mode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func,
+
+GtkWidget *
+parcoords_imode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func,
   ggobid *gg, gboolean useIds)
 {
+  GtkWidget *imode_menu;
 
-  /*-- I/O menu --*/
-  gg->parcoords.mode_menu = gtk_menu_new ();
+  imode_menu = gtk_menu_new ();
 
-  CreateMenuItem (gg->parcoords.mode_menu, "Parallel Coordinates",
-    "^p", "", NULL, accel_group, func,
-    useIds ? GINT_TO_POINTER (PCPLOT) : gg, gg);
+  CreateMenuItem (imode_menu, "Parallel Coordinates",
+    "^h", "", NULL, accel_group, func,
+    useIds ? GINT_TO_POINTER (DEFAULT_IMODE) : gg, gg);
 
   /* Add a separator */
-  CreateMenuItem (gg->parcoords.mode_menu, NULL,
+  CreateMenuItem (imode_menu, NULL,
     "", "", NULL, NULL, NULL, NULL, gg);
 
   /*-- ViewMode menu --*/
-  CreateMenuItem (gg->parcoords.mode_menu, "Brush",
+  CreateMenuItem (imode_menu, "Brush",
     "^b", "", NULL, accel_group, func,
     useIds ? GINT_TO_POINTER (BRUSH) : gg, gg);
-  CreateMenuItem (gg->parcoords.mode_menu, "Identify",
+  CreateMenuItem (imode_menu, "Identify",
     "^i", "", NULL, accel_group,
     func, useIds ? GINT_TO_POINTER (IDENT) : gg, gg);
 /*
-  CreateMenuItem (gg->parcoords.mode_menu, "Move Points",
+  CreateMenuItem (imode_menu, "Move Points",
     "^m", "", NULL, accel_group, func,
     useIds ? GINT_TO_POINTER (MOVEPTS) : gg, gg);
 */
 
-  gtk_widget_show (gg->parcoords.mode_menu);
+  gtk_widget_show (imode_menu);
+
+  return (imode_menu);
 }
 
 /*--------------------------------------------------------------------*/

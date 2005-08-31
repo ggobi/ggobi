@@ -69,14 +69,31 @@ enum idtargetd {identify_points, identify_edges};
 */
 
 /* modes */
-typedef enum {NULLMODE = -1,
-               P1PLOT, XYPLOT, TOUR1D,
-               TOUR2D3, TOUR2D, COTOUR,
-               SCALE, BRUSH, IDENT, EDGEED, MOVEPTS,
-               SCATMAT, PCPLOT,
-               EXTENDED_DISPLAY_MODE,
-               NMODES} PipelineMode;
+/* Former viewmodes:
+typedef enum {NULLMODE = -1
+              P1PLOT, XYPLOT, TOUR1D,
+              TOUR2D3, TOUR2D, COTOUR,
+              SCALE, BRUSH, IDENT, EDGEED, MOVEPTS,
+              SCATMAT, PCPLOT,
+              EXTENDED_DISPLAY_MODE,
+	      NMODES} PipelineMode;
+*/
 
+typedef enum {NULL_PMODE = -1, DEFAULT_PMODE,
+              P1PLOT, /* d, D */
+	      XYPLOT, /* x, X */
+	      TOUR1D, /* t, T */
+	      TOUR2D3, /* r, R */
+	      TOUR2D, /* g, G */
+	      COTOUR, /* c, C */
+              EXTENDED_DISPLAY_PMODE, N_PMODES} ProjectionMode;
+typedef enum {NULL_IMODE = -1, DEFAULT_IMODE,
+	      SCALE, /* s, S */
+	      BRUSH, /* b, B */ 
+	      IDENT, /* i, I */ 
+	      EDGEED, /* e, E */
+	      MOVEPTS, /* m, M */
+              EXTENDED_DISPLAY_IMODE, N_IMODES} InteractionMode;
 /* */
 
 #define TEXTURE 0

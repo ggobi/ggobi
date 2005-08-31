@@ -33,6 +33,7 @@ void ga_nodes_show_cb (GtkWidget *btn, PluginInstance *inst);
 void count_visible_edges (PluginInstance *inst);
 void show_neighbors_toggle_cb (GtkToggleButton *button, PluginInstance *inst);
 void neighborhood_depth_cb (GtkWidget *w, gpointer cbd);
+void ga_edge_tidy_cb (GtkWidget *, PluginInstance *);
 
 #define GLAYOUT_H
 #endif

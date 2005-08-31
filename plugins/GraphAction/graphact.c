@@ -317,6 +317,27 @@ create_graphact_window(ggobid *gg, PluginInstance *inst)
   /*-- --*/
 
 
+  /*-- Tidy the graph in different ways --*/
+  frame = gtk_frame_new ("Tidy the graph");
+  gtk_container_set_border_width (GTK_CONTAINER (frame), 1);
+
+  vbox = gtk_vbox_new (false, 1);
+  gtk_container_add (GTK_CONTAINER(frame), vbox);
+
+  hbox = gtk_hbox_new (true, 10);
+  gtk_box_pack_start (GTK_BOX (vbox), hbox, false, false, 2);
+  btn = gtk_button_new_with_label ("Shadow orphaned edges");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), btn,
+    "Shadow brush edges connected to shadowed nodes", NULL);
+  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
+    GTK_SIGNAL_FUNC (ga_edge_tidy_cb), inst);
+  gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 2);
+
+  label = gtk_label_new ("Tidy");
+  gtk_notebook_append_page (GTK_NOTEBOOK (notebook), frame, label);
+  /*-- --*/
+
+
   gtk_widget_show_all (window);
 
   return(window);

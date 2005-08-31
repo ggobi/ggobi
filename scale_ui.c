@@ -104,15 +104,15 @@ scale_interaction_style_set (gint style, ggobid *gg) {
   cpaneld *cpanel = &gg->current_display->cpanel;
   gboolean click_p;
   GtkWidget *pan_radio, *zoom_radio, *pan_option_menu, *zoom_option_menu;
+  GtkWidget *panel = mode_panel_get_by_name(GGOBI(getIModeName)(SCALE), gg);
 
-  pan_radio = widget_find_by_name (gg->control_panel[SCALE],
-    "SCALE:pan_radio_button");
-  zoom_radio = widget_find_by_name (gg->control_panel[SCALE],
-    "SCALE:zoom_radio_button");
-  pan_option_menu = widget_find_by_name (gg->control_panel[SCALE],
-    "SCALE:pan_option_menu");
-  zoom_option_menu = widget_find_by_name (gg->control_panel[SCALE],
-    "SCALE:zoom_option_menu");
+  if (panel == (GtkWidget *) NULL)
+    return;
+
+  pan_radio = widget_find_by_name (panel, "SCALE:pan_radio_button");
+  zoom_radio = widget_find_by_name (panel, "SCALE:zoom_radio_button");
+  pan_option_menu = widget_find_by_name (panel,"SCALE:pan_option_menu");
+  zoom_option_menu = widget_find_by_name (panel, "SCALE:zoom_option_menu");
 
   cpanel->scale_style = style;  /*-- DRAG or CLICK --*/
   click_p = (cpanel->scale_style == CLICK);
@@ -134,24 +134,29 @@ void
 interaction_style_cb (GtkToggleButton *w, ggobid *gg) 
 {
   GtkWidget *radio, *opt;
+  GtkWidget *panel = mode_panel_get_by_name(GGOBI(getIModeName)(SCALE), gg);
+
 /*
  * This is connected to the Drag button
 */
   gint scale_style = (w->active) ? DRAG : CLICK;
   scale_interaction_style_set (scale_style, gg);
 
-  radio = widget_find_by_name (gg->control_panel[SCALE],
+  if (panel == (GtkWidget *) NULL)
+    return;
+
+  radio = widget_find_by_name (panel,
     "SCALE:pan_radio_button");
   gtk_widget_set_sensitive (radio, scale_style == CLICK);
-  radio = widget_find_by_name (gg->control_panel[SCALE],
+  radio = widget_find_by_name (panel,
     "SCALE:zoom_radio_button");
   gtk_widget_set_sensitive (radio, scale_style == CLICK);
 
-  opt = widget_find_by_name (gg->control_panel[SCALE],
+  opt = widget_find_by_name (panel,
     "SCALE:pan_option_menu");
   gtk_widget_set_sensitive (opt, scale_style == CLICK);
   
-  opt = widget_find_by_name (gg->control_panel[SCALE],
+  opt = widget_find_by_name (panel,
     "SCALE:zoom_option_menu");
   gtk_widget_set_sensitive (opt, scale_style == CLICK);
 
@@ -378,18 +383,22 @@ scale_event_handlers_toggle (splotd *sp, gboolean state) {
 
 void
 cpanel_scale_make (ggobid *gg) {
+  modepaneld *panel;
   GtkWidget *frame, *f, *vbox, *hbox, *vb, *lbl;
   GtkWidget *radio1, *radio2, *tgl;
   GSList *group;
   GtkWidget *pan_radio, *zoom_radio, *pan_option_menu, *zoom_option_menu;
 
-  gg->control_panel[SCALE] = gtk_vbox_new (false, VBOX_SPACING);
-  gtk_container_set_border_width (GTK_CONTAINER (gg->control_panel[SCALE]), 5);
+  panel = (modepaneld *) g_malloc(sizeof(modepaneld));
+  gg->control_panels = g_list_append(gg->control_panels, (gpointer) panel);
+  panel->name = g_strdup(GGOBI(getIModeName)(SCALE));
+  panel->w = gtk_vbox_new (false, VBOX_SPACING);
+  gtk_container_set_border_width (GTK_CONTAINER (panel->w), 5);
 
 
   frame = gtk_frame_new ("Interaction style");
   gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[SCALE]),
+  gtk_box_pack_start (GTK_BOX (panel->w),
                       frame, false, false, 0);
 
   hbox = gtk_hbox_new (true, 1);
@@ -417,7 +426,7 @@ cpanel_scale_make (ggobid *gg) {
   /*-- frame and vbox for drag-style controls --*/
   frame = gtk_frame_new ("Drag-style controls");
   gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[SCALE]),
+  gtk_box_pack_start (GTK_BOX (panel->w),
                       frame, false, false, 0);
 
   vbox = gtk_vbox_new (true, 1);
@@ -436,7 +445,7 @@ cpanel_scale_make (ggobid *gg) {
   /*-- frame and vbox for click-style controls --*/
   frame = gtk_frame_new ("Click-style controls");
   gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[SCALE]),
+  gtk_box_pack_start (GTK_BOX (panel->w),
                       frame, false, false, 0);
 
   vbox = gtk_vbox_new (true, 1);
@@ -515,7 +524,7 @@ cpanel_scale_make (ggobid *gg) {
   gtk_widget_set_sensitive (pan_option_menu, false);
   gtk_widget_set_sensitive (zoom_option_menu, false);
 
-  gtk_widget_show_all (gg->control_panel[SCALE]);
+  gtk_widget_show_all (panel->w);
 }
 
 void
@@ -628,34 +637,38 @@ cpanel_scale_init (cpaneld *cpanel, ggobid *gg) {
 void
 cpanel_scale_set (displayd *display, cpaneld *cpanel, ggobid *gg) {
   GtkWidget *w;
+  GtkWidget *panel = mode_panel_get_by_name(GGOBI(getIModeName)(SCALE), gg);
+
+  if (panel == (GtkWidget *) NULL)
+    return;
 
   /*-- set the Drag or Click radio buttons --*/
   if (cpanel->scale_style == DRAG)
-    w = widget_find_by_name (gg->control_panel[SCALE],
+    w = widget_find_by_name (panel,
       "SCALE:drag_radio_button");
   else
-    w = widget_find_by_name (gg->control_panel[SCALE],
+    w = widget_find_by_name (panel,
       "SCALE:click_radio_button");
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(w), true);
 
-  w = widget_find_by_name (gg->control_panel[SCALE],
+  w = widget_find_by_name (panel,
     "SCALE:drag_aspect_ratio_tgl");
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(w),
     cpanel->scale_drag_aspect_p);
 
   /*-- set the Pan or Zoom radio buttons --*/
-  w = widget_find_by_name (gg->control_panel[SCALE],
+  w = widget_find_by_name (panel,
     "SCALE:pan_radio_button");
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(w),
     cpanel->scale_click_opt == PAN);
 
   /*-- set the Pan options --*/
-  w = widget_find_by_name (gg->control_panel[SCALE],
+  w = widget_find_by_name (panel,
     "SCALE:pan_option_menu");
   gtk_option_menu_set_history (GTK_OPTION_MENU(w), cpanel->scale_pan_opt);
 
   /*-- set the Zoom options--*/
-  w = widget_find_by_name (gg->control_panel[SCALE],
+  w = widget_find_by_name (panel,
                            "SCALE:zoom_option_menu");
   gtk_option_menu_set_history (GTK_OPTION_MENU(w), cpanel->scale_zoom_opt);
 }

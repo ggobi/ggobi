@@ -179,15 +179,20 @@ movepts_event_handlers_toggle (splotd *sp, gboolean state) {
 
 void
 cpanel_movepts_make (ggobid *gg) {
+  modepaneld *panel;
   GtkWidget *btn, *opt, *box, *hb, *lbl;
+
+  panel = (modepaneld *) g_malloc(sizeof(modepaneld));
+  gg->control_panels = g_list_append(gg->control_panels, (gpointer) panel);
+  panel->name = g_strdup(GGOBI(getIModeName)(MOVEPTS));
   
-  gg->control_panel[MOVEPTS] = gtk_vbox_new (false, VBOX_SPACING);
-  gtk_container_set_border_width (GTK_CONTAINER (gg->control_panel[MOVEPTS]),
+  panel->w = gtk_vbox_new (false, VBOX_SPACING);
+  gtk_container_set_border_width (GTK_CONTAINER (panel->w),
                                   5);
 
   /*-- option menu: direction of motion --*/
   hb = gtk_vbox_new (false, 0);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[MOVEPTS]),
+  gtk_box_pack_start (GTK_BOX (panel->w),
                       hb, false, false, 0);
 
   lbl = gtk_label_new ("Direction of motion:");
@@ -209,7 +214,7 @@ cpanel_movepts_make (ggobid *gg) {
     "Move all points with the same symbol", NULL);
   gtk_signal_connect (GTK_OBJECT (btn), "toggled",
                      GTK_SIGNAL_FUNC (move_cluster_cb), (gpointer) gg);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[MOVEPTS]),
+  gtk_box_pack_start (GTK_BOX (panel->w),
     btn, false, false, 1);
 
   /*-- Box to hold reset buttons --*/
@@ -229,9 +234,9 @@ cpanel_movepts_make (ggobid *gg) {
                      GTK_SIGNAL_FUNC (undo_last_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (box), btn, false, false, 1);
 
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[MOVEPTS]),
+  gtk_box_pack_start (GTK_BOX (panel->w),
                       box, false, false, 1);
 
-  gtk_widget_show_all (gg->control_panel[MOVEPTS]);
+  gtk_widget_show_all (panel->w);
 }
 

@@ -57,7 +57,7 @@ cpanel_tour2d_set (displayd *display, cpaneld *cpanel, ggobid* gg)
 */
 {
   GtkWidget *w, *btn;
-  GtkWidget *pnl = gg->control_panel[TOUR2D];
+  GtkWidget *pnl = mode_panel_get_by_name(GGOBI(getPModeName)(TOUR2D), gg);
   GtkAdjustment *adj;
 
   /*-- speed --*/
@@ -154,13 +154,17 @@ static void manip_cb (GtkWidget *w, gpointer cbd)
 
 void
 cpanel_tour2d_make (ggobid *gg) {
+  modepaneld *panel;
   GtkWidget *box, *btn, *sbar, *lbl, *vb;
   GtkObject *adj;
   GtkWidget *manip_opt;
   /*GtkWidget *tgl;*/
   
-  gg->control_panel[TOUR2D] = gtk_vbox_new (false, VBOX_SPACING);
-  gtk_container_set_border_width (GTK_CONTAINER (gg->control_panel[TOUR2D]), 5);
+  panel = (modepaneld *) g_malloc(sizeof(modepaneld));
+  gg->control_panels = g_list_append(gg->control_panels, (gpointer) panel);
+  panel->name = g_strdup(GGOBI(getPModeName)(TOUR2D));
+  panel->w = gtk_vbox_new (false, VBOX_SPACING);
+  gtk_container_set_border_width (GTK_CONTAINER (panel->w), 5);
 
 /*
  * speed scrollbar
@@ -180,7 +184,7 @@ cpanel_tour2d_make (ggobid *gg) {
     "Adjust speed of tour motion", NULL);
   scale_set_default_values (GTK_SCALE (sbar));
 
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[TOUR2D]), sbar,
+  gtk_box_pack_start (GTK_BOX (panel->w), sbar,
     false, false, 1);
 
 /*
@@ -196,7 +200,7 @@ cpanel_tour2d_make (ggobid *gg) {
                      GTK_SIGNAL_FUNC (tour2d_pause_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
 
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[TOUR2D]), box, false, false, 1);
+  gtk_box_pack_start (GTK_BOX (panel->w), box, false, false, 1);
 
 /*
  * Box to hold 'Reinit' toggle and 'Scramble' button
@@ -217,7 +221,7 @@ cpanel_tour2d_make (ggobid *gg) {
                      GTK_SIGNAL_FUNC (scramble_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
 
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[TOUR2D]), box, false, false, 1);
+  gtk_box_pack_start (GTK_BOX (panel->w), box, false, false, 1);
 
 /*
  * snapshot and video stream controls
@@ -238,14 +242,14 @@ cpanel_tour2d_make (ggobid *gg) {
                      GTK_SIGNAL_FUNC (t2d_video_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
 
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[TOUR2D]), box, false, false, 1);
+  gtk_box_pack_start (GTK_BOX (panel->w), box, false, false, 1);
 
 /*
  * manipulation option menu and label inside vbox
 */
 
   vb = gtk_vbox_new (false, 0);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[TOUR2D]), vb, false, false, 0);
+  gtk_box_pack_start (GTK_BOX (panel->w), vb, false, false, 0);
 
   lbl = gtk_label_new ("Manual manipulation:");
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
@@ -268,7 +272,7 @@ cpanel_tour2d_make (ggobid *gg) {
     "Show principal component axes or plain variable axes", NULL);
   gtk_signal_connect (GTK_OBJECT (tgl), "toggled",
                       GTK_SIGNAL_FUNC (pcaxes_cb), (gpointer) NULL);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[TOUR2D]),
+  gtk_box_pack_start (GTK_BOX (panel->w),
                       tgl, false, false, 1);
   */
 /*
@@ -277,7 +281,7 @@ cpanel_tour2d_make (ggobid *gg) {
   btn = gtk_button_new_with_label ("Projection pursuit ...");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Open panel for grand tour projection pursuit. Requires selected variables to be sphered (see the tools menu).", NULL);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[TOUR2D]),
+  gtk_box_pack_start (GTK_BOX (panel->w),
                       btn, false, false, 1);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (tour2dpp_cb), gg);
@@ -289,13 +293,13 @@ cpanel_tour2d_make (ggobid *gg) {
   btn = gtk_button_new_with_label ("Advanced features ...");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Open panel for additional grand tour features", NULL);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[TOUR2D]),
+  gtk_box_pack_start (GTK_BOX (panel->w),
                       btn, false, false, 1);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (tour2dadv_cb), gg);
 #endif
 
-  gtk_widget_show_all (gg->control_panel[TOUR2D]);
+  gtk_widget_show_all (panel->w);
 }
 
 
@@ -610,9 +614,10 @@ key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
   /*-- insert mode-specific key presses (if any) here --*/
   if (event->keyval == GDK_w || event->keyval == GDK_W) {
     /*-- turn pause on and off --*/
+    GtkWidget *pnl = mode_panel_get_by_name(GGOBI(getPModeName)(TOUR2D), gg);
     GtkWidget *pause_button = NULL;
-    pause_button = widget_find_by_name (gg->control_panel[TOUR2D],
-      "TOUR2D:pause_button");
+
+    pause_button = widget_find_by_name (pnl, "TOUR2D:pause_button");
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pause_button),
       !cpanel->t2d.paused);
   }

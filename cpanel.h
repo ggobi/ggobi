@@ -44,8 +44,8 @@ typedef struct _Tour2DCPanel {
 
 typedef struct {
 
- PipelineMode viewmode, prev_viewmode;
- PipelineMode projection;
+ ProjectionMode pmode, pmode_prev;  /* this may not be used */
+ InteractionMode imode, imode_prev;
 
  /*-- 1d plotting --*/
  struct _P1DCpanel {

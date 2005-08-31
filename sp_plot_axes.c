@@ -32,7 +32,7 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
   gint j, k, ix, iy, nc;
   displayd *dsp = (displayd *) sp->displayptr;
   cpaneld *cpanel = &dsp->cpanel;
-  gint proj = cpanel->projection;
+  gint proj = cpanel->pmode;
   gint lbearing, rbearing, width, width2, ascent, descent;
   GtkStyle *style = gtk_widget_get_style (sp->da);
   datad *d = dsp->d;

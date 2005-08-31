@@ -495,7 +495,7 @@ pt_plane_to_world (splotd *sp, gcoords *planar, gcoords *eps, greal *world)
   cpaneld *cpanel = &display->cpanel;
   gint j, var;
 
-  switch (cpanel->projection) {
+  switch (cpanel->pmode) {  /* only valid for scatterplots? */
     case P1PLOT:
       if (display->p1d_orientation == VERTICAL)
         world[sp->p1dvar] = planar->y;

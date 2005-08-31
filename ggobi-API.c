@@ -259,7 +259,9 @@ GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
       GGOBI(displays_release)(gg);
       varpanel_clear(d, gg);
       GGOBI(data_release)(d, gg); 
-      submenu_destroy (gg->viewmode_item);
+      /* ?? */
+      submenu_destroy (gg->pmode_item);
+      submenu_destroy (gg->imode_item);
   }
 
   d->input = desc;
@@ -1056,7 +1058,7 @@ GGOBI(close)(ggobid *gg, gboolean closeWindow)
   closePlugins(gg);
 #endif
 
-  procs_activate (off, gg->current_display, gg);
+  procs_activate (off, gg->pmode, gg->current_display, gg);
 
   display_free_all (gg);
 
@@ -1193,18 +1195,77 @@ GGOBI(getSPlot)(gint which, displayd *display)
   return(sp);
 }
 
-
 gint
-GGOBI(setMode)(const gchar *name, ggobid *gg)
+GGOBI(setPMode)(const gchar *name, ggobid *gg)
 {
-  PipelineMode old = viewmode_get(gg);
-  PipelineMode newMode = (PipelineMode) GGOBI(getModeId)(name);
-  if(newMode != NULLMODE)
-    GGOBI(full_viewmode_set)(newMode, gg);
-
+  ProjectionMode old = pmode_get(gg);
+  ProjectionMode newMode = (ProjectionMode) GGOBI(getPModeId)(name);
+  if(newMode != NULL_PMODE)
+    GGOBI(full_viewmode_set)(newMode, DEFAULT_IMODE, gg);
   return(old);
 }
+gint
+GGOBI(getPModeId)(const gchar *name)
+{
+  gint n, i;
+  const gchar *const *names = GGOBI(getPModeNames)(&n);
+ 
+  for(i = 0; i < n; i++) {
+    if(strcmp(names[i],name) == 0)
+      return(i);
+  }
 
+  return(-1);
+}
+
+const gchar *
+GGOBI(getPModeName)(int which)
+{ 
+  int n;
+  const gchar *const *names = GGOBI(getPModeNames)(&n);
+  return(names[which]);
+}
+
+gint
+GGOBI(setIMode)(const gchar *name, ggobid *gg)
+{
+  InteractionMode old = imode_get(gg);
+  InteractionMode newMode = (InteractionMode) GGOBI(getIModeId)(name);
+  if(newMode != NULL_PMODE)
+    GGOBI(full_viewmode_set)(NULL_PMODE, newMode, gg);
+  return(old);
+}
+gint
+GGOBI(getIModeId)(const gchar *name)
+{
+  gint n, i;
+  const gchar *const *names = GGOBI(getIModeNames)(&n);
+ 
+  for(i = 0; i < n; i++) {
+    if(strcmp(names[i],name) == 0)
+      return(i);
+  }
+
+  return(-1);
+}
+
+const gchar *
+GGOBI(getIModeName)(int which)
+{ 
+  int n;
+  const gchar *const *names = GGOBI(getIModeNames)(&n);
+  return(names[which]);
+}
+
+const gchar *
+GGOBI(getPModeKey)(int which)
+{ 
+  int n;
+  const gchar *const *keys = GGOBI(getPModeKeys)(&n);
+  return(keys[which]);
+}
+
+/*
 gint
 GGOBI(getModeId)(const gchar *name)
 {
@@ -1226,6 +1287,7 @@ GGOBI(getModeName)(int which)
   const gchar *const *names = GGOBI(getOpModeNames)(&n);
   return(names[which]);
 }
+*/
 
 gint 
 GGOBI(setBrushColor)(gint cid, ggobid *gg)
@@ -1700,7 +1762,7 @@ gboolean
 GGOBI(setTour2DProjectionMatrix)(gdouble *Fvalues, gint ncols, gint ndim, 
   gboolean vals_scaled, ggobid *gg)
 {
-  PipelineMode vm = viewmode_get(gg);
+  ProjectionMode vm = pmode_get(gg);
   displayd *dsp = gg->current_display; 
   cpaneld *cpanel = &dsp->cpanel;
   datad *d = dsp->d;

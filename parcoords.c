@@ -303,11 +303,13 @@ parcoords_new (displayd *display, gboolean missing_p, gint nvars, gint *vars,
 
 #ifdef PARCOORDS_DRAG_AND_DROP
  {
+/* This should only be active when imode==DEFAULT_IMODE.  I could
+just test the imode, but really it should be added and removed like
+other interactions. -- dfs */
     static GtkTargetEntry target = {"text/plain", GTK_TARGET_SAME_APP, 1001};
 
     gtk_drag_source_set(GTK_WIDGET(sp), GDK_BUTTON1_MASK, &target, 1, GDK_ACTION_COPY);
     gtk_signal_connect(GTK_OBJECT(sp), "drag_data_get",  start_parcoords_drag, NULL);
-
 
     gtk_drag_dest_set(GTK_WIDGET(sp), GTK_DEST_DEFAULT_ALL /* DROP */ , &target, 1, GDK_ACTION_COPY /*MOVE*/);
     gtk_signal_connect(GTK_OBJECT(sp), "drag_data_received",  receive_parcoords_drag, NULL);
@@ -317,9 +319,6 @@ parcoords_new (displayd *display, gboolean missing_p, gint nvars, gint *vars,
 
   if(GTK_GGOBI_WINDOW_DISPLAY(display)->window)
      gtk_widget_show_all (GTK_GGOBI_WINDOW_DISPLAY(display)->window);
-  else {
-	  /* display == vbox  gtk_container_add(GTK_CONTAINER(display), vbox);      */
-  }
 
   return display;
 }
@@ -432,8 +431,9 @@ parcoords_add_delete_splot(cpaneld *cpanel, splotd *sp, gint jvar, gint *jvar_pr
        * If the plot being removed is the current plot, reset
        * gg->current_splot.
       */
+      /* ?mode or ?mode_prev?  Don't know. */
       if (jvar_sp == gg->current_splot) {
-        sp_event_handlers_toggle (sp, off);
+        sp_event_handlers_toggle (sp, off, display->cpanel.pmode, display->cpanel.imode);
 
         new_indx = (jvar_indx == 0) ? 0 : MIN (nplots-1, jvar_indx);
         gg->current_splot = (splotd *)
@@ -464,7 +464,7 @@ parcoords_add_delete_splot(cpaneld *cpanel, splotd *sp, gint jvar, gint *jvar_pr
     } else {
 
       /*-- prepare to reset the current plot --*/
-      sp_event_handlers_toggle (sp, off);
+      sp_event_handlers_toggle (sp, off, display->cpanel.pmode, display->cpanel.imode);
 
       /*-- keep the window from growing by shrinking all plots --*/
       ratio = (gfloat) nplots / (gfloat) (nplots+1);
@@ -505,7 +505,7 @@ parcoords_add_delete_splot(cpaneld *cpanel, splotd *sp, gint jvar, gint *jvar_pr
       }
 
       gg->current_splot = sp->displayptr->current_splot = sp_new;
-      sp_event_handlers_toggle (sp_new, on);
+      sp_event_handlers_toggle (sp_new, on, display->cpanel.pmode, display->cpanel.imode);
       redraw = true;
     }
   }

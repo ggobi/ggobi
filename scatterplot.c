@@ -122,11 +122,21 @@ ruler_ranges_set (gboolean force, displayd *display, splotd *sp, ggobid *gg)
   tfmin.x = tfmin.y = tfmax.x = tfmax.y = 0.0;
 
   scr.x = scr.y = 0;
-  splot_screen_to_tform (cpanel, sp, &scr, &tfmin, gg);
+  if(sp && GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
+     GtkGGobiExtendedSPlotClass *klass;
+     klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT_GET_CLASS(sp));
+     if(klass->screen_to_tform)
+       klass->screen_to_tform(cpanel, sp, &scr, &tfmin, gg);
+  }
 
   scr.x = sp->max.x;
   scr.y = sp->max.y;
-  splot_screen_to_tform (cpanel, sp, &scr, &tfmax, gg);
+  if(sp && GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
+     GtkGGobiExtendedSPlotClass *klass;
+     klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT_GET_CLASS(sp));
+     if(klass->screen_to_tform)
+       klass->screen_to_tform(cpanel, sp, &scr, &tfmax, gg);
+  }
 
   /*
    * Reset only if necessary:  if the ruler is visible and the
@@ -247,7 +257,7 @@ createScatterplot(displayd *display, gboolean missing_p, splotd *sp, gint numVar
 {
   GtkWidget *table, *vbox, *w;
   GtkItemFactory *factory;
-  PipelineMode projection;
+  ProjectionMode projection;
 
   if (d == NULL || d->ncols < 1)
     return (NULL);
@@ -268,7 +278,7 @@ createScatterplot(displayd *display, gboolean missing_p, splotd *sp, gint numVar
    */
 
   projection = (d->ncols >= 2) ? XYPLOT : P1PLOT;
-  scatterplot_cpanel_init (&display->cpanel, projection, gg);
+  scatterplot_cpanel_init (&display->cpanel, projection, DEFAULT_IMODE, gg);
 
   vbox = GTK_WIDGET(display); /* gtk_vbox_new (false, 1); */
 

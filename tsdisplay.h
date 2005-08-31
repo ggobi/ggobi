@@ -81,16 +81,19 @@ gint tsplotIsVarPlotted(displayd *display, gint *cols, gint ncols, datad *d);
 gboolean tsplotCPanelSet(displayd *dpy, cpaneld *cpanel, ggobid *gg);
 void tsplotDisplaySet(displayd *dpy, ggobid *gg);
 void tsplotVarpanelRefresh(displayd *display, splotd *sp, datad *d);
-gboolean tsplotHandlesAction(displayd *dpy, PipelineMode mode);
+gboolean tsplotHandlesProjection(displayd *dpy, ProjectionMode mode);
+gboolean tsplotHandlesInteraction(displayd *, InteractionMode);
+
 void add_xml_tsplot_variables(xmlNodePtr node, GList *plots, displayd *dpy);
 void tsplotVarpanelTooltipsSet(displayd *dpy, ggobid *gg, GtkWidget *wx, GtkWidget *wy, GtkWidget *wz, GtkWidget *label);
 gint tsplotPlottedColsGet(displayd *display, gint *cols, datad *d, ggobid *gg);
 
-GtkWidget *tsplotMenusMake(displayd *dpy, PipelineMode viewMode, ggobid *gg);
+GtkWidget *tsplotMenusMake(displayd *dpy, ggobid *gg);
 
-GtkWidget *tsplotCPanelWidget(displayd *dpy, gint viewmode, gchar **modeName, ggobid *gg);
-gboolean tsplotEventHandlersToggle(displayd *dpy, splotd *sp, gboolean state, gint viewMode);
-gint tsplotSPlotKeyEventHandler(displayd *dpy, splotd *sp, gint keval);
+GtkWidget *tsplotCPanelWidget(displayd *dpy, gchar **modeName, ggobid *gg);
+
+gboolean tsplotEventHandlersToggle(displayd *dpy, splotd *sp, gboolean state, ProjectionMode, InteractionMode imode);
+gboolean tsplotKeyEventHandled(GtkWidget *, displayd *, splotd *sp, GdkEventKey *, ggobid *);
 gchar *tsplot_tree_label(splotd *sp, datad *d, ggobid *gg);
 
 GdkSegment * tsplotAllocWhiskers(displayd *dpy, splotd *sp, gint nrows, datad *d);

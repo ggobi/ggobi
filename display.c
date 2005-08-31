@@ -490,7 +490,8 @@ gint
 display_add (displayd *display, ggobid *gg)
 {
   splotd *prev_splot = gg->current_splot;
-  PipelineMode prev_viewmode = viewmode_get (gg);
+  ProjectionMode pmode_prev = pmode_get (gg);
+  InteractionMode imode_prev = imode_get (gg);
   displayd *oldDisplay = gg->current_display;
 
    /* This is a safety test to avoid having a display be entered twice.
@@ -517,17 +518,17 @@ display_add (displayd *display, ggobid *gg)
      splot_set_current (gg->current_splot, on, gg);
   }
 
-
   /*
    * The current display types start without signal handlers, but
    * I may need to add handlers later for some unforeseen display.
   */
   /* don't activate */
-  viewmode_set (gg->current_display->cpanel.viewmode, gg); 
+  viewmode_set (gg->current_display->cpanel.pmode, gg->current_display->cpanel.imode,  gg); 
 
   /*-- if starting from the API, or changing mode, update the mode menus --*/
-  if (prev_viewmode != gg->current_display->cpanel.viewmode) {
-    viewmode_submenus_update (prev_viewmode, oldDisplay, gg);
+  if (pmode_prev != gg->current_display->cpanel.pmode ||
+      imode_prev != gg->current_display->cpanel.imode) {
+    main_miscmenus_update (pmode_prev, imode_prev, oldDisplay, gg);
   }
 
   /*-- Make sure the border for the previous plot is turned off --*/
@@ -588,7 +589,8 @@ display_free (displayd* display, gboolean force, ggobid *gg)
 */
     dsp = (displayd *) gg->current_splot->displayptr;
     if (dsp == display) {
-      sp_event_handlers_toggle (gg->current_splot, off);
+      sp_event_handlers_toggle (gg->current_splot, off, display->cpanel.pmode,
+        display->cpanel.imode);
     }
 
 
@@ -640,7 +642,7 @@ display_free (displayd* display, gboolean force, ggobid *gg)
 
   /*-- If there are no longer any displays, set ggobi's mode to NULLMODE --*/
   if (g_list_length (gg->displays) == 0) {
-    GGOBI(full_viewmode_set) (NULLMODE, gg);
+    GGOBI(full_viewmode_set) (NULL_PMODE, NULL_IMODE, gg);
   }
 }
 
@@ -697,6 +699,10 @@ display_set_current (displayd *new_display, ggobid *gg)
     return;
 
   gtk_accel_group_unlock (gg->main_accel_group);
+  /*
+   *gtk_accel_group_unlock (gg->pmode_accel_group);
+   *gtk_accel_group_unlock (gg->imode_accel_group);
+  */
 
   /* Clean up the old display first. Reset its title to show it is no
      longer active.
@@ -713,19 +719,26 @@ display_set_current (displayd *new_display, ggobid *gg)
     }
 
     /* Now clean up the different control panel menus associated with
-       this display.  Specifically, this gets rid of the ViewMode menu.
+       this display.  Specifically, this deletes the imode and pmode menus.
      */
     if(GTK_IS_GGOBI_EXTENDED_DISPLAY(gg->current_display)) {
      /* Allow the extended display to override the submenu_destroy call.
         If it doesn't provide a method, then call submenu_destroy. */
       void (*f)(displayd *dpy, GtkWidget *) =
         GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(gg->current_display))->display_unset;
-      if(f)
-        f(gg->current_display, gg->viewmode_item);
-      else
-        submenu_destroy (gg->viewmode_item); /* default if no method provided. */
+      if(f) {
+        f(gg->current_display, gg->pmode_item);
+        f(gg->current_display, gg->imode_item);
+      }
+      else {
+	g_printerr ("ref count before %d\n", gg->main_accel_group->ref_count);
+        submenu_destroy (gg->pmode_item); /* default if no method
+					     provided. */
+        submenu_destroy (gg->imode_item);
+	g_printerr ("ref count %d\n", gg->main_accel_group->ref_count);
       }
     }
+  }
 
   /* Now do the setup for the new display.  */
   if (GTK_IS_GGOBI_WINDOW_DISPLAY(new_display)) {
@@ -762,6 +775,10 @@ display_set_current (displayd *new_display, ggobid *gg)
   varpanel_tooltips_set (gg->current_display, gg);
 
   gtk_accel_group_lock (gg->main_accel_group);
+  /*
+   *gtk_accel_group_lock (gg->pmode_accel_group);
+   *gtk_accel_group_lock (gg->imode_accel_group);
+  */
   gg->firsttime = false;
 }
 
@@ -851,7 +868,7 @@ display_tailpipe (displayd *display, RedrawStyle type, ggobid *gg)
 /*-- update transient brushing; I will also need to un-brush some points --*/
     if (display == gg->current_display &&
         sp == gg->current_splot &&
-        viewmode_get (gg) == BRUSH)
+        imode_get (gg) == BRUSH)
     {
       datad *d = display->d;
       assign_points_to_bins (d, gg);
@@ -916,13 +933,25 @@ isEmbeddedDisplay (displayd *dpy)
  * support which view modes
 */
 gboolean
-display_type_handles_action (displayd *display, PipelineMode viewmode) 
+display_type_handles_projection (displayd *display, ProjectionMode pmode) 
 {
   gboolean handles = false;
-  PipelineMode v = viewmode;
+  ProjectionMode v = pmode;
 
   if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
-    handles = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display))->handles_action(display, v);
+    handles = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display))->handles_projection(display, v);
+  } 
+
+  return handles;
+}
+gboolean
+display_type_handles_interaction (displayd *display, InteractionMode imode) 
+{
+  gboolean handles = false;
+  InteractionMode v = imode;
+
+  if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
+    handles = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display))->handles_interaction(display, v);
   } 
 
   return handles;

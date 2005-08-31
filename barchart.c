@@ -41,6 +41,8 @@ void rectangle_inset(gbind * bin);
 void barchart_allocate_structure(barchartSPlotd * sp, datad * d);
 void button_draw_with_shadows(GdkPoint * region, GdkDrawable * drawable,
                               ggobid * gg);
+gboolean rect_intersect(GdkRectangle *rect1, GdkRectangle *rect2, GdkRectangle *dest);
+gboolean pt_in_rect(icoords pt, GdkRectangle rect);
 
 /*----------------------------------------------------------------------*/
 /*                          Options section                             */
@@ -221,7 +223,7 @@ createBarchart(displayd *display, gboolean missing_p, splotd * sp, gint var, dat
   /*-- hide any extraneous rulers --*/
 
   display->p1d_orientation = VERTICAL;
-  scatterplot_show_rulers(display, P1PLOT);
+  scatterplot_show_rulers(display, P1PLOT);  /* put in pmodeSet? */
   ruler_ranges_set(true, display, sp, gg);
 
   return display;
@@ -1206,7 +1208,7 @@ gboolean barchart_active_paint_points(splotd * rawsp, datad * d, ggobid *gg)
   gint i, m, indx;
   GdkRectangle brush_rect;
   GdkRectangle dummy;
-  GdkRectangle *rect;
+  /*GdkRectangle *rect;*/
   gint x1 = MIN(brush_pos->x1, brush_pos->x2);
   gint x2 = MAX(brush_pos->x1, brush_pos->x2);
   gint y1 = MIN(brush_pos->y1, brush_pos->y2);
@@ -1589,7 +1591,7 @@ barchart_add_bar_cues(splotd * rawsp, GdkDrawable * drawable, ggobid * gg)
   gchar *string;
   icoords mousepos = rawsp->mousepos;
   colorschemed *scheme = gg->activeColorScheme;
-  PipelineMode mode = viewmode_get (gg);
+  InteractionMode mode = imode_get (gg);
   gint level;
   gint j;
 
@@ -1710,9 +1712,9 @@ splotd *gtk_barchart_splot_new(displayd * dpy, gint width, gint height,
 */
 void barchart_cpanel_init(cpaneld * cpanel, ggobid * gg)
 {
-  cpanel->viewmode = EXTENDED_DISPLAY_MODE;
-  cpanel->projection = P1PLOT;  /*-- does it need a projection? --*/
-  cpanel->barchart_display_mode = 0;    /*dfs-barchart */
+  cpanel->imode = DEFAULT_IMODE;
+  cpanel->pmode = EXTENDED_DISPLAY_PMODE;
+  cpanel->barchart_display_mode = 0;
 
   /*-- 1d plots --*/
   cpanel_p1d_init(cpanel, gg);

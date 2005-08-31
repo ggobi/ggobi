@@ -140,19 +140,24 @@ p1d_event_handlers_toggle (splotd *sp, gboolean state)
 
 void
 cpanel_p1dplot_make (ggobid *gg) {
+  modepaneld *panel;
   GtkWidget *frame, *framevb, *tgl, *btn, *vbox, *vb, *opt;
   GtkWidget *sbar;
   GtkObject *adj;
   
-  gg->control_panel[P1PLOT] = gtk_vbox_new (false, VBOX_SPACING);
-  gtk_container_set_border_width (GTK_CONTAINER (gg->control_panel[P1PLOT]), 5);
+  panel = (modepaneld *) g_malloc(sizeof(modepaneld));
+  panel->name = g_strdup(GGOBI(getPModeName)(P1PLOT));
+  gg->control_panels = g_list_append(gg->control_panels, (gpointer) panel);
+
+  panel->w = gtk_vbox_new (false, VBOX_SPACING);
+  gtk_container_set_border_width (GTK_CONTAINER (panel->w), 5);
 
  /*-- option menu --*/
   opt = gtk_option_menu_new ();
   gtk_widget_set_name (opt, "P1PLOT:type_option_menu");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
     "Display either textured dot plots or average shifted histograms", NULL);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[P1PLOT]),
+  gtk_box_pack_start (GTK_BOX (panel->w),
                       opt, false, false, 0);
   populate_option_menu (opt, type_lbl,
     sizeof (type_lbl) / sizeof (gchar *),
@@ -161,7 +166,7 @@ cpanel_p1dplot_make (ggobid *gg) {
   /*-- frame around ASH parameters --*/
   frame = gtk_frame_new ("ASH parameters");
   gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[P1PLOT]), frame,
+  gtk_box_pack_start (GTK_BOX (panel->w), frame,
     false, false, 3);
 
   framevb = gtk_vbox_new (false, VBOX_SPACING);
@@ -211,7 +216,7 @@ cpanel_p1dplot_make (ggobid *gg) {
 
   frame = gtk_frame_new ("Plot cycling");
   gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[P1PLOT]), frame,
+  gtk_box_pack_start (GTK_BOX (panel->w), frame,
     false, false, 3);
 
   vb = gtk_vbox_new (false, VBOX_SPACING);
@@ -250,7 +255,7 @@ cpanel_p1dplot_make (ggobid *gg) {
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (chdir_cb), gg);
 
-  gtk_widget_show_all (gg->control_panel[P1PLOT]);
+  gtk_widget_show_all (panel->w);
 }
 
 /*--------------------------------------------------------------------*/
@@ -278,9 +283,10 @@ cpanel_p1d_set (displayd *display, cpaneld *cpanel, ggobid* gg)
  * which may have different p1d options and parameters selected
 */
 {
-  GtkWidget *pnl = gg->control_panel[P1PLOT];
-  GtkWidget *w;
+  GtkWidget *pnl, *w;
   GtkAdjustment *adj;
+
+  pnl = mode_panel_get_by_name(GGOBI(getPModeName)(P1PLOT), gg);
 
   /*-- Texturing or ASH --*/
   w = widget_find_by_name (pnl, "P1PLOT:type_option_menu");
@@ -302,7 +308,7 @@ cpanel_p1d_set (displayd *display, cpaneld *cpanel, ggobid* gg)
 */
 
   /*-- Cycling on or off --*/
-  w = widget_find_by_name (gg->control_panel[P1PLOT], "P1PLOT:cycle_toggle");
+  w = widget_find_by_name (pnl, "P1PLOT:cycle_toggle");
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(w), cpanel->p1d.cycle_p);
 
   /*-- Cycling speed --*/

@@ -458,7 +458,7 @@ splot_draw_to_pixmap0_binned (splotd *sp, gboolean draw_hidden, ggobid *gg)
   gint k;
   displayd *display = (displayd *) sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
-  gint proj = cpanel->projection;
+  ProjectionMode proj = cpanel->pmode;
   datad *d = display->d;
   colorschemed *scheme = gg->activeColorScheme;
   icoords *bin0 = &gg->plot.bin0;
@@ -585,11 +585,11 @@ splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *gg)
   datad *d = display->d;
   colorschemed *scheme = gg->activeColorScheme;
 
-  gboolean proceed = (cpanel->projection == XYPLOT ||
-                      cpanel->projection == P1PLOT ||
-                      cpanel->projection == PCPLOT ||
-                      cpanel->projection == SCATMAT ||
-                      cpanel->projection == EXTENDED_DISPLAY_MODE);
+  gboolean proceed = (cpanel->pmode == XYPLOT ||
+                      cpanel->pmode == P1PLOT ||
+                      /*cpanel->pmode == PCPLOT ||
+			cpanel->pmode == SCATMAT ||*/
+                      cpanel->pmode == EXTENDED_DISPLAY_PMODE);
   if (!proceed)
     return;
 
@@ -760,7 +760,7 @@ splot_add_record_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
   displayd *display = (displayd *) sp->displayptr;
   datad *d = display->d;
   datad *e = display->e;
-  PipelineMode mode = viewmode_get (gg);
+  InteractionMode imode = imode_get (gg);
   cpaneld *cpanel = &display->cpanel;
 
   /*
@@ -771,7 +771,7 @@ splot_add_record_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
        source, maybe dest and edge      in edge editing
   */
 
-  if (mode == IDENT) {
+  if (imode == IDENT) {
     if (cpanel->id_target_type == identify_points &&
         d->nearest_point != -1)
     {
@@ -781,9 +781,9 @@ splot_add_record_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
         splot_add_identify_edge_cues (sp, drawable, e->nearest_point, true, gg);
     }
   }
-  else if (mode == MOVEPTS)
+  else if (imode == MOVEPTS)
      splot_add_movepts_cues (sp, drawable, d->nearest_point, true, gg);
-  else if (mode == EDGEED)
+  else if (imode == EDGEED)
     /* If I want to draw in the color of nearest_point, I should pass
        it in here -- dfs*/
     splot_add_edgeedit_cues (sp, drawable, d->nearest_point, true, gg);
@@ -863,7 +863,7 @@ splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
   datad *e = dsp->e;
   datad *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
-  gint proj = cpanel->projection;
+  gint proj = cpanel->pmode;
   GtkGGobiExtendedSPlotClass *splotKlass;
 
   /*
@@ -915,10 +915,10 @@ splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
   if (g_list_length (dsp->splots) == 1  /*-- scatterplot --*/
       || sp == dsp->current_splot)  /*-- ... in a multi-plot display --*/
   {
-    if (cpanel->viewmode == BRUSH) {
+    if (cpanel->imode == BRUSH) {
       brush_draw_brush (sp, drawable, d, gg);
       brush_draw_label (sp, drawable, d, gg);
-    } else if (cpanel->viewmode == SCALE) {
+    } else if (cpanel->imode == SCALE) {
       scaling_visual_cues_draw (sp, drawable, gg);
 
       if (GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {

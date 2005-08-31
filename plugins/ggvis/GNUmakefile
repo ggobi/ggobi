@@ -34,7 +34,6 @@ OBJS=$(SRC:%=%.o)
 
 CFLAGS+=-g
 
-
 ifdef WIN32
 $(PKG).dll: $(OBJS) $(PKG).def
 	$(CC) -mwindows -s -shared -o $@ $(PKG).def $(OBJS) $(GGOBI_LIB) $(LIBS) $(XML_LIBS)
@@ -43,7 +42,7 @@ $(PKG).dll: $(OBJS) $(PKG).def
 #	$(CC) -shared -o $@ $(OBJS) $(GGOBI_LIB) $(shell $(GTK_CONFIG) --libs) $(XML_LIB_DIRS=%-L%) $(LDFLAGS)
 endif
 
-ggvis.so: $(OBJS)
+$(PKG).so: $(OBJS)
 
 tmp:
 	@echo "$(XML_LIBS)"

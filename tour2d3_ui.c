@@ -45,7 +45,7 @@ cpanel_tour2d3_set (displayd *display, cpaneld *cpanel, ggobid* gg)
 */
 {
   GtkWidget *w, *btn;
-  GtkWidget *pnl = gg->control_panel[TOUR2D3];
+  GtkWidget *pnl = mode_panel_get_by_name(GGOBI(getPModeName)(TOUR2D3), gg);
   GtkAdjustment *adj;
 
   /*-- speed --*/
@@ -107,13 +107,16 @@ manip_cb (GtkWidget *w, gpointer cbd)
 
 void
 cpanel_tour2d3_make (ggobid *gg) {
+  modepaneld *panel;
   GtkWidget *box, *btn, *sbar, *lbl, *vb;
   GtkObject *adj;
   GtkWidget *manip_opt;
   
-  gg->control_panel[TOUR2D3] = gtk_vbox_new (false, VBOX_SPACING);
-  gtk_container_set_border_width (GTK_CONTAINER (gg->control_panel[TOUR2D3]),
-    5);
+  panel = (modepaneld *) g_malloc(sizeof(modepaneld));
+  gg->control_panels = g_list_append(gg->control_panels, (gpointer) panel);
+  panel->name = g_strdup(GGOBI(getPModeName)(TOUR2D3));
+  panel->w = gtk_vbox_new (false, VBOX_SPACING);
+  gtk_container_set_border_width (GTK_CONTAINER (panel->w), 5);
 
 /*
  * speed scrollbar
@@ -133,7 +136,7 @@ cpanel_tour2d3_make (ggobid *gg) {
     "Adjust speed of tour motion", NULL);
   scale_set_default_values (GTK_SCALE (sbar));
 
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[TOUR2D3]), sbar,
+  gtk_box_pack_start (GTK_BOX (panel->w), sbar,
     false, false, 1);
 
 /*
@@ -149,7 +152,7 @@ cpanel_tour2d3_make (ggobid *gg) {
                      GTK_SIGNAL_FUNC (tour2d3_pause_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
 
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[TOUR2D3]), box,
+  gtk_box_pack_start (GTK_BOX (panel->w), box,
     false, false, 1);
 
 /*
@@ -171,7 +174,7 @@ cpanel_tour2d3_make (ggobid *gg) {
                      GTK_SIGNAL_FUNC (scramble_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
 
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[TOUR2D3]), box,
+  gtk_box_pack_start (GTK_BOX (panel->w), box,
     false, false, 1);
 
 /*
@@ -179,7 +182,7 @@ cpanel_tour2d3_make (ggobid *gg) {
 */
 
   vb = gtk_vbox_new (false, 0);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[TOUR2D3]), vb,
+  gtk_box_pack_start (GTK_BOX (panel->w), vb,
     false, false, 0);
 
   lbl = gtk_label_new ("Manual manipulation:");
@@ -195,7 +198,7 @@ cpanel_tour2d3_make (ggobid *gg) {
     sizeof (manip_lbl) / sizeof (gchar *),
     (GtkSignalFunc) manip_cb, "GGobi", gg);
 
-  gtk_widget_show_all (gg->control_panel[TOUR2D3]);
+  gtk_widget_show_all (panel->w);
 }
 
 /*----------------------------------------------------------------------*/
@@ -227,9 +230,9 @@ key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
   /*-- insert mode-specific key presses (if any) here --*/
   if (event->keyval == GDK_w || event->keyval == GDK_W) {
     /*-- turn pause on and off --*/
+    GtkWidget *pnl = mode_panel_get_by_name(GGOBI(getPModeName)(TOUR2D3), gg);
     GtkWidget *pause_button = NULL;
-    pause_button = widget_find_by_name (gg->control_panel[TOUR2D3],
-      "TOUR2D3:pause_button");
+    pause_button = widget_find_by_name (pnl, "TOUR2D3:pause_button");
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pause_button),
       !cpanel->t2d3.paused);
   }

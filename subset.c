@@ -245,14 +245,15 @@ subset_rowlab (gchar *substr, gint substr_pos, gboolean ignore_case,
   gint top = d->nrows;
   size_t slen, slen2;
   gchar *lbl;
-  GtkWidget *w;
+  GtkWidget *w, *pnl;
+  
+  pnl = mode_panel_get_by_name(GGOBI(getIModeName)(IDENT), gg);
 
   if (substr == NULL || (slen = strlen(substr)) == 0)
     return false;
 
   /*-- remove all sticky labels --*/
-  w = widget_find_by_name (gg->control_panel[IDENT],
-    "IDENTIFY:remove_sticky_labels");
+  w = widget_find_by_name (pnl, "IDENTIFY:remove_sticky_labels");
   gtk_signal_emit_by_name (GTK_OBJECT (w), "clicked", gg);
   /*-- --*/
 

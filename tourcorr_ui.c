@@ -46,9 +46,10 @@ cpanel_tourcorr_set (displayd *display, cpaneld *cpanel, ggobid* gg)
  * which may have different tour options and parameters selected
 */
 {
-  GtkWidget *w, *btn;
-  GtkWidget *pnl = gg->control_panel[COTOUR];
+  GtkWidget *pnl, *w, *btn;
   GtkAdjustment *adj;
+
+  pnl = (GtkWidget *) mode_panel_get_by_name(GGOBI(getPModeName)(COTOUR), gg);
 
   /*-- speed --*/
   w = widget_find_by_name (pnl, "COTOUR:speed_bar");
@@ -158,13 +159,17 @@ static void pathlen_cb (GtkWidget *w, gpointer cbd)
 
 void
 cpanel_ctour_make (ggobid *gg) {
+  modepaneld *panel;
   GtkWidget *box, *btn, *sbar, *vb, *lbl;
   GtkObject *adj;
   GtkWidget *manip_opt;
   /* GtkWidget *pathlen_opt, *tgl; */
   
-  gg->control_panel[COTOUR] = gtk_vbox_new (false, VBOX_SPACING);
-  gtk_container_set_border_width (GTK_CONTAINER (gg->control_panel[COTOUR]), 5);
+  panel = (modepaneld *) g_malloc(sizeof(modepaneld));
+  gg->control_panels = g_list_append(gg->control_panels, (gpointer) panel);
+  panel->name = g_strdup(GGOBI(getPModeName)(COTOUR));
+  panel->w = gtk_vbox_new (false, VBOX_SPACING);
+  gtk_container_set_border_width (GTK_CONTAINER (panel->w), 5);
 
 /*
  * speed scrollbar
@@ -183,7 +188,7 @@ cpanel_ctour_make (ggobid *gg) {
     "Adjust speed of tour motion", NULL);
   scale_set_default_values (GTK_SCALE (sbar));
 
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[COTOUR]), sbar,
+  gtk_box_pack_start (GTK_BOX (panel->w), sbar,
     false, false, 1);
 
 /*
@@ -199,7 +204,7 @@ cpanel_ctour_make (ggobid *gg) {
                      GTK_SIGNAL_FUNC (tourcorr_pause_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
 
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[COTOUR]),
+  gtk_box_pack_start (GTK_BOX (panel->w),
     box, false, false, 1);
 /*
  * Box to hold 'Reinit' toggle and 'Scramble' button
@@ -220,7 +225,7 @@ cpanel_ctour_make (ggobid *gg) {
                      GTK_SIGNAL_FUNC (tourcorr_scramble_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
 
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[COTOUR]),
+  gtk_box_pack_start (GTK_BOX (panel->w),
     box, false, false, 1);
 
 /*
@@ -242,13 +247,13 @@ cpanel_ctour_make (ggobid *gg) {
                      GTK_SIGNAL_FUNC (tourcorr_video_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
 
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[COTOUR]), box, false, false, 1);
+  gtk_box_pack_start (GTK_BOX (panel->w), box, false, false, 1);
 
 /*
  * manipulation option menu with label
 */
   vb = gtk_vbox_new (false, 0);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[COTOUR]), vb, false, false, 0);
+  gtk_box_pack_start (GTK_BOX (panel->w), vb, false, false, 0);
 
   lbl = gtk_label_new ("Manual manipulation:");
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
@@ -268,7 +273,7 @@ cpanel_ctour_make (ggobid *gg) {
  * path length option menu 
 */
   /*  vb = gtk_vbox_new (false, 0);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[COTOUR]), vb, false, false, 0);
+  gtk_box_pack_start (GTK_BOX (panel->w), vb, false, false, 0);
 
   lbl = gtk_label_new ("Path length:");
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
@@ -291,7 +296,7 @@ cpanel_ctour_make (ggobid *gg) {
     "Synchronize the horizontal and vertical axes", NULL);
   gtk_signal_connect (GTK_OBJECT (tgl), "toggled",
                       GTK_SIGNAL_FUNC (syncaxes_cb), (gpointer) NULL);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[COTOUR]),
+  gtk_box_pack_start (GTK_BOX (panel->w),
                       tgl, false, false, 1);
   */
 /*
@@ -300,7 +305,7 @@ cpanel_ctour_make (ggobid *gg) {
   /*  btn = gtk_button_new_with_label ("Projection pursuit ...");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Open panel for correlation tour projection pursuit", NULL);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[COTOUR]),
+  gtk_box_pack_start (GTK_BOX (panel->w),
                       btn, false, false, 1);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (ctourpp_cb), gg);
@@ -311,12 +316,12 @@ cpanel_ctour_make (ggobid *gg) {
   /*  btn = gtk_button_new_with_label ("Advanced features ...");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Open panel for additional correlation tour features", NULL);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[COTOUR]),
+  gtk_box_pack_start (GTK_BOX (panel->w),
                       btn, false, false, 1);
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (ctouradv_cb), NULL);
   */
-  gtk_widget_show_all (gg->control_panel[COTOUR]); 
+  gtk_widget_show_all (panel->w); 
   
 }
 
@@ -388,14 +393,15 @@ key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
   /*-- insert mode-specific key presses (if any) here --*/
   if (event->keyval == GDK_w || event->keyval == GDK_W) {
     /*-- turn pause on and off --*/
+    GtkWidget *pnl;
     GtkWidget *pause_button = NULL;
-    pause_button = widget_find_by_name (gg->control_panel[COTOUR],
-      "COTOUR:pause_button");
-
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pause_button),
-      !cpanel->tcorr1.paused || !cpanel->tcorr2.paused);
+    pnl = mode_panel_get_by_name(GGOBI(getPModeName)(COTOUR), gg);
+    if (pnl) {
+      pause_button = widget_find_by_name (pnl, "COTOUR:pause_button");
+      gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pause_button),
+        !cpanel->tcorr1.paused || !cpanel->tcorr2.paused);
+    }
   }
-
 
   return true;
 }

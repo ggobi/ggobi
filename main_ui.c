@@ -36,28 +36,32 @@
 #include "testEvents.h"
 #endif
 
+#include "scatmatClass.h"
 
-const char *const GGOBI(OpModeNames)[] = {
+const char *const GGOBI(PModeNames)[] = {
+  "Default",
   "1D Plot",
-  "XYPlot",
+  "XY Plot",
   "1D Tour",
   "Rotation",
   "2D Tour",
   "Correlation Tour",
+};
+const char *const GGOBI(IModeNames)[] = {
+  "Default",
   "Scale",
   "Brush",
   "Identify",
   "Edit Edges",
   "Move Points",
-
-  "Scatmat",
-  "Parcoords",
-  "TSplot",
-  "Barchart"
 };
+static const char *const *pmode_name = GGOBI(PModeNames);
+static const char *const *imode_name = GGOBI(IModeNames);
 
-
-static const char *const *viewmode_name = GGOBI(OpModeNames);
+const char * const GGOBI(PModeKeys)[] = {
+  "", "d", "x", "t", "r", "g", "c", "", ""};
+const char * const GGOBI(IModeKeys)[] = {
+  "", "s", "b", "i", "e", "m", "", ""};
 
 void addPreviousFilesMenu(GtkWidget *parent, GGobiInitInfo *info, ggobid *gg);
 
@@ -81,10 +85,28 @@ make_control_panels (ggobid *gg)
   cpanel_edgeedit_make (gg);
   cpanel_movepts_make (gg);
 
-
-  cpanel_scatmat_make (gg);
+  /* Remove from here, and do like parcoords etc.
+   * cpanel_scatmat_make (gg);  
+  */
 
   /* Leave the extendeded display types to be done on demand. */
+}
+
+/* This can return NULL, so calling routines must check */
+GtkWidget * mode_panel_get_by_name(const gchar *name, ggobid *gg)
+{
+  GList *l;
+  GtkWidget *w = NULL;
+  modepaneld *pnl = (modepaneld *) l;
+
+  for (l=gg->control_panels; l; l=l->next) {
+    pnl = (modepaneld *) l->data;
+    if (strcmp(name, pnl->name) == 0) {
+      w = pnl->w;
+      break;
+    }
+  }
+  return (GtkWidget *) w;
 }
 
 void
@@ -142,22 +164,13 @@ cpanel_show_cb (GtkCheckMenuItem *w, guint action)
 {
   ggobid *gg = GGobiFromWidget(GTK_WIDGET(w), true);
   if (w->active)
-    gtk_widget_show (gg->viewmode_frame);
+    gtk_widget_show (gg->imode_frame);
   else
-    gtk_widget_hide (gg->viewmode_frame);
+    gtk_widget_hide (gg->imode_frame);
 }
 
-
-PipelineMode
-viewmode_get (ggobid* gg) 
-{
-  return gg->viewmode;
-}
-PipelineMode
-projection_get (ggobid* gg) 
-{
-  return gg->projection;
-}
+ProjectionMode pmode_get (ggobid *gg) { return gg->pmode; }
+InteractionMode imode_get (ggobid *gg) { return gg->imode; }
 
 /*
  * Use the mode to determine whether the variable selection
@@ -177,11 +190,7 @@ varpanel_highd (displayd *display)
 
   return (highd);
 }
-gboolean
-varpanel_permits_circles_or_checkboxes (gint mode)
-{
-  return (mode > COTOUR && mode < SCATMAT);
-}
+
 /*
  * Use the widget state to figure out which is currently displayed.
 */
@@ -227,45 +236,103 @@ varpanel_reinit (ggobid *gg)
   }
 }
 
-void 
-viewmode_set (PipelineMode m, ggobid *gg)
+void
+rebuild_mode_menus(displayd *display, ggobid *gg)
 {
-/*
- * This could be called ui_mode_set or main_window_mode_set,
- * because it just sets up the mode_frame and the variable
- * selection panel.
-*/
-  displayd *display = gg->current_display;
-
-  gg->viewmode = m;
-
-  if (gg->viewmode != gg->prev_viewmode) {
-
-    if (gg->prev_viewmode != NULLMODE) {
-      GtkWidget *modeBox = gg->current_control_panel;
-      if(modeBox) {
-        gtk_widget_ref (modeBox);
-        gtk_container_remove (GTK_CONTAINER (gg->viewmode_frame), modeBox);
+    if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
+     /* Allow the extended display to override the submenu_destroy call.
+        If it doesn't provide a method, then call submenu_destroy. */
+      void (*f)(displayd *dpy, GtkWidget *) =
+        GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display))->display_unset;
+      if(f) {
+        f(display, gg->pmode_item);
+        f(display, gg->imode_item);
+      }
+      else { /* If no method, use this */
+        if (gg->pmode_item)
+          submenu_destroy (gg->pmode_item); 
+        submenu_destroy (gg->imode_item);
       }
     }
 
-    if (gg->viewmode != NULLMODE) {
+    /* Then rebuild */
+    if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
+      void (*f)(displayd *dpy, ggobid *gg) =
+        GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display))->display_set;
+      if(f)
+        f(display, gg);
+    }
+
+}
+
+void
+viewmode_set (ProjectionMode pmode, InteractionMode imode, ggobid *gg)
+{
+  displayd *display = gg->current_display;
+  gboolean cpanelchanged = ((imode != NULL_IMODE && imode != gg->imode) ||
+			    (pmode != NULL_PMODE && pmode != gg->pmode));
+
+  if (pmode != NULL_PMODE) {
+    gg->pmode_prev = gg->pmode; gg->pmode = pmode;
+  }
+  if (imode != NULL_IMODE) {
+    gg->imode_prev = gg->imode; gg->imode = imode;
+  } else {
+    gg->imode_prev = gg->imode; gg->imode = DEFAULT_IMODE;
+  }
+
+  /* Experiment -- seems to work */
+  rebuild_mode_menus (display, gg);
+
+  if (gg->pmode != NULL_PMODE && gg->pmode != gg->pmode_prev) {
+    /* 
+     * If moving between modes whose variable selection interface
+     * differs, swap in the correct display.
+     */
+     varpanel_reinit (gg);
+     varpanel_tooltips_set (display, gg);
+     varpanel_refresh (display, gg);
+  }
+
+/*
+ * just sets up the mode_frame and the variable selection panel.
+*/
+  if (cpanelchanged) {
+
+    if (gg->current_control_panel) {
+      GtkWidget *modeBox = gg->current_control_panel;
+      if (modeBox) {
+        gtk_widget_ref (modeBox);
+        gtk_container_remove (GTK_CONTAINER (gg->imode_frame), modeBox);
+      }
+    }
+
+    if (imode != NULL_IMODE) {
       gchar * modeName = NULL;
       GtkWidget *panel = NULL;
 
-      if(gg->viewmode < EXTENDED_DISPLAY_MODE) {
-        modeName = (gchar *) viewmode_name[gg->viewmode];
-        panel = gg->control_panel[gg->viewmode];
-      } else {
-        GtkGGobiExtendedDisplayClass *klass;
-	if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
-          klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display));
-          panel = klass->viewmode_control_box(display, gg->viewmode, &modeName, gg);
-	}
+      /* a change within the set of imodes */
+      if (imode > DEFAULT_IMODE && imode < EXTENDED_DISPLAY_IMODE) {
+        modeName = (gchar *) imode_name[imode];  /* could be DEFAULT */
+        panel = mode_panel_get_by_name (modeName, gg); 
       }
 
-      gtk_frame_set_label (GTK_FRAME (gg->viewmode_frame), modeName);
-      gtk_container_add (GTK_CONTAINER (gg->viewmode_frame), panel);
+      /* the pmode is taking over the control panel */
+      else if (imode == DEFAULT_IMODE && gg->pmode > NULL_PMODE) {
+        if (gg->pmode == EXTENDED_DISPLAY_PMODE) {
+          GtkGGobiExtendedDisplayClass *klass;
+          if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
+            klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display));
+            panel = klass->imode_control_box(display, &modeName, gg);
+          } 
+        } else if (pmode < EXTENDED_DISPLAY_PMODE) {  /* scatterplot? */
+          modeName = (gchar *) pmode_name[gg->pmode];
+          panel = mode_panel_get_by_name (modeName, gg); 
+        }
+      }
+
+      gtk_frame_set_label (GTK_FRAME (gg->imode_frame), modeName);
+      gtk_container_add (GTK_CONTAINER (gg->imode_frame), panel);
       gg->current_control_panel = panel;
 
       /*-- avoid increasing the object's ref_count infinitely  --*/
@@ -278,40 +345,34 @@ viewmode_set (PipelineMode m, ggobid *gg)
     }
   }
 
-  /*
-   * The projection type is one of P1PLOT, XYPLOT, ROTATE,
-   * TOUR1D, TOUR2D or COTOUR.  It only changes if another projection
-   * type is selected.  (For parcoords and scatmat plots, the
-   * value of projection is irrelevant.)
-  */
-  if (display && GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
-    GtkGGobiExtendedDisplayClass *klass;
-    klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display));
-    if(klass->viewmode_set)
-       klass->viewmode_set(display, gg);
+  if (pmode != NULL_PMODE && gg->pmode != gg->pmode_prev) {
+
+    /*
+     * The projection type is one of P1PLOT, XYPLOT, ROTATE,
+     * TOUR1D, TOUR2D or COTOUR.  It only changes if another projection
+     * type is selected.  (For parcoords and scatmat plots, the
+     * value of projection is irrelevant.)
+    */
+    if (display && GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
+      GtkGGobiExtendedDisplayClass *klass;
+      klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display));
+      if(klass->pmode_set)
+         klass->pmode_set(pmode, display, gg);
+    }
   }
-
-  if (gg->viewmode != gg->prev_viewmode) {
-    /* 
-     * If moving between modes whose variable selection interface
-     * differs, swap in the correct display.
-     */
-     varpanel_reinit (gg);
-  }
-
-  gg->prev_viewmode = gg->viewmode;
-
-  varpanel_tooltips_set (display, gg);
-  varpanel_refresh (display, gg);
 }
 
 /*
  * Turn the tour procs on and off here
 */
 void
-procs_activate (gboolean state, displayd *display, ggobid *gg)
+procs_activate (gboolean state, ProjectionMode pmode, displayd *display, ggobid *gg)
 {
-  switch (gg->viewmode) {
+  /*
+  g_printerr ("procs_activate (state=%d, mode=%d) in main_ui.c\n",
+  state, pmode);
+  */
+  switch (pmode) {
     case TOUR1D:
       if (!display->cpanel.t1d.paused)
         tour1d_func (state, display, gg);
@@ -334,28 +395,45 @@ procs_activate (gboolean state, displayd *display, ggobid *gg)
 }
 
 RedrawStyle
-viewmode_activate (splotd *sp, PipelineMode m, gboolean state, ggobid *gg)
+imode_activate (splotd *sp, ProjectionMode pmode, InteractionMode imode, gboolean state, ggobid *gg)
 {
   displayd *display = (displayd *) sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
   RedrawStyle redraw_style = NONE;
 
+  /*  g_printerr("(imode_activate) state %d pmode %d imode %d\n",
+      state, pmode, imode); */
+
   if (state == off) {
-    switch (m) {
-      case XYPLOT:
-        xyplot_activate (state, display, gg);
-      break;
-      case TOUR2D3:
-        if (cpanel->t2d3.manip_mode != MANIP_OFF)
-          splot_cursor_set ((gint) NULL, sp);
-      break;
-      case TOUR2D:
-        if (cpanel->t2d.manip_mode != MANIP_OFF)
-          splot_cursor_set ((gint) NULL, sp);
-      break;
-      case COTOUR:
-        if (cpanel->tcorr.manip_mode != MANIP_OFF)
-          splot_cursor_set ((gint) NULL, sp);
+    switch (imode) {
+    case DEFAULT_IMODE:
+      switch(pmode) {
+        case P1PLOT:
+          p1d_activate (state, display, gg);
+        break;
+        case XYPLOT:
+          xyplot_activate (state, display, gg);
+        break;
+        case TOUR2D3:
+          if (cpanel->t2d3.manip_mode != MANIP_OFF)
+            splot_cursor_set ((gint) NULL, sp);
+        break;
+        case TOUR2D:
+          if (cpanel->t2d.manip_mode != MANIP_OFF)
+            splot_cursor_set ((gint) NULL, sp);
+        break;
+        case COTOUR:
+          if (cpanel->tcorr.manip_mode != MANIP_OFF)
+            splot_cursor_set ((gint) NULL, sp);
+        break;
+        case TOUR1D:
+        case NULL_PMODE:
+        case DEFAULT_PMODE:
+        case EXTENDED_DISPLAY_PMODE: /* Each class needs its own one
+					of these */
+        case N_PMODES:
+        break;
+        }
       break;
       case BRUSH:
         redraw_style = brush_activate (state, display, gg);
@@ -375,26 +453,35 @@ viewmode_activate (splotd *sp, PipelineMode m, gboolean state, ggobid *gg)
       break;
     }
   } else if (state == on) {
-    switch (m) {
-      case P1PLOT:
-        p1d_activate (state, display, gg);
-      break;
-      case XYPLOT:
-        xyplot_activate (state, display, gg);
-      break;
-      case TOUR2D3:
-        if (cpanel->t2d3.manip_mode != MANIP_OFF)
-          splot_cursor_set (GDK_HAND2, sp);
-      break;
-      case TOUR2D:
-        if (cpanel->t2d.manip_mode != MANIP_OFF)
-          splot_cursor_set (GDK_HAND2, sp);
-      break;
-      case COTOUR:
+    switch (imode) {
+    case DEFAULT_IMODE:
+      switch (pmode) {
+        case P1PLOT:
+          p1d_activate (state, display, gg);
+        break;
+        case XYPLOT:
+          xyplot_activate (state, display, gg);
+        break;
+        case TOUR2D3:
+          if (cpanel->t2d3.manip_mode != MANIP_OFF)
+            splot_cursor_set (GDK_HAND2, sp);
+        break;
+        case TOUR2D:
+          if (cpanel->t2d.manip_mode != MANIP_OFF)
+            splot_cursor_set (GDK_HAND2, sp);
+        break;
+        case COTOUR:
         if (cpanel->tcorr.manip_mode != MANIP_OFF)
           splot_cursor_set (GDK_HAND2, sp);
+        break;
+        case TOUR1D:
+        case NULL_PMODE:
+        case DEFAULT_PMODE:
+        case EXTENDED_DISPLAY_PMODE:
+        case N_PMODES:
+        break;
+      }
       break;
-
       case BRUSH:
         redraw_style = brush_activate (state, display, gg);
       break;
@@ -414,19 +501,12 @@ viewmode_activate (splotd *sp, PipelineMode m, gboolean state, ggobid *gg)
   return redraw_style;
 }
 
-void
-viewmode_set_cb (GtkWidget *widget, gint action)
-{
-  ggobid *gg = GGobiFromWidget(widget,true);
-  GGOBI(full_viewmode_set)((PipelineMode) action, gg);
-}
-
 /*
  * Verify that the number of variables is large enough before
  * allowing the projection to be reset.
 */
 gboolean
-projection_ok (gint m, displayd *display)
+projection_ok (ProjectionMode m, displayd *display)
 {
   gboolean ok = true;
   datad *d = display->d;
@@ -462,13 +542,41 @@ projection_ok (gint m, displayd *display)
       break;
     }
   }
-
   return ok;
 }
 
+void
+pmode_set_cb (GtkWidget *w, gint action) {
+  ggobid *gg = GGobiFromWidget(w, true);
+  ProjectionMode pm = (ProjectionMode) action;
+
+  if ((pm != gg->pmode || gg->imode != DEFAULT_IMODE) &&
+       projection_ok(pm, gg->current_display)) 
+  {
+    /* When the pmode is reset, the imode is set to the default */
+    GGOBI(full_viewmode_set)(pm, DEFAULT_IMODE, gg);
+  }
+}
+void
+imode_set_cb (GtkWidget *w, gint action) {
+  ggobid *gg = GGobiFromWidget(w, true);
+  InteractionMode im;
+
+  im = (InteractionMode) action;
+  if (im != gg->imode) {
+    GGOBI(full_viewmode_set)(NULL_PMODE, im, gg);
+  }
+}
+
+/* Do everything in one routine for now; split later if apropriate */
 gint
-GGOBI(full_viewmode_set)(gint action, ggobid *gg)
+GGOBI(full_viewmode_set)(ProjectionMode pmode, InteractionMode imode, ggobid *gg)
 {
+  /*
+   * When a new pmode is selected, it sets a new pmode and then calls
+   * this routine, because a new imode is also selected.
+  */
+
 /*
  * Some of the routines called here, like procs_activate
  * and reinit_transient brushing, are routines that we want
@@ -477,8 +585,13 @@ GGOBI(full_viewmode_set)(gint action, ggobid *gg)
  * a new display becomes current.
  * Because of that, we don't put them in viewmode_activate.
 */
-  PipelineMode prev_viewmode = gg->viewmode;
   gboolean reinit_transient_p = false;
+  gboolean cpanel_shows_pmode = (imode == DEFAULT_IMODE);
+
+  /*
+  g_printerr ("(full_viewmode_set) pmodearg=%d pmode=%d pmode_prev=%d,
+  imodearg=%d imode=%d imode_prev=%d\n", pmode, gg->pmode,
+  gg->pmode_prev, imode, gg->imode, gg->imode_prev); */
 
   if (gg->current_display != NULL && gg->current_splot != NULL) {
     splotd *sp = gg->current_splot;
@@ -486,49 +599,60 @@ GGOBI(full_viewmode_set)(gint action, ggobid *gg)
     cpaneld *cpanel = &display->cpanel;
     RedrawStyle redraw_style = NONE;
 
-    if (projection_ok (action, display)) {
-      sp_event_handlers_toggle (sp, off);
-      redraw_style = viewmode_activate (sp, gg->viewmode, off, gg);
-      procs_activate (off, display, gg);
+    /* Shutting off event handlers and idle procs */
+    /* It may make sense to split the event handlers into two routines
+       */
+    /* Each display class may need one of these */
+    sp_event_handlers_toggle (sp, off, gg->pmode, gg->imode);
+    redraw_style = imode_activate (sp, gg->pmode, gg->imode, off, gg);
+    procs_activate (off, gg->pmode, display, gg);
 
-      display->cpanel.viewmode = (PipelineMode) action;
-      viewmode_set (display->cpanel.viewmode, gg);
+    /* UI part and resetting the variables */
+    if (pmode != NULL_PMODE)
+      display->cpanel.pmode = pmode;
+    display->cpanel.imode = imode;
+    viewmode_set(pmode, imode, gg);
+    /*
+    g_printerr ("new: gg->pmode=%d  gg->imode=%d\n", gg->pmode,
+    gg->imode);
+    */
+    /* */
 
-      sp_event_handlers_toggle (sp, on);
-      viewmode_activate (sp, gg->viewmode, on, gg);
+    sp_event_handlers_toggle (sp, on, gg->pmode, gg->imode);
+    imode_activate (sp, gg->pmode, gg->imode, on, gg);
+    if (cpanel_shows_pmode)
+      procs_activate (on, gg->pmode, display, gg);
 
-      procs_activate (on, display, gg);
-      if (gg->viewmode != BRUSH && prev_viewmode == BRUSH) {
-        if (cpanel->br.mode == BR_TRANSIENT) {
-          reinit_transient_p = true;
-          reinit_transient_brushing (display, gg);
-        }
+    if (gg->imode != BRUSH && gg->imode_prev == BRUSH) {
+      if (cpanel->br.mode == BR_TRANSIENT) {
+        reinit_transient_p = true;
+        reinit_transient_brushing (display, gg);
       }
-
-      /*
-       * work out which mode menus (Options, Reset, I/O) need
-       * to be present, and add the needed callbacks.
-      */
-      viewmode_submenus_update (prev_viewmode, gg->current_display, gg);
-
-      /*-- redraw this display --*/
-      display_tailpipe (display, FULL, gg);
-
-      /*-- redraw as needed for transient brushing and identify --*/
-      if (redraw_style != NONE || reinit_transient_p) {
-        displays_plot (sp, FULL, gg);
-      }
-
-/**/  return (action);
     }
+
+    /*
+     * work out which mode menus (Options, Reset, I/O) need
+     * to be present, and add the needed callbacks.  
+     * Arguments are goofy -- prev is just as easy to get hold of as mode.
+    */
+    main_miscmenus_update (gg->pmode_prev, gg->imode_prev, gg->current_display, gg);
+    /*-- redraw this display --*/
+    display_tailpipe (display, FULL, gg);
+
+    /*-- redraw as needed for transient brushing and identify --*/
+    if (redraw_style != NONE || reinit_transient_p) {
+      displays_plot (sp, FULL, gg);
+    }
+
+ /**/return (gg->imode);
+
   } else {  /* if there's no display */
-
-    viewmode_set (NULLMODE, gg);
+    viewmode_set (NULL_PMODE, NULL_IMODE, gg);
     /*-- need to remove console menus: Options, Reset, ... --*/
-    viewmode_submenus_update (prev_viewmode, NULL, gg);
-    submenu_destroy (gg->viewmode_item);
+    main_miscmenus_update (gg->pmode_prev, gg->imode_prev, NULL, gg);
+    submenu_destroy (gg->imode_item);
 
-/**/return (NULLMODE);
+/**/return (NULL_IMODE);
   }
 
   return(-1);
@@ -684,7 +808,7 @@ quit_ggobi(ggobid *gg, gint action, GtkWidget *w)
   }
   closePlugins(gg);
 #endif
-  procs_activate (off, gg->current_display, gg);
+  procs_activate (off, gg->pmode, gg->current_display, gg);
   gtk_main_quit();
 }
 
@@ -740,6 +864,19 @@ make_ui (ggobid *gg)
     gg->main_accel_group, window,
     &gg->main_menubar, (gpointer) gg);
 
+/* I don't know that this is the best place for this ... should I
+create and destroy these groups when the menus are torn down and
+rebuilt? -- dfs */
+
+  gg->pmode_accel_group = gtk_accel_group_new ();
+  gg->imode_accel_group = gtk_accel_group_new ();
+  /*
+  gtk_window_add_accel_group (GTK_WINDOW (window), gg->pmode_accel_group);
+  gtk_window_add_accel_group (GTK_WINDOW (window), gg->imode_accel_group);
+  gtk_accel_group_lock (gg->pmode_accel_group);
+  gtk_accel_group_lock (gg->imode_accel_group);
+  */
+
 #ifdef SUPPORT_INIT_FILES
   if (sessionOptions->info && sessionOptions->info->numInputs > 0) {
     GtkWidget *w;
@@ -761,18 +898,23 @@ make_ui (ggobid *gg)
  * Create a frame to hold the mode panels, set its label
  * and contents, using the default mode for the default display.
 */
-  gg->viewmode_frame = gtk_frame_new ((gg->viewmode == NULLMODE) 
-                                       ? "" : viewmode_name[gg->viewmode]);
+  gg->imode_frame = gtk_frame_new ((gg->imode == NULL_IMODE) 
+                                    ? "" : imode_name[gg->imode]);
 
-  gtk_box_pack_start (GTK_BOX (hbox), gg->viewmode_frame, false, false, 3);
-  gtk_container_set_border_width (GTK_CONTAINER (gg->viewmode_frame), 3);
-  gtk_frame_set_shadow_type (GTK_FRAME (gg->viewmode_frame),
+  gtk_box_pack_start (GTK_BOX (hbox), gg->imode_frame, false, false, 3);
+  gtk_container_set_border_width (GTK_CONTAINER (gg->imode_frame), 3);
+  gtk_frame_set_shadow_type (GTK_FRAME (gg->imode_frame),
     GTK_SHADOW_IN);
 
   make_control_panels (gg);
-  if (gg->viewmode != NULLMODE)
-    gtk_container_add (GTK_CONTAINER (gg->viewmode_frame),
-                       gg->control_panel[gg->viewmode]);
+  if (gg->imode != NULL_IMODE) {
+    if (gg->imode == DEFAULT_IMODE)
+      gtk_container_add (GTK_CONTAINER (gg->imode_frame),
+    	mode_panel_get_by_name((gchar *) pmode_name[gg->pmode], gg));
+    else
+      gtk_container_add (GTK_CONTAINER (gg->imode_frame),
+    	mode_panel_get_by_name((gchar *) imode_name[gg->imode], gg));
+  }
 
   /*-- Variable selection panel --*/
   varpanel_make (hbox, gg);
@@ -793,26 +935,34 @@ make_ui (ggobid *gg)
   /* -- do not map or show this widget -- */
   
   /*-- at this point, the mode could be NULLMODE, P1PLOT, or XYPLOT --*/
-  /*mode_submenus_activate (NULL, gg->viewmode, on, gg);*/
   {
-    void viewmode_submenus_initialize (PipelineMode mode, ggobid *gg);
-    viewmode_submenus_initialize (gg->viewmode, gg);
+    void main_miscmenus_initialize (ggobid *gg);
+    main_miscmenus_initialize (gg);
   }
 
   if(sessionOptions->showControlPanel)
       gtk_widget_show_all (window);
 }
 
-
 const gchar * const* 
-GGOBI(getOpModeNames)(int *n)
+GGOBI(getPModeNames)(int *n)
 {
-  /*  extern const gchar *const* GGOBI(ModeNames); */
-  *n = sizeof(GGOBI(OpModeNames))/sizeof(GGOBI(OpModeNames)[0]);
-  return (GGOBI(OpModeNames));
+  *n = sizeof(GGOBI(PModeNames))/sizeof(GGOBI(PModeNames)[0]);
+  return (GGOBI(PModeNames));
+}
+const gchar * const* 
+GGOBI(getIModeNames)(int *n)
+{
+  *n = sizeof(GGOBI(IModeNames))/sizeof(GGOBI(IModeNames)[0]);
+  return (GGOBI(IModeNames));
 }
 
-
+const gchar * const* 
+GGOBI(getPModeKeys)(int *n)
+{
+  *n = sizeof(GGOBI(PModeKeys))/sizeof(GGOBI(PModeKeys)[0]);
+  return (GGOBI(PModeKeys));
+}
 
 
 #ifdef SUPPORT_INIT_FILES
@@ -902,6 +1052,7 @@ create_ggobi(InputDescription *desc)
 
      /*-- some initializations --*/
   gg->displays = NULL;
+  gg->control_panels = NULL;
   globals_init (gg);      /*-- variables that don't depend on the data --*/
   special_colors_init (gg);
   make_ui (gg);

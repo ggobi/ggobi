@@ -79,7 +79,8 @@ filesel_ok (GtkWidget *w, GtkFileSelection *fs)
        * and to make the Options menu appear.
       */
       if (firsttime) {
-        GGOBI(full_viewmode_set) (XYPLOT, gg);
+        gg->pmode = XYPLOT;
+        GGOBI(full_viewmode_set) (XYPLOT, DEFAULT_IMODE, gg);
       }
     }
     break;

@@ -159,7 +159,7 @@ datad_init (datad *d, ggobid *gg, gboolean cleanup)
 
   if (cleanup || g_list_length(gg->displays) == 0) {
     display_free_all (gg);  /*-- destroy any existing displays --*/
-    gg->viewmode = NULLMODE;
+    gg->pmode = NULL_PMODE;
 
     /*-- initialize the first display --*/
     if(sessionOptions->info->createInitialScatterPlot && d->ncols > 0) {
@@ -177,8 +177,10 @@ datad_init (datad *d, ggobid *gg, gboolean cleanup)
         display->current_splot = gg->current_splot;
 
         /*-- turn on event handling in the very first plot --*/
-        /*-- ... but will it cause trouble for later plots?  ok so far --*/
-        sp_event_handlers_toggle (gg->current_splot, on);
+        /*-- ... but will it cause trouble for later plots?  ok so far
+	  --*/
+	/* Is imode set yet?  I hope so. */
+        sp_event_handlers_toggle (gg->current_splot, on, gg->pmode, gg->imode);
       }
     }
   }

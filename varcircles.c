@@ -39,7 +39,7 @@ static void varcircle_pack (GtkWidget *, datad *);
 void
 varcircles_visibility_set (displayd *display, ggobid *gg)
 {
-  gint projection;
+  ProjectionMode projection;
   gint j;
   GtkWidget *box;
   datad *d;
@@ -49,7 +49,7 @@ varcircles_visibility_set (displayd *display, ggobid *gg)
   if(!display)
       return;
 
-  projection = (gint) projection_get (gg);
+  projection = pmode_get (gg);
   d = display->d;
   children = gtk_container_children (GTK_CONTAINER (d->vcirc_ui.table));
 

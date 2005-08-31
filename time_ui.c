@@ -179,27 +179,28 @@ cpanel_tsplot_make (ggobid *gg)
   At present, this is always false.
   See scatmat_mode_menu_make and scatterplot_mode_menu_make.
  */
-void
-tsplot_mode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func, ggobid *gg, gboolean useIds) 
+GtkWidget *
+tsplot_imode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func, ggobid *gg, gboolean useIds) 
 {
-  gg->tsplot.mode_menu = gtk_menu_new ();
+  GtkWidget *imode_menu = gtk_menu_new ();
 
-  CreateMenuItem (gg->tsplot.mode_menu, "Time Series",
-    "^v", "", NULL, accel_group, func,
-    useIds ? GINT_TO_POINTER (EXTENDED_DISPLAY_MODE) : gg, gg);
+  CreateMenuItem (imode_menu, "Time Series",
+    "^h", "", NULL, accel_group, func,
+    useIds ? GINT_TO_POINTER (DEFAULT_IMODE) : gg, gg);
 
   /* Add a separator */
-  CreateMenuItem (gg->tsplot.mode_menu, NULL,
+  CreateMenuItem (imode_menu, NULL,
     "", "", NULL, NULL, NULL, NULL, gg);
 
-  CreateMenuItem (gg->tsplot.mode_menu, "Brush",
+  CreateMenuItem (imode_menu, "Brush",
     "^b", "", NULL, accel_group, func,
     useIds ? GINT_TO_POINTER (BRUSH) : gg, gg);
-  CreateMenuItem (gg->tsplot.mode_menu, "Identify",
+  CreateMenuItem (imode_menu, "Identify",
     "^i", "", NULL, accel_group, func,
     useIds ? GINT_TO_POINTER (IDENT) : gg, gg);
 
-  gtk_widget_show (gg->tsplot.mode_menu);
+  gtk_widget_show (imode_menu);
+  return (imode_menu);
 }
 
 /*--------------------------------------------------------------------*/

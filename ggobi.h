@@ -96,10 +96,6 @@ typedef struct {
 
   struct _ggobid *thisGG;
 
- /*-- viewmode menus --*/
-  GtkWidget *scatmat_mode_menu;
-  GtkWidget *scatterplot_mode_menu;
-
   GtkAccelGroup *sp_accel_group; /*-- sp = scatterplot here --*/
 
 } GGobiMenus;
@@ -142,12 +138,15 @@ struct _ggobid {
 
   /* main_ui */
   GtkWidget *current_control_panel;
-  GtkWidget *control_panel[NMODES];
+
+  GList *control_panels;
+
   GtkWidget *main_window, *main_menubar;
   GtkItemFactory *main_menu_factory;
   GtkWidget *display_menu_item, *display_menu; /*-- menu labelled 'Window' --*/
-  GtkAccelGroup *main_accel_group;
-  GtkWidget *viewmode_frame, *viewmode_item;
+  GtkAccelGroup *main_accel_group, *pmode_accel_group, *imode_accel_group;
+  GtkWidget *pmode_item, *imode_item;
+  GtkWidget *imode_frame;  /* this should be cpanel_frame, actually */
   GtkTooltips *tips;
   gboolean firsttime;
 
@@ -171,8 +170,8 @@ struct _ggobid {
 
 /*----------------------- pipeline ---------------------------------*/
 
-  PipelineMode viewmode, prev_viewmode;
-  PipelineMode projection, prev_projection;
+  ProjectionMode pmode, pmode_prev;
+  InteractionMode imode, imode_prev;
 
   struct _VarTableUI {
     GtkWidget *window;
@@ -282,7 +281,6 @@ struct _ggobid {
   struct _Parcoords {
     GtkAccelGroup *accel_group;
     GtkWidget *arrangement_box;
-    GtkWidget *mode_menu;
   } parcoords;
 
 /*---------------------time series------------------------------------*/
@@ -291,7 +289,6 @@ struct _ggobid {
   struct _TSPLOT {
     GtkAccelGroup *accel_group;
     GtkWidget *arrangement_box;
-    GtkWidget *mode_menu;
   } tsplot;
 
 
@@ -326,10 +323,10 @@ struct _ggobid {
 
 /*--------------------- submenu management ---------------------------*/
 
-  struct _Mode_SubMenu {
+  struct _Main_MiscMenu {
     GtkWidget *options_item, *options_menu;
     GtkWidget *reset_item, *reset_menu;
-    GtkWidget *io_item, *io_menu;
+    /*GtkWidget *io_item, *io_menu;*/
   } menus;
 
 /*-------------------- transformation --------------------------------*/
@@ -417,7 +414,6 @@ struct _ggobid {
     gboolean layoutByRow;
   } varpanel_ui;
 
-
   KeyEventHandler *NumberedKeyEventHandler;
 
   PrintOptions *printOptions;
@@ -426,8 +422,8 @@ struct _ggobid {
   GList *colorSchemes;
   colorschemed *activeColorScheme;
 
-
-  GSList *viewModeRadioGroup;
+  GSList *pmodeRadioGroup;
+  GSList *imodeRadioGroup;
 
   void *userData;/** A place to hang data for a host application, plugin, etc. 
                      Since plugins, etc. may also use this, we might want 
@@ -436,7 +432,6 @@ struct _ggobid {
 };                              /*  ggobid; */
 
 #include "read_init.h"
-
 
 typedef enum { GGOBI_SILENT, GGOBI_CHATTY, GGOBI_VERBOSE } GGobiOutputLevel;
 
@@ -523,10 +518,8 @@ typedef struct {
       */
   gchar *ggobiHome;
 
-
   gfloat defaultTourSpeed;
   gfloat defaultTour1dSpeed;
-
 
   gboolean useRadioMenuItems;
 

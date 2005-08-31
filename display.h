@@ -276,7 +276,8 @@ typedef struct
 
     void (*varpanel_refresh)(displayd *dpy, splotd *sp, datad *d);
 
-    gboolean (*handles_action)(displayd *dpy, PipelineMode mode);
+  gboolean (*handles_projection)(displayd *dpy, ProjectionMode);
+  gboolean (*handles_interaction)(displayd *dpy, InteractionMode);
 
 	/* Probably should arrange for displayd to come first and no need to pass the splots. */
     void (*xml_describe)(xmlNodePtr node, GList *splots, displayd *dpy);
@@ -285,37 +286,44 @@ typedef struct
 
     gint (*plotted_vars_get)(displayd *display, gint *cols, datad *d, ggobid *gg);
 
-    GtkWidget *(*viewmode_control_box)(displayd *, gint viewmode, gchar **modeName, ggobid *gg);
+    GtkWidget *(*imode_control_box)(displayd *, gchar **modeName, ggobid *gg);
 
-    GtkWidget *(*menus_make)(displayd *dpy, PipelineMode viewMode, ggobid *gg);
+  GtkWidget *(*menus_make)(displayd *dpy, ggobid *gg);
 
-    gboolean (*event_handlers_toggle)(displayd *dpy, splotd *sp, gboolean state, gint viewMode);
+  gboolean (*event_handlers_toggle)(displayd *dpy, splotd *sp, gboolean state, ProjectionMode, InteractionMode);
 
     gint (*splot_key_event_handler)(displayd *dpy, splotd *sp, gint keval);
+  /* new - dfs */
+  gint (*splot_key_event_handled)(GtkWidget *, displayd *, splotd *, GdkEventKey *, ggobid *);
 
     void (*add_plot_labels)(displayd *dpy, splotd *sp, GdkDrawable *, datad *, ggobid *);
 
-    gboolean (*varpanel_highd)(displayd *dpy);
+  gboolean (*varpanel_highd)(displayd *dpy);
 
-    void (*move_points_motion_cb)(displayd *, splotd *, GtkWidget *w, GdkEventMotion *event, ggobid *);
-    void (*move_points_button_cb)(displayd *, splotd *, GtkWidget *w, GdkEventButton *event, ggobid *);
+  void (*move_points_motion_cb)(displayd *, splotd *, GtkWidget *w, GdkEventMotion *event, ggobid *);
+  void (*move_points_button_cb)(displayd *, splotd *, GtkWidget *w, GdkEventButton *event, ggobid *);
 
 /* XXX duncan and dfs: you need to sort this out
     void (*world_to_raw)(displayd *, splotd *, gint, datad *, ggobid *);
 */
-    void (*viewmode_set)(displayd *, ggobid *);
 
-    gboolean (*varcircle_draw)(displayd *, gint jvar, GdkPixmap *da_pix, ggobid *gg);
-    void (*select_X)(GtkWidget *, displayd *, gint, ggobid *);
+  /* time will tell which of these we need -- dfs */
+  void (*viewmode_set)(displayd *, ggobid *);
+  void (*pmode_set)(ProjectionMode, displayd *, ggobid *);
+  void (*imode_set)(displayd *, ggobid *);
+  /* */
 
-    void (*tour1d_realloc)(displayd *, gint, datad *);
-    void (*tour2d3_realloc)(displayd *, gint, datad *);
-    void (*tour2d_realloc)(displayd *, gint, datad *);
-    void (*tourcorr_realloc)(displayd *, gint, datad *);
+  gboolean (*varcircle_draw)(displayd *, gint jvar, GdkPixmap *da_pix, ggobid *gg);
+  void (*select_X)(GtkWidget *, displayd *, gint, ggobid *);
 
-    void (*set_show_axes_option)(displayd *, gboolean);
-    void (*set_show_axes_label_option)(displayd *, gboolean);
-    void (*set_show_axes_values_option)(displayd *, gboolean);
+  void (*tour1d_realloc)(displayd *, gint, datad *);
+  void (*tour2d3_realloc)(displayd *, gint, datad *);
+  void (*tour2d_realloc)(displayd *, gint, datad *);
+  void (*tourcorr_realloc)(displayd *, gint, datad *);
+
+  void (*set_show_axes_option)(displayd *, gboolean);
+  void (*set_show_axes_label_option)(displayd *, gboolean);
+  void (*set_show_axes_values_option)(displayd *, gboolean);
 
 } GtkGGobiExtendedDisplayClass;
 

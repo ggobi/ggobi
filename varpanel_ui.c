@@ -165,7 +165,7 @@ varsel (GtkWidget *w, cpaneld *cpanel, splotd *sp, gint jvar,
   if (redraw) {
     display_tailpipe (display, FULL, gg);
 
-    if (viewmode_get (gg) == BRUSH) {
+    if (imode_get (gg) == BRUSH) {
       display_tailpipe (display, NONE, gg);
       brush_once_and_redraw (true, sp, display, gg); /* binning ok */
     }

@@ -362,10 +362,10 @@ ggobi_alloc(ggobid *tmp)
   tmp->displays = NULL;
 
   /*-- initialize to NULLMODE and check for ncols later --*/
-  tmp->viewmode = NULLMODE;
-  tmp->prev_viewmode = NULLMODE;
-  tmp->projection = NULLMODE;
-  tmp->prev_projection = NULLMODE;
+  tmp->pmode = NULL_PMODE;
+  tmp->pmode_prev = NULL_PMODE;
+  tmp->imode = NULL_IMODE;
+  tmp->imode_prev = NULL_IMODE;
   /*-- --*/
 
   /*-- initialize main window, tool windows to NULL --*/

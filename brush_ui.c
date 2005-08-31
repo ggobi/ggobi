@@ -492,13 +492,18 @@ GtkWidget *create_linkby_notebook (GtkWidget *, ggobid *);
 
 void cpanel_brush_make(ggobid * gg)
 {
+  modepaneld *panel;
   GtkWidget *btn;
   GtkWidget *option_menu;
   GtkWidget *vb, *lbl;
   GtkWidget *notebook;
 
-  gg->control_panel[BRUSH] = gtk_vbox_new(false, VBOX_SPACING);
-  gtk_container_set_border_width(GTK_CONTAINER(gg->control_panel[BRUSH]),
+  panel = (modepaneld *) g_malloc(sizeof(modepaneld));
+  gg->control_panels = g_list_append(gg->control_panels, (gpointer) panel);
+  panel->name = g_strdup(GGOBI(getIModeName)(BRUSH));
+
+  panel->w = gtk_vbox_new(false, VBOX_SPACING);
+  gtk_container_set_border_width(GTK_CONTAINER(panel->w),
                                  5);
 
  /*-- button: open symbol panel --*/
@@ -507,7 +512,7 @@ void cpanel_brush_make(ggobid * gg)
     "Open panel for choosing color and glyph", NULL);
   gtk_signal_connect(GTK_OBJECT(btn), "clicked",
     GTK_SIGNAL_FUNC(open_symbol_window_cb), (gpointer) gg);
-  gtk_box_pack_start(GTK_BOX(gg->control_panel[BRUSH]),
+  gtk_box_pack_start(GTK_BOX(panel->w),
     btn, false, false, 1);
 
 /*-- option menu: persistent/transient --*/
@@ -515,7 +520,7 @@ void cpanel_brush_make(ggobid * gg)
   gtk_widget_set_name(option_menu, "BRUSH:mode_option_menu");
   gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), option_menu,
     "Persistent or transient brushing", NULL);
-  gtk_box_pack_start(GTK_BOX(gg->control_panel[BRUSH]),
+  gtk_box_pack_start(GTK_BOX(panel->w),
     option_menu, false, false, 0);
   populate_option_menu(option_menu, mode_lbl,
     sizeof(mode_lbl) / sizeof(gchar *),
@@ -525,7 +530,7 @@ void cpanel_brush_make(ggobid * gg)
 
 /*-- option menu: brush with color/glyph/both --*/
   vb = gtk_vbox_new(false, 0);
-  gtk_box_pack_start(GTK_BOX(gg->control_panel[BRUSH]), vb,
+  gtk_box_pack_start(GTK_BOX(panel->w), vb,
                      false, false, 0);
 
   lbl = gtk_label_new("Point brushing:");
@@ -547,7 +552,7 @@ void cpanel_brush_make(ggobid * gg)
 
 /*-- new, for edges --*/
   vb = gtk_vbox_new(false, 0);
-  gtk_box_pack_start(GTK_BOX(gg->control_panel[BRUSH]), vb,
+  gtk_box_pack_start(GTK_BOX(panel->w), vb,
                      false, false, 0);
 
   lbl = gtk_label_new("Edge brushing:");
@@ -572,13 +577,13 @@ void cpanel_brush_make(ggobid * gg)
   gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), btn,
     "Undo the most recent brushing changes, from button down to button up",
     NULL);
-  gtk_box_pack_start(GTK_BOX(gg->control_panel[BRUSH]),
+  gtk_box_pack_start(GTK_BOX(panel->w),
     btn, false, false, 0);
   gtk_signal_connect(GTK_OBJECT(btn), "clicked",
     GTK_SIGNAL_FUNC(brush_undo_cb), gg);
 
   /*-- Define the linking rule --*/
-  notebook = create_linkby_notebook (gg->control_panel[BRUSH], gg);
+  notebook = create_linkby_notebook (panel->w, gg);
   gtk_widget_set_name(notebook, "BRUSH:linkby_notebook");
 
 /*-- button for opening 'color schemes' panel --*/
@@ -588,7 +593,7 @@ void cpanel_brush_make(ggobid * gg)
     NULL);
   gtk_signal_connect(GTK_OBJECT(btn), "clicked",
     GTK_SIGNAL_FUNC(wvis_window_cb), (gpointer) gg);
-  gtk_box_pack_start(GTK_BOX(gg->control_panel[BRUSH]),
+  gtk_box_pack_start(GTK_BOX(panel->w),
     btn, false, false, 1);
 
 /*-- button for opening clusters table --*/
@@ -598,7 +603,7 @@ void cpanel_brush_make(ggobid * gg)
     NULL);
   gtk_signal_connect(GTK_OBJECT(btn), "clicked",
     GTK_SIGNAL_FUNC(cluster_window_cb), (gpointer) gg);
-  gtk_box_pack_start(GTK_BOX(gg->control_panel[BRUSH]),
+  gtk_box_pack_start(GTK_BOX(panel->w),
     btn, false, false, 1);
 
   btn = gtk_check_button_new_with_label("Brush on");
@@ -608,10 +613,10 @@ void cpanel_brush_make(ggobid * gg)
     NULL);
   gtk_signal_connect(GTK_OBJECT(btn), "toggled",
     GTK_SIGNAL_FUNC(brush_on_cb), (gpointer) gg);
-  gtk_box_pack_start(GTK_BOX(gg->control_panel[BRUSH]), btn, false,
+  gtk_box_pack_start(GTK_BOX(panel->w), btn, false,
   false, 0);
 
-  gtk_widget_show_all(gg->control_panel[BRUSH]);
+  gtk_widget_show_all(panel->w);
 }
 
 /*--------------------------------------------------------------------*/
@@ -634,8 +639,11 @@ void cpanel_brush_init(cpaneld *cpanel, ggobid *gg)
 void cpanel_brush_set(displayd *display, cpaneld *cpanel, ggobid *gg)
 {
   GtkWidget *w;
-  GtkWidget *pnl = gg->control_panel[BRUSH];
+  GtkWidget *pnl = mode_panel_get_by_name(GGOBI(getIModeName)(BRUSH), gg);
   GtkWidget *btn;
+
+  if (pnl == (GtkWidget *) NULL)
+    return;
 
   btn = widget_find_by_name(pnl, "BRUSH:brush_on_button");
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(btn),
@@ -648,7 +656,8 @@ void cpanel_brush_set(displayd *display, cpaneld *cpanel, ggobid *gg)
   w = widget_find_by_name(pnl, "BRUSH:linkby_notebook");
   gtk_notebook_set_page(GTK_NOTEBOOK(w), cpanel->br.linkby_page);
   /* Get the clist (how?) and set the current row number. */
-  /* I could save the page number and the row number */
+  /* It's the notebook page corresponding to display->d -- uh-oh, what
+     if it's display->e?? */
   /* Set the values for gg->linkby_cv and d->linkvar_vt based on
      cpanel->br_linkby and the state of the notebook page? */
 

@@ -14,6 +14,7 @@
  *   Andreas Buja        andreas.buja@wharton.upenn.edu
 */
 
+#include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 #ifdef USE_STRINGS_H
 #include <strings.h>
@@ -276,18 +277,22 @@ static gchar *target_lbl[] = {
   };
 void
 cpanel_identify_make(ggobid *gg) {
+  modepaneld *panel;
   GtkWidget *btn, *opt;
   GtkWidget *notebook;
   GtkWidget *frame, *framevb;
   
-  gg->control_panel[IDENT] = gtk_vbox_new (false, VBOX_SPACING);
-  gtk_container_set_border_width (GTK_CONTAINER(gg->control_panel[IDENT]), 5);
+  panel = (modepaneld *) g_malloc(sizeof(modepaneld));
+  gg->control_panels = g_list_append(gg->control_panels, (gpointer) panel);
+  panel->name = g_strdup(GGOBI(getIModeName)(IDENT));
+  panel->w = gtk_vbox_new (false, VBOX_SPACING);
+  gtk_container_set_border_width (GTK_CONTAINER(panel->w), 5);
 
   /*-- provide a variable list so that any variable can be the label --*/
-  notebook = create_variable_notebook (gg->control_panel[IDENT],
+  notebook = create_variable_notebook (panel->w,
     GTK_SELECTION_EXTENDED, all_vartypes, all_datatypes,
     (GtkSignalFunc) NULL, gg);
-  gtk_object_set_data (GTK_OBJECT (gg->control_panel[IDENT]),
+  gtk_object_set_data (GTK_OBJECT (panel->w),
     "notebook", notebook);
 
   /*-- option menu --*/
@@ -296,7 +301,7 @@ cpanel_identify_make(ggobid *gg) {
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
     "How to construct the label to be displayed: the record label, record number, a label constructed using variables selected in the list above, or the record id",
     NULL);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[IDENT]),
+  gtk_box_pack_start (GTK_BOX (panel->w),
                       opt, false, false, 0);
   populate_option_menu (opt, display_lbl,
     sizeof (display_lbl) / sizeof (gchar *),
@@ -310,7 +315,7 @@ cpanel_identify_make(ggobid *gg) {
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (id_remove_labels_cb),
                       gg);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[IDENT]),
+  gtk_box_pack_start (GTK_BOX (panel->w),
                       btn, false, false, 1);
 
 /*
@@ -323,7 +328,7 @@ cpanel_identify_make(ggobid *gg) {
   gtk_signal_connect (GTK_OBJECT (btn), "clicked",
                       GTK_SIGNAL_FUNC (id_all_sticky_cb),
                       (gpointer) gg);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[IDENT]),
+  gtk_box_pack_start (GTK_BOX (panel->w),
                       btn, false, false, 1);
 
   /*-- option menu --*/
@@ -332,7 +337,7 @@ cpanel_identify_make(ggobid *gg) {
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
     "Label points or edges",
     NULL);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[IDENT]),
+  gtk_box_pack_start (GTK_BOX (panel->w),
     opt, false, false, 0);
   populate_option_menu (opt, target_lbl,
     sizeof (target_lbl) / sizeof (gchar *),
@@ -342,7 +347,7 @@ cpanel_identify_make(ggobid *gg) {
   /*-- frame around button for resetting center --*/
   frame = gtk_frame_new ("Recenter data");
   gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[IDENT]), frame,
+  gtk_box_pack_start (GTK_BOX (panel->w), frame,
     false, false, 3);
 
   framevb = gtk_vbox_new (false, VBOX_SPACING);
@@ -360,7 +365,7 @@ cpanel_identify_make(ggobid *gg) {
     false, false, 0);
   /*-- --*/
 
-  gtk_widget_show_all (gg->control_panel[IDENT]);
+  gtk_widget_show_all (panel->w);
 }
 
 
@@ -378,14 +383,16 @@ void
 cpanel_identify_set (displayd *display, cpaneld *cpanel, ggobid *gg)
 {
   GtkWidget *w;
+  GtkWidget *pnl = mode_panel_get_by_name(GGOBI(getIModeName)(IDENT), gg);
 
-  w = widget_find_by_name (gg->control_panel[IDENT],
-                           "IDENTIFY:display_option_menu");
+  if (pnl == (GtkWidget *) NULL)
+    return;
+
+  w = widget_find_by_name (pnl, "IDENTIFY:display_option_menu");
   gtk_option_menu_set_history (GTK_OPTION_MENU(w),
                                cpanel->id_display_type);
 
-  w = widget_find_by_name (gg->control_panel[IDENT],
-                           "IDENTIFY:target_option_menu");
+  w = widget_find_by_name (pnl, "IDENTIFY:target_option_menu");
   gtk_option_menu_set_history (GTK_OPTION_MENU(w),
                                (gint) cpanel->id_target_type);
 }

@@ -19,7 +19,10 @@
 #include <string.h>
 #include "write_state.h"
 #include "externs.h"
+#include <gdk/gdkkeysyms.h>
 
+static gboolean parcoordsKeyEventHandled(GtkWidget *, displayd *, splotd *,
+					GdkEventKey *, ggobid *);
 
 gint
 splot1DVariablesGet(splotd *sp, gint *cols, datad *d)
@@ -66,9 +69,64 @@ parcoordsDisplayInit(parcoordsDisplayd *display)
 }
 
 static gboolean
-handlesAction(displayd *dpy, PipelineMode v)
+handlesInteraction(displayd *dpy, InteractionMode v)
 {
-   return(v == BRUSH || v == IDENT || v == PCPLOT);
+   return(v == BRUSH || v == IDENT || v == DEFAULT_IMODE);
+}
+
+gboolean
+parcoordsEventHandlersToggle(displayd * dpy, splotd * sp, gboolean state,
+                            ProjectionMode pmode, InteractionMode imode)
+{
+  switch (imode) {
+  case DEFAULT_IMODE:
+      p1d_event_handlers_toggle (sp, state);
+  break;
+  case BRUSH:
+      brush_event_handlers_toggle (sp, state);
+  break;
+  case IDENT:
+      identify_event_handlers_toggle (sp, state);
+  break;
+  default:
+  break;
+  }
+
+  return (false);
+}
+
+static gboolean
+parcoordsKeyEventHandled(GtkWidget *w, displayd *display, splotd * sp, GdkEventKey *event, ggobid *gg)
+{
+  gboolean ok = true;
+  ProjectionMode pmode = NULL_PMODE;
+  InteractionMode imode = DEFAULT_IMODE;
+
+  switch (event->keyval) {
+    case GDK_h:
+    case GDK_H:
+      pmode = EXTENDED_DISPLAY_PMODE;
+    break;
+
+    case GDK_b:
+    case GDK_B:
+      imode = BRUSH;
+    break;
+    case GDK_i:
+    case GDK_I:
+      imode = IDENT;
+    break;
+
+    default:
+      ok = false;
+    break;
+  }
+
+  if (ok) {
+    GGOBI(full_viewmode_set)(pmode, imode, gg);
+  }
+
+  return ok;
 }
 
 
@@ -274,13 +332,15 @@ plottedVarsGet(displayd *display, gint *cols, datad *d, ggobid *gg)
 static void
 displaySet(displayd *display, ggobid *gg)
 {
-        parcoords_mode_menu_make (gg->main_accel_group,
-          (GtkSignalFunc) viewmode_set_cb, gg, true);
-        gg->viewmode_item = submenu_make ("_ViewMode", 'V',
-          gg->main_accel_group);
-        gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->viewmode_item),
-                                   gg->parcoords.mode_menu); 
-        submenu_insert (gg->viewmode_item, gg->main_menubar, 2);
+  GtkWidget *imode_menu;
+
+  imode_menu = parcoords_imode_menu_make (gg->imode_accel_group,
+    (GtkSignalFunc) imode_set_cb, gg, true);
+  gg->imode_item = submenu_make ("_Interaction", 'I',
+    gg->main_accel_group);
+  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->imode_item),
+                             imode_menu); 
+  submenu_insert (gg->imode_item, gg->main_menubar, 3);
 }
 
 /*
@@ -337,7 +397,7 @@ splot_add_whisker_cues (gint k, splotd *sp, GdkDrawable *drawable, ggobid *gg)
 
 
 static GtkWidget *
-parcoordsCPanelWidget(displayd *dpy, gint viewmode, gchar **modeName, ggobid *gg)
+parcoordsCPanelWidget(displayd *dpy, gchar **modeName, ggobid *gg)
 {
   GtkWidget *w = GTK_GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget;
   if(!w) {
@@ -375,7 +435,7 @@ parcoordsDisplayClassInit(GtkGGobiParCoordsDisplayClass *klass)
 
   klass->parent_class.varpanel_refresh = varpanelRefresh;
   
-  klass->parent_class.handles_action = handlesAction;
+  klass->parent_class.handles_interaction = handlesInteraction;
 
   klass->parent_class.cpanel_set = cpanelSet;
 
@@ -385,13 +445,12 @@ parcoordsDisplayClassInit(GtkGGobiParCoordsDisplayClass *klass)
 
   klass->parent_class.plotted_vars_get = plottedVarsGet;
 
-  klass->parent_class.viewmode_control_box = parcoordsCPanelWidget;
+  klass->parent_class.imode_control_box = parcoordsCPanelWidget;
 
 /* menus_make */
 
-/* event_handlers_toggle */
-
-/* splot_key_event_handler */
+  klass->parent_class.event_handlers_toggle = parcoordsEventHandlersToggle;
+  klass->parent_class.splot_key_event_handled = parcoordsKeyEventHandled;
 
   klass->parent_class.add_plot_labels = addPlotLabels;
 }

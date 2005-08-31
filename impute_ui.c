@@ -273,6 +273,33 @@ impute_window_open (ggobid *gg)
     label = gtk_label_new ("Random");
     gtk_notebook_append_page (GTK_NOTEBOOK (gg->impute.notebook),
       frame, label);
+
+    /* Mean */
+    radio = gtk_radio_button_new_with_label (gtk_radio_button_group (GTK_RADIO_BUTTON (radio)), "Variable mean");
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), radio,
+      "Assign the variable mean to each missing value",
+      NULL);
+    gtk_signal_connect (GTK_OBJECT (radio), "toggled",
+                       GTK_SIGNAL_FUNC (set_mean_cb), (gpointer) gg);
+    gtk_table_attach (GTK_TABLE (table), radio, 0, 1, row, row+1,
+                      (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND),
+                      (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND),
+                      1, 1);
+    row++;
+
+    /* Median */
+    radio = gtk_radio_button_new_with_label (gtk_radio_button_group (GTK_RADIO_BUTTON (radio)), "Variable median");
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), radio,
+      "Assign the variable median to each missing value",
+      NULL);
+    gtk_signal_connect (GTK_OBJECT (radio), "toggled",
+                       GTK_SIGNAL_FUNC (set_median_cb), (gpointer) gg);
+    gtk_table_attach (GTK_TABLE (table), radio, 0, 1, row, row+1,
+                      (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND),
+                      (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND),
+                      1, 1);
+    row++;
+
       
 /*
  * Fixed: some fixed value
@@ -359,6 +386,35 @@ impute_window_open (ggobid *gg)
                       1, 1);
     row++;
 
+      
+      
+    /* Mean */
+    radio = gtk_radio_button_new_with_label (gtk_radio_button_group (GTK_RADIO_BUTTON (radio)), "Variable mean");
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), radio,
+      "Assign the variable mean to each missing value",
+      NULL);
+    gtk_signal_connect (GTK_OBJECT (radio), "toggled",
+                       GTK_SIGNAL_FUNC (set_mean_cb), (gpointer) gg);
+    gtk_table_attach (GTK_TABLE (table), radio, 0, 1, row, row+1,
+                      (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND),
+                      (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND),
+                      1, 1);
+    row++;
+
+    /* Median */
+    radio = gtk_radio_button_new_with_label (gtk_radio_button_group (GTK_RADIO_BUTTON (radio)), "Variable median");
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), radio,
+      "Assign the variable median to each missing value",
+      NULL);
+    gtk_signal_connect (GTK_OBJECT (radio), "toggled",
+                       GTK_SIGNAL_FUNC (set_median_cb), (gpointer) gg);
+    gtk_table_attach (GTK_TABLE (table), radio, 0, 1, row, row+1,
+                      (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND),
+                      (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND),
+                      1, 1);
+    row++;
+
+
     /* Fixed */
     radio = gtk_radio_button_new_with_label (gtk_radio_button_group (GTK_RADIO_BUTTON (radio)), "Fixed");
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), radio,
@@ -414,32 +470,6 @@ impute_window_open (ggobid *gg)
     gtk_entry_set_text (GTK_ENTRY(entry), "10");
     gtk_widget_set_name (entry, "IMPUTE:entry_above");
     gtk_table_attach (GTK_TABLE (table), entry, 1, 2, row, row+1,
-                      (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND),
-                      (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND),
-                      1, 1);
-    row++;
-
-    /* Mean */
-    radio = gtk_radio_button_new_with_label (gtk_radio_button_group (GTK_RADIO_BUTTON (radio)), "Variable mean");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), radio,
-      "Assign the variable mean to each missing value",
-      NULL);
-    gtk_signal_connect (GTK_OBJECT (radio), "toggled",
-                       GTK_SIGNAL_FUNC (set_mean_cb), (gpointer) gg);
-    gtk_table_attach (GTK_TABLE (table), radio, 0, 1, row, row+1,
-                      (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND),
-                      (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND),
-                      1, 1);
-    row++;
-
-    /* Median */
-    radio = gtk_radio_button_new_with_label (gtk_radio_button_group (GTK_RADIO_BUTTON (radio)), "Variable median");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), radio,
-      "Assign the variable median to each missing value",
-      NULL);
-    gtk_signal_connect (GTK_OBJECT (radio), "toggled",
-                       GTK_SIGNAL_FUNC (set_median_cb), (gpointer) gg);
-    gtk_table_attach (GTK_TABLE (table), radio, 0, 1, row, row+1,
                       (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND),
                       (GtkAttachOptions) (GTK_SHRINK|GTK_FILL|GTK_EXPAND),
                       1, 1);

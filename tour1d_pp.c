@@ -799,9 +799,10 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
           &dsp->t1d_pp_param);
       break;
     case PCA: 
-      dsp->t1d.ppval = t1d_calc_indx (dsp->t1d_pp_op.pdata, pca, NULL);
+      dsp->t1d.ppval = t1d_calc_indx (dsp->t1d_pp_op.pdata, 
+        (Tour_PPIndex_f) pca, NULL);
       if (basismeth == 1)
-        kout = optimize0 (&dsp->t1d_pp_op, pca, NULL);
+        kout = optimize0 (&dsp->t1d_pp_op, (Tour_PPIndex_f) pca, NULL);
       break;
     case LDA:
       if (!compute_groups (dsp->t1d_pp_param.group, dsp->t1d_pp_param.ngroup, 

@@ -96,7 +96,7 @@ void globals_init(ggobid * gg)
 }
 
 /*-- initialize variables which DO depend on the size of the data --*/
-static void viewmodes_init(datad * d, ggobid * gg)
+static void imodes_init(datad * d, ggobid * gg)
 {
   edgeedit_init(gg);
   brush_init(d, gg);
@@ -213,7 +213,7 @@ void pipeline_init(datad * d, ggobid * gg)
   rows_in_plot_set(d, gg);
 
   /*-- some initializations --*/
-  viewmodes_init(d, gg);
+  imodes_init(d, gg);
 
   /*-- run the first half of the pipeline --*/
   arrayf_copy(&d->raw, &d->tform);
@@ -346,13 +346,17 @@ void start_ggobi(ggobid * gg, gboolean init_data, gboolean createPlot)
     d = (datad *) gg->d->data;
     if (d != NULL) {
       if (d->ncols > 0) {
-        gg->viewmode = (d->ncols == 1) ? P1PLOT : XYPLOT;
+        gg->pmode = (d->ncols == 1) ? P1PLOT : XYPLOT;
+        gg->imode = DEFAULT_IMODE;
       }
     }
-  } else
-    gg->viewmode = NULLMODE;
+  } else {
+    gg->pmode = NULL_PMODE;
+    gg->imode = NULL_IMODE;
+  }
 
-  gg->prev_viewmode = gg->projection = gg->prev_projection = gg->viewmode;
+  gg->pmode_prev = gg->pmode;
+  gg->imode_prev = gg->imode;
         /*-- initialize the mode menus for the new mode --*/
-  viewmode_submenus_update(NULLMODE, (displayd *) NULL, gg);
+  main_miscmenus_update(NULL_PMODE, NULL_IMODE, (displayd *) NULL, gg);
 }

@@ -57,9 +57,12 @@ p1d_activate (gint state, displayd *display, ggobid *gg)
      * Turn cycling off when leaving the mode, but don't worry
      * for now about turning it on when re-entering.
     */
-    GtkWidget *w = widget_find_by_name (gg->control_panel[P1PLOT], 
-                                        "P1PLOT:cycle_toggle");
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(w), off);
+    GtkWidget *pnl;
+    pnl = mode_panel_get_by_name(GGOBI(getPModeName)(P1PLOT), gg);
+    if (pnl) {
+      GtkWidget *w = widget_find_by_name (pnl, "P1PLOT:cycle_toggle");
+      gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(w), off);
+    }
   }
 
   return NONE;

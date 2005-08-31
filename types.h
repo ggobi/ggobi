@@ -19,6 +19,11 @@
 
 #include <gtk/gtk.h>
 
+typedef struct {
+  GtkWidget *w;
+  gchar *name;
+} modepaneld;
+
 /*
  * greal is at several steps in the pipeline, in particular
  * for world, jitdata, and planar, as we eliminate the conversion

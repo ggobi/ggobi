@@ -26,104 +26,11 @@
 */
 
 /*--------------------------------------------------------------------*/
-/*                   Plot1D: Options menu                             */
+/*                   Tours: Options menus                             */
 /*--------------------------------------------------------------------*/
 
 void
-p1dplot_menus_make (ggobid *gg)
-{
-  gg->menus.options_menu = gtk_menu_new ();
-
-  CreateMenuCheck (gg->menus.options_menu, "Show tooltips",
-    GTK_SIGNAL_FUNC (tooltips_show_cb), NULL,
-    GTK_TOOLTIPS (gg->tips)->enabled, gg);
-
-  CreateMenuCheck (gg->menus.options_menu, "Show control panel",
-    GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
-    GTK_WIDGET_VISIBLE (gg->viewmode_frame), gg);
-
-  CreateMenuCheck (gg->menus.options_menu, "Show status bar",
-    GTK_SIGNAL_FUNC (statusbar_show_cb), NULL,
-    gg->statusbar_p, gg);
-
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
-    gg->menus.options_menu);
-}
-
-/*--------------------------------------------------------------------*/
-/*                     XYPlot: Options menu                           */
-/*--------------------------------------------------------------------*/
-
-void
-xyplot_menus_make (ggobid *gg)
-{
-  gg->menus.options_menu = gtk_menu_new ();
-
-  CreateMenuCheck (gg->menus.options_menu, "Show tooltips",
-    GTK_SIGNAL_FUNC (tooltips_show_cb), NULL,
-    GTK_TOOLTIPS (gg->tips)->enabled, gg);
-
-  CreateMenuCheck (gg->menus.options_menu, "Show control panel",
-    GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
-    GTK_WIDGET_VISIBLE (gg->viewmode_frame), gg);
-
-  CreateMenuCheck (gg->menus.options_menu, "Show status bar",
-    GTK_SIGNAL_FUNC (statusbar_show_cb), NULL,
-    gg->statusbar_p, gg);
-
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
-    gg->menus.options_menu);
-}
-
-/*--------------------------------------------------------------------*/
-/*                   Tour 1D: I/O and Options menus                   */
-/*--------------------------------------------------------------------*/
-
-void
-tour1d_menus_make (ggobid *gg) {
-  /*GtkWidget *item;*/
-
-  /*-- I/O menu --*/
-  /*  gg->menus.io_menu = gtk_menu_new ();
-
-  item = gtk_menu_item_new_with_label ("Save coefficients");
-  gtk_signal_connect (GTK_OBJECT (item), "activate",
-                      GTK_SIGNAL_FUNC (tour1d_io_cb),
-                      (gpointer) "write_coeffs");
-  gtk_menu_append (GTK_MENU (gg->menus.io_menu), item);
-
-  item = gtk_menu_item_new_with_label ("Save history");
-  gtk_signal_connect (GTK_OBJECT (item), "activate",
-                      GTK_SIGNAL_FUNC (tour1d_io_cb),
-                      (gpointer) "write_history");
-  gtk_menu_append (GTK_MENU (gg->menus.io_menu), item);
-
-  item = gtk_menu_item_new_with_label ("Read history");
-  gtk_signal_connect (GTK_OBJECT (item), "activate",
-                      GTK_SIGNAL_FUNC (tour1d_io_cb),
-                      (gpointer) "read_history");
-  gtk_menu_append (GTK_MENU (gg->menus.io_menu), item);
-
-  gtk_widget_show_all (gg->menus.io_menu);
-
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.io_item),
-  gg->menus.io_menu); *//* di hasn't filled this in yet. */
-
-  /*-- Options menu --*/ 
-  gg->menus.options_menu = gtk_menu_new ();
-
-  CreateMenuCheck (gg->menus.options_menu, "Show tooltips",
-    GTK_SIGNAL_FUNC (tooltips_show_cb), NULL,
-    GTK_TOOLTIPS (gg->tips)->enabled, gg);
-
-  CreateMenuCheck (gg->menus.options_menu, "Show control panel",
-    GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
-    GTK_WIDGET_VISIBLE (gg->viewmode_frame), gg);
-
-  CreateMenuCheck (gg->menus.options_menu, "Show status bar",
-    GTK_SIGNAL_FUNC (statusbar_show_cb), NULL,
-    gg->statusbar_p, gg);
-
+tour1d_option_items_add (ggobid *gg) {
   /* Add a separator before the mode-specific items */
   CreateMenuItem (gg->menus.options_menu, NULL,
     "", "", NULL, NULL, NULL, NULL, gg);
@@ -135,87 +42,10 @@ tour1d_menus_make (ggobid *gg) {
   CreateMenuCheck (gg->menus.options_menu, "Select all variables",
     GTK_SIGNAL_FUNC (tour1d_all_vars_cb), NULL,
     gg->tour1d.all_vars, gg);
-
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
-    gg->menus.options_menu);
 }
 
-/*--------------------------------------------------------------------*/
-/*                  Rotation: I/O and Options menus                   */
-/*--------------------------------------------------------------------*/
-
 void
-tour2d3_menus_make (ggobid *gg)
-{
-  /*-- Options menu --*/
-  gg->menus.options_menu = gtk_menu_new ();
-
-  CreateMenuCheck (gg->menus.options_menu, "Show tooltips",
-    GTK_SIGNAL_FUNC (tooltips_show_cb), NULL,
-    GTK_TOOLTIPS (gg->tips)->enabled, gg);
-
-  CreateMenuCheck (gg->menus.options_menu, "Show control panel",
-    GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
-    GTK_WIDGET_VISIBLE (gg->viewmode_frame), gg);
-
-  CreateMenuCheck (gg->menus.options_menu, "Show status bar",
-    GTK_SIGNAL_FUNC (statusbar_show_cb), NULL,
-    gg->statusbar_p, gg);
-
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
-    gg->menus.options_menu);
-}
-
-/*--------------------------------------------------------------------*/
-/*                   Tour 2D: I/O and Options menus                   */
-/*--------------------------------------------------------------------*/
-
-void
-tour2d_menus_make (ggobid *gg)
-{
-  /*GtkWidget *item;*/
-
-  /*-- I/O menu --*/
-  /*  gg->menus.io_menu = gtk_menu_new ();
-
-  item = gtk_menu_item_new_with_label ("Save coefficients");
-  gtk_signal_connect (GTK_OBJECT (item), "activate",
-                      GTK_SIGNAL_FUNC (tour2d_io_cb),
-                      (gpointer) "write_coeffs");
-  gtk_menu_append (GTK_MENU (gg->menus.io_menu), item);
-
-  item = gtk_menu_item_new_with_label ("Save history");
-  gtk_signal_connect (GTK_OBJECT (item), "activate",
-                      GTK_SIGNAL_FUNC (tour2d_io_cb),
-                      (gpointer) "write_history");
-  gtk_menu_append (GTK_MENU (gg->menus.io_menu), item);
-
-  item = gtk_menu_item_new_with_label ("Read history");
-  gtk_signal_connect (GTK_OBJECT (item), "activate",
-                      GTK_SIGNAL_FUNC (tour2d_io_cb),
-                      (gpointer) "read_history");
-  gtk_menu_append (GTK_MENU (gg->menus.io_menu), item);
-
-  gtk_widget_show_all (gg->menus.io_menu);*//* di hasn't filled in
-//these routines yet */
-
-  /*  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.io_item),
-      gg->menus.io_menu); */
-
-  /*-- Options menu --*/
-  gg->menus.options_menu = gtk_menu_new ();
-
-  CreateMenuCheck (gg->menus.options_menu, "Show tooltips",
-    GTK_SIGNAL_FUNC (tooltips_show_cb), NULL,
-    GTK_TOOLTIPS (gg->tips)->enabled, gg);
-
-  CreateMenuCheck (gg->menus.options_menu, "Show control panel",
-    GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
-    GTK_WIDGET_VISIBLE (gg->viewmode_frame), gg);
-
-  CreateMenuCheck (gg->menus.options_menu, "Show status bar",
-    GTK_SIGNAL_FUNC (statusbar_show_cb), NULL,
-    gg->statusbar_p, gg);
+tour2d_option_items_add (ggobid *gg) {
 
   /* Add a separator before the mode-specific items */
   CreateMenuItem (gg->menus.options_menu, NULL,
@@ -228,61 +58,10 @@ tour2d_menus_make (ggobid *gg)
   CreateMenuCheck (gg->menus.options_menu, "Select all variables",
     GTK_SIGNAL_FUNC (tour2d_all_vars_cb), NULL,
     gg->tour2d.all_vars, gg);
-
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
-    gg->menus.options_menu);
 }
 
-/*--------------------------------------------------------------------*/
-/*                 Corr Tour: I/O and Options menus                   */
-/*--------------------------------------------------------------------*/
-
 void
-tourcorr_menus_make (ggobid *gg)
-{
-  /*GtkWidget *item;*/
-
-  /*-- I/O menu --*/
-  /*  gg->menus.io_menu = gtk_menu_new ();
-
-  item = gtk_menu_item_new_with_label ("Save coefficients");
-  gtk_signal_connect (GTK_OBJECT (item), "activate",
-                      GTK_SIGNAL_FUNC (tourcorr_io_cb),
-                      (gpointer) "write_coeffs");
-  gtk_menu_append (GTK_MENU (gg->menus.io_menu), item);
-
-  item = gtk_menu_item_new_with_label ("Save history");
-  gtk_signal_connect (GTK_OBJECT (item), "activate",
-                      GTK_SIGNAL_FUNC (tourcorr_io_cb),
-                      (gpointer) "write_history");
-  gtk_menu_append (GTK_MENU (gg->menus.io_menu), item);
-
-  item = gtk_menu_item_new_with_label ("Read history");
-  gtk_signal_connect (GTK_OBJECT (item), "activate",
-                      GTK_SIGNAL_FUNC (tourcorr_io_cb),
-                      (gpointer) "read_history");
-  gtk_menu_append (GTK_MENU (gg->menus.io_menu), item);
-
-  gtk_widget_show_all (gg->menus.io_menu);
-
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.io_item),
-  gg->menus.io_menu); *//* di hasn't filled this in yet */
-
-  /*-- Options menu --*/
-  gg->menus.options_menu = gtk_menu_new ();
-
-  CreateMenuCheck (gg->menus.options_menu, "Show tooltips",
-    GTK_SIGNAL_FUNC (tooltips_show_cb), NULL,
-    GTK_TOOLTIPS (gg->tips)->enabled, gg);
-
-  CreateMenuCheck (gg->menus.options_menu, "Show control panel",
-    GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
-    GTK_WIDGET_VISIBLE (gg->viewmode_frame), gg);
-
-  CreateMenuCheck (gg->menus.options_menu, "Show status bar",
-    GTK_SIGNAL_FUNC (statusbar_show_cb), NULL,
-    gg->statusbar_p, gg);
-
+cotour_option_items_add (ggobid *gg) {
   /* Add a separator before the mode-specific items */
   CreateMenuItem (gg->menus.options_menu, NULL,
     "", "", NULL, NULL, NULL, NULL, gg);
@@ -290,9 +69,6 @@ tourcorr_menus_make (ggobid *gg)
   CreateMenuCheck (gg->menus.options_menu, "Fade variables on de-selection",
     GTK_SIGNAL_FUNC (tourcorr_fade_vars_cb), NULL,
     gg->tourcorr.fade_vars, gg);
-
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
-    gg->menus.options_menu);
 }
 
 /*--------------------------------------------------------------------*/
@@ -300,13 +76,10 @@ tourcorr_menus_make (ggobid *gg)
 /*--------------------------------------------------------------------*/
 
 void
-scale_menus_make (ggobid *gg) {
-  GtkWidget *item;
+scale_reset_items_add(ggobid *gg) {
   void pan_reset_cb (GtkWidget *w, ggobid *gg);
   void zoom_reset_cb (GtkWidget *w, ggobid *gg);
-
-  /*-- Reset menu --*/
-  gg->menus.reset_menu = gtk_menu_new ();
+  GtkWidget *item;
 
   item = gtk_menu_item_new_with_label ("Reset pan");
   gtk_signal_connect (GTK_OBJECT (item), "activate",
@@ -319,29 +92,6 @@ scale_menus_make (ggobid *gg) {
                       GTK_SIGNAL_FUNC (zoom_reset_cb),
                       (gpointer) gg);
   gtk_menu_append (GTK_MENU (gg->menus.reset_menu), item);
-
-  gtk_widget_show_all (gg->menus.reset_menu);
-
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.reset_item),
-    gg->menus.reset_menu); 
-
-  /*-- Options menu --*/
-  gg->menus.options_menu = gtk_menu_new ();
-
-  CreateMenuCheck (gg->menus.options_menu, "Show tooltips",
-    GTK_SIGNAL_FUNC (tooltips_show_cb), NULL,
-    GTK_TOOLTIPS (gg->tips)->enabled, gg);
-
-  CreateMenuCheck (gg->menus.options_menu, "Show control panel",
-    GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
-    GTK_WIDGET_VISIBLE (gg->viewmode_frame), gg);
-
-  CreateMenuCheck (gg->menus.options_menu, "Show status bar",
-    GTK_SIGNAL_FUNC (statusbar_show_cb), NULL,
-    gg->statusbar_p, gg);
-
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
-    gg->menus.options_menu);
 }
 
 /*--------------------------------------------------------------------*/
@@ -349,12 +99,9 @@ scale_menus_make (ggobid *gg) {
 /*--------------------------------------------------------------------*/
 
 void
-brush_menus_make (ggobid *gg)
+brush_reset_items_add (ggobid *gg)
 {
   GtkWidget *item;
-
-  /*-- Reset menu --*/
-  gg->menus.reset_menu = gtk_menu_new ();
 
 /*
    Adding include/exclude for points; do I need to add menu items
@@ -408,27 +155,11 @@ brush_menus_make (ggobid *gg)
                       GTK_SIGNAL_FUNC (brush_reset_cb),
                       (gpointer) GINT_TO_POINTER (RESET_INIT_BRUSH));
   gtk_menu_append (GTK_MENU (gg->menus.reset_menu), item);
+}
 
-  gtk_widget_show_all (gg->menus.reset_menu);
-
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.reset_item),
-    gg->menus.reset_menu);
-
-  /*-- Options menu --*/
-  gg->menus.options_menu = gtk_menu_new ();
-
-  CreateMenuCheck (gg->menus.options_menu, "Show tooltips",
-    GTK_SIGNAL_FUNC (tooltips_show_cb), NULL,
-    GTK_TOOLTIPS (gg->tips)->enabled, gg);
-
-  CreateMenuCheck (gg->menus.options_menu, "Show control panel",
-    GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
-    GTK_WIDGET_VISIBLE (gg->viewmode_frame), gg);
-
-  CreateMenuCheck (gg->menus.options_menu, "Show status bar",
-    GTK_SIGNAL_FUNC (statusbar_show_cb), NULL,
-    gg->statusbar_p, gg);
-
+void
+brush_option_items_add(ggobid *gg)
+{
   /* Add a separator before the mode-specific items */
   CreateMenuItem (gg->menus.options_menu, NULL,
     "", "", NULL, NULL, NULL, NULL, NULL);
@@ -436,306 +167,130 @@ brush_menus_make (ggobid *gg)
   CreateMenuCheck (gg->menus.options_menu, "Update brushing continuously",
     GTK_SIGNAL_FUNC (brush_update_set_cb), NULL,
     gg->brush.updateAlways_p, gg);
-
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
-    gg->menus.options_menu);
 }
-
-/*--------------------------------------------------------------------*/
-/*                   Identify: Options menu                           */
-/*--------------------------------------------------------------------*/
-
-void
-identify_menus_make (ggobid *gg)
-{
-  gg->menus.options_menu = gtk_menu_new ();
-
-  CreateMenuCheck (gg->menus.options_menu, "Show tooltips",
-    GTK_SIGNAL_FUNC (tooltips_show_cb), NULL,
-    GTK_TOOLTIPS (gg->tips)->enabled, gg);
-
-  CreateMenuCheck (gg->menus.options_menu, "Show control panel",
-    GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
-    GTK_WIDGET_VISIBLE (gg->viewmode_frame), gg);
-
-  CreateMenuCheck (gg->menus.options_menu, "Show status bar",
-    GTK_SIGNAL_FUNC (statusbar_show_cb), NULL,
-    gg->statusbar_p, gg);
-
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
-    gg->menus.options_menu);
-}
-
-/*--------------------------------------------------------------------*/
-/*                   Movepts: Options menu                            */
-/*--------------------------------------------------------------------*/
-
-void
-movepts_menus_make (ggobid *gg)
-{
-  gg->menus.options_menu = gtk_menu_new ();
-
-  CreateMenuCheck (gg->menus.options_menu, "Show tooltips",
-    GTK_SIGNAL_FUNC (tooltips_show_cb), NULL,
-    GTK_TOOLTIPS (gg->tips)->enabled, gg);
-
-  CreateMenuCheck (gg->menus.options_menu, "Show control panel",
-    GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
-    GTK_WIDGET_VISIBLE (gg->viewmode_frame), gg);
-
-  CreateMenuCheck (gg->menus.options_menu, "Show status bar",
-    GTK_SIGNAL_FUNC (statusbar_show_cb), NULL,
-    gg->statusbar_p, gg);
-
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
-    gg->menus.options_menu);
-}
-
-
-/*--------------------------------------------------------------------*/
-/*                   Edge edit: Options menu                          */
-/*--------------------------------------------------------------------*/
-
-void
-edgeedit_menus_make (ggobid *gg)
-{
-  gg->menus.options_menu = gtk_menu_new ();
-
-  CreateMenuCheck (gg->menus.options_menu, "Show tooltips",
-    GTK_SIGNAL_FUNC (tooltips_show_cb), NULL,
-    GTK_TOOLTIPS (gg->tips)->enabled, gg);
-
-  CreateMenuCheck (gg->menus.options_menu, "Show control panel",
-    GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
-    GTK_WIDGET_VISIBLE (gg->viewmode_frame), gg);
-
-  CreateMenuCheck (gg->menus.options_menu, "Show status bar",
-    GTK_SIGNAL_FUNC (statusbar_show_cb), NULL,
-    gg->statusbar_p, gg);
-
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
-    gg->menus.options_menu);
-
-}
-
-/*--------------------------------------------------------------------*/
-/*                   Scatmat: Options menu                            */
-/*--------------------------------------------------------------------*/
-
-void
-scatmat_menus_make (ggobid *gg)
-{
-  gg->menus.options_menu = gtk_menu_new ();
-
-  CreateMenuCheck (gg->menus.options_menu, "Show tooltips",
-    GTK_SIGNAL_FUNC (tooltips_show_cb), NULL,
-    GTK_TOOLTIPS (gg->tips)->enabled, gg);
-
-  CreateMenuCheck (gg->menus.options_menu, "Show control panel",
-    GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
-    GTK_WIDGET_VISIBLE (gg->viewmode_frame), gg);
-
-  CreateMenuCheck (gg->menus.options_menu, "Show status bar",
-    GTK_SIGNAL_FUNC (statusbar_show_cb), NULL,
-    gg->statusbar_p, gg);
-
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
-    gg->menus.options_menu);
-}
-
-/*--------------------------------------------------------------------*/
-/*                   Parcoords: Options menu                          */
-/*--------------------------------------------------------------------*/
-
-void
-pcplot_menus_make (ggobid *gg)
-{
-  gg->menus.options_menu = gtk_menu_new ();
-
-  CreateMenuCheck (gg->menus.options_menu, "Show tooltips",
-    GTK_SIGNAL_FUNC (tooltips_show_cb), NULL,
-    GTK_TOOLTIPS (gg->tips)->enabled, gg);
-
-  CreateMenuCheck (gg->menus.options_menu, "Show control panel",
-    GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
-    GTK_WIDGET_VISIBLE (gg->viewmode_frame), gg);
-
-  CreateMenuCheck (gg->menus.options_menu, "Show status bar",
-    GTK_SIGNAL_FUNC (statusbar_show_cb), NULL,
-    gg->statusbar_p, gg);
-
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
-    gg->menus.options_menu);
-}
-
 
 /*--------------------------------------------------------------------*/
 /*               Routines to manage the mode menus                    */
 /*--------------------------------------------------------------------*/
 
 gboolean
-mode_has_options_menu (gint mode, displayd *prev_display, ggobid *gg)
+imode_has_reset_menu (InteractionMode imode)
 {
-  if(prev_display && GTK_IS_GGOBI_EXTENDED_DISPLAY(prev_display)) {
-   return(GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(prev_display))->options_menu_p);
-  }
-
-  /*-- every mode has an options menu --*/
-  return (mode == P1PLOT || mode == XYPLOT || mode == SCALE  ||
-          mode == BRUSH  || mode == TOUR1D || mode == TOUR2D ||
-          mode == COTOUR || mode == IDENT  ||
-          mode == EDGEED ||
-          mode == MOVEPTS ||
-          mode == SCATMAT || mode == PCPLOT  || mode == EXTENDED_DISPLAY_MODE);
+  return (imode == SCALE  || imode == BRUSH);
 }
-
-gboolean
-mode_has_reset_menu (gint mode)
-{
-  return (mode == SCALE  || mode == BRUSH);
-}
-
-gboolean
-mode_has_io_menu (gint mode)
-{
-  return (mode == TOUR1D || mode == TOUR2D || mode == COTOUR);
-}
-
 
 /*-- make the menu items once, and then show/hide them as necessary --*/
 void
-viewmode_submenus_initialize (PipelineMode mode, ggobid *gg)
+main_miscmenus_initialize (ggobid *gg)
 {
   gg->menus.options_item = NULL;
   gg->menus.reset_item = NULL;
-  gg->menus.io_item = NULL;
 }
 
 void
-viewmode_submenus_update (PipelineMode prev_mode, displayd *prev_display,
-  ggobid *gg)
+main_options_menu_update (ProjectionMode pmode_prev, InteractionMode imode_prev, displayd *prev_display, ggobid *gg)
 {
-  PipelineMode mode = viewmode_get (gg);
+  ProjectionMode pmode = pmode_get (gg);
+  InteractionMode imode = imode_get (gg);
 
-  /*-- remove any previous submenus --*/
-  /* if the menu should be there and it really is there ... */
-  if (mode_has_options_menu (prev_mode, prev_display, gg) &&
-      gg->menus.options_item)
-  {
+  /* the options menu is always present */
+  if (gg->menus.options_item) {
     gtk_menu_item_remove_submenu (GTK_MENU_ITEM (gg->menus.options_item));
-    /*-- destroy menu items if called for --*/
-    if (!mode_has_options_menu (mode, gg->current_display, gg)) {
-      if (gg->menus.options_item != NULL) {
-        gtk_widget_destroy (gg->menus.options_item);
-        gg->menus.options_item = NULL;
-      }
-    }
   } else {
-    /*-- create and insert menu items if called for --*/
-    if (mode_has_options_menu (mode, gg->current_display, gg)) {
+    /*-- create and insert menu new item --*/
       gg->menus.options_item = submenu_make ("_Options", 'O',
         gg->main_accel_group);
       submenu_insert (gg->menus.options_item,
         gg->main_menubar, 4);
-    }
   }
 
-  /*-- remove any previous submenus --*/
-  /*  if (mode_has_io_menu (prev_mode)) {
-    gtk_menu_item_remove_submenu (GTK_MENU_ITEM (gg->menus.io_item));
-    *-- destroy menu items if called for --*
-    if (!mode_has_io_menu (mode)) {
-      if (gg->menus.io_item != NULL) {
-        gtk_widget_destroy (gg->menus.io_item);
-        gg->menus.io_item = NULL;
-      }
-      }
-  } else {
-    *-- create and insert menu items if called for --*
-    if (mode_has_io_menu (mode)) {
-      gg->menus.io_item = submenu_make ("_I/O", 'I',
-        gg->main_accel_group);
-      submenu_insert (gg->menus.io_item,
-      gg->main_menubar, 5);
-    }
-    }*//* di hasn't filled these in yet*/
+  gg->menus.options_menu = gtk_menu_new ();
 
-  /* if the menu should be there and it really is there ... */
-  if (mode_has_reset_menu (prev_mode) && gg->menus.reset_item) {
+  /* These three items are always present */
+
+  CreateMenuCheck (gg->menus.options_menu, "Show tooltips",
+    GTK_SIGNAL_FUNC (tooltips_show_cb), NULL,
+    GTK_TOOLTIPS (gg->tips)->enabled, gg);
+
+  CreateMenuCheck (gg->menus.options_menu, "Show control panel",
+    GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
+    GTK_WIDGET_VISIBLE (gg->imode_frame), gg);
+
+  CreateMenuCheck (gg->menus.options_menu, "Show status bar",
+    GTK_SIGNAL_FUNC (statusbar_show_cb), NULL,
+    gg->statusbar_p, gg);
+
+  /* This should probably be class-specific */
+  if (pmode == TOUR1D && imode == DEFAULT_IMODE) {
+    tour1d_option_items_add (gg);
+  } else if (pmode == TOUR2D && imode == DEFAULT_IMODE) {
+    tour2d_option_items_add (gg);
+  } else if (pmode == COTOUR && imode == DEFAULT_IMODE) {
+    cotour_option_items_add (gg);
+  } else if (imode == BRUSH) {
+    brush_option_items_add(gg);
+  }
+
+  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
+    gg->menus.options_menu);
+
+}
+void
+main_reset_menu_update (ProjectionMode pmode_prev, InteractionMode imode_prev, displayd *prev_display, ggobid *gg)
+{
+  InteractionMode imode = imode_get (gg);
+
+  /* if the previous menu had a reset menu ... */
+  if (imode_has_reset_menu (imode_prev) && gg->menus.reset_item) {
     gtk_menu_item_remove_submenu (GTK_MENU_ITEM (gg->menus.reset_item));
-    if (!mode_has_reset_menu (mode)) {
+    if (!imode_has_reset_menu (imode)) {
       if (gg->menus.reset_item != NULL) {
         gtk_widget_destroy (gg->menus.reset_item);
         gg->menus.reset_item = NULL;
       }
     }
-  } else {
-    if (mode_has_reset_menu (mode) && gg->menus.reset_item == NULL) {
+  } else { /* else if it didn't ... */
+    if (imode_has_reset_menu (imode) && gg->menus.reset_item == NULL) {
       gg->menus.reset_item = submenu_make ("_Reset", 'R',
         gg->main_accel_group);
       submenu_insert (gg->menus.reset_item,
         gg->main_menubar, 5);
-    }
+    } 
   }
 
-  /*-- add any new submenus --*/
-  switch (mode) {
-    case PCPLOT:
-      pcplot_menus_make (gg);
-    break;
-    case SCATMAT:
-      scatmat_menus_make (gg);
-    break;
-    case P1PLOT:
-      p1dplot_menus_make (gg);
-    break;
-    case XYPLOT:
-      xyplot_menus_make (gg);
-    break;
-    case EDGEED:
-      edgeedit_menus_make (gg);
-    break;
-    case MOVEPTS:
-      movepts_menus_make (gg);
-    break;
+  /* If the new mode has a reset menu, build it */
+  if (imode_has_reset_menu(imode)) {
+    gg->menus.reset_menu = gtk_menu_new ();
 
-    case TOUR1D:
-      tour1d_menus_make (gg);
-    break;
+    if (imode == BRUSH) {
+      brush_reset_items_add (gg);
+    } else if (imode == SCALE) {
+      scale_reset_items_add (gg);
+    }
 
-    case TOUR2D3:
-      tour2d3_menus_make (gg);
-    break;
+    gtk_widget_show_all (gg->menus.reset_menu);
+    gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.reset_item),
+     gg->menus.reset_menu);
+  }
+}
 
-    case TOUR2D:
-      tour2d_menus_make (gg);
-    break;
+void
+main_miscmenus_update (ProjectionMode pmode_prev, InteractionMode imode_prev, displayd *prev_display,
+  ggobid *gg)
+{
 
-    case COTOUR:
-      tourcorr_menus_make (gg);
-    break;
+  /*
+Perhaps the thing to do is to destroy these menus right here, then
+call class-specific menus to rebuild them.
+  */
 
-    case SCALE :
-      scale_menus_make (gg);
-    break;
+  main_options_menu_update(pmode_prev, imode_prev, prev_display, gg);
+  main_reset_menu_update(pmode_prev, imode_prev, prev_display, gg);
 
-    case BRUSH :
-      brush_menus_make (gg);
-    break;
-
-    case IDENT:
-      identify_menus_make (gg);
-    break;
-
-    case NULLMODE:
-    break;
-
-    case NMODES:  /*-- why is this part of the enum? Compiler warnings otherwise. --*/
-    break;	    
-
-    case EXTENDED_DISPLAY_MODE:
-    default:
-    {
+  /*
+  Should use instead klass->option_items_add() which does nothing,
+  and maybe klass->reset_items_add() as well.
+  if (pmode == EXTENDED_DISPLAY_MODE && imode == DEFAULT) {
       displayd *dpy = gg->current_display;
       if(GTK_IS_GGOBI_EXTENDED_DISPLAY(dpy)) {
         GtkGGobiExtendedDisplayClass *klass;
@@ -743,6 +298,7 @@ viewmode_submenus_update (PipelineMode prev_mode, displayd *prev_display,
         klass->menus_make(dpy, mode, gg);
       }
     }
-    break;
-  }
+  */
+
 }
+

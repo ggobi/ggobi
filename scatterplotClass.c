@@ -23,6 +23,7 @@
 #include "write_state.h"
 
 #include <gtk/gtk.h>
+#include <gdk/gdkkeysyms.h>
 
 /*
   display_datad_added_cb() in display.c
@@ -42,7 +43,7 @@
 
   world_to_raw needs methods.
 
-display_data_added_cb should only be called for scatterplot guys.
+  display_data_added_cb should only be called for scatterplot guys.
   
    splot_draw_to_pixmap0_unbinned needs an additional pre-plot hook for drawing edges.
 
@@ -57,25 +58,25 @@ display_data_added_cb should only be called for scatterplot guys.
 static void
 setShowAxesLabelOption(displayd *display, gboolean active)
 {
-  if(display->cpanel.projection == TOUR2D)
+  if(display->cpanel.pmode == TOUR2D)
      display_plot (display, FULL, display->ggobi);  
-  else if (display->cpanel.projection == TOUR2D3)
+  else if (display->cpanel.pmode == TOUR2D3)
      display_plot (display, FULL, display->ggobi);  
 }
 
 static void
 setShowAxesValuesOption(displayd *display, gboolean active)
 {
-  if(display->cpanel.projection == TOUR2D)
+  if(display->cpanel.pmode == TOUR2D)
      display_plot (display, FULL, display->ggobi);  
-  else if (display->cpanel.projection == TOUR2D3)
+  else if (display->cpanel.pmode == TOUR2D3)
      display_plot (display, FULL, display->ggobi);  
 }
 
 static void
 setShowAxesOption(displayd *display, gboolean active)
 {
-  switch (display->cpanel.projection) {
+  switch (display->cpanel.pmode) {
     case XYPLOT:
       if (display->hrule != NULL) {
         scatterplot_show_vrule (display, active);
@@ -116,7 +117,7 @@ varpanelRefresh(displayd *display, splotd *sp, datad *d)
   cpaneld *cpanel = &display->cpanel;
   gint j;
 
-  switch (cpanel->projection) {
+  switch (cpanel->pmode) {
     case P1PLOT:
       for (j=0; j<d->ncols; j++) {
         varpanel_toggle_set_active (VARSEL_X, j, j == sp->p1dvar, d);
@@ -213,16 +214,16 @@ variableSelect(GtkWidget *w, displayd *display, splotd *sp, gint jvar, gint togg
   gboolean redraw = false;
   gint jvar_prev = -1;
 
-  switch (cpanel->projection) {
+  switch (cpanel->pmode) {
     case P1PLOT:
       redraw = p1d_varsel (sp, jvar, &jvar_prev, toggle, mouse);
-      if (viewmode_get (gg) == BRUSH && cpanel->br.mode == BR_TRANSIENT)
+      if (imode_get (gg) == BRUSH && cpanel->br.mode == BR_TRANSIENT)
         reinit_transient_brushing (display, gg);
     break;
     case XYPLOT:
       redraw = xyplot_varsel (sp, jvar, &jvar_prev, toggle, mouse);
       if (redraw)
-        if (viewmode_get (gg) == BRUSH && cpanel->br.mode == BR_TRANSIENT)
+        if (imode_get (gg) == BRUSH && cpanel->br.mode == BR_TRANSIENT)
           reinit_transient_brushing (display, gg);
     break;
     case TOUR1D:
@@ -252,7 +253,7 @@ varcircleDraw(displayd *display, gint jvar, GdkPixmap *da_pix, ggobid *gg)
   cpaneld *cpanel = &display->cpanel;
   gboolean chosen = false;
 
-  switch (cpanel->projection) {
+  switch (cpanel->pmode) {
     case TOUR1D:
       x = (gint) (display->t1d.F.vals[0][jvar]*(gfloat)r);
       y = 0;
@@ -653,7 +654,7 @@ void
 worldToRaw(displayd *display, splotd *sp, gint pt, datad *d, ggobid *gg)
 {
   cpaneld *cpanel = &display->cpanel;
-  PipelineMode proj = cpanel->projection;
+  ProjectionMode proj = cpanel->pmode;
   gint j;
 
   switch (proj) {
@@ -780,24 +781,109 @@ scatterplotMovePointsMotionCb(displayd *display, splotd *sp, GtkWidget *w, GdkEv
 }
 
 static void
-viewmodeSet(displayd *display, ggobid *gg)
+pmodeSet(ProjectionMode pmode, displayd *display, ggobid *gg)
 {
-  if (display) {
-    if (gg->viewmode <= COTOUR)
-      display->cpanel.projection = gg->viewmode;
-    gg->projection = display->cpanel.projection;
+  if (display && pmode != NULL_PMODE) {
+    display->cpanel.pmode = pmode;
 
-    if (gg->projection != gg->prev_projection) {
-      scatterplot_show_rulers (display, gg->projection);
-      gg->prev_projection = gg->projection;
+    if (pmode != gg->pmode_prev) {
+      scatterplot_show_rulers (display, pmode);
     }
   }
 }
 
 static gboolean
+scatterplotKeyEventHandled(GtkWidget *w, displayd *display, splotd *sp, GdkEventKey *event, ggobid *gg)
+{
+  gboolean ok = true;
+  cpaneld *cpanel = &display->cpanel;
+  ProjectionMode pmode = NULL_PMODE;
+  InteractionMode imode = DEFAULT_IMODE;
+
+  /* The key press could either lead to a pmode or an imode change;
+     this works with or without the control key being pressed */
+
+  switch (event->keyval) {
+    case GDK_0:
+    case GDK_1:
+    case GDK_2:
+    case GDK_3:
+    case GDK_4:
+    case GDK_5:
+    case GDK_6:
+    case GDK_7:
+    case GDK_8:
+    case GDK_9:
+      if (gg->NumberedKeyEventHandler != NULL &&
+          gg->NumberedKeyEventHandler->handlerRoutine)
+      {
+        (gg->NumberedKeyEventHandler->handlerRoutine)(event->keyval, w, event,
+           cpanel, sp, gg, gg->NumberedKeyEventHandler->userData);
+      }
+    break;
+    case GDK_d:
+    case GDK_D:
+      pmode = P1PLOT;
+    break;
+    case GDK_x:
+    case GDK_X:
+      pmode = XYPLOT;
+    break;
+    case GDK_t:
+    case GDK_T:
+      pmode = TOUR1D;
+    break;
+    case GDK_r:
+    case GDK_R:
+      pmode = TOUR2D3;
+    break;
+    case GDK_g:
+    case GDK_G:
+      pmode = TOUR2D;
+    break;
+    case GDK_c:
+    case GDK_C:
+      pmode = COTOUR;
+    break;
+
+    case GDK_s:
+    case GDK_S:
+      imode = SCALE;
+    break;
+    case GDK_b:
+    case GDK_B:
+      imode = BRUSH;
+    break;
+    case GDK_i:
+    case GDK_I:
+      imode = IDENT;
+    break;
+    case GDK_e:
+    case GDK_E:
+      imode = EDGEED;
+    break;
+    case GDK_m:
+    case GDK_M:
+      imode = MOVEPTS;
+    break;
+    default:
+      ok = false;
+  }
+
+  if (ok) {
+    if (pmode > -1 && !projection_ok(pmode, display))
+      ok = false;
+    else
+      GGOBI(full_viewmode_set)(pmode, imode, gg);
+  }
+
+  return ok;
+}
+
+static gboolean
 varpanelHighd(displayd *display)
 {
-  gint proj = display->cpanel.projection;
+  ProjectionMode proj = display->cpanel.pmode;
   return(proj == TOUR1D || proj == TOUR2D3 || proj == TOUR2D || proj == COTOUR);
 }
 
@@ -825,7 +911,7 @@ binningPermitted(displayd* dpy)
   ggobid *gg = dpy->ggobi;
   datad *e = dpy->e;
 
-  if (projection_get(gg) == P1PLOT &&
+  if (pmode_get(gg) == P1PLOT &&
        cpanel->p1d.type == ASH &&
        cpanel->p1d.ASH_add_lines_p)
      return(false);
@@ -879,22 +965,39 @@ cpanelSet(displayd *dpy, cpaneld *cpanel, ggobid *gg)
 void
 displaySet(displayd *dpy, ggobid *gg)
 {
-  scatterplot_mode_menu_make (gg->main_accel_group,
-    (GtkSignalFunc) viewmode_set_cb, gg, true);
-  gg->viewmode_item = submenu_make ("_ViewMode", 'V',
+  GtkWidget *pmode_menu, *imode_menu;
+
+  pmode_menu = scatterplot_pmode_menu_make (gg->pmode_accel_group,
+    (GtkSignalFunc) pmode_set_cb, gg, true);
+  gtk_menu_set_accel_group (GTK_MENU(pmode_menu), gg->main_accel_group);   
+
+  gg->pmode_item = submenu_make ("_View", 'V',
     gg->main_accel_group);
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->viewmode_item),
-    gg->app.scatterplot_mode_menu); 
-  submenu_insert (gg->viewmode_item, gg->main_menubar, 2);
+  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->pmode_item),
+    pmode_menu); 
+  submenu_insert (gg->pmode_item, gg->main_menubar, 2);
+
+  imode_menu = scatterplot_imode_menu_make (gg->imode_accel_group,
+    (GtkSignalFunc) imode_set_cb, gg, true);
+  gtk_menu_set_accel_group (GTK_MENU(imode_menu), gg->main_accel_group);   
+
+  gg->imode_item = submenu_make ("_Interaction", 'I',
+    gg->main_accel_group);
+  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->imode_item),
+    imode_menu); 
+  submenu_insert (gg->imode_item, gg->main_menubar, 3);
 }
 
+/* Hmm.  These are probably useful in the other display classes. dfs */
 static gboolean
-handlesAction(displayd *dpy,  PipelineMode v)
+handlesProjection(displayd *dpy,  ProjectionMode v)
 {
-  if (v != SCATMAT && v != PCPLOT)
-    return(true);
-
-  return(false);
+  return(true);
+}
+static gboolean
+handlesInteraction(displayd *dpy,  InteractionMode v)
+{
+  return(true);
 }
 
 
@@ -903,7 +1006,7 @@ plotted(displayd *display, gint *cols, gint ncols, datad *d)
 {
   gint j, k;
   splotd *sp = (splotd *) display->splots->data;  /*-- only one splot --*/
-  gint projection = projection_get (display->ggobi);
+  ProjectionMode projection = (gint) pmode_get (display->ggobi);
 
   switch (projection) {
     case P1PLOT:
@@ -964,6 +1067,12 @@ plotted(displayd *display, gint *cols, gint ncols, datad *d)
         }
       }
     break;
+    case NULL_PMODE:
+    case DEFAULT_PMODE:
+    case EXTENDED_DISPLAY_PMODE:
+    case N_PMODES:
+      g_printerr ("Unexpected pmode value %d\n", projection);
+    break;
   }
 
   return(-1);
@@ -973,7 +1082,7 @@ plotted(displayd *display, gint *cols, gint ncols, datad *d)
 static void
 varpanelTooltipsReset(displayd *display, ggobid *gg, GtkWidget *wx, GtkWidget *wy, GtkWidget *wz, GtkWidget *label)
 {
-  gint projection = projection_get (gg);
+  ProjectionMode projection = pmode_get (gg);
 
   switch (projection) {
     case P1PLOT:
@@ -1046,7 +1155,7 @@ varpanelTooltipsReset(displayd *display, ggobid *gg, GtkWidget *wx, GtkWidget *w
 static gint 
 plottedVarsGet(displayd *display, gint *cols, datad *d, ggobid *gg)
 {
-  PipelineMode mode = viewmode_get (gg);
+  ProjectionMode mode = pmode_get (gg);
   gint ncols = 0, k;
   splotd *sp = gg->current_splot;
 
@@ -1106,7 +1215,7 @@ treeLabel(splotd *splot, datad *d, ggobid *gg)
   vartabled *vt, *vtx, *vty;
   gint n;
 
-  switch (cpanel->projection) {
+  switch (cpanel->pmode) {
      case P1PLOT:
      case TOUR1D:
        vt = vartable_element_get (splot->p1dvar, d);
@@ -1160,7 +1269,7 @@ worldToPlane(splotd *sp, datad *d, ggobid *gg)
 {
   cpaneld *cpanel = &(sp->displayptr->cpanel);
 
-  switch (cpanel->projection) {
+  switch (cpanel->pmode) {
     case P1PLOT:
       p1d_reproject (sp, d->world.vals, d, gg);
     break;
@@ -1194,7 +1303,7 @@ drawCase(splotd *sp, gint m, datad *d, ggobid *gg)
 {
   displayd *display = sp->displayptr;
   gboolean draw_case = true;
-  gint proj = projection_get (gg);
+  ProjectionMode proj = pmode_get (gg);
   gint j;
 
   switch (proj) {
@@ -1249,6 +1358,12 @@ drawCase(splotd *sp, gint m, datad *d, ggobid *gg)
 	}
       }
     break;
+    case NULL_PMODE:
+    case DEFAULT_PMODE:
+    case EXTENDED_DISPLAY_PMODE:
+    case N_PMODES:
+      g_printerr ("Unexpected pmode value %d\n", proj);
+    break;
   }
 
   return(draw_case);
@@ -1258,7 +1373,7 @@ static gboolean
 drawEdge(splotd *sp, gint m, datad *d, datad *e, ggobid *gg) 
 {
   gboolean draw_edge = true;
-  gint proj = projection_get (gg);
+  ProjectionMode proj = pmode_get (gg);
 
   switch (proj) {
     case P1PLOT:
@@ -1290,6 +1405,12 @@ drawEdge(splotd *sp, gint m, datad *d, datad *e, ggobid *gg)
         draw_edge = false;
       else if (e->missing.vals[m][sp->displayptr->tcorr2.active_vars.els[m]])
         draw_edge = false;
+    break;
+    case NULL_PMODE:
+    case DEFAULT_PMODE:
+    case EXTENDED_DISPLAY_PMODE:
+    case N_PMODES:
+      g_printerr ("Unexpected pmode value %d\n", proj);
     break;
   }
   return(draw_edge);
@@ -1378,9 +1499,9 @@ addPlotLabels(splotd *sp, GdkDrawable *drawable, ggobid *gg)
 {
 /* Same as scatmat... */
   cpaneld *cpanel = &(sp->displayptr->cpanel);
-  if(cpanel->projection == XYPLOT)
+  if(cpanel->pmode == XYPLOT)
     scatterXYAddPlotLabels(sp, drawable, gg->plot_GC);
-  else if(cpanel->projection == P1PLOT)
+  else if(cpanel->pmode == P1PLOT)
     scatter1DAddPlotLabels(sp, drawable, gg->plot_GC);
 }
 
@@ -1389,7 +1510,7 @@ withinDrawToUnbinned(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc)
 {
   displayd *display = sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
-  gint proj = cpanel->projection;
+  ProjectionMode proj = cpanel->pmode;
   icoords *baseline;
 
   /*-- add ash baseline to p1d or tour1d --*/
@@ -1428,6 +1549,93 @@ addMarkupCues(splotd *sp, GdkDrawable *drawable, ggobid *gg)
 }
 
 void
+splotScreenToTform(cpaneld *cpanel, splotd *sp, icoords *scr,
+		   fcoords *tfd, ggobid *gg)
+{
+  gcoords planar, world;
+  greal precis = (greal) PRECISION1;
+  greal ftmp, max, min, rdiff;
+  displayd *display = (displayd *) sp->displayptr;
+  datad *d = display->d;
+  gfloat scale_x, scale_y;
+  vartabled *vt, *vtx, *vty;
+
+  g_return_if_fail (cpanel->pmode == XYPLOT ||
+                    cpanel->pmode == P1PLOT ||
+                    cpanel->pmode == TOUR1D ||
+                    cpanel->pmode == TOUR2D3 ||
+                    cpanel->pmode == TOUR2D ||
+                    cpanel->pmode == COTOUR);
+
+  scale_x = sp->scale.x;
+  scale_y = sp->scale.y;
+  scale_x /= 2;
+  sp->iscale.x = (greal) sp->max.x * scale_x;
+  scale_y /= 2;
+  sp->iscale.y = -1 * (greal) sp->max.y * scale_y;
+
+/*
+ * screen to plane 
+*/
+  planar.x = (scr->x - sp->max.x/2) * precis / sp->iscale.x ;
+  planar.x += sp->pmid.x;
+  planar.y = (scr->y - sp->max.y/2) * precis / sp->iscale.y ;
+  planar.y += sp->pmid.y;
+
+/*
+ * plane to world
+*/
+
+  switch (cpanel->pmode) {
+    case P1PLOT:
+      vt = vartable_element_get (sp->p1dvar, d);
+      max = vt->lim.max;
+      min = vt->lim.min;
+      rdiff = max - min;
+
+      if (display->p1d_orientation == HORIZONTAL) {
+        /* x */
+        world.x = planar.x;
+        ftmp = world.x / precis;
+        tfd->x = (ftmp + 1.0) * .5 * rdiff;
+        tfd->x += min;
+      } else {
+        /* y */
+        world.y = planar.y;
+        ftmp = world.y / precis;
+        tfd->y = (ftmp + 1.0) * .5 * rdiff;
+        tfd->y += min;
+      }
+    break;
+
+    case XYPLOT:
+      /* x */
+      vtx = vartable_element_get (sp->xyvars.x, d);
+      max = vtx->lim.max;
+      min = vtx->lim.min;
+      rdiff = max - min;
+      world.x = planar.x;
+      ftmp = world.x / precis;
+      tfd->x = (ftmp + 1.0) * .5 * rdiff;
+      tfd->x += min;
+
+      /* y */
+      vty = vartable_element_get (sp->xyvars.y, d);
+      max = vty->lim.max;
+      min = vty->lim.min;
+      rdiff = max - min;
+      world.y = planar.y;
+      ftmp = world.y / precis;
+      tfd->y = (ftmp + 1.0) * .5 * rdiff;
+      tfd->y += min;
+    break;
+
+    default:
+    break;
+  }
+}
+
+void
 scatterplotDisplayClassInit(GtkGGobiScatterplotDisplayClass *klass)
 {
   klass->parent_class.createWithVars = scatterplot_new_with_vars;
@@ -1439,7 +1647,8 @@ scatterplotDisplayClassInit(GtkGGobiScatterplotDisplayClass *klass)
   klass->parent_class.cpanel_set = cpanelSet;
   klass->parent_class.display_set = displaySet;
 
-  klass->parent_class.handles_action = handlesAction;
+  klass->parent_class.handles_projection = handlesProjection;
+  klass->parent_class.handles_interaction = handlesInteraction;
 
   klass->parent_class.variable_plotted_p = plotted;
 
@@ -1454,7 +1663,9 @@ scatterplotDisplayClassInit(GtkGGobiScatterplotDisplayClass *klass)
   klass->parent_class.varpanel_highd = varpanelHighd;
   klass->parent_class.varpanel_refresh = varpanelRefresh;
   klass->parent_class.variable_select = variableSelect;
-  klass->parent_class.viewmode_set = viewmodeSet;
+  klass->parent_class.pmode_set = pmodeSet;
+  klass->parent_class.splot_key_event_handled = scatterplotKeyEventHandled;
+
   klass->parent_class.move_points_motion_cb = scatterplotMovePointsMotionCb;
   klass->parent_class.move_points_button_cb = scatterplotMovePointsButtonCb;
 
@@ -1485,18 +1696,24 @@ splotVariablesGet(splotd *sp, gint *cols, datad *d)
   return(2);
 }
 
+
 void
 scatterSPlotClassInit(GtkGGobiScatterSPlotClass *klass)
 {
-   klass->parent_class.within_draw_to_unbinned = withinDrawToUnbinned;
-   klass->parent_class.tree_label = treeLabel;
-   klass->parent_class.sub_plane_to_screen = subPlaneToScreen;
-   klass->parent_class.world_to_plane = worldToPlane;
-   klass->parent_class.draw_case_p = drawCase;
-   klass->parent_class.draw_edge_p = drawEdge;
-   klass->parent_class.add_plot_labels = addPlotLabels;
-   klass->parent_class.within_draw_to_unbinned = withinDrawToUnbinned;
-   klass->parent_class.add_markup_cues = addMarkupCues;
+  klass->parent_class.within_draw_to_unbinned = withinDrawToUnbinned;
+  klass->parent_class.tree_label = treeLabel;
 
-   klass->parent_class.plotted_vars_get = splotVariablesGet;
+  /* reverse pipeline */ 
+  klass->parent_class.screen_to_tform = splotScreenToTform;
+
+  klass->parent_class.sub_plane_to_screen = subPlaneToScreen;
+  klass->parent_class.world_to_plane = worldToPlane;
+
+  klass->parent_class.draw_case_p = drawCase;
+  klass->parent_class.draw_edge_p = drawEdge;
+  klass->parent_class.add_plot_labels = addPlotLabels;
+  klass->parent_class.within_draw_to_unbinned = withinDrawToUnbinned;
+  klass->parent_class.add_markup_cues = addMarkupCues;
+
+  klass->parent_class.plotted_vars_get = splotVariablesGet;
 }

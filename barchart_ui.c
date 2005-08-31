@@ -55,7 +55,6 @@ GtkWidget *cpanel_barchart_make(ggobid * gg)
   panel = gtk_vbox_new(false, VBOX_SPACING);
   gtk_container_set_border_width(GTK_CONTAINER(panel), 5);
 
-
 /*
  * option menu: selection mode
 */
@@ -93,31 +92,38 @@ GtkWidget *cpanel_barchart_make(ggobid * gg)
   At present, this is always false.
   See scatmat_mode_menu_make and scatterplot_mode_menu_make.
  */
-GtkWidget *barchart_mode_menu_make(GtkAccelGroup * accel_group,
+GtkWidget *barchart_pmode_menu_make(GtkAccelGroup * accel_group,
                                    GtkSignalFunc func,
                                    ggobid * gg, gboolean useIds)
 {
   GtkWidget *menu;
-  /* menu used to be in gg->barchart.mode_menu. But that was never used
-     except for a way to return the value from here. */
   menu = gtk_menu_new();
 
-  CreateMenuItem (menu, "PROJECTION MODES:",
-    "", "", NULL, NULL, NULL, NULL, gg);
-
-  CreateMenuItem(menu, "1D Plot",
+  CreateMenuItem(menu, "Barchart",
                  "^h", "", NULL, accel_group, func,
-                 useIds ? GINT_TO_POINTER(EXTENDED_DISPLAY_MODE) : gg, gg);
-
+                 useIds ? GINT_TO_POINTER(EXTENDED_DISPLAY_PMODE) : gg, gg);
   CreateMenuItem(menu, "1D Tour",
                  "^t", "", NULL, accel_group, func,
                  useIds ? GINT_TO_POINTER(TOUR1D) : gg, gg);
-  /*             useIds ? GINT_TO_POINTER(EXTENDED_DISPLAY_MODE) : gg, gg);*/
+
+  gtk_widget_show(menu);
+
+  return (menu);
+}
+
+GtkWidget *barchart_imode_menu_make(GtkAccelGroup * accel_group,
+                                   GtkSignalFunc func,
+                                   ggobid * gg, gboolean useIds)
+{
+  GtkWidget *menu;
+  menu = gtk_menu_new();
+
+  CreateMenuItem(menu, "Barchart",
+    "^h", "", NULL, accel_group, func,
+    useIds ? GINT_TO_POINTER(DEFAULT_IMODE) : gg, gg);
 
   /* Add a separator */
   CreateMenuItem(menu, NULL, "", "", NULL, NULL, NULL, NULL, gg);
-  CreateMenuItem (menu, "INTERACTION MODES:",
-    "", "", NULL, NULL, NULL, NULL, gg);
 
   CreateMenuItem(menu, "Scale",
                  "^s", "", NULL, accel_group, func,
@@ -297,6 +303,8 @@ barchart_scale(gboolean button1_p, gboolean button2_p, splotd * sp)
   cpaneld *cpanel = &display->cpanel;
   barchartSPlotd *bsp = GTK_GGOBI_BARCHART_SPLOT(sp);
   datad *d = display->d;
+  GtkGGobiExtendedSPlotClass *klass;
+  klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT_GET_CLASS(sp));  
 
   /*-- I'm not sure this could ever happen --*/
   if (sp->mousepos.x == sp->mousepos_o.x
@@ -323,9 +331,9 @@ barchart_scale(gboolean button1_p, gboolean button2_p, splotd * sp)
         scale_y /= 2;
         sp->iscale.y = (gfloat) sp->max.y * scale_y;
 
-        splot_screen_to_tform(cpanel, sp, &scr, &pts1, gg);
+        klass->screen_to_tform(cpanel, sp, &scr, &pts1, gg);
         sp->pmid.y -= (dy * (greal)PRECISION1 / sp->iscale.y);
-        splot_screen_to_tform(cpanel, sp, &scr, &pts2, gg);
+        klass->screen_to_tform(cpanel, sp, &scr, &pts2, gg);
         bsp->bar->offset += (pts1.y - pts2.y);
 
 /* moving the anchor more than one binwidth up or down doesn't make sense */
@@ -356,8 +364,8 @@ barchart_scale(gboolean button1_p, gboolean button2_p, splotd * sp)
       if (idy != 0) {
         gfloat width, oldwidth;
 
-        splot_screen_to_tform(cpanel, sp, &sp->mousepos_o, &pts1, gg);
-        splot_screen_to_tform(cpanel, sp, &sp->mousepos, &pts2, gg);
+        klass->screen_to_tform(cpanel, sp, &sp->mousepos_o, &pts1, gg);
+        klass->screen_to_tform(cpanel, sp, &sp->mousepos, &pts2, gg);
 
         oldwidth = bsp->bar->breaks[1] - bsp->bar->breaks[0];
         width = oldwidth - (pts1.y - pts2.y);
@@ -444,11 +452,8 @@ button_press_cb(GtkWidget * w, GdkEventButton * event, splotd * sp)
   return retval;
 }
 
-void barchart_event_handlers_toggle(splotd * sp, gboolean state)
+void barchart_event_handlers_toggle(displayd * display, splotd * sp, gboolean state, ProjectionMode pmode, InteractionMode imode)
 {
-  displayd *display = (displayd *) sp->displayptr;
-
-
   if (!GTK_IS_GGOBI_WINDOW_DISPLAY(display))
     return;
 

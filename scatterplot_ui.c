@@ -22,74 +22,113 @@
 /*                   Resetting the main menubar                       */
 /*--------------------------------------------------------------------*/
 
-void
-scatterplot_mode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func,
+GtkWidget *
+scatterplot_pmode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func,
 			    ggobid *gg, gboolean useIds)
 {
-  GtkWidget *item;
+  GtkWidget *pmode_menu;
+  /* Projections */
 
-  /*-- ViewMode menu --*/
-  gg->app.scatterplot_mode_menu = gtk_menu_new ();
+  pmode_menu = gtk_menu_new ();
 
-  CreateMenuItem (gg->app.scatterplot_mode_menu, NULL,
-    "", "", NULL, NULL, NULL, NULL, gg);
-  CreateMenuItem (gg->app.scatterplot_mode_menu, "PROJECTION MODES:",
-    "", "", NULL, NULL, NULL, NULL, gg);
-
-  CreateMenuItem (gg->app.scatterplot_mode_menu, "1D Plot",
+  CreateMenuItem (pmode_menu, "1D Plot",
     "^d", "", NULL, accel_group, func,
     useIds ? GINT_TO_POINTER  (P1PLOT) : gg, gg);
-  CreateMenuItem (gg->app.scatterplot_mode_menu, "XYPlot",
+  CreateMenuItem (pmode_menu, "XYPlot",
     "^x", "", NULL, accel_group, func,
     useIds ? GINT_TO_POINTER  (XYPLOT) : gg, gg);
 
-  CreateMenuItem (gg->app.scatterplot_mode_menu, "1D Tour",
+  CreateMenuItem (pmode_menu, "1D Tour",
     "^t", "", NULL, accel_group, func,
     useIds ? GINT_TO_POINTER  (TOUR1D) : gg, gg);
-  CreateMenuItem (gg->app.scatterplot_mode_menu, "Rotation",
+  CreateMenuItem (pmode_menu, "Rotation",
     "^r", "", NULL, accel_group, func,
     useIds ? GINT_TO_POINTER  (TOUR2D3) : gg, gg);
-  CreateMenuItem (gg->app.scatterplot_mode_menu, "2D Tour",
+  CreateMenuItem (pmode_menu, "2D Tour",
     "^g", "", NULL, accel_group, func,
     useIds ? GINT_TO_POINTER  (TOUR2D) : gg, gg);
-  CreateMenuItem (gg->app.scatterplot_mode_menu, "2x1D Tour",
+  CreateMenuItem (pmode_menu, "2x1D Tour",
     "^c", "", NULL, accel_group, func,
     useIds ? GINT_TO_POINTER  (COTOUR) : gg, gg);
 
-  /* Add a separator */
-  CreateMenuItem (gg->app.scatterplot_mode_menu, NULL,
-    "", "", NULL, NULL, NULL, NULL, gg);
-  CreateMenuItem (gg->app.scatterplot_mode_menu, "INTERACTION MODES:",
+  gtk_widget_show (pmode_menu);
+  return (pmode_menu);
+}
+
+GtkWidget *
+scatterplot_imode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func,
+			    ggobid *gg, gboolean useIds)
+{
+  /* Interaction modes for scatterplot.  The first one is "Default"
+     which is generally going to mean we want to see the control panel
+     corresponding to the projection. */
+
+  GtkWidget *imode_menu, *item;
+
+  imode_menu = gtk_menu_new ();
+
+  CreateMenuItemWithCheck (imode_menu,
+    (gg->pmode != -1) ? (gchar *)GGOBI(getPModeName)(gg->pmode) : "(Default)",
+			   /*
+    (gg->pmode != -1) ?
+       g_strdup_printf("^%s", GGOBI(getPModeKey)(gg->pmode)) : "^x", 
+			   */
+			   "^h",
+    "", NULL, accel_group, func,
+    useIds ? GINT_TO_POINTER (DEFAULT_IMODE) : gg, gg, 
+    gg->imodeRadioGroup,
+    sessionOptions->useRadioMenuItems);
+
+  /* Add a separator? */
+  CreateMenuItem (imode_menu, "",
     "", "", NULL, NULL, NULL, NULL, gg);
 
-  CreateMenuItemWithCheck (gg->app.scatterplot_mode_menu, "Scale",
+  CreateMenuItemWithCheck (imode_menu, "Scale",
     "^s", "", NULL, accel_group, func,
-    useIds ? GINT_TO_POINTER (SCALE) : gg, gg, sessionOptions->useRadioMenuItems);
-  CreateMenuItemWithCheck (gg->app.scatterplot_mode_menu, "Brush",
+    useIds ? GINT_TO_POINTER (SCALE) : gg, gg, 
+    gg->imodeRadioGroup,
+    sessionOptions->useRadioMenuItems);
+  CreateMenuItemWithCheck (imode_menu, "Brush",
     "^b", "", NULL, accel_group, func,
-    useIds ? GINT_TO_POINTER (BRUSH) : gg, gg, sessionOptions->useRadioMenuItems);
-  CreateMenuItemWithCheck (gg->app.scatterplot_mode_menu, "Identify",
+    useIds ? GINT_TO_POINTER (BRUSH) : gg, gg, 
+    gg->imodeRadioGroup,
+    sessionOptions->useRadioMenuItems);
+  CreateMenuItemWithCheck (imode_menu, "Identify",
     "^i", "", NULL, accel_group, func,
-    useIds ? GINT_TO_POINTER (IDENT) : gg, gg, sessionOptions->useRadioMenuItems);
-  CreateMenuItemWithCheck (gg->app.scatterplot_mode_menu, "Edit edges",
+    useIds ? GINT_TO_POINTER (IDENT) : gg, gg, 
+    gg->imodeRadioGroup,
+    sessionOptions->useRadioMenuItems);
+  CreateMenuItemWithCheck (imode_menu, "Edit edges",
     "^e", "", NULL, accel_group, func,
-    useIds ? GINT_TO_POINTER (EDGEED) : gg, gg, sessionOptions->useRadioMenuItems);
-  CreateMenuItemWithCheck (gg->app.scatterplot_mode_menu, "Move Points",
+    useIds ? GINT_TO_POINTER (EDGEED) : gg, gg, 
+    gg->imodeRadioGroup,
+    sessionOptions->useRadioMenuItems);
+  CreateMenuItemWithCheck (imode_menu, "Move Points",
     "^m", "", NULL, accel_group, func,
-    useIds ? GINT_TO_POINTER (MOVEPTS) : gg, gg, sessionOptions->useRadioMenuItems);
+    useIds ? GINT_TO_POINTER (MOVEPTS) : gg, gg, 
+    gg->imodeRadioGroup,
+    sessionOptions->useRadioMenuItems);
 
+  /* A bit more thought is required to make this work with the new
+     menus, and to update properly -- we don't need an "Off" button,
+     but we do need a system to keep the selection current and these
+     menus change a lot. dfs */
 
-  if(sessionOptions->useRadioMenuItems) {
-     item = CreateMenuItemWithCheck (gg->app.scatterplot_mode_menu, "Off",
-				  "^o", "", NULL, accel_group, func,
-				  useIds ? GINT_TO_POINTER (XYPLOT) : gg, gg, sessionOptions->useRadioMenuItems);
+  if (sessionOptions->useRadioMenuItems) {
+     item = CreateMenuItemWithCheck (imode_menu, "Off",
+       "^o", "", NULL, accel_group, func,
+       useIds ? GINT_TO_POINTER (DEFAULT_IMODE) : gg, gg,
+       gg->imodeRadioGroup,
+       sessionOptions->useRadioMenuItems);
 
      gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), true);
   }
 
 
-  gtk_widget_show (gg->app.scatterplot_mode_menu);
+  gtk_widget_show (imode_menu);
+  return (imode_menu);
 }
+
 
 /*--------------------------------------------------------------------*/
 /*                   Setting the display menubar                      */

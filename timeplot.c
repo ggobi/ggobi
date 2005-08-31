@@ -377,7 +377,9 @@ tsplot_varsel (GtkWidget *w, displayd *display, splotd *sp, gint jvar,
          * gg->current_splot.
          */
         if (jvar_sp == gg->current_splot) {
-          sp_event_handlers_toggle (sp, off);
+          sp_event_handlers_toggle (sp, off,
+            gg->current_display->cpanel.pmode,
+            gg->current_display->cpanel.imode);
 
           new_indx = (jvar_indx == 0) ? 0 : MIN (nplots-1, jvar_indx);
           gg->current_splot = (splotd *)
@@ -410,7 +412,9 @@ tsplot_varsel (GtkWidget *w, displayd *display, splotd *sp, gint jvar,
       else {
 
         /*-- prepare to reset the current plot --*/
-        sp_event_handlers_toggle (sp, off);
+        sp_event_handlers_toggle (sp, off, 
+          gg->current_display->cpanel.pmode,
+          gg->current_display->cpanel.imode);
 
         /*-- keep the window from growing by shrinking all plots --*/
         ratio = (gfloat) nplots / (gfloat) (nplots+1);
@@ -453,7 +457,9 @@ tsplot_varsel (GtkWidget *w, displayd *display, splotd *sp, gint jvar,
         }
 
         gg->current_splot = sp->displayptr->current_splot = sp_new;
-        sp_event_handlers_toggle (sp_new, on);
+        sp_event_handlers_toggle (sp_new, on,
+          gg->current_display->cpanel.pmode,
+          gg->current_display->cpanel.imode);
         redraw = true;
       }
     }

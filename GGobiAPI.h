@@ -737,7 +737,13 @@ extern gboolean GGobi_close(ggobid *gg, gboolean closeWindow);
     The number of elements in the array is returned as the 
     value of the argument.
  */
-extern const gchar * const* GGobi_getOpModeNames(int *n);
+extern const gchar * const* GGobi_getPModeNames(int *n);
+extern const gchar * const* GGobi_getIModeNames(int *n);
+
+  /* Attempting to imitate the style of getPModeName to get the string
+     associated with the keyboard */
+extern const gchar * const* GGobi_getPModeKeys(int *n);
+extern const gchar *GGobi_getPModeKey(gint which);
 
 /**
   Get the symbolic constant associated with the 
@@ -745,27 +751,29 @@ extern const gchar * const* GGobi_getOpModeNames(int *n);
   The possible names are available from
   ggobi_getOpModeNames
  */
-extern gint GGobi_getModeId(const gchar *name);
+  extern gint GGobi_getPModeId(const gchar *name);
+  extern gint GGobi_getIModeId(const gchar *name);
 
 /**
  Set the operation mode (e.g. brush, identify, ...) for this GGobi instance.
  @param name one of the entries.
  */
 
-extern gint GGobi_setMode(const gchar *name, ggobid *gg);
+extern gint GGobi_setPMode(const gchar *name, ggobid *gg);
+extern gint GGobi_setIMode(const gchar *name, ggobid *gg);
 /**
  Get the human-readable name of the user interaction mode
  associated with the internal symbolic identifier.
 
  @see GGobi_getModeId()
  */
-extern const gchar *GGobi_getModeName(gint which);
+extern const gchar *GGobi_getPModeName(gint which);
+extern const gchar *GGobi_getIModeName(gint which);
 
 /**
  ? 
  */
-extern int GGobi_full_viewmode_set(gint action, ggobid *gg);
-
+extern int GGobi_full_viewmode_set(ProjectionMode, InteractionMode, ggobid *gg);
 
 /**
   Lower or raise a top-level display window associated with a ggobi

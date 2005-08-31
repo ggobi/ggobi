@@ -87,16 +87,15 @@ tsplotCPanelSet(displayd *dpy, cpaneld *cpanel, ggobid *gg)
 void
 tsplotDisplaySet(displayd *dpy, ggobid *gg)
 {
-  tsplot_mode_menu_make (gg->main_accel_group,
-    (GtkSignalFunc) viewmode_set_cb, gg, true);
-  gg->viewmode_item = submenu_make ("_ViewMode", 'V',
-    gg->main_accel_group);
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->viewmode_item),
-                             gg->tsplot.mode_menu); 
-  submenu_insert (gg->viewmode_item, gg->main_menubar, 2);
+  GtkWidget *imode_menu;
+
+  imode_menu = tsplot_imode_menu_make (gg->imode_accel_group,
+    (GtkSignalFunc) imode_set_cb, gg, true);
+  gg->imode_item = submenu_make ("_Interaction", 'I', gg->main_accel_group);
+  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->imode_item),
+    imode_menu); 
+  submenu_insert (gg->imode_item, gg->main_menubar, 2);
 }
-
-
 
 void
 tsplotVarpanelRefresh(displayd *display, splotd *sp, datad *d)
@@ -123,11 +122,10 @@ tsplotVarpanelRefresh(displayd *display, splotd *sp, datad *d)
 }
 
 gboolean
-tsplotHandlesAction(displayd *dpy, PipelineMode mode)
+tsplotHandlesInteraction(displayd *dpy, InteractionMode mode)
 {
-  return(mode == BRUSH || mode == IDENT || mode == EXTENDED_DISPLAY_MODE);
+  return(mode == BRUSH || mode == IDENT || mode == DEFAULT_IMODE);
 }
-
 
 /*
   Write out the variables in a time series plot
@@ -182,15 +180,15 @@ tsplotPlottedColsGet(displayd *display, gint *cols, datad *d, ggobid *gg)
 
 
 GtkWidget *
-tsplotMenusMake(displayd *dpy, PipelineMode viewMode, ggobid *gg)
+tsplotMenusMake(displayd *dpy, ggobid *gg)
 {
-  tsplot_menus_make (gg);
+  tsplot_menus_make (dpy, gg);
   return(NULL);
 }
 
 
 GtkWidget *
-tsplotCPanelWidget(displayd *dpy, gint viewmode, gchar **modeName, ggobid *gg)
+tsplotCPanelWidget(displayd *dpy, gchar **modeName, ggobid *gg)
 {
   GtkWidget *w = GTK_GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget;
   if(!w) {
@@ -201,31 +199,50 @@ tsplotCPanelWidget(displayd *dpy, gint viewmode, gchar **modeName, ggobid *gg)
 }
 
 gboolean 
-tsplotEventHandlersToggle(displayd *dpy, splotd *sp, gboolean state, gint viewMode)
+tsplotEventHandlersToggle(displayd *dpy, splotd *sp, gboolean state, ProjectionMode pmode, InteractionMode imode)
 {
-      if(viewMode != EXTENDED_DISPLAY_MODE)
-        return(true);
+  if (imode != DEFAULT_IMODE)
+    return(true);
 
-      xyplot_event_handlers_toggle (sp, state);  /*-- ?? --*/
-      return(true);
+  xyplot_event_handlers_toggle (sp, state);  /*-- ?? --*/
+    return(true);
 }
 
 
 #include <gdk/gdkkeysyms.h>
 
-gint 
-tsplotSPlotKeyEventHandler(displayd *dpy, splotd *sp, gint keyval)
+gboolean
+tsplotKeyEventHandled(GtkWidget *w, displayd *display, splotd *sp, GdkEventKey *event, ggobid *gg)
 {
-  gint action = -1;
-  switch(keyval) {
-    case GDK_v:
-    case GDK_V:
-       action = EXTENDED_DISPLAY_MODE;
+  gboolean ok = true;
+  ProjectionMode pmode = NULL_PMODE;
+  InteractionMode imode = DEFAULT_IMODE;
+
+  switch (event->keyval) {
+    case GDK_h:
+    case GDK_H:
+      pmode = EXTENDED_DISPLAY_PMODE;
     break;
+
+    case GDK_b:
+    case GDK_B:
+      imode = BRUSH;
+    break;
+    case GDK_i:
+    case GDK_I:
+      imode = IDENT;
+    break;
+
     default:
+      ok = false;
     break;
   }
-  return(action);
+
+  if (ok) {
+    GGOBI(full_viewmode_set)(pmode, imode, gg);
+  }
+
+  return ok;
 }
 
 
@@ -250,8 +267,8 @@ tsplot_tree_label(splotd *sp, datad *d, ggobid *gg)
 void
 tsplot_cpanel_init (cpaneld* cpanel, ggobid *gg) 
 {
-  cpanel->viewmode = EXTENDED_DISPLAY_MODE;
-  cpanel->projection = XYPLOT;  /*-- does it need a projection? --*/
+  cpanel->pmode = EXTENDED_DISPLAY_PMODE;
+  cpanel->imode = DEFAULT_IMODE;
 
   /*-- 1d plots --*/
   cpanel->p1d.type = DOTPLOT;
@@ -273,7 +290,7 @@ tsplot_cpanel_init (cpaneld* cpanel, ggobid *gg)
 /*--------------------------------------------------------------------*/
 
 void
-tsplot_menus_make (ggobid *gg)
+tsplot_menus_make (displayd *display, ggobid *gg)
 {
   gg->menus.options_menu = gtk_menu_new ();
 
@@ -283,7 +300,11 @@ tsplot_menus_make (ggobid *gg)
 
   CreateMenuCheck (gg->menus.options_menu, "Show control panel",
     GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
-    GTK_WIDGET_VISIBLE (gg->viewmode_frame), gg);
+    GTK_WIDGET_VISIBLE (gg->imode_frame), gg);
+
+  CreateMenuCheck (gg->menus.options_menu, "Show status bar",
+    GTK_SIGNAL_FUNC (statusbar_show_cb), NULL,
+    gg->statusbar_p, gg);
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
      gg->menus.options_menu);

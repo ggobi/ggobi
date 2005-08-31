@@ -532,7 +532,7 @@ scatmat_varsel_simple (cpaneld *cpanel, splotd *sp, gint jvar,
           gtk_container_remove (GTK_CONTAINER (display->table), da);
 
           if (s == gg->current_splot)
-            sp_event_handlers_toggle (s, off);
+            sp_event_handlers_toggle (s, off, display->cpanel.pmode, display->cpanel.imode);
           splot_free (s, display, gg);
         }
       }
@@ -636,7 +636,7 @@ scatmat_varsel_simple (cpaneld *cpanel, splotd *sp, gint jvar,
       gint row = -1, col = -1;
 
       /*-- prepare to reset the current plot --*/
-      sp_event_handlers_toggle (sp, off);
+      sp_event_handlers_toggle (sp, off, display->cpanel.pmode, display->cpanel.imode);
 
       /*
        * First adjust the table, inserting or appending a row
@@ -707,7 +707,7 @@ scatmat_varsel_simple (cpaneld *cpanel, splotd *sp, gint jvar,
                         scatmat_nvars, scatmat_nvars);
 
       gg->current_splot = sp->displayptr->current_splot = sp;
-      sp_event_handlers_toggle (sp_new, on);
+      sp_event_handlers_toggle (sp_new, on, gg->current_display->cpanel.pmode, gg->current_display->cpanel.imode);
       redraw = true;
     }
   }

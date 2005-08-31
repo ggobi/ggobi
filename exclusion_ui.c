@@ -221,13 +221,13 @@ gint include_hiddens (gboolean include, datad *d, ggobid *gg)
   vartable_stats_set(d);
   tform_to_world(d, gg);
 
-  if (cpanel->projection == TOUR1D)
+  if (cpanel->pmode == TOUR1D)
     dsp->t1d.get_new_target = true;
-  else if (cpanel->projection == TOUR2D3) 
+  else if (cpanel->pmode == TOUR2D3) 
     dsp->t2d3.get_new_target = true;
-  else if (cpanel->projection == TOUR2D)
+  else if (cpanel->pmode == TOUR2D)
     dsp->t2d.get_new_target = true;
-  else if (cpanel->projection == COTOUR) {
+  else if (cpanel->pmode == COTOUR) {
     dsp->tcorr1.get_new_target = true;
     dsp->tcorr2.get_new_target = true;
   }

@@ -54,17 +54,21 @@ static void selection_mode_cb (GtkWidget *w, gpointer cbd)
 /*                         Control panel                                  */
 /*------------------------------------------------------------------------*/
 
-void
+GtkWidget *
 cpanel_scatmat_make (ggobid *gg) {
+  modepaneld *panel;
   GtkWidget *vb, *lbl, *opt;
   
-  gg->control_panel[SCATMAT] = gtk_vbox_new (false, VBOX_SPACING);
-  gtk_container_set_border_width (GTK_CONTAINER (gg->control_panel[SCATMAT]),
+  panel = (modepaneld *) g_malloc(sizeof(modepaneld));
+  gg->control_panels = g_list_append(gg->control_panels, (gpointer) panel);
+  panel->name = g_strdup("SCATMAT");
+  panel->w = gtk_vbox_new (false, VBOX_SPACING);
+  gtk_container_set_border_width (GTK_CONTAINER (panel->w),
                                   5);
 
  /*-- option menu: selection mode --*/
   vb = gtk_vbox_new (false, 0);
-  gtk_box_pack_start (GTK_BOX (gg->control_panel[SCATMAT]),
+  gtk_box_pack_start (GTK_BOX (panel->w),
                       vb, false, false, 0);
 
   lbl = gtk_label_new ("Selection mode:");
@@ -81,7 +85,9 @@ cpanel_scatmat_make (ggobid *gg) {
     sizeof (selection_mode_lbl) / sizeof (gchar *),
     (GtkSignalFunc) selection_mode_cb, "GGobi", gg);
 
-  gtk_widget_show_all (gg->control_panel[SCATMAT]);
+  gtk_widget_show_all (panel->w);
+
+  return panel->w;
 }
 
 
@@ -89,36 +95,42 @@ cpanel_scatmat_make (ggobid *gg) {
 /*                       Resetting the main menubar                       */
 /*------------------------------------------------------------------------*/
 
-
-void
-scatmat_mode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func,
+GtkWidget *
+scatmat_imode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func,
   ggobid *gg, gboolean useIds) 
 {
-  /*-- I/O menu --*/
-  gg->app.scatmat_mode_menu = gtk_menu_new ();
+  GtkWidget *imode_menu;
 
-  CreateMenuItem (gg->app.scatmat_mode_menu, "Scatterplot Matrix",
-    "^a", "", NULL, accel_group, func,
-    useIds ? GINT_TO_POINTER (SCATMAT) : gg, gg);
+  imode_menu = gtk_menu_new ();
+
+  CreateMenuItem (imode_menu, "Scatterplot Matrix",
+    "^h", "", NULL, accel_group, func,
+    useIds ? GINT_TO_POINTER (DEFAULT_IMODE) : gg, gg);
 
   /*-- Add a separator --*/
-  CreateMenuItem (gg->app.scatmat_mode_menu, NULL,
+  CreateMenuItem (imode_menu, NULL,
     "", "", NULL, NULL, NULL, NULL, gg);
 
-  CreateMenuItem (gg->app.scatmat_mode_menu, "Scale",
+  CreateMenuItem (imode_menu, "Scale",
     "^s", "", NULL, accel_group, func,
     useIds ? GINT_TO_POINTER (SCALE) : gg, gg);
-  CreateMenuItem (gg->app.scatmat_mode_menu, "Brush",
+  CreateMenuItem (imode_menu, "Brush",
     "^b", "", NULL, accel_group, func,
     useIds ? GINT_TO_POINTER (BRUSH) : gg, gg);
-  CreateMenuItem (gg->app.scatmat_mode_menu, "Identify",
+  CreateMenuItem (imode_menu, "Identify",
     "^i", "", NULL, accel_group, func,
     useIds ? GINT_TO_POINTER (IDENT) : gg, gg);
-  CreateMenuItem (gg->app.scatmat_mode_menu, "Move Points",
+  /* temporarily disabled -- this tried to use movept_screen_to_raw,
+which calls code in lineedit.c, which fails because the pmode is
+wrong.  It will be necessarily to implement the reverse pipeline
+as class-specific code.  dfs
+  CreateMenuItem (imode_menu, "Move Points",
     "^m", "", NULL, accel_group, func,
     useIds ? GINT_TO_POINTER (MOVEPTS) : gg, gg);
+  */
 
-  gtk_widget_show (gg->app.scatmat_mode_menu);
+  gtk_widget_show (imode_menu);
+  return (imode_menu);
 }
 
 /*--------------------------------------------------------------------*/
@@ -130,11 +142,12 @@ scatmat_mode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func,
 void
 cpanel_scatmat_set (displayd *display, cpaneld *cpanel, ggobid *gg)
 {
+  GtkWidget *pnl = mode_panel_get_by_name("SCATMAT", gg);
   GtkWidget *w;
 
-  w = widget_find_by_name (gg->control_panel[SCATMAT],
-                           "SCATMAT:sel_mode_option_menu");
-
-  gtk_option_menu_set_history (GTK_OPTION_MENU(w),
-                               cpanel->scatmat_selection_mode);
+  if (pnl) {
+    w = widget_find_by_name (pnl, "SCATMAT:sel_mode_option_menu");
+    gtk_option_menu_set_history (GTK_OPTION_MENU(w),
+                                 cpanel->scatmat_selection_mode);
+  }
 }

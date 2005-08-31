@@ -574,7 +574,6 @@ static void extendedDisplayInit(extendedDisplayd * dpy)
 }
 
 static GtkWidget *getExtendedDisplayCPanelWidget(displayd * dpy,
-                                                 gint viewmode,
                                                  gchar ** modeName,
                                                  ggobid * gg)
 {
@@ -584,7 +583,7 @@ static GtkWidget *getExtendedDisplayCPanelWidget(displayd * dpy,
 
 static void extendedDisplayClassInit(GtkGGobiExtendedDisplayClass * klass)
 {
-  klass->viewmode_control_box = getExtendedDisplayCPanelWidget;
+  klass->imode_control_box = getExtendedDisplayCPanelWidget;
   klass->options_menu_p = true;
   klass->allow_reorientation = true;
   klass->binning_ok = true;

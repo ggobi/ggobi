@@ -20,13 +20,10 @@
 #include "externs.h"
 
 void
-scatterplot_cpanel_init (cpaneld *cpanel, PipelineMode initial_mode,
-  ggobid *gg)
+scatterplot_cpanel_init (cpaneld *cpanel, ProjectionMode pmode, InteractionMode imode, ggobid *gg)
 {
-  cpanel->viewmode = initial_mode;
-
-  /*-- scatterplot only, so far --*/
-  cpanel->projection = initial_mode;
+  cpanel->pmode = pmode; /* XYPlot */
+  cpanel->imode = imode; /* DEFAULT */
 
   /*-- 1d plots --*/
   cpanel->p1d.type = ASH;
@@ -45,8 +42,8 @@ scatterplot_cpanel_init (cpaneld *cpanel, PipelineMode initial_mode,
 
 void
 scatmat_cpanel_init (cpaneld* cpanel, ggobid *gg) {
-  cpanel->viewmode = SCATMAT;
-  cpanel->projection = XYPLOT;  /*-- does it need a projection? --*/
+  cpanel->pmode = EXTENDED_DISPLAY_PMODE;
+  cpanel->imode = DEFAULT_IMODE;
 
   cpanel->scatmat_selection_mode = VAR_REPLACE;
 
@@ -62,8 +59,8 @@ scatmat_cpanel_init (cpaneld* cpanel, ggobid *gg) {
 void
 parcoords_cpanel_init (cpaneld* cpanel, ggobid *gg) 
 {
-  cpanel->viewmode = PCPLOT;
-  cpanel->projection = P1PLOT;  /*-- does it need a projection? --*/
+  cpanel->pmode = EXTENDED_DISPLAY_PMODE;
+  cpanel->imode = DEFAULT_IMODE;
 
   /*-- 1d plots --*/
   cpanel->p1d.type = DOTPLOT;
@@ -88,8 +85,8 @@ cpanel_set (displayd *display, ggobid *gg)
    displaytype_known = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display))->cpanel_set(display, cpanel, gg);
   }
 
-  if (cpanel->viewmode < COTOUR) cpanel->projection = cpanel->viewmode;
-
-  if (displaytype_known)
-    viewmode_set (cpanel->viewmode, gg);
+  if (displaytype_known) { 
+    /*g_printerr ("(cpanel_set) gg->pmode=%d cpanel->pmode=%d\n", gg->pmode, cpanel->pmode);*/
+    viewmode_set (cpanel->pmode, cpanel->imode, gg);
+  }
 }
