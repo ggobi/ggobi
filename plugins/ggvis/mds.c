@@ -636,7 +636,7 @@ mds_once (gboolean doit, ggvisd *ggv, ggobid *gg)
   }
 
   /* dragged by mouse */
-  if (viewmode_get (gg) == MOVEPTS &&
+  if (imode_get (gg) == MOVEPTS &&
       gg->buttondown &&
       dpos->nearest_point != -1)
   {
