@@ -407,6 +407,61 @@ parcoordsCPanelWidget(displayd *dpy, gchar **modeName, ggobid *gg)
   return(w);
 }
 
+static void
+splotScreenToTform(cpaneld *cpanel, splotd *sp, icoords *scr,
+		   fcoords *tfd, ggobid *gg)
+{
+  gcoords planar, world;
+  greal precis = (greal) PRECISION1;
+  greal ftmp, max, min, rdiff;
+  displayd *display = (displayd *) sp->displayptr;
+  datad *d = display->d;
+  gfloat scale_x, scale_y;
+  vartabled *vt;
+
+  scale_x = sp->scale.x;
+  scale_y = sp->scale.y;
+  scale_x /= 2;
+  sp->iscale.x = (greal) sp->max.x * scale_x;
+  scale_y /= 2;
+  sp->iscale.y = -1 * (greal) sp->max.y * scale_y;
+
+/*
+ * screen to plane 
+*/
+  planar.x = (scr->x - sp->max.x/2) * precis / sp->iscale.x ;
+  planar.x += sp->pmid.x;
+  planar.y = (scr->y - sp->max.y/2) * precis / sp->iscale.y ;
+  planar.y += sp->pmid.y;
+
+/*
+ * plane to tform
+*/
+
+  if (sp->p1dvar != -1) {
+
+      vt = vartable_element_get (sp->p1dvar, d);
+      max = vt->lim.max;
+      min = vt->lim.min;
+      rdiff = max - min;
+
+      if (display->p1d_orientation == HORIZONTAL) {
+        /* x */
+        world.x = planar.x;
+        ftmp = world.x / precis;
+        tfd->x = (ftmp + 1.0) * .5 * rdiff;
+        tfd->x += min;
+      } else {
+        /* y */
+        world.y = planar.y;
+        ftmp = world.y / precis;
+        tfd->y = (ftmp + 1.0) * .5 * rdiff;
+        tfd->y += min;
+      }
+  }
+
+}
+
 void
 parcoordsDisplayClassInit(GtkGGobiParCoordsDisplayClass *klass)
 {
@@ -464,7 +519,10 @@ parcoordsSPlotClassInit(GtkGGobiParCoordsSPlotClass *klass)
 
    klass->parent_class.tree_label = treeLabel;
 
+   /* reverse pipeline */ 
+   klass->parent_class.screen_to_tform = splotScreenToTform;
    klass->parent_class.world_to_plane = worldToPlane;
+   
    klass->parent_class.sub_plane_to_screen = withinPlaneToScreen;
 
    klass->parent_class.draw_edge_p = drawEdge_p;

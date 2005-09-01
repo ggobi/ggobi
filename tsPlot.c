@@ -210,6 +210,57 @@ tsplotCreateWithVars(displayd *display, gint *vars, gint nvar, gint width, gint 
    return(sp);
 }
 
+static void
+splotScreenToTform(cpaneld *cpanel, splotd *sp, icoords *scr,
+		   fcoords *tfd, ggobid *gg)
+{
+  gcoords planar, world;
+  greal precis = (greal) PRECISION1;
+  greal ftmp, max, min, rdiff;
+  displayd *display = (displayd *) sp->displayptr;
+  datad *d = display->d;
+  gfloat scale_x, scale_y;
+  vartabled *vtx, *vty;
+
+  scale_x = sp->scale.x;
+  scale_y = sp->scale.y;
+  scale_x /= 2;
+  sp->iscale.x = (greal) sp->max.x * scale_x;
+  scale_y /= 2;
+  sp->iscale.y = -1 * (greal) sp->max.y * scale_y;
+
+/*
+ * screen to plane 
+*/
+  planar.x = (scr->x - sp->max.x/2) * precis / sp->iscale.x ;
+  planar.x += sp->pmid.x;
+  planar.y = (scr->y - sp->max.y/2) * precis / sp->iscale.y ;
+  planar.y += sp->pmid.y;
+
+/*
+ * plane to tform
+*/
+  /* x */
+  vtx = vartable_element_get (sp->xyvars.x, d);
+  max = vtx->lim.max;
+  min = vtx->lim.min;
+  rdiff = max - min;
+  world.x = planar.x;
+  ftmp = world.x / precis;
+  tfd->x = (ftmp + 1.0) * .5 * rdiff;
+  tfd->x += min;
+
+  /* y */
+  vty = vartable_element_get (sp->xyvars.y, d);
+  max = vty->lim.max;
+  min = vty->lim.min;
+  rdiff = max - min;
+  world.y = planar.y;
+  ftmp = world.y / precis;
+  tfd->y = (ftmp + 1.0) * .5 * rdiff;
+  tfd->y += min;
+}
+
 void 
 timeSeriesSPlotClassInit(GtkGGobiTimeSeriesSPlotClass *klass)
 {
@@ -226,6 +277,9 @@ timeSeriesSPlotClassInit(GtkGGobiTimeSeriesSPlotClass *klass)
 
     klass->extendedSPlotClass.sub_plane_to_screen = tsWithinPlaneToScreen;
     klass->extendedSPlotClass.alloc_whiskers = tsAllocWhiskers;
+
+    /* reverse pipeline */ 
+    klass->extendedSPlotClass.screen_to_tform = splotScreenToTform;
 
     klass->extendedSPlotClass.world_to_plane = tsWorldToPlane;
 
