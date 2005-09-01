@@ -181,32 +181,19 @@ scale_convert (splotd *sp, gint ival, gint max, greal mid, gint scale)
 */
 void
 describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
- splotd *sp, dspdescd *desc)
+   splotd *sp, dspdescd *desc, ProjectionMode projection)
 {
   vartabled *vt; 
-
-  /* I want to use this same routine to draw the scatterplots of a
-     scatterplot matrix, but how will I get the projection right?
-     Apparently I use the value of sp->p1dvar in the scatterplot
-     matrix code; I could also use the plot position.
-  */
-
   cpaneld *cpanel = &display->cpanel;
-  PipelineMode projection = cpanel->projection;
   gint i, j, m;
   gint k = -1;
-  const gchar *const *gnames = GGOBI(getOpModeNames)(&k);
+  const gchar *const *gnames = GGOBI(getPModeNames)(&k);
   datad *d = display->d;
   datad *e = display->e;
   /*gboolean missing;*/
   icoords scr;
   fcoords tfmin, tfmax;
   fcoords pmin, pmax;
-
-  /* for plots composite displays, the projection may not be correct */
-  if (GTK_IS_GGOBI_SCATMAT_SPLOT(sp)) {
-    if (sp->p1dvar != -1) projection = P1PLOT;
-  }
 
   OPEN_LIST(fp);  /* plot; unlabelled */
 
@@ -223,11 +210,27 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
   tfmin.x = tfmin.y = tfmax.x = tfmax.y = 0.0;
 
   scr.x = scr.y = 0;
-  splot_screen_to_tform (cpanel, sp, &scr, &tfmin, gg);
+  /*splot_screen_to_tform (cpanel, sp, &scr, &tfmin, gg);*/
+  if(sp && GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
+     GtkGGobiExtendedSPlotClass *klass;
+     klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT_GET_CLASS(sp));
+     if(klass->screen_to_tform)
+       klass->screen_to_tform(cpanel, sp, &scr, &tfmin, gg);
+     else
+       g_printerr ("screen_to_tform routine needed\n");
+  }
 
   scr.x = sp->max.x;
   scr.y = sp->max.y;
-  splot_screen_to_tform (cpanel, sp, &scr, &tfmax, gg);
+  /*splot_screen_to_tform (cpanel, sp, &scr, &tfmax, gg);*/
+  if(sp && GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
+     GtkGGobiExtendedSPlotClass *klass;
+     klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT_GET_CLASS(sp));
+     if(klass->screen_to_tform)
+       klass->screen_to_tform(cpanel, sp, &scr, &tfmin, gg);
+     else
+       g_printerr ("screen_to_tform routine needed\n");
+  }
 
   fprintf (fp,
     "tformLims=c(xmin=%.3f, xmax=%.3f, ymin=%.3f, ymax=%.3f),",
@@ -604,7 +607,7 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
 
 void
 describe_scatterplot_display (FILE *fp, ggobid *gg, displayd *display, 
-		      dspdescd *desc)
+			      dspdescd *desc)
 {
   splotd *sp = (splotd *) display->splots->data;
 
@@ -612,7 +615,8 @@ describe_scatterplot_display (FILE *fp, ggobid *gg, displayd *display,
   ADD_COMMA(fp); ADD_CR(fp);
   OPEN_NAMED_LIST(fp, "plots");
 
-  describe_scatterplot_plot (fp, gg, display, sp, desc);
+  describe_scatterplot_plot (fp, gg, display, sp, desc, 
+    display->cpanel.pmode);
 
   CLOSE_LIST(fp);  /* plots */
 }
@@ -625,6 +629,7 @@ describe_scatmat_display (FILE *fp, ggobid *gg, displayd *display,
   GList *l;
   splotd *sp;
   gint ncols;
+  ProjectionMode projection;
 
   ncols = g_list_length (display->scatmat_cols);
 
@@ -643,7 +648,8 @@ describe_scatmat_display (FILE *fp, ggobid *gg, displayd *display,
 
   for (l = display->splots; l; l = l->next) {
     sp = (splotd *) l->data;
-    describe_scatterplot_plot (fp, gg, display, sp, desc);
+    projection = (sp->p1dvar != -1) ? P1PLOT : XYPLOT;
+    describe_scatterplot_plot (fp, gg, display, sp, desc, projection);
     ADD_COMMA(fp);
   }
 
@@ -671,7 +677,7 @@ describe_parcoords_display (FILE *fp, ggobid *gg, displayd *display,
 
   for (l = display->splots; l; l = l->next) {
     sp = (splotd *) l->data;
-    describe_scatterplot_plot (fp, gg, display, sp, desc);
+    describe_scatterplot_plot (fp, gg, display, sp, desc, P1PLOT);
     ADD_COMMA(fp);
   }
 
@@ -695,7 +701,7 @@ describe_time_series_display (FILE *fp, ggobid *gg, displayd *display,
 
   for (l = display->splots; l; l = l->next) {
     sp = (splotd *) l->data;
-    describe_scatterplot_plot (fp, gg, display, sp, desc);
+    describe_scatterplot_plot (fp, gg, display, sp, desc, XYPLOT);
     ADD_COMMA(fp);
   }
 
