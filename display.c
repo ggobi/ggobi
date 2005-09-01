@@ -731,11 +731,9 @@ display_set_current (displayd *new_display, ggobid *gg)
         f(gg->current_display, gg->imode_item);
       }
       else {
-	g_printerr ("ref count before %d\n", gg->main_accel_group->ref_count);
         submenu_destroy (gg->pmode_item); /* default if no method
 					     provided. */
         submenu_destroy (gg->imode_item);
-	g_printerr ("ref count %d\n", gg->main_accel_group->ref_count);
       }
     }
   }
