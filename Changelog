@@ -1,12 +1,15 @@
 September 2005
 
-Split the ViewMode menu into a View menu (representing projection),
-as needed, and an Interaction menu.  This involved changes to over 60
-files.
+Added alt-t/p accelerators to toggle between persistent and transient
+brushing; transient brush now drawn as a dotted line.
 
 Corrected a bug in the behavior of the "linkby" notebook on the
 brushing panel, and improved its behavior (I hope) so that only the
 relevant tab in the notebook is sensitive for each display.
+
+Split the ViewMode menu into a View menu (representing projection),
+as needed, and an Interaction menu.  This involved changes to over 60
+files.
 
 
 July 2005
