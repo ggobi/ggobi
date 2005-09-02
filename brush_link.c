@@ -479,6 +479,12 @@ linkby_notebook_subwindow_add (datad *d, GtkWidget *notebook, ggobid *gg)
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (swin),
     GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
 
+  /* If this is not the first child of the notebook, initialize it
+   * as insensitive.
+   */
+  if (gtk_container_children(GTK_CONTAINER(notebook)) != 0)
+    gtk_widget_set_sensitive (swin, false);
+
   gtk_object_set_data(GTK_OBJECT(swin), "datad", d);  /*setdata*/
 /*
  * name or nickname?  Which one we'd prefer to use depends on the
