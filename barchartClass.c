@@ -151,7 +151,7 @@ void barchartDisplaySet(displayd * dpy, ggobid * gg)
 {
   GtkWidget *pmode_menu, *imode_menu;
 
-  imode_menu = barchart_pmode_menu_make(gg->pmode_accel_group,
+  pmode_menu = barchart_pmode_menu_make(gg->pmode_accel_group,
                                  (GtkSignalFunc) pmode_set_cb, gg,
                                  true);
   gg->pmode_item = submenu_make("_View", 'V', gg->main_accel_group);
@@ -383,6 +383,8 @@ barchartKeyEventHandled(GtkWidget *w, displayd *display, splotd * sp, GdkEventKe
   ProjectionMode pmode = NULL_PMODE;
   InteractionMode imode = DEFAULT_IMODE;
 
+  if (event->state == 0 || event->state == GDK_CONTROL_MASK) {
+
   switch (event->keyval) {
     case GDK_h:
     case GDK_H:
@@ -414,6 +416,7 @@ barchartKeyEventHandled(GtkWidget *w, displayd *display, splotd * sp, GdkEventKe
   if (ok) {
     GGOBI(full_viewmode_set)(pmode, imode, gg);
   }
+  } else { ok = false; }
 
   return ok;
 }

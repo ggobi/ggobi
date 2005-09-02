@@ -381,7 +381,7 @@ gint       plotted_cols_get (gint *, datad *, ggobid *);
 gboolean   point_colors_read (InputDescription *desc, gboolean, datad *, ggobid *);
 gboolean   point_glyphs_read (InputDescription *desc, gboolean, datad *, ggobid *);
 gboolean   point_in_which_bin (gint, gint, gint *, gint *, datad *, splotd *);
-void       populate_option_menu (GtkWidget *, gchar **, gint, GtkSignalFunc, gchar *key, gpointer);
+GtkWidget *populate_option_menu (GtkWidget *, gchar **, gint, GtkSignalFunc, gchar *key, gpointer);
 void       position_popup_menu (GtkMenu *menu, gint *px, gint *py, gpointer);
 gboolean   processRestoreFile(const gchar * const fileName, ggobid *gg);
 void       procs_activate(gboolean state, ProjectionMode pmode, displayd *display, ggobid *gg);

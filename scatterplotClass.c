@@ -803,6 +803,8 @@ scatterplotKeyEventHandled(GtkWidget *w, displayd *display, splotd *sp, GdkEvent
   /* The key press could either lead to a pmode or an imode change;
      this works with or without the control key being pressed */
 
+  if (event->state == 0 || event->state == GDK_CONTROL_MASK) {
+
   switch (event->keyval) {
     case GDK_0:
     case GDK_1:
@@ -876,6 +878,7 @@ scatterplotKeyEventHandled(GtkWidget *w, displayd *display, splotd *sp, GdkEvent
     else
       GGOBI(full_viewmode_set)(pmode, imode, gg);
   }
+  } else { ok = false; }
 
   return ok;
 }

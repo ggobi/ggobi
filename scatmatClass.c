@@ -205,6 +205,8 @@ scatmatKeyEventHandled(GtkWidget *w, displayd *display, splotd * sp, GdkEventKey
   ProjectionMode pmode = NULL_PMODE;
   InteractionMode imode = DEFAULT_IMODE;
 
+  if (event->state == 0 || event->state == GDK_CONTROL_MASK) {
+
   switch (event->keyval) {
     case GDK_h:
     case GDK_H:
@@ -232,6 +234,7 @@ scatmatKeyEventHandled(GtkWidget *w, displayd *display, splotd * sp, GdkEventKey
   if (ok) {
     GGOBI(full_viewmode_set)(pmode, imode, gg);
   }
+  } else { ok = false; }
 
   return ok;
 }

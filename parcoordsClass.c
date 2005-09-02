@@ -102,6 +102,8 @@ parcoordsKeyEventHandled(GtkWidget *w, displayd *display, splotd * sp, GdkEventK
   ProjectionMode pmode = NULL_PMODE;
   InteractionMode imode = DEFAULT_IMODE;
 
+  if (event->state == 0 || event->state == GDK_CONTROL_MASK) {
+
   switch (event->keyval) {
     case GDK_h:
     case GDK_H:
@@ -125,6 +127,7 @@ parcoordsKeyEventHandled(GtkWidget *w, displayd *display, splotd * sp, GdkEventK
   if (ok) {
     GGOBI(full_viewmode_set)(pmode, imode, gg);
   }
+  } else { ok = false; }
 
   return ok;
 }

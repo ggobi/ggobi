@@ -151,10 +151,23 @@ static void brush_edge_targets_cb(GtkWidget * w, gpointer cbd)
 }
 
 static gchar *mode_lbl[] = { "Persistent", "Transient" };
+void
+brush_mode_set (gint mode, splotd *sp, displayd *display, ggobid *gg) {
+  cpaneld *cpanel = &gg->current_display->cpanel;
+
+  gint prev_mode = cpanel->br.mode;
+  cpanel->br.mode = mode;
+  if (mode == BR_PERSISTENT && mode != prev_mode) {
+    brush_once(false, sp, gg);
+  }
+  display_plot (display, QUICK, gg);
+}
 static void brush_mode_cb(GtkWidget * w, gpointer cbd)
 {
   ggobid *gg = GGobiFromWidget(w, true);
   splotd *sp = gg->current_splot;
+  brush_mode_set (GPOINTER_TO_INT(cbd), sp, gg->current_display, gg);
+  /*
   cpaneld *cpanel = &gg->current_display->cpanel;
   gint prev_mode = cpanel->br.mode;
 
@@ -163,6 +176,8 @@ static void brush_mode_cb(GtkWidget * w, gpointer cbd)
   if (cpanel->br.mode == BR_PERSISTENT && cpanel->br.mode != prev_mode) {
     brush_once(false, sp, gg);
   }
+  display_plot (gg->current_display, QUICK, gg);
+  */
 }
 
 static void open_symbol_window_cb(GtkWidget * w, ggobid * gg)
@@ -283,6 +298,8 @@ void brush_reset(ggobid * gg, gint action)
 /*      Handling keyboard and mouse events in the plot window         */
 /*--------------------------------------------------------------------*/
 
+#include <gdk/gdkkeysyms.h>
+
 static gint key_press_cb(GtkWidget * w, GdkEventKey * event, splotd * sp)
 {
   ggobid *gg = GGobiFromSPlot(sp);
@@ -293,6 +310,14 @@ static gint key_press_cb(GtkWidget * w, GdkEventKey * event, splotd * sp)
     return true;
 
   /*-- insert mode-specific key presses (if any) here --*/
+  /* Persistent/transient */
+  if (event->state == GDK_MOD1_MASK) {
+    if (event->keyval == GDK_t || event->keyval == GDK_T) {
+      brush_mode_set (BR_TRANSIENT, sp, gg->current_display, gg);
+    } else if (event->keyval == GDK_p || event->keyval == GDK_P) {
+      brush_mode_set (BR_PERSISTENT, sp, gg->current_display, gg);
+    }
+  }
 
   return true;
 }
@@ -349,15 +374,6 @@ button_press_cb(GtkWidget * w, GdkEventButton * event, splotd * sp)
   cpanel = &display->cpanel;
   d = display->d;
   e = display->e;
-
-  /*-- set the value of the boolean gg->linkby_cv --*/
-  g_printerr ("(button_press_cb)\n");
-  /*
-  linking_method_set(display, d, gg);
-
-Do I have to execute something here so that I can do the right
-thing when there are multiple datasets?
-  */
 
   brush_prev_vectors_update(d, gg);
   if (e != NULL)
@@ -494,7 +510,7 @@ void cpanel_brush_make(ggobid * gg)
 {
   modepaneld *panel;
   GtkWidget *btn;
-  GtkWidget *option_menu;
+  GtkWidget *option_menu, *menu;
   GtkWidget *vb, *lbl;
   GtkWidget *notebook;
 
@@ -522,11 +538,34 @@ void cpanel_brush_make(ggobid * gg)
     "Persistent or transient brushing", NULL);
   gtk_box_pack_start(GTK_BOX(panel->w),
     option_menu, false, false, 0);
-  populate_option_menu(option_menu, mode_lbl,
+  menu = populate_option_menu(option_menu, mode_lbl,
     sizeof(mode_lbl) / sizeof(gchar *),
     (GtkSignalFunc) brush_mode_cb, "GGobi", gg);
   /* initialize transient */
   gtk_option_menu_set_history(GTK_OPTION_MENU(option_menu), 1);
+
+  {  /* I really ought to do this by adding an argument to
+      * populate_option_menu, but I'm not sure it's worth it just
+      * for a single pair of accelerators.  
+      * The other point about all these accelerator groups is
+      * that I should be able to add the accel_groups to each display
+      * instead of having separate key event management.  dfs 9/2/2005
+      */
+  /* Add accelerators to the option menu */
+    GList *children = gtk_container_children(GTK_CONTAINER(menu));
+    GList *child;
+    GtkWidget *item;
+    guint accels[] = {'p', 't'};
+    gint i = 0;
+    GtkAccelGroup *accel_group = gtk_accel_group_new ();
+    gtk_window_add_accel_group (GTK_WINDOW (gg->main_window), accel_group);
+
+    for (child=children; child; child=child->next) {
+      item = (GtkWidget *) child->data;
+      gtk_widget_add_accelerator (item, "activate", accel_group,
+        accels[i++], GDK_MOD1_MASK, GTK_ACCEL_VISIBLE);
+    }
+  }
 
 /*-- option menu: brush with color/glyph/both --*/
   vb = gtk_vbox_new(false, 0);

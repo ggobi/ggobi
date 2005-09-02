@@ -416,8 +416,12 @@ brush_draw_brush (splotd *sp, GdkDrawable *drawable, datad *d, ggobid *gg) {
     }
   }
 
-  if (point_painting_p)
-  {
+  if (cpanel->br.mode == BR_TRANSIENT)
+    gdk_gc_set_line_attributes (gg->plot_GC,
+      0, GDK_LINE_ON_OFF_DASH, GDK_CAP_ROUND, GDK_JOIN_ROUND);
+
+  if (point_painting_p) {
+
     gdk_draw_rectangle (drawable, gg->plot_GC, false,
       x1, y1, (x2>x1)?(x2-x1):(x1-x2), (y2>y1)?(y2-y1):(y1-y2));
     /* Mark the corner to which the cursor will be attached */
@@ -449,7 +453,11 @@ brush_draw_brush (splotd *sp, GdkDrawable *drawable, datad *d, ggobid *gg) {
       gdk_draw_line (drawable, gg->plot_GC,
         x1, y1 + (y2 - y1)/2 + 1, x2, y1 + (y2 - y1)/2 + 1 );
     }
+
   }
+  if (cpanel->br.mode == BR_TRANSIENT)
+    gdk_gc_set_line_attributes (gg->plot_GC,
+      0, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
 }
 
 /*----------------------------------------------------------------------*/

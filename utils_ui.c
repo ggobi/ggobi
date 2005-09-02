@@ -235,7 +235,7 @@ get_main_menu (const GtkItemFactoryEntry menu_items [],
   return(item_factory);
 }
 
-void
+GtkWidget *
 populate_option_menu (GtkWidget *opt_menu, gchar **lbl, gint nitems,
   GtkSignalFunc func, gchar *key, gpointer obj)
 {
@@ -256,6 +256,8 @@ populate_option_menu (GtkWidget *opt_menu, gchar **lbl, gint nitems,
   }
 
   gtk_option_menu_set_menu (GTK_OPTION_MENU (opt_menu), menu);
+
+  return menu;
 }
 
 
