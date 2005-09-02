@@ -330,6 +330,7 @@ void       limits_display_set_by_var (gint j, datad *d, ggobid *gg);
 void       limits_set (gboolean do_raw, gboolean do_tform, datad *, ggobid *);  
 void       limits_set_by_var (gint, gboolean do_raw, gboolean do_tform, datad *, ggobid *);  
 gint       lines_intersect (glong, glong, glong, glong, glong, glong, glong, glong);
+void       linkby_current_page_set (displayd *, GtkWidget *w, ggobid *);
 void       linking_method_set (displayd *, datad *, ggobid *);
 void       make_ggobi (GGobiOptions *, gboolean, ggobid *);
 void       make_symbol_window (ggobid *);

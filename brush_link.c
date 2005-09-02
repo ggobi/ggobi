@@ -325,6 +325,37 @@ build_symbol_vectors_by_var(cpaneld * cpanel, datad * d, ggobid * gg)
 
 void linkby_notebook_subwindow_add (datad *d, GtkWidget *notebook, ggobid *);
 
+/* called from cpanel_brush_set */
+void
+linkby_current_page_set (displayd *display, GtkWidget *notebook, ggobid *gg)
+{
+  GtkWidget *swin;
+  datad *d = display->d, *paged;
+  gint page_num;
+
+  if (notebook == NULL) {
+    return;
+  }
+
+  /*
+   * For each page of the notebook, get its child, the scrolled
+   * window.  Get the datad that the scrolled window knows about,
+   * and compare it with display->d
+   */
+
+  page_num = 0;
+  swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK(notebook), page_num);
+  while (swin) {
+    paged = (datad *) gtk_object_get_data (GTK_OBJECT (swin), "datad");
+    gtk_widget_set_sensitive (swin, (paged == d));
+    if (paged == d) {
+      gtk_notebook_set_page (GTK_NOTEBOOK(notebook), page_num);
+    }
+    page_num += 1;
+    swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK(notebook), page_num);
+  }
+}
+
 void
 linking_method_set_cb (GtkWidget *cl, gint row, gint column,
   GdkEventButton *event, ggobid *gg)
@@ -332,16 +363,10 @@ linking_method_set_cb (GtkWidget *cl, gint row, gint column,
   datad *d = gtk_object_get_data (GTK_OBJECT(cl), "datad");
   displayd *display = gg->current_display;
   cpaneld *cpanel = &display->cpanel;  
-  /* cpanel has to come from display; is there another way to
-     get the display? Or can I get the cpanel from the swin? */
-  /* think about why this is specified in cpanel, gg, and d -- seems
-     confusing */
   GtkWidget *notebook;
 
   notebook = (GtkWidget *) gtk_object_get_data(GTK_OBJECT(cl), "notebook");
-
   cpanel->br.linkby_row = row;
-  cpanel->br.linkby_page = gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook));
 
   if (row <= 0) {
     gg->linkby_cv = false;

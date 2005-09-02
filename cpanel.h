@@ -72,7 +72,7 @@ typedef struct {
   struct _BrushCpanel {
    gboolean brush_on_p;
    gint mode;
-   gint linkby_page, linkby_row;
+   gint linkby_row;
    BrushTargetType point_targets, edge_targets;
   } br;
 

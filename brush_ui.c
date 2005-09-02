@@ -351,6 +351,7 @@ button_press_cb(GtkWidget * w, GdkEventButton * event, splotd * sp)
   e = display->e;
 
   /*-- set the value of the boolean gg->linkby_cv --*/
+  g_printerr ("(button_press_cb)\n");
   /*
   linking_method_set(display, d, gg);
 
@@ -487,7 +488,6 @@ void brush_event_handlers_toggle(splotd * sp, gboolean state)
 /*                   Resetting the main menubar                       */
 /*--------------------------------------------------------------------*/
 
-/* dfs testing */
 GtkWidget *create_linkby_notebook (GtkWidget *, ggobid *);
 
 void cpanel_brush_make(ggobid * gg)
@@ -628,7 +628,6 @@ void cpanel_brush_init(cpaneld *cpanel, ggobid *gg)
   cpanel->br.brush_on_p = true;
 
   cpanel->br.mode = BR_TRANSIENT;
-  cpanel->br.linkby_page = 0;
   cpanel->br.linkby_row = 0;
 
   /*-- point brushing on, edge brushing off --*/
@@ -654,12 +653,7 @@ void cpanel_brush_set(displayd *display, cpaneld *cpanel, ggobid *gg)
 
   /* Open the correct page in the linking rule notebook */
   w = widget_find_by_name(pnl, "BRUSH:linkby_notebook");
-  gtk_notebook_set_page(GTK_NOTEBOOK(w), cpanel->br.linkby_page);
-  /* Get the clist (how?) and set the current row number. */
-  /* It's the notebook page corresponding to display->d -- uh-oh, what
-     if it's display->e?? */
-  /* Set the values for gg->linkby_cv and d->linkvar_vt based on
-     cpanel->br_linkby and the state of the notebook page? */
+  linkby_current_page_set (display, w, gg);
 
   w = widget_find_by_name(pnl, "BRUSH:point_targets_option_menu");
   gtk_option_menu_set_history(GTK_OPTION_MENU(w),
