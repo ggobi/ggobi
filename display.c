@@ -522,8 +522,11 @@ display_add (displayd *display, ggobid *gg)
    * The current display types start without signal handlers, but
    * I may need to add handlers later for some unforeseen display.
   */
-  /* don't activate */
-  viewmode_set (gg->current_display->cpanel.pmode, gg->current_display->cpanel.imode,  gg); 
+  /* This seems to be redundant -- dfs */
+  /*
+  viewmode_set (gg->current_display->cpanel.pmode,
+  gg->current_display->cpanel.imode,  gg); 
+  */
 
   /*-- if starting from the API, or changing mode, update the mode menus --*/
   if (pmode_prev != gg->current_display->cpanel.pmode ||
