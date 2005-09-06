@@ -103,7 +103,7 @@ scatterplot_imode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func,
     useIds ? GINT_TO_POINTER (EDGEED) : gg, gg, 
     gg->imodeRadioGroup,
     sessionOptions->useRadioMenuItems);
-  CreateMenuItemWithCheck (imode_menu, "Move Points",
+  CreateMenuItemWithCheck (imode_menu, "Move points",
     "^m", "", NULL, accel_group, func,
     useIds ? GINT_TO_POINTER (MOVEPTS) : gg, gg, 
     gg->imodeRadioGroup,
