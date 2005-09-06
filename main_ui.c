@@ -52,8 +52,8 @@ const char *const GGOBI(IModeNames)[] = {
   "Scale",
   "Brush",
   "Identify",
-  "Edit Edges",
-  "Move Points",
+  "Edit edges",
+  "Move points",
 };
 static const char *const *pmode_name = GGOBI(PModeNames);
 static const char *const *imode_name = GGOBI(IModeNames);
@@ -269,8 +269,6 @@ void
 viewmode_set (ProjectionMode pmode, InteractionMode imode, ggobid *gg)
 {
   displayd *display = gg->current_display;
-  gboolean cpanelchanged = ((imode != NULL_IMODE && imode != gg->imode) ||
-			    (pmode != NULL_PMODE && pmode != gg->pmode));
 
   if (pmode != NULL_PMODE) {
     gg->pmode_prev = gg->pmode; gg->pmode = pmode;
@@ -295,63 +293,63 @@ viewmode_set (ProjectionMode pmode, InteractionMode imode, ggobid *gg)
   }
 
 /*
- * just sets up the mode_frame and the variable selection panel.
+ * Just sets up the mode_frame and the variable selection panel.
+ * Assume that it's always necessary.
 */
-  if (cpanelchanged) {
 
-    if (gg->current_control_panel) {
-      GtkWidget *modeBox = gg->current_control_panel;
-      if (modeBox) {
-        gtk_widget_ref (modeBox);
-        gtk_container_remove (GTK_CONTAINER (gg->imode_frame), modeBox);
-      }
+  if (gg->current_control_panel) {
+    GtkWidget *modeBox = gg->current_control_panel;
+    if (modeBox) {
+      gtk_widget_ref (modeBox);
+      gtk_container_remove (GTK_CONTAINER (gg->imode_frame), modeBox);
+    }
+  }
+
+  if (imode != NULL_IMODE) {
+    gchar * modeName = NULL;
+    GtkWidget *panel = NULL;
+
+    /* a change within the set of imodes */
+    if (imode > DEFAULT_IMODE && imode < EXTENDED_DISPLAY_IMODE) {
+      modeName = (gchar *) imode_name[imode];  /* could be DEFAULT */
+      panel = mode_panel_get_by_name (modeName, gg); 
     }
 
-    if (imode != NULL_IMODE) {
-      gchar * modeName = NULL;
-      GtkWidget *panel = NULL;
-
-      /* a change within the set of imodes */
-      if (imode > DEFAULT_IMODE && imode < EXTENDED_DISPLAY_IMODE) {
-        modeName = (gchar *) imode_name[imode];  /* could be DEFAULT */
+    /* the pmode is taking over the control panel */
+    else if (imode == DEFAULT_IMODE && gg->pmode > NULL_PMODE) {
+      if (gg->pmode == EXTENDED_DISPLAY_PMODE) {
+        GtkGGobiExtendedDisplayClass *klass;
+        if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
+          klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display));
+          panel = klass->imode_control_box(display, &modeName, gg);
+        } 
+      } else if (pmode < EXTENDED_DISPLAY_PMODE) {  /* scatterplot? */
+        modeName = (gchar *) pmode_name[gg->pmode];
         panel = mode_panel_get_by_name (modeName, gg); 
       }
-
-      /* the pmode is taking over the control panel */
-      else if (imode == DEFAULT_IMODE && gg->pmode > NULL_PMODE) {
-        if (gg->pmode == EXTENDED_DISPLAY_PMODE) {
-          GtkGGobiExtendedDisplayClass *klass;
-          if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
-            klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display));
-            panel = klass->imode_control_box(display, &modeName, gg);
-          } 
-        } else if (pmode < EXTENDED_DISPLAY_PMODE) {  /* scatterplot? */
-          modeName = (gchar *) pmode_name[gg->pmode];
-          panel = mode_panel_get_by_name (modeName, gg); 
-        }
-      }
-
-      gtk_frame_set_label (GTK_FRAME (gg->imode_frame), modeName);
-      gtk_container_add (GTK_CONTAINER (gg->imode_frame), panel);
-      gg->current_control_panel = panel;
-
-      /*-- avoid increasing the object's ref_count infinitely  --*/
-#if GTK_MAJOR_VERSION == 1
-      if (GTK_OBJECT (panel)->ref_count > 1)
-#else
-      if (G_OBJECT (panel)->ref_count > 1)
-#endif
-        gtk_widget_unref (panel);
     }
+
+    gtk_frame_set_label (GTK_FRAME (gg->imode_frame), modeName);
+    gtk_container_add (GTK_CONTAINER (gg->imode_frame), panel);
+    gg->current_control_panel = panel;
+
+    /*-- avoid increasing the object's ref_count infinitely  --*/
+#if GTK_MAJOR_VERSION == 1
+    if (GTK_OBJECT (panel)->ref_count > 1)
+#else
+    if (G_OBJECT (panel)->ref_count > 1)
+#endif
+      gtk_widget_unref (panel);
   }
 
   if (pmode != NULL_PMODE && gg->pmode != gg->pmode_prev) {
 
     /*
-     * The projection type is one of P1PLOT, XYPLOT, ROTATE,
-     * TOUR1D, TOUR2D or COTOUR.  It only changes if another projection
-     * type is selected.  (For parcoords and scatmat plots, the
-     * value of projection is irrelevant.)
+     * The projection type is one of P1PLOT, XYPLOT, ROTATE, TOUR1D,
+     * TOUR2D or COTOUR.  It only changes if another projection type
+     * is selected.  (For parcoords, time series, and scatmat plots,
+     * the value of projection is irrelevant.  A second pmode is in
+     * the process of being added to the barchart.)
     */
     if (display && GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
       GtkGGobiExtendedDisplayClass *klass;
@@ -368,10 +366,6 @@ viewmode_set (ProjectionMode pmode, InteractionMode imode, ggobid *gg)
 void
 procs_activate (gboolean state, ProjectionMode pmode, displayd *display, ggobid *gg)
 {
-  /*
-  g_printerr ("procs_activate (state=%d, mode=%d) in main_ui.c\n",
-  state, pmode);
-  */
   switch (pmode) {
     case TOUR1D:
       if (!display->cpanel.t1d.paused)
@@ -400,9 +394,6 @@ imode_activate (splotd *sp, ProjectionMode pmode, InteractionMode imode, gboolea
   displayd *display = (displayd *) sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
   RedrawStyle redraw_style = NONE;
-
-  /*  g_printerr("(imode_activate) state %d pmode %d imode %d\n",
-      state, pmode, imode); */
 
   if (state == off) {
     switch (imode) {
@@ -588,11 +579,6 @@ GGOBI(full_viewmode_set)(ProjectionMode pmode, InteractionMode imode, ggobid *gg
   gboolean reinit_transient_p = false;
   gboolean cpanel_shows_pmode = (imode == DEFAULT_IMODE);
 
-  /*
-  g_printerr ("(full_viewmode_set) pmodearg=%d pmode=%d pmode_prev=%d,
-  imodearg=%d imode=%d imode_prev=%d\n", pmode, gg->pmode,
-  gg->pmode_prev, imode, gg->imode, gg->imode_prev); */
-
   if (gg->current_display != NULL && gg->current_splot != NULL) {
     splotd *sp = gg->current_splot;
     displayd *display = gg->current_display;
@@ -612,10 +598,6 @@ GGOBI(full_viewmode_set)(ProjectionMode pmode, InteractionMode imode, ggobid *gg
       display->cpanel.pmode = pmode;
     display->cpanel.imode = imode;
     viewmode_set(pmode, imode, gg);
-    /*
-    g_printerr ("new: gg->pmode=%d  gg->imode=%d\n", gg->pmode,
-    gg->imode);
-    */
     /* */
 
     sp_event_handlers_toggle (sp, on, gg->pmode, gg->imode);
