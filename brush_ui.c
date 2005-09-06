@@ -311,7 +311,7 @@ static gint key_press_cb(GtkWidget * w, GdkEventKey * event, splotd * sp)
 
   /*-- insert mode-specific key presses (if any) here --*/
   /* Persistent/transient */
-  if (event->state == GDK_MOD1_MASK) {
+  if ((event->state & GDK_MOD1_MASK) == GDK_MOD1_MASK) {
     if (event->keyval == GDK_t || event->keyval == GDK_T) {
       brush_mode_set (BR_TRANSIENT, sp, gg->current_display, gg);
     } else if (event->keyval == GDK_p || event->keyval == GDK_P) {
@@ -612,9 +612,9 @@ void cpanel_brush_make(ggobid * gg)
   gtk_option_menu_set_history(GTK_OPTION_MENU(option_menu), 0);
 
 
-  btn = gtk_button_new_with_label("Undo");
+  btn = gtk_button_new_with_label("Undo persistent");
   gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), btn,
-    "Undo the most recent brushing changes, from button down to button up",
+    "Undo the most recent persistent brushing changes, from button down to button up",
     NULL);
   gtk_box_pack_start(GTK_BOX(panel->w),
     btn, false, false, 0);
