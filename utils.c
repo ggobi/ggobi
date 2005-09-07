@@ -497,3 +497,18 @@ ggobi_sleep(guint interval)
   gtk_timeout_add(interval*1000, GGobiSleepTimer, NULL);
   gtk_main();
 }
+
+gboolean
+in_vector (gint k, gint *vec, gint nels)
+{
+  gint j;
+  gboolean in = false;
+  for (j=0; j<nels; j++) {
+    if (k == vec[j]) {
+      in = true;
+      break;
+    }
+  }
+  return in;
+}
+
