@@ -1,5 +1,9 @@
 September 2005
 
+When a new display is opened, its initial variables are now chosen
+based on the variables displayed in the display that was current when
+the new one was initialized.
+
 Added alt-t/p accelerators to toggle between persistent and transient
 brushing; transient brush now drawn as a dotted line.
 

@@ -315,11 +315,37 @@ createScatterplot(displayd *display, gboolean missing_p, splotd *sp, gint numVar
   if (sp == NULL) {
     sp = gtk_scatter_plot_new (display, WIDTH, HEIGHT, gg);
     if(numVars < 2 || vars == NULL) {
-      sp->xyvars.x = 0;
-      sp->xyvars.y = 1;
+
+      /* Initialize display with the plotted variables in the current
+         display, if appropriate */
+      if (gg->current_display != NULL && gg->current_display != display && 
+          gg->current_display->d == d && 
+          GTK_IS_GGOBI_EXTENDED_DISPLAY(gg->current_display))
+      {
+        gint nplotted_vars;
+        gint *plotted_vars = (gint *) g_malloc(d->ncols * sizeof(gint));
+        displayd *dsp = gg->current_display;
+
+        nplotted_vars = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(dsp))->plotted_vars_get(dsp, plotted_vars, d, gg);
+
+        if (nplotted_vars) {
+          if (projection == XYPLOT)
+    	    sp->xyvars.x = plotted_vars[0];
+          else
+            sp->p1dvar = plotted_vars[0];
+        }
+        if (nplotted_vars > 1 && projection == XYPLOT)
+	  sp->xyvars.y = plotted_vars[1];
+
+        g_free (plotted_vars);
+      }
     } else {
-      sp->xyvars.x = vars[0];
-      sp->xyvars.y = vars[1];
+      if (projection == XYPLOT) {
+        sp->xyvars.x = vars[0];
+        sp->xyvars.y = vars[1];
+      } else {
+        sp->p1dvar = vars[0];
+      }
     }
   }
 
@@ -327,7 +353,7 @@ createScatterplot(displayd *display, gboolean missing_p, splotd *sp, gint numVar
   display->splots = g_list_append (display->splots, (gpointer) sp);
 
   /*-- Initialize tours if possible --*/
- {
+  {
 /*XX seems like only scatterplot gets in here. (i.e. not scatmat) */
     display_tour1d_init_null (display, gg);
     if (d->ncols >= MIN_NVARS_FOR_TOUR1D)

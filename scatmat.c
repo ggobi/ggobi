@@ -59,6 +59,7 @@ scatmat_cols_print (displayd *display) {
 }
 */
 
+
 static void
 scatmat_display_menus_make (displayd *display, GtkAccelGroup *accel_group,
   GtkSignalFunc func, GtkWidget *mbar, ggobid *gg)
@@ -263,13 +264,46 @@ scatmat_new (displayd *display,
      within a scatterplot matrix.
      ! Need to check rows and cols are allocated. !
    */
+
   if (numRows == 0 || numCols == 0) {
+
     scatmat_nrows = scatmat_ncols = MIN (d->ncols, sessionOptions->info->numScatMatrixVars);
     if(scatmat_nrows < 0) {
 	scatmat_nrows = scatmat_ncols = d->ncols;
     }
-    for (j=0; j<scatmat_nrows; j++)
-      rows[j] = cols[j] = j;
+
+    /* Initialize display with the plotted variables in the current
+       display, if appropriate */
+    if (gg->current_display != NULL && gg->current_display != display && 
+        gg->current_display->d == d && 
+        GTK_IS_GGOBI_EXTENDED_DISPLAY(gg->current_display))
+    {
+      gint k, nplotted_vars;
+      gint *plotted_vars = (gint *) g_malloc(d->ncols * sizeof(gint));
+      displayd *dsp = gg->current_display;
+
+      nplotted_vars = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(dsp))->plotted_vars_get(dsp, plotted_vars, d, gg);
+
+      scatmat_ncols = scatmat_nrows = MAX (scatmat_nrows, nplotted_vars);
+      for (j=0; j<nplotted_vars; j++)
+        rows[j] = cols[j] = plotted_vars[j];
+      j = nplotted_vars;
+      for (k=0; k<d->ncols; k++) {
+        if (!in_vector(k, plotted_vars, nplotted_vars)) {
+          rows[j] = cols[j] = k;
+          j++;
+          if (j == scatmat_ncols)
+            break;
+        }
+      }
+      g_free (plotted_vars);
+
+    } else {
+      
+      for (j=0; j<scatmat_nrows; j++)
+        rows[j] = cols[j] = j;
+    }
+
   } else { 
     scatmat_nrows = numRows;
     scatmat_ncols = numCols;

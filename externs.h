@@ -314,6 +314,7 @@ gboolean   impute_fixed (ImputeType, gfloat val, int nvars, gint *vars, datad *,
 gboolean   impute_mean_or_median (gint, gint, gint *, datad *, ggobid *);
 void       impute_random (datad *, gint nvars, gint *vars, ggobid *);
 void       impute_window_open (ggobid *);
+gboolean   in_vector (gint k, gint *vec, gint nels);
 gint       include_hiddens (gboolean include, datad *d, ggobid *gg);
 void       increment_tour(vector_f, vector_f, gfloat, gfloat, gfloat *, gint);
 void       initSessionOptions(int argc, char **argv);

@@ -163,8 +163,8 @@ tsplot_new(displayd *display, gboolean missing_p, gint nvars, gint *vars, datad 
 
   if (nvars == 0) {
 
-      /* See if there is a variable which has been marked as isTime and use the first of 
-         these as the horizontal axis. */
+      /* See if there is a variable which has been marked as isTime
+         and use the first of these as the horizontal axis. */
     for(i = 0; i < d->ncols; i++) {
 	vartabled *el;
 	el = vartable_element_get(i, d);
@@ -175,10 +175,55 @@ tsplot_new(displayd *display, gboolean missing_p, gint nvars, gint *vars, datad 
     }
 
     nplots = MIN ((d->ncols-1), sessionOptions->info->numTimePlotVars);
-    if(nplots < 0)
+    if (nplots < 0)
       nplots = d->ncols;
 
-    for (i=1, cur = 0; i < nplots; i++, cur++) {
+    if (gg->current_display != NULL && gg->current_display != display && 
+        gg->current_display->d == d && 
+        GTK_IS_GGOBI_EXTENDED_DISPLAY(gg->current_display))
+    {
+      gint j, k, nplotted_vars;
+      gint *plotted_vars = (gint *) g_malloc(d->ncols * sizeof(gint));
+      displayd *dsp = gg->current_display;
+
+      nplotted_vars = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(dsp))->plotted_vars_get(dsp, plotted_vars, d, gg);
+
+      nplots = MAX (nplots, nplotted_vars);
+      vars[0] = timeVariable;
+
+      /* Loop through plotted_vars.  Don't add timeVariable again, or
+	 exceed the number of plots */
+      j = 1;
+      for (k=0; k<nplotted_vars; k++) {
+        if (plotted_vars[k] != timeVariable) {
+          vars[j] = plotted_vars[k];
+          j++;
+          if (j == nplots)
+            break;
+        }
+      }
+
+      /* If we still need more plots, loop through remaining
+	 variables.  Don't add timeVariable again, or exceed the
+	 number of plots */
+      if (j < nplots) {
+        for (k=0; k<d->ncols; k++) {
+          if (!in_vector(k, plotted_vars, nplotted_vars) && 
+              k != timeVariable) 
+          {
+            vars[j] = k;
+            j++;
+            if (j == nplots)
+              break;
+          } 
+        }
+      }
+
+      g_free (plotted_vars);
+
+    } else {
+
+      for (i=1, cur = 0; i < nplots; i++, cur++) {
 
 	/* Check that we are not setting a variable to the timeVariable
 	   but also that we have enough variables. */
@@ -188,12 +233,13 @@ tsplot_new(displayd *display, gboolean missing_p, gint nvars, gint *vars, datad 
 	    }
 	} else
 	    vars[i] = cur;
+      }
     }
 
 
   } else {
     nplots = nvars;
-    timeVariable =vars[0];
+    timeVariable = vars[0];
   }
 
   tsplot_cpanel_init (&display->cpanel, gg);

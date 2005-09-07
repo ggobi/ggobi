@@ -208,10 +208,40 @@ parcoords_new (displayd *display, gboolean missing_p, gint nvars, gint *vars,
     if(nplots < 0) {
       nplots = d->ncols;
     }
-    for (i=0; i<nplots; i++)
-      vars[i] = i;
+
+    /* Initialize using the plotted variables in the current display,
+       if appropriate */
+    if (gg->current_display != NULL && gg->current_display != display && 
+        gg->current_display->d == d && 
+        GTK_IS_GGOBI_EXTENDED_DISPLAY(gg->current_display))
+    {
+      gint j, k, nplotted_vars;
+      gint *plotted_vars = (gint *) g_malloc(d->ncols * sizeof(gint));
+      displayd *dsp = gg->current_display;
+
+      nplotted_vars = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(dsp))->plotted_vars_get(dsp, plotted_vars, d, gg);
+     
+      nplots = MAX (nplots, nplotted_vars);
+      for (j=0; j<nplotted_vars; j++)
+        vars[j] = plotted_vars[j];
+      j = nplotted_vars;
+      for (k=0; k<d->ncols; k++) {
+        if (!in_vector(k, plotted_vars, nplotted_vars)) {
+          vars[j] = k;
+          j++;
+          if (j == nplots)
+            break;
+        }
+      }
+      g_free (plotted_vars);
+
+    } else {
+
+      for (i=0; i<nplots; i++)
+        vars[i] = i;
+    }
   } else {
-    nplots = nvars;
+    nplots = nvars;  /* and we assume the argument vars is populated */
   }
 
   parcoords_cpanel_init (&display->cpanel, gg);

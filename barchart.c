@@ -98,10 +98,10 @@ createBarchart(displayd *display, gboolean missing_p, splotd * sp, gint var, dat
 
   if(!display) {
    if (sp == NULL || sp->displayptr == NULL) {
-    /* Use GTK_TYPE_GGOBI_BARCHART_DISPLAY, or the regular extended display
-       and set the titleLabel immediately afterward. If more goes into barchart,
-       we will do the former. And that's what we do.
-       The alternative is.
+    /* Use GTK_TYPE_GGOBI_BARCHART_DISPLAY, or the regular extended
+       display and set the titleLabel immediately afterward. If more
+       goes into barchart, we will do the former. And that's what we
+       do.  The alternative is.
        display = gtk_type_new(GTK_TYPE_GGOBI_EXTENDED_DISPLAY);
        GTK_GGOBI_EXTENDED_DISPLAY(display)->titleLabel = "BarChart";
      */
@@ -150,6 +150,26 @@ createBarchart(displayd *display, gboolean missing_p, splotd * sp, gint var, dat
   /*-- Initialize a single splot --*/
   if (sp == NULL) {
     sp = gtk_barchart_splot_new(display, WIDTH, HEIGHT, gg);
+  }
+
+  /* Reset sp->p1dvar based on the plotted variables in the current
+     display, if appropriate -- it has already been initialized to
+     zero in splot_init, a few levels down from
+     gtk_barchart_splot_new(),*/
+  if (gg->current_display != NULL && gg->current_display != display && 
+      gg->current_display->d == d && 
+      GTK_IS_GGOBI_EXTENDED_DISPLAY(gg->current_display))
+  {
+    gint nplotted_vars;
+    gint *plotted_vars = (gint *) g_malloc(d->ncols * sizeof(gint));
+    displayd *dsp = gg->current_display;
+
+    nplotted_vars = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(dsp))->plotted_vars_get(dsp, plotted_vars, d, gg);
+    if (nplotted_vars && plotted_vars[0] != 0) {
+      sp->p1dvar = plotted_vars[0];
+      barchart_clean_init(GTK_GGOBI_BARCHART_SPLOT(sp));
+      barchart_recalc_counts(GTK_GGOBI_BARCHART_SPLOT(sp), d, gg);
+    }
   }
 
 
