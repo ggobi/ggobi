@@ -51,6 +51,7 @@ display_menu_build (ggobid *gg)
 {
   gint nd;
   datad *d0;
+  GtkWidget *item;
 
   if(gg == NULL || gg->d == NULL)
       return;
@@ -68,6 +69,18 @@ display_menu_build (ggobid *gg)
        buildExtendedDisplayMenu(gg, nd, d0);
     }
   }
+
+  /* Experiment: move the DisplayTree to the Display menu -- dfs */
+  /* Add a separator before the mode-specific items */
+  CreateMenuItem (gg->display_menu, NULL,
+    "", "", NULL, NULL, NULL, NULL, gg);
+
+  item = gtk_menu_item_new_with_label ("Show DisplayTree");
+  gtk_signal_connect (GTK_OBJECT (item), "activate",
+                      GTK_SIGNAL_FUNC (show_display_tree_cb),
+                      (gpointer) gg);
+  gtk_menu_append (GTK_MENU (gg->display_menu), item);
+
 
 #ifdef SUPPORT_PLUGINS  
   if (sessionOptions->info != NULL) {

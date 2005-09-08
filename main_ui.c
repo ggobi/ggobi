@@ -743,11 +743,14 @@ static GtkItemFactoryEntry menu_items[] = {
        NULL },
   { "/Tools/sep",     NULL, NULL, 0, "<Separator>" },  /*-- before plugins --*/
 
+  /* Experiment: moving this to the Display menu -- dfs */
+  /*
   {"/Dis_playTree", NULL, NULL, 0, "<Branch>"},
   { "/DisplayTree/Displays",    
        NULL, 
        (GtkItemFactoryCallback) show_display_tree,
        2},
+  */
 
   { "/_Help",                NULL, NULL, 0, "<LastBranch>" },
   { "/Help/About GGobi",

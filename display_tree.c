@@ -282,8 +282,14 @@ splot_tree_label(splotd *splot, gint ctr, datad *d, ggobid *gg)
    Callback for a menu item, etc. to create and show
    the display and plot hierarchy.
  */
-void
+void  /* used when DisplayTree is part of the ItemFactory in the main
+	 menubar */
 show_display_tree (ggobid *gg, GtkWidget *widget)
+{
+  plot_tree_display(gg);
+}
+void  /* used when DisplayTree is part of the Display menu */
+show_display_tree_cb (GtkWidget *w, ggobid *gg)
 {
   plot_tree_display(gg);
 }
