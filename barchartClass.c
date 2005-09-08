@@ -59,6 +59,19 @@ static gboolean barchartEventHandlersToggle(displayd * dpy, splotd * sp,
 static gboolean barchartKeyEventHandled(GtkWidget *, displayd *, splotd *,
 					GdkEventKey *, ggobid *);
 
+static void
+setShowAxesOption(displayd *display, gboolean active)
+{
+  switch (display->cpanel.pmode) {
+    case EXTENDED_DISPLAY_PMODE:
+      scatterplot_show_vrule (display, active);
+    break;
+    default:
+    break;
+  }
+}
+
+
 static gboolean
 varpanelHighd(displayd *display)
 {
@@ -523,6 +536,8 @@ void barchartDisplayClassInit(GtkGGobiBarChartDisplayClass * klass)
   klass->parent_class.event_handlers_toggle = barchartEventHandlersToggle;
   klass->parent_class.splot_key_event_handled =
       barchartKeyEventHandled;
+
+  klass->parent_class.set_show_axes_option = setShowAxesOption;
 }
 
 void barchartSPlotClassInit(GtkGGobiBarChartSPlotClass * klass)

@@ -1499,10 +1499,6 @@ barchart_display_menus_make(displayd * display,
   GtkWidget *topmenu, *options_menu;
   GtkWidget *item;
 
-  display->edge_item = NULL;
-  display->edge_menu = NULL;
-  scatterplot_display_edge_menu_update(display, accel_group, func, gg);
-
   /*-- Options menu --*/
   topmenu = submenu_make("_Options", 'H', accel_group);
   /*-- add a tooltip --*/
@@ -1511,13 +1507,14 @@ barchart_display_menus_make(displayd * display,
 
   options_menu = gtk_menu_new();
 
-  item = CreateMenuCheck(options_menu, "Show points",
+  item = CreateMenuCheck(options_menu, "Show bars",
                          func, GINT_TO_POINTER(DOPT_POINTS), on, gg);
   gtk_object_set_data(GTK_OBJECT(item), "display", (gpointer) display);
 
   /*-- Add a separator --*/
   CreateMenuItem(options_menu, NULL, "", "", NULL, NULL, NULL, NULL, gg);
 
+  /* This makes sense, but it isn't working */
   item = CreateMenuCheck(options_menu, "Show axes",
                          func, GINT_TO_POINTER(DOPT_AXES), on, gg);
   gtk_object_set_data(GTK_OBJECT(item), "display", (gpointer) display);
