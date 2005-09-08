@@ -41,9 +41,7 @@ gchar *display_tree_label(displayd *display);
 /* For Gtk 2.4, need to set -DGTK_ENABLE_BROKEN as GtkTree will not be defined otherwise. */
 GtkTree *plot_tree_display(ggobid *gg);
 
-/*
-void show_display_tree (gpointer cbd, guint action, GtkWidget *widget);
-*/
+void show_display_tree_cb (GtkWidget *widget, ggobid *);
 void show_display_tree (ggobid *gg, GtkWidget *widget);
 
 GtkWidget *splot_subtree_create(displayd *display, ggobid *gg);
