@@ -1,5 +1,12 @@
 September 2005
 
+Removed the Reset menus for Brush and Scale from main menubar.  Now
+when a display is in Brush or Scale mode, a menu with the interaction
+mode name appears in the menubar of the display.
+
+Fixed a bug:  the 'Show axes' option wasn't working on the barchart
+display Options menu.
+
 Removed the DisplayTree item from the main menubar; added a "Show
 DisplayTree" item to the bottom of the Display menu.
 
@@ -8,11 +15,13 @@ based on the variables displayed in the display that was current when
 the new one was initialized.
 
 Added alt-t/p accelerators to toggle between persistent and transient
-brushing; transient brush now drawn as a dotted line.
+brushing; transient brush now drawn as a dotted line.  (One tester
+says it doesn't work on the Mac.)
 
 Corrected a bug in the behavior of the "linkby" notebook on the
 brushing panel, and improved its behavior (I hope) so that only the
-relevant tab in the notebook is sensitive for each display.
+relevant tab in the notebook is sensitive for each display.  (One
+tester says this isn't working; it works for the author.)
 
 Split the ViewMode menu into a View menu (representing projection),
 as needed, and an Interaction menu.  This involved changes to over 60

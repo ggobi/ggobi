@@ -325,8 +325,6 @@ struct _ggobid {
 
   struct _Main_MiscMenu {
     GtkWidget *options_item, *options_menu;
-    GtkWidget *reset_item, *reset_menu;
-    /*GtkWidget *io_item, *io_menu;*/
   } menus;
 
 /*-------------------- transformation --------------------------------*/

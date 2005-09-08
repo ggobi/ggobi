@@ -228,6 +228,7 @@ displayd*  display_create (gint displaytype, gboolean missing_p, datad *, ggobid
 void       display_delete_cb (GtkWidget *, GdkEvent *, displayd *);
 void       display_free (displayd *, gboolean force, ggobid *);
 void       display_free_all (ggobid *);
+void       display_imode_menu_update (ProjectionMode, InteractionMode, displayd *, ggobid *);
 void       display_menu_build (ggobid *);
 void       display_menu_init (ggobid *);
 void       display_new (ggobid *, guint action, GtkWidget *widget);

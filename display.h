@@ -63,6 +63,7 @@ struct _displayd {
    /*-- for scatterplots, where edge menus need to be rebuilt on the fly --*/
  GtkWidget *menubar;
  GtkWidget *edge_item, *edge_menu;
+ GtkWidget *imode_item, *imode_menu;
 
  cpaneld cpanel;
 

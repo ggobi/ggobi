@@ -613,11 +613,12 @@ GGOBI(full_viewmode_set)(ProjectionMode pmode, InteractionMode imode, ggobid *gg
     }
 
     /*
-     * work out which mode menus (Options, Reset, I/O) need
-     * to be present, and add the needed callbacks.  
-     * Arguments are goofy -- prev is just as easy to get hold of as mode.
+     * work out which menus (Options, Reset, I/O) need to be present
+     * on the main menubar and the display menubar.
     */
-    main_miscmenus_update (gg->pmode_prev, gg->imode_prev, gg->current_display, gg);
+    main_miscmenus_update (gg->pmode_prev, gg->imode_prev, display, gg);
+    display_imode_menu_update (gg->pmode_prev, gg->imode_prev, display, gg);
+
     /*-- redraw this display --*/
     display_tailpipe (display, FULL, gg);
 

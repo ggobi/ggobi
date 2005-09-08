@@ -504,7 +504,7 @@ display_add (displayd *display, ggobid *gg)
   if (GTK_IS_GGOBI_WINDOW_DISPLAY(display)  && GTK_GGOBI_WINDOW_DISPLAY(display)->useWindow) {
     GGobi_widget_set(GTK_GGOBI_WINDOW_DISPLAY(display)->window, gg, true);
     if(g_list_length(display->splots))
-          display_set_current (display, gg);  /*-- this may initialize the mode --*/
+          display_set_current (display, gg);  /*-- this initializes the mode --*/
   }
   gg->displays = g_list_append (gg->displays, (gpointer) display);
 
@@ -532,6 +532,8 @@ display_add (displayd *display, ggobid *gg)
   if (pmode_prev != gg->current_display->cpanel.pmode ||
       imode_prev != gg->current_display->cpanel.imode) {
     main_miscmenus_update (pmode_prev, imode_prev, oldDisplay, gg);
+    display_imode_menu_update (pmode_prev, imode_prev,
+      gg->current_display, gg);
   }
 
   /*-- Make sure the border for the previous plot is turned off --*/
