@@ -1,4 +1,5 @@
-/*-- menus.c: menus in the main menubar that change with the mode: --*/
+/*-- menus.c: menus in the main menubar that change with the mode;
+ some of the menus have recently migrated to the display menubar --*/
 /*
  * ggobi
  * Copyright (C) AT&T, Duncan Temple Lang, Dianne Cook 1999-2005
@@ -71,24 +72,6 @@ cotour_option_items_add (ggobid *gg) {
     gg->tourcorr.fade_vars, gg);
 }
 
-
-/*--------------------------------------------------------------------*/
-/*               Brushing: Options menus                              */
-/*--------------------------------------------------------------------*/
-
-
-void
-brush_option_items_add(ggobid *gg)
-{
-  /* Add a separator before the mode-specific items */
-  CreateMenuItem (gg->menus.options_menu, NULL,
-    "", "", NULL, NULL, NULL, NULL, NULL);
-
-  CreateMenuCheck (gg->menus.options_menu, "Update brushing continuously",
-    GTK_SIGNAL_FUNC (brush_update_set_cb), NULL,
-    gg->brush.updateAlways_p, gg);
-}
-
 /*--------------------------------------------------------------------*/
 /*               Routines to manage the mode menus                    */
 /*--------------------------------------------------------------------*/
@@ -140,9 +123,7 @@ main_options_menu_update (ProjectionMode pmode_prev, InteractionMode imode_prev,
     tour2d_option_items_add (gg);
   } else if (pmode == COTOUR && imode == DEFAULT_IMODE) {
     cotour_option_items_add (gg);
-  } else if (imode == BRUSH) {
-    brush_option_items_add(gg);
-  }
+  } 
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
     gg->menus.options_menu);
@@ -175,7 +156,11 @@ call class-specific menus to rebuild them.
 
 }
 
-/*------------------- imode menus (reset items, to start) ---------------------*/
+
+/*
+ * These menus have migrated from the main menubar to the display
+ * menubar.
+ */
 
 void
 brush_display_imode_items_add (GtkWidget *menu, ggobid *gg)
@@ -234,6 +219,15 @@ brush_display_imode_items_add (GtkWidget *menu, ggobid *gg)
                       GTK_SIGNAL_FUNC (brush_reset_cb),
                       (gpointer) GINT_TO_POINTER (RESET_INIT_BRUSH));
   gtk_menu_append (GTK_MENU (menu), item);
+
+  /* Add a separator before the option */
+  CreateMenuItem (menu, NULL,
+    "", "", NULL, NULL, NULL, NULL, NULL);
+
+  CreateMenuCheck (menu, "Update brushing continuously",
+    GTK_SIGNAL_FUNC (brush_update_set_cb), NULL,
+    gg->brush.updateAlways_p, gg);
+
 }
 
 void
