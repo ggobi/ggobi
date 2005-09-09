@@ -67,63 +67,59 @@ scatterplot_imode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func,
 
   imode_menu = gtk_menu_new ();
 
-  CreateMenuItemWithCheck (imode_menu,
+  item = CreateMenuItemWithCheck (imode_menu,
     (gg->pmode != -1) ? (gchar *)GGOBI(getPModeName)(gg->pmode) : "(Default)",
-			   /*
-    (gg->pmode != -1) ?
-       g_strdup_printf("^%s", GGOBI(getPModeKey)(gg->pmode)) : "^x", 
-			   */
-			   "^h",
+    "^h",
     "", NULL, accel_group, func,
     useIds ? GINT_TO_POINTER (DEFAULT_IMODE) : gg, gg, 
     gg->imodeRadioGroup,
     sessionOptions->useRadioMenuItems);
+  if (sessionOptions->useRadioMenuItems && gg->imode == DEFAULT_IMODE)
+     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), true);
 
   /* Add a separator? */
   CreateMenuItem (imode_menu, "",
     "", "", NULL, NULL, NULL, NULL, gg);
 
-  CreateMenuItemWithCheck (imode_menu, "Scale",
+  item = CreateMenuItemWithCheck (imode_menu, "Scale",
     "^s", "", NULL, accel_group, func,
     useIds ? GINT_TO_POINTER (SCALE) : gg, gg, 
     gg->imodeRadioGroup,
     sessionOptions->useRadioMenuItems);
-  CreateMenuItemWithCheck (imode_menu, "Brush",
+  if (sessionOptions->useRadioMenuItems && gg->imode == SCALE)
+     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), true);
+
+  item = CreateMenuItemWithCheck (imode_menu, "Brush",
     "^b", "", NULL, accel_group, func,
     useIds ? GINT_TO_POINTER (BRUSH) : gg, gg, 
     gg->imodeRadioGroup,
     sessionOptions->useRadioMenuItems);
-  CreateMenuItemWithCheck (imode_menu, "Identify",
+  if (sessionOptions->useRadioMenuItems && gg->imode == BRUSH)
+     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), true);
+
+  item = CreateMenuItemWithCheck (imode_menu, "Identify",
     "^i", "", NULL, accel_group, func,
     useIds ? GINT_TO_POINTER (IDENT) : gg, gg, 
     gg->imodeRadioGroup,
     sessionOptions->useRadioMenuItems);
-  CreateMenuItemWithCheck (imode_menu, "Edit edges",
+  if (sessionOptions->useRadioMenuItems && gg->imode == IDENT)
+     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), true);
+
+  item = CreateMenuItemWithCheck (imode_menu, "Edit edges",
     "^e", "", NULL, accel_group, func,
     useIds ? GINT_TO_POINTER (EDGEED) : gg, gg, 
     gg->imodeRadioGroup,
     sessionOptions->useRadioMenuItems);
-  CreateMenuItemWithCheck (imode_menu, "Move points",
+  if (sessionOptions->useRadioMenuItems && gg->imode == EDGEED)
+     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), true);
+
+  item = CreateMenuItemWithCheck (imode_menu, "Move points",
     "^m", "", NULL, accel_group, func,
     useIds ? GINT_TO_POINTER (MOVEPTS) : gg, gg, 
     gg->imodeRadioGroup,
     sessionOptions->useRadioMenuItems);
-
-  /* A bit more thought is required to make this work with the new
-     menus, and to update properly -- we don't need an "Off" button,
-     but we do need a system to keep the selection current and these
-     menus change a lot. dfs */
-
-  if (sessionOptions->useRadioMenuItems) {
-     item = CreateMenuItemWithCheck (imode_menu, "Off",
-       "^o", "", NULL, accel_group, func,
-       useIds ? GINT_TO_POINTER (DEFAULT_IMODE) : gg, gg,
-       gg->imodeRadioGroup,
-       sessionOptions->useRadioMenuItems);
-
+  if (sessionOptions->useRadioMenuItems && gg->imode == MOVEPTS)
      gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), true);
-  }
-
 
   gtk_widget_show (imode_menu);
   return (imode_menu);
