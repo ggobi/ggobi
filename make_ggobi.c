@@ -358,5 +358,5 @@ void start_ggobi(ggobid * gg, gboolean init_data, gboolean createPlot)
   gg->pmode_prev = gg->pmode;
   gg->imode_prev = gg->imode;
         /*-- initialize the mode menus for the new mode --*/
-  main_miscmenus_update(NULL_PMODE, NULL_IMODE, (displayd *) NULL, gg);
+  /*main_miscmenus_update(NULL_PMODE, NULL_IMODE, (displayd *) NULL, gg);*/
 }

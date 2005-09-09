@@ -1,8 +1,9 @@
 September 2005
 
-Removed the Reset menus for Brush and Scale from main menubar.  Now
-when a display is in Brush or Scale mode, a menu with the interaction
-mode name appears in the menubar of the display.
+Removed the Reset menus for Brush and Scale from the main menubar.
+Now when a display is in Brush or Scale mode, a menu with the
+interaction mode name appears in the menubar of the display.  Moving
+the brushing option from the display Options menu to the Brush menu.
 
 Fixed a bug:  the 'Show axes' option wasn't working on the barchart
 display Options menu.

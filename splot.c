@@ -241,7 +241,7 @@ GGOBI(splot_set_current_full)(displayd *display, splotd *sp, ggobid *gg)
   /*-- display and cpanel for outgoing current_splot --*/
   displayd *display_prev = NULL;
   cpaneld *cpanel = NULL;
-  ProjectionMode pmode_prev = gg->pmode;
+  /*ProjectionMode pmode_prev = gg->pmode;*/
   InteractionMode imode_prev = gg->imode;
 
   if (sp != sp_prev) {
@@ -251,13 +251,13 @@ GGOBI(splot_set_current_full)(displayd *display, splotd *sp, ggobid *gg)
       cpanel = &display_prev->cpanel;
 
       /*
-       * This feels like a kludge, but I don't know where else
-       * to do it.  We want to handle a special case:  we're
-       * brushing in a multi-plot display, and we move to a new
-       * splot within the same display.  
-       * In the future, there may be other things we want to undo,
-       * but for now we just want to turn off the effects of
-       * in the previous splot.
+       * This feels like a kludge, but I don't know where else to do
+       * it.  We want to handle a special case: we're brushing in a
+       * multi-plot display, and we move to a new splot within the
+       * same display.
+       * In the future, there may be other things we want to undo, but
+       * for now we just want to turn off the effects of in the
+       * previous splot.
       */
       if (g_list_length (display_prev->splots) > 1 /*-- multi-plot display --*/
           && display == display_prev)   /*-- display not changing --*/
@@ -272,7 +272,7 @@ GGOBI(splot_set_current_full)(displayd *display, splotd *sp, ggobid *gg)
     gg->current_splot = sp->displayptr->current_splot = sp;
     splot_set_current (sp, on, gg);
 
-    main_miscmenus_update (pmode_prev, imode_prev, display_prev, gg);
+    /*main_miscmenus_update (pmode_prev, imode_prev, display_prev, gg);*/
 
     /*
      * if the previous splot is in transient brushing mode, a FULL

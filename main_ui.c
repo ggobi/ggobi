@@ -109,10 +109,18 @@ GtkWidget * mode_panel_get_by_name(const gchar *name, ggobid *gg)
   return (GtkWidget *) w;
 }
 
-void
+void  /* if we don't use itemfactory */
 tooltips_show_cb (GtkCheckMenuItem *w, guint action) 
 {
   ggobid *gg = GGobiFromWidget(GTK_WIDGET(w), true);
+  if (w->active)
+    gtk_tooltips_enable (gg->tips);
+  else
+    gtk_tooltips_disable (gg->tips);
+}
+void  /* if we do */
+tooltips_show_itemfactory_cb (ggobid *gg, GdkEvent *ev, GtkCheckMenuItem *w) 
+{
   if (w->active)
     gtk_tooltips_enable (gg->tips);
   else
@@ -124,16 +132,23 @@ statusbar_show (gboolean show, ggobid *gg)
 {
   GtkWidget *entry = (GtkWidget *)
     gtk_object_get_data (GTK_OBJECT(gg->main_window), "MAIN:STATUSBAR");
-  if (show)
-    gtk_widget_show (entry);
-  else
-    gtk_widget_hide (entry);
+  if (entry) {
+    if (show)
+      gtk_widget_show (entry);
+    else
+      gtk_widget_hide (entry);
+  }
   gg->statusbar_p = show;
 }
-void
+void /* If we're not using the itemfactory */
 statusbar_show_cb (GtkCheckMenuItem *w, guint action) 
 {
   ggobid *gg = GGobiFromWidget(GTK_WIDGET(w), true);
+  statusbar_show (w->active, gg);
+}
+void  /* If we are */
+statusbar_show_itemfactory_cb (ggobid *gg, GdkEvent *ev, GtkCheckMenuItem *w) 
+{
   statusbar_show (w->active, gg);
 }
 /*
@@ -167,6 +182,16 @@ cpanel_show_cb (GtkCheckMenuItem *w, guint action)
     gtk_widget_show (gg->imode_frame);
   else
     gtk_widget_hide (gg->imode_frame);
+}
+void
+cpanel_show_itemfactory_cb (ggobid *gg, GdkEvent *ev, GtkCheckMenuItem *w) 
+{
+  if (gg->imode_frame) {
+    if (w->active)
+      gtk_widget_show (gg->imode_frame);
+    else
+      gtk_widget_hide (gg->imode_frame);
+  }
 }
 
 ProjectionMode pmode_get (ggobid *gg) { return gg->pmode; }
@@ -616,8 +641,8 @@ GGOBI(full_viewmode_set)(ProjectionMode pmode, InteractionMode imode, ggobid *gg
      * work out which menus (Options, Reset, I/O) need to be present
      * on the main menubar and the display menubar.
     */
-    main_miscmenus_update (gg->pmode_prev, gg->imode_prev, display, gg);
-    display_imode_menu_update (gg->pmode_prev, gg->imode_prev, display, gg);
+    /*main_miscmenus_update (gg->pmode_prev, gg->imode_prev, display, gg);*/
+    display_mode_menus_update (gg->pmode_prev, gg->imode_prev, display, gg);
 
     /*-- redraw this display --*/
     display_tailpipe (display, FULL, gg);
@@ -632,7 +657,7 @@ GGOBI(full_viewmode_set)(ProjectionMode pmode, InteractionMode imode, ggobid *gg
   } else {  /* if there's no display */
     viewmode_set (NULL_PMODE, NULL_IMODE, gg);
     /*-- need to remove console menus: Options, Reset, ... --*/
-    main_miscmenus_update (gg->pmode_prev, gg->imode_prev, NULL, gg);
+    /*main_miscmenus_update (gg->pmode_prev, gg->imode_prev, NULL, gg);*/
     submenu_destroy (gg->imode_item);
 
 /**/return (NULL_IMODE);
@@ -680,6 +705,24 @@ static GtkItemFactoryEntry menu_items[] = {
        "<ctrl>Q",   
        (GtkItemFactoryCallback) quit_ggobi, 
        0 },
+
+  /* The options menu from menus.c might migrate here.  */
+  { "/_Options",      NULL,         NULL, 0, "<Branch>" },
+  { "/Options/Show tooltips", 
+       NULL,        
+       (GtkItemFactoryCallback) tooltips_show_itemfactory_cb,   
+       0,
+       "<CheckItem>" },
+  { "/Options/Show control panel", 
+       NULL,        
+       (GtkItemFactoryCallback) cpanel_show_itemfactory_cb,   
+       0,
+       "<CheckItem>" },
+  { "/Options/Show status bar", 
+       NULL,        
+       (GtkItemFactoryCallback) statusbar_show_itemfactory_cb,   
+       0,
+       "<CheckItem>" },
 
 
   { "/_Tools",        NULL,         NULL, 0, "<Branch>" },
@@ -850,6 +893,25 @@ make_ui (ggobid *gg)
     gg->main_accel_group, window,
     &gg->main_menubar, (gpointer) gg);
 
+  /* Initialize check items in the item factory */
+
+  entry = gtk_item_factory_get_widget(gg->main_menu_factory,
+    "/Options/Show tooltips");
+  if (entry)
+    gtk_check_menu_item_set_active  (GTK_CHECK_MENU_ITEM(entry),
+				     GTK_TOOLTIPS(gg->tips)->enabled);
+  entry = gtk_item_factory_get_widget(gg->main_menu_factory,
+      "/Options/Show control panel");
+  if (entry)
+    gtk_check_menu_item_set_active  (GTK_CHECK_MENU_ITEM(entry),
+    true);  /* no variable available yet */
+  entry = gtk_item_factory_get_widget(gg->main_menu_factory,
+    "/Options/Show status bar");
+  if (entry)
+    gtk_check_menu_item_set_active  (GTK_CHECK_MENU_ITEM(entry),
+				   gg->statusbar_p);
+
+
 /* I don't know that this is the best place for this ... should I
 create and destroy these groups when the menus are torn down and
 rebuilt? -- dfs */
@@ -923,7 +985,7 @@ rebuilt? -- dfs */
   /*-- at this point, the mode could be NULLMODE, P1PLOT, or XYPLOT --*/
   {
     void main_miscmenus_initialize (ggobid *gg);
-    main_miscmenus_initialize (gg);
+    /*main_miscmenus_initialize (gg);*/
   }
 
   if(sessionOptions->showControlPanel)

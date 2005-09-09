@@ -250,7 +250,7 @@ displaySet(displayd *display, ggobid *gg)
     gg->main_accel_group);
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->imode_item),
     imode_menu); 
-  submenu_insert (gg->imode_item, gg->main_menubar, 3);
+  submenu_insert (gg->imode_item, gg->main_menubar, 2);
 }
 
 static gboolean

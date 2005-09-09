@@ -1551,7 +1551,7 @@ addMarkupCues(splotd *sp, GdkDrawable *drawable, ggobid *gg)
             true, gg);
 }
 
-void
+static void
 splotScreenToTform(cpaneld *cpanel, splotd *sp, icoords *scr,
 		   fcoords *tfd, ggobid *gg)
 {
@@ -1562,13 +1562,6 @@ splotScreenToTform(cpaneld *cpanel, splotd *sp, icoords *scr,
   datad *d = display->d;
   gfloat scale_x, scale_y;
   vartabled *vt, *vtx, *vty;
-
-  g_return_if_fail (cpanel->pmode == XYPLOT ||
-                    cpanel->pmode == P1PLOT ||
-                    cpanel->pmode == TOUR1D ||
-                    cpanel->pmode == TOUR2D3 ||
-                    cpanel->pmode == TOUR2D ||
-                    cpanel->pmode == COTOUR);
 
   scale_x = sp->scale.x;
   scale_y = sp->scale.y;
@@ -1708,7 +1701,6 @@ scatterSPlotClassInit(GtkGGobiScatterSPlotClass *klass)
 
   /* reverse pipeline */ 
   klass->parent_class.screen_to_tform = splotScreenToTform;
-
   klass->parent_class.sub_plane_to_screen = subPlaneToScreen;
   klass->parent_class.world_to_plane = worldToPlane;
 

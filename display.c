@@ -531,8 +531,8 @@ display_add (displayd *display, ggobid *gg)
   /*-- if starting from the API, or changing mode, update the mode menus --*/
   if (pmode_prev != gg->current_display->cpanel.pmode ||
       imode_prev != gg->current_display->cpanel.imode) {
-    main_miscmenus_update (pmode_prev, imode_prev, oldDisplay, gg);
-    display_imode_menu_update (pmode_prev, imode_prev,
+    /*main_miscmenus_update (pmode_prev, imode_prev, oldDisplay, gg);*/
+    display_mode_menus_update (pmode_prev, imode_prev,
       gg->current_display, gg);
   }
 
