@@ -75,7 +75,7 @@ display_menu_build (ggobid *gg)
   CreateMenuItem (gg->display_menu, NULL,
     "", "", NULL, NULL, NULL, NULL, gg);
 
-  item = gtk_menu_item_new_with_label ("Show DisplayTree");
+  item = gtk_menu_item_new_with_label ("Show display tree");
   gtk_signal_connect (GTK_OBJECT (item), "activate",
                       GTK_SIGNAL_FUNC (show_display_tree_cb),
                       (gpointer) gg);
