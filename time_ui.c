@@ -56,9 +56,9 @@ static void arrangement_cb (GtkWidget *w, gpointer cbd)
  */ 
 
 #ifdef TS_EXTENSIONS_IMPLEMENTED
-static gchar *selection_mode_lbl[] = {"Replace", "Insert", "Append","Delete", "Overlay"};
+static gchar *selection_mode_lbl[] = {"Replace","Insert","Append","Delete","Overlay"};
 #else
-static gchar *selection_mode_lbl[] = {"Replace", "Insert", "Append","Delete"};
+static gchar *selection_mode_lbl[] = {"Replace","Insert","Append","Delete"};
 #endif
 static void selection_mode_cb (GtkWidget *w, gpointer cbd)
 {
@@ -134,6 +134,8 @@ cpanel_tsplot_make (ggobid *gg)
     "Selecting a variable either replaces the variable in the current plot (swapping if appropriate), inserts a new plot before the current plot, or appends a new plot after the last plot",
     NULL);
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
+  /* dfs: I'm trying to build a menu with 4 menuitems, and the code
+   * says it's working, but the resulting menu has only 3 items. */
   populate_option_menu (opt, selection_mode_lbl,
     sizeof (selection_mode_lbl) / sizeof (gchar *),
     (GtkSignalFunc) selection_mode_cb, "GGobi", gg);

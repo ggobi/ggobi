@@ -96,6 +96,7 @@ static void tour2d_pause_cb (GtkToggleButton *button, ggobid *gg)
 
 static void reinit_cb (GtkWidget *w, ggobid *gg) {
 
+  g_printerr ("reinit\n");
   tour2d_reinit(gg);
 }
 

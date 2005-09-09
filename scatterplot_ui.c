@@ -303,7 +303,7 @@ scatterplot_display_menus_make (displayd *display,
     func, GINT_TO_POINTER (DOPT_POINTS), on, gg);
   gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
 
-  /*-- Add a separator --*/
+/* These options are being moved to pmode menus on the display menubar.
   CreateMenuItem (options_menu, NULL, "", "", NULL, NULL, NULL, NULL, gg);
 
   item = CreateMenuCheck (options_menu, "Show axes",
@@ -318,6 +318,7 @@ scatterplot_display_menus_make (displayd *display,
   item = CreateMenuCheck (options_menu, "Show 2D tour proj vals",
     func, GINT_TO_POINTER (DOPT_AXESVALS), on, gg);
   gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
+ */
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (topmenu), options_menu);
   submenu_append (topmenu, display->menubar);
