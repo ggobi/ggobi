@@ -458,6 +458,7 @@ imode_activate (splotd *sp, ProjectionMode pmode, InteractionMode imode, gboolea
         redraw_style = identify_activate (state, display, gg);
       break;
       case SCALE:
+        splot_cursor_set ((gint) NULL, sp);
         /*-- for insurance, because sometimes scaling doesn't quit --*/
         disconnect_motion_signal (sp);
         /*-- --*/
@@ -505,6 +506,7 @@ imode_activate (splotd *sp, ProjectionMode pmode, InteractionMode imode, gboolea
         redraw_style = identify_activate (state, display, gg);
       break;
       case SCALE:
+        splot_cursor_set (GDK_HAND2, sp);
         scale_click_init (sp, gg);
       break;
       case EDGEED:
