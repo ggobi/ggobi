@@ -1,0 +1,378 @@
+<?xml version="1.0"?>
+<!DOCTYPE ggobidata SYSTEM "ggobi.dtd">
+<ggobidata count="2">
+<data name="perm5">
+<variables count="4">
+  <realvariable name="Pos1" />
+  <realvariable name="Pos2" />
+  <realvariable name="Pos3" />
+  <realvariable name="Pos4" />
+</variables>
+<records count="120">
+<record id="12345"> 1 0.5 -1.494 -1.41</record>
+<record id="12354"> 0.999315 0.526168 0.032 -0.844</record>
+<record id="12435"> 0.997261 0.552264 0.251 -0.219</record>
+<record id="12453"> 0.993844 0.578217 -2.265 -2.412</record>
+<record id="12534"> 0.989074 0.603956 0.051 0.5</record>
+<record id="12543"> 0.982963 0.62941 0.624 0.335</record>
+<record id="13245"> 0.975528 0.654508 -0.572 -0.384</record>
+<record id="13254"> 0.96679 0.679184 -0.655 -0.16</record>
+<record id="13425"> 0.956773 0.703368 -1.391 1.192</record>
+<record id="13452"> 0.945503 0.726995 -0.252 1.026</record>
+<record id="13524"> 0.933013 0.75 -0.924 0.061</record>
+<record id="13542"> 0.919335 0.772319 -1.82 -0.556</record>
+<record id="14235"> 0.904508 0.793893 0.398 -0.05</record>
+<record id="14253"> 0.888573 0.81466 0.812 0.364</record>
+<record id="14325"> 0.871572 0.834565 0.364 -1.092</record>
+<record id="14352"> 0.853553 0.853553 1.851 0.315</record>
+<record id="14523"> 0.834565 0.871572 0.565 -1.033</record>
+<record id="14532"> 0.81466 0.888573 0.495 1.024</record>
+<record id="15234"> 0.793893 0.904508 -0.147 0.401</record>
+<record id="15243"> 0.772319 0.919335 1.392 -0.814</record>
+<record id="15324"> 0.75 0.933013 0.31 0.145</record>
+<record id="15342"> 0.726995 0.945503 2.09 -0.071</record>
+<record id="15423"> 0.703368 0.956773 0.257 0.796</record>
+<record id="15432"> 0.679184 0.96679 0.692 0.054</record>
+<record id="21345"> 0.654508 0.975528 -2.11 0.599</record>
+<record id="21354"> 0.62941 0.982963 1.531 -0.434</record>
+<record id="21435"> 0.603956 0.989074 -0.426 1.555</record>
+<record id="21453"> 0.578217 0.993844 0.352 1.34</record>
+<record id="21534"> 0.552264 0.997261 0.384 -0.543</record>
+<record id="21543"> 0.526168 0.999315 1.058 0.005</record>
+<record id="23145"> 0.5 1 0.085 0.304</record>
+<record id="23154"> 0.473832 0.999315 -1.185 -1.708</record>
+<record id="23415"> 0.447736 0.997261 0.443 -0.254</record>
+<record id="23451"> 0.421783 0.993844 -0.572 -0.597</record>
+<record id="23514"> 0.396044 0.989074 -1.151 1.449</record>
+<record id="23541"> 0.37059 0.982963 1.105 0.276</record>
+<record id="24135"> 0.345491 0.975528 -0.553 -1.236</record>
+<record id="24153"> 0.320816 0.96679 -0.702 -0.51</record>
+<record id="24315"> 0.296632 0.956773 -0.811 0.769</record>
+<record id="24351"> 0.273005 0.945503 -0.221 -0.12</record>
+<record id="24513"> 0.25 0.933013 0.005 0.1</record>
+<record id="24531"> 0.22768 0.919335 0.515 0.406</record>
+<record id="25134"> 0.206107 0.904508 -0.228 -0.195</record>
+<record id="25143"> 0.18534 0.888573 1.677 0.822</record>
+<record id="25314"> 0.165435 0.871572 -0.588 -2.048</record>
+<record id="25341"> 0.146447 0.853553 -0.409 0.551</record>
+<record id="25413"> 0.128428 0.834565 0.146 -1.457</record>
+<record id="25431"> 0.111427 0.81466 0.384 -1.149</record>
+<record id="31245"> 0.095492 0.793893 -1.152 0.403</record>
+<record id="31254"> 0.080665 0.772319 -0.033 -1.04</record>
+<record id="31425"> 0.066987 0.75 -1.22 0.236</record>
+<record id="31452"> 0.054497 0.726995 -2.057 1.64</record>
+<record id="31524"> 0.043227 0.703368 1.803 -0.151</record>
+<record id="31542"> 0.03321 0.679184 -0.815 -0.539</record>
+<record id="32145"> 0.024472 0.654508 2.472 0.025</record>
+<record id="32154"> 0.017037 0.62941 -1.166 0.023</record>
+<record id="32415"> 0.010926 0.603956 0.491 -0.506</record>
+<record id="32451"> 0.006156 0.578217 0.432 1.146</record>
+<record id="32514"> 0.002739 0.552264 -1.248 -0.169</record>
+<record id="32541"> 0.000685 0.526168 -0.383 1.495</record>
+<record id="34125"> 0 0.5 -0.84 -0.214</record>
+<record id="34152"> 0.000685 0.473832 0.52 0.679</record>
+<record id="34215"> 0.002739 0.447736 -1.143 -1.11</record>
+<record id="34251"> 0.006156 0.421783 0.294 0.068</record>
+<record id="34512"> 0.010926 0.396044 -0.478 0.059</record>
+<record id="34521"> 0.017037 0.37059 -0.232 -0.475</record>
+<record id="35124"> 0.024472 0.345491 -2.039 -0.545</record>
+<record id="35142"> 0.03321 0.320816 0.682 0.96</record>
+<record id="35214"> 0.043227 0.296632 0.542 -1.114</record>
+<record id="35241"> 0.054497 0.273005 -0.109 0.855</record>
+<record id="35412"> 0.066987 0.25 0.312 -1.406</record>
+<record id="35421"> 0.080665 0.22768 -0.17 0.214</record>
+<record id="41235"> 0.095491 0.206107 1.603 -0.137</record>
+<record id="41253"> 0.111427 0.18534 -2.228 0.698</record>
+<record id="41325"> 0.128428 0.165435 0.412 0.095</record>
+<record id="41352"> 0.146447 0.146447 1.218 -0.058</record>
+<record id="41523"> 0.165435 0.128428 -1.188 -1.625</record>
+<record id="41532"> 0.18534 0.111427 1.453 0.788</record>
+<record id="42135"> 0.206107 0.095492 1.846 1.437</record>
+<record id="42153"> 0.22768 0.080665 0.144 -1.056</record>
+<record id="42315"> 0.25 0.066987 1.192 1.2</record>
+<record id="42351"> 0.273005 0.054497 0.166 -0.149</record>
+<record id="42513"> 0.296632 0.043227 1.795 0.395</record>
+<record id="42531"> 0.320816 0.03321 -1.606 1.415</record>
+<record id="43125"> 0.345491 0.024472 1.24 0.043</record>
+<record id="43152"> 0.37059 0.017037 0.588 1.673</record>
+<record id="43215"> 0.396044 0.010926 -2.173 -0.866</record>
+<record id="43251"> 0.421783 0.006156 0.155 -0.95</record>
+<record id="43512"> 0.447736 0.002739 0.472 0.731</record>
+<record id="43521"> 0.473832 0.000685 0.43 -1.088</record>
+<record id="45123"> 0.5 0 0.38 0.559</record>
+<record id="45132"> 0.526168 0.000685 1.712 -1.755</record>
+<record id="45213"> 0.552264 0.002739 0.749 -1.048</record>
+<record id="45231"> 0.578217 0.006156 -1.108 -0.177</record>
+<record id="45312"> 0.603956 0.010926 -1.991 0.544</record>
+<record id="45321"> 0.629409 0.017037 0.626 1.166</record>
+<record id="51234"> 0.654508 0.024472 0.603 -1.002</record>
+<record id="51243"> 0.679184 0.03321 0.803 2.072</record>
+<record id="51324"> 0.703368 0.043227 -1.838 0.469</record>
+<record id="51342"> 0.726995 0.054497 -0.082 -0.808</record>
+<record id="51423"> 0.75 0.066987 -0.066 1.663</record>
+<record id="51432"> 0.772319 0.080665 -0.759 0.001</record>
+<record id="52134"> 0.793893 0.095491 1.668 -0.166</record>
+<record id="52143"> 0.81466 0.111427 -0.605 0.643</record>
+<record id="52314"> 0.834565 0.128428 0.233 -1.261</record>
+<record id="52341"> 0.853553 0.146447 -1.43 1.011</record>
+<record id="52413"> 0.871572 0.165435 -0.522 -1.515</record>
+<record id="52431"> 0.888573 0.18534 -0.156 -0.505</record>
+<record id="53124"> 0.904508 0.206107 -1.365 -0.804</record>
+<record id="53142"> 0.919335 0.22768 -0.004 1.047</record>
+<record id="53214"> 0.933013 0.25 0.451 -0.358</record>
+<record id="53241"> 0.945503 0.273005 -0.808 -1.064</record>
+<record id="53412"> 0.956773 0.296632 -0.722 -0.467</record>
+<record id="53421"> 0.96679 0.320816 -0.183 0.916</record>
+<record id="54123"> 0.975528 0.345491 -0.586 -0.897</record>
+<record id="54132"> 0.982963 0.37059 0.811 -1.554</record>
+<record id="54213"> 0.989074 0.396044 1.807 0.437</record>
+<record id="54231"> 0.993844 0.421783 -1.604 0.106</record>
+<record id="54312"> 0.997261 0.447736 -1.118 -0.017</record>
+<record id="54321"> 0.999315 0.473832 -0.263 -0.171</record>
+</records>
+</data>
+<data name="edges">
+<records count="240">
+<record source="12345" destination="12354" />
+<record source="12345" destination="12435" />
+<record source="12435" destination="12453" />
+<record source="12354" destination="12534" />
+<record source="12534" destination="12543" />
+<record source="12453" destination="12543" />
+<record source="12345" destination="13245" />
+<record source="13245" destination="13254" />
+<record source="12354" destination="13254" />
+<record source="13245" destination="13425" />
+<record source="13425" destination="13452" />
+<record source="13254" destination="13524" />
+<record source="13524" destination="13542" />
+<record source="13452" destination="13542" />
+<record source="12435" destination="14235" />
+<record source="14235" destination="14253" />
+<record source="12453" destination="14253" />
+<record source="14235" destination="14325" />
+<record source="13425" destination="14325" />
+<record source="14325" destination="14352" />
+<record source="13452" destination="14352" />
+<record source="14253" destination="14523" />
+<record source="14523" destination="14532" />
+<record source="14352" destination="14532" />
+<record source="12534" destination="15234" />
+<record source="15234" destination="15243" />
+<record source="12543" destination="15243" />
+<record source="15234" destination="15324" />
+<record source="13524" destination="15324" />
+<record source="15324" destination="15342" />
+<record source="13542" destination="15342" />
+<record source="15243" destination="15423" />
+<record source="14523" destination="15423" />
+<record source="15423" destination="15432" />
+<record source="15342" destination="15432" />
+<record source="14532" destination="15432" />
+<record source="12345" destination="21345" />
+<record source="21345" destination="21354" />
+<record source="12354" destination="21354" />
+<record source="21345" destination="21435" />
+<record source="12435" destination="21435" />
+<record source="21435" destination="21453" />
+<record source="12453" destination="21453" />
+<record source="21354" destination="21534" />
+<record source="12534" destination="21534" />
+<record source="21534" destination="21543" />
+<record source="21453" destination="21543" />
+<record source="12543" destination="21543" />
+<record source="21345" destination="23145" />
+<record source="23145" destination="23154" />
+<record source="21354" destination="23154" />
+<record source="23145" destination="23415" />
+<record source="23415" destination="23451" />
+<record source="23154" destination="23514" />
+<record source="23514" destination="23541" />
+<record source="23451" destination="23541" />
+<record source="21435" destination="24135" />
+<record source="24135" destination="24153" />
+<record source="21453" destination="24153" />
+<record source="24135" destination="24315" />
+<record source="23415" destination="24315" />
+<record source="24315" destination="24351" />
+<record source="23451" destination="24351" />
+<record source="24153" destination="24513" />
+<record source="24513" destination="24531" />
+<record source="24351" destination="24531" />
+<record source="21534" destination="25134" />
+<record source="25134" destination="25143" />
+<record source="21543" destination="25143" />
+<record source="25134" destination="25314" />
+<record source="23514" destination="25314" />
+<record source="25314" destination="25341" />
+<record source="23541" destination="25341" />
+<record source="25143" destination="25413" />
+<record source="24513" destination="25413" />
+<record source="25413" destination="25431" />
+<record source="25341" destination="25431" />
+<record source="24531" destination="25431" />
+<record source="13245" destination="31245" />
+<record source="31245" destination="31254" />
+<record source="13254" destination="31254" />
+<record source="31245" destination="31425" />
+<record source="13425" destination="31425" />
+<record source="31425" destination="31452" />
+<record source="13452" destination="31452" />
+<record source="31254" destination="31524" />
+<record source="13524" destination="31524" />
+<record source="31524" destination="31542" />
+<record source="31452" destination="31542" />
+<record source="13542" destination="31542" />
+<record source="31245" destination="32145" />
+<record source="23145" destination="32145" />
+<record source="32145" destination="32154" />
+<record source="31254" destination="32154" />
+<record source="23154" destination="32154" />
+<record source="32145" destination="32415" />
+<record source="23415" destination="32415" />
+<record source="32415" destination="32451" />
+<record source="23451" destination="32451" />
+<record source="32154" destination="32514" />
+<record source="23514" destination="32514" />
+<record source="32514" destination="32541" />
+<record source="32451" destination="32541" />
+<record source="23541" destination="32541" />
+<record source="31425" destination="34125" />
+<record source="34125" destination="34152" />
+<record source="31452" destination="34152" />
+<record source="34125" destination="34215" />
+<record source="32415" destination="34215" />
+<record source="34215" destination="34251" />
+<record source="32451" destination="34251" />
+<record source="34152" destination="34512" />
+<record source="34512" destination="34521" />
+<record source="34251" destination="34521" />
+<record source="31524" destination="35124" />
+<record source="35124" destination="35142" />
+<record source="31542" destination="35142" />
+<record source="35124" destination="35214" />
+<record source="32514" destination="35214" />
+<record source="35214" destination="35241" />
+<record source="32541" destination="35241" />
+<record source="35142" destination="35412" />
+<record source="34512" destination="35412" />
+<record source="35412" destination="35421" />
+<record source="35241" destination="35421" />
+<record source="34521" destination="35421" />
+<record source="14235" destination="41235" />
+<record source="41235" destination="41253" />
+<record source="14253" destination="41253" />
+<record source="41235" destination="41325" />
+<record source="14325" destination="41325" />
+<record source="41325" destination="41352" />
+<record source="14352" destination="41352" />
+<record source="41253" destination="41523" />
+<record source="14523" destination="41523" />
+<record source="41523" destination="41532" />
+<record source="41352" destination="41532" />
+<record source="14532" destination="41532" />
+<record source="41235" destination="42135" />
+<record source="24135" destination="42135" />
+<record source="42135" destination="42153" />
+<record source="41253" destination="42153" />
+<record source="24153" destination="42153" />
+<record source="42135" destination="42315" />
+<record source="24315" destination="42315" />
+<record source="42315" destination="42351" />
+<record source="24351" destination="42351" />
+<record source="42153" destination="42513" />
+<record source="24513" destination="42513" />
+<record source="42513" destination="42531" />
+<record source="42351" destination="42531" />
+<record source="24531" destination="42531" />
+<record source="41325" destination="43125" />
+<record source="34125" destination="43125" />
+<record source="43125" destination="43152" />
+<record source="41352" destination="43152" />
+<record source="34152" destination="43152" />
+<record source="43125" destination="43215" />
+<record source="42315" destination="43215" />
+<record source="34215" destination="43215" />
+<record source="43215" destination="43251" />
+<record source="42351" destination="43251" />
+<record source="34251" destination="43251" />
+<record source="43152" destination="43512" />
+<record source="34512" destination="43512" />
+<record source="43512" destination="43521" />
+<record source="43251" destination="43521" />
+<record source="34521" destination="43521" />
+<record source="41523" destination="45123" />
+<record source="45123" destination="45132" />
+<record source="41532" destination="45132" />
+<record source="45123" destination="45213" />
+<record source="42513" destination="45213" />
+<record source="45213" destination="45231" />
+<record source="42531" destination="45231" />
+<record source="45132" destination="45312" />
+<record source="43512" destination="45312" />
+<record source="45312" destination="45321" />
+<record source="45231" destination="45321" />
+<record source="43521" destination="45321" />
+<record source="15234" destination="51234" />
+<record source="51234" destination="51243" />
+<record source="15243" destination="51243" />
+<record source="51234" destination="51324" />
+<record source="15324" destination="51324" />
+<record source="51324" destination="51342" />
+<record source="15342" destination="51342" />
+<record source="51243" destination="51423" />
+<record source="15423" destination="51423" />
+<record source="51423" destination="51432" />
+<record source="51342" destination="51432" />
+<record source="15432" destination="51432" />
+<record source="51234" destination="52134" />
+<record source="25134" destination="52134" />
+<record source="52134" destination="52143" />
+<record source="51243" destination="52143" />
+<record source="25143" destination="52143" />
+<record source="52134" destination="52314" />
+<record source="25314" destination="52314" />
+<record source="52314" destination="52341" />
+<record source="25341" destination="52341" />
+<record source="52143" destination="52413" />
+<record source="25413" destination="52413" />
+<record source="52413" destination="52431" />
+<record source="52341" destination="52431" />
+<record source="25431" destination="52431" />
+<record source="51324" destination="53124" />
+<record source="35124" destination="53124" />
+<record source="53124" destination="53142" />
+<record source="51342" destination="53142" />
+<record source="35142" destination="53142" />
+<record source="53124" destination="53214" />
+<record source="52314" destination="53214" />
+<record source="35214" destination="53214" />
+<record source="53214" destination="53241" />
+<record source="52341" destination="53241" />
+<record source="35241" destination="53241" />
+<record source="53142" destination="53412" />
+<record source="35412" destination="53412" />
+<record source="53412" destination="53421" />
+<record source="53241" destination="53421" />
+<record source="35421" destination="53421" />
+<record source="51423" destination="54123" />
+<record source="45123" destination="54123" />
+<record source="54123" destination="54132" />
+<record source="51432" destination="54132" />
+<record source="45132" destination="54132" />
+<record source="54123" destination="54213" />
+<record source="52413" destination="54213" />
+<record source="45213" destination="54213" />
+<record source="54213" destination="54231" />
+<record source="52431" destination="54231" />
+<record source="45231" destination="54231" />
+<record source="54132" destination="54312" />
+<record source="53412" destination="54312" />
+<record source="45312" destination="54312" />
+<record source="54312" destination="54321" />
+<record source="54231" destination="54321" />
+<record source="53421" destination="54321" />
+<record source="45321" destination="54321" />
+</records>
+</data>
+</ggobidata>
