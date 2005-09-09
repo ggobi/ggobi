@@ -611,11 +611,17 @@ void ggv_dims_cb (GtkAdjustment *adj, PluginInstance *inst)
       ggv->maxdim = MAX(ggv->dim, dim);
     }
     ggv->dim = dim;
+    if (running) mds_func (true, inst);
+
+  } else {  /* User hasn't started running mds yet */
+    if (dim > ggv->maxdim) {
+      arrayd_add_cols (&ggv->pos, dim);
+      vectord_realloc (&ggv->pos_mean, dim);
+      ggv->maxdim = MAX(ggv->dim, dim);
+    }
+    ggv->dim = dim;
   }
 
-  if (ggv->dpos) {
-    if (running) mds_func (true, inst);
-  }
 }
 
 void ggv_dist_power_cb (GtkAdjustment *adj, PluginInstance *inst)
