@@ -291,8 +291,11 @@ display_mode_menus_update (ProjectionMode pmode_prev, InteractionMode imode_prev
 
     /* Remove any existing imode submenu */
     if (imode_has_display_menu(imode_prev) && display->imode_item) {
-      gtk_menu_item_remove_submenu (GTK_MENU_ITEM (display->imode_item));
-      gtk_widget_destroy (display->imode_item);
+      /* I don't understand why all these tests are necessary ... dfs */
+      if (GTK_IS_MENU_ITEM(display->imode_item))
+        gtk_menu_item_remove_submenu (GTK_MENU_ITEM (display->imode_item));
+      if (GTK_IS_WIDGET(display->imode_item))
+        gtk_widget_destroy (display->imode_item);
       display->imode_item = NULL;
     }
 

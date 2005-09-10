@@ -568,7 +568,11 @@ pmode_set_cb (GtkWidget *w, gint action) {
   ggobid *gg = GGobiFromWidget(w, true);
   ProjectionMode pm = (ProjectionMode) action;
 
-  if ((pm != gg->pmode || gg->imode != DEFAULT_IMODE) &&
+  /* I don't know why this other test used to be necessary when
+     it doesn't seem to be any more, but I know it does great harm
+     when I'm using radio buttons ... dfs */
+
+  if ((pm != gg->pmode /*|| gg->imode != DEFAULT_IMODE*/) &&
        projection_ok(pm, gg->current_display)) 
   {
     /* When the pmode is reset, the imode is set to the default */
