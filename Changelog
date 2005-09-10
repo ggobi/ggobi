@@ -1,5 +1,12 @@
 September 2005
 
+Gradually restoring the option that allows the View and Interaction
+Menus to be radio buttons; done for scatterplot and scatterplot matrix.
+(The ggobirc "preference" is    <useRadioMenuItems on="true" /> )
+
+Treating the Options like the Reset items, so that now tour menus
+also appear in the display menubar as appropriate.
+
 Removed the Reset menus for Brush and Scale from the main menubar.
 Now when a display is in Brush or Scale mode, a menu with the
 interaction mode name appears in the menubar of the display.  Moving
