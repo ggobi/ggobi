@@ -26,30 +26,53 @@ GtkWidget *
 scatterplot_pmode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func,
 			    ggobid *gg, gboolean useIds)
 {
-  GtkWidget *pmode_menu;
   /* Projections */
+  GtkWidget *pmode_menu, *item;
+  gboolean radiop = sessionOptions->useRadioMenuItems;
 
   pmode_menu = gtk_menu_new ();
 
-  CreateMenuItem (pmode_menu, "1D Plot",
+  item = CreateMenuItemWithCheck (pmode_menu, "1D Plot",
     "^d", "", NULL, accel_group, func,
-    useIds ? GINT_TO_POINTER  (P1PLOT) : gg, gg);
-  CreateMenuItem (pmode_menu, "XYPlot",
-    "^x", "", NULL, accel_group, func,
-    useIds ? GINT_TO_POINTER  (XYPLOT) : gg, gg);
+    useIds ? GINT_TO_POINTER  (P1PLOT) : gg, gg,
+    gg->pmodeRadioGroup, radiop);
+  if (radiop && gg->pmode == P1PLOT)
+     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), true);
 
-  CreateMenuItem (pmode_menu, "1D Tour",
+  item = CreateMenuItemWithCheck (pmode_menu, "XYPlot",
+    "^x", "", NULL, accel_group, func,
+    useIds ? GINT_TO_POINTER  (XYPLOT) : gg, gg,
+    gg->pmodeRadioGroup, radiop);
+  if (radiop && gg->pmode == XYPLOT)
+     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), true);
+
+  item = CreateMenuItemWithCheck (pmode_menu, "1D Tour",
     "^t", "", NULL, accel_group, func,
-    useIds ? GINT_TO_POINTER  (TOUR1D) : gg, gg);
-  CreateMenuItem (pmode_menu, "Rotation",
+    useIds ? GINT_TO_POINTER  (TOUR1D) : gg, gg,
+    gg->pmodeRadioGroup, radiop);
+  if (radiop && gg->pmode == TOUR1D)
+     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), true);
+
+  item = CreateMenuItemWithCheck (pmode_menu, "Rotation",
     "^r", "", NULL, accel_group, func,
-    useIds ? GINT_TO_POINTER  (TOUR2D3) : gg, gg);
-  CreateMenuItem (pmode_menu, "2D Tour",
+    useIds ? GINT_TO_POINTER  (TOUR2D3) : gg, gg,
+    gg->pmodeRadioGroup, radiop);
+  if (radiop && gg->pmode == TOUR2D3)
+     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), true);
+
+  item = CreateMenuItemWithCheck (pmode_menu, "2D Tour",
     "^g", "", NULL, accel_group, func,
-    useIds ? GINT_TO_POINTER  (TOUR2D) : gg, gg);
-  CreateMenuItem (pmode_menu, "2x1D Tour",
+    useIds ? GINT_TO_POINTER  (TOUR2D) : gg, gg,
+    gg->pmodeRadioGroup, radiop);
+  if (radiop && gg->pmode == TOUR2D)
+     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), true);
+
+  item = CreateMenuItemWithCheck (pmode_menu, "2x1D Tour",
     "^c", "", NULL, accel_group, func,
-    useIds ? GINT_TO_POINTER  (COTOUR) : gg, gg);
+    useIds ? GINT_TO_POINTER  (COTOUR) : gg, gg,
+    gg->pmodeRadioGroup, radiop);
+  if (radiop && gg->pmode == COTOUR)
+     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), true);
 
   gtk_widget_show (pmode_menu);
   return (pmode_menu);
@@ -64,17 +87,16 @@ scatterplot_imode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func,
      corresponding to the projection. */
 
   GtkWidget *imode_menu, *item;
+  gboolean radiop = sessionOptions->useRadioMenuItems;
 
   imode_menu = gtk_menu_new ();
 
   item = CreateMenuItemWithCheck (imode_menu,
     (gg->pmode != -1) ? (gchar *)GGOBI(getPModeName)(gg->pmode) : "(Default)",
-    "^h",
-    "", NULL, accel_group, func,
+    "^h", "", NULL, accel_group, func,
     useIds ? GINT_TO_POINTER (DEFAULT_IMODE) : gg, gg, 
-    gg->imodeRadioGroup,
-    sessionOptions->useRadioMenuItems);
-  if (sessionOptions->useRadioMenuItems && gg->imode == DEFAULT_IMODE)
+    gg->imodeRadioGroup, radiop);
+  if (radiop && gg->imode == DEFAULT_IMODE)
      gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), true);
 
   /* Add a separator? */
@@ -84,41 +106,36 @@ scatterplot_imode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func,
   item = CreateMenuItemWithCheck (imode_menu, "Scale",
     "^s", "", NULL, accel_group, func,
     useIds ? GINT_TO_POINTER (SCALE) : gg, gg, 
-    gg->imodeRadioGroup,
-    sessionOptions->useRadioMenuItems);
-  if (sessionOptions->useRadioMenuItems && gg->imode == SCALE)
+    gg->imodeRadioGroup, radiop);
+  if (radiop && gg->imode == SCALE)
      gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), true);
 
   item = CreateMenuItemWithCheck (imode_menu, "Brush",
     "^b", "", NULL, accel_group, func,
     useIds ? GINT_TO_POINTER (BRUSH) : gg, gg, 
-    gg->imodeRadioGroup,
-    sessionOptions->useRadioMenuItems);
-  if (sessionOptions->useRadioMenuItems && gg->imode == BRUSH)
+    gg->imodeRadioGroup, radiop);
+  if (radiop && gg->imode == BRUSH)
      gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), true);
 
   item = CreateMenuItemWithCheck (imode_menu, "Identify",
     "^i", "", NULL, accel_group, func,
     useIds ? GINT_TO_POINTER (IDENT) : gg, gg, 
-    gg->imodeRadioGroup,
-    sessionOptions->useRadioMenuItems);
-  if (sessionOptions->useRadioMenuItems && gg->imode == IDENT)
+    gg->imodeRadioGroup, radiop);
+  if (radiop && gg->imode == IDENT)
      gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), true);
 
   item = CreateMenuItemWithCheck (imode_menu, "Edit edges",
     "^e", "", NULL, accel_group, func,
     useIds ? GINT_TO_POINTER (EDGEED) : gg, gg, 
-    gg->imodeRadioGroup,
-    sessionOptions->useRadioMenuItems);
-  if (sessionOptions->useRadioMenuItems && gg->imode == EDGEED)
+    gg->imodeRadioGroup, radiop);
+  if (radiop && gg->imode == EDGEED)
      gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), true);
 
   item = CreateMenuItemWithCheck (imode_menu, "Move points",
     "^m", "", NULL, accel_group, func,
     useIds ? GINT_TO_POINTER (MOVEPTS) : gg, gg, 
-    gg->imodeRadioGroup,
-    sessionOptions->useRadioMenuItems);
-  if (sessionOptions->useRadioMenuItems && gg->imode == MOVEPTS)
+    gg->imodeRadioGroup, radiop);
+  if (radiop && gg->imode == MOVEPTS)
      gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), true);
 
   gtk_widget_show (imode_menu);
