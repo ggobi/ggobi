@@ -241,7 +241,7 @@ scatmat_new (displayd *display,
 	       gint numCols, gint *cols, datad *d, ggobid *gg) 
 {
   GtkWidget *vbox, *frame;
-  GtkWidget *mbar, *w;
+  GtkWidget *w;
   GtkItemFactory *factory;
   gint i, j, ctr;
   gint width, height;
@@ -327,7 +327,7 @@ scatmat_new (displayd *display,
   scatmat_accel_group = gtk_accel_group_new ();
   factory = get_main_menu (menu_items,
     sizeof (menu_items) / sizeof (menu_items[0]),
-    scatmat_accel_group, wdpy->window, &mbar,
+    scatmat_accel_group, wdpy->window, &display->menubar,
     (gpointer) display);
 
   /*-- add a tooltip to the file menu --*/
@@ -341,8 +341,8 @@ scatmat_new (displayd *display,
    * add the Options and Link menus another way
   */
    scatmat_display_menus_make (display, scatmat_accel_group,
-			       (GtkSignalFunc) display_options_cb, mbar, gg);
-   gtk_box_pack_start (GTK_BOX (vbox), mbar, false, true, 0);
+       (GtkSignalFunc) display_options_cb, display->menubar, gg);
+   gtk_box_pack_start (GTK_BOX (vbox), display->menubar, false, true, 0);
   }
 /*
  * splots in a table 

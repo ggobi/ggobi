@@ -99,27 +99,43 @@ GtkWidget *
 scatmat_imode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func,
   ggobid *gg, gboolean useIds) 
 {
-  GtkWidget *imode_menu;
+  GtkWidget *imode_menu, *item;
+  gboolean radiop = sessionOptions->useRadioMenuItems;
 
   imode_menu = gtk_menu_new ();
 
-  CreateMenuItem (imode_menu, "Scatterplot Matrix",
+  item = CreateMenuItemWithCheck (imode_menu, "Scatterplot Matrix",
     "^h", "", NULL, accel_group, func,
-    useIds ? GINT_TO_POINTER (DEFAULT_IMODE) : gg, gg);
+    useIds ? GINT_TO_POINTER (DEFAULT_IMODE) : gg, gg, 
+    gg->imodeRadioGroup, radiop);
+  if (radiop && gg->imode == DEFAULT_IMODE)
+     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), true);
 
   /*-- Add a separator --*/
   CreateMenuItem (imode_menu, NULL,
     "", "", NULL, NULL, NULL, NULL, gg);
 
-  CreateMenuItem (imode_menu, "Scale",
+  item = CreateMenuItemWithCheck (imode_menu, "Scale",
     "^s", "", NULL, accel_group, func,
-    useIds ? GINT_TO_POINTER (SCALE) : gg, gg);
-  CreateMenuItem (imode_menu, "Brush",
+    useIds ? GINT_TO_POINTER (SCALE) : gg, gg, 
+    gg->imodeRadioGroup, radiop);
+  if (radiop && gg->imode == SCALE)
+     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), true);
+
+  item = CreateMenuItemWithCheck (imode_menu, "Brush",
     "^b", "", NULL, accel_group, func,
-    useIds ? GINT_TO_POINTER (BRUSH) : gg, gg);
-  CreateMenuItem (imode_menu, "Identify",
+    useIds ? GINT_TO_POINTER (BRUSH) : gg, gg, 
+    gg->imodeRadioGroup, radiop);
+ if (radiop && gg->imode == BRUSH)
+     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), true);
+
+  item = CreateMenuItemWithCheck (imode_menu, "Identify",
     "^i", "", NULL, accel_group, func,
-    useIds ? GINT_TO_POINTER (IDENT) : gg, gg);
+    useIds ? GINT_TO_POINTER (IDENT) : gg, gg, 
+    gg->imodeRadioGroup, radiop);
+ if (radiop && gg->imode == IDENT)
+     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), true);
+
   /* temporarily disabled -- this tried to use movept_screen_to_raw,
 which calls code in lineedit.c, which fails because the pmode is
 wrong.  It will be necessarily to implement the reverse pipeline
