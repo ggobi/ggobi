@@ -108,7 +108,7 @@ GtkWidget *barchart_pmode_menu_make(GtkAccelGroup * accel_group,
   if (radiop && gg->pmode == EXTENDED_DISPLAY_PMODE)
      gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), true);
 
-#ifdef TOUR1D_IMPLEMENTED
+#ifdef BARCHART_TOUR1D_IMPLEMENTED
   item = CreateMenuItemWithCheck(menu, "1D Tour",
     "^t", "", NULL, accel_group, func,
     useIds ? GINT_TO_POINTER(TOUR1D) : gg, gg,
