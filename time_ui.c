@@ -184,22 +184,35 @@ cpanel_tsplot_make (ggobid *gg)
 GtkWidget *
 tsplot_imode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func, ggobid *gg, gboolean useIds) 
 {
-  GtkWidget *imode_menu = gtk_menu_new ();
+  GtkWidget *imode_menu, *item;
+  gboolean radiop = sessionOptions->useRadioMenuItems;
 
-  CreateMenuItem (imode_menu, "Time Series",
+  imode_menu = gtk_menu_new ();
+
+  item = CreateMenuItemWithCheck (imode_menu, "Time Series",
     "^h", "", NULL, accel_group, func,
-    useIds ? GINT_TO_POINTER (DEFAULT_IMODE) : gg, gg);
+    useIds ? GINT_TO_POINTER (DEFAULT_IMODE) : gg, gg, 
+    gg->imodeRadioGroup, radiop);
+ if (radiop && gg->imode == DEFAULT_IMODE)
+     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), true);
 
   /* Add a separator */
   CreateMenuItem (imode_menu, NULL,
     "", "", NULL, NULL, NULL, NULL, gg);
 
-  CreateMenuItem (imode_menu, "Brush",
+  item = CreateMenuItemWithCheck (imode_menu, "Brush",
     "^b", "", NULL, accel_group, func,
-    useIds ? GINT_TO_POINTER (BRUSH) : gg, gg);
-  CreateMenuItem (imode_menu, "Identify",
+    useIds ? GINT_TO_POINTER (BRUSH) : gg, gg, 
+    gg->imodeRadioGroup, radiop);
+  if (radiop && gg->imode == BRUSH)
+     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), true);
+
+  item = CreateMenuItemWithCheck (imode_menu, "Identify",
     "^i", "", NULL, accel_group, func,
-    useIds ? GINT_TO_POINTER (IDENT) : gg, gg);
+    useIds ? GINT_TO_POINTER (IDENT) : gg, gg, 
+    gg->imodeRadioGroup, radiop);
+  if (radiop && gg->imode == IDENT)
+     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), true);
 
   gtk_widget_show (imode_menu);
   return (imode_menu);

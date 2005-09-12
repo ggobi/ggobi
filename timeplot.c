@@ -148,7 +148,7 @@ displayd *
 tsplot_new(displayd *display, gboolean missing_p, gint nvars, gint *vars, datad *d, ggobid *gg) 
 {
   GtkWidget *vbox, *frame;
-  GtkWidget *mbar, *w;
+  GtkWidget *w;
   GtkItemFactory *factory;
   gint i, timeVariable, cur;
   splotd *sp;
@@ -260,7 +260,7 @@ tsplot_new(displayd *display, gboolean missing_p, gint nvars, gint *vars, datad 
     factory = get_main_menu (menu_items,
 			     sizeof (menu_items) / sizeof (menu_items[0]),
 			     gg->tsplot.accel_group, GTK_GGOBI_WINDOW_DISPLAY(display)->window, 
-			     &mbar, (gpointer) display);
+			     &display->menubar, (gpointer) display);
 
     /*-- add a tooltip to the file menu --*/
     w = gtk_item_factory_get_widget (factory, "<main>/File");
@@ -272,8 +272,9 @@ tsplot_new(displayd *display, gboolean missing_p, gint nvars, gint *vars, datad 
    * add the Display Options and Link menus another way
   */
     tsplot_display_menus_make (display, gg->tsplot.accel_group,
-			       (GtkSignalFunc) display_options_cb, mbar, gg);
-    gtk_box_pack_start (GTK_BOX (vbox), mbar, false, true, 0);
+			       (GtkSignalFunc) display_options_cb, 
+			       display->menubar, gg);
+    gtk_box_pack_start (GTK_BOX (vbox), display->menubar, false, true, 0);
   }
 
 
