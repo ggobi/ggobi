@@ -1,7 +1,8 @@
 September 2005
 
-Gradually restoring the option that allows the View and Interaction
-Menus to be radio buttons; done for scatterplot and scatterplot matrix.
+For all displays, restored the option that allows the View and
+Interaction Menus to be radio buttons; the default is still false,
+but we may change it to true (set in ggobi.c).
 (The ggobirc "preference" is    <useRadioMenuItems on="true" /> )
 
 Treating the Options like the Reset items, so that now tour menus
