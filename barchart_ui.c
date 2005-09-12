@@ -96,15 +96,26 @@ GtkWidget *barchart_pmode_menu_make(GtkAccelGroup * accel_group,
                                    GtkSignalFunc func,
                                    ggobid * gg, gboolean useIds)
 {
-  GtkWidget *menu;
+  GtkWidget *menu, *item;
+  gboolean radiop = sessionOptions->useRadioMenuItems;
+
   menu = gtk_menu_new();
 
-  CreateMenuItem(menu, "Barchart",
-                 "^h", "", NULL, accel_group, func,
-                 useIds ? GINT_TO_POINTER(EXTENDED_DISPLAY_PMODE) : gg, gg);
-  CreateMenuItem(menu, "1D Tour",
-                 "^t", "", NULL, accel_group, func,
-                 useIds ? GINT_TO_POINTER(TOUR1D) : gg, gg);
+  item = CreateMenuItemWithCheck(menu, "Barchart",
+    "^h", "", NULL, accel_group, func,
+    useIds ? GINT_TO_POINTER(EXTENDED_DISPLAY_PMODE) : gg, gg,
+    gg->pmodeRadioGroup, radiop);
+  if (radiop && gg->pmode == EXTENDED_DISPLAY_PMODE)
+     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), true);
+
+#ifdef TOUR1D_IMPLEMENTED
+  item = CreateMenuItemWithCheck(menu, "1D Tour",
+    "^t", "", NULL, accel_group, func,
+    useIds ? GINT_TO_POINTER(TOUR1D) : gg, gg,
+    gg->pmodeRadioGroup, radiop);
+  if (radiop && gg->pmode == TOUR1D)
+     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), true);
+#endif
 
   gtk_widget_show(menu);
 
@@ -115,25 +126,41 @@ GtkWidget *barchart_imode_menu_make(GtkAccelGroup * accel_group,
                                    GtkSignalFunc func,
                                    ggobid * gg, gboolean useIds)
 {
-  GtkWidget *menu;
+  GtkWidget *menu, *item;
+  gboolean radiop = sessionOptions->useRadioMenuItems;
+
   menu = gtk_menu_new();
 
-  CreateMenuItem(menu, "Barchart",
+  item = CreateMenuItemWithCheck(menu, "Barchart",
     "^h", "", NULL, accel_group, func,
-    useIds ? GINT_TO_POINTER(DEFAULT_IMODE) : gg, gg);
+    useIds ? GINT_TO_POINTER(DEFAULT_IMODE) : gg, gg,
+    gg->pmodeRadioGroup, radiop);
+  if (radiop && gg->imode == DEFAULT_IMODE)
+     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), true);
 
   /* Add a separator */
   CreateMenuItem(menu, NULL, "", "", NULL, NULL, NULL, NULL, gg);
 
-  CreateMenuItem(menu, "Scale",
-                 "^s", "", NULL, accel_group, func,
-                 useIds ? GINT_TO_POINTER(SCALE) : gg, gg);
-  CreateMenuItem(menu, "Brush",
-                 "^b", "", NULL, accel_group, func,
-                 useIds ? GINT_TO_POINTER(BRUSH) : gg, gg);
-  CreateMenuItem(menu, "Identify",
-                 "^i", "", NULL, accel_group, func,
-                 useIds ? GINT_TO_POINTER(IDENT) : gg, gg);
+  item = CreateMenuItemWithCheck(menu, "Scale",
+    "^s", "", NULL, accel_group, func,
+    useIds ? GINT_TO_POINTER(SCALE) : gg, gg,
+    gg->pmodeRadioGroup, radiop);
+  if (radiop && gg->imode == SCALE)
+     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), true);
+
+  item = CreateMenuItemWithCheck(menu, "Brush",
+    "^b", "", NULL, accel_group, func,
+    useIds ? GINT_TO_POINTER(BRUSH) : gg, gg,
+    gg->pmodeRadioGroup, radiop);
+  if (radiop && gg->imode == BRUSH)
+     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), true);
+
+  item = CreateMenuItemWithCheck(menu, "Identify",
+    "^i", "", NULL, accel_group, func,
+    useIds ? GINT_TO_POINTER(IDENT) : gg, gg,
+    gg->pmodeRadioGroup, radiop);
+  if (radiop && gg->imode == IDENT)
+     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), true);
 
   gtk_widget_show(menu);
 
