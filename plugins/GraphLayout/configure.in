@@ -3,6 +3,15 @@ AC_INIT(glayout.c)
 AC_PATH_PROG(GTK_CONFIG, gtk-config)
 AC_SUBST(GTK_CONFIG)
 
+PKG_CHECK_MODULES(LIBGVC, [libgvc >= 2.3],
+        [HAVE_LIBGVC="1"],
+        [AC_MSG_WARN(libgvc library not available)])
+AC_SUBST(LIBGVC_CFLAGS)
+AC_SUBST(LIBGVC_LIBS)
+AC_SUBST(HAVE_LIBGVC)
+
+if test "x${HAVE_LIBGVC}" = "x" ; then
+
 AC_PATH_PROG(DOTNEATO_CONFIG, dotneato-config)
 
 GRAPHVIZ=
@@ -12,6 +21,8 @@ fi
 
 AC_SUBST(GRAPHVIZ)
 AC_SUBST(DOTNEATO_CONFIG)
+
+fi
 
 
 AC_OUTPUT(local.config)

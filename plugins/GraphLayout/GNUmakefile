@@ -31,11 +31,18 @@ else
  CFLAGS+=$(shell cd $(GGOBI_HOME) ; $(MAKE) cflags $(GGOBI_MAKEFILE)) $(GGOBI_INCLUDE_DIR)
 endif
 
+ifdef HAVE_LIBGVC
+# For 2.3, graphviz uses pkgconfig and provides the interface in libgvc + gvc.h
+ CFLAGS+=-Wno-unknown-pragmas
+ CFLAGS+=$(LIBGVC_CFLAGS) -DHAVE_LIBGVC
+ PLUGIN_LIBS+=$(LIBGVC_LIBS)
+else
+ifdef GRAPHVIZ
+
 ifndef DOTNEATO_CONFIG
  DOTNEATO_CONFIG=dotneato-config
 endif
 
-ifdef GRAPHVIZ
 ifndef GRAPHVIZ_INCLUDES
    GRAPHVIZ_INCLUDES= $(shell $(DOTNEATO_CONFIG) --cflags)
 endif
@@ -43,10 +50,12 @@ endif
 ifndef GRAPHVIZ_LIBS
  GRAPHVIZ_LIBS= $(shell $(DOTNEATO_CONFIG) --ldflags) $(shell $(DOTNEATO_CONFIG) --libs)
 endif
- CFLAGS+=-Wno-unknown-pragmas
+ #CFLAGS+=-Wno-unknown-pragmas
  CFLAGS+=-DGRAPHVIZ=1 $(GRAPHVIZ_INCLUDES)
  PLUGIN_LIBS+=$(GRAPHVIZ_LIBS)
 endif
+endif
+
 
 ifdef WITH_R
  CFLAGS+= -I$(OMEGA_HOME)/include/Corba -I$(R_HOME)/include -DWITH_R=1 -DUSE_R=1 -D_R_=1
