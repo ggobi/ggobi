@@ -347,6 +347,9 @@ linkby_current_page_set (displayd *display, GtkWidget *notebook, ggobid *gg)
   swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK(notebook), page_num);
   while (swin) {
     paged = (datad *) gtk_object_get_data (GTK_OBJECT (swin), "datad");
+
+    g_printerr ("(current_page_set) paged %s d %s   ==? %d\n", paged->name, d->name, (paged == d));
+
     gtk_widget_set_sensitive (swin, (paged == d));
     if (paged == d) {
       gtk_notebook_set_page (GTK_NOTEBOOK(notebook), page_num);
@@ -482,9 +485,13 @@ linkby_notebook_subwindow_add (datad *d, GtkWidget *notebook, ggobid *gg)
   /* If this is not the first child of the notebook, initialize it
    * as insensitive.
    */
-  if (gtk_container_children(GTK_CONTAINER(notebook)) != 0)
-    gtk_widget_set_sensitive (swin, false);
 
+/*
+  g_printerr ("(subwindow_add) d %s nchildren %d\n", d->name, g_list_length(gtk_container_children(GTK_CONTAINER(notebook))));
+*/
+  if (g_list_length(gtk_container_children(GTK_CONTAINER(notebook))) != 0) {
+    gtk_widget_set_sensitive (swin, false);
+  }
   gtk_object_set_data(GTK_OBJECT(swin), "datad", d);  /*setdata*/
 /*
  * name or nickname?  Which one we'd prefer to use depends on the
