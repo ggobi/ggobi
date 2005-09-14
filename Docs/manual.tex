@@ -57,7 +57,7 @@ Andreas Buja, The Wharton School, University of Pennsylvania \\
 Duncan Temple Lang, University of California at Davis
 }
 
-\date{September 2003}
+\date{September 2005}
 
 \maketitle
 
@@ -168,21 +168,26 @@ scatterplot of the Area vs Region, from the olive oils data.
 
 Next, get acquainted with the main menubar for the console by
 exploring each of its menus.  Pay particular attention to the
-Display, ViewMode and Tools menus.
+Display, View, Interaction and Tools menus.
 
 \begin {itemize}
 \item The Display menu is the interface for opening new plotting
   windows.
-\item The ViewMode menu is the interface for specifying both the
-  projection (1d, 2d, 3d or higher) and mouse interactions (for scaling
-  the plot, highlighting points, and so on) for the current plot.
+\item The View menu is the interface for specifying the
+  projection (1d, 2d, 3d or higher) for the current display.  (For
+  some displays, such as the parallel coordinates display, there are
+  no choices in the projection used, so the View menu is not
+  always present.)
+\item The Interaction menu is the interface for specifying the mouse
+  interactions (for scaling the plot, highlighting points, and so on)
+  for the current plot.
 \item The Tools menu lets you open other windows to manipulate
   characteristics of the data and the view.
 \end {itemize}
 
-Using the ViewMode menu, choose {\bf Identify}. Look at the buttons
+Using the Interaction menu, choose {\bf Identify}. Look at the buttons
 inside the leftmost portion of the ggobi console. Notice that they're
-contained by a frame labeled {\bf Identify,} which is the view mode
+contained by a frame labeled {\bf Identify,} which is the interaction mode
 of the current plot.  This frame contains most of the row labeling
 controls, which are described in section \ref{slbl:Identify}. Move the
 cursor around the plot window using the mouse, and observe the labels
@@ -199,13 +204,13 @@ controls and the variable selection region correspond to the current plot.
 
 Now set up a plot of linoleic vs eicosenoic in the first scatterplot,
 and disply Region in the barchart, and make the barchart the current
-plot.  Using the ViewMode menu, choose {\bf Brush.}  Look at the
+plot.  Using the Interaction menu, choose {\bf Brush.}  Look at the
 buttons and menus inside the leftmost portion of the ggobi console.
 Notice that they're contained by a frame labeled {\bf Brush,} which is
 the view mode of the current plot.  This frame contains most of the
 brushing controls, which are described in the section
 \ref{slbl:Brush}.  A few of the brushing controls, though, are in the
-main menubar: in the Reset menu and at the bottom of the Options menu.
+{\bf Brush} menu in the display menubar.
 
 The rectangle that appears in the current plot is the ``paintbrush,''
 and dragging it over bars (or in a scatterplot the points) changes
@@ -292,7 +297,7 @@ consideration.
 \label{fig5}
 \end{figure}
 
-Switch into {\bf 2D Tour} using the {\bf ViewMode} menu. A column of
+Switch into {\bf 2D Tour} using the {\bf View} menu. A column of
 variable circles is added to the right of the variable toggles, one for
 each selected variable.  Click on the toggle widgets for the variables
 palmitoleic through arachidic to make these variables available for
@@ -302,11 +307,10 @@ circle for each.
 
 The scrollbar at the top of the tour controls is used to adjust the
 speed of the tour.  Drag it to the right to speed up the rotation.
-The circle at the bottom left of the plot window displays the axes
-for the tour. These can be removed by toggling the ``Show axes''
-button on the plot window's {\bf Options} menu.  Pause the tour when
-you see a separation of the two regions (as seen in Figure
-\ref{fig6}).
+The circle at the bottom left of the plot window displays the axes for
+the tour. These can be removed by toggling the ``Show axes'' button on
+the display's {\bf 2D Tour} menu.  Pause the tour when you see a
+separation of the two regions (as seen in Figure \ref{fig6}).
 
 Now you are going to use manual tour controls to sharpen up the
 separation by manually changing the coefficients of the variables in
@@ -348,7 +352,7 @@ Open a parallel coordinates display using the {\bf Display} menu.
 %parallel coordinates plot. Then switch to {\bf Append} mode and add
 %the remaining acid variables.
 Select the first plot in the parallel coordinates display by
-clicking on it, and use the {\bf ViewMode} menu to switch to {\bf
+clicking on it, and use the {\bf Interaction} menu to switch to {\bf
 Brush} mode. Choose a new color (say yellow) and large closed glyph,
 and transiently paint the case with a very low value on palmitic
 (Figure \ref{fig7}). This case also has a very high value for oleic
@@ -375,9 +379,9 @@ section contains more detailed information on its functionality.
 \subsection{The major functions}
 
 Across the top of the console, as seen in in Figure \ref{fig1},
-stretches a row of menu buttons:  {\bf File}, {\bf Display,} {\bf
-ViewMode}, {\bf Tools}, {\bf Options} and {\bf DisplayTree} are
-always visible; others appear as appropriate.
+stretches a row of menu buttons:  {\bf File}, {\bf Display},
+{\bf Interaction}, {\bf Options} and {\bf Tools} are
+always visible; {\bf View} appears as appropriate.
 
 As expected, the {\bf File} menu contains items for selecting
 input/output functions and for exiting.
@@ -396,8 +400,12 @@ The display types include
 Each display type
 is discussed in section ~\ref{DisplayTypes}.
 
-The {\bf ViewMode} menu contains items to set the projection 
-and to the interaction type:
+The {\bf DisplayTree} button at the bottom of the menu allows users to
+open a tree listing all the currently open display windows, each of
+which may contain several plots.
+
+The {\bf View} menu contains items to set the projection; the
+full menu is available only for scatterplot displays:
 \begin{itemize}
 \itemsep 0em
 \item 1DPlot: 1-D dotplots and average shifted histograms,
@@ -407,6 +415,19 @@ and to the interaction type:
 \item 2D Tour: 2-D tour,
 \item 2x1D Tour: a correlation tour; that is, independent 1-D tours on
       horizontal and vertical axes,
+\end{itemize}
+
+When you choose a new view, the {\bf Interaction} mode (described
+next) is also changed.  Each view is discussed in
+section~\ref{slbl:ViewModes}.
+
+The {\bf Interaction} menu contains items to set the interaction type.
+Each {\bf View} also has its own set of interactions, and appears on
+the Interaction menu when selected.  The Interaction modes
+themselves are:
+
+\begin{itemize}
+\itemsep 0em
 \item Scale: axis scaling,
 \item Brush: setting point glyphs, edge types, and point and edge colors,
 \item Identify: labeling points,
@@ -414,11 +435,11 @@ and to the interaction type:
 \item Move Points: direct manipulation of point positions,
 \end{itemize}
 
-When you choose a new view mode, the controls at the left of the main
-window will change correspondingly:  each mode has its own
-parameters, and its own rules for responding to mouse actions in the
-plotting windows.  The view modes are discussed in
-section~\ref{slbl:ViewModes}.
+When you choose a new interaction mode, the controls at the left of
+the main window will change correspondingly: each mode has its own
+parameters and its own rules for responding to mouse actions in the
+plotting windows.  The interaction modes are discussed in
+section~\ref{slbl:InteractionModes}.
 
 The {\bf Tools} menu gives access to 
 \begin{itemize}
@@ -437,27 +458,24 @@ The {\bf Tools} menu gives access to
 
 Each of these tools is discussed in section ~\ref{Tools}.
 
-There are a couple of distinctions between view modes and tools.  The
-view mode functions determine the mouse interactions in the display
-windows, while none of the Tools does.  Furthermore, view mode
-functions populate the control panel in the ggobi console, while
-tools open their own windows, as shown in Figure~\ref{fig4}.  For
-example, the {\bf Variable Manipulation tool} is a window containing
-tables which describe the variables, as well as several buttons,
-and the {\bf Variable Transformation tool} is also a separate window,
-with a list of variable names and a set of transformation menus.
+%There are a couple of distinctions between view modes and tools.  The
+%view mode functions determine the mouse interactions in the display
+%windows, while none of the Tools does.  Furthermore, view mode
+%functions populate the control panel in the ggobi console, while
+%tools open their own windows, as shown in Figure~\ref{fig4}.  For
+%example, the {\bf Variable Manipulation tool} is a window containing
+%tables which describe the variables, as well as several buttons,
+%and the {\bf Variable Transformation tool} is also a separate window,
+%with a list of variable names and a set of transformation menus.
 
-The {\bf Options} menu allows users to set some options for the main
+The {\bf Options} menu allows users to set options for the main
 control window:  whether tooltips are displayed and whether the
-control panel is shown.  In some view modes, it contains additional
-options that are specific to that mode.
+control panel is shown.  
+%In some view modes, it contains additional
+%options that are specific to that mode.
 
-Other menus are present only during certain modes:  you will
-sometimes find an {\bf I/O} menu or a {\bf Reset} menu.
-
-The {\bf DisplayTree} menu allows users to open a tree listing
-all the currently open display windows, each of which may contain
-several plots.
+%Other menus are present only during certain modes:  you will
+%sometimes find an {\bf I/O} menu or a {\bf Reset} menu.
 
 \subsection{Graphical displays}
 \label{slbl:GraphicalDisplays}
@@ -475,13 +493,13 @@ scatterplot matrix, contain multiple plots.) The current plot is the
 one which is outlined with a thick white border; the current display
 is the one which contains the current plot.
 
-To reset the current plot and display, just click once (left, right
-or middle) in the plot you wish to address.  To understand the
-effects of this selection, open a few displays and set them in
-different ViewModes, then click on different plots and see what
-happens.  The white border follows your actions, and the
-console updates so that its control panel corresponds to the
-current display type and view mode.
+To reset the current plot and display, just click once (left, right or
+middle) in the plot you wish to address.  To understand the effects of
+this selection, open a few displays and set them in different
+interaction modes, then click on different plots and see what happens.
+The white border follows your actions, and the console updates so that
+its control panel corresponds to the current display type and view
+mode.
 
 \subsubsection{Display types}
 \label{DisplayTypes}
@@ -492,19 +510,20 @@ As mentioned earlier, there are presently five main display types:
 % scatterplot
 
 The {\bf scatterplot} display is a window containing a single scatterplot.
-By default, it includes axes; they can be turned off using the Options
-menu in the main control window.  It has the largest number of view
-modes of any display, and each of the projection modes has its own
-rules for variable selection.  The main variable selection interface
-for the XYPlot modes uses toggle buttons: clicking on the {\em X}
-button selects the variable to plot horizontally, and clicking on {\em
-Y} selects the variable to plot vertically.  (There's a less obvious
-variable selection interface as a shortcut: clicking left (right) on the
-variable label selects the {\em X} ({\em Y}) variable.)  The interface
-for the 1D plot is similar:  it only shows one column of toggle buttons,
-so clicking on {\em X} selects the variable to be plotted irrespective
-of the plot orientation.  (Using the variable label shortcut, you can
-change the plot orientation as you make a variable selection.)
+%By default, it includes axes; they can be turned off using the Options
+%menu in the main control window.  
+It has the largest number of view (projection) modes of any display,
+and each projection has its own rules for variable selection.  The
+main variable selection interface for the XYPlot modes uses toggle
+buttons: clicking on the {\em X} button selects the variable to plot
+horizontally, and clicking on {\em Y} selects the variable to plot
+vertically.  (There's a less obvious variable selection interface as a
+shortcut: clicking left (right) on the variable label selects the {\em
+X} ({\em Y}) variable.)  The interface for the 1D plot is similar: it
+only shows one column of toggle buttons, so clicking on {\em X}
+selects the variable to be plotted irrespective of the plot
+orientation.  (Using the variable label shortcut, you can change the
+plot orientation as you make a variable selection.)
 % column of checkboxes: clicking left on one of these selects a
 % variable to be plotted horizontally, clicking middle or right selects
 % a vertical variable. 
@@ -551,7 +570,7 @@ case $i$, think of drawing a dot on each axis,  with the point on
 axis $j$ being the value of $x[i][j]$, and then connecting the dots
 into one set of connected line segments \cite{In85,We90}.)  The line
 segments are drawn by default, but you can turn them off using the
-{\bf Options} menu on the display menubar.
+display's {\bf Options} menu.
 
 By default, the plots are simple dotplots, but they can also be drawn
 using one of the two methods for 1D plots:  as a textured dot
@@ -744,37 +763,25 @@ for Gnumeric.
 There are several examples of plugins for ggobi now distributed with
 the code, including a simple spreadsheet viewer.
 
-\section{View modes: projection and interaction}
+\section{View modes:~~projections}
 \label{slbl:ViewModes}
 
-Selecting any mode on the {\bf ViewMode} menu changes the interactions
-available for the display and plot that are current, and pops the
-corresponding control panel into the left portion of the console
-window.  The modes in the top half of the menu do something more as
-well:  they set the projection method for the display, and the meaning
-of actions in the variable selection panel always conforms to the current
-projection method.
+Selecting any item on the {\bf View} menu changes the projection of
+the current display.  This causes two changes: the control panel for
+the new projection appears to the left of the console window, and
+defines the appearance and behavior of the variable selection panel.
 
 As an example, start GGobi with some data, and watch what happens in
 the main GGobi window and a a single scatterplot display.   When
 GGobi starts, it's in {\bf XYPlot} mode by default, so the
-scatterplot window shows a 2-dimensional projection of the data.  If
-you select {\bf Scale} or {\bf Brush} (or any choice in the bottom
-half of the menu), the control panel at the left of the console
-changes, reflecting the different interactions available to you in
-each mode.  However, the projection in the window doesn't change.
-(There may be cues added to the plot to tell you the view mode of the
-plot.) If you click on the checkboxes in the variable selection panel
-at the right of the GGobi console, you replace one of the plotted
-variables.
+scatterplot window shows a 2-dimensional projection of the data. 
 
-Now select {\em 2D Tour} in the ViewMode menu.  {\em Everything}
-changes at once, because you've effectively selected both a new mode and
-a new projection type at the same time.
+Now select {\em 2D Tour} in the View menu.  
+
 \begin{itemize}
 \itemsep 0em
-\item The panel at the left of the console changes, because a
-      new set of interactions just became available.
+\item The control panel at the left of the console changes, because
+      the {\em 2D Tour} has its own set of interactions.
 \item The variable selection panel changes, because the variable
       selection behavior for high-dimensional projection types is
       quite different than that for low-dimensional projection types.
@@ -783,14 +790,9 @@ a new projection type at the same time.
       it's moving, because a grand tour process is running.
 \end{itemize}
 
-If you now select one of the modes in the bottom half of the ViewMode
-menu, you'll see again that the variable selection panel doesn't
-change, and the plot in the scatterplot doesn't change -- except
-that it stops moving.  The only thing that changes with every
-selection is the panel at the left of the console.
 
 Now we'll describe each view mode in more detail, starting at the
-top of the ViewMode menu. 
+top of the View menu. 
 
 \subsection{1D plots}
 
@@ -878,7 +880,7 @@ the manipulation variable, constrained by the values of the coefficients
 of other active variables (which may also change).
 
 The variable axes and projection coeeficient values can be toggled on
-or off using the options menu at the top of the plot window.
+or off using the display's {\bf 1D Tour} menu.
 
 To activate this view mode from the keyboard, type {\em t} or {\em T}
 with the focus in the plot window, or type Control-{\em t} or
@@ -894,15 +896,15 @@ rather than proceeding randomly.  The numbers displayed to the right
 of the {\bf PP index} label are the minimum, current value, and
 maximum of the index.  A selection of indices is available.
 
-\subsubsection{Options}
+\subsubsection{1D Tour Options}
 
-The {\bf Options} menu on the main menu bar contains controls for
-laying out variable circles in the variable selection panel in
-different ways, and also for toggling variable fading on or
-off. Variable fading means a variable smoothly fades out when it is
-de-selected. The alternative is to zero the variable out of view
-immediately, which creates a discontinuity in the tour motion, but is
-desirable for some situations.
+The display's {\bf 1D Tour} menu contains controls for laying out
+variable circles in the variable selection panel in different ways,
+and also for toggling variable fading on or off. Variable fading means
+a variable smoothly fades out when it is de-selected. The alternative
+is to zero the variable out of view immediately, which creates a
+discontinuity in the tour motion, but is desirable for some
+situations.
 
 \subsection{2D Tour}
 \label{slbl:2DTour}
@@ -940,8 +942,8 @@ direction of the variable keeping angle fixed, and {\it angular}
 manipulation allows rotating the variable axis in the plane of the plot
 window, keeping the length of the axis fixed.
 
-The variable axes can be toggled on or off using the options menu at
-the top of the plot window.
+The variable axes can be toggled on or off using the {\bf 2D Tour}
+menu at the top of the display window.
 
 To activate this view mode from the keyboard, type {\em g} or {\em G}
 with the focus in the plot window, or type Control-{\em g} or
@@ -963,15 +965,15 @@ mass indices. Use the {\bf Tools} menu and use the {\bf Sphering...}
 tool to clone sphered counterparts of the currently active variables
 to do this.
 
-\subsubsection{Options}
+\subsubsection{2D Tour Options}
 
-The {\bf Options} menu on the main menu bar contains controls for
-laying out variable circles in the variable selection panel in
-different ways, and also for toggling variable fading on or
-off. Variable fading means a variable smoothly fades out when it is
-de-selected. The alternative is to zero the variable out of view
-immediately, which creates a discontinuity in the tour motion, but is
-desirable for some situations.
+The display's {\bf 2D Tour} menu contains controls for laying out
+variable circles in the variable selection panel in different ways,
+and also for toggling variable fading on or off. Variable fading means
+a variable smoothly fades out when it is de-selected. The alternative
+is to zero the variable out of view immediately, which creates a
+discontinuity in the tour motion, but is desirable for some
+situations.
 
 \subsection{Rotation: 2D Tour with Three Variables}
 \label{slbl:Rotation}
@@ -1016,26 +1018,34 @@ constrains the horizontal and vertical changes to be equal, {\it
 horizontal} and {\it vertical} constrain manipulation in the corresponding
 direction.
 
-The {\bf Options} menu on the main menu bar contains controls for
-laying out variable circles in the variable selection panel in
-different ways, and also for toggling variable fading on or
-off. Variable fading means a variable smoothly fades out when it is
-de-selected. The alternative is to zero the variable out of view
-immediately, which creates a discontinuity in the tour motion, but is
-desirable for some situations.
+The {\bf 2x1D Tour} menu on the menu bar in the display window
+contains controls for laying out variable circles in the variable
+selection panel in different ways, and also for toggling variable
+fading on or off. Variable fading means a variable smoothly fades out
+when it is de-selected. The alternative is to zero the variable out of
+view immediately, which creates a discontinuity in the tour motion,
+but is desirable for some situations.
 
-The variable axes can be toggled on or off using the options menu at
-the top of the plot window.
+The variable axes can be toggled on or off using the same menu.
 
 To activate this view mode from the keyboard, type {\em c} or {\em C}
 with the focus in the plot window, or type Control-{\em c} or
 Control-{\em C} with the focus in the console.
 
+\section{Interaction modes}
+\label{slbl:InteractionModes}
+
+Selecting an item on the {\bf Interaction} menu changes the
+interactions available for manipulating the current display.  These
+new interactions are visible in the control panel that appears to the
+left of the console window.  (There may also be cues added to the plot
+to tell you the interaction of the plot.
+
 \subsection{Scaling of axes}
 \label{slbl:Scaling}
 
 There are three ways to perform view scaling:  {\bf Drag} and {\bf Click}
-scaling are visible in the interface, and available in all viewmodes.
+scaling are visible in the interface, and available in all projections.
 When axes are present in scatterplots, you can also scale the
 view using the axes themselves.
 
@@ -1051,8 +1061,8 @@ Click-style scaling may take you a few minutes to get used to, but
 you'll find that it gives you very precise control and is especially
 useful when you have a lot of data.
 
-To activate this view mode from the keyboard, type {\em s} or {\em S}
-with the focus in the plot window, or type Control-{\em s} or
+To activate this interaction from the keyboard, type {\em s} or
+{\em S} with the focus in the plot window, or type Control-{\em s} or
 Control-{\em S} with the focus in the console.
 
 \subsubsection{Drag}
@@ -1088,7 +1098,7 @@ yield small movements.
 
 \subsubsection{Reset}
 
-To reset the plot, use the menu marked Reset in the main menubar:
+To reset the plot, use the {\bf Scale} menu in the display's menubar:
 it has two entries, allowing pan and zoom to be reset separately.
 
 \subsubsection{Click: pan and zoom options}
@@ -1104,9 +1114,9 @@ To pan the data in simple 1D and 2D projections, simply drag the mouse
 in the axis widgets with the left button pressed.  To zoom, drag with
 the middle or right button pressed.
 
-At this writing, we don't require that ggobi be in the scaling viewmode to
-scale this way, but we may add that restriction if this raises 
-difficulties for us as ggobi programmers.
+At this writing, we don't require that ggobi be in the scaling mode to
+scale this way, but we may add that restriction if this raises
+difficulties.
 
 \subsection{Brush: brushing of points and edges}
 \label{slbl:Brush}
@@ -1121,21 +1131,9 @@ the brush while you paint.  (If you lose the brush by pulling it
 outside the plotting window, you can grab it again if you press the
 left or middle button while the cursor is inside the display window.)
 
-To activate this view mode from the keyboard, type {\em b} or {\em B}
-with the focus in the plot window, or type Control-{\em b} or
+To activate this interaction from the keyboard, type {\em b} or
+{\em B} with the focus in the plot window, or type Control-{\em b} or
 Control-{\em B} with the focus in the console.
-
-\subsubsection{Brush on}
-%
-When the {\bf Brush on} checkbox is checked, moving the brush
-over a plotted point causes that point to change its color or
-plotting character (called a glyph).  If the brush is turned off, the
-brush can be freely moved across the plotting window and it does not
-change the points.
-
-This is useful if you are plotting a very large number of points,
-and you want to position the brush before painting, because you
-can move it much more quickly across the plot.  
 
 \subsubsection{Point and edge brushing}
 %
@@ -1242,10 +1240,45 @@ documented in section \ref{slbl:ColorSchemes}.
 Since this button is also found on the Tools menu, it is
 documented in section \ref{slbl:ColorAndGlyphGroups}.
 
-\subsubsection{Options menu}
+\subsubsection{Brush on}
 %
-When the brushing mode is active, the Options menu in the main
-menu bar includes this item:
+When the {\bf Brush on} checkbox is checked, moving the brush
+over a plotted point causes that point to change its color or
+plotting character (called a glyph).  If the brush is turned off, the
+brush can be freely moved across the plotting window and it does not
+change the points.
+
+This is useful if you are plotting a very large number of points,
+and you want to position the brush before painting, because you
+can move it much more quickly across the plot.  
+
+
+\subsubsection{Brush menu in display}
+%
+When the brushing mode is active, the {\bf Brush} menu in the display's
+menu bar contains these items:
+
+\begin{itemize}
+ \item Exclude shadowed points: Excluded points
+       aren't drawn, and the views are scaled without them.  Excluding
+       a lot of points from large data sets can improve the performance
+       of many operations.
+ \item Include shadowed points: Redraw these points
+       as shadows, and include them in view scaling.
+ \item Un-shadow all points: Restore the points to their usual colors.
+ \item Exclude shadowed edges: As is the case with
+       points, excluding a lot of edges from large data sets can
+       improve performance.
+ \item Include shadowed edges: Redraw these edges as shadows.
+ \item Un-shadow all edges: Restore the edges to their usual colors.
+ \item Reset brush size: Reset the brush to its default size and position.
+\end{itemize}
+
+The first few items in that list may affect more than the current
+display.  Because they really operate on the {\em data} in the current
+display, all other displays showing the same data will also respond.
+
+This option is also available on the display's {\bf Brush} menu:
 \medskip
 \noindent
 \\{\bf Update brushing continuously}: Update linked
@@ -1253,33 +1286,6 @@ menu bar includes this item:
   views only when the mouse is released, which is more efficient when
   there are a great many points in the plot, or a great many plots on
   the screen.
-
-\subsubsection{Reset menu}
-%
-When the brushing mode is active, the Reset Menu in the main
-menu bar contains these items:
-
-\begin{itemize}
- \item Exclude shadowed points in current display: Excluded points
-       aren't drawn, and the views are scaled without them.  Excluding
-       a lot of points from large data sets can improve the performance
-       of many operations.
- \item Include shadowed points in current display: Redraw these points
-       as shadows, and include them in view scaling.
- \item Un-shadow all points in current display: Restore the points to
-       their usual colors.
- \item Exclude shadowed edges in current display: As is the case with
-       points, excluding a lot of edges from large data sets can
-       improve performance.
- \item Include shadowed edges in current display: Redraw these edges
-       as shadows.
- \item Un-shadow all edges in current display: Restore the edges to their
-       usual colors.
- \item Reset brush size: Reset the brush to its default size and position.
-\end{itemize}
-The first few items in that list may affect more than the current
-display.  Because they really operate on the {\em data} in the current
-display, all other displays showing the same data will also respond.
 
 \subsection{Identification}
 \label{slbl:Identify}
@@ -1299,9 +1305,10 @@ labels are
 \item the record id.
 \end{itemize}
 
-Identification in one window is instantly reflected in all linked windows.
-[Some thought is required before deciding how or whether this view mode
-should reflect the linking rules used in brushing.]
+Identification in one window is instantly reflected in all linked
+windows.  [Some thought is required before deciding how or whether
+this interaction mode should reflect the linking rules used in
+brushing.]
 
 To cause a label to become ``sticky,'' click left when the target
 label is displayed.  The printing style changes and the label now
@@ -1319,11 +1326,11 @@ the labels at once by clicking on {\bf Make all sticky}.
 Notice that once a point's label is sticky, you can click {\bf Recenter}
 to make it the center for the rotation and tour modes.
 
-To activate this view mode from the keyboard, type {\em i} or {\em I}
+To activate this interaction mode from the keyboard, type {\em i} or {\em I}
 with the focus in the plot window, or type Control-{\em i} or
 Control-{\em I} with the focus in the console.
 
-\subsection{Edit Edges}
+\subsection{Edit edges}
 \label{slbl:EditEdges}
 
 Here we add points or edges to the datasets by adding them to
@@ -1367,7 +1374,7 @@ discrete mathematicians use xgobi and ggobi to visualize graphs.  In
 that context, moving and editing graphs is quite natural ~--~ as it
 sometimes turns out to be in the context of data analysis, too.
 
-\subsection{Move Points}
+\subsection{Move points}
 \label{slbl:MovePoints}
 
 In this mode, points or groups of points can be moved.  Move
@@ -1383,8 +1390,8 @@ the selected point will be moved with it.
 The {\bf Undo last} and {\bf Reset all} buttons allow movement
 to be reversed.
 
-To activate this view mode from the keyboard, type {\em m} or {\em M}
-with the focus in the plot window, or type Control-{\em m} or
+To activate this interaction mode from the keyboard, type {\em m} or
+{\em M} with the focus in the plot window, or type Control-{\em m} or
 Control-{\em M} with the focus in the console.
 
 \newpage
@@ -1856,9 +1863,9 @@ ambiguity: you now have to tell ggobi which display, and which plot
 within a display, you want to address.  Do that by simply clicking
 inside the target plot.  GGobi will draw a thick white outline around
 that plot so that you can check which plot your actions will be
-addressing.  The ViewMode control panel in the ggobi console should
-always correspond to the state of the current display, too.  We need
-more user experience before we can tell whether this approach is
+addressing.  The interaction mode control panel in the ggobi console
+should always correspond to the state of the current display, too.  We
+need more user experience before we can tell whether this approach is
 satisfactory.
 
 The basis for linking has changed, too.  All displays of the same data
@@ -1947,7 +1954,7 @@ documentation included in the ggobi distribution.
 \subsection {Variable selection}
 
 There have been a few changes in variable selection.  The familiar
-variable circles are still used for high-dimensional view modes, but
+variable circles are still used for high-dimensional projections, but
 we've switched to a simple checkbox interface for plots where only one
 or two variables can be selected simultaneously.  In these plots, the
 rich feedback provided by the variable circles is not needed, and may
@@ -1975,9 +1982,9 @@ on the variable selection and statistics table.
 
 For more detail on this table, see section \ref{slbl:VarManip}.
 
-\subsection{Changes in ViewModes and Tools}
+\subsection{Changes in projection, interaction and tools}
 
-{\bf Brush} may be the view mode that has changed the most,
+{\bf Brush} may be the mode that has changed the most,
 because GGobi has a much richer notion of color selection than
 XGobi.  Open the {\bf Choose color \& glyph} panel, and then
 double-click on any element of the color palette to bring up a color
