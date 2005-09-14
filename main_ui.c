@@ -45,7 +45,7 @@ const char *const GGOBI(PModeNames)[] = {
   "1D Tour",
   "Rotation",
   "2D Tour",
-  "Correlation Tour",
+  "2x1D Tour",
 };
 const char *const GGOBI(IModeNames)[] = {
   "Default",
@@ -275,7 +275,7 @@ rebuild_mode_menus(displayd *display, ggobid *gg)
       }
       else { /* If no method, use this */
         if (gg->pmode_item)
-          submenu_destroy (gg->pmode_item); 
+          submenu_destroy (gg->pmode_item);
         submenu_destroy (gg->imode_item);
       }
     }
