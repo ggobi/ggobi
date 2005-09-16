@@ -54,19 +54,19 @@ getDBMSCommandLineArgs(DBMSLoginInfo *login)
     const char * tmp;
     tmp = getCommandLineArgValue("Host");
     if(tmp)
-	setDBMSLoginElement(HOST, (char *)tmp, login);
+	setDBMSLoginElement(HOST, (gchar *)tmp, login);
 
     tmp = getCommandLineArgValue("User");
     if(tmp)
-	setDBMSLoginElement(USER, (char *)tmp, login);
+	setDBMSLoginElement(USER, (gchar *)tmp, login);
 
     tmp = getCommandLineArgValue("Database");
     if(tmp)
-	setDBMSLoginElement(DATABASE, (char *)tmp, login);
+	setDBMSLoginElement(DATABASE, (gchar *)tmp, login);
 
     tmp = getCommandLineArgValue("DataQuery");
     if(tmp)
-	setDBMSLoginElement(DATA_QUERY, (char *)tmp, login);
+	setDBMSLoginElement(DATA_QUERY, (gchar *)tmp, login);
 
     return(login);
 }
@@ -129,11 +129,7 @@ getDBMSLoginElementIndex(const char *name)
 }
 
 int 
-<<<<<<< dbms.c
-setDBMSLoginElement(DBMSInfoElement i, const char * val, DBMSLoginInfo *info)
-=======
 setDBMSLoginElement(DBMSInfoElement i, char * val, DBMSLoginInfo *info)
->>>>>>> 1.8
 {
 /* Arrange to have this done by the caller -- it causes a fatal error
    on Suns. */
@@ -144,7 +140,7 @@ setDBMSLoginElement(DBMSInfoElement i, char * val, DBMSLoginInfo *info)
 
    switch(i) {
      case HOST:
-       info->host = val;
+       info->host = (gchar *)val;
        break;
      case USER:
        info->user = val;

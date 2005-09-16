@@ -117,7 +117,7 @@ tour1d_display_pmode_items_add (GtkWidget *menu, ggobid *gg)
 {
   displayd *display = gg->current_display;
   GtkWidget *item;
-  GtkSignalFunc func = display_options_cb;
+  GtkSignalFunc func = (GtkSignalFunc) display_options_cb;
 
   item = CreateMenuCheck (menu, "Show axes",
     func, GINT_TO_POINTER (DOPT_AXES), display->options.axes_show_p, gg);
@@ -140,7 +140,7 @@ void
 tour2d_display_pmode_items_add (GtkWidget *menu, ggobid *gg) {
   displayd *display = gg->current_display;
   GtkWidget *item;
-  GtkSignalFunc func = display_options_cb;
+  GtkSignalFunc func = (GtkSignalFunc) display_options_cb;
 
   item = CreateMenuCheck (menu, "Show axes",
     func, GINT_TO_POINTER (DOPT_AXES), display->options.axes_show_p, gg);
@@ -171,7 +171,7 @@ void
 cotour_display_pmode_items_add (GtkWidget *menu, ggobid *gg) {
   displayd *display = gg->current_display;
   GtkWidget *item;
-  GtkSignalFunc func = display_options_cb;
+  GtkSignalFunc func = (GtkSignalFunc) display_options_cb;
 
   item = CreateMenuCheck (menu, "Show axes",
     func, GINT_TO_POINTER (DOPT_AXES), display->options.axes_show_p, gg);
