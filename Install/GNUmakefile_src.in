@@ -32,6 +32,7 @@ SRC=\
     ggobi-API.c \
     ggobi.c \
     ggobiClass.c \
+    GGobiAppClass.c \
     identify.c \
     identify_ui.c \
     impute.c \

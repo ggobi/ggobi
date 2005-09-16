@@ -31,9 +31,11 @@ SHARE_FILES=Install/ggobirc.in
 DATA_SRC_FILES=\
    flea.col flea.colors flea.dat flea.doc flea.glyphs flea.row \
    roos.col roos.dat roos.doc roos.missing roos.row \
-   flea.xml pigs.xml ratcns.xml sat.xml sleep.xml eies.xml buckyball.xml \
+   flea.xml pigs.xml ratcns.xml sat.xml sleep.xml \
    stdColorMap.xml prim7.xml olive.col olive.dat olive.row olive.xml \
-   places.xml algal-bloom.xml sarsHK.xml snetwork.xml \
+   places.xml algal-bloom.xml river.xml \
+   buckyball.xml cube6.xml eies.xml morsecodes.xml \
+   perm4.xml perm5.xml snetwork.xml \
    laser.col laser.dat laser.doc laser.xml Shipman.xml tips.xml \
    test1.csv test2.csv test3.csv \
    ggobi.dtd
@@ -53,7 +55,8 @@ DOC_FILES=$(DOC_TEX_FILES:%=Docs/%.$(DOC_EXTENSION)) Docs/ggobi.css Docs/Embeddi
 C_SRC_FILES=$(SRC) $(XML_SRC) ggobiMain.c xmlConvert.c
 
 C_HEADER_FILES=\
-  GGobiAPI barchartDisplay brushing colorscheme cpanel datad defines \
+  GGobiAPI GGobiApp \
+  barchartDisplay brushing colorscheme cpanel datad defines \
   display display_tree \
   externs fileio ggobi ggobiClass noop-toggle plugin read_xml rb \
   splot types vars varseldata write_xml writedata gtkext \
