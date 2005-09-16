@@ -281,8 +281,8 @@ select_row_cb (GtkSheet *sheet, gint row, datad *d)
 {
   ggobid *gg = (ggobid *) d->gg;
 
-  if (viewmode_get(gg) != IDENT)
-    viewmode_set (IDENT, gg);
+  if (imode_get(gg) != IDENT)
+    viewmode_set (NULL_PMODE, IDENT, gg);
 
   d->nearest_point = row;
   /*-- the label could be made sticky -- double click? keystroke? --*/
