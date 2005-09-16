@@ -348,7 +348,10 @@ linkby_current_page_set (displayd *display, GtkWidget *notebook, ggobid *gg)
   while (swin) {
     paged = (datad *) gtk_object_get_data (GTK_OBJECT (swin), "datad");
 
-    g_printerr ("(current_page_set) paged %s d %s   ==? %d\n", paged->name, d->name, (paged == d));
+    /*
+    g_printerr ("(current_page_set) paged %s d %s   ==? %d\n",
+    paged->name, d->name, (paged == d));
+    */
 
     gtk_widget_set_sensitive (swin, (paged == d));
     if (paged == d) {
