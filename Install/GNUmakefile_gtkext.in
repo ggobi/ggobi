@@ -29,7 +29,7 @@ libgtkext.so: $(OBJ:%.o=%.lo)
 	$(CC) $(SHLIB_LDFLAGS) -o $@ $(OBJ:%.o=%.lo) $(LIBS)
 
 libgtkext.dylib: $(OBJ:%.o=%.lo)
-	$(CC) $(SHLIB_LDFLAGS) -o $@ $(OBJ:%.o=%.lo) -lSystem $(LIBS) `echo "$(GTK_LIBS)" | sed 's/-bexpall//' | sed -e 's/-I[^ ]*//'` -lgcc
+	$(CC) -dynamiclib -o $@ $(OBJ:%.o=%.lo) -lSystem $(LIBS) `echo "$(GTK_LIBS)" | sed 's/-bexpall//' | sed -e 's/-I[^ ]*//'` -lgcc
 
 $(TOP)/lib/libgtkext.@SHLIB_EXT@: libgtkext.@SHLIB_EXT@
 	$(MV) $^ $(@D)

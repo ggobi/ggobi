@@ -158,7 +158,7 @@ libggobi.so $(TOP)/lib/libggobi.so: $(OBJ:%.o=%.lo)
 	$(CC) $(SHLIB_LDFLAGS) -o $@ $(OBJ:%.o=%.lo) $(LIBS)
 
 libggobi.dylib $(TOP)/lib/libggobi.dylib: $(OBJ:%.o=%.lo)
-	$(CC) $(SHLIB_LDFLAGS) -o $@ $(OBJ:%.o=%.lo) `echo "$(LIBS)"|sed 's/-bexpall//' | sed -e 's/-I[^ ]*//'` -lgcc
+	$(CC) -dynamiclib -o $@ $(OBJ:%.o=%.lo) `echo "$(LIBS)"|sed 's/-bexpall//' | sed -e 's/-I[^ ]*//'` -lgcc
 
 $(TOP)/bin/xmlConvert xmlConvert: xmlConvert.o libggobi.@SHLIB_EXT@
 	$(CC) -o $@ xmlConvert.o -L$(TOP)/lib  -L. -lggobi $(GTK_EXT_LD) $(XML_LIBS) $(GTK_LIBS) 
