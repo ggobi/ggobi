@@ -23,6 +23,7 @@
 #endif
 
 #include <unistd.h>
+#include <libgen.h>
 
 #include <gtk/gtk.h>
 
@@ -340,13 +341,30 @@ filename_get_w (GtkWidget *w, ggobid *gg)
 
   chooser = createOutputFileSelectionDialog(title);
   
-  /*
-   * I would like to put in the directory here without the
-   * filename, but I don't know how -- dfs
-  */
-  if (gg->input && gg->input->baseName)
+  if (gg->input && gg->input->baseName) {
+    char buf[256];
+    char *cwd;
+    cwd = getcwd(buf, (size_t) 256);
+
+    /* This needs to be the full path name of the data directory */
+    gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER(chooser),
+	 g_strdup_printf ("%s%c%s",
+			  cwd,
+			  G_DIR_SEPARATOR,
+ 			  gg->input->dirName));
+
+    /* Come to think of it, it's dangerous to print the name of the
+       current file, because it would be easy to overwrite it in error.
+       dfs
+    */
+    /*
     gtk_file_chooser_set_filename(GTK_FILE_CHOOSER (chooser),
-                                     gg->input->baseName);
+				  g_strdup_printf("%s%c%s.xml",
+						 cwd, 
+						 G_DIR_SEPARATOR,
+                                  gg->input->baseName));
+    */
+  }
 
   filename_get_configure(chooser, WRITE_FILESET, gg);
 
