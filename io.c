@@ -212,9 +212,10 @@ GtkWidget*
 createOutputFileSelectionDialog(const gchar *title)
 {
 	GtkWidget *chooser;
-	chooser = gtk_file_chooser_dialog_new(title, NULL, GTK_FILE_CHOOSER_ACTION_SAVE,
+	chooser = gtk_file_chooser_dialog_new(title, NULL, 
+                        GTK_FILE_CHOOSER_ACTION_SAVE,
 	   		GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-			GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+			GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT,
 			NULL);
 	return(chooser);
 }
@@ -309,12 +310,18 @@ filename_get_r (ggobid *gg)
   chooser = createInputFileSelectionDialog("Read ggobi data", gg);
   //gtk_file_selection_hide_fileop_buttons (GTK_FILE_SELECTION (fs)); 
 
-  /*
-   * I would like to put in the directory here without the
-   * filename, but I don't know how -- dfs
-  */
-  if (gg->input && gg->input->baseName)
-    gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(chooser), gg->input->baseName);
+  if (gg->input && gg->input->baseName) {
+    char buf[256];
+    char *cwd;
+    cwd = getcwd(buf, (size_t) 256);
+
+    gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(chooser), 
+	 g_strdup_printf ("%s%c%s",
+			  cwd,
+			  G_DIR_SEPARATOR,
+ 			  gg->input->dirName));
+    /*      gg->input->baseName); */
+  }
 
   filename_get_configure (chooser, READ_FILESET, gg);
 
