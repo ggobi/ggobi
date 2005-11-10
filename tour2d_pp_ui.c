@@ -29,11 +29,9 @@ static GtkAdjustment *param_adj;
 */
 
 /*-- called when closed from the close menu item --*/
-static void
-close_menuitem_cb (displayd *dsp, gint action, GtkWidget *w) 
-{
+static void action_close_cb (GtkAction *action, displayd *dsp) {
   gtk_widget_hide (dsp->t2d_window);
-  t2d_optimz(0, &dsp->t2d.get_new_target, 
+  t1d_optimz(0, &dsp->t2d.get_new_target, 
     &dsp->t2d.target_selection_method, dsp);
 
   /*  free_optimize0_p(&dsp->t2d_pp_op); * should this go here? *
@@ -65,21 +63,11 @@ hide_cb (GtkWidget *w) {
 */
 
 static void
-options_cb(displayd *dsp, guint action, GtkCheckMenuItem *w) 
-{
-  switch (action) {
-    case 0:
-      if (w->active)
-        gtk_widget_show (dsp->t2d_control_frame);
+action_show_controls_cb(GtkToggleAction *action, displayd *dsp) {
+      if (gtk_toggle_action_get_active(action))
+        gtk_widget_show (dsp->t1d_control_frame);
       else
-        gtk_widget_hide (dsp->t2d_control_frame);
-      break;
-
-    case 1:
-    case 2:
-    default:
-      fprintf(stderr, "Unhandled switch-case in options_cb\n");
-  }
+        gtk_widget_hide (dsp->t1d_control_frame);
 }
 
 /*static void
@@ -163,12 +151,11 @@ TourPPIndex StandardPPIndices[] = {
 };
 
 
-void t2d_pp_func_cb (GtkWidget *w, gpointer cbd)
+void t2d_pp_func_cb (GtkWidget *w, displayd *dsp)
 {
-  displayd *dsp = (displayd *) gtk_object_get_data (GTK_OBJECT(w), "displayd");
   ggobid *gg;
   cpaneld *cpanel = NULL;
-  gint indx = GPOINTER_TO_INT (cbd);
+  gint indx = gtk_combo_box_get_active(GTK_COMBO_BOX(w));
   gchar *label = g_strdup("PP index: (0.000) 0.0000 (0.000)");
 
   if (dsp == NULL) {
@@ -254,13 +241,39 @@ t2d_ppda_expose_cb (GtkWidget *w, GdkEventConfigure *event, displayd *dsp)
   return false;
 }
 
-static GtkItemFactoryEntry menu_items[] = {
+static const gchar* tour2dpp_ui =
+"<ui>"
+"	<menubar>"
+"		<menu action='File'>"
+"			<menuitem action='Close'/>"
+"		</menu>"
+"		<menu action='Options'>"
+"			<menuitem action='ShowControls'/>"
+"		</menu>"
+"	</menubar>"
+"</ui>";
+
+static GtkActionEntry entries[] = {
+	{ "File", NULL, "_File" },
+	{ "Close", GTK_STOCK_CLOSE, "_Close", "<control>C", 
+		"Hide the projection pursuit window", G_CALLBACK(action_close_cb)
+	},
+	{ "Options", NULL, "_Options" }
+};
+static GtkToggleActionEntry t_entries[] = {
+	{ "ShowControls", NULL, "_Show controls", "<control>S",
+		"Hide the controls on the left so that the graph consumes the entire window",
+		G_CALLBACK(action_show_controls_cb), true
+	}
+};
+
+/*static GtkItemFactoryEntry menu_items[] = {
   { "/_File",         NULL,         NULL, 0, "<Branch>" },
   { "/File/Close",  
          "",         (GtkItemFactoryCallback) close_menuitem_cb, 0, "<Item>" },
   { "/_Options",      NULL,         NULL, 0, "<Branch>" },
   { "/Options/Show controls",  
-         "v",         (GtkItemFactoryCallback) options_cb, 0, "<CheckItem>" },
+         "v",         (GtkItemFactoryCallback) options_cb, 0, "<CheckItem>" },*/
 /* -- comment the rest out for now -- */
 /*
   { "/Options/Show lines",  
@@ -296,18 +309,17 @@ static GtkItemFactoryEntry menu_items[] = {
   { "/Options/Replot frequency/16",  
          "" ,        (GtkItemFactoryCallback) replot_freq_cb, 16,"/Options/Replot frequency/1" },
 */
-};
+/*};*/
 
 void
 tour2dpp_window_open (ggobid *gg) {
   /*GtkWidget **btn, *label, *da, *entry;*/
-  GtkWidget *hbox, *vbox, *vbc, *vb, *frame, *tgl, *hb, *opt, *sbar;
+  GtkWidget *hbox, *vbox, *vbc, *vb, *frame, *tgl, *hb, *opt, *sbar, *lbl;
   GtkObject *adj;
   displayd *dsp = gg->current_display;  /* ok as long as we only use the gui */
   datad *d = dsp->d;
   gboolean vars_sphered = true;
   /*-- to initialize the checkboxes in the menu --*/
-  GtkItemFactory *factory;
   GtkWidget *item;
 
   if (dsp == NULL)
@@ -338,31 +350,39 @@ tour2dpp_window_open (ggobid *gg) {
   } else {
 
     if (dsp->t2d_window == NULL) {
-
+		GtkUIManager *manager = gtk_ui_manager_new();
+		GtkActionGroup *actions = gtk_action_group_new("Tour2DPPActions");
+		
       dsp->t2d_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
       gtk_window_set_title (GTK_WINDOW (dsp->t2d_window), 
         "projection pursuit - 2D");
-      gtk_signal_connect (GTK_OBJECT (dsp->t2d_window), "delete_event",
-                          GTK_SIGNAL_FUNC (close_wmgr_cb), (gpointer) dsp);
+      g_signal_connect (G_OBJECT (dsp->t2d_window), "delete_event",
+                          G_CALLBACK (close_wmgr_cb), (gpointer) dsp);
       /*gtk_window_set_policy (GTK_WINDOW (dsp->t2d_window), true, true, false);*/
-      gtk_signal_connect (GTK_OBJECT(d), "rows_in_plot_changed",
-        GTK_SIGNAL_FUNC(reset_pp), gg);
+      g_signal_connect (G_OBJECT(d), "rows_in_plot_changed",
+        G_CALLBACK(reset_pp), gg);
 
       gtk_container_set_border_width (GTK_CONTAINER (dsp->t2d_window), 10);
-      gtk_object_set_data (GTK_OBJECT (dsp->t2d_window), "displayd", dsp);
+      g_object_set_data(G_OBJECT (dsp->t2d_window), "displayd", dsp);
 
 /*
  * Add the main menu bar
 */
       vbox = gtk_vbox_new (FALSE, 1);
-      gtk_container_border_width (GTK_CONTAINER (vbox), 1);
+      gtk_container_set_border_width (GTK_CONTAINER (vbox), 1);
       gtk_container_add (GTK_CONTAINER (dsp->t2d_window), vbox);
 
-      dsp->t2d_pp_accel_group = gtk_accel_group_new ();
+	  gtk_action_group_add_actions(actions, entries, G_N_ELEMENTS(entries), dsp);
+	  gtk_action_group_add_toggle_actions(actions, t_entries, G_N_ELEMENTS(t_entries), dsp);
+	  gtk_ui_manager_insert_action_group(manager, actions, 0);
+	  g_object_unref(G_OBJECT(actions));
+	  dsp->t2d_mbar = create_menu_bar(manager, tour2dpp_ui, dsp->t2d_window);
+	
+      /*dsp->t2d_pp_accel_group = gtk_accel_group_new ();
       factory = get_main_menu (menu_items,
         sizeof (menu_items) / sizeof (menu_items[0]),
         dsp->t2d_pp_accel_group, dsp->t2d_window, &dsp->t2d_mbar,
-        (gpointer) dsp);
+        (gpointer) dsp);*/
       gtk_box_pack_start (GTK_BOX (vbox), dsp->t2d_mbar, false, true, 0);
 
 
@@ -370,7 +390,7 @@ tour2dpp_window_open (ggobid *gg) {
  * Divide the window:  controls on the left, plot on the right
 */
       hbox = gtk_hbox_new (false, 1);
-      gtk_container_border_width (GTK_CONTAINER (hbox), 1);
+      gtk_container_set_border_width (GTK_CONTAINER (hbox), 1);
       gtk_box_pack_start (GTK_BOX (vbox),
                         hbox, true, true, 1);
 /*
@@ -389,12 +409,12 @@ tour2dpp_window_open (ggobid *gg) {
 /*
  * Optimize toggle
 */
-      tgl = gtk_check_button_new_with_label ("Optimize");
+      tgl = gtk_check_button_new_with_mnemonic ("_Optimize");
       gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), tgl,
         "Guide the tour using projection pursuit optimization or tour passively",
         NULL);
-      gtk_signal_connect (GTK_OBJECT (tgl), "toggled",
-                          GTK_SIGNAL_FUNC (t2d_optimz_cb), (gpointer) dsp);
+      g_signal_connect (G_OBJECT (tgl), "toggled",
+                          G_CALLBACK (t2d_optimz_cb), (gpointer) dsp);
       gtk_box_pack_start (GTK_BOX (vbc),
                         tgl, false, false, 1);
 
@@ -405,15 +425,16 @@ tour2dpp_window_open (ggobid *gg) {
 
     vb = gtk_vbox_new (false, 0);
 
-    gtk_box_pack_start (GTK_BOX (vb), gtk_label_new ("Temp start:"),
-      false, false, 0);
+    lbl = gtk_label_new_with_mnemonic ("_Temp start:");
+    gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
 
   /*-- value, lower, upper, step --*/
     adj = gtk_adjustment_new (1.0, 0.1, 3.0, 0.1, 0.1, 0.0);
-    gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
-                      GTK_SIGNAL_FUNC (t2d_pptemp_set_cb), dsp);
+    g_signal_connect (G_OBJECT (adj), "value_changed",
+                      G_CALLBACK (t2d_pptemp_set_cb), dsp);
 
     sbar = gtk_hscale_new (GTK_ADJUSTMENT (adj));
+	gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), sbar);
     gtk_widget_set_name (sbar, "TOUR2D:PP_TEMPST");
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
     "Adjust starting temp of pp", NULL);
@@ -429,14 +450,16 @@ tour2dpp_window_open (ggobid *gg) {
   /*-- value, lower, upper, step --*/
     vb = gtk_vbox_new (false, 0);
 
-    gtk_box_pack_start (GTK_BOX (vb), gtk_label_new ("Cooling:"),
+    lbl = gtk_label_new_with_mnemonic ("_Cooling:");
+    gtk_box_pack_start (GTK_BOX (vb), lbl,
       false, false, 0);
 
     adj = gtk_adjustment_new (0.99, 0.50, 1.0, 0.05, 0.05, 0.0);
-    gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
-                      GTK_SIGNAL_FUNC (t2d_ppcool_set_cb), dsp);
+    g_signal_connect (G_OBJECT (adj), "value_changed",
+                      G_CALLBACK (t2d_ppcool_set_cb), dsp);
 
     sbar = gtk_hscale_new (GTK_ADJUSTMENT (adj));
+	gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), sbar);
     gtk_widget_set_name (sbar, "TOUR2D:PP_COOLING");
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
     "Adjust cooling", NULL);
@@ -471,10 +494,10 @@ tour2dpp_window_open (ggobid *gg) {
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), entry,
       "The value of the projection pursuit index for the current projection",
       NULL);
-    gtk_signal_connect (GTK_OBJECT (entry), "value_changed",
-    GTK_SIGNAL_FUNC (t2d_writeindx_cb), gg);*/
-    /*    gtk_signal_connect (GTK_OBJECT (dsp->t2d.ppval), "value_changed",
-          GTK_SIGNAL_FUNC (t2d_writeindx_cb), gg);*/
+    g_signal_connect (G_OBJECT (entry), "value_changed",
+    G_CALLBACK (t2d_writeindx_cb), gg);*/
+    /*    g_signal_connect (G_OBJECT (dsp->t2d.ppval), "value_changed",
+          G_CALLBACK (t2d_writeindx_cb), gg);*/
 
 /*
  * pp index menu and scale inside frame
@@ -492,13 +515,13 @@ tour2dpp_window_open (ggobid *gg) {
       /*      btn = gtk_button_new_with_label ("Sphere Vars");
       gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
         "Interface to sphering variables (principal components analysis)", NULL);
-      gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-         GTK_SIGNAL_FUNC (sphere_cb), (gpointer) gg);
+      g_signal_connect (G_OBJECT (btn), "clicked",
+         G_CALLBACK (sphere_cb), (gpointer) gg);
       gtk_box_pack_start (GTK_BOX (vb), btn, true, true, 1);
       */
 
-      opt = gtk_option_menu_new ();
-      gtk_container_set_border_width (GTK_CONTAINER (opt), 4);
+      opt = gtk_combo_box_new_text ();
+      //gtk_container_set_border_width (GTK_CONTAINER (opt), 4);
 /*
       gtk_misc_set_alignment (opt, 0, 0.5);
 */
@@ -506,9 +529,8 @@ tour2dpp_window_open (ggobid *gg) {
         "Set the projection pursuit index", NULL);
       gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
       /*    gtk_box_pack_start (GTK_BOX (hb), opt, false, false, 0);*/
-      populate_option_menu (opt, t2d_pp_func_lbl,
-        sizeof (t2d_pp_func_lbl) / sizeof (gchar *),
-        (GtkSignalFunc) t2d_pp_func_cb, "displayd", (gpointer) dsp);
+      populate_combo_box (opt, t2d_pp_func_lbl, G_N_ELEMENTS(t2d_pp_func_lbl),
+        G_CALLBACK(t2d_pp_func_cb), (gpointer) dsp);
 
     /*    param_vb = gtk_vbox_new (false, 3);
     gtk_container_set_border_width (GTK_CONTAINER (param_vb), 4);
@@ -542,25 +564,23 @@ tour2dpp_window_open (ggobid *gg) {
                           frame, true, true, 1);
 
       dsp->t2d_ppda = gtk_drawing_area_new ();
-#if GTK_MAJOR_VERSION == 2
       gtk_widget_set_double_buffered(dsp->t2d_ppda, false);
-#endif
-      gtk_drawing_area_size (GTK_DRAWING_AREA (dsp->t2d_ppda), WIDTH, HEIGHT);
-      gtk_signal_connect (GTK_OBJECT (dsp->t2d_ppda),
+      gtk_widget_set_size_request (GTK_WIDGET (dsp->t2d_ppda), WIDTH, HEIGHT);
+      g_signal_connect (G_OBJECT (dsp->t2d_ppda),
                           "configure_event",
-                          (GtkSignalFunc) t2d_ppda_configure_cb,
+                          G_CALLBACK(t2d_ppda_configure_cb),
                           (gpointer) dsp);
 
-      gtk_signal_connect (GTK_OBJECT (dsp->t2d_ppda),
+      g_signal_connect (G_OBJECT (dsp->t2d_ppda),
                           "expose_event",
-                          (GtkSignalFunc) t2d_ppda_expose_cb,
+                          G_CALLBACK(t2d_ppda_expose_cb),
                           (gpointer) dsp);
   
       gtk_container_add (GTK_CONTAINER (frame), dsp->t2d_ppda);
       gtk_widget_show_all (dsp->t2d_window);
 
       /*-- Set the appropriate check menu items to true. -- dfs --*/
-      item = gtk_item_factory_get_widget (factory, "/Options/Show controls");
+      item = gtk_ui_manager_get_widget (manager, "/menubar/Options/ShowControls");
       gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (item), true);
 /* comment out until the options are implemented
       item = gtk_item_factory_get_widget (factory, "/Options/Show lines");

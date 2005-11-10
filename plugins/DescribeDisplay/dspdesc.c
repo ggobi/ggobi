@@ -14,9 +14,9 @@ void       close_dspdesc_window(GtkWidget *w, PluginInstance *inst);
 GtkWidget *create_dspdesc_window(ggobid *gg, PluginInstance *inst);
 void       show_dspdesc_window(GtkWidget *widget, PluginInstance *inst);
 
-static void window_close_cb(GtkWidget *btn, PluginInstance *inst);
+static void window_close (PluginInstance *inst);
 
-extern void desc_write_cb (GtkWidget *btn, PluginInstance *inst);
+extern void desc_write (PluginInstance *inst);
 
 void
 dspdesc_init (dspdescd *desc)
@@ -41,8 +41,8 @@ addToToolsMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
   inst->gg = gg;
 
   entry = GGobi_addToolsMenuItem ((gchar *)lbl, gg);
-  gtk_signal_connect (GTK_OBJECT(entry), "activate",
-                      GTK_SIGNAL_FUNC (show_dspdesc_window), inst);
+  g_signal_connect (G_OBJECT(entry), "activate",
+                      G_CALLBACK (show_dspdesc_window), inst);
   return(true);
 }
 
@@ -59,7 +59,7 @@ show_dspdesc_window (GtkWidget *widget, PluginInstance *inst)
     inst->data = desc;
 
     create_dspdesc_window (inst->gg, inst);
-    gtk_object_set_data (GTK_OBJECT (desc->window), "dspdescd", desc);
+    g_object_set_data(G_OBJECT (desc->window), "dspdescd", desc);
 
   } else {
     desc = (dspdescd *) inst->data;
@@ -77,45 +77,54 @@ dspdescFromInst (PluginInstance *inst)
 GtkWidget *
 create_dspdesc_window(ggobid *gg, PluginInstance *inst)
 {
-  GtkWidget *window, *main_vbox, *hb, *label, *entry, *btn;
+  GtkWidget *window, *hb, *label, *entry;
   GtkTooltips *tips = gtk_tooltips_new ();
   dspdescd *desc = dspdescFromInst (inst); 
 
   /*-- I will probably have to get hold of this window, after which
        I can name all the other widgets --*/
-  window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	   
+  //window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+  window = gtk_file_chooser_dialog_new("Save display description", NULL, 
+  	GTK_FILE_CHOOSER_ACTION_SAVE,
+  	GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT, GTK_STOCK_CLOSE, GTK_RESPONSE_REJECT, NULL);
+	
   desc->window = window;
-
+#if 0
   gtk_window_set_title(GTK_WINDOW(window), "Save display description");
-  gtk_signal_connect (GTK_OBJECT (window), "destroy",
-                      GTK_SIGNAL_FUNC (close_dspdesc_window), inst);
+  g_signal_connect (G_OBJECT (window), "destroy",
+                      G_CALLBACK (close_dspdesc_window), inst);
 
   main_vbox = gtk_vbox_new (FALSE,1);
   gtk_container_set_border_width (GTK_CONTAINER(main_vbox), 5); 
   gtk_container_add (GTK_CONTAINER(window), main_vbox);
-
+#endif
   /* label and entry widget for main title */
   hb = gtk_hbox_new (false, 1);
-  gtk_box_pack_start (GTK_BOX (main_vbox), hb, true, true, 2);
-
-  label = gtk_label_new ("Figure title");
+  //gtk_box_pack_start (GTK_BOX (main_vbox), hb, true, true, 2);
+  
+  label = gtk_label_new_with_mnemonic ("Figure _title");
   gtk_box_pack_start (GTK_BOX (hb), label, true, true, 2);
 
   entry = gtk_entry_new ();
-  gtk_object_set_data (GTK_OBJECT(window), "TITLE", entry);
+  gtk_label_set_mnemonic_widget(GTK_LABEL(label), entry);
+  g_object_set_data(G_OBJECT(window), "TITLE", entry);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), entry,
     "Type in the figure title", NULL);
   gtk_box_pack_start (GTK_BOX (hb), entry, true, true, 2);
 
+  gtk_file_chooser_set_extra_widget(GTK_FILE_CHOOSER(window), hb);
+  #if 0
   /* label and entry widget for file name */
   hb = gtk_hbox_new (false, 1);
   gtk_box_pack_start (GTK_BOX (main_vbox), hb, true, true, 2);
 
-  label = gtk_label_new ("File name");
+  label = gtk_label_new_with_mnemonic ("_File name");
   gtk_box_pack_start (GTK_BOX (hb), label, true, true, 2);
 
   entry = gtk_entry_new ();
-  gtk_object_set_data (GTK_OBJECT(window), "FILENAME", entry);
+  gtk_label_set_mnemonic_widget(GTK_LABEL(label), entry);
+  g_object_set_data(G_OBJECT(window), "FILENAME", entry);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), entry,
     "Type in the name of the file", NULL);
   gtk_box_pack_start (GTK_BOX (hb), entry, true, true, 2);
@@ -128,26 +137,34 @@ create_dspdesc_window(ggobid *gg, PluginInstance *inst)
   btn = gtk_button_new_with_label ("Save");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), btn,
     "Create the file", NULL);
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-    GTK_SIGNAL_FUNC (desc_write_cb), inst);
+  g_signal_connect (G_OBJECT (btn), "clicked",
+    G_CALLBACK (desc_write_cb), inst);
   gtk_box_pack_start (GTK_BOX (hb), btn, false, false, 2);
 
 
   btn = gtk_button_new_with_label ("Close");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), btn,
     "Close this window", NULL);
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-    GTK_SIGNAL_FUNC (window_close_cb), inst);
+  g_signal_connect (G_OBJECT (btn), "clicked",
+    G_CALLBACK (window_close_cb), inst);
 
   gtk_box_pack_start (GTK_BOX (hb), btn, false, false, 2);
 
   gtk_widget_show_all (window);
+#endif
 
+	gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(window), "ggdisplay.R");
+	
+	if (gtk_dialog_run(GTK_DIALOG(window)) == GTK_RESPONSE_ACCEPT)
+		desc_write(inst);
+	
+	window_close(inst);
+	
   return(window);
 }
 
 void
-window_close_cb(GtkWidget *btn, PluginInstance *inst)
+window_close(PluginInstance *inst)
 {
 	if(inst->data) {
 	    dspdescd *desc = (dspdescd *) inst->data;
@@ -165,8 +182,8 @@ void closeWindow(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
   if (inst->data) {
   dspdescd *desc = dspdescFromInst (inst); 
     /* I don't remember what this line is for -- dfs
-    gtk_signal_disconnect_by_func(GTK_OBJECT(inst->data),
-      GTK_SIGNAL_FUNC (close_dspdesc_window), inst);
+    g_signal_handlers_disconnect_by_func(G_OBJECT(inst->data),
+      G_CALLBACK (close_dspdesc_window), inst);
     */
     gtk_widget_destroy (desc->window);
   }

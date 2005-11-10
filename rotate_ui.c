@@ -53,13 +53,12 @@ static void reinit_cb (GtkWidget *w) {
 }
 
 static gchar *type_lbl[] = {"Rotate", "Rock", "Interpolate"};
-static void type_cb (GtkWidget *w, gpointer cbd)
+static void type_cb (GtkWidget *w, ggobid *gg)
 {
-  ggobid *gg = GGobiFromWidget(w, true);
 
   if (gg->current_display != NULL) {
     cpaneld *cpanel = &gg->current_display->cpanel;
-    gint indx = GPOINTER_TO_INT (cbd);
+    gint indx = gtk_combo_box_get_active(GTK_COMBO_BOX(w));
 
     cpanel->ro_type = indx;
 
@@ -68,12 +67,11 @@ static void type_cb (GtkWidget *w, gpointer cbd)
 }
 
 static gchar *axis_lbl[] = {"Y Axis", "X Axis", "Oblique Axis"};
-static void axis_cb (GtkWidget *w, gpointer cbd)
+static void axis_cb (GtkWidget *w, ggobid *gg)
 {
-  ggobid *gg = GGobiFromWidget(w, true);
   if (gg->current_display != NULL) {
     cpaneld *cpanel = &gg->current_display->cpanel;
-    gint indx = GPOINTER_TO_INT (cbd);
+    gint indx = gtk_combo_box_get_active(GTK_COMBO_BOX(w));
 
     cpanel->ro_axis = indx;
 
@@ -113,9 +111,9 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   sp->mousepos.x = (gint) event->x;
   sp->mousepos.y = (gint) event->y;
 
-  sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
+  sp->motion_id = g_signal_connect (G_OBJECT (sp->da),
                                       "motion_notify_event",
-                                      (GtkSignalFunc) motion_notify_cb,
+                                      G_CALLBACK(motion_notify_cb),
                                       (gpointer) sp);
   return true;
 }
@@ -137,13 +135,13 @@ void
 rotation_event_handlers_toggle (splotd *sp, gboolean state)
 {
   if (state == on) {
-    sp->press_id = gtk_signal_connect (GTK_OBJECT (sp->da),
+    sp->press_id = g_signal_connect (G_OBJECT (sp->da),
                                        "button_press_event",
-                                       (GtkSignalFunc) button_press_cb,
+                                       G_CALLBACK(button_press_cb),
                                        (gpointer) sp);
-    sp->release_id = gtk_signal_connect (GTK_OBJECT (sp->da),
+    sp->release_id = g_signal_connect (G_OBJECT (sp->da),
                                          "button_release_event",
-                                         (GtkSignalFunc) button_release_cb,
+                                         G_CALLBACK(button_release_cb),
                                          (gpointer) sp);
   } else {
     disconnect_button_press_signal (sp);
@@ -183,8 +181,8 @@ cpanel_rotation_make (ggobid *gg) {
    * scrollbar widgets, and the highest value you'll get is actually
    * (upper - page_size). */
   adj = gtk_adjustment_new (1.0, 0.0, MAX_TOUR_SPEED, 1.0, 1.0, 0.0);
-  gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
-                      GTK_SIGNAL_FUNC (rotation_speed_cb), NULL);
+  g_signal_connect (G_OBJECT (adj), "value_changed",
+                      G_CALLBACK (rotation_speed_cb), NULL);
 
   sbar = gtk_hscale_new (GTK_ADJUSTMENT (adj));
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
@@ -199,18 +197,18 @@ cpanel_rotation_make (ggobid *gg) {
 */
   box = gtk_hbox_new (true, 2);
 
-  ro_paused_btn = gtk_check_button_new_with_label ("Pause");
+  ro_paused_btn = gtk_check_button_new_with_mnemonic ("_Pause");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), ro_paused_btn,
     "Stop rotation temporarily", NULL);
-  gtk_signal_connect (GTK_OBJECT (ro_paused_btn), "toggled",
-                     GTK_SIGNAL_FUNC (rotate_pause_cb), (gpointer) NULL);
+  g_signal_connect (G_OBJECT (ro_paused_btn), "toggled",
+                     G_CALLBACK (rotate_pause_cb), (gpointer) NULL);
   gtk_box_pack_start (GTK_BOX (box), ro_paused_btn, true, true, 1);
 
-  btn = gtk_button_new_with_label ("Reinit");
+  btn = gtk_button_new_with_mnemonic ("_Reinit");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Reset projection", NULL);
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                     GTK_SIGNAL_FUNC (reinit_cb), (gpointer) NULL);
+  g_signal_connect (G_OBJECT (btn), "clicked",
+                     G_CALLBACK (reinit_cb), (gpointer) NULL);
   gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
 
   gtk_box_pack_start (GTK_BOX (panel->w), box, false, false, 1);
@@ -218,37 +216,35 @@ cpanel_rotation_make (ggobid *gg) {
 /*
  * Button to change direction
 */
-  btn = gtk_button_new_with_label ("Change direction");
+  btn = gtk_button_new_with_mnemonic ("Change di_rection");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Change direction of rotation", NULL);
   gtk_box_pack_start (GTK_BOX (panel->w), btn, false, false, 1);
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                      GTK_SIGNAL_FUNC (chdir_cb), gg);
+  g_signal_connect (G_OBJECT (btn), "clicked",
+                      G_CALLBACK (chdir_cb), gg);
 
 /*
  * option menu: rotate/rock/interpolate
 */
-  ro_type_opt = gtk_option_menu_new ();
+  ro_type_opt = gtk_combo_box_new_text ();
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), ro_type_opt,
     "Rotate freely, rock locally, or interpolate between two orthogonal projections",
     NULL);
   gtk_box_pack_start (GTK_BOX (panel->w),
                       ro_type_opt, false, false, 0);
-  populate_option_menu (ro_type_opt, type_lbl,
-                        sizeof (type_lbl) / sizeof (gchar *),
-                        (GtkSignalFunc) type_cb, gg);
+  populate_combo_box (ro_type_opt, type_lbl, G_N_ELEMENTS(type_lbl),
+                        G_CALLBACK(type_cb), gg);
 
 /*
  * option menu: y/x/oblique axis
 */
-  ro_axis_opt = gtk_option_menu_new ();
+  ro_axis_opt = gtk_combo_box_new_text ();
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), ro_axis_opt,
     "Choose axis of rotation",   NULL);
   gtk_box_pack_start (GTK_BOX (panel->w),
                       ro_axis_opt, false, false, 0);
-  populate_option_menu (ro_axis_opt, axis_lbl,
-                        sizeof (axis_lbl) / sizeof (gchar *),
-                        (GtkSignalFunc) axis_cb, gg);
+  populate_combo_box (ro_axis_opt, axis_lbl, G_N_ELEMENTS(axis_lbl),
+                        G_CALLBACK(axis_cb), gg);
   gtk_widget_show_all (panel->w);
 }
 
@@ -267,9 +263,9 @@ cpanel_rotation_init (cpaneld *cpanel, ggobid *gg) {
 void
 cpanel_rotation_set (cpaneld *cpanel, ggobid *gg) {
 
-  gtk_option_menu_set_history (GTK_OPTION_MENU (ro_type_opt),
+  gtk_combo_box_set_active (GTK_COMBO_BOX (ro_type_opt),
                                cpanel->ro_type);
-  gtk_option_menu_set_history (GTK_OPTION_MENU (ro_axis_opt),
+  gtk_combo_box_set_active (GTK_COMBO_BOX (ro_axis_opt),
                                cpanel->ro_axis);
 
   GTK_TOGGLE_BUTTON (ro_paused_btn)->active = cpanel->ro_paused_p;

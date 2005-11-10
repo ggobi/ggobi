@@ -5,4 +5,4 @@
 #include "scatmatClass.h"
 
 
-void registerDisplayTypes(GtkTypeLoad *loaders, int n);
+void registerDisplayTypes(GTypeLoad *loaders, int n);

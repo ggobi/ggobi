@@ -45,7 +45,7 @@ static void destroyit (gboolean kill, ggobid * gg)
   } else {
     /*-- the window should have just one child.  Find it and kill it --*/
     GList *gl =
-        gtk_container_children(GTK_CONTAINER(gg->cluster_ui.window));
+        gtk_container_get_children(GTK_CONTAINER(gg->cluster_ui.window));
     GtkWidget *child = (GtkWidget *) gl->data;
     gtk_widget_destroy(child);
   }
@@ -345,7 +345,7 @@ cluster_symbol_cb(GtkWidget * w, GdkEventExpose * event, gpointer cbd)
     }
   }
 
-  gtk_signal_emit_by_name(GTK_OBJECT(w), "expose_event",
+  g_signal_emit_by_name(G_OBJECT(w), "expose_event",
     (gpointer) gg, (gpointer) & rval);
 
   /* clusters_set reorders clusv, so it's bad news here */
@@ -362,21 +362,19 @@ void cluster_add(gint k, datad * d, ggobid * gg)
   gint dawidth = 2 * NGLYPHSIZES + 1 + 10;
 
   d->clusvui[k].da = gtk_drawing_area_new();
-#if GTK_MAJOR_VERSION == 2
   gtk_widget_set_double_buffered(d->clusvui[k].da, false);
-#endif
-  gtk_drawing_area_size(GTK_DRAWING_AREA(d->clusvui[k].da),
+  gtk_widget_set_size_request(GTK_WIDGET(d->clusvui[k].da),
     dawidth, dawidth);
 
   gtk_widget_set_events(d->clusvui[k].da,
     GDK_EXPOSURE_MASK | GDK_ENTER_NOTIFY_MASK
     | GDK_LEAVE_NOTIFY_MASK | GDK_BUTTON_PRESS_MASK);
 
-  gtk_signal_connect(GTK_OBJECT(d->clusvui[k].da), "expose_event",
-    GTK_SIGNAL_FUNC(cluster_symbol_show),
+  g_signal_connect(G_OBJECT(d->clusvui[k].da), "expose_event",
+    G_CALLBACK(cluster_symbol_show),
     GINT_TO_POINTER(k));
-  gtk_signal_connect(GTK_OBJECT(d->clusvui[k].da), "button_press_event",
-    GTK_SIGNAL_FUNC(cluster_symbol_cb),
+  g_signal_connect(G_OBJECT(d->clusvui[k].da), "button_press_event",
+    G_CALLBACK(cluster_symbol_cb),
     GINT_TO_POINTER(k));
   GGobi_widget_set(d->clusvui[k].da, gg, true);
   gtk_table_attach(GTK_TABLE(d->cluster_table), d->clusvui[k].da,
@@ -387,8 +385,8 @@ void cluster_add(gint k, datad * d, ggobid * gg)
   d->clusvui[k].h_btn = gtk_toggle_button_new_with_label("Shadow");
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(d->clusvui[k].h_btn),
     d->clusv[k].hidden_p);
-  gtk_signal_connect(GTK_OBJECT(d->clusvui[k].h_btn), "toggled",
-    GTK_SIGNAL_FUNC(hide_cluster_cb), GINT_TO_POINTER(k));
+  g_signal_connect(G_OBJECT(d->clusvui[k].h_btn), "toggled",
+    G_CALLBACK(hide_cluster_cb), GINT_TO_POINTER(k));
   GGobi_widget_set(d->clusvui[k].h_btn, gg, true);
   gtk_table_attach(GTK_TABLE(d->cluster_table),
     d->clusvui[k].h_btn,
@@ -398,8 +396,8 @@ void cluster_add(gint k, datad * d, ggobid * gg)
   d->clusvui[k].e_btn = gtk_toggle_button_new_with_label("E");
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(d->clusvui[k].e_btn),
     d->clusv[k].excluded_p);
-  gtk_signal_connect(GTK_OBJECT(d->clusvui[k].e_btn), "toggled",
-    GTK_SIGNAL_FUNC(exclude_cluster_cb), GINT_TO_POINTER(k));
+  g_signal_connect(G_OBJECT(d->clusvui[k].e_btn), "toggled",
+    G_CALLBACK(exclude_cluster_cb), GINT_TO_POINTER(k));
   GGobi_widget_set(d->clusvui[k].e_btn, gg, true);
   gtk_table_attach(GTK_TABLE(d->cluster_table),
     d->clusvui[k].e_btn,
@@ -468,7 +466,7 @@ nclusters_changed(ggobid * gg)
     page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(gg->cluster_ui.notebook),
                                      k);
     if (page) {
-      d = (datad *) gtk_object_get_data(GTK_OBJECT(page), "datad");
+      d = (datad *) g_object_get_data(G_OBJECT(page), "datad");
       nrows = GTK_TABLE(d->cluster_table)->nrows;
 
       if (nrows != d->nclusters + 1) {/*-- add one for the titles --*/
@@ -528,8 +526,8 @@ void cluster_window_open(ggobid * gg)
       !GTK_WIDGET_REALIZED(gg->cluster_ui.window))
   {
     gg->cluster_ui.window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    gtk_signal_connect(GTK_OBJECT(gg->cluster_ui.window), "delete_event",
-      GTK_SIGNAL_FUNC(close_wmgr_cb), (gpointer) gg);
+    g_signal_connect(G_OBJECT(gg->cluster_ui.window), "delete_event",
+      G_CALLBACK(close_wmgr_cb), (gpointer) gg);
     gtk_window_set_title(GTK_WINDOW(gg->cluster_ui.window),
       "color & glyph groups");
     new = true;
@@ -562,7 +560,7 @@ void cluster_window_open(ggobid * gg)
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_window),
       GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
 
-    gtk_object_set_data(GTK_OBJECT(scrolled_window), "datad", d);  /*setdata*/
+    g_object_set_data(G_OBJECT(scrolled_window), "datad", d);  /*setdata*/
     gtk_notebook_append_page(GTK_NOTEBOOK(gg->cluster_ui.notebook),
       scrolled_window, gtk_label_new(d->name));
     gtk_widget_show(scrolled_window);
@@ -660,50 +658,50 @@ void cluster_window_open(ggobid * gg)
   /*-- listen for datad_added events on main_window --*/
   /*-- Be careful to add this signal handler only once! --*/
   if (new) {
-    gtk_signal_connect(GTK_OBJECT(gg),
+    g_signal_connect(G_OBJECT(gg),
       "datad_added",
-      GTK_SIGNAL_FUNC(exclusion_notebook_adddata_cb),
+      G_CALLBACK(exclusion_notebook_adddata_cb),
       NULL);
   }
 
   /*-- give the window an initial height --*/
-  gtk_widget_set_usize(GTK_WIDGET(scrolled_window), -1, 150);
+  gtk_widget_set_size_request(GTK_WIDGET(scrolled_window), -1, 150);
 
   /*-- horizontal box to hold a few buttons --*/
   hbox = gtk_hbox_new(false, 2);
   gtk_box_pack_start(GTK_BOX(vbox), hbox, false, false, 0);
 
   /*-- Exclude button --*/
-  btn = gtk_button_new_with_label("Exclude shadows");
+  btn = gtk_button_new_with_mnemonic("E_xclude shadows");
   gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), btn,
     "Exclude all points in shadow, so that they're not drawn and they're ignored when scaling the view.",
     NULL);
-  gtk_signal_connect(GTK_OBJECT(btn), "clicked",
-    GTK_SIGNAL_FUNC(exclude_hiddens_cb), (gpointer) gg);
+  g_signal_connect(G_OBJECT(btn), "clicked",
+    G_CALLBACK(exclude_hiddens_cb), (gpointer) gg);
   gtk_box_pack_start(GTK_BOX(hbox), btn, true, true, 0);
 
   /*-- Include button --*/
-  btn = gtk_button_new_with_label("Include shadows");
+  btn = gtk_button_new_with_mnemonic("_Include shadows");
   gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), btn,
     "Include all previously hidden and excluded points.",
     NULL);
-  gtk_signal_connect(GTK_OBJECT(btn), "clicked",
-    GTK_SIGNAL_FUNC(include_hiddens_cb), (gpointer) gg);
+  g_signal_connect(G_OBJECT(btn), "clicked",
+    G_CALLBACK(include_hiddens_cb), (gpointer) gg);
   gtk_box_pack_start(GTK_BOX(hbox), btn, true, true, 0);
 
   /*-- Update button --*/
-  btn = gtk_button_new_with_label("Update");
+  btn = gtk_button_new_from_stock(GTK_STOCK_REFRESH);
   gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), btn,
     "Reset plots after brushing so that shadow and excluded status is consistent with this table; reset this table if necessary.",
     NULL);
-  gtk_signal_connect(GTK_OBJECT(btn), "clicked",
-    GTK_SIGNAL_FUNC(update_cb), (gpointer) gg);
+  g_signal_connect(G_OBJECT(btn), "clicked",
+    G_CALLBACK(update_cb), (gpointer) gg);
   gtk_box_pack_start(GTK_BOX(hbox), btn, true, true, 0);
 
   /*-- Close button --*/
-  btn = gtk_button_new_with_label("Close");
-  gtk_signal_connect(GTK_OBJECT(btn), "clicked",
-    GTK_SIGNAL_FUNC(close_btn_cb), (gpointer) gg);
+  btn = gtk_button_new_from_stock(GTK_STOCK_CLOSE);
+  g_signal_connect(G_OBJECT(btn), "clicked",
+    G_CALLBACK(close_btn_cb), (gpointer) gg);
   gtk_box_pack_start(GTK_BOX(vbox), btn, false, false, 0);
 
   gtk_widget_show_all(gg->cluster_ui.window);
@@ -711,7 +709,7 @@ void cluster_window_open(ggobid * gg)
   for (l = gg->d; l; l = l->next) {
     d = (datad *) l->data;
     /*-- this doesn't track cluster counts, just cluster identities --*/
-    gtk_signal_emit(GTK_OBJECT(gg), GGobiSignals[CLUSTERS_CHANGED_SIGNAL], d);
+    g_signal_emit(G_OBJECT(gg), GGobiSignals[CLUSTERS_CHANGED_SIGNAL], 0, d);
   }
 
   gdk_window_raise(gg->cluster_ui.window->window);

@@ -25,8 +25,8 @@ addToToolsMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
   inst->gg = gg;
 
   entry = GGobi_addToolsMenuItem ((gchar *)lbl, gg);
-  gtk_signal_connect (GTK_OBJECT(entry), "activate",
-                      GTK_SIGNAL_FUNC (show_glayout_window), inst);
+  g_signal_connect (G_OBJECT(entry), "activate",
+                      G_CALLBACK (show_glayout_window), inst);
   return(true);
 }
 
@@ -48,7 +48,7 @@ show_glayout_window (GtkWidget *widget, PluginInstance *inst)
     inst->data = gl;
 
     create_glayout_window (inst->gg, inst);
-    gtk_object_set_data (GTK_OBJECT (gl->window), "glayoutd", gl);
+    g_object_set_data(G_OBJECT (gl->window), "glayoutd", gl);
 
   } else {
     gl = (glayoutd *) inst->data;
@@ -65,68 +65,43 @@ glayoutFromInst (PluginInstance *inst)
 }
 
 static void
-glayout_datad_set_cb (GtkWidget *cl, gint row, gint column,
-  GdkEventButton *event, PluginInstance *inst)
+glayout_datad_set_cb (GtkTreeSelection *tree_sel, PluginInstance *inst)
 {
-  ggobid *gg = inst->gg;
   glayoutd *gl = glayoutFromInst (inst);
-  gchar *dname;
   datad *d;
-  GSList *l;
-  gchar *clname = gtk_widget_get_name (GTK_WIDGET(cl));
-
-  gtk_clist_get_text (GTK_CLIST (cl), row, 0, &dname);
-  for (l = gg->d; l; l = l->next) {
-    d = l->data;
-    if (strcmp (d->name, dname) == 0) {
-      if (strcmp (clname, "nodeset") == 0) {
-        gl->dsrc = d;
-      } else if (strcmp (clname, "edgeset") == 0) {
-        gl->e = d;
-      }
-      break;
-    }
-  }
+  const gchar *clname = gtk_widget_get_name(GTK_WIDGET(gtk_tree_selection_get_tree_view(tree_sel)));
+  GtkTreeModel *model;
+  GtkTreeIter iter;
+  
+  if (!gtk_tree_selection_get_selected(tree_sel, &model, &iter))
+	  return;
+  gtk_tree_model_get(model, &iter, 1, &d, -1);
+  if (strcmp (clname, "nodeset") == 0)
+	  gl->dsrc = d;
+  else if (strcmp (clname, "edgeset") == 0)
+	  gl->e = d;
   /* Don't free either string; they're just pointers */
 }
 static gint
-glayout_clist_datad_added_cb (ggobid *gg, datad *d, void *clist)
+glayout_tree_view_datad_added_cb (ggobid *gg, datad *d, GtkWidget *tree_view)
 {
-  gchar *row[1];
-  GtkWidget *swin;
-  gchar *clname;
-
-  if (!GTK_IS_OBJECT (clist))
-    g_printerr ("(glayout_clist_datad_added_cb) clist is not an object\n");
-  if (!GTK_IS_WIDGET (clist))
-    g_printerr ("(glayout_clist_datad_added_cb) clist is not a widget\n");
-
-  swin = (GtkWidget *) gtk_object_get_data (GTK_OBJECT (clist), "datad_swin");
-  clname = gtk_widget_get_name (GTK_WIDGET(clist));
-#ifdef GGOBI_DEBUG
-  g_printerr ("clname = %s\n", clname);
-#endif
-
-  /*
-   * This doesn't look right: a new datad can be only one of a
-   * node set and an edge set. ???
-   */
-  if (strcmp (clname, "nodeset") == 0 && d->rowIds) {
-    row[0] = g_strdup (d->name);
-    gtk_clist_append (GTK_CLIST (GTK_OBJECT(clist)), row);
-    g_free (row[0]);
+  GtkWidget *swin = (GtkWidget *)
+    g_object_get_data(G_OBJECT (tree_view), "datad_swin");
+  const gchar *clname = gtk_widget_get_name (GTK_WIDGET(tree_view));
+  GtkTreeIter iter;
+  GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(tree_view));
+  
+  if (strcmp (clname, "nodeset") == 0 && d->rowIds != NULL) 
+  {
+    gtk_list_store_append(GTK_LIST_STORE(model), &iter);
+	gtk_list_store_set(GTK_LIST_STORE(model), &iter, 0, d->name, 1, d, -1);
   }
-  if (strcmp (clname, "edgeset") == 0) {
-    if (d->edge.n > 0) {
-#ifdef GGOBI_DEBUG
-      g_printerr ("... with %d edges\n", d->edge.n);
-#endif
-      row[0] = g_strdup (d->name);
-      gtk_clist_append (GTK_CLIST (GTK_OBJECT(clist)), row);
-      g_free (row[0]);
-    }
+  if (strcmp (clname, "edgeset") == 0 && d->edge.n > 0)
+  {
+    gtk_list_store_append(GTK_LIST_STORE(model), &iter);
+	gtk_list_store_set(GTK_LIST_STORE(model), &iter, 0, d->name, 1, d, -1);
   }
-
+  
   gtk_widget_show_all (swin);
 
   return false;
@@ -139,17 +114,18 @@ create_glayout_window(ggobid *gg, PluginInstance *inst)
 {
   GtkWidget *window, *main_vbox, *notebook, *label, *frame, *vbox, *btn;
   GtkWidget *hb, *entry;
-#if defined HAVE_LIBGVC || defined GRAPHVIZ
+#if defined HAVE_LIBGVC || GRAPHVIZ
   GtkWidget *hscale, *vb, *opt, *apply_btn, *varnotebook;
   GtkObject *adj;
 #endif
   GtkTooltips *tips = gtk_tooltips_new ();
   /*-- for lists of datads --*/
-  gchar *clist_titles[2] = {"node sets", "edge sets"};
+  gchar *tree_view_titles[2] = {"node sets", "edge sets"};
   datad *d;
-  GtkWidget *hbox, *swin, *clist;
-  gchar *row[1];
+  GtkWidget *hbox, *swin, *tree_view;
   GSList *l;
+  GtkListStore *model;
+  GtkTreeIter iter;
   glayoutd *gl = glayoutFromInst (inst);
 
   /*-- I will probably have to get hold of this window, after which
@@ -158,8 +134,8 @@ create_glayout_window(ggobid *gg, PluginInstance *inst)
   gl->window = window;
 
   gtk_window_set_title(GTK_WINDOW(window), "Graph Layout");
-  gtk_signal_connect (GTK_OBJECT (window), "destroy",
-                      GTK_SIGNAL_FUNC (close_glayout_window), inst);
+  g_signal_connect (G_OBJECT (window), "destroy",
+                      G_CALLBACK (close_glayout_window), inst);
 
   main_vbox = gtk_vbox_new (FALSE,1);
   gtk_container_set_border_width (GTK_CONTAINER(main_vbox), 5); 
@@ -184,27 +160,25 @@ create_glayout_window(ggobid *gg, PluginInstance *inst)
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (swin),
     GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
 
-  clist = gtk_clist_new_with_titles (1, &clist_titles[0]);
-  gtk_widget_set_name (GTK_WIDGET(clist), "nodeset");
-  gtk_clist_set_selection_mode (GTK_CLIST (clist),
-    GTK_SELECTION_SINGLE);
-  gtk_object_set_data (GTK_OBJECT (clist), "datad_swin", swin);
-  gtk_signal_connect (GTK_OBJECT (clist), "select_row",
-    (GtkSignalFunc) glayout_datad_set_cb, inst);
-  gtk_signal_connect (GTK_OBJECT (gg), "datad_added",
-    (GtkSignalFunc) glayout_clist_datad_added_cb, GTK_OBJECT (clist));
+  model = gtk_list_store_new(2, G_TYPE_STRING, GGOBI_TYPE_DATA);
+  tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(model));
+  populate_tree_view(tree_view, tree_view_titles, 1, true, GTK_SELECTION_SINGLE,
+		G_CALLBACK(glayout_datad_set_cb), inst);
+  gtk_widget_set_name (GTK_WIDGET(tree_view), "nodeset");
+  g_object_set_data(G_OBJECT (tree_view), "datad_swin", swin);
+  g_signal_connect (G_OBJECT (gg), "datad_added",
+    G_CALLBACK(glayout_tree_view_datad_added_cb), GTK_OBJECT (tree_view));
   /*-- --*/
 
   for (l = gg->d; l; l = l->next) {
     d = (datad *) l->data;
     if (d->rowIds != NULL) {  /*-- node sets --*/
-      row[0] = g_strdup (d->name);
-      gtk_clist_append (GTK_CLIST (clist), row);
-      g_free (row[0]);
+		gtk_list_store_append(model, &iter);
+		gtk_list_store_set(model, &iter, 0, d->name, 1, d, -1);
     }
   }
-  gtk_clist_select_row (GTK_CLIST(clist), 0, 0);
-  gtk_container_add (GTK_CONTAINER (swin), clist);
+  select_tree_view_row(tree_view, 0);
+  gtk_container_add (GTK_CONTAINER (swin), tree_view);
   gtk_box_pack_start (GTK_BOX (hbox), swin, true, true, 2);
 
 /*
@@ -215,27 +189,25 @@ create_glayout_window(ggobid *gg, PluginInstance *inst)
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (swin),
     GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
 
-  clist = gtk_clist_new_with_titles (1, &clist_titles[1]);
-  gtk_widget_set_name (GTK_WIDGET(clist), "edgeset");
-  gtk_clist_set_selection_mode (GTK_CLIST (clist),
-    GTK_SELECTION_SINGLE);
-  gtk_object_set_data (GTK_OBJECT (clist), "datad_swin", swin);
-  gtk_signal_connect (GTK_OBJECT (clist), "select_row",
-    (GtkSignalFunc) glayout_datad_set_cb, inst);
-  gtk_signal_connect (GTK_OBJECT (gg), "datad_added",
-    (GtkSignalFunc) glayout_clist_datad_added_cb, GTK_OBJECT (clist));
+  model = gtk_list_store_new(2, G_TYPE_STRING, GGOBI_TYPE_DATA);
+  tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(model));
+  populate_tree_view(tree_view, tree_view_titles, 1, true, GTK_SELECTION_SINGLE,
+		G_CALLBACK(glayout_datad_set_cb), inst);
+  gtk_widget_set_name (GTK_WIDGET(tree_view), "edgeset");
+  g_object_set_data(G_OBJECT (tree_view), "datad_swin", swin);
+  g_signal_connect (G_OBJECT (gg), "datad_added",
+    G_CALLBACK(glayout_tree_view_datad_added_cb), GTK_OBJECT (tree_view));
   /*-- --*/
 
   for (l = gg->d; l; l = l->next) {
     d = (datad *) l->data;
     if (d->edge.n != 0) {  /*-- edge sets --*/
-      row[0] = g_strdup (d->name);
-      gtk_clist_append (GTK_CLIST (clist), row);
-      g_free (row[0]);
+		gtk_list_store_append(model, &iter);
+		gtk_list_store_set(model, &iter, 0, d->name, 1, d, -1);
     }
   }
-  gtk_clist_select_row (GTK_CLIST(clist), 0, 0);
-  gtk_container_add (GTK_CONTAINER (swin), clist);
+  select_tree_view_row(tree_view, 0);
+  gtk_container_add (GTK_CONTAINER (swin), tree_view);
   gtk_box_pack_start (GTK_BOX (hbox), swin, true, true, 2);
 
   label = gtk_label_new ("Specify datasets");
@@ -258,13 +230,13 @@ create_glayout_window(ggobid *gg, PluginInstance *inst)
   gtk_box_pack_start (GTK_BOX (hb), gtk_label_new ("Center node"),
     false, false, 2);
   entry = gtk_entry_new ();
-  gtk_entry_set_editable (GTK_ENTRY (entry), false);
-  gtk_object_set_data (GTK_OBJECT(window), "CENTERNODE", entry);
+  gtk_editable_set_editable (GTK_EDITABLE (entry), false);
+  g_object_set_data(G_OBJECT(window), "CENTERNODE", entry);
   if (gl->dsrc)
     gtk_entry_set_text (GTK_ENTRY (entry),
       (gchar *) g_array_index (gl->dsrc->rowlab, gchar *, 0));
-  gtk_signal_connect (GTK_OBJECT(gg),
-    "sticky_point_added", radial_center_set_cb, inst);
+  g_signal_connect (G_OBJECT(gg),
+    "sticky_point_added", G_CALLBACK(radial_center_set_cb), inst);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), entry,
     "To reset the center node, use sticky identification in ggobi", 
     NULL);
@@ -272,9 +244,9 @@ create_glayout_window(ggobid *gg, PluginInstance *inst)
 
   /*-- checkbox: automatically update the center node when
     responding to identify events --*/
-  btn = gtk_check_button_new_with_label("Automatically update layout when center node is reset");  
-  gtk_signal_connect (GTK_OBJECT (btn), "toggled",
-    GTK_SIGNAL_FUNC (radial_auto_update_cb), (gpointer) inst);
+  btn = gtk_check_button_new_with_mnemonic("_Automatically update layout when center node is reset");  
+  g_signal_connect (G_OBJECT (btn), "toggled",
+    G_CALLBACK (radial_auto_update_cb), (gpointer) inst);
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(btn),
     gl->radialAutoUpdate);
   gtk_widget_set_name (btn, "RADIAL:autoupdate");
@@ -286,9 +258,9 @@ create_glayout_window(ggobid *gg, PluginInstance *inst)
   /*-- checkbox: create new datad and display: this has to
     be on and insensitive initially.  It should become sensitive
     after the first layout has been generated. --*/
-  btn = gtk_check_button_new_with_label("Create new data and display when updating layout");
-  gtk_signal_connect (GTK_OBJECT (btn), "toggled",
-    GTK_SIGNAL_FUNC (radial_new_data_cb), (gpointer) inst);
+  btn = gtk_check_button_new_with_mnemonic("_Create new data and display when updating layout");
+  g_signal_connect (G_OBJECT (btn), "toggled",
+    G_CALLBACK (radial_new_data_cb), (gpointer) inst);
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(btn),
     gl->radialNewData);
   gtk_widget_set_sensitive (btn, false);
@@ -298,20 +270,20 @@ create_glayout_window(ggobid *gg, PluginInstance *inst)
     NULL);
   gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 2);
 
-  btn = gtk_button_new_with_label ("apply");
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                      GTK_SIGNAL_FUNC (radial_cb), inst);
+  btn = gtk_button_new_from_stock (GTK_STOCK_APPLY);
+  g_signal_connect (G_OBJECT (btn), "clicked",
+                      G_CALLBACK (radial_cb), inst);
   gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 3);
 
   /*-- highlight the edges connected to nodes with sticky labels --*/
 /*
   btn = gtk_button_new_with_label ("highlight edges");
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                      GTK_SIGNAL_FUNC (highlight_edges_cb), inst);
+  g_signal_connect (G_OBJECT (btn), "clicked",
+                      G_CALLBACK (highlight_edges_cb), inst);
   gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 3);
 */
 
-  label = gtk_label_new ("Radial");
+  label = gtk_label_new_with_mnemonic ("_Radial");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
                             frame, label);
   /*-- --*/
@@ -321,7 +293,7 @@ create_glayout_window(ggobid *gg, PluginInstance *inst)
 */
   frame = gtk_frame_new ("Neato layout");
   gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
-#if defined HAVE_LIBGVC || defined GRAPHVIZ
+#if defined HAVE_LIBGVC || GRAPHVIZ
 
   hbox = gtk_hbox_new (false, 5);
   gtk_container_set_border_width (GTK_CONTAINER(hbox), 5); 
@@ -337,32 +309,33 @@ Add an option:  Model either 'circuit resistance' or 'shortest path'
   vb = gtk_vbox_new (false, 0);
   gtk_box_pack_start (GTK_BOX (vbox), vb, false, false, 0);
 
-  label = gtk_label_new ("Model:");
+  label = gtk_label_new_with_mnemonic ("_Model:");
   gtk_misc_set_alignment (GTK_MISC (label), 0, 1);
   gtk_box_pack_start (GTK_BOX (vb), label, false, false, 0);
-  opt = gtk_option_menu_new ();
+  opt = gtk_combo_box_new_text ();
+  gtk_label_set_mnemonic_widget(GTK_LABEL(label), opt);
 /*
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
     "Fix one of the axes during plot cycling or let them both float", NULL);
 */
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
-  populate_option_menu (opt, (gchar**) neato_model_lbl,
-    sizeof (neato_model_lbl) / sizeof (gchar *),
-    (GtkSignalFunc) neato_model_cb, "PluginInst", inst);
+  populate_combo_box (opt, (gchar**) neato_model_lbl, G_N_ELEMENTS(neato_model_lbl),
+    G_CALLBACK(neato_model_cb), inst);
 
   /*-- neato scale --*/
   vb = gtk_vbox_new (false, 0);
   gtk_box_pack_start (GTK_BOX (vbox), vb, false, false, 1);
 
-  label = gtk_label_new ("Dimension:");
+  label = gtk_label_new_with_mnemonic ("_Dimension:");
   gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.0);
   gtk_box_pack_start (GTK_BOX (vb), label, false, false, 3);
 
   adj = gtk_adjustment_new ((gfloat)gl->neato_dim, 2.0, 11.0, 1.0, 1.0, 1.0);
-  gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
-    GTK_SIGNAL_FUNC (neato_dim_cb), inst);
+  g_signal_connect (G_OBJECT (adj), "value_changed",
+    G_CALLBACK (neato_dim_cb), inst);
   hscale = gtk_hscale_new (GTK_ADJUSTMENT (adj));
-  gtk_widget_set_usize (GTK_WIDGET (hscale), 150, 30);
+  gtk_label_set_mnemonic_widget(GTK_LABEL(label), opt);
+  //gtk_widget_set_usize (GTK_WIDGET (hscale), 150, 30);
 
   gtk_range_set_update_policy (GTK_RANGE (hscale), GTK_UPDATE_CONTINUOUS);
   gtk_scale_set_digits (GTK_SCALE(hscale), 0);
@@ -373,10 +346,10 @@ Add an option:  Model either 'circuit resistance' or 'shortest path'
   gtk_box_pack_start (GTK_BOX (vb), hscale, false, false, 3);
   /*-- --*/
 
-  apply_btn = gtk_button_new_with_label ("apply");
+  apply_btn = gtk_button_new_from_stock (GTK_STOCK_APPLY);
   gtk_widget_set_name (apply_btn, "neato");
-  gtk_signal_connect (GTK_OBJECT (apply_btn), "clicked",
-                      GTK_SIGNAL_FUNC (dot_neato_layout_cb), (gpointer) inst);
+  g_signal_connect (G_OBJECT (apply_btn), "clicked",
+                      G_CALLBACK (dot_neato_layout_cb), (gpointer) inst);
   gtk_box_pack_start (GTK_BOX (vbox), apply_btn, false, false, 3);
 
 
@@ -385,24 +358,24 @@ Add an option:  Model either 'circuit resistance' or 'shortest path'
   gtk_container_set_border_width (GTK_CONTAINER(vbox), 5); 
   gtk_box_pack_start (GTK_BOX (hbox), vbox, false, false, 0);
 
-  btn = gtk_check_button_new_with_label ("Use edge length");
+  btn = gtk_check_button_new_with_mnemonic ("Use _edge length");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), btn,
     "Have neato use edge length in determining node positions, and use the selected variable as a source of lengths.  Edge lengths must be >= 1.0.",
     NULL);
-  gtk_signal_connect (GTK_OBJECT (btn), "toggled",
-    GTK_SIGNAL_FUNC (neato_use_edge_length_cb), inst);
+  g_signal_connect (G_OBJECT (btn), "toggled",
+    G_CALLBACK (neato_use_edge_length_cb), inst);
   gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 2);
 
   /*-- include only edge sets.  --*/
   varnotebook = create_variable_notebook (vbox,
     GTK_SELECTION_SINGLE, all_vartypes, edgesets_only,
-    (GtkSignalFunc) NULL, inst->gg);
-  gtk_object_set_data (GTK_OBJECT(apply_btn), "notebook", varnotebook);
+    G_CALLBACK(NULL), inst->gg);
+  g_object_set_data(G_OBJECT(apply_btn), "notebook", varnotebook);
 #else
   gtk_container_add (GTK_CONTAINER(frame), gtk_label_new ("Not enabled"));
 #endif
 
-  label = gtk_label_new ("Neato");
+  label = gtk_label_new_with_mnemonic ("_Neato");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), frame, label);
 
 
@@ -412,21 +385,21 @@ Add an option:  Model either 'circuit resistance' or 'shortest path'
   frame = gtk_frame_new ("Dot layout");
   gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
 
-#if defined HAVE_LIBGVC || defined GRAPHVIZ
+#if defined HAVE_LIBGVC || GRAPHVIZ
   vbox = gtk_vbox_new (false, 5);
   gtk_container_set_border_width (GTK_CONTAINER(vbox), 5); 
   gtk_container_add (GTK_CONTAINER(frame), vbox);
 
-  btn = gtk_button_new_with_label ("apply");
+  btn = gtk_button_new_from_stock (GTK_STOCK_APPLY);
   gtk_widget_set_name (btn, "dot");
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-    GTK_SIGNAL_FUNC (dot_neato_layout_cb), (gpointer) inst);
+  g_signal_connect (G_OBJECT (btn), "clicked",
+    G_CALLBACK (dot_neato_layout_cb), (gpointer) inst);
   gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 3);
 #else
   gtk_container_add (GTK_CONTAINER(frame), gtk_label_new ("Not enabled"));
 #endif
 
-  label = gtk_label_new ("Dot");
+  label = gtk_label_new_with_mnemonic ("_Dot");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), frame, label);
 
 /*
@@ -435,21 +408,21 @@ Add an option:  Model either 'circuit resistance' or 'shortest path'
   frame = gtk_frame_new ("fdp layout");
   gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
 
-#if defined HAVE_LIBGVC || defined GRAPHVIZ
+#if defined HAVE_LIBGVC || GRAPHVIZ
   vbox = gtk_vbox_new (false, 5);
   gtk_container_set_border_width (GTK_CONTAINER(vbox), 5); 
   gtk_container_add (GTK_CONTAINER(frame), vbox);
 
-  btn = gtk_button_new_with_label ("apply");
+  btn = gtk_button_new_from_stock (GTK_STOCK_APPLY);
   gtk_widget_set_name (btn, "fdp");
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-    GTK_SIGNAL_FUNC (dot_neato_layout_cb), (gpointer) inst);
+  g_signal_connect (G_OBJECT (btn), "clicked",
+    G_CALLBACK (dot_neato_layout_cb), (gpointer) inst);
   gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 3);
 #else
   gtk_container_add (GTK_CONTAINER(frame), gtk_label_new ("Not enabled"));
 #endif
 
-  label = gtk_label_new ("FDP");
+  label = gtk_label_new_with_mnemonic ("_FDP");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), frame, label);
 
 /*
@@ -458,21 +431,21 @@ Add an option:  Model either 'circuit resistance' or 'shortest path'
   frame = gtk_frame_new ("twopi layout");
   gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
 
-#if defined HAVE_LIBGVC || defined GRAPHVIZ
+#if defined HAVE_LIBGVC || GRAPHVIZ
   vbox = gtk_vbox_new (false, 5);
   gtk_container_set_border_width (GTK_CONTAINER(vbox), 5); 
   gtk_container_add (GTK_CONTAINER(frame), vbox);
 
-  btn = gtk_button_new_with_label ("apply");
+  btn = gtk_button_new_from_stock (GTK_STOCK_APPLY);
   gtk_widget_set_name (btn, "twopi");
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-    GTK_SIGNAL_FUNC (dot_neato_layout_cb), (gpointer) inst);
+  g_signal_connect (G_OBJECT (btn), "clicked",
+    G_CALLBACK (dot_neato_layout_cb), (gpointer) inst);
   gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 3);
 #else
   gtk_container_add (GTK_CONTAINER(frame), gtk_label_new ("Not enabled"));
 #endif
 
-  label = gtk_label_new ("Twopi");
+  label = gtk_label_new_with_mnemonic ("_Twopi");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), frame, label);
 
 /*
@@ -481,21 +454,21 @@ Add an option:  Model either 'circuit resistance' or 'shortest path'
   frame = gtk_frame_new ("circo layout");
   gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
 
-#if defined HAVE_LIBGVC || defined GRAPHVIZ
+#if defined HAVE_LIBGVC || GRAPHVIZ
   vbox = gtk_vbox_new (false, 5);
   gtk_container_set_border_width (GTK_CONTAINER(vbox), 5); 
   gtk_container_add (GTK_CONTAINER(frame), vbox);
 
-  btn = gtk_button_new_with_label ("apply");
+  btn = gtk_button_new_from_stock (GTK_STOCK_APPLY);
   gtk_widget_set_name (btn, "circo");
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-    GTK_SIGNAL_FUNC (dot_neato_layout_cb), (gpointer) inst);
+  g_signal_connect (G_OBJECT (btn), "clicked",
+    G_CALLBACK (dot_neato_layout_cb), (gpointer) inst);
   gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 3);
 #else
   gtk_container_add (GTK_CONTAINER(frame), gtk_label_new ("Not enabled"));
 #endif
 
-  label = gtk_label_new ("Circo");
+  label = gtk_label_new_with_mnemonic ("_Circo");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), frame, label);
 
   gtk_widget_show_all (window);
@@ -507,8 +480,8 @@ Add an option:  Model either 'circuit resistance' or 'shortest path'
 void close_glayout_window(GtkWidget *w, PluginInstance *inst)
 {
   /*
-  gtk_signal_connect (GTK_OBJECT (gg), "datad_added",
-    (GtkSignalFunc) glayout_clist_datad_added_cb, GTK_OBJECT (clist));
+  g_signal_connect (G_OBJECT (gg), "datad_added",
+    G_CALLBACK(glayout_clist_datad_added_cb), GTK_OBJECT (clist));
   */
   if (inst->data) {
     glayoutd *gl = glayoutFromInst (inst);
@@ -523,8 +496,8 @@ void closeWindow(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
   if (inst->data) {
     glayoutd *gl = glayoutFromInst (inst);
     /* I don't remember what this code is for -- dfs
-    gtk_signal_disconnect_by_func(GTK_OBJECT(inst->data),
-      GTK_SIGNAL_FUNC (close_glayout_window), inst);
+    g_signal_handlers_disconnect_by_func(G_OBJECT(inst->data),
+      G_CALLBACK (close_glayout_window), inst);
     */
     gtk_widget_destroy (gl->window);
   }

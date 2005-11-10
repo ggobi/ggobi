@@ -27,10 +27,12 @@ jitter_vars_init (datad *d, ggobid *gg) {
 static void
 jitter_cb (GtkButton *w, ggobid *gg)
 {
-  GtkWidget *clist = get_clist_from_object (GTK_OBJECT(gg->jitter_ui.window));
-  datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
-  gint *vars = (gint *) g_malloc (d->ncols * sizeof(gint));
-  gint nvars = get_selections_from_clist (d->ncols, vars, clist, d);
+  GtkWidget *tree_view = get_tree_view_from_object (G_OBJECT(gg->jitter_ui.window));
+  datad *d = (datad *) g_object_get_data(G_OBJECT (tree_view), "datad");
+  gint *vars;// = (gint *) g_malloc (d->ncols * sizeof(gint));
+  gint nvars;
+  
+  vars = get_selections_from_tree_view (tree_view, &nvars);
 
   if (nvars) {
     rejitter (vars, nvars, d, gg);
@@ -43,10 +45,12 @@ jitter_cb (GtkButton *w, ggobid *gg)
 */
 static void
 degree_cb (GtkAdjustment *adj, ggobid *gg) {
-  GtkWidget *clist = get_clist_from_object (GTK_OBJECT(gg->jitter_ui.window));
-  datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
-  gint *vars = (gint *) g_malloc (d->ncols * sizeof(gint));
-  gint nvars = get_selections_from_clist (d->ncols, vars, clist, d);
+  GtkWidget *tree_view = get_tree_view_from_object (G_OBJECT(gg->jitter_ui.window));
+  datad *d = (datad *) g_object_get_data(G_OBJECT (tree_view), "datad");
+  gint *vars;// = (gint *) g_malloc (d->ncols * sizeof(gint));
+  gint nvars;
+  
+  vars = get_selections_from_tree_view (tree_view, &nvars);
 
   jitter_value_set (adj->value, d, gg);
   if (nvars) {
@@ -67,14 +71,15 @@ close_wmgr_cb (GtkWidget *w, GdkEvent *event, ggobid *gg) {
 
 static gchar *type_lbl[] = {"Uniform", "Normal"};
 
-static void type_cb (GtkWidget *w, gpointer cbd)
+static void type_cb (GtkWidget *w, ggobid *gg)
 {
-  gint indx = GPOINTER_TO_INT (cbd);
-  ggobid *gg = GGobiFromWidget(w, true);
-  GtkWidget *clist = get_clist_from_object (GTK_OBJECT(gg->jitter_ui.window));
-  datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
-  gint *vars = (gint *) g_malloc (d->ncols * sizeof(gint));
-  gint nvars = get_selections_from_clist (d->ncols, vars, clist, d);
+  gint indx = gtk_combo_box_get_active(GTK_COMBO_BOX(w));
+  GtkWidget *tree_view = get_tree_view_from_object (G_OBJECT(gg->jitter_ui.window));
+  datad *d = (datad *) g_object_get_data(G_OBJECT (tree_view), "datad");
+  gint *vars;// = (gint *) g_malloc (d->ncols * sizeof(gint));
+  gint nvars;
+  
+  vars = get_selections_from_tree_view (tree_view, &nvars);
 
   d->jitter.type = indx;
 
@@ -109,8 +114,8 @@ jitter_window_open (ggobid *gg) {
       gtk_window_set_default_size(GTK_WINDOW(gg->jitter_ui.window), 200, 250);
       /*--                           --*/
 
-      gtk_signal_connect (GTK_OBJECT (gg->jitter_ui.window), "delete_event",
-                          GTK_SIGNAL_FUNC (close_wmgr_cb), (gpointer) gg);
+      g_signal_connect (G_OBJECT (gg->jitter_ui.window), "delete_event",
+                          G_CALLBACK (close_wmgr_cb), (gpointer) gg);
       gtk_window_set_title (GTK_WINDOW (gg->jitter_ui.window), "jitter data");
     
       gtk_container_set_border_width (GTK_CONTAINER (gg->jitter_ui.window), 10);
@@ -120,29 +125,28 @@ jitter_window_open (ggobid *gg) {
 
       /* Create a notebook, set the position of the tabs */
       notebook = create_variable_notebook (vbox,
-        GTK_SELECTION_EXTENDED, all_vartypes, all_datatypes,
-        (GtkSignalFunc) NULL, gg);
+        GTK_SELECTION_MULTIPLE, all_vartypes, all_datatypes,
+        G_CALLBACK(NULL), gg);
 
       /*-- option menu --*/
-      opt = gtk_option_menu_new ();
+      opt = gtk_combo_box_new_text ();
       gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
         "The jittering is either distributed uniform or normal", NULL);
       gtk_box_pack_start (GTK_BOX (vbox), opt, false, false, 0);
-      populate_option_menu (opt, type_lbl,
-        sizeof (type_lbl) / sizeof (gchar *),
-        (GtkSignalFunc) type_cb, "GGobi", gg);
+      populate_combo_box (opt, type_lbl, G_N_ELEMENTS(type_lbl),
+        G_CALLBACK(type_cb), gg);
 
       /*-- vbox for label and rangewidget --*/
       vb = gtk_vbox_new (true, 2);
       gtk_box_pack_start (GTK_BOX (vbox), vb, false, false, 1);
 
-      lbl = gtk_label_new ("Degree of jitter:");
+      lbl = gtk_label_new_with_mnemonic ("_Degree of jitter:");
       gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
       gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
 
       adj = gtk_adjustment_new (0.0, 0.0, 0.7, 0.01, .01, 0.0);
-      gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
-                          GTK_SIGNAL_FUNC (degree_cb), (gpointer) gg);
+      g_signal_connect (G_OBJECT (adj), "value_changed",
+                          G_CALLBACK (degree_cb), (gpointer) gg);
 
       sbar = gtk_hscale_new (GTK_ADJUSTMENT (adj));
       gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
@@ -153,12 +157,14 @@ jitter_window_open (ggobid *gg) {
       gtk_scale_set_value_pos (GTK_SCALE (sbar), GTK_POS_BOTTOM);
       gtk_box_pack_start (GTK_BOX (vb), sbar, false, false, 0);
 
+	  gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), sbar);
+	  
       /*-- Rejitter button --*/
-      btn = gtk_button_new_with_label ("Jitter");
+      btn = gtk_button_new_with_mnemonic ("_Jitter");
       gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
         "Rejitter the data", NULL);
-      gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                         GTK_SIGNAL_FUNC (jitter_cb), (gpointer) gg);
+      g_signal_connect (G_OBJECT (btn), "clicked",
+                         G_CALLBACK (jitter_cb), (gpointer) gg);
       gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 3);
 
       /*-- Close button --*/
@@ -166,13 +172,13 @@ jitter_window_open (ggobid *gg) {
       hb = gtk_hbox_new (false, 2);
       gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 1);
 
-      btn = gtk_button_new_with_label ("Close");
-      gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                          GTK_SIGNAL_FUNC (close_btn_cb), gg);
+      btn = gtk_button_new_from_stock(GTK_STOCK_CLOSE);
+      g_signal_connect (G_OBJECT (btn), "clicked",
+                          G_CALLBACK (close_btn_cb), gg);
       gtk_box_pack_start (GTK_BOX (hb), btn, true, false, 0);
     }
 
-    gtk_object_set_data (GTK_OBJECT (gg->jitter_ui.window),
+    g_object_set_data(G_OBJECT (gg->jitter_ui.window),
       "notebook", notebook);
     gtk_widget_show_all (gg->jitter_ui.window);
   }

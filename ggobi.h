@@ -104,13 +104,13 @@ typedef struct _PrintOptions PrintOptions;
 
 
 
-GtkType gtk_ggobi_get_type(void);
+GType ggobi_ggobi_get_type(void);
 
-#define   GTK_TYPE_GGOBI gtk_ggobi_get_type()
+#define   GGOBI_TYPE_GGOBI ggobi_ggobi_get_type()
 
-typedef struct _GtkGGobiClass {
-  GtkObjectClass parent_class;
-} GtkGGobiClass;
+typedef struct _GGobiGGobiClass {
+  GObjectClass parent_class;
+} GGobiGGobiClass;
 
 
 /**
@@ -120,7 +120,7 @@ typedef struct _GtkGGobiClass {
  */
 struct _ggobid {
 
-  GtkObject object;
+  GObject object;
 
     /** 
        A tree 
@@ -142,13 +142,14 @@ struct _ggobid {
   GList *control_panels;
 
   GtkWidget *main_window, *main_menubar;
-  GtkItemFactory *main_menu_factory;
-  GtkWidget *display_menu_item, *display_menu; /*-- menu labelled 'Window' --*/
+  GtkUIManager *main_menu_manager;
+  GtkWidget *display_menu; /*-- menu labelled 'Window' --*/
   GtkAccelGroup *main_accel_group, *pmode_accel_group, *imode_accel_group;
   GtkWidget *pmode_item, *imode_item;
   GtkWidget *imode_frame;  /* this should be cpanel_frame, actually */
   GtkTooltips *tips;
   gboolean firsttime;
+  guint mode_merge_id;
 
   /* status bar in main console window */
   void (*status_message_func) (gchar *, ggobid *);
@@ -342,7 +343,7 @@ struct _ggobid {
     GtkObject *npcs_adj;
     GtkWidget *stdized_entry, *variance_entry, *condnum_entry;
     GtkWidget *apply_btn, *restore_btn;
-    GtkWidget *clist;
+    GtkWidget *tree_view;
 
    /*-- a pointer to be compared with current_display->d --*/
     datad *d;
@@ -597,7 +598,7 @@ void gtk_marshal_NONE__INT_POINTER_POINTER_POINTER(GtkObject * object,
 
 
 extern GSList *ExtendedDisplayTypes;
-typedef GtkType(*GtkTypeLoad) (void);
+typedef GType(*GTypeLoad) (void);
 
 void ggobi_sleep(guint interval);
 
@@ -607,7 +608,7 @@ void setMissingValue(int i, int j, datad *d, vartabled *vt);
 
 GList *getInputPluginSelections(ggobid *gg);
 
-extern const gchar DefaultUnknownInputModeName[];
+extern const gchar *DefaultUnknownInputModeName;
 	
 
 InputDescription *
@@ -619,15 +620,8 @@ fileset_generate(const gchar * fileName,
 
 #include "GGobiEvents.h"
 
-
-#ifndef GTK_2_0
-#define GTK_OBJECT_GET_CLASS(obj)  (GTK_OBJECT(obj))->klass
-#endif
-
 #include "GGobiApp.h"
-GtkGGobiApp *getGGobiApp();
-
-
+GGobiApp *getGGobiApp();
 
 #ifdef __cplusplus
 } /* end of extern "C" */

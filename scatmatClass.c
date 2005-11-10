@@ -242,15 +242,15 @@ scatmatKeyEventHandled(GtkWidget *w, displayd *display, splotd * sp, GdkEventKey
 static void
 displaySet(displayd *display, ggobid *gg)
 {
-  GtkWidget *imode_menu;
+/*  GtkWidget *imode_menu;
 
   imode_menu = scatmat_imode_menu_make (gg->imode_accel_group,
-    (GtkSignalFunc) imode_set_cb, gg, true);
+    G_CALLBACK(imode_set_cb), gg, true);
   gg->imode_item = submenu_make ("_Interaction", 'I',
     gg->main_accel_group);
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->imode_item),
     imode_menu); 
-  submenu_insert (gg->imode_item, gg->main_menubar, 2);
+  submenu_insert (gg->imode_item, gg->main_menubar, 2);*/
 }
 
 static gboolean
@@ -263,9 +263,9 @@ handlesInteraction(displayd *display, InteractionMode v)
 static GtkWidget *
 scatmatCPanelWidget(displayd *dpy, gchar **modeName, ggobid *gg)
 {
-  GtkWidget *w = GTK_GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget;
+  GtkWidget *w = GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget;
   if(!w) {
-   GTK_GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget = w = cpanel_scatmat_make(gg);
+   GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget = w = cpanel_scatmat_make(gg);
   }
   *modeName = "Scatterplot Matrix";
   return(w);
@@ -347,7 +347,7 @@ splotScreenToTform(cpaneld *cpanel, splotd *sp, icoords *scr,
 }
 
 void
-scatmatDisplayClassInit(GtkGGobiScatmatDisplayClass *klass)
+scatmatDisplayClassInit(GGobiScatmatDisplayClass *klass)
 {
 	klass->parent_class.show_edges_p = true;
 	klass->parent_class.treeLabel = klass->parent_class.titleLabel = "Scatterplot Matrix";
@@ -368,6 +368,7 @@ scatmatDisplayClassInit(GtkGGobiScatmatDisplayClass *klass)
 	klass->parent_class.plotted_vars_get = plottedVarsGet;
 	klass->parent_class.createWithVars = createWithVars;
 	klass->parent_class.display_set = displaySet;
+	klass->parent_class.mode_ui_get = scatmat_mode_ui_get;
 	klass->parent_class.handles_interaction = handlesInteraction;
 
   klass->parent_class.event_handlers_toggle = scatmatEventHandlersToggle;
@@ -462,7 +463,7 @@ splotVariablesGet(splotd *sp, gint *cols, datad *d)
 
 
 void
-scatmatSPlotClassInit(GtkGGobiScatmatSPlotClass *klass) 
+scatmatSPlotClassInit(GGobiScatmatSPlotClass *klass) 
 {
   klass->parent_class.tree_label = treeLabel;
 

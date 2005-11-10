@@ -1,3 +1,5 @@
+#define _ISOC99_SOURCE /* for NAN */
+
 #include <gtk/gtk.h>
 #include "ggobi.h"
 #include "externs.h"
@@ -7,10 +9,9 @@
 
 #include "plugin.h"
 
-#include <gtkextra/gtksheet.h>
-
 #include <stdlib.h>
 #include <strings.h>
+
 #include "errno.h"
 
 #include "parcoordsClass.h"
@@ -20,26 +21,27 @@
 void       add_ggobi_sheets(ggobid *gg, GtkWidget *notebook);
 void       close_worksheet_window(GtkWidget *w, PluginInstance *inst);
 GtkWidget* create_ggobi_sheet(datad *data, ggobid *gg);
-void       add_ggobi_data(datad *data, GtkWidget *sheet);
+void       add_ggobi_data(datad *data, GtkTreeModel *model);
 GtkWidget *create_ggobi_worksheet_window(ggobid *gg, PluginInstance *inst);
 
 void       show_data_edit_window(PluginInstance *inst, GtkWidget *widget);
 
 GtkWidget* create_ggobi_sheet(datad *data, ggobid *gg);
 void update_cell(gint row, gint column, double value, datad *data);
-void cell_changed(GtkSheet *sheet, gint row, gint column, datad *data);
+void cell_changed(GtkCellRendererText *renderer, gchar *path_str, gchar *text, GtkTreeModel *model);
 
-void brush_change(ggobid *gg, splotd *sp, GdkEventMotion *ev, datad *d, GtkSheet *sheet);
-void move_point_value(GtkWidget *w, splotd *sp, GGobiPointMoveEvent *ev, ggobid *gg, GtkSheet *sheet);
-void monitor_new_plot(GtkWidget *w, splotd *sp, ggobid *gg, GtkSheet *sheet);
-void identify_cell(ggobid *gg, splotd *sp, gint id, datad *d, GtkSheet *sheet);
-void color_row(GtkSheet *sheet, gint row, gint ncols, GdkColor *col);
+void brush_change(ggobid *gg, splotd *sp, GdkEventMotion *ev, datad *d, GtkWidget *sheet);
+void move_point_value(GtkWidget *w, splotd *sp, GGobiPointMoveEvent *ev, ggobid *gg, GtkWidget *sheet);
+void monitor_new_plot(GtkWidget *w, splotd *sp, ggobid *gg, GtkWidget *sheet);
+void identify_cell(ggobid *gg, splotd *sp, gint id, datad *d, GtkWidget *sheet);
+void color_row(GtkWidget *sheet, gint row, gint ncols, GdkColor *col);
 
-void connect_to_existing_displays(ggobid *gg, GtkSheet *sheet);
+void connect_to_existing_displays(ggobid *gg, GtkWidget *sheet);
 
 static GdkColor red = {-1, 65535, 0, 0};
 static GdkColor black;
 
+#if 0
 /* dfs, working on adding a search facility */
 static void
 row_find_by_label (GtkWidget *w, GtkWidget *notebook)
@@ -100,7 +102,7 @@ open_find_dialog (GtkWidget *window)
   GtkWidget *dialog, *hb, *entry;
   GtkWidget *okay_btn, *cancel_btn;
   GtkWidget *notebook = (GtkWidget *)
-    gtk_object_get_data (GTK_OBJECT (window), "notebook");
+    g_object_get_data(G_OBJECT (window), "notebook");
 
   dialog = gtk_dialog_new ();
   gtk_window_set_title (GTK_WINDOW (dialog), "Find row by label");
@@ -119,15 +121,15 @@ open_find_dialog (GtkWidget *window)
 
   /*-- ok button --*/
   okay_btn = gtk_button_new_with_label ("Okay");
-  gtk_signal_connect (GTK_OBJECT (okay_btn), "clicked",
-    GTK_SIGNAL_FUNC (row_find_by_label), notebook);
+  g_signal_connect (G_OBJECT (okay_btn), "clicked",
+    G_CALLBACK (row_find_by_label), notebook);
   gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->action_area),
     okay_btn);
 
   /*-- cancel button --*/
   cancel_btn = gtk_button_new_with_label ("Close");
-  gtk_signal_connect (GTK_OBJECT (cancel_btn), "clicked",
-    GTK_SIGNAL_FUNC (dialog_close), NULL);
+  g_signal_connect (G_OBJECT (cancel_btn), "clicked",
+    G_CALLBACK (dialog_close), NULL);
   gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->action_area),
     cancel_btn);
 
@@ -141,7 +143,7 @@ static GtkItemFactoryEntry menubar_items[] = {
        0 },
 };
 /* */
-
+#endif
 /**
  Called when the plugin instance is created for a new ggobi instance.
  This adds an entry to the Tools menu that the user can select to 
@@ -163,11 +165,22 @@ addToMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
   gdk_color_black(gdk_colormap_get_system(), &black);
 
   entry = GGobi_addToolsMenuItem ("Data grid ...", gg);
-  gtk_signal_connect_object (GTK_OBJECT(entry), "activate",
-                             GTK_SIGNAL_FUNC (show_data_edit_window),
-                             (gpointer) inst);
+  g_signal_connect_object (G_OBJECT(entry), "activate",
+                             G_CALLBACK (show_data_edit_window),
+                             (gpointer) inst, 0);
 
-#ifdef USE_FACTORY
+  static const gchar *ui = 
+  "	<ui>"
+  "		<menubar>"
+  "			<menu action='Data'>"
+  "				<menuitem action='DataView'/>"
+  "			</menu>"
+  "		</menubar>"
+  "	</ui>";
+  
+  gtk_ui_manager_add_ui_from_string(gg->main_menu_manager, ui, -1, NULL);
+  
+#if 0
     /* This is an attempt to use the more automated menu creation mechanism.
        However, it is not behaving itself quite yet, so we use the
        manual mechanism which is more verbose but more controllable. */
@@ -178,7 +191,6 @@ static GtkItemFactoryEntry menu_items[] = {
 
   gtk_item_factory_create_items(gg->main_menu_factory, sizeof(menu_items)/sizeof(menu_items[0]), menu_items, (gpointer) gg);
 #endif
-
   return(true);
 }
 
@@ -213,15 +225,14 @@ GtkWidget *
 create_ggobi_worksheet_window(ggobid *gg, PluginInstance *inst)
 {
   GtkWidget *window, *main_vbox, *notebook;
-  GtkWidget *menubar;
 
   window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
   gtk_window_set_title(GTK_WINDOW(window), "ggobi data viewer");
-  gtk_widget_set_usize(GTK_WIDGET(window), 600, 400);
+  gtk_window_set_default_size(GTK_WINDOW(window), 600, 400);
 
-  gtk_signal_connect (GTK_OBJECT (window), "destroy",
-                      GTK_SIGNAL_FUNC (close_worksheet_window), inst);
+  g_signal_connect (G_OBJECT (window), "destroy",
+                      G_CALLBACK (close_worksheet_window), inst);
 
 
   main_vbox=gtk_vbox_new(FALSE,1);
@@ -229,11 +240,13 @@ create_ggobi_worksheet_window(ggobid *gg, PluginInstance *inst)
   gtk_container_add(GTK_CONTAINER(window), main_vbox);
 
 /* */
+/*
   get_main_menu (menubar_items,
     sizeof (menubar_items) / sizeof (menubar_items[0]),
     gtk_accel_group_new(), window,
     &menubar, (gpointer) window);
   gtk_box_pack_start (GTK_BOX (main_vbox), menubar, false, false, 0);
+  */
 /* */
 
   notebook=gtk_notebook_new();
@@ -243,7 +256,7 @@ create_ggobi_worksheet_window(ggobid *gg, PluginInstance *inst)
 
   add_ggobi_sheets(gg, notebook);
 
-  gtk_object_set_data (GTK_OBJECT (window), "notebook", notebook);
+  g_object_set_data(G_OBJECT (window), "notebook", notebook);
   gtk_widget_show_all(window);
 
   return(window);
@@ -277,14 +290,14 @@ add_ggobi_sheets(ggobid *gg, GtkWidget *notebook)
 
 
 void
-select_row_cb (GtkSheet *sheet, gint row, datad *d)
+select_row_cb (GtkTreeSelection *tree_sel, datad *d)
 {
   ggobid *gg = (ggobid *) d->gg;
-
+  
   if (imode_get(gg) != IDENT)
-    viewmode_set (NULL_PMODE, IDENT, gg);
-
-  d->nearest_point = row;
+    GGOBI(full_viewmode_set)(NULL_PMODE, IDENT, gg);
+  
+  d->nearest_point = tree_selection_get_selected_row(tree_sel);
   /*-- the label could be made sticky -- double click? keystroke? --*/
   /*sticky_id_toggle (d, gg);*/
 
@@ -301,25 +314,78 @@ GtkWidget*
 create_ggobi_sheet(datad *data, ggobid *gg)
 {
   GtkWidget *sheet, *scrolled_window;
-
-  sheet = gtk_sheet_new(data->nrows, data->ncols, data->name);  
+  GtkListStore *model;
+  GtkTreeModel *sorted_model;
+  GtkTreeSelection *sel;
+  GType *col_types = g_new(GType, data->ncols + 2);
+  gchar **col_labels = g_new(gchar *, data->ncols + 1);
+  gint i;
+  
+  // first column is for the row label
+  col_types[0] = G_TYPE_STRING;
+  col_labels[0] = "Row Label";
+  col_types[data->ncols+1] = GDK_TYPE_COLOR; // last column for color (hidden)
+  for(i = 0; i < data->ncols; i++) {
+	  vartabled *vt = (vartabled*) g_slist_nth_data (data->vartable, i);
+	  if (vt->vartype == integer || vt->vartype == counter)
+		  col_types[i+1] = G_TYPE_INT;
+	  else if (vt->vartype == categorical)
+		  col_types[i+1] = G_TYPE_STRING;
+	  else col_types[i+1] = G_TYPE_DOUBLE;
+	  col_labels[i+1] = vt->collab;
+  }
+  
+  model = gtk_list_store_newv(data->ncols+2, col_types);
+  g_object_set_data(G_OBJECT(model), "data", data);
+  sorted_model = gtk_tree_model_sort_new_with_model(GTK_TREE_MODEL(model));
+  g_free(col_types);
+  sheet = gtk_tree_view_new_with_model(sorted_model);
+  // making editable cells is not that convenient
+  for(i = 0; i < data->ncols+1; i++) { // note: row label not editable
+	  GtkCellRenderer *renderer;
+	  GtkTreeViewColumn *col;
+	  GType type = gtk_tree_model_get_column_type(GTK_TREE_MODEL(model), i);
+	  if (i > 0 && type == G_TYPE_STRING) {// categorical (combo editing)
+		  GtkListStore *level_model = gtk_list_store_new(1, G_TYPE_STRING);
+		  GtkTreeIter iter;
+		  vartabled *vt = g_slist_nth_data(data->vartable, i-1);
+		  gint k;
+		  for (k = 0; k < vt->nlevels; k++) {
+			  gtk_list_store_append(level_model, &iter);
+			  gtk_list_store_set(level_model, &iter, 0, vt->level_names[k], -1);
+		  }
+		  renderer = gtk_cell_renderer_combo_new();
+		  g_object_set(G_OBJECT(renderer), "model", level_model, 
+		  	"text-column", 0, NULL);
+	  } else renderer = gtk_cell_renderer_text_new();
+	  if (i > 0) {
+		  g_object_set(G_OBJECT(renderer), "mode", GTK_CELL_RENDERER_MODE_EDITABLE, NULL);
+		  g_object_set_data(G_OBJECT(renderer), "column", GINT_TO_POINTER(i-1));
+		  g_signal_connect(G_OBJECT(renderer), "edited", G_CALLBACK(cell_changed), model);
+	  }
+	  col = gtk_tree_view_column_new_with_attributes(col_labels[i], renderer, 
+	  			"text", i, "cell-foreground-gdk", data->ncols+1, NULL);
+	  gtk_tree_view_column_set_sort_column_id(col, i);
+	  gtk_tree_view_column_set_resizable(col, true);
+	  gtk_tree_view_insert_column(GTK_TREE_VIEW(sheet), col, -1);
+  }
+  g_free(col_labels);
+  gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(sheet), true);
+  gtk_tree_view_set_headers_clickable(GTK_TREE_VIEW(sheet), true);
+  sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(sheet));
+  g_signal_connect(G_OBJECT(sel), "changed", G_CALLBACK(select_row_cb), data);
+  
   scrolled_window = gtk_scrolled_window_new(NULL, NULL);
-
   gtk_container_add(GTK_CONTAINER(scrolled_window), sheet);
 
-  gtk_widget_show(sheet);
+  add_ggobi_data(data, GTK_TREE_MODEL(model));
 
-  add_ggobi_data(data, sheet);
+  gtk_widget_show_all(scrolled_window);
 
-  gtk_widget_show(scrolled_window);
+  g_signal_connect_object(G_OBJECT(gg), "splot_new",
+    G_CALLBACK(monitor_new_plot), G_OBJECT(sheet), 0);
 
-  gtk_signal_connect(GTK_OBJECT(sheet), "changed", cell_changed, data);
-  gtk_signal_connect_while_alive (GTK_OBJECT(gg), "splot_new",
-    monitor_new_plot, sheet, GTK_OBJECT (sheet));
-
-  gtk_signal_connect (GTK_OBJECT(sheet), "select_row", select_row_cb, data);
-
-  connect_to_existing_displays(gg, GTK_SHEET(sheet));
+  connect_to_existing_displays(gg, sheet);
 
   return(scrolled_window);
 }
@@ -333,16 +399,16 @@ CHECK_EVENT_SIGNATURE(identify_cell, identify_point_f)
   Register signal handlers for GGobi events on the particular splot.
  */
 void
-connect_to_splot(splotd *sp, GtkSheet *sheet)
+connect_to_splot(splotd *sp, GtkWidget *sheet)
 {
   ggobid *gg = sp->displayptr->ggobi;
 
-  gtk_signal_connect_while_alive (GTK_OBJECT(gg), "identify_point",
-    identify_cell, sheet, GTK_OBJECT(sheet));
-  gtk_signal_connect_while_alive (GTK_OBJECT(gg), "move_point",
-    move_point_value, sheet, GTK_OBJECT(sheet));
-  gtk_signal_connect_while_alive (GTK_OBJECT(gg), "brush_motion",
-    brush_change, sheet, GTK_OBJECT(sheet));
+  g_signal_connect_object (G_OBJECT(gg), "identify_point",
+    G_CALLBACK(identify_cell), G_OBJECT(sheet), 0);
+  g_signal_connect_object (G_OBJECT(gg), "move_point",
+    G_CALLBACK(move_point_value), G_OBJECT(sheet), 0);
+  g_signal_connect_object (G_OBJECT(gg), "brush_motion",
+    G_CALLBACK(brush_change), G_OBJECT(sheet), 0);
 }
 
 
@@ -352,7 +418,7 @@ connect_to_splot(splotd *sp, GtkSheet *sheet)
   display being the same as the data in the sheet!
  */
 void
-connect_to_display(displayd *dpy, GtkSheet *sheet)
+connect_to_display(displayd *dpy, GtkWidget *sheet)
 {
     GList *el;
     splotd *sp;
@@ -372,7 +438,7 @@ connect_to_display(displayd *dpy, GtkSheet *sheet)
   handlers for the different GGobi events.
  */
 void
-connect_to_existing_displays(ggobid *gg, GtkSheet *sheet)
+connect_to_existing_displays(ggobid *gg, GtkWidget *sheet)
 {
     GList *el;
     displayd *dpy;
@@ -390,7 +456,7 @@ connect_to_existing_displays(ggobid *gg, GtkSheet *sheet)
   for those.
  */ 
 void
-monitor_new_plot(GtkWidget *w, splotd *sp, ggobid *gg, GtkSheet *sheet)
+monitor_new_plot(GtkWidget *w, splotd *sp, ggobid *gg, GtkWidget *sheet)
 {
     connect_to_splot(sp, sheet);
 }
@@ -400,55 +466,30 @@ monitor_new_plot(GtkWidget *w, splotd *sp, ggobid *gg, GtkSheet *sheet)
   given data set (data).
  */
 void 
-add_ggobi_data(datad *data, GtkWidget *w)
+add_ggobi_data(datad *data, GtkTreeModel *model)
 {
   gint i, j, k, level;
   gboolean level_ok;
-  GtkSheet *sheet;
   const gfloat **raw;
   vartabled *vt;
   /*-- for working out the width of the longest row label --*/
   gchar *str;
-  GtkStyle *style = gtk_widget_get_style (w);
-  gint lbearing, rbearing, width, ascent, descent;
-  gint maxwidth = 0;
-
-  sheet = GTK_SHEET(w);
-  for(i = 0; i < data->ncols; i++) {
-    char *name;
-    vt = (vartabled*) g_slist_nth_data (data->vartable, i);
-    name = vt->collab;
-    gtk_sheet_column_button_add_label(sheet, i, name);
-    gtk_sheet_set_column_title(sheet, i, name);
-  }
-
+  
   raw = GGOBI(getRawData)(data, data->gg);
   for(i = 0; i < data->nrows; i++) {
-    str = (gchar *) g_array_index(data->rowlab, gchar*, i);
-    gtk_sheet_row_button_justify (sheet, i, GTK_JUSTIFY_LEFT);
-
-    gtk_sheet_row_button_add_label(sheet, i, str);
-
-    /* keep track of the width of the longest label */
-    gdk_text_extents (
-#if GTK_MAJOR_VERSION == 2
-      gtk_style_get_font (style),
-#else
-      style->font,
-#endif
-      str, strlen (str),
-      &lbearing, &rbearing, &width, &ascent, &descent);
-    maxwidth = MAX (width, maxwidth);
-    /* */
-
+    GtkTreeIter iter;
+	gtk_list_store_append(GTK_LIST_STORE(model), &iter);
+	
+	str = (gchar *) g_array_index(data->rowlab, gchar*, i);
+	gtk_list_store_set(GTK_LIST_STORE(model), 0, str, -1);
+	
     for(j = 0; j < data->ncols; j++) {
-      char buf[128];
-      vartabled *vt;
       vt = g_slist_nth_data(data->vartable, j);
-      if(data->nmissing && data->missing.vals[i][j])
-           sprintf(buf, "<NA>");
-      else {
+      if(data->nmissing && data->missing.vals[i][j] && vt->vartype != categorical)
+		  gtk_list_store_set(GTK_LIST_STORE(model), &iter, j+1, NAN, -1);
+	  else {
          if(vt->vartype == categorical)  {
+		  gchar *level_str;
           level_ok = false;
           for (k=0; k<vt->nlevels; k++) {
             if ((gint)raw[i][j] == vt->level_values[k]) {
@@ -458,22 +499,15 @@ add_ggobi_data(datad *data, GtkWidget *w)
             }
           }
           if (level_ok)
-            sprintf(buf, "%s", vt->level_names[level]);
-          else
-            sprintf(buf, "%s", "improper level");
-         } else  {
-          sprintf(buf, "%.3g", raw[i][j]);
+			  level_str = vt->level_names[level];
+          else level_str = "<improper level>";
+		  gtk_list_store_set(GTK_LIST_STORE(model), &iter, j+1, level_str, -1);
+         } else {
+          gtk_list_store_set(GTK_LIST_STORE(model), &iter, j+1, raw[i][j], -1);
          }
       }
-      gtk_sheet_set_cell(sheet, i, j, GTK_JUSTIFY_RIGHT, buf);
     }
   }
-
-  /*-- Does this apply to the row or column titles?  Alas, no.  --*/
-  /* This now triggers a compile error.
-  GTK_SHEET_SET_FLAGS(sheet, GTK_SHEET_AUTORESIZE);
-  */
-  gtk_sheet_set_row_titles_width (sheet, maxwidth);
 }
 
 /**
@@ -490,8 +524,8 @@ void close_worksheet_window(GtkWidget *w, PluginInstance *inst)
 void closeWindow(ggobid *gg, PluginInstance *inst)
 {
   if(inst->data) {
-    gtk_signal_disconnect_by_func(GTK_OBJECT(inst->data),
-      GTK_SIGNAL_FUNC (close_worksheet_window), inst);
+    g_signal_handlers_disconnect_by_func(G_OBJECT(inst->data),
+      G_CALLBACK (close_worksheet_window), inst);
     gtk_widget_destroy((GtkWidget*) inst->data);
   }
 }
@@ -516,30 +550,37 @@ update_cell(gint row, gint column, double value, datad *data)
  and redraws all the plots.
  */
 void
-cell_changed(GtkSheet *sheet, gint row, gint column, datad *data)
+cell_changed(GtkCellRendererText *renderer, gchar *path_str, gchar *text, GtkTreeModel *model)
 {
-    char *val, *tmp;
-    float value;
-    if(row < 0)
-	return;
-    val = gtk_sheet_cell_get_text(sheet, row, column);
-    if (val) {
-      value = strtod(val, &tmp);
-      if(val == tmp) {
-/*
- * This error message is trigged by resizing a column width when a
- * cell is selected, or even by selecting a cell.  These are not
- * errors.
-        fprintf(stderr, "Error in strtod: %d\n", errno);
-        fflush(stderr);
-*/
-        return;
-      }
-
-#if 1
-      update_cell(row, column, value, data);
-#endif
-  }
+	GtkTreePath *path = gtk_tree_path_new_from_string(path_str);
+	gint row = gtk_tree_path_get_indices(path)[0];
+	GtkTreeIter iter;
+	gint col = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(renderer), "column"));
+	datad *data = (datad *)g_object_get_data(G_OBJECT(model), "data");
+	GType type = gtk_tree_model_get_column_type(model, col);
+	gdouble value;
+	
+	gtk_tree_model_get_iter(model, &iter, path);
+	gtk_tree_path_free(path);
+	
+	if (type == G_TYPE_STRING) { // categorical
+		vartabled *vt = g_slist_nth_data(data->vartable, col);
+		gchar *old_text;
+		gint k;
+		for (k = 0; k < vt->nlevels; k++) {
+			if (!strcmp(vt->level_names[k], text))
+				break;
+		}
+		value = vt->level_values[k];
+		gtk_tree_model_get(model, &iter, col, &old_text, -1);
+		g_free(old_text);
+		gtk_list_store_set(GTK_LIST_STORE(model), &iter, col, text, -1);
+	} else {
+		value = atof(text);
+		gtk_list_store_set(GTK_LIST_STORE(model), &iter, col, value, -1);
+	}
+      
+    update_cell(row, col, value, data);
 }
 
 
@@ -549,13 +590,22 @@ cell_changed(GtkSheet *sheet, gint row, gint column, datad *data)
   and selecting that row.
  */
 void
-identify_cell(ggobid *gg, splotd *sp, gint id, datad *d, GtkSheet *sheet)
+identify_cell(ggobid *gg, splotd *sp, gint id, datad *d, GtkWidget *sheet)
 {
+
+	GtkTreePath *path, *child_path;
+	GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(sheet));
+	
   if(id < 0)
     return;
 
-  gtk_sheet_moveto(sheet, id, 2, 0.5, 0.5);
-  gtk_sheet_select_row(sheet, id);
+  child_path = gtk_tree_path_new_from_indices(id, -1);
+  path = gtk_tree_model_sort_convert_child_path_to_path(GTK_TREE_MODEL_SORT(model), child_path);
+  gtk_tree_path_free(child_path);
+  
+  gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(sheet), path, NULL, true, 0.5, 0.5); 
+  gtk_tree_selection_select_path(gtk_tree_view_get_selection(GTK_TREE_VIEW(sheet)), path);
+  gtk_tree_path_free(path);
 }
 
 
@@ -563,27 +613,32 @@ identify_cell(ggobid *gg, splotd *sp, gint id, datad *d, GtkSheet *sheet)
  Called by ggobi when the user drags a point to change its value. This
  updates the value in the appropriate cell of the worksheet to reflect
  the new value.
+ FIXME: This only works with parallel coordinate and xy plots
  */
 void
-move_point_value(GtkWidget *w, splotd *sp, GGobiPointMoveEvent *ev, ggobid *gg, GtkSheet *sheet)
-{
-  int cols[2];
-  int n = 2, i;
-  char buf[20];
+move_point_value(GtkWidget *w, splotd *sp, GGobiPointMoveEvent *ev, ggobid *gg, GtkWidget *sheet)
+{ 
+	GtkTreeModel *model;
+	GtkTreePath *path;
+	GtkTreeIter iter;
+	
   if(ev->id < 0)
     return;
-
-  if(GTK_IS_GGOBI_PARCOORDS_SPLOT(sp)) {
-    cols[0] = sp->p1dvar;
-    n = 1;
+  
+  model = gtk_tree_view_get_model(GTK_TREE_VIEW(sheet));
+  model = gtk_tree_model_sort_get_model(GTK_TREE_MODEL_SORT(model));
+  
+  path = gtk_tree_path_new_from_indices(ev->id, -1);
+  gtk_tree_model_get_iter(model, &iter, path);
+  gtk_tree_path_free(path);
+  
+  if(GGOBI_IS_PAR_COORDS_SPLOT(sp)) {
+    gtk_list_store_set(GTK_LIST_STORE(model), &iter, sp->p1dvar+1, 
+		sp->displayptr->d->raw.vals[ev->id][sp->p1dvar], -1);
   } else {
-    cols[0] = sp->xyvars.x;
-    cols[1] = sp->xyvars.y;
-  }
-
-  for(i = 0; i < n ; i++) {
-    sprintf(buf, "%f", sp->displayptr->d->raw.vals[ev->id][cols[i]]);
-    gtk_sheet_set_cell(sheet, ev->id, cols[i], GTK_JUSTIFY_CENTER, buf);
+	  gtk_list_store_set(GTK_LIST_STORE(model), &iter, 
+	  	sp->xyvars.x+1, sp->displayptr->d->raw.vals[ev->id][sp->xyvars.x],
+		sp->xyvars.y+1, sp->displayptr->d->raw.vals[ev->id][sp->xyvars.y], -1);
   }
 }
 
@@ -592,17 +647,21 @@ move_point_value(GtkWidget *w, splotd *sp, GGobiPointMoveEvent *ev, ggobid *gg, 
  Changes the foreground color of the specified row.
  */
 void
-color_row(GtkSheet *sheet, gint row, gint ncols, GdkColor *col)
+color_row(GtkWidget *sheet, gint row, gint ncols, GdkColor *col)
 {
-  GtkSheetRange range;
-  range.row0 = row;
-  range.col0 = 0;
-  range.rowi = row+1;/* row or row+1*/
-  range.coli = ncols-1;
-
+  GtkTreeIter iter;
+  GtkTreePath *path;
+  GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(sheet));
+  model = gtk_tree_model_sort_get_model(GTK_TREE_MODEL_SORT(model));
+  
+  path = gtk_tree_path_new_from_indices(row, -1);
+  gtk_tree_model_get_iter(model, &iter, path);
+  gtk_tree_path_free(path);
+  
   if(col == NULL)
     col = &red;
-  gtk_sheet_range_set_foreground(sheet, &range, col);
+  
+  gtk_list_store_set(GTK_LIST_STORE(model), &iter, ncols+1, col, -1);
 }
 
 /**
@@ -610,7 +669,7 @@ color_row(GtkSheet *sheet, gint row, gint ncols, GdkColor *col)
  Really want the identity of the point that was added or discarded.
  */
 void
-brush_change(ggobid *gg, splotd *sp, GdkEventMotion *ev, datad *d, GtkSheet *sheet)
+brush_change(ggobid *gg, splotd *sp, GdkEventMotion *ev, datad *d, GtkWidget *sheet)
 {
   /* datad *d = sp->displayptr->d; */
   int nr, i;

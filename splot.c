@@ -133,9 +133,9 @@ splot_event_handled (GtkWidget *w, GdkEventKey *event,
 */
   if (event->time == etime) return false;  /*-- already processed --*/
 
-  if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
-    GtkGGobiExtendedDisplayClass *klass;
-    klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display));
+  if(GGOBI_IS_EXTENDED_DISPLAY(display)) {
+    GGobiExtendedDisplayClass *klass;
+    klass = GGOBI_EXTENDED_DISPLAY_GET_CLASS(display);
     if (klass->splot_key_event_handled) {
       common_event = klass->splot_key_event_handled(w, display, sp,
         event, gg);
@@ -157,9 +157,9 @@ sp_event_handlers_toggle (splotd *sp, gboolean state, ProjectionMode pmode, Inte
      to the switch statement; scatterplot doesn't have one of these
      routines yet.  dfs 8/31/2005
  */
-  if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
-    GtkGGobiExtendedDisplayClass *klass;
-    klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display));
+  if(GGOBI_IS_EXTENDED_DISPLAY(display)) {
+    GGobiExtendedDisplayClass *klass;
+    klass = GGOBI_EXTENDED_DISPLAY_GET_CLASS(display);
     if(klass->event_handlers_toggle && klass->event_handlers_toggle(display, sp, state, pmode, imode) == false) {
       return;
     }
@@ -363,9 +363,9 @@ splot_alloc (splotd *sp, displayd *display, ggobid *gg)
   vectorf_init_null (&sp->p1d.spread_data);
   vectorf_alloc (&sp->p1d.spread_data, nr);
 
-  if(GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
-    GtkGGobiExtendedSPlotClass *klass;
-    klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT_GET_CLASS(sp));
+  if(GGOBI_IS_EXTENDED_SPLOT(sp)) {
+    GGobiExtendedSPlotClass *klass;
+    klass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);
     if(klass->alloc_whiskers)
       sp->whiskers = klass->alloc_whiskers(sp->whiskers, sp, nr, d);
   }
@@ -384,12 +384,13 @@ splot_free (splotd *sp, displayd *display, ggobid *gg)
   win32_drawing_arrays_free (sp);
 #endif
 
-  if(GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
+  if(GGOBI_IS_EXTENDED_SPLOT(sp)) {
      gtk_object_destroy(GTK_OBJECT(sp));
   } else
      gtk_widget_destroy (GTK_WIDGET(sp));
 }
 
+#if 0
 void
 splot_dimension_set (splotd* sp, gint width, gint height)
 {
@@ -402,19 +403,20 @@ splot_dimension_set (splotd* sp, gint width, gint height)
     gtk_drawing_area_size (GTK_DRAWING_AREA (sp->da), width, height);
   }
 }
+#endif
 
 splotd *
 splot_new (displayd *display, gint width, gint height, ggobid *gg) 
 {
   splotd *sp;
 
-  sp = gtk_type_new(GTK_TYPE_GGOBI_SPLOT);
-  splot_init(sp, display, width, height, gg);
+  sp = g_object_new(GGOBI_TYPE_SPLOT, NULL);
+  splot_init(sp, display, gg);
 
   return(sp);
 }
 
-
+#if 0
 /* 
   Key action callback to raise the control panel window.
  */
@@ -426,9 +428,10 @@ raise_control_panel(GtkWidget *w, GdkEventKey *ev, ggobid *gg)
       (ev->state & GDK_MOD1_MASK) && ev->keyval == GDK_m)
 	gdk_window_raise(gg->main_window->window);
 }
+#endif
 
 void
-splot_init(splotd *sp, displayd *display, gint width, gint height, ggobid *gg) 
+splot_init(splotd *sp, displayd *display, ggobid *gg) 
 {
 /*
  * Initialize the widget portion of the splot object
@@ -436,36 +439,37 @@ splot_init(splotd *sp, displayd *display, gint width, gint height, ggobid *gg)
 
   brush_pos_init (sp);
   
-  splot_dimension_set (sp, width, height);
+  //splot_dimension_set (sp, width, height);
 
   /*
    * Let it be possible to get a pointer to the splotd object 
    * from the drawing area; and to gg as well.
   */
-  gtk_object_set_data (GTK_OBJECT (sp->da), "splotd", (gpointer) sp);
+  g_object_set_data(G_OBJECT (sp->da), "splotd", (gpointer) sp);
   GGobi_widget_set (sp->da, gg, true);
 
-
-#if GTK_MAJOR_VERSION == 2
   gtk_widget_set_double_buffered(sp->da, false);
-#endif
-  gtk_signal_connect (GTK_OBJECT (sp->da),
+
+  g_signal_connect (G_OBJECT (sp->da),
                       "expose_event",
-                      (GtkSignalFunc) splot_expose_cb,
+                      G_CALLBACK(splot_expose_cb),
                       (gpointer) sp);
-  gtk_signal_connect (GTK_OBJECT (sp->da),
+  g_signal_connect (G_OBJECT (sp->da),
                       "configure_event",
-                      (GtkSignalFunc) splot_configure_cb,
+                      G_CALLBACK(splot_configure_cb),
                       (gpointer) sp);
-  gtk_signal_connect (GTK_OBJECT (sp->da),
+  g_signal_connect (G_OBJECT (sp->da),
                       "button_press_event",
-                      (GtkSignalFunc) splot_set_current_cb,
+                      G_CALLBACK(splot_set_current_cb),
                       (gpointer) sp);
 
   gtk_widget_set_events (sp->da, GDK_EXPOSURE_MASK
              | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK
              | GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK);
 
+
+/* Init some dimension attributes */
+sp->pmid.x = sp->pmid.y = sp->max.x = sp->max.y = 0;
 
 /*
  * Initialize the data portion of the splot object
@@ -503,13 +507,14 @@ splot_init(splotd *sp, displayd *display, gint width, gint height, ggobid *gg)
 #ifdef WIN32
   sp->win32.npoints = 0;
 #endif
-
-  gtk_signal_connect (GTK_OBJECT (GTK_GGOBI_WINDOW_DISPLAY(display)->window),
+  
+/*
+  g_signal_connect (G_OBJECT (GGOBI_WINDOW_DISPLAY(display)->window),
 		      "key_press_event",
-		      (GtkSignalFunc) raise_control_panel,
+		      G_CALLBACK(raise_control_panel),
 		      (gpointer) gg);
-
-  gtk_signal_emit(GTK_OBJECT(gg), GGobiSignals[SPLOT_NEW_SIGNAL], sp);
+*/
+  g_signal_emit(G_OBJECT(gg), GGobiSignals[SPLOT_NEW_SIGNAL], 0, sp);
 }
 
 
@@ -541,8 +546,8 @@ splot_world_to_plane (cpaneld *cpanel, splotd *sp, ggobid *gg)
  * beyond d->ncols.
 */
 
-  if(GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
-    GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT_GET_CLASS(sp))->world_to_plane(sp,
+  if(GGOBI_IS_EXTENDED_SPLOT(sp)) {
+    GGOBI_EXTENDED_SPLOT_GET_CLASS(sp)->world_to_plane(sp,
       d, gg);
   }
 }
@@ -560,11 +565,11 @@ splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp,
   greal scale_x, scale_y;
   datad *d = display->d;
   greal gtmp;
-  GtkGGobiExtendedSPlotClass *klass = NULL;
+  GGobiExtendedSPlotClass *klass = NULL;
   greal precis = (greal) PRECISION1;
 
-  if(GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
-     klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT_GET_CLASS(sp));
+  if(GGOBI_IS_EXTENDED_SPLOT(sp)) {
+     klass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);
     
      if(klass->plane_to_screen) {
         klass->plane_to_screen(sp, d, gg);
@@ -852,8 +857,8 @@ splot_reverse_pipeline (splotd *sp, gint ipt, gcoords *eps,
 void
 disconnect_key_press_signal (splotd *sp) {
   displayd *display = sp->displayptr;
-  if (sp->key_press_id && GTK_IS_GGOBI_WINDOW_DISPLAY(display)) {
-    gtk_signal_disconnect (GTK_OBJECT (GTK_GGOBI_WINDOW_DISPLAY(display)->window), sp->key_press_id);
+  if (sp->key_press_id && GGOBI_IS_WINDOW_DISPLAY(display)) {
+    g_signal_handler_disconnect (G_OBJECT (GGOBI_WINDOW_DISPLAY(display)->window), sp->key_press_id);
     sp->key_press_id = 0;
   }
 }
@@ -862,7 +867,7 @@ void
 disconnect_button_press_signal (splotd *sp) 
 {
   if (sp->press_id) {
-    gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->press_id);
+    g_signal_handler_disconnect (G_OBJECT (sp->da), sp->press_id);
     sp->press_id = 0;
   }
 }
@@ -870,14 +875,14 @@ disconnect_button_press_signal (splotd *sp)
 void
 disconnect_button_release_signal (splotd *sp) {
   if (sp->release_id) {
-    gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->release_id);
+    g_signal_handler_disconnect (G_OBJECT (sp->da), sp->release_id);
     sp->release_id = 0;
   }
 }
 void
 disconnect_motion_signal (splotd *sp) {
   if (sp->motion_id) {
-    gtk_signal_disconnect (GTK_OBJECT (sp->da), sp->motion_id);
+    g_signal_handler_disconnect (G_OBJECT (sp->da), sp->motion_id);
     sp->motion_id = 0;
   }
 }

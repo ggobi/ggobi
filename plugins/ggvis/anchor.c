@@ -29,7 +29,7 @@ symbol_show (GtkWidget *w, GdkEventExpose *event, gpointer cbd)
 {
   gint k = GPOINTER_TO_INT(cbd);
   PluginInstance *inst = (PluginInstance *)
-    gtk_object_get_data (GTK_OBJECT(w), "PluginInst");
+    g_object_get_data(G_OBJECT(w), "PluginInst");
   ggobid *gg = inst->gg;
   ggvisd *ggv = ggvisFromInst (inst);
   icoords pos;
@@ -76,13 +76,13 @@ anchor_toggle (GtkWidget *w, GdkEvent *event, gpointer cbd)
 {
   gint n = GPOINTER_TO_INT(cbd);
   PluginInstance *inst = (PluginInstance *)
-    gtk_object_get_data (GTK_OBJECT(w), "PluginInst");
+    g_object_get_data(G_OBJECT(w), "PluginInst");
   ggvisd *ggv = ggvisFromInst (inst);
   gboolean rval = false;
 
   if (ggv->anchor_group.nels > n) {
     ggv->anchor_group.els[n] = !ggv->anchor_group.els[n];
-    gtk_signal_emit_by_name (GTK_OBJECT(w), "expose_event", cbd, 
+    g_signal_emit_by_name (G_OBJECT(w), "expose_event", cbd, 
       (gboolean) &rval);
 
     recount_anchor_groups (ggv);
@@ -108,23 +108,21 @@ symbol_add (GtkWidget *table, gint k, gint row, gint col,
 
   da = gtk_drawing_area_new();
   gtk_container_add(GTK_CONTAINER(ebox), da);
-#if GTK_MAJOR_VERSION == 2
   gtk_widget_set_double_buffered(da, false);
-#endif
-  gtk_drawing_area_size(GTK_DRAWING_AREA(da), dawidth, dawidth);
+  gtk_widget_set_size_request(GTK_WIDGET(da), dawidth, dawidth);
 
   gtk_widget_set_events(da,
     GDK_EXPOSURE_MASK | GDK_ENTER_NOTIFY_MASK |
     GDK_LEAVE_NOTIFY_MASK | GDK_BUTTON_PRESS_MASK);
 
-  gtk_signal_connect(GTK_OBJECT(da), "expose_event",
-    GTK_SIGNAL_FUNC(symbol_show),
+  g_signal_connect(G_OBJECT(da), "expose_event",
+    G_CALLBACK(symbol_show),
     GINT_TO_POINTER(k));
-  gtk_signal_connect(GTK_OBJECT(da), "button_press_event",
-    GTK_SIGNAL_FUNC(anchor_toggle),
+  g_signal_connect(G_OBJECT(da), "button_press_event",
+    G_CALLBACK(anchor_toggle),
     GINT_TO_POINTER(k));
 
-  gtk_object_set_data (GTK_OBJECT(da), "PluginInst", inst);
+  g_object_set_data(G_OBJECT(da), "PluginInst", inst);
 
   gtk_table_attach (GTK_TABLE (table), ebox, col, col+1, row, row+1,
     (GtkAttachOptions) (GTK_FILL), 

@@ -192,9 +192,9 @@ do_radial(glayoutd *gl, datad *d, datad *e, displayd *dsp, ggobid *gg)
 /*-- This may not belong here, but where exactly?  As soon as the
      panel is opened  --*/
 /*
-  gtk_signal_connect (GTK_OBJECT(gg),
+  g_signal_connect (G_OBJECT(gg),
     "sticky_point_added", radial_highlight_sticky_edges, inst);
-  gtk_signal_connect (GTK_OBJECT(gg),
+  g_signal_connect (G_OBJECT(gg),
     "sticky_point_removed", radial_highlight_sticky_edges, inst);
 */
 
@@ -450,7 +450,7 @@ void radial_center_set_cb (ggobid *gg, gint index,
   if (gl == NULL || gl->window == NULL)
     return;
 
-  entry = (GtkWidget *) gtk_object_get_data (GTK_OBJECT(gl->window),
+  entry = (GtkWidget *) g_object_get_data(G_OBJECT(gl->window),
     "CENTERNODE");
   if (entry == NULL)
     return;
@@ -463,7 +463,7 @@ void radial_center_set_cb (ggobid *gg, gint index,
       d->sticky_ids = g_slist_remove (d->sticky_ids, 
 				      g_slist_nth_data (d->sticky_ids, 0));
       sticky_id_link_by_id (STICKY_REMOVE, k, d, gg);
-      gtk_signal_emit(GTK_OBJECT(gg),
+      g_signal_emit(G_OBJECT(gg),
         getGGobiSignal(STICKY_POINT_REMOVED_SIGNAL), 0,
         (gint) UNSTICKY, d);
     }

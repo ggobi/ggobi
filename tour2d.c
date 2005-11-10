@@ -165,12 +165,12 @@ tour2d_realloc_up (gint nc, datad *d, ggobid *gg)
   GList *l;
 
   for (l=gg->displays; l; l=l->next) {
-    GtkGGobiExtendedDisplayClass *klass;
+    GGobiExtendedDisplayClass *klass;
     dsp = (displayd *) l->data;
 
-    if(!GTK_IS_GGOBI_EXTENDED_DISPLAY(dsp))
+    if(!GGOBI_IS_EXTENDED_DISPLAY(dsp))
       continue;
-    klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(dsp));
+    klass = GGOBI_EXTENDED_DISPLAY_GET_CLASS(dsp);
     if(klass->tour2d_realloc)
         klass->tour2d_realloc(dsp, nc, d);
   }
@@ -282,28 +282,23 @@ display_tour2d_init (displayd *dsp, ggobid *gg) {
   tour2d_speed_set_display(sessionOptions->defaultTourSpeed, dsp);
 }
 
-/*-- called from the Options menu --*/
 void
-tour2d_fade_vars_cb (GtkCheckMenuItem *w, guint action) 
+tour2d_fade_vars (gboolean fade, ggobid *gg) 
 {
-  ggobid *gg = GGobiFromWidget(GTK_WIDGET(w), true);
-
-  gg->tour2d.fade_vars = !gg->tour2d.fade_vars;
+  gg->tour2d.fade_vars = fade;
 }
 
-/*-- called from the Options menu --*/
 void
-tour2d_all_vars_cb (GtkCheckMenuItem *w, guint action) 
+tour2d_all_vars (displayd *dsp) 
 {
-  ggobid *gg = GGobiFromWidget(GTK_WIDGET(w), true);
-  displayd *dsp = gg->current_display; 
+  ggobid *gg = dsp->ggobi;
   datad *d = dsp->d;
   gint j;
 
-  gg->tour2d.all_vars = !gg->tour2d.all_vars;
+  //gg->tour2d.all_vars = !gg->tour2d.all_vars;
 
-  if (gg->tour2d.all_vars)
-  {
+  //if (gg->tour2d.all_vars)
+  //{
     for (j=0; j<d->ncols; j++) {
       dsp->t2d.subset_vars.els[j] = j;
       dsp->t2d.active_vars.els[j] = j;
@@ -325,7 +320,7 @@ tour2d_all_vars_cb (GtkCheckMenuItem *w, guint action)
       alloc_pp(&dsp->t2d_pp_param, d->nrows_in_plot, dsp->t2d.nactive, 2);
       t2d_pp_reinit(dsp, gg);
     }  
-  }
+  //}
 }
 
 void tour2d_speed_set(gfloat slidepos, ggobid *gg) {
@@ -861,14 +856,14 @@ void tour2d_func (gboolean state, displayd *dsp, ggobid *gg)
 {
   if (state) {
     if (dsp->t2d.idled == 0) {
-      dsp->t2d.idled = gtk_idle_add_priority (G_PRIORITY_LOW,
-                                   (GtkFunction) tour2d_idle_func, dsp);
+      dsp->t2d.idled = g_idle_add_full (G_PRIORITY_LOW,
+                                   (GtkFunction) tour2d_idle_func, dsp, NULL);
 
       gg->tour2d.idled = 1;
     }
   } else {
     if (dsp->t2d.idled != 0) {
-      gtk_idle_remove (dsp->t2d.idled);
+      g_source_remove (dsp->t2d.idled);
       dsp->t2d.idled = 0;
     }
     gg->tour2d.idled = 0;

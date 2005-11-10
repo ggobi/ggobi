@@ -41,20 +41,18 @@
 
 
 void
-filesel_ok (GtkWidget *w, GtkFileSelection *fs)
+filesel_ok (GtkWidget *chooser)
 {
-  extern const gchar* const key_get (void);
-  const gchar *fname;
+  extern const gchar* key_get (void);
+  gchar *pluginModeName;
   ggobid *gg;
   guint action, len;
-  gchar *filename, *pluginModeName;
+  gchar *fname, *filename;
   gboolean firsttime;
-  GtkWidget *combo;
 
-
-  gg = (ggobid *) gtk_object_get_data (GTK_OBJECT (fs), key_get());
-  fname = gtk_file_selection_get_filename (GTK_FILE_SELECTION (fs));
-  action = GPOINTER_TO_INT (gtk_object_get_data (GTK_OBJECT (fs), "action"));
+  gg = (ggobid *) g_object_get_data(G_OBJECT(chooser), key_get());
+  fname = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(chooser));
+  action = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(chooser), "action"));
   len = strlen (fname);
 
   switch (action) {
@@ -62,17 +60,18 @@ filesel_ok (GtkWidget *w, GtkFileSelection *fs)
     {
       gint which;
       GGobiPluginInfo *plugin;
-      combo = (GtkWidget *)gtk_object_get_data(GTK_OBJECT(fs), "PluginTypeCombo");
-      pluginModeName = gtk_editable_get_chars(GTK_EDITABLE(GTK_COMBO(combo)->entry), 0, -1);
-      which = *((gint *)gtk_object_get_data(GTK_OBJECT(fs), ".selectedElement"));
-      plugin = getInputPluginByModeNameIndex(which);
+	  GtkWidget *combo;
+	  
+      combo = (GtkWidget *)g_object_get_data(G_OBJECT(chooser), "PluginTypeCombo");
+      which = gtk_combo_box_get_active(GTK_COMBO_BOX(combo));
+      plugin = getInputPluginByModeNameIndex(which, &pluginModeName);
       firsttime = (g_slist_length (gg->d) == 0);
       if (fileset_read_init (fname, pluginModeName, plugin, gg)) 
-        /*-- destroy and rebuild the menu every time data is read in --*/
+		  /*-- destroy and rebuild the menu every time data is read in --*/
         display_menu_build (gg);
 
-      g_free(pluginModeName);
-
+	  g_free(pluginModeName);
+	  
       /*
        * If this is the first data read in, we need a call to
        * full_viewmode_set to initialize the mode and projection,
@@ -140,62 +139,62 @@ filesel_ok (GtkWidget *w, GtkFileSelection *fs)
       }
       break;
   }
+  
+  g_free(fname);
 }
 
 static void
-filename_get_configure (GtkWidget *fs, guint type, ggobid *gg) 
+filename_get_configure (GtkWidget *chooser, guint type, ggobid *gg) 
 {
-  extern const gchar* const key_get (void);
+  extern const gchar* key_get (void);
 
   const gchar *key = key_get();
-  gtk_object_set_data (GTK_OBJECT (fs), "action", GINT_TO_POINTER (type));
-  gtk_object_set_data (GTK_OBJECT (fs), key, gg);
+  g_object_set_data(G_OBJECT (chooser), "action", GINT_TO_POINTER (type));
+  g_object_set_data(G_OBJECT (chooser), key, gg);
 
-  gtk_signal_connect (GTK_OBJECT (GTK_FILE_SELECTION (fs)->ok_button),
-                      "clicked", GTK_SIGNAL_FUNC (filesel_ok), (gpointer) fs);
+  #if 0
+  g_signal_connect (G_OBJECT (GTK_FILE_CHOOSER(chooser)->ok_button),
+                      "clicked", G_CALLBACK (filesel_ok), (gpointer) chooser);
                             
   /*-- Ensure that the dialog box is destroyed. --*/
     
-  gtk_signal_connect_object (GTK_OBJECT (GTK_FILE_SELECTION (fs)->ok_button),
-                             "clicked", GTK_SIGNAL_FUNC (gtk_widget_destroy),
-                             (GtkObject*) fs);
+  g_signal_connect_swapped (G_OBJECT (GTK_FILE_CHOOSER(chooser)->ok_button),
+                             "clicked", G_CALLBACK (gtk_widget_destroy),
+                             G_OBJECT(chooser));
 
-  gtk_signal_connect_object (GTK_OBJECT (GTK_FILE_SELECTION(fs)->cancel_button),
-                             "clicked", GTK_SIGNAL_FUNC (gtk_widget_destroy),
-                             (GtkObject*) fs);
+  g_signal_connect_swapped (G_OBJECT (GTK_FILE_CHOOSER(chooser)->cancel_button),
+                             "clicked", G_CALLBACK (gtk_widget_destroy),
+                             G_OBJECT(chooser));
+#endif
 }
 
-
+#if 0
 GtkWidget *
-getFileSelectionWorkContainer(GtkWidget *fs)
+getFileSelectionWorkContainer(GtkWidget *chooser)
 {
        GtkWidget *dlg, *vbox = NULL;
-#if 0
-       gtk_widget_realize(dlg);
-       dlg = GTK_FILE_SELECTION(fs)->fileop_dialog;
-       vbox = GTK_DIALOG(dlg)->vbox;
-#else
+
        GList *kids;
-       kids = gtk_container_children(GTK_CONTAINER(fs));
+       kids = gtk_container_get_children(GTK_CONTAINER(chooser));
        dlg = g_list_nth_data(kids, 0);
        return(dlg);
 /*
-       kids = gtk_container_children(GTK_CONTAINER(dlg));
+       kids = gtk_container_get_children(GTK_CONTAINER(dlg));
        vbox = g_list_nth_data(kids, 0);
        if(!GTK_IS_VBOX(vbox)) {
           g_printerr("Not vbox\n");
        }
 */
-#endif
 
        return(vbox);
 }
-
+#endif
+/*
 static void
 filename_mode_selection_cb(GtkList *l, GtkWidget *el, GtkWidget *data)
 {
     
-    gint *i = gtk_object_get_data(GTK_OBJECT(data), ".selectedElement");
+    gint *i = g_object_get_data(G_OBJECT(data), ".selectedElement");
     if(i) {
       *i = gtk_list_child_position(l, el);
     }
@@ -206,23 +205,72 @@ free_gdata(GtkObject *src, gpointer data)
 {
   g_free(data);
 }
+*/
 
 GtkWidget*
-createInputFileSelectionDialog(gchar *title, ggobid *gg, GtkWidget **ocombo)
+createOutputFileSelectionDialog(const gchar *title)
 {
-       GtkWidget *fs, *vbox, *combo, *box;
-       GList *els;
-       gint *i;
+	GtkWidget *chooser;
+	chooser = gtk_file_chooser_dialog_new(title, NULL, GTK_FILE_CHOOSER_ACTION_SAVE,
+	   		GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+			GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+			NULL);
+	return(chooser);
+}
+
+GtkWidget*
+createInputFileSelectionDialog(gchar *title, ggobid *gg)
+{
+       GtkWidget *chooser, *combo, *hbox, *lbl, *button;
+	   //GtkEntryCompletion *completion;
+	   //GtkListStore *model;
+	   GList *els, *l;
 
        els = getInputPluginSelections(gg);
 
-       fs = gtk_file_selection_new(title);
-       vbox = getFileSelectionWorkContainer(fs);
+       chooser = gtk_file_chooser_dialog_new(title, NULL, GTK_FILE_CHOOSER_ACTION_OPEN,
+	   		GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+			GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+			NULL);
+		
+		hbox = gtk_hbox_new(false, 5);
+		
+		lbl = gtk_label_new_with_mnemonic("Input _Type:");
+		gtk_box_pack_start(GTK_BOX(hbox), lbl, false, false, 0);
+		
+		combo = gtk_combo_box_new_text();
+		gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), combo);
+		for(l = els; l; l = l->next) {
+			gtk_combo_box_append_text(GTK_COMBO_BOX(combo), l->data);
+			g_free(l->data);
+		}
+		g_list_free(els);
+		gtk_combo_box_set_active(GTK_COMBO_BOX(combo), 0);
+		gtk_box_pack_start(GTK_BOX(hbox), combo, false, false, 0);
+		g_object_set_data(G_OBJECT(chooser), "PluginTypeCombo", combo);
+		
+		button = gtk_button_new_with_mnemonic("Enter _Location");
+		gtk_box_pack_start(GTK_BOX(hbox), button, false, false, 0);
+		
+		/*completion = gtk_entry_completion_new();
+		model = gtk_list_store_new(1, G_TYPE_STRING);
+		gtk_entry_completion_set_model(completion, GTK_TREE_MODEL(model));
+		gtk_entry_completion_set_text_column(completion, 0);
+		
+		entry = gtk_entry_new();
+		gtk_entry_set_completion(GTK_ENTRY(entry), completion);
+		gtk_box_pack_start(GTK_BOX(vbox), entry, false, false, 0);
+		*/
+		gtk_file_chooser_set_extra_widget(GTK_FILE_CHOOSER(chooser), hbox);
+		gtk_widget_show_all(hbox);
+		
+ #if 0
+	   vbox = GTK_DIALOG(chooser)->vbox;
 
        box = gtk_frame_new("Reader Type");
 
        combo = gtk_combo_new();
-       gtk_object_set_data(GTK_OBJECT(fs), "PluginTypeCombo", combo);
+       g_object_set_data(G_OBJECT(fs), "PluginTypeCombo", combo);
        if(ocombo)
            *ocombo = combo;
        gtk_combo_set_popdown_strings(GTK_COMBO(combo), els);
@@ -237,40 +285,42 @@ createInputFileSelectionDialog(gchar *title, ggobid *gg, GtkWidget **ocombo)
 
        i = (gint *) g_malloc(sizeof(gint));
 /*XXX Need to free this when we destroy the fileselection widget */
-       gtk_signal_connect(GTK_OBJECT(fs), "destroy", 
-         GTK_SIGNAL_FUNC(free_gdata), i);
+       g_signal_connect(G_OBJECT(fs), "destroy", 
+         G_CALLBACK(free_gdata), i);
 
        *i = -1;
-       gtk_object_set_data(GTK_OBJECT(fs), ".selectedElement", i);
-       gtk_signal_connect(GTK_OBJECT(GTK_COMBO(combo)->list), "select-child",
-         GTK_SIGNAL_FUNC(filename_mode_selection_cb), fs);
+       g_object_set_data(G_OBJECT(fs), ".selectedElement", i);
+       g_signal_connect(G_OBJECT(GTK_COMBO(combo)->list), "select-child",
+         G_CALLBACK(filename_mode_selection_cb), fs);
+#endif
 
 
-
-       return(fs);
+       return(chooser);
 }
 /*--------------------------------------------------------------------------*/
 /*                    reading files                                         */
 /*--------------------------------------------------------------------------*/
 
 void
-filename_get_r (ggobid *gg, guint action, GtkWidget *w) 
+filename_get_r (ggobid *gg) 
 {
-  GtkWidget *fs, *combo;
-  fs = createInputFileSelectionDialog("read ggobi data", gg, &combo);
-  gtk_file_selection_hide_fileop_buttons (GTK_FILE_SELECTION (fs)); 
+  GtkWidget *chooser;
+  chooser = createInputFileSelectionDialog("Read ggobi data", gg);
+  //gtk_file_selection_hide_fileop_buttons (GTK_FILE_SELECTION (fs)); 
 
   /*
    * I would like to put in the directory here without the
    * filename, but I don't know how -- dfs
   */
   if (gg->input && gg->input->baseName)
-    gtk_file_selection_set_filename (GTK_FILE_SELECTION (fs),
-                                     gg->input->baseName);
+    gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(chooser), gg->input->baseName);
 
-  filename_get_configure (fs, READ_FILESET, gg);
+  filename_get_configure (chooser, READ_FILESET, gg);
 
-  gtk_widget_show (fs);
+  //gtk_widget_show (chooser);
+  if (gtk_dialog_run(GTK_DIALOG(chooser)) == GTK_RESPONSE_ACCEPT)
+	  filesel_ok(chooser);
+  gtk_widget_destroy(chooser);
 }
 
 /*--------------------------------------------------------------------------*/
@@ -280,24 +330,27 @@ filename_get_r (ggobid *gg, guint action, GtkWidget *w)
 void
 filename_get_w (GtkWidget *w, ggobid *gg) 
 {
-  GtkWidget *fs;
-
+  GtkWidget *chooser;
+  const gchar *title;
+  
   if (gg->save.format == XMLDATA)
-    fs = gtk_file_selection_new ("Specify base name for new xml file");
+    title = "Specify base name for new xml file";
   else
-    fs = gtk_file_selection_new ("Specify base name for new file set");
+    title = "Specify base name for new file set";
 
-  gtk_file_selection_hide_fileop_buttons (GTK_FILE_SELECTION (fs));
-
+  chooser = createOutputFileSelectionDialog(title);
+  
   /*
    * I would like to put in the directory here without the
    * filename, but I don't know how -- dfs
   */
   if (gg->input && gg->input->baseName)
-    gtk_file_selection_set_filename (GTK_FILE_SELECTION (fs),
+    gtk_file_chooser_set_filename(GTK_FILE_CHOOSER (chooser),
                                      gg->input->baseName);
 
-  filename_get_configure (fs, WRITE_FILESET, gg);
+  filename_get_configure(chooser, WRITE_FILESET, gg);
 
-  gtk_widget_show (fs);
+  if (gtk_dialog_run(GTK_DIALOG(chooser)) == GTK_RESPONSE_ACCEPT)
+	  filesel_ok(chooser);
+  gtk_widget_destroy(chooser);
 }

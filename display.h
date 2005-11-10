@@ -31,24 +31,25 @@ extern "C" {
 struct _ggobid; 
 
 
-#define GTK_TYPE_GGOBI_DISPLAY	 (gtk_ggobi_display_get_type ())
-#define GTK_GGOBI_DISPLAY(obj)	 (GTK_CHECK_CAST ((obj), GTK_TYPE_GGOBI_DISPLAY, displayd))
-#define GTK_GGOBI_DISPLAY_CLASS(klass) (GTK_CHECK_CLASS_CAST ((klass), GTK_TYPE_GGOBI_DISPLAY, GtkGGobiDisplayClass))
-#define GTK_IS_GGOBI_DISPLAY(obj)	 (GTK_CHECK_TYPE ((obj), GTK_TYPE_GGOBI_DISPLAY))
-#define GTK_IS_GGOBI_DISPLAY_CLASS(klass) (GTK_CHECK_CLASS_TYPE ((klass), GTK_TYPE_GGOBI_DISPLAY))
+#define GGOBI_TYPE_DISPLAY	 (ggobi_display_get_type ())
+#define GGOBI_DISPLAY(obj)	 (G_TYPE_CHECK_INSTANCE_CAST ((obj), GGOBI_TYPE_DISPLAY, displayd))
+#define GGOBI_DISPLAY_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GGOBI_TYPE_DISPLAY, GGobiDisplayClass))
+#define GGOBI_IS_DISPLAY(obj)	 (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GGOBI_TYPE_DISPLAY))
+#define GGOBI_IS_DISPLAY_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GGOBI_TYPE_DISPLAY))
+#define GGOBI_DISPLAY_GET_CLASS(obj)  		(G_TYPE_INSTANCE_GET_CLASS ((obj), GGOBI_TYPE_DISPLAY, GGobiDisplayClass))
 
-GtkType gtk_ggobi_display_get_type();
+GType ggobi_display_get_type();
 
 enum { TOUR_STEP_SIGNAL, 
        MAX_GGOBI_DISPLAY_SIGNALS};
 
 
-typedef struct _GtkGGobiDisplayClass
+typedef struct _GGobiDisplayClass
 {
   GtkVBoxClass parent_class;
   guint signals[MAX_GGOBI_DISPLAY_SIGNALS];
 
-} GtkGGobiDisplayClass;
+} GGobiDisplayClass;
 
 /**
 
@@ -60,11 +61,15 @@ struct _displayd {
  * Used by all displays
 */
 
-   /*-- for scatterplots, where edge menus need to be rebuilt on the fly --*/
+   
  GtkWidget *menubar;
+ GtkUIManager *menu_manager;
+ guint imode_merge_id, pmode_merge_id;
+ /*-- for scatterplots, where edge menus need to be rebuilt on the fly --*/
  GtkWidget *edge_item, *edge_menu;
- GtkWidget *imode_item, *pmode_item;
-
+ //GtkWidget *imode_item, *pmode_item;
+ 
+ 
  cpaneld cpanel;
 
  GList *splots;          /*-- doubly linked list of splots --*/
@@ -172,19 +177,20 @@ struct _displayd {
 
 
 
-#define GTK_TYPE_GGOBI_EMBEDDED_DISPLAY	 (gtk_ggobi_embedded_display_get_type ())
-#define GTK_GGOBI_EMBEDDED_DISPLAY(obj)	 (GTK_CHECK_CAST ((obj), GTK_TYPE_GGOBI_EMBEDDED_DISPLAY, displayd))
-#define GTK_GGOBI_EMBEDDED_DISPLAY_CLASS(klass) (GTK_CHECK_CLASS_CAST ((klass), GTK_TYPE_GGOBI_EMBEDDED_DISPLAY, GtkGGobiEmbeddedDisplayClass))
-#define GTK_IS_GGOBI_EMBEDDED_DISPLAY(obj)	 (GTK_CHECK_TYPE ((obj), GTK_TYPE_GGOBI_EMBEDDED_DISPLAY))
-#define GTK_IS_GGOBI_EMBEDDED_DISPLAY_CLASS(klass) (GTK_CHECK_CLASS_TYPE ((klass), GTK_TYPE_GGOBI_EMBEDDED_DISPLAY))
+#define GGOBI_TYPE_EMBEDDED_DISPLAY	 (ggobi_embedded_display_get_type ())
+#define GGOBI_EMBEDDED_DISPLAY(obj)	 (G_TYPE_CHECK_INSTANCE_CAST ((obj), GGOBI_TYPE_EMBEDDED_DISPLAY, displayd))
+#define GGOBI_EMBEDDED_DISPLAY_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GGOBI_TYPE_EMBEDDED_DISPLAY, GGobiEmbeddedDisplayClass))
+#define GGOBI_IS_EMBEDDED_DISPLAY(obj)	 (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GGOBI_TYPE_EMBEDDED_DISPLAY))
+#define GGOBI_IS_EMBEDDED_DISPLAY_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GGOBI_TYPE_EMBEDDED_DISPLAY))
+#define GGOBI_EMBEDDED_DISPLAY_GET_CLASS(obj)  		(G_TYPE_INSTANCE_GET_CLASS ((obj), GGOBI_TYPE_EMBEDDED_DISPLAY, GGobiEmbeddedDisplayClass))
 
-GtkType gtk_ggobi_embedded_display_get_type();
+GType ggobi_embedded_display_get_type();
 
-typedef struct _GtkGGobiEmbeddedDisplayClass
+typedef struct _GGobiEmbeddedDisplayClass
 {
-    GtkGGobiDisplayClass parent_class;
+    GGobiDisplayClass parent_class;
 
-} GtkGGobiEmbeddedDisplayClass;
+} GGobiEmbeddedDisplayClass;
 
 typedef struct _embeddedDisplayd {
    displayd display;
@@ -194,20 +200,21 @@ typedef struct _embeddedDisplayd {
 
 
 
-#define GTK_TYPE_GGOBI_WINDOW_DISPLAY	 (gtk_ggobi_window_display_get_type ())
-#define GTK_GGOBI_WINDOW_DISPLAY(obj)	 (GTK_CHECK_CAST ((obj), GTK_TYPE_GGOBI_WINDOW_DISPLAY, windowDisplayd))
-#define GTK_GGOBI_WINDOW_DISPLAY_CLASS(klass) (GTK_CHECK_CLASS_CAST ((klass), GTK_TYPE_GGOBI_WINDOW_DISPLAY, GtkGGobiWindowDisplayClass))
-#define GTK_IS_GGOBI_WINDOW_DISPLAY(obj)	 (GTK_CHECK_TYPE ((obj), GTK_TYPE_GGOBI_WINDOW_DISPLAY))
-#define GTK_IS_GGOBI_WINDOW_DISPLAY_CLASS(klass) (GTK_CHECK_CLASS_TYPE ((klass), GTK_TYPE_GGOBI_WINDOW_DISPLAY))
+#define GGOBI_TYPE_WINDOW_DISPLAY	 (ggobi_window_display_get_type ())
+#define GGOBI_WINDOW_DISPLAY(obj)	 (G_TYPE_CHECK_INSTANCE_CAST ((obj), GGOBI_TYPE_WINDOW_DISPLAY, windowDisplayd))
+#define GGOBI_WINDOW_DISPLAY_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GGOBI_TYPE_WINDOW_DISPLAY, GGobiWindowDisplayClass))
+#define GGOBI_IS_WINDOW_DISPLAY(obj)	 (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GGOBI_TYPE_WINDOW_DISPLAY))
+#define GGOBI_IS_WINDOW_DISPLAY_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GGOBI_TYPE_WINDOW_DISPLAY))
+#define GGOBI_WINDOW_DISPLAY_GET_CLASS(obj)  		(G_TYPE_INSTANCE_GET_CLASS ((obj), GGOBI_TYPE_WINDOW_DISPLAY, GGobiWindowDisplayClass))
 
-GtkType gtk_ggobi_window_display_get_type();
-displayd *gtk_ggobi_window_display_new(gint type, gboolean missing_p, datad *d, ggobid *gg);
+GType ggobi_window_display_get_type();
+displayd *ggobi_window_display_new(gint type, gboolean missing_p, datad *d, ggobid *gg);
 
 typedef struct 
 {
-    GtkGGobiDisplayClass parent_class;
+    GGobiDisplayClass parent_class;
 
-} GtkGGobiWindowDisplayClass;
+} GGobiWindowDisplayClass;
 
 
 typedef struct _windowDisplayd {
@@ -228,17 +235,18 @@ gboolean isEmbeddedDisplay(displayd *dpy);
  We might remove it when we are finished the construction.
 */
 
-#define GTK_TYPE_GGOBI_EXTENDED_DISPLAY	 (gtk_ggobi_extended_display_get_type ())
-#define GTK_GGOBI_EXTENDED_DISPLAY(obj)	 (GTK_CHECK_CAST ((obj), GTK_TYPE_GGOBI_EXTENDED_DISPLAY, extendedDisplayd))
-#define GTK_GGOBI_EXTENDED_DISPLAY_CLASS(klass) (GTK_CHECK_CLASS_CAST ((klass), GTK_TYPE_GGOBI_EXTENDED_DISPLAY, GtkGGobiExtendedDisplayClass))
-#define GTK_IS_GGOBI_EXTENDED_DISPLAY(obj)	 (GTK_CHECK_TYPE ((obj), GTK_TYPE_GGOBI_EXTENDED_DISPLAY))
-#define GTK_IS_GGOBI_EXTENDED_DISPLAY_CLASS(klass) (GTK_CHECK_CLASS_TYPE ((klass), GTK_TYPE_GGOBI_EXTENDED_DISPLAY))
+#define GGOBI_TYPE_EXTENDED_DISPLAY	 (ggobi_extended_display_get_type ())
+#define GGOBI_EXTENDED_DISPLAY(obj)	 (G_TYPE_CHECK_INSTANCE_CAST ((obj), GGOBI_TYPE_EXTENDED_DISPLAY, extendedDisplayd))
+#define GGOBI_EXTENDED_DISPLAY_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GGOBI_TYPE_EXTENDED_DISPLAY, GGobiExtendedDisplayClass))
+#define GGOBI_IS_EXTENDED_DISPLAY(obj)	 (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GGOBI_TYPE_EXTENDED_DISPLAY))
+#define GGOBI_IS_EXTENDED_DISPLAY_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GGOBI_TYPE_EXTENDED_DISPLAY))
+#define GGOBI_EXTENDED_DISPLAY_GET_CLASS(obj)  		(G_TYPE_INSTANCE_GET_CLASS ((obj), GGOBI_TYPE_EXTENDED_DISPLAY, GGobiExtendedDisplayClass))
 
-GtkType gtk_ggobi_extended_display_get_type();
+GType ggobi_extended_display_get_type();
 
 typedef struct 
 {
-    GtkGGobiWindowDisplayClass parent_class;
+    GGobiWindowDisplayClass parent_class;
 
     gboolean supports_edges_p;  /* only true for scatterplots? */
     gboolean show_edges_p; /* used in splot_draw_to_pixmap0_unbinned by scatmat and scatterplot (only) */
@@ -268,7 +276,9 @@ typedef struct
 
     gboolean (*cpanel_set)(displayd *dpy, cpaneld *cp, ggobid *gg);
 
-    void (*display_unset)(displayd *dpy, GtkWidget *);
+	const gchar *(*mode_ui_get)(displayd *dpy);
+	
+    void (*display_unset)(displayd *dpy);
     void (*display_set)(displayd *dpy, ggobid *gg);
 
     gboolean (*build_symbol_vectors)(cpaneld *, datad *, ggobid *);
@@ -326,7 +336,7 @@ typedef struct
   void (*set_show_axes_label_option)(displayd *, gboolean);
   void (*set_show_axes_values_option)(displayd *, gboolean);
 
-} GtkGGobiExtendedDisplayClass;
+} GGobiExtendedDisplayClass;
 
 
 typedef struct {
@@ -346,11 +356,14 @@ void display_set_values(displayd *display, datad *d, ggobid *gg);
 const gchar const * gtk_display_tree_label(displayd *dpy);
 const gchar const * gtk_display_title_label(displayd *dpy);
 */
-const gchar * const gtk_display_tree_label(displayd *dpy);
-const gchar * const gtk_display_title_label(displayd *dpy);
+/* These functions are no longer const, because this is dangerous, given
+   that the input is a pointer and the data it points to could change,
+   fooling the compiler - mfl */
+const gchar * /*const*/ ggobi_display_tree_label(displayd *dpy);
+const gchar * /*const*/ ggobi_display_title_label(displayd *dpy);
 
 
-displayd *gtk_ggobi_display_new(gboolean missing_p, datad *d, ggobid *gg);
+displayd *ggobi_display_new(gboolean missing_p, datad *d, ggobid *gg);
 
 #ifdef __cplusplus
 } /* end of extern "C" */

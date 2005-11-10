@@ -27,12 +27,12 @@ datad *
 datad_get_from_window (GtkWidget *window)
 {
   datad *d = NULL;
-  GtkWidget *clist;
+  GtkWidget *tree_view;
 
   if (window != NULL) {
-    clist = get_clist_from_object (GTK_OBJECT(window));
-    if (clist != NULL)
-      d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
+    tree_view = get_tree_view_from_object (G_OBJECT(window));
+    if (tree_view != NULL)
+      d = (datad *) g_object_get_data(G_OBJECT (tree_view), "datad");
   }
 
   return d;
@@ -80,35 +80,35 @@ void sphere_npcs_range_set (gint n, ggobid *gg)
 /*-------------------------------------------------------------------------*/
 /*                          callbacks                                      */
 /*-------------------------------------------------------------------------*/
-
+#if 0
 static gint
-sphere_clist_size_alloc_cb (GtkWidget *w, GdkEvent *event, ggobid *gg)
+sphere_tree_view_size_alloc_cb (GtkWidget *w, GdkEvent *event, ggobid *gg)
 {
   if (!widget_initialized (w)) {
     gint fheight;
-    gint lbearing, rbearing, width, ascent, descent;
-    GtkStyle *style;
-    GtkCList *clist = GTK_CLIST (w);
-    style = gtk_widget_get_style (w);
-    gdk_text_extents (
-#if GTK_MAJOR_VERSION == 2
+    GtkTreeView *tree_view = GTK_TREE_VIEW (w);
+    PangoContext *ctx = gtk_widget_get_pango_context(w);
+	PangoFontMetrics *metrics = pango_context_get_metrics(ctx, 
+		pango_context_get_font_description(ctx), NULL);
+	gint ascent = PANGO_PIXELS(pango_font_metrics_get_ascent(metrics));
+	gint descent = PANGO_PIXELS(pango_font_metrics_get_descent(metrics));
+	/*gdk_text_extents (
       gtk_style_get_font (style),
-#else
-      style->font,
-#endif
       "arbitrary string", strlen ("arbitrary string"),
       &lbearing, &rbearing, &width, &ascent, &descent);
-    fheight = ascent + descent;
-
+    */
     gtk_widget_set_usize (w, -1,
-      4*fheight + 3*1 +  /*-- 1 = CELL_SPACING --*/
-      clist->column_title_area.height);
+      4*(ascent+descent) + 3*1 +  /*-- 1 = CELL_SPACING --*/
+      tree_view->column_title_area.height);
 
     widget_initialize (w, true);
+	
+	pango_font_metrics_unref(metrics);
   }
 
   return true;
 }
+#endif
 
 static void
 deleteit (ggobid *gg) {
@@ -159,7 +159,7 @@ vars_stdized_send_event (datad *d, ggobid *gg)
   {
     gboolean rval = false;
 
-    gtk_signal_emit_by_name (GTK_OBJECT (gg->sphere_ui.stdized_entry),
+    g_signal_emit_by_name (G_OBJECT (gg->sphere_ui.stdized_entry),
       "expose_event", (gpointer) d, (gpointer) &rval);
   }
 }
@@ -285,12 +285,13 @@ scree_expose_cb (GtkWidget *w, GdkEventConfigure *event, ggobid *gg)
   gint j;
   gint xpos, ypos, xstrt, ystrt;
   gchar *tickmk;
-  GtkStyle *style = gtk_widget_get_style (gg->sphere_ui.scree_da);
+  //GtkStyle *style = gtk_widget_get_style (gg->sphere_ui.scree_da);
   datad *d = datad_get_from_window (gg->sphere_ui.window);
   gint wid = w->allocation.width, hgt = w->allocation.height;
   gint *sphvars, nels;
   gfloat *evals;
   colorschemed *scheme = gg->activeColorScheme;
+  PangoLayout *layout;
 
   CHECK_GG (gg);
 
@@ -317,15 +318,12 @@ scree_expose_cb (GtkWidget *w, GdkEventConfigure *event, ggobid *gg)
     for (j=0; j<nels; j++) {
       xpos = (gint)(((gfloat) (wid - 2*margin))/(gfloat)(nels-1)*j+margin);
       ypos = (gint)(((gfloat) (hgt-margin)) - evals[j]/evals[0]*(hgt-2*margin));
-
-      tickmk = g_strdup_printf ("%d", j+1);
-      gdk_draw_string (gg->sphere_ui.scree_pixmap,
-#if GTK_MAJOR_VERSION == 2
+	  tickmk = g_strdup_printf ("%d", j+1);
+	  layout = gtk_widget_create_pango_layout(gg->sphere_ui.scree_da, tickmk);
+	  gdk_draw_layout(gg->sphere_ui.scree_pixmap, gg->plot_GC, xpos, hgt-margin/2, layout);
+      /*gdk_draw_string (gg->sphere_ui.scree_pixmap,
         gtk_style_get_font (style),
-#else
-        style->font,
-#endif
-        gg->plot_GC, xpos, hgt-margin/2, tickmk);
+        gg->plot_GC, xpos, hgt-margin/2, tickmk);*/
       g_free (tickmk);
 
       if (j>0) 
@@ -357,7 +355,7 @@ void scree_plot_make (ggobid *gg)
 
   if (pca_calc (d, gg)) {  /*-- spherevars_set is called here --*/
     gboolean rval = false;
-    gtk_signal_emit_by_name (GTK_OBJECT (gg->sphere_ui.scree_da),
+    g_signal_emit_by_name (G_OBJECT (gg->sphere_ui.scree_da),
       "expose_event", (gpointer) gg, (gpointer) &rval);
     pca_diagnostics_set (d, gg);
   } else {
@@ -378,9 +376,11 @@ sphere_panel_open (ggobid *gg)
   GtkWidget *spinner;
   datad *d;
   GtkWidget *notebook;
-  /*-- for the clist of sphered variables --*/
+  /*-- for the tree_view of sphered variables --*/
   GtkWidget *scrolled_window;
   gchar *titles[1] = {"sphered variables"};
+  GtkListStore *model;
+  
   /*-- --*/
 
   /*-- if used before we have data, bail out --*/
@@ -394,8 +394,8 @@ sphere_panel_open (ggobid *gg)
   if (gg->sphere_ui.window == NULL) {
     d = gg->current_display->d;
   } else {
-    GtkWidget *clist = get_clist_from_object (GTK_OBJECT(gg->sphere_ui.window));
-    d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
+    GtkWidget *tree_view = get_tree_view_from_object (G_OBJECT(gg->sphere_ui.window));
+    d = (datad *) g_object_get_data(G_OBJECT (tree_view), "datad");
   }
 
   spherevars_set (gg); 
@@ -406,8 +406,8 @@ sphere_panel_open (ggobid *gg)
     gg->sphere_ui.window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title (GTK_WINDOW (gg->sphere_ui.window),
       "sphere variables");
-    gtk_signal_connect (GTK_OBJECT (gg->sphere_ui.window), "delete_event",
-                        GTK_SIGNAL_FUNC (close_wmgr_cb), (gpointer) gg);
+    g_signal_connect (G_OBJECT (gg->sphere_ui.window), "delete_event",
+                        G_CALLBACK (close_wmgr_cb), (gpointer) gg);
     gtk_container_set_border_width (GTK_CONTAINER (gg->sphere_ui.window),
       10);
 
@@ -417,29 +417,29 @@ sphere_panel_open (ggobid *gg)
 
     /* Create a notebook, set the position of the tabs */
     notebook = create_variable_notebook (vbox,
-      GTK_SELECTION_EXTENDED, all_vartypes, all_datatypes,
-      (GtkSignalFunc) NULL, gg);
+      GTK_SELECTION_MULTIPLE, all_vartypes, all_datatypes,
+      G_CALLBACK(NULL), gg);
 
     /*-- use correlation matrix? --*/
-    btn = gtk_check_button_new_with_label ("Use correlation matrix");
+    btn = gtk_check_button_new_with_mnemonic ("Use _correlation matrix");
     gtk_widget_set_name (btn, "SPHERE:std_button");
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
       "When this button is checked the correlation matrix is used to generate the PCs, otherwise the variance-covariance matrix is used",
       NULL);
-    gtk_signal_connect (GTK_OBJECT (btn), "toggled",
-                        (GtkSignalFunc) vars_stdized_cb, (gpointer) gg);
+    g_signal_connect (G_OBJECT (btn), "toggled",
+                        G_CALLBACK(vars_stdized_cb), (gpointer) gg);
     gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 1);
 
     /*-- update scree plot when n selected vars changes --*/
-    btn = gtk_button_new_with_label ("Update scree plot");
+    btn = gtk_button_new_with_mnemonic ("_Update scree plot");
     GGobi_widget_set (btn, gg, true);
     gtk_box_pack_start (GTK_BOX (vbox), btn,
       false, false, 0);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
       "Update scree plot when a new set of variables is selected, or when variables are transformed",
       NULL);
-    gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                        GTK_SIGNAL_FUNC (scree_update_cb), gg);
+    g_signal_connect (G_OBJECT (btn), "clicked",
+                        G_CALLBACK (scree_update_cb), gg);
 
     /*-- scree plot --*/
     frame = gtk_frame_new ("Scree plot");
@@ -453,21 +453,19 @@ sphere_panel_open (ggobid *gg)
     gtk_container_add (GTK_CONTAINER (frame), vb);
  
     gg->sphere_ui.scree_da = gtk_drawing_area_new ();
-#if GTK_MAJOR_VERSION == 2
     gtk_widget_set_double_buffered(gg->sphere_ui.scree_da, false);
-#endif
-    gtk_drawing_area_size (GTK_DRAWING_AREA (gg->sphere_ui.scree_da),
+    gtk_widget_set_size_request(GTK_WIDGET (gg->sphere_ui.scree_da),
       SCREE_WIDTH, SCREE_HEIGHT);
     gtk_box_pack_start (GTK_BOX (vb), gg->sphere_ui.scree_da,
                         true, true, 1);
 
-    gtk_signal_connect (GTK_OBJECT (gg->sphere_ui.scree_da),
+    g_signal_connect (G_OBJECT (gg->sphere_ui.scree_da),
                         "expose_event",
-                        (GtkSignalFunc) scree_expose_cb,
+                        G_CALLBACK(scree_expose_cb),
                         (gpointer) gg);
-    gtk_signal_connect (GTK_OBJECT (gg->sphere_ui.scree_da),
+    g_signal_connect (G_OBJECT (gg->sphere_ui.scree_da),
                         "configure_event",
-                        (GtkSignalFunc) scree_configure_cb,
+                        G_CALLBACK(scree_configure_cb),
                         (gpointer) gg);
 
     /*-- element 3 of vbox: controls in a labelled frame --*/
@@ -481,7 +479,7 @@ sphere_panel_open (ggobid *gg)
     gtk_container_set_border_width (GTK_CONTAINER (table), 4);
 
     /*-- current variance --*/
-    label = gtk_label_new ("Set number of PCs");
+    label = gtk_label_new_with_mnemonic ("Set number of _PCs");
     gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
     gtk_table_attach (GTK_TABLE (table), label,
       0, 1, 0, 1, GTK_FILL, GTK_FILL, 0, 0);
@@ -491,18 +489,15 @@ sphere_panel_open (ggobid *gg)
     gg->sphere_ui.npcs_adj = gtk_adjustment_new ((gfloat) d->sphere.vars.nels,
        1.0, (gfloat) d->sphere.vars.nels, 1.0, 5.0, 0.0);
 
-    gtk_signal_connect (GTK_OBJECT (gg->sphere_ui.npcs_adj),
+    g_signal_connect (G_OBJECT (gg->sphere_ui.npcs_adj),
                         "value_changed",
-                        GTK_SIGNAL_FUNC (sphere_npcs_set_cb),
+                        G_CALLBACK (sphere_npcs_set_cb),
                         gg);
 
     spinner = gtk_spin_button_new (GTK_ADJUSTMENT (gg->sphere_ui.npcs_adj),
                                    0, 0);
+	gtk_label_set_mnemonic_widget(GTK_LABEL(label), spinner);
     gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinner), false);
-#if GTK_MAJOR_VERSION == 1
-    gtk_spin_button_set_shadow_type (GTK_SPIN_BUTTON (spinner),
-                                     GTK_SHADOW_OUT);
-#endif
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), spinner,
       "Specify the number of principal components",
       NULL);
@@ -510,13 +505,14 @@ sphere_panel_open (ggobid *gg)
       1, 2, 0, 1, GTK_FILL, GTK_FILL, 0, 0);
 
     /*-- total variance --*/
-    label = gtk_label_new ("Variance");
+    label = gtk_label_new_with_mnemonic ("_Variance");
     gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
     gtk_table_attach (GTK_TABLE (table), label,
       0, 1, 1, 2, GTK_FILL, GTK_FILL, 0, 0);
 
     gg->sphere_ui.variance_entry = gtk_entry_new ();
-    gtk_entry_set_editable (GTK_ENTRY (gg->sphere_ui.variance_entry), false);
+	gtk_label_set_mnemonic_widget(GTK_LABEL(label), gg->sphere_ui.variance_entry);
+    gtk_editable_set_editable (GTK_EDITABLE (gg->sphere_ui.variance_entry), false);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->sphere_ui.variance_entry,
       "The percentage of variance accounted for by the first n principal components",
       NULL);
@@ -527,13 +523,14 @@ sphere_panel_open (ggobid *gg)
       1, 2, 1, 2, GTK_FILL, GTK_FILL, 0, 0);
 
     /*-- condition number --*/
-    label = gtk_label_new ("Condition number");
+    label = gtk_label_new_with_mnemonic ("Condition _number");
     gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
     gtk_table_attach (GTK_TABLE (table), label,
       0, 1, 2, 3, GTK_FILL, GTK_FILL, 0, 0);
 
     gg->sphere_ui.condnum_entry = gtk_entry_new ();
-    gtk_entry_set_editable (GTK_ENTRY (gg->sphere_ui.condnum_entry), false);
+	gtk_label_set_mnemonic_widget(GTK_LABEL(label), gg->sphere_ui.condnum_entry);
+    gtk_editable_set_editable (GTK_EDITABLE (gg->sphere_ui.condnum_entry), false);
     gtk_entry_set_text (GTK_ENTRY (gg->sphere_ui.condnum_entry), "-");
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->sphere_ui.condnum_entry,
       "The condition number for the specified number of principal components",
@@ -551,14 +548,14 @@ sphere_panel_open (ggobid *gg)
     gtk_container_add (GTK_CONTAINER (frame), vb);
 
     /*-- last: after choosing nPCs, the apply button --*/
-    gg->sphere_ui.apply_btn = gtk_button_new_with_label ("Apply sphering");
+    gg->sphere_ui.apply_btn = gtk_button_new_with_mnemonic ("_Apply sphering");
     gtk_box_pack_start (GTK_BOX (vb), gg->sphere_ui.apply_btn,
       false, false, 0);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->sphere_ui.apply_btn,
       "Apply principal components transformation to the selected variables",
       NULL);
-    gtk_signal_connect (GTK_OBJECT (gg->sphere_ui.apply_btn), "clicked",
-                        GTK_SIGNAL_FUNC (sphere_apply_cb), gg);
+    g_signal_connect (G_OBJECT (gg->sphere_ui.apply_btn), "clicked",
+                        G_CALLBACK (sphere_apply_cb), gg);
 
     /*-- list to show the currently sphered variables --*/
     scrolled_window = gtk_scrolled_window_new (NULL, NULL);
@@ -567,16 +564,19 @@ sphere_panel_open (ggobid *gg)
     gtk_box_pack_start (GTK_BOX (vb), scrolled_window,
       true, true, 0);
 
-    gg->sphere_ui.clist = gtk_clist_new_with_titles (1, titles);
-    gtk_signal_connect (GTK_OBJECT (gg->sphere_ui.clist),
+	model = gtk_list_store_new(1, G_TYPE_STRING);
+    gg->sphere_ui.tree_view = gtk_tree_view_new_with_model (GTK_TREE_MODEL(model));
+	populate_tree_view(gg->sphere_ui.tree_view, titles, G_N_ELEMENTS(titles), true, 
+		GTK_SELECTION_SINGLE, NULL, NULL);
+    /*g_signal_connect (G_OBJECT (gg->sphere_ui.tree_view),
                         "size_allocate",
-                        (GtkSignalFunc) sphere_clist_size_alloc_cb,
-                        (gpointer) gg);
-    gtk_clist_column_titles_passive (GTK_CLIST (gg->sphere_ui.clist));
-    widget_initialize (gg->sphere_ui.clist, false);
+                        G_CALLBACK(sphere_tree_view_size_alloc_cb),
+                        (gpointer) gg);*/
+	gtk_tree_view_set_headers_clickable(GTK_TREE_VIEW(gg->sphere_ui.tree_view), false);
+    widget_initialize (gg->sphere_ui.tree_view, false);
 
     gtk_container_add (GTK_CONTAINER (scrolled_window),
-      gg->sphere_ui.clist);
+      gg->sphere_ui.tree_view);
     /*-- --*/
 
 /*
@@ -586,8 +586,8 @@ sphere_panel_open (ggobid *gg)
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->sphere_ui.restore_btn,
       "Restore the scree plot to reflect the current principal components",
       NULL);
-    gtk_signal_connect (GTK_OBJECT (gg->sphere_ui.restore_btn), "clicked",
-                        GTK_SIGNAL_FUNC (scree_restore_cb), gg);
+    g_signal_connect (G_OBJECT (gg->sphere_ui.restore_btn), "clicked",
+                        G_CALLBACK (scree_restore_cb), gg);
     gtk_box_pack_start (GTK_BOX (vb), gg->sphere_ui.restore_btn,
       false, false, 0);
 */
@@ -598,14 +598,14 @@ sphere_panel_open (ggobid *gg)
     hb = gtk_hbox_new (false, 2);
     gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 1);
 
-    btn = gtk_button_new_with_label ("Close");
+    btn = gtk_button_new_from_stock (GTK_STOCK_CLOSE);
     gtk_box_pack_start (GTK_BOX (hb), btn, true, false, 0);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
       "Close the sphering window", NULL);
-    gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                        GTK_SIGNAL_FUNC (close_btn_cb), gg);
+    g_signal_connect (G_OBJECT (btn), "clicked",
+                        G_CALLBACK (close_btn_cb), gg);
 
-    gtk_object_set_data (GTK_OBJECT (gg->sphere_ui.window),
+    g_object_set_data(G_OBJECT (gg->sphere_ui.window),
       "notebook", notebook);
   }
 
@@ -617,22 +617,22 @@ sphere_panel_open (ggobid *gg)
 /*-- play around with making this notebook larger --*/
   if (g_list_length (GTK_NOTEBOOK(notebook)->children) > 0) {
     gint page;
-    GtkWidget *swin, *clist;
+    GtkWidget *swin, *tree_view;
     GtkAdjustment *adj;
     page = gtk_notebook_get_current_page (GTK_NOTEBOOK (notebook));
     swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), page);
     if (swin) {
       adj = gtk_scrolled_window_get_vadjustment (GTK_SCROLLED_WINDOW (swin));
-      clist = GTK_BIN (swin)->child;
-      if (clist->allocation.height < adj->upper) {
-        gint sz = MIN(clist->allocation.height*2, adj->upper);
-        gtk_widget_set_usize (clist, -1, sz);
+      tree_view = GTK_BIN (swin)->child;
+      if (tree_view->allocation.height < adj->upper) {
+        gint sz = MIN(tree_view->allocation.height*2, adj->upper);
+        gtk_widget_set_size_request (tree_view, -1, sz);
       }
       /*
       g_printerr ("value %f lower %f upper %f size %f\n", 
         adj->value, adj->lower, adj->upper, adj->page_size);
       g_printerr ("swin height %d\n", swin->allocation.height);
-      g_printerr ("clist height %d\n", clist->allocation.height);
+      g_printerr ("tree_view height %d\n", tree_view->allocation.height);
       */
     }
   }

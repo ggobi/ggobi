@@ -167,8 +167,8 @@ varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint btn,
   }
 
     /* Change the source object for this event to something more meaningful! */
-  gtk_signal_emit(GTK_OBJECT(gg->main_window),
-    GGobiSignals[VARIABLE_SELECTION_SIGNAL], jvar, display->d, sp, gg);
+  g_signal_emit(G_OBJECT(gg->main_window),
+    GGobiSignals[VARIABLE_SELECTION_SIGNAL], 0, jvar, display->d, sp, gg);
 
   /*-- overkill for scatmat: could redraw one row, one column --*/
   /*-- overkill for parcoords: need to redraw at most 3 plots --*/
@@ -203,14 +203,14 @@ varpanel_show_page (displayd *display, ggobid *gg)
     return;
 
   page_new = 0;
-  children = gtk_container_children (GTK_CONTAINER (gg->varpanel_ui.notebook));
+  children = gtk_container_get_children (GTK_CONTAINER (gg->varpanel_ui.notebook));
   for (l = children; l; l = l->next) {
     child = l->data;
     tab_label = (GtkWidget *) gtk_notebook_get_tab_label (nb, child);
     if (tab_label && GTK_IS_LABEL (tab_label)) {
       if (strcmp (GTK_LABEL (tab_label)->label, d->name) == 0) {
         if (page != page_new) {
-          gtk_notebook_set_page (nb, page_new);
+          gtk_notebook_set_current_page (nb, page_new);
           break;
         }
       }
@@ -392,8 +392,8 @@ varpanel_checkbox_add (gint j, datad *d, ggobid *gg)
   vartabled *vt = vartable_element_get (j, d);
   GtkWidget *w = gtk_noop_check_button_new_with_label (vt->collab);
   GGobi_widget_set (w, gg, true);
-  gtk_signal_connect (GTK_OBJECT (w),
-    "button_press_event", GTK_SIGNAL_FUNC (varsel_cb), d);
+  g_signal_connect (G_OBJECT (w),
+    "button_press_event", G_CALLBACK (varsel_cb), d);
   gtk_box_pack_start (GTK_BOX (d->vcbox_ui.vbox),
     w, false, false, 0);
 
@@ -445,8 +445,8 @@ varpanel_make (GtkWidget *parent, ggobid *gg) {
   gg->varpanel_ui.notebook = gtk_notebook_new ();
   gtk_notebook_set_tab_pos (GTK_NOTEBOOK (gg->varpanel_ui.notebook),
     GTK_POS_TOP);
-  gtk_signal_connect (GTK_OBJECT (gg->varpanel_ui.notebook), "switch-page",
-    GTK_SIGNAL_FUNC (varpanel_switch_page_cb), gg);
+  g_signal_connect (G_OBJECT (gg->varpanel_ui.notebook), "switch-page",
+    G_CALLBACK (varpanel_switch_page_cb), gg);
 
   gtk_box_pack_start (GTK_BOX (parent), gg->varpanel_ui.notebook,
     true, true, 2);
@@ -464,7 +464,7 @@ varpanel_clear (datad *d, ggobid *gg)
   if (gg->varpanel_ui.notebook != NULL &&
       GTK_WIDGET_REALIZED (gg->varpanel_ui.notebook))
   {
-    pages = gtk_container_children (GTK_CONTAINER (gg->varpanel_ui.notebook));
+    pages = gtk_container_get_children (GTK_CONTAINER (gg->varpanel_ui.notebook));
     npages = g_list_length (pages);
     for (k=0; k< npages; k++)
       gtk_notebook_remove_page (GTK_NOTEBOOK (gg->varpanel_ui.notebook), 0);

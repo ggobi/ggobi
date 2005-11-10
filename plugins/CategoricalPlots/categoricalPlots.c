@@ -46,7 +46,7 @@ show_barplot_display(PluginInstance *inst, GtkWidget *widget)
 	return;
     }
 
-    data = (datad*) gtk_object_get_data(GTK_OBJECT(widget), "data");
+    data = (datad*) g_object_get_data(G_OBJECT(widget), "data");
     if(!data)
 	return;
 
@@ -76,8 +76,8 @@ addBarplotMenuItems (ggobid *gg, PluginInstance *inst)
 
   entry = GGobi_addDisplayMenuItem ("Barplot", gg);    
   if (entry != NULL)
-    gtk_signal_connect_object (GTK_OBJECT(entry), "activate",
-      GTK_SIGNAL_FUNC (show_barplot_display), (gpointer) inst);
+    g_signal_connect_swapped (G_OBJECT(entry), "activate",
+      G_CALLBACK (show_barplot_display), (gpointer) inst);
 
   return(true);
 }

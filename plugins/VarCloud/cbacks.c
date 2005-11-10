@@ -35,7 +35,7 @@ launch_varcloud_cb (GtkWidget *w, PluginInstance *inst)
   gint var1 = vcl->var1, var2 = vcl->var2;
   gdouble xci, xcj, yci, ycj;
   gchar *lbl;
-  gchar *name = gtk_widget_get_name (w);
+  const gchar *name = gtk_widget_get_name (w);
 
   /*
      If widget name is 'Cross', this should be a cross-variogram

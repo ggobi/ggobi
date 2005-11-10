@@ -142,12 +142,12 @@ tour2d3_realloc_up (gint nc, datad *d, ggobid *gg)
   GList *l;
 
   for (l=gg->displays; l; l=l->next) {
-    GtkGGobiExtendedDisplayClass *klass;
+    GGobiExtendedDisplayClass *klass;
     dsp = (displayd *) l->data;
 
-    if(!GTK_IS_GGOBI_EXTENDED_DISPLAY(dsp))
+    if(!GGOBI_IS_EXTENDED_DISPLAY(dsp))
       continue;
-    klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(dsp));
+    klass = GGOBI_EXTENDED_DISPLAY_GET_CLASS(dsp);
     if(klass->tour2d3_realloc)
         klass->tour2d3_realloc(dsp, nc, d);
   }
@@ -589,13 +589,13 @@ void tour2d3_func (gboolean state, displayd *dsp, ggobid *gg)
 {
   if (state) {
     if (dsp->t2d3.idled == 0) {
-      dsp->t2d3.idled = gtk_idle_add_priority (G_PRIORITY_LOW,
-                                   (GtkFunction) tour2d3_idle_func, dsp);
+      dsp->t2d3.idled = g_idle_add_full (G_PRIORITY_LOW,
+                                   (GtkFunction) tour2d3_idle_func, dsp, NULL);
     }
     gg->tour2d3.idled = 1;
   } else {
     if (dsp->t2d3.idled != 0) {
-      gtk_idle_remove (dsp->t2d3.idled);
+      g_source_remove (dsp->t2d3.idled);
       dsp->t2d3.idled = 0;
     }
     gg->tour2d3.idled = 0;

@@ -51,7 +51,7 @@ varpanel_widget_get_nth (gint jbutton, gint jvar, datad *d)
   if(!box)
     return(NULL);
 
-  child = (GtkWidget *) gtk_object_get_data (GTK_OBJECT (box),
+  child = (GtkWidget *) g_object_get_data(G_OBJECT (box),
     varpanel_names[jbutton]);
   return child;
 }
@@ -82,7 +82,7 @@ varpanel_widget_set_visible (gint jbutton, gint jvar, gboolean show, datad *d)
   gboolean visible;
 
   box = (GtkWidget *) varpanel_container_get_nth (jvar, d);
-  child = (GtkWidget *) gtk_object_get_data (GTK_OBJECT (box),
+  child = (GtkWidget *) g_object_get_data(G_OBJECT (box),
     varpanel_names[jbutton]);
 
   visible = GTK_WIDGET_VISIBLE (child);
@@ -137,15 +137,15 @@ varsel (GtkWidget *w, cpaneld *cpanel, splotd *sp, gint jvar,
   displayd *display = (displayd *) sp->displayptr;
   gboolean redraw = false;
 
-  if (display == NULL || !GTK_IS_GGOBI_WINDOW_DISPLAY(display) || 
-            !GTK_IS_WIDGET (GTK_GGOBI_WINDOW_DISPLAY(display)->window)) 
+  if (display == NULL || !GGOBI_IS_WINDOW_DISPLAY(display) || 
+            !GTK_IS_WIDGET (GGOBI_WINDOW_DISPLAY(display)->window)) 
   {
     g_printerr ("Bug?  I see no active display\n");
     return ;
   }
 
-  if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
-     redraw = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display))->variable_select(w, display, sp, jvar, toggle, mousebtn, cpanel, gg);
+  if(GGOBI_IS_EXTENDED_DISPLAY(display)) {
+     redraw = GGOBI_EXTENDED_DISPLAY_GET_CLASS(display)->variable_select(w, display, sp, jvar, toggle, mousebtn, cpanel, gg);
   }
 
   /* 
@@ -157,7 +157,7 @@ varsel (GtkWidget *w, cpaneld *cpanel, splotd *sp, gint jvar,
    * the current splot, that case is suppressed.
    */
   if (sp == gg->current_splot)
-    gtk_signal_emit(GTK_OBJECT(gg), GGobiSignals[VARIABLE_SELECTION_SIGNAL], 
+    g_signal_emit(G_OBJECT(gg), GGobiSignals[VARIABLE_SELECTION_SIGNAL], 0,
       display->d, jvar, sp);
 
   /*-- overkill for scatmat: could redraw one row, one column --*/
@@ -193,14 +193,14 @@ varpanel_show_page (displayd *display, ggobid *gg)
     return;
 
   page_new = 0;
-  children = gtk_container_children (GTK_CONTAINER (gg->varpanel_ui.notebook));
+  children = gtk_container_get_children (GTK_CONTAINER (gg->varpanel_ui.notebook));
   for (l = children; l; l = l->next) {
     child = l->data;
     tab_label = (GtkWidget *) gtk_notebook_get_tab_label (nb, child);
     if (tab_label && GTK_IS_LABEL (tab_label)) {
       if (strcmp (GTK_LABEL (tab_label)->label, d->name) == 0) {
         if (page != page_new) {
-          gtk_notebook_set_page (nb, page_new);
+          gtk_notebook_set_current_page (nb, page_new);
           if (gg->status_message_func)
             gg->status_message_func((gchar *)NULL, gg);
           break;
@@ -242,8 +242,8 @@ varpanel_refresh (displayd *display, ggobid *gg)
     d = display->d;
 
     if (sp != NULL && d != NULL) {
-      if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
-        GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display))->varpanel_refresh(display, sp, d);
+      if(GGOBI_IS_EXTENDED_DISPLAY(display)) {
+        GGOBI_EXTENDED_DISPLAY_GET_CLASS(display)->varpanel_refresh(display, sp, d);
       }
     }
   } else {
@@ -344,37 +344,37 @@ varpanel_add_row (gint j, datad *d, ggobid *gg)
   gtk_box_pack_start (GTK_BOX (d->vcbox_ui.vbox),
     box, false, false, 0);
 
-  xw = gtk_noop_toggle_button_new_with_label (" X ");
+  xw = ggobi_noop_toggle_button_new_with_label (" X ");
   gtk_box_pack_start (GTK_BOX (box), xw, false, false, 2);
   GGobi_widget_set (xw, gg, true);
-  gtk_object_set_data (GTK_OBJECT(box), varpanel_names[VARSEL_X], xw);
-  gtk_signal_connect (GTK_OBJECT (xw),
-    "button_press_event", GTK_SIGNAL_FUNC (varsel_cb), d);
+  g_object_set_data(G_OBJECT(box), varpanel_names[VARSEL_X], xw);
+  g_signal_connect (G_OBJECT (xw),
+    "button_press_event", G_CALLBACK (varsel_cb), d);
   gtk_widget_show (xw);
 
-  yw = gtk_noop_toggle_button_new_with_label (" Y ");
+  yw = ggobi_noop_toggle_button_new_with_label (" Y ");
   gtk_box_pack_start (GTK_BOX (box), yw, false, false, 2);
   GGobi_widget_set (yw, gg, true);
-  gtk_object_set_data (GTK_OBJECT(box), varpanel_names[VARSEL_Y], yw);
-  gtk_signal_connect (GTK_OBJECT (yw),
-    "button_press_event", GTK_SIGNAL_FUNC (varsel_cb), d);
+  g_object_set_data(G_OBJECT(box), varpanel_names[VARSEL_Y], yw);
+  g_signal_connect (G_OBJECT (yw),
+    "button_press_event", G_CALLBACK (varsel_cb), d);
   gtk_widget_show (yw);
 
-  zw = gtk_noop_toggle_button_new_with_label (" Z ");
+  zw = ggobi_noop_toggle_button_new_with_label (" Z ");
   gtk_box_pack_start (GTK_BOX (box), zw, false, false, 2);
   GGobi_widget_set (zw, gg, true);
-  gtk_object_set_data (GTK_OBJECT(box), varpanel_names[VARSEL_Z], zw);
-  gtk_signal_connect (GTK_OBJECT (zw),
-    "button_press_event", GTK_SIGNAL_FUNC (varsel_cb), d);
+  g_object_set_data(G_OBJECT(box), varpanel_names[VARSEL_Z], zw);
+  g_signal_connect (G_OBJECT (zw),
+    "button_press_event", G_CALLBACK (varsel_cb), d);
   /*-- hide this widget by default --*/
 
   /*-- the label is actually a button, with the old behavior --*/
   label = gtk_button_new_with_label (vt->collab_tform);
   gtk_button_set_relief (GTK_BUTTON (label), GTK_RELIEF_NONE);
   GGobi_widget_set (label, gg, true);
-  gtk_object_set_data (GTK_OBJECT(box), varpanel_names[VARSEL_LABEL], label);
-  gtk_signal_connect (GTK_OBJECT (label),
-    "button_press_event", GTK_SIGNAL_FUNC (varsel_cb), d);
+  g_object_set_data(G_OBJECT(box), varpanel_names[VARSEL_LABEL], label);
+  g_signal_connect (G_OBJECT (label),
+    "button_press_event", G_CALLBACK (varsel_cb), d);
   gtk_box_pack_start (GTK_BOX (box), label, false, false, 2);
   gtk_widget_show (label);
 
@@ -442,15 +442,15 @@ varpanel_make (GtkWidget *parent, ggobid *gg) {
   gg->varpanel_ui.notebook = gtk_notebook_new ();
   gtk_notebook_set_tab_pos (GTK_NOTEBOOK (gg->varpanel_ui.notebook),
     GTK_POS_TOP);
-  gtk_signal_connect (GTK_OBJECT (gg->varpanel_ui.notebook), "switch-page",
-    GTK_SIGNAL_FUNC (varpanel_switch_page_cb), gg);
+  g_signal_connect (G_OBJECT (gg->varpanel_ui.notebook), "switch-page",
+    G_CALLBACK (varpanel_switch_page_cb), gg);
 
   gtk_box_pack_start (GTK_BOX (parent), gg->varpanel_ui.notebook,
     true, true, 2);
 
   /*-- prepare to respond to variable_added events --*/
-  gtk_signal_connect (GTK_OBJECT (gg), "variable_added",
-    GTK_SIGNAL_FUNC (varpanel_addvar_cb), NULL);
+  g_signal_connect (G_OBJECT (gg), "variable_added",
+    G_CALLBACK (varpanel_addvar_cb), NULL);
 
   gtk_widget_show (gg->varpanel_ui.notebook);
 }
@@ -465,7 +465,7 @@ varpanel_clear (datad *d, ggobid *gg)
   if (gg->varpanel_ui.notebook != NULL &&
       GTK_WIDGET_REALIZED (gg->varpanel_ui.notebook))
   {
-    pages = gtk_container_children (GTK_CONTAINER (gg->varpanel_ui.notebook));
+    pages = gtk_container_get_children (GTK_CONTAINER (gg->varpanel_ui.notebook));
     npages = g_list_length (pages);
     for (k=0; k< npages; k++)
       gtk_notebook_remove_page (GTK_NOTEBOOK (gg->varpanel_ui.notebook), 0);
@@ -488,14 +488,12 @@ varpanel_populate (datad *d, ggobid *gg)
 
   /*-- create a paned widget --*/
   d->varpanel_ui.hpane = gtk_hpaned_new ();
-#ifndef GTK_2_0
-  gtk_paned_set_handle_size (GTK_PANED(d->varpanel_ui.hpane), 0);
-#endif
-  gtk_paned_set_gutter_size (GTK_PANED(d->varpanel_ui.hpane), 0);
+  /* not possible to set gutter size in GTK2 */
+  //gtk_paned_set_gutter_size (GTK_PANED(d->varpanel_ui.hpane), 0);
   /*-- set the handle position all the way to the right --*/
   gtk_paned_set_position (GTK_PANED(d->varpanel_ui.hpane), -1);
 
-  gtk_object_set_data(GTK_OBJECT(d->varpanel_ui.hpane), "datad", d);/*setdata*/
+  g_object_set_data(G_OBJECT(d->varpanel_ui.hpane), "datad", d);/*setdata*/
   /*-- only add a tab if there are variables --*/
   if (g_slist_length (d->vartable) > 0 || d->ncols > 0) {
     gtk_notebook_append_page (GTK_NOTEBOOK (gg->varpanel_ui.notebook),
@@ -540,11 +538,11 @@ void
 GGOBI(selectScatterplotX) (GtkWidget *w, gint jvar, ggobid *gg) 
 {
   displayd *display = gg->current_display;
-  GtkGGobiExtendedDisplayClass *klass;
+  GGobiExtendedDisplayClass *klass;
 
-  if(!GTK_IS_GGOBI_EXTENDED_DISPLAY(display))
+  if(!GGOBI_IS_EXTENDED_DISPLAY(display))
     return;
-  klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display));
+  klass = GGOBI_EXTENDED_DISPLAY_GET_CLASS(display);
   if(klass->select_X)
     klass->select_X(w, display, jvar, gg);
 }
@@ -588,8 +586,8 @@ varpanel_tooltips_set (displayd *display, ggobid *gg)
       wz = varpanel_widget_get_nth (VARSEL_Z, j, d);
       label = varpanel_widget_get_nth (VARSEL_LABEL, j, d);
     
-      if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
-         GtkGGobiExtendedDisplayClass *klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display));
+      if(GGOBI_IS_EXTENDED_DISPLAY(display)) {
+         GGobiExtendedDisplayClass *klass = GGOBI_EXTENDED_DISPLAY_GET_CLASS(display);
          if(klass->varpanel_tooltips_set)
            klass->varpanel_tooltips_set(display, gg, wx, wy, wz, label);
       }

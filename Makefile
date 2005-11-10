@@ -24,21 +24,21 @@ LD=$(CXX)
 LD=$(CC)
 
 
-#CFLAGS+= -g -g2 -Wall -fPIC -DHAVE_GGOBI_CONFIG_H -DPARCOORDS_DRAG_AND_DROP=1  $(EXTRA_CFLAGS)
-CFLAGS+= -g -g2 -Wall -fPIC -DHAVE_GGOBI_CONFIG_H $(EXTRA_CFLAGS)
+CFLAGS+= -g -g2 -Wall -fPIC -DHAVE_GGOBI_CONFIG_H -DPARCOORDS_DRAG_AND_DROP=1  $(EXTRA_CFLAGS)
+#CFLAGS+= -g -g2 -Wall -fPIC -DHAVE_GGOBI_CONFIG_H $(EXTRA_CFLAGS)
 #CFLAGS= -g -w -DHAVE_CONFIG_H # when using Irix cc, suppress warnings
 CXXFLAGS=$(CFLAGS)
 
-ifndef GTK_CONFIG
- GTK_CONFIG=gtk-config
+ifndef PKG_CONFIG
+ PKG_CONFIG=pkg-config
 endif
 
 ifndef GTK_CFLAGS
- GTK_CFLAGS=`$(GTK_CONFIG) --cflags`
+ GTK_CFLAGS=`$(PKG_CONFIG) gtk+-2.0 --cflags`
 endif
 
 ifndef GTK_LIBS
- GTK_LIBS=`$(GTK_CONFIG) --libs`
+ GTK_LIBS=`$(PKG_CONFIG) gtk+-2.0 --libs`
 endif
 
 ifdef TEST_KEYS
@@ -57,20 +57,17 @@ ifndef DOXYGEN
   DOXYGEN=doxygen
 endif
 
-
-ifdef GTK_2
 GLIB_GENMARSHAL=glib-genmarshal
 
 marshal.h: marshal.list
-	 $(GLIB_GENMARSHAL) --prefix=gtk_marshal $< --header > $@
+	 $(GLIB_GENMARSHAL) --prefix=ggobi_marshal $< --header > $@
 
 marshal.c: marshal.list
-	 $(GLIB_GENMARSHAL) --prefix=gtk_marshal $< --body > $@
+	 $(GLIB_GENMARSHAL) --prefix=ggobi_marshal $< --body > $@
 
-make_ggobi.o: marshal.h GtkSignalDef.c
+make_ggobi.o: marshal.h
 
 ggobiClass.o: marshal.h
-endif
 
 # used to comment out sections of code for incompletely
 # implemented or buggy functionality
@@ -137,7 +134,7 @@ SRC=\
  tour2d3.c tour2d3_ui.c \
  tour.c tourcorr.c tourcorr_ui.c \
  transform.c transform_ui.c \
- utils.c utils_gdk.c utils_ui.c \
+ utils.c utils_gdk.c utils_ui.c utils_pango.c \
  varchange.c varcircles.c varpanel_ui.c \
  vartable.c vartable_nbook.c vartable_ui.c \
  vector.c wvis.c wvis_ui.c win32_draw.c \
@@ -145,14 +142,7 @@ SRC=\
  xlines.c xyplot.c xyplot_ui.c \
 \
  mt19937ar.c cokus.c \
- print.c 
-
-
-ifdef GTK_2
- SRC+=marshal.c
-else
- SRC+=gtkextruler.c gtkexthruler.c gtkextvruler.c 
-endif
+ print.c marshal.c
 
 ifdef TEST_EVENTS
   SRC+=  testEvents.c
@@ -205,7 +195,7 @@ ggobi.sched: $(OB)
 	$(CC) -S $(OB) $(LDFLAGS)  $(XML_LIB_DIRS:%=-L%) $(XML_LIBS) `gtk-config --cflags --libs`
 
 mt19937ar.o: mt19937ar.c
-	$(CC) $(CFLAGS) `gtk-config --cflags` -c $<
+	$(CC) $(CFLAGS) -c $<
 
 efence: $(OB)
 	MALLOC_CHECK_=2

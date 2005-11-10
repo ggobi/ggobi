@@ -59,10 +59,10 @@ tour1d_varrect_retune (display, gg) {
     "TOUR1D:rectholder");
 
   /*--- Reset the jvar element of each varrectd struct  --*/
-  children = (GSList *) gtk_container_children (GTK_CONTAINER (rectholder));
+  children = (GSList *) gtk_container_get_children (GTK_CONTAINER (rectholder));
   for (l = children, j = 0; l; l=l->next, j++) {
     w = (GtkWidget *) l->data;
-    r = (rectdatad *) gtk_object_get_data (GTK_OBJECT (w), "rectdata");
+    r = (rectdatad *) g_object_get_data(G_OBJECT (w), "rectdata");
     r->jvar = display->vp_tour1d.vars[j];
   }
 }
@@ -102,10 +102,10 @@ tour1d_varrect_remove (jvar) {
     "TOUR1D:rectholder");
 
   /*--- Find the varrectd struct associated with jvar --*/
-  children = (GList *) gtk_container_children (GTK_CONTAINER (rectholder));
+  children = (GList *) gtk_container_get_children (GTK_CONTAINER (rectholder));
   for (l = children, j = 0; l; l=l->next, j++) {
     w = (GtkWidget *) l->data;
-    r = (rectdatad *) gtk_object_get_data (GTK_OBJECT (w), "rectdata");
+    r = (rectdatad *) g_object_get_data(G_OBJECT (w), "rectdata");
     if (r->jvar == jvar) {
       g_list_remove (r);
       varrect_destroy (r);

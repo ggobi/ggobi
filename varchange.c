@@ -62,9 +62,9 @@ addvar_pipeline_realloc (datad *d, ggobid *gg)
    be messy, too, because they have to respond in a particular order ..
    Oh man ...
 
-  gtk_signal_connect (GTK_OBJECT (gg),
+  g_signal_connect (G_OBJECT (gg),
                       "variable_added", 
-                      GTK_SIGNAL_FUNC (variable_notebook_varchange_cb),
+                      G_CALLBACK (variable_notebook_varchange_cb),
                       GTK_OBJECT (notebook));
 
 void 
@@ -74,20 +74,13 @@ variable_notebook_varchange_cb (ggobid *gg, vartabled *vt, gint which,
 void
 addvar_propagate (gint ncols_prev, gint ncols_added, datad *d, ggobid *gg)
 {
-  gint j, k, jvar;
-  vartabled *vt;
+  gint j, jvar;
 
   for (j=0; j<ncols_added; j++) {
     jvar = ncols_prev + j;  /*-- its new index --*/
 
-    /*-- update the clist widget (the visible table) --*/
+    /*-- update the tree_view widget (the visible table) --*/
     vartable_row_append (jvar, d, gg);          /*-- append empty --*/
-
-    /*-- add rows for the levels for categorical variables --*/
-    vt = vartable_element_get (jvar, d);
-    if (vt->vartype == categorical)
-      for (k=0; k<vt->nlevels; k++)
-        vartable_row_append (jvar, d, gg);
 
     vartable_cells_set_by_var (jvar, d);  /*-- then populate --*/
   }
@@ -157,8 +150,8 @@ newvar_add_with_values (gdouble *vals, gint nvals, gchar *vname,
        is set.
 */
   /*-- emit variable_added signal --*/
-  gtk_signal_emit (GTK_OBJECT (gg),
-    GGobiSignals[VARIABLE_ADDED_SIGNAL], vt, d->ncols -1, d); 
+  g_signal_emit (G_OBJECT (gg),
+    GGobiSignals[VARIABLE_ADDED_SIGNAL], 0, vt, d->ncols -1, d); 
 }
 
 void
@@ -200,19 +193,19 @@ clone_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
     vt = vartable_element_get (n, d);
 
     /*-- emit variable_added signal. Is n the correct index? --*/
-    gtk_signal_emit (GTK_OBJECT (gg),
-                     GGobiSignals[VARIABLE_ADDED_SIGNAL], vt, n, d); 
+    g_signal_emit (G_OBJECT (gg),
+                     GGobiSignals[VARIABLE_ADDED_SIGNAL], 0, vt, n, d); 
   }
 
   /*
-   * I'm sending this expose event because sometimes the clist
+   * I'm sending this expose event because sometimes the tree_view
    * is scrambled after a variable is cloned, with the entire list
    * of variables appearing twice.  -- dfs 1/16/2002
   */
   {
     if (gg->vartable_ui.window) {
       gboolean rval = false;
-      gtk_signal_emit_by_name (GTK_OBJECT (gg->vartable_ui.window),
+      g_signal_emit_by_name (G_OBJECT (gg->vartable_ui.window),
         "expose_event",
         (gpointer) gg, (gpointer) &rval);
     }
@@ -242,9 +235,9 @@ plotted (gint *cols, gint ncols, datad *d, ggobid *gg)
     if (jplotted >= 0)
       break;
 
-    if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
-      GtkGGobiExtendedDisplayClass *klass;
-      klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display));
+    if(GGOBI_IS_EXTENDED_DISPLAY(display)) {
+      GGobiExtendedDisplayClass *klass;
+      klass = GGOBI_EXTENDED_DISPLAY_GET_CLASS(display);
       jplotted = klass->variable_plotted_p(display, cols, ncols, d);
     }
   }
@@ -257,10 +250,6 @@ delete_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
 {
   gint j;
   gint *keepers, nkeepers;
-  GList *l;
-  GtkCListRow *row;
-  gchar *varstr;
-  gint irow;
   vartabled *vt;
 
   /*-- don't allow all variables to be deleted --*/
@@ -279,14 +268,14 @@ delete_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
     quick_message (message, false);
     g_free (message);
 
-/**/return false;
+	return false;
   }
 
   keepers = g_malloc ((d->ncols-ncols) * sizeof (gint));
   nkeepers = find_keepers (d->ncols, ncols, cols, keepers);
   if (nkeepers == -1) {
     g_free (keepers);
-/**/return false;
+	return false;
   }
 
   for (j=0; j<ncols; j++) {
@@ -294,23 +283,18 @@ delete_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
     vt = vartable_element_get (cols[j], d);
   }
 
-  /*-- delete rows from clist; no copying is called for --*/
-  if (d->vartable_clist[real] != NULL) {
-    l = g_list_last (GTK_CLIST (d->vartable_clist[real])->row_list);
-    while (l) {
-      row = GTK_CLIST_ROW (l);
-      /*-- grab the text in the invisible cell of the row to get the index --*/
-      varstr = GTK_CELL_TEXT(row->cell[REAL_CLIST_VARNO])->text;
-      if (varstr != NULL && strlen (varstr) > 0) {
-        irow = atoi (varstr);
-        if (!array_contains (keepers, nkeepers, irow)) {
-          gtk_clist_freeze (GTK_CLIST (d->vartable_clist[real]));
-          gtk_clist_remove (GTK_CLIST (d->vartable_clist[real]), irow);
-          gtk_clist_thaw (GTK_CLIST (d->vartable_clist[real]));
-        }
-      }
-      l = l->prev;
-    }
+  /*-- delete rows from tree model; no copying is called for --*/
+  if (d->vartable_tree_view[real] != NULL) {
+	  for (j = 0; j < nkeepers; j++) {
+		  GtkTreeModel *model;
+		  GtkTreeIter iter;
+		  GtkTreePath *path = gtk_tree_path_new_from_indices(keepers[j], -1);
+		  vt = vartable_element_get(keepers[j], d);
+		  model = gtk_tree_view_get_model(GTK_TREE_VIEW(d->vartable_tree_view[vt->vartype]));
+		  gtk_tree_model_get_iter(model, &iter, path);
+		  gtk_list_store_remove(GTK_LIST_STORE(model), &iter);
+		  gtk_tree_path_free(path);
+	  }
   }
 
   /*-- delete columns from pipeline arrays --*/
@@ -343,8 +327,8 @@ delete_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
   /*-- emit a single variable_list_changed signal when finished --*/
   /*-- doesn't need to give a variable index any more, really --*/
   vt = vartable_element_get (cols[d->ncols-1], d);
-  gtk_signal_emit (GTK_OBJECT (gg),
-                   GGobiSignals[VARIABLE_LIST_CHANGED_SIGNAL], d); 
+  g_signal_emit (G_OBJECT (gg),
+                   GGobiSignals[VARIABLE_LIST_CHANGED_SIGNAL], 0, d); 
 
   /*-- run the first part of the pipeline  --*/
   tform_to_world (d, gg);

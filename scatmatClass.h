@@ -19,20 +19,21 @@
 
 #include "ggobi.h"
 
-#define GTK_TYPE_GGOBI_SCATMAT_SPLOT          (gtk_ggobi_scatmat_splot_get_type())
-#define GTK_GGOBI_SCATMAT_SPLOT(obj)	        (GTK_CHECK_CAST ((obj), GTK_TYPE_GGOBI_SCATMAT_SPLOT, scatmatSPlotd))
-#define GTK_GGOBI_SCATMAT_SPLOT_CLASS(klass)	(GTK_CHECK_CLASS_CAST ((klass), GTK_TYPE_GGOBI_SCATMAT_SPLOT, GtkGGobiScatmatSPlotClass))
-#define GTK_IS_GGOBI_SCATMAT_SPLOT(obj)	 (GTK_CHECK_TYPE ((obj), GTK_TYPE_GGOBI_SCATMAT_SPLOT))
-#define GTK_IS_GGOBI_SCATMAT_SPLOT_CLASS(klass) (GTK_CHECK_CLASS_TYPE ((klass), GTK_TYPE_GGOBI_SCATMAT_SPLOT))
+#define GGOBI_TYPE_SCATMAT_SPLOT          (ggobi_scatmat_splot_get_type())
+#define GGOBI_SCATMAT_SPLOT(obj)	        (G_TYPE_CHECK_INSTANCE_CAST ((obj), GGOBI_TYPE_SCATMAT_SPLOT, scatmatSPlotd))
+#define GGOBI_SCATMAT_SPLOT_CLASS(klass)	(G_TYPE_CHECK_CLASS_CAST ((klass), GGOBI_TYPE_SCATMAT_SPLOT, GGobiScatmatSPlotClass))
+#define GGOBI_IS_SCATMAT_SPLOT(obj)	 (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GGOBI_TYPE_SCATMAT_SPLOT))
+#define GGOBI_IS_SCATMAT_SPLOT_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GGOBI_TYPE_SCATMAT_SPLOT))
+#define GGOBI_SCATMAT_SPLOT_GET_CLASS(obj)  		(G_TYPE_INSTANCE_GET_CLASS ((obj), GGOBI_TYPE_SCATMAT_SPLOT, GGobiScatmatSPlotClass))
 
-GtkType gtk_ggobi_scatmat_splot_get_type(void);
+GType ggobi_scatmat_splot_get_type(void);
 
 
 typedef struct 
 {
-    GtkGGobiExtendedSPlotClass parent_class;
+    GGobiExtendedSPlotClass parent_class;
 
-} GtkGGobiScatmatSPlotClass;
+} GGobiScatmatSPlotClass;
 
 typedef  struct {
 
@@ -43,21 +44,23 @@ typedef  struct {
 
 
 
-#define GTK_TYPE_GGOBI_SCATMAT_DISPLAY	 (gtk_ggobi_scatmat_display_get_type ())
-#define GTK_GGOBI_SCATMAT_DISPLAY(obj)	 (GTK_CHECK_CAST ((obj), GTK_TYPE_GGOBI_SCATMAT_DISPLAY, scatmatDisplayd))
-#define GTK_GGOBI_SCATMAT_DISPLAY_CLASS(klass) (GTK_CHECK_CLASS_CAST ((klass), GTK_TYPE_GGOBI_SCATMAT_DISPLAY, GtkGGobiScatmatDisplayClass))
-#define GTK_IS_GGOBI_SCATMAT_DISPLAY(obj)	 (GTK_CHECK_TYPE ((obj), GTK_TYPE_GGOBI_SCATMAT_DISPLAY))
-#define GTK_IS_GGOBI_SCATMAT_DISPLAY_CLASS(klass) (GTK_CHECK_CLASS_TYPE ((klass), GTK_TYPE_GGOBI_SCATMAT_DISPLAY))
+#define GGOBI_TYPE_SCATMAT_DISPLAY	 (ggobi_scatmat_display_get_type ())
+#define GGOBI_SCATMAT_DISPLAY(obj)	 (G_TYPE_CHECK_INSTANCE_CAST ((obj), GGOBI_TYPE_SCATMAT_DISPLAY, scatmatDisplayd))
+#define GGOBI_SCATMAT_DISPLAY_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GGOBI_TYPE_SCATMAT_DISPLAY, GGobiScatmatDisplayClass))
+#define GGOBI_IS_SCATMAT_DISPLAY(obj)	 (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GGOBI_TYPE_SCATMAT_DISPLAY))
+#define GGOBI_IS_SCATMAT_DISPLAY_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GGOBI_TYPE_SCATMAT_DISPLAY))
+#define GGOBI_SCATMAT_DISPLAY_GET_CLASS(obj)  		(G_TYPE_INSTANCE_GET_CLASS ((obj), GGOBI_TYPE_SCATMAT_DISPLAY, GGobiScatmatDisplayClass))
 
-GtkType gtk_ggobi_scatmat_display_get_type();
-displayd *gtk_ggobi_scatmat_display_new(gint type, gboolean missing_p, datad *d, ggobid *gg);
+
+GType ggobi_scatmat_display_get_type();
+displayd *ggobi_scatmat_display_new(gint type, gboolean missing_p, datad *d, ggobid *gg);
 
 typedef struct 
 {
-    GtkGGobiExtendedDisplayClass parent_class;
+    GGobiExtendedDisplayClass parent_class;
 
 
-} GtkGGobiScatmatDisplayClass;
+} GGobiScatmatDisplayClass;
 
 
 typedef struct {
@@ -67,8 +70,8 @@ typedef struct {
 } scatmatDisplayd;
 
 
-void scatmatDisplayClassInit(GtkGGobiScatmatDisplayClass *klass);
-void scatmatSPlotClassInit(GtkGGobiScatmatSPlotClass *klass) ;
+void scatmatDisplayClassInit(GGobiScatmatDisplayClass *klass);
+void scatmatSPlotClassInit(GGobiScatmatSPlotClass *klass) ;
 
 
 #endif

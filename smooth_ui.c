@@ -22,9 +22,9 @@ static GtkWidget *window = NULL;
 static gchar *smoother_lbl[] = {"Mean", "Median", "Nadaraya-Watson", "Spline" };
 
 static void
-smoother_cb (GtkWidget *w, gpointer cbd)
+smoother_cb (GtkWidget *w, ggobid *gg)
 {
-  gint indx = GPOINTER_TO_INT (cbd);
+  gint indx = gtk_combo_box_get_active(GTK_COMBO_BOX(w));
   g_printerr ("cbd: %s\n", smoother_lbl[indx]);
 }
 
@@ -78,11 +78,11 @@ smooth_window_open (ggobid *gg) {
 /*
  * Smooth toggle
 */
-    tgl = gtk_check_button_new_with_label ("Smooth");
+    tgl = gtk_check_button_new_with_mnemonic ("_Smooth");
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), tgl,
       "Add one or more smoothed lines to the current plot", NULL);
-    gtk_signal_connect (GTK_OBJECT (tgl), "toggled",
-                       GTK_SIGNAL_FUNC (smooth_cb), (gpointer) NULL);
+    g_signal_connect (G_OBJECT (tgl), "toggled",
+                       G_CALLBACK (smooth_cb), (gpointer) NULL);
     gtk_box_pack_start (GTK_BOX (vbox), tgl, false, false, 3);
 
 /*
@@ -91,18 +91,18 @@ smooth_window_open (ggobid *gg) {
     vb = gtk_vbox_new (false, 0);
     gtk_box_pack_start (GTK_BOX (vbox), vb, false, false, 1);
 
-    lbl = gtk_label_new ("Smoothing functions:"),
+    lbl = gtk_label_new_with_mnemonic ("Smoothing f_unctions:"),
     gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
     gtk_box_pack_start (GTK_BOX (vbox), lbl, false, false, 0);
 
-    opt = gtk_option_menu_new ();
+    opt = gtk_combo_box_new_text ();
+	gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), opt);
     gtk_container_set_border_width (GTK_CONTAINER (opt), 4);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
       "Set the smoothing function", NULL);
     gtk_box_pack_start (GTK_BOX (vbox), opt, false, false, 0);
-    populate_option_menu (opt, smoother_lbl,
-      sizeof (smoother_lbl) / sizeof (gchar *),
-      (GtkSignalFunc) smoother_cb, "GGobi", gg);
+    populate_combo_box (opt, smoother_lbl, G_N_ELEMENTS(smoother_lbl),
+      G_CALLBACK(smoother_cb), gg);
 
 /*
  * vbox for label and rangewidget
@@ -110,15 +110,16 @@ smooth_window_open (ggobid *gg) {
     vb = gtk_vbox_new (false, 0);
     gtk_box_pack_start (GTK_BOX (vbox), vb, false, false, 1);
 
-    lbl = gtk_label_new ("Width:");
+    lbl = gtk_label_new_with_mnemonic ("_Width:");
     gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
     gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
 
     adj = gtk_adjustment_new (1.0, 0.0, 1.0, 0.01, .01, 0.0);
-    gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
-                        GTK_SIGNAL_FUNC (width_cb), gg);
+    g_signal_connect (G_OBJECT (adj), "value_changed",
+                        G_CALLBACK (width_cb), gg);
 
     sbar = gtk_hscale_new (GTK_ADJUSTMENT (adj));
+	gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), sbar);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
       "Set the width of the smoothing window", NULL);
     gtk_range_set_update_policy (GTK_RANGE (sbar), GTK_UPDATE_CONTINUOUS);
@@ -129,22 +130,22 @@ smooth_window_open (ggobid *gg) {
 /*
  * Use color groups toggle
 */
-    tgl = gtk_check_button_new_with_label ("Use groups");
+    tgl = gtk_check_button_new_with_mnemonic ("Use _groups");
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), tgl,
       "Add one smoothed line for each point color", NULL);
-    gtk_signal_connect (GTK_OBJECT (tgl), "toggled",
-                       GTK_SIGNAL_FUNC (groups_cb), (gpointer) NULL);
+    g_signal_connect (G_OBJECT (tgl), "toggled",
+                       G_CALLBACK (groups_cb), (gpointer) NULL);
     gtk_box_pack_start (GTK_BOX (vbox), tgl,
       false, false, 3);
 
 /*
  * Show smoothing window
 */
-    tgl = gtk_check_button_new_with_label ("Show window");
+    tgl = gtk_check_button_new_with_mnemonic ("Sh_ow window");
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), tgl,
       "Show the smoothing window on the scatterplot display", NULL);
-    gtk_signal_connect (GTK_OBJECT (tgl), "toggled",
-                       GTK_SIGNAL_FUNC (window_cb), (gpointer) NULL);
+    g_signal_connect (G_OBJECT (tgl), "toggled",
+                       G_CALLBACK (window_cb), (gpointer) NULL);
     gtk_box_pack_start (GTK_BOX (vbox), tgl,
       false, false, 3);
 

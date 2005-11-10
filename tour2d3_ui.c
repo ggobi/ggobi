@@ -61,7 +61,7 @@ cpanel_tour2d3_set (displayd *display, cpaneld *cpanel, ggobid* gg)
   /*-- manual manip --*/
   w = widget_find_by_name (pnl, "TOUR2D3:manip");
   if (w)
-    gtk_option_menu_set_history (GTK_OPTION_MENU (w), cpanel->t2d3.manip_mode);
+    gtk_combo_box_set_active (GTK_COMBO_BOX (w), cpanel->t2d3.manip_mode);
 }
 
 
@@ -90,14 +90,13 @@ static void scramble_cb (GtkWidget *w, ggobid *gg)
 static gchar *manip_lbl[] = {"Off", "Oblique", "Vert", "Horiz", "Radial",
                              "Angular"};
 static void
-manip_cb (GtkWidget *w, gpointer cbd)
+manip_cb (GtkWidget *w, ggobid *gg)
 {
-  ggobid *gg = GGobiFromWidget(w, true);
   displayd *dsp = gg->current_display;
   cpaneld *cpanel = &dsp->cpanel;
   splotd *sp = gg->current_splot;
 
-  cpanel->t2d3.manip_mode = GPOINTER_TO_INT (cbd);
+  cpanel->t2d3.manip_mode = gtk_combo_box_get_active(GTK_COMBO_BOX(w));
 
   if (cpanel->t2d3.manip_mode == MANIP_OFF)
     splot_cursor_set ((gint) NULL, sp);
@@ -127,8 +126,8 @@ cpanel_tour2d3_make (ggobid *gg) {
    * (upper - page_size). */
   adj = gtk_adjustment_new (sessionOptions->defaultTourSpeed, 0.0, MAX_TOUR_SPEED, 1.0, 1.0, 0.0);
 
-  gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
-                      GTK_SIGNAL_FUNC (speed2d3_set_cb), (gpointer) gg);
+  g_signal_connect (G_OBJECT (adj), "value_changed",
+                      G_CALLBACK (speed2d3_set_cb), (gpointer) gg);
 
   sbar = gtk_hscale_new (GTK_ADJUSTMENT (adj));
   gtk_widget_set_name (sbar, "TOUR2D3:speed_bar");
@@ -144,12 +143,12 @@ cpanel_tour2d3_make (ggobid *gg) {
 */
   box = gtk_hbox_new (true, 1);
 
-  btn = gtk_check_button_new_with_label ("Pause");
+  btn = gtk_check_button_new_with_mnemonic ("_Pause");
   gtk_widget_set_name (btn, "TOUR2D3:pause_button");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Stop tour motion temporarily (keyboard shortcut: w)", NULL);
-  gtk_signal_connect (GTK_OBJECT (btn), "toggled",
-                     GTK_SIGNAL_FUNC (tour2d3_pause_cb), (gpointer) gg);
+  g_signal_connect (G_OBJECT (btn), "toggled",
+                     G_CALLBACK (tour2d3_pause_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
 
   gtk_box_pack_start (GTK_BOX (panel->w), box,
@@ -160,18 +159,18 @@ cpanel_tour2d3_make (ggobid *gg) {
 */
   box = gtk_hbox_new (true, 2);
 
-  btn = gtk_button_new_with_label ("Reinit");
+  btn = gtk_button_new_with_mnemonic ("_Reinit");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Reset projection to first two active variables", NULL);
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                     GTK_SIGNAL_FUNC (reinit_cb), (gpointer) gg);
+  g_signal_connect (G_OBJECT (btn), "clicked",
+                     G_CALLBACK (reinit_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
 
-  btn = gtk_button_new_with_label ("Scramble");
+  btn = gtk_button_new_with_mnemonic ("Scr_amble");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Reset projection to random value", NULL);
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                     GTK_SIGNAL_FUNC (scramble_cb), (gpointer) gg);
+  g_signal_connect (G_OBJECT (btn), "clicked",
+                     G_CALLBACK (scramble_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
 
   gtk_box_pack_start (GTK_BOX (panel->w), box,
@@ -185,18 +184,18 @@ cpanel_tour2d3_make (ggobid *gg) {
   gtk_box_pack_start (GTK_BOX (panel->w), vb,
     false, false, 0);
 
-  lbl = gtk_label_new ("Manual manipulation:");
+  lbl = gtk_label_new_with_mnemonic ("_Manual manipulation:");
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
   gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
 
-  manip_opt = gtk_option_menu_new ();
+  manip_opt = gtk_combo_box_new_text ();
+  gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), manip_opt);
   gtk_widget_set_name (manip_opt, "TOUR2D3:manip");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), manip_opt,
     "Set the manual manipulation method", NULL);
   gtk_box_pack_end (GTK_BOX (vb), manip_opt, false, false, 0);
-  populate_option_menu (manip_opt, manip_lbl,
-    sizeof (manip_lbl) / sizeof (gchar *),
-    (GtkSignalFunc) manip_cb, "GGobi", gg);
+  populate_combo_box (manip_opt, manip_lbl, G_N_ELEMENTS(manip_lbl),
+    G_CALLBACK(manip_cb), gg);
 
   gtk_widget_show_all (panel->w);
 }
@@ -235,9 +234,10 @@ key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
     pause_button = widget_find_by_name (pnl, "TOUR2D3:pause_button");
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pause_button),
       !cpanel->t2d3.paused);
+	return true;
   }
 
-  return true;
+  return false;
 }
 
 static gint
@@ -267,9 +267,9 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   mousepos_get_pressed (w, event, &button1_p, &button2_p, sp);
   if (cpanel->t2d3.manip_mode != MANIP_OFF) 
   {
-    sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
+    sp->motion_id = g_signal_connect (G_OBJECT (sp->da),
                                       "motion_notify_event",
-                                      (GtkSignalFunc) motion_notify_cb,
+                                      G_CALLBACK(motion_notify_cb),
                                       (gpointer) sp);
     tour2d3_manip_init(sp->mousepos.x, sp->mousepos.y, sp);
   }
@@ -296,18 +296,18 @@ tour2d3_event_handlers_toggle (splotd *sp, gboolean state) {
   displayd *display = (displayd *) sp->displayptr;
 
   if (state == on) {
-    if(GTK_IS_GGOBI_WINDOW_DISPLAY(display))
-      sp->key_press_id = gtk_signal_connect (GTK_OBJECT (GTK_GGOBI_WINDOW_DISPLAY(display)->window),
+    if(GGOBI_IS_WINDOW_DISPLAY(display))
+      sp->key_press_id = g_signal_connect (G_OBJECT (GGOBI_WINDOW_DISPLAY(display)->window),
         "key_press_event",
-        (GtkSignalFunc) key_press_cb,
+        G_CALLBACK(key_press_cb),
         (gpointer) sp);
-    sp->press_id = gtk_signal_connect (GTK_OBJECT (sp->da),
+    sp->press_id = g_signal_connect (G_OBJECT (sp->da),
                                        "button_press_event",
-                                       (GtkSignalFunc) button_press_cb,
+                                       G_CALLBACK(button_press_cb),
                                        (gpointer) sp);
-    sp->release_id = gtk_signal_connect (GTK_OBJECT (sp->da),
+    sp->release_id = g_signal_connect (G_OBJECT (sp->da),
                                          "button_release_event",
-                                         (GtkSignalFunc) button_release_cb,
+                                         G_CALLBACK(button_release_cb),
                                          (gpointer) sp);
   } else {
     disconnect_key_press_signal (sp);

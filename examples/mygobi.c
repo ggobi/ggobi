@@ -78,13 +78,13 @@ int main(int argc, char *argv[])
   ggobiInit(&argc, &argv);
     
   window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-  gtk_signal_connect (GTK_OBJECT (window), "destroy", GTK_SIGNAL_FUNC (destroy), NULL);
+  g_signal_connect (G_OBJECT (window), "destroy", G_CALLBACK (destroy), NULL);
   gtk_container_set_border_width (GTK_CONTAINER (window), 10);
     
   button = gtk_button_new_with_label ("Open ggobi");
-  gtk_signal_connect (GTK_OBJECT (button), "clicked", GTK_SIGNAL_FUNC (on_bt_clicked), NULL);
-  gtk_signal_connect_object (GTK_OBJECT (button), "clicked", GTK_SIGNAL_FUNC (gtk_widget_destroy),
-			     GTK_OBJECT (window));
+  g_signal_connect (G_OBJECT (button), "clicked", G_CALLBACK (on_bt_clicked), NULL);
+  g_signal_connect_swapped (G_OBJECT (button), "clicked", G_CALLBACK (gtk_widget_destroy),
+			     G_OBJECT (window));
   gtk_container_add (GTK_CONTAINER (window), button);
     
   gtk_widget_show (button);

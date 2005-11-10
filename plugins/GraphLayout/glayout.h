@@ -75,9 +75,9 @@ gint cmds (array_d *D, array_d *X);
 void spring_once (gint ndims, datad *d, datad *e, array_d *dist, array_d *pos);
 #endif
 
-#if defined HAVE_LIBGVC || defined GRAPHVIZ
+#if defined GRAPHVIZ || defined HAVE_LIBGVC
 void neato_dim_cb (GtkAdjustment *adj, PluginInstance *inst);
-void neato_model_cb (GtkWidget *w, gpointer cbd);
+void neato_model_cb (GtkWidget *w, PluginInstance *inst);
 void dot_neato_layout_cb (GtkWidget *, PluginInstance *inst);
 void neato_use_edge_length_cb (GtkToggleButton *button, PluginInstance *inst);
 #endif

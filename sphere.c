@@ -109,10 +109,11 @@ spherize_set_pcvars (datad *d, ggobid *gg)
   gdouble *dtmp;
   gboolean succeeded = true;
 
-  /*-- for updating the clist --*/
+  /*-- for updating the tree view --*/
   vartabled *vt;
-  GtkCList *clist = GTK_CLIST (gg->sphere_ui.clist);
-  gchar *row[] = {""};
+  GtkWidget *tree_view = gg->sphere_ui.tree_view;
+  GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(tree_view));
+  GtkTreeIter iter;
   /*-- --*/
 
 /*
@@ -223,17 +224,16 @@ g_printerr ("npcs=%d\n", d->sphere.npcs);
       g_free (lbl);
     }
 
-    /*-- clear the clist --*/
-    gtk_clist_clear (clist);
-    /*-- add the new labels to the 'sphered variables' clist --*/
-    gtk_clist_freeze (clist);
+    /*-- clear the model --*/
+    gtk_list_store_clear(GTK_LIST_STORE(model));
+    /*-- add the new labels to the 'sphered variables' tree view --*/
     for (j=0; j<d->sphere.vars_sphered.nels; j++) {
       vt = vartable_element_get (d->sphere.vars_sphered.els[j], d);
-      row[0] = g_strdup (vt->collab);
-      gtk_clist_append (clist, row);
-      g_free (row[0]);
+      //row[0] = g_strdup (vt->collab);
+	  gtk_list_store_append(GTK_LIST_STORE(model), &iter);
+	  gtk_list_store_set(GTK_LIST_STORE(model), &iter, 0, vt->collab, -1);
+      //g_free (row[0]);
     }
-    gtk_clist_thaw (clist);
   }
 
   return succeeded;
@@ -316,7 +316,7 @@ spherevars_set (ggobid *gg)
 {
   gint j, nvars, *vars;
   datad *d;
-  GtkWidget *clist;
+  GtkWidget *tree_view;
 
   if (gg->sphere_ui.window == NULL) {
     d = gg->current_display->d;
@@ -324,11 +324,11 @@ spherevars_set (ggobid *gg)
     vars = (gint *) g_malloc (d->ncols * sizeof(gint));
     nvars = 0;  /*-- initially, no variables are selected --*/
   } else {
-    clist = get_clist_from_object (GTK_OBJECT(gg->sphere_ui.window));
-    if (clist == NULL) return;
-    d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
-    vars = (gint *) g_malloc (d->ncols * sizeof(gint));
-    nvars = get_selections_from_clist (d->ncols, vars, clist, d);
+    tree_view = get_tree_view_from_object (G_OBJECT(gg->sphere_ui.window));
+    if (tree_view == NULL) return;
+    d = (datad *) g_object_get_data(G_OBJECT (tree_view), "datad");
+    //vars = (gint *) g_malloc (d->ncols * sizeof(gint));
+    vars = get_selections_from_tree_view (tree_view, &nvars);
   }
 
   if (d->sphere.vars.els == NULL || d->sphere.vars.nels != nvars) {

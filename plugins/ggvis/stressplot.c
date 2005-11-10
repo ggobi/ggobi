@@ -104,9 +104,9 @@ draw_stress (ggvisd *ggv, ggobid *gg)
   GdkPoint strPts[NSTRESSVALUES];
   gfloat height;
   GtkWidget *da = ggv->stressplot_da;
-  GtkStyle *style = gtk_widget_get_style (da);
-  gint lbearing, rbearing, strwidth, ascent, descent;
   colorschemed *scheme = gg->activeColorScheme;
+  PangoLayout *layout = gtk_widget_create_pango_layout(da, NULL);
+  PangoRectangle rect;
 
   if (gg->plot_GC == NULL)
     init_plot_GC (ggv->stressplot_pix, gg);
@@ -114,14 +114,7 @@ draw_stress (ggvisd *ggv, ggobid *gg)
   height = (gfloat)da->allocation.height - 2. * (gfloat)STRESSPLOT_MARGIN;
 
   str = g_strdup_printf ("%s", ".9999");
-  gdk_text_extents (
-#if GTK_MAJOR_VERSION == 2
-    gtk_style_get_font (style),
-#else
-    style->font,
-#endif
-    str, strlen (str),
-    &lbearing, &rbearing, &strwidth, &ascent, &descent);
+  layout_text(layout, text, &rect);
   g_free (str);
 
   if (ggv->stressplot_pix == NULL)
@@ -160,21 +153,15 @@ draw_stress (ggvisd *ggv, ggobid *gg)
 
     str = g_strdup_printf ("%2.4f",
       ggv->stressvalues.els[ggv->nstressvalues-1]);
-    gdk_draw_string (ggv->stressplot_pix,
-#if GTK_MAJOR_VERSION == 2
-      gtk_style_get_font (style),
-#else
-      style->font,
-#endif
-      gg->plot_GC,
-      da->allocation.width - 2*STRESSPLOT_MARGIN - strwidth,
-      STRESSPLOT_MARGIN,
-      str);
+	layout_text(layout, str, NULL);
+	gdk_draw_layout(ggv->stressplot_pix, gg->plot_GC, 
+		da->allocation.width - 2*STRESSPLOT_MARGIN - rect.width,
+		STRESSPLOT_MARGIN - rect.height, layout);
     gdk_draw_lines (ggv->stressplot_pix, gg->plot_GC,
       strPts, npixels);
     g_free(str);
   }
-
+  g_object_unref(layout);
   stressplot_pixmap_copy (ggv, gg);
 }
 

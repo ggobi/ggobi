@@ -323,7 +323,34 @@ build_symbol_vectors_by_var(cpaneld * cpanel, datad * d, ggobid * gg)
 /*          Create a variable notebook for brush linking rule        */
 /*********************************************************************/
 
+enum { VARLIST_NAME, VARLIST_VT, VARLIST_NCOLS };
+
 void linkby_notebook_subwindow_add (datad *d, GtkWidget *notebook, ggobid *);
+
+void varlist_append(GtkListStore *list, vartabled *vt) {
+	gchar *row;
+	GtkTreeIter iter;
+	
+	if (vt && vt->vartype == categorical) {
+		gtk_list_store_append(list, &iter);
+		row = g_strdup_printf("Link by %s", vt->collab);
+		gtk_list_store_set(list, &iter, VARLIST_NAME, row, VARLIST_VT, vt, -1);
+		g_free(row);
+	}
+}
+void varlist_populate(GtkListStore *list, datad *d) {
+  gint j;
+  GtkTreeIter first;
+  vartabled *vt;
+  
+  gtk_list_store_append(list, &first);
+  gtk_list_store_set(list, &first, VARLIST_NAME, "Link by case id", -1);
+  
+  for (j=0; j<d->ncols; j++) {
+    vt = vartable_element_get(j, d);
+    varlist_append(list, vt);
+  }
+}
 
 /* called from cpanel_brush_set */
 void
@@ -346,16 +373,13 @@ linkby_current_page_set (displayd *display, GtkWidget *notebook, ggobid *gg)
   page_num = 0;
   swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK(notebook), page_num);
   while (swin) {
-    paged = (datad *) gtk_object_get_data (GTK_OBJECT (swin), "datad");
+    paged = (datad *) g_object_get_data (G_OBJECT (swin), "datad");
 
-    /*
-    g_printerr ("(current_page_set) paged %s d %s   ==? %d\n",
-    paged->name, d->name, (paged == d));
-    */
+    //g_printerr ("(current_page_set) paged %s d %s   ==? %d\n", paged->name, d->name, (paged == d));
 
     gtk_widget_set_sensitive (swin, (paged == d));
     if (paged == d) {
-      gtk_notebook_set_page (GTK_NOTEBOOK(notebook), page_num);
+      gtk_notebook_set_current_page (GTK_NOTEBOOK(notebook), page_num);
     }
     page_num += 1;
     swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK(notebook), page_num);
@@ -363,32 +387,40 @@ linkby_current_page_set (displayd *display, GtkWidget *notebook, ggobid *gg)
 }
 
 void
-linking_method_set_cb (GtkWidget *cl, gint row, gint column,
-  GdkEventButton *event, ggobid *gg)
+linking_method_set_cb (GtkTreeSelection *treesel, ggobid *gg)
 {
-  datad *d = gtk_object_get_data (GTK_OBJECT(cl), "datad");
+  datad *d = g_object_get_data (G_OBJECT(gtk_tree_selection_get_tree_view(treesel)), "datad");
   displayd *display = gg->current_display;
   cpaneld *cpanel = &display->cpanel;  
-  GtkWidget *notebook;
+  GtkTreeModel *model;
+  GtkTreeIter iter;
+  GtkTreePath *path;
+  gint row = -1;
 
-  notebook = (GtkWidget *) gtk_object_get_data(GTK_OBJECT(cl), "notebook");
+  if(gtk_tree_selection_get_selected(treesel, &model, &iter)) {
+	  path = gtk_tree_model_get_path(model, &iter);
+	  row = gtk_tree_path_get_indices(path)[0];
+	  gtk_tree_path_free(path);
+  }
+  
+  //notebook = (GtkWidget *) g_object_get_data(G_OBJECT(cl), "notebook");
   cpanel->br.linkby_row = row;
 
   if (row <= 0) {
     gg->linkby_cv = false;
     return;  /* link by case id; done */
   } else {
-    gpointer ptr = gtk_clist_get_row_data (GTK_CLIST(cl), row);
-    gint jvar = GPOINTER_TO_INT(ptr);
+    //gpointer ptr = gtk_clist_get_row_data (GTK_CLIST(cl), row);
+    //gint jvar = GPOINTER_TO_INT(ptr);
     vartabled *vt;
-    gchar *rowtext, *varname;
-    gboolean ok;
-    gint j;
-
-
+	gtk_tree_model_get(model, &iter, VARLIST_VT, &vt, -1);
+	gg->linkby_cv = true;
+    d->linkvar_vt = vt;
+	
     /* I need to get the text in the row and strip out "Link by ".
      * That will give me the variable name */
-    ok = gtk_clist_get_text (GTK_CLIST(cl), row, 0, &rowtext);
+    /*
+	 ok = gtk_clist_get_text (GTK_CLIST(cl), row, 0, &rowtext);
     if (ok) {
       varname = &rowtext[8];
       for (j=0; j<d->ncols; j++) {
@@ -401,16 +433,41 @@ linking_method_set_cb (GtkWidget *cl, gint row, gint column,
           }
         }
       }
-    }
+    }*/
 
   }
 }
 
+GtkListStore *
+list_from_data(ggobid *gg, datad *data, GtkNotebook *notebook) {
+	GtkWidget *swin;
+	GtkListStore *list = NULL;
+	
+	gint kd = g_slist_index(gg->d, data);
+	swin = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), kd);
+	
+	if(swin)
+		list = GTK_LIST_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(GTK_BIN(swin)->child)));
+	
+	return(list);
+}
+
 void 
-linkby_notebook_varchange_cb (ggobid *gg, vartabled *vt, gint which,
-  datad *data, void *notebook)
+linkby_notebook_varchanged_cb (ggobid *gg, datad *data, GtkNotebook *notebook) {
+	GtkListStore *list = list_from_data(gg, data, notebook);
+	gtk_list_store_clear(list);
+	varlist_populate(list, data);
+}
+
+void 
+linkby_notebook_varadded_cb (ggobid *gg, vartabled *vt, gint which,
+  datad *data, GtkNotebook *notebook)
 {
-  GtkWidget *swin, *clist;
+	GtkListStore *model = list_from_data(gg, data, notebook);
+	if (model)
+		varlist_append(model, vt);
+	
+	#if 0
 
   /*-- add one or more variables to this datad --*/
   datad *d = (datad *) datad_get_from_notebook (GTK_WIDGET(notebook), gg);
@@ -444,12 +501,13 @@ linkby_notebook_varchange_cb (ggobid *gg, vartabled *vt, gint which,
     }
     gtk_clist_thaw (GTK_CLIST(clist));
   }
+  #endif
 }
 
 void 
 linkby_notebook_list_changed_cb(ggobid *gg, datad *d, void *notebook)
 {
-  linkby_notebook_varchange_cb(gg, NULL, -1, d, notebook);
+  linkby_notebook_varchanged_cb(gg, d, notebook);
 }
 
 CHECK_EVENT_SIGNATURE(linkby_notebook_adddata_cb, datad_added_f)
@@ -470,10 +528,8 @@ linkby_notebook_adddata_cb (ggobid *gg, datad *d, void *notebook, GtkSignalFunc 
 void
 linkby_notebook_subwindow_add (datad *d, GtkWidget *notebook, ggobid *gg)
 {
-  GtkWidget *swin, *clist;
-  gint j, k;
-  gchar *row[1];
-  vartabled *vt;
+  GtkWidget *swin, *treeview;
+  GtkListStore *list;
 
   GtkSelectionMode mode = GTK_SELECTION_SINGLE;
 
@@ -490,12 +546,12 @@ linkby_notebook_subwindow_add (datad *d, GtkWidget *notebook, ggobid *gg)
    */
 
 /*
-  g_printerr ("(subwindow_add) d %s nchildren %d\n", d->name, g_list_length(gtk_container_children(GTK_CONTAINER(notebook))));
+  g_printerr ("(subwindow_add) d %s nchildren %d\n", d->name, g_list_length(gtk_container_get_children(GTK_CONTAINER(notebook))));
 */
-  if (g_list_length(gtk_container_children(GTK_CONTAINER(notebook))) != 0) {
+  if (g_list_length(gtk_container_get_children(GTK_CONTAINER(notebook))) != 0) {
     gtk_widget_set_sensitive (swin, false);
   }
-  gtk_object_set_data(GTK_OBJECT(swin), "datad", d);  /*setdata*/
+  g_object_set_data(G_OBJECT(swin), "datad", d);  /*setdata*/
 /*
  * name or nickname?  Which one we'd prefer to use depends on the
  * size of the space we're working in -- maybe this will become an
@@ -505,39 +561,21 @@ linkby_notebook_subwindow_add (datad *d, GtkWidget *notebook, ggobid *gg)
     (d->nickname != NULL) ?
       gtk_label_new (d->nickname) : gtk_label_new (d->name)); 
 
-  /* add the CList */
-  clist = gtk_clist_new (1);
-  gtk_clist_set_selection_mode (GTK_CLIST (clist), mode);
-  gtk_object_set_data (GTK_OBJECT (clist), "datad", d);
-  gtk_object_set_data (GTK_OBJECT (clist), "notebook", notebook);
-  gtk_signal_connect (GTK_OBJECT (clist), "select_row", 
-    GTK_SIGNAL_FUNC (linking_method_set_cb), gg);
+  
+  /* add the treeview (list) */
+  list = gtk_list_store_new(VARLIST_NCOLS, G_TYPE_STRING, G_TYPE_POINTER);
+  varlist_populate(list, d);
 
-  /* Insert this string */
-  row[0] = g_strdup_printf ("Link by case id");
-  gtk_clist_append (GTK_CLIST (clist), row);
+  treeview = gtk_tree_view_new_with_model(GTK_TREE_MODEL(list));
+  populate_tree_view(treeview, NULL, 1, false, mode, G_CALLBACK(linking_method_set_cb), gg);
 
-  k = 1;
-  for (j=0; j<d->ncols; j++) {
-    vt = vartable_element_get (j, d);
-    if (vt && vt->vartype == categorical) {
-      row[0] = g_strdup_printf ("Link by %s", vt->collab);
-      gtk_clist_append (GTK_CLIST (clist), row);
-      gtk_clist_set_row_data(GTK_CLIST(clist), k, GINT_TO_POINTER(j));
-      g_free (row[0]);
-    }
-  }
-
-  /*-- suggested by Gordon Deane; causes no change under linux --*/
-  gtk_clist_set_column_width(GTK_CLIST(clist), 0,
-    gtk_clist_optimal_column_width (GTK_CLIST(clist), 0));
-  /*--                           --*/
-
-  gtk_container_add (GTK_CONTAINER (swin), clist);
+  g_object_set_data (G_OBJECT (treeview), "datad", d);
+  //g_object_set_data (G_OBJECT (clist), "notebook", notebook);
+  
+  gtk_container_add (GTK_CONTAINER (swin), treeview);
   gtk_widget_show_all (swin);
-
-  /* It appears that this has to follow 'show_all' to take effect */
-  gtk_clist_select_row (GTK_CLIST(clist), 0, 0);
+  
+  select_tree_view_row(treeview, 0);
 }
 
 GtkWidget *
@@ -557,9 +595,9 @@ create_linkby_notebook (GtkWidget *box, ggobid *gg)
   gtk_notebook_set_tab_pos (GTK_NOTEBOOK (notebook), GTK_POS_TOP);
   gtk_notebook_set_show_tabs (GTK_NOTEBOOK (notebook), nd > 1);
   gtk_box_pack_start (GTK_BOX (box), notebook, true, true, 2);
-  gtk_object_set_data (GTK_OBJECT(notebook), "SELECTION", (gpointer) mode);
-  gtk_object_set_data (GTK_OBJECT(notebook), "vartype", (gpointer) vtype);
-  gtk_object_set_data (GTK_OBJECT(notebook), "datatype", (gpointer) dtype);
+  g_object_set_data (G_OBJECT(notebook), "SELECTION", (gpointer) mode);
+  g_object_set_data (G_OBJECT(notebook), "vartype", (gpointer) vtype);
+  g_object_set_data (G_OBJECT(notebook), "datatype", (gpointer) dtype);
 
   for (l = gg->d; l; l = l->next) {
     d = (datad *) l->data;
@@ -569,20 +607,20 @@ create_linkby_notebook (GtkWidget *box, ggobid *gg)
   }
 
   /*-- listen for variable_added and _list_changed events on main_window --*/
-  /*--   ... list_changed would be enough --*/
-  gtk_signal_connect (GTK_OBJECT (gg),
+  /*--   ... list_changed would be enough but it's only called on delete --*/
+  g_signal_connect (G_OBJECT (gg),
 		      "variable_added", 
-		      GTK_SIGNAL_FUNC (linkby_notebook_varchange_cb),
+		      G_CALLBACK (linkby_notebook_varadded_cb),
 		      GTK_OBJECT (notebook));
-  gtk_signal_connect (GTK_OBJECT (gg),
+  g_signal_connect (G_OBJECT (gg),
 		      "variable_list_changed", 
-		      GTK_SIGNAL_FUNC (linkby_notebook_varchange_cb),
+		      G_CALLBACK (linkby_notebook_varchanged_cb),
 		      GTK_OBJECT (notebook));
 
   /*-- listen for datad_added events on main_window --*/
-  gtk_signal_connect (GTK_OBJECT (gg),
+  g_signal_connect (G_OBJECT (gg),
 		      "datad_added", 
-		      GTK_SIGNAL_FUNC (linkby_notebook_adddata_cb),
+		      G_CALLBACK (linkby_notebook_adddata_cb),
 		      GTK_OBJECT (notebook));
 
   return notebook;

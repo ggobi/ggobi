@@ -25,11 +25,51 @@ addToToolsMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
   inst->gg = gg;
 
   entry = GGobi_addToolsMenuItem ((gchar *)lbl, gg);
-  gtk_signal_connect (GTK_OBJECT(entry), "activate",
-                      GTK_SIGNAL_FUNC (show_ggvis_window), inst);
+  g_signal_connect (G_OBJECT(entry), "activate",
+                      G_CALLBACK (show_ggvis_window), inst);
   return(true);
 }
 
+static const gchar *menu_ui =
+"<ui>"
+"	<menubar>"
+"		<menu action='View'>"
+"			<menuitem action='ShepardPlot'/>"
+"		</menu>"
+"		<menu action='Reset'>"
+"			<menuitem action='ReinitLayout'/>"
+"			<menuitem action='ScrambleLayout'/>"
+"			<menuitem action='ResetMDSParameters/>"
+"		</menu>"
+#if 0
+"		<menu action='Help'>"
+"			<menuitem action='MDSBackground'/>"
+"			<menuitem action='MDSControls'/>"
+"			<menuitem action='KruskalShepardFormula'/>"
+"			<menuitem action='TorgersonGowerFormula'/>"
+"		</menu>"
+#endif
+"	</menubar>"
+"</ui>";
+
+static GtkActionEntry entries[] = {
+	{ "View", NULL, "_View" },
+	{ "ShepardPlot", NULL, "_Shepard Plot", "<control>S", "Display a Shepard Plot", 
+		G_CALLBACK(create_shepard_data_cb)
+	},
+	{ "Reset", NULL, "_Reset" },
+	{ "ReinitLayout", GTK_STOCK_REFRESH, "Reinit _Layout", "<control>L", "Reinitialize the layout",
+		G_CALLBACK(mds_reinit_cb)
+	},
+	{ "ScrambleLayout", NULL, "_Scramble Layout", "<control>A", "Scramble the layout",
+		G_CALLBACK(mds_scramble_cb)
+	},
+	{ "ResetMDSParameters", NULL, "Reset MDS _Parameters", "<control>P", "Reset the MDS Parameters",
+		G_CALLBACK(mds_reset_params_cb)
+	},
+};
+	
+#if 0
 static GtkItemFactoryEntry menu_items[] = {
 /*
   { "/_IO",            NULL,     NULL,             0, "<Branch>" },
@@ -81,6 +121,7 @@ static GtkItemFactoryEntry menu_items[] = {
        (GtkItemFactoryCallback) NULL,  
        0 },
   };
+#endif
 
 static const gchar *const dsource_lbl[] = {
   "Unweighted graph dist", 
@@ -131,7 +172,7 @@ ggvisFromInst (PluginInstance *inst)
   ggvisd *ggv = NULL;
 
   if (window)
-    ggv = (ggvisd *) gtk_object_get_data (GTK_OBJECT(window), "ggvisd");
+    ggv = (ggvisd *) g_object_get_data(G_OBJECT(window), "ggvisd");
 
   return ggv;
 }
@@ -145,8 +186,7 @@ void ggvis_scale_set_default_values (GtkScale *scale)
 }
 
 static void
-ggv_datad_set_cb (GtkWidget *cl, gint row, gint column,
-  GdkEventButton *event, PluginInstance *inst)
+ggv_datad_set_cb (GtkTreeSelection *tree_sel, PluginInstance *inst)
 {
   ggobid *gg = inst->gg;
   ggvisd *ggv = ggvisFromInst (inst);
@@ -155,8 +195,14 @@ ggv_datad_set_cb (GtkWidget *cl, gint row, gint column,
   GSList *l;
   gchar *clname = gtk_widget_get_name (GTK_WIDGET(cl));
   gint k;
-
-  gtk_clist_get_text (GTK_CLIST (cl), row, 0, &dname);
+  GtkTreeModel *model;
+  GtkTreeIter iter;
+  
+  if (!gtk_tree_selection_get_selected(tree_sel, &model, &iter))
+	  return;
+  
+  gtk_tree_model_get(model, &iter, 0, &dname, -1);
+  
   for (l = gg->d; l; l = l->next) {
     d = l->data;
     if (strcmp (d->name, dname) == 0) {
@@ -178,28 +224,28 @@ ggv_datad_set_cb (GtkWidget *cl, gint row, gint column,
   /* Don't free either string; they're just pointers */
 }
 static void 
-ggv_clist_datad_added_cb (ggobid *gg, datad *d, void *clist)
+ggv_tree_view_datad_added_cb (ggobid *gg, datad *d, GtkWidget *tree_view)
 {
   gchar *row[1];
   GtkWidget *swin;
   gchar *clname;
-
-  if (clist == NULL)
+  GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(tree_view));
+  GtkTreeIter iter;
+	
+  if (tree_view == NULL)
     return;
 
   swin = (GtkWidget *)
-    gtk_object_get_data (GTK_OBJECT (clist), "datad_swin");
-  clname = gtk_widget_get_name (GTK_WIDGET(clist));
+    g_object_get_data(G_OBJECT (tree_view), "datad_swin");
+  clname = gtk_widget_get_name (GTK_WIDGET(tree_view));
 
   if (strcmp (clname, "nodeset") == 0 && d->rowIds != NULL) {
-    row[0] = g_strdup (d->name);
-    gtk_clist_append (GTK_CLIST (GTK_OBJECT(clist)), row);
-    g_free (row[0]);
+    gtk_list_store_append(GTK_LIST_STORE(model), &iter);
+	gtk_list_store_set(GTK_LIST_STORE(model), &iter, 0, d->name, -1); 
   }
   if (strcmp (clname, "edgeset") == 0 && d->edge.n > 0) {
-    row[0] = g_strdup (d->name);
-    gtk_clist_append (GTK_CLIST (GTK_OBJECT(clist)), row);
-    g_free (row[0]);
+    gtk_list_store_append(GTK_LIST_STORE(model), &iter);
+	gtk_list_store_set(GTK_LIST_STORE(model), &iter, 0, d->name, -1);
   }
 
   gtk_widget_show_all (swin);
@@ -216,37 +262,41 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   GSList *group;
   GtkObject *adj, *Dtarget_adj, *isotonic_mix_adj;
   gint i, top;
-  GtkAccelGroup *ggv_accel_group;
   GtkWidget *menubar;
   /*-- for lists of datads --*/
-  gchar *clist_titles[2] = {"node sets", "edge sets"};
+  gchar *titles[2] = {"node sets", "edge sets"};
   datad *d;
   ggobid *gg = inst->gg;
-  GtkWidget *swin, *clist;
+  GtkWidget *swin, *tree_view;
   gchar *row[1];
   GSList *l;
+  GtkTreeModel *model;
+  GtkTreeSelection *tree_sel;
+  GtkUIManager *manager;
+  GtkActionGroup *actions;
 
   ggv->tips = gtk_tooltips_new ();
 
   window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-  gtk_object_set_data (GTK_OBJECT (window), "ggvisd", ggv);
+  g_object_set_data(G_OBJECT (window), "ggvisd", ggv);
   inst->data = window;  /*-- or this could be the ggvis structure --*/
 
   gtk_window_set_title(GTK_WINDOW(window),
     "ggvis: multidimensional scaling");
-  gtk_signal_connect (GTK_OBJECT (window), "destroy",
-    GTK_SIGNAL_FUNC (close_ggvis_window), inst);
+  g_signal_connect (G_OBJECT (window), "destroy",
+    G_CALLBACK (close_ggvis_window), inst);
 
   main_vbox = gtk_vbox_new (false, 1);
   gtk_container_set_border_width (GTK_CONTAINER(main_vbox), 5); 
   gtk_container_add (GTK_CONTAINER(window), main_vbox);
 
   /* main menu bar */
-  ggv_accel_group = gtk_accel_group_new ();
-  get_main_menu (menu_items,
-    sizeof (menu_items) / sizeof (menu_items[0]),
-    ggv_accel_group, window,
-    &menubar, (gpointer) inst);
+  //ggv_accel_group = gtk_accel_group_new ();
+  manager = gtk_ui_manager_new();
+  actions = gtk_action_group_new("ggvis");
+  gtk_action_group_add_actions(actions, entries, G_N_ELEMENTS(entries), inst);
+  gtk_ui_manager_insert_action_group(manager, actions, 0);
+  menubar = create_menu_bar (manager, menu_ui, window);
   gtk_box_pack_start (GTK_BOX (main_vbox), menubar, false, false, 0);
 
 /*-- notebook for datads, distance matrix, run controls --*/
@@ -268,27 +318,30 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (swin),
     GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
 
-  clist = gtk_clist_new_with_titles (1, &clist_titles[0]);
-  gtk_widget_set_name (GTK_WIDGET(clist), "nodeset");
-  gtk_clist_set_selection_mode (GTK_CLIST (clist),
-    GTK_SELECTION_SINGLE);
-  gtk_object_set_data (GTK_OBJECT (clist), "datad_swin", swin);
-  gtk_signal_connect (GTK_OBJECT (clist), "select_row",
-    (GtkSignalFunc) ggv_datad_set_cb, inst);
-  gtk_signal_connect (GTK_OBJECT (gg), "datad_added",
-    (GtkSignalFunc) ggv_clist_datad_added_cb, GTK_OBJECT (clist));
+  model = gtk_list_store_new(1, G_TYPE_STRING);
+  tree_view = gtk_tree_model_new_with_model(model);
+  populate_tree_view(tree_view, titles, 1, true, GTK_SELECTION_SINGLE, 
+  	ggv_datad_set_cb, inst);
+
+  gtk_widget_set_name (GTK_WIDGET(tree_view), "nodeset");
+  g_object_set_data(G_OBJECT (tree_view), "datad_swin", swin);
+  g_signal_connect (G_OBJECT (gg), "datad_added",
+    G_CALLBACK(ggv_tree_view_datad_added_cb), GTK_OBJECT (tree_view));
   /*-- --*/
 
   for (l = gg->d; l; l = l->next) {
     d = (datad *) l->data;
     if (d->rowIds != NULL) {  /*-- node sets --*/
-      row[0] = g_strdup (d->name);
-      gtk_clist_append (GTK_CLIST (clist), row);
-      g_free (row[0]);
+      GtkTreeIter iter;
+	  gtk_list_store_append(GTK_LIST_STORE(model), &iter);
+	  gtk_list_store_set(GTK_LIST_STORE(model), &iter, 0, d->name, -1);
+	  /*row[0] = g_strdup (d->name);
+      gtk_tree_view_append (GTK_CLIST (tree_view), row);
+      g_free (row[0]);*/
     }
   }
-  gtk_clist_select_row (GTK_CLIST(clist), 0, 0);
-  gtk_container_add (GTK_CONTAINER (swin), clist);
+  select_tree_view_row(tree_view, 0);
+  gtk_container_add (GTK_CONTAINER (swin), tree_view);
   gtk_box_pack_start (GTK_BOX (hbox), swin, true, true, 2);
 
 /*
@@ -299,30 +352,30 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (swin),
     GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
 
-  clist = gtk_clist_new_with_titles (1, &clist_titles[1]);
-  gtk_widget_set_name (GTK_WIDGET(clist), "edgeset");
-  gtk_clist_set_selection_mode (GTK_CLIST (clist),
-    GTK_SELECTION_SINGLE);
-  gtk_object_set_data (GTK_OBJECT (clist), "datad_swin", swin);
-  gtk_signal_connect (GTK_OBJECT (clist), "select_row",
-    (GtkSignalFunc) ggv_datad_set_cb, inst);
-  gtk_signal_connect (GTK_OBJECT (gg), "datad_added",
-    (GtkSignalFunc) ggv_clist_datad_added_cb, GTK_OBJECT (clist));
+	model = gtk_list_store_new(1, G_TYPE_STRING);
+	tree_view = gtk_tree_view_new_with_model(model);
+	populate_tree_view(tree_view, 1, &titles[1], true, GTK_SELECTION_SINGLE, 
+		ggv_datad_set_cb, inst); 
+	gtk_widget_set_name (GTK_WIDGET(tree_view), "edgeset");
+  
+  g_object_set_data(G_OBJECT (tree_view), "datad_swin", swin);
+  g_signal_connect (G_OBJECT (gg), "datad_added",
+    G_CALLBACK(ggv_tree_view_datad_added_cb), GTK_OBJECT (tree_view));
   /*-- --*/
 
   for (l = gg->d; l; l = l->next) {
     d = (datad *) l->data;
     if (d->edge.n != 0) {  /*-- edge sets --*/
-      row[0] = g_strdup (d->name);
-      gtk_clist_append (GTK_CLIST (clist), row);
-      g_free (row[0]);
+      GtkTreeIter iter;
+	  gtk_list_store_append(GTK_LIST_STORE(model), &iter);
+	  gtk_list_store_set(GTK_LIST_STORE(model), &iter, 0, d->name, -1);
     }
   }
-  gtk_clist_select_row (GTK_CLIST(clist), 0, 0);
-  gtk_container_add (GTK_CONTAINER (swin), clist);
+  select_tree_view_row(tree_view, 0);
+  gtk_container_add (GTK_CONTAINER (swin), tree_view);
   gtk_box_pack_start (GTK_BOX (hbox), swin, true, true, 2);
 
-  label = gtk_label_new ("Datasets");
+  label = gtk_label_new_with_mnemonic ("_Datasets");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), hbox, label);
 
   /*-- Task controls --*/
@@ -338,13 +391,13 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gtk_container_set_border_width (GTK_CONTAINER (vb), 3);
   gtk_container_add (GTK_CONTAINER(frame), vb);
 
-  radio1 = gtk_radio_button_new_with_label (NULL, "Dissimilarity analysis");
+  radio1 = gtk_radio_button_new_with_mnemonic (NULL, "_Dissimilarity analysis");
   gtk_widget_set_name (GTK_WIDGET(radio1), "MDS");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (ggv->tips), radio1,
     "Perform multidimensional scaling (MDS) for the purpose of dissimilarity analysis; dissimilarities (distances) are provided as an edge variable.",
     NULL);
   group = gtk_radio_button_group (GTK_RADIO_BUTTON (radio1));
-  radio2 = gtk_radio_button_new_with_label (group, "Graph layout");
+  radio2 = gtk_radio_button_new_with_mnemonic (group, "Graph _layout");
   gtk_widget_set_name (GTK_WIDGET(radio2), "GRAPH_LAYOUT");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (ggv->tips), radio2,
     "Perform multidimensional scaling (MDS) for the purpose of laying out a graph.",
@@ -353,10 +406,10 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   GTK_TOGGLE_BUTTON(radio1)->active = (ggv->mds_task == DissimAnalysis);
   GTK_TOGGLE_BUTTON(radio2)->active = (ggv->mds_task == GraphLayout);
 
-  gtk_signal_connect (GTK_OBJECT (radio1), "toggled",
-    GTK_SIGNAL_FUNC (ggv_task_cb), inst);
-  gtk_signal_connect (GTK_OBJECT (radio2), "toggled",
-    GTK_SIGNAL_FUNC (ggv_task_cb), inst);
+  g_signal_connect (G_OBJECT (radio1), "toggled",
+    G_CALLBACK (ggv_task_cb), inst);
+  g_signal_connect (G_OBJECT (radio2), "toggled",
+    G_CALLBACK (ggv_task_cb), inst);
 
   gtk_box_pack_start (GTK_BOX (vb), radio1, true, true, 2);
   gtk_box_pack_start (GTK_BOX (vb), radio2, true, true, 2);
@@ -369,18 +422,18 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gtk_container_set_border_width (GTK_CONTAINER (vb), 3);
   gtk_container_add (GTK_CONTAINER(frame), vb);
 
-  btn = gtk_check_button_new_with_label ("Use edge weights");
+  btn = gtk_check_button_new_with_mnemonic ("Use edge _weights");
   gtk_widget_set_name (GTK_WIDGET(btn), "MDS_WEIGHTS");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (ggv->tips), btn,
     "The distance matrix for a graph is the minimum number of edges connecting any pair of nodes.  These distances can be weighted if an edge variable is supplied.",
     NULL);
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (btn), false);
   gtk_widget_set_sensitive (btn, ggv->mds_task == GraphLayout);
-  gtk_signal_connect (GTK_OBJECT (btn), "toggled",
-    GTK_SIGNAL_FUNC (ggv_edge_weights_cb), inst);
+  g_signal_connect (G_OBJECT (btn), "toggled",
+    G_CALLBACK (ggv_edge_weights_cb), inst);
   gtk_box_pack_start (GTK_BOX (vb), btn, true, true, 2);
 
-  btn = gtk_check_button_new_with_label ("Complete graph distances");
+  btn = gtk_check_button_new_with_mnemonic ("_Complete graph distances");
   gtk_widget_set_name (GTK_WIDGET(btn), "MDS_COMPLETE");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (ggv->tips), btn,
     "Fill in a missing D[i,j] using a shortest path algorithm when a path exists from i to j; if not checked, D[i,j] is treated as missing.",
@@ -388,11 +441,11 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(btn),
     ggv->Dtarget_source == LinkDist);
   gtk_widget_set_sensitive (btn, (ggv->mds_task == GraphLayout));
-  gtk_signal_connect (GTK_OBJECT (btn), "toggled",
-    GTK_SIGNAL_FUNC (ggv_complete_distances_cb), inst);
+  g_signal_connect (G_OBJECT (btn), "toggled",
+    G_CALLBACK (ggv_complete_distances_cb), inst);
   gtk_box_pack_start (GTK_BOX (vb), btn, true, true, 2);
 
-  label = gtk_label_new ("Task");
+  label = gtk_label_new_with_mnemonic ("_Task");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), vbox, label);
 
 /*-- "Definition of D" controls --*/
@@ -406,20 +459,20 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   /*-- include only edge sets.  --*/
   varnotebook = create_variable_notebook (hbox,
     GTK_SELECTION_SINGLE, all_vartypes, edgesets_only,
-    (GtkSignalFunc) NULL, inst->gg);
+    G_CALLBACK(NULL), inst->gg);
   swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK (varnotebook), 0);
   if (swin != NULL) {
-    ggv->clist_dist = (GtkCList *) GTK_BIN(swin)->child;
+    ggv->tree_view_dist = (GtkTreeView *) GTK_BIN(swin)->child;
     /* Initialize, selecting first variable */
     if (ggv->mds_task == DissimAnalysis)
-      gtk_clist_select_row (ggv->clist_dist, 0, 0);
-  } else ggv->clist_dist = (GtkCList *) NULL;
+		select_tree_view_row(ggv->tree_view_dist, 0);
+  } else ggv->tree_view_dist = (GtkTreeView *) NULL;
 
   /*-- Report on D --*/
   hb = gtk_hbox_new (false, 1);
   gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 2);
 
-  label = gtk_label_new ("Dist");
+  label = gtk_label_new_with_mnemonic ("_Dist");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), hbox, label);
 
 /*-- Run controls --*/
@@ -435,7 +488,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   top = 0;
 
   /*-- MDS Dimension --*/
-  label = gtk_label_new ("Dimension (k)");
+  label = gtk_label_new_with_mnemonic ("Dimension (_k)");
   /*gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.0);*/
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, top, top+1,
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND), 
@@ -443,10 +496,11 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
     1, 1);
 
   adj = gtk_adjustment_new ((gfloat)ggv->dim, 1.0, 10.0, 1.0, 1.0, 1.0);
-  gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
-    GTK_SIGNAL_FUNC (ggv_dims_cb), inst);
+  g_signal_connect (G_OBJECT (adj), "value_changed",
+    G_CALLBACK (ggv_dims_cb), inst);
   hscale = gtk_hscale_new (GTK_ADJUSTMENT (adj));
-  gtk_widget_set_usize (GTK_WIDGET (hscale), 150, 30);
+  gtk_label_set_mnemonic_widget(GTK_LABEL(label), hscale);
+  //gtk_widget_set_usize (GTK_WIDGET (hscale), 150, 30);
   ggvis_scale_set_default_values (GTK_SCALE(hscale));
   gtk_scale_set_digits (GTK_SCALE(hscale), 0);
   gtk_table_attach (GTK_TABLE (table), hscale, 1, 2, top, top+1,
@@ -457,7 +511,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   top++;
 
   /* Stepsize */
-  label = gtk_label_new ("Step size");
+  label = gtk_label_new_with_mnemonic ("_Step size");
   /*gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.0);*/
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, top, top+1,
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND), 
@@ -465,13 +519,14 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
     1, 1);
 
   adj = gtk_adjustment_new (0.01, 0.0001, 0.2, 0.02, 0.2, 0.10);
-  gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
-    GTK_SIGNAL_FUNC (ggv_stepsize_cb), inst);
+  g_signal_connect (G_OBJECT (adj), "value_changed",
+    G_CALLBACK (ggv_stepsize_cb), inst);
   hscale = gtk_hscale_new (GTK_ADJUSTMENT (adj));
+  gtk_label_set_mnemonic_widget(GTK_LABEL(label), hscale);
   gtk_widget_set_name (hscale, "stepsize_scale");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (ggv->tips), hscale,
     "Stepsize", NULL);
-  gtk_widget_set_usize (GTK_WIDGET (hscale), 100, 30);
+  //gtk_widget_set_usize (GTK_WIDGET (hscale), 100, 30);
   ggvis_scale_set_default_values (GTK_SCALE(hscale));
   gtk_scale_set_digits (GTK_SCALE(hscale), 4);
   /*
@@ -488,21 +543,21 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gtk_box_pack_start (GTK_BOX (vbox), hbox, false, false, 2);
 
   /*-- run --*/
-  btn = gtk_check_button_new_with_label ("Run MDS");
+  btn = gtk_check_button_new_with_mnemonic ("_Run MDS");
   gtk_widget_set_name (btn, "RunMDS");
 
   gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 2);
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-    GTK_SIGNAL_FUNC (mds_run_cb), inst);
+  g_signal_connect (G_OBJECT (btn), "clicked",
+    G_CALLBACK (mds_run_cb), inst);
 
-  btn = gtk_button_new_with_label ("Step once");
+  btn = gtk_button_new_with_mnemonic ("Step _once");
   gtk_widget_set_name (btn, "Step");
   gtk_widget_set_sensitive (btn, false); /* make sensitive after running */
   gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 2);
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-    GTK_SIGNAL_FUNC (mds_step_cb), inst);
+  g_signal_connect (G_OBJECT (btn), "clicked",
+    G_CALLBACK (mds_step_cb), inst);
 
-  label = gtk_label_new ("Run");
+  label = gtk_label_new_with_mnemonic ("_Run");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), vbox, label);
 
   /*-- Plot of stress function --*/
@@ -517,10 +572,10 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   ggv->stressplot_da = gtk_drawing_area_new ();
   gtk_drawing_area_size (GTK_DRAWING_AREA (ggv->stressplot_da),
     STRESSPLOT_WIDTH, STRESSPLOT_HEIGHT);
-  gtk_signal_connect (GTK_OBJECT (ggv->stressplot_da), "expose_event",
-    GTK_SIGNAL_FUNC(ggv_stressplot_expose_cb), inst);
-  gtk_signal_connect (GTK_OBJECT (ggv->stressplot_da), "configure_event",
-    GTK_SIGNAL_FUNC(ggv_stressplot_configure_cb), inst);
+  g_signal_connect (G_OBJECT (ggv->stressplot_da), "expose_event",
+    G_CALLBACK(ggv_stressplot_expose_cb), inst);
+  g_signal_connect (G_OBJECT (ggv->stressplot_da), "configure_event",
+    G_CALLBACK(ggv_stressplot_configure_cb), inst);
   gtk_widget_set_events (ggv->stressplot_da, GDK_EXPOSURE_MASK);
   gtk_box_pack_start (GTK_BOX (vb), ggv->stressplot_da, true, true, 2);
 
@@ -538,20 +593,18 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gtk_box_pack_start (GTK_BOX (vbox), hbox, false, false, 2);
 
   /*-- Metric vs Non-metric --*/
-  metric_opt = gtk_option_menu_new ();
+  metric_opt = gtk_combo_box_new_text ();
   gtk_widget_set_name (metric_opt, "metric_opt");
-  populate_option_menu (metric_opt, (gchar**) metric_lbl,
-    sizeof (metric_lbl) / sizeof (gchar *),
-    (GtkSignalFunc) ggv_metric_cb, "PluginInst", inst);
+  populate_combo_box (metric_opt, (gchar**) metric_lbl, G_N_ELEMENTS(metric_lbl),
+    G_CALLBACK(ggv_metric_cb), inst);
   gtk_box_pack_start (GTK_BOX (hbox), metric_opt, false, false, 2);
   /* attach the label, hscale and two adjustments to this widget */
 
   /*-- Kruskal/Shepard vs Classic --*/
-  opt = gtk_option_menu_new ();
+  opt = gtk_combo_box_new_text ();
   gtk_widget_set_name (opt, "kruskalshepard_classic_opt");
-  populate_option_menu (opt, (gchar**) kruskal_lbl,
-    sizeof (kruskal_lbl) / sizeof (gchar *),
-    (GtkSignalFunc) ggv_kruskal_cb, "PluginInst", inst);
+  populate_combo_box (opt, (gchar**) kruskal_lbl, G_N_ELEMENTS(kruskal_lbl),
+    G_CALLBACK(ggv_kruskal_cb), inst);
   gtk_box_pack_start (GTK_BOX (hbox), opt, false, false, 2);
 
 
@@ -564,21 +617,21 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gtk_container_add (GTK_CONTAINER(frame), vb);
 
   ggv->dissim->da = gtk_drawing_area_new ();
-  gtk_drawing_area_size (GTK_DRAWING_AREA (ggv->dissim->da),
+  gtk_widget_set_size_request (GTK_WIDGET (ggv->dissim->da),
     HISTOGRAM_WIDTH, HISTOGRAM_HEIGHT);
   gtk_widget_set_events (ggv->dissim->da, GDK_EXPOSURE_MASK
              | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK
              | GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK);
-  gtk_signal_connect (GTK_OBJECT (ggv->dissim->da), "expose_event",
-    GTK_SIGNAL_FUNC(ggv_histogram_expose_cb), inst);
-  gtk_signal_connect (GTK_OBJECT (ggv->dissim->da), "configure_event",
-    GTK_SIGNAL_FUNC(ggv_histogram_configure_cb), inst);
-  gtk_signal_connect (GTK_OBJECT (ggv->dissim->da), "motion_notify_event",
-    GTK_SIGNAL_FUNC(ggv_histogram_motion_cb), inst);
-  gtk_signal_connect (GTK_OBJECT (ggv->dissim->da), "button_press_event",
-    GTK_SIGNAL_FUNC(ggv_histogram_button_press_cb), inst);
-  gtk_signal_connect (GTK_OBJECT (ggv->dissim->da), "button_release_event",
-    GTK_SIGNAL_FUNC(ggv_histogram_button_release_cb), inst);
+  g_signal_connect (G_OBJECT (ggv->dissim->da), "expose_event",
+    G_CALLBACK(ggv_histogram_expose_cb), inst);
+  g_signal_connect (G_OBJECT (ggv->dissim->da), "configure_event",
+    G_CALLBACK(ggv_histogram_configure_cb), inst);
+  g_signal_connect (G_OBJECT (ggv->dissim->da), "motion_notify_event",
+    G_CALLBACK(ggv_histogram_motion_cb), inst);
+  g_signal_connect (G_OBJECT (ggv->dissim->da), "button_press_event",
+    G_CALLBACK(ggv_histogram_button_press_cb), inst);
+  g_signal_connect (G_OBJECT (ggv->dissim->da), "button_release_event",
+    G_CALLBACK(ggv_histogram_button_release_cb), inst);
 
   gtk_box_pack_start (GTK_BOX (vb), ggv->dissim->da, true, true, 1);
 
@@ -592,7 +645,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
 
   /*-- Data (Dtarget) power --*/
 /* Add a second adjustment for isotonic_mix, [0:1] */
-  label = gtk_label_new ("Data power (D^p)");
+  label = gtk_label_new_with_mnemonic ("Data _power (D^p)");
   gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.0);
   gtk_table_attach (GTK_TABLE (table), label, 1, 2, top, top+1,
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND), 
@@ -600,12 +653,13 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
     1, 1);
 
   Dtarget_adj = gtk_adjustment_new (1.0, 0.0, 7.0, 0.02, 0.01, 1.0);
-  gtk_signal_connect (GTK_OBJECT (Dtarget_adj), "value_changed",
-    GTK_SIGNAL_FUNC (ggv_Dtarget_power_cb), inst);
+  g_signal_connect (G_OBJECT (Dtarget_adj), "value_changed",
+    G_CALLBACK (ggv_Dtarget_power_cb), inst);
 
   hscale = gtk_hscale_new (GTK_ADJUSTMENT (Dtarget_adj));
+  gtk_label_set_mnemonic_widget(GTK_LABEL(label), hscale);
   gtk_widget_set_name (hscale, "Dtarget_power_scale");
-  gtk_widget_set_usize (GTK_WIDGET (hscale), 150, 30);
+  //gtk_widget_set_usize (GTK_WIDGET (hscale), 150, 30);
   ggvis_scale_set_default_values (GTK_SCALE(hscale));
   gtk_table_attach (GTK_TABLE (table), hscale, 0, 1, top, top+1,
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND), 
@@ -614,24 +668,19 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
 
   /*-- additional adjustment for isotonic_mix */
   isotonic_mix_adj = gtk_adjustment_new (100.0, 0.0, 101.0, 1.0, 1.0, 1.0);
-  gtk_signal_connect (GTK_OBJECT (isotonic_mix_adj), "value_changed",
-    GTK_SIGNAL_FUNC (ggv_Dtarget_power_cb), inst);
-  menu = gtk_option_menu_get_menu (GTK_OPTION_MENU(metric_opt));
-  children = gtk_container_children (GTK_CONTAINER(menu));
-
-  for (list = children; list; list = list->next) {
-    child = (GtkWidget *) list->data;
-    gtk_object_set_data (GTK_OBJECT(child), "label", label); 
-    gtk_object_set_data (GTK_OBJECT(child), "hscale", hscale);
-    gtk_object_set_data (GTK_OBJECT(child),
+  g_signal_connect (G_OBJECT (isotonic_mix_adj), "value_changed",
+    G_CALLBACK (ggv_Dtarget_power_cb), inst);
+  
+    g_object_set_data(G_OBJECT(metric_opt), "label", label); 
+    g_object_set_data(G_OBJECT(metric_opt), "hscale", hscale);
+    g_object_set_data(G_OBJECT(metric_opt),
       "isotonic_mix_adj", isotonic_mix_adj); 
-    gtk_object_set_data (GTK_OBJECT(child),
+    g_object_set_data(G_OBJECT(metric_opt),
       "Dtarget_adj", Dtarget_adj); 
-  }
 
   /*-- Weight power --*/
   top++;
-  label = gtk_label_new ("Weight (w=D^r)");
+  label = gtk_label_new_with_mnemonic ("_Weight (w=D^r)");
   gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.0);
   gtk_table_attach (GTK_TABLE (table), label, 1, 2, top, top+1,
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND), 
@@ -639,11 +688,12 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
     1, 1);
 
   adj = gtk_adjustment_new (0.0, -4.0, 5.0, 0.02, 0.01, 1.0);
-  gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
-    GTK_SIGNAL_FUNC (ggv_weight_power_cb), inst);
+  g_signal_connect (G_OBJECT (adj), "value_changed",
+    G_CALLBACK (ggv_weight_power_cb), inst);
   hscale = gtk_hscale_new (GTK_ADJUSTMENT (adj));
+  gtk_label_set_mnemonic_widget(GTK_LABEL(label), hscale);
   gtk_widget_set_name (hscale, "weight_power_scale");
-  gtk_widget_set_usize (GTK_WIDGET (hscale), 150, 30);
+  //gtk_widget_set_usize (GTK_WIDGET (hscale), 150, 30);
   ggvis_scale_set_default_values (GTK_SCALE(hscale));
   gtk_table_attach (GTK_TABLE (table), hscale, 0, 1, top, top+1,
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND), 
@@ -675,7 +725,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
 
   /*-- Dist power --*/
   top++;
-  label = gtk_label_new ("Dist power (d^q)");
+  label = gtk_label_new_with_mnemonic ("Dist _power (d^q)");
   gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.0);
   gtk_table_attach (GTK_TABLE (table), label, 1, 2, top, top+1,
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND), 
@@ -683,11 +733,12 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
     1, 1);
 
   adj = gtk_adjustment_new (1.0, 0.0, 7.0, 0.02, 0.01, 1.0);
-  gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
-    GTK_SIGNAL_FUNC (ggv_dist_power_cb), inst);
+  g_signal_connect (G_OBJECT (adj), "value_changed",
+    G_CALLBACK (ggv_dist_power_cb), inst);
   hscale = gtk_hscale_new (GTK_ADJUSTMENT (adj));
+  gtk_label_set_mnemonic_widget(GTK_LABEL(label), hscale);
   gtk_widget_set_name (hscale, "dist_power_scale");
-  gtk_widget_set_usize (GTK_WIDGET (hscale), 150, 30);
+  //gtk_widget_set_usize (GTK_WIDGET (hscale), 150, 30);
   ggvis_scale_set_default_values (GTK_SCALE(hscale));
   gtk_table_attach (GTK_TABLE (table), hscale, 0, 1, top, top+1,
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND), 
@@ -696,7 +747,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
 
   /*-- Minkowski --*/
   top++;
-  label = gtk_label_new ("Minkowski (m)");
+  label = gtk_label_new_with_mnemonic ("_Minkowski (m)");
   gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.0);
   gtk_table_attach (GTK_TABLE (table), label, 1, 2, top, top+1,
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND), 
@@ -704,11 +755,12 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
     1, 1);
 
   adj = gtk_adjustment_new (2.0, 1.0, 7.0, 0.02, 0.01, 1.0);
-  gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
-    GTK_SIGNAL_FUNC (ggv_lnorm_cb), inst);
+  g_signal_connect (G_OBJECT (adj), "value_changed",
+    G_CALLBACK (ggv_lnorm_cb), inst);
   hscale = gtk_hscale_new (GTK_ADJUSTMENT (adj));
+  gtk_label_set_mnemonic_widget(GTK_LABEL(label), hscale);
   gtk_widget_set_name (hscale, "lnorm_scale");
-  gtk_widget_set_usize (GTK_WIDGET (hscale), 150, 30);
+  //gtk_widget_set_usize (GTK_WIDGET (hscale), 150, 30);
   ggvis_scale_set_default_values (GTK_SCALE(hscale));
   gtk_table_attach (GTK_TABLE (table), hscale, 0, 1, top, top+1,
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND), 
@@ -735,13 +787,13 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
       group = gtk_radio_button_group (GTK_RADIO_BUTTON (radio));
       radio = gtk_radio_button_new_with_label (group, groups_lbl[i]);
     }
-    gtk_object_set_data (GTK_OBJECT(radio), "PluginInst", inst);
-    gtk_signal_connect (GTK_OBJECT (radio), "toggled",
-      GTK_SIGNAL_FUNC (ggv_groups_cb), GINT_TO_POINTER(i));
+    g_object_set_data(G_OBJECT(radio), "PluginInst", inst);
+    g_signal_connect (G_OBJECT (radio), "toggled",
+      G_CALLBACK (ggv_groups_cb), GINT_TO_POINTER(i));
     gtk_box_pack_start (GTK_BOX (vbox), radio, TRUE, TRUE, 0);
   }
 
-  label = gtk_label_new ("Groups");
+  label = gtk_label_new_with_mnemonic ("_Groups");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), frame, label);
 
   /*-- Anchor tab --*/
@@ -759,14 +811,14 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
     if (i == 0) {
       radio = gtk_radio_button_new_with_label (NULL, anchor_lbl[i]);
       gtk_widget_set_name (radio, "ANCHOR_OFF");
-      GTK_TOGGLE_BUTTON (radio)->active = TRUE;
+      gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(radio), true);
     } else {
       group = gtk_radio_button_group (GTK_RADIO_BUTTON (radio));
       radio = gtk_radio_button_new_with_label (group, anchor_lbl[i]);
     }
-    gtk_object_set_data (GTK_OBJECT(radio), "PluginInst", inst);
-    gtk_signal_connect (GTK_OBJECT (radio), "toggled",
-      GTK_SIGNAL_FUNC (ggv_anchor_cb), GINT_TO_POINTER(i));
+    g_object_set_data(G_OBJECT(radio), "PluginInst", inst);
+    g_signal_connect (G_OBJECT (radio), "toggled",
+      G_CALLBACK (ggv_anchor_cb), GINT_TO_POINTER(i));
     gtk_box_pack_start (GTK_BOX (vbox), radio, TRUE, TRUE, 0);
   }
 
@@ -775,7 +827,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gtk_box_pack_start (GTK_BOX (hbox), ggv->anchor_frame, TRUE, TRUE, 0);
   ggv_anchor_table_build (inst);
 
-  label = gtk_label_new ("Anchor");
+  label = gtk_label_new_with_mnemonic ("_Anchor");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), frame, label);
 
   /*-- Sensitivity Analysis --*/
@@ -791,27 +843,28 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   top = 0;
 
   /*-- selection probability slider and button --*/
-  btn = gtk_button_new_with_label ("Resample");
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-    GTK_SIGNAL_FUNC (ggv_selection_prob_btn_cb), inst);
+  btn = gtk_button_new_with_mnemonic ("_Resample");
+  g_signal_connect (G_OBJECT (btn), "clicked",
+    G_CALLBACK (ggv_selection_prob_btn_cb), inst);
   gtk_table_attach (GTK_TABLE (table), btn, 0, 1, top, top+1,
     (GtkAttachOptions) (GTK_FILL), 
     (GtkAttachOptions) (GTK_FILL),
     2, 2);
 
   adj = gtk_adjustment_new (ggv->rand_select_val, 0.0, 1.0, .01, .01, 0.0);
-  gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
-    GTK_SIGNAL_FUNC (ggv_selection_prob_adj_cb), inst);
+  g_signal_connect (G_OBJECT (adj), "value_changed",
+    G_CALLBACK (ggv_selection_prob_adj_cb), inst);
   hscale = gtk_hscale_new (GTK_ADJUSTMENT (adj));
   gtk_widget_set_name (GTK_WIDGET(hscale), "selection_prob_scale");
-  gtk_widget_set_usize (GTK_WIDGET (hscale), 100, 30);
+  //gtk_widget_set_usize (GTK_WIDGET (hscale), 100, 30);
   ggvis_scale_set_default_values (GTK_SCALE(hscale));
   gtk_table_attach (GTK_TABLE (table), hscale, 1, 2, top, top+1,
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND), 
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
     2, 2);
 
-  label = gtk_label_new ("Selection prob.");
+  label = gtk_label_new_with_mnemonic ("_Selection prob.");
+  gtk_label_set_mnemonic_widget(GTK_LABEL(label), hscale);
   gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.0);
   gtk_table_attach (GTK_TABLE (table), label, 2, 3, top, top+1,
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND), 
@@ -821,27 +874,28 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
 
   /*-- perturbation slider and button --*/
   top++;
-  btn = gtk_button_new_with_label ("Reperturb");
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-    GTK_SIGNAL_FUNC (ggv_perturb_btn_cb), inst);
+  btn = gtk_button_new_with_mnemonic ("Re_perturb");
+  g_signal_connect (G_OBJECT (btn), "clicked",
+    G_CALLBACK (ggv_perturb_btn_cb), inst);
   gtk_table_attach (GTK_TABLE (table), btn, 0, 1, top, top+1,
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND), 
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
     2, 2);
 
   adj = gtk_adjustment_new (ggv->perturb_val, 0.0, 1.0, 0.01, 0.01, 0.0);
-  gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
-    GTK_SIGNAL_FUNC (ggv_perturb_adj_cb), inst);
+  g_signal_connect (G_OBJECT (adj), "value_changed",
+    G_CALLBACK (ggv_perturb_adj_cb), inst);
   hscale = gtk_hscale_new (GTK_ADJUSTMENT (adj));
   gtk_widget_set_name (GTK_WIDGET(hscale), "perturbation_scale");
-  gtk_widget_set_usize (GTK_WIDGET (hscale), 100, 30);
+  //gtk_widget_set_usize (GTK_WIDGET (hscale), 100, 30);
   ggvis_scale_set_default_values (GTK_SCALE(hscale));
   gtk_table_attach (GTK_TABLE (table), hscale, 1, 2, top, top+1,
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND), 
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
     2, 2);
 
-  label = gtk_label_new ("Perturbation");
+  label = gtk_label_new_with_mnemonic ("P_erturbation");
+  gtk_label_set_mnemonic_widget(GTK_LABEL(label), hscale);
   gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.0);
   gtk_table_attach (GTK_TABLE (table), label, 2, 3, top, top+1,
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND), 
@@ -850,7 +904,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   /*--        --*/
 
 
-  label = gtk_label_new ("Sensitivity");
+  label = gtk_label_new_with_mnemonic ("Se_nsitivity");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
                             frame, label);
 
@@ -862,17 +916,16 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gtk_container_set_border_width (GTK_CONTAINER (vbox), 5);
   gtk_container_add (GTK_CONTAINER(frame), vbox);
 
-  opt = gtk_option_menu_new ();
-  populate_option_menu (opt, (gchar**) constrained_lbl,
-    sizeof (constrained_lbl) / sizeof (gchar *),
-    (GtkSignalFunc) ggv_constrained_cb, "PluginInst", inst);
+  opt = gtk_combo_box_new_text ();
+  populate_option_menu (opt, (gchar**) constrained_lbl, G_N_ELEMENTS(constrained_lbl),
+    G_CALLBACK(ggv_constrained_cb), inst);
   gtk_box_pack_start (GTK_BOX (vbox), opt, false, false, 0);
 
-  label = gtk_label_new ("Constraints");
+  label = gtk_label_new_with_mnemonic ("C_onstraints");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook),
                             frame, label);
 
-  gtk_signal_connect (GTK_OBJECT(gg),
+  g_signal_connect (G_OBJECT(gg),
     "clusters_changed", clusters_changed_cb, inst);
 
   gtk_widget_show_all (window);
@@ -894,36 +947,36 @@ void close_ggvis_window(GtkWidget *w, PluginInstance *inst)
     ggobid *gg = inst->gg;
     ggvisd *ggv = ggvisFromInst (inst);
 
-    GtkWidget *clist_node = widget_find_by_name (window, "nodeset");
-    GtkWidget *clist_edge = widget_find_by_name (window, "edgeset");
+    GtkWidget *tree_view_node = widget_find_by_name (window, "nodeset");
+    GtkWidget *tree_view_edge = widget_find_by_name (window, "edgeset");
 
-    /* I'm definitely getting the right clists; I've checked */
+    /* I'm definitely getting the right tree_views; I've checked */
 /*
-    if (id) gtk_signal_disconnect (GTK_OBJECT(gg), id);
-    if (id) gtk_signal_disconnect (GTK_OBJECT(gg), id);
+    if (id) g_signal_handler_disconnect (G_OBJECT(gg), id);
+    if (id) g_signal_handler_disconnect (G_OBJECT(gg), id);
 */
 
     /* Disconnect signals; this isn't working.  Don't know why. */
 
-    /*gtk_signal_connect (GTK_OBJECT (gg), "datad_added",
-     (GtkSignalFunc) ggv_clist_datad_added_cb,
-     GTK_OBJECT (clist));*/
-    id = gtk_signal_lookup ("datad_added", GTK_TYPE_GGOBI);
-    if (id && clist_node != NULL && clist_edge != NULL) {
-      gtk_signal_disconnect_by_func (GTK_OBJECT(gg),
-        (GtkSignalFunc) ggv_clist_datad_added_cb,
-        (gpointer) GTK_OBJECT(clist_node));
-      gtk_signal_disconnect_by_func (GTK_OBJECT(gg),
-        (GtkSignalFunc) ggv_clist_datad_added_cb,
-        (gpointer) GTK_OBJECT(clist_edge));
+    /*g_signal_connect (G_OBJECT (gg), "datad_added",
+     G_CALLBACK(ggv_tree_view_datad_added_cb),
+     GTK_OBJECT (tree_view));*/
+    id = g_signal_lookup ("datad_added", GGOBI_TYPE_GGOBI);
+    if (id && tree_view_node != NULL && tree_view_edge != NULL) {
+      g_signal_handlers_disconnect_by_func (G_OBJECT(gg),
+        G_CALLBACK(ggv_tree_view_datad_added_cb),
+        (gpointer) tree_view_node);
+      g_signal_handlers_disconnect_by_func (G_OBJECT(gg),
+        G_CALLBACK(ggv_tree_view_datad_added_cb),
+        (gpointer) tree_view_edge);
     }
 
-    /*  gtk_signal_connect (GTK_OBJECT(gg),
+    /*  g_signal_connect (G_OBJECT(gg),
 	"clusters_changed", clusters_changed_cb, inst); */
-    id = gtk_signal_lookup ("clusters_changed", GTK_TYPE_GGOBI);
+    id = g_signal_lookup ("clusters_changed", GGOBI_TYPE_GGOBI);
     if (id) {
-      gtk_signal_disconnect_by_func (GTK_OBJECT(gg),
-        (GtkSignalFunc) clusters_changed_cb,
+      g_signal_handlers_disconnect_by_func (G_OBJECT(gg),
+        G_CALLBACK(clusters_changed_cb),
         (gpointer) inst);
     }
 

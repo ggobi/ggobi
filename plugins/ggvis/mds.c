@@ -545,13 +545,13 @@ void mds_func (gboolean state, PluginInstance *inst)
 
   if (state) {
     if (!ggv->running_p) {
-      ggv->idle_id = gtk_idle_add_priority (G_PRIORITY_LOW,
-        (GtkFunction) mds_idle_func, inst);
+      ggv->idle_id = g_idle_add_full (G_PRIORITY_LOW,
+        (GSourceFunc)mds_idle_func, inst, NULL);
     }
     ggv->running_p = true;
   } else {
     if (ggv->running_p) {
-      gtk_idle_remove (ggv->idle_id);
+      g_source_remove (ggv->idle_id);
       ggv->idle_id = 0;
     }
     ggv->running_p = false;

@@ -26,8 +26,8 @@ addToToolsMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
   inst->gg = gg;
 
   entry = GGobi_addToolsMenuItem ((gchar *)lbl, gg);
-  gtk_signal_connect (GTK_OBJECT(entry), "activate",
-                      GTK_SIGNAL_FUNC (show_graphact_window), inst);
+  g_signal_connect (G_OBJECT(entry), "activate",
+                      G_CALLBACK (show_graphact_window), inst);
   return(true);
 }
 
@@ -49,7 +49,7 @@ show_graphact_window (GtkWidget *widget, PluginInstance *inst)
     inst->data = ga;
 
     create_graphact_window (inst->gg, inst);
-    gtk_object_set_data (GTK_OBJECT (ga->window), "graphactd", ga);
+    g_object_set_data(G_OBJECT (ga->window), "graphactd", ga);
 
   } else {
     ga = (graphactd *) inst->data;
@@ -65,17 +65,27 @@ graphactFromInst (PluginInstance *inst)
 }
 
 static void
-graphact_datad_set_cb (GtkWidget *cl, gint row, gint column,
-  GdkEventButton *event, PluginInstance *inst)
+graphact_datad_set_cb (GtkTreeSelection *tree_sel, PluginInstance *inst)
 {
-  ggobid *gg = inst->gg;
   graphactd *ga = graphactFromInst (inst);
-  gchar *dname;
-  datad *d;
-  GSList *l;
-  gchar *clname = gtk_widget_get_name (GTK_WIDGET(cl));
+  datad *d, *e;
+  const gchar *clname = gtk_widget_get_name(GTK_WIDGET(gtk_tree_selection_get_tree_view(tree_sel)));
   gboolean changed = false;
-
+  GtkTreeModel *model;
+  GtkTreeIter iter;
+  
+  if (!gtk_tree_selection_get_selected(tree_sel, &model, &iter))
+	  return;
+  gtk_tree_model_get(model, &iter, 1, &d, -1);
+  if (strcmp (clname, "nodeset") == 0) {
+	  changed = ga->d != d;
+	  ga->d = d;
+  } else if (strcmp (clname, "edgeset") == 0) {
+	  changed = ga->e != e;
+	  ga->e = e;
+  }
+  
+  #if 0
   gtk_clist_get_text (GTK_CLIST (cl), row, 0, &dname);
   for (l = gg->d; l; l = l->next) {
     d = l->data;
@@ -90,8 +100,7 @@ graphact_datad_set_cb (GtkWidget *cl, gint row, gint column,
       break;
     }
   }
-  /* Don't free either string; they're just pointers */
-
+  #endif
 
   if (ga->d != NULL && ga->e != NULL) {
     init_edge_vectors (changed, inst);
@@ -99,22 +108,19 @@ graphact_datad_set_cb (GtkWidget *cl, gint row, gint column,
 }
 
 static void 
-graphact_clist_datad_added_cb (ggobid *gg, datad *d, void *clist)
+graphact_tree_view_datad_added_cb (ggobid *gg, datad *d, GtkWidget *tree_view)
 {
-  gchar *row[1];
   GtkWidget *swin = (GtkWidget *)
-    gtk_object_get_data (GTK_OBJECT (clist), "datad_swin");
-  gchar *clname = gtk_widget_get_name (GTK_WIDGET(clist));
-
-  if (strcmp (clname, "nodeset") == 0 && d->rowIds != NULL) {
-    row[0] = g_strdup (d->name);
-    gtk_clist_append (GTK_CLIST (GTK_OBJECT(clist)), row);
-    g_free (row[0]);
-  }
-  if (strcmp (clname, "edgeset") == 0 && d->edge.n > 0) {
-    row[0] = g_strdup (d->name);
-    gtk_clist_append (GTK_CLIST (GTK_OBJECT(clist)), row);
-    g_free (row[0]);
+    g_object_get_data(G_OBJECT (tree_view), "datad_swin");
+  const gchar *clname = gtk_widget_get_name (GTK_WIDGET(tree_view));
+  GtkTreeIter iter;
+  GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(tree_view));
+  
+  if ((strcmp (clname, "nodeset") == 0 && d->rowIds != NULL) ||
+  		(strcmp (clname, "edgeset") == 0 && d->edge.n > 0)) 
+  {
+    gtk_list_store_append(GTK_LIST_STORE(model), &iter);
+	gtk_list_store_set(GTK_LIST_STORE(model), &iter, 0, d->name, 1, d, -1);
   }
 
   gtk_widget_show_all (swin);
@@ -128,12 +134,13 @@ create_graphact_window(ggobid *gg, PluginInstance *inst)
   GtkWidget *window, *main_vbox, *notebook, *label, *frame, *vbox, *btn, *opt;
   GtkTooltips *tips = gtk_tooltips_new ();
   /*-- for lists of datads --*/
-  gchar *clist_titles[2] = {"node sets", "edge sets"};
+  gchar *tree_view_titles[2] = {"node sets", "edge sets"};
   datad *d;
-  GtkWidget *hbox, *swin, *clist;
-  gchar *row[1];
+  GtkWidget *hbox, *swin, *tree_view;
   GSList *l;
   graphactd *ga = graphactFromInst (inst); 
+  GtkTreeIter iter;
+  GtkListStore *model;
 
   /*-- I will probably have to get hold of this window, after which
        I can name all the other widgets --*/
@@ -141,8 +148,8 @@ create_graphact_window(ggobid *gg, PluginInstance *inst)
   ga->window = window;
 
   gtk_window_set_title(GTK_WINDOW(window), "Graph operations");
-  gtk_signal_connect (GTK_OBJECT (window), "destroy",
-                      GTK_SIGNAL_FUNC (close_graphact_window), inst);
+  g_signal_connect (G_OBJECT (window), "destroy",
+                      G_CALLBACK (close_graphact_window), inst);
 
   main_vbox = gtk_vbox_new (FALSE,1);
   gtk_container_set_border_width (GTK_CONTAINER(main_vbox), 5); 
@@ -167,27 +174,26 @@ create_graphact_window(ggobid *gg, PluginInstance *inst)
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (swin),
     GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
 
-  clist = gtk_clist_new_with_titles (1, &clist_titles[0]);
-  gtk_widget_set_name (GTK_WIDGET(clist), "nodeset");
-  gtk_clist_set_selection_mode (GTK_CLIST (clist),
-    GTK_SELECTION_SINGLE);
-  gtk_object_set_data (GTK_OBJECT (clist), "datad_swin", swin);
-  gtk_signal_connect (GTK_OBJECT (clist), "select_row",
-    (GtkSignalFunc) graphact_datad_set_cb, inst);
-  gtk_signal_connect (GTK_OBJECT (gg), "datad_added",
-    (GtkSignalFunc) graphact_clist_datad_added_cb, GTK_OBJECT (clist));
+	model = gtk_list_store_new(2, G_TYPE_STRING, GGOBI_TYPE_DATA);
+	tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(model));
+	populate_tree_view(tree_view, tree_view_titles, 1, true, GTK_SELECTION_SINGLE,
+		G_CALLBACK(graphact_datad_set_cb), inst);
+  gtk_widget_set_name (GTK_WIDGET(tree_view), "nodeset");
+  g_object_set_data(G_OBJECT (tree_view), "datad_swin", swin);
+  g_signal_connect (G_OBJECT (gg), "datad_added",
+    G_CALLBACK(graphact_tree_view_datad_added_cb), tree_view);
   /*-- --*/
 
   for (l = gg->d; l; l = l->next) {
     d = (datad *) l->data;
     if (d->rowIds != NULL) {  /*-- node sets --*/
-      row[0] = g_strdup (d->name);
-      gtk_clist_append (GTK_CLIST (clist), row);
-      g_free (row[0]);
+		gtk_list_store_append(model, &iter);
+		gtk_list_store_set(model, &iter, 0, d->name, 1, d, -1);
     }
   }
-  gtk_clist_select_row (GTK_CLIST(clist), 0, 0);
-  gtk_container_add (GTK_CONTAINER (swin), clist);
+  select_tree_view_row(tree_view, 0);
+  
+  gtk_container_add (GTK_CONTAINER (swin), tree_view);
   gtk_box_pack_start (GTK_BOX (hbox), swin, false, false, 2);
 
 /*
@@ -198,30 +204,28 @@ create_graphact_window(ggobid *gg, PluginInstance *inst)
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (swin),
     GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
 
-  clist = gtk_clist_new_with_titles (1, &clist_titles[1]);
-  gtk_widget_set_name (GTK_WIDGET(clist), "edgeset");
-  gtk_clist_set_selection_mode (GTK_CLIST (clist),
-    GTK_SELECTION_SINGLE);
-  gtk_object_set_data (GTK_OBJECT (clist), "datad_swin", swin);
-  gtk_signal_connect (GTK_OBJECT (clist), "select_row",
-    (GtkSignalFunc) graphact_datad_set_cb, inst);
-  gtk_signal_connect (GTK_OBJECT (gg), "datad_added",
-    (GtkSignalFunc) graphact_clist_datad_added_cb, GTK_OBJECT (clist));
+  model = gtk_list_store_new(2, G_TYPE_STRING, GGOBI_TYPE_DATA);
+  tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(model));
+  populate_tree_view(tree_view, tree_view_titles, 1, true, GTK_SELECTION_SINGLE,
+		G_CALLBACK(graphact_datad_set_cb), inst);
+  gtk_widget_set_name (GTK_WIDGET(tree_view), "edgeset");
+  g_object_set_data(G_OBJECT (tree_view), "datad_swin", swin);
+  g_signal_connect (G_OBJECT (gg), "datad_added",
+    G_CALLBACK(graphact_tree_view_datad_added_cb), tree_view);
   /*-- --*/
 
   for (l = gg->d; l; l = l->next) {
     d = (datad *) l->data;
     if (d->edge.n != 0) {  /*-- edge sets --*/
-      row[0] = g_strdup (d->name);
-      gtk_clist_append (GTK_CLIST (clist), row);
-      g_free (row[0]);
+      gtk_list_store_append(model, &iter);
+	  gtk_list_store_set(model, &iter, 0, d->name, 1, d, -1);
     }
   }
-  gtk_clist_select_row (GTK_CLIST(clist), 0, 0);
-  gtk_container_add (GTK_CONTAINER (swin), clist);
+  select_tree_view_row(tree_view, 0);
+  gtk_container_add (GTK_CONTAINER (swin), tree_view);
   gtk_box_pack_start (GTK_BOX (hbox), swin, true, true, 2);
 
-  label = gtk_label_new ("Specify datasets");
+  label = gtk_label_new_with_mnemonic ("Specify _datasets");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), hbox, label);
 
   /*-- --*/
@@ -235,30 +239,30 @@ create_graphact_window(ggobid *gg, PluginInstance *inst)
 
   hbox = gtk_hbox_new (true, 10);
   gtk_box_pack_start (GTK_BOX (vbox), hbox, false, false, 2);
-  btn = gtk_button_new_with_label ("Shadow leaves");
+  btn = gtk_button_new_with_mnemonic ("Shadow _leaves");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), btn,
     "Recursively shadow brush leaf nodes and edges", NULL);
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-    GTK_SIGNAL_FUNC (ga_leaf_hide_cb), inst);
+  g_signal_connect (G_OBJECT (btn), "clicked",
+    G_CALLBACK (ga_leaf_hide_cb), inst);
   gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 2);
 
-  btn = gtk_button_new_with_label ("Shadow orphans");
+  btn = gtk_button_new_with_mnemonic ("Shadow _orphans");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), btn,
     "Shadow brush nodes without any edges that are both included and not shadowed",
     NULL);
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-    GTK_SIGNAL_FUNC (ga_orphans_hide_cb), inst);
+  g_signal_connect (G_OBJECT (btn), "clicked",
+    G_CALLBACK (ga_orphans_hide_cb), inst);
   gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 2);
 
 
-  btn = gtk_button_new_with_label ("Show all");
+  btn = gtk_button_new_with_mnemonic ("Show _all");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), btn,
     "Show all nodes and edges", NULL);
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-    GTK_SIGNAL_FUNC (ga_nodes_show_cb), inst);  /*-- show all nodes --*/
+  g_signal_connect (G_OBJECT (btn), "clicked",
+    G_CALLBACK (ga_nodes_show_cb), inst);  /*-- show all nodes --*/
   gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 2);
 
-  label = gtk_label_new ("Thin");
+  label = gtk_label_new_with_mnemonic ("_Thin");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), frame, label);
   /*-- --*/
 
@@ -284,35 +288,35 @@ create_graphact_window(ggobid *gg, PluginInstance *inst)
   hbox = gtk_hbox_new (true, 10);
   gtk_box_pack_start (GTK_BOX (vbox), hbox, false, false, 2);
 
-  btn = gtk_check_button_new_with_label ("Show neighbors");
+  btn = gtk_check_button_new_with_mnemonic ("Show _neighbors");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), btn,
     "To display only a node and its neighbors, turn this on, select 'Identify' in ggobi, and double-click to make a label 'sticky.'", NULL);
-  gtk_signal_connect (GTK_OBJECT (btn), "toggled",
-    GTK_SIGNAL_FUNC (show_neighbors_toggle_cb), inst);
+  g_signal_connect (G_OBJECT (btn), "toggled",
+    G_CALLBACK (show_neighbors_toggle_cb), inst);
   gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 2);
 
-  btn = gtk_button_new_with_label ("Show all");
+  btn = gtk_button_new_with_mnemonic ("Show _all");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), btn,
     "Show all nodes and edges", NULL);
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-    GTK_SIGNAL_FUNC (ga_nodes_show_cb), inst);  /*-- show all nodes --*/
+  g_signal_connect (G_OBJECT (btn), "clicked",
+    G_CALLBACK (ga_nodes_show_cb), inst);  /*-- show all nodes --*/
   gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 2);
 
 
   hbox = gtk_hbox_new (true, 10);
   gtk_box_pack_start (GTK_BOX (vbox), hbox, false, false, 2);
-  label = gtk_label_new ("Depth:");
+  label = gtk_label_new_with_mnemonic ("_Depth:");
   gtk_misc_set_alignment (GTK_MISC (label), 0, 1);
   gtk_box_pack_start (GTK_BOX (hbox), label, false, false, 0);
-  opt = gtk_option_menu_new ();
+  opt = gtk_combo_box_new_text();
+  gtk_label_set_mnemonic_widget(GTK_LABEL(label), opt);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), opt,
     "Select the size of the selected node's neighborhood to show; ie, the number of steps from the node.", NULL);
   gtk_box_pack_start (GTK_BOX (hbox), opt, false, false, 0);
-  populate_option_menu (opt, (gchar**) neighborhood_depth_lbl,
-    sizeof (neighborhood_depth_lbl) / sizeof (gchar *),
-    (GtkSignalFunc) neighborhood_depth_cb, "PluginInst", inst);
+  populate_combo_box (opt, (gchar**) neighborhood_depth_lbl, G_N_ELEMENTS(neighborhood_depth_lbl),
+    G_CALLBACK(neighborhood_depth_cb), inst);
 
-  label = gtk_label_new ("Neighbors");
+  label = gtk_label_new_with_mnemonic ("_Neighbors");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), frame, label);
   /*-- --*/
 
@@ -326,14 +330,14 @@ create_graphact_window(ggobid *gg, PluginInstance *inst)
 
   hbox = gtk_hbox_new (true, 10);
   gtk_box_pack_start (GTK_BOX (vbox), hbox, false, false, 2);
-  btn = gtk_button_new_with_label ("Shadow orphaned edges");
+  btn = gtk_button_new_with_mnemonic ("_Shadow orphaned edges");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), btn,
     "Shadow brush edges connected to shadowed nodes", NULL);
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-    GTK_SIGNAL_FUNC (ga_edge_tidy_cb), inst);
+  g_signal_connect (G_OBJECT (btn), "clicked",
+    G_CALLBACK (ga_edge_tidy_cb), inst);
   gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 2);
 
-  label = gtk_label_new ("Tidy");
+  label = gtk_label_new_with_mnemonic ("_Tidy");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), frame, label);
   /*-- --*/
 
@@ -354,8 +358,8 @@ void closeWindow(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
   if (inst->data) {
   graphactd *ga = graphactFromInst (inst); 
     /* I don't remember what this line is for -- dfs
-    gtk_signal_disconnect_by_func(GTK_OBJECT(inst->data),
-      GTK_SIGNAL_FUNC (close_graphact_window), inst);
+    g_signal_handlers_disconnect_by_func(G_OBJECT(inst->data),
+      G_CALLBACK (close_graphact_window), inst);
     */
     gtk_widget_destroy (ga->window);
   }

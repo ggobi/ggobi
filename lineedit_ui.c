@@ -37,7 +37,7 @@ add_record_dialog_cancel (GtkWidget *w, ggobid *gg)
   gtk_widget_destroy (dialog);
   edgeedit_event_handlers_toggle (gg->current_splot, true);
   
-  gtk_signal_emit_by_name(GTK_OBJECT(gg->current_splot->da),
+  g_signal_emit_by_name(G_OBJECT(gg->current_splot->da),
     "expose_event", (gpointer) gg, (gpointer) & rval);
 }
 
@@ -170,11 +170,12 @@ add_record_dialog_open (datad *d, datad *e, displayd *dsp, ggobid *gg)
     row++;
   }
 
-  w = gtk_label_new ("Record label");
+  w = gtk_label_new_with_mnemonic ("Record _label");
   gtk_misc_set_alignment (GTK_MISC (w), 1, .5);
   gtk_table_attach (GTK_TABLE (table),
     w, 0, 1, row, row+1, table_opt, table_opt, 1, 1);
   entry = gtk_entry_new ();
+  gtk_label_set_mnemonic_widget(GTK_LABEL(w), entry);
   lbl = g_strdup_printf("%d", dtarget->nrows+1);
   gtk_entry_set_text (GTK_ENTRY(entry), lbl);
   g_free (lbl);
@@ -187,11 +188,12 @@ add_record_dialog_open (datad *d, datad *e, displayd *dsp, ggobid *gg)
   if ((cpanel->ee_mode == ADDING_POINTS && d->idTable) ||
       (cpanel->ee_mode == ADDING_EDGES && e->idTable))
   {
-    w = gtk_label_new ("Record id");
+    w = gtk_label_new_with_mnemonic("Record _id");
     gtk_misc_set_alignment (GTK_MISC (w), 1, .5);
     gtk_table_attach (GTK_TABLE (table),
       w, 0, 1, row, row+1, table_opt, table_opt, 1, 1);
     entry = gtk_entry_new ();
+	gtk_label_set_mnemonic_widget(GTK_LABEL(w), entry);
     lbl = g_strdup_printf("%d", dtarget->nrows+1);
     gtk_entry_set_text (GTK_ENTRY(entry), lbl);
     g_free (lbl);
@@ -236,17 +238,17 @@ add_record_dialog_open (datad *d, datad *e, displayd *dsp, ggobid *gg)
   }
 
   /*-- ok button --*/
-  w = gtk_button_new_with_label ("Apply");
+  w = gtk_button_new_from_stock (GTK_STOCK_APPLY);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), w,
     "Add the point or edge.  To avoid seeing this dialog, use the middle or right button.", NULL);
-  gtk_signal_connect (GTK_OBJECT (w), "clicked",
-    GTK_SIGNAL_FUNC (add_record_dialog_apply), dsp);
+  g_signal_connect (G_OBJECT (w), "clicked",
+    G_CALLBACK (add_record_dialog_apply), dsp);
   gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->action_area), w);
 
   /*-- cancel button --*/
-  w = gtk_button_new_with_label ("Close");
-  gtk_signal_connect (GTK_OBJECT (w), "clicked",
-    GTK_SIGNAL_FUNC (add_record_dialog_cancel), gg);
+  w = gtk_button_new_from_stock (GTK_STOCK_CLOSE);
+  g_signal_connect (G_OBJECT (w), "clicked",
+    G_CALLBACK (add_record_dialog_cancel), gg);
   gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->action_area), w);
 
 
@@ -298,7 +300,7 @@ key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
 
   /*-- insert mode-specific key presses (if any) here --*/
 
-  return true;
+  return false;
 }
 
 static gint
@@ -453,15 +455,15 @@ edgeedit_event_handlers_toggle (splotd *sp, gboolean state) {
   displayd *display = sp->displayptr;
 
   if (state == on) {
-    if(GTK_IS_GGOBI_WINDOW_DISPLAY(display))
-      sp->key_press_id = gtk_signal_connect (GTK_OBJECT (GTK_GGOBI_WINDOW_DISPLAY(display)->window),
-        "key_press_event", (GtkSignalFunc) key_press_cb, (gpointer) sp);
-    sp->press_id = gtk_signal_connect (GTK_OBJECT (sp->da),
-      "button_press_event", (GtkSignalFunc) button_press_cb, (gpointer) sp);
-    sp->release_id = gtk_signal_connect (GTK_OBJECT (sp->da),
-      "button_release_event", (GtkSignalFunc) button_release_cb, (gpointer) sp);
-    sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
-      "motion_notify_event", (GtkSignalFunc) motion_notify_cb, (gpointer) sp);
+    if(GGOBI_IS_WINDOW_DISPLAY(display))
+      sp->key_press_id = g_signal_connect (G_OBJECT (GGOBI_WINDOW_DISPLAY(display)->window),
+        "key_press_event", G_CALLBACK(key_press_cb), (gpointer) sp);
+    sp->press_id = g_signal_connect (G_OBJECT (sp->da),
+      "button_press_event", G_CALLBACK(button_press_cb), (gpointer) sp);
+    sp->release_id = g_signal_connect (G_OBJECT (sp->da),
+      "button_release_event", G_CALLBACK(button_release_cb), (gpointer) sp);
+    sp->motion_id = g_signal_connect (G_OBJECT (sp->da),
+      "motion_notify_event", G_CALLBACK(motion_notify_cb), (gpointer) sp);
 
   } else {
     disconnect_key_press_signal (sp);
@@ -488,19 +490,19 @@ cpanel_edgeedit_make (ggobid *gg) {
   gtk_container_set_border_width (GTK_CONTAINER (hb), 3);
   gtk_box_pack_start (GTK_BOX (panel->w), hb, false, false, 0);
 
-  radio1 = gtk_radio_button_new_with_label (NULL, "Add edges");
+  radio1 = gtk_radio_button_new_with_mnemonic (NULL, "Add _edges");
   gtk_widget_set_name (radio1, "EDGEEDIT:add_edges_radio_button");
   GTK_TOGGLE_BUTTON (radio1)->active = true;
 
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), radio1,
     "Add new edges using the mouse. The left button opens a dialog window; the middle or right button adds an edge using default.", NULL);
-  gtk_signal_connect (GTK_OBJECT (radio1), "toggled",
-                      GTK_SIGNAL_FUNC (add_edges_or_points_cb), gg);
+  g_signal_connect (G_OBJECT (radio1), "toggled",
+                      G_CALLBACK (add_edges_or_points_cb), gg);
   gtk_box_pack_start (GTK_BOX (hb), radio1, false, false, 0);
 
-  group = gtk_radio_button_group (GTK_RADIO_BUTTON (radio1));
+  group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (radio1));
 
-  radio2 = gtk_radio_button_new_with_label (group, "Add points");
+  radio2 = gtk_radio_button_new_with_mnemonic (group, "Add _points");
   gtk_widget_set_name (radio2, "EDGEEDIT:add_points_radio_button");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), radio2,
     "Add points using the mouse.  The left button opens a dialog window; the middle or right button adds a point using defaults.", NULL);
@@ -514,8 +516,8 @@ cpanel_edgeedit_make (ggobid *gg) {
     "Undo last action", NULL);
   gtk_box_pack_start (GTK_BOX (panel->w),
                       btn, false, false, 1);
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                      GTK_SIGNAL_FUNC (undo_last_cb), NULL);
+  g_signal_connect (G_OBJECT (btn), "clicked",
+                      G_CALLBACK (undo_last_cb), NULL);
   */		      
 
   gtk_widget_show_all (panel->w);

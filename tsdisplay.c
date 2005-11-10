@@ -70,9 +70,9 @@ gboolean
 tsplotCPanelSet(displayd *dpy, cpaneld *cpanel, ggobid *gg)
 { 
   GtkWidget *w;
-  w = GTK_GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget;
+  w = GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget;
   if(!w) {
-    GTK_GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget = w =  cpanel_tsplot_make(gg);
+    GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget = w =  cpanel_tsplot_make(gg);
   }
 /* Can actually be more efficient here by storing the option menu used
    in tsplot_set and avoid looking it up each time. Store it in the
@@ -86,15 +86,15 @@ tsplotCPanelSet(displayd *dpy, cpaneld *cpanel, ggobid *gg)
 
 void
 tsplotDisplaySet(displayd *dpy, ggobid *gg)
-{
+{/*
   GtkWidget *imode_menu;
 
   imode_menu = tsplot_imode_menu_make (gg->imode_accel_group,
-    (GtkSignalFunc) imode_set_cb, gg, true);
+    G_CALLBACK(imode_set_cb), gg, true);
   gg->imode_item = submenu_make ("_Interaction", 'I', gg->main_accel_group);
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->imode_item),
     imode_menu); 
-  submenu_insert (gg->imode_item, gg->main_menubar, 2);
+  submenu_insert (gg->imode_item, gg->main_menubar, 2);*/
 }
 
 void
@@ -178,21 +178,21 @@ tsplotPlottedColsGet(displayd *display, gint *cols, datad *d, ggobid *gg)
   return(ncols);
 }
 
-
+/*
 GtkWidget *
 tsplotMenusMake(displayd *dpy, ggobid *gg)
 {
   tsplot_menus_make (dpy, gg);
   return(NULL);
 }
-
+*/
 
 GtkWidget *
 tsplotCPanelWidget(displayd *dpy, gchar **modeName, ggobid *gg)
 {
-  GtkWidget *w = GTK_GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget;
+  GtkWidget *w = GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget;
   if(!w) {
-   GTK_GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget = w =  cpanel_tsplot_make(gg);
+   GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget = w =  cpanel_tsplot_make(gg);
   }
   *modeName = "TSPlot";
   return(w);
@@ -291,24 +291,25 @@ tsplot_cpanel_init (cpaneld* cpanel, ggobid *gg)
 /*--------------------------------------------------------------------*/
 /*                   Time series: Options menu                        */
 /*--------------------------------------------------------------------*/
-
+#if 0
 void
 tsplot_menus_make (displayd *display, ggobid *gg)
 {
   gg->menus.options_menu = gtk_menu_new ();
 
   CreateMenuCheck (gg->menus.options_menu, "Show tooltips",
-    GTK_SIGNAL_FUNC (tooltips_show_cb), NULL,
+    G_CALLBACK (tooltips_show_cb), NULL,
     GTK_TOOLTIPS (gg->tips)->enabled, gg);
 
   CreateMenuCheck (gg->menus.options_menu, "Show control panel",
-    GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
+    G_CALLBACK (cpanel_show_cb), NULL,
     GTK_WIDGET_VISIBLE (gg->imode_frame), gg);
 
   CreateMenuCheck (gg->menus.options_menu, "Show status bar",
-    GTK_SIGNAL_FUNC (statusbar_show_cb), NULL,
+    G_CALLBACK (statusbar_show_cb), NULL,
     gg->statusbar_p, gg);
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
      gg->menus.options_menu);
 }
+#endif

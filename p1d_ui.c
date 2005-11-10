@@ -24,11 +24,10 @@
 
 static gchar *type_lbl[] = {"Texturing", "ASH"};
 
-static void type_cb (GtkWidget *w, gpointer cbd)
+static void type_cb (GtkWidget *w, ggobid *gg)
 {
-  ggobid *gg = GGobiFromWidget(w, true);
   cpaneld *cpanel = &gg->current_display->cpanel;
-  cpanel->p1d.type = GPOINTER_TO_INT (cbd);
+  cpanel->p1d.type = gtk_combo_box_get_active(GTK_COMBO_BOX(w));
 
   display_tailpipe (gg->current_display, FULL, gg);
 }
@@ -60,12 +59,12 @@ void
 p1d_cycle_activate (gboolean state, cpaneld *cpanel, ggobid *gg)
 {
   if (state) {
-    gg->p1d.cycle_id = gtk_timeout_add (cpanel->p1d.cycle_delay,
-      (GtkFunction) p1dcycle_func, (gpointer) gg);
+    gg->p1d.cycle_id = g_timeout_add (cpanel->p1d.cycle_delay,
+      (GSourceFunc)p1dcycle_func, (gpointer) gg);
     cpanel->p1d.cycle_p = true;
   } else {
     if (gg->p1d.cycle_id) {
-      gtk_timeout_remove (gg->p1d.cycle_id);
+      g_source_remove (gg->p1d.cycle_id);
       gg->p1d.cycle_id = 0;
       cpanel->p1d.cycle_p = false;
     }
@@ -87,9 +86,9 @@ static void cycle_speed_cb (GtkAdjustment *adj, ggobid *gg)
 
   cpanel->p1d.cycle_delay = -1 * (guint32) adj->value;
   if (cpanel->p1d.cycle_p) {
-    gtk_timeout_remove (gg->p1d.cycle_id);
-    gg->p1d.cycle_id = gtk_timeout_add (cpanel->p1d.cycle_delay,
-    (GtkFunction) p1dcycle_func, (gpointer) gg);
+    g_source_remove (gg->p1d.cycle_id);
+    gg->p1d.cycle_id = g_timeout_add (cpanel->p1d.cycle_delay,
+    (GSourceFunc) p1dcycle_func, (gpointer) gg);
   }
 }
 
@@ -117,7 +116,7 @@ key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
 
   /*-- insert mode-specific key presses (if any) here --*/
 
-  return true;
+  return false;
 }
 
 void
@@ -126,10 +125,10 @@ p1d_event_handlers_toggle (splotd *sp, gboolean state)
   displayd *display = (displayd *) sp->displayptr;
 
   if (state == on) {
-    if(GTK_IS_GGOBI_WINDOW_DISPLAY(display) && GTK_GGOBI_WINDOW_DISPLAY(display)->useWindow)
-      sp->key_press_id = gtk_signal_connect (GTK_OBJECT (GTK_GGOBI_WINDOW_DISPLAY(display)->window),
+    if(GGOBI_IS_WINDOW_DISPLAY(display) && GGOBI_WINDOW_DISPLAY(display)->useWindow)
+      sp->key_press_id = g_signal_connect (G_OBJECT (GGOBI_WINDOW_DISPLAY(display)->window),
         "key_press_event",
-        (GtkSignalFunc) key_press_cb,
+        G_CALLBACK(key_press_cb),
         (gpointer) sp);
   } else {
     disconnect_key_press_signal (sp);
@@ -141,7 +140,7 @@ p1d_event_handlers_toggle (splotd *sp, gboolean state)
 void
 cpanel_p1dplot_make (ggobid *gg) {
   modepaneld *panel;
-  GtkWidget *frame, *framevb, *tgl, *btn, *vbox, *vb, *opt;
+  GtkWidget *frame, *framevb, *tgl, *btn, *vbox, *vb, *opt, *lbl;
   GtkWidget *sbar;
   GtkObject *adj;
   
@@ -153,15 +152,14 @@ cpanel_p1dplot_make (ggobid *gg) {
   gtk_container_set_border_width (GTK_CONTAINER (panel->w), 5);
 
  /*-- option menu --*/
-  opt = gtk_option_menu_new ();
+  opt = gtk_combo_box_new_text ();
   gtk_widget_set_name (opt, "P1PLOT:type_option_menu");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
     "Display either textured dot plots or average shifted histograms", NULL);
   gtk_box_pack_start (GTK_BOX (panel->w),
                       opt, false, false, 0);
-  populate_option_menu (opt, type_lbl,
-    sizeof (type_lbl) / sizeof (gchar *),
-    (GtkSignalFunc) type_cb, "GGobi", gg);
+  populate_combo_box (opt, type_lbl, G_N_ELEMENTS(type_lbl),
+    G_CALLBACK(type_cb), gg);
 
   /*-- frame around ASH parameters --*/
   frame = gtk_frame_new ("ASH parameters");
@@ -174,15 +172,15 @@ cpanel_p1dplot_make (ggobid *gg) {
   gtk_container_add (GTK_CONTAINER (frame), framevb);
 
   /*-- ASH line segments --*/
-  btn = gtk_check_button_new_with_label ("ASH: add lines");
+  btn = gtk_check_button_new_with_mnemonic ("ASH: _add lines");
   gtk_widget_set_name (btn, "P1PLOT:ASH_add_lines");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "When displaying ASHes, add lines connecting each point to the baseline.",
     NULL);
   /*-- cpanel may not be available, so initialize this to false --*/
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (btn), false);
-  gtk_signal_connect (GTK_OBJECT (btn), "toggled",
-    GTK_SIGNAL_FUNC (ASH_add_lines_cb), (gpointer) gg);
+  g_signal_connect (G_OBJECT (btn), "toggled",
+    G_CALLBACK (ASH_add_lines_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (framevb), btn,
     false, false, 0);
 
@@ -190,15 +188,16 @@ cpanel_p1dplot_make (ggobid *gg) {
   vbox = gtk_vbox_new (false, 0);
   gtk_box_pack_start (GTK_BOX (framevb), vbox, false, false, 0);
 
-  gtk_box_pack_start (GTK_BOX (vbox), gtk_label_new ("ASH smoothness:"),
-    false, false, 0);
+  lbl = gtk_label_new_with_mnemonic ("ASH _smoothness:");
+  gtk_box_pack_start (GTK_BOX (vbox), lbl, false, false, 0);
 
   /*-- value, lower, upper, step --*/
   adj = gtk_adjustment_new (0.19, 0.02, 0.5, 0.01, .01, 0.0);
-  gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
-                      GTK_SIGNAL_FUNC (ash_smoothness_cb), gg);
+  g_signal_connect (G_OBJECT (adj), "value_changed",
+                      G_CALLBACK (ash_smoothness_cb), gg);
 
   sbar = gtk_hscale_new (GTK_ADJUSTMENT (adj));
+  gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), sbar);
   gtk_widget_set_name (sbar, "P1PLOT:ASH_smooth");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
     "Adjust ASH smoothness", NULL);
@@ -223,12 +222,12 @@ cpanel_p1dplot_make (ggobid *gg) {
   gtk_container_set_border_width (GTK_CONTAINER (vb), 4);
   gtk_container_add (GTK_CONTAINER (frame), vb);
 
-  tgl = gtk_check_button_new_with_label ("Cycle");
+  tgl = gtk_check_button_new_with_mnemonic ("_Cycle");
   gtk_widget_set_name (tgl, "P1PLOT:cycle_toggle");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), tgl,
                         "Cycle through 1D plots", NULL);
-  gtk_signal_connect (GTK_OBJECT (tgl), "toggled",
-                      GTK_SIGNAL_FUNC (cycle_cb), (gpointer) gg);
+  g_signal_connect (G_OBJECT (tgl), "toggled",
+                      G_CALLBACK (cycle_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (vb), tgl, false, false, 1);
 
 
@@ -239,8 +238,8 @@ cpanel_p1dplot_make (ggobid *gg) {
   gg->p1d.cycle_delay_adj = (GtkAdjustment *)
     gtk_adjustment_new (-1.0 * 1000 /* cpanel->p1d.cycle_delay */,
     -5000.0, -250.0, 100.0, 1000.0, 0.0);
-  gtk_signal_connect (GTK_OBJECT (gg->p1d.cycle_delay_adj), "value_changed",
-                      GTK_SIGNAL_FUNC (cycle_speed_cb), gg);
+  g_signal_connect (G_OBJECT (gg->p1d.cycle_delay_adj), "value_changed",
+                      G_CALLBACK (cycle_speed_cb), gg);
 
   sbar = gtk_hscale_new (GTK_ADJUSTMENT (gg->p1d.cycle_delay_adj));
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
@@ -248,12 +247,12 @@ cpanel_p1dplot_make (ggobid *gg) {
   scale_set_default_values (GTK_SCALE (sbar));
   gtk_box_pack_start (GTK_BOX (vb), sbar, false, false, 1);
 
-  btn = gtk_button_new_with_label ("Change direction");
+  btn = gtk_button_new_with_mnemonic ("Change di_rection");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Change cycling direction", NULL);
   gtk_box_pack_start (GTK_BOX (vb), btn, false, false, 1);
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                      GTK_SIGNAL_FUNC (chdir_cb), gg);
+  g_signal_connect (G_OBJECT (btn), "clicked",
+                      G_CALLBACK (chdir_cb), gg);
 
   gtk_widget_show_all (panel->w);
 }
@@ -290,7 +289,7 @@ cpanel_p1d_set (displayd *display, cpaneld *cpanel, ggobid* gg)
 
   /*-- Texturing or ASH --*/
   w = widget_find_by_name (pnl, "P1PLOT:type_option_menu");
-  gtk_option_menu_set_history (GTK_OPTION_MENU (w), cpanel->p1d.type);
+  gtk_combo_box_set_active (GTK_COMBO_BOX (w), cpanel->p1d.type);
 
   /*-- ASH smoothness parameter --*/
   w = widget_find_by_name (pnl, "P1PLOT:ASH_add_lines");

@@ -97,10 +97,10 @@ choose_glyph_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg)
 
   gg->glyph_id.type = type;
   gg->glyph_id.size = size;
-  gtk_signal_emit_by_name (GTK_OBJECT (gg->color_ui.symbol_display),
+  g_signal_emit_by_name (G_OBJECT (gg->color_ui.symbol_display),
     "expose_event",
     (gpointer) sp, (gpointer) &rval);
-  gtk_signal_emit_by_name (GTK_OBJECT (gg->color_ui.line_display),
+  g_signal_emit_by_name (G_OBJECT (gg->color_ui.line_display),
     "expose_event",
     (gpointer) sp, (gpointer) &rval);
 }
@@ -285,7 +285,7 @@ redraw_line_display (GtkWidget *w, ggobid *gg)
   gint i, linewidth;
   icoords pos;
   gint margin, spacing;
-  gchar dash_list[2];
+  gint8 dash_list[2];
   colorschemed *scheme = gg->activeColorScheme;
 
   margin = gg->color_ui.margin;
@@ -365,7 +365,7 @@ set_color_fg ( GtkWidget *w, GdkEventButton *event , ggobid *gg)
 {
   gint i;
   gint prev = gg->color_id;
-  gint k = GPOINTER_TO_INT (gtk_object_get_data (GTK_OBJECT (w), "index"));
+  gint k = GPOINTER_TO_INT (g_object_get_data (G_OBJECT (w), "index"));
   splotd *sp = gg->current_splot;
   displayd *display = (displayd *) sp->displayptr;
   datad *d = display->d;
@@ -380,9 +380,9 @@ set_color_fg ( GtkWidget *w, GdkEventButton *event , ggobid *gg)
     open_colorsel_dialog (w, gg);
   } else {
     gint rval = false;
-    gtk_signal_emit_by_name (GTK_OBJECT (gg->color_ui.symbol_display),
+    g_signal_emit_by_name (G_OBJECT (gg->color_ui.symbol_display),
       "expose_event", (gpointer) gg, (gpointer) &rval);
-    gtk_signal_emit_by_name (GTK_OBJECT (gg->color_ui.line_display),
+    g_signal_emit_by_name (G_OBJECT (gg->color_ui.line_display),
       "expose_event", (gpointer) gg, (gpointer) &rval);
   }
 
@@ -408,7 +408,7 @@ set_color_id (GtkWidget *w, GdkEventButton *event, ggobid *gg)
     set_color_fg (w, event, gg);
 
   splot_redraw (gg->current_splot, 
-                GTK_GGOBI_SPLOT_CLASS(GTK_OBJECT_GET_CLASS(gg->current_splot))->redraw,
+                GGOBI_SPLOT_GET_CLASS(gg->current_splot)->redraw,
                 gg);  /*-- redraw brush --*/
 
   return FALSE;
@@ -442,7 +442,7 @@ redraw_fg (GtkWidget *w, gint k, ggobid *gg)
 static gint
 color_expose_fg (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
 {
-  gint k = GPOINTER_TO_INT (gtk_object_get_data (GTK_OBJECT (w), "index"));
+  gint k = GPOINTER_TO_INT (g_object_get_data (G_OBJECT (w), "index"));
 
   if (k <= gg->activeColorScheme->n)
     redraw_fg (w, k, gg);
@@ -537,9 +537,9 @@ reverse_video_cb (GtkWidget *ok_button, ggobid* gg) {
     &scheme->rgb_hidden, writeable, best_match))
       g_printerr("failure allocating hidden color\n");
 
-  gtk_signal_emit_by_name (GTK_OBJECT (gg->color_ui.symbol_display),
+  g_signal_emit_by_name (G_OBJECT (gg->color_ui.symbol_display),
     "expose_event", (gpointer) gg, (gpointer) &rval);
-  gtk_signal_emit_by_name (GTK_OBJECT (gg->color_ui.line_display),
+  g_signal_emit_by_name (G_OBJECT (gg->color_ui.line_display),
     "expose_event", (gpointer) gg, (gpointer) &rval);
 
   redraw_bg (gg->color_ui.bg_da, gg);
@@ -556,21 +556,14 @@ reverse_video_cb (GtkWidget *ok_button, ggobid* gg) {
 void
 color_changed_cb (GtkWidget *colorsel, ggobid *gg)
 {
-  gdouble color[3];
   GdkColor gdk_color;
   GdkColormap *cmap = gdk_colormap_get_system ();
   splotd *sp = gg->current_splot;
-#if GTK_MAJOR_VERSION == 1
-  GtkWidget *wheel = GTK_COLOR_SELECTION (colorsel)->wheel_area;
-#endif
+
   colorschemed *scheme = gg->activeColorScheme;
 
   /* Get current color */
-  gtk_color_selection_get_color (GTK_COLOR_SELECTION (colorsel), color);
-
-  gdk_color.red = (guint16)(color[0]*65535.0);
-  gdk_color.green = (guint16)(color[1]*65535.0);
-  gdk_color.blue = (guint16)(color[2]*65535.0);
+  gtk_color_selection_get_current_color (GTK_COLOR_SELECTION (colorsel), &gdk_color);
 
   /* Allocate color */
   if (gdk_color_alloc (cmap, &gdk_color)) {
@@ -613,21 +606,11 @@ color_changed_cb (GtkWidget *colorsel, ggobid *gg)
 
     if (sp->da != NULL) {
       gboolean rval = false;
-      gtk_signal_emit_by_name (GTK_OBJECT (sp->da), "expose_event",
+      g_signal_emit_by_name (G_OBJECT (sp->da), "expose_event",
         (gpointer) sp, (gpointer) &rval);
     }
 
-    /*
-     * If wheel doesn't have the grab, it means that the button
-     * has been released:  update all plots.
-    */
-#if GTK_MAJOR_VERSION == 1
-    if (!GTK_WIDGET_HAS_GRAB (wheel)) {
-#endif
       displays_plot ((splotd *) NULL, FULL, gg);
-#if GTK_MAJOR_VERSION == 1
-    }
-#endif
   }
 }
 
@@ -641,7 +624,6 @@ open_colorsel_dialog (GtkWidget *w, ggobid *gg) {
   gint handled = FALSE;
   GtkWidget *colorsel, *ok_button, *cancel_button, *help_button;
   gint i;
-  gdouble color[3];
   GtkColorSelectionDialog *colordlg;
   colorschemed *scheme = gg->activeColorScheme;
 
@@ -661,8 +643,8 @@ open_colorsel_dialog (GtkWidget *w, ggobid *gg) {
      * Connect to the "color_changed" signal, set the client-data
      * to the colorsel widget
     */
-    gtk_signal_connect (GTK_OBJECT (colorsel), "color_changed",
-      (GtkSignalFunc) color_changed_cb, gg);
+    g_signal_connect (G_OBJECT (colorsel), "color_changed",
+      G_CALLBACK(color_changed_cb), gg);
 
     /*
      * Connect up the buttons
@@ -670,44 +652,27 @@ open_colorsel_dialog (GtkWidget *w, ggobid *gg) {
     ok_button = colordlg->ok_button;
     cancel_button = colordlg->cancel_button;
     help_button = colordlg->help_button;
-    gtk_signal_connect (GTK_OBJECT (ok_button), "clicked",
-                        (GtkSignalFunc) dlg_close_cb, gg);
-    gtk_signal_connect (GTK_OBJECT (cancel_button), "clicked",
-                        (GtkSignalFunc) dlg_close_cb, gg);
+    g_signal_connect (G_OBJECT (ok_button), "clicked",
+                        G_CALLBACK(dlg_close_cb), gg);
+    g_signal_connect (G_OBJECT (cancel_button), "clicked",
+                        G_CALLBACK(dlg_close_cb), gg);
 
   } else {
-
     colorsel = GTK_COLOR_SELECTION_DIALOG (gg->color_ui.colorseldlg)->colorsel;
   }
 
   if (w == gg->color_ui.bg_da) {
-    color[0] = (gdouble) scheme->rgb_bg.red / 65535.0;
-    color[1] = (gdouble) scheme->rgb_bg.green / 65535.0;
-    color[2] = (gdouble) scheme->rgb_bg.blue / 65535.0;
-
-    gtk_color_selection_set_color (GTK_COLOR_SELECTION (colorsel), color);
-
+    gtk_color_selection_set_current_color (GTK_COLOR_SELECTION (colorsel), &scheme->rgb_bg);
   } else if (w == gg->color_ui.accent_da) {
-    color[0] = (gdouble) scheme->rgb_accent.red / 65535.0;
-    color[1] = (gdouble) scheme->rgb_accent.green / 65535.0;
-    color[2] = (gdouble) scheme->rgb_accent.blue / 65535.0;
-
-    gtk_color_selection_set_color (GTK_COLOR_SELECTION (colorsel), color);
-
+    gtk_color_selection_set_current_color (GTK_COLOR_SELECTION (colorsel), &scheme->rgb_accent);
   } else if (w == gg->color_ui.hidden_da) {
-    color[0] = (gdouble) scheme->rgb_hidden.red / 65535.0;
-    color[1] = (gdouble) scheme->rgb_hidden.green / 65535.0;
-    color[2] = (gdouble) scheme->rgb_hidden.blue / 65535.0;
-
-    gtk_color_selection_set_color (GTK_COLOR_SELECTION (colorsel), color);
+    gtk_color_selection_set_current_color (GTK_COLOR_SELECTION (colorsel), &scheme->rgb_hidden);
   }
   else {
       for (i=0; i<MAXNCOLORS; i++) {
       if (w == gg->color_ui.fg_da[i]) {
-        color[0] = (gdouble) gg->activeColorScheme->rgb[i].red / 65535.0;
-        color[1] = (gdouble) gg->activeColorScheme->rgb[i].green / 65535.0;
-        color[2] = (gdouble) gg->activeColorScheme->rgb[i].blue / 65535.0;
-          gtk_color_selection_set_color (GTK_COLOR_SELECTION (colorsel), color);
+        gtk_color_selection_set_current_color (GTK_COLOR_SELECTION (colorsel), 
+			&gg->activeColorScheme->rgb[i]);
       }
     }
   }
@@ -763,10 +728,10 @@ symbol_window_redraw (ggobid *gg)
 
   if (gg->color_ui.symbol_display) {
 
-    gtk_signal_emit_by_name (GTK_OBJECT (gg->color_ui.symbol_display),
+    g_signal_emit_by_name (G_OBJECT (gg->color_ui.symbol_display),
       "expose_event",
       (gpointer) sp, (gpointer) &rval);
-    gtk_signal_emit_by_name (GTK_OBJECT (gg->color_ui.line_display),
+    g_signal_emit_by_name (G_OBJECT (gg->color_ui.line_display),
       "expose_event",
       (gpointer) sp, (gpointer) &rval);
     redraw_bg (gg->color_ui.bg_da, gg);
@@ -819,16 +784,16 @@ make_symbol_window (ggobid *gg) {
      * I thought this would be enough to prevent the window from
      * being destroyed, but it doesn't seem to be.
     */
-    gtk_signal_connect (GTK_OBJECT (gg->color_ui.symbol_window),
+    g_signal_connect (G_OBJECT (gg->color_ui.symbol_window),
                         "delete_event",
-                        GTK_SIGNAL_FUNC (delete_symbol_window_cb),
+                        G_CALLBACK (delete_symbol_window_cb),
                         (gpointer) gg);
 
 
     /* Track when the ggobid instance is closed and shut this one down too. */
-    gtk_signal_connect (GTK_OBJECT (gg->main_window),
+    g_signal_connect (G_OBJECT (gg->main_window),
                         "delete_event",
-                        GTK_SIGNAL_FUNC (close_symbol_window_cb),
+                        G_CALLBACK (close_symbol_window_cb),
                         (gpointer) gg);
 
     vbox = gtk_vbox_new (false, 2);
@@ -842,9 +807,7 @@ make_symbol_window (ggobid *gg) {
  * display of glyph types and sizes
 */
     gg->color_ui.symbol_display = gtk_drawing_area_new (); 
-#if GTK_MAJOR_VERSION == 2
     gtk_widget_set_double_buffered(gg->color_ui.symbol_display, false);
-#endif
 
     /*-- after this, margin is only used in determining y position --*/
     /*-- 2*(NGLYPHSIZES+1) is the size of the largest glyph --*/
@@ -858,7 +821,7 @@ make_symbol_window (ggobid *gg) {
       height += (gg->color_ui.margin + 2*(i+2));
     height += gg->color_ui.margin;
 
-    gtk_drawing_area_size (GTK_DRAWING_AREA (gg->color_ui.symbol_display),
+    gtk_widget_set_size_request (GTK_WIDGET (gg->color_ui.symbol_display),
       width, height);
     gtk_box_pack_start (GTK_BOX (hbox), gg->color_ui.symbol_display,
       true, true, 0);
@@ -868,12 +831,12 @@ make_symbol_window (ggobid *gg) {
       "Click to select glyph type and size -- which also selects the line type",
       NULL);
 
-    gtk_signal_connect (GTK_OBJECT (gg->color_ui.symbol_display),
+    g_signal_connect (G_OBJECT (gg->color_ui.symbol_display),
       "expose_event",
-      GTK_SIGNAL_FUNC (symbol_display_expose_cb), gg);
-    gtk_signal_connect (GTK_OBJECT (gg->color_ui.symbol_display),
+      G_CALLBACK (symbol_display_expose_cb), gg);
+    g_signal_connect (G_OBJECT (gg->color_ui.symbol_display),
       "button_press_event",
-      GTK_SIGNAL_FUNC (choose_glyph_cb), gg);
+      G_CALLBACK (choose_glyph_cb), gg);
 
     gtk_widget_set_events (gg->color_ui.symbol_display, GDK_EXPOSURE_MASK
           | GDK_ENTER_NOTIFY_MASK
@@ -883,15 +846,13 @@ make_symbol_window (ggobid *gg) {
  * the display of line types and widths
 */
     gg->color_ui.line_display = gtk_drawing_area_new (); 
-#if GTK_MAJOR_VERSION == 2
     gtk_widget_set_double_buffered(gg->color_ui.line_display, false);
-#endif
 
     width = NEDGETYPES*gg->color_ui.spacing +     /*-- lines --*/
             (NEDGETYPES+1)*gg->color_ui.spacing;  /*-- space between --*/
 
     /*-- use the same height we used for the symbol display --*/
-    gtk_drawing_area_size (GTK_DRAWING_AREA (gg->color_ui.line_display),
+    gtk_widget_set_size_request (GTK_WIDGET (gg->color_ui.line_display),
       width, height);
     gtk_box_pack_start (GTK_BOX (hbox), gg->color_ui.line_display,
       true, true, 0);
@@ -899,13 +860,13 @@ make_symbol_window (ggobid *gg) {
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
       gg->color_ui.line_display, "Shows the line type corresponding to the current glyph selection", NULL);
 
-    gtk_signal_connect (GTK_OBJECT (gg->color_ui.line_display),
+    g_signal_connect (G_OBJECT (gg->color_ui.line_display),
       "expose_event",
-      GTK_SIGNAL_FUNC (line_display_expose_cb), gg);
+      G_CALLBACK (line_display_expose_cb), gg);
 /*
-    gtk_signal_connect (GTK_OBJECT (gg->color_ui.line_display),
+    g_signal_connect (G_OBJECT (gg->color_ui.line_display),
       "button_press_event",
-      GTK_SIGNAL_FUNC (choose_linetype_cb), gg);
+      G_CALLBACK (choose_linetype_cb), gg);
 */
 
     gtk_widget_set_events (gg->color_ui.line_display, GDK_EXPOSURE_MASK
@@ -927,13 +888,12 @@ make_symbol_window (ggobid *gg) {
     k = 0;
     for (i=0, j=0; i<MAXNCOLORS; i++) {
       gg->color_ui.fg_da[k] = gtk_drawing_area_new ();
-#if GTK_MAJOR_VERSION == 2
     gtk_widget_set_double_buffered(gg->color_ui.fg_da[k], false);
-#endif
-      gtk_object_set_data (GTK_OBJECT (gg->color_ui.fg_da[k]),
+
+      g_object_set_data (G_OBJECT (gg->color_ui.fg_da[k]),
                            "index",
                            GINT_TO_POINTER (k));
-      gtk_drawing_area_size (GTK_DRAWING_AREA (gg->color_ui.fg_da[k]),
+      gtk_widget_set_size_request (GTK_WIDGET (gg->color_ui.fg_da[k]),
         PSIZE, PSIZE);
 
       gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->color_ui.fg_da[k],
@@ -946,12 +906,12 @@ make_symbol_window (ggobid *gg) {
                              | GDK_LEAVE_NOTIFY_MASK
                              | GDK_BUTTON_PRESS_MASK);
 
-      gtk_signal_connect (GTK_OBJECT (gg->color_ui.fg_da[k]),
+      g_signal_connect (G_OBJECT (gg->color_ui.fg_da[k]),
        "button_press_event",
-        GTK_SIGNAL_FUNC (set_color_id), gg);
-      gtk_signal_connect (GTK_OBJECT (gg->color_ui.fg_da[k]),
+        G_CALLBACK (set_color_id), gg);
+      g_signal_connect (G_OBJECT (gg->color_ui.fg_da[k]),
        "expose_event",
-        GTK_SIGNAL_FUNC (color_expose_fg), gg);
+        G_CALLBACK (color_expose_fg), gg);
       gtk_table_attach (GTK_TABLE (fg_table),
         gg->color_ui.fg_da[k], i, i+1, j, j+1,
         GTK_FILL, GTK_FILL, 10, 10);
@@ -974,10 +934,9 @@ make_symbol_window (ggobid *gg) {
     gtk_container_add (GTK_CONTAINER (ebox), bg_table);
 
     gg->color_ui.bg_da = gtk_drawing_area_new ();
-#if GTK_MAJOR_VERSION == 2
     gtk_widget_set_double_buffered(gg->color_ui.bg_da, false);
-#endif
-    gtk_drawing_area_size (GTK_DRAWING_AREA (gg->color_ui.bg_da),
+
+    gtk_widget_set_size_request (GTK_WIDGET (gg->color_ui.bg_da),
       PSIZE, PSIZE);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
       gg->color_ui.bg_da,
@@ -989,10 +948,10 @@ make_symbol_window (ggobid *gg) {
                            | GDK_LEAVE_NOTIFY_MASK
                            | GDK_BUTTON_PRESS_MASK);
 
-    gtk_signal_connect (GTK_OBJECT (gg->color_ui.bg_da),
-      "expose_event", GTK_SIGNAL_FUNC (color_expose_bg), gg);
-    gtk_signal_connect (GTK_OBJECT (gg->color_ui.bg_da),
-      "button_press_event", GTK_SIGNAL_FUNC (set_color_id), gg);
+    g_signal_connect (G_OBJECT (gg->color_ui.bg_da),
+      "expose_event", G_CALLBACK (color_expose_bg), gg);
+    g_signal_connect (G_OBJECT (gg->color_ui.bg_da),
+      "button_press_event", G_CALLBACK (set_color_id), gg);
 
     gtk_table_attach (GTK_TABLE (bg_table),
       gg->color_ui.bg_da, 0, 1, 0, 1,
@@ -1009,10 +968,8 @@ make_symbol_window (ggobid *gg) {
     gtk_container_add (GTK_CONTAINER (ebox), accent_table);
 
     gg->color_ui.accent_da = gtk_drawing_area_new ();
-#if GTK_MAJOR_VERSION == 2
     gtk_widget_set_double_buffered(gg->color_ui.accent_da, false);
-#endif
-    gtk_drawing_area_size (GTK_DRAWING_AREA (gg->color_ui.accent_da),
+    gtk_widget_set_size_request (GTK_WIDGET (gg->color_ui.accent_da),
       PSIZE, PSIZE);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
       gg->color_ui.accent_da, "Double click to reset color for labels and axes",
@@ -1023,10 +980,10 @@ make_symbol_window (ggobid *gg) {
                            | GDK_LEAVE_NOTIFY_MASK
                            | GDK_BUTTON_PRESS_MASK);
 
-    gtk_signal_connect (GTK_OBJECT (gg->color_ui.accent_da),
-      "expose_event", GTK_SIGNAL_FUNC (color_expose_accent), gg);
-    gtk_signal_connect (GTK_OBJECT (gg->color_ui.accent_da),
-      "button_press_event", GTK_SIGNAL_FUNC (set_color_id), gg);
+    g_signal_connect (G_OBJECT (gg->color_ui.accent_da),
+      "expose_event", G_CALLBACK (color_expose_accent), gg);
+    g_signal_connect (G_OBJECT (gg->color_ui.accent_da),
+      "button_press_event", G_CALLBACK (set_color_id), gg);
 
     gtk_table_attach (GTK_TABLE (accent_table),
       gg->color_ui.accent_da, 0, 1, 0, 1,
@@ -1043,10 +1000,8 @@ make_symbol_window (ggobid *gg) {
     gtk_container_add (GTK_CONTAINER (ebox), hidden_table);
 
     gg->color_ui.hidden_da = gtk_drawing_area_new ();
-#if GTK_MAJOR_VERSION == 2
     gtk_widget_set_double_buffered(gg->color_ui.hidden_da, false);
-#endif
-    gtk_drawing_area_size (GTK_DRAWING_AREA (gg->color_ui.hidden_da),
+    gtk_widget_set_size_request (GTK_WIDGET (gg->color_ui.hidden_da),
       PSIZE, PSIZE);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
       gg->color_ui.hidden_da, "Double click to reset color for labels and axes",
@@ -1057,29 +1012,29 @@ make_symbol_window (ggobid *gg) {
                            | GDK_LEAVE_NOTIFY_MASK
                            | GDK_BUTTON_PRESS_MASK);
 
-    gtk_signal_connect (GTK_OBJECT (gg->color_ui.hidden_da),
-      "expose_event", GTK_SIGNAL_FUNC (color_expose_hidden), gg);
-    gtk_signal_connect (GTK_OBJECT (gg->color_ui.hidden_da),
-      "button_press_event", GTK_SIGNAL_FUNC (set_color_id), gg);
+    g_signal_connect (G_OBJECT (gg->color_ui.hidden_da),
+      "expose_event", G_CALLBACK (color_expose_hidden), gg);
+    g_signal_connect (G_OBJECT (gg->color_ui.hidden_da),
+      "button_press_event", G_CALLBACK (set_color_id), gg);
 
     gtk_table_attach (GTK_TABLE (hidden_table),
       gg->color_ui.hidden_da, 0, 1, 0, 1,
       GTK_FILL, GTK_FILL, 10, 10);
 
     /*-- Temporary, perhaps: reverse video button --*/
-    btn = gtk_button_new_with_label ("Reverse video");
+    btn = gtk_button_new_with_mnemonic ("_Reverse video");
     gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 0);
-    gtk_signal_connect (GTK_OBJECT (btn),
+    g_signal_connect (G_OBJECT (btn),
                         "clicked",
-                        GTK_SIGNAL_FUNC (reverse_video_cb),
+                        G_CALLBACK (reverse_video_cb),
                         (gpointer) gg);
 
     /*-- Close button --*/
-    btn = gtk_button_new_with_label ("Close");
+    btn = gtk_button_new_from_stock (GTK_STOCK_CLOSE);
     gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 0);
-    gtk_signal_connect (GTK_OBJECT (btn),
+    g_signal_connect (G_OBJECT (btn),
                         "clicked",
-                        GTK_SIGNAL_FUNC (hide_symbol_window_cb),
+                        G_CALLBACK (hide_symbol_window_cb),
                         (gpointer) gg);
   }
 

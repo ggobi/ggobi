@@ -21,26 +21,27 @@
 #define GGOBI_TSDISPLAY_H
 
 /**
- This defines a new class of display (GtkGGobiTimeSeriesDisplay)
+ This defines a new class of display (GGobiTimeSeriesDisplay)
  which is the top-level container for multiple time series plots.
- This extends the windowed display class (GtkGGobiWindowDisplay).
+ This extends the windowed display class (GGobiWindowDisplay).
 */
 
 
 
-#define GTK_TYPE_GGOBI_TS_SPLOT           (gtk_ggobi_time_series_splot_get_type())
-#define GTK_GGOBI_TS_SPLOT(obj)	        (GTK_CHECK_CAST ((obj), GTK_TYPE_GGOBI_TS_SPLOT, timeSeriesSPlotd))
-#define GTK_GGOBI_TS_SPLOT_CLASS(klass)	(GTK_CHECK_CLASS_CAST ((klass), GTK_TYPE_GGOBI_TS_SPLOT, GtkGGobiTimeSeriesSPlotClass))
-#define GTK_IS_GGOBI_TS_SPLOT(obj)	 (GTK_CHECK_TYPE ((obj), GTK_TYPE_GGOBI_TS_SPLOT))
-#define GTK_IS_GGOBI_TS_SPLOT_CLASS(klass) (GTK_CHECK_CLASS_TYPE ((klass), GTK_TYPE_GGOBI_TS_SPLOT))
+#define GGOBI_TYPE_TIME_SERIES_SPLOT           (ggobi_time_series_splot_get_type())
+#define GGOBI_TIME_SERIES_SPLOT(obj)	        (G_TYPE_CHECK_INSTANCE_CAST ((obj), GGOBI_TYPE_TIME_SERIES_SPLOT, timeSeriesSPlotd))
+#define GGOBI_TIME_SERIES_SPLOT_CLASS(klass)	(G_TYPE_CHECK_CLASS_CAST ((klass), GGOBI_TYPE_TIME_SERIES_SPLOT, GGobiTimeSeriesSPlotClass))
+#define GGOBI_IS_TIME_SERIES_SPLOT(obj)	 (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GGOBI_TYPE_TIME_SERIES_SPLOT))
+#define GGOBI_IS_TIME_SERIES_SPLOT_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GGOBI_TYPE_TIME_SERIES_SPLOT))
+#define GGOBI_TIME_SERIES_SPLOT_GET_CLASS(obj)  		(G_TYPE_INSTANCE_GET_CLASS ((obj), GGOBI_TYPE_TIME_SERIES_SPLOT, GGobiTimeSeriesSPlotClass))
 
-GtkType gtk_ggobi_time_series_splot_get_type(void);
+GType ggobi_time_series_splot_get_type(void);
 
 typedef struct 
 {
-    GtkGGobiExtendedSPlotClass extendedSPlotClass;
+    GGobiExtendedSPlotClass extendedSPlotClass;
 
-} GtkGGobiTimeSeriesSPlotClass;
+} GGobiTimeSeriesSPlotClass;
 
 typedef  struct {
 
@@ -51,21 +52,22 @@ typedef  struct {
 
 
 
-#define GTK_TYPE_GGOBI_TIME_SERIES_DISPLAY	 (gtk_ggobi_time_series_display_get_type ())
-#define GTK_GGOBI_TIME_SERIES_DISPLAY(obj)	 (GTK_CHECK_CAST ((obj), GTK_TYPE_GGOBI_TIME_SERIES_DISPLAY, timeSeriesDisplayd))
-#define GTK_GGOBI_TIME_SERIES_DISPLAY_CLASS(klass) (GTK_CHECK_CLASS_CAST ((klass), GTK_TYPE_GGOBI_TIME_SERIES_DISPLAY, GtkGGobiTimeSeriesDisplayClass))
-#define GTK_IS_GGOBI_TIME_SERIES_DISPLAY(obj)	 (GTK_CHECK_TYPE ((obj), GTK_TYPE_GGOBI_TIME_SERIES_DISPLAY))
-#define GTK_IS_GGOBI_TIME_SERIES_DISPLAY_CLASS(klass) (GTK_CHECK_CLASS_TYPE ((klass), GTK_TYPE_GGOBI_TIME_SERIES_DISPLAY))
+#define GGOBI_TYPE_TIME_SERIES_DISPLAY	 (ggobi_time_series_display_get_type ())
+#define GGOBI_TIME_SERIES_DISPLAY(obj)	 (G_TYPE_CHECK_INSTANCE_CAST ((obj), GGOBI_TYPE_TIME_SERIES_DISPLAY, timeSeriesDisplayd))
+#define GGOBI_TIME_SERIES_DISPLAY_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GGOBI_TYPE_TIME_SERIES_DISPLAY, GGobiTimeSeriesDisplayClass))
+#define GGOBI_IS_TIME_SERIES_DISPLAY(obj)	 (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GGOBI_TYPE_TIME_SERIES_DISPLAY))
+#define GGOBI_IS_TIME_SERIES_DISPLAY_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GGOBI_TYPE_TIME_SERIES_DISPLAY))
+#define GGOBI_TIME_SERIES_DISPLAY_GET_CLASS(obj)  		(G_TYPE_INSTANCE_GET_CLASS ((obj), GGOBI_TYPE_TIME_SERIES_DISPLAY, GGobiTimeSeriesDisplayClass))
 
-GtkType gtk_ggobi_time_series_display_get_type();
-displayd *gtk_ggobi_time_series_display_new(gint type, gboolean missing_p, datad *d, ggobid *gg);
+GType ggobi_time_series_display_get_type();
+displayd *ggobi_time_series_display_new(gint type, gboolean missing_p, datad *d, ggobid *gg);
 
 typedef struct 
 {
-    GtkGGobiExtendedDisplayClass parent_class;
+    GGobiExtendedDisplayClass parent_class;
 
 
-} GtkGGobiTimeSeriesDisplayClass;
+} GGobiTimeSeriesDisplayClass;
 
 
 typedef struct _timeSeriesDisplayd {
@@ -88,7 +90,7 @@ void add_xml_tsplot_variables(xmlNodePtr node, GList *plots, displayd *dpy);
 void tsplotVarpanelTooltipsSet(displayd *dpy, ggobid *gg, GtkWidget *wx, GtkWidget *wy, GtkWidget *wz, GtkWidget *label);
 gint tsplotPlottedColsGet(displayd *display, gint *cols, datad *d, ggobid *gg);
 
-GtkWidget *tsplotMenusMake(displayd *dpy, ggobid *gg);
+//GtkWidget *tsplotMenusMake(displayd *dpy, ggobid *gg);
 
 GtkWidget *tsplotCPanelWidget(displayd *dpy, gchar **modeName, ggobid *gg);
 
@@ -100,7 +102,7 @@ GdkSegment * tsplotAllocWhiskers(displayd *dpy, splotd *sp, gint nrows, datad *d
 void tsplotAddPlotLabels(displayd *display, splotd *sp, GdkDrawable *drawable, datad *d, ggobid *gg);
 
 
-splotd *gtk_time_series_splot_new(displayd *dpy, gint width, gint height, ggobid *gg);
+splotd *ggobi_time_series_splot_new(displayd *dpy, ggobid *gg);
 
 #endif
 

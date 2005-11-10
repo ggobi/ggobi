@@ -211,9 +211,9 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
 
   scr.x = scr.y = 0;
   /*splot_screen_to_tform (cpanel, sp, &scr, &tfmin, gg);*/
-  if(sp && GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
-     GtkGGobiExtendedSPlotClass *klass;
-     klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT_GET_CLASS(sp));
+  if(sp && GGOBI_IS_EXTENDED_SPLOT(sp)) {
+     GGobiExtendedSPlotClass *klass;
+     klass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);
      if(klass->screen_to_tform)
        klass->screen_to_tform(cpanel, sp, &scr, &tfmin, gg);
      else
@@ -223,9 +223,9 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
   scr.x = sp->max.x;
   scr.y = sp->max.y;
   /*splot_screen_to_tform (cpanel, sp, &scr, &tfmax, gg);*/
-  if(sp && GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
-     GtkGGobiExtendedSPlotClass *klass;
-     klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT_GET_CLASS(sp));
+  if(sp && GGOBI_IS_EXTENDED_SPLOT(sp)) {
+     GGobiExtendedSPlotClass *klass;
+     klass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);
      if(klass->screen_to_tform)
        klass->screen_to_tform(cpanel, sp, &scr, &tfmin, gg);
      else
@@ -341,9 +341,9 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
     for (m=0; m<d->nrows_in_plot; m++) {
     i = d->rows_in_plot.els[m];
       missing = false;
-      if(GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
-        GtkGGobiExtendedSPlotClass *klass;
-        klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT_GET_CLASS(sp));
+      if(GGOBI_IS_EXTENDED_SPLOT(sp)) {
+        GGobiExtendedSPlotClass *klass;
+        klass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);
         if (klass->draw_case_p)
           missing = klass->draw_case_p (sp, i, d, gg);
       }
@@ -714,18 +714,19 @@ desc_setup (dspdescd *desc)
   GtkWidget *entry;
 
   entry = (GtkWidget *)
-    gtk_object_get_data (GTK_OBJECT(desc->window), "TITLE");
+    g_object_get_data(G_OBJECT(desc->window), "TITLE");
   if (desc->title) g_free(desc->title);
   desc->title = gtk_editable_get_chars (GTK_EDITABLE (entry), 0, -1);
-
+/*
   entry = (GtkWidget *)
-    gtk_object_get_data (GTK_OBJECT(desc->window), "FILENAME");
+    g_object_get_data(G_OBJECT(desc->window), "FILENAME");*/
   if (desc->filename) g_free(desc->filename);
-  desc->filename = gtk_editable_get_chars (GTK_EDITABLE (entry), 0, -1);
+  //desc->filename = gtk_editable_get_chars (GTK_EDITABLE (entry), 0, -1);
+  desc->filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(desc->window));
 } 
 
 void
-desc_write_cb (GtkWidget *btn, PluginInstance *inst)
+desc_write (PluginInstance *inst)
 {
   ggobid *gg = inst->gg;
   dspdescd *desc = dspdescFromInst (inst);
@@ -756,24 +757,24 @@ desc_write_cb (GtkWidget *btn, PluginInstance *inst)
   fprintf (fp, "title='%s',", desc->title);
 
   /* A display could report its own name, but I don't know if it can */
-  if (GTK_IS_GGOBI_SCATTERPLOT_DISPLAY(display)) {
+  if (GGOBI_IS_SCATTERPLOT_DISPLAY(display)) {
     fprintf (fp, "type='scatterplot',");
     describe_scatterplot_display (fp, gg, display, desc);
-  } else if (GTK_IS_GGOBI_SCATMAT_DISPLAY(display)) {
+  } else if (GGOBI_IS_SCATMAT_DISPLAY(display)) {
     fprintf (fp, "type='scatmat',");
     /* ncols: display is symmetric */
     fprintf (fp, "ncols = %d,", g_list_length (display->scatmat_cols));
     describe_scatmat_display (fp, gg, display, desc);
-  } else if (GTK_IS_GGOBI_PARCOORDS_DISPLAY(display)) {
+  } else if (GGOBI_IS_PARCOORDS_DISPLAY(display)) {
     fprintf (fp, "type='parcoords',");
     fprintf (fp, "ncols = %d,", g_list_length (display->splots));
     describe_parcoords_display (fp, gg, display, desc);
-  } else if (GTK_IS_GGOBI_TIME_SERIES_DISPLAY(display)) {
+  } else if (GGOBI_IS_TIME_SERIES_DISPLAY(display)) {
     fprintf (fp, "type='timeseries',");
     fprintf (fp, "ncols = %d,", g_list_length (display->splots));
     describe_time_series_display (fp, gg, display, desc);
   /*
-  } else if (GTK_IS_GGOBI_BARCHART_DISPLAY(display)) {
+  } else if (GGOBI_IS_BARCHART_DISPLAY(display)) {
     fprintf (fp, "type='barchart',");
     -- is_histogram and is_spine are attributes of the plot, not the
        display : sp->bar->is_histogram, etc.
@@ -800,6 +801,6 @@ desc_write_cb (GtkWidget *btn, PluginInstance *inst)
 
   fclose(fp);
 
-  gtk_widget_hide(desc->window);
+  //gtk_widget_hide(desc->window);
   /* Put a message in the status bar saying it was done. */
 }

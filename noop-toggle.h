@@ -6,25 +6,25 @@
 #include <gtk/gtk.h>
 #include <gtk/gtktogglebutton.h>
 
-typedef struct _GtkNoopToggleButton GtkNoopToggleButton;
-typedef struct _GtkNoopToggleButtonClass GtkNoopToggleButtonClass;
+typedef struct _GGobiNoopToggleButton GGobiNoopToggleButton;
+typedef struct _GGobiNoopToggleButtonClass GGobiNoopToggleButtonClass;
 
-struct _GtkNoopToggleButton {
+struct _GGobiNoopToggleButton {
   GtkToggleButton parent;
 };
 
-struct _GtkNoopToggleButtonClass {
+struct _GGobiNoopToggleButtonClass {
   GtkToggleButtonClass parent_class;
 };
 
-#define GTK_TYPE_NOOP_TOGGLE_BUTTON (gtk_noop_toggle_button_get_type())
-#define GTK_NOOP_TOGGLE_BUTTON(obj) (GTK_CHECK_CAST((obj),GTK_TYPE_NOOP_TOGGLE_BUTTON,GtkNoopToggleButton))
-#define GTK_NOOP_TOGGLE_BUTTON_CLASS(klass) (GTK_TOGGLE_CLASS_CAST((klass),GTK_TYPE_NOOP_TOGGLE_BUTTON,GtkNoopToggleButtonClass))
-#define GTK_IS_NOOP_TOGGLE_BUTTON(obj) (GTK_CHECK_TYPE((obj), GTK_TYPE_NOOP_TOGGLE_BUTTON))
-#define GTK_IS_NOOP_TOGGLE_BUTTON_CLASS(klass) (GTK_CHECK_CLASS_TYPE((klass), GTK_TYPE_NOOP_TOGGLE_BUTTON))
+#define GGOBI_TYPE_NOOP_TOGGLE_BUTTON (ggobi_noop_toggle_button_get_type())
+#define GGOBI_NOOP_TOGGLE_BUTTON(obj) (G_TYPE_CHECK_INSTANCE_CAST((obj),GGOBI_TYPE_NOOP_TOGGLE_BUTTON,GGobiNoopToggleButton))
+#define GGOBI_NOOP_TOGGLE_BUTTON_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST((klass),GGOBI_TYPE_NOOP_TOGGLE_BUTTON,GGobiNoopToggleButtonClass))
+#define GGOBI_IS_NOOP_TOGGLE_BUTTON(obj) (G_TYPE_CHECK_INSTANCE_TYPE((obj), GGOBI_TYPE_NOOP_TOGGLE_BUTTON))
+#define GGOBI_IS_NOOP_TOGGLE_BUTTON_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE((klass), GGOBI_TYPE_NOOP_TOGGLE_BUTTON))
 
-GtkType gtk_noop_toggle_button_get_type(void);
-GtkWidget* gtk_noop_toggle_button_new(void);
-GtkWidget* gtk_noop_toggle_button_new_with_label(const gchar *label);
+GType ggobi_noop_toggle_button_get_type(void);
+GtkWidget* ggobi_noop_toggle_button_new(void);
+GtkWidget* ggobi_noop_toggle_button_new_with_label(const gchar *label);
 
 #endif /* _INC_NOOP_TOGGLE_BUTTON_H */

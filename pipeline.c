@@ -293,7 +293,7 @@ tform_to_world (datad *d, ggobid *gg)
 void
 rows_in_plot_set (datad *d, ggobid *gg) {
   gint i;
-  GtkGGobiDataClass *klass;
+  GGobiDataClass *klass;
   gint nprev = d->nrows_in_plot;
 
   d->nrows_in_plot = 0;
@@ -302,9 +302,9 @@ rows_in_plot_set (datad *d, ggobid *gg) {
     if (d->sampled.els[i] && !d->excluded.els[i])
       d->rows_in_plot.els[d->nrows_in_plot++] = i;
 
-  klass = GTK_GGOBI_DATA_CLASS(GTK_OBJECT_GET_CLASS(d));
-  gtk_signal_emit (GTK_OBJECT(d),
-    klass->signals[ROWS_IN_PLOT_CHANGED_SIGNAL], 
+  klass = GGOBI_DATA_GET_CLASS(d);
+  g_signal_emit (G_OBJECT(d),
+    klass->signals[ROWS_IN_PLOT_CHANGED_SIGNAL], 0,
     nprev, -1, gg);  /* the argument shown with -1 has no current use */
 
   return; /* (nprev == d->nrows_in_plot); */
@@ -344,9 +344,9 @@ world_to_raw (gint pt, splotd *sp, datad *d, ggobid *gg)
 {
   displayd *display = (displayd *) sp->displayptr;
 
-  if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
-     GtkGGobiExtendedDisplayClass *klass;
-     klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
+  if(GGOBI_IS_EXTENDED_DISPLAY(display)) {
+     GGobiExtendedDisplayClass *klass;
+     klass = GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
      if(klass->world_to_raw)
          klass->world_to_raw(display, sp, pt, d, gg);
   } 

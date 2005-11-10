@@ -19,19 +19,20 @@
 
 #include "ggobi.h"
 
-#define GTK_TYPE_GGOBI_PARCOORDS_SPLOT          (gtk_ggobi_par_coords_splot_get_type())
-#define GTK_GGOBI_PARCOORDS_SPLOT(obj)	        (GTK_CHECK_CAST ((obj), GTK_TYPE_GGOBI_PARCOORDS_SPLOT, parcoordsSPlotd))
-#define GTK_GGOBI_PARCOORDS_SPLOT_CLASS(klass)	(GTK_CHECK_CLASS_CAST ((klass), GTK_TYPE_GGOBI_PARCOORDS_SPLOT, GtkGGobiParCoordsSPlotClass))
-#define GTK_IS_GGOBI_PARCOORDS_SPLOT(obj)	 (GTK_CHECK_TYPE ((obj), GTK_TYPE_GGOBI_PARCOORDS_SPLOT))
-#define GTK_IS_GGOBI_PARCOORDS_SPLOT_CLASS(klass) (GTK_CHECK_CLASS_TYPE ((klass), GTK_TYPE_GGOBI_PARCOORDS_SPLOT))
+#define GGOBI_TYPE_PAR_COORDS_SPLOT          (ggobi_par_coords_splot_get_type())
+#define GGOBI_PAR_COORDS_SPLOT(obj)	        (G_TYPE_CHECK_INSTANCE_CAST ((obj), GGOBI_TYPE_PAR_COORDS_SPLOT, parcoordsSPlotd))
+#define GGOBI_PAR_COORDS_SPLOT_CLASS(klass)	(G_TYPE_CHECK_CLASS_CAST ((klass), GGOBI_TYPE_PAR_COORDS_SPLOT, GGobiParCoordsSPlotClass))
+#define GGOBI_IS_PAR_COORDS_SPLOT(obj)	 (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GGOBI_TYPE_PAR_COORDS_SPLOT))
+#define GGOBI_IS_PAR_COORDS_SPLOT_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GGOBI_TYPE_PAR_COORDS_SPLOT))
+#define GGOBI_PAR_COORDS_GET_CLASS(obj)  		(G_TYPE_INSTANCE_GET_CLASS ((obj), GGOBI_TYPE_PAR_COORDS, GGobiParCoordsClass))
 
-GtkType gtk_ggobi_par_coords_splot_get_type(void);
+GType ggobi_par_coords_splot_get_type(void);
 
 typedef struct 
 {
-    GtkGGobiExtendedSPlotClass parent_class;
+    GGobiExtendedSPlotClass parent_class;
 
-} GtkGGobiParCoordsSPlotClass;
+} GGobiParCoordsSPlotClass;
 
 typedef  struct {
 
@@ -41,21 +42,23 @@ typedef  struct {
 
 
 
-#define GTK_TYPE_GGOBI_PARCOORDS_DISPLAY	 (gtk_ggobi_par_coords_display_get_type ())
-#define GTK_GGOBI_PARCOORDS_DISPLAY(obj)	 (GTK_CHECK_CAST ((obj), GTK_TYPE_GGOBI_PARCOORDS_DISPLAY, parcoordsDisplayd))
-#define GTK_GGOBI_PARCOORDS_DISPLAY_CLASS(klass) (GTK_CHECK_CLASS_CAST ((klass), GTK_TYPE_GGOBI_PARCOORDS_DISPLAY, GtkGGobiParCoordsDisplayClass))
-#define GTK_IS_GGOBI_PARCOORDS_DISPLAY(obj)	 (GTK_CHECK_TYPE ((obj), GTK_TYPE_GGOBI_PARCOORDS_DISPLAY))
-#define GTK_IS_GGOBI_PARCOORDS_DISPLAY_CLASS(klass) (GTK_CHECK_CLASS_TYPE ((klass), GTK_TYPE_GGOBI_PARCOORDS_DISPLAY))
+#define GGOBI_TYPE_PAR_COORDS_DISPLAY	 (ggobi_par_coords_display_get_type ())
+#define GGOBI_PAR_COORDS_DISPLAY(obj)	 (G_TYPE_CHECK_INSTANCE_CAST ((obj), GGOBI_TYPE_PAR_COORDS_DISPLAY, parcoordsDisplayd))
+#define GGOBI_PAR_COORDS_DISPLAY_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GGOBI_TYPE_PAR_COORDS_DISPLAY, GGobiParCoordsDisplayClass))
+#define GGOBI_IS_PAR_COORDS_DISPLAY(obj)	 (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GGOBI_TYPE_PAR_COORDS_DISPLAY))
+#define GGOBI_IS_PAR_COORDS_DISPLAY_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GGOBI_TYPE_PAR_COORDS_DISPLAY))
+#define GGOBI_PAR_COORDS_DISPLAY_GET_CLASS(obj)  		(G_TYPE_INSTANCE_GET_CLASS ((obj), GGOBI_TYPE_PAR_COORDS_DISPLAY, GGobiParCoordsDisplayClass))
 
-GtkType gtk_ggobi_par_coords_display_get_type();
-displayd *gtk_ggobi_par_coords_display_new(gint type, gboolean missing_p, datad *d, ggobid *gg);
+
+GType ggobi_par_coords_display_get_type();
+displayd *ggobi_par_coords_display_new(gint type, gboolean missing_p, datad *d, ggobid *gg);
 
 typedef struct 
 {
-    GtkGGobiExtendedDisplayClass parent_class;
+    GGobiExtendedDisplayClass parent_class;
 
 
-} GtkGGobiParCoordsDisplayClass;
+} GGobiParCoordsDisplayClass;
 
 
 typedef struct {
@@ -65,10 +68,10 @@ typedef struct {
 } parcoordsDisplayd;
 
 
-void parcoordsDisplayClassInit(GtkGGobiParCoordsDisplayClass *klass);
-void parcoordsSPlotClassInit(GtkGGobiParCoordsSPlotClass *klass);
+void parcoordsDisplayClassInit(GGobiParCoordsDisplayClass *klass);
+void parcoordsSPlotClassInit(GGobiParCoordsSPlotClass *klass);
 void parcoordsDisplayInit(parcoordsDisplayd *display);
-splotd *gtk_parcoords_splot_new(displayd *dpy, gint width, gint height, ggobid *gg);
+splotd *ggobi_parcoords_splot_new(displayd *dpy, ggobid *gg);
 
 #endif
 

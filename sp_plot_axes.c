@@ -33,8 +33,6 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
   displayd *dsp = (displayd *) sp->displayptr;
   cpaneld *cpanel = &dsp->cpanel;
   gint proj = cpanel->pmode;
-  gint lbearing, rbearing, width, width2, ascent, descent;
-  GtkStyle *style = gtk_widget_get_style (sp->da);
   datad *d = dsp->d;
   gfloat dst, val;
   gint textheight = 0, textheight2;
@@ -44,19 +42,26 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
   gint axindent = 20;
   vartabled *vt;
   colorschemed *scheme = gg->activeColorScheme;
-
+  PangoContext *ctx;
+  PangoFontMetrics *metrics;
+  PangoLayout *layout = gtk_widget_create_pango_layout(sp->da, NULL);
+  PangoRectangle rect;
+  
   if (!dsp->options.axes_show_p)
     return;
   
+  ctx = gtk_widget_get_pango_context(sp->da);
+  metrics = pango_context_get_metrics(ctx,
+			pango_context_get_font_description(ctx), NULL);
   if (sp != NULL && sp->da != NULL && sp->da->window != NULL) {
     gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
     switch (proj) {
       case TOUR1D:
         /*-- use string height to place the labels --*/
-        splot_text_extents ("yA", style, 
-          &lbearing, &rbearing, &width, &ascent, &descent);
-        textheight = ascent + descent;
-
+		
+        textheight = PANGO_PIXELS(pango_font_metrics_get_ascent(metrics) + 
+					  pango_font_metrics_get_descent(metrics));
+		
         /*-- draw vertical lines to mark the min and max positions --*/
         gdk_draw_line(drawable, gg->plot_GC,
           dawidth/4, daheight - textheight*d->ncols - 10,
@@ -77,8 +82,8 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
           else
             gdk_gc_set_foreground(gg->plot_GC, &scheme->rgb_accent);
           gdk_draw_line(drawable, gg->plot_GC,
-            dawidth/2, daheight - 10 - (dsp->t1d.nsubset-1-k)*textheight,
-            ix, iy);
+            dawidth/2, daheight - 10 - textheight / 2 - (dsp->t1d.nsubset-1-k)*textheight,
+            ix, iy - textheight / 2);
 /*
  * An experiment:  add the labels only for those variables with
  * non-zero multipliers.  Add them on the right if positive, on
@@ -88,14 +93,11 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
             vt = vartable_element_get (j, d);
             varlab = g_strdup_printf("%s:%4.3f(%.2f)",vt->collab_tform,
               dsp->t1d.F.vals[0][j],vt->lim.max-vt->lim.min);
-            splot_text_extents (varlab, style, 
-              &lbearing, &rbearing, &width, &ascent, &descent);
-
-            splot_draw_string (varlab,
-              (ix > dawidth/2) ? 3*dawidth/4 + 10 : dawidth/4 - width -10,
-              iy,
-              style, drawable, gg);
-            g_free (varlab);
+            layout_text(layout, varlab, &rect);
+			gdk_draw_layout(drawable, gg->plot_GC, 
+				(ix > dawidth/2) ? 3*dawidth/4 + 10 : dawidth/4 - rect.width -10,
+				iy - rect.height, layout);
+			g_free (varlab);
           }
         }     
         gdk_gc_set_line_attributes(gg->plot_GC, 1, GDK_LINE_SOLID, 
@@ -134,11 +136,8 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
             } else {
               varlab = g_strdup_printf ("%d",j+1);
             }
-
-            splot_text_extents (varlab, style, 
-              &lbearing, &rbearing, &width, &ascent, &descent);
-
-            textheight = ascent+descent;
+			layout_text(layout, varlab, &rect);
+           
             ix = ix - axindent - dawidth/8;
             iy = iy - (daheight - daheight/8 - axindent);
             dst = sqrt(ix*ix + iy*iy);
@@ -147,15 +146,15 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
             iy = daheight - axindent - 
                daheight/8 + (gint) ((gfloat) iy / dst * (gfloat) daheight/8);
             if (ix < dawidth/8+axindent)
-              ix -= width;
+              ix -= rect.width;
             else
-              ix += (width/2);
+              ix += (rect.width/2);
             if (iy < daheight-daheight/8-axindent)
-              iy -= (textheight/2);
-            else
-              iy += (textheight);
+              iy -= (rect.height);
+            //else
+            //  iy += (rect.height);
 
-            splot_draw_string (varlab, ix, iy, style, drawable, gg);
+			gdk_draw_layout(drawable, gg->plot_GC, ix, iy, layout);
             g_free (varlab);
           }
 
@@ -163,15 +162,14 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
           if (dsp->options.axes_values_p) {
             varval = g_strdup_printf ("%d:%4.3f,%4.3f",j+1,
               dsp->t2d3.F.vals[0][j],dsp->t2d3.F.vals[1][j]);
-            if (k == 0) {
-              splot_text_extents (varval, style, 
-                &lbearing, &rbearing, &width2, &ascent, &descent);
-              textheight2 = ascent+descent+5;
-            }
+            //if (k == 0) {
+				layout_text(layout, varval, &rect);
+                textheight2 = rect.height;
+            //}
 
-            ix = dawidth - width2 - axindent;
-            iy = daheight - (dsp->t2d3.nsubset-k-1)*textheight2 - axindent;
-            splot_draw_string (varval, ix, iy, style, drawable, gg);
+            ix = dawidth - rect.width - axindent;
+            iy = daheight - (dsp->t2d3.nsubset-k)*textheight2 - axindent;
+			gdk_draw_layout(drawable, gg->plot_GC, ix, iy, layout);
             g_free (varval);
           }
         }
@@ -213,10 +211,8 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
               varlab = g_strdup_printf ("%d",j+1);
             }
 
-            splot_text_extents (varlab, style, 
-              &lbearing, &rbearing, &width, &ascent, &descent);
+			layout_text(layout, varlab, &rect);
 
-            textheight = ascent+descent;
             ix = ix - axindent - daheight/8;
             iy = iy - (daheight - daheight/8 - axindent);
             dst = sqrt(ix*ix + iy*iy);
@@ -225,15 +221,15 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
             iy = daheight - axindent - 
                daheight/8 + (gint) ((gfloat) iy / dst * (gfloat) daheight/8);
             if (ix < daheight/8+axindent)
-              ix -= width;
+              ix -= rect.width;
             else
-              ix += (width/2);
+              ix += (rect.width/2);
             if (iy < daheight-daheight/8-axindent)
-              iy -= (textheight/2);
-            else
-              iy += (textheight);
+              iy -= (rect.height);
+            //else
+            //  iy += (rect.height);
 
-            splot_draw_string (varlab, ix, iy, style, drawable, gg);
+			gdk_draw_layout(drawable, gg->plot_GC, ix, iy, layout);
             g_free (varlab);
           }
 
@@ -243,15 +239,14 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
             varval = g_strdup_printf ("%d:%4.3f,%4.3f(%.2f)",j+1,
               dsp->t2d.F.vals[0][j],dsp->t2d.F.vals[1][j],
               vt->lim.max-vt->lim.min);
-            if (k == 0) {
-              splot_text_extents (varval, style, 
-                &lbearing, &rbearing, &width2, &ascent, &descent);
-              textheight2 = ascent+descent+5;
-            }
+            //if (k == 0) {
+              layout_text(layout, varval, &rect);
+              textheight2 = rect.height;
+            //}
 
-            ix = dawidth - width2 - axindent;
-            iy = daheight - (dsp->t2d.nsubset-k-1)*textheight2 - axindent;
-            splot_draw_string (varval, ix, iy, style, drawable, gg);
+            ix = dawidth - rect.width - axindent;
+            iy = daheight - (dsp->t2d.nsubset-k)*textheight2 - axindent;
+			gdk_draw_layout(drawable, gg->plot_GC, ix, iy, layout);
             g_free (varval);
           }
 
@@ -267,9 +262,8 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
         nc = dsp->tcorr1.nsubset + dsp->tcorr2.nsubset;
 
         /*-- use string height to place the labels --*/
-        splot_text_extents ("yA", style, 
-          &lbearing, &rbearing, &width, &ascent, &descent);
-        textheight = ascent + descent;
+        textheight = PANGO_PIXELS(pango_font_metrics_get_ascent(metrics) + 
+					  pango_font_metrics_get_descent(metrics));
 
         /*-- draw vertical lines to mark the min and max positions --*/
         gdk_draw_line(drawable, gg->plot_GC,
@@ -311,22 +305,19 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
           ix = dawidth/2 + 
             (gint) (dsp->tcorr1.F.vals[0][j]*
             (gfloat) dawidth/4);
-          iy = daheight - 10 - (nc-1-k)*textheight;
+          iy = daheight - 10 - (nc-k)*textheight;
           if (j == dsp->tc1_manip_var)
             gdk_gc_set_foreground(gg->plot_GC, &gg->vcirc_manip_color);
           else
             gdk_gc_set_foreground(gg->plot_GC, &scheme->rgb_accent);
           gdk_draw_line(drawable, gg->plot_GC,
-            dawidth/2, daheight - 10 - (nc-1-k)*textheight,
-            ix, iy);
+            dawidth/2, iy + rect.height/2,
+            ix, iy + rect.height/2);
           gdk_gc_set_line_attributes(gg->plot_GC, 1, GDK_LINE_SOLID, 
             GDK_CAP_ROUND, GDK_JOIN_ROUND);
 
-          splot_text_extents (varlab, style, 
-            &lbearing, &rbearing, &width, &ascent, &descent);
-
-          splot_draw_string (varlab, dawidth/2+dawidth/4+10, iy,
-            style, drawable, gg);
+			layout_text(layout, varlab, &rect);
+			gdk_draw_layout(drawable, gg->plot_GC, dawidth/2+dawidth/4+10, iy, layout);
   
           /* vertical */
           ix = 10 + k*textheight;
@@ -340,7 +331,7 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
           else
             gdk_gc_set_foreground(gg->plot_GC, &scheme->rgb_accent);
           gdk_draw_line(drawable, gg->plot_GC,
-            10+k*textheight,daheight/2,
+            ix,daheight/2,
             ix, iy);
 
           g_free (varlab);
@@ -352,4 +343,6 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
         break;
     }
   }
+  pango_font_metrics_unref(metrics);
+  g_object_unref(layout);
 }

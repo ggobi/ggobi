@@ -1,55 +1,50 @@
 #include "GGobiApp.h"
 #include "ggobi.h"
 
-void gtk_ggobi_app_class_init(GtkGGobiAppClass * klass);
-void ggobi_app_init(GtkGGobiApp *app);
+void ggobi_app_class_init(GGobiAppClass * klass);
+void ggobi_app_init(GGobiApp *app);
 
 /**
-  This registers and returns a unique Gtk type representing
-  the ggobi class.
+  This registers and returns a unique GType representing
+  the ggobi app class.
  */
-GtkType gtk_ggobi_app_get_type(void)
+GType ggobi_app_get_type(void)
 {
-  static GtkType data_type = 0;
+  static GType app_type = 0;
 
-  if (!data_type) {
-    static const GtkTypeInfo data_info = {
-      "GtkGGobiApp",
-      sizeof(GtkGGobiApp),
-      sizeof(GtkGGobiAppClass),
-      (GtkClassInitFunc) gtk_ggobi_app_class_init,
-      (GtkObjectInitFunc) ggobi_app_init,
-      /* reserved_1 */ NULL,
-      /* reserved_2 */ NULL,
-      (GtkClassInitFunc) NULL,
+  if (!app_type) {
+    static const GTypeInfo app_info = {
+      sizeof(GGobiAppClass),
+	  NULL, NULL,
+	  (GClassInitFunc) ggobi_app_class_init,
+	  NULL, NULL,
+	  sizeof(GGobiApp), 0,
+      (GInstanceInitFunc) ggobi_app_init,
+      NULL
     };
 
-    data_type = gtk_type_unique(gtk_object_get_type(), &data_info);
+    app_type = g_type_register_static(G_TYPE_OBJECT, "GGobiApp", &app_info, 0);
   }
 
-  return data_type;
+  return app_type;
 }
 
 
 void
-ggobi_app_init(GtkGGobiApp *app)
+ggobi_app_init(GGobiApp *app)
 {
 
 }
 
-void gtk_ggobi_app_class_init(GtkGGobiAppClass * klass)
-{
-#ifndef GTK_2_0
-  if (gtk_signal_lookup("new_ggobi", GTK_TYPE_GGOBI_APP) == 0) {
-    GGobiSignals[DATAD_ADDED_SIGNAL] =
-      gtk_object_class_user_signal_new(gtk_type_class(GTK_TYPE_GGOBI_APP),
-        "new_ggobi",
-        GTK_RUN_LAST | GTK_RUN_ACTION,
-        gtk_marshal_NONE__POINTER,
-        GTK_TYPE_NONE, 1,
-        GTK_TYPE_GGOBI);
+void ggobi_app_class_init(GGobiAppClass * klass)
+{ /* why is this stored as the "DATAD_ADDED_SIGNAL" ? */
+  if (g_signal_lookup("new_ggobi", GGOBI_TYPE_APP) == 0) {
+    //GGobiSignals[DATAD_ADDED_SIGNAL] =
+      g_signal_new("new_ggobi",
+	  	GGOBI_TYPE_APP,
+        G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION, 0, NULL, NULL,
+        g_cclosure_marshal_VOID__OBJECT,
+        G_TYPE_NONE, 1,
+        GGOBI_TYPE_GGOBI);
   }
-
-#endif
-
 }

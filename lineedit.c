@@ -95,14 +95,20 @@ gboolean record_add (eeMode mode, gint a, gint b, gchar *lbl, gchar *id,
             change, as well as Any of the real variable stats.
           */
 	  {
-            if (d->vartable_clist[categorical] != NULL) {
-              gint vartable_rownum_from_varno (gint jvar, vartyped vartype, datad *d);
-              gtk_clist_set_text (GTK_CLIST (d->vartable_clist[categorical]),
-	        level+1+vartable_rownum_from_varno (j, vt->vartype, d),
-                CAT_CLIST_LEVEL_COUNT,
-                g_strdup_printf ("%d", vt->level_counts[level]));
-	    }
-          }
+            if (d->vartable_tree_view[categorical] != NULL) {
+				GtkTreeIter iter;
+				GtkTreeModel *model;
+				GtkTreePath *path;
+				
+				vartable_iter_from_varno(j, d, &model, &iter);
+				path = gtk_tree_model_get_path(model, &iter);
+				gtk_tree_path_append_index(path, level);
+				gtk_tree_model_get_iter(model, &iter, path);
+				gtk_tree_path_free(path);
+				gtk_list_store_set(GTK_LIST_STORE(model), &iter, VT_LEVEL_COUNT,
+			  		vt->level_counts[level], -1);
+			}
+      }
         } else raw[j] = x;
       }
     }
@@ -246,16 +252,16 @@ DTL: So need to call unresolveEdgePoints(e, d) to remove it from the
             splot_points_realloc (dtarget->nrows-1, sp, d);
           
           /*-- this is only necessary if there are variables, I think --*/
-          if (GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
-            GtkGGobiExtendedSPlotClass *klass;
-            klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT_GET_CLASS(sp));
+          if (GGOBI_IS_EXTENDED_SPLOT(sp)) {
+            GGobiExtendedSPlotClass *klass;
+            klass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);
             if(klass->alloc_whiskers)
               sp->whiskers = klass->alloc_whiskers(sp->whiskers, sp,
                 d->nrows, d);
 
             /*-- each plot type should have its own realloc routines --*/
-            if (GTK_IS_GGOBI_BARCHART_SPLOT(sp)) {
-              barchartSPlotd *bsp = GTK_GGOBI_BARCHART_SPLOT(sp);
+            if (GGOBI_IS_BARCHART_SPLOT(sp)) {
+              barchartSPlotd *bsp = GGOBI_BARCHART_SPLOT(sp);
               barchart_clean_init (bsp);
               barchart_recalc_counts (bsp, d, gg);
             }

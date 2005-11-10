@@ -1,7 +1,7 @@
 PKG_NAME=ggobi
 
 USE_XML=1
-USE_DBMS=1
+#USE_DBMS=1
 
 createDist:
 
@@ -13,7 +13,7 @@ PDFLATEX=pdflatex
 TAR=tar
 
 DIRS=\
-   src include lib bin Docs data gtkext/src gtkext/include examples \
+   src include lib bin Docs data examples \
    plugins share/tools
 
 TOOLS=Install/plugin.in 
@@ -31,11 +31,9 @@ SHARE_FILES=Install/ggobirc.in
 DATA_SRC_FILES=\
    flea.col flea.colors flea.dat flea.doc flea.glyphs flea.row \
    roos.col roos.dat roos.doc roos.missing roos.row \
-   flea.xml pigs.xml ratcns.xml sat.xml sleep.xml \
+   flea.xml pigs.xml ratcns.xml sat.xml sleep.xml eies.xml buckyball.xml \
    stdColorMap.xml prim7.xml olive.col olive.dat olive.row olive.xml \
-   places.xml algal-bloom.xml river.xml \
-   buckyball.xml cube6.xml eies.xml morsecodes.xml \
-   perm4.xml perm5.xml snetwork.xml \
+   places.xml algal-bloom.xml sarsHK.xml snetwork.xml \
    laser.col laser.dat laser.doc laser.xml Shipman.xml tips.xml \
    test1.csv test2.csv test3.csv \
    ggobi.dtd
@@ -55,31 +53,22 @@ DOC_FILES=$(DOC_TEX_FILES:%=Docs/%.$(DOC_EXTENSION)) Docs/ggobi.css Docs/Embeddi
 C_SRC_FILES=$(SRC) $(XML_SRC) ggobiMain.c xmlConvert.c
 
 C_HEADER_FILES=\
-  GGobiAPI GGobiApp \
-  barchartDisplay brushing colorscheme cpanel datad defines \
+  GGobiAPI barchartDisplay brushing colorscheme cpanel datad defines \
   display display_tree \
   externs fileio ggobi ggobiClass noop-toggle plugin read_xml rb \
-  splot types vars varseldata write_xml writedata gtkext \
+  splot types vars varseldata write_xml writedata \
   tour1d_pp tour2d_pp tour_pp splash read_init \
   tsdisplay tsPlot vartable write_state \
   print \
   dbms dbms_ui \
   scatterplotClass \
   scatmatClass parcoordsClass  \
-  GGobiEvents tour \
-
-ifdef GTK_2
- C_HEADER_FILES+=marshal
-endif
+  GGobiEvents GGobiApp tour marshal \
 
 Install/configure: Install/configure.in
 	(cd Install ; autoconf)
 
-
-GTK_EXTRA_SRC= gtkextruler.c   gtkexthruler.c   gtkextvruler.c 
-LGPL_HEADERS:=$(GTK_EXTRA_SRC:%.c=%.h)
-LGPL_SRC=$(GTK_EXTRA_SRC) mt19937ar.c cokus.c
-
+LGPL_SRC=mt19937ar.c cokus.c
 
 createDist: Install/configure $(DOC_FILES) $(DATA_FILES) CmdArgHelp.c
 ifndef DONT_REMOVE_EXISTING_FILES
@@ -106,16 +95,12 @@ endif
 	cp Install/local.config.in $(TMP_INSTALL_DIR)/
 	cp Install/ggobi.pc.in $(TMP_INSTALL_DIR)/	
 	cp VersionInfo $(TMP_INSTALL_DIR)/src
-	cp marshal.list GtkSignalDef.c $(TMP_INSTALL_DIR)/src
-	cp Makefile.win32 $(TMP_INSTALL_DIR)/src
+	cp marshal.list $(TMP_INSTALL_DIR)/src
 	if test -n "${DOC_FILES}" ; then cp $(DOC_FILES) $(TMP_INSTALL_DIR)/Docs ; fi
 	cp $(DATA_FILES) $(TMP_INSTALL_DIR)/data
 	cp notes/ggobirc $(TMP_INSTALL_DIR)/examples
 	cp $(C_SRC_FILES) CmdArgHelp.c $(TMP_INSTALL_DIR)/src
 	cp $(C_HEADER_FILES:%=%.h) GGStructSizes.c $(TMP_INSTALL_DIR)/include
-	cp $(LGPL_SRC) $(TMP_INSTALL_DIR)/gtkext/src
-	cp $(LGPL_HEADERS) $(TMP_INSTALL_DIR)/gtkext/include
-	cp Install/GNUmakefile_gtkext.in $(TMP_INSTALL_DIR)/gtkext/src/GNUmakefile.in
 	cp $(SHARE_FILES) $(TMP_INSTALL_DIR)/share
 	cp $(TOOLS) $(TMP_INSTALL_DIR)/share/tools
 	$(MAKE) ADMIN=1 copyPlugins
@@ -125,14 +110,6 @@ CUR_DIR=$(shell pwd)
 
 tmp:
 	@echo "$(CUR_DIR)"
-
-lgpl lgpl.tar.gz:
-	if test ! -d $(TMP_INSTALL_DIR) ; then mkdir -p $(TMP_INSTALL_DIR) ; fi
-	cp $(LGPL_SRC) $(TMP_INSTALL_DIR)/src
-	cp $(LGPL_HEADERS) $(TMP_INSTALL_DIR)/include
-	(cd $(TMP_INSTALL_DIR)/.. ; $(TAR) zcvf $(CUR_DIR)/lgpl.tar.gz $(LGPL_SRC:%=$(PKG_NAME)/src/%) $(LGPL_HEADERS:%=$(PKG_NAME)/include/%))
-
-
 
 $(TAR_FILE) tar $(PKG_NAME).tar.gz: createDist
 	(cd $(TMP_INSTALL_DIR)/.. ; $(TAR) zcvf $(CUR_DIR)/$(TAR_FILE) $(PKG_NAME))

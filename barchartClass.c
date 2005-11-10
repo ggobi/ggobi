@@ -52,7 +52,7 @@ static gint barchartPlottedColsGet(displayd * display, gint * cols,
                                    datad * d, ggobid * gg);
 static GtkWidget *barchartCPanelWidget(displayd * dpy,
                                        gchar ** modeName, ggobid * gg);
-static GtkWidget *barchartMenusMake(displayd * dpy, ggobid * gg);
+//static GtkWidget *barchartMenusMake(displayd * dpy, ggobid * gg);
 static gboolean barchartEventHandlersToggle(displayd * dpy, splotd * sp,
                                             gboolean state, ProjectionMode,
                                             InteractionMode);
@@ -124,8 +124,8 @@ barchartVarSel(GtkWidget *w, displayd * display, splotd * sp, gint jvar,
     displayd *display = (displayd *) sp->displayptr;
     datad *d = display->d;
 
-    barchart_clean_init(GTK_GGOBI_BARCHART_SPLOT(sp));
-    barchart_recalc_counts(GTK_GGOBI_BARCHART_SPLOT(sp), d, d->gg);
+    barchart_clean_init(GGOBI_BARCHART_SPLOT(sp));
+    barchart_recalc_counts(GGOBI_BARCHART_SPLOT(sp), d, d->gg);
   }
 
   return (true);
@@ -148,9 +148,9 @@ barchartVarIsPlotted(displayd * dpy, gint * cols, gint ncols, datad * d)
 gboolean barchartCPanelSet(displayd * dpy, cpaneld * cpanel, ggobid * gg)
 {
   GtkWidget *w;
-  w = GTK_GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget;
+  w = GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget;
   if (!w) {
-    GTK_GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget = w =
+    GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget = w =
         cpanel_barchart_make(gg);
   }
   cpanel_barchart_set(dpy, cpanel, w, gg);
@@ -161,23 +161,24 @@ gboolean barchartCPanelSet(displayd * dpy, cpaneld * cpanel, ggobid * gg)
 }
 
 void barchartDisplaySet(displayd * dpy, ggobid * gg)
-{
+{  
+  /*
   GtkWidget *pmode_menu, *imode_menu;
 
   pmode_menu = barchart_pmode_menu_make(gg->pmode_accel_group,
-                                 (GtkSignalFunc) pmode_set_cb, gg,
+                                 G_CALLBACK(pmode_set_cb), gg,
                                  true);
   gg->pmode_item = submenu_make("_View", 'V', gg->main_accel_group);
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(gg->pmode_item), pmode_menu);
   submenu_insert(gg->pmode_item, gg->main_menubar, 2);
 
   imode_menu = barchart_imode_menu_make(gg->imode_accel_group,
-                                 (GtkSignalFunc) imode_set_cb, gg,
+                                 G_CALLBACK(imode_set_cb), gg,
                                  true);
   gg->imode_item = submenu_make("_Interaction", 'I', gg->main_accel_group);
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(gg->imode_item), imode_menu);
   submenu_insert(gg->imode_item, gg->main_menubar, 3);
-
+*/
 }
 
 
@@ -187,27 +188,18 @@ static void barchartDestroy(GtkObject *obj)
   barchartSPlotd * sp;
   GtkObjectClass *klass;
 
-#ifdef GTK_2_0
-  klass = g_type_class_peek_parent(GTK_GGOBI_EXTENDED_SPLOT_CLASS(obj));
-#else
-  klass = gtk_type_parent_class(GTK_TYPE_GGOBI_EXTENDED_SPLOT);
-#endif
+  klass = g_type_class_peek_parent(GGOBI_EXTENDED_SPLOT_CLASS(obj));
 
-  sp = GTK_GGOBI_BARCHART_SPLOT(obj);
+  sp = GGOBI_BARCHART_SPLOT(obj);
 
   if(sp && sp->bar) {
 	  GtkObjectClass *klass;
                 /* Goal here is to get the class object for the parent
-                   of the GTK_TYPE_GGOBI_EXTENDED_SPLOT class so that we can call its
+                   of the GGOBI_TYPE_EXTENDED_SPLOT class so that we can call its
                    destroy method. */
-#ifdef GTK_2_0
                /* Need to get the class of the barchart and then constrain it to the 
                   extended splot class. */
-	  klass = g_type_class_peek_parent(GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT_GET_CLASS(obj)));
-#else
-	  klass = gtk_type_parent_class(GTK_TYPE_GGOBI_EXTENDED_SPLOT);
-#endif
-
+	  klass = g_type_class_peek_parent(GGOBI_EXTENDED_SPLOT_GET_CLASS(obj));
 
 	  barchart_free_structure(sp);
 	  vectori_free (&sp->bar->index_to_rank);
@@ -222,7 +214,7 @@ static void barchartDestroy(GtkObject *obj)
 
 void barchartPlaneToScreen(splotd * sp, datad * d, ggobid * gg)
 {
-  barchartSPlotd *bsp = GTK_GGOBI_BARCHART_SPLOT(sp);
+  barchartSPlotd *bsp = GGOBI_BARCHART_SPLOT(sp);
 
   barchart_recalc_dimensions(sp, d, gg);
   barchart_recalc_group_dimensions(bsp, gg);
@@ -230,7 +222,7 @@ void barchartPlaneToScreen(splotd * sp, datad * d, ggobid * gg)
 
 void barchartWorldToPlane (splotd *sp, datad *d, ggobid *gg)
 {
-  barchartSPlotd *bsp = GTK_GGOBI_BARCHART_SPLOT(sp);
+  barchartSPlotd *bsp = GGOBI_BARCHART_SPLOT(sp);
 
   /*  barchart_clean_init(bsp);*/
   barchart_recalc_counts(bsp, d, gg);
@@ -316,22 +308,23 @@ gboolean barchartHandlesInteraction(displayd * dpy, gint action)
 /*--------------------------------------------------------------------*/
 
 /* delete dfs -- change this to option_items_add , which adds nothing */
+#if 0
 static void barchart_menus_make(displayd *display, ggobid * gg)
 {
   gg->menus.options_menu = gtk_menu_new();
 
   CreateMenuCheck(gg->menus.options_menu, "Show tooltips",
-                  GTK_SIGNAL_FUNC(tooltips_show_cb), NULL,
+                  G_CALLBACK(tooltips_show_cb), NULL,
                   GTK_TOOLTIPS(gg->tips)->enabled, gg);
 
   CreateMenuCheck(gg->menus.options_menu, "Show control panel",
-                  GTK_SIGNAL_FUNC(cpanel_show_cb), NULL,
+                  G_CALLBACK(cpanel_show_cb), NULL,
                   GTK_WIDGET_VISIBLE(gg->imode_frame), gg);
 
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(gg->menus.options_item),
                             gg->menus.options_menu);
 }
-
+#endif
 
 void
 barchartVarpanelTooltipsSet(displayd * dpy, ggobid * gg, GtkWidget * wx,
@@ -353,19 +346,19 @@ barchartPlottedColsGet(displayd * display, gint * cols, datad * d,
   return (ncols);
 }
 
-
+#if 0
 GtkWidget *barchartMenusMake(displayd * dpy, ggobid * gg)
 {
   barchart_menus_make(dpy, gg);
   return (NULL);
 }
-
+#endif
 
 GtkWidget *barchartCPanelWidget(displayd * dpy, gchar ** modeName, ggobid * gg)
 {
-  GtkWidget *w = GTK_GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget;
+  GtkWidget *w = GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget;
   if (!w) {
-    GTK_GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget = w =
+    GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget = w =
         cpanel_barchart_make(gg);
   }
   *modeName = "Bar Chart";
@@ -498,7 +491,7 @@ barchartScreenToTform(cpaneld *cpanel, splotd *sp, icoords *scr,
   }
 }
 
-void barchartDisplayClassInit(GtkGGobiBarChartDisplayClass * klass)
+void barchartDisplayClassInit(GGobiBarChartDisplayClass * klass)
 {
   klass->parent_class.treeLabel = klass->parent_class.titleLabel =
       "Barchart";
@@ -509,6 +502,7 @@ void barchartDisplayClassInit(GtkGGobiBarChartDisplayClass * klass)
   klass->parent_class.cpanel_set = barchartCPanelSet;
   klass->parent_class.display_unset = NULL;
   klass->parent_class.display_set = barchartDisplaySet;
+  klass->parent_class.mode_ui_get = barchart_mode_ui_get;
   klass->parent_class.variable_plotted_p = barchart_is_variable_plotted;
 
   klass->parent_class.build_symbol_vectors = barchart_build_symbol_vectors;
@@ -526,7 +520,7 @@ void barchartDisplayClassInit(GtkGGobiBarChartDisplayClass * klass)
 
   klass->parent_class.plotted_vars_get = barchartPlottedColsGet;
 
-  klass->parent_class.menus_make = barchartMenusMake;
+  //klass->parent_class.menus_make = barchartMenusMake;
 
   klass->parent_class.imode_control_box = barchartCPanelWidget;
 
@@ -540,7 +534,7 @@ void barchartDisplayClassInit(GtkGGobiBarChartDisplayClass * klass)
   klass->parent_class.set_show_axes_option = setShowAxesOption;
 }
 
-void barchartSPlotClassInit(GtkGGobiBarChartSPlotClass * klass)
+void barchartSPlotClassInit(GGobiBarChartSPlotClass * klass)
 {
   /* barcharts need more attention than redrawing the brush */
   klass->extendedSPlotClass.splot.redraw = FULL;

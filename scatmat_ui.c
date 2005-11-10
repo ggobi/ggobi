@@ -28,10 +28,9 @@
 /*----------------------------------------------------------------------*/
 
 static gchar *selection_mode_lbl[] = {"Replace", "Insert", "Append", "Delete"};
-static void selection_mode_cb (GtkWidget *w, gpointer cbd)
+static void selection_mode_cb (GtkWidget *w, ggobid *gg)
 {
-  gint indx = GPOINTER_TO_INT (cbd);
-  ggobid *gg = GGobiFromWidget(w, true);
+  gint indx = gtk_combo_box_get_active(GTK_COMBO_BOX(w));
   cpaneld *cpanel = &gg->current_display->cpanel;
 
   switch (indx) {
@@ -71,19 +70,19 @@ cpanel_scatmat_make (ggobid *gg) {
   gtk_box_pack_start (GTK_BOX (panel->w),
                       vb, false, false, 0);
 
-  lbl = gtk_label_new ("Selection mode:");
+  lbl = gtk_label_new_with_mnemonic ("_Selection mode:");
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
   gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
 
-  opt = gtk_option_menu_new ();
+  opt = gtk_combo_box_new_text ();
+  gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), opt);
   gtk_widget_set_name (opt, "SCATMAT:sel_mode_option_menu");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
     "Selecting an unselected variable either replaces the variable in the current plot, inserts a new plot before the current plot, or appends a new plot after the last plot",
     NULL);
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
-  populate_option_menu (opt, selection_mode_lbl,
-    sizeof (selection_mode_lbl) / sizeof (gchar *),
-    (GtkSignalFunc) selection_mode_cb, "GGobi", gg);
+  populate_combo_box (opt, selection_mode_lbl, G_N_ELEMENTS(selection_mode_lbl),
+    G_CALLBACK(selection_mode_cb), gg);
 
   gtk_widget_show_all (panel->w);
 
@@ -95,6 +94,26 @@ cpanel_scatmat_make (ggobid *gg) {
 /*                       Resetting the main menubar                       */
 /*------------------------------------------------------------------------*/
 
+static const gchar* mode_ui_str =
+"<ui>"
+"	<menubar>"
+"		<menu action='IMode'>"
+"			<menuitem action='DefaultIMode'/>"
+"			<separator/>"
+"			<menuitem action='Scale'/>"
+"			<menuitem action='Brush'/>"
+"			<menuitem action='Identify'/>"
+"		</menu>"
+"	</menubar>"
+"</ui>";
+
+const gchar*
+scatmat_mode_ui_get(displayd *display)
+{
+	return(mode_ui_str);
+}
+
+#if 0
 GtkWidget *
 scatmat_imode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func,
   ggobid *gg, gboolean useIds) 
@@ -148,6 +167,7 @@ as class-specific code.  dfs
   gtk_widget_show (imode_menu);
   return (imode_menu);
 }
+#endif
 
 /*--------------------------------------------------------------------*/
 /*                      Control panel updating                        */
@@ -163,7 +183,7 @@ cpanel_scatmat_set (displayd *display, cpaneld *cpanel, ggobid *gg)
 
   if (pnl) {
     w = widget_find_by_name (pnl, "SCATMAT:sel_mode_option_menu");
-    gtk_option_menu_set_history (GTK_OPTION_MENU(w),
+    gtk_combo_box_set_active (GTK_COMBO_BOX(w),
                                  cpanel->scatmat_selection_mode);
   }
 }

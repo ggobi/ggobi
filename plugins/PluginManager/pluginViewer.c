@@ -45,11 +45,11 @@ select_plugin_file(GtkWidget *mitem, ggobid *gg)
 
   gtk_file_selection_hide_fileop_buttons(GTK_FILE_SELECTION(file_selector));
 
-  gtk_signal_connect (GTK_OBJECT (GTK_FILE_SELECTION(file_selector)->ok_button),
-                        "clicked", GTK_SIGNAL_FUNC (loadPluginFromFile), gg);
+  g_signal_connect (G_OBJECT (GTK_FILE_SELECTION(file_selector)->ok_button),
+                        "clicked", G_CALLBACK (loadPluginFromFile), gg);
 
-  gtk_signal_connect_object(GTK_OBJECT (GTK_FILE_SELECTION(file_selector)->cancel_button),
-                        "clicked", GTK_SIGNAL_FUNC (gtk_widget_destroy), (gpointer) file_selector);
+  g_signal_connect_swapped(G_OBJECT (GTK_FILE_SELECTION(file_selector)->cancel_button),
+                        "clicked", G_CALLBACK (gtk_widget_destroy), (gpointer) file_selector);
                             
 
   gtk_widget_show(file_selector);
@@ -76,8 +76,8 @@ addToMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
     */
 
   entry = GGobi_addToolsMenuItem ("Load plugin", gg);
-  gtk_signal_connect(GTK_OBJECT(entry), "activate",
-                             GTK_SIGNAL_FUNC (select_plugin_file),
+  g_signal_connect(G_OBJECT(entry), "activate",
+                             G_CALLBACK (select_plugin_file),
                              (gpointer) gg);
 
 

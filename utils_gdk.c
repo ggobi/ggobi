@@ -105,6 +105,10 @@ draw_glyph (GdkDrawable *drawable, glyphd *gl, icoords *xypos, gint jpos, ggobid
   }
 }
 
+/* These functions are now obsolete in GTK2
+	since all text rendering is now based on Pango - mfl */
+
+#if 0
 void
 splot_text_extents (gchar *text, GtkStyle *style,
   gint *lbearing, gint *rbearing, gint *width, gint *ascent, gint *descent)
@@ -131,6 +135,7 @@ splot_draw_string (gchar *text, gint xpos, gint ypos,
 #endif
     gg->plot_GC, xpos, ypos, text);
 }
+#endif
 
 void
 mousepos_get_pressed (GtkWidget *w, GdkEventButton *event,

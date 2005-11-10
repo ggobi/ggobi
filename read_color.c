@@ -233,7 +233,7 @@ getForegroundColor(gint index, xmlNodePtr node, xmlDocPtr doc,
   ptr =  xmlGetProp(node, (xmlChar *) "name");
   {
     gchar *tmp;
-    tmp = name = (gchar *) g_malloc(sizeof(gchar) * (strlen(ptr) + 1));
+    tmp = name = (gchar *) g_malloc(sizeof(gchar) * (xmlStrlen(ptr) + 1));
     while(ptr[0]) {
     *tmp++ = *ptr++;
     }

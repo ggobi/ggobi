@@ -18,10 +18,10 @@
 #define GGOBI_EVENTS_H
 
 /*
- The CHECK_EVENT_SIGNATURE is for testing routines used with gtk_signal_connect.
- The CHECK_R_EVENT_SIGNATURE is for testing routines used with gtk_signal_connect_object.
+ The CHECK_EVENT_SIGNATURE is for testing routines used with g_signal_connect.
+ The CHECK_R_EVENT_SIGNATURE is for testing routines used with g_signal_connect_object.
 
- Similarly, the ggev_r_... are for the routines used with gtk_signal_connect_object.
+ Similarly, the ggev_r_... are for the routines used with g_signal_connect_object.
 */
 
 typedef void (*ggev_datad_added_f)(ggobid *, datad *, void *);

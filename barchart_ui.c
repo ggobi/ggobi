@@ -31,14 +31,13 @@ void barchart_set_initials(splotd * sp, datad * d);
 void barchart_allocate_structure(splotd * sp, datad * d);
 extern void barchart_set_breakpoints(gfloat width, splotd * sp, datad * d);
 
-static void display_mode_cb(GtkWidget * w, gpointer cbd)
+static void display_mode_cb(GtkWidget * w, ggobid *gg)
 {
-  ggobid *gg = GGobiFromWidget(w, true);
   cpaneld *cpanel = &gg->current_display->cpanel;
-  barchartSPlotd *sp = GTK_GGOBI_BARCHART_SPLOT(gg->current_splot);
+  barchartSPlotd *sp = GGOBI_BARCHART_SPLOT(gg->current_splot);
   displayd *display = gg->current_display;
 
-  cpanel->barchart_display_mode = GPOINTER_TO_INT(cbd);
+  cpanel->barchart_display_mode = gtk_combo_box_get_active(GTK_COMBO_BOX(w));
   sp->bar->is_spine = !sp->bar->is_spine;
   scatterplot_show_vrule(display, !sp->bar->is_spine);
 }
@@ -61,19 +60,20 @@ GtkWidget *cpanel_barchart_make(ggobid * gg)
   vb = gtk_vbox_new(false, 0);
   gtk_box_pack_start(GTK_BOX(panel), vb, false, false, 0);
 
-  lbl = gtk_label_new("Display mode:");
+  lbl = gtk_label_new_with_mnemonic("Display _mode:");
   gtk_misc_set_alignment(GTK_MISC(lbl), 0, 0.5);
   gtk_box_pack_start(GTK_BOX(vb), lbl, false, false, 0);
 
-  opt = gtk_option_menu_new();
-  gtk_widget_set_name(opt, "BARCHART:displ_mode_option_menu");
+  //opt = gtk_option_menu_new();
+  opt = gtk_combo_box_new_text();
+  gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), opt);
+  gtk_widget_set_name(opt, "BARCHART:display_mode_option_menu");
   gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), opt,
     "switch between height (bars) and width (spines) to represent count",
     NULL);
   gtk_box_pack_start(GTK_BOX(vb), opt, false, false, 0);
-  populate_option_menu(opt, display_mode_lbl,
-    sizeof(display_mode_lbl) / sizeof(gchar *),
-    (GtkSignalFunc) display_mode_cb, "GGobi", gg);
+  populate_combo_box(opt, display_mode_lbl, G_N_ELEMENTS(display_mode_lbl),
+    G_CALLBACK(display_mode_cb), gg);
 
   gtk_widget_show_all(panel);
 
@@ -84,8 +84,30 @@ GtkWidget *cpanel_barchart_make(ggobid * gg)
 /*                   Resetting the main menubar                       */
 /*--------------------------------------------------------------------*/
 
+static const gchar* mode_ui_str =
+"<ui>"
+"	<menubar>"
+"		<menu action='PMode'>"
+"			<menuitem action='ExtendedDisplayPMode'/>"
+"			<menuitem action='1D Tour'/>"
+"		</menu>"
+"		<menu action='IMode'>"
+"			<menuitem action='DefaultIMode'/>"
+"			<separator/>"
+"			<menuitem action='Scale'/>"
+"			<menuitem action='Brush'/>"
+"			<menuitem action='Identify'/>"
+"		</menu>"
+"	</menubar>"
+"</ui>";
 
 
+const gchar *
+barchart_mode_ui_get(displayd *display) {
+	return(mode_ui_str);
+}
+
+#if 0
 /*
   The useIds indicates whether the callback data should be integers
   identifying the menu item or the global gg.
@@ -166,6 +188,7 @@ GtkWidget *barchart_imode_menu_make(GtkAccelGroup * accel_group,
 
   return (menu);
 }
+#endif
 
 /*--------------------------------------------------------------------*/
 /*                   End of main menubar section                      */
@@ -181,9 +204,9 @@ void cpanel_barchart_set(displayd *display, cpaneld * cpanel, GtkWidget * panel,
 {
   GtkWidget *w;
 
-  w = widget_find_by_name(panel, "BARCHART:displ_mode_option_menu");
+  w = widget_find_by_name(panel, "BARCHART:display_mode_option_menu");
 
-  gtk_option_menu_set_history(GTK_OPTION_MENU(w),
+  gtk_combo_box_set_active(GTK_COMBO_BOX(w),
                               cpanel->barchart_display_mode);
 }
 
@@ -202,7 +225,7 @@ static gint key_press_cb(GtkWidget * w, GdkEventKey * event, splotd * sp)
   datad *d = display->d;
   vartabled *vtx;
 
-  barchartSPlotd *bsp = GTK_GGOBI_BARCHART_SPLOT(sp);
+  barchartSPlotd *bsp = GGOBI_BARCHART_SPLOT(sp);
 
   vtx = vartable_element_get(sp->p1dvar, d);
 
@@ -236,13 +259,15 @@ static gint key_press_cb(GtkWidget * w, GdkEventKey * event, splotd * sp)
 
     barchart_allocate_structure(sp, d);
     barchart_set_initials(sp, d);
-    barchart_recalc_counts(GTK_GGOBI_BARCHART_SPLOT(sp), d, gg);
+    barchart_recalc_counts(GGOBI_BARCHART_SPLOT(sp), d, gg);
     sp->redraw_style = FULL;
     splot_redraw(sp, sp->redraw_style, gg);
+	
+	return true;
   }
 
 
-  return true;
+  return false;
 }
 
 static gint
@@ -275,7 +300,7 @@ static gint
 mouse_motion_notify_cb(GtkWidget * w, GdkEventMotion * event, splotd * sp)
 {
   gboolean button1_p, button2_p;
-  barchartSPlotd *bsp = GTK_GGOBI_BARCHART_SPLOT(sp);
+  barchartSPlotd *bsp = GGOBI_BARCHART_SPLOT(sp);
 
   /*-- get the mouse position and find out which buttons are pressed --*/
   mousepos_get_motion(w, event, &button1_p, &button2_p, sp);
@@ -328,10 +353,10 @@ barchart_scale(gboolean button1_p, gboolean button2_p, splotd * sp)
   displayd *display = sp->displayptr;
   ggobid *gg = GGobiFromSPlot(sp);
   cpaneld *cpanel = &display->cpanel;
-  barchartSPlotd *bsp = GTK_GGOBI_BARCHART_SPLOT(sp);
+  barchartSPlotd *bsp = GGOBI_BARCHART_SPLOT(sp);
   datad *d = display->d;
-  GtkGGobiExtendedSPlotClass *klass;
-  klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT_GET_CLASS(sp));  
+  GGobiExtendedSPlotClass *klass;
+  klass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);  
 
   /*-- I'm not sure this could ever happen --*/
   if (sp->mousepos.x == sp->mousepos_o.x
@@ -379,7 +404,7 @@ barchart_scale(gboolean button1_p, gboolean button2_p, splotd * sp)
 
 
         if (set_anchor) {
-          barchart_recalc_counts(GTK_GGOBI_BARCHART_SPLOT(sp), d, gg);
+          barchart_recalc_counts(GGOBI_BARCHART_SPLOT(sp), d, gg);
           splot_redraw(sp, FULL, gg);
         } else {
           sp->pmid.y = pmid_old;
@@ -408,7 +433,7 @@ barchart_scale(gboolean button1_p, gboolean button2_p, splotd * sp)
           }
           if (set_breaks) {
             barchart_set_breakpoints(width, sp, d);
-            barchart_recalc_counts(GTK_GGOBI_BARCHART_SPLOT(sp), d, gg);
+            barchart_recalc_counts(GGOBI_BARCHART_SPLOT(sp), d, gg);
             splot_redraw(sp, FULL, gg);
           }
         }
@@ -447,7 +472,7 @@ button_press_cb(GtkWidget * w, GdkEventButton * event, splotd * sp)
   ggobid *gg = GGobiFromSPlot(sp);
   gboolean button1_p, button2_p;
   GdkRegion *region;
-  barchartSPlotd *bsp = GTK_GGOBI_BARCHART_SPLOT(sp);
+  barchartSPlotd *bsp = GGOBI_BARCHART_SPLOT(sp);
 
   mousepos_get_pressed(w, event, &button1_p, &button2_p, sp);
 
@@ -481,15 +506,15 @@ button_press_cb(GtkWidget * w, GdkEventButton * event, splotd * sp)
 
 void barchart_event_handlers_toggle(displayd * display, splotd * sp, gboolean state, ProjectionMode pmode, InteractionMode imode)
 {
-  if (!GTK_IS_GGOBI_WINDOW_DISPLAY(display))
+  if (!GGOBI_IS_WINDOW_DISPLAY(display))
     return;
 
   if (state == on) {
     GtkObject *winobj =
-        GTK_OBJECT(GTK_GGOBI_WINDOW_DISPLAY(display)->window);
+        GTK_OBJECT(GGOBI_WINDOW_DISPLAY(display)->window);
     sp->key_press_id =
-        gtk_signal_connect(winobj, "key_press_event",
-                           (GtkSignalFunc) key_press_cb, (gpointer) sp);
+        g_signal_connect(winobj, "key_press_event",
+                           G_CALLBACK(key_press_cb), (gpointer) sp);
 
   } else {
     disconnect_key_press_signal(sp);
@@ -503,24 +528,23 @@ void barchart_scale_event_handlers_toggle(splotd * sp, gboolean state)
 
   if (state == on) {
     GtkObject *winobj =
-        GTK_OBJECT(GTK_GGOBI_WINDOW_DISPLAY(display)->window);
-    if (GTK_IS_GGOBI_WINDOW_DISPLAY(display))
-      sp->key_press_id = gtk_signal_connect(winobj,
+        GTK_OBJECT(GGOBI_WINDOW_DISPLAY(display)->window);
+    if (GGOBI_IS_WINDOW_DISPLAY(display))
+      sp->key_press_id = g_signal_connect(winobj,
                                             "key_press_event",
-                                            (GtkSignalFunc) key_press_cb,
+                                            G_CALLBACK(key_press_cb),
                                             (gpointer) sp);
-    sp->press_id = gtk_signal_connect(GTK_OBJECT(sp->da),
+    sp->press_id = g_signal_connect(G_OBJECT(sp->da),
                                       "button_press_event",
-                                      (GtkSignalFunc) button_press_cb,
+                                      G_CALLBACK(button_press_cb),
                                       (gpointer) sp);
-    sp->release_id = gtk_signal_connect(GTK_OBJECT(sp->da),
+    sp->release_id = g_signal_connect(G_OBJECT(sp->da),
                                         "button_release_event",
-                                        (GtkSignalFunc) button_release_cb,
+                                        G_CALLBACK(button_release_cb),
                                         (gpointer) sp);
-    sp->motion_id = gtk_signal_connect(GTK_OBJECT(sp->da),
+    sp->motion_id = g_signal_connect(G_OBJECT(sp->da),
                                        "motion_notify_event",
-                                       (GtkSignalFunc)
-                                       mouse_motion_notify_cb,
+                                       G_CALLBACK(mouse_motion_notify_cb),
                                        (gpointer) sp);
   } else {
     disconnect_key_press_signal(sp);

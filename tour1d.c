@@ -166,12 +166,12 @@ tour1d_realloc_up (gint nc, datad *d, ggobid *gg)
   GList *l;
 
   for (l=gg->displays; l; l=l->next) {
-    GtkGGobiExtendedDisplayClass *klass;
+    GGobiExtendedDisplayClass *klass;
     dsp = (displayd *) l->data;
 
-    if(!GTK_IS_GGOBI_EXTENDED_DISPLAY(dsp))
+    if(!GGOBI_IS_EXTENDED_DISPLAY(dsp))
       continue;
-    klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(dsp));
+    klass = GGOBI_EXTENDED_DISPLAY_GET_CLASS(dsp);
     if(klass->tour1d_realloc)
         klass->tour1d_realloc(dsp, nc, d);
   }
@@ -322,28 +322,23 @@ display_tour1d_init (displayd *dsp, ggobid *gg)
   tour1d_speed_set_display(sessionOptions->defaultTour1dSpeed, dsp);
 }
 
-/*-- called from the Options menu --*/
 void
-tour1d_fade_vars_cb (GtkCheckMenuItem *w, guint action) 
+tour1d_fade_vars (gboolean fade, ggobid *gg) 
 {
-  ggobid *gg = GGobiFromWidget(GTK_WIDGET(w), true);
-
-  gg->tour1d.fade_vars = !gg->tour1d.fade_vars;
+  gg->tour1d.fade_vars = fade;
 }
 
-/*-- called from the Options menu --*/
 void
-tour1d_all_vars_cb (GtkCheckMenuItem *w, guint action) 
+tour1d_all_vars (displayd *dsp) 
 {
-  ggobid *gg = GGobiFromWidget(GTK_WIDGET(w), true);
-  displayd *dsp = gg->current_display; 
+  ggobid *gg = dsp->ggobi;
   datad *d = dsp->d;
   gint j;
 
-  gg->tour1d.all_vars = !gg->tour1d.all_vars;
+  //gg->tour1d.all_vars = !gg->tour1d.all_vars;
 
-  if (gg->tour1d.all_vars)
-  {
+  //if (gg->tour1d.all_vars)
+  //{
     for (j=0; j<d->ncols; j++) {
       dsp->t1d.subset_vars.els[j] = j;
       dsp->t1d.active_vars.els[j] = j;
@@ -365,7 +360,7 @@ tour1d_all_vars_cb (GtkCheckMenuItem *w, guint action)
       alloc_pp(&dsp->t1d_pp_param, d->nrows_in_plot, dsp->t1d.nactive, 1);
       t1d_pp_reinit(dsp, gg);
     }  
-  }
+  //}
 }
 
 static void 
@@ -828,10 +823,10 @@ g_printerr ("\n");*/
  /*  tour_reproject(dsp, 2);*/
 #ifdef TESTING_TOUR_STEP
 {
-  GtkGGobiDisplayClass *klass;
-  klass = GTK_GGOBI_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(dsp));
-  gtk_signal_emit(GTK_OBJECT(dsp),
-    klass->signals[TOUR_STEP_SIGNAL], dsp->t1d,
+  GGobiDisplayClass *klass;
+  klass = GGOBI_DISPLAY_GET_CLASS(dsp);
+  g_signal_emit(G_OBJECT(dsp),
+    klass->signals[TOUR_STEP_SIGNAL], 0, dsp->t1d,
     (gint) 1, gg);
 }
 #endif
@@ -867,13 +862,13 @@ void tour1d_func (gboolean state, displayd *dsp, ggobid *gg)
 {
   if (state) {
     if (dsp->t1d.idled == 0) {
-      dsp->t1d.idled = gtk_idle_add_priority (G_PRIORITY_LOW,
-                                     (GtkFunction) tour1d_idle_func, dsp);
+      dsp->t1d.idled = g_idle_add_full (G_PRIORITY_LOW,
+                                     (GtkFunction) tour1d_idle_func, dsp, NULL);
     }
     gg->tour1d.idled = 1;
   } else {
     if (dsp->t1d.idled) {
-      gtk_idle_remove (dsp->t1d.idled);
+      g_source_remove (dsp->t1d.idled);
       dsp->t1d.idled = 0;
     }
     gg->tour1d.idled = 0;

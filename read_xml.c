@@ -1936,7 +1936,7 @@ setDataset(const xmlChar **attrs, XMLParserData *parserData, enum xmlDataState t
   gchar *name;
   const gchar *tmp;
 
-  data = gtk_ggobi_data_new(parserData->gg);
+  data = ggobi_data_new(parserData->gg);
 
   data->readXMLRecord = readXMLRecord;
   parserData->counterVariableIndex = -1;
@@ -2085,10 +2085,10 @@ readXMLRecord(const xmlChar **attrs, XMLParserData *data)
   return(true);
 }
 
-char * const
-intern(XMLParserData *data, const char * const el)
+gchar *
+intern(XMLParserData *data, const char * el)
 {
- char * ans;
+ gchar * ans;
 
  if(data->idNamesTable == NULL) {
    data->idNamesTable = g_hash_table_new(g_str_hash, g_str_equal);  

@@ -459,8 +459,11 @@ GGOBI(get_mysql_login_info)(MySQLLoginInfo *info, ggobid *gg)
   guiInputs  = (MySQLGUIInput*) g_malloc(sizeof(MySQLGUIInput));
 
     /* Create the GUI and its components. */
-  dialog = gtk_dialog_new();
-  gtk_window_set_title(GTK_WINDOW(dialog), "MySQL Login & Query Settings");
+  dialog = gtk_dialog_new_with_buttons("MySQL Login & Query Settings", NULL, 0, 
+  				GTK_STOCK_OK, GTK_RESPONSE_ACCEPT,
+				GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT,
+				GTK_STOCK_HELP, GTK_RESPONSE_HELP, NULL);
+  //gtk_window_set_title(GTK_WINDOW(dialog), "MySQL Login & Query Settings");
 
   guiInputs->gg = gg;
   guiInputs->dialog = dialog;
@@ -496,9 +499,16 @@ GGOBI(get_mysql_login_info)(MySQLLoginInfo *info, ggobid *gg)
 
   gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), table, TRUE, TRUE, 0);
 
+  while(true) {
+	  response = gtk_dialog_run(GTK_DIALOG(dialog));
+	  if (response == GTK_RESPONSE_HELP)
+		  GGOBI(getMySQLGUIHelp)(guiInputs);
+	  else if (response == GTK_RESPONSE_CANCEL || GGOBI(getMySQLGUIInfo)(guiInputs))
+		  break;
+  }
 
       /* Now add the buttons at the bottom of the dialog. */
-  okay_button = gtk_button_new_with_label("Okay");
+  /*okay_button = gtk_button_new_with_label("Okay");
   cancel_button = gtk_button_new_with_label("Cancel");
   help_button = gtk_button_new_with_label("Help");
   gtk_container_add (GTK_CONTAINER (GTK_DIALOG(dialog)->action_area), okay_button);
@@ -506,17 +516,20 @@ GGOBI(get_mysql_login_info)(MySQLLoginInfo *info, ggobid *gg)
   gtk_container_add (GTK_CONTAINER (GTK_DIALOG(dialog)->action_area), help_button);
 
   gtk_widget_show_all(dialog);
-
+*/
       /* Now setup the action/signal handlers. */  
-  gtk_signal_connect (GTK_OBJECT (cancel_button), "clicked",
-                      GTK_SIGNAL_FUNC (GGOBI(cancelMySQLGUI)), guiInputs);
+  /*g_signal_connect (G_OBJECT (cancel_button), "clicked",
+                      G_CALLBACK (GGOBI(cancelMySQLGUI)), guiInputs);
 
-  gtk_signal_connect (GTK_OBJECT (okay_button), "clicked",
-                      GTK_SIGNAL_FUNC (GGOBI(getMySQLGUIInfo)), guiInputs);
-  gtk_signal_connect (GTK_OBJECT (help_button), "clicked",
-                      GTK_SIGNAL_FUNC (GGOBI(getMySQLGUIHelp)), guiInputs);
+  g_signal_connect (G_OBJECT (okay_button), "clicked",
+                      G_CALLBACK (GGOBI(getMySQLGUIInfo)), guiInputs);
+  g_signal_connect (G_OBJECT (help_button), "clicked",
+                      G_CALLBACK (GGOBI(getMySQLGUIHelp)), guiInputs);
+*/
 
-
+  gtk_widget_destroy(dialog);
+  g_free(guiInputs);
+  
   return(NULL);
 }
 
@@ -530,7 +543,7 @@ GGOBI(get_mysql_login_info)(MySQLLoginInfo *info, ggobid *gg)
    and the array of input/entry widgets.
  */
 void
-GGOBI(getMySQLGUIInfo)(GtkButton *button, MySQLGUIInput *guiInput)
+GGOBI(getMySQLGUIInfo)(MySQLGUIInput *guiInput)
 {
  ggobid *gg = guiInput->gg;
  gint i;
@@ -566,16 +579,16 @@ GGOBI(getMySQLGUIInfo)(GtkButton *button, MySQLGUIInput *guiInput)
 /*
   Close the specified dialog and free up the associated GUI info.
  */
-
+/*
 void
 GGOBI(cancelMySQLGUI)(GtkButton *button, MySQLGUIInput *guiInput)
 {
   gtk_widget_destroy (guiInput->dialog);
   g_free (guiInput);
 }
-
+*/
 void
-GGOBI(getMySQLGUIHelp)(GtkButton *button, MySQLGUIInput *guiInput)
+GGOBI(getMySQLGUIHelp)(MySQLGUIInput *guiInput)
 {
   quick_message("GGobi/MySQL help not implemented yet!", false);
 }

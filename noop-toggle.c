@@ -6,7 +6,7 @@
 static GtkObjectClass* parent_class = NULL;
 
 static void
-gtk_noop_toggle_button_destroy(GtkObject* obj)
+ggobi_noop_toggle_button_destroy(GtkObject* obj)
 {
   if (parent_class->destroy)
     parent_class->destroy(obj);
@@ -29,59 +29,60 @@ button_press_event(GtkWidget* w, GdkEventButton* event)
 }
 
 static void
-gtk_noop_toggle_button_class_init(GtkNoopToggleButtonClass* klass)
+ggobi_noop_toggle_button_class_init(GGobiNoopToggleButtonClass* klass)
 {
   GtkObjectClass* object_class = (GtkObjectClass*)klass;
   GtkWidgetClass* widget_class = GTK_WIDGET_CLASS(klass);
 
-  parent_class = gtk_type_class(GTK_TYPE_TOGGLE_BUTTON);
+  parent_class = g_type_class_peek(GTK_TYPE_TOGGLE_BUTTON);
 
-  object_class->destroy = gtk_noop_toggle_button_destroy;
+  object_class->destroy = ggobi_noop_toggle_button_destroy;
   widget_class->button_press_event = button_press_event;
 }
 
 static void
-gtk_noop_toggle_button_init(GtkNoopToggleButton* obj)
+ggobi_noop_toggle_button_init(GGobiNoopToggleButton* obj)
 {
   /* Initialize any state here. */
 }
 
-GtkType
-gtk_noop_toggle_button_get_type(void)
+GType
+ggobi_noop_toggle_button_get_type(void)
 {
-  static GtkType gtk_noop_toggle_button_type = 0;
-  if (!gtk_noop_toggle_button_type) {
-    static const GtkTypeInfo gtk_noop_toggle_button_info = {
-      "GtkNoopToggleButton",
-      sizeof(GtkNoopToggleButton),
-      sizeof(GtkNoopToggleButtonClass),
-      (GtkClassInitFunc) gtk_noop_toggle_button_class_init,
-      (GtkObjectInitFunc)gtk_noop_toggle_button_init,
-      NULL, NULL, (GtkClassInitFunc)NULL
+  static GType ggobi_noop_toggle_button_type = 0;
+  if (!ggobi_noop_toggle_button_type) {
+    static const GTypeInfo ggobi_noop_toggle_button_info = {
+      sizeof(GGobiNoopToggleButtonClass),
+      NULL, NULL,
+	  (GClassInitFunc)ggobi_noop_toggle_button_class_init,
+      NULL, NULL,
+      sizeof(GGobiNoopToggleButton), 0,
+      (GInstanceInitFunc)ggobi_noop_toggle_button_init,
+      NULL
     };
-    gtk_noop_toggle_button_type = gtk_type_unique(GTK_TYPE_TOGGLE_BUTTON,
-      &gtk_noop_toggle_button_info);
+    ggobi_noop_toggle_button_type = g_type_register_static(GTK_TYPE_TOGGLE_BUTTON, "GGobiNoopToggleButton",
+      &ggobi_noop_toggle_button_info, 0);
   }
-  return gtk_noop_toggle_button_type;
+  return ggobi_noop_toggle_button_type;
 }
 
 GtkWidget*
-gtk_noop_toggle_button_new(void)
+ggobi_noop_toggle_button_new(void)
 {
   /* Do initialization up in _init(), not here.  If you need to
      pass in args to _new, write a _construct() function that
      takes those args and applies them to the object you build here
      before returning it. */
-  return GTK_WIDGET(gtk_type_new(gtk_noop_toggle_button_get_type()));
+  return GTK_WIDGET(g_object_new(ggobi_noop_toggle_button_get_type(), NULL));
 }
 
 GtkWidget*
-gtk_noop_toggle_button_new_with_label (const gchar *label)
+ggobi_noop_toggle_button_new_with_label (const gchar *label)
 {
   GtkWidget *noop_toggle_button;
   GtkWidget *label_widget;
 
-  noop_toggle_button = gtk_noop_toggle_button_new ();
+  noop_toggle_button = ggobi_noop_toggle_button_new ();
   label_widget = gtk_label_new (label);
   gtk_misc_set_alignment (GTK_MISC (label_widget), 0, 0.5);
 

@@ -66,7 +66,8 @@ extern "C" {
   @see GGobi_getVersionNumbers()
 */
 /*extern char const * GGOBI(getVersionDate)(void);*/
-extern char * const GGOBI(getVersionDate)(void);
+/* I think these should be 'const char *' and not 'char * const' - mfl */
+extern const char * GGOBI(getVersionDate)(void);
 
 /**
  @ingroup Version
@@ -76,7 +77,7 @@ extern char * const GGOBI(getVersionDate)(void);
   bugs have been fixed, etc. 
 */
 /*extern  char const * GGobi_getVersionString();*/
-extern char * const GGobi_getVersionString();
+extern const char * GGobi_getVersionString();
 
 /**
  @ingroup Version
@@ -87,7 +88,7 @@ extern char * const GGobi_getVersionString();
   of this version of the GGobi software.
 */
 /*extern  int const * GGobi_getVersionNumbers();*/
-extern int * const GGobi_getVersionNumbers();
+extern const int * GGobi_getVersionNumbers();
 
 
 /**
@@ -122,11 +123,9 @@ const gchar *GGobi_setFileName(const gchar *fileName, DataMode data_mode, ggobid
   or ASCII file.
  */
 extern DataMode GGobi_getDataMode(ggobid *gg);
-/**
- @ingroup GGobi
- */
-/*extern const gchar const * GGobi_getDataModeDescription(DataMode mode);*/
-extern const gchar * const GGobi_getDataModeDescription(DataMode mode);
+
+/* I don't think this is defined anymore - mfl */
+/*extern const gchar * const GGobi_getDataModeDescription(DataMode mode);*/
 
 /**
  @ingroup GGobi
@@ -395,8 +394,8 @@ extern gint *GGobi_getGlyphTypes(gint *n);
   is contained in the value of the argument (n).
  @ingroup Glyphs
  */
-/*extern const gchar * const * GGobi_getGlyphTypeNames(gint *n);*/
-extern const gchar ** const GGobi_getGlyphTypeNames(gint *n);
+extern const gchar * const * GGobi_getGlyphTypeNames(gint *n);
+/*extern const gchar ** const GGobi_getGlyphTypeNames(gint *n);*/
 
 /**
  Get the symbolic name of the glyph corresponding to the
@@ -712,7 +711,7 @@ gboolean GGobi_registerColorMap(ggobid *gg);
  @param gg
  */
 /*extern const gchar const * GGobi_getColorName(gint cid, ggobid *gg, gboolean inDefault);*/
-extern const gchar * const GGobi_getColorName(gint cid, ggobid *gg, gboolean inDefault);
+extern const gchar * /*const*/ GGobi_getColorName(gint cid, ggobid *gg, gboolean inDefault);
 
 
 
@@ -769,6 +768,12 @@ extern gint GGobi_setIMode(const gchar *name, ggobid *gg);
  */
 extern const gchar *GGobi_getPModeName(gint which);
 extern const gchar *GGobi_getIModeName(gint which);
+/**
+ As above, except it gives the name as it is displayed on the screen
+*/
+const gchar *GGobi_getIModeScreenName(int which, displayd *display);
+const gchar *GGobi_getPModeScreenName(int which, displayd *display);
+
 
 /**
  ? 

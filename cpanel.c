@@ -81,8 +81,8 @@ cpanel_set (displayd *display, ggobid *gg)
   cpaneld *cpanel = &display->cpanel;
   gboolean displaytype_known = true;
 
-  if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
-   displaytype_known = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display))->cpanel_set(display, cpanel, gg);
+  if(GGOBI_IS_EXTENDED_DISPLAY(display)) {
+   displaytype_known = GGOBI_EXTENDED_DISPLAY_GET_CLASS(display)->cpanel_set(display, cpanel, gg);
   }
 
   if (displaytype_known) { 

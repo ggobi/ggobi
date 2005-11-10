@@ -64,13 +64,6 @@ delete_vars_cb (GtkWidget *w, ggobid *gg)
 /*-------------------------------------------------------------------------*/
 
 static void
-dialog_range_cancel (GtkWidget *w, ggobid *gg) 
-{
-  GtkWidget *dialog = gtk_widget_get_toplevel (w);
-  gtk_widget_destroy (dialog);
-}
-
-static void
 limits_type_cb (GtkToggleButton *w, ggobid *gg) 
 {
   gg->lims_use_visible = w->active;
@@ -79,9 +72,10 @@ limits_type_cb (GtkToggleButton *w, ggobid *gg)
 static void
 dialog_range_set (GtkWidget *w, ggobid *gg) 
 {
-  GtkWidget *dialog = gtk_widget_get_toplevel (w);
+  GtkWidget *dialog = w;
   GtkWidget *umin_entry, *umax_entry;
-  GtkCList *clist = vartable_clist_get (gg);
+  //GtkWidget *tree_view = vartable_tree_view_get (gg);
+  GtkTreeModel *model;
   datad *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
   gint *cols = (gint *) g_malloc (d->ncols * sizeof (gint));
   gint ncols = selected_cols_get (cols, d, gg);
@@ -126,17 +120,19 @@ dialog_range_set (GtkWidget *w, ggobid *gg)
   } else {
 
     for (k=0; k<ncols; k++) {
+	  GtkTreeIter iter;
+	  
       j = cols[k];
-      vt = vartable_element_get (j, d);
+	  vt = vartable_element_get (j, d);
 
+	  vartable_iter_from_varno(j, d, &model, &iter);
+      
       vt->lim_specified.min = vt->lim_specified_tform.min = min_val;
       vt->lim_specified.max = vt->lim_specified_tform.max = max_val;
 
-      gtk_clist_set_text (clist, j, REAL_CLIST_USER_MIN,
-        g_strdup_printf("%8.3f", min_val));
-      gtk_clist_set_text (clist, j, REAL_CLIST_USER_MAX,
-        g_strdup_printf("%8.3f", max_val));
-
+	  gtk_tree_store_set(GTK_TREE_STORE(model), &iter, 
+	  	VT_REAL_USER_MIN, min_val, VT_REAL_USER_MAX, max_val, -1);
+      
       vt->lim_specified_p = min_p && max_p;
     }
 
@@ -153,7 +149,6 @@ dialog_range_set (GtkWidget *w, ggobid *gg)
   }
 
   g_free (cols);
-  gtk_widget_destroy (dialog);
 }
 
 static void
@@ -182,7 +177,7 @@ static void rescale_cb (GtkWidget *w, ggobid *gg) {
 static void
 open_range_set_dialog (GtkWidget *w, ggobid *gg)
 {
-  GtkWidget *frame, *vb, *hb, *btn, *okay_btn, *cancel_btn;
+  GtkWidget *frame, *vb, *hb, *btn, *lbl;
   GtkWidget *dialog, *umin, *umax;
   GtkWidget *radio1, *radio2;
   GSList *group;
@@ -207,9 +202,10 @@ open_range_set_dialog (GtkWidget *w, ggobid *gg)
   }
   g_free (cols);
   if (!ok)
-/**/return;
+	  return;
 
-  dialog = gtk_dialog_new ();
+  dialog = gtk_dialog_new_with_buttons ("Range dialog", NULL, 0, 
+  			GTK_STOCK_OK, GTK_RESPONSE_ACCEPT, GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT, NULL);
 
   /*-- frame for a pair of radio buttons --*/
   frame = gtk_frame_new ("Define rescaling behavior");
@@ -220,17 +216,17 @@ open_range_set_dialog (GtkWidget *w, ggobid *gg)
   gtk_container_set_border_width (GTK_CONTAINER (vb), 5);
   gtk_container_add (GTK_CONTAINER (frame), vb);
 
-  radio1 = gtk_radio_button_new_with_label (NULL, "Use visible points");
+  radio1 = gtk_radio_button_new_with_mnemonic (NULL, "Use _visible points");
   GTK_TOGGLE_BUTTON (radio1)->active = TRUE;
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), radio1,
     "When rescaling, use only the cases that are visible: ie, not hidden by brushing and not excluded by subsampling",
     NULL);
-  gtk_signal_connect (GTK_OBJECT (radio1), "toggled",
-                      GTK_SIGNAL_FUNC (limits_type_cb), gg);
+  g_signal_connect (G_OBJECT (radio1), "toggled",
+                      G_CALLBACK (limits_type_cb), gg);
   gtk_box_pack_start (GTK_BOX (vb), radio1, false, false, 0);
 
-  group = gtk_radio_button_group (GTK_RADIO_BUTTON (radio1));
-  radio2 = gtk_radio_button_new_with_label (group, "Use all points");
+  group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (radio1));
+  radio2 = gtk_radio_button_new_with_mnemonic (group, "Use _all points");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), radio2,
     "When rescaling, use all cases",
     NULL);
@@ -249,20 +245,13 @@ open_range_set_dialog (GtkWidget *w, ggobid *gg)
 
   /*-- make an hbox to hold a label and a text entry widget --*/
   hb = gtk_hbox_new (true, 5);
-  gtk_box_pack_start (GTK_BOX (hb), gtk_label_new ("Minimum: "),
-    true, true, 0);
+  lbl = gtk_label_new_with_mnemonic ("M_inimum: ");
+  gtk_box_pack_start (GTK_BOX (hb), lbl, true, true, 0);
 
   umin = gtk_entry_new ();
-#if GTK_MAJOR_VERSION == 2
-  gtk_widget_set_usize (umin,
-    gdk_string_width (gtk_style_get_font (umin->style), 
-      "0000000000"), -1);
-#else
-  gtk_widget_set_usize (umin,
-    gdk_string_width (umin->style->font,
-      "0000000000"), -1);
-#endif
-
+  gtk_entry_set_width_chars(GTK_ENTRY(umin), 10);
+  gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), umin);
+  
   gtk_widget_set_name (umin, "umin_entry");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), umin,
     "Minimum for the selected variable(s)", NULL);
@@ -272,20 +261,14 @@ open_range_set_dialog (GtkWidget *w, ggobid *gg)
 
   /*-- make another hbox --*/
   hb = gtk_hbox_new (true, 5);
-  gtk_box_pack_start (GTK_BOX (hb), gtk_label_new ("Maximum: "),
+  lbl = gtk_label_new_with_mnemonic ("M_aximum: ");
+  gtk_box_pack_start (GTK_BOX (hb), lbl,
     true, true, 2);
 
   umax = gtk_entry_new ();
-#if GTK_MAJOR_VERSION == 2
-  gtk_widget_set_usize (umax,
-    gdk_string_width (gtk_style_get_font (umax->style), 
-      "0000000000"), -1);
-#else
-  gtk_widget_set_usize (umax,
-    gdk_string_width (umax->style->font,
-      "0000000000"), -1);
-#endif
-
+  gtk_entry_set_width_chars(GTK_ENTRY(umin), 10);
+  gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), umax);
+  
   gtk_widget_set_name (umax, "umax_entry");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), umax,
     "Maximum for the selected variable(s)", NULL);
@@ -302,34 +285,25 @@ open_range_set_dialog (GtkWidget *w, ggobid *gg)
   gtk_container_set_border_width (GTK_CONTAINER (vb), 5);
   gtk_container_add (GTK_CONTAINER (frame), vb);
 
-  btn = gtk_button_new_with_label ("Clear user limits");
+  btn = gtk_button_new_with_mnemonic ("_Clear user limits");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Unset user min and max for the selected variable(s)", NULL);
   gtk_box_pack_start (GTK_BOX (vb), btn, false, false, 1);
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                      GTK_SIGNAL_FUNC (range_unset_cb), gg);
+  g_signal_connect (G_OBJECT (btn), "clicked",
+                      G_CALLBACK (range_unset_cb), gg);
   /*-- --*/
 
-  /*-- ok button --*/
-  okay_btn = gtk_button_new_with_label ("Okay");
-  gtk_signal_connect (GTK_OBJECT (okay_btn), "clicked",
-    GTK_SIGNAL_FUNC (dialog_range_set), gg);
-  gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->action_area),
-    okay_btn);
+  gtk_widget_show_all(GTK_DIALOG(dialog)->vbox);
+  
+  if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT)
+	  dialog_range_set(dialog, gg);
 
-  /*-- cancel button --*/
-  cancel_btn = gtk_button_new_with_label ("Close");
-  gtk_signal_connect (GTK_OBJECT (cancel_btn), "clicked",
-    GTK_SIGNAL_FUNC (dialog_range_cancel), gg);
-  gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->action_area),
-    cancel_btn);
-
-  gtk_widget_show_all (dialog);
+  gtk_widget_destroy(dialog);
 }
 
 void range_unset (ggobid *gg)
 {
-  GtkCList *clist = vartable_clist_get (gg);
+  GtkTreeModel *model;
   datad *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
   gint *cols = (gint *) g_malloc (d->ncols * sizeof (gint));
   gint ncols = selected_cols_get (cols, d, gg);
@@ -337,12 +311,17 @@ void range_unset (ggobid *gg)
   vartabled *vt;
 
   for (k=0; k<ncols; k++) {
+	  GtkTreeIter iter;
+	  
     j = cols[k];
     vt = vartable_element_get (j, d);
+	
+	vartable_iter_from_varno(j, d, &model, &iter);
+	  
     vt->lim_specified_p = false;
     /*-- then null out the two entries in the table --*/
-    gtk_clist_set_text (clist, j, REAL_CLIST_USER_MIN, g_strdup(""));
-    gtk_clist_set_text (clist, j, REAL_CLIST_USER_MAX, g_strdup(""));
+    gtk_tree_store_set(GTK_TREE_STORE(model), &iter, 
+	  	VT_REAL_USER_MIN, 0.0, VT_REAL_USER_MAX, 0.0, -1);
   }
   g_free ((gchar *) cols);
 
@@ -362,16 +341,9 @@ void range_unset (ggobid *gg)
 /*-------------------------------------------------------------------------*/
 
 static void
-dialog_newvar_cancel (GtkWidget *w, ggobid *gg) 
-{
-  GtkWidget *dialog = gtk_widget_get_toplevel (w);
-  gtk_widget_destroy (dialog);
-}
-
-static void
 dialog_newvar_add (GtkWidget *w, ggobid *gg) 
 {
-  GtkWidget *dialog = gtk_widget_get_toplevel (w);
+  GtkWidget *dialog = w;
   GtkWidget *entry, *radio_brush;
   datad *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
   gint vtype;
@@ -413,8 +385,6 @@ dialog_newvar_add (GtkWidget *w, ggobid *gg)
     gtk_adjustment_value_changed (adj);
 #endif
 
-    /*-- destroy the dialog widget --*/
-    gtk_widget_destroy (dialog);
   }
 }
 
@@ -422,12 +392,12 @@ static void
 open_newvar_dialog (GtkWidget *w, ggobid *gg)
 {
   GtkWidget *dialog;
-  GtkWidget *frame, *vb, *hb, *okay_btn, *cancel_btn;
+  GtkWidget *frame, *vb, *hb, *lbl;
   GtkWidget *radio1, *radio2, *entry;
   GSList *radio_group;
 
-  dialog = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW (dialog), "Add new variable");
+  dialog = gtk_dialog_new_with_buttons ("Add new variable", NULL, 0, GTK_STOCK_OK,
+  				GTK_RESPONSE_ACCEPT, GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT, NULL);
   frame = gtk_frame_new ("Variable values");
   gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
   gtk_box_pack_start (GTK_BOX (GTK_DIALOG (dialog)->vbox), frame,
@@ -437,15 +407,15 @@ open_newvar_dialog (GtkWidget *w, ggobid *gg)
   vb = gtk_vbox_new (false, 2);
   gtk_container_add (GTK_CONTAINER (frame), vb);
 
-  radio1 = gtk_radio_button_new_with_label (NULL, "1:n");
+  radio1 = gtk_radio_button_new_with_mnemonic (NULL, "1:_n");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), radio1,
     "Add a variable whose values run from 1 to the number of cases",
     NULL);
   gtk_box_pack_start (GTK_BOX (vb), radio1, false, false, 2);
 
-  radio_group = gtk_radio_button_group (GTK_RADIO_BUTTON (radio1));
+  radio_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (radio1));
 
-  radio2 = gtk_radio_button_new_with_label (radio_group, "Brushed groups");
+  radio2 = gtk_radio_button_new_with_mnemonic (radio_group, "Brushed _groups");
   gtk_widget_set_name (radio2, "radio_brush");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), radio2,
     "Add a variable whose values are based on the groups defined by brushing",
@@ -454,9 +424,11 @@ open_newvar_dialog (GtkWidget *w, ggobid *gg)
 
   /*-- label and entry --*/
   hb = gtk_hbox_new (false, 2);
-  gtk_box_pack_start (GTK_BOX (hb), gtk_label_new ("Variable name: "),
+  lbl = gtk_label_new_with_mnemonic ("Variable _name: ");
+  gtk_box_pack_start (GTK_BOX (hb), lbl,
     true, true, 2);
   entry = gtk_entry_new();
+  gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), entry);
   gtk_entry_set_text (GTK_ENTRY (entry), "foo");
   gtk_widget_set_name (entry, "newvar_entry");
 
@@ -465,21 +437,12 @@ open_newvar_dialog (GtkWidget *w, ggobid *gg)
   gtk_box_pack_start (GTK_BOX (GTK_DIALOG (dialog)->vbox), hb,
     false, false, 2);
 
-  /*-- ok button --*/
-  okay_btn = gtk_button_new_with_label ("Okay");
-  gtk_signal_connect (GTK_OBJECT (okay_btn), "clicked",
-    GTK_SIGNAL_FUNC (dialog_newvar_add), gg);
-  gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->action_area),
-    okay_btn);
-
-  /*-- cancel button --*/
-  cancel_btn = gtk_button_new_with_label ("Close");
-  gtk_signal_connect (GTK_OBJECT (cancel_btn), "clicked",
-    GTK_SIGNAL_FUNC (dialog_newvar_cancel), gg);
-  gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->action_area),
-    cancel_btn);
-
-  gtk_widget_show_all (dialog);
+	gtk_widget_show_all(GTK_DIALOG(dialog)->vbox);
+	
+	if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT)
+		dialog_newvar_add(dialog, gg);
+	
+  gtk_widget_destroy(dialog);
 }
 
 
@@ -490,7 +453,7 @@ open_newvar_dialog (GtkWidget *w, ggobid *gg)
 static void
 dialog_rename_var (GtkWidget *w, ggobid *gg) 
 {
-  GtkWidget *dialog = gtk_widget_get_toplevel (w);
+  GtkWidget *dialog = w;
   GtkWidget *entry;
   datad *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
   gchar *vname;
@@ -526,8 +489,7 @@ dialog_rename_var (GtkWidget *w, ggobid *gg)
 static void
 open_rename_dialog (GtkWidget *w, ggobid *gg)
 {
-  GtkWidget *dialog, *hb, *entry;
-  GtkWidget *okay_btn, *cancel_btn;
+  GtkWidget *dialog, *hb, *entry, *lbl;
   datad *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
   gint *selected_vars, nselected_vars = 0;
   vartabled *vt;
@@ -540,18 +502,19 @@ open_rename_dialog (GtkWidget *w, ggobid *gg)
     gchar *message = g_strdup_printf ("You must select one variable.\n");
     quick_message (message, false);
     g_free (message);
-/**/return;
+	return;
   }
 
-  dialog = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW (dialog), "Rename one variable");
-
+  dialog = gtk_dialog_new_with_buttons ("Rename one variable", NULL, 0, 
+  			GTK_STOCK_OK, GTK_RESPONSE_ACCEPT, GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT, NULL);
+ 
   /*-- label and entry --*/
   hb = gtk_hbox_new (false, 2);
-  gtk_box_pack_start (GTK_BOX (hb), gtk_label_new ("Variable name: "),
+  lbl = gtk_label_new ("Variable _name: ");
+  gtk_box_pack_start (GTK_BOX (hb), lbl,
     true, true, 2);
   entry = gtk_entry_new();
-
+  gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), entry);
   /*-- label it with the name of the variable being renamed --*/
   vt = vartable_element_get (selected_vars[0], d);
   gtk_entry_set_text (GTK_ENTRY (entry), vt->collab);
@@ -561,36 +524,28 @@ open_rename_dialog (GtkWidget *w, ggobid *gg)
 
   gtk_box_pack_start (GTK_BOX (GTK_DIALOG (dialog)->vbox), hb,
     false, false, 2);
+	
+  gtk_widget_show_all(GTK_DIALOG(dialog)->vbox);
 
-  /*-- ok button --*/
-  okay_btn = gtk_button_new_with_label ("Okay");
-  gtk_signal_connect (GTK_OBJECT (okay_btn), "clicked",
-    GTK_SIGNAL_FUNC (dialog_rename_var), gg);
-  gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->action_area),
-    okay_btn);
+  if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT)
+	  dialog_rename_var(dialog, gg);
 
-  /*-- cancel button --*/
-  cancel_btn = gtk_button_new_with_label ("Close");
-  gtk_signal_connect (GTK_OBJECT (cancel_btn), "clicked",
-    GTK_SIGNAL_FUNC (dialog_newvar_cancel), gg);
-  gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->action_area),
-    cancel_btn);
-
-  gtk_widget_show_all (dialog);
-
+  gtk_widget_destroy(dialog);
 }
 
 /*-------------------------------------------------------------------------*/
 
 void select_all_cb (GtkWidget *w, ggobid *gg)
 {
-  GtkCList *clist = vartable_clist_get (gg);
-  gtk_clist_select_all (clist);
+  GtkWidget *tree_view = vartable_tree_view_get (gg);
+  GtkTreeSelection *tree_sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view));
+  gtk_tree_selection_select_all(tree_sel);
 }
 void deselect_all_cb (GtkWidget *w, ggobid *gg)
 {
-  GtkCList *clist = vartable_clist_get (gg);
-  gtk_clist_unselect_all (clist);
+  GtkWidget *tree_view = vartable_tree_view_get (gg);
+  GtkTreeSelection *tree_sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view));
+  gtk_tree_selection_unselect_all(tree_sel);
 }
 
 GtkWidget *
@@ -603,19 +558,19 @@ vartable_buttonbox_build (ggobid *gg) {
   /*-- Make and clear selections --*/
   hb = gtk_hbox_new (false, 2);
 
-  btn = gtk_button_new_with_label ("Select all");
+  btn = gtk_button_new_with_mnemonic ("_Select all");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Select all variables", NULL);
   gtk_box_pack_start (GTK_BOX (hb), btn, false, false, 1);
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                      GTK_SIGNAL_FUNC (select_all_cb), gg);
+  g_signal_connect (G_OBJECT (btn), "clicked",
+                      G_CALLBACK (select_all_cb), gg);
 
-  btn = gtk_button_new_with_label ("Clear selection");
+  btn = gtk_button_new_with_mnemonic ("Clear s_election");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Deselect all variables", NULL);
   gtk_box_pack_start (GTK_BOX (hb), btn, false, false, 1);
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                      GTK_SIGNAL_FUNC (deselect_all_cb), gg);
+  g_signal_connect (G_OBJECT (btn), "clicked",
+                      G_CALLBACK (deselect_all_cb), gg);
 
   gtk_box_pack_start (GTK_BOX (hbox), hb, true, false, 1);
   /*-- --*/
@@ -624,20 +579,20 @@ vartable_buttonbox_build (ggobid *gg) {
   hb = gtk_hbox_new (false, 2);
 
   /*-- set and clear variable ranges --*/
-  btn = gtk_button_new_with_label ("Limits ... ");
+  btn = gtk_button_new_with_mnemonic ("_Limits ... ");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Set user min and max for the selected variable(s), and define rescaling behavior", NULL);
   gtk_box_pack_start (GTK_BOX (hb), btn, true, false, 1);
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                      GTK_SIGNAL_FUNC (open_range_set_dialog), gg);
+  g_signal_connect (G_OBJECT (btn), "clicked",
+                      G_CALLBACK (open_range_set_dialog), gg);
 
   /*-- rescale after resetting variable ranges --*/
-  btn = gtk_button_new_with_label ("Rescale");
+  btn = gtk_button_new_with_mnemonic ("Resc_ale");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Rescale plots using specified limits and scaling behavior", NULL);
   gtk_box_pack_start (GTK_BOX (hb), btn, false, false, 1);
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                      GTK_SIGNAL_FUNC (rescale_cb), gg);
+  g_signal_connect (G_OBJECT (btn), "clicked",
+                      G_CALLBACK (rescale_cb), gg);
 
   gtk_box_pack_start (GTK_BOX (hbox), hb, true, false, 1);
   /*--  --*/
@@ -646,20 +601,20 @@ vartable_buttonbox_build (ggobid *gg) {
   hb = gtk_hbox_new (false, 2);
   /*-- Clone or delete selected variables --*/
 
-  btn = gtk_button_new_with_label ("Clone");
+  btn = gtk_button_new_with_mnemonic ("Cl_one");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Clone selected variables", NULL);
   gtk_box_pack_start (GTK_BOX (hb), btn, false, false, 1);
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                      GTK_SIGNAL_FUNC (clone_vars_cb), gg);
+  g_signal_connect (G_OBJECT (btn), "clicked",
+                      G_CALLBACK (clone_vars_cb), gg);
 
   /*-- New variable: index, derived from brushing, ... --*/
-  btn = gtk_button_new_with_label ("New ...");
+  btn = gtk_button_new_with_mnemonic ("_New");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Add a new variable", NULL);
   gtk_box_pack_start (GTK_BOX (hb), btn, false, false, 1);
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                      GTK_SIGNAL_FUNC (open_newvar_dialog), gg);
+  g_signal_connect (G_OBJECT (btn), "clicked",
+                      G_CALLBACK (open_newvar_dialog), gg);
   /*-- --*/
 
 /*
@@ -668,8 +623,8 @@ vartable_buttonbox_build (ggobid *gg) {
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Delete selected variables", NULL);
   gtk_box_pack_start (GTK_BOX (hb), btn, false, false, 1);
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                      GTK_SIGNAL_FUNC (delete_vars_cb), gg);
+  g_signal_connect (G_OBJECT (btn), "clicked",
+                      G_CALLBACK (delete_vars_cb), gg);
   gtk_widget_set_sensitive (btn, false);
 */
 
@@ -677,20 +632,20 @@ vartable_buttonbox_build (ggobid *gg) {
   /*-- --*/
 
   /*-- Rename one variable ... --*/
-  btn = gtk_button_new_with_label ("Rename ...");
+  btn = gtk_button_new_with_mnemonic ("Rena_me ...");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Rename one variable -- one variable must be selected", NULL);
   gtk_box_pack_start (GTK_BOX (hbox), btn, true, false, 1);
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                      GTK_SIGNAL_FUNC (open_rename_dialog), gg);
+  g_signal_connect (G_OBJECT (btn), "clicked",
+                      G_CALLBACK (open_rename_dialog), gg);
   /*-- --*/
 
-  btn = gtk_button_new_with_label ("Close");
+  btn = gtk_button_new_from_stock (GTK_STOCK_CLOSE);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Close the window", NULL);
   gtk_box_pack_start (GTK_BOX (hbox), btn, true, false, 1);
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                      GTK_SIGNAL_FUNC (close_btn_cb), gg);
+  g_signal_connect (G_OBJECT (btn), "clicked",
+                      G_CALLBACK (close_btn_cb), gg);
 
   return hbox;
 }

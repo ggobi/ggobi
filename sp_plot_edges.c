@@ -56,9 +56,9 @@ splot_plot_edge (gint m, datad *d, datad *e,
   
   /*-- can prevent drawing of missings for parcoords or scatmat plots --*/
   else if (e->nmissing > 0 && !e->missings_show_p) {
-    if (GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
-      GtkGGobiExtendedSPlotClass *klass;
-      klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT_GET_CLASS(sp));
+    if (GGOBI_IS_EXTENDED_SPLOT(sp)) {
+      GGobiExtendedSPlotClass *klass;
+      klass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);
       if (klass->draw_edge_p) {
         draw_edge = klass->draw_edge_p(sp, m, d, e, gg);
       }
@@ -83,9 +83,9 @@ splot_hidden_edge (gint m, datad *d, datad *e,
   /*-- can prevent drawing of missings for parcoords or scatmat plots --*/
 /*
   } else if (e->nmissing > 0 && !e->missings_show_p) {
-    if (GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
-      GtkGGobiExtendedSPlotClass *klass;
-      klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass);
+    if (GGOBI_IS_EXTENDED_SPLOT(sp)) {
+      GGobiExtendedSPlotClass *klass;
+      klass = GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass);
       if (klass->draw_edge_p) {
         draw_edge = klass->draw_edge_p(sp, m, d, e, gg);
       }
@@ -271,7 +271,7 @@ splot_edges_draw (splotd *sp, gboolean draw_hidden, GdkDrawable *drawable,
 
             lwidth = (k<3) ? 0 : (k-2)*2;
             if (edges_show_p) {
-              gchar dash_list[2];
+              gint8 dash_list[2];
 
               switch (n) {
                 case SOLID:
@@ -378,12 +378,11 @@ splot_add_edge_label (splotd *sp, GdkDrawable *drawable, gint k,
   displayd *dsp = (displayd *) sp->displayptr;
   datad *d = dsp->d;
   datad *e = dsp->e;
-  gint lbearing, rbearing, width, ascent, descent;
-  GtkStyle *style = gtk_widget_get_style (sp->da);
   gint xp, yp;
   gint a, b;
   endpointsd *endpoints;
-
+  PangoLayout *layout = gtk_widget_create_pango_layout(sp->da, NULL);
+  PangoRectangle rect;
 
   gboolean draw_edge = (dsp->options.edges_undirected_show_p ||
                         dsp->options.edges_directed_show_p);
@@ -399,31 +398,31 @@ splot_add_edge_label (splotd *sp, GdkDrawable *drawable, gint k,
 
     /*-- add the label last so it will be in front of other markings --*/
     lbl = identify_label_fetch (k, &dsp->cpanel, e, gg);
-    splot_text_extents (lbl, style, 
-      &lbearing, &rbearing, &width, &ascent, &descent);
+	layout_text(layout, lbl, &rect);
 
     if (sp->screen[a].x > sp->screen[b].x) {gint itmp=b; b=a; a=itmp;}
     xp = (sp->screen[b].x - sp->screen[a].x)/2 + sp->screen[a].x;
     if (sp->screen[a].y > sp->screen[b].y) {gint itmp=b; b=a; a=itmp;}
-    yp = (sp->screen[b].y - sp->screen[a].y)/2 + sp->screen[a].y;
+    yp = (sp->screen[b].y - sp->screen[a].y)/2 + sp->screen[a].y - rect.height;
 
-    splot_draw_string (lbl, xp, yp, style, drawable, gg);
-
-    if (nearest) {
-      /*-- underline the label --*/
+	if (nearest) {
+      underline_text(layout);
+	#if 0
+		/*-- underline the label --*/
       gdk_draw_line (drawable, gg->plot_GC,
-        xp, yp+1, xp+width, yp+1);
-
+        xp, yp+1, xp+rect.width, yp+1);
       /*-- display it in the top center of the window --*/
-      splot_draw_string (lbl,
-        (sp->max.x - width)/2,
-        ascent + descent + 5,  /*-- the border is of width 3 --*/
-        style, drawable, gg);
+	#endif
+	  gdk_draw_layout(drawable, gg->plot_GC, 
+	  	(sp->max.x - rect.width)/2, 5, layout);
+	#if 0
       /*-- underline it there, too, for consistency --*/
       gdk_draw_line (drawable, gg->plot_GC,
-        (sp->max.x - width)/2, ascent + descent + 5 + 1,
-        (sp->max.x - width)/2 + width, ascent + descent + 5 + 1);
+        (sp->max.x - rect.width)/2, rect.height + 5 + 1,
+        (sp->max.x - rect.width)/2 + rect.width, 5 + 1);
+	#endif
     }
+	gdk_draw_layout(drawable, gg->plot_GC, xp, yp, layout);
   }
 }
 
@@ -439,9 +438,9 @@ splot_add_identify_edge_cues (splotd *sp, GdkDrawable *drawable, gint k,
 
   if (e->hidden_now.els[k]) return;
 
-  if (GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
-    GtkGGobiExtendedSPlotClass *klass;
-    klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT_GET_CLASS(sp));
+  if (GGOBI_IS_EXTENDED_SPLOT(sp)) {
+    GGobiExtendedSPlotClass *klass;
+    klass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);
     if(klass->add_identify_edge_cues)
       klass->add_identify_edge_cues(k, sp, drawable, nearest, gg);
     else 

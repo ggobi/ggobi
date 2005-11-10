@@ -614,30 +614,20 @@ void t1d_ppdraw_think(displayd *dsp, ggobid *gg)
 {
   splotd *sp = (splotd *) g_list_nth_data (dsp->splots, 0);
   colorschemed *scheme = gg->activeColorScheme;
-  GtkStyle *style = gtk_widget_get_style (sp->da);
-  gchar *varlab;
-  gint lbearing, rbearing, width, ascent, descent;
   gint wid = dsp->t1d_ppda->allocation.width, 
     hgt = dsp->t1d_ppda->allocation.height;
-
+  PangoLayout *layout = gtk_widget_create_pango_layout(sp->da, "Thinking...");
+  
   gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
-  varlab = g_strdup_printf("Thinking...");
-  gdk_text_extents (
-#if GTK_MAJOR_VERSION == 2
+  gdk_draw_layout(dsp->t1d_pp_pixmap, gg->plot_GC, 10, 10, layout);
+  g_object_unref(G_OBJECT(layout));
+  /*gdk_text_extents (
     gtk_style_get_font (style),
-#else
-    style->font,
-#endif
     varlab, strlen (varlab),
     &lbearing, &rbearing, &width, &ascent, &descent);
     gdk_draw_string (dsp->t1d_pp_pixmap,
-#if GTK_MAJOR_VERSION == 2
     gtk_style_get_font (style),
-#else
-      style->font,
-#endif
-      gg->plot_GC, 10, 10, varlab);
-    g_free (varlab);
+      gg->plot_GC, 10, 10, varlab);*/
   gdk_draw_pixmap (dsp->t1d_ppda->window, gg->plot_GC, dsp->t1d_pp_pixmap,
     0, 0, 0, 0, wid, hgt);
 }

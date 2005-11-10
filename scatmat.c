@@ -30,16 +30,6 @@
 #define HEIGHT 200
 #define MAXNVARS 4   /* only used to set up the initial matrix */
 
-static GtkItemFactoryEntry menu_items[] = {
-  { "/_File",         NULL,     NULL,     0,                    "<Branch>" },
-#ifdef PRINTING_IMPLEMENTED
-  { "/File/Print",    "",       (GtkItemFactoryCallback) display_print_cb, 0, "<Item>" },
-  { "/File/sep",      NULL,     NULL,     0, "<Separator>" },
-#endif
-  { "/File/Control Panel",    "",       (GtkItemFactoryCallback) show_display_control_panel_cb, 0, "<Item>" },
-  { "/File/Close",    "",       (GtkItemFactoryCallback) display_close_cb, 0, "<Item>" },
-};
-
 /*
 static void
 scatmat_rows_print (displayd *display) {
@@ -59,7 +49,16 @@ scatmat_cols_print (displayd *display) {
 }
 */
 
+static const gchar *scatmat_ui =
+"<ui>"
+"	<menubar>"
+"		<menu action='Options'>"
+"			<menuitem action='ShowPoints'/>"
+"		</menu>"
+"	</menubar>"
+"</ui>";
 
+#if 0
 static void
 scatmat_display_menus_make (displayd *display, GtkAccelGroup *accel_group,
   GtkSignalFunc func, GtkWidget *mbar, ggobid *gg)
@@ -76,25 +75,25 @@ scatmat_display_menus_make (displayd *display, GtkAccelGroup *accel_group,
 
   item = CreateMenuCheck (options_menu, "Show points",
     func, GINT_TO_POINTER (DOPT_POINTS), on, gg);
-  gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
+  g_object_set_data(G_OBJECT (item), "display", (gpointer) display);
 
 /*  -- once the scatterplot is working, consider this --
   item = CreateMenuCheck (options_menu, "Show edges (undirected)",
     func, GINT_TO_POINTER (DOPT_EDGES_U), off, gg);
-  gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
+  g_object_set_data(G_OBJECT (item), "display", (gpointer) display);
   item = CreateMenuCheck (options_menu, "Show 'arrowheads'",
     func, GINT_TO_POINTER (DOPT_EDGES_U), off, gg);
-  gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
+  g_object_set_data(G_OBJECT (item), "display", (gpointer) display);
   item = CreateMenuCheck (options_menu, "Show edges (directed)",
     func, GINT_TO_POINTER (DOPT_EDGES_D), off, gg);
-  gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
+  g_object_set_data(G_OBJECT (item), "display", (gpointer) display);
 */
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (submenu), options_menu);
   submenu_append (submenu, mbar);
   gtk_widget_show (submenu);
 }
-
+#endif
 
 #if 0
 displayd *
@@ -113,9 +112,9 @@ scatmat_new (gboolean missing_p, gint numRows, gint *rows,
   windowDisplayd *wdpy;
   GtkAccelGroup *scatmat_accel_group;
 
-  display = gtk_type_new(GTK_TYPE_GGOBI_SCATMAT_DISPLAY);
+  display = g_object_new(GGOBI_TYPE_SCATMAT_DISPLAY, NULL);
   display_set_values (display, d, gg);
-  wdpy = GTK_GGOBI_WINDOW_DISPLAY(display);
+  wdpy = GGOBI_WINDOW_DISPLAY(display);
 
   /* If the caller didn't specify the rows and columns, 
      use the default which is the number of variables
@@ -139,13 +138,13 @@ scatmat_new (gboolean missing_p, gint numRows, gint *rows,
 
   scatmat_cpanel_init (&display->cpanel, gg);
 
-  display_window_init (GTK_GGOBI_WINDOW_DISPLAY(display), 5, gg);
+  display_window_init (GGOBI_WINDOW_DISPLAY(display), 5, gg);
 
 /*
  * Add the main menu bar
 */
   vbox = gtk_vbox_new (FALSE, 1);
-  gtk_container_border_width (GTK_CONTAINER (vbox), 1);
+  gtk_container_set_border_width (GTK_CONTAINER (vbox), 1);
   gtk_container_add (GTK_CONTAINER (wdpy->window), vbox);
 
   scatmat_accel_group = gtk_accel_group_new ();
@@ -165,7 +164,7 @@ scatmat_new (gboolean missing_p, gint numRows, gint *rows,
    * add the Options and Link menus another way
   */
   scatmat_display_menus_make (display, scatmat_accel_group,
-                              (GtkSignalFunc) display_options_cb, mbar, gg);
+                              G_CALLBACK(display_options_cb), mbar, gg);
   gtk_box_pack_start (GTK_BOX (vbox), mbar, false, true, 0);
 
 /*
@@ -198,7 +197,7 @@ scatmat_new (gboolean missing_p, gint numRows, gint *rows,
   for (i=0; i<scatmat_ncols; i++) {
     for (j=0; j<scatmat_nrows; j++, ctr++) {
 /* Can we use SCATTER_SPLOT or do we need SCATMAT_SPLOT. */
-      sp = gtk_type_new(GTK_TYPE_GGOBI_SCATMAT_SPLOT);
+      sp = g_object_new(GGOBI_TYPE_SCATMAT_SPLOT, NULL);
       splot_init(sp, display, width, height, gg);
 
       sp->xyvars.x = rows[i]; 
@@ -241,22 +240,19 @@ scatmat_new (displayd *display,
 	       gint numCols, gint *cols, datad *d, ggobid *gg) 
 {
   GtkWidget *vbox, *frame;
-  GtkWidget *w;
-  GtkItemFactory *factory;
   gint i, j, ctr;
   gint width, height;
   gint scr_width, scr_height;
   gint scatmat_nrows, scatmat_ncols;
   splotd *sp;
   windowDisplayd *wdpy = NULL;
-  GtkAccelGroup *scatmat_accel_group;
-
+  
   if(!display)
-     display = gtk_type_new(GTK_TYPE_GGOBI_SCATMAT_DISPLAY);
+     display = g_object_new(GGOBI_TYPE_SCATMAT_DISPLAY, NULL);
 
   display_set_values (display, d, gg);
-  if(GTK_IS_GGOBI_WINDOW_DISPLAY(display))
-    wdpy = GTK_GGOBI_WINDOW_DISPLAY(display);
+  if(GGOBI_IS_WINDOW_DISPLAY(display))
+    wdpy = GGOBI_WINDOW_DISPLAY(display);
 
   /* If the caller didn't specify the rows and columns, 
      use the default which is the number of variables
@@ -276,13 +272,13 @@ scatmat_new (displayd *display,
        display, if appropriate */
     if (gg->current_display != NULL && gg->current_display != display && 
         gg->current_display->d == d && 
-        GTK_IS_GGOBI_EXTENDED_DISPLAY(gg->current_display))
+        GGOBI_IS_EXTENDED_DISPLAY(gg->current_display))
     {
       gint k, nplotted_vars;
       gint *plotted_vars = (gint *) g_malloc(d->ncols * sizeof(gint));
       displayd *dsp = gg->current_display;
 
-      nplotted_vars = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(dsp))->plotted_vars_get(dsp, plotted_vars, d, gg);
+      nplotted_vars = GGOBI_EXTENDED_DISPLAY_GET_CLASS(dsp)->plotted_vars_get(dsp, plotted_vars, d, gg);
 
       scatmat_ncols = scatmat_nrows = MAX (scatmat_nrows, nplotted_vars);
       for (j=0; j<nplotted_vars; j++)
@@ -313,47 +309,6 @@ scatmat_new (displayd *display,
 
   scatmat_cpanel_init (&display->cpanel, gg);
 
-  if(wdpy && wdpy->useWindow)
-    display_window_init (GTK_GGOBI_WINDOW_DISPLAY(display), 5, gg);
-
-/*
- * Add the main menu bar
-*/
-  vbox = gtk_vbox_new (FALSE, 1);
-  gtk_container_border_width (GTK_CONTAINER (vbox), 1);
-  if(wdpy && wdpy->useWindow) {
-    gtk_container_add (GTK_CONTAINER (wdpy->window), vbox);
-
-  scatmat_accel_group = gtk_accel_group_new ();
-  factory = get_main_menu (menu_items,
-    sizeof (menu_items) / sizeof (menu_items[0]),
-    scatmat_accel_group, wdpy->window, &display->menubar,
-    (gpointer) display);
-
-  /*-- add a tooltip to the file menu --*/
-  w = gtk_item_factory_get_widget (factory, "<main>/File");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
-    gtk_menu_get_attach_widget (GTK_MENU(w)),
-    "File menu for this display", NULL);
-
-  /*
-   * After creating the menubar, and populating the file menu,
-   * add the Options and Link menus another way
-  */
-   scatmat_display_menus_make (display, scatmat_accel_group,
-       (GtkSignalFunc) display_options_cb, display->menubar, gg);
-   gtk_box_pack_start (GTK_BOX (vbox), display->menubar, false, true, 0);
-  }
-/*
- * splots in a table 
-*/
-  frame = gtk_frame_new (NULL);
-  gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_IN);
-  gtk_container_set_border_width (GTK_CONTAINER (frame), 3);
-  gtk_box_pack_start (GTK_BOX (vbox), frame, true, true, 1);
-
-  gtk_widget_show (frame);
-
   /*
    * make the matrix take up no more than some fraction
    * the screen by default, and make the plots square.
@@ -366,6 +321,51 @@ scatmat_new (displayd *display,
     (scr_height / scatmat_nrows) : HEIGHT;
   width = height = MIN (width, height);
   /* */
+  
+  if(wdpy && wdpy->useWindow)
+    display_window_init (GGOBI_WINDOW_DISPLAY(display), 
+  		width*scatmat_ncols, height*scatmat_nrows, 5, gg);
+
+/*
+ * Add the main menu bar
+*/
+  vbox = gtk_vbox_new (FALSE, 1);
+  gtk_container_set_border_width (GTK_CONTAINER (vbox), 1);
+  if(wdpy && wdpy->useWindow) {
+    gtk_container_add (GTK_CONTAINER (wdpy->window), vbox);
+
+  display->menu_manager = display_menu_manager_create(display);
+  display->menubar = create_menu_bar(display->menu_manager, scatmat_ui, wdpy->window);
+/*
+  scatmat_accel_group = gtk_accel_group_new ();
+  factory = get_main_menu (menu_items,
+    sizeof (menu_items) / sizeof (menu_items[0]),
+    scatmat_accel_group, wdpy->window, &display->menubar,
+    (gpointer) display);
+*/
+  /*-- add a tooltip to the file menu --*/
+/*  w = gtk_item_factory_get_widget (factory, "<main>/File");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
+    gtk_menu_get_attach_widget (GTK_MENU(w)),
+    "File menu for this display", NULL);
+*/
+  /*
+   * After creating the menubar, and populating the file menu,
+   * add the Options and Link menus another way
+  */
+/*   scatmat_display_menus_make (display, scatmat_accel_group,
+       G_CALLBACK(display_options_cb), display->menubar, gg);*/
+   gtk_box_pack_start (GTK_BOX (vbox), display->menubar, false, true, 0);
+  }
+/*
+ * splots in a table 
+*/
+  frame = gtk_frame_new (NULL);
+  gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_IN);
+  gtk_container_set_border_width (GTK_CONTAINER (frame), 3);
+  gtk_box_pack_start (GTK_BOX (vbox), frame, true, true, 1);
+
+  gtk_widget_show (frame);
 
   display->table = gtk_table_new (scatmat_ncols, scatmat_nrows, false);
   gtk_container_add (GTK_CONTAINER (frame), display->table);
@@ -374,8 +374,8 @@ scatmat_new (displayd *display,
   for (i=0; i<scatmat_ncols; i++) {
     for (j=0; j<scatmat_nrows; j++, ctr++) {
 /* Can we use SCATTER_SPLOT or do we need SCATMAT_SPLOT. */
-      sp = gtk_type_new(GTK_TYPE_GGOBI_SCATMAT_SPLOT);
-      splot_init(sp, display, width, height, gg);
+      sp = g_object_new(GGOBI_TYPE_SCATMAT_SPLOT, NULL);
+      splot_init(sp, display, gg);
 
       sp->xyvars.x = rows[i]; 
       sp->xyvars.y = cols[j]; 
@@ -470,12 +470,12 @@ scatmat_var_selected (gint jvar, displayd *display)
 
 static splotd *
 scatmat_add_plot (gint xvar, gint yvar, gint col, gint row,
-		  gint width, gint height, displayd *display, ggobid *gg)
+		  displayd *display, ggobid *gg)
 {
   splotd *sp_new;
 
-  sp_new = gtk_type_new(GTK_TYPE_GGOBI_SCATMAT_SPLOT);
-  splot_init(sp_new, display, width, height, gg);
+  sp_new = g_object_new(GGOBI_TYPE_SCATMAT_SPLOT, NULL);
+  splot_init(sp_new, display, gg);
 
   sp_new->xyvars.x = xvar;
   sp_new->xyvars.y = yvar;
@@ -500,11 +500,10 @@ scatmat_varsel_simple (cpaneld *cpanel, splotd *sp, gint jvar,
 {
   gboolean redraw = true;
   gboolean Delete = false;
-  gint k, width, height;
+  gint k;
   GList *l;
   splotd *s, *sp_new;
   GtkWidget *da;
-  gfloat ratio = 1.0;
   GtkTableChild *child;
   displayd *display = gg->current_display;
 
@@ -513,10 +512,10 @@ scatmat_varsel_simple (cpaneld *cpanel, splotd *sp, gint jvar,
 
   /* Check the assumption of layout symmetry */
   if (!scatmat_symmetric) {
-/**/return  (false);
+	  return  (false);
   }
 
-  splot_get_dimensions (gg->current_splot, &width, &height);
+  //splot_get_dimensions (gg->current_splot, &width, &height);
 
 /*
  * If jvar is selected, delete a row and a column.  Delete the
@@ -529,10 +528,10 @@ scatmat_varsel_simple (cpaneld *cpanel, splotd *sp, gint jvar,
       /* if jvar is one of the plotted variables, its row and column */
       gint jvar_rc;
       jvar_rc = g_list_index (display->scatmat_cols, GINT_TO_POINTER (jvar));
-
+#if 0
       ratio = (gfloat) scatmat_nvars / (gfloat) (scatmat_nvars-1);
       width = (gint) (ratio * (gfloat) width);
-
+#endif
       l = (GTK_TABLE (display->table))->children;
       while (l) {
         Delete = false;
@@ -555,7 +554,7 @@ scatmat_varsel_simple (cpaneld *cpanel, splotd *sp, gint jvar,
 
         if (Delete) {
 
-          s = (splotd *) gtk_object_get_data (GTK_OBJECT (da), "splotd");
+          s = (splotd *) g_object_get_data(G_OBJECT (da), "splotd");
           display->splots = g_list_remove (display->splots, (gpointer) s);
           /*
            * add a reference to da here, because it's going to be
@@ -584,6 +583,7 @@ scatmat_varsel_simple (cpaneld *cpanel, splotd *sp, gint jvar,
                         g_list_length (display->scatmat_cols));
 
       /*-- when finished, adjust the sizes of the remaining plots --*/
+	  #if 0
       l = (GTK_TABLE (display->table))->children;
       while (l) {
         child = (GtkTableChild *) l->data;
@@ -592,7 +592,7 @@ scatmat_varsel_simple (cpaneld *cpanel, splotd *sp, gint jvar,
         gtk_widget_set_usize (da, -1, -1);
         gtk_widget_set_usize (da, width, height);
       }
-  
+	  #endif
       /*
        * I'm not sure this is necessary -- am I checking whether the
        * gg.current_splot was deleted?
@@ -620,7 +620,7 @@ scatmat_varsel_simple (cpaneld *cpanel, splotd *sp, gint jvar,
     for (l=(GTK_TABLE (display->table))->children; l; l=l->next) {
       child = (GtkTableChild *) l->data;
       da = child->widget;
-      s = (splotd *) gtk_object_get_data (GTK_OBJECT (da), "splotd");
+      s = (splotd *) g_object_get_data(G_OBJECT (da), "splotd");
       if (s == gg->current_splot) {
         sprow = child->top_attach;
         spcol = child->left_attach;
@@ -642,7 +642,7 @@ scatmat_varsel_simple (cpaneld *cpanel, splotd *sp, gint jvar,
         child = (GtkTableChild *) l->data;
         l = l->next;
         da = child->widget;
-        s = (splotd *) gtk_object_get_data (GTK_OBJECT (da), "splotd");
+        s = (splotd *) g_object_get_data(G_OBJECT (da), "splotd");
 
         if (child->left_attach == spcol) {
           *jvar_prev = s->xyvars.x;
@@ -685,11 +685,11 @@ scatmat_varsel_simple (cpaneld *cpanel, splotd *sp, gint jvar,
                                                              scatmat_nvars;
       row = (cpanel->scatmat_selection_mode == VAR_INSERT) ? sprow :
                                                              scatmat_nvars;
-
+#if 0
       ratio = (gfloat) scatmat_nvars / (gfloat) (scatmat_nvars+1);
       width = (gint) (ratio * (gfloat) width);
       height = (gint) (ratio * (gfloat) height);
-
+#endif
       /*
        * Fix up the attachments of the rows below and columns to the right
        * of the inserted/appended row/column.
@@ -697,8 +697,8 @@ scatmat_varsel_simple (cpaneld *cpanel, splotd *sp, gint jvar,
       for (l=(GTK_TABLE (display->table))->children; l; l=l->next) {
         child = (GtkTableChild *) l->data;
         da = child->widget;
-        gtk_widget_set_usize (da, -1, -1);
-        gtk_widget_set_usize (da, width, height);
+        //gtk_widget_set_usize (da, -1, -1);
+        //gtk_widget_set_usize (da, width, height);
 
         if (child->left_attach >= col) {
           child->left_attach++;
@@ -728,12 +728,10 @@ scatmat_varsel_simple (cpaneld *cpanel, splotd *sp, gint jvar,
         /* which variable is plotting in the k'th intersecting row/column? */
         newvar = GPOINTER_TO_INT (g_list_nth_data (display->scatmat_rows, k));
 
-        sp_new = scatmat_add_plot (jvar, newvar, col, k,
-          width, height, display, gg);
+        sp_new = scatmat_add_plot (jvar, newvar, col, k, display, gg);
 
         if (k != row) {  /*-- except at the intersection, do it twice --*/
-          sp_new = scatmat_add_plot (newvar, jvar, k, row,
-            width, height, display, gg);
+          sp_new = scatmat_add_plot (newvar, jvar, k, row, display, gg);
         }
       }
 
@@ -748,13 +746,14 @@ scatmat_varsel_simple (cpaneld *cpanel, splotd *sp, gint jvar,
 
   return redraw;
 }
-
+#if 0
 /**
   This creates the scatter matrix window contents using static
   variables within this file.
 
   The corresponding code in scatmat_new should be deprecated and
   that routine should be made to call this one.
+  -- I think this has already been done - mfl
  */
 gint *
 createScatmatWindow(gint nrows, gint ncols, displayd *display, ggobid *gg, gboolean useWindow)
@@ -773,26 +772,26 @@ createScatmatWindow(gint nrows, gint ncols, displayd *display, ggobid *gg, gbool
   scatmat_cpanel_init (&display->cpanel, gg);
 
   if(useWindow) {
-    display_window_init (GTK_GGOBI_WINDOW_DISPLAY(display), 5, gg);
+    display_window_init (GGOBI_WINDOW_DISPLAY(display), 5, gg);
 
 
 /*
  * Add the main menu bar
 */
     vbox = GTK_WIDGET(display); 
-    gtk_container_border_width (GTK_CONTAINER (vbox), 1);
-    gtk_container_add (GTK_CONTAINER (GTK_GGOBI_WINDOW_DISPLAY(display)->window), vbox);
+    gtk_container_set_border_width (GTK_CONTAINER (vbox), 1);
+    gtk_container_add (GTK_CONTAINER (GGOBI_WINDOW_DISPLAY(display)->window), vbox);
 
   scatmat_accel_group = gtk_accel_group_new ();
   get_main_menu (menu_items, sizeof (menu_items) / sizeof (menu_items[0]),
-                 scatmat_accel_group, GTK_GGOBI_WINDOW_DISPLAY(display)->window, &mbar,
+                 scatmat_accel_group, GGOBI_WINDOW_DISPLAY(display)->window, &mbar,
                  (gpointer) display);
   /*
    * After creating the menubar, and populating the file menu,
    * add the Options and Link menus another way
   */
   scatmat_display_menus_make (display, scatmat_accel_group,
-                               (GtkSignalFunc) display_options_cb, mbar, gg);
+                               G_CALLBACK(display_options_cb), mbar, gg);
   gtk_box_pack_start (GTK_BOX (vbox), mbar, false, true, 0);
 
 /*
@@ -829,7 +828,7 @@ createScatmatWindow(gint nrows, gint ncols, displayd *display, ggobid *gg, gbool
 
   return(dims);
 }
-
+#endif
 
 #undef WIDTH
 #undef HEIGHT

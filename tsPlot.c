@@ -43,16 +43,16 @@ tsWorldToPlane(splotd *sp,  datad *d, ggobid *gg)
 }
 
 splotd *
-gtk_time_series_splot_new(displayd *dpy, gint width, gint height, ggobid *gg)
+ggobi_time_series_splot_new(displayd *dpy, ggobid *gg)
 {
   timeSeriesSPlotd *bsp;
   splotd *sp;
 
-  bsp = gtk_type_new(GTK_TYPE_GGOBI_TS_SPLOT);
-  sp = GTK_GGOBI_SPLOT(bsp);
+  bsp = g_object_new(GGOBI_TYPE_TIME_SERIES_SPLOT, NULL);
+  sp = GGOBI_SPLOT(bsp);
 
 
-  splot_init(sp, dpy, width, height, gg);
+  splot_init(sp, dpy, gg);
 
   return(sp);
 }
@@ -89,49 +89,41 @@ tsAddPlotLabels(splotd *sp, GdkDrawable *drawable, ggobid *gg)
 {
     displayd *display = sp->displayptr;
     GList *l = display->splots;
-    gint lbearing, rbearing, width, ascent, descent;
-    GtkStyle *style = gtk_widget_get_style (sp->da);
     vartabled *vtx, *vty;
-
+	PangoLayout *layout = gtk_widget_create_pango_layout(sp->da, NULL);
+	PangoRectangle rect;
+	
     if (l->data == sp) {
       vtx = vartable_element_get (sp->xyvars.x, display->d);
-      gdk_text_extents (
-#if GTK_MAJOR_VERSION == 2
+	  layout_text(layout, vtx->collab_tform, &rect);
+	  gdk_draw_layout(drawable, gg->plot_GC, 
+	  	sp->max.x - rect.width - 5,
+        sp->max.y - rect.height - 5,
+		layout);
+      /*gdk_text_extents (
         gtk_style_get_font (style),
-#else
-        style->font,
-#endif
         vtx->collab_tform, strlen (vtx->collab_tform),
         &lbearing, &rbearing, &width, &ascent, &descent);
       gdk_draw_string (drawable,
-#if GTK_MAJOR_VERSION == 2
         gtk_style_get_font (style),
-#else
-        style->font,
-#endif
         gg->plot_GC,
         sp->max.x - width - 5,
         sp->max.y - 5,
-        vtx->collab_tform);
+        vtx->collab_tform);*/
     }
     vty = vartable_element_get (sp->xyvars.y, display->d);
-    gdk_text_extents (
-#if GTK_MAJOR_VERSION == 2
+	layout_text(layout, vty->collab_tform, &rect);
+	gdk_draw_layout(drawable, gg->plot_GC, 5, 5, layout);
+    /*gdk_text_extents (
       gtk_style_get_font (style),
-#else
-      style->font,
-#endif
       vty->collab_tform, strlen (vty->collab_tform),
       &lbearing, &rbearing, &width, &ascent, &descent);
     gdk_draw_string (drawable,
-#if GTK_MAJOR_VERSION == 2
       gtk_style_get_font (style),
-#else
-      style->font,
-#endif
       gg->plot_GC,
       5, 5 + ascent + descent,
-      vty->collab_tform);
+      vty->collab_tform);*/
+	  g_object_unref(G_OBJECT(layout));
 }
 
 void
@@ -190,7 +182,7 @@ XX Incomplete. Need to finish off the construction of splotd's directly
  from command line language rather than as part of the displayd.
 */
 splotd *
-tsplotCreateWithVars(displayd *display, gint *vars, gint nvar, gint width, gint height, ggobid *gg)
+tsplotCreateWithVars(displayd *display, gint *vars, gint nvar, ggobid *gg)
 {
    splotd *sp;
    if(nvar < 1) {
@@ -198,7 +190,7 @@ tsplotCreateWithVars(displayd *display, gint *vars, gint nvar, gint width, gint 
       return(NULL);
    }
 
-   sp = gtk_time_series_splot_new(display, width, height, gg);
+   sp = ggobi_time_series_splot_new(display, gg);
    if(nvar > 1) {
       sp->xyvars.y = vars[1];
       sp->xyvars.x = vars[0];
@@ -262,7 +254,7 @@ splotScreenToTform(cpaneld *cpanel, splotd *sp, icoords *scr,
 }
 
 void 
-timeSeriesSPlotClassInit(GtkGGobiTimeSeriesSPlotClass *klass)
+timeSeriesSPlotClassInit(GGobiTimeSeriesSPlotClass *klass)
 {
     klass->extendedSPlotClass.splot.redraw = QUICK;
     klass->extendedSPlotClass.tree_label = tsTreeLabel;
@@ -290,7 +282,7 @@ timeSeriesSPlotClassInit(GtkGGobiTimeSeriesSPlotClass *klass)
 
 
 void 
-timeSeriesClassInit(GtkGGobiTimeSeriesDisplayClass *klass)
+timeSeriesClassInit(GGobiTimeSeriesDisplayClass *klass)
 {
     klass->parent_class.binning_ok = false;
 
@@ -302,6 +294,7 @@ timeSeriesClassInit(GtkGGobiTimeSeriesDisplayClass *klass)
     klass->parent_class.cpanel_set = tsplotCPanelSet;
     klass->parent_class.display_unset = NULL;
     klass->parent_class.display_set = tsplotDisplaySet;
+	klass->parent_class.mode_ui_get = tsplot_mode_ui_get;
     klass->parent_class.varpanel_refresh = tsplotVarpanelRefresh;
 
     klass->parent_class.handles_interaction = tsplotHandlesInteraction;
@@ -313,7 +306,7 @@ timeSeriesClassInit(GtkGGobiTimeSeriesDisplayClass *klass)
 
 
     klass->parent_class.imode_control_box = tsplotCPanelWidget;
-    klass->parent_class.menus_make = tsplotMenusMake;
+    //klass->parent_class.menus_make = tsplotMenusMake;
 
     klass->parent_class.event_handlers_toggle = tsplotEventHandlersToggle;
 

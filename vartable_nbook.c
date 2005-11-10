@@ -58,19 +58,27 @@ vartable_switch_page_cb (GtkNotebook *notebook, GtkNotebookPage *page,
   gint page_num, ggobid *gg)
 {
   gint prev_page = gtk_notebook_get_current_page (notebook);
-  GtkWidget *swin, *clist;
+  GtkWidget *swin, *tree_view;
   GList *children;
 
   if (prev_page > -1) {
+	GtkTreeSelection *tree_sel;
     swin = gtk_notebook_get_nth_page (notebook, prev_page);
-    children = gtk_container_children (GTK_CONTAINER (swin));
-    clist = g_list_nth_data (children, 0);
-    gtk_clist_unselect_all (GTK_CLIST (clist));
+    children = gtk_container_get_children (GTK_CONTAINER (swin));
+    tree_view = g_list_nth_data (children, 0);
+	tree_sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view));
+    gtk_tree_selection_unselect_all(tree_sel);
   }
 }
 
-GtkCList *
-vartable_clist_get (ggobid *gg) {
+GtkTreeModel *
+vartable_tree_model_get (datad *d)
+{
+	return(d->vartable_tree_model);
+}
+
+GtkWidget *
+vartable_tree_view_get (ggobid *gg) {
   GtkNotebook *nb, *subnb;
   gint indx, subindx;
   GtkWidget *swin;
@@ -79,7 +87,7 @@ vartable_clist_get (ggobid *gg) {
  * Each page of vartable_ui.notebook has one child, which is
  * another notebook.
  * That notebook has two children, two scrolled windows, and
- * each scrolled window has one child, a clist
+ * each scrolled window has one child, a tree_view
 */
 /*
   vartable_ui.notebook
@@ -100,12 +108,12 @@ vartable_clist_get (ggobid *gg) {
   subindx = gtk_notebook_get_current_page (subnb);
   /*-- get the current page of the variable type notebook --*/
   swin = gtk_notebook_get_nth_page (subnb, subindx);
-  children = gtk_container_children (GTK_CONTAINER (swin));
+  children = gtk_container_get_children (GTK_CONTAINER (swin));
 
-  return ((GtkCList *) g_list_nth_data (children, 0));
+  return ((GtkWidget *) g_list_nth_data (children, 0));
 /*
   swin = gtk_notebook_get_nth_page (nb, indx);
-  GList *swin_children = gtk_container_children (GTK_CONTAINER (swin));
+  GList *swin_children = gtk_container_get_children (GTK_CONTAINER (swin));
 */
 }
 
@@ -128,14 +136,14 @@ vartable_show_page (datad *d, ggobid *gg)
     return;
 
   page_new = 0;
-  children = gtk_container_children (GTK_CONTAINER (gg->vartable_ui.notebook));
+  children = gtk_container_get_children (GTK_CONTAINER (gg->vartable_ui.notebook));
   for (l = children; l; l = l->next) {
     child = l->data;
     tab_label = (GtkWidget *) gtk_notebook_get_tab_label (nb, child);
     if (tab_label && GTK_IS_LABEL (tab_label)) {
       if (strcmp (GTK_LABEL (tab_label)->label, d->name) == 0) {
         if (page != page_new) {
-          gtk_notebook_set_page (nb, page_new);
+          gtk_notebook_set_current_page (nb, page_new);
           break;
         }
       }
@@ -145,27 +153,64 @@ vartable_show_page (datad *d, ggobid *gg)
 }
 
 gint
+vartable_varno_from_path(GtkTreeModel *model, GtkTreePath *path)
+{
+	GtkTreeModel *unsorted_model, *root_model;
+	GtkTreePath *unsorted_path, *root_path;
+	gint varno;
+	
+	unsorted_model = gtk_tree_model_sort_get_model(GTK_TREE_MODEL_SORT(model));
+	g_object_get(G_OBJECT(unsorted_model), "child-model", &root_model, NULL);
+	
+	unsorted_path = gtk_tree_model_sort_convert_path_to_child_path(
+	  	GTK_TREE_MODEL_SORT(model), path);
+	root_path = gtk_tree_model_filter_convert_path_to_child_path(
+	  	GTK_TREE_MODEL_FILTER(unsorted_model), unsorted_path);
+	
+	varno = gtk_tree_path_get_indices(root_path)[0];
+	
+	gtk_tree_path_free(unsorted_path);
+	gtk_tree_path_free(root_path);
+	
+	return(varno);
+}
+gboolean
+vartable_iter_from_varno(gint var, datad *d, GtkTreeModel **model, GtkTreeIter *iter)
+{
+  GtkTreeModel *loc_model;
+  GtkTreePath *path;
+  gboolean valid;
+  
+  loc_model = vartable_tree_model_get(d);
+  path = gtk_tree_path_new_from_indices(var, -1);
+  valid = gtk_tree_model_get_iter(loc_model, iter, path);
+  gtk_tree_path_free(path);
+  
+  if (model)
+	  *model = loc_model;
+  
+  return(valid);
+}
+
+#if 0
+gint
 vartable_rownum_from_varno (gint jvar, vartyped vartype, datad *d)
 {
-  GList *l;
-  gint irow = -1;
-  GtkCListRow *row;
-  gchar *varstr;
+  gint row = -1;
   gint rownum = 0;
   vartyped type = (vartype == categorical) ? categorical : real;
-
-  if (d->vartable_clist[type] != NULL) {
-    l = GTK_CLIST(d->vartable_clist[type])->row_list;
-    while (l) {
-      row = GTK_CLIST_ROW (l);
-      varstr = GTK_CELL_TEXT(row->cell[0])->text; /* 0th column for all types */
-      if (varstr != NULL && strlen (varstr) > 0) {
-        irow = atoi (varstr);
-        if (irow == jvar)
+  
+  if (d->vartable_tree_view[type] != NULL) {
+    GtkTreeModel *model = d->vartable_tree_view[type];
+	GtkTreeIter iter;
+	gint col = gtk_tree_model_get_n_columns(model) - 1;
+	gboolean row_valid = gtk_tree_model_get_iter_first(model, &iter);
+    while (row_valid) {
+		gtk_tree_model_get(model, &iter, col, &row);
+        if (row == jvar)
           return rownum;
         rownum++;
-      }
-      l = l->next;
+		row_valid = gtk_tree_model_iter_next(model, &iter);
     }
   }
   return -1;
@@ -174,156 +219,53 @@ vartable_rownum_from_varno (gint jvar, vartyped vartype, datad *d)
 gint
 vartable_varno_from_rownum (gint rownum, vartyped vartype, datad *d)
 {
-  GList *l;
-  gint irow = -1;
-  GtkCListRow *row;
-  gchar *varstr;
+  gint row = -1;
+  GtkTreeIter iter;
+  GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(d->vartable_tree_view[vartype]));
+  gint col = gtk_tree_model_get_n_columns(model) - 1;
+  GtkTreePath *path = gtk_tree_path_new_from_indices(rownum, -1);
+  gboolean row_valid = gtk_tree_model_get_iter(model, &iter, path);
 
-  l = g_list_last (GTK_CLIST(d->vartable_clist[vartype])->row_list);
-  while (l) {
-    row = GTK_CLIST_ROW (l);
-    varstr = GTK_CELL_TEXT(row->cell[0])->text;   /* var index always first */
-    if (varstr != NULL && strlen (varstr) > 0) {
-      irow = atoi (varstr);
-      if (irow != -1)
-        return irow;
-    }
-    l = l->prev;
+  gtk_tree_path_free(path);
+  
+  if(row_valid) {
+	  gtk_tree_model_get(model, &iter, col, &row);
   }
-
-  return irow;
+  
+  return row;
 }
+#endif
 
-/*
+/* GtkTreeSelection only tells us when the selection has changed,
+	so we have to reset the selected status of the vartable */
 void
-vartable_select_var (gint jvar, gboolean selected, datad *d, ggobid *gg)
+selection_changed_cb (GtkTreeSelection *tree_sel, ggobid *gg)
 {
-  gint j, varno;
-  gchar *varno_str;
+  gint j;
+  datad *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
   vartabled *vt;
-  vartyped vartype;
-
-  for (j=0; j<d->ncols; j++) {
+  GList *rows, *l;
+  GtkTreeModel *model;
+  
+  for (j = 0 ; j < d->ncols ; j++) { /* clear selection */
     vt = vartable_element_get (j, d);
-    vartype = (vt->vartype == categorical) ? categorical : real;
-    rownum = vartable_rownum_from_varno (j, vt->vartype, d);
-
-    if (d->vartable_clist[vartype] != NULL) {
-      while (rownum >= 0) {
-        gtk_clist_get_text (GTK_CLIST (d->vartable_clist[vartype]), rownum, 0,
-          &varno_str);
-        varno = (gint) atoi (varno_str);
-        if (varno >= 0)
-          break;
-        rownum--;
-      }
-    } else varno = j;
-
-    if (varno == jvar) {
-      if (d->vartable_clist[vartype] != NULL) {
-        if (selected)
-          gtk_clist_select_row (GTK_CLIST (d->vartable_clist[vartype]),
-            jvar, 1);
-        else
-          gtk_clist_unselect_row (GTK_CLIST (d->vartable_clist[vartype]),
-            jvar, 1);
-      }
-      vt = vartable_element_get (jvar, d);
-      vt->selected = selected;
-    }
+	vt->selected = false;
   }
-}
-*/
-
-void
-selection_made (GtkWidget *cl, gint row, gint column,
-  GdkEventButton *event, ggobid *gg)
-{
-  gint varno;
-  gchar *varno_str;
-  datad *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
-  vartabled *vt;
-
-  while (row >= 0) {
-    gtk_clist_get_text (GTK_CLIST (cl), row, 0, &varno_str);
-    varno = (gint) atoi (varno_str);
-    if (varno >= 0) {
-      vt = vartable_element_get (varno, d);
-      vt->selected = true;
-      break;
-    } else row--;
+  
+  rows = gtk_tree_selection_get_selected_rows(tree_sel, &model);
+  for (l = rows; l; l = l->next) {
+	  gint varno;
+	  GtkTreePath *path = (GtkTreePath*)l->data;
+	  
+	  varno = vartable_varno_from_path(model, path);
+	  gtk_tree_path_free(path);
+	  
+	  vt = vartable_element_get (varno, d);
+	  vt->selected = true;
   }
-
-  return;
+  g_list_free(rows);
 }
-
-void
-deselection_made (GtkWidget *cl, gint row, gint column,
-  GdkEventButton *event, ggobid *gg)
-{
-  gint varno;
-  gchar *varno_str;
-  datad *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
-  vartabled *vt;
-
-  while (row >= 0) {
-    gtk_clist_get_text (GTK_CLIST (cl), row, 0, &varno_str);
-    varno = (gint) atoi (varno_str);
-    if (varno >= 0) {
-      vt = vartable_element_get (varno, d);
-      vt->selected = false;
-      break;
-    } else row--;
-  }
-
-  return;
-}
-
-gint
-arithmetic_compare (GtkCList *cl, gconstpointer ptr1, gconstpointer ptr2) 
-{
-  const GtkCListRow *row1 = (const GtkCListRow *) ptr1;
-  const GtkCListRow *row2 = (const GtkCListRow *) ptr2;
-  gchar *text1 = NULL;
-  gchar *text2 = NULL;
-  gfloat f1, f2;
-
-  text1 = GTK_CELL_TEXT (row1->cell[cl->sort_column])->text;
-  text2 = GTK_CELL_TEXT (row2->cell[cl->sort_column])->text;
-
-  f1 = atof (text1);
-  f2 = atof (text2);
-
-  return ((f1 < f2) ? -1 : (f1 > f2) ? 1 : 0);
-}
-
-void sortbycolumn_cb (GtkWidget *cl, gint column, ggobid *gg)
-{
-/*
-  datad *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
-*/
-
-  gtk_clist_set_sort_column (GTK_CLIST (cl), column);
-
-/*
-   If column is already sorted in forward order, it would be useful to
-   sort it in reverse order, but how do I determine its sort order?
-   I can either keep an integer vector and keep track of each column's
-   sort order, or I can just reset the sort order for the whole clist.
-   The lists and trees are so different in gtk 1.3 that it doesn't
-   seem worthwhile to work on this now.
-*/
-
-  if (column >= 1 && column <= 3)  /*-- name, cat?, tform --*/
-    gtk_clist_set_compare_func (GTK_CLIST (cl), NULL);
-  else
-    gtk_clist_set_compare_func (GTK_CLIST (cl),
-      (GtkCListCompareFunc) arithmetic_compare);
-  gtk_clist_sort (GTK_CLIST (cl));
-
-  return;
-}
-
+#if 0
 static void
 vartable_row_assemble (gint jvar, vartyped type, gchar **row,
   datad *d, ggobid *gg)
@@ -365,53 +307,58 @@ vartable_row_assemble (gint jvar, vartyped type, gchar **row,
   }
 }
 
+#endif
+
+/** 'row' here corresponds to 'variable' (top-level rows) */
 void
 vartable_row_append (gint jvar, datad *d, ggobid *gg)
 {
-  vartabled *vt = vartable_element_get (jvar, d);
-  vartyped type = vt->vartype;
   gint k;
-  gchar **row;
-  gint ncolumns;
-  if (type == categorical) {
-    ncolumns = NCOLS_CLIST_CAT;
-  } else {
-    ncolumns = NCOLS_CLIST_REAL;
-    type = real;
-  }
+  vartabled *vt = vartable_element_get (jvar, d);
+  GtkTreeModel *model = vartable_tree_model_get(d);
+  GtkTreeIter iter;
+  GtkTreeIter child;
+  if (!model)
+	  return;
+  gtk_tree_store_append(GTK_TREE_STORE(model), &iter, NULL);
+  for (k=0; k<vt->nlevels; k++)
+	  gtk_tree_store_append(GTK_TREE_STORE(model), &child, &iter);
+}
 
-  if (d->vartable_clist[type] != NULL) {
-    row = (gchar **) g_malloc (ncolumns * sizeof (gchar *));
-
-    vartable_row_assemble (jvar, type, row, d, gg);
-
-    gtk_clist_freeze (GTK_CLIST (d->vartable_clist[type]));
-    gtk_clist_append (GTK_CLIST (d->vartable_clist[type]), row);
-    gtk_clist_thaw (GTK_CLIST (d->vartable_clist[type]));
-
-    for (k=0; k<ncolumns; k++)
-      g_free ((gpointer) row[k]);
-    g_free ((gpointer) row);
-  }
+static gboolean
+real_filter_func (GtkTreeModel *model, GtkTreeIter *iter, datad *d)
+{
+	GtkTreePath *path = gtk_tree_model_get_path(model, iter);
+	vartabled *vt = vartable_element_get (gtk_tree_path_get_indices(path)[0], d);
+	gtk_tree_path_free(path);
+	return(vt->vartype != categorical);
+}
+static gboolean
+cat_filter_func (GtkTreeModel *model, GtkTreeIter *iter, datad *d)
+{
+	GtkTreePath *path = gtk_tree_model_get_path(model, iter);
+	vartabled *vt = vartable_element_get (gtk_tree_path_get_indices(path)[0], d);
+	gtk_tree_path_free(path);
+	return(vt->vartype == categorical);
 }
 
 static void
 vartable_subwindow_init (datad *d, ggobid *gg)
 {
-  gint j, k;
-  GtkWidget *scrolled_window, *wlbl;
+  gint j;
+  GtkWidget *sw, *wlbl;
   gchar *lbl;
-  gchar *titles[NCOLS_CLIST_REAL] = {
-    "varno",          /*-- varno will be an invisible column --*/
+  static gchar *titles[] = {
     "Variable",
     "Transform",
     "Min (user)", "Max (user)",
     "Min (data)", "Max (data)",
     "Mean", "Median",
+	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
     "N NAs"};
-  gchar *titles_cat[NCOLS_CLIST_CAT] = {
-    "varno",          /*-- varno will be an invisible column --*/
+  static gchar *titles_cat[] = {
     "Variable",
+	NULL, NULL, NULL, NULL, NULL, NULL, NULL,
     "N Levels",
     "Level",
     "Value",
@@ -421,49 +368,47 @@ vartable_subwindow_init (datad *d, ggobid *gg)
     "N NAs",
   };
   GtkWidget *nbook = gtk_notebook_new ();
-  vartabled *vt;
-
-  gtk_signal_connect (GTK_OBJECT (nbook), "switch-page",
-    GTK_SIGNAL_FUNC (vartable_switch_page_cb), gg);
+  GtkTreeStore *model;
+  GtkTreeModel *sort_model, *filter_model;
+  
+  g_signal_connect (G_OBJECT (nbook), "switch-page",
+    G_CALLBACK (vartable_switch_page_cb), gg);
 
   lbl = datasetName (d, gg);
   /*
    * We're showing all datasets for now, whether they have variables
    * or not.  That could change.
   */
-  gtk_object_set_data(GTK_OBJECT(nbook), "datad", d);  /*setdata*/
+  g_object_set_data(G_OBJECT(nbook), "datad", d);  /*setdata*/
   gtk_notebook_append_page (GTK_NOTEBOOK (gg->vartable_ui.notebook),
     nbook, gtk_label_new (lbl));
   g_free (lbl);
 
 
-  /* Pack each clist into a scrolled window */
-  scrolled_window = gtk_scrolled_window_new (NULL, NULL);
-  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled_window),
-    GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
-
+  /* Pack each tree_view into a scrolled window */
+  sw = gtk_scrolled_window_new (NULL, NULL);
+ 
 /*
  * Page for real, counter and integer variables
 */
-  d->vartable_clist[real] = gtk_clist_new_with_titles (NCOLS_CLIST_REAL,
-    titles);
-
-  gtk_clist_set_selection_mode (GTK_CLIST (d->vartable_clist[real]),
-    GTK_SELECTION_EXTENDED);
+  model = gtk_tree_store_new(NCOLS_VT, G_TYPE_STRING, G_TYPE_STRING,
+  	G_TYPE_DOUBLE, G_TYPE_DOUBLE, G_TYPE_DOUBLE, G_TYPE_DOUBLE, G_TYPE_DOUBLE, 
+	G_TYPE_DOUBLE, G_TYPE_INT, G_TYPE_STRING, G_TYPE_INT, G_TYPE_INT, G_TYPE_INT, 
+	G_TYPE_INT, G_TYPE_INT, G_TYPE_INT, G_TYPE_INT);
+  filter_model = gtk_tree_model_filter_new(GTK_TREE_MODEL(model), NULL);
+  gtk_tree_model_filter_set_visible_func(GTK_TREE_MODEL_FILTER(filter_model), 
+  	(GtkTreeModelFilterVisibleFunc)real_filter_func, d, NULL);
+  sort_model = gtk_tree_model_sort_new_with_model(filter_model);
+  d->vartable_tree_view[real] = gtk_tree_view_new_with_model(sort_model);
+  populate_tree_view(d->vartable_tree_view[real], titles, G_N_ELEMENTS(titles), true,
+  	GTK_SELECTION_MULTIPLE, G_CALLBACK(selection_changed_cb), gg);
+  gtk_tree_view_set_headers_clickable(GTK_TREE_VIEW(d->vartable_tree_view[real]), true);
+  
   /*-- right justify all the numerical columns --*/
-  for (k=0; k<NCOLS_CLIST_REAL; k++)
-    gtk_clist_set_column_justification (GTK_CLIST (d->vartable_clist[real]),
-      k, GTK_JUSTIFY_RIGHT);
-  /*-- make the first column invisible --*/
-  gtk_clist_set_column_visibility (GTK_CLIST (d->vartable_clist[real]),
-    REAL_CLIST_VARNO, false);
   /*-- set the column width automatically --*/
-  for (k=0; k<NCOLS_CLIST_REAL; k++)
-    gtk_clist_set_column_auto_resize (GTK_CLIST (d->vartable_clist[real]),
-                                      k, true);
 
-  gtk_container_add (GTK_CONTAINER (scrolled_window), d->vartable_clist[real]);
-  wlbl = gtk_label_new("real");
+  gtk_container_add (GTK_CONTAINER (sw), d->vartable_tree_view[real]);
+  wlbl = gtk_label_new_with_mnemonic("_Real");
 /*
 This works for showing tooltips in the tabs, but unfortunately it
 interferes with the normal operation of the widget -- I can't switch
@@ -476,42 +421,28 @@ pages any more!
     "Table of statistics for real, integer and counter variables", NULL);
   gtk_notebook_append_page (GTK_NOTEBOOK (nbook), scrolled_window, ebox);
 */
-  gtk_notebook_append_page (GTK_NOTEBOOK (nbook), scrolled_window, wlbl);
+  gtk_notebook_append_page (GTK_NOTEBOOK (nbook), sw, wlbl);
 
+  sw = gtk_scrolled_window_new (NULL, NULL);
 
-  gtk_widget_set_usize (GTK_WIDGET (scrolled_window),
-    d->vartable_clist[real]->requisition.width + 3 +
-    GTK_SCROLLED_WINDOW (scrolled_window)->vscrollbar->requisition.width,
-    150);
-  gtk_widget_show (scrolled_window);
-
-
-  scrolled_window = gtk_scrolled_window_new (NULL, NULL);
-  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled_window),
-    GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
 /*
  * Page for categorical variables
 */
-  d->vartable_clist[categorical] = gtk_clist_new_with_titles (NCOLS_CLIST_CAT,
-    titles_cat);
-
-  gtk_clist_set_selection_mode (GTK_CLIST (d->vartable_clist[categorical]),
-    GTK_SELECTION_EXTENDED);
+  
+  filter_model = gtk_tree_model_filter_new(GTK_TREE_MODEL(model), NULL);
+  gtk_tree_model_filter_set_visible_func(GTK_TREE_MODEL_FILTER(filter_model), 
+  	(GtkTreeModelFilterVisibleFunc)cat_filter_func, d, NULL);
+  sort_model = gtk_tree_model_sort_new_with_model(filter_model);
+  d->vartable_tree_view[categorical] = gtk_tree_view_new_with_model(sort_model);
+  populate_tree_view(d->vartable_tree_view[categorical], titles_cat,
+  	G_N_ELEMENTS(titles_cat), true, GTK_SELECTION_MULTIPLE, G_CALLBACK(selection_changed_cb), gg);
+  gtk_tree_view_set_headers_clickable(GTK_TREE_VIEW(d->vartable_tree_view[categorical]), true);
+  
   /*-- right justify all the numerical columns --*/
-  for (k=0; k<NCOLS_CLIST_CAT; k++)
-    gtk_clist_set_column_justification (GTK_CLIST (d->vartable_clist[categorical]),
-      k, GTK_JUSTIFY_RIGHT);
-  /*-- make the first column invisible --*/
-  gtk_clist_set_column_visibility (GTK_CLIST (d->vartable_clist[categorical]),
-    CAT_CLIST_VARNO, false);
-  /*-- set the column width automatically --*/
-  for (k=0; k<NCOLS_CLIST_CAT; k++)
-    gtk_clist_set_column_auto_resize (GTK_CLIST (d->vartable_clist[categorical]),
-      k, true);
 
-  gtk_container_add (GTK_CONTAINER (scrolled_window),
-    d->vartable_clist[categorical]);
-  wlbl = gtk_label_new("categorical");
+  gtk_container_add (GTK_CONTAINER (sw),
+    d->vartable_tree_view[categorical]);
+  wlbl = gtk_label_new_with_mnemonic("_Categorical");
 /*
   ebox = gtk_event_box_new ();
   gtk_container_add (GTK_CONTAINER (ebox), wlbl);
@@ -520,59 +451,18 @@ pages any more!
     "Table of statistics for categorical variables", NULL);
   gtk_notebook_append_page (GTK_NOTEBOOK (nbook), scrolled_window, ebox);
 */
-  gtk_notebook_append_page (GTK_NOTEBOOK (nbook), scrolled_window, wlbl);
+  gtk_notebook_append_page (GTK_NOTEBOOK (nbook), sw, wlbl);
 
   /*-- 3 = COLUMN_INSET --*/
-  gtk_widget_set_usize (GTK_WIDGET (scrolled_window),
-    d->vartable_clist[categorical]->requisition.width + 3 +
-    GTK_SCROLLED_WINDOW (scrolled_window)->vscrollbar->requisition.width,
-    150);
-  gtk_widget_show (scrolled_window);
-
+  
+  d->vartable_tree_model = GTK_TREE_MODEL(model);
+  
   /*-- populate the tables --*/
   for (j = 0 ; j < d->ncols ; j++) {
-    vt = vartable_element_get (j, d);
-
-    vartable_row_append (j, d, gg);    /*-- append a generic row --*/
-    if (vt->vartype == categorical) {
-      for (k = 0; k < vt->nlevels ; k++)
-        vartable_row_append (j, d, gg);
-    }
-
-    vartable_cells_set_by_var (j, d);  /*-- then populate --*/
+	  vartable_row_append(j, d, gg);
+	  vartable_cells_set_by_var(j, d);
   }
   
-
-/* reals (etc) */
-  /*-- track selections --*/
-  gtk_signal_connect (GTK_OBJECT (d->vartable_clist[real]),
-    "select_row", GTK_SIGNAL_FUNC (selection_made), gg);
-  gtk_signal_connect (GTK_OBJECT (d->vartable_clist[real]),
-    "unselect_row", GTK_SIGNAL_FUNC (deselection_made), gg);
-  /*-- re-sort when receiving a mouse click on a column header --*/
-  gtk_signal_connect (GTK_OBJECT (d->vartable_clist[real]),
-    "click_column", GTK_SIGNAL_FUNC (sortbycolumn_cb), gg);
-
-/* categoricals */
-  /*-- track selections --*/
-  gtk_signal_connect (GTK_OBJECT (d->vartable_clist[categorical]),
-    "select_row", GTK_SIGNAL_FUNC (selection_made), gg);
-  gtk_signal_connect (GTK_OBJECT (d->vartable_clist[categorical]),
-    "unselect_row", GTK_SIGNAL_FUNC (deselection_made), gg);
-  /*-- re-sort when receiving a mouse click on a column header --*/
-/*  no: because this is a goofy sort of hierarchical display
-  gtk_signal_connect (GTK_OBJECT (d->vartable_clist[categorical]),
-    "click_column", GTK_SIGNAL_FUNC (sortbycolumn_cb), gg);
-*/
-
-
-  /* It isn't necessary to shadow the border, but it looks nice :) */
-/*
-  gtk_clist_set_shadow_type (GTK_CLIST (d->vartable_clist[real]),
-    GTK_SHADOW_OUT);
-*/
-
-
   gtk_widget_show_all (nbook);
 
 }
@@ -586,7 +476,7 @@ vartable_open (ggobid *gg)
 
   /*-- if used before we have data, bail out --*/
   if (gg->d == NULL || g_slist_length (gg->d) == 0) 
-/**/return;
+	  return;
 
   /*-- if new datad's have been added, the user has to reopen the window --*/
   if (gg->vartable_ui.window != NULL) {
@@ -594,8 +484,9 @@ vartable_open (ggobid *gg)
   }
 
   gg->vartable_ui.window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-  gtk_signal_connect (GTK_OBJECT (gg->vartable_ui.window),
-    "delete_event", GTK_SIGNAL_FUNC (close_wmgr_cb), gg);
+  gtk_window_set_default_size(GTK_WINDOW(gg->vartable_ui.window), 750, 300);
+  g_signal_connect (G_OBJECT (gg->vartable_ui.window),
+    "delete_event", G_CALLBACK (close_wmgr_cb), gg);
   gtk_window_set_title (GTK_WINDOW (gg->vartable_ui.window),
     "Variable manipulation");
 
@@ -619,8 +510,8 @@ vartable_open (ggobid *gg)
   }
 
   /*-- listen for datad_added events --*/
-  gtk_signal_connect (GTK_OBJECT (gg),
-    "datad_added", GTK_SIGNAL_FUNC (vartable_notebook_adddata_cb),
+  g_signal_connect (G_OBJECT (gg),
+    "datad_added", G_CALLBACK (vartable_notebook_adddata_cb),
      GTK_OBJECT (gg->vartable_ui.notebook));
 
   hbox = vartable_buttonbox_build (gg);
@@ -642,43 +533,37 @@ void
 vartable_collab_set_by_var (gint j, datad *d)
 {
   vartabled *vt = vartable_element_get (j, d);
-  gint rownum, k;
-
+  gint k;
+  GtkTreeModel *model;
+  GtkTreeIter iter;
+  GtkTreeIter child;
+  
+  if (d->vartable_tree_view[real] == NULL)
+	  return;
+  
+  vartable_iter_from_varno(j, d, &model, &iter);
+  
   if (vt) {
-    rownum = vartable_rownum_from_varno (j, vt->vartype, d);
-
     switch (vt->vartype) {
       case categorical:
-        if (d->vartable_clist[categorical] != NULL) {
-          gtk_clist_set_text (GTK_CLIST (d->vartable_clist[categorical]),
-            rownum, CAT_CLIST_VARNAME, vt->collab);
-          gtk_clist_set_text (GTK_CLIST (d->vartable_clist[categorical]),
-            rownum, CAT_CLIST_NLEVELS,
-            g_strdup_printf ("%d", vt->nlevels));
-          /*-- set the level fields --*/
-          for (k=0; k<vt->nlevels; k++) {
-            gtk_clist_set_text (GTK_CLIST (d->vartable_clist[categorical]),
-              k+1+rownum, CAT_CLIST_VARNO, "-1");
-            gtk_clist_set_text (GTK_CLIST (d->vartable_clist[categorical]),
-              k+1+rownum, CAT_CLIST_LEVEL_NAME,
-              vt->level_names[k]);
-            gtk_clist_set_text (GTK_CLIST (d->vartable_clist[categorical]),
-              k+1+rownum, CAT_CLIST_LEVEL_VALUE,
-              g_strdup_printf ("%d", vt->level_values[k]));
-            gtk_clist_set_text (GTK_CLIST (d->vartable_clist[categorical]),
-              k+1+rownum, CAT_CLIST_LEVEL_COUNT,
-              g_strdup_printf ("%d", vt->level_counts[k]));
-          }
+		
+		gtk_tree_store_set(GTK_TREE_STORE(model), &iter, 
+ 			VT_NLEVELS, vt->nlevels, -1);
+		gtk_tree_model_iter_children(model, &child, &iter);
+    	/*-- set the level fields --*/
+     	for (k=0; k<vt->nlevels; k++) {
+            gtk_tree_store_set(GTK_TREE_STORE(model), &child, VT_LEVEL_NAME,
+			  	vt->level_names[k], VT_LEVEL_VALUE, vt->level_values[k],
+				VT_LEVEL_COUNT, vt->level_counts[k], -1);
+			gtk_tree_model_iter_next(model, &child);
         }
-      break;
+	   // no more break
       case integer:
       case counter:
       case uniform:
       case real:
-        if (d->vartable_clist[real] != NULL) {
-          gtk_clist_set_text (GTK_CLIST (d->vartable_clist[real]), rownum,
-            REAL_CLIST_VARNAME, vt->collab);
-        }
+        gtk_tree_store_set(GTK_TREE_STORE(model), &iter,
+			VT_VARNAME, vt->collab, -1);
       break;
       case all_vartypes:
         g_printerr ("(vartable_collab_set_by_var) illegal variable type %d\n", all_vartypes);
@@ -692,19 +577,24 @@ void
 vartable_collab_tform_set_by_var (gint j, datad *d)
 {
   vartabled *vt;
+  GtkTreeModel *model;
+  GtkTreeIter iter;
+  
+  if (d->vartable_tree_view[real] == NULL)
+	  return;
+  
+  vartable_iter_from_varno(j, d, &model, &iter);
 
-  if (d->vartable_clist[real] != NULL) {
-    vt = vartable_element_get (j, d);
-    if (vt->tform0 == NO_TFORM0 &&
-        vt->tform1 == NO_TFORM1 &&
-        vt->tform2 == NO_TFORM2)
-    {
-      gtk_clist_set_text (GTK_CLIST (d->vartable_clist[real]), j,
-        REAL_CLIST_TFORM, g_strdup(""));
-    } else {
-      gtk_clist_set_text (GTK_CLIST (d->vartable_clist[real]), j,
-        REAL_CLIST_TFORM, vt->collab_tform);
-    }
+  vt = vartable_element_get (j, d);
+  if (vt->tform0 == NO_TFORM0 &&
+	vt->tform1 == NO_TFORM1 &&
+	vt->tform2 == NO_TFORM2)
+  {
+	  gtk_tree_store_set(GTK_TREE_STORE(model), &iter,
+			VT_TFORM, "", -1);
+  } else {
+	  gtk_tree_store_set(GTK_TREE_STORE(model), &iter,
+			VT_TFORM, vt->collab_tform, -1);
   }
 }
 
@@ -712,68 +602,41 @@ vartable_collab_tform_set_by_var (gint j, datad *d)
 void
 vartable_limits_set_by_var (gint j, datad *d)
 {
-  gchar *stmp;
   vartabled *vt = vartable_element_get (j, d);
+  GtkTreeModel *model;
+  GtkTreeIter iter;
+  
+  if (d->vartable_tree_view[real] == NULL)
+	  return;
+  
+  vartable_iter_from_varno(j, d, &model, &iter);
+  
   if (vt) {
-    gint rownum = vartable_rownum_from_varno (j, vt->vartype, d);
+    //gint rownum = vartable_rownum_from_varno (j, vt->vartype, d);
 
     switch (vt->vartype) {
       case integer:
       case counter:
       case uniform:
       case real:
-        if (d->vartable_clist[real] != NULL) {
-
-          stmp = g_strdup_printf ("%8.3f", (gfloat) vt->lim_display.min);
-          gtk_clist_set_text (GTK_CLIST (d->vartable_clist[real]), rownum,
-            REAL_CLIST_DATA_MIN, stmp);
-          g_free (stmp);
-
-          stmp = g_strdup_printf ("%8.3f", (gfloat) vt->lim_display.max);
-          gtk_clist_set_text (GTK_CLIST (d->vartable_clist[real]), rownum,
-            REAL_CLIST_DATA_MAX, stmp);
-          g_free (stmp);
-
-          if (vt->lim_specified_p) {
-            stmp = g_strdup_printf ("%8.3f",
-              (gfloat) vt->lim_specified_tform.min);
-            gtk_clist_set_text (GTK_CLIST (d->vartable_clist[real]), rownum,
-              REAL_CLIST_USER_MIN, stmp);
-            g_free (stmp);
-
-            stmp = g_strdup_printf ("%8.3f",
-              (gfloat) vt->lim_specified_tform.max);
-            gtk_clist_set_text (GTK_CLIST (d->vartable_clist[real]), rownum,
-              REAL_CLIST_USER_MAX, stmp);
-            g_free (stmp);
-          }
+		gtk_tree_store_set(GTK_TREE_STORE(model), &iter,
+		 	VT_REAL_DATA_MIN, vt->lim_display.min,
+			VT_REAL_DATA_MAX, vt->lim_display.max, -1);
+		if (vt->lim_specified_p) {
+			gtk_tree_store_set(GTK_TREE_STORE(model), &iter, 
+		  		VT_REAL_USER_MIN, vt->lim_specified_tform.min,
+				VT_REAL_USER_MAX, vt->lim_specified_tform.max, -1);
         }
       break;
 
       case categorical:
-        if (d->vartable_clist[categorical] != NULL) {
-
-          stmp = g_strdup_printf ("%d", (gint) vt->lim_display.min);
-          gtk_clist_set_text (GTK_CLIST (d->vartable_clist[categorical]),
-            rownum, CAT_CLIST_DATA_MIN, stmp);
-          g_free (stmp);
-
-          stmp = g_strdup_printf ("%d", (gint) vt->lim_display.max);
-          gtk_clist_set_text (GTK_CLIST (d->vartable_clist[categorical]),
-            rownum, CAT_CLIST_DATA_MAX, stmp);
-          g_free (stmp);
-
-          if (vt->lim_specified_p) {
-            stmp = g_strdup_printf ("%d", (gint) vt->lim_specified_tform.min);
-            gtk_clist_set_text (GTK_CLIST (d->vartable_clist[categorical]),
-              rownum, CAT_CLIST_USER_MIN, stmp);
-            g_free (stmp);
-
-            stmp = g_strdup_printf ("%d", (gint) vt->lim_specified_tform.max);
-            gtk_clist_set_text (GTK_CLIST (d->vartable_clist[categorical]),
-              rownum, CAT_CLIST_USER_MAX, stmp);
-            g_free (stmp);
-          }
+		gtk_tree_store_set(GTK_TREE_STORE(model), &iter, 
+			VT_CAT_DATA_MIN, (gint)vt->lim_display.min,
+			VT_CAT_DATA_MAX, (gint)vt->lim_display.max, -1); 
+  	    if (vt->lim_specified_p) {
+			gtk_tree_store_set(GTK_TREE_STORE(model), &iter, 
+		  		VT_CAT_USER_MIN, (gint)vt->lim_specified_tform.min,
+				VT_CAT_USER_MAX, (gint)vt->lim_specified_tform.max, -1);
         }
       break;
       case all_vartypes:
@@ -787,7 +650,7 @@ void
 vartable_limits_set (datad *d) 
 {
   gint j;
-  if (d->vartable_clist[real] != NULL || d->vartable_clist[categorical] != NULL)
+  if (d->vartable_tree_view[real] != NULL || d->vartable_tree_view[categorical] != NULL)
     for (j=0; j<d->ncols; j++)
       vartable_limits_set_by_var (j, d);
 }
@@ -796,47 +659,31 @@ vartable_limits_set (datad *d)
 void
 vartable_stats_set_by_var (gint j, datad *d) {
   vartabled *vt = vartable_element_get (j, d);
-  gchar *stmp;
   vartyped type;
+  GtkTreeModel *model;
+  GtkTreeIter iter;
 
+  if (d->vartable_tree_view[real] == NULL)
+	  return;
+  
+  vartable_iter_from_varno(j, d, &model, &iter);
+  
   if (vt) {
-    gint rownum = vartable_rownum_from_varno (j, vt->vartype, d);
+    //gint rownum = vartable_rownum_from_varno (j, vt->vartype, d);
     switch (vt->vartype) {
-      case categorical:
-        if (d->vartable_clist[categorical] != NULL) {
-          stmp = g_strdup_printf ("%d", vt->nmissing);
-          gtk_clist_set_text (GTK_CLIST (d->vartable_clist[categorical]),
-            rownum, CAT_CLIST_NMISSING, stmp);
-          g_free (stmp);
-        }
-        break;  /* I <think> I want to break here.  dfs 5/8/2005 */
-
       case integer:
       case counter:
       case uniform:
       case real:
         type = real;
-        if (d->vartable_clist[real] != NULL) {
-
-          /*-- for counter variables, don't display the mean --*/
-          stmp = (vt->vartype == counter) ?
-            g_strdup("") : g_strdup_printf ("%8.3f", vt->mean);
-          gtk_clist_set_text (GTK_CLIST (d->vartable_clist[real]),
-            rownum, REAL_CLIST_MEAN, stmp);
-          g_free (stmp); 
-
-          /*-- for counter variables, don't display the median --*/
-          stmp = (vt->vartype == counter) ?
-            g_strdup("") : g_strdup_printf ("%8.3f", vt->median);
-          gtk_clist_set_text (GTK_CLIST (d->vartable_clist[real]),
-            rownum, REAL_CLIST_MEDIAN, stmp);
-          g_free (stmp);
-
-          stmp = g_strdup_printf ("%d", vt->nmissing);
-          gtk_clist_set_text (GTK_CLIST (d->vartable_clist[real]),
-            rownum, REAL_CLIST_NMISSING, stmp);
-          g_free (stmp);
-        }
+        /*-- for counter variables, don't display the mean --*/
+		if (vt->vartype != counter)
+		  gtk_tree_store_set(GTK_TREE_STORE(model), &iter, 
+			VT_MEAN, vt->mean, VT_MEDIAN, vt->median, -1);
+      //break;
+	  case categorical:
+        gtk_tree_store_set(GTK_TREE_STORE(model), &iter, 
+			VT_NMISSING, vt->nmissing, -1);
       break;
       case all_vartypes:
         g_printerr ("(vartable_stats_set_by_var) %d: illegal variable type %d\n",
@@ -850,14 +697,14 @@ void
 vartable_stats_set (datad *d) {
   gint j;
 
-  if (d->vartable_clist[real] != NULL)
+  if (d->vartable_tree_view[real] != NULL)
     for (j=0; j<d->ncols; j++)
       vartable_stats_set_by_var (j, d);
 }
 
 /*
  * in one routine, populate every cell in a row -- all these
- * functions call gtk_clist_set_text.
+ * functions call gtk_tree_view_set_text.
 */
 void
 vartable_cells_set_by_var (gint j, datad *d) 

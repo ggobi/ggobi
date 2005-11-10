@@ -67,7 +67,7 @@ move_variable (gint from, gint to) {
  * the vbox, and then get_data to grab the label attached to
  * the button.
 */
-    vb_list = gtk_container_children (GTK_CONTAINER (varpanel));  /* vboxes */
+    vb_list = gtk_container_get_children (GTK_CONTAINER (varpanel));  /* vboxes */
 
     for (j=0; j<xg.ncols; j++) {
       k = -1;
@@ -76,10 +76,10 @@ move_variable (gint from, gint to) {
       vb = (GtkWidget *) vb_list->data;
 
       /* get the button, the first child of the vbox */
-      btn = (gtk_container_children (GTK_CONTAINER (vb)))->data;
+      btn = (gtk_container_get_children (GTK_CONTAINER (vb)))->data;
 
       /* get the label, the user data associated with the button */
-      d = gtk_object_get_data (GTK_OBJECT (btn), "index");
+      d = g_object_get_data(G_OBJECT (btn), "index");
       if (d != NULL) {
         /* get the label of the label */
         gtk_label_get (GTK_LABEL (d), &name);
@@ -128,7 +128,7 @@ ebox_drag_data_received  (GtkWidget          *w,
  * widget is attached.  The label widget has the index of destination
  * variable circle.
 */
-  d = gtk_object_get_data (GTK_OBJECT (w), "index");
+  d = g_object_get_data(G_OBJECT (w), "index");
   gtk_label_get (GTK_LABEL (GTK_LABEL (d)), &label);
   p = atoi (label);
 /* */
@@ -145,7 +145,7 @@ ebox_drag_data_received  (GtkWidget          *w,
       gboolean rval = false;
       move_variable (k, p);
       for (j=0; j<xg.ncols; j++)
-        gtk_signal_emit_by_name (GTK_OBJECT (da[j]), "expose_event",
+        g_signal_emit_by_name (G_OBJECT (da[j]), "expose_event",
           GINT_TO_POINTER (j), &rval);
       gtk_drag_finish ((GdkDragContext *) context, TRUE, FALSE, time);
       return;
@@ -206,7 +206,7 @@ select_varcircle (gint select, gint variable, gint varcircle) {
     xg.view.varchosen[var] = select;
   }
 
-  gtk_signal_emit_by_name (GTK_OBJECT (da[varcirc]), "expose_event",
+  g_signal_emit_by_name (G_OBJECT (da[varcirc]), "expose_event",
     GINT_TO_POINTER (varcirc), &rval);
 }
 
@@ -261,7 +261,7 @@ varsel_cb (GtkWidget *w, GdkEvent *event, gpointer cbd)
         sp_world_to_plane (view, sp);
         sp_plane_to_screen (view, sp);
         setRulerRanges (view, sp);
-        gtk_signal_emit_by_name (GTK_OBJECT (sp->da), "expose_event",
+        g_signal_emit_by_name (G_OBJECT (sp->da), "expose_event",
           (gpointer) sp, (gpointer) &rval);
       }
       return true;
@@ -405,7 +405,7 @@ add_varcircle (gint i, gint j, gint k,
   GtkWidget *lbl, *ebox;
 
   vb = gtk_vbox_new (false, 0);
-  gtk_container_border_width (GTK_CONTAINER (vb), 1);
+  gtk_container_set_border_width (GTK_CONTAINER (vb), 1);
   gtk_widget_show (vb);
 
   button = gtk_button_new_with_label (xg.collab[k]);
@@ -419,10 +419,10 @@ add_varcircle (gint i, gint j, gint k,
    * data to the button.
   */
   lbl = gtk_label_new (g_strdup_printf ("%d", k));
-  gtk_object_set_data (GTK_OBJECT (button), "index", GTK_OBJECT (lbl));
+  g_object_set_data(G_OBJECT (button), "index", GTK_OBJECT (lbl));
 
-  gtk_signal_connect_object (GTK_OBJECT (button), "button_press_event",
-    GTK_SIGNAL_FUNC (popup_varmenu), GTK_OBJECT (xyplot_menu));
+  g_signal_connect_swapped (G_OBJECT (button), "button_press_event",
+    G_CALLBACK (popup_varmenu), G_OBJECT (xyplot_menu));
 
 /*
  * connect the drag and drop signals to the right mouse button
@@ -433,8 +433,8 @@ add_varcircle (gint i, gint j, gint k,
                      GTK_DEST_DEFAULT_ALL,
                      target_table, 1,
                      GDK_ACTION_COPY | GDK_ACTION_MOVE);
-  gtk_signal_connect (GTK_OBJECT (button), "drag_data_received",
-                     GTK_SIGNAL_FUNC (ebox_drag_data_received), NULL);
+  g_signal_connect (G_OBJECT (button), "drag_data_received",
+                     G_CALLBACK (ebox_drag_data_received), NULL);
 
   /* button qua source */
   gtk_drag_source_set (button, GDK_BUTTON3_MASK,
@@ -445,11 +445,11 @@ add_varcircle (gint i, gint j, gint k,
                             drag_icon, drag_mask);
   gdk_pixmap_unref (drag_icon);
   gdk_pixmap_unref (drag_mask);
-  gtk_signal_connect (GTK_OBJECT (button), "drag_data_get",
-                      GTK_SIGNAL_FUNC (source_drag_data_get),
+  g_signal_connect (G_OBJECT (button), "drag_data_get",
+                      G_CALLBACK (source_drag_data_get),
                       GINT_TO_POINTER (k));
-  gtk_signal_connect (GTK_OBJECT (button), "drag_data_delete",
-                      GTK_SIGNAL_FUNC (source_drag_data_delete),
+  g_signal_connect (G_OBJECT (button), "drag_data_delete",
+                      G_CALLBACK (source_drag_data_delete),
                       GINT_TO_POINTER (k));
 
 /*
@@ -469,12 +469,12 @@ add_varcircle (gint i, gint j, gint k,
   gtk_tooltips_set_tip (GTK_TOOLTIPS (xg.tips),
     ebox, "Click to select; see menu", NULL);
 
-  gtk_signal_connect (GTK_OBJECT (da[k]), "expose_event",
-    GTK_SIGNAL_FUNC (da_expose), GINT_TO_POINTER (k));
+  g_signal_connect (G_OBJECT (da[k]), "expose_event",
+    G_CALLBACK (da_expose), GINT_TO_POINTER (k));
 
   gtk_widget_show (da[k]);
-  gtk_signal_connect (GTK_OBJECT (ebox), "button_press_event",
-    GTK_SIGNAL_FUNC (varsel_cb), GINT_TO_POINTER (k));
+  g_signal_connect (G_OBJECT (ebox), "button_press_event",
+    G_CALLBACK (varsel_cb), GINT_TO_POINTER (k));
 
   gtk_container_add (GTK_CONTAINER (ebox), da[k]);
   gtk_container_add (GTK_CONTAINER (vb), ebox);

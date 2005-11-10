@@ -28,17 +28,17 @@
 /*                   Options section                                  */
 /*--------------------------------------------------------------------*/
 
-static GtkItemFactoryEntry menu_items[] = {
-  { "/_File",         NULL,     NULL,     0,                    "<Branch>" },
-#ifdef PRINTING_IMPLEMENTED
-  { "/File/Print",    "",       (GtkItemFactoryCallback) display_print_cb, 0, "<Item>" },
-  { "/File/sep",      NULL,     NULL,     0, "<Separator>" },
-#endif
-  {"/File/Control Panel",  "",  (GtkItemFactoryCallback) show_display_control_panel_cb, 0, "<Item>" },
-  { "/File/Close",    "",       (GtkItemFactoryCallback) display_close_cb, 0, "<Item>" },
-};
-/* The rest of the menus will be appended once the menubar is created */
+static const gchar* parcoords_ui =
+"<ui>"
+"	<menubar>"
+"		<menu action='Options'>"
+"			<menuitem action='ShowPoints'/>"
+"			<menuitem action='ShowLines'/>"
+"		</menu>"
+"	</menubar>"
+"</ui>";
 
+#if 0
 void
 parcoords_display_menus_make (displayd *display, 
   GtkAccelGroup *accel_group, GtkSignalFunc func, GtkWidget *mbar, ggobid *gg)
@@ -55,10 +55,10 @@ parcoords_display_menus_make (displayd *display,
 
   item = CreateMenuCheck (options_menu, "Show points",
     func, GINT_TO_POINTER (DOPT_POINTS), on, gg);
-  gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
+  g_object_set_data(G_OBJECT (item), "display", (gpointer) display);
   item = CreateMenuCheck (options_menu, "Show line segments",
     func, GINT_TO_POINTER (DOPT_WHISKERS), on, gg);
-  gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
+  g_object_set_data(G_OBJECT (item), "display", (gpointer) display);
 
   /* Add a separator */
 /*
@@ -68,7 +68,7 @@ parcoords_display_menus_make (displayd *display,
 /*
   item = CreateMenuCheck (options_menu, "Double buffer",
     func, GINT_TO_POINTER (DOPT_BUFFER), on, gg);
-  gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
+  g_object_set_data(G_OBJECT (item), "display", (gpointer) display);
 */
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (submenu), options_menu);
@@ -77,6 +77,7 @@ parcoords_display_menus_make (displayd *display,
   gtk_widget_show (submenu);
 }
 
+#endif
 
 void
 parcoords_reset_arrangement (displayd *display, gint arrangement, ggobid *gg) {
@@ -119,14 +120,14 @@ parcoords_reset_arrangement (displayd *display, gint arrangement, ggobid *gg) {
 */
   for (l=display->splots; l; l=l->next) {
     sp = (splotd *) l->data;
-    gtk_widget_set_usize (sp->da, width, height);
+    //gtk_widget_set_usize (sp->da, width, height);
     gtk_box_pack_start (GTK_BOX (gg->parcoords.arrangement_box),
                         sp->da, true, true, 0);
     gtk_widget_unref (sp->da);  /*-- keep the ref_count appropriate --*/
   }
 
   /*-- position the display toward the lower left of the main window --*/
-  display_set_position (GTK_GGOBI_WINDOW_DISPLAY(display), gg);
+  display_set_position (GGOBI_WINDOW_DISPLAY(display), gg);
 
   gtk_widget_show_all (gg->parcoords.arrangement_box);
 
@@ -134,45 +135,6 @@ parcoords_reset_arrangement (displayd *display, gint arrangement, ggobid *gg) {
 
   varpanel_refresh (display, gg);
 }
-
-
-void
-start_parcoords_drag(GtkWidget *src, GdkDragContext *ctxt, GtkSelectionData *data, guint info, guint time, gpointer udata)
-{
-   gtk_selection_data_set(data, GDK_SELECTION_TYPE_STRING, 8, (gchar *) src, sizeof(splotd *)); 
-
-}
-
-void
-receive_parcoords_drag(GtkWidget *src, GdkDragContext *context, int x, int y, const GtkSelectionData *data,   unsigned int info, unsigned int event_time, gpointer *udata)
-{
-   splotd *to = GTK_GGOBI_SPLOT(src);
-   splotd *from;
-   displayd *display;
-   guint tmp;
-   display = to->displayptr;
-
-#if 0
-   from = (splotd *) data->data;/*XXX Want a proper, robust and portable way to do this. */
-#endif
-
-   from = GTK_GGOBI_SPLOT(gtk_drag_get_source_widget(context));
-
-   if(from->displayptr != display) {
-      gg_write_to_statusbar("the source and destination of the parallel coordinate plots are not from the same display.\n", display->ggobi);
-      return;
-   }
-
-   tmp = to->p1dvar;
-   to->p1dvar = from->p1dvar;
-   from->p1dvar = tmp;
-
-   display_tailpipe (display, FULL, display->ggobi);
-   varpanel_refresh (display, display->ggobi);
-
-}
-
-
 
 #define MAXNPCPLOTS 5
 
@@ -188,8 +150,7 @@ displayd *
 parcoords_new (displayd *display, gboolean missing_p, gint nvars, gint *vars,
 	       datad *d, ggobid *gg) 
 {
-  GtkWidget *vbox, *frame, *w;
-  GtkItemFactory *factory;
+  GtkWidget *vbox, *frame;
   gint i;
   splotd *sp;
   gint nplots;
@@ -198,7 +159,7 @@ parcoords_new (displayd *display, gboolean missing_p, gint nvars, gint *vars,
   gint height, screenheight;
 
   if(!display) 
-    display = gtk_type_new(GTK_TYPE_GGOBI_PARCOORDS_DISPLAY);
+    display = g_object_new(GGOBI_TYPE_PAR_COORDS_DISPLAY, NULL);
 
   display_set_values(display, d, gg);
 
@@ -212,13 +173,13 @@ parcoords_new (displayd *display, gboolean missing_p, gint nvars, gint *vars,
        if appropriate */
     if (gg->current_display != NULL && gg->current_display != display && 
         gg->current_display->d == d && 
-        GTK_IS_GGOBI_EXTENDED_DISPLAY(gg->current_display))
+        GGOBI_IS_EXTENDED_DISPLAY(gg->current_display))
     {
       gint j, k, nplotted_vars;
       gint *plotted_vars = (gint *) g_malloc(d->ncols * sizeof(gint));
       displayd *dsp = gg->current_display;
 
-      nplotted_vars = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(dsp))->plotted_vars_get(dsp, plotted_vars, d, gg);
+      nplotted_vars = GGOBI_EXTENDED_DISPLAY_GET_CLASS(dsp)->plotted_vars_get(dsp, plotted_vars, d, gg);
      
       nplots = MAX (nplots, nplotted_vars);
       for (j=0; j<nplotted_vars; j++)
@@ -245,38 +206,54 @@ parcoords_new (displayd *display, gboolean missing_p, gint nvars, gint *vars,
 
   parcoords_cpanel_init (&display->cpanel, gg);
   
-  if(GTK_IS_GGOBI_WINDOW_DISPLAY(display) && GTK_GGOBI_WINDOW_DISPLAY(display)->useWindow)
-     display_window_init (GTK_GGOBI_WINDOW_DISPLAY(display), 3, gg);
+  /*-- make sure the initial plot doesn't spill outside the screen --*/
+  /*-- this should know about the display borders, but it doesn't --*/
+  /*-- at the moment, the arrangement is forced to be ARRANGE_ROW --*/
+  width = WIDTH;
+  height = HEIGHT;
+  if (arrangement == ARRANGE_ROW) {
+    screenwidth = gdk_screen_width();
+    while (nplots * width > screenwidth) {
+      width -= 10;
+    }
+  } else {
+    screenheight = gdk_screen_height();
+    while (nplots * height > screenheight) {
+      height -= 10;
+    }
+  }
+  
+  if(GGOBI_IS_WINDOW_DISPLAY(display) && GGOBI_WINDOW_DISPLAY(display)->useWindow)
+     display_window_init (GGOBI_WINDOW_DISPLAY(display), nplots*width, height, 3, gg);
 
 /*
  * Add the main menu bar
 */
   vbox = GTK_WIDGET(display); 
-  gtk_container_border_width (GTK_CONTAINER (vbox), 1);
+  gtk_container_set_border_width (GTK_CONTAINER (vbox), 1);
 
-  if(GTK_IS_GGOBI_WINDOW_DISPLAY(display) && GTK_GGOBI_WINDOW_DISPLAY(display)->window) {
-    gtk_container_add (GTK_CONTAINER (GTK_GGOBI_WINDOW_DISPLAY(display)->window), vbox);
+  if(GGOBI_IS_WINDOW_DISPLAY(display) && GGOBI_WINDOW_DISPLAY(display)->window) {
+    gtk_container_add (GTK_CONTAINER (GGOBI_WINDOW_DISPLAY(display)->window), vbox);
 
-    gg->parcoords.accel_group = gtk_accel_group_new ();
-    factory = get_main_menu (menu_items,
-			     sizeof (menu_items) / sizeof (menu_items[0]),
-			     gg->parcoords.accel_group, 
-			     GTK_GGOBI_WINDOW_DISPLAY(display)->window,
-			     &display->menubar, (gpointer) display);
+	display->menu_manager = display_menu_manager_create(display);
+    //gg->parcoords.accel_group = gtk_accel_group_new ();
+    display->menubar = create_menu_bar(display->menu_manager, parcoords_ui,
+			     GGOBI_WINDOW_DISPLAY(display)->window);
 
     /*-- add a tooltip to the file menu --*/
-    w = gtk_item_factory_get_widget (factory, "<main>/File");
+    /* - tooltips are generally not done for toplevel menus
+	w = gtk_item_factory_get_widget (factory, "<main>/File");
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
 			  gtk_menu_get_attach_widget (GTK_MENU(w)),
 			  "File menu for this display", NULL);
-
+	*/
     /*
      * After creating the menubar, and populating the file menu,
      * add the Options and Link menus another way
      */
-    parcoords_display_menus_make (display, gg->parcoords.accel_group,
-                                (GtkSignalFunc) display_options_cb, 
-				  display->menubar, gg);
+    /*parcoords_display_menus_make (display, gg->parcoords.accel_group,
+                                G_CALLBACK(display_options_cb), 
+				  display->menubar, gg);*/
     gtk_box_pack_start (GTK_BOX (vbox), display->menubar, false, true, 0);
   }
 
@@ -298,26 +275,10 @@ parcoords_new (displayd *display, gboolean missing_p, gint nvars, gint *vars,
 
   display->splots = NULL;
 
-  /*-- make sure the initial plot doesn't spill outside the screen --*/
-  /*-- this should know about the display borders, but it doesn't --*/
-  /*-- at the moment, the arrangement is forced to be ARRANGE_ROW --*/
-  width = WIDTH;
-  height = HEIGHT;
-  if (arrangement == ARRANGE_ROW) {
-    screenwidth = gdk_screen_width();
-    while (nplots * width > screenwidth) {
-      width -= 10;
-    }
-  } else {
-    screenheight = gdk_screen_height();
-    while (nplots * height > screenheight) {
-      height -= 10;
-    }
-  }
   /*-- --*/
 
   for (i = 0; i < nplots; i++) {
-    sp = gtk_parcoords_splot_new(display, width, height, gg);
+    sp = ggobi_parcoords_splot_new(display, gg);
     sp->p1dvar = vars[i]; 
 
 /*
@@ -331,25 +292,10 @@ parcoords_new (displayd *display, gboolean missing_p, gint nvars, gint *vars,
     display->splots = g_list_append (display->splots, (gpointer) sp);
     gtk_box_pack_start (GTK_BOX (gg->parcoords.arrangement_box),
       sp->da, true, true, 0);
-
-#ifdef PARCOORDS_DRAG_AND_DROP
- {
-/* This should only be active when imode==DEFAULT_IMODE.  I could
-just test the imode, but really it should be added and removed like
-other interactions. -- dfs */
-    static GtkTargetEntry target = {"text/plain", GTK_TARGET_SAME_APP, 1001};
-
-    gtk_drag_source_set(GTK_WIDGET(sp), GDK_BUTTON1_MASK, &target, 1, GDK_ACTION_COPY);
-    gtk_signal_connect(GTK_OBJECT(sp), "drag_data_get",  start_parcoords_drag, NULL);
-
-    gtk_drag_dest_set(GTK_WIDGET(sp), GTK_DEST_DEFAULT_ALL /* DROP */ , &target, 1, GDK_ACTION_COPY /*MOVE*/);
-    gtk_signal_connect(GTK_OBJECT(sp), "drag_data_received",  receive_parcoords_drag, NULL);
- }
-#endif
   }
-
-  if(GTK_GGOBI_WINDOW_DISPLAY(display)->window)
-     gtk_widget_show_all (GTK_GGOBI_WINDOW_DISPLAY(display)->window);
+	
+  if(GGOBI_WINDOW_DISPLAY(display)->window)
+     gtk_widget_show_all (GGOBI_WINDOW_DISPLAY(display)->window);
 
   return display;
 }
@@ -402,16 +348,17 @@ parcoords_add_delete_splot(cpaneld *cpanel, splotd *sp, gint jvar, gint *jvar_pr
   gint jvar_indx, new_indx;
   GList *l;
   splotd *s, *sp_new;
-  GtkWidget *box, *w;
-  gfloat ratio = 1.0;
+  GtkWidget *box;// *w;
+  //gfloat ratio = 1.0;
 
 
   /* The index of gg.current_splot */
   gint sp_indx = g_list_index (display->splots, sp);
 
-  if(GTK_IS_GGOBI_WINDOW_DISPLAY(display))
-      gtk_window_set_policy (GTK_WINDOW (GTK_GGOBI_WINDOW_DISPLAY(display)->window),
-        false, false, false);
+  /*
+  if(GGOBI_IS_WINDOW_DISPLAY(display))
+      gtk_window_set_policy (GTK_WINDOW (GGOBI_WINDOW_DISPLAY(display)->window),
+        false, false, false);*/
 
   splot_get_dimensions (sp, &width, &height);
 
@@ -438,7 +385,7 @@ parcoords_add_delete_splot(cpaneld *cpanel, splotd *sp, gint jvar, gint *jvar_pr
 
       /*-- Delete the plot from the list, and destroy it. --*/
       display->splots = g_list_remove (display->splots, (gpointer) jvar_sp);
-
+#if 0
       /*-- keep the window from shrinking by growing all plots --*/
       ratio = (gfloat) nplots / (gfloat) (nplots-1);
       if (cpanel->parcoords_arrangement == ARRANGE_ROW)
@@ -457,7 +404,7 @@ parcoords_add_delete_splot(cpaneld *cpanel, splotd *sp, gint jvar, gint *jvar_pr
         l = l->next ;
       }
       /* */
-
+#endif
       /*
        * If the plot being removed is the current plot, reset
        * gg->current_splot.
@@ -498,14 +445,14 @@ parcoords_add_delete_splot(cpaneld *cpanel, splotd *sp, gint jvar, gint *jvar_pr
       sp_event_handlers_toggle (sp, off, display->cpanel.pmode, display->cpanel.imode);
 
       /*-- keep the window from growing by shrinking all plots --*/
-      ratio = (gfloat) nplots / (gfloat) (nplots+1);
+      /*ratio = (gfloat) nplots / (gfloat) (nplots+1);
       if (cpanel->parcoords_arrangement == ARRANGE_ROW)
         width = (gint) (ratio * (gfloat) width);
       else
         height = (gint) (ratio * (gfloat) height);
-      /* */
+      */
 
-      sp_new = gtk_parcoords_splot_new (display, width, height, gg);
+      sp_new = ggobi_parcoords_splot_new (display, gg);
       sp_new->p1dvar = jvar; 
 
       if (cpanel->parcoords_selection_mode == VAR_INSERT)
@@ -518,7 +465,7 @@ parcoords_add_delete_splot(cpaneld *cpanel, splotd *sp, gint jvar, gint *jvar_pr
       box = (sp->da)->parent;
       gtk_box_pack_end (GTK_BOX (box), sp_new->da, false, false, 0);
       gtk_widget_show (sp_new->da);
-
+#if 0
       l = display->splots;
       while (l) {
         w = ((splotd *) l->data)->da;
@@ -534,16 +481,16 @@ parcoords_add_delete_splot(cpaneld *cpanel, splotd *sp, gint jvar, gint *jvar_pr
         gtk_widget_unref (w);  /*-- decrease the ref_count by 1 --*/
         l = l->next ;
       }
-
+#endif
       gg->current_splot = sp->displayptr->current_splot = sp_new;
       sp_event_handlers_toggle (sp_new, on, display->cpanel.pmode, display->cpanel.imode);
       redraw = true;
     }
   }
 
-  if(GTK_IS_GGOBI_WINDOW_DISPLAY(display))
-      gtk_window_set_policy (GTK_WINDOW (GTK_GGOBI_WINDOW_DISPLAY(display)->window),
-       true, true, false);
+  /*if(GGOBI_IS_WINDOW_DISPLAY(display))
+      gtk_window_set_policy (GTK_WINDOW (GGOBI_WINDOW_DISPLAY(display)->window),
+       true, true, false);*/
 
   return redraw;
 }

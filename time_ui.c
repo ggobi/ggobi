@@ -32,10 +32,9 @@
  * plots of all selected series
  */
 static gchar *arrangement_lbl[] = {"Split", "Joint"};
-static void arrangement_cb (GtkWidget *w, gpointer cbd)
+static void arrangement_cb (GtkWidget *w, ggobid *gg)
 {
-  gint indx = GPOINTER_TO_INT (cbd);
-  ggobid *gg = GGobiFromWidget(w, true);
+  gint indx = gtk_combo_box_get_active(GTK_COMBO_BOX(w));
   g_printerr ("cbd: %s\n", arrangement_lbl[indx]);
 
   if (indx != gg->current_display->cpanel.tsplot_arrangement)
@@ -60,11 +59,10 @@ static gchar *selection_mode_lbl[] = {"Replace","Insert","Append","Delete","Over
 #else
 static gchar *selection_mode_lbl[] = {"Replace","Insert","Append","Delete"};
 #endif
-static void selection_mode_cb (GtkWidget *w, gpointer cbd)
+static void selection_mode_cb (GtkWidget *w, ggobid *gg)
 {
-  ggobid *gg = GGobiFromWidget(w, true);
   cpaneld *cpanel = &gg->current_display->cpanel;
-  cpanel->tsplot_selection_mode = GPOINTER_TO_INT (cbd);
+  cpanel->tsplot_selection_mode = gtk_combo_box_get_active(GTK_COMBO_BOX(w));
 }
 
 #ifdef TS_EXTENSIONS_IMPLEMENTED
@@ -75,9 +73,9 @@ static void selection_mode_cb (GtkWidget *w, gpointer cbd)
  * and max to [0,1].
  */
 static gchar *varscale_lbl[] = {"Common", "Independent"};
-static void varscale_cb (GtkWidget *w, gpointer cbd)
+static void varscale_cb (GtkWidget *w, ggobid *gg)
 {
-  gint indx = GPOINTER_TO_INT (cbd);
+  gint indx = gtk_combo_box_get_active (GTK_COMBO_BOX(w));
   g_printerr ("cbd: %s\n", varscale_lbl[indx]);
 }
 #endif
@@ -103,19 +101,19 @@ cpanel_tsplot_make (ggobid *gg)
   vb = gtk_vbox_new (false, 0);
   gtk_box_pack_start (GTK_BOX (cpanel), vb, false, false, 0);
 
-  lbl = gtk_label_new ("Layout:");
+  lbl = gtk_label_new_with_mnemonic ("_Layout:");
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
   gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
 
-  opt = gtk_option_menu_new ();
+  opt = gtk_combo_box_new_text ();
+  gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), lbl);
   gtk_container_set_border_width (GTK_CONTAINER (opt), 4);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
 			"Arrange the time series as single plot or several plots",
 			NULL);
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
-  populate_option_menu (opt, arrangement_lbl,
-    sizeof (arrangement_lbl) / sizeof (gchar *),
-    arrangement_cb, "GGobi", gg);
+  populate_combo_box (opt, arrangement_lbl, G_N_ELEMENTS(arrangement_lbl),
+    arrangement_cb, gg);
 #endif
 
 /*
@@ -124,11 +122,11 @@ cpanel_tsplot_make (ggobid *gg)
   vb = gtk_vbox_new (false, 0);
   gtk_box_pack_start (GTK_BOX (cpanel), vb, false, false, 0);
 
-  lbl = gtk_label_new ("Selection mode:");
+  lbl = gtk_label_new_with_mnemonic ("_Selection mode:");
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
   gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
 
-  opt = gtk_option_menu_new ();
+  opt = gtk_combo_box_new_text ();
   gtk_widget_set_name (opt, "TSPLOT:sel_mode_option_menu");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
     "Selecting a variable either replaces the variable in the current plot (swapping if appropriate), inserts a new plot before the current plot, or appends a new plot after the last plot",
@@ -136,9 +134,8 @@ cpanel_tsplot_make (ggobid *gg)
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
   /* dfs: I'm trying to build a menu with 4 menuitems, and the code
    * says it's working, but the resulting menu has only 3 items. */
-  populate_option_menu (opt, selection_mode_lbl,
-    sizeof (selection_mode_lbl) / sizeof (gchar *),
-    (GtkSignalFunc) selection_mode_cb, "GGobi", gg);
+  populate_combo_box (opt, selection_mode_lbl, G_N_ELEMENTS(selection_mode_lbl),
+    G_CALLBACK(selection_mode_cb), gg);
 
 /*
  * Variable scales
@@ -148,18 +145,18 @@ cpanel_tsplot_make (ggobid *gg)
   vb = gtk_vbox_new (false, 0);
   gtk_box_pack_start (GTK_BOX (cpanel), vb, false, false, 0);
 
-  lbl = gtk_label_new ("Scales:");
+  lbl = gtk_label_new_with_mnemonic ("Sc_ales:");
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
   gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
 
-  opt = gtk_option_menu_new ();
+  opt = gtk_combo_box_new_text ();
+  gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), opt);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
    "Scale variables (and variable groups) on a common scale, or independently",
     NULL);
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
-  populate_option_menu (opt, varscale_lbl,
-    sizeof (varscale_lbl) / sizeof (gchar *),
-    varscale_cb, "GGobi", gg);
+  populate_combo_box (opt, varscale_lbl, G_N_ELEMENTS(varscale_lbl),
+    varscale_cb, gg);
 #endif
 
 
@@ -174,7 +171,25 @@ cpanel_tsplot_make (ggobid *gg)
 /*--------------------------------------------------------------------*/
 
 
+static const gchar* mode_ui_str =
+"<ui>"
+"	<menubar>"
+"		<menu action='IMode'>"
+"			<menuitem action='DefaultIMode'/>"
+"			<separator/>"
+"			<menuitem action='Brush'/>"
+"			<menuitem action='Identify'/>"
+"		</menu>"
+"	</menubar>"
+"</ui>";
 
+const gchar*
+tsplot_mode_ui_get(displayd *display)
+{
+	return(mode_ui_str);
+}
+
+#if 0
 /*
   The useIds indicates whether the callback data should be integers
   identifying the menu item or the global gg.
@@ -217,7 +232,7 @@ tsplot_imode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func, ggobid *
   gtk_widget_show (imode_menu);
   return (imode_menu);
 }
-
+#endif
 /*--------------------------------------------------------------------*/
 /*                   End of main menubar section                      */  
 /*--------------------------------------------------------------------*/
@@ -236,6 +251,6 @@ cpanel_tsplot_set (displayd *display, cpaneld *cpanel, GtkWidget *panelWidget, g
   w = widget_find_by_name (panelWidget,
                            "TSPLOT:sel_mode_option_menu");
 
-  gtk_option_menu_set_history (GTK_OPTION_MENU(w),
+  gtk_combo_box_set_active (GTK_COMBO_BOX(w),
                                cpanel->tsplot_selection_mode);
 }

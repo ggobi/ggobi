@@ -32,7 +32,6 @@ SRC=\
     ggobi-API.c \
     ggobi.c \
     ggobiClass.c \
-    GGobiAppClass.c \
     identify.c \
     identify_ui.c \
     impute.c \
@@ -102,6 +101,7 @@ SRC=\
     utils.c \
     utils_gdk.c \
     utils_ui.c \
+    utils_pango.c \
     varcircles.c \
     varpanel_ui.c \
     vartable.c \
@@ -119,19 +119,14 @@ SRC=\
     xyplot.c \
     xyplot_ui.c \
     print.c \
-    dbms.c dbms_ui.c \
     @XML_SRC@ \
     help.c \
+    GGobiAppClass.c \
     parcoordsClass.c scatmatClass.c scatterplotClass.c \
-    tour2d3.c tour2d3_ui.c
-
-
-ifneq ($(GTK_2),)
- SRC+= marshal.c
-endif
-
-#    mt19937-1.c \
-#    cokus.c \
+    tour2d3.c tour2d3_ui.c \
+    marshal.c \
+    mt19937ar.c cokus.c
+    #    dbms.c dbms_ui.c \
 
 ifdef USE_XML
  XML_INC_DIRS=$(foreach el,@XML_INC_DIRS@, $(el))
@@ -139,14 +134,12 @@ ifdef USE_XML
 # -lxml2
 endif
 
-GTK_EXT_LD=-lgtkext
-
 OBJ=$(SRC:%.c=%.o)
 
-CFLAGS= @SRC_DEBUG@ -I$(TOP)/include -I$(TOP)/gtkext/include $(GTK_CFLAGS) $(XML_INC_DIRS) @XML_CFLAG_DEFINES@ 
+CFLAGS= @SRC_DEBUG@ -I$(TOP)/include $(GTK_CFLAGS) $(XML_INC_DIRS) @XML_CFLAG_DEFINES@ 
 #@DEFS@ - contains the HAVE_CONFIG_H
 
-LIBS=-L$(TOP)/lib $(GTK_EXT_LD) $(XML_LIBS) $(GTK_LIBS) @LIBS@
+LIBS=-L$(TOP)/lib $(XML_LIBS) $(GTK_LIBS) @LIBS@
 
 ggobi $(TOP)/bin/ggobi.bin: $(OBJ) ggobiMain.o
 	$(CC) $(LDFLAGS) -o $@ $(OBJ) ggobiMain.o $(LIBS)
@@ -158,16 +151,19 @@ libggobi.so $(TOP)/lib/libggobi.so: $(OBJ:%.o=%.lo)
 	$(CC) $(SHLIB_LDFLAGS) -o $@ $(OBJ:%.o=%.lo) $(LIBS)
 
 libggobi.dylib $(TOP)/lib/libggobi.dylib: $(OBJ:%.o=%.lo)
-	$(CC) -dynamiclib -o $@ $(OBJ:%.o=%.lo) `echo "$(LIBS)"|sed 's/-bexpall//' | sed -e 's/-I[^ ]*//'` -lgcc
+	libtool -dynamic -o $@ $(OBJ:%.o=%.lo) `echo "$(LIBS)"|sed 's/-bexpall//' | sed -e 's/-I[^ ]*//'` -lgcc
+
+libggobi.dll $(TOP)/lib/libggobi.dll: $(OBJ:%.o=%.lo)
+	$(CC) $(SHLIB_LDFLAGS) -o $@ ggobi.def -Wl,--out-implib,$(TOP)/lib/libggobi.a $(OBJ:%.o=%.lo) $(LIBS) 
 
 $(TOP)/bin/xmlConvert xmlConvert: xmlConvert.o libggobi.@SHLIB_EXT@
-	$(CC) -o $@ xmlConvert.o -L$(TOP)/lib  -L. -lggobi $(GTK_EXT_LD) $(XML_LIBS) $(GTK_LIBS) 
+	$(CC) -o $@ xmlConvert.o -L$(TOP)/lib  -L. -lggobi $(XML_LIBS) $(GTK_LIBS) 
 
 cflags:
 	@echo "$(CFLAGS)"
 
 libs:
-	@echo "-L$(TOP)/lib -lggobi $(GTK_EXT_LD) $(XML_LIBS) $(GTK_LIBS) @LIBS@"
+	@echo "-L$(TOP)/lib -lggobi $(XML_LIBS) $(GTK_LIBS) @LIBS@"
 # This is very close to $(LIBS) but we need to put ggobi in there.
 
 clean:
@@ -179,16 +175,10 @@ TAGS:
 	etags $(SRC) $(find $(TOP)/include -name '*.h')
 
 
-marshal.h: marshal.list
-	 $(GLIB_GENMARSHAL) --prefix=gtk_marshal $< --header > $@
+#marshal.h: marshal.list
+#	 $(GLIB_GENMARSHAL) --prefix=gtk_marshal $< --header > $@
 
-marshal.c: marshal.list
-	 $(GLIB_GENMARSHAL) --prefix=gtk_marshal $< --body > $@
+#marshal.c: marshal.list
+#	 $(GLIB_GENMARSHAL) --prefix=gtk_marshal $< --body > $@
 
-marshal.o: marshal.h 
-
-ifneq ($(GTK_2),)
- make_ggobi.o: marshal.h GtkSignalDef.c
- ggobiClass.o: marshal.h
-endif
-
+#marshal.o: marshal.h 

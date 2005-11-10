@@ -254,7 +254,7 @@ subset_rowlab (gchar *substr, gint substr_pos, gboolean ignore_case,
 
   /*-- remove all sticky labels --*/
   w = widget_find_by_name (pnl, "IDENTIFY:remove_sticky_labels");
-  gtk_signal_emit_by_name (GTK_OBJECT (w), "clicked", gg);
+  g_signal_emit_by_name (G_OBJECT (w), "clicked", gg);
   /*-- --*/
 
   subset_clear (d, gg);

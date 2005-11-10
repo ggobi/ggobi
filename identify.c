@@ -88,8 +88,8 @@ sticky_id_toggle (datad *d, ggobid *gg)
       sticky_id_link_by_id (STICKY_REMOVE, d->nearest_point, d, gg);
        /* This will become an event on the datad when we move to
           Gtk objects (soon now!) */
-      gtk_signal_emit(GTK_OBJECT(gg),
-        GGobiSignals[STICKY_POINT_REMOVED_SIGNAL], d->nearest_point,
+      g_signal_emit(G_OBJECT(gg),
+        GGobiSignals[STICKY_POINT_REMOVED_SIGNAL], 0, d->nearest_point,
         (gint) UNSTICKY, d);
     } else {
       ptr = GINT_TO_POINTER (d->nearest_point);
@@ -97,8 +97,8 @@ sticky_id_toggle (datad *d, ggobid *gg)
       sticky_id_link_by_id (STICKY_ADD, d->nearest_point, d, gg);
        /* This will become an event on the datad when we move to
           Gtk objects (soon now!) */
-      gtk_signal_emit(GTK_OBJECT(gg),
-        GGobiSignals[STICKY_POINT_ADDED_SIGNAL], d->nearest_point,
+      g_signal_emit(G_OBJECT(gg),
+        GGobiSignals[STICKY_POINT_ADDED_SIGNAL], 0, d->nearest_point,
         (gint) STICKY, d);
     }
   }
@@ -232,21 +232,22 @@ identify_label_fetch (gint k, cpaneld *cpanel, datad *d, ggobid *gg)
   if (id_display_type == ID_VAR_LABELS) {
     GtkWidget *pnl = mode_panel_get_by_name(GGOBI(getIModeName)(IDENT), gg);
     vartabled *vt;
-    GtkWidget *clist;
-    datad *clistd;
+    GtkWidget *tree_view;
+    datad *tree_view_d;
 
-    clist = get_clist_from_object (GTK_OBJECT (pnl));
-    clistd = (datad *) gtk_object_get_data (GTK_OBJECT(clist), "datad");
+    tree_view = get_tree_view_from_object (G_OBJECT (pnl));
+    tree_view_d = (datad *) g_object_get_data(G_OBJECT(tree_view), "datad");
 
-    if (clistd != d) {
+    if (tree_view_d != d) {
       id_display_type = ID_RECORD_LABEL;
       /*-- this will be caught below --*/
-
     } else {
-      gint *vars = (gint *) g_malloc (d->ncols * sizeof(gint));
-      gint nvars = get_selections_from_clist (d->ncols, vars, clist, d);
-      gint j, lval;
+      gint *vars; // = (gint *) g_malloc (d->ncols * sizeof(gint));
+      gint nvars;
+	  gint j, lval;
 
+	  vars = get_selections_from_tree_view (tree_view, &nvars);
+      
       for (j=0; j<nvars; j++) {
         vt = vartable_element_get (vars[j], d);
         if (vt == NULL) continue;

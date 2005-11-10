@@ -117,12 +117,14 @@ rejitter (gint *selected_cols, gint nselected_cols, datad *d, ggobid *gg) {
 
 void
 jitter_value_set (gfloat value, datad *d, ggobid *gg) {
-  GtkWidget *clist = get_clist_from_object (GTK_OBJECT(gg->jitter_ui.window));
-  gint *vars = (gint *) g_malloc (d->ncols * sizeof(gint));
-  gint nvars = get_selections_from_clist (d->ncols, vars, clist, d);
+  GtkWidget *tree_view = get_tree_view_from_object (G_OBJECT(gg->jitter_ui.window));
+  gint *vars; // = (gint *) g_malloc (d->ncols * sizeof(gint));
+  gint nvars;
   gint j;
   vartabled *vt;
 
+  vars = get_selections_from_tree_view (tree_view, &nvars);
+  
   for (j=0; j<nvars; j++) {
     vt = vartable_element_get (vars[j], d);
     vt->jitter_factor = value;

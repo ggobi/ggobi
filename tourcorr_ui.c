@@ -64,7 +64,7 @@ cpanel_tourcorr_set (displayd *display, cpaneld *cpanel, ggobid* gg)
   /*-- manual manip --*/
   w = widget_find_by_name (pnl, "COTOUR:manip");
   if (w)
-    gtk_option_menu_set_history (GTK_OPTION_MENU (w), cpanel->tcorr.manip_mode);
+    gtk_combo_box_set_active (GTK_COMBO_BOX (w), cpanel->tcorr.manip_mode);
 
   /*-- PC axes --*/
   /*-- backtracking --*/
@@ -133,14 +133,13 @@ static void ctouradv_cb (GtkWidget *w, gpointer dummy) {
 
 static gchar *manip_lbl[] = {"Off", "Comb", "Vertical", "Horizontal", 
                              "EqualComb"};
-static void manip_cb (GtkWidget *w, gpointer cbd)
+static void manip_cb (GtkWidget *w, ggobid *gg)
 {
-  ggobid *gg = GGobiFromWidget(w, true);
   displayd *dsp = gg->current_display;
   cpaneld *cpanel = &dsp->cpanel;
   splotd *sp = gg->current_splot;
 
-  cpanel->tcorr.manip_mode = GPOINTER_TO_INT (cbd);
+  cpanel->tcorr.manip_mode = gtk_combo_box_get_active(GTK_COMBO_BOX(w));
 
   if (cpanel->tcorr.manip_mode == CMANIP_OFF)
     splot_cursor_set ((gint) NULL, sp);
@@ -179,8 +178,8 @@ cpanel_ctour_make (ggobid *gg) {
    * scrollbar widgets, and the highest value you'll get is actually
    * (upper - page_size). */
   adj = gtk_adjustment_new (sessionOptions->defaultTourSpeed, 0.0, MAX_TOUR_SPEED, 1.0, 1.0, 0.0);
-  gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
-                      GTK_SIGNAL_FUNC (speedcorr_set_cb), (gpointer) gg);
+  g_signal_connect (G_OBJECT (adj), "value_changed",
+                      G_CALLBACK (speedcorr_set_cb), (gpointer) gg);
 
   sbar = gtk_hscale_new (GTK_ADJUSTMENT (adj));
   gtk_widget_set_name (sbar, "COTOUR:speed_bar");
@@ -196,12 +195,12 @@ cpanel_ctour_make (ggobid *gg) {
 */
   box = gtk_hbox_new (true, 1);
 
-  btn = gtk_check_button_new_with_label ("Pause");
+  btn = gtk_check_button_new_with_mnemonic ("_Pause");
   gtk_widget_set_name (btn, "COTOUR:pause_button");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Stop tour motion temporarily (keyboard shortcut: w)", NULL);
-  gtk_signal_connect (GTK_OBJECT (btn), "toggled",
-                     GTK_SIGNAL_FUNC (tourcorr_pause_cb), (gpointer) gg);
+  g_signal_connect (G_OBJECT (btn), "toggled",
+                     G_CALLBACK (tourcorr_pause_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
 
   gtk_box_pack_start (GTK_BOX (panel->w),
@@ -211,18 +210,18 @@ cpanel_ctour_make (ggobid *gg) {
 */
   box = gtk_hbox_new (true, 2);
 
-  btn = gtk_button_new_with_label ("Reinit");
+  btn = gtk_button_new_with_mnemonic("_Reinit");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Reset projection", NULL);
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                     GTK_SIGNAL_FUNC (tourcorr_reinit_cb), (gpointer) gg);
+  g_signal_connect (G_OBJECT (btn), "clicked",
+                     G_CALLBACK (tourcorr_reinit_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
 
-  btn = gtk_button_new_with_label ("Scramble");
+  btn = gtk_button_new_with_mnemonic ("Scr_amble");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Reset projection to random value", NULL);
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                     GTK_SIGNAL_FUNC (tourcorr_scramble_cb), (gpointer) gg);
+  g_signal_connect (G_OBJECT (btn), "clicked",
+                     G_CALLBACK (tourcorr_scramble_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
 
   gtk_box_pack_start (GTK_BOX (panel->w),
@@ -233,18 +232,18 @@ cpanel_ctour_make (ggobid *gg) {
  */
   box = gtk_hbox_new (true, 2);
 
-  btn = gtk_button_new_with_label ("Snap");
+   btn = gtk_button_new_with_mnemonic ("_Snap");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Take a snapshot of this frame to re-generate plot outside ggobi", NULL);
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                     GTK_SIGNAL_FUNC (tourcorr_snap_cb), (gpointer) gg);
+  g_signal_connect (G_OBJECT (btn), "clicked",
+                     G_CALLBACK (tourcorr_snap_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
 
-  btn = gtk_check_button_new_with_label ("Video");
+  btn = gtk_check_button_new_with_mnemonic ("Vid_eo");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Save sequence of projection frames out to file", NULL);
-  gtk_signal_connect (GTK_OBJECT (btn), "toggled",
-                     GTK_SIGNAL_FUNC (tourcorr_video_cb), (gpointer) gg);
+  g_signal_connect (G_OBJECT (btn), "toggled",
+                     G_CALLBACK (tourcorr_video_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
 
   gtk_box_pack_start (GTK_BOX (panel->w), box, false, false, 1);
@@ -255,19 +254,19 @@ cpanel_ctour_make (ggobid *gg) {
   vb = gtk_vbox_new (false, 0);
   gtk_box_pack_start (GTK_BOX (panel->w), vb, false, false, 0);
 
-  lbl = gtk_label_new ("Manual manipulation:");
+  lbl = gtk_label_new_with_mnemonic ("_Manual manipulation:");
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
   gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
 
-  manip_opt = gtk_option_menu_new ();
+  manip_opt = gtk_combo_box_new_text ();
+  gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), manip_opt);
   gtk_widget_set_name (manip_opt, "COTOUR:manip");
-  gtk_container_set_border_width (GTK_CONTAINER (manip_opt), 4);
+  //gtk_container_set_border_width (GTK_CONTAINER (manip_opt), 4);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), manip_opt,
     "Set the manual manipulation method", NULL);
   gtk_container_add (GTK_CONTAINER (vb), manip_opt);
-  populate_option_menu (manip_opt, manip_lbl,
-    sizeof (manip_lbl) / sizeof (gchar *),
-    (GtkSignalFunc) manip_cb, "GGobi", gg);
+  populate_combo_box (manip_opt, manip_lbl, G_N_ELEMENTS(manip_lbl),
+    G_CALLBACK(manip_cb), (gpointer) gg);
 
 /*
  * path length option menu 
@@ -286,7 +285,7 @@ cpanel_ctour_make (ggobid *gg) {
   gtk_container_add (GTK_CONTAINER (vb), pathlen_opt);
   populate_option_menu (pathlen_opt, pathlen_lbl,
     sizeof (pathlen_lbl) / sizeof (gchar *),
-    (GtkSignalFunc) pathlen_cb, "GGobi", gg);
+    G_CALLBACK(pathlen_cb), "GGobi", gg);
   */
 /*
  * Sync Axes toggle
@@ -294,8 +293,8 @@ cpanel_ctour_make (ggobid *gg) {
   /*  tgl = gtk_check_button_new_with_label ("Sync axes");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), tgl,
     "Synchronize the horizontal and vertical axes", NULL);
-  gtk_signal_connect (GTK_OBJECT (tgl), "toggled",
-                      GTK_SIGNAL_FUNC (syncaxes_cb), (gpointer) NULL);
+  g_signal_connect (G_OBJECT (tgl), "toggled",
+                      G_CALLBACK (syncaxes_cb), (gpointer) NULL);
   gtk_box_pack_start (GTK_BOX (panel->w),
                       tgl, false, false, 1);
   */
@@ -307,8 +306,8 @@ cpanel_ctour_make (ggobid *gg) {
     "Open panel for correlation tour projection pursuit", NULL);
   gtk_box_pack_start (GTK_BOX (panel->w),
                       btn, false, false, 1);
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                      GTK_SIGNAL_FUNC (ctourpp_cb), gg);
+  g_signal_connect (G_OBJECT (btn), "clicked",
+                      G_CALLBACK (ctourpp_cb), gg);
   */
 /*
  * advanced features button
@@ -318,8 +317,8 @@ cpanel_ctour_make (ggobid *gg) {
     "Open panel for additional correlation tour features", NULL);
   gtk_box_pack_start (GTK_BOX (panel->w),
                       btn, false, false, 1);
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                      GTK_SIGNAL_FUNC (ctouradv_cb), NULL);
+  g_signal_connect (G_OBJECT (btn), "clicked",
+                      G_CALLBACK (ctouradv_cb), NULL);
   */
   gtk_widget_show_all (panel->w); 
   
@@ -354,9 +353,9 @@ ctouradv_window_open (void) {
     gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
     gtk_box_pack_start (GTK_BOX (vbox), frame, false, false, 0);
 
-    btn = gtk_button_new_with_label ("Close");
-    gtk_signal_connect_object (GTK_OBJECT (btn), "clicked",
-                   GTK_SIGNAL_FUNC (hide_cb), (GtkObject*) window);
+    btn = gtk_button_new_from_stock (GTK_STOCK_CLOSE);
+    g_signal_connect_swapped (G_OBJECT (btn), "clicked",
+                   G_CALLBACK (hide_cb), (GtkObject*) window);
     gtk_box_pack_start (GTK_BOX (vbox), btn, false, true, 2);
   }
 
@@ -400,10 +399,11 @@ key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
       pause_button = widget_find_by_name (pnl, "COTOUR:pause_button");
       gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pause_button),
         !cpanel->tcorr1.paused || !cpanel->tcorr2.paused);
+	  return true;
     }
   }
 
-  return true;
+  return false;
 }
 
 static gint
@@ -434,9 +434,9 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 
   if (cpanel->tcorr.manip_mode != CMANIP_OFF) 
   {
-    sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
+    sp->motion_id = g_signal_connect (G_OBJECT (sp->da),
                                       "motion_notify_event",
-                                      (GtkSignalFunc) motion_notify_cb,
+                                      G_CALLBACK(motion_notify_cb),
                                       (gpointer) sp);
 
     tourcorr_manip_init(sp->mousepos.x, sp->mousepos.y, sp);
@@ -464,18 +464,18 @@ ctour_event_handlers_toggle (splotd *sp, gboolean state) {
   displayd *display = (displayd *) sp->displayptr;
 
   if (state == on) {
-    if(GTK_IS_GGOBI_WINDOW_DISPLAY(display))
-      sp->key_press_id = gtk_signal_connect (GTK_OBJECT (GTK_GGOBI_WINDOW_DISPLAY(display)->window),
+    if(GGOBI_IS_WINDOW_DISPLAY(display))
+      sp->key_press_id = g_signal_connect (G_OBJECT (GGOBI_WINDOW_DISPLAY(display)->window),
         "key_press_event",
-        (GtkSignalFunc) key_press_cb,
+        G_CALLBACK(key_press_cb),
         (gpointer) sp);
-    sp->press_id = gtk_signal_connect (GTK_OBJECT (sp->da),
+    sp->press_id = g_signal_connect (G_OBJECT (sp->da),
                                        "button_press_event",
-                                       (GtkSignalFunc) button_press_cb,
+                                       G_CALLBACK(button_press_cb),
                                        (gpointer) sp);
-    sp->release_id = gtk_signal_connect (GTK_OBJECT (sp->da),
+    sp->release_id = g_signal_connect (G_OBJECT (sp->da),
                                          "button_release_event",
-                                         (GtkSignalFunc) button_release_cb,
+                                         G_CALLBACK(button_release_cb),
                                          (gpointer) sp);
   } else {
     disconnect_key_press_signal (sp);

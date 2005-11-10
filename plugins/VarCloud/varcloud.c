@@ -26,8 +26,8 @@ addToToolsMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
   inst->gg = gg;
 
   entry = GGobi_addToolsMenuItem ((gchar *)lbl, gg);
-  gtk_signal_connect (GTK_OBJECT(entry), "activate",
-                      GTK_SIGNAL_FUNC (show_vcl_window), inst);
+  g_signal_connect (G_OBJECT(entry), "activate",
+                      G_CALLBACK (show_vcl_window), inst);
   return(true);
 }
 
@@ -57,105 +57,94 @@ vclFromInst (PluginInstance *inst)
   vcld *vcl = NULL;
 
   if (window)
-    vcl = (vcld *) gtk_object_get_data (GTK_OBJECT(window), "vcld");
+    vcl = (vcld *) g_object_get_data(G_OBJECT(window), "vcld");
 
   return vcl;
 }
 
 static void
-vcl_datad_set_cb (GtkWidget *cl, gint row, gint column,
-  GdkEventButton *event, PluginInstance *inst)
+vcl_datad_set_cb (GtkTreeSelection *tree_sel, PluginInstance *inst)
 {
-  ggobid *gg = inst->gg;
   vcld *vcl = vclFromInst (inst);
-  gchar *dname;
   datad *d, *dprev;
-  GSList *l;
+  GtkTreeModel *model;
+  GtkTreeIter iter;
 
+  if (!gtk_tree_selection_get_selected(tree_sel, &model, &iter))
+	  return;
+ 
   dprev = vcl->dsrc;
-  gtk_clist_get_text (GTK_CLIST (cl), row, 0, &dname);
-  for (l = gg->d; l; l = l->next) {
-    d = l->data;
-    if (strcmp (d->name, dname) == 0) {
-      vcl->dsrc = d;
-      break;
-    }
-  }
-  /* Don't free the string; it's just a pointer */
+  gtk_tree_model_get(model, &iter, 1, &d, -1);
+  vcl->dsrc = d;
 
   /* Rebuild the clists ... or should the clists respond to these events? */
   if (vcl->dsrc != dprev) {
-    GtkWidget *clist;
+    GtkWidget *tree_view;
     GtkWidget *window = (GtkWidget *) inst->data;
     gchar *names[] = {"XCOORD", "YCOORD", "VAR1"};
     vartabled *vt;
     gint j, k;
-    gchar *row[1];
+    GtkTreeModel *model;
+	GtkTreeIter iter;
 
     for (k=0; k<3; k++) {
-      clist = widget_find_by_name(window, names[k]);
-      gtk_clist_freeze (GTK_CLIST(clist));
-      gtk_clist_clear (GTK_CLIST (clist));
+      tree_view = widget_find_by_name(window, names[k]);
+	  model = gtk_tree_view_get_model(GTK_TREE_VIEW(tree_view));
+	  gtk_list_store_clear(GTK_LIST_STORE(model));
       for (j=0; j<vcl->dsrc->ncols; j++) {
         vt = vartable_element_get (j, vcl->dsrc);
         if (vt) {
-          row[0] = g_strdup_printf (vt->collab);
-          gtk_clist_append (GTK_CLIST (clist), row);
-        }
+          gtk_list_store_append(GTK_LIST_STORE(model), &iter);
+		  gtk_list_store_set(GTK_LIST_STORE(model), &iter, 0, vt->collab, -1);
+		}
       }
-      gtk_clist_thaw (GTK_CLIST(clist));
     }
   }
 }
 
 static void 
-vcl_clist_datad_added_cb (ggobid *gg, datad *d, void *clist)
+vcl_tree_view_datad_added_cb (ggobid *gg, datad *d, GtkWidget *tree_view)
 {
-  gchar *row[1];
   GtkWidget *swin;
-  gchar *clname;
+  GtkTreeModel *model;
+  GtkTreeIter iter;
 
-  if (clist == NULL)
+  if (tree_view == NULL)
     return;
 
   swin = (GtkWidget *)
-    gtk_object_get_data (GTK_OBJECT (clist), "datad_swin");
-  clname = gtk_widget_get_name (GTK_WIDGET(clist));
-
-  row[0] = g_strdup (d->name);
-  gtk_clist_append (GTK_CLIST (GTK_OBJECT(clist)), row);
-  g_free (row[0]);
-
+    g_object_get_data(G_OBJECT (tree_view), "datad_swin");
+  
+  model = gtk_tree_view_get_model(GTK_TREE_VIEW(tree_view));
+  gtk_list_store_append(GTK_LIST_STORE(model), &iter);
+  gtk_list_store_set(GTK_LIST_STORE(model), &iter, 0, d->name, -1);
+	
   gtk_widget_show_all (swin);
 }
 
 static void
-vcl_xcoord_set_cb (GtkWidget *cl, gint row, gint column,
-  GdkEventButton *event, PluginInstance *inst)
+vcl_xcoord_set_cb (GtkTreeSelection *tree_sel, PluginInstance *inst)
 {
   vcld *vcl = vclFromInst (inst);
-  vcl->xcoord = row;
+  vcl->xcoord = tree_selection_get_selected_row(tree_sel);
 }
 static void
-vcl_ycoord_set_cb (GtkWidget *cl, gint row, gint column,
-  GdkEventButton *event, PluginInstance *inst)
+vcl_ycoord_set_cb (GtkTreeSelection *tree_sel, PluginInstance *inst)
 {
   vcld *vcl = vclFromInst (inst);
-  vcl->ycoord = row;
+  vcl->ycoord = tree_selection_get_selected_row(tree_sel);
 }
 static void
-vcl_variable1_set_cb (GtkWidget *cl, gint row, gint column,
-  GdkEventButton *event, PluginInstance *inst)
+vcl_variable1_set_cb (GtkTreeSelection *tree_sel, PluginInstance *inst)
 {
   vcld *vcl = vclFromInst (inst);
-  vcl->var1 = row;
+  vcl->var1 = tree_selection_get_selected_row(tree_sel);
 }
 static void
-vcl_variable2_set_cb (GtkWidget *cl, gint row, gint column,
-  GdkEventButton *event, PluginInstance *inst)
+vcl_variable2_set_cb (GtkTreeSelection *tree_sel, PluginInstance *inst)
 {
   vcld *vcl = vclFromInst (inst);
-  vcl->var2 = row;
+  vcl->var2 = tree_selection_get_selected_row(tree_sel);
 }
 
 
@@ -163,26 +152,27 @@ void
 create_vcl_window(vcld *vcl, PluginInstance *inst)
 {
   GtkWidget *window, *main_vbox;
-  GtkWidget *clist;
+  GtkWidget *tree_view;
   GtkWidget *frame, *btn, *hbox, *vb;
   GtkWidget *swin;
   gint j, nd;
   GSList *l;
   datad *d;
-  gchar *row[1];
   ggobid *gg = inst->gg;
   vartabled *vt;
+  GtkListStore *model;
+  GtkTreeIter iter;
 
   vcl->tips = gtk_tooltips_new ();
 
   window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-  gtk_object_set_data (GTK_OBJECT (window), "vcld", vcl);
+  g_object_set_data(G_OBJECT (window), "vcld", vcl);
   inst->data = window; 
 
   gtk_window_set_title(GTK_WINDOW(window),
     "VarCloud");
-  gtk_signal_connect (GTK_OBJECT (window), "destroy",
-    GTK_SIGNAL_FUNC (vcl_window_closed), inst);
+  g_signal_connect (G_OBJECT (window), "destroy",
+    G_CALLBACK (vcl_window_closed), inst);
 
   main_vbox = gtk_vbox_new (false, 1);
   gtk_container_set_border_width (GTK_CONTAINER(main_vbox), 5); 
@@ -202,23 +192,23 @@ create_vcl_window(vcld *vcl, PluginInstance *inst)
     gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (swin),
       GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
 
-    clist = gtk_clist_new (1);
-    gtk_clist_set_selection_mode (GTK_CLIST (clist),
-      GTK_SELECTION_SINGLE);
-    gtk_signal_connect (GTK_OBJECT (clist), "select_row",
-      (GtkSignalFunc) vcl_datad_set_cb, inst);
-    gtk_signal_connect (GTK_OBJECT (gg), "datad_added",
-      (GtkSignalFunc) vcl_clist_datad_added_cb, GTK_OBJECT (clist));
+	  model = gtk_list_store_new(1, G_TYPE_STRING);
+	  tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(model));
+	  populate_tree_view(tree_view, NULL, 1, false, GTK_SELECTION_SINGLE, 
+	  	G_CALLBACK(vcl_datad_set_cb), inst);
+	  
+    g_signal_connect (G_OBJECT (gg), "datad_added",
+      G_CALLBACK(vcl_tree_view_datad_added_cb), tree_view);
     /*-- --*/
 
     for (l = gg->d; l; l = l->next) {
       d = (datad *) l->data;
-      row[0] = g_strdup (d->name);
-      gtk_clist_append (GTK_CLIST (clist), row);
-      g_free (row[0]);
+      gtk_list_store_append(GTK_LIST_STORE(model), &iter);
+	  gtk_list_store_set(GTK_LIST_STORE(model), &iter, 0, d->name, -1);
     }
-    gtk_clist_select_row (GTK_CLIST(clist), 0, 0);
-    gtk_container_add (GTK_CONTAINER (swin), clist);
+	
+    select_tree_view_row (tree_view, 0);
+    gtk_container_add (GTK_CONTAINER (swin), tree_view);
     gtk_box_pack_start (GTK_BOX (vb), swin, true, true, 2);
     gtk_box_pack_start (GTK_BOX (main_vbox), frame, true, true, 2);
   }
@@ -241,19 +231,18 @@ create_vcl_window(vcld *vcl, PluginInstance *inst)
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (swin),
     GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
  
-  clist = gtk_clist_new(1);
-  gtk_widget_set_name(clist, "XCOORD");
-  gtk_clist_set_selection_mode(GTK_CLIST(clist), GTK_SELECTION_SINGLE);
-  gtk_signal_connect (GTK_OBJECT (clist), "select_row",
-		      GTK_SIGNAL_FUNC (vcl_xcoord_set_cb), inst);
+  model = gtk_list_store_new(1, G_TYPE_STRING);
+  tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(model));
+  populate_tree_view(tree_view, NULL, 1, false, GTK_SELECTION_SINGLE, 
+  	G_CALLBACK(vcl_xcoord_set_cb), inst);
+  gtk_widget_set_name(tree_view, "XCOORD");
   for (j=0; j<vcl->dsrc->ncols; j++) {
     vt = vartable_element_get (j, vcl->dsrc);
-    row[0] = g_strdup (vt->collab);
-    gtk_clist_append (GTK_CLIST (clist), row);
-    g_free (row[0]);
+    gtk_list_store_append(GTK_LIST_STORE(model), &iter);
+	gtk_list_store_set(GTK_LIST_STORE(model), &iter, 0, vt->collab, -1);
   }
-  gtk_clist_select_row (GTK_CLIST(clist), 0, 0);
-  gtk_container_add (GTK_CONTAINER (swin), clist);
+  select_tree_view_row (tree_view, 0);
+  gtk_container_add (GTK_CONTAINER (swin), tree_view);
   gtk_box_pack_start (GTK_BOX (vb), swin, true, true, 2);
 
   frame = gtk_frame_new("Y Coordinate");
@@ -267,19 +256,18 @@ create_vcl_window(vcld *vcl, PluginInstance *inst)
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (swin),
     GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
  
-  clist = gtk_clist_new(1);
-  gtk_widget_set_name(clist, "YCOORD");
-  gtk_clist_set_selection_mode(GTK_CLIST(clist), GTK_SELECTION_SINGLE);
-  gtk_signal_connect (GTK_OBJECT (clist), "select_row",
-		      GTK_SIGNAL_FUNC (vcl_ycoord_set_cb), inst);
+  model = gtk_list_store_new(1, G_TYPE_STRING);
+  tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(model));
+  populate_tree_view(tree_view, NULL, 1, false, GTK_SELECTION_SINGLE, 
+  	G_CALLBACK(vcl_ycoord_set_cb), inst);
+  gtk_widget_set_name(tree_view, "YCOORD");
   for (j=0; j<vcl->dsrc->ncols; j++) {
     vt = vartable_element_get (j, vcl->dsrc);
-    row[0] = g_strdup (vt->collab);
-    gtk_clist_append (GTK_CLIST (clist), row);
-    g_free (row[0]);
+    gtk_list_store_append(GTK_LIST_STORE(model), &iter);
+	gtk_list_store_set(GTK_LIST_STORE(model), &iter, 0, vt->collab, -1);
   }
-  gtk_clist_select_row (GTK_CLIST(clist), 1, 0);
-  gtk_container_add (GTK_CONTAINER (swin), clist);
+  select_tree_view_row (tree_view, 0);
+  gtk_container_add (GTK_CONTAINER (swin), tree_view);
   gtk_box_pack_start (GTK_BOX (vb), swin, true, true, 2);
 
   gtk_box_pack_start (GTK_BOX (main_vbox), hbox, true, true, 2);
@@ -300,20 +288,18 @@ create_vcl_window(vcld *vcl, PluginInstance *inst)
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (swin),
     GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
  
-  clist = gtk_clist_new(1);
-  gtk_widget_set_name(clist, "VAR1");
-  gtk_clist_set_selection_mode(GTK_CLIST(clist), GTK_SELECTION_SINGLE);
-  gtk_signal_connect (GTK_OBJECT (clist), "select_row",
-		      GTK_SIGNAL_FUNC (vcl_variable1_set_cb), inst);
+  model = gtk_list_store_new(1, G_TYPE_STRING);
+  tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(model));
+  populate_tree_view(tree_view, NULL, 1, false, GTK_SELECTION_SINGLE, 
+  	G_CALLBACK(vcl_variable1_set_cb), inst);
+  gtk_widget_set_name(tree_view, "VAR1");
   for (j=0; j<vcl->dsrc->ncols; j++) {
     vt = vartable_element_get (j, vcl->dsrc);
-    row[0] = g_strdup (vt->collab);
-    gtk_clist_append (GTK_CLIST (clist), row);
-    g_free (row[0]);
+    gtk_list_store_append(GTK_LIST_STORE(model), &iter);
+	gtk_list_store_set(GTK_LIST_STORE(model), &iter, 0, vt->collab, -1);
   }
-  gtk_clist_select_row (GTK_CLIST(clist), 2, 0);  /* assumes 3
-						     variables */
-  gtk_container_add (GTK_CONTAINER (swin), clist);
+  select_tree_view_row (tree_view, 2);
+  gtk_container_add (GTK_CONTAINER (swin), tree_view);
   gtk_box_pack_start (GTK_BOX (vb), swin, true, true, 2);
 
 
@@ -328,20 +314,18 @@ create_vcl_window(vcld *vcl, PluginInstance *inst)
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (swin),
     GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
  
-  clist = gtk_clist_new(1);
-  gtk_widget_set_name(clist, "VAR2");
-  gtk_clist_set_selection_mode(GTK_CLIST(clist), GTK_SELECTION_SINGLE);
-  gtk_signal_connect (GTK_OBJECT (clist), "select_row",
-		      GTK_SIGNAL_FUNC (vcl_variable2_set_cb), inst);
+  model = gtk_list_store_new(1, G_TYPE_STRING);
+  tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(model));
+  populate_tree_view(tree_view, NULL, 1, false, GTK_SELECTION_SINGLE, 
+  	G_CALLBACK(vcl_variable2_set_cb), inst);
+  gtk_widget_set_name(tree_view, "VAR2");
   for (j=0; j<vcl->dsrc->ncols; j++) {
     vt = vartable_element_get (j, vcl->dsrc);
-    row[0] = g_strdup (vt->collab);
-    gtk_clist_append (GTK_CLIST (clist), row);
-    g_free (row[0]);
+    gtk_list_store_append(GTK_LIST_STORE(model), &iter);
+	gtk_list_store_set(GTK_LIST_STORE(model), &iter, 0, vt->collab, -1);
   }
-  gtk_clist_select_row (GTK_CLIST(clist), 2, 0);  /* assumes 3
-						     variables */
-  gtk_container_add (GTK_CONTAINER (swin), clist);
+  select_tree_view_row (tree_view, 2);
+  gtk_container_add (GTK_CONTAINER (swin), tree_view);
   gtk_box_pack_start (GTK_BOX (vb), swin, true, true, 2);
 
   gtk_box_pack_start (GTK_BOX (main_vbox), hbox, true, true, 2);
@@ -354,28 +338,28 @@ create_vcl_window(vcld *vcl, PluginInstance *inst)
   gtk_box_pack_start (GTK_BOX (main_vbox), hbox, false, false, 2);
 
   /*-- run --*/
-  btn = gtk_button_new_with_label ("Var cloud");
+  btn = gtk_button_new_with_mnemonic ("_Var cloud");
   gtk_widget_set_name (btn, "VarCloud");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (vcl->tips), btn,
     "Launch variogram cloud plot, using Variable 1", NULL);
   gtk_box_pack_start (GTK_BOX (hbox), btn, true, false, 2);
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-    GTK_SIGNAL_FUNC (launch_varcloud_cb), inst);
+  g_signal_connect (G_OBJECT (btn), "clicked",
+    G_CALLBACK (launch_varcloud_cb), inst);
 
-  btn = gtk_button_new_with_label ("Cross-var cloud");
+  btn = gtk_button_new_with_mnemonic ("_Cross-var cloud");
   gtk_widget_set_name (btn, "Cross");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (vcl->tips), btn,
     "Launch cross-variogram cloud plot, using Variables 1 and 2", NULL);
   gtk_box_pack_start (GTK_BOX (hbox), btn, true, false, 2);
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-    GTK_SIGNAL_FUNC (launch_varcloud_cb), inst);
+  g_signal_connect (G_OBJECT (btn), "clicked",
+    G_CALLBACK (launch_varcloud_cb), inst);
 
 
-  btn = gtk_button_new_with_label ("Close");
+  btn = gtk_button_new_from_stock (GTK_STOCK_CLOSE);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (vcl->tips), btn,
     "Close this window", NULL);
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-		      GTK_SIGNAL_FUNC (close_vcl_window_cb), inst); 
+  g_signal_connect (G_OBJECT (btn), "clicked",
+		      G_CALLBACK (close_vcl_window_cb), inst); 
   gtk_box_pack_start (GTK_BOX (main_vbox), btn, false, false, 2);
 
 

@@ -13,10 +13,10 @@ splot_tform_to_screen (cpaneld *cpanel, splotd *sp, icoords *scr,
 {
   displayd *display = (displayd *) sp->displayptr;
 
-  gfloat xmin = GTK_EXT_RULER (display->hrule)->lower;
-  gfloat xmax = GTK_EXT_RULER (display->hrule)->upper;
-  gfloat ymin = GTK_EXT_RULER (display->vrule)->upper;
-  gfloat ymax = GTK_EXT_RULER (display->vrule)->lower;
+  gfloat xmin = GTK_RULER (display->hrule)->lower;
+  gfloat xmax = GTK_RULER (display->hrule)->upper;
+  gfloat ymin = GTK_RULER (display->vrule)->upper;
+  gfloat ymax = GTK_RULER (display->vrule)->lower;
 
   scr.x = (gint)
     ((gfloat) sp->max.x * (xmax - tfd->x) / (xmax - xmin));

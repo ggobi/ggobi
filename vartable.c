@@ -126,9 +126,9 @@ plotted_cols_get (gint *cols, datad *d, ggobid *gg)
   splotd *sp = gg->current_splot;
   displayd *display = (displayd *) sp->displayptr;
 
-  if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
-     GtkGGobiExtendedDisplayClass *klass;
-     klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display));
+  if(GGOBI_IS_EXTENDED_DISPLAY(display)) {
+     GGobiExtendedDisplayClass *klass;
+     klass = GGOBI_EXTENDED_DISPLAY_GET_CLASS(display);
      ncols = klass->plotted_vars_get(display, cols, d, gg);
   }
 

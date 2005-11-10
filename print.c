@@ -31,42 +31,16 @@
 
 gboolean PrintAsSVG(PrintOptions *options, PrintInfo *info, void *userData);
 
-static void addDialogButtons(GtkWidget *dialog, PrintInfo *data);
-static void cancelPrint(GtkButton *button, PrintInfo *info);
-static void handlePrintOptions(GtkButton *button, PrintInfo *info);
+//static void addDialogButtons(GtkWidget *dialog, PrintInfo *data);
+static void handlePrintOptions(PrintInfo *info);
 
 GGobiPrintHandler DefaultPrintHandler;
 
-PrintOptions *
-showPrintDialog(PrintOptions *options, displayd *dpy, ggobid *gg, GGobiPrintHandler *printHandler)
+PrintInfo *
+createPrintInfo(GtkWidget *dialog, PrintOptions *options, displayd *dpy, 
+	ggobid *gg, PrintDialogHandler print, void *userData)
 {
- GtkWidget *dlg;
-
- dlg = createPrintDialog(options, dpy, gg, printHandler->dialog, printHandler->userData);
- gdk_window_show(dlg->window);
- gdk_window_raise(dlg->window);
-
- return(options);
-}
-
-
-GtkWidget *
-createPrintDialog(PrintOptions *options, displayd *dpy, ggobid *gg, PrintDialogHandler print, void *userData)
-{
-  gchar *title;
-  GtkWidget *dialog;
   PrintInfo *data;
-  title = g_malloc((strlen("Print Options") +
-    strlen((dpy ? " for display" : "")) + 1 )* sizeof(gchar));
-  sprintf(title, "%s%s", "Print Options", (dpy ? " for display" : ""));
-
-#ifdef USE_GNOME_DIALOGS
- dlg = gnome_dialog_new(title, GNOME_STOCK_BUTTON_OK, GNOME_STOCK_BUTTON_CANCEL, NULL);
-#else
-  dialog = gtk_dialog_new();
-  gtk_window_set_title(GTK_WINDOW(dialog), title);
-#endif
-
   data = (PrintInfo *)g_malloc( 1 * sizeof(PrintInfo));
   data->options = options;
   data->dpy = dpy;
@@ -74,9 +48,50 @@ createPrintDialog(PrintOptions *options, displayd *dpy, ggobid *gg, PrintDialogH
   data->dialog = dialog;
   data->handler = print;
   data->userData = userData;
+  return(data);
+}
 
-  addDialogButtons(dialog, data);
-  gtk_widget_show_all(dialog);
+PrintOptions *
+showPrintDialog(PrintOptions *options, displayd *dpy, ggobid *gg, GGobiPrintHandler *printHandler)
+{
+ GtkWidget *dlg;
+ PrintInfo *info;
+ 
+ dlg = createPrintDialog(dpy);
+ info = createPrintInfo(dlg, options, dpy, gg, printHandler->dialog, printHandler->userData);
+ 
+ if (gtk_dialog_run(GTK_DIALOG(dlg)) == GTK_RESPONSE_ACCEPT)
+	 handlePrintOptions(info);
+ 
+ gtk_widget_destroy(dlg);
+ g_free(info);
+	 
+ //gdk_window_show(dlg->window);
+ //gdk_window_raise(dlg->window);
+
+ return(options);
+}
+
+
+
+GtkWidget *
+createPrintDialog(displayd *dpy)
+{
+  gchar *title;
+  GtkWidget *dialog;
+  
+  title = g_malloc((strlen("Print Options") +
+    strlen((dpy ? " for display" : "")) + 1 )* sizeof(gchar));
+  sprintf(title, "%s%s", "Print Options", (dpy ? " for display" : ""));
+
+  dialog = gtk_dialog_new_with_buttons(title, NULL, 0, 
+  	GTK_STOCK_OK, GTK_RESPONSE_ACCEPT, GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT, NULL);
+  //gtk_window_set_title(GTK_WINDOW(dialog), title);
+
+  
+
+  //addDialogButtons(dialog, data);
+  //gtk_widget_show_all(dialog);
   return(dialog);
 }
 
@@ -85,7 +100,7 @@ createPrintDialog(PrintOptions *options, displayd *dpy, ggobid *gg, PrintDialogH
  */
 
 static void
-handlePrintOptions(GtkButton *button, PrintInfo *info)
+handlePrintOptions(PrintInfo *info)
 {
   gboolean ok = true;
   PrintOptions localOptions;
@@ -103,24 +118,13 @@ handlePrintOptions(GtkButton *button, PrintInfo *info)
   } else {
     /* We already have set the options globally when we got them. */
   }
-
-  if(ok) {
-    cancelPrint(button, info);
-  }
-
-}
-
-static void
-cancelPrint(GtkButton *button, PrintInfo *info)
-{
-  gtk_widget_destroy (info->dialog);
-  g_free(info);
 }
 
 /*
  Adds the Okay and Cancel buttons to the specified dialog
  and establishes local handlers for the click actions.
  */
+ #if 0
 static void
 addDialogButtons(GtkWidget *dialog, PrintInfo *data)
 {
@@ -135,16 +139,16 @@ addDialogButtons(GtkWidget *dialog, PrintInfo *data)
 
 
       /* Now setup the action/signal handlers. */  
-  gtk_signal_connect (GTK_OBJECT (cancel_button), "clicked",
-                      GTK_SIGNAL_FUNC (cancelPrint), data);
+  g_signal_connect (G_OBJECT (cancel_button), "clicked",
+                      G_CALLBACK (cancelPrint), data);
 
 
-  gtk_signal_connect (GTK_OBJECT (okay_button), "clicked",
-                      GTK_SIGNAL_FUNC (handlePrintOptions), data);
+  g_signal_connect (G_OBJECT (okay_button), "clicked",
+                      G_CALLBACK (handlePrintOptions), data);
 
   /*  gnome_dialog_set_default(GNOME_DIALOG(dlg), GNOME_OK); */
 }
-
+#endif
 /*
  This is the unfinished version of the default print handler
  for the stand-alone ggobi. 

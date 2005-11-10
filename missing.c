@@ -60,9 +60,9 @@ missing_arrays_add_rows (gint nrows, datad *d)
 */
 void missings_datad_cb (GtkWidget *w, ggobid *gg)
 {
-  GtkObject *obj = GTK_OBJECT(gg->impute.window);
-  GtkWidget *clist = get_clist_from_object (obj);
-  datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (clist), "datad");
+  GObject *obj = G_OBJECT(gg->impute.window);
+  GtkWidget *tree_view = get_tree_view_from_object (obj);
+  datad *d = (datad *) g_object_get_data(G_OBJECT (tree_view), "datad");
   static gchar *lnames[] = {"present", "missing"};
 
   if (d && d->nmissing > 0) {
@@ -81,7 +81,7 @@ void missings_datad_cb (GtkWidget *w, ggobid *gg)
         cols_with_missings[ncols_with_missings++] = j;
     }
 
-    notebook = (GtkWidget *) gtk_object_get_data (obj, "notebook");
+    notebook = (GtkWidget *) g_object_get_data (obj, "notebook");
     dnew = datad_create (d->nrows, ncols_with_missings, gg);
     dnew->name = g_strdup_printf ("%s (missing)", d->name);
 

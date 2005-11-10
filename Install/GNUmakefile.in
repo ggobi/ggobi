@@ -15,21 +15,16 @@ CUR_DIR=$(shell pwd)
 
 include Makeconf
 
-INSTALLED_LIB_NAMES=libggobi.@SHLIB_EXT@ libgtkext.@SHLIB_EXT@
+INSTALLED_LIB_NAMES=libggobi.@SHLIB_EXT@
 
-GTK_EXT=lib/libgtkext.@SHLIB_EXT@
-
-all: $(GTK_EXT) bin/ggobi.bin @EMBED_LIB@ $(UTILS) @PACKAGES@ buildPlugins
+all: bin/ggobi.bin @EMBED_LIB@ $(UTILS) @PACKAGES@ buildPlugins
 
 .PHONY:	lib Rggobi Pythonggobi Perlggobi
 
-lib/libgtkext.@SHLIB_EXT@:
-	$(MAKE) -C gtkext/src install
-
-ggobi bin/ggobi.bin: $(GTK_EXT)
+ggobi bin/ggobi.bin:
 	$(MAKE) -C src ../bin/ggobi.bin
 
-lib/libggobi.@SHLIB_EXT@ lib: $(GTK_EXT)
+lib/libggobi.@SHLIB_EXT@ lib:
 	$(MAKE) -C src ../lib/libggobi.@SHLIB_EXT@
 
 
@@ -46,7 +41,6 @@ ifeq (${LOCAL_INSTALL},)
 	if test -n "${EMBED_LIB}" ; then  \
 	  $(INSTALL) -d $(libdir) ; \
 	  $(INSTALL) $(INSTALL_FLAGS) $(EMBED_LIB) $(libdir) ;\
-	  $(INSTALL) $(INSTALL_FLAGS) $(GTK_EXT) $(libdir) ;\
 	fi
 	if ! test  -d $(ggobi_install_home) ; then \
 		mkdir $(ggobi_install_home) ; \
@@ -147,7 +141,7 @@ installPlugins:
 endif
 
 clean:
-	for f in src gtkext/src ; do \
+	for f in src ; do \
 	  $(MAKE) -C $$f clean ; \
 	done
 

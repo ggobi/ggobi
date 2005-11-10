@@ -273,14 +273,14 @@ g_list_replace_nth (GList *list, gpointer item, gint indx) {
 
 gboolean
 widget_initialized (GtkWidget *w) {
-  gboolean initd = GPOINTER_TO_INT (gtk_object_get_data (GTK_OBJECT (w),
+  gboolean initd = GPOINTER_TO_INT (g_object_get_data(G_OBJECT (w),
     "initialized"));
 
   return (initd != (gboolean) NULL && initd == true) ? true : false;
 }
 void
 widget_initialize (GtkWidget *w, gboolean initd) {
-  gtk_object_set_data (GTK_OBJECT (w),
+  g_object_set_data(G_OBJECT (w),
     "initialized",
     GINT_TO_POINTER (initd));
 }
@@ -288,7 +288,9 @@ widget_initialize (GtkWidget *w, gboolean initd) {
 /*-----------------------------------------------------------------------*/
 /*  a routine gtk should have for finding out which option is selected   */
 /*-----------------------------------------------------------------------*/
+/* GTK2 has this for GtkComboBox, forget about GtkOptionMenu */
 
+#if 0
 /**
  * option_menu_index:
  * @optionmenu: a gtkoptionmenu
@@ -326,6 +328,7 @@ option_menu_index (GtkOptionMenu *optionmenu)
 
   return index;
 }
+#endif
 
 /*--------------------------------------------------------------------*/
 /*--- Find a widget by name, starting from an enclosing container ----*/
@@ -355,7 +358,7 @@ widget_find_by_name (GtkWidget *parent, gchar *name)
 
   else {
     if (GTK_CONTAINER(parent)) {
-      children = gtk_container_children (GTK_CONTAINER(parent));
+      children = gtk_container_get_children (GTK_CONTAINER(parent));
       for (l=children; l; l=l->next) {
         if (GTK_IS_WIDGET(l->data)) {
           w = GTK_WIDGET (l->data);
@@ -399,7 +402,7 @@ print_lists (displayd *display) {
 void
 print_dims (displayd *d) {
   g_printerr ("children: %d\n", 
-    g_list_length (gtk_container_children (GTK_CONTAINER (d->table))));
+    g_list_length (gtk_container_get_children (GTK_CONTAINER (d->table))));
 
   g_printerr ("scatmat_ncols= %d, scatmat_nrows= %d ; ",
     g_list_length (d->scatmat_cols), g_list_length (d->scatmat_rows));
@@ -494,7 +497,7 @@ GGobiSleepTimer(gpointer data)
 void
 ggobi_sleep(guint interval)
 {
-  gtk_timeout_add(interval*1000, GGobiSleepTimer, NULL);
+  g_timeout_add(interval*1000, GGobiSleepTimer, NULL);
   gtk_main();
 }
 

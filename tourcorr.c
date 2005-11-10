@@ -203,12 +203,12 @@ tourcorr_realloc_up (gint nc, datad *d, ggobid *gg)
   GList *l;
 
   for (l=gg->displays; l; l=l->next) {
-    GtkGGobiExtendedDisplayClass *klass;
+    GGobiExtendedDisplayClass *klass;
     dsp = (displayd *) l->data;
 
-    if(!GTK_IS_GGOBI_EXTENDED_DISPLAY(dsp))
+    if(!GGOBI_IS_EXTENDED_DISPLAY(dsp))
       continue;
-    klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(dsp));
+    klass = GGOBI_EXTENDED_DISPLAY_GET_CLASS(dsp);
     if(klass->tourcorr_realloc)
         klass->tourcorr_realloc(dsp, nc, d);
   }
@@ -375,13 +375,10 @@ display_tourcorr_init (displayd *dsp, ggobid *gg) {
   dsp->tcorr_axes = true;
 }
 
-/*-- called from the Options menu --*/
 void
-tourcorr_fade_vars_cb (GtkCheckMenuItem *w, guint action) 
+tourcorr_fade_vars (gboolean fade, ggobid *gg) 
 {
-  ggobid *gg = GGobiFromWidget(GTK_WIDGET(w), true);
-
-  gg->tourcorr.fade_vars = !gg->tourcorr.fade_vars;
+  gg->tourcorr.fade_vars = fade;
 }
 
 void tourcorr_speed_set(gfloat slidepos, ggobid *gg) {
@@ -1251,13 +1248,13 @@ void tourcorr_func (gboolean state, displayd *dsp, ggobid *gg)
 {
   if (state) {
     if (dsp->tcorr1.idled == 0) {
-      dsp->tcorr1.idled = gtk_idle_add_priority (G_PRIORITY_LOW,
-        (GtkFunction) tourcorr_idle_func, dsp);
+      dsp->tcorr1.idled = g_idle_add_full (G_PRIORITY_LOW,
+        (GSourceFunc) tourcorr_idle_func, dsp, NULL);
     }
     gg->tourcorr.idled = 1;
   } else {
     if (dsp->tcorr1.idled) {
-      gtk_idle_remove (dsp->tcorr1.idled);
+      g_source_remove (dsp->tcorr1.idled);
       dsp->tcorr1.idled = 0;
     }
     gg->tourcorr.idled = 0;

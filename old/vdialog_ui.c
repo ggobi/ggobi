@@ -84,20 +84,20 @@ vardialog_open (ggobid *gg, gchar *title)
   gtk_box_pack_start (GTK_BOX (vbox), hbox, false, false, 5);
 
   btn = gtk_button_new_with_label ("OK");
-  gtk_object_set_data (GTK_OBJECT (btn), "GGobi", (gpointer) gg);
+  g_object_set_data(G_OBJECT (btn), "GGobi", (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 10);
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                      GTK_SIGNAL_FUNC (OK_cb), list);
+  g_signal_connect (G_OBJECT (btn), "clicked",
+                      G_CALLBACK (OK_cb), list);
   btn = gtk_button_new_with_label ("Clear");
-  gtk_object_set_data (GTK_OBJECT (btn), "GGobi", (gpointer) gg);
+  g_object_set_data(G_OBJECT (btn), "GGobi", (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 10);
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                      GTK_SIGNAL_FUNC (clear_cb), list);
+  g_signal_connect (G_OBJECT (btn), "clicked",
+                      G_CALLBACK (clear_cb), list);
   btn = gtk_button_new_with_label ("Cancel");
-  gtk_object_set_data (GTK_OBJECT (btn), "GGobi", (gpointer) gg);
+  g_object_set_data(G_OBJECT (btn), "GGobi", (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 10);
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                      GTK_SIGNAL_FUNC (cancel_cb), list);
+  g_signal_connect (G_OBJECT (btn), "clicked",
+                      G_CALLBACK (cancel_cb), list);
 
   gtk_widget_set_usize (GTK_WIDGET (scrolled_window),
     list->requisition.width + 3 +

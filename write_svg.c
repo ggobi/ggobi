@@ -213,6 +213,8 @@ fclose (f);
 return;
 }
 
+/* what about using cairo here? can send to svg, pdf, nice screen, etc */
+
 void
 display_write_svg (ggobid *gg) 
 {

@@ -45,15 +45,18 @@ GGOBI(get_dbms_login_info)(DBMSLoginInfo *info, ggobid *gg)
   char *tmpVal;
   int isCopy;
   int n = NUM_DBMS_FIELDS; /* sizeof(fieldNames)/sizeof(fieldNames[0]); */
-
+  gint response;
+  
   if(info == NULL)
     info = &DefaultDBMSInfo;
 
   guiInputs  = (DBMSGUIInput*) g_malloc(sizeof(DBMSGUIInput));
 
     /* Create the GUI and its components. */
-  dialog = gtk_dialog_new();
-  gtk_window_set_title(GTK_WINDOW(dialog), "DBMS Login & Query Settings");
+  dialog = gtk_dialog_new_with_buttons("DBMS Login & Query Settings", NULL, 0, 
+  				GTK_STOCK_OK, GTK_RESPONSE_ACCEPT,
+				GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT, 
+				GTK_STOCK_HELP, GTK_RESPONSE_HELP, NULL);
 
   guiInputs->gg = gg;
   guiInputs->dialog = dialog;
@@ -91,9 +94,19 @@ GGOBI(get_dbms_login_info)(DBMSLoginInfo *info, ggobid *gg)
 
   gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), table, TRUE, TRUE, 0);
 
-
+  while(true) {
+	  response = gtk_dialog_run(GTK_DIALOG(dialog));
+	  if (response == GTK_RESPONSE_HELP)
+		  GGOBI(getDBMSGUIHelp)(guiInputs);
+	  else if (response == GTK_RESPONSE_CANCEL || GGOBI(getDBMSGUIInfo)(guiInputs))
+		  break;
+  }
+	  
+  gtk_widget_destroy(dialog);
+  g_free(guiInputs);
+  
       /* Now add the buttons at the bottom of the dialog. */
-  okay_button = gtk_button_new_with_label("Okay");
+  /*okay_button = gtk_button_new_with_label("Okay");
   cancel_button = gtk_button_new_with_label("Cancel");
   help_button = gtk_button_new_with_label("Help");
   gtk_container_add (GTK_CONTAINER (GTK_DIALOG(dialog)->action_area), okay_button);
@@ -102,15 +115,14 @@ GGOBI(get_dbms_login_info)(DBMSLoginInfo *info, ggobid *gg)
 
   gtk_widget_show_all(dialog);
 
-      /* Now setup the action/signal handlers. */  
-  gtk_signal_connect (GTK_OBJECT (cancel_button), "clicked",
-                      GTK_SIGNAL_FUNC (GGOBI(cancelDBMSGUI)), guiInputs);
+  g_signal_connect (G_OBJECT (cancel_button), "clicked",
+                      G_CALLBACK (GGOBI(cancelDBMSGUI)), guiInputs);
 
-  gtk_signal_connect (GTK_OBJECT (okay_button), "clicked",
-                      GTK_SIGNAL_FUNC (GGOBI(getDBMSGUIInfo)), guiInputs);
-  gtk_signal_connect (GTK_OBJECT (help_button), "clicked",
-                      GTK_SIGNAL_FUNC (GGOBI(getDBMSGUIHelp)), guiInputs);
-
+  g_signal_connect (G_OBJECT (okay_button), "clicked",
+                      G_CALLBACK (GGOBI(getDBMSGUIInfo)), guiInputs);
+  g_signal_connect (G_OBJECT (help_button), "clicked",
+                      G_CALLBACK (GGOBI(getDBMSGUIHelp)), guiInputs);
+*/
 
   return(NULL);
 }
@@ -124,8 +136,8 @@ GGOBI(get_dbms_login_info)(DBMSLoginInfo *info, ggobid *gg)
    The guiInput argument contains the ggobid object reference
    and the array of input/entry widgets.
  */
-void
-GGOBI(getDBMSGUIInfo)(GtkButton *button, DBMSGUIInput *guiInput)
+gboolean
+GGOBI(getDBMSGUIInfo)(DBMSGUIInput *guiInput)
 {
  ggobid *gg = guiInput->gg;
  gint i;
@@ -156,13 +168,10 @@ GGOBI(getDBMSGUIInfo)(GtkButton *button, DBMSGUIInput *guiInput)
   /* Only cancel if we read something. Otherwise,
      leave the display for the user to edit.
    */
- if(info->dbms_read_input == NULL)
-     return;
-
-  if (info->dbms_read_input(info, TRUE, gg) > 0) {
-   GGOBI(cancelDBMSGUI)(button, guiInput);
-     /* Can we free the info here. */
+  if (info->dbms_read_input != NULL && info->dbms_read_input(info, TRUE, gg) > 0) {
+   return(true);
   }
+  return(false);
 }
 
 /*
@@ -170,14 +179,7 @@ GGOBI(getDBMSGUIInfo)(GtkButton *button, DBMSGUIInput *guiInput)
  */
 
 void
-GGOBI(cancelDBMSGUI)(GtkButton *button, DBMSGUIInput *guiInput)
-{
-  gtk_widget_destroy (guiInput->dialog);
-  g_free (guiInput);
-}
-
-void
-GGOBI(getDBMSGUIHelp)(GtkButton *button, DBMSGUIInput *guiInput)
+GGOBI(getDBMSGUIHelp)(DBMSGUIInput *guiInput)
 {
   quick_message("GGobi/DBMS help not implemented yet!", false);
 }

@@ -45,9 +45,6 @@ DisplayOptions DefaultDisplayOptions = {
                                        };
 
 
-void set_display_option(gboolean active, guint action, displayd *display, ggobid *gg);
-
-
 /*-- debugging utility --*/
 /*
 static void
@@ -159,17 +156,6 @@ display_edges_arrowheads_show (displayd *display, gboolean show)
   }
 }
 
-void
-display_options_cb (GtkCheckMenuItem *w, guint action) 
-{
-  ggobid *gg = GGobiFromWidget(GTK_WIDGET(w), true);
-  displayd *display = (displayd *)
-    gtk_object_get_data (GTK_OBJECT (w), "display");
-
-  set_display_option(w->active, action, display, gg);
-}
-
-
 /*
 We need to allow people to programmatically change a setting and force
 the update.  The current framework is all based on GUI events and so
@@ -177,8 +163,9 @@ we don't update the GUI components here as we assume they are set
 appropriately.  A Model View Controller approach is needed.
 */
 void
-set_display_option(gboolean active, guint action, displayd *display, ggobid *gg)
+set_display_option(gboolean active, guint action, displayd *display)
 {
+  ggobid *gg = display->ggobi;
   gchar *title;
   gint ne = 0;
   datad *onlye = NULL;
@@ -228,7 +215,7 @@ set_display_option(gboolean active, guint action, displayd *display, ggobid *gg)
       if (display->e != NULL) {
         title = computeTitle (false, gg->current_display, gg);
         if (title) {
-          gtk_window_set_title (GTK_WINDOW (GTK_GGOBI_WINDOW_DISPLAY(display)->window), title);
+          gtk_window_set_title (GTK_WINDOW (GGOBI_WINDOW_DISPLAY(display)->window), title);
           g_free (title); 
         }
       }
@@ -248,7 +235,7 @@ set_display_option(gboolean active, guint action, displayd *display, ggobid *gg)
       if (display->e != NULL) {
         title = computeTitle (false, gg->current_display, gg);
         if (title) {
-          gtk_window_set_title (GTK_WINDOW (GTK_GGOBI_WINDOW_DISPLAY(display)->window), title);
+          gtk_window_set_title (GTK_WINDOW (GGOBI_WINDOW_DISPLAY(display)->window), title);
           g_free (title); 
         }
       }
@@ -267,7 +254,7 @@ set_display_option(gboolean active, guint action, displayd *display, ggobid *gg)
       if (display->e != NULL) {
         title = computeTitle (false, gg->current_display, gg);
         if (title) {
-          gtk_window_set_title (GTK_WINDOW (GTK_GGOBI_WINDOW_DISPLAY(display)->window), title);
+          gtk_window_set_title (GTK_WINDOW (GGOBI_WINDOW_DISPLAY(display)->window), title);
           g_free (title); 
         }
       }
@@ -309,9 +296,9 @@ set_display_option(gboolean active, guint action, displayd *display, ggobid *gg)
     case DOPT_AXES:
       display->options.axes_show_p = active;
 
-      if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
-        GtkGGobiExtendedDisplayClass *klass;
-        klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display));
+      if(GGOBI_IS_EXTENDED_DISPLAY(display)) {
+        GGobiExtendedDisplayClass *klass;
+        klass = GGOBI_EXTENDED_DISPLAY_GET_CLASS(display);
         if(klass->set_show_axes_option)
           klass->set_show_axes_option(display, active);
       }
@@ -320,9 +307,9 @@ set_display_option(gboolean active, guint action, displayd *display, ggobid *gg)
     case DOPT_AXESLAB:
       display->options.axes_label_p = active;
 
-      if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
-        GtkGGobiExtendedDisplayClass *klass;
-        klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display));
+      if(GGOBI_IS_EXTENDED_DISPLAY(display)) {
+        GGobiExtendedDisplayClass *klass;
+        klass = GGOBI_EXTENDED_DISPLAY_GET_CLASS(display);
         if(klass->set_show_axes_label_option)
           klass->set_show_axes_label_option(display, active);
       }      
@@ -331,9 +318,9 @@ set_display_option(gboolean active, guint action, displayd *display, ggobid *gg)
     case DOPT_AXESVALS:
       display->options.axes_values_p = active;
 
-      if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
-        GtkGGobiExtendedDisplayClass *klass;
-        klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display));
+      if(GGOBI_IS_EXTENDED_DISPLAY(display)) {
+        GGobiExtendedDisplayClass *klass;
+        klass = GGOBI_EXTENDED_DISPLAY_GET_CLASS(display);
         if(klass->set_show_axes_values_option)
           klass->set_show_axes_values_option(display, active);
       }
@@ -400,13 +387,13 @@ set_display_options(displayd *display, ggobid *gg)
 			 break;
 	 }
 
-         set_display_option(active, i, display, gg);
+         set_display_option(active, i, display);
     }
 }
 
 
 void
-display_print_cb (displayd *display, guint action, GtkWidget *w) 
+display_print (displayd *display) 
 {
   ggobid *gg;
   gg = display->ggobi;
@@ -420,9 +407,9 @@ display_print_cb (displayd *display, guint action, GtkWidget *w)
       display->ggobi, &DefaultPrintHandler);
 }
 
-/*-- Called when a plot window is closed from the menu --*/
+/*-- Close a display --*/
 void
-display_close_cb (displayd *display, guint action, GtkWidget *w) 
+display_close (displayd *display) 
 {
   ggobid *gg = GGobiFromDisplay (display);
   display_free (display, false, gg);
@@ -430,7 +417,7 @@ display_close_cb (displayd *display, guint action, GtkWidget *w)
 
 
 void
-show_display_control_panel_cb(displayd *display, guint action, GtkWidget *w) 
+show_display_control_panel(displayd *display) 
 {
   ggobid *gg = GGobiFromDisplay (display);
   /* gtk_window_present(GTK_WINDOW(gg->main_window()));*/
@@ -455,7 +442,7 @@ display_delete_cb (GtkWidget *w, GdkEvent *event, displayd *display)
  This display class is really a virtual class.
 */
 displayd *
-gtk_ggobi_display_new(gboolean missing_p, datad *d, ggobid *gg)
+ggobi_display_new(gboolean missing_p, datad *d, ggobid *gg)
 {
   return(display_alloc_init(missing_p, d, gg));
 }
@@ -478,8 +465,8 @@ display_alloc_init (gboolean missing_p, datad *d, ggobid *gg)
 {
   displayd *display;
 
-  display = gtk_type_new(GTK_TYPE_GGOBI_WINDOW_DISPLAY);
-  GTK_GGOBI_WINDOW_DISPLAY(display)->useWindow = true;
+  display = g_object_new(GGOBI_TYPE_WINDOW_DISPLAY, NULL);
+  GGOBI_WINDOW_DISPLAY(display)->useWindow = true;
   display_set_values(display, d, gg);
 
   return (display);
@@ -492,7 +479,7 @@ display_add (displayd *display, ggobid *gg)
   splotd *prev_splot = gg->current_splot;
   ProjectionMode pmode_prev = pmode_get (gg);
   InteractionMode imode_prev = imode_get (gg);
-  displayd *oldDisplay = gg->current_display;
+  ///displayd *oldDisplay = gg->current_display;
 
    /* This is a safety test to avoid having a display be entered twice.
       Deactivate if we want to be slightly more efficient.             */  
@@ -501,23 +488,26 @@ display_add (displayd *display, ggobid *gg)
     return(-1);
   }
 
-  if (GTK_IS_GGOBI_WINDOW_DISPLAY(display)  && GTK_GGOBI_WINDOW_DISPLAY(display)->useWindow) {
-    GGobi_widget_set(GTK_GGOBI_WINDOW_DISPLAY(display)->window, gg, true);
+  /* moved this here so that the current splot is set when configuring cpanels - mfl */
+  if(g_list_length(display->splots)) {
+     gg->current_splot = (splotd *)
+       g_list_nth_data (display->splots, 0);
+     display->current_splot = gg->current_splot;
+     splot_set_current (gg->current_splot, on, gg);
+  }
+  
+  if (GGOBI_IS_WINDOW_DISPLAY(display)  && GGOBI_WINDOW_DISPLAY(display)->useWindow) {
+    GGobi_widget_set(GGOBI_WINDOW_DISPLAY(display)->window, gg, true);
     if(g_list_length(display->splots))
           display_set_current (display, gg);  /*-- this initializes the mode --*/
   }
   gg->displays = g_list_append (gg->displays, (gpointer) display);
 
     /* If the tree of displays is active, add this to it. */
-  display_add_tree(display, -1, gg->display_tree.tree, gg);
+  display_add_tree(display);
 
-  if(g_list_length(display->splots)) {
-     gg->current_splot = (splotd *)
-       g_list_nth_data (gg->current_display->splots, 0);
-     display->current_splot = gg->current_splot;
-     splot_set_current (gg->current_splot, on, gg);
-  }
-
+  // setting current splot was here
+  
   /*
    * The current display types start without signal handlers, but
    * I may need to add handlers later for some unforeseen display.
@@ -542,7 +532,7 @@ display_add (displayd *display, ggobid *gg)
     gtk_widget_queue_draw (prev_splot->da);
   }
 
-  gtk_signal_emit(GTK_OBJECT(gg), GGobiSignals[DISPLAY_NEW_SIGNAL], display);
+  g_signal_emit(G_OBJECT(gg), GGobiSignals[DISPLAY_NEW_SIGNAL], 0, display);
 
   return (g_list_length (gg->displays));
 }
@@ -628,7 +618,7 @@ display_free (displayd* display, gboolean force, ggobid *gg)
 
     count = g_list_length (display->splots);
 
-    if (GTK_IS_GGOBI_WINDOW_DISPLAY(display)) {
+    if (GGOBI_IS_WINDOW_DISPLAY(display)) {
 /*XX
       GList *l;
       for (l=display->splots; count > 0 && l; l=l->next, count--) {
@@ -637,7 +627,7 @@ display_free (displayd* display, gboolean force, ggobid *gg)
       }
 */
 
-     gtk_widget_destroy (GTK_GGOBI_WINDOW_DISPLAY(display)->window);
+     gtk_widget_destroy (GGOBI_WINDOW_DISPLAY(display)->window);
     }
 #if 0 /*XX */
     gtk_object_destroy(GTK_OBJECT(display));
@@ -676,13 +666,13 @@ display_free_all (ggobid *gg) {
       break;
 
     if(nc >= MIN_NVARS_FOR_TOUR1D && display->t1d.idled)
-      gtk_idle_remove(display->t1d.idled);
+      g_source_remove(display->t1d.idled);
     if(nc >= MIN_NVARS_FOR_TOUR2D && display->t2d.idled)
-      gtk_idle_remove(display->t2d.idled);
+      g_source_remove(display->t2d.idled);
     if(nc >= MIN_NVARS_FOR_COTOUR && display->tcorr1.idled)
-      gtk_idle_remove(display->tcorr1.idled);
+      g_source_remove(display->tcorr1.idled);
     if(nc >= MIN_NVARS_FOR_COTOUR && display->tcorr2.idled)
-      gtk_idle_remove(display->tcorr2.idled);
+      g_source_remove(display->tcorr2.idled);
 
 
      /* If the second argument 'force' is true, it eliminates the
@@ -715,49 +705,60 @@ display_set_current (displayd *new_display, ggobid *gg)
      in order to get ready for the elements provided by the new display. */
 
   if (gg->firsttime == false && gg->current_display &&
-      GTK_IS_GGOBI_WINDOW_DISPLAY(gg->current_display))
+      GGOBI_IS_WINDOW_DISPLAY(gg->current_display))
   {
     title = computeTitle (false, gg->current_display, gg);
-    if (title && GTK_GGOBI_WINDOW_DISPLAY(gg->current_display)->window) {
-      gtk_window_set_title (GTK_WINDOW (GTK_GGOBI_WINDOW_DISPLAY(gg->current_display)->window), title);
+    if (title && GGOBI_WINDOW_DISPLAY(gg->current_display)->window) {
+      gtk_window_set_title (GTK_WINDOW (GGOBI_WINDOW_DISPLAY(gg->current_display)->window), title);
       g_free (title); 
     }
 
     /* Now clean up the different control panel menus associated with
        this display.  Specifically, this deletes the imode and pmode menus.
      */
-    if(GTK_IS_GGOBI_EXTENDED_DISPLAY(gg->current_display)) {
+    if(GGOBI_IS_EXTENDED_DISPLAY(gg->current_display)) {
+		gtk_ui_manager_remove_ui(gg->main_menu_manager, gg->mode_merge_id);
      /* Allow the extended display to override the submenu_destroy call.
         If it doesn't provide a method, then call submenu_destroy. */
-      void (*f)(displayd *dpy, GtkWidget *) =
-        GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(gg->current_display))->display_unset;
+      void (*f)(displayd *dpy) =
+        GGOBI_EXTENDED_DISPLAY_GET_CLASS(gg->current_display)->display_unset;
       if(f) {
-        f(gg->current_display, gg->pmode_item);
-        f(gg->current_display, gg->imode_item);
+        f(gg->current_display);
+        f(gg->current_display);
       }
+	  /*
       else {
-        submenu_destroy (gg->pmode_item); /* default if no method
-					     provided. */
+        submenu_destroy (gg->pmode_item); 
         submenu_destroy (gg->imode_item);
-      }
+      }*/
     }
   }
 
   /* Now do the setup for the new display.  */
-  if (GTK_IS_GGOBI_WINDOW_DISPLAY(new_display)) {
-    if(GTK_GGOBI_WINDOW_DISPLAY(new_display)->useWindow) {
+  if (GGOBI_IS_WINDOW_DISPLAY(new_display)) {
+    if(GGOBI_WINDOW_DISPLAY(new_display)->useWindow) {
       title = computeTitle (true, new_display, gg);
       if (title) {
-        gtk_window_set_title (GTK_WINDOW (GTK_GGOBI_WINDOW_DISPLAY(new_display)->window), title);   
+        gtk_window_set_title (GTK_WINDOW (GGOBI_WINDOW_DISPLAY(new_display)->window), title);   
         g_free (title); 
       }
     }
 
-    if(GTK_IS_GGOBI_EXTENDED_DISPLAY(new_display)) {
-       /* Allow the extended display to override the submenu_destroy call.
-          If it doesn't provide a method, then call submenu_destroy. */
+    if(GGOBI_IS_EXTENDED_DISPLAY(new_display)) {
+		const gchar* (*ui_get)(displayd *dpy) = 
+			GGOBI_EXTENDED_DISPLAY_GET_CLASS(new_display)->mode_ui_get;
+		if (ui_get) {
+			GError *error = NULL;
+			const gchar *ui = ui_get(new_display);
+			gg->mode_merge_id = 
+				gtk_ui_manager_add_ui_from_string(gg->main_menu_manager, ui, -1, &error);
+			if (error) {
+				g_message("Could not merge main mode ui from display");
+				g_error_free(error);
+			}
+		}
       void (*f)(displayd *dpy, ggobid *gg) =
-        GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(new_display))->display_set;
+        GGOBI_EXTENDED_DISPLAY_GET_CLASS(new_display)->display_set;
       if(f)
         f(new_display, gg);
     }
@@ -805,8 +806,8 @@ computeTitle (gboolean current_p, displayd *display, ggobid *gg)
   g_printerr ("ndisplays %d\n", ndisplays);
   */
 
-  if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
-    tmp = gtk_display_title_label(display);
+  if(GGOBI_IS_EXTENDED_DISPLAY(display)) {
+    tmp = ggobi_display_title_label(display);
   }
 
   if (display->d->name != NULL) {
@@ -877,9 +878,9 @@ display_tailpipe (displayd *display, RedrawStyle type, ggobid *gg)
       assign_points_to_bins (d, gg);
     }
 
-    if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
+    if(GGOBI_IS_EXTENDED_DISPLAY(display)) {
       void (*f)(gboolean, displayd *, splotd *, ggobid *);
-      f = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display))->ruler_ranges_set;
+      f = GGOBI_EXTENDED_DISPLAY_GET_CLASS(display)->ruler_ranges_set;
       if(f) {
         f(GTK_WIDGET_VISIBLE (display->hrule) ||
           GTK_WIDGET_VISIBLE (display->vrule),
@@ -906,16 +907,20 @@ displays_tailpipe (RedrawStyle type, ggobid *gg) {
 }
 
 void
-display_window_init (windowDisplayd *display, gint width, ggobid *gg)
+display_window_init (windowDisplayd *display, gint width, gint height, gint bwidth, ggobid *gg)
 {
   display->window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-  gtk_object_set_data (GTK_OBJECT (display->window),
+  g_object_set_data(G_OBJECT (display->window),
                        "displayd",
                        (gpointer) display);
-  gtk_window_set_policy (GTK_WINDOW (display->window), true, true, false);
-  gtk_container_set_border_width (GTK_CONTAINER (display->window), width);
-  gtk_signal_connect (GTK_OBJECT (display->window), "delete_event",
-                      GTK_SIGNAL_FUNC (display_delete_cb), (gpointer) display);
+	/* allowing shrink is considered a 'bad thing' - instead we no longer
+	   request a size for the drawing areas (splots), but instead we set a default
+	   window size and allow the splots to automatically fill the space - mfl */
+  //gtk_window_set_policy (GTK_WINDOW (display->window), true, true, false);
+  gtk_window_set_default_size(GTK_WINDOW(display->window), width, height);
+  //gtk_container_set_border_width (GTK_CONTAINER (display->window), bwidth);
+  g_signal_connect (G_OBJECT (display->window), "delete_event",
+                      G_CALLBACK (display_delete_cb), (gpointer) display);
 
   GGobi_widget_set (GTK_WIDGET (display->window), gg, true);
 }
@@ -925,7 +930,7 @@ gboolean
 isEmbeddedDisplay (displayd *dpy)
 {
   gboolean ans = false;
-  ans = (GTK_IS_GGOBI_WINDOW_DISPLAY(dpy) == false || GTK_GGOBI_WINDOW_DISPLAY(dpy)->useWindow);
+  ans = (GGOBI_IS_WINDOW_DISPLAY(dpy) == false || GGOBI_WINDOW_DISPLAY(dpy)->useWindow);
 
   return (ans);
 }
@@ -941,8 +946,8 @@ display_type_handles_projection (displayd *display, ProjectionMode pmode)
   gboolean handles = false;
   ProjectionMode v = pmode;
 
-  if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
-    handles = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display))->handles_projection(display, v);
+  if(GGOBI_IS_EXTENDED_DISPLAY(display)) {
+    handles = GGOBI_EXTENDED_DISPLAY_GET_CLASS(display)->handles_projection(display, v);
   } 
 
   return handles;
@@ -953,8 +958,8 @@ display_type_handles_interaction (displayd *display, InteractionMode imode)
   gboolean handles = false;
   InteractionMode v = imode;
 
-  if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
-    handles = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display))->handles_interaction(display, v);
+  if(GGOBI_IS_EXTENDED_DISPLAY(display)) {
+    handles = GGOBI_EXTENDED_DISPLAY_GET_CLASS(display)->handles_interaction(display, v);
   } 
 
   return handles;

@@ -32,18 +32,18 @@ test_brush_motion_cb(void *userData, splotd *sp, GdkEventMotion *ev, datad *d, g
 
 
 /*
-  use gtk_signal_connect_object()
+  use g_signal_connect_swapped()
  */
 void 
 test_new_plot_cb(void *userData, splotd *sp, ggobid *gg)
 {
   fprintf(stderr, "New plot: %s\n", (char *)userData);fflush(stderr);
 #if 1
-  gtk_signal_connect_object(GTK_OBJECT(gg), "brush_motion", GTK_SIGNAL_FUNC(test_brush_motion_cb), (gpointer)"My brushing");
-  gtk_signal_connect_object(GTK_OBJECT(gg), "move_point", GTK_SIGNAL_FUNC(test_point_move_cb), (gpointer)"My moving");
+  g_signal_connect_swapped(G_OBJECT(gg), "brush_motion", G_CALLBACK(test_brush_motion_cb), (gpointer)"My brushing");
+  g_signal_connect_swapped(G_OBJECT(gg), "move_point", G_CALLBACK(test_point_move_cb), (gpointer)"My moving");
 #else
-  gtk_signal_connect_object(GTK_OBJECT(sp->da), "brush_motion", GTK_SIGNAL_FUNC(test_brush_motion_cb), (gpointer)"My brushing");
-  gtk_signal_connect_object(GTK_OBJECT(sp->da), "move_point", test_point_move_cb, (gpointer)"My moving");
+  g_signal_connect_swapped(G_OBJECT(sp->da), "brush_motion", G_CALLBACK(test_brush_motion_cb), (gpointer)"My brushing");
+  g_signal_connect_swapped(G_OBJECT(sp->da), "move_point", test_point_move_cb, (gpointer)"My moving");
 #endif
 }
 
@@ -51,13 +51,13 @@ test_new_plot_cb(void *userData, splotd *sp, ggobid *gg)
 CHECK_EVENT_SIGNATURE(test_variable_select, select_variable_f)
 
 /*
-  use gtk_signal_connect() rather than ...._object().
+  use g_signal_connect() rather than ...._object().
  */
 void
 test_data_add_cb(ggobid *gg, datad *d, gpointer data)
 {
   g_printerr ("(test_data_add_cb) adding datad\n");
-  gtk_signal_connect(GTK_OBJECT(gg), "select_variable", GTK_SIGNAL_FUNC(test_variable_select), "My String");
+  g_signal_connect(G_OBJECT(gg), "select_variable", G_CALLBACK(test_variable_select), "My String");
 }
 
 

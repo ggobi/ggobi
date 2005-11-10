@@ -265,7 +265,7 @@ build_whisker_segs (gint j, gint *nwhisker_segs, splotd *sp)
 {
   displayd *display = (displayd *) sp->displayptr;
   gint n;
-  if (GTK_IS_GGOBI_PARCOORDS_DISPLAY(display)) {
+  if (GGOBI_IS_PAR_COORDS_DISPLAY(display)) {
     n = 2*j;
     sp->win32.whisker_segs[*nwhisker_segs].x1 = sp->whiskers[n].x1;
     sp->win32.whisker_segs[*nwhisker_segs].y1 = sp->whiskers[n].y1;
@@ -279,7 +279,7 @@ build_whisker_segs (gint j, gint *nwhisker_segs, splotd *sp)
     sp->win32.whisker_segs[*nwhisker_segs].y2 = sp->whiskers[n].y2;
     *nwhisker_segs += 1;
   }
-  else if (GTK_IS_GGOBI_TIME_SERIES_DISPLAY(display)) {
+  else if (GGOBI_IS_TIME_SERIES_DISPLAY(display)) {
     sp->win32.whisker_segs[*nwhisker_segs].x1 = sp->whiskers[j].x1;
     sp->win32.whisker_segs[*nwhisker_segs].y1 = sp->whiskers[j].y1;
     sp->win32.whisker_segs[*nwhisker_segs].x2 = sp->whiskers[j].x2;
@@ -370,14 +370,14 @@ win32_draw_to_pixmap_unbinned (gint current_color, splotd *sp, gboolean draw_hid
             sp->win32.open_rects, &nr_open, sp->win32.filled_rects, &nr_filled,
             sp->win32.open_arcs, &nc_open,  sp->win32.filled_arcs, &nc_filled);
 
-          if ((GTK_IS_GGOBI_PARCOORDS_DISPLAY(display) ||
-               GTK_IS_GGOBI_TIME_SERIES_DISPLAY(display)) &&
+          if ((GGOBI_IS_PAR_COORDS_DISPLAY(display) ||
+               GGOBI_IS_TIME_SERIES_DISPLAY(display)) &&
               display->options.whiskers_show_p)
           {
             build_whisker_segs (m, &nwhisker_segs, sp);
-          } else if (GTK_IS_GGOBI_SCATTERPLOT_DISPLAY(display) &&
-            ((projection_get(gg) == TOUR1D && cpanel->t1d.ASH_add_lines_p) ||
-             (projection_get(gg) == P1PLOT && cpanel->p1d.type == ASH &&
+          } else if (GGOBI_IS_SCATTERPLOT_DISPLAY(display) &&
+            ((pmode_get(gg) == TOUR1D && cpanel->t1d.ASH_add_lines_p) ||
+             (pmode_get(gg) == P1PLOT && cpanel->p1d.type == ASH &&
               cpanel->p1d.ASH_add_lines_p))) {
             build_ash_segs (m, &nash_segs, sp);
           }
@@ -427,8 +427,8 @@ win32_draw_to_pixmap_binned (icoords *bin0, icoords *bin1,
               sp->win32.open_arcs, &nc_open,   
               sp->win32.filled_arcs, &nc_filled);
 
-            if (GTK_IS_GGOBI_PARCOORDS_DISPLAY(display) ||
-                GTK_IS_GGOBI_TIME_SERIES_DISPLAY(display))
+            if (GGOBI_IS_PAR_COORDS_DISPLAY(display) ||
+                GGOBI_IS_TIME_SERIES_DISPLAY(display))
             {
               build_whisker_segs (j, &nwhisker_segs, sp);
             }

@@ -23,19 +23,17 @@
 #include "vars.h"
 #include "externs.h"
 
-static void display_cb (GtkWidget *w, gpointer cbd)
+static void display_cb (GtkWidget *w, ggobid *gg)
 {
-  ggobid *gg = GGobiFromWidget(w, true);
   cpaneld *cpanel = &gg->current_display->cpanel;
-  cpanel->id_display_type = GPOINTER_TO_INT (cbd);
+  cpanel->id_display_type = gtk_combo_box_get_active(GTK_COMBO_BOX(w));
   displays_plot (NULL, QUICK, gg);
 }
 
-static void identify_target_cb (GtkWidget *w, gpointer cbd)
+static void identify_target_cb (GtkWidget *w, ggobid *gg)
 {
-  ggobid *gg = GGobiFromWidget(w, true);
   cpaneld *cpanel = &gg->current_display->cpanel;
-  cpanel->id_target_type = (enum idtargetd) GPOINTER_TO_INT (cbd);
+  cpanel->id_target_type = (enum idtargetd) gtk_combo_box_get_active(GTK_COMBO_BOX(w));
   displays_plot (NULL, QUICK, gg);
 }
 
@@ -70,7 +68,7 @@ id_remove_labels_cb (GtkWidget *w, ggobid *gg)
 
   /* This will become an event on the datad when we move to
      Gtk objects (soon now!) */
-  gtk_signal_emit(GTK_OBJECT(gg), GGobiSignals[STICKY_POINT_REMOVED_SIGNAL], 
+  g_signal_emit(G_OBJECT(gg), GGobiSignals[STICKY_POINT_REMOVED_SIGNAL], 0,
     -1, (gint) UNSTICKY, d);
 
   displays_plot (NULL, QUICK, gg);
@@ -99,8 +97,8 @@ id_all_sticky_cb (GtkWidget *w, ggobid *gg)
 
   /* This will become an event on the datad when we move to
      Gtk objects (soon now!) */
-  gtk_signal_emit(GTK_OBJECT(gg),
-    GGobiSignals[STICKY_POINT_ADDED_SIGNAL], -1,
+  g_signal_emit(G_OBJECT(gg),
+    GGobiSignals[STICKY_POINT_ADDED_SIGNAL], 0, -1,
     (gint) STICKY, d);
   displays_plot (NULL, QUICK, gg);
 }
@@ -121,7 +119,7 @@ key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
 
   /*-- insert mode-specific key presses (if any) here --*/
 
-  return true;
+  return false;
 }
 
 
@@ -138,16 +136,16 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
 
 /*
  * w = sp->da
- * sp = gtk_object_get_data (GTK_OBJECT (w), "splotd"));
+ * sp = g_object_get_data(G_OBJECT (w), "splotd"));
 */
 
   mousepos_get_motion (w, event, &button1_p, &button2_p, sp);
  
-  if (GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
+  if (GGOBI_IS_EXTENDED_SPLOT(sp)) {
     gboolean changed;
     gboolean (*f)(icoords, splotd *sp, datad *, ggobid *);
 
-    f = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT_GET_CLASS(sp))->identify_notify;
+    f = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp)->identify_notify;
     if(f) {
       changed = f(sp->mousepos, sp, d, gg);
       if (changed) {
@@ -179,8 +177,8 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
         ev.d = d;
         ev.id = k;
         /* This will become an event on the datad when we move to
-           Gtk objects (soon now!) */
-        gtk_signal_emit(GTK_OBJECT(gg), GGobiSignals[IDENTIFY_POINT_SIGNAL],
+           Gtk objects (soon now!) - note: this came long ago */
+        g_signal_emit(G_OBJECT(gg), GGobiSignals[IDENTIFY_POINT_SIGNAL], 0,
           sp, k, d); 
 
         displays_plot (NULL, QUICK, gg);
@@ -196,7 +194,7 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
         ev.d = e;
         ev.id = k;
         /*-- perhaps this should be an IDENTIFY_EDGE_SIGNAL ... --*/
-        gtk_signal_emit(GTK_OBJECT(gg), GGobiSignals[IDENTIFY_POINT_SIGNAL],
+        g_signal_emit(G_OBJECT(gg), GGobiSignals[IDENTIFY_POINT_SIGNAL], 0,
           sp, k, e); 
 
         displays_plot (NULL, QUICK, gg);
@@ -242,16 +240,16 @@ identify_event_handlers_toggle (splotd *sp, gboolean state) {
   displayd *display = (displayd *) sp->displayptr;
   
   if (state == on) {
-    if(GTK_IS_GGOBI_WINDOW_DISPLAY(display))
-      sp->key_press_id = gtk_signal_connect (GTK_OBJECT (GTK_GGOBI_WINDOW_DISPLAY(display)->window),
-        "key_press_event", (GtkSignalFunc) key_press_cb, (gpointer) sp);
+    if(GGOBI_IS_WINDOW_DISPLAY(display))
+      sp->key_press_id = g_signal_connect (G_OBJECT (GGOBI_WINDOW_DISPLAY(display)->window),
+        "key_press_event", G_CALLBACK(key_press_cb), (gpointer) sp);
 
-    sp->press_id = gtk_signal_connect (GTK_OBJECT (sp->da),
-      "button_press_event", (GtkSignalFunc) button_press_cb, (gpointer) sp);
-    sp->release_id = gtk_signal_connect (GTK_OBJECT (sp->da),
-      "button_release_event", (GtkSignalFunc) button_release_cb, (gpointer) sp);
-    sp->motion_id = gtk_signal_connect (GTK_OBJECT (sp->da),
-      "motion_notify_event", (GtkSignalFunc) motion_notify_cb, (gpointer) sp);
+    sp->press_id = g_signal_connect (G_OBJECT (sp->da),
+      "button_press_event", G_CALLBACK(button_press_cb), (gpointer) sp);
+    sp->release_id = g_signal_connect (G_OBJECT (sp->da),
+      "button_release_event", G_CALLBACK(button_release_cb), (gpointer) sp);
+    sp->motion_id = g_signal_connect (G_OBJECT (sp->da),
+      "motion_notify_event", G_CALLBACK(motion_notify_cb), (gpointer) sp);
   } else {
     disconnect_key_press_signal (sp);
     disconnect_button_press_signal (sp);
@@ -290,30 +288,29 @@ cpanel_identify_make(ggobid *gg) {
 
   /*-- provide a variable list so that any variable can be the label --*/
   notebook = create_variable_notebook (panel->w,
-    GTK_SELECTION_EXTENDED, all_vartypes, all_datatypes,
-    (GtkSignalFunc) NULL, gg);
-  gtk_object_set_data (GTK_OBJECT (panel->w),
+    GTK_SELECTION_MULTIPLE, all_vartypes, all_datatypes,
+    G_CALLBACK(NULL), gg);
+  g_object_set_data(G_OBJECT (panel->w),
     "notebook", notebook);
 
   /*-- option menu --*/
-  opt = gtk_option_menu_new ();
+  opt = gtk_combo_box_new_text ();
   gtk_widget_set_name (opt, "IDENTIFY:display_option_menu");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
     "How to construct the label to be displayed: the record label, record number, a label constructed using variables selected in the list above, or the record id",
     NULL);
   gtk_box_pack_start (GTK_BOX (panel->w),
                       opt, false, false, 0);
-  populate_option_menu (opt, display_lbl,
-    sizeof (display_lbl) / sizeof (gchar *),
-    (GtkSignalFunc) display_cb, "GGobi", gg);
+  populate_combo_box (opt, display_lbl, G_N_ELEMENTS(display_lbl),
+    G_CALLBACK(display_cb), gg);
 
  /*-- button for removing all labels --*/
-  btn = gtk_button_new_with_label ("Remove labels");
+  btn = gtk_button_new_with_mnemonic ("_Remove labels");
   gtk_widget_set_name (btn, "IDENTIFY:remove_sticky_labels");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
                         btn, "Remove all labels", NULL);
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                      GTK_SIGNAL_FUNC (id_remove_labels_cb),
+  g_signal_connect (G_OBJECT (btn), "clicked",
+                      G_CALLBACK (id_remove_labels_cb),
                       gg);
   gtk_box_pack_start (GTK_BOX (panel->w),
                       btn, false, false, 1);
@@ -321,27 +318,26 @@ cpanel_identify_make(ggobid *gg) {
 /*
  * button for making all labels sticky
 */
-  btn = gtk_button_new_with_label ("Make all sticky");
+  btn = gtk_button_new_with_mnemonic ("Make all _sticky");
   gtk_tooltips_set_tip (GTK_TOOLTIPS(gg->tips), btn,
     "Make all labels sticky, or persistent (to make the nearest point label sticky, click middle or right in the plot)",
     NULL);
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                      GTK_SIGNAL_FUNC (id_all_sticky_cb),
+  g_signal_connect (G_OBJECT (btn), "clicked",
+                      G_CALLBACK (id_all_sticky_cb),
                       (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (panel->w),
                       btn, false, false, 1);
 
   /*-- option menu --*/
-  opt = gtk_option_menu_new ();
+  opt = gtk_combo_box_new_text ();
   gtk_widget_set_name (opt, "IDENTIFY:target_option_menu");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
     "Label points or edges",
     NULL);
   gtk_box_pack_start (GTK_BOX (panel->w),
     opt, false, false, 0);
-  populate_option_menu (opt, target_lbl,
-    sizeof (target_lbl) / sizeof (gchar *),
-    (GtkSignalFunc) identify_target_cb, "GGobi", gg);
+  populate_combo_box (opt, target_lbl, G_N_ELEMENTS(target_lbl),
+    G_CALLBACK(identify_target_cb), gg);
 
 
   /*-- frame around button for resetting center --*/
@@ -354,13 +350,13 @@ cpanel_identify_make(ggobid *gg) {
   gtk_container_set_border_width (GTK_CONTAINER (framevb), 4);
   gtk_container_add (GTK_CONTAINER (frame), framevb);
 
-  btn = gtk_button_new_with_label ("Recenter");
+  btn = gtk_button_new_with_mnemonic ("Re_center");
   gtk_widget_set_name (btn, "IDENT:recenter_btn");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Make one point sticky, and then click here to recenter the data around that point. (If there are no sticky labels, restore default centering.)",
     NULL);
-  gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-    GTK_SIGNAL_FUNC (recenter_cb), (gpointer) gg);
+  g_signal_connect (G_OBJECT (btn), "clicked",
+    G_CALLBACK (recenter_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (framevb), btn,
     false, false, 0);
   /*-- --*/
@@ -389,11 +385,11 @@ cpanel_identify_set (displayd *display, cpaneld *cpanel, ggobid *gg)
     return;
 
   w = widget_find_by_name (pnl, "IDENTIFY:display_option_menu");
-  gtk_option_menu_set_history (GTK_OPTION_MENU(w),
+  gtk_combo_box_set_active (GTK_COMBO_BOX(w),
                                cpanel->id_display_type);
 
   w = widget_find_by_name (pnl, "IDENTIFY:target_option_menu");
-  gtk_option_menu_set_history (GTK_OPTION_MENU(w),
+  gtk_combo_box_set_active (GTK_COMBO_BOX(w),
                                (gint) cpanel->id_target_type);
 }
 

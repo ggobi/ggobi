@@ -51,7 +51,7 @@ varcircles_visibility_set (displayd *display, ggobid *gg)
 
   projection = pmode_get (gg);
   d = display->d;
-  children = gtk_container_children (GTK_CONTAINER (d->vcirc_ui.table));
+  children = gtk_container_get_children (GTK_CONTAINER (d->vcirc_ui.table));
 
   switch (projection) {
 
@@ -65,11 +65,7 @@ varcircles_visibility_set (displayd *display, ggobid *gg)
                                 false, false, 2);
             gtk_box_reorder_child (GTK_BOX (d->vcirc_ui.table), box, n);
             gtk_widget_show_all (box);
-#if GTK_MAJOR_VERSION == 1
-            if (GTK_OBJECT (box)->ref_count > 1)
-#else
             if (G_OBJECT (box)->ref_count > 1)
-#endif
               gtk_widget_unref (box);
           }
           n++;
@@ -93,11 +89,7 @@ varcircles_visibility_set (displayd *display, ggobid *gg)
                                 false, false, 2);
             gtk_box_reorder_child (GTK_BOX (d->vcirc_ui.table), box, n);
             gtk_widget_show_all (box);
-#if GTK_MAJOR_VERSION == 1
-            if (GTK_OBJECT (box)->ref_count > 1)
-#else
             if (G_OBJECT (box)->ref_count > 1)
-#endif
               gtk_widget_unref (box);
           }
           n++;
@@ -121,11 +113,7 @@ varcircles_visibility_set (displayd *display, ggobid *gg)
                                 false, false, 2);
             gtk_box_reorder_child (GTK_BOX (d->vcirc_ui.table), box, n);
             gtk_widget_show_all (box);
-#if GTK_MAJOR_VERSION == 1
-            if (GTK_OBJECT (box)->ref_count > 1)
-#else
             if (G_OBJECT (box)->ref_count > 1)
-#endif
               gtk_widget_unref (box);
           }
           n++;
@@ -151,11 +139,7 @@ varcircles_visibility_set (displayd *display, ggobid *gg)
                                 false, false, 2);
             gtk_box_reorder_child (GTK_BOX (d->vcirc_ui.table), box, n);
             gtk_widget_show_all (box);
-#if GTK_MAJOR_VERSION == 1
-            if (GTK_OBJECT (box)->ref_count > 1)
-#else
             if (G_OBJECT (box)->ref_count > 1)
-#endif
               gtk_widget_unref (box);
           }
           n++;
@@ -323,12 +307,6 @@ varcircles_show (gboolean show, datad *d, displayd *display, ggobid *gg)
       gtk_paned_pack2 (GTK_PANED (d->varpanel_ui.hpane),
         d->vcirc_ui.ebox, true, true);
     }
-
-#ifndef GTK_2_0
-    gtk_paned_set_handle_size (GTK_PANED(d->varpanel_ui.hpane), 10);
-#endif
-    gtk_paned_set_gutter_size (GTK_PANED(d->varpanel_ui.hpane), 15);
-
   } else {
     /*-- remove circles/rectangles --*/
 
@@ -340,12 +318,7 @@ varcircles_show (gboolean show, datad *d, displayd *display, ggobid *gg)
       gtk_box_pack_start (GTK_BOX(basement), d->vcirc_ui.ebox, false, false, 0);
     }
 
-
-#ifndef GTK_2_0
-    gtk_paned_set_handle_size (GTK_PANED(d->varpanel_ui.hpane), 0);
-#endif
-    gtk_paned_set_gutter_size (GTK_PANED(d->varpanel_ui.hpane), 0);
-    /*-- set the handle position all the way to the right --*/
+	/*-- set the handle position all the way to the right --*/
     gtk_paned_set_position (GTK_PANED(d->varpanel_ui.hpane), -1);
 
 
@@ -412,16 +385,14 @@ varcircles_populate (datad *d, ggobid *gg)
 
   /* -- a drawing area to place next to the manip button as a color key --*/
   da = gtk_drawing_area_new ();
-#if GTK_MAJOR_VERSION == 2
   gtk_widget_set_double_buffered(da, false);
-#endif
-  gtk_drawing_area_size (GTK_DRAWING_AREA (da), 8, 8);
+  gtk_widget_set_size_request (GTK_WIDGET (da), 8, 8);
   gtk_widget_set_events (da, GDK_EXPOSURE_MASK);
   gtk_box_pack_start (GTK_BOX (d->vcirc_ui.hbox), da,
     false, false, 2);
   GGobi_widget_set (da, gg, true);
-  gtk_signal_connect (GTK_OBJECT (da), "expose_event",
-    GTK_SIGNAL_FUNC (da_manip_expose_cb), d);
+  g_signal_connect (G_OBJECT (da), "expose_event",
+    G_CALLBACK (da_manip_expose_cb), d);
   gtk_widget_show (da);
 
   d->vcirc_ui.manip_btn = gtk_button_new_with_label ("Manip");
@@ -430,23 +401,21 @@ varcircles_populate (datad *d, ggobid *gg)
     NULL);
   gtk_box_pack_start (GTK_BOX (d->vcirc_ui.hbox), d->vcirc_ui.manip_btn,
     true, true, 2);
-  gtk_signal_connect (GTK_OBJECT (d->vcirc_ui.manip_btn),
-    "button_press_event", GTK_SIGNAL_FUNC (manip_select_cb), d);
+  g_signal_connect (G_OBJECT (d->vcirc_ui.manip_btn),
+    "button_press_event", G_CALLBACK (manip_select_cb), d);
   gtk_widget_show (d->vcirc_ui.manip_btn);
 
 #ifdef FREEZE_IMPLEMENTED
   /* -- a drawing area to place next to the freeze button as a color key --*/
   da = gtk_drawing_area_new ();
-#if GTK_MAJOR_VERSION == 2
   gtk_widget_set_double_buffered(da, false);
-#endif
-  gtk_drawing_area_size (GTK_DRAWING_AREA (da), 8, 8);
+  gtk_widget_set_size_request (GTK_WIDGET (da), 8, 8);
   gtk_widget_set_events (da, GDK_EXPOSURE_MASK);
   gtk_box_pack_start (GTK_BOX (d->vcirc_ui.hbox), da,
     false, false, 2);
   GGobi_widget_set (da, gg, true);
-  gtk_signal_connect (GTK_OBJECT (da), "expose_event",
-    GTK_SIGNAL_FUNC (da_freeze_expose_cb), d);
+  g_signal_connect (G_OBJECT (da), "expose_event",
+    G_CALLBACK (da_freeze_expose_cb), d);
   gtk_widget_show (da);
 
   d->vcirc_ui.freeze_btn = gtk_button_new_with_label ("Freeze");
@@ -455,8 +424,8 @@ varcircles_populate (datad *d, ggobid *gg)
     NULL);
   gtk_box_pack_start (GTK_BOX (d->vcirc_ui.hbox), d->vcirc_ui.freeze_btn,
     true, true, 2);
-  gtk_signal_connect (GTK_OBJECT (d->vcirc_ui.freeze_btn),
-    "button_press_event", GTK_SIGNAL_FUNC (freeze_select_cb), d);
+  g_signal_connect (G_OBJECT (d->vcirc_ui.freeze_btn),
+    "button_press_event", G_CALLBACK (freeze_select_cb), d);
   gtk_widget_show (d->vcirc_ui.freeze_btn);
 #endif
 }
@@ -564,15 +533,13 @@ varcircle_create (gint j, datad *d, ggobid *gg)
 
   vb = gtk_hbox_new (false, 0);
   d->vcirc_ui.vb = g_slist_append (d->vcirc_ui.vb, vb);
-  gtk_container_border_width (GTK_CONTAINER (vb), 1);
+  gtk_container_set_border_width (GTK_CONTAINER (vb), 1);
 
   /*-- a drawing area to contain the variable circle --*/
   da = gtk_drawing_area_new ();
-#if GTK_MAJOR_VERSION == 2
   gtk_widget_set_double_buffered(da, false);
-#endif
   d->vcirc_ui.da = g_slist_append (d->vcirc_ui.da, da);
-  gtk_drawing_area_size (GTK_DRAWING_AREA (da),
+  gtk_widget_set_size_request (GTK_WIDGET (da),
                          VAR_CIRCLE_DIAM+2, VAR_CIRCLE_DIAM+2);
   gtk_widget_set_events (da, GDK_EXPOSURE_MASK
              | GDK_ENTER_NOTIFY_MASK
@@ -583,11 +550,11 @@ varcircle_create (gint j, datad *d, ggobid *gg)
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), da,
     "Click left to select or deselect", NULL);
 
-  gtk_signal_connect (GTK_OBJECT (da), "expose_event",
-    GTK_SIGNAL_FUNC (da_expose_cb), GINT_TO_POINTER (j));
-  gtk_signal_connect (GTK_OBJECT (da), "button_press_event",
-    GTK_SIGNAL_FUNC (varcircle_sel_cb), GINT_TO_POINTER (j));
-  gtk_object_set_data (GTK_OBJECT (da), "datad", d);
+  g_signal_connect (G_OBJECT (da), "expose_event",
+    G_CALLBACK (da_expose_cb), GINT_TO_POINTER (j));
+  g_signal_connect (G_OBJECT (da), "button_press_event",
+    G_CALLBACK (varcircle_sel_cb), GINT_TO_POINTER (j));
+  g_object_set_data(G_OBJECT (da), "datad", d);
   GGobi_widget_set (GTK_WIDGET (da), gg, true);
   /*gtk_container_add (GTK_CONTAINER (vb), da);*/
   gtk_box_pack_start (GTK_BOX (vb), da, false, false, 0);
@@ -598,7 +565,7 @@ varcircle_create (gint j, datad *d, ggobid *gg)
   d->vcirc_ui.label = g_slist_append (d->vcirc_ui.label, lbl);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
     lbl, "Click left on the circle to select or deselect", NULL);
-  gtk_object_set_data (GTK_OBJECT (lbl), "datad", d);
+  g_object_set_data(G_OBJECT (lbl), "datad", d);
   GGobi_widget_set (GTK_WIDGET (lbl), gg, true);
   /*gtk_container_add (GTK_CONTAINER (vb), lbl);*/
   gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
@@ -681,9 +648,9 @@ varcircle_draw (gint jvar, datad *d, ggobid *gg)
                 0, 64 * 360);
 
   /*-- add the appropriate line --*/
-  if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
-    GtkGGobiExtendedDisplayClass *klass;
-    klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display));
+  if(GGOBI_IS_EXTENDED_DISPLAY(display)) {
+    GGobiExtendedDisplayClass *klass;
+    klass = GGOBI_EXTENDED_DISPLAY_GET_CLASS(display);
     if(klass->varcircle_draw)
       chosen = klass->varcircle_draw(display, jvar, da_pix, gg);
   }
@@ -721,7 +688,7 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, gpointer cbd)
 {
   ggobid *gg = GGobiFromWidget (w, true);
   gint j = GPOINTER_TO_INT (cbd);
-  datad *d = (datad *) gtk_object_get_data (GTK_OBJECT (w), "datad");
+  datad *d = (datad *) g_object_get_data(G_OBJECT (w), "datad");
   GtkWidget *da = varcircles_get_nth (DA, j, d);
   GdkPixmap *da_pix = g_slist_nth_data (d->vcirc_ui.da_pix, j);
 

@@ -239,7 +239,7 @@ transform1_apply (gint j, datad *d, ggobid *gg)
   lims slim, slim_tform;  /*-- specified limits --*/
   GtkWidget *stage1_option_menu = widget_find_by_name (gg->tform_ui.window,
                                             "TRANSFORM:stage1_option_menu");
-  gint tform1 = option_menu_index (GTK_OPTION_MENU (stage1_option_menu));
+  gint tform1 = gtk_combo_box_get_active (GTK_COMBO_BOX (stage1_option_menu));
   gfloat boxcoxparam = gg->tform_ui.boxcox_adj->value;
   vartabled *vt = vartable_element_get (j, d);
   gfloat incr = vt->domain_incr;
@@ -521,7 +521,7 @@ transform2_apply (gint jcol, datad *d, ggobid *gg)
   gboolean tform_ok = true;
   GtkWidget *stage2_option_menu = widget_find_by_name (gg->tform_ui.window,
                                             "TRANSFORM:stage2_option_menu");
-  gint tform2 = option_menu_index (GTK_OPTION_MENU (stage2_option_menu));
+  gint tform2 = gtk_combo_box_get_active (GTK_COMBO_BOX (stage2_option_menu));
 
   switch (tform2)
   {
@@ -827,7 +827,7 @@ transform (gint stage, gint tform_type, gfloat param, gint *vars, gint nvars,
 
   for (k=0; k<nvars; k++)
     transform_variable (stage, tform_type, param, vars[k], d, gg);
-
+  
   limits_set (false, true, d, gg);  
   for (k=0; k<nvars; k++) {
     vartable_limits_set_by_var (vars[k], d);

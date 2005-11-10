@@ -50,7 +50,7 @@
 #include "plugin.h" /* For registerDefaultPlugin. */
 
 
-GtkGGobiApp *GGobiApp;
+GGobiApp *ggobiApp;
 
 static GGobiOptions sessionoptions;
 GGobiOptions *sessionOptions;
@@ -69,12 +69,12 @@ gint totalNumGGobis;
 
 #include "ggobiClass.h"
 
-const GtkTypeLoad typeLoaders[] = {
-                               	   gtk_ggobi_scatterplot_display_get_type,
-                               	   gtk_ggobi_scatmat_display_get_type,
-                               	   gtk_ggobi_par_coords_display_get_type,
-                                   gtk_ggobi_time_series_display_get_type,
-                                   gtk_ggobi_barchart_display_get_type
+const GTypeLoad typeLoaders[] = {
+                               	   	ggobi_scatterplot_display_get_type,
+										ggobi_scatmat_display_get_type,
+										ggobi_par_coords_display_get_type,
+                                   	ggobi_time_series_display_get_type,
+										ggobi_barchart_display_get_type
                                   };
 
 const gchar * const ViewTypes[] =
@@ -91,10 +91,10 @@ static gchar *computeGGobiHome(char *str);
 
 
 
-GtkGGobiApp *
+GGobiApp *
 getGGobiApp()
 {
-   return(GGobiApp);
+   return(ggobiApp);
 }
 
 
@@ -298,7 +298,8 @@ ggobi_remove_by_index (ggobid *gg, gint which)
     gg->d = g_slist_remove (gg->d, d);
   }
 
-  gtk_object_destroy(GTK_OBJECT(gg));
+  g_object_unref(G_OBJECT(gg));
+  /* gtk_object_destroy(GTK_OBJECT(gg)); */
 /*  g_free (gg); */
 
   return (which);
@@ -352,7 +353,7 @@ ggobi_alloc(ggobid *tmp)
 	 tmp = (ggobid*) g_malloc (sizeof (ggobid));
 	 memset (tmp, '\0', sizeof (ggobid)); 
       */
-	tmp = gtk_type_new(GTK_TYPE_GGOBI);
+	tmp = g_object_new(GGOBI_TYPE_GGOBI, NULL);
   }
 
   tmp->firsttime = true;
@@ -431,7 +432,7 @@ ggobi_alloc(ggobid *tmp)
     g_strdup("A string for the key handler"),"Test handler", NULL, tmp, C);
 #endif
 
-  gtk_signal_emit_by_name(GTK_OBJECT(GGobiApp), "new_ggobi", tmp);
+  g_signal_emit_by_name(G_OBJECT(ggobiApp), "new_ggobi", tmp);
 
   return (tmp);
 }
@@ -446,7 +447,7 @@ ggobiInit(int *argc, char **argv[])
 
   gtk_init (argc, argv);
 
-  GGobiApp = gtk_type_new(GTK_TYPE_GGOBI_APP);
+  ggobiApp = g_object_new(GGOBI_TYPE_APP, NULL);
 
 #ifdef TEST_GGOBI_APPP
 /*XXX FIX */
@@ -456,8 +457,8 @@ ggobiInit(int *argc, char **argv[])
 
   initSessionOptions(*argc, *argv);
  
-  GTK_TYPE_GGOBI;
-  registerDisplayTypes((GtkTypeLoad *) typeLoaders,
+  GGOBI_TYPE_GGOBI;
+  registerDisplayTypes((GTypeLoad *) typeLoaders,
 		       sizeof(typeLoaders)/sizeof(typeLoaders)[0]);
 
   registerDefaultPlugins(sessionOptions->info);
@@ -503,7 +504,7 @@ GGOBI(main)(gint argc, gchar *argv[], gboolean processEvents)
   }
   
 
-  gg = gtk_type_new(GTK_TYPE_GGOBI); 
+  gg = g_object_new(GGOBI_TYPE_GGOBI, NULL); 
 
   gg->mono_p = (vis->depth == 1 ||
                 vis->type == GDK_VISUAL_STATIC_GRAY ||
@@ -677,15 +678,8 @@ initSessionOptions(int argc, char **argv)
   sessionOptions->defaultTour1dSpeed = 40.0;  
 }
 
-
-/*
-  Called in response to a window being destroyed.
-  Be careful not to use the event or the object
-  as they are not guaranteed to be correct. We are 
-  abusing the callback marshalling system a little.
- */
 gboolean
-ggobi_close (ggobid *gg, GdkEvent *ev, GtkObject *w)
+ggobi_close (ggobid *gg)
 {
   GGOBI(close)(gg, true);
   return(true);
@@ -696,9 +690,9 @@ ggobi_close (ggobid *gg, GdkEvent *ev, GtkObject *w)
    Key for storing a reference to a ggobid instance in a widget
    so that we can retrieve it within a callback.
 */
-const gchar * const GGobiGTKey = "GGobi";
+static const gchar * GGobiGTKey = "GGobi";
 
-const gchar* const key_get (void) {
+const gchar* key_get (void) {
   return GGobiGTKey;
 }
 
@@ -717,7 +711,7 @@ GGobiFromWidget (GtkWidget *w, gboolean useWindow)
    return(GGobiFromWindow(win));
   */
   ggobid *gg = NULL;
-  gg = (ggobid*) gtk_object_get_data (GTK_OBJECT(w), GGobiGTKey);
+  gg = (ggobid*) g_object_get_data(G_OBJECT(w), GGobiGTKey);
   ValidateGGobiRef (gg, true);
 
   return (gg);
@@ -726,7 +720,7 @@ GGobiFromWidget (GtkWidget *w, gboolean useWindow)
 ggobid* GGobiFromWindow (GdkWindow *win)
 {
   ggobid *gg = NULL;
-  gg = (ggobid*) gtk_object_get_data(GTK_OBJECT(win), GGobiGTKey);
+  gg = (ggobid*) g_object_get_data(G_OBJECT(win), GGobiGTKey);
   ValidateGGobiRef (gg, true);
 
   return(gg);
@@ -747,13 +741,11 @@ GGobiFromDisplay(displayd *display)
 void
 GGobi_widget_set (GtkWidget *w, ggobid *gg, gboolean asIs)
 {
-  GtkObject *obj;
-  if (asIs)
-    obj = GTK_OBJECT (w);
-  else 
-    obj = GTK_OBJECT (gtk_widget_get_parent_window (w));
+  GtkWidget *wid = w;
+  if (!asIs)
+	  wid = GTK_WIDGET (gtk_widget_get_parent_window (wid));
 
-  gtk_object_set_data (obj, GGobiGTKey, gg);
+  g_object_set_data (G_OBJECT(wid), GGobiGTKey, gg);
 }
 
 

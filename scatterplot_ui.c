@@ -22,6 +22,35 @@
 /*                   Resetting the main menubar                       */
 /*--------------------------------------------------------------------*/
 
+static const gchar *mode_ui_str =
+"<ui>"
+"	<menubar>"
+"		<menu action='PMode'>"
+"			<menuitem action='1D Plot'/>"
+"			<menuitem action='XY Plot'/>"
+"			<menuitem action='1D Tour'/>"
+"			<menuitem action='Rotation'/>"
+"			<menuitem action='2D Tour'/>"
+"			<menuitem action='2x1D Tour'/>"
+"		</menu>"
+"		<menu action='IMode'>"
+"			<menuitem action='DefaultIMode'/>"
+"			<separator/>"
+"			<menuitem action='Scale'/>"
+"			<menuitem action='Brush'/>"
+"			<menuitem action='Identify'/>"
+"			<menuitem action='Edit edges'/>"
+"			<menuitem action='Move points'/>"
+"		</menu>"
+"	</menubar>"
+"</ui>";
+
+const gchar *
+scatterplot_mode_ui_get(displayd *display)
+{
+	return(mode_ui_str);
+}
+#if 0
 GtkWidget *
 scatterplot_pmode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func,
 			    ggobid *gg, gboolean useIds)
@@ -141,11 +170,18 @@ scatterplot_imode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func,
   gtk_widget_show (imode_menu);
   return (imode_menu);
 }
-
+#endif
 
 /*--------------------------------------------------------------------*/
 /*                   Setting the display menubar                      */
 /*--------------------------------------------------------------------*/
+
+static void
+edge_options_cb(GtkWidget *w, gpointer opt)
+{
+	displayd *dsp = g_object_get_data(G_OBJECT(w), "display");
+	set_display_option(GTK_CHECK_MENU_ITEM(w)->active, GPOINTER_TO_INT(opt), dsp);
+}
 
 /*
  * This handles the initialization of the edge menu item and menu,
@@ -155,8 +191,7 @@ scatterplot_imode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func,
 */
 void
 scatterplot_display_edge_menu_update (displayd *display,
-                                      GtkAccelGroup *accel_group,
-                                      GtkSignalFunc func, ggobid *gg)
+                                      GtkAccelGroup *accel_group, ggobid *gg)
 {
   datad *d = display->d;  /*-- this dataset --*/
   gint nd = g_slist_length (gg->d);
@@ -203,9 +238,9 @@ scatterplot_display_edge_menu_update (displayd *display,
     /*-- create the edge menu item if there is at least one edge set --*/
     if (ne > 0) {
       if (display->edge_item == NULL) {
-        display->edge_item = submenu_make ("_Edges", 'E',
-          gg->main_accel_group);
-        submenu_insert (display->edge_item, display->menubar, 1);
+        display->edge_item = gtk_menu_item_new_with_mnemonic("_Edges");
+        gtk_menu_shell_insert(GTK_MENU_SHELL(display->menubar), display->edge_item, 1);
+		//submenu_insert (display->edge_item, display->menubar, 1);
       }
     }
   }
@@ -225,8 +260,8 @@ scatterplot_display_edge_menu_update (displayd *display,
       lbl = g_strdup_printf ("Select edge set (%s)", onlye->name);
       item = CreateMenuItem (display->edge_menu, lbl,
         NULL, NULL, NULL, gg->main_accel_group,
-        GTK_SIGNAL_FUNC (edgeset_add_cb), onlye, gg);
-      gtk_object_set_data (GTK_OBJECT (item),
+        G_CALLBACK (edgeset_add_cb), onlye, gg);
+      g_object_set_data(G_OBJECT (item),
         "display", GINT_TO_POINTER (display));
       g_free (lbl);
     }
@@ -246,8 +281,8 @@ scatterplot_display_edge_menu_update (displayd *display,
           lbl = datasetName (e, gg);
           item = CreateMenuItem (submenu, lbl,
             NULL, NULL, NULL, gg->main_accel_group,
-            GTK_SIGNAL_FUNC (edgeset_add_cb), e, gg);
-          gtk_object_set_data (GTK_OBJECT (item),
+            G_CALLBACK (edgeset_add_cb), e, gg);
+          g_object_set_data(G_OBJECT (item),
             "display", GINT_TO_POINTER (display));
           g_free (lbl);
         }
@@ -267,30 +302,32 @@ scatterplot_display_edge_menu_update (displayd *display,
     */
     item = CreateMenuCheck (display->edge_menu,
       "Show undirected edges",
-      GTK_SIGNAL_FUNC(display_options_cb), GINT_TO_POINTER (DOPT_EDGES_U),
+      G_CALLBACK(edge_options_cb), GINT_TO_POINTER (DOPT_EDGES_U),
       display->options.edges_undirected_show_p, gg);
     gtk_widget_set_name (item, "DISPLAYMENU:edges_u");
-    gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
+    g_object_set_data(G_OBJECT (item), "display", (gpointer) display);
 
     item = CreateMenuCheck (display->edge_menu,
       "Show directed edges (edges and 'arrowheads')",
-      GTK_SIGNAL_FUNC(display_options_cb), GINT_TO_POINTER (DOPT_EDGES_D),
+      G_CALLBACK(edge_options_cb), GINT_TO_POINTER (DOPT_EDGES_D),
       display->options.edges_directed_show_p, gg);
     gtk_widget_set_name (item, "DISPLAYMENU:edges_d");
-    gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
+    g_object_set_data(G_OBJECT (item), "display", (gpointer) display);
 
     item = CreateMenuCheck (display->edge_menu,
       "Show 'arrowheads' only",
-      GTK_SIGNAL_FUNC(display_options_cb), GINT_TO_POINTER (DOPT_EDGES_A),
+      G_CALLBACK(edge_options_cb), GINT_TO_POINTER (DOPT_EDGES_A),
       display->options.edges_arrowheads_show_p, gg);
     gtk_widget_set_name (item, "DISPLAYMENU:edges_a");
-    gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
+    g_object_set_data(G_OBJECT (item), "display", (gpointer) display);
 
     gtk_menu_item_set_submenu (GTK_MENU_ITEM (display->edge_item),
       display->edge_menu);
+	 
+	gtk_widget_show_all(display->edge_item);
   }
 }
-
+#if 0
 void
 scatterplot_display_menus_make (displayd *display,
                                 GtkAccelGroup *accel_group,
@@ -314,7 +351,7 @@ scatterplot_display_menus_make (displayd *display,
 
   item = CreateMenuCheck (options_menu, "Show points",
     func, GINT_TO_POINTER (DOPT_POINTS), on, gg);
-  gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
+  g_object_set_data(G_OBJECT (item), "display", (gpointer) display);
 
 /* These options are being moved to pmode menus on the display menubar.
   CreateMenuItem (options_menu, NULL, "", "", NULL, NULL, NULL, NULL, gg);
@@ -322,19 +359,19 @@ scatterplot_display_menus_make (displayd *display,
   item = CreateMenuCheck (options_menu, "Show axes",
     func, GINT_TO_POINTER (DOPT_AXES), display->options.axes_show_p, gg);
   gtk_widget_set_name (item, "DISPLAY:show_axes");
-  gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
+  g_object_set_data(G_OBJECT (item), "display", (gpointer) display);
 
   item = CreateMenuCheck (options_menu, "Show 2D tour axes as text",
     func, GINT_TO_POINTER (DOPT_AXESLAB), off, gg);
-  gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
+  g_object_set_data(G_OBJECT (item), "display", (gpointer) display);
 
   item = CreateMenuCheck (options_menu, "Show 2D tour proj vals",
     func, GINT_TO_POINTER (DOPT_AXESVALS), on, gg);
-  gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
+  g_object_set_data(G_OBJECT (item), "display", (gpointer) display);
  */
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (topmenu), options_menu);
   submenu_append (topmenu, display->menubar);
   gtk_widget_show (topmenu);
 }
-
+#endif

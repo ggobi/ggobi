@@ -1,5 +1,5 @@
-/*-- menus.c: menus in the main menubar that change with the mode;
- some of the menus have recently migrated to the display menubar --*/
+/*-- menus.c: menus in the display menubar that change with the mode;
+*/
 /*
  * ggobi
  * Copyright (C) AT&T, Duncan Temple Lang, Dianne Cook 1999-2005
@@ -30,6 +30,7 @@
 /*               Routines to manage the mode menus                    */
 /*--------------------------------------------------------------------*/
 
+#if 0
 /*-- make the menu items once, and then show/hide them as necessary --*/
 void
 main_miscmenus_initialize (ggobid *gg)
@@ -59,15 +60,15 @@ main_options_menu_update (ProjectionMode pmode_prev, InteractionMode imode_prev,
   /* These three items are always present */
 
   CreateMenuCheck (gg->menus.options_menu, "Show tooltips",
-    GTK_SIGNAL_FUNC (tooltips_show_cb), NULL,
+    G_CALLBACK (tooltips_show_cb), NULL,
     GTK_TOOLTIPS (gg->tips)->enabled, gg);
 
   CreateMenuCheck (gg->menus.options_menu, "Show control panel",
-    GTK_SIGNAL_FUNC (cpanel_show_cb), NULL,
+    G_CALLBACK (cpanel_show_cb), NULL,
     GTK_WIDGET_VISIBLE (gg->imode_frame), gg);
 
   CreateMenuCheck (gg->menus.options_menu, "Show status bar",
-    GTK_SIGNAL_FUNC (statusbar_show_cb), NULL,
+    G_CALLBACK (statusbar_show_cb), NULL,
     gg->statusbar_p, gg);
 
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->menus.options_item),
@@ -90,15 +91,17 @@ call class-specific menus to rebuild them.
   Should use instead klass->option_items_add() which does nothing,
   if (pmode == EXTENDED_DISPLAY_MODE && imode == DEFAULT) {
       displayd *dpy = gg->current_display;
-      if(GTK_IS_GGOBI_EXTENDED_DISPLAY(dpy)) {
-        GtkGGobiExtendedDisplayClass *klass;
-        klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(dpy));
+      if(GGOBI_IS_EXTENDED_DISPLAY(dpy)) {
+        GGobiExtendedDisplayClass *klass;
+        klass = GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(dpy));
         klass->menus_make(dpy, mode, gg);
       }
     }
   */
 
 }
+
+#endif
 
 
 /*
@@ -112,80 +115,141 @@ pmode_has_display_menu (ProjectionMode pmode)
   return (pmode == TOUR1D  || pmode == TOUR2D || pmode == COTOUR);
 }
 
+static const gchar *tour1d_pmode_ui =
+"<ui>"
+"	<menubar>"
+"		<menu action='Tour1D'>"
+"			<menuitem action='ShowAxes'/>"
+"			<menuitem action='FadeVariables1D'/>"
+"			<menuitem action='SelectAllVariables1D'/>"
+"		</menu>"
+"	</menubar>"
+"</ui>";
+
+#if 0
 void
 tour1d_display_pmode_items_add (GtkWidget *menu, ggobid *gg)
 {
   displayd *display = gg->current_display;
   GtkWidget *item;
-  GtkSignalFunc func = (GtkSignalFunc) display_options_cb;
+  GCallback func = G_CALLBACK(display_options_cb);
 
   item = CreateMenuCheck (menu, "Show axes",
     func, GINT_TO_POINTER (DOPT_AXES), display->options.axes_show_p, gg);
   gtk_widget_set_name (item, "DISPLAY:show_axes");
-  gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
+  g_object_set_data(G_OBJECT (item), "display", (gpointer) display);
 
   /*-- Add a separator --*/
   CreateMenuItem (menu, NULL, "", "", NULL, NULL, NULL, NULL, gg);
 
   CreateMenuCheck (menu, "Fade variables on de-selection",
-    GTK_SIGNAL_FUNC (tour1d_fade_vars_cb), NULL,
+    G_CALLBACK (tour1d_fade_vars_cb), NULL,
     gg->tour1d.fade_vars, gg);
 
   CreateMenuCheck (menu, "Select all variables",
-    GTK_SIGNAL_FUNC (tour1d_all_vars_cb), NULL,
+    G_CALLBACK (tour1d_all_vars_cb), NULL,
     gg->tour1d.all_vars, gg);
 }
+#endif
 
+static const gchar* tour2d_pmode_ui =
+"<ui>"
+"	<menubar>"
+"		<menu action='Tour2D'>"
+"			<menuitem action='ShowAxes'/>"
+"			<menuitem action='ShowAxesLabels'/>"
+"			<menuitem action='ShowAxesVals'/>"
+"			<separator/>"
+"			<menuitem action='FadeVariables2D'/>"
+"			<menuitem action='SelectAllVariables2D'/>"
+"		</menu>"
+"	</menubar>"
+"</ui>";
+
+#if 0
 void
 tour2d_display_pmode_items_add (GtkWidget *menu, ggobid *gg) {
   displayd *display = gg->current_display;
   GtkWidget *item;
-  GtkSignalFunc func = (GtkSignalFunc) display_options_cb;
+  GtkSignalFunc func = G_CALLBACK(display_options_cb);
 
   item = CreateMenuCheck (menu, "Show axes",
     func, GINT_TO_POINTER (DOPT_AXES), display->options.axes_show_p, gg);
   gtk_widget_set_name (item, "DISPLAY:show_axes");
-  gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
+  g_object_set_data(G_OBJECT (item), "display", (gpointer) display);
 
   item = CreateMenuCheck (menu, "Show 2D tour axes as text",
     func, GINT_TO_POINTER (DOPT_AXESLAB), off, gg);
-  gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
+  g_object_set_data(G_OBJECT (item), "display", (gpointer) display);
 
   item = CreateMenuCheck (menu, "Show 2D tour proj vals",
     func, GINT_TO_POINTER (DOPT_AXESVALS), on, gg);
-  gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
+  g_object_set_data(G_OBJECT (item), "display", (gpointer) display);
 
   /*-- Add a separator --*/
   CreateMenuItem (menu, NULL, "", "", NULL, NULL, NULL, NULL, gg);
 
   CreateMenuCheck (menu, "Fade variables on de-selection",
-    GTK_SIGNAL_FUNC (tour2d_fade_vars_cb), NULL,
+    G_CALLBACK (tour2d_fade_vars_cb), NULL,
     gg->tour2d.fade_vars, gg);
 
   CreateMenuCheck (menu, "Select all variables",
-    GTK_SIGNAL_FUNC (tour2d_all_vars_cb), NULL,
+    G_CALLBACK (tour2d_all_vars_cb), NULL,
     gg->tour2d.all_vars, gg);
 }
+#endif
 
+static const gchar *cotour_pmode_ui =
+"<ui>"
+"	<menubar>"
+"		<menu action='CorrTour'>"
+"			<menuitem action='ShowAxes'/>"
+"			<separator/>"
+"			<menuitem action='FadeVariablesCo'/>"
+"		</menu>"
+"	</menubar>"
+"</ui>";
+
+#if 0
 void
 cotour_display_pmode_items_add (GtkWidget *menu, ggobid *gg) {
   displayd *display = gg->current_display;
   GtkWidget *item;
-  GtkSignalFunc func = (GtkSignalFunc) display_options_cb;
+  GtkSignalFunc func = G_CALLBACK(display_options_cb);
 
   item = CreateMenuCheck (menu, "Show axes",
     func, GINT_TO_POINTER (DOPT_AXES), display->options.axes_show_p, gg);
   gtk_widget_set_name (item, "DISPLAY:show_axes");
-  gtk_object_set_data (GTK_OBJECT (item), "display", (gpointer) display);
+  g_object_set_data(G_OBJECT (item), "display", (gpointer) display);
 
   /*-- Add a separator --*/
   CreateMenuItem (menu, NULL, "", "", NULL, NULL, NULL, NULL, gg);
 
   CreateMenuCheck (menu, "Fade variables on de-selection",
-    GTK_SIGNAL_FUNC (tourcorr_fade_vars_cb), NULL,
+    G_CALLBACK (tourcorr_fade_vars_cb), NULL,
     gg->tourcorr.fade_vars, gg);
 }
+#endif
 
+static const gchar *brush_imode_ui =
+"<ui>"
+"	<menubar>"
+"		<menu action='Brush'>"
+"			<menuitem action='ExcludeShadowedPoints'/>"
+"			<menuitem action='IncludeShadowedPoints'/>"
+"			<menuitem action='UnshadowAllPoints'/>"
+"			<separator/>"
+"			<menuitem action='ExcludeShadowedEdges'/>"
+"			<menuitem action='IncludeShadowedEdges'/>"
+"			<menuitem action='UnshadowAllEdges'/>"
+"			<separator/>"
+"			<menuitem action='ResetBrushSize'/>"
+"			<menuitem action='UpdateBrushContinuously'/>"
+"		</menu>"
+"	</menubar>"
+"</ui>";
+
+#if 0
 void
 brush_display_imode_items_add (GtkWidget *menu, ggobid *gg)
 {
@@ -197,50 +261,50 @@ brush_display_imode_items_add (GtkWidget *menu, ggobid *gg)
 */
   item = gtk_menu_item_new_with_label ("Exclude shadowed points");
   GGobi_widget_set (item, gg, true);
-  gtk_signal_connect (GTK_OBJECT (item), "activate",
-                      GTK_SIGNAL_FUNC (brush_reset_cb),
+  g_signal_connect (G_OBJECT (item), "activate",
+                      G_CALLBACK (brush_reset_cb),
                       (gpointer) GINT_TO_POINTER (RESET_EXCLUDE_SHADOW_POINTS));
   gtk_menu_append (GTK_MENU (menu), item);
 
   item = gtk_menu_item_new_with_label ("Include shadowed points");
   GGobi_widget_set (item, gg, true);
-  gtk_signal_connect (GTK_OBJECT (item), "activate",
-                      GTK_SIGNAL_FUNC (brush_reset_cb),
+  g_signal_connect (G_OBJECT (item), "activate",
+                      G_CALLBACK (brush_reset_cb),
                       (gpointer) GINT_TO_POINTER (RESET_INCLUDE_SHADOW_POINTS));
   gtk_menu_append (GTK_MENU (menu), item);
 
   item = gtk_menu_item_new_with_label ("Un-shadow all points");
   GGobi_widget_set (item, gg, true);
-  gtk_signal_connect (GTK_OBJECT (item), "activate",
-                      GTK_SIGNAL_FUNC (brush_reset_cb),
+  g_signal_connect (G_OBJECT (item), "activate",
+                      G_CALLBACK (brush_reset_cb),
                       (gpointer) GINT_TO_POINTER (RESET_UNSHADOW_POINTS));
   gtk_menu_append (GTK_MENU (menu), item);
 
   item = gtk_menu_item_new_with_label ("Exclude shadowed edges");
   GGobi_widget_set (item, gg, true);
-  gtk_signal_connect (GTK_OBJECT (item), "activate",
-                      GTK_SIGNAL_FUNC (brush_reset_cb),
+  g_signal_connect (G_OBJECT (item), "activate",
+                      G_CALLBACK (brush_reset_cb),
                       (gpointer) GINT_TO_POINTER (RESET_EXCLUDE_SHADOW_EDGES));
   gtk_menu_append (GTK_MENU (menu), item);
 
   item = gtk_menu_item_new_with_label ("Include shadowed edges");
   GGobi_widget_set (item, gg, true);
-  gtk_signal_connect (GTK_OBJECT (item), "activate",
-                      GTK_SIGNAL_FUNC (brush_reset_cb),
+  g_signal_connect (G_OBJECT (item), "activate",
+                      G_CALLBACK (brush_reset_cb),
                       (gpointer) GINT_TO_POINTER (RESET_INCLUDE_SHADOW_EDGES));
   gtk_menu_append (GTK_MENU (menu), item);
 
   item = gtk_menu_item_new_with_label ("Un-shadow all edges");
   GGobi_widget_set (item, gg, true);
-  gtk_signal_connect (GTK_OBJECT (item), "activate",
-                      GTK_SIGNAL_FUNC (brush_reset_cb),
+  g_signal_connect (G_OBJECT (item), "activate",
+                      G_CALLBACK (brush_reset_cb),
                       (gpointer) GINT_TO_POINTER (RESET_UNSHADOW_EDGES));
   gtk_menu_append (GTK_MENU (menu), item);
 
   item = gtk_menu_item_new_with_label ("Reset brush size");
   GGobi_widget_set (item, gg, true);
-  gtk_signal_connect (GTK_OBJECT (item), "activate",
-                      GTK_SIGNAL_FUNC (brush_reset_cb),
+  g_signal_connect (G_OBJECT (item), "activate",
+                      G_CALLBACK (brush_reset_cb),
                       (gpointer) GINT_TO_POINTER (RESET_INIT_BRUSH));
   gtk_menu_append (GTK_MENU (menu), item);
 
@@ -249,29 +313,42 @@ brush_display_imode_items_add (GtkWidget *menu, ggobid *gg)
     "", "", NULL, NULL, NULL, NULL, NULL);
 
   CreateMenuCheck (menu, "Update brushing continuously",
-    GTK_SIGNAL_FUNC (brush_update_set_cb), NULL,
+    G_CALLBACK (brush_update_set_cb), NULL,
     gg->brush.updateAlways_p, gg);
 
 }
+#endif
 
+static const gchar* scale_imode_ui =
+"<ui>"
+"	<menubar>"
+"		<menu action='Scale'>"
+"			<menuitem action='ResetPan'/>"
+"			<menuitem action='ResetZoom'/>"
+"		</menu>"
+"	</menubar>"
+"</ui>";
+
+#if 0
 void
 scale_display_imode_items_add (GtkWidget *menu, ggobid *gg) {
-  void pan_reset_cb (GtkWidget *w, ggobid *gg);
-  void zoom_reset_cb (GtkWidget *w, ggobid *gg);
+  void pan_reset_cb (displayd *display);
+  void zoom_reset_cb (displayd *display);
   GtkWidget *item;
 
   item = gtk_menu_item_new_with_label ("Reset pan");
-  gtk_signal_connect (GTK_OBJECT (item), "activate",
-                      GTK_SIGNAL_FUNC (pan_reset_cb),
+  g_signal_connect (G_OBJECT (item), "activate",
+                      G_CALLBACK (pan_reset_cb),
                       (gpointer) gg);
   gtk_menu_append (GTK_MENU (menu), item);
 
   item = gtk_menu_item_new_with_label ("Reset zoom");
-  gtk_signal_connect (GTK_OBJECT (item), "activate",
-                      GTK_SIGNAL_FUNC (zoom_reset_cb),
+  g_signal_connect (G_OBJECT (item), "activate",
+                      G_CALLBACK (zoom_reset_cb),
                       (gpointer) gg);
   gtk_menu_append (GTK_MENU (menu), item);
 }
+#endif
 
 gboolean
 imode_has_display_menu (InteractionMode imode)
@@ -286,24 +363,40 @@ display_mode_menus_update (ProjectionMode pmode_prev, InteractionMode imode_prev
    ProjectionMode pmode = display->cpanel.pmode;
   InteractionMode imode = display->cpanel.imode; 
   /* or imode_get (gg) */
-
+  const gchar *ui;
+  GError *error = NULL;
+  
   if (imode != imode_prev) {
-
     /* Remove any existing imode submenu */
-    if (imode_has_display_menu(imode_prev) && display->imode_item) {
-      /* I don't understand why all these tests are necessary ... dfs */
-      if (GTK_IS_MENU_ITEM(display->imode_item))
+	if (imode_has_display_menu(imode_prev)) {
+      gtk_ui_manager_remove_ui(display->menu_manager, display->imode_merge_id);
+	  /* I don't understand why all these tests are necessary ... dfs */
+      /*if (GTK_IS_MENU_ITEM(display->imode_item))
         gtk_menu_item_remove_submenu (GTK_MENU_ITEM (display->imode_item));
       if (GTK_IS_WIDGET(display->imode_item))
         gtk_widget_destroy (display->imode_item);
-      display->imode_item = NULL;
+      display->imode_item = NULL;*/
     }
 
     /* If the new mode has an imode menu, build it */
     if (imode_has_display_menu (imode)) {
-      GtkWidget *imode_menu;
-      /* GtkAccelGroup *accel_group = gtk_accel_group_new(); not yet ...*/
+	  if (imode == BRUSH) {
+		 ui = brush_imode_ui;
+      } else if (imode == SCALE) {
+         ui = scale_imode_ui;
+      }
+	  
+	  display->imode_merge_id = 
+	  	gtk_ui_manager_add_ui_from_string(display->menu_manager, ui, -1, &error);
+	  if (error) {
+		  g_message("Failed to load display imode ui!\n");
+		  g_error_free(error);
+	  }
 
+      #if 0
+	  GtkWidget *imode_menu;
+      /* GtkAccelGroup *accel_group = gtk_accel_group_new(); not yet ...*/
+	  
       display->imode_item = gtk_menu_item_new_with_label ((gchar *)GGOBI(getIModeName)(imode));
       gtk_widget_show (display->imode_item);
       submenu_insert (display->imode_item, display->menubar, 2);
@@ -318,6 +411,7 @@ display_mode_menus_update (ProjectionMode pmode_prev, InteractionMode imode_prev
 
       gtk_widget_show_all (imode_menu);
       gtk_menu_item_set_submenu (GTK_MENU_ITEM (display->imode_item), imode_menu);
+	  #endif
     }
   }
 
@@ -325,10 +419,11 @@ display_mode_menus_update (ProjectionMode pmode_prev, InteractionMode imode_prev
   if (pmode != pmode_prev && imode == DEFAULT_IMODE) {
 
     /* Remove any existing pmode submenu */
-    if (pmode_has_display_menu(pmode_prev) && display->pmode_item) {
-      gtk_menu_item_remove_submenu (GTK_MENU_ITEM (display->pmode_item));
+    if (pmode_has_display_menu(pmode_prev) && display->pmode_merge_id) {
+      gtk_ui_manager_remove_ui(display->menu_manager, display->pmode_merge_id);
+	  /*gtk_menu_item_remove_submenu (GTK_MENU_ITEM (display->pmode_item));
       gtk_widget_destroy (display->pmode_item);
-      display->pmode_item = NULL;
+      display->pmode_item = NULL;*/
     }
 
     /* Do we need to be in the default imode for this?  I don't see
@@ -336,7 +431,23 @@ display_mode_menus_update (ProjectionMode pmode_prev, InteractionMode imode_prev
 
     /* If the new mode has a pmode menu, build it */
     if (pmode_has_display_menu (pmode)) {
-      GtkWidget *pmode_menu;
+	  if (pmode == TOUR1D) {
+		  ui = tour1d_pmode_ui;
+      } else if (pmode == TOUR2D) {
+		  ui = tour2d_pmode_ui;
+      } else if (pmode == COTOUR) {
+          ui = cotour_pmode_ui;
+      } 
+	  
+	  display->pmode_merge_id = 
+	  	gtk_ui_manager_add_ui_from_string(display->menu_manager, ui, -1, &error);
+	  if (error) {
+		  g_message("Failed to load display pmode ui!\n");
+		  g_error_free(error);
+	  }
+	  
+      #if 0
+	  GtkWidget *pmode_menu;
       /* GtkAccelGroup *accel_group = gtk_accel_group_new(); not yet ...*/
 
       display->pmode_item = gtk_menu_item_new_with_label ((gchar *)GGOBI(getPModeName)(pmode));
@@ -355,6 +466,7 @@ display_mode_menus_update (ProjectionMode pmode_prev, InteractionMode imode_prev
 
       gtk_widget_show_all (pmode_menu);
       gtk_menu_item_set_submenu (GTK_MENU_ITEM (display->pmode_item), pmode_menu);
+	  #endif
     }
 
 

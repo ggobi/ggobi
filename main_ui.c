@@ -39,16 +39,17 @@
 #include "scatmatClass.h"
 
 const char *const GGOBI(PModeNames)[] = {
-  "Default",
+  "DefaultPMode",
   "1D Plot",
   "XY Plot",
   "1D Tour",
   "Rotation",
   "2D Tour",
   "2x1D Tour",
+  "ExtendedDisplayPMode"
 };
 const char *const GGOBI(IModeNames)[] = {
-  "Default",
+  "DefaultIMode",
   "Scale",
   "Brush",
   "Identify",
@@ -65,9 +66,9 @@ const char * const GGOBI(IModeKeys)[] = {
 
 void addPreviousFilesMenu(GtkWidget *parent, GGobiInitInfo *info, ggobid *gg);
 
-void store_session(ggobid *gg, gint action, GtkWidget *w);
-void show_plugin_list(ggobid *gg, gint action, GtkWidget *w);
-void create_new_ggobi(ggobid *gg, gint action, GtkWidget *w);
+void store_session(ggobid *gg);
+void show_plugin_list(ggobid *gg);
+void create_new_ggobi();
 
 void
 make_control_panels (ggobid *gg) 
@@ -109,19 +110,10 @@ GtkWidget * mode_panel_get_by_name(const gchar *name, ggobid *gg)
   return (GtkWidget *) w;
 }
 
-void  /* if we don't use itemfactory */
-tooltips_show_cb (GtkCheckMenuItem *w, guint action) 
+void
+tooltips_show (gboolean show, ggobid *gg) 
 {
-  ggobid *gg = GGobiFromWidget(GTK_WIDGET(w), true);
-  if (w->active)
-    gtk_tooltips_enable (gg->tips);
-  else
-    gtk_tooltips_disable (gg->tips);
-}
-void  /* if we do */
-tooltips_show_itemfactory_cb (ggobid *gg, GdkEvent *ev, GtkCheckMenuItem *w) 
-{
-  if (w->active)
+  if (show)
     gtk_tooltips_enable (gg->tips);
   else
     gtk_tooltips_disable (gg->tips);
@@ -131,7 +123,7 @@ void
 statusbar_show (gboolean show, ggobid *gg)
 {
   GtkWidget *entry = (GtkWidget *)
-    gtk_object_get_data (GTK_OBJECT(gg->main_window), "MAIN:STATUSBAR");
+    g_object_get_data(G_OBJECT(gg->main_window), "MAIN:STATUSBAR");
   if (entry) {
     if (show)
       gtk_widget_show (entry);
@@ -140,54 +132,38 @@ statusbar_show (gboolean show, ggobid *gg)
   }
   gg->statusbar_p = show;
 }
-void /* If we're not using the itemfactory */
-statusbar_show_cb (GtkCheckMenuItem *w, guint action) 
-{
-  ggobid *gg = GGobiFromWidget(GTK_WIDGET(w), true);
-  statusbar_show (w->active, gg);
-}
-void  /* If we are */
-statusbar_show_itemfactory_cb (ggobid *gg, GdkEvent *ev, GtkCheckMenuItem *w) 
-{
-  statusbar_show (w->active, gg);
-}
+
 /*
   gg->status_message_func((gchar *)domain_error_message, gg);
 */
 void
 gg_write_to_statusbar (gchar *message, ggobid *gg)
 {
-  GtkWidget *entry = (GtkWidget *)
-    gtk_object_get_data (GTK_OBJECT(gg->main_window), "MAIN:STATUSBAR");
+  GtkWidget *statusbar = (GtkWidget *)
+    g_object_get_data(G_OBJECT(gg->main_window), "MAIN:STATUSBAR");
 
+	// for now we pop by default to prevent memory leaking, but we could
+	// support a temporary statusbar message in which case we would not pop
+  gtk_statusbar_pop(GTK_STATUSBAR(statusbar), 0);
   if (message)
-    gtk_entry_set_text (GTK_ENTRY(entry), message);
+    gtk_statusbar_push(GTK_STATUSBAR(statusbar), 0, message);
   else {
     /*-- by default, describe the current datad --*/
     datad *d = datad_get_from_notebook (gg->varpanel_ui.notebook, gg);
     if (d) {
       gchar *msg = g_strdup_printf ("%s: %d x %d  (%s)",
         d->name, d->nrows, d->ncols, gg->input->fileName);
-      gtk_entry_set_text (GTK_ENTRY(entry), msg);
+      gtk_statusbar_push(GTK_STATUSBAR(statusbar), 0, msg);
       g_free (msg);
     }
   }
 }
 
 void
-cpanel_show_cb (GtkCheckMenuItem *w, guint action) 
-{
-  ggobid *gg = GGobiFromWidget(GTK_WIDGET(w), true);
-  if (w->active)
-    gtk_widget_show (gg->imode_frame);
-  else
-    gtk_widget_hide (gg->imode_frame);
-}
-void
-cpanel_show_itemfactory_cb (ggobid *gg, GdkEvent *ev, GtkCheckMenuItem *w) 
+cpanel_show (gboolean show, ggobid *gg) 
 {
   if (gg->imode_frame) {
-    if (w->active)
+    if (show)
       gtk_widget_show (gg->imode_frame);
     else
       gtk_widget_hide (gg->imode_frame);
@@ -206,9 +182,9 @@ varpanel_highd (displayd *display)
 {
   gboolean highd = false;
 
-  if(display && GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
-     GtkGGobiExtendedDisplayClass *klass;
-     klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display));
+  if(display && GGOBI_IS_EXTENDED_DISPLAY(display)) {
+     GGobiExtendedDisplayClass *klass;
+     klass = GGOBI_EXTENDED_DISPLAY_GET_CLASS(display);
      if(klass->varpanel_highd)
        highd = klass->varpanel_highd(display);
   }
@@ -264,30 +240,73 @@ varpanel_reinit (ggobid *gg)
 void
 rebuild_mode_menus(displayd *display, ggobid *gg)
 {
-    if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
+	static const gchar *iprefix = "/menubar/IMode/", *pprefix = "/menubar/PMode/";
+	gchar* path;
+	GtkAction *action = NULL;
+
+	
+    if(GGOBI_IS_EXTENDED_DISPLAY(display)) {
+		gtk_ui_manager_remove_ui(gg->main_menu_manager, gg->mode_merge_id);
      /* Allow the extended display to override the submenu_destroy call.
         If it doesn't provide a method, then call submenu_destroy. */
-      void (*f)(displayd *dpy, GtkWidget *) =
-        GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display))->display_unset;
+      void (*f)(displayd *dpy) =
+        GGOBI_EXTENDED_DISPLAY_GET_CLASS(display)->display_unset;
       if(f) {
-        f(display, gg->pmode_item);
-        f(display, gg->imode_item);
-      }
-      else { /* If no method, use this */
+        f(display);
+        f(display);
+      }/*
+      else { 
         if (gg->pmode_item)
           submenu_destroy (gg->pmode_item);
         submenu_destroy (gg->imode_item);
-      }
+      }*/
     }
 
     /* Then rebuild */
-    if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
+    if(GGOBI_IS_EXTENDED_DISPLAY(display)) {
+		const gchar* (*ui_get)(displayd *dpy) = 
+			GGOBI_EXTENDED_DISPLAY_GET_CLASS(display)->mode_ui_get;
+		if (ui_get) {
+			GError *error = NULL;
+			const gchar *ui = ui_get(display);
+			gg->mode_merge_id = 
+				gtk_ui_manager_add_ui_from_string(gg->main_menu_manager, ui, -1, &error);
+			if (error) {
+				g_message("Could not merge main mode ui from display");
+				g_error_free(error);
+			}
+		}
       void (*f)(displayd *dpy, ggobid *gg) =
-        GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display))->display_set;
+        GGOBI_EXTENDED_DISPLAY_GET_CLASS(display)->display_set;
       if(f)
         f(display, gg);
+	  
+	  /* use an informative label for the default actions, if necessary */
+	  path = g_strdup_printf("%s%s", pprefix, "ExtendedDisplayPMode");
+	  action = gtk_ui_manager_get_action(gg->main_menu_manager, path);
+	  if (action)
+		g_object_set(G_OBJECT(action), "label", 
+			GGOBI(getPModeScreenName)(EXTENDED_DISPLAY_PMODE, display), NULL);
+	  g_free(path);
+	  path = g_strdup_printf("%s%s", iprefix, "DefaultIMode");
+	  action = gtk_ui_manager_get_action(gg->main_menu_manager, path);
+	  if (action)
+		g_object_set(G_OBJECT(action), "label", 
+			GGOBI(getIModeScreenName)(DEFAULT_IMODE, display), NULL);
+	  g_free(path);
+	  /* force the radio actions to update */
+	  path = g_strdup_printf("%s%s", pprefix, GGOBI(getPModeName)(pmode_get(gg)));
+	  action = gtk_ui_manager_get_action(gg->main_menu_manager, path);
+	  if (action)
+		gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action), true);
+	  g_free(path);
+	  path = g_strdup_printf("%s%s", iprefix, GGOBI(getIModeName)(imode_get(gg)));
+	  action = gtk_ui_manager_get_action(gg->main_menu_manager, path);
+	  if (action)
+		gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action), true);
+	  g_free(path);
     }
-
+	
 }
 
 void
@@ -321,12 +340,12 @@ viewmode_set (ProjectionMode pmode, InteractionMode imode, ggobid *gg)
  * Just sets up the mode_frame and the variable selection panel.
  * Assume that it's always necessary.
 */
-
   if (gg->current_control_panel) {
     GtkWidget *modeBox = gg->current_control_panel;
     if (modeBox) {
       gtk_widget_ref (modeBox);
       gtk_container_remove (GTK_CONTAINER (gg->imode_frame), modeBox);
+	  gg->current_control_panel = NULL;
     }
   }
 
@@ -343,9 +362,9 @@ viewmode_set (ProjectionMode pmode, InteractionMode imode, ggobid *gg)
     /* the pmode is taking over the control panel */
     else if (imode == DEFAULT_IMODE && gg->pmode > NULL_PMODE) {
       if (gg->pmode == EXTENDED_DISPLAY_PMODE) {
-        GtkGGobiExtendedDisplayClass *klass;
-        if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
-          klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display));
+        GGobiExtendedDisplayClass *klass;
+        if(GGOBI_IS_EXTENDED_DISPLAY(display)) {
+          klass = GGOBI_EXTENDED_DISPLAY_GET_CLASS(display);
           panel = klass->imode_control_box(display, &modeName, gg);
         } 
       } else if (pmode < EXTENDED_DISPLAY_PMODE) {  /* scatterplot? */
@@ -359,12 +378,9 @@ viewmode_set (ProjectionMode pmode, InteractionMode imode, ggobid *gg)
     gg->current_control_panel = panel;
 
     /*-- avoid increasing the object's ref_count infinitely  --*/
-#if GTK_MAJOR_VERSION == 1
-    if (GTK_OBJECT (panel)->ref_count > 1)
-#else
+
     if (G_OBJECT (panel)->ref_count > 1)
-#endif
-      gtk_widget_unref (panel);
+		gtk_widget_unref (panel);
   }
 
   if (pmode != NULL_PMODE && gg->pmode != gg->pmode_prev) {
@@ -376,9 +392,9 @@ viewmode_set (ProjectionMode pmode, InteractionMode imode, ggobid *gg)
      * the value of projection is irrelevant.  A second pmode is in
      * the process of being added to the barchart.)
     */
-    if (display && GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
-      GtkGGobiExtendedDisplayClass *klass;
-      klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display));
+    if (display && GGOBI_IS_EXTENDED_DISPLAY(display)) {
+      GGobiExtendedDisplayClass *klass;
+      klass = GGOBI_EXTENDED_DISPLAY_GET_CLASS(display);
       if(klass->pmode_set)
          klass->pmode_set(pmode, display, gg);
     }
@@ -563,33 +579,6 @@ projection_ok (ProjectionMode m, displayd *display)
   return ok;
 }
 
-void
-pmode_set_cb (GtkWidget *w, gint action) {
-  ggobid *gg = GGobiFromWidget(w, true);
-  ProjectionMode pm = (ProjectionMode) action;
-
-  /* I don't know why this other test used to be necessary when
-     it doesn't seem to be any more, but I know it does great harm
-     when I'm using radio buttons ... dfs */
-
-  if ((pm != gg->pmode /*|| gg->imode != DEFAULT_IMODE*/) &&
-       projection_ok(pm, gg->current_display)) 
-  {
-    /* When the pmode is reset, the imode is set to the default */
-    GGOBI(full_viewmode_set)(pm, DEFAULT_IMODE, gg);
-  }
-}
-void
-imode_set_cb (GtkWidget *w, gint action) {
-  ggobid *gg = GGobiFromWidget(w, true);
-  InteractionMode im;
-
-  im = (InteractionMode) action;
-  if (im != gg->imode) {
-    GGOBI(full_viewmode_set)(NULL_PMODE, im, gg);
-  }
-}
-
 /* Do everything in one routine for now; split later if apropriate */
 gint
 GGOBI(full_viewmode_set)(ProjectionMode pmode, InteractionMode imode, ggobid *gg)
@@ -658,167 +647,21 @@ GGOBI(full_viewmode_set)(ProjectionMode pmode, InteractionMode imode, ggobid *gg
       displays_plot (sp, FULL, gg);
     }
 
- /**/return (gg->imode);
+ return (gg->imode);
 
   } else {  /* if there's no display */
     viewmode_set (NULL_PMODE, NULL_IMODE, gg);
     /*-- need to remove console menus: Options, Reset, ... --*/
     /*main_miscmenus_update (gg->pmode_prev, gg->imode_prev, NULL, gg);*/
-    submenu_destroy (gg->imode_item);
+    if (gg->mode_merge_id)
+		gtk_ui_manager_remove_ui(gg->main_menu_manager, gg->mode_merge_id);
+	//submenu_destroy (gg->imode_item);
 
-/**/return (NULL_IMODE);
+  return (NULL_IMODE);
   }
 
   return(-1);
 }
-
-static GtkItemFactoryEntry menu_items[] = {
-  { "/_File",            NULL,     NULL,             0, "<Branch>" },
-  { "/File/Open ...",
-       NULL,    
-       (GtkItemFactoryCallback) filename_get_r,  
-       0 },
-  { "/File/New",
-       NULL,    
-       (GtkItemFactoryCallback) create_new_ggobi,  
-       0 },
-  { "/File/Save ...",   
-       NULL,    
-       (GtkItemFactoryCallback) writeall_window_open,    
-       2 },
-
-  { "/File/sep",         NULL,     NULL,          0, "<Separator>" },
-
-  { "/File/sep",         NULL,     NULL,          0, "<Separator>" },
-  { "/File/Store session",   
-       NULL,   
-       (GtkItemFactoryCallback) store_session, 
-       0 },
-#ifdef PRINTING_IMPLEMENTED
-  { "/File/sep",         NULL,     NULL,          0, "<Separator>" },
-  { "/File/Print",
-       NULL,    
-       (GtkItemFactoryCallback) display_write_svg,         
-       0 },
-#endif
-
-  { "/File/sep",         NULL,     NULL,          0, "<Separator>" },
-  { "/File/Close",   
-       "<ctrl>C",   
-       (GtkItemFactoryCallback) ggobi_close, 
-       0 },
-  { "/File/Quit",   
-       "<ctrl>Q",   
-       (GtkItemFactoryCallback) quit_ggobi, 
-       0 },
-
-  /* The options menu from menus.c might migrate here.  */
-  { "/_Options",      NULL,         NULL, 0, "<Branch>" },
-  { "/Options/Show tooltips", 
-       NULL,        
-       (GtkItemFactoryCallback) tooltips_show_itemfactory_cb,   
-       0,
-       "<CheckItem>" },
-  { "/Options/Show control panel", 
-       NULL,        
-       (GtkItemFactoryCallback) cpanel_show_itemfactory_cb,   
-       0,
-       "<CheckItem>" },
-  { "/Options/Show status bar", 
-       NULL,        
-       (GtkItemFactoryCallback) statusbar_show_itemfactory_cb,   
-       0,
-       "<CheckItem>" },
-
-
-  { "/_Tools",        NULL,         NULL, 0, "<Branch>" },
-  { "/Tools/Variable manipulation ...", 
-       NULL,        
-       (GtkItemFactoryCallback) vartable_open,   
-       0,
-       NULL },
-  { "/Tools/Variable transformation ...", 
-       NULL,        
-       (GtkItemFactoryCallback) transform_window_open,
-       0,
-       NULL },
-  { "/Tools/Sphering ...", 
-       NULL,        
-       (GtkItemFactoryCallback) sphere_panel_open,
-       0,
-       NULL },
-#ifdef INFERENCE_IMPLEMENTED
-  { "/Tools/Inference ...", 
-       NULL,        
-       (GtkItemFactoryCallback) NULL,  /*-- inference_window_open --*/
-       0,
-       NULL },
-#endif
-  { "/Tools/Variable jittering ...", 
-       NULL,        
-       (GtkItemFactoryCallback) jitter_window_open,   
-       0,
-       NULL },
-  { "/Tools/Color schemes ...", 
-       NULL,        
-       (GtkItemFactoryCallback) wvis_window_open,   
-       0,
-       NULL },
-
-  /*-- Tools that apply to cases --*/
-  { "/Tools/sep",     NULL, NULL, 0, "<Separator>" },
-  { "/Tools/Color & glyph groups ...", 
-       NULL,        
-       (GtkItemFactoryCallback) cluster_window_open,
-       0,
-       NULL },
-  { "/Tools/Case subsetting and sampling ...", 
-       NULL,        
-       (GtkItemFactoryCallback) subset_window_open,   
-       0,
-       NULL },
-  { "/Tools/sep",     NULL, NULL, 0, "<Separator>" },
-#ifdef SMOOTH_IMPLEMENTED
-  { "/Tools/Smooth ...", 
-       NULL,        
-       (GtkItemFactoryCallback) smooth_window_open,   
-       0,
-       NULL },
-#endif
-
-  { "/Tools/Missing values ...", 
-       NULL,        
-       (GtkItemFactoryCallback) impute_window_open,   
-       0,
-       NULL },
-  { "/Tools/sep",     NULL, NULL, 0, "<Separator>" },  /*-- before plugins --*/
-
-  /* Experiment: moving this to the Display menu -- dfs */
-  /*
-  {"/Dis_playTree", NULL, NULL, 0, "<Branch>"},
-  { "/DisplayTree/Displays",    
-       NULL, 
-       (GtkItemFactoryCallback) show_display_tree,
-       2},
-  */
-
-  { "/_Help",                NULL, NULL, 0, "<LastBranch>" },
-  { "/Help/About GGobi",
-       NULL,
-       (GtkItemFactoryCallback) splash_show,
-       0 },
-/*
-  { "/Help/About help ...",  NULL, NULL, 0, NULL },
-*/
-
-#ifdef SUPPORT_PLUGINS
-  { "/Help/About plugins ...",
-       NULL,
-       (GtkItemFactoryCallback) show_plugin_list,
-       (gint) NULL },
-#endif
-};
-
 
 /*
 #ifndef AS_GGOBI_LIBRARY
@@ -829,7 +672,7 @@ static GtkItemFactoryEntry menu_items[] = {
   the Quit button.
  */
 void
-quit_ggobi(ggobid *gg, gint action, GtkWidget *w)
+quit_ggobi(ggobid *gg)
 {
 #ifdef SUPPORT_PLUGINS
   extern void closePlugins(ggobid *gg);
@@ -847,25 +690,366 @@ quit_ggobi(ggobid *gg, gint action, GtkWidget *w)
   gtk_main_quit();
 }
 
+/* action callbacks */
+static void 
+action_open_cb(GtkAction *action, ggobid *gg)
+{
+	filename_get_r(gg);
+}
+static void
+action_new_cb(GtkAction *action, ggobid *gg)
+{
+	create_new_ggobi();
+}
+static void
+action_save_cb(GtkAction *action, ggobid *gg)
+{
+	writeall_window_open(gg);
+}
+static void
+action_store_session_cb(GtkAction *action, ggobid *gg)
+{
+	store_session(gg);
+}
+#ifdef PRINTING_IMPLEMENTED
+static void
+action_print_cb(GtkAction *action, ggobid *gg)
+{
+	display_write_svg(gg);
+}
+#endif
+static void
+action_close_cb(GtkAction *action, ggobid *gg)
+{
+	ggobi_close(gg);
+}
+static void /* this is to connect to the delete signal (window closed) */
+signal_delete_cb(ggobid *gg, GdkEvent *ev, GtkWidget *w)
+{
+	ggobi_close(gg);
+}
+static void
+action_quit_cb(GtkAction *action, ggobid *gg)
+{
+	quit_ggobi(gg);
+}
+static void
+action_manipulate_cb(GtkAction *action, ggobid *gg)
+{
+	vartable_open(gg);
+}
+static void
+action_transform_cb(GtkAction *action, ggobid *gg)
+{
+	transform_window_open(gg);
+}
+static void
+action_sphere_cb(GtkAction *action, ggobid *gg)
+{
+	sphere_panel_open(gg);
+}
+static void
+action_jitter_cb(GtkAction *action, ggobid *gg)
+{
+	jitter_window_open(gg);
+}
+static void
+action_color_schemes_cb(GtkAction *action, ggobid *gg)
+{
+	wvis_window_open(gg);
+}
+static void
+action_color_glyph_groups_cb(GtkAction *action, ggobid *gg)
+{
+	cluster_window_open(gg);
+}
+static void
+action_subset_cb(GtkAction *action, ggobid *gg)
+{
+	subset_window_open(gg);
+}
+#ifdef SMOOTH_IMPLEMENTED
+static void
+action_smooth_cb(GtkAction *action, ggobid *gg)
+{
+	smooth_window_open(gg);
+}
+#endif
+static void
+action_impute_cb(GtkAction *action, ggobid *gg)
+{
+	impute_window_open(gg);
+}
+static void
+action_about_cb(GtkAction *action, ggobid *gg)
+{
+	splash_show(gg);
+}
+#ifdef SUPPORT_PLUGINS
+static void
+action_plugins_cb(GtkAction *action, ggobid *gg)
+{
+	show_plugin_list(gg);
+}
+#endif
+static void
+action_toggle_tooltips_cb(GtkToggleAction *action, ggobid *gg)
+{
+	tooltips_show(gtk_toggle_action_get_active(action), gg);
+}
+static void
+action_toggle_cpanel_cb(GtkToggleAction *action, ggobid *gg)
+{
+	cpanel_show(gtk_toggle_action_get_active(action), gg);
+}
+static void
+action_toggle_statusbar_cb(GtkToggleAction *action, ggobid *gg)
+{
+	statusbar_show(gtk_toggle_action_get_active(action), gg);
+}
+
+static void
+action_radio_pmode_cb(GtkRadioAction *action, GtkRadioAction *current, ggobid *gg)
+{
+	ProjectionMode pm = (ProjectionMode) gtk_radio_action_get_current_value(action);
+
+  /* I don't know why this other test used to be necessary when
+     it doesn't seem to be any more, but I know it does great harm
+     when I'm using radio buttons ... dfs */
+
+  if ((pm != gg->pmode /*|| gg->imode != DEFAULT_IMODE*/) &&
+       projection_ok(pm, gg->current_display)) 
+  {
+    /* When the pmode is reset, the imode is set to the default */
+    GGOBI(full_viewmode_set)(pm, DEFAULT_IMODE, gg);
+  }
+}
+static void
+action_radio_imode_cb(GtkRadioAction *action, GtkRadioAction *current, ggobid *gg)
+{
+  InteractionMode im;
+
+  im = (InteractionMode) gtk_radio_action_get_current_value(action);
+  if (im != gg->imode) {
+    GGOBI(full_viewmode_set)(NULL_PMODE, im, gg);
+  }
+}
+
+static const gchar *main_ui_str =
+"<ui>"
+"	<menubar>"
+"		<menu action='File'>"
+"			<menuitem action='Open'/>"
+"			<menuitem action='New'/>"
+"			<menuitem action='Save'/>"
+"			<separator/>"
+"			<menuitem action='StoreSession'/>"
+#ifdef PRINTING_IMPLEMENTED
+"			<separator/>"
+"			<menuitem action='Print'/>"
+#endif
+"			<separator/>"
+"			<menuitem action='Close'/>"
+"			<menuitem action='Quit'/>"
+"		</menu>"
+"		<menu action='Display'/>"
+"		<menu action='PMode'/>"
+"		<menu action='IMode'/>"
+"		<menu action='Options'>"
+"			<menuitem action='ShowTooltips'/>"
+"			<menuitem action='ShowControlPanel'/>"
+"			<menuitem action='ShowStatusbar'/>"
+"		</menu>"
+"		<menu action='Tools'>"
+"			<menuitem action='VariableManipulation'/>"
+"			<menuitem action='VariableTransformation'/>"
+"			<menuitem action='Sphering'/>"
+#ifdef INFERENCE_IMPLEMENTED
+"			<menuitem action='Inference'/>"
+#endif
+"			<menuitem action='VariableJittering'/>"
+"			<menuitem action='ColorSchemes'/>"
+"			<separator/>"
+"			<menuitem action='ColorAndGlyphGroups'/>"
+"			<menuitem action='CaseSubsettingAndSampling'/>"
+#ifdef SMOOTH_IMPLEMENTED
+"			<menuitem action='Smooth'/>"
+#endif
+"			<menuitem action='MissingValues'/>"
+"		</menu>"
+"		<menu action='Help'>"
+"			<menuitem action='AboutGGobi'/>"
+#ifdef SUPPORT_PLUGINS
+"			<menuitem action='AboutPlugins'/>"
+#endif
+"		</menu>"
+"	</menubar>"
+"</ui>";
+
+static GtkActionEntry entries[] = {
+	{ "File", NULL, "_File" },
+	{ "Open", GTK_STOCK_OPEN, "_Open", NULL, "Open a datafile", G_CALLBACK(action_open_cb) },
+	{ "New", GTK_STOCK_NEW, "_New", NULL, "Create a new GGobi instance", G_CALLBACK(action_new_cb) },
+	{ "Save", GTK_STOCK_SAVE, "_Save", "<control>V", "Save some data", G_CALLBACK(action_save_cb) },
+	{ "StoreSession", GTK_STOCK_GOTO_BOTTOM, "Store session", NULL, "Save this GGobi session", 
+		G_CALLBACK(action_store_session_cb) 
+	},
+	#ifdef PRINTING_IMPLEMENTED
+	{ "Print", GTK_STOCK_PRINT, "_Print", NULL, "Print the current display", G_CALLBACK(action_print_cb) },
+	#endif
+	{ "Close", GTK_STOCK_CLOSE, "_Close", "<control>C", "Close this GGobi instance", G_CALLBACK(action_close_cb) },
+	{ "Quit", GTK_STOCK_QUIT, "_Quit", "<control>Q", "Quit GGobi", G_CALLBACK(action_quit_cb) },
+	
+	{ "Display", NULL, "_Display" },
+	{ "PMode", NULL, "_View" },
+	{ "IMode", NULL, "_Interaction" },
+	{ "Options", NULL, "_Options" },
+	
+	{ "Tools", NULL, "_Tools" },
+	{ "VariableManipulation", GTK_STOCK_INDEX, "Variable _Manipulation", NULL, 
+		"Open a table of variables for manipulation", G_CALLBACK(action_manipulate_cb) 
+	},
+	{ "VariableTransformation", GTK_STOCK_CONVERT, "Variable _Transformation", NULL, 
+		"Perform transformations on the dataset's variables", G_CALLBACK(action_transform_cb)
+	},
+	{ "Sphering", GTK_STOCK_JUMP_TO, "_Sphering",  NULL, "Open a panel to perform sphering",
+		G_CALLBACK(action_sphere_cb) 
+	},
+	#ifdef INFERENCE_IMPLEMENTED /* to do */
+	{ "Inference", GTK_STOCK_EXECUTE, "_Inference", NULL, "Perform inference", NULL },
+	#endif
+	{ "VariableJittering", NULL, "Variable _Jittering", NULL, "'Jitter' some variables", 
+		G_CALLBACK(action_jitter_cb) 
+	},
+	{ "ColorSchemes", GTK_STOCK_SELECT_COLOR, "_Color Schemes", NULL, "Configure and pick color schemes",
+		G_CALLBACK(action_color_schemes_cb) 
+	},
+	{ "ColorAndGlyphGroups", NULL, "Color & _Glyph Groups", NULL, "Configure color and glyph groups",
+		G_CALLBACK(action_color_glyph_groups_cb)
+	},
+	{ "CaseSubsettingAndSampling", NULL, "Case S_ubsetting and Sampling", NULL,
+		"Extract and resample subsets of cases", G_CALLBACK(action_subset_cb)
+	},
+	#ifdef SMOOTH_IMPLEMENTED
+	{ "Smoothing", NULL, "Sm_oothing", NULL, "Smooth the data", G_CALLBACK(action_smooth_cb) },
+	#endif
+	{ "MissingValues", NULL, "Missing _Values", NULL, "Impute missing values", 
+		G_CALLBACK(action_impute_cb) 
+	},
+	
+	{ "Help", NULL, "_Help" },
+	{ "AboutGGobi", NULL, "About _GGobi", NULL, "Discover the magic behind GGobi",
+		G_CALLBACK(action_about_cb)
+	},
+	#ifdef SUPPORT_PLUGINS
+	{ "AboutPlugins", NULL, "About _Plugins", NULL, "Current plugin status",
+		G_CALLBACK(action_plugins_cb)
+	}
+	#endif
+};
+
+static GtkRadioActionEntry pmode_entries[] = {
+	/* here is where the i/p mode stuff goes */
+	{ "ExtendedDisplayPMode", NULL, "Default", "<control>H",
+		/* assumes 'extended display pmode' is 'default' */
+		"Switch to the default view mode for this display", EXTENDED_DISPLAY_PMODE 
+	},
+	{ "1D Plot", NULL, "1_D Plot", "<control>D",
+		"View a 1D plot of the data", P1PLOT
+	},
+	{ "XY Plot", NULL, "_XY Plot", "<control>X",
+		"View a 2D plot of the data", XYPLOT
+	},
+	{ "1D Tour", NULL, "1D _Tour", "<control>T",
+		"Tour the data in a single dimension", TOUR1D
+	},
+	{ "Rotation", NULL, "_Rotation", "<control>R",
+		"Tour the data in two dimensions, three variables at a time", TOUR2D3
+	},
+	{ "2D Tour", NULL, "2D To_ur", "<control>G",
+		"Take a grand tour of the data", TOUR2D
+	},
+	{ "2x1D Tour", NULL, "2x1D T_our", "<control>U",
+		"Take a 2x1D (correlation) tour of the data", COTOUR
+	}
+};
+
+static GtkRadioActionEntry imode_entries[] = {
+	{ "DefaultIMode", NULL, "Default", "<control>H",
+		/* assumes 'extended display pmode' is 'default' */
+		"Switch to the default interaction mode for this view mode", DEFAULT_IMODE 
+	},
+	{ "Scale", NULL, "_Scale", "<control>S",
+		"Scale (pan and zoom) the data", SCALE
+	},
+	{ "Brush", NULL, "_Brush", "<control>B",
+		"Brush (color) points", BRUSH
+	},
+	{ "Identify", NULL, "_Identify", "<control>I",
+		"Identify points (query their values)", IDENT
+	},
+	{ "Edit edges", NULL, "_Edit edges", "<control>E",
+		"Edit the edges in the plot", EDGEED
+	},
+	{ "Move points", NULL, "_Move points", "<control>M",
+		"Move the points in the plot", MOVEPTS
+	}
+};
+
+GtkActionGroup *
+ggobi_actions_create(ggobid *gg) {
+	GtkAction *display_action;
+	GtkToggleActionEntry t_entries[] = { /* not global because depends on gg state */
+	{ "ShowTooltips", NULL, "Show _Tooltips", NULL, "Toggle display of helpful tips like this one", 
+		G_CALLBACK(action_toggle_tooltips_cb), GTK_TOOLTIPS(gg->tips)->enabled 
+	},
+	{ "ShowControlPanel", NULL, "Show _Control Panel", NULL, "Toggle display of control panel",
+		G_CALLBACK(action_toggle_cpanel_cb), true 
+	},
+	{ "ShowStatusbar", NULL, "Show _Statusbar", NULL, "Toggle display of statusbar at bottom",
+		G_CALLBACK(action_toggle_statusbar_cb), gg->statusbar_p 
+	}
+	};
+	
+	GtkActionGroup *actions = gtk_action_group_new("GGobiActions");
+	gtk_action_group_add_actions(actions, entries, G_N_ELEMENTS(entries), gg);
+	gtk_action_group_add_toggle_actions(actions, t_entries, G_N_ELEMENTS(t_entries), gg);
+	gtk_action_group_add_radio_actions(actions, pmode_entries, G_N_ELEMENTS(pmode_entries),
+		EXTENDED_DISPLAY_PMODE, G_CALLBACK(action_radio_pmode_cb), gg);
+	gtk_action_group_add_radio_actions(actions, imode_entries, G_N_ELEMENTS(imode_entries),
+		DEFAULT_IMODE, G_CALLBACK(action_radio_imode_cb), gg);
+	display_action = gtk_action_group_get_action(actions, "Display");
+	g_object_set(G_OBJECT(display_action), "hide_if_empty", false, NULL);
+	return(actions);
+}
+GtkUIManager *
+ggobi_menu_manager_create(ggobid *gg) {
+	GtkUIManager *manager = gtk_ui_manager_new();
+	GtkActionGroup *actions = ggobi_actions_create(gg);
+	gtk_ui_manager_insert_action_group(manager, actions, 0);
+	gtk_ui_manager_set_add_tearoffs(manager, true);
+	g_object_unref(G_OBJECT(actions));
+	return(manager);
+}
 
 void 
 make_ui (ggobid *gg) 
 {
   GtkWidget *window;
-  GtkWidget *hbox, *vbox, *entry;
+  GtkWidget *hbox, *vbox, *statusbar;
   GtkWidget *basement;
-
+  
   gg->tips = gtk_tooltips_new ();
 
   gg->main_window = window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   GGobi_widget_set (window, gg, true);
 
 #ifdef TEST_GGOBI_EVENTS
-/*  gtk_signal_connect (GTK_OBJECT(gg), "splot_new", test_new_plot_cb, (gpointer) "A new plot"); */
-  gtk_signal_connect_object(GTK_OBJECT(gg), "splot_new", test_new_plot_cb, (gpointer) "A new plot");
-  gtk_signal_connect(GTK_OBJECT(gg), "datad_added", test_data_add_cb, NULL);
-  gtk_signal_connect(GTK_OBJECT(gg), "sticky_point_added", test_sticky_points, NULL);
-  gtk_signal_connect(GTK_OBJECT(gg), "sticky_point_removed", test_sticky_points, NULL);
+/*  g_signal_connect (G_OBJECT(gg), "splot_new", test_new_plot_cb, (gpointer) "A new plot"); */
+  g_signal_connect_swapped(G_OBJECT(gg), "splot_new", test_new_plot_cb, (gpointer) "A new plot");
+  g_signal_connect(G_OBJECT(gg), "datad_added", test_data_add_cb, NULL);
+  g_signal_connect(G_OBJECT(gg), "sticky_point_added", test_sticky_points, NULL);
+  g_signal_connect(G_OBJECT(gg), "sticky_point_removed", test_sticky_points, NULL);
 #endif
 
 /*
@@ -875,55 +1059,36 @@ make_ui (ggobid *gg)
  * change.  This seems to fix that, with the perhaps undesirable side
  * effect that I can't reduce the size of the console below
  * its initial size.  -- dfs
+ * The below is the GTK default, no need to set. -mfl
 */
 /*gtk_window_set_policy (GTK_WINDOW (window), allow_shrink, allow_grow, auto_shrink);*/
-  gtk_window_set_policy (GTK_WINDOW (window), false,        true,       false);
+//  gtk_window_set_policy (GTK_WINDOW (window), false,        true,       false);
 
-  gtk_signal_connect_object(GTK_OBJECT (window), "delete_event",
-                            GTK_SIGNAL_FUNC (ggobi_close), (gpointer) gg);
-  gtk_signal_connect_object(GTK_OBJECT (window), "destroy_event",
-                            GTK_SIGNAL_FUNC (ggobi_close), (gpointer) gg); 
+  g_signal_connect_swapped(G_OBJECT (window), "delete_event",
+                            G_CALLBACK (signal_delete_cb), (gpointer) gg);
+  g_signal_connect_swapped(G_OBJECT (window), "destroy_event",
+                            G_CALLBACK (signal_delete_cb), (gpointer) gg); 
 
-  gtk_container_set_border_width (GTK_CONTAINER (window), 10);
+  //gtk_container_set_border_width (GTK_CONTAINER (window), 10);
 
 /*
  * Add the main menu bar
 */
   vbox = gtk_vbox_new (false, 1);
-  gtk_container_border_width (GTK_CONTAINER (vbox), 1);
+  gtk_container_set_border_width (GTK_CONTAINER (vbox), 1);
   gtk_container_add (GTK_CONTAINER (window), vbox);
-
-  gg->main_accel_group = gtk_accel_group_new ();
-  gg->main_menu_factory = get_main_menu (menu_items,
-    sizeof (menu_items) / sizeof (menu_items[0]),
-    gg->main_accel_group, window,
-    &gg->main_menubar, (gpointer) gg);
-
-  /* Initialize check items in the item factory */
-
-  entry = gtk_item_factory_get_widget(gg->main_menu_factory,
-    "/Options/Show tooltips");
-  if (entry)
-    gtk_check_menu_item_set_active  (GTK_CHECK_MENU_ITEM(entry),
-				     GTK_TOOLTIPS(gg->tips)->enabled);
-  entry = gtk_item_factory_get_widget(gg->main_menu_factory,
-      "/Options/Show control panel");
-  if (entry)
-    gtk_check_menu_item_set_active  (GTK_CHECK_MENU_ITEM(entry),
-    true);  /* no variable available yet */
-  entry = gtk_item_factory_get_widget(gg->main_menu_factory,
-    "/Options/Show status bar");
-  if (entry)
-    gtk_check_menu_item_set_active  (GTK_CHECK_MENU_ITEM(entry),
-				   gg->statusbar_p);
-
+  
+  gg->main_menu_manager = ggobi_menu_manager_create(gg);
+  gg->main_menubar = create_menu_bar(gg->main_menu_manager, main_ui_str, window);
+  gg->main_accel_group = gtk_ui_manager_get_accel_group(gg->main_menu_manager);
 
 /* I don't know that this is the best place for this ... should I
 create and destroy these groups when the menus are torn down and
 rebuilt? -- dfs */
-
+/* - these should probably just exist within the ui manager - mfl
   gg->pmode_accel_group = gtk_accel_group_new ();
   gg->imode_accel_group = gtk_accel_group_new ();
+*/
   /*
   gtk_window_add_accel_group (GTK_WINDOW (window), gg->pmode_accel_group);
   gtk_window_add_accel_group (GTK_WINDOW (window), gg->imode_accel_group);
@@ -934,7 +1099,7 @@ rebuilt? -- dfs */
 #ifdef SUPPORT_INIT_FILES
   if (sessionOptions->info && sessionOptions->info->numInputs > 0) {
     GtkWidget *w;
-    w = gtk_item_factory_get_widget(gg->main_menu_factory, "/File");
+    w = gtk_ui_manager_get_widget(gg->main_menu_manager, "/menubar/File");
     addPreviousFilesMenu(w, sessionOptions->info, gg);
   }
 #endif
@@ -974,10 +1139,9 @@ rebuilt? -- dfs */
   varpanel_make (hbox, gg);
 
   /*-- status bar --*/
-  entry = gtk_entry_new ();
-  gtk_editable_set_editable(GTK_EDITABLE(entry), false);
-  gtk_object_set_data (GTK_OBJECT(gg->main_window), "MAIN:STATUSBAR", entry);
-  gtk_box_pack_start (GTK_BOX (vbox), entry, false, false, 0);
+  statusbar = gtk_statusbar_new();
+  g_object_set_data(G_OBJECT(gg->main_window), "MAIN:STATUSBAR", statusbar);
+  gtk_box_pack_start (GTK_BOX (vbox), statusbar, false, false, 0);
   /*--            --*/
 
   gtk_widget_show_all (hbox);
@@ -987,6 +1151,7 @@ rebuilt? -- dfs */
   gtk_widget_set_name (basement, "BASEMENT");
   gtk_box_pack_start (GTK_BOX (hbox), basement, false, false, 0);
   /* -- do not map or show this widget -- */
+  
   
   /*-- at this point, the mode could be NULLMODE, P1PLOT, or XYPLOT --*/
   {
@@ -1036,11 +1201,11 @@ addPreviousFilesMenu(GtkWidget *parent, GGobiInitInfo *info, ggobid *gg)
       input = &(info->descriptions[i].input);
       if(input && input->fileName) {
         el = gtk_menu_item_new_with_label(input->fileName);
-        gtk_signal_connect(GTK_OBJECT(el), "activate",
-                           GTK_SIGNAL_FUNC(load_previous_file),
+        g_signal_connect(G_OBJECT(el), "activate",
+                           G_CALLBACK(load_previous_file),
                            info->descriptions + i);
         GGobi_widget_set(el, gg, true);
-        gtk_menu_insert(GTK_MENU(parent), el, 3 + i + 1);
+        gtk_menu_shell_insert(GTK_MENU_SHELL(parent), el, 3 + i + 1);
       }
     }
   }
@@ -1127,7 +1292,7 @@ create_ggobi(InputDescription *desc)
 
 #ifdef SUPPORT_PLUGINS
 void
-show_plugin_list(ggobid *gg, gint action, GtkWidget *w)
+show_plugin_list(ggobid *gg)
 {
   if(sessionOptions->info && sessionOptions->info->plugins)
     showPluginInfo(sessionOptions->info->plugins,
@@ -1138,39 +1303,35 @@ show_plugin_list(ggobid *gg, gint action, GtkWidget *w)
 
 
 void
-store_session_in_file(GtkWidget *btn, GtkWidget *selector)
+store_session_in_file(GtkWidget *chooser)
 {
-  const gchar *fileName;
+  gchar *fileName;
   ggobid *gg;
 
-  fileName = gtk_file_selection_get_filename(GTK_FILE_SELECTION(selector));
+  fileName = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(chooser));
   if(fileName && fileName[0]) {
-    gg = gtk_object_get_data(GTK_OBJECT(selector), "ggobi");
+    gg = g_object_get_data(G_OBJECT(chooser), "ggobi");
     write_ggobi_as_xml(gg, fileName, NULL);
-    gtk_widget_destroy(selector);
-  } else {
-    quick_message("Pick a file", true);
+	g_free(fileName);
   }
 }
 
 void
-store_session(ggobid *gg, gint action, GtkWidget *w)
+store_session(ggobid *gg)
 {
   GtkWidget *dlg;
+  gchar *buf;
+  
   if(!sessionOptions->info->sessionFile) {
-    char buf[1000];
-    sprintf(buf,"%s%c%s", getenv("HOME"), G_DIR_SEPARATOR, ".ggobi-session");
-    dlg = gtk_file_selection_new("Save ggobi session");
-    gtk_object_set_data(GTK_OBJECT(dlg), "ggobi", (gpointer) gg);
-    gtk_file_selection_set_filename(GTK_FILE_SELECTION(dlg), buf);
-    gtk_signal_connect (GTK_OBJECT (GTK_FILE_SELECTION(dlg)->ok_button),
-      "clicked", GTK_SIGNAL_FUNC (store_session_in_file), dlg);
-
-    gtk_signal_connect (GTK_OBJECT (GTK_FILE_SELECTION(dlg)->cancel_button),
-      "clicked", GTK_SIGNAL_FUNC (gtk_widget_destroy),
-      (gpointer) dlg);
-
-    gtk_widget_show(dlg);
+    buf = g_strdup_printf("%s%c%s", getenv("HOME"), G_DIR_SEPARATOR, ".ggobi-session");
+    dlg = gtk_file_chooser_dialog_new("Save ggobi session", NULL, GTK_FILE_CHOOSER_ACTION_SAVE,
+		GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT, GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT, NULL);
+    g_object_set_data(G_OBJECT(dlg), "ggobi", (gpointer) gg);
+    gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(dlg), buf);
+	g_free(buf);
+    if (gtk_dialog_run(GTK_DIALOG(dlg)) == GTK_RESPONSE_ACCEPT)
+		store_session_in_file(dlg);
+	gtk_widget_destroy(dlg);
   } else {
     ggobi_write_session(sessionOptions->info->sessionFile);
     /* write_ggobi_as_xml(gg, sessionOptions->info->sessionFile); */
@@ -1180,7 +1341,7 @@ store_session(ggobid *gg, gint action, GtkWidget *w)
 
 
 void
-create_new_ggobi(ggobid *gg, gint action, GtkWidget *w)
+create_new_ggobi()
 {
   create_ggobi(NULL);
 }

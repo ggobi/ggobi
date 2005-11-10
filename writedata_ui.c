@@ -27,18 +27,16 @@ static gchar *format_lbl[] =
 #endif
 };
 void format_set (gint fmt, ggobid *gg) { gg->save.format = fmt; }
-static void format_set_cb (GtkWidget *w, gpointer cbd)
+static void format_set_cb (GtkWidget *w, ggobid *gg)
 {
-  ggobid *gg = GGobiFromWidget(w, true);
-  format_set (GPOINTER_TO_INT (cbd), gg);
+  format_set (gtk_combo_box_get_active(GTK_COMBO_BOX(w)), gg);
 }
 
 static gchar *stage_lbl[] = {"Raw data", "Transformed data"};
 void stage_set (gint stage, ggobid *gg) { gg->save.stage = stage; }
-static void stage_set_cb (GtkWidget *w, gpointer cbd)
+static void stage_set_cb (GtkWidget *w, ggobid *gg)
 {
-  ggobid *gg = GGobiFromWidget (w, true);
-  stage_set (GPOINTER_TO_INT (cbd), gg);
+  stage_set (gtk_combo_box_get_active(GTK_COMBO_BOX(w)), gg);
 }
 
 /*
@@ -55,37 +53,33 @@ static gchar *rowdata_lbl[] = {"All cases",
                                "Displayed cases",
                                /*"Labeled cases"*/};
 void rowind_set (gint ind, ggobid *gg) { gg->save.row_ind = ind; }
-static void rowind_set_cb (GtkWidget *w, gpointer cbd)
+static void rowind_set_cb (GtkWidget *w, ggobid *gg)
 {
-  ggobid *gg = GGobiFromWidget (w, true);
-  rowind_set (GPOINTER_TO_INT (cbd), gg);
+  rowind_set (gtk_combo_box_get_active(GTK_COMBO_BOX(w)), gg);
 }
 
 static gchar *columndata_lbl[] = {"All variables",
                                   "Selected variables"};
 void columnind_set (gint ind, ggobid *gg) { gg->save.column_ind = ind; }
-static void columnind_set_cb (GtkWidget *w, gpointer cbd)
-{
-  ggobid *gg = GGobiFromWidget (w, true);
-  columnind_set (GPOINTER_TO_INT (cbd), gg);
+static void columnind_set_cb (GtkWidget *w, ggobid *gg)
+{;
+  columnind_set (gtk_combo_box_get_active(GTK_COMBO_BOX(w)), gg);
 }
 
 static gchar *missing_lbl[] = {"Missings as 'na'",
                                "Missings as '.'",
                                "Imputed values"};
 void missingind_set (gint ind, ggobid *gg) { gg->save.missing_ind = ind; }
-static void missingind_set_cb (GtkWidget *w, gpointer cbd)
+static void missingind_set_cb (GtkWidget *w, ggobid *gg)
 {
-  ggobid *gg = GGobiFromWidget (w, true);
-  missingind_set (GPOINTER_TO_INT (cbd), gg);
+  missingind_set (gtk_combo_box_get_active(GTK_COMBO_BOX(w)), gg);
 }
 
 static gchar *edges_lbl[] = {"Don't save edges", "Save edges"};
 void edgesp_set (gboolean edgesp, ggobid *gg) { gg->save.edges_p = edgesp; }
-static void edgesp_set_cb (GtkWidget *w, gpointer cbd)
+static void edgesp_set_cb (GtkWidget *w, ggobid *gg)
 {
-  ggobid *gg = GGobiFromWidget (w, true);
-  edgesp_set ((gboolean ) GPOINTER_TO_INT (cbd), gg);
+  edgesp_set ((gboolean ) gtk_combo_box_get_active(GTK_COMBO_BOX(w)), gg);
 }
 
 /*-- called when closed from the button -- what button? --*/
@@ -104,14 +98,14 @@ static void delete_cb (GtkWidget *w, GdkEvent *event, ggobid *gg) {
 
 void
 writeall_window_open (ggobid *gg) {
-  GtkWidget *vbox, *table, *opt, *btn;
+  GtkWidget *vbox, *table, *opt, *btn, *lbl;
   gint j;
 
   if (gg->save.window == NULL) {
 
     gg->save.window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-    gtk_signal_connect (GTK_OBJECT (gg->save.window), "delete_event",
-                        GTK_SIGNAL_FUNC (delete_cb), (gpointer) gg);
+    g_signal_connect (G_OBJECT (gg->save.window), "delete_event",
+                        G_CALLBACK (delete_cb), (gpointer) gg);
     gtk_window_set_title (GTK_WINDOW (gg->save.window), "create ggobi file set");
     
     gtk_container_set_border_width (GTK_CONTAINER (gg->save.window), 10);
@@ -126,40 +120,40 @@ writeall_window_open (ggobid *gg) {
 
     /*-- Format --*/
     j = 0;
-    opt = gtk_option_menu_new ();
+    opt = gtk_combo_box_new_text ();
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
       "Save the data in XML or in a ggobi file set (data in ascii or binary",
       NULL);
-    populate_option_menu (opt, format_lbl,
-      sizeof (format_lbl) / sizeof (gchar *),
-      (GtkSignalFunc) format_set_cb, "GGobi", gg);
-    gtk_option_menu_set_history (GTK_OPTION_MENU (opt),
+    populate_combo_box (opt, format_lbl, G_N_ELEMENTS(format_lbl),
+      G_CALLBACK(format_set_cb), gg);
+    gtk_combo_box_set_active (GTK_COMBO_BOX (opt),
       XMLDATA);
     /*-- initialize variable to correspond to option menu --*/
     gg->save.format = XMLDATA;
 
-    gtk_table_attach (GTK_TABLE (table),
-      gtk_label_new ("Format:"),
+	lbl = gtk_label_new_with_mnemonic ("_Format:");
+	gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), opt);
+    gtk_table_attach (GTK_TABLE (table), lbl,
       0, 1, j, j+1, GTK_FILL, GTK_FILL, 5, 0);
     gtk_table_attach (GTK_TABLE (table), opt,
       1, 2, j, j+1, GTK_FILL, GTK_FILL, 5, 0);
 
     /*-- Stage --*/
     j++;
-    opt = gtk_option_menu_new ();
+    opt = gtk_combo_box_new_text ();
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
       "Save raw or transformed data",
       NULL);
-    populate_option_menu (opt, stage_lbl,
-      sizeof (stage_lbl) / sizeof (gchar *),
-      (GtkSignalFunc) stage_set_cb, "GGobi", gg);
-    gtk_option_menu_set_history (GTK_OPTION_MENU (opt),
+    populate_combo_box (opt, stage_lbl, G_N_ELEMENTS(stage_lbl),
+      G_CALLBACK(stage_set_cb), gg);
+    gtk_combo_box_set_active (GTK_COMBO_BOX (opt),
       TFORMDATA);
     /*-- initialize variable to correspond to option menu --*/
     gg->save.stage = TFORMDATA;
 
-    gtk_table_attach (GTK_TABLE (table),
-      gtk_label_new ("Stage:"),
+	lbl = gtk_label_new_with_mnemonic ("_Stage:");
+	gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), opt);
+    gtk_table_attach (GTK_TABLE (table), lbl,
       0, 1, j, j+1, GTK_FILL, GTK_FILL, 5, 0);
     gtk_table_attach (GTK_TABLE (table), opt,
       1, 2, j, j+1, GTK_FILL, GTK_FILL, 5, 0);
@@ -185,84 +179,84 @@ writeall_window_open (ggobid *gg) {
 
     /*-- Which rows --*/
     j++;
-    opt = gtk_option_menu_new ();
+    opt = gtk_combo_box_new_text ();
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
       "Specify which rows should be written out",
       NULL);
-    populate_option_menu (opt, rowdata_lbl,
-      sizeof (rowdata_lbl) / sizeof (gchar *),
-      (GtkSignalFunc) rowind_set_cb, "GGobi", gg);
-    gtk_option_menu_set_history (GTK_OPTION_MENU (opt),
+    populate_combo_box (opt, rowdata_lbl, G_N_ELEMENTS(rowdata_lbl),
+      G_CALLBACK(rowind_set_cb), gg);
+    gtk_combo_box_set_active (GTK_COMBO_BOX (opt),
       ALLROWS);
     /*-- initialize variable to correspond to option menu --*/
     gg->save.row_ind = ALLROWS;
 
-    gtk_table_attach (GTK_TABLE (table),
-      gtk_label_new ("Cases:"),
+	lbl = gtk_label_new_with_mnemonic ("_Cases:");
+	gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), opt);
+    gtk_table_attach (GTK_TABLE (table), lbl,
       0, 1, j, j+1, GTK_FILL, GTK_FILL, 5, 0);
     gtk_table_attach (GTK_TABLE (table), opt,
       1, 2, j, j+1, GTK_FILL, GTK_FILL, 5, 0);
 
     /*-- Which columns --*/
     j++;
-    opt = gtk_option_menu_new ();
+    opt = gtk_combo_box_new_text ();
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
       "Specify which variables should be written out",
       NULL);
-    populate_option_menu (opt, columndata_lbl,
-      sizeof (columndata_lbl) / sizeof (gchar *),
-      (GtkSignalFunc) columnind_set_cb, "GGobi", gg);
-    gtk_option_menu_set_history (GTK_OPTION_MENU (opt),
+    populate_combo_box (opt, columndata_lbl, G_N_ELEMENTS(columndata_lbl),
+      G_CALLBACK(columnind_set_cb), gg);
+    gtk_combo_box_set_active (GTK_COMBO_BOX (opt),
       ALLCOLS);
     /*-- initialize variable to correspond to option menu --*/
     gg->save.column_ind = ALLCOLS;
 
-    gtk_table_attach (GTK_TABLE (table),
-      gtk_label_new ("Variables:"),
+	lbl = gtk_label_new_with_mnemonic ("_Variables:");
+	gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), opt);
+    gtk_table_attach (GTK_TABLE (table), lbl,
       0, 1, j, j+1, GTK_FILL, GTK_FILL, 5, 0);
     gtk_table_attach (GTK_TABLE (table), opt,
       1, 2, j, j+1, GTK_FILL, GTK_FILL, 5, 0);
 
     /*-- Format for missings --*/
     j++;
-    opt = gtk_option_menu_new ();
+    opt = gtk_combo_box_new_text ();
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
       "Specify how to write out missing data",
       NULL);
-    populate_option_menu (opt, missing_lbl,
-      sizeof (missing_lbl) / sizeof (gchar *),
-      (GtkSignalFunc) missingind_set_cb, "GGobi", gg);
-    gtk_option_menu_set_history (GTK_OPTION_MENU (opt),
+    populate_combo_box (opt, missing_lbl, G_N_ELEMENTS(missing_lbl),
+      G_CALLBACK(missingind_set_cb), gg);
+    gtk_combo_box_set_active (GTK_COMBO_BOX (opt),
       MISSINGSNA);
     /*-- initialize variable to correspond to option menu --*/
     gg->save.missing_ind = MISSINGSNA;
 
-    gtk_table_attach (GTK_TABLE (table),
-      gtk_label_new ("Format for missings:"),
+	lbl = gtk_label_new_with_mnemonic ("Format for _missings:");
+	gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), opt);
+    gtk_table_attach (GTK_TABLE (table), lbl,
       0, 1, j, j+1, GTK_FILL, GTK_FILL, 5, 0);
     gtk_table_attach (GTK_TABLE (table), opt,
       1, 2, j, j+1, GTK_FILL, GTK_FILL, 5, 0);
 
     /*-- edges? --*/
     j++;
-    opt = gtk_option_menu_new ();
+    opt = gtk_combo_box_new_text ();
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
       "Include line segments?",
       NULL);
-    populate_option_menu (opt, edges_lbl,
-      sizeof (edges_lbl) / sizeof (gchar *),
-      (GtkSignalFunc) edgesp_set_cb, "GGobi", gg);
+    populate_combo_box (opt, edges_lbl, G_N_ELEMENTS(edges_lbl),
+      G_CALLBACK(edgesp_set_cb), gg);
     /*-- initialize variable corresponding to option menu --*/
     /*
      * This is pretty simple-minded:  if any edgesets are present,
      * let the default be to save edges.  Otherwise not.
      */
     gg->save.edges_p = (edgesets_count(gg) > 0);
-    gtk_option_menu_set_history (GTK_OPTION_MENU (opt),
+    gtk_combo_box_set_active (GTK_COMBO_BOX (opt),
       gg->save.edges_p);
 
-    gtk_table_attach (GTK_TABLE (table),
-      gtk_label_new ("Edges?:"),
+	  lbl = gtk_label_new_with_mnemonic ("_Edges?:");
+	  gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), opt);
+    gtk_table_attach (GTK_TABLE (table), lbl,
       0, 1, j, j+1, GTK_FILL, GTK_FILL, 5, 0);
     gtk_table_attach (GTK_TABLE (table), opt,
       1, 2, j, j+1, GTK_FILL, GTK_FILL, 5, 0);
@@ -270,13 +264,13 @@ writeall_window_open (ggobid *gg) {
 /*
  * Add a button to open a file selection box; see filename_get_* in io.c
 */
-    btn = gtk_button_new_with_label ("Save ...");
+    btn = gtk_button_new_from_stock (GTK_STOCK_SAVE);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
       "Open file selection widget", NULL);
     gtk_box_pack_start (GTK_BOX (vbox), btn,
                         false, false, 3);
-    gtk_signal_connect (GTK_OBJECT (btn), "clicked",
-                        GTK_SIGNAL_FUNC (filename_get_w), gg);
+    g_signal_connect (G_OBJECT (btn), "clicked",
+                        G_CALLBACK (filename_get_w), gg);
 
 
     gtk_widget_show_all (gg->save.window);

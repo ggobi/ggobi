@@ -32,19 +32,19 @@ typedef enum {DL_UNLOADED = 0, DL_LOADED, DL_FAILED} PluginLoadStatus;
 typedef void (*DLFUNC)();
 
 typedef struct {
-    char *name;
-    char *dllName;
+    gchar *name;
+    gchar *dllName;
     HINSTANCE library;
 
-    char *description;
-    char *author;
+    gchar *description;
+    gchar *author;
 
     PluginLoadStatus loaded;
 
-    char *onLoad; 
-    char *onUnload; 
+    gchar *onLoad; 
+    gchar *onUnload; 
 
-    char *language;
+    gchar *language;
     GSList *depends;
 
     GSList *args;
@@ -53,10 +53,10 @@ typedef struct {
 } GGobiPluginDetails;
 
 typedef struct {
-    char *onCreate; 
-    char *onClose; 
+    gchar *onCreate; 
+    gchar *onClose; 
 
-    char *onUpdateDisplay; 
+    gchar *onUpdateDisplay; 
 } GGobiGeneralPluginInfo;
 
 
@@ -65,13 +65,13 @@ typedef struct {
  */
 struct   _GGobiInputPluginInfo {
 #if 0
-    char *_modeName;
+    gchar *_modeName;
 #endif
-    char **modeNames;
+    gchar **modeNames;
     guint numModeNames;
-    char *read_symbol_name;
-    char *probe_symbol_name;
-    char *getDescription;
+    gchar *read_symbol_name;
+    gchar *probe_symbol_name;
+    gchar *getDescription;
 
     gboolean interactive;
 
@@ -108,7 +108,7 @@ typedef gboolean (*ProcessPluginInfo)(xmlNodePtr, GGobiPluginInfo *, GGobiPlugin
 
 
 typedef struct {
-    char *processPluginName;
+    gchar *processPluginName;
     gboolean (*processPlugin)();
 } GGobiLanguagePluginData;
 
@@ -132,10 +132,10 @@ typedef gboolean (*OnUpdateDisplayMenu)(ggobid *gg, PluginInstance *inst);
 
 typedef struct {
 
-  HINSTANCE (*open)(const char *name, GGobiPluginDetails *info);
+  HINSTANCE (*open)(const gchar *name, GGobiPluginDetails *info);
   int   (*close)(HINSTANCE);
-  DLFUNC  (*resolve)(HINSTANCE handle, const char *name);
-  void  (*getError)(char *buf, GGobiPluginDetails *info);
+  DLFUNC  (*resolve)(HINSTANCE handle, const gchar *name);
+  void  (*getError)(gchar *buf, GGobiPluginDetails *info);
 
 } Dynload;
 
@@ -145,7 +145,7 @@ extern const Dynload *dynload;
 
 HINSTANCE load_plugin_library(GGobiPluginDetails *plugin, gboolean recurse);
 
-DLFUNC getPluginSymbol(const char *name, GGobiPluginDetails *plugin);
+DLFUNC getPluginSymbol(const gchar *name, GGobiPluginDetails *plugin);
 
 gboolean registerPlugins(ggobid *gg, GList *plugins);
 gboolean pluginsUpdateDisplayMenu(ggobid *gg, GList *plugins);
@@ -160,11 +160,11 @@ GtkWidget *showPluginInfo(GList *plugins, GList *inputPlugins, ggobid *gg);
 
 gboolean loadPluginLibrary(GGobiPluginDetails *plugin, GGobiPluginInfo *realPlugin);
 gboolean GGobi_checkPlugin(GGobiPluginDetails *plugin);
-gboolean setLanguagePluginInfo(GGobiPluginDetails *details, const char *language, GGobiInitInfo *info);
+gboolean setLanguagePluginInfo(GGobiPluginDetails *details, const gchar *language, GGobiInitInfo *info);
 
 gboolean pluginSupportsInputMode(const gchar *modeName, GGobiPluginInfo *pluginInfo);
 
-GGobiPluginInfo *getInputPluginByModeNameIndex(gint index);
+GGobiPluginInfo *getInputPluginByModeNameIndex(gint index,gchar **modeName);
 InputDescription *callInputPluginGetDescription(const gchar *fileName, const gchar *modeName, GGobiPluginInfo *info, ggobid *gg);
 
 

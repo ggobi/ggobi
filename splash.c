@@ -29,14 +29,14 @@
 void
 splash_destroy (GtkWidget *w, GdkEventButton *event, GdkPixmap *pix)
 {
-  GtkWidget *win = (GtkWidget *) gtk_object_get_data (GTK_OBJECT(w), "window");
+  GtkWidget *win = (GtkWidget *) g_object_get_data(G_OBJECT(w), "window");
 
   gdk_pixmap_unref (pix);
   gtk_widget_destroy (win);
 }
 
 void
-splash_show (ggobid *gg, guint action, GtkWidget *w)
+splash_show (ggobid *gg)
 {
   char *versionInfo;
   GdkPixmap *splash_pix;
@@ -47,9 +47,9 @@ splash_show (ggobid *gg, guint action, GtkWidget *w)
   GtkWidget *hbox = gtk_vbox_new (false, 0);
 
   splash_pix = gdk_pixmap_colormap_create_from_xpm_d (NULL,
-    gtk_widget_get_colormap (w),
+    gtk_widget_get_colormap (gg->main_window),
     NULL, NULL, (gchar **) splash);
-  splashw = gtk_pixmap_new (splash_pix, NULL);
+  splashw = gtk_image_new_from_pixmap (splash_pix, NULL);
 
   gtk_container_add (GTK_CONTAINER (window), ebox);
   gtk_container_add (GTK_CONTAINER (ebox), hbox);
@@ -68,11 +68,11 @@ splash_show (ggobid *gg, guint action, GtkWidget *w)
   gtk_box_pack_start (GTK_BOX (hbox), label, FALSE, FALSE, 0);
   g_free(versionInfo);
 
-  gtk_object_set_data (GTK_OBJECT (ebox), "window", (gpointer) window);
+  g_object_set_data(G_OBJECT (ebox), "window", (gpointer) window);
 
-  gtk_signal_connect (GTK_OBJECT (ebox),
+  g_signal_connect (G_OBJECT (ebox),
                       "button_press_event",
-                      (GtkSignalFunc) splash_destroy,
+                      G_CALLBACK(splash_destroy),
                       (gpointer) splash_pix);
   gtk_widget_set_events (ebox, GDK_BUTTON_PRESS_MASK);
 

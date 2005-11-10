@@ -902,7 +902,7 @@ gtk_scatterplot_new(datad *d, ggobid *gg)
 void
 scatterplotDisplayInit(scatterplotDisplayd *display)
 {
-  GTK_GGOBI_DISPLAY(display)->p1d_orientation = HORIZONTAL;
+  GGOBI_DISPLAY(display)->p1d_orientation = HORIZONTAL;
 }
 
 
@@ -941,9 +941,9 @@ cpanelSet(displayd *dpy, cpaneld *cpanel, ggobid *gg)
 #if 0
 /*XX Add the creation of the widget here! */
       GtkWidget *w;
-      w = GTK_GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget;
+      w = GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget;
       if(!w) {
-        GTK_GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget = w =  cpanel_scatterplot_make(gg);
+        GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget = w =  cpanel_scatterplot_make(gg);
       }
 #endif
 
@@ -967,11 +967,11 @@ cpanelSet(displayd *dpy, cpaneld *cpanel, ggobid *gg)
 
 void
 displaySet(displayd *dpy, ggobid *gg)
-{
+{/*
   GtkWidget *pmode_menu, *imode_menu;
 
   pmode_menu = scatterplot_pmode_menu_make (gg->pmode_accel_group,
-    (GtkSignalFunc) pmode_set_cb, gg, true);
+    G_CALLBACK(pmode_set_cb), gg, true);
   gtk_menu_set_accel_group (GTK_MENU(pmode_menu), gg->main_accel_group);   
 
   gg->pmode_item = submenu_make ("_View", 'V',
@@ -981,14 +981,14 @@ displaySet(displayd *dpy, ggobid *gg)
   submenu_insert (gg->pmode_item, gg->main_menubar, 2);
 
   imode_menu = scatterplot_imode_menu_make (gg->imode_accel_group,
-    (GtkSignalFunc) imode_set_cb, gg, true);
+    G_CALLBACK(imode_set_cb), gg, true);
   gtk_menu_set_accel_group (GTK_MENU(imode_menu), gg->main_accel_group);   
 
   gg->imode_item = submenu_make ("_Interaction", 'I',
     gg->main_accel_group);
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->imode_item),
     imode_menu); 
-  submenu_insert (gg->imode_item, gg->main_menubar, 3);
+  submenu_insert (gg->imode_item, gg->main_menubar, 3);*/
 }
 
 /* Hmm.  These are probably useful in the other display classes. dfs */
@@ -1422,79 +1422,68 @@ drawEdge(splotd *sp, gint m, datad *d, datad *e, ggobid *gg)
 void
 scatter1DAddPlotLabels(splotd *sp, GdkDrawable *drawable, GdkGC *gc)
 {
-  gint lbearing, rbearing, width, ascent, descent;
-  GtkStyle *style = gtk_widget_get_style (sp->da);
+  PangoLayout *layout = gtk_widget_create_pango_layout(GTK_WIDGET(sp->da), NULL);
+  PangoRectangle rect;
   vartabled *vt;
   datad *d = sp->displayptr->d;
+  
       vt = vartable_element_get (sp->p1dvar, d);
-      gdk_text_extents (
-#if GTK_MAJOR_VERSION == 2
-        gtk_style_get_font (style),
-#else
-        style->font,
-#endif
+	  layout_text(layout, vt->collab_tform, &rect);
+	  gdk_draw_layout(drawable, gc, 
+	  	sp->max.x/2 - rect.width/2, sp->max.y - rect.height - 5,
+		layout);
+      /*gdk_text_extents (
+	  gtk_style_get_font (style),
         vt->collab_tform, strlen (vt->collab_tform),
         &lbearing, &rbearing, &width, &ascent, &descent);
       gdk_draw_string (drawable,
-#if GTK_MAJOR_VERSION == 2
-        gtk_style_get_font (style),
-#else
-        style->font,
-#endif
+	  	gtk_style_get_font (style),
         gc,
-        sp->max.x/2 - width/2,  /*-- center --*/
+        sp->max.x/2 - width/2, 
         sp->max.y - 5,
-        vt->collab_tform);
+        vt->collab_tform);*/
+	g_object_unref(G_OBJECT(layout));
 }
 
 void
 scatterXYAddPlotLabels(splotd *sp, GdkDrawable *drawable, GdkGC *gc)
 {
-  gint lbearing, rbearing, width, ascent, descent;
-  GtkStyle *style = gtk_widget_get_style (sp->da);
+  PangoLayout *layout = gtk_widget_create_pango_layout(GTK_WIDGET(sp->da), NULL);
+  PangoRectangle rect;
 
   vartabled *vtx, *vty;
   datad *d = sp->displayptr->d;
 
       /*-- xyplot: right justify the label --*/
       vtx = vartable_element_get (sp->xyvars.x, d);
-      gdk_text_extents (
-#if GTK_MAJOR_VERSION == 2
-        gtk_style_get_font (style),
-#else
-        style->font,
-#endif
+	  layout_text(layout, vtx->collab_tform, &rect);
+	  gdk_draw_layout(drawable, gc, 
+	  	sp->max.x - rect.width - 5,
+        sp->max.y - rect.height - 5, layout);
+      /*gdk_text_extents (
+	  	gtk_style_get_font (style),
         vtx->collab_tform, strlen (vtx->collab_tform),
         &lbearing, &rbearing, &width, &ascent, &descent);
       gdk_draw_string (drawable,
-#if GTK_MAJOR_VERSION == 2
         gtk_style_get_font (style),
-#else
-        style->font,
-#endif
         gc,
-        sp->max.x - width - 5,  /*-- right justify --*/
+        sp->max.x - width - 5,
         sp->max.y - 5,
-        vtx->collab_tform);
+        vtx->collab_tform);*/
 
       vty = vartable_element_get (sp->xyvars.y, d);
-      gdk_text_extents (
-#if GTK_MAJOR_VERSION == 2
+	  layout_text(layout, vty->collab_tform, &rect);
+	  gdk_draw_layout(drawable, gc, 5, 5, layout);
+      /*gdk_text_extents (
         gtk_style_get_font (style),
-#else
-        style->font,
-#endif
         vty->collab_tform, strlen (vty->collab_tform),
         &lbearing, &rbearing, &width, &ascent, &descent);
       gdk_draw_string (drawable,
-#if GTK_MAJOR_VERSION == 2
         gtk_style_get_font (style),
-#else
-        style->font,
-#endif
         gc,
         5, 5 + ascent + descent,
-        vty->collab_tform);
+        vty->collab_tform);*/
+		g_object_unref(G_OBJECT(layout));
 }
 
 static void
@@ -1632,7 +1621,7 @@ splotScreenToTform(cpaneld *cpanel, splotd *sp, icoords *scr,
 }
 
 void
-scatterplotDisplayClassInit(GtkGGobiScatterplotDisplayClass *klass)
+scatterplotDisplayClassInit(GGobiScatterplotDisplayClass *klass)
 {
   klass->parent_class.createWithVars = scatterplot_new_with_vars;
   klass->parent_class.create = scatterplot_new;
@@ -1642,6 +1631,7 @@ scatterplotDisplayClassInit(GtkGGobiScatterplotDisplayClass *klass)
 
   klass->parent_class.cpanel_set = cpanelSet;
   klass->parent_class.display_set = displaySet;
+  klass->parent_class.mode_ui_get = scatterplot_mode_ui_get;
 
   klass->parent_class.handles_projection = handlesProjection;
   klass->parent_class.handles_interaction = handlesInteraction;
@@ -1694,7 +1684,7 @@ splotVariablesGet(splotd *sp, gint *cols, datad *d)
 
 
 void
-scatterSPlotClassInit(GtkGGobiScatterSPlotClass *klass)
+scatterSPlotClassInit(GGobiScatterSPlotClass *klass)
 {
   klass->parent_class.within_draw_to_unbinned = withinDrawToUnbinned;
   klass->parent_class.tree_label = treeLabel;

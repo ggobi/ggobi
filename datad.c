@@ -36,7 +36,7 @@ datad *
 datad_new(datad *d, ggobid *gg)
 { 
   if (d == NULL) {
-    d = (datad *) gtk_type_new(GTK_TYPE_GGOBI_DATA);
+    d = (datad *) g_object_new(GGOBI_TYPE_DATA, NULL);
   }
 
   datad_instance_init(d);
@@ -68,7 +68,7 @@ datad_new(datad *d, ggobid *gg)
 
 #ifdef TESTING_ROWS_IN_PLOT_CB
   /*-- listen for rows_in_plot_changed events --*/
-  gtk_signal_connect (GTK_OBJECT(d), "rows_in_plot_changed",
+  g_signal_connect (G_OBJECT(d), "rows_in_plot_changed",
     rows_in_plot_test_cb, gg);
 #endif
 
@@ -171,10 +171,11 @@ datad_init (datad *d, ggobid *gg, gboolean cleanup)
 
       if (display != NULL) {
         gg->displays = g_list_append (gg->displays, (gpointer) display);
-        display_set_current (display, gg);
-        gg->current_splot = (splotd *)
-        g_list_nth_data (gg->current_display->splots, 0);
+	    gg->current_splot = (splotd *)
+        	g_list_nth_data (display->splots, 0);
         display->current_splot = gg->current_splot;
+        display_set_current (display, gg);
+        
 
         /*-- turn on event handling in the very first plot --*/
         /*-- ... but will it cause trouble for later plots?  ok so far
@@ -188,7 +189,7 @@ datad_init (datad *d, ggobid *gg, gboolean cleanup)
   if (gg->current_display != NULL)
     varpanel_refresh (gg->current_display, gg);
 
-  gtk_signal_emit (GTK_OBJECT (gg), GGobiSignals[DATAD_ADDED_SIGNAL], d); 
+  g_signal_emit (G_OBJECT (gg), GGobiSignals[DATAD_ADDED_SIGNAL], 0, d);
 
   return (display);
 }
@@ -263,7 +264,7 @@ datad_get_from_notebook (GtkWidget *notebook, ggobid *gg) {
      * Assume that each notebook page has a datad attached.
     */
     if (page) {
-      d = gtk_object_get_data (GTK_OBJECT(page), "datad");
+      d = g_object_get_data (G_OBJECT(page), "datad");
     }
 
     /*
@@ -273,7 +274,7 @@ datad_get_from_notebook (GtkWidget *notebook, ggobid *gg) {
 /*
     gint k, n;
   datatyped dtype;
-    dtype = (vartyped) gtk_object_get_data (GTK_OBJECT(notebook), "datatype");
+    dtype = (vartyped) g_object_get_data(G_OBJECT(notebook), "datatype");
     for (k = 0, n = 0; k < nd; k++) {
       d = (datad *) g_slist_nth_data (gg->d, k);
 

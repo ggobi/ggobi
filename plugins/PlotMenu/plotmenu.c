@@ -38,9 +38,9 @@ newSplotEvent(ggobid *gg, splotd *sp, gpointer udata)
 
     menu = gtk_menu_new();
 
-    if(GTK_IS_GGOBI_PARCOORDS_SPLOT(sp)) {
+    if(GGOBI_IS_PARCOORDS_SPLOT(sp)) {
        createParcoordsMenu(menu, sp, gg);
-    } else if(GTK_IS_GGOBI_SCATTER_SPLOT(sp) && GTK_IS_GGOBI_SCATTERPLOT_DISPLAY(GTK_GGOBI_SPLOT(sp)->displayptr)) {
+    } else if(GGOBI_IS_SCATTER_SPLOT(sp) && GGOBI_IS_SCATTERPLOT_DISPLAY(GGOBI_SPLOT(sp)->displayptr)) {
        createXYPlotMenu(menu, sp, gg);
     } else {
 
@@ -55,8 +55,8 @@ newSplotEvent(ggobid *gg, splotd *sp, gpointer udata)
 
     gtk_widget_show_all(menu);
 
-    gtk_signal_connect(GTK_OBJECT(sp), "event", (GtkSignalFunc) showMenu, menu);
-    gtk_signal_connect(GTK_OBJECT(sp), "destroy", (GtkSignalFunc) destroyMenu, menu);
+    g_signal_connect(G_OBJECT(sp), "event", G_CALLBACK(showMenu), menu);
+    g_signal_connect(G_OBJECT(sp), "destroy", G_CALLBACK(destroyMenu), menu);
 }
 
 void
@@ -90,7 +90,7 @@ showMenu(GtkWidget *src, GdkEvent *event, GtkMenu *menu)
 void
 newGGobiEvent(GtkObject *obj, ggobid *gg, gpointer udata)
 {
-   gtk_signal_connect(GTK_OBJECT(gg), "splot_new", newSplotEvent, udata);
+   g_signal_connect(G_OBJECT(gg), "splot_new", newSplotEvent, udata);
 }
 
 
@@ -100,7 +100,7 @@ newGGobiEvent(GtkObject *obj, ggobid *gg, gpointer udata)
 gboolean
 onLoadPlotMenu(gboolean init, GGobiPluginInfo *plugin)
 {
-  gtk_signal_connect(GTK_OBJECT(getGGobiApp()), "new_ggobi", newGGobiEvent, NULL);
+  g_signal_connect(G_OBJECT(getGGobiApp()), "new_ggobi", newGGobiEvent, NULL);
 
   return(true);
 }
@@ -219,7 +219,7 @@ createParcoordsMenu(GtkWidget *menu, splotd *sp, ggobid *gg)
 
    item = gtk_menu_item_new_with_label("Delete");
    gtk_menu_append(GTK_MENU(menu), item); 
-   gtk_signal_connect(GTK_OBJECT(item), "activate", removeParcoordsSPlot, sp);
+   g_signal_connect(G_OBJECT(item), "activate", removeParcoordsSPlot, sp);
 
    item = gtk_menu_item_new_with_label("Insert");
    submenu = gtk_menu_new();
@@ -280,7 +280,7 @@ addVariableElements(GtkWidget *menu, datad *d, splotd *sp, GtkSignalFunc f)
       id = (ParCoordsPanelID *) g_malloc(sizeof(ParCoordsPanelID));
       id->sp =  sp;  id->id = i;
 
-      gtk_signal_connect(GTK_OBJECT(item), "activate", f, id);
+      g_signal_connect(G_OBJECT(item), "activate", f, id);
    }
    return(d->ncols);
 }

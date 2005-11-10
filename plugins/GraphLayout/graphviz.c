@@ -63,13 +63,10 @@ test_edge_length (Agraph_t *graph, glayoutd *gl, ggobid *gg)
 }
 #endif
 
-void neato_model_cb (GtkWidget *w, gpointer cbd)
+void neato_model_cb (GtkWidget *w, PluginInstance *inst)
 {
-  PluginInstance *inst = (PluginInstance *) 
-    gtk_object_get_data (GTK_OBJECT (w),
-    "PluginInst");
   glayoutd *gl = glayoutFromInst (inst);
-  gl->neato_model = GPOINTER_TO_INT (cbd);
+  gl->neato_model = gtk_combo_box_get_active(GTK_COMBO_BOX(w));
 }
 void neato_use_edge_length_cb (GtkToggleButton *button, PluginInstance *inst)
 {
@@ -89,21 +86,21 @@ neato_get_weight_var (Agraph_t *graph, GtkWidget *w, glayoutd *gl, ggobid *gg)
   gint weightvar;
   datad *e = gl->e;
   datad *e_clist;
-  GtkWidget *clist;
+  GtkWidget *tree_view;
 
   /*-- find the variable which will define the edge lengths --*/
   /*-- first get the list of variables from the 'apply' button --*/
-  clist = get_clist_from_object (GTK_OBJECT (w));
-  if (!clist) {
+  tree_view = get_tree_view_from_object (G_OBJECT (w));
+  if (!tree_view) {
     quick_message ("I can't identify a set of edges", false);
     return false;
   }
-  e_clist = gtk_object_get_data (GTK_OBJECT(clist), "datad");
+  e_clist = g_object_get_data(G_OBJECT(tree_view), "datad");
   if (e_clist == NULL || e_clist != e) {
     quick_message ("This isn't the same set of edges you're using", false);
     return false;
   }
-  weightvar = get_one_selection_from_clist (clist, e);
+  weightvar = get_one_selection_from_tree_view (tree_view, e);
   if (weightvar == -1) {
     quick_message ("Please specify a variable", false);
     return false;
@@ -130,7 +127,7 @@ neato_apply_edge_length (Agraph_t *graph, GtkWidget *w,
     quick_message ("I can't identify a set of edges", false);
     return false;
   }
-  e_clist = gtk_object_get_data (GTK_OBJECT(clist), "datad");
+  e_clist = g_object_get_data(G_OBJECT(clist), "datad");
   if (e_clist == NULL || e_clist != e) {
     quick_message ("This isn't the same set of edges you're using", false);
     return false;

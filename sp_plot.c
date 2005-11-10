@@ -66,9 +66,9 @@ splot_plot_case (gint m, datad *d,
 
   /*-- can prevent drawing of missings for parcoords or scatmat plots --*/
   else if (d->nmissing > 0 && !d->missings_show_p) {
-    if(GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
-      GtkGGobiExtendedSPlotClass *klass;
-      klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT_GET_CLASS(sp));
+    if(GGOBI_IS_EXTENDED_SPLOT(sp)) {
+      GGobiExtendedSPlotClass *klass;
+      klass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);
       if(klass->draw_case_p) {
          draw_case = klass->draw_case_p(sp, m, d, gg);
       }
@@ -115,8 +115,8 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
   gint i, m;
   gboolean (*f)(splotd *, datad*, ggobid*, gboolean) = NULL;
 
-  GtkGGobiExtendedSPlotClass *klass = NULL;
-  GtkGGobiExtendedDisplayClass *displayKlass = NULL;
+  GGobiExtendedSPlotClass *klass = NULL;
+  GGobiExtendedDisplayClass *displayKlass = NULL;
 
   /*
    * since parcoords and tsplot each have their own weird way
@@ -128,8 +128,8 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
 
   g_assert (d->hidden.nels == d->nrows);
 
-  if (GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
-   displayKlass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display));
+  if (GGOBI_IS_EXTENDED_DISPLAY(display)) {
+   displayKlass = GGOBI_EXTENDED_DISPLAY_GET_CLASS(display);
    loop_over_points = display->options.points_show_p &&
                       displayKlass->loop_over_points;
   } else
@@ -171,8 +171,8 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
 
       /*
       */
-      if (GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
-        klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT_GET_CLASS(sp));
+      if (GGOBI_IS_EXTENDED_SPLOT(sp)) {
+        klass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);
         f = klass->redraw;
         if(f) {
           f(sp, d, gg, false);
@@ -213,8 +213,8 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
         current_color = colors_used[k];
         gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[current_color]);
 
-        if (GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
-          klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT_GET_CLASS(sp));
+        if (GGOBI_IS_EXTENDED_SPLOT(sp)) {
+          klass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);
           f = klass->redraw;
           if(f) {
             f(sp, d, gg, false);
@@ -269,8 +269,8 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
   gint i, m;
   gboolean (*f)(splotd *, datad*, ggobid*, gboolean) = NULL;  /* redraw */
 
-  GtkGGobiExtendedSPlotClass *klass = NULL;
-  GtkGGobiExtendedDisplayClass *displayKlass = NULL;
+  GGobiExtendedSPlotClass *klass = NULL;
+  GGobiExtendedDisplayClass *displayKlass = NULL;
 
   g_assert (d->hidden.nels == d->nrows);
 
@@ -289,8 +289,8 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
    * be deferred.    -- dfs
    */
 
-  if (GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
-    displayKlass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display)); 
+  if (GGOBI_IS_EXTENDED_DISPLAY(display)) {
+    displayKlass = GGOBI_EXTENDED_DISPLAY_GET_CLASS(display); 
     /* 
      * This has to be true for the whiskered displays if either points
      * or whiskers are to be drawn.
@@ -302,8 +302,8 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
     loop_over_points = display->options.points_show_p;
   }
 
-  if (GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
-    klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT_GET_CLASS(sp));
+  if (GGOBI_IS_EXTENDED_SPLOT(sp)) {
+    klass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);
     f = klass->redraw;
   }
 
@@ -469,15 +469,15 @@ splot_draw_to_pixmap0_binned (splotd *sp, gboolean draw_hidden, ggobid *gg)
   gint ncolors_used;
   gushort colors_used[MAXNCOLORS+2];
 
-  GtkGGobiExtendedSPlotClass *klass = NULL;
+  GGobiExtendedSPlotClass *klass = NULL;
 
   if (gg->plot_GC == NULL)
     init_plot_GC (sp->pixmap0, gg);
 
     /* Allow the extended plot to take over the entire thing.
        If it wants to take over just a small part, see below.*/
-  if(GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
-    klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT_GET_CLASS(sp));
+  if(GGOBI_IS_EXTENDED_SPLOT(sp)) {
+    klass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);
     if(klass->redraw) {
       displayd *display = (displayd *) sp->displayptr;
       datad *d = display->d;
@@ -595,9 +595,9 @@ splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *gg)
 
   gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
 
-  if(GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
+  if(GGOBI_IS_EXTENDED_SPLOT(sp)) {
     void (*f)(splotd *, GdkDrawable*, ggobid*);
-    f =  GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT_GET_CLASS(sp))->add_plot_labels;
+    f =  GGOBI_EXTENDED_SPLOT_GET_CLASS(sp)->add_plot_labels;
     if(f) {
       f(sp, drawable, gg);
       return;
@@ -606,9 +606,9 @@ splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *gg)
   } 
      /* And allow the display to take up the slack if we don't want to have a special splot class
         for the display type but still need to do something special. */
-  if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
+  if(GGOBI_IS_EXTENDED_DISPLAY(display)) {
     void (*f)(displayd *, splotd *, GdkDrawable*, datad *, ggobid*);
-    f =  GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display))->add_plot_labels;
+    f =  GGOBI_EXTENDED_DISPLAY_GET_CLASS(display)->add_plot_labels;
     if(f)
       f(display, sp, drawable, d, gg);
   }
@@ -650,8 +650,8 @@ splot_add_point_label (gboolean nearest, gint k, splotd *sp,
 {
   displayd *dsp = sp->displayptr;
   datad *d = dsp->d;
-  gint lbearing, rbearing, width, ascent, descent;
-  GtkStyle *style = gtk_widget_get_style (sp->da);
+  PangoLayout *layout;
+  PangoRectangle rect;
   gint diamond_dim = DIAMOND_DIM;
   gchar *lbl = NULL;
 
@@ -664,48 +664,54 @@ splot_add_point_label (gboolean nearest, gint k, splotd *sp,
    * lbl can still be NULL here.
   */
   if (lbl) {
-    splot_text_extents (lbl, style, 
-      &lbearing, &rbearing, &width, &ascent, &descent);
-
+	  layout = gtk_widget_create_pango_layout(sp->da, NULL);
+	  layout_text(layout, lbl, &rect);
+	if (nearest) {
+		underline_text(layout);
+		gdk_draw_layout (drawable, gg->plot_GC,
+        	(sp->max.x - rect.width)/2, 5, layout);
+	}
     if (sp->screen[k].x <= sp->max.x/2) {
-      splot_draw_string (lbl,
-        sp->screen[k].x+diamond_dim,
-        sp->screen[k].y-diamond_dim,
-        style, drawable, gg);
+      gdk_draw_layout (drawable, gg->plot_GC, 
+	  	 sp->screen[k].x+diamond_dim,
+		 sp->screen[k].y-rect.height-diamond_dim,
+		 layout);
 
       /*-- underline the nearest point label?  --*/
-      if (nearest)
+      #if 0
+	  if (nearest)
         gdk_draw_line (drawable, gg->plot_GC,
           sp->screen[k].x+diamond_dim,
           sp->screen[k].y-diamond_dim+1,
-          sp->screen[k].x+diamond_dim+width,
+          sp->screen[k].x+diamond_dim+rect.width,
           sp->screen[k].y-diamond_dim+1);
-      
+      #endif
     } else {
-      splot_draw_string (lbl,
-        sp->screen[k].x - width - diamond_dim,
-        sp->screen[k].y - diamond_dim,
-        style, drawable, gg);
-
+		gdk_draw_layout(drawable, gg->plot_GC,
+        	sp->screen[k].x - rect.width - diamond_dim,
+			sp->screen[k].y - rect.height - diamond_dim,
+			layout);
+	  #if 0
       if (nearest)
         gdk_draw_line (drawable, gg->plot_GC,
-          sp->screen[k].x - width - diamond_dim,
+          sp->screen[k].x - rect.width - diamond_dim,
           sp->screen[k].y - diamond_dim+1,
           sp->screen[k].x - diamond_dim,
           sp->screen[k].y - diamond_dim+1);
+	  #endif
     }
-
+#if 0
     /*-- display the label in the top center of the window as well --*/
     if (nearest) {
-      splot_draw_string (lbl,
-        (sp->max.x - width)/2,
-        ascent + descent + 5,  /*-- the border is of width 3 --*/
-        style, drawable, gg);
+      gdk_draw_layout (drawable, gg->plot_GC,
+        (sp->max.x - rect.width)/2, 5, layout);
       /*-- underline it there, too, for consistency --*/
       gdk_draw_line (drawable, gg->plot_GC,
-        (sp->max.x - width)/2, ascent + descent + 5 + 1,
-        (sp->max.x - width)/2 + width, ascent + descent + 5 + 1);
+        (sp->max.x - rect.width)/2, rect.height + 5 + 1,
+        (sp->max.x - rect.width)/2 + rect.width, rect.height + 5 + 1);
     }
+#endif
+	g_object_unref(layout);
   }
 }
 
@@ -717,9 +723,9 @@ splot_add_identify_cues (splotd *sp, GdkDrawable *drawable,
   gboolean useDefault = false;
 
   if (nearest) {
-    if (GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
-      GtkGGobiExtendedSPlotClass *klass;
-      klass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT_GET_CLASS(sp));
+    if (GGOBI_IS_EXTENDED_SPLOT(sp)) {
+      GGobiExtendedSPlotClass *klass;
+      klass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);
       if (klass->add_identify_cues)
         klass->add_identify_cues(k, sp, drawable, gg);
       else 
@@ -864,7 +870,7 @@ splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
   datad *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
   gint proj = cpanel->pmode;
-  GtkGGobiExtendedSPlotClass *splotKlass;
+  GGobiExtendedSPlotClass *splotKlass;
 
   /*
    * if identification is going on in a plot of points that 
@@ -875,10 +881,10 @@ splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
   /*-- moving this section breaks splot_redraw (QUICK) for adding edges --*/
   if (sp != gg->current_splot && e && e->edge.n) {
     gboolean draw_edge;
-    GtkGGobiExtendedDisplayClass *displayKlass = NULL;
+    GGobiExtendedDisplayClass *displayKlass = NULL;
 
-    if (GTK_IS_GGOBI_EXTENDED_DISPLAY(dsp)) {
-      displayKlass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(dsp));
+    if (GGOBI_IS_EXTENDED_DISPLAY(dsp)) {
+      displayKlass = GGOBI_EXTENDED_DISPLAY_GET_CLASS(dsp);
       draw_edge = displayKlass->supports_edges_p && displayKlass->show_edges_p;
     } else {
       draw_edge = dsp->options.edges_undirected_show_p ||
@@ -894,9 +900,9 @@ splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
     }
   }
   
-  if (GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
+  if (GGOBI_IS_EXTENDED_SPLOT(sp)) {
     void (*f)(splotd *, GdkDrawable*, ggobid*);
-    splotKlass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT_GET_CLASS(sp));
+    splotKlass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);
     f = splotKlass->add_markup_cues;
     if(f) {
       f(sp, drawable, gg);
@@ -921,9 +927,9 @@ splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
     } else if (cpanel->imode == SCALE) {
       scaling_visual_cues_draw (sp, drawable, gg);
 
-      if (GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
+      if (GGOBI_IS_EXTENDED_SPLOT(sp)) {
         void (*f)(splotd *, GdkDrawable*, ggobid*);
-        splotKlass = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT_GET_CLASS(sp));
+        splotKlass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);
         f = splotKlass->add_scaling_cues;
         if(f)
           f(sp, drawable, gg);

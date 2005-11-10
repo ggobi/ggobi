@@ -526,8 +526,8 @@ RGGobi_getDisplayWindow(USER_OBJECT_ sdpy)
 {
  displayd *dpy;
  dpy = (displayd *) (long) NUMERIC_POINTER(VECTOR_ELT(sdpy, 1))[0];
- if(GTK_IS_GGOBI_WINDOW_DISPLAY(dpy)) {
-   return(R_createRef(GTK_GGOBI_WINDOW_DISPLAY(dpy)->window, "GtkWidget"));
+ if(GGOBI_IS_WINDOW_DISPLAY(dpy)) {
+   return(R_createRef(GGOBI_WINDOW_DISPLAY(dpy)->window, "GtkWidget"));
  } else
    return (R_NilValue);
 }

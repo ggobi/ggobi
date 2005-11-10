@@ -183,8 +183,8 @@ p1d_varsel (splotd *sp, gint jvar, gint *jprev, gint toggle, gint mouse)
   gint orientation = display->p1d_orientation;
   gboolean allow = true;
 
-  if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
-     allow = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(display))->allow_reorientation;
+  if(GGOBI_IS_EXTENDED_DISPLAY(display)) {
+     allow = GGOBI_EXTENDED_DISPLAY_GET_CLASS(display)->allow_reorientation;
   }
 
   /*-- if button == -1, don't change orientation. That protects

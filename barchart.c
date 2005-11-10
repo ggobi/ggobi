@@ -25,7 +25,6 @@
 #include <string.h>
 #include <gtk/gtk.h>
 #include "vars.h"
-#include "gtkext.h"
 #include "externs.h"
 
 #include "barchartDisplay.h"
@@ -48,30 +47,30 @@ gboolean pt_in_rect(icoords pt, GdkRectangle rect);
 /*                          Options section                             */
 /*----------------------------------------------------------------------*/
 
-static const GtkItemFactoryEntry menu_items[] = {
-  {"/_File",
-   NULL,
-   NULL,
-   0,
-   "<Branch>"},
-  {"/File/Print",
-   "",
-   (GtkItemFactoryCallback) display_print_cb,
-   0,
-   "<Item>"},
-  {"/File/sep",
-   NULL,
-   NULL,
-   0,
-   "<Separator>"},
-  {"/File/Close",
-   "",
-   (GtkItemFactoryCallback) display_close_cb,
-   0,
-   "<Item>"},
+static const gchar *menu_ui =
+"<ui>"
+"	<menubar>"
+"		<menu action='Options'>"
+"			<menuitem action='ShowPoints'/>"
+"			<separator/>"
+"			<menuitem action='ShowAxes'/>"
+"		</menu>"
+"	</menubar>"
+"</ui>";
+
+static void
+action_toggle_show_bars(GtkToggleAction *action, displayd *display)
+{
+	set_display_option(gtk_toggle_action_get_active(action), DOPT_POINTS, display);
+}
+/* the 'ShowPoints' display action is overridden here for bar display */
+static GtkToggleActionEntry toggle_entries[] = {
+	{ "ShowPoints", NULL, "Show _bars", "<control>B", "Toggle bar display", 
+		G_CALLBACK(action_toggle_show_bars), true 
+	},
 };
 
-
+static guint n_toggle_entries = G_N_ELEMENTS(toggle_entries);
 
 displayd *
 barchart_new(gboolean missing_p, splotd * sp, datad * d, ggobid * gg)
@@ -85,8 +84,6 @@ barchart_new_with_vars(gboolean missing_p, gint nvars, gint *vars, datad * d, gg
  return(createBarchart(NULL, missing_p, NULL, vars ? vars[0] : 0, d, gg));
 }
 
-
-
 displayd *
 createBarchart(displayd *display, gboolean missing_p, splotd * sp, gint var, datad * d,
   ggobid * gg)
@@ -98,14 +95,14 @@ createBarchart(displayd *display, gboolean missing_p, splotd * sp, gint var, dat
 
   if(!display) {
    if (sp == NULL || sp->displayptr == NULL) {
-    /* Use GTK_TYPE_GGOBI_BARCHART_DISPLAY, or the regular extended
+    /* Use GGOBI_TYPE_BARCHART_DISPLAY, or the regular extended
        display and set the titleLabel immediately afterward. If more
        goes into barchart, we will do the former. And that's what we
        do.  The alternative is.
-       display = gtk_type_new(GTK_TYPE_GGOBI_EXTENDED_DISPLAY);
-       GTK_GGOBI_EXTENDED_DISPLAY(display)->titleLabel = "BarChart";
+       display = g_object_new(GGOBI_TYPE_EXTENDED_DISPLAY);
+       GGOBI_EXTENDED_DISPLAY(display)->titleLabel = "BarChart";
      */
-    display = gtk_type_new(GTK_TYPE_GGOBI_BARCHART_DISPLAY);
+    display = g_object_new(GGOBI_TYPE_BARCHART_DISPLAY, NULL);
     display_set_values(display, d, gg);
    } else {
     display = (displayd *) sp->displayptr;
@@ -120,55 +117,54 @@ createBarchart(displayd *display, gboolean missing_p, splotd * sp, gint var, dat
 
   barchart_cpanel_init(&display->cpanel, gg);
 
-  if(GTK_IS_GGOBI_WINDOW_DISPLAY(display) && GTK_GGOBI_WINDOW_DISPLAY(display)->useWindow)
-     display_window_init(GTK_GGOBI_WINDOW_DISPLAY(display), 3, gg);   /*-- 3 = width = any small int --*/
+  if(GGOBI_IS_WINDOW_DISPLAY(display) && GGOBI_WINDOW_DISPLAY(display)->useWindow)
+     display_window_init(GGOBI_WINDOW_DISPLAY(display), WIDTH, HEIGHT, 3, gg);   /*-- 3 = width = any small int --*/
 
   /*-- Add the main menu bar --*/
   vbox = GTK_WIDGET(display);  
-  gtk_container_border_width(GTK_CONTAINER(vbox), 1);
-  if(GTK_IS_GGOBI_WINDOW_DISPLAY(display) && GTK_GGOBI_WINDOW_DISPLAY(display)->window) {
-
-    gtk_container_add(GTK_CONTAINER
-		      (GTK_GGOBI_WINDOW_DISPLAY(display)->window), vbox);
-    
-    gg->app.sp_accel_group = gtk_accel_group_new();
-    get_main_menu((GtkItemFactoryEntry *) menu_items,
-		  sizeof(menu_items) / sizeof(menu_items[0]),
-		  gg->app.sp_accel_group,
-		  GTK_GGOBI_WINDOW_DISPLAY(display)->window,
-		  &display->menubar, (gpointer) display);
+  gtk_container_set_border_width(GTK_CONTAINER(vbox), 1);
+  if(GGOBI_IS_WINDOW_DISPLAY(display) && GGOBI_WINDOW_DISPLAY(display)->window) {
+    //gg->app.sp_accel_group = gtk_accel_group_new();
+	GtkActionGroup *actions = gtk_action_group_new("BarchartActions");
+	gtk_action_group_add_toggle_actions(actions, toggle_entries, n_toggle_entries, display);
+	display->menu_manager = display_menu_manager_create(display);
+	gtk_ui_manager_insert_action_group(display->menu_manager, actions, 0);
+	g_object_unref(G_OBJECT(actions));
+	display->menubar =
+    	create_menu_bar(display->menu_manager, menu_ui, GGOBI_WINDOW_DISPLAY(display)->window); 
     /*
      * After creating the menubar, and populating the file menu,
      * add the other menus manually
      */
-    barchart_display_menus_make(display, gg->app.sp_accel_group,
-				(GtkSignalFunc) display_options_cb, gg);
+    //barchart_display_menus_make(display, gg->app.sp_accel_group,
+	//			G_CALLBACK(display_options_cb), gg);
 
+	gtk_container_add(GTK_CONTAINER(GGOBI_WINDOW_DISPLAY(display)->window), vbox);
     gtk_box_pack_start(GTK_BOX(vbox), display->menubar, false, true, 0);
   }
 
   /*-- Initialize a single splot --*/
   if (sp == NULL) {
-    sp = gtk_barchart_splot_new(display, WIDTH, HEIGHT, gg);
+    sp = ggobi_barchart_splot_new(display, gg);
   }
 
   /* Reset sp->p1dvar based on the plotted variables in the current
      display, if appropriate -- it has already been initialized to
      zero in splot_init, a few levels down from
-     gtk_barchart_splot_new(),*/
+     ggobi_barchart_splot_new(),*/
   if (gg->current_display != NULL && gg->current_display != display && 
       gg->current_display->d == d && 
-      GTK_IS_GGOBI_EXTENDED_DISPLAY(gg->current_display))
+      GGOBI_IS_EXTENDED_DISPLAY(gg->current_display))
   {
     gint nplotted_vars;
     gint *plotted_vars = (gint *) g_malloc(d->ncols * sizeof(gint));
     displayd *dsp = gg->current_display;
 
-    nplotted_vars = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(dsp))->plotted_vars_get(dsp, plotted_vars, d, gg);
+    nplotted_vars = GGOBI_EXTENDED_DISPLAY_GET_CLASS(dsp)->plotted_vars_get(dsp, plotted_vars, d, gg);
     if (nplotted_vars && plotted_vars[0] != 0) {
       sp->p1dvar = plotted_vars[0];
-      barchart_clean_init(GTK_GGOBI_BARCHART_SPLOT(sp));
-      barchart_recalc_counts(GTK_GGOBI_BARCHART_SPLOT(sp), d, gg);
+      barchart_clean_init(GGOBI_BARCHART_SPLOT(sp));
+      barchart_recalc_counts(GGOBI_BARCHART_SPLOT(sp), d, gg);
     }
   }
 
@@ -196,15 +192,7 @@ createBarchart(displayd *display, gboolean missing_p, splotd * sp, gint var, dat
    * drawing area, a motion_notify_event is passed to the
    * appropriate event handler for the ruler.
    */
-#ifndef GTK_2_0
-  display->hrule = gtk_ext_hruler_new();
-  gtk_signal_connect_object(GTK_OBJECT(sp->da), "motion_notify_event",
-    (GtkSignalFunc) EVENT_METHOD(display->hrule, motion_notify_event),
-    GTK_OBJECT(display->hrule));
-#else
-  display->hrule = gtk_hruler_new ();
-   /* What about the events above. */
-#endif
+  display->hrule = gtk_hruler_new();
 
   gtk_table_attach(GTK_TABLE(table),
                    display->hrule, 1, 2, 1, 2,
@@ -217,17 +205,9 @@ createBarchart(displayd *display, gboolean missing_p, splotd * sp, gint var, dat
    * the drawing area, a motion_notify_event is passed to the
    * appropriate event handler for the ruler.
    */
-#ifndef GTK_2_0
-  display->vrule = gtk_ext_vruler_new();
-  gtk_signal_connect_object(GTK_OBJECT(sp->da),
-    "motion_notify_event",
-    (GtkSignalFunc) EVENT_METHOD(display->vrule, motion_notify_event),
-    GTK_OBJECT(display->vrule));
-#else
-  display->vrule = gtk_vruler_new ();
-   /* What about the events above. */
-#endif
 
+  display->vrule = gtk_vruler_new ();
+  
   gtk_table_attach(GTK_TABLE(table),
                    display->vrule, 0, 1, 0, 1,
                    (GtkAttachOptions) GTK_FILL,
@@ -235,8 +215,8 @@ createBarchart(displayd *display, gboolean missing_p, splotd * sp, gint var, dat
                    0, 0);
 
 
-  if(GTK_IS_GGOBI_WINDOW_DISPLAY(display) && GTK_GGOBI_WINDOW_DISPLAY(display)->useWindow)
-     gtk_widget_show_all(GTK_GGOBI_WINDOW_DISPLAY(display)->window);
+  if(GGOBI_IS_WINDOW_DISPLAY(display) && GGOBI_WINDOW_DISPLAY(display)->useWindow)
+     gtk_widget_show_all(GGOBI_WINDOW_DISPLAY(display)->window);
   else
      gtk_widget_show_all(table);
 
@@ -255,7 +235,7 @@ void barchart_clean_init(barchartSPlotd * sp)
   datad *d;
   gint i, j;
 
-  display = (displayd *) GTK_GGOBI_SPLOT(sp)->displayptr;
+  display = (displayd *) GGOBI_SPLOT(sp)->displayptr;
   d = display->d;
 
   sp->bar->nbins = -1;
@@ -281,7 +261,7 @@ void barchart_clean_init(barchartSPlotd * sp)
 
   barchart_set_initials(sp, d);
   sp->bar->offset = 0;
-  GTK_GGOBI_SPLOT(sp)->pmid.y = 0;
+  GGOBI_SPLOT(sp)->pmid.y = 0;
 
   vectori_realloc (&sp->bar->index_to_rank, d->nrows_in_plot);
   barchart_init_categorical(sp, d);
@@ -291,7 +271,7 @@ static void
 barchart_recalc_group_counts(barchartSPlotd * sp, datad * d, ggobid * gg)
 {
   gint i, j, m, bin;
-  vartabled *vtx = vartable_element_get(GTK_GGOBI_SPLOT(sp)->p1dvar, d);
+  vartabled *vtx = vartable_element_get(GGOBI_SPLOT(sp)->p1dvar, d);
 
   g_assert (sp->bar->index_to_rank.nels == d->nrows_in_plot);
 
@@ -315,7 +295,7 @@ barchart_recalc_group_counts(barchartSPlotd * sp, datad * d, ggobid * gg)
 
     /*-- skip missings?  --*/
     if (d->nmissing > 0 && !d->missings_show_p
-        && MISSING_P(m, GTK_GGOBI_SPLOT(sp)->p1dvar))
+        && MISSING_P(m, GGOBI_SPLOT(sp)->p1dvar))
       continue;
 
     /*-- skip hiddens?  here, yes. --*/
@@ -323,7 +303,7 @@ barchart_recalc_group_counts(barchartSPlotd * sp, datad * d, ggobid * gg)
       continue;
     }
 
-    bin = GTK_GGOBI_SPLOT(sp)->planar[m].x;
+    bin = GGOBI_SPLOT(sp)->planar[m].x;
 /* dfs */
     if (vtx->vartype == categorical)
       bin = sp->bar->index_to_rank.els[i];
@@ -561,7 +541,7 @@ void barchart_allocate_structure(barchartSPlotd * sp, datad * d)
 {
   vartabled *vtx;
   gint i, nbins;
-  splotd *rawsp = GTK_GGOBI_SPLOT(sp);
+  splotd *rawsp = GGOBI_SPLOT(sp);
   ggobid *gg = GGobiFromSPlot(rawsp);
   colorschemed *scheme = gg->activeColorScheme;
 
@@ -627,7 +607,7 @@ void barchart_allocate_structure(barchartSPlotd * sp, datad * d)
 
 void barchart_init_categorical(barchartSPlotd * sp, datad * d)
 {
-  splotd *rawsp = GTK_GGOBI_SPLOT(sp);
+  splotd *rawsp = GGOBI_SPLOT(sp);
   gint i, jvar = rawsp->p1dvar;
   ggobid *gg = GGobiFromSPlot(rawsp);
   vartabled *vtx = vartable_element_get(rawsp->p1dvar, d);
@@ -661,7 +641,7 @@ barchart_redraw(splotd * rawsp, datad * d, ggobid * gg, gboolean binned)
 {
   gint i, j, radius;
   colorschemed *scheme = gg->activeColorScheme;
-  barchartSPlotd *sp = GTK_GGOBI_BARCHART_SPLOT(rawsp);
+  barchartSPlotd *sp = GGOBI_BARCHART_SPLOT(rawsp);
   gbind *bin;
 
 /* dfs */
@@ -749,51 +729,47 @@ void
 barchart_splot_add_plot_labels(splotd * sp, GdkDrawable * drawable,
                                ggobid * gg)
 {
-  GtkStyle *style = gtk_widget_get_style(sp->da);
-  gint lbearing, rbearing, width, ascent, descent;
+  //GtkStyle *style = gtk_widget_get_style(sp->da);
+  //gint lbearing, rbearing, width, ascent, descent;
   displayd *display = (displayd *) sp->displayptr;
   datad *d = display->d;
-
+  PangoLayout *layout = gtk_widget_create_pango_layout(GTK_WIDGET(sp->da), NULL);
+  PangoRectangle rect;
+  
   vartabled *vtx;
 
   vtx = vartable_element_get(sp->p1dvar, d);
 
-#if GTK_MAJOR_VERSION == 2
+  layout_text(layout, vtx->collab_tform, &rect);
+  gdk_draw_layout(drawable, gg->plot_GC, sp->max.x - rect.width - 5, 
+  		sp->max.y - rect.height - 5, layout);
+  
+  /*
   gdk_text_extents(gtk_style_get_font(style),
     vtx->collab_tform, strlen(vtx->collab_tform),
     &lbearing, &rbearing, &width, &ascent, &descent);
-#else
-  gdk_text_extents(style->font,
-     vtx->collab_tform, strlen(vtx->collab_tform),
-     &lbearing, &rbearing, &width, &ascent, &descent);
-#endif
 
-#if GTK_MAJOR_VERSION == 2
   gdk_draw_string(drawable, gtk_style_get_font(style),
-    gg->plot_GC, sp->max.x - width - 5, /*-- right justify --*/
+    gg->plot_GC, sp->max.x - width - 5,
     sp->max.y - 5, vtx->collab_tform);
-#else
-  gdk_draw_string(drawable, style->font,
-    gg->plot_GC, sp->max.x - width - 5, /*-- right justify --*/
-    sp->max.y - 5, vtx->collab_tform);
-#endif
-
+  */
   if (vtx->vartype == categorical) {
     gint i;
     gchar *catname;
-    barchartSPlotd *bsp = GTK_GGOBI_BARCHART_SPLOT(sp);
+    barchartSPlotd *bsp = GGOBI_BARCHART_SPLOT(sp);
 
 /* dfs */
     gint level;
-    gint lbearing, rbearing, width, ascent, descent, textheight;
+    //gint lbearing, rbearing, width, ascent, descent, textheight;
     
-    splot_text_extents ("yA", style, 
+    /*splot_text_extents ("yA", style, 
           &lbearing, &rbearing, &width, &ascent, &descent);
-        textheight = ascent + descent;
+        textheight = ascent + descent;*/
+	layout_text(layout, "yA", &rect);
     
  /* is there enough space for labels? If not - return */
     if (!bsp->bar->is_spine) {
-        if (bsp->bar->bins[1].rect.height < textheight) return;
+        if (bsp->bar->bins[1].rect.height < rect.height) return;
     }
     
     for (i = 0; i < bsp->bar->nbins; i++) {
@@ -805,28 +781,28 @@ barchart_splot_add_plot_labels(splotd * sp, GdkDrawable * drawable,
     for (i = 0; i < vtx->nlevels; i++) {
       catname = g_strdup (vtx->level_names[i]);
 #endif
-
-#if GTK_MAJOR_VERSION == 2
-      gdk_draw_string(drawable, gtk_style_get_font(style), gg->plot_GC,
+	  layout_text(layout, catname, NULL);
+	  gdk_draw_layout(drawable, gg->plot_GC, 
+	    bsp->bar->bins[i].rect.x + 2,
+	  	bsp->bar->bins[i].rect.y + bsp->bar->bins[i].rect.height / 2 + 2,
+		layout);
+		
+      /*gdk_draw_string(drawable, gtk_style_get_font(style), gg->plot_GC,
         bsp->bar->bins[i].rect.x + 2,
         bsp->bar->bins[i].rect.y +
         bsp->bar->bins[i].rect.height / 2 + 2, catname);
-#else
-      gdk_draw_string(drawable, style->font, gg->plot_GC,
-        bsp->bar->bins[i].rect.x + 2,
-        bsp->bar->bins[i].rect.y +
-        bsp->bar->bins[i].rect.height / 2 + 2, catname);
-#endif
-      g_free (catname);
+	  */
+	  g_free (catname);
     }
   }
+  g_object_unref(G_OBJECT(layout));
 }
 
 void barchart_set_breakpoints(gfloat width, barchartSPlotd * sp, datad * d)
 {
   gfloat rdiff;
   gint i, nbins;
-  splotd *rawsp = GTK_GGOBI_SPLOT(sp);
+  splotd *rawsp = GGOBI_SPLOT(sp);
 
   rdiff = rawsp->p1d.lim.max - rawsp->p1d.lim.min;
 
@@ -845,7 +821,7 @@ void barchart_set_breakpoints(gfloat width, barchartSPlotd * sp, datad * d)
 
 void barchart_set_initials(barchartSPlotd * sp, datad * d)
 {
-  splotd *rawsp = GTK_GGOBI_SPLOT(sp);
+  splotd *rawsp = GGOBI_SPLOT(sp);
   vartabled *vtx = vartable_element_get(rawsp->p1dvar, d);
 
   if (vtx->vartype == categorical) {
@@ -918,7 +894,7 @@ void barchart_recalc_counts(barchartSPlotd * sp, datad * d, ggobid * gg)
 {
   gfloat yy;
   gint i, bin, m;
-  splotd *rawsp = GTK_GGOBI_SPLOT(sp);
+  splotd *rawsp = GGOBI_SPLOT(sp);
   vartabled *vtx = vartable_element_get(rawsp->p1dvar, d);
 
   g_assert (sp->bar->index_to_rank.nels == d->nrows_in_plot);
@@ -1052,7 +1028,7 @@ void barchart_recalc_counts(barchartSPlotd * sp, datad * d, ggobid * gg)
     sp->bar->col_high_bin = NULL;
   }
 
-  barchart_recalc_dimensions(GTK_GGOBI_SPLOT(sp), d, gg);
+  barchart_recalc_dimensions(GGOBI_SPLOT(sp), d, gg);
 }
 
 void barchart_recalc_dimensions(splotd * rawsp, datad * d, ggobid * gg)
@@ -1068,7 +1044,7 @@ void barchart_recalc_dimensions(splotd * rawsp, datad * d, ggobid * gg)
   gbind *bin;
 
   GdkRectangle *rect;
-  barchartSPlotd *sp = GTK_GGOBI_BARCHART_SPLOT(rawsp);
+  barchartSPlotd *sp = GGOBI_BARCHART_SPLOT(rawsp);
 
   scale_y = rawsp->scale.y;
 
@@ -1223,7 +1199,7 @@ void barchart_recalc_dimensions(splotd * rawsp, datad * d, ggobid * gg)
 
 gboolean barchart_active_paint_points(splotd * rawsp, datad * d, ggobid *gg)
 {
-  barchartSPlotd *sp = GTK_GGOBI_BARCHART_SPLOT(rawsp);
+  barchartSPlotd *sp = GGOBI_BARCHART_SPLOT(rawsp);
   brush_coords *brush_pos = &rawsp->brush_pos;
   gint i, m, indx;
   GdkRectangle brush_rect;
@@ -1433,8 +1409,8 @@ barchart_scaling_visual_cues_draw(splotd * rawsp, GdkDrawable * drawable,
   vartabled *vtx;
   displayd *display = gg->current_display;
   datad *d = display->d;
-  barchartSPlotd *sp = GTK_GGOBI_BARCHART_SPLOT(rawsp);
-  vtx = vartable_element_get(GTK_GGOBI_SPLOT(sp)->p1dvar, d);
+  barchartSPlotd *sp = GGOBI_BARCHART_SPLOT(rawsp);
+  vtx = vartable_element_get(GGOBI_SPLOT(sp)->p1dvar, d);
 
   if (vtx->vartype != categorical) {
 /* calculate & draw anchor_rgn */
@@ -1490,7 +1466,7 @@ button_draw_with_shadows(GdkPoint * region, GdkDrawable * drawable,
   gdk_draw_line(drawable, gg->plot_GC, region[0].x, region[2].y + 1,
                 region[2].x, region[2].y + 1);
 }
-
+#if 0
 void
 barchart_display_menus_make(displayd * display,
                             GtkAccelGroup * accel_group,
@@ -1509,7 +1485,7 @@ barchart_display_menus_make(displayd * display,
 
   item = CreateMenuCheck(options_menu, "Show bars",
                          func, GINT_TO_POINTER(DOPT_POINTS), on, gg);
-  gtk_object_set_data(GTK_OBJECT(item), "display", (gpointer) display);
+  g_object_set_data(G_OBJECT(item), "display", (gpointer) display);
 
   /*-- Add a separator --*/
   CreateMenuItem(options_menu, NULL, "", "", NULL, NULL, NULL, NULL, gg);
@@ -1517,13 +1493,13 @@ barchart_display_menus_make(displayd * display,
   /* This makes sense, but it isn't working */
   item = CreateMenuCheck(options_menu, "Show axes",
                          func, GINT_TO_POINTER(DOPT_AXES), on, gg);
-  gtk_object_set_data(GTK_OBJECT(item), "display", (gpointer) display);
+  g_object_set_data(G_OBJECT(item), "display", (gpointer) display);
 
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(topmenu), options_menu);
   submenu_append(topmenu, display->menubar);
   gtk_widget_show(topmenu);
 }
-
+#endif
 gboolean rect_intersect(GdkRectangle *rect1, GdkRectangle *rect2, GdkRectangle *dest)
 {
     gint right, bottom;
@@ -1556,7 +1532,7 @@ barchart_identify_bars(icoords mousepos, splotd * rawsp, datad * d,
 /*         1 if different bars are hit */
   gint i, nbins;
   gboolean stop;
-  barchartSPlotd *sp = GTK_GGOBI_BARCHART_SPLOT(rawsp);
+  barchartSPlotd *sp = GGOBI_BARCHART_SPLOT(rawsp);
   nbins = sp->bar->nbins;
 
   /* check, which bars are hit */
@@ -1602,8 +1578,9 @@ barchart_identify_bars(icoords mousepos, splotd * rawsp, datad * d,
 void
 barchart_add_bar_cues(splotd * rawsp, GdkDrawable * drawable, ggobid * gg)
 {
-  barchartSPlotd *sp = GTK_GGOBI_BARCHART_SPLOT(rawsp);
-  GtkStyle *style = gtk_widget_get_style(rawsp->da);
+  barchartSPlotd *sp = GGOBI_BARCHART_SPLOT(rawsp);
+  //GtkStyle *style = gtk_widget_get_style(rawsp->da);
+  PangoLayout *layout = gtk_widget_create_pango_layout(GTK_WIDGET(rawsp->da), NULL);
   gint i, nbins;
   gchar *string;
   icoords mousepos = rawsp->mousepos;
@@ -1631,13 +1608,11 @@ barchart_add_bar_cues(splotd * rawsp, GdkDrawable * drawable, ggobid * gg)
     gdk_draw_rectangle(drawable, gg->plot_GC, FALSE,
       sp->bar->low_bin->rect.x, sp->bar->low_bin->rect.y,
       sp->bar->low_bin->rect.width, sp->bar->low_bin->rect.height);
-    gdk_draw_string(drawable,
-#if GTK_MAJOR_VERSION == 2
-      gtk_style_get_font(style),
-#else
-      style->font,
-#endif
-      gg->plot_GC, mousepos.x, mousepos.y, string);
+    /*gdk_draw_string(drawable,
+	gtk_style_get_font(style),
+      gg->plot_GC, mousepos.x, mousepos.y, string);*/
+	  layout_text(layout, string, NULL);
+	  gdk_draw_layout(drawable, gg->plot_GC, mousepos.x, mousepos.y, layout);
     g_free(string);
   }
   for (i = 1; i < nbins + 1; i++) {
@@ -1678,13 +1653,11 @@ barchart_add_bar_cues(splotd * rawsp, GdkDrawable * drawable, ggobid * gg)
       gdk_draw_rectangle(drawable, gg->plot_GC, FALSE,
         sp->bar->bins[i - 1].rect.x, sp->bar->bins[i - 1].rect.y,
         sp->bar->bins[i - 1].rect.width, sp->bar->bins[i - 1].rect.height);
-      gdk_draw_string(drawable,
-#if GTK_MAJOR_VERSION == 2
+      /*gdk_draw_string(drawable,
         gtk_style_get_font(style),
-#else
-        style->font,
-#endif
-        gg->plot_GC, mousepos.x, mousepos.y, string);
+        gg->plot_GC, mousepos.x, mousepos.y, string);*/
+		layout_text(layout, string, NULL);
+		gdk_draw_layout(drawable, gg->plot_GC, mousepos.x, mousepos.y, layout);
       g_free(string);
     }
   }
@@ -1697,27 +1670,25 @@ barchart_add_bar_cues(splotd * rawsp, GdkDrawable * drawable, ggobid * gg)
     gdk_draw_rectangle(drawable, gg->plot_GC, FALSE,
       sp->bar->high_bin->rect.x, sp->bar->high_bin->rect.y,
       sp->bar->high_bin->rect.width, sp->bar->high_bin->rect.height);
-    gdk_draw_string(drawable,
-#if GTK_MAJOR_VERSION == 2
-      gtk_style_get_font(style),
-#else
-      style->font,
-#endif
-      gg->plot_GC, mousepos.x, mousepos.y, string);
+    /*gdk_draw_string(drawable,
+		gtk_style_get_font(style),
+      gg->plot_GC, mousepos.x, mousepos.y, string);*/
+	  layout_text(layout, string, NULL);
+	  gdk_draw_layout(drawable, gg->plot_GC, mousepos.x, mousepos.y, layout);
     g_free (string);
   }
+  g_object_unref(G_OBJECT(layout));
 }
 
-splotd *gtk_barchart_splot_new(displayd * dpy, gint width, gint height,
-                               ggobid * gg)
+splotd *ggobi_barchart_splot_new(displayd * dpy, ggobid * gg)
 {
   barchartSPlotd *bsp;
   splotd *sp;
 
-  bsp = gtk_type_new(GTK_TYPE_GGOBI_BARCHART_SPLOT);
-  sp = GTK_GGOBI_SPLOT(bsp);
+  bsp = g_object_new(GGOBI_TYPE_BARCHART_SPLOT, NULL);
+  sp = GGOBI_SPLOT(bsp);
 
-  splot_init(sp, dpy, width, height, gg);
+  splot_init(sp, dpy, gg);
   barchart_clean_init(bsp);
   barchart_recalc_counts(bsp, dpy->d, gg);
 

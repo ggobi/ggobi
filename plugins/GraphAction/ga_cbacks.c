@@ -345,7 +345,7 @@ ga_nodes_show_cb (GtkWidget *btn, PluginInstance *inst)
 
 void neighborhood_depth_cb (GtkWidget *w, gpointer cbd)
 {
-  PluginInstance *inst = (PluginInstance *) gtk_object_get_data (GTK_OBJECT (w),
+  PluginInstance *inst = (PluginInstance *) g_object_get_data(G_OBJECT (w),
     "PluginInst");
   graphactd *ga = (graphactd *) inst->data;
   ga->neighborhood_depth = GPOINTER_TO_INT (cbd) + 1;
@@ -485,14 +485,14 @@ show_neighbors_toggle_cb (GtkToggleButton *button, PluginInstance *inst)
   graphactd *ga = (graphactd *) inst->data;
 
   if (ga->neighbors_find_p) {
-    gtk_signal_disconnect_by_func(GTK_OBJECT(inst->gg),
-      GTK_SIGNAL_FUNC (show_neighbors_sticky_cb), inst);
+    g_signal_handlers_disconnect_by_func(G_OBJECT(inst->gg),
+      G_CALLBACK (show_neighbors_sticky_cb), inst);
     ga->neighbors_find_p = false;
   } else {
-    gtk_signal_connect (GTK_OBJECT(inst->gg),
-      "sticky_point_added", show_neighbors_sticky_cb, inst);
-    gtk_signal_connect (GTK_OBJECT(inst->gg),
-      "sticky_point_removed", show_neighbors_sticky_cb, inst);
+    g_signal_connect (G_OBJECT(inst->gg),
+      "sticky_point_added", G_CALLBACK(show_neighbors_sticky_cb), inst);
+    g_signal_connect (G_OBJECT(inst->gg),
+      "sticky_point_removed", G_CALLBACK(show_neighbors_sticky_cb), inst);
     ga->neighbors_find_p = true;
   }
 }

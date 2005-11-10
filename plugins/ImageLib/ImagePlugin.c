@@ -19,8 +19,8 @@ init_image_plugin(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 
     /* Want to put it on any newly created display. */
     entry = GGobi_addToolsMenuItem("Save", gg);
-    gtk_signal_connect_object(GTK_OBJECT(entry), "activate",
-                               GTK_SIGNAL_FUNC(saveAsImage), (gpointer) inst);
+    g_signal_connect_swapped(G_OBJECT(entry), "activate",
+                               G_CALLBACK(saveAsImage), (gpointer) inst);
 }
 
 void
@@ -36,12 +36,12 @@ saveAsImage(PluginInstance *inst, GtkWidget *widget)
  data->fileSelector = file_selector;
  data->inst = inst;
 
- gtk_signal_connect_object (GTK_OBJECT (GTK_FILE_SELECTION(file_selector)->ok_button),
-                                           "clicked", GTK_SIGNAL_FUNC (SaveImage),
+ g_signal_connect_swapped (G_OBJECT (GTK_FILE_SELECTION(file_selector)->ok_button),
+                                           "clicked", G_CALLBACK (SaveImage),
                                            (gpointer) data);
 
-    gtk_signal_connect_object (GTK_OBJECT (GTK_FILE_SELECTION(file_selector)->cancel_button),
-                                           "clicked", GTK_SIGNAL_FUNC (gtk_widget_destroy),
+    g_signal_connect_swapped (G_OBJECT (GTK_FILE_SELECTION(file_selector)->cancel_button),
+                                           "clicked", G_CALLBACK (gtk_widget_destroy),
                                            (gpointer) file_selector);
 
     gtk_widget_show(file_selector);
@@ -60,7 +60,7 @@ SaveImage(FileData *data, GtkWidget *widget)
     dpy = inst->gg->current_display;
 
 
-    win = GTK_GGOBI_WINDOW_DISPLAY(dpy)->window;
+    win = GGOBI_WINDOW_DISPLAY(dpy)->window;
     sp  = dpy->current_splot;
     gdk_imlib_init();
 

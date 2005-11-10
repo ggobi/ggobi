@@ -136,11 +136,11 @@ getXMLDocElement(const xmlDocPtr doc, const char *tagName)
 xmlNode *
 getXMLElement(xmlNodePtr node, const char *tagName)
 {
-  if(strcmp(node->name, tagName) == 0)
+  if(xmlStrcmp(node->name, BAD_CAST(tagName)) == 0)
     return(node);
   node = XML_CHILDREN(node);
   while(node) {
-    if(strcmp((const char *) node->name, tagName) == 0) {
+    if(xmlStrcmp(node->name, BAD_CAST(tagName)) == 0) {
       return(node);
     }
     node = node->next;
@@ -155,10 +155,10 @@ getTourSpeedValue(xmlNodePtr node, const xmlDocPtr doc, const gchar *name, gfloa
 {
   xmlNodePtr el = getXMLElement(node, name);
   if(el) {
-      gchar *tmp;
+      xmlChar *tmp;
       gfloat val;
       tmp =  xmlNodeListGetString(doc, XML_CHILDREN(el), 1);
-      val = atof(tmp);
+      val = atof((char *)tmp);
       if(val > 0 && val < MAX_TOUR_SPEED)
 	  *value = val;
       else
@@ -476,12 +476,12 @@ getDisplayDescription(xmlNodePtr node)
   dpy->canRecreate = true;
 
   tmp = xmlGetProp(node, (xmlChar *) "type");
-  dpy->typeName = g_strdup(tmp);
+  dpy->typeName = g_strdup((gchar *)tmp);
   tmp = xmlGetProp(node, (xmlChar *) "data");
   if(tmp) {
     dpy->data = strToInteger((char *)tmp) - 1;
     if(dpy->data < 0)
-      dpy->datasetName = g_strdup(tmp);
+      dpy->datasetName = g_strdup((gchar *)tmp);
   } else
     dpy->data = 0;
 
@@ -610,7 +610,7 @@ getPlugins(xmlDocPtr doc, GGobiInitInfo *info, gboolean single)
   reading the description, author, etc.
  */
 
-#define GET_PROP_VALUE(field,name) symInfo->field = ((tmp = (char *) xmlGetProp(c, name)) != NULL) ? g_strdup(tmp) : NULL
+#define GET_PROP_VALUE(field,name) symInfo->field = ((tmp = xmlGetProp(c, BAD_CAST(name))) != NULL) ? g_strdup((gchar *)tmp) : NULL
 
 
 /**
@@ -1008,7 +1008,7 @@ getInputPluginValues(xmlNodePtr node, GGobiInputPluginInfo *plugin,
     xmlChar *val = xmlNodeListGetString(doc, XML_CHILDREN(c), 1);      
 
     plugin->modeNames = (char **) g_malloc(sizeof(char *));
-    plugin->modeNames[0] = g_strdup(val);
+    plugin->modeNames[0] = g_strdup((gchar *)val);
     plugin->numModeNames = 1;
   } else if((c = getXMLElement(node, "modeNames"))) {
 	  xmlNodePtr tmp;
@@ -1028,7 +1028,7 @@ getInputPluginValues(xmlNodePtr node, GGobiInputPluginInfo *plugin,
   	     while(tmp) {
 	       if(strcmp((const char *) tmp->name, "modeName") == 0) {
 		  xmlChar *val = xmlNodeListGetString(doc, XML_CHILDREN(tmp), 1);
-  	          plugin->modeNames[ctr] = g_strdup(val);
+  	          plugin->modeNames[ctr] = g_strdup((gchar *)val);
 		  ctr++;
 	       }
      	       tmp = tmp->next;
@@ -1060,9 +1060,9 @@ createExtendedDisplay(const gchar * const type, gint *vars, gint numVars, datad 
 {
   displayd *dpy;
 
-  GtkGGobiExtendedDisplayClass *klass;
-  GtkType gtype = gtk_type_from_name(type);
-  klass = gtk_type_class(gtype);
+  GGobiExtendedDisplayClass *klass;
+  GType gtype = g_type_from_name(type);
+  klass = g_type_class_peek(gtype);
   if(!klass->createWithVars) {
      g_printerr("Cannot currently handle the extended display %s type.", type);
      return(NULL);

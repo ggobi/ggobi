@@ -42,25 +42,6 @@
 
 guint GGobiSignals[MAX_GGOBI_SIGNALS];
 
-
-/*
-  This is for handling the event calls for variable selection. Gtk doesn't have
-  a marshalling function of the appropriate form!
- */
-
-#ifndef GTK_2_0
-void
-gtk_marshal_NONE__INT_POINTER_POINTER_POINTER(GtkObject * object,
-                                              GtkSignalFunc func,
-                                              gpointer func_data,
-                                              GtkArg * args)
-{
-  (func) (object, GTK_VALUE_INT(args[0]), GTK_VALUE_POINTER(args[1]),
-          GTK_VALUE_POINTER(args[2]), GTK_VALUE_POINTER(args[3]),
-          func_data);
-}
-#endif
-
 gboolean read_input(InputDescription * desc, ggobid * gg);
 
 /*-- initialize variables which don't depend on the size of the data --*/
@@ -87,12 +68,6 @@ void globals_init(ggobid * gg)
   gg->save.window = NULL;
 
   gg->statusbar_p = true;
-
-
-#ifndef GTK_2_0
-#else
-#include "GtkSignalDef.c"
-#endif
 }
 
 /*-- initialize variables which DO depend on the size of the data --*/

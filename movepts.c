@@ -220,7 +220,7 @@ move_pt (gint id, gint x, gint y, splotd *sp, datad *d, ggobid *gg) {
     GGobiPointMoveEvent ev;
     ev.id = id;
     ev.d = d;
-    gtk_signal_emit(GTK_OBJECT(gg), GGobiSignals[POINT_MOVE_SIGNAL],
+    g_signal_emit(G_OBJECT(gg), GGobiSignals[POINT_MOVE_SIGNAL], 0,
 		    sp, id, d);
   }
 }

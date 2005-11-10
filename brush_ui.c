@@ -26,11 +26,9 @@
 #include "vars.h"
 #include "externs.h"
 
-/*-- called from Options menu --*/
-void brush_update_set_cb(GtkCheckMenuItem * w, guint action)
+void brush_update_set(gboolean update, ggobid *gg)
 {
-  ggobid *gg = GGobiFromWidget(GTK_WIDGET(w), true);
-  gg->brush.updateAlways_p = !gg->brush.updateAlways_p;
+  gg->brush.updateAlways_p = update;
 }
 
 static void brush_on_cb(GtkToggleButton * button, ggobid * gg)
@@ -72,15 +70,14 @@ set of vectors, though, so I'll just turn it off for now.
 static gchar *point_targets_lbl[] =
 { "Off", "Color and glyph", "Color only", "Glyph only", "Shadow", /*"Select"*/};
 static void
-brush_point_targets_cb (GtkWidget * w, gpointer cbd)
+brush_point_targets_cb (GtkWidget * w, ggobid *gg)
 {
-  ggobid *gg = GGobiFromWidget(w, true);
   cpaneld *cpanel = &gg->current_display->cpanel;
 
   if (cpanel->br.mode == BR_TRANSIENT)
     reinit_transient_brushing (gg->current_display, gg);
 
-  cpanel->br.point_targets = GPOINTER_TO_INT(cbd);
+  cpanel->br.point_targets = gtk_combo_box_get_active(GTK_COMBO_BOX(w));
 
   /* binning not permitted here */
   brush_once_and_redraw (false, gg->current_splot, gg->current_display, gg);
@@ -113,15 +110,14 @@ brush_point_targets_cb (GtkWidget * w, gpointer cbd)
 static gchar *edge_targets_lbl[] =
   { "Off", "Color and line", "Color only", "Line only", "Shadow", 
     /*"Select"*/};
-static void brush_edge_targets_cb(GtkWidget * w, gpointer cbd)
+static void brush_edge_targets_cb(GtkWidget * w, ggobid *gg)
 {
-  ggobid *gg = GGobiFromWidget(w, true);
   cpaneld *cpanel = &gg->current_display->cpanel;
 
   if (cpanel->br.mode == BR_TRANSIENT)
     reinit_transient_brushing (gg->current_display, gg);
 
-  cpanel->br.edge_targets = GPOINTER_TO_INT(cbd);
+  cpanel->br.edge_targets = gtk_combo_box_get_active(GTK_COMBO_BOX(w));
 
   /* binning not permitted here */
   brush_once_and_redraw (false, gg->current_splot, gg->current_display, gg);
@@ -150,7 +146,6 @@ static void brush_edge_targets_cb(GtkWidget * w, gpointer cbd)
 
 }
 
-static gchar *mode_lbl[] = { "Persistent", "Transient" };
 void
 brush_mode_set (gint mode, splotd *sp, displayd *display, ggobid *gg) {
   cpaneld *cpanel = &gg->current_display->cpanel;
@@ -162,11 +157,11 @@ brush_mode_set (gint mode, splotd *sp, displayd *display, ggobid *gg) {
   }
   display_plot (display, QUICK, gg);
 }
-static void brush_mode_cb(GtkWidget * w, gpointer cbd)
+static void brush_mode_cb(GtkWidget * w, ggobid *gg)
 {
-  ggobid *gg = GGobiFromWidget(w, true);
   splotd *sp = gg->current_splot;
-  brush_mode_set (GPOINTER_TO_INT(cbd), sp, gg->current_display, gg);
+  brush_mode_set (!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(w)), 
+  	sp, gg->current_display, gg);
   /*
   cpaneld *cpanel = &gg->current_display->cpanel;
   gint prev_mode = cpanel->br.mode;
@@ -195,22 +190,10 @@ static void wvis_window_cb(GtkWidget * button, ggobid * gg)
   wvis_window_open(gg);
 }
 
-/*
- * Callbacks for menus in the main menubar
-*/
-
-/* Actions from the Reset menu in the main menubar */
-void brush_reset_cb(GtkWidget * w, gpointer cbd)
-{
-  ggobid *gg = GGobiFromWidget(w, true);
-  gint action = GPOINTER_TO_INT(cbd);
-  brush_reset(gg, action);
-}
-
-void brush_reset(ggobid * gg, gint action)
+void brush_reset(displayd * display, gint action)
 {
   gint i, k;
-  displayd *display = gg->current_display;
+  ggobid *gg = display->ggobi;
   datad *d = display->d;
   datad *e = display->e;
   cpaneld *cpanel = &display->cpanel;
@@ -314,12 +297,14 @@ static gint key_press_cb(GtkWidget * w, GdkEventKey * event, splotd * sp)
   if ((event->state & GDK_MOD1_MASK) == GDK_MOD1_MASK) {
     if (event->keyval == GDK_t || event->keyval == GDK_T) {
       brush_mode_set (BR_TRANSIENT, sp, gg->current_display, gg);
+	  return true;
     } else if (event->keyval == GDK_p || event->keyval == GDK_P) {
       brush_mode_set (BR_PERSISTENT, sp, gg->current_display, gg);
+	  return true;
     }
   }
 
-  return true;
+  return false;
 }
 
 static gint
@@ -350,7 +335,7 @@ motion_notify_cb(GtkWidget *w, GdkEventMotion *event, cpaneld *cpanel)
 #endif
 /*XX is this the correct source object? */
     if(changed)
-      gtk_signal_emit(GTK_OBJECT(gg), GGobiSignals[BRUSH_MOTION_SIGNAL],
+      g_signal_emit(G_OBJECT(gg), GGobiSignals[BRUSH_MOTION_SIGNAL], 0,
          sp, event, sp->displayptr->d);
   }
   return true;
@@ -381,9 +366,9 @@ button_press_cb(GtkWidget * w, GdkEventButton * event, splotd * sp)
 
   mousepos_get_pressed(w, event, &button1_p, &button2_p, sp);
 
-  sp->motion_id = gtk_signal_connect(GTK_OBJECT(sp->da),
+  sp->motion_id = g_signal_connect(G_OBJECT(sp->da),
                                      "motion_notify_event",
-                                     (GtkSignalFunc) motion_notify_cb,
+                                     G_CALLBACK(motion_notify_cb),
                                      (gpointer) cpanel);
 
   brush_set_pos((gint) sp->mousepos.x, (gint) sp->mousepos.y, sp);
@@ -428,7 +413,7 @@ button_release_cb(GtkWidget * w, GdkEventButton * event, splotd * sp)
     clusters_set(d, gg);
 
 /*   ??
- *  gtk_signal_emit (GTK_OBJECT (gg->main_window),
+ *  g_signal_emit (GTK_OBJECT (gg->main_window),
  *    gg->signal_symbols_changed, gg); 
  */
 
@@ -478,20 +463,20 @@ void brush_event_handlers_toggle(splotd * sp, gboolean state)
   displayd *display = (displayd *) sp->displayptr;
 
   if (state == on) {
-    if (GTK_IS_GGOBI_WINDOW_DISPLAY(display) && GTK_GGOBI_WINDOW_DISPLAY(display)->useWindow)
-      sp->key_press_id = gtk_signal_connect(GTK_OBJECT
-        (GTK_GGOBI_WINDOW_DISPLAY(display)->window),
+    if (GGOBI_IS_WINDOW_DISPLAY(display) && GGOBI_WINDOW_DISPLAY(display)->useWindow)
+      sp->key_press_id = g_signal_connect(G_OBJECT
+        (GGOBI_WINDOW_DISPLAY(display)->window),
         "key_press_event",
-        (GtkSignalFunc) key_press_cb, (gpointer) sp);
+        G_CALLBACK(key_press_cb), (gpointer) sp);
 
 
-    sp->press_id = gtk_signal_connect(GTK_OBJECT(sp->da),
+    sp->press_id = g_signal_connect(G_OBJECT(sp->da),
       "button_press_event",
-      (GtkSignalFunc) button_press_cb,
+      G_CALLBACK(button_press_cb),
       (gpointer) sp);
-    sp->release_id = gtk_signal_connect(GTK_OBJECT(sp->da),
+    sp->release_id = g_signal_connect(G_OBJECT(sp->da),
       "button_release_event",
-      (GtkSignalFunc) button_release_cb,
+      G_CALLBACK(button_release_cb),
       (gpointer) sp);
   } else {
     disconnect_key_press_signal(sp);
@@ -510,7 +495,7 @@ void cpanel_brush_make(ggobid * gg)
 {
   modepaneld *panel;
   GtkWidget *btn;
-  GtkWidget *option_menu, *menu;
+  GtkWidget *option_menu, *check_btn;
   GtkWidget *vb, *lbl;
   GtkWidget *notebook;
 
@@ -523,26 +508,28 @@ void cpanel_brush_make(ggobid * gg)
                                  5);
 
  /*-- button: open symbol panel --*/
-  btn = gtk_button_new_with_label("Choose color & glyph ...");
+  btn = gtk_button_new_with_mnemonic("_Choose color & glyph ...");
   gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), btn,
     "Open panel for choosing color and glyph", NULL);
-  gtk_signal_connect(GTK_OBJECT(btn), "clicked",
-    GTK_SIGNAL_FUNC(open_symbol_window_cb), (gpointer) gg);
+  g_signal_connect(G_OBJECT(btn), "clicked",
+    G_CALLBACK(open_symbol_window_cb), (gpointer) gg);
   gtk_box_pack_start(GTK_BOX(panel->w),
     btn, false, false, 1);
 
-/*-- option menu: persistent/transient --*/
-  option_menu = gtk_option_menu_new();
-  gtk_widget_set_name(option_menu, "BRUSH:mode_option_menu");
-  gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), option_menu,
+/*-- check button: persistent/transient --*/
+  /*-- this was an option menu but was changed to allow accelerators in GTK2 */
+  check_btn = gtk_check_button_new_with_mnemonic("_Persistent");
+  gtk_widget_set_name(check_btn, "BRUSH:mode_check_btn");
+  gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), check_btn,
     "Persistent or transient brushing", NULL);
+  g_signal_connect(G_OBJECT(check_btn), "clicked",
+  	G_CALLBACK(brush_mode_cb), gg);
   gtk_box_pack_start(GTK_BOX(panel->w),
-    option_menu, false, false, 0);
-  menu = populate_option_menu(option_menu, mode_lbl,
-    sizeof(mode_lbl) / sizeof(gchar *),
-    (GtkSignalFunc) brush_mode_cb, "GGobi", gg);
+    check_btn, false, false, 0);
+  //menu = populate_combo_box(option_menu, mode_lbl, G_N_ELEMENTS(mode_lbl),
+  //  G_CALLBACK(brush_mode_cb), gg);
   /* initialize transient */
-  gtk_option_menu_set_history(GTK_OPTION_MENU(option_menu), 1);
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_btn), false);
 
   {  /* I really ought to do this by adding an argument to
       * populate_option_menu, but I'm not sure it's worth it just
@@ -550,21 +537,26 @@ void cpanel_brush_make(ggobid * gg)
       * The other point about all these accelerator groups is
       * that I should be able to add the accel_groups to each display
       * instead of having separate key event management.  dfs 9/2/2005
+	  * - unfortunately it is not possible to drive an accelerator from
+	  * a window that is not the parent of the accelerated widget,
+	  * therefore key events seem necessary - mfl
       */
   /* Add accelerators to the option menu */
-    GList *children = gtk_container_children(GTK_CONTAINER(menu));
+    
+	/*GList *children = gtk_container_get_children(GTK_CONTAINER(menu));
     GList *child;
-    GtkWidget *item;
-    guint accels[] = {'p', 't'};
-    gint i = 0;
-    GtkAccelGroup *accel_group = gtk_accel_group_new ();
-    gtk_window_add_accel_group (GTK_WINDOW (gg->main_window), accel_group);
-
-    for (child=children; child; child=child->next) {
+    GtkWidget *item;*/
+    /*guint accel = 'p';
+    //gint i = 0;
+    GtkAccelGroup *accel_group = gtk_accel_group_new();
+    gtk_window_add_accel_group(GTK_WINDOW (gg->main_window), accel_group);
+	gtk_widget_add_accelerator(check_btn, "toggled", accel_group, accel, 
+		GDK_MOD2_MASK, GTK_ACCEL_VISIBLE);*/
+    /*for (child=children; child; child=child->next) {
       item = (GtkWidget *) child->data;
       gtk_widget_add_accelerator (item, "activate", accel_group,
-        accels[i++], GDK_MOD1_MASK, GTK_ACCEL_VISIBLE);
-    }
+        accels[i++], GDK_MOD2_MASK, GTK_ACCEL_VISIBLE);
+    }*/
   }
 
 /*-- option menu: brush with color/glyph/both --*/
@@ -572,86 +564,84 @@ void cpanel_brush_make(ggobid * gg)
   gtk_box_pack_start(GTK_BOX(panel->w), vb,
                      false, false, 0);
 
-  lbl = gtk_label_new("Point brushing:");
+  lbl = gtk_label_new_with_mnemonic("Poi_nt brushing:");
   gtk_misc_set_alignment(GTK_MISC(lbl), 0, 0.5);
   gtk_box_pack_start(GTK_BOX(vb), lbl, false, false, 0);
 
-  option_menu = gtk_option_menu_new();
+  option_menu = gtk_combo_box_new_text();
+  gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), option_menu);
   gtk_widget_set_name(option_menu, "BRUSH:point_targets_option_menu");
   gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), option_menu,
     "Brushing points: what characteristics, if any, should respond?",
     NULL);
   gtk_box_pack_start(GTK_BOX(vb), option_menu, false, false, 0);
-  populate_option_menu(option_menu, point_targets_lbl,
-    sizeof(point_targets_lbl) / sizeof(gchar *),
-    (GtkSignalFunc) brush_point_targets_cb, "GGobi", gg);
+  populate_combo_box(option_menu, point_targets_lbl, G_N_ELEMENTS(point_targets_lbl),
+    NULL, NULL);
   /*-- initial value: both --*/
-  gtk_option_menu_set_history(GTK_OPTION_MENU(option_menu), 1);
-
+  /* defer signal registration until after setting the active option */
+  gtk_combo_box_set_active(GTK_COMBO_BOX(option_menu), 1);
+  g_signal_connect(G_OBJECT(option_menu), "changed", G_CALLBACK(brush_point_targets_cb), gg);
 
 /*-- new, for edges --*/
   vb = gtk_vbox_new(false, 0);
   gtk_box_pack_start(GTK_BOX(panel->w), vb,
                      false, false, 0);
 
-  lbl = gtk_label_new("Edge brushing:");
+  lbl = gtk_label_new_with_mnemonic("_Edge brushing:");
   gtk_misc_set_alignment(GTK_MISC(lbl), 0, 0.5);
   gtk_box_pack_start(GTK_BOX(vb), lbl, false, false, 0);
 
   /*-- option menu:  Off, color&line, color only, ... --*/
-  option_menu = gtk_option_menu_new();
+  option_menu = gtk_combo_box_new_text();
+  gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), option_menu);
   gtk_widget_set_name(option_menu, "BRUSH:edge_targets_option_menu");
   gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), option_menu,
     "Brushing edges: what characteristics, if any, should respond?",
     NULL);
   gtk_box_pack_start(GTK_BOX(vb), option_menu, false, false, 0);
-  populate_option_menu(option_menu, edge_targets_lbl,
-    sizeof(edge_targets_lbl) / sizeof(gchar *),
-    (GtkSignalFunc) brush_edge_targets_cb, "GGobi", gg);
-  /*-- initial value: off --*/
-  gtk_option_menu_set_history(GTK_OPTION_MENU(option_menu), 0);
+  populate_combo_box(option_menu, edge_targets_lbl, G_N_ELEMENTS(edge_targets_lbl),
+    G_CALLBACK(brush_edge_targets_cb), gg);
 
-
-  btn = gtk_button_new_with_label("Undo persistent");
+  btn = gtk_button_new_from_stock(GTK_STOCK_UNDO);
   gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), btn,
     "Undo the most recent persistent brushing changes, from button down to button up",
     NULL);
   gtk_box_pack_start(GTK_BOX(panel->w),
     btn, false, false, 0);
-  gtk_signal_connect(GTK_OBJECT(btn), "clicked",
-    GTK_SIGNAL_FUNC(brush_undo_cb), gg);
+  g_signal_connect(G_OBJECT(btn), "clicked",
+    G_CALLBACK(brush_undo_cb), gg);
 
   /*-- Define the linking rule --*/
   notebook = create_linkby_notebook (panel->w, gg);
   gtk_widget_set_name(notebook, "BRUSH:linkby_notebook");
 
 /*-- button for opening 'color schemes' panel --*/
-  btn = gtk_button_new_with_label("Color schemes ...");
+  btn = gtk_button_new_with_mnemonic("Color _schemes ...");
   gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), btn,
     "Open tools panel for automatic brushing by variable",
     NULL);
-  gtk_signal_connect(GTK_OBJECT(btn), "clicked",
-    GTK_SIGNAL_FUNC(wvis_window_cb), (gpointer) gg);
+  g_signal_connect(G_OBJECT(btn), "clicked",
+    G_CALLBACK(wvis_window_cb), (gpointer) gg);
   gtk_box_pack_start(GTK_BOX(panel->w),
     btn, false, false, 1);
 
 /*-- button for opening clusters table --*/
-  btn = gtk_button_new_with_label("Color & glyph groups ...");
+  btn = gtk_button_new_with_mnemonic("Color & glyph _groups ...");
   gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), btn,
     "Open tools panel for hiding or excluding brushed groups",
     NULL);
-  gtk_signal_connect(GTK_OBJECT(btn), "clicked",
-    GTK_SIGNAL_FUNC(cluster_window_cb), (gpointer) gg);
+  g_signal_connect(G_OBJECT(btn), "clicked",
+    G_CALLBACK(cluster_window_cb), (gpointer) gg);
   gtk_box_pack_start(GTK_BOX(panel->w),
     btn, false, false, 1);
 
-  btn = gtk_check_button_new_with_label("Brush on");
+  btn = gtk_check_button_new_with_mnemonic("_Brush on");
   gtk_widget_set_name(btn, "BRUSH:brush_on_button");
   gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), btn,
     "Make the brush active or inactive.  Drag the left button to brush and the right or middle button  to resize the brush.",
     NULL);
-  gtk_signal_connect(GTK_OBJECT(btn), "toggled",
-    GTK_SIGNAL_FUNC(brush_on_cb), (gpointer) gg);
+  g_signal_connect(G_OBJECT(btn), "toggled",
+    G_CALLBACK(brush_on_cb), (gpointer) gg);
   gtk_box_pack_start(GTK_BOX(panel->w), btn, false,
   false, 0);
 
@@ -687,19 +677,18 @@ void cpanel_brush_set(displayd *display, cpaneld *cpanel, ggobid *gg)
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(btn),
     cpanel->br.brush_on_p);
 
-  w = widget_find_by_name(pnl, "BRUSH:mode_option_menu");
-  gtk_option_menu_set_history(GTK_OPTION_MENU(w), cpanel->br.mode);
-
+  w = widget_find_by_name(pnl, "BRUSH:mode_check_btn");
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(w), !cpanel->br.mode);
+  
   /* Open the correct page in the linking rule notebook */
   w = widget_find_by_name(pnl, "BRUSH:linkby_notebook");
   linkby_current_page_set (display, w, gg);
 
   w = widget_find_by_name(pnl, "BRUSH:point_targets_option_menu");
-  gtk_option_menu_set_history(GTK_OPTION_MENU(w),
-                              cpanel->br.point_targets);
-
+  gtk_combo_box_set_active(GTK_COMBO_BOX(w), cpanel->br.point_targets);
+  
   w = widget_find_by_name(pnl, "BRUSH:edge_targets_option_menu");
-  gtk_option_menu_set_history(GTK_OPTION_MENU(w), cpanel->br.edge_targets);
+  gtk_combo_box_set_active(GTK_COMBO_BOX(w), cpanel->br.edge_targets);
 }
 
 /*--------------------------------------------------------------------*/

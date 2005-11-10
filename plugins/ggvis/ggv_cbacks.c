@@ -244,8 +244,9 @@ void ggv_task_cb (GtkToggleButton *button, PluginInstance *inst)
     w = widget_find_by_name (window, "MDS_COMPLETE");
     gtk_widget_set_sensitive (w, ggv->mds_task == GraphLayout);
 
-    if (ggv->mds_task == DissimAnalysis)
-      gtk_clist_select_row (ggv->clist_dist, 0, 0);
+    if (ggv->mds_task == DissimAnalysis) {
+		select_tree_view_row(ggv->tree_view_dist, 0);
+	}
   }
 }
 
@@ -260,7 +261,7 @@ void ggv_edge_weights_cb (GtkToggleButton *button, PluginInstance *inst)
 
   ggv->Dtarget_source = (MDSDtargetSource) button->active;
   if (ggv->Dtarget_source == VarValues)
-    gtk_clist_select_row (ggv->clist_dist, 0, 0);
+    select_tree_view_row(ggv->tree_view_dist, 0);
 }
 
 /*
@@ -358,8 +359,8 @@ void mds_run_cb (GtkToggleButton *btn, PluginInstance *inst)
     }
     dsrc = ggv->dsrc;
     /* Make sure there's an edge set */
-    if (ggv->clist_dist != (GtkCList *) NULL)
-      ggv->e = gtk_object_get_data (GTK_OBJECT(ggv->clist_dist), "datad");
+    if (ggv->tree_view_dist != (GtkTreeView *) NULL)
+      ggv->e = g_object_get_data(G_OBJECT(ggv->tree_view_dist), "datad");
     if (ggv->e == NULL || ggv->e->edge.n == 0) {
       g_printerr ("edge set not correctly specified\n");
       return;
@@ -370,7 +371,7 @@ void mds_run_cb (GtkToggleButton *btn, PluginInstance *inst)
      * to be non-negative?)
     */
     if (ggv->mds_task == DissimAnalysis || ggv->Dtarget_source == VarValues) {
-      selected_var = get_one_selection_from_clist (GTK_WIDGET(ggv->clist_dist),
+      selected_var = get_one_selection_from_tree_view (GTK_WIDGET(ggv->tree_view_dist),
         ggv->e);
       if (selected_var == -1) {
         quick_message ("Please specify a variable", false);
@@ -446,7 +447,7 @@ void mds_step_cb (GtkWidget *btn, PluginInstance *inst)
   mds_once (true, ggv, gg);
   update_ggobi (ggv, gg);
 }
-void mds_reinit_cb (PluginInstance *inst, guint action, GtkWidget *w)
+void mds_reinit_cb (GtkAction *action, PluginInstance *inst)
 {
   ggvisd *ggv = ggvisFromInst (inst);
   ggobid *gg = inst->gg;
@@ -464,7 +465,7 @@ void mds_reinit_cb (PluginInstance *inst, guint action, GtkWidget *w)
   update_ggobi (ggv, gg);
 }
 
-void mds_scramble_cb (PluginInstance *inst, guint action, GtkWidget *w)
+void mds_scramble_cb (GtkAction *action, PluginInstance *inst)
 {
   ggvisd *ggv = ggvisFromInst (inst);
   ggobid *gg = inst->gg;
@@ -483,7 +484,7 @@ void mds_scramble_cb (PluginInstance *inst, guint action, GtkWidget *w)
 }
 
 void
-mds_reset_params_cb (PluginInstance *inst, guint action, GtkWidget *widget)
+mds_reset_params_cb (GtkAction *action, PluginInstance *inst)
 {
   ggvisd *ggv = ggvisFromInst (inst);
   ggobid *gg = inst->gg;
@@ -522,7 +523,7 @@ mds_reset_params_cb (PluginInstance *inst, guint action, GtkWidget *widget)
     (gint) ggv->metric_nonmetric);
 {  /*-- make sure the appropriate adjustment is attached to the hscale --*/
   GtkWidget *menu = gtk_option_menu_get_menu (GTK_OPTION_MENU(w));
-  GList *children = gtk_container_children (GTK_CONTAINER(menu));
+  GList *children = gtk_container_get_children (GTK_CONTAINER(menu));
   GtkWidget *item = (GtkWidget *) children->data;  /*-- first one --*/
   ggv_metric (item, 0);
 }
@@ -676,20 +677,18 @@ void ggv_weight_power_cb (GtkAdjustment *adj, PluginInstance *inst)
   ggv->weight_power = adj->value;
 }
 
-void ggv_metric (GtkWidget *w, gint param)
+void ggv_metric (GtkWidget *w, PluginInstance *inst, gint param)
 {
-  PluginInstance *inst = (PluginInstance *)
-    gtk_object_get_data (GTK_OBJECT(w), "PluginInst");
   ggvisd *ggv = ggvisFromInst (inst);
   GtkWidget *label, *hscale;
   GtkAdjustment *Dtarget_adj, *isotonic_mix_adj;
 
   ggv->metric_nonmetric = (MDSMetricInd) param;
 
-  label = gtk_object_get_data (GTK_OBJECT(w), "label");
-  hscale = gtk_object_get_data (GTK_OBJECT(w), "hscale");
-  Dtarget_adj = gtk_object_get_data (GTK_OBJECT(w), "Dtarget_adj");
-  isotonic_mix_adj = gtk_object_get_data (GTK_OBJECT(w), "isotonic_mix_adj");
+  label = g_object_get_data(G_OBJECT(w), "label");
+  hscale = g_object_get_data(G_OBJECT(w), "hscale");
+  Dtarget_adj = g_object_get_data(G_OBJECT(w), "Dtarget_adj");
+  isotonic_mix_adj = g_object_get_data(G_OBJECT(w), "isotonic_mix_adj");
 
   if (ggv->metric_nonmetric == metric) {
     if (GTK_RANGE(hscale)->adjustment != Dtarget_adj) {
@@ -697,13 +696,13 @@ void ggv_metric (GtkWidget *w, gint param)
        * add to the ref count of the adjust to be removed, because
        * gtk_range_set_adjustment will decrease its ref count.
       */
-      gtk_object_ref (GTK_OBJECT(isotonic_mix_adj));
+      g_object_ref (G_OBJECT(isotonic_mix_adj));
       gtk_range_set_adjustment (GTK_RANGE(hscale), Dtarget_adj);
       gtk_label_set_text (GTK_LABEL(label), "Data power (D^p)");
     }
   } else {
     if (GTK_RANGE(hscale)->adjustment != isotonic_mix_adj) {
-      gtk_object_ref (GTK_OBJECT(Dtarget_adj));
+      g_object_ref (G_OBJECT(Dtarget_adj));
       gtk_range_set_adjustment (GTK_RANGE(hscale), isotonic_mix_adj);
       gtk_label_set_text (GTK_LABEL(label), "Isotonic(D) (%)");
     }
@@ -711,18 +710,15 @@ void ggv_metric (GtkWidget *w, gint param)
 
 }
 
-void ggv_metric_cb (GtkWidget *w, gpointer cbd)
+void ggv_metric_cb (GtkWidget *w, PluginInstance *inst)
 {
-  gint param = (MDSMetricInd) GPOINTER_TO_INT (cbd);
-  ggv_metric (w, param);
+  gint param = (MDSMetricInd) gtk_combo_box_get_active(GTK_COMBO_BOX(w));
+  ggv_metric (w, inst, param);
 }
-void ggv_kruskal_cb (GtkWidget *w, gpointer cbd)
+void ggv_kruskal_cb (GtkWidget *w, PluginInstance *inst)
 {
-  PluginInstance *inst = (PluginInstance *)
-    gtk_object_get_data (GTK_OBJECT(w), "PluginInst");
   ggvisd *ggv = ggvisFromInst (inst);
-
-  ggv->KruskalShepard_classic = (MDSKSInd) GPOINTER_TO_INT (cbd);
+  ggv->KruskalShepard_classic = (MDSKSInd) gtk_combo_box_get_active(GTK_COMBO_BOX(w));
 }
 
 
@@ -731,7 +727,7 @@ void ggv_groups_cb (GtkToggleButton *button,  gpointer cbd)
   /* all_distances, within, between */
   if (button->active) {
     PluginInstance *inst = (PluginInstance *)
-      gtk_object_get_data (GTK_OBJECT(button), "PluginInst");
+      g_object_get_data(G_OBJECT(button), "PluginInst");
     ggvisd *ggv = ggvisFromInst (inst);
 
     ggv->group_ind = GPOINTER_TO_INT (cbd);
@@ -751,7 +747,7 @@ void ggv_anchor_cb (GtkToggleButton *button, gpointer cbd)
   /* no_anchor, scaled, fixed */
   if (button->active) {
     PluginInstance *inst = (PluginInstance *)
-      gtk_object_get_data (GTK_OBJECT(button), "PluginInst");
+      g_object_get_data(G_OBJECT(button), "PluginInst");
     ggvisd *ggv = ggvisFromInst (inst);
 
     ggv->anchor_ind = GPOINTER_TO_INT (cbd);
@@ -834,13 +830,11 @@ ggv_selection_prob_btn_cb (GtkWidget *btn, PluginInstance *inst)
   update_ggobi (ggv, gg);
 }
 
-void ggv_constrained_cb (GtkWidget *w, gpointer cbd)
+void ggv_constrained_cb (GtkWidget *w, PluginInstance *inst)
 {
-  PluginInstance *inst = (PluginInstance *)
-     gtk_object_get_data (GTK_OBJECT (w), "PluginInst");
   ggvisd *ggv = ggvisFromInst (inst);
   /*-- 0: no variables frozen        --*/
   /*-- 1: first variable frozen      --*/
   /*-- 2: first two variables frozen --*/
-  ggv->freeze_var = GPOINTER_TO_INT (cbd);
+  ggv->freeze_var = gtk_combo_box_get_active(GTK_COMBO_BOX(w));
 }

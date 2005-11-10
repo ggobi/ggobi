@@ -112,7 +112,7 @@ PrintOptions *showPrintDialog(PrintOptions *options, displayd *dpy, ggobid *gg, 
 
 
 GtkWidget *
-createPrintDialog(PrintOptions *options, displayd *dpy, ggobid *gg, PrintDialogHandler print, void *userData);
+createPrintDialog(displayd *dpy);
 
 void setStandardPrintHandlers();
 PrintOptions *getDefaultPrintOptions(PrintOptions *opts);

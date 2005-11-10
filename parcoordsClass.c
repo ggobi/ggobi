@@ -46,9 +46,9 @@ static gboolean
 cpanelSet(displayd *dpy, cpaneld *cpanel, ggobid *gg)
 {
   GtkWidget *w;
-  w = GTK_GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget;
+  w = GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget;
   if (!w) {
-    GTK_GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget = w =
+    GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget = w =
       cpanel_parcoords_make(gg);
   }
 
@@ -65,7 +65,7 @@ cpanelSet(displayd *dpy, cpaneld *cpanel, ggobid *gg)
 void
 parcoordsDisplayInit(parcoordsDisplayd *display)
 {
-    GTK_GGOBI_DISPLAY(display)->p1d_orientation = VERTICAL;
+    GGOBI_DISPLAY(display)->p1d_orientation = VERTICAL;
 }
 
 static gboolean
@@ -74,13 +74,79 @@ handlesInteraction(displayd *dpy, InteractionMode v)
    return(v == BRUSH || v == IDENT || v == DEFAULT_IMODE);
 }
 
+void
+start_parcoords_drag(GtkWidget *src, GdkDragContext *ctxt, GtkSelectionData *data, guint info, guint time, gpointer udata)
+{
+   gtk_selection_data_set(data, data->target, 8, (guchar *) src, sizeof(splotd *)); 
+}
+
+void
+receive_parcoords_drag(GtkWidget *src, GdkDragContext *context, int x, int y, const GtkSelectionData *data,   unsigned int info, unsigned int event_time, gpointer *udata)
+{
+   splotd *to = GGOBI_SPLOT(src);
+   splotd *from;
+   displayd *display;
+   guint tmp;
+   display = to->displayptr;
+
+#if 0
+   from = (splotd *) data->data;/*XXX Want a proper, robust and portable way to do this. */
+#endif
+
+   from = GGOBI_SPLOT(gtk_drag_get_source_widget(context));
+
+   if(from->displayptr != display) {
+      gg_write_to_statusbar("the source and destination of the parallel coordinate plots are not from the same display.\n", display->ggobi);
+      return;
+   }
+
+   tmp = to->p1dvar;
+   to->p1dvar = from->p1dvar;
+   from->p1dvar = tmp;
+
+   display_tailpipe (display, FULL, display->ggobi);
+   varpanel_refresh (display, display->ggobi);
+
+}
+
+void
+parcoordsPlotDragAndDropEnable(splotd *sp, gboolean active) {
+	static GtkTargetEntry target = {"text/plain", GTK_TARGET_SAME_APP, 1001};	
+	if (active) {
+		gtk_drag_source_set(GTK_WIDGET(sp), GDK_BUTTON1_MASK, &target, 1, GDK_ACTION_COPY);
+		g_signal_connect(G_OBJECT(sp), "drag_data_get",  G_CALLBACK(start_parcoords_drag), NULL);
+		gtk_drag_dest_set(GTK_WIDGET(sp), GTK_DEST_DEFAULT_ALL /* DROP */ , &target, 1, GDK_ACTION_COPY /*MOVE*/);
+		g_signal_connect(G_OBJECT(sp), "drag_data_received",  G_CALLBACK(receive_parcoords_drag), NULL);
+	} else {
+		g_signal_handlers_disconnect_by_func(G_OBJECT(sp), G_CALLBACK(start_parcoords_drag), NULL);
+		g_signal_handlers_disconnect_by_func(G_OBJECT(sp), G_CALLBACK(receive_parcoords_drag), NULL);
+		gtk_drag_source_unset(GTK_WIDGET(sp));
+		gtk_drag_dest_unset(GTK_WIDGET(sp));
+	}
+}
+
+void
+parcoordsDragAndDropEnable(displayd *dsp, gboolean active) {
+	GList *l;
+	for (l = dsp->splots; l; l = l->next) {
+		splotd *sp = (splotd *)l->data;
+		parcoordsPlotDragAndDropEnable(sp, active);
+	}
+}
+
 gboolean
 parcoordsEventHandlersToggle(displayd * dpy, splotd * sp, gboolean state,
                             ProjectionMode pmode, InteractionMode imode)
 {
+	/* it's necessary to disable/enable so that duplicate handlers are not registered */
+	/* it's necessary to toggle all plots, because all plots need to be ready to receive */
+	/* would be better if there was some callback when the imode changed */
+  parcoordsDragAndDropEnable(dpy, false);
+  
   switch (imode) {
   case DEFAULT_IMODE:
       p1d_event_handlers_toggle (sp, state);
+	  parcoordsDragAndDropEnable(dpy, true);
   break;
   case BRUSH:
       brush_event_handlers_toggle (sp, state);
@@ -219,41 +285,40 @@ static void
 addPlotLabels(displayd *display, splotd *sp, GdkDrawable *drawable, datad *d, ggobid *gg)
 {
     vartabled *vt;
-    gint lbearing, rbearing, width, ascent, descent;
-    GtkStyle *style = gtk_widget_get_style (sp->da);
+    //gint lbearing, rbearing, width, ascent, descent;
+    //GtkStyle *style = gtk_widget_get_style (sp->da);
+	PangoRectangle rect;
+	PangoLayout *layout = gtk_widget_create_pango_layout(GTK_WIDGET(sp->da), NULL);
+	
     cpaneld *cpanel = &display->cpanel;
 
     vt = vartable_element_get (sp->p1dvar, d);
-    gdk_text_extents (
-#if GTK_MAJOR_VERSION == 2
+    
+	/*gdk_text_extents (
       gtk_style_get_font (style),
-#else
-      style->font,
-#endif
       vt->collab_tform, strlen (vt->collab_tform),
       &lbearing, &rbearing, &width, &ascent, &descent);
-
+    */
+	layout_text(layout, vt->collab_tform, &rect);
     if (cpanel->parcoords_arrangement == ARRANGE_ROW)
-      gdk_draw_string (drawable,
-#if GTK_MAJOR_VERSION == 2
+      gdk_draw_layout(drawable, gg->plot_GC, 
+		(rect.width <= sp->max.x) ?  sp->max.x/2 - rect.width/2 : 0, 
+		sp->max.y - rect.height - 5,
+		layout);
+		
+	  /*gdk_draw_string (drawable,
         gtk_style_get_font (style),
-#else
-        style->font,
-#endif
         gg->plot_GC,
-        /*-- if the label fits, center it; else, left justify --*/
+        //-- if the label fits, center it; else, left justify
         (width <= sp->max.x) ?  sp->max.x/2 - width/2 : 0, 
         sp->max.y - 5,
-        vt->collab_tform);
+        vt->collab_tform);*/
      else
-      gdk_draw_string (drawable,
-#if GTK_MAJOR_VERSION == 2
+      /*gdk_draw_string (drawable,
         gtk_style_get_font (style),
-#else
-        style->font,
-#endif
-        gg->plot_GC, 5, 5+ascent+descent, vt->collab_tform);
-
+        gg->plot_GC, 5, 5+ascent+descent, vt->collab_tform);*/
+		gdk_draw_layout(drawable, gg->plot_GC, 5, 5, layout);
+	g_object_unref(G_OBJECT(layout));
 }
 
 
@@ -335,15 +400,15 @@ plottedVarsGet(displayd *display, gint *cols, datad *d, ggobid *gg)
 static void
 displaySet(displayd *display, ggobid *gg)
 {
-  GtkWidget *imode_menu;
-
+  /*GtkWidget *imode_menu;
   imode_menu = parcoords_imode_menu_make (gg->imode_accel_group,
-    (GtkSignalFunc) imode_set_cb, gg, true);
+    G_CALLBACK(imode_set_cb), gg, true);
   gg->imode_item = submenu_make ("_Interaction", 'I',
     gg->main_accel_group);
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->imode_item),
                              imode_menu); 
   submenu_insert (gg->imode_item, gg->main_menubar, 2);
+  */
 }
 
 /*
@@ -402,9 +467,9 @@ splot_add_whisker_cues (gint k, splotd *sp, GdkDrawable *drawable, ggobid *gg)
 static GtkWidget *
 parcoordsCPanelWidget(displayd *dpy, gchar **modeName, ggobid *gg)
 {
-  GtkWidget *w = GTK_GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget;
+  GtkWidget *w = GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget;
   if(!w) {
-   GTK_GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget = w = cpanel_parcoords_make(gg);
+   GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget = w = cpanel_parcoords_make(gg);
   }
   *modeName = "Parcoords";
   return(w);
@@ -466,7 +531,7 @@ splotScreenToTform(cpaneld *cpanel, splotd *sp, icoords *scr,
 }
 
 void
-parcoordsDisplayClassInit(GtkGGobiParCoordsDisplayClass *klass)
+parcoordsDisplayClassInit(GGobiParCoordsDisplayClass *klass)
 {
   klass->parent_class.loop_over_points = true;
   klass->parent_class.binningPermitted = parcoordsBinningPermitted;
@@ -486,6 +551,8 @@ parcoordsDisplayClassInit(GtkGGobiParCoordsDisplayClass *klass)
 
   /* no unset */
   klass->parent_class.display_set = displaySet;
+  
+  klass->parent_class.mode_ui_get = parcoords_mode_ui_get;
 
   /* no build_symbol_vectors */
 
@@ -515,7 +582,7 @@ parcoordsDisplayClassInit(GtkGGobiParCoordsDisplayClass *klass)
 
 
 void
-parcoordsSPlotClassInit(GtkGGobiParCoordsSPlotClass *klass)
+parcoordsSPlotClassInit(GGobiParCoordsSPlotClass *klass)
 {
    klass->parent_class.alloc_whiskers = allocWhiskers;
    klass->parent_class.add_identify_cues = splot_add_whisker_cues;
@@ -539,9 +606,9 @@ parcoordsSPlotClassInit(GtkGGobiParCoordsSPlotClass *klass)
 
 
 splotd *
-gtk_parcoords_splot_new(displayd *dpy, gint width, gint height, ggobid *gg)
+ggobi_parcoords_splot_new(displayd *dpy, ggobid *gg)
 {
-   splotd *sp = gtk_type_new(GTK_TYPE_GGOBI_PARCOORDS_SPLOT);
-   splot_init(sp, dpy, width, height, gg);
+   splotd *sp = g_object_new(GGOBI_TYPE_PAR_COORDS_SPLOT, NULL);
+   splot_init(sp, dpy, gg);
    return(sp);
 }

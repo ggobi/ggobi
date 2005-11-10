@@ -4,29 +4,29 @@
 
 #include <gtk/gtk.h>
 
-extern GtkType gtk_ggobi_app_get_type(void);
+extern GType ggobi_app_get_type(void);
 
-#define GTK_TYPE_GGOBI_APP	      (gtk_ggobi_app_get_type ())
-#define GTK_GGOBI_APP(obj)	      (GTK_CHECK_CAST ((obj), GTK_TYPE_GGOBI_APP, GtkGGobiApp))
-#define GTK_GGOBI_APP_CLASS(klass)    (GTK_CHECK_CLASS_CAST ((klass), GTK_TYPE_GGOBI_APP, GtkGGobiAppClass))
-#define GTK_IS_GGOBI_APP(obj)	      (GTK_CHECK_TYPE ((obj), GTK_TYPE_GGOBI_APP))
-#define GTK_IS_GGOBI_APP_CLASS(klass) (GTK_CHECK_CLASS_TYPE ((klass), GTK_TYPE_GGOBI_APP))
+#define GGOBI_TYPE_APP	      			(ggobi_app_get_type ())
+#define GGOBI_APP(obj)	      			(G_TYPE_CHECK_INSTANCE_CAST ((obj), GGOBI_TYPE_APP, GGobiApp))
+#define GGOBI_APP_CLASS(klass)    		(G_TYPE_CHECK_CLASS_CAST ((klass), GGOBI_TYPE_APP, GGobiAppClass))
+#define GGOBI_IS_APP(obj)	      		(G_TYPE_CHECK_INSTANCE_TYPE ((obj), GGOBI_TYPE_APP))
+#define GGOBI_IS_APP_CLASS(klass) 		(G_TYPE_CHECK_CLASS_TYPE ((klass), GGOBI_TYPE_APP))
+#define GGOBI_APP_GET_CLASS(obj)  		(G_TYPE_INSTANCE_GET_CLASS ((obj), GGOBI_TYPE_APP, GGobiAppClass))
 
 
-/* Create the GtkGGobiApp class that is derived from GtkObject. */
+
+/* Create the GGobiApp class that is derived from GObject. */
 typedef struct {
-
-   GtkObjectClass parent_class;
-
-} GtkGGobiAppClass;
+   GObjectClass parent_class;
+} GGobiAppClass;
 
 
 typedef struct {
-  GtkObject object;
+  GObject object;
   /* Session info options would be appropriate here. 
      Also, all the global variables such as all_ggobis, num_ggobis, totalNumGGobis.
    */
-} GtkGGobiApp;
+} GGobiApp;
 
 
 #endif /* GGOBI_APP_H */

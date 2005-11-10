@@ -11,7 +11,7 @@
 
 #include <externs.h>
 
-displayd *createWindowlessDisplay(GtkType type, datad *d, ggobid *gg);
+displayd *createWindowlessDisplay(GType type, datad *d, ggobid *gg);
 
 /**
  This example is intended to illustrate how we can create our own
@@ -36,7 +36,7 @@ displayd *createWindowlessDisplay(GtkType type, datad *d, ggobid *gg);
  Check setting the viewmodes by clicking on plots, etc.
 
  For the barchart, one of the rulersis too small.
- ** CRITICAL **: file gtkextruler.c: line 422 (gtk_ext_ruler_calc_scale): assertion `dx > 0' failed.
+ ** CRITICAL **: file gtkextruler.c: line 422 (GTK_RULER_calc_scale): assertion `dx > 0' failed.
  Why does this appear. Doesn't in stand-alone ggobi.
 */
 
@@ -91,7 +91,7 @@ main(int argc, char *argv[])
 
    /* Now create our scatterplot matrix. We create a 3 x 2 matrix of plots. */
  rows = cols = &indices[0];
- dpy = createWindowlessDisplay(GTK_TYPE_GGOBI_SCATMAT_DISPLAY, data, gg);
+ dpy = createWindowlessDisplay(GGOBI_TYPE_SCATMAT_DISPLAY, data, gg);
 
    /* Now fill in the display.*/
  scatmat_new(dpy, false, 3, rows, 2, cols,  data, gg);
@@ -104,13 +104,13 @@ main(int argc, char *argv[])
 /********* Put a regular scatterplot *********/
 
 
- dpy = createWindowlessDisplay(GTK_TYPE_GGOBI_SCATTERPLOT_DISPLAY, data, gg);
+ dpy = createWindowlessDisplay(GGOBI_TYPE_SCATTERPLOT_DISPLAY, data, gg);
  createScatterplot(dpy, false, NULL, 4, rows, data, gg);
  gtk_container_add(GTK_CONTAINER(box2), GTK_WIDGET(dpy)); 
 
 
  gtk_container_add(GTK_CONTAINER(box), btn);
- gtk_signal_connect(GTK_OBJECT(btn), "clicked", set_active_display, dpy);
+ g_signal_connect(G_OBJECT(btn), "clicked", set_active_display, dpy);
 
 
  gtk_container_add(GTK_CONTAINER(box), GTK_WIDGET(box2)); 
@@ -123,13 +123,13 @@ main(int argc, char *argv[])
  pane = gtk_vpaned_new();
  box2 = gtk_hpaned_new();
 
- dpy = createWindowlessDisplay(GTK_TYPE_GGOBI_TIME_SERIES_DISPLAY, data, gg);
+ dpy = createWindowlessDisplay(GGOBI_TYPE_TIME_SERIES_DISPLAY, data, gg);
  tsplot_new(dpy, false, 4, rows, data, gg);
  gtk_container_add(GTK_CONTAINER(box2), GTK_WIDGET(dpy)); 
  gtk_widget_show_all(GTK_WIDGET(dpy));
 
 
- dpy = createWindowlessDisplay(GTK_TYPE_GGOBI_BARCHART_DISPLAY, data, gg);
+ dpy = createWindowlessDisplay(GGOBI_TYPE_BARCHART_DISPLAY, data, gg);
  createBarchart(dpy, false, NULL, 3, data, gg);
  gtk_container_add(GTK_CONTAINER(box2), GTK_WIDGET(dpy));
  gtk_widget_show(GTK_WIDGET(dpy));
@@ -138,7 +138,7 @@ main(int argc, char *argv[])
 
 
 /* Last row. */
- dpy = createWindowlessDisplay(GTK_TYPE_GGOBI_PARCOORDS_DISPLAY, data, gg);
+ dpy = createWindowlessDisplay(GGOBI_TYPE_PARCOORDS_DISPLAY, data, gg);
  parcoords_new(dpy, false, 3, rows, data, gg);
  gtk_widget_set_usize(GTK_WIDGET(dpy), 200, 150); 
 
@@ -172,11 +172,11 @@ main(int argc, char *argv[])
 }
 
 displayd *
-createWindowlessDisplay(GtkType type, datad *data, ggobid *gg)
+createWindowlessDisplay(GType type, datad *data, ggobid *gg)
 {
  displayd *dpy;
- dpy = gtk_type_new(type);
- GTK_GGOBI_WINDOW_DISPLAY(dpy)->useWindow = false;
+ dpy = g_object_new(type, NULL);
+ GGOBI_WINDOW_DISPLAY(dpy)->useWindow = false;
  if(data && gg)
    display_set_values(dpy, data, gg);
 

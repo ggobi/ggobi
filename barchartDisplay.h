@@ -21,29 +21,30 @@
 #define GGOBI_BARCHART_DISPLAY_H
 
 /**
- This defines a new class of display (GtkGGobiBarchartDisplay)
+ This defines a new class of display (GGobiBarchartDisplay)
  which is the top-level container for barchart plots.
- This extends the windowed display class (GtkGGobiWindowDisplay).
+ This extends the windowed display class (GGobiWindowDisplay).
 */
 
 /*
  Is it necessary/useful to sub-class these
 */
 
-#define GTK_TYPE_GGOBI_BARCHART_DISPLAY	 (gtk_ggobi_barchart_display_get_type ())
-#define GTK_GGOBI_BARCHART_DISPLAY(obj)	 (GTK_CHECK_CAST ((obj), GTK_TYPE_GGOBI_BARCHART_DISPLAY, barchartDisplayd))
-#define GTK_GGOBI_BARCHART_DISPLAY_CLASS(klass) (GTK_CHECK_CLASS_CAST ((klass), GTK_TYPE_GGOBI_BARCHART_DISPLAY, GtkGGobiBarChartClass))
-#define GTK_IS_GGOBI_BARCHART_DISPLAY(obj)	 (GTK_CHECK_TYPE ((obj), GTK_TYPE_GGOBI_BARCHART_DISPLAY))
-#define GTK_IS_GGOBI_BARCHART_DISPLAY_CLASS(klass) (GTK_CHECK_CLASS_TYPE ((klass), GTK_TYPE_GGOBI_BARCHART_DISPLAY))
+#define GGOBI_TYPE_BARCHART_DISPLAY	 (ggobi_barchart_display_get_type ())
+#define GGOBI_BARCHART_DISPLAY(obj)	 (G_TYPE_CHECK_INSTANCE_CAST ((obj), GGOBI_TYPE_BARCHART_DISPLAY, barchartDisplayd))
+#define GGOBI_BARCHART_DISPLAY_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GGOBI_TYPE_BARCHART_DISPLAY, GGobiBarChartClass))
+#define GGOBI_IS_BARCHART_DISPLAY(obj)	 (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GGOBI_TYPE_BARCHART_DISPLAY))
+#define GGOBI_IS_BARCHART_DISPLAY_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GGOBI_TYPE_BARCHART_DISPLAY))
+#define GGOBI_BARCHART_DISPLAY_GET_CLASS(obj)  		(G_TYPE_INSTANCE_GET_CLASS ((obj), GGOBI_TYPE_BARCHART_DISPLAY, GGobiBarChartClass))
 
-GtkType gtk_ggobi_barchart_display_get_type();
-displayd *gtk_ggobi_barchart_display_new(gint type, gboolean missing_p,
+GType ggobi_barchart_display_get_type();
+displayd *ggobi_barchart_display_new(gint type, gboolean missing_p,
                                          datad * d, ggobid * gg);
 
 typedef struct {
-  GtkGGobiExtendedDisplayClass parent_class;
+  GGobiExtendedDisplayClass parent_class;
 
-} GtkGGobiBarChartDisplayClass;
+} GGobiBarChartDisplayClass;
 
 
 typedef struct {
@@ -54,18 +55,19 @@ typedef struct {
 
 
 
-#define GTK_TYPE_GGOBI_BARCHART_SPLOT           (gtk_ggobi_barchart_splot_get_type())
-#define GTK_GGOBI_BARCHART_SPLOT(obj)	        (GTK_CHECK_CAST ((obj), GTK_TYPE_GGOBI_BARCHART_SPLOT, barchartSPlotd))
-#define GTK_GGOBI_BARCHART_SPLOT_CLASS(klass)	(GTK_CHECK_CLASS_CAST ((klass), GTK_TYPE_GGOBI_BARCHART_SPLOT, GtkGGobiBarChartSPlotClass))
-#define GTK_IS_GGOBI_BARCHART_SPLOT(obj)	 (GTK_CHECK_TYPE ((obj), GTK_TYPE_GGOBI_BARCHART_SPLOT))
-#define GTK_IS_GGOBI_BARCHART_SPLOT_CLASS(klass) (GTK_CHECK_CLASS_TYPE ((klass), GTK_TYPE_GGOBI_BARCHART_SPLOT))
+#define GGOBI_TYPE_BARCHART_SPLOT           (ggobi_barchart_splot_get_type())
+#define GGOBI_BARCHART_SPLOT(obj)	        (G_TYPE_CHECK_INSTANCE_CAST ((obj), GGOBI_TYPE_BARCHART_SPLOT, barchartSPlotd))
+#define GGOBI_BARCHART_SPLOT_CLASS(klass)	(G_TYPE_CHECK_CLASS_CAST ((klass), GGOBI_TYPE_BARCHART_SPLOT, GGobiBarChartSPlotClass))
+#define GGOBI_IS_BARCHART_SPLOT(obj)	 (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GGOBI_TYPE_BARCHART_SPLOT))
+#define GGOBI_IS_BARCHART_SPLOT_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GGOBI_TYPE_BARCHART_SPLOT))
+#define GGOBI_BARCHART_SPLOT_GET_CLASS(obj)  		(G_TYPE_INSTANCE_GET_CLASS ((obj), GGOBI_TYPE_BARCHART_SPLOT, GGobiBarChartSPlotClass))
 
-GtkType gtk_ggobi_barchart_splot_get_type(void);
+GType ggobi_barchart_splot_get_type(void);
 
 typedef struct {
-  GtkGGobiExtendedSPlotClass extendedSPlotClass;
+  GGobiExtendedSPlotClass extendedSPlotClass;
 
-} GtkGGobiBarChartSPlotClass;
+} GGobiBarChartSPlotClass;
 
 typedef struct {
 
@@ -80,12 +82,11 @@ typedef struct {
 extern void barchart_display_menus_make(displayd * display,
                                         GtkAccelGroup *, GtkSignalFunc,
                                         ggobid *);
-extern splotd *gtk_barchart_splot_new(displayd * dpy, gint width,
-                                      gint height, ggobid * gg);
+extern splotd *ggobi_barchart_splot_new(displayd * dpy, ggobid * gg);
 
 /* Make these available to ggobiClass.c. 
   (Could put the _get_type routines in the barchartClass.h file.) */
 
-void barchartSPlotClassInit(GtkGGobiBarChartSPlotClass * klass);
-void barchartDisplayClassInit(GtkGGobiBarChartDisplayClass * klass);
+void barchartSPlotClassInit(GGobiBarChartSPlotClass * klass);
+void barchartDisplayClassInit(GGobiBarChartDisplayClass * klass);
 #endif

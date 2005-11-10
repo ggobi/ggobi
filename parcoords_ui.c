@@ -34,10 +34,9 @@ ash_smoothness_cb (GtkAdjustment *adj, ggobid *gg)
 }
 
 static gchar *arrangement_lbl[] = {"Row", "Column"};
-static void arrangement_cb (GtkWidget *w, gpointer cbd)
+static void arrangement_cb (GtkWidget *w, ggobid *gg)
 {
-  gint indx = GPOINTER_TO_INT (cbd);
-  ggobid *gg = GGobiFromWidget(w, true);
+  gint indx = gtk_combo_box_get_active(GTK_COMBO_BOX(w));
 
   if (indx != gg->current_display->cpanel.parcoords_arrangement)
     parcoords_reset_arrangement (gg->current_display, indx, gg);
@@ -46,22 +45,20 @@ static void arrangement_cb (GtkWidget *w, gpointer cbd)
 }
 
 static gchar *type_lbl[] = {"Texturing", "ASH", "Dotplot"};
-static void type_cb (GtkWidget *w, gpointer cbd)
+static void type_cb (GtkWidget *w, ggobid *gg)
 {
-  ggobid *gg = GGobiFromWidget(w, true);
   cpaneld *cpanel;
     cpanel = &gg->current_display->cpanel;
-  cpanel->p1d.type = GPOINTER_TO_INT (cbd);
+  cpanel->p1d.type = gtk_combo_box_get_active(GTK_COMBO_BOX(w));
 
   display_tailpipe (gg->current_display, FULL, gg);
 }
 
 static gchar *selection_mode_lbl[] = {"Replace", "Insert", "Append", "Delete"};
-static void selection_mode_cb (GtkWidget *w, gpointer cbd)
-{
-  ggobid *gg = GGobiFromWidget(w, true);
+static void selection_mode_cb (GtkWidget *w, ggobid *gg)
+{;
   cpaneld *cpanel = &gg->current_display->cpanel;
-  cpanel->parcoords_selection_mode = GPOINTER_TO_INT (cbd);
+  cpanel->parcoords_selection_mode = gtk_combo_box_get_active(GTK_COMBO_BOX(w));
 }
 
 /*
@@ -104,38 +101,38 @@ cpanel_parcoords_make (ggobid *gg)
   vb = gtk_vbox_new (false, 0);
   gtk_box_pack_start (GTK_BOX (panel->w), vb, false, false, 0);
 
-  lbl = gtk_label_new ("Plot arrangement:");
+  lbl = gtk_label_new_with_mnemonic ("Plot _arrangement:");
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
   gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
 
-  opt = gtk_option_menu_new ();
+  opt = gtk_combo_box_new_text ();
+  gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), opt);
   gtk_widget_set_name (opt, "PCPLOT:sel_mode_option_menu");
-  gtk_container_set_border_width (GTK_CONTAINER (opt), 4);
+  //gtk_container_set_border_width (GTK_CONTAINER (opt), 4);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
     "When opening a new parallel coordinates display, arrange the 1d plots in a row or a column",
     NULL);
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
-  populate_option_menu (opt, arrangement_lbl,
-    sizeof (arrangement_lbl) / sizeof (gchar *),
-    (GtkSignalFunc) arrangement_cb, "GGobi", gg);
+  populate_combo_box (opt, arrangement_lbl, G_N_ELEMENTS(arrangement_lbl),
+    G_CALLBACK(arrangement_cb), gg);
 /*
  * option menu: selection mode
 */
   vb = gtk_vbox_new (false, 0);
   gtk_box_pack_start (GTK_BOX (panel->w), vb, false, false, 0);
 
-  lbl = gtk_label_new ("Selection mode:");
+  lbl = gtk_label_new_with_mnemonic ("_Selection mode:");
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
   gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
 
-  opt = gtk_option_menu_new ();
+  opt = gtk_combo_box_new_text ();
+  gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), opt);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
     "Selecting an unselected variable either replaces the variable in the current plot, inserts a new plot before the current plot, or appends a new plot after the last plot",
     NULL);
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
-  populate_option_menu (opt, selection_mode_lbl,
-    sizeof (selection_mode_lbl) / sizeof (gchar *),
-    (GtkSignalFunc) selection_mode_cb, "GGobi", gg);
+  populate_combo_box (opt, selection_mode_lbl, G_N_ELEMENTS(selection_mode_lbl),
+    G_CALLBACK(selection_mode_cb), gg);
 
 /*
  * option menu
@@ -143,19 +140,18 @@ cpanel_parcoords_make (ggobid *gg)
   vb = gtk_vbox_new (false, 0);
   gtk_box_pack_start (GTK_BOX (panel->w), vb, false, false, 0);
 
-  lbl = gtk_label_new ("Spreading method:");
+  lbl = gtk_label_new_with_mnemonic ("Sp_reading method:");
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
   gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
 
-  opt = gtk_option_menu_new ();
+  opt = gtk_combo_box_new_text();
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
     "Display either textured dot plots or average shifted histograms", NULL);
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
-  populate_option_menu (opt, type_lbl,
-    sizeof (type_lbl) / sizeof (gchar *),
-    (GtkSignalFunc) type_cb, "GGobi", gg);
+  populate_combo_box (opt, type_lbl, G_N_ELEMENTS(type_lbl),
+    G_CALLBACK(type_cb), gg);
   /*-- this should be set to the value of cpanel->p1d_type --*/
-  gtk_option_menu_set_history (GTK_OPTION_MENU (opt), DOTPLOT);
+  gtk_combo_box_set_active (GTK_COMBO_BOX(opt), DOTPLOT);
 
 /*
  * ASH smoothness
@@ -164,15 +160,16 @@ cpanel_parcoords_make (ggobid *gg)
   gtk_box_pack_start (GTK_BOX (panel->w), vbox,
     false, false, 0);
 
-  lbl = gtk_label_new ("ASH smoothness:"),
+  lbl = gtk_label_new_with_mnemonic ("ASH s_moothness:"),
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
   gtk_box_pack_start (GTK_BOX (vbox), lbl, false, false, 0);
 
   adj = gtk_adjustment_new (0.19, 0.02, 0.5, 0.01, .01, 0.0);
-  gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
-                      GTK_SIGNAL_FUNC (ash_smoothness_cb), gg);
+  g_signal_connect (G_OBJECT (adj), "value_changed",
+                      G_CALLBACK (ash_smoothness_cb), gg);
 
   sbar = gtk_hscale_new (GTK_ADJUSTMENT (adj));
+  gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), sbar);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
     "Adjust ASH smoothness", NULL);
   gtk_range_set_update_policy (GTK_RANGE (sbar), GTK_UPDATE_CONTINUOUS);
@@ -200,7 +197,7 @@ cpanel_parcoords_make (ggobid *gg)
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
   populate_option_menu (opt, showcases_lbl,
     sizeof (showcases_lbl) / sizeof (gchar *),
-    (GtkSignalFunc) showcases_cb, "GGobi", gg);
+    G_CALLBACK(showcases_cb), "GGobi", gg);
 */
 
 /*
@@ -222,7 +219,7 @@ cpanel_parcoords_make (ggobid *gg)
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
   populate_option_menu (opt, varscale_lbl,
     sizeof (varscale_lbl) / sizeof (gchar *),
-    (GtkSignalFunc) varscale_cb, "GGobi", gg);
+    G_CALLBACK(varscale_cb), "GGobi", gg);
 */
 
   gtk_widget_show_all (panel->w);
@@ -235,6 +232,23 @@ cpanel_parcoords_make (ggobid *gg)
 /*                   Resetting the main menubar                       */
 /*--------------------------------------------------------------------*/
 
+static const gchar* mode_ui_str = 
+"<ui>"
+"	<menubar>"
+"		<menu action='IMode'>"
+"			<menuitem action='DefaultIMode'/>"
+"			<separator/>"
+"			<menuitem action='Brush'/>"
+"			<menuitem action='Identify'/>"
+"		</menu>"
+"	</menubar>"
+"</ui>";
+
+const gchar *
+parcoords_mode_ui_get(displayd *dsp)
+{
+	return(mode_ui_str);
+}
 
 /*
   The useIds indicates whether the callback data should be integers
@@ -243,6 +257,7 @@ cpanel_parcoords_make (ggobid *gg)
   See scatmat_mode_menu_make and scatterplot_mode_menu_make.
  */
 
+#if 0
 GtkWidget *
 parcoords_imode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func,
   ggobid *gg, gboolean useIds)
@@ -291,6 +306,7 @@ parcoords_imode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func,
 
   return (imode_menu);
 }
+#endif
 
 /*--------------------------------------------------------------------*/
 /*                   End of main menubar section                      */  
@@ -309,6 +325,6 @@ cpanel_parcoords_set (displayd *display, cpaneld *cpanel, GtkWidget *panel, ggob
 
   w = widget_find_by_name (panel, "PCPLOT:sel_mode_option_menu");
 
-  gtk_option_menu_set_history (GTK_OPTION_MENU(w),
+  gtk_combo_box_set_active (GTK_COMBO_BOX(w),
                                cpanel->parcoords_selection_mode);
 }

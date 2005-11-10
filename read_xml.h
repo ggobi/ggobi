@@ -217,7 +217,7 @@ extern "C" {
 
   gboolean readXMLRecord(const xmlChar ** attrs, XMLParserData * data);
 
-  char * const intern(XMLParserData *, const char * const el);
+  gchar * intern(XMLParserData *, const char * el);
 
 #ifdef __cplusplus
 }

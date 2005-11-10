@@ -32,7 +32,7 @@
 #include "plugin.h"
 #endif
 
-extern const gchar *const GlyphNames[];
+extern const gchar * const GlyphNames[];
 
 
 void warning(const char *msg);
@@ -206,10 +206,10 @@ GGobi_setMissingValueIdentifier(MissingValue_p f)
 
 static const gchar * const DefaultRowNames = NULL;
 
-const gchar ** const
+const gchar * const *
 getDefaultRowNamesPtr()
 {
-  return((const gchar ** const) &DefaultRowNames);
+  return((const gchar * const *) &DefaultRowNames);
 }
 
 void
@@ -260,8 +260,9 @@ GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
       varpanel_clear(d, gg);
       GGOBI(data_release)(d, gg); 
       /* ?? */
-      submenu_destroy (gg->pmode_item);
-      submenu_destroy (gg->imode_item);
+	  gtk_ui_manager_remove_ui(gg->main_menu_manager, gg->mode_merge_id);
+      /*submenu_destroy (gg->pmode_item);
+      submenu_destroy (gg->imode_item);*/
   }
 
   d->input = desc;
@@ -520,13 +521,13 @@ GGOBI(getViewTypeName)(displayd *dpy)
 {
   gchar *val;
 
-  if(!GTK_IS_GGOBI_EXTENDED_DISPLAY(dpy)) 
+  if(!GGOBI_IS_EXTENDED_DISPLAY(dpy)) 
      return(NULL);
 
 /*
  or use gtk_type_name(GTK_OBJECT_TYPE(dpy))
  */
-  val = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(dpy))->treeLabel;
+  val = GGOBI_EXTENDED_DISPLAY_GET_CLASS(dpy)->treeLabel;
 
   return (val);
 }
@@ -625,11 +626,11 @@ GGOBI(getGlyphTypes)(int *n)
   return(glyphIds);
 }
 
-const gchar **const
+const gchar * const *
 GGOBI(getGlyphTypeNames)(gint *n)
 {
   *n = UNKNOWN_GLYPH - 1; /* -1 since we start at 1; starting at 0 now */
-  return ((const gchar **const) GlyphNames);
+  return ((const gchar * const *) GlyphNames);
 }
 
 
@@ -1081,7 +1082,7 @@ GGOBI(close)(ggobid *gg, gboolean closeWindow)
   val = ggobi_remove(gg) != -1;
 
   if(GGobi_getNumGGobis() == 0 && sessionOptions->info->quitWithNoGGobi) {
-      gtk_exit(0);
+      gtk_main_quit();
   }
 
   return(val);
@@ -1222,8 +1223,22 @@ const gchar *
 GGOBI(getPModeName)(int which)
 { 
   int n;
-  const gchar *const *names = GGOBI(getPModeNames)(&n);
+  const gchar *const *names;
+  
+  names = GGOBI(getPModeNames)(&n);
   return(names[which]);
+}
+
+const gchar *
+GGOBI(getPModeScreenName)(int which, displayd *display)
+{
+	if (which == EXTENDED_DISPLAY_PMODE) {
+		gchar *name;
+		GGOBI_EXTENDED_DISPLAY_GET_CLASS(display)->imode_control_box(
+			display, &name, display->ggobi);
+		return name;
+	}
+	return(GGOBI(getPModeName)(which));
 }
 
 gint
@@ -1253,8 +1268,18 @@ const gchar *
 GGOBI(getIModeName)(int which)
 { 
   int n;
-  const gchar *const *names = GGOBI(getIModeNames)(&n);
+  const gchar *const *names;
+  
+  names = GGOBI(getIModeNames)(&n);
   return(names[which]);
+}
+
+const gchar *
+GGOBI(getIModeScreenName)(int which, displayd *display)
+{
+	if (which == DEFAULT_IMODE)
+		return(GGOBI(getPModeScreenName)(display->cpanel.pmode, display));
+	return(GGOBI(getIModeName)(which));
 }
 
 const gchar *
@@ -1305,7 +1330,7 @@ GGOBI(getBrushColor)(ggobid *gg)
   return(gg->color_id);
 }
 
-const gchar *const 
+const gchar *
 GGOBI(getColorName)(gint cid, ggobid *gg, gboolean inDefault)
 {
   if(cid >= 0 && cid < gg->activeColorScheme->n) {
@@ -1471,19 +1496,19 @@ GGOBI(setPlotRange)(double *x, double *y, int plotNum, displayd *display, gboole
   tfmax.y = y[1];
 
   if (GTK_WIDGET_VISIBLE (display->hrule)) {
-    if (((gfloat) GTK_EXT_RULER (display->hrule)->lower != tfmin.x) ||
-        ((gfloat) GTK_EXT_RULER (display->hrule)->upper != tfmax.x))
+    if (((gfloat) GTK_RULER (display->hrule)->lower != tfmin.x) ||
+        ((gfloat) GTK_RULER (display->hrule)->upper != tfmax.x))
     {
-      gtk_ext_ruler_set_range (GTK_EXT_RULER (display->hrule),
+      GTK_RULER_set_range (GTK_RULER (display->hrule),
                                (gdouble) tfmin.x, (gdouble) tfmax.x);
     }
   }
 
   if (GTK_WIDGET_VISIBLE (display->vrule)) {
-    if (((gfloat) GTK_EXT_RULER (display->vrule)->upper != tfmin.y) ||
-        ((gfloat) GTK_EXT_RULER (display->vrule)->lower != tfmax.y))
+    if (((gfloat) GTK_RULER (display->vrule)->upper != tfmin.y) ||
+        ((gfloat) GTK_RULER (display->vrule)->lower != tfmax.y))
     {
-      gtk_ext_ruler_set_range (GTK_EXT_RULER (display->vrule),
+      GTK_RULER_set_range (GTK_RULER (display->vrule),
                                (gdouble) tfmax.y, (gdouble) tfmin.y);
     }
   }
@@ -1520,7 +1545,7 @@ GGOBI(raiseWindow)(int which, gboolean raiseOrIcon, gboolean up, ggobid *gg)
 
      for(i = start; i < end; i++) {
       display = (windowDisplayd *) g_list_nth_data(gg->displays, i);
-      if(GTK_IS_GGOBI_WINDOW_DISPLAY(display) == false)
+      if(GGOBI_IS_WINDOW_DISPLAY(display) == false)
         continue;
       if(raiseOrIcon) {
         if(up) 
@@ -1656,28 +1681,28 @@ GGOBI(removeNumberedKeyEventHandler)(ggobid *gg)
 
 #ifdef HAVE_GGOBI_CONFIG_H
 #include "config.h"
-static gchar *version_date = GGOBI_RELEASE_DATE;
-int GgobiVersionNumbers[] = {MAJOR_VERSION, MINOR_VERSION, PATCH_LEVEL};
-static gchar *version_string =  GGOBI_VERSION_STRING;
+static const gchar *version_date = GGOBI_RELEASE_DATE;
+static const int GgobiVersionNumbers[] = {MAJOR_VERSION, MINOR_VERSION, PATCH_LEVEL};
+static const gchar *version_string =  GGOBI_VERSION_STRING;
 #else
-static gchar *version_date = "October 10, 2000";
-int GgobiVersionNumbers[] = {-1,-1,-1};
-static gchar *version_string = "developer";
+static const gchar *version_date = "October 10, 2000";
+static const int GgobiVersionNumbers[] = {-1,-1,-1};
+static const gchar *version_string = "developer";
 #endif
 
-char * const 
+const char * 
 GGOBI(getVersionDate)()
 {
   return(version_date);
 }
 
-char * const 
+const char *  
 GGOBI(getVersionString)()
 {
   return(version_string);
 }
 
-int* const 
+const int*  
 GGOBI(getVersionNumbers)()
 {
   return(GgobiVersionNumbers);

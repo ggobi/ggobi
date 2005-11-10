@@ -185,9 +185,9 @@ histogram_draw (ggvisd *ggv, ggobid *gg)
   GtkWidget *da = D->da;
   gint ymax = da->allocation.height - 2*HISTOGRAM_VMARGIN -
     HISTOGRAM_GRIP_SPACE;
-  GtkStyle *style = gtk_widget_get_style (da);
-  gint lbearing, rbearing, strwidth, ascent, descent;
-
+  PangoLayout *layout = gtk_widget_create_pango_layout(da, NULL);
+  PangoRectangle rect;
+  
   if (D->pix == NULL)
     return;
   if (ggv->trans_dist.nels == 0)
@@ -233,49 +233,19 @@ histogram_draw (ggvisd *ggv, ggobid *gg)
     str = g_strdup_printf ("%s", "??");
   else
     str = g_strdup_printf ("%2.2f", trans_dist_max);
-  gdk_text_extents (
-#if GTK_MAJOR_VERSION == 2
-    gtk_style_get_font (style),
-#else
-    style->font,
-#endif
-    str, strlen (str),
-    &lbearing, &rbearing, &strwidth, &ascent, &descent);
-  gdk_draw_string (D->pix,
-#if GTK_MAJOR_VERSION == 2
-      gtk_style_get_font (style),
-#else
-      style->font,
-#endif
-    gg->plot_GC,
-    da->allocation.width - STR_HMARGIN - strwidth,
-    ascent + descent + STR_VMARGIN,
-    str);
+  layout_text(layout, str, &rect);
+  gdk_draw_layout(D->pix, gg->plot_GC, da->allocation.width - STR_HMARGIN - rect.width,
+  	STR_VMARGIN, layout);
   g_free (str);
 
   if (trans_dist_min == DBL_MAX)  /*-- not initialized -- why? --*/
     str = g_strdup_printf ("%s", "??");
   else
     str = g_strdup_printf ("%2.2f", trans_dist_min);
-  gdk_text_extents (
-#if GTK_MAJOR_VERSION == 2
-    gtk_style_get_font (style),
-#else
-    style->font,
-#endif
-    str, strlen (str),
-    &lbearing, &rbearing, &strwidth, &ascent, &descent);
-  gdk_draw_string (D->pix,
-#if GTK_MAJOR_VERSION == 2
-      gtk_style_get_font (style),
-#else
-      style->font,
-#endif
-    gg->plot_GC,
-    (gint) STR_HMARGIN/2,
-    ascent + descent + STR_VMARGIN,
-    str);
+  layout_text(layout, str, &rect);
+  gdk_draw_layout(D->pix, gg->plot_GC, (gint) STR_HMARGIN/2, STR_VMARGIN, layout);
   g_free (str);
+  g_object_unref(layout);
 
   draw_grip_control (ggv, gg);
 

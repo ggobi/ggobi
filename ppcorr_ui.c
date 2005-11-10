@@ -24,10 +24,10 @@
 static GtkWidget *window = NULL;
 static GtkWidget *control_frame;
 static GtkWidget *mbar;
-static GtkAccelGroup *cpp_accel_group;
+//static GtkAccelGroup *cpp_accel_group;
 
 static void
-hide_cb (GtkWidget *w ) {
+hide_cb (GtkAction *action, GtkWidget *window) {
   gtk_widget_hide (window);
 }
 
@@ -36,11 +36,28 @@ optimize_cb (GtkToggleButton  *w) {
   g_printerr ("optimize?  %d\n", w->active);
 }
 
+static const gchar* ui_str =
+"<ui>"
+"	<menubar>"
+"		<menu action='File'/>"
+"			<menuitem action='Close'/>"
+"		</menu>"
+"	</menubar>"
+"</ui>";
+
+static GtkActionEntry entries[] = {
+	{ "File", NULL, "_File" },
+	{ "Close", GTK_STOCK_CLOSE, "_Close", "<control>C", 
+		"Hide the projection pursuit window", G_CALLBACK(hide_cb)
+	}
+};
+static guint n_entries = G_N_ELEMENTS(entries);
+/*
 static GtkItemFactoryEntry menu_items[] = {
   { "/_File",         NULL,         NULL, 0, "<Branch>" },
   { "/File/Close",  
          "",         (GtkItemFactoryCallback) hide_cb,        0, "<Item>" },
-};
+};*/
 
 void
 ctourpp_window_open (ggobid *gg) 
@@ -49,31 +66,40 @@ ctourpp_window_open (ggobid *gg)
   GtkWidget *da, *label, *hb;
 
   if (window == NULL) {
-
+	GtkActionGroup *actions = gtk_action_group_new("PPActions");
+	GtkUIManager *manager = gtk_ui_manager_new();
+	
     window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-    gtk_signal_connect (GTK_OBJECT (window), "delete_event",
-                        GTK_SIGNAL_FUNC (hide_cb), (gpointer) NULL);
+    g_signal_connect (G_OBJECT (window), "delete_event",
+                        G_CALLBACK (hide_cb), (gpointer) NULL);
     gtk_window_set_title (GTK_WINDOW (window), "projection pursuit");
-    gtk_window_set_policy (GTK_WINDOW (window), true, true, false);
+    //gtk_window_set_policy (GTK_WINDOW (window), true, true, false);
     gtk_container_set_border_width (GTK_CONTAINER (window), 5);
 
 /*
  * Add the main menu bar
 */
     vbox = gtk_vbox_new (FALSE, 1);
-    gtk_container_border_width (GTK_CONTAINER (vbox), 1);
+    gtk_container_set_border_width (GTK_CONTAINER (vbox), 1);
     gtk_container_add (GTK_CONTAINER (window), vbox);
-
+/*
     cpp_accel_group = gtk_accel_group_new ();
     get_main_menu (menu_items, sizeof (menu_items) / sizeof (menu_items[0]),
                    cpp_accel_group, window, &mbar, (gpointer) window);
-    gtk_box_pack_start (GTK_BOX (vbox), mbar, false, true, 0);
+*/
+	
+	gtk_action_group_add_actions(actions, entries, n_entries, window);
+	gtk_ui_manager_insert_action_group(manager, actions, 0);
+	mbar = create_menu_bar(manager, ui_str, window);
+	g_object_unref(G_OBJECT(actions));
+	
+	gtk_box_pack_start (GTK_BOX (vbox), mbar, false, true, 0);
 
 /*
  * Divide the window:  controls on the left, plot on the right
 */
     hbox = gtk_hbox_new (false, 1);
-    gtk_container_border_width (GTK_CONTAINER (hbox), 1);
+    gtk_container_set_border_width (GTK_CONTAINER (hbox), 1);
     gtk_box_pack_start (GTK_BOX (vbox),
                         hbox, true, true, 1);
 
@@ -93,12 +119,12 @@ ctourpp_window_open (ggobid *gg)
 /*
  * Optimize toggle
 */
-    tgl = gtk_check_button_new_with_label ("Optimize");
+    tgl = gtk_check_button_new_with_mnemonic ("_Optimize");
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), tgl,
       "Guide the tour using projection pursuit optimization or tour passively",
       NULL);
-    gtk_signal_connect (GTK_OBJECT (tgl), "toggled",
-                        GTK_SIGNAL_FUNC (optimize_cb), (gpointer) NULL);
+    g_signal_connect (G_OBJECT (tgl), "toggled",
+                        G_CALLBACK (optimize_cb), (gpointer) NULL);
     gtk_box_pack_start (GTK_BOX (vbc),
                       tgl, false, false, 1);
 
@@ -112,8 +138,9 @@ ctourpp_window_open (ggobid *gg)
     gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
     gtk_box_pack_start (GTK_BOX (hb), label, false, false, 0);
 
-    entry = gtk_entry_new_with_max_length (32);
-    gtk_entry_set_editable (GTK_ENTRY (entry), false);
+    entry = gtk_entry_new ();
+	gtk_entry_set_max_length(GTK_ENTRY(entry), 32);
+    gtk_editable_set_editable (GTK_EDITABLE (entry), false);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), entry,
       "The value of the projection pursuit index for the current projection",
       NULL);
@@ -129,10 +156,8 @@ ctourpp_window_open (ggobid *gg)
                         frame, true, true, 1);
 
     da = gtk_drawing_area_new ();
-#if GTK_MAJOR_VERSION == 2
     gtk_widget_set_double_buffered(da, false);
-#endif
-    gtk_drawing_area_size (GTK_DRAWING_AREA (da), WIDTH, HEIGHT);
+    gtk_widget_set_size_request (GTK_WIDGET (da), WIDTH, HEIGHT);
     gtk_container_add (GTK_CONTAINER (frame), da);
   }
 

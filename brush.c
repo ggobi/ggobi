@@ -216,11 +216,11 @@ binning_permitted (displayd *display, ggobid *gg)
   if (gg->linkby_cv)
     return(false);
 
-  if(GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
+  if(GGOBI_IS_EXTENDED_DISPLAY(display)) {
      /* If there is a function to determine this, call it. Otherwise just 
         get the value of binning_ok in the class. */
-    GtkGGobiExtendedDisplayClass *klass;
-    klass = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(GTK_OBJECT(display)));
+    GGobiExtendedDisplayClass *klass;
+    klass = GGOBI_EXTENDED_DISPLAY_GET_CLASS(display);
     if(klass->binningPermitted)
        return(klass->binningPermitted(display));
     return(klass->binning_ok);
@@ -360,31 +360,29 @@ brush_boundaries_set (cpaneld *cpanel,
 void
 brush_draw_label (splotd *sp, GdkDrawable *drawable, datad *d, ggobid *gg)
 {
-  gint lbearing, rbearing, width, ascent, descent;
-  GtkStyle *style = gtk_widget_get_style (sp->da);
-
+  //gint lbearing, rbearing, width, ascent, descent;
+  //GtkStyle *style = gtk_widget_get_style (sp->da);
+  PangoRectangle rect;
+  PangoLayout *layout = gtk_widget_create_pango_layout(GTK_WIDGET(sp->da), NULL);
+  
   if (d->npts_under_brush > 0) {
     gchar *str = g_strdup_printf ("%d", d->npts_under_brush);
-    gdk_text_extents (
-#if GTK_MAJOR_VERSION == 2
+    layout_text(layout, str, &rect);
+	gdk_draw_layout(drawable, gg->plot_GC, 
+		sp->max.x - rect.width - 5, 5, layout);
+	/*gdk_text_extents (
       gtk_style_get_font (style),
-#else
-      style->font,
-#endif
       str, strlen (str),
       &lbearing, &rbearing, &width, &ascent, &descent);
     gdk_draw_string (drawable,
-#if GTK_MAJOR_VERSION == 2
       gtk_style_get_font (style),
-#else
-      style->font,
-#endif
       gg->plot_GC,
       sp->max.x - width - 5,
       ascent + descent + 5,
-      str);
+      str);*/
     g_free (str);
   }
+  g_object_unref(G_OBJECT(layout));
 }
 
 void
@@ -676,8 +674,8 @@ build_symbol_vectors (cpaneld *cpanel, datad *d, ggobid *gg)
   splotd *sp = gg->current_splot;
   displayd *display = (displayd *) sp->displayptr;
 
-  if (GTK_IS_GGOBI_EXTENDED_DISPLAY(display)) {
-    f = GTK_GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT_GET_CLASS(GTK_OBJECT(display)))->build_symbol_vectors; 
+  if (GGOBI_IS_EXTENDED_DISPLAY(display)) {
+    f = GGOBI_EXTENDED_DISPLAY_GET_CLASS(display)->build_symbol_vectors; 
     if(f)
       changed = f(cpanel, d, gg);
   }
@@ -760,8 +758,8 @@ active_paint_points (splotd *sp, datad *d, ggobid *gg)
 
   g_assert (d->pts_under_brush.nels == d->nrows);
 
-  if (GTK_IS_GGOBI_EXTENDED_SPLOT(sp)) {
-    f = GTK_GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT_GET_CLASS(GTK_OBJECT(sp)))->active_paint_points;
+  if (GGOBI_IS_EXTENDED_SPLOT(sp)) {
+    f = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp)->active_paint_points;
     if(f)
        d->npts_under_brush = f(sp, d, gg);
   }

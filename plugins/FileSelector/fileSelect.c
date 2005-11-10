@@ -110,13 +110,13 @@ show_fileselector(InputDescription *desc, ggobid *gg, GGobiPluginInfo *info)
     gtk_icon_file_selection_set_filter(GTK_ICON_FILESEL(w), "*.xml");
 
 
-    gtk_signal_connect (GTK_OBJECT (GTK_ICON_FILESEL(w)->ok_button), 
+    g_signal_connect (G_OBJECT (GTK_ICON_FILESEL(w)->ok_button), 
                      "clicked",
-		      GTK_SIGNAL_FUNC (ok_clicked), data);
+		      G_CALLBACK (ok_clicked), data);
 
-    gtk_signal_connect (GTK_OBJECT (GTK_ICON_FILESEL(w)->cancel_button), 
+    g_signal_connect (G_OBJECT (GTK_ICON_FILESEL(w)->cancel_button), 
                      "clicked",
-		      GTK_SIGNAL_FUNC (cancel_clicked), data);
+		      G_CALLBACK (cancel_clicked), data);
 
     gtk_widget_show(w);
 

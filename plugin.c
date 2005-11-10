@@ -15,6 +15,7 @@
 */
 
 #include "plugin.h"
+#include "externs.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -308,17 +309,30 @@ createPluginList()
    /* Number of entries here should be the same as in set_column_width below and 
       as the number of elements in addPlugin().
    */
-  static const gchar * const titles[] = {"Name", "Description", "Author", "Location", "Loaded", "Active"};
+  static gchar *titles[] = {"Name", "Description", "Author", "Location", "Loaded", "Active"};
+  static const gint widths[] = {100, 225, 150, 225, 50, 50};
+  
+  gint i;
   GtkWidget *list;
-  list = gtk_clist_new_with_titles(sizeof(titles)/sizeof(titles[0]), (gchar **) titles);
-
+  GList *cols, *l;
+  //list = gtk_clist_new_with_titles(sizeof(titles)/sizeof(titles[0]), (gchar **) titles);
+  GtkListStore *model = gtk_list_store_new(6, G_TYPE_STRING, G_TYPE_STRING,
+  	G_TYPE_STRING, G_TYPE_STRING, G_TYPE_BOOLEAN, G_TYPE_BOOLEAN);
+  
+  list = gtk_tree_view_new_with_model(GTK_TREE_MODEL(model));
+  populate_tree_view(list, titles, G_N_ELEMENTS(titles), true, GTK_SELECTION_SINGLE, NULL, NULL);
+  cols = gtk_tree_view_get_columns(GTK_TREE_VIEW(list));
+  
+  for (i = 0, l = cols; l; l = l->next, i++)
+	  gtk_tree_view_column_set_min_width(GTK_TREE_VIEW_COLUMN(l->data), widths[i]);
+  /*
   gtk_clist_set_column_width(GTK_CLIST(list), 0, 100); 
   gtk_clist_set_column_width(GTK_CLIST(list), 1, 225); 
   gtk_clist_set_column_width(GTK_CLIST(list), 2, 150); 
   gtk_clist_set_column_width(GTK_CLIST(list), 3, 225); 
   gtk_clist_set_column_width(GTK_CLIST(list), 4,  50); 
   gtk_clist_set_column_width(GTK_CLIST(list), 5,  50); 
-
+*/
   return(list);
 }
 
@@ -329,7 +343,7 @@ createPluginList()
 GtkWidget *
 showPluginInfo(GList *plugins, GList *inputPlugins, ggobid *gg)
 {
- GtkWidget *win, *main_vbox, *list;
+ GtkWidget *win, *main_vbox, *list, *lbl = NULL;
 
   win = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
@@ -343,14 +357,18 @@ showPluginInfo(GList *plugins, GList *inputPlugins, ggobid *gg)
   if(plugins) {
     list = createPluginList();
     addPlugins(plugins, list, gg, GENERAL_PLUGIN);
-    gtk_notebook_append_page(GTK_NOTEBOOK(main_vbox), list, gtk_label_new("General"));
+	lbl = gtk_label_new_with_mnemonic("_General");
+    gtk_notebook_append_page(GTK_NOTEBOOK(main_vbox), list, lbl);
   }
   if(inputPlugins) {
     list = createPluginList();
     addPlugins(inputPlugins, list, gg, INPUT_PLUGIN);
-    gtk_notebook_append_page(GTK_NOTEBOOK(main_vbox), list, gtk_label_new("Input Readers"));
+	lbl = gtk_label_new_with_mnemonic("_Input Readers");
+    gtk_notebook_append_page(GTK_NOTEBOOK(main_vbox), list, lbl);
   }
-
+  
+  if (lbl)
+	  gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), main_vbox);
 
   gtk_widget_show_all(main_vbox);
   gtk_widget_show(win);
@@ -429,6 +447,12 @@ addInputPlugin(GGobiPluginInfo *info, GtkWidget *list, ggobid *gg)
 void
 addPluginDetails(GGobiPluginDetails *info, GtkWidget *list, ggobid *gg, gboolean active)
 {
+	GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(list));
+	GtkTreeIter iter;
+	gtk_list_store_append(GTK_LIST_STORE(model), &iter);
+	gtk_list_store_set(GTK_LIST_STORE(model), &iter, 0, info->name, 1, info->description, 
+		2, info->author, 3, info->dllName, 4, info->loaded, 5, active, -1);
+	/*
   gchar **els = (gchar **) g_malloc(6*sizeof(gchar*));
   els[0] = info->name;
   els[1] = info->description;
@@ -438,7 +462,7 @@ addPluginDetails(GGobiPluginDetails *info, GtkWidget *list, ggobid *gg, gboolean
 
   els[5] = active ? "yes" : "no";
 
-  gtk_clist_append(GTK_CLIST(list), els);
+  gtk_clist_append(GTK_CLIST(list), els);*/
 }
 
 /**
@@ -612,9 +636,6 @@ checkDLL()
   f();
 }
 
-
-#include "externs.h"
-
 gchar *XMLModeNames[] = {"xml", "url"};
 GGobiInputPluginInfo XMLInputPluginInfo = {
 	NULL,
@@ -747,7 +768,7 @@ registerDefaultPlugins(GGobiInitInfo *info)
   info->inputPlugins = g_list_append(info->inputPlugins, plugin);
 }
 
-const gchar DefaultUnknownInputModeName[] =  "unknown";
+const gchar *DefaultUnknownInputModeName =  "unknown";
 
 GList *
 getInputPluginSelections(ggobid *gg)
@@ -755,39 +776,41 @@ getInputPluginSelections(ggobid *gg)
        GList *els = NULL, *plugins;
        GGobiPluginInfo *plugin;
        int i, n, k;
+	   gchar *buf;
 
-       els = g_list_append(els, (gpointer)DefaultUnknownInputModeName);
+       els = g_list_append(els, g_strdup(DefaultUnknownInputModeName));
        plugins = sessionOptions->info->inputPlugins;
        n = g_list_length(plugins);
        for(i = 0; i < n; i++) {
-           char buf[5000];
-	   plugin = g_list_nth_data(plugins, i);
-
-	   for(k = 0; k < plugin->info.i->numModeNames; k++) {
-/*XXX Need to free this. Catch destruction of the associated GtkList and free the elements of this list. */
-   	       sprintf(buf, "%s (%s)", plugin->info.i->modeNames[k], plugin->details->name);
-  	       els = g_list_append(els, g_strdup(buf));
-	   }
+		   plugin = g_list_nth_data(plugins, i);
+		   for(k = 0; k < plugin->info.i->numModeNames; k++) {
+			   buf = g_strdup_printf("%s (%s)", plugin->info.i->modeNames[k], plugin->details->name);
+			   els = g_list_append(els, buf);
+		   }
        }
 
        return(els);
 }
 
 GGobiPluginInfo *
-getInputPluginByModeNameIndex(gint which)
+getInputPluginByModeNameIndex(gint which, gchar **modeName)
 {
    gint ctr = 1, numPlugins, i; /* Start at 1 since guess/unknown is 0. */
    GList *plugins = sessionOptions->info->inputPlugins;
    GGobiPluginInfo *plugin;
 
-   if(which < ctr)
+   if(which == 0) {
+	  *modeName = g_strdup(DefaultUnknownInputModeName);
       return(NULL);
+   }
 
    numPlugins = g_list_length(plugins);
    for(i = 0; i < numPlugins ; i++) {
        plugin = g_list_nth_data(plugins, i);
-       if(which >= ctr && which < ctr + plugin->info.i->numModeNames)
+       if(which >= ctr && which < ctr + plugin->info.i->numModeNames) {
+		  *modeName = g_strdup(plugin->info.i->modeNames[which-ctr]);
           return(plugin);
+	   }
        ctr += plugin->info.i->numModeNames;
    }
    

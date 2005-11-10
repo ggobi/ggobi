@@ -20,20 +20,21 @@
 #include "ggobi.h"
 
 
-#define GTK_TYPE_GGOBI_SCATTER_SPLOT          (gtk_ggobi_scatter_splot_get_type())
-#define GTK_GGOBI_SCATTER_SPLOT(obj)	        (GTK_CHECK_CAST ((obj), GTK_TYPE_GGOBI_SCATTER_SPLOT, scatterSPlotd))
-#define GTK_GGOBI_SCATTER_SPLOT_CLASS(klass)	(GTK_CHECK_CLASS_CAST ((klass), GTK_TYPE_GGOBI_SCATTER_SPLOT, GtkGGobiScatterSPlotClass))
-#define GTK_IS_GGOBI_SCATTER_SPLOT(obj)	 (GTK_CHECK_TYPE ((obj), GTK_TYPE_GGOBI_SCATTER_SPLOT))
-#define GTK_IS_GGOBI_SCATTER_SPLOT_CLASS(klass) (GTK_CHECK_CLASS_TYPE ((klass), GTK_TYPE_GGOBI_SCATTER_SPLOT))
+#define GGOBI_TYPE_SCATTER_SPLOT          (ggobi_scatter_splot_get_type())
+#define GGOBI_SCATTER_SPLOT(obj)	        (G_TYPE_CHECK_INSTANCE_CAST ((obj), GGOBI_TYPE_SCATTER_SPLOT, scatterSPlotd))
+#define GGOBI_SCATTER_SPLOT_CLASS(klass)	(G_TYPE_CHECK_CLASS_CAST ((klass), GGOBI_TYPE_SCATTER_SPLOT, GGobiScatterSPlotClass))
+#define GGOBI_IS_SCATTER_SPLOT(obj)	 (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GGOBI_TYPE_SCATTER_SPLOT))
+#define GGOBI_IS_SCATTER_SPLOT_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GGOBI_TYPE_SCATTER_SPLOT))
+#define GGOBI_SCATTER_SPLOT_GET_CLASS(obj)  		(G_TYPE_INSTANCE_GET_CLASS ((obj), GGOBI_TYPE_SCATTER_SPLOT, GGobiScatterSPlotClass))
 
-GtkType gtk_ggobi_scatter_splot_get_type(void);
+GType ggobi_scatter_splot_get_type(void);
 
 
 typedef struct 
 {
-    GtkGGobiExtendedSPlotClass parent_class;
+    GGobiExtendedSPlotClass parent_class;
 
-} GtkGGobiScatterSPlotClass;
+} GGobiScatterSPlotClass;
 
 typedef  struct {
 
@@ -43,21 +44,23 @@ typedef  struct {
 
 
 
-#define GTK_TYPE_GGOBI_SCATTERPLOT_DISPLAY	 (gtk_ggobi_scatterplot_display_get_type ())
-#define GTK_GGOBI_SCATTERPLOT_DISPLAY(obj)	 (GTK_CHECK_CAST ((obj), GTK_TYPE_GGOBI_SCATTERPLOT_DISPLAY, scatterplotDisplayd))
-#define GTK_GGOBI_SCATTERPLOT_DISPLAY_CLASS(klass) (GTK_CHECK_CLASS_CAST ((klass), GTK_TYPE_GGOBI_SCATTERPLOT_DISPLAY, GtkGGobiScatterplotDisplayClass))
-#define GTK_IS_GGOBI_SCATTERPLOT_DISPLAY(obj)	 (GTK_CHECK_TYPE ((obj), GTK_TYPE_GGOBI_SCATTERPLOT_DISPLAY))
-#define GTK_IS_GGOBI_SCATTERPLOT_DISPLAY_CLASS(klass) (GTK_CHECK_CLASS_TYPE ((klass), GTK_TYPE_GGOBI_SCATTERPLOT_DISPLAY))
+#define GGOBI_TYPE_SCATTERPLOT_DISPLAY	 (ggobi_scatterplot_display_get_type ())
+#define GGOBI_SCATTERPLOT_DISPLAY(obj)	 (G_TYPE_CHECK_INSTANCE_CAST ((obj), GGOBI_TYPE_SCATTERPLOT_DISPLAY, scatterplotDisplayd))
+#define GGOBI_SCATTERPLOT_DISPLAY_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GGOBI_TYPE_SCATTERPLOT_DISPLAY, GGobiScatterplotDisplayClass))
+#define GGOBI_IS_SCATTERPLOT_DISPLAY(obj)	 (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GGOBI_TYPE_SCATTERPLOT_DISPLAY))
+#define GGOBI_IS_SCATTERPLOT_DISPLAY_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GGOBI_TYPE_SCATTERPLOT_DISPLAY))
+#define GGOBI_SCATTERPLOT_DISPLAY_GET_CLASS(obj)  		(G_TYPE_INSTANCE_GET_CLASS ((obj), GGOBI_TYPE_SCATTERPLOT_DISPLAY, GGobiScatterplotDisplayClass))
 
-GtkType gtk_ggobi_scatterplot_display_get_type();
-displayd *gtk_ggobi_scatterplot_display_new(gint type, gboolean missing_p, datad *d, ggobid *gg);
+
+GType ggobi_scatterplot_display_get_type();
+displayd *ggobi_scatterplot_display_new(gint type, gboolean missing_p, datad *d, ggobid *gg);
 
 typedef struct 
 {
-    GtkGGobiExtendedDisplayClass parent_class;
+    GGobiExtendedDisplayClass parent_class;
 
 
-} GtkGGobiScatterplotDisplayClass;
+} GGobiScatterplotDisplayClass;
 
 
 typedef struct {
@@ -67,8 +70,8 @@ typedef struct {
 } scatterplotDisplayd;
 
 
-void scatterSPlotClassInit(GtkGGobiScatterSPlotClass *klass);
-void scatterplotDisplayClassInit(GtkGGobiScatterplotDisplayClass *display);
+void scatterSPlotClassInit(GGobiScatterSPlotClass *klass);
+void scatterplotDisplayClassInit(GGobiScatterplotDisplayClass *display);
 void scatterplotDisplayInit(scatterplotDisplayd *display);
 
 
