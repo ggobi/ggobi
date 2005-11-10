@@ -462,7 +462,8 @@ write_xml_edge(FILE *f, datad *d, ggobid *gg, int i, XmlWriteInfo *xmlWriteInfo)
 void
 writeFloat(FILE *f, double value)
 {
-  fprintf(f, "%.3f", value);
+  /*fprintf(f, "%.3f", value);*/
+  fprintf(f, "%g", value); 
 }
 
 gboolean
