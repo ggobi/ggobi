@@ -1,4 +1,4 @@
-#include <ggobi.h>
+#include "ggobi.h"
 
 gint GGOBI(main)(gint argc, gchar *argv[], gboolean processEvents);
 

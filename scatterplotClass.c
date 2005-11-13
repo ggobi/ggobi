@@ -1191,7 +1191,6 @@ plottedVarsGet(displayd *display, gint *cols, datad *d, ggobid *gg)
     default:
     break;
   }
-  
   return(ncols);
 }
 

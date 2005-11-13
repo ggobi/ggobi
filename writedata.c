@@ -107,6 +107,7 @@ set_colv (gint *colv, gchar *rootname, datad *d, ggobid *gg)
 
     case SELECTEDCOLS:
       ncols = selected_cols_get (colv, d, gg);
+      fprintf(stderr, "%d\n", ncols);
       if (ncols == 0)
         ncols = plotted_cols_get (colv, d, gg);
       break;

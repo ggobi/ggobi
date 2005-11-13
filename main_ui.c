@@ -842,6 +842,7 @@ static const gchar *main_ui_str =
 "			<menuitem action='Open'/>"
 "			<menuitem action='New'/>"
 "			<menuitem action='Save'/>"
+"			<menu action='PreviousFiles'/>"
 "			<separator/>"
 "			<menuitem action='StoreSession'/>"
 #ifdef PRINTING_IMPLEMENTED
@@ -891,6 +892,7 @@ static GtkActionEntry entries[] = {
 	{ "Open", GTK_STOCK_OPEN, "_Open", NULL, "Open a datafile", G_CALLBACK(action_open_cb) },
 	{ "New", GTK_STOCK_NEW, "_New", NULL, "Create a new GGobi instance", G_CALLBACK(action_new_cb) },
 	{ "Save", GTK_STOCK_SAVE, "_Save", "<control>V", "Save some data", G_CALLBACK(action_save_cb) },
+	{ "PreviousFiles", NULL, "_Previous files" },
 	{ "StoreSession", GTK_STOCK_GOTO_BOTTOM, "Store session", NULL, "Save this GGobi session", 
 		G_CALLBACK(action_store_session_cb) 
 	},
@@ -998,7 +1000,6 @@ static GtkRadioActionEntry imode_entries[] = {
 
 GtkActionGroup *
 ggobi_actions_create(ggobid *gg) {
-	GtkAction *display_action;
 	GtkToggleActionEntry t_entries[] = { /* not global because depends on gg state */
 	{ "ShowTooltips", NULL, "Show _Tooltips", NULL, "Toggle display of helpful tips like this one", 
 		G_CALLBACK(action_toggle_tooltips_cb), GTK_TOOLTIPS(gg->tips)->enabled 
@@ -1018,8 +1019,12 @@ ggobi_actions_create(ggobid *gg) {
 		EXTENDED_DISPLAY_PMODE, G_CALLBACK(action_radio_pmode_cb), gg);
 	gtk_action_group_add_radio_actions(actions, imode_entries, G_N_ELEMENTS(imode_entries),
 		DEFAULT_IMODE, G_CALLBACK(action_radio_imode_cb), gg);
-	display_action = gtk_action_group_get_action(actions, "Display");
-	g_object_set(G_OBJECT(display_action), "hide_if_empty", false, NULL);
+	
+	g_object_set(G_OBJECT(gtk_action_group_get_action(actions, "Display")), 
+		"hide_if_empty", false, NULL);
+	g_object_set(G_OBJECT(gtk_action_group_get_action(actions, "PreviousFiles")), 
+		"hide_if_empty", false, NULL);
+	
 	return(actions);
 }
 GtkUIManager *
@@ -1099,7 +1104,7 @@ rebuilt? -- dfs */
 #ifdef SUPPORT_INIT_FILES
   if (sessionOptions->info && sessionOptions->info->numInputs > 0) {
     GtkWidget *w;
-    w = gtk_ui_manager_get_widget(gg->main_menu_manager, "/menubar/File");
+    w = gtk_ui_manager_get_widget(gg->main_menu_manager, "/menubar/File/PreviousFiles/");
     addPreviousFilesMenu(w, sessionOptions->info, gg);
   }
 #endif
@@ -1194,9 +1199,10 @@ void
 addPreviousFilesMenu(GtkWidget *parent, GGobiInitInfo *info, ggobid *gg)
 {
   gint i;
-  GtkWidget *el;
+  GtkWidget *el, *menu;
   InputDescription *input;
   if(info) {
+	 menu = gtk_menu_new(); 
     for(i = 0 ; i < info->numInputs ; i++) {
       input = &(info->descriptions[i].input);
       if(input && input->fileName) {
@@ -1205,8 +1211,10 @@ addPreviousFilesMenu(GtkWidget *parent, GGobiInitInfo *info, ggobid *gg)
                            G_CALLBACK(load_previous_file),
                            info->descriptions + i);
         GGobi_widget_set(el, gg, true);
-        gtk_menu_shell_insert(GTK_MENU_SHELL(parent), el, 3 + i + 1);
+        gtk_menu_shell_append(GTK_MENU_SHELL(menu), el);
       }
+	  gtk_widget_show_all(menu);
+	  gtk_menu_item_set_submenu(GTK_MENU_ITEM(parent), menu);
     }
   }
 }
