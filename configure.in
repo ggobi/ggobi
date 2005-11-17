@@ -13,7 +13,7 @@ dnl This also finds GTK2
 AC_INIT(src/ggobi.c)
 
 # Get the version information.
-. src/VersionInfo
+. VersionInfo
 
 TOP_DIR=`pwd`
 
@@ -98,8 +98,14 @@ else
  INSTALL_SRC_CFLAGS="-I${INSTALL_DIR}/include/ggobi"
  GGOBI_INSTALL_HOME="${INSTALL_DIR}/ggobi/"
 fi
-	
-GGOBI_HOME=`pwd`/
+
+dnl We need the Windows style path here for Inno
+if test "`uname`" = "MINGW32_NT-5.1"; then
+	GGOBI_HOME=`pwd -W`
+else
+	GGOBI_HOME=`pwd`
+fi
+
 echo "Install home: $GGOBI_INSTALL_HOME"
 
 AC_SUBST(LOCAL_INSTALL)
@@ -585,59 +591,6 @@ dnl    PLUGIN_DIRS="${PLUGIN_DIRS}  TestPlugin TestInput"
 dnl fi
 AC_SUBST(PLUGIN_DIRS)
 
-if test -n "$MYSQL_PLUGIN" ; then 
- mysql_xml=plugins/MySQL/plugin.xml
-else
- mysql_xml=/dev/null
-fi
-
-if test -n "$POSTGRES_PLUGIN" ; then 
- postgres_xml=plugins/Postgres/plugin.xml
-else
- postgres_xml=/dev/null
-fi
-
-if test -n "$DATAVIEWER_PLUGIN" ; then 
- dataviewer_xml=plugins/DataViewer/plugin.xml
-else
- dataviewer_xml=/dev/null
-fi
-
-if test -n "$FILESELECTOR_PLUGIN" ; then 
- fileselect_xml=plugins/FileSelect/plugin.xml
-else
- fileselect_xml=/dev/null
-fi
-
-if test -n "$GRAPHLAYOUT_PLUGIN" ; then 
- graphlayout_xml=plugins/GraphLayout/plugin.xml
-else
- graphlayout_xml=/dev/null
-fi
-
-if test -n "$GGVIS_PLUGIN" ; then 
- ggvis_xml=plugins/ggvis/plugin.xml
-else
- ggvis_xml=/dev/null
-fi
-
-testInput_xml=/dev/null
-testPlugin_xml=/dev/null
-
-dnl if test -n "${PLUGIN_DIRS}" ; then
-dnl  testInput_xml=plugins/TestInput/plugin.xml
-dnl  testPlugin_xml=plugins/TestPlugin/plugin.xml
-dnl fi
-
-AC_SUBST_FILE(mysql_xml)
-AC_SUBST_FILE(postgres_xml)
-AC_SUBST_FILE(dataviewer_xml)
-AC_SUBST_FILE(fileselect_xml)
-AC_SUBST_FILE(graphlayout_xml)
-AC_SUBST_FILE(ggvis_xml)
-AC_SUBST_FILE(testInput_xml)
-AC_SUBST_FILE(testPlugin_xml)
-
 if test "$prefix" = "NONE" ; then
  INSTALL_DIR=$ac_default_prefix
 else
@@ -648,7 +601,7 @@ AC_SUBST(INSTALL_DIR)
 
  dnl Process the different .in files, substituting the values computed here in the configuration
  dnl script for the corresponding @variable@ in these files.
-AC_OUTPUT(Makeconf GNUmakefile src/GNUmakefile bin/setLD.csh  bin/setLD.bsh bin/ggobi bin/ggobi-config bugTemplate share/ggobirc local.config share/tools/plugin ggobi.pc)
+AC_OUTPUT(Makeconf GNUmakefile src/GNUmakefile bin/setLD.csh  bin/setLD.bsh bin/ggobi bin/ggobi-config bugTemplate local.config plugin ggobi.pc win32/ggobi.iss)
 
 cp src/config.h include/GGobiConfig.h
 

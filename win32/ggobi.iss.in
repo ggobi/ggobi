@@ -12,7 +12,9 @@ DefaultDirName={pf}\ggobi
 DefaultGroupName=ggobi
 AllowNoIcons=yes
 ;AlwaysCreateUninstallIcon=yes
-LicenseFile=@GGOBI_HOME@LICENSING\license.txt
+LicenseFile=@GGOBI_HOME@/CPLicense.txt
+OutputBaseFilename=ggobi_@MAJOR_VERSION@.@MINOR_VERSION@-@PATCH_LEVEL@
+OutputDir=@GGOBI_HOME@/win32
 ; uncomment the following line if you want your installation to run on NT 3.51 too.
 ; MinVersion=4,3.51
 
@@ -20,32 +22,31 @@ LicenseFile=@GGOBI_HOME@LICENSING\license.txt
 Name: "desktopicon"; Description: "Create a &desktop icon"; GroupDescription: "Additional icons:"; MinVersion: 4,4
 
 [Files]
-Source: "@GGOBI_HOME@ggobi.exe"; DestDir: "{app}"; CopyMode: alwaysoverwrite
-Source: "@GGOBI_HOME@libs\*.*"; DestDir: "{app}"; CopyMode: alwaysoverwrite
-Source: "@GGOBI_HOME@data\*.*"; DestDir: "{app}\data"; CopyMode: alwaysoverwrite
-Source: "@GGOBI_HOME@notes\*.html"; DestDir: "{app}\Docs"; CopyMode: alwaysoverwrite
-Source: "@GGOBI_HOME@Install\ggobi.ico"; DestDir: "{app}"; CopyMode: alwaysoverwrite
-
-Source: "@GGOBI_HOME@tmp\ggobirc"; DestDir: "{app}"; CopyMode: alwaysoverwrite
-Source: "@GGOBI_HOME@notes\colorschemes.xml"; DestDir: "{app}\share"; CopyMode: alwaysoverwrite
-
-Source: "@GGOBI_HOME@*.h"; DestDir: "{app}\include"; CopyMode: alwaysoverwrite
-
-Source: "@GGOBI_HOME@plugins\ggvis\ggvis.dll"; DestDir: "{app}\plugins"; CopyMode: alwaysoverwrite
-Source: "@GGOBI_HOME@plugins\GraphAction\GraphAction.dll"; DestDir: "{app}\plugins"; CopyMode: alwaysoverwrite
-Source: "@GGOBI_HOME@plugins\ExcelReader\ExcelReader.dll"; DestDir: "{app}\plugins"; CopyMode: alwaysoverwrite
-
-Source: "@GGOBI_HOME@libggobi.a"; DestDir: "{app}\lib"; CopyMode: alwaysoverwrite
-Source: "@GGOBI_HOME@ggobi.dll"; DestDir: "{app}"; CopyMode: alwaysoverwrite
-Source: "@GGOBI_HOME@ggobi.def"; DestDir: "{app}\lib"; CopyMode: alwaysoverwrite
-
+; The binary
+Source: "@GGOBI_HOME@/bin\ggobi.bin"; DestDir: "{app}"; DestName: "ggobi.exe"; Flags: ignoreversion
+; Get the data
+Source: "@GGOBI_HOME@/data\*.*"; DestDir: "{app}\data"; Flags: ignoreversion
+; The docs
+Source: "@GGOBI_HOME@/Docs\*.*"; DestDir: "{app}\Docs"; Flags: ignoreversion
+; The icon, ggobirc, and colorshemes
+Source: "@GGOBI_HOME@/share\ggobi.ico"; DestDir: "{app}"; Flags: ignoreversion
+Source: "@GGOBI_HOME@\ggobirc"; DestDir: "{app}"; Flags: ignoreversion
+Source: "@GGOBI_HOME@/share\colorschemes.xml"; DestDir: "{app}\share"; Flags: ignoreversion
+; The headers and libs
+;Source: "@GGOBI_HOME@\include\*.h"; DestDir: "{app}\include"; Flags: ignoreversion
+;Source: "@GGOBI_HOME@/lib\libggobi.a"; DestDir: "{app}\lib"; Flags: ignoreversion
+Source: "@GGOBI_HOME@/lib\libggobi.dll"; DestDir: "{app}"; Flags: ignoreversion
+; Plugins [should this be hardcoded or on-the-fly?]
+;Source: "@GGOBI_HOME@/plugins\ggvis\ggvis.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
+;Source: "@GGOBI_HOME@/plugins\GraphAction\GraphAction.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
+;Source: "@GGOBI_HOME@/plugins\ExcelReader\ExcelReader.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
+;Source: "@GGOBI_HOME@/plugins\GraphLayout\GraphLayout.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
 
 [INI]
 Filename: "{app}\ggobi.url"; Section: "InternetShortcut"; Key: "URL"; String: "http://www.ggobi.org"
 
 [Icons]
-Name: "{group}\GGobi"; Filename: "{app}\ggobi.exe"; IconFilename: "{app}\ggobi.ico" ; WorkingDir: "{app}" ; Flags: runminimized
-
+Name: "{group}\GGobi"; Filename: "{app}\ggobi.exe"; IconFilename: "{app}\ggobi.ico" ; WorkingDir: "{app}" ;
 Name: "{group}\GGobi on the Web"; Filename: "{app}\ggobi.url"
 Name: "{userdesktop}\GGobi"; Filename: "{app}\ggobi.exe"; IconFilename: "{app}\ggobi.ico";  Tasks: desktopicon
 
@@ -55,7 +56,7 @@ Name: "{userdesktop}\ggobi"; Filename: "{app}\ggobi.exe";  MinVersion: 4,4; Task
 [Run]
 ; Must put the "" around the data file since otherwise app may get broken into
 ; multiple words such as c:\Program Files\data\flea.xml, counting as two arguments!
-Filename: "{app}\ggobi.exe"; Parameters: """{app}\data\flea.xml"""; Description: "Launch ggobi"; Flags: runminimized
+Filename: "{app}\ggobi.exe"; Parameters: """{app}\data\flea.xml"""; Description: "Launch ggobi";
 
 ; nowait postinstall skipifsilent
 

@@ -1,0 +1,71 @@
+#!/bin/sh
+
+#
+# Script for building and querying GGobi plugins.
+#
+
+
+GGOBI_HOME=${GGOBI_HOME-@GGOBI_HOME@}
+export GGOBI_HOME
+
+GGOBI_CONFIG=${GGOBI_HOME}/bin/ggobi-config
+export GGOBI_CONFIG
+
+MAKE=${MAKE-make}
+
+VERBOSE=0
+
+STANDARD_PLUGIN_MAKEFILE="-f ${GGOBI_HOME}/plugins/GNUmakefile.plugin"
+
+INSTALL_DIR=/usr/local/ggobi
+
+while test "$1" != "" ; do
+ case "$1" in 
+ --objects) TARGET="objects" ; shift ;;
+ -plugin) PLUGIN="$2" ; shift ; shift ;;
+ --no-std) STANDARD_PLUGIN_MAKEFILE="" ; shift ;;
+ --plugin) PLUGIN=`echo $1 | sed -e s/.*=//g` ; shift ;; 
+ --verbose) VERBOSE=1 ; shift;;
+ --install) INSTALL=1 ; shift;;
+ --install=*) INSTALL=1; INSTALL_DIR=`echo $1 | sed -e s/.*=//g` ; shift ;; 
+ *)  if test -z "${PLUGIN}" ; then
+       PLUGIN=${1-TestPlugin}
+     else 
+       ARGS="$ARGS $1" 
+     fi ;
+     shift ;;
+     
+ esac
+done
+
+if test -n "${INSTALL}" ; then
+ TARGET=install
+else
+if test -z "${TARGET}" ; then
+ TARGET=${PLUGIN}.so
+fi
+
+fi # end of test -n "${INSTALL}"
+
+plugin_dir=$GGOBI_HOME/plugins/$PLUGIN
+
+if test -r ${plugin_dir}/Makevars ; then
+ MAKE_VARS="-f ${plugin_dir}/Makevars" 
+else
+ if test -r ${plugin_dir}/GNUmakefile ; then
+  MAKE_VARS="-f ${plugin_dir}/GNUmakefile"
+ elif test -r ${plugin_dir}/makefile ; then
+  MAKE_VARS="-f ${plugin_dir}/makefile"
+ elif test -r ${plugin_dir}/Makefile ; then
+  MAKE_VARS="-f ${plugin_dir}/Makefile"
+ fi
+fi
+
+ARGS="${ARGS} PLUGIN_NAME=${PLUGIN}"
+
+if test "${VERBOSE}" != "0" ; then
+  echo "$MAKE ${MAKE_VARS} ${STANDARD_PLUGIN_MAKEFILE} -C $plugin_dir ${TARGET} $ARGS"
+fi
+
+$MAKE ${MAKE_VARS} ${STANDARD_PLUGIN_MAKEFILE} -C $plugin_dir ${TARGET} $ARGS
+

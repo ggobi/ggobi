@@ -140,8 +140,11 @@ installPlugins:
 
 endif
 
+win32-installer: all ggobirc
+	iscc win32/ggobi.iss
+	
 clean:
-	for f in src ; do \
+	for f in src gtkext/src ; do \
 	  $(MAKE) -C $$f clean ; \
 	done
 
