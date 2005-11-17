@@ -2,4 +2,5 @@ Most of the GGobi code was written by Debby Swayne, Di Cook and Duncan
 Temple Lang and Andreas Buja.  Nicholas Lewin-Koh has provided a great
 deal of help and wrote the primary version the time series displays.
 Heike Hoffman provided the primary version of the barchart displays
-while at AT&T and then at Iowa State.
+while at AT&T and then at Iowa State. Michael Lawrence fully upgraded
+the GUI to GTK2.

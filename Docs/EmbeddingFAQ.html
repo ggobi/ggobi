@@ -40,16 +40,16 @@
       variable panel
        window. How can I do that?
   <dd> You can get access to the menu and all its sub-items
-       via the field <i>main_menu_factory</i>
+       via the field <i>main_menu_manager</i>
        object in the <i>ggobid</i> structure. This is a reference to a
-       <a href="http://www.gtk.org/doc/API/gtk/gtkitemfactory.html"><i>GtkItemFactory</i></a>
+       <a href="http://developer.gnome.org/doc/API/2.0/gtk/GtkUIManager.html"><i>GtkUIManager</i></a>
        object  and one can use it to find the different elements. For
       example, in the Python interface to ggobi, we add a Suspend
       button to the <b>File</b> menu in the following way:
 <pre>
-  menu = GTK_MENU(gtk_item_factory_get_widget(gg->main_menu_factory, "/File"));
+  menu = GTK_MENU(gtk_ui_manager_get_widget(gg->main_menu_manager, "/File"));
   suspend = gtk_menu_item_new_with_label ("Suspend");
-  gtk_menu_append( GTK_MENU(menu), suspend);      
+  gtk_menu_shell_append( GTK_MENU_SHELL(menu), suspend);      
 </pre>
        You can use this to get a reference to the different widgets
       in the menu (i.e. menu items, menus and sub-menus, etc.)
@@ -83,6 +83,6 @@
 <address><a href="http://cm.bell-labs.com/stat/duncan">Duncan Temple Lang</a>
 <a href=mailto:duncan@research.bell-labs.com>&lt;duncan@research.bell-labs.com&gt;</a></address>
 <!-- hhmts start -->
-Last modified: Tue Nov 23 16:51:50 PST 2004
+Last modified: Sun Nov 13 12:31:50 CST 2005
 <!-- hhmts end -->
 </body> </html>

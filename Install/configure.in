@@ -304,7 +304,7 @@ dnl  fi
    fi
  else 
   if test -z "${XML_CONFIG}" ; then
-   AC_PATH_PROG(XML_CONFIG, xml2-config)
+   XML_CONFIG="${PKG_CONFIG} libxml-2.0"
   
    if test -z "${XML_CONFIG}" ; then
      AC_PATH_PROG(XML_CONFIG, xml-config)

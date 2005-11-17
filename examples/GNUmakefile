@@ -1,10 +1,10 @@
-GTK_CONFIG=gtk-config
+
 
 ifdef FOOEY
 GGOBI_CONFIG=ggobi-config
 
 CFLAGS=$(shell $(GGOBI_CONFIG) --cflags)
-LIBS=$(shell $(GGOBI_CONFIG) --libs) $(shell $(GTK_CONFIG) --libs)
+LIBS=$(shell $(GGOBI_CONFIG) --libs)
 
 else
 

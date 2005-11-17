@@ -3,308 +3,94 @@
 <body>
 <h1>Building GGobi on Windows from Source</h1>
 
-This document attempts to explain how to build GGobi for Windows.  It
-is intended for pepole working from the current tar.gz file or CVS
-repository (either directly or via rsync), although this latter
-approach is problematic lately.
+This document attempts to explain how to build GGobi (>= 2.0) for Windows. It 
+assumes that the reader is reasonably familiar with building packages in linux.
 
-<h2>Getting the latest ggobi.tar.gz: </h2> You can go to the <a
+<h2>Setup</h2>
+
+<h3>Required tools and libraries:</h3> To quickly obtain the necessary
+elements for building GGobi on Windows, get the GGobiWindowsDevPack. It has
+everything that is required, and it should be kept up to date.
+
+<h3>MinGW:</h3> The tools we use to build the GGobi distribution depend
+on having the <a href="http://www.mingw.org">MinGW/MSYS tools</a>
+installed (from the pack).  MinGW is Minimalist GNU for Windows, 
+essentially gcc for Windows. MSYS is a build environment for MinGW. For MinGW, 
+there are options within the installation that allow you to customize which 
+packages are installed (this can also be done after the initial installation). 
+Be sure that you include the gcc-core and g77 (if you want to build Rggobi) 
+packages. You may also want the 
+<a href="http://prdownloads.sourceforge.net/mingw/msysDTK-1.0.1.exe?download">MSYS DTK</a> 
+for tools like autoconf. If you plan to build R packages, make sure that you do 
+not install Perl from this package, because it conflicts with R's build system,
+which requires ActivePerl. Go ahead and install MinGW and MSYS now.
+
+<h3>Setting up the build directories:</h3> Unzip the build.zip file in the pack.
+This file assumes you unzipped it to the root directory of your <code>C:</code> drive.
+The zip file contains all the necessary libraries and other necessities and creates
+a nice UNIXish directory structure.
+
+<h3>Getting the latest ggobi.tar.gz:</h3> You can go to the <a
 href="http://www.ggobi.org/Download"> ggobi web site </a> and download
-the latest version of the tar.gz file. Unzip it (to tar and then to
-ggobi). You can use Winzip, or if you have cygwin already installed
-the usual gunzip and tar unix commands can be used.
+the latest version of the tar.gz file. Place it in <code>/c/build/src</code>.
+Start MSYS, change to <code>/c/build/src</code> and untar the archive.
 
-<h2>Cygwin:</h2> The tools we use to build the GGobi distribution are
-based on having the <a href="http://www.cygwin.com">Cygnus tools</a>
-installed.  This is a relatively painless installation: go to the web
-site and click on the "<i>Install Now</i>" icon near the top of the
-page.  It is important to ensure that you have the necessary
-development tools such as GNU make.  There are options within the
-installation that allow you to customize which packages are installed
-and this can be done after the initial installation. Be sure that you
-get a full developers installation. Some of the tools may not be
-installed by default, eg autoconf, but you can come back to this site
-and install the missed pieces at any time.
+<h3>Path setup:</h3>
+Add <code>/c/build/bin</code> to your PATH variable.
 
-<h2>Installing all the development packages:</h2> Get supporting
-development files from <a
-href="http://www.public.iastate.edu/~dicook/ggobi/ggobi-developers-pack.tar.gz">
-Di Cook's web site </a>.  Unpack this into a temporary directory.
+<h2>Compilation:</h2> Change to <code>/c/build/src/ggobi</code>. Type
+<code>./configure --enable-local</code> and then <code>make</code>.
 
-<h2>MingW</h2> is minimalist GNU for windows. It has several useful
-utilities and libraries which enable us to use Unix/Linux style
-program.  The setup file is MinGW-2.0.0-3.exe, and it should create a
-directory C:/MinGW.
-
-<P>To enable using of bin programs in MingW, you need to modify path in
-the profile in Cygwin. Open the profile file under "etc" directory in
-Cygwin, and add path of MingW bin directory.
-
-<P><PRE>PATH="/cygdrive/c/mingw/bin:/usr/local/bin:/usr/bin:/bin:$PATH"</PRE>
-
-<h2>Notes on Gcc versions:</h2>
-The Gtk, Glib, etc. libraries from Tor Lillqvist must be used with gcc
-2.95 or Visual C++.  It appears that you cannot use gcc 3.*.  This is
-indicated by a run-time error which states that the definition of
-GtkWindow is different (between the header files and the run-time
-engine) and that one probably needs to re-compiled using the
--fnative-struct argument.  Gcc 3.* doesn't support that argument.
-Using gcc 2.95 works fine for me. Just specify the explicit location
-of the GCC compiler by giving its value in the definition of the CC
-make variable (either in local.config or Makefile.win)
-
-<h2>Installing Gcc:</h2> Unzip gcc-2.95.2-1-msvcrt.zip and copy the
-pieces into the MingW directory.
-
-<P>Note: gcc-2.95.2.-1-msvcrt.zip consists of four directories, bin,
-i386-mingw32msvc, include, and lib, which already exist in MingW
-directory; therefore, you need to overwrite files in the bin, include,
-and lib directories. There are newer versions of gcc but ggobi cannot
-be compiled with these yet.
- 
-<h2>Installing libxml2 library:</h2>
-Unzip the file libxml2-2.6.6.win32.zip into the directory
-C:/GGobiLibs. The directory name GGobiLibs can be changed to whatever
-you want to call it, but the you'll need to use this new name
-everywhere that we use GGobiLibs in these instructions.
-
-<h2>Installing libintl library:</h2>
-Unzip the file libintl-0.10.40-tml-20020904.zip into the directory,
-C:/GGobiLibs.
-
-<h2>Installing libiconv library:</h2>
-Unzip the libiconv-1.8-w32-1.bin.zip into the directory, C:/GGobiLibs.
-
-<h2>Installing GTK libraries:</h2>
-Unzip the files gtk+-dev-1.3.0-20030115.zip, gtk+-1.3.0-20030717.zip,
-into the directory, C:/GGobiLibs.
-
-<h2>Installing glib libraries:</h2>
-Unzip the files glib-dev-2.2.3-20040116.zip, glib-2.2.3-20040116.zip
-into the directory, C:/GGobiLibs.
-
-<h2>Installing zlib libraries:</h2>
-Unzip the file zlib-1.1.4.win32.zip into the directory, C:/GGobiLibs.
-
-<P>Now the C:/GGobiLibs directory structure should look like
-
-<PRE>
-C:/GGobiLibs/
-               bin
-               etc
-               include
-               lib
-               libiconv-1.8-w32-1.bin
-               libxml2-2.6.6.win32
-               zlib-1.1.4.win32         
-               man
-               share
-</PRE>
-
-<h2>Compilation:</h2>
-
-<P>Create folder name Install in ggobi/src and copy ggobi/src/config.h.in
-into that folder.
-
-<P>There should be a Makefile.win32 file available in the src
-directory. This is the file that will control the make. It may need to
-be updated for each new release of ggobi. Right now there is a
-Makefile.win32 which matches the latest ggobi-xml.1.0-1-beta.ta.gz.
-
-<P>Copy the local.config file from the ggobi-developers-pack directory
-into ggobi/src.  (Change this line to
-<PRE>DOWNLOAD_DIR=C:\users\aashish\projects\Win32\april09\GGobiLibs</PRE>
-to the location where you have GGobiLibs folder )
-
-<P>Copy the files developerConfigure.in, s_erf.c, ggobiMain.c,
-ggobi.def from the ggobi-developers-pack directory into
-ggobi/src. (These files are missing from the tar.gz, or ggobi.def is
-needed for Windows compilation to be able to call functions from dlls,
-but its is incomplete or missing from the tar.gz!)
-
-<P>Copy all the dlls from ggobi-developers-pack/dlls to ggobi/src/.
-
-<P>The final step is to type <PRE>make -f Makefile.win32</PRE>
-
-<P>If you have trouble send email to ggobi-help@ggobi.org, complete with
-the error messages you got in the cygwin window. We'll aim to help as
+<P>If you have trouble send an <a href="mailto:ggobi-help@ggobi.org">email</a>, 
+complete with the error messages you got in the MSYS window. We'll aim to help as
 possible.
-
-<h2>Run-time Paths</h2>
-You need to add the different directories containing
-the necessary DLLs to your PATH.
-
-export PATH=$PATH:${DOWNLOAD_DIR}/lib:$${LIB_XML}/lib:${LIB_ICONV}
 
 <h2>Building the Self-installing Executable</h2>
 
 <h3>Inno Installer</h3>
 To create the self-installing GGobi executable, you will need to
-download Inno from 
-<a href="http://www.jrsoftware.org/">http://www.jrsoftware.org/</a>
+<a href="http://www.jrsoftware.org/">download</a> Inno. Make sure that
+<code>iscc.exe</code> (the Inno compiler) is on your path.
 
-There is a ggobi.iss file in the ggobi-developers-pack directory. Copy
-this to the Install directory. The the following should work. If it
-doesn't then you can directly build the self-installing executable
-from Inno, using the Build/Run (test out the installer) and Compile
-(make it) menus.
-
-Then
-you will need to prepare the files that will be put into the
-installer.  The make target <i>installer</i> takes care of this for
-you.
-<pre>
- make -f Makefile.win32 installer
-</pre>
-This builds pretty much everything that goes into the installer:
-ggobi.exe, libggobi.dll, libggobi.a,
-
-<p/>
-Then finally, you can build the installer by starting the INNO
-tool, loading Install/ggobi.iss and selecting the Compile menu item.
-The resulting installer is placed in the directory
-<code>Install/Output/</code> and named <b>setup.exe</b>.
-
-<h3>What does <i>make -f Makefile.win32 installer</i> do?</h3>
-Just for the record, what the <i>installer</i> target does
-is as follows.
-
-We create the input file for INNO.
-You do this via the command 
-<pre>
- make -f Makefile.win32 Install/ggobi.iss
-</pre>
-This copies the ggobi.iss.in file in the Install/ directory to
-Install/ggobi.iss and then replaces the string @GGOBI_HOME@ with the
-current directory.  It also replaces the name of the directory
-expected to contain the libraries (i.e. the DLLs) that will be shipped
-with GGobi, including the 3<sup>rd</sup>-party ones you downloaded
-previously.  
-
-<p/>
-These libraries are placed into the libs/ directory within
-the current working directory.  The next step is to create this
-directory and copy the libraries there so they can be put in the
-installer's executable.  
-This step is  done via
-the command
-<pre>
- make -f Makefile.win32 libs
-</pre>
-
-</p>
-And finally <i>installer</i> creates libggobi.a and libggobi.dll.
+<p>Run <code>make win32-installer</code> to build the setup executable.
 
 <h2>Plugins:</h2>
 
-Go into the plugin directory that you want to make, and hack the
-appropriate Makefile.win32 file. An example for ggvis is provided in
-the ggobi-developers-pack. Its ugly, but it should work. 
+You should be able to simply do a <code>./configure</code> and <code>make</code> 
+in the plugin directory. You can also make plugins using the ggobi build system.
+Note that some of the plugins require additional libraries.
 
 <P> The next step is to edit the ggobirc file, and put it in a
 location that ggobi will look at so that the plugin will be loaded.
 
-<h2>Building RGGobi on Windows:</h2>
+<h1>Building RGGobi on Windows:</h1>
 
 <p>Follow the instructions for building ggobi on Windows in the ggobi
-distribution files. You'll at least need to have the same development
-environment set up as this.
+distribution files. You'll at least need the same development
+environment.
 
-<P>Download RGtk for windows from <a
-  href="http://www.omegahat.org/RGtk/Windows/">
-  http://www.omegahat.org/RGtk/Windows/</a> (It is dated March 2003.)
-  and install it using the R menu item "Packages", "...from local zip
-  files".  I'm using R-1.9.1.
+<h2>Obtain necessary files</h2>
+<a href="http://www.ggobi.org/Download">Download</a> the latest Rggobi and 
+unpack it into <code>/c/build/src</code>.
 
-<P>Download the Rggobi_1.0.0.tar.gz file from the GGobi web site <a
-  href="http://www.ggobi.org/Download"> http://www.ggobi.org/Download
-  </a> and unpack it into a directory, eg, C:/GGobi, where
-  C:/GGobi/ggobi contains the GGobi binary and src files, etc.
+<p>The R build system requires <a href="http://www.activestate.com/store/languages/register.plex?id=ActivePerl">ActivePerl</a>.
+Make sure it (<code>/c/perl</code>) is on your path.
+<p>In order to build Windows help for the documentation, you need <code>hhc.exe</code>
+from the <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/htmlhelp/html/hwMicrosoftHTMLHelpDownloads.asp">HTML Help Workshop</a>
+on your path. Yes, I know it's from Microsoft, but you need it.
 
-<p>Create a local.config file containing the lines:
-
+<h2>Build the binary R package</h2>
+Enter the <code>Rggobi2</code> directory and run <code>./configure</code>.
+<p>Now you have to hack the <code>build</code> perl script in the <code>R/bin</code>
+directory so that it doesn't prefix <code>cygwin</code> to paths when running tar.
+<p>Finally, make sure R is on your path, and in the parent directory, run:
 <PRE>
-RGTK_DIR=C:/GGobi/RGtk/src
-RS_COMMON_H=$(RGTK_DIR)/RSCommon.h
-RGTK_SRC_DIR=$(RGTK_DIR)
-
-R_HOME=C:/Program\ Files/R/rw1091
+  Rcmd build --binary Rggobi2
 </PRE>
 
-Edit the directory lines in the file Makefile.win, eg
+<h2>Installing the package</h2>
 
-<PRE>
-# The directory in which the ggobi.h and other header 
-# files are to be found.
-GGOBI_INCLUDE_DIR=../../ggobi/include
-# Where the libggobi.a. 
-GGOBI_LIB_DIR=../../ggobi/src
-
-DOWNLOAD_DIR=C:/GGobiLibs
-LIB_ICONV=${DOWNLOAD_DIR}/libiconv-1.8-w32-1.bin
-LIB_XML=${DOWNLOAD_DIR}/libxml2-2.6.6.win32
-
-XML_INC_DIRS=${LIB_XML}/include
-XML_LIB_DIRS=${LIB_XML}/lib
-
-DOWNLOAD_INCLUDES=include include/glib-2.0 lib/gtk+ lib/glib-2.0 lib/glib-2.0/include lib/gtk+/include
-LIB_DIRS=$(DOWNLOAD_DIR)/lib
-INCLUDES=${DOWNLOAD_INCLUDES:%=${DOWNLOAD_DIR}/%} ${LIB_ICONV}/
-GTK_INCLUDES=${DOWNLOAD_INCLUDES:%=${DOWNLOAD_DIR}/%} ${LIB_ICONV}/
-
-GTK_LIB_DIRS=$(LIB_DIRS)
-GTK_LIBS=$(GTK_LIB_DIRS:%=-L%) -lgdk -lgtk -lglib-2.0
-
-R_HOME=C:/Program\ Files/R/rw1091
-</PRE>
-
-I changed all the RHOME to R_HOME references in this file also, eg
-
-<PRE>
-PKG_LIBS=-L$(GGOBI_LIB_DIR) -lGgobi $(GTK_LIBS) $(XML_LIBS)
-DLLLIBS=-L$(R_HOME)/src/gnuwin32 $(PKG_LIBS) -L$(R_HOME)/bin -lR
-</PRE>
-
-In cygwin, switch to the Rggobi/src directory, and type
-
-<PRE>  make -f Makefile.win </PRE>
-
-You should now have an Rggobi.dll file in the src directory.
-
-<h3>Building the R package for distribution:</h3>
-
-<P>Follow the instructions in Ko-Kang Wang's notes on R for Windows
-(in the contributed documentation on the <a
-href="http://www.R-project.org web site"> http://www.R-project.org web
-site </a>).
-
-The instructions for installing R suggest many packages need to be
-installed. I needed to install Perl, and make sure that cygwin had a
-copy of zip installed.
-
-I needed to put the directory where Perl is installed into my PATH
-variable, file C:/cygwin/etc/profile:
-
-<PRE>
-  PATH="/cygdrive/c/Perl:/cygdrive/c/Perl/bin:/cygdrive/c/Program Files/R/rw1091:/cygdrive/c/Program Files/R/rw1091/share/perl:/cygdrive/c/Program Files/R/rw1091/bin:/cygdrive/c/mingw/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
-
-  R_HOME="/cygdrive/c/Program Files/R/rw1091"
-  export R_HOME
-</PRE>
-
-Now you should be able to build the zip file in a cygwin window. Be
-sure that you are in the parent directory for the Rggobi files.
-
-<PRE>
-  Rcmd build --binary Rggobi
-</PRE>
-
-<h3>Installing the package</h3>
-
-<P>Copy the dlls from the Rggobi and the ggobi directories into the R bin
-directory, C:\Program Files\R\rw1091\bin. 
-
-<P>Install the Rggobi package using the R menu for installing packages.
+Install the Rggobi package using the R menu for installing packages.
 
 <P>You should be ready to start it up:
 
@@ -314,5 +100,4 @@ directory, C:\Program Files\R\rw1091\bin.
 </PRE>
 
 <hr>
-<P> (These notes are the combined effort of Duncan Temple Lang, Nicholas
-Lewin-Koh, Di Cook, Aashish Chaudhary.)
+<P> These notes are by Michael Lawrence.

@@ -1,3 +1,107 @@
+November 2005
+
+Writing selected variables to XML now falls back to those in current plot.
+
+Modified main build system to work on Windows.
+
+October 2005 (Michael)
+
+Redesigned the menu management system. Instead of manually creating menus for
+things like the modes on the fly, I employed the GtkUIManager that allows one to
+merge and unmerge UI elements specified as XML and driven by GtkActions. This
+makes things a little cleaner, even though some menus like "Display" and the
+"Edges" scatterplot menu are still manually constructed. Now that the actions
+are factored nicely it would be easy to express them in ways besides menus, like
+toolbars. This also makes the radio indicators show up in the menus on my system
+(they were missing in the original GTK2 build). I'm running the latest version
+of GTK.
+
+Redesigned the splot layout mechanism. The original version required specifying
+the dimensions of an splot. In the case of displays with multiple plots, this
+required explicitly resizing plots when the number of plots or the size of the
+window changed. This design was not really in the "spirit" of the GTK layout
+paradigm and required the use of deprecated functions (they were deprecated in
+an effort to discourage such schemes). The new design gives a default size to a
+display and then just lets GTK handle the sizing of the component plots. This
+seems to work great. It prevents ugly things like being able to shrink a display
+so that the menubar is no longer visible and greatly simplifies the layout of
+multiple plots.
+
+All text rendering is now anti-aliased and based on UTF8 (via Pango). I was
+successful in translating the variables in a dataset to Korean and the Korean
+script was correctly displayed throughout GGobi.
+
+The GUI is now much more easily navigable from the keyboard. Most buttons,
+labeled entries, notebook tabs, etc now have mnemonics.
+
+Added the imode and pmode to the display tree. The display tree is now based on
+a columned tree widget and has columns for the display name, dataset and modes.
+The modes are not kept in sync yet, due to the lack of events for changing them.
+These events will be added when ggobi is tweaked for better embedding (ie
+Rggobi2). Ideally we could allow the user to set the modes from the display tree
+by using a combo box.
+
+The variable manipulation tool was reimplemented using a single GtkTreeModel
+aligned with the dataset. By using filters and sort proxy models the single
+model drives both the 'real' and 'categorical' tree views. Sorting is now
+completely transparent. Given the tree structure, the categorical levels are now
+children of their corresponding variable. There are some questions I have about
+the tool. How does rescaling work with categorical variables? How does one
+create a new categorical variable?
+
+File load and save dialogs are now based on the GtkFileChooser dialog. This is a
+lot cleaner than GtkFileSelection in that it is an actual GtkDialog and it has a
+nicer file list and supports configurable bookmarks. I added the input plugin
+selection widget to it, as well as a button that pops up a dialog for entering a
+location with automatic completion (the GtkFileChooser does not have a path
+entry in the main GUI, go figure).
+
+Many of the user actions now have associated stock icons. These are only those
+available by default in GTK. Hadley might make some new icons for GGobi specific
+actions.
+
+The rulers now work in GTK2, except there is some issue with the pan
+functionality when dragging on a ruler.
+
+Accelerators now work in displays. Before the key handlers were blocking the
+signal so that the accelerators never responded.
+
+Most menus and comboboxes now have tearoff items that allow one to tear off the
+menu as a toplevel window. This emulates a toolbar.
+
+Overall, all deprecated widgets were replaced with GTK2 equivalents.
+
+Result:  GGobi now compiles sans warnings with the GTK_DISABLE_DEPRECATED cflag.
+
+Known issues:
+
+The GTK2 combo box does not allow one to set its active element without emitting
+the 'changed' signal. The only problem I've seen this cause is that all plots
+have the 'hand' mouse icon for manual manipulation of a tour. This happens when
+a display is activated and its cpanels are reconfigured from the display's
+state. Since the default state includes active manual manipulation, the cursor
+is changed for the plot, even though the tour is not the active viewmode. One
+possible fix for this is to reconfigure the panels when the corresponding view
+mode / imode is set. Maybe a nicer fix would be to create an API separate from
+the GUI for manipulating the tour's state. Then have the combobox callback call
+the API function and that function could check whether the tour is the current
+view mode before changing the cursor. There would also need to be a signal for
+setting the pmode which would set the cursor correctly when the tour became
+active.
+
+The plugins have not been converted yet. Actually a couple have been (partially)
+converted. I would like to know which plugins we are deciding to maintain. Then
+I could just convert those.
+
+Right now I *think* GGobi only requires GTK 2.4, which was released a couple of
+years ago. I haven't tested this though. The only major reason for moving to 2.6
+would be the about dialog, but the existing about dialog has a certain charm to
+it. GTK 2.8 would allow us to draw some things using cairo (vector graphics). I
+think cairo would be too slow to use for the actual plotting though. I am not
+sure. It would allow us to do cool things like alpha-blending of the colors to
+deal with overplotting. This is not supported through the GDK X11 backend, since
+most X servers do not support compositing yet. 
+
 September 2005
 
 For all displays, restored the option that allows the View and

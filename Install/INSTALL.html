@@ -96,7 +96,7 @@ bin/ggobi <datafilename>
 
 <h3> Stand-alone with XML support </h3>
 
-<p> If the libxml2 library is installed on your system (not common!) then
+<p> If the libxml2 library is installed on your system (common!) then
 type:
 
 <pre>
@@ -104,7 +104,7 @@ type:
 make
 </pre>
 
-<p> However you may need to build the libxml2 library (common!) before
+<p> However you may need to build the libxml2 library (not common!) before
 starting (instructions below and in separate file INSTALL-xml.html).
 Then type:
 
@@ -127,7 +127,7 @@ make
 
 <h3> Stand-alone and embeddable GGobi library with XML support </h3>
 
-<p> If the libxml2 library is installed on your system (not common!) then
+<p> If the libxml2 library is installed on your system (common!) then
 type:
 
 <pre>
@@ -135,7 +135,7 @@ type:
 make 
 </pre>
 
-<p> However you may need to build the libxml2 library (common!) before
+<p> However you may need to build the libxml2 library (not common!) before
 starting (instructions below and in separate file INSTALL-xml.html).
 Then type:
 
@@ -156,34 +156,17 @@ Install R after downloading and following instructions from
 
 <p> From the GGobi web site, download Rggobi_x.x-x.tar.gz. 
 
-<p> Set various system parameters:
-
-<pre>
-% setenv R_HOME /usr/lib/R (where R got installed)
-% setenv GGOBI_ROOT $HOME/ggobi   (or wherever GGobi lives)
-% setenv R_LIBS /usr/lib/R/library 
-</pre>
-
-<p> You may need to use the export command rather than setenv in some
-shells, eg
-
-<pre>
-% R_HOME=/usr/lib/R 
-% export R_HOME
-</pre>
-
 Become superuser:
 
 <pre>
 % su
 </pre>
 
-<p> Set a symbolic link to the GGobi library and the gtkext library in the
+<p> Set a symbolic link to the GGobi library in the
 /usr/lib directory (the one above where R resides):
 
 <pre>
 % ln -s $GGOBI_ROOT/lib/libggobi.so /usr/lib/.
-% ln -s $GGOBI_ROOT/lib/libgtkext.so /usr/lib/.
 </pre>
 
 <p> Install the Rggobi library:
@@ -266,12 +249,9 @@ commands
 
 <h2> Building GGobi under Windows </h2>
 
-<p> Win-GGobi is the native windows port of GGobi. 
-
 <h3> Installation from Binary </h3>
 
-<p> Unzip the binary in the directory of your choice, and double-click on
-the icon winggobi\bin\ggobi.exe 
+<p> Download and run the GGobi installer from the download page.
 
 <h3> RSGGobi - Running GGobi from R  </h3>
 
@@ -280,21 +260,12 @@ the icon winggobi\bin\ggobi.exe
 open source statistical package simailar to S+. GGobi can be run and
 exchange data with an R session.
 
-<p> The RSGGobi package is an add on package for R
-(<href="http://www.r-project.org">http://www.r-project.org</a>  ) 
-an open source statistical package simailar to S+. GGobi can be run and
-exchange data with an R session.
-
 <p> To install Rggobi you will first need to download and install the
 R binaries from <a
 href="http://cran.r-project.org">http://cran.r-project.org</a> .
 
-<p> Once R is installed unzip Rggobi.zip in the directory rw10xx/library. Next
-you will need to install winggobi. The last
-step is to put the directory winggobi/bin in your path. If you are running
-windows 95 or 98 you will need to edit the file C:\AUTOEXEC.BAT. If you
-are running windows NT or 2000 go to Start->Control Panel-> System->Environment
-and select PATH, and add the winggobi/bin directory to the path.
+<p> Once R is installed, download and install (via the R GUI) the Rggobi
+binary package for Windows.
 
 <p>  Now fire up R
 
@@ -305,88 +276,15 @@ and select PATH, and add the winggobi/bin directory to the path.
 
 <h3> Compiling ggobi on windows  </h3>
 
-<pre>
-Using the Mingw32 compiler
-
->The following notes include the set-up I used to compile GGobi on windows.
-I have successfully compiled it on win98 and winnt. I am sure there is
-an easier way but everything I have used in the process is GPL or LGPL
-so I assume there are no licensing issues.
-
-What is needed
---------------
-
-Mingw32 (gcc for windows) download the latest stable snapshot
-gcc-2.95.2-1 at
-ftp://ftp.nanotech.wisc.edu/pub/khan/gnu-win32/mingw32/snapshots/gcc-2.95.2-1/
-
-Download all the files for msvcrt (mingw-msvcrt-20000203.zip,
-gcc-2.95.2-1-msvcrt.zip, binutils-19990818-1-msvcrt.zip,
-binutils-fixes-msvcrt.zip, ld-msvcrt.zip) from
-http://user.sgic.fi/~tml/gimp/win32/ 
-
-Download the current development version of gtk+ for windows.
-(libiconv-dev-20001007.zip, glib-dev-20001023.zip,
-gtk+-dev-20001023.zip) 
-
-and finally at http://www.penguin.at0.net/~fredo/
-you need libxml2-x.x.x-mingw.zip 
-
-optional: get
-the cygwin 1.1 distribution. The bash shell is really helpful at
-http://sourceware.cygnus.com/cygwin/mirrors.html
-phew! (Note, when i find or compile a version of mysql I
-will add that too)
-
-Installation
-------------
-
-I will pretend everything is being installed in c:\
-
-First if you are going to use cygnus download everything but the
-cygwin distribution of gcc manually from the ftp site and then use the
-install script for a local install. Install in C:\cygnus using the
-installer, and use the option install from local source.
-
-Now install gcc, say in C:\mingw, now gcc needs to be added to your
-path, if you did not heed my advice and downloaded cygwin gcc when you
-installed bash then gcc needs to be in your path BEFORE the cygwin
-stuff. This is because people still seem to have some problems with
-the -mno-cygwin flag. Unzip the mingw files in the order listed above
-in the mingw directory
-
-Next unzip the gtk stuff say in C:\gtkwin.
-Now if you do not have gimp installed I found it easiest to make a
-folder under gtkwin say C:\gtkwin\bin and copy all the dlls from the various
-gtk and extra stuff to that folder and put that folder in your path. Now
-all gtk+ applications will run without having to have a copy of the dll
-in each folder. Since the gtk+ distribution is changing rapidly it is not
-a good idea to put this stuff in your system folder.
-
-Lastly unzip libxml2, everything is compiled for windows already so it
-just needs to be unzipped.
-
-Compiling
----------
-
-For compiling here is the link to the makefile I have been using, also
-the following source needs to be there, since erf is not in the Mingw
-math libraries. (http://www.public.iastate.edu/~nlewin/ggobi/Makefile.win32, 
- s_erf.c)
-
-Now just fire up bash, copy s_erf.c and Makefile.win32 over to your ggobi
-directory (note you will need to change the paths in the
-makefile to reflect your system) and make. Email me when nothing works
-at kohnicho@comp.nus.edu.sg
-</pre>
-
+Please see these <a href="http://www.ggobi.org/downloads/windows.html">instructions</a>.
 
 <hr>
+Michael Lawrence<br>
 <address><a href="http://www.public.iastate.edu/~dicook">Di Cook</a>
 <a href=mailto:dicook@iastate.edu>&lt;dicook@iastate.edu&gt;</a></address>
 <address><a href="http://cm.bell-labs.com/stat/duncan">Duncan Temple Lang</a>
 <a href=mailto:duncan@research.bell-labs.com>&lt;duncan@research.bell-labs.com&gt;</a></address>
 <!-- hhmts start -->
-Last modified: Thu Oct 30 20:18:25 EST 2003
+Last modified: Wed Nov 16 07:15:45 CST 2005
 <!-- hhmts end -->
 </body> </html>
