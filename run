@@ -1,3 +1,0 @@
-#!/bin/sh
-LD_LIBRARYN32_PATH=.:/usr/lib32:/usr/common/libn32:/usr/common/lib \
-/usr/dfs/xgobi/gtk/ggobi $*

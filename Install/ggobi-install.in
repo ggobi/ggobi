@@ -1,7 +1,0 @@
-#!/bin/sh
-
-GGOBI_HOME=${GGOBI_HOME-@GGOBI_HOME@}
-
-. ${GGOBI_HOME}/bin/setLD.bsh
-
-${INSTALL_DIR}/bin/ggobi.bin "$@"
