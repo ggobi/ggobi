@@ -5,6 +5,8 @@ include $(TOP)/Makeconf
 XML_INC_DIRS=@XML_INC_DIRS@
 XML_LIB_DIRS=@XML_LIB_DIRS@
 
+XML_UTILS=@XML_UTILS@
+UTILS=$(XML_UTILS:%=$(TOP)/bin/%)
 
 SRC=\
     array.c \
@@ -134,18 +136,27 @@ ifdef USE_XML
 # -lxml2
 endif
 
+ifdef USE_DBMS
+ SRC+= dbms.c dbms_ui.c
+endif
+
 OBJ=$(SRC:%.c=%.o)
 
-CFLAGS= @SRC_DEBUG@ -I$(TOP)/include $(GTK_CFLAGS) $(XML_INC_DIRS) @XML_CFLAG_DEFINES@ 
+CFLAGS= @SRC_DEBUG@ $(GTK_CFLAGS) $(XML_INC_DIRS) @XML_CFLAG_DEFINES@ 
 #@DEFS@ - contains the HAVE_CONFIG_H
 
 LIBS=-L$(TOP)/lib $(XML_LIBS) $(GTK_LIBS) @LIBS@
 
-ggobi $(TOP)/bin/ggobi.bin: $(OBJ) ggobiMain.o
+all: ggobi lib $(UTILS)
+
+.PHONY: ggobi
+
+ggobi: $(TOP)/bin/ggobi.bin
+
+$(TOP)/bin/ggobi.bin: $(OBJ) ggobiMain.o
 	$(CC) $(LDFLAGS) -o $@ $(OBJ) ggobiMain.o $(LIBS)
 
-lib:
-	make libggobi.@SHLIB_EXT@
+lib: $(TOP)/lib/libggobi.@SHLIB_EXT@
 
 libggobi.so $(TOP)/lib/libggobi.so: $(OBJ:%.o=%.lo)
 	$(CC) $(SHLIB_LDFLAGS) -o $@ $(OBJ:%.o=%.lo) $(LIBS)
@@ -156,7 +167,7 @@ libggobi.dylib $(TOP)/lib/libggobi.dylib: $(OBJ:%.o=%.lo)
 libggobi.dll $(TOP)/lib/libggobi.dll: $(OBJ:%.o=%.lo)
 	$(CC) $(SHLIB_LDFLAGS) -o $@ ggobi.def -Wl,--out-implib,$(TOP)/lib/libggobi.a $(OBJ:%.o=%.lo) $(LIBS) 
 
-$(TOP)/bin/xmlConvert xmlConvert: xmlConvert.o libggobi.@SHLIB_EXT@
+$(TOP)/bin/xmlConvert xmlConvert: xmlConvert.o $(TOP)/lib/libggobi.@SHLIB_EXT@
 	$(CC) -o $@ xmlConvert.o -L$(TOP)/lib  -L. -lggobi $(XML_LIBS) $(GTK_LIBS) 
 
 cflags:
@@ -175,10 +186,10 @@ TAGS:
 	etags $(SRC) $(find $(TOP)/include -name '*.h')
 
 
-#marshal.h: marshal.list
-#	 $(GLIB_GENMARSHAL) --prefix=gtk_marshal $< --header > $@
+marshal.h: marshal.list
+	 $(GLIB_GENMARSHAL) --prefix=ggobi_marshal $< --header > $@
+marshal.c: marshal.list
+	 $(GLIB_GENMARSHAL) --prefix=ggobi_marshal $< --body > $@
 
-#marshal.c: marshal.list
-#	 $(GLIB_GENMARSHAL) --prefix=gtk_marshal $< --body > $@
-
-#marshal.o: marshal.h 
+make_ggobi.o: marshal.h
+ggobiClass.o: marshal.h

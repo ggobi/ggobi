@@ -6,9 +6,6 @@
 TOP=@TOP@
 INSTALL_DIR=@INSTALL_DIR@
 
-XML_UTILS=@XML_UTILS@
-
-UTILS=$(XML_UTILS:%=bin/%)
 PLUGIN_DIRS=@PLUGIN_DIRS@
 
 CUR_DIR=$(shell pwd)
@@ -17,19 +14,18 @@ include Makeconf
 
 INSTALLED_LIB_NAMES=libggobi.@SHLIB_EXT@
 
-all: bin/ggobi.bin @EMBED_LIB@ $(UTILS) @PACKAGES@ buildPlugins
+all: all-src @PACKAGES@ buildPlugins
 
 .PHONY:	lib Rggobi Pythonggobi Perlggobi
 
-ggobi bin/ggobi.bin:
-	$(MAKE) -C src ../bin/ggobi.bin
+all-src:
+	$(MAKE) -C src all
+	
+ggobi:
+	$(MAKE) -C src ggobi
 
-lib/libggobi.@SHLIB_EXT@ lib:
-	$(MAKE) -C src ../lib/libggobi.@SHLIB_EXT@
-
-
-bin/xmlConvert:
-	$(MAKE) -C src ../bin/xmlConvert
+lib:
+	$(MAKE) -C src lib
 
 include PluginList
 
@@ -96,14 +92,6 @@ endif
 	echo "</plugins>" >> $@ 
 	echo "</ggobirc>" >> $@
 
-Rggobi: @EMBED_LIB@
-	if test -d Rggobi ; then \
-		@R_BIN@ CMD INSTALL -c @R_PKG_DIR@ $@  ; \
-	else \
-		echo "No Rggobi directory here. Untar the Rggobi distribution first!" ; \
-	fi
-
-
 #	(GGOBI_ROOT=`pwd` ; export GGOBI_ROOT ; @R_BIN@ CMD INSTALL -c @R_PKG_DIR@ $@)
 
 Python: @EMBED_LIB@
@@ -122,12 +110,12 @@ buildPlugins:  @EMBED_LIB@
 	  for f in $(PLUGIN_DIRS) ; do \
 	    echo "Building plugin $$f" ; \
 	    LOCAL_BUILD=1; export LOCAL_BUILD ; \
-	    export GGOBI_HOME ; $(GGOBI_HOME)/share/tools/plugin $$f ; \
+	    export GGOBI_HOME ; $(GGOBI_HOME)/plugin $$f ; \
 	  done \
 
 installPlugins:
 	for f in ${PLUGIN_DIRS} ; do \
-	  export GGOBI_HOME ; $(GGOBI_HOME)/share/tools/plugin --install=$(ggobi_install_home) $$f ; \
+	  export GGOBI_HOME ; $(GGOBI_HOME)/plugin --install=$(ggobi_install_home) $$f ; \
 	done
 
 else
@@ -144,7 +132,7 @@ win32-installer: all ggobirc
 	iscc win32/ggobi.iss
 	
 clean:
-	for f in src gtkext/src ; do \
+	for f in src ; do \
 	  $(MAKE) -C $$f clean ; \
 	done
 

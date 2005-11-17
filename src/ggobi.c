@@ -671,7 +671,7 @@ initSessionOptions(int argc, char **argv)
 
   tmp = g_malloc(sizeof(gchar) * (strlen(sessionOptions->ggobiHome) + strlen("data/colorschemes.xml") + 2));
   sprintf(tmp, "%s%s%c%s", sessionOptions->ggobiHome,
-	                   "data", G_DIR_SEPARATOR, "colorschemes.xml");
+	                   "share", G_DIR_SEPARATOR, "colorschemes.xml");
   sessionOptions->info->colorSchemeFile = tmp;
 
   sessionOptions->defaultTourSpeed = 50.0;  

@@ -11,12 +11,6 @@ endif
 -include local.config
 -include $(GGOBI_HOME)/local.config
 
-include ../GNUmakefile.plugin
-
-ifdef WIN32
-  GGOBI_MAKEFILE=-f Makefile.win32
-endif
-
 ifndef GTK_CONFIG
  GTK_CONFIG=gtk-config
 endif

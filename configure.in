@@ -598,13 +598,6 @@ else
 fi
 AC_SUBST(INSTALL_DIR)
 
-
- dnl Process the different .in files, substituting the values computed here in the configuration
- dnl script for the corresponding @variable@ in these files.
-AC_OUTPUT(Makeconf GNUmakefile src/GNUmakefile bin/setLD.csh  bin/setLD.bsh bin/ggobi bin/ggobi-config bugTemplate local.config plugin ggobi.pc win32/ggobi.iss)
-
-cp src/config.h include/GGobiConfig.h
-
 if test -n "${PLUGIN_DIRS}" ; then
  echo "Enabling plugins"
  export GGOBI_ROOT
@@ -648,15 +641,16 @@ dnl might do the same thing.
 
 fi
 
+ dnl Process the different .in files, substituting the values computed here in the configuration
+ dnl script for the corresponding @variable@ in these files.
+AC_OUTPUT(Makeconf GNUmakefile src/GNUmakefile bin/setLD.csh  bin/setLD.bsh bin/ggobi bin/ggobi-config bugTemplate local.config plugin ggobi.pc win32/ggobi.iss PluginList)
 
-dnl Doing this here seems to generate all of the files again.
-dnl Want to just write out this one.
-AC_OUTPUT(PluginList)
+dnl cp src/config.h include/GGobiConfig.h
 
 dnl Ensure the resulting ggobi scripts executable.
 chmod +x bin/ggobi
 chmod +x bin/ggobi-config
-chmod +x share/tools/plugin
+chmod +x plugin
 
 
 
@@ -665,12 +659,11 @@ echo ""
 echo "GGobi"
 echo " Version:                $GGOBI_VERSION_STRING"
 echo " Building ggobi library: $enable_embed"
-echo " Installation directory: $INSTALL_DIR"
 echo " XML:                    version ${XML_VERSION}"
 echo " Gtk:                    version ${GTK_VERSION}"
-echo " Plugins:               ${PLUGIN_DIRS}"
+echo " Plugins:                ${PLUGIN_DIRS}"
 echo " Rggobi:                 ${WILL_BUILD_RGGOBI-no}" 
-echo  "Installation directory: $GGOBI_INSTALL_HOME"
+echo " Installation directory: $GGOBI_INSTALL_HOME"
 echo ""
 echo "*******************************"
 
