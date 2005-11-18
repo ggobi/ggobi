@@ -359,7 +359,7 @@ void mds_run_cb (GtkToggleButton *btn, PluginInstance *inst)
     }
     dsrc = ggv->dsrc;
     /* Make sure there's an edge set */
-    if (ggv->tree_view_dist != (GtkTreeView *) NULL)
+    if (ggv->tree_view_dist)
       ggv->e = g_object_get_data(G_OBJECT(ggv->tree_view_dist), "datad");
     if (ggv->e == NULL || ggv->e->edge.n == 0) {
       g_printerr ("edge set not correctly specified\n");
@@ -525,7 +525,7 @@ mds_reset_params_cb (GtkAction *action, PluginInstance *inst)
   GtkWidget *menu = gtk_option_menu_get_menu (GTK_OPTION_MENU(w));
   GList *children = gtk_container_get_children (GTK_CONTAINER(menu));
   GtkWidget *item = (GtkWidget *) children->data;  /*-- first one --*/
-  ggv_metric (item, 0);
+  ggv_metric (item, inst, 0);
 }
 
 /*

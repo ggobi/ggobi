@@ -114,7 +114,7 @@ draw_stress (ggvisd *ggv, ggobid *gg)
   height = (gfloat)da->allocation.height - 2. * (gfloat)STRESSPLOT_MARGIN;
 
   str = g_strdup_printf ("%s", ".9999");
-  layout_text(layout, text, &rect);
+  layout_text(layout, str, &rect);
   g_free (str);
 
   if (ggv->stressplot_pix == NULL)

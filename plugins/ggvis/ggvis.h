@@ -113,7 +113,7 @@ typedef struct {
   MDSDtargetSource Dtarget_source;
   gint weight_var;  /* index of the variable which is the source of
 		       the distance matrix or vector of weights */
-  GtkCList *clist_dist;
+  GtkWidget *tree_view_dist;
   gboolean complete_Dtarget;
 
   MDSGroupInd group_ind;
@@ -139,9 +139,9 @@ void ggvis_init (ggvisd *, ggobid *gg);
 ggvisd* ggvisFromInst (PluginInstance *inst);
 void mds_run_cb (GtkToggleButton *btn, PluginInstance *inst);
 void mds_step_cb (GtkWidget *btn, PluginInstance *inst);
-void mds_reinit_cb (PluginInstance *inst, guint action, GtkWidget *w);
-void mds_scramble_cb (PluginInstance *inst, guint action, GtkWidget *w);
-void mds_reset_params_cb (PluginInstance *inst, guint action, GtkWidget *w);
+void mds_reinit_cb (GtkAction *action, PluginInstance *inst);
+void mds_scramble_cb (GtkAction *action, PluginInstance *inst);
+void mds_reset_params_cb (GtkAction *action, PluginInstance *inst);
 void update_ggobi (ggvisd *ggv, ggobid *gg);
 
 /*void ggv_dsource_cb (GtkWidget *w, gpointer cbd);*/
@@ -163,10 +163,10 @@ void ggv_histogram_button_press_cb (GtkWidget *w, GdkEventButton *evnt, PluginIn
 void ggv_histogram_button_release_cb (GtkWidget *w, GdkEventButton *evnt, PluginInstance *inst);
 void ggv_Dtarget_histogram_update (ggvisd *, ggobid *);
 
-void ggv_metric_cb (GtkWidget *w, gpointer cbd);
-void ggv_metric (GtkWidget *w, gint param);
-void ggv_kruskal_cb (GtkWidget *w, gpointer cbd);
-void ggv_constrained_cb (GtkWidget *w, gpointer cbd);
+void ggv_metric_cb (GtkWidget *w, PluginInstance *inst);
+void ggv_metric (GtkWidget *w, PluginInstance *inst, gint param);
+void ggv_kruskal_cb (GtkWidget *w, PluginInstance *inst);
+void ggv_constrained_cb (GtkWidget *w, PluginInstance *inst);
 void ggv_dims_cb (GtkAdjustment *adj, PluginInstance *inst);
 void ggv_perturb_adj_cb (GtkAdjustment *adj, PluginInstance *inst);
 void ggv_perturb_btn_cb (GtkWidget *w, PluginInstance *inst);
@@ -190,7 +190,7 @@ void mds_once (gboolean doit, ggvisd *ggv, ggobid *gg);
 void mds_open_display_cb (GtkWidget *btn, PluginInstance *inst);
 
 void clusters_changed_cb (ggobid *, datad *, void *);
-void create_shepard_data_cb (PluginInstance *inst, guint action, GtkWidget *w);
+void create_shepard_data_cb (GtkAction *action, PluginInstance *inst);
 
 void ggv_free (ggvisd *);
 

@@ -27,7 +27,7 @@ CFLAGS="@INSTALL_SRC_CFLAGS@ ${GTK_CFLAGS} @XML_INC_DIRS@ @XML_CFLAG_DEFINES@ @O
 # @DEFS@ contains the HAVE_CONFIG_H which we don't want. We use HAVE_GGOBI_CONFIG_H to avoid
 # name conflict ambiguities.
 
-LIBS="@INSTALL_SRC_LIBS@ -lggobi"
+LIBS="@INSTALL_SRC_LIBS@"
 
 
 usage="

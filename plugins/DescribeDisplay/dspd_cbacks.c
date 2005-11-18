@@ -765,7 +765,7 @@ desc_write (PluginInstance *inst)
     /* ncols: display is symmetric */
     fprintf (fp, "ncols = %d,", g_list_length (display->scatmat_cols));
     describe_scatmat_display (fp, gg, display, desc);
-  } else if (GGOBI_IS_PARCOORDS_DISPLAY(display)) {
+  } else if (GGOBI_IS_PAR_COORDS_DISPLAY(display)) {
     fprintf (fp, "type='parcoords',");
     fprintf (fp, "ncols = %d,", g_list_length (display->splots));
     describe_parcoords_display (fp, gg, display, desc);

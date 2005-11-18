@@ -3,18 +3,18 @@
 # for accessing the different sub-parts of the 
 # source base.
 
-TOP=@TOP@
+TOP=@TOP_DIR@
 INSTALL_DIR=@INSTALL_DIR@
 
 PLUGIN_DIRS=@PLUGIN_DIRS@
 
-CUR_DIR=$(shell pwd)
+CUR_DIR=@GGOBI_ROOT@
 
 include Makeconf
 
 INSTALLED_LIB_NAMES=libggobi.@SHLIB_EXT@
 
-all: all-src @PACKAGES@ buildPlugins
+all: all-src buildPlugins
 
 .PHONY:	lib Rggobi Pythonggobi Perlggobi
 
@@ -32,7 +32,7 @@ include PluginList
 
 HEADER_FILES=$(wildcard include/*.h) 
 
-install: all bin/ggobi.bin ggobirc
+install: all ggobirc
 ifeq (${LOCAL_INSTALL},)
 	if test -n "${EMBED_LIB}" ; then  \
 	  $(INSTALL) -d $(libdir) ; \
@@ -92,18 +92,7 @@ endif
 	echo "</plugins>" >> $@ 
 	echo "</ggobirc>" >> $@
 
-#	(GGOBI_ROOT=`pwd` ; export GGOBI_ROOT ; @R_BIN@ CMD INSTALL -c @R_PKG_DIR@ $@)
-
-Python: @EMBED_LIB@
-	@if test -d Python ; then \
-	   $(MAKE) -C Python ; \
-	else \
-	   echo "The python module is not present. Download it and reconfigure."
-	fi
-
 GGOBI_HOME=$(shell pwd)
-
-
 
 ifneq (${PLUGIN_DIRS},)
 buildPlugins:  @EMBED_LIB@
@@ -137,7 +126,7 @@ clean:
 	done
 
 distclean: clean
-	-rm config.cache config.log
+	-rm config.log
 	-rm lib/*.so
 	-rm bin/ggobi.bin bin/xmlConvert
 

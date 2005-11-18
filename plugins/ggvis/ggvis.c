@@ -39,7 +39,7 @@ static const gchar *menu_ui =
 "		<menu action='Reset'>"
 "			<menuitem action='ReinitLayout'/>"
 "			<menuitem action='ScrambleLayout'/>"
-"			<menuitem action='ResetMDSParameters/>"
+"			<menuitem action='ResetMDSParameters'/>"
 "		</menu>"
 #if 0
 "		<menu action='Help'>"
@@ -130,14 +130,14 @@ static const gchar *const dsource_lbl[] = {
 static const gchar *const metric_lbl[] = {"Metric MDS", "Nonmetric MDS"};
 static const gchar *const kruskal_lbl[] = {"Kruskal", "Classic"};
 static const gchar *const groups_lbl[] = {
-  "Use all distances",
-  "Use distances within groups",
-  "Use distances between groups",
+  "Use _all distances",
+  "Use distances _within groups",
+  "Use distances _between groups",
 };
 static const gchar *const anchor_lbl[] = {
-  "No anchor",
-  "Scaled",
-  "Fixed",
+  "_No anchor",
+  "_Scaled",
+  "_Fixed",
 };
 static const gchar *const constrained_lbl[] = {
   "No variables frozen",
@@ -193,7 +193,7 @@ ggv_datad_set_cb (GtkTreeSelection *tree_sel, PluginInstance *inst)
   gchar *dname;
   datad *d;
   GSList *l;
-  gchar *clname = gtk_widget_get_name (GTK_WIDGET(cl));
+  const gchar *clname = gtk_widget_get_name (GTK_WIDGET(gtk_tree_selection_get_tree_view(tree_sel)));
   gint k;
   GtkTreeModel *model;
   GtkTreeIter iter;
@@ -209,8 +209,7 @@ ggv_datad_set_cb (GtkTreeSelection *tree_sel, PluginInstance *inst)
       if (strcmp (clname, "nodeset") == 0) {
         ggv->dsrc = d;
 
-        /* Once dsrc has been defined, the anchor groups can be
-	   initialized */
+        /* Once dsrc has been defined, the anchor groups can be initialized */
         vectorb_realloc (&ggv->anchor_group, d->nclusters);
         for (k=0; k<d->nclusters; k++)
           ggv->anchor_group.els[k] = false;
@@ -228,7 +227,7 @@ ggv_tree_view_datad_added_cb (ggobid *gg, datad *d, GtkWidget *tree_view)
 {
   gchar *row[1];
   GtkWidget *swin;
-  gchar *clname;
+  const gchar *clname;
   GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(tree_view));
   GtkTreeIter iter;
 	
@@ -237,7 +236,7 @@ ggv_tree_view_datad_added_cb (ggobid *gg, datad *d, GtkWidget *tree_view)
 
   swin = (GtkWidget *)
     g_object_get_data(G_OBJECT (tree_view), "datad_swin");
-  clname = gtk_widget_get_name (GTK_WIDGET(tree_view));
+  clname = gtk_widget_get_name (tree_view);
 
   if (strcmp (clname, "nodeset") == 0 && d->rowIds != NULL) {
     gtk_list_store_append(GTK_LIST_STORE(model), &iter);
@@ -264,13 +263,13 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gint i, top;
   GtkWidget *menubar;
   /*-- for lists of datads --*/
-  gchar *titles[2] = {"node sets", "edge sets"};
+  gchar *titles[] = {"node sets", "edge sets"};
   datad *d;
   ggobid *gg = inst->gg;
   GtkWidget *swin, *tree_view;
   gchar *row[1];
   GSList *l;
-  GtkTreeModel *model;
+  GtkListStore *model;
   GtkTreeSelection *tree_sel;
   GtkUIManager *manager;
   GtkActionGroup *actions;
@@ -319,9 +318,9 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
     GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
 
   model = gtk_list_store_new(1, G_TYPE_STRING);
-  tree_view = gtk_tree_model_new_with_model(model);
+  tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(model));
   populate_tree_view(tree_view, titles, 1, true, GTK_SELECTION_SINGLE, 
-  	ggv_datad_set_cb, inst);
+  	G_CALLBACK(ggv_datad_set_cb), inst);
 
   gtk_widget_set_name (GTK_WIDGET(tree_view), "nodeset");
   g_object_set_data(G_OBJECT (tree_view), "datad_swin", swin);
@@ -353,9 +352,9 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
     GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
 
 	model = gtk_list_store_new(1, G_TYPE_STRING);
-	tree_view = gtk_tree_view_new_with_model(model);
-	populate_tree_view(tree_view, 1, &titles[1], true, GTK_SELECTION_SINGLE, 
-		ggv_datad_set_cb, inst); 
+	tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(model));
+	populate_tree_view(tree_view, &titles[1], 1, true, GTK_SELECTION_SINGLE, 
+		G_CALLBACK(ggv_datad_set_cb), inst); 
 	gtk_widget_set_name (GTK_WIDGET(tree_view), "edgeset");
   
   g_object_set_data(G_OBJECT (tree_view), "datad_swin", swin);
@@ -462,17 +461,17 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
     G_CALLBACK(NULL), inst->gg);
   swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK (varnotebook), 0);
   if (swin != NULL) {
-    ggv->tree_view_dist = (GtkTreeView *) GTK_BIN(swin)->child;
+    ggv->tree_view_dist = GTK_BIN(swin)->child;
     /* Initialize, selecting first variable */
     if (ggv->mds_task == DissimAnalysis)
 		select_tree_view_row(ggv->tree_view_dist, 0);
-  } else ggv->tree_view_dist = (GtkTreeView *) NULL;
+  } else ggv->tree_view_dist = NULL;
 
   /*-- Report on D --*/
   hb = gtk_hbox_new (false, 1);
   gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 2);
 
-  label = gtk_label_new_with_mnemonic ("_Dist");
+  label = gtk_label_new_with_mnemonic ("D_ist");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), hbox, label);
 
 /*-- Run controls --*/
@@ -489,7 +488,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
 
   /*-- MDS Dimension --*/
   label = gtk_label_new_with_mnemonic ("Dimension (_k)");
-  /*gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.0);*/
+  gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.0);
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, top, top+1,
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND), 
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
@@ -512,7 +511,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
 
   /* Stepsize */
   label = gtk_label_new_with_mnemonic ("_Step size");
-  /*gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.0);*/
+  gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.0);
   gtk_table_attach (GTK_TABLE (table), label, 0, 1, top, top+1,
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND), 
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
@@ -725,7 +724,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
 
   /*-- Dist power --*/
   top++;
-  label = gtk_label_new_with_mnemonic ("Dist _power (d^q)");
+  label = gtk_label_new_with_mnemonic ("Dist p_ower (d^q)");
   gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.0);
   gtk_table_attach (GTK_TABLE (table), label, 1, 2, top, top+1,
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND), 
@@ -767,7 +766,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
     1, 1);
 
-  label = gtk_label_new ("Distance");
+  label = gtk_label_new ("Di_stance");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), vbox_params, label);
 
   /*-- Groups tab --*/
@@ -780,12 +779,12 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
 
   for (i=0; i<3; i++) {
     if (i == 0) {
-      radio = gtk_radio_button_new_with_label (NULL, groups_lbl[i]);
+      radio = gtk_radio_button_new_with_mnemonic (NULL, groups_lbl[i]);
       GTK_TOGGLE_BUTTON (radio)->active = TRUE;
       gtk_widget_set_name (radio, "GROUPS_OFF");
     } else {
       group = gtk_radio_button_group (GTK_RADIO_BUTTON (radio));
-      radio = gtk_radio_button_new_with_label (group, groups_lbl[i]);
+      radio = gtk_radio_button_new_with_mnemonic (group, groups_lbl[i]);
     }
     g_object_set_data(G_OBJECT(radio), "PluginInst", inst);
     g_signal_connect (G_OBJECT (radio), "toggled",
@@ -809,12 +808,12 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
 
   for (i=0; i<3; i++) {
     if (i == 0) {
-      radio = gtk_radio_button_new_with_label (NULL, anchor_lbl[i]);
+      radio = gtk_radio_button_new_with_mnemonic (NULL, anchor_lbl[i]);
       gtk_widget_set_name (radio, "ANCHOR_OFF");
       gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(radio), true);
     } else {
       group = gtk_radio_button_group (GTK_RADIO_BUTTON (radio));
-      radio = gtk_radio_button_new_with_label (group, anchor_lbl[i]);
+      radio = gtk_radio_button_new_with_mnemonic (group, anchor_lbl[i]);
     }
     g_object_set_data(G_OBJECT(radio), "PluginInst", inst);
     g_signal_connect (G_OBJECT (radio), "toggled",
@@ -917,7 +916,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gtk_container_add (GTK_CONTAINER(frame), vbox);
 
   opt = gtk_combo_box_new_text ();
-  populate_option_menu (opt, (gchar**) constrained_lbl, G_N_ELEMENTS(constrained_lbl),
+  populate_combo_box(opt, (gchar **)constrained_lbl, G_N_ELEMENTS(constrained_lbl),
     G_CALLBACK(ggv_constrained_cb), inst);
   gtk_box_pack_start (GTK_BOX (vbox), opt, false, false, 0);
 
@@ -926,7 +925,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
                             frame, label);
 
   g_signal_connect (G_OBJECT(gg),
-    "clusters_changed", clusters_changed_cb, inst);
+    "clusters_changed", G_CALLBACK(clusters_changed_cb), inst);
 
   gtk_widget_show_all (window);
 }
@@ -961,8 +960,7 @@ void close_ggvis_window(GtkWidget *w, PluginInstance *inst)
     /*g_signal_connect (G_OBJECT (gg), "datad_added",
      G_CALLBACK(ggv_tree_view_datad_added_cb),
      GTK_OBJECT (tree_view));*/
-    id = g_signal_lookup ("datad_added", GGOBI_TYPE_GGOBI);
-    if (id && tree_view_node != NULL && tree_view_edge != NULL) {
+    if (tree_view_node != NULL && tree_view_edge != NULL) {
       g_signal_handlers_disconnect_by_func (G_OBJECT(gg),
         G_CALLBACK(ggv_tree_view_datad_added_cb),
         (gpointer) tree_view_node);
@@ -973,12 +971,9 @@ void close_ggvis_window(GtkWidget *w, PluginInstance *inst)
 
     /*  g_signal_connect (G_OBJECT(gg),
 	"clusters_changed", clusters_changed_cb, inst); */
-    id = g_signal_lookup ("clusters_changed", GGOBI_TYPE_GGOBI);
-    if (id) {
-      g_signal_handlers_disconnect_by_func (G_OBJECT(gg),
+    g_signal_handlers_disconnect_by_func (G_OBJECT(gg),
         G_CALLBACK(clusters_changed_cb),
         (gpointer) inst);
-    }
 
     /* The signals don't seem to be disappearing, and
        I can't disconnect a signal by id */

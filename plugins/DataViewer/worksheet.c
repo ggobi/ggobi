@@ -1,5 +1,3 @@
-#define _ISOC99_SOURCE /* for NAN */
-
 #include <gtk/gtk.h>
 #include "ggobi.h"
 #include "externs.h"
@@ -24,7 +22,7 @@ GtkWidget* create_ggobi_sheet(datad *data, ggobid *gg);
 void       add_ggobi_data(datad *data, GtkTreeModel *model);
 GtkWidget *create_ggobi_worksheet_window(ggobid *gg, PluginInstance *inst);
 
-void       show_data_edit_window(PluginInstance *inst, GtkWidget *widget);
+void       show_data_edit_window(GtkAction *actions, PluginInstance *inst);
 
 GtkWidget* create_ggobi_sheet(datad *data, ggobid *gg);
 void update_cell(gint row, gint column, double value, datad *data);
@@ -144,6 +142,8 @@ static GtkItemFactoryEntry menubar_items[] = {
 };
 /* */
 #endif
+
+
 /**
  Called when the plugin instance is created for a new ggobi instance.
  This adds an entry to the Tools menu that the user can select to 
@@ -153,6 +153,7 @@ gboolean
 addToMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 {
   GtkWidget *entry;
+  GtkActionGroup *actions;
   extern GtkWidget *GGobi_addToolsMenuItem (gchar *label, ggobid *gg);
 
   inst->data = NULL;
@@ -164,20 +165,28 @@ addToMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
   gdk_colormap_alloc_color(gdk_colormap_get_system(), &red, TRUE, TRUE);
   gdk_color_black(gdk_colormap_get_system(), &black);
 
-  entry = GGobi_addToolsMenuItem ("Data grid ...", gg);
+  /*entry = GGobi_addToolsMenuItem ("Data grid ...", gg);
   g_signal_connect_object (G_OBJECT(entry), "activate",
                              G_CALLBACK (show_data_edit_window),
                              (gpointer) inst, 0);
-
+*/
   static const gchar *ui = 
   "	<ui>"
   "		<menubar>"
-  "			<menu action='Data'>"
+  "			<menu action='Tools'>"
   "				<menuitem action='DataView'/>"
   "			</menu>"
   "		</menubar>"
   "	</ui>";
   
+  static GtkActionEntry action_entries[] = {
+	{ "DataView", NULL, "Data _Viewer", NULL, "View the data elements on a grid", 
+		G_CALLBACK (show_data_edit_window) },
+  };
+  
+  actions = gtk_action_group_new("DataViewer Actions");
+  gtk_action_group_add_actions(actions, action_entries, G_N_ELEMENTS(action_entries), inst);
+  gtk_ui_manager_insert_action_group(gg->main_menu_manager, actions, -1);
   gtk_ui_manager_add_ui_from_string(gg->main_menu_manager, ui, -1, NULL);
   
 #if 0
@@ -200,7 +209,7 @@ static GtkItemFactoryEntry menu_items[] = {
   for the GGobi instance associated with the menu.
  */
 void
-show_data_edit_window(PluginInstance *inst, GtkWidget *widget)
+show_data_edit_window(GtkAction *action, PluginInstance *inst)
 {
   if(g_slist_length(inst->gg->d) < 1) {
       fprintf(stderr, "No datasets to show\n");fflush(stderr);
@@ -364,7 +373,7 @@ create_ggobi_sheet(datad *data, ggobid *gg)
 		  g_signal_connect(G_OBJECT(renderer), "edited", G_CALLBACK(cell_changed), model);
 	  }
 	  col = gtk_tree_view_column_new_with_attributes(col_labels[i], renderer, 
-	  			"text", i, "cell-foreground-gdk", data->ncols+1, NULL);
+	  			"text", i, "foreground-gdk", data->ncols+1, NULL);
 	  gtk_tree_view_column_set_sort_column_id(col, i);
 	  gtk_tree_view_column_set_resizable(col, true);
 	  gtk_tree_view_insert_column(GTK_TREE_VIEW(sheet), col, -1);
@@ -481,12 +490,13 @@ add_ggobi_data(datad *data, GtkTreeModel *model)
 	gtk_list_store_append(GTK_LIST_STORE(model), &iter);
 	
 	str = (gchar *) g_array_index(data->rowlab, gchar*, i);
-	gtk_list_store_set(GTK_LIST_STORE(model), 0, str, -1);
+	gtk_list_store_set(GTK_LIST_STORE(model), &iter, 0, str, -1);
 	
     for(j = 0; j < data->ncols; j++) {
       vt = g_slist_nth_data(data->vartable, j);
-      if(data->nmissing && data->missing.vals[i][j] && vt->vartype != categorical)
-		  gtk_list_store_set(GTK_LIST_STORE(model), &iter, j+1, NAN, -1);
+	  /** FIXME: Handle missings */
+      if(data->nmissing && data->missing.vals[i][j] && vt->vartype != categorical);
+	  //	  gtk_list_store_set(GTK_LIST_STORE(model), &iter, j+1, NAN, -1);
 	  else {
          if(vt->vartype == categorical)  {
 		  gchar *level_str;

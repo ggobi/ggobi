@@ -42,7 +42,7 @@ if test -n "${INSTALL}" ; then
  TARGET=install
 else
 if test -z "${TARGET}" ; then
- TARGET=${PLUGIN}.so
+ TARGET=${PLUGIN}.@SHLIB_EXT@
 fi
 
 fi # end of test -n "${INSTALL}"
@@ -67,5 +67,5 @@ if test "${VERBOSE}" != "0" ; then
   echo "$MAKE ${MAKE_VARS} ${STANDARD_PLUGIN_MAKEFILE} -C $plugin_dir ${TARGET} $ARGS"
 fi
 
-$MAKE ${MAKE_VARS} ${STANDARD_PLUGIN_MAKEFILE} -C $plugin_dir ${TARGET} $ARGS
+$MAKE ${STANDARD_PLUGIN_MAKEFILE} ${MAKE_VARS} -C $plugin_dir ${TARGET} $ARGS
 

@@ -1,7 +1,4 @@
 # Need to compute this in configure.in
-DLL_EXT=@SHLIB_EXT@
-
-GTK_CONFIG=@GTK_CONFIG@
 
 PKG_CONFIG=@PKG_CONFIG@
 

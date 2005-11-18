@@ -2,37 +2,20 @@ ifndef GGOBI_HOME
  GGOBI_HOME=../..
 endif
 
-ifdef GGOBI_DEVELOPER
--include $(GGOBI_HOME)/local.config
-else
--include $(GGOBI_HOME)/Makeconf
+ -include $(GGOBI_HOME)/Makeconf
+ -include $(GGOBI_HOME)/local.config
+ 
+# build against the local (non-system) copy?
+ifdef LOCAL_BUILD
+ export PKG_CONFIG_PATH=$(GGOBI_HOME):$PKG_CONFIG_PATH
 endif
-
-ifdef ADMIN
- include Install/GNUmakefile.admin
-endif
-
+ 
 -include local.config
 
-ifdef LOCAL_BUILD
+ # now query pkg config for the flags
 
- GGOBI_CFLAGS=$(shell $(MAKE) --quiet -C $(GGOBI_HOME)/src cflags TOP=$(GGOBI_HOME))
- GGOBI_LIB=$(shell $(MAKE) --quiet -C $(GGOBI_HOME)/src libs TOP=$(GGOBI_HOME))
-
-else
-
-ifdef GGOBI_CONFIG
- GGOBI_CFLAGS=$(shell $(GGOBI_CONFIG) --cflags)
- GGOBI_LIB=$(shell $(GGOBI_CONFIG) --libs)
-else
- GGOBI_INCLUDE_DIR=-I$(GGOBI_HOME)
-ifndef GGOBI_LIB
- GGOBI_LIB=-L$(GGOBI_HOME) -lggobi
-endif
- GGOBI_CFLAGS=$(GGOBI_INCLUDE_DIR)
-endif
-
-endif
+GGOBI_CFLAGS=`$(PKG_CONFIG) ggobi --cflags`
+GGOBI_LIBS=`$(PKG_CONFIG) ggobi --libs`
 
 ifndef SRC
  SRC=$(wildcard *.c *.f)
@@ -46,17 +29,18 @@ ifndef SHLIB_LDFLAGS
  SHLIB_LDFLAGS=-shared
 endif
 
-GTK_LIBS=$(shell $(GTK_CONFIG) --libs)
-
-GTK_CFLAGS=$(shell $(GTK_CONFIG) --cflags)
-
 %.o: %.c
-	$(CC) -c $(PIC_CFLAG) $(PLUGIN_CFLAGS) $(CFLAGS) $(GTK_CFLAGS) $(GGOBI_CFLAGS) $<
+	$(CC) -c $(PIC_CFLAG) $(PLUGIN_CFLAGS) $(CFLAGS) $(GGOBI_CFLAGS) $<
 
 %.so: $(OBJS)
-	$(CC) $(SHLIB_LDFLAGS) $(PLUGIN_LD_FLAGS) $(OBJS) -o $@ $(PLUGIN_LIBS) $(GGOBI_LIB) $(GTK_LIBS)
+	$(CC) $(SHLIB_LDFLAGS) $(PLUGIN_LD_FLAGS) $(OBJS) -o $@ $(PLUGIN_LIBS) $(GGOBI_LIBS)
 
+%.dll: $(OBJS)
+	$(CC) $(SHLIB_LDFLAGS) $(PLUGIN_LD_FLAGS) -o $@ $(@:%.dll=%.def) \
+	-Wl,--out-implib,$(@:%.dll=%.a) $(OBJS) $(PLUGIN_LIBS) $(GGOBI_LIBS)
+	
 $(PKG).so:
+$(PKG).dll:
 
 objects: 
 	@echo "$(OBJS)"
@@ -70,27 +54,11 @@ install:
 
 # Docs and support files, e.g. R, Python, Perl files.
 
-distclean:: clean
-	-rm config.cache config.status config.log $(PKG).so
+distclean: clean
+	-rm config.cache config.status config.log local.config $(PKG).so
 
 clean:
 	rm -f *.o *.so
-
-
-ifndef ADMIN
-local.config: local.config.in configure
-	if test -r local.config.in ; then \
-	   if test -r local.config ; then cp local.config local.config.bak ; fi ;  \
-	   ./configure \
-	else \
-	   touch $@ ; \
-	fi
-endif
-
-ifndef ADMIN
-configure: configure.in
-	autoconf
-endif
 
 show:
 	@echo $(OBJS)

@@ -1,9 +1,8 @@
 
 plugin:DataViewer
-dependencies:gtkextra-1.0.0
+dependencies:none
 builds:yes
-works:limited, viewing only
-note:gtkextra-2.0.0 untested
+working:probably not
 
 plugin:DescribeDisplay
 dependencies:none
@@ -17,7 +16,7 @@ working:yes
 plugin:FileSelector
 dependencies:gtkextra-1.0.0
 builds:yes
-works:yes?
+working:yes?
 note:gtkextra-2.0.0 untested
 
 plugin:ggvis

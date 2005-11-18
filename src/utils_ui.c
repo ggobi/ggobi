@@ -690,13 +690,16 @@ GGobi_addDisplayMenuItem (const gchar *label, ggobid *gg)
 gboolean
 GGobi_addToolsMenuWidget(GtkWidget *entry, ggobid *gg)
 {
-  GtkWidget *tools_menu = NULL;
+  GtkWidget *tools_menu = NULL, *tools_item = NULL;
   GtkUIManager *manager;
 
   manager = gg->main_menu_manager; /* gtk_item_factory_from_path ("<main>"); */
-  tools_menu = gtk_ui_manager_get_widget (manager, "/menubar/Tools");
-
-  if (tools_menu != NULL) {
+  tools_item = gtk_ui_manager_get_widget (manager, "/menubar/Tools");
+  
+  if (tools_item)
+	  tools_menu = gtk_menu_item_get_submenu(GTK_MENU_ITEM(tools_item));
+  
+  if (tools_menu) {
       gtk_menu_shell_append (GTK_MENU_SHELL (tools_menu), entry);
   } else
       return(false);

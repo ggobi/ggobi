@@ -30,9 +30,7 @@
 #include "vars.h"
 #include "externs.h"
 
-#ifdef HAVE_GGOBI_CONFIG_H
 #include "config.h"
-#endif
 
 #include "print.h"
 

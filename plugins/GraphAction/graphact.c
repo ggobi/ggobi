@@ -206,7 +206,7 @@ create_graphact_window(ggobid *gg, PluginInstance *inst)
 
   model = gtk_list_store_new(2, G_TYPE_STRING, GGOBI_TYPE_DATA);
   tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(model));
-  populate_tree_view(tree_view, tree_view_titles, 1, true, GTK_SELECTION_SINGLE,
+  populate_tree_view(tree_view, tree_view_titles+1, 1, true, GTK_SELECTION_SINGLE,
 		G_CALLBACK(graphact_datad_set_cb), inst);
   gtk_widget_set_name (GTK_WIDGET(tree_view), "edgeset");
   g_object_set_data(G_OBJECT (tree_view), "datad_swin", swin);

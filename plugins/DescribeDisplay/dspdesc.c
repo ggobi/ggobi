@@ -81,30 +81,17 @@ create_dspdesc_window(ggobid *gg, PluginInstance *inst)
   GtkTooltips *tips = gtk_tooltips_new ();
   dspdescd *desc = dspdescFromInst (inst); 
 
-  /*-- I will probably have to get hold of this window, after which
-       I can name all the other widgets --*/
-	   
-  //window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
   window = gtk_file_chooser_dialog_new("Save display description", NULL, 
-  	GTK_FILE_CHOOSER_ACTION_SAVE,
-  	GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT, GTK_STOCK_CLOSE, GTK_RESPONSE_REJECT, NULL);
+  	GTK_FILE_CHOOSER_ACTION_SAVE, GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT, 
+	GTK_STOCK_CLOSE, GTK_RESPONSE_REJECT, NULL);
 	
   desc->window = window;
-#if 0
-  gtk_window_set_title(GTK_WINDOW(window), "Save display description");
-  g_signal_connect (G_OBJECT (window), "destroy",
-                      G_CALLBACK (close_dspdesc_window), inst);
 
-  main_vbox = gtk_vbox_new (FALSE,1);
-  gtk_container_set_border_width (GTK_CONTAINER(main_vbox), 5); 
-  gtk_container_add (GTK_CONTAINER(window), main_vbox);
-#endif
   /* label and entry widget for main title */
   hb = gtk_hbox_new (false, 1);
-  //gtk_box_pack_start (GTK_BOX (main_vbox), hb, true, true, 2);
   
-  label = gtk_label_new_with_mnemonic ("Figure _title");
-  gtk_box_pack_start (GTK_BOX (hb), label, true, true, 2);
+  label = gtk_label_new_with_mnemonic ("Figure _title: ");
+  gtk_box_pack_start (GTK_BOX (hb), label, false, false, 2);
 
   entry = gtk_entry_new ();
   gtk_label_set_mnemonic_widget(GTK_LABEL(label), entry);
@@ -112,53 +99,14 @@ create_dspdesc_window(ggobid *gg, PluginInstance *inst)
   gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), entry,
     "Type in the figure title", NULL);
   gtk_box_pack_start (GTK_BOX (hb), entry, true, true, 2);
-
+  gtk_widget_show_all(hb);
+  
   gtk_file_chooser_set_extra_widget(GTK_FILE_CHOOSER(window), hb);
-  #if 0
-  /* label and entry widget for file name */
-  hb = gtk_hbox_new (false, 1);
-  gtk_box_pack_start (GTK_BOX (main_vbox), hb, true, true, 2);
-
-  label = gtk_label_new_with_mnemonic ("_File name");
-  gtk_box_pack_start (GTK_BOX (hb), label, true, true, 2);
-
-  entry = gtk_entry_new ();
-  gtk_label_set_mnemonic_widget(GTK_LABEL(label), entry);
-  g_object_set_data(G_OBJECT(window), "FILENAME", entry);
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), entry,
-    "Type in the name of the file", NULL);
-  gtk_box_pack_start (GTK_BOX (hb), entry, true, true, 2);
-  gtk_entry_set_text (GTK_ENTRY (entry), "ggdisplay.R");
-
-  /* 'Do it' and 'Close' buttons */
-  hb = gtk_hbox_new (false, 1);
-  gtk_box_pack_start (GTK_BOX (main_vbox), hb, true, true, 2);
-
-  btn = gtk_button_new_with_label ("Save");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), btn,
-    "Create the file", NULL);
-  g_signal_connect (G_OBJECT (btn), "clicked",
-    G_CALLBACK (desc_write_cb), inst);
-  gtk_box_pack_start (GTK_BOX (hb), btn, false, false, 2);
-
-
-  btn = gtk_button_new_with_label ("Close");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), btn,
-    "Close this window", NULL);
-  g_signal_connect (G_OBJECT (btn), "clicked",
-    G_CALLBACK (window_close_cb), inst);
-
-  gtk_box_pack_start (GTK_BOX (hb), btn, false, false, 2);
-
-  gtk_widget_show_all (window);
-#endif
-
-	gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(window), "ggdisplay.R");
 	
-	if (gtk_dialog_run(GTK_DIALOG(window)) == GTK_RESPONSE_ACCEPT)
-		desc_write(inst);
+  if (gtk_dialog_run(GTK_DIALOG(window)) == GTK_RESPONSE_ACCEPT)
+	desc_write(inst);
 	
-	window_close(inst);
+  window_close(inst);
 	
   return(window);
 }

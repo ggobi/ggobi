@@ -22,9 +22,7 @@
 
 #include "splash.h"
 
-#ifdef HAVE_GGOBI_CONFIG_H
 #include "config.h"
-#endif
 
 void
 splash_destroy (GtkWidget *w, GdkEventButton *event, GdkPixmap *pix)

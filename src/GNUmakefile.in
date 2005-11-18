@@ -145,16 +145,16 @@ OBJ=$(SRC:%.c=%.o)
 CFLAGS= @SRC_DEBUG@ $(GTK_CFLAGS) $(XML_INC_DIRS) @XML_CFLAG_DEFINES@ 
 #@DEFS@ - contains the HAVE_CONFIG_H
 
-LIBS=-L$(TOP)/lib $(XML_LIBS) $(GTK_LIBS) @LIBS@
+LIBS=$(XML_LIBS) $(GTK_LIBS) @LIBS@
 
-all: ggobi lib $(UTILS)
+all: ggobi $(UTILS)
 
-.PHONY: ggobi
+.PHONY: ggobi lib
 
 ggobi: $(TOP)/bin/ggobi.bin
 
-$(TOP)/bin/ggobi.bin: $(OBJ) ggobiMain.o
-	$(CC) $(LDFLAGS) -o $@ $(OBJ) ggobiMain.o $(LIBS)
+$(TOP)/bin/ggobi.bin: $(TOP)/lib/libggobi.@SHLIB_EXT@ ggobiMain.o
+	$(CC) $(LDFLAGS) -o $@ ggobiMain.o -L$(TOP)/lib -lggobi $(LIBS)
 
 lib: $(TOP)/lib/libggobi.@SHLIB_EXT@
 
@@ -167,15 +167,14 @@ libggobi.dylib $(TOP)/lib/libggobi.dylib: $(OBJ:%.o=%.lo)
 libggobi.dll $(TOP)/lib/libggobi.dll: $(OBJ:%.o=%.lo)
 	$(CC) $(SHLIB_LDFLAGS) -o $@ ggobi.def -Wl,--out-implib,$(TOP)/lib/libggobi.a $(OBJ:%.o=%.lo) $(LIBS) 
 
-$(TOP)/bin/xmlConvert xmlConvert: xmlConvert.o $(TOP)/lib/libggobi.@SHLIB_EXT@
-	$(CC) -o $@ xmlConvert.o -L$(TOP)/lib  -L. -lggobi $(XML_LIBS) $(GTK_LIBS) 
+$(TOP)/bin/xmlConvert: xmlConvert.o $(TOP)/lib/libggobi.@SHLIB_EXT@
+	$(CC) -o $@ xmlConvert.o -L$(TOP)/lib -lggobi $(XML_LIBS) $(GTK_LIBS) 
 
 cflags:
 	@echo "$(CFLAGS)"
 
 libs:
-	@echo "-L$(TOP)/lib -lggobi $(XML_LIBS) $(GTK_LIBS) @LIBS@"
-# This is very close to $(LIBS) but we need to put ggobi in there.
+	@echo "$(LIBS)"
 
 clean:
 	for f in $(OBJ) $(OBJ:%.o=%.lo) ; do \
