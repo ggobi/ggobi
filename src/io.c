@@ -23,7 +23,6 @@
 #endif
 
 #include <unistd.h>
-#include <libgen.h>
 
 #include <gtk/gtk.h>
 
