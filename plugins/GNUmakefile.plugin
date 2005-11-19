@@ -36,7 +36,7 @@ endif
 	$(CC) $(SHLIB_LDFLAGS) $(PLUGIN_LD_FLAGS) $(OBJS) -o $@ $(PLUGIN_LIBS) $(GGOBI_LIBS)
 
 %.dylib: $(OBJS)
-	libtool -dynamic $(PLUGIN_LD_FLAGS) -o $@ $(OBJS) `echo "$(PLUGIN_LIBS) $(GGOBI_LIBS)"|sed 's/-bexpall//' | sed -e 's/-I[^ ]*//'` -lgcc
+	libtool -dynamic $(PLUGIN_LD_FLAGS) -o $@ $(OBJS) $(PLUGIN_LIBS) $(GGOBI_LIBS) -lgcc
 	
 %.dll: $(OBJS)
 	$(CC) $(SHLIB_LDFLAGS) $(PLUGIN_LD_FLAGS) -o $@ $(@:%.dll=%.def) \
