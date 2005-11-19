@@ -140,32 +140,32 @@ ifdef USE_DBMS
  SRC+= dbms.c dbms_ui.c
 endif
 
-OBJ=$(SRC:%.c=%.o)
+OBJ=$(SRC:%.c=%.lo)
 
 CFLAGS= @SRC_DEBUG@ $(GTK_CFLAGS) $(XML_INC_DIRS) @XML_CFLAG_DEFINES@ 
 #@DEFS@ - contains the HAVE_CONFIG_H
 
 LIBS=$(XML_LIBS) $(GTK_LIBS) @LIBS@
 
-all: ggobi $(UTILS)
+all: bin $(UTILS)
 
-.PHONY: ggobi lib
+.PHONY: bin lib
 
-ggobi: $(TOP)/bin/ggobi.bin
+bin: $(TOP)/bin/ggobi.bin
 
 $(TOP)/bin/ggobi.bin: $(TOP)/lib/libggobi.@SHLIB_EXT@ ggobiMain.o
 	$(CC) $(LDFLAGS) -o $@ ggobiMain.o -L$(TOP)/lib -lggobi $(LIBS)
 
 lib: $(TOP)/lib/libggobi.@SHLIB_EXT@
 
-libggobi.so $(TOP)/lib/libggobi.so: $(OBJ:%.o=%.lo)
-	$(CC) $(SHLIB_LDFLAGS) -o $@ $(OBJ:%.o=%.lo) $(LIBS)
+libggobi.so $(TOP)/lib/libggobi.so: $(OBJ)
+	$(CC) $(SHLIB_LDFLAGS) -o $@ $(OBJ) $(LIBS)
 
-libggobi.dylib $(TOP)/lib/libggobi.dylib: $(OBJ:%.o=%.lo)
-	libtool -dynamic -o $@ $(OBJ:%.o=%.lo) `echo "$(LIBS)"|sed 's/-bexpall//' | sed -e 's/-I[^ ]*//'` -lgcc
+libggobi.dylib $(TOP)/lib/libggobi.dylib: $(OBJ)
+	libtool -dynamic -o $@ $(OBJ) `echo "$(LIBS)"|sed 's/-bexpall//' | sed -e 's/-I[^ ]*//'` -lgcc
 
-libggobi.dll $(TOP)/lib/libggobi.dll: $(OBJ:%.o=%.lo)
-	$(CC) $(SHLIB_LDFLAGS) -o $@ ggobi.def -Wl,--out-implib,$(TOP)/lib/libggobi.a $(OBJ:%.o=%.lo) $(LIBS) 
+libggobi.dll $(TOP)/lib/libggobi.dll: $(OBJ)
+	$(CC) $(SHLIB_LDFLAGS) -o $@ ggobi.def -Wl,--out-implib,$(TOP)/lib/libggobi.a $(OBJ) $(LIBS) 
 
 $(TOP)/bin/xmlConvert: xmlConvert.o $(TOP)/lib/libggobi.@SHLIB_EXT@
 	$(CC) -o $@ xmlConvert.o -L$(TOP)/lib -lggobi $(XML_LIBS) $(GTK_LIBS) 
@@ -190,5 +190,5 @@ marshal.h: marshal.list
 marshal.c: marshal.list
 	 $(GLIB_GENMARSHAL) --prefix=ggobi_marshal $< --body > $@
 
-make_ggobi.o: marshal.h
-ggobiClass.o: marshal.h
+make_ggobi.lo: marshal.h
+ggobiClass.lo: marshal.h
