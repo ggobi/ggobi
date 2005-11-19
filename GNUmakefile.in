@@ -14,18 +14,29 @@ include Makeconf
 
 INSTALLED_LIB_NAMES=libggobi.@SHLIB_EXT@
 
-all: all-src buildPlugins
+all: all-src buildPlugins symlinks
 
-.PHONY:	lib Rggobi Pythonggobi Perlggobi
+.PHONY:	all-src lib bin
 
 all-src:
 	$(MAKE) -C src all
 	
-ggobi:
+bin:
 	$(MAKE) -C src ggobi
 
 lib:
 	$(MAKE) -C src lib
+
+ifdef LOCAL_INSTALL
+symlinks: ggobi ggobidb
+else
+symlinks:
+endif
+
+ggobi:
+	ln -s bin/ggobi ggobi
+ggobidb:
+	ln -s bin/ggobidb ggobidb
 
 include PluginList
 
@@ -95,14 +106,14 @@ endif
 GGOBI_HOME=$(shell pwd)
 
 ifneq (${PLUGIN_DIRS},)
-buildPlugins:  @EMBED_LIB@
+buildPlugins: all-src
 	  for f in $(PLUGIN_DIRS) ; do \
 	    echo "Building plugin $$f" ; \
 	    LOCAL_BUILD=1; export LOCAL_BUILD ; \
 	    export GGOBI_HOME ; $(GGOBI_HOME)/plugin $$f ; \
 	  done \
 
-installPlugins:
+installPlugins: buildPlugins
 	for f in ${PLUGIN_DIRS} ; do \
 	  export GGOBI_HOME ; $(GGOBI_HOME)/plugin --install=$(ggobi_install_home) $$f ; \
 	done

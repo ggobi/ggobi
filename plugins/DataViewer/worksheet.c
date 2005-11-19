@@ -180,7 +180,7 @@ addToMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
   "	</ui>";
   
   static GtkActionEntry action_entries[] = {
-	{ "DataView", NULL, "Data _Viewer", NULL, "View the data elements on a grid", 
+	{ "DataView", NULL, "_Data Viewer", NULL, "View the data elements on a grid", 
 		G_CALLBACK (show_data_edit_window) },
   };
   

@@ -877,6 +877,7 @@ static const gchar *main_ui_str =
 "			<menuitem action='Smooth'/>"
 #endif
 "			<menuitem action='MissingValues'/>"
+"			<separator/>"
 "		</menu>"
 "		<menu action='Help'>"
 "			<menuitem action='AboutGGobi'/>"
