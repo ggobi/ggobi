@@ -455,16 +455,19 @@ parcoords_add_delete_splot(cpaneld *cpanel, splotd *sp, gint jvar, gint *jvar_pr
       sp_new = ggobi_parcoords_splot_new (display, gg);
       sp_new->p1dvar = jvar; 
 
-      if (cpanel->parcoords_selection_mode == VAR_INSERT)
+	  box = (sp->da)->parent;
+	  gtk_box_pack_start (GTK_BOX (box), sp_new->da, true, true, 0);
+	  
+      if (cpanel->parcoords_selection_mode == VAR_INSERT) {
         display->splots = g_list_insert (display->splots,
           (gpointer) sp_new, sp_indx);
-      else if (cpanel->parcoords_selection_mode == VAR_APPEND)
+		gtk_box_reorder_child(GTK_BOX(box), sp_new->da, sp_indx);
+	  } else if (cpanel->parcoords_selection_mode == VAR_APPEND)
         display->splots = g_list_append (display->splots,
           (gpointer) sp_new);
 
-      box = (sp->da)->parent;
-      gtk_box_pack_end (GTK_BOX (box), sp_new->da, false, false, 0);
-      gtk_widget_show (sp_new->da);
+	  gtk_widget_show (sp_new->da);
+
 #if 0
       l = display->splots;
       while (l) {

@@ -196,7 +196,7 @@ create_vcl_window(vcld *vcl, PluginInstance *inst)
 	  tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(model));
 	  populate_tree_view(tree_view, NULL, 1, false, GTK_SELECTION_SINGLE, 
 	  	G_CALLBACK(vcl_datad_set_cb), inst);
-	  
+	  g_object_set_data(G_OBJECT(tree_view), "datad_swin", swin);
     g_signal_connect (G_OBJECT (gg), "datad_added",
       G_CALLBACK(vcl_tree_view_datad_added_cb), tree_view);
     /*-- --*/

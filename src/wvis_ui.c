@@ -150,7 +150,9 @@ colorscheme_set_cb (GtkTreeSelection *sel, GtkTreeView* tree_view)
  * gg->activeColorScheme to the value of scheme when the user asks.
 */
 
-	gtk_tree_selection_get_selected(sel, &model, &iter);
+	if (!gtk_tree_selection_get_selected(sel, &model, &iter))
+		return;
+	
 	gtk_tree_model_get(model, &iter, 1, &scheme, -1);
 	
   if (scheme) {

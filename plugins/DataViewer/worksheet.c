@@ -368,8 +368,8 @@ create_ggobi_sheet(datad *data, ggobid *gg)
 		  	"text-column", 0, NULL);
 	  } else renderer = gtk_cell_renderer_text_new();
 	  if (i > 0) {
-		  g_object_set(G_OBJECT(renderer), "mode", GTK_CELL_RENDERER_MODE_EDITABLE, NULL);
-		  g_object_set_data(G_OBJECT(renderer), "column", GINT_TO_POINTER(i-1));
+		  g_object_set(G_OBJECT(renderer), "editable", true, NULL);
+		  g_object_set_data(G_OBJECT(renderer), "column", GINT_TO_POINTER(i));
 		  g_signal_connect(G_OBJECT(renderer), "edited", G_CALLBACK(cell_changed), model);
 	  }
 	  col = gtk_tree_view_column_new_with_attributes(col_labels[i], renderer, 
@@ -394,6 +394,13 @@ create_ggobi_sheet(datad *data, ggobid *gg)
   g_signal_connect_object(G_OBJECT(gg), "splot_new",
     G_CALLBACK(monitor_new_plot), G_OBJECT(sheet), 0);
 
+  g_signal_connect_object (G_OBJECT(gg), "identify_point",
+    G_CALLBACK(identify_cell), G_OBJECT(sheet), 0);
+  g_signal_connect_object (G_OBJECT(gg), "move_point",
+    G_CALLBACK(move_point_value), G_OBJECT(sheet), 0);
+  g_signal_connect_object (G_OBJECT(gg), "brush_motion",
+    G_CALLBACK(brush_change), G_OBJECT(sheet), 0);
+	
   connect_to_existing_displays(gg, sheet);
 
   return(scrolled_window);
@@ -412,12 +419,7 @@ connect_to_splot(splotd *sp, GtkWidget *sheet)
 {
   ggobid *gg = sp->displayptr->ggobi;
 
-  g_signal_connect_object (G_OBJECT(gg), "identify_point",
-    G_CALLBACK(identify_cell), G_OBJECT(sheet), 0);
-  g_signal_connect_object (G_OBJECT(gg), "move_point",
-    G_CALLBACK(move_point_value), G_OBJECT(sheet), 0);
-  g_signal_connect_object (G_OBJECT(gg), "brush_motion",
-    G_CALLBACK(brush_change), G_OBJECT(sheet), 0);
+  // nothing to do currently, all events come from GGobi itself, not the splot
 }
 
 
@@ -574,7 +576,7 @@ cell_changed(GtkCellRendererText *renderer, gchar *path_str, gchar *text, GtkTre
 	gtk_tree_path_free(path);
 	
 	if (type == G_TYPE_STRING) { // categorical
-		vartabled *vt = g_slist_nth_data(data->vartable, col);
+		vartabled *vt = g_slist_nth_data(data->vartable, col-1);
 		gchar *old_text;
 		gint k;
 		for (k = 0; k < vt->nlevels; k++) {
@@ -590,7 +592,7 @@ cell_changed(GtkCellRendererText *renderer, gchar *path_str, gchar *text, GtkTre
 		gtk_list_store_set(GTK_LIST_STORE(model), &iter, col, value, -1);
 	}
       
-    update_cell(row, col, value, data);
+    update_cell(row, col-1, value, data);
 }
 
 

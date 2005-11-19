@@ -766,7 +766,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
     1, 1);
 
-  label = gtk_label_new ("Di_stance");
+  label = gtk_label_new_with_mnemonic ("Di_stance");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), vbox_params, label);
 
   /*-- Groups tab --*/
