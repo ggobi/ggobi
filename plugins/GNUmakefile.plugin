@@ -35,12 +35,12 @@ endif
 %.so: $(OBJS)
 	$(CC) $(SHLIB_LDFLAGS) $(PLUGIN_LD_FLAGS) $(OBJS) -o $@ $(PLUGIN_LIBS) $(GGOBI_LIBS)
 
+%.dylib: $(OBJS)
+	libtool -dynamic $(PLUGIN_LD_FLAGS) -o $@ $(OBJS) `echo "$(PLUGIN_LIBS) $(GGOBI_LIBS)"|sed 's/-bexpall//' | sed -e 's/-I[^ ]*//'` -lgcc
+	
 %.dll: $(OBJS)
 	$(CC) $(SHLIB_LDFLAGS) $(PLUGIN_LD_FLAGS) -o $@ $(@:%.dll=%.def) \
 	-Wl,--out-implib,$(@:%.dll=%.a) $(OBJS) $(PLUGIN_LIBS) $(GGOBI_LIBS)
-	
-$(PKG).so:
-$(PKG).dll:
 
 objects: 
 	@echo "$(OBJS)"

@@ -177,7 +177,7 @@ libs:
 	@echo "$(LIBS)"
 
 clean:
-	for f in $(OBJ) $(OBJ:%.o=%.lo) ; do \
+	for f in $(OBJ) ggobiMain.o xmlConvert.o marshal.c marshal.h; do \
 	  if test -f $$f ; then rm $$f ; fi \
 	done
 
