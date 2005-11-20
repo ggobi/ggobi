@@ -50,9 +50,11 @@ const Dynload *dynload = &unixDynload;
 #ifndef WIN32 
 #include <unistd.h> 
 #include <sys/stat.h> 
-
+#ifndef Darwin
 #define DLL_EXTENSION ".so"
-
+#else
+#define DLL_EXTENSION ".dylib"
+#endif
 #else
 
 #include <glib.h> 

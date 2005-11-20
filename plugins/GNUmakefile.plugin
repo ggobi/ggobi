@@ -38,9 +38,15 @@ endif
 %.dylib: $(OBJS)
 	libtool -dynamic $(PLUGIN_LD_FLAGS) -o $@ $(OBJS) $(PLUGIN_LIBS) $(GGOBI_LIBS) -lgcc
 	
-%.dll: $(OBJS)
+%.dll: $(OBJS) $(@:%.dll=%.def)
 	$(CC) $(SHLIB_LDFLAGS) $(PLUGIN_LD_FLAGS) -o $@ $(@:%.dll=%.def) \
 	-Wl,--out-implib,$(@:%.dll=%.a) $(OBJS) $(PLUGIN_LIBS) $(GGOBI_LIBS)
+
+%.def: $(OBJS)
+	echo EXPORTS > $@
+	nm $(OB) > tmp
+	sed -n '/^........ [T] _/s/^........ [T] _/ /p' tmp >> $@
+	rm tmp
 
 objects: 
 	@echo "$(OBJS)"
@@ -55,10 +61,10 @@ install:
 # Docs and support files, e.g. R, Python, Perl files.
 
 distclean: clean
-	-rm config.cache config.status config.log local.config $(PKG).so
+	-rm config.cache config.status config.log local.config
 
 clean:
-	rm -f *.o *.so
+	rm -f *.o *.so *.def *.dll *.dylib
 
 show:
 	@echo $(OBJS)
