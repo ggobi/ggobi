@@ -426,6 +426,7 @@ Add an option:  Model either 'circuit resistance' or 'shortest path'
 /*
  * twopi tab
 */
+/* This doesn't work as well as my 'radial' in any case; disable.
   frame = gtk_frame_new ("twopi layout");
   gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
 
@@ -445,6 +446,7 @@ Add an option:  Model either 'circuit resistance' or 'shortest path'
 
   label = gtk_label_new_with_mnemonic ("_Twopi");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), frame, label);
+ */
 
 /*
  * circo tab
