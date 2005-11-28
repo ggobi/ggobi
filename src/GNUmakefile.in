@@ -164,8 +164,14 @@ libggobi.so $(TOP)/lib/libggobi.so: $(OBJ)
 libggobi.dylib $(TOP)/lib/libggobi.dylib: $(OBJ)
 	libtool -dynamic -o $@ $(OBJ) `echo "$(LIBS)"|sed 's/-bexpall//' | sed -e 's/-I[^ ]*//'` -lgcc
 
-libggobi.dll $(TOP)/lib/libggobi.dll: $(OBJ)
-	$(CC) $(SHLIB_LDFLAGS) -o $@ ggobi.def -Wl,--out-implib,$(TOP)/lib/libggobi.a $(OBJ) $(LIBS) 
+libggobi.def: $(OBJ)
+	echo EXPORTS > $@
+	nm -g --defined-only $(OBJ) > tmp
+	sed -n '/^........ [T|C] _/s/^........ [T|C] _/ /p' tmp >> $@
+	rm tmp
+	
+libggobi.dll $(TOP)/lib/libggobi.dll: $(OBJ) libggobi.def
+	$(CC) $(SHLIB_LDFLAGS) -o $@ libggobi.def -Wl,--out-implib,$(TOP)/lib/libggobi.a $(OBJ) $(LIBS) 
 
 $(TOP)/bin/xmlConvert: xmlConvert.o $(TOP)/lib/libggobi.@SHLIB_EXT@
 	$(CC) -o $@ xmlConvert.o -L$(TOP)/lib -lggobi $(XML_LIBS) $(GTK_LIBS) 

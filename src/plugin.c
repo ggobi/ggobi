@@ -23,7 +23,7 @@
 HINSTANCE ggobi_dlopen(const char *name, GGobiPluginDetails *plugin);
 void ggobi_dlerror(char *buf, GGobiPluginDetails *plugin);
 
-#ifdef WIN32
+#ifdef G_OS_WIN32
 
 int ggobi_dlclose(HINSTANCE handle);
 DLFUNC ggobi_dlsym(HINSTANCE handle, const char *name);
@@ -47,7 +47,7 @@ const Dynload *dynload = &unixDynload;
 #endif
 
 
-#ifndef WIN32 
+#ifndef G_OS_WIN32 
 #include <unistd.h> 
 #include <sys/stat.h> 
 #ifndef Darwin
@@ -75,7 +75,7 @@ gboolean
 canRead(const char * const fileName)
 {
   gboolean val = false;
-#ifndef WIN32
+#ifndef G_OS_WIN32
   struct stat buf;
   val = (stat(fileName, &buf) == 0);
 #else
@@ -559,7 +559,7 @@ runInteractiveInputPlugin(ggobid *gg)
 
 /***************************************************************************/
 
-#ifdef WIN32
+#ifdef G_OS_WIN32
 
 HINSTANCE
 ggobi_dlopen(const char *name, GGobiPluginDetails *plugin)
@@ -715,7 +715,7 @@ GGobiPluginInfo  *
 createGGobiInputPluginInfo(GGobiInputPluginInfo *info, GGobiPluginDetails *details, gchar **modeNames, guint numModes)
 {
   GGobiPluginInfo  *plugin; 
-#ifdef WIN32
+#ifdef G_OS_WIN32
   static HINSTANCE ggobiLibrary = NULL;
  
   if(!details->dllName && !details->library) {

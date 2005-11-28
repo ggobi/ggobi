@@ -7,15 +7,15 @@ endif
  
 # build against the local (non-system) copy?
 ifdef LOCAL_BUILD
- export PKG_CONFIG_PATH=$(GGOBI_HOME):$PKG_CONFIG_PATH
+ PKG_CONFIG_PATH := "$(GGOBI_ROOT):$(PKG_CONFIG_PATH)"
 endif
  
 -include local.config
 
  # now query pkg config for the flags
 
-GGOBI_CFLAGS=`$(PKG_CONFIG) ggobi --cflags`
-GGOBI_LIBS=`$(PKG_CONFIG) ggobi --libs`
+GGOBI_CFLAGS=$(shell PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) $(PKG_CONFIG) ggobi --cflags)
+GGOBI_LIBS=$(shell PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) $(PKG_CONFIG) ggobi --libs)
 
 ifndef SRC
  SRC=$(wildcard *.c *.f)
@@ -38,14 +38,14 @@ endif
 %.dylib: $(OBJS)
 	libtool -dynamic $(PLUGIN_LD_FLAGS) -o $@ $(OBJS) $(PLUGIN_LIBS) $(GGOBI_LIBS) -lgcc
 	
-%.dll: $(OBJS) $(@:%.dll=%.def)
+%.dll: $(OBJS) DataViewer.def
 	$(CC) $(SHLIB_LDFLAGS) $(PLUGIN_LD_FLAGS) -o $@ $(@:%.dll=%.def) \
 	-Wl,--out-implib,$(@:%.dll=%.a) $(OBJS) $(PLUGIN_LIBS) $(GGOBI_LIBS)
 
 %.def: $(OBJS)
 	echo EXPORTS > $@
-	nm $(OB) > tmp
-	sed -n '/^........ [T] _/s/^........ [T] _/ /p' tmp >> $@
+	nm -g --defined-only $(OBJS) > tmp
+	sed -n '/^........ [T|C] _/s/^........ [T|C] _/ /p' tmp >> $@
 	rm tmp
 
 objects: 

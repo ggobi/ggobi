@@ -1,5 +1,7 @@
 # Need to compute this in configure.in
 
+GGOBI_ROOT=@GGOBI_ROOT@
+
 PKG_CONFIG=@PKG_CONFIG@
 
 GTK_CFLAGS=@GTK_CFLAGS@
