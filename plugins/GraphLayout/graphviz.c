@@ -31,6 +31,28 @@ extern void neatoLayout(Agraph_t *, int, int);
 #define TWOPI_LAYOUT 3
 #define CIRCO_LAYOUT 4
 
+// This will be part of graphviz, but it probably isn't yet.
+int agsafeset(void* obj, char* name, char* value, char* def)
+{
+    Agsym_t* a = agfindattr(obj, name);
+
+    if (a == NULL) {
+        if (!def) def = "";
+        switch (agobjkind(obj)) {
+        case AGGRAPH:
+            a = agraphattr((Agraph_t*)obj, name, def);
+            break;
+        case AGNODE:
+            a = agnodeattr(((Agnode_t*)obj)->graph, name, def);
+            break;
+        case AGEDGE:
+            a = agedgeattr(((Agedge_t*)obj)->head->graph, name, def);
+            break;
+        }
+    }
+    return agxset(obj, a->index, value);
+}
+
 #ifdef DEBUG
 static void
 test_edge_length (Agraph_t *graph, glayoutd *gl, ggobid *gg)
@@ -154,7 +176,12 @@ neato_apply_edge_length (Agraph_t *graph, GtkWidget *w,
           quick_message ("The minimum length is 1.0; perform a variable transformation before doing the layout.", false);
           return false;
         } else {
+#ifdef HAVE_LIBGVC
+          agsafeset (edge, "len", 
+  	    g_strdup_printf("%f", e->tform.vals[i][selected_var]));
+#else
           edge->u.dist = e->tform.vals[i][selected_var];
+#endif
         }
       }
     }
@@ -299,10 +326,11 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
     int ncc;
 
     /* Get the rowlab associated with the center node, if defined */
-    if (gl->centerNodeIndex >= 0)
+    if (gl->centerNodeIndex >= 0) {
       ctr = agfindnode(graph,
         (gchar *) g_array_index (d->rowlab, gchar *, 
 				 (gl->centerNodeIndex)));
+    }
 
 #ifndef HAVE_LIBGVC
     twopi_init_graph(graph);
@@ -314,6 +342,8 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
 #endif
 
 #ifdef HAVE_LIBGVC
+    if (ctr)
+      agsafeset (graph, "root", ctr->name, NULL);
     gvLayout (gvc, graph, "twopi");
 #else
     circleLayout(graph, ctr);
@@ -337,6 +367,7 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
     gvLayout (gvc, graph, "fdp");
 #else
     void fdpLayout(graph_t * g);
+
     fdp_init_graph(graph);
     fdpLayout(graph);
 #endif
@@ -347,7 +378,7 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
       name = (gchar *) g_array_index (d->rowlab, gchar *, m);
       node = agfindnode (graph, name);
       for (k=0; k<dim; k++)
-        pos[i][k] = (gdouble) ND_pos(node)[k]; /* node->u.pos[k]; */
+        pos[i][k] = (gdouble) ND_pos(node)[k]; /* node->u.pos[k];*/
     }
 #ifndef HAVE_LIBGVC
     fdp_cleanup(graph);
@@ -355,7 +386,11 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
 
   } else if (layout_type == NEATO_LAYOUT) {
     attrsym_t*  sym;
-    gint        model;
+#ifdef HAVE_LIBGVC
+    gchar *model;
+#else
+    gint imodel;
+#endif
 
     if (gl->neato_dim > 2) {
         char buf[20];
@@ -370,18 +405,30 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
      * mechanism for setting Ndim but obviously wouldn't be in 1.16.
      * -- Emden
      */
-#ifndef HAVE_LIBGVC
-    neato_init_graph(graph);
-
+#ifdef HAVE_LIBGVC
     /* There is also a subset model */
     if (gl->neato_model == neato_circuit_resistance) {
-      model = MODEL_CIRCUIT;
+      model = "circuit";
       modelchar = 'c';
     } else if (gl->neato_model == neato_shortest_path) {
-      model = MODEL_SHORTPATH;
+      model = "shortpath";
       modelchar = 's';
     } else {
-      model = MODEL_SUBSET;
+      model = "subset";
+      modelchar = 'b';
+    }
+    agsafeset (graph, "model", model, NULL);
+#else
+    neato_init_graph(graph);
+    /* There is also a subset model */
+    if (gl->neato_model == neato_circuit_resistance) {
+      imodel = "MODEL_CIRCUIT";
+      modelchar = 'c';
+    } else if (gl->neato_model == neato_shortest_path) {
+      imodel = "MODEL_SHORTPATH";
+      modelchar = 's';
+    } else {
+      imodel = "MODEL_SUBSET";
       modelchar = 'b';
     }
 #endif
@@ -445,7 +492,6 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
  * and this code could be more efficient -- writing to one set
  * of arrays, then copying to a matrix is probably unnecessary.
 */
-
   nc = dim;
 
   rowids = (gchar **) g_malloc (nvisible * sizeof(gchar *));
