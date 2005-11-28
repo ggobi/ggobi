@@ -12,21 +12,16 @@
 
 void       close_ggvis_window(GtkWidget *w, PluginInstance *inst);
 void       create_ggvis_window(ggvisd *ggv, PluginInstance *inst);
-void       show_ggvis_window (GtkWidget *widget, PluginInstance *inst);
+void       show_ggvis_window (GtkAction *action, PluginInstance *inst);
 
 gboolean
 addToToolsMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 {
-  GtkWidget *entry;
-  const gchar *lbl = "ggvis (MDS) ...";
-
-  inst->data = NULL;
-  inst->info = plugin;
-  inst->gg = gg;
-
-  entry = GGobi_addToolsMenuItem ((gchar *)lbl, gg);
-  g_signal_connect (G_OBJECT(entry), "activate",
-                      G_CALLBACK (show_ggvis_window), inst);
+  static GtkActionEntry entry = {
+	"GGVis", NULL, "_ggvis", NULL, "Multi-dimensional scaling tool", 
+		G_CALLBACK (show_ggvis_window)
+  };
+  GGOBI(addToolAction)(&entry, (gpointer)inst, gg);
   return(true);
 }
 
@@ -145,7 +140,7 @@ static const gchar *const constrained_lbl[] = {
   "First two variables frozen"};
 
 void
-show_ggvis_window (GtkWidget *widget, PluginInstance *inst)
+show_ggvis_window (GtkAction *action, PluginInstance *inst)
 {
   if (g_slist_length(inst->gg->d) < 1) {
     g_printerr ("No datasets to show\n");

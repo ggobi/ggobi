@@ -12,28 +12,23 @@
 
 void       close_graphact_window(GtkWidget *w, PluginInstance *inst);
 GtkWidget *create_graphact_window(ggobid *gg, PluginInstance *inst);
-void       show_graphact_window (GtkWidget *widget, PluginInstance *inst);
+void       show_graphact_window (GtkAction *action, PluginInstance *inst);
 
 
 gboolean
 addToToolsMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 {
-  GtkWidget *entry;
-  const gchar *lbl = "Graph operations ...";
-
-  inst->data = NULL;
-  inst->info = plugin;
-  inst->gg = gg;
-
-  entry = GGobi_addToolsMenuItem ((gchar *)lbl, gg);
-  g_signal_connect (G_OBJECT(entry), "activate",
-                      G_CALLBACK (show_graphact_window), inst);
+  static GtkActionEntry entry = {
+	"GraphAction", NULL, "Graph _operations", NULL, "Perform misc operations on a graph", 
+		G_CALLBACK (show_graphact_window)
+  };
+  GGOBI(addToolAction)(&entry, (gpointer)inst, gg);
   return(true);
 }
 
 
 void
-show_graphact_window (GtkWidget *widget, PluginInstance *inst)
+show_graphact_window (GtkAction *action, PluginInstance *inst)
 {
   graphactd *ga;
 

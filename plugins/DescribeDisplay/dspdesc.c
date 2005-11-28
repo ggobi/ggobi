@@ -12,7 +12,7 @@
 
 void       close_dspdesc_window(GtkWidget *w, PluginInstance *inst);
 GtkWidget *create_dspdesc_window(ggobid *gg, PluginInstance *inst);
-void       show_dspdesc_window(GtkWidget *widget, PluginInstance *inst);
+void       show_dspdesc_window(GtkAction *action, PluginInstance *inst);
 
 static void window_close (PluginInstance *inst);
 
@@ -33,22 +33,23 @@ dspdesc_init (dspdescd *desc)
 gboolean
 addToToolsMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 {
-  GtkWidget *entry;
-  const gchar *lbl = "Save display description ...";
-
+  static GtkActionEntry entry = {
+	"DescribeDisplay", NULL, "_Save display description", NULL, "Save an S-language description of this display", 
+		G_CALLBACK (show_dspdesc_window)
+  };
+  
   inst->data = NULL;
   inst->info = plugin;
   inst->gg = gg;
 
-  entry = GGobi_addToolsMenuItem ((gchar *)lbl, gg);
-  g_signal_connect (G_OBJECT(entry), "activate",
-                      G_CALLBACK (show_dspdesc_window), inst);
+  GGOBI(addToolAction)(&entry, (gpointer)inst, gg);
+  
   return(true);
 }
 
 
 void
-show_dspdesc_window (GtkWidget *widget, PluginInstance *inst)
+show_dspdesc_window (GtkAction *action, PluginInstance *inst)
 {
   dspdescd *desc;
 

@@ -60,6 +60,7 @@ ggobid*    GGobiFromDisplay (displayd *display);
 ggobid*    GGobiFromSPlot (splotd *sp);
 ggobid*    GGobiFromWidget (GtkWidget *w, gboolean);
 ggobid*    GGobiFromWindow (GdkWindow *w);
+void GGobi_addToolAction (GtkActionEntry *entry, gpointer *data, ggobid *gg);
 GtkWidget* GGobi_addToolsMenuItem (gchar *label, ggobid *gg);
 gboolean   GGobi_addToolsMenuWidget(GtkWidget *entry, ggobid *gg);
 void       GGobi_widget_set (GtkWidget *, ggobid *gg, gboolean isWindow);

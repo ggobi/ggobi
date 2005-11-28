@@ -721,6 +721,15 @@ GGobi_addToolsMenuWidget(GtkWidget *entry, ggobid *gg)
   return(true);
 }
 
+void
+GGobi_addToolAction (GtkActionEntry *entry, gpointer *data, ggobid *gg) {
+	GtkActionGroup *actions = gtk_action_group_new(entry->name);
+	gtk_action_group_add_actions(actions, entry, 1, data);
+	gtk_ui_manager_insert_action_group(gg->main_menu_manager, actions, -1);
+	gtk_ui_manager_add_ui(gg->main_menu_manager, gtk_ui_manager_new_merge_id(gg->main_menu_manager),
+		"/menubar/Tools/", entry->name, entry->name, GTK_UI_MANAGER_AUTO, false);
+}
+
 GtkWidget *
 GGobi_addToolsMenuItem (gchar *lbl, ggobid *gg)
 {

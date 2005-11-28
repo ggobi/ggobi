@@ -13,26 +13,21 @@
 void    vcl_window_closed(GtkWidget *w, PluginInstance *inst);
 void    close_vcl_window_cb(GtkWidget *w, PluginInstance *inst);
 void    create_vcl_window(vcld *vcl, PluginInstance *inst);
-void    show_vcl_window (GtkWidget *widget, PluginInstance *inst);
+void    show_vcl_window (GtkAction *action, PluginInstance *inst);
 
 gboolean
 addToToolsMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 {
-  GtkWidget *entry;
-  const gchar *lbl = "VarCloud ...";
-
-  inst->data = NULL;
-  inst->info = plugin;
-  inst->gg = gg;
-
-  entry = GGobi_addToolsMenuItem ((gchar *)lbl, gg);
-  g_signal_connect (G_OBJECT(entry), "activate",
-                      G_CALLBACK (show_vcl_window), inst);
+  static GtkActionEntry entry = {
+	"VarCloud", NULL, "Variogram _Cloud", NULL, "Spatial data analysis tool", 
+		G_CALLBACK (show_vcl_window)
+  };
+  GGOBI(addToolAction)(&entry, (gpointer)inst, gg);
   return(true);
 }
 
 void
-show_vcl_window (GtkWidget *widget, PluginInstance *inst)
+show_vcl_window (GtkAction *action, PluginInstance *inst)
 {
   if (g_slist_length(inst->gg->d) < 1) {
     g_printerr ("No datasets to show\n");

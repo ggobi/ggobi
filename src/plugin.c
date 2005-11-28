@@ -325,8 +325,10 @@ createPluginList()
   populate_tree_view(list, titles, G_N_ELEMENTS(titles), true, GTK_SELECTION_SINGLE, NULL, NULL);
   cols = gtk_tree_view_get_columns(GTK_TREE_VIEW(list));
   
-  for (i = 0, l = cols; l; l = l->next, i++)
-	  gtk_tree_view_column_set_min_width(GTK_TREE_VIEW_COLUMN(l->data), widths[i]);
+  for (i = 0, l = cols; l; l = l->next, i++) {
+	  gtk_tree_view_column_set_sizing(GTK_TREE_VIEW_COLUMN(l->data), GTK_TREE_VIEW_COLUMN_FIXED);
+	  gtk_tree_view_column_set_fixed_width(GTK_TREE_VIEW_COLUMN(l->data), widths[i]);
+  }
   /*
   gtk_clist_set_column_width(GTK_CLIST(list), 0, 100); 
   gtk_clist_set_column_width(GTK_CLIST(list), 1, 225); 
@@ -345,35 +347,35 @@ createPluginList()
 GtkWidget *
 showPluginInfo(GList *plugins, GList *inputPlugins, ggobid *gg)
 {
- GtkWidget *win, *main_vbox, *list, *lbl = NULL;
+ GtkWidget *win, *main_vbox, *list, *swin, *lbl = NULL;
 
   win = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-
+  gtk_window_set_default_size(GTK_WINDOW(win), 850, 200);
+  gtk_window_set_title(GTK_WINDOW(win), "About plugins");
+  
   main_vbox = gtk_notebook_new();
 
   gtk_container_set_border_width(GTK_CONTAINER(main_vbox),0); 
   gtk_container_add(GTK_CONTAINER(win), main_vbox);
-  gtk_widget_show(main_vbox);
-
 
   if(plugins) {
-    list = createPluginList();
+	  swin = gtk_scrolled_window_new(NULL, NULL);
+      list = createPluginList();
+      gtk_container_add(GTK_CONTAINER(swin), list);
     addPlugins(plugins, list, gg, GENERAL_PLUGIN);
 	lbl = gtk_label_new_with_mnemonic("_General");
-    gtk_notebook_append_page(GTK_NOTEBOOK(main_vbox), list, lbl);
+	gtk_notebook_append_page(GTK_NOTEBOOK(main_vbox), swin, lbl);
   }
   if(inputPlugins) {
-    list = createPluginList();
+	  swin = gtk_scrolled_window_new(NULL, NULL);
+	  list = createPluginList();
+	  gtk_container_add(GTK_CONTAINER(swin), list);
     addPlugins(inputPlugins, list, gg, INPUT_PLUGIN);
 	lbl = gtk_label_new_with_mnemonic("_Input Readers");
-    gtk_notebook_append_page(GTK_NOTEBOOK(main_vbox), list, lbl);
+	gtk_notebook_append_page(GTK_NOTEBOOK(main_vbox), swin, lbl);
   }
   
-  if (lbl)
-	  gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), main_vbox);
-
-  gtk_widget_show_all(main_vbox);
-  gtk_widget_show(win);
+  gtk_widget_show_all(win);
  
   return(win); 
 }

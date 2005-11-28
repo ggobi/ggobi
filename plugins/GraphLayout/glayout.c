@@ -12,27 +12,22 @@
 
 void       close_glayout_window(GtkWidget *w, PluginInstance *inst);
 GtkWidget *create_glayout_window(ggobid *gg, PluginInstance *inst);
-void       show_glayout_window (GtkWidget *widget, PluginInstance *inst);
+void       show_glayout_window (GtkAction *action, PluginInstance *inst);
 
 gboolean
 addToToolsMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 {
-  GtkWidget *entry;
-  const gchar *lbl = "Graph layout ...";
-
-  inst->data = NULL;
-  inst->info = plugin;
-  inst->gg = gg;
-
-  entry = GGobi_addToolsMenuItem ((gchar *)lbl, gg);
-  g_signal_connect (G_OBJECT(entry), "activate",
-                      G_CALLBACK (show_glayout_window), inst);
+  static GtkActionEntry entry = {
+	"GraphLayout", NULL, "Graph _layout", NULL, "Layout graphs using graphviz", 
+		G_CALLBACK (show_glayout_window)
+  };  
+  GGOBI(addToolAction)(&entry, (gpointer)inst, gg);
   return(true);
 }
 
 
 void
-show_glayout_window (GtkWidget *widget, PluginInstance *inst)
+show_glayout_window (GtkAction *action, PluginInstance *inst)
 {
   glayoutd *gl;
 
