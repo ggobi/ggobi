@@ -403,8 +403,10 @@ Add an option:  Model either 'circuit resistance' or 'shortest path'
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), frame, label);
 
 /*
- * fdp tab
+ * fdp tab -- disable for a while.  It crashes on snetwork.xml, and
+ * I don't know why.
 */
+/*
   frame = gtk_frame_new ("fdp layout");
   gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
 
@@ -424,6 +426,7 @@ Add an option:  Model either 'circuit resistance' or 'shortest path'
 
   label = gtk_label_new_with_mnemonic ("_FDP");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), frame, label);
+ */
 
 /*
  * twopi tab
