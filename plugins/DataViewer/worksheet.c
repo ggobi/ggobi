@@ -152,10 +152,11 @@ static GtkItemFactoryEntry menubar_items[] = {
 gboolean
 addToMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 {
-  GtkWidget *entry;
-  GtkActionGroup *actions;
-  extern GtkWidget *GGobi_addToolsMenuItem (gchar *label, ggobid *gg);
-
+  static GtkActionEntry entry = {
+	"DataView", NULL, "_Data Viewer", NULL, "View the data elements on a grid", 
+		G_CALLBACK (show_data_edit_window)
+  };
+  
   inst->data = NULL;
   inst->info = plugin;
 
@@ -164,42 +165,9 @@ addToMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
     */
   gdk_colormap_alloc_color(gdk_colormap_get_system(), &red, TRUE, TRUE);
   gdk_color_black(gdk_colormap_get_system(), &black);
+  
+  GGOBI(addToolAction)(&entry, (gpointer)inst, gg);
 
-  /*entry = GGobi_addToolsMenuItem ("Data grid ...", gg);
-  g_signal_connect_object (G_OBJECT(entry), "activate",
-                             G_CALLBACK (show_data_edit_window),
-                             (gpointer) inst, 0);
-*/
-  static const gchar *ui = 
-  "	<ui>"
-  "		<menubar>"
-  "			<menu action='Tools'>"
-  "				<menuitem action='DataView'/>"
-  "			</menu>"
-  "		</menubar>"
-  "	</ui>";
-  
-  static GtkActionEntry action_entries[] = {
-	{ "DataView", NULL, "_Data Viewer", NULL, "View the data elements on a grid", 
-		G_CALLBACK (show_data_edit_window) },
-  };
-  
-  actions = gtk_action_group_new("DataViewer Actions");
-  gtk_action_group_add_actions(actions, action_entries, G_N_ELEMENTS(action_entries), inst);
-  gtk_ui_manager_insert_action_group(gg->main_menu_manager, actions, -1);
-  gtk_ui_manager_add_ui_from_string(gg->main_menu_manager, ui, -1, NULL);
-  
-#if 0
-    /* This is an attempt to use the more automated menu creation mechanism.
-       However, it is not behaving itself quite yet, so we use the
-       manual mechanism which is more verbose but more controllable. */
-static GtkItemFactoryEntry menu_items[] = {
-    {"/Data", NULL, NULL, "<LastBranch>"},
-    {"/Data/View", NULL, (GtkItemFactoryCallback) show_data_edit_window, NULL}
- };
-
-  gtk_item_factory_create_items(gg->main_menu_factory, sizeof(menu_items)/sizeof(menu_items[0]), menu_items, (gpointer) gg);
-#endif
   return(true);
 }
 

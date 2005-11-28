@@ -1,7 +1,7 @@
 <plugin name="Data Viewer" load="immediate"><!-- load may be on demand. -->
    <description>Displays datasets in data grid.</description>
    <author>Duncan Temple Lang</author>
-   <dll name="plugins/DataViewer/DataViewer.so">
+   <dll name="plugins/DataViewer/DataViewer">
     <init onCreate="addToMenu" onClose="closeWindow" />
   </dll>
 </plugin>
