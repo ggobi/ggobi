@@ -452,6 +452,20 @@ variable_notebook_adddata_cb (ggobid *gg, datad *d, void *notebook)
                               g_slist_length (gg->d) > 1);
 }
 
+void
+variable_notebook_handlers_disconnect (GtkWidget *notebook, ggobid *gg)
+{
+  g_signal_handlers_disconnect_by_func (G_OBJECT (gg),
+		      G_CALLBACK (variable_notebook_varchange_cb),
+		      GTK_OBJECT (notebook));
+  g_signal_handlers_disconnect_by_func (G_OBJECT (gg),
+		      G_CALLBACK (variable_notebook_varchange_cb),
+		      GTK_OBJECT (notebook));
+  g_signal_handlers_disconnect_by_func (G_OBJECT (gg),
+		      G_CALLBACK (variable_notebook_adddata_cb),
+		      GTK_OBJECT (notebook));
+}
+
 GtkWidget *
 get_tree_view_from_object (GObject *obj)
 {

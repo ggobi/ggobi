@@ -631,6 +631,7 @@ void       varcircles_show (gboolean, datad *, displayd *, ggobid *);
 void       varcircles_visibility_set (displayd *display, ggobid *gg);
 void       vardialog_open (ggobid *, gchar *title);
 void       variable_clone (gint, const gchar *, gboolean, datad *, ggobid *);
+void       variable_notebook_handlers_disconnect (GtkWidget *notebook, ggobid *gg);
 void       variable_notebook_list_changed_cb(ggobid *gg, datad *d, void *notebook);
 void       variable_notebook_subwindow_add (datad *d, GtkSignalFunc func, GtkWidget *notebook, vartyped, datatyped, ggobid *gg);
 void       variable_notebook_varchange_cb (ggobid *gg, vartabled *vt, gint which, datad *, void *notebook);
