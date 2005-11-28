@@ -171,6 +171,7 @@ EOF
 elif test "${GCC}" = "yes" ; then
 if test "`uname`" = "MINGW32_NT-5.1"; then
   SHLIB_EXT="dll"
+  EXE_EXT=".exe"
   OTHER_CFLAGS="${OTHER_CFLAGS} -mms-bitfields"
   LDFLAGS="-mwindows"
 else 
@@ -490,6 +491,7 @@ AC_SUBST(OS_INFO)
 AC_SUBST(GGOBI_VERSION_STRING)
 AC_SUBST(GGOBI_RELEASE_DATE)
 
+AC_SUBST(EXE_EXT)
 
  dnl These go into config.h as #define entries.
 AC_DEFINE_UNQUOTED(GGOBI_VERSION_STRING, "$GGOBI_VERSION_STRING")
