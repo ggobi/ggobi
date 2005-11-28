@@ -125,6 +125,8 @@ typedef struct {
 
   GtkTooltips *tips;
 
+  GtkWidget *varnotebook;  /* this might make it easier to destroy */
+
   /*-- for Shepard plot --*/
   gint shepard_iter;
 

@@ -231,6 +231,8 @@ ggv_tree_view_datad_added_cb (ggobid *gg, datad *d, GtkWidget *tree_view)
   GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(tree_view));
   GtkTreeIter iter;
 	
+  g_printerr ("datad_added, d %d tree_view %d\n", (gint)d, (gint)tree_view);
+
   if (tree_view == NULL)
     return;
 
@@ -254,7 +256,7 @@ void
 create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
 {
   GtkWidget *window, *main_vbox, *vbox_params;
-  GtkWidget *notebook, *varnotebook, *opt, *metric_opt;
+  GtkWidget *notebook, *opt, *metric_opt;
   GtkWidget *label, *frame, *btn, *vbox, *hbox, *vb, *hscale, *table, *hb;
   GtkWidget *menu, *child, *radio, *radio1, *radio2;
   GList *children, *list;
@@ -325,7 +327,8 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gtk_widget_set_name (GTK_WIDGET(tree_view), "nodeset");
   g_object_set_data(G_OBJECT (tree_view), "datad_swin", swin);
   g_signal_connect (G_OBJECT (gg), "datad_added",
-    G_CALLBACK(ggv_tree_view_datad_added_cb), GTK_OBJECT (tree_view));
+		    G_CALLBACK(ggv_tree_view_datad_added_cb), 
+                    (gpointer) tree_view);
   /*-- --*/
 
   for (l = gg->d; l; l = l->next) {
@@ -456,10 +459,10 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gtk_box_pack_start (GTK_BOX (hbox), vbox, false, false, 2);
 
   /*-- include only edge sets.  --*/
-  varnotebook = create_variable_notebook (hbox,
+  ggv->varnotebook = create_variable_notebook (hbox,
     GTK_SELECTION_SINGLE, all_vartypes, edgesets_only,
     G_CALLBACK(NULL), inst->gg);
-  swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK (varnotebook), 0);
+  swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK (ggv->varnotebook), 0);
   if (swin != NULL) {
     ggv->tree_view_dist = GTK_BIN(swin)->child;
     /* Initialize, selecting first variable */
@@ -934,13 +937,10 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
  * This one is called if the ggvis window is closed while
  * ggobi is still running.  It should disconnect signals,
  * because otherwise there's a problem when another routine
- * (eg GraphLayout) adds a datad.  (This doesn't happen to be
- * working, but it should!)
+ * (eg GraphLayout) adds a datad.
  */
 void close_ggvis_window(GtkWidget *w, PluginInstance *inst)
 {
- guint id;
- 
   if (inst->data) {
     GtkWidget *window = GTK_WIDGET(inst->data);
     ggobid *gg = inst->gg;
@@ -949,25 +949,22 @@ void close_ggvis_window(GtkWidget *w, PluginInstance *inst)
     GtkWidget *tree_view_node = widget_find_by_name (window, "nodeset");
     GtkWidget *tree_view_edge = widget_find_by_name (window, "edgeset");
 
-    /* I'm definitely getting the right tree_views; I've checked */
-/*
-    if (id) g_signal_handler_disconnect (G_OBJECT(gg), id);
-    if (id) g_signal_handler_disconnect (G_OBJECT(gg), id);
-*/
-
-    /* Disconnect signals; this isn't working.  Don't know why. */
-
     /*g_signal_connect (G_OBJECT (gg), "datad_added",
      G_CALLBACK(ggv_tree_view_datad_added_cb),
      GTK_OBJECT (tree_view));*/
     if (tree_view_node != NULL && tree_view_edge != NULL) {
-      g_signal_handlers_disconnect_by_func (G_OBJECT(gg),
+      g_signal_handlers_disconnect_matched(G_OBJECT(gg),
+	(GSignalMatchType) G_SIGNAL_MATCH_FUNC, 0, 0, NULL, 
         G_CALLBACK(ggv_tree_view_datad_added_cb),
         (gpointer) tree_view_node);
-      g_signal_handlers_disconnect_by_func (G_OBJECT(gg),
+      g_signal_handlers_disconnect_matched(G_OBJECT(gg),
+	(GSignalMatchType) G_SIGNAL_MATCH_FUNC, 0, 0, NULL, 
         G_CALLBACK(ggv_tree_view_datad_added_cb),
         (gpointer) tree_view_edge);
     }
+
+    // I would have thought destroying this was enough, but apparently not.
+    variable_notebook_handlers_disconnect (ggv->varnotebook, gg);
 
     /*  g_signal_connect (G_OBJECT(gg),
 	"clusters_changed", clusters_changed_cb, inst); */
@@ -975,13 +972,12 @@ void close_ggvis_window(GtkWidget *w, PluginInstance *inst)
         G_CALLBACK(clusters_changed_cb),
         (gpointer) inst);
 
-    /* The signals don't seem to be disappearing, and
-       I can't disconnect a signal by id */
-
+    
     /*
      * This is the window, so it should serve to destroy
      * all the child widgets.
     */
+    //gtk_widget_destroy (ggv->varnotebook);
     gtk_widget_destroy ((GtkWidget *) inst->data);
 
     ggv_free (ggv);
