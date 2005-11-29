@@ -27,8 +27,10 @@ extern void neatoLayout(Agraph_t *, int, int);
 
 #define DOT_LAYOUT   0
 #define NEATO_LAYOUT 1
-#define FDP_LAYOUT   2
-#define TWOPI_LAYOUT 3
+#define FDP_LAYOUT   2 // currently disabled; crashes with memory
+                       // errors when running snetwork.xml
+#define TWOPI_LAYOUT 3 // currently disabled; redundant with radial,
+                       // and not as good.
 #define CIRCO_LAYOUT 4
 
 // This will be part of graphviz, but it probably isn't yet.
@@ -105,7 +107,7 @@ void neato_dim_cb (GtkAdjustment *adj, PluginInstance *inst)
 static gint
 neato_get_weight_var (Agraph_t *graph, GtkWidget *w, glayoutd *gl, ggobid *gg)
 {
-  gint weightvar;
+  gint weightvar = -1;
   datad *e = gl->e;
   datad *e_clist;
   GtkWidget *tree_view;
@@ -115,80 +117,79 @@ neato_get_weight_var (Agraph_t *graph, GtkWidget *w, glayoutd *gl, ggobid *gg)
   tree_view = get_tree_view_from_object (G_OBJECT (w));
   if (!tree_view) {
     quick_message ("I can't identify a set of edges", false);
-    return false;
+    return -1;
   }
   e_clist = g_object_get_data(G_OBJECT(tree_view), "datad");
   if (e_clist == NULL || e_clist != e) {
     quick_message ("This isn't the same set of edges you're using", false);
-    return false;
+    return -1;
   }
   weightvar = get_one_selection_from_tree_view (tree_view, e);
   if (weightvar == -1) {
     quick_message ("Please specify a variable", false);
-    return false;
+    return -1;
   }
   return weightvar;
 }
 
-/*
 static gboolean
-neato_apply_edge_length (Agraph_t *graph, GtkWidget *w,
-  glayoutd *gl, ggobid *gg)
+neato_apply_edge_length (Agraph_t *graph, gint weightvar, glong *visible,
+			 gint nvisible, datad *d, datad *e, ggobid *gg)
 {
-  gint i, a, b, selected_var;
-  datad *d = gl->dsrc;
-  datad *e = gl->e;
+  gint i, a, b;
   datad *e_clist;
   Agnode_t *head, *tail;
   Agedge_t *edge;
   gchar *name;
-  GtkWidget *clist;
+  endpointsd *endpoints;
 
+  /*
+  GtkWidget *clist;
   clist = get_clist_from_object (GTK_OBJECT (w));
   if (!clist) {
     quick_message ("I can't identify a set of edges", false);
     return false;
   }
+  // I don't think I have an equivalent of this test now.
   e_clist = g_object_get_data(G_OBJECT(clist), "datad");
   if (e_clist == NULL || e_clist != e) {
     quick_message ("This isn't the same set of edges you're using", false);
     return false;
   }
-  selected_var = get_one_selection_from_clist (clist, e);
-  if (selected_var == -1) {
-    quick_message ("Please specify a variable", false);
-    return false;
-  }
+  */
 
+  endpoints = resolveEdgePoints(e, d);
+  if (endpoints) {
+
+    // See splot_hidden_edge
   for (i=0; i<e->edge.n; i++) {
-    a = d->rowid.idv.els[e->edge.endpoints[i].a];
+    edge_endpoints_get (i, &a, &b, d, endpoints, e);
+
     name = (gchar *) g_array_index (d->rowlab, gchar *, a);
     tail = agfindnode (graph, name);
 
-    b = d->rowid.idv.els[e->edge.endpoints[i].b];
     name = (gchar *) g_array_index (d->rowlab, gchar *, b);
     head = agfindnode (graph, name);
 
     if (head && tail) {
       edge = agfindedge (graph, tail, head);
       if (edge) {
-        if (e->tform.vals[i][selected_var] < 1) {
+        if (e->tform.vals[i][weightvar] < 1) {
           quick_message ("The minimum length is 1.0; perform a variable transformation before doing the layout.", false);
           return false;
         } else {
 #ifdef HAVE_LIBGVC
           agsafeset (edge, "len", 
-  	    g_strdup_printf("%f", e->tform.vals[i][selected_var]));
+	     g_strdup_printf("%f", e->tform.vals[i][weightvar]), NULL);
 #else
           edge->u.dist = e->tform.vals[i][selected_var];
 #endif
         }
       }
     }
-  }
+  }}
   return true;
 }
-*/
 
 
 void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
@@ -432,9 +433,12 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
       modelchar = 'b';
     }
 #endif
-     
+
     /* In place of MODE_MAJOR, you could use MODE_KK which is the old neato */
 #ifdef HAVE_LIBGVC
+    if (gl->neato_use_edge_length_p && weightvar >= 0) {
+      neato_apply_edge_length(graph, weightvar, visible, nvisible, d, e, gg);
+    }
     gvLayout (gvc, graph, "neato");
 #else
     neatoLayout (graph, MODE_MAJOR, model);
