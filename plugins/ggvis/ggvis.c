@@ -226,8 +226,6 @@ ggv_tree_view_datad_added_cb (ggobid *gg, datad *d, GtkWidget *tree_view)
   GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(tree_view));
   GtkTreeIter iter;
 	
-  g_printerr ("datad_added, d %d tree_view %d\n", (gint)d, (gint)tree_view);
-
   if (tree_view == NULL)
     return;
 
