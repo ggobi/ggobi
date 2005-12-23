@@ -570,7 +570,7 @@ getGGobiHomeFromRegistry()
   DWORD bufSize, type;
   HKEY lkey;
 
-  key = "SOFTWARE\\GGobi";
+  key = "Software\\GGobi";
 
   hr = RegOpenKeyEx(HKEY_LOCAL_MACHINE, key, 0, KEY_ALL_ACCESS, &lkey);
   if(hr != ERROR_SUCCESS) {

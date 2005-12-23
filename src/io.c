@@ -25,6 +25,7 @@
 #include <unistd.h>
 
 #include <gtk/gtk.h>
+#include <gdk/gdkkeysyms.h>
 
 #include "vars.h"
 #include "externs.h"
@@ -222,9 +223,7 @@ createOutputFileSelectionDialog(const gchar *title)
 GtkWidget*
 createInputFileSelectionDialog(gchar *title, ggobid *gg)
 {
-       GtkWidget *chooser, *combo, *hbox, *lbl, *button;
-	   //GtkEntryCompletion *completion;
-	   //GtkListStore *model;
+       GtkWidget *chooser, *combo, *hbox, *lbl;
 	   GList *els, *l;
 
        els = getInputPluginSelections(gg);
@@ -250,52 +249,14 @@ createInputFileSelectionDialog(gchar *title, ggobid *gg)
 		gtk_box_pack_start(GTK_BOX(hbox), combo, false, false, 0);
 		g_object_set_data(G_OBJECT(chooser), "PluginTypeCombo", combo);
 		
-		button = gtk_button_new_with_mnemonic("Enter _Location");
+		/*button = gtk_button_new_with_mnemonic("Enter _Location");
 		gtk_box_pack_start(GTK_BOX(hbox), button, false, false, 0);
+		g_signal_connect(G_OBJECT(button), "clicked", 
+			G_CALLBACK(location_button_clicked_cb), chooser);*/
 		
-		/*completion = gtk_entry_completion_new();
-		model = gtk_list_store_new(1, G_TYPE_STRING);
-		gtk_entry_completion_set_model(completion, GTK_TREE_MODEL(model));
-		gtk_entry_completion_set_text_column(completion, 0);
-		
-		entry = gtk_entry_new();
-		gtk_entry_set_completion(GTK_ENTRY(entry), completion);
-		gtk_box_pack_start(GTK_BOX(vbox), entry, false, false, 0);
-		*/
 		gtk_file_chooser_set_extra_widget(GTK_FILE_CHOOSER(chooser), hbox);
 		gtk_widget_show_all(hbox);
 		
- #if 0
-	   vbox = GTK_DIALOG(chooser)->vbox;
-
-       box = gtk_frame_new("Reader Type");
-
-       combo = gtk_combo_new();
-       g_object_set_data(G_OBJECT(fs), "PluginTypeCombo", combo);
-       if(ocombo)
-           *ocombo = combo;
-       gtk_combo_set_popdown_strings(GTK_COMBO(combo), els);
-
-       gtk_container_add(GTK_CONTAINER(box), combo);
-       gtk_widget_show_all(box);
-
-
-       gtk_box_pack_start(GTK_BOX(vbox), box, false, false, 3);
-        /* Shouldn't need to do this if we had a real dialog with action area and work area. */
-       gtk_box_reorder_child(GTK_BOX(vbox), combo, 4);
-
-       i = (gint *) g_malloc(sizeof(gint));
-/*XXX Need to free this when we destroy the fileselection widget */
-       g_signal_connect(G_OBJECT(fs), "destroy", 
-         G_CALLBACK(free_gdata), i);
-
-       *i = -1;
-       g_object_set_data(G_OBJECT(fs), ".selectedElement", i);
-       g_signal_connect(G_OBJECT(GTK_COMBO(combo)->list), "select-child",
-         G_CALLBACK(filename_mode_selection_cb), fs);
-#endif
-
-
        return(chooser);
 }
 /*--------------------------------------------------------------------------*/
@@ -307,7 +268,6 @@ filename_get_r (ggobid *gg)
 {
   GtkWidget *chooser;
   chooser = createInputFileSelectionDialog("Read ggobi data", gg);
-  //gtk_file_selection_hide_fileop_buttons (GTK_FILE_SELECTION (fs)); 
 
   if (gg->input && gg->input->baseName) {
     char buf[256];
@@ -324,7 +284,6 @@ filename_get_r (ggobid *gg)
 
   filename_get_configure (chooser, READ_FILESET, gg);
 
-  //gtk_widget_show (chooser);
   if (gtk_dialog_run(GTK_DIALOG(chooser)) == GTK_RESPONSE_ACCEPT)
 	  filesel_ok(chooser);
   gtk_widget_destroy(chooser);

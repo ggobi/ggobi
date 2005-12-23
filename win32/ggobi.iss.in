@@ -39,11 +39,19 @@ Source: "@GGOBI_HOME@/lib/libggobi.dll"; DestDir: "{app}"; Flags: ignoreversion
 ; Plugins [should this be hardcoded or on-the-fly?]
 Source: "@GGOBI_HOME@/plugins/ggvis/ggvis.dll"; DestDir: "{app}\plugins\ggvis"; Flags: ignoreversion
 Source: "@GGOBI_HOME@/plugins/GraphAction/GraphAction.dll"; DestDir: "{app}\plugins\GraphAction"; Flags: ignoreversion
-Source: "@GGOBI_HOME@/plugins/ExcelReader/ExcelReader.dll"; DestDir: "{app}\plugins\ExcelReader"; Flags: ignoreversion
-Source: "@GGOBI_HOME@/plugins/GraphLayout/GraphLayout.dll"; DestDir: "{app}\plugins\GraphLayout"; Flags: ignoreversion
+;Source: "@GGOBI_HOME@/plugins/ExcelReader/ExcelReader.dll"; DestDir: "{app}\plugins\ExcelReader"; Flags: ignoreversion
+;Source: "@GGOBI_HOME@/plugins/GraphLayout/GraphLayout.dll"; DestDir: "{app}\plugins\GraphLayout"; Flags: ignoreversion
 Source: "@GGOBI_HOME@/plugins/DataViewer/DataViewer.dll"; DestDir: "{app}\plugins\DataViewer"; Flags: ignoreversion
 Source: "@GGOBI_HOME@/plugins/VarCloud/VarCloud.dll"; DestDir: "{app}\plugins\VarCloud"; Flags: ignoreversion
 Source: "@GGOBI_HOME@/plugins/DiscribeDisplay/DescribeDisplay.dll"; DestDir: "{app}\plugins\DescribeDisplay"; Flags: ignoreversion
+; A utility for setting environment variables, install to tmp dir
+Source: "@GGOBI_HOME@/win32/SetEnv.exe"; DestDir: "{tmp}"
+
+[Run]
+Filename: "{tmp}\SetEnv.exe"; Parameters: "-a Path %{app}"
+
+[Registry]
+Root: HKLM; Subkey: "Software\GGobi"; ValueType: string; ValueName: "Home"; ValueData: "{app}"; Flags: uninsdeletekey
 
 [INI]
 Filename: "{app}\ggobi.url"; Section: "InternetShortcut"; Key: "URL"; String: "http://www.ggobi.org"
