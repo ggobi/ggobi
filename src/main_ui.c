@@ -53,8 +53,8 @@ const char *const GGOBI(IModeNames)[] = {
   "Scale",
   "Brush",
   "Identify",
-  "Edit edges",
-  "Move points",
+  "Edit Edges",
+  "Move Points",
 };
 static const char *const *pmode_name = GGOBI(PModeNames);
 static const char *const *imode_name = GGOBI(IModeNames);

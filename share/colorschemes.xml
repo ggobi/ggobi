@@ -7199,8 +7199,11 @@
  behavior in ggobi.)
 </description>
 <foreground>
- <color name="F">
-  <red>1.0000</red><green>1.0000</green><blue>0.2000</blue>
+ <color name="D">
+  <red>0.5961</red><green>0.3059</green><blue>0.6392</blue>
+ </color>
+ <color name="H">
+  <red>0.9686</red><green>0.5059</green><blue>0.7490</blue>
  </color>
  <color name="A">
   <red>0.8941</red><green>0.1020</green><blue>0.1098</blue>
@@ -7217,18 +7220,15 @@
  <color name="G">
   <red>0.6510</red><green>0.3373</green><blue>0.1569</blue>
  </color>
- <color name="H">
-  <red>0.9686</red><green>0.5059</green><blue>0.7490</blue>
- </color>
  <color name="I">
   <red>0.6000</red><green>0.6000</green><blue>0.6000</blue>
  </color>
- <color name="D">
-  <red>0.5961</red><green>0.3059</green><blue>0.6392</blue>
+ <color name="F">
+  <red>1.0000</red><green>1.0000</green><blue>0.2000</blue>
  </color>
 </foreground>
 <background>
- <color><red>0</red><green>0</green><blue>0</blue></color>
+ <color><red>0.2</red><green>0.2</green><blue>0.2</blue></color>
 </background>
 <annotations>
  <color><red>1</red><green>1</green><blue>1</blue></color>

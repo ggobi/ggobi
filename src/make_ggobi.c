@@ -51,7 +51,7 @@ void globals_init(ggobid * gg)
 
   gg->close_pending = false;
 
-  gg->glyph_id.type = gg->glyph_0.type = FR;
+  gg->glyph_id.type = gg->glyph_0.type = FC;
   gg->glyph_id.size = gg->glyph_0.size = 1;
   gg->color_0 = 0;
   gg->color_id = scheme->n - 1; /* default: initialize to last color */
