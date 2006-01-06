@@ -38,9 +38,22 @@ symbol_link_by_id (gboolean persistentp, gint k, datad * sd, ggobid * gg)
   /*-- k is the row number in source_d --*/
 
   if (sd->rowIds) {
-    gpointer ptr = g_hash_table_lookup(sd->idTable, sd->rowIds[k]);
-    if (ptr)
-      id = * ((guint *)ptr);
+    gpointer ptr;
+    if (sd->rowIds[k]) {
+      g_printerr ("rowIds[%d] = %s\n", k, sd->rowIds[k]);
+      ptr = g_hash_table_lookup(sd->idTable, sd->rowIds[k]);
+      if (ptr)
+        id = * ((guint *)ptr);
+    } else {
+      /* 
+       * I've only seen one thing that causes this, and that was in
+       * an xml file with two datad's, nodes and edges, but in which
+       * the edge data mistakenly duplicated the record ids of the
+       * node data.  I removed those record ids, and the file was
+       * fine.  -- Debby
+       */
+      g_printerr ("rowIds[%d] is null\n", k);
+    }
   }
 
   if (id < 0)      /*-- this would indicate a bug --*/
