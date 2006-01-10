@@ -46,9 +46,16 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
   PangoFontMetrics *metrics;
   PangoLayout *layout = gtk_widget_create_pango_layout(sp->da, NULL);
   PangoRectangle rect;
+  #ifdef ENABLE_CAIRO
+  cairo_t *cr;
+  #endif
   
   if (!dsp->options.axes_show_p)
     return;
+  
+  #ifdef ENABLE_CAIRO
+  cr = gdk_cairo_create(drawable);
+  #endif
   
   ctx = gtk_widget_get_pango_context(sp->da);
   metrics = pango_context_get_metrics(ctx,
@@ -78,12 +85,26 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
           ix = dawidth/2 + (gint) (dsp->t1d.F.vals[0][j]*(gfloat) dawidth/4);
           iy = daheight - 10 - (dsp->t1d.nsubset-1-k)*textheight;
           if (j == dsp->t1d_manip_var)
+			#ifdef ENABLE_CAIRO
+		  	gdk_cairo_set_source_color(cr, &gg->vcirc_manip_color);
+			#else
             gdk_gc_set_foreground(gg->plot_GC, &gg->vcirc_manip_color);
+			#endif
           else
+			#ifdef ENABLE_CAIRO
+		  	gdk_cairo_set_source_color(cr, &scheme->rgb_accent);
+			#else
             gdk_gc_set_foreground(gg->plot_GC, &scheme->rgb_accent);
+			#endif
+		  #ifdef ENABLE_CAIRO
+		  cairo_move_to(cr, dawidth/2, daheight - 10 - textheight / 2 - (dsp->t1d.nsubset-1-k)*textheight);
+		  cairo_line_to(cr, ix, iy - textheight / 2);
+		  cairo_stroke(cr);
+		  #else
           gdk_draw_line(drawable, gg->plot_GC,
             dawidth/2, daheight - 10 - textheight / 2 - (dsp->t1d.nsubset-1-k)*textheight,
             ix, iy - textheight / 2);
+		  #endif
 /*
  * An experiment:  add the labels only for those variables with
  * non-zero multipliers.  Add them on the right if positive, on
@@ -106,10 +127,16 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
 
       case TOUR2D3:
         /* draws circle */
+		#ifdef ENABLE_CAIRO
+		cairo_set_source_rgb(cr, 1.0, 1.0, 1.0);
+		cairo_arc(cr, axindent+daheight/8, 7*daheight/8 - axindent,
+		  daheight/8, 0, 2*M_PI);
+		cairo_stroke(cr);
+		#else
         gdk_draw_arc(drawable,gg->plot_GC,FALSE,
           axindent, 3*daheight/4 - axindent,
           dawidth/4, daheight/4, 0,360*64);
-
+		#endif
         /* draw the axes and labels */
         for (k=0; k<dsp->t2d3.nsubset; k++) {
           j = dsp->t2d3.subset_vars.els[k];
@@ -120,12 +147,26 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
           gdk_gc_set_line_attributes(gg->plot_GC, 2, GDK_LINE_SOLID, 
             GDK_CAP_ROUND, GDK_JOIN_ROUND);
           if (j == dsp->t2d_manip_var)
+            #ifdef ENABLE_CAIRO
+		  	gdk_cairo_set_source_color(cr, &gg->vcirc_manip_color);
+			#else
             gdk_gc_set_foreground(gg->plot_GC, &gg->vcirc_manip_color);
+			#endif
           else
+            #ifdef ENABLE_CAIRO
+		  	gdk_cairo_set_source_color(cr, &scheme->rgb_accent);
+			#else
             gdk_gc_set_foreground(gg->plot_GC, &scheme->rgb_accent);
+			#endif
+		  #ifdef ENABLE_CAIRO
+		  cairo_move_to(cr, daheight/8+axindent, daheight-daheight/8-axindent);
+		  cairo_line_to(cr, ix, iy);
+		  cairo_stroke(cr);
+		  #else
           gdk_draw_line(drawable, gg->plot_GC,
             dawidth/8+axindent, daheight-daheight/8-axindent,
             ix, iy);
+		  #endif
 
           if (abs(ix - axindent - dawidth/8) > 5 ||
               abs(iy + axindent - (daheight- daheight/8)) > 5)
@@ -180,9 +221,16 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
 
       case TOUR2D:
         /* draws circle */
+		#ifdef ENABLE_CAIRO
+		cairo_set_source_rgb(cr, 1.0, 1.0, 1.0);
+		cairo_arc(cr, axindent+daheight/8, 7*daheight/8 - axindent,
+		  daheight/8, 0, 2*M_PI);
+		cairo_stroke(cr);
+		#else
         gdk_draw_arc(drawable,gg->plot_GC,FALSE,
           axindent, 3*daheight/4 - axindent,
           daheight/4, daheight/4, 0,360*64);
+		#endif
 
         /* draw the axes and labels */
         for (k=0; k<dsp->t2d.nsubset; k++) {
@@ -194,12 +242,26 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
           gdk_gc_set_line_attributes(gg->plot_GC, 2, GDK_LINE_SOLID, 
             GDK_CAP_ROUND, GDK_JOIN_ROUND);
           if (j == dsp->t2d_manip_var)
+            #ifdef ENABLE_CAIRO
+		  	gdk_cairo_set_source_color(cr, &gg->vcirc_manip_color);
+			#else
             gdk_gc_set_foreground(gg->plot_GC, &gg->vcirc_manip_color);
+			#endif
           else
+            #ifdef ENABLE_CAIRO
+		  	gdk_cairo_set_source_color(cr, &scheme->rgb_accent);
+			#else
             gdk_gc_set_foreground(gg->plot_GC, &scheme->rgb_accent);
+			#endif
+		  #ifdef ENABLE_CAIRO
+		  cairo_move_to(cr, daheight/8+axindent, daheight-daheight/8-axindent);
+		  cairo_line_to(cr, ix, iy);
+		  cairo_stroke(cr);
+		  #else
           gdk_draw_line(drawable, gg->plot_GC,
             daheight/8+axindent, daheight-daheight/8-axindent,
             ix, iy);
+		  #endif
 
           if (abs(ix - axindent - daheight/8) > 5 ||
               abs(iy + axindent - (daheight- daheight/8)) > 5)
@@ -307,12 +369,26 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
             (gfloat) dawidth/4);
           iy = daheight - 10 - (nc-k)*textheight;
           if (j == dsp->tc1_manip_var)
+            #ifdef ENABLE_CAIRO
+		  	gdk_cairo_set_source_color(cr, &gg->vcirc_manip_color);
+			#else
             gdk_gc_set_foreground(gg->plot_GC, &gg->vcirc_manip_color);
+			#endif
           else
+			#ifdef ENABLE_CAIRO
+		  	gdk_cairo_set_source_color(cr, &scheme->rgb_accent);
+			#else
             gdk_gc_set_foreground(gg->plot_GC, &scheme->rgb_accent);
+			#endif
+		  #ifdef ENABLE_CAIRO
+		  cairo_move_to(cr, dawidth/2, iy + rect.height/2);
+		  cairo_line_to(cr, ix, iy + rect.height/2);
+		  cairo_stroke(cr);
+		  #else
           gdk_draw_line(drawable, gg->plot_GC,
             dawidth/2, iy + rect.height/2,
             ix, iy + rect.height/2);
+		  #endif
           gdk_gc_set_line_attributes(gg->plot_GC, 1, GDK_LINE_SOLID, 
             GDK_CAP_ROUND, GDK_JOIN_ROUND);
 
@@ -327,12 +403,26 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
           gdk_gc_set_line_attributes(gg->plot_GC, 2, GDK_LINE_SOLID, 
             GDK_CAP_ROUND, GDK_JOIN_ROUND);
           if (j == dsp->tc2_manip_var)
+            #ifdef ENABLE_CAIRO
+		  	gdk_cairo_set_source_color(cr, &gg->vcirc_manip_color);
+			#else
             gdk_gc_set_foreground(gg->plot_GC, &gg->vcirc_manip_color);
+			#endif
           else
+			#ifdef ENABLE_CAIRO
+		  	gdk_cairo_set_source_color(cr, &scheme->rgb_accent);
+			#else
             gdk_gc_set_foreground(gg->plot_GC, &scheme->rgb_accent);
+			#endif
+		  #ifdef ENABLE_CAIRO
+		  cairo_move_to(cr, ix,daheight/2);
+		  cairo_line_to(cr, ix, iy);
+		  cairo_stroke(cr);
+		  #else
           gdk_draw_line(drawable, gg->plot_GC,
             ix,daheight/2,
             ix, iy);
+		  #endif
 
           g_free (varlab);
           /*-- can't add vertical variable labels --*/
@@ -343,6 +433,9 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
         break;
     }
   }
+  #ifdef ENABLE_CAIRO
+  cairo_destroy(cr);
+  #endif
   pango_font_metrics_unref(metrics);
   g_object_unref(layout);
 }

@@ -25,7 +25,6 @@
 #include <unistd.h>
 
 #include <gtk/gtk.h>
-#include <gdk/gdkkeysyms.h>
 
 #include "vars.h"
 #include "externs.h"

@@ -897,7 +897,10 @@ void barchart_recalc_counts(barchartSPlotd * sp, datad * d, ggobid * gg)
   splotd *rawsp = GGOBI_SPLOT(sp);
   vartabled *vtx = vartable_element_get(rawsp->p1dvar, d);
 
-  g_assert (sp->bar->index_to_rank.nels == d->nrows_in_plot);
+  if (sp->bar->index_to_rank.nels != d->nrows_in_plot) {
+	  vectori_realloc (&sp->bar->index_to_rank, d->nrows_in_plot);
+	  barchart_init_categorical(sp, d);
+  }
 
   if (vtx->vartype != categorical)
     rawsp->scale.y = 1-(1-SCALE_DEFAULT)/2;
