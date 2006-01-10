@@ -103,6 +103,14 @@ id_all_sticky_cb (GtkWidget *w, ggobid *gg)
   displays_plot (NULL, QUICK, gg);
 }
 
+static
+void
+variable_selected_cb(GtkTreeSelection *treesel, GtkComboBox *combobox)
+{
+	if (gtk_tree_selection_count_selected_rows(treesel) > 0)
+		gtk_combo_box_set_active(combobox, ID_VAR_LABELS);
+}
+
 /*--------------------------------------------------------------------*/
 /*      Handling keyboard and mouse events in the plot window         */
 /*--------------------------------------------------------------------*/
@@ -264,10 +272,10 @@ identify_event_handlers_toggle (splotd *sp, gboolean state) {
 /*----------------------------------------------------------------------*/
 
 static gchar *display_lbl[] = {
+  "Record id",
   "Record label",
   "Record number",
   "Variable labels",
-  "Record id",
   };
 static gchar *target_lbl[] = {
   "Points",
@@ -287,14 +295,16 @@ cpanel_identify_make(ggobid *gg) {
   gtk_container_set_border_width (GTK_CONTAINER(panel->w), 5);
 
   /*-- provide a variable list so that any variable can be the label --*/
+  opt = gtk_combo_box_new_text (); /* create combo box before notebook */
   notebook = create_variable_notebook (panel->w,
     GTK_SELECTION_MULTIPLE, all_vartypes, all_datatypes,
-    G_CALLBACK(NULL), gg);
+    G_CALLBACK(variable_selected_cb), opt, gg);
   g_object_set_data(G_OBJECT (panel->w),
     "notebook", notebook);
+  gtk_combo_box_set_active(GTK_COMBO_BOX(opt), ID_RECORD_LABEL);
 
   /*-- option menu --*/
-  opt = gtk_combo_box_new_text ();
+  /* created above */
   gtk_widget_set_name (opt, "IDENTIFY:display_option_menu");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
     "How to construct the label to be displayed: the record label, record number, a label constructed using variables selected in the list above, or the record id",

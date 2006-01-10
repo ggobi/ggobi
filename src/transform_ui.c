@@ -212,7 +212,7 @@ transform_window_open (ggobid *gg)
     /* Create a notebook, set the position of the tabs */
     notebook = create_variable_notebook (vbox,
       GTK_SELECTION_MULTIPLE, all_vartypes, all_datatypes,
-      G_CALLBACK(NULL), gg);
+      G_CALLBACK(NULL), NULL, gg);
 
     /*
      * Stage 0: Domain adjustment

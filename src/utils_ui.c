@@ -358,7 +358,7 @@ void scale_set_default_values (GtkScale *scale)
 enum { VARLIST_NAME, VARLIST_INDEX, VARLIST_NCOLS };
 
 void
-variable_notebook_subwindow_add (datad *d, GCallback func,
+variable_notebook_subwindow_add (datad *d, GCallback func, gpointer func_data,
   GtkWidget *notebook, vartyped vtype, datatyped dtype, ggobid *gg)
 {
   GtkWidget *swin, *tree_view;
@@ -406,7 +406,9 @@ variable_notebook_subwindow_add (datad *d, GCallback func,
   tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(model));
   gtk_widget_set_size_request(tree_view, -1, 75);
   g_object_set_data(G_OBJECT (tree_view), "datad", d);
-  populate_tree_view(tree_view, NULL, 1, false, mode, func, gg);
+  if (!func_data)
+	  func_data = gg;
+  populate_tree_view(tree_view, NULL, 1, false, mode, func, func_data);
   gtk_tree_view_column_set_spacing(gtk_tree_view_get_column(GTK_TREE_VIEW(tree_view), 0), 0);
   //if(func)
   //   g_signal_connect (G_OBJECT (tree_view), "select_row", G_CALLBACK (func), gg);
@@ -432,10 +434,13 @@ variable_notebook_subwindow_add (datad *d, GCallback func,
 static void 
 variable_notebook_adddata_cb (ggobid *gg, datad *d, void *notebook)
 {
-  GtkSignalFunc func = NULL;
+  GCallback func;
+  gpointer func_data;
   vartyped vtype;
   datatyped dtype;
 
+  func = G_CALLBACK(g_object_get_data(G_OBJECT(notebook), "selection-func"));
+  func_data = g_object_get_data(G_OBJECT(notebook), "selection-func-data");
   vtype = (vartyped) g_object_get_data(G_OBJECT(notebook), "vartype");
   dtype = (vartyped) g_object_get_data(G_OBJECT(notebook), "datatype");
 
@@ -444,7 +449,7 @@ variable_notebook_adddata_cb (ggobid *gg, datad *d, void *notebook)
       (dtype == edgesets_only && d->edge.n > 0))
   {
     if (g_slist_length (d->vartable)) {
-      variable_notebook_subwindow_add (d, func, notebook, vtype, dtype, gg);
+      variable_notebook_subwindow_add (d, func, func_data, notebook, vtype, dtype, gg);
     }
   }
 
@@ -621,7 +626,7 @@ CHECK_EVENT_SIGNATURE(variable_notebook_list_changed_cb, variable_list_changed_f
 
 GtkWidget *
 create_variable_notebook (GtkWidget *box, GtkSelectionMode mode, 
-  vartyped vtype, datatyped dtype, GtkSignalFunc func, ggobid *gg)
+  vartyped vtype, datatyped dtype, GtkSignalFunc func, gpointer func_data, ggobid *gg)
 {
   GtkWidget *notebook;
   gint nd = g_slist_length (gg->d);
@@ -635,6 +640,8 @@ create_variable_notebook (GtkWidget *box, GtkSelectionMode mode,
   gtk_notebook_set_show_tabs (GTK_NOTEBOOK (notebook), nd > 1);
   gtk_box_pack_start (GTK_BOX (box), notebook, true, true, 2);
   g_object_set_data(G_OBJECT(notebook), "SELECTION", (gpointer) mode);
+  g_object_set_data(G_OBJECT(notebook), "selection-func", func);
+  g_object_set_data(G_OBJECT(notebook), "selection-func-data", func_data);
   g_object_set_data(G_OBJECT(notebook), "vartype", (gpointer) vtype);
   g_object_set_data(G_OBJECT(notebook), "datatype", (gpointer) dtype);
 
@@ -645,7 +652,7 @@ create_variable_notebook (GtkWidget *box, GtkSelectionMode mode,
         (dtype == edgesets_only && d->edge.n > 0))
     {
       if (g_slist_length (d->vartable)) {
-        variable_notebook_subwindow_add (d, func, notebook, vtype, dtype, gg);
+        variable_notebook_subwindow_add (d, func, func_data, notebook, vtype, dtype, gg);
       }
     }
   }

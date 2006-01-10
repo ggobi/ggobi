@@ -170,6 +170,7 @@ static const gchar *scatterplot_ui =
 "	<menubar>"
 "		<menu action='Options'>"
 "			<menuitem action='ShowPoints'/>"
+"			<menuitem action='ShowAxes'/>"
 "		</menu>"
 "	</menubar>"
 "</ui>";

@@ -126,7 +126,7 @@ jitter_window_open (ggobid *gg) {
       /* Create a notebook, set the position of the tabs */
       notebook = create_variable_notebook (vbox,
         GTK_SELECTION_MULTIPLE, all_vartypes, all_datatypes,
-        G_CALLBACK(NULL), gg);
+        G_CALLBACK(NULL), NULL, gg);
 
       /*-- option menu --*/
       opt = gtk_combo_box_new_text ();

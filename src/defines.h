@@ -221,7 +221,7 @@ typedef enum {ARRANGE_ROW, ARRANGE_COL} ParCoordsArrangeMode;
 #define STICKY_ADD    1
 #define STICKY_REMOVE 2
 
-enum {ID_RECORD_LABEL, ID_RECORD_NO, ID_VAR_LABELS, ID_RECORD_ID};
+enum {ID_RECORD_ID, ID_RECORD_LABEL, ID_RECORD_NO, ID_VAR_LABELS};
 
 /*
  * jittering

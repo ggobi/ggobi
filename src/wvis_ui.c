@@ -75,7 +75,7 @@ wvis_variable_notebook_adddata_cb (ggobid *gg, datad *d, void *notebook)
        * responds to "select_row" signal
       */
     }
-    variable_notebook_subwindow_add (d, func, GTK_WIDGET(notebook),
+    variable_notebook_subwindow_add (d, func, NULL, GTK_WIDGET(notebook),
       all_vartypes, all_datatypes, gg);
     gtk_notebook_set_show_tabs (GTK_NOTEBOOK (notebook),
                                 g_slist_length (gg->d) > 1);
@@ -103,7 +103,7 @@ wvis_create_variable_notebook (GtkWidget *box, GtkSelectionMode mode,
   for (l = gg->d; l; l = l->next) {
     d = (datad *) l->data;
     if (g_slist_length (d->vartable)) {
-      variable_notebook_subwindow_add (d, func, notebook,
+      variable_notebook_subwindow_add (d, func, NULL, notebook,
         all_vartypes, all_datatypes, gg);
     }
   }
