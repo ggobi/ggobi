@@ -120,7 +120,7 @@ win32_draw_arcs (GdkDrawable *drawable,
     if (filled)
       gdk_draw_arc (drawable, gc, filled,
         arcs[i].x, arcs[i].y,
-        arcs[i].width, arcs[i].height, 0, (gshort) 23040);
+        arcs[i].width+1, arcs[i].height, 0, (gshort) 23040);
   }
 }
 
@@ -221,7 +221,7 @@ build_glyph (glyphd *gl, icoords *xypos, gint jpos,
   arcd *filledarcv,   gint *nc_filled)
 {
   gshort size, type;
-  size = gl->size;
+  size = gl->size + 1;
   type = gl->type;
 
   switch (type) {

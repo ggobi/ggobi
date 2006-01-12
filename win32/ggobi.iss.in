@@ -25,30 +25,30 @@ Name: "desktopicon"; Description: "Create a &desktop icon"; GroupDescription: "A
 ; The binary
 Source: "@GGOBI_HOME@/bin/ggobi.bin"; DestDir: "{app}"; DestName: "ggobi.exe"; Flags: ignoreversion
 ; Get the data
-Source: "@GGOBI_HOME@/data/*.*"; DestDir: "{app}\data"; Flags: ignoreversion
+Source: "@GGOBI_HOME@\data\*.*"; DestDir: "{app}\data"; Flags: ignoreversion
 ; The docs
-Source: "@GGOBI_HOME@/doc/*.*"; DestDir: "{app}\doc"; Flags: ignoreversion
+Source: "@GGOBI_HOME@\doc\*.*"; DestDir: "{app}\doc"; Flags: ignoreversion
 ; The icon, ggobirc, and colorshemes
-Source: "@GGOBI_HOME@/share/ggobi.ico"; DestDir: "{app}"; Flags: ignoreversion
+Source: "@GGOBI_HOME@\share\ggobi.ico"; DestDir: "{app}"; Flags: ignoreversion
 Source: "@GGOBI_HOME@\ggobirc"; DestDir: "{app}"; Flags: ignoreversion
-Source: "@GGOBI_HOME@/share/colorschemes.xml"; DestDir: "{app}\share"; Flags: ignoreversion
+Source: "@GGOBI_HOME@\share\colorschemes.xml"; DestDir: "{app}\share"; Flags: ignoreversion
 ; The headers and libs, not necessary besides the dll
-;Source: "@GGOBI_HOME@/src/*.h"; DestDir: "{app}\include"; Flags: ignoreversion
-;Source: "@GGOBI_HOME@/lib/libggobi.a"; DestDir: "{app}\lib"; Flags: ignoreversion
-Source: "@GGOBI_HOME@/lib/libggobi.dll"; DestDir: "{app}"; Flags: ignoreversion
+;Source: "@GGOBI_HOME@\src\*.h"; DestDir: "{app}\include"; Flags: ignoreversion
+;Source: "@GGOBI_HOME@\lib\libggobi.a"; DestDir: "{app}\lib"; Flags: ignoreversion
+Source: "@GGOBI_HOME@\lib\libggobi.dll"; DestDir: "{app}"; Flags: ignoreversion
 ; Plugins [should this be hardcoded or on-the-fly?]
-Source: "@GGOBI_HOME@/plugins/ggvis/ggvis.dll"; DestDir: "{app}\plugins\ggvis"; Flags: ignoreversion
-Source: "@GGOBI_HOME@/plugins/GraphAction/GraphAction.dll"; DestDir: "{app}\plugins\GraphAction"; Flags: ignoreversion
-;Source: "@GGOBI_HOME@/plugins/ExcelReader/ExcelReader.dll"; DestDir: "{app}\plugins\ExcelReader"; Flags: ignoreversion
-;Source: "@GGOBI_HOME@/plugins/GraphLayout/GraphLayout.dll"; DestDir: "{app}\plugins\GraphLayout"; Flags: ignoreversion
-Source: "@GGOBI_HOME@/plugins/DataViewer/DataViewer.dll"; DestDir: "{app}\plugins\DataViewer"; Flags: ignoreversion
-Source: "@GGOBI_HOME@/plugins/VarCloud/VarCloud.dll"; DestDir: "{app}\plugins\VarCloud"; Flags: ignoreversion
-Source: "@GGOBI_HOME@/plugins/DiscribeDisplay/DescribeDisplay.dll"; DestDir: "{app}\plugins\DescribeDisplay"; Flags: ignoreversion
+Source: "@GGOBI_HOME@\plugins\ggvis\ggvis.dll"; DestDir: "{app}\plugins\ggvis\"; Flags: ignoreversion
+;Source: "@GGOBI_HOME@\plugins\GraphAction\GraphAction.dll"; DestDir: "{app}\plugins\GraphAction\"; Flags: ignoreversion
+;Source: "@GGOBI_HOME@\plugins\ExcelReader\ExcelReader.dll"; DestDir: "{app}\plugins\ExcelReader\"; Flags: ignoreversion
+;Source: "@GGOBI_HOME@\plugins\GraphLayout\GraphLayout.dll"; DestDir: "{app}\plugins\GraphLayout\"; Flags: ignoreversion
+Source: "@GGOBI_HOME@\plugins\DataViewer\DataViewer.dll"; DestDir: "{app}\plugins\DataViewer\"; Flags: ignoreversion
+Source: "@GGOBI_HOME@\plugins\VarCloud\VarCloud.dll"; DestDir: "{app}\plugins\VarCloud\"; Flags: ignoreversion
+Source: "@GGOBI_HOME@\plugins\DescribeDisplay\DescribeDisplay.dll"; DestDir: "{app}\plugins\DescribeDisplay\"; Flags: ignoreversion
 ; A utility for setting environment variables, install to tmp dir
-Source: "@GGOBI_HOME@/win32/SetEnv.exe"; DestDir: "{tmp}"
+Source: "@GGOBI_HOME@\win32\SetEnv.exe"; DestDir: "{tmp}"
 
 [Run]
-Filename: "{tmp}\SetEnv.exe"; Parameters: "-a Path %{app}"
+Filename: "{tmp}\SetEnv.exe"; Parameters: "-a Path ""%{app}"""
 
 [Registry]
 Root: HKLM; Subkey: "Software\GGobi"; ValueType: string; ValueName: "Home"; ValueData: "{app}"; Flags: uninsdeletekey

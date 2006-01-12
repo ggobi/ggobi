@@ -38,16 +38,14 @@ endif
 %.dylib: $(OBJS)
 	libtool -dynamic $(PLUGIN_LD_FLAGS) -o $@ $(OBJS) $(PLUGIN_LIBS) $(GGOBI_LIBS) -lgcc
 	
-%.dll: $(OBJS) DataViewer.def
+%.dll: $(OBJS)
+	echo EXPORTS > $(@:%.dll=%.def)
+	nm -g --defined-only $(OBJS) > tmp
+	sed -n '/^........ [T|C] _/s/^........ [T|C] _/ /p' tmp >> $(@:%.dll=%.def)
+	rm tmp
 	$(CC) $(SHLIB_LDFLAGS) $(PLUGIN_LD_FLAGS) -o $@ $(@:%.dll=%.def) \
 	-Wl,--out-implib,$(@:%.dll=%.a) $(OBJS) $(PLUGIN_LIBS) $(GGOBI_LIBS)
-
-%.def: $(OBJS)
-	echo EXPORTS > $@
-	nm -g --defined-only $(OBJS) > tmp
-	sed -n '/^........ [T|C] _/s/^........ [T|C] _/ /p' tmp >> $@
-	rm tmp
-
+	
 objects: 
 	@echo "$(OBJS)"
 
