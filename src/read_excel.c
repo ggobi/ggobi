@@ -2,6 +2,7 @@
 /* This code was written by Dongshin Kim, at Iowa State University
    under supervision by Dianne Cook */
 
+
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -25,13 +26,13 @@ gint g_tmp;
 gboolean name_set(FILE* fp, InputDescription *desc, datad* d, ggobid* gg);
 void whatisfiletype(FILE* fp, gint* ncols, gint* nrows);
 gboolean is_num(gchar* word);
-void read_col_labels(datad* d,FILE* fp);
-void read_row_labels(datad* d,FILE* fp);
+void read_col_labels(datad* d, FILE* fp);
+void read_row_labels(datad* d, FILE* fp);
 static gboolean read_excel(datad* d, FILE* fp, gint* text_table, Tree* text_category);
 gboolean setup_category(datad* d, gint* text_table, Tree* text_category);
 void InorderTravel_setup_category(Tree* T, Node* X, vartabled* vt);
 
-gboolean  read_csv_data(InputDescription *desc, ggobid *gg);
+gboolean read_csv_data(InputDescription *desc, ggobid *gg);
 
 void InorderTravel_setup_category(Tree* T, Node* X, vartabled* vt)
 {
@@ -99,8 +100,7 @@ read_csv(InputDescription *desc, ggobid *gg, GGobiPluginInfo *plugin)
 }
 
 InputDescription *
-read_csv_input_description(const char * const fileName, const char * const modeName, 
-			   ggobid *gg, GGobiPluginInfo *info)
+read_csv_input_description(const char * const fileName, const char * const modeName, ggobid *gg, GGobiPluginInfo *info)
 {
   InputDescription *desc;
   desc = (InputDescription*) g_malloc(sizeof(InputDescription));
@@ -364,9 +364,9 @@ void read_col_labels(datad* d,FILE* fp)
   }
   else
   {
-    for(i=0;i<d->ncols;i++)
+    for(i = 0 ;i < d->ncols; i++)
     {
-      vt = vartable_element_get (i, d);
+      vt = vartable_element_get(i, d);
       vt->collab = g_strdup_printf("Col %d", missing_cnt+1);
       vt->nickname = g_strndup(vt->collab, 2);
       missing_cnt++;
