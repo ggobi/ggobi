@@ -364,7 +364,7 @@ Add an option:  Model either 'circuit resistance' or 'shortest path'
   /*-- include only edge sets.  --*/
   varnotebook = create_variable_notebook (vbox,
     GTK_SELECTION_SINGLE, all_vartypes, edgesets_only,
-    G_CALLBACK(NULL), inst->gg);
+    G_CALLBACK(NULL), (gpointer) NULL, inst->gg);
   g_object_set_data(G_OBJECT(apply_btn), "notebook", varnotebook);
 #else
   gtk_container_add (GTK_CONTAINER(frame), gtk_label_new ("Not enabled"));

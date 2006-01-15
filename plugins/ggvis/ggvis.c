@@ -454,7 +454,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   /*-- include only edge sets.  --*/
   ggv->varnotebook = create_variable_notebook (hbox,
     GTK_SELECTION_SINGLE, all_vartypes, edgesets_only,
-    G_CALLBACK(NULL), inst->gg);
+    G_CALLBACK(NULL), (gpointer) NULL, inst->gg);
   swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK (ggv->varnotebook), 0);
   if (swin != NULL) {
     ggv->tree_view_dist = GTK_BIN(swin)->child;
