@@ -53,7 +53,7 @@ varcircles_visibility_set (displayd *display, ggobid *gg)
   if(!display)
       return;
 
-  projection = pmode_get (gg);
+  projection = pmode_get (display, gg);
   d = display->d;
   children = gtk_container_get_children (GTK_CONTAINER (d->vcirc_ui.table));
 

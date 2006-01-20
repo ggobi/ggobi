@@ -29,8 +29,9 @@ extern "C" {
 #endif
 
 GtkWidget * mode_panel_get_by_name(const gchar *, ggobid *);
-InteractionMode imode_get(ggobid *);
-ProjectionMode pmode_get(ggobid *);
+InteractionMode imode_get(ggobid *);  /* this should probably also
+					 change */
+ProjectionMode pmode_get(displayd *, ggobid *);
 void pmode_set_cb (GtkWidget *widget, gint action);
 void imode_set_cb (GtkWidget *widget, gint action);
 void main_miscmenus_update (ProjectionMode, InteractionMode, displayd *, ggobid *gg);
@@ -268,8 +269,8 @@ gint       dsvd (gdouble **a, gint m, gint n, gfloat *w, gdouble **v);
 void layout_text(PangoLayout *layout, const gchar *text, PangoRectangle *rect);
 void underline_text(PangoLayout *layout);
 
-ProjectionMode pmode_get (ggobid *);
-InteractionMode imode_get (ggobid *);
+ProjectionMode pmode_get(displayd *, ggobid *);
+InteractionMode imode_get(ggobid *);
 
 gboolean   edge_add (gint, gint, gchar *, gchar *, datad *, datad *, ggobid *);
 gboolean   edge_endpoints_get (gint k, gint *a, gint *b, datad *d, endpointsd *endpoints, datad *e);

@@ -170,7 +170,12 @@ cpanel_show (gboolean show, ggobid *gg)
   }
 }
 
-ProjectionMode pmode_get (ggobid *gg) { return gg->pmode; }
+ProjectionMode pmode_get (displayd *dsp, ggobid *gg) {
+  if (dsp == NULL)
+    return gg->pmode;
+  else
+    return dsp->cpanel.pmode;
+}
 InteractionMode imode_get (ggobid *gg) { return gg->imode; }
 
 /*
@@ -295,7 +300,8 @@ rebuild_mode_menus(displayd *display, ggobid *gg)
 			GGOBI(getIModeScreenName)(DEFAULT_IMODE, display), NULL);
 	  g_free(path);
 	  /* force the radio actions to update */
-	  path = g_strdup_printf("%s%s", pprefix, GGOBI(getPModeName)(pmode_get(gg)));
+	  path = g_strdup_printf("%s%s", pprefix, 
+            GGOBI(getPModeName)(pmode_get(gg->current_display, gg)));
 	  action = gtk_ui_manager_get_action(gg->main_menu_manager, path);
 	  if (action)
 		gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action), true);

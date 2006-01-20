@@ -964,7 +964,7 @@ binningPermitted(displayd* dpy)
   ggobid *gg = dpy->ggobi;
   datad *e = dpy->e;
 
-  if (pmode_get(gg) == P1PLOT &&
+  if (pmode_get(dpy, gg) == P1PLOT &&
        cpanel->p1d.type == ASH &&
        cpanel->p1d.ASH_add_lines_p)
      return(false);
@@ -1059,7 +1059,7 @@ plotted(displayd *display, gint *cols, gint ncols, datad *d)
 {
   gint j, k;
   splotd *sp = (splotd *) display->splots->data;  /*-- only one splot --*/
-  ProjectionMode projection = (gint) pmode_get (display->ggobi);
+  ProjectionMode projection = (gint) pmode_get (display, display->ggobi);
 
   switch (projection) {
     case P1PLOT:
@@ -1135,7 +1135,7 @@ plotted(displayd *display, gint *cols, gint ncols, datad *d)
 static void
 varpanelTooltipsReset(displayd *display, ggobid *gg, GtkWidget *wx, GtkWidget *wy, GtkWidget *wz, GtkWidget *label)
 {
-  ProjectionMode projection = pmode_get (gg);
+  ProjectionMode projection = pmode_get (display, gg);
 
   switch (projection) {
     case P1PLOT:
@@ -1208,7 +1208,7 @@ varpanelTooltipsReset(displayd *display, ggobid *gg, GtkWidget *wx, GtkWidget *w
 static gint 
 plottedVarsGet(displayd *display, gint *cols, datad *d, ggobid *gg)
 {
-  ProjectionMode mode = pmode_get (gg);
+  ProjectionMode mode = pmode_get (display, gg);
   gint ncols = 0, k;
   splotd *sp = gg->current_splot;
 
@@ -1355,7 +1355,7 @@ drawCase(splotd *sp, gint m, datad *d, ggobid *gg)
 {
   displayd *display = sp->displayptr;
   gboolean draw_case = true;
-  ProjectionMode proj = pmode_get (gg);
+  ProjectionMode proj = pmode_get (display, gg);
   gint j;
 
   switch (proj) {
@@ -1424,8 +1424,9 @@ drawCase(splotd *sp, gint m, datad *d, ggobid *gg)
 static gboolean
 drawEdge(splotd *sp, gint m, datad *d, datad *e, ggobid *gg) 
 {
+  displayd *display = sp->displayptr;
   gboolean draw_edge = true;
-  ProjectionMode proj = pmode_get (gg);
+  ProjectionMode proj = pmode_get (display, gg);
 
   switch (proj) {
     case P1PLOT:

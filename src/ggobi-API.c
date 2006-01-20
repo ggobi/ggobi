@@ -1199,7 +1199,7 @@ GGOBI(getSPlot)(gint which, displayd *display)
 gint
 GGOBI(setPMode)(const gchar *name, ggobid *gg)
 {
-  ProjectionMode old = pmode_get(gg);
+  ProjectionMode old = pmode_get(gg->current_display, gg);
   ProjectionMode newMode = (ProjectionMode) GGOBI(getPModeId)(name);
   if(newMode != NULL_PMODE)
     GGOBI(full_viewmode_set)(newMode, DEFAULT_IMODE, gg);
@@ -1782,7 +1782,7 @@ gboolean
 GGOBI(setTour2DProjectionMatrix)(gdouble *Fvalues, gint ncols, gint ndim, 
   gboolean vals_scaled, ggobid *gg)
 {
-  ProjectionMode vm = pmode_get(gg);
+  ProjectionMode vm = pmode_get(gg->current_display, gg);
   displayd *dsp = gg->current_display; 
   cpaneld *cpanel = &dsp->cpanel;
   datad *d = dsp->d;

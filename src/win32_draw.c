@@ -376,8 +376,8 @@ win32_draw_to_pixmap_unbinned (gint current_color, splotd *sp, gboolean draw_hid
           {
             build_whisker_segs (m, &nwhisker_segs, sp);
           } else if (GGOBI_IS_SCATTERPLOT_DISPLAY(display) &&
-            ((pmode_get(gg) == TOUR1D && cpanel->t1d.ASH_add_lines_p) ||
-             (pmode_get(gg) == P1PLOT && cpanel->p1d.type == ASH &&
+            ((pmode_get(display, gg) == TOUR1D && cpanel->t1d.ASH_add_lines_p) ||
+             (pmode_get(display, gg) == P1PLOT && cpanel->p1d.type == ASH &&
               cpanel->p1d.ASH_add_lines_p))) {
             build_ash_segs (m, &nash_segs, sp);
           }

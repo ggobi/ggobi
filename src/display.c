@@ -477,7 +477,8 @@ gint
 display_add (displayd *display, ggobid *gg)
 {
   splotd *prev_splot = gg->current_splot;
-  ProjectionMode pmode_prev = pmode_get (gg);
+  //ProjectionMode pmode_prev = pmode_get (gg);
+  ProjectionMode pmode_prev = pmode_get (gg->current_display, gg);
   InteractionMode imode_prev = imode_get (gg);
   ///displayd *oldDisplay = gg->current_display;
 
