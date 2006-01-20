@@ -44,8 +44,8 @@ typedef struct _Tour2DCPanel {
 
 typedef struct {
 
- ProjectionMode pmode, pmode_prev;  /* this may not be used */
- InteractionMode imode, imode_prev;
+  ProjectionMode pmode;
+  InteractionMode imode;
 
  /*-- 1d plotting --*/
  struct _P1DCpanel {
