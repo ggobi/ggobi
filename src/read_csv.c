@@ -90,7 +90,7 @@ static int csv_row_parse (Row *row, GIOChannel *channel, gint trim);
 static gboolean is_numeric(gchar *str, gint len);
 static gboolean has_column_labels(GList *rows, gboolean has_row_labels);
 static gboolean has_row_labels(GList *rows);
-static void load_column_labels(Row *row, datad *d, gboolean col_labels, gboolean row_labels);
+static void load_column_labels(Row *row, datad *d, gboolean row_labels);
 static void load_row_labels(GList *rows, datad *d, gboolean has_labels);
 static void load_levels_from_hash(gpointer key, gpointer value, vartabled *vt);
 static void load_row_values(GList *rows, datad *d, gboolean row_labels);
@@ -114,6 +114,8 @@ static int csv_row_parse (Row *row, GIOChannel *channel, gint trim) {
     if (g_io_channel_read_line_string(channel, row->src, NULL, NULL) != G_IO_STATUS_NORMAL) {
 		return ERR_STREAM_READ;
     }
+	
+	g_string_append_c(row->src, '\r');
 	
 	//fprintf(stderr, "%s\n", row->src->str);
 	
@@ -154,7 +156,7 @@ static int csv_row_parse (Row *row, GIOChannel *channel, gint trim) {
 
         i++;
         row->rIdx++;  /* New row entry */
-
+		
         if (row->rIdx >= rowMlen) {
             struct RowEntry * t;
             rowMlen += rowMlen;
@@ -222,7 +224,6 @@ static int csv_row_parse (Row *row, GIOChannel *channel, gint trim) {
             while (fastIsSpace (row->src->str[i])) i++;
             crpStrictAssert (row->src->str[i] != '"', ERR_NON_ENCLOSED_QUOTE);
         }
-
         row->entry[row->rIdx].len = k - startOfs;
         goto LCommaEncountered;
 
@@ -274,7 +275,6 @@ static int csv_row_parse (Row *row, GIOChannel *channel, gint trim) {
         }
     LDoneLast:
         row->rIdx++;
-        /*checkLF (bFp);*/
         return 1;
 }
 
@@ -310,6 +310,8 @@ static gboolean is_numeric(gchar *str, gint len) {
 	return len > 0 && end == str + len;
 }
 
+/* Detection of column labels deprecated - we assume column labels exist */
+#if 0
 static gboolean has_column_labels(GList *rows, gboolean has_row_labels)
 {
 	Row *first, *second;
@@ -339,6 +341,7 @@ static gboolean has_column_labels(GList *rows, gboolean has_row_labels)
 	
 	return false;
 }
+#endif
 
 /*  Heuristic: If the first row has an empty in the first column and
 	and all the values in the first column are unique, we have row names.
@@ -366,13 +369,13 @@ static gboolean has_row_labels(GList *rows)
 	return true;
 }
 
-static void load_column_labels(Row *row, datad *d, gboolean col_labels, gboolean row_labels)
+static void load_column_labels(Row *row, datad *d, gboolean row_labels)
 {
 	gint i;
 	gint offset = (row_labels ? 1 : 0);
 	for (i = 0; i < d->ncols; i++) {	
 		vartabled *vt = vartable_element_get(i, d);
-		if (!col_labels || row->entry[i + offset].len == 0)
+		if (row->entry[i + offset].len == 0)
 			vt->collab = g_strdup_printf("Col %d", i + 1);
 		else vt->collab = g_strdup(row->src->str + row->entry[i + offset].ofs);
 		vt->nickname = g_strndup(vt->collab, 2);
@@ -409,7 +412,7 @@ static void load_row_values(GList *rows, datad *d, gboolean row_labels)
 	arrayf_alloc (&d->raw, d->nrows, d->ncols);
 	/* Initialize short array */
 	arrays_alloc_zero (&d->missing, d->nrows, d->ncols);
-  
+	
 	for (j = 0; j < d->ncols; j++) {
 		GHashTable *hash = g_hash_table_new((GHashFunc)g_str_hash, (GEqualFunc)g_str_equal);
 		vartabled *vt = vartable_element_get (j, d);
@@ -417,17 +420,18 @@ static void load_row_values(GList *rows, datad *d, gboolean row_labels)
 		for (cur = rows, i = 0; cur; cur = cur->next, i++) {
 			Row *row = (Row *)cur->data;
 			gchar *str = row->src->str + row->entry[j + offset].ofs;
-			/*fprintf(stderr, "string: %s\n", str);*/
+			//fprintf(stderr, "string: %s\n", str);
 			if (is_numeric(str, row->entry[j + offset].len))
 				d->raw.vals[i][j] = (gfloat) g_strtod(str, NULL);
 			else {
-				if (!g_ascii_strcasecmp(str, "na") || !strcmp(str, ".")) {
+				if (str[0] == '\0' || !g_ascii_strcasecmp(str, "na") || !strcmp(str, ".")) {
 					d->nmissing++;
 					vt->nmissing++;
 					d->missing.vals[i][j] = 1;
 					d->raw.vals[i][j] = 0.0;
 				} else {
 					gint index; /* values start from 1 */
+					//fprintf(stderr, "string: %s (%d) at %d,%d\n", str, row->entry[j + offset].len, i, j);
 					if (!(index = GPOINTER_TO_INT(g_hash_table_lookup(hash, str)))) {
 						index = ++(vt->nlevels);
 						g_hash_table_insert(hash, str, GINT_TO_POINTER(index));
@@ -462,19 +466,17 @@ static void load_row_data(GList *rows, datad *d)
 	
 	fprintf(stderr, "loading data...\n");
 	gboolean row_labels = has_row_labels(rows);
-	gboolean column_labels = has_column_labels(rows, row_labels);
+	/*gboolean column_labels = has_column_labels(rows, row_labels);*/
 	
-	fprintf(stderr, "colnames: %d rownames: %d\n", column_labels, row_labels);
+	fprintf(stderr, "rownames: %d\n", row_labels);
 	
 	if (nrows > 0)
 		ncols = ((Row *)rows->data)->rIdx;
 	if (row_labels)
 		ncols--;
 	d->ncols = ncols;
-	
-	if (column_labels)
-		nrows--;
-	d->nrows = nrows;
+
+	d->nrows = nrows - 1;
 	
 	fprintf(stderr, "Rows: %d Cols: %d\n", d->nrows, d->ncols);
 	
@@ -482,11 +484,10 @@ static void load_row_data(GList *rows, datad *d)
     vartable_alloc(d);
     vartable_init(d);
 	
-	load_column_labels((Row *)rows->data, d, column_labels, row_labels);
-	
+	load_column_labels((Row *)rows->data, d, row_labels);
 	fprintf(stderr, "Loaded column labels\n");
-	if (column_labels)
-		rows = g_list_next(rows);
+	
+	rows = g_list_next(rows); /* skip the column labels */
 	
 	load_row_labels(rows, d, row_labels);
 	fprintf(stderr, "Loaded row labels\n");
