@@ -627,14 +627,14 @@ setEdgePartners (XMLParserData *parserData)
   for (i=1; i<e->edge.n; i++) {
     k = i-1;
     if (strcmp(ep[i].a, ep[k].a) == 0 && strcmp(ep[i].b, ep[k].b) == 0) {
-      g_printerr ("Error: found duplicate edge from %s to %s\n",
+      g_critical("Found duplicate edge from %s to %s",
 		  (gchar *) e->edge.sym_endpoints[ ep[i].jcase ].a,
 		  (gchar *) e->edge.sym_endpoints[ ep[i].jcase ].b);
       dups = true;
     }
   }
   if (dups) 
-    /* */ (*FatalError)(1);
+    g_error("Duplicate edges found");
 
 
   /*-- If there are no dups, add the reverse of each edge and re-sort --*/
@@ -678,9 +678,8 @@ void endXMLElement(void *user_data, const xmlChar *name)
       setEdgePartners(data);
       releaseCurrentDataInfo(data);
       if (data->current_record < d->nrows) {
-        g_printerr ("There are fewer records than declared for '%s': %d < %d.\n",
+        g_error("There are fewer records than declared for '%s': %d < %d.",
           d->name, data->current_record, d->nrows);
-        (*FatalError)(101);
       }
 
     }
@@ -920,8 +919,7 @@ setDatasetInfo (const xmlChar **attrs, XMLParserData *data)
   datad *d = getCurrentXMLData(data);
 
   if (tmp == NULL) {
-    g_printerr ("No count attribute\n");
-    (*FatalError)(101);
+    g_error("No count attribute");
   }
 
   d->nrows = strToInteger(tmp);
@@ -1113,8 +1111,7 @@ setGlyph(const xmlChar **attrs, XMLParserData *data, gint i)
     value = mapGlyphName(tmp);
     if (value == UNKNOWN_GLYPH) {
      if(tmp[0] < '0' || tmp[0] > '6') {
-       g_printerr ("%s is an illegal value for glyphType; it must be on [0,6]\n", tmp);
-       (*FatalError)(101);
+       g_error("%s is an illegal value for glyphType; it must be on [0,6]", tmp);
      }
 
      value = strToInteger(tmp);
@@ -1509,8 +1506,7 @@ allocVariables (const xmlChar **attrs, XMLParserData *data)
   datad *d = getCurrentXMLData(data);
 
   if(tmp == NULL) {
-    g_printerr ("No count for variables attribute\n");
-    (*FatalError)(101);
+    g_error("No count for variables attribute\n");
   }
 
   d->ncols = strToInteger(tmp);
@@ -1996,9 +1992,8 @@ readXMLRecord(const xmlChar **attrs, XMLParserData *data)
   gint i = data->current_record;
 
   if (i == d->nrows) {
-    g_printerr ("There are more records than declared for '%s'; exiting.\n",
+    g_error("There are more records than declared for '%s'; exiting.",
       d->name);
-    (*FatalError)(101);
   }
 
   data->current_element = 0;

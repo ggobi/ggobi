@@ -46,19 +46,9 @@ void GGOBI(splot_release)(splotd *sp, displayd *display, ggobid *gg);
 void GGOBI(data_release)(datad *, ggobid *gg);
 void GGOBI(vartable_free)(datad *, ggobid *gg);
 void GGOBI(vardatum_free)(vartabled *var, ggobid *gg);
-void GGOBI(setErrorHandlers)(FatalErrorHandler err);
 #ifdef __cplusplus
 }
 #endif
-
-
-void
-GGOBI(setErrorHandlers)(FatalErrorHandler err)
-{
-    if(!err)
-       return;
-    FatalError = err;
-}
 
 const gchar *
 GGOBI(getFileName) (ggobid *gg)

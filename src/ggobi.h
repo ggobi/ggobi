@@ -540,11 +540,6 @@ gboolean read_input(InputDescription * desc, ggobid * gg);
 void start_ggobi(ggobid * gg, gboolean init_data, gboolean createPlot);
 void process_initialization_files();
 
-
-typedef void (*FatalErrorHandler)(int);
-
-extern FatalErrorHandler FatalError;
-
 extern GGobiOptions *sessionOptions;
 
 /**

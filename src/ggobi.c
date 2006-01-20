@@ -83,8 +83,6 @@ const gchar * const ViewTypes[] =
 };
 const gint ViewTypeIndices[];
 
-FatalErrorHandler FatalError = &exit;
-
 static gchar *computeGGobiHome(char *str);
 
 
@@ -409,8 +407,7 @@ ggobi_alloc(ggobid *tmp)
         g_list_nth_data(tmp->colorSchemes, 0);
   }
   if (!tmp->activeColorScheme) {
-    g_printerr ("failed to find color scheme\n");
-    (*FatalError)(0);
+    g_error ("failed to find color scheme");
   } else colorscheme_init (tmp->activeColorScheme);
     /*
      * the number of colors in use will be tested against the
@@ -796,6 +793,7 @@ GGobi_get_data_by_name(const gchar * const name, const ggobid * const gg)
 ggobid*
 ValidateGGobiRef(ggobid *gg, gboolean fatal)
 { 
+ static gchar *error_msg = "Incorrect reference to ggobid.";
  extern ggobid** all_ggobis;
  extern gint num_ggobis;
   gint i;
@@ -804,11 +802,9 @@ ValidateGGobiRef(ggobid *gg, gboolean fatal)
     return(gg);
   }
 
-  g_printerr ("Incorrect reference to ggobid.\n");
-
   if (fatal) {
-     (*FatalError)(10);
-  }
+     g_error(error_msg);
+  } else g_critical(error_msg);
 
  return(NULL);
 }
@@ -816,6 +812,7 @@ ValidateGGobiRef(ggobid *gg, gboolean fatal)
 datad *
 ValidateDatadRef(datad *d, ggobid *gg, gboolean fatal)
 {
+  static gchar *error_msg = "Incorrect reference to datad.";
   gint i, n;
   n = g_slist_length(gg->d);
   for(i = 0; i < n ; i++) {
@@ -823,11 +820,10 @@ ValidateDatadRef(datad *d, ggobid *gg, gboolean fatal)
     return(d);
   }
 
-  g_printerr("Incorrect reference to datad.\n");
-
  if (fatal)
-  (*FatalError)(11);
-
+  g_error(error_msg);
+ else g_critical(error_msg);
+ 
  return(NULL); 
 }
 
@@ -836,6 +832,7 @@ ValidateDatadRef(datad *d, ggobid *gg, gboolean fatal)
 displayd *
 ValidateDisplayRef(displayd *d, ggobid *gg, gboolean fatal)
 {
+  static gchar *error_msg = "Incorrect reference to display.";
   gint i, n;
   n = g_list_length(gg->displays);
   for(i = 0; i < n ; i++) {
@@ -843,11 +840,10 @@ ValidateDisplayRef(displayd *d, ggobid *gg, gboolean fatal)
     return(d);
   }
 
-  g_printerr("Incorrect reference to display.\n");
-
  if (fatal)
-  (*FatalError)(11);
-
+  g_error(error_msg);
+ else g_critical(error_msg);
+ 
  return(NULL); 
 }
 

@@ -64,7 +64,7 @@ const char * const GGOBI(PModeKeys)[] = {
 const char * const GGOBI(IModeKeys)[] = {
   "", "s", "b", "i", "e", "m", "", ""};
 
-void addPreviousFilesMenu(GtkWidget *parent, GGobiInitInfo *info, ggobid *gg);
+void addPreviousFilesMenu(GGobiInitInfo *info, ggobid *gg);
 
 void store_session(ggobid *gg);
 void show_plugin_list(ggobid *gg);
@@ -848,9 +848,11 @@ static const gchar *main_ui_str =
 "			<menuitem action='Open'/>"
 "			<menuitem action='New'/>"
 "			<menuitem action='Save'/>"
-"			<menu action='PreviousFiles'/>"
+"			<menu action='Shortcuts'/>"
+#ifdef STORE_SESSION_ENABLED
 "			<separator/>"
 "			<menuitem action='StoreSession'/>"
+#endif
 #ifdef PRINTING_IMPLEMENTED
 "			<separator/>"
 "			<menuitem action='Print'/>"
@@ -899,7 +901,7 @@ static GtkActionEntry entries[] = {
 	{ "Open", GTK_STOCK_OPEN, "_Open", NULL, "Open a datafile", G_CALLBACK(action_open_cb) },
 	{ "New", GTK_STOCK_NEW, "_New", NULL, "Create a new GGobi instance", G_CALLBACK(action_new_cb) },
 	{ "Save", GTK_STOCK_SAVE, "_Save", "<control>V", "Save some data", G_CALLBACK(action_save_cb) },
-	{ "PreviousFiles", NULL, "_Previous files" },
+	{ "Shortcuts", NULL, "Shortc_uts" },
 	{ "StoreSession", GTK_STOCK_GOTO_BOTTOM, "Store session", NULL, "Save this GGobi session", 
 		G_CALLBACK(action_store_session_cb) 
 	},
@@ -1029,8 +1031,8 @@ ggobi_actions_create(ggobid *gg) {
 	
 	g_object_set(G_OBJECT(gtk_action_group_get_action(actions, "Display")), 
 		"hide_if_empty", false, NULL);
-	g_object_set(G_OBJECT(gtk_action_group_get_action(actions, "PreviousFiles")), 
-		"hide_if_empty", false, NULL);
+	/*g_object_set(G_OBJECT(gtk_action_group_get_action(actions, "Shortcuts")), 
+		"hide_if_empty", false, NULL);*/
 	
 	return(actions);
 }
@@ -1110,9 +1112,7 @@ rebuilt? -- dfs */
 
 #ifdef SUPPORT_INIT_FILES
   if (sessionOptions->info && sessionOptions->info->numInputs > 0) {
-    GtkWidget *w;
-    w = gtk_ui_manager_get_widget(gg->main_menu_manager, "/menubar/File/PreviousFiles/");
-    addPreviousFilesMenu(w, sessionOptions->info, gg);
+    addPreviousFilesMenu(sessionOptions->info, gg);
   }
 #endif
 
@@ -1198,31 +1198,37 @@ GGOBI(getPModeKeys)(int *n)
 
 #ifdef SUPPORT_INIT_FILES
 
-void load_previous_file(GtkWidget *w, gpointer cbd);
+void load_previous_file(GtkAction *action, gpointer cbd);
 /*
   Add the previous input sources to the menu.
  */
 void
-addPreviousFilesMenu(GtkWidget *parent, GGobiInitInfo *info, ggobid *gg)
+addPreviousFilesMenu(GGobiInitInfo *info, ggobid *gg)
 {
   gint i;
-  GtkWidget *el, *menu;
   InputDescription *input;
   if(info) {
-	 menu = gtk_menu_new(); 
-    for(i = 0 ; i < info->numInputs ; i++) {
-      input = &(info->descriptions[i].input);
-      if(input && input->fileName) {
-        el = gtk_menu_item_new_with_label(input->fileName);
-        g_signal_connect(G_OBJECT(el), "activate",
-                           G_CALLBACK(load_previous_file),
-                           info->descriptions + i);
-        GGobi_widget_set(el, gg, true);
-        gtk_menu_shell_append(GTK_MENU_SHELL(menu), el);
-      }
-	  gtk_widget_show_all(menu);
-	  gtk_menu_item_set_submenu(GTK_MENU_ITEM(parent), menu);
-    }
+	  GtkUIManager *manager = gg->main_menu_manager;
+	  GtkActionGroup *actions = gtk_action_group_new("Shortcuts");
+	  guint merge_id = gtk_ui_manager_new_merge_id(manager);
+	  gtk_ui_manager_insert_action_group(manager, actions, -1);
+      for(i = 0 ; i < info->numInputs ; i++) {
+		  input = &(info->descriptions[i].input);
+		  if(input && input->fileName) {
+			  gchar *action_name = g_strdup_printf("Shortcut_%d", i);
+			  GtkAction *action = gtk_action_new(action_name, input->fileName,
+			  						"Open this shortcut", GTK_STOCK_FILE); 
+			  g_signal_connect(G_OBJECT(action), "activate", 
+			  	G_CALLBACK(load_previous_file) , info->descriptions + i);
+			  g_object_set_data(G_OBJECT(action), "ggobi", gg);
+			  gtk_action_group_add_action(actions, action);
+			  gtk_ui_manager_add_ui(manager, merge_id, "/menubar/File/Shortcuts", 
+			  	action_name, action_name, GTK_UI_MANAGER_MENUITEM, false);
+			  g_free(action_name);
+			  g_object_unref(action);
+		  }
+	  }
+	  g_object_unref(actions);
   }
 }
 
@@ -1230,13 +1236,13 @@ addPreviousFilesMenu(GtkWidget *parent, GGobiInitInfo *info, ggobid *gg)
 ggobid *create_ggobi(InputDescription *desc);
 
 void
-load_previous_file(GtkWidget *w, gpointer cbd)
+load_previous_file(GtkAction *action, gpointer cbd)
 {
   InputDescription *desc;
   GGobiDescription *gdesc;
   ggobid *gg;
 
-  gg = GGobiFromWidget(w, false);
+  gg = (ggobid *)g_object_get_data(G_OBJECT(action), "ggobi");
   gdesc = (GGobiDescription*) cbd;
   desc =  &(gdesc->input);
 

@@ -1021,13 +1021,6 @@ GGOBI_EXPORT datad* datad_create(int nr, int nc, ggobid *gg);
 
 void GGobi_setSessionOptions(GGobiOptions *opts);
 
-
-/**
-Set the fatal error handler so that host applications
-can control how to recover from GGobi "exceptions"
- */
-void GGOBI(setErrorHandlers)(FatalErrorHandler err);
-
 /**
 
  */

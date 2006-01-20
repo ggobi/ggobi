@@ -66,9 +66,8 @@ read_binary (FILE *fp, datad *d, ggobid *gg)
     for (j=0; j<d->ncols; j++) {
       out = fread ((gchar *) &d->raw.vals[i][j], onesize, 1, fp);
       if (out != 1) {
-        g_printerr ("problem in reading the binary data file\n");
         fclose (fp);
-        (*FatalError)(1);
+        g_error("problem in reading the binary data file\n");
 
       } else if (d->raw.vals[i][j] == FLT_MAX) {
         d->raw.vals[i][j] = 0.0;
@@ -132,9 +131,7 @@ find_data_start (FILE *fp)
     }
     else if (isalpha (ch) && ch != 'n' && ch != 'N')
     {
-      g_printerr ("Comment lines must begin with # or %%;\n");
-      g_printerr ("I found a line beginning with '%c'\n", ch);
-      (*FatalError)(1);
+	  g_error("Comment lines must begin with # or %%; I found a line beginning with '%c'", ch);
     }
     else
     {
@@ -171,10 +168,8 @@ row1_read (FILE *fp, gfloat *row1, gshort *row1_missing, datad *d, ggobid *gg) {
         ;
 
       else if (ungetc (ch, fp) == EOF || fscanf (fp, "%s", word) < 0 ) {
-        g_printerr ("error in reading first row of data\n");
-        fclose (fp);
-        (*FatalError)(0);
-
+		fclose (fp);
+        g_error("error in reading first row of data");
       } else {
 
         if (g_strcasecmp (word, "na") == 0 || strcmp (word, ".") == 0) {
@@ -189,11 +184,8 @@ row1_read (FILE *fp, gfloat *row1, gshort *row1_missing, datad *d, ggobid *gg) {
         gotone = true;  /*-- suppress the alarm -- the file pointer is ok --*/
 
         if (d->ncols >= MAXNCOLS) {
-          g_printerr (
-            "This file has more than %d columns.  In order to read\n",
-            MAXNCOLS);
-          g_printerr ("it in, increase MAXNCOLS in defines.h and recompile.\n");
-          (*FatalError)(0);
+          g_error("This file has more than %d columns.  In order to read it in, "
+		  	"increase MAXNCOLS in defines.h and recompile", MAXNCOLS);
         }
       }
     }
@@ -313,13 +305,10 @@ ReadAscii (FILE *fp, datad *d, ggobid *gg)
     g_printerr ("size of data: %d x %d\n", d->nrows, d->ncols);
 
   if (nitems != d->nrows * d->ncols) {
-    g_printerr ("ReadAscii: nrows*ncols != nitems read\n");
-    g_printerr ("(nrows= %d, ncols= %d, nitems read= %d)\n",
-      d->nrows, d->ncols, nitems);
-    (*FatalError)(0);
+    g_error("ReadAscii: nrows*ncols != nitems read (nrows= %d, ncols= %d, nitems read= %d)",
+		d->nrows, d->ncols, nitems);
   } else if (nitems == 0) {
-    g_printerr ("No data was read\n");
-    (*FatalError)(0);
+    g_error("No data was read");
   }
   else {  /*-- nitems ok --*/
     /*
