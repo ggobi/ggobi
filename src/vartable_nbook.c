@@ -329,6 +329,8 @@ static gboolean
 real_filter_func (GtkTreeModel *model, GtkTreeIter *iter, datad *d)
 {
 	GtkTreePath *path = gtk_tree_model_get_path(model, iter);
+	if (gtk_tree_path_get_depth(path) > 1)
+		return(false);
 	vartabled *vt = vartable_element_get (gtk_tree_path_get_indices(path)[0], d);
 	gtk_tree_path_free(path);
 	return(vt->vartype != categorical);
@@ -337,6 +339,8 @@ static gboolean
 cat_filter_func (GtkTreeModel *model, GtkTreeIter *iter, datad *d)
 {
 	GtkTreePath *path = gtk_tree_model_get_path(model, iter);
+	if (gtk_tree_path_get_depth(path) > 1)
+		return(true);
 	vartabled *vt = vartable_element_get (gtk_tree_path_get_indices(path)[0], d);
 	gtk_tree_path_free(path);
 	return(vt->vartype == categorical);
@@ -395,6 +399,15 @@ vartable_subwindow_init (datad *d, ggobid *gg)
   	G_TYPE_DOUBLE, G_TYPE_DOUBLE, G_TYPE_DOUBLE, G_TYPE_DOUBLE, G_TYPE_DOUBLE, 
 	G_TYPE_DOUBLE, G_TYPE_INT, G_TYPE_STRING, G_TYPE_INT, G_TYPE_INT, G_TYPE_INT, 
 	G_TYPE_INT, G_TYPE_INT, G_TYPE_INT, G_TYPE_INT);
+	
+  d->vartable_tree_model = GTK_TREE_MODEL(model);
+  
+  /*-- populate the tables BEFORE attaching filters --*/
+  for (j = 0 ; j < d->ncols ; j++) {
+	  vartable_row_append(j, d, gg);
+	  vartable_cells_set_by_var(j, d);
+  }
+  
   filter_model = gtk_tree_model_filter_new(GTK_TREE_MODEL(model), NULL);
   gtk_tree_model_filter_set_visible_func(GTK_TREE_MODEL_FILTER(filter_model), 
   	(GtkTreeModelFilterVisibleFunc)real_filter_func, d, NULL);
@@ -455,13 +468,7 @@ pages any more!
 
   /*-- 3 = COLUMN_INSET --*/
   
-  d->vartable_tree_model = GTK_TREE_MODEL(model);
   
-  /*-- populate the tables --*/
-  for (j = 0 ; j < d->ncols ; j++) {
-	  vartable_row_append(j, d, gg);
-	  vartable_cells_set_by_var(j, d);
-  }
   
   gtk_widget_show_all (nbook);
 
@@ -538,10 +545,8 @@ vartable_collab_set_by_var (gint j, datad *d)
   GtkTreeIter iter;
   GtkTreeIter child;
   
-  if (d->vartable_tree_view[real] == NULL)
+  if (!vartable_iter_from_varno(j, d, &model, &iter))
 	  return;
-  
-  vartable_iter_from_varno(j, d, &model, &iter);
   
   if (vt) {
     switch (vt->vartype) {
@@ -580,10 +585,8 @@ vartable_collab_tform_set_by_var (gint j, datad *d)
   GtkTreeModel *model;
   GtkTreeIter iter;
   
-  if (d->vartable_tree_view[real] == NULL)
+  if (!vartable_iter_from_varno(j, d, &model, &iter))
 	  return;
-  
-  vartable_iter_from_varno(j, d, &model, &iter);
 
   vt = vartable_element_get (j, d);
   if (vt->tform0 == NO_TFORM0 &&
@@ -606,10 +609,8 @@ vartable_limits_set_by_var (gint j, datad *d)
   GtkTreeModel *model;
   GtkTreeIter iter;
   
-  if (d->vartable_tree_view[real] == NULL)
+  if (!vartable_iter_from_varno(j, d, &model, &iter))
 	  return;
-  
-  vartable_iter_from_varno(j, d, &model, &iter);
   
   if (vt) {
     //gint rownum = vartable_rownum_from_varno (j, vt->vartype, d);
@@ -650,7 +651,7 @@ void
 vartable_limits_set (datad *d) 
 {
   gint j;
-  if (d->vartable_tree_view[real] != NULL || d->vartable_tree_view[categorical] != NULL)
+  if (d->vartable_tree_model != NULL)
     for (j=0; j<d->ncols; j++)
       vartable_limits_set_by_var (j, d);
 }
@@ -663,10 +664,8 @@ vartable_stats_set_by_var (gint j, datad *d) {
   GtkTreeModel *model;
   GtkTreeIter iter;
 
-  if (d->vartable_tree_view[real] == NULL)
+  if (!vartable_iter_from_varno(j, d, &model, &iter))
 	  return;
-  
-  vartable_iter_from_varno(j, d, &model, &iter);
   
   if (vt) {
     //gint rownum = vartable_rownum_from_varno (j, vt->vartype, d);
@@ -697,7 +696,7 @@ void
 vartable_stats_set (datad *d) {
   gint j;
 
-  if (d->vartable_tree_view[real] != NULL)
+  if (d->vartable_tree_model != NULL)
     for (j=0; j<d->ncols; j++)
       vartable_stats_set_by_var (j, d);
 }
