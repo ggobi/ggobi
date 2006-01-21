@@ -376,7 +376,7 @@ varcircles_populate (datad *d, ggobid *gg)
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (d->vcirc_ui.swin),
     GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
   gtk_box_pack_start (GTK_BOX (d->vcirc_ui.vbox), d->vcirc_ui.swin,
-    true, true, 2);
+    true, true, 0);
   gtk_widget_show (d->vcirc_ui.swin);
 
   d->vcirc_ui.table = gtk_vbox_new (false, 0);
