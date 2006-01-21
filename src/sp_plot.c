@@ -711,6 +711,7 @@ splot_add_point_label (gboolean nearest, gint k, splotd *sp,
         (sp->max.x - rect.width)/2 + rect.width, rect.height + 5 + 1);
     }
 #endif
+	g_free(lbl);
 	g_object_unref(layout);
   }
 }

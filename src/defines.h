@@ -221,7 +221,7 @@ typedef enum {ARRANGE_ROW, ARRANGE_COL} ParCoordsArrangeMode;
 #define STICKY_ADD    1
 #define STICKY_REMOVE 2
 
-enum {ID_RECORD_ID, ID_RECORD_LABEL, ID_RECORD_NO, ID_VAR_LABELS};
+enum {ID_RECORD_ID = 1 << 3, ID_RECORD_LABEL = 1 << 2, ID_RECORD_NO = 1 << 1, ID_VAR_LABELS = 1 << 0};
 
 /*
  * jittering
@@ -262,6 +262,9 @@ enum {ID_RECORD_ID, ID_RECORD_LABEL, ID_RECORD_NO, ID_VAR_LABELS};
 #define WVIS_UPDATE_ON_MOUSE_UP  0
 #define WVIS_UPDATE_CONTINUOUSLY 1
 /*--                   --*/
+
+/*-- variable notebook columns --*/
+enum { VARLIST_NAME, VARLIST_INDEX, VARLIST_NCOLS };
 
 /*-- macros --*/
 

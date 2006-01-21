@@ -289,7 +289,6 @@ typedef struct
  vector_i index_to_rank;
 } barchartd;
 
-
 #define TYPES_H
 
 #endif

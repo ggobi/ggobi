@@ -23,12 +23,12 @@
 #include "vars.h"
 #include "externs.h"
 
-static void display_cb (GtkWidget *w, ggobid *gg)
+/*static void display_cb (GtkWidget *w, ggobid *gg)
 {
   cpaneld *cpanel = &gg->current_display->cpanel;
   cpanel->id_display_type = gtk_combo_box_get_active(GTK_COMBO_BOX(w));
   displays_plot (NULL, QUICK, gg);
-}
+}*/
 
 static void identify_target_cb (GtkWidget *w, ggobid *gg)
 {
@@ -103,12 +103,23 @@ id_all_sticky_cb (GtkWidget *w, ggobid *gg)
   displays_plot (NULL, QUICK, gg);
 }
 
+enum { RECORD_ID_INDEX = -3, RECORD_LABEL_INDEX, RECORD_NUMBER_INDEX };
+
 static
 void
-variable_selected_cb(GtkTreeSelection *treesel, GtkComboBox *combobox)
+label_selected_cb(GtkTreeSelection *treesel, ggobid *gg)
 {
-	if (gtk_tree_selection_count_selected_rows(treesel) > 0)
-		gtk_combo_box_set_active(combobox, ID_VAR_LABELS);
+	GtkTreeModel *model;
+	gint *vars, nvars, i;
+	cpaneld *cpanel = &gg->current_display->cpanel;
+	vars = get_selections_from_tree_view(GTK_WIDGET(gtk_tree_selection_get_tree_view(treesel)), &nvars);
+	cpanel->id_display_type = 0;
+	for (i = 0; i < nvars; i++) {
+		if (vars[i] < 0)
+			cpanel->id_display_type |= 1 << -vars[i];
+		else cpanel->id_display_type |= 1;
+	}
+	displays_plot (NULL, QUICK, gg);
 }
 
 /*--------------------------------------------------------------------*/
@@ -266,17 +277,31 @@ identify_event_handlers_toggle (splotd *sp, gboolean state) {
   }
 }
 
+static const gchar *label_prefices[] = {
+	"<i>Record Id</i>",
+	"<i>Record Label</i>",
+	"<i>Record Number</i>"
+};
+
+static const gchar **label_prefix_func(GtkWidget *notebook, datad *d, gint *n_prefices)
+{
+	gint offset = d->rowIds ? 0 : 1;
+	*n_prefices = G_N_ELEMENTS(label_prefices) - offset;
+	return(label_prefices + offset);
+}
 
 /*----------------------------------------------------------------------*/
 /*                   Making the control panel                           */
 /*----------------------------------------------------------------------*/
 
+
+/*	
 static gchar *display_lbl[] = {
   "Record id",
   "Record label",
   "Record number",
   "Variable labels",
-  };
+  };*/
 static gchar *target_lbl[] = {
   "Points",
   "Edges",
@@ -295,17 +320,16 @@ cpanel_identify_make(ggobid *gg) {
   gtk_container_set_border_width (GTK_CONTAINER(panel->w), 5);
 
   /*-- provide a variable list so that any variable can be the label --*/
-  opt = gtk_combo_box_new_text (); /* create combo box before notebook */
-  notebook = create_variable_notebook (panel->w,
-    GTK_SELECTION_MULTIPLE, all_vartypes, all_datatypes,
-    G_CALLBACK(variable_selected_cb), opt, gg);
+  /*opt = gtk_combo_box_new_text ();*/ /* create combo box before notebook */
+  notebook = create_prefixed_variable_notebook (panel->w, GTK_SELECTION_MULTIPLE, 
+  	all_vartypes, all_datatypes, G_CALLBACK(label_selected_cb), NULL, gg, label_prefix_func);
   g_object_set_data(G_OBJECT (panel->w),
     "notebook", notebook);
-  gtk_combo_box_set_active(GTK_COMBO_BOX(opt), ID_RECORD_LABEL);
+  /*gtk_combo_box_set_active(GTK_COMBO_BOX(opt), ID_RECORD_LABEL);*/
 
   /*-- option menu --*/
   /* created above */
-  gtk_widget_set_name (opt, "IDENTIFY:display_option_menu");
+  /*gtk_widget_set_name (opt, "IDENTIFY:display_option_menu");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
     "How to construct the label to be displayed: the record label, record number, a label constructed using variables selected in the list above, or the record id",
     NULL);
@@ -313,7 +337,7 @@ cpanel_identify_make(ggobid *gg) {
                       opt, false, false, 0);
   populate_combo_box (opt, display_lbl, G_N_ELEMENTS(display_lbl),
     G_CALLBACK(display_cb), gg);
-
+*/
  /*-- button for removing all labels --*/
   btn = gtk_button_new_with_mnemonic ("_Remove labels");
   gtk_widget_set_name (btn, "IDENTIFY:remove_sticky_labels");
@@ -394,10 +418,10 @@ cpanel_identify_set (displayd *display, cpaneld *cpanel, ggobid *gg)
   if (pnl == (GtkWidget *) NULL)
     return;
 
-  w = widget_find_by_name (pnl, "IDENTIFY:display_option_menu");
+  /*w = widget_find_by_name (pnl, "IDENTIFY:display_option_menu");
   gtk_combo_box_set_active (GTK_COMBO_BOX(w),
                                cpanel->id_display_type);
-
+*/
   w = widget_find_by_name (pnl, "IDENTIFY:target_option_menu");
   gtk_combo_box_set_active (GTK_COMBO_BOX(w),
                                (gint) cpanel->id_target_type);

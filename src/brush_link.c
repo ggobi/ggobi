@@ -336,7 +336,7 @@ build_symbol_vectors_by_var(cpaneld * cpanel, datad * d, ggobid * gg)
 /*          Create a variable notebook for brush linking rule        */
 /*********************************************************************/
 
-enum { VARLIST_NAME, VARLIST_VT, VARLIST_NCOLS };
+enum { LINKBYLIST_NAME, LINKBYLIST_VT, LINKBYLIST_NCOLS };
 
 void linkby_notebook_subwindow_add (datad *d, GtkWidget *notebook, ggobid *);
 
@@ -347,7 +347,7 @@ void varlist_append(GtkListStore *list, vartabled *vt) {
 	if (vt && vt->vartype == categorical) {
 		gtk_list_store_append(list, &iter);
 		row = g_strdup_printf("Link by %s", vt->collab);
-		gtk_list_store_set(list, &iter, VARLIST_NAME, row, VARLIST_VT, vt, -1);
+		gtk_list_store_set(list, &iter, LINKBYLIST_NAME, row, LINKBYLIST_VT, vt, -1);
 		g_free(row);
 	}
 }
@@ -357,7 +357,7 @@ void varlist_populate(GtkListStore *list, datad *d) {
   vartabled *vt;
   
   gtk_list_store_append(list, &first);
-  gtk_list_store_set(list, &first, VARLIST_NAME, "Link by case id", -1);
+  gtk_list_store_set(list, &first, LINKBYLIST_NAME, "Link by case id", -1);
   
   for (j=0; j<d->ncols; j++) {
     vt = vartable_element_get(j, d);
@@ -426,7 +426,7 @@ linking_method_set_cb (GtkTreeSelection *treesel, ggobid *gg)
     //gpointer ptr = gtk_clist_get_row_data (GTK_CLIST(cl), row);
     //gint jvar = GPOINTER_TO_INT(ptr);
     vartabled *vt;
-	gtk_tree_model_get(model, &iter, VARLIST_VT, &vt, -1);
+	gtk_tree_model_get(model, &iter, LINKBYLIST_VT, &vt, -1);
 	gg->linkby_cv = true;
     d->linkvar_vt = vt;
 	
@@ -576,7 +576,7 @@ linkby_notebook_subwindow_add (datad *d, GtkWidget *notebook, ggobid *gg)
 
   
   /* add the treeview (list) */
-  list = gtk_list_store_new(VARLIST_NCOLS, G_TYPE_STRING, G_TYPE_POINTER);
+  list = gtk_list_store_new(LINKBYLIST_NCOLS, G_TYPE_STRING, G_TYPE_POINTER);
   varlist_populate(list, d);
 
   treeview = gtk_tree_view_new_with_model(GTK_TREE_MODEL(list));

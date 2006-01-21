@@ -260,7 +260,7 @@ populate_tree_view(GtkWidget *tree_view, gchar **lbl, gint nitems, gboolean head
 	for (i=0; i<nitems; i++) {
 		if (!headers || lbl[i]) {
 			GtkTreeViewColumn *col = gtk_tree_view_column_new_with_attributes(
-				headers ? lbl[i] : NULL, gtk_cell_renderer_text_new(), "text", i, NULL);
+				headers ? lbl[i] : NULL, gtk_cell_renderer_text_new(), "markup", i, NULL);
 			gtk_tree_view_column_set_sort_column_id(col, i);
 			gtk_tree_view_column_set_resizable(col, true);
 			gtk_tree_view_insert_column(GTK_TREE_VIEW(tree_view), col, -1);
@@ -354,8 +354,6 @@ void scale_set_default_values (GtkScale *scale)
 /*--------------------------------------------------------------------*/
 /*      Notebook containing the variable list for each datad          */
 /*--------------------------------------------------------------------*/
-
-enum { VARLIST_NAME, VARLIST_INDEX, VARLIST_NCOLS };
 
 void
 variable_notebook_subwindow_add (datad *d, GCallback func, gpointer func_data,
@@ -675,6 +673,71 @@ create_variable_notebook (GtkWidget *box, GtkSelectionMode mode,
 		      GTK_OBJECT (notebook));
 
   return notebook;
+}
+  
+static void variable_notebook_page_add_prefices(GtkWidget *notebook, gint page) {
+	GtkTreeIter iter;
+	gint i, n_prefices;
+	GtkWidget *nth_page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), page);
+	datad *d = g_object_get_data(G_OBJECT(nth_page), "datad");
+	GtkWidget *view = GTK_BIN(nth_page)->child;
+	GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(view));
+	GGobiVariableNotebookPrefixFunc p_func = g_object_get_data(G_OBJECT(notebook), "prefix_func");
+	const gchar **prefices = p_func(notebook, d, &n_prefices);
+	for (i = n_prefices-1; i >= 0; i--) {
+		gtk_list_store_insert(GTK_LIST_STORE(model), &iter, 0);
+		gtk_list_store_set(GTK_LIST_STORE(model), &iter, 
+			VARLIST_NAME, prefices[i], VARLIST_INDEX, -(n_prefices - i), -1);
+	}
+}
+
+static void 
+prefixed_variable_notebook_varchange_cb (ggobid *gg, vartabled *vt, gint which,
+  datad *data, void *notebook)
+{
+	datad *d = (datad *) datad_get_from_notebook (GTK_WIDGET(notebook), gg);
+    gint kd = g_slist_index (gg->d, d);
+	variable_notebook_page_add_prefices(GTK_WIDGET(notebook), kd);
+}
+
+static void 
+prefixed_variable_notebook_adddata_cb (ggobid *gg, datad *d, void *notebook)
+{
+	datatyped dtype = (datatyped) g_object_get_data(G_OBJECT(notebook), "datatype");
+
+	if ((dtype == all_datatypes) ||
+      (dtype == no_edgesets && d->edge.n == 0) ||
+      (dtype == edgesets_only && d->edge.n > 0))
+	{
+		if (g_slist_length (d->vartable))
+			variable_notebook_page_add_prefices(GTK_WIDGET(notebook),	 
+		  		gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook))-1);
+	}
+}
+
+GtkWidget *create_prefixed_variable_notebook(GtkWidget *box, GtkSelectionMode mode, 
+	vartyped vtype, datatyped dtype, GtkSignalFunc func, gpointer func_data, 
+	ggobid *gg, GGobiVariableNotebookPrefixFunc prefix_func)
+{
+	gint i;
+	GtkWidget *notebook = create_variable_notebook(box, mode, vtype, dtype, 
+							func, func_data, gg);
+	g_object_set_data(G_OBJECT(notebook), "prefix_func", prefix_func);
+	for (i = 0; i < gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)); i++)
+		variable_notebook_page_add_prefices(notebook, i);
+	g_signal_connect (G_OBJECT (gg),
+		      "variable_added", 
+		      G_CALLBACK (prefixed_variable_notebook_varchange_cb),
+		      GTK_OBJECT (notebook));
+	g_signal_connect (G_OBJECT (gg),
+		      "variable_list_changed", 
+		      G_CALLBACK (prefixed_variable_notebook_varchange_cb),
+		      GTK_OBJECT (notebook));
+  	g_signal_connect (G_OBJECT (gg),
+		      "datad_added", 
+		      G_CALLBACK (prefixed_variable_notebook_adddata_cb),
+	      GTK_OBJECT (notebook));
+	return(notebook);
 }
 
 /*--------------------------------------------------------------------*/
