@@ -203,7 +203,7 @@ void       cpanel_xyplot_make (ggobid *);
 void       cpanel_xyplot_set (displayd *, cpaneld *, ggobid *);
 displayd * createDisplayFromDescription (ggobid *, GGobiDisplayDescription *desc);
 GtkWidget* create_variable_notebook (GtkWidget *box, GtkSelectionMode mode, vartyped vtype, datatyped dtype, GtkSignalFunc func, gpointer func_data, ggobid *);
-typedef const gchar ** (*GGobiVariableNotebookPrefixFunc) (GtkWidget *notebook, datad *d, gint *n_prefices);
+typedef const gchar ** (*GGobiVariableNotebookPrefixFunc) (GtkWidget *notebook, datad *d, gint *sel_prefix, gint *n_prefices);
 GtkWidget* create_prefixed_variable_notebook (GtkWidget *box, GtkSelectionMode mode, vartyped vtype, datatyped dtype, GtkSignalFunc func, gpointer func_data, ggobid *, GGobiVariableNotebookPrefixFunc prefix_func);
 void       ctour_event_handlers_toggle (splotd *, gboolean);
 void       ctourpp_window_open (ggobid *);

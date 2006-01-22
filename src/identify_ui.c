@@ -283,10 +283,11 @@ static const gchar *label_prefices[] = {
 	"<i>Record Number</i>"
 };
 
-static const gchar **label_prefix_func(GtkWidget *notebook, datad *d, gint *n_prefices)
+static const gchar **label_prefix_func(GtkWidget *notebook, datad *d, gint *sel_prefix, gint *n_prefices)
 {
 	gint offset = d->rowIds ? 0 : 1;
 	*n_prefices = G_N_ELEMENTS(label_prefices) - offset;
+	*sel_prefix = 1 - offset;
 	return(label_prefices + offset);
 }
 
