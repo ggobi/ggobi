@@ -494,7 +494,7 @@ GtkWidget *create_linkby_notebook (GtkWidget *, ggobid *);
 void cpanel_brush_make(ggobid * gg)
 {
   modepaneld *panel;
-  GtkWidget *btn;
+  GtkWidget *btn, *hb;
   GtkWidget *option_menu, *check_btn;
   GtkWidget *vb, *lbl;
   GtkWidget *notebook;
@@ -516,6 +516,12 @@ void cpanel_brush_make(ggobid * gg)
   gtk_box_pack_start(GTK_BOX(panel->w),
     btn, false, false, 1);
 
+
+  /* hbox to hold the Persistent checkbox and the Undo button */
+  hb = gtk_hbox_new(false, 0);
+  gtk_box_pack_start(GTK_BOX(panel->w),
+    hb, false, false, 0);
+
 /*-- check button: persistent/transient --*/
   /*-- this was an option menu but was changed to allow accelerators in GTK2 */
   check_btn = gtk_check_button_new_with_mnemonic("_Persistent");
@@ -524,10 +530,8 @@ void cpanel_brush_make(ggobid * gg)
     "Persistent or transient brushing", NULL);
   g_signal_connect(G_OBJECT(check_btn), "clicked",
   	G_CALLBACK(brush_mode_cb), gg);
-  gtk_box_pack_start(GTK_BOX(panel->w),
+  gtk_box_pack_start(GTK_BOX(hb),
     check_btn, false, false, 0);
-  //menu = populate_combo_box(option_menu, mode_lbl, G_N_ELEMENTS(mode_lbl),
-  //  G_CALLBACK(brush_mode_cb), gg);
   /* initialize transient */
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_btn), false);
 
@@ -558,6 +562,14 @@ void cpanel_brush_make(ggobid * gg)
         accels[i++], GDK_MOD2_MASK, GTK_ACCEL_VISIBLE);
     }*/
   }
+
+  btn = gtk_button_new_from_stock(GTK_STOCK_UNDO);
+  gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), btn,
+    "Undo the most recent persistent brushing changes, from button down to button up",
+    NULL);
+  gtk_box_pack_start(GTK_BOX(hb),btn, true, true, 0);
+  g_signal_connect(G_OBJECT(btn), "clicked", G_CALLBACK(brush_undo_cb), gg);
+
 
 /*-- option menu: brush with color/glyph/both --*/
   vb = gtk_vbox_new(false, 0);
@@ -602,20 +614,12 @@ void cpanel_brush_make(ggobid * gg)
   populate_combo_box(option_menu, edge_targets_lbl, G_N_ELEMENTS(edge_targets_lbl),
     G_CALLBACK(brush_edge_targets_cb), gg);
 
-  btn = gtk_button_new_from_stock(GTK_STOCK_UNDO);
-  gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), btn,
-    "Undo the most recent persistent brushing changes, from button down to button up",
-    NULL);
-  gtk_box_pack_start(GTK_BOX(panel->w),
-    btn, false, false, 0);
-  g_signal_connect(G_OBJECT(btn), "clicked",
-    G_CALLBACK(brush_undo_cb), gg);
-
   /*-- Define the linking rule --*/
   notebook = create_linkby_notebook (panel->w, gg);
   gtk_widget_set_name(notebook, "BRUSH:linkby_notebook");
 
 /*-- button for opening 'color schemes' panel --*/
+/*
   btn = gtk_button_new_with_mnemonic("Color _schemes ...");
   gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), btn,
     "Open tools panel for automatic brushing by variable",
@@ -624,6 +628,7 @@ void cpanel_brush_make(ggobid * gg)
     G_CALLBACK(wvis_window_cb), (gpointer) gg);
   gtk_box_pack_start(GTK_BOX(panel->w),
     btn, false, false, 1);
+ */
 
 /*-- button for opening clusters table --*/
   btn = gtk_button_new_with_mnemonic("Color & glyph _groups ...");
