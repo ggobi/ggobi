@@ -353,7 +353,8 @@ cpanel_identify_make(ggobid *gg) {
 /*
  * button for making all labels sticky
 */
-  btn = gtk_button_new_with_mnemonic ("Make all _sticky");
+  //btn = gtk_button_new_with_mnemonic ("Make all _sticky");
+  btn = gtk_button_new_with_mnemonic ("Label all");
   gtk_tooltips_set_tip (GTK_TOOLTIPS(gg->tips), btn,
     "Make all labels sticky, or persistent (to make the nearest point label sticky, click middle or right in the plot)",
     NULL);
