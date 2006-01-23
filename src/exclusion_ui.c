@@ -382,6 +382,9 @@ void cluster_add(gint k, datad * d, ggobid * gg)
     (GtkAttachOptions) 0, (GtkAttachOptions) 0, 5, 2);
 
 
+  // Set clusv[k].hidden_p in case the user has made changes.
+  d->clusv[k].hidden_p = (d->clusv[k].nhidden == d->clusv[k].n);
+
   d->clusvui[k].h_btn = gtk_toggle_button_new_with_label("Shadow");
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(d->clusvui[k].h_btn),
     d->clusv[k].hidden_p);
