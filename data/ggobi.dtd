@@ -17,9 +17,9 @@
 <!ELEMENT variable ( #PCDATA )>
 <!ELEMENT realvariable ( (description)?,(quickHelp)? )>
 
-<!ELEMENT categoricalvariable (description?, quickHelp?, levels)?>
+<!ELEMENT categoricalvariable (description?, quickHelp?, levels, time?)?>
 <!ELEMENT countervariable EMPTY>
-<!ELEMENT integervariable (description?, quickHelp?)>
+<!ELEMENT integervariable (description?, quickHelp?, time?)>
 
 
 <!ELEMENT level (#PCDATA)>
@@ -33,6 +33,7 @@
 >
 
 <!ELEMENT quickHelp (#PCDATA)>
+<!ELEMENT time (#PCDATA)>
 
 
 <!ELEMENT records ( record )*>
@@ -104,6 +105,7 @@
     nickname      NMTOKEN #IMPLIED
     transformName NMTOKEN #IMPLIED
     missingValue  CDATA   #IMPLIED
+    time          CDATA   #IMPLIED
     min           CDATA   #IMPLIED
     max           CDATA   #IMPLIED">
 
@@ -124,6 +126,7 @@
     name          CDATA   #IMPLIED
     nickname      NMTOKEN #IMPLIED
     quickHelp     CDATA   #IMPLIED
+    time          CDATA   #IMPLIED
     transformName CDATA   #IMPLIED
     missingValue  CDATA   #IMPLIED
     min           CDATA   #IMPLIED
@@ -134,6 +137,7 @@
     name          NMTOKEN #IMPLIED
     nickname      NMTOKEN #IMPLIED
     quickHelp     CDATA   #IMPLIED
+    time          CDATA   #IMPLIED
     transformName NMTOKEN #IMPLIED
     missingValue  CDATA   #IMPLIED
     min           CDATA   #IMPLIED
