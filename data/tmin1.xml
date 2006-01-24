@@ -6,6 +6,8 @@
  computed levels for a categorical variable using
  the levels="auto" attribute for a categoricalvariable
  element. It also uses the string element to identify these values.
+ Note that because we want to tag one of the elements of each record,
+ we have to tag them all so that this can be a valid xml file.
 </description>
 <variables count="5">
  <realvariable name="nseconds" />
@@ -29,11 +31,11 @@
 
 <records count="7">
  <record id="a1"> <real>42</real> <real>4870</real> <int>0</int><int>0</int> <string>AB C</string></record>
- <record id="b2"> 42 4880  0 1 <string>DEF</string> </record>
- <record id="c3">  7 4890  1 2 <string>GHI</string> </record>
- <record id="d4"> 12 5000  2 1 <string>J</string> </record>
- <record id="e5"> 18 5100  2 2 <string>KLM</string> </record>
- <record id="f6"> 12 5000  2 1 <string>NOP QRST</string> </record>
+ <record id="b2"> <real>42</real> <real>4880</real>  <int>0</int> <int>1</int> <string>DEF</string> </record>
+ <record id="c3">  <real>7</real> <real>4890</real>  <int>1</int> <int>2</int> <string>GHI</string> </record>
+ <record id="d4"> <real>12</real> <real>5000</real>  <int>2</int> <int>1</int> <string>J</string> </record>
+ <record id="e5"> <real>18</real> <real>5100</real>  <int>2</int> <int>2</int> <string>KLM</string> </record>
+ <record id="f6"> <real>12</real> <real>5000</real>  <int>2</int> <int>1</int> <string>NOP QRST</string> </record>
  <record id="g7"><real>18</real> <real>5200</real><int>2</int><int>2</int><string>Happy Birthday</string></record>
 </records>
 </data>
