@@ -7,6 +7,8 @@
  computed levels for a categorical variable using
  the levels="auto" attribute for a categoricalvariable
  element. It also uses the string element to identify these values.
+ Note that because we want to tag one of the elements of each record,
+ we have to tag them all so that this can be a valid xml file.
 </description>
 <variables count="7">
  <realvariable name="nseconds" />
@@ -41,15 +43,27 @@
 </variables>
 
 <records count="7">
- <record id="a1" label="a1"> 0 10 <string>Monday</string> 0 0 <string>AB C</string> 0</record>
- <record id="b2"> 1  20 <string>Tuesday</string> 0 1 <string>DEF</string> 1</record>
- <record id="c3"> 2  30 <string>Wednesay</string> 1 2 <string>GHI</string> 2</record>
- <record id="d4"> 3  40 <string>Thursday</string> 2 1 <string>J</string> 3</record>
- <record id="e5"> 4  50 <string>Friday</string> 2 2 <string>KLM</string> 4</record>
- <record id="f6"> 5  60 <string>Saturday</string> 2 1 <string>NOP QRST</string> 5</record>
- <record id="g7"><real>6</real>
- <real>70</real><string>Sunday</string><int>2</int><int>2</int><string>Happy
- Birthday</string><int>7</int></record>
+<record id="a1" label="a1"> 
+ <real>0</real> <real>10</real> <string>Monday</string> <int>0</int> <int>0</int> <string>AB C</string> <int>0</int>
+</record>
+<record id="b2"> 
+ <real>1</real>  <real>20</real> <string>Tuesday</string> <int>0</int> <int>1</int> <string>DEF</string> <int>1</int>
+</record>
+<record id="c3">
+ <real>2</real>  <real>30</real> <string>Wednesay</string> <int>1</int> <int>2</int> <string>GHI</string> <int>2</int>
+</record>
+<record id="d4">
+ <real>3</real>  <real>40</real> <string>Thursday</string> <int>2</int> <int>1</int> <string>J</string> <int>3</int>
+</record>
+<record id="e5">
+ <real>4</real>  <real>50</real> <string>Friday</string> <int>2</int> <int>2</int> <string>KLM</string> <int>4</int>
+</record>
+<record id="f6">
+ <real>5</real> <real> 60</real> <string>Saturday</string> <int>2</int> <int>1</int> <string>NOP QRST</string> <int>5</int>
+</record>
+<record id="g7">
+ <real>6</real><real>70</real><string>Sunday</string><int>2</int><int>2</int><string>Happy Birthday</string><int>7</int>
+</record>
 </records>
 </data>
 
