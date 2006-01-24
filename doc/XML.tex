@@ -19,134 +19,96 @@
 \href{http://www.research.att.com/~dfs}{Deborah F. Swayne}}
 \begin{document}
 \maketitle
-\section{Using XML Input Formats}
-There is now support for reading the data from an XML
-file.
-This is an alternative to having the inputs
-for a dataset be contained in a collection of multiple but associated files
-that provide the different characteristics such as 
-\begin{itemize}
-\item data
-\item observation labels
-\item glyph information
-\item color
-\item segments between points.
-\end{itemize}
-Instead, the XML format allows all the information to be specified in
-a single file.  Additionally, different sections of information can be
-omitted.
+\section{The Advantages of XML}
 
+GGobi's XML format allows a rich variety of data attributes and
+relationships to be specified in a single file, including
 
-One of the advantages of XML is that it can be validated externally.
-In other words, a well-formed file can be tested outside of the
-application for which it serves as input.  This helps to prepare and
-maintain correct input files.  Given the ability of R, S and Omegahat
-(and an increasing number of other statistical applications) to read
-XML, the dataset can be used in other applications with little or no
-additional code.  (Of course, read.table() and associated functions in
-R/S makes reading the old file formats easy.)
-
-XML parsers can check whether the document is well-formed.  This means
-that all obligatory sections are present, that sections are in the
-correct place.  Additionally, identifiers can be specified for each
-row and validating parsers can check that they are unique.
-
-Additionally, more useful information can be added
-to the data source.
-This includes items such as 
-\begin{itemize}
+\begin{itemize} \itemsep 0em
+\item missing values,
 \item how missing values
       are encoded (for the entire dataset or per variable),
 \item how many records there are, 
 \item levels of a variable that are not observed
-      but known to exist (e.g. ethnicities not encountered in a survey)
-\item the source of the data
-\item tooltips for use in describing the data
-\item the type of each variable (e.g. factor or numeric)
+      but known to exist (e.g. ethnicities not encountered in a survey),
+\item the source of the data,
+\item the type of each variable (e.g. factor or numeric), 
+\item graph topology,
+\item symbol types, sizes and colors (for the entire dataset or
+      per observation).
 \end{itemize}
-The fact that the number of records and variables are specified in the
-file format means that only one pass of the file is needed to read the
-data and no reallocation is needed as more observations than expected
-are located.  Additionally, it is easier to handle non-rectangular
-data.  For example, sparse data and variable number of values per
-observational unit (e.g in medical studies).
 
+% Can be validated
 
-Additionally, the growing usage of XML means that there are editors
-and browser to create and view XML files.
+There is no doubt that the XML format is verbose.  However, its
+copious markup and rigid structure offer many compensating benefits to
+authors of the input files as well as to application programmers.  For
+example, XML files can be validated externally: in other words, a
+well-formed file can be tested outside of the application for which it
+serves as input, which greatly helps in preparing and maintaining
+correct input files.  XML parsers check whether the document is
+well-formed, that all obligatory sections are present, and that all
+sections are correctly placed.  Identifiers can be specified for each
+row and validating parsers can check that they are unique.
 
-There is no doubt that the XML format appears more verbose and indeed
-it is. However, its more rigid structure benefits the authors of the
-input files as well as the application programmers.  It is more
-convenient and significantly less error-prone to have related
-information be in the same location.  For example, specifying the
-color of a line segment connecting two points in one file and the
-actual connection in another means that one has to have a mechanism to
-link the two specifications. Frequently this is a simple order in
-which they appear in the different files.  Removing individual lines
-of information commonly leads to lengthy searches for why the input
-does not produce the desired result.  Often this is because of an
-``off-by-one'' connection.
-
-
-Note that the XML approach will also be used to generate and
-potentially read plot descriptions for persistence and exchange with
-other software systems.
-
-
-A final benefit to using XML is that we have support for reading
-compressed files.  The XML parser we employ (Daniel Veillard's libxml)
-can parse XML directly from compressed files.  For large datasets,
-this is convenient as we don't have to uncompress the files before
-using them.  You can try this feature by using GNU zip (gzip)
-to compress the file flea.xml in the \directory{data}
-directory and starting the ggobi application
+To validate a ggobi data file, execute
 \begin{verbatim}
-  ggobi -x data/flea
+  xmllint -noout -dtdvalid ggobi.dtd flea.xml
 \end{verbatim}
-This searches for a file named data/flea.xml and if this is not found,
-\file{data/flea.xml.gz} and then \file{data/flea.xmlz}.  The parser
-automatically determines whether it is compressed or not.  This
-support can be turned off.  Some simple tests illustrate that the XML
-representation can be about about 50\% larger than their simpler ASCII
-equivalents (i.e. without the markup) but that the compression brings
-them to about $1/3$ the size. The speed at which the compressed file
-is read is almost the same as the uncompressed XML, and is about 33\%
-longer than the ASCII equivalents. (These were done on a $100000
-\times 5$ matrix.  Note also that all the color and glyph information
-was included in the XML and not provided in the ASCII, so the XML
-looks slightly better than the above numbers suggest.)
+
+% Familiar, supported by various tools
+
+The growing use of XML means that its structure is now familiar to
+many people, and there are editors and browsers to create and view XML
+files.  Given the ability of R, S and Omegahat (and an increasing
+number of other statistical applications) to read XML, the dataset can
+be used in other applications with little or no additional code.
+
+% Flexible
+
+Additionally, it is easy to define new DTDs to represent different
+inputs such as property or resource files, descriptions of plots,
+layout specifications for multiple plots, graph descriptions, etc.
+This can leverage much of the same parsing setup and importantly
+provides a uniform and increasingly familiar interface for the user
+for specifying files.
+
+% Reads compressed files
+
+XML offers support for reading compressed files.  The XML parser we
+employ (Daniel Veillard's libxml) can parse XML directly from
+compressed files with very little speed penalty.  You can try this
+feature by using GNU zip (gzip) to compress the file flea.xml in the
+\directory{data} directory and starting the ggobi application
+\begin{verbatim}
+  ggobi data/flea.xml.gz
+\end{verbatim}
+The parser automatically determines whether the file is compressed or
+not.
+
+% Reads via http
 
 Note also that the XML parsing library has support for reading files
 via ftp and http.
+% No longer here; but should be somewhere
 \begin{verbatim}
-  ggobi -x http://www.ggobi.org/data/flea.xml
+  ggobi http://www.ggobi.org/data/flea.xml
 \end{verbatim}
 
+% File-specific defaults + record and cell-specific overrides
 
-Being able to specify file-specific defaults allows one to easily
-change the characterstics of the plots without excessive editing of
-the contents of the file.  For example, to use a different glyph type,
-we need only specify a different value for the \texttt{glyphType}
-attribute in the \texttt{records} tag.  This greatly simplifies
+GGobi xml files allow one to specify default attributes (e.g., symbol
+type, size and color) for all records in the file, and to override
+those defaults for a single record at a time.  This greatly simplifies
 experimenting with different parameter values.
 
+% One-pass reading
 
-In contrast with the multiple input files for each dataset used by
-xgobi, the XML approach reduces the number of files to $1$. This means
-that it is easier to distribute inputs to others. There is no need to
-send multiple files individually, or to combine them into an archive,
-etc.
-
-An advantage of XML over a simpler but omre specialized format is that
-people are somewhat familiar with the basic rules of HTML, and hence
-XML. Additionally, it is easy to define new DTDs to represent
-different inputs such as property or resource files, descriptions of
-plots (see \dir{SVG/}), layout specifications for multiple plots,
-graph descriptions, etc.  This can leverage much of the same parsing
-setup and importantly provides a uniform and increasingly familiar
-interface for the user for specifying files.
-
+The fact that the number of records and variables are specified in the
+file format means that only one pass of the file is needed to read the
+data.  Additionally, it is easier to handle non-rectangular data,
+which may occur when data are sparse or when there is a variable number
+of values per observation (e.g in medical studies).
 
 \section{The File Format}
 
