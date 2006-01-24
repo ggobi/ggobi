@@ -1,0 +1,3 @@
+To validate xml data files:
+
+xmllint -dtdvalid ggobi.dtd --noout tmin2.xml
