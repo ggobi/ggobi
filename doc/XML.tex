@@ -1,15 +1,24 @@
 \documentclass{article}
 
 \input{pstricks}
-\input{WebMacros}
-\def\directory#1{\dir{#1}}
 
-\def\XMLAttribute#1{\Escape{#1}}
-\def\XMLTag#1{\Escape{#1}}
+% Taken from omegahat/Docs/WebMacros.tex
+\def\strip#1>{}
+\def\Escape#1{\def\next{#1}%
+{\frenchspacing\expandafter\strip\meaning\next}}
+\def\Env#1{{\gray\texttt{\Escape{#1}}}}
+\def\file#1{\HREF{#1}{\textbf{\Escape{#1}}}}
+\def\dir#1{\textbf{\Escape{#1/}}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Taken from omegahat/Docs/XMLMacros.tex
+\def\XMLTag#1{\textit{#1}}
+\def\XMLAttribute#1{\textsl{#1}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\def\directory#1{\dir{#1}}
 \def\XMLElement#1{\XMLTag{#1}}
 
-% dfs, just trying to build the pdf file
-\def\file#1{\Escape{#1}}
 \usepackage{comment}
 
 \usepackage{fullpage}
@@ -127,9 +136,10 @@ DTD.
 <ggobidata>
 \end{verbatim}
 %
-The string ggobidata indicates that this is the top-level tag for the
-document, and this is what appears next.  To specify that more than
-one dataset is inlcuded, use the \texttt{count} attribute:
+The string \XMLElement{ggobidata} indicates that this is the top-level
+tag for the document, and this is what appears next.  To specify that
+more than one dataset is included, use the \XMLAttribute{count}
+attribute:
 %
 \begin{verbatim}
 <ggobidata count="2">
@@ -142,7 +152,7 @@ This tag must be terminated at the end of the file:
 
 \subsection{Data}
 
-This is followed by the \texttt{data} tag, which begins the
+This is followed by the \XMLAttribute{data} tag, which begins the
 entries for a dataset:
 
 \begin{verbatim}
@@ -161,9 +171,11 @@ types of relationships among their elements:
 \item one dataset can contain a description of edges which connect
   points in another, as described in section \ref{Edges}.
 \end{itemize}
+Both of these schemes depend on the \XMLElement{record} \XMLAttribute{id} to
+uniquely identify a record.
 
 The remainder of the dataset is specified as sub-elements or sub-tags
-within this \texttt{data} element.
+within this \XMLElement{data} element.
 
 \subsection{Color schemes}
 
@@ -187,7 +199,6 @@ specify it as follows:
 <activeColorScheme file="/full/path/name/mycolorschemes.xml"
                    name="MyColorScheme 7"/>
 \end{verbatim}
-
 
 \begin{comment}
 \subsection{Colormap}
@@ -269,7 +280,7 @@ creating the file does not facilitate such rescaling.
 
 \subsection{Description}
 
-The second of the sub-elements within the \texttt{data} tag is
+The second of the sub-elements within the \XMLTag{data} tag is
 a description of the dataset.
 
 \begin{verbatim}
@@ -279,13 +290,13 @@ Physical measurements on flea beetles.
 \end{verbatim}
 
 This includes the source, any references, etc.  This is currently
-free-format.  A convenient attribute is \texttt{source} which
+free-format.  A convenient attribute is \XMLAttribute{source} which
 indicates where it can be found.
 
 \subsection{Variables}
 
 The next section of the file contains the descriptions of
-the variables.  It begins with the \texttt{variables} tag,
+the variables.  It begins with the \XMLElement{variables} tag,
 which must include the number of variables:
 
 \begin{verbatim}
@@ -293,23 +304,65 @@ which must include the number of variables:
 </variables
 \end{verbatim}
 %
-Between the \texttt{variables} tags, the file lists the variables,
-which can be continuous or categorical.  Continuous variables are
-specified simply:
+Between the \XMLElement{variables} tags, the file lists the variables,
+which can be continuous (real or integer) or categorical.  Continuous
+real variables are specified simply:
 \begin{verbatim}
 <realvariable>
  <name> tars1 </name>
 </realvariable>
 \end{verbatim}
-
+Integer variables use the tag \texttt{integervariable}.
 % 
 For categorical variables, some correspondance must be established
-between level values and data values, since the data values in
-\texttt{record} tag are numbers.  (These
-levels can also serve as a basis for linking records during brushing
-as described in \ref{LinkingRecords}.)  The most explicit method
-for setting up this correspondance is to fully specify level values and
-names:
+between level values and data values, since GGobi stores and
+manipulates numbers. (These levels can also serve as a basis for
+linking records during brushing as described in \ref{LinkingRecords}.)
+The simplest way to specify the variable is:
+%
+\begin{verbatim}
+  <categoricalvariable name="SEX" levels="auto" />
+  <categoricalvariable name="SMOKER" levels="auto" />
+\end{verbatim}
+%
+In that case the record values must be individually tagged as strings,
+and all the rest of the values in the record should also be individually
+tagged.  This is a sample record from tips.xml:
+%
+\begin{verbatim}
+<record label="1">
+ <real>1</real> <real>16.99</real> <real>1.01</real> <string>F</string>
+ <string>no</string> <real>6</real> <real>1</real> <real>2</real>
+</record>
+\end{verbatim}
+
+If your data values are numbers instead of strings, and all levels of
+interest are present in the data, a convenient alternative is to let
+ggobi assign the levels:
+%
+\begin{verbatim}
+<categoricalvariable name="fraudp">
+  <levels count="3" />
+</categoricalvariable>
+\end{verbatim}
+%
+By default, the level values in this case will be 1, 2, and 3, and
+the level names will be L1, L2 and L3.  If you want level values
+that begin at some number other than 1, specify the variable range: 
+%
+\begin{verbatim}
+<categoricalvariable name="fraudp" min="0" max="2">
+  <levels count="3" />
+</categoricalvariable>
+\end{verbatim}
+
+These methods are appropriate when the levels of the categorical
+variable have no natural ordering, and when all levels of interest are
+known to be present in the data.  When you want all gaps to be filled
+in, and you want complete control over the correspondance between
+value and level name, a fully explicit specification can be used to
+establish the correspondance between levels and values:
+%
 \begin{verbatim}
 <categoricalvariable name="fraudp">
   <levels count="3">
@@ -319,21 +372,18 @@ names:
   </levels>
 </categoricalvariable>
 \end{verbatim}
-A convenient alternative when there are very many levels is to
-let ggobi assign them:
-\begin{verbatim}
-<categoricalvariable name="fraudp">
-  <levels count="3" />
-</categoricalvariable>
-\end{verbatim}
-By default, the level values in this case will be 1, 2, and 3, and
-the level names will be L1, L2 and L3.  If you want level values
-that begin at some number other than 1, specify the variable range: 
-\begin{verbatim}
-<categoricalvariable name="fraudp" min="0" max="2">
-  <levels count="3" />
-</categoricalvariable>
-\end{verbatim}
+%
+For another example, see Shipman.xml.  The levels of month are
+fully specified, because we want the correspondance between month
+name and number to be properly established; the levels of place
+and cause can be automatically assigned because no such restriction
+exists.
+
+Two other variable types exist: \texttt{countervariable}
+\texttt{randomuniformvariable}.  For these two variables, no data
+should be specified; they will be automatically populated when
+ggobi starts, the first with integers from 1 to N, the second
+with random real numbers on [0, 1].
 
 The name of the variable can be specified as the text within the
 variable tag rather than as an attribute, and an optional ``nickname''
@@ -341,7 +391,7 @@ can be added, to be used for labelling variables in tight spaces:
 \begin{verbatim}
 <realvariable name="tars1" nickname="t1" />
 \end{verbatim}
-
+%
 (By default, the nickname is the first two letters of a variable,
 and that isn't always enough to make distinctions.)
 
@@ -357,6 +407,7 @@ Variable ranges can be specified for real variables as well:
 %The name of the transformed variable can be specified via the
 %attribute \texttt{transformedName}.
 
+\begin{comment}
 Additionally, instructions as to how to create the variable can be
 specified as a programming command via the Programming Instruction (PI)
 \begin{verbatim}
@@ -364,6 +415,7 @@ specified as a programming command via the Programming Instruction (PI)
 <?R rnorm(10)>
 </realvariable>
 \end{verbatim}
+\end{comment}
 
 \subsection{Records}
 
@@ -390,6 +442,8 @@ representing a single-pixel point and 6 a filled circle, and
 the rest as shown in the table below.  Legal values
 for the first string in the glyph tag are described in this table:
 
+\vspace{1em}
+
 \begin{tabular}{l|l|l}
 glyphType & glyph specifier & resulting glyph \\
 \hline
@@ -402,21 +456,31 @@ glyphType & glyph specifier & resulting glyph \\
 6 & fc   & filled circle
 \end{tabular}
 
-The body or content of each \texttt{record} is a simply ASCII listing
-of the values. Each value is separated by white space (space
-character, tabs or new lines).
+\vspace{1em}
+
+The body or content of each \texttt{record} may take two forms:
+\begin{itemize} \itemsep 0em
+\item An ASCII listing of the values, with each value
+separated by white space (space character, tabs or new lines).
+(See flea.xml.)
+\item A fully specified listing of the values, with each value tagged
+as real, int, or string.  (See tips.xml.)  For the file to be
+valid, all values must be tagged if any one is.  GGobi will read the
+file without complaint, but Rggobi will balk and the file will not
+validate.
+\end{itemize}
 
 A record can be considered ``hidden''.  This is set via a logical
 value for the attribute \texttt{hidden}.
+
+\subsubsection{Linking Records}
+\label{LinkingRecords}
 
 Each record can be given an \XMLAttribute{id} attribute value, which
 can be an arbitrary string.  This
 is different from a label in that it is not used by ggobi instance
 when displaying plots.  Instead, it is used only to uniquely identify
 a record within a dataset, and it has two purposes.
-
-\subsubsection{Linking Records}
-\label{LinkingRecords}
 
 The \XMLAttribute{id} can be used in the case where different
 datasets contain different variables for the same subjects, or
@@ -426,12 +490,11 @@ demographic data for a subset of those customers.  Those datasets
 will be linked for brushing and identification if they have the
 same value for \XMLAttribute{id}.
 
-The levels of a categorical variable can also be used as the
-basis for linking records during brushing.  If {\em Link by
-variable} is selected, and a categorical variable is highlighted
-in the {\bf Variable manipulation} tool, then brushing one
-observation causes all observations in all displays with the
-same level for that variable to be brushed as well.
+The levels of a categorical variable can also be used as the basis for
+linking records during brushing.  If records are linked by a
+categorical variable (see the Brush control panel), then brushing one
+observation causes all observations in all displays with the same
+level for that variable to be painted as well.
 
 \subsubsection{Edges}
 \label{Edges}
@@ -459,15 +522,7 @@ If other data values are present, this dataset is like any other
 dataset, and the values can be displayed in scatterplots, 
 parallel coordinate plots, and so on.
 
-
-\section{Using XML Files}
-To use data that is contained in an XML file, invoke ggobi with no
-command line flag, or with the command line flag \texttt{-x}.
-
-% Does it do this now?
-In the future, ggobi could be smart enough to include the detection of
-the XML format.
-
+% This may be deleted ...
 \section{Conversion of Old Files}
 The distribution contains an application named xmlConvert that can be
 used to read datasets provided in the old file format to XML.  This
@@ -482,7 +537,6 @@ For example,
 In the future, we will support writing the output to a file. (We need
 to process the command line arguments and look for a -o flag).
 
-
 Note that this dynamically loads the libraries libGGobi.so and
 libxml.so.  Thus the directories that contain these libraries must be
 referenced in the environment variable 
@@ -490,7 +544,7 @@ referenced in the environment variable
 Alternatively, the makefile can be edited to statically link these
 libraries.
 
-
+\begin{comment}
 \section{Compilation}
 To activate the XML mechanism, define the variable
 \Env{USE_XML} in  local.config.
@@ -500,13 +554,17 @@ When we use autoconf, this can be done by
   ./configure --with-xml
 \end{verbatim}
 
-This requires the XML parsing libray libxml (also know as gnome-xml) by Daniel Veillard.
-(\texttt{Daniel.Veillard@w3.org}).
-See \Escape{http://xmlsoft.org}
+This requires the XML parsing library libxml (also know as gnome-xml)
+by Daniel Veillard.  (\texttt{Daniel.Veillard@w3.org}).  See
+\Escape{http://xmlsoft.org}
+\end{comment}
+
+
 \section{References}
-The XML Handbook, Charles F Goldfarb and Paul Prescod
+The XML Handbook, Charles F Goldfarb and Paul Prescod,
  Prentice Hall.
 
+\vspace{1em} \parindent 0em
 http://www.w3.org/XML
 
 \end{document}
