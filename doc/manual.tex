@@ -1,5 +1,6 @@
 \documentclass[11pt]{article}
 \usepackage{fullpage}
+\usepackage{comment}
 \bibliographystyle{plain}
 %\bibliographystyle{asa}
 %\bibliographystyle{harvard}
@@ -637,11 +638,63 @@ height, and it is their width that varies instead.
 \section{Data format}
 \label{slbl:DataFormat}
 
+\subsection {XML}
+\label{slbl:XML}
+
+The richest file format supported by GGobi is an XML format, which is
+described in {\em The GGobi XML Input Format} (XML.pdf), available
+from the web site.  This format allows a great deal of detailed
+specification, such as
+
+\begin{itemize}
+\item multiple datasets within a single XML file, all available within
+      a single GGobi process;
+\item multiple variable types, such as categorical, integer, and 
+      random uniform;
+\item rules for linking between datasets;
+\item rules for specifying edges: line segments connecting pairs of points.
+% Leave this out for now, because I only know how to do it on
+% the command line.
+% \item the colormap to be used in brushing.
+\end{itemize}
+
+\subsection {CSV files}
+\label{slbl:excel}
+
+GGobi reads CSV (Comma-Separated Variables) files, with ``,'' as a
+field delimiter and carriage return as a record delimiter.  This is a
+format that has been made popular by Excel.  The file extension should
+be {\tt .csv}.
+
+An example file is:
+
+\begin{verbatim}
+,Var1,Var2,Var3
+A,1,F,9
+C,2,G,NA
+D,-1,NA,3
+E,.,F,7
+F,1,F,-5
+\end{verbatim}
+
+The first row contains column labels, and note that it begins with
+``,'' indicating that the first column contains the row labels.
+Non-numeric variables are treated as categorical.  Missing values can
+be denoted with ``NA'' or ``.''. There are a few example CSV
+files included with the distribution.
+
+Note that CSV files are extremely basic: they don't allow the
+specification of color or glyph, for example, nor do they allow row
+ids, so they can't be used for linking across data sets and the
+display of graphs.
+
 \subsection {ASCII}
 \label{slbl:ASCII}
 
-The ascii data format used in XGobi is still
-supported, with some changes and some exclusions.
+GGobi can read files in the format used by XGobi, with some changes
+and some exclusions.  As new functionality is added to GGobi, it is
+not extended to this older format, so such features as row ids and
+categorical variables are not present.
 
 The only essential file is the one containing the data itself.  Each
 line in the file contains one row of the input data matrix, and lines
@@ -685,56 +738,15 @@ The number is then 0 for the single-pixel glyph, and
 $7 \times (type-1) + size + 1$ for all other glyphs.
 \end{itemize}
 
-Filled circles may be the most visually appealing glyph, but take
-much longer to draw under Microsoft Windows.  Consequently, our
-sample data files usually use a small filled rectangle as the default
-glyph.
+% Don't know if this is true any longer; dfs.
+Filled circles may be the most visually appealing glyph, but take much
+longer to draw under Microsoft Windows.  Consequently, our sample data
+files usually use a small filled rectangle as the default glyph.
 
-Colors must be integers from 0 to one less than the number of colors in
+Colors must be integers from 0 to one fewer than the number of colors in
 the colormap.
 
-\subsection {XML}
-\label{slbl:XML}
-
-The XML format is described in {\em Using XML Input Formats},
-available from the web site.  The XML format allows more detailed
-specification, such as
-
-\begin{itemize}
-\item multiple datasets within a single XML file, all available within
-      a single GGobi process,
-\item rules for linking between datasets, and
-\item rules for specifying edges: line segments connecting pairs of points.
-% Leave this out for now, because I only know how to do it on
-% the command line.
-% \item the colormap to be used in brushing.
-\end{itemize}
-
-\subsection {Excel-formatted text dump}
-\label{slbl:excel}
-
-GGobi reads data text-dumped from Excel, with ``,'' used as the
-delimiter and no quotes on the text. GGobi will look for file
-extensions of the form {\tt .csv, .asc} or {\tt .txt}. An example file
-is:
-
-\begin{verbatim}
-,Var1,Var2,Var3
-A,1,F,9
-C,2,G,NA
-D,-1,NA,3
-E,.,F,7
-F,1,F,-5
-\end{verbatim}
-
-The first row are column labels, and note that it begins with
-``,'' indicating that the first column contains the row labels.
-
-Categorical variables are automatically converted to appropriate
-format for categorical variables in GGobi. Missing values need to be
-denoted with a ``.'', ``NA'' or ``.''. There are 3 test data sets to
-play with in the distribution, all aptly called {\tt test*.csv}.
-
+\begin{comment}
 % Should this be moved to a section on plugins?
 \subsection {Database access}
 \label{slbl:MySQL}
@@ -744,6 +756,7 @@ database. Details of this are described in the document {\em GGobi and
 Database Management Systems}, available through the web site. 
 
 Database access is implemented as a plugin.
+\end{comment}
 
 \section{Integration of ggobi with other software systems}
 \label{slbl:Integration}
@@ -1924,11 +1937,14 @@ to specify edges in the ascii data format, but they can be specified in
 XML -- and they can have associated data values.
 
 Several XML data files are included in the sample ggobi data, and
-the details of their format is described in {\em XML Input Format}
+the details of their format is described in {\em The GGobi XML Input Format}
 (XML.pdf) which is included as part of the ggobi distribution.
 
+% Not currently supported
+\begin{comment}
 Another innovation in data access is the ability to read data
 directly from a MySQL database, as described in section \ref{slbl:MySQL}.
+\end{comment}
 
 \subsection{Integration}
 
