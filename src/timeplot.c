@@ -284,7 +284,7 @@ tsplot_new(displayd *display, gboolean missing_p, gint nvars, gint *vars, datad 
  * splots in a box in a frame -- either a vbox or an hbox.
 */
   frame = gtk_frame_new (NULL);
-  gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_IN);
+  //gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_IN);
   gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
   gtk_box_pack_start (GTK_BOX (vbox), frame, true, true, 1);
 

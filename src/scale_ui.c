@@ -23,6 +23,8 @@
 #include "externs.h"
 #include <math.h>
 
+static gboolean updateAlways_p = false;
+
 void
 scale_pan_reset (displayd *display) {
 	ggobid *gg = display->ggobi;
@@ -193,7 +195,7 @@ static void zoomoptions_cb (GtkWidget *w, ggobid *gg)
 }
 
 /*--------------------------------------------------------------------*/
-/*      Handling keyooooboard and mouse events in the plot window         */
+/*      Handling keyboard and mouse events in the plot window         */
 /*--------------------------------------------------------------------*/
 
 static gint
@@ -287,10 +289,12 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
         zoom_by_drag (sp, gg);
       }
 
-      /*-- redisplay this plot --*/
-      splot_plane_to_screen (display, &display->cpanel, sp, gg);
-      ruler_ranges_set (false, gg->current_display, sp, gg);
-      splot_redraw (sp, FULL, gg);
+      if (updateAlways_p) {
+        /*-- redisplay this plot --*/
+        splot_plane_to_screen (display, &display->cpanel, sp, gg);
+        ruler_ranges_set (false, gg->current_display, sp, gg);
+        splot_redraw (sp, FULL, gg);
+      }
       break;
 
     case CLICK:
@@ -341,6 +345,14 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   gdk_pointer_ungrab (event->time);
   disconnect_motion_signal (sp);
 
+  if (!updateAlways_p) {
+    displayd *display = sp->displayptr;
+    /*-- redisplay this plot --*/
+    splot_plane_to_screen (display, &display->cpanel, sp, gg);
+    ruler_ranges_set (false, gg->current_display, sp, gg);
+    splot_redraw (sp, FULL, gg);
+  }
+
   return retval;
 }
 
@@ -385,7 +397,7 @@ cpanel_scale_make (ggobid *gg) {
 
 
   frame = gtk_frame_new ("Interaction style");
-  gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
+  //gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
   gtk_box_pack_start (GTK_BOX (panel->w),
                       frame, false, false, 0);
 
@@ -413,7 +425,7 @@ cpanel_scale_make (ggobid *gg) {
 
   /*-- frame and vbox for drag-style controls --*/
   frame = gtk_frame_new ("Drag-style controls");
-  gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
+  //gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
   gtk_box_pack_start (GTK_BOX (panel->w),
                       frame, false, false, 0);
 
@@ -432,7 +444,7 @@ cpanel_scale_make (ggobid *gg) {
 
   /*-- frame and vbox for click-style controls --*/
   frame = gtk_frame_new ("Click-style controls");
-  gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
+  //gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
   gtk_box_pack_start (GTK_BOX (panel->w),
                       frame, false, false, 0);
 
@@ -442,7 +454,7 @@ cpanel_scale_make (ggobid *gg) {
 
  /*-- pan or zoom radio buttons --*/
   f = gtk_frame_new (NULL);
-  gtk_frame_set_shadow_type (GTK_FRAME (f), GTK_SHADOW_ETCHED_OUT);
+  //gtk_frame_set_shadow_type (GTK_FRAME (f), GTK_SHADOW_ETCHED_OUT);
   gtk_box_pack_start (GTK_BOX (vbox), f, false, false, 0);
 
   hbox = gtk_hbox_new (true, 1);

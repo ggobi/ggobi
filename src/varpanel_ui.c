@@ -512,7 +512,7 @@ varpanel_populate (datad *d, ggobid *gg)
   /*-- create a scrolled window, and put it in the ebox --*/
   d->vcbox_ui.swin = gtk_scrolled_window_new (NULL, NULL);
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (d->vcbox_ui.swin),
-    GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
+    GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
   gtk_container_add (GTK_CONTAINER (d->vcbox_ui.ebox), d->vcbox_ui.swin);
 
   /*-- add a vbox to the swin --*/

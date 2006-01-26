@@ -561,7 +561,7 @@ void cluster_window_open(ggobid * gg)
     /* Create a scrolled window to hold the table */
     scrolled_window = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_window),
-      GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
+      GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
 
     g_object_set_data(G_OBJECT(scrolled_window), "datad", d);  /*setdata*/
     gtk_notebook_append_page(GTK_NOTEBOOK(gg->cluster_ui.notebook),

@@ -171,7 +171,7 @@ scatmat_new (gboolean missing_p, gint numRows, gint *rows,
  * splots in a table 
 */
   frame = gtk_frame_new (NULL);
-  gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_IN);
+  //gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_IN);
   gtk_container_set_border_width (GTK_CONTAINER (frame), 3);
   gtk_box_pack_start (GTK_BOX (vbox), frame, true, true, 1);
 
@@ -361,7 +361,7 @@ scatmat_new (displayd *display,
  * splots in a table 
 */
   frame = gtk_frame_new (NULL);
-  gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_IN);
+  //gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_IN);
   gtk_container_set_border_width (GTK_CONTAINER (frame), 3);
   gtk_box_pack_start (GTK_BOX (vbox), frame, true, true, 1);
 
@@ -798,7 +798,7 @@ createScatmatWindow(gint nrows, gint ncols, displayd *display, ggobid *gg, gbool
  * splots in a table 
 */
   frame = gtk_frame_new (NULL);
-  gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_IN);
+  //gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_IN);
   gtk_container_set_border_width (GTK_CONTAINER (frame), 3);
   gtk_box_pack_start (GTK_BOX (vbox), frame, true, true, 1);
 

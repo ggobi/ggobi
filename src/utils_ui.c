@@ -387,7 +387,7 @@ variable_notebook_subwindow_add (datad *d, GCallback func, gpointer func_data,
   /* Create a scrolled window to pack the tree view widget into */
   swin = gtk_scrolled_window_new (NULL, NULL);
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (swin),
-    GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
+    GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
 
   g_object_set_data(G_OBJECT(swin), "datad", d);  /*setdata*/
 /*

@@ -249,7 +249,7 @@ cpanel_tour1d_make (ggobid *gg) {
 
   /*-- frame around ASH parameters --*/
   frame = gtk_frame_new ("ASH parameters");
-  gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
+  //gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
   gtk_box_pack_start (GTK_BOX (panel->w), frame,
     false, false, 3);
 

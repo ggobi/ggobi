@@ -378,7 +378,7 @@ cpanel_identify_make(ggobid *gg) {
 
   /*-- frame around button for resetting center --*/
   frame = gtk_frame_new ("Recenter data");
-  gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
+  //gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
   gtk_box_pack_start (GTK_BOX (panel->w), frame,
     false, false, 3);
 

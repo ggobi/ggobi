@@ -107,7 +107,7 @@ ctourpp_window_open (ggobid *gg)
  * Controls
 */
     control_frame = gtk_frame_new (NULL);
-    gtk_frame_set_shadow_type (GTK_FRAME (control_frame), GTK_SHADOW_IN);
+    //gtk_frame_set_shadow_type (GTK_FRAME (control_frame), GTK_SHADOW_IN);
     gtk_container_set_border_width (GTK_CONTAINER (control_frame), 5);
     gtk_box_pack_start (GTK_BOX (hbox),
                         control_frame, false, false, 1);
@@ -150,7 +150,7 @@ ctourpp_window_open (ggobid *gg)
  * Drawing area in a frame
 */
     frame = gtk_frame_new (NULL);
-    gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_IN);
+    //gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_IN);
     gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
     gtk_box_pack_start (GTK_BOX (hbox),
                         frame, true, true, 1);

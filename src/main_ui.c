@@ -1136,8 +1136,7 @@ rebuilt? -- dfs */
 
   gtk_box_pack_start (GTK_BOX (hbox), gg->imode_frame, false, false, 3);
   gtk_container_set_border_width (GTK_CONTAINER (gg->imode_frame), 3);
-  gtk_frame_set_shadow_type (GTK_FRAME (gg->imode_frame),
-    GTK_SHADOW_IN);
+  //gtk_frame_set_shadow_type (GTK_FRAME (gg->imode_frame),    GTK_SHADOW_IN);
 
   make_control_panels (gg);
   if (gg->imode != NULL_IMODE) {

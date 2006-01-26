@@ -218,7 +218,7 @@ transform_window_open (ggobid *gg)
      * Stage 0: Domain adjustment
     */
     frame = gtk_frame_new ("Stage 0");
-    gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
+    //gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
     gtk_box_pack_start (GTK_BOX (vbox), frame, false, false, 1);
 
     stage0_option_menu = gtk_combo_box_new_text ();
@@ -235,7 +235,7 @@ transform_window_open (ggobid *gg)
      * Stage 1: Power transformations et al
     */
     frame = gtk_frame_new ("Stage 1");
-    gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
+    //gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
     gtk_box_pack_start (GTK_BOX (vbox), frame, false, false, 1);
 
     vb = gtk_vbox_new (false, 5);
@@ -309,7 +309,7 @@ transform_window_open (ggobid *gg)
      * Stage 2: Another standardization step
     */
     frame = gtk_frame_new ("Stage 2");
-    gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
+    //gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
     gtk_box_pack_start (GTK_BOX (vbox), frame, false, false, 1);
 
     stage2_option_menu = gtk_combo_box_new_text ();

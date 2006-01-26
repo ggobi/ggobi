@@ -129,7 +129,7 @@ cpanel_xyplot_make (ggobid *gg) {
   gtk_container_set_border_width (GTK_CONTAINER (panel->w), 5);
 
   frame = gtk_frame_new ("Plot cycling");
-  gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
+  //gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
   gtk_box_pack_start (GTK_BOX (panel->w), frame,
     false, false, 3);
 

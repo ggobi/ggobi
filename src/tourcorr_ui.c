@@ -350,7 +350,7 @@ ctouradv_window_open (void) {
     gtk_container_add (GTK_CONTAINER (window), vbox);
     
     frame = gtk_frame_new ("History");
-    gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
+    //gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
     gtk_box_pack_start (GTK_BOX (vbox), frame, false, false, 0);
 
     btn = gtk_button_new_from_stock (GTK_STOCK_CLOSE);

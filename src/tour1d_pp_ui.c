@@ -346,7 +346,7 @@ tour1dpp_window_open (ggobid *gg) {
  * Controls
 */
     dsp->t1d_control_frame = gtk_frame_new (NULL);
-    gtk_frame_set_shadow_type (GTK_FRAME (dsp->t1d_control_frame), GTK_SHADOW_IN);
+    //gtk_frame_set_shadow_type (GTK_FRAME (dsp->t1d_control_frame), GTK_SHADOW_IN);
     gtk_container_set_border_width (GTK_CONTAINER (dsp->t1d_control_frame), 5);
     gtk_box_pack_start (GTK_BOX (hbox),
                         dsp->t1d_control_frame, false, false, 1);
@@ -452,7 +452,7 @@ tour1dpp_window_open (ggobid *gg) {
  * pp index menu and scale inside frame
 */
     /*    frame = gtk_frame_new ("PP index function");
-    gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
+    //gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
     gtk_box_pack_start (GTK_BOX (vbc), frame, false, false, 0);
     */
 
@@ -498,7 +498,7 @@ tour1dpp_window_open (ggobid *gg) {
  * Drawing area in a frame
 */
     frame = gtk_frame_new (NULL);
-    gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_IN);
+    //gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_IN);
     gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
     gtk_box_pack_start (GTK_BOX (hbox),
                         frame, true, true, 1);

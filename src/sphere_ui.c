@@ -443,7 +443,7 @@ sphere_panel_open (ggobid *gg)
 
     /*-- scree plot --*/
     frame = gtk_frame_new ("Scree plot");
-    gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
+    //gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
     gtk_container_set_border_width (GTK_CONTAINER (frame), 2);
     gtk_box_pack_start (GTK_BOX (vbox), frame, true, true, 2);
 
@@ -470,7 +470,7 @@ sphere_panel_open (ggobid *gg)
 
     /*-- element 3 of vbox: controls in a labelled frame --*/
     frame0 = gtk_frame_new ("Prepare to sphere");
-    gtk_frame_set_shadow_type (GTK_FRAME (frame0), GTK_SHADOW_ETCHED_OUT);
+    //gtk_frame_set_shadow_type (GTK_FRAME (frame0), GTK_SHADOW_ETCHED_OUT);
     gtk_box_pack_start (GTK_BOX (vbox), frame0, false, false, 1);
 
     table = gtk_table_new (3, 2, false);
@@ -539,7 +539,7 @@ sphere_panel_open (ggobid *gg)
       1, 2, 2, 3, GTK_FILL, GTK_FILL, 0, 0);
 
     frame = gtk_frame_new ("Sphere");
-    gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
+    //gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
     gtk_container_set_border_width (GTK_CONTAINER (frame), 2);
     gtk_box_pack_start (GTK_BOX (vbox), frame, false, false, 2);
 
@@ -560,7 +560,7 @@ sphere_panel_open (ggobid *gg)
     /*-- list to show the currently sphered variables --*/
     scrolled_window = gtk_scrolled_window_new (NULL, NULL);
     gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled_window),
-      GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
+      GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
     gtk_box_pack_start (GTK_BOX (vb), scrolled_window,
       true, true, 0);
 

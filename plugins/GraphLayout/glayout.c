@@ -153,7 +153,7 @@ create_glayout_window(ggobid *gg, PluginInstance *inst)
   /* Create a scrolled window to pack the CList widget into */
   swin = gtk_scrolled_window_new (NULL, NULL);
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (swin),
-    GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
+    GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
 
   model = gtk_list_store_new(2, G_TYPE_STRING, GGOBI_TYPE_DATA);
   tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(model));
@@ -182,7 +182,7 @@ create_glayout_window(ggobid *gg, PluginInstance *inst)
   /* Create a scrolled window to pack the CList widget into */
   swin = gtk_scrolled_window_new (NULL, NULL);
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (swin),
-    GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
+    GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
 
   model = gtk_list_store_new(2, G_TYPE_STRING, GGOBI_TYPE_DATA);
   tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(model));

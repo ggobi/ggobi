@@ -937,7 +937,7 @@ wvis_window_open (ggobid *gg)
    * preview of section on choosing new colormap: place the frame
   */
     frame2 = gtk_frame_new ("Choose color scheme");
-    gtk_frame_set_shadow_type (GTK_FRAME (frame2), GTK_SHADOW_ETCHED_OUT);
+    //gtk_frame_set_shadow_type (GTK_FRAME (frame2), GTK_SHADOW_ETCHED_OUT);
     gtk_box_pack_start (GTK_BOX (vbox), frame2, false, false, 1);
 
     /*-- preview of section on colors, symbols --*/
@@ -945,7 +945,7 @@ wvis_window_open (ggobid *gg)
     gtk_box_pack_start (GTK_BOX (vbox), vb, false, false, 0);
 
     frame1 = gtk_frame_new ("Apply color scheme by variable");
-    gtk_frame_set_shadow_type (GTK_FRAME (frame1), GTK_SHADOW_ETCHED_OUT);
+    //gtk_frame_set_shadow_type (GTK_FRAME (frame1), GTK_SHADOW_ETCHED_OUT);
     gtk_box_pack_start (GTK_BOX (vbox), frame1, true, true, 1);
 
 /*  */
