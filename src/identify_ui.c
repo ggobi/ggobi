@@ -278,7 +278,7 @@ identify_event_handlers_toggle (splotd *sp, gboolean state) {
 }
 
 static const gchar *label_prefices[] = {
-	"<i>Record Id</i>",
+	"<i>Record ID</i>",
 	"<i>Record Label</i>",
 	"<i>Record Number</i>"
 };

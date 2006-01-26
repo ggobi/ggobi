@@ -345,7 +345,7 @@ void varlist_append(GtkListStore *list, vartabled *vt) {
 	
 	if (vt && vt->vartype == categorical) {
 		gtk_list_store_append(list, &iter);
-		row = g_strdup_printf("Link by %s", vt->collab);
+		row = g_strdup_printf("%s", vt->collab);
 		gtk_list_store_set(list, &iter, LINKBYLIST_NAME, row, LINKBYLIST_VT, vt, -1);
 		g_free(row);
 	}
@@ -356,7 +356,7 @@ void varlist_populate(GtkListStore *list, datad *d) {
   vartabled *vt;
   
   gtk_list_store_append(list, &first);
-  gtk_list_store_set(list, &first, LINKBYLIST_NAME, "Link by case id", -1);
+  gtk_list_store_set(list, &first, LINKBYLIST_NAME, "<i>Case ID</i>", -1);
   
   for (j=0; j<d->ncols; j++) {
     vt = vartable_element_get(j, d);
