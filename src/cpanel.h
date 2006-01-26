@@ -70,6 +70,7 @@ typedef struct {
 
  /*-- brushing --*/
   struct _BrushCpanel {
+   gboolean updateAlways_p;
    gboolean brush_on_p;
    gint mode;
    gint linkby_row;

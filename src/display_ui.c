@@ -330,7 +330,12 @@ action_toggle_fade_vars_co_cb(GtkToggleAction *action, displayd *display)
 static void
 action_toggle_brush_update_cb(GtkToggleAction *action, displayd *display)
 {
-	brush_update_set(gtk_toggle_action_get_active(action), display->ggobi);
+	brush_update_set(gtk_toggle_action_get_active(action), display, display->ggobi);
+}
+static void
+action_toggle_brush_on_cb(GtkToggleAction *action, displayd *display)
+{
+	brush_on_set(gtk_toggle_action_get_active(action), display, display->ggobi);
 }
 
 static GtkActionEntry disp_action_entries[] = {
@@ -418,9 +423,15 @@ display_default_actions_create(displayd *display) {
 			"Toggle whether variables fade on when de-selected from the corr tour",
 			G_CALLBACK(action_toggle_fade_vars_co_cb), display->ggobi->tourcorr.fade_vars
 		}, /* i-mode specific */
+		/* I'm going to make these display-specific since
+		they're on the display menu -- dfs */
 		{ "UpdateBrushContinuously", NULL, "Update brushing _continuously", NULL, 
 			"Toggle whether the brush operates continuously", 
-			G_CALLBACK(action_toggle_brush_update_cb), display->ggobi->brush.updateAlways_p
+			G_CALLBACK(action_toggle_brush_update_cb), display->cpanel.br.updateAlways_p
+		}, /* i-mode specific */
+		{ "BrushOn", NULL, "Brush _on", NULL, 
+			"Toggle whether the brush is active", 
+		  G_CALLBACK(action_toggle_brush_on_cb), display->cpanel.br.brush_on_p
 		}
 	};
 	

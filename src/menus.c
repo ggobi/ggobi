@@ -245,6 +245,7 @@ static const gchar *brush_imode_ui =
 "			<separator/>"
 "			<menuitem action='ResetBrushSize'/>"
 "			<menuitem action='UpdateBrushContinuously'/>"
+"			<menuitem action='BrushOn'/>"
 "		</menu>"
 "	</menubar>"
 "</ui>";
@@ -315,6 +316,9 @@ brush_display_imode_items_add (GtkWidget *menu, ggobid *gg)
   CreateMenuCheck (menu, "Update brushing continuously",
     G_CALLBACK (brush_update_set_cb), NULL,
     gg->brush.updateAlways_p, gg);
+  CreateMenuCheck (menu, "Brush on",
+    G_CALLBACK (brush_on_set_cb), NULL,
+    gg->brush.brushOn_p, gg);
 
 }
 #endif

@@ -878,9 +878,10 @@ static const gchar *main_ui_str =
 "			<menuitem action='Inference'/>"
 #endif
 "			<menuitem action='VariableJittering'/>"
-"			<menuitem action='ColorSchemes'/>"
 "			<separator/>"
+"			<menuitem action='ColorSchemes'/>"
 "			<menuitem action='ColorAndGlyphGroups'/>"
+"			<separator/>"
 "			<menuitem action='CaseSubsettingAndSampling'/>"
 #ifdef SMOOTH_IMPLEMENTED
 "			<menuitem action='Smooth'/>"

@@ -383,7 +383,7 @@ ggobi_alloc(ggobid *tmp)
   tmp->tourcorr.fade_vars = true;
   tmp->tour1d.all_vars = false;
   tmp->tour2d.all_vars = false;
-  tmp->brush.updateAlways_p = true;
+  // tmp->brush.updateAlways_p = true;
 
   tmp->tour2d3.idled = 0;
 

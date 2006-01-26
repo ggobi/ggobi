@@ -253,7 +253,7 @@ brush_once_and_redraw (gboolean binningp, splotd *sp, displayd *display,
     if (binningp && binning_permitted (display, gg)) {
       if (changed) {
         splot_redraw (sp, BINNED, gg);
-        if (gg->brush.updateAlways_p) {
+        if (cpanel->br.updateAlways_p) {
           displays_plot (sp, FULL, gg);
         }
 
@@ -263,7 +263,7 @@ brush_once_and_redraw (gboolean binningp, splotd *sp, displayd *display,
 
     } else {  /* no binning */
       splot_redraw (sp, FULL, gg);  
-      if (gg->brush.updateAlways_p)
+      if (cpanel->br.updateAlways_p)
         displays_plot (sp, FULL, gg);  
     }
 

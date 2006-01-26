@@ -299,7 +299,6 @@ struct _ggobid {
   glyphd glyph_id, glyph_0;
 
   struct _Brush_UI {
-    gboolean updateAlways_p;
     gboolean firsttime;
   } brush;
 

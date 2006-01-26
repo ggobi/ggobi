@@ -26,17 +26,24 @@
 #include "vars.h"
 #include "externs.h"
 
-void brush_update_set(gboolean update, ggobid *gg)
+void brush_update_set(gboolean update, displayd *dsp, ggobid *gg)
 {
-  gg->brush.updateAlways_p = update;
+  dsp->cpanel.br.updateAlways_p = update;
+}
+void brush_on_set(gboolean brushon, displayd *dsp, ggobid *gg)
+{
+  dsp->cpanel.br.brush_on_p = brushon;
+  splot_redraw(gg->current_splot, QUICK, gg);
 }
 
+/*
 static void brush_on_cb(GtkToggleButton * button, ggobid * gg)
 {
   cpaneld *cpanel = &gg->current_display->cpanel;
   cpanel->br.brush_on_p = button->active;
   splot_redraw(gg->current_splot, QUICK, gg);
 }
+*/
 
 static void brush_undo_cb(GtkToggleButton * button, ggobid * gg)
 {
@@ -447,7 +454,7 @@ button_release_cb(GtkWidget * w, GdkEventButton * event, splotd * sp)
   }
 
   /*-- if we're only doing linked brushing on mouse up, do it now --*/
-  if (!gg->brush.updateAlways_p)
+  if (!cpanel->br.updateAlways_p)
     displays_plot(sp, FULL, gg);
 
   return retval;
@@ -631,6 +638,7 @@ void cpanel_brush_make(ggobid * gg)
  */
 
 /*-- button for opening clusters table --*/
+/*
   btn = gtk_button_new_with_mnemonic("Color & glyph _groups ...");
   gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), btn,
     "Open tools panel for hiding or excluding brushed groups",
@@ -639,7 +647,9 @@ void cpanel_brush_make(ggobid * gg)
     G_CALLBACK(cluster_window_cb), (gpointer) gg);
   gtk_box_pack_start(GTK_BOX(panel->w),
     btn, false, false, 1);
+*/
 
+  /*
   btn = gtk_check_button_new_with_mnemonic("_Brush on");
   gtk_widget_set_name(btn, "BRUSH:brush_on_button");
   gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), btn,
@@ -649,6 +659,7 @@ void cpanel_brush_make(ggobid * gg)
     G_CALLBACK(brush_on_cb), (gpointer) gg);
   gtk_box_pack_start(GTK_BOX(panel->w), btn, false,
   false, 0);
+  */
 
   gtk_widget_show_all(panel->w);
 }
@@ -660,6 +671,7 @@ void cpanel_brush_make(ggobid * gg)
 void cpanel_brush_init(cpaneld *cpanel, ggobid *gg)
 {
   cpanel->br.brush_on_p = true;
+  cpanel->br.updateAlways_p = true;
 
   cpanel->br.mode = BR_TRANSIENT;
   cpanel->br.linkby_row = 0;
@@ -678,9 +690,11 @@ void cpanel_brush_set(displayd *display, cpaneld *cpanel, ggobid *gg)
   if (pnl == (GtkWidget *) NULL)
     return;
 
+  /*
   btn = widget_find_by_name(pnl, "BRUSH:brush_on_button");
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(btn),
     cpanel->br.brush_on_p);
+  */
 
   w = widget_find_by_name(pnl, "BRUSH:mode_check_btn");
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(w), !cpanel->br.mode);
