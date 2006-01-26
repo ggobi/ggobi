@@ -78,6 +78,7 @@ typedef struct {
   } br;
 
  /*-- scaling --*/
+  gboolean scale_updateAlways_p;
  gint scale_style;       /* DRAG or CLICK */
  gint scale_click_opt;   /* PAN or ZOOM */
  gboolean scale_drag_aspect_p;   /* fix aspect ratio or don't */

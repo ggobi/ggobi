@@ -427,6 +427,7 @@ void       scale_event_handlers_toggle (splotd *, gboolean);
 void       scale_set_default_values (GtkScale *scale);
 void	   scale_zoom_reset (displayd *dsp);
 void	   scale_pan_reset (displayd *display);
+void       scale_update_set (gboolean, displayd *, ggobid *);
 void       scaling_visual_cues_draw (splotd *, GdkDrawable *, ggobid *);
 void       scatmat_cpanel_init (cpaneld *, ggobid *);
 GtkWidget *scatmat_imode_menu_make (GtkAccelGroup *, GtkSignalFunc, ggobid *gg, gboolean);

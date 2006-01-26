@@ -278,6 +278,11 @@ action_reset_zoom_cb(GtkAction *action, displayd *display)
 	scale_zoom_reset(display);
 }
 static void
+action_toggle_scale_update_cb(GtkToggleAction *action, displayd *display)
+{
+	scale_update_set(gtk_toggle_action_get_active(action), display, display->ggobi);
+}
+static void
 action_select_all_1d_cb(GtkAction *action, displayd *display)
 {
 	tour1d_all_vars(display);
@@ -379,6 +384,7 @@ static GtkActionEntry disp_action_entries[] = {
 	{ "ResetZoom", NULL, "Reset _zoom", "<control>Z",
 		"Return to initial zoom", G_CALLBACK(action_reset_zoom_cb)
 	},
+
 	/* p-mode specific stuff - should move elsewhere */
 	{ "Tour1D", NULL, "_Tour1D" },
 	{ "SelectAllVariables1D", NULL, "_Select all variables", "<control>S",
@@ -432,8 +438,12 @@ display_default_actions_create(displayd *display) {
 		{ "BrushOn", NULL, "Brush _on", NULL, 
 			"Toggle whether the brush is active", 
 		  G_CALLBACK(action_toggle_brush_on_cb), display->cpanel.br.brush_on_p
-		}
-	};
+		},
+	{ "UpdateContinuously", NULL, "Update _continuously", NULL, 
+		"Toggle whether panning and zooming operates continuously", 
+		G_CALLBACK(action_toggle_scale_update_cb), display->cpanel.scale_updateAlways_p
+	}
+        };
 	
 	GtkActionGroup *actions = gtk_action_group_new("DisplayActions");
 	gtk_action_group_add_actions(actions, disp_action_entries, 

@@ -329,6 +329,7 @@ static const gchar* scale_imode_ui =
 "		<menu action='Scale'>"
 "			<menuitem action='ResetPan'/>"
 "			<menuitem action='ResetZoom'/>"
+"			<menuitem action='UpdateContinuously'/>"
 "		</menu>"
 "	</menubar>"
 "</ui>";
