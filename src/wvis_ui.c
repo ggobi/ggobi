@@ -99,6 +99,11 @@ wvis_create_variable_notebook (GtkWidget *box, GtkSelectionMode mode,
   gtk_notebook_set_tab_pos (GTK_NOTEBOOK (notebook), GTK_POS_TOP);
   gtk_notebook_set_show_tabs (GTK_NOTEBOOK (notebook), nd > 1);
   gtk_box_pack_start (GTK_BOX (box), notebook, true, true, 2);
+  g_object_set_data(G_OBJECT(notebook), "SELECTION", (gpointer) mode);
+  g_object_set_data(G_OBJECT(notebook), "selection-func", func);
+  g_object_set_data(G_OBJECT(notebook), "selection-func-data", NULL);
+  g_object_set_data(G_OBJECT(notebook), "vartype", (gpointer) all_vartypes);
+  g_object_set_data(G_OBJECT(notebook), "datatype", (gpointer) all_datatypes);
 
   for (l = gg->d; l; l = l->next) {
     d = (datad *) l->data;
@@ -655,7 +660,7 @@ selection_made_cb (GtkTreeSelection *tree_sel, ggobid *gg)
   datad *d = (datad *) g_object_get_data(G_OBJECT (tree_view), "datad");
   GtkWidget *btn;
   gint row;
-  
+
   row = tree_selection_get_selected_row(tree_sel);
   if (row == -1)
 	  return;
@@ -951,6 +956,7 @@ wvis_window_open (ggobid *gg)
     /* Create a notebook, set the position of the tabs */
     notebook = wvis_create_variable_notebook (vb1, GTK_SELECTION_SINGLE,
       G_CALLBACK(selection_made_cb), gg);
+    gtk_widget_set_sensitive(notebook, true);
 
     tr = createColorSchemeTree(UNKNOWN_COLOR_TYPE, colorscaletype_lbl,
       gg, notebook);
