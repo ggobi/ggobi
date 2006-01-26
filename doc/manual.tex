@@ -6,11 +6,13 @@
 %\bibliographystyle{harvard}
 %\bibliographystyle{apalike}
 
+\def\Variable#1{\textsl{#1}}
+\def\Widget#1{\textbf{#1}}
+\def\File#1{\textsl{#1}}
+
 
 % Issues:
-%  I haven't worked out a consistent notation:  when to display
-%  a button's contents in bf, when to use em, etc.
-
+%
 % Some pictures are now out of date, such as the variable
 % manipulation table.
 
@@ -55,10 +57,12 @@
 Deborah F. Swayne, AT\&T Labs -- Research \\
 Di Cook, Iowa State University \\
 Andreas Buja, The Wharton School, University of Pennsylvania \\
-Duncan Temple Lang, University of California at Davis
+Duncan Temple Lang, University of California at Davis \\
+Hadley Wickham, Iowa State University \\
+Michael Lawrence, Iowa State University 
 }
 
-\date{September 2005}
+\date{January 2006}
 
 \maketitle
 
@@ -74,7 +78,7 @@ The most significant change may be that ggobi is so easy to extend, either
 with the addition of ``plugins'' or by embedding it in other software;
 either way, it can be controlled using an API (application programming
 interface).  When ggobi is embedded in R, for example, the result is a
-full marriage between ggobi's direct manipulation graphical environment
+union of ggobi's direct manipulation graphical environment
 and R's familiar extensible environment for statistical data analysis.
 
 It has the same graphical functionality whether it is running
@@ -123,15 +127,15 @@ We begin with a tutorial, and move on to describe GGobi in detail.
 \section{Tutorial}
 
 Several sample data files are included with the GGobi distribution, in
-a directory called {\bf data,} and there you will find the file {\bf
-olive.xml}, a dataset on olive oil samples from Italy \cite{FALT83}.
-This data set uses an XML format.  The olive oil data consists of the
-percentage composition of 8 fatty acids (palmitic, palmitoleic,
-stearic, oleic, linoleic, linolenic, arachidic, eicosenoic) found in
-the lipid fraction of 572 Italian olive oils. There are 9 collection
-areas, 4 from southern Italy (North and South Apulia, Calabria,
-Sicily), two from Sardinia (Inland and Coastal) and 3 from northern
-Italy (Umbria, East and West Liguria).
+a directory called \File{data,} and there you will find the file
+\File{olive.xml}, a dataset on olive oil samples from Italy
+\cite{FALT83}.  This data set uses an XML format.  The olive oil data
+consists of the percentage composition of 8 fatty acids (palmitic,
+palmitoleic, stearic, oleic, linoleic, linolenic, arachidic,
+eicosenoic) found in the lipid fraction of 572 Italian olive
+oils. There are 9 collection areas, 4 from southern Italy (North and
+South Apulia, Calabria, Sicily), two from Sardinia (Inland and
+Coastal) and 3 from northern Italy (Umbria, East and West Liguria).
 
 The data is part of a quality control study of olive oils. It is proposed
 that the olive oils from different regions have different fatty acid
@@ -146,8 +150,7 @@ ggobi olive
 Two windows will appear, the GGobi console
 and a scatterplot, as shown in Figure~\ref{fig1}.
 
-The console has a panel of controls on the left, labeled {\bf
-XYPlot}, and a variable selection region on the right.  You can see
+The console has a panel of controls on the left, labeled \Widget{XYPlot}, and a variable selection region on the right.  You can see
 that the scatterplot contains a 2-dimensional projection of the data,
 a plot of Area vs Region.  Move the mouse to one of the variable labels
 in the variable selection region, and leave it in place until the
@@ -186,9 +189,9 @@ Display, View, Interaction and Tools menus.
   characteristics of the data and the view.
 \end {itemize}
 
-Using the Interaction menu, choose {\bf Identify}. Look at the buttons
+Using the Interaction menu, choose \Widget{Identify}. Look at the buttons
 inside the leftmost portion of the ggobi console. Notice that they're
-contained by a frame labeled {\bf Identify,} which is the interaction mode
+contained by a frame labeled \Widget{Identify,} which is the interaction mode
 of the current plot.  This frame contains most of the row labeling
 controls, which are described in section \ref{slbl:Identify}. Move the
 cursor around the plot window using the mouse, and observe the labels
@@ -205,22 +208,23 @@ controls and the variable selection region correspond to the current plot.
 
 Now set up a plot of linoleic vs eicosenoic in the first scatterplot,
 and disply Region in the barchart, and make the barchart the current
-plot.  Using the Interaction menu, choose {\bf Brush.}  Look at the
+plot.  Using the Interaction menu, choose \Widget{Brush.}  Look at the
 buttons and menus inside the leftmost portion of the ggobi console.
-Notice that they're contained by a frame labeled {\bf Brush,} which is
+Notice that they're contained by a frame labeled \Widget{Brush,} which is
 the view mode of the current plot.  This frame contains most of the
 brushing controls, which are described in the section
 \ref{slbl:Brush}.  A few of the brushing controls, though, are in the
-{\bf Brush} menu in the display menubar.
+\Widget{Brush} menu in the display menubar, and some associated tools
+are in the \Widget{Tools} menu.
 
 The rectangle that appears in the current plot is the ``paintbrush,''
 and dragging it over bars (or in a scatterplot the points) changes
-their color. Change the color of the brush by opening up the {\bf
-Choose color \& glyph} panel (Figure \ref{fig2}). Hold down the left
-button and drag the mouse to paint the first region, then the second
-and third regions, or click on the bars.  Since you're brushing in the
-{\bf Transient} style, the points resume their original color when the
-paintbrush no longer surrounds them.
+their color. Change the color of the brush by opening up the
+\Widget{Choose color \& glyph} panel (Figure \ref{fig2}). Hold down
+the left button and drag the mouse to paint the first region, then the
+second and third regions, or click on the bars.  Since you're brushing
+in the \Widget{Transient} style, the points resume their original
+color when the paintbrush no longer surrounds them.
 
 While you brush, keep an eye on the plot of linoleic vs eicosenoic,
 and notice where the painted points fall in that scatterplot (Figure
@@ -251,14 +255,14 @@ eicosenoic acid.
 \label{fig3}
 \end{figure}
 
-Change to {\bf Persistent} brushing and paint the three Regions
+Change to \Widget{Persistent} brushing and paint the three Regions
 using different colors. 
 
-Open the {\bf Variable transformation} tool, select all of the fatty
+Open the \Widget{Variable transformation} tool, select all of the fatty
 acid variables -- either hold down the control button while selecting
 them one at a time, or select the first one, then hold down the
 shift button down while you select the last one.  Once they're all
-highlighted, choose {\bf Standardize} in the ``Stage 2'' transformation
+highlighted, choose \Widget{Standardize} in the ``Stage 2'' transformation
 panel to standardize all the variables to have mean 0 and variance 1.
 This tool has numerous transformations, which can be applied in sequence.
 Stage 0 transformations are used to adjust variables' values so that
@@ -283,13 +287,13 @@ displays.
 \label{fig4}
 \end{figure}
 
-Now look at the plot of linoleic vs eicosenoic. Open up the {\bf
-Color \& glyph groups ...} tool, and experiment with it:  Use the
-``Shadow'' toggle buttons to have groups of points drawn in a dim
+Now look at the plot of linoleic vs eicosenoic. Open up the
+\Widget{Color \& glyph groups ...} tool, and experiment with it: Use
+the ``Shadow'' toggle buttons to have groups of points drawn in a dim
 color, and then use ``Exclude shadows'' to exclude them altogether,
 and ``Include shadows'' to re-include them.  (Figure \ref{fig5}).
 Finally, use these controls to shadow brush the cases from geographic
-region 1, and then use {\bf Exclude shadows} to remove them from
+region 1, and then use \Widget{Exclude shadows} to remove them from
 consideration.
 
 \begin{figure}[htp]
@@ -298,37 +302,38 @@ consideration.
 \label{fig5}
 \end{figure}
 
-Switch into {\bf 2D Tour} using the {\bf View} menu. A column of
-variable circles is added to the right of the variable toggles, one for
-each selected variable.  Click on the toggle widgets for the variables
-palmitoleic through arachidic to make these variables available for
-touring, and toggle Region and Area out of the tour.  Click the {\bf
-Reinit} button.  The tour should now include 7 variables, with one variable
-circle for each.
+Switch into \Widget{2D Tour} using the \Widget{View} menu. A column of
+variable circles is added to the right of the variable toggles, one
+for each selected variable.  Click on the toggle widgets for the
+variables palmitoleic through arachidic to make these variables
+available for touring, and toggle Region and Area out of the tour.
+Click the \Widget{Reinit} button.  The tour should now include 7
+variables, with one variable circle for each.
 
 The scrollbar at the top of the tour controls is used to adjust the
 speed of the tour.  Drag it to the right to speed up the rotation.
 The circle at the bottom left of the plot window displays the axes for
 the tour. These can be removed by toggling the ``Show axes'' button on
-the display's {\bf 2D Tour} menu.  Pause the tour when you see a
+the display's \Widget{2D Tour} menu.  Pause the tour when you see a
 separation of the two regions (as seen in Figure \ref{fig6}).
 
 Now you are going to use manual tour controls to sharpen up the
 separation by manually changing the coefficients of the variables in
-the projection.  Click on the {\bf Manip} (magenta) button below the
-variable selection region of the console, and then click on linoleic
-acid (a magenta circle will be seen now in the variable circle for
-linoleic acid).  {\bf Oblique} is already selected in the {\bf Manual
-manipulation} menu.  In the plot window, hold down any mouse
-button while you drag the cursor. The coefficient corresponding to
-linoleic acid will increase and decrease following the mouse, inducing
-a rotation of the scattercloud.  If the axes are still showing in the
-scatterplot window, the axis in magenta corresponds to the variable
-you're manipulating.  Similarly rotate oleic acid and arachidic acid
-in and out of the plot, with the aim of finding a projection where the
-two regions are well separated (for example, Figure \ref{fig6}).
-There are 5 choices of manipulation mode (unconstrained oblique,
-vertical, horizontal, radial and angular) to explore.
+the projection.  Click on the \Widget{Manip} (magenta) button below
+the variable selection region of the console, and then click on
+linoleic acid (a magenta circle will be seen now in the variable
+circle for linoleic acid).  \Widget{Oblique} is already selected in
+the \Widget{Manual manipulation} menu.  In the plot window, hold down
+any mouse button while you drag the cursor. The coefficient
+corresponding to linoleic acid will increase and decrease following
+the mouse, inducing a rotation of the scattercloud.  If the axes are
+still showing in the scatterplot window, the axis in magenta
+corresponds to the variable you're manipulating.  Similarly rotate
+oleic acid and arachidic acid in and out of the plot, with the aim of
+finding a projection where the two regions are well separated (for
+example, Figure \ref{fig6}).  There are 5 choices of manipulation mode
+(unconstrained oblique, vertical, horizontal, radial and angular) to
+explore.
 
 \begin{figure}[htp]
 \hbox{\pdfimage width 3in {Figures/olive-tour1.jpg}\pdfimage width 3in {Figures/olive-tour2.jpg}}
@@ -337,7 +342,7 @@ olive oils.}
 \label{fig6}
 \end{figure}
 
-Next use the Tools menu to open the {\bf Variable manipulation} tool
+Next use the Tools menu to open the \Widget{Variable manipulation} tool
 (Figure \ref{fig4}).  It contains a notebook widget which separates
 the variables by type, and displays information about them in a set
 of tables.  The buttons below the tables allow you to set variable
@@ -347,14 +352,10 @@ or use the control and shift keys as modifiers to select more than one.
 Select all the fatty acid variables, all of which are in the table
 of real variables.
 
-Open a parallel coordinates display using the {\bf Display} menu.
-%Using the {\bf Selection Mode:} menu on the control
-%panel select {\bf Delete} mode to remove Region and Area from the
-%parallel coordinates plot. Then switch to {\bf Append} mode and add
-%the remaining acid variables.
+Open a parallel coordinates display using the \Widget{Display} menu.
 Select the first plot in the parallel coordinates display by
-clicking on it, and use the {\bf Interaction} menu to switch to {\bf
-Brush} mode. Choose a new color (say yellow) and large closed glyph,
+clicking on it, and use the \Widget{Interaction} menu to switch to 
+\Widget{Brush} mode. Choose a new color (say yellow) and large closed glyph,
 and transiently paint the case with a very low value on palmitic
 (Figure \ref{fig7}). This case also has a very high value for oleic
 acid, and low value for linolenic acid.
@@ -366,9 +367,9 @@ palmitic, oleic and linolenic acids.}
 \label{fig7}
 \end{figure}
 
-Using the {\bf Color \& glyph groups} tool from the {\bf Brush}
+Using the \Widget{Color \& glyph groups} tool from the \Widget{Brush}
 controls, click on the appropriate `S' button to bring the Region 1
-cases back into the plot.  Using the {\bf File} menu, save the data,
+cases back into the plot.  Using the \Widget{File} menu, save the data,
 preserving the colors and glyphs that have been assigned during this
 session.
 
@@ -380,14 +381,17 @@ section contains more detailed information on its functionality.
 \subsection{The major functions}
 
 Across the top of the console, as seen in in Figure \ref{fig1},
-stretches a row of menu buttons:  {\bf File}, {\bf Display},
-{\bf Interaction}, {\bf Options} and {\bf Tools} are
-always visible; {\bf View} appears as appropriate.
+stretches a row of menu buttons: \Widget{File}, \Widget{Display},
+\Widget{Interaction}, \Widget{Tools}, and \Widget{Help} are always visible;
+\Widget{View} appears as appropriate.
 
-As expected, the {\bf File} menu contains items for selecting
-input/output functions and for exiting.
+As expected, the \Widget{File} menu contains items for selecting
+input/output functions and for exiting.  It also contains
+\Widget{Options} allowing users to set options for the main control
+window: whether tooltips are displayed and whether the control panel
+is shown.
 
-The {\bf Display} menu allows a new plotting window to be opened. 
+The \Widget{Display} menu allows a new plotting window to be opened. 
 The display types include
 \begin{itemize}
 \itemsep 0em
@@ -401,11 +405,11 @@ The display types include
 Each display type
 is discussed in section ~\ref{DisplayTypes}.
 
-The {\bf DisplayTree} button at the bottom of the menu allows users to
+The \Widget{DisplayTree} button at the bottom of the menu allows users to
 open a tree listing all the currently open display windows, each of
 which may contain several plots.
 
-The {\bf View} menu contains items to set the projection; the
+The \Widget{View} menu contains items to set the projection; the
 full menu is available only for scatterplot displays:
 \begin{itemize}
 \itemsep 0em
@@ -418,12 +422,12 @@ full menu is available only for scatterplot displays:
       horizontal and vertical axes,
 \end{itemize}
 
-When you choose a new view, the {\bf Interaction} mode (described
+When you choose a new view, the \Widget{Interaction} mode (described
 next) is also changed.  Each view is discussed in
 section~\ref{slbl:ViewModes}.
 
-The {\bf Interaction} menu contains items to set the interaction type.
-Each {\bf View} also has its own set of interactions, and appears on
+The \Widget{Interaction} menu contains items to set the interaction type.
+Each \Widget{View} also has its own set of interactions, and appears on
 the Interaction menu when selected.  The Interaction modes
 themselves are:
 
@@ -442,7 +446,7 @@ parameters and its own rules for responding to mouse actions in the
 plotting windows.  The interaction modes are discussed in
 section~\ref{slbl:InteractionModes}.
 
-The {\bf Tools} menu gives access to 
+The \Widget{Tools} menu gives access to 
 \begin{itemize}
 \itemsep 0em
 \item a variable manipulation table,
@@ -459,25 +463,6 @@ The {\bf Tools} menu gives access to
 
 Each of these tools is discussed in section ~\ref{Tools}.
 
-%There are a couple of distinctions between view modes and tools.  The
-%view mode functions determine the mouse interactions in the display
-%windows, while none of the Tools does.  Furthermore, view mode
-%functions populate the control panel in the ggobi console, while
-%tools open their own windows, as shown in Figure~\ref{fig4}.  For
-%example, the {\bf Variable Manipulation tool} is a window containing
-%tables which describe the variables, as well as several buttons,
-%and the {\bf Variable Transformation tool} is also a separate window,
-%with a list of variable names and a set of transformation menus.
-
-The {\bf Options} menu allows users to set options for the main
-control window:  whether tooltips are displayed and whether the
-control panel is shown.  
-%In some view modes, it contains additional
-%options that are specific to that mode.
-
-%Other menus are present only during certain modes:  you will
-%sometimes find an {\bf I/O} menu or a {\bf Reset} menu.
-
 \subsection{Graphical displays}
 \label{slbl:GraphicalDisplays}
 
@@ -485,7 +470,7 @@ control panel is shown.
 
 Since there are multiple displays, some of which contain multiple
 plots, the question arises:  Which plot in which display window
-corresponds to the console?  If you select the {\bf Scale} mode,
+corresponds to the console?  If you select the \Widget{Scale} mode,
 how can you tell which plot is going to respond?
 
 There is in GGobi a notion of the ``current display'' and the
@@ -510,24 +495,21 @@ As mentioned earlier, there are presently five main display types:
 
 % scatterplot
 
-The {\bf scatterplot} display is a window containing a single scatterplot.
-%By default, it includes axes; they can be turned off using the Options
-%menu in the main control window.  
-It has the largest number of view (projection) modes of any display,
-and each projection has its own rules for variable selection.  The
-main variable selection interface for the XYPlot modes uses toggle
-buttons: clicking on the {\em X} button selects the variable to plot
-horizontally, and clicking on {\em Y} selects the variable to plot
-vertically.  (There's a less obvious variable selection interface as a
-shortcut: clicking left (right) on the variable label selects the {\em
-X} ({\em Y}) variable.)  The interface for the 1D plot is similar: it
-only shows one column of toggle buttons, so clicking on {\em X}
-selects the variable to be plotted irrespective of the plot
-orientation.  (Using the variable label shortcut, you can change the
-plot orientation as you make a variable selection.)
-% column of checkboxes: clicking left on one of these selects a
-% variable to be plotted horizontally, clicking middle or right selects
-% a vertical variable. 
+The \Widget{scatterplot} display is a window containing a single
+scatterplot.  It has the largest number of view (projection) modes of
+any display, and each projection has its own rules for variable
+selection.  The main variable selection interface for the XYPlot modes
+uses toggle buttons: clicking on the \Widget{X} button selects the
+variable to plot horizontally, and clicking on \Widget{Y} selects the
+variable to plot vertically.  (There's a less obvious variable
+selection interface as a shortcut: clicking left (right) on the
+variable label selects the \Widget{X} (\Widget{Y}) variable.)  The
+interface for the 1D plot is similar: it only shows one column of
+toggle buttons, so clicking on \Widget{X} selects the variable to be
+plotted irrespective of the plot orientation.  (Using the variable
+label shortcut, you can change the plot orientation as you make a
+variable selection.)
+
 The tour modes, including rotation, all use toggle buttons to select
 a subset of variables to be available for touring, and a column of
 variable circles, one for each variable in the subset.  The variable
@@ -536,7 +518,7 @@ actively touring, and they provide some feedback about current projection.
 The variable selection behavior for the tour modes will be described in
 the section for each mode.
 
-The {\bf scatterplot matrix} is a window containing a symmetric matrix
+The \Widget{scatterplot matrix} is a window containing a symmetric matrix
 of scatterplots for the chosen variables.  The plots along the diagonal
 are ASHes (Average Shifted Histograms).  The matrix is required to be
 symmetric, and that constraint affects its variable selection behavior.
@@ -562,7 +544,7 @@ button you press.
 
 % parallel coordinates
 
-The {\bf parallel coordinates} display contains a single parallel
+The \Widget{parallel coordinates} display contains a single parallel
 coordinates plot, which can be arranged horizontally or vertically.
 (To understand this plot if you are encountering it for the first
 time, imagine deconstructing a high-dimensional scatterplot and
@@ -571,7 +553,7 @@ case $i$, think of drawing a dot on each axis,  with the point on
 axis $j$ being the value of $x[i][j]$, and then connecting the dots
 into one set of connected line segments \cite{In85,We90}.)  The line
 segments are drawn by default, but you can turn them off using the
-display's {\bf Options} menu.
+display's \Widget{Options} menu.
 
 By default, the plots are simple dotplots, but they can also be drawn
 using one of the two methods for 1D plots:  as a textured dot
@@ -599,36 +581,36 @@ button you press.
 
 % time series
 
-The {\bf time series display} contains a row or column of 2-variable
+The \Widget{time series display} contains a row or column of 2-variable
 plots with a common axis, usually a time variable.  By default, the
 points are connected with line segments.  
 
 The behavior of the toggle buttons and labels depends on the state of the
-{\bf Selection mode} option menu in the console.
+\Widget{Selection mode} option menu in the console.
 
 \begin{itemize}
 \item Replace: If you want to replace the horizontal (time) variable,
-  no plot selection is required; simply click the {\em X} toggle
+  no plot selection is required; simply click the X toggle
   button for the variable you want.  To replace a vertical variable,
-  first select the plot you want to change, and then click the {\em
-  Y} toggle for the variable you want.  (For now, ggobi won't let you
-  plot the same variable twice.) 
+  first select the plot you want to change, and then click the
+  Y toggle for the variable you want.  (ggobi won't
+  let you plot the same variable twice.)
 \item Insert:  Select a plot in the display, and then click
-  on a the {\em Y} toggle to add a new plot before the current plot.
-\item Append:  Click on one of the {\em Y} toggles to append
+  on a the Y toggle to add a new plot before the current plot.
+\item Append:  Click on one of the Y toggles to append
   a new plot after all other plots.  (GGobi will not add a variable
   that's already plotted.)
 \item Delete: No plot selection is required; just click the
-  {\em Y} toggle for the variable in the plot you want to delete.
+  Y toggle for the variable in the plot you want to delete.
 \end{itemize}
 
 The variable label shortcuts can be used in the Time Series display.
-In general, clicking left (right) corresponds to selecting the {\em X}
-({\em Y}) toggle button.
+In general, clicking left (right) corresponds to selecting the X
+(Y) toggle button.
 
 % barchart
 
-The {\bf barchart display} contains a single plot, a barchart if the
+The \Widget{barchart display} contains a single plot, a barchart if the
 variable is categorical, and a histogram if it is real.   Variable
 selection is simple: one variable at a time.  An option menu can be used
 to switch to a spineplot display style, where all the bars are the same
@@ -700,19 +682,20 @@ The only essential file is the one containing the data itself.  Each
 line in the file contains one row of the input data matrix, and lines
 must be separated by carriage returns.  Columns, or variables, can be
 separated by any number of tabs or spaces.  The file needs to have the
-suffix {\em .dat}.
+suffix \File{.dat}.
 
 You can supply variable and case labels in associated files.  Variable
-(column) labels can be in a file named {\bf datafile.col} (or {\bf
-datafile.column}, {\bf datafile.collab}, or {\bf datafile.var}).  Variable
-ranges can be specified by adding two more fields, using $|$ as the
-field separator.  Case (row) labels can be supplied in a file named {\bf
-datafile.row} (or {\bf data\-file.row\-lab} or {\bf data\-file.case}).
-There should be one label per line, and the label can include blanks.
-If variable or case labels are not supplied, default labels using column
-or row numbers are used.
+(column) labels can be in a file named \File{datafile.col} (or
+\File{datafile.column}, \File{datafile.collab}, or
+\File{datafile.var}).  Variable ranges can be specified by adding two
+more fields, using $|$ as the field separator.  Case (row) labels can
+be supplied in a file named \File{datafile.row} (or
+\File{data\-file.row\-lab} or \File{data\-file.case}).  There should
+be one label per line, and the label can include blanks.  If variable
+or case labels are not supplied, default labels using column or row
+numbers are used.
 
-The files {\bf datafile.glyphs} and {\bf datafile.colors} can be
+The files \File{datafile.glyphs} and \File{datafile.colors} can be
 used to set the plotting characters and colors to be used in
 drawing each point.  Glyphs can be specified in two ways:
 
@@ -779,22 +762,22 @@ the code, including a simple spreadsheet viewer.
 \section{View modes:~~projections}
 \label{slbl:ViewModes}
 
-Selecting any item on the {\bf View} menu changes the projection of
+Selecting any item on the \Widget{View} menu changes the projection of
 the current display.  This causes two changes: the control panel for
 the new projection appears to the left of the console window, and
 defines the appearance and behavior of the variable selection panel.
 
 As an example, start GGobi with some data, and watch what happens in
 the main GGobi window and a a single scatterplot display.   When
-GGobi starts, it's in {\bf XYPlot} mode by default, so the
+GGobi starts, it's in \Widget{XYPlot} mode by default, so the
 scatterplot window shows a 2-dimensional projection of the data. 
 
-Now select {\em 2D Tour} in the View menu.  
+Now select \Widget{2D Tour} in the View menu.  
 
 \begin{itemize}
 \itemsep 0em
 \item The control panel at the left of the console changes, because
-      the {\em 2D Tour} has its own set of interactions.
+      the \Widget{2D Tour} has its own set of interactions.
 \item The variable selection panel changes, because the variable
       selection behavior for high-dimensional projection types is
       quite different than that for low-dimensional projection types.
@@ -859,11 +842,12 @@ Control-{\em X} with the focus in the console.
 
 The 1D tour generates a continuous sequence of 1-D projections of the
 active variable space. The projected data are displayed as an average
-shifted histogram (ASH), horizontally or vertically. The scrollbar at the
-top of the controls allows the speed of rotation to be adjusted. The
-pause checkbox stops and starts the tour. {\bf Reinit} initializes the tour
-to the projection (the ASH) of the first active variable.  {\bf Scramble} sets
-the view to a random projection.
+shifted histogram (ASH), horizontally or vertically. The scrollbar at
+the top of the controls allows the speed of rotation to be
+adjusted. The pause checkbox stops and starts the
+tour. \Widget{Reinit} initializes the tour to the projection (the ASH)
+of the first active variable.  \Widget{Scramble} sets the view to a
+random projection.
 
 Variables can be toggled into and out of the subset of active
 variables by clicking on the the toggle buttons. The variable will be
@@ -887,13 +871,13 @@ de-select these variables to fine tune the tour.
 
 The variable projection coefficients can be manually manipulated
 using manual controls. To select the variable to manipulate, click on
-the purple {\bf Manip} button and then click on the variable circle.
+the purple \Widget{Manip} button and then click on the variable circle.
 Horizontal mouse motions in the plot window then alter the coefficient for
 the manipulation variable, constrained by the values of the coefficients
 of other active variables (which may also change).
 
 The variable axes and projection coeeficient values can be toggled on
-or off using the display's {\bf 1D Tour} menu.
+or off using the display's \Widget{1D Tour} menu.
 
 To activate this view mode from the keyboard, type {\em t} or {\em T}
 with the focus in the plot window, or type Control-{\em t} or
@@ -901,17 +885,17 @@ Control-{\em T} with the focus in the console.
 
 \subsubsection{Projection Pursuit}
 
-A guided tour is available when the {\bf Projection Pursuit} button is
-selected. It is controlled through a separate pop-up projection
+A guided tour is available when the \Widget{Projection Pursuit} button
+is selected. It is controlled through a separate pop-up projection
 pursuit window, which contains a plot of the projection pursuit index.
-When {\bf Optimize} is selected, the tour is guided by the index
+When \Widget{Optimize} is selected, the tour is guided by the index
 rather than proceeding randomly.  The numbers displayed to the right
-of the {\bf PP index} label are the minimum, current value, and
+of the \Widget{PP index} label are the minimum, current value, and
 maximum of the index.  A selection of indices is available.
 
 \subsubsection{1D Tour Options}
 
-The display's {\bf 1D Tour} menu contains controls for laying out
+The display's \Widget{1D Tour} menu contains controls for laying out
 variable circles in the variable selection panel in different ways,
 and also for toggling variable fading on or off. Variable fading means
 a variable smoothly fades out when it is de-selected. The alternative
@@ -926,8 +910,9 @@ The 2D tour generates a continuous sequence of 2-D projections of the
 active variable space. The projected data are displayed as a
 scatterplot. The scrollbar at the top of the controls allows the speed
 of rotation to be adjusted. The pause checkbox stops and starts the
-tour. {\bf Reinit} initializes the tour to the projection of the first two
-active variables. {\bf Scramble} sets the view to a random projection.
+tour. \Widget{Reinit} initializes the tour to the projection of the
+first two active variables. \Widget{Scramble} sets the view to a
+random projection.
 
 Variables can be toggled into and out of the subset of active
 variables by clicking on the the toggle buttons. The variable will be
@@ -942,11 +927,11 @@ variable fades out gradually, to maintain continuity of motion.
 
 The variable projection coefficients can be manually manipulated using
 manual controls. To select the variable to manipulate, click on the
-purple {\bf Manip} button and then click on the variable circle. 
-Once a manipulation mode has been selected,
-horizontal mouse motions in the plot window alter the coefficient for
-the manipulation variable, constrained by the values of the coefficients
-of other active variables (which may also change).
+purple \Widget{Manip} button and then click on the variable circle.
+Once a manipulation mode has been selected, horizontal mouse motions
+in the plot window alter the coefficient for the manipulation
+variable, constrained by the values of the coefficients of other
+active variables (which may also change).
 
 There are 5 manipulation modes: {\it oblique} allows unconstrained
 manipulation, {\it horizontal} and {\it vertical} constrain manipulation
@@ -955,7 +940,7 @@ direction of the variable keeping angle fixed, and {\it angular}
 manipulation allows rotating the variable axis in the plane of the plot
 window, keeping the length of the axis fixed.
 
-The variable axes can be toggled on or off using the {\bf 2D Tour}
+The variable axes can be toggled on or off using the \Widget{2D Tour}
 menu at the top of the display window.
 
 To activate this view mode from the keyboard, type {\em g} or {\em G}
@@ -964,23 +949,23 @@ Control-{\em G} with the focus in the console.
 
 \subsubsection{Projection Pursuit}
 
-A guided tour is available when the {\bf Projection Pursuit} button is
+A guided tour is available when the \Widget{Projection Pursuit} button is
 selected. It is controlled through a separate pop-up projection
 pursuit window, which contains a plot of the projection pursuit index.
-When {\bf Optimize} is selected, the tour is guided by the index
+When \Widget{Optimize} is selected, the tour is guided by the index
 rather than proceeding randomly.  The numbers displayed to the right
-of the {\bf PP index} label are the minimum, current value, and
+of the \Widget{PP index} label are the minimum, current value, and
 maximum of the index.  A selection of indices is available.
 
 Often, sphering the data ahead of time provides more interesting
 results with the 2D guided tour, especially for the holes and central
-mass indices. Use the {\bf Tools} menu and use the {\bf Sphering...}
-tool to clone sphered counterparts of the currently active variables
-to do this.
+mass indices. Use the \Widget{Tools} menu and use the
+\Widget{Sphering...}  tool to clone sphered counterparts of the
+currently active variables to do this.
 
 \subsubsection{2D Tour Options}
 
-The display's {\bf 2D Tour} menu contains controls for laying out
+The display's \Widget{2D Tour} menu contains controls for laying out
 variable circles in the variable selection panel in different ways,
 and also for toggling variable fading on or off. Variable fading means
 a variable smoothly fades out when it is de-selected. The alternative
@@ -993,10 +978,11 @@ situations.
 
 The rotation mode is essentially a 2D tour that is restricted to use
 three variables.  Its graphical user interface is a subset of the 2D
-tour interface, with the exception that the three axes are individually
-represented by toggle buttons labelled {\bf X}, {\bf Y} and {\bf Z},
-principally so that it's possible to unambiguously specify the variable
-to be replaced when selecting a new one.
+tour interface, with the exception that the three axes are
+individually represented by toggle buttons labelled X,
+Y and Z, principally so that it's possible to
+unambiguously specify the variable to be replaced when selecting a new
+one.
 
 \subsection{2x1D Tour}
 \label{slbl:2x1DTour}
@@ -1005,9 +991,9 @@ The 1x1D tour generates 2 independent continuous sequences of 1D
 projections of 2 active variable spaces, plotting the results
 horizontally and vertically generating a scatterplot. The scrollbar at
 the top of the controls allows the speed of rotation to be
-adjusted. The pause checkbox stops and starts the tour. {\bf Reinit}
+adjusted. The pause checkbox stops and starts the tour. \Widget{Reinit}
 initializes the tour to the projection of the first two active
-variables. {\bf Scramble} sets the view to a random projection.
+variables. \Widget{Scramble} sets the view to a random projection.
 
 Variables can be toggled into the tour by clicking on the variable
 circles. A click with the left mouse toggles a variable in the horizontal
@@ -1019,7 +1005,7 @@ gradually, to maintain continuity of motion.
 
 The variable projection coefficients can be manually manipulated using
 manual controls. To select the variable to manipulate, click on the purple
-{\bf Manip} button and then click left or right on the variable circle.
+\Widget{Manip} button and then click left or right on the variable circle.
 Once a manipulation mode has been selected, mouse motions in the plot
 window alter the coefficients for the manipulation variable or variables,
 constrained by the values of the coefficients of other active variables
@@ -1031,7 +1017,7 @@ constrains the horizontal and vertical changes to be equal, {\it
 horizontal} and {\it vertical} constrain manipulation in the corresponding
 direction.
 
-The {\bf 2x1D Tour} menu on the menu bar in the display window
+The \Widget{2x1D Tour} menu on the menu bar in the display window
 contains controls for laying out variable circles in the variable
 selection panel in different ways, and also for toggling variable
 fading on or off. Variable fading means a variable smoothly fades out
@@ -1048,7 +1034,7 @@ Control-{\em C} with the focus in the console.
 \section{Interaction modes}
 \label{slbl:InteractionModes}
 
-Selecting an item on the {\bf Interaction} menu changes the
+Selecting an item on the \Widget{Interaction} menu changes the
 interactions available for manipulating the current display.  These
 new interactions are visible in the control panel that appears to the
 left of the console window.  (There may also be cues added to the plot
@@ -1057,18 +1043,18 @@ to tell you the interaction of the plot.
 \subsection{Scaling of axes}
 \label{slbl:Scaling}
 
-There are three ways to perform view scaling:  {\bf Drag} and {\bf Click}
-scaling are visible in the interface, and available in all projections.
-When axes are present in scatterplots, you can also scale the
-view using the axes themselves.
+There are three ways to perform view scaling: \Widget{Drag} and
+\Widget{Click} scaling are visible in the interface, and available in
+all projections.  When axes are present in scatterplots, you can also
+scale the view using the axes themselves.
 
-The two styles of interaction, {\bf Drag} and {\bf Click}, are quite
-different.  Drag-style scaling is a perfect example of a direct
+The two styles of interaction, \Widget{Drag} and \Widget{Click}, are
+quite different.  Drag-style scaling is a perfect example of a direct
 manipulation interface, in which the points follow cursor motion in a
 very simple way.  However, if you're looking at a lot of data, the
 points may sometimes lag behind the cursor motion, making the degree
-of panning or zooming hard to control.  There's also no way to
-hold the aspect ratio fixed with drag-style scaling.
+of panning or zooming hard to control.  There's also no way to hold
+the aspect ratio fixed with drag-style scaling.
 
 Click-style scaling may take you a few minutes to get used to, but
 you'll find that it gives you very precise control and is especially
@@ -1095,15 +1081,15 @@ When you select the Click interaction style, the manipulation is
 not so direct, but your control of the panning and zooming becomes
 more precise.
 
-With {\bf Pan} selected, the mouse controls the endpoint of a line
+With \Widget{Pan} selected, the mouse controls the endpoint of a line
 segment which is anchored at the center of the plot (just where the
-center of the crosshair is in Drag style).  When you press the {\bf
-Space} bar, you'll cause the plot to pan so that the endpoint becomes
-the new center -- ie, short segments yield small movements.  Repeated
-presses repeat the motion in the same direction -- convenient for
-browsing time-dependent data, for instance.
+center of the crosshair is in Drag style).  When you press the
+\Widget{Space} bar, you'll cause the plot to pan so that the endpoint
+becomes the new center -- ie, short segments yield small movements.
+Repeated presses repeat the motion in the same direction -- convenient
+for browsing time-dependent data, for instance.
 
-With {\bf Zoom} selected, the visual guide changes again: this time,
+With \Widget{Zoom} selected, the visual guide changes again: this time,
 the mouse controls a rectangle, and two keys are used: {\boldmath $<$}
 to zoom in and {\boldmath $>$} to zoom out an amount inversely
 proportional to the size of the rectangle -- that is, large rectangles
@@ -1111,7 +1097,7 @@ yield small movements.
 
 \subsubsection{Reset}
 
-To reset the plot, use the {\bf Scale} menu in the display's menubar:
+To reset the plot, use the \Widget{Scale} menu in the display's menubar:
 it has two entries, allowing pan and zoom to be reset separately.
 
 \subsubsection{Click: pan and zoom options}
@@ -1150,48 +1136,40 @@ Control-{\em B} with the focus in the console.
 
 \subsubsection{Point and edge brushing}
 %
-If {\bf Point brushing} is in any state but {\it Off}, the brush has a
+If \Widget{Point brushing} is in any state but {\it Off}, the brush has a
 rectangular outline.  As the brush is moved across the points, any
 points contained by the brush are affected.  You may be changing the
 color, glyph shape, glyph size, or the ``visible'' state of the point,
-depending on the menu setting.  The brushing style called ``Shadow'' 
-deserves a few words: When it is selected, the brushed points are drawn
-in a color that's very close to the background color \cite{BeckerCleveland87}. 
-The
-are de-emphasized but they provide context for the rest of the data.
-% disabling this style of brushing for now.
-%``Select'' does the opposite: de-emphasizing all the points that aren't
-%brushed.
+depending on the menu setting.  The brushing style called ``Shadow''
+deserves a few words: When it is selected, the brushed points are
+drawn in a color that's very close to the background color
+\cite{BeckerCleveland87}.  The points are de-emphasized but they
+provide context for the rest of the data.
 
-Similarly, if {\bf Edge brushing} is in any state but {\it Off}, the
-brush includes a crosshair, and as the brush is moved in the window,
-any edges (line segments) intersecting either the vertical or
-horizontal ``hair'' are affected.  You may be changing the color,
-line type, line thickness, or visible state of the edge.
+Similarly, if \Widget{Edge brushing} is in any state but \Widget{Off},
+the brush includes a crosshair, and as the brush is moved in the
+window, any edges (line segments) intersecting either the vertical or
+horizontal ``hair'' are affected.  You may be changing the color, line
+type, line thickness, or visible state of the edge.
 
-If both {\bf Point brushing} and {\bf Edge brushing} are on, the
+If both \Widget{Point brushing} and \Widget{Edge brushing} are on, the
 brush is drawn as a crosshair inside a rectangle, and both point and
 edge brushing are performed.
 
-\subsubsection{Brushing modes:  persistent, transient}
+\subsubsection{Persistent brushing}
 %
-There are two brushing modes.
-\medskip
-\noindent
-\\{\bf Persistent}:  When you brush a point or edge, it retains its new
-  characteristics when the brush has moved away.
-\\{\bf Transient}:  As the brush moves off a point or edge, it returns
-  to the characteristics it had before it was brushed.
+If \Widget{Persistent} is selected, then a brushed point or edge
+retains its new characteristics after the brush has moved on.
 
 \subsubsection{Undo}
 %
-Clicking on the {\bf Undo} button restores the characteristics
-of all points and edges painted between the last mouse-down and
+Clicking on the \Widget{Undo} button restores the characteristics of all
+points and edges persistently painted between the last mouse-down and
 mouse-up.
 
 \subsubsection{Choose color \& glyph ...}
 
-Clicking on this button opens the {\bf Choose color \& glyph} panel,
+Clicking on this button opens the \Widget{Choose color \& glyph} panel,
 which can be used to choose the point color and glyph as well as the
 edge type for brushing.  At the top of the panel, there is a table of
 all possible point glyphs and another table of all possible edge types.
@@ -1206,69 +1184,53 @@ but it isn't clear which glyph to select if a new edge type is chosen.
 For that reason, the edge symbols don't yet respond to button clicks.)
 
 Below those tables is a row of rectangles of color which represent the
-current color scale.  Clicking on one of these sets the brushing color.
-Double-clicking on one of these rectangles, or on the two rectangles
-just below them for the background and accent colors, opens a color
-selection widget with access to the full color map.  The {\bf Reverse
-video} button allows you to swap the background and accent colors.
+current color scale.  Clicking on one of these sets the brushing
+color.  Double-clicking on one of these rectangles, or on the two
+rectangles just below them for the background and accent colors, opens
+a color selection widget with access to the full color map.  The
+\Widget{Reverse video} button allows you to swap the background and
+accent colors.
 
-\subsubsection{Link by ID or by variable}
+\subsubsection{Linking rules}
 \label{LinkingRules}
 
-This option menu is used to define which of two linking rules is to
-be used.  The default rule, {\it Link by ID}, dictates that points
-representing records that have the same {\it id}, as specified in the XML
-description (or in the API), will respond identically to brushing events.
-Ids are unique within a dataset, so this rule has no effect when only
-a single dataset is being studied.
+This list is used to define which of two linking rules is
+to be used.  The default rule, linking by case id, dictates that points
+representing records that have the same {\it id}, as specified in the
+XML description (or in the API), will respond identically to brushing
+events.  Ids are unique within a dataset, so this rule has no effect
+when only a single dataset is being studied.
 
-The second rule, {\it Link by variable}, uses the levels of a
-categorical variable to link points.  To choose a variable, select a
-categorical variable from the {\it Linking rule} list.  Now when a
-case is brushed in one display, all cases with the same value of the
-categorical variable will change accordingly, in this and all other
-displays.
+If instead the data includes categorical variables, and one of those
+is selected, the linking logic uses the levels of that variable to
+link points.  When a case is brushed in one display, all cases
+with the same value of the categorical variable will change
+accordingly, in this and all other displays.
 
-For example, look at the {\em algal-bloom.xml} data supplied with
+For example, look at the \File{algal-bloom.xml} data supplied with
 GGobi.  It contains four datasets, one of which contains the levels of
 a factorial experimental, while another represents the response.  Both
 include the same categorical variables.  Open two scatterplots, one
 for each of those two datasets.  In the measurements display, plot
 algal count against day.  In the plot of experimental conditions, plot
 the level of phosphorus against the level of carbon.  Prepare to brush
-in the plot of experimental conditions.  Choose {\it Link by Carbon}
+in the plot of experimental conditions.  Choose \Widget{Link by Carbon}
 as the linking rule: Note that you have to select brushing and set the
 linking rule twice, once when each scatterplot is the current plot.
 Highlighting the low values of carbon, note that all of the points
 highlighted in the measurements display are among the lowest in algal
 count.
 
-\subsubsection{Color schemes ...}
+\subsubsection{Tools of importance for brushing}
 
-Since this button is also found on the Tools menu, it is
-documented in section \ref{slbl:ColorSchemes}.
-
-\subsubsection{Color \& glyph groups ...}
-
-Since this button is also found on the Tools menu, it is
-documented in section \ref{slbl:ColorAndGlyphGroups}.
-
-\subsubsection{Brush on}
-%
-When the {\bf Brush on} checkbox is checked, moving the brush
-over a plotted point causes that point to change its color or
-plotting character (called a glyph).  If the brush is turned off, the
-brush can be freely moved across the plotting window and it does not
-change the points.
-
-This is useful if you are plotting a very large number of points,
-and you want to position the brush before painting, because you
-can move it much more quickly across the plot.  
-
+See section \ref{slbl:ColorSchemes} for a description of the
+\Widget{Color Schemes} tool, and section
+\ref{slbl:ColorAndGlyphGroups} for the \Widget Color \& glyph groups}
+tool.
 
 \subsubsection{Brush menu in display}
 %
-When the brushing mode is active, the {\bf Brush} menu in the display's
+When the brushing mode is active, the \Widget{Brush} menu in the display's
 menu bar contains these items:
 
 \begin{itemize}
@@ -1285,20 +1247,21 @@ menu bar contains these items:
  \item Include shadowed edges: Redraw these edges as shadows.
  \item Un-shadow all edges: Restore the edges to their usual colors.
  \item Reset brush size: Reset the brush to its default size and position.
+ \item Brush on: When this is not checked, the brush can be freely
+    moved across the plotting window and it does not change the points.
+    This is useful if you are plotting a very large number of points,
+    and you want to position the brush before painting, because you
+    can move it much more quickly across the plot.  
+ \item Update brushing continuously: Update linked brushing with every
+    mouse motion.  The alternative is to update linked views only when
+    the mouse is released, which is more efficient when there are a
+    great many points in the plot, or a great many plots on the
+    screen.
 \end{itemize}
 
 The first few items in that list may affect more than the current
 display.  Because they really operate on the {\em data} in the current
 display, all other displays showing the same data will also respond.
-
-This option is also available on the display's {\bf Brush} menu:
-\medskip
-\noindent
-\\{\bf Update brushing continuously}: Update linked
-  brushing with every mouse motion.  The alternative is to update linked
-  views only when the mouse is released, which is more efficient when
-  there are a great many points in the plot, or a great many plots on
-  the screen.
 
 \subsection{Identification}
 \label{slbl:Identify}
@@ -1326,18 +1289,19 @@ brushing.]
 To cause a label to become ``sticky,'' click left when the target
 label is displayed.  The printing style changes and the label now
 remains printed as the cursor moves off, and even remains printed as
-you leave the {\bf Identify} mode.  It is possible to rescale or
+you leave the \Widget{Identify} mode.  It is possible to rescale or
 rotate data, and the sticky labels will continue to be displayed next
 to their associated points.
 
-To cause a label to become ``unsticky,'' return to the {\bf Identify}
+To cause a label to become ``unsticky,'' return to the \Widget{Identify}
 mode and click left again when the target point is nearest the
 cursor.  It is also possible to restore all labels to unsticky status
-by clicking on the {\bf Remove labels} button.  You can also see all
-the labels at once by clicking on {\bf Make all sticky}.
+by clicking on the \Widget{Remove labels} button.  You can also see all
+the labels at once by clicking on \Widget{Label all}.
 
-Notice that once a point's label is sticky, you can click {\bf Recenter}
-to make it the center for the rotation and tour modes.
+Notice that once a point's label is sticky, you can click
+\Widget{Recenter} to make it the center for the rotation and tour
+modes.
 
 To activate this interaction mode from the keyboard, type {\em i} or {\em I}
 with the focus in the plot window, or type Control-{\em i} or
@@ -1395,12 +1359,12 @@ the cursor in the window until it's nearest to the point you
 want to move, then press any mouse button and drag until the
 point is where you want.
 
-The {\bf Direction of motion} menu allows the movement to be
-constrained.  If the {\bf Move brush group} checkbox is
+The \Widget{Direction of motion} menu allows the movement to be
+constrained.  If the \Widget{Move brush group} checkbox is
 checked, then all points with the same glyph and color as
 the selected point will be moved with it.
 
-The {\bf Undo last} and {\bf Reset all} buttons allow movement
+The \Widget{Undo last} and \Widget{Reset all} buttons allow movement
 to be reversed.
 
 To activate this interaction mode from the keyboard, type {\em m} or
@@ -1415,7 +1379,7 @@ Control-{\em M} with the focus in the console.
 \label{slbl:VarManip}
 
 This powerful tool is opened by selecting the first entry on the
-{\bf Tools} menu.  It has several important functions:
+\Widget{Tools} menu.  It has several important functions:
 \begin{itemize} \itemsep 0em
 \item the display of variable statistics,
 \item variable subset selection for launching multi-plot displays,
@@ -1449,11 +1413,11 @@ The selected variables can also be cloned, and the new variables
 you create will be added to the table as well as the console.
 
 \label{NewVariable}
-There's another way to add new variables, and that relies on the {\em New
-...} button, which brings up a small panel.  Use that panel to specify
-the variable's name and to set its values:  either the row numbers or
-a set of integers reflecting the assignment of a group identifier to each
-combination of point color and glyph.
+There's another way to add new variables, and that relies on the
+\Widget{New ...} button, which brings up a small panel.  Use that
+panel to specify the variable's name and to set its values: either the
+row numbers or a set of integers reflecting the assignment of a group
+identifier to each combination of point color and glyph.
 
 \subsection{Variable transformation tool}
 \label{slbl:VarTransform}
@@ -1483,11 +1447,11 @@ transformations are not linear; they include sorting and ranking.
 \label{slbl:Sphering}
 
 To sphere one or more variables, first select the variables in the list
-at the top of the window, then click on {\bf Update scree plot}.
+at the top of the window, then click on \Widget{Update scree plot}.
 
 It's common to standardize the variables before sphering, that is, use
 the correlation matrix instead of the variance-covariance matrix. The
-check box {\bf Use correlation matrix} allows for this option.
+check box \Widget{Use correlation matrix} allows for this option.
 
 Now you're ready to sphere the selected variables.  Working your way down
 the panel, use your visual interpretation of the scree plot together
@@ -1501,26 +1465,27 @@ components you're going to generate.  The variance and condition number
 are displayed to help you make that choice.
 
 Once you're satisfied with the selected variables and the number of
-principal components, proceed to the last step.  Click on {\em Apply
-sphering} to create new variables and add them GGobi's variable selection
-panels.  The names of the selected variables will be added to the
-``sphered variables'' to help you remember which variables you sphered.
+principal components, proceed to the last step.  Click on
+\Widget{Apply sphering} to create new variables and add them GGobi's
+variable selection panels.  The names of the selected variables will
+be added to the ``sphered variables'' to help you remember which
+variables you sphered.
 
 \subsection{Jittering}
 
-Select {\em Variable jittering ...} to open a panel that allows
+Select \Widget{Variable jittering ...} to open a panel that allows
 random noise to be added to selected variables.  This ameliorates
 overplotting in scatterplots of data with many ties.
 
 First specify the variables you wish to jitter.  Choose between uniform
 and normal random jitter, and then set the degree of jitter using the
 slider.  To rejitter without changing the degree of jitter, simply click
-on the {\bf Jitter} button.
+on the \Widget{Jitter} button.
 
 \subsection{Color schemes}
 \label{slbl:ColorSchemes}
 
-The {\bf Color schemes} tool has two purposes: to select a
+The \Widget{Color schemes} tool has two purposes: to select a
 new color scheme, and to automatically color points
 using the current color scheme.
 
@@ -1592,12 +1557,12 @@ The four types represented are
 
 To brush the data according to the values of a variable, first select
 a variable in the list at the top of the tool window.  This adds two
-sets of numbers to the display:  along the bottom of the display, at
+sets of numbers to the display: along the bottom of the display, at
 the center of each stripe of color, is shown the number of points that
-will be drawn with this color once {\bf Apply color scheme by variable}
-is pressed.  Along the top of the display, at the boundaries between the
-stripes of color, appear the values of the chosen variable that define
-the boundaries between colors. 
+will be drawn with this color once \Widget{Apply color scheme by
+variable} is pressed.  Along the top of the display, at the boundaries
+between the stripes of color, appear the values of the chosen variable
+that define the boundaries between colors.
 
 There are two methods available for defining the bin boundaries, and
 a menu for choosing between them.  The ``constant bin width'' method
@@ -1624,7 +1589,7 @@ variables yet.
 \subsection{Color \& glyph groups}
 \label{slbl:ColorAndGlyphGroups}
 
-The {\bf Color \& glyph groups} tool displays a table.  Each unique
+The \Widget{Color \& glyph groups} tool displays a table.  Each unique
 symbol in the data (combination of color and glyph) occupies a row,
 and for each row has a toggle button that shadow brushes all points
 drawn in the corresponding symbol.  The three remaining columns
@@ -1640,49 +1605,48 @@ likely that someone might do that by mistake, and unlikely that they
 would do it deliberately.  (That choice should be resolved by a
 dialog, probably, and an 'undo' button should be added.)
 
-The {\bf Exclude shadows} button at the bottom of the window will
+The \Widget{Exclude shadows} button at the bottom of the window will
 exclude all shadow-brushed points from consideration in the
 displays:  the views will be scaled without those points, and they
 won't be drawn.  (Excluding a lot of points from large data sets can
 improve the performance of many operations.)
-The {\bf Include shadows} button will bring those
+The \Widget{Include shadows} button will bring those
 points back into the plot, and they'll be drawn in the shadow color
 as before.
 
-The {\bf Update} button updates the contents of the table in case it
+The \Widget{Update} button updates the contents of the table in case it
 isn't responding properly to changes in the displays as you continue
 to brush.
-
 
 See \ref{NewVariable} to read how you can add a new variable to the
 existing data which serves as an indicator for these ``clusters.''
 
 \subsection{Subsetting}
 
-Select {\bf Case subsetting and sampling ...} to open a panel
+Select \Widget{Case subsetting and sampling ...} to open a panel
 that allows subsets to be specified in one of six ways.
 
-{\bf Random sample without replacement}:  Specify the number of
+\Widget{Random sample without replacement}:  Specify the number of
      cases to be in the sample.
-\\{\bf Consecutive block}:  Specify the first and last row of the block.
+\\\Widget{Consecutive block}:  Specify the first and last row of the block.
      (The two controls in the second row control the increment used
      in the control in the first row.)
-\\{\bf Limits}:  Use the limits defined by the user in the variable
+\\\Widget{Limits}:  Use the limits defined by the user in the variable
      manipulation table to define the subset.
-\\{\bf Every nth case}:  Specify the interval and the first row.
-\\{\bf Sticky labels}:  All cases with a ``sticky'' label will
+\\\Widget{Every nth case}:  Specify the interval and the first row.
+\\\Widget{Sticky labels}:  All cases with a ``sticky'' label will
   be in the subset.  If no points have a sticky label, this
-  will have no effect. (See {\em Identification} for a description
+  will have no effect. (See section {\ref{slbl:Identify} for a description
   of sticky labels.)
-\\{\bf Row labels}: Type in a string, and specify where it should
+\\\Widget{Row labels}: Type in a string, and specify where it should
   fall (or not fall) in the row labels, and whether case should
   be ignored.  Matches will be included in the subset.
 
-Select one of those six, then click on {\bf Subset} in the
+Select one of those six, then click on \Widget{Subset} in the
 bottom row of the panel.  If you want to re-include all rows, 
-select the {\bf Include all} button in the bottom row.
+select the \Widget{Include all} button in the bottom row.
 
-Click the {\bf Rescale} button to rescale all plots excluding
+Click the \Widget{Rescale} button to rescale all plots excluding
 the points not in the subset.
 
 One purpose of subsetting is to allow the use of GGobi on data matrices
@@ -1695,14 +1659,14 @@ a good chance it's not just an artifact of visualization.
 
 \subsection{Controls for missing data}
 
-When your data includes missing values, you can add a new dataset to the
-current ggobi using the button at the top of the {\bf Missing data} tool.
-The resulting dataset has the same number of rows as the original,
-but it may have fewer variables, since it only uses those variables
-which actually have missing values.  It has the same variable names,
-row labels, glyphs and colors as the original.  The difference is this:
-if the original data in position $i,j$ is missing, the new dataset's
-value is $1.0$; otherwise it's $0.0$.
+When your data includes missing values, you can add a new dataset to
+the current ggobi using the button at the top of the \Widget{Missing
+data} tool.  The resulting dataset has the same number of rows as the
+original, but it may have fewer variables, since it only uses those
+variables which actually have missing values.  It has the same
+variable names, row labels, glyphs and colors as the original.  The
+difference is this: if the original data in position $i,j$ is missing,
+the new dataset's value is $1.0$; otherwise it's $0.0$.
 
 Once the new dataset has been created, plots of missingness information
 can be launched and linked to plots of the data.  The missings plots
@@ -1717,25 +1681,25 @@ joint distribution of missing values across variables.
 %
 By default, missing values are assigned the value $0$, but you
 may sometimes find that to be an inconvenient choice.  Use the
-{\bf Missing values} panel to assign alternative numbers.
+\Widget{Missing values} panel to assign alternative numbers.
 
 Select the variable or variables whose imputed value you
 wish to change, then select a method and fill in the text window
-if necessary, and click {\bf Impute.}
+if necessary, and click \Widget{Impute.}
 
 Below the list of variables, a notebook widget allows you to specify
 the type of imputation you'd like to use.
 
-{\bf Random imputation}: Sample from the present values for each variable
+\Widget{Random imputation}: Sample from the present values for each variable
   to populate the missing values.  If you have done some brushing to
   partition the cases, you can specify that you want the sampling to be
   done using only cases brushed with the same color and glyph.
-\\{\bf Fixed value}: Specify any value to use instead of the default.
-\\{\bf Percentage below minimum}: Specify a value that is $x$ percent
+\\\Widget{Fixed value}: Specify any value to use instead of the default.
+\\\Widget{Percentage below minimum}: Specify a value that is $x$ percent
   below the minimum value.  For example, if the variable ranges from
  $40$ to $80$, specifying 10 will assign the missings the value $40 - (10\%
  * 40) = 36$.
-\\{\bf Percentage above minimum}: Specify a value that is $x$ percent
+\\\Widget{Percentage above minimum}: Specify a value that is $x$ percent
 above the maximum.
 
 Click the resale button when you want to update the view to
@@ -1749,17 +1713,17 @@ For more complex imputation, consider using GGobi from within R.
 
 \section{Multiple datasets}
 
-Several datasets can be open in GGobi simultaneously. The {\bf File}
+Several datasets can be open in GGobi simultaneously. The \Widget{File}
 menu interfaces reading in additional data sets. Data tabs corresponding
 to each open data set appear above the variable selection window on
 the main controls window, and in various tool windows. The rules for
 linking these data sets is described in Section \ref{LinkingRules}.
 
-Several of the sample datasets included with ggobi use multiple datasets.
-In most cases, the additional datasets are used to add edges, but {\em
-algal-bloom.xml} contains four datasets, one of which contains the levels
-of a factorial experimental, while another represents the response.
-These two can be linked by variable.
+Several of the sample datasets included with ggobi use multiple
+datasets.  In most cases, the additional datasets are used to add
+edges, but \File{algal-bloom.xml} contains four datasets, one of which
+contains the levels of a factorial experimental, while another
+represents the response.  These two can be linked by variable.
 
 \section{Edges}
 
@@ -1767,13 +1731,14 @@ A special case of the use of multiple datasets is use of edges (line
 segments).  There are many reasons one would want to display line segments
 in a scatterplot. 
 
-There are several datasets with edges distributed with GGobi: {\em
-algal-bloom.xml}, in which edges are used to structure the display of an
-analysis of variance; {\em buckyball.xml}, data describing a graph -- a
-geometrical object; {\em eies.xml}, social network data; {\em pigs.xml},
-a dataset which includes several time variables; {\em prim7.xml},
-in which line segments are used to illustrate structure in the
-data which was found during extensive exploratory data analysis.
+There are several datasets with edges distributed with GGobi:
+\File{algal-bloom.xml}, in which edges are used to structure the
+display of an analysis of variance; \File{buckyball.xml}, data
+describing a graph -- a geometrical object; \File{eies.xml}, social
+network data; \File{pigs.xml}, a dataset which includes several time
+variables; \File{prim7.xml}, in which line segments are used to
+illustrate structure in the data which was found during extensive
+exploratory data analysis.
 
 We specify specify line segments (edges) for GGobi by the addition of a
 second dataset in an XML file (or through the API) in which each record
@@ -1782,7 +1747,7 @@ can still have variables, of course, which might represent variables
 measured on transactions or interactions.
 
 A scatterplot which has corresponding edge datasets (which we might call
-edge sets) will have an {\bf Edges} menu in its menubar.  If there's a
+edge sets) will have an \Widget{Edges} menu in its menubar.  If there's a
 choice of edge sets, you'll see a cascading menu showing their names.
 Edges can have ``arrowheads'' added, to indicate the edge's direction;
 it's also possible to see the arrowheads alone.
@@ -1824,7 +1789,7 @@ methods.  Use the Tools->Case subsetting and sampling panel to select
 a sample of the data.
 
 If the touring and rotation methods become too slow, pause the movement
-and use the {\bf Scramble} button to see different views.
+and use the \Widget{Scramble} button to see different views.
 
 Avoid the 1-D plotting methods in scatterplots; they both become slow
 as the data gets very large.  The barchart/histogram display is of course
@@ -1915,11 +1880,11 @@ awkward in XGobi.
 Before we describe other key changes in the visible design, we'll
 introduce the changes in data format.  The XGobi format, in which a
 set of files with a common base name is used, is still supported,
-though some file formats have changed ({\em .colors}), and some are no
-longer supported ({\em .bin}, {\em .vgroups}, {\em .lines}).  (See
+though some file formats have changed (\File{.colors}), and some are no
+longer supported (\File{.bin}, \File{.vgroups}, \File{.lines}).  (See
 section \ref{slbl:DataFormat} for more detail.) The functions served
 by the discarded file types are usually served now in a different
-way:  for example, XGobi uses the {\em .vgroups} file to force
+way:  for example, XGobi uses the \File{.vgroups} file to force
 a group of variables to use the same axis ranges.  In GGobi, that's
 accomplished by setting limits in the variable manipulation tool.
 
@@ -1982,7 +1947,7 @@ horizontally and the middle (or right) button to plot vertically.
 
 \subsection {The variable manipulation tool}
 
-The {\bf Variable manipulation} tool presents summary statistics for
+The \Widget{Variable manipulation} tool presents summary statistics for
 each variable.  If a variable has been described in the XML data file
 as categorical, it also shows the name and count for each level.
 The tables can also be used to select variables -- not for plotting, but
@@ -2000,30 +1965,30 @@ For more detail on this table, see section \ref{slbl:VarManip}.
 
 \subsection{Changes in projection, interaction and tools}
 
-{\bf Brush} may be the mode that has changed the most,
+\Widget{Brush} may be the mode that has changed the most,
 because GGobi has a much richer notion of color selection than
-XGobi.  Open the {\bf Choose color \& glyph} panel, and then
+XGobi.  Open the \Widget{Choose color \& glyph} panel, and then
 double-click on any element of the color palette to bring up a color
 selection widget with access to the full color map.  Notice that you
 can change the background color as well as any of the foreground
 colors, and notice that changing the glyph also changes the line
 type to be used in edge brushing.
 
-The {\bf Color schemes} tool has extended brushing considerably,
+The \Widget{Color schemes} tool has extended brushing considerably,
 by allowing a choice of color schemes and enabling a form of
 automatic brushing.  See \ref{slbl:ColorSchemes}.
 
-{\bf Scale} has also changed.  The direct manipulation shifting and
+\Widget{Scale} has also changed.  The direct manipulation shifting and
 scaling methods work as they did in XGobi, but we've added what we
 call ``Click-style interaction'' for more precise control.  See section
 \ref{slbl:Scaling}.
 
 The tour methods in GGobi are still evolving: many things are not yet
-implemented, but new things are beginning to appear.  In the {\bf
-1DTour}, a projection of several variables is viewed as an average
-shifted histogram, as described in section \ref{slbl:1DTour}.
+implemented, but new things are beginning to appear.  In the
+\Widget{1DTour}, a projection of several variables is viewed as an
+average shifted histogram, as described in section \ref{slbl:1DTour}.
 
-The redesign of the tour methods is reflected in the {\bf Sphering}
+The redesign of the tour methods is reflected in the \Widget{Sphering}
 tool, which also appears in the most recent versions of XGobi.
 Instead of automatically sphering variables in projection pursuit,
 GGobi requires you to specify which variables to sphere.  Since this
@@ -2039,7 +2004,7 @@ The on-line help system used in XGobi has been replaced with
 ``tooltips,'' so leaving the mouse over a widget for a couple of
 seconds brings up a phrase describing the function of that widget.
 If the tooltips annoy you, you can turn then off using a checkbox on
-the {\bf Options} menu.
+the \Widget{File->Options} menu.
 
 \section{Known problems}
 
