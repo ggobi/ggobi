@@ -355,15 +355,22 @@ struct _ggobid {
     GtkWidget *notebook;
   } subset_ui;
 
+/*---------------- color scheme selection -------------------------------*/
+
+  struct _SchemeChooser {
+    GtkWidget *window, *entry_preview, *entry_applied, *da;
+    GdkPixmap *pix;
+    colorschemed *scheme; /*-- current color scheme --*/
+    GdkGC *GC;
+    gfloat *pct;
+    gint npct;
+  } svis;
+
 /*---------------- brushing by weights -------------------------------*/
 
   struct _WeightedVis {
-    GtkWidget *window, *entry_preview, *entry_applied, *da;
+    GtkWidget *window, *da;
     GdkPixmap *pix;
-    /*GdkColor gray1, gray2, gray3;*/
-
-    colorschemed *scheme; /*-- current color scheme --*/
-
     GdkGC *GC;
 
     gfloat *pct;
