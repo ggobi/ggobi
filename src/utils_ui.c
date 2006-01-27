@@ -518,7 +518,6 @@ get_selections_from_tree_view (GtkWidget *tree_view, gint *nvars)
   rows = gtk_tree_selection_get_selected_rows(sel, &model);
   *nvars = g_list_length(rows);
   vars = g_new(gint, *nvars);
-  
   for (l = rows, i = 0; l; l = l->next, i++) {
 	  GtkTreePath *path = (GtkTreePath*)l->data;
 	  gtk_tree_model_get_iter(model, &iter, path);
@@ -679,7 +678,10 @@ static void variable_notebook_page_add_prefices(GtkWidget *notebook, gint page) 
 	GtkTreeIter iter;
 	gint i, sel_prefix, n_prefices;
 	GtkWidget *nth_page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), page);
-	datad *d = g_object_get_data(G_OBJECT(nth_page), "datad");
+	datad *d;
+	if (!nth_page)
+		return;
+	d = g_object_get_data(G_OBJECT(nth_page), "datad");
 	GtkWidget *view = GTK_BIN(nth_page)->child;
 	GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(view));
 	GGobiVariableNotebookPrefixFunc p_func = g_object_get_data(G_OBJECT(notebook), "prefix_func");
@@ -690,10 +692,7 @@ static void variable_notebook_page_add_prefices(GtkWidget *notebook, gint page) 
 			VARLIST_NAME, prefices[i], VARLIST_INDEX, -(n_prefices - i), -1);
 	}
 	if (sel_prefix >= 0) {
-		GtkTreeSelection *tree_sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(view));
-		GtkTreePath *path = gtk_tree_path_new_from_indices(sel_prefix, -1);
-		gtk_tree_selection_select_path(tree_sel, path);
-		gtk_tree_path_free(path);
+		select_tree_view_row(view, sel_prefix);
 	}
 }
 
@@ -710,7 +709,6 @@ static void
 prefixed_variable_notebook_adddata_cb (ggobid *gg, datad *d, void *notebook)
 {
 	datatyped dtype = (datatyped) g_object_get_data(G_OBJECT(notebook), "datatype");
-
 	if ((dtype == all_datatypes) ||
       (dtype == no_edgesets && d->edge.n == 0) ||
       (dtype == edgesets_only && d->edge.n > 0))

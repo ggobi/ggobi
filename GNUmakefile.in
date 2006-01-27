@@ -136,7 +136,12 @@ clean:
 	  $(MAKE) -C $$f clean ; \
 	done
 
-distclean: clean
+clean-plugins:
+	for f in ${PLUGIN_DIRS} ; do \
+	  export GGOBI_HOME ; $(GGOBI_HOME)/plugin --clean $$f ; \
+	done
+
+distclean: clean clean-plugins
 	for f in $(OBJ) config.log lib/*.so bin/ggobi.bin bin/xmlConvert@EXE_EXT@ ggobi ggobidb; do \
 	  if test -f $$f ; then rm $$f ; fi \
 	done

@@ -182,6 +182,8 @@ vartable_iter_from_varno(gint var, datad *d, GtkTreeModel **model, GtkTreeIter *
   gboolean valid;
   
   loc_model = vartable_tree_model_get(d);
+  if (!loc_model)
+	  return(FALSE);
   path = gtk_tree_path_new_from_indices(var, -1);
   valid = gtk_tree_model_get_iter(loc_model, iter, path);
   gtk_tree_path_free(path);

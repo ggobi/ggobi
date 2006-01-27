@@ -27,24 +27,27 @@ while test "$1" != "" ; do
  --plugin) PLUGIN=`echo $1 | sed -e s/.*=//g` ; shift ;; 
  --verbose) VERBOSE=1 ; shift;;
  --install) INSTALL=1 ; shift;;
- --install=*) INSTALL=1; INSTALL_DIR=`echo $1 | sed -e s/.*=//g` ; shift ;; 
+ --install=*) INSTALL=1; INSTALL_DIR=`echo $1 | sed -e s/.*=//g` ; shift ;;
+ --clean) CLEAN=1 ; shift;; 
  *)  if test -z "${PLUGIN}" ; then
        PLUGIN=${1-TestPlugin}
      else 
        ARGS="$ARGS $1" 
      fi ;
      shift ;;
-     
  esac
 done
 
 if test -n "${INSTALL}" ; then
  TARGET=install
 else
+if test -n "${CLEAN}" ; then
+ TARGET=clean
+else
 if test -z "${TARGET}" ; then
  TARGET=${PLUGIN}.@SHLIB_EXT@
 fi
-
+fi
 fi # end of test -n "${INSTALL}"
 
 plugin_dir=$GGOBI_HOME/plugins/$PLUGIN

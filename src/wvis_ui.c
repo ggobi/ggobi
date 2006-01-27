@@ -608,7 +608,7 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
           str, strlen(str),
           &lbearing, &rbearing, &width, &ascent, &descent);*/
         x = xmargin + gg->wvis.pct[k] * (w->allocation.width - 2*xmargin);
-        gdk_draw_layout(pix, gg->wvis.GC, x - rect.width/2, y - 2, layout);
+        gdk_draw_layout(pix, gg->wvis.GC, x - rect.width/2, y - 2 - rect.height, layout);
 		/*gdk_draw_string (pix,
           gtk_style_get_font (style),
           gg->wvis.GC,
@@ -632,7 +632,7 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
         x -= diff/2 * (w->allocation.width - 2*xmargin);
 		gdk_draw_layout(pix, gg->wvis.GC, 
 			x - rect.width/2,
-			(w->allocation.height - ymargin) + rect.height + 2,
+			(w->allocation.height - ymargin) + 2,
 			layout);
         /*gdk_draw_string (pix,
           gtk_style_get_font (style),

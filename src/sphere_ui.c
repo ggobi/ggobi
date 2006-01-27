@@ -316,11 +316,14 @@ scree_expose_cb (GtkWidget *w, GdkEventConfigure *event, ggobid *gg)
 
     nels = d->sphere.vars.nels;
     for (j=0; j<nels; j++) {
+	  PangoRectangle rect;
       xpos = (gint)(((gfloat) (wid - 2*margin))/(gfloat)(nels-1)*j+margin);
       ypos = (gint)(((gfloat) (hgt-margin)) - evals[j]/evals[0]*(hgt-2*margin));
 	  tickmk = g_strdup_printf ("%d", j+1);
-	  layout = gtk_widget_create_pango_layout(gg->sphere_ui.scree_da, tickmk);
-	  gdk_draw_layout(gg->sphere_ui.scree_pixmap, gg->plot_GC, xpos, hgt-margin/2, layout);
+	  layout = gtk_widget_create_pango_layout(gg->sphere_ui.scree_da, NULL);
+	  layout_text(layout, tickmk, &rect);
+	  gdk_draw_layout(gg->sphere_ui.scree_pixmap, gg->plot_GC, xpos, hgt-margin/2-0.75*rect.height, layout);
+	  g_object_unref(G_OBJECT(layout));
       /*gdk_draw_string (gg->sphere_ui.scree_pixmap,
         gtk_style_get_font (style),
         gg->plot_GC, xpos, hgt-margin/2, tickmk);*/
