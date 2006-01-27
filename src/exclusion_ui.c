@@ -532,7 +532,7 @@ void cluster_window_open(ggobid * gg)
     g_signal_connect(G_OBJECT(gg->cluster_ui.window), "delete_event",
       G_CALLBACK(close_wmgr_cb), (gpointer) gg);
     gtk_window_set_title(GTK_WINDOW(gg->cluster_ui.window),
-      "color & glyph groups");
+      "Color & Glyph Groups");
     new = true;
   }
 

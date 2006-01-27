@@ -110,7 +110,7 @@ GtkWidget * mode_panel_get_by_name(const gchar *name, ggobid *gg)
   return (GtkWidget *) w;
 }
 
-void
+void 
 tooltips_show (gboolean show, ggobid *gg) 
 {
   if (show)
@@ -910,7 +910,7 @@ static GtkActionEntry entries[] = {
 	{ "New", GTK_STOCK_NEW, "_New", NULL, "Create a new GGobi instance", G_CALLBACK(action_new_cb) },
 	{ "Save", GTK_STOCK_SAVE, "_Save", "<control>V", "Save some data", G_CALLBACK(action_save_cb) },
 	{ "Shortcuts", NULL, "Shortc_uts" },
-	{ "StoreSession", GTK_STOCK_GOTO_BOTTOM, "Store session", NULL, "Save this GGobi session", 
+	{ "StoreSession", GTK_STOCK_GOTO_BOTTOM, "Store Session", NULL, "Save this GGobi session", 
 		G_CALLBACK(action_store_session_cb) 
 	},
 	#ifdef PRINTING_IMPLEMENTED
@@ -1010,10 +1010,10 @@ static GtkRadioActionEntry imode_entries[] = {
 	{ "Identify", NULL, "_Identify", "<control>I",
 		"Identify points (query their values)", IDENT
 	},
-	{ "Edit edges", NULL, "_Edit edges", "<control>E",
+	{ "Edit edges", NULL, "_Edit Edges", "<control>E",
 		"Edit the edges in the plot", EDGEED
 	},
-	{ "Move points", NULL, "_Move points", "<control>M",
+	{ "Move points", NULL, "_Move Points", "<control>M",
 		"Move the points in the plot", MOVEPTS
 	}
 };
@@ -1067,6 +1067,10 @@ make_ui (ggobid *gg)
   gg->tips = gtk_tooltips_new ();
 
   gg->main_window = window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  gtk_window_set_title(window, "GGobi");
+  gtk_window_set_policy(window, true, true, false);
+  gtk_window_set_default_size(window, 400, 300);
+
   GGobi_widget_set (window, gg, true);
 
 #ifdef TEST_GGOBI_EVENTS
@@ -1077,17 +1081,6 @@ make_ui (ggobid *gg)
   g_signal_connect(G_OBJECT(gg), "sticky_point_removed", test_sticky_points, NULL);
 #endif
 
-/*
- * I used to set allow_shrink to true, but somehow it causes what we
- * experience as auto_shrink-ing.  That is, when changing viewmode or
- * selecting variables, the size of the ggobi console window can suddenly
- * change.  This seems to fix that, with the perhaps undesirable side
- * effect that I can't reduce the size of the console below
- * its initial size.  -- dfs
- * The below is the GTK default, no need to set. -mfl
-*/
-/*gtk_window_set_policy (GTK_WINDOW (window), allow_shrink, allow_grow, auto_shrink);*/
-//  gtk_window_set_policy (GTK_WINDOW (window), false,        true,       false);
 
   g_signal_connect_swapped(G_OBJECT (window), "delete_event",
                             G_CALLBACK (signal_delete_cb), (gpointer) gg);

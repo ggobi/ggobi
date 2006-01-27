@@ -205,7 +205,7 @@ impute_window_open (ggobid *gg)
     
     gg->impute.window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title (GTK_WINDOW (gg->impute.window),
-      "Missing values");
+      "Missing Values");
     g_signal_connect (G_OBJECT (gg->impute.window),
       "delete_event", G_CALLBACK (close_wmgr_cb), gg);
   

@@ -778,7 +778,7 @@ make_symbol_window (ggobid *gg) {
   if (gg->color_ui.symbol_window == NULL) {
     gg->color_ui.symbol_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title (GTK_WINDOW (gg->color_ui.symbol_window),
-      "color & glyph chooser");
+      "Color & Glyph Chooser");
 
     /*
      * I thought this would be enough to prevent the window from

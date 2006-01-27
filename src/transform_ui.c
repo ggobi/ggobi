@@ -195,7 +195,7 @@ transform_window_open (ggobid *gg)
   if (gg->tform_ui.window == NULL) {
     gg->tform_ui.window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title (GTK_WINDOW (gg->tform_ui.window),
-                          "transform variables");
+                          "Transform Variables");
     gtk_container_set_border_width (GTK_CONTAINER (gg->tform_ui.window), 10);
 
     g_signal_connect (G_OBJECT (gg->tform_ui.window),

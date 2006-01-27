@@ -497,7 +497,7 @@ vartable_open (ggobid *gg)
   g_signal_connect (G_OBJECT (gg->vartable_ui.window),
     "delete_event", G_CALLBACK (close_wmgr_cb), gg);
   gtk_window_set_title (GTK_WINDOW (gg->vartable_ui.window),
-    "Variable manipulation");
+    "Variable Manipulation");
 
   vbox = gtk_vbox_new (false, 5);
   gtk_container_set_border_width (GTK_CONTAINER (vbox), 5);

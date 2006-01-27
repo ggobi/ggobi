@@ -287,7 +287,7 @@ subset_window_open (ggobid *gg) {
     
       gg->subset_ui.window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
       gtk_window_set_title (GTK_WINDOW (gg->subset_ui.window),
-        "subset data");
+        "Subset Data");
       g_signal_connect (G_OBJECT (gg->subset_ui.window),
         "delete_event", G_CALLBACK (close_wmgr_cb), (gpointer) gg);
   

@@ -76,7 +76,7 @@ display_menu_build (ggobid *gg)
   CreateMenuItem (gg->display_menu, NULL,
     "", "", NULL, NULL, NULL, NULL, gg);
 
-  item = gtk_menu_item_new_with_label ("Show display tree");
+  item = gtk_menu_item_new_with_label ("Show Display Tree");
   g_signal_connect (G_OBJECT (item), "activate",
                       G_CALLBACK (show_display_tree_cb),
                       (gpointer) gg);
@@ -400,46 +400,46 @@ static GtkActionEntry disp_action_entries[] = {
 GtkActionGroup *
 display_default_actions_create(displayd *display) {
 	GtkToggleActionEntry disp_t_action_entries[] = {
-		{ "ShowAxes", NULL, "Show _axes", "<control>A", "Toggle visibility of axes on this display",
+		{ "ShowAxes", NULL, "Show _Axes", "<control>A", "Toggle visibility of axes on this display",
 			G_CALLBACK(action_toggle_axes_cb), display->options.axes_show_p
 		}, 
-		{ "ShowLines", NULL, "Show _lines", "<control>L", "Toggle visibility of lines on this display",
+		{ "ShowLines", NULL, "Show _Lines", "<control>L", "Toggle visibility of lines on this display",
 			G_CALLBACK(action_toggle_lines_cb), display->options.whiskers_show_p
 		},
-		{ "ShowPoints", NULL, "Show p_oints", "<control>O", "Toggle visibility of points on this display",
+		{ "ShowPoints", NULL, "Show P_oints", "<control>O", "Toggle visibility of points on this display",
 			G_CALLBACK(action_toggle_points_cb), display->options.points_show_p
 		}, 
-		{ "ShowAxesLabels", NULL, "Show axes _labels", "<control>L",
+		{ "ShowAxesLabels", NULL, "Show Axes _Labels", "<control>L",
 			"Toggle display of the axes labels", 
 			G_CALLBACK(action_toggle_axes_labels_cb), display->options.axes_label_p 
 		},
-		{ "ShowAxesVals", NULL, "Show proj _vals", "<control>V",
+		{ "ShowAxesVals", NULL, "Show Projection _Vals", "<control>V",
 			"Toggle display of the projection values",
 			G_CALLBACK(action_toggle_axes_vals_cb), display->options.axes_values_p
 		},
-		{ "FadeVariables1D", NULL, "_Fade variables on de-selection", NULL, 
+		{ "FadeVariables1D", NULL, "_Fade Variables on Deselection", NULL, 
 			"Toggle whether variables fade on when de-selected from the 1D tour",
 			G_CALLBACK(action_toggle_fade_vars_1d_cb), display->ggobi->tour1d.fade_vars
 		},
-		{ "FadeVariables2D", NULL, "_Fade variables on de-selection", NULL,
+		{ "FadeVariables2D", NULL, "_Fade Variables on Deselection", NULL,
 			"Toggle whether variables fade on when de-selected from the 2D tour",
 			G_CALLBACK(action_toggle_fade_vars_2d_cb), display->ggobi->tour2d.fade_vars
 		},
-		{ "FadeVariablesCo", NULL, "_Fade variables on de-selection", NULL,
+		{ "FadeVariablesCo", NULL, "_Fade Variables on Deselection", NULL,
 			"Toggle whether variables fade on when de-selected from the corr tour",
 			G_CALLBACK(action_toggle_fade_vars_co_cb), display->ggobi->tourcorr.fade_vars
 		}, /* i-mode specific */
 		/* I'm going to make these display-specific since
 		they're on the display menu -- dfs */
-		{ "UpdateBrushContinuously", NULL, "Update brushing _continuously", NULL, 
+		{ "UpdateBrushContinuously", NULL, "Update Brushing _Continuously", NULL, 
 			"Toggle whether the brush operates continuously", 
 			G_CALLBACK(action_toggle_brush_update_cb), display->cpanel.br.updateAlways_p
 		}, /* i-mode specific */
-		{ "BrushOn", NULL, "Brush _on", NULL, 
+		{ "BrushOn", NULL, "Brush _On", NULL, 
 			"Toggle whether the brush is active", 
 		  G_CALLBACK(action_toggle_brush_on_cb), display->cpanel.br.brush_on_p
 		},
-	{ "UpdateContinuously", NULL, "Update _continuously", NULL, 
+	{ "UpdateContinuously", NULL, "Update _Continuously", NULL, 
 		"Toggle whether panning and zooming operates continuously", 
 		G_CALLBACK(action_toggle_scale_update_cb), display->cpanel.scale_updateAlways_p
 	}

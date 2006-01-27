@@ -38,46 +38,6 @@ static const gchar* parcoords_ui =
 "	</menubar>"
 "</ui>";
 
-#if 0
-void
-parcoords_display_menus_make (displayd *display, 
-  GtkAccelGroup *accel_group, GtkSignalFunc func, GtkWidget *mbar, ggobid *gg)
-{
-  GtkWidget *options_menu, *submenu, *item;
-
-  /*-- Options menu --*/
-  submenu = submenu_make ("_Options", 'O', accel_group);
-  /*-- add a tooltip --*/
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), submenu,
-    "Options menu for this display", NULL);
-
-  options_menu = gtk_menu_new ();
-
-  item = CreateMenuCheck (options_menu, "Show points",
-    func, GINT_TO_POINTER (DOPT_POINTS), on, gg);
-  g_object_set_data(G_OBJECT (item), "display", (gpointer) display);
-  item = CreateMenuCheck (options_menu, "Show line segments",
-    func, GINT_TO_POINTER (DOPT_WHISKERS), on, gg);
-  g_object_set_data(G_OBJECT (item), "display", (gpointer) display);
-
-  /* Add a separator */
-/*
-  CreateMenuItem (options_menu, NULL, "", "", NULL, NULL, NULL, NULL, gg);
-*/
-
-/*
-  item = CreateMenuCheck (options_menu, "Double buffer",
-    func, GINT_TO_POINTER (DOPT_BUFFER), on, gg);
-  g_object_set_data(G_OBJECT (item), "display", (gpointer) display);
-*/
-
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (submenu), options_menu);
-  submenu_append (submenu, mbar);
-
-  gtk_widget_show (submenu);
-}
-
-#endif
 
 void
 parcoords_reset_arrangement (displayd *display, gint arrangement, ggobid *gg) {

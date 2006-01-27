@@ -41,40 +41,6 @@ static const gchar* timeplot_ui =
 "	</menubar>"
 "</ui>";
 
-#if 0
-/**
- The menu that appears on the display window itself, not the control panel.
-*/
-static void
-tsplot_display_menus_make (displayd *display, 
-  GtkAccelGroup *accel_group, GtkSignalFunc func, 
-  GtkWidget *mbar, ggobid *gg)
-{
-  GtkWidget *options_menu, *submenu, *item;
-
-/*
- * Display options menu
-*/
-  submenu = submenu_make ("_Options", 'D', accel_group);
-  /*-- add a tooltip --*/
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), submenu,
-    "Options menu for this display", NULL);
-
-  options_menu = gtk_menu_new ();
-
-  item = CreateMenuCheck (options_menu, "Show points",
-      func, GINT_TO_POINTER (DOPT_POINTS), on, gg);
-  g_object_set_data(G_OBJECT (item), "display", (gpointer) display);
-  item = CreateMenuCheck (options_menu, "Show line segments",
-      func, GINT_TO_POINTER (DOPT_WHISKERS), on, gg);
-  g_object_set_data(G_OBJECT (item), "display", (gpointer) display);
-
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (submenu), options_menu);
-  submenu_append (submenu, mbar);
-
-  gtk_widget_show (submenu);
-}
-#endif
 
 void
 tsplot_reset_arrangement (displayd *display, gint arrangement, ggobid *gg) 

@@ -204,7 +204,7 @@ open_range_set_dialog (GtkWidget *w, ggobid *gg)
   if (!ok)
 	  return;
 
-  dialog = gtk_dialog_new_with_buttons ("Range dialog", NULL, 0, 
+  dialog = gtk_dialog_new_with_buttons ("Range Dialog", NULL, 0, 
   			GTK_STOCK_OK, GTK_RESPONSE_ACCEPT, GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT, NULL);
 
   /*-- frame for a pair of radio buttons --*/
@@ -396,7 +396,7 @@ open_newvar_dialog (GtkWidget *w, ggobid *gg)
   GtkWidget *radio1, *radio2, *entry;
   GSList *radio_group;
 
-  dialog = gtk_dialog_new_with_buttons ("Add new variable", NULL, 0, GTK_STOCK_OK,
+  dialog = gtk_dialog_new_with_buttons ("Add New Variable", NULL, 0, GTK_STOCK_OK,
   				GTK_RESPONSE_ACCEPT, GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT, NULL);
   frame = gtk_frame_new ("Variable values");
   gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
@@ -505,7 +505,7 @@ open_rename_dialog (GtkWidget *w, ggobid *gg)
 	return;
   }
 
-  dialog = gtk_dialog_new_with_buttons ("Rename one variable", NULL, 0, 
+  dialog = gtk_dialog_new_with_buttons ("Rename One Variable", NULL, 0, 
   			GTK_STOCK_OK, GTK_RESPONSE_ACCEPT, GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT, NULL);
  
   /*-- label and entry --*/

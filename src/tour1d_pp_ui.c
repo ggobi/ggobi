@@ -247,49 +247,7 @@ static GtkToggleActionEntry t_entries[] = {
 		G_CALLBACK(action_show_controls_cb), true
 	}
 };
-/*
-static GtkItemFactoryEntry menu_items[] = {
-  { "/_File",         NULL,         NULL, 0, "<Branch>" },
-  { "/File/Close",  
-         "",         (GtkItemFactoryCallback) close_menuitem_cb, 0, "<Item>" },
-  { "/_Options",      NULL,         NULL, 0, "<Branch>" },
-  { "/Options/Show controls",  
-         "v",         (GtkItemFactoryCallback) options_cb, 0, "<CheckItem>" },*/
-/*
-  { "/Options/Show lines",  
-         "",         (GtkItemFactoryCallback) options_cb, 1, "<CheckItem>" },
-  { "/Options/Show points",  
-         "" ,        (GtkItemFactoryCallback) options_cb, 2, "<CheckItem>" },
-  { "/Options/Line thickness",  
-         "" ,        NULL,           0, "<Branch>" },
-  { "/Options/Line thickness/Thin",  
-         "" ,        (GtkItemFactoryCallback) line_options_cb,   0, "<RadioItem>" },
-  { "/Options/Line thickness/Medium",  
-         "" ,        (GtkItemFactoryCallback) line_options_cb,   1, "/Options/Line thickness/Thin" },
-  { "/Options/Line thickness/Thick",  
-         "" ,        (GtkItemFactoryCallback) line_options_cb,   2, "/Options/Line thickness/Thin" },
-  { "/Options/Bitmap size",  
-         "" ,        NULL,           0, "<Branch>" },
-  { "/Options/Bitmap size/Small",  
-         "" ,        (GtkItemFactoryCallback) bitmap_size_cb, 0, "<RadioItem>" },
-  { "/Options/Bitmap size/Medium", 
-         "" ,        (GtkItemFactoryCallback) bitmap_size_cb, 1, "/Options/Bitmap size/Small" },
-  { "/Options/Bitmap size/Large",  
-         "" ,        (GtkItemFactoryCallback) bitmap_size_cb, 2, "/Options/Bitmap size/Small" },
-  { "/Options/Replot frequency",  
-         "" ,        NULL,           0, "<Branch>" },
-  { "/Options/Replot frequency/1",  
-         "" ,        (GtkItemFactoryCallback) replot_freq_cb, 1, "<RadioItem>" },
-  { "/Options/Replot frequency/2",  
-         "" ,        (GtkItemFactoryCallback) replot_freq_cb, 2, "/Options/Replot frequency/1" },
-  { "/Options/Replot frequency/4",  
-         "" ,        (GtkItemFactoryCallback) replot_freq_cb, 4, "/Options/Replot frequency/1" },
-  { "/Options/Replot frequency/8",  
-         "" ,        (GtkItemFactoryCallback) replot_freq_cb, 8, "/Options/Replot frequency/1" },
-  { "/Options/Replot frequency/16",  
-         "" ,        (GtkItemFactoryCallback) replot_freq_cb, 16,"/Options/Replot frequency/1" },
 
-};*/
 
 void
 tour1dpp_window_open (ggobid *gg) {
@@ -306,7 +264,7 @@ tour1dpp_window_open (ggobid *gg) {
 	
     dsp->t1d_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title (GTK_WINDOW (dsp->t1d_window), 
-      "projection pursuit - 1D");
+      "Projection Pursuit - 1D");
     g_signal_connect (G_OBJECT (dsp->t1d_window), "delete_event",
                         G_CALLBACK (close_wmgr_cb), (gpointer) dsp);
     /*gtk_window_set_policy (GTK_WINDOW (dsp->t1d_window), true, true, false);*/
@@ -520,13 +478,7 @@ tour1dpp_window_open (ggobid *gg) {
 
     gtk_widget_show_all (dsp->t1d_window);
 
-    /*-- Set the appropriate check menu items to true. -- dfs --*/
-/* comment out until the options are implemented
-    item = gtk_item_factory_get_widget (factory, "/Options/Show lines");
-    gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (item), true);
-    item = gtk_item_factory_get_widget (factory, "/Options/Show points");
-    gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (item), true);
-*/
+
   }
 
   alloc_optimize0_p(&dsp->t1d_pp_op, d->nrows_in_plot, dsp->t1d.nactive, 1);
