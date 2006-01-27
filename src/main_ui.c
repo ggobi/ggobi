@@ -762,6 +762,11 @@ action_jitter_cb(GtkAction *action, ggobid *gg)
 static void
 action_color_schemes_cb(GtkAction *action, ggobid *gg)
 {
+	svis_window_open(gg);
+}
+static void
+action_autobrush_cb(GtkAction *action, ggobid *gg)
+{
 	wvis_window_open(gg);
 }
 static void
@@ -880,6 +885,7 @@ static const gchar *main_ui_str =
 "			<menuitem action='VariableJittering'/>"
 "			<separator/>"
 "			<menuitem action='ColorSchemes'/>"
+"			<menuitem action='AutoBrushing'/>"
 "			<menuitem action='ColorAndGlyphGroups'/>"
 "			<separator/>"
 "			<menuitem action='CaseSubsettingAndSampling'/>"
@@ -936,6 +942,9 @@ static GtkActionEntry entries[] = {
 	},
 	{ "ColorSchemes", GTK_STOCK_SELECT_COLOR, "_Color Schemes", NULL, "Configure and pick color schemes",
 		G_CALLBACK(action_color_schemes_cb) 
+	},
+	{ "AutoBrushing", NULL, "_Automatic Brushing", NULL, "Apply color scheme along a variable",
+		G_CALLBACK(action_autobrush_cb) 
 	},
 	{ "ColorAndGlyphGroups", NULL, "Color & _Glyph Groups", NULL, "Configure color and glyph groups",
 		G_CALLBACK(action_color_glyph_groups_cb)
@@ -1218,7 +1227,7 @@ addPreviousFilesMenu(GGobiInitInfo *info, ggobid *gg)
 		  if(input && input->fileName) {
 			  gchar *action_name = g_strdup_printf("Shortcut_%d", i);
 			  GtkAction *action = gtk_action_new(action_name, input->fileName,
-			  						"Open this shortcut", GTK_STOCK_FILE); 
+							     "Open this shortcut", NULL /*GTK_STOCK_FILE*/); /* my gtk doesn't have this -- dfs 1.23.06 */
 			  g_signal_connect(G_OBJECT(action), "activate", 
 			  	G_CALLBACK(load_previous_file) , info->descriptions + i);
 			  g_object_set_data(G_OBJECT(action), "ggobi", gg);
