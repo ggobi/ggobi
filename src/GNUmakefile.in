@@ -70,6 +70,8 @@ SRC=\
     scatmat_ui.c \
     scatterplot.c \
     scatterplot_ui.c \
+    schemes.c \
+    schemes_ui.c \
     smooth_ui.c \
     sp_plot.c \
     sp_plot_axes.c \
@@ -169,7 +171,7 @@ libggobi.def: $(OBJ)
 	nm -g --defined-only $(OBJ) > tmp
 	sed -n '/^........ [T|C] _/s/^........ [T|C] _/ /p' tmp >> $@
 	rm tmp
-	
+
 libggobi.dll $(TOP)/lib/libggobi.dll: $(OBJ) libggobi.def
 	$(CC) $(SHLIB_LDFLAGS) -o $@ libggobi.def -Wl,--out-implib,$(TOP)/lib/libggobi.a $(OBJ) $(LIBS) 
 
