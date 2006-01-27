@@ -1066,6 +1066,8 @@ GGOBI(close)(ggobid *gg, gboolean closeWindow)
 
   if (gg->wvis.window) 
     gtk_widget_destroy (gg->wvis.window);
+  if (gg->svis.window)
+    gtk_widget_destroy (gg->svis.window);
 
   gg->close_pending = false;
   /* Now fix up the list of ggobi's */
