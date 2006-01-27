@@ -429,6 +429,7 @@ sphere_panel_open (ggobid *gg)
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
       "When this button is checked the correlation matrix is used to generate the PCs, otherwise the variance-covariance matrix is used",
       NULL);
+		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(btn), TRUE);
     g_signal_connect (G_OBJECT (btn), "toggled",
                         G_CALLBACK(vars_stdized_cb), (gpointer) gg);
     gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 1);

@@ -38,6 +38,8 @@ sphere_init (datad *d) {
 
   vectorf_init_null (&d->sphere.tform_mean);
   vectorf_init_null (&d->sphere.tform_stddev);
+
+	d->sphere.vars_stdized = TRUE;
 }
 
 void
