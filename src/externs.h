@@ -724,6 +724,8 @@ GtkWidget* widget_find_by_name (GtkWidget *, gchar *);
 void       widget_initialize (GtkWidget *w, gboolean initd);
 gboolean   widget_initialized (GtkWidget *w);
 void       writeall_window_open (ggobid *);
+void       svis_init (ggobid *gg);
+void       svis_window_open (ggobid *gg);
 void       wvis_init (ggobid *gg);
 void       wvis_window_open (ggobid *gg);
 void       xy_reproject (splotd *, greal **, datad *, ggobid *);
