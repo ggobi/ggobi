@@ -18,7 +18,7 @@ gboolean
 addToToolsMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 {
   static GtkActionEntry entry = {
-	"GGVis", NULL, "_ggvis", NULL, "Multi-dimensional scaling tool", 
+	"GGVis", NULL, "_ggvis (MDS)", NULL, "Multi-dimensional scaling tool", 
 		G_CALLBACK (show_ggvis_window)
   };
   GGOBI(addToolAction)(&entry, (gpointer)inst, gg);
@@ -392,7 +392,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
     "Perform multidimensional scaling (MDS) for the purpose of dissimilarity analysis; dissimilarities (distances) are provided as an edge variable.",
     NULL);
   group = gtk_radio_button_group (GTK_RADIO_BUTTON (radio1));
-  radio2 = gtk_radio_button_new_with_mnemonic (group, "Graph _layout");
+  radio2 = gtk_radio_button_new_with_mnemonic (group, "Graph _Layout");
   gtk_widget_set_name (GTK_WIDGET(radio2), "GRAPH_LAYOUT");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (ggv->tips), radio2,
     "Perform multidimensional scaling (MDS) for the purpose of laying out a graph.",

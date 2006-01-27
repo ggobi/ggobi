@@ -660,7 +660,7 @@ wvis_window_open (ggobid *gg)
 
     gg->wvis.window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title (GTK_WINDOW (gg->wvis.window),
-      "Automatic brushing by variable");
+      "Automatic Brushing by Variable");
     g_signal_connect (G_OBJECT (gg->wvis.window),
       "delete_event", G_CALLBACK (close_wmgr_cb), gg);
 

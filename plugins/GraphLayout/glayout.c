@@ -18,7 +18,7 @@ gboolean
 addToToolsMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 {
   static GtkActionEntry entry = {
-	"GraphLayout", NULL, "Graph _layout", NULL, "Layout graphs using graphviz", 
+	"GraphLayout", NULL, "Graph _Layout", NULL, "Layout graphs using graphviz", 
 		G_CALLBACK (show_glayout_window)
   };  
   GGOBI(addToolAction)(&entry, (gpointer)inst, gg);

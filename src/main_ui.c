@@ -1067,9 +1067,9 @@ make_ui (ggobid *gg)
   gg->tips = gtk_tooltips_new ();
 
   gg->main_window = window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-  gtk_window_set_title(window, "GGobi");
-  gtk_window_set_policy(window, true, true, false);
-  gtk_window_set_default_size(window, 400, 300);
+  gtk_window_set_title(GTK_WINDOW(window), "GGobi");
+  gtk_window_set_policy(GTK_WINDOW(window), true, true, false);
+  gtk_window_set_default_size(GTK_WINDOW(window), 400, 300);
 
   GGobi_widget_set (window, gg, true);
 

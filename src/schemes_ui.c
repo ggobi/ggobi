@@ -261,7 +261,7 @@ gboolean colors_remap (colorschemed *scheme, gboolean force, ggobid *gg)
   else if (!force && ncolors_used > scheme->n) {
 
     /* fatal: bail out with a warning */
-    quick_message ("The number of colors now in use is greater than than\nthe number of colors in the chosen color scheme.",
+    quick_message ("The number of colors now in use is greater than than\nthe number of colors in the chosen color scheme.  Please choose a color scheme with more colours, or use less colors in the plot.",
       false);
 
     remap_ok = false;   
@@ -403,16 +403,16 @@ svis_window_open (ggobid *gg)
   /*-- for colorscales --*/
   GtkWidget *hpane, *tr, *sw;
   static gchar *colorscaletype_lbl[UNKNOWN_COLOR_TYPE] = {
-    "DIVERGING",
-    "SEQUENTIAL",
-    "SPECTRAL",
-    "QUALITATIVE"};
+    "<b>Diverging</b>",
+    "<b>Sequential</b>",
+    "<b>Spectral</b>",
+    "<b>Qualitative</b>"};
 
   if (gg->svis.window == NULL) {
 
     gg->svis.window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title (GTK_WINDOW (gg->svis.window),
-      "Choose color scheme");
+      "Choose Color Scheme");
     g_signal_connect (G_OBJECT (gg->svis.window),
       "delete_event", G_CALLBACK (close_wmgr_cb), gg);
 
@@ -429,16 +429,18 @@ svis_window_open (ggobid *gg)
 #endif
 
     hpane = gtk_hpaned_new();
+    //gtk_paned_set_position (GTK_PANED(hpane), 150);
     gtk_container_add (GTK_CONTAINER (gg->svis.window), hpane);
 
     /* Color scheme tree */
     sw = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(sw), GTK_SHADOW_IN);
+		gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW(sw), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
     gtk_container_add (GTK_CONTAINER (hpane), sw);
 
     tr = createColorSchemeTree(UNKNOWN_COLOR_TYPE, colorscaletype_lbl,
       gg);
-    gtk_widget_set_size_request(sw, 200, 20);
+    gtk_widget_set_size_request(sw, 150, 20);
     gtk_container_add(GTK_CONTAINER(sw), tr);
 
 
@@ -482,7 +484,7 @@ svis_window_open (ggobid *gg)
     /* Drawing area */
     gg->svis.da = gtk_drawing_area_new ();
     gtk_widget_set_double_buffered(gg->svis.da, false);
-    gtk_widget_set_size_request (GTK_WIDGET (gg->svis.da), 400, 200);
+    gtk_widget_set_size_request (GTK_WIDGET (gg->svis.da), 300, 150);
     gtk_box_pack_start (GTK_BOX (vbox), gg->svis.da, false, false, 0);
 
     g_signal_connect (G_OBJECT (gg->svis.da),

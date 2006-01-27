@@ -19,7 +19,7 @@ gboolean
 addToToolsMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 {
   static GtkActionEntry entry = {
-	"GraphAction", NULL, "Graph _operations", NULL, "Perform misc operations on a graph", 
+	"GraphAction", NULL, "Graph _Operations", NULL, "Perform misc operations on a graph", 
 		G_CALLBACK (show_graphact_window)
   };
   GGOBI(addToolAction)(&entry, (gpointer)inst, gg);
