@@ -15,13 +15,6 @@
 */
 
 /*
- * It is my understanding that I'm supposed to use gdk_colormap_free_colors
- * to free anything I've allocated with gdk_colormap_alloc_color(s), but
- * it just isn't working to free all the wvis.color_map colors.   
- *    dfs, 10/30/2001
-*/
-
-/*
  * Something here should respond to a variable transformation event,
  * I think.  We don't yet have such an event, so I won't spend the 
  * time now to work out what the response should be.  dfs 9/10/2002
@@ -40,10 +33,7 @@ static gint xmargin = 20;
 static gint ymargin = 20;
 
 static void bin_counts_reset (gint jvar, datad *d, ggobid *gg);
-
-GtkWidget *createColorSchemeTree(int numTypes, gchar *schemeTypes[], ggobid *gg, GtkWidget *notebook);
 static void selection_made_cb (GtkTreeSelection *tree_sel, ggobid *gg);
-static void entry_set_scheme_name (ggobid *gg);
 
 /*--------------------------------------------------------------------*/
 /*      Notebook containing the variable list for each datad          */
@@ -65,16 +55,18 @@ wvis_variable_notebook_adddata_cb (ggobid *gg, datad *d, void *notebook)
     GtkWidget *tree_view;
     GtkSelectionMode mode = GTK_SELECTION_SINGLE;
     GCallback func = G_CALLBACK(selection_made_cb);
+
     tree_view = GTK_BIN (swin)->child;
     if (tree_view) {
-		GtkTreeSelection *tree_sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view));
-		mode = gtk_tree_selection_get_mode(tree_sel);
-		/* um is something supposed to happen here? mfl */
+	GtkTreeSelection *tree_sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view));
+	mode = gtk_tree_selection_get_mode(tree_sel);
+	/* um is something supposed to happen here? mfl */
       /*
        * should also be possible to retrieve the signal function that
        * responds to "select_row" signal
       */
     }
+
     variable_notebook_subwindow_add (d, func, NULL, GTK_WIDGET(notebook),
       all_vartypes, all_datatypes, gg);
     gtk_notebook_set_show_tabs (GTK_NOTEBOOK (notebook),
@@ -132,70 +124,6 @@ wvis_create_variable_notebook (GtkWidget *box, GtkSelectionMode mode,
   return notebook;
 }
 
-/*--------------------------------------------------------------------*/
-
-/*-------------------------------------------------------------------*/
-/*             Using colorschemed objects                            */
-/*-------------------------------------------------------------------*/
-
-void
-colorscheme_set_cb (GtkTreeSelection *sel, GtkTreeView* tree_view)
-{
-  ggobid *gg = GGobiFromWidget (GTK_WIDGET(tree_view), true);
-  gboolean rval = false;
-  GtkTreeModel *model;
-  datad *d;
-  gint selected_var;
-  colorschemed *scheme;
-  GtkTreeIter iter;
-  
-/*
- * gg->wvis sometimes has its own scheme, and then we'll use it.
- * If it's null, we use gg->activeColorScheme.  We update
- * gg->activeColorScheme to the value of scheme when the user asks.
-*/
-
-	if (!gtk_tree_selection_get_selected(sel, &model, &iter))
-		return;
-	
-	gtk_tree_model_get(model, &iter, 1, &scheme, -1);
-	
-  if (scheme) {
-    gg->wvis.scheme = scheme;
-    entry_set_scheme_name (gg);
-    colorscheme_init (scheme);
-  }
-
-/*-- delete this line once debugging is complete --*/
-  displays_plot (NULL, FULL, gg);
-
-  /*-- rebuild the drawing area in this window --*/
-/*
- * This is using two expose events, which is odd:  it's something
- * to do with getting the numbers of points in each bin to appear,
- * and there's probably a way to do it better.
-*/
-  tree_view = gtk_tree_selection_get_tree_view(sel);
-  if(tree_view != NULL) {
-      d = (datad *) g_object_get_data(G_OBJECT (tree_view), "datad");
-      selected_var = get_one_selection_from_tree_view (GTK_WIDGET(tree_view), d);
-  } else {
-      d = (datad *) g_slist_nth_data(gg->d, 0);
-      selected_var = 0;
-  }
-
-  if (d && selected_var != -1) {
-      g_signal_emit_by_name (G_OBJECT (gg->wvis.da), "expose_event",
-        (gpointer) gg, (gpointer) &rval);
-
-      bin_counts_reset (selected_var, d, gg);
-  }
-
-  g_signal_emit_by_name(G_OBJECT (gg->wvis.da), "expose_event",
-    (gpointer) gg, (gpointer) &rval);
-}
-
-
 /*-------------------------------------------------------------------------*/
 
 static void
@@ -205,8 +133,7 @@ bin_counts_reset (gint jvar, datad *d, ggobid *gg)
   gfloat val;
   vartabled *vt;
   gfloat min, max;
-  colorschemed *scheme = (gg->wvis.scheme != NULL) ?
-    gg->wvis.scheme : gg->activeColorScheme;
+  colorschemed *scheme = gg->activeColorScheme;
 
   if (jvar == -1)
     return;
@@ -221,7 +148,7 @@ bin_counts_reset (gint jvar, datad *d, ggobid *gg)
   for (m=0; m<d->nrows_in_plot; m++) {
     i = d->rows_in_plot.els[m];
     for (k=0; k<scheme->n; k++) {
-      val = min + gg->wvis.pct[k] * (max - min);
+       val = min + gg->wvis.pct[k] * (max - min);
       if (d->tform.vals[i][jvar] <= val) {
         gg->wvis.n[k]++;
         break;
@@ -238,23 +165,14 @@ record_colors_reset (gint selected_var, datad *d, ggobid *gg)
   gint nd = g_slist_length(gg->d);
   vartabled *vt;
   gfloat min, max, val;
-  colorschemed *scheme;
+  colorschemed *scheme = gg->activeColorScheme;
 
   if (selected_var < 0)
     return;
 
-  /*
-   * If the user is moving the bar boundaries, but just messing
-   * about with a preview color scheme without having applied it,
-   * then we're not going to reset the colors.
-  */
-  if (gg->wvis.scheme != NULL && gg->wvis.scheme != gg->activeColorScheme)
-    return;
-  
   vt = vartable_element_get (selected_var, d);
   min = vt->lim_tform.min;
   max = vt->lim_tform.max;
-  scheme = gg->activeColorScheme;
 
   for (m=0; m<d->nrows_in_plot; m++) {
     i = d->rows_in_plot.els[m];
@@ -352,9 +270,6 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg)
   gfloat *pct = gg->wvis.pct;
   gint *nearest_color = &gg->wvis.nearest_color;
   gint hgt;
-
-  if (gg->wvis.scheme != NULL)
-    scheme = gg->wvis.scheme;
 
   hgt = (w->allocation.height - 2*ymargin) / (scheme->n - 1);
 
@@ -510,6 +425,18 @@ static void update_method_cb (GtkWidget *w, ggobid *gg)
   gg->wvis.update_method = gtk_combo_box_get_active(GTK_COMBO_BOX(w));
 }
 
+static void alloc_pct (ggobid *gg)
+{
+  colorschemed *scheme = gg->activeColorScheme;
+  if (gg->wvis.npct != scheme->n) {
+    gg->wvis.npct = scheme->n;
+    gg->wvis.pct = (gfloat *) g_realloc (gg->wvis.pct,
+                                         gg->wvis.npct * sizeof (gfloat));
+    gg->wvis.n = (gint *) g_realloc (gg->wvis.n,
+                                     gg->wvis.npct * sizeof (gint));
+  }
+}
+
 static void
 da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
 {
@@ -517,11 +444,9 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
   gint x0, x1, k, hgt;
   gint x = xmargin;
   gint y = ymargin;
-  /*GdkPoint *points;*/
   gfloat diff;
   vartabled *vt;
-  colorschemed *scheme = (gg->wvis.scheme != NULL) ?
-    gg->wvis.scheme : gg->activeColorScheme;
+  colorschemed *scheme = gg->activeColorScheme;
 
   GtkWidget *tree_view = get_tree_view_from_object (G_OBJECT (w));
   datad *d = NULL;
@@ -676,151 +601,16 @@ selection_made_cb (GtkTreeSelection *tree_sel, ggobid *gg)
     gtk_widget_set_sensitive (btn, true);
 }
 
-/*
- * Find out whether it's possible to use the new scheme
- * without losing brushing information.  If so, go ahead
- * and change index values if that's required
- *
- * If force is true, remap even if the number of colors
- * is too large.
-*/
-/*-- move this to color.c --*/
-gboolean colors_remap (colorschemed *scheme, gboolean force, ggobid *gg)
-{
-  gint i, k;
-  gboolean all_colors_p[MAXNCOLORS];
-  GSList *l;
-  datad *d;
-  gushort colors_used[MAXNCOLORS];
-  gint maxcolorid, ncolors_used;
-  gboolean remap_ok = true;
-
-  for (k=0; k<MAXNCOLORS; k++)
-    all_colors_p[k] = false;
-
-  /*-- find out all the colors (indices) are currently in use --*/
-  for (l = gg->d; l; l = l->next) {
-    d = (datad *) l->data;
-    datad_colors_used_get (&ncolors_used, colors_used, d, gg);
-    for (k=0; k<ncolors_used; k++)
-      all_colors_p[colors_used[k]] = true;
-  }
- 
-  /*-- find out how many colors are currently in use --*/
-  ncolors_used = 0;
-  for (k=0; k<MAXNCOLORS; k++)
-    if (all_colors_p[k])
-      ncolors_used++;
-
-  /*-- find the largest color index currently in use --*/
-  maxcolorid = -1;
-  for (k=MAXNCOLORS-1; k>0; k--) {
-    if (all_colors_p[k]) {
-      maxcolorid = k;
-      break;
-    }
-  }
-
-  if (maxcolorid < scheme->n)
-    /* no problem, go right ahead */
-    ;
-  else if (!force && ncolors_used > scheme->n) {
-
-    /* fatal: bail out with a warning */
-    quick_message ("The number of colors now in use is greater than than\nthe number of colors in the chosen color scheme.",
-      false);
-
-    remap_ok = false;   
-  } else if (maxcolorid >= scheme->n) {
-    /*-- build the vector that will be used to reset the current indices --*/
-    gint *newind = (gint *) g_malloc ((maxcolorid+1) * sizeof (gint));
-    gint n = 0;
-
-    for (k=0; k<=maxcolorid; k++) {
-      if (all_colors_p[k]) {
-        newind[k] = n;
-
-        /*
-         * try to achieve a decent spread of the color values,
-         * which is helpful in most color maps
-        */
-        n+= ((scheme->n+1)/ncolors_used);
-        /*-- make sure we haven't gone too far --*/
-        if (n >= scheme->n-1)  n = scheme->n-1;
-
-      }
-    }
-
-    for (l = gg->d; l; l = l->next) {
-      d = (datad *) l->data;
-      for (i=0; i<d->nrows; i++) {
-        d->color.els[i] = newind[ d->color.els[i] ];
-        d->color_now.els[i] = newind[ d->color_now.els[i] ];
-        /*-- what about color_prev?  --*/
-      }
-    }
-    g_free (newind);
-
-  } else {
-    g_printerr ("nothing else should possibly happen, no?\n");
-  }
-
-  return remap_ok;
-}
-
-static void scale_set_cb (GtkWidget *w, ggobid* gg)
-{
-  GtkWidget *tree_view = get_tree_view_from_object (G_OBJECT (w));
-  datad *d = NULL;
-  gboolean rval = false;
-
-  if(tree_view)
-    d = (datad *) g_object_get_data(G_OBJECT (tree_view), "datad");
-
-  /*
-   * If we've been using gg->wvis.scheme, set gg->activeColorScheme
-   * to the current scheme.
-  */
-  if (gg->wvis.scheme) {
-    colorschemed *scheme = gg->wvis.scheme;
-
-    /*-- if no current color index is too high, continue --*/
-    if (!colors_remap (scheme, false, gg))
-      return;
-
-    gg->activeColorScheme = scheme;
-    gg->wvis.scheme = NULL;
-  }
-
-  displays_plot (NULL, FULL, gg);
-  g_signal_emit_by_name(G_OBJECT (gg->wvis.da), "expose_event",
-    (gpointer) gg, (gpointer) &rval);
-
-  entry_set_scheme_name (gg);
-
-  symbol_window_redraw (gg);
-  cluster_table_update (d, gg);
-}
 
 static void scale_apply_cb (GtkWidget *w, ggobid* gg)
 {
   GtkWidget *tree_view = get_tree_view_from_object (G_OBJECT (w));
   datad *d = (datad *) g_object_get_data(G_OBJECT (tree_view), "datad");
   gint selected_var = get_one_selection_from_tree_view (tree_view, d);
-  colorschemed *scheme = (gg->wvis.scheme != NULL) ?
-    gg->wvis.scheme : gg->activeColorScheme;
+  colorschemed *scheme = gg->activeColorScheme;
 
   if (d && selected_var != -1) {
     gboolean rval = false;
-
-    /*
-     * If we've been using gg->wvis.scheme, set gg->activeColorScheme
-     * to this scheme.
-    */
-    if (gg->wvis.scheme) {
-      gg->activeColorScheme = gg->wvis.scheme;
-      entry_set_scheme_name (gg);
-    }
 
     record_colors_reset (selected_var, d, gg);
     clusters_set (d, gg);
@@ -839,23 +629,12 @@ static void scale_apply_cb (GtkWidget *w, ggobid* gg)
   }
 }
 
-static void
-entry_set_scheme_name (ggobid *gg)
-{
-  gtk_entry_set_text (GTK_ENTRY (gg->wvis.entry_preview),
-    (gg->wvis.scheme != NULL) ? gg->wvis.scheme->name :
-                                gg->activeColorScheme->name);
-
-  gtk_entry_set_text (GTK_ENTRY (gg->wvis.entry_applied),
-                                gg->activeColorScheme->name);
-}
-
 /* Can close the window via an event or in the ggobi_close routine.
    The former (i.e. events) are more extensible and localized. */
 void
 close_wvis_window_cb(GtkWidget *w, GdkEventButton *event, ggobid *gg)
 {
-fprintf(stderr, "Closing the color scheme window\n");fflush(stderr);
+fprintf(stderr, "Closing the automatic brushing window\n");fflush(stderr);
 #if 0
    gtk_widget_destroy(gg->wvis.window);
    gg->wvis.window = NULL;
@@ -865,19 +644,9 @@ fprintf(stderr, "Closing the color scheme window\n");fflush(stderr);
 void
 wvis_window_open (ggobid *gg) 
 {
-  GtkWidget *vbox;
-  GtkWidget *frame1, *vb1, *hb;
+  GtkWidget *vbox, *hb;
   GtkWidget *notebook = NULL;
-  GtkWidget *btn, *vb, *opt, *label;
-
-  /*-- for colorscales --*/
-  GtkWidget *hpane, *tr, *sw;
-  GtkWidget *frame2, *vbs;
-  static gchar *colorscaletype_lbl[UNKNOWN_COLOR_TYPE] = {
-    "DIVERGING",
-    "SEQUENTIAL",
-    "SPECTRAL",
-    "QUALITATIVE"};
+  GtkWidget *btn, *opt, *label;
   static gchar *const binning_method_lbl[] = {
     "Constant bin width",
     "Constant bin count (approx)"};
@@ -885,16 +654,13 @@ wvis_window_open (ggobid *gg)
     "Update on mouse release",
     "Update continuously"};
 
-#if 0
-  if (gg->d == NULL || g_slist_length (gg->d) == 0)
-    return;
-#endif
+  alloc_pct (gg);
 
   if (gg->wvis.window == NULL) {
 
     gg->wvis.window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title (GTK_WINDOW (gg->wvis.window),
-      "color schemes");
+      "Automatic brushing by variable");
     g_signal_connect (G_OBJECT (gg->wvis.window),
       "delete_event", G_CALLBACK (close_wmgr_cb), gg);
 
@@ -910,159 +676,23 @@ wvis_window_open (ggobid *gg)
                         (gpointer) gg);
 #endif
 
-    hpane = gtk_hpaned_new();
-    gtk_container_add (GTK_CONTAINER (gg->wvis.window), hpane);
-
-    sw = gtk_scrolled_window_new(NULL, NULL);
-	gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(sw), GTK_SHADOW_IN);
-    gtk_container_add (GTK_CONTAINER (hpane), sw);
-
     vbox = gtk_vbox_new (false, 0);
     gtk_container_set_border_width (GTK_CONTAINER (vbox), 5);
     gtk_box_set_spacing (GTK_BOX(vbox), 5);
-
-    gtk_container_add (GTK_CONTAINER (hpane), vbox);    
-
-/*
- * First the frame for the section on choosing new colormaps,
- * then the graphics, and finally the section on applying
- * the colorscheme by variable -- does this make sense?
- *
- * The awkwardness in sequencing here is that the notebook
- * has to be defined early because it's used by the color
- * scheme section, but I prefer to show it later.
-*/
-
-  /*
-   * preview of section on choosing new colormap: place the frame
-  */
-    frame2 = gtk_frame_new ("Choose color scheme");
-    //gtk_frame_set_shadow_type (GTK_FRAME (frame2), GTK_SHADOW_ETCHED_OUT);
-    gtk_box_pack_start (GTK_BOX (vbox), frame2, false, false, 1);
-
-    /*-- preview of section on colors, symbols --*/
-    vb = gtk_vbox_new (false, 0);
-    gtk_box_pack_start (GTK_BOX (vbox), vb, false, false, 0);
-
-    frame1 = gtk_frame_new ("Apply color scheme by variable");
-    //gtk_frame_set_shadow_type (GTK_FRAME (frame1), GTK_SHADOW_ETCHED_OUT);
-    gtk_box_pack_start (GTK_BOX (vbox), frame1, true, true, 1);
-
-/*  */
-    vb1 = gtk_vbox_new (false, 0);
-    gtk_container_set_border_width (GTK_CONTAINER (vb1), 5);
-    gtk_container_add (GTK_CONTAINER (frame1), vb1);
+    gtk_container_add (GTK_CONTAINER (gg->wvis.window), vbox);    
 
     /* Create a notebook, set the position of the tabs */
-    notebook = wvis_create_variable_notebook (vb1, GTK_SELECTION_SINGLE,
+    notebook = wvis_create_variable_notebook (vbox, GTK_SELECTION_SINGLE,
       G_CALLBACK(selection_made_cb), gg);
     gtk_widget_set_sensitive(notebook, true);
 
-    tr = createColorSchemeTree(UNKNOWN_COLOR_TYPE, colorscaletype_lbl,
-      gg, notebook);
-    gtk_widget_set_size_request(sw, 200, 20);
-    gtk_container_add(GTK_CONTAINER(sw), tr);
 
-    /*-- Insert an option menu for choosing the method of binning --*/
-    opt = gtk_combo_box_new_text ();
-    gtk_widget_set_name (opt, "WVIS:binning_method");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-      "Select a binning method", NULL);
-    gtk_box_pack_start (GTK_BOX (vb1), opt,
-      false, false, 0);
-    populate_combo_box (opt, (gchar**) binning_method_lbl, G_N_ELEMENTS(binning_method_lbl),
-      G_CALLBACK(binning_method_cb), gg);
-
-  /*
-   * section on choosing new colormap
-  */
-
-    vbs = gtk_vbox_new (false, 0);
-    gtk_container_set_border_width (GTK_CONTAINER (vbs), 5);
-    gtk_container_add (GTK_CONTAINER (frame2), vbs);
-
-#if 0
-    opt = gtk_option_menu_new ();
-    menu = gtk_menu_new ();
-
-    colorscheme_add_to_menu (menu, "Default", NULL,
-      G_CALLBACK(colorscheme_set_cb), notebook, gg);
- 
-    for (n=0; n<ncolorscaletype_lbl; n++, i++) {
-      colorscheme_add_to_menu (menu, colorscaletype_lbl[n], NULL,
-       NULL, notebook, gg);
-      for (l = gg->colorSchemes; l; l = l->next, i++) {
-        scheme = (colorschemed *) l->data;
-        if (scheme->type == n) {
-          colorscheme_add_to_menu (menu, scheme->name, scheme,
-            G_CALLBACK(colorscheme_set_cb), notebook, gg);
-  if(strcmp(scheme->name, gg->activeColorScheme->name) == 0) {
-/*XX Fix this - off by some quantity because Debby didn't use trees. :-) */
-      currentSelection = i + 2;
-  }
-}
-      }
-    }
-
-    gtk_option_menu_set_menu (GTK_OPTION_MENU (opt), menu);
-    gtk_option_menu_set_history(GTK_OPTION_MENU (opt), currentSelection);
-
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-      "Choose a color scale", NULL);
-
-    gtk_box_pack_start (GTK_BOX (vbs), opt, false, false, 1);
-#endif
-
-    hb = gtk_hbox_new (true, 0);
-    gtk_box_pack_start (GTK_BOX (vbs), hb, true, true, 5);
-    label = gtk_label_new_with_mnemonic ("Color scheme (_preview)");
-    gtk_misc_set_alignment (GTK_MISC(label), 0, .5);
-    gtk_box_pack_start (GTK_BOX (hb), label, true, true, 0);
-    gg->wvis.entry_preview = gtk_entry_new();
-	gtk_label_set_mnemonic_widget(GTK_LABEL(label), gg->wvis.entry_preview);
-    gtk_editable_set_editable (GTK_EDITABLE (gg->wvis.entry_preview), false);
-    /*entry_set_scheme_name (gg);*/
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->wvis.entry_preview,
-      "The name of the color scheme whose colors are displayed below.  This may be the currently active color scheme, or the scheme you're previewing using the tree to the left left.",
-      NULL);
-    gtk_box_pack_start (GTK_BOX (hb), gg->wvis.entry_preview, true, true, 0);
-
-    btn = gtk_button_new_with_mnemonic ("Apply color scheme to _brushing colors");
-    g_object_set_data(G_OBJECT (btn), "notebook", notebook);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-      "Make this the current color scheme for brushing in ggobi, preserving current color groups.  If the number of colors in the new scheme is less than the number of colors currently in use, this won't work.",
-      NULL);
-    gtk_box_pack_start (GTK_BOX (vbs), btn, false, false, 0);
-    g_signal_connect (G_OBJECT (btn), "clicked",
-                        G_CALLBACK (scale_set_cb), gg);
-    gtk_widget_set_name (btn, "WVIS:setcolorscheme");
-
-    hb = gtk_hbox_new (true, 0);
-    gtk_box_pack_start (GTK_BOX (vbs), hb, true, true, 5);
-    label = gtk_label_new_with_mnemonic ("Color scheme (a_pplied)");
-    gtk_misc_set_alignment (GTK_MISC(label), 0, .5);
-    gtk_box_pack_start (GTK_BOX (hb), label, true, true, 0);
-    gg->wvis.entry_applied = gtk_entry_new();
-	gtk_label_set_mnemonic_widget(GTK_LABEL(label), gg->wvis.entry_applied);
-    gtk_editable_set_editable (GTK_EDITABLE (gg->wvis.entry_applied), false);
-    entry_set_scheme_name (gg);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->wvis.entry_applied,
-      "The name of the currently active color scheme.",
-      NULL);
-    gtk_box_pack_start (GTK_BOX (hb), gg->wvis.entry_applied, true, true, 0);
-  /**/
-
-    /*-- colors, symbols --*/
     /*-- now we get fancy:  draw the scale, with glyphs and colors --*/
-/*
-    vb = gtk_vbox_new (false, 0);
-    gtk_box_pack_start (GTK_BOX (vbox), vb, false, false, 0);
-*/
     gg->wvis.da = gtk_drawing_area_new ();
     gtk_widget_set_double_buffered(gg->wvis.da, false);
     gtk_widget_set_size_request (GTK_WIDGET (gg->wvis.da), 400, 200);
     g_object_set_data(G_OBJECT (gg->wvis.da), "notebook", notebook);
-    gtk_box_pack_start (GTK_BOX (vb), gg->wvis.da, false, false, 0);
+    gtk_box_pack_start (GTK_BOX (vbox), gg->wvis.da, false, false, 0);
 
     g_signal_connect (G_OBJECT (gg->wvis.da),
                         "configure_event",
@@ -1085,36 +715,48 @@ wvis_window_open (ggobid *gg)
                | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK
                | GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK);
 
-    /*-- add an hbox to hold a button and a menu --*/
+    /*-- hbox to hold the options --*/
     hb = gtk_hbox_new (false, 2);
-    gtk_box_pack_start (GTK_BOX (vb1), hb, false, false, 0);
+    gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 0);
 
-    btn = gtk_button_new_from_stock (GTK_STOCK_APPLY);
-    g_object_set_data(G_OBJECT (btn), "notebook", notebook);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-      "Apply the color scale, using the values of the variable selected in the list above",
-      NULL);
-    gtk_box_pack_start (GTK_BOX (hb), btn, true, true, 0);
-    g_signal_connect (G_OBJECT (btn), "clicked",
-                        G_CALLBACK (scale_apply_cb), gg);
-    gtk_widget_set_name (btn, "WVIS:apply");
-    gtk_widget_set_sensitive (btn, false);
+    /*-- option menu for choosing the method of binning --*/
+    opt = gtk_combo_box_new_text ();
+    gtk_widget_set_name (opt, "WVIS:binning_method");
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
+      "Select a binning method", NULL);
+    gtk_box_pack_start (GTK_BOX (hb), opt,
+      false, false, 0);
+    populate_combo_box (opt, (gchar**) binning_method_lbl, G_N_ELEMENTS(binning_method_lbl),
+      G_CALLBACK(binning_method_cb), gg);
 
     /*-- option menu for choosing the method of updating --*/
+    /* This should be a checkbox, I think ... */
     opt = gtk_combo_box_new_text ();
-    gtk_widget_set_name (opt, "WVIS:update_method");
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-      "How to update the displays in response to movements of the sliders (works after a color scheme has been applied by variable)",
+      "How to update the displays in response to movements of the sliders",
       NULL);
     gtk_box_pack_start (GTK_BOX (hb), opt, true, true, 0);
     populate_combo_box (opt, (gchar**) update_method_lbl, G_N_ELEMENTS(update_method_lbl),
       G_CALLBACK(update_method_cb), gg);
 
-    /*-- add a close button --*/
+    /*-- hbox for buttons --*/
     gtk_box_pack_start (GTK_BOX (vbox), gtk_hseparator_new(),
       false, true, 2);
     hb = gtk_hbox_new (false, 2);
-    gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 1);
+    gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 0);
+
+    /* Apply button */
+    btn = gtk_button_new_from_stock (GTK_STOCK_APPLY);
+    g_object_set_data(G_OBJECT (btn), "notebook", notebook);
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
+      "Apply the color scale, using the values of the variable selected in the list above",
+      NULL);
+    gtk_box_pack_start (GTK_BOX (hb), btn, true, true, 1);
+    g_signal_connect (G_OBJECT (btn), "clicked",
+                        G_CALLBACK (scale_apply_cb), gg);
+    gtk_widget_set_name (btn, "WVIS:apply");
+
+
 
     btn = gtk_button_new_from_stock (GTK_STOCK_CLOSE);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
@@ -1128,73 +770,3 @@ wvis_window_open (ggobid *gg)
   gdk_window_raise (gg->wvis.window->window);
 }
 
-GtkWidget *createSchemeColorsTree(colorschemed *scheme);
-
-/**
- Create the tree displaying the colorscheme information.
- This displays the different levels:
-    types of schemes, 
-    different schemes within each type, 
-    colors within each scheme.
- 
- */
-GtkWidget *
-createColorSchemeTree(gint numTypes, gchar *schemeTypes[], ggobid *gg,
-  GtkWidget *notebook)
-{
-  //GtkWidget *item;
-  //GtkWidget **trees, *top;
-  /*GtkWidget *tree;*/
-  GtkWidget *tree_view;
-  GtkTreeStore *model;
-  GtkTreeIter *iters;
-  gint n;
-  GList *l;
-  colorschemed *scheme;
-
-  model = gtk_tree_store_new(2, G_TYPE_STRING, G_TYPE_POINTER);
-  
-  iters = g_new(GtkTreeIter, numTypes);
-  for (n = 0; n < numTypes; n++) {
-    gtk_tree_store_append(GTK_TREE_STORE(model), &iters[n], NULL);
-	gtk_tree_store_set(GTK_TREE_STORE(model), &iters[n], 0, schemeTypes[n], 1, NULL, -1);
-  }
-
-  for(l = gg->colorSchemes; l ; l = l->next) {
-	  GtkTreeIter iter;
-	  scheme = (colorschemed *) l->data;
-	  gtk_tree_store_append(GTK_TREE_STORE(model), &iter, &iters[scheme->type]);
-	  gtk_tree_store_set(GTK_TREE_STORE(model), &iter, 0, scheme->name, 1, scheme, -1);
-  }
-
-  tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(model));
-  GGobi_widget_set(tree_view, gg, true);
-  g_object_set_data(G_OBJECT (tree_view), "notebook", notebook); 
-  
-  populate_tree_view(tree_view, NULL, 1, false, GTK_SELECTION_SINGLE,
-  	G_CALLBACK(colorscheme_set_cb), tree_view);
-  
-  return(tree_view);
-}
-#if 0
-GtkWidget *
-createSchemeColorsTree(colorschemed *scheme)
-{
-  GtkWidget *tree, *item;
-  gchar *name;
-  gint n, i;
-
-  n = scheme->n;
-  tree = gtk_tree_new();
-  for(i = 0; i < n; i++) {
-    name = g_array_index(scheme->colorNames, gchar *, i);
-    if(!name)
-      name = "missing color name";
-    item = gtk_tree_item_new_with_label(name);
-    gtk_tree_append(GTK_TREE(tree), item);
-    gtk_widget_show(item);
-  }
-
-  return(tree);
-}
-#endif
