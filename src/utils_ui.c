@@ -388,6 +388,7 @@ variable_notebook_subwindow_add (datad *d, GCallback func, gpointer func_data,
   swin = gtk_scrolled_window_new (NULL, NULL);
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (swin),
     GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
+  gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW(swin), GTK_SHADOW_NONE);
 
   g_object_set_data(G_OBJECT(swin), "datad", d);  /*setdata*/
 /*

@@ -440,7 +440,7 @@ varpanel_make (GtkWidget *parent, ggobid *gg) {
   gg->selvarfg_GC = NULL;
 
   gg->varpanel_ui.notebook = gtk_notebook_new ();
-	gtk_notebook_set_show_border (GTK_NOTEBOOK (gg->varpanel_ui.notebook), FALSE);
+  gtk_notebook_set_show_border (GTK_NOTEBOOK (gg->varpanel_ui.notebook), FALSE);
   gtk_notebook_set_tab_pos (GTK_NOTEBOOK (gg->varpanel_ui.notebook),
     GTK_POS_TOP);
   g_signal_connect (G_OBJECT (gg->varpanel_ui.notebook), "switch-page",
@@ -474,7 +474,9 @@ varpanel_clear (datad *d, ggobid *gg)
 }
 
 
-/*-- for each datad, a scrolled window, vbox, hbox, togglebuttons and label --*/
+
+/*-- for each datad:  hpane, ebox, scrolled window, vbox;
+     in varpanel_add_row, an hbox, togglebuttons and label --*/
 void 
 varpanel_populate (datad *d, ggobid *gg)
 {
@@ -485,7 +487,6 @@ varpanel_populate (datad *d, ggobid *gg)
   /*-- we don't know the length of gg->d when the notebook is created --*/
   gtk_notebook_set_show_tabs (GTK_NOTEBOOK (gg->varpanel_ui.notebook),
     nd > 1);
-
 
   /*-- create a paned widget --*/
   d->varpanel_ui.hpane = gtk_hpaned_new ();
@@ -513,6 +514,8 @@ varpanel_populate (datad *d, ggobid *gg)
   /*-- create a scrolled window, and put it in the ebox --*/
   d->vcbox_ui.swin = gtk_scrolled_window_new (NULL, NULL);
 
+  gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW(d->vcbox_ui.swin), GTK_SHADOW_NONE);
+
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (d->vcbox_ui.swin),
     GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
   gtk_container_add (GTK_CONTAINER (d->vcbox_ui.ebox), d->vcbox_ui.swin);
@@ -522,7 +525,16 @@ varpanel_populate (datad *d, ggobid *gg)
   gtk_scrolled_window_add_with_viewport (
     GTK_SCROLLED_WINDOW (d->vcbox_ui.swin),
     d->vcbox_ui.vbox);
-  
+
+  {  
+    GList *children;
+    GtkWidget *foo;
+    children = gtk_container_get_children (GTK_CONTAINER (d->vcbox_ui.swin));
+    foo = g_list_nth_data (children, 0);
+    if (GTK_IS_VIEWPORT(foo)) {
+      gtk_viewport_set_shadow_type (GTK_VIEWPORT(foo), GTK_SHADOW_NONE);
+    }
+  }
   gtk_widget_show_all (d->varpanel_ui.hpane);
   gdk_flush ();
 

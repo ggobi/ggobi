@@ -393,6 +393,7 @@ vartable_subwindow_init (datad *d, ggobid *gg)
 
   /* Pack each tree_view into a scrolled window */
   sw = gtk_scrolled_window_new (NULL, NULL);
+  gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW(sw), GTK_SHADOW_NONE);
  
 /*
  * Page for real, counter and integer variables
@@ -439,6 +440,7 @@ pages any more!
   gtk_notebook_append_page (GTK_NOTEBOOK (nbook), sw, wlbl);
 
   sw = gtk_scrolled_window_new (NULL, NULL);
+  gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW(sw), GTK_SHADOW_NONE);
 
 /*
  * Page for categorical variables
