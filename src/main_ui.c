@@ -925,7 +925,7 @@ static GtkActionEntry entries[] = {
 	{ "VariableTransformation", GTK_STOCK_CONVERT, "Variable _Transformation", NULL, 
 		"Perform transformations on the dataset's variables", G_CALLBACK(action_transform_cb)
 	},
-	{ "Sphering", GTK_STOCK_JUMP_TO, "_Sphering",  NULL, "Open a panel to perform sphering",
+	{ "Sphering", GTK_STOCK_JUMP_TO, "_Sphering (PCA)",  NULL, "Open a panel to perform sphering",
 		G_CALLBACK(action_sphere_cb) 
 	},
 	#ifdef INFERENCE_IMPLEMENTED /* to do */

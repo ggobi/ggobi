@@ -33,7 +33,7 @@ static void
 stdin_empty (gint arg)
 {
   if (!gotone) {
-    g_printerr ("ggobi requires a filename or some data from stdin\n");
+    g_printerr ("GGobi requires a filename or some data from stdin\n");
     exit (0);
   }
 }

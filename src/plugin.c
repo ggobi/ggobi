@@ -351,7 +351,7 @@ showPluginInfo(GList *plugins, GList *inputPlugins, ggobid *gg)
 
   win = gtk_window_new(GTK_WINDOW_TOPLEVEL);
   gtk_window_set_default_size(GTK_WINDOW(win), 850, 200);
-  gtk_window_set_title(GTK_WINDOW(win), "About plugins");
+  gtk_window_set_title(GTK_WINDOW(win), "About Plugins");
   
   main_vbox = gtk_notebook_new();
 

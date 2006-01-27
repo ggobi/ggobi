@@ -408,7 +408,7 @@ sphere_panel_open (ggobid *gg)
 
     gg->sphere_ui.window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title (GTK_WINDOW (gg->sphere_ui.window),
-      "sphere variables");
+      "Sphere Variables");
     g_signal_connect (G_OBJECT (gg->sphere_ui.window), "delete_event",
                         G_CALLBACK (close_wmgr_cb), (gpointer) gg);
     gtk_container_set_border_width (GTK_CONTAINER (gg->sphere_ui.window),

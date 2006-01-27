@@ -342,7 +342,7 @@ varpanel_add_row (gint j, datad *d, ggobid *gg)
 
   box = gtk_hbox_new (false, 2);
   gtk_box_pack_start (GTK_BOX (d->vcbox_ui.vbox),
-    box, false, false, 0);
+    box, false, false, 1);
 
   xw = ggobi_noop_toggle_button_new_with_label (" X ");
   gtk_box_pack_start (GTK_BOX (box), xw, false, false, 2);
@@ -440,6 +440,7 @@ varpanel_make (GtkWidget *parent, ggobid *gg) {
   gg->selvarfg_GC = NULL;
 
   gg->varpanel_ui.notebook = gtk_notebook_new ();
+	gtk_notebook_set_show_border (GTK_NOTEBOOK (gg->varpanel_ui.notebook), FALSE);
   gtk_notebook_set_tab_pos (GTK_NOTEBOOK (gg->varpanel_ui.notebook),
     GTK_POS_TOP);
   g_signal_connect (G_OBJECT (gg->varpanel_ui.notebook), "switch-page",
@@ -511,6 +512,7 @@ varpanel_populate (datad *d, ggobid *gg)
 
   /*-- create a scrolled window, and put it in the ebox --*/
   d->vcbox_ui.swin = gtk_scrolled_window_new (NULL, NULL);
+
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (d->vcbox_ui.swin),
     GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
   gtk_container_add (GTK_CONTAINER (d->vcbox_ui.ebox), d->vcbox_ui.swin);

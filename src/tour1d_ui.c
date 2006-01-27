@@ -433,7 +433,7 @@ static void tour1dadv_window_open (ggobid *gg)
   if (window == NULL) {
     
     window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_title (GTK_WINDOW (window), "advanced tour");
+    gtk_window_set_title (GTK_WINDOW (window), "Advanced Tour");
     
     gtk_container_set_border_width (GTK_CONTAINER (window), 10);
 

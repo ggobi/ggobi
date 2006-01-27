@@ -106,7 +106,7 @@ writeall_window_open (ggobid *gg) {
     gg->save.window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     g_signal_connect (G_OBJECT (gg->save.window), "delete_event",
                         G_CALLBACK (delete_cb), (gpointer) gg);
-    gtk_window_set_title (GTK_WINDOW (gg->save.window), "create ggobi file set");
+    gtk_window_set_title (GTK_WINDOW (gg->save.window), "Create GGobi File Set");
     
     gtk_container_set_border_width (GTK_CONTAINER (gg->save.window), 10);
 

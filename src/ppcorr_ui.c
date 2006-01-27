@@ -72,7 +72,7 @@ ctourpp_window_open (ggobid *gg)
     window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     g_signal_connect (G_OBJECT (window), "delete_event",
                         G_CALLBACK (hide_cb), (gpointer) NULL);
-    gtk_window_set_title (GTK_WINDOW (window), "projection pursuit");
+    gtk_window_set_title (GTK_WINDOW (window), "Projection Pursuit");
     //gtk_window_set_policy (GTK_WINDOW (window), true, true, false);
     gtk_container_set_border_width (GTK_CONTAINER (window), 5);
 

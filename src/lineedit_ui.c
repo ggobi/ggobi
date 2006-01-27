@@ -127,7 +127,7 @@ add_record_dialog_open (datad *d, datad *e, displayd *dsp, ggobid *gg)
   else dtarget = d;
 
   dialog = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW(dialog), "Add a record");
+  gtk_window_set_title (GTK_WINDOW(dialog), "Add a Record");
 
   table = gtk_table_new (5, 2, false);
   gtk_box_pack_start (GTK_BOX(GTK_DIALOG (dialog)->vbox),

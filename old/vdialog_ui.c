@@ -74,7 +74,7 @@ vardialog_open (ggobid *gg, gchar *title)
     vardialog_row_append (j, list, gg);
 
   /* It isn't necessary to shadow the border, but it looks nice */
-  gtk_clist_set_shadow_type (GTK_CLIST (list), GTK_SHADOW_OUT);
+  //gtk_clist_set_shadow_type (GTK_CLIST (list), GTK_SHADOW_OUT);
 
   gtk_container_add (GTK_CONTAINER (scrolled_window), list);
   gtk_widget_show (list);

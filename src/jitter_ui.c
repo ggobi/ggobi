@@ -116,7 +116,7 @@ jitter_window_open (ggobid *gg) {
 
       g_signal_connect (G_OBJECT (gg->jitter_ui.window), "delete_event",
                           G_CALLBACK (close_wmgr_cb), (gpointer) gg);
-      gtk_window_set_title (GTK_WINDOW (gg->jitter_ui.window), "jitter data");
+      gtk_window_set_title (GTK_WINDOW (gg->jitter_ui.window), "Jitter Data");
     
       gtk_container_set_border_width (GTK_CONTAINER (gg->jitter_ui.window), 10);
 

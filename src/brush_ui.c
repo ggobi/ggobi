@@ -515,7 +515,7 @@ void cpanel_brush_make(ggobid * gg)
                                  5);
 
  /*-- button: open symbol panel --*/
-  btn = gtk_button_new_with_mnemonic("_Choose color & glyph ...");
+  btn = gtk_button_new_with_mnemonic("_Choose color & glyph...");
   gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), btn,
     "Open panel for choosing color and glyph", NULL);
   g_signal_connect(G_OBJECT(btn), "clicked",
