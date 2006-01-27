@@ -242,6 +242,7 @@ make_ggobi(GGobiOptions * options, gboolean processEvents, ggobid * gg)
   special_colors_init (gg);
 
   wvis_init(gg);
+  svis_init(gg);
   make_ui(gg);
 
   /* If the user specified a data file on the command line, then 
