@@ -44,14 +44,10 @@ scale_pan_reset (displayd *display) {
 
 void
 scale_zoom_reset (displayd *dsp) {
-  /*gint projection = projection_get (gg);*/
   ggobid *gg = dsp->ggobi;
   splotd *sp = gg->current_splot;
   
-  /*  if (projection == TOUR2D)
-    sp->tour_scale.x = sp->tour_scale.y = TOUR_SCALE_DEFAULT;
-    else*/
-    sp->scale.x = sp->scale.y = SCALE_DEFAULT;
+  sp->scale.x = sp->scale.y = SCALE_DEFAULT;
 
   splot_plane_to_screen (dsp, &dsp->cpanel, sp, gg);
   ruler_ranges_set (false, dsp, sp, gg);
@@ -99,68 +95,27 @@ void
 scale_interaction_style_set (gint style, ggobid *gg) {
   cpaneld *cpanel = &gg->current_display->cpanel;
   gboolean click_p;
-  GtkWidget *pan_radio, *zoom_radio, *pan_option_menu, *zoom_option_menu;
   GtkWidget *panel = mode_panel_get_by_name(GGOBI(getIModeName)(SCALE), gg);
 
   if (panel == (GtkWidget *) NULL)
     return;
-
-  pan_radio = widget_find_by_name (panel, "SCALE:pan_radio_button");
-  zoom_radio = widget_find_by_name (panel, "SCALE:zoom_radio_button");
-  pan_option_menu = widget_find_by_name (panel,"SCALE:pan_option_menu");
-  zoom_option_menu = widget_find_by_name (panel, "SCALE:zoom_option_menu");
 
   cpanel->scale_style = style;  /*-- DRAG or CLICK --*/
   click_p = (cpanel->scale_style == CLICK);
 
-/*
- * If DRAG, disable all the click-style controls
-*/
-# if 0    // NOCLICK
-  gtk_widget_set_sensitive (pan_radio, click_p);
-  gtk_widget_set_sensitive (zoom_radio, click_p);
-  gtk_widget_set_sensitive (pan_option_menu, click_p);
-  gtk_widget_set_sensitive (zoom_option_menu, click_p);
-
-  if (click_p)
-    scale_click_init (gg->current_splot, gg);
-#endif
-
   splot_redraw (gg->current_splot, QUICK, gg);
 }
+
+// portions of this will be called in response to keyboard actions
 void
 interaction_style_cb (GtkToggleButton *w, ggobid *gg) 
 {
-  GtkWidget *radio, *opt;
-  GtkWidget *panel = mode_panel_get_by_name(GGOBI(getIModeName)(SCALE), gg);
-
-/*
- * This is connected to the Drag button
-*/
   gint scale_style = (w->active) ? DRAG : CLICK;
   scale_interaction_style_set (scale_style, gg);
-
-  if (panel == (GtkWidget *) NULL)
-    return;
-
-#if 0  // NOCLICK
-  radio = widget_find_by_name (panel,
-    "SCALE:pan_radio_button");
-  gtk_widget_set_sensitive (radio, scale_style == CLICK);
-  radio = widget_find_by_name (panel,
-    "SCALE:zoom_radio_button");
-  gtk_widget_set_sensitive (radio, scale_style == CLICK);
-
-  opt = widget_find_by_name (panel,
-    "SCALE:pan_option_menu");
-  gtk_widget_set_sensitive (opt, scale_style == CLICK);
-  
-  opt = widget_find_by_name (panel,
-    "SCALE:zoom_option_menu");
-  gtk_widget_set_sensitive (opt, scale_style == CLICK);
-#endif
 }
 
+// These are just always going to be oblique -- no constraints.
+// Call scale_click_init when click is turned on;
 #if 0  // NOCLICK
 void scale_clickoptions_set (gint click_opt, ggobid *gg) {
   cpaneld *cpanel = &gg->current_display->cpanel;
@@ -176,7 +131,6 @@ static void clickoptions_cb (GtkToggleButton *w, ggobid *gg)
   scale_clickoptions_set (scale_click_opt, gg);
 }
 
-static gchar *panoptions_lbl[] = {"Horiz only", "Vert only", "Oblique"};
 void panoptions_set (gint pan_opt, ggobid *gg) {
   cpaneld *cpanel = &gg->current_display->cpanel;
   cpanel->scale_pan_opt = pan_opt;
@@ -184,13 +138,8 @@ void panoptions_set (gint pan_opt, ggobid *gg) {
 static void panoptions_cb (GtkWidget *w, ggobid *gg)
 {
   gint pan_opt = gtk_combo_box_get_active(GTK_COMBO_BOX(w));
-
   panoptions_set (pan_opt, gg);
 }
-static gchar *zoomoptions_lbl[] = {"Fixed aspect",
-                                   "Horiz only",
-                                   "Vert only",
-                                   "Oblique"};
 void zoomoptions_set (gint zoom_opt, ggobid *gg) {
   cpaneld *cpanel = &gg->current_display->cpanel;
   cpanel->scale_zoom_opt = zoom_opt;
@@ -207,6 +156,11 @@ static void zoomoptions_cb (GtkWidget *w, ggobid *gg)
 /*--------------------------------------------------------------------*/
 /*      Handling keyboard and mouse events in the plot window         */
 /*--------------------------------------------------------------------*/
+
+/*
+If ctrl-alt-p is pressed, toggle on and off click-style panning.
+If ctrl-alt-z is pressed, toggle on and off click-style zooming.
+*/
 
 static gint
 key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
@@ -227,6 +181,7 @@ key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
     case CLICK:
       switch (cpanel->scale_click_opt) {
         case PAN:
+
           if (event->keyval == GDK_space) {
             pan_step (sp, cpanel->scale_pan_opt, gg);
             redraw = true;
@@ -239,6 +194,7 @@ key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
 	    redraw = true;
           }
           break;
+
         case ZOOM:
           /* zoom in if > or . */
           if (event->keyval == GDK_greater || event->keyval == GDK_period) {
@@ -369,7 +325,6 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
     ruler_ranges_set (false, gg->current_display, sp, gg);
     splot_redraw (sp, FULL, gg);
   } else {
-    g_printerr ("doing quick redraw\n");
     splot_redraw (sp, QUICK, gg);
   }
 
@@ -404,10 +359,8 @@ scale_event_handlers_toggle (splotd *sp, gboolean state) {
 void
 cpanel_scale_make (ggobid *gg) {
   modepaneld *panel;
-  GtkWidget *frame, *f, *vbox, *hbox, *vb, *lbl;
-  GtkWidget *radio1, *radio2, *tgl;
-  GSList *group;
-  GtkWidget *pan_radio, *zoom_radio, *pan_option_menu, *zoom_option_menu;
+  GtkWidget *f, *vbox, *hbox, *vb, *lbl;
+  GtkWidget *tgl;
 
   panel = (modepaneld *) g_malloc(sizeof(modepaneld));
   gg->control_panels = g_list_append(gg->control_panels, (gpointer) panel);
@@ -415,44 +368,12 @@ cpanel_scale_make (ggobid *gg) {
   panel->w = gtk_vbox_new (false, VBOX_SPACING);
   gtk_container_set_border_width (GTK_CONTAINER (panel->w), 5);
 
-#if 0 // NOCLICK
-  frame = gtk_frame_new ("Interaction style");
-  //gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
-  gtk_box_pack_start (GTK_BOX (panel->w),
-                      frame, false, false, 0);
-
-  hbox = gtk_hbox_new (true, 1);
-  gtk_container_set_border_width (GTK_CONTAINER (hbox), 3);
-  gtk_container_add (GTK_CONTAINER (frame), hbox);
-
-  radio1 = gtk_radio_button_new_with_mnemonic (NULL, "_Drag");
-  gtk_widget_set_name (radio1, "SCALE:drag_radio_button");
-  GTK_TOGGLE_BUTTON (radio1)->active = TRUE;
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), radio1,
-    "Drag left to pan, drag middle or right to zoom (the most direct style).  Tip: when zooming, don't put the cursor too close to the center of the plot.\n(To reset, see Reset in main menubar)",
-    NULL);
-  g_signal_connect (G_OBJECT (radio1), "toggled",
-    G_CALLBACK (interaction_style_cb), gg);
-  gtk_box_pack_start (GTK_BOX (hbox), radio1, TRUE, TRUE, 0);
-
-  group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (radio1));
-  radio2 = gtk_radio_button_new_with_mnemonic (group, "_Click");
-  gtk_widget_set_name (radio2, "SCALE:click_radio_button");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), radio2,
-    "Use mouse clicks and key presses to pan and zoom (useful for large data).\n(To reset, see Reset in main menubar)",
-    NULL);
-  gtk_box_pack_start (GTK_BOX (hbox), radio2, TRUE, TRUE, 0);
-#endif
-
-  /*-- frame and vbox for drag-style controls --*/
-  frame = gtk_frame_new ("Drag-style controls");
-  //gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
-  gtk_box_pack_start (GTK_BOX (panel->w),
-                      frame, false, false, 0);
 
   vbox = gtk_vbox_new (true, 1);
   gtk_container_set_border_width (GTK_CONTAINER (vbox), 3);
-  gtk_container_add (GTK_CONTAINER (frame), vbox);
+  /*-- frame and vbox for drag-style controls --*/
+  gtk_box_pack_start (GTK_BOX (panel->w),
+                      vbox, false, false, 0);
 
   tgl = gtk_check_button_new_with_mnemonic ("Fixed _aspect");
   gtk_widget_set_name (tgl, "SCALE:drag_aspect_ratio_tgl");
@@ -462,92 +383,6 @@ cpanel_scale_make (ggobid *gg) {
   g_signal_connect (G_OBJECT (tgl), "toggled",
     G_CALLBACK (drag_aspect_ratio_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (vbox), tgl, false, false, 3);
-
-#if 0  // NOCLICK
-  /*-- frame and vbox for click-style controls --*/
-  frame = gtk_frame_new ("Click-style controls");
-  //gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
-  gtk_box_pack_start (GTK_BOX (panel->w),
-                      frame, false, false, 0);
-
-  vbox = gtk_vbox_new (true, 1);
-  gtk_container_set_border_width (GTK_CONTAINER (vbox), 3);
-  gtk_container_add (GTK_CONTAINER (frame), vbox);
-
- /*-- pan or zoom radio buttons --*/
-  f = gtk_frame_new (NULL);
-  //gtk_frame_set_shadow_type (GTK_FRAME (f), GTK_SHADOW_ETCHED_OUT);
-  gtk_box_pack_start (GTK_BOX (vbox), f, false, false, 0);
-
-  hbox = gtk_hbox_new (true, 1);
-  gtk_container_set_border_width (GTK_CONTAINER (hbox), 1);
-  gtk_container_add (GTK_CONTAINER (f), hbox);
-
-  pan_radio = gtk_radio_button_new_with_mnemonic (NULL, "_Pan");
-  gtk_widget_set_name (pan_radio, "SCALE:pan_radio_button");
-  gtk_widget_set_sensitive (pan_radio, false);
-  GTK_TOGGLE_BUTTON (pan_radio)->active = true;
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), pan_radio,
-    "Pan: Hit the space bar to pan. A vector drawn on the plot dictates direction and distance. Drag the mouse to control the vector, and keep it small. The arrow keys work, too.  To reset, use `Reset pan' under the main menubar",
-    NULL);
-  g_signal_connect (G_OBJECT (pan_radio), "toggled",
-                      G_CALLBACK (clickoptions_cb), gg);
-  gtk_box_pack_start (GTK_BOX (hbox), pan_radio, TRUE, TRUE, 0);
-
-  group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (pan_radio));
-  zoom_radio = gtk_radio_button_new_with_mnemonic (group, "_Zoom");
-  gtk_widget_set_name (zoom_radio, "SCALE:zoom_radio_button");
-  gtk_widget_set_sensitive (zoom_radio, false);
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), zoom_radio,
-    "Zoom: hit > to zoom in and < to zoom out. A rectangle drawn on the plot dictates the degree of zoom. Drag the mouse to control the rectangle, and keep it large. To reset, use `Reset zoom' under the main menubar",
-    NULL);
-  gtk_box_pack_start (GTK_BOX (hbox), zoom_radio, TRUE, TRUE, 0);
-
- /*-- panning controls --*/
-
-  vb = gtk_vbox_new (false, 0);
-  gtk_box_pack_start (GTK_BOX (vbox), vb, false, false, 0);
-
-  lbl = gtk_label_new_with_mnemonic ("Pan _options:");
-  gtk_misc_set_alignment (GTK_MISC (lbl), 0, 1);
-  gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
-
-  pan_option_menu = gtk_combo_box_new_text ();
-  gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), pan_option_menu);
-  gtk_widget_set_name (pan_option_menu, "SCALE:pan_option_menu");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), pan_option_menu,
-    "Specify constraints on click-style panning.",
-    NULL);
-  gtk_box_pack_end (GTK_BOX (vb), pan_option_menu, false, false, 0);
-  populate_combo_box (pan_option_menu, panoptions_lbl, G_N_ELEMENTS(panoptions_lbl),
-    G_CALLBACK(panoptions_cb), gg);
-
- /*-- zooming controls --*/
-  vb = gtk_vbox_new (false, 0);
-  gtk_box_pack_start (GTK_BOX (vbox), vb, false, false, 0);
-
-  lbl = gtk_label_new_with_mnemonic ("Zoom o_ptions:");
-  gtk_misc_set_alignment (GTK_MISC (lbl), 0, 1);
-  gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
-
-  zoom_option_menu = gtk_combo_box_new_text ();
-  gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), zoom_option_menu);
-  gtk_widget_set_name (zoom_option_menu, "SCALE:zoom_option_menu");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), zoom_option_menu,
-    "Specify constraints on click-style zooming.",
-    NULL);
-  gtk_box_pack_end (GTK_BOX (vb), zoom_option_menu, false, false, 0);
-  populate_combo_box (zoom_option_menu, zoomoptions_lbl, G_N_ELEMENTS(zoomoptions_lbl),
-    G_CALLBACK(zoomoptions_cb), gg);
-#endif
-
-  /*-- start with dragging on by default --*/
-#if 0  // NOCLICK
-  gtk_widget_set_sensitive (pan_radio, false);
-  gtk_widget_set_sensitive (zoom_radio, false);
-  gtk_widget_set_sensitive (pan_option_menu, false);
-  gtk_widget_set_sensitive (zoom_option_menu, false);
-#endif
 
   gtk_widget_show_all (panel->w);
 }
@@ -661,8 +496,9 @@ void
 cpanel_scale_init (cpaneld *cpanel, ggobid *gg) {
 
   cpanel->scale_updateAlways_p = true;
-
   cpanel->scale_style = DRAG;
+
+  // Invisible options
   cpanel->scale_click_opt = PAN;
   cpanel->scale_drag_aspect_p = false;
   cpanel->scale_pan_opt = P_OBLIQUE;
@@ -677,38 +513,9 @@ cpanel_scale_set (displayd *display, cpaneld *cpanel, ggobid *gg) {
   if (panel == (GtkWidget *) NULL)
     return;
 
-#if 0  // NOCLICK
-  /*-- set the Drag or Click radio buttons --*/
-  if (cpanel->scale_style == DRAG)
-    w = widget_find_by_name (panel,
-      "SCALE:drag_radio_button");
-  else
-    w = widget_find_by_name (panel,
-      "SCALE:click_radio_button");
-  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(w), true);
-#endif
-
   w = widget_find_by_name (panel,
     "SCALE:drag_aspect_ratio_tgl");
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(w),
     cpanel->scale_drag_aspect_p);
-
-#if 0  // NOCLICK
-  /*-- set the Pan or Zoom radio buttons --*/
-  w = widget_find_by_name (panel,
-    "SCALE:pan_radio_button");
-  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(w),
-    cpanel->scale_click_opt == PAN);
-
-  /*-- set the Pan options --*/
-  w = widget_find_by_name (panel,
-    "SCALE:pan_option_menu");
-  gtk_combo_box_set_active (GTK_COMBO_BOX(w), cpanel->scale_pan_opt);
-
-  /*-- set the Zoom options--*/
-  w = widget_find_by_name (panel,
-                           "SCALE:zoom_option_menu");
-  gtk_combo_box_set_active (GTK_COMBO_BOX(w), cpanel->scale_zoom_opt);
-#endif
 }
 
