@@ -550,6 +550,8 @@ linkby_notebook_subwindow_add (datad *d, GtkWidget *notebook, ggobid *gg)
 
   /* Create a scrolled window to pack the CList widget into */
   swin = gtk_scrolled_window_new (NULL, NULL);
+  gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (swin), GTK_SHADOW_NONE);
+  
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (swin),
     GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
 

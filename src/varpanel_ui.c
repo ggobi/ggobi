@@ -509,7 +509,7 @@ varpanel_populate (datad *d, ggobid *gg)
   /*-- create an ebox, and put it in the hpane --*/
   d->vcbox_ui.ebox = gtk_event_box_new ();
   gtk_paned_pack1 (GTK_PANED(d->varpanel_ui.hpane),
-    d->vcbox_ui.ebox, true, false);
+    d->vcbox_ui.ebox, true, true);
 
   /*-- create a scrolled window, and put it in the ebox --*/
   d->vcbox_ui.swin = gtk_scrolled_window_new (NULL, NULL);
@@ -521,7 +521,9 @@ varpanel_populate (datad *d, ggobid *gg)
   gtk_container_add (GTK_CONTAINER (d->vcbox_ui.ebox), d->vcbox_ui.swin);
 
   /*-- add a vbox to the swin --*/
-  d->vcbox_ui.vbox = gtk_vbox_new (false, 0);
+  d->vcbox_ui.vbox = gtk_vbox_new (false, 1);
+  gtk_container_set_border_width (GTK_CONTAINER (d->vcbox_ui.vbox), 2);
+  
   gtk_scrolled_window_add_with_viewport (
     GTK_SCROLLED_WINDOW (d->vcbox_ui.swin),
     d->vcbox_ui.vbox);

@@ -1137,8 +1137,8 @@ rebuilt? -- dfs */
                                     ? "" : imode_name[gg->imode]);
 
   gtk_box_pack_start (GTK_BOX (hbox), gg->imode_frame, false, false, 3);
-  gtk_container_set_border_width (GTK_CONTAINER (gg->imode_frame), 3);
-  //gtk_frame_set_shadow_type (GTK_FRAME (gg->imode_frame),    GTK_SHADOW_IN);
+  gtk_container_set_border_width (GTK_CONTAINER (gg->imode_frame), 2);
+  gtk_frame_set_shadow_type (GTK_FRAME (gg->imode_frame),    GTK_SHADOW_NONE);
 
   make_control_panels (gg);
   if (gg->imode != NULL_IMODE) {
@@ -1149,6 +1149,9 @@ rebuilt? -- dfs */
       gtk_container_add (GTK_CONTAINER (gg->imode_frame),
     	mode_panel_get_by_name((gchar *) imode_name[gg->imode], gg));
   }
+
+
+  gtk_box_pack_start (GTK_BOX (hbox), gtk_vseparator_new(), false, false, 2);
 
   /*-- Variable selection panel --*/
   varpanel_make (hbox, gg);

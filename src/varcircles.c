@@ -385,6 +385,17 @@ varcircles_populate (datad *d, ggobid *gg)
 
   gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (d->vcirc_ui.swin),
     d->vcirc_ui.table);
+    
+  {   
+    GList *children; 
+    GtkWidget *foo; 
+    children = gtk_container_get_children (GTK_CONTAINER (d->vcirc_ui.swin)); 
+    foo = g_list_nth_data (children, 0); 
+    if (GTK_IS_VIEWPORT(foo)) { 
+     gtk_viewport_set_shadow_type (GTK_VIEWPORT(foo), GTK_SHADOW_NONE); 
+    } 
+  }  
+    
   gtk_widget_show (d->vcirc_ui.table);
 
   /*-- da and label are freed in varcircle_clear --*/
