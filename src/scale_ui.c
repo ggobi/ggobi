@@ -23,7 +23,8 @@
 #include "externs.h"
 #include <math.h>
 
-//
+static icoords mousedownpos;
+
 void scale_update_set(gboolean update, displayd *dsp, ggobid *gg)
 {
   dsp->cpanel.scale_updateAlways_p = update;
@@ -303,6 +304,8 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
         splot_plane_to_screen (display, &display->cpanel, sp, gg);
         ruler_ranges_set (false, gg->current_display, sp, gg);
         splot_redraw (sp, FULL, gg);
+      } else {
+        splot_redraw (sp, QUICK, gg);
       }
       break;
 
@@ -333,6 +336,9 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   sp->mousepos_o.x = sp->mousepos.x;
   sp->mousepos_o.y = sp->mousepos.y;
 
+  mousedownpos.x = sp->mousepos.x;
+  mousedownpos.y = sp->mousepos.y;
+
   sp->motion_id = g_signal_connect (G_OBJECT (sp->da),
                                       "motion_notify_event",
                                       G_CALLBACK(motion_notify_cb),
@@ -362,6 +368,9 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
     splot_plane_to_screen (display, &display->cpanel, sp, gg);
     ruler_ranges_set (false, gg->current_display, sp, gg);
     splot_redraw (sp, FULL, gg);
+  } else {
+    g_printerr ("doing quick redraw\n");
+    splot_redraw (sp, QUICK, gg);
   }
 
   return retval;
@@ -609,6 +618,7 @@ scaling_visual_cues_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
   switch (cpanel->scale_style) {
 
     case DRAG:
+
       /*-- draw horizontal line --*/
       gdk_draw_line (drawable, gg->plot_GC,  
         0, sp->da->allocation.height/2,  
@@ -617,7 +627,14 @@ scaling_visual_cues_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
       gdk_draw_line (drawable, gg->plot_GC,
         sp->da->allocation.width/2, 0,
         sp->da->allocation.width/2, sp->da->allocation.height);
+      if (!cpanel->scale_updateAlways_p) {
+	if (gg->buttondown)
+          gdk_draw_line (drawable, gg->plot_GC,
+            mousedownpos.x, mousedownpos.y,
+            sp->mousepos.x, sp->mousepos.y);
+      }
       break;
+
 
     case CLICK:
       switch (cpanel->scale_click_opt) {
