@@ -348,9 +348,11 @@ static GtkActionEntry disp_action_entries[] = {
 #ifdef PRINTING_IMPLEMENTED
 	{ "Print", GTK_STOCK_PRINT, "Pr_int", "<control>I", "Print this display", G_CALLBACK(action_print_cb) },
 #endif
+#if 0
 	{ "ControlPanel", NULL, "Control _Panel", "<control>P", "Focus on the control panel", 
 		G_CALLBACK(action_show_control_panel_cb)
 	},
+#endif
 	{ "Close", GTK_STOCK_CLOSE, "_Close", "<control>C", "Close this display", G_CALLBACK(action_close_cb) },
 	{ "Options", NULL, "_Options", NULL, "Options for this display" },
 	/* imode brush specific */
@@ -461,7 +463,9 @@ static const gchar* display_default_ui =
 "			<menuitem action='Print'/>"
 #endif
 "			<separator/>"
+#if 0
 "			<menuitem action='ControlPanel'/>"
+#endif
 "			<menuitem action='Close'/>"
 "		</menu>"
 "	</menubar>"
