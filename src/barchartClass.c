@@ -530,6 +530,15 @@ void barchartDisplayClassInit(GGobiBarChartDisplayClass * klass)
   klass->parent_class.set_show_axes_option = setShowAxesOption;
 }
 
+void
+barchart_identify_cues_draw(splotd * rawsp, GdkDrawable * drawable,
+                                  ggobid * gg)
+{
+  /* Adding a no-op here is a way to have the default cues drawn for
+   all the scatterplot types, but not here.  Experiment or hack; you
+   be the judge.  -- dfs */
+}
+
 void barchartSPlotClassInit(GGobiBarChartSPlotClass * klass)
 {
   /* barcharts need more attention than redrawing the brush */
@@ -540,6 +549,7 @@ void barchartSPlotClassInit(GGobiBarChartSPlotClass * klass)
   klass->extendedSPlotClass.add_markup_cues = barchart_add_bar_cues;
   klass->extendedSPlotClass.add_scaling_cues =
       barchart_scaling_visual_cues_draw;
+  klass->extendedSPlotClass.add_identify_cues = barchart_identify_cues_draw;
   klass->extendedSPlotClass.add_plot_labels =
       barchart_splot_add_plot_labels;
   klass->extendedSPlotClass.redraw = barchart_redraw;

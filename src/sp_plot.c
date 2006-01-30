@@ -727,18 +727,23 @@ splot_add_identify_cues (splotd *sp, GdkDrawable *drawable,
     if (GGOBI_IS_EXTENDED_SPLOT(sp)) {
       GGobiExtendedSPlotClass *klass;
       klass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);
-      if (klass->add_identify_cues)
+      if (klass->add_identify_cues) {
         klass->add_identify_cues(k, sp, drawable, gg);
-      else 
+      } else {
         useDefault = true;
+      }
     }
 
-    if (useDefault)
+    if (useDefault) {
       splot_add_diamond_cue (k, sp, drawable, gg);
+    }
+
+    /* I don't want to do this in the barchart, parallel coords and
+       scatteerplot matrix displays need some thought too. */
+    gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
+    splot_add_point_label (nearest, k, sp, drawable, gg);
   }
 
-  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
-  splot_add_point_label (nearest, k, sp, drawable, gg);
 }
 
 void
