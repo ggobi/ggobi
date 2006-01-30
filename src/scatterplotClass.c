@@ -1594,6 +1594,8 @@ addScalingCues(splotd *sp, GdkDrawable *drawable, ggobid *gg)
 {
   cpaneld *cpanel = &gg->current_display->cpanel;
 
+  /* Let's try scaling without the use of the crosshair */
+#if 0
   /*-- draw horizontal line --*/
   gdk_draw_line (drawable, gg->plot_GC,  
     0, sp->da->allocation.height/2,  
@@ -1602,6 +1604,8 @@ addScalingCues(splotd *sp, GdkDrawable *drawable, ggobid *gg)
   gdk_draw_line (drawable, gg->plot_GC,
     sp->da->allocation.width/2, 0,
     sp->da->allocation.width/2, sp->da->allocation.height);
+#endif
+
   if (!cpanel->scale.updateAlways_p) {
     if (gg->buttondown)
       gdk_draw_line (drawable, gg->plot_GC,
