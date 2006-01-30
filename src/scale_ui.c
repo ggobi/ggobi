@@ -80,7 +80,7 @@ static void zoom_cb (GtkAdjustment *adj, ggobid *gg) {
   gdouble value_other;
   // step and eps are in the space of the adjustment values;
   // exp_eps is in the space of the scaling values.
-  gdouble expvalue = exp10(adj->value), step = 0.0;
+  gdouble expvalue = pow(10., adj->value), step = 0.0;  // exp10
   gdouble eps = .0001, exp_eps = .001;
 
   /* this unappealing case arises when cpanel_scale_set is resetting
@@ -94,7 +94,7 @@ static void zoom_cb (GtkAdjustment *adj, ggobid *gg) {
     sp->scale.x = expvalue;
     if (cpanel->scale.fixAspect_p && fabs(step) > eps) {
       adj_other = scale_adjustment_find_by_name("SCALE:y_zoom", gg);
-      sp->scale.y = exp10(adj_other->value + step);
+      sp->scale.y = pow(10., adj_other->value + step);
       increment_adjustment(adj_other, step, eps);
     }
   } else {
@@ -103,7 +103,7 @@ static void zoom_cb (GtkAdjustment *adj, ggobid *gg) {
     sp->scale.y = expvalue;
     if (cpanel->scale.fixAspect_p && fabs(step) > eps) {
       adj_other = scale_adjustment_find_by_name("SCALE:x_zoom", gg);
-      sp->scale.x = exp10(adj_other->value + step);
+      sp->scale.x = pow(10.0, adj_other->value + step);
       increment_adjustment(adj_other, step, eps);
     }
   }
