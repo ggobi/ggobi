@@ -142,8 +142,25 @@ static const gchar *const constrained_lbl[] = {
 void
 show_ggvis_window (GtkAction *action, PluginInstance *inst)
 {
+  GList *l;
+  datad *d;
+  gboolean ok = false;
+
+  /* Before doing anything making sure there is input data, and that
+     it includes an edge set */
   if (g_slist_length(inst->gg->d) < 1) {
-    g_printerr ("No datasets to show\n");
+    g_printerr ("ggvis: can't initialize without data\n");
+    return;
+  }
+  for (l = inst->gg->d; l; l = l->next) {
+    d = (datad *) l->data;
+    if (d->edge.n > 0) {
+      ok = true;
+      break;
+    }
+  }
+  if (!ok) {
+    g_printerr ("ggvis: need an edgeset to define pairwise distances.\n");
     return;
   }
 
