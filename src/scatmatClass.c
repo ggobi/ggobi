@@ -65,6 +65,7 @@ variablePlottedP(displayd *display, gint *cols, gint ncols, datad *d)
 	GList *l;
 	gint j;
 	splotd *sp;
+	g_printerr ("(scatmat variablePlottedP)\n");
         for (l = display->splots; l; l = l->next) {
           sp = (splotd *) l->data;
 
@@ -402,6 +403,18 @@ worldToPlane(splotd *sp, datad *d, ggobid *gg)
         p1d_reproject (sp, d->world.vals, d, gg);
 }
 
+static void
+addIdentifyCues (gint k, splotd *sp, GdkDrawable *drawable, ggobid *gg)
+{
+  colorschemed *scheme = gg->activeColorScheme;
+
+  splot_add_diamond_cue (k, sp, drawable, gg);
+
+  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
+  // OK -- this routine only called for nearest.
+  splot_add_point_label (true, k, false, sp, drawable, gg);
+}
+
 gboolean
 drawEdgeP(splotd *sp, gint m, datad *d, datad *e, ggobid *gg)
 {
@@ -474,6 +487,7 @@ scatmatSPlotClassInit(GGobiScatmatSPlotClass *klass)
   klass->parent_class.draw_case_p = drawCaseP;
   klass->parent_class.draw_edge_p = drawEdgeP;
   klass->parent_class.add_plot_labels = addPlotLabels;
+  klass->parent_class.add_identify_cues = addIdentifyCues;
 
   klass->parent_class.plotted_vars_get = splotVariablesGet;
 }
