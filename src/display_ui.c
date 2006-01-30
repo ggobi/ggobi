@@ -443,7 +443,7 @@ display_default_actions_create(displayd *display) {
 		},
 	{ "UpdateContinuously", NULL, "Update _Continuously", NULL, 
 		"Toggle whether panning and zooming operates continuously", 
-		G_CALLBACK(action_toggle_scale_update_cb), display->cpanel.scale_updateAlways_p
+		G_CALLBACK(action_toggle_scale_update_cb), display->cpanel.scale.updateAlways_p
 	}
         };
 	

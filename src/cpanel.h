@@ -78,12 +78,12 @@ typedef struct {
   } br;
 
  /*-- scaling --*/
-  gboolean scale_updateAlways_p;
- gint scale_style;       /* DRAG or CLICK */
- gint scale_click_opt;   /* PAN or ZOOM */
- gboolean scale_drag_aspect_p;   /* fix aspect ratio or don't */
- gint scale_pan_opt;     /* P_OBLIQUE, P_HORIZ, P_VERT */
- gint scale_zoom_opt;    /* Z_OBLIQUE, Z_ASPECT, Z_HORIZ, Z_VERT */
+  struct _ScaleCpanel {
+    gboolean updateAlways_p;
+    gboolean fixAspect_p;   /* fix aspect ratio or don't */
+    struct {gdouble x, y;} zoomval;
+    struct {gdouble x, y;} panval;
+  } scale;
 
  /*-- identification --*/
  gint id_display_type;

@@ -422,7 +422,6 @@ void       rowlabels_free (datad *d);
 gboolean   rowlabels_read (InputDescription *desc, gboolean, datad *, ggobid *);
 void       rows_in_plot_set (datad *d, ggobid *);
 void       ruler_ranges_set (gboolean force, displayd *, splotd *, ggobid *);
-void       scale_click_init (splotd *sp, ggobid *gg);
 void       scale_event_handlers_toggle (splotd *, gboolean);
 void       scale_set_default_values (GtkScale *scale);
 void	   scale_zoom_reset (displayd *dsp);

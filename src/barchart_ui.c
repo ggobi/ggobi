@@ -441,9 +441,12 @@ barchart_scale(gboolean button1_p, gboolean button2_p, splotd * sp)
     }
   } else {   /*-- we're not dragging the bars, only scaling --*/
 
+    /* Uh-oh -- I've just eliminated this option, so I hope it
+       doesn't matter -- dfs */
+#if 0
     switch (cpanel->scale_style) {
-
     case DRAG:
+#endif
       if (button1_p) {
         pan_by_drag(sp, gg);
       } else if (button2_p) {
@@ -454,13 +457,14 @@ barchart_scale(gboolean button1_p, gboolean button2_p, splotd * sp)
       splot_plane_to_screen(display, &display->cpanel, sp, gg);
       ruler_ranges_set(false, gg->current_display, sp, gg);
       splot_redraw(sp, FULL, gg);
+#if 0
       break;
-
     case CLICK:
       splot_redraw(sp, QUICK, gg);
       break;
 
     }  /*-- end switch (scale_style) --*/
+#endif
   }
   return true;
 }

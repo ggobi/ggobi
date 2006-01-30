@@ -386,6 +386,7 @@ struct _ggobid {
 
 /*-------------------- scaling ---------------------------------------*/
 
+// Delete
   struct _Scale {
     rectd click_rect;
   } scale;

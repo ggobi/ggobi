@@ -29,16 +29,11 @@ pan_by_drag (splotd *sp, ggobid *gg)
 {
   greal dx, dy;
   greal scale_x, scale_y;
-  /*cpaneld *cpanel = &gg->current_display->cpanel;*/
   greal precis = (greal) PRECISION1;
 
   dx = (greal) (sp->mousepos.x - sp->mousepos_o.x);
   dy = (greal) (sp->mousepos.y - sp->mousepos_o.y);
 
-  /*  scale_x = (greal)
-    ((cpanel->projection == TOUR2D) ? sp->tour_scale.x : sp->scale.x);
-  scale_y = (greal)
-  ((cpanel->projection == TOUR2D) ? sp->tour_scale.y : sp->scale.y);*/
   scale_x = (greal) sp->scale.x;
   scale_y = (greal) sp->scale.y;
 
@@ -86,7 +81,8 @@ zoom_by_drag (splotd *sp, ggobid *gg)
     scalefac.y =
       (gfloat) (sp->mousepos.y - mid.y) / (gfloat) (sp->mousepos_o.y - mid.y);
 
-   if (cpanel->scale_drag_aspect_p) {
+
+   if (cpanel->scale.fixAspect_p) {
      greal fac = MAX(scalefac.x, scalefac.y);
      *scale_x = *scale_x * fac;
      *scale_y = *scale_y * fac;
@@ -98,6 +94,5 @@ zoom_by_drag (splotd *sp, ggobid *gg)
         *scale_y = *scale_y * scalefac.y;
     }
   }
-
 }
 
