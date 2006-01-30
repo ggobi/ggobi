@@ -1589,6 +1589,26 @@ addMarkupCues(splotd *sp, GdkDrawable *drawable, ggobid *gg)
           splot_add_identify_edge_cues (sp, drawable, e->nearest_point,
             true, gg);
 }
+void
+addScalingCues(splotd *sp, GdkDrawable *drawable, ggobid *gg)
+{
+  cpaneld *cpanel = &gg->current_display->cpanel;
+
+  /*-- draw horizontal line --*/
+  gdk_draw_line (drawable, gg->plot_GC,  
+    0, sp->da->allocation.height/2,  
+    sp->da->allocation.width, sp->da->allocation.height/2);
+  /*-- draw vertical line --*/
+  gdk_draw_line (drawable, gg->plot_GC,
+    sp->da->allocation.width/2, 0,
+    sp->da->allocation.width/2, sp->da->allocation.height);
+  if (!cpanel->scale.updateAlways_p) {
+    if (gg->buttondown)
+      gdk_draw_line (drawable, gg->plot_GC,
+        sp->mousedownpos.x, sp->mousedownpos.y,
+        sp->mousepos.x, sp->mousepos.y);
+  }
+}
 
 static void
 splotScreenToTform(cpaneld *cpanel, splotd *sp, icoords *scr,
@@ -1749,6 +1769,7 @@ scatterSPlotClassInit(GGobiScatterSPlotClass *klass)
   klass->parent_class.add_plot_labels = addPlotLabels;
   klass->parent_class.within_draw_to_unbinned = withinDrawToUnbinned;
   klass->parent_class.add_markup_cues = addMarkupCues;
+  klass->parent_class.add_scaling_cues = addScalingCues;
 
   klass->parent_class.plotted_vars_get = splotVariablesGet;
 }

@@ -23,8 +23,6 @@
 #include "externs.h"
 #include <math.h>
 
-static icoords mousedownpos;
-
 void scale_update_set(gboolean update, displayd *dsp, ggobid *gg)
 {
   cpaneld *cpanel = &dsp->cpanel;
@@ -281,8 +279,8 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   sp->mousepos_o.x = sp->mousepos.x;
   sp->mousepos_o.y = sp->mousepos.y;
 
-  mousedownpos.x = sp->mousepos.x;
-  mousedownpos.y = sp->mousepos.y;
+  sp->mousedownpos.x = sp->mousepos.x;
+  sp->mousedownpos.y = sp->mousepos.y;
 
   sp->motion_id = g_signal_connect (G_OBJECT (sp->da),
                                       "motion_notify_event",
@@ -439,85 +437,6 @@ cpanel_scale_make (ggobid *gg) {
 
 
   gtk_widget_show_all (panel->w);
-}
-
-void
-scale_click_zoom_rect_calc (splotd *sp, gint sc_zoom_opt, ggobid *gg) {
-  icoords mid;
-  mid.x = sp->max.x / 2;
-  mid.y = sp->max.y / 2;
-
-  if (sp->mousepos.x <= mid.x && sp->mousepos.y <= mid.y) {
-    /* upper left quadrant of plot, based on the value of mid */
-    gg->scale.click_rect.x = sp->mousepos.x;
-    gg->scale.click_rect.y = sp->mousepos.y;
-  } else if (sp->mousepos.x <= mid.x && sp->mousepos.y > mid.y) {
-    /* lower left quadrant of plot */
-    gg->scale.click_rect.x = sp->mousepos.x;
-    gg->scale.click_rect.y = mid.y - (sp->mousepos.y - mid.y);
-  } else if (sp->mousepos.x > mid.x && sp->mousepos.y > mid.y) {
-    /* lower right quadrant of plot */
-    gg->scale.click_rect.x = mid.x - (sp->mousepos.x - mid.x);
-    gg->scale.click_rect.y = mid.y - (sp->mousepos.y - mid.y);
-  } else if (sp->mousepos.x > mid.x && sp->mousepos.y <= mid.y) {
-    /* upper right quadrant of plot */
-    gg->scale.click_rect.x = mid.x - (sp->mousepos.x - mid.x);
-    gg->scale.click_rect.y = sp->mousepos.y;
-  }
-  gg->scale.click_rect.x = (mid.x - gg->scale.click_rect.x < 20) ?
-                       (mid.x - 20) :
-                       gg->scale.click_rect.x;
-  gg->scale.click_rect.y = (mid.y - gg->scale.click_rect.y < 20) ?
-                       (mid.y - 20) :
-                       gg->scale.click_rect.y;
-  gg->scale.click_rect.width = 2 * (mid.x - gg->scale.click_rect.x);
-  gg->scale.click_rect.height = 2 * (mid.y - gg->scale.click_rect.y);
-
-  switch (sc_zoom_opt) {
-    case Z_OBLIQUE:
-      /* -- use the values just calculated --*/
-    break;
-
-    case Z_ASPECT:
-      /*-- force the rectangle to be square --*/
-      gg->scale.click_rect.x = gg->scale.click_rect.y =
-        MAX (gg->scale.click_rect.x, gg->scale.click_rect.y);
-      gg->scale.click_rect.width = 2 * (mid.x - gg->scale.click_rect.x);
-      gg->scale.click_rect.height = 2 * (mid.y - gg->scale.click_rect.y);
-    break;
-
-    case Z_HORIZ:
-      /*-- override the vertical position and height --*/
-      gg->scale.click_rect.y = 0;
-      gg->scale.click_rect.height = sp->max.y;
-    break;
-    case Z_VERT:
-      /*-- override the horizontal position and width --*/
-      gg->scale.click_rect.x = 0;
-      gg->scale.click_rect.width = sp->max.x;
-    break;
-  }
-}
-
-
-void
-scaling_visual_cues_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
-  cpaneld *cpanel = &gg->current_display->cpanel;
-
-      /*-- draw horizontal line --*/
-      gdk_draw_line (drawable, gg->plot_GC,  
-        0, sp->da->allocation.height/2,  
-        sp->da->allocation.width, sp->da->allocation.height/2);
-      /*-- draw vertical line --*/
-      gdk_draw_line (drawable, gg->plot_GC,
-        sp->da->allocation.width/2, 0,
-        sp->da->allocation.width/2, sp->da->allocation.height);
-      if (!cpanel->scale.updateAlways_p) {
-	if (gg->buttondown)
-          gdk_draw_line (drawable, gg->plot_GC,
-            mousedownpos.x, mousedownpos.y,
-            sp->mousepos.x, sp->mousepos.y);
-      }
 }
 
 /*--------------------------------------------------------------------*/

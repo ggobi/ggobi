@@ -926,7 +926,6 @@ splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
       brush_draw_brush (sp, drawable, d, gg);
       brush_draw_label (sp, drawable, d, gg);
     } else if (cpanel->imode == SCALE) {
-      scaling_visual_cues_draw (sp, drawable, gg);
 
       if (GGOBI_IS_EXTENDED_SPLOT(sp)) {
         void (*f)(splotd *, GdkDrawable*, ggobid*);

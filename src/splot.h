@@ -83,7 +83,7 @@ typedef struct
  * button and key event information
 */
  gint motion_id, press_id, release_id, key_press_id;
- icoords mousepos, mousepos_o;
+ icoords mousedownpos, mousepos, mousepos_o;
 
  brush_coords brush_pos, brush_pos_o;  
 
