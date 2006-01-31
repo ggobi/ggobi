@@ -281,7 +281,19 @@ void vartable_init (datad *d)
 }
 
 void
-vartable_element_categorical_init (vartabled *vt,
+vartable_element_init(vartabled *vt, const gchar *label, const gchar *nickname)
+{
+	if (vt) {
+		vt->collab = g_strdup(label);
+		vt->collab_tform = g_strdup(label);
+		if (nickname)
+			vt->nickname = g_strdup(nickname);
+		else vt->nickname = g_strndup(vt->collab, 2);
+	}
+}
+
+void
+vartable_element_categorical_init(vartabled *vt,
   gint nlevels, gchar **level_names, gint *level_values, gint *level_counts)
 {
   gint i;
@@ -295,15 +307,11 @@ vartable_element_categorical_init (vartabled *vt,
       vt->level_names[i] = g_strdup(level_names[i]);
       if (level_counts)
         vt->level_counts[i] = level_counts[i];
+	  else vt->level_counts[i] = 0;
       if (level_values)
    	    vt->level_values[i] = level_values[i];
+	  else vt->level_values[i] = i+1;
    }
-   if (!level_counts) {
-      for(i = 0; i < nlevels; i++) {
-        vt->level_counts[i] = i;
-        vt->level_values[i] = i;
-      }
-    }
   }
 }
 

@@ -274,7 +274,7 @@ datad *ggobi_data_new(ggobid * gg)
 datad *ggobi_data_new_with_dimensions(int nr, int nc, ggobid * gg)
 {
   datad *d;
-  ggobi_data_get_type();
+  //ggobi_data_get_type();
   d = datad_create(nr, nc, gg);
   return (d);
 }

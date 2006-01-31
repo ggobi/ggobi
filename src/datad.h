@@ -258,6 +258,11 @@ extern endpointsd *resolveEdgePoints(datad *e, datad *d);
 void unresolveAllEdgePoints(datad *e);
 
 void datad_record_ids_set(datad *d, gchar **ids, gboolean duplicate);
+void ggobi_data_set_integer_column(datad *d, gint j, gint *values);
+void ggobi_data_set_double_column(datad *d, gint j, gdouble *values);
+void ggobi_data_set_row_labels(datad *d, gchar **labels);
+void ggobi_data_set_name(datad *d, const gchar *name);
+
 
 #ifdef __cplusplus
 } /* end of extern "C" */

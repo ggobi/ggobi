@@ -191,6 +191,8 @@ datad_init (datad *d, ggobid *gg, gboolean cleanup)
 
   g_signal_emit (G_OBJECT (gg), GGobiSignals[DATAD_ADDED_SIGNAL], 0, d);
 
+  display_menu_build (gg);
+  
   return (display);
 }
 
@@ -241,6 +243,54 @@ datad_record_id_add (gchar *id, datad *d)
  * quite clear on this point.  -- dfs
 */
   /*g_free (index);*/
+}
+
+void
+ggobi_data_set_integer_column(datad *d, gint j, gint *values)
+{
+	gint i;
+	vartabled *vt = vartable_element_get(j, d);
+	for (i = 0; i < d->nrows; i++) {
+		gint value = values[i];
+		if (vt->vartype == categorical) {
+			gint level = checkLevelValue(vt, value);
+			vt->level_counts[level]++;
+		}
+		if(GGobiMissingValue && GGobiMissingValue(value))
+         setMissingValue(i, j, d, vt);
+        else d->raw.vals[i][j] = (gdouble)value;
+	}
+}
+void
+ggobi_data_set_double_column(datad *d, gint j, gdouble *values)
+{
+	gint i;
+	vartabled *vt = vartable_element_get(j, d);
+	for (i = 0; i < d->nrows; i++) {
+		if(GGobiMissingValue && GGobiMissingValue(values[i]))
+         setMissingValue(i, j, d, vt);
+        else d->raw.vals[i][j] = values[i];
+	}
+}
+
+/* FIXME: this only works the first time */
+void
+ggobi_data_set_row_labels(datad *d, gchar **labels)
+{
+	gint i;
+	for (i = 0; i < d->nrows; i++) {
+		gchar *label;
+		if (labels && labels[i])
+			label = g_strdup(labels[i]);
+		else label = g_strdup_printf("%d", i);
+		g_array_append_val(d->rowlab, label);
+	}
+}
+
+void
+ggobi_data_set_name(datad *d, const gchar *name)
+{
+	d->name = g_strdup(name);
 }
 
 /*
