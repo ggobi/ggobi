@@ -531,7 +531,7 @@ void barchartDisplayClassInit(GGobiBarChartDisplayClass * klass)
 }
 
 void
-barchart_identify_cues_draw(splotd * rawsp, GdkDrawable * drawable,
+barchart_identify_cues_draw(gint k, splotd * rawsp, GdkDrawable * drawable,
                                   ggobid * gg)
 {
   /* Adding a no-op here is a way to have the default cues drawn for

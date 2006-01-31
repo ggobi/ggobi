@@ -1073,7 +1073,8 @@ GGOBI(close)(ggobid *gg, gboolean closeWindow)
   /* Now fix up the list of ggobi's */
   val = ggobi_remove(gg) != -1;
 
-  if(GGobi_getNumGGobis() == 0 && sessionOptions->info->quitWithNoGGobi) {
+  if(GGobi_getNumGGobis() == 0 && sessionOptions->info->quitWithNoGGobi &&
+  	gtk_main_level() > 0) {
       gtk_main_quit();
   }
 
