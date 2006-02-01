@@ -404,15 +404,15 @@ worldToPlane(splotd *sp, datad *d, ggobid *gg)
 }
 
 static void
-addIdentifyCues (gint k, splotd *sp, GdkDrawable *drawable, ggobid *gg)
+addIdentifyCues (gboolean nearest_p, gint k, splotd *sp, GdkDrawable *drawable, ggobid *gg)
 {
   colorschemed *scheme = gg->activeColorScheme;
 
-  splot_add_diamond_cue (k, sp, drawable, gg);
+  if (nearest_p)
+    splot_add_diamond_cue (k, sp, drawable, gg);
 
   gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
-  // OK -- this routine only called for nearest.
-  splot_add_point_label (true, k, false, sp, drawable, gg);
+  splot_add_point_label (nearest_p, k, false, sp, drawable, gg);
 }
 
 gboolean

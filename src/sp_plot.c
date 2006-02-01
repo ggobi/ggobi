@@ -643,11 +643,10 @@ splot_add_diamond_cue (gint k, splotd *sp, GdkDrawable *drawable, ggobid *gg)
 }
 
 /*-- add the label to a case (with or without underlining).  if this
-  is the nearest point, the label is also added at the top of the
-  window.  it would be easy enough to make that optional so different
-  display types could make different choices. --*/
+  is the nearest point, the label may also be added at the top of the
+  window. --*/
 void
-splot_add_point_label (gboolean nearest, gint k, gboolean top_p, splotd *sp,
+splot_add_point_label (gboolean nearest_p, gint k, gboolean top_p, splotd *sp,
   GdkDrawable *drawable, ggobid *gg)
 {
   displayd *dsp = sp->displayptr;
@@ -668,34 +667,35 @@ splot_add_point_label (gboolean nearest, gint k, gboolean top_p, splotd *sp,
   if (lbl) {
     layout = gtk_widget_create_pango_layout(sp->da, NULL);
     layout_text(layout, lbl, &rect);
-    /*-- display the label in the top center of the window --*/
-    if (nearest && top_p) {
+    /* display the label in the top center of the window */
+    if (nearest_p && top_p) {
       underline_text(layout);
       gdk_draw_layout (drawable, gg->plot_GC,
        	(sp->max.x - rect.width)/2, 5, layout);
     }
+    /* display the label next to the point */
     if (sp->screen[k].x <= sp->max.x/2) {
       gdk_draw_layout (drawable, gg->plot_GC, 
   	 sp->screen[k].x+diamond_dim,
 	 sp->screen[k].y-rect.height-diamond_dim,
 	 layout);
-
-      /*-- underline the nearest point label?  --*/
 #if 0
-      if (nearest)
+      /*-- underline the nearest point label?  --*/
+      if (nearest_p)
         gdk_draw_line (drawable, gg->plot_GC,
           sp->screen[k].x+diamond_dim,
           sp->screen[k].y-diamond_dim+1,
           sp->screen[k].x+diamond_dim+rect.width,
           sp->screen[k].y-diamond_dim+1);
 #endif
+
     } else {
-	gdk_draw_layout(drawable, gg->plot_GC,
-       	sp->screen[k].x - rect.width - diamond_dim,
+      gdk_draw_layout(drawable, gg->plot_GC,
+        sp->screen[k].x - rect.width - diamond_dim,
 	sp->screen[k].y - rect.height - diamond_dim,
 	layout);
 #if 0
-      if (nearest)
+      if (nearest_p)
         gdk_draw_line (drawable, gg->plot_GC,
           sp->screen[k].x - rect.width - diamond_dim,
           sp->screen[k].y - diamond_dim+1,
@@ -705,7 +705,7 @@ splot_add_point_label (gboolean nearest, gint k, gboolean top_p, splotd *sp,
     }
 #if 0
     /*-- display the label in the top center of the window as well --*/
-    if (nearest && top_p) {
+    if (nearest_p && top_p) {
       gdk_draw_layout (drawable, gg->plot_GC,
         (sp->max.x - rect.width)/2, 5, layout);
       /*-- underline it there, too, for consistency --*/
@@ -725,21 +725,18 @@ splot_add_identify_cues (splotd *sp, GdkDrawable *drawable,
 {
   colorschemed *scheme = gg->activeColorScheme;
 
-  if (nearest_p) {
-    if (GGOBI_IS_EXTENDED_SPLOT(sp)) {
-      GGobiExtendedSPlotClass *klass;
-      klass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);
-      if (klass->add_identify_cues) {
-        klass->add_identify_cues(k, sp, drawable, gg);
-      } else {
-
+  if (GGOBI_IS_EXTENDED_SPLOT(sp)) {
+    GGobiExtendedSPlotClass *klass;
+    klass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);
+    if (klass->add_identify_cues) {
+      klass->add_identify_cues(nearest_p, k, sp, drawable, gg);
+    } else {
+      if (nearest_p)
         splot_add_diamond_cue (k, sp, drawable, gg);
-        /* I've turned off this label for the barchart. parallel coords
-         and scatterplot matrix displays need some thought too. */
-        gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
-        splot_add_point_label (nearest_p, k, true, sp, drawable, gg);
-
-      }
+      /* I've turned off this label for the barchart.  parallel coords
+       and scatterplot matrix displays need some thought too. dfs */
+      gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
+      splot_add_point_label (nearest_p, k, true, sp, drawable, gg);
     }
   }
 }

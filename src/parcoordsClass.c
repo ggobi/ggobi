@@ -435,7 +435,7 @@ add_xml_parcoords_variables(xmlNodePtr node, GList *plots, displayd *dpy)
 
 /*-- add highlighting for parallel coordinates plot --*/
 static void
-splot_add_whisker_cues (gint k, splotd *sp, GdkDrawable *drawable, ggobid *gg)
+splot_add_whisker_cues (gboolean nearest_p, gint k, splotd *sp, GdkDrawable *drawable, ggobid *gg)
 {
   gint n;
   displayd *display = sp->displayptr;
@@ -462,10 +462,11 @@ splot_add_whisker_cues (gint k, splotd *sp, GdkDrawable *drawable, ggobid *gg)
       0, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
   }
 
-  /* Add the label for the nearest point -- at the top as well */
-  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
-  // OK -- this routine only called for nearest.
-  splot_add_point_label (true, k, true, sp, drawable, gg);
+  if (nearest_p) {
+    /* Add the label for the nearest point at the top as well */
+    gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
+    splot_add_point_label (true, k, true, sp, drawable, gg);
+  }
 }
 
 
