@@ -187,16 +187,6 @@ static void open_symbol_window_cb(GtkWidget * w, ggobid * gg)
   make_symbol_window(gg);
 }
 
-static void cluster_window_cb(GtkWidget * button, ggobid * gg)
-{
-  cluster_window_open(gg);
-}
-
-static void wvis_window_cb(GtkWidget * button, ggobid * gg)
-{
-  wvis_window_open(gg);
-}
-
 void brush_reset(displayd * display, gint action)
 {
   gint i, k;
