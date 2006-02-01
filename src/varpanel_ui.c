@@ -345,6 +345,7 @@ varpanel_add_row (gint j, datad *d, ggobid *gg)
     box, false, false, 1);
 
   xw = ggobi_noop_toggle_button_new_with_label (" X ");
+  gtk_widget_set_sensitive(xw, false);
   gtk_box_pack_start (GTK_BOX (box), xw, false, false, 2);
   GGobi_widget_set (xw, gg, true);
   g_object_set_data(G_OBJECT(box), varpanel_names[VARSEL_X], xw);
@@ -353,6 +354,7 @@ varpanel_add_row (gint j, datad *d, ggobid *gg)
   gtk_widget_show (xw);
 
   yw = ggobi_noop_toggle_button_new_with_label (" Y ");
+  gtk_widget_set_sensitive(yw, false);
   gtk_box_pack_start (GTK_BOX (box), yw, false, false, 2);
   GGobi_widget_set (yw, gg, true);
   g_object_set_data(G_OBJECT(box), varpanel_names[VARSEL_Y], yw);
@@ -361,6 +363,7 @@ varpanel_add_row (gint j, datad *d, ggobid *gg)
   gtk_widget_show (yw);
 
   zw = ggobi_noop_toggle_button_new_with_label (" Z ");
+  gtk_widget_set_sensitive(zw, false);
   gtk_box_pack_start (GTK_BOX (box), zw, false, false, 2);
   GGobi_widget_set (zw, gg, true);
   g_object_set_data(G_OBJECT(box), varpanel_names[VARSEL_Z], zw);
@@ -370,6 +373,7 @@ varpanel_add_row (gint j, datad *d, ggobid *gg)
 
   /*-- the label is actually a button, with the old behavior --*/
   label = gtk_button_new_with_label (vt->collab_tform);
+  gtk_widget_set_sensitive(label, false);
   gtk_button_set_relief (GTK_BUTTON (label), GTK_RELIEF_NONE);
   GGobi_widget_set (label, gg, true);
   g_object_set_data(G_OBJECT(box), varpanel_names[VARSEL_LABEL], label);
@@ -428,6 +432,32 @@ its own projection.  Add a variable to varpanel_ui in datad.h? -- dfs */
 /*-------------------------------------------------------------------------*/
 /*                  initialize and populate the var panel                  */
 /*-------------------------------------------------------------------------*/
+
+static GtkWidget *
+varpanel_widget_find_by_attributes(gint row, gchar *name, GtkWidget *box) {
+
+}
+
+void
+varpanel_set_sensitive (datad *d, gboolean sensitive_p)
+{
+  gint i;
+  GtkWidget *vbox = d->vcbox_ui.vbox, *hb;
+  GList *vblist, *hblist, *l;
+
+  /* The vbox has one child per row, an hbox. */
+  vblist = gtk_container_get_children(GTK_CONTAINER(vbox));
+  while (vblist) {
+    hb = (GtkWidget *) vblist->data;
+    hblist = gtk_container_get_children(GTK_CONTAINER(hb));
+    while (hblist) {
+      gtk_widget_set_sensitive((GtkWidget *) hblist->data, sensitive_p);
+      hblist = hblist->next;
+    }
+    vblist = vblist->next;
+  }    
+}
+
 
 /*
  * build the notebook to contain a paned widget which will contain
@@ -513,9 +543,7 @@ varpanel_populate (datad *d, ggobid *gg)
 
   /*-- create a scrolled window, and put it in the ebox --*/
   d->vcbox_ui.swin = gtk_scrolled_window_new (NULL, NULL);
-
-  gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW(d->vcbox_ui.swin), GTK_SHADOW_NONE);
-
+  //gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW(d->vcbox_ui.swin), GTK_SHADOW_NONE);
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (d->vcbox_ui.swin),
     GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
   gtk_container_add (GTK_CONTAINER (d->vcbox_ui.ebox), d->vcbox_ui.swin);

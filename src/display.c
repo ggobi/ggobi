@@ -458,6 +458,7 @@ display_set_values(displayd *display, datad *d, ggobid *gg)
 
   display->ggobi = gg;
   display->d = d;
+  varpanel_set_sensitive(d, true);
 }
 
 displayd *
@@ -477,13 +478,12 @@ gint
 display_add (displayd *display, ggobid *gg)
 {
   splotd *prev_splot = gg->current_splot;
-  //ProjectionMode pmode_prev = pmode_get (gg);
   ProjectionMode pmode_prev = pmode_get (gg->current_display, gg);
   InteractionMode imode_prev = imode_get (gg);
   ///displayd *oldDisplay = gg->current_display;
 
-   /* This is a safety test to avoid having a display be entered twice.
-      Deactivate if we want to be slightly more efficient.             */  
+ /* This is a safety test to avoid having a display be entered twice.
+    Deactivate if we want to be slightly more efficient.             */  
   if(g_list_find(gg->displays, display)) {
     g_printerr("Display has already been added to the displays list of this ggobi\n");
     return(-1);
@@ -504,7 +504,7 @@ display_add (displayd *display, ggobid *gg)
   }
   gg->displays = g_list_append (gg->displays, (gpointer) display);
 
-    /* If the tree of displays is active, add this to it. */
+  /* If the tree of displays is active, add this to it. */
   display_add_tree(display);
 
   // setting current splot was here
@@ -512,11 +512,6 @@ display_add (displayd *display, ggobid *gg)
   /*
    * The current display types start without signal handlers, but
    * I may need to add handlers later for some unforeseen display.
-  */
-  /* This seems to be redundant -- dfs */
-  /*
-  viewmode_set (gg->current_display->cpanel.pmode,
-  gg->current_display->cpanel.imode,  gg); 
   */
 
   /*-- if starting from the API, or changing mode, update the mode menus --*/
