@@ -245,21 +245,21 @@ varpanel_reinit (ggobid *gg)
 void
 rebuild_mode_menus(displayd *display, ggobid *gg)
 {
-	static const gchar *iprefix = "/menubar/IMode/", *pprefix = "/menubar/PMode/";
-	gchar* path;
-	GtkAction *action = NULL;
+  static const gchar *iprefix = "/menubar/IMode/", *pprefix = "/menubar/PMode/";
+  gchar* path;
+  GtkAction *action = NULL;
 
 	
-    if(GGOBI_IS_EXTENDED_DISPLAY(display)) {
-		gtk_ui_manager_remove_ui(gg->main_menu_manager, gg->mode_merge_id);
-     /* Allow the extended display to override the submenu_destroy call.
-        If it doesn't provide a method, then call submenu_destroy. */
-      void (*f)(displayd *dpy) =
+  if(GGOBI_IS_EXTENDED_DISPLAY(display)) {
+    gtk_ui_manager_remove_ui(gg->main_menu_manager, gg->mode_merge_id);
+    /* Allow the extended display to override the submenu_destroy call.
+       If it doesn't provide a method, then call submenu_destroy. */
+    void (*f)(displayd *dpy) =
         GGOBI_EXTENDED_DISPLAY_GET_CLASS(display)->display_unset;
-      if(f) {
+    if(f) {
         f(display);
         f(display);
-      }/*
+    }/*
       else { 
         if (gg->pmode_item)
           submenu_destroy (gg->pmode_item);
@@ -269,18 +269,18 @@ rebuild_mode_menus(displayd *display, ggobid *gg)
 
     /* Then rebuild */
     if(GGOBI_IS_EXTENDED_DISPLAY(display)) {
-		const gchar* (*ui_get)(displayd *dpy) = 
-			GGOBI_EXTENDED_DISPLAY_GET_CLASS(display)->mode_ui_get;
-		if (ui_get) {
-			GError *error = NULL;
-			const gchar *ui = ui_get(display);
-			gg->mode_merge_id = 
-				gtk_ui_manager_add_ui_from_string(gg->main_menu_manager, ui, -1, &error);
-			if (error) {
-				g_message("Could not merge main mode ui from display");
-				g_error_free(error);
-			}
-		}
+      const gchar* (*ui_get)(displayd *dpy) = 
+	  GGOBI_EXTENDED_DISPLAY_GET_CLASS(display)->mode_ui_get;
+      if (ui_get) {
+	  GError *error = NULL;
+	  const gchar *ui = ui_get(display);
+	  gg->mode_merge_id = 
+	    gtk_ui_manager_add_ui_from_string(gg->main_menu_manager, ui, -1, &error);
+	  if (error) {
+		g_message("Could not merge main mode ui from display");
+		g_error_free(error);
+	  }
+      }
       void (*f)(displayd *dpy, ggobid *gg) =
         GGOBI_EXTENDED_DISPLAY_GET_CLASS(display)->display_set;
       if(f)
@@ -413,6 +413,9 @@ viewmode_set (ProjectionMode pmode, InteractionMode imode, ggobid *gg)
 void
 procs_activate (gboolean state, ProjectionMode pmode, displayd *display, ggobid *gg)
 {
+  if (!display)
+    return;
+
   switch (pmode) {
     case TOUR1D:
       if (!display->cpanel.t1d.paused)
@@ -659,7 +662,7 @@ GGOBI(full_viewmode_set)(ProjectionMode pmode, InteractionMode imode, ggobid *gg
     /*-- need to remove console menus: Options, Reset, ... --*/
     /*main_miscmenus_update (gg->pmode_prev, gg->imode_prev, NULL, gg);*/
     if (gg->mode_merge_id)
-		gtk_ui_manager_remove_ui(gg->main_menu_manager, gg->mode_merge_id);
+ 	gtk_ui_manager_remove_ui(gg->main_menu_manager, gg->mode_merge_id);
 	//submenu_destroy (gg->imode_item);
 
   return (NULL_IMODE);
@@ -691,6 +694,7 @@ quit_ggobi(ggobid *gg)
   }
   closePlugins(gg);
 #endif
+  g_printerr("(quit_ggobi)\n");
   procs_activate (off, gg->pmode, gg->current_display, gg);
   gtk_main_quit();
 }
@@ -1098,20 +1102,6 @@ make_ui (ggobid *gg)
   gg->main_menu_manager = ggobi_menu_manager_create(gg);
   gg->main_menubar = create_menu_bar(gg->main_menu_manager, main_ui_str, window);
   gg->main_accel_group = gtk_ui_manager_get_accel_group(gg->main_menu_manager);
-
-/* I don't know that this is the best place for this ... should I
-create and destroy these groups when the menus are torn down and
-rebuilt? -- dfs */
-/* - these should probably just exist within the ui manager - mfl
-  gg->pmode_accel_group = gtk_accel_group_new ();
-  gg->imode_accel_group = gtk_accel_group_new ();
-*/
-  /*
-  gtk_window_add_accel_group (GTK_WINDOW (window), gg->pmode_accel_group);
-  gtk_window_add_accel_group (GTK_WINDOW (window), gg->imode_accel_group);
-  gtk_accel_group_lock (gg->pmode_accel_group);
-  gtk_accel_group_lock (gg->imode_accel_group);
-  */
 
 #ifdef SUPPORT_INIT_FILES
   if (sessionOptions->info && sessionOptions->info->numInputs > 0) {
