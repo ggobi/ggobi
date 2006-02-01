@@ -87,10 +87,10 @@ GtkWidget *cpanel_barchart_make(ggobid * gg)
 static const gchar* mode_ui_str =
 "<ui>"
 "	<menubar>"
-"		<menu action='PMode'>"
+/*"		<menu action='PMode'>"
 "			<menuitem action='ExtendedDisplayPMode'/>"
 "			<menuitem action='1D Tour'/>"
-"		</menu>"
+"		</menu>"*/
 "		<menu action='IMode'>"
 "			<menuitem action='DefaultIMode'/>"
 "			<separator/>"

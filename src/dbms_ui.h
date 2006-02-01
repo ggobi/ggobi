@@ -54,9 +54,9 @@ extern "C" {
   DBMSInfoElement getDBMSLoginElementIndex(const char *name);
 
 
-    void GGOBI(cancelDBMSGUI)(GtkButton *button, DBMSGUIInput *guiInput);
-    void GGOBI(getDBMSGUIHelp)(GtkButton *button, DBMSGUIInput *guiInput);
-    void GGOBI(getDBMSGUIInfo)(GtkButton *button, DBMSGUIInput *guiInput);
+    void GGOBI(cancelDBMSGUI)(DBMSGUIInput *guiInput);
+    void GGOBI(getDBMSGUIHelp)(DBMSGUIInput *guiInput);
+    gboolean GGOBI(getDBMSGUIInfo)(DBMSGUIInput *guiInput);
 
 #ifdef __cplusplus 
 }

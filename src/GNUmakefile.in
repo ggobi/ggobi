@@ -24,6 +24,8 @@ SRC=\
     color_ui.c \
     cpanel.c \
     datad.c \
+    dbms.c \
+    dbms_ui.c \
     display.c \
     display_tree.c \
     display_ui.c \

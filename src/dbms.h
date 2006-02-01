@@ -66,7 +66,7 @@ extern DBMSLoginInfo DefaultDBMSInfo;
 DBMSLoginInfo * initDBMSLoginInfo(DBMSLoginInfo *login, GHashTable *);
 DBMSInfoElement getDBMSLoginElementIndex(const char *name);
 char *getDBMSLoginElement(DBMSInfoElement i, int *isCopy, DBMSLoginInfo *info);
-int setDBMSLoginElement(DBMSInfoElement i, char * const val, DBMSLoginInfo *info);
+int setDBMSLoginElement(DBMSInfoElement i, char *val, DBMSLoginInfo *info);
 #endif
 
 
