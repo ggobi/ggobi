@@ -551,23 +551,28 @@ display_free (displayd* display, gboolean force, ggobid *gg)
 
   if (num_ggobis > 1 || force || g_list_length (gg->displays) > 0) {
 
-    /* These are probably mutually exclusive 
-       and so we could use an else-if sequence
-       but the results are catastrophic if we get it
+    /* These are probably mutually exclusive and so we could use an
+       else-if sequence but the results are catastrophic if we get it
        wrong so we play on the safe side of the fence.
      */
-    if(display->t2d.idled) {
-      tour2d_func(false, display, gg);
-    }
-    if (display->t2d_window)  /* XXX more to free or destroy here? */
-      gtk_widget_destroy (display->t2d_window);
+
     if(display->t1d.idled) {
       tour1d_func(false, display, gg);
     }
     if (display->t1d_window)  /* XXX more to free or destroy here? */
       gtk_widget_destroy (display->t1d_window);
+
+    if(display->t2d.idled) {
+      tour2d_func(false, display, gg);
+    }
+    if (display->t2d_window)  /* XXX more to free or destroy here? */
+      gtk_widget_destroy (display->t2d_window);
+
     if(display->tcorr1.idled) {
       tourcorr_func(false, display, gg);
+    }
+    if(display->t2d3.idled) {
+      tour2d3_func(false, display, gg);
     }
 
 /*
