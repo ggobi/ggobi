@@ -694,7 +694,6 @@ quit_ggobi(ggobid *gg)
   }
   closePlugins(gg);
 #endif
-  g_printerr("(quit_ggobi)\n");
   procs_activate (off, gg->pmode, gg->current_display, gg);
   gtk_main_quit();
 }
