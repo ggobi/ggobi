@@ -18,7 +18,7 @@ gboolean
 addToToolsMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 {
   static GtkActionEntry entry = {
-	"GGVis", NULL, "_ggvis (MDS)", NULL, "Multi-dimensional scaling tool", 
+	"GGVis", NULL, "ggvis (MDS)", NULL, "Multi-dimensional scaling tool", 
 		G_CALLBACK (show_ggvis_window)
   };
   GGOBI(addToolAction)(&entry, (gpointer)inst, gg);
