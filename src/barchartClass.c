@@ -162,23 +162,6 @@ gboolean barchartCPanelSet(displayd * dpy, cpaneld * cpanel, ggobid * gg)
 
 void barchartDisplaySet(displayd * dpy, ggobid * gg)
 {  
-  /*
-  GtkWidget *pmode_menu, *imode_menu;
-
-  pmode_menu = barchart_pmode_menu_make(gg->pmode_accel_group,
-                                 G_CALLBACK(pmode_set_cb), gg,
-                                 true);
-  gg->pmode_item = submenu_make("_View", 'V', gg->main_accel_group);
-  gtk_menu_item_set_submenu(GTK_MENU_ITEM(gg->pmode_item), pmode_menu);
-  submenu_insert(gg->pmode_item, gg->main_menubar, 2);
-
-  imode_menu = barchart_imode_menu_make(gg->imode_accel_group,
-                                 G_CALLBACK(imode_set_cb), gg,
-                                 true);
-  gg->imode_item = submenu_make("_Interaction", 'I', gg->main_accel_group);
-  gtk_menu_item_set_submenu(GTK_MENU_ITEM(gg->imode_item), imode_menu);
-  submenu_insert(gg->imode_item, gg->main_menubar, 3);
-*/
 }
 
 
