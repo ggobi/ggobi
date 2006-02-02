@@ -182,7 +182,7 @@ neato_apply_edge_length (Agraph_t *graph, gint weightvar, glong *visible,
           agsafeset (edge, "len", 
 	     g_strdup_printf("%f", e->tform.vals[i][weightvar]), NULL);
 #else
-          edge->u.dist = e->tform.vals[i][selected_var];
+          edge->u.dist = e->tform.vals[i][weightvar];
 #endif
         }
       }
@@ -441,7 +441,7 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
     }
     gvLayout (gvc, graph, "neato");
 #else
-    neatoLayout (graph, MODE_MAJOR, model);
+    neatoLayout (graph, MODE_MAJOR, imodel);
     adjustNodes(graph);
 #endif
 
