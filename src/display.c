@@ -458,7 +458,6 @@ display_set_values(displayd *display, datad *d, ggobid *gg)
 
   display->ggobi = gg;
   display->d = d;
-  varpanel_set_sensitive(d, true);
 }
 
 displayd *

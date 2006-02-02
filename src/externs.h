@@ -648,7 +648,7 @@ void       varpanel_make (GtkWidget *, ggobid *);
 void       varpanel_populate (datad *, ggobid *);
 void       varpanel_refresh (displayd *, ggobid *);
 void       varpanel_reinit (ggobid *gg);
-void       varpanel_set_sensitive (datad *d, gboolean sensitive_p);
+void       varpanel_set_sensitive (datad *d, gboolean sensitive_p, ggobid *);
 void       varpanel_show_page (displayd*, ggobid*);
 void       varpanel_tooltips_set (displayd *, ggobid *);
 GtkWidget* varpanel_widget_get_nth (gint jbutton, gint jvar, datad *d);

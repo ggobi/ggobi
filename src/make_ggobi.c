@@ -310,6 +310,8 @@ void start_ggobi(ggobid * gg, gboolean init_data, gboolean createPlot)
     for (l = gg->d; l; l = l->next) {
       d = (datad *) l->data;
       datad_init(d, gg, firstd);
+      if (firstd)
+        varpanel_set_sensitive (d, true, gg);
       firstd = false;
     }
 
@@ -333,6 +335,6 @@ void start_ggobi(ggobid * gg, gboolean init_data, gboolean createPlot)
 
   gg->pmode_prev = gg->pmode;
   gg->imode_prev = gg->imode;
-        /*-- initialize the mode menus for the new mode --*/
+  /*-- initialize the mode menus for the new mode --*/
   /*main_miscmenus_update(NULL_PMODE, NULL_IMODE, (displayd *) NULL, gg);*/
 }
