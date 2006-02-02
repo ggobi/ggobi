@@ -142,7 +142,7 @@ static const gchar *const constrained_lbl[] = {
 void
 show_ggvis_window (GtkAction *action, PluginInstance *inst)
 {
-  GList *l;
+  GSList *l;
   datad *d;
   gboolean ok = false;
 
