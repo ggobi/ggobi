@@ -357,6 +357,7 @@ ggobi_alloc(ggobid *tmp)
 
   tmp->d = NULL;
   tmp->displays = NULL;
+  tmp->current_display = NULL;
 
   /*-- initialize to NULLMODE and check for ncols later --*/
   tmp->pmode = NULL_PMODE;

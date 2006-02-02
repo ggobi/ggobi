@@ -175,7 +175,6 @@ datad_init (datad *d, ggobid *gg, gboolean cleanup)
         	g_list_nth_data (display->splots, 0);
         display->current_splot = gg->current_splot;
         display_set_current (display, gg);
-        
 
         /*-- turn on event handling in the very first plot --*/
         /*-- ... but will it cause trouble for later plots?  ok so far
