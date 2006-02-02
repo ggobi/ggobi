@@ -340,15 +340,15 @@ enum { LINKBYLIST_NAME, LINKBYLIST_VT, LINKBYLIST_NCOLS };
 void linkby_notebook_subwindow_add (datad *d, GtkWidget *notebook, ggobid *);
 
 void varlist_append(GtkListStore *list, vartabled *vt) {
-	gchar *row;
-	GtkTreeIter iter;
+  gchar *row;
+  GtkTreeIter iter;
 	
-	if (vt && vt->vartype == categorical) {
-		gtk_list_store_append(list, &iter);
-		row = g_strdup_printf("%s", vt->collab);
-		gtk_list_store_set(list, &iter, LINKBYLIST_NAME, row, LINKBYLIST_VT, vt, -1);
-		g_free(row);
-	}
+  if (vt && vt->vartype == categorical) {
+    gtk_list_store_append(list, &iter);
+    row = g_strdup_printf("%s", vt->collab);
+    gtk_list_store_set(list, &iter, LINKBYLIST_NAME, row, LINKBYLIST_VT, vt, -1);
+    g_free(row);
+  }
 }
 void varlist_populate(GtkListStore *list, datad *d) {
   gint j;
@@ -370,7 +370,7 @@ linkby_current_page_set (displayd *display, GtkWidget *notebook, ggobid *gg)
 {
   GtkWidget *swin;
   datad *d = display->d, *paged;
-  gint page_num;
+  gint page_num, cur_page_num;
 
   if (notebook == NULL) {
     return;
@@ -387,11 +387,10 @@ linkby_current_page_set (displayd *display, GtkWidget *notebook, ggobid *gg)
   while (swin) {
     paged = (datad *) g_object_get_data (G_OBJECT (swin), "datad");
 
-    //g_printerr ("(current_page_set) paged %s d %s   ==? %d\n", paged->name, d->name, (paged == d));
-
     gtk_widget_set_sensitive (swin, (paged == d));
     if (paged == d) {
       gtk_notebook_set_current_page (GTK_NOTEBOOK(notebook), page_num);
+      break;
     }
     page_num += 1;
     swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK(notebook), page_num);
@@ -533,8 +532,8 @@ linkby_notebook_adddata_cb (ggobid *gg, datad *d, void *notebook, GtkSignalFunc 
     linkby_notebook_subwindow_add (d, notebook, gg);
   }
 
-  gtk_notebook_set_show_tabs (GTK_NOTEBOOK (GTK_OBJECT(notebook)),
-                              g_slist_length (gg->d) > 1);
+  //gtk_notebook_set_show_tabs (GTK_NOTEBOOK (GTK_OBJECT(notebook)),
+  //                            g_slist_length (gg->d) > 1);
 }
 
 void
@@ -607,7 +606,8 @@ create_linkby_notebook (GtkWidget *box, ggobid *gg)
   /* Create a notebook, set the position of the tabs */
   notebook = gtk_notebook_new ();
   gtk_notebook_set_tab_pos (GTK_NOTEBOOK (notebook), GTK_POS_TOP);
-  gtk_notebook_set_show_tabs (GTK_NOTEBOOK (notebook), nd > 1);
+  //gtk_notebook_set_show_tabs (GTK_NOTEBOOK (notebook), nd > 1);
+  gtk_notebook_set_show_tabs (GTK_NOTEBOOK (notebook), false);
   gtk_box_pack_start (GTK_BOX (box), notebook, true, true, 2);
   g_object_set_data (G_OBJECT(notebook), "SELECTION", (gpointer) mode);
   g_object_set_data (G_OBJECT(notebook), "vartype", (gpointer) vtype);
