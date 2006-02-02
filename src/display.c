@@ -765,6 +765,9 @@ display_set_current (displayd *new_display, ggobid *gg)
   }
 
   gg->current_display = new_display;
+
+  g_signal_emit(G_OBJECT(gg), GGobiSignals[DISPLAY_SELECTED_SIGNAL], 0, new_display);
+
   cpanel_set (gg->current_display, gg);
 
   /*

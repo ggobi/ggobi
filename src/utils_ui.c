@@ -534,10 +534,10 @@ get_selections_from_tree_view (GtkWidget *tree_view, gint *nvars)
 void
 select_tree_view_row(GtkWidget *tree_view, gint row)
 {
-	GtkTreeSelection *tree_sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view));
-	GtkTreePath *path = gtk_tree_path_new_from_indices(row, -1);
-	gtk_tree_selection_select_path(tree_sel, path);
-	gtk_tree_path_free(path);
+  GtkTreeSelection *tree_sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view));
+  GtkTreePath *path = gtk_tree_path_new_from_indices(row, -1);
+  gtk_tree_selection_select_path(tree_sel, path);
+  gtk_tree_path_free(path);
 }
 
 /** gets the selected row index from a GtkTreeSelection in 'single' mode.
@@ -701,24 +701,53 @@ static void
 prefixed_variable_notebook_varchange_cb (ggobid *gg, vartabled *vt, gint which,
   datad *data, void *notebook)
 {
-	datad *d = (datad *) datad_get_from_notebook (GTK_WIDGET(notebook), gg);
-    gint kd = g_slist_index (gg->d, d);
-	variable_notebook_page_add_prefices(GTK_WIDGET(notebook), kd);
+  datad *d = (datad *) datad_get_from_notebook (GTK_WIDGET(notebook), gg);
+  gint kd = g_slist_index (gg->d, d);
+  variable_notebook_page_add_prefices(GTK_WIDGET(notebook), kd);
 }
 
 static void 
 prefixed_variable_notebook_adddata_cb (ggobid *gg, datad *d, void *notebook)
 {
-	datatyped dtype = (datatyped) g_object_get_data(G_OBJECT(notebook), "datatype");
-	if ((dtype == all_datatypes) ||
+  datatyped dtype = (datatyped) g_object_get_data(G_OBJECT(notebook), "datatype");
+  if ((dtype == all_datatypes) ||
       (dtype == no_edgesets && d->edge.n == 0) ||
       (dtype == edgesets_only && d->edge.n > 0))
-	{
-		if (g_slist_length (d->vartable))
-			variable_notebook_page_add_prefices(GTK_WIDGET(notebook),	 
-		  		gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook))-1);
-	}
+  {
+    if (g_slist_length (d->vartable))
+	variable_notebook_page_add_prefices(GTK_WIDGET(notebook),	 
+		gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook))-1);
+  }
 }
+
+/*  modeled on the routine in brush_link.c
+void
+prefixed_variable_notebook_current_page_set (displayd *display, 
+  GtkWidget *notebook, ggobid *gg)
+{
+  GtkWidget *swin;
+  datad *d = display->d, *paged;
+  gint page_num, cur_page_num;
+
+  if (notebook == NULL) {
+    return;
+  }
+
+  page_num = 0;
+  swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK(notebook), page_num);
+  while (swin) {
+    paged = (datad *) g_object_get_data (G_OBJECT (swin), "datad");
+
+    gtk_widget_set_sensitive (swin, (paged == d));
+    if (paged == d) {
+      gtk_notebook_set_current_page (GTK_NOTEBOOK(notebook), page_num);
+      break;
+    }
+    page_num += 1;
+    swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK(notebook), page_num);
+  }
+}
+*/
 
 GtkWidget *create_prefixed_variable_notebook(GtkWidget *box, GtkSelectionMode mode, 
 	vartyped vtype, datatyped dtype, GtkSignalFunc func, gpointer func_data, 

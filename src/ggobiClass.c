@@ -202,6 +202,20 @@ void ggobi_ggobi_class_init(GGobiGGobiClass * klass)
       G_TYPE_NONE, 1, 
       GGOBI_TYPE_DISPLAY);  /* displayd pointer */
   }
+
+
+  /* This signal is to be emitted by display_set_current, and picked
+     up by the console. */
+  if (g_signal_lookup("display_selected", GGOBI_TYPE_GGOBI) == 0) {
+    GGobiSignals[DISPLAY_SELECTED_SIGNAL] = 
+    g_signal_new("display_selected",
+      G_TYPE_FROM_CLASS(klass),
+	  G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION, 0, NULL, NULL,
+      g_cclosure_marshal_VOID__OBJECT,
+      G_TYPE_NONE, 1, 
+      GGOBI_TYPE_DISPLAY);  /* displayd pointer */
+  }
+
   /*int i;
   for (i = 0; i < MAX_GGOBI_SIGNALS; i++) {
 	  printf("%d\n", GGobiSignals[i]);

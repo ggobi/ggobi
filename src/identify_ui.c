@@ -322,23 +322,14 @@ cpanel_identify_make(ggobid *gg) {
 
   /*-- provide a variable list so that any variable can be the label --*/
   /*opt = gtk_combo_box_new_text ();*/ /* create combo box before notebook */
-  notebook = create_prefixed_variable_notebook (panel->w, GTK_SELECTION_MULTIPLE, 
-  	all_vartypes, all_datatypes, G_CALLBACK(label_selected_cb), NULL, gg, label_prefix_func);
-  g_object_set_data(G_OBJECT (panel->w),
-    "notebook", notebook);
+  notebook = create_prefixed_variable_notebook (panel->w,
+    GTK_SELECTION_MULTIPLE, all_vartypes, all_datatypes, 
+    G_CALLBACK(label_selected_cb), NULL, gg, label_prefix_func);
+  // experiment -- dfs
+  //gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), false);
+  g_object_set_data(G_OBJECT (panel->w), "notebook", notebook);
   /*gtk_combo_box_set_active(GTK_COMBO_BOX(opt), ID_RECORD_LABEL);*/
 
-  /*-- option menu --*/
-  /* created above */
-  /*gtk_widget_set_name (opt, "IDENTIFY:display_option_menu");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-    "How to construct the label to be displayed: the record label, record number, a label constructed using variables selected in the list above, or the record id",
-    NULL);
-  gtk_box_pack_start (GTK_BOX (panel->w),
-                      opt, false, false, 0);
-  populate_combo_box (opt, display_lbl, G_N_ELEMENTS(display_lbl),
-    G_CALLBACK(display_cb), gg);
-*/
  /*-- button for removing all labels --*/
   btn = gtk_button_new_with_mnemonic ("_Remove labels");
   gtk_widget_set_name (btn, "IDENTIFY:remove_sticky_labels");
@@ -353,7 +344,6 @@ cpanel_identify_make(ggobid *gg) {
 /*
  * button for making all labels sticky
 */
-  //btn = gtk_button_new_with_mnemonic ("Make all _sticky");
   btn = gtk_button_new_with_mnemonic ("Label all");
   gtk_tooltips_set_tip (GTK_TOOLTIPS(gg->tips), btn,
     "Make all labels sticky, or persistent (to make the nearest point label sticky, click middle or right in the plot)",
