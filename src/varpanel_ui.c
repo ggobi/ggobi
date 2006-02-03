@@ -32,8 +32,8 @@
 /* Sample: respond to display_selected events */
 /*
 void 
-varpanel_display_selected_cb (ggobid *gg, displayd *display) {
-  g_printerr("display selected: %s\n", display->d->name);
+varpanel_display_selected_cb (ggobid *gg, displayd *display, datad *d) {
+  g_printerr("display selected: %s for d=%s\n", display->d->name, d->name);
 }
 */
 
@@ -579,9 +579,10 @@ varpanel_populate (datad *d, ggobid *gg)
   gtk_container_set_border_width (GTK_CONTAINER (d->vcbox_ui.vbox), 2);
   g_signal_connect (G_OBJECT (gg), "display_new",
     G_CALLBACK (varpanel_set_sensitive_cb), NULL);
-  /* Sample: connecting to display_selected event
+  /* Sample: connecting to display_selected event */
+  /* 
   g_signal_connect (G_OBJECT (gg), "display_selected",
-    G_CALLBACK (varpanel_display_selected_cb), NULL);
+    G_CALLBACK (varpanel_display_selected_cb), d);
   */
 
   gtk_scrolled_window_add_with_viewport (
