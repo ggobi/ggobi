@@ -376,6 +376,12 @@ linkby_current_page_set (displayd *display, GtkWidget *notebook, ggobid *gg)
     return;
   }
 
+  /* temporary fix to keep gg->linkby_cv in sync with the display */
+  {
+    cpaneld *cpanel = &display->cpanel;
+    gg->linkby_cv = (cpanel->br.linkby_row > 0);
+  }
+
   /*
    * For each page of the notebook, get its child, the scrolled
    * window.  Get the datad that the scrolled window knows about,
@@ -413,6 +419,7 @@ linking_method_set_cb (GtkTreeSelection *treesel, ggobid *gg)
 	  row = gtk_tree_path_get_indices(path)[0];
 	  gtk_tree_path_free(path);
   }
+
   
   //notebook = (GtkWidget *) g_object_get_data(G_OBJECT(cl), "notebook");
   cpanel->br.linkby_row = row;
@@ -424,8 +431,8 @@ linking_method_set_cb (GtkTreeSelection *treesel, ggobid *gg)
     //gpointer ptr = gtk_clist_get_row_data (GTK_CLIST(cl), row);
     //gint jvar = GPOINTER_TO_INT(ptr);
     vartabled *vt;
-	gtk_tree_model_get(model, &iter, LINKBYLIST_VT, &vt, -1);
-	gg->linkby_cv = true;
+    gtk_tree_model_get(model, &iter, LINKBYLIST_VT, &vt, -1);
+    gg->linkby_cv = true;
     d->linkvar_vt = vt;
 	
     /* I need to get the text in the row and strip out "Link by ".
