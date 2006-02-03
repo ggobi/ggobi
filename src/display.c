@@ -344,10 +344,9 @@ set_display_option(gboolean active, guint action, displayd *display)
 
 
 /**
- This is a start at allowing programmatic specification
-of options. Here, we set them in place (i.e. in
-display->options) and then force them to be applied.
-This does not update the menus.
+ This is a start at allowing programmatic specification of
+ options. Here, we set them in place (i.e. in display->options) and
+ then force them to be applied.  This does not update the menus.
 */
 void
 set_display_options(displayd *display, ggobid *gg)
@@ -488,7 +487,8 @@ display_add (displayd *display, ggobid *gg)
     return(-1);
   }
 
-  /* moved this here so that the current splot is set when configuring cpanels - mfl */
+  /* moved this here so that the current splot is set when configuring
+     cpanels - mfl */
   if(g_list_length(display->splots)) {
      gg->current_splot = (splotd *)
        g_list_nth_data (display->splots, 0);
@@ -499,7 +499,7 @@ display_add (displayd *display, ggobid *gg)
   if (GGOBI_IS_WINDOW_DISPLAY(display)  && GGOBI_WINDOW_DISPLAY(display)->useWindow) {
     GGobi_widget_set(GGOBI_WINDOW_DISPLAY(display)->window, gg, true);
     if(g_list_length(display->splots))
-          display_set_current (display, gg);  /*-- this initializes the mode --*/
+      display_set_current (display, gg);  /*-- this initializes the mode --*/
   }
   gg->displays = g_list_append (gg->displays, (gpointer) display);
 
@@ -676,9 +676,8 @@ display_free_all (ggobid *gg) {
 
 
      /* If the second argument 'force' is true, it eliminates the
-        final display.
-        It will work now if there is more than one ggobi instance
-        running.
+        final display.  It will work now if there is more than one
+        ggobi instance running.
       */
     dlist = dlist->next;
     display_free (display, true, gg); 
@@ -694,15 +693,11 @@ display_set_current (displayd *new_display, ggobid *gg)
     return;
 
   gtk_accel_group_unlock (gg->main_accel_group);
-  /*
-   *gtk_accel_group_unlock (gg->pmode_accel_group);
-   *gtk_accel_group_unlock (gg->imode_accel_group);
-  */
 
   /* Clean up the old display first. Reset its title to show it is no
-     longer active.
-     Clean up the control panel of the elements provided by this old display,
-     in order to get ready for the elements provided by the new display. */
+     longer active.  Clean up the control panel of the elements
+     provided by this old display, in order to get ready for the
+     elements provided by the new display. */
 
   if (gg->firsttime == false && gg->current_display &&
       GGOBI_IS_WINDOW_DISPLAY(gg->current_display))
@@ -714,23 +709,20 @@ display_set_current (displayd *new_display, ggobid *gg)
     }
 
     /* Now clean up the different control panel menus associated with
-       this display.  Specifically, this deletes the imode and pmode menus.
+       this display.  Specifically, this deletes the imode and pmode
+       menus.
      */
     if(GGOBI_IS_EXTENDED_DISPLAY(gg->current_display)) {
-		gtk_ui_manager_remove_ui(gg->main_menu_manager, gg->mode_merge_id);
-     /* Allow the extended display to override the submenu_destroy call.
-        If it doesn't provide a method, then call submenu_destroy. */
+	gtk_ui_manager_remove_ui(gg->main_menu_manager, gg->mode_merge_id);
+     /* Allow the extended display to override the submenu_destroy
+        call.  If it doesn't provide a method, then call
+        submenu_destroy. */
       void (*f)(displayd *dpy) =
         GGOBI_EXTENDED_DISPLAY_GET_CLASS(gg->current_display)->display_unset;
       if(f) {
         f(gg->current_display);
         f(gg->current_display);
       }
-	  /*
-      else {
-        submenu_destroy (gg->pmode_item); 
-        submenu_destroy (gg->imode_item);
-      }*/
     }
   }
 
@@ -745,18 +737,18 @@ display_set_current (displayd *new_display, ggobid *gg)
     }
 
     if(GGOBI_IS_EXTENDED_DISPLAY(new_display)) {
-		const gchar* (*ui_get)(displayd *dpy) = 
-			GGOBI_EXTENDED_DISPLAY_GET_CLASS(new_display)->mode_ui_get;
-		if (ui_get) {
-			GError *error = NULL;
-			const gchar *ui = ui_get(new_display);
-			gg->mode_merge_id = 
-				gtk_ui_manager_add_ui_from_string(gg->main_menu_manager, ui, -1, &error);
-			if (error) {
-				g_message("Could not merge main mode ui from display");
-				g_error_free(error);
-			}
-		}
+      const gchar* (*ui_get)(displayd *dpy) = 
+	GGOBI_EXTENDED_DISPLAY_GET_CLASS(new_display)->mode_ui_get;
+      if (ui_get) {
+	GError *error = NULL;
+	const gchar *ui = ui_get(new_display);
+	gg->mode_merge_id = 
+	  gtk_ui_manager_add_ui_from_string(gg->main_menu_manager, ui, -1, &error);
+	if (error) {
+  	  g_message("Could not merge main mode ui from display");
+	  g_error_free(error);
+	}
+      }
       void (*f)(displayd *dpy, ggobid *gg) =
         GGOBI_EXTENDED_DISPLAY_GET_CLASS(new_display)->display_set;
       if(f)
@@ -782,10 +774,6 @@ display_set_current (displayd *new_display, ggobid *gg)
   varpanel_tooltips_set (gg->current_display, gg);
 
   gtk_accel_group_lock (gg->main_accel_group);
-  /*
-   *gtk_accel_group_lock (gg->pmode_accel_group);
-   *gtk_accel_group_lock (gg->imode_accel_group);
-  */
   gg->firsttime = false;
 }
 
@@ -800,14 +788,6 @@ computeTitle (gboolean current_p, displayd *display, ggobid *gg)
   gint n;
   gchar *title = NULL, *description;
   const char *tmp = NULL;
-
-  /*
-     I was going to use this value to avoid displaying "(current)" when
-     there's only one display, but the value of ndisplays is almost never
-     right.  This is weird.  dfs.
-  gint ndisplays = g_list_length(gg->displays);
-  g_printerr ("ndisplays %d\n", ndisplays);
-  */
 
   if(GGOBI_IS_EXTENDED_DISPLAY(display)) {
     tmp = ggobi_display_title_label(display);
@@ -916,9 +896,10 @@ display_window_init (windowDisplayd *display, gint width, gint height, gint bwid
   g_object_set_data(G_OBJECT (display->window),
                        "displayd",
                        (gpointer) display);
-	/* allowing shrink is considered a 'bad thing' - instead we no longer
-	   request a size for the drawing areas (splots), but instead we set a default
-	   window size and allow the splots to automatically fill the space - mfl */
+  /* allowing shrink is considered a 'bad thing' - instead we no
+     longer request a size for the drawing areas (splots), but instead
+     we set a default window size and allow the splots to
+     automatically fill the space - mfl */
   //gtk_window_set_policy (GTK_WINDOW (display->window), true, true, false);
   gtk_window_set_default_size(GTK_WINDOW(display->window), width, height);
   //gtk_container_set_border_width (GTK_CONTAINER (display->window), bwidth);
