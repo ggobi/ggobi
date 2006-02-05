@@ -70,6 +70,12 @@ void store_session(ggobid *gg);
 void show_plugin_list(ggobid *gg);
 void create_new_ggobi();
 
+/* Listen for display_selected events; update control panel */
+void 
+control_panel_display_selected_cb (ggobid *gg, displayd *display) {
+  cpanel_set (display, gg);
+}
+
 void
 make_control_panels (ggobid *gg) 
 {
@@ -1128,6 +1134,9 @@ make_ui (ggobid *gg)
   gtk_container_set_border_width (GTK_CONTAINER (gg->imode_frame), 2);
   gtk_frame_set_shadow_type (GTK_FRAME (gg->imode_frame),    GTK_SHADOW_NONE);
 
+  g_signal_connect (G_OBJECT (gg), "display_selected",
+    G_CALLBACK (control_panel_display_selected_cb), NULL);
+
   make_control_panels (gg);
   if (gg->imode != NULL_IMODE) {
     if (gg->imode == DEFAULT_IMODE)
@@ -1137,7 +1146,6 @@ make_ui (ggobid *gg)
       gtk_container_add (GTK_CONTAINER (gg->imode_frame),
     	mode_panel_get_by_name((gchar *) imode_name[gg->imode], gg));
   }
-
 
   gtk_box_pack_start (GTK_BOX (hbox), gtk_vseparator_new(), false, false, 2);
 

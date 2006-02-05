@@ -760,7 +760,8 @@ display_set_current (displayd *new_display, ggobid *gg)
 
   g_signal_emit(G_OBJECT(gg), GGobiSignals[DISPLAY_SELECTED_SIGNAL], 0, new_display);
 
-  cpanel_set (gg->current_display, gg);
+  // replaced by listener -- dfs
+  // cpanel_set (gg->current_display, gg);
 
   /*
    * if the datad for the new current display doesn't match that
@@ -768,7 +769,8 @@ display_set_current (displayd *new_display, ggobid *gg)
    * panel notebook to the appropriate tab.  Do the same thing for
    * the variable manipulation table.
   */
-  varpanel_show_page (gg->current_display, gg);
+  // replaced by listener
+  // varpanel_show_page (gg->current_display, gg);
   vartable_show_page (gg->current_display->d, gg);
 
   varpanel_tooltips_set (gg->current_display, gg);

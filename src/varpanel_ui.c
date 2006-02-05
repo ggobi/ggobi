@@ -27,15 +27,21 @@
 #include "vars.h"
 #include "externs.h"
 
+/*-------------------------------------------------------------------------*/
+/*            Listen for display_selected events                           */
+/*-------------------------------------------------------------------------*/
 
 
-/* Sample: respond to display_selected events */
-/*
+/* Update variable selection panel */
 void 
-varpanel_display_selected_cb (ggobid *gg, displayd *display, datad *d) {
-  g_printerr("display selected: %s for d=%s\n", display->d->name, d->name);
+varpanel_show_page_cb (ggobid *gg, displayd *display, datad *d) {
+  varpanel_show_page(display, gg);
 }
-*/
+/* Update tooltips */
+void 
+varpanel_tooltips_set_cb (ggobid *gg, displayd *display, datad *d) {
+  varpanel_tooltips_set(display, gg);
+}
 
 /*-------------------------------------------------------------------------*/
 /*                         utilities                                       */
@@ -538,6 +544,8 @@ void
 varpanel_populate (datad *d, ggobid *gg)
 {
   gint j, nd;
+  GList *children;
+  GtkWidget *foo;
 
   nd = ndatad_with_vars_get (gg); 
 
@@ -579,25 +587,25 @@ varpanel_populate (datad *d, ggobid *gg)
   gtk_container_set_border_width (GTK_CONTAINER (d->vcbox_ui.vbox), 2);
   g_signal_connect (G_OBJECT (gg), "display_new",
     G_CALLBACK (varpanel_set_sensitive_cb), NULL);
-  /* Sample: connecting to display_selected event */
-  /* 
+
+  /* Connecting to display_selected event */
   g_signal_connect (G_OBJECT (gg), "display_selected",
-    G_CALLBACK (varpanel_display_selected_cb), d);
-  */
+    G_CALLBACK (varpanel_show_page_cb), d);
+  g_signal_connect (G_OBJECT (gg), "display_selected",
+    G_CALLBACK (varpanel_tooltips_set_cb), d);
+  /* */
 
   gtk_scrolled_window_add_with_viewport (
     GTK_SCROLLED_WINDOW (d->vcbox_ui.swin),
     d->vcbox_ui.vbox);
 
-  {  
-    GList *children;
-    GtkWidget *foo;
-    children = gtk_container_get_children (GTK_CONTAINER (d->vcbox_ui.swin));
-    foo = g_list_nth_data (children, 0);
-    if (GTK_IS_VIEWPORT(foo)) {
-      gtk_viewport_set_shadow_type (GTK_VIEWPORT(foo), GTK_SHADOW_NONE);
-    }
-  }
+  /* Set shadow type for viewport */
+  children = gtk_container_get_children (GTK_CONTAINER (d->vcbox_ui.swin));
+  foo = g_list_nth_data (children, 0);
+  if (GTK_IS_VIEWPORT(foo))
+    gtk_viewport_set_shadow_type (GTK_VIEWPORT(foo), GTK_SHADOW_NONE);
+
+
   gtk_widget_show_all (d->varpanel_ui.hpane);
   gdk_flush ();
 
