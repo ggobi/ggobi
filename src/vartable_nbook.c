@@ -27,8 +27,21 @@
 
 #include <string.h> /* for strcmp() */
 
+
 extern GtkWidget * vartable_buttonbox_build (ggobid *gg);
 static void vartable_subwindow_init (datad *d, ggobid *gg);
+
+/*-------------------------------------------------------------------------*/
+/*            Listen for display_selected events                           */
+/*-------------------------------------------------------------------------*/
+
+/* Update variable selection panel */
+void 
+vartable_show_page_cb (ggobid *gg, displayd *display) {
+  vartable_show_page(display->d, gg);
+}
+
+/*-------------------------------------------------------------------------*/
 
 static void close_wmgr_cb (GtkWidget *cl, GdkEventButton *event, ggobid *gg)
 {
@@ -514,6 +527,11 @@ vartable_open (ggobid *gg)
     g_slist_length (gg->d) > 1);
   gtk_box_pack_start (GTK_BOX (vbox), gg->vartable_ui.notebook,
     true, true, 2);
+
+  /* Connecting to display_selected event */
+  g_signal_connect (G_OBJECT (gg), "display_selected",
+    G_CALLBACK (vartable_show_page_cb), NULL);
+  /* */
 
   for (l = gg->d; l; l = l->next) {
     d = (datad *) l->data;

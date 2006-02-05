@@ -760,20 +760,11 @@ display_set_current (displayd *new_display, ggobid *gg)
 
   g_signal_emit(G_OBJECT(gg), GGobiSignals[DISPLAY_SELECTED_SIGNAL], 0, new_display);
 
-  // replaced by listener -- dfs
+  // replaced by listeners -- dfs
   // cpanel_set (gg->current_display, gg);
-
-  /*
-   * if the datad for the new current display doesn't match that
-   * of the previous current display, move the variable selection
-   * panel notebook to the appropriate tab.  Do the same thing for
-   * the variable manipulation table.
-  */
-  // replaced by listener
   // varpanel_show_page (gg->current_display, gg);
-  vartable_show_page (gg->current_display->d, gg);
-
-  varpanel_tooltips_set (gg->current_display, gg);
+  // vartable_show_page (gg->current_display->d, gg);
+  // varpanel_tooltips_set (gg->current_display, gg);
 
   gtk_accel_group_lock (gg->main_accel_group);
   gg->firsttime = false;
