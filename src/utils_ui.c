@@ -452,8 +452,10 @@ variable_notebook_adddata_cb (ggobid *gg, datad *d, void *notebook)
     }
   }
 
-  gtk_notebook_set_show_tabs (GTK_NOTEBOOK (GTK_OBJECT(notebook)),
-                              g_slist_length (gg->d) > 1);
+  // Removing this line fixes identify; I'm not sure if it hurts
+  // anything else -- dfs.
+  //gtk_notebook_set_show_tabs (GTK_NOTEBOOK (GTK_OBJECT(notebook)),
+  //                            g_slist_length (gg->d) > 1);
 }
 
 void
@@ -635,7 +637,8 @@ create_variable_notebook (GtkWidget *box, GtkSelectionMode mode,
   notebook = gtk_notebook_new ();
   /* gtk_notebook_set_homogeneous_tabs (GTK_NOTEBOOK (notebook), true); */
   gtk_notebook_set_tab_pos (GTK_NOTEBOOK (notebook), GTK_POS_TOP);
-  gtk_notebook_set_show_tabs (GTK_NOTEBOOK (notebook), nd > 1);
+  // This will have to be done per notebook.
+  //gtk_notebook_set_show_tabs (GTK_NOTEBOOK (notebook), nd > 1);
   gtk_box_pack_start (GTK_BOX (box), notebook, true, true, 2);
   g_object_set_data(G_OBJECT(notebook), "SELECTION", (gpointer) mode);
   g_object_set_data(G_OBJECT(notebook), "selection-func", func);
@@ -715,8 +718,8 @@ prefixed_variable_notebook_adddata_cb (ggobid *gg, datad *d, void *notebook)
       (dtype == edgesets_only && d->edge.n > 0))
   {
     if (g_slist_length (d->vartable))
-	variable_notebook_page_add_prefices(GTK_WIDGET(notebook),	 
-		gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook))-1);
+      variable_notebook_page_add_prefices(GTK_WIDGET(notebook),	 
+	gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook))-1);
   }
 }
 
