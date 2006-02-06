@@ -538,9 +538,6 @@ linkby_notebook_adddata_cb (ggobid *gg, datad *d, void *notebook, GtkSignalFunc 
   if (g_slist_length (d->vartable)) {
     linkby_notebook_subwindow_add (d, notebook, gg);
   }
-
-  //gtk_notebook_set_show_tabs (GTK_NOTEBOOK (GTK_OBJECT(notebook)),
-  //                            g_slist_length (gg->d) > 1);
 }
 
 void

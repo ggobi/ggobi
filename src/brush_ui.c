@@ -538,13 +538,13 @@ void cpanel_brush_make(ggobid * gg)
       * The other point about all these accelerator groups is
       * that I should be able to add the accel_groups to each display
       * instead of having separate key event management.  dfs 9/2/2005
-	  * - unfortunately it is not possible to drive an accelerator from
-	  * a window that is not the parent of the accelerated widget,
-	  * therefore key events seem necessary - mfl
+      * - unfortunately it is not possible to drive an accelerator from
+      * a window that is not the parent of the accelerated widget,
+      * therefore key events seem necessary - mfl
       */
   /* Add accelerators to the option menu */
     
-	/*GList *children = gtk_container_get_children(GTK_CONTAINER(menu));
+    /*GList *children = gtk_container_get_children(GTK_CONTAINER(menu));
     GList *child;
     GtkWidget *item;*/
     /*guint accel = 'p';
@@ -679,12 +679,6 @@ void cpanel_brush_set(displayd *display, cpaneld *cpanel, ggobid *gg)
 
   if (pnl == (GtkWidget *) NULL)
     return;
-
-  /*
-  btn = widget_find_by_name(pnl, "BRUSH:brush_on_button");
-  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(btn),
-    cpanel->br.brush_on_p);
-  */
 
   w = widget_find_by_name(pnl, "BRUSH:mode_check_btn");
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(w), !cpanel->br.mode);
