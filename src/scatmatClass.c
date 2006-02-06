@@ -280,9 +280,10 @@ receive_scatmat_drag(GtkWidget *src, GdkDragContext *context, int x, int y, cons
   displayd *display;
   guint tmp;
   GList *l;
-  gint n, sprow, spcol;
+  gint k, n, sprow, spcol;
   GtkWidget *da;
   GtkTableChild *child;
+  GList *ivars = NULL;
 
   display = to->displayptr;
   from = GGOBI_SPLOT(gtk_drag_get_source_widget(context));
@@ -298,25 +299,33 @@ receive_scatmat_drag(GtkWidget *src, GdkDragContext *context, int x, int y, cons
 
   if (from->p1dvar != -1 && to->p1dvar != -1) {
 
-    /* Swap list elements */
+    /* Create a new list of elements */
     l = display->scatmat_rows;
     while (l) {
       n = GPOINTER_TO_INT(l->data);
       if (n == from->p1dvar)
-        l->data = GINT_TO_POINTER(to->p1dvar);
-      else if (n == to->p1dvar)
-        l->data = GINT_TO_POINTER(from->p1dvar);
+        ;
+      else if (n == to->p1dvar) {
+        ivars = g_list_append(ivars, GINT_TO_POINTER(from->p1dvar));
+        ivars = g_list_append(ivars, l->data);
+      } else ivars = g_list_append(ivars, l->data);
       l = l->next;
     }
-    /* Sigh, columns too */
+
+    /* Update the existing lists, though we may scrap them yet */
     l = display->scatmat_cols;
+    k = 0;
     while (l) {
-      n = GPOINTER_TO_INT(l->data);
-      if (n == from->p1dvar)
-        l->data = GINT_TO_POINTER(to->p1dvar);
-      else if (n == to->p1dvar)
-        l->data = GINT_TO_POINTER(from->p1dvar);
+      l->data = g_list_nth_data(ivars, k);
       l = l->next;
+      k++;
+    }
+    l = display->scatmat_rows;
+    k = 0;
+    while (l) {
+      l->data = g_list_nth_data(ivars, k);
+      l = l->next;
+      k++;
     }
       
     /* Loop through the plots setting the values of xyvars and
