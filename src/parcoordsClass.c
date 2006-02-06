@@ -83,29 +83,48 @@ start_parcoords_drag(GtkWidget *src, GdkDragContext *ctxt, GtkSelectionData *dat
 void
 receive_parcoords_drag(GtkWidget *src, GdkDragContext *context, int x, int y, const GtkSelectionData *data,   unsigned int info, unsigned int event_time, gpointer *udata)
 {
-   splotd *to = GGOBI_SPLOT(src);
-   splotd *from;
-   displayd *display;
-   guint tmp;
-   display = to->displayptr;
+  splotd *to = GGOBI_SPLOT(src), *from, *sp;
+  displayd *display;
+  guint tmp;
+  display = to->displayptr;
+  GList *l;
+  gint k;
+  GList *ivars = NULL;
 
-#if 0
-   from = (splotd *) data->data;/*XXX Want a proper, robust and portable way to do this. */
-#endif
+  from = GGOBI_SPLOT(gtk_drag_get_source_widget(context));
 
-   from = GGOBI_SPLOT(gtk_drag_get_source_widget(context));
-
-   if(from->displayptr != display) {
+  if(from->displayptr != display) {
       gg_write_to_statusbar("the source and destination of the parallel coordinate plots are not from the same display.\n", display->ggobi);
       return;
-   }
+  }
 
-   tmp = to->p1dvar;
-   to->p1dvar = from->p1dvar;
-   from->p1dvar = tmp;
+  /* Gather a list of indices in the new order */
+  l = display->splots;
+  while (l) {
+    sp = (splotd *) l->data;
+    k = sp->p1dvar;
+    if (k == from->p1dvar)
+      ;
+    else if (k == to->p1dvar) {
+      ivars = g_list_append(ivars, GINT_TO_POINTER(from->p1dvar));
+      ivars = g_list_append(ivars, GINT_TO_POINTER(k));
+    } else ivars = g_list_append(ivars, GINT_TO_POINTER(k));
+    l = l->next;
+  }
 
-   display_tailpipe (display, FULL, display->ggobi);
-   varpanel_refresh (display, display->ggobi);
+  /* Assign them to the existing plots */
+  k = 0;
+  l = display->splots;
+  while (l) {
+    sp = (splotd *) l->data;
+    sp->p1dvar = GPOINTER_TO_INT(g_list_nth_data(ivars, k));
+    k++;
+    l = l->next;
+  }
+  g_list_free(ivars);
+
+  display_tailpipe (display, FULL, display->ggobi);
+  varpanel_refresh (display, display->ggobi);
 }
 
 void
