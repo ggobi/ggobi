@@ -266,31 +266,15 @@ createScatterplot(displayd *display, gboolean missing_p, splotd *sp, gint numVar
     gtk_container_set_border_width (GTK_CONTAINER (vbox), 1);
     gtk_container_add (GTK_CONTAINER (GGOBI_WINDOW_DISPLAY(display)->window), vbox);
 	
-	display->menu_manager = display_menu_manager_create(display);
-	display->menubar = create_menu_bar(display->menu_manager, scatterplot_ui, 
-		GGOBI_WINDOW_DISPLAY(display)->window);
-/*
-    gg->app.sp_accel_group = gtk_accel_group_new ();
-    factory = get_main_menu (menu_items, sizeof (menu_items) / sizeof (menu_items[0]),
-			     gg->app.sp_accel_group, 
-			     GGOBI_WINDOW_DISPLAY(display)->window, 
-			     &display->menubar,
-			     (gpointer) display);
-*/
+    display->menu_manager = display_menu_manager_create(display);
+    display->menubar = create_menu_bar(display->menu_manager, scatterplot_ui, 
+	GGOBI_WINDOW_DISPLAY(display)->window);
 
-  /*-- add a tooltip to the file menu --*/
-/*    w = gtk_item_factory_get_widget (factory, "<main>/File");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
-			  gtk_menu_get_attach_widget (GTK_MENU(w)),
-			  "File menu for this display", NULL);
-*/
   /*
    * After creating the menubar, and populating the file menu,
    * add the other menus manually
   */
-/*    scatterplot_display_menus_make (display, gg->app.sp_accel_group,
-				    G_CALLBACK(display_options_cb), gg);*/
-	scatterplot_display_edge_menu_update(display, gg->app.sp_accel_group, gg);
+    scatterplot_display_edge_menu_update(display, gg->app.sp_accel_group, gg);
     gtk_box_pack_start (GTK_BOX (vbox), display->menubar, false, true, 0);
   }
 
