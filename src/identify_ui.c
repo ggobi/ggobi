@@ -285,10 +285,10 @@ static const gchar *label_prefices[] = {
 
 static const gchar **label_prefix_func(GtkWidget *notebook, datad *d, gint *sel_prefix, gint *n_prefices)
 {
-	gint offset = d->rowIds ? 0 : 1;
-	*n_prefices = G_N_ELEMENTS(label_prefices) - offset;
-	*sel_prefix = 1 - offset;
-	return(label_prefices + offset);
+  gint offset = d->rowIds ? 0 : 1;
+  *n_prefices = G_N_ELEMENTS(label_prefices) - offset;
+  *sel_prefix = 1 - offset;
+  return(label_prefices + offset);
 }
 
 /*----------------------------------------------------------------------*/
@@ -321,14 +321,13 @@ cpanel_identify_make(ggobid *gg) {
   gtk_container_set_border_width (GTK_CONTAINER(panel->w), 5);
 
   /*-- provide a variable list so that any variable can be the label --*/
-  /*opt = gtk_combo_box_new_text ();*/ /* create combo box before notebook */
   notebook = create_prefixed_variable_notebook (panel->w,
     GTK_SELECTION_MULTIPLE, all_vartypes, all_datatypes, 
     G_CALLBACK(label_selected_cb), NULL, gg, label_prefix_func);
+  gtk_widget_set_name(notebook, "IDENTIFY:notebook");
   // experiment -- dfs
-  //gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), false);
+  gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), false);
   g_object_set_data(G_OBJECT (panel->w), "notebook", notebook);
-  /*gtk_combo_box_set_active(GTK_COMBO_BOX(opt), ID_RECORD_LABEL);*/
 
  /*-- button for removing all labels --*/
   btn = gtk_button_new_with_mnemonic ("_Remove labels");
@@ -401,6 +400,39 @@ cpanel_identify_init (cpaneld *cpanel, ggobid *gg)
   cpanel->id_display_type = ID_RECORD_LABEL;
 }
 
+/* called from cpanel_identify_set */
+static void
+notebook_current_page_set (displayd *display, GtkWidget *notebook, ggobid *gg)
+{
+  GtkWidget *swin;
+  datad *d = display->d, *paged;
+  gint page_num, cur_page_num;
+
+  if (notebook == NULL) {
+    return;
+  }
+
+  /*
+   * For each page of the notebook, get its child, the scrolled
+   * window.  Get the datad that the scrolled window knows about,
+   * and compare it with display->d
+   */
+  page_num = 0;
+  swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK(notebook), page_num);
+  while (swin) {
+    paged = (datad *) g_object_get_data (G_OBJECT (swin), "datad");
+
+    //gtk_widget_set_sensitive (swin, (paged == d));
+    if (paged == d) {
+      gtk_notebook_set_current_page (GTK_NOTEBOOK(notebook), page_num);
+      break;
+    }
+    page_num += 1;
+    swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK(notebook), page_num);
+  }
+  gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), false);
+}
+
 void
 cpanel_identify_set (displayd *display, cpaneld *cpanel, ggobid *gg)
 {
@@ -410,10 +442,9 @@ cpanel_identify_set (displayd *display, cpaneld *cpanel, ggobid *gg)
   if (pnl == (GtkWidget *) NULL)
     return;
 
-  /*w = widget_find_by_name (pnl, "IDENTIFY:display_option_menu");
-  gtk_combo_box_set_active (GTK_COMBO_BOX(w),
-                               cpanel->id_display_type);
-*/
+  w = widget_find_by_name(pnl, "IDENTIFY:notebook");
+  notebook_current_page_set (display, w, gg);
+
   w = widget_find_by_name (pnl, "IDENTIFY:target_option_menu");
   gtk_combo_box_set_active (GTK_COMBO_BOX(w),
                                (gint) cpanel->id_target_type);
