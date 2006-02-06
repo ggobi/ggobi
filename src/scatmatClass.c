@@ -169,6 +169,7 @@ add_xml_scatmat_variables(xmlNodePtr node, GList *plots, displayd *dpy)
   }
 }
 
+#if 0
 gboolean
 scatmatEventHandlersToggle(displayd * dpy, splotd * sp, gboolean state,
                             ProjectionMode pmode, InteractionMode imode)
@@ -198,6 +199,7 @@ scatmatEventHandlersToggle(displayd * dpy, splotd * sp, gboolean state,
 
   return (false);
 }
+#endif
 
 static gboolean
 scatmatKeyEventHandled(GtkWidget *w, displayd *display, splotd * sp, GdkEventKey *event, ggobid *gg)
@@ -260,6 +262,155 @@ handlesInteraction(displayd *display, InteractionMode v)
   return(v == SCALE || v == BRUSH || v == IDENT || /*v == MOVEPTS ||*/
           v == DEFAULT_IMODE);
 }
+
+/*-------------------------------------------------------------------*/
+/*--------------- Drag and Drop -------------------------------------*/
+/*-------------------------------------------------------------------*/
+
+void
+start_scatmat_drag(GtkWidget *src, GdkDragContext *ctxt, GtkSelectionData *data, guint info, guint time, gpointer udata)
+{
+   gtk_selection_data_set(data, data->target, 8, (guchar *) src, sizeof(splotd *)); 
+}
+
+void
+receive_scatmat_drag(GtkWidget *src, GdkDragContext *context, int x, int y, const GtkSelectionData *data, unsigned int info, unsigned int event_time, gpointer *udata)
+{
+  splotd *to = GGOBI_SPLOT(src), *from, *sp;
+  displayd *display;
+  guint tmp;
+  GList *l;
+  gint n, sprow, spcol;
+  GtkWidget *da;
+  GtkTableChild *child;
+
+  display = to->displayptr;
+  from = GGOBI_SPLOT(gtk_drag_get_source_widget(context));
+
+  if(from->displayptr != display) {
+    gg_write_to_statusbar("the source and destination of the scatterplots are not from the same display.\n", display->ggobi);
+    return;
+  }
+
+  /* Require symmetry, and require drag and drop motions in which
+     either the row or the column is held constant -- actually, start
+     by requiring that both plots be along the diagonal. */
+
+  if (from->p1dvar != -1 && to->p1dvar != -1) {
+
+    /* Swap list elements */
+    l = display->scatmat_rows;
+    while (l) {
+      n = GPOINTER_TO_INT(l->data);
+      if (n == from->p1dvar)
+        l->data = GINT_TO_POINTER(to->p1dvar);
+      else if (n == to->p1dvar)
+        l->data = GINT_TO_POINTER(from->p1dvar);
+      l = l->next;
+    }
+    /* Sigh, columns too */
+    l = display->scatmat_cols;
+    while (l) {
+      n = GPOINTER_TO_INT(l->data);
+      if (n == from->p1dvar)
+        l->data = GINT_TO_POINTER(to->p1dvar);
+      else if (n == to->p1dvar)
+        l->data = GINT_TO_POINTER(from->p1dvar);
+      l = l->next;
+    }
+      
+    /* Loop through the plots setting the values of xyvars and
+       p1dvar */
+    for (l=(GTK_TABLE (display->table))->children; l; l=l->next) {
+      child = (GtkTableChild *) l->data;
+      da = child->widget;
+      sp = (splotd *) g_object_get_data(G_OBJECT (da), "splotd");
+      sprow = child->top_attach;  /* 0, ..., nrows-1 */
+      spcol = child->left_attach; /* 0, ..., ncols-1 */
+      if (sprow == spcol)
+        sp->p1dvar = GPOINTER_TO_INT(g_list_nth_data(display->scatmat_rows,
+						     sprow));
+      else {
+        sp->p1dvar = -1;
+        sp->xyvars.x = GPOINTER_TO_INT(g_list_nth_data(display->scatmat_cols,
+						       spcol));
+        sp->xyvars.y = GPOINTER_TO_INT(g_list_nth_data(display->scatmat_cols,
+						       sprow));
+      }
+    }
+
+    display_tailpipe (display, FULL, display->ggobi);
+    varpanel_refresh (display, display->ggobi);
+  }
+}
+
+void
+scatmatPlotDragAndDropEnable(splotd *sp, gboolean active) {
+  static GtkTargetEntry target = {"text/plain", GTK_TARGET_SAME_APP, 1001};	
+  if (active) {
+    gtk_drag_source_set(GTK_WIDGET(sp), GDK_BUTTON1_MASK, &target, 1, 
+      GDK_ACTION_COPY);
+    g_signal_connect(G_OBJECT(sp), "drag_data_get",  
+      G_CALLBACK(start_scatmat_drag), NULL);
+    gtk_drag_dest_set(GTK_WIDGET(sp), GTK_DEST_DEFAULT_ALL /* DROP */,
+      &target, 1, GDK_ACTION_COPY /*MOVE*/);
+    g_signal_connect(G_OBJECT(sp), "drag_data_received",
+      G_CALLBACK(receive_scatmat_drag), NULL);
+  } else {
+    g_signal_handlers_disconnect_by_func(G_OBJECT(sp),
+      G_CALLBACK(start_scatmat_drag), NULL);
+    g_signal_handlers_disconnect_by_func(G_OBJECT(sp),
+      G_CALLBACK(receive_scatmat_drag), NULL);
+    gtk_drag_source_unset(GTK_WIDGET(sp));
+    gtk_drag_dest_unset(GTK_WIDGET(sp));
+  }
+}
+
+void
+scatmatDragAndDropEnable(displayd *dsp, gboolean active) {
+  GList *l;
+  for (l = dsp->splots; l; l = l->next) {
+    splotd *sp = (splotd *)l->data;
+    scatmatPlotDragAndDropEnable(sp, active);
+  }
+}
+
+gboolean
+scatmatEventHandlersToggle(displayd * dpy, splotd * sp, gboolean state,
+                            ProjectionMode pmode, InteractionMode imode)
+{
+  scatmatDragAndDropEnable(dpy, false);
+
+  switch (imode) {
+  case DEFAULT_IMODE:
+      switch (sp->p1dvar) {
+        case -1:
+          xyplot_event_handlers_toggle (sp, state);
+        break;
+        default:
+          p1d_event_handlers_toggle (sp, state);
+      }
+      scatmatDragAndDropEnable(dpy, true);
+  break;
+  case SCALE:
+      scale_event_handlers_toggle (sp, state);
+  break;
+  case BRUSH:
+      brush_event_handlers_toggle (sp, state);
+  break;
+  case IDENT:
+      identify_event_handlers_toggle (sp, state);
+  break;
+  default:
+  break;
+  }
+
+  return (false);
+}
+
+
+
+/*-------------------------------------------------------------------*/
 
 static GtkWidget *
 scatmatCPanelWidget(displayd *dpy, gchar **modeName, ggobid *gg)
