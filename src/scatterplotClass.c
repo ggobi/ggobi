@@ -1017,28 +1017,7 @@ cpanelSet(displayd *dpy, cpaneld *cpanel, ggobid *gg)
 
 void
 displaySet(displayd *dpy, ggobid *gg)
-{/*
-  GtkWidget *pmode_menu, *imode_menu;
-
-  pmode_menu = scatterplot_pmode_menu_make (gg->pmode_accel_group,
-    G_CALLBACK(pmode_set_cb), gg, true);
-  gtk_menu_set_accel_group (GTK_MENU(pmode_menu), gg->main_accel_group);   
-
-  gg->pmode_item = submenu_make ("_View", 'V',
-    gg->main_accel_group);
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->pmode_item),
-    pmode_menu); 
-  submenu_insert (gg->pmode_item, gg->main_menubar, 2);
-
-  imode_menu = scatterplot_imode_menu_make (gg->imode_accel_group,
-    G_CALLBACK(imode_set_cb), gg, true);
-  gtk_menu_set_accel_group (GTK_MENU(imode_menu), gg->main_accel_group);   
-
-  gg->imode_item = submenu_make ("_Interaction", 'I',
-    gg->main_accel_group);
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->imode_item),
-    imode_menu); 
-  submenu_insert (gg->imode_item, gg->main_menubar, 3);*/
+{
 }
 
 /* Hmm.  These are probably useful in the other display classes. dfs */
@@ -1477,22 +1456,12 @@ scatter1DAddPlotLabels(splotd *sp, GdkDrawable *drawable, GdkGC *gc)
   vartabled *vt;
   datad *d = sp->displayptr->d;
   
-      vt = vartable_element_get (sp->p1dvar, d);
-	  layout_text(layout, vt->collab_tform, &rect);
-	  gdk_draw_layout(drawable, gc, 
-	  	sp->max.x/2 - rect.width/2, sp->max.y - rect.height - 5,
-		layout);
-      /*gdk_text_extents (
-	  gtk_style_get_font (style),
-        vt->collab_tform, strlen (vt->collab_tform),
-        &lbearing, &rbearing, &width, &ascent, &descent);
-      gdk_draw_string (drawable,
-	  	gtk_style_get_font (style),
-        gc,
-        sp->max.x/2 - width/2, 
-        sp->max.y - 5,
-        vt->collab_tform);*/
-	g_object_unref(G_OBJECT(layout));
+  vt = vartable_element_get (sp->p1dvar, d);
+  layout_text(layout, vt->collab_tform, &rect);
+  gdk_draw_layout(drawable, gc, 
+  	sp->max.x/2 - rect.width/2, sp->max.y - rect.height - 5,
+	layout);
+  g_object_unref(G_OBJECT(layout));
 }
 
 void
@@ -1504,36 +1473,17 @@ scatterXYAddPlotLabels(splotd *sp, GdkDrawable *drawable, GdkGC *gc)
   vartabled *vtx, *vty;
   datad *d = sp->displayptr->d;
 
-      /*-- xyplot: right justify the label --*/
-      vtx = vartable_element_get (sp->xyvars.x, d);
-	  layout_text(layout, vtx->collab_tform, &rect);
-	  gdk_draw_layout(drawable, gc, 
-	  	sp->max.x - rect.width - 5,
+  /*-- xyplot: right justify the label --*/
+  vtx = vartable_element_get (sp->xyvars.x, d);
+  layout_text(layout, vtx->collab_tform, &rect);
+  gdk_draw_layout(drawable, gc, 
+	sp->max.x - rect.width - 5,
         sp->max.y - rect.height - 5, layout);
-      /*gdk_text_extents (
-	  	gtk_style_get_font (style),
-        vtx->collab_tform, strlen (vtx->collab_tform),
-        &lbearing, &rbearing, &width, &ascent, &descent);
-      gdk_draw_string (drawable,
-        gtk_style_get_font (style),
-        gc,
-        sp->max.x - width - 5,
-        sp->max.y - 5,
-        vtx->collab_tform);*/
 
-      vty = vartable_element_get (sp->xyvars.y, d);
-	  layout_text(layout, vty->collab_tform, &rect);
-	  gdk_draw_layout(drawable, gc, 5, 5, layout);
-      /*gdk_text_extents (
-        gtk_style_get_font (style),
-        vty->collab_tform, strlen (vty->collab_tform),
-        &lbearing, &rbearing, &width, &ascent, &descent);
-      gdk_draw_string (drawable,
-        gtk_style_get_font (style),
-        gc,
-        5, 5 + ascent + descent,
-        vty->collab_tform);*/
-		g_object_unref(G_OBJECT(layout));
+  vty = vartable_element_get (sp->xyvars.y, d);
+  layout_text(layout, vty->collab_tform, &rect);
+  gdk_draw_layout(drawable, gc, 5, 5, layout);
+  g_object_unref(G_OBJECT(layout));
 }
 
 static void
