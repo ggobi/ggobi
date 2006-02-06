@@ -292,11 +292,10 @@ parcoords_varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint *jvar_prev,
    isVarSelected = parcoords_var_selected (jvar, gg->current_display);
 
    if((mode == VAR_DELETE && isVarSelected) || !isVarSelected)
-        status = parcoords_add_delete_splot(cpanel, sp, jvar, jvar_prev, gg, gg->current_display, mode);
+      status = parcoords_add_delete_splot(cpanel, sp, jvar, jvar_prev, gg, gg->current_display, mode);
 
    return(status);
 }
-
 
 gboolean
 parcoords_add_delete_splot(cpaneld *cpanel, splotd *sp, gint jvar, gint *jvar_prev, ggobid *gg, displayd *display, ParCoordsSelectionMode selMode)
@@ -311,14 +310,13 @@ parcoords_add_delete_splot(cpaneld *cpanel, splotd *sp, gint jvar, gint *jvar_pr
   GtkWidget *box;// *w;
   //gfloat ratio = 1.0;
 
-
   /* The index of gg.current_splot */
   gint sp_indx = g_list_index (display->splots, sp);
 
   /*
   if(GGOBI_IS_WINDOW_DISPLAY(display))
-      gtk_window_set_policy (GTK_WINDOW (GGOBI_WINDOW_DISPLAY(display)->window),
-        false, false, false);*/
+     gtk_window_set_policy (GTK_WINDOW (GGOBI_WINDOW_DISPLAY(display)->window),
+     false, false, false);*/
 
   splot_get_dimensions (sp, &width, &height);
 
@@ -415,15 +413,15 @@ parcoords_add_delete_splot(cpaneld *cpanel, splotd *sp, gint jvar, gint *jvar_pr
       sp_new = ggobi_parcoords_splot_new (display, gg);
       sp_new->p1dvar = jvar; 
 
-	  box = (sp->da)->parent;
-	  gtk_box_pack_start (GTK_BOX (box), sp_new->da, true, true, 0);
+      box = (sp->da)->parent;
+      gtk_box_pack_start (GTK_BOX (box), sp_new->da, true, true, 0);
 	  
       if (cpanel->parcoords_selection_mode == VAR_INSERT) {
         display->splots = g_list_insert (display->splots,
           (gpointer) sp_new, sp_indx);
-		gtk_box_reorder_child(GTK_BOX(box), sp_new->da, sp_indx);
-	  } else if (cpanel->parcoords_selection_mode == VAR_APPEND)
-        display->splots = g_list_append (display->splots,
+	gtk_box_reorder_child(GTK_BOX(box), sp_new->da, sp_indx);
+       } else if (cpanel->parcoords_selection_mode == VAR_APPEND)
+         display->splots = g_list_append (display->splots,
           (gpointer) sp_new);
 
 	  gtk_widget_show (sp_new->da);

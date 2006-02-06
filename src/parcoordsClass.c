@@ -106,41 +106,48 @@ receive_parcoords_drag(GtkWidget *src, GdkDragContext *context, int x, int y, co
 
    display_tailpipe (display, FULL, display->ggobi);
    varpanel_refresh (display, display->ggobi);
-
 }
 
 void
 parcoordsPlotDragAndDropEnable(splotd *sp, gboolean active) {
-	static GtkTargetEntry target = {"text/plain", GTK_TARGET_SAME_APP, 1001};	
-	if (active) {
-		gtk_drag_source_set(GTK_WIDGET(sp), GDK_BUTTON1_MASK, &target, 1, GDK_ACTION_COPY);
-		g_signal_connect(G_OBJECT(sp), "drag_data_get",  G_CALLBACK(start_parcoords_drag), NULL);
-		gtk_drag_dest_set(GTK_WIDGET(sp), GTK_DEST_DEFAULT_ALL /* DROP */ , &target, 1, GDK_ACTION_COPY /*MOVE*/);
-		g_signal_connect(G_OBJECT(sp), "drag_data_received",  G_CALLBACK(receive_parcoords_drag), NULL);
-	} else {
-		g_signal_handlers_disconnect_by_func(G_OBJECT(sp), G_CALLBACK(start_parcoords_drag), NULL);
-		g_signal_handlers_disconnect_by_func(G_OBJECT(sp), G_CALLBACK(receive_parcoords_drag), NULL);
-		gtk_drag_source_unset(GTK_WIDGET(sp));
-		gtk_drag_dest_unset(GTK_WIDGET(sp));
-	}
+  static GtkTargetEntry target = {"text/plain", GTK_TARGET_SAME_APP, 1001};	
+  if (active) {
+    gtk_drag_source_set(GTK_WIDGET(sp), GDK_BUTTON1_MASK, &target, 1, 
+      GDK_ACTION_COPY);
+    g_signal_connect(G_OBJECT(sp), "drag_data_get",  
+      G_CALLBACK(start_parcoords_drag), NULL);
+    gtk_drag_dest_set(GTK_WIDGET(sp), GTK_DEST_DEFAULT_ALL /* DROP */,
+      &target, 1, GDK_ACTION_COPY /*MOVE*/);
+    g_signal_connect(G_OBJECT(sp), "drag_data_received",
+      G_CALLBACK(receive_parcoords_drag), NULL);
+  } else {
+    g_signal_handlers_disconnect_by_func(G_OBJECT(sp),
+      G_CALLBACK(start_parcoords_drag), NULL);
+    g_signal_handlers_disconnect_by_func(G_OBJECT(sp),
+      G_CALLBACK(receive_parcoords_drag), NULL);
+    gtk_drag_source_unset(GTK_WIDGET(sp));
+    gtk_drag_dest_unset(GTK_WIDGET(sp));
+  }
 }
 
 void
 parcoordsDragAndDropEnable(displayd *dsp, gboolean active) {
-	GList *l;
-	for (l = dsp->splots; l; l = l->next) {
-		splotd *sp = (splotd *)l->data;
-		parcoordsPlotDragAndDropEnable(sp, active);
-	}
+  GList *l;
+  for (l = dsp->splots; l; l = l->next) {
+    splotd *sp = (splotd *)l->data;
+    parcoordsPlotDragAndDropEnable(sp, active);
+  }
 }
 
 gboolean
 parcoordsEventHandlersToggle(displayd * dpy, splotd * sp, gboolean state,
                             ProjectionMode pmode, InteractionMode imode)
 {
-	/* it's necessary to disable/enable so that duplicate handlers are not registered */
-	/* it's necessary to toggle all plots, because all plots need to be ready to receive */
-	/* would be better if there was some callback when the imode changed */
+/* it's necessary to disable/enable so that duplicate handlers are not
+   registered */
+/* it's necessary to toggle all plots, because all plots need to be
+   ready to receive */
+/* would be better if there was some callback when the imode changed */
   parcoordsDragAndDropEnable(dpy, false);
   
   switch (imode) {
@@ -202,14 +209,14 @@ parcoordsKeyEventHandled(GtkWidget *w, displayd *display, splotd * sp, GdkEventK
 gchar *
 treeLabel(splotd *splot, datad *d, ggobid *gg)
 {
-   vartabled *vt;
-   int n;
-   gchar *buf;
-      vt = vartable_element_get (splot->p1dvar, d);
-      n = strlen (vt->collab);
-      buf = (gchar*) g_malloc(n * sizeof (gchar*));
-      sprintf(buf, "%s", vt->collab);
-      return(buf);
+  vartabled *vt;
+  int n;
+  gchar *buf;
+  vt = vartable_element_get (splot->p1dvar, d);
+  n = strlen (vt->collab);
+  buf = (gchar*) g_malloc(n * sizeof (gchar*));
+  sprintf(buf, "%s", vt->collab);
+  return(buf);
 }
 
 static GdkSegment *
@@ -224,13 +231,11 @@ worldToPlane(splotd *sp, datad *d, ggobid *gg)
   p1d_reproject (sp, d->world.vals, d, gg);
 }
 
-
 void
 withinPlaneToScreen(splotd *sp, displayd *display, datad *d, ggobid *gg)
 {
   sp_whiskers_make (sp, display, gg);
 }
-
 
 gboolean
 drawEdge_p(splotd *sp, gint m, datad *d, datad *e, ggobid *gg)
@@ -247,28 +252,28 @@ drawCase_p(splotd *sp, gint m, datad *d, ggobid *gg)
 void
 withinDrawBinned(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc)
 {
- displayd *display = sp->displayptr;
+  displayd *display = sp->displayptr;
 
- if (display->options.whiskers_show_p) {
-	 gint n;
-	 n = 2*m;
-	 gdk_draw_line (drawable, gc,
-			sp->whiskers[n].x1, sp->whiskers[n].y1,
-			sp->whiskers[n].x2, sp->whiskers[n].y2);
-	 n++;
-	 gdk_draw_line (drawable, gc,
-			sp->whiskers[n].x1, sp->whiskers[n].y1,
-			sp->whiskers[n].x2, sp->whiskers[n].y2);
- }
+  if (display->options.whiskers_show_p) {
+    gint n;
+    n = 2*m;
+    gdk_draw_line (drawable, gc,
+		sp->whiskers[n].x1, sp->whiskers[n].y1,
+		sp->whiskers[n].x2, sp->whiskers[n].y2);
+    n++;
+    gdk_draw_line (drawable, gc,
+		sp->whiskers[n].x1, sp->whiskers[n].y1,
+		sp->whiskers[n].x2, sp->whiskers[n].y2);
+  }
 }
 
 
 void
 withinDrawUnbinned(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc)
 {
- displayd *display = sp->displayptr;
+  displayd *display = sp->displayptr;
 
- if (display->options.whiskers_show_p) {
+  if (display->options.whiskers_show_p) {
 	 gint n = 2*m;
 	 gdk_draw_line (drawable, gc,
 			sp->whiskers[n].x1, sp->whiskers[n].y1,
@@ -277,67 +282,51 @@ withinDrawUnbinned(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc)
 	 gdk_draw_line (drawable, gc,
 			sp->whiskers[n].x1, sp->whiskers[n].y1,
 			sp->whiskers[n].x2, sp->whiskers[n].y2);
- }
+  }
 }
 
 
 static void
 addPlotLabels(displayd *display, splotd *sp, GdkDrawable *drawable, datad *d, ggobid *gg)
 {
-    vartabled *vt;
-    //gint lbearing, rbearing, width, ascent, descent;
-    //GtkStyle *style = gtk_widget_get_style (sp->da);
-	PangoRectangle rect;
-	PangoLayout *layout = gtk_widget_create_pango_layout(GTK_WIDGET(sp->da), NULL);
-	
-    cpaneld *cpanel = &display->cpanel;
+  vartabled *vt;
+  PangoRectangle rect;
+  PangoLayout *layout = gtk_widget_create_pango_layout(GTK_WIDGET(sp->da), NULL);
+  cpaneld *cpanel = &display->cpanel;
 
-    vt = vartable_element_get (sp->p1dvar, d);
+  vt = vartable_element_get (sp->p1dvar, d);
     
-	/*gdk_text_extents (
-      gtk_style_get_font (style),
-      vt->collab_tform, strlen (vt->collab_tform),
-      &lbearing, &rbearing, &width, &ascent, &descent);
-    */
-	layout_text(layout, vt->collab_tform, &rect);
-    if (cpanel->parcoords_arrangement == ARRANGE_ROW)
-      gdk_draw_layout(drawable, gg->plot_GC, 
-		(rect.width <= sp->max.x) ?  sp->max.x/2 - rect.width/2 : 0, 
-		sp->max.y - rect.height - 5,
-		layout);
+	
+  layout_text(layout, vt->collab_tform, &rect);
+  if (cpanel->parcoords_arrangement == ARRANGE_ROW)
+    gdk_draw_layout(drawable, gg->plot_GC, 
+      (rect.width <= sp->max.x) ?  sp->max.x/2 - rect.width/2 : 0, 
+      sp->max.y - rect.height - 5,
+      layout);
 		
-	  /*gdk_draw_string (drawable,
-        gtk_style_get_font (style),
-        gg->plot_GC,
-        //-- if the label fits, center it; else, left justify
-        (width <= sp->max.x) ?  sp->max.x/2 - width/2 : 0, 
-        sp->max.y - 5,
-        vt->collab_tform);*/
-     else
-      /*gdk_draw_string (drawable,
-        gtk_style_get_font (style),
-        gg->plot_GC, 5, 5+ascent+descent, vt->collab_tform);*/
-		gdk_draw_layout(drawable, gg->plot_GC, 5, 5, layout);
-	g_object_unref(G_OBJECT(layout));
+  else
+    gdk_draw_layout(drawable, gg->plot_GC, 5, 5, layout);
+
+  g_object_unref(G_OBJECT(layout));
 }
 
 
 static gint
 plotted(displayd *display, gint *cols, gint ncols, datad *d)
 {
-	GList *l;
-	splotd *sp;
-	gint j;
-        for (l = display->splots; l; l = l->next) {
-          sp = (splotd *) l->data;
+  GList *l;
+  splotd *sp;
+  gint j;
+  for (l = display->splots; l; l = l->next) {
+    sp = (splotd *) l->data;
 
-          for (j=0; j<ncols; j++) {
-            if (sp->xyvars.x == cols[j]) {
-              return(sp->xyvars.x);
-            }
-          }
-        }
-	return(-1);
+    for (j=0; j<ncols; j++) {
+      if (sp->xyvars.x == cols[j]) {
+        return(sp->xyvars.x);
+      }
+    }
+  }
+  return(-1);
 }
 
 static gboolean
@@ -351,23 +340,23 @@ variableSelect(GtkWidget *w, displayd *dpy, splotd *sp, gint jvar, gint toggle, 
 static void
 varpanelRefresh(displayd *display, splotd *sp, datad *d)
 {
-	gint j;
-	GList *l;
-        for (j=0; j<d->ncols; j++) {
-          varpanel_toggle_set_active (VARSEL_X, j, false, d);
+  gint j;
+  GList *l;
+  for (j=0; j<d->ncols; j++) {
+    varpanel_toggle_set_active (VARSEL_X, j, false, d);
 
-          varpanel_toggle_set_active (VARSEL_Y, j, false, d);
-          varpanel_widget_set_visible (VARSEL_Y, j, false, d);
-          varpanel_toggle_set_active (VARSEL_Z, j, false, d);
-          varpanel_widget_set_visible (VARSEL_Z, j, false, d);
-        }
+    varpanel_toggle_set_active (VARSEL_Y, j, false, d);
+    varpanel_widget_set_visible (VARSEL_Y, j, false, d);
+    varpanel_toggle_set_active (VARSEL_Z, j, false, d);
+    varpanel_widget_set_visible (VARSEL_Z, j, false, d);
+  }
 
-        l = display->splots;
-        while (l) {
-          j = ((splotd *) l->data)->p1dvar;
-          varpanel_toggle_set_active (VARSEL_X, j, true, d);
-          l = l->next;
-        }
+  l = display->splots;
+  while (l) {
+    j = ((splotd *) l->data)->p1dvar;
+    varpanel_toggle_set_active (VARSEL_X, j, true, d);
+    l = l->next;
+  }
 }
 
 static void
@@ -396,19 +385,9 @@ plottedVarsGet(displayd *display, gint *cols, datad *d, ggobid *gg)
       return(ncols);
 }
 
-
 static void
 displaySet(displayd *display, ggobid *gg)
 {
-  /*GtkWidget *imode_menu;
-  imode_menu = parcoords_imode_menu_make (gg->imode_accel_group,
-    G_CALLBACK(imode_set_cb), gg, true);
-  gg->imode_item = submenu_make ("_Interaction", 'I',
-    gg->main_accel_group);
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->imode_item),
-                             imode_menu); 
-  submenu_insert (gg->imode_item, gg->main_menubar, 2);
-  */
 }
 
 /*
