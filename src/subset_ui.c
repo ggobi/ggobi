@@ -52,11 +52,11 @@ datad_get_from_widget (GtkWidget *w, ggobid *gg)
     GtkWidget *tree_view = (GtkWidget *)
       g_object_get_data(G_OBJECT (w), "datad_tree_view");
     if (tree_view) {
-		sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view));
-		gint kd = tree_selection_get_selected_row(sel);
+	sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view));
+	gint kd = tree_selection_get_selected_row(sel);
         /*-- Assume that all datad's are included --*/
         if (kd >= 0) d = (datad *) g_slist_nth_data (gg->d, kd);
-	}
+    }
   }
 
   return d;
@@ -302,10 +302,10 @@ subset_window_open (ggobid *gg) {
       gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (swin),
         GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
 
-		model = gtk_list_store_new(1, G_TYPE_STRING);
-		tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(model));
-		populate_tree_view(tree_view, tree_view_titles, G_N_ELEMENTS(tree_view_titles), 
-			true, GTK_SELECTION_SINGLE, G_CALLBACK(subset_datad_set_cb), gg);
+      model = gtk_list_store_new(1, G_TYPE_STRING);
+      tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(model));
+      populate_tree_view(tree_view, tree_view_titles, G_N_ELEMENTS(tree_view_titles), 
+	true, GTK_SELECTION_SINGLE, G_CALLBACK(subset_datad_set_cb), gg);
       
       g_object_set_data(G_OBJECT (tree_view), "datad_swin", swin);
       g_signal_connect (G_OBJECT (gg), "datad_added",
@@ -314,17 +314,17 @@ subset_window_open (ggobid *gg) {
 
       /*-- All datad's are included. This assumption is used in two places. */
       for (l = gg->d; l; l = l->next) {
-		GtkTreeIter iter;
+	GtkTreeIter iter;
         d = (datad *) l->data;
         subset_init (d, gg);
-		gtk_list_store_append(model, &iter);
-		gtk_list_store_set(model, &iter, 0, d->name, -1);
-		if (l == gg->d)
-			gtk_tree_selection_select_iter(gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view)), 
-				&iter);
+	gtk_list_store_append(model, &iter);
+	gtk_list_store_set(model, &iter, 0, d->name, -1);
+	if (l == gg->d)
+	  gtk_tree_selection_select_iter(gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view)), 
+		&iter);
       }
       gtk_container_add (GTK_CONTAINER (swin), tree_view);
-      gtk_box_pack_start (GTK_BOX (vbox), swin, false, false, 2);
+      gtk_box_pack_start (GTK_BOX (vbox), swin, true, true, 2);
 
       d = gg->d->data;
     
