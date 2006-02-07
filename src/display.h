@@ -97,9 +97,7 @@ struct _displayd {
 /*
  * Scatterplot matrix display
 */
- GList *scatmat_cols, *scatmat_rows;
  GtkWidget *table;
-
 
 /*
  * Parallel coordinates display

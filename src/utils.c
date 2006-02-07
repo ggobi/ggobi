@@ -386,31 +386,6 @@ widget_find_by_name (GtkWidget *parent, gchar *name)
 /*-----------------------------------------------------------------------*/
 
 void
-print_lists (displayd *display) {
-  GList *l;
-
-  g_printerr ("columns: ");
-  for (l=display->scatmat_cols; l; l=l->next)
-    g_printerr ("%d ", GPOINTER_TO_INT (l->data));
-  g_printerr ("\n");
-  g_printerr ("rows: ");
-  for (l=display->scatmat_rows; l; l=l->next)
-    g_printerr ("%d ", GPOINTER_TO_INT (l->data));
-  g_printerr ("\n");
-}
-
-void
-print_dims (displayd *d) {
-  g_printerr ("children: %d\n", 
-    g_list_length (gtk_container_get_children (GTK_CONTAINER (d->table))));
-
-  g_printerr ("scatmat_ncols= %d, scatmat_nrows= %d ; ",
-    g_list_length (d->scatmat_cols), g_list_length (d->scatmat_rows));
-  g_printerr ("rows= %d, cols= %d\n",
-    GTK_TABLE (d->table)->nrows, GTK_TABLE (d->table)->ncols);
-}
-
-void
 print_attachments (ggobid *gg) {
   GList *l;
   GtkTableChild *child;

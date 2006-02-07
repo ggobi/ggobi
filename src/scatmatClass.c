@@ -95,8 +95,8 @@ variableSelect(GtkWidget *w, displayd *dpy, splotd *sp, gint jvar, gint toggle, 
 static void 
 varpanelRefresh(displayd *display, splotd *sp, datad *d)
 {
-  gint j;
-  GList *l;
+  gint j, n, *vars;
+  ggobid *gg = GGobiFromDisplay(display);
 
   for (j=0; j<d->ncols; j++) {
     varpanel_toggle_set_active (VARSEL_X, j, false, d);
@@ -106,14 +106,15 @@ varpanelRefresh(displayd *display, splotd *sp, datad *d)
     varpanel_toggle_set_active (VARSEL_Z, j, false, d);
     varpanel_widget_set_visible (VARSEL_Z, j, false, d);
   }
-  l = display->scatmat_cols;  /*-- assume rows = cols --*/
-  while (l) {
-    j = GPOINTER_TO_INT (l->data);
-    varpanel_toggle_set_active (VARSEL_X, j, true, d);
-    l = l->next;
-  }
-}
 
+   vars = (gint *) g_malloc(d->ncols * sizeof(gint));
+   n = GGOBI_EXTENDED_DISPLAY_GET_CLASS(display)->plotted_vars_get(display, vars, d, gg);
+
+  for (j=0; j<n; j++)
+    varpanel_toggle_set_active (VARSEL_X, vars[j], true, d);
+
+  g_free(vars);
+}
 
 static void
 varpanelTooltipsSet(displayd *display, ggobid *gg, GtkWidget *wx, GtkWidget *wy, GtkWidget *wz, GtkWidget *label)
@@ -127,24 +128,52 @@ varpanelTooltipsSet(displayd *display, ggobid *gg, GtkWidget *wx, GtkWidget *wy,
 }
 
 static gint
-plottedVarsGet(displayd *display, gint *cols, datad *d, ggobid *gg)
+plottedVarsGet(displayd *display, gint *vars, datad *d, ggobid *gg)
 {
-      GList *l;
-      splotd *s;
-      gint ncols = 0;
-      for (l=display->splots; l; l=l->next) {
-        s = (splotd *) l->data;
-        if (s->p1dvar == -1) {
-          if (!array_contains (cols, ncols, s->xyvars.x))
-            cols[ncols++] = s->xyvars.x;
-          if (!array_contains (cols, ncols, s->xyvars.y))
-            cols[ncols++] = s->xyvars.y;
-        } else {
-          if (!array_contains (cols, ncols, s->p1dvar))
-            cols[ncols++] = s->p1dvar;
-        }
-      }
-      return(ncols);
+  GList *l;
+  GtkTableChild *child;
+  GtkWidget *da;
+  splotd *sp;
+  gint nvars = 0;
+
+  /* First count the number of variables */
+  for (l=(GTK_TABLE (display->table))->children; l; l=l->next) {
+    child = (GtkTableChild *) l->data;
+    da = child->widget;
+    sp = (splotd *) g_object_get_data(G_OBJECT (da), "splotd");
+    if (sp->p1dvar != -1)
+      nvars += 1;
+  }
+  
+  /* Then populate the vector of variables */
+  for (l=(GTK_TABLE (display->table))->children; l; l=l->next) {
+    child = (GtkTableChild *) l->data;
+    da = child->widget;
+    sp = (splotd *) g_object_get_data(G_OBJECT (da), "splotd");
+    if (sp->p1dvar != -1) {
+      vars[child->left_attach] = sp->p1dvar;
+    }
+  }
+
+  return nvars;
+#if 0
+  GList *l;
+  splotd *s;
+  gint ncols = 0;
+  for (l=display->splots; l; l=l->next) {
+    s = (splotd *) l->data;
+    if (s->p1dvar == -1) {
+      if (!array_contains (cols, ncols, s->xyvars.x))
+        cols[ncols++] = s->xyvars.x;
+      if (!array_contains (cols, ncols, s->xyvars.y))
+        cols[ncols++] = s->xyvars.y;
+    } else {
+      if (!array_contains (cols, ncols, s->p1dvar))
+        cols[ncols++] = s->p1dvar;
+    }
+  }
+  return(ncols);
+#endif
 }
 
 displayd *
@@ -284,8 +313,13 @@ receive_scatmat_drag(GtkWidget *src, GdkDragContext *context, int x, int y, cons
   GtkWidget *da;
   GtkTableChild *child;
   GList *ivars = NULL;
+  gint nvars, *vars;
+  datad *d;
+  ggobid *gg;
 
   display = to->displayptr;
+  d = display->d;
+  gg = GGobiFromDisplay(display);
   from = GGOBI_SPLOT(gtk_drag_get_source_widget(context));
 
   if(from->displayptr != display) {
@@ -299,35 +333,19 @@ receive_scatmat_drag(GtkWidget *src, GdkDragContext *context, int x, int y, cons
 
   if (from->p1dvar != -1 && to->p1dvar != -1) {
 
+    vars = (gint *) g_malloc(d->ncols * sizeof(gint));
+    nvars = GGOBI_EXTENDED_DISPLAY_GET_CLASS(display)->plotted_vars_get(display, vars, d, gg);
+
+    for (n=0; n<nvars; n++) {
     /* Create a new list of elements */
-    l = display->scatmat_rows;
-    while (l) {
-      n = GPOINTER_TO_INT(l->data);
-      if (n == from->p1dvar)
+      if (vars[n] == from->p1dvar)
         ;
-      else if (n == to->p1dvar) {
+      else if (vars[n] == to->p1dvar) {
         ivars = g_list_append(ivars, GINT_TO_POINTER(from->p1dvar));
-        ivars = g_list_append(ivars, l->data);
-      } else ivars = g_list_append(ivars, l->data);
-      l = l->next;
+        ivars = g_list_append(ivars, GINT_TO_POINTER(vars[n]));
+      } else ivars = g_list_append(ivars, GINT_TO_POINTER(vars[n]));
     }
 
-    /* Update the existing lists, though we may scrap them yet */
-    l = display->scatmat_cols;
-    k = 0;
-    while (l) {
-      l->data = g_list_nth_data(ivars, k);
-      l = l->next;
-      k++;
-    }
-    l = display->scatmat_rows;
-    k = 0;
-    while (l) {
-      l->data = g_list_nth_data(ivars, k);
-      l = l->next;
-      k++;
-    }
-      
     /* Loop through the plots setting the values of xyvars and
        p1dvar */
     for (l=(GTK_TABLE (display->table))->children; l; l=l->next) {
@@ -336,20 +354,19 @@ receive_scatmat_drag(GtkWidget *src, GdkDragContext *context, int x, int y, cons
       sp = (splotd *) g_object_get_data(G_OBJECT (da), "splotd");
       sprow = child->top_attach;  /* 0, ..., nrows-1 */
       spcol = child->left_attach; /* 0, ..., ncols-1 */
-      if (sprow == spcol)
-        sp->p1dvar = GPOINTER_TO_INT(g_list_nth_data(display->scatmat_rows,
-						     sprow));
-      else {
+      if (sprow == spcol) {
+        sp->p1dvar = GPOINTER_TO_INT(g_list_nth_data(ivars, sprow));
+      } else {
         sp->p1dvar = -1;
-        sp->xyvars.x = GPOINTER_TO_INT(g_list_nth_data(display->scatmat_cols,
-						       spcol));
-        sp->xyvars.y = GPOINTER_TO_INT(g_list_nth_data(display->scatmat_cols,
-						       sprow));
+        sp->xyvars.x = GPOINTER_TO_INT(g_list_nth_data(ivars, spcol));
+        sp->xyvars.y = GPOINTER_TO_INT(g_list_nth_data(ivars, sprow));
       }
     }
 
     display_tailpipe (display, FULL, display->ggobi);
     varpanel_refresh (display, display->ggobi);
+
+    g_free(vars);
   }
 }
 
@@ -510,27 +527,27 @@ splotScreenToTform(cpaneld *cpanel, splotd *sp, icoords *scr,
 void
 scatmatDisplayClassInit(GGobiScatmatDisplayClass *klass)
 {
-	klass->parent_class.show_edges_p = true;
-	klass->parent_class.treeLabel = klass->parent_class.titleLabel = "Scatterplot Matrix";
+  klass->parent_class.show_edges_p = true;
+  klass->parent_class.treeLabel = klass->parent_class.titleLabel = "Scatterplot Matrix";
 
-	klass->parent_class.cpanel_set = cpanelSet;
-        klass->parent_class.imode_control_box = scatmatCPanelWidget;
+  klass->parent_class.cpanel_set = cpanelSet;
+  klass->parent_class.imode_control_box = scatmatCPanelWidget;
 
-	klass->parent_class.xml_describe = add_xml_scatmat_variables;
-	klass->parent_class.move_points_motion_cb = movePointsMotionCb;
-	klass->parent_class.move_points_button_cb = movePointsButtonCb;
+  klass->parent_class.xml_describe = add_xml_scatmat_variables;
+  klass->parent_class.move_points_motion_cb = movePointsMotionCb;
+  klass->parent_class.move_points_button_cb = movePointsButtonCb;
 /* XXX duncan and dfs: you need to sort this out
 	klass->parent_class.world_to_raw = worldToRaw;
 */
-	klass->parent_class.variable_plotted_p = variablePlottedP;
-	klass->parent_class.variable_select = variableSelect;
-	klass->parent_class.varpanel_refresh = varpanelRefresh;
-	klass->parent_class.varpanel_tooltips_set = varpanelTooltipsSet;
-	klass->parent_class.plotted_vars_get = plottedVarsGet;
-	klass->parent_class.createWithVars = createWithVars;
-	klass->parent_class.display_set = displaySet;
-	klass->parent_class.mode_ui_get = scatmat_mode_ui_get;
-	klass->parent_class.handles_interaction = handlesInteraction;
+  klass->parent_class.variable_plotted_p = variablePlottedP;
+  klass->parent_class.variable_select = variableSelect;
+  klass->parent_class.varpanel_refresh = varpanelRefresh;
+  klass->parent_class.varpanel_tooltips_set = varpanelTooltipsSet;
+  klass->parent_class.plotted_vars_get = plottedVarsGet;
+  klass->parent_class.createWithVars = createWithVars;
+  klass->parent_class.display_set = displaySet;
+  klass->parent_class.mode_ui_get = scatmat_mode_ui_get;
+  klass->parent_class.handles_interaction = handlesInteraction;
 
   klass->parent_class.event_handlers_toggle = scatmatEventHandlersToggle;
   klass->parent_class.splot_key_event_handled = scatmatKeyEventHandled;

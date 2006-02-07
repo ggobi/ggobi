@@ -27,6 +27,7 @@
 /*                       Callbacks                                      */
 /*----------------------------------------------------------------------*/
 
+#if 0
 static gchar *selection_mode_lbl[] = {"Replace", "Insert", "Append", "Delete"};
 static void selection_mode_cb (GtkWidget *w, ggobid *gg)
 {
@@ -48,6 +49,7 @@ static void selection_mode_cb (GtkWidget *w, ggobid *gg)
     break;
   }
 }
+#endif
 
 /*------------------------------------------------------------------------*/
 /*                         Control panel                                  */
@@ -70,6 +72,7 @@ cpanel_scatmat_make (ggobid *gg) {
   gtk_box_pack_start (GTK_BOX (panel->w),
                       vb, false, false, 0);
 
+#if 0
   lbl = gtk_label_new_with_mnemonic ("_Selection mode:");
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
   gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
@@ -78,11 +81,12 @@ cpanel_scatmat_make (ggobid *gg) {
   gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), opt);
   gtk_widget_set_name (opt, "SCATMAT:sel_mode_option_menu");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-    "Selecting an unselected variable either replaces the variable in the current plot, inserts a new plot before the current plot, or appends a new plot after the last plot",
+    "Selecting an unselected variable appends a new plot after the last plot",
     NULL);
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
   populate_combo_box (opt, selection_mode_lbl, G_N_ELEMENTS(selection_mode_lbl),
     G_CALLBACK(selection_mode_cb), gg);
+#endif
 
   gtk_widget_show_all (panel->w);
 
