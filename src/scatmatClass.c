@@ -397,7 +397,8 @@ scatmatDragAndDropEnable(displayd *dsp, gboolean active) {
   GList *l;
   for (l = dsp->splots; l; l = l->next) {
     splotd *sp = (splotd *)l->data;
-    scatmatPlotDragAndDropEnable(sp, active);
+    if (sp->p1dvar != -1)
+       scatmatPlotDragAndDropEnable(sp, active);
   }
 }
 
