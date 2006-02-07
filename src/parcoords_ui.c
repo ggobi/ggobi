@@ -54,12 +54,14 @@ static void type_cb (GtkWidget *w, ggobid *gg)
   display_tailpipe (gg->current_display, FULL, gg);
 }
 
+#if 0
 static gchar *selection_mode_lbl[] = {"Replace", "Insert", "Append", "Delete"};
 static void selection_mode_cb (GtkWidget *w, ggobid *gg)
 {;
   cpaneld *cpanel = &gg->current_display->cpanel;
   cpanel->parcoords_selection_mode = gtk_combo_box_get_active(GTK_COMBO_BOX(w));
 }
+#endif
 
 /*
 static gchar *showcases_lbl[] = {"All", "Labelled"};
@@ -115,6 +117,8 @@ cpanel_parcoords_make (ggobid *gg)
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
   populate_combo_box (opt, arrangement_lbl, G_N_ELEMENTS(arrangement_lbl),
     G_CALLBACK(arrangement_cb), gg);
+
+#if 0
 /*
  * option menu: selection mode
 */
@@ -133,6 +137,7 @@ cpanel_parcoords_make (ggobid *gg)
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
   populate_combo_box (opt, selection_mode_lbl, G_N_ELEMENTS(selection_mode_lbl),
     G_CALLBACK(selection_mode_cb), gg);
+#endif
 
 /*
  * option menu
@@ -321,10 +326,10 @@ parcoords_imode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func,
 void
 cpanel_parcoords_set (displayd *display, cpaneld *cpanel, GtkWidget *panel, ggobid *gg)
 {
+#if 0
   GtkWidget *w;
-
   w = widget_find_by_name (panel, "PCPLOT:sel_mode_option_menu");
-
   gtk_combo_box_set_active (GTK_COMBO_BOX(w),
                                cpanel->parcoords_selection_mode);
+#endif
 }

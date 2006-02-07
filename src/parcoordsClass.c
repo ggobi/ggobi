@@ -170,11 +170,11 @@ parcoordsEventHandlersToggle(displayd * dpy, splotd * sp, gboolean state,
    ready to receive */
 /* would be better if there was some callback when the imode changed */
   parcoordsDragAndDropEnable(dpy, false);
-  
+
   switch (imode) {
   case DEFAULT_IMODE:
       p1d_event_handlers_toggle (sp, state);
-	  parcoordsDragAndDropEnable(dpy, true);
+      parcoordsDragAndDropEnable(dpy, true);
   break;
   case BRUSH:
       brush_event_handlers_toggle (sp, state);

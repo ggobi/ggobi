@@ -243,15 +243,6 @@ scatmatKeyEventHandled(GtkWidget *w, displayd *display, splotd * sp, GdkEventKey
 static void
 displaySet(displayd *display, ggobid *gg)
 {
-/*  GtkWidget *imode_menu;
-
-  imode_menu = scatmat_imode_menu_make (gg->imode_accel_group,
-    G_CALLBACK(imode_set_cb), gg, true);
-  gg->imode_item = submenu_make ("_Interaction", 'I',
-    gg->main_accel_group);
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (gg->imode_item),
-    imode_menu); 
-  submenu_insert (gg->imode_item, gg->main_menubar, 2);*/
 }
 
 static gboolean

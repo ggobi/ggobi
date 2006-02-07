@@ -850,5 +850,5 @@ InputDescription *read_ascii_input_description(const char * const fileName, cons
 void resetDataMode();
 vartabled *vartable_element_get(gint i, datad *d);
 
-gboolean parcoords_add_delete_splot(cpaneld *cpanel, splotd *sp, gint jvar, gint *jvar_prev, ggobid *gg, displayd *display, ParCoordsSelectionMode selMode);
+gboolean parcoords_add_delete_splot(cpaneld *cpanel, splotd *sp, gint jvar, gint *jvar_prev, ggobid *gg, displayd *display);
 #endif

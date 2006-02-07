@@ -64,7 +64,6 @@ parcoords_cpanel_init (cpaneld* cpanel, ggobid *gg)
   cpanel->p1d.type = DOTPLOT;
   cpanel_p1d_init (cpanel, gg);
 
-  cpanel->parcoords_selection_mode = VAR_REPLACE;
   cpanel->parcoords_arrangement = ARRANGE_ROW;
 
   /*-- available modes --*/
@@ -84,7 +83,6 @@ cpanel_set (displayd *display, ggobid *gg)
   }
 
   if (displaytype_known) { 
-    /*g_printerr ("(cpanel_set) gg->pmode=%d cpanel->pmode=%d\n", gg->pmode, cpanel->pmode);*/
     viewmode_set (cpanel->pmode, cpanel->imode, gg);
   }
 }

@@ -284,174 +284,94 @@ gboolean
 parcoords_varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint *jvar_prev,
   ggobid *gg)
 {
-   gboolean status = false;
-   ParCoordsSelectionMode mode;
-   gboolean isVarSelected;
+  gboolean status = false;
 
-   mode = cpanel->parcoords_selection_mode;
-   isVarSelected = parcoords_var_selected (jvar, gg->current_display);
+  status = parcoords_add_delete_splot(cpanel, sp, jvar, jvar_prev, gg, gg->current_display);
 
-   if((mode == VAR_DELETE && isVarSelected) || !isVarSelected)
-      status = parcoords_add_delete_splot(cpanel, sp, jvar, jvar_prev, gg, gg->current_display, mode);
-
-   return(status);
+  return(status);
 }
 
 gboolean
-parcoords_add_delete_splot(cpaneld *cpanel, splotd *sp, gint jvar, gint *jvar_prev, ggobid *gg, displayd *display, ParCoordsSelectionMode selMode)
+parcoords_add_delete_splot(cpaneld *cpanel, splotd *sp, gint jvar, gint *jvar_prev, ggobid *gg, displayd *display)
 {
-
   gboolean redraw = true;
   gint nplots = g_list_length (display->splots);
-  gint k, width, height;
-  gint jvar_indx, new_indx;
+  gint k;
+  gint indx, new_indx;
   GList *l;
-  splotd *s, *sp_new;
-  GtkWidget *box;// *w;
-  //gfloat ratio = 1.0;
+  splotd *sp_jvar, *s, *sp_new;
+  GtkWidget *box;
 
-  /* The index of gg.current_splot */
-  gint sp_indx = g_list_index (display->splots, sp);
+  /* sp = gg->current_splot
+     jvar = the variable being deleted or added
+  */
 
-  /*
-  if(GGOBI_IS_WINDOW_DISPLAY(display))
-     gtk_window_set_policy (GTK_WINDOW (GGOBI_WINDOW_DISPLAY(display)->window),
-     false, false, false);*/
+  /*-- Delete a plot  --*/
+  if (parcoords_var_selected (jvar, display)) {
 
-  splot_get_dimensions (sp, &width, &height);
+    if (nplots > 1) {
 
-  /*-- VAR_DELETE  --*/
-  if (selMode == VAR_DELETE)
-  {
-    /* If jvar is one of the plotted variables, its corresponding plot */
-    splotd *jvar_sp = NULL;
-
-    k = 0;
-    l = display->splots;
-    while (l) {
-      s = (splotd *) l->data;
-      if (s->p1dvar == jvar) {
-        jvar_sp = s;
-        jvar_indx = k;
-        break;
-      }
-      l = l->next;
-      k++;
-    }
-
-    if (jvar_sp != NULL && nplots > 1) {
-
-      /*-- Delete the plot from the list, and destroy it. --*/
-      display->splots = g_list_remove (display->splots, (gpointer) jvar_sp);
-#if 0
-      /*-- keep the window from shrinking by growing all plots --*/
-      ratio = (gfloat) nplots / (gfloat) (nplots-1);
-      if (cpanel->parcoords_arrangement == ARRANGE_ROW)
-        width = (gint) (ratio * (gfloat) width);
-      else
-        height = (gint) (ratio * (gfloat) height);
-
+      k = 0;
       l = display->splots;
       while (l) {
-        w = ((splotd *) l->data)->da;
-        gtk_widget_ref (w);
-        /*-- shrink each plot --*/
-        gtk_widget_set_usize (w, -1, -1);
-        gtk_widget_set_usize (w, width, height);
-        /* */
-        l = l->next ;
+	s = (splotd *) l->data;
+	if (s->p1dvar == jvar) {
+	  sp_jvar = s;
+	  indx = k;
+	  break;
+	}
+        l = l->next;
+        k++;
       }
-      /* */
-#endif
+
+      /*-- Delete the plot from the list, and destroy it. --*/
+      display->splots = g_list_remove (display->splots, (gpointer) sp_jvar);
+      nplots--;
+
       /*
        * If the plot being removed is the current plot, reset
        * gg->current_splot.
       */
-      /* ?mode or ?mode_prev?  Don't know. */
-      if (jvar_sp == gg->current_splot) {
-        sp_event_handlers_toggle (sp, off, display->cpanel.pmode, display->cpanel.imode);
+      if (sp_jvar == gg->current_splot) {
+        sp_event_handlers_toggle (sp_jvar, off, cpanel->pmode, cpanel->imode);
 
-        new_indx = (jvar_indx == 0) ? 0 : MIN (nplots-1, jvar_indx);
-        gg->current_splot = (splotd *)
-          g_list_nth_data (display->splots, new_indx);
+        new_indx = (indx == 0) ? 0 : MIN (nplots-1, indx);
+        s = (splotd *) g_list_nth_data (display->splots, new_indx);
         /* just for insurance, to handle the unforeseen */
-        if (gg->current_splot == NULL)
-          gg->current_splot = (splotd *) g_list_nth_data (display->splots, 0);
-        display->current_splot = gg->current_splot;
+        if (s == NULL) {
+          s = (splotd *) g_list_nth_data (display->splots, 0);
+        }
+        display->current_splot = gg->current_splot = s;
 
-/*-- dfs, testing -- all this, or just event_handlers_toggle? --*/
-        splot_set_current (gg->current_splot, on, gg);
+        /* If we're brushing, is this ok? */
+        sp_event_handlers_toggle (s, on, cpanel->pmode, cpanel->imode);
       }
 
-      splot_free (jvar_sp, display, gg);
-
-      nplots--;
+      splot_free (sp_jvar, display, gg);
     }
 
-  /*-- VAR_REPLACE or VAR_INSERT or VAR_APPEND  --*/
-  } else /* */ {
+  } else /* Append a new variable */ {
 
-    if (selMode == VAR_REPLACE) {
+    sp_new = ggobi_parcoords_splot_new (display, gg);
+    sp_new->p1dvar = jvar; 
+    box = (sp->da)->parent;
+    gtk_box_pack_start (GTK_BOX (box), sp_new->da, true, true, 0);
+    display->splots = g_list_append (display->splots,
+      (gpointer) sp_new);
+    gtk_widget_show (sp_new->da);
 
-      *jvar_prev = sp->p1dvar;
-      sp->p1dvar = jvar;
-      redraw = true;
+    /* I don't think it's possible to initialize brushing until the
+       data has run through the pipeline.  Since I can't cleanly add a
+       plot in brushing mode, I think it's best to switch back to the
+       default mode.  -- dfs
+       */
+    GGOBI(full_viewmode_set)(EXTENDED_DISPLAY_PMODE, DEFAULT_IMODE, gg);
 
-    } else {
+    /* Initialize drag and drop for the new panel */
+    sp_event_handlers_toggle (sp_new, on, cpanel->pmode, cpanel->imode);
 
-      /*-- prepare to reset the current plot --*/
-      sp_event_handlers_toggle (sp, off, display->cpanel.pmode, display->cpanel.imode);
-
-      /*-- keep the window from growing by shrinking all plots --*/
-      /*ratio = (gfloat) nplots / (gfloat) (nplots+1);
-      if (cpanel->parcoords_arrangement == ARRANGE_ROW)
-        width = (gint) (ratio * (gfloat) width);
-      else
-        height = (gint) (ratio * (gfloat) height);
-      */
-
-      sp_new = ggobi_parcoords_splot_new (display, gg);
-      sp_new->p1dvar = jvar; 
-
-      box = (sp->da)->parent;
-      gtk_box_pack_start (GTK_BOX (box), sp_new->da, true, true, 0);
-	  
-      if (cpanel->parcoords_selection_mode == VAR_INSERT) {
-        display->splots = g_list_insert (display->splots,
-          (gpointer) sp_new, sp_indx);
-	gtk_box_reorder_child(GTK_BOX(box), sp_new->da, sp_indx);
-       } else if (cpanel->parcoords_selection_mode == VAR_APPEND)
-         display->splots = g_list_append (display->splots,
-          (gpointer) sp_new);
-
-	  gtk_widget_show (sp_new->da);
-
-#if 0
-      l = display->splots;
-      while (l) {
-        w = ((splotd *) l->data)->da;
-        gtk_widget_ref (w);
-
-        /* shrink each plot */
-        gtk_widget_set_usize (w, -1, -1);
-        gtk_widget_set_usize (w, width, height);
-        /* */
-
-        gtk_container_remove (GTK_CONTAINER (box), w);
-        gtk_box_pack_start (GTK_BOX (box), w, true, true, 0);
-        gtk_widget_unref (w);  /*-- decrease the ref_count by 1 --*/
-        l = l->next ;
-      }
-#endif
-      gg->current_splot = sp->displayptr->current_splot = sp_new;
-      sp_event_handlers_toggle (sp_new, on, display->cpanel.pmode, display->cpanel.imode);
-      redraw = true;
-    }
+    redraw = true;
   }
-
-  /*if(GGOBI_IS_WINDOW_DISPLAY(display))
-      gtk_window_set_policy (GTK_WINDOW (GGOBI_WINDOW_DISPLAY(display)->window),
-       true, true, false);*/
 
   return redraw;
 }

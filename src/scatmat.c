@@ -299,8 +299,7 @@ scatmat_varsel_simple (cpaneld *cpanel, splotd *sp, gint jvar,
        gtk_container_remove (GTK_CONTAINER (display->table), da);
 
        if (s == gg->current_splot)
-         sp_event_handlers_toggle (s, off, display->cpanel.pmode, 
-           display->cpanel.imode);
+         sp_event_handlers_toggle (s, off, cpanel->pmode, cpanel->imode);
        splot_free (s, display, gg);
      }
    }
@@ -313,19 +312,14 @@ scatmat_varsel_simple (cpaneld *cpanel, splotd *sp, gint jvar,
     gg->current_splot = (splotd *) g_list_nth_data (display->splots, 0);
     display->current_splot = gg->current_splot;
     /* Turn any event handlers back on */
-    sp_event_handlers_toggle (gg->current_splot, on, display->cpanel.pmode, 
-      display->cpanel.imode);
+    sp_event_handlers_toggle (gg->current_splot, on, cpanel->pmode, 
+      cpanel->imode);
 
     redraw = false;  /*-- individual plots don't need a redraw --*/
     g_free(vars);
-  } // End of deleting a plot.
+  } // End of deleting a variable.
 
-/*
- * Otherwise, append a row <and> a column.  When appending a lot,
- * there's no need to change the current splot or to monkey with
- * event handlers.
-*/
-  else {
+  else {  /* Append a variable.  Don't change current_splot. */
 
     vars = (gint *) g_malloc(d->ncols * sizeof(gint));
     nvars = GGOBI_EXTENDED_DISPLAY_GET_CLASS(display)->plotted_vars_get(display, vars, d, gg);
@@ -342,14 +336,19 @@ scatmat_varsel_simple (cpaneld *cpanel, splotd *sp, gint jvar,
       }
     }
     sp_new = scatmat_add_plot (jvar, jvar, nvars, nvars, display, gg);
-    /* This isn't the current splot, so I don't want to turn on event
-       handlers for it, but the new marginal plot needs to receive drag
-       events without ever being the current splot */
-    sp_event_handlers_toggle (sp_new, on, DEFAULT_PMODE, DEFAULT_IMODE);
+
+    /* I don't think it's possible to initialize brushing until the
+       data has run through the pipeline.  Since I can't cleanly add a
+       plot in brushing mode, I think it's best to switch back to the
+       default mode.  -- dfs
+       */
+    GGOBI(full_viewmode_set)(EXTENDED_DISPLAY_PMODE, DEFAULT_IMODE, gg);
+
+    /* Set up the new splot for drag and drop */
+    sp_event_handlers_toggle (sp_new, on, cpanel->pmode, cpanel->imode);
 
 
-    gtk_table_resize (GTK_TABLE (gg->current_display->table),
-                     nvars, nvars);
+    gtk_table_resize (GTK_TABLE (display->table), nvars, nvars);
     redraw = true;
     g_free(vars);
   }
