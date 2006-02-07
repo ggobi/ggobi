@@ -336,7 +336,17 @@ receive_scatmat_drag(GtkWidget *src, GdkDragContext *context, int x, int y, cons
     vars = (gint *) g_malloc(d->ncols * sizeof(gint));
     nvars = GGOBI_EXTENDED_DISPLAY_GET_CLASS(display)->plotted_vars_get(display, vars, d, gg);
 
-    for (n=0; n<nvars; n++) {
+    for (n=0; n<nvars; n++)
+      ivars = g_list_append(ivars, GINT_TO_POINTER(vars[n]));
+    /* Find the index of the to element */
+    k = g_list_index(ivars, GINT_TO_POINTER(to->p1dvar));
+
+    /* Remove the from element */
+    ivars = g_list_remove(ivars, GINT_TO_POINTER(from->p1dvar));
+    /* Insert the from element */
+    ivars = g_list_insert(ivars, GINT_TO_POINTER(from->p1dvar), k);
+
+#if 0
     /* Create a new list of elements */
       if (vars[n] == from->p1dvar)
         ;
@@ -345,6 +355,7 @@ receive_scatmat_drag(GtkWidget *src, GdkDragContext *context, int x, int y, cons
         ivars = g_list_append(ivars, GINT_TO_POINTER(vars[n]));
       } else ivars = g_list_append(ivars, GINT_TO_POINTER(vars[n]));
     }
+#endif
 
     /* Loop through the plots setting the values of xyvars and
        p1dvar */
