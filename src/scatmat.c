@@ -196,40 +196,6 @@ scatmat_new (displayd *display,
   return display;
 }
 
-#if 0
-gint
-scatmat_vars_get(displayd *display, gint *vars) {
-  GList *l;
-  GtkTableChild *child;
-  GtkWidget *da;
-  splotd *sp;
-  gint nvars = 0;
-
-  /* First count the number of variables */
-  for (l=(GTK_TABLE (display->table))->children; l; l=l->next) {
-    child = (GtkTableChild *) l->data;
-    da = child->widget;
-    sp = (splotd *) g_object_get_data(G_OBJECT (da), "splotd");
-    if (sp->p1dvar != -1)
-      nvars += 1;
-  }
-  
-  /* Then allocate and populate the vector of variables */
-  vars = (gint *) g_malloc(sizeof(gint) * nvars);
-
-  for (l=(GTK_TABLE (display->table))->children; l; l=l->next) {
-    child = (GtkTableChild *) l->data;
-    da = child->widget;
-    sp = (splotd *) g_object_get_data(G_OBJECT (da), "splotd");
-    if (sp->p1dvar != -1) {
-      vars[child->left_attach] = sp->p1dvar;
-    }
-  }
-
-  return nvars;
-}
-#endif
-
 /*
  * Find out whether a variable is selected
 */
@@ -339,82 +305,36 @@ scatmat_varsel_simple (cpaneld *cpanel, splotd *sp, gint jvar,
      }
    }
 
-   vars = (gint *) g_malloc(d->ncols * sizeof(gint));
-   nvars = GGOBI_EXTENDED_DISPLAY_GET_CLASS(display)->plotted_vars_get(display, vars, d, gg);
-   gtk_table_resize (GTK_TABLE (display->table), nvars, nvars);
+    vars = (gint *) g_malloc(d->ncols * sizeof(gint));
+    nvars = GGOBI_EXTENDED_DISPLAY_GET_CLASS(display)->plotted_vars_get(display, vars, d, gg);
+    gtk_table_resize (GTK_TABLE (display->table), nvars, nvars);
 
-   /*-- when finished, adjust the sizes of the remaining plots --*/
-#if 0
-   l = (GTK_TABLE (display->table))->children;
-   while (l) {
-     child = (GtkTableChild *) l->data;
-     l = l->next;
-     da = child->widget;
-     gtk_widget_set_usize (da, -1, -1);
-     gtk_widget_set_usize (da, width, height);
-   }
-#endif
-   /*
-    * I'm not sure this is necessary -- am I checking whether the
-    * gg.current_splot was deleted?
-   */
-   gg->current_splot = (splotd *) g_list_nth_data (display->splots, 0);
-   display->current_splot = gg->current_splot;
+    /* Make the first plot the current plot */
+    gg->current_splot = (splotd *) g_list_nth_data (display->splots, 0);
+    display->current_splot = gg->current_splot;
+    /* Turn any event handlers back on */
+    sp_event_handlers_toggle (gg->current_splot, on, display->cpanel.pmode, 
+      display->cpanel.imode);
 
-   redraw = false;  /*-- individual plots don't need a redraw --*/
- }
+    redraw = false;  /*-- individual plots don't need a redraw --*/
+    g_free(vars);
+  } // End of deleting a plot.
 
 /*
- * Otherwise, append a row <and> a column
+ * Otherwise, append a row <and> a column.  When appending a lot,
+ * there's no need to change the current splot or to monkey with
+ * event handlers.
 */
   else {
 
-   vars = (gint *) g_malloc(d->ncols * sizeof(gint));
-   nvars = GGOBI_EXTENDED_DISPLAY_GET_CLASS(display)->plotted_vars_get(display, vars, d, gg);
-
-    /*-- prepare to reset the current plot --*/
-    sp_event_handlers_toggle (sp, off, display->cpanel.pmode,
-      display->cpanel.imode);
-
-    /*
-     * First adjust the table, inserting or appending a row
-     * and resetting the attachment values.
-    */
-
-#if 0
-    ratio = (gfloat) nvars / (gfloat) (nvars+1);
-    width = (gint) (ratio * (gfloat) width);
-    height = (gint) (ratio * (gfloat) height);
-#endif
-
-#if 0
-    /*
-     * Fix up the attachments of the rows below and columns to the right
-     * of the inserted/appended row/column.  I don't think I need this.
-    */
-    for (l=(GTK_TABLE (display->table))->children; l; l=l->next) {
-      child = (GtkTableChild *) l->data;
-      da = child->widget;
-      //gtk_widget_set_usize (da, -1, -1);
-      //gtk_widget_set_usize (da, width, height);
-
-      if (child->left_attach >= nvars) {
-        child->left_attach++;
-        child->right_attach++;
-      } 
-      if (child->top_attach >= nvars) {
-        child->top_attach++;
-        child->bottom_attach++;
-      }
-    }
-#endif
+    vars = (gint *) g_malloc(d->ncols * sizeof(gint));
+    nvars = GGOBI_EXTENDED_DISPLAY_GET_CLASS(display)->plotted_vars_get(display, vars, d, gg);
 
     /*
      * Now create the new plots and fill in the new row/column.
      * Work out the correct p1dvar/xyvars values for each new plot.
     */
 
-    /*-- note the strong assumption of symmetry here --*/
     for (k=0; k<nvars; k++) {
       sp_new = scatmat_add_plot (jvar, vars[k], nvars, k, display, gg);
       if (k != nvars) {  /*-- except at the intersection, do it twice --*/
@@ -422,14 +342,16 @@ scatmat_varsel_simple (cpaneld *cpanel, splotd *sp, gint jvar,
       }
     }
     sp_new = scatmat_add_plot (jvar, jvar, nvars, nvars, display, gg);
+    /* This isn't the current splot, so I don't want to turn on event
+       handlers for it, but the new marginal plot needs to receive drag
+       events without ever being the current splot */
+    sp_event_handlers_toggle (sp_new, on, DEFAULT_PMODE, DEFAULT_IMODE);
+
 
     gtk_table_resize (GTK_TABLE (gg->current_display->table),
                      nvars, nvars);
-
-    gg->current_splot = sp->displayptr->current_splot = sp;
-    sp_event_handlers_toggle (sp_new, on, gg->current_display->cpanel.pmode,
-      gg->current_display->cpanel.imode);
     redraw = true;
+    g_free(vars);
   }
 
   return redraw;
