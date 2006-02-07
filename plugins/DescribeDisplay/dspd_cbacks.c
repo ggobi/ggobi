@@ -628,10 +628,10 @@ describe_scatmat_display (FILE *fp, ggobid *gg, displayd *display,
 {
   GList *l;
   splotd *sp;
-  gint ncols;
+  gint ncols, *cols;
   ProjectionMode projection;
 
-  ncols = g_list_length (display->scatmat_cols);
+  ncols = scatmat_vars_get(display, cols);
 
   fprintf (fp, "nplots=%d", ncols * ncols);
   ADD_COMMA(fp); ADD_CR(fp);
@@ -763,7 +763,10 @@ desc_write (PluginInstance *inst)
   } else if (GGOBI_IS_SCATMAT_DISPLAY(display)) {
     fprintf (fp, "type='scatmat',");
     /* ncols: display is symmetric */
-    fprintf (fp, "ncols = %d,", g_list_length (display->scatmat_cols));
+    gint ncols, *cols;
+    ncols = scatmat_vars_get(display, cols);
+    fprintf (fp, "ncols = %d,", ncols);
+    g_free(cols);
     describe_scatmat_display (fp, gg, display, desc);
   } else if (GGOBI_IS_PAR_COORDS_DISPLAY(display)) {
     fprintf (fp, "type='parcoords',");
