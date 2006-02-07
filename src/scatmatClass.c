@@ -120,10 +120,11 @@ static void
 varpanelTooltipsSet(displayd *display, ggobid *gg, GtkWidget *wx, GtkWidget *wy, GtkWidget *wz, GtkWidget *label)
 {
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
-    "Select to replace/insert/append a variable, or to delete it",
+    "Toggle to append or delete; drag along the plot diagonal to reorder",
     NULL);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
-    "Click to replace/insert/append a variable, or to delete it",
+    "Toggle to append or delete; drag along the plot diagonal to reorder",
+
     NULL);
 }
 
@@ -336,26 +337,15 @@ receive_scatmat_drag(GtkWidget *src, GdkDragContext *context, int x, int y, cons
     vars = (gint *) g_malloc(d->ncols * sizeof(gint));
     nvars = GGOBI_EXTENDED_DISPLAY_GET_CLASS(display)->plotted_vars_get(display, vars, d, gg);
 
+    /* Easier to do this with a linked list, perhaps */
     for (n=0; n<nvars; n++)
       ivars = g_list_append(ivars, GINT_TO_POINTER(vars[n]));
     /* Find the index of the to element */
     k = g_list_index(ivars, GINT_TO_POINTER(to->p1dvar));
-
     /* Remove the from element */
     ivars = g_list_remove(ivars, GINT_TO_POINTER(from->p1dvar));
-    /* Insert the from element */
+    /* Insert the from element in the position of the to element */
     ivars = g_list_insert(ivars, GINT_TO_POINTER(from->p1dvar), k);
-
-#if 0
-    /* Create a new list of elements */
-      if (vars[n] == from->p1dvar)
-        ;
-      else if (vars[n] == to->p1dvar) {
-        ivars = g_list_append(ivars, GINT_TO_POINTER(from->p1dvar));
-        ivars = g_list_append(ivars, GINT_TO_POINTER(vars[n]));
-      } else ivars = g_list_append(ivars, GINT_TO_POINTER(vars[n]));
-    }
-#endif
 
     /* Loop through the plots setting the values of xyvars and
        p1dvar */

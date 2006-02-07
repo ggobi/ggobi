@@ -105,10 +105,6 @@ typedef struct {
 /*XX*/
  gint barchart_display_mode;
 
-
- /*-- scatterplot matrix --*/
- gint scatmat_selection_mode;
-
  /*-- 2d touring control pane --*/
  Tour2DCPanel t2d;
 

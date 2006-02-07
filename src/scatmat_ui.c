@@ -23,34 +23,6 @@
 #include "vars.h"
 #include "externs.h"
 
-/*----------------------------------------------------------------------*/
-/*                       Callbacks                                      */
-/*----------------------------------------------------------------------*/
-
-#if 0
-static gchar *selection_mode_lbl[] = {"Replace", "Insert", "Append", "Delete"};
-static void selection_mode_cb (GtkWidget *w, ggobid *gg)
-{
-  gint indx = gtk_combo_box_get_active(GTK_COMBO_BOX(w));
-  cpaneld *cpanel = &gg->current_display->cpanel;
-
-  switch (indx) {
-    case 0:
-      cpanel->scatmat_selection_mode = VAR_REPLACE;
-    break;
-    case 1:
-      cpanel->scatmat_selection_mode = VAR_INSERT;
-    break;
-    case 2:
-      cpanel->scatmat_selection_mode = VAR_APPEND;
-    break;
-    case 3:
-      cpanel->scatmat_selection_mode = VAR_DELETE;
-    break;
-  }
-}
-#endif
-
 /*------------------------------------------------------------------------*/
 /*                         Control panel                                  */
 /*------------------------------------------------------------------------*/
@@ -58,7 +30,6 @@ static void selection_mode_cb (GtkWidget *w, ggobid *gg)
 GtkWidget *
 cpanel_scatmat_make (ggobid *gg) {
   modepaneld *panel;
-  GtkWidget *vb, *lbl, *opt;
   
   panel = (modepaneld *) g_malloc(sizeof(modepaneld));
   gg->control_panels = g_list_append(gg->control_panels, (gpointer) panel);
@@ -66,27 +37,6 @@ cpanel_scatmat_make (ggobid *gg) {
   panel->w = gtk_vbox_new (false, VBOX_SPACING);
   gtk_container_set_border_width (GTK_CONTAINER (panel->w),
                                   5);
-
- /*-- option menu: selection mode --*/
-  vb = gtk_vbox_new (false, 0);
-  gtk_box_pack_start (GTK_BOX (panel->w),
-                      vb, false, false, 0);
-
-#if 0
-  lbl = gtk_label_new_with_mnemonic ("_Selection mode:");
-  gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
-  gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
-
-  opt = gtk_combo_box_new_text ();
-  gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), opt);
-  gtk_widget_set_name (opt, "SCATMAT:sel_mode_option_menu");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-    "Selecting an unselected variable appends a new plot after the last plot",
-    NULL);
-  gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
-  populate_combo_box (opt, selection_mode_lbl, G_N_ELEMENTS(selection_mode_lbl),
-    G_CALLBACK(selection_mode_cb), gg);
-#endif
 
   gtk_widget_show_all (panel->w);
 
@@ -114,7 +64,7 @@ static const gchar* mode_ui_str =
 const gchar*
 scatmat_mode_ui_get(displayd *display)
 {
-	return(mode_ui_str);
+  return(mode_ui_str);
 }
 
 
@@ -127,12 +77,4 @@ scatmat_mode_ui_get(displayd *display)
 void
 cpanel_scatmat_set (displayd *display, cpaneld *cpanel, ggobid *gg)
 {
-  GtkWidget *pnl = mode_panel_get_by_name("SCATMAT", gg);
-  GtkWidget *w;
-
-  if (pnl) {
-    w = widget_find_by_name (pnl, "SCATMAT:sel_mode_option_menu");
-    gtk_combo_box_set_active (GTK_COMBO_BOX(w),
-                                 cpanel->scatmat_selection_mode);
-  }
 }

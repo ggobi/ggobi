@@ -45,8 +45,6 @@ scatmat_cpanel_init (cpaneld* cpanel, ggobid *gg) {
   cpanel->pmode = EXTENDED_DISPLAY_PMODE;
   cpanel->imode = DEFAULT_IMODE;
 
-  cpanel->scatmat_selection_mode = VAR_REPLACE;
-
   /*-- 1d plots --*/
   cpanel->p1d.type = ASH;
   cpanel_p1d_init (cpanel, gg);
