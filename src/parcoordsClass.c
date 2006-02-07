@@ -389,19 +389,19 @@ varpanelTooltipsSet(displayd *dpy, ggobid *gg, GtkWidget *wx, GtkWidget *wy, Gtk
     NULL);
 }
 
-
+/* Are these ordered?  Maybe so */
 static gint
 plottedVarsGet(displayd *display, gint *cols, datad *d, ggobid *gg)
 {
-      GList *l;
-      splotd *s;
-      gint ncols = 0;
-      for (l=display->splots; l; l=l->next) {
-        s = (splotd *) l->data;
-        if (!array_contains (cols, ncols, s->p1dvar))
-          cols[ncols++] = s->p1dvar;
-      }
-      return(ncols);
+  GList *l;
+  splotd *s;
+  gint ncols = 0;
+  for (l=display->splots; l; l=l->next) {
+    s = (splotd *) l->data;
+    if (!array_contains (cols, ncols, s->p1dvar))
+      cols[ncols++] = s->p1dvar;
+  }
+  return(ncols);
 }
 
 static void
