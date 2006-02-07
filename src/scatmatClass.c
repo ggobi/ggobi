@@ -62,27 +62,26 @@ worldToRaw(displayd *display, splotd *sp, gint pt, datad *d, ggobid *gg)
 static gint 
 variablePlottedP(displayd *display, gint *cols, gint ncols, datad *d)
 {
-	GList *l;
-	gint j;
-	splotd *sp;
-	g_printerr ("(scatmat variablePlottedP)\n");
-        for (l = display->splots; l; l = l->next) {
-          sp = (splotd *) l->data;
+  GList *l;
+  gint j;
+  splotd *sp;
+  for (l = display->splots; l; l = l->next) {
+    sp = (splotd *) l->data;
 
-          for (j=0; j<ncols; j++) {
-            if (sp->p1dvar == -1) {
-              if (sp->xyvars.x == cols[j]) {
-                return(sp->xyvars.x);
-              }
-              if (sp->xyvars.y == cols[j]) {
-                return(sp->xyvars.y);
-              }
-            } else if (sp->p1dvar == cols[j]) {
-              return(sp->p1dvar);
-            }
-          }
+    for (j=0; j<ncols; j++) {
+      if (sp->p1dvar == -1) {
+        if (sp->xyvars.x == cols[j]) {
+          return(sp->xyvars.x);
         }
-	return(-1);
+        if (sp->xyvars.y == cols[j]) {
+          return(sp->xyvars.y);
+        }
+      } else if (sp->p1dvar == cols[j]) {
+        return(sp->p1dvar);
+      }
+    }
+  }
+  return(-1);
 }
 
 static gboolean
@@ -199,37 +198,6 @@ add_xml_scatmat_variables(xmlNodePtr node, GList *plots, displayd *dpy)
   }
 }
 
-#if 0
-gboolean
-scatmatEventHandlersToggle(displayd * dpy, splotd * sp, gboolean state,
-                            ProjectionMode pmode, InteractionMode imode)
-{
-  switch (imode) {
-  case DEFAULT_IMODE:
-      switch (sp->p1dvar) {
-        case -1:
-          xyplot_event_handlers_toggle (sp, state);
-        break;
-        default:
-          p1d_event_handlers_toggle (sp, state);
-      }
-  break;
-  case SCALE:
-      scale_event_handlers_toggle (sp, state);
-  break;
-  case BRUSH:
-      brush_event_handlers_toggle (sp, state);
-  break;
-  case IDENT:
-      identify_event_handlers_toggle (sp, state);
-  break;
-  default:
-  break;
-  }
-
-  return (false);
-}
-#endif
 
 static gboolean
 scatmatKeyEventHandled(GtkWidget *w, displayd *display, splotd * sp, GdkEventKey *event, ggobid *gg)
