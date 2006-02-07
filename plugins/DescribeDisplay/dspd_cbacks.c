@@ -359,7 +359,7 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
   /*-- parameters for each projection ---------------------------------*/
 
   if (projection == P1PLOT) {
-    OPEN_NAMED_LIST(fp, "p1plotparams");
+    OPEN_NAMED_LIST(fp, "params");
     vt = vartable_element_get (sp->p1dvar, d);
     fprintf (fp, "label='%s',", vt->collab_tform);
     /* type: TEXTURE=0, ASH=1 */
@@ -368,17 +368,17 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
     fprintf (fp, "orientation=%d,", display->p1d_orientation);
     /* whether we're drawing line segments */
     fprintf (fp, "lines=%d", cpanel->p1d.ASH_add_lines_p);
-    CLOSE_LIST(fp); /* p1plotparams */
+    CLOSE_LIST(fp); /* p1plot params */
   } else if (projection == XYPLOT) {
-    OPEN_NAMED_LIST(fp, "xyplotparams");
+    OPEN_NAMED_LIST(fp, "params");
     vt = vartable_element_get (sp->xyvars.x, d);
     fprintf (fp, "xlabel='%s',", vt->collab_tform);
     vt = vartable_element_get (sp->xyvars.y, d);
     fprintf (fp, "ylabel='%s',", vt->collab_tform);
-    CLOSE_LIST(fp);  /* xyplotparams */
+    CLOSE_LIST(fp);  /* xyplot params */
   } else if (projection == TOUR1D) {
     /* F, variable labels, variable lims */
-    OPEN_NAMED_LIST(fp, "tour1dparams");
+    OPEN_NAMED_LIST(fp, "params");
     /* F */
     OPEN_NAMED_C(fp, "F");
     for (k=0; k<display->t1d.nsubset; k++) {
@@ -407,10 +407,10 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
       ADD_COMMA(fp);
     }
     CLOSE_LIST(fp);  /* tour1d ranges */
-    CLOSE_LIST(fp);  /* tour1dparams */
+    CLOSE_LIST(fp);  /* tour1d params */
   } else if (projection == TOUR2D3) {
     /* F, variable labels, variable lims */
-    OPEN_NAMED_LIST(fp, "tour2d3params");
+    OPEN_NAMED_LIST(fp, "params");
     /* F */
     OPEN_NAMED_C(fp, "F");
     for (k=0; k<display->t2d3.nsubset; k++) {
@@ -443,10 +443,10 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
       ADD_COMMA(fp);
     }
     CLOSE_LIST(fp);  /* tour2d3 ranges */
-    CLOSE_LIST(fp);  /* tour2d3params */
+    CLOSE_LIST(fp);  /* tour2d3 params */
   } else if (projection == TOUR2D) {
     /* F, variable labels, variable lims */
-    OPEN_NAMED_LIST(fp, "tour2dparams");
+    OPEN_NAMED_LIST(fp, "params");
     /* F */
     OPEN_NAMED_C(fp, "F");
     for (k=0; k<display->t2d.nsubset; k++) {
@@ -479,10 +479,10 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
       ADD_COMMA(fp);
     }
     CLOSE_LIST(fp);   /* tour2d ranges */
-    CLOSE_LIST(fp);  /* tour2dparams */
+    CLOSE_LIST(fp);  /* tour2d params */
   } else if (projection == COTOUR) {
     /* xF, x variable labels, x variable lims; ditto for y */
-    OPEN_NAMED_LIST(fp, "tour2x1dparams");
+    OPEN_NAMED_LIST(fp, "params");
     /* xF */
     OPEN_NAMED_C(fp, "xF");
     for (k=0; k<display->tcorr1.nsubset; k++) {
@@ -543,7 +543,7 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
     }
     CLOSE_LIST(fp);  /* tour2x1d, y ranges */
 
-    CLOSE_LIST(fp);  /* tour2x1dparams */
+    CLOSE_LIST(fp);  /* tour2x1d params */
   }
   ADD_COMMA(fp);
 
