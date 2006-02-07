@@ -630,8 +630,10 @@ describe_scatmat_display (FILE *fp, ggobid *gg, displayd *display,
   splotd *sp;
   gint ncols, *cols;
   ProjectionMode projection;
+  datad *d = display->d;
 
-  ncols = scatmat_vars_get(display, cols);
+  cols = (gint *) g_malloc(d->ncols * sizeof(gint));
+  ncols = GGOBI_EXTENDED_DISPLAY_GET_CLASS(display)->plotted_vars_get(display, cols, d, gg);
 
   fprintf (fp, "nplots=%d", ncols * ncols);
   ADD_COMMA(fp); ADD_CR(fp);
@@ -761,10 +763,12 @@ desc_write (PluginInstance *inst)
     fprintf (fp, "type='scatterplot',");
     describe_scatterplot_display (fp, gg, display, desc);
   } else if (GGOBI_IS_SCATMAT_DISPLAY(display)) {
+    gint ncols, *cols;
+    datad *d = display->d;
     fprintf (fp, "type='scatmat',");
     /* ncols: display is symmetric */
-    gint ncols, *cols;
-    ncols = scatmat_vars_get(display, cols);
+    cols = (gint *) g_malloc(d->ncols * sizeof(gint));
+    ncols = GGOBI_EXTENDED_DISPLAY_GET_CLASS(display)->plotted_vars_get(display, cols, d, gg);
     fprintf (fp, "ncols = %d,", ncols);
     g_free(cols);
     describe_scatmat_display (fp, gg, display, desc);
