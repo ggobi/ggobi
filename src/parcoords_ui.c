@@ -54,15 +54,6 @@ static void type_cb (GtkWidget *w, ggobid *gg)
   display_tailpipe (gg->current_display, FULL, gg);
 }
 
-#if 0
-static gchar *selection_mode_lbl[] = {"Replace", "Insert", "Append", "Delete"};
-static void selection_mode_cb (GtkWidget *w, ggobid *gg)
-{;
-  cpaneld *cpanel = &gg->current_display->cpanel;
-  cpanel->parcoords_selection_mode = gtk_combo_box_get_active(GTK_COMBO_BOX(w));
-}
-#endif
-
 /*
 static gchar *showcases_lbl[] = {"All", "Labelled"};
 static void showcases_cb (GtkWidget *w, gpointer cbd)
@@ -117,27 +108,6 @@ cpanel_parcoords_make (ggobid *gg)
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
   populate_combo_box (opt, arrangement_lbl, G_N_ELEMENTS(arrangement_lbl),
     G_CALLBACK(arrangement_cb), gg);
-
-#if 0
-/*
- * option menu: selection mode
-*/
-  vb = gtk_vbox_new (false, 0);
-  gtk_box_pack_start (GTK_BOX (panel->w), vb, false, false, 0);
-
-  lbl = gtk_label_new_with_mnemonic ("_Selection mode:");
-  gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
-  gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
-
-  opt = gtk_combo_box_new_text ();
-  gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), opt);
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-    "Selecting an unselected variable either replaces the variable in the current plot, inserts a new plot before the current plot, or appends a new plot after the last plot",
-    NULL);
-  gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
-  populate_combo_box (opt, selection_mode_lbl, G_N_ELEMENTS(selection_mode_lbl),
-    G_CALLBACK(selection_mode_cb), gg);
-#endif
 
 /*
  * option menu
@@ -262,57 +232,6 @@ parcoords_mode_ui_get(displayd *dsp)
   See scatmat_mode_menu_make and scatterplot_mode_menu_make.
  */
 
-#if 0
-GtkWidget *
-parcoords_imode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func,
-  ggobid *gg, gboolean useIds)
-{
-  GtkWidget *imode_menu, *item;
-  gboolean radiop = sessionOptions->useRadioMenuItems;
-
-  imode_menu = gtk_menu_new ();
-
-  item = CreateMenuItemWithCheck  (imode_menu, "Parallel Coordinates",
-    "^h", "", NULL, accel_group, func,
-    useIds ? GINT_TO_POINTER (DEFAULT_IMODE) : gg, gg, 
-    gg->imodeRadioGroup, radiop);
-  if (radiop && gg->imode == DEFAULT_IMODE)
-     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), true);
-
-  /* Add a separator */
-  CreateMenuItem (imode_menu, NULL,
-    "", "", NULL, NULL, NULL, NULL, gg);
-
-  /*-- ViewMode menu --*/
-  item = CreateMenuItemWithCheck  (imode_menu, "Brush",
-    "^b", "", NULL, accel_group, func,
-    useIds ? GINT_TO_POINTER (BRUSH) : gg, gg, 
-    gg->imodeRadioGroup, radiop);
-  if (radiop && gg->imode == BRUSH)
-     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), true);
-
-  item = CreateMenuItemWithCheck  (imode_menu, "Identify",
-    "^i", "", NULL, accel_group,
-    func, useIds ? GINT_TO_POINTER (IDENT) : gg, gg, 
-    gg->imodeRadioGroup, radiop);
-  if (radiop && gg->imode == IDENT)
-     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), true);
-
-/*
-  item = CreateMenuItemWithCheck  (imode_menu, "Move Points",
-    "^m", "", NULL, accel_group, func,
-    useIds ? GINT_TO_POINTER (MOVEPTS) : gg, gg, 
-    gg->imodeRadioGroup, radiop);
-  if (radiop && gg->imode == MOVEPTS)
-     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), true);
-*/
-
-  gtk_widget_show (imode_menu);
-
-  return (imode_menu);
-}
-#endif
-
 /*--------------------------------------------------------------------*/
 /*                   End of main menubar section                      */  
 /*--------------------------------------------------------------------*/
@@ -326,10 +245,4 @@ parcoords_imode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func,
 void
 cpanel_parcoords_set (displayd *display, cpaneld *cpanel, GtkWidget *panel, ggobid *gg)
 {
-#if 0
-  GtkWidget *w;
-  w = widget_find_by_name (panel, "PCPLOT:sel_mode_option_menu");
-  gtk_combo_box_set_active (GTK_COMBO_BOX(w),
-                               cpanel->parcoords_selection_mode);
-#endif
 }

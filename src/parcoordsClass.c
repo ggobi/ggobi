@@ -384,10 +384,10 @@ static void
 varpanelTooltipsSet(displayd *dpy, ggobid *gg, GtkWidget *wx, GtkWidget *wy, GtkWidget *xz, GtkWidget *label)
 {
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
-    "Select to replace/insert/append a variable, or to delete it",
+    "Toggle to append or delete; drag plots to reorder",
     NULL);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
-    "Click to replace/insert/append a variable, or to delete it",
+    "Toggle to append or delete; drag plots to reorder",
     NULL);
 }
 
