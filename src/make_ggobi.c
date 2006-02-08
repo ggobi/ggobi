@@ -95,7 +95,6 @@ fileset_read_init(const gchar * ldata_in, const gchar *pluginModeName, GGobiPlug
     for (i = howMany; i < n; i++) {
       d = (datad *) g_slist_nth_data(gg->d, i);
       datad_init(d, gg, (i + howMany) == 0);
-      if (i == 0)  varpanel_set_sensitive (d, true, gg);
     }
   }
 
@@ -311,8 +310,6 @@ void start_ggobi(ggobid * gg, gboolean init_data, gboolean createPlot)
     for (l = gg->d; l; l = l->next) {
       d = (datad *) l->data;
       datad_init(d, gg, firstd);
-      if (firstd)
-        varpanel_set_sensitive (d, true, gg);
       firstd = false;
     }
 
