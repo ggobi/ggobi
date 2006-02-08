@@ -44,27 +44,6 @@ static void arrangement_cb (GtkWidget *w, ggobid *gg)
 }
 #endif
 
-/* 
- * Five selection modes, Replace, Insert and Append behave as in parcoords 
- * except that when in replace mode if a y variable is already in a plot 
- * nothing happens insted of deleting the variable. Delete will delete y
- * variables from a plot and if there is only 1 variable will remove the plot 
- * from the layout, unless there is only one plot with one variable in which 
- * case nothing happens. Overlay will add a variable to a plot unless the 
- * variable is already in that plot. 
- */ 
-
-#ifdef TS_EXTENSIONS_IMPLEMENTED
-static gchar *selection_mode_lbl[] = {"Replace","Insert","Append","Delete","Overlay"};
-#else
-static gchar *selection_mode_lbl[] = {"Replace","Insert","Append","Delete"};
-#endif
-static void selection_mode_cb (GtkWidget *w, ggobid *gg)
-{
-  cpaneld *cpanel = &gg->current_display->cpanel;
-  cpanel->tsplot_selection_mode = gtk_combo_box_get_active(GTK_COMBO_BOX(w));
-}
-
 #ifdef TS_EXTENSIONS_IMPLEMENTED
 /*
  * "Common" scales all series by 
@@ -117,27 +96,6 @@ cpanel_tsplot_make (ggobid *gg)
 #endif
 
 /*
- * option menu: selection mode
-*/
-  vb = gtk_vbox_new (false, 0);
-  gtk_box_pack_start (GTK_BOX (cpanel), vb, false, false, 0);
-
-  lbl = gtk_label_new_with_mnemonic ("_Selection mode:");
-  gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
-  gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
-
-  opt = gtk_combo_box_new_text ();
-  gtk_widget_set_name (opt, "TSPLOT:sel_mode_option_menu");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-    "Selecting a variable either replaces the variable in the current plot (swapping if appropriate), inserts a new plot before the current plot, or appends a new plot after the last plot",
-    NULL);
-  gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
-  /* dfs: I'm trying to build a menu with 4 menuitems, and the code
-   * says it's working, but the resulting menu has only 3 items. */
-  populate_combo_box (opt, selection_mode_lbl, G_N_ELEMENTS(selection_mode_lbl),
-    G_CALLBACK(selection_mode_cb), gg);
-
-/*
  * Variable scales
 */
 
@@ -170,7 +128,6 @@ cpanel_tsplot_make (ggobid *gg)
 /*                   Resetting the main menubar                       */
 /*--------------------------------------------------------------------*/
 
-
 static const gchar* mode_ui_str =
 "<ui>"
 "	<menubar>"
@@ -189,50 +146,6 @@ tsplot_mode_ui_get(displayd *display)
 	return(mode_ui_str);
 }
 
-#if 0
-/*
-  The useIds indicates whether the callback data should be integers
-  identifying the menu item or the global gg.
-  At present, this is always false.
-  See scatmat_mode_menu_make and scatterplot_mode_menu_make.
- */
-GtkWidget *
-tsplot_imode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func, ggobid *gg, gboolean useIds) 
-{
-  GtkWidget *imode_menu, *item;
-  gboolean radiop = sessionOptions->useRadioMenuItems;
-
-  imode_menu = gtk_menu_new ();
-
-  item = CreateMenuItemWithCheck (imode_menu, "Time Series",
-    "^h", "", NULL, accel_group, func,
-    useIds ? GINT_TO_POINTER (DEFAULT_IMODE) : gg, gg, 
-    gg->imodeRadioGroup, radiop);
- if (radiop && gg->imode == DEFAULT_IMODE)
-     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), true);
-
-  /* Add a separator */
-  CreateMenuItem (imode_menu, NULL,
-    "", "", NULL, NULL, NULL, NULL, gg);
-
-  item = CreateMenuItemWithCheck (imode_menu, "Brush",
-    "^b", "", NULL, accel_group, func,
-    useIds ? GINT_TO_POINTER (BRUSH) : gg, gg, 
-    gg->imodeRadioGroup, radiop);
-  if (radiop && gg->imode == BRUSH)
-     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), true);
-
-  item = CreateMenuItemWithCheck (imode_menu, "Identify",
-    "^i", "", NULL, accel_group, func,
-    useIds ? GINT_TO_POINTER (IDENT) : gg, gg, 
-    gg->imodeRadioGroup, radiop);
-  if (radiop && gg->imode == IDENT)
-     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), true);
-
-  gtk_widget_show (imode_menu);
-  return (imode_menu);
-}
-#endif
 /*--------------------------------------------------------------------*/
 /*                   End of main menubar section                      */  
 /*--------------------------------------------------------------------*/
@@ -246,11 +159,4 @@ tsplot_imode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func, ggobid *
 void
 cpanel_tsplot_set (displayd *display, cpaneld *cpanel, GtkWidget *panelWidget, ggobid *gg)
 {
-  GtkWidget *w;
-
-  w = widget_find_by_name (panelWidget,
-                           "TSPLOT:sel_mode_option_menu");
-
-  gtk_combo_box_set_active (GTK_COMBO_BOX(w),
-                               cpanel->tsplot_selection_mode);
 }

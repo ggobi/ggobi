@@ -61,14 +61,11 @@ struct _displayd {
  * Used by all displays
 */
 
-   
  GtkWidget *menubar;
  GtkUIManager *menu_manager;
  guint imode_merge_id, pmode_merge_id;
  /*-- for scatterplots, where edge menus need to be rebuilt on the fly --*/
  GtkWidget *edge_item, *edge_menu;
- //GtkWidget *imode_item, *pmode_item;
- 
  
  cpaneld cpanel;
 
@@ -228,9 +225,9 @@ gboolean isEmbeddedDisplay(displayd *dpy);
 
 
 /**
- This is used as a trivial class for its type information so that we can detect whether 
- we have one of the new style classes.
- We might remove it when we are finished the construction.
+ This is used as a trivial class for its type information so that we
+ can detect whether we have one of the new style classes.  We might
+ remove it when we are finished the construction.
 */
 
 #define GGOBI_TYPE_EXTENDED_DISPLAY	 (ggobi_extended_display_get_type ())
@@ -319,7 +316,6 @@ typedef struct
   /* time will tell which of these we need -- dfs */
   void (*viewmode_set)(displayd *, ggobid *);
   void (*pmode_set)(ProjectionMode, displayd *, ggobid *);
-  void (*imode_set)(displayd *, ggobid *);
   /* */
 
   gboolean (*varcircle_draw)(displayd *, gint jvar, GdkPixmap *da_pix, ggobid *gg);
@@ -338,22 +334,13 @@ typedef struct
 
 
 typedef struct {
-
    windowDisplayd dpy;
-
    gchar * titleLabel;
-
    GtkWidget *cpanelWidget;
-   
 } extendedDisplayd;
 
 void display_set_values(displayd *display, datad *d, ggobid *gg);
 
- /* For the extended cases. */
-/*
-const gchar const * gtk_display_tree_label(displayd *dpy);
-const gchar const * gtk_display_title_label(displayd *dpy);
-*/
 /* These functions are no longer const, because this is dangerous, given
    that the input is a pointer and the data it points to could change,
    fooling the compiler - mfl */

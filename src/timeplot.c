@@ -48,7 +48,6 @@ tsplot_reset_arrangement (displayd *display, gint arrangement, ggobid *gg)
   GList *l;
   GtkWidget *frame, *w;
   splotd *sp;
-  //gint height, width;
 
   if (display->cpanel.tsplot_arrangement == arrangement)
     return;
@@ -70,22 +69,8 @@ tsplot_reset_arrangement (displayd *display, gint arrangement, ggobid *gg)
 
   display->p1d_orientation = (arrangement == ARRANGE_ROW) ? VERTICAL :
                                                             HORIZONTAL;
-/*
-  height = (arrangement == ARRANGE_ROW) ? HEIGHT : WIDTH;
-  width = (arrangement == ARRANGE_ROW) ? WIDTH : HEIGHT;
-  */
-/*
-  l = display->splots;
-  while (l) {
-    sp = (splotd *) l->data;
-    gtk_widget_set_usize (sp->da, width, height);
-    gtk_box_pack_start (GTK_BOX (arrangement_box), sp->da, true, true, 0);
-    l = l->next ;
-  }
-*/
   for (l=display->splots; l; l=l->next) {
     sp = (splotd *) l->data;
-    //gtk_widget_set_usize (sp->da, width, height);
     gtk_box_pack_start (GTK_BOX (gg->tsplot.arrangement_box),
                         sp->da, true, true, 0);
     gtk_widget_unref (sp->da);
@@ -223,28 +208,9 @@ tsplot_new(displayd *display, gboolean missing_p, gint nvars, gint *vars, datad 
 	display->menu_manager = display_menu_manager_create(display);
 	display->menubar = create_menu_bar(display->menu_manager, timeplot_ui, 
 		GGOBI_WINDOW_DISPLAY(display)->window);
-/*
-    gg->tsplot.accel_group = gtk_accel_group_new ();
-    factory = get_main_menu (menu_items,
-			     sizeof (menu_items) / sizeof (menu_items[0]),
-			     gg->tsplot.accel_group, GGOBI_WINDOW_DISPLAY(display)->window, 
-			     &display->menubar, (gpointer) display);
-*/
-    /*-- add a tooltip to the file menu --*/
-    /*w = gtk_item_factory_get_widget (factory, "<main>/File");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gtk_menu_get_attach_widget (GTK_MENU(w)),
-			  "File menu for this display", NULL);
-*/
-  /*
-   * After creating the menubar, and populating the file menu,
-   * add the Display Options and Link menus another way
-  */
-/*    tsplot_display_menus_make (display, gg->tsplot.accel_group,
-			       G_CALLBACK(display_options_cb), 
-			       display->menubar, gg);*/
+
     gtk_box_pack_start (GTK_BOX (vbox), display->menubar, false, true, 0);
   }
-
 
 /*
  * splots in a box in a frame -- either a vbox or an hbox.
@@ -269,14 +235,6 @@ tsplot_new(displayd *display, gboolean missing_p, gint nvars, gint *vars, datad 
 
     sp->xyvars.y = vars[i];
     sp->xyvars.x = timeVariable;
-
-/*
-    if (sub_plots == NULL) {
-      sp = splot_new (display, WIDTH, HEIGHT, gg);
-      sp->xyvars.y = i; 
-    } else
-       sp = sub_plots[i];
-*/
 
     display->splots = g_list_append (display->splots, (gpointer) sp);
     gtk_box_pack_start (GTK_BOX (gg->tsplot.arrangement_box),
@@ -314,21 +272,11 @@ tsplot_varsel (GtkWidget *w, displayd *display, splotd *sp, gint jvar,
 {
   gboolean redraw = true;
   gint nplots = g_list_length (gg->current_display->splots);
-  gint k;// width, height;
+  gint k;
   gint jvar_indx=-1, new_indx;
   GList *l;
   splotd *s, *sp_new;
   GtkWidget *box;
-  gfloat ratio = 1.0;
-
-  /* The index of gg.current_splot */
-  gint sp_indx = g_list_index (gg->current_display->splots, sp);
-/*
-  if(GGOBI_IS_WINDOW_DISPLAY(gg->current_display))
-    gtk_window_set_policy (GTK_WINDOW (GGOBI_WINDOW_DISPLAY(gg->current_display)->window),
-      false, false, false);
-*/
-//  splot_get_dimensions (sp, &width, &height);
 
   /*
    *  if left button click, the x variable no matter what
@@ -348,7 +296,7 @@ tsplot_varsel (GtkWidget *w, displayd *display, splotd *sp, gint jvar,
 
   } else if (toggle == VARSEL_Y || mouse == 2 || mouse == 3) {
 
-    if (tsplot_var_selected (jvar, display)) {
+    if (tsplot_var_selected (jvar, display)) {  /* then delete */
 
       /* If jvar is one of the plotted variables, its corresponding plot */
       splotd *jvar_sp = NULL;
@@ -366,37 +314,17 @@ tsplot_varsel (GtkWidget *w, displayd *display, splotd *sp, gint jvar,
         k++;
       }
 
-      if (jvar_sp != NULL && nplots > 1 && 
-         cpanel->tsplot_selection_mode == VAR_DELETE) {
+      if (jvar_sp != NULL && nplots > 1) {
         /*-- Delete the plot from the list, and destroy it. --*/
         display->splots = g_list_remove (display->splots, (gpointer) jvar_sp);
-
-        /*-- keep the window from shrinking by growing all plots --*/
-        #if 0
-		ratio = (gfloat) nplots / (gfloat) (nplots-1);
-        height = (gint) (ratio * (gfloat) height);
-
-        l = display->splots;
-        while (l) {
-          da = ((splotd *) l->data)->da;
-          gtk_widget_ref (da);
-          /*-- shrink each plot --*/
-          gtk_widget_set_usize (da, -1, -1);
-          gtk_widget_set_usize (da, width, height);
-          /* */
-          l = l->next ;
-        }
-		#endif
-        /* */
+        nplots--;
 
         /*
          * If the plot being removed is the current plot, reset
          * gg->current_splot.
          */
         if (jvar_sp == gg->current_splot) {
-          sp_event_handlers_toggle (sp, off,
-            gg->current_display->cpanel.pmode,
-            gg->current_display->cpanel.imode);
+          sp_event_handlers_toggle (sp, off, cpanel->pmode, cpanel->imode);
 
           new_indx = (jvar_indx == 0) ? 0 : MIN (nplots-1, jvar_indx);
           gg->current_splot = (splotd *)
@@ -405,87 +333,41 @@ tsplot_varsel (GtkWidget *w, displayd *display, splotd *sp, gint jvar,
           if (gg->current_splot == NULL) 
             gg->current_splot = (splotd *) g_list_nth_data (display->splots, 0);
           display->current_splot = gg->current_splot;
-
-          /*-- dfs, keeping event handling in sync --*/
-          splot_set_current (gg->current_splot, on, gg);
+          sp_event_handlers_toggle (gg->current_splot, on, cpanel->pmode, cpanel->imode);
         }
 
         splot_free (jvar_sp, display, gg);
-
-        nplots--;
       }
 
-    } 
-    else if (cpanel->tsplot_selection_mode != VAR_DELETE) {
+    } else {  /* Append */
 
-      if (cpanel->tsplot_selection_mode == VAR_REPLACE) {
-#if NOT_USED_ANYMORE
-        *jvar_prev = sp->xyvars.y;
-#endif
-        sp->xyvars.y = jvar;
-        redraw = true;
+      l = display->splots;
+      s = (splotd *) l->data; /* this let us set the x var for the new plot
+                                 to be the same as that of the first plot. */
+      sp_new = ggobi_time_series_splot_new (display, gg);
+      sp_new->xyvars.y = jvar;
+      sp_new->xyvars.x = s->xyvars.x;
 
-      } 
-      else {
+      display->splots = g_list_append (display->splots,
+        (gpointer) sp_new);
 
-        /*-- prepare to reset the current plot --*/
-        sp_event_handlers_toggle (sp, off, 
-          gg->current_display->cpanel.pmode,
-          gg->current_display->cpanel.imode);
+      box = (sp->da)->parent;
+      gtk_box_pack_end (GTK_BOX (box), sp_new->da, true, true, 0);
+      gtk_widget_show (sp_new->da);
+      //gg->current_splot = sp->displayptr->current_splot = sp_new;
 
-        /*-- keep the window from growing by shrinking all plots --*/
-        ratio = (gfloat) nplots / (gfloat) (nplots+1);
-        /*       if (cpanel->parcoords_arrangement == ARRANGE_ROW) */
-        /*         width = (gint) (ratio * (gfloat) width); */
-        /*       else */
-        //height = (gint) (ratio * (gfloat) height);
-        /* */
-        l = display->splots;
-        s = (splotd *) l->data; /* this sets the x var for the new plot
-                                   to be the same as that of the first plot. */
-        sp_new = ggobi_time_series_splot_new (display, gg);
-        sp_new->xyvars.y = jvar;
-        sp_new->xyvars.x = s->xyvars.x;
+    /* I don't think it's possible to initialize brushing until the
+       data has run through the pipeline.  Since I can't cleanly add a
+       plot in brushing mode, I think it's best to switch back to the
+       default mode.  -- dfs
+       */
+      GGOBI(full_viewmode_set)(EXTENDED_DISPLAY_PMODE, DEFAULT_IMODE, gg);
 
-        if (cpanel->tsplot_selection_mode == VAR_INSERT)
-          display->splots = g_list_insert (display->splots,
-                                           (gpointer) sp_new, sp_indx);
-        else if (cpanel->tsplot_selection_mode == VAR_APPEND)
-          display->splots = g_list_append (display->splots,
-            (gpointer) sp_new);
-
-        box = (sp->da)->parent;
-        gtk_box_pack_end (GTK_BOX (box), sp_new->da, false, false, 0);
-        gtk_widget_show (sp_new->da);
-#if 0
-        while (l) {
-          da = ((splotd *) l->data)->da;
-          gtk_widget_ref (da);
-
-          /* shrink each plot */
-          gtk_widget_set_usize (da, -1, -1);
-          gtk_widget_set_usize (da, width, height);
-          /* */
-
-          gtk_container_remove (GTK_CONTAINER (box), da);
-          gtk_box_pack_start (GTK_BOX (box), da, true, true, 0);
-          gtk_widget_unref (da);  /*-- decrease the ref_count by 1 --*/
-          l = l->next ;
-        }
-#endif
-        gg->current_splot = sp->displayptr->current_splot = sp_new;
-        sp_event_handlers_toggle (sp_new, on,
-          gg->current_display->cpanel.pmode,
-          gg->current_display->cpanel.imode);
-        redraw = true;
-      }
+      /* Initialize drag and drop for the new panel */
+      sp_event_handlers_toggle (sp_new, on, cpanel->pmode, cpanel->imode);
+      redraw = true;
     }
   }
-/*
-  if(GGOBI_IS_WINDOW_DISPLAY(gg->current_display))
-    gtk_window_set_policy (GTK_WINDOW (GGOBI_WINDOW_DISPLAY(gg->current_display)->window),
-      true, true, false);
-*/
 
   return redraw;
 }

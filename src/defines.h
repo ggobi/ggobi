@@ -182,12 +182,8 @@ typedef enum {NULL_IMODE = -1, DEFAULT_IMODE,
 #define CART_VAR       14
 #define PCA            15*/
 
-/*-- only used in tsdisplays at this point --*/
-typedef enum {VAR_REPLACE, VAR_INSERT, VAR_APPEND, VAR_DELETE, VAR_OVERLAY} ParCoordsSelectionMode;
-
-/* Only used in parallel coordinates displays */
+/* Used in parallel coordinates displays */
 typedef enum {ARRANGE_ROW, ARRANGE_COL} ParCoordsArrangeMode;
-
 
 #define DEFINES_H
 
