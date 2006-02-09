@@ -350,7 +350,7 @@ barchartEventHandlersToggle(displayd * dpy, splotd * sp, gboolean state,
 {
   if (imode == SCALE) {
     barchart_scale_event_handlers_toggle(sp, state);
-    return (true);
+    return (false);
   }
 
   if (imode != DEFAULT_IMODE && imode != SCALE)
