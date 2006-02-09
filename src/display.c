@@ -860,8 +860,7 @@ display_tailpipe (displayd *display, RedrawStyle type, ggobid *gg)
           f(d, sp, gg);  // need to exclude area plots
         }
       }
-
-  //assign_points_to_bins (d, sp, gg); // damnit, not for area plots
+      //assign_points_to_bins (d, sp, gg); // damnit, not for area plots
     }
 
     if(GGOBI_IS_EXTENDED_DISPLAY(display)) {
