@@ -965,13 +965,23 @@ splot_pixmap_to_window (splotd *sp, GdkPixmap *pixmap, ggobid *gg) {
 
 void
 splot_redraw (splotd *sp, RedrawStyle redraw_style, ggobid *gg) {
+  RedrawStyle style;
 
   /*-- sometimes the first draw happens before configure is called --*/
   if (sp == NULL || sp->da == NULL || sp->pixmap0 == NULL) {
     return;
   }
 
-  switch (redraw_style) {
+  /*
+   * Event compression is, I think, causing only the last redraw event
+   * to get through, so that a full redraw can be blocked by a
+   * subsequent expose.  Can I set a flag when a full redraw is
+   * needed, and then override the setting here?  Or maybe this simple
+   * act will do it:
+  */
+  style = MAX(sp->redraw_style, redraw_style);
+
+  switch (style) {
     case FULL:  /*-- FULL_2PIXMAP --*/
       splot_clear_pixmap0 (sp, gg);
       splot_draw_to_pixmap0_unbinned (sp, true, gg);  /* true = hiddens */
@@ -1016,7 +1026,7 @@ splot_redraw (splotd *sp, RedrawStyle redraw_style, ggobid *gg) {
    * I ought to be able to fix that more nicely some day, but in the
    * meantime, what's an extra rectangle?
   */
-  if (sp == gg->current_splot && redraw_style != NONE) 
+  if (sp == gg->current_splot && style != NONE) 
     splot_draw_border (sp, sp->da->window, gg);
 
   sp->redraw_style = EXPOSE;

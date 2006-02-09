@@ -35,8 +35,9 @@ splot_configure_cb (GtkWidget *w, GdkEventConfigure *event, splotd *sp)
   displayd *display = (displayd *) sp->displayptr; 
   cpaneld *cpanel = &display->cpanel;
   datad *d = display->d;
-  gg = sp->displayptr->ggobi;
+  //gg = sp->displayptr->ggobi;
 
+  g_printerr ("configure event\n");
   /*
    * Somehow when a new splot is added to a table, the initial
    * configuration event for the drawing_area occurs before the
@@ -94,7 +95,6 @@ splot_configure_cb (GtkWidget *w, GdkEventConfigure *event, splotd *sp)
         f(d, sp, gg);  // need to exclude area plots
       }
     }
-    //assign_points_to_bins (d, sp, gg);
   }
 
   sp->redraw_style = FULL;
