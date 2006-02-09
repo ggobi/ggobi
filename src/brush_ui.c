@@ -36,15 +36,6 @@ void brush_on_set(gboolean brushon, displayd *dsp, ggobid *gg)
   splot_redraw(gg->current_splot, QUICK, gg);
 }
 
-/*
-static void brush_on_cb(GtkToggleButton * button, ggobid * gg)
-{
-  cpaneld *cpanel = &gg->current_display->cpanel;
-  cpanel->br.brush_on_p = button->active;
-  splot_redraw(gg->current_splot, QUICK, gg);
-}
-*/
-
 static void brush_undo_cb(GtkToggleButton * button, ggobid * gg)
 {
   cpaneld *cpanel = &gg->current_display->cpanel;
@@ -178,17 +169,6 @@ static void brush_mode_cb(GtkWidget * w, ggobid *gg)
   splotd *sp = gg->current_splot;
   brush_mode_set (!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(w)), 
   	sp, gg->current_display, gg);
-  /*
-  cpaneld *cpanel = &gg->current_display->cpanel;
-  gint prev_mode = cpanel->br.mode;
-
-  cpanel->br.mode = GPOINTER_TO_INT(cbd);
-
-  if (cpanel->br.mode == BR_PERSISTENT && cpanel->br.mode != prev_mode) {
-    brush_once(false, sp, gg);
-  }
-  display_plot (gg->current_display, QUICK, gg);
-  */
 }
 
 static void open_symbol_window_cb(GtkWidget * w, ggobid * gg)
