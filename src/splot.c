@@ -85,7 +85,16 @@ splot_configure_cb (GtkWidget *w, GdkEventConfigure *event, splotd *sp)
   splot_plane_to_screen (display, cpanel, sp, gg);
 
   if (cpanel->imode == BRUSH) {
-    assign_points_to_bins (d, gg);
+    if (GGOBI_IS_EXTENDED_SPLOT(sp)) {
+      void (*f)(datad *, splotd *, ggobid *);
+      GGobiExtendedSPlotClass *klass;
+      klass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);
+      f = klass->splot_assign_points_to_bins;
+      if(f) {
+        f(d, sp, gg);  // need to exclude area plots
+      }
+    }
+    //assign_points_to_bins (d, sp, gg);
   }
 
   sp->redraw_style = FULL;

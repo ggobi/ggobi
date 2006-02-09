@@ -60,7 +60,16 @@ static void brush_undo_cb(GtkToggleButton * button, ggobid * gg)
 
   /*-- when rows_in_plot changes ... --*/
   rows_in_plot_set(d, gg);
-  assign_points_to_bins(d, gg);
+  if (GGOBI_IS_EXTENDED_SPLOT(sp)) {
+    void (*f)(datad *, splotd *, ggobid *);
+    GGobiExtendedSPlotClass *klass;
+    klass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);
+    f = klass->splot_assign_points_to_bins;
+    if(f) {
+      f(d, sp, gg);  // need to exclude area plots
+    }
+  }
+  //assign_points_to_bins(d, sp, gg);
   clusters_set(d, gg);
   /*-- --*/
 
@@ -405,7 +414,16 @@ button_release_cb(GtkWidget * w, GdkEventButton * event, splotd * sp)
   if (cpanel->br.mode == BR_PERSISTENT) {
     rows_in_plot_set(d, gg);
 
-    assign_points_to_bins(d, gg);
+    if (GGOBI_IS_EXTENDED_SPLOT(sp)) {
+      void (*f)(datad *, splotd *, ggobid *);
+      GGobiExtendedSPlotClass *klass;
+      klass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);
+      f = klass->splot_assign_points_to_bins;
+      if(f) {
+        f(d, sp, gg);  // need to exclude area plots
+      }
+    }
+    //assign_points_to_bins(d, sp, gg);
     /*-- reset the number and properties of the brush groups --*/
     clusters_set(d, gg);
 
@@ -465,7 +483,6 @@ void brush_event_handlers_toggle(splotd * sp, gboolean state)
         (GGOBI_WINDOW_DISPLAY(display)->window),
         "key_press_event",
         G_CALLBACK(key_press_cb), (gpointer) sp);
-
 
     sp->press_id = g_signal_connect(G_OBJECT(sp->da),
       "button_press_event",

@@ -25,9 +25,8 @@
 
 
 void
-assign_points_to_bins (datad *d, ggobid *gg)
+assign_points_to_bins (datad *d, splotd *sp, ggobid *gg)
 {
-  splotd *sp = gg->current_splot;
   gint i, k, ih, iv;
 
   /*

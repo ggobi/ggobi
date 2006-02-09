@@ -208,6 +208,8 @@ typedef struct
    void (*within_draw_to_binned)(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc);
    void (*within_draw_to_unbinned)(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc);
 
+  void (*splot_assign_points_to_bins)(datad *, splotd *, ggobid *);
+
    gint (*plotted_vars_get)(splotd *sp, gint *vars, datad *d);
 
 

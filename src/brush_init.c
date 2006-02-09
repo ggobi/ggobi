@@ -282,13 +282,22 @@ brush_init (datad *d, ggobid *gg)
 }
 
 RedrawStyle
-brush_activate (gboolean state, displayd *display, ggobid *gg)
+brush_activate (gboolean state, displayd *display, splotd *sp, ggobid *gg)
 {
   datad *d = display->d;
   RedrawStyle redraw_style = NONE;
 
-  if (state)
-    assign_points_to_bins (d, gg);
+  if (GGOBI_IS_EXTENDED_SPLOT(sp)) {
+    void (*f)(datad *, splotd *, ggobid *);
+    GGobiExtendedSPlotClass *klass;
+    klass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);
+    if (state) {
+      f = klass->splot_assign_points_to_bins;
+      if(f) {
+        f(d, sp, gg);  // need to exclude area plots
+      }
+    }
+  }
 
   return redraw_style;
 }

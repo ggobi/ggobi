@@ -24,11 +24,17 @@
 static gboolean parcoordsKeyEventHandled(GtkWidget *, displayd *, splotd *,
 					GdkEventKey *, ggobid *);
 
+static void
+splotAssignPointsToBins(datad *d, splotd *sp, ggobid *gg)
+{
+  assign_points_to_bins (d, sp, gg);
+}
+
 gint
 splot1DVariablesGet(splotd *sp, gint *cols, datad *d)
 {
-	cols[0] = sp->p1dvar;
-	return(1);
+  cols[0] = sp->p1dvar;
+  return(1);
 }
 
 static gboolean
@@ -606,6 +612,8 @@ parcoordsSPlotClassInit(GGobiParCoordsSPlotClass *klass)
 
    klass->parent_class.within_draw_to_binned = withinDrawBinned;
    klass->parent_class.within_draw_to_unbinned = withinDrawUnbinned;
+
+  klass->parent_class.splot_assign_points_to_bins = splotAssignPointsToBins;
 
    klass->parent_class.plotted_vars_get = splot1DVariablesGet;
 }

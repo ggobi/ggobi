@@ -38,7 +38,7 @@ void main_miscmenus_update (ProjectionMode, InteractionMode, displayd *, ggobid 
 void viewmode_set(ProjectionMode, InteractionMode, ggobid *);
 gint GGOBI(full_viewmode_set)(ProjectionMode, InteractionMode, ggobid*);
 
-RedrawStyle brush_activate (gboolean, displayd *, ggobid *);
+RedrawStyle brush_activate (gboolean, displayd *, splotd *, ggobid *);
 RedrawStyle edgeedit_activate (gboolean state, displayd *display, ggobid *gg);
 RedrawStyle identify_activate (gint, displayd *, ggobid *);
 RedrawStyle p1d_activate (gint, displayd *, ggobid *);
@@ -117,7 +117,7 @@ void       arrays_free (array_s *, gint, gint);
 void       arrays_init_null (array_s *);
 void       arrays_zero (array_s *);
 void       ash_baseline_set (icoords *, splotd *sp);
-void       assign_points_to_bins (datad *, ggobid *);
+void       assign_points_to_bins (datad *, splotd *, ggobid *);
 void       br_color_ids_add (datad *d, ggobid *gg);
 void       br_color_ids_alloc (datad *, ggobid *);
 void       br_color_ids_init (datad *, ggobid *);

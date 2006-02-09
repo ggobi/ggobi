@@ -1565,6 +1565,12 @@ addScalingCues(splotd *sp, GdkDrawable *drawable, ggobid *gg)
 }
 
 static void
+splotAssignPointsToBins(datad *d, splotd *sp, ggobid *gg)
+{
+  assign_points_to_bins (d, sp, gg);
+}
+
+static void
 splotScreenToTform(cpaneld *cpanel, splotd *sp, icoords *scr,
 		   fcoords *tfd, ggobid *gg)
 {
@@ -1724,6 +1730,8 @@ scatterSPlotClassInit(GGobiScatterSPlotClass *klass)
   klass->parent_class.within_draw_to_unbinned = withinDrawToUnbinned;
   klass->parent_class.add_markup_cues = addMarkupCues;
   klass->parent_class.add_scaling_cues = addScalingCues;
+
+  klass->parent_class.splot_assign_points_to_bins = splotAssignPointsToBins;
 
   klass->parent_class.plotted_vars_get = splotVariablesGet;
 }

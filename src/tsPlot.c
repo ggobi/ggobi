@@ -203,6 +203,12 @@ tsplotCreateWithVars(displayd *display, gint *vars, gint nvar, ggobid *gg)
 }
 
 static void
+splotAssignPointsToBins(datad *d, splotd *sp, ggobid *gg)
+{
+  assign_points_to_bins (d, sp, gg);
+}
+
+static void
 splotScreenToTform(cpaneld *cpanel, splotd *sp, icoords *scr,
 		   fcoords *tfd, ggobid *gg)
 {
@@ -278,6 +284,7 @@ timeSeriesSPlotClassInit(GGobiTimeSeriesSPlotClass *klass)
     klass->extendedSPlotClass.plotted_vars_get = splotVariablesGet;
 
     klass->extendedSPlotClass.createWithVars = tsplotCreateWithVars;
+    klass->extendedSPlotClass.splot_assign_points_to_bins = splotAssignPointsToBins;
 }
 
 
@@ -312,6 +319,6 @@ timeSeriesClassInit(GGobiTimeSeriesDisplayClass *klass)
 
     klass->parent_class.splot_key_event_handled = tsplotKeyEventHandled;
 
-
     klass->parent_class.add_plot_labels = NULL; 
+
 }

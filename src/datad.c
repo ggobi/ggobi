@@ -188,7 +188,7 @@ datad_init (datad *d, ggobid *gg, gboolean cleanup)
   if (gg->current_display != NULL)
     varpanel_refresh (gg->current_display, gg);
 
-  if (g_list_length(gg->d) == 1)
+  if (g_slist_length(gg->d) == 1)
       varpanel_set_sensitive (d, true, gg);
 
   g_signal_emit (G_OBJECT (gg), GGobiSignals[DATAD_ADDED_SIGNAL], 0, d);

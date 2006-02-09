@@ -411,6 +411,12 @@ scatmatCPanelWidget(displayd *dpy, gchar **modeName, ggobid *gg)
 }
 
 static void
+splotAssignPointsToBins(datad *d, splotd *sp, ggobid *gg)
+{
+  assign_points_to_bins (d, sp, gg);
+}
+
+static void
 splotScreenToTform(cpaneld *cpanel, splotd *sp, icoords *scr,
 		   fcoords *tfd, ggobid *gg)
 {
@@ -626,6 +632,8 @@ scatmatSPlotClassInit(GGobiScatmatSPlotClass *klass)
   klass->parent_class.draw_edge_p = drawEdgeP;
   klass->parent_class.add_plot_labels = addPlotLabels;
   klass->parent_class.add_identify_cues = addIdentifyCues;
+
+  klass->parent_class.splot_assign_points_to_bins = splotAssignPointsToBins;
 
   klass->parent_class.plotted_vars_get = splotVariablesGet;
 }

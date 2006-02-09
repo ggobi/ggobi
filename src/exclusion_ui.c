@@ -444,9 +444,19 @@ void cluster_free(gint k, datad * d, ggobid * gg)
 static void update_cb(GtkWidget * w, ggobid * gg)
 {
   datad *d = datad_get_from_notebook(gg->cluster_ui.notebook, gg);
+  splotd *sp = gg->current_splot;
 
   rows_in_plot_set(d, gg);
-  assign_points_to_bins(d, gg);
+  if (GGOBI_IS_EXTENDED_SPLOT(sp)) {
+    void (*f)(datad *, splotd *, ggobid *);
+    GGobiExtendedSPlotClass *klass;
+    klass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);
+    f = klass->splot_assign_points_to_bins;
+    if(f) {
+      f(d, sp, gg);  // need to exclude area plots
+    }
+  }
+  //assign_points_to_bins(d, sp, gg);
   clusters_set(d, gg);
 
   cluster_table_labels_update(d, gg);

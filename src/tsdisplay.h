@@ -102,6 +102,7 @@ GdkSegment * tsplotAllocWhiskers(displayd *dpy, splotd *sp, gint nrows, datad *d
 void tsplotAddPlotLabels(displayd *display, splotd *sp, GdkDrawable *drawable, datad *d, ggobid *gg);
 
 
+
 splotd *ggobi_time_series_splot_new(displayd *dpy, ggobid *gg);
 
 #endif

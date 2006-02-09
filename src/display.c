@@ -851,7 +851,17 @@ display_tailpipe (displayd *display, RedrawStyle type, ggobid *gg)
         imode_get (gg) == BRUSH)
     {
       datad *d = display->d;
-      assign_points_to_bins (d, gg);
+      if (GGOBI_IS_EXTENDED_SPLOT(sp)) {
+        void (*f)(datad *, splotd *, ggobid *);
+        GGobiExtendedSPlotClass *klass;
+        klass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);
+        f = klass->splot_assign_points_to_bins;
+        if(f) {
+          f(d, sp, gg);  // need to exclude area plots
+        }
+      }
+
+  //assign_points_to_bins (d, sp, gg); // damnit, not for area plots
     }
 
     if(GGOBI_IS_EXTENDED_DISPLAY(display)) {
