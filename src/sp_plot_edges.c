@@ -112,8 +112,6 @@ splot_edges_draw (splotd *sp, gboolean draw_hidden, GdkDrawable *drawable,
   GlyphType gtype;
   colorschemed *scheme = gg->activeColorScheme;
 
-/* g_printerr ("preparing to draw %s on %s\n", e->name, d->name); */
-
   if (e == (datad *) NULL || e->edge.n == 0) {
 /**/return;
   }
@@ -121,8 +119,6 @@ splot_edges_draw (splotd *sp, gboolean draw_hidden, GdkDrawable *drawable,
   if (d->idTable == NULL) {  /*-- d has no record ids --*/
 /**/return;
   }
-
-/* g_printerr (" at 1; nedges %d\n", e->edge.n); */
 
   edges_show_p = (display->options.edges_directed_show_p ||
                   display->options.edges_undirected_show_p);
@@ -157,13 +153,16 @@ splot_edges_draw (splotd *sp, gboolean draw_hidden, GdkDrawable *drawable,
       /* Or if we're not drawing hiddens and this isn't hidden ... */
           (!draw_hidden && !e->hidden_now.els[m])))
       {
+
         gtype = e->glyph_now.els[m].type;
+        ltype = ltype_from_gtype(gtype);
+	/*
         if (gtype == FC || gtype == FR)
           ltype = SOLID;
         else if (gtype == OC || gtype == OR)
           ltype = WIDE_DASH;
         else ltype = NARROW_DASH;
-
+	*/
         symbols_used[e->glyph_now.els[m].size][ltype][e->color_now.els[m]]++;
       }
     }
@@ -208,11 +207,14 @@ splot_edges_draw (splotd *sp, gboolean draw_hidden, GdkDrawable *drawable,
               edge_endpoints_get (j, &a, &b, d, endpoints, e);
 
               gtype = e->glyph_now.els[j].type;
+              ltype = ltype_from_gtype(gtype);
+	      /*
               if (gtype == FC || gtype == FR)
                 ltype = SOLID;
               else if (gtype == OC || gtype == OR)
                 ltype = WIDE_DASH;
               else ltype = NARROW_DASH;
+	      */
 
               if (e->color_now.els[j] == p &&
                   ltype == n &&
@@ -269,11 +271,15 @@ splot_edges_draw (splotd *sp, gboolean draw_hidden, GdkDrawable *drawable,
               }
             }
 
-            lwidth = (k<3) ? 0 : (k-2)*2;
+            lwidth = lwidth_from_gsize(k);
+	    /* Why do we suddenly make the line types more complicated
+	       here?  Maybe we store them one way and but
+	    set_line_attributes using these other values? */
             if (edges_show_p) {
+              ltype = set_lattribute_from_ltype(n, gg);
+#if 0
               gint8 dash_list[2];
-
-              switch (n) {
+              switch (n) {  /* n is one of the EDGETYPES */
                 case SOLID:
                   ltype = GDK_LINE_SOLID;
                 break;
@@ -290,6 +296,8 @@ splot_edges_draw (splotd *sp, gboolean draw_hidden, GdkDrawable *drawable,
                   gdk_gc_set_dashes (gg->plot_GC, 0, dash_list, 2);
                 break;
               }
+#endif
+
 
 	      if (k_prev == -1 || k_prev != i || n_prev == -1 || n_prev != n) {
                 gdk_gc_set_line_attributes (gg->plot_GC, lwidth,
@@ -473,10 +481,11 @@ splot_add_edgeedit_cues (splotd *sp, GdkDrawable *drawable,
       splot_add_diamond_cue (gg->edgeedit.a, sp, drawable, gg);
 
     if (gg->buttondown && gg->edgeedit.a != -1 &&
-        k != -1 &&
-        k != gg->edgeedit.a) {
+      k != -1 &&
+      k != gg->edgeedit.a) {
 
-      lwidth = (size<3) ? 0 : (size-2)*2;
+      lwidth = lwidth_from_gsize(k);
+      //lwidth = (size<3) ? 0 : (size-2)*2;
       gdk_gc_set_line_attributes (gg->plot_GC, lwidth,
         GDK_LINE_SOLID, GDK_CAP_BUTT, GDK_JOIN_ROUND);
 

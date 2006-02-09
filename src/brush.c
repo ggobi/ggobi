@@ -32,6 +32,52 @@ static gboolean build_symbol_vectors (cpaneld *, datad *, ggobid *);
 /*             Glyph utility: called in read_data                       */
 /*----------------------------------------------------------------------*/
 
+/* convert a glyph size into a line width */
+gint
+lwidth_from_gsize(gint size)
+{
+  return ((size<3) ? 0 : (size-2)*2);
+}
+gint  /* This refers to the stored ltype, apparently */
+ltype_from_gtype(gint gtype) {
+  gint ltype;
+
+  /* These ltypes are the three EDGETYPES; should be an enum */
+
+  if (gtype == FC || gtype == FR)
+    ltype = SOLID;
+  else if (gtype == OC || gtype == OR)
+    ltype = WIDE_DASH;
+  else ltype = NARROW_DASH;
+
+  return ltype;
+}
+gint /* sets dashes and returns a gtk line attribute */
+set_lattribute_from_ltype(gint ltype, ggobid *gg)
+{
+  gint8 dash_list[2];
+
+  switch (ltype) {  /* one of the three EDGETYPES; should be an enum */
+    case SOLID:
+      ltype = GDK_LINE_SOLID;
+    break;
+    case WIDE_DASH:
+      ltype = GDK_LINE_ON_OFF_DASH;
+      dash_list[0] = 8;
+      dash_list[1] = 2;
+      gdk_gc_set_dashes (gg->plot_GC, 0, dash_list, 2);
+    break;
+    case NARROW_DASH:
+      ltype = GDK_LINE_ON_OFF_DASH;
+      dash_list[0] = 4;
+      dash_list[1] = 2;
+      gdk_gc_set_dashes (gg->plot_GC, 0, dash_list, 2);
+    break;
+  }
+
+
+} 
+
 void
 find_glyph_type_and_size (gint gid, glyphd *glyph)
 {

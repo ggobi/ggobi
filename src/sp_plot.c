@@ -239,6 +239,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
                 draw_glyph (sp->pixmap0, &d->glyph_now.els[m], sp->screen,
                   m, gg);
               if (klass && klass->within_draw_to_unbinned)
+              /* Set the line type according to the glyph? */
                 klass->within_draw_to_unbinned(sp, m, sp->pixmap0, gg->plot_GC);
             }
           }
@@ -265,6 +266,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
   colorschemed *scheme = gg->activeColorScheme;
   gushort maxcolorid;
   gboolean loop_over_points;
+  //gint size;  // To minimize how often we need to set the line width
 
   gint i, m;
   gboolean (*f)(splotd *, datad*, ggobid*, gboolean) = NULL;  /* redraw */
@@ -368,6 +370,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
 #ifdef WIN32
         win32_draw_to_pixmap_unbinned (current_color, sp, draw_hidden, gg);
 #else
+        //size = -1;
         for (i=0; i<d->nrows_in_plot; i++) {
           m = d->rows_in_plot.els[i];
           if (d->color_now.els[m] == current_color &&
@@ -375,15 +378,22 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
             splot_plot_case (m, d, sp, display, gg))
           {
             /*
-             * As above, this test accommodates the parallel coordinates
-             * and time series displays, because we have to ignore points_show_p
-             * in order to draw the whiskers but not the points.
+             * As above, this test accommodates the parallel
+             * coordinates and time series displays, because we have
+             * to ignore points_show_p in order to draw the whiskers
+             * but not the points.
             */
             if (display->options.points_show_p)
               draw_glyph (sp->pixmap0, &d->glyph_now.els[m], sp->screen,
                 m, gg);
-            if (klass && klass->within_draw_to_unbinned)
-              klass->within_draw_to_unbinned(sp, m, sp->pixmap0, gg->plot_GC);
+
+            if (klass && klass->within_draw_to_unbinned) {
+              klass->within_draw_to_unbinned(sp, m, 
+	       //size == d->glyph_now.els[m].size,  /* glyph size changed */
+              sp->pixmap0, gg->plot_GC);
+            }
+            //size = d->glyph_now.els[m].size;
+
           }
         }
 #endif
