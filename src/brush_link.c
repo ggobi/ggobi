@@ -194,11 +194,11 @@ brush_link_by_var(gint jlinkby, vector_b * levelv,
             d->glyph.els[i].type = d->glyph_now.els[i].type =
               gg->glyph_id.type;
           break;
-          case br_hide:   /*-- hidden --*/
+          case br_shadow:   /*-- shadowed, hidden --*/
             d->hidden.els[i] = d->hidden_now.els[i] = true;
           break;
 	  /*
-          case br_select:
+          case br_unshadow:
             d->hidden.els[i] = d->hidden_now.els[i] = false;
           break;
 	  */
@@ -220,11 +220,11 @@ brush_link_by_var(gint jlinkby, vector_b * levelv,
             d->glyph_now.els[i].size = gg->glyph_id.size;
             d->glyph_now.els[i].type = gg->glyph_id.type;
           break;
-          case br_hide:   /*-- hidden --*/
+          case br_shadow:   /*-- hidden --*/
             d->hidden_now.els[i] = true;
           break;
 	  /*
-          case br_select:
+          case br_unshadow:
             d->hidden_now.els[i] = false;
           break;
 	  */
@@ -248,11 +248,11 @@ brush_link_by_var(gint jlinkby, vector_b * levelv,
           d->glyph_now.els[i].size = d->glyph.els[i].size;
           d->glyph_now.els[i].type = d->glyph.els[i].type;
         break;
-        case br_hide:   /*-- hidden --*/
+        case br_shadow:   /*-- hidden --*/
           d->hidden_now.els[i] = d->hidden.els[i];
         break;
 	/* disabled
-        case br_select:
+        case br_unshadow:
           d->hidden_now.els[i] = d->hidden.els[i];
         break;
 	*/

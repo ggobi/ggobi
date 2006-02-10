@@ -1252,8 +1252,8 @@ gboolean barchart_active_paint_points(splotd * rawsp, datad * d, ggobid *gg)
       continue;
 
     if (d->hidden_now.els[m] &&
-      (cpanel->br.point_targets != br_hide 
-       /* && cpanel->br_point_targets != br_select */))
+      (cpanel->br.point_targets != br_shadow
+       /* && cpanel->br_point_targets != br_unshadow */))
     {
         continue;
     }

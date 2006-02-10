@@ -755,7 +755,7 @@ build_symbol_vectors (cpaneld *cpanel, datad *d, ggobid *gg)
               changed = update_glyph_vectors (j, changed,
                 d->pts_under_brush.els, d, gg);
             break;
-            case br_hide:  /*-- hidden --*/
+            case br_shadow:  /*-- hidden --*/
               changed = update_hidden_vectors (j, changed,
                 d->pts_under_brush.els, d, gg);
             break;
@@ -834,7 +834,7 @@ active_paint_points (splotd *sp, datad *d, ggobid *gg)
            * cases; otherwise it's ok (I think).
           */
           if (d->hidden_now.els[pt] &&
-            (cpanel->br.point_targets != br_hide 
+            (cpanel->br.point_targets != br_shadow
 	     /* && cpanel->br.point_targets != br_select */))
           {
               continue;
@@ -948,7 +948,7 @@ build_edge_symbol_vectors (cpaneld *cpanel, datad *e, ggobid *gg)
         changed = update_glyph_vectors (i, changed,
           e->edge.xed_by_brush.els, e, gg);
       break;
-      case br_hide:  /*-- hidden --*/
+      case br_shadow:  /*-- hidden --*/
         changed = update_hidden_vectors (i, changed,
           e->edge.xed_by_brush.els, e, gg);
       break;
