@@ -194,8 +194,9 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
             draw_glyph (sp->pixmap0, &d->glyph_now.els[m], sp->screen,
               m, gg);
           /* draw the whiskers ... or, potentially, other decorations */
-          if (klass && klass->within_draw_to_unbinned)
+          if (klass && klass->within_draw_to_unbinned) {
             klass->within_draw_to_unbinned(sp, m, sp->pixmap0, gg->plot_GC);
+          }
         }
       }
 #endif

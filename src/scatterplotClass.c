@@ -1567,7 +1567,8 @@ addScalingCues(splotd *sp, GdkDrawable *drawable, ggobid *gg)
 static void
 splotAssignPointsToBins(datad *d, splotd *sp, ggobid *gg)
 {
-  assign_points_to_bins (d, sp, gg);
+  if (sp == gg->current_splot && binningPermitted(sp->displayptr))
+    assign_points_to_bins (d, sp, gg);
 }
 
 static void

@@ -287,6 +287,9 @@ brush_activate (gboolean state, displayd *display, splotd *sp, ggobid *gg)
   datad *d = display->d;
   RedrawStyle redraw_style = NONE;
 
+  if (sp != gg->current_splot)
+    return redraw_style;
+
   if (GGOBI_IS_EXTENDED_SPLOT(sp)) {
     void (*f)(datad *, splotd *, ggobid *);
     GGobiExtendedSPlotClass *klass;

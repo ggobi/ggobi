@@ -413,7 +413,8 @@ scatmatCPanelWidget(displayd *dpy, gchar **modeName, ggobid *gg)
 static void
 splotAssignPointsToBins(datad *d, splotd *sp, ggobid *gg)
 {
-  assign_points_to_bins (d, sp, gg);
+  if (sp == gg->current_splot)
+    assign_points_to_bins (d, sp, gg);
 }
 
 static void
