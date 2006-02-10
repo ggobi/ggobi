@@ -303,8 +303,6 @@ withinDrawUnbinned(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc)
   ggobid *gg = GGobiFromSPlot(sp);
   gint n, lwidth, ltype, gtype;
 
-  if (sp == g_list_nth_data(display->splots, 0))
-
   if (display->options.whiskers_show_p) {
     n = 2*m;
     lwidth = lwidth_from_gsize(d->glyph_now.els[m].size);
