@@ -372,7 +372,12 @@ varpanel_add_row (gint j, datad *d, ggobid *gg)
   // This shouldn't be necessary.
   //gboolean sens = (d == g_slist_nth_data(gg->d, 0));
   gboolean sens = false;
+  GList *displays;
 
+  for(displays = gg->displays; !sens && displays; displays = g_list_next(displays)) 
+	  if (GGOBI_DISPLAY(displays->data)->d == d)
+		  sens = true;
+  
   box = gtk_hbox_new (false, 2);
   gtk_box_pack_start (GTK_BOX (d->vcbox_ui.vbox),
     box, false, false, 1);
