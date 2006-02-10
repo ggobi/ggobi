@@ -581,7 +581,7 @@ fi
 
  dnl Process the different .in files, substituting the values computed here in the configuration
  dnl script for the corresponding @variable@ in these files.
-AC_OUTPUT(Makeconf GNUmakefile src/GNUmakefile bin/setLD.csh  bin/setLD.bsh bin/ggobi bin/ggobidb bin/ggobi-config bugTemplate local.config plugin ggobi.pc win32/ggobi.iss PluginList)
+AC_OUTPUT(Makeconf GNUmakefile src/GNUmakefile bin/setLD.csh bin/setLD.bsh bin/ggobi bin/ggobidb bin/ggobi-config local.config plugin ggobi.pc win32/ggobi.iss PluginList)
 
 dnl cp src/config.h include/GGobiConfig.h
 
