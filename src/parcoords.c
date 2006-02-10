@@ -298,7 +298,7 @@ parcoords_add_delete_splot(cpaneld *cpanel, splotd *sp, gint jvar, gint *jvar_pr
   gint nplots = g_list_length (display->splots);
   gint k;
   gint indx, new_indx;
-  GList *l;
+  GList *l, *ltofree;
   splotd *sp_jvar, *s, *sp_new;
   GtkWidget *box;
 
@@ -316,6 +316,7 @@ parcoords_add_delete_splot(cpaneld *cpanel, splotd *sp, gint jvar, gint *jvar_pr
       while (l) {
 	s = (splotd *) l->data;
 	if (s->p1dvar == jvar) {
+          ltofree = l;
 	  sp_jvar = s;
 	  indx = k;
 	  break;
@@ -324,8 +325,10 @@ parcoords_add_delete_splot(cpaneld *cpanel, splotd *sp, gint jvar, gint *jvar_pr
         k++;
       }
 
-      /*-- Delete the plot from the list, and destroy it. --*/
-      display->splots = g_list_remove (display->splots, (gpointer) sp_jvar);
+      /*-- Delete the plot from the list without freeing it. --*/
+      display->splots = g_list_remove_link (display->splots, ltofree);
+      //display->splots = g_list_remove_link (display->splots, 
+      //  (gpointer) sp_jvar);
       nplots--;
 
       /*
@@ -346,8 +349,10 @@ parcoords_add_delete_splot(cpaneld *cpanel, splotd *sp, gint jvar, gint *jvar_pr
         /* If we're brushing, is this ok? */
         sp_event_handlers_toggle (s, on, cpanel->pmode, cpanel->imode);
       }
-
+      // Try to get all the event handlers toggled before the plot is freed.
+      gdk_flush();
       splot_free (sp_jvar, display, gg);
+      g_list_free(ltofree);  // Free the list element that pointed to sp_jvar.
     }
 
   } else /* Append a new variable */ {
@@ -366,9 +371,6 @@ parcoords_add_delete_splot(cpaneld *cpanel, splotd *sp, gint jvar, gint *jvar_pr
        default mode.  -- dfs
        */
     GGOBI(full_viewmode_set)(EXTENDED_DISPLAY_PMODE, DEFAULT_IMODE, gg);
-
-    /* Initialize drag and drop for the new panel */
-    sp_event_handlers_toggle (sp_new, on, cpanel->pmode, cpanel->imode);
 
     redraw = true;
   }

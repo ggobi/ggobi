@@ -107,9 +107,13 @@ static void chdir_cb (GtkButton *button, ggobid *gg)
 static gint
 key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
 {
-  ggobid *gg = GGobiFromSPlot(sp);
-  cpaneld *cpanel = &gg->current_display->cpanel;
-  
+  ggobid *gg;
+  cpaneld *cpanel;
+
+  gg = GGobiFromSPlot(sp);  
+  if (!gg) return true;
+  cpanel = &gg->current_display->cpanel;
+
 /*-- add a key_press_cb in each mode, and let it begin with these lines --*/
   if (splot_event_handled (w, event, cpanel, sp, gg))
     return true;
@@ -122,16 +126,20 @@ key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
 void
 p1d_event_handlers_toggle (splotd *sp, gboolean state) 
 {
-  displayd *display = (displayd *) sp->displayptr;
+  displayd *display;
 
-  if (state == on) {
-    if(GGOBI_IS_WINDOW_DISPLAY(display) && GGOBI_WINDOW_DISPLAY(display)->useWindow)
-      sp->key_press_id = g_signal_connect (G_OBJECT (GGOBI_WINDOW_DISPLAY(display)->window),
-        "key_press_event",
-        G_CALLBACK(key_press_cb),
-        (gpointer) sp);
-  } else {
-    disconnect_key_press_signal (sp);
+  if (sp) {
+    display = (displayd *) sp->displayptr;
+
+    if (state == on) {
+      if(GGOBI_IS_WINDOW_DISPLAY(display) && GGOBI_WINDOW_DISPLAY(display)->useWindow)
+        sp->key_press_id = g_signal_connect (G_OBJECT (GGOBI_WINDOW_DISPLAY(display)->window),
+          "key_press_event",
+          G_CALLBACK(key_press_cb),
+          (gpointer) sp);
+    } else {
+      disconnect_key_press_signal (sp);
+    }
   }
 }
 

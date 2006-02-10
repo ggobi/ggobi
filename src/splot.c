@@ -126,8 +126,20 @@ splot_event_handled (GtkWidget *w, GdkEventKey *event,
 {
   static guint32 etime = (guint32) 0;
   gboolean common_event = true;
-  displayd *display = (displayd *) sp->displayptr;
+  displayd *display = (displayd *) NULL;
 
+/* In composite displays, we sometimes find ourselves trying to
+ * process an event on a deleted splot.  I'm not sure if that's a bug
+ * that should be fixed properly, or whether doing some error-checking
+ * is an adequate response.  At the moment, I think I'm seeing gtk
+ * bugs in addition to our own. -- dfs
+ */
+  if (!sp) return false;
+  if (sp->displayptr) {
+    display = ValidateDisplayRef((displayd *) sp->displayptr, 
+				 gg, false);
+  }
+  if (!display) return false;
 /*
  * I can't say this is the best way to handle this bug, but it
  * seems to work.  By switching modes before the processing
@@ -391,9 +403,9 @@ splot_free (splotd *sp, displayd *display, ggobid *gg)
   win32_drawing_arrays_free (sp);
 #endif
 
-  if(GGOBI_IS_EXTENDED_SPLOT(sp)) {
+  if(GGOBI_IS_EXTENDED_SPLOT(sp))
      gtk_object_destroy(GTK_OBJECT(sp));
-  } else
+  else
      gtk_widget_destroy (GTK_WIDGET(sp));
 }
 
@@ -863,17 +875,21 @@ splot_reverse_pipeline (splotd *sp, gint ipt, gcoords *eps,
 /*-- this one isn't attached to sp->da, but we'll bundle it anyway --*/
 void
 disconnect_key_press_signal (splotd *sp) {
-  displayd *display = sp->displayptr;
-  if (sp->key_press_id && GGOBI_IS_WINDOW_DISPLAY(display)) {
-    g_signal_handler_disconnect (G_OBJECT (GGOBI_WINDOW_DISPLAY(display)->window), sp->key_press_id);
-    sp->key_press_id = 0;
+  displayd *display;
+
+  if (sp) {
+    display = (displayd *) sp->displayptr;
+    if (sp->key_press_id && GGOBI_IS_WINDOW_DISPLAY(display)) {
+      g_signal_handler_disconnect (G_OBJECT (GGOBI_WINDOW_DISPLAY(display)->window), sp->key_press_id);
+      sp->key_press_id = 0;
+    }
   }
 }
 
 void
 disconnect_button_press_signal (splotd *sp) 
 {
-  if (sp->press_id) {
+  if (sp && sp->press_id) {
     g_signal_handler_disconnect (G_OBJECT (sp->da), sp->press_id);
     sp->press_id = 0;
   }
@@ -881,14 +897,14 @@ disconnect_button_press_signal (splotd *sp)
 
 void
 disconnect_button_release_signal (splotd *sp) {
-  if (sp->release_id) {
+  if (sp && sp->release_id) {
     g_signal_handler_disconnect (G_OBJECT (sp->da), sp->release_id);
     sp->release_id = 0;
   }
 }
 void
 disconnect_motion_signal (splotd *sp) {
-  if (sp->motion_id) {
+  if (sp && sp->motion_id) {
     g_signal_handler_disconnect (G_OBJECT (sp->da), sp->motion_id);
     sp->motion_id = 0;
   }

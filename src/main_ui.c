@@ -634,7 +634,7 @@ GGOBI(full_viewmode_set)(ProjectionMode pmode, InteractionMode imode, ggobid *gg
     viewmode_set(pmode, imode, gg);
     /* */
 
-     sp_event_handlers_toggle (sp, on, gg->pmode, gg->imode);
+    sp_event_handlers_toggle (sp, on, gg->pmode, gg->imode);
     imode_activate (sp, gg->pmode, gg->imode, on, gg);
     if (cpanel_shows_pmode)
       procs_activate (on, gg->pmode, display, gg);

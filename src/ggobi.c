@@ -702,13 +702,13 @@ const gchar* key_get (void) {
 ggobid*
 GGobiFromWidget (GtkWidget *w, gboolean useWindow)
 {
-  /*
-   GdkWindow *win = gtk_widget_get_parent_window(w);
-   return(GGobiFromWindow(win));
-  */
   ggobid *gg = NULL;
-  gg = (ggobid*) g_object_get_data(G_OBJECT(w), GGobiGTKey);
-  ValidateGGobiRef (gg, true);
+  GObject *obj;
+  obj = g_object_get_data(G_OBJECT(w), GGobiGTKey);
+  if (obj) {
+    gg = (ggobid*) obj;
+    ValidateGGobiRef (gg, true);
+  }
 
   return (gg);
 }
@@ -716,8 +716,12 @@ GGobiFromWidget (GtkWidget *w, gboolean useWindow)
 ggobid* GGobiFromWindow (GdkWindow *win)
 {
   ggobid *gg = NULL;
-  gg = (ggobid*) g_object_get_data(G_OBJECT(win), GGobiGTKey);
-  ValidateGGobiRef (gg, true);
+  GObject *obj;
+  obj = g_object_get_data(G_OBJECT(win), GGobiGTKey);
+  if (obj) {
+    gg = (ggobid*) obj;
+    ValidateGGobiRef (gg, true);
+  }
 
   return(gg);
 }
@@ -725,7 +729,15 @@ ggobid* GGobiFromWindow (GdkWindow *win)
 ggobid* 
 GGobiFromSPlot(splotd *sp)
 {
- return (sp->displayptr->ggobi);
+  ggobid *gg = NULL;
+  displayd *display = NULL;
+  if ((sp) && sp->displayptr) {
+    display = (displayd *) sp->displayptr;
+    if (display) {
+      gg = ValidateGGobiRef(display->ggobi, false);
+    }
+  }
+  return gg;
 }
 
 ggobid* 

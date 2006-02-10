@@ -274,6 +274,9 @@ static gint key_press_cb(GtkWidget * w, GdkEventKey * event, splotd * sp)
   ggobid *gg = GGobiFromSPlot(sp);
   cpaneld *cpanel = &gg->current_display->cpanel;
 
+  if (!sp || !gg || !cpanel)
+    return;
+
   /*-- handle the keys for setting the mode and launching generic events --*/
   if (splot_event_handled(w, event, cpanel, sp, gg))
     return true;
@@ -338,6 +341,9 @@ button_press_cb(GtkWidget * w, GdkEventButton * event, splotd * sp)
   gboolean button1_p, button2_p;
   ggobid *gg = GGobiFromSPlot(sp);
   datad *d, *e;
+
+  if (!sp || !gg)
+    return;
 
   gg->current_splot = sp->displayptr->current_splot = sp;
   gg->current_display = sp->displayptr;

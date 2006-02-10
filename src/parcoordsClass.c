@@ -285,6 +285,9 @@ withinDrawBinned(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc)
   ggobid *gg = GGobiFromSPlot(sp);
   gint n, lwidth, ltype, gtype;
 
+  if (!gg || !display)
+    return;
+
   if (display->options.whiskers_show_p) {
     n = 2*m;
     lwidth = lwidth_from_gsize(d->glyph_now.els[m].size);
@@ -311,6 +314,9 @@ withinDrawUnbinned(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc)
   datad *d = display->d;
   ggobid *gg = GGobiFromSPlot(sp);
   gint n, lwidth, ltype, gtype;
+
+  if (!gg || !display)
+    return;
 
   if (display->options.whiskers_show_p) {
     n = 2*m;
