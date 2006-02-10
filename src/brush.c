@@ -406,26 +406,14 @@ brush_boundaries_set (cpaneld *cpanel,
 void
 brush_draw_label (splotd *sp, GdkDrawable *drawable, datad *d, ggobid *gg)
 {
-  //gint lbearing, rbearing, width, ascent, descent;
-  //GtkStyle *style = gtk_widget_get_style (sp->da);
   PangoRectangle rect;
   PangoLayout *layout = gtk_widget_create_pango_layout(GTK_WIDGET(sp->da), NULL);
   
   if (d->npts_under_brush > 0) {
     gchar *str = g_strdup_printf ("%d", d->npts_under_brush);
     layout_text(layout, str, &rect);
-	gdk_draw_layout(drawable, gg->plot_GC, 
+    gdk_draw_layout(drawable, gg->plot_GC, 
 		sp->max.x - rect.width - 5, 5, layout);
-	/*gdk_text_extents (
-      gtk_style_get_font (style),
-      str, strlen (str),
-      &lbearing, &rbearing, &width, &ascent, &descent);
-    gdk_draw_string (drawable,
-      gtk_style_get_font (style),
-      gg->plot_GC,
-      sp->max.x - width - 5,
-      ascent + descent + 5,
-      str);*/
     g_free (str);
   }
   g_object_unref(G_OBJECT(layout));
@@ -599,7 +587,7 @@ update_color_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
 }
 
 /*----------------------------------------------------------------------*/
-/*                      Hide brushing                                   */
+/*                    Shadow brushing                                   */
 /*----------------------------------------------------------------------*/
 
 gboolean
@@ -641,15 +629,9 @@ update_hidden_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
   return (doit);
 }
 
-/*
- * the opposite of hide: note that persistent selection doesn't
- * really work because it keeps overwriting the hidden vectors.
- * If we need persistent selection, I'll have to create a new
- * vector that's only used here, or use some temporary vector.
-*/
 gboolean
-update_selected_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
-  datad *d, ggobid *gg)
+bizarro_update_hidden_vectors (gint i, gboolean changed, 
+  gboolean *hit_by_brush, datad *d, ggobid *gg)
 {
   cpaneld *cpanel = &gg->current_display->cpanel;
   gboolean doit = true;
@@ -760,8 +742,8 @@ build_symbol_vectors (cpaneld *cpanel, datad *d, ggobid *gg)
                 d->pts_under_brush.els, d, gg);
             break;
 	    /*
-            case br_select:
-              changed = update_selected_vectors (j, changed,
+            case br_unshadow:
+              changed = bizarro_update_hidden_vectors (j, changed,
                 d->pts_under_brush.els, d, gg);
             break;
 	    */
@@ -801,6 +783,7 @@ active_paint_points (splotd *sp, datad *d, ggobid *gg)
   displayd *display = (displayd *) sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
   gint (*f)(splotd *sp, datad *, ggobid *) = NULL;
+  BrushTargetType ttype;
 
   g_assert (d->pts_under_brush.nels == d->nrows);
 
@@ -821,6 +804,7 @@ active_paint_points (splotd *sp, datad *d, ggobid *gg)
      * cases in rows_in_plot.els[] so there's no need to test for that.
     */
 
+    ttype = cpanel->br.point_targets;
     for (ih=d->brush.bin0.x; ih<=d->brush.bin1.x; ih++) {
       for (iv=d->brush.bin0.y; iv<=d->brush.bin1.y; iv++) {
         for (j=0; j<d->brush.binarray[ih][iv].nels; j++) {
@@ -834,8 +818,8 @@ active_paint_points (splotd *sp, datad *d, ggobid *gg)
            * cases; otherwise it's ok (I think).
           */
           if (d->hidden_now.els[pt] &&
-            (cpanel->br.point_targets != br_shadow
-	     /* && cpanel->br.point_targets != br_select */))
+            (ttype != br_shadow
+	     /* && ttype != br_unshadow */))
           {
               continue;
           }
@@ -953,8 +937,8 @@ build_edge_symbol_vectors (cpaneld *cpanel, datad *e, ggobid *gg)
           e->edge.xed_by_brush.els, e, gg);
       break;
       /* disabled
-      case br_select:
-        changed = update_selected_vectors (i, changed,
+      case br_unshadow:
+        changed = bizarro_update_hidden_vectors (i, changed,
           e->edge.xed_by_brush.els, e, gg);
       break;
       */

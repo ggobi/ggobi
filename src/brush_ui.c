@@ -69,13 +69,10 @@ static void brush_undo_cb(GtkToggleButton * button, ggobid * gg)
 
   displays_plot(NULL, FULL, gg);
 }
-/*
-The select mode has some unpleasant behavior, basically because I'm
-just re-using the hidden vectors.  I have no desire to add another
-set of vectors, though, so I'll just turn it off for now.
-*/
+
 static gchar *point_targets_lbl[] =
-{ "Off", "Color and glyph", "Color only", "Glyph only", "Shadow", /*"Select"*/};
+{ "Off", "Color and glyph", "Color only", "Glyph only", "Shadow",
+  /*"Unshadow"*/};
 static void
 brush_point_targets_cb (GtkWidget * w, ggobid *gg)
 {
@@ -88,30 +85,6 @@ brush_point_targets_cb (GtkWidget * w, ggobid *gg)
 
   /* binning not permitted here */
   brush_once_and_redraw (false, gg->current_splot, gg->current_display, gg);
-
-
-  /*
-   * select brushing is a special case: hide all points
-   * before starting to move the brush.
-   *
-   * There's still a weird thing that can happen:  enter select
-   * brushing and then leave it; all points remain hidden.  Hmm.
-  */ /* select brushing has been disabled */
-  /*
-  if (cpanel->br_point_targets == br_select) {
-    gint i, m;
-    datad *d = gg->current_display->d;
-
-    g_assert (d->hidden.nels == d->nrows);
-
-    for (i=0; i<d->nrows_in_plot; i++) {
-      m = d->rows_in_plot.els[i];
-      d->hidden_now.els[m] = d->hidden.els[m] = true;
-    }
-    displays_plot (NULL, FULL, gg);
-  }
-  */
-
 }
 
 static gchar *edge_targets_lbl[] =
