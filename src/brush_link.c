@@ -371,6 +371,7 @@ linkby_current_page_set (displayd *display, GtkWidget *notebook, ggobid *gg)
   GtkWidget *swin;
   datad *d = display->d, *paged;
   gint page_num, cur_page_num;
+  cpaneld *cpanel = &display->cpanel;
 
   if (notebook == NULL) {
     return;
@@ -378,7 +379,6 @@ linkby_current_page_set (displayd *display, GtkWidget *notebook, ggobid *gg)
 
   /* temporary fix to keep gg->linkby_cv in sync with the display */
   {
-    cpaneld *cpanel = &display->cpanel;
     gg->linkby_cv = (cpanel->br.linkby_row > 0);
   }
 
@@ -407,52 +407,35 @@ void
 linking_method_set_cb (GtkTreeSelection *treesel, ggobid *gg)
 {
   datad *d = g_object_get_data (G_OBJECT(gtk_tree_selection_get_tree_view(treesel)), "datad");
-  displayd *display = gg->current_display;
-  cpaneld *cpanel = &display->cpanel;  
   GtkTreeModel *model;
   GtkTreeIter iter;
   GtkTreePath *path;
   gint row = -1;
 
   if(gtk_tree_selection_get_selected(treesel, &model, &iter)) {
-	  path = gtk_tree_model_get_path(model, &iter);
-	  row = gtk_tree_path_get_indices(path)[0];
-	  gtk_tree_path_free(path);
+    path = gtk_tree_model_get_path(model, &iter);
+    row = gtk_tree_path_get_indices(path)[0];
+    gtk_tree_path_free(path);
   }
 
-  
-  //notebook = (GtkWidget *) g_object_get_data(G_OBJECT(cl), "notebook");
-  cpanel->br.linkby_row = row;
+  /* Before  touching the  cpanel, make  sure the  display  and cpanel
+   * actually correspond to the current data.  This looks more and
+   * more like a kludge -- I do need to revisit this.  -- dfs
+ */
+  if (gg->current_display->d == d) {
+    displayd *display = gg->current_display;
+    cpaneld *cpanel = &display->cpanel;  
+    cpanel->br.linkby_row = row;
+  }
 
   if (row <= 0) {
     gg->linkby_cv = false;
     return;  /* link by case id; done */
   } else {
-    //gpointer ptr = gtk_clist_get_row_data (GTK_CLIST(cl), row);
-    //gint jvar = GPOINTER_TO_INT(ptr);
     vartabled *vt;
     gtk_tree_model_get(model, &iter, LINKBYLIST_VT, &vt, -1);
     gg->linkby_cv = true;
     d->linkvar_vt = vt;
-	
-    /* I need to get the text in the row and strip out "Link by ".
-     * That will give me the variable name */
-    /*
-	 ok = gtk_clist_get_text (GTK_CLIST(cl), row, 0, &rowtext);
-    if (ok) {
-      varname = &rowtext[8];
-      for (j=0; j<d->ncols; j++) {
-        vt = vartable_element_get (j, d);
-        if (vt && vt->vartype == categorical) {
-          if (strcmp(vt->collab_tform, varname) == 0) {
-            jvar = j;
-            gg->linkby_cv = true;
-            d->linkvar_vt = vt;
-          }
-        }
-      }
-    }*/
-
   }
 }
 
@@ -562,9 +545,6 @@ linkby_notebook_subwindow_add (datad *d, GtkWidget *notebook, ggobid *gg)
    * as insensitive.
    */
 
-/*
-  g_printerr ("(subwindow_add) d %s nchildren %d\n", d->name, g_list_length(gtk_container_get_children(GTK_CONTAINER(notebook))));
-*/
   if (g_list_length(gtk_container_get_children(GTK_CONTAINER(notebook))) != 0) {
     gtk_widget_set_sensitive (swin, false);
   }
