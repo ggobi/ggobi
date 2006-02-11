@@ -14,7 +14,7 @@ void       close_dspdesc_window(GtkWidget *w, PluginInstance *inst);
 GtkWidget *create_dspdesc_window(ggobid *gg, PluginInstance *inst);
 void       show_dspdesc_window(GtkAction *action, PluginInstance *inst);
 
-static void window_close (PluginInstance *inst);
+static void plugin_destroy (PluginInstance *inst);
 
 extern void desc_write (PluginInstance *inst);
 
@@ -34,8 +34,9 @@ gboolean
 addToToolsMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 {
   static GtkActionEntry entry = {
-	"DescribeDisplay", NULL, "_Save display description", NULL, "Save an S-language description of this display", 
-		G_CALLBACK (show_dspdesc_window)
+    "DescribeDisplay", NULL, "Save Display Description", 
+    NULL, "Save an S-language description of this display", 
+    G_CALLBACK (show_dspdesc_window)
   };
   
   inst->data = NULL;
@@ -52,20 +53,13 @@ void
 show_dspdesc_window (GtkAction *action, PluginInstance *inst)
 {
   dspdescd *desc;
+  desc = (dspdescd *) g_malloc (sizeof (dspdescd));
 
-  if (inst->data == NULL) {
-    desc = (dspdescd *) g_malloc (sizeof (dspdescd));
+  /* Create it fresh and destroy it each time */
+  dspdesc_init (desc);
+  inst->data = desc;
 
-    dspdesc_init (desc);
-    inst->data = desc;
-
-    create_dspdesc_window (inst->gg, inst);
-    g_object_set_data(G_OBJECT (desc->window), "dspdescd", desc);
-
-  } else {
-    desc = (dspdescd *) inst->data;
-    gtk_widget_show_now ((GtkWidget*) desc->window);
-  }
+  create_dspdesc_window (inst->gg, inst);
 }
 
 dspdescd *
@@ -107,34 +101,30 @@ create_dspdesc_window(ggobid *gg, PluginInstance *inst)
   if (gtk_dialog_run(GTK_DIALOG(window)) == GTK_RESPONSE_ACCEPT)
 	desc_write(inst);
 	
-  window_close(inst);
+  plugin_destroy(inst);
 	
   return(window);
 }
 
+
 void
-window_close(PluginInstance *inst)
+plugin_destroy(PluginInstance *inst)
 {
-	if(inst->data) {
-	    dspdescd *desc = (dspdescd *) inst->data;
-     	    gtk_widget_hide(desc->window);
-	}
+  if(inst->data) {
+    dspdescd *desc = dspdescFromInst (inst); 
+    gtk_widget_destroy (desc->window);
+    g_free(desc);
+    inst->data = NULL;
+  }
 }
 
 void close_dspdesc_window(GtkWidget *w, PluginInstance *inst)
 {
-  inst->data = NULL;
+  plugin_destroy(inst);
 }
 
 void closeWindow(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 {
-  if (inst->data) {
-  dspdescd *desc = dspdescFromInst (inst); 
-    /* I don't remember what this line is for -- dfs
-    g_signal_handlers_disconnect_by_func(G_OBJECT(inst->data),
-      G_CALLBACK (close_dspdesc_window), inst);
-    */
-    gtk_widget_destroy (desc->window);
-  }
+  plugin_destroy(inst);
 }
 

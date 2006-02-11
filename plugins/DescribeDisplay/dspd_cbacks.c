@@ -172,12 +172,12 @@ scale_convert (splotd *sp, gint ival, gint max, greal mid, gint scale)
       stickylabels = list(list(index=, label=""),
                           list(index=, label=""), ...)),
       # the parameters corresponding to the current projection
-      p1dparams = list(label="", orientation=""),
-      xyparams = list(xlabel="", ylabel="",),
-      tour1dparams = list(F, labels, ranges),
-      tour2dparams = list(F, labels, ranges),
-      tour3dparams = list(F, labels, ranges),
-      tour2x1dparams = list(xF, xlabels, xranges, yF, ylabels, yranges),
+      params = list(label="", orientation=""),
+      params = list(xlabel="", ylabel="",),
+      params = list(F, labels, ranges),
+      params = list(F, labels, ranges),
+      params = list(F, labels, ranges),
+      dparams = list(xF, xlabels, xranges, yF, ylabels, yranges),
 */
 void
 describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
@@ -656,6 +656,7 @@ describe_scatmat_display (FILE *fp, ggobid *gg, displayd *display,
   }
 
   CLOSE_LIST(fp);  /* plots */
+  g_free(cols);
 }
 
 
