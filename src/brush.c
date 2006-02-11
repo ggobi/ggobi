@@ -741,12 +741,10 @@ build_symbol_vectors (cpaneld *cpanel, datad *d, ggobid *gg)
               changed = update_hidden_vectors (j, changed,
                 d->pts_under_brush.els, d, gg);
             break;
-	    /*
             case br_unshadow:
               changed = bizarro_update_hidden_vectors (j, changed,
                 d->pts_under_brush.els, d, gg);
             break;
-	    */
             case br_off:
               ;
             break;
@@ -811,15 +809,10 @@ active_paint_points (splotd *sp, datad *d, ggobid *gg)
           pt = d->rows_in_plot.els[d->brush.binarray[ih][iv].els[j]];
 
           /*
-           * if a case is hidden, or it's missing and we aren't
-           * displaying missings, don't count it as being under the brush.
-           * Caution:
-           * If we're doing hide or un-hide brushing, we can't ignore hidden
-           * cases; otherwise it's ok (I think).
+           * Ignore hidden cases unless shadow or unshadow brushing.
           */
           if (d->hidden_now.els[pt] &&
-            (ttype != br_shadow
-	     /* && ttype != br_unshadow */))
+            (ttype != br_shadow && ttype != br_unshadow))
           {
               continue;
           }
@@ -936,12 +929,10 @@ build_edge_symbol_vectors (cpaneld *cpanel, datad *e, ggobid *gg)
         changed = update_hidden_vectors (i, changed,
           e->edge.xed_by_brush.els, e, gg);
       break;
-      /* disabled
       case br_unshadow:
         changed = bizarro_update_hidden_vectors (i, changed,
           e->edge.xed_by_brush.els, e, gg);
       break;
-      */
       case br_off:
         ;
       break;

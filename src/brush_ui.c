@@ -70,9 +70,9 @@ static void brush_undo_cb(GtkToggleButton * button, ggobid * gg)
   displays_plot(NULL, FULL, gg);
 }
 
-static gchar *point_targets_lbl[] =
-{ "Off", "Color and glyph", "Color only", "Glyph only", "Shadow",
-  /*"Unshadow"*/};
+static gchar *point_targets_lbl[] = { 
+  "Off", "Color and glyph", "Color only", "Glyph only", "Shadow", "Unshadow"
+};
 static void
 brush_point_targets_cb (GtkWidget * w, ggobid *gg)
 {
@@ -87,9 +87,9 @@ brush_point_targets_cb (GtkWidget * w, ggobid *gg)
   brush_once_and_redraw (false, gg->current_splot, gg->current_display, gg);
 }
 
-static gchar *edge_targets_lbl[] =
-  { "Off", "Color and line", "Color only", "Line only", "Shadow", 
-    /*"Select"*/};
+static gchar *edge_targets_lbl[] = {
+  "Off", "Color and line", "Color only", "Line only", "Shadow", "Unshadow"
+};
 static void brush_edge_targets_cb(GtkWidget * w, ggobid *gg)
 {
   cpaneld *cpanel = &gg->current_display->cpanel;
