@@ -328,28 +328,8 @@ brush_motion (icoords *mouse, gboolean button1_p, gboolean button2_p,
   brush_coords *brush_pos = &sp->brush_pos;
 
   if (button1_p) {
-/*
-    if (display->displaytype == parcoords) {
-      if (mouse->x > sp->da->allocation.width || mouse->x < 0) {
-        gint indx = g_list_index (display->splots, sp);
-        gint nplots = g_list_length (display->splots);
-        if (mouse->x > sp->da->allocation.width) {
-          if (indx != nplots-1) {
-            g_printerr ("slid off to the right\n");
-          }
-        } else if (mouse->x < 0) {
-          if (indx > 0) {
-            g_printerr ("slid off to the left\n");
-          }
-        }
-      }
-    }
-*/
-
     brush_set_pos (mouse->x, mouse->y, sp);
-  }
-
-  else if (button2_p) {
+  } else if (button2_p) {
     brush_pos->x2 = mouse->x ;
     brush_pos->y2 = mouse->y ;
   }
@@ -436,23 +416,26 @@ brush_draw_brush (splotd *sp, GdkDrawable *drawable, datad *d, ggobid *gg) {
   gint y1 = MIN (brush_pos->y1, brush_pos->y2);
   gint y2 = MAX (brush_pos->y1, brush_pos->y2);
 
-  if (!gg->mono_p) {
-    if ((scheme->rgb[gg->color_id].red != scheme->rgb_bg.red) ||
-        (scheme->rgb[gg->color_id].blue != scheme->rgb_bg.blue) ||
-        (scheme->rgb[gg->color_id].green != scheme->rgb_bg.green))
-    {
-      gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[gg->color_id]);
-    } else {
-      gdk_gc_set_foreground (gg->plot_GC,
-                             &scheme->rgb_accent);
-    }
-  }
-
   if (cpanel->br.mode == BR_TRANSIENT)
     gdk_gc_set_line_attributes (gg->plot_GC,
       0, GDK_LINE_ON_OFF_DASH, GDK_CAP_ROUND, GDK_JOIN_ROUND);
 
   if (point_painting_p) {
+
+    /* set brush color for points */
+    if (cpanel->br.point_targets == br_shadow) {
+      gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_hidden);
+    } else if (cpanel->br.point_targets == br_unshadow) {
+      gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
+    } else if ((scheme->rgb[gg->color_id].red != scheme->rgb_bg.red) ||
+      (scheme->rgb[gg->color_id].blue != scheme->rgb_bg.blue) ||
+      (scheme->rgb[gg->color_id].green != scheme->rgb_bg.green))
+    {
+      gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[gg->color_id]);
+    } else {
+      /* I don't remember what this is for ... -- dfs */
+      gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
+    }
 
     gdk_draw_rectangle (drawable, gg->plot_GC, false,
       x1, y1, (x2>x1)?(x2-x1):(x1-x2), (y2>y1)?(y2-y1):(y1-y2));
@@ -474,6 +457,22 @@ brush_draw_brush (splotd *sp, GdkDrawable *drawable, datad *d, ggobid *gg) {
   }
 
   if (edge_painting_p) {
+
+    /* set brush color for edges */
+    if (cpanel->br.edge_targets == br_shadow) {
+      gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_hidden);
+    } else if (cpanel->br.point_targets == br_unshadow) {
+      gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
+    } else if ((scheme->rgb[gg->color_id].red != scheme->rgb_bg.red) ||
+      (scheme->rgb[gg->color_id].blue != scheme->rgb_bg.blue) ||
+      (scheme->rgb[gg->color_id].green != scheme->rgb_bg.green))
+    {
+      gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[gg->color_id]);
+    } else {
+      /* I don't remember what this is for ... -- dfs */
+      gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
+    }
+
     gdk_draw_line (drawable, gg->plot_GC,
       x1 + (x2 - x1)/2, y1, x1 + (x2 - x1)/2, y2 );
     gdk_draw_line (drawable, gg->plot_GC,
@@ -554,6 +553,8 @@ update_color_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
 {
   cpaneld *cpanel = &gg->current_display->cpanel;
   gboolean doit = true;
+
+  //g_printerr ("(update_color_vectors) d=%s\n", d->name);
 
 /* setting the value of doit */
   if (!changed) {
