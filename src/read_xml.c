@@ -947,7 +947,6 @@ setDatasetInfo (const xmlChar **attrs, XMLParserData *data)
   data->current_variable = 0;
   data->current_element = 0;
 
-/*-- dfs: this seems to be needed; are there more? --*/
   data->idTable = NULL;
 
   return (true);
