@@ -272,32 +272,8 @@ splot_edges_draw (splotd *sp, gboolean draw_hidden, GdkDrawable *drawable,
             }
 
             lwidth = lwidth_from_gsize(k);
-	    /* Why do we suddenly make the line types more complicated
-	       here?  Maybe we store them one way and but
-	    set_line_attributes using these other values? */
             if (edges_show_p) {
               ltype = set_lattribute_from_ltype(n, gg);
-#if 0
-              gint8 dash_list[2];
-              switch (n) {  /* n is one of the EDGETYPES */
-                case SOLID:
-                  ltype = GDK_LINE_SOLID;
-                break;
-                case WIDE_DASH:
-                  ltype = GDK_LINE_ON_OFF_DASH;
-                  dash_list[0] = 8;
-                  dash_list[1] = 2;
-                  gdk_gc_set_dashes (gg->plot_GC, 0, dash_list, 2);
-                break;
-                case NARROW_DASH:
-                  ltype = GDK_LINE_ON_OFF_DASH;
-                  dash_list[0] = 4;
-                  dash_list[1] = 2;
-                  gdk_gc_set_dashes (gg->plot_GC, 0, dash_list, 2);
-                break;
-              }
-#endif
-
 
 	      if (k_prev == -1 || k_prev != i || n_prev == -1 || n_prev != n) {
                 gdk_gc_set_line_attributes (gg->plot_GC, lwidth,
@@ -354,8 +330,8 @@ splot_add_edge_highlight_cue (splotd *sp, GdkDrawable *drawable, gint k,
 /*
  * How to distinguish between sticky and nearest edges?
 */
-  /*-- draw a thickened line --*/
-  if (draw_edge) {
+  /*-- draw a thickened line only for nearest --*/
+  if (nearest && draw_edge) {
     gdk_gc_set_line_attributes (gg->plot_GC,
       3, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
     gdk_gc_set_foreground (gg->plot_GC,
@@ -405,32 +381,22 @@ splot_add_edge_label (splotd *sp, GdkDrawable *drawable, gint k,
   if (draw_edge) {
 
     /*-- add the label last so it will be in front of other markings --*/
+
+    /* for edge labels, this is not the appropriate cpanel ... */
     lbl = identify_label_fetch (k, &dsp->cpanel, e, gg);
-	layout_text(layout, lbl, &rect);
+    layout_text(layout, lbl, &rect);
 
     if (sp->screen[a].x > sp->screen[b].x) {gint itmp=b; b=a; a=itmp;}
     xp = (sp->screen[b].x - sp->screen[a].x)/2 + sp->screen[a].x;
     if (sp->screen[a].y > sp->screen[b].y) {gint itmp=b; b=a; a=itmp;}
     yp = (sp->screen[b].y - sp->screen[a].y)/2 + sp->screen[a].y - rect.height;
 
-	if (nearest) {
+    if (nearest) {
       underline_text(layout);
-	#if 0
-		/*-- underline the label --*/
-      gdk_draw_line (drawable, gg->plot_GC,
-        xp, yp+1, xp+rect.width, yp+1);
-      /*-- display it in the top center of the window --*/
-	#endif
-	  gdk_draw_layout(drawable, gg->plot_GC, 
-	  	(sp->max.x - rect.width)/2, 5, layout);
-	#if 0
-      /*-- underline it there, too, for consistency --*/
-      gdk_draw_line (drawable, gg->plot_GC,
-        (sp->max.x - rect.width)/2, rect.height + 5 + 1,
-        (sp->max.x - rect.width)/2 + rect.width, 5 + 1);
-	#endif
+      gdk_draw_layout(drawable, gg->plot_GC, 
+	(sp->max.x - rect.width)/2, 5, layout);
     }
-	gdk_draw_layout(drawable, gg->plot_GC, xp, yp, layout);
+    gdk_draw_layout(drawable, gg->plot_GC, xp, yp, layout);
   }
 }
 
