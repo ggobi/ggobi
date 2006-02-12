@@ -245,12 +245,12 @@ identify_label_fetch (gint k, cpaneld *cpanel, datad *d, ggobid *gg)
     } else {
       gint *vars; // = (gint *) g_malloc (d->ncols * sizeof(gint));
       gint nvars;
-	  gint j, lval;
+      gint j, lval;
 
-	  vars = get_selections_from_tree_view (tree_view, &nvars);
+      vars = get_selections_from_tree_view (tree_view, &nvars);
       
       for (j=0; j<nvars; j++) {
-		if (vars[j] < 0) continue;
+	if (vars[j] < 0) continue;
         vt = vartable_element_get (vars[j], d);
         if (vt == NULL) continue;
 
@@ -283,12 +283,12 @@ identify_label_fetch (gint k, cpaneld *cpanel, datad *d, ggobid *gg)
           }
   
           lbl = (vt->vartype == categorical) ?
-		  g_strdup_printf ("%s=%s",
-			vt->collab_tform, vt->level_names[lval]) :
-		  g_strdup_printf ("%s=%g",
-			vt->collab_tform, d->tform.vals[k][vars[j]]);
+		g_strdup_printf ("%s=%s",
+		  vt->collab_tform, vt->level_names[lval]) :
+		g_strdup_printf ("%s=%g",
+		  vt->collab_tform, d->tform.vals[k][vars[j]]);
         }
-		labels = g_list_append(labels, lbl);
+	labels = g_list_append(labels, lbl);
       }
       g_free (vars);
     }
@@ -297,38 +297,38 @@ identify_label_fetch (gint k, cpaneld *cpanel, datad *d, ggobid *gg)
   /* Should check here that d->rowlab is long enough */
   if (id_display_type & ID_RECORD_LABEL) {
     lbl = (gchar *) g_array_index (d->rowlab, gchar *, k);
-	if (id_display_type & ~ID_RECORD_LABEL)
-		lbl = g_strdup_printf("label = %s", lbl);
-	else lbl = g_strdup(lbl);
-	labels = g_list_append(labels, lbl);
+    if (id_display_type & ~ID_RECORD_LABEL)
+      lbl = g_strdup_printf("label = %s", lbl);
+    else lbl = g_strdup(lbl);
+    labels = g_list_append(labels, lbl);
   }
 
   if (id_display_type & ID_RECORD_NO) {
     if (id_display_type & ~ID_RECORD_NO)
-		lbl = g_strdup_printf("num = %d", k);
-	else lbl = g_strdup_printf ("%d", k);
+	lbl = g_strdup_printf("num = %d", k);
+    else lbl = g_strdup_printf ("%d", k);
 	labels = g_list_append(labels, lbl);
   } 
   
   if (id_display_type & ID_RECORD_ID) {
-	if (d->rowIds && d->rowIds[k]) {
-	  if (id_display_type & ~ID_RECORD_ID)
-		  lbl = g_strdup_printf("id = %s", d->rowIds[k]);
+    if (d->rowIds && d->rowIds[k]) {
+      if (id_display_type & ~ID_RECORD_ID)
+	 lbl = g_strdup_printf("id = %s", d->rowIds[k]);
       else lbl = g_strdup_printf ("%s", d->rowIds[k]);
     } else {
       lbl = g_strdup ("");
     }
-	labels = g_list_append(labels, lbl);
+    labels = g_list_append(labels, lbl);
   }
 
   if (lbl) {
-	  lbl = (gchar *)g_list_first(labels)->data;
-	  for (l = labels->next; l; l = l->next) {
-		  gchar *tmp_lbl = g_strdup_printf("%s, %s", lbl, l->data);
-		  g_free(l->data);
-		  g_free(lbl);
-		  lbl = tmp_lbl;
-	  }
+    lbl = (gchar *)g_list_first(labels)->data;
+    for (l = labels->next; l; l = l->next) {
+      gchar *tmp_lbl = g_strdup_printf("%s, %s", lbl, l->data);
+      g_free(l->data);
+      g_free(lbl);
+      lbl = tmp_lbl;
+    }
   }
   
   return lbl;
