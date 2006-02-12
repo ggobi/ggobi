@@ -97,10 +97,18 @@ datad_create(gint nr, gint nc, ggobid *gg)
 
   d->missings_show_p = true;
 
+  ggobi_data_alloc(d);
+
+  return(d);
+}
+
+/* FIXME: eventually this will be internalized - mfl */
+void
+ggobi_data_alloc(datad *d) {
   vectori_init_null (&d->rows_in_plot);
   d->nrows_in_plot = d->nrows;  /*-- for now --*/
 
-  arrayf_alloc(&d->raw, nr, nc);
+  arrayf_alloc(&d->raw, d->nrows, d->ncols);
 
   rowlabels_alloc (d);
 
@@ -108,15 +116,13 @@ datad_create(gint nr, gint nc, ggobid *gg)
   vartable_init (d);
 
   br_glyph_ids_alloc (d);
-  br_glyph_ids_init (d, gg);
+  br_glyph_ids_init (d, d->gg);
 
-  br_color_ids_alloc (d, gg);
-  br_color_ids_init (d, gg);
+  br_color_ids_alloc (d, d->gg);
+  br_color_ids_init (d, d->gg);
 
   br_hidden_alloc (d);
   br_hidden_init (d);
-
-  return(d);
 }
 
 void

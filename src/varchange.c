@@ -89,7 +89,8 @@ addvar_propagate (gint ncols_prev, gint ncols_added, datad *d, ggobid *gg)
   display_menu_build (gg);
 }
 
-
+/* FIXME: all this stuff should be moved into the GGobiData API, so that
+   datad allocation, in particular, is encapsulated. */
 void
 newvar_add_with_values (gdouble *vals, gint nvals, gchar *vname,
  vartyped type,
@@ -102,9 +103,18 @@ newvar_add_with_values (gdouble *vals, gint nvals, gchar *vname,
   gint jvar = d_ncols_prev;
   vartabled *vt;
 
-  if (nvals != d->nrows)
+  if (nvals != d->nrows && d->ncols > 0)
     return;
-
+  
+  d->ncols += 1;
+  if (d->ncols == 1) { // lazily allocate datad
+	  d->nrows = nvals;
+    ggobi_data_alloc(d);
+    pipeline_init (d, d->gg);
+  } else {
+    addvar_pipeline_realloc (d, gg);
+  }
+  
   /* Create a new element in the vartable list iff we need
      to. Otherwise use the one in the current position. */
   if(jvar >= g_slist_length(d->vartable))
@@ -116,12 +126,8 @@ newvar_add_with_values (gdouble *vals, gint nvals, gchar *vname,
       level_values, level_counts);
   transform_values_init (jvar, d, gg);
 
-
-  d->ncols += 1;
-  addvar_pipeline_realloc (d, gg);
-
   for (i=0; i<d->nrows; i++) {
-     if(vals == &AddVarRowNumbers) {
+    if(vals == &AddVarRowNumbers) {
       d->raw.vals[i][jvar] = d->tform.vals[i][jvar] = (gfloat) (i+1);
     } else if(vals == &AddVarBrushGroup) {
       d->raw.vals[i][jvar] = d->tform.vals[i][jvar] = (gfloat) d->clusterid.els[i];

@@ -428,6 +428,7 @@ void
 varpanel_widgets_add (gint nc, datad *d, ggobid *gg) 
 {
   gint j;
+  gint nd = g_slist_length (gg->d);
   gint n = g_slist_length (d->vcbox_ui.box);
 
   /*-- create the variable widgets --*/
@@ -438,9 +439,11 @@ varpanel_widgets_add (gint nc, datad *d, ggobid *gg)
    * If there were no variables before, a tab hasn't been added;
    * add one now.
   */
-  if (n == 0)
+  if (n == 0) {
     gtk_notebook_append_page (GTK_NOTEBOOK (gg->varpanel_ui.notebook),
       d->varpanel_ui.hpane, gtk_label_new (d->name));
+    gtk_notebook_set_show_tabs (GTK_NOTEBOOK (gg->varpanel_ui.notebook),nd > 1);
+  }
 }
 
 /*-------------------------------------------------------------------------*/

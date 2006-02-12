@@ -263,6 +263,8 @@ void ggobi_data_set_double_column(datad *d, gint j, gdouble *values);
 void ggobi_data_set_row_labels(datad *d, gchar **labels);
 void ggobi_data_set_name(datad *d, const gchar *name);
 
+void ggobi_data_alloc(datad *d);
+
 
 #ifdef __cplusplus
 } /* end of extern "C" */

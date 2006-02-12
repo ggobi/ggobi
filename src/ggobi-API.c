@@ -1341,19 +1341,16 @@ addVariableInternal(gdouble *vals, gint num, gchar *name,
 		    gchar **levels, gint *values, gint *counts, gint numLevels,
 		    gboolean update, datad *d, ggobid *gg)
 {
-  if (d->ncols < 1) {
+  /*if (d->ncols < 1) {
     gchar ** rnames = (gchar **) &DefaultRowNames; 
-    /* May want the final false here to be true as it causes the 
-       creation of a plot. Probably not, but just mention it here
-       so we don't forget.
-     */
     GGOBI(setData)(NULL, rnames, &name, num, d->ncols, d, false, gg, NULL, false, d->input); 
     datad_init(d, gg, false);
-  }
+  }*/
 
-    if (num > d->nrows) {
+    if (num > d->nrows && d->ncols > 0) {
       num =  d->nrows;
-      /* Add a warning here. */
+      g_warning("Variable length (%d) exceeds the number of dataset rows (%d)",
+	    num, d->nrows);
     }
     newvar_add_with_values (vals, num, name,
 			    numLevels > 0 ? categorical : real, 

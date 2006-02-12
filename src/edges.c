@@ -167,7 +167,7 @@ datad *setDisplayEdge(displayd * dpy, datad * e)
 {
   GList *l;
   datad *old = NULL;
-g_debug("attaching edgeset");
+
   if(resolveEdgePoints(e, dpy->d)) {
     dpy->e = e;
       /* Now update all displays, not just this one. Events could also be used,
