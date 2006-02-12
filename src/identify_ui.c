@@ -78,29 +78,38 @@ static void
 id_all_sticky_cb (GtkWidget *w, ggobid *gg)
 {
   gint i, m;
-  datad *d;
+  datad *d = NULL;
   displayd *dsp = gg->current_display;
   cpaneld *cpanel = &dsp->cpanel;
 
   if (cpanel->id_target_type == identify_edges) {
-    if (dsp->e != NULL) d = dsp->e;
+    /* Make sure there is an edge set and it is displayed */
+    if (dsp->e != NULL &&
+       (dsp->options.edges_directed_show_p ||
+        dsp->options.edges_undirected_show_p ||
+        dsp->options.edges_arrowheads_show_p))
+    {
+      d = dsp->e;
+    }
   } else d = dsp->d;
-  
-  /*-- clear the list before adding to avoid redundant entries --*/
-  g_slist_free (d->sticky_ids);
-  d->sticky_ids = (GSList *) NULL;
 
-  for (m=0; m<d->nrows_in_plot; m++) {
-    i = d->rows_in_plot.els[m];
-    d->sticky_ids = g_slist_append (d->sticky_ids, GINT_TO_POINTER (i));
+  if (d) {  
+
+    /*-- clear the list before adding to avoid redundant entries --*/
+    g_slist_free (d->sticky_ids);
+    d->sticky_ids = (GSList *) NULL;
+    for (m=0; m<d->nrows_in_plot; m++) {
+      i = d->rows_in_plot.els[m];
+      d->sticky_ids = g_slist_append (d->sticky_ids, GINT_TO_POINTER (i));
+    }
+
+    /* This will become an event on the datad when we move to
+       Gtk objects (soon now!) */
+    g_signal_emit(G_OBJECT(gg),
+      GGobiSignals[STICKY_POINT_ADDED_SIGNAL], 0, -1,
+      (gint) STICKY, d);
+    displays_plot (NULL, QUICK, gg);
   }
-
-  /* This will become an event on the datad when we move to
-     Gtk objects (soon now!) */
-  g_signal_emit(G_OBJECT(gg),
-    GGobiSignals[STICKY_POINT_ADDED_SIGNAL], 0, -1,
-    (gint) STICKY, d);
-  displays_plot (NULL, QUICK, gg);
 }
 
 enum { RECORD_ID_INDEX = -3, RECORD_LABEL_INDEX, RECORD_NUMBER_INDEX };
