@@ -176,12 +176,27 @@ scatterplot_imode_menu_make (GtkAccelGroup *accel_group, GtkSignalFunc func,
 /*                   Setting the display menubar                      */
 /*--------------------------------------------------------------------*/
 
-static void
-edge_options_cb(GtkWidget *w, gpointer opt)
-{
-	displayd *dsp = g_object_get_data(G_OBJECT(w), "display");
-	set_display_option(GTK_CHECK_MENU_ITEM(w)->active, GPOINTER_TO_INT(opt), dsp);
-}
+static const gchar *edge_ui = 
+"<ui>"
+"	<menubar>"
+"		<menu action='Edges'>"
+"			<menu action='Edgesets'/>"
+"		</menu>"
+"	</menubar>"
+"</ui>";
+
+static const gchar *edge_option_ui =
+"<ui>"
+"	<menubar>"
+"		<menu action='Edges'>"
+"			<separator/>"
+"			<menuitem action='ShowUndirectedEdges'/>"
+"			<menuitem action='ShowDirectedEdges'/>"
+"			<menuitem action='ShowArrowheadsOnly'/>"
+"			<menuitem action='HideEdges'/>"
+"		</menu>"
+"	</menubar>"
+"</ui>";
 
 /*
  * This handles the initialization of the edge menu item and menu,
@@ -195,136 +210,101 @@ scatterplot_display_edge_menu_update (displayd *display,
 {
   datad *d = display->d;  /*-- this dataset --*/
   gint nd = g_slist_length (gg->d);
-  datad *e, *onlye;
+  datad *e;
   gint k, ne = 0;
-  GtkWidget *item;
-  GtkWidget *submenu, *anchor;
-  gchar *lbl;
 
   /*-- If this datad has ids, find the number of other datad's with
        edges --*/
-/*
-  If I wanted to verify that they were compatible, how would I
-  do that?  Could I try to resolve them?  Yes, with
-    resolveEdgePoints (e, d)
-  If it returns NULL, there's no match.
-  I just have to decide whether I want to expend the computing time.
-*/
+
   if (d->rowIds) {
     endpointsd *endpoints;
     for (k=0; k<nd; k++) { 
       e = (datad*) g_slist_nth_data (gg->d, k);
-      if (/* e != d && */ e->edge.n > 0) {
+      if (e->edge.n > 0) {
         endpoints = resolveEdgePoints(e, d);
         if (endpoints != NULL) {
           ne++;
-          onlye = e;  /* meaningful if there's only one */
         }
-        /* I don't know whether I need to unresolveEdgePoints afterwards */
       }
     }
   }
 
   /*-- remove any existing submenu --*/
-  if (display->edge_item != NULL && display->edge_menu != NULL) {
-    gtk_menu_item_remove_submenu (GTK_MENU_ITEM (display->edge_item));
-    display->edge_menu = NULL;
+  if (display->edge_merge != -1) {
+	gtk_ui_manager_remove_ui(display->menu_manager, display->edge_merge);
+	if (display->edge_option_merge != -1)
+	  gtk_ui_manager_remove_ui(display->menu_manager, display->edge_option_merge);
     if (ne < 1) {
       /*-- destroy menu item if there are no edge sets --*/
-      gtk_widget_destroy (display->edge_item);
-      display->edge_item = NULL;
-    }
-  } else {
-    /*-- create the edge menu item if there is at least one edge set --*/
-    if (ne > 0) {
-      if (display->edge_item == NULL) {
-        display->edge_item = gtk_menu_item_new_with_mnemonic("_Edges");
-        gtk_menu_shell_insert(GTK_MENU_SHELL(display->menubar), display->edge_item, 1);
-		//submenu_insert (display->edge_item, display->menubar, 1);
-      }
+	  display->edge_merge = display->edge_option_merge = -1;
     }
   }
 
   /*-- then build the new menu if appropriate --*/
   if (ne) {
-    /*-- build the menu --*/
-    display->edge_menu = gtk_menu_new ();
+	GtkAction *action = NULL;
+	GSList *group = NULL;
+	const gchar *tooltip = "Attach this edge dataset";
+	GtkActionGroup *actions = gtk_action_group_new("Edge Datasets");
+	
+	if (display->edgeset_action_group) {
+		gtk_ui_manager_remove_action_group(display->menu_manager, 
+		  display->edgeset_action_group);
+		g_object_unref(G_OBJECT(display->edgeset_action_group));
+	}
+	gtk_ui_manager_insert_action_group(display->menu_manager, actions, -1);
+	display->edgeset_action_group = actions;
+    
+	/*-- build the menu --*/
+    display->edge_merge = gtk_ui_manager_add_ui_from_string(display->menu_manager, 
+	  edge_ui, -1, NULL);
 
+	if (display->e) {
+      gtk_ui_manager_ensure_update(display->menu_manager);
+	  display->edge_option_merge = gtk_ui_manager_add_ui_from_string(
+	 	  display->menu_manager, edge_option_ui, -1, NULL);
+	}
     /*
        When there's only one edge set, indicate that on the menu
        with a single menu item naming the edge set.  Let it behave
        like the other menu items, too, turning on undirected
        edges.  Selecting an edge set is required.
     */
-    if (ne == 1) {
-      lbl = g_strdup_printf ("Select edge set (%s)", onlye->name);
-      item = CreateMenuItem (display->edge_menu, lbl,
-        NULL, NULL, NULL, gg->main_accel_group,
-        G_CALLBACK (edgeset_add_cb), onlye, gg);
-      g_object_set_data(G_OBJECT (item),
-        "display", GINT_TO_POINTER (display));
-      g_free (lbl);
-    }
 
-    /*-- if there's only one edge set, there's no need for this menu --*/
-    else if (ne > 1) {  /*-- add cascading menu --*/
-
-      submenu = gtk_menu_new ();
-      anchor = CreateMenuItem (display->edge_menu,
-       "Select edge set",
-        NULL, NULL, gg->main_menubar, NULL, NULL, NULL, NULL);
-
-      for (k=0; k<nd; k++) { 
+	for (k=0; k<nd; k++) { 
         e = (datad *) g_slist_nth_data (gg->d, k);
-        /* if (e == d) continue; */
         if (e->edge.n > 0) {
-          lbl = datasetName (e, gg);
-          item = CreateMenuItem (submenu, lbl,
-            NULL, NULL, NULL, gg->main_accel_group,
-            G_CALLBACK (edgeset_add_cb), e, gg);
-          g_object_set_data(G_OBJECT (item),
-            "display", GINT_TO_POINTER (display));
+		  gchar *lbl, *path, *name;
+		  if (ne == 1) {
+			lbl = g_strdup_printf ("Attach edge set (%s)", e->name);
+			path = "/menubar/Edges";
+			name = g_strdup ("edges");
+		  } else {
+			lbl = datasetName (e, gg);
+			path = "/menubar/Edges/Edgesets";
+			name = g_strdup_printf ("edgeset_%p", e);
+		  }
+		  if (ne == 1 || !display->e) {
+			action = gtk_action_new(name, lbl, tooltip, NULL);
+		  } else {
+			action = GTK_ACTION(gtk_radio_action_new(name, lbl, tooltip, 
+		      NULL, GPOINTER_TO_INT(e)));
+			gtk_radio_action_set_group(GTK_RADIO_ACTION(action), group);
+		    group = gtk_radio_action_get_group(GTK_RADIO_ACTION(action));
+			if (e == display->e)
+				gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action), true);
+		  }
+		  g_signal_connect(G_OBJECT(action), "activate", 
+		    G_CALLBACK(edgeset_add_cb), e);
+		  gtk_action_group_add_action(actions, action);
+		  g_object_unref(action);
+		  gtk_ui_manager_add_ui(display->menu_manager, display->edge_merge, 
+	  	    path, name, name, GTK_UI_MANAGER_MENUITEM, true);
+		  g_object_set_data(G_OBJECT(action), "display", display);
           g_free (lbl);
+		  g_free (name);
         }
-      }
-
-      gtk_menu_item_set_submenu (GTK_MENU_ITEM (anchor), submenu);
-
-      /* Add a separator */
-      CreateMenuItem (display->edge_menu, NULL, "", "",
-                      NULL, NULL, NULL, NULL, gg);
-    } /*-- end of adding cascading menu --*/
-
-    /*
-     * The edge options are handled like other display options,
-     * and their callback function is display_options_cb.
-     * I may want to change that, but leave it for now.
-    */
-    item = CreateMenuCheck (display->edge_menu,
-      "Show undirected edges",
-      G_CALLBACK(edge_options_cb), GINT_TO_POINTER (DOPT_EDGES_U),
-      display->options.edges_undirected_show_p, gg);
-    gtk_widget_set_name (item, "DISPLAYMENU:edges_u");
-    g_object_set_data(G_OBJECT (item), "display", (gpointer) display);
-
-    item = CreateMenuCheck (display->edge_menu,
-      "Show directed edges (edges and 'arrowheads')",
-      G_CALLBACK(edge_options_cb), GINT_TO_POINTER (DOPT_EDGES_D),
-      display->options.edges_directed_show_p, gg);
-    gtk_widget_set_name (item, "DISPLAYMENU:edges_d");
-    g_object_set_data(G_OBJECT (item), "display", (gpointer) display);
-
-    item = CreateMenuCheck (display->edge_menu,
-      "Show 'arrowheads' only",
-      G_CALLBACK(edge_options_cb), GINT_TO_POINTER (DOPT_EDGES_A),
-      display->options.edges_arrowheads_show_p, gg);
-    gtk_widget_set_name (item, "DISPLAYMENU:edges_a");
-    g_object_set_data(G_OBJECT (item), "display", (gpointer) display);
-
-    gtk_menu_item_set_submenu (GTK_MENU_ITEM (display->edge_item),
-      display->edge_menu);
-	 
-	gtk_widget_show_all(display->edge_item);
+    }
   }
 }
 

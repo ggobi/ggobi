@@ -168,6 +168,7 @@ ruler_ranges_set (gboolean force, displayd *display, splotd *sp, ggobid *gg)
 static const gchar *scatterplot_ui =
 "<ui>"
 "	<menubar>"
+"		<menu action='Edges'/>"
 "		<menu action='Options'>"
 "			<menuitem action='ShowPoints'/>"
 "			<menuitem action='ShowAxes'/>"
@@ -228,7 +229,27 @@ GGOBI(edge_menus_update)(ggobid *gg)
   }
 }
 
+static GtkActionEntry edge_actions[] = {
+	{ "Edges", NULL, "_Edges" },
+	{ "Edgesets", NULL, "_Attach edge set" }
+};
+static GtkRadioActionEntry edge_radio_actions[] = {
+	{ "ShowUndirectedEdges", NULL, "Show _lines only", "<control>L", 
+		"Show edges without arrowheads", DOPT_EDGES_U },
+	{ "ShowDirectedEdges", NULL, "Show lines _with arrowheads", "<control>W",
+		"Show edges with arrowheads", DOPT_EDGES_D },
+	{ "ShowArrowheadsOnly", NULL, "Show arrowheads _only", "<control>O",
+		"Show only the arrowheads, no line", DOPT_EDGES_A },
+	{ "HideEdges", NULL, "_Hide edges", "<control>H", 
+		"Make the edges invisible", DOPT_EDGES_H }
+};
 
+static void
+edge_options_cb(GtkRadioAction *action, GtkRadioAction *current, displayd *dsp)
+{
+	gint active = gtk_radio_action_get_current_value(action);
+	set_display_option(true, active, dsp);
+}
 
 displayd *
 createScatterplot(displayd *display, gboolean missing_p, splotd *sp, gint numVars, gint *vars, datad *d, ggobid *gg)
@@ -260,6 +281,11 @@ createScatterplot(displayd *display, gboolean missing_p, splotd *sp, gint numVar
   vbox = GTK_WIDGET(display); /* gtk_vbox_new (false, 1); */
 
   if(GGOBI_IS_WINDOW_DISPLAY(display) && GGOBI_WINDOW_DISPLAY(display)->useWindow) {
+	GtkActionGroup *actions = gtk_action_group_new("Edge Actions");
+	gtk_action_group_add_actions(actions, edge_actions, G_N_ELEMENTS(edge_actions), NULL);
+	gtk_action_group_add_radio_actions(actions, edge_radio_actions, 
+		G_N_ELEMENTS(edge_radio_actions), DOPT_EDGES_H, G_CALLBACK(edge_options_cb), display);
+	
     display_window_init (GGOBI_WINDOW_DISPLAY(display), WIDTH, HEIGHT, 3, gg);
 
     /*-- Add the main menu bar --*/
@@ -267,8 +293,10 @@ createScatterplot(displayd *display, gboolean missing_p, splotd *sp, gint numVar
     gtk_container_add (GTK_CONTAINER (GGOBI_WINDOW_DISPLAY(display)->window), vbox);
 	
     display->menu_manager = display_menu_manager_create(display);
+	gtk_ui_manager_insert_action_group(display->menu_manager, actions, -1);
+	g_object_unref(actions);
     display->menubar = create_menu_bar(display->menu_manager, scatterplot_ui, 
-	GGOBI_WINDOW_DISPLAY(display)->window);
+	  GGOBI_WINDOW_DISPLAY(display)->window);
 
   /*
    * After creating the menubar, and populating the file menu,

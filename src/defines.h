@@ -59,7 +59,8 @@ enum idtargetd {identify_points, identify_edges};
 #define DOPT_EDGES_U   4
 #define DOPT_EDGES_A   5
 #define DOPT_EDGES_D   6
-#define DOPT_WHISKERS  7
+#define DOPT_EDGES_H   7
+#define DOPT_WHISKERS  8
 /* unused
 #define DOPT_GRIDLINES 5
 #define DOPT_MISSINGS  5

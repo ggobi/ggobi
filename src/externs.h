@@ -283,7 +283,7 @@ void       edges_create (datad *, ggobid *);
 void       edges_free (datad *, ggobid *);
 gboolean   edges_read (InputDescription *desc, gboolean, datad *, ggobid *);
 gboolean   edgeset_add (displayd *);
-void       edgeset_add_cb (GtkWidget *w, datad *e);
+void       edgeset_add_cb (GtkAction *action, datad *e);
 gint       edgesets_count (ggobid *gg);
 void       eigenvals_get (gfloat *, datad *);
 gboolean   exclude_link_by_id (gint k, datad *source_d, ggobid *gg);

@@ -859,17 +859,18 @@ GGOBI(getShowLines)()
  return(GGOBI(getDefaultDisplayOptions)()->edges_undirected_show_p);
 }
 
-
+/* uh.. this takes a boolean value but always shows lines... what's up */
 gboolean GGOBI(setShowLines)(displayd *dsp, gboolean val)
 {
-  GtkWidget *menu_item;
+  GtkAction *action;
   gboolean old = GGOBI(getShowLines)();
   /*GGOBI(getDefaultDisplayOptions)()->edges_undirected_show_p = val;*/
   dsp->options.edges_undirected_show_p = true;
 
-  menu_item = widget_find_by_name (dsp->edge_menu, "DISPLAYMENU:edges_u");
-  if (menu_item)
-    gtk_check_menu_item_set_active ((GtkCheckMenuItem *) menu_item, val);
+  action = gtk_ui_manager_get_action(dsp->menu_manager, 
+    "/menubar/Edges/ShowUndirectedEdges");
+  if (action)
+    gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action), true);
 
   return(old);
 }

@@ -167,7 +167,7 @@ datad *setDisplayEdge(displayd * dpy, datad * e)
 {
   GList *l;
   datad *old = NULL;
-
+g_debug("attaching edgeset");
   if(resolveEdgePoints(e, dpy->d)) {
     dpy->e = e;
       /* Now update all displays, not just this one. Events could also be used,
@@ -226,14 +226,19 @@ gboolean edgeset_add(displayd * display)
  on a scatterplot to control whether edges are displayed or not
  on the plot.
  */
-void edgeset_add_cb(GtkWidget * w, datad * e)
+void edgeset_add_cb(GtkAction *action, datad * e)
 {
-  ggobid *gg = GGobiFromWidget(w, true);
-  displayd *display = (displayd *) g_object_get_data(G_OBJECT(w),
-                                                       "display");
-  setDisplayEdge(display, e);
+  ggobid *gg = e->gg;
+  displayd *display = GGOBI_DISPLAY(g_object_get_data(G_OBJECT(action), 
+    "display"));
 
-  display_plot(display, FULL, gg);   /*- moving edge drawing */
+  if (GTK_IS_TOGGLE_ACTION(action) && !gtk_toggle_action_get_active(GTK_TOGGLE_ACTION(action)))
+	  return;
+	  
+  if (e != display->e) {
+	  setDisplayEdge(display, e);
+	  display_plot(display, FULL, gg);   /*- moving edge drawing */
+  }
 
   /*
    * If no edge option is true, then turn on undirected edges.
@@ -242,11 +247,14 @@ void edgeset_add_cb(GtkWidget * w, datad * e)
       !display->options.edges_directed_show_p &&
       !display->options.edges_arrowheads_show_p)
   {
-    GtkWidget *ww = widget_find_by_name(display->edge_menu,
+	  GtkAction *action = gtk_ui_manager_get_action(display->menu_manager, 
+	  	"/menubar/Edges/ShowUndirectedEdges");
+	  gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action), true);
+    /*GtkWidget *ww = widget_find_by_name(display->edge_menu,
       "DISPLAYMENU:edges_u");
     if (ww) {
       gtk_check_menu_item_set_active((GtkCheckMenuItem *) ww, true);
-    }
+    }*/
   }
 }
 

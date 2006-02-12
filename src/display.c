@@ -102,13 +102,13 @@ display_plot_allbutone (displayd *display, splotd *splot,
 /*----------------------------------------------------------------------*/
 /*           Callbacks common to multiple display types                 */
 /*----------------------------------------------------------------------*/
-
+#if 0
 static void
 display_edges_directed_show (displayd *display, gboolean show)
 {
   GtkWidget *w;
 
-  if(!display->edge_menu) {
+  if(display->edge_merge == -1) {
      /* set_display_options doesn't know whether to call this or not. */
     return;
   }
@@ -117,6 +117,8 @@ display_edges_directed_show (displayd *display, gboolean show)
     "DISPLAYMENU:edges_d");
 
   if (!show && display->options.edges_directed_show_p && w) {
+	GtkAction *action = gtk_ui_manager_get_action(display->menu_manager,
+	  "/menubar/Edges/ShowDirectedEdges");
     gtk_check_menu_item_set_active ((GtkCheckMenuItem *) w, false);
     display->options.edges_directed_show_p = false;
   }
@@ -155,7 +157,7 @@ display_edges_arrowheads_show (displayd *display, gboolean show)
     }
   }
 }
-
+#endif
 /*
 We need to allow people to programmatically change a setting and force
 the update.  The current framework is all based on GUI events and so
@@ -170,9 +172,11 @@ set_display_option(gboolean active, guint action, displayd *display)
   gint ne = 0;
   datad *onlye = NULL;
 
+  g_return_if_fail(GGOBI_IS_DISPLAY(display));
+  
   /*-- count edge sets --*/
   if (action == DOPT_EDGES_U || action == DOPT_EDGES_D ||
-      action == DOPT_EDGES_A)
+      action == DOPT_EDGES_A || action == DOPT_EDGES_H )
   {
     gint k, nd = g_slist_length (gg->d);
     datad *e;
@@ -205,11 +209,14 @@ set_display_option(gboolean active, guint action, displayd *display)
 */
 
       display->options.edges_undirected_show_p = active;
-      if (active) {
-        display_edges_directed_show (display, false);
+      /*if (active) {
+		display_edges_directed_show (display, false);
         display_edges_arrowheads_show (display, false);
-      }
+      }*/
 
+	  display->options.edges_directed_show_p = false;
+	  display->options.edges_arrowheads_show_p = false;
+        
       if (display->e == NULL && ne == 1)
         setDisplayEdge (display, onlye);   /* don't rebuild the menu */
       if (display->e != NULL) {
@@ -225,10 +232,13 @@ set_display_option(gboolean active, guint action, displayd *display)
     case DOPT_EDGES_D:  /*-- directed: both edges and arrowheads --*/
 
       display->options.edges_directed_show_p = active;
-      if (active) {
-        display_edges_undirected_show (display, false);
+      /*if (active) {
+		display_edges_undirected_show (display, false);
         display_edges_arrowheads_show (display, false);
-      }
+      }*/
+	  display->options.edges_undirected_show_p = false;
+      display->options.edges_arrowheads_show_p = false;
+       
 
       if (display->e == NULL && ne == 1)
         setDisplayEdge (display, onlye);   /* don't rebuild the menu */
@@ -244,11 +254,32 @@ set_display_option(gboolean active, guint action, displayd *display)
     break;
     case DOPT_EDGES_A:  /*-- arrowheads only --*/
       display->options.edges_arrowheads_show_p = active;
-      if (active) {
-        display_edges_directed_show (display, false);
+      /*if (active) {
+		display_edges_directed_show (display, false);
         display_edges_undirected_show (display, false);
+      }*/
+	  display->options.edges_directed_show_p = false;
+      display->options.edges_undirected_show_p = false;
+        
+
+      if (display->e == NULL && ne == 1)
+        setDisplayEdge (display, onlye);   /* don't rebuild the menu */
+      if (display->e != NULL) {
+        title = computeTitle (false, gg->current_display, gg);
+        if (title) {
+          gtk_window_set_title (GTK_WINDOW (GGOBI_WINDOW_DISPLAY(display)->window), title);
+          g_free (title); 
+        }
       }
 
+
+      display_plot (display, FULL, gg);
+    break;
+	case DOPT_EDGES_H:  /*-- arrowheads only --*/
+      display->options.edges_arrowheads_show_p = false;
+	  display->options.edges_directed_show_p = false;
+	  display->options.edges_undirected_show_p = false;
+        
       if (display->e == NULL && ne == 1)
         setDisplayEdge (display, onlye);   /* don't rebuild the menu */
       if (display->e != NULL) {
@@ -352,11 +383,12 @@ void
 set_display_options(displayd *display, ggobid *gg)
 {
     int i;
-    gboolean active;
+    gboolean active = true;
     DisplayOptions *options = &display->options;
     for(i = DOPT_POINTS ; i <=  DOPT_WHISKERS; i++) {
-       if (i == DOPT_EDGES_U || i == DOPT_EDGES_D ||  i == DOPT_EDGES_A)
-         if(!display->edge_menu)
+       if (i == DOPT_EDGES_U || i == DOPT_EDGES_D ||  i == DOPT_EDGES_A || 
+		   i == DOPT_EDGES_H)
+         if(display->edge_merge == -1)
    	   continue;
 
          switch(i) {
@@ -954,29 +986,34 @@ display_type_handles_interaction (displayd *display, InteractionMode imode)
 gboolean
 display_copy_edge_options (displayd *dsp, displayd *dspnew)
 {
-  GtkWidget *item;
+  GtkAction *action;
 
   dspnew->options.edges_undirected_show_p =
     dsp->options.edges_undirected_show_p;
-  item = widget_find_by_name (dspnew->edge_menu, "DISPLAYMENU:edges_u");
-  if (item) {
-    gtk_check_menu_item_set_active ((GtkCheckMenuItem *) item,
+  action = gtk_ui_manager_get_action (dspnew->menu_manager, 
+    "/menubar/Edges/ShowUndirectedEdges");
+  if (action) {
+    gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action),
       dspnew->options.edges_undirected_show_p);
   }
 
   dspnew->options.edges_directed_show_p =
     dsp->options.edges_directed_show_p;
-  item = widget_find_by_name (dspnew->edge_menu, "DISPLAYMENU:edges_d");
-  if (item)
-    gtk_check_menu_item_set_active ((GtkCheckMenuItem *) item,
+  action = gtk_ui_manager_get_action (dspnew->menu_manager, 
+    "/menubar/Edges/ShowDirectedEdges");
+  if (action) {
+    gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action),
       dspnew->options.edges_directed_show_p);
+  }
 
   dspnew->options.edges_arrowheads_show_p =
     dsp->options.edges_arrowheads_show_p;
-  item = widget_find_by_name (dspnew->edge_menu, "DISPLAYMENU:edges_a");
-  if (item)
-    gtk_check_menu_item_set_active ((GtkCheckMenuItem *) item,
+  action = gtk_ui_manager_get_action (dspnew->menu_manager, 
+    "/menubar/Edges/ShowArrowheadsOnly");
+  if (action) {
+    gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action),
       dspnew->options.edges_arrowheads_show_p);
+  }
 
   return (dspnew->options.edges_directed_show_p || 
           dspnew->options.edges_undirected_show_p ||

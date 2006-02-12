@@ -64,9 +64,11 @@ struct _displayd {
  GtkWidget *menubar;
  GtkUIManager *menu_manager;
  guint imode_merge_id, pmode_merge_id;
- /*-- for scatterplots, where edge menus need to be rebuilt on the fly --*/
- GtkWidget *edge_item, *edge_menu;
  
+ /*-- for scatterplots, where edge menus need to be rebuilt on the fly --*/
+ guint edge_merge, edge_option_merge;
+ GtkActionGroup *edgeset_action_group;
+
  cpaneld cpanel;
 
  GList *splots;          /*-- doubly linked list of splots --*/
