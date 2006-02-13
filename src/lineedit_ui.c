@@ -240,7 +240,7 @@ add_record_dialog_open (datad *d, datad *e, displayd *dsp, ggobid *gg)
   /*-- ok button --*/
   w = gtk_button_new_from_stock (GTK_STOCK_APPLY);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), w,
-    "Add the point or edge.  To avoid seeing this dialog, use the middle or right button.", NULL);
+    "Add the point or edge.  To avoid seeing this dialog, use the left button.", NULL);
   g_signal_connect (G_OBJECT (w), "clicked",
     G_CALLBACK (add_record_dialog_apply), dsp);
   gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->action_area), w);
@@ -276,13 +276,6 @@ static void add_edges_or_points_cb (GtkToggleButton *button, ggobid *gg)
     splot_cursor_set (GDK_CROSSHAIR, gg->current_splot);
   }
 }
-
-/*
-static void undo_last_cb (GtkToggleButton *button)
-{
-  g_printerr("undo last\n");
-}
-*/
 
 /*--------------------------------------------------------------------*/
 /*          Handling and mouse events in the plot window              */
@@ -415,10 +408,10 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
       }
 
       if (which_button == 1)
+        record_add_defaults (d, e, display, gg);
+      else
         /*-- Open a dialog window to ask for label, rowId, data ... --*/
         add_record_dialog_open (d, e, display, gg);
-      else
-        record_add_defaults (d, e, display, gg);
     }
 
   } else if (cpanel->ee_mode == ADDING_POINTS) {
@@ -435,10 +428,10 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
       gdk_pointer_ungrab (event->time);
     }
     if (which_button == 1)
+      record_add_defaults (d, e, display, gg);
+    else
       /*-- Open a dialog window to ask for label, rowId, data ... --*/
       add_record_dialog_open (d, e, display, gg);
-    else
-      record_add_defaults (d, e, display, gg);
   }
 
   /*-- Release the pointer so the button press can be detected --*/
@@ -495,7 +488,7 @@ cpanel_edgeedit_make (ggobid *gg) {
   GTK_TOGGLE_BUTTON (radio1)->active = true;
 
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), radio1,
-    "Add new edges using the mouse. The left button opens a dialog window; the middle or right button adds an edge using default.", NULL);
+    "Add new edges using the mouse. The right or middle button opens a dialog window; the left button adds an edge using defaults.", NULL);
   g_signal_connect (G_OBJECT (radio1), "toggled",
                       G_CALLBACK (add_edges_or_points_cb), gg);
   gtk_box_pack_start (GTK_BOX (hb), radio1, false, false, 0);
@@ -505,7 +498,7 @@ cpanel_edgeedit_make (ggobid *gg) {
   radio2 = gtk_radio_button_new_with_mnemonic (group, "Add _points");
   gtk_widget_set_name (radio2, "EDGEEDIT:add_points_radio_button");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), radio2,
-    "Add points using the mouse.  The left button opens a dialog window; the middle or right button adds a point using defaults.", NULL);
+    "Add points using the mouse.  The right or button opens a dialog window; the left button adds a point using defaults.", NULL);
   gtk_box_pack_start (GTK_BOX (hb), radio2, false, false, 0);
 
 
