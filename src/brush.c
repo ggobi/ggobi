@@ -604,7 +604,11 @@ update_hidden_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
   */
   if (!changed) {
     if (hit_by_brush[i])
-      doit = (d->hidden_now.els[i] != true);
+      /* This test covers the case where a transient brush has first
+       * covered all the points of interest, and then persistent
+       * brushing has been activated. -- dfs */
+      doit = d->hidden_now.els[i] != true ||
+	(cpanel->br.mode == BR_PERSISTENT && d->hidden.els[i] != true);
     else
       doit = (d->hidden_now.els[i] != d->hidden.els[i]);
   }
@@ -630,6 +634,8 @@ update_hidden_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
   return (doit);
 }
 
+/* This routine named in honor of the Bizarro world of the Superman
+   comics, where everything is backwards. */
 gboolean
 bizarro_update_hidden_vectors (gint i, gboolean changed, 
   gboolean *hit_by_brush, datad *d, ggobid *gg)
@@ -643,7 +649,11 @@ bizarro_update_hidden_vectors (gint i, gboolean changed,
   */
   if (!changed) {
     if (hit_by_brush[i])
-      doit = (d->hidden_now.els[i] == true);
+      /* This test covers the case where a transient brush has first
+       * covered all the points of interest, and then persistent
+       * brushing has been activated. -- dfs */
+      doit = d->hidden_now.els[i] == true ||
+	(cpanel->br.mode == BR_PERSISTENT && d->hidden.els[i] == true);
     else
       doit = (d->hidden_now.els[i] != d->hidden.els[i]);
   }
