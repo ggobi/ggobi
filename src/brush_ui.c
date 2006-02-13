@@ -60,7 +60,6 @@ static void brush_undo_cb(GtkToggleButton * button, ggobid * gg)
       f(d, sp, gg);  // need to exclude area plots
     }
   }
-  //assign_points_to_bins(d, sp, gg);
   clusters_set(d, gg);
   /*-- --*/
 
@@ -101,29 +100,6 @@ static void brush_edge_targets_cb(GtkWidget * w, ggobid *gg)
 
   /* binning not permitted here */
   brush_once_and_redraw (false, gg->current_splot, gg->current_display, gg);
-
-  /*
-   * select brushing is a special case: hide all points
-   * before starting to move the brush.
-  */  /* select brushing has been disabled */
-  /*
-  if (cpanel->br.edge_targets == br_select) {
-    gint i, m;
-    datad *e = gg->current_display->e;
-
-    g_assert (e->hidden.nels == e->nrows);
-
-    if (e) {
-      for (i=0; i<e->nrows_in_plot; i++) {
-        m = e->rows_in_plot.els[i];
-        e->hidden_now.els[m] = e->hidden.els[m] = true;
-      }
-      displays_plot (NULL, FULL, gg);
-    }
-  }
-  */
-
-
 }
 
 void
@@ -382,7 +358,6 @@ button_release_cb(GtkWidget * w, GdkEventButton * event, splotd * sp)
         f(d, sp, gg);  // need to exclude area plots
       }
     }
-    //assign_points_to_bins(d, sp, gg);
     /*-- reset the number and properties of the brush groups --*/
     clusters_set(d, gg);
 

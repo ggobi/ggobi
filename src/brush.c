@@ -554,8 +554,6 @@ update_color_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
   cpaneld *cpanel = &gg->current_display->cpanel;
   gboolean doit = true;
 
-  //g_printerr ("(update_color_vectors) d=%s\n", d->name);
-
 /* setting the value of doit */
   if (!changed) {
     if (hit_by_brush[i])
