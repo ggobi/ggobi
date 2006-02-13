@@ -8,7 +8,7 @@ AppPublisher=ggobi
 AppPublisherURL=http://www.ggobi.org
 AppSupportURL=http://www.ggobi.org
 AppUpdatesURL=http://www.ggobi.org/Download
-DefaultDirName={pf}\ggobi
+DefaultDirName={pf}\ggobi@MAJOR_VERSION@
 DefaultGroupName=ggobi
 AllowNoIcons=yes
 ;AlwaysCreateUninstallIcon=yes
@@ -47,9 +47,6 @@ Source: "@GGOBI_HOME@\plugins\DescribeDisplay\DescribeDisplay.dll"; DestDir: "{a
 ; A utility for setting environment variables, install to tmp dir
 Source: "@GGOBI_HOME@\win32\SetEnv.exe"; DestDir: "{tmp}"
 
-[Run]
-Filename: "{tmp}\SetEnv.exe"; Parameters: "-a Path ""%{app}"""
-
 [Registry]
 Root: HKLM; Subkey: "Software\GGobi"; ValueType: string; ValueName: "Home"; ValueData: "{app}"; Flags: uninsdeletekey
 
@@ -62,12 +59,14 @@ Name: "{group}\GGobi on the Web"; Filename: "{app}\ggobi.url"
 Name: "{userdesktop}\GGobi"; Filename: "{app}\ggobi.exe"; IconFilename: "{app}\ggobi.ico";  Tasks: desktopicon
 
 ; IconFilename: "C:\WINDOWS\WINUPD.ICO";
-Name: "{userdesktop}\ggobi"; Filename: "{app}\ggobi.exe";  MinVersion: 4,4; Tasks: desktopicon; WorkingDir: "{app}\data"; Comment: "GGobi Interactive, Dynamic Visualization Software"; Flags: runminimized ; IconFilename: "{app}\ggobi.ico"
+Name: "{userdesktop}\ggobi"; Filename: "{app}\ggobi.exe";  MinVersion: 4,4; Tasks: desktopicon; WorkingDir: "{app}\data"; Comment: "GGobi Interactive, Dynamic Visualization Software"; IconFilename: "{app}\ggobi.ico"
 
 [Run]
 ; Must put the "" around the data file since otherwise app may get broken into
 ; multiple words such as c:\Program Files\data\flea.xml, counting as two arguments!
-Filename: "{app}\ggobi.exe"; Parameters: """{app}\data\flea.xml"""; Description: "Launch ggobi";
+;Filename: "{app}\ggobi.exe"; Parameters: """{app}\data\flea.xml"""; Description: "Launch ggobi";
+Filename: "{tmp}\SetEnv.exe"; Parameters: "-a Path ""%{app}"""
+Filename: "{tmp}\SetEnv.exe"; Parameters: "-a GGOBI_HOME ""%{app}"""
 
 ; nowait postinstall skipifsilent
 

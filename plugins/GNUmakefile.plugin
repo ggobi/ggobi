@@ -29,6 +29,8 @@ ifndef SHLIB_LDFLAGS
  SHLIB_LDFLAGS=-shared
 endif
 
+PLUGIN_LD_FLAGS+=-s
+
 %.o: %.c
 	$(CC) -c $(PIC_CFLAG) $(PLUGIN_CFLAGS) $(CFLAGS) $(GGOBI_CFLAGS) $<
 
