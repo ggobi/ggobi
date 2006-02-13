@@ -241,12 +241,10 @@ gboolean barchart_build_symbol_vectors (cpaneld *cpanel, datad * d, ggobid * gg)
         changed = update_hidden_vectors (m, changed,
           d->pts_under_brush.els, d, gg);
       break;
-      /* disabled
       case br_unshadow:
-        changed = update_selected_vectors (m, changed,
+        changed = bizarro_update_hidden_vectors (m, changed,
           d->pts_under_brush.els, d, gg);
       break;
-      */
       case br_off:
         ;
       break;
