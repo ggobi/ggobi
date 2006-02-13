@@ -368,18 +368,14 @@ void varlist_populate(GtkListStore *list, datad *d) {
 void
 linkby_current_page_set (displayd *display, GtkWidget *notebook, ggobid *gg)
 {
-  GtkWidget *swin;
+  GtkWidget *swin, *treeview;
   datad *d = display->d, *paged;
   gint page_num, cur_page_num;
   cpaneld *cpanel = &display->cpanel;
+  GList *children;
 
   if (notebook == NULL) {
     return;
-  }
-
-  /* temporary fix to keep gg->linkby_cv in sync with the display */
-  {
-    gg->linkby_cv = (cpanel->br.linkby_row > 0);
   }
 
   /*
@@ -396,6 +392,12 @@ linkby_current_page_set (displayd *display, GtkWidget *notebook, ggobid *gg)
     gtk_widget_set_sensitive (swin, (paged == d));
     if (paged == d) {
       gtk_notebook_set_current_page (GTK_NOTEBOOK(notebook), page_num);
+
+      children = gtk_container_get_children (GTK_CONTAINER (swin));
+      treeview = children->data;
+      /* Set the selected row of the selected page */
+      select_tree_view_row(treeview, cpanel->br.linkby_row);
+      gg->linkby_cv = (cpanel->br.linkby_row > 0);
       break;
     }
     page_num += 1;
@@ -441,68 +443,32 @@ linking_method_set_cb (GtkTreeSelection *treesel, ggobid *gg)
 
 GtkListStore *
 list_from_data(ggobid *gg, datad *data, GtkNotebook *notebook) {
-	GtkWidget *swin;
-	GtkListStore *list = NULL;
+  GtkWidget *swin;
+  GtkListStore *list = NULL;
 	
-	gint kd = g_slist_index(gg->d, data);
-	swin = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), kd);
+  gint kd = g_slist_index(gg->d, data);
+  swin = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), kd);
 	
-	if(swin)
-		list = GTK_LIST_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(GTK_BIN(swin)->child)));
+  if(swin)
+    list = GTK_LIST_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(GTK_BIN(swin)->child)));
 	
-	return(list);
+  return(list);
 }
 
 void 
 linkby_notebook_varchanged_cb (ggobid *gg, datad *data, GtkNotebook *notebook) {
-	GtkListStore *list = list_from_data(gg, data, notebook);
-	gtk_list_store_clear(list);
-	varlist_populate(list, data);
+  GtkListStore *list = list_from_data(gg, data, notebook);
+  gtk_list_store_clear(list);
+  varlist_populate(list, data);
 }
 
 void 
 linkby_notebook_varadded_cb (ggobid *gg, vartabled *vt, gint which,
   datad *data, GtkNotebook *notebook)
 {
-	GtkListStore *model = list_from_data(gg, data, notebook);
-	if (model)
-		varlist_append(model, vt);
-	
-	#if 0
-
-  /*-- add one or more variables to this datad --*/
-  datad *d = (datad *) datad_get_from_notebook (GTK_WIDGET(notebook), gg);
-  gint kd = g_slist_index (gg->d, d);
-
-  /*-- get the clist associated with this data; clear and rebuild --*/
-  swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK (GTK_WIDGET(notebook)), kd);
-  if (swin) {
-    gint j, k;
-    gchar *row[1];
-    vartabled *vt;
-    clist = GTK_BIN (swin)->child;
-
-    gtk_clist_freeze (GTK_CLIST(clist));
-    gtk_clist_clear (GTK_CLIST (clist));
-
-    /* Insert this string */
-    row[0] = g_strdup_printf ("Link by case id");
-    gtk_clist_append (GTK_CLIST (clist), row);
-
-    k = 1;
-    for (j=0; j<d->ncols; j++) {
-      vt = vartable_element_get (j, d);
-      if (vt && vt->vartype == categorical) {
-        row[0] = g_strdup_printf ("Link by %s", vt->collab);
-        gtk_clist_append (GTK_CLIST (clist), row);
-        gtk_clist_set_row_data(GTK_CLIST(clist), k, GINT_TO_POINTER(j));
-        g_free (row[0]);
-        k++;
-      }
-    }
-    gtk_clist_thaw (GTK_CLIST(clist));
-  }
-  #endif
+  GtkListStore *model = list_from_data(gg, data, notebook);
+  if (model)
+    varlist_append(model, vt);
 }
 
 void 
@@ -536,7 +502,8 @@ linkby_notebook_subwindow_add (datad *d, GtkWidget *notebook, ggobid *gg)
 
   /* Create a scrolled window to pack the CList widget into */
   swin = gtk_scrolled_window_new (NULL, NULL);
-  gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (swin), GTK_SHADOW_NONE);
+  gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (swin), 
+    GTK_SHADOW_NONE);
   
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (swin),
     GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
@@ -558,7 +525,6 @@ linkby_notebook_subwindow_add (datad *d, GtkWidget *notebook, ggobid *gg)
     (d->nickname != NULL) ?
       gtk_label_new (d->nickname) : gtk_label_new (d->name)); 
 
-  
   /* add the treeview (list) */
   list = gtk_list_store_new(LINKBYLIST_NCOLS, G_TYPE_STRING, G_TYPE_POINTER);
   varlist_populate(list, d);

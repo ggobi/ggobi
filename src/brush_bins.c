@@ -56,9 +56,8 @@ assign_points_to_bins (datad *d, splotd *sp, ggobid *gg)
               sizeof (gulong));
         }
         /*
-         * brush.binarray contains the
-         * index of rows_in_plot[] rather than the contents, so
-         * here the assignment is k rather than i
+         * brush.binarray contains the index of rows_in_plot[] rather
+         * than the contents, so the assignment is k rather than i
         */
         d->brush.binarray[ih][iv].els[d->brush.binarray[ih][iv].nels] =
           (gulong) k;

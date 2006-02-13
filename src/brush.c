@@ -713,9 +713,11 @@ build_symbol_vectors (cpaneld *cpanel, datad *d, ggobid *gg)
 
   if (GGOBI_IS_EXTENDED_DISPLAY(display)) {
     f = GGOBI_EXTENDED_DISPLAY_GET_CLASS(display)->build_symbol_vectors; 
-    if(f)
+    if(f) {
       changed = f(cpanel, d, gg);
+    }
   }
+
 
 /*
  * None of the following code makes any sense for the barchart...
@@ -796,11 +798,13 @@ active_paint_points (splotd *sp, datad *d, ggobid *gg)
 
   if (GGOBI_IS_EXTENDED_SPLOT(sp)) {
     f = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp)->active_paint_points;
-    if(f)
+    if(f) {
        d->npts_under_brush = f(sp, d, gg);
+    }
   }
 
   if (!f) {
+
     /* Zero out pts_under_brush[] before looping */
     d->npts_under_brush = 0;
     for (j=0; j<d->nrows_in_plot; j++)
@@ -827,6 +831,7 @@ active_paint_points (splotd *sp, datad *d, ggobid *gg)
           }
           if (splot_plot_case (pt, d, sp, display, gg)) {
             if (under_brush (pt, sp)) {
+              if (pt < 100)
               d->npts_under_brush++ ;
               d->pts_under_brush.els[pt] = 1;
             }
