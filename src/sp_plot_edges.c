@@ -450,8 +450,7 @@ splot_add_edgeedit_cues (splotd *sp, GdkDrawable *drawable,
       k != -1 &&
       k != gg->edgeedit.a) {
 
-      lwidth = lwidth_from_gsize(k);
-      //lwidth = (size<3) ? 0 : (size-2)*2;
+      lwidth = lwidth_from_gsize(size);  // Not sure gsize is relevant.
       gdk_gc_set_line_attributes (gg->plot_GC, lwidth,
         GDK_LINE_SOLID, GDK_CAP_BUTT, GDK_JOIN_ROUND);
 
