@@ -23,6 +23,9 @@
 #include "vars.h"
 #include "externs.h"
 
+static gchar * tip_edges = "Click and drag between\npoints to add edges.\nRight-click and drag\nfor more options.";
+static gchar * tip_points = "Click to add points.\nRight-click for more\noptions.";
+
 /*--------------------------------------------------------------------*/
 /*                 Dialog for adding records                          */
 /*--------------------------------------------------------------------*/
@@ -266,14 +269,20 @@ static void add_edges_or_points_cb (GtkToggleButton *button, ggobid *gg)
 {
   displayd *display = gg->current_display;
   cpaneld *cpanel = &display->cpanel;
+  GtkWidget *panel = mode_panel_get_by_name(GGOBI(getIModeName)(EDGEED), gg);
+  GtkWidget *w;
+
+  w = widget_find_by_name (panel, "EDGEEDIT:tip_label");
 
   if (button->active) {
     cpanel->ee_mode = ADDING_EDGES;
     splot_cursor_set ((gint)NULL, gg->current_splot);
+    gtk_label_set_text(GTK_LABEL(w), tip_edges);
   }
   else {
     cpanel->ee_mode = ADDING_POINTS;
     splot_cursor_set (GDK_CROSSHAIR, gg->current_splot);
+    gtk_label_set_text(GTK_LABEL(w), tip_points);
   }
 }
 
@@ -469,8 +478,10 @@ edgeedit_event_handlers_toggle (splotd *sp, gboolean state) {
 void
 cpanel_edgeedit_make (ggobid *gg) {
   modepaneld *panel;
-  GtkWidget *hb, *radio1, *radio2;
+  GtkWidget *vb, *radio1, *radio2, *w;
   GSList *group;
+  // This should be in an init routine
+  gboolean adding_edges = true;
   
   panel = (modepaneld *) g_malloc(sizeof(modepaneld));
   gg->control_panels = g_list_append(gg->control_panels, (gpointer) panel);
@@ -479,19 +490,20 @@ cpanel_edgeedit_make (ggobid *gg) {
   gtk_container_set_border_width (GTK_CONTAINER (panel->w), 5);
 
  /*-- Radio group in a box: add edges or points buttons --*/
-  hb = gtk_vbox_new (true, 1);
-  gtk_container_set_border_width (GTK_CONTAINER (hb), 3);
-  gtk_box_pack_start (GTK_BOX (panel->w), hb, false, false, 0);
+  vb = gtk_vbox_new (false, 1);
+  gtk_container_set_border_width (GTK_CONTAINER (vb), 3);
+  gtk_box_pack_start (GTK_BOX (panel->w), vb, false, false, 0);
 
   radio1 = gtk_radio_button_new_with_mnemonic (NULL, "Add _edges");
   gtk_widget_set_name (radio1, "EDGEEDIT:add_edges_radio_button");
-  GTK_TOGGLE_BUTTON (radio1)->active = true;
+  if (adding_edges)
+    GTK_TOGGLE_BUTTON (radio1)->active = true;
 
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), radio1,
     "Add new edges using the mouse. The right or middle button opens a dialog window; the left button adds an edge using defaults.", NULL);
   g_signal_connect (G_OBJECT (radio1), "toggled",
                       G_CALLBACK (add_edges_or_points_cb), gg);
-  gtk_box_pack_start (GTK_BOX (hb), radio1, false, false, 0);
+  gtk_box_pack_start (GTK_BOX (vb), radio1, false, false, 0);
 
   group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (radio1));
 
@@ -499,9 +511,13 @@ cpanel_edgeedit_make (ggobid *gg) {
   gtk_widget_set_name (radio2, "EDGEEDIT:add_points_radio_button");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), radio2,
     "Add points using the mouse.  The right or button opens a dialog window; the left button adds a point using defaults.", NULL);
-  gtk_box_pack_start (GTK_BOX (hb), radio2, false, false, 0);
+  gtk_box_pack_start (GTK_BOX (vb), radio2, false, false, 0);
 
-
+  w = gtk_label_new(tip_edges);
+  gtk_label_set_line_wrap(GTK_LABEL(w), true);
+  gtk_box_pack_start (GTK_BOX (vb), w, false, false, 0);
+  gtk_widget_set_name (w, "EDGEEDIT:tip_label");
+    
   /*-- Undo --*/
   /*   not implemented
   btn = gtk_button_new_with_label ("Undo");
@@ -531,13 +547,17 @@ cpanel_edgeedit_set (displayd *display, cpaneld *cpanel, ggobid *gg) {
   GtkWidget *w;
   GtkWidget *panel = mode_panel_get_by_name(GGOBI(getIModeName)(EDGEED), gg);
 
+  GtkWidget *lbl = widget_find_by_name (panel, "EDGEEDIT:tip_label");
+
   /*-- set the Drag or Click radio buttons --*/
   if (cpanel->ee_mode == ADDING_EDGES) {
     w = widget_find_by_name (panel, "EDGEEDIT:add_edges_radio_button");
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(w), true);
+    gtk_label_set_text(GTK_LABEL(lbl), tip_edges);
   } else {
     w = widget_find_by_name (panel, "EDGEEDIT:add_points_radio_button");
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(w), true);
+    gtk_label_set_text(GTK_LABEL(lbl), tip_points);
   }
 }
 
