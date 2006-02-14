@@ -39,13 +39,11 @@ gboolean record_add (eeMode mode, gint a, gint b, gchar *lbl, gchar *id,
 
   /*-- eventually check whether a->b already exists before adding --*/
   if (mode == ADDING_EDGES) {
-
     g_assert (e->edge.n == e->nrows);
     g_assert (a >= 0 && b >= 0 && a != b);
-
     dtarget = e;
   }
-
+    
   /*-- Make sure the id is unique -- usually only if adding points --*/
   if (dtarget->idTable && id) {
     gchar *stmp;
@@ -96,19 +94,19 @@ gboolean record_add (eeMode mode, gint a, gint b, gchar *lbl, gchar *id,
           */
 	  {
             if (d->vartable_tree_view[categorical] != NULL) {
-				GtkTreeIter iter;
-				GtkTreeModel *model;
-				GtkTreePath *path;
+	      GtkTreeIter iter;
+	      GtkTreeModel *model;
+	      GtkTreePath *path;
 				
-				vartable_iter_from_varno(j, d, &model, &iter);
-				path = gtk_tree_model_get_path(model, &iter);
-				gtk_tree_path_append_index(path, level);
-				gtk_tree_model_get_iter(model, &iter, path);
-				gtk_tree_path_free(path);
-				gtk_list_store_set(GTK_LIST_STORE(model), &iter, VT_LEVEL_COUNT,
-			  		vt->level_counts[level], -1);
-			}
-      }
+	      vartable_iter_from_varno(j, d, &model, &iter);
+	      path = gtk_tree_model_get_path(model, &iter);
+	      gtk_tree_path_append_index(path, level);
+	      gtk_tree_model_get_iter(model, &iter, path);
+	      gtk_tree_path_free(path);
+	      gtk_list_store_set(GTK_LIST_STORE(model), &iter, VT_LEVEL_COUNT,
+  		vt->level_counts[level], -1);
+	    }
+          }
         } else raw[j] = x;
       }
     }
@@ -151,7 +149,11 @@ gboolean record_add (eeMode mode, gint a, gint b, gchar *lbl, gchar *id,
   /*-- this is adding the brushing color when it should use the color
     of the points, really --*/
   br_color_ids_add (dtarget, gg);
-  dtarget->color.els[dtarget->nrows-1] = dtarget->color_now.els[dtarget->nrows-1]= d->color.els[a];
+  /* A default color was assigned during the reallocation; override it
+   * only if adding edges */
+  if (mode == ADDING_EDGES) {
+    dtarget->color.els[dtarget->nrows-1] = dtarget->color_now.els[dtarget->nrows-1]= d->color.els[a];
+  }
   br_hidden_alloc (dtarget);
   vectorb_realloc (&dtarget->pts_under_brush, dtarget->nrows);
   clusters_set (dtarget, gg);
