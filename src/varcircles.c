@@ -200,8 +200,11 @@ varcircles_delete_nth (gint jvar, datad *d)
 
   w = (GtkWidget *) g_slist_nth_data (d->vcirc_ui.vb, jvar);
   if (w != NULL) {
+    if (w->parent) {  // If it has been packed, unpack it.
+      g_object_ref(G_OBJECT(w)); // so it isn't destroyed when removed
+      gtk_container_remove (GTK_CONTAINER (d->vcirc_ui.table), w);
+    }
     d->vcirc_ui.vb = g_slist_remove (d->vcirc_ui.vb, (gpointer) w);
-    gtk_container_remove (GTK_CONTAINER (d->vcirc_ui.table), w);
   }
 }
 
@@ -567,6 +570,7 @@ varcircle_create (gint j, datad *d, ggobid *gg)
   d->vcirc_ui.vb = g_slist_append (d->vcirc_ui.vb, vb);
   gtk_container_set_border_width (GTK_CONTAINER (vb), 1);
 
+
   /*-- a drawing area to contain the variable circle --*/
   da = gtk_drawing_area_new ();
   gtk_widget_set_double_buffered(da, false);
@@ -783,7 +787,7 @@ varcircles_add (gint nc, datad *d, ggobid *gg)
   /*-- create the variable circles --*/
   for (j=n; j<nc; j++) {
     vb = varcircle_create (j, d, gg);
-    /*varcircle_pack (vb, d);*/
+    /* varcircle_pack (vb, d); */
   }
 
   gtk_widget_show_all (gg->varpanel_ui.notebook);

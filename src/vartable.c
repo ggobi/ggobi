@@ -53,7 +53,14 @@ array_contains (gint* arr, gint n, gint el)
 vartabled *
 vartable_element_get (gint j, datad *d)
 {
-  return ((vartabled *) g_slist_nth_data (d->vartable, j));
+  vartabled *vt = (vartabled *) NULL;
+
+  if (j < 0 || j >= d->ncols)
+    g_printerr ("(vartable_element_get) illegal variable number %d\n", j);
+  else
+    vt = (vartabled *) g_slist_nth_data (d->vartable, j);
+
+  return (vt);
 }
 gint
 vartable_index_get_by_name (gchar *collab, datad *d)

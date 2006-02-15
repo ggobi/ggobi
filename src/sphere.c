@@ -22,7 +22,6 @@
 #include "externs.h"
 
 
-
 /*-------------------------------------------------------------------------*/
 /*      dynamic memory allocation routines                                 */
 /*-------------------------------------------------------------------------*/
@@ -39,7 +38,7 @@ sphere_init (datad *d) {
   vectorf_init_null (&d->sphere.tform_mean);
   vectorf_init_null (&d->sphere.tform_stddev);
 
-	d->sphere.vars_stdized = TRUE;
+  d->sphere.vars_stdized = TRUE;
 }
 
 void
@@ -86,7 +85,6 @@ variable_set_label (datad *d, gint j, gchar *lbl)
   vt->collab = g_strdup (lbl);
   vt->collab_tform = g_strdup (lbl);
   vartable_collab_set_by_var (j, d);
-  /*varlabel_set (j, d);*/         /*-- checkboxes --*/
   varpanel_label_set (j, d);   /*-- checkboxes --*/
   varcircle_label_set (j, d);  /*-- variable circles --*/
 }
@@ -117,12 +115,6 @@ spherize_set_pcvars (datad *d, ggobid *gg)
   GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(tree_view));
   GtkTreeIter iter;
   /*-- --*/
-
-/*
-g_printerr ("pcvars.nels %d sphere->npcs %d\n",
-d->sphere.pcvars.nels, d->sphere.npcs);
-g_printerr ("npcs=%d\n", d->sphere.npcs);
-*/
 
   if (d->sphere.npcs == 0)
     return false;
@@ -231,10 +223,8 @@ g_printerr ("npcs=%d\n", d->sphere.npcs);
     /*-- add the new labels to the 'sphered variables' tree view --*/
     for (j=0; j<d->sphere.vars_sphered.nels; j++) {
       vt = vartable_element_get (d->sphere.vars_sphered.els[j], d);
-      //row[0] = g_strdup (vt->collab);
-	  gtk_list_store_append(GTK_LIST_STORE(model), &iter);
-	  gtk_list_store_set(GTK_LIST_STORE(model), &iter, 0, vt->collab, -1);
-      //g_free (row[0]);
+      gtk_list_store_append(GTK_LIST_STORE(model), &iter);
+      gtk_list_store_set(GTK_LIST_STORE(model), &iter, 0, vt->collab, -1);
     }
   }
 

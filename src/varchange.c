@@ -157,7 +157,7 @@ newvar_add_with_values (gdouble *vals, gint nvals, gchar *vname,
 */
   /*-- emit variable_added signal --*/
   g_signal_emit (G_OBJECT (gg),
-    GGobiSignals[VARIABLE_ADDED_SIGNAL], 0, vt, d->ncols -1, d); 
+    GGobiSignals[VARIABLE_ADDED_SIGNAL], 0, vt, d->ncols-1, d); 
 }
 
 void
@@ -200,7 +200,7 @@ clone_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
 
     /*-- emit variable_added signal. Is n the correct index? --*/
     g_signal_emit (G_OBJECT (gg),
-                     GGobiSignals[VARIABLE_ADDED_SIGNAL], 0, vt, n, d); 
+      GGobiSignals[VARIABLE_ADDED_SIGNAL], 0, vt, n, d); 
   }
 
   /*
@@ -274,33 +274,52 @@ delete_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
     quick_message (message, false);
     g_free (message);
 
-	return false;
+    return false;
   }
+
 
   keepers = g_malloc ((d->ncols-ncols) * sizeof (gint));
   nkeepers = find_keepers (d->ncols, ncols, cols, keepers);
   if (nkeepers == -1) {
     g_free (keepers);
-	return false;
+    return false;
   }
 
-  for (j=0; j<ncols; j++) {
-    vartable_element_remove (cols[j], d);
-    vt = vartable_element_get (cols[j], d);
-  }
 
+  /* Help, I think this deletes the keepers intead of the elements to
+     be removed -- dfs 2006/2/15 */
+#if 0
   /*-- delete rows from tree model; no copying is called for --*/
   if (d->vartable_tree_view[real] != NULL) {
-	  for (j = 0; j < nkeepers; j++) {
-		  GtkTreeModel *model;
-		  GtkTreeIter iter;
-		  GtkTreePath *path = gtk_tree_path_new_from_indices(keepers[j], -1);
-		  vt = vartable_element_get(keepers[j], d);
-		  model = gtk_tree_view_get_model(GTK_TREE_VIEW(d->vartable_tree_view[vt->vartype]));
-		  gtk_tree_model_get_iter(model, &iter, path);
-		  gtk_list_store_remove(GTK_LIST_STORE(model), &iter);
-		  gtk_tree_path_free(path);
-	  }
+    for (j = 0; j < nkeepers; j++) {
+	GtkTreeModel *model;
+	GtkTreeIter iter;
+	GtkTreePath *path = gtk_tree_path_new_from_indices(keepers[j], -1);
+	vt = vartable_element_get(keepers[j], d);
+	model = gtk_tree_view_get_model(GTK_TREE_VIEW(d->vartable_tree_view[vt->vartype]));
+	gtk_tree_model_get_iter(model, &iter, path);
+	gtk_list_store_remove(GTK_LIST_STORE(model), &iter);
+	gtk_tree_path_free(path);
+    }
+  }
+#endif
+  // Try this instead:
+  if (d->vartable_tree_view[real] != NULL) {
+    for (j = 0; j < ncols; j++) {
+	GtkTreeModel *model;
+	GtkTreeIter iter;
+	GtkTreePath *path = gtk_tree_path_new_from_indices(cols[j], -1);
+	vt = vartable_element_get(cols[j], d);
+	model = gtk_tree_view_get_model(GTK_TREE_VIEW(d->vartable_tree_view[vt->vartype]));
+	gtk_tree_model_get_iter(model, &iter, path);
+	gtk_list_store_remove(GTK_LIST_STORE(model), &iter);
+	gtk_tree_path_free(path);
+    }
+  }
+
+  // And doesn't this have to follow the changes to the model?
+  for (j=0; j<ncols; j++) {
+    vartable_element_remove (cols[j], d);
   }
 
   /*-- delete columns from pipeline arrays --*/
@@ -317,9 +336,9 @@ delete_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
   /*-- reallocate the rest of the arrays --*/
   arrayg_alloc (&d->world, d->nrows, nkeepers);
 
-  /*-- delete checkboxes --*/
+
+  /*-- delete checkboxes --*/ 
   for (j=ncols-1; j>=0; j--) {
-    /*checkbox_delete_nth (cols[j], d);*/
     varpanel_delete_nth (cols[j], d);
   }
 
@@ -332,12 +351,14 @@ delete_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
 
   /*-- emit a single variable_list_changed signal when finished --*/
   /*-- doesn't need to give a variable index any more, really --*/
-  vt = vartable_element_get (cols[d->ncols-1], d);
   g_signal_emit (G_OBJECT (gg),
-                   GGobiSignals[VARIABLE_LIST_CHANGED_SIGNAL], 0, d); 
+                 GGobiSignals[VARIABLE_LIST_CHANGED_SIGNAL], 0, d); 
 
   /*-- run the first part of the pipeline  --*/
   tform_to_world (d, gg);
+
+
+  g_free(keepers);
 
   return true;
 }
