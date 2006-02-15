@@ -23,17 +23,23 @@
 #include "vars.h"
 #include "externs.h"
 
-/*static void display_cb (GtkWidget *w, ggobid *gg)
-{
-  cpaneld *cpanel = &gg->current_display->cpanel;
-  cpanel->id_display_type = gtk_combo_box_get_active(GTK_COMBO_BOX(w));
-  displays_plot (NULL, QUICK, gg);
-}*/
 
 static void identify_target_cb (GtkWidget *w, ggobid *gg)
 {
-  cpaneld *cpanel = &gg->current_display->cpanel;
+  displayd *display = gg->current_display;
+  cpaneld *cpanel = &display->cpanel;
+  gboolean edges_displayed = (display->e != NULL &&
+       (display->options.edges_directed_show_p ||
+        display->options.edges_undirected_show_p ||
+        display->options.edges_arrowheads_show_p));
+
   cpanel->id_target_type = (enum idtargetd) gtk_combo_box_get_active(GTK_COMBO_BOX(w));
+
+  if (!edges_displayed && cpanel->id_target_type == identify_edges) {
+    quick_message("Sorry, need to display edges before labeling them.", false);
+    gtk_combo_box_set_active (GTK_COMBO_BOX(w), (gint) identify_points);
+  }
+
   displays_plot (NULL, QUICK, gg);
 }
 
