@@ -21,6 +21,11 @@
 #include "vars.h"
 #include "externs.h"
 
+static void tf0_opt_menu_set_value(vartabled *vt, ggobid *gg);
+static void tf1_opt_menu_set_value(vartabled *vt, ggobid *gg);
+static void tf2_opt_menu_set_value(vartabled *vt, ggobid *gg);
+
+
 /*-- called when closed from the close button --*/
 static void close_btn_cb (GtkWidget *w, ggobid *gg) {
   gtk_widget_hide (gg->tform_ui.window);
@@ -181,6 +186,67 @@ static void tform_reset_cb (GtkWidget *w, ggobid *gg)
 }
 
 void
+tfvar_selection_made_cb (GtkTreeSelection *tree_sel, ggobid *gg)
+{
+#if 0
+  gboolean rval = false;
+  GtkTreeView *tree_view = gtk_tree_selection_get_tree_view(tree_sel);
+  datad *d = (datad *) g_object_get_data(G_OBJECT (tree_view), "datad");
+  GtkWidget *btn;
+  gint j, nvars, *rows;  // allocated in function
+
+  /* Parameters of transformation */
+  vartabled *vt0, *vtnew;
+  gint tform0;
+  gfloat domain_incr;  /*-- stage 0 --*/
+  gfloat (*domain_adj) (gfloat x, gfloat incr);
+  gfloat (*inv_domain_adj) (gfloat x, gfloat incr);
+  gint tform1;
+  gfloat param;
+  gint tform2;
+
+
+  if (!d)
+    return;
+
+  rows = get_selections_from_tree_view(GTK_WIDGET(tree_view), &nvars);
+  if (nvars < 0)
+    return;
+
+  vtnew = (vartabled *) g_malloc(sizeof(vartabled));
+  vt0 = vartable_element_get (0, d);
+  vt_copy (vt0, vtnew);
+
+  /* If there's only one selected variable, we're ready to reset the
+   * variable selection panel.  If there are more, we have to find out
+   * if all the selected variables share the same transformation.
+   */
+  if (nvars > 1) {
+    gboolean same = true;
+    for (j=1; j<nvars; j++) {
+      same = same && transform_values_compare(0, j, d);
+      if (!same) 
+        break;
+    }
+    /* If they aren't all the same, use the default values */
+    if (!same) {
+      vt_init(vtnew);
+    }
+  }
+
+  /* This causes an endless loop, somehow -- resetting the widgets
+   * calls transform(), and why that calls this over agai, I don't know. */
+  /* Reset the widgets on the panel */
+  tf0_opt_menu_set_value(vtnew, gg);
+  tf1_opt_menu_set_value(vtnew, gg);
+  tf2_opt_menu_set_value(vtnew, gg);
+
+  g_free(rows);
+  g_free (vtnew);
+#endif
+}
+
+void
 transform_window_open (ggobid *gg) 
 {
   GtkWidget *vbox, *frame, *notebook, *hb, *vb, *btn;
@@ -212,7 +278,7 @@ transform_window_open (ggobid *gg)
     /* Create a notebook, set the position of the tabs */
     notebook = create_variable_notebook (vbox,
       GTK_SELECTION_MULTIPLE, all_vartypes, all_datatypes,
-      G_CALLBACK(NULL), NULL, gg);
+      G_CALLBACK(tfvar_selection_made_cb), NULL, gg);
 
     /*
      * Stage 0: Domain adjustment
@@ -359,36 +425,56 @@ transform_window_open (ggobid *gg)
  * They're used when the transformations are set from somewhere
  * other than those option menus, such as the reset button.
 */
+static void  // These are combo boxes now, and should use MVC.
+tf0_opt_menu_set_value(vartabled *vt, ggobid *gg)
+{
+  GtkWidget *opt;
+  opt = widget_find_by_name (gg->tform_ui.window,
+                             "TRANSFORM:stage0_option_menu");
+  if (opt != NULL) {
+    gtk_combo_box_set_active (GTK_COMBO_BOX (opt), vt->tform0);
+  }
+}
 void
 transform0_opt_menu_set_value (gint j, datad *d, ggobid *gg)
 {
-  GtkWidget *stage0_option_menu;
   vartabled *vt = vartable_element_get (j, d);
-
-  stage0_option_menu = widget_find_by_name (gg->tform_ui.window,
-                                            "TRANSFORM:stage0_option_menu");
-  gtk_combo_box_set_active (GTK_COMBO_BOX (stage0_option_menu),
-    vt->tform0);
+  if (vt != NULL)
+    tf0_opt_menu_set_value(vt, gg);
+}
+/*-------------------------------------------------------------------*/
+static void
+tf1_opt_menu_set_value(vartabled *vt, ggobid *gg)
+{
+  GtkWidget *opt;
+  opt = widget_find_by_name (gg->tform_ui.window,
+                             "TRANSFORM:stage1_option_menu");
+  if (opt) {
+    //g_printerr ("tf1: resetting to %d\n", vt->tform1);
+    gtk_combo_box_set_active (GTK_COMBO_BOX (opt), vt->tform1);
+  }
 }
 void
 transform1_opt_menu_set_value (gint j, datad *d, ggobid *gg)
 {
-  GtkWidget *stage1_option_menu;
   vartabled *vt = vartable_element_get (j, d);
-
-  stage1_option_menu = widget_find_by_name (gg->tform_ui.window,
-                                            "TRANSFORM:stage1_option_menu");
-  gtk_combo_box_set_active (GTK_COMBO_BOX (stage1_option_menu),
-    vt->tform1);
+  if (vt != NULL)
+    tf1_opt_menu_set_value(vt, gg);
+}
+/*-------------------------------------------------------------------*/
+static void
+tf2_opt_menu_set_value(vartabled *vt, ggobid *gg)
+{
+  GtkWidget *opt;
+  opt = widget_find_by_name (gg->tform_ui.window,
+                             "TRANSFORM:stage2_option_menu");
+  if (opt != NULL)
+    gtk_combo_box_set_active (GTK_COMBO_BOX (opt), vt->tform2);
 }
 void
 transform2_opt_menu_set_value (gint j, datad *d, ggobid *gg)
 {
-  GtkWidget *stage2_option_menu;
   vartabled *vt = vartable_element_get (j, d);
-
-  stage2_option_menu = widget_find_by_name (gg->tform_ui.window,
-                                            "TRANSFORM:stage2_option_menu");
-  gtk_combo_box_set_active (GTK_COMBO_BOX (stage2_option_menu),
-    vt->tform2);
+  if (vt != NULL)
+    tf2_opt_menu_set_value(vt, gg);
 }

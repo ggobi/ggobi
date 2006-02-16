@@ -141,9 +141,8 @@ qnorm (gdouble pr)
 }
 
 void
-transform_values_init (gint j, datad *d, ggobid *gg) 
+vt_init(vartabled *vt)
 {
-  vartabled *vt = vartable_element_get (j, d);
   vt->tform0 = NO_TFORM0;
   vt->tform1 = NO_TFORM1;
   vt->tform2 = NO_TFORM2;
@@ -153,17 +152,46 @@ transform_values_init (gint j, datad *d, ggobid *gg)
   vt->inv_domain_adj = no_change;
 }
 void
-transform_values_copy (gint jfrom, gint jto, datad *d) 
+transform_values_init (gint j, datad *d, ggobid *gg) 
 {
-  vartabled *vtf = vartable_element_get (jfrom, d);
-  vartabled *vtt = vartable_element_get (jto, d);
+  vartabled *vt = vartable_element_get (j, d);
+  vt_init(vt);
+}
 
+void
+vt_copy(vartabled *vtf, vartabled *vtt)
+{
   vtt->tform1 = vtf->tform1;
   vtt->tform2 = vtf->tform2;
   vtt->domain_incr = vtf->domain_incr;
   vtt->param = vtf->param;
   vtt->domain_adj = vtf->domain_adj;
   vtt->inv_domain_adj = vtf->inv_domain_adj;
+}
+
+void
+transform_values_copy (gint jfrom, gint jto, datad *d)
+{
+  vartabled *vtf = vartable_element_get (jfrom, d);
+  vartabled *vtt = vartable_element_get (jto, d);
+  vt_copy (vtf, vtt);
+}
+gboolean
+transform_values_compare (gint jfrom, gint jto, datad *d)
+{
+  gboolean same = true;
+  vartabled *vtf = vartable_element_get (jfrom, d);
+  vartabled *vtt = vartable_element_get (jto, d);
+
+  same = (
+    vtt->tform1 == vtf->tform1 &&
+    vtt->tform2 == vtf->tform2 &&
+    vtt->domain_incr == vtf->domain_incr &&
+    vtt->param == vtf->param &&
+    vtt->domain_adj == vtf->domain_adj &&
+    vtt->inv_domain_adj == vtf->inv_domain_adj);
+
+  return same;
 }
 
 void
@@ -778,6 +806,7 @@ void
 transform_variable (gint stage, gint tform_type, gfloat param, gint jcol,
   datad *d, ggobid *gg)
 {
+  //g_printerr ("transform_variable for stage=%d, j=%d\n", stage, jcol);
   switch (stage) {
     case 0:
 

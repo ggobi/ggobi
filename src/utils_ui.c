@@ -252,26 +252,26 @@ populate_combo_box(GtkWidget *combo_box, gchar **lbl, gint nitems,
    signal of the associated GtkTreeSelection.  The columns render
    text from the corresponding model columns. */
 void
-populate_tree_view(GtkWidget *tree_view, gchar **lbl, gint nitems, gboolean headers,
-	GtkSelectionMode mode, GCallback func, gpointer obj)
+populate_tree_view(GtkWidget *tree_view, gchar **lbl, gint nitems, 
+ gboolean headers, GtkSelectionMode mode, GCallback func, gpointer obj)
 {
-	gint i;
-	GtkTreeSelection *sel;
+  gint i;
+  GtkTreeSelection *sel;
 	
-	for (i=0; i<nitems; i++) {
-		if (!headers || lbl[i]) {
-			GtkTreeViewColumn *col = gtk_tree_view_column_new_with_attributes(
-				headers ? lbl[i] : NULL, gtk_cell_renderer_text_new(), "markup", i, NULL);
-			gtk_tree_view_column_set_sort_column_id(col, i);
-			gtk_tree_view_column_set_resizable(col, true);
-			gtk_tree_view_insert_column(GTK_TREE_VIEW(tree_view), col, -1);
-		}
+  for (i=0; i<nitems; i++) {
+	if (!headers || lbl[i]) {
+		GtkTreeViewColumn *col = gtk_tree_view_column_new_with_attributes(
+			headers ? lbl[i] : NULL, gtk_cell_renderer_text_new(), "markup", i, NULL);
+		gtk_tree_view_column_set_sort_column_id(col, i);
+		gtk_tree_view_column_set_resizable(col, true);
+		gtk_tree_view_insert_column(GTK_TREE_VIEW(tree_view), col, -1);
 	}
-	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(tree_view), headers);
-	sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view));
-	gtk_tree_selection_set_mode(sel, mode);
-	if (func)
-		g_signal_connect(G_OBJECT(sel), "changed", G_CALLBACK(func), obj);
+  }
+  gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(tree_view), headers);
+  sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view));
+  gtk_tree_selection_set_mode(sel, mode);
+  if (func)
+	g_signal_connect(G_OBJECT(sel), "changed", G_CALLBACK(func), obj);
 }
 
 void scale_set_default_values (GtkScale *scale)
@@ -425,16 +425,16 @@ get_tree_view_from_object (GObject *obj)
 gint  /*-- assumes GTK_SELECTION_SINGLE --*/
 get_one_selection_from_tree_view (GtkWidget *tree_view, datad *d)
 {
-	GtkTreeSelection *sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view));
-	GtkTreeModel *model;
-	GtkTreeIter iter;
-	gint selected_var = -1;
+  GtkTreeSelection *sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view));
+  GtkTreeModel *model;
+  GtkTreeIter iter;
+  gint selected_var = -1;
 	
-	gboolean selected = gtk_tree_selection_get_selected(sel, &model, &iter);
-	if (selected)
-		gtk_tree_model_get(model, &iter, VARLIST_INDEX, &selected_var, -1);
+  gboolean selected = gtk_tree_selection_get_selected(sel, &model, &iter);
+  if (selected)
+    gtk_tree_model_get(model, &iter, VARLIST_INDEX, &selected_var, -1);
 
-	return selected_var;
+  return selected_var;
 }
 /** returns the dataset indices of the view's selected variables */
 gint * /*-- assumes multiple selection is possible --*/

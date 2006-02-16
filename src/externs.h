@@ -723,7 +723,8 @@ void       vectors_free (vector_s *);
 void       vectors_init_null (vector_s *);
 void       vectors_realloc (vector_s *, gint);
 void       vectors_realloc_zero (vector_s *, gint);
-
+void       vt_copy(vartabled *vtf, vartabled *vtt);
+void       vt_init(vartabled *);
 GtkWidget* widget_find_by_name (GtkWidget *, gchar *);
 void       widget_initialize (GtkWidget *w, gboolean initd);
 gboolean   widget_initialized (GtkWidget *w);
