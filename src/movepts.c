@@ -175,9 +175,9 @@ move_pt (gint id, gint x, gint y, splotd *sp, datad *d, ggobid *gg) {
   horiz = gg->movepts.direction == horizontal || gg->movepts.direction == both;
   vert = gg->movepts.direction == vertical || gg->movepts.direction == both;
 
-  if (horiz)
+  if (horiz) /* Jump the point horizontally to the mouse position */
     sp->screen[id].x = x;
-  if (vert)
+  if (vert) /* Jump the point vertically to the mouse position */
     sp->screen[id].y = y;
 
   /* run the pipeline backwards for case 'id' */
