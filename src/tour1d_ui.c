@@ -229,7 +229,7 @@ cpanel_tour1d_make (ggobid *gg) {
 /*
  * snapshot and video stream controls
  */
-  box = gtk_hbox_new (true, 2);
+  /*box = gtk_hbox_new (true, 2);
 
   btn = gtk_button_new_with_mnemonic ("_Snap");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
@@ -246,7 +246,8 @@ cpanel_tour1d_make (ggobid *gg) {
   gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
 
   gtk_box_pack_start (GTK_BOX (panel->w), box, false, false, 1);
-
+ */
+ 
   /*-- frame around ASH parameters --*/
   frame = gtk_frame_new ("ASH parameters");
   //gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);

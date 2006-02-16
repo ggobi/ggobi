@@ -226,7 +226,6 @@ cpanel_tour2d_make (ggobid *gg) {
 
 /*
  * snapshot and video stream controls
- */
   box = gtk_hbox_new (true, 2);
 
   btn = gtk_button_new_with_mnemonic ("_Snap");
@@ -244,6 +243,7 @@ cpanel_tour2d_make (ggobid *gg) {
   gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
 
   gtk_box_pack_start (GTK_BOX (panel->w), box, false, false, 1);
+ */
 
 /*
  * manipulation option menu and label inside vbox
