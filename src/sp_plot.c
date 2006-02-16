@@ -569,24 +569,72 @@ splot_add_point_label (gboolean nearest_p, gint k, gboolean top_p, splotd *sp,
   }
 }
 
+// Generic, for scatterplots and cousins
 void
-splot_add_identify_cues (splotd *sp, GdkDrawable *drawable,
+splot_add_identify_point_cues(splotd *sp, GdkDrawable *drawable,
   gint k, gboolean nearest_p, ggobid *gg)
 {
   colorschemed *scheme = gg->activeColorScheme;
+
+  if (k != -1) {
+    if (nearest_p)
+      splot_add_diamond_cue (k, sp, drawable, gg);
+
+    /* I've turned off this label for the barchart.  parallel coords
+       and scatterplot matrix displays need some thought too. dfs */
+    gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
+    splot_add_point_label (nearest_p, k, true, sp, drawable, gg);
+  }
+}
+
+// Messy -- points, edges, bars, ... there's probably a better way
+// to sort this out.
+void
+splot_add_identify_nearest_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg)
+{
+  displayd *display = sp->displayptr;
+  gint pt;
 
   if (GGOBI_IS_EXTENDED_SPLOT(sp)) {
     GGobiExtendedSPlotClass *klass;
     klass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);
     if (klass->add_identify_cues) {
-      klass->add_identify_cues(nearest_p, k, sp, drawable, gg);
+      pt = display->d->nearest_point;
+      klass->add_identify_cues(true, pt, sp, drawable, gg);
+
     } else {
-      if (nearest_p)
-        splot_add_diamond_cue (k, sp, drawable, gg);
-      /* I've turned off this label for the barchart.  parallel coords
-       and scatterplot matrix displays need some thought too. dfs */
-      gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
-      splot_add_point_label (nearest_p, k, true, sp, drawable, gg);
+      cpaneld *cpanel = &display->cpanel;
+      if (cpanel->id_target_type == identify_points) {
+        datad *d = display->d;
+        pt = d->nearest_point;
+        splot_add_identify_point_cues (sp, drawable, pt, true, gg);
+      } else {
+        if (display->e) {
+          datad *e = display->e;
+          pt = e->nearest_point;
+          splot_add_identify_edge_cues (sp, drawable, pt, true, gg);
+        }
+      }
+    }
+  }
+}
+
+/* Points only, so not so messy */
+void
+splot_add_identify_sticky_cues (splotd *sp, GdkDrawable *drawable, gint k,
+  ggobid *gg)
+{
+  displayd *display = sp->displayptr;
+
+  if (GGOBI_IS_EXTENDED_SPLOT(sp)) {
+    GGobiExtendedSPlotClass *klass;
+    klass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);
+    if (klass->add_identify_cues) {
+      // No sticky-drawing behavior in the barchart?
+      klass->add_identify_cues(false, k, sp, drawable, gg);
+
+    } else {
+      splot_add_identify_point_cues (sp, drawable, k, false, gg);
     }
   }
 }
@@ -609,7 +657,6 @@ splot_add_movepts_cues (splotd *sp, GdkDrawable *drawable,
   }
 }
 
-
 static void
 splot_add_record_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
   gint id;
@@ -628,16 +675,8 @@ splot_add_record_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
        source, maybe dest and edge      in edge editing
   */
 
-  if (imode == IDENT) {
-    if (cpanel->id_target_type == identify_points &&
-        d->nearest_point != -1)
-    {
-      splot_add_identify_cues (sp, drawable, d->nearest_point, true, gg);
-    } else if (cpanel->id_target_type == identify_edges && e) {
-      if (e->nearest_point != -1)
-        splot_add_identify_edge_cues (sp, drawable, e->nearest_point, true, gg);
-    }
-  }
+  if (imode == IDENT) 
+    splot_add_identify_nearest_cues(sp, drawable, gg); // pt or edge
   else if (imode == MOVEPTS)
      splot_add_movepts_cues (sp, drawable, d->nearest_point, true, gg);
   else if (imode == EDGEED)
@@ -646,16 +685,17 @@ splot_add_record_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
     splot_add_edgeedit_cues (sp, drawable, d->nearest_point, true, gg);
  
 
-  /*-- and these are the sticky ids, added in all modes --*/
+  /*-- and these are the sticky points, added in all modes --*/
   if (d->sticky_ids != NULL && g_slist_length (d->sticky_ids) > 0) {
     for (l = d->sticky_ids; l; l = l->next) {
       id = GPOINTER_TO_INT (l->data);
       if (!d->hidden_now.els[id])
         /*-- false = !nearest --*/
-        splot_add_identify_cues (sp, drawable, id, false, gg);
+        splot_add_identify_sticky_cues (sp, drawable, id, gg);
     }
   }
 
+  /*-- sticky edges, added in all modes --*/
   if (e && e->sticky_ids != NULL && g_slist_length (e->sticky_ids) > 0) {
     for (l = e->sticky_ids; l; l = l->next) {
       id = GPOINTER_TO_INT (l->data);

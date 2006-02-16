@@ -274,7 +274,7 @@ void barchartVarpanelRefresh(displayd * display, splotd * sp, datad * d)
 gboolean barchartHandlesInteraction(displayd * dpy, gint action)
 {
   InteractionMode imode = (InteractionMode) action;
-  return (imode == SCALE || imode == BRUSH || imode == IDENT
+  return (/*imode == SCALE ||*/ imode == BRUSH || imode == IDENT
           || imode == DEFAULT_IMODE);
 }
 
@@ -283,25 +283,6 @@ gboolean barchartHandlesInteraction(displayd * dpy, gint action)
 /*--------------------------------------------------------------------*/
 /*                      Barchart: Options menu                        */
 /*--------------------------------------------------------------------*/
-
-/* delete dfs -- change this to option_items_add , which adds nothing */
-#if 0
-static void barchart_menus_make(displayd *display, ggobid * gg)
-{
-  gg->menus.options_menu = gtk_menu_new();
-
-  CreateMenuCheck(gg->menus.options_menu, "Show tooltips",
-                  G_CALLBACK(tooltips_show_cb), NULL,
-                  GTK_TOOLTIPS(gg->tips)->enabled, gg);
-
-  CreateMenuCheck(gg->menus.options_menu, "Show control panel",
-                  G_CALLBACK(cpanel_show_cb), NULL,
-                  GTK_WIDGET_VISIBLE(gg->imode_frame), gg);
-
-  gtk_menu_item_set_submenu(GTK_MENU_ITEM(gg->menus.options_item),
-                            gg->menus.options_menu);
-}
-#endif
 
 void
 barchartVarpanelTooltipsSet(displayd * dpy, ggobid * gg, GtkWidget * wx,
@@ -323,14 +304,6 @@ barchartPlottedColsGet(displayd * display, gint * cols, datad * d,
   return (ncols);
 }
 
-#if 0
-GtkWidget *barchartMenusMake(displayd * dpy, ggobid * gg)
-{
-  barchart_menus_make(dpy, gg);
-  return (NULL);
-}
-#endif
-
 GtkWidget *barchartCPanelWidget(displayd * dpy, gchar ** modeName, ggobid * gg)
 {
   GtkWidget *w = GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget;
@@ -346,16 +319,15 @@ gboolean
 barchartEventHandlersToggle(displayd * dpy, splotd * sp, gboolean state,
                             ProjectionMode pmode, InteractionMode imode)
 {
-  if (imode == SCALE) {
-    barchart_scale_event_handlers_toggle(sp, state);
-    return (false);
+  if (imode == IDENT) {
+    identify_event_handlers_toggle (sp, state);  // Generic method
+  } else if (imode == BRUSH) {
+    brush_event_handlers_toggle (sp, state);  // Generic method
+  } else if (imode == DEFAULT_IMODE) {
+    barchart_event_handlers_toggle(dpy, sp, state, pmode, imode);
   }
 
-  if (imode != DEFAULT_IMODE && imode != SCALE)
-    return (true);
-
-  barchart_event_handlers_toggle(dpy, sp, state, pmode, imode);
-  return (true);
+  return (false);
 }
 
 
@@ -376,11 +348,6 @@ barchartKeyEventHandled(GtkWidget *w, displayd *display, splotd * sp, GdkEventKe
     case GDK_t:
     case GDK_T:
       pmode = TOUR1D;
-    break;
-
-    case GDK_s:
-    case GDK_S:
-      imode = SCALE;
     break;
     case GDK_b:
     case GDK_B:
@@ -512,12 +479,91 @@ void barchartDisplayClassInit(GGobiBarChartDisplayClass * klass)
 }
 
 void
-barchart_identify_cues_draw(gboolean nearest_p, gint k, splotd * rawsp, GdkDrawable * drawable,
-                                  ggobid * gg)
+barchart_identify_cues_draw(gboolean nearest_p, gint k, splotd * rawsp, 
+  GdkDrawable * drawable, ggobid * gg)
 {
-  /* Adding a no-op here is a way to have the default cues drawn for
-   all the scatterplot types, but not here.  Experiment or hack; you
-   be the judge.  -- dfs */
+  barchartSPlotd *sp = GGOBI_BARCHART_SPLOT(rawsp);
+  PangoLayout *layout = gtk_widget_create_pango_layout(GTK_WIDGET(rawsp->da), NULL);
+  gint i, nbins;
+  gchar *string;
+  icoords mousepos = rawsp->mousepos;
+  colorschemed *scheme = gg->activeColorScheme;
+  gint level;
+  gint j;
+
+  nbins = sp->bar->nbins;
+  gdk_gc_set_foreground(gg->plot_GC, &scheme->rgb_accent);
+
+  if (sp->bar->low_pts_missing && sp->bar->bar_hit[0]) {
+    string = g_strdup_printf ("%ld point%s < %.2f", sp->bar->low_bin->count,
+      sp->bar->low_bin->count == 1 ? "" : "s",
+      sp->bar->breaks[0] + sp->bar->offset);
+
+    gdk_draw_rectangle(drawable, gg->plot_GC, FALSE,
+      sp->bar->low_bin->rect.x, sp->bar->low_bin->rect.y,
+      sp->bar->low_bin->rect.width, sp->bar->low_bin->rect.height);
+    layout_text(layout, string, NULL);
+    gdk_draw_layout(drawable, gg->plot_GC, mousepos.x, mousepos.y, layout);
+    g_free(string);
+  }
+  for (i = 1; i < nbins + 1; i++) {
+    if (sp->bar->bar_hit[i]) {
+      if (sp->bar->is_histogram) {
+        string = g_strdup_printf ("%ld point%s in (%.2f,%.2f)",
+                sp->bar->bins[i - 1].count,
+                sp->bar->bins[i - 1].count == 1 ? "" : "s",
+                sp->bar->breaks[i - 1] + sp->bar->offset,
+                sp->bar->breaks[i] + sp->bar->offset);
+      } else {
+        gchar *levelName;
+        vartabled *var;
+        var = (vartabled *) g_slist_nth_data(rawsp->displayptr->d->vartable,
+                                           rawsp->p1dvar);
+/* dfs */
+        j = i-1;
+        level = checkLevelValue (var, (gdouble) sp->bar->bins[j].value);
+
+        if (level == -1) {
+          string = g_strdup_printf ("%ld point%s missing",
+                sp->bar->bins[j].count,
+                sp->bar->bins[j].count == 1 ? "" : "s");
+        } else {
+          levelName = var->level_names[level];
+          string = g_strdup_printf ("%ld point%s in %s",
+                sp->bar->bins[j].count,
+                sp->bar->bins[j].count == 1 ? "" : "s", levelName);
+        }
+/* --- */
+#ifdef PREV
+        levelName = var->level_names[i - 1];
+        sprintf(string, "%ld point%s in %s",
+                sp->bar->bins[i - 1].count,
+                sp->bar->bins[i - 1].count == 1 ? "" : "s", levelName);
+#endif
+      }
+      gdk_draw_rectangle(drawable, gg->plot_GC, FALSE,
+        sp->bar->bins[i - 1].rect.x, sp->bar->bins[i - 1].rect.y,
+        sp->bar->bins[i - 1].rect.width, sp->bar->bins[i - 1].rect.height);
+      layout_text(layout, string, NULL);
+      gdk_draw_layout(drawable, gg->plot_GC, mousepos.x, mousepos.y, layout);
+      g_free(string);
+    }
+  }
+
+  if (sp->bar->high_pts_missing && sp->bar->bar_hit[nbins + 1]) {
+    string = g_strdup_printf ("%ld point%s > %.2f", sp->bar->high_bin->count,
+            sp->bar->high_bin->count == 1 ? "" : "s",
+            sp->bar->breaks[nbins] + sp->bar->offset);
+
+    gdk_draw_rectangle(drawable, gg->plot_GC, FALSE,
+      sp->bar->high_bin->rect.x, sp->bar->high_bin->rect.y,
+      sp->bar->high_bin->rect.width, sp->bar->high_bin->rect.height);
+    layout_text(layout, string, NULL);
+    gdk_draw_layout(drawable, gg->plot_GC, mousepos.x, mousepos.y, layout);
+    g_free (string);
+  }
+  g_object_unref(G_OBJECT(layout));
+
 }
 
 void barchartSPlotClassInit(GGobiBarChartSPlotClass * klass)
@@ -528,8 +574,10 @@ void barchartSPlotClassInit(GGobiBarChartSPlotClass * klass)
 
   klass->extendedSPlotClass.identify_notify = barchart_identify_bars;
   klass->extendedSPlotClass.add_markup_cues = barchart_add_bar_cues;
+#if 0  // No more scale mode
   klass->extendedSPlotClass.add_scaling_cues =
       barchart_scaling_visual_cues_draw;
+#endif
   klass->extendedSPlotClass.add_identify_cues = barchart_identify_cues_draw;
   klass->extendedSPlotClass.add_plot_labels =
       barchart_splot_add_plot_labels;

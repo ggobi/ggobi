@@ -644,10 +644,7 @@ barchart_redraw(splotd * rawsp, datad * d, ggobid * gg, gboolean binned)
   barchartSPlotd *sp = GGOBI_BARCHART_SPLOT(rawsp);
   gbind *bin;
 
-/* dfs */
   barchart_recalc_counts(sp, d, gg);
-/*-- --*/
-
   barchart_recalc_group_counts(sp, d, gg);
 
 /* dfs: if there are hiddens, draw the entire rectangle in the shadow color */
@@ -729,8 +726,6 @@ void
 barchart_splot_add_plot_labels(splotd * sp, GdkDrawable * drawable,
                                ggobid * gg)
 {
-  //GtkStyle *style = gtk_widget_get_style(sp->da);
-  //gint lbearing, rbearing, width, ascent, descent;
   displayd *display = (displayd *) sp->displayptr;
   datad *d = display->d;
   PangoLayout *layout = gtk_widget_create_pango_layout(GTK_WIDGET(sp->da), NULL);
@@ -744,28 +739,13 @@ barchart_splot_add_plot_labels(splotd * sp, GdkDrawable * drawable,
   gdk_draw_layout(drawable, gg->plot_GC, sp->max.x - rect.width - 5, 
   		sp->max.y - rect.height - 5, layout);
   
-  /*
-  gdk_text_extents(gtk_style_get_font(style),
-    vtx->collab_tform, strlen(vtx->collab_tform),
-    &lbearing, &rbearing, &width, &ascent, &descent);
-
-  gdk_draw_string(drawable, gtk_style_get_font(style),
-    gg->plot_GC, sp->max.x - width - 5,
-    sp->max.y - 5, vtx->collab_tform);
-  */
   if (vtx->vartype == categorical) {
     gint i;
     gchar *catname;
     barchartSPlotd *bsp = GGOBI_BARCHART_SPLOT(sp);
-
-/* dfs */
     gint level;
-    //gint lbearing, rbearing, width, ascent, descent, textheight;
     
-    /*splot_text_extents ("yA", style, 
-          &lbearing, &rbearing, &width, &ascent, &descent);
-        textheight = ascent + descent;*/
-	layout_text(layout, "yA", &rect);
+    layout_text(layout, "yA", &rect);
     
  /* is there enough space for labels? If not - return */
     if (!bsp->bar->is_spine) {
@@ -776,23 +756,14 @@ barchart_splot_add_plot_labels(splotd * sp, GdkDrawable * drawable,
       level = checkLevelValue (vtx, (gdouble) bsp->bar->bins[i].value);
       catname = g_strdup_printf ("%s",
         (level == -1) ? "missing" : vtx->level_names[level]);
-/* --- */
-#ifdef PREV
-    for (i = 0; i < vtx->nlevels; i++) {
-      catname = g_strdup (vtx->level_names[i]);
-#endif
-	  layout_text(layout, catname, NULL);
-	  gdk_draw_layout(drawable, gg->plot_GC, 
-	    bsp->bar->bins[i].rect.x + 2,
-	  	bsp->bar->bins[i].rect.y + bsp->bar->bins[i].rect.height / 2 + 2,
-		layout);
+
+      layout_text(layout, catname, NULL);
+      gdk_draw_layout(drawable, gg->plot_GC, 
+	bsp->bar->bins[i].rect.x + 2,
+	bsp->bar->bins[i].rect.y + bsp->bar->bins[i].rect.height / 2 + 2,
+	layout);
 		
-      /*gdk_draw_string(drawable, gtk_style_get_font(style), gg->plot_GC,
-        bsp->bar->bins[i].rect.x + 2,
-        bsp->bar->bins[i].rect.y +
-        bsp->bar->bins[i].rect.height / 2 + 2, catname);
-	  */
-	  g_free (catname);
+      g_free (catname);
     }
   }
   g_object_unref(G_OBJECT(layout));
@@ -927,12 +898,7 @@ void barchart_recalc_counts(barchartSPlotd * sp, datad * d, ggobid * gg)
         if (d->hidden_now.els[m])
           sp->bar->bins[bin].nhidden++;
       }
-/* dfs */
       rawsp->planar[m].x = (greal) sp->bar->bins[bin].value;
-/* --- */
-#ifdef PREV
-      rawsp->planar[m].x = bin;
-#endif
     }
   } else {  /* all vartypes but categorical */
     gint index, m, rank = 0;
@@ -1072,11 +1038,6 @@ void barchart_recalc_dimensions(splotd * rawsp, datad * d, ggobid * gg)
       ftmp = -1.0 + 2.0*((greal)bin->value - rawsp->p1d.lim.min)
         / rdiff;
       bin->planar.y = (greal) (PRECISION1 * ftmp);
-#ifdef PREV
-      index = bin->index;
-      if (index >= 0)
-        bin->planar.y = (glong) d->world.vals[index][rawsp->p1dvar];
-#endif
     } else {
       ftmp = -1.0 + 2.0 * (sp->bar->breaks[i] - sp->bar->breaks[0]) / rdiff;
       bin->planar.y = (glong) (precis * ftmp);
@@ -1207,7 +1168,6 @@ gboolean barchart_active_paint_points(splotd * rawsp, datad * d, ggobid *gg)
   gint i, m, indx;
   GdkRectangle brush_rect;
   GdkRectangle dummy;
-  /*GdkRectangle *rect;*/
   gint x1 = MIN(brush_pos->x1, brush_pos->x2);
   gint x2 = MAX(brush_pos->x1, brush_pos->x2);
   gint y1 = MIN(brush_pos->y1, brush_pos->y2);
@@ -1341,7 +1301,7 @@ barchart_sort_index(gfloat * yy, gint ny, ggobid * gg, barchartSPlotd * sp)
   } else {  /* vartype = categorical */
 
 /* dfs */
-    /* XXX
+    /* XXX 
        Later, when labelling, if a value doesn't match one of the
        level_values, label it 'missing'
     */
@@ -1406,7 +1366,7 @@ barchart_sort_index(gfloat * yy, gint ny, ggobid * gg, barchartSPlotd * sp)
 }
 
 void
-barchart_scaling_visual_cues_draw(splotd * rawsp, GdkDrawable * drawable,
+barchart_default_visual_cues_draw(splotd * rawsp, GdkDrawable * drawable,
                                   ggobid * gg)
 {
   vartabled *vtx;
@@ -1415,30 +1375,59 @@ barchart_scaling_visual_cues_draw(splotd * rawsp, GdkDrawable * drawable,
   barchartSPlotd *sp = GGOBI_BARCHART_SPLOT(rawsp);
   vtx = vartable_element_get(GGOBI_SPLOT(sp)->p1dvar, d);
 
+  GdkPoint btn[4];
+  /* Experiment: ontinue to draw small triangular buttons, but allow
+     the regions to grow into long rectangles running along the bars.
+     dfs
+  */
+
+
   if (vtx->vartype != categorical) {
 /* calculate & draw anchor_rgn */
     gint y = sp->bar->bins[0].rect.y + sp->bar->bins[0].rect.height;
     gint x = sp->bar->bins[0].rect.x;
     gint halfwidth = sp->bar->bins[0].rect.height / 2 - 2;
 
-
     sp->bar->anchor_rgn[0].x = sp->bar->anchor_rgn[1].x = x - 5;
-    sp->bar->anchor_rgn[2].x = x;
+    sp->bar->anchor_rgn[2].x = x + GGOBI_SPLOT(sp)->max.x; // extend
     sp->bar->anchor_rgn[0].y = y + halfwidth;
     sp->bar->anchor_rgn[1].y = y - halfwidth;
-    sp->bar->anchor_rgn[2].y = y;
+    //sp->bar->anchor_rgn[2].y = y;
 
-    button_draw_with_shadows(sp->bar->anchor_rgn, drawable, gg);
+    // Rectangle instead of triangle
+    sp->bar->anchor_rgn[3].x = sp->bar->anchor_rgn[2].x;
+    sp->bar->anchor_rgn[2].y = sp->bar->anchor_rgn[1].y;
+    sp->bar->anchor_rgn[3].y = sp->bar->anchor_rgn[0].y;
+
+    btn[0].x = btn[1].x = x - 5;
+    btn[2].x = x;
+    btn[0].y = y + halfwidth;
+    btn[1].y = y - halfwidth;
+    btn[2].y = y;
+    button_draw_with_shadows(btn, drawable, gg);
+    //button_draw_with_shadows(sp->bar->anchor_rgn, drawable, gg);
 
 /* calculate & draw offset_rgn */
     y = sp->bar->bins[0].rect.y;
     sp->bar->offset_rgn[0].x = sp->bar->offset_rgn[1].x = x - 5;
-    sp->bar->offset_rgn[2].x = x;
+    sp->bar->offset_rgn[2].x = x + GGOBI_SPLOT(sp)->max.x; // extend
     sp->bar->offset_rgn[0].y = y + halfwidth;
     sp->bar->offset_rgn[1].y = y - halfwidth;
-    sp->bar->offset_rgn[2].y = y;
+    //sp->bar->offset_rgn[2].y = y;
 
-    button_draw_with_shadows(sp->bar->offset_rgn, drawable, gg);
+    // Rectangle instead of triangle -- dfs
+    sp->bar->offset_rgn[3].x = sp->bar->offset_rgn[2].x;
+    sp->bar->offset_rgn[2].y = sp->bar->offset_rgn[1].y;
+    sp->bar->offset_rgn[3].y = sp->bar->offset_rgn[0].y;
+
+
+    btn[0].x = btn[1].x = x - 5;
+    btn[2].x = x;
+    btn[0].y = y + halfwidth;
+    btn[1].y = y - halfwidth;
+    btn[2].y = y;
+    button_draw_with_shadows(btn, drawable, gg);
+    //button_draw_with_shadows(sp->bar->offset_rgn, drawable, gg);
   }
 }
 
@@ -1469,40 +1458,7 @@ button_draw_with_shadows(GdkPoint * region, GdkDrawable * drawable,
   gdk_draw_line(drawable, gg->plot_GC, region[0].x, region[2].y + 1,
                 region[2].x, region[2].y + 1);
 }
-#if 0
-void
-barchart_display_menus_make(displayd * display,
-                            GtkAccelGroup * accel_group,
-                            GtkSignalFunc func, ggobid * gg)
-{
-  GtkWidget *topmenu, *options_menu;
-  GtkWidget *item;
 
-  /*-- Options menu --*/
-  topmenu = submenu_make("_Options", 'H', accel_group);
-  /*-- add a tooltip --*/
-  gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), topmenu,
-                       "Options menu for this display (barchart)", NULL);
-
-  options_menu = gtk_menu_new();
-
-  item = CreateMenuCheck(options_menu, "Show bars",
-                         func, GINT_TO_POINTER(DOPT_POINTS), on, gg);
-  g_object_set_data(G_OBJECT(item), "display", (gpointer) display);
-
-  /*-- Add a separator --*/
-  CreateMenuItem(options_menu, NULL, "", "", NULL, NULL, NULL, NULL, gg);
-
-  /* This makes sense, but it isn't working */
-  item = CreateMenuCheck(options_menu, "Show axes",
-                         func, GINT_TO_POINTER(DOPT_AXES), on, gg);
-  g_object_set_data(G_OBJECT(item), "display", (gpointer) display);
-
-  gtk_menu_item_set_submenu(GTK_MENU_ITEM(topmenu), options_menu);
-  submenu_append(topmenu, display->menubar);
-  gtk_widget_show(topmenu);
-}
-#endif
 gboolean rect_intersect(GdkRectangle *rect1, GdkRectangle *rect2, GdkRectangle *dest)
 {
     gint right, bottom;
@@ -1526,6 +1482,22 @@ gboolean pt_in_rect(icoords pt, GdkRectangle rect)
   return ((pt.x >= rect.x) && (pt.x <= rect.x + rect.width)
           && (pt.y >= rect.y) && (pt.y <= rect.y + rect.height));
 }
+
+
+/* Cues that are drawn in the default mode, indicating that the
+ * binwidth and anchor point can be changed. */
+void
+barchart_add_bar_cues(splotd * rawsp, GdkDrawable * drawable, ggobid * gg)
+{
+  displayd *display = rawsp->displayptr;
+  cpaneld *cpanel = &display->cpanel;
+
+  if (cpanel->imode != DEFAULT_IMODE)
+    return;
+
+  barchart_default_visual_cues_draw(rawsp, drawable, gg);
+}
+
 
 gboolean
 barchart_identify_bars(icoords mousepos, splotd * rawsp, datad * d,
@@ -1576,111 +1548,6 @@ barchart_identify_bars(icoords mousepos, splotd * rawsp, datad * d,
     sp->bar->old_bar_hit[i] = sp->bar->bar_hit[i];
 
   return TRUE;
-}
-
-void
-barchart_add_bar_cues(splotd * rawsp, GdkDrawable * drawable, ggobid * gg)
-{
-  barchartSPlotd *sp = GGOBI_BARCHART_SPLOT(rawsp);
-  //GtkStyle *style = gtk_widget_get_style(rawsp->da);
-  PangoLayout *layout = gtk_widget_create_pango_layout(GTK_WIDGET(rawsp->da), NULL);
-  gint i, nbins;
-  gchar *string;
-  icoords mousepos = rawsp->mousepos;
-  colorschemed *scheme = gg->activeColorScheme;
-  InteractionMode mode = imode_get (gg);
-  gint level;
-  gint j;
-
-  /*
-  g_printerr ("in barchart_add_bar_cues: mode == IDENT? %d\n", mode == IDENT);
-  */
-
-  if (mode != IDENT)
-    return;
-
-  nbins = sp->bar->nbins;
-  gdk_gc_set_foreground(gg->plot_GC, &scheme->rgb_accent);
-
-  if (sp->bar->low_pts_missing && sp->bar->bar_hit[0]) {
-  /*	*/
-    string = g_strdup_printf ("%ld point%s < %.2f", sp->bar->low_bin->count,
-      sp->bar->low_bin->count == 1 ? "" : "s",
-      sp->bar->breaks[0] + sp->bar->offset);
-
-    gdk_draw_rectangle(drawable, gg->plot_GC, FALSE,
-      sp->bar->low_bin->rect.x, sp->bar->low_bin->rect.y,
-      sp->bar->low_bin->rect.width, sp->bar->low_bin->rect.height);
-    /*gdk_draw_string(drawable,
-	gtk_style_get_font(style),
-      gg->plot_GC, mousepos.x, mousepos.y, string);*/
-	  layout_text(layout, string, NULL);
-	  gdk_draw_layout(drawable, gg->plot_GC, mousepos.x, mousepos.y, layout);
-    g_free(string);
-  }
-  for (i = 1; i < nbins + 1; i++) {
-    if (sp->bar->bar_hit[i]) {
-      if (sp->bar->is_histogram) {
-        string = g_strdup_printf ("%ld point%s in (%.2f,%.2f)",
-                sp->bar->bins[i - 1].count,
-                sp->bar->bins[i - 1].count == 1 ? "" : "s",
-                sp->bar->breaks[i - 1] + sp->bar->offset,
-                sp->bar->breaks[i] + sp->bar->offset);
-      } else {
-        gchar *levelName;
-        vartabled *var;
-        var = (vartabled *) g_slist_nth_data(rawsp->displayptr->d->vartable,
-                                           rawsp->p1dvar);
-/* dfs */
-        j = i-1;
-        level = checkLevelValue (var, (gdouble) sp->bar->bins[j].value);
-
-        if (level == -1) {
-          string = g_strdup_printf ("%ld point%s missing",
-                sp->bar->bins[j].count,
-                sp->bar->bins[j].count == 1 ? "" : "s");
-        } else {
-          levelName = var->level_names[level];
-          string = g_strdup_printf ("%ld point%s in %s",
-                sp->bar->bins[j].count,
-                sp->bar->bins[j].count == 1 ? "" : "s", levelName);
-        }
-/* --- */
-#ifdef PREV
-        levelName = var->level_names[i - 1];
-        sprintf(string, "%ld point%s in %s",
-                sp->bar->bins[i - 1].count,
-                sp->bar->bins[i - 1].count == 1 ? "" : "s", levelName);
-#endif
-      }
-      gdk_draw_rectangle(drawable, gg->plot_GC, FALSE,
-        sp->bar->bins[i - 1].rect.x, sp->bar->bins[i - 1].rect.y,
-        sp->bar->bins[i - 1].rect.width, sp->bar->bins[i - 1].rect.height);
-      /*gdk_draw_string(drawable,
-        gtk_style_get_font(style),
-        gg->plot_GC, mousepos.x, mousepos.y, string);*/
-		layout_text(layout, string, NULL);
-		gdk_draw_layout(drawable, gg->plot_GC, mousepos.x, mousepos.y, layout);
-      g_free(string);
-    }
-  }
-
-  if (sp->bar->high_pts_missing && sp->bar->bar_hit[nbins + 1]) {
-    string = g_strdup_printf ("%ld point%s > %.2f", sp->bar->high_bin->count,
-            sp->bar->high_bin->count == 1 ? "" : "s",
-            sp->bar->breaks[nbins] + sp->bar->offset);
-
-    gdk_draw_rectangle(drawable, gg->plot_GC, FALSE,
-      sp->bar->high_bin->rect.x, sp->bar->high_bin->rect.y,
-      sp->bar->high_bin->rect.width, sp->bar->high_bin->rect.height);
-    /*gdk_draw_string(drawable,
-		gtk_style_get_font(style),
-      gg->plot_GC, mousepos.x, mousepos.y, string);*/
-	  layout_text(layout, string, NULL);
-	  gdk_draw_layout(drawable, gg->plot_GC, mousepos.x, mousepos.y, layout);
-    g_free (string);
-  }
-  g_object_unref(G_OBJECT(layout));
 }
 
 splotd *ggobi_barchart_splot_new(displayd * dpy, ggobid * gg)

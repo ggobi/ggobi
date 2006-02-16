@@ -94,7 +94,9 @@ static const gchar* mode_ui_str =
 "		<menu action='IMode'>"
 "			<menuitem action='DefaultIMode'/>"
 "			<separator/>"
+#if 0
 "			<menuitem action='Scale'/>"
+#endif
 "			<menuitem action='Brush'/>"
 "			<menuitem action='Identify'/>"
 "		</menu>"
@@ -106,89 +108,6 @@ const gchar *
 barchart_mode_ui_get(displayd *display) {
 	return(mode_ui_str);
 }
-
-#if 0
-/*
-  The useIds indicates whether the callback data should be integers
-  identifying the menu item or the global gg.
-  At present, this is always false.
-  See scatmat_mode_menu_make and scatterplot_mode_menu_make.
- */
-GtkWidget *barchart_pmode_menu_make(GtkAccelGroup * accel_group,
-                                   GtkSignalFunc func,
-                                   ggobid * gg, gboolean useIds)
-{
-  GtkWidget *menu, *item;
-  gboolean radiop = sessionOptions->useRadioMenuItems;
-
-  menu = gtk_menu_new();
-
-  item = CreateMenuItemWithCheck(menu, "Barchart",
-    "^h", "", NULL, accel_group, func,
-    useIds ? GINT_TO_POINTER(EXTENDED_DISPLAY_PMODE) : gg, gg,
-    gg->pmodeRadioGroup, radiop);
-  if (radiop && gg->pmode == EXTENDED_DISPLAY_PMODE)
-     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), true);
-
-#ifdef BARCHART_TOUR1D_IMPLEMENTED
-  item = CreateMenuItemWithCheck(menu, "1D Tour",
-    "^t", "", NULL, accel_group, func,
-    useIds ? GINT_TO_POINTER(TOUR1D) : gg, gg,
-    gg->pmodeRadioGroup, radiop);
-  if (radiop && gg->pmode == TOUR1D)
-     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), true);
-#endif
-
-  gtk_widget_show(menu);
-
-  return (menu);
-}
-
-GtkWidget *barchart_imode_menu_make(GtkAccelGroup * accel_group,
-                                   GtkSignalFunc func,
-                                   ggobid * gg, gboolean useIds)
-{
-  GtkWidget *menu, *item;
-  gboolean radiop = sessionOptions->useRadioMenuItems;
-
-  menu = gtk_menu_new();
-
-  item = CreateMenuItemWithCheck(menu, "Barchart",
-    "^h", "", NULL, accel_group, func,
-    useIds ? GINT_TO_POINTER(DEFAULT_IMODE) : gg, gg,
-    gg->pmodeRadioGroup, radiop);
-  if (radiop && gg->imode == DEFAULT_IMODE)
-     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), true);
-
-  /* Add a separator */
-  CreateMenuItem(menu, NULL, "", "", NULL, NULL, NULL, NULL, gg);
-
-  item = CreateMenuItemWithCheck(menu, "Scale",
-    "^s", "", NULL, accel_group, func,
-    useIds ? GINT_TO_POINTER(SCALE) : gg, gg,
-    gg->pmodeRadioGroup, radiop);
-  if (radiop && gg->imode == SCALE)
-     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), true);
-
-  item = CreateMenuItemWithCheck(menu, "Brush",
-    "^b", "", NULL, accel_group, func,
-    useIds ? GINT_TO_POINTER(BRUSH) : gg, gg,
-    gg->pmodeRadioGroup, radiop);
-  if (radiop && gg->imode == BRUSH)
-     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), true);
-
-  item = CreateMenuItemWithCheck(menu, "Identify",
-    "^i", "", NULL, accel_group, func,
-    useIds ? GINT_TO_POINTER(IDENT) : gg, gg,
-    gg->pmodeRadioGroup, radiop);
-  if (radiop && gg->imode == IDENT)
-     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), true);
-
-  gtk_widget_show(menu);
-
-  return (menu);
-}
-#endif
 
 /*--------------------------------------------------------------------*/
 /*                   End of main menubar section                      */
@@ -277,6 +196,8 @@ button_release_cb(GtkWidget * w, GdkEventButton * event, splotd * sp)
   ggobid *gg = GGobiFromSPlot(sp);
   GdkModifierType state;
 
+  disconnect_motion_signal (sp);
+
   gg->buttondown = 0;
 
   gdk_window_get_pointer(w->window, &sp->mousepos.x, &sp->mousepos.y,
@@ -314,6 +235,8 @@ mouse_motion_notify_cb(GtkWidget * w, GdkEventMotion * event, splotd * sp)
     GdkRegion *region;
     gboolean cursor_set = FALSE;
 
+    /* This should be determined by when the button is pressed, and
+     * not re-decided while the button is moving -- dfs */
     region = gdk_region_polygon(bsp->bar->anchor_rgn, 3, GDK_WINDING_RULE);
     if (gdk_region_point_in(region, sp->mousepos.x, sp->mousepos.y)) {
       splot_cursor_set(GDK_HAND2, sp);
@@ -323,7 +246,7 @@ mouse_motion_notify_cb(GtkWidget * w, GdkEventMotion * event, splotd * sp)
 
     region = gdk_region_polygon(bsp->bar->offset_rgn, 3, GDK_WINDING_RULE);
     if (gdk_region_point_in(region, sp->mousepos.x, sp->mousepos.y)) {
-      splot_cursor_set(GDK_SPIDER, sp);
+      splot_cursor_set(GDK_BOTTOM_SIDE, sp);
       cursor_set = TRUE;
     }
     gdk_region_destroy(region);
@@ -347,6 +270,7 @@ mouse_motion_notify_cb(GtkWidget * w, GdkEventMotion * event, splotd * sp)
   return true;
 }
 
+/* Reset bin width or anchor point */
 gboolean
 barchart_scale(gboolean button1_p, gboolean button2_p, splotd * sp)
 {
@@ -441,15 +365,11 @@ barchart_scale(gboolean button1_p, gboolean button2_p, splotd * sp)
     }
   } else {   /*-- we're not dragging the bars, only scaling --*/
 
-    /* Uh-oh -- I've just eliminated this option, so I hope it
-       doesn't matter -- dfs */
-#if 0
-    switch (cpanel->scale_style) {
-    case DRAG:
-#endif
+#if 0  // No scaling at this time
       if (button1_p) {
         pan_by_drag(sp, gg);
-      } else if (button2_p) {
+      } 
+      else if (button2_p) {
         zoom_by_drag(sp, gg);
       }
 
@@ -457,14 +377,8 @@ barchart_scale(gboolean button1_p, gboolean button2_p, splotd * sp)
       splot_plane_to_screen(display, &display->cpanel, sp, gg);
       ruler_ranges_set(false, gg->current_display, sp, gg);
       splot_redraw(sp, FULL, gg);
-#if 0
-      break;
-    case CLICK:
-      splot_redraw(sp, QUICK, gg);
-      break;
-
-    }  /*-- end switch (scale_style) --*/
 #endif
+
   }
   return true;
 }
@@ -483,7 +397,6 @@ button_press_cb(GtkWidget * w, GdkEventButton * event, splotd * sp)
   gg->current_splot = sp->displayptr->current_splot = sp;
   gg->current_display = (displayd *) sp->displayptr;
 
-
   if (bsp->bar->is_histogram) {
     bsp->bar->anchor_drag = FALSE;
     bsp->bar->width_drag = FALSE;
@@ -491,7 +404,6 @@ button_press_cb(GtkWidget * w, GdkEventButton * event, splotd * sp)
     region = gdk_region_polygon(bsp->bar->anchor_rgn, 3, GDK_WINDING_RULE);
     if (gdk_region_point_in(region, sp->mousepos.x, sp->mousepos.y)) {
       bsp->bar->anchor_drag = TRUE;
-
     }
     gdk_region_destroy(region);
 
@@ -501,6 +413,11 @@ button_press_cb(GtkWidget * w, GdkEventButton * event, splotd * sp)
     }
     gdk_region_destroy(region);
   }
+
+  sp->motion_id = g_signal_connect(G_OBJECT(sp->da),
+                                   "motion_notify_event",
+                                   G_CALLBACK(mouse_motion_notify_cb),
+                                   (gpointer) sp);
 
   sp->mousepos_o.x = sp->mousepos.x;
   sp->mousepos_o.y = sp->mousepos.y;
@@ -516,28 +433,12 @@ void barchart_event_handlers_toggle(displayd * display, splotd * sp, gboolean st
   if (state == on) {
     GtkObject *winobj =
         GTK_OBJECT(GGOBI_WINDOW_DISPLAY(display)->window);
+    /* Mode selection */
     sp->key_press_id =
         g_signal_connect(winobj, "key_press_event",
                            G_CALLBACK(key_press_cb), (gpointer) sp);
 
-  } else {
-    disconnect_key_press_signal(sp);
-  }
-}
-
-
-void barchart_scale_event_handlers_toggle(splotd * sp, gboolean state)
-{
-  displayd *display = (displayd *) sp->displayptr;
-
-  if (state == on) {
-    GtkObject *winobj =
-        GTK_OBJECT(GGOBI_WINDOW_DISPLAY(display)->window);
-    if (GGOBI_IS_WINDOW_DISPLAY(display))
-      sp->key_press_id = g_signal_connect(winobj,
-                                            "key_press_event",
-                                            G_CALLBACK(key_press_cb),
-                                            (gpointer) sp);
+    /* Resetting bin width and anchor */
     sp->press_id = g_signal_connect(G_OBJECT(sp->da),
                                       "button_press_event",
                                       G_CALLBACK(button_press_cb),
@@ -546,13 +447,10 @@ void barchart_scale_event_handlers_toggle(splotd * sp, gboolean state)
                                         "button_release_event",
                                         G_CALLBACK(button_release_cb),
                                         (gpointer) sp);
-    sp->motion_id = g_signal_connect(G_OBJECT(sp->da),
-                                       "motion_notify_event",
-                                       G_CALLBACK(mouse_motion_notify_cb),
-                                       (gpointer) sp);
   } else {
     disconnect_key_press_signal(sp);
     disconnect_button_press_signal(sp);
     disconnect_button_release_signal(sp);
   }
 }
+
