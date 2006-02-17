@@ -44,7 +44,9 @@ parcoords_reset_arrangement (displayd *display, gint arrangement, ggobid *gg) {
   GList *l;
   GtkWidget *frame, *w;
   splotd *sp;
-  gint height, width;
+  gint x, y, width, height, depth;
+  gint wframe, hframe;
+  GdkWindow *window;
 
   if (display->cpanel.parcoords_arrangement == arrangement)
     return;
@@ -56,6 +58,16 @@ parcoords_reset_arrangement (displayd *display, gint arrangement, ggobid *gg) {
   }
 
   frame = gg->parcoords.arrangement_box->parent;
+
+  // Resize the enclosing window according to the new arrangement.
+  window = gtk_widget_get_parent_window (frame);
+  gdk_window_get_geometry(window, &x, &y, &width, &height, &depth);
+  wframe = (arrangement == ARRANGE_ROW) ? MAX(width,height) : 
+    MIN(width,height);
+  hframe = (arrangement == ARRANGE_ROW) ? MIN(width,height) :
+    MAX(width,height);
+  gdk_window_resize(window, wframe, hframe);
+
   gtk_widget_destroy (gg->parcoords.arrangement_box);
 
   if (arrangement == ARRANGE_ROW)
@@ -67,20 +79,8 @@ parcoords_reset_arrangement (displayd *display, gint arrangement, ggobid *gg) {
   display->p1d_orientation = (arrangement == ARRANGE_ROW) ? VERTICAL :
                                                             HORIZONTAL;
 
-  height = (arrangement == ARRANGE_ROW) ? HEIGHT : WIDTH;
-  width = (arrangement == ARRANGE_ROW) ? WIDTH : HEIGHT;
-/*
-  l = display->splots;
-  while (l) {
-    sp = (splotd *) l->data;
-    gtk_widget_set_usize (sp->da, width, height);
-    gtk_box_pack_start (GTK_BOX (arrangement_box), sp->da, true, true, 0);
-    l = l->next ;
-  }
-*/
   for (l=display->splots; l; l=l->next) {
     sp = (splotd *) l->data;
-    //gtk_widget_set_usize (sp->da, width, height);
     gtk_box_pack_start (GTK_BOX (gg->parcoords.arrangement_box),
                         sp->da, true, true, 0);
     gtk_widget_unref (sp->da);  /*-- keep the ref_count appropriate --*/
