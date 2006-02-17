@@ -552,11 +552,11 @@ sphere_panel_open (ggobid *gg)
     gtk_container_add (GTK_CONTAINER (frame), vb);
 
     /*-- last: after choosing nPCs, the apply button --*/
-    gg->sphere_ui.apply_btn = gtk_button_new_with_mnemonic ("_Apply sphering");
+    gg->sphere_ui.apply_btn = gtk_button_new_with_mnemonic ("_Apply sphering, add PCs to data");
     gtk_box_pack_start (GTK_BOX (vb), gg->sphere_ui.apply_btn,
       false, false, 0);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->sphere_ui.apply_btn,
-      "Apply principal components transformation to the selected variables",
+      "Apply principal components transformation to the selected variables, adding 'number of PCs' variables to the data set",
       NULL);
     g_signal_connect (G_OBJECT (gg->sphere_ui.apply_btn), "clicked",
                         G_CALLBACK (sphere_apply_cb), gg);
