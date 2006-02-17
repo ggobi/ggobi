@@ -429,7 +429,7 @@ sphere_panel_open (ggobid *gg)
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
       "When this button is checked the correlation matrix is used to generate the PCs, otherwise the variance-covariance matrix is used",
       NULL);
-		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(btn), TRUE);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(btn), TRUE);
     g_signal_connect (G_OBJECT (btn), "toggled",
                         G_CALLBACK(vars_stdized_cb), (gpointer) gg);
     gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 1);
@@ -515,7 +515,7 @@ sphere_panel_open (ggobid *gg)
       0, 1, 1, 2, GTK_FILL, GTK_FILL, 0, 0);
 
     gg->sphere_ui.variance_entry = gtk_entry_new ();
-	gtk_label_set_mnemonic_widget(GTK_LABEL(label), gg->sphere_ui.variance_entry);
+    gtk_label_set_mnemonic_widget(GTK_LABEL(label), gg->sphere_ui.variance_entry);
     gtk_editable_set_editable (GTK_EDITABLE (gg->sphere_ui.variance_entry), false);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->sphere_ui.variance_entry,
       "The percentage of variance accounted for by the first n principal components",
@@ -568,15 +568,13 @@ sphere_panel_open (ggobid *gg)
     gtk_box_pack_start (GTK_BOX (vb), scrolled_window,
       true, true, 0);
 
-	model = gtk_list_store_new(1, G_TYPE_STRING);
+    model = gtk_list_store_new(1, G_TYPE_STRING);
     gg->sphere_ui.tree_view = gtk_tree_view_new_with_model (GTK_TREE_MODEL(model));
-	populate_tree_view(gg->sphere_ui.tree_view, titles, G_N_ELEMENTS(titles), true, 
-		GTK_SELECTION_SINGLE, NULL, NULL);
-    /*g_signal_connect (G_OBJECT (gg->sphere_ui.tree_view),
-                        "size_allocate",
-                        G_CALLBACK(sphere_tree_view_size_alloc_cb),
-                        (gpointer) gg);*/
-	gtk_tree_view_set_headers_clickable(GTK_TREE_VIEW(gg->sphere_ui.tree_view), false);
+    gtk_widget_set_size_request(gg->sphere_ui.tree_view, -1, 70);
+    populate_tree_view(gg->sphere_ui.tree_view, titles, G_N_ELEMENTS(titles), 
+      true, GTK_SELECTION_SINGLE, NULL, NULL);
+    gtk_tree_view_set_headers_clickable(GTK_TREE_VIEW(gg->sphere_ui.tree_view),
+      false);
     widget_initialize (gg->sphere_ui.tree_view, false);
 
     gtk_container_add (GTK_CONTAINER (scrolled_window),
