@@ -21,9 +21,9 @@
 #include "vars.h"
 #include "externs.h"
 
-static void tf0_opt_menu_set_value(vartabled *vt, ggobid *gg);
-static void tf1_opt_menu_set_value(vartabled *vt, ggobid *gg);
-static void tf2_opt_menu_set_value(vartabled *vt, ggobid *gg);
+static void tf0_combo_box_set_value(vartabled *vt, gboolean, ggobid *gg);
+static void tf1_combo_box_set_value(vartabled *vt, gboolean, ggobid *gg);
+static void tf2_combo_box_set_value(vartabled *vt, gboolean, ggobid *gg);
 
 
 /*-- called when closed from the close button --*/
@@ -102,7 +102,7 @@ scale_get_a (ggobid *gg) {
   gchar *val_str;
   gfloat val = 0;  /*-- default value --*/
   GtkWidget *entry_a;
-  entry_a = widget_find_by_name (gg->tform_ui.window, "TRANSFORM:entry_a");
+  entry_a = widget_find_by_name (gg->tform_ui.window, "TFORM:entry_a");
 
   if (entry_a) {
     val_str = gtk_editable_get_chars (GTK_EDITABLE (entry_a), 0, -1);
@@ -121,7 +121,7 @@ scale_get_b (ggobid *gg) {
   gchar *val_str;
   gfloat val = 1;  /*-- default value --*/
   GtkWidget *entry_b;
-  entry_b = widget_find_by_name (gg->tform_ui.window, "TRANSFORM:entry_b");
+  entry_b = widget_find_by_name (gg->tform_ui.window, "TFORM:entry_b");
 
   if (entry_b) {
     val_str = gtk_editable_get_chars (GTK_EDITABLE (entry_b), 0, -1);
@@ -188,7 +188,6 @@ static void tform_reset_cb (GtkWidget *w, ggobid *gg)
 void
 tfvar_selection_made_cb (GtkTreeSelection *tree_sel, ggobid *gg)
 {
-#if 0
   gboolean rval = false;
   GtkTreeView *tree_view = gtk_tree_selection_get_tree_view(tree_sel);
   datad *d = (datad *) g_object_get_data(G_OBJECT (tree_view), "datad");
@@ -205,7 +204,6 @@ tfvar_selection_made_cb (GtkTreeSelection *tree_sel, ggobid *gg)
   gfloat param;
   gint tform2;
 
-
   if (!d)
     return;
 
@@ -214,7 +212,7 @@ tfvar_selection_made_cb (GtkTreeSelection *tree_sel, ggobid *gg)
     return;
 
   vtnew = (vartabled *) g_malloc(sizeof(vartabled));
-  vt0 = vartable_element_get (0, d);
+  vt0 = vartable_element_get (rows[0], d);
   vt_copy (vt0, vtnew);
 
   /* If there's only one selected variable, we're ready to reset the
@@ -235,15 +233,14 @@ tfvar_selection_made_cb (GtkTreeSelection *tree_sel, ggobid *gg)
   }
 
   /* This causes an endless loop, somehow -- resetting the widgets
-   * calls transform(), and why that calls this over agai, I don't know. */
+   * calls transform() .. */
   /* Reset the widgets on the panel */
-  tf0_opt_menu_set_value(vtnew, gg);
-  tf1_opt_menu_set_value(vtnew, gg);
-  tf2_opt_menu_set_value(vtnew, gg);
+  tf0_combo_box_set_value(vtnew, false/*don't transform*/, gg);
+  tf1_combo_box_set_value(vtnew, false, gg);
+  tf2_combo_box_set_value(vtnew, false, gg);
 
   g_free(rows);
   g_free (vtnew);
-#endif
 }
 
 void
@@ -288,13 +285,13 @@ transform_window_open (ggobid *gg)
     gtk_box_pack_start (GTK_BOX (vbox), frame, false, false, 1);
 
     stage0_option_menu = gtk_combo_box_new_text ();
-    gtk_widget_set_name (stage0_option_menu, "TRANSFORM:stage0_option_menu");
+    gtk_widget_set_name (stage0_option_menu, "TFORM:stage0_options");
     //gtk_container_set_border_width (GTK_CONTAINER (stage0_option_menu), 4);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), stage0_option_menu,
       "Stage 0: Adjust the domain of the variables",
       NULL);
-    populate_combo_box (stage0_option_menu, stage0_lbl, G_N_ELEMENTS(stage0_lbl),
-      G_CALLBACK(stage0_cb), gg);
+    populate_combo_box (stage0_option_menu, stage0_lbl, 
+      G_N_ELEMENTS(stage0_lbl), G_CALLBACK(stage0_cb), gg);
     gtk_container_add (GTK_CONTAINER (frame), stage0_option_menu);
 
     /*
@@ -309,12 +306,12 @@ transform_window_open (ggobid *gg)
     gtk_container_add (GTK_CONTAINER (frame), vb);
 
     stage1_option_menu = gtk_combo_box_new_text ();
-    gtk_widget_set_name (stage1_option_menu, "TRANSFORM:stage1_option_menu");
+    gtk_widget_set_name (stage1_option_menu, "TFORM:stage1_options");
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), stage1_option_menu,
       "Stage 1: Data-independent transformations, preserving user-defined limits",
       NULL);
-    populate_combo_box (stage1_option_menu, stage1_lbl, G_N_ELEMENTS(stage1_lbl),
-    	G_CALLBACK(stage1_cb), gg);
+    populate_combo_box (stage1_option_menu, stage1_lbl, 
+      G_N_ELEMENTS(stage1_lbl), G_CALLBACK(stage1_cb), gg);
     gtk_box_pack_start (GTK_BOX (vb), stage1_option_menu, true, false, 1);
 
     /*-- label and spin button for Box-Cox parameter --*/
@@ -353,7 +350,7 @@ transform_window_open (ggobid *gg)
 
     entry_a = gtk_entry_new ();
 	gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), entry_a);
-    gtk_widget_set_name (entry_a, "TRANSFORM:entry_a");
+    gtk_widget_set_name (entry_a, "TFORM:entry_a");
     gtk_entry_set_text (GTK_ENTRY (entry_a), "0");
 	gtk_entry_set_width_chars(GTK_ENTRY(entry_a), 9);
     //gtk_widget_set_usize (entry_a, width, -1);
@@ -365,7 +362,7 @@ transform_window_open (ggobid *gg)
 
     entry_b = gtk_entry_new ();
 	gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), entry_b);
-    gtk_widget_set_name (entry_b, "TRANSFORM:entry_b");
+    gtk_widget_set_name (entry_b, "TFORM:entry_b");
     gtk_entry_set_text (GTK_ENTRY (entry_b), "1");
 	gtk_entry_set_width_chars(GTK_ENTRY(entry_b), 9);
     //gtk_widget_set_usize (entry_b, width, -1);
@@ -379,13 +376,13 @@ transform_window_open (ggobid *gg)
     gtk_box_pack_start (GTK_BOX (vbox), frame, false, false, 1);
 
     stage2_option_menu = gtk_combo_box_new_text ();
-    gtk_widget_set_name (stage2_option_menu, "TRANSFORM:stage2_option_menu");
+    gtk_widget_set_name (stage2_option_menu, "TFORM:stage2_options");
     //gtk_container_set_border_width (GTK_CONTAINER (stage2_option_menu), 4);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), stage2_option_menu,
       "Stage 2: Data-dependent transformations, ignoring user-defined limits",
       NULL);
-    populate_combo_box (stage2_option_menu, stage2_lbl, G_N_ELEMENTS(stage2_lbl),
-      G_CALLBACK(stage2_cb), gg);
+    populate_combo_box (stage2_option_menu, stage2_lbl, 
+      G_N_ELEMENTS(stage2_lbl), G_CALLBACK(stage2_cb), gg);
     gtk_container_add (GTK_CONTAINER (frame), stage2_option_menu);
 
     /*
@@ -425,56 +422,83 @@ transform_window_open (ggobid *gg)
  * They're used when the transformations are set from somewhere
  * other than those option menus, such as the reset button.
 */
-static void  // These are combo boxes now, and should use MVC.
-tf0_opt_menu_set_value(vartabled *vt, ggobid *gg)
+/*----------------------------------------------------------------*/
+static void
+tf0_combo_box_set_value (vartabled *vt, gboolean force, ggobid *gg)
 {
-  GtkWidget *opt;
-  opt = widget_find_by_name (gg->tform_ui.window,
-                             "TRANSFORM:stage0_option_menu");
-  if (opt != NULL) {
-    gtk_combo_box_set_active (GTK_COMBO_BOX (opt), vt->tform0);
+  GtkWidget *cbox;
+  GCallback func = G_CALLBACK(stage0_cb);
+  gint n;
+
+  cbox = widget_find_by_name (gg->tform_ui.window, "TFORM:stage0_options");
+  if (cbox != NULL) {
+    if (!force) { // remove callback: responding to variable selection
+      n = g_signal_handlers_block_by_func(G_OBJECT(cbox), func, gg);
+    }
+    // Set the combo box selection
+    gtk_combo_box_set_active (GTK_COMBO_BOX (cbox), vt->tform0);
+    if (!force) { // restore callback
+      n = g_signal_handlers_unblock_by_func(G_OBJECT(cbox), func, gg);
+    }
   }
 }
 void
-transform0_opt_menu_set_value (gint j, datad *d, ggobid *gg)
+transform0_combo_box_set_value (gint j, gboolean force, datad *d, ggobid *gg)
 {
   vartabled *vt = vartable_element_get (j, d);
   if (vt != NULL)
-    tf0_opt_menu_set_value(vt, gg);
+    tf0_combo_box_set_value(vt, force, gg);
 }
 /*-------------------------------------------------------------------*/
 static void
-tf1_opt_menu_set_value(vartabled *vt, ggobid *gg)
+tf1_combo_box_set_value(vartabled *vt, gboolean force, ggobid *gg)
 {
-  GtkWidget *opt;
-  opt = widget_find_by_name (gg->tform_ui.window,
-                             "TRANSFORM:stage1_option_menu");
-  if (opt) {
-    //g_printerr ("tf1: resetting to %d\n", vt->tform1);
-    gtk_combo_box_set_active (GTK_COMBO_BOX (opt), vt->tform1);
+  gint n = 0;
+  GtkWidget *cbox;
+  GCallback func = G_CALLBACK(stage1_cb);
+
+  cbox = widget_find_by_name (gg->tform_ui.window, "TFORM:stage1_options");
+  if (cbox) {
+    if (!force) { // remove callback: responding to variable selection
+      n = g_signal_handlers_block_by_func(G_OBJECT(cbox), func, gg);
+    }
+    // Set the combo box selection
+    gtk_combo_box_set_active (GTK_COMBO_BOX (cbox), vt->tform1);
+    if (!force) { // restore callback
+      n = g_signal_handlers_unblock_by_func(G_OBJECT(cbox), func, gg);
+    }
   }
 }
 void
-transform1_opt_menu_set_value (gint j, datad *d, ggobid *gg)
+transform1_combo_box_set_value (gint j, gboolean force, datad *d, ggobid *gg)
 {
   vartabled *vt = vartable_element_get (j, d);
   if (vt != NULL)
-    tf1_opt_menu_set_value(vt, gg);
+    tf1_combo_box_set_value(vt, force, gg);
 }
 /*-------------------------------------------------------------------*/
 static void
-tf2_opt_menu_set_value(vartabled *vt, ggobid *gg)
+tf2_combo_box_set_value(vartabled *vt, gboolean force, ggobid *gg)
 {
-  GtkWidget *opt;
-  opt = widget_find_by_name (gg->tform_ui.window,
-                             "TRANSFORM:stage2_option_menu");
-  if (opt != NULL)
-    gtk_combo_box_set_active (GTK_COMBO_BOX (opt), vt->tform2);
+  gint n;
+  GtkWidget *cbox;
+  cbox = widget_find_by_name (gg->tform_ui.window, "TFORM:stage2_options");
+  GCallback func = G_CALLBACK(stage2_cb);
+
+  if (cbox != NULL)
+    if (!force) { // remove callback: responding to variable selection
+      n = g_signal_handlers_block_by_func(G_OBJECT(cbox), func, gg);
+    }
+    // Set the combo box selection
+    gtk_combo_box_set_active (GTK_COMBO_BOX (cbox), vt->tform2);
+    if (!force) { // restore callback
+      n = g_signal_handlers_unblock_by_func(G_OBJECT(cbox), func, gg);
+    }
 }
 void
-transform2_opt_menu_set_value (gint j, datad *d, ggobid *gg)
+transform2_combo_box_set_value (gint j, gboolean force, datad *d, ggobid *gg)
 {
   vartabled *vt = vartable_element_get (j, d);
   if (vt != NULL)
-    tf2_opt_menu_set_value(vt, gg);
+    tf2_combo_box_set_value(vt, force, gg);
 }

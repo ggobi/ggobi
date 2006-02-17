@@ -161,6 +161,7 @@ transform_values_init (gint j, datad *d, ggobid *gg)
 void
 vt_copy(vartabled *vtf, vartabled *vtt)
 {
+  vtt->tform0 = vtf->tform0;
   vtt->tform1 = vtf->tform1;
   vtt->tform2 = vtf->tform2;
   vtt->domain_incr = vtf->domain_incr;
@@ -240,7 +241,7 @@ transform0_values_set (gint tform0, gint j, datad *d, ggobid *gg)
   vt->inv_domain_adj = inv_domain_adj;
 
   /*-- set explicitly in case the routine is not called from the ui --*/
-  transform0_opt_menu_set_value (j, d, gg);
+  transform0_combo_box_set_value (j, true/*transform*/, d, gg);
 }
 
 void
@@ -253,7 +254,7 @@ transform1_values_set (gint tform1, gfloat expt, gint j,
   vt->param = expt;
 
   /*-- set explicitly in case the routine is not called from the ui --*/
-  transform1_opt_menu_set_value (j, d, gg);
+  transform1_combo_box_set_value (j, true, d, gg);
 }
 
 gboolean 
@@ -265,15 +266,21 @@ transform1_apply (gint j, datad *d, ggobid *gg)
   gboolean tform_ok = true;
   gdouble dtmp;
   lims slim, slim_tform;  /*-- specified limits --*/
-  GtkWidget *stage1_option_menu = widget_find_by_name (gg->tform_ui.window,
-                                            "TRANSFORM:stage1_option_menu");
-  gint tform1 = gtk_combo_box_get_active (GTK_COMBO_BOX (stage1_option_menu));
+  GtkWidget *stage1_cbox;
+  gint tform1;
   gfloat boxcoxparam = gg->tform_ui.boxcox_adj->value;
   vartabled *vt = vartable_element_get (j, d);
   gfloat incr = vt->domain_incr;
   gfloat (*domain_adj) (gfloat x, gfloat incr) = vt->domain_adj;
 
-  
+  stage1_cbox = widget_find_by_name (gg->tform_ui.window,
+    "TFORM:stage1_options");
+
+  if (!stage1_cbox)
+    return false;
+
+  tform1 = gtk_combo_box_get_active (GTK_COMBO_BOX (stage1_cbox));
+
   /*-- adjust the transformed value of the user-supplied limits --*/
   if (vt->lim_specified_p) {
     slim.min = vt->lim_specified.min;
@@ -539,7 +546,7 @@ transform2_values_set (gint tform2, gint j, datad *d, ggobid *gg)
   vt->tform2 = tform2;
 
   /*-- set explicitly in case the routine is not called from the ui --*/
-  transform2_opt_menu_set_value (j, d, gg);
+  transform2_combo_box_set_value (j, true, d, gg);
 }
 
 gboolean 
@@ -547,9 +554,15 @@ transform2_apply (gint jcol, datad *d, ggobid *gg)
 {
   gint i, m;
   gboolean tform_ok = true;
-  GtkWidget *stage2_option_menu = widget_find_by_name (gg->tform_ui.window,
-                                            "TRANSFORM:stage2_option_menu");
-  gint tform2 = gtk_combo_box_get_active (GTK_COMBO_BOX (stage2_option_menu));
+  GtkWidget *stage2_cbox;
+  gint tform2;
+
+  stage2_cbox = widget_find_by_name (gg->tform_ui.window,
+                                            "TFORM:stage2_options");
+  if (!stage2_cbox)
+    return false;
+
+  tform2 = gtk_combo_box_get_active (GTK_COMBO_BOX (stage2_cbox));
 
   switch (tform2)
   {

@@ -237,7 +237,7 @@ populate_combo_box(GtkWidget *combo_box, gchar **lbl, gint nitems,
 {
   gint i;
   for (i=0; i<nitems; i++) {
-	  gtk_combo_box_append_text(GTK_COMBO_BOX(combo_box), lbl[i]);
+    gtk_combo_box_append_text(GTK_COMBO_BOX(combo_box), lbl[i]);
   }
   //gtk_combo_box_set_add_tearoffs(GTK_COMBO_BOX(combo_box), true);
   gtk_combo_box_set_active(GTK_COMBO_BOX(combo_box), 0);
@@ -259,13 +259,13 @@ populate_tree_view(GtkWidget *tree_view, gchar **lbl, gint nitems,
   GtkTreeSelection *sel;
 	
   for (i=0; i<nitems; i++) {
-	if (!headers || lbl[i]) {
-		GtkTreeViewColumn *col = gtk_tree_view_column_new_with_attributes(
-			headers ? lbl[i] : NULL, gtk_cell_renderer_text_new(), "markup", i, NULL);
-		gtk_tree_view_column_set_sort_column_id(col, i);
-		gtk_tree_view_column_set_resizable(col, true);
-		gtk_tree_view_insert_column(GTK_TREE_VIEW(tree_view), col, -1);
-	}
+    if (!headers || lbl[i]) {
+      GtkTreeViewColumn *col = gtk_tree_view_column_new_with_attributes(
+	headers ? lbl[i] : NULL, gtk_cell_renderer_text_new(), "markup", i, NULL);
+      gtk_tree_view_column_set_sort_column_id(col, i);
+      gtk_tree_view_column_set_resizable(col, true);
+      gtk_tree_view_insert_column(GTK_TREE_VIEW(tree_view), col, -1);
+    }
   }
   gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(tree_view), headers);
   sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view));
