@@ -241,7 +241,7 @@ transform0_values_set (gint tform0, gint j, datad *d, ggobid *gg)
   vt->inv_domain_adj = inv_domain_adj;
 
   /*-- set explicitly in case the routine is not called from the ui --*/
-  transform0_combo_box_set_value (j, true/*transform*/, d, gg);
+  transform0_combo_box_set_value (j, false/*transform*/, d, gg);
 }
 
 void
@@ -254,7 +254,7 @@ transform1_values_set (gint tform1, gfloat expt, gint j,
   vt->param = expt;
 
   /*-- set explicitly in case the routine is not called from the ui --*/
-  transform1_combo_box_set_value (j, true, d, gg);
+  transform1_combo_box_set_value (j, false, d, gg);
 }
 
 gboolean 
@@ -315,7 +315,7 @@ transform1_apply (gint j, datad *d, ggobid *gg)
           }
         }
         /*-- apply the same domain test to the specified limits --*/
-        if (vt->lim_specified_p) {
+        if (tform_ok && vt->lim_specified_p) {
           if (((*domain_adj)(slim_tform.min, incr) <= 0) ||
               ((*domain_adj)(slim_tform.max, incr) <= 0))
           {
@@ -369,7 +369,7 @@ transform1_apply (gint j, datad *d, ggobid *gg)
         }
 
         /*-- apply the same transformation to the specified limits --*/
-        if (vt->lim_specified_p) {
+        if (tform_ok && vt->lim_specified_p) {
           dtmp = pow ((gdouble) (*domain_adj)(slim.min, incr), boxcoxparam);
 #ifdef WIN32
           if (!_finite (dtmp)) {
@@ -404,7 +404,7 @@ transform1_apply (gint j, datad *d, ggobid *gg)
         }
       }
       /*-- apply the same domain test to the specified limits --*/
-      if (vt->lim_specified_p) {
+      if (tform_ok && vt->lim_specified_p) {
         if (((*domain_adj)(slim_tform.min, incr) <= 0) ||
             ((*domain_adj)(slim_tform.max, incr) <= 0))
         {
@@ -442,7 +442,7 @@ transform1_apply (gint j, datad *d, ggobid *gg)
         }
       }
       /*-- apply the same domain test to the specified limits --*/
-      if (vt->lim_specified_p) {
+      if (tform_ok && vt->lim_specified_p) {
         if (SIGNUM((*domain_adj)(slim_tform.min, incr)) !=
             SIGNUM((*domain_adj)(slim_tform.max, incr)))
         {
@@ -815,11 +815,12 @@ void tform_label_update (gint j, datad *d, ggobid *gg)
  * tform_type depends on the stage
  * param is the box-cox exponent, only used in stage 1
 */
-void
+gboolean
 transform_variable (gint stage, gint tform_type, gfloat param, gint jcol,
   datad *d, ggobid *gg)
 {
-  //g_printerr ("transform_variable for stage=%d, j=%d\n", stage, jcol);
+  gboolean success = true;
+
   switch (stage) {
     case 0:
 
@@ -829,13 +830,15 @@ transform_variable (gint stage, gint tform_type, gfloat param, gint jcol,
       /*-- if it fails, reset tform1 to NULL --*/
       if (!transform1_apply (jcol, d, gg)) {
         transform1_values_set (NO_TFORM1, 0.0, jcol, d, gg);
-        transform1_apply (jcol, d, gg);
+        //transform1_apply (jcol, d, gg);  // not needed?
+        success = false;
       }
 
       /*-- try to apply tform2 to the new values of tform1 --*/
       /*-- if it fails, reset tform2 to NULL --*/
       if (!transform2_apply (jcol, d, gg)) {
         transform2_values_set (NO_TFORM2, jcol, d, gg);
+        success = false;
       }
       break;
 
@@ -847,6 +850,7 @@ transform_variable (gint stage, gint tform_type, gfloat param, gint jcol,
       if (!transform1_apply (jcol, d, gg)) {
         transform1_values_set (NO_TFORM1, 0., jcol, d, gg);
         transform1_apply (jcol, d, gg);
+        success = false;
       }
 
       /*-- then run the stage2 transform --*/
@@ -854,11 +858,14 @@ transform_variable (gint stage, gint tform_type, gfloat param, gint jcol,
         transform2_values_set (tform_type, jcol, d, gg);
       if (!transform2_apply (jcol, d, gg)) {
         transform2_values_set (NO_TFORM2, jcol, d, gg);
+        success = false;
       }
     break;
   }
 
   tform_label_update (jcol, d, gg);
+
+  return success;
 }
 
 void
@@ -866,12 +873,19 @@ transform (gint stage, gint tform_type, gfloat param, gint *vars, gint nvars,
   datad *d, ggobid *gg) 
 {
   gint k;
+  gboolean ok = true;
+  gint completed = nvars;
 
-  for (k=0; k<nvars; k++)
-    transform_variable (stage, tform_type, param, vars[k], d, gg);
+  for (k=0; k<nvars; k++) {
+    ok = transform_variable (stage, tform_type, param, vars[k], d, gg);
+    if (!ok) {
+      completed = k;
+      break;
+    }
+  }
   
   limits_set (false, true, d, gg);  
-  for (k=0; k<nvars; k++) {
+  for (k=0; k<completed; k++) {
     vartable_limits_set_by_var (vars[k], d);
     vartable_stats_set_by_var (vars[k], d);
     tform_to_world_by_var (vars[k], d, gg);

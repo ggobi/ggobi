@@ -70,7 +70,7 @@ stage1_cb (GtkWidget *w, ggobid *gg)
   datad *d = (datad *) g_object_get_data(G_OBJECT (tree_view), "datad");
   gint *vars;// = (gint *) g_malloc (d->ncols * sizeof(gint));
   gint nvars;
-  
+
   vars = get_selections_from_tree_view (tree_view, &nvars);
 
   if (nvars) {

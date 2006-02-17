@@ -624,7 +624,7 @@ void       transform2_combo_box_set_value (gint, gboolean, datad *, ggobid *);
 void       transform2_values_set (gint, gint, datad *, ggobid *);
 void       transform_values_copy (gint jfrom, gint jto, datad *d);
 void       transform_values_init (gint j, datad *, ggobid *);
-void       transform_variable (gint, gint, gfloat, gint, datad *, ggobid *);
+gboolean   transform_variable (gint, gint, gfloat, gint, datad *, ggobid *);
 void       transform_window_open (ggobid *);
 gboolean   update_color_vectors (gint i, gboolean changed, gboolean *hit_by_brush, datad *d, ggobid *gg);
 gboolean   update_glyph_vectors (gint i, gboolean changed, gboolean *hit_by_brush, datad *d, ggobid *gg);
