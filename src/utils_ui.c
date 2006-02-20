@@ -607,7 +607,7 @@ create_variable_notebook (GtkWidget *box, GtkSelectionMode mode,
 		      GTK_OBJECT (notebook));
   g_signal_connect (G_OBJECT (gg),
 		      "variable_list_changed", 
-		      G_CALLBACK (variable_notebook_varchange_cb),
+		      G_CALLBACK (variable_notebook_list_changed_cb),
 		      GTK_OBJECT (notebook));
 
   /*-- listen for datad_added events on main_window --*/
@@ -658,6 +658,16 @@ prefixed_variable_notebook_varchange_cb (ggobid *gg, vartabled *vt, gint which,
   kd = g_slist_index (gg->d, d);
 
   variable_notebook_page_add_prefices(GTK_WIDGET(notebook), kd);
+}
+
+void 
+prefixed_variable_notebook_list_changed_cb(ggobid *gg, datad *d, GtkNotebook *notebook)
+{
+  if (!GTK_IS_NOTEBOOK(notebook)) {
+    g_printerr("(variable_notebook_list_changed_cb) notebook? %d\n",
+      GTK_IS_NOTEBOOK(notebook));
+  }
+  prefixed_variable_notebook_varchange_cb(gg, NULL, -1, d, notebook);
 }
 
 static void 
@@ -720,7 +730,7 @@ GtkWidget *create_prefixed_variable_notebook(GtkWidget *box,
     GTK_OBJECT (notebook));
   g_signal_connect (G_OBJECT (gg),
     "variable_list_changed", 
-    G_CALLBACK (prefixed_variable_notebook_varchange_cb),
+    G_CALLBACK (prefixed_variable_notebook_list_changed_cb),
     GTK_OBJECT (notebook));
   g_signal_connect (G_OBJECT (gg),
     "datad_added", 

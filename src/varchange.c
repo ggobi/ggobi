@@ -36,8 +36,8 @@ addvar_vartable_expand (gint ncols, datad *d, ggobid *gg)
 
   for (j=d->ncols; j<d->ncols+ncols; j++) {
     /*-- allocate the new vartable element, initialize with default values --*/
-    vartable_element_new (d);
-    transform_values_init (j, d, gg);
+    vartabled *vt = vartable_element_new (d);
+    transform_values_init (vt);
   }
 }
 
@@ -124,7 +124,7 @@ newvar_add_with_values (gdouble *vals, gint nvals, gchar *vname,
   if (type == categorical)
     vartable_element_categorical_init (vt, nlevels, level_names,
       level_values, level_counts);
-  transform_values_init (jvar, d, gg);
+  transform_values_init (vt);
 
   for (i=0; i<d->nrows; i++) {
     if(vals == &AddVarRowNumbers) {

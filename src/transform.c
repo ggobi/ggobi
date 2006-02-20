@@ -152,9 +152,8 @@ vt_init(vartabled *vt)
   vt->inv_domain_adj = no_change;
 }
 void
-transform_values_init (gint j, datad *d, ggobid *gg) 
+transform_values_init (vartabled *vt) 
 {
-  vartabled *vt = vartable_element_get (j, d);
   vt_init(vt);
 }
 
