@@ -518,11 +518,6 @@ variable_notebook_varchange_cb (ggobid *gg, vartabled *vt, gint which,
   datad *d;
   gint kd = -1;
 
-  if (! GTK_IS_NOTEBOOK(notebook)) {
-    g_printerr ("(variable_notebook_varchange_cb) notebook? %d\n", GTK_IS_NOTEBOOK(notebook));
-    return;
-  }
-
   /*-- add one or more variables to this datad --*/
   d = (datad *) datad_get_from_notebook (GTK_WIDGET(notebook), gg);
   kd = g_slist_index (gg->d, d);
@@ -554,10 +549,6 @@ variable_notebook_varchange_cb (ggobid *gg, vartabled *vt, gint which,
 void 
 variable_notebook_list_changed_cb(ggobid *gg, datad *d, void *notebook)
 {
-  if (!GTK_IS_NOTEBOOK(notebook)) {
-    g_printerr("(variable_notebook_list_changed_cb) notebook? %d\n",
-      GTK_IS_NOTEBOOK(notebook));
-  }
   variable_notebook_varchange_cb(gg, NULL, -1, d, notebook);
 }
 
@@ -649,11 +640,6 @@ prefixed_variable_notebook_varchange_cb (ggobid *gg, vartabled *vt, gint which,
   datad *d;
   gint kd;
 
-  if (!GTK_IS_NOTEBOOK(notebook)) {
-    g_printerr ("(prefixed_variable_notebook_varchange_cb) notebook? %d\n",
-	GTK_IS_NOTEBOOK(notebook));
-  }
-
   d = (datad *) datad_get_from_notebook (GTK_WIDGET(notebook), gg);
   kd = g_slist_index (gg->d, d);
 
@@ -663,10 +649,6 @@ prefixed_variable_notebook_varchange_cb (ggobid *gg, vartabled *vt, gint which,
 void 
 prefixed_variable_notebook_list_changed_cb(ggobid *gg, datad *d, GtkNotebook *notebook)
 {
-  if (!GTK_IS_NOTEBOOK(notebook)) {
-    g_printerr("(variable_notebook_list_changed_cb) notebook? %d\n",
-      GTK_IS_NOTEBOOK(notebook));
-  }
   prefixed_variable_notebook_varchange_cb(gg, NULL, -1, d, notebook);
 }
 

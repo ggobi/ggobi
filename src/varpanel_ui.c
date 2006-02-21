@@ -515,6 +515,7 @@ varpanel_make (GtkWidget *parent, ggobid *gg) {
 
   gg->varpanel_ui.notebook = gtk_notebook_new ();
   gtk_notebook_set_show_border (GTK_NOTEBOOK (gg->varpanel_ui.notebook), FALSE);
+  gtk_notebook_set_scrollable (GTK_NOTEBOOK (gg->varpanel_ui.notebook), TRUE);
   gtk_notebook_set_tab_pos (GTK_NOTEBOOK (gg->varpanel_ui.notebook),
     GTK_POS_TOP);
   g_signal_connect (G_OBJECT (gg->varpanel_ui.notebook), "switch-page",
