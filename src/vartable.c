@@ -290,13 +290,13 @@ void vartable_init (datad *d)
 void
 vartable_element_init(vartabled *vt, const gchar *label, const gchar *nickname)
 {
-	if (vt) {
-		vt->collab = g_strdup(label);
-		vt->collab_tform = g_strdup(label);
-		if (nickname)
-			vt->nickname = g_strdup(nickname);
-		else vt->nickname = g_strndup(vt->collab, 2);
-	}
+  if (vt) {
+    vt->collab = g_strdup(label);
+    vt->collab_tform = g_strdup(label);
+    if (nickname)
+      vt->nickname = g_strdup(nickname);
+    else vt->nickname = g_strndup(vt->collab, 2);
+  }
 }
 
 void

@@ -74,7 +74,6 @@ dialog_range_set (GtkWidget *w, ggobid *gg)
 {
   GtkWidget *dialog = w;
   GtkWidget *umin_entry, *umax_entry;
-  //GtkWidget *tree_view = vartable_tree_view_get (gg);
   GtkTreeModel *model;
   datad *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
   gint *cols = (gint *) g_malloc (d->ncols * sizeof (gint));
@@ -120,18 +119,18 @@ dialog_range_set (GtkWidget *w, ggobid *gg)
   } else {
 
     for (k=0; k<ncols; k++) {
-	  GtkTreeIter iter;
+      GtkTreeIter iter;
 	  
       j = cols[k];
-	  vt = vartable_element_get (j, d);
+      vt = vartable_element_get (j, d);
 
-	  vartable_iter_from_varno(j, d, &model, &iter);
+      vartable_iter_from_varno(j, d, &model, &iter);
       
       vt->lim_specified.min = vt->lim_specified_tform.min = min_val;
       vt->lim_specified.max = vt->lim_specified_tform.max = max_val;
 
-	  gtk_tree_store_set(GTK_TREE_STORE(model), &iter, 
-	  	VT_REAL_USER_MIN, min_val, VT_REAL_USER_MAX, max_val, -1);
+      gtk_tree_store_set(GTK_TREE_STORE(model), &iter, 
+	VT_REAL_USER_MIN, min_val, VT_REAL_USER_MAX, max_val, -1);
       
       vt->lim_specified_p = min_p && max_p;
     }
@@ -311,12 +310,12 @@ void range_unset (ggobid *gg)
   vartabled *vt;
 
   for (k=0; k<ncols; k++) {
-	  GtkTreeIter iter;
+    GtkTreeIter iter;
 	  
     j = cols[k];
     vt = vartable_element_get (j, d);
 	
-	vartable_iter_from_varno(j, d, &model, &iter);
+    vartable_iter_from_varno(j, d, &model, &iter);
 	  
     vt->lim_specified_p = false;
     /*-- then null out the two entries in the table --*/
@@ -396,8 +395,9 @@ open_newvar_dialog (GtkWidget *w, ggobid *gg)
   GtkWidget *radio1, *radio2, *entry;
   GSList *radio_group;
 
-  dialog = gtk_dialog_new_with_buttons ("Add New Variable", NULL, 0, GTK_STOCK_OK,
-  				GTK_RESPONSE_ACCEPT, GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT, NULL);
+  dialog = gtk_dialog_new_with_buttons ("Add New Variable", NULL, 0, 
+    GTK_STOCK_OK, GTK_RESPONSE_ACCEPT, GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT, 
+    NULL);
   frame = gtk_frame_new ("Variable values");
   gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
   gtk_box_pack_start (GTK_BOX (GTK_DIALOG (dialog)->vbox), frame,

@@ -21,13 +21,13 @@ extern const double AddVarBrushGroup;
 
 typedef enum {real, categorical, integer, counter, uniform,  all_vartypes} vartyped;
 
-
 /*
- * a vartabled object is not a table, but rather an entry in
- * a table:  it's all the data for a single variable, and it
- * is used to populate a row in the variable manipulation table.
+ * A vartabled object is not a table, but rather an entry in a table:
+ * it's all the data for a single variable, and it is used to populate
+ * a row in the variable manipulation table.  Now that is done using a
+ * GtkTreeModel, so be careful before adding or moving an element in
+ * this structure.
 */
-
 typedef struct {
  struct _datad *d;  /*-- I want a pointer back to its parent datad --*/
 
