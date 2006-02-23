@@ -51,7 +51,7 @@
 \parindent 0in
 \parskip 6pt
 
-\begin {document}
+\begin{document}
 \title {{\tt ggobi} Manual}
 \author{
 Deborah F. Swayne, AT\&T Labs -- Research \\
@@ -1043,79 +1043,34 @@ to tell you the interaction of the plot.
 \subsection{Scaling of axes}
 \label{slbl:Scaling}
 
-There are three ways to perform view scaling: \Widget{Drag} and
-\Widget{Click} scaling are visible in the interface, and available in
-all projections.  When axes are present in scatterplots, you can also
-scale the view using the axes themselves.
-
-The two styles of interaction, \Widget{Drag} and \Widget{Click}, are
-quite different.  Drag-style scaling is a perfect example of a direct
-manipulation interface, in which the points follow cursor motion in a
-very simple way.  However, if you're looking at a lot of data, the
-points may sometimes lag behind the cursor motion, making the degree
-of panning or zooming hard to control.  There's also no way to hold
-the aspect ratio fixed with drag-style scaling.
-
-Click-style scaling may take you a few minutes to get used to, but
-you'll find that it gives you very precise control and is especially
-useful when you have a lot of data.
+You can think of view scaling as if you're operating a camera and
+looking at a projection of the data in the viewfinder.  That is, you
+aren't transforming the data itself, just your view of it.  There are
+two ways to perform view scaling: by using the sliders on the console
+or by direct manipulation in the plot window.
 
 To activate this interaction from the keyboard, type {\em s} or
 {\em S} with the focus in the plot window, or type Control-{\em s} or
 Control-{\em S} with the focus in the console.
 
-\subsubsection{Drag}
+\subsubsection{Sliders}
 
-For the default setting, Drag, the actions of the mouse can be
-described in terms of a camera:  you're operating a camera and
-looking at a projection of the data in the viewfinder.  When you use
-the left button, the camera is panning freely around, following the
-mouse exactly.  When you use the middle or right button, you're
-zooming the camera in and out, and changing the aspect ratio of
-the plot.  (There is an option that allows you to fix the
-aspect ratio, too.)
+There are two Zoom sliders, one for zooming in and out horizontally
+and the other for zooming vertically.  Drag a slider, or click in the
+trough, to zoom.  To manipulate both sliders at once, select
+\Widget{Fixed aspect}.
 
-\subsubsection{Click}
+\subsubsection{Direct manipulation}
 
-When you select the Click interaction style, the manipulation is
-not so direct, but your control of the panning and zooming becomes
-more precise.
-
-With \Widget{Pan} selected, the mouse controls the endpoint of a line
-segment which is anchored at the center of the plot (just where the
-center of the crosshair is in Drag style).  When you press the
-\Widget{Space} bar, you'll cause the plot to pan so that the endpoint
-becomes the new center -- ie, short segments yield small movements.
-Repeated presses repeat the motion in the same direction -- convenient
-for browsing time-dependent data, for instance.
-
-With \Widget{Zoom} selected, the visual guide changes again: this time,
-the mouse controls a rectangle, and two keys are used: {\boldmath $<$}
-to zoom in and {\boldmath $>$} to zoom out an amount inversely
-proportional to the size of the rectangle -- that is, large rectangles
-yield small movements.
+Use the left button to pan move the data freely around the window, and
+the middle or right button to zoom.  Once again, selecting
+\Widget{Fixed aspect} will hold the aspect ratio constant during
+zooming.
 
 \subsubsection{Reset}
 
 To reset the plot, use the \Widget{Scale} menu in the display's menubar:
 it has two entries, allowing pan and zoom to be reset separately.
-
-\subsubsection{Click: pan and zoom options}
-
-By the default, the panning and zooming of the plot is unconstrained,
-moving or rescaling vertically and horizontally with each action.
-The pan and zoom options allow it to be constrained so that only
-one axis is affected, convenient for browsing one variable at a time.
-
-\subsubsection{Using the axes}
-
-To pan the data in simple 1D and 2D projections, simply drag the mouse
-in the axis widgets with the left button pressed.  To zoom, drag with
-the middle or right button pressed.
-
-At this writing, we don't require that ggobi be in the scaling mode to
-scale this way, but we may add that restriction if this raises
-difficulties.
 
 \subsection{Brush: brushing of points and edges}
 \label{slbl:Brush}
@@ -1194,8 +1149,8 @@ accent colors.
 \subsubsection{Linking rules}
 \label{LinkingRules}
 
-This list is used to define which of two linking rules is
-to be used.  The default rule, linking by case id, dictates that points
+This list is used to define which of two linking rules is to be used.
+The default rule, linking by case identifier, dictates that points
 representing records that have the same {\it id}, as specified in the
 XML description (or in the API), will respond identically to brushing
 events.  Ids are unique within a dataset, so this rule has no effect
@@ -1223,10 +1178,10 @@ count.
 
 \subsubsection{Tools of importance for brushing}
 
-See section \ref{slbl:ColorSchemes} for a description of the
-\Widget{Color Schemes} tool, and section
-\ref{slbl:ColorAndGlyphGroups} for the \Widget{Color \& glyph groups}
-tool.
+See section \ref{slbl:ColorSchemes} for a description of the selection
+of color schemes, section \ref{slbl:AutoBrushing} for a description of
+\Widget{Automatic Brushing} and section \ref{slbl:ColorAndGlyphGroups}
+for a description of a tool for showing and hiding clusters.
 
 \subsubsection{Brush menu in display}
 %
@@ -1313,18 +1268,18 @@ Control-{\em I} with the focus in the console.
 Here we add points or edges to the datasets by adding them to
 the displays.  
 
-Adding edges:  Press the mouse button when the cursor is near the
+Adding edges: Press the mouse button when the cursor is near the
 source node, and drag it around the window.  You'll see a temporary
 edge between the source and the nearest node, drawn using the current
 color and ``glyph.''  When you release the button, one of two things
-will happen:  If you pressed the left mouse button, a dialog window
-will appear with default values describing the new edge; if you
-pressed the middle or right button, the edge will simply be added
-with those same default values.
+will happen: If you pressed the middle or right mouse button, a dialog
+window will appear with default values describing the new edge; if you
+pressed the left button, the edge will simply be added with those same
+default values.
 
-Adding points:  Simply click a mouse button when the cursor is
-where you want the new point to be located.  As above, the left
-button raises a dialog, and the other buttons simply add the point.
+Adding points: Simply click a mouse button when the cursor is where
+you want the new point to be located.  As above, the middle or right
+button raises a dialog, and the left button simply adds the point.
 
 The default values that are assigned are the record label and record
 id (often the same), and the variable values (if the dataset being
@@ -1553,16 +1508,17 @@ The four types represented are
       color vision impairments.
 \end{itemize}
 
-\subsubsection{Applying the color scheme by variable}
+\subsection{Automatic brushing}
+\label{slbl:AutoBrushing}
 
-To brush the data according to the values of a variable, first select
+To paint the data according to the values of a variable, first select
 a variable in the list at the top of the tool window.  This adds two
 sets of numbers to the display: along the bottom of the display, at
 the center of each stripe of color, is shown the number of points that
-will be drawn with this color once \Widget{Apply color scheme by
-variable} is pressed.  Along the top of the display, at the boundaries
-between the stripes of color, appear the values of the chosen variable
-that define the boundaries between colors.
+will be drawn with this color once \Widget{Apply} is pressed.  Along
+the top of the display, at the boundaries between the stripes of
+color, appear the values of the chosen variable that define the
+boundaries between colors.
 
 There are two methods available for defining the bin boundaries, and
 a menu for choosing between them.  The ``constant bin width'' method
