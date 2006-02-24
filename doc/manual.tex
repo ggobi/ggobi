@@ -5,7 +5,6 @@
 %\bibliographystyle{asa}
 %\bibliographystyle{harvard}
 %\bibliographystyle{apalike}
-
 \def\Variable#1{\textsl{#1}}
 \def\Widget#1{\textbf{#1}}
 \def\File#1{\textsl{#1}}
@@ -28,7 +27,8 @@
 \ifpdf
   \pdfoutput=1
   \usepackage[pdftex]{graphicx}  % uncomment if using graphicx
-  \usepackage[pdftex]{hyperref}  % uncomment if using hyperref
+  \usepackage[pdftex,bookmarks,colorlinks,pdfpagemode=UseOutlines]{hyperref} 
+  % uncomment if using hyperref
 \else
   \usepackage{graphicx}  % uncomment if using graphicx
   \usepackage[colorlinks=true,

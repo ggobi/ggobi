@@ -22,7 +22,7 @@
 \usepackage{comment}
 
 \usepackage{fullpage}
-\usepackage{hyperref}
+\usepackage[pdftex,bookmarks,colorlinks,pdfpagemode=UseOutlines]{hyperref} 
 \title{The GGobi XML Input Format}
 \author{\href{http://cm.bell-labs.com/stat/duncan}{Duncan Temple Lang}\\
 \href{http://www.research.att.com/~dfs}{Deborah F. Swayne}}
@@ -96,13 +96,13 @@ The parser automatically determines whether the file is compressed or
 not.
 
 % Reads via http
-
-Note also that the XML parsing library has support for reading files
-via ftp and http.
-% No longer here; but should be somewhere
-\begin{verbatim}
-  ggobi http://www.ggobi.org/data/flea.xml
-\end{verbatim}
+% No data there currently
+% Note also that the XML parsing library has support for reading files
+% via ftp and http.
+% % No longer here; but should be somewhere
+% \begin{verbatim}
+%   ggobi http://www.ggobi.org/data/flea.xml
+% \end{verbatim}
 
 % File-specific defaults + record and cell-specific overrides
 
@@ -565,6 +565,6 @@ The XML Handbook, Charles F Goldfarb and Paul Prescod,
  Prentice Hall.
 
 \vspace{1em} \parindent 0em
-http://www.w3.org/XML
+\url{http://www.w3.org/XML}
 
 \end{document}
