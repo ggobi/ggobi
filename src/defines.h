@@ -280,4 +280,8 @@ typedef enum {
   PYTHON
   } ProgrammingLanguage;
 
+#if GTK_CHECK_VERSION(2,8,0)
+#define ENABLE_CAIRO 1
+#endif
+
 #endif /* End of conditional definition. */
