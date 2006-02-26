@@ -29,8 +29,6 @@ ifndef SHLIB_LDFLAGS
  SHLIB_LDFLAGS=-shared
 endif
 
-PLUGIN_LD_FLAGS+=-s
-
 %.o: %.c
 	$(CC) -c $(PIC_CFLAG) $(PLUGIN_CFLAGS) $(CFLAGS) $(GGOBI_CFLAGS) $<
 
@@ -45,7 +43,7 @@ PLUGIN_LD_FLAGS+=-s
 	nm -g --defined-only $(OBJS) > tmp
 	sed -n '/^........ [T|C] _/s/^........ [T|C] _/ /p' tmp >> $(@:%.dll=%.def)
 	rm tmp
-	$(CC) $(SHLIB_LDFLAGS) $(PLUGIN_LD_FLAGS) -o $@ $(@:%.dll=%.def) \
+	$(CC) $(SHLIB_LDFLAGS) $(PLUGIN_LD_FLAGS) -s -o $@ $(@:%.dll=%.def) \
 	-Wl,--out-implib,$(@:%.dll=%.a) $(OBJS) $(PLUGIN_LIBS) $(GGOBI_LIBS)
 	
 objects: 
