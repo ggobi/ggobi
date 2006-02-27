@@ -1,0 +1,64 @@
+Pipeline 2.0
+===============================================================
+
+Signals
+	* entire dataset changed
+	* columns changed
+	* rows changed 
+
+
+Raw data (inherits from pipeline)
+===============================================================
+
+ * creation and freeing
+
+Data:
+
+ * adding, setting, deleting variables
+ * adding, setting, deleting records
+ * variable type
+ * variable description
+
+Meta data:
+(for whole dataset, by variable, by cell and by record ?)
+
+list of attributes can be modified by plugins etc.
+
+ * add, get, set, delete record level attributes (shadowed, glyph, colour, size, shadowed, included, sampled) -- boolean, character, integer
+ * add, get, set, delete cell level attributes (missing)
+ * getting and setting row ids
+
+ * getting clusterid (defined as unique combination of colour, size, glyph), symbol table
+ * getting rows in plot (included && sampled)
+ * getting row number
+
+ * decorations?
+ * from and to edges
+ * map polygons
+
+Signals:
+
+ * row/column/cell attribute changed (which attribute changed)
+   * use signal details
+
+
+Metadata
+===============================================================
+
+ * variable level information
+
+
+Transformation
+===============================================================
+
+ * transformation information
+ 
+
+World
+===============================================================
+
+
+Jitter
+===============================================================
+
+
