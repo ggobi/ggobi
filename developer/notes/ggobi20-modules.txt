@@ -42,22 +42,39 @@ Signals:
    * use signal details
 
 
+===============================================================
 Metadata
 ===============================================================
 
- * variable level information
+ * variable level information -- all of vartable.h could remain part
+   of the datad attribute object, or it could be split, with the
+   transformation portion moved to the transformation object.
 
-
+===============================================================
 Transformation
 ===============================================================
 
- * transformation information
- 
+ * creation and freeing
 
+Data:
+
+ * input: n, p, the nxp raw data and the variable limits
+ * output: the transformation and its parameters, the nxp
+   transformed data.
+
+ * getting, setting values
+
+Signals:
+ * row/column/cell attribute changed (which attribute changed)
+   * use signal details
+
+
+===============================================================
 World
 ===============================================================
 
 
+===============================================================
 Jitter
 ===============================================================
 
