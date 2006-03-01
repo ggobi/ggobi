@@ -167,7 +167,7 @@ libggobi.so $(TOP)/lib/libggobi.so: $(OBJ)
 	$(CC) $(SHLIB_LDFLAGS) -o $@ $(OBJ) $(LIBS)
 
 libggobi.dylib $(TOP)/lib/libggobi.dylib: $(OBJ)
-	libtool -dynamic -o $@ $(OBJ) `echo "$(LIBS)"|sed 's/-bexpall//' | sed -e 's/-I[^ ]*//'` -lgcc
+	libtool $(SHLIB_LDFLAGS) -o $@ $(OBJ) $(LIBS) -lgcc
 
 libggobi.def: $(OBJ)
 	echo EXPORTS > $@

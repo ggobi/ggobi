@@ -154,7 +154,7 @@ SHLIB_EXT="so"
 if test "`uname`" = "Darwin" ; then
  echo "Darwin operating system detected."
  PIC_CFLAG=-fno-common
- SHLIB_LDFLAGS=-bundle -arch_only `uname -m`
+ SHLIB_LDFLAGS=-dynamic -arch_only `uname -m`
  OTHER_CFLAGS="${OTHER_CFLAGS} -DDarwin"
 # SHLIB_LDFLAGS="-dylib -flat_namespace -undefined suppress"
  SHLIB_EXT="dylib"
