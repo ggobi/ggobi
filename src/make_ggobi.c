@@ -68,13 +68,6 @@ void globals_init(ggobid * gg)
   gg->statusbar_p = true;
 }
 
-/*-- initialize variables which DO depend on the size of the data --*/
-static void imodes_init(datad * d, ggobid * gg)
-{
-  edgeedit_init(gg);
-  brush_init(d, gg);
-}
-
 
 gboolean
 fileset_read_init(const gchar * ldata_in, const gchar *pluginModeName, GGobiPluginInfo *plugin, ggobid * gg)
@@ -198,10 +191,6 @@ make_ggobi(GGobiOptions * options, gboolean processEvents, ggobid * gg)
 
   gg->status_message_func = gg_write_to_statusbar;
 
-#if 0
- checkDLL(gg);
- exit(0);
-#endif
 
   if (processEvents) {
     gtk_main();

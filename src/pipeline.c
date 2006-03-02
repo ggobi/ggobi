@@ -40,7 +40,9 @@ void pipeline_init(datad * d, ggobid * gg)
   rows_in_plot_set(d, gg);
 
   /*-- some initializations --*/
-  imodes_init(d, gg);
+  edgeedit_init(gg);
+  brush_init(d, gg);
+
 
   /*-- run the first half of the pipeline --*/
   arrayf_copy(&d->raw, &d->tform);
