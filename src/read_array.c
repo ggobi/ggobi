@@ -357,7 +357,7 @@ read_ascii_data(InputDescription *desc, ggobid *gg)
 {
   datad *d;
 
-  d = datad_new (NULL, gg);
+  d = ggobi_data_new();
 
   if (array_read (d, desc, gg) == false) {
     /* Somewhere, we have to arrange to throw away the datad

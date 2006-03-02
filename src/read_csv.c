@@ -97,7 +97,7 @@ static void load_row_values(GList *rows, datad *d, gboolean row_labels);
 static void load_row_data(GList *rows, datad *d);
 static gboolean name_set(InputDescription *desc, datad* d, ggobid* gg);
 static void tokenize_row(Row *row);
-gboolean read_csv_data(InputDescription *desc, ggobid *gg);
+GSList* read_csv_data(InputDescription *desc, ggobid *gg);
 static void row_free(Row *r);
 
 /* This code would probably be simpler if it used GScanner */
@@ -280,7 +280,7 @@ static int csv_row_parse (Row *row, GIOChannel *channel, gint trim) {
 
 /* END BCSV CODE */
 
-gboolean
+GSList*
 read_csv(InputDescription *desc, ggobid *gg, GGobiPluginInfo *plugin)
 {
    return(read_csv_data(desc, gg));
@@ -309,39 +309,6 @@ static gboolean is_numeric(gchar *str, gint len) {
 	g_strtod(str, &end);
 	return len > 0 && end == str + len;
 }
-
-/* Detection of column labels deprecated - we assume column labels exist */
-#if 0
-static gboolean has_column_labels(GList *rows, gboolean has_row_labels)
-{
-	Row *first, *second;
-	gint i;
-	
-	if (g_list_length(rows) < 2)
-		return false;
-	
-	/* 	Heuristic 1: Missing first field (indicating existence of row names).
-		Heuristic 2: String value where second row has a number.
-		
-		So we miss column names if it's all categorical data without rownames
-	*/
-
-	first = (Row *)rows->data;
-	second = (Row *)rows->next->data;
-	
-	if (first->entry[0].len == 0 && has_row_labels)
-		return true;
-	
-	for (i = 0; i < first->rIdx; i++)
-	{
-		if (!is_numeric(first->src->str+first->entry[i].ofs, first->entry[i].len) &&
-			is_numeric(second->src->str+second->entry[i].ofs, second->entry[i].len))
-			return true;
-	}
-	
-	return false;
-}
-#endif
 
 /*  Heuristic: If the first row has an empty in the first column and
 	and all the values in the first column are unique, we have row names.
@@ -513,13 +480,14 @@ static void tokenize_row(Row *row)
     }
 }
 
-gboolean 
+GSList* 
 read_csv_data(InputDescription *desc, ggobid *gg)
 {
 	datad *d;
 	GIOChannel *channel;
 	gint ret;
 	GList *rows = NULL;
+	GSList* ds = NULL;
 	
 	fprintf(stderr, "Reading csv data\n");
 	
@@ -554,7 +522,7 @@ read_csv_data(InputDescription *desc, ggobid *gg)
 	g_io_channel_shutdown(channel, FALSE, NULL);
 	
 	/* Initialize datad structure */
-    d = datad_new(NULL, gg);
+    d = ggobi_data_new();
 	
 	/* Call naming function */
     name_set(desc, d, gg);
@@ -563,18 +531,19 @@ read_csv_data(InputDescription *desc, ggobid *gg)
 	load_row_data(rows, d);
 	
 	/* Dummy for future purpose - not sure if necessary - michael */
-    br_glyph_ids_alloc(d);
-    br_glyph_ids_init(d,gg);
-    br_color_ids_alloc(d,gg);
-    br_color_ids_init(d,gg);
-    br_hidden_alloc(d);
-    br_hidden_init(d);
+  br_glyph_ids_alloc(d);
+  br_glyph_ids_init(d,gg);
+  br_color_ids_alloc(d,gg);
+  br_color_ids_init(d,gg);
+  br_hidden_alloc(d);
+  br_hidden_init(d);
 	
 	/* Cleanup */
 	g_list_foreach(rows, (GFunc)row_free, NULL);
 	g_list_free(rows);
 	
-	return (true);
+	ds = g_slist_append(ds, d);
+	return(ds);
 }
 
 static void row_free(Row *row)

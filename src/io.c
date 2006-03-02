@@ -154,60 +154,9 @@ filename_get_configure (GtkWidget *chooser, guint type, ggobid *gg)
   g_object_set_data(G_OBJECT (chooser), "action", GINT_TO_POINTER (type));
   g_object_set_data(G_OBJECT (chooser), key, gg);
 
-  #if 0
-  g_signal_connect (G_OBJECT (GTK_FILE_CHOOSER(chooser)->ok_button),
-                      "clicked", G_CALLBACK (filesel_ok), (gpointer) chooser);
-                            
-  /*-- Ensure that the dialog box is destroyed. --*/
-    
-  g_signal_connect_swapped (G_OBJECT (GTK_FILE_CHOOSER(chooser)->ok_button),
-                             "clicked", G_CALLBACK (gtk_widget_destroy),
-                             G_OBJECT(chooser));
 
-  g_signal_connect_swapped (G_OBJECT (GTK_FILE_CHOOSER(chooser)->cancel_button),
-                             "clicked", G_CALLBACK (gtk_widget_destroy),
-                             G_OBJECT(chooser));
-#endif
 }
 
-#if 0
-GtkWidget *
-getFileSelectionWorkContainer(GtkWidget *chooser)
-{
-       GtkWidget *dlg, *vbox = NULL;
-
-       GList *kids;
-       kids = gtk_container_get_children(GTK_CONTAINER(chooser));
-       dlg = g_list_nth_data(kids, 0);
-       return(dlg);
-/*
-       kids = gtk_container_get_children(GTK_CONTAINER(dlg));
-       vbox = g_list_nth_data(kids, 0);
-       if(!GTK_IS_VBOX(vbox)) {
-          g_printerr("Not vbox\n");
-       }
-*/
-
-       return(vbox);
-}
-#endif
-/*
-static void
-filename_mode_selection_cb(GtkList *l, GtkWidget *el, GtkWidget *data)
-{
-    
-    gint *i = g_object_get_data(G_OBJECT(data), ".selectedElement");
-    if(i) {
-      *i = gtk_list_child_position(l, el);
-    }
-}
-
-void
-free_gdata(GtkObject *src, gpointer data)
-{
-  g_free(data);
-}
-*/
 
 GtkWidget*
 createOutputFileSelectionDialog(const gchar *title)

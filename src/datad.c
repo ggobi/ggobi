@@ -34,17 +34,11 @@ void rows_in_plot_test_cb (datad *d, gint nprev, gint b, ggobid *gg,
 
 
 
-
-datad *
-datad_new(datad *d, ggobid *gg)
+datad *ggobi_data_new()
 { 
-  if (d == NULL) {
-    d = (datad *) g_object_new(GGOBI_TYPE_DATA, NULL);
-  }
+  datad* d = (datad *) g_object_new(GGOBI_TYPE_DATA, NULL);
 
   datad_instance_init(d);
-
-  d->gg = gg;
 
   /*-- initialize arrays to NULL --*/
   arrayf_init_null (&d->raw);
@@ -66,17 +60,7 @@ datad_new(datad *d, ggobid *gg)
   d->idTable = NULL;
 
   sphere_init (d);
-
-  jitter_vars_init (d, gg);
-
-#ifdef TESTING_ROWS_IN_PLOT_CB
-  /*-- listen for rows_in_plot_changed e
-  vents --*/
-  g_signal_connect (G_OBJECT(d), "rows_in_plot_changed",
-    rows_in_plot_test_cb, gg);
-#endif
-
-  gg->d = g_slist_append (gg->d, d);
+  jitter_vars_init (d);
 
   d->nclusters = 0;
   d->nearest_point = -1;
@@ -93,7 +77,7 @@ datad*
 datad_create(gint nr, gint nc, ggobid *gg)
 {
   datad *d;
-  d = datad_new(NULL, gg);
+  d = ggobi_data_new();
   d->ncols = nc;
   d->nrows = nr;
 
@@ -154,6 +138,8 @@ datad_free (datad *d, ggobid *gg)
 displayd *
 datad_init (datad *d, ggobid *gg, gboolean cleanup)
 {
+  d->gg = gg;
+  gg->d = g_slist_append (gg->d, d);
   displayd *display = NULL;
 
   if (cleanup) {

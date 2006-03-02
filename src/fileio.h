@@ -26,7 +26,7 @@ typedef struct _GGobiPluginInfo GGobiPluginInfo;
 typedef struct _ggobid ggobid;
 typedef struct _InputDescription InputDescription;
 
-typedef gboolean (*InputReader)(InputDescription *desc, ggobid *gg, GGobiPluginInfo *);
+typedef GSList* (*InputReader)(InputDescription *desc, ggobid *gg, GGobiPluginInfo *);
 typedef gboolean (*InputProbe)(const char * const input, ggobid *gg, GGobiPluginInfo *);
 
 typedef InputDescription* (*InputGetDescription)(const char * const fileName, const char * const input, ggobid *gg, GGobiPluginInfo*);

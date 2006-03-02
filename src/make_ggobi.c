@@ -42,8 +42,6 @@
 
 guint GGobiSignals[MAX_GGOBI_SIGNALS];
 
-gboolean read_input(InputDescription * desc, ggobid * gg);
-
 /*-- initialize variables which don't depend on the size of the data --*/
 void globals_init(ggobid * gg)
 {
@@ -77,32 +75,20 @@ static void imodes_init(datad * d, ggobid * gg)
   brush_init(d, gg);
 }
 
+
 gboolean 
 fileset_read_init(const gchar * ldata_in, const gchar *pluginModeName, GGobiPluginInfo *plugin, ggobid * gg)
 {
-  gint howMany;
-  gboolean ans;
-
-  howMany = g_slist_length(gg->d);
-  ans = fileset_read(ldata_in, pluginModeName, plugin, gg);
-  if (ans) {
-    datad *d;
-    gint n, i;
-    /* Loop over the newly added datad elements
-       and update them.
-     */
-    n = g_slist_length(gg->d);
-    for (i = howMany; i < n; i++) {
-      d = (datad *) g_slist_nth_data(gg->d, i);
-      datad_init(d, gg, (i + howMany) == 0);
-    }
+  GSList *ds = fileset_read(ldata_in, pluginModeName, plugin, gg);
+  for(; ds; ds = ds->next) {
+    datad_init((datad*) ds->data, gg, FALSE);
   }
 
-  return (ans);
+  return (ds != NULL);
 }
 
-
-gboolean 
+// returns a list of datasets (some input types (eg. xml) may return multiple data types)
+GSList*
 fileset_read(const gchar * ldata_in, const gchar *pluginModeName, GGobiPluginInfo *plugin, ggobid * gg)
 {
   InputDescription *desc;
@@ -123,55 +109,30 @@ fileset_read(const gchar * ldata_in, const gchar *pluginModeName, GGobiPluginInf
 
   gg->input = desc;
 
-  ok = read_input(desc, gg);
-
-  return ok;                    /* need to check return codes of reading routines */
+  return(read_input(desc, gg));
 }
 
-gboolean read_input(InputDescription * desc, ggobid * gg)
+
+// returns a list of datasets (some input types (eg. xml) may return multiple data types)
+GSList*
+read_input(InputDescription * desc, ggobid * gg)
 {
-  gboolean ok = false;
+  GSList* ds;
   if (desc == NULL)
-    return (ok);
+    return (NULL);
 
-  switch (desc->mode) {
-   case mysql_data:
-#ifdef USE_MYSQL
-    {
-      extern MySQLLoginInfo DefaultMySQLInfo;
-      getDefaultValuesFromFile(ldata_in);
-      ok = read_mysql_data(&DefaultMySQLInfo, FALSE, gg);
-    }
-#else
-    g_printerr("No support for reading MySQL\n");
-#endif
-    break;
+  if (desc->desc_read_input) {
+    if(!desc->baseName) 
+      completeFileDesc(desc->fileName, desc);
+      ds = desc->desc_read_input(desc, gg, NULL);
+  } else
+    g_printerr("Unknown data type in read_input\n");
 
-  case binary_data:
-    g_printerr("No support yet for binary data\n");
-    break;
-
-  case Sprocess_data:
-    break;
-
-  default:
-     /* Use the plugin structure. */
-    if (desc->desc_read_input) {
-#if 1
-      if(!desc->baseName) 
-	completeFileDesc(desc->fileName, desc);
-#endif
-      ok = desc->desc_read_input(desc, gg, NULL);
-    } else
-      g_printerr("Unknown data type in read_input\n");
-    break;
-  }
-
-  if (ok && sessionOptions->verbose == GGOBI_VERBOSE) {
+  if (ds && sessionOptions->verbose == GGOBI_VERBOSE) {
     showInputDescription(desc, gg);
   }
 
-  return (ok);
+  return (ds);
 }
 
 void pipeline_init(datad * d, ggobid * gg)
@@ -252,7 +213,7 @@ make_ggobi(GGobiOptions * options, gboolean processEvents, ggobid * gg)
      a user interface to query the user as to what to do.
    */
   if (options->data_in != NULL) {
-    if (fileset_read(options->data_in, sessionOptions->data_type, NULL, gg) > 0) {
+    if (fileset_read(options->data_in, sessionOptions->data_type, NULL, gg)) {
       init_data = true;
     }
   } else {

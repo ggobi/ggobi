@@ -1965,7 +1965,7 @@ getCurrentXMLData(XMLParserData* parserData)
 {
   datad *data = parserData->current_data;
   if(data == NULL) {
-    data = datad_new(NULL, parserData->gg);
+    data = ggobi_data_new();
     parserData->current_data = data;
   }
   if(data->input == NULL)

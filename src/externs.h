@@ -215,7 +215,7 @@ datad*     datad_get_from_notebook (GtkWidget *notebook, ggobid *);
 gboolean   datad_has_edges (datad *d);
 gboolean   datad_has_variables (datad *d);
 displayd*  datad_init (datad *, ggobid *, gboolean);
-datad*     datad_new(datad *d, ggobid *gg);
+datad*     ggobi_data_new();
 void       datad_record_id_add (gchar *ids, datad *d);
 void       datad_record_id_add (gchar *ids, datad *d);
 gchar*     datasetName (datad *d, ggobid *gg);
@@ -290,7 +290,7 @@ gboolean   exclude_link_by_id (gint k, datad *source_d, ggobid *gg);
 gint       fcompare (const void *x1, const void *x2);
 void       filename_get_r (ggobid *);
 void       filename_get_w (GtkWidget *, ggobid *);
-gboolean   fileset_read (const gchar *, const gchar *modeName, GGobiPluginInfo *, ggobid *);
+GSList*    fileset_read (const gchar *, const gchar *modeName, GGobiPluginInfo *, ggobid *);
 gboolean   fileset_read_init (const gchar *ldata_in, const gchar *, GGobiPluginInfo *, ggobid *);
 void       find_glyph_type_and_size (gint, glyphd *);
 gint       find_keepers (gint ncols_current, gint nc, gint *cols, gint *keepers);
@@ -336,7 +336,7 @@ gdouble    inner_prod (gdouble *, gdouble *, gint);
 gboolean   isCrossed (gdouble, gdouble, gdouble, gdouble, gdouble, gdouble, gdouble, gdouble);
 gfloat     jitter_randval (gint);
 void       jitter_value_set (gfloat, datad *, ggobid *);
-void       jitter_vars_init (datad *, ggobid *);
+void       jitter_vars_init (datad *);
 void       jitter_window_open (ggobid *);
 void       limits_adjust (gfloat *, gfloat *);
 void       limits_display_set_by_var (gint j, datad *d, ggobid *gg);
@@ -841,7 +841,7 @@ extern double erfc(double x);
 #endif
 
 gboolean read_xml(InputDescription *desc, ggobid *gg, GGobiPluginInfo *plugin);
-gboolean read_csv(InputDescription *desc, ggobid *gg, GGobiPluginInfo *plugin);
+GSList* read_csv(InputDescription *desc, ggobid *gg, GGobiPluginInfo *plugin);
 //gboolean read_ascii(InputDescription *desc, ggobid *gg, GGobiPluginInfo *plugin);
 
 InputDescription *read_xml_input_description(const char * const fileName, const char * const modeName, 

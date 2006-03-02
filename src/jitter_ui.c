@@ -19,7 +19,7 @@
 #include "externs.h"
 
 void
-jitter_vars_init (datad *d, ggobid *gg) {
+jitter_vars_init (datad *d) {
   d->jitter.type = UNIFORM;
   d->jitter.convex = true;
 }
