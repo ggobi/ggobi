@@ -124,7 +124,6 @@ SRC=\
   vartable_ui.c \
   vector.c \
   win32_draw.c \
-  writedata.c \
   writedata_ui.c \
   write_svg.c \
   wvis.c \

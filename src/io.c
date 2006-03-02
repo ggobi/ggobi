@@ -103,6 +103,7 @@ filesel_ok (GtkWidget *chooser)
           g_free (filename);
         }
         break;
+#ifdef WRITEASCII // Obsolete
         case ASCIIDATA:
         {
           datad *d = NULL;
@@ -132,6 +133,7 @@ filesel_ok (GtkWidget *chooser)
           g_free (filename);
         }
         break;
+#endif
         case BINARYDATA:  /*-- not yet implemented --*/
         break;
         case MYSQL_DATA:  /*-- never will be implemented --*/
