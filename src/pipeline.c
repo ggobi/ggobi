@@ -26,6 +26,55 @@ gfloat median_largest_dist (gfloat **, gint *, gint, gfloat *, gfloat *, datad *
 
 /* ------------ Dynamic allocation, freeing section --------- */
 
+void pipeline_init(datad * d, ggobid * gg)
+{
+  gint i;
+
+  /*-- a handful of allocations and initializations --*/
+  pipeline_arrays_alloc(d, gg);
+  for (i = 0; i < d->nrows; i++) {
+    d->sampled.els[i] = true;
+    d->excluded.els[i] = false;
+  }
+  /*-- maybe some points are tagged "hidden" in the data --*/
+  rows_in_plot_set(d, gg);
+
+  /*-- some initializations --*/
+  imodes_init(d, gg);
+
+  /*-- run the first half of the pipeline --*/
+  arrayf_copy(&d->raw, &d->tform);
+
+  limits_set(true, true, d, gg);
+
+  vartable_limits_set(d);   /*-- does this do something here?  --*/
+  vartable_stats_set(d);   /*-- does this do something here?  --*/
+
+  /*
+   * If there are missings, they've been initialized with a value
+   * of 0.  Here, re-set that value to 15% below the minimum for each
+   * variable.  (dfs -- done at Di's request, September 2004)
+  */
+
+  if (d->nmissing > 0) {
+    gint j;
+    vartabled *vt;
+    gint vars[1];
+    for (j=0; j<d->ncols; j++) {
+      vt = vartable_element_get (j, d);
+      if (vt->nmissing) {
+        vars[0] = j;
+        impute_fixed (IMP_BELOW, 15.0, 1, vars, d, gg);
+      }
+    }
+    limits_set (true, true, d, gg);
+    vartable_limits_set(d);
+    vartable_stats_set(d);
+  }
+
+  tform_to_world(d, gg);
+}
+
 void
 pipeline_arrays_free (datad *d, ggobid *gg)
 /*
