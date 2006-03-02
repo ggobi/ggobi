@@ -80,16 +80,6 @@ GGOBI(setDataMode) (DataMode newMode, ggobid *gg)
   return(old);
 }
 
-#if 0
-/*XXX */
-const gchar * const 
-GGOBI(getDataModeDescription)(DataMode mode)
-{
-  return(DataModeNames[mode]);
-}
-#endif
-
-
 /**
  Caller should now free the return value, but not the elements of the
  array.
@@ -278,10 +268,10 @@ GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
   vartable_init (d);
 
   br_glyph_ids_alloc (d);
-  br_glyph_ids_init (d, gg);
+  br_glyph_ids_init (d);
 
-  br_color_ids_alloc (d, gg);
-  br_color_ids_init (d, gg);
+  br_color_ids_alloc (d);
+  br_color_ids_init (d);
 
   br_hidden_alloc (d);
   br_hidden_init(d);

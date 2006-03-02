@@ -68,24 +68,20 @@ gint totalNumGGobis;
 #include "ggobiClass.h"
 
 const GTypeLoad typeLoaders[] = {
-                               	   	ggobi_scatterplot_display_get_type,
-										ggobi_scatmat_display_get_type,
-										ggobi_par_coords_display_get_type,
-                                   	ggobi_time_series_display_get_type,
-										ggobi_barchart_display_get_type
-                                  };
+  ggobi_scatterplot_display_get_type,
+  ggobi_scatmat_display_get_type,
+  ggobi_par_coords_display_get_type,
+  ggobi_time_series_display_get_type,
+  ggobi_barchart_display_get_type
+};
 
-const gchar * const ViewTypes[] =
-  {"Scatterplot", "Scatterplot Matrix", 
-#ifdef PARCOORDS_BUILTIN
-"Parallel Coordinates",
-#endif
+const gchar * const ViewTypes[] = {
+  "Scatterplot", 
+  "Scatterplot Matrix", 
 };
 const gint ViewTypeIndices[];
 
 static gchar *computeGGobiHome(char *str);
-
-
 
 GGobiApp *
 getGGobiApp()

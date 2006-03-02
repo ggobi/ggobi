@@ -20,6 +20,7 @@
 
 #include "vars.h"
 #include "externs.h"
+#include "marshal.h"
 
 #include <string.h> /* for memset() declaration */
 #define INITSTRSIZE 512
@@ -32,71 +33,165 @@ void rows_in_plot_test_cb (datad *d, gint nprev, gint b, ggobid *gg,
 }
 #endif
 
+enum {
+  GGOBI_DATA_NROW = 1,
+  GGOBI_DATA_NCOL,
+};
+
+static void
+ggobi_data_set_property (GObject      *object,
+                        guint         property_id,
+                        const GValue *value,
+                        GParamSpec   *pspec)
+{
+  datad *self = (datad *) object;
+
+  switch (property_id) {
+    case GGOBI_DATA_NROW: 
+      self->nrows = g_value_get_uint(value);
+      g_debug("Setting nrows: %d", self->nrows);
+    break;
+    
+    case GGOBI_DATA_NCOL: 
+      self->ncols = g_value_get_uint(value);
+    break;
+    
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID(object,property_id,pspec);
+    break;
+  }
+}
+
+static void
+ggobi_data_get_property (GObject      *object,
+                        guint         property_id,
+                        GValue       *value,
+                        GParamSpec   *pspec)
+{
+  datad *self = (datad *) object;
+
+  switch (property_id) {
+    case GGOBI_DATA_NROW: 
+      g_value_set_uint(value, self->nrows);
+    break;
+    
+    case GGOBI_DATA_NCOL: 
+      g_value_set_uint(value, self->ncols);
+    break;
+    
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID(object,property_id,pspec);
+    break;
+  }
+}
+
+/* 
+ * GGobi data clase
+ */
+void 
+ggobi_data_class_init(GGobiDataClass * klass)
+{
+  GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
+  GParamSpec *pspec;
+  
+  if (g_signal_lookup("rows_in_plot_changed", GGOBI_TYPE_DATA) == 0) {
+    klass->signals[ROWS_IN_PLOT_CHANGED_SIGNAL] = 
+    g_signal_new("rows_in_plot_changed",
+        G_TYPE_FROM_CLASS(klass), 
+        G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION, 0, NULL, NULL,
+        ggobi_marshal_VOID__INT_INT_OBJECT, 
+        G_TYPE_NONE, 3, 
+        G_TYPE_INT, G_TYPE_INT, GGOBI_TYPE_GGOBI);
+  }
+  
+  gobject_class->set_property = ggobi_data_set_property;
+  gobject_class->get_property = ggobi_data_get_property;
+  
+  g_object_class_install_property(gobject_class, GGOBI_DATA_NROW,
+    g_param_spec_uint("nrows", "nrows", "number of rows", 
+      0, INT_MAX, 0,
+      G_PARAM_CONSTRUCT | G_PARAM_READWRITE
+    )
+  );
+  
+  g_object_class_install_property(gobject_class, GGOBI_DATA_NCOL,
+    g_param_spec_uint("ncols", "ncols", "number of cols", 
+      0, INT_MAX, 0,
+      G_PARAM_CONSTRUCT | G_PARAM_READWRITE
+    )
+  );
+  /*if (g_signal_lookup("rows_in_plot_changed", GGOBI_TYPE_DATA) == 0) {
+    klass->signals[ROWS_IN_PLOT_CHANGED_SIGNAL] = 
+    g_signal_new(
+        "rows_in_plot_changed",
+		G_TYPE_FROM_CLASS(klass), 
+        G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION, 0, NULL, NULL,
+        ggobi_marshal_VOID__INT_INT_OBJECT, 
+        G_TYPE_NONE, 3, 
+        G_TYPE_INT, G_TYPE_INT, GGOBI_TYPE_GGOBI);
+  }*/
+}
 
 
-datad *ggobi_data_new()
-{ 
-  datad* d = (datad *) g_object_new(GGOBI_TYPE_DATA, NULL);
 
-  datad_instance_init(d);
+// defines GGobi data type for GTK
+GType 
+ggobi_data_get_type(void)
+{
+  static GType data_type = 0;
 
+  if (!data_type) {
+    static const GTypeInfo data_info = {
+      sizeof(GGobiDataClass),
+      NULL, NULL,
+      (GClassInitFunc) ggobi_data_class_init,
+      NULL, NULL,
+      sizeof(datad), 0,
+      NULL,
+      NULL
+    };
+    
+    data_type = g_type_register_static(G_TYPE_OBJECT, "GGobiData", &data_info, 0);
+  }
+
+  return data_type;
+}
+
+
+
+void 
+datad_instance_init(datad * d)
+{
   /*-- initialize arrays to NULL --*/
-  arrayf_init_null (&d->raw);
-  arrayf_init_null (&d->tform);
-  arrayg_init_null (&d->world);
-  arrayg_init_null (&d->jitdata);
+  arrayf_init_null(&d->raw);
+  arrayf_init_null(&d->tform);
+  arrayg_init_null(&d->world);
+  arrayg_init_null(&d->jitdata);
+  arrays_init_null(&d->missing);
 
-  arrays_init_null (&d->missing);
-
-  vectori_init_null (&d->clusterid);
+  vectori_init_null(&d->clusterid);
 
   /*-- brushing and linking --*/
-  vectorb_init_null (&d->edge.xed_by_brush);
+  vectorb_init_null(&d->edge.xed_by_brush);
 
   /*-- linking by categorical variable --*/
   d->linkvar_vt = NULL;
 
+  memset(&d->vcbox_ui, '\0', sizeof(struct _Varpanel_cboxd));
+
+  sphere_init(d);
+
   d->rowIds = NULL;
   d->idTable = NULL;
 
-  sphere_init (d);
   jitter_vars_init (d);
 
   d->nclusters = 0;
   d->nearest_point = -1;
-
   d->missings_show_p = true;
 
-  return (d);
-}
-
-/**
- Creates and initializes the datad object.
- */
-datad*
-datad_create(gint nr, gint nc, ggobid *gg)
-{
-  datad *d;
-  d = ggobi_data_new();
-  d->ncols = nc;
-  d->nrows = nr;
-
-  d->nearest_point = -1;
-
-  d->missings_show_p = true;
-
-  ggobi_data_alloc(d);
-
-  return(d);
-}
-
-/* FIXME: eventually this will be internalized - mfl */
-void
-ggobi_data_alloc(datad *d) {
   vectori_init_null (&d->rows_in_plot);
   d->nrows_in_plot = d->nrows;  /*-- for now --*/
-
-  arrayf_alloc(&d->raw, d->nrows, d->ncols);
 
   rowlabels_alloc (d);
 
@@ -104,13 +199,28 @@ ggobi_data_alloc(datad *d) {
   vartable_init (d);
 
   br_glyph_ids_alloc (d);
-  br_glyph_ids_init (d, d->gg);
+  br_glyph_ids_init (d);
 
-  br_color_ids_alloc (d, d->gg);
-  br_color_ids_init (d, d->gg);
+  br_color_ids_alloc (d);
+  br_color_ids_init (d);
 
   br_hidden_alloc (d);
   br_hidden_init (d);
+}
+
+
+datad*
+ggobi_data_new(guint nrows, guint ncols)
+{ 
+  datad* d = (datad*) g_object_new(GGOBI_TYPE_DATA, "ncols", ncols, "nrows", nrows, NULL);
+  datad_instance_init(d);  //FIXME: this should happen during object creation
+  return (d);
+}
+
+datad* 
+datad_create(guint nr, guint nc, ggobid *gg)
+{
+  ggobi_data_new(nr, nc);
 }
 
 void
@@ -121,7 +231,6 @@ datad_free (datad *d, ggobid *gg)
 
   if (d->nmissing)
     arrays_free (&d->missing, 0, 0);
-
 
    /* rowIds and idTable are intrinsically linked !*/
   if(d->idTable) {
@@ -296,7 +405,7 @@ ggobi_data_set_name(datad *d, const gchar *name)
  * corresponding to different datad's.  This is a way to figure
  * out which datad we should be operating on in that case.
 */
-datad *
+datad*
 datad_get_from_notebook (GtkWidget *notebook, ggobid *gg) {
   datad *d = NULL;
   gint nd = g_slist_length (gg->d);
@@ -393,7 +502,8 @@ gboolean datad_has_variables (datad *d)
 /*                          row labels                                    */
 /*------------------------------------------------------------------------*/
 
-void rowlabels_free (datad *d)
+void 
+rowlabels_free (datad *d)
 {
   g_array_free (d->rowlab, true);
 }
@@ -403,8 +513,7 @@ void
 rowlabels_alloc (datad *d) 
 {
   if (d->rowlab != NULL) rowlabels_free (d);
-  d->rowlab = g_array_new (false, false, sizeof (gchar *));
-  /* gdk2: g_array_sized_new (false, false, sizeof (gchar *), d->nrows); */
+  d->rowlab = g_array_sized_new (false, false, sizeof (gchar *), d->nrows);
 }
 
 void

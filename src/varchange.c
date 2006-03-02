@@ -109,7 +109,7 @@ newvar_add_with_values (gdouble *vals, gint nvals, gchar *vname,
   d->ncols += 1;
   if (d->ncols == 1) { // lazily allocate datad
 	  d->nrows = nvals;
-    ggobi_data_alloc(d);
+    ///ggobi_data_alloc(d);
     pipeline_init (d, d->gg);
   } else {
     addvar_pipeline_realloc (d, gg);

@@ -31,7 +31,7 @@
 /*-------------------------------------------------------------------------*/
 
 void
-br_glyph_ids_free (datad *d, ggobid *gg)
+br_glyph_ids_free (datad *d)
 {
   vectorg_free (&d->glyph);
   vectorg_free (&d->glyph_now);
@@ -47,7 +47,7 @@ br_glyph_ids_alloc (datad *d)
 }
 
 void
-br_glyph_ids_init (datad *d, ggobid *gg)
+br_glyph_ids_init (datad *d)
 {
   gint i;
 
@@ -55,9 +55,9 @@ br_glyph_ids_init (datad *d, ggobid *gg)
 
   for (i=0; i<d->nrows; i++) {
     d->glyph.els[i].type = d->glyph_now.els[i].type =
-      d->glyph_prev.els[i].type = gg->glyph_0.type;
+      d->glyph_prev.els[i].type = FC;
     d->glyph.els[i].size = d->glyph_now.els[i].size =
-      d->glyph_prev.els[i].size = gg->glyph_0.size;
+      d->glyph_prev.els[i].size = 1;
   }
 }
 
@@ -85,7 +85,7 @@ br_glyph_ids_add (datad *d, ggobid *gg)
 /*-------------------------------------------------------------------------*/
 
 void
-br_color_ids_free (datad *d, ggobid *gg)
+br_color_ids_free (datad *d)
 {
   vectors_free (&d->color);
   vectors_free (&d->color_now);
@@ -93,7 +93,7 @@ br_color_ids_free (datad *d, ggobid *gg)
 }
 
 void
-br_color_ids_alloc (datad *d, ggobid *gg)
+br_color_ids_alloc (datad *d)
 {
   vectors_realloc (&d->color, d->nrows);
   vectors_realloc (&d->color_now, d->nrows);
@@ -101,15 +101,14 @@ br_color_ids_alloc (datad *d, ggobid *gg)
 }
 
 void
-br_color_ids_init (datad *d, ggobid *gg)
+br_color_ids_init (datad *d)
 {
   gint i;
 
   g_assert (d->color.nels == d->nrows);
 
   for (i=0; i<d->nrows; i++)
-    d->color.els[i] = d->color_now.els[i] = d->color_prev.els[i] =
-      gg->color_0;
+    d->color.els[i] = d->color_now.els[i] = d->color_prev.els[i] = 0;
 }
 
 /*-- reallocate and initialize colors --*/
@@ -249,8 +248,8 @@ brush_free (datad *d, ggobid *gg)
 {
   int j,k;
 
-  br_glyph_ids_free (d, gg);
-  br_color_ids_free (d, gg);
+  br_glyph_ids_free (d);
+  br_color_ids_free (d);
 
   vectorb_free (&d->pts_under_brush);
 

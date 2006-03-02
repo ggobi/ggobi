@@ -54,7 +54,7 @@ GType ggobi_ggobi_get_type(void)
 		sizeof(ggobid), 0,      
 		(GInstanceInitFunc) ggobi_alloc,
 		NULL
-    };
+  };
 
     ggobi_type = g_type_register_static(G_TYPE_OBJECT, "GGobi", &ggobi_info, 0);
   }
@@ -96,7 +96,7 @@ void ggobi_ggobi_class_init(GGobiGGobiClass * klass)
     GGobiSignals[POINT_MOVE_SIGNAL] =
       g_signal_new("move_point",
         G_TYPE_FROM_CLASS(klass),
-		G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION, 0, NULL, NULL,
+        G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION, 0, NULL, NULL,
         ggobi_marshal_VOID__OBJECT_INT_OBJECT,
         G_TYPE_NONE, 3,
         GGOBI_TYPE_SPLOT,
@@ -108,8 +108,8 @@ void ggobi_ggobi_class_init(GGobiGGobiClass * klass)
     GGobiSignals[IDENTIFY_POINT_SIGNAL] =
       g_signal_new("identify_point",
         G_TYPE_FROM_CLASS(klass),
-		G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION, 0, NULL, NULL,
-		ggobi_marshal_VOID__OBJECT_INT_OBJECT,
+        G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION, 0, NULL, NULL,
+        ggobi_marshal_VOID__OBJECT_INT_OBJECT,
         G_TYPE_NONE, 3,
         GGOBI_TYPE_SPLOT,
         G_TYPE_INT,
@@ -225,83 +225,6 @@ void ggobi_ggobi_class_init(GGobiGGobiClass * klass)
 /****************************/
 
 
-void ggobi_data_class_init(GGobiDataClass * klass)
-{
-  if (g_signal_lookup("rows_in_plot_changed", GGOBI_TYPE_DATA) == 0) {
-    klass->signals[ROWS_IN_PLOT_CHANGED_SIGNAL] = 
-    g_signal_new("rows_in_plot_changed",
-        G_TYPE_FROM_CLASS(klass), 
-        G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION, 0, NULL, NULL,
-        ggobi_marshal_VOID__INT_INT_OBJECT, 
-        G_TYPE_NONE, 3, 
-        G_TYPE_INT, G_TYPE_INT, GGOBI_TYPE_GGOBI);
-  }
-  /*if (g_signal_lookup("rows_in_plot_changed", GGOBI_TYPE_DATA) == 0) {
-    klass->signals[ROWS_IN_PLOT_CHANGED_SIGNAL] = 
-    g_signal_new(
-        "rows_in_plot_changed",
-		G_TYPE_FROM_CLASS(klass), 
-        G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION, 0, NULL, NULL,
-        ggobi_marshal_VOID__INT_INT_OBJECT, 
-        G_TYPE_NONE, 3, 
-        G_TYPE_INT, G_TYPE_INT, GGOBI_TYPE_GGOBI);
-  }*/
-}
-
-
-GType ggobi_data_get_type(void)
-{
-  static GType data_type = 0;
-
-#ifdef DEBUGGING_PLUGINS
-  fprintf(stderr, "ggobi_data_get_type\n");fflush(stderr);
-#endif
-
-  if (!data_type) {
-    static const GTypeInfo data_info = {
-		sizeof(GGobiDataClass),
-		NULL, NULL,
-		(GClassInitFunc) ggobi_data_class_init,
-		NULL, NULL,
-		sizeof(datad), 0,
-		(GInstanceInitFunc) datad_instance_init,
-		NULL
-	};
-#ifdef DEBUGGIN_PLUGINS
-    fprintf(stderr, "Registering data type\n");fflush(stderr);
-#endif
-    data_type = g_type_register_static(G_TYPE_OBJECT, "GGobiData", &data_info, 0);
-  }
-
-  return data_type;
-}
-
-
-
-void datad_instance_init(datad * d)
-{
-/*  memset(d, 0, sizeof(datad)); */
-
-  /*-- initialize arrays to NULL --*/
-  arrayf_init_null(&d->raw);
-  arrayf_init_null(&d->tform);
-  arrayg_init_null(&d->world);
-  arrayg_init_null(&d->jitdata);
-
-  arrays_init_null(&d->missing);
-
-  vectori_init_null(&d->clusterid);
-
-  /*-- brushing and linking --*/
-  vectorb_init_null(&d->edge.xed_by_brush);
-
-  /*-- linking by categorical variable --*/
-  d->linkvar_vt = NULL;
-
-  memset(&d->vcbox_ui, '\0', sizeof(struct _Varpanel_cboxd));
-
-  sphere_init(d);
-}
 
 /******************************************************/
 

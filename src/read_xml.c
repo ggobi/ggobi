@@ -936,12 +936,12 @@ setDatasetInfo (const xmlChar **attrs, XMLParserData *data)
 
   rowlabels_alloc (d);
   br_glyph_ids_alloc (d);
-  br_glyph_ids_init (d, data->gg);
+  br_glyph_ids_init (d);
 
   d->edge.n = 0;
 
-  br_color_ids_alloc (d, data->gg);
-  br_color_ids_init (d, data->gg);
+  br_color_ids_alloc (d);
+  br_color_ids_init (d);
 
   setDefaultDatasetValues(attrs, data);
 
@@ -1940,8 +1940,9 @@ setDataset(const xmlChar **attrs, XMLParserData *parserData, enum xmlDataState t
   gchar *name;
   const gchar *tmp;
 
-  data = ggobi_data_new(parserData->gg);
-
+  //data = ggobi_data_new(parserData->gg);
+  data = ggobi_data_new(0, 0);
+  
   data->readXMLRecord = readXMLRecord;
   parserData->counterVariableIndex = -1;
 
@@ -1974,7 +1975,7 @@ getCurrentXMLData(XMLParserData* parserData)
 {
   datad *data = parserData->current_data;
   if(data == NULL) {
-    data = ggobi_data_new();
+    data = ggobi_data_new(0, 0);
     parserData->current_data = data;
   }
   if(data->input == NULL)

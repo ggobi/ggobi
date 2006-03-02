@@ -95,7 +95,7 @@ static void load_row_labels(GList *rows, datad *d, gboolean has_labels);
 static void load_levels_from_hash(gpointer key, gpointer value, vartabled *vt);
 static void load_row_values(GList *rows, datad *d, gboolean row_labels);
 static void load_row_data(GList *rows, datad *d);
-static gboolean name_set(InputDescription *desc, datad* d, ggobid* gg);
+static gboolean name_set(datad* d, gchar* name);
 static void tokenize_row(Row *row);
 GSList* read_csv_data(InputDescription *desc, ggobid *gg);
 static void row_free(Row *r);
@@ -426,47 +426,42 @@ static void load_row_values(GList *rows, datad *d, gboolean row_labels)
 	}
 }
 
-static void load_row_data(GList *rows, datad *d)
+static datad *
+create_data(GList *rows, gchar* name)
 {
+  datad* d;
 	GList *cur;
-	gint nrows = g_list_length(rows), ncols = 0;
+	guint nrows = g_list_length(rows), ncols = 0;
 	
-	fprintf(stderr, "loading data...\n");
 	gboolean row_labels = has_row_labels(rows);
-	/*gboolean column_labels = has_column_labels(rows, row_labels);*/
-	
-	fprintf(stderr, "rownames: %d\n", row_labels);
-	
+
 	if (nrows > 0)
 		ncols = ((Row *)rows->data)->rIdx;
 	if (row_labels)
 		ncols--;
-	d->ncols = ncols;
-
-	d->nrows = nrows - 1;
-	
-	fprintf(stderr, "Rows: %d Cols: %d\n", d->nrows, d->ncols);
+		
+	/* Initialize datad structure */
+  d = ggobi_data_new(nrows - 1, ncols);
+  name_set(d, name);
 	
 	/* Initialize vartable */
-    vartable_alloc(d);
-    vartable_init(d);
+  vartable_alloc(d);
+  vartable_init(d);
 	
 	load_column_labels((Row *)rows->data, d, row_labels);
-	fprintf(stderr, "Loaded column labels\n");
-	
+
 	rows = g_list_next(rows); /* skip the column labels */
 	
 	load_row_labels(rows, d, row_labels);
-	fprintf(stderr, "Loaded row labels\n");
-	
 	load_row_values(rows, d, row_labels);
-	fprintf(stderr, "Loaded row values\n");
+	
+	return(d);
 }
 
-static gboolean name_set(InputDescription *desc, datad* d, ggobid* gg)
+static gboolean name_set(datad* d, gchar* name)
 {
   /* Initialize name structure in datad */      
-  d->name = g_path_get_basename(desc->baseName);
+  d->name = g_path_get_basename(name);
   d->nickname = g_strndup (d->name, 2);
   return (true);
 }
@@ -488,6 +483,7 @@ read_csv_data(InputDescription *desc, ggobid *gg)
 	gint ret;
 	GList *rows = NULL;
 	GSList* ds = NULL;
+	gint nrows, ncols = 0;
 	
 	fprintf(stderr, "Reading csv data\n");
 	
@@ -520,23 +516,9 @@ read_csv_data(InputDescription *desc, ggobid *gg)
 	
 	/* Close the file */
 	g_io_channel_shutdown(channel, FALSE, NULL);
-	
-	/* Initialize datad structure */
-    d = ggobi_data_new();
-	
-	/* Call naming function */
-    name_set(desc, d, gg);
-	
+		
 	/* Load the parsed data into the datad */
-	load_row_data(rows, d);
-	
-	/* Dummy for future purpose - not sure if necessary - michael */
-  br_glyph_ids_alloc(d);
-  br_glyph_ids_init(d,gg);
-  br_color_ids_alloc(d,gg);
-  br_color_ids_init(d,gg);
-  br_hidden_alloc(d);
-  br_hidden_init(d);
+	d = create_data(rows, desc->baseName);
 	
 	/* Cleanup */
 	g_list_foreach(rows, (GFunc)row_free, NULL);

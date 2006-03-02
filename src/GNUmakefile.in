@@ -149,7 +149,7 @@ CFLAGS= @SRC_DEBUG@ $(GTK_CFLAGS) $(XML_INC_DIRS) @XML_CFLAG_DEFINES@
 
 LIBS=$(XML_LIBS) $(GTK_LIBS) @LIBS@
 
-all: bin $(UTILS)
+all: marshal.h bin $(UTILS)
 
 .PHONY: bin lib
 
