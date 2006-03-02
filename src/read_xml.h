@@ -85,6 +85,8 @@ typedef struct _XMLUserData {
 
   /* The current data object to which new records are added. */
   datad *current_data;
+  // The list of all datad's read.
+  GSList *dlist; 
 
   /* Flag indicating whether we should convert
      char arrays into null-terminated strings
@@ -186,7 +188,7 @@ extern "C" {
   int setLevelIndex(const xmlChar ** attrs, XMLParserData * data);
   void addLevel(XMLParserData * data, const char *c, int len);
 
-  gboolean data_xml_read(InputDescription * desc, ggobid * gg);
+  GSList * data_xml_read(InputDescription * desc, ggobid * gg);
 
   gboolean setHidden(const xmlChar ** attrs, XMLParserData * data, gint i);
 

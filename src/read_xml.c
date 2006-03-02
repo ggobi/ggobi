@@ -161,7 +161,7 @@ const gchar * const xmlDataTagNames[] = {
   };
 
 
-gboolean
+GSList *
 read_xml(InputDescription *desc, ggobid *gg, GGobiPluginInfo *plugin)
 {
    return(data_xml_read(desc, gg));
@@ -235,7 +235,7 @@ ggobi_XML_error_handler(void *data, const gchar *msg, ...)
 
 
 
-gboolean
+GSList *
 data_xml_read (InputDescription *desc, ggobid *gg)
 {
   xmlSAXHandlerPtr xmlParserHandler;
@@ -243,6 +243,7 @@ data_xml_read (InputDescription *desc, ggobid *gg)
   XMLParserData data;
   gboolean ok = false;  
   gchar *name = g_strdup(desc->fileName); /* find_xml_file(desc->fileName, NULL, gg); */
+  GSList *dlist;
 
   if (name == NULL)
     return (false);
@@ -279,8 +280,11 @@ data_xml_read (InputDescription *desc, ggobid *gg)
   data.parser = ctx;
   data.input = desc;
   ctx->sax = xmlParserHandler;
+  data.dlist = NULL;
 
   xmlParseDocument(ctx);
+
+  dlist = ((XMLParserData *)(ctx->userData))->dlist;
 
   ctx->sax = NULL;
   xmlFreeParserCtxt(ctx);
@@ -288,6 +292,7 @@ data_xml_read (InputDescription *desc, ggobid *gg)
   g_free(xmlParserHandler);
   g_free (name);
 
+#ifdef XXX
   {
     GSList *l;
     datad *d;
@@ -299,8 +304,9 @@ data_xml_read (InputDescription *desc, ggobid *gg)
       ok &= (d->nrows > 0);
     }
   }
-      
-  return (ok);
+#endif
+
+  return (dlist);
 }
 
 void
@@ -663,7 +669,8 @@ setEdgePartners (XMLParserData *parserData)
 }
 
 
-void endXMLElement(void *user_data, const xmlChar *name)
+void
+endXMLElement(void *user_data, const xmlChar *name)
 {
   XMLParserData *data = (XMLParserData*)user_data;
   enum xmlDataState type = tagType(name, true);
@@ -681,6 +688,8 @@ void endXMLElement(void *user_data, const xmlChar *name)
         g_error("There are fewer records than declared for '%s': %d < %d.",
           d->name, data->current_record, d->nrows);
       }
+
+      data->dlist = g_slist_append(data->dlist, d);
 
     }
     break;
@@ -1927,7 +1936,7 @@ releaseCurrentDataInfo(XMLParserData *parserData)
 gboolean
 setDataset(const xmlChar **attrs, XMLParserData *parserData, enum xmlDataState type) 
 {
-  datad *data;
+  datad *data = NULL;
   gchar *name;
   const gchar *tmp;
 

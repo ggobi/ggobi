@@ -840,7 +840,7 @@ extern double erf(double x);
 extern double erfc(double x);
 #endif
 
-gboolean read_xml(InputDescription *desc, ggobid *gg, GGobiPluginInfo *plugin);
+GSList * read_xml(InputDescription *desc, ggobid *gg, GGobiPluginInfo *plugin);
 GSList* read_csv(InputDescription *desc, ggobid *gg, GGobiPluginInfo *plugin);
 //gboolean read_ascii(InputDescription *desc, ggobid *gg, GGobiPluginInfo *plugin);
 
