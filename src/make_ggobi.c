@@ -76,7 +76,7 @@ static void imodes_init(datad * d, ggobid * gg)
 }
 
 
-gboolean 
+gboolean
 fileset_read_init(const gchar * ldata_in, const gchar *pluginModeName, GGobiPluginInfo *plugin, ggobid * gg)
 {
   GSList *ds = fileset_read(ldata_in, pluginModeName, plugin, gg);
@@ -166,7 +166,9 @@ make_ggobi(GGobiOptions * options, gboolean processEvents, ggobid * gg)
      a user interface to query the user as to what to do.
    */
   if (options->data_in != NULL) {
-    if (fileset_read(options->data_in, sessionOptions->data_type, NULL, gg)) {
+    if (fileset_read_init(options->data_in, sessionOptions->data_type, 
+      NULL, gg))
+    {
       init_data = true;
     }
   } else {
