@@ -24,7 +24,6 @@
 #include "vars.h"
 #include "externs.h"
 
-#define INITSTRSIZE 512
 
 
 /* Make certain this matches GlyphType. */
@@ -65,116 +64,7 @@ findAssociatedFile(InputDescription *desc, const gchar * const *extensions,
 }
 
 
-/*------------------------------------------------------------------------*/
-/*                          row labels                                    */
-/*------------------------------------------------------------------------*/
 
-void rowlabels_free (datad *d)
-{
-  g_array_free (d->rowlab, true);
-}
-
-
-void
-rowlabels_alloc (datad *d) 
-{
-  if (d->rowlab != NULL) rowlabels_free (d);
-  d->rowlab = g_array_new (false, false, sizeof (gchar *));
-  /* gdk2: g_array_sized_new (false, false, sizeof (gchar *), d->nrows); */
-}
-
-void
-rowlabel_add (gchar *label, datad *d) 
-{
-  g_array_append_val (d->rowlab, label);
-
-  g_assert (d->rowlab->len == d->nrows);
-}
-
-gboolean
-rowlabels_read (InputDescription *desc, gboolean init, datad *d, ggobid *gg)
-{
-  gint i;
-  static const gchar *const suffixes[] = {
-    "row", "rowlab", "case"
-  };
-  gchar initstr[INITSTRSIZE];
-  gchar *lbl;
-  gint ncase;
-  gboolean found = true;
-  FILE *fp;
-
-  gint whichSuffix;
-  gchar *fileName;
-
-  if (init)
-    rowlabels_alloc (d);
-
-  fileName = findAssociatedFile (desc, suffixes,
-    sizeof(suffixes)/sizeof(suffixes[0]), &whichSuffix, false);
-  if (fileName == NULL)
-    found = false;
-  else if( ( fp = fopen(fileName, "r") ) == NULL ) {
-    g_free(fileName);
-    found = false;
-  }
-
-  /*
-   * Read in case labels or initiate them to generic if no label
-   * file exists
-  */
-  if (found) {
-    gint k, len;
-    ncase = 0;
-
-    k = 0;  /* k is the file row */
-    while (fgets (initstr, INITSTRSIZE-1, fp) != NULL) {
-      len = MIN ((int) strlen (initstr), ROWLABLEN-1) ;
-
-      /* trim trailing blanks, and eliminate the carriage return */
-      while (initstr[len-1] == ' ' || initstr[len-1] == '\n')
-        len-- ;
-      initstr[len] = '\0';
-      lbl = g_strdup (initstr);
-      g_array_append_val (d->rowlab, lbl);
-  
-      if (ncase++ >= d->nrows)
-        break;
-      k++;  /* read the next row ... */
-    }
-  
-    /*
-     * If there aren't enough labels, use blank labels for
-     * the remainder.
-    */
-    if (init && ncase != d->nrows) {
-      g_printerr ("number of labels = %d, number of rows = %d\n",
-        ncase, d->nrows);
-      for (i=ncase; i<d->nrows; i++) {
-        lbl = g_strdup (" ");
-        g_array_append_val (d->rowlab, lbl);
-      }
-    }
-  }
-  else
-  {
-    if (init) {  /* apply defaults if initializing; else, do nothing */
-
-      for (i=0; i<d->nrows; i++) {
-        lbl = g_strdup_printf ("%d", i+1);
-        g_array_append_val (d->rowlab, lbl);
-      }
-    }
-  }
-
-
-  if(found) {
-    addInputSuffix(desc, suffixes[whichSuffix]);
-  }
-  g_free(fileName);
-
- return (found);
-}
 
 /*------------------------------------------------------------------------*/
 /*                       column labels                                    */

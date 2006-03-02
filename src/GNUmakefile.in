@@ -68,9 +68,7 @@ SRC=\
   pipeline.c \
   ppcorr_ui.c \
   print.c \
-  read_array.c \
   read_csv.c \
-  read_data.c \
   scale_api.c \
   scale_drag.c \
   scale_ui.c \
@@ -177,9 +175,6 @@ libggobi.def: $(OBJ)
 
 libggobi.dll $(TOP)/lib/libggobi.dll: $(OBJ) libggobi.def
 	$(CC) $(SHLIB_LDFLAGS) -o $@ libggobi.def -Wl,--out-implib,$(TOP)/lib/libggobi.a $(OBJ) $(LIBS) 
-
-$(TOP)/bin/xmlConvert: xmlConvert.o $(TOP)/lib/libggobi.@SHLIB_EXT@
-	$(CC) -o $@ xmlConvert.o -L$(TOP)/lib -lggobi $(XML_LIBS) $(GTK_LIBS) 
 
 cflags:
 	@echo "$(CFLAGS)"

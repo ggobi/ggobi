@@ -22,6 +22,7 @@
 #include "externs.h"
 
 #include <string.h> /* for memset() declaration */
+#define INITSTRSIZE 512
 
 #ifdef TESTING_ROWS_IN_PLOT_CB
 void rows_in_plot_test_cb (datad *d, gint nprev, gint b, ggobid *gg,
@@ -30,6 +31,8 @@ void rows_in_plot_test_cb (datad *d, gint nprev, gint b, ggobid *gg,
   g_printerr ("d->nrows_in_plot = %d nprev %d\n", d->nrows_in_plot, nprev);
 }
 #endif
+
+
 
 
 datad *
@@ -67,7 +70,8 @@ datad_new(datad *d, ggobid *gg)
   jitter_vars_init (d, gg);
 
 #ifdef TESTING_ROWS_IN_PLOT_CB
-  /*-- listen for rows_in_plot_changed events --*/
+  /*-- listen for rows_in_plot_changed e
+  vents --*/
   g_signal_connect (G_OBJECT(d), "rows_in_plot_changed",
     rows_in_plot_test_cb, gg);
 #endif
@@ -398,3 +402,29 @@ gboolean datad_has_variables (datad *d)
   return (d->ncols > 0);
 }
 
+
+/*------------------------------------------------------------------------*/
+/*                          row labels                                    */
+/*------------------------------------------------------------------------*/
+
+void rowlabels_free (datad *d)
+{
+  g_array_free (d->rowlab, true);
+}
+
+
+void
+rowlabels_alloc (datad *d) 
+{
+  if (d->rowlab != NULL) rowlabels_free (d);
+  d->rowlab = g_array_new (false, false, sizeof (gchar *));
+  /* gdk2: g_array_sized_new (false, false, sizeof (gchar *), d->nrows); */
+}
+
+void
+rowlabel_add (gchar *label, datad *d) 
+{
+  g_array_append_val (d->rowlab, label);
+
+  g_assert (d->rowlab->len == d->nrows);
+}

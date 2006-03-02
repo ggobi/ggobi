@@ -608,8 +608,6 @@ void gtk_marshal_NONE__INT_POINTER_POINTER_POINTER(GtkObject * object,
 extern GSList *ExtendedDisplayTypes;
 typedef GType(*GTypeLoad) (void);
 
-void ggobi_sleep(guint interval);
-
 
 void setMissingValue(int i, int j, datad *d, vartabled *vt);
 

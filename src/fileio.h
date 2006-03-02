@@ -84,7 +84,7 @@ gchar *computeExtension(const gchar *fileName);
 gchar *completeFileDesc(const gchar *fileName, InputDescription *desc);
 
 
-gchar *findAssociatedFile(InputDescription *desc, const gchar * const *suffixes, gint numSuffixes, gint *which, gboolean isError);
+//gchar *findAssociatedFile(InputDescription *desc, const gchar * const *suffixes, gint numSuffixes, gint *which, gboolean isError);
 gint addInputSuffix(InputDescription *desc, const gchar *suffix);
 gint addInputFile(InputDescription *desc, const gchar *file);
 

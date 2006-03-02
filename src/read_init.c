@@ -42,6 +42,14 @@
 #include "tour.h"
 
 
+
+  const gchar * const GlyphNames[] = {
+  /*        ".", "+", "x", "or", "fr", "oc", "fc", "" */
+            ".", "plus", "x", "oc", "or", "fc", "fr", ""
+          };
+
+
+
 gint     getPreviousFiles(const xmlDocPtr doc, GGobiInitInfo *info);
 DataMode getPreviousInput(xmlNode *node, InputDescription *input);
 DataMode getInputType(xmlNode *node);
@@ -1157,4 +1165,22 @@ readPluginFile(const char * const fileName, GGobiInitInfo *info)
   xmlFreeDoc(doc); 
 
   return(plugin);
+}
+
+
+GlyphType 
+mapGlyphName (const gchar *gtype)
+{
+  GlyphType type;
+  gint i;
+
+  type = UNKNOWN_GLYPH;
+  for (i = 0; i < sizeof (GlyphNames)/sizeof (GlyphNames[0]) - 1; i++) {
+    if (strcmp(gtype, GlyphNames[i]) == 0) {
+      type = (GlyphType) (i);
+      break;
+    }
+  }
+
+  return(type);
 }

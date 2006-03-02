@@ -32,8 +32,7 @@
 #include "plugin.h"
 #endif
 
-extern const gchar * const GlyphNames[];
-
+ extern const gchar * const GlyphNames[];
 
 void warning(const char *msg);
 

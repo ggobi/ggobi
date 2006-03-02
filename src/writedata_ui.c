@@ -21,10 +21,8 @@
 #include "writedata.h"
 
 static gchar *format_lbl[] =
-  {"XML", "File set (ascii)",
-#ifdef BINARY_IO_IMPLEMENTED
-"File set (binary)"
-#endif
+  {"XML"
+//, "File set (ascii)",
 };
 void format_set (gint fmt, ggobid *gg) { gg->save.format = fmt; }
 static void format_set_cb (GtkWidget *w, ggobid *gg)

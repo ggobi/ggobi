@@ -465,7 +465,7 @@ data_mode_set (gchar *filename)
 static gint
 GGobiSleepTimer(gpointer data)
 {
-   gtk_main_quit();
+   gtk_main_quit(); // Makes the innermost invocation of the main loop return when it regains control.
    return(0);
 }
 
