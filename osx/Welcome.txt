@@ -1,6 +1,0 @@
-GGobi data analysis visualization tool with linked, dynamic
-graphics.  This provides tools for scatterplots, parallel coordinate plots,
-histograms, barcharts, and scatterplot matrices. Additionally, it can
-perform graph layouts.  The grand tour and various projection pursuit
-indices are provided.
-
