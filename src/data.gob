@@ -269,7 +269,7 @@ class GGobi:Data from G:Object {
     br_hidden_alloc (d);
     br_hidden_init (d);
 
-    return(d);
+    return((GObject *)d);
   }
   
   public GGobiData* new(guint nrows, guint ncols)
