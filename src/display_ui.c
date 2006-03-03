@@ -21,7 +21,7 @@
 #include "plugin.h"
 #endif
 
-void buildExtendedDisplayMenu(ggobid *gg, int nd, datad *d0);
+void buildExtendedDisplayMenu(ggobid *gg, int nd, GGobiData *d0);
 
 void
 display_set_position (windowDisplayd *display, ggobid *gg)
@@ -48,7 +48,7 @@ void
 display_menu_build (ggobid *gg)
 {
   gint nd;
-  datad *d0;
+  GGobiData *d0;
   GtkWidget *item;
   
   if(gg == NULL || gg->d == NULL)
@@ -56,7 +56,7 @@ display_menu_build (ggobid *gg)
 
   nd = ndatad_with_vars_get (gg);
 
-  d0 = (datad *) gg->d->data;
+  d0 = (GGobiData *) gg->d->data;
   if (gg->display_menu != NULL)
     gtk_widget_destroy (gg->display_menu);
 
@@ -111,7 +111,7 @@ display_menu_init (ggobid *gg)
 
 typedef struct {
   GGobiExtendedDisplayClass *klass;
-  datad *d;
+  GGobiData *d;
 } ExtendedDisplayCreateData;
 
 static void
@@ -157,7 +157,7 @@ extended_display_open_cb (GtkWidget *w, ExtendedDisplayCreateData *data)
 }
 
 void
-buildExtendedDisplayMenu(ggobid *gg, gint nd, datad *d0)
+buildExtendedDisplayMenu(ggobid *gg, gint nd, GGobiData *d0)
 {
   gchar label[200], *lbl;
   GGobiExtendedDisplayClass *klass;
@@ -188,7 +188,7 @@ buildExtendedDisplayMenu(ggobid *gg, gint nd, datad *d0)
 
       k = 0;
       for (k=0; k < g_slist_length(gg->d); k++) {
-        datad *d = (datad*) g_slist_nth_data (gg->d, k);
+        GGobiData *d = (GGobiData*) g_slist_nth_data (gg->d, k);
 
         /*-- add an item for each datad with variables --*/
         if (g_slist_length (d->vartable) > 0) {

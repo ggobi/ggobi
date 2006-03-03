@@ -31,7 +31,7 @@ ggv_scramble (ggvisd *ggv, ggobid *gg)
 }
 
 void
-ggv_ggobi_data_new (datad *dsrc, datad *e, displayd *dsp, PluginInstance *inst)
+ggv_ggobi_data_new (GGobiData *dsrc, GGobiData *e, displayd *dsp, PluginInstance *inst)
 {
   ggvisd *ggv = ggvisFromInst (inst); 
   ggobid *gg = inst->gg;
@@ -39,7 +39,7 @@ ggv_ggobi_data_new (datad *dsrc, datad *e, displayd *dsp, PluginInstance *inst)
   gint nc = ggv->dim;   /*-- default:  3d --*/
   gchar **rownames, **colnames, **rowids;
   gdouble *values;
-  datad *dnew;
+  GGobiData *dnew;
   InputDescription *desc = NULL;
   displayd *dspnew;
   vartabled *vt;
@@ -203,7 +203,7 @@ ggv_pos_init (ggvisd *ggv)
 void
 ggv_pos_reinit (ggvisd *ggv)
 {
-  datad *dsrc = ggv->dsrc;
+  GGobiData *dsrc = ggv->dsrc;
   gint i, j;
   gdouble min, range;
   vartabled *vt;
@@ -337,7 +337,7 @@ void mds_run_cb (GtkToggleButton *btn, PluginInstance *inst)
   ggvisd *ggv = ggvisFromInst (inst);
   gboolean state = btn->active;
   gint selected_var = -1;
-  datad *dsrc;
+  GGobiData *dsrc;
   ggobid *gg = inst->gg;
 
   if (state) {
@@ -587,7 +587,7 @@ void ggv_dims_cb (GtkAdjustment *adj, PluginInstance *inst)
   gint i, j;
   gchar *vname;
   gboolean running = ggv->running_p;
-  datad *d = ggv->dpos;
+  GGobiData *d = ggv->dpos;
   gdouble *dtmp;
 
   if (ggv->dpos) {

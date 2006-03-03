@@ -329,7 +329,7 @@ void init_var_GCs(GtkWidget * w, ggobid * gg)
 
 gushort  /*-- returns the maximum color id --*/
 datad_colors_used_get (gint *ncolors_used, gushort *colors_used,
-  datad *d, ggobid *gg) 
+  GGobiData *d, ggobid *gg) 
 {
   gboolean new_color;
   gint i, k, m, n;

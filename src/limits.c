@@ -28,7 +28,7 @@
 /*-- this isn't being used --*/
 void
 min_max (gfloat **vals, gint jvar, gfloat *min, gfloat *max,
-  datad *d, ggobid *gg)
+  GGobiData *d, ggobid *gg)
 /*
  * Find the minimum and maximum values of variable jvar
  * using min-max scaling.
@@ -91,7 +91,7 @@ limits_adjust (gfloat *min, gfloat *max)
 }
 
 static void
-limits_raw_set_by_var (gint j, datad *d, ggobid *gg) {
+limits_raw_set_by_var (gint j, GGobiData *d, ggobid *gg) {
   gint i, m;
   vartabled *vt = vartable_element_get (j, d);
   greal min, max;
@@ -153,7 +153,7 @@ limits_raw_set_by_var (gint j, datad *d, ggobid *gg) {
 }
 
 static void
-limits_raw_set (datad *d, ggobid *gg) {
+limits_raw_set (GGobiData *d, ggobid *gg) {
   gint j;
 
   g_assert (d->raw.nrows == d->nrows);
@@ -164,7 +164,7 @@ limits_raw_set (datad *d, ggobid *gg) {
 }
 
 static void
-limits_tform_set_by_var (gint j, datad *d, ggobid *gg)
+limits_tform_set_by_var (gint j, GGobiData *d, ggobid *gg)
 {
   gint i, m;
   vartabled *vt = vartable_element_get (j, d);
@@ -227,7 +227,7 @@ limits_tform_set_by_var (gint j, datad *d, ggobid *gg)
 
 /*-- this version of the limits never includes missings --*/
 void
-limits_display_set_by_var (gint j, datad *d, ggobid *gg)
+limits_display_set_by_var (gint j, GGobiData *d, ggobid *gg)
 {
   gint i, m, np = 0;
   gfloat sum = 0.0;
@@ -310,7 +310,7 @@ limits_display_set_by_var (gint j, datad *d, ggobid *gg)
   g_free ((gpointer) x);
 }
 static void
-limits_tform_set (datad *d, ggobid *gg) {
+limits_tform_set (GGobiData *d, ggobid *gg) {
   gint j;
 
   g_assert (d->tform.nrows == d->nrows);
@@ -324,7 +324,7 @@ limits_tform_set (datad *d, ggobid *gg) {
 
 
 void
-limits_set (gboolean do_raw, gboolean do_tform, datad *d, ggobid *gg)
+limits_set (gboolean do_raw, gboolean do_tform, GGobiData *d, ggobid *gg)
 {
   gint j;
   gfloat min, max;
@@ -358,7 +358,7 @@ limits_set (gboolean do_raw, gboolean do_tform, datad *d, ggobid *gg)
 
 void
 limits_set_by_var (gint j, gboolean do_raw, gboolean do_tform,
-  datad *d, ggobid *gg)
+  GGobiData *d, ggobid *gg)
 {
   gfloat min, max;
   vartabled *vt = vartable_element_get (j, d);
@@ -391,7 +391,7 @@ limits_set_by_var (gint j, gboolean do_raw, gboolean do_tform,
 
 /*  Recenter the data using the current sticky point */
 void
-recenter_data (gint i, datad *d, ggobid *gg) {
+recenter_data (gint i, GGobiData *d, ggobid *gg) {
   vartabled *vt;
   greal x;
   gint j;

@@ -51,7 +51,7 @@ array_contains (gint* arr, gint n, gint el)
 }
 
 vartabled *
-vartable_element_get (gint j, datad *d)
+vartable_element_get (gint j, GGobiData *d)
 {
   vartabled *vt = (vartabled *) NULL;
 
@@ -63,7 +63,7 @@ vartable_element_get (gint j, datad *d)
   return (vt);
 }
 gint
-vartable_index_get_by_name (gchar *collab, datad *d)
+vartable_index_get_by_name (gchar *collab, GGobiData *d)
 {
   gint j = -1;
   vartabled *vt;
@@ -78,7 +78,7 @@ vartable_index_get_by_name (gchar *collab, datad *d)
   return j;
 }
 vartabled *
-vartable_element_get_by_name (gchar *collab, datad *d)
+vartable_element_get_by_name (gchar *collab, GGobiData *d)
 {
   gint j;
   vartabled *vt;
@@ -93,19 +93,19 @@ vartable_element_get_by_name (gchar *collab, datad *d)
   return ((vartabled *) NULL);
 }
 void
-vartable_element_append (vartabled *vt, datad *d)
+vartable_element_append (vartabled *vt, GGobiData *d)
 {
   d->vartable = g_slist_append (d->vartable, vt);
 }
 void
-vartable_element_remove (gint j, datad *d)
+vartable_element_remove (gint j, GGobiData *d)
 {
   vartabled *vt = vartable_element_get (j, d);
   d->vartable = g_slist_remove (d->vartable, vt);
 }
 
 gint
-selected_cols_get (gint *cols, datad *d, ggobid *gg)
+selected_cols_get (gint *cols, GGobiData *d, ggobid *gg)
 {
 /*
  * Figure out which columns are selected.
@@ -127,7 +127,7 @@ selected_cols_get (gint *cols, datad *d, ggobid *gg)
  * this is how we find out which columns are selected for plotting.
 */
 gint
-plotted_cols_get (gint *cols, datad *d, ggobid *gg) 
+plotted_cols_get (gint *cols, GGobiData *d, ggobid *gg) 
 {
   gint ncols = 0;
   splotd *sp = gg->current_splot;
@@ -147,7 +147,7 @@ plotted_cols_get (gint *cols, datad *d, ggobid *gg)
 /*-------------------------------------------------------------------------*/
 
 void
-vartable_free_element (gint j, datad *d)
+vartable_free_element (gint j, GGobiData *d)
 {
   vartabled *vt = vartable_element_get (j, d); 
 
@@ -160,7 +160,7 @@ vartable_free_element (gint j, datad *d)
 }
 
 void
-vartable_free (datad *d)
+vartable_free (GGobiData *d)
 {
   gint j;
   for (j=d->ncols-1; j >= 0; j--) {
@@ -171,7 +171,7 @@ vartable_free (datad *d)
 }
 
 void
-vartable_alloc (datad *d)  /* weird -- nothing is allocated here --*/
+vartable_alloc (GGobiData *d)  /* weird -- nothing is allocated here --*/
 {
   if (d->vartable != NULL)
     vartable_free (d);
@@ -180,7 +180,7 @@ vartable_alloc (datad *d)  /* weird -- nothing is allocated here --*/
 }
 
 void
-vartable_copy_var (gint jfrom, gint jto, datad *d)
+vartable_copy_var (gint jfrom, gint jto, GGobiData *d)
 {
   gint k;
   vartabled *vt_from = vartable_element_get (jfrom, d);
@@ -235,11 +235,11 @@ vartable_copy_var (gint jfrom, gint jto, datad *d)
 /*-------------------------------------------------------------------------*/
 
 vartabled *
-vartable_element_new (datad *d) 
+vartable_element_new (GGobiData *d) 
 {
   vartabled *vt = (vartabled *) g_malloc (sizeof (vartabled));
 
-  vt->d = (datad *) d;
+  vt->d = (GGobiData *) d;
 
   vt->selected = false;
   vt->nmissing = 0;
@@ -280,7 +280,7 @@ vartable_element_new (datad *d)
   return vt;
 }
 
-void vartable_init (datad *d)
+void vartable_init (GGobiData *d)
 {
   gint j;
   for (j=0; j<d->ncols; j++)
@@ -327,7 +327,7 @@ vartable_element_categorical_init(vartabled *vt,
 /*-------------------------------------------------------------------------*/
 
 void
-vartable_stats_print (datad *d, ggobid *gg) 
+vartable_stats_print (GGobiData *d, ggobid *gg) 
 {
   gint j;
   vartabled *vt;

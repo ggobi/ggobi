@@ -41,7 +41,7 @@ stdin_empty (gint arg)
 
 
 static void
-read_binary (FILE *fp, datad *d, ggobid *gg)
+read_binary (FILE *fp, GGobiData *d, ggobid *gg)
 {
   gint i, j, nr, nc;
   gint onesize = sizeof (gfloat);
@@ -144,7 +144,7 @@ find_data_start (FILE *fp)
 }
 
 gint
-row1_read (FILE *fp, gfloat *row1, gshort *row1_missing, datad *d, ggobid *gg) {
+row1_read (FILE *fp, gfloat *row1, gshort *row1_missing, GGobiData *d, ggobid *gg) {
 
   gint j, ch;
   gboolean found_row = true;
@@ -195,7 +195,7 @@ row1_read (FILE *fp, gfloat *row1, gshort *row1_missing, datad *d, ggobid *gg) {
 }
 
 static gboolean
-ReadAscii (FILE *fp, datad *d, ggobid *gg)
+ReadAscii (FILE *fp, GGobiData *d, ggobid *gg)
 {
   gint j, jrows, nrows, jcols, fs;
   gint nitems;
@@ -355,7 +355,7 @@ read_ascii_input_description(const char * const fileName, const char * const mod
 gboolean
 read_ascii_data(InputDescription *desc, ggobid *gg)
 {
-  datad *d;
+  GGobiData *d;
 
   d = ggobi_data_new();
 
@@ -385,7 +385,7 @@ read_ascii_data(InputDescription *desc, ggobid *gg)
 /*----------------------------------------------------------------------*/
 
 gboolean
-array_read (datad *d, InputDescription *desc, ggobid *gg)
+array_read (GGobiData *d, InputDescription *desc, ggobid *gg)
 {
   gchar fname[128];
   FILE *fp;

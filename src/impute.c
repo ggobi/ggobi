@@ -23,7 +23,7 @@
 
 
 gboolean
-impute_fixed (ImputeType impute_type, gfloat val, gint nvars, gint *vars, datad *d, ggobid *gg)
+impute_fixed (ImputeType impute_type, gfloat val, gint nvars, gint *vars, GGobiData *d, ggobid *gg)
 {
   gint i, j, k, m;
   gfloat maxval, minval, range, impval;
@@ -87,7 +87,7 @@ impute_fixed (ImputeType impute_type, gfloat val, gint nvars, gint *vars, datad 
 
 gboolean
 impute_mean_or_median (gint type, gint nvars, gint *vars, 
-   datad *d, ggobid *gg)
+   GGobiData *d, ggobid *gg)
 {
   gint i, j, k, m, n;
   gint np, nmissing;
@@ -172,7 +172,7 @@ impute_mean_or_median (gint type, gint nvars, gint *vars,
 
 static void
 impute_single (gint *missv, gint nmissing, gint *presv, gint npresent,
-  gint col, datad *d, ggobid *gg)
+  gint col, GGobiData *d, ggobid *gg)
 {
   gint i, k;
   gfloat rrand;
@@ -199,7 +199,7 @@ impute_single (gint *missv, gint nmissing, gint *presv, gint npresent,
 }
 
 void
-impute_random (datad *d, gint nvars, gint *vars, ggobid *gg)
+impute_random (GGobiData *d, gint nvars, gint *vars, ggobid *gg)
 {
 /* Perform single random imputation */
 

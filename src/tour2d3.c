@@ -67,7 +67,7 @@ display_tour2d3_init_null (displayd *dsp, ggobid *gg)
 void
 alloc_tour2d3 (displayd *dsp, ggobid *gg)
 {
-  datad *d = dsp->d;
+  GGobiData *d = dsp->d;
   gint nc = d->ncols;
 
   /* first index is the projection dimensions, second dimension is ncols */
@@ -102,7 +102,7 @@ alloc_tour2d3 (displayd *dsp, ggobid *gg)
 
 /*-- eliminate the nc columns contained in *cols --*/
 void
-tour2d3_realloc_down (gint nc, gint *cols, datad *d, ggobid *gg)
+tour2d3_realloc_down (gint nc, gint *cols, GGobiData *d, ggobid *gg)
 {
   displayd *dsp;
   GList *l;
@@ -136,7 +136,7 @@ tour2d3_realloc_down (gint nc, gint *cols, datad *d, ggobid *gg)
 /*-- append columns for a total of nc columns --*/
 /*-- we don't know for certain that tour has been initialized, do we? --*/
 void
-tour2d3_realloc_up (gint nc, datad *d, ggobid *gg)
+tour2d3_realloc_up (gint nc, GGobiData *d, ggobid *gg)
 {
   displayd *dsp;
   GList *l;
@@ -186,7 +186,7 @@ free_tour2d3(displayd *dsp)
 void 
 display_tour2d3_init (displayd *dsp, ggobid *gg) {
   gint i, j;
-  datad *d = dsp->d;
+  GGobiData *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
   gint nc = d->ncols;
 
@@ -248,7 +248,7 @@ void tour2d3_speed_set(gfloat slidepos, ggobid *gg) {
 
 void tour2d3_pause (cpaneld *cpanel, gboolean state, ggobid *gg) {
   displayd *dsp = gg->current_display;
-  datad *d = dsp->d;
+  GGobiData *d = dsp->d;
   cpanel->t2d3.paused = state;
 
   tour2d3_func (!cpanel->t2d3.paused, gg->current_display, gg);
@@ -262,7 +262,7 @@ void tour2d3_pause (cpaneld *cpanel, gboolean state, ggobid *gg) {
 
 /*-- add/remove jvar to/from the subset of variables that <may> be active --*/
 gboolean
-tour2d3_subset_var_set (gint jvar, gint *jprev, gint toggle, datad *d,
+tour2d3_subset_var_set (gint jvar, gint *jprev, gint toggle, GGobiData *d,
   displayd *dsp, ggobid *gg)
 {
   gboolean in_subset = dsp->t2d3.subset_vars_p.els[jvar];
@@ -330,7 +330,7 @@ tour2d3_subset_var_set (gint jvar, gint *jprev, gint toggle, datad *d,
 
 /*-- add or remove jvar from the set of active variables --*/
 void 
-tour2d3_active_vars_swap (gint jvar_out, gint jvar_in, datad *d,
+tour2d3_active_vars_swap (gint jvar_out, gint jvar_in, GGobiData *d,
   displayd *dsp, ggobid *gg)
 {
   gint k;
@@ -374,7 +374,7 @@ tour2d3_manip_var_set (gint j, ggobid *gg)
 }
 
 gboolean
-tour2d3_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse, datad *d,
+tour2d3_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse, GGobiData *d,
   ggobid *gg)
 {
   displayd *dsp = gg->current_display;
@@ -414,7 +414,7 @@ tour2d3_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse, datad *d,
 }
 
 void
-tour2d3_projdata(splotd *sp, greal **world_data, datad *d, ggobid *gg)
+tour2d3_projdata(splotd *sp, greal **world_data, GGobiData *d, ggobid *gg)
 {
   gint i, j, m;
   displayd *dsp = (displayd *) sp->displayptr;
@@ -456,7 +456,7 @@ tour2d3_projdata(splotd *sp, greal **world_data, datad *d, ggobid *gg)
 void tour2d3_scramble(ggobid *gg)
 {
   displayd *dsp = gg->current_display;
-  datad *d = dsp->d;
+  GGobiData *d = dsp->d;
 
   arrayd_zero (&dsp->t2d3.Fa);
   arrayd_zero (&dsp->t2d3.Fz);
@@ -480,7 +480,7 @@ void tour2d3_scramble(ggobid *gg)
 void
 tour2d3_run(displayd *dsp, ggobid *gg)
 {
-  datad *d = dsp->d;
+  GGobiData *d = dsp->d;
   gint i, nv;
   gint k;
   gboolean chosen;
@@ -606,7 +606,7 @@ void tour2d3_reinit(ggobid *gg)
 {
   gint i;
   displayd *dsp = gg->current_display;
-  datad *d = dsp->d;
+  GGobiData *d = dsp->d;
   splotd *sp = gg->current_splot;
 
   arrayd_zero (&dsp->t2d3.Fa);
@@ -635,7 +635,7 @@ void
 tour2d3_manip_init(gint p1, gint p2, splotd *sp) 
 {
   displayd *dsp = (displayd *) sp->displayptr;
-  datad *d = dsp->d;
+  GGobiData *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
   ggobid *gg = GGobiFromSPlot(sp);
   gint j, k;
@@ -847,7 +847,7 @@ void
 tour2d3_manip(gint p1, gint p2, splotd *sp, ggobid *gg) 
 {
   displayd *dsp = (displayd *) sp->displayptr;
-  datad *d = dsp->d;
+  GGobiData *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
   gint actual_nvars = dsp->t2d3.nactive;
   gboolean offscreen = false;

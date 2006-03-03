@@ -34,10 +34,10 @@
 
 gfloat barchart_sort_index(gfloat * yy, gint ny, ggobid * gg,
                            barchartSPlotd * sp);
-void barchart_init_categorical(barchartSPlotd * sp, datad * d);
-void barchart_set_initials(barchartSPlotd * sp, datad * d);
+void barchart_init_categorical(barchartSPlotd * sp, GGobiData * d);
+void barchart_set_initials(barchartSPlotd * sp, GGobiData * d);
 void rectangle_inset(gbind * bin);
-void barchart_allocate_structure(barchartSPlotd * sp, datad * d);
+void barchart_allocate_structure(barchartSPlotd * sp, GGobiData * d);
 void button_draw_with_shadows(GdkPoint * region, GdkDrawable * drawable,
                               ggobid * gg);
 gboolean rect_intersect(GdkRectangle *rect1, GdkRectangle *rect2, GdkRectangle *dest);
@@ -73,19 +73,19 @@ static GtkToggleActionEntry toggle_entries[] = {
 static guint n_toggle_entries = G_N_ELEMENTS(toggle_entries);
 
 displayd *
-barchart_new(gboolean missing_p, splotd * sp, datad * d, ggobid * gg)
+barchart_new(gboolean missing_p, splotd * sp, GGobiData * d, ggobid * gg)
 {
   return(createBarchart(NULL, missing_p, sp, -1, d, gg));
 }
 
 displayd *
-barchart_new_with_vars(gboolean missing_p, gint nvars, gint *vars, datad * d, ggobid * gg)
+barchart_new_with_vars(gboolean missing_p, gint nvars, gint *vars, GGobiData * d, ggobid * gg)
 {
  return(createBarchart(NULL, missing_p, NULL, vars ? vars[0] : 0, d, gg));
 }
 
 displayd *
-createBarchart(displayd *display, gboolean missing_p, splotd * sp, gint var, datad * d,
+createBarchart(displayd *display, gboolean missing_p, splotd * sp, gint var, GGobiData * d,
   ggobid * gg)
 {
   GtkWidget *table, *vbox;
@@ -232,7 +232,7 @@ createBarchart(displayd *display, gboolean missing_p, splotd * sp, gint var, dat
 void barchart_clean_init(barchartSPlotd * sp)
 {
   displayd *display;
-  datad *d;
+  GGobiData *d;
   gint i, j;
 
   display = (displayd *) GGOBI_SPLOT(sp)->displayptr;
@@ -268,7 +268,7 @@ void barchart_clean_init(barchartSPlotd * sp)
 }
 
 static void
-barchart_recalc_group_counts(barchartSPlotd * sp, datad * d, ggobid * gg)
+barchart_recalc_group_counts(barchartSPlotd * sp, GGobiData * d, ggobid * gg)
 {
   gint i, j, m, bin;
   vartabled *vtx = vartable_element_get(GGOBI_SPLOT(sp)->p1dvar, d);
@@ -537,7 +537,7 @@ void barchart_free_structure(barchartSPlotd * sp)
   barchart_init_vectors(sp);
 }
 
-void barchart_allocate_structure(barchartSPlotd * sp, datad * d)
+void barchart_allocate_structure(barchartSPlotd * sp, GGobiData * d)
 {
   vartabled *vtx;
   gint i, nbins;
@@ -605,7 +605,7 @@ void barchart_allocate_structure(barchartSPlotd * sp, datad * d)
   sp->bar->breaks = (gfloat *) g_malloc((nbins + 1) * sizeof(nbins));
 }
 
-void barchart_init_categorical(barchartSPlotd * sp, datad * d)
+void barchart_init_categorical(barchartSPlotd * sp, GGobiData * d)
 {
   splotd *rawsp = GGOBI_SPLOT(sp);
   gint i, jvar = rawsp->p1dvar;
@@ -637,7 +637,7 @@ void barchart_init_categorical(barchartSPlotd * sp, datad * d)
 
 
 gboolean
-barchart_redraw(splotd * rawsp, datad * d, ggobid * gg, gboolean binned)
+barchart_redraw(splotd * rawsp, GGobiData * d, ggobid * gg, gboolean binned)
 {
   gint i, j, radius;
   colorschemed *scheme = gg->activeColorScheme;
@@ -727,7 +727,7 @@ barchart_splot_add_plot_labels(splotd * sp, GdkDrawable * drawable,
                                ggobid * gg)
 {
   displayd *display = (displayd *) sp->displayptr;
-  datad *d = display->d;
+  GGobiData *d = display->d;
   PangoLayout *layout = gtk_widget_create_pango_layout(GTK_WIDGET(sp->da), NULL);
   PangoRectangle rect;
   
@@ -769,7 +769,7 @@ barchart_splot_add_plot_labels(splotd * sp, GdkDrawable * drawable,
   g_object_unref(G_OBJECT(layout));
 }
 
-void barchart_set_breakpoints(gfloat width, barchartSPlotd * sp, datad * d)
+void barchart_set_breakpoints(gfloat width, barchartSPlotd * sp, GGobiData * d)
 {
   gfloat rdiff;
   gint i, nbins;
@@ -790,7 +790,7 @@ void barchart_set_breakpoints(gfloat width, barchartSPlotd * sp, datad * d)
 
 }
 
-void barchart_set_initials(barchartSPlotd * sp, datad * d)
+void barchart_set_initials(barchartSPlotd * sp, GGobiData * d)
 {
   splotd *rawsp = GGOBI_SPLOT(sp);
   vartabled *vtx = vartable_element_get(rawsp->p1dvar, d);
@@ -861,7 +861,7 @@ void barchart_set_initials(barchartSPlotd * sp, datad * d)
   }
 }
 
-void barchart_recalc_counts(barchartSPlotd * sp, datad * d, ggobid * gg)
+void barchart_recalc_counts(barchartSPlotd * sp, GGobiData * d, ggobid * gg)
 {
   gfloat yy;
   gint i, bin, m;
@@ -1000,7 +1000,7 @@ void barchart_recalc_counts(barchartSPlotd * sp, datad * d, ggobid * gg)
   barchart_recalc_dimensions(GGOBI_SPLOT(sp), d, gg);
 }
 
-void barchart_recalc_dimensions(splotd * rawsp, datad * d, ggobid * gg)
+void barchart_recalc_dimensions(splotd * rawsp, GGobiData * d, ggobid * gg)
 {
   gint i, maxbincount = 0, maxbin = -1;
   gfloat precis = PRECISION1;
@@ -1161,7 +1161,7 @@ void barchart_recalc_dimensions(splotd * rawsp, datad * d, ggobid * gg)
   }
 }
 
-gboolean barchart_active_paint_points(splotd * rawsp, datad * d, ggobid *gg)
+gboolean barchart_active_paint_points(splotd * rawsp, GGobiData * d, ggobid *gg)
 {
   barchartSPlotd *sp = GGOBI_BARCHART_SPLOT(rawsp);
   brush_coords *brush_pos = &rawsp->brush_pos;
@@ -1371,7 +1371,7 @@ barchart_default_visual_cues_draw(splotd * rawsp, GdkDrawable * drawable,
 {
   vartabled *vtx;
   displayd *display = gg->current_display;
-  datad *d = display->d;
+  GGobiData *d = display->d;
   barchartSPlotd *sp = GGOBI_BARCHART_SPLOT(rawsp);
   vtx = vartable_element_get(GGOBI_SPLOT(sp)->p1dvar, d);
 
@@ -1500,7 +1500,7 @@ barchart_add_bar_cues(splotd * rawsp, GdkDrawable * drawable, ggobid * gg)
 
 
 gboolean
-barchart_identify_bars(icoords mousepos, splotd * rawsp, datad * d,
+barchart_identify_bars(icoords mousepos, splotd * rawsp, GGobiData * d,
                        ggobid * gg)
 {
 /* returns 0 if nothing has changed from the last time */

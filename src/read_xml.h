@@ -19,11 +19,7 @@
 
 #include "vars.h"
 
-#if 1
 #include <libxml/parser.h>
-#else
-#include <parser.h>
-#endif
 
 enum xmlDataState {
   TOP = 0,
@@ -84,7 +80,7 @@ typedef struct _XMLUserData {
   InputDescription *input;
 
   /* The current data object to which new records are added. */
-  datad *current_data;
+  GGobiData *current_data;
   // The list of all datad's read.
   GSList *dlist; 
 
@@ -215,7 +211,9 @@ extern "C" {
   double asNumber(const char *sval);
   gboolean asLogical(const gchar * sval);
 
-  datad *getCurrentXMLData(XMLParserData * parserData);
+  GGobiData *getCurrentXMLData(XMLParserData * parserData);
+
+  gboolean readXMLRecord(const xmlChar ** attrs, XMLParserData * data);
 
   gchar * intern(XMLParserData *, const char * el);
 

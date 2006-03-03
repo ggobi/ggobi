@@ -33,7 +33,7 @@ static void close_btn_cb (GtkWidget *w, ggobid *gg)
 static void
 clone_vars_cb (GtkWidget *w, ggobid *gg)
 {
-  datad *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
+  GGobiData *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
   gint *cols = (gint *) g_malloc (d->ncols * sizeof (gint));
   gint ncols = selected_cols_get (cols, d, gg);
 
@@ -48,7 +48,7 @@ clone_vars_cb (GtkWidget *w, ggobid *gg)
 static void
 delete_vars_cb (GtkWidget *w, ggobid *gg)
 {
-  datad *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
+  GGobiData *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
   gint *cols = (gint *) g_malloc (d->ncols * sizeof (gint));
   gint ncols = selected_cols_get (cols, d, gg);
 
@@ -75,7 +75,7 @@ dialog_range_set (GtkWidget *w, ggobid *gg)
   GtkWidget *dialog = w;
   GtkWidget *umin_entry, *umax_entry;
   GtkTreeModel *model;
-  datad *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
+  GGobiData *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
   gint *cols = (gint *) g_malloc (d->ncols * sizeof (gint));
   gint ncols = selected_cols_get (cols, d, gg);
   gint j, k;
@@ -157,7 +157,7 @@ range_unset_cb (GtkWidget *w, ggobid *gg)
 }
 
 static void rescale_cb (GtkWidget *w, ggobid *gg) {
-  datad *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
+  GGobiData *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
 
   limits_set (true, true, d, gg);  
   vartable_limits_set (d);
@@ -181,7 +181,7 @@ open_range_set_dialog (GtkWidget *w, ggobid *gg)
   GtkWidget *radio1, *radio2;
   GSList *group;
   gint k;
-  datad *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
+  GGobiData *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
   gint *cols = (gint *) g_malloc (d->ncols * sizeof (gint));
   gint ncols = selected_cols_get (cols, d, gg);
   gboolean ok = true;
@@ -303,7 +303,7 @@ open_range_set_dialog (GtkWidget *w, ggobid *gg)
 void range_unset (ggobid *gg)
 {
   GtkTreeModel *model;
-  datad *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
+  GGobiData *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
   gint *cols = (gint *) g_malloc (d->ncols * sizeof (gint));
   gint ncols = selected_cols_get (cols, d, gg);
   gint j, k;
@@ -344,7 +344,7 @@ dialog_newvar_add (GtkWidget *w, ggobid *gg)
 {
   GtkWidget *dialog = w;
   GtkWidget *entry, *radio_brush;
-  datad *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
+  GGobiData *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
   gint vtype;
   gchar *vname;
 
@@ -455,7 +455,7 @@ dialog_rename_var (GtkWidget *w, ggobid *gg)
 {
   GtkWidget *dialog = w;
   GtkWidget *entry;
-  datad *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
+  GGobiData *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
   gchar *vname;
   gint *selected_vars, nselected_vars = 0;
   gint jvar;
@@ -490,7 +490,7 @@ static void
 open_rename_dialog (GtkWidget *w, ggobid *gg)
 {
   GtkWidget *dialog, *hb, *entry, *lbl;
-  datad *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
+  GGobiData *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
   gint *selected_vars, nselected_vars = 0;
   vartabled *vt;
 

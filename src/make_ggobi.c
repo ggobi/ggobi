@@ -74,7 +74,7 @@ fileset_read_init(const gchar * ldata_in, const gchar *pluginModeName, GGobiPlug
 {
   GSList *ds = fileset_read(ldata_in, pluginModeName, plugin, gg);
   for(; ds; ds = ds->next) {
-    datad_init((datad*) ds->data, gg, FALSE);
+    datad_init((GGobiData*) ds->data, gg, FALSE);
   }
 
   return (ds != NULL);
@@ -208,12 +208,12 @@ resetDataMode()
 
 void start_ggobi(ggobid * gg, gboolean init_data, gboolean createPlot)
 {
-  datad *d;
+  GGobiData *d;
   if (init_data) {
     GSList *l;
     gboolean firstd = createPlot;
     for (l = gg->d; l; l = l->next) {
-      d = (datad *) l->data;
+      d = (GGobiData *) l->data;
       datad_init(d, gg, firstd);
       firstd = false;
     }
@@ -224,7 +224,7 @@ void start_ggobi(ggobid * gg, gboolean init_data, gboolean createPlot)
 
   /*-- now that we've read some data, set the mode --*/
   if (createPlot && gg->d) {
-    d = (datad *) gg->d->data;
+    d = (GGobiData *) gg->d->data;
     if (d != NULL) {
       if (d->ncols > 0) {
         gg->pmode = (d->ncols == 1) ? P1PLOT : XYPLOT;

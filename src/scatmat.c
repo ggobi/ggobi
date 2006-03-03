@@ -45,7 +45,7 @@ static const gchar *scatmat_ui =
 displayd *
 scatmat_new (displayd *display,
 	       gboolean missing_p, gint numRows, gint *rows,
-	       gint numCols, gint *cols, datad *d, ggobid *gg) 
+	       gint numCols, gint *cols, GGobiData *d, ggobid *gg) 
 {
   GtkWidget *vbox, *frame;
   gint i, j, ctr;
@@ -260,7 +260,7 @@ scatmat_varsel_simple (cpaneld *cpanel, splotd *sp, gint jvar,
   GtkTableChild *child;
   displayd *display = gg->current_display;
   gint jpos, *vars, nvars;
-  datad *d = display->d;
+  GGobiData *d = display->d;
 
   /* Simple:  if jvar is among the plotted variables, delete it;
      otherwise, append it */

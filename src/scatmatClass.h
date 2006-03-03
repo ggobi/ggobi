@@ -53,7 +53,7 @@ typedef  struct {
 
 
 GType ggobi_scatmat_display_get_type();
-displayd *ggobi_scatmat_display_new(gint type, gboolean missing_p, datad *d, ggobid *gg);
+displayd *ggobi_scatmat_display_new(gint type, gboolean missing_p, GGobiData *d, ggobid *gg);
 
 typedef struct 
 {

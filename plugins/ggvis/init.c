@@ -11,7 +11,7 @@
 void
 ggvis_init (ggvisd *ggv, ggobid *gg)
 {
-  datad *d;
+  GGobiData *d;
   GSList *l;
 
   /*-- initialize the datad pointers --*/

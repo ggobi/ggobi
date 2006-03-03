@@ -259,7 +259,7 @@ void
 eigen_clear (array_d Ga, array_d Gz, vector_f lambda, vector_f tau, 
   vector_f tinc, gint datadim)
 {
-  /*  datad *d = dsp->d;
+  /*  GGobiData *d = dsp->d;
   gint datadim = d->ncols;*/
   gint j, k;
 

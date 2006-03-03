@@ -155,7 +155,7 @@ gboolean initJVM(GGobiPluginInfo *info)
 gboolean 
 JavaReadInput(InputDescription *desc, ggobid *gg, GGobiPluginInfo *plugin)
 {
-    datad *gdata;
+    GGobiData *gdata;
     JavaRunTimeData *rt = ((JavaInputPluginData *) plugin->data)->runTime;
     int i, j;
     int nrow, ncol;

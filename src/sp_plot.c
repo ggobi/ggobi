@@ -27,7 +27,7 @@ static void splot_draw_border (splotd *, GdkDrawable *, ggobid *);
 
 static void
 splot_check_colors (gushort maxcolorid, gint *ncolors_used,
-  gushort *colors_used, datad *d, ggobid *gg)
+  gushort *colors_used, GGobiData *d, ggobid *gg)
 {
   colorschemed *scheme = gg->activeColorScheme;
   gchar *message;
@@ -53,7 +53,7 @@ splot_check_colors (gushort maxcolorid, gint *ncolors_used,
 
 
 gboolean
-splot_plot_case (gint m, datad *d,
+splot_plot_case (gint m, GGobiData *d,
   splotd *sp, displayd *display, ggobid *gg)
 {
   gboolean draw_case = true;
@@ -106,13 +106,13 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
   gint ncolors_used;
   gushort colors_used[MAXNCOLORS+2];
   displayd *display = (displayd *) sp->displayptr;
-  datad *d = display->d;
+  GGobiData *d = display->d;
   colorschemed *scheme = gg->activeColorScheme;
   gushort maxcolorid;
   gboolean loop_over_points;
 
   gint i, m;
-  gboolean (*f)(splotd *, datad*, ggobid*, gboolean) = NULL;  /* redraw */
+  gboolean (*f)(splotd *, GGobiData*, ggobid*, gboolean) = NULL;  /* redraw */
 
   GGobiExtendedSPlotClass *klass = NULL;
   GGobiExtendedDisplayClass *displayKlass = NULL;
@@ -254,7 +254,7 @@ splot_clear_pixmap0_binned (splotd *sp, ggobid *gg)
   icoords *loc0 = &gg->plot.loc0;
   icoords *loc1 = &gg->plot.loc1;
   displayd *display = (displayd *) sp->displayptr;
-  datad *d = display->d;
+  GGobiData *d = display->d;
   colorschemed *scheme = gg->activeColorScheme;
 
 /*
@@ -310,7 +310,7 @@ splot_draw_to_pixmap0_binned (splotd *sp, gboolean draw_hidden, ggobid *gg)
   displayd *display = (displayd *) sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
   ProjectionMode proj = cpanel->pmode;
-  datad *d = display->d;
+  GGobiData *d = display->d;
   colorschemed *scheme = gg->activeColorScheme;
   icoords *bin0 = &gg->plot.bin0;
   icoords *bin1 = &gg->plot.bin1;
@@ -331,7 +331,7 @@ splot_draw_to_pixmap0_binned (splotd *sp, gboolean draw_hidden, ggobid *gg)
     klass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);
     if(klass->redraw) {
       displayd *display = (displayd *) sp->displayptr;
-      datad *d = display->d;
+      GGobiData *d = display->d;
 /* XXX barcharts, for instance, don't know about this new approach yet */
       if(klass->redraw(sp, d, gg, true)) {
         return;
@@ -432,7 +432,7 @@ splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *gg)
 {
   displayd *display = (displayd *) sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
-  datad *d = display->d;
+  GGobiData *d = display->d;
   colorschemed *scheme = gg->activeColorScheme;
 
   gboolean proceed = (cpanel->pmode == XYPLOT ||
@@ -456,7 +456,7 @@ splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *gg)
       have a special splot class for the display type but still need
       to do something special. */
   if(GGOBI_IS_EXTENDED_DISPLAY(display)) {
-    void (*f)(displayd *, splotd *, GdkDrawable*, datad *, ggobid*);
+    void (*f)(displayd *, splotd *, GdkDrawable*, GGobiData *, ggobid*);
     f =  GGOBI_EXTENDED_DISPLAY_GET_CLASS(display)->add_plot_labels;
     if(f)
       f(display, sp, drawable, d, gg);
@@ -472,7 +472,7 @@ splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *gg)
 void
 splot_add_diamond_cue (gint k, splotd *sp, GdkDrawable *drawable, ggobid *gg)
 {
-  datad *d = sp->displayptr->d;
+  GGobiData *d = sp->displayptr->d;
   gint diamond_dim = DIAMOND_DIM;
   GdkPoint diamond[5];
   colorschemed *scheme = gg->activeColorScheme;
@@ -500,7 +500,7 @@ splot_add_point_label (gboolean nearest_p, gint k, gboolean top_p, splotd *sp,
   GdkDrawable *drawable, ggobid *gg)
 {
   displayd *dsp = sp->displayptr;
-  datad *d = dsp->d;
+  GGobiData *d = dsp->d;
   PangoLayout *layout;
   PangoRectangle rect;
   gint diamond_dim = DIAMOND_DIM;
@@ -605,12 +605,12 @@ splot_add_identify_nearest_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg)
     } else {
       cpaneld *cpanel = &display->cpanel;
       if (cpanel->id_target_type == identify_points) {
-        datad *d = display->d;
+        GGobiData *d = display->d;
         pt = d->nearest_point;
         splot_add_identify_point_cues (sp, drawable, pt, true, gg);
       } else {
         if (display->e) {
-          datad *e = display->e;
+          GGobiData *e = display->e;
           pt = e->nearest_point;
           splot_add_identify_edge_cues (sp, drawable, pt, true, gg);
         }
@@ -644,7 +644,7 @@ splot_add_movepts_cues (splotd *sp, GdkDrawable *drawable,
   gint k, gboolean nearest, ggobid *gg)
 {
   displayd *dsp = (displayd *) sp->displayptr;
-  datad *d = dsp->d;
+  GGobiData *d = dsp->d;
 
   if (k < 0 || k >= d->nrows)
     return;
@@ -662,8 +662,8 @@ splot_add_record_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
   gint id;
   GSList *l;
   displayd *display = (displayd *) sp->displayptr;
-  datad *d = display->d;
-  datad *e = display->e;
+  GGobiData *d = display->d;
+  GGobiData *e = display->e;
   InteractionMode imode = imode_get (gg);
   cpaneld *cpanel = &display->cpanel;
 
@@ -757,8 +757,8 @@ static void
 splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
 {
   displayd *dsp = (displayd *) sp->displayptr;
-  datad *e = dsp->e;
-  datad *d = dsp->d;
+  GGobiData *e = dsp->e;
+  GGobiData *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
   gint proj = cpanel->pmode;
   GGobiExtendedSPlotClass *splotKlass;

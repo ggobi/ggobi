@@ -26,9 +26,9 @@
 static void reset_all_cb (GtkButton *button, ggobid *gg)
 {
   GSList *l;
-  datad *d;
+  GGobiData *d;
   for (l = gg->d; l; l = l->next) {
-    d = (datad *) l->data;
+    d = (GGobiData *) l->data;
 
     while (g_slist_length (d->movepts_history) > 0) {
       /*-- yes, twice -- once for x motion, once for y motion --*/
@@ -43,7 +43,7 @@ static void reset_all_cb (GtkButton *button, ggobid *gg)
 
 static void undo_last_cb (GtkButton *button, ggobid *gg)
 {
-  datad *d = gg->current_display->d;
+  GGobiData *d = gg->current_display->d;
 
 /*-- remove the last two cells --*/
   movepts_history_delete_last (d, gg);

@@ -106,7 +106,7 @@ filesel_ok (GtkWidget *chooser)
 #ifdef WRITEASCII // Obsolete
         case ASCIIDATA:
         {
-          datad *d = NULL;
+          GGobiData *d = NULL;
           GSList *l = gg->d;
           gchar *name;
           gint k;
@@ -120,7 +120,7 @@ filesel_ok (GtkWidget *chooser)
 
           k = 0;
           while (l) {
-            d = (datad *) l->data;
+            d = (GGobiData *) l->data;
             name = (nd > 1) ?
               g_strdup_printf ("%s%d", filename, k) : g_strdup (filename);
             ggobi_file_set_create (name, d, gg);

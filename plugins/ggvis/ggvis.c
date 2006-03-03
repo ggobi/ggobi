@@ -143,7 +143,7 @@ void
 show_ggvis_window (GtkAction *action, PluginInstance *inst)
 {
   GSList *l;
-  datad *d;
+  GGobiData *d;
   gboolean ok = false;
 
   /* Before doing anything making sure there is input data, and that
@@ -153,7 +153,7 @@ show_ggvis_window (GtkAction *action, PluginInstance *inst)
     return;
   }
   for (l = inst->gg->d; l; l = l->next) {
-    d = (datad *) l->data;
+    d = (GGobiData *) l->data;
     if (d->edge.n > 0) {
       ok = true;
       break;
@@ -203,7 +203,7 @@ ggv_datad_set_cb (GtkTreeSelection *tree_sel, PluginInstance *inst)
   ggobid *gg = inst->gg;
   ggvisd *ggv = ggvisFromInst (inst);
   gchar *dname;
-  datad *d;
+  GGobiData *d;
   GSList *l;
   const gchar *clname = gtk_widget_get_name (GTK_WIDGET(gtk_tree_selection_get_tree_view(tree_sel)));
   gint k;
@@ -235,7 +235,7 @@ ggv_datad_set_cb (GtkTreeSelection *tree_sel, PluginInstance *inst)
   /* Don't free either string; they're just pointers */
 }
 static void 
-ggv_tree_view_datad_added_cb (ggobid *gg, datad *d, GtkWidget *tree_view)
+ggv_tree_view_datad_added_cb (ggobid *gg, GGobiData *d, GtkWidget *tree_view)
 {
   gchar *row[1];
   GtkWidget *swin;
@@ -276,7 +276,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   GtkWidget *menubar;
   /*-- for lists of datads --*/
   gchar *titles[] = {"node sets", "edge sets"};
-  datad *d;
+  GGobiData *d;
   ggobid *gg = inst->gg;
   GtkWidget *swin, *tree_view;
   gchar *row[1];
@@ -342,7 +342,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   /*-- --*/
 
   for (l = gg->d; l; l = l->next) {
-    d = (datad *) l->data;
+    d = (GGobiData *) l->data;
     if (d->rowIds != NULL) {  /*-- node sets --*/
       GtkTreeIter iter;
 	  gtk_list_store_append(GTK_LIST_STORE(model), &iter);
@@ -376,7 +376,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   /*-- --*/
 
   for (l = gg->d; l; l = l->next) {
-    d = (datad *) l->data;
+    d = (GGobiData *) l->data;
     if (d->edge.n != 0) {  /*-- edge sets --*/
       GtkTreeIter iter;
 	  gtk_list_store_append(GTK_LIST_STORE(model), &iter);

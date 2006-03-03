@@ -34,12 +34,12 @@
 
 /* Update variable selection panel */
 void 
-varpanel_show_page_cb (ggobid *gg, displayd *display, datad *d) {
+varpanel_show_page_cb (ggobid *gg, displayd *display, GGobiData *d) {
   varpanel_show_page(display, gg);
 }
 /* Update tooltips */
 void 
-varpanel_tooltips_set_cb (ggobid *gg, displayd *display, datad *d) {
+varpanel_tooltips_set_cb (ggobid *gg, displayd *display, GGobiData *d) {
   varpanel_tooltips_set(display, gg);
 }
 
@@ -51,14 +51,14 @@ static gchar *varpanel_names[] = {"xtoggle", "ytoggle", "ztoggle", "label"};
 
 /*-- return the hbox --*/
 GtkWidget *
-varpanel_container_get_nth (gint jvar, datad *d)
+varpanel_container_get_nth (gint jvar, GGobiData *d)
 {
   GtkWidget *w;
   w = (GtkWidget *) g_slist_nth_data (d->vcbox_ui.box, jvar);
   return w;
 }
 GtkWidget *
-varpanel_widget_get_nth (gint jbutton, gint jvar, datad *d)
+varpanel_widget_get_nth (gint jbutton, gint jvar, GGobiData *d)
 {
   GtkWidget *box, *child;
   box = (GtkWidget *) varpanel_container_get_nth (jvar, d);
@@ -70,7 +70,7 @@ varpanel_widget_get_nth (gint jbutton, gint jvar, datad *d)
   return child;
 }
 void
-varpanel_label_set (gint j, datad *d)
+varpanel_label_set (gint j, GGobiData *d)
 {
   GtkWidget *label = varpanel_widget_get_nth (VARSEL_LABEL, j, d);
   vartabled *vt = vartable_element_get (j, d);
@@ -90,7 +90,7 @@ varpanel_label_set (gint j, datad *d)
 }
 
 GtkWidget *
-varpanel_widget_set_visible (gint jbutton, gint jvar, gboolean show, datad *d)
+varpanel_widget_set_visible (gint jbutton, gint jvar, gboolean show, GGobiData *d)
 {
   GtkWidget *box, *child;
   gboolean visible;
@@ -109,7 +109,7 @@ varpanel_widget_set_visible (gint jbutton, gint jvar, gboolean show, datad *d)
 }
 
 void
-varpanel_delete_nth (gint jvar, datad *d)
+varpanel_delete_nth (gint jvar, GGobiData *d)
 {
   GtkWidget *box = varpanel_container_get_nth (jvar, d);
   if (box != NULL) {
@@ -123,7 +123,7 @@ varpanel_delete_nth (gint jvar, datad *d)
 /*-------------------------------------------------------------------------*/
 
 void
-varpanel_toggle_set_active (gint jbutton, gint jvar, gboolean active, datad *d)
+varpanel_toggle_set_active (gint jbutton, gint jvar, gboolean active, GGobiData *d)
 {
   gboolean active_prev;
   GtkWidget *w;
@@ -146,7 +146,7 @@ varpanel_toggle_set_active (gint jbutton, gint jvar, gboolean active, datad *d)
 void
 varsel (GtkWidget *w, cpaneld *cpanel, splotd *sp, gint jvar,
   gint toggle, gint mousebtn,
-  gint alt_mod, gint ctrl_mod, gint shift_mod, datad *d, ggobid *gg)
+  gint alt_mod, gint ctrl_mod, gint shift_mod, GGobiData *d, ggobid *gg)
 {
   displayd *display = (displayd *) sp->displayptr;
   gboolean redraw = false;
@@ -198,7 +198,7 @@ varpanel_show_page (displayd *display, ggobid *gg)
 {
   GtkNotebook *nb;
   gint page, page_new;
-  datad *d = display->d, *paged;
+  GGobiData *d = display->d, *paged;
   GList *l, *children;
   GtkWidget *child, *tab_label;
   GtkWidget *pagechild;
@@ -250,7 +250,7 @@ varpanel_switch_page_cb (GtkNotebook *notebook, GtkNotebookPage *page,
 
   /*-- describe the datad being selected in the console statusbar --*/
   if (gg->status_message_func) {
-    datad *d = (datad *) g_slist_nth_data (gg->d, page_num);
+    GGobiData *d = (GGobiData *) g_slist_nth_data (gg->d, page_num);
     if (d) {
       gchar *msg = g_strdup_printf ("%s: %d x %d (%s)",
         d->name, d->nrows, d->ncols, gg->input->fileName);
@@ -266,7 +266,7 @@ void
 varpanel_refresh (displayd *display, ggobid *gg) 
 {
   splotd *sp = gg->current_splot;
-  datad *d;
+  GGobiData *d;
 
   if (display) {
     d = display->d;
@@ -300,7 +300,7 @@ varpanel_refresh (displayd *display, ggobid *gg)
 
 /*-- responds to a button_press_event --*/
 static gint
-varsel_cb (GtkWidget *w, GdkEvent *event, datad *d)
+varsel_cb (GtkWidget *w, GdkEvent *event, GGobiData *d)
 {
   ggobid *gg = GGobiFromWidget (w, true);
   displayd *display = gg->current_display;
@@ -365,7 +365,7 @@ varsel_cb (GtkWidget *w, GdkEvent *event, datad *d)
 /*------------------------------------------------------------------*/
 
 static void
-varpanel_add_row (gint j, datad *d, ggobid *gg) 
+varpanel_add_row (gint j, GGobiData *d, ggobid *gg) 
 {
   vartabled *vt = vartable_element_get (j, d);
   GtkWidget *box, *xw, *yw, *zw, *label;
@@ -425,7 +425,7 @@ varpanel_add_row (gint j, datad *d, ggobid *gg)
 }
 
 void
-varpanel_widgets_add (gint nc, datad *d, ggobid *gg) 
+varpanel_widgets_add (gint nc, GGobiData *d, ggobid *gg) 
 {
   gint j;
   gint nd = g_slist_length (gg->d);
@@ -452,7 +452,7 @@ varpanel_widgets_add (gint nc, datad *d, ggobid *gg)
 
 void 
 varpanel_addvar_cb (ggobid *gg, vartabled *vt, gint which,
-  datad *d, void *p)
+  GGobiData *d, void *p)
 {
   /*-- variable toggle buttons and circles --*/
   varpanel_widgets_add (d->ncols, d, gg);
@@ -475,7 +475,7 @@ its own projection.  Add a variable to varpanel_ui in datad.h? -- dfs */
 /*-------------------------------------------------------------------------*/
 
 void
-varpanel_set_sensitive (datad *d, gboolean sensitive_p, ggobid *gg)
+varpanel_set_sensitive (GGobiData *d, gboolean sensitive_p, ggobid *gg)
 {
   gint i;
   GtkWidget *vbox = d->vcbox_ui.vbox, *hb;
@@ -532,7 +532,7 @@ varpanel_make (GtkWidget *parent, ggobid *gg) {
 }
 
 void
-varpanel_clear (datad *d, ggobid *gg)
+varpanel_clear (GGobiData *d, ggobid *gg)
 {
   GList *pages;
   gint npages;
@@ -553,7 +553,7 @@ varpanel_clear (datad *d, ggobid *gg)
 /*-- for each datad:  hpane, ebox, scrolled window, vbox;
      in varpanel_add_row, an hbox, togglebuttons and label --*/
 void 
-varpanel_populate (datad *d, ggobid *gg)
+varpanel_populate (GGobiData *d, ggobid *gg)
 {
   gint j, nd;
   GList *children;
@@ -652,7 +652,7 @@ void
 varpanel_tooltips_set (displayd *display, ggobid *gg) 
 {
   gint j;
-  datad *d;
+  GGobiData *d;
   GtkWidget *wx, *wy, *wz, *label;
 
   if (display == NULL) {

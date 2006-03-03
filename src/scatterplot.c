@@ -177,7 +177,7 @@ static const gchar *scatterplot_ui =
 "</ui>";
 
 static void 
-display_datad_added_cb (ggobid *gg, datad *d, void *win)
+display_datad_added_cb (ggobid *gg, GGobiData *d, void *win)
 {
   windowDisplayd *display =  GGOBI_WINDOW_DISPLAY(GTK_OBJECT(win));
 
@@ -200,13 +200,13 @@ ggobi_scatter_plot_new(displayd *dpy, ggobid *gg)
 }
 
 displayd *
-scatterplot_new_with_vars(gboolean missing_p, gint numVars, gint *vars, datad *d, ggobid *gg)
+scatterplot_new_with_vars(gboolean missing_p, gint numVars, gint *vars, GGobiData *d, ggobid *gg)
 {
   return(createScatterplot(NULL, missing_p, NULL, numVars, vars, d, gg));
 }
 
 displayd *
-scatterplot_new (gboolean missing_p, splotd *sp, datad *d, ggobid *gg) 
+scatterplot_new (gboolean missing_p, splotd *sp, GGobiData *d, ggobid *gg) 
 {
   return(createScatterplot(NULL, missing_p, sp, 0, NULL, d, gg));
 }
@@ -252,7 +252,7 @@ edge_options_cb(GtkRadioAction *action, GtkRadioAction *current, displayd *dsp)
 }
 
 displayd *
-createScatterplot(displayd *display, gboolean missing_p, splotd *sp, gint numVars, gint *vars, datad *d, ggobid *gg)
+createScatterplot(displayd *display, gboolean missing_p, splotd *sp, gint numVars, gint *vars, GGobiData *d, ggobid *gg)
 {
   GtkWidget *table, *vbox;
   ProjectionMode projection;

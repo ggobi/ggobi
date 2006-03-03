@@ -39,14 +39,14 @@ GtkWidget *addDisplayMenuItem(const char *label, ggobid *gg);
 void
 show_barplot_display(PluginInstance *inst, GtkWidget *widget)
 {
-    datad *data;
+    GGobiData *data;
     displayd *display;
 
     if(ValidateGGobiRef(inst->gg, false) == NULL) {
 	return;
     }
 
-    data = (datad*) g_object_get_data(G_OBJECT(widget), "data");
+    data = (GGobiData*) g_object_get_data(G_OBJECT(widget), "data");
     if(!data)
 	return;
 

@@ -21,12 +21,12 @@
 #include "vars.h"
 #include "externs.h"
 
-gfloat mean_largest_dist (gfloat **, gint *, gint, gfloat *, gfloat *, datad *, ggobid *);
-gfloat median_largest_dist (gfloat **, gint *, gint, gfloat *, gfloat *, datad *, ggobid *);
+gfloat mean_largest_dist (gfloat **, gint *, gint, gfloat *, gfloat *, GGobiData *, ggobid *);
+gfloat median_largest_dist (gfloat **, gint *, gint, gfloat *, gfloat *, GGobiData *, ggobid *);
 
 /* ------------ Dynamic allocation, freeing section --------- */
 
-void pipeline_init(datad * d, ggobid * gg)
+void pipeline_init(GGobiData * d, ggobid * gg)
 {
   gint i;
 
@@ -78,7 +78,7 @@ void pipeline_init(datad * d, ggobid * gg)
 }
 
 void
-pipeline_arrays_free (datad *d, ggobid *gg)
+pipeline_arrays_free (GGobiData *d, ggobid *gg)
 /*
  * Dynamically free arrays used in data pipeline.
 */
@@ -97,7 +97,7 @@ pipeline_arrays_free (datad *d, ggobid *gg)
 }
 
 void
-pipeline_arrays_alloc (datad *d, ggobid *gg)
+pipeline_arrays_alloc (GGobiData *d, ggobid *gg)
 /*
  * Dynamically allocate arrays.
 */
@@ -117,7 +117,7 @@ pipeline_arrays_alloc (datad *d, ggobid *gg)
 }
 
 void
-pipeline_arrays_check_dimensions (datad *d)
+pipeline_arrays_check_dimensions (GGobiData *d)
 {
   gint n;
 
@@ -191,7 +191,7 @@ icompare (gint *x1, gint *x2)
 
 gfloat
 median_largest_dist (gfloat **vals, gint *cols, gint ncols,
-  gfloat *min, gfloat *max, datad *d, ggobid *gg)
+  gfloat *min, gfloat *max, GGobiData *d, ggobid *gg)
 {
 /*
  * Find the minimum and maximum values of each variable,
@@ -243,7 +243,7 @@ median_largest_dist (gfloat **vals, gint *cols, gint ncols,
 
 gfloat
 mean_largest_dist (gfloat **vals, gint *cols, gint ncols,
-  gfloat *min, gfloat *max, datad *d, ggobid *gg)
+  gfloat *min, gfloat *max, GGobiData *d, ggobid *gg)
 {
 /*
  * Find the minimum and maximum values of each variable,
@@ -288,7 +288,7 @@ mean_largest_dist (gfloat **vals, gint *cols, gint ncols,
 }
 
 void
-tform_to_world_by_var (gint j, datad *d, ggobid *gg)
+tform_to_world_by_var (gint j, GGobiData *d, ggobid *gg)
 {
   gint i, m;
   greal max, min, range, ftmp;
@@ -317,7 +317,7 @@ tform_to_world_by_var (gint j, datad *d, ggobid *gg)
 }
 
 void
-tform_to_world (datad *d, ggobid *gg)
+tform_to_world (GGobiData *d, ggobid *gg)
 {
 /*
  * Take tform.vals[][], one column at a time, and generate world[]
@@ -342,7 +342,7 @@ tform_to_world (datad *d, ggobid *gg)
 */
 
 void
-rows_in_plot_set (datad *d, ggobid *gg) {
+rows_in_plot_set (GGobiData *d, ggobid *gg) {
   gint i;
   GGobiDataClass *klass;
   gint nprev = d->nrows_in_plot;
@@ -354,8 +354,8 @@ rows_in_plot_set (datad *d, ggobid *gg) {
       d->rows_in_plot.els[d->nrows_in_plot++] = i;
 
   klass = GGOBI_DATA_GET_CLASS(d);
-  g_signal_emit (G_OBJECT(d),
-    klass->signals[ROWS_IN_PLOT_CHANGED_SIGNAL], 0,
+  g_signal_emit_by_name (G_OBJECT(d),
+    "rows-in-plot-changed", 0,
     nprev, -1, gg);  /* the argument shown with -1 has no current use */
 
   return; /* (nprev == d->nrows_in_plot); */
@@ -367,7 +367,7 @@ rows_in_plot_set (datad *d, ggobid *gg) {
 
 /* XXX duncan and dfs: you need to sort this out
 void
-world_to_raw_by_var (gint pt, gint j, displayd *display, datad *d, ggobid *gg)
+world_to_raw_by_var (gint pt, gint j, displayd *display, GGobiData *d, ggobid *gg)
 {
   gfloat precis = PRECISION1;
   gfloat ftmp, rdiff;
@@ -391,7 +391,7 @@ world_to_raw_by_var (gint pt, gint j, displayd *display, datad *d, ggobid *gg)
 */
 /* XXX duncan and dfs: you need to sort this out
 void
-world_to_raw (gint pt, splotd *sp, datad *d, ggobid *gg)
+world_to_raw (gint pt, splotd *sp, GGobiData *d, ggobid *gg)
 {
   displayd *display = (displayd *) sp->displayptr;
 

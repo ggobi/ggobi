@@ -63,7 +63,7 @@ int
 read_mysql_data(MySQLLoginInfo *login, gint init, ggobid *gg)
 {
   MYSQL *conn;
-  datad *d;
+  GGobiData *d;
 
   if(login->password == NULL) {
     /* The user hasn't specified a password.
@@ -145,12 +145,12 @@ GGOBI(mysql_connect)(MySQLLoginInfo *login, ggobid *gg)
    using the connection and then reads the data and 
    puts it in the ggobid raw.data array.
  */
-datad*
+GGobiData*
 GGOBI(get_mysql_data)(MYSQL *conn, const char *query, ggobid *gg)
 {
   MYSQL_RES *res;
   int status;
-  datad *d = NULL;
+  GGobiData *d = NULL;
 
   if(query == NULL || query[0] == '\0')
     return(NULL);
@@ -178,7 +178,7 @@ GGOBI(get_mysql_data)(MYSQL *conn, const char *query, ggobid *gg)
  */
 int
 GGOBI(register_mysql_data)(MYSQL *conn, MYSQL_RES *res, gint preFetched,
-                            datad *d, ggobid *gg)
+                            GGobiData *d, ggobid *gg)
 {
   unsigned glong j, rownum = 0;
   unsigned glong nrows, ncols;
@@ -240,7 +240,7 @@ GGOBI(mysql_warning)(const char *msg, MYSQL *conn, ggobid *gg)
   Can now use ggobi_data_new();
  */
 void
-GGOBI(setDimensions)(gint nrow, gint ncol, datad *d, ggobid *gg)
+GGOBI(setDimensions)(gint nrow, gint ncol, GGobiData *d, ggobid *gg)
 {
   d->nrows = nrow;
   d->nrows_in_plot = d->nrows;  /*-- for now --*/

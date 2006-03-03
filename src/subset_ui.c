@@ -38,10 +38,10 @@ close_wmgr_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg) {
   gtk_widget_hide (gg->subset_ui.window);
 }
 
-static datad *
+static GGobiData *
 datad_get_from_widget (GtkWidget *w, ggobid *gg)
 {
-  datad *d = NULL;
+  GGobiData *d = NULL;
   GtkTreeSelection *sel;
   
   if (g_slist_length (gg->d) == 0)
@@ -55,7 +55,7 @@ datad_get_from_widget (GtkWidget *w, ggobid *gg)
 	sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view));
 	gint kd = tree_selection_get_selected_row(sel);
         /*-- Assume that all datad's are included --*/
-        if (kd >= 0) d = (datad *) g_slist_nth_data (gg->d, kd);
+        if (kd >= 0) d = (GGobiData *) g_slist_nth_data (gg->d, kd);
     }
   }
 
@@ -86,7 +86,7 @@ static const gchar *const substr_lbl[] = {
 };
 static void subset_string_pos_cb (GtkWidget *w, ggobid *gg)
 {
-  datad *d = datad_get_from_widget (w, gg);
+  GGobiData *d = datad_get_from_widget (w, gg);
   GtkWidget *tgl = (GtkWidget *)
     g_object_get_data(G_OBJECT(gg->subset_ui.window), "SS:IGNORE_CASE");
 
@@ -103,7 +103,7 @@ static void subset_string_pos_cb (GtkWidget *w, ggobid *gg)
 }
 
 static void
-subset_display_update (datad *d, ggobid *gg)
+subset_display_update (GGobiData *d, ggobid *gg)
 {
   GtkWidget *spinbtn, *entry;
   /*
@@ -150,7 +150,7 @@ subset_datad_set_cb (GtkTreeSelection *tree_sel, ggobid *gg)
   /*-- Assume that all datad's are included --*/
   gint row = tree_selection_get_selected_row(tree_sel);
   if (row != -1) {
-	  datad *d = g_slist_nth_data (gg->d, row);
+	  GGobiData *d = g_slist_nth_data (gg->d, row);
 	  if (d)
 		  subset_display_update (d, gg);
   }
@@ -159,7 +159,7 @@ subset_datad_set_cb (GtkTreeSelection *tree_sel, ggobid *gg)
 static void
 rescale_cb (GtkWidget *w, ggobid *gg)
 {
-  datad *d = datad_get_from_widget (w, gg);
+  GGobiData *d = datad_get_from_widget (w, gg);
   if (d) {
     limits_set (true, true, d, gg);
     vartable_limits_set (d);
@@ -178,7 +178,7 @@ subset_cb (GtkWidget *w, ggobid *gg)
   gint bstart, bsize;
   gint estart, estep;
   gboolean redraw;
-  datad *d = datad_get_from_widget (w, gg);
+  GGobiData *d = datad_get_from_widget (w, gg);
   GtkWidget *entry, *tgl;
 
   if (!d)
@@ -233,7 +233,7 @@ subset_cb (GtkWidget *w, ggobid *gg)
 
 static void
 include_all_cb (GtkWidget *w, ggobid *gg) {
-  datad *d = datad_get_from_widget (w, gg);
+  GGobiData *d = datad_get_from_widget (w, gg);
 
   if (d != NULL) {
     subset_include_all (d, gg);
@@ -243,7 +243,7 @@ include_all_cb (GtkWidget *w, ggobid *gg) {
 
 
 static void 
-subset_tree_view_datad_added_cb (ggobid *gg, datad *d, GtkWidget *tree_view)
+subset_tree_view_datad_added_cb (ggobid *gg, GGobiData *d, GtkWidget *tree_view)
 {
   GtkTreeIter iter;
   GtkTreeModel *model;
@@ -268,7 +268,7 @@ subset_window_open (ggobid *gg) {
   GtkWidget *button, *t;
   GtkWidget *vbox, *frame, *hb, *vb, *button_hbox, *close_hbox;
   GtkWidget *label, *btn, *spinbtn, *entry, *opt;
-  datad *d;
+  GGobiData *d;
   static gchar *tree_view_titles[1] = {"datasets"};
 
   GtkWidget *swin, *tree_view;
@@ -315,7 +315,7 @@ subset_window_open (ggobid *gg) {
       /*-- All datad's are included. This assumption is used in two places. */
       for (l = gg->d; l; l = l->next) {
 	GtkTreeIter iter;
-        d = (datad *) l->data;
+        d = (GGobiData *) l->data;
         subset_init (d, gg);
 	gtk_list_store_append(model, &iter);
 	gtk_list_store_set(model, &iter, 0, d->name, -1);

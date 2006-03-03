@@ -41,7 +41,7 @@ extern "C" {
 #if 0
   int read_mysql_data(MySQLLoginInfo *login, int init, ggobid *gg);
   MYSQL *GGOBI(mysql_connect)(MySQLLoginInfo *login, ggobid *gg);
-  datad*  GGOBI(get_mysql_data)(MYSQL *conn, const char *query, ggobid *gg);
+  GGobiData*  GGOBI(get_mysql_data)(MYSQL *conn, const char *query, ggobid *gg);
   void GGOBI(mysql_warning)(const char *msg, MYSQL *conn, ggobid *gg);
   int GGOBI(register_mysql_data)(MYSQL *conn, MYSQL_RES *res, int preFetched, ggobid *gg);
 #endif

@@ -11,7 +11,7 @@
 
 #include "defines.h"
 #include "types.h"
-#include "datad.h"
+#include "ggobi-data.h"
 #include "ggobi.h"
 #include "display.h"
 

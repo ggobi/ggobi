@@ -24,20 +24,20 @@
 #include "externs.h"
 
 
-static void tsWorldToPlane(splotd *sp, datad *d, ggobid *gg);
-static void tsWithinPlaneToScreen(splotd *sp, displayd *display, datad *d, ggobid *gg);
-static gboolean tsDrawEdge_p(splotd *sp, gint m, datad *d, datad *e, ggobid *gg);
-static gboolean tsDrawCase_p(splotd *sp, gint m, datad *d, ggobid *gg);
+static void tsWorldToPlane(splotd *sp, GGobiData *d, ggobid *gg);
+static void tsWithinPlaneToScreen(splotd *sp, displayd *display, GGobiData *d, ggobid *gg);
+static gboolean tsDrawEdge_p(splotd *sp, gint m, GGobiData *d, GGobiData *e, ggobid *gg);
+static gboolean tsDrawCase_p(splotd *sp, gint m, GGobiData *d, ggobid *gg);
 static void tsAddPlotLabels(splotd *sp, GdkDrawable *drawable, ggobid *gg) ;
 static void tsWithinDrawBinned(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc);
 static void tsShowWhiskers(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc);
-static GdkSegment * tsAllocWhiskers(GdkSegment *, splotd *sp, gint nrows, datad *d);
-static gchar *tsTreeLabel(splotd *sp, datad *d, ggobid *gg);
+static GdkSegment * tsAllocWhiskers(GdkSegment *, splotd *sp, gint nrows, GGobiData *d);
+static gchar *tsTreeLabel(splotd *sp, GGobiData *d, ggobid *gg);
 
 
 
 void
-tsWorldToPlane(splotd *sp,  datad *d, ggobid *gg)
+tsWorldToPlane(splotd *sp,  GGobiData *d, ggobid *gg)
 {
       xy_reproject (sp, d->world.vals, d, gg);
 }
@@ -64,13 +64,13 @@ tsDestroy(splotd *sp)
 }
 
 void
-tsWithinPlaneToScreen(splotd *sp, displayd *display, datad *d, ggobid *gg)
+tsWithinPlaneToScreen(splotd *sp, displayd *display, GGobiData *d, ggobid *gg)
 {
       tsplot_whiskers_make (sp, display, gg);
 }
 
 gboolean
-tsDrawEdge_p(splotd *sp, gint m, datad *d, datad *e, ggobid *gg)
+tsDrawEdge_p(splotd *sp, gint m, GGobiData *d, GGobiData *e, ggobid *gg)
 {
    gboolean draw_edge = true;
 
@@ -79,7 +79,7 @@ tsDrawEdge_p(splotd *sp, gint m, datad *d, datad *e, ggobid *gg)
 }
 
 gboolean
-tsDrawCase_p(splotd *sp, gint m, datad *d, ggobid *gg)
+tsDrawCase_p(splotd *sp, gint m, GGobiData *d, ggobid *gg)
 {
   return !(d->missing.vals[m][sp->xyvars.y] || d->missing.vals[m][sp->xyvars.x]);
 }
@@ -148,13 +148,13 @@ tsShowWhiskers(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc)
 
 
 GdkSegment * 
-tsAllocWhiskers(GdkSegment *whiskers, splotd *sp, gint nrows, datad *d)
+tsAllocWhiskers(GdkSegment *whiskers, splotd *sp, gint nrows, GGobiData *d)
 {
   return((GdkSegment *) g_realloc (whiskers, (nrows-1) * sizeof (GdkSegment)));
 }
 
 gchar *
-tsTreeLabel(splotd *sp, datad *d, ggobid *gg)
+tsTreeLabel(splotd *sp, GGobiData *d, ggobid *gg)
 {
   vartabled *vty;
   int n;
@@ -170,7 +170,7 @@ tsTreeLabel(splotd *sp, datad *d, ggobid *gg)
 
 
 static gint
-splotVariablesGet(splotd *sp, gint *cols, datad *d)
+splotVariablesGet(splotd *sp, gint *cols, GGobiData *d)
 {
 	cols[0] = sp->xyvars.x;
 	cols[1] = sp->xyvars.y;
@@ -203,7 +203,7 @@ tsplotCreateWithVars(displayd *display, gint *vars, gint nvar, ggobid *gg)
 }
 
 static void
-splotAssignPointsToBins(datad *d, splotd *sp, ggobid *gg)
+splotAssignPointsToBins(GGobiData *d, splotd *sp, ggobid *gg)
 {
   assign_points_to_bins (d, sp, gg);
 }
@@ -216,7 +216,7 @@ splotScreenToTform(cpaneld *cpanel, splotd *sp, icoords *scr,
   greal precis = (greal) PRECISION1;
   greal ftmp, max, min, rdiff;
   displayd *display = (displayd *) sp->displayptr;
-  datad *d = display->d;
+  GGobiData *d = display->d;
   gfloat scale_x, scale_y;
   vartabled *vtx, *vty;
 

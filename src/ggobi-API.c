@@ -22,7 +22,7 @@
 #include "GGobiAPI.h"
 
 #include "ggobi.h"
-#include "datad.h"
+#include "ggobi-data.h"
 #include "types.h"
 #include "vars.h"
 #include "externs.h"
@@ -42,8 +42,8 @@ extern "C" {
 void GGOBI(displays_release)(ggobid *gg);
 void GGOBI(display_release)(displayd *display, ggobid *gg);
 void GGOBI(splot_release)(splotd *sp, displayd *display, ggobid *gg);
-void GGOBI(data_release)(datad *, ggobid *gg);
-void GGOBI(vartable_free)(datad *, ggobid *gg);
+void GGOBI(data_release)(GGobiData *, ggobid *gg);
+void GGOBI(vartable_free)(GGobiData *, ggobid *gg);
 void GGOBI(vardatum_free)(vartabled *var, ggobid *gg);
 #ifdef __cplusplus
 }
@@ -118,7 +118,7 @@ GGOBI(getDataModeNames)(int *n)
 
 
 gchar **
-GGOBI(getVariableNames)(gint transformed, datad *d, ggobid *gg)
+GGOBI(getVariableNames)(gint transformed, GGobiData *d, ggobid *gg)
 {
   gchar **names;
   gint nc = d->ncols, j;
@@ -137,7 +137,7 @@ GGOBI(getVariableNames)(gint transformed, datad *d, ggobid *gg)
 
 void
 GGOBI(setVariableName)(gint j, gchar *name, gboolean transformed,
-  datad *d, ggobid *gg)
+  GGobiData *d, ggobid *gg)
 {
   vartabled *vt = vartable_element_get (j, d);
 
@@ -149,7 +149,7 @@ GGOBI(setVariableName)(gint j, gchar *name, gboolean transformed,
     vt->collab_tform = g_strdup(name);
   else {
 /*
-    extern GtkWidget *checkbox_get_nth (gint, datad *);
+    extern GtkWidget *checkbox_get_nth (gint, GGobiData *);
     GtkWidget *w;
     w = checkbox_get_nth (j, d);
     if(w)
@@ -192,7 +192,7 @@ getDefaultRowNamesPtr()
 }
 
 void
-setRowNames(datad *d, gchar **rownames)
+setRowNames(GGobiData *d, gchar **rownames)
 {
     int i;
     gchar *lbl;
@@ -220,7 +220,7 @@ setRowNames(datad *d, gchar **rownames)
 /*-- need two of these now, one to replace and one to append --*/
 void
 GGOBI(setData)(gdouble *values, gchar **rownames, gchar **colnames,
-                gint nr, gint nc, datad *d, gboolean cleanup, ggobid *gg,
+                gint nr, gint nc, GGobiData *d, gboolean cleanup, ggobid *gg,
                 gchar **ids, gboolean duplicate, InputDescription *desc)
 {
   gint i, j;
@@ -363,9 +363,9 @@ GGOBI(splot_release)(splotd *sp, displayd *display, ggobid *gg)
 
 /* Not in the API for the moment. A "protected" routine. */
 void
-GGOBI(data_release)(datad *d, ggobid *gg)
+GGOBI(data_release)(GGobiData *d, ggobid *gg)
 {
-  void vartable_free (datad *d);
+  void vartable_free (GGobiData *d);
 
   if(d == NULL)
     return;
@@ -379,7 +379,7 @@ GGOBI(data_release)(datad *d, ggobid *gg)
 
 /*
 void
-GGOBI(vartable_free)(datad *d, ggobid *gg)
+GGOBI(vartable_free)(GGobiData *d, ggobid *gg)
 {
   gint i;
   for(i = 0; i < d->ncols ; i++) {
@@ -420,7 +420,7 @@ GGOBI(getViewTypeIndices)(gint *n)
 
 
 displayd *
-GGOBI(newScatterplot) (gint ix, gint iy, datad *d, ggobid *gg)
+GGOBI(newScatterplot) (gint ix, gint iy, GGobiData *d, ggobid *gg)
 {
   displayd *display = NULL;
   gint vars[2];
@@ -438,7 +438,7 @@ GGOBI(newScatterplot) (gint ix, gint iy, datad *d, ggobid *gg)
 
 displayd *
 GGOBI(newScatmat) (gint *rows, gint *columns, gint nr, gint nc,
-  datad *d, ggobid *gg)
+  GGobiData *d, ggobid *gg)
 {
   displayd *display; 
 
@@ -451,7 +451,7 @@ GGOBI(newScatmat) (gint *rows, gint *columns, gint nr, gint nc,
 }
 
 displayd *
-GGOBI(newParCoords)(gint *vars, gint numVars, datad *d, ggobid *gg)
+GGOBI(newParCoords)(gint *vars, gint numVars, GGobiData *d, ggobid *gg)
 {
   displayd *display = NULL;
 
@@ -465,7 +465,7 @@ GGOBI(newParCoords)(gint *vars, gint numVars, datad *d, ggobid *gg)
 }
 
 displayd * 
-GGOBI(newTimeSeries)(gint *yvars, gint numVars, datad *d, ggobid *gg) 
+GGOBI(newTimeSeries)(gint *yvars, gint numVars, GGobiData *d, ggobid *gg) 
 { 
   displayd *display = NULL; 
  
@@ -517,7 +517,7 @@ GGOBI(getViewTypeName)(displayd *dpy)
   Don't touch this.
  */
 const gfloat** 
-GGOBI(getRawData)(datad *d, ggobid *gg)
+GGOBI(getRawData)(GGobiData *d, ggobid *gg)
 {
   return((const gfloat**) d->raw.vals);
 }
@@ -527,7 +527,7 @@ GGOBI(getRawData)(datad *d, ggobid *gg)
   Don't touch this.
  */
 const gfloat** 
-GGOBI(getTFormData)(datad *d, ggobid *gg)
+GGOBI(getTFormData)(GGobiData *d, ggobid *gg)
 {
   return ((const gfloat **) d->tform.vals);
 }
@@ -539,7 +539,7 @@ GGOBI(getTFormData)(datad *d, ggobid *gg)
   Do not change this as it is not a copy.
  */
 const gchar **
-GGOBI(getCaseNames)(datad *d, ggobid *gg)
+GGOBI(getCaseNames)(GGobiData *d, ggobid *gg)
 {
   gchar **rowlab = (gchar **) g_malloc (sizeof(gchar*) * d->nrows);
   gint i;
@@ -561,7 +561,7 @@ GGOBI(getCaseNames)(datad *d, ggobid *gg)
  value, but the caller will have to free that pointer.
  */
 void
-GGOBI(setCaseName)(gint index, const gchar *label, datad *d, ggobid *gg)
+GGOBI(setCaseName)(gint index, const gchar *label, GGobiData *d, ggobid *gg)
 {
   gchar *old;
   if (index < 0 || index >= d->nrows) {
@@ -624,7 +624,7 @@ GGOBI(getGlyphTypeName)(gint type)
 
 
 gint *
-GGOBI(getCaseGlyphTypes)(gint *ids, gint n, datad *d, ggobid *gg)
+GGOBI(getCaseGlyphTypes)(gint *ids, gint n, GGobiData *d, ggobid *gg)
 {
   gint i;
   gint *ans = (gint *) g_malloc (n * sizeof(gint));
@@ -636,14 +636,14 @@ GGOBI(getCaseGlyphTypes)(gint *ids, gint n, datad *d, ggobid *gg)
 }
 
 gint 
-GGOBI(getCaseGlyphType)(gint id, datad *d, ggobid *gg)
+GGOBI(getCaseGlyphType)(gint id, GGobiData *d, ggobid *gg)
 {
   gint index = d->rows_in_plot.els[id];
   return (d->glyph_now.els[index].type);
 }
 
 gint *
-GGOBI(getCaseGlyphSizes)(gint *ids, gint n, datad *d, ggobid *gg)
+GGOBI(getCaseGlyphSizes)(gint *ids, gint n, GGobiData *d, ggobid *gg)
 {
   gint i;
   gint *ans = (gint *) g_malloc (n * sizeof(gint));
@@ -655,7 +655,7 @@ GGOBI(getCaseGlyphSizes)(gint *ids, gint n, datad *d, ggobid *gg)
 }
 
 gint 
-GGOBI(getCaseGlyphSize)(gint id, datad *d, ggobid *gg)
+GGOBI(getCaseGlyphSize)(gint id, GGobiData *d, ggobid *gg)
 {
   gint index = d->rows_in_plot.els[id];
 
@@ -663,7 +663,7 @@ GGOBI(getCaseGlyphSize)(gint id, datad *d, ggobid *gg)
 }
 
 void 
-GGOBI(setCaseGlyph)(gint index, gint type, gint size, datad *d, ggobid *gg)
+GGOBI(setCaseGlyph)(gint index, gint type, gint size, GGobiData *d, ggobid *gg)
 {
   if (type > -1) {
     if (type >= NGLYPHTYPES)
@@ -682,7 +682,7 @@ GGOBI(setCaseGlyph)(gint index, gint type, gint size, datad *d, ggobid *gg)
 
 void 
 GGOBI(setCaseGlyphs)(gint *ids, gint n, gint type, gint size,
-  datad *d, ggobid *gg)
+  GGobiData *d, ggobid *gg)
 {
   gint i, doit = 1;
   /*
@@ -711,7 +711,7 @@ GGOBI(setCaseGlyphs)(gint *ids, gint n, gint type, gint size,
 /*-------------------------------------------------------------------------*/
 
 void 
-GGOBI(setCaseColor)(gint pt, gint colorIndex, datad *d, ggobid *gg)
+GGOBI(setCaseColor)(gint pt, gint colorIndex, GGobiData *d, ggobid *gg)
 {
   colorschemed *scheme = gg->activeColorScheme;
 
@@ -723,7 +723,7 @@ GGOBI(setCaseColor)(gint pt, gint colorIndex, datad *d, ggobid *gg)
 
 void 
 GGOBI(setCaseColors)(gint *pts, gint howMany, gint colorIndex,
-  datad *d, ggobid *gg)
+  GGobiData *d, ggobid *gg)
 {
   gint i;
   for (i = 0; i < howMany ; i++)
@@ -732,13 +732,13 @@ GGOBI(setCaseColors)(gint *pts, gint howMany, gint colorIndex,
 
 
 gint 
-GGOBI(getCaseColor) (gint pt, datad *d, ggobid *gg)
+GGOBI(getCaseColor) (gint pt, GGobiData *d, ggobid *gg)
 {
   return (d->color_now.els[pt]);
 }
 
 gint *
-GGOBI(getCaseColors)(gint *pts, gint howMany, datad *d, ggobid *gg)
+GGOBI(getCaseColors)(gint *pts, gint howMany, GGobiData *d, ggobid *gg)
 {
   gint i;
   gint *ans = (gint*) g_malloc(howMany * sizeof(gint));
@@ -754,14 +754,14 @@ GGOBI(getCaseColors)(gint *pts, gint howMany, datad *d, ggobid *gg)
 /*-------------------------------------------------------------------------*/
 
 void 
-GGOBI(setCaseHidden)(gint pt, gboolean hidden_p, datad *d, ggobid *gg)
+GGOBI(setCaseHidden)(gint pt, gboolean hidden_p, GGobiData *d, ggobid *gg)
 {
   d->hidden.els[pt] = d->hidden_now.els[pt] = hidden_p;
   /*-- don't replot --*/
 }
 
 void 
-GGOBI(setCaseHiddens)(gint *pts, gint howMany, gboolean hidden_p, datad *d, ggobid *gg)
+GGOBI(setCaseHiddens)(gint *pts, gint howMany, gboolean hidden_p, GGobiData *d, ggobid *gg)
 {
   gint i;
   for (i = 0; i < howMany ; i++)
@@ -770,13 +770,13 @@ GGOBI(setCaseHiddens)(gint *pts, gint howMany, gboolean hidden_p, datad *d, ggob
 }
 
 gboolean
-GGOBI(getCaseHidden) (gint pt, datad *d, ggobid *gg)
+GGOBI(getCaseHidden) (gint pt, GGobiData *d, ggobid *gg)
 {
   return (d->hidden_now.els[pt]);
 }
 
 gboolean *
-GGOBI(getCaseHiddens)(gint *pts, gint howMany, datad *d, ggobid *gg)
+GGOBI(getCaseHiddens)(gint *pts, gint howMany, GGobiData *d, ggobid *gg)
 {
  gint i;
  gboolean *ans = (gboolean *) g_malloc (howMany * sizeof(gboolean));
@@ -793,7 +793,7 @@ GGOBI(getCaseHiddens)(gint *pts, gint howMany, datad *d, ggobid *gg)
 
 #ifdef OBSOLETE_EDGE_CODE
 gboolean 
-GGOBI(isConnectedEdge)(gint a, gint b, datad *d, datad *e, ggobid *gg)
+GGOBI(isConnectedEdge)(gint a, gint b, GGobiData *d, GGobiData *e, ggobid *gg)
 {
   gint tmp, i;
 
@@ -829,7 +829,7 @@ GGOBI(isConnectedEdge)(gint a, gint b, datad *d, datad *e, ggobid *gg)
   To do this, the value of update should be false.
  */
 void
-GGOBI(setObservationEdge)(gint x, gint y, datad *d, ggobid *gg, gboolean update)
+GGOBI(setObservationEdge)(gint x, gint y, GGobiData *d, ggobid *gg, gboolean update)
 {
   if (GGOBI(isConnectedEdge)(x, y, d, gg) == false) {
     if (update)
@@ -1328,7 +1328,7 @@ GGOBI(getColorName)(gint cid, ggobid *gg, gboolean inDefault)
 static gint
 addVariableInternal(gdouble *vals, gint num, gchar *name,
 		    gchar **levels, gint *values, gint *counts, gint numLevels,
-		    gboolean update, datad *d, ggobid *gg)
+		    gboolean update, GGobiData *d, ggobid *gg)
 {
   /*if (d->ncols < 1) {
     gchar ** rnames = (gchar **) &DefaultRowNames; 
@@ -1355,7 +1355,7 @@ addVariableInternal(gdouble *vals, gint num, gchar *name,
 /*-- this is really addRealVariable --*/
 gint
 GGOBI(addVariable)(gdouble *vals, gint num, gchar *name,
-		   gboolean update, datad *d, ggobid *gg)
+		   gboolean update, GGobiData *d, ggobid *gg)
 {
   return(addVariableInternal(vals, num, name, NULL, NULL, NULL, 0, update, d, gg));
 }
@@ -1370,7 +1370,7 @@ only very limted use of the event we emit.    dfs  2/7
 gint
 GGOBI(addCategoricalVariable)(gdouble *vals, gint num, gchar *name,
 			      gchar **levels, gint *values, gint *counts, gint numLevels,
-			      gboolean update, datad *d, ggobid *gg)
+			      gboolean update, GGobiData *d, ggobid *gg)
 {
 
   return(addVariableInternal(vals, num, name, levels, values, counts, numLevels, update, d, gg));
@@ -1389,7 +1389,7 @@ GGOBI(addCategoricalVariable)(gdouble *vals, gint num, gchar *name,
  */
 gboolean
 GGOBI(setVariableValues)(gint whichVar, gdouble *vals, gint num,
-  gboolean update, datad *d, ggobid *gg)
+  gboolean update, GGobiData *d, ggobid *gg)
 {
   gint i;
   for (i = 0; i < num; i++) {
@@ -1404,7 +1404,7 @@ GGOBI(setVariableValues)(gint whichVar, gdouble *vals, gint num,
 }
 
 void
-GGOBI(update_data)(datad *d, ggobid *gg)
+GGOBI(update_data)(GGobiData *d, ggobid *gg)
 {
   limits_set (true, true, d, gg);  
   vartable_limits_set (d);
@@ -1414,7 +1414,7 @@ GGOBI(update_data)(datad *d, ggobid *gg)
 }
 
 gint
-GGOBI(removeVariable)(gchar *name, datad *d, ggobid *gg)
+GGOBI(removeVariable)(gchar *name, GGobiData *d, ggobid *gg)
 {
   gint which = GGOBI(getVariableIndex)(name, d, gg);
   if (which > -1 && which < d->ncols)
@@ -1424,7 +1424,7 @@ GGOBI(removeVariable)(gchar *name, datad *d, ggobid *gg)
 }
 
 gint
-GGOBI(removeVariableByIndex)(gint which, datad *d, ggobid *gg)
+GGOBI(removeVariableByIndex)(gint which, GGobiData *d, ggobid *gg)
 {
   gint i, j;
   for (i = 0; i < d->nrows; i++) {
@@ -1440,7 +1440,7 @@ GGOBI(removeVariableByIndex)(gint which, datad *d, ggobid *gg)
 
 
 gint 
-GGOBI(getVariableIndex)(const gchar *name, datad *d, ggobid *gg)
+GGOBI(getVariableIndex)(const gchar *name, GGobiData *d, ggobid *gg)
 {
   gint j;
   vartabled *vt;
@@ -1564,12 +1564,12 @@ GGOBI(getDescription)(ggobid *gg)
 int 
 GGOBI(datasetIndex)(const char *name,  const ggobid * const gg)
 {
-  datad *d;
+  GGobiData *d;
   int ctr = 0;
   GSList *tmp = gg->d;
 
   while(tmp) {
-    d =(datad *) tmp->data;
+    d =(GGobiData *) tmp->data;
     if(strcmp(name, d->name) == 0)
       return(ctr);
     ctr++;
@@ -1587,13 +1587,13 @@ gchar **
 GGOBI(getDatasetNames)(gint *n, ggobid *gg)
 {
   gint i;
-  datad *d;
+  GGobiData *d;
   gchar **names;
   GSList *tmp = gg->d;
   *n = g_slist_length(gg->d);
   names = (gchar **) g_malloc(sizeof(gchar *) * (*n));
   for(i = 0; i < *n ; i++) {
-    d =(datad *) tmp->data;
+    d =(GGobiData *) tmp->data;
     names[i] = g_strdup(d->name);
     tmp = tmp->next;
   }
@@ -1612,13 +1612,13 @@ GGOBI(ggobi_get)(gint which)
 }
 
 gint
-GGOBI(ncols)(datad *data)
+GGOBI(ncols)(GGobiData *data)
 {
  return(data->ncols);
 }
 
 gint
-GGOBI(nrecords)(datad *data)
+GGOBI(nrecords)(GGobiData *data)
 {
  return(data->nrows);
 }
@@ -1684,10 +1684,10 @@ GGOBI(getVersionNumbers)()
 }
 
 
-datad *
+GGobiData *
 GGOBI(data_get)(gint which, const ggobid * const gg)
 {
-  datad *data = NULL;
+  GGobiData *data = NULL;
 
   if (gg->d != NULL)
     data = g_slist_nth_data(gg->d, which);
@@ -1695,11 +1695,11 @@ GGOBI(data_get)(gint which, const ggobid * const gg)
   return(data);
 }
 
-datad *
+GGobiData *
 GGOBI(data_get_by_name)(const gchar * const name, const ggobid * const gg)
 {
   gint which;
-  datad *data = NULL;
+  GGobiData *data = NULL;
 
   which = GGOBI(datasetIndex)(name, gg);
   if(which > -1) {
@@ -1747,7 +1747,7 @@ GGobi_getLevelName(vartabled *vt, double value)
 
 
 void 
-GGobi_setDataName(const char * const name, datad *d)
+GGobi_setDataName(const char * const name, GGobiData *d)
 {
    if(d->name)
       g_free((gchar *) d->name);
@@ -1765,7 +1765,7 @@ GGOBI(setTour2DProjectionMatrix)(gdouble *Fvalues, gint ncols, gint ndim,
   ProjectionMode vm = pmode_get(gg->current_display, gg);
   displayd *dsp = gg->current_display; 
   cpaneld *cpanel = &dsp->cpanel;
-  datad *d = dsp->d;
+  GGobiData *d = dsp->d;
   gboolean candoit = true;
   gint i, j;
 
@@ -1806,7 +1806,7 @@ GGOBI(getTour2DProjectionMatrix)(gint ncols, gint ndim, gboolean vals_scaled,
   ggobid *gg)
 {
   displayd *dsp = gg->current_display; 
-  datad *d = dsp->d;
+  GGobiData *d = dsp->d;
   gdouble **Fvals;
   gint i, j;
 

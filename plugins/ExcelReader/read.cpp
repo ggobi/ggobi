@@ -12,7 +12,7 @@ extern "C" {
 
 #include "externs.h"
 
-displayd*  datad_init (datad *, ggobid *, gboolean);
+displayd*  datad_init (GGobiData *, ggobid *, gboolean);
 
 extern const gchar **getDefaultRowNamesPtr();
 
@@ -39,11 +39,11 @@ IDispatch *getWorkbooks(IDispatch *);
 HRESULT getProperty(IDispatch *, BSTR name, VARIANT *v);
 IDispatch *call(IDispatch *iface, BSTR name, VARIANT *args, int numArgs);
 
-datad *createDataset(VARIANT *var, ggobid *gg);
+GGobiData *createDataset(VARIANT *var, ggobid *gg);
 
 gboolean readData(InputDescription *desc, ggobid *gg, GGobiPluginInfo *plugin);
 
-datad *loadSheet(IDispatch *sheet, ggobid *gg, gchar *fileName);
+GGobiData *loadSheet(IDispatch *sheet, ggobid *gg, gchar *fileName);
 
 
 gboolean
@@ -199,7 +199,7 @@ readDataFile(gchar *fileName, InputDescription *desc, ggobid *gg)
 #endif
 }
 
-datad *
+GGobiData *
 loadSheet(IDispatch *sheet, ggobid *gg, gchar *fileName)
 {
   VARIANT vars[3], *v;
@@ -214,7 +214,7 @@ loadSheet(IDispatch *sheet, ggobid *gg, gchar *fileName)
     releaseVariants(vars, sizeof(vars)/sizeof(vars[0]), true);
     return(NULL);
   }
-  datad *d = createDataset(v, gg);
+  GGobiData *d = createDataset(v, gg);
   if(d) {
 #ifdef DEBUG_EXCEL_PLUGIN
     fprintf(stderr, "Finished getting dataset\n");fflush(stderr);
@@ -355,7 +355,7 @@ setLevels(vartabled *var, GHashTable *levels, int numLevels)
 }
 
 gboolean
-readRowNames(SAFEARRAY *arr, gboolean hasColNames, long dim[2][2], datad *d)
+readRowNames(SAFEARRAY *arr, gboolean hasColNames, long dim[2][2], GGobiData *d)
 {
   long indices[2];
   VARIANT value;
@@ -385,7 +385,7 @@ readRowNames(SAFEARRAY *arr, gboolean hasColNames, long dim[2][2], datad *d)
   return(true);
 }
 
-datad *
+GGobiData *
 createDataset(VARIANT *var, ggobid *gg)
 {
   SAFEARRAY *arr;
@@ -405,7 +405,7 @@ createDataset(VARIANT *var, ggobid *gg)
   long indices[2];
   long dim[2][2];
   UINT numDim;
-  datad *d = NULL;
+  GGobiData *d = NULL;
 
   numDim = SafeArrayGetDim(arr); //  should be two - always!
 
@@ -451,7 +451,7 @@ createDataset(VARIANT *var, ggobid *gg)
   int nrow = dim[0][1] - dim[0][0] + (hasColNames ? 0 : 1);
   int ncol =  dim[1][1] - dim[1][0] + 1 - (hasRowNames ? 1 : 0);
 
-  d = datad_create(nrow, ncol, gg);
+  d = ggobi_data_new(nrow, ncol);
 
 #ifdef DEBUG_EXCEL_PLUGIN
   fprintf(stderr, "Has row names? %d, column names? %d. Start = %d\n", 

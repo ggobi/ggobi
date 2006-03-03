@@ -29,7 +29,7 @@
 
 
 extern GtkWidget * vartable_buttonbox_build (ggobid *gg);
-static void vartable_subwindow_init (datad *d, ggobid *gg);
+static void vartable_subwindow_init (GGobiData *d, ggobid *gg);
 
 /*-------------------------------------------------------------------------*/
 /*            Listen for display_selected events                           */
@@ -54,7 +54,7 @@ static void destroyit (ggobid *gg)
 }
 
 static void 
-vartable_notebook_adddata_cb (ggobid *gg, datad *d, void *notebook)
+vartable_notebook_adddata_cb (ggobid *gg, GGobiData *d, void *notebook)
 {
   vartable_subwindow_init (d, gg);
   gtk_notebook_set_show_tabs (GTK_NOTEBOOK (GTK_WIDGET(notebook)),
@@ -63,7 +63,7 @@ vartable_notebook_adddata_cb (ggobid *gg, datad *d, void *notebook)
 CHECK_EVENT_SIGNATURE(vartable_notebook_adddata_cb, datad_added_f)
 
 vartyped
-tree_view_get_type (datad *d, GtkWidget *tree_view)
+tree_view_get_type (GGobiData *d, GtkWidget *tree_view)
 {
   vartyped vtype = all_vartypes;
   if (d->vartable_tree_view[real] != NULL) {
@@ -112,7 +112,7 @@ vartable_switch_page_cb (GtkNotebook *notebook, GtkNotebookPage *page,
   // yet.  dfs
   if (page_num > -1) {
     vartyped vtype;
-    datad *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
+    GGobiData *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
     swin = gtk_notebook_get_nth_page (notebook, page_num);
     children = gtk_container_get_children (GTK_CONTAINER (swin));
     tree_view = g_list_nth_data (children, 0);
@@ -125,7 +125,7 @@ vartable_switch_page_cb (GtkNotebook *notebook, GtkNotebookPage *page,
 }
 
 GtkTreeModel *
-vartable_tree_model_get (datad *d)
+vartable_tree_model_get (GGobiData *d)
 {
   return(d->vartable_tree_model);
 }
@@ -171,7 +171,7 @@ vartable_tree_view_get (ggobid *gg) {
 }
 
 void
-vartable_show_page (datad *d, ggobid *gg)
+vartable_show_page (GGobiData *d, ggobid *gg)
 {
   GtkNotebook *nb;
   gint page, page_new;
@@ -228,7 +228,7 @@ vartable_varno_from_path(GtkTreeModel *model, GtkTreePath *path)
   return(varno);
 }
 gboolean
-vartable_iter_from_varno(gint var, datad *d, GtkTreeModel **model, GtkTreeIter *iter)
+vartable_iter_from_varno(gint var, GGobiData *d, GtkTreeModel **model, GtkTreeIter *iter)
 {
   GtkTreeModel *loc_model;
   GtkTreePath *path;
@@ -253,7 +253,7 @@ void
 selection_changed_cb (GtkTreeSelection *tree_sel, ggobid *gg)
 {
   gint j;
-  datad *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
+  GGobiData *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
   vartabled *vt;
   GList *rows, *l;
   GtkTreeModel *model;
@@ -278,7 +278,7 @@ selection_changed_cb (GtkTreeSelection *tree_sel, ggobid *gg)
 
 /** 'row' here corresponds to 'variable' (top-level rows) */
 void
-vartable_row_append (gint jvar, datad *d, ggobid *gg)
+vartable_row_append (gint jvar, GGobiData *d, ggobid *gg)
 {
   gint k;
   vartabled *vt = vartable_element_get (jvar, d);
@@ -293,7 +293,7 @@ vartable_row_append (gint jvar, datad *d, ggobid *gg)
 }
 
 static gboolean
-real_filter_func (GtkTreeModel *model, GtkTreeIter *iter, datad *d)
+real_filter_func (GtkTreeModel *model, GtkTreeIter *iter, GGobiData *d)
 {
   GtkTreePath *path = gtk_tree_model_get_path(model, iter);
   if (gtk_tree_path_get_depth(path) > 1)
@@ -303,7 +303,7 @@ real_filter_func (GtkTreeModel *model, GtkTreeIter *iter, datad *d)
   return(vt->vartype != categorical);
 }
 static gboolean
-cat_filter_func (GtkTreeModel *model, GtkTreeIter *iter, datad *d)
+cat_filter_func (GtkTreeModel *model, GtkTreeIter *iter, GGobiData *d)
 {
   GtkTreePath *path = gtk_tree_model_get_path(model, iter);
   if (gtk_tree_path_get_depth(path) > 1)
@@ -314,7 +314,7 @@ cat_filter_func (GtkTreeModel *model, GtkTreeIter *iter, datad *d)
 }
 
 static void
-vartable_subwindow_init (datad *d, ggobid *gg)
+vartable_subwindow_init (GGobiData *d, ggobid *gg)
 {
   gint j;
   GtkWidget *sw, *wlbl;
@@ -447,7 +447,7 @@ vartable_open (ggobid *gg)
 {                                  
   GtkWidget *vbox, *hbox;
   GSList *l;
-  datad *d;
+  GGobiData *d;
 
   /*-- if used before we have data, bail out --*/
   if (gg->d == NULL || g_slist_length (gg->d) == 0) 
@@ -488,7 +488,7 @@ vartable_open (ggobid *gg)
   /* */
 
   for (l = gg->d; l; l = l->next) {
-    d = (datad *) l->data;
+    d = (GGobiData *) l->data;
     vartable_subwindow_init (d, gg);
   }
 
@@ -503,7 +503,7 @@ vartable_open (ggobid *gg)
   gtk_widget_show_all (gg->vartable_ui.window);
 
   /*-- set it to the page corresponding to the current display --*/
-  d = (gg->current_display ? gg->current_display->d : (datad *)gg->d->data);
+  d = (gg->current_display ? gg->current_display->d : (GGobiData *)gg->d->data);
   vartable_show_page (d, gg);
 }
 
@@ -513,7 +513,7 @@ vartable_open (ggobid *gg)
 
 /*-- sets the name of the un-transformed variable --*/
 void
-vartable_collab_set_by_var (gint j, datad *d)
+vartable_collab_set_by_var (gint j, GGobiData *d)
 {
   vartabled *vt = vartable_element_get (j, d);
   gint k;
@@ -555,7 +555,7 @@ vartable_collab_set_by_var (gint j, datad *d)
 
 /*-- sets the name of the transformed variable --*/
 void
-vartable_collab_tform_set_by_var (gint j, datad *d)
+vartable_collab_tform_set_by_var (gint j, GGobiData *d)
 {
   vartabled *vt;
   GtkTreeModel *model;
@@ -579,7 +579,7 @@ vartable_collab_tform_set_by_var (gint j, datad *d)
 
 /*-- sets the limits for a variable --*/
 void
-vartable_limits_set_by_var (gint j, datad *d)
+vartable_limits_set_by_var (gint j, GGobiData *d)
 {
   vartabled *vt = vartable_element_get (j, d);
   GtkTreeModel *model;
@@ -623,7 +623,7 @@ vartable_limits_set_by_var (gint j, datad *d)
   }
 }
 void
-vartable_limits_set (datad *d) 
+vartable_limits_set (GGobiData *d) 
 {
   gint j;
   if (d->vartable_tree_model != NULL)
@@ -633,7 +633,7 @@ vartable_limits_set (datad *d)
 
 /*-- sets the mean, median, and number of missings for a variable --*/
 void
-vartable_stats_set_by_var (gint j, datad *d) {
+vartable_stats_set_by_var (gint j, GGobiData *d) {
   vartabled *vt = vartable_element_get (j, d);
   vartyped type;
   GtkTreeModel *model;
@@ -667,7 +667,7 @@ vartable_stats_set_by_var (gint j, datad *d) {
 }
 
 void
-vartable_stats_set (datad *d) {
+vartable_stats_set (GGobiData *d) {
   gint j;
 
   if (d->vartable_tree_model != NULL)
@@ -680,7 +680,7 @@ vartable_stats_set (datad *d) {
  * functions call gtk_tree_view_set_text.
 */
 void
-vartable_cells_set_by_var (gint j, datad *d) 
+vartable_cells_set_by_var (gint j, GGobiData *d) 
 {
   vartable_stats_set_by_var (j, d);
   vartable_limits_set_by_var (j, d);

@@ -63,7 +63,7 @@ static void
 graphact_datad_set_cb (GtkTreeSelection *tree_sel, PluginInstance *inst)
 {
   graphactd *ga = graphactFromInst (inst);
-  datad *d, *e;
+  GGobiData *d, *e;
   const gchar *clname = gtk_widget_get_name(GTK_WIDGET(gtk_tree_selection_get_tree_view(tree_sel)));
   gboolean changed = false;
   GtkTreeModel *model;
@@ -103,7 +103,7 @@ graphact_datad_set_cb (GtkTreeSelection *tree_sel, PluginInstance *inst)
 }
 
 static void 
-graphact_tree_view_datad_added_cb (ggobid *gg, datad *d, GtkWidget *tree_view)
+graphact_tree_view_datad_added_cb (ggobid *gg, GGobiData *d, GtkWidget *tree_view)
 {
   GtkWidget *swin = (GtkWidget *)
     g_object_get_data(G_OBJECT (tree_view), "datad_swin");
@@ -130,7 +130,7 @@ create_graphact_window(ggobid *gg, PluginInstance *inst)
   GtkTooltips *tips = gtk_tooltips_new ();
   /*-- for lists of datads --*/
   gchar *tree_view_titles[2] = {"node sets", "edge sets"};
-  datad *d;
+  GGobiData *d;
   GtkWidget *hbox, *swin, *tree_view;
   GSList *l;
   graphactd *ga = graphactFromInst (inst); 
@@ -180,7 +180,7 @@ create_graphact_window(ggobid *gg, PluginInstance *inst)
   /*-- --*/
 
   for (l = gg->d; l; l = l->next) {
-    d = (datad *) l->data;
+    d = (GGobiData *) l->data;
     if (d->rowIds != NULL) {  /*-- node sets --*/
 		gtk_list_store_append(model, &iter);
 		gtk_list_store_set(model, &iter, 0, d->name, 1, d, -1);
@@ -210,7 +210,7 @@ create_graphact_window(ggobid *gg, PluginInstance *inst)
   /*-- --*/
 
   for (l = gg->d; l; l = l->next) {
-    d = (datad *) l->data;
+    d = (GGobiData *) l->data;
     if (d->edge.n != 0) {  /*-- edge sets --*/
       gtk_list_store_append(model, &iter);
 	  gtk_list_store_set(model, &iter, 0, d->name, 1, d, -1);
@@ -361,7 +361,7 @@ void closeWindow(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 }
 
 gint
-visible_set (glong *visible, datad *d)
+visible_set (glong *visible, GGobiData *d)
 {
   gint i, m;
   gint nvisible = 0;

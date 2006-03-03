@@ -3,6 +3,8 @@
 #ifndef VARTABLE_H
 #define VARTABLE_H
 
+#include "types.h"
+
 enum { 
       VT_VARNAME, VT_TFORM,
       VT_REAL_USER_MIN, VT_REAL_USER_MAX,

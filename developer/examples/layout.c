@@ -11,7 +11,7 @@
 
 #include <externs.h>
 
-displayd *createWindowlessDisplay(GType type, datad *d, ggobid *gg);
+displayd *createWindowlessDisplay(GType type, GGobiData *d, ggobid *gg);
 
 /**
  This example is intended to illustrate how we can create our own
@@ -65,7 +65,7 @@ main(int argc, char *argv[])
  GtkWidget *btn;
 
  displayd *dpy;
- datad *data;
+ GGobiData *data;
  gint indices[] = {0, 2, 1, 3};
  gint *rows, *cols;
 
@@ -78,7 +78,7 @@ main(int argc, char *argv[])
     return(1);
  }
 
- data = (datad *) gg->d->data;
+ data = (GGobiData *) gg->d->data;
 
    /* Create a window for our customized display */
  win = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -172,7 +172,7 @@ main(int argc, char *argv[])
 }
 
 displayd *
-createWindowlessDisplay(GType type, datad *data, ggobid *gg)
+createWindowlessDisplay(GType type, GGobiData *data, ggobid *gg)
 {
  displayd *dpy;
  dpy = g_object_new(type, NULL);

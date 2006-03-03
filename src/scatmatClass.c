@@ -49,7 +49,7 @@ movePointsButtonCb(displayd *display, splotd *sp, GtkWidget *w, GdkEventButton *
 
 /* XXX duncan and dfs: you need to sort this out
 static void
-worldToRaw(displayd *display, splotd *sp, gint pt, datad *d, ggobid *gg)
+worldToRaw(displayd *display, splotd *sp, gint pt, GGobiData *d, ggobid *gg)
 {
  if (sp->p1dvar == -1) {
     world_to_raw_by_var (pt, sp->xyvars.x, display, d, gg);
@@ -60,7 +60,7 @@ worldToRaw(displayd *display, splotd *sp, gint pt, datad *d, ggobid *gg)
 
 
 static gint 
-variablePlottedP(displayd *display, gint *cols, gint ncols, datad *d)
+variablePlottedP(displayd *display, gint *cols, gint ncols, GGobiData *d)
 {
   GList *l;
   gint j;
@@ -92,7 +92,7 @@ variableSelect(GtkWidget *w, displayd *dpy, splotd *sp, gint jvar, gint toggle, 
 }
 
 static void 
-varpanelRefresh(displayd *display, splotd *sp, datad *d)
+varpanelRefresh(displayd *display, splotd *sp, GGobiData *d)
 {
   gint j, n, *vars;
   ggobid *gg = GGobiFromDisplay(display);
@@ -128,7 +128,7 @@ varpanelTooltipsSet(displayd *display, ggobid *gg, GtkWidget *wx, GtkWidget *wy,
 }
 
 static gint
-plottedVarsGet(displayd *display, gint *vars, datad *d, ggobid *gg)
+plottedVarsGet(displayd *display, gint *vars, GGobiData *d, ggobid *gg)
 {
   GList *l;
   GtkTableChild *child;
@@ -177,7 +177,7 @@ plottedVarsGet(displayd *display, gint *vars, datad *d, ggobid *gg)
 }
 
 displayd *
-createWithVars(gboolean missing_p, gint nvars, gint *vars, datad *d, ggobid *gg)
+createWithVars(gboolean missing_p, gint nvars, gint *vars, GGobiData *d, ggobid *gg)
 {
    return(GGOBI(newScatmat)(vars, vars, nvars, nvars, d, gg));
 }
@@ -274,7 +274,7 @@ receive_scatmat_drag(GtkWidget *src, GdkDragContext *context, int x, int y, cons
   GtkTableChild *child;
   GList *ivars = NULL;
   gint nvars, *vars;
-  datad *d;
+  GGobiData *d;
   ggobid *gg;
 
   display = to->displayptr;
@@ -411,7 +411,7 @@ scatmatCPanelWidget(displayd *dpy, gchar **modeName, ggobid *gg)
 }
 
 static void
-splotAssignPointsToBins(datad *d, splotd *sp, ggobid *gg)
+splotAssignPointsToBins(GGobiData *d, splotd *sp, ggobid *gg)
 {
   if (sp == gg->current_splot)
     assign_points_to_bins (d, sp, gg);
@@ -425,7 +425,7 @@ splotScreenToTform(cpaneld *cpanel, splotd *sp, icoords *scr,
   greal precis = (greal) PRECISION1;
   greal ftmp, max, min, rdiff;
   displayd *display = (displayd *) sp->displayptr;
-  datad *d = display->d;
+  GGobiData *d = display->d;
   gfloat scale_x, scale_y;
   vartabled *vt, *vtx, *vty;
 
@@ -524,7 +524,7 @@ scatmatDisplayClassInit(GGobiScatmatDisplayClass *klass)
 
 /* */
 static gchar *
-treeLabel(splotd *splot, datad *d, ggobid *gg)
+treeLabel(splotd *splot, GGobiData *d, ggobid *gg)
 {
    gint n;
    vartabled *vtx, *vty;
@@ -540,7 +540,7 @@ treeLabel(splotd *splot, datad *d, ggobid *gg)
 
 
 static void
-worldToPlane(splotd *sp, datad *d, ggobid *gg)
+worldToPlane(splotd *sp, GGobiData *d, ggobid *gg)
 {
       if (sp->p1dvar == -1)
         xy_reproject (sp, d->world.vals, d, gg);
@@ -561,7 +561,7 @@ addIdentifyCues (gboolean nearest_p, gint k, splotd *sp, GdkDrawable *drawable, 
 }
 
 gboolean
-drawEdgeP(splotd *sp, gint m, datad *d, datad *e, ggobid *gg)
+drawEdgeP(splotd *sp, gint m, GGobiData *d, GGobiData *e, ggobid *gg)
 {
 	gboolean draw_edge = true;
         if (sp->p1dvar != -1) {
@@ -578,7 +578,7 @@ drawEdgeP(splotd *sp, gint m, datad *d, datad *e, ggobid *gg)
 }
 
 gboolean
-drawCaseP(splotd *sp, gint m, datad *d, ggobid *gg)
+drawCaseP(splotd *sp, gint m, GGobiData *d, ggobid *gg)
 {
 	gboolean draw_case = true;
         if (sp->p1dvar != -1) {
@@ -607,7 +607,7 @@ addPlotLabels(splotd *sp, GdkDrawable *drawable, ggobid *gg)
 
 
 static gint
-splotVariablesGet(splotd *sp, gint *cols, datad *d)
+splotVariablesGet(splotd *sp, gint *cols, GGobiData *d)
 {
 	if(sp->p1dvar > -1) {
    	   cols[0] = sp->p1dvar;

@@ -81,7 +81,7 @@ in addition to the user-defined data provided when
 one registers the callback.
 The signature is
 \begin{verbatim}
- void (*callback)(void *userData, datad *data, ggobid *gg);
+ void (*callback)(void *userData, GGobiData *data, ggobid *gg);
 \end{verbatim}
 and the datad object is a reference to the new 
 datad object being added. The ggobid parameter is the source of the event.
@@ -140,7 +140,7 @@ generated when the user clicks on the variable panel in the main
 window to select a variable.  This can be used to monitor changes to
 the variables displayed in plots, etc.
 \begin{verbatim}
-void (*callback)(void *userData, gint whichVar, datad *d, splotd *sp, 
+void (*callback)(void *userData, gint whichVar, GGobiData *d, splotd *sp, 
                    ggobid *gg, GtkWidget *mainWin);
 \end{verbatim}
 \end{description}

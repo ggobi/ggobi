@@ -27,9 +27,9 @@
 #define CTON true
 #define CTOFF false
 
-static void tourcorr_active_horvar_set (gint jvar, datad *, displayd *, ggobid *);
-static void tourcorr_active_vervar_set (gint jvar, datad *, displayd *, ggobid *);
-static void tourcorr_active_var_set (gint jvar, datad *d, displayd *dsp, ggobid *gg);
+static void tourcorr_active_horvar_set (gint jvar, GGobiData *, displayd *, ggobid *);
+static void tourcorr_active_vervar_set (gint jvar, GGobiData *, displayd *, ggobid *);
+static void tourcorr_active_var_set (gint jvar, GGobiData *d, displayd *dsp, ggobid *gg);
 void tourcorr_write_video(ggobid *gg);
 
 void
@@ -88,7 +88,7 @@ display_tourcorr_init_null (displayd *dsp, ggobid *gg)
 void
 alloc_tourcorr (displayd *dsp, ggobid *gg)
 {
-  datad *d = dsp->d;
+  GGobiData *d = dsp->d;
   gint nc = d->ncols;
 
   /* first index is the projection dimensions, second dimension is ncols */
@@ -144,7 +144,7 @@ alloc_tourcorr (displayd *dsp, ggobid *gg)
 
 /*-- eliminate the nc columns contained in *cols --*/
 void
-tourcorr_realloc_down (gint nc, gint *cols, datad *d, ggobid *gg)
+tourcorr_realloc_down (gint nc, gint *cols, GGobiData *d, ggobid *gg)
 {
   displayd *dsp;
   GList *l;
@@ -197,7 +197,7 @@ tourcorr_realloc_down (gint nc, gint *cols, datad *d, ggobid *gg)
 
 /*-- append columns for a total of nc columns --*/
 void
-tourcorr_realloc_up (gint nc, datad *d, ggobid *gg)
+tourcorr_realloc_up (gint nc, GGobiData *d, ggobid *gg)
 {
   displayd *dsp;
   GList *l;
@@ -218,7 +218,7 @@ void
 free_tourcorr(displayd *dsp)
 {
   /*  gint k;*/
-  /*  datad *d = dsp->d;*/
+  /*  GGobiData *d = dsp->d;*/
   /*  gint nc = d->ncols;*/
 
   vectori_free(&dsp->tcorr1.subset_vars);
@@ -271,7 +271,7 @@ free_tourcorr(displayd *dsp)
 void 
 display_tourcorr_init (displayd *dsp, ggobid *gg) {
   gint i, j;
-  datad *d = dsp->d;
+  GGobiData *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
   gint nc = d->ncols;
   gint nvert, nhoriz;
@@ -407,7 +407,7 @@ void tourcorr_pause (cpaneld *cpanel, gboolean state, ggobid *gg)
 }
 
 gboolean
-tourcorr_subset_horvar_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
+tourcorr_subset_horvar_set (gint jvar, GGobiData *d, displayd *dsp, ggobid *gg)
 {
   gboolean in_subset = dsp->tcorr1.subset_vars_p.els[jvar];
   gint j, k;
@@ -500,7 +500,7 @@ tourcorr_subset_horvar_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
 }
 
 static void 
-tourcorr_active_horvar_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
+tourcorr_active_horvar_set (gint jvar, GGobiData *d, displayd *dsp, ggobid *gg)
 {
   gint j, k;
   gboolean in_subset = dsp->tcorr1.subset_vars_p.els[jvar];
@@ -569,7 +569,7 @@ tourcorr_active_horvar_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
 }
 
 gboolean
-tourcorr_subset_vervar_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
+tourcorr_subset_vervar_set (gint jvar, GGobiData *d, displayd *dsp, ggobid *gg)
 {
   gboolean in_subset = dsp->tcorr2.subset_vars_p.els[jvar];
   gint j, k;
@@ -662,7 +662,7 @@ tourcorr_subset_vervar_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
 
 #ifdef OVER
 gboolean
-tourcorr_subset_vervar_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
+tourcorr_subset_vervar_set (gint jvar, GGobiData *d, displayd *dsp, ggobid *gg)
 {
   gboolean in_subset = dsp->tcorr2.subset_vars_p.els[jvar];
   gint j, k;
@@ -705,7 +705,7 @@ tourcorr_subset_vervar_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
 #endif
 
 static void 
-tourcorr_active_vervar_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
+tourcorr_active_vervar_set (gint jvar, GGobiData *d, displayd *dsp, ggobid *gg)
 {
   gint j, k;
   gboolean in_subset = dsp->tcorr2.subset_vars_p.els[jvar];
@@ -776,7 +776,7 @@ tourcorr_active_vervar_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
 }
 
 static void 
-tourcorr_active_var_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
+tourcorr_active_var_set (gint jvar, GGobiData *d, displayd *dsp, ggobid *gg)
 {
   gboolean in_subsethor = dsp->tcorr1.subset_vars_p.els[jvar];
   gboolean in_subsetver = dsp->tcorr2.subset_vars_p.els[jvar];
@@ -899,7 +899,7 @@ tourcorr_manip_var_set (gint j, gint btn, ggobid *gg)
 }
 
 gboolean
-tourcorr_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse, datad *d, ggobid *gg)
+tourcorr_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse, GGobiData *d, ggobid *gg)
 {
   displayd *dsp = gg->current_display;
   gboolean changed = true;
@@ -936,7 +936,7 @@ tourcorr_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse, datad *d, ggo
 }
 
 void
-tourcorr_projdata(splotd *sp, greal **world_data, datad *d, ggobid *gg) {
+tourcorr_projdata(splotd *sp, greal **world_data, GGobiData *d, ggobid *gg) {
   gint i, j, m;
   displayd *dsp = (displayd *) sp->displayptr;
   greal precis = (greal) PRECISION1;
@@ -978,7 +978,7 @@ void tourcorr_snap(ggobid *gg)
 {
   displayd *dsp = gg->current_display;
   splotd *sp = gg->current_splot;
-  datad *d = dsp->d;
+  GGobiData *d = dsp->d;
   gint j;
   gdouble rnge;
   vartabled *vt;
@@ -1004,7 +1004,7 @@ void tourcorr_write_video(ggobid *gg)
 {
   displayd *dsp = gg->current_display;
   splotd *sp = gg->current_splot;
-  datad *d = dsp->d;
+  GGobiData *d = dsp->d;
   gint j;
   vartabled *vt;
 
@@ -1021,7 +1021,7 @@ void
 tourcorr_manip_init(gint p1, gint p2, splotd *sp) 
 {
   displayd *dsp = (displayd *) sp->displayptr;
-  datad *d = dsp->d;
+  GGobiData *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
   ggobid *gg = GGobiFromSPlot(sp);
   gint j;
@@ -1103,7 +1103,7 @@ tourcorr_manip_init(gint p1, gint p2, splotd *sp)
 void
 tourcorr_run(displayd *dsp, ggobid *gg)
 {
-  datad *d = dsp->d;
+  GGobiData *d = dsp->d;
   /*  cpaneld *cpanel = &dsp->cpanel;*/
   gint i, nv;
   gint pathprob = 0;
@@ -1265,7 +1265,7 @@ void tourcorr_reinit(ggobid *gg)
 {
   int j, m;
   displayd *dsp = gg->current_display;
-  datad *d = dsp->d;
+  GGobiData *d = dsp->d;
   splotd *sp = gg->current_splot;
 
   for (j=0; j<d->ncols; j++) {
@@ -1300,7 +1300,7 @@ void tourcorr_scramble(ggobid *gg)
 {
   gint j;
   displayd *dsp = gg->current_display;
-  datad *d = dsp->d;
+  GGobiData *d = dsp->d;
   /*gint i, nc = d->ncols;*/
 
   for (j=0; j<d->ncols; j++) {
@@ -1335,7 +1335,7 @@ void
 tourcorr_manip(gint p1, gint p2, splotd *sp, ggobid *gg) 
 {
   displayd *dsp = (displayd *) sp->displayptr;
-  datad *d = dsp->d;
+  GGobiData *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
   gfloat xcosphi=1., xsinphi=0., ycosphi=1., ysinphi=0.;
   gfloat distx = 0., disty = 0.;

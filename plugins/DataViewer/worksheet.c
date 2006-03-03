@@ -18,20 +18,20 @@
 
 void       add_ggobi_sheets(ggobid *gg, GtkWidget *notebook);
 void       close_worksheet_window(GtkWidget *w, PluginInstance *inst);
-GtkWidget* create_ggobi_sheet(datad *data, ggobid *gg);
-void       add_ggobi_data(datad *data, GtkTreeModel *model);
+GtkWidget* create_ggobi_sheet(GGobiData *data, ggobid *gg);
+void       add_ggobi_data(GGobiData *data, GtkTreeModel *model);
 GtkWidget *create_ggobi_worksheet_window(ggobid *gg, PluginInstance *inst);
 
 void       show_data_edit_window(GtkAction *actions, PluginInstance *inst);
 
-GtkWidget* create_ggobi_sheet(datad *data, ggobid *gg);
-void update_cell(gint row, gint column, double value, datad *data);
+GtkWidget* create_ggobi_sheet(GGobiData *data, ggobid *gg);
+void update_cell(gint row, gint column, double value, GGobiData *data);
 void cell_changed(GtkCellRendererText *renderer, gchar *path_str, gchar *text, GtkTreeModel *model);
 
-void brush_change(ggobid *gg, splotd *sp, GdkEventMotion *ev, datad *d, GtkWidget *sheet);
+void brush_change(ggobid *gg, splotd *sp, GdkEventMotion *ev, GGobiData *d, GtkWidget *sheet);
 void move_point_value(GtkWidget *w, splotd *sp, GGobiPointMoveEvent *ev, ggobid *gg, GtkWidget *sheet);
 void monitor_new_plot(GtkWidget *w, splotd *sp, ggobid *gg, GtkWidget *sheet);
-void identify_cell(ggobid *gg, splotd *sp, gint id, datad *d, GtkWidget *sheet);
+void identify_cell(ggobid *gg, splotd *sp, gint id, GGobiData *d, GtkWidget *sheet);
 void color_row(GtkWidget *sheet, gint row, gint ncols, GdkColor *col);
 
 void connect_to_existing_displays(ggobid *gg, GtkWidget *sheet);
@@ -246,14 +246,14 @@ create_ggobi_worksheet_window(ggobid *gg, PluginInstance *inst)
 void
 add_ggobi_sheets(ggobid *gg, GtkWidget *notebook)
 {
-  datad *data;
+  GGobiData *data;
   GSList *el;
 
   el = gg->d;
   while(el) {
    GtkWidget *label;
    GtkWidget *sheet;
-   data = (datad*) el->data;
+   data = (GGobiData*) el->data;
 
    if (g_slist_length (data->vartable)) {
      label = gtk_label_new(data->name);
@@ -267,7 +267,7 @@ add_ggobi_sheets(ggobid *gg, GtkWidget *notebook)
 
 
 void
-select_row_cb (GtkTreeSelection *tree_sel, datad *d)
+select_row_cb (GtkTreeSelection *tree_sel, GGobiData *d)
 {
   ggobid *gg = (ggobid *) d->gg;
   
@@ -288,7 +288,7 @@ select_row_cb (GtkTreeSelection *tree_sel, datad *d)
  or a new plot is created by ggobi. 
  */
 GtkWidget*
-create_ggobi_sheet(datad *data, ggobid *gg)
+create_ggobi_sheet(GGobiData *data, ggobid *gg)
 {
   GtkWidget *sheet, *scrolled_window;
   GtkListStore *model;
@@ -445,7 +445,7 @@ monitor_new_plot(GtkWidget *w, splotd *sp, ggobid *gg, GtkWidget *sheet)
   given data set (data).
  */
 void 
-add_ggobi_data(datad *data, GtkTreeModel *model)
+add_ggobi_data(GGobiData *data, GtkTreeModel *model)
 {
   gint i, j, k, level;
   gboolean level_ok;
@@ -516,7 +516,7 @@ void closeWindow(ggobid *gg, PluginInstance *inst)
   affected GGobi plots.
  */
 void
-update_cell(gint row, gint column, double value, datad *data)
+update_cell(gint row, gint column, double value, GGobiData *data)
 {
     data->raw.vals[row][column] = data->tform.vals[row][column] = value;
     tform_to_world (data, data->gg);
@@ -536,7 +536,7 @@ cell_changed(GtkCellRendererText *renderer, gchar *path_str, gchar *text, GtkTre
 	gint row = gtk_tree_path_get_indices(path)[0];
 	GtkTreeIter iter;
 	gint col = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(renderer), "column"));
-	datad *data = (datad *)g_object_get_data(G_OBJECT(model), "data");
+	GGobiData *data = (GGobiData *)g_object_get_data(G_OBJECT(model), "data");
 	GType type = gtk_tree_model_get_column_type(model, col);
 	gdouble value;
 	
@@ -570,7 +570,7 @@ cell_changed(GtkCellRendererText *renderer, gchar *path_str, gchar *text, GtkTre
   and selecting that row.
  */
 void
-identify_cell(ggobid *gg, splotd *sp, gint id, datad *d, GtkWidget *sheet)
+identify_cell(ggobid *gg, splotd *sp, gint id, GGobiData *d, GtkWidget *sheet)
 {
 
 	GtkTreePath *path, *child_path;
@@ -649,9 +649,9 @@ color_row(GtkWidget *sheet, gint row, gint ncols, GdkColor *col)
  Really want the identity of the point that was added or discarded.
  */
 void
-brush_change(ggobid *gg, splotd *sp, GdkEventMotion *ev, datad *d, GtkWidget *sheet)
+brush_change(ggobid *gg, splotd *sp, GdkEventMotion *ev, GGobiData *d, GtkWidget *sheet)
 {
-  /* datad *d = sp->displayptr->d; */
+  /* GGobiData *d = sp->displayptr->d; */
   int nr, i;
   nr = d->npts_under_brush;
   for (i = 0 ; i < d->nrows ; i++) {

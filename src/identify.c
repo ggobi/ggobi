@@ -20,7 +20,7 @@
 #include "externs.h"
 
 gint
-find_nearest_point (icoords *lcursor_pos, splotd *splot, datad *d, ggobid *gg)
+find_nearest_point (icoords *lcursor_pos, splotd *splot, GGobiData *d, ggobid *gg)
 {
 /*
  * Returns index of nearest un-hidden point
@@ -51,7 +51,7 @@ RedrawStyle
 identify_activate (gint state, displayd *display, ggobid *gg)
 {
   RedrawStyle redraw_style = NONE;
-  datad *d = display->d;
+  GGobiData *d = display->d;
 
 /* At the moment, do the same thing whether identify is turning on or off */
   if (state == on || state == off) {
@@ -63,7 +63,7 @@ identify_activate (gint state, displayd *display, ggobid *gg)
 }
 
 void
-sticky_id_toggle (datad *d, ggobid *gg)
+sticky_id_toggle (GGobiData *d, ggobid *gg)
 {
   gint i = 0;
   gboolean i_in_list = false;
@@ -109,9 +109,9 @@ sticky_id_toggle (datad *d, ggobid *gg)
 /*----------------------------------------------------------------------*/
 
 void
-identify_link_by_id (gint k, datad *source_d, ggobid *gg)
+identify_link_by_id (gint k, GGobiData *source_d, ggobid *gg)
 {
-  datad *d;
+  GGobiData *d;
   GSList *l;
   gboolean inrange;
 
@@ -119,7 +119,7 @@ identify_link_by_id (gint k, datad *source_d, ggobid *gg)
 
   if (k < 0) {  /*-- handle this case separately --*/
     for (l = gg->d; l; l = l->next) {
-      d = (datad *) l->data;
+      d = (GGobiData *) l->data;
       if (d != source_d)
         d->nearest_point_prev = d->nearest_point = -1;
     }
@@ -133,7 +133,7 @@ identify_link_by_id (gint k, datad *source_d, ggobid *gg)
     }
     for (l = gg->d; l; l = l->next) {
       gpointer ptr;
-      d = (datad *) l->data;
+      d = (GGobiData *) l->data;
       inrange = false;
 
       if (d == source_d || d->idTable == NULL)
@@ -156,9 +156,9 @@ identify_link_by_id (gint k, datad *source_d, ggobid *gg)
 }
 
 void
-sticky_id_link_by_id (gint whattodo, gint k, datad *source_d, ggobid *gg)
+sticky_id_link_by_id (gint whattodo, gint k, GGobiData *source_d, ggobid *gg)
 {
-  datad *d;
+  GGobiData *d;
   GSList *l;
   gint i, n, id = -1;
   gboolean i_in_list = false;
@@ -178,7 +178,7 @@ sticky_id_link_by_id (gint whattodo, gint k, datad *source_d, ggobid *gg)
     return;
 
   for (l = gg->d; l; l = l->next) {
-    d = (datad *) l->data;
+    d = (GGobiData *) l->data;
     if (d == source_d)
       continue;        /*-- skip the originating datad --*/
 
@@ -219,7 +219,7 @@ sticky_id_link_by_id (gint whattodo, gint k, datad *source_d, ggobid *gg)
 /*----------------------------------------------------------------------*/
 
 gchar *
-identify_label_fetch (gint k, cpaneld *cpanel, datad *d, ggobid *gg)
+identify_label_fetch (gint k, cpaneld *cpanel, GGobiData *d, ggobid *gg)
 {
   gchar *lbl = NULL;
   GList *labels = NULL, *l;
@@ -234,10 +234,10 @@ identify_label_fetch (gint k, cpaneld *cpanel, datad *d, ggobid *gg)
     GtkWidget *pnl = mode_panel_get_by_name(GGOBI(getIModeName)(IDENT), gg);
     vartabled *vt;
     GtkWidget *tree_view;
-    datad *tree_view_d;
+    GGobiData *tree_view_d;
 
     tree_view = get_tree_view_from_object (G_OBJECT (pnl));
-    tree_view_d = (datad *) g_object_get_data(G_OBJECT(tree_view), "datad");
+    tree_view_d = (GGobiData *) g_object_get_data(G_OBJECT(tree_view), "datad");
 
     if (tree_view_d != d) {
       id_display_type = ID_RECORD_LABEL;

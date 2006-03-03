@@ -49,14 +49,14 @@ add_record_dialog_apply (GtkWidget *w, displayd *display)
 {
   gint j;
   cpaneld *cpanel = &display->cpanel;
-  datad *d = display->d;
-  datad *e = display->e;
+  GGobiData *d = display->d;
+  GGobiData *e = display->e;
   ggobid *gg = d->gg;
   GtkWidget *dialog = gtk_widget_get_toplevel (w);
   GtkWidget *label_entry, *id_entry;
   gchar *label = NULL, *id = NULL;
   gchar **vals = NULL;
-  datad *dtarget;
+  GGobiData *dtarget;
 
   dtarget = (cpanel->ee_mode == ADDING_EDGES)?e:d;
   if (dtarget->ncols) {
@@ -113,7 +113,7 @@ add_record_dialog_apply (GtkWidget *w, displayd *display)
 }
 
 static void
-add_record_dialog_open (datad *d, datad *e, displayd *dsp, ggobid *gg)
+add_record_dialog_open (GGobiData *d, GGobiData *e, displayd *dsp, ggobid *gg)
 {
   GtkWidget *dialog, *table;
   GtkWidget *entry, *w;
@@ -122,7 +122,7 @@ add_record_dialog_open (datad *d, datad *e, displayd *dsp, ggobid *gg)
   /*  GtkAttachOptions table_opt = GTK_SHRINK|GTK_FILL|GTK_EXPAND;*/
   GtkAttachOptions table_opt = GTK_SHRINK;
   gint row = 0;
-  datad *dtarget;
+  GGobiData *dtarget;
 
   edgeedit_event_handlers_toggle (gg->current_splot, false);
 
@@ -214,7 +214,7 @@ add_record_dialog_open (datad *d, datad *e, displayd *dsp, ggobid *gg)
     gchar **vals = (gchar **) g_malloc (dtarget->ncols * sizeof (gchar *));
 
     extern void fetch_default_record_values (gchar **vals, 
-      datad *, displayd *, ggobid *gg);
+      GGobiData *, displayd *, ggobid *gg);
     fetch_default_record_values (vals, dtarget, dsp, gg);
 
     tablev = gtk_table_new (dtarget->ncols, 2, false);
@@ -310,7 +310,7 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
 {
   displayd *display = sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
-  datad *d = display->d;
+  GGobiData *d = display->d;
   ggobid *gg = GGobiFromSPlot(sp);
   gboolean button1_p, button2_p;
   gint k;
@@ -345,7 +345,7 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
   ggobid *gg = GGobiFromSPlot(sp);
   displayd *display = sp->displayptr;
-  datad *d = display->d;
+  GGobiData *d = display->d;
   gboolean button1_p, button2_p;
   mousepos_get_pressed (w, event, &button1_p, &button2_p, sp);
 
@@ -364,11 +364,11 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   ggobid *gg = GGobiFromSPlot (sp);
   displayd *display = sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
-  datad *d = display->d;
-  datad *e = display->e;
+  GGobiData *d = display->d;
+  GGobiData *e = display->e;
   gint i, which_button = 1;
 
-  void record_add_defaults (datad *d, datad *e, displayd *display, ggobid *gg);
+  void record_add_defaults (GGobiData *d, GGobiData *e, displayd *display, ggobid *gg);
 
   if ((event->state & GDK_BUTTON1_MASK) == GDK_BUTTON1_MASK)
     which_button = 1;

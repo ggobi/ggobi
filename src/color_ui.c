@@ -37,7 +37,7 @@ choose_glyph_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg)
   icoords pos, ev;
   splotd *sp = gg->current_splot;
   displayd *display = (displayd *) sp->displayptr;
-  datad *d = display->d;
+  GGobiData *d = display->d;
   gint spacing = gg->color_ui.spacing;
   gint margin = gg->color_ui.margin;
 
@@ -368,7 +368,7 @@ set_color_fg ( GtkWidget *w, GdkEventButton *event , ggobid *gg)
   gint k = GPOINTER_TO_INT (g_object_get_data (G_OBJECT (w), "index"));
   splotd *sp = gg->current_splot;
   displayd *display = (displayd *) sp->displayptr;
-  datad *d = display->d;
+  GGobiData *d = display->d;
 
   g_assert (d->color.nels == d->nrows);
 

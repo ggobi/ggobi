@@ -25,14 +25,14 @@ static gboolean parcoordsKeyEventHandled(GtkWidget *, displayd *, splotd *,
 					GdkEventKey *, ggobid *);
 
 static void
-splotAssignPointsToBins(datad *d, splotd *sp, ggobid *gg)
+splotAssignPointsToBins(GGobiData *d, splotd *sp, ggobid *gg)
 {
   if (sp == gg->current_splot && binningPermitted(sp->displayptr))
     assign_points_to_bins (d, sp, gg);
 }
 
 gint
-splot1DVariablesGet(splotd *sp, gint *cols, datad *d)
+splot1DVariablesGet(splotd *sp, gint *cols, GGobiData *d)
 {
   cols[0] = sp->p1dvar;
   return(1);
@@ -235,7 +235,7 @@ parcoordsKeyEventHandled(GtkWidget *w, displayd *display, splotd * sp, GdkEventK
 
 
 gchar *
-treeLabel(splotd *splot, datad *d, ggobid *gg)
+treeLabel(splotd *splot, GGobiData *d, ggobid *gg)
 {
   vartabled *vt;
   int n;
@@ -248,31 +248,31 @@ treeLabel(splotd *splot, datad *d, ggobid *gg)
 }
 
 static GdkSegment *
-allocWhiskers(GdkSegment *whiskers, splotd *sp, gint nr, datad *d)
+allocWhiskers(GdkSegment *whiskers, splotd *sp, gint nr, GGobiData *d)
 {
   return((GdkSegment *) g_realloc (whiskers, 2 * nr * sizeof (GdkSegment)));
 }
 
 void
-worldToPlane(splotd *sp, datad *d, ggobid *gg)
+worldToPlane(splotd *sp, GGobiData *d, ggobid *gg)
 {
   p1d_reproject (sp, d->world.vals, d, gg);
 }
 
 void
-withinPlaneToScreen(splotd *sp, displayd *display, datad *d, ggobid *gg)
+withinPlaneToScreen(splotd *sp, displayd *display, GGobiData *d, ggobid *gg)
 {
   sp_whiskers_make (sp, display, gg);
 }
 
 gboolean
-drawEdge_p(splotd *sp, gint m, datad *d, datad *e, ggobid *gg)
+drawEdge_p(splotd *sp, gint m, GGobiData *d, GGobiData *e, ggobid *gg)
 {
   return(! e->missing.vals[m][sp->p1dvar]);
 }
 
 gboolean
-drawCase_p(splotd *sp, gint m, datad *d, ggobid *gg)
+drawCase_p(splotd *sp, gint m, GGobiData *d, ggobid *gg)
 {
   return(!d->missing.vals[m][sp->p1dvar]);
 }
@@ -281,7 +281,7 @@ void
 withinDrawBinned(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc)
 {
   displayd *display = sp->displayptr;
-  datad *d = display->d;
+  GGobiData *d = display->d;
   ggobid *gg = GGobiFromSPlot(sp);
   gint n, lwidth, ltype, gtype;
 
@@ -311,7 +311,7 @@ void
 withinDrawUnbinned(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc)
 {
   displayd *display = sp->displayptr;
-  datad *d = display->d;
+  GGobiData *d = display->d;
   ggobid *gg = GGobiFromSPlot(sp);
   gint n, lwidth, ltype, gtype;
 
@@ -339,7 +339,7 @@ withinDrawUnbinned(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc)
 
 
 static void
-addPlotLabels(displayd *display, splotd *sp, GdkDrawable *drawable, datad *d, ggobid *gg)
+addPlotLabels(displayd *display, splotd *sp, GdkDrawable *drawable, GGobiData *d, ggobid *gg)
 {
   vartabled *vt;
   PangoRectangle rect;
@@ -364,7 +364,7 @@ addPlotLabels(displayd *display, splotd *sp, GdkDrawable *drawable, datad *d, gg
 
 
 static gint
-plotted(displayd *display, gint *cols, gint ncols, datad *d)
+plotted(displayd *display, gint *cols, gint ncols, GGobiData *d)
 {
   GList *l;
   splotd *sp;
@@ -390,7 +390,7 @@ variableSelect(GtkWidget *w, displayd *dpy, splotd *sp, gint jvar, gint toggle, 
 
 
 static void
-varpanelRefresh(displayd *display, splotd *sp, datad *d)
+varpanelRefresh(displayd *display, splotd *sp, GGobiData *d)
 {
   gint j;
   GList *l;
@@ -424,7 +424,7 @@ varpanelTooltipsSet(displayd *dpy, ggobid *gg, GtkWidget *wx, GtkWidget *wy, Gtk
 
 /* Are these ordered?  Maybe so */
 static gint
-plottedVarsGet(displayd *display, gint *cols, datad *d, ggobid *gg)
+plottedVarsGet(displayd *display, gint *cols, GGobiData *d, ggobid *gg)
 {
   GList *l;
   splotd *s;
@@ -470,7 +470,7 @@ splot_add_whisker_cues (gboolean nearest_p, gint k, splotd *sp, GdkDrawable *dra
 {
   gint n;
   displayd *display = sp->displayptr;
-  datad *d = display->d;
+  GGobiData *d = display->d;
   colorschemed *scheme = gg->activeColorScheme;
 
   if (k < 0 || k >= d->nrows) return;
@@ -520,7 +520,7 @@ splotScreenToTform(cpaneld *cpanel, splotd *sp, icoords *scr,
   greal precis = (greal) PRECISION1;
   greal ftmp, max, min, rdiff;
   displayd *display = (displayd *) sp->displayptr;
-  datad *d = display->d;
+  GGobiData *d = display->d;
   gfloat scale_x, scale_y;
   vartabled *vt;
 

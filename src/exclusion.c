@@ -19,7 +19,7 @@
 #include "externs.h"
 
 void
-symbol_table_zero (datad *d)
+symbol_table_zero (GGobiData *d)
 {
   gint j, k, m;
 
@@ -36,7 +36,7 @@ symbol_table_zero (datad *d)
  * populate d->symbol_table
 */
 gint 
-symbol_table_populate (datad *d)
+symbol_table_populate (GGobiData *d)
 {
   register gint i, j, k, m;
   gint nclusters = 0;
@@ -61,7 +61,7 @@ symbol_table_populate (datad *d)
 }
 
 void
-clusters_set (datad *d, ggobid *gg) {
+clusters_set (GGobiData *d, ggobid *gg) {
   gint i, j, k, m;
   gint n, nclusters;
   colorschemed *scheme = gg->activeColorScheme;

@@ -90,7 +90,7 @@ display_tour2d_init_null (displayd *dsp, ggobid *gg)
 void
 alloc_tour2d (displayd *dsp, ggobid *gg)
 {
-  datad *d = dsp->d;
+  GGobiData *d = dsp->d;
   gint nc = d->ncols;
 
   /* first index is the projection dimensions, second dimension is ncols */
@@ -125,7 +125,7 @@ alloc_tour2d (displayd *dsp, ggobid *gg)
 
 /*-- eliminate the nc columns contained in *cols --*/
 void
-tour2d_realloc_down (gint nc, gint *cols, datad *d, ggobid *gg)
+tour2d_realloc_down (gint nc, gint *cols, GGobiData *d, ggobid *gg)
 {
   displayd *dsp;
   GList *l;
@@ -159,7 +159,7 @@ tour2d_realloc_down (gint nc, gint *cols, datad *d, ggobid *gg)
 /*-- append columns for a total of nc columns --*/
 /*-- we don't know for certain that tour has been initialized, do we? --*/
 void
-tour2d_realloc_up (gint nc, datad *d, ggobid *gg)
+tour2d_realloc_up (gint nc, GGobiData *d, ggobid *gg)
 {
   displayd *dsp;
   GList *l;
@@ -209,7 +209,7 @@ free_tour2d(displayd *dsp)
 void 
 display_tour2d_init (displayd *dsp, ggobid *gg) {
   gint i, j;
-  datad *d = dsp->d;
+  GGobiData *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
   gint nc = d->ncols;
 
@@ -292,7 +292,7 @@ void
 tour2d_all_vars (displayd *dsp) 
 {
   ggobid *gg = dsp->ggobi;
-  datad *d = dsp->d;
+  GGobiData *d = dsp->d;
   gint j;
 
   //gg->tour2d.all_vars = !gg->tour2d.all_vars;
@@ -373,7 +373,7 @@ void tour2d_pause (cpaneld *cpanel, gboolean state, displayd *dsp, ggobid *gg)
 
 /*-- add/remove jvar to/from the subset of variables that <may> be active --*/
 gboolean
-tour2d_subset_var_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
+tour2d_subset_var_set (gint jvar, GGobiData *d, displayd *dsp, ggobid *gg)
 {
   gboolean in_subset = dsp->t2d.subset_vars_p.els[jvar];
   gint j, k;
@@ -419,7 +419,7 @@ tour2d_subset_var_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
 
 /*-- add or remove jvar from the set of active variables --*/
 void 
-tour2d_active_var_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
+tour2d_active_var_set (gint jvar, GGobiData *d, displayd *dsp, ggobid *gg)
 {
   gint j, jtmp, k;
   gboolean in_subset = dsp->t2d.subset_vars_p.els[jvar];
@@ -509,7 +509,7 @@ tour2d_manip_var_set (gint j, ggobid *gg)
 
 gboolean
 tour2d_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse,
-  datad *d, ggobid *gg)
+  GGobiData *d, ggobid *gg)
 {
   displayd *dsp = gg->current_display;
   gboolean changed = true;
@@ -548,7 +548,7 @@ tour2d_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse,
 }
 
 void
-tour2d_projdata(splotd *sp, greal **world_data, datad *d, ggobid *gg) {
+tour2d_projdata(splotd *sp, greal **world_data, GGobiData *d, ggobid *gg) {
   gint i, j, m;
   displayd *dsp = (displayd *) sp->displayptr;
   greal precis = (greal) PRECISION1;
@@ -589,7 +589,7 @@ tour2d_projdata(splotd *sp, greal **world_data, datad *d, ggobid *gg) {
 void tour2d_scramble(ggobid *gg)
 {
   displayd *dsp = gg->current_display;
-  datad *d = dsp->d;
+  GGobiData *d = dsp->d;
 
   arrayd_zero (&dsp->t2d.Fa);
   arrayd_zero (&dsp->t2d.Fz);
@@ -615,7 +615,7 @@ void tour2d_snap(ggobid *gg)
 {
   displayd *dsp = gg->current_display;
   splotd *sp = gg->current_splot;
-  datad *d = dsp->d;
+  GGobiData *d = dsp->d;
   gint j;
   gdouble rnge;
   vartabled *vt;
@@ -642,7 +642,7 @@ void tour2d_write_video(ggobid *gg)
 {
   displayd *dsp = gg->current_display;
   splotd *sp = gg->current_splot;
-  datad *d = dsp->d;
+  GGobiData *d = dsp->d;
   gint j;
   vartabled *vt;
   gdouble rnge;
@@ -662,7 +662,7 @@ void tour2d_write_video(ggobid *gg)
 void
 tour2d_run(displayd *dsp, ggobid *gg)
 {
-  datad *d = dsp->d;
+  GGobiData *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
   gint i, j, nv;
   /*  static gint count = 0;*/
@@ -874,7 +874,7 @@ void tour2d_reinit(ggobid *gg)
 {
   gint i;
   displayd *dsp = gg->current_display;
-  datad *d = dsp->d;
+  GGobiData *d = dsp->d;
   splotd *sp = gg->current_splot;
 
   arrayd_zero (&dsp->t2d.Fa);
@@ -920,7 +920,7 @@ void
 tour2d_manip_init(gint p1, gint p2, splotd *sp) 
 {
   displayd *dsp = (displayd *) sp->displayptr;
-  datad *d = dsp->d;
+  GGobiData *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
   ggobid *gg = GGobiFromSPlot(sp);
   gint j, k;
@@ -1127,7 +1127,7 @@ void
 tour2d_manip(gint p1, gint p2, splotd *sp, ggobid *gg) 
 {
   displayd *dsp = (displayd *) sp->displayptr;
-  datad *d = dsp->d;
+  GGobiData *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
   gint actual_nvars = dsp->t2d.nactive;
   gboolean offscreen = false;

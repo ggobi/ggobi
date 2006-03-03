@@ -108,7 +108,7 @@ setShowAxesOption(displayd *display, gboolean active)
 static void
 selectXVar(GtkWidget *w, displayd *display, gint jvar, ggobid *gg)
 {
-  datad *d = display->d;
+  GGobiData *d = display->d;
   splotd *sp = (splotd *) display->splots->data;
   cpaneld *cpanel = &display->cpanel;
 
@@ -116,7 +116,7 @@ selectXVar(GtkWidget *w, displayd *display, gint jvar, ggobid *gg)
 }
 
 static void
-varpanelRefresh(displayd *display, splotd *sp, datad *d)
+varpanelRefresh(displayd *display, splotd *sp, GGobiData *d)
 {
   cpaneld *cpanel = &display->cpanel;
   gint j;
@@ -423,7 +423,7 @@ varcircleDraw(displayd *display, gint jvar, GdkPixmap *da_pix, ggobid *gg)
 }
 
 static void
-tourCorrRealloc(displayd *dsp, gint nc, datad *d)
+tourCorrRealloc(displayd *dsp, gint nc, GGobiData *d)
 {
     /*
      * because display_tourcorr_init_null has been performed even if
@@ -524,7 +524,7 @@ tourCorrRealloc(displayd *dsp, gint nc, datad *d)
 }
 
 static void
-tour2d3Realloc(displayd *dsp, gint nc, datad *d)
+tour2d3Realloc(displayd *dsp, gint nc, GGobiData *d)
 {
   gint old_ncols, i;
   /*
@@ -583,7 +583,7 @@ tour2d3Realloc(displayd *dsp, gint nc, datad *d)
 }
 
 static void
-tour2dRealloc(displayd *dsp, gint nc, datad *d)
+tour2dRealloc(displayd *dsp, gint nc, GGobiData *d)
 {
   gint old_ncols, i;
   /*
@@ -642,7 +642,7 @@ tour2dRealloc(displayd *dsp, gint nc, datad *d)
 }
 
 static void
-tour1dRealloc(displayd *dsp, gint nc, datad *d)
+tour1dRealloc(displayd *dsp, gint nc, GGobiData *d)
 {
   gint old_ncols, i;
     /*
@@ -701,7 +701,7 @@ tour1dRealloc(displayd *dsp, gint nc, datad *d)
 
 /* XXX duncan and dfs: you need to sort this out
 void
-worldToRaw(displayd *display, splotd *sp, gint pt, datad *d, ggobid *gg)
+worldToRaw(displayd *display, splotd *sp, gint pt, GGobiData *d, ggobid *gg)
 {
   cpaneld *cpanel = &display->cpanel;
   ProjectionMode proj = cpanel->pmode;
@@ -751,7 +751,7 @@ worldToRaw(displayd *display, splotd *sp, gint pt, datad *d, ggobid *gg)
 void
 scatterplotMovePointsButtonCb(displayd *display, splotd *sp, GtkWidget *w, GdkEventButton *event, ggobid *gg)
 {
-  datad *d = gg->current_display->d;
+  GGobiData *d = gg->current_display->d;
 
   g_assert (d->clusterid.nels == d->nrows);
 
@@ -783,7 +783,7 @@ scatterplotMovePointsButtonCb(displayd *display, splotd *sp, GtkWidget *w, GdkEv
 void
 scatterplotMovePointsMotionCb(displayd *display, splotd *sp, GtkWidget *w, GdkEventMotion *event, ggobid *gg)
 {
-  datad *d = display->d;
+  GGobiData *d = display->d;
   gboolean button1_p, button2_p;
   gboolean inwindow, wasinwindow;
 
@@ -941,7 +941,7 @@ varpanelHighd(displayd *display)
 }
 
 displayd *
-gtk_scatterplot_new(datad *d, ggobid *gg)
+gtk_scatterplot_new(GGobiData *d, ggobid *gg)
 {
   displayd *display;
   display = scatterplot_new(false, NULL, d, gg);
@@ -962,7 +962,7 @@ binningPermitted(displayd* dpy)
 {
   cpaneld *cpanel = &dpy->cpanel;
   ggobid *gg = dpy->ggobi;
-  datad *e = dpy->e;
+  GGobiData *e = dpy->e;
 
   if (pmode_get(dpy, gg) == P1PLOT &&
        cpanel->p1d.type == ASH &&
@@ -1034,7 +1034,7 @@ handlesInteraction(displayd *dpy,  InteractionMode v)
 
 
 static gint 
-plotted(displayd *display, gint *cols, gint ncols, datad *d)
+plotted(displayd *display, gint *cols, gint ncols, GGobiData *d)
 {
   gint j, k;
   splotd *sp = (splotd *) display->splots->data;  /*-- only one splot --*/
@@ -1185,7 +1185,7 @@ varpanelTooltipsReset(displayd *display, ggobid *gg, GtkWidget *wx, GtkWidget *w
 }
 
 static gint 
-plottedVarsGet(displayd *display, gint *cols, datad *d, ggobid *gg)
+plottedVarsGet(displayd *display, gint *cols, GGobiData *d, ggobid *gg)
 {
   ProjectionMode mode = pmode_get (display, gg);
   gint ncols = 0, k;
@@ -1238,7 +1238,7 @@ add_xml_scatterplot_variables(xmlNodePtr node, GList *plots, displayd *dpy)
 
 /* Splot methods. */
 static gchar *
-treeLabel(splotd *splot, datad *d, ggobid *gg)
+treeLabel(splotd *splot, GGobiData *d, ggobid *gg)
 {
   gchar *buf = NULL;
   displayd *display = (displayd *) splot->displayptr; 
@@ -1289,14 +1289,14 @@ treeLabel(splotd *splot, datad *d, ggobid *gg)
 
 
 static void
-subPlaneToScreen(splotd *sp, displayd *dpy, datad *d, ggobid *gg)
+subPlaneToScreen(splotd *sp, displayd *dpy, GGobiData *d, ggobid *gg)
 {
   ash_baseline_set (&sp->p1d.ash_baseline, sp);
   ash_baseline_set (&sp->tour1d.ash_baseline, sp);
 }
 
 static void
-worldToPlane(splotd *sp, datad *d, ggobid *gg)
+worldToPlane(splotd *sp, GGobiData *d, ggobid *gg)
 {
   cpaneld *cpanel = &(sp->displayptr->cpanel);
 
@@ -1330,7 +1330,7 @@ worldToPlane(splotd *sp, datad *d, ggobid *gg)
 }
 
 static gboolean
-drawCase(splotd *sp, gint m, datad *d, ggobid *gg)
+drawCase(splotd *sp, gint m, GGobiData *d, ggobid *gg)
 {
   displayd *display = sp->displayptr;
   gboolean draw_case = true;
@@ -1401,7 +1401,7 @@ drawCase(splotd *sp, gint m, datad *d, ggobid *gg)
 }
 
 static gboolean
-drawEdge(splotd *sp, gint m, datad *d, datad *e, ggobid *gg) 
+drawEdge(splotd *sp, gint m, GGobiData *d, GGobiData *e, ggobid *gg) 
 {
   displayd *display = sp->displayptr;
   gboolean draw_edge = true;
@@ -1454,7 +1454,7 @@ scatter1DAddPlotLabels(splotd *sp, GdkDrawable *drawable, GdkGC *gc)
   PangoLayout *layout = gtk_widget_create_pango_layout(GTK_WIDGET(sp->da), NULL);
   PangoRectangle rect;
   vartabled *vt;
-  datad *d = sp->displayptr->d;
+  GGobiData *d = sp->displayptr->d;
   
   vt = vartable_element_get (sp->p1dvar, d);
   layout_text(layout, vt->collab_tform, &rect);
@@ -1471,7 +1471,7 @@ scatterXYAddPlotLabels(splotd *sp, GdkDrawable *drawable, GdkGC *gc)
   PangoRectangle rect;
 
   vartabled *vtx, *vty;
-  datad *d = sp->displayptr->d;
+  GGobiData *d = sp->displayptr->d;
 
   /*-- xyplot: right justify the label --*/
   vtx = vartable_element_get (sp->xyvars.x, d);
@@ -1530,7 +1530,7 @@ addMarkupCues(splotd *sp, GdkDrawable *drawable, ggobid *gg)
 {
 /* See splot_add_markup_to_pixmap */
   displayd *display = sp->displayptr;
-  datad *e = display->e;
+  GGobiData *e = display->e;
   if (e)
     if (display->options.edges_undirected_show_p ||
         display->options.edges_arrowheads_show_p ||
@@ -1565,7 +1565,7 @@ addScalingCues(splotd *sp, GdkDrawable *drawable, ggobid *gg)
 }
 
 static void
-splotAssignPointsToBins(datad *d, splotd *sp, ggobid *gg)
+splotAssignPointsToBins(GGobiData *d, splotd *sp, ggobid *gg)
 {
   if (sp == gg->current_splot)  /* whether binning permitted or not */
     assign_points_to_bins (d, sp, gg);
@@ -1579,7 +1579,7 @@ splotScreenToTform(cpaneld *cpanel, splotd *sp, icoords *scr,
   greal precis = (greal) PRECISION1;
   greal ftmp, max, min, rdiff;
   displayd *display = (displayd *) sp->displayptr;
-  datad *d = display->d;
+  GGobiData *d = display->d;
   gfloat scale_x, scale_y;
   vartabled *vt, *vtx, *vty;
 
@@ -1706,7 +1706,7 @@ scatterplotDisplayClassInit(GGobiScatterplotDisplayClass *klass)
 }
 
 static gint
-splotVariablesGet(splotd *sp, gint *cols, datad *d)
+splotVariablesGet(splotd *sp, gint *cols, GGobiData *d)
 {
   cols[0] = sp->xyvars.x;
   cols[1] = sp->xyvars.y;

@@ -90,13 +90,13 @@ tsplot_reset_arrangement (displayd *display, gint arrangement, ggobid *gg)
 #define MAXNTSPLOTS 6
 
 displayd *
-tsplot_new_with_vars (gboolean missing_p, gint nvars, gint *vars, datad *d, ggobid *gg) 
+tsplot_new_with_vars (gboolean missing_p, gint nvars, gint *vars, GGobiData *d, ggobid *gg) 
 {
   return(tsplot_new(NULL, missing_p, nvars, vars, d, gg));
 }
 
 displayd *
-tsplot_new(displayd *display, gboolean missing_p, gint nvars, gint *vars, datad *d, ggobid *gg) 
+tsplot_new(displayd *display, gboolean missing_p, gint nvars, gint *vars, GGobiData *d, ggobid *gg) 
 {
   GtkWidget *vbox, *frame;
   gint i, timeVariable, cur;
@@ -381,7 +381,7 @@ tsplot_rewhisker (splotd *sp, ggobid *gg)
 {
   gint i, k, n;
   displayd *display = (displayd *) sp->displayptr;
-  datad *d = display->d;
+  GGobiData *d = display->d;
   gboolean draw_whisker;
 
   if (d->nmissing) {

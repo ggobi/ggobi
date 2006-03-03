@@ -39,7 +39,7 @@
 
 GType ggobi_barchart_display_get_type();
 displayd *ggobi_barchart_display_new(gint type, gboolean missing_p,
-                                         datad * d, ggobid * gg);
+                                         GGobiData * d, ggobid * gg);
 
 typedef struct {
   GGobiExtendedDisplayClass parent_class;

@@ -25,14 +25,14 @@
 /*--------------------------------------------------------------------*/
 
 gboolean record_add (eeMode mode, gint a, gint b, gchar *lbl, gchar *id,
-  gchar **vals, datad * d, datad * e, ggobid *gg)
+  gchar **vals, GGobiData * d, GGobiData * e, ggobid *gg)
 {
   gchar *s1, *s2;
   gint i, j;
   GList *l, *sl;
   splotd *sp;
   displayd *dsp;
-  datad *dtarget = d;
+  GGobiData *dtarget = d;
   greal *raw = NULL, x;
   vartabled *vt;
   gboolean found_missings = false;
@@ -202,9 +202,9 @@ gboolean record_add (eeMode mode, gint a, gint b, gchar *lbl, gchar *id,
 
   } else {
     GSList *l;
-    datad *dd;
+    GGobiData *dd;
     for (l=gg->d; l; l=l->next) {
-      dd = (datad *) l->data;
+      dd = (GGobiData *) l->data;
       if (dd != dtarget && dd->edge.n > 0) {
         if (hasEdgePoints (dd, dtarget)) {
           unresolveAllEdgePoints (dd);
@@ -289,10 +289,10 @@ DTL: So need to call unresolveEdgePoints(e, d) to remove it from the
  * editing.
 */
 void
-record_add_defaults (datad *d, datad *e, displayd *display, ggobid *gg)
+record_add_defaults (GGobiData *d, GGobiData *e, displayd *display, ggobid *gg)
 {
   cpaneld *cpanel = &display->cpanel;
-  datad *dtarget;
+  GGobiData *dtarget;
   gchar *lbl;
   gchar **vals = NULL;
   gint j;
@@ -301,7 +301,7 @@ record_add_defaults (datad *d, datad *e, displayd *display, ggobid *gg)
 
   if (dtarget->ncols) {
     void fetch_default_record_values (gchar **vals, 
-      datad *, displayd *, ggobid *gg);
+      GGobiData *, displayd *, ggobid *gg);
     vals = (gchar **) g_malloc (dtarget->ncols * sizeof (gchar *));
     fetch_default_record_values (vals, dtarget, display, gg);
   }
@@ -339,8 +339,8 @@ find_nearest_edge (splotd *sp, displayd *display, ggobid *gg)
   icoords a, b, distab, distac, c;
   gfloat proj;
   gboolean doit;
-  datad *e = display->e;
-  datad *d = display->d;
+  GGobiData *e = display->e;
+  GGobiData *d = display->d;
   icoords *mpos = &sp->mousepos;
 
   lineid = -1;
@@ -559,7 +559,7 @@ pt_plane_to_world (splotd *sp, gcoords *planar, gcoords *eps, greal *world)
 }
 
 void
-pt_world_to_raw_by_var (gint j, greal *world, greal *raw, datad *d)
+pt_world_to_raw_by_var (gint j, greal *world, greal *raw, GGobiData *d)
 {
   gfloat precis = PRECISION1;
   gfloat ftmp, rdiff;
@@ -577,7 +577,7 @@ pt_world_to_raw_by_var (gint j, greal *world, greal *raw, datad *d)
 
 void
 pt_screen_to_raw (icoords *screen, gint id, gboolean horiz, gboolean vert,
-  greal *raw, gcoords *eps, datad *d, splotd *sp, ggobid *gg)
+  greal *raw, gcoords *eps, GGobiData *d, splotd *sp, ggobid *gg)
 {
   gint j;
   gcoords planar;
@@ -593,7 +593,7 @@ pt_screen_to_raw (icoords *screen, gint id, gboolean horiz, gboolean vert,
 }
 
 void
-fetch_default_record_values (gchar **vals, datad *dtarget, 
+fetch_default_record_values (gchar **vals, GGobiData *dtarget, 
   displayd *display, ggobid *gg)
 {
   gint j;

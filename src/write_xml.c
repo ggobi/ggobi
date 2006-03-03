@@ -30,7 +30,7 @@
 #include "writedata.h"
 
 
-XmlWriteInfo *updateXmlWriteInfo(datad *d, ggobid *gg, XmlWriteInfo *info);
+XmlWriteInfo *updateXmlWriteInfo(GGobiData *d, ggobid *gg, XmlWriteInfo *info);
 
 gboolean
 write_xml (const gchar *filename,  ggobid *gg, XmlWriteInfo *xmlWriteInfo)
@@ -38,7 +38,7 @@ write_xml (const gchar *filename,  ggobid *gg, XmlWriteInfo *xmlWriteInfo)
   FILE *f;
   gboolean ok = false;
 /*
- *datad *d;
+ *GGobiData *d;
  *GSList *tmp = gg->d;
 */
   f = fopen (filename,"w");
@@ -56,14 +56,14 @@ gboolean
 write_xml_stream (FILE *f, ggobid *gg, const gchar *filename, XmlWriteInfo *xmlWriteInfo)
 {
  gint numDatasets, i;
- datad *d;
+ GGobiData *d;
  numDatasets = g_slist_length(gg->d);
 g_printerr ("numDatasets %d\n", numDatasets);
 
  write_xml_header (f, -1, gg, xmlWriteInfo);
 
   for(i = 0; i < numDatasets; i++) {
-    d = (datad *) g_slist_nth_data(gg->d, i);
+    d = (GGobiData *) g_slist_nth_data(gg->d, i);
     if(xmlWriteInfo->useDefault)
       updateXmlWriteInfo(d, gg, xmlWriteInfo);
     write_xml_dataset(f, d, gg, xmlWriteInfo);
@@ -74,7 +74,7 @@ g_printerr ("numDatasets %d\n", numDatasets);
 }
 
 gboolean
-write_xml_dataset(FILE *f, datad *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
+write_xml_dataset(FILE *f, GGobiData *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 {
   if (d->edge.n && !d->ncols) {
     write_xml_edges(f, d, gg, xmlWriteInfo);
@@ -120,7 +120,7 @@ write_xml_description (FILE *f, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 }
 
 gboolean
-write_xml_variables (FILE *f, datad *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
+write_xml_variables (FILE *f, GGobiData *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 {
   gint j;
 
@@ -152,7 +152,7 @@ write_xml_variables (FILE *f, datad *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 }
 
 gboolean
-write_xml_variable(FILE *f, datad *d, ggobid *gg, gint j,
+write_xml_variable(FILE *f, GGobiData *d, ggobid *gg, gint j,
   XmlWriteInfo *xmlWriteInfo)
 {
   vartabled *vt = vartable_element_get (j, d);
@@ -197,7 +197,7 @@ write_xml_variable(FILE *f, datad *d, ggobid *gg, gint j,
 
 /*
 gboolean
-write_edge_record_p (gint i, datad *e, ggobid *gg)
+write_edge_record_p (gint i, GGobiData *e, ggobid *gg)
 {
  * If e is an edge set, then
  * loop over all other datads and test their rowids to decide
@@ -205,13 +205,13 @@ write_edge_record_p (gint i, datad *e, ggobid *gg)
  * XXX  We can't really do this, because we don't know what 
  *      edgeset may have been associated with what nodeset.
   gboolean save_case = true;
-  datad *d;
+  GGobiData *d;
   GSList *l;
   gint a, b;
 
   if (e->edge.n == e->nrows) {
     for (l = gg->d; l; l=l->next) {
-      d = (datad *) l->data;
+      d = (GGobiData *) l->data;
       endpointsd *endpoints = resolveEdgePoints(e, d);
       if (endpoints) {
         if (!edge_endpoints_get (i, &a, &b, d, endpoints, e) ||
@@ -229,7 +229,7 @@ write_edge_record_p (gint i, datad *e, ggobid *gg)
 */
 
 gboolean
-write_xml_records(FILE *f, datad *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
+write_xml_records(FILE *f, GGobiData *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 {
   gint i, m, n;
 
@@ -285,7 +285,7 @@ write_xml_records(FILE *f, datad *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
  * I want this to write <edge> records as well as <record> records.
 */
 gboolean
-write_xml_record (FILE *f, datad *d, ggobid *gg, gint i,
+write_xml_record (FILE *f, GGobiData *d, ggobid *gg, gint i,
   XmlWriteInfo *xmlWriteInfo)
 {
   gint j;
@@ -420,7 +420,7 @@ write_xml_record (FILE *f, datad *d, ggobid *gg, gint i,
 }
 
 gboolean
-write_xml_edges (FILE *f, datad *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
+write_xml_edges (FILE *f, GGobiData *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 {
   gint i;
   if (d->edge.n < 1)
@@ -451,7 +451,7 @@ write_xml_edges (FILE *f, datad *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 
 /*
 gboolean
-write_xml_edge(FILE *f, datad *d, ggobid *gg, int i, XmlWriteInfo *xmlWriteInfo)
+write_xml_edge(FILE *f, GGobiData *d, ggobid *gg, int i, XmlWriteInfo *xmlWriteInfo)
 {
   fprintf(f, " <edge ");
   fprintf(f, "source=\"%s\" destination=\"%s\"", d->edge.sym_endpoints[i].a
@@ -470,7 +470,7 @@ writeFloat(FILE *f, double value)
 }
 
 gboolean
-write_dataset_header (FILE *f, datad *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
+write_dataset_header (FILE *f, GGobiData *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 {
  fprintf(f,"<data ");
 /*fprintf(f, "numRecords=\"%d\"", d->nrows);*/
@@ -495,7 +495,7 @@ write_xml_footer(FILE *f, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 }
 
 XmlWriteInfo *
-updateXmlWriteInfo(datad *d, ggobid *gg, XmlWriteInfo *info)
+updateXmlWriteInfo(GGobiData *d, ggobid *gg, XmlWriteInfo *info)
 {
   int i, n, numGlyphSizes;
   gint *colorCounts, *glyphTypeCounts, *glyphSizeCounts, count;

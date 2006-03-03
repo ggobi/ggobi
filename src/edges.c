@@ -30,7 +30,7 @@ void GGOBI(edge_menus_update)(ggobid *gg);
  * edges and arrowheads arrays are handled in splot.c
 */
 
-void edges_alloc(gint nsegs, datad * d)
+void edges_alloc(gint nsegs, GGobiData * d)
 {
   d->edge.n = nsegs;
   d->edge.sym_endpoints = (SymbolicEndpoints*)
@@ -39,7 +39,7 @@ void edges_alloc(gint nsegs, datad * d)
   vectorb_alloc(&d->edge.xed_by_brush, nsegs);
 }
 
-void edges_free(datad * d, ggobid * gg)
+void edges_free(GGobiData * d, ggobid * gg)
 {
   gpointer ptr;
 
@@ -57,7 +57,7 @@ void edges_free(datad * d, ggobid * gg)
   Allocate space for another edge observation and set the
   locations of the rows.
  */
-gboolean edge_add (gint a, gint b, gchar *lbl, gchar *id, datad * d, datad * e,
+gboolean edge_add (gint a, gint b, gchar *lbl, gchar *id, GGobiData * d, GGobiData * e,
   ggobid *gg)
 {
   gchar *s1, *s2;
@@ -163,10 +163,10 @@ DTL: So need to call unresolveEdgePoints(e, d) to remove it from the
   This sets the data set as the source of the edge information
   for all the plots within the display.
  */
-datad *setDisplayEdge(displayd * dpy, datad * e)
+GGobiData *setDisplayEdge(displayd * dpy, GGobiData * e)
 {
   GList *l;
-  datad *old = NULL;
+  GGobiData *old = NULL;
 
   if(resolveEdgePoints(e, dpy->d)) {
     dpy->e = e;
@@ -192,8 +192,8 @@ datad *setDisplayEdge(displayd * dpy, datad * e)
  */
 gboolean edgeset_add(displayd * display)
 {
-  datad *d;
-  datad *e;
+  GGobiData *d;
+  GGobiData *e;
   gint k;
   gboolean added = false;
   ggobid *gg;
@@ -208,7 +208,7 @@ gboolean edgeset_add(displayd * display)
 
     if (d->idTable) {
       for (k = 0; k < nd; k++) {
-        e = (datad *) g_slist_nth_data(gg->d, k);
+        e = (GGobiData *) g_slist_nth_data(gg->d, k);
         if (/* e != d && */ e->edge.n > 0) {
           setDisplayEdge(display, e);
           added = true;
@@ -226,7 +226,7 @@ gboolean edgeset_add(displayd * display)
  on a scatterplot to control whether edges are displayed or not
  on the plot.
  */
-void edgeset_add_cb(GtkAction *action, datad * e)
+void edgeset_add_cb(GtkAction *action, GGobiData * e)
 {
   ggobid *gg = e->gg;
   displayd *display = GGOBI_DISPLAY(g_object_get_data(G_OBJECT(action), 
@@ -282,7 +282,7 @@ GGobi_cleanUpEdgeRelationships(struct _EdgeData *edge, int startPosition)
 /* --------------------------------------------------------------- */
 
 gboolean
-edge_endpoints_get (gint k, gint *a, gint *b, datad *d, endpointsd *endpoints, datad *e)
+edge_endpoints_get (gint k, gint *a, gint *b, GGobiData *d, endpointsd *endpoints, GGobiData *e)
 {
   gboolean ok;
 
@@ -299,10 +299,10 @@ edgesets_count (ggobid *gg)
 {
   gint k, ne = 0;
   gint nd = g_slist_length (gg->d);
-  datad *e;
+  GGobiData *e;
 
   for (k=0; k<nd; k++) { 
-    e = (datad*) g_slist_nth_data (gg->d, k);
+    e = (GGobiData*) g_slist_nth_data (gg->d, k);
     if (e->edge.n > 0)
       ne++;
   }
@@ -322,7 +322,7 @@ static endpointsd DegenerateEndpoints;
   given the symbolic names in the edgeset specification (sym).
 */
 static endpointsd *
-computeResolvedEdgePoints(datad *e, datad *d)
+computeResolvedEdgePoints(GGobiData *e, GGobiData *d)
 {
   endpointsd *ans;
   GHashTable *tbl = d->idTable;
@@ -369,7 +369,7 @@ computeResolvedEdgePoints(datad *e, datad *d)
 
 
 static endpointsd *
-do_resolveEdgePoints(datad *e, datad *d, gboolean compute)
+do_resolveEdgePoints(GGobiData *e, GGobiData *d, gboolean compute)
 {
   endpointsd *ans = NULL;
   DatadEndpoints *ptr;
@@ -422,14 +422,14 @@ g_printerr ("   %d %d\n", ptr->endpoints[0].a, ptr->endpoints[0].b);
  in e.
 */
 endpointsd *
-resolveEdgePoints(datad *e, datad *d)
+resolveEdgePoints(GGobiData *e, GGobiData *d)
 {
   return(do_resolveEdgePoints(e, d, true));
 }
 
 
 gboolean
-hasEdgePoints(datad *e, datad *d)
+hasEdgePoints(GGobiData *e, GGobiData *d)
 {
   return(do_resolveEdgePoints(e, d, false) ? true : false);
 }
@@ -444,7 +444,7 @@ cleanEdgePoint(gpointer data, gpointer userData)
 }
 
 void
-unresolveAllEdgePoints(datad *e)
+unresolveAllEdgePoints(GGobiData *e)
 {
   if(e->edge.endpointList) {
     g_list_foreach(e->edge.endpointList, cleanEdgePoint, NULL);
@@ -455,7 +455,7 @@ unresolveAllEdgePoints(datad *e)
 
 
 gboolean
-unresolveEdgePoints(datad *e, datad *d)
+unresolveEdgePoints(GGobiData *e, GGobiData *d)
 {
   DatadEndpoints *ptr;
   GList *tmp;

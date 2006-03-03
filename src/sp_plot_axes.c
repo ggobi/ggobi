@@ -33,7 +33,7 @@ splot_draw_tour_axes(splotd *sp, GdkDrawable *drawable, ggobid *gg)
   displayd *dsp = (displayd *) sp->displayptr;
   cpaneld *cpanel = &dsp->cpanel;
   gint proj = cpanel->pmode;
-  datad *d = dsp->d;
+  GGobiData *d = dsp->d;
   gfloat dst, val;
   gint textheight = 0, textheight2;
   gchar *varlab, *varval;

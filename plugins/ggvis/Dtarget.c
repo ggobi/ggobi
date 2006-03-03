@@ -15,7 +15,7 @@ ggv_init_Dtarget (gint selected_var, ggvisd *ggv)
 {
   gint i, j;
   gdouble infinity, largest = -1;
-  datad *e = ggv->e;
+  GGobiData *e = ggv->e;
   gint indx = -1;
 
   /*-- initalize Dtarget --*/
@@ -54,7 +54,7 @@ ggv_init_Dtarget (gint selected_var, ggvisd *ggv)
 void
 ggv_compute_Dtarget (gint selected_var, ggvisd *ggv)
 {
-  datad *e, *dsrc;
+  GGobiData *e, *dsrc;
   endpointsd *endpoints;
   gboolean changing;
   gint end1, end2, end3;

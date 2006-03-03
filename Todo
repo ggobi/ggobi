@@ -134,7 +134,7 @@ Is this working now?
 Adding data:  check for inconsistencies and redundancies in these
 routines:
   ggobi-API.c (setData)
-  datad.c  (datad_create, datad_init)
+  datad.c  (ggobi_data_new, datad_init)
   missing.c (missings_datad_cb)
 
 -----------------------------------------------------------------

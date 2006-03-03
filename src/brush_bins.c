@@ -25,7 +25,7 @@
 
 
 void
-assign_points_to_bins (datad *d, splotd *sp, ggobid *gg)
+assign_points_to_bins (GGobiData *d, splotd *sp, ggobid *gg)
 {
   gint i, k, ih, iv;
 
@@ -69,7 +69,7 @@ assign_points_to_bins (datad *d, splotd *sp, ggobid *gg)
 }
 
 void
-get_extended_brush_corners (icoords *bin0, icoords *bin1, datad *d, splotd *sp)
+get_extended_brush_corners (icoords *bin0, icoords *bin1, GGobiData *d, splotd *sp)
 {
   brush_coords *brush = &sp->brush_pos;
   brush_coords *obrush = &sp->brush_pos_o;
@@ -115,7 +115,7 @@ get_extended_brush_corners (icoords *bin0, icoords *bin1, datad *d, splotd *sp)
 }
 
 gboolean
-point_in_which_bin (gint x, gint y, gint *ih, gint *iv, datad *d, splotd *sp)
+point_in_which_bin (gint x, gint y, gint *ih, gint *iv, GGobiData *d, splotd *sp)
 {
   gboolean inwindow = true;
 

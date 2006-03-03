@@ -96,7 +96,7 @@ display_tour1d_init_null (displayd *dsp, ggobid *gg)
 void
 alloc_tour1d (displayd *dsp, ggobid *gg)
 {
-  datad *d = dsp->d;
+  GGobiData *d = dsp->d;
   gint nc = d->ncols;
 
   arrayd_alloc(&dsp->t1d.Fa, 1, nc);
@@ -127,7 +127,7 @@ alloc_tour1d (displayd *dsp, ggobid *gg)
 
 /*-- eliminate the nc columns contained in *cols --*/
 void
-tour1d_realloc_down (gint nc, gint *cols, datad *d, ggobid *gg)
+tour1d_realloc_down (gint nc, gint *cols, GGobiData *d, ggobid *gg)
 {
   displayd *dsp;
   GList *l;
@@ -160,7 +160,7 @@ tour1d_realloc_down (gint nc, gint *cols, datad *d, ggobid *gg)
 
 /*-- append columns for a total of nc columns --*/
 void
-tour1d_realloc_up (gint nc, datad *d, ggobid *gg)
+tour1d_realloc_up (gint nc, GGobiData *d, ggobid *gg)
 {
   displayd *dsp;
   GList *l;
@@ -208,7 +208,7 @@ void tour1d_snap(ggobid *gg)
 {
   displayd *dsp = gg->current_display;
   splotd *sp = gg->current_splot;
-  datad *d = dsp->d;
+  GGobiData *d = dsp->d;
   gint j;
   gdouble rnge;
   vartabled *vt;
@@ -234,7 +234,7 @@ void tour1d_write_video(ggobid *gg)
 {
   displayd *dsp = gg->current_display;
   splotd *sp = gg->current_splot;
-  datad *d = dsp->d;
+  GGobiData *d = dsp->d;
   gint j;
   gdouble rnge;
   vartabled *vt;
@@ -256,7 +256,7 @@ void
 display_tour1d_init (displayd *dsp, ggobid *gg) 
 {
   gint i, j;
-  datad *d = dsp->d;
+  GGobiData *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
   gint nc = d->ncols;
 
@@ -332,7 +332,7 @@ void
 tour1d_all_vars (displayd *dsp) 
 {
   ggobid *gg = dsp->ggobi;
-  datad *d = dsp->d;
+  GGobiData *d = dsp->d;
   gint j;
 
   //gg->tour1d.all_vars = !gg->tour1d.all_vars;
@@ -402,7 +402,7 @@ void tour1d_pause (cpaneld *cpanel, gboolean state, displayd *dsp, ggobid *gg)
 
 /*-- add/remove jvar to/from the subset of variables that <may> be active --*/
 static gboolean
-tour1d_subset_var_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
+tour1d_subset_var_set (gint jvar, GGobiData *d, displayd *dsp, ggobid *gg)
 {
   gboolean in_subset = dsp->t1d.subset_vars_p.els[jvar];
   gint j, k;
@@ -447,7 +447,7 @@ tour1d_subset_var_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
 }
 
 void 
-tour1d_active_var_set (gint jvar, datad *d, displayd *dsp, ggobid *gg)
+tour1d_active_var_set (gint jvar, GGobiData *d, displayd *dsp, ggobid *gg)
 {
   gint j, k;
   gboolean in_subset = dsp->t1d.subset_vars_p.els[jvar];
@@ -534,7 +534,7 @@ tour1d_manip_var_set (gint j, gint btn, ggobid *gg)
 }
 
 gboolean
-tour1d_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse, datad *d, ggobid *gg)
+tour1d_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse, GGobiData *d, ggobid *gg)
 {
   displayd *dsp = gg->current_display;
   gboolean redraw = true;
@@ -595,7 +595,7 @@ tour1d_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse, datad *d, ggobi
 }
 
 void
-tour1d_projdata(splotd *sp, greal **world_data, datad *d, ggobid *gg)
+tour1d_projdata(splotd *sp, greal **world_data, GGobiData *d, ggobid *gg)
 {
   gint i, j, m;
   displayd *dsp = (displayd *) sp->displayptr;
@@ -684,7 +684,7 @@ tour1d_projdata(splotd *sp, greal **world_data, datad *d, ggobid *gg)
 void
 tour1d_run(displayd *dsp, ggobid *gg)
 {
-  datad *d = dsp->d;
+  GGobiData *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
   /*  static gint count = 0;*/
   gboolean revert_random = false;
@@ -879,7 +879,7 @@ void tour1d_reinit(ggobid *gg)
 {
   gint i, j;
   displayd *dsp = gg->current_display;
-  datad *d = dsp->d;
+  GGobiData *d = dsp->d;
   splotd *sp = gg->current_splot;
 
   for (i=0; i<1; i++) {
@@ -908,7 +908,7 @@ void tour1d_scramble(ggobid *gg)
 {
   int i, j;
   displayd *dsp = gg->current_display;
-  datad *d = dsp->d;
+  GGobiData *d = dsp->d;
   gint nc = d->ncols;
 
   for (i=0; i<1; i++)
@@ -942,7 +942,7 @@ void
 tour1d_manip_init(gint p1, gint p2, splotd *sp) 
 {
   displayd *dsp = (displayd *) sp->displayptr;
-  datad *d = dsp->d;
+  GGobiData *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
   ggobid *gg = GGobiFromSPlot(sp);
   gint j;
@@ -1002,7 +1002,7 @@ void
 tour1d_manip(gint p1, gint p2, splotd *sp, ggobid *gg) 
 {
   displayd *dsp = (displayd *) sp->displayptr;
-  datad *d = dsp->d;
+  GGobiData *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
   gfloat xcosphi=1., xsinphi=0.;
   gfloat distx, disty;

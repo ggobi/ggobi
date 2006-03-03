@@ -101,14 +101,14 @@ parcoords_reset_arrangement (displayd *display, gint arrangement, ggobid *gg) {
 
 displayd *
 parcoords_new_with_vars(gboolean missing_p, gint nvars, gint *vars,
-	       datad *d, ggobid *gg) 
+	       GGobiData *d, ggobid *gg) 
 {
 	return(parcoords_new(NULL, missing_p, nvars, vars, d, gg));
 }
 
 displayd *
 parcoords_new (displayd *display, gboolean missing_p, gint nvars, gint *vars,
-	       datad *d, ggobid *gg) 
+	       GGobiData *d, ggobid *gg) 
 {
   GtkWidget *vbox, *frame;
   gint i;
@@ -387,7 +387,7 @@ sp_rewhisker (splotd *sp_prev, splotd *sp, splotd *sp_next, ggobid *gg) {
   gint i, k, m;
   displayd *display = (displayd *) sp->displayptr;
   cpaneld *cpanel = (cpaneld *) &display->cpanel;
-  datad *d = display->d;
+  GGobiData *d = display->d;
   gboolean draw_whisker;
 
   for (k=0; k<d->nrows_in_plot; k++) {

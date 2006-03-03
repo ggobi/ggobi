@@ -19,7 +19,7 @@
 #include "externs.h"
 
 void
-jitter_vars_init (datad *d) {
+jitter_vars_init (GGobiData *d) {
   d->jitter.type = UNIFORM;
   d->jitter.convex = true;
 }
@@ -28,7 +28,7 @@ static void
 jitter_cb (GtkButton *w, ggobid *gg)
 {
   GtkWidget *tree_view = get_tree_view_from_object (G_OBJECT(gg->jitter_ui.window));
-  datad *d = (datad *) g_object_get_data(G_OBJECT (tree_view), "datad");
+  GGobiData *d = (GGobiData *) g_object_get_data(G_OBJECT (tree_view), "datad");
   gint *vars;// = (gint *) g_malloc (d->ncols * sizeof(gint));
   gint nvars;
   
@@ -46,7 +46,7 @@ jitter_cb (GtkButton *w, ggobid *gg)
 static void
 degree_cb (GtkAdjustment *adj, ggobid *gg) {
   GtkWidget *tree_view = get_tree_view_from_object (G_OBJECT(gg->jitter_ui.window));
-  datad *d = (datad *) g_object_get_data(G_OBJECT (tree_view), "datad");
+  GGobiData *d = (GGobiData *) g_object_get_data(G_OBJECT (tree_view), "datad");
   gint *vars;// = (gint *) g_malloc (d->ncols * sizeof(gint));
   gint nvars;
   
@@ -75,7 +75,7 @@ static void type_cb (GtkWidget *w, ggobid *gg)
 {
   gint indx = gtk_combo_box_get_active(GTK_COMBO_BOX(w));
   GtkWidget *tree_view = get_tree_view_from_object (G_OBJECT(gg->jitter_ui.window));
-  datad *d = (datad *) g_object_get_data(G_OBJECT (tree_view), "datad");
+  GGobiData *d = (GGobiData *) g_object_get_data(G_OBJECT (tree_view), "datad");
   gint *vars;// = (gint *) g_malloc (d->ncols * sizeof(gint));
   gint nvars;
   

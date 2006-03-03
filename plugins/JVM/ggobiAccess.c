@@ -6,7 +6,7 @@
 
 void  *getAddressInst(JNIEnv *env, jobject obj);
 ggobid *getGGobiInst(JNIEnv *env, jobject obj);
-jobject createJavaDatad(JNIEnv *env, datad *d);
+jobject createJavaDatad(JNIEnv *env, GGobiData *d);
 
 jint
 Java_ggobi_ggobi_getNumDatasets(JNIEnv *env, jobject jgg)
@@ -38,7 +38,7 @@ jstring
 Java_ggobi_datad_getName(JNIEnv *env, jobject obj)
 {
   jstring str = NULL;
-  datad *d = (datad*) getAddressInst(env, obj);
+  GGobiData *d = (GGobiData*) getAddressInst(env, obj);
   if(!d) {
       return(NULL);
   }
@@ -51,18 +51,18 @@ Java_ggobi_datad_getName(JNIEnv *env, jobject obj)
 jobject
 Java_ggobi_ggobi_getDataset__I(JNIEnv *env, jobject jgg, jint which)
 {
-    datad *d;
+    GGobiData *d;
     ggobid *gg;
     gg = getGGobiInst(env, jgg);
-    d = (datad*) g_slist_nth_data(gg->d, which);
+    d = (GGobiData*) g_slist_nth_data(gg->d, which);
     return(createJavaDatad(env, d));
 }
 
 jint
 Java_ggobi_datad_getNumRecords(JNIEnv *env, jobject jdata)
 {
-    datad *d;
-    d = (datad*) getAddressInst(env, jdata);
+    GGobiData *d;
+    d = (GGobiData*) getAddressInst(env, jdata);
     return(d->nrows);
 }
 
@@ -88,7 +88,7 @@ getAddressInst(JNIEnv *env, jobject obj)
 }
 
 jobject
-createJavaDatad(JNIEnv *env, datad *d)
+createJavaDatad(JNIEnv *env, GGobiData *d)
 {
     jmethodID id;
     jobject obj;

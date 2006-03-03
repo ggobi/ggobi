@@ -30,7 +30,7 @@ const double AddVarBrushGroup = -1.0;
 
 
 static void
-addvar_vartable_expand (gint ncols, datad *d, ggobid *gg)
+addvar_vartable_expand (gint ncols, GGobiData *d, ggobid *gg)
 {
   gint j;
 
@@ -43,7 +43,7 @@ addvar_vartable_expand (gint ncols, datad *d, ggobid *gg)
 
 /*-- specific adding variables --*/
 static void
-addvar_pipeline_realloc (datad *d, ggobid *gg)
+addvar_pipeline_realloc (GGobiData *d, ggobid *gg)
 {
   /*-- realloc pipeline arrays --*/
   arrayf_add_cols (&d->raw, d->ncols);
@@ -69,10 +69,10 @@ addvar_pipeline_realloc (datad *d, ggobid *gg)
 
 void 
 variable_notebook_varchange_cb (ggobid *gg, vartabled *vt, gint which,
-  datad *data, void *notebook)
+  GGobiData *data, void *notebook)
 */
 void
-addvar_propagate (gint ncols_prev, gint ncols_added, datad *d, ggobid *gg)
+addvar_propagate (gint ncols_prev, gint ncols_added, GGobiData *d, ggobid *gg)
 {
   gint j, jvar;
 
@@ -96,7 +96,7 @@ newvar_add_with_values (gdouble *vals, gint nvals, gchar *vname,
  vartyped type,
  /*-- if categorical, we need ... --*/
  gint nlevels, gchar **level_names, gint *level_values, gint *level_counts,
- datad *d, ggobid *gg)
+ GGobiData *d, ggobid *gg)
 {
   gint i;
   gint d_ncols_prev = d->ncols;
@@ -161,7 +161,7 @@ newvar_add_with_values (gdouble *vals, gint nvals, gchar *vname,
 }
 
 void
-clone_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
+clone_vars (gint *cols, gint ncols, GGobiData *d, ggobid *gg)
 {
   gint i, k, n, jvar;
   gint d_ncols_prev = d->ncols;
@@ -226,7 +226,7 @@ clone_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
 /*-------------------------------------------------------------------------*/
 
 static gint
-plotted (gint *cols, gint ncols, datad *d, ggobid *gg)
+plotted (gint *cols, gint ncols, GGobiData *d, ggobid *gg)
 {
   GList *dlist;
   displayd *display;
@@ -252,7 +252,7 @@ plotted (gint *cols, gint ncols, datad *d, ggobid *gg)
 }
 
 gboolean
-delete_vars (gint *cols, gint ncols, datad *d, ggobid *gg) 
+delete_vars (gint *cols, gint ncols, GGobiData *d, ggobid *gg) 
 {
   gint j;
   gint *keepers, nkeepers;
@@ -365,7 +365,7 @@ delete_vars (gint *cols, gint ncols, datad *d, ggobid *gg)
 
 
 vartyped
-ggobi_data_set_var_type(datad *d, int which, vartyped value)
+ggobi_data_set_var_type(GGobiData *d, int which, vartyped value)
 {
     vartabled *vt;
     vartyped old;
@@ -386,7 +386,7 @@ ggobi_data_set_var_type(datad *d, int which, vartyped value)
 
 
 gboolean
-ggobi_data_set_time_var(datad *d, int which, gboolean value)
+ggobi_data_set_time_var(GGobiData *d, int which, gboolean value)
 {
     vartabled *vt;
     gboolean old;

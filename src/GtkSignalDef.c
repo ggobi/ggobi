@@ -10,7 +10,7 @@
 #else
        /*-- If this signal has not been initialized yet, do it now --*/
   if (gtk_signal_lookup ("datad_added", GTK_TYPE_GGOBI) == 0) {
-      /* This signal is  f(ggobid *, datad *d, gpointer userData) */
+      /* This signal is  f(ggobid *, GGobiData *d, gpointer userData) */
     GGobiSignals[DATAD_ADDED_SIGNAL] =
 	g_signal_new ("datad_added", 
         GTK_TYPE_GGOBI, 

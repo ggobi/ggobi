@@ -19,14 +19,14 @@
 #include "vars.h"
 #include "externs.h"
 
-static gboolean movepts_history_contains (gint, gint, datad *, ggobid *);
+static gboolean movepts_history_contains (gint, gint, GGobiData *, ggobid *);
 
 /*------------------------------------------------------------------------*/
 /*                       history                                          */
 /*------------------------------------------------------------------------*/
 
 static gboolean
-movepts_history_contains (gint i, gint j, datad *d, ggobid *gg) {
+movepts_history_contains (gint i, gint j, GGobiData *d, ggobid *gg) {
 
   if (g_slist_length (d->movepts_history) > 0) {
     GSList *l;
@@ -43,7 +43,7 @@ movepts_history_contains (gint i, gint j, datad *d, ggobid *gg) {
 }
 
 void
-movepts_history_add (gint id, splotd *sp, datad *d, ggobid *gg)
+movepts_history_add (gint id, splotd *sp, GGobiData *d, ggobid *gg)
 {
 /*
  * So that it's possible to do 'undo last', always add two
@@ -79,7 +79,7 @@ movepts_history_add (gint id, splotd *sp, datad *d, ggobid *gg)
 }
 
 void
-movepts_history_delete_last (datad *d, ggobid *gg)
+movepts_history_delete_last (GGobiData *d, ggobid *gg)
 {
   gint n;
 
@@ -108,7 +108,7 @@ movept_screen_to_raw (splotd *sp, gint ipt, gcoords *eps,
   gint j;
   gcoords planar;
   displayd *display = (displayd *) sp->displayptr;
-  datad *d = display->d;
+  GGobiData *d = display->d;
   greal *world = (greal *) g_malloc0 (d->ncols * sizeof(greal));
   icoords pos;
   greal *raw = (greal *) g_malloc (d->ncols * sizeof (greal));
@@ -136,7 +136,7 @@ movept_screen_to_raw (splotd *sp, gint ipt, gcoords *eps,
 }
 
 void
-movept_plane_to_raw (splotd *sp, gint ipt, gcoords *eps, datad *d, ggobid *gg)
+movept_plane_to_raw (splotd *sp, gint ipt, gcoords *eps, GGobiData *d, ggobid *gg)
 {
   gint j;
   gcoords planar;
@@ -165,7 +165,7 @@ movept_plane_to_raw (splotd *sp, gint ipt, gcoords *eps, datad *d, ggobid *gg)
 /*------------------------------------------------------------------------*/
 
 void
-move_pt (gint id, gint x, gint y, splotd *sp, datad *d, ggobid *gg) {
+move_pt (gint id, gint x, gint y, splotd *sp, GGobiData *d, ggobid *gg) {
   gint i, k;
   gboolean horiz, vert;
 

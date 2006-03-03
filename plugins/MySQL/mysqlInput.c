@@ -19,7 +19,7 @@ int read_mysql_data(DBMSLoginInfo *info, gboolean init, ggobid *gg);
 void mysql_warning(const char *msg, MYSQL *conn, ggobid *gg);
 MYSQL* makeConnection(DBMSLoginInfo *login, ggobid *gg);
 MYSQL_RES *query(const char * const query, MYSQL *conn, ggobid *gg);
-datad *processResult(MYSQL_RES *result, MYSQL *conn, ggobid *gg);
+GGobiData *processResult(MYSQL_RES *result, MYSQL *conn, ggobid *gg);
 
 /**
   This creates and populates an InputDescription object
@@ -80,7 +80,7 @@ read_mysql_data(DBMSLoginInfo *info, gboolean init, ggobid *gg)
 {
     MYSQL *conn;
     MYSQL_RES *result;
-    datad *d;
+    GGobiData *d;
 
     if(!info->dataQuery || !info->dataQuery[0]) {
 	mysql_warning("You haven't specified a data query!",NULL, gg);
@@ -168,12 +168,12 @@ mysql_warning(const char *msg, MYSQL *conn, ggobid *gg)
 }
 
 
-datad *
+GGobiData *
 processResult(MYSQL_RES *result, MYSQL *conn, ggobid *gg)
 {
   int i, j;
   int nr, nc;
-  datad *d = NULL;
+  GGobiData *d = NULL;
 
   nr =  mysql_num_rows(result);
   nc = mysql_num_fields(result);

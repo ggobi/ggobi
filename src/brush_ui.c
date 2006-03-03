@@ -41,8 +41,8 @@ static void brush_undo_cb(GtkToggleButton * button, ggobid * gg)
   cpaneld *cpanel = &gg->current_display->cpanel;
   splotd *sp = gg->current_splot;
   displayd *display = sp->displayptr;
-  datad *d = display->d;
-  datad *e = display->e;
+  GGobiData *d = display->d;
+  GGobiData *e = display->e;
 
   if (cpanel->br.point_targets)
     brush_undo(sp, d, gg);
@@ -52,7 +52,7 @@ static void brush_undo_cb(GtkToggleButton * button, ggobid * gg)
   /*-- when rows_in_plot changes ... --*/
   rows_in_plot_set(d, gg);
   if (GGOBI_IS_EXTENDED_SPLOT(sp)) {
-    void (*f)(datad *, splotd *, ggobid *);
+    void (*f)(GGobiData *, splotd *, ggobid *);
     GGobiExtendedSPlotClass *klass;
     klass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);
     f = klass->splot_assign_points_to_bins;
@@ -129,8 +129,8 @@ void brush_reset(displayd * display, gint action)
 {
   gint i, k;
   ggobid *gg = display->ggobi;
-  datad *d = display->d;
-  datad *e = display->e;
+  GGobiData *d = display->d;
+  GGobiData *e = display->e;
   cpaneld *cpanel = &display->cpanel;
 
   g_assert (d->hidden.nels == d->nrows);
@@ -289,7 +289,7 @@ button_press_cb(GtkWidget * w, GdkEventButton * event, splotd * sp)
   gboolean retval = true;
   gboolean button1_p, button2_p;
   ggobid *gg = GGobiFromSPlot(sp);
-  datad *d, *e;
+  GGobiData *d, *e;
 
   if (!sp || !gg)
     return;
@@ -334,7 +334,7 @@ button_release_cb(GtkWidget * w, GdkEventButton * event, splotd * sp)
   displayd *display = (displayd *) sp->displayptr;
   ggobid *gg = GGobiFromSPlot(sp);
   cpaneld *cpanel = &display->cpanel;
-  datad *d = display->d;
+  GGobiData *d = display->d;
   gboolean retval = true;
   GdkModifierType state;
 
@@ -350,7 +350,7 @@ button_release_cb(GtkWidget * w, GdkEventButton * event, splotd * sp)
     rows_in_plot_set(d, gg);
 
     if (GGOBI_IS_EXTENDED_SPLOT(sp)) {
-      void (*f)(datad *, splotd *, ggobid *);
+      void (*f)(GGobiData *, splotd *, ggobid *);
       GGobiExtendedSPlotClass *klass;
       klass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);
       f = klass->splot_assign_points_to_bins;
@@ -382,9 +382,9 @@ button_release_cb(GtkWidget * w, GdkEventButton * event, splotd * sp)
     */
     {
       GSList *l;
-      datad *dd;
+      GGobiData *dd;
       for (l = gg->d; l; l = l->next) {
-        dd = (datad *) l->data;
+        dd = (GGobiData *) l->data;
         if (dd != d) {
           clusters_set (dd, gg);
         }

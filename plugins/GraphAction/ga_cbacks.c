@@ -21,8 +21,8 @@ void
 count_visible_edges (PluginInstance *inst)
 {
   graphactd *ga = (graphactd *) inst->data;
-  datad *d = ga->d;
-  datad *e = ga->e;
+  GGobiData *d = ga->d;
+  GGobiData *e = ga->e;
   gint m, i, k, a, b, edgeid;
   endpointsd *endpoints;
 
@@ -86,8 +86,8 @@ hide_inEdge (gint i, PluginInstance *inst)
 {
   gint k, edgeid, a;
   graphactd *ga = graphactFromInst (inst);
-  datad *d = ga->d;
-  datad *e = ga->e;
+  GGobiData *d = ga->d;
+  GGobiData *e = ga->e;
   ggobid *gg = inst->gg;
   gint nd = g_slist_length (gg->d);
   endpointsd *endpoints;
@@ -125,8 +125,8 @@ hide_outEdge (gint i, PluginInstance *inst)
 {
   gint k, edgeid, b;
   graphactd *ga = graphactFromInst (inst);
-  datad *d = ga->d;
-  datad *e = ga->e;
+  GGobiData *d = ga->d;
+  GGobiData *e = ga->e;
   ggobid *gg = inst->gg;
   gint nd = g_slist_length (gg->d);
   endpointsd *endpoints;
@@ -162,8 +162,8 @@ ga_leaf_hide_cb (GtkWidget *btn, PluginInstance *inst)
 {
   ggobid *gg = inst->gg;
   graphactd *ga = graphactFromInst (inst);
-  datad *d = ga->d;
-  datad *e = ga->e;
+  GGobiData *d = ga->d;
+  GGobiData *e = ga->e;
   gboolean changing;
   gboolean need_to_link_p = false;
   gint i, m;
@@ -260,8 +260,8 @@ ga_orphans_hide_cb (GtkWidget *btn, PluginInstance *inst)
 {
   ggobid *gg = inst->gg;
   graphactd *ga = graphactFromInst (inst);
-  datad *d = gg->current_display->d;
-  datad *e = gg->current_display->e;
+  GGobiData *d = gg->current_display->d;
+  GGobiData *e = gg->current_display->e;
   gint m, i, k, edgeid, a, b;
   gboolean included;
   endpointsd *endpoints;
@@ -319,8 +319,8 @@ void
 ga_nodes_show_cb (GtkWidget *btn, PluginInstance *inst)
 {
   graphactd *ga = graphactFromInst (inst);
-  datad *d = ga->d;
-  datad *e = ga->e;
+  GGobiData *d = ga->d;
+  GGobiData *e = ga->e;
   gint i;
   ggobid *gg = inst->gg;
   gint nd = g_slist_length (gg->d);
@@ -351,7 +351,7 @@ void neighborhood_depth_cb (GtkWidget *w, gpointer cbd)
   ga->neighborhood_depth = GPOINTER_TO_INT (cbd) + 1;
 }
 
-void ga_all_hide (datad *d, datad *e, PluginInstance *inst)
+void ga_all_hide (GGobiData *d, GGobiData *e, PluginInstance *inst)
 {
   gint i;
 
@@ -363,7 +363,7 @@ void ga_all_hide (datad *d, datad *e, PluginInstance *inst)
 
 void
 show_neighbors (gint nodeid, gint edgeid, gint depth,
-  datad *d, datad *e, PluginInstance *inst)
+  GGobiData *d, GGobiData *e, PluginInstance *inst)
 {
   gint a, b, neighbor, k, eid;
   graphactd *ga = (graphactd *) inst->data;
@@ -406,16 +406,16 @@ show_neighbors (gint nodeid, gint edgeid, gint depth,
  * all others.
 */
 void show_neighbors_sticky_cb (ggobid *gg, gint index, gint state,
-  datad *d, void *data)
+  GGobiData *d, void *data)
 {
   PluginInstance *inst = (PluginInstance *)data;
   graphactd *ga = (graphactd *) inst->data;
-  datad *e = ga->e;
+  GGobiData *e = ga->e;
   gint k, edgeid;
   gint nd = g_slist_length (gg->d);
   gint i;
   endpointsd *endpoints;
-  /*datad *d = ga->d;*/
+  /*GGobiData *d = ga->d;*/
   enum {GRAPH_VIEW, EDGE_DATA_VIEW} idview;
   displayd *display = gg->current_display;
 
@@ -502,8 +502,8 @@ void
 ga_edge_tidy_cb (GtkWidget *w, PluginInstance *inst)
 {
   graphactd *ga = (graphactd *) inst->data;
-  datad *d = ga->d;
-  datad *e = ga->e;
+  GGobiData *d = ga->d;
+  GGobiData *e = ga->e;
   endpointsd *endpoints;
   gint a, b, k;
 

@@ -34,7 +34,7 @@ splot_configure_cb (GtkWidget *w, GdkEventConfigure *event, splotd *sp)
   ggobid *gg = GGobiFromSPlot(sp);
   displayd *display = (displayd *) sp->displayptr; 
   cpaneld *cpanel = &display->cpanel;
-  datad *d = display->d;
+  GGobiData *d = display->d;
 
   /*
    * Somehow when a new splot is added to a table, the initial
@@ -85,7 +85,7 @@ splot_configure_cb (GtkWidget *w, GdkEventConfigure *event, splotd *sp)
 
   if (cpanel->imode == BRUSH) {
     if (GGOBI_IS_EXTENDED_SPLOT(sp)) {
-      void (*f)(datad *, splotd *, ggobid *);
+      void (*f)(GGobiData *, splotd *, ggobid *);
       GGobiExtendedSPlotClass *klass;
       klass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);
       f = klass->splot_assign_points_to_bins;
@@ -332,7 +332,7 @@ splot_set_current_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 /* --------------------------------------------------------------- */
 
 void
-splot_points_realloc (gint nrows_prev, splotd *sp, datad *d)
+splot_points_realloc (gint nrows_prev, splotd *sp, GGobiData *d)
 {
   gint i;
 
@@ -350,7 +350,7 @@ splot_points_realloc (gint nrows_prev, splotd *sp, datad *d)
 }
 
 void
-splot_edges_realloc (gint nedges_prev, splotd *sp, datad *e) 
+splot_edges_realloc (gint nedges_prev, splotd *sp, GGobiData *e) 
 {
   gint i;
 
@@ -371,7 +371,7 @@ splot_edges_realloc (gint nedges_prev, splotd *sp, datad *e)
 void
 splot_alloc (splotd *sp, displayd *display, ggobid *gg) 
 {
-  datad *d;
+  GGobiData *d;
   gint nr; 
   if(!display)
     return;
@@ -556,7 +556,7 @@ splot_world_to_plane (cpaneld *cpanel, splotd *sp, ggobid *gg)
 */
 {
   displayd *display = (displayd *) sp->displayptr;
-  datad *d = display->d;
+  GGobiData *d = display->d;
 
 /*
  * This may be the place to respond to the possibility that a
@@ -582,7 +582,7 @@ splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp,
 {
   gint i, k;
   greal scale_x, scale_y;
-  datad *d = display->d;
+  GGobiData *d = display->d;
   greal gtmp;
   GGobiExtendedSPlotClass *klass = NULL;
   greal precis = (greal) PRECISION1;
@@ -659,7 +659,7 @@ splot_screen_to_tform (cpaneld *cpanel, splotd *sp, icoords *scr,
   greal precis = (greal) PRECISION1;
   greal ftmp, max, min, rdiff;
   displayd *display = (displayd *) sp->displayptr;
-  datad *d = display->d;
+  GGobiData *d = display->d;
   gfloat scale_x, scale_y;
   vartabled *vt, *vtx, *vty;
 
@@ -782,7 +782,7 @@ splot_plane_to_world (splotd *sp, gint ipt, ggobid *gg)
 {
   displayd *display = (displayd *) sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
-  datad *d = display->d;
+  GGobiData *d = display->d;
 
   switch (cpanel->pmode) {
     case P1PLOT:
@@ -861,7 +861,7 @@ splot_reverse_pipeline (splotd *sp, gint ipt, gcoords *eps,
                         gboolean horiz, gboolean vert, ggobid *gg)
 {
   displayd *display = (displayd *) sp->displayptr;
-  datad *d = display->d;
+  GGobiData *d = display->d;
   splot_screen_to_plane (sp, ipt, eps, horiz, vert);
   splot_plane_to_world (sp, ipt, gg);
   world_to_raw (ipt, sp, d, gg);

@@ -30,16 +30,16 @@
 #include "externs.h"
 #include "writedata.h"
 
-static gboolean write_binary_data (gchar *, gint *, gint, gint *, gint, datad *, ggobid *);
-static gboolean write_ascii_data (gchar *, gint *, gint, gint *, gint, datad *, ggobid *);
-static gboolean save_collabels (gchar *, gint *colv, gint nc, datad *, ggobid *);
-static gboolean save_rowlabels (gchar *, gint *rowv, gint nr, datad *, ggobid *);
-static gboolean brush_save_colors (gchar *, gint *, gint, datad *, ggobid *);
-static gboolean brush_save_erase (gchar *, gint *, gint, datad *, ggobid *);
-static gboolean brush_save_glyphs (gchar *, gint *, gint, datad *, ggobid *);
+static gboolean write_binary_data (gchar *, gint *, gint, gint *, gint, GGobiData *, ggobid *);
+static gboolean write_ascii_data (gchar *, gint *, gint, gint *, gint, GGobiData *, ggobid *);
+static gboolean save_collabels (gchar *, gint *colv, gint nc, GGobiData *, ggobid *);
+static gboolean save_rowlabels (gchar *, gint *rowv, gint nr, GGobiData *, ggobid *);
+static gboolean brush_save_colors (gchar *, gint *, gint, GGobiData *, ggobid *);
+static gboolean brush_save_erase (gchar *, gint *, gint, GGobiData *, ggobid *);
+static gboolean brush_save_glyphs (gchar *, gint *, gint, GGobiData *, ggobid *);
 
 static gint
-set_rowv (gint *rowv, gchar *rootname, datad *d, ggobid *gg)
+set_rowv (gint *rowv, gchar *rootname, GGobiData *d, ggobid *gg)
 {
   gint i, j, k;
   gint nrows = 0;
@@ -89,7 +89,7 @@ set_rowv (gint *rowv, gchar *rootname, datad *d, ggobid *gg)
 }
 
 static gint
-set_colv (gint *colv, gchar *rootname, datad *d, ggobid *gg)
+set_colv (gint *colv, gchar *rootname, GGobiData *d, ggobid *gg)
 {
   gint i;
   gint ncols = 0;
@@ -124,7 +124,7 @@ set_colv (gint *colv, gchar *rootname, datad *d, ggobid *gg)
 
 gboolean
 write_ascii_data (gchar *rootname, gint *rowv, gint nr, gint *colv, gint nc,
-  datad *d, ggobid *gg)
+  GGobiData *d, ggobid *gg)
 {
   gchar fname[164];
   gchar *message;
@@ -177,7 +177,7 @@ strip_blanks (gchar *str)
 }
 
 gboolean
-ggobi_file_set_create (gchar *rootname, datad *d, ggobid *gg)
+ggobi_file_set_create (gchar *rootname, GGobiData *d, ggobid *gg)
 {
   gint nr, nc;
   gint *rowv, *colv;
@@ -216,7 +216,7 @@ ggobi_file_set_create (gchar *rootname, datad *d, ggobid *gg)
 */
 
   if (d == NULL)
-    d = (datad *) g_slist_nth_data(gg->d, 0);
+    d = (GGobiData *) g_slist_nth_data(gg->d, 0);
 
 /* Determine the rows to be saved */
   rowv = (gint *) g_malloc (d->nrows * sizeof (gint));
@@ -348,7 +348,7 @@ ggobi_file_set_create (gchar *rootname, datad *d, ggobid *gg)
 
 gboolean
 write_binary_data (gchar *rootname, gint *rowv, gint nr, gint *colv, gint nc,
-  datad *d, ggobid *gg)
+  GGobiData *d, ggobid *gg)
 {
   gchar *fname;
   FILE *fp;
@@ -405,7 +405,7 @@ write_binary_data (gchar *rootname, gint *rowv, gint nr, gint *colv, gint nc,
  * save limits if they exist
 */
 gboolean
-save_collabels (gchar *rootname, gint *colv, gint nc, datad *d, ggobid *gg)
+save_collabels (gchar *rootname, gint *colv, gint nc, GGobiData *d, ggobid *gg)
 {
   gint j;
   FILE *fp;
@@ -441,7 +441,7 @@ save_collabels (gchar *rootname, gint *colv, gint nc, datad *d, ggobid *gg)
 }
 
 gboolean
-save_rowlabels (gchar *rootname, gint *rowv, gint nr, datad *d, ggobid *gg)
+save_rowlabels (gchar *rootname, gint *rowv, gint nr, GGobiData *d, ggobid *gg)
 {
   gint i;
   FILE *fp;
@@ -473,7 +473,7 @@ save_rowlabels (gchar *rootname, gint *rowv, gint nr, datad *d, ggobid *gg)
 }
 
 gboolean
-brush_save_colors (gchar *rootname, gint *rowv, gint nr, datad *d, ggobid *gg)
+brush_save_colors (gchar *rootname, gint *rowv, gint nr, GGobiData *d, ggobid *gg)
 {
   gchar *fname;
   gint i;
@@ -507,7 +507,7 @@ brush_save_colors (gchar *rootname, gint *rowv, gint nr, datad *d, ggobid *gg)
 }
 
 gboolean
-brush_save_glyphs (gchar *rootname, gint *rowv, gint nr, datad *d, ggobid *gg)
+brush_save_glyphs (gchar *rootname, gint *rowv, gint nr, GGobiData *d, ggobid *gg)
 {
   gchar *fname;
   gint i;
@@ -568,7 +568,7 @@ brush_save_glyphs (gchar *rootname, gint *rowv, gint nr, datad *d, ggobid *gg)
 }
 
 gboolean
-brush_save_erase (gchar *rootname, gint *rowv, gint nr, datad *d, ggobid *gg)
+brush_save_erase (gchar *rootname, gint *rowv, gint nr, GGobiData *d, ggobid *gg)
 {
   gchar *fname;
   gint i;
@@ -597,7 +597,7 @@ brush_save_erase (gchar *rootname, gint *rowv, gint nr, datad *d, ggobid *gg)
 
 gboolean
 save_missing (gchar *rootname, gint *rowv, gint nr, gint *colv, gint nc,
-  datad *d, ggobid *gg)
+  GGobiData *d, ggobid *gg)
 {
   gint i;
   gchar *fname;

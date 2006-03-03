@@ -47,7 +47,7 @@ colorscheme_set_cb (GtkTreeSelection *sel, GtkTreeView* tree_view)
   ggobid *gg = GGobiFromWidget (GTK_WIDGET(tree_view), true);
   gboolean rval = false;
   GtkTreeModel *model;
-  datad *d;
+  GGobiData *d;
   colorschemed *scheme;
   GtkTreeIter iter;
   
@@ -79,9 +79,9 @@ colorscheme_set_cb (GtkTreeSelection *sel, GtkTreeView* tree_view)
 */
   tree_view = gtk_tree_selection_get_tree_view(sel);
   if(tree_view != NULL) {
-      d = (datad *) g_object_get_data(G_OBJECT (tree_view), "datad");
+      d = (GGobiData *) g_object_get_data(G_OBJECT (tree_view), "datad");
   } else {
-      d = (datad *) g_slist_nth_data(gg->d, 0);
+      d = (GGobiData *) g_slist_nth_data(gg->d, 0);
   }
 
   g_signal_emit_by_name(G_OBJECT (gg->svis.da), "expose_event",
@@ -122,7 +122,7 @@ da_configure_cb (GtkWidget *w, GdkEventConfigure *event, ggobid *gg)
  * scheme->n equal-sized pieces
 */ 
 static void
-bin_boundaries_set (datad *d, ggobid *gg)
+bin_boundaries_set (GGobiData *d, ggobid *gg)
 {
   gint k;
 
@@ -148,7 +148,7 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
   colorschemed *scheme = (gg->svis.scheme != NULL) ?
     gg->svis.scheme : gg->activeColorScheme;
 
-  datad *d = NULL;
+  GGobiData *d = NULL;
 
   GtkWidget *da = gg->svis.da;
   GdkPixmap *pix = gg->svis.pix;
@@ -192,7 +192,7 @@ selection_made_cb (GtkTreeSelection *tree_sel, ggobid *gg)
 {
   gboolean rval = false;
   GtkTreeView *tree_view = gtk_tree_selection_get_tree_view(tree_sel);
-  datad *d = (datad *) g_object_get_data(G_OBJECT (tree_view), "datad");
+  GGobiData *d = (GGobiData *) g_object_get_data(G_OBJECT (tree_view), "datad");
   GtkWidget *btn;
   gint row;
 
@@ -224,7 +224,7 @@ gboolean colors_remap (colorschemed *scheme, gboolean force, ggobid *gg)
   gint i, k;
   gboolean all_colors_p[MAXNCOLORS];
   GSList *l;
-  datad *d;
+  GGobiData *d;
   gushort colors_used[MAXNCOLORS];
   gint maxcolorid, ncolors_used;
   gboolean remap_ok = true;
@@ -234,7 +234,7 @@ gboolean colors_remap (colorschemed *scheme, gboolean force, ggobid *gg)
 
   /*-- find out all the colors (indices) are currently in use --*/
   for (l = gg->d; l; l = l->next) {
-    d = (datad *) l->data;
+    d = (GGobiData *) l->data;
     datad_colors_used_get (&ncolors_used, colors_used, d, gg);
     for (k=0; k<ncolors_used; k++)
       all_colors_p[colors_used[k]] = true;
@@ -286,7 +286,7 @@ gboolean colors_remap (colorschemed *scheme, gboolean force, ggobid *gg)
     }
 
     for (l = gg->d; l; l = l->next) {
-      d = (datad *) l->data;
+      d = (GGobiData *) l->data;
       for (i=0; i<d->nrows; i++) {
         d->color.els[i] = newind[ d->color.els[i] ];
         d->color_now.els[i] = newind[ d->color_now.els[i] ];
@@ -305,11 +305,11 @@ gboolean colors_remap (colorschemed *scheme, gboolean force, ggobid *gg)
 static void scale_set_cb (GtkWidget *w, ggobid* gg)
 {
   GtkWidget *tree_view = get_tree_view_from_object (G_OBJECT (w));
-  datad *d = NULL;
+  GGobiData *d = NULL;
   gboolean rval = false;
 
   if(tree_view)
-    d = (datad *) g_object_get_data(G_OBJECT (tree_view), "datad");
+    d = (GGobiData *) g_object_get_data(G_OBJECT (tree_view), "datad");
 
   /*
    * If we've been using gg->svis.scheme, set gg->activeColorScheme
@@ -339,7 +339,7 @@ static void scale_set_cb (GtkWidget *w, ggobid* gg)
 static void scale_apply_cb (GtkWidget *w, ggobid* gg)
 {
   GtkWidget *tree_view = get_tree_view_from_object (G_OBJECT (w));
-  datad *d = (datad *) g_object_get_data(G_OBJECT (tree_view), "datad");
+  GGobiData *d = (GGobiData *) g_object_get_data(G_OBJECT (tree_view), "datad");
   colorschemed *scheme = (gg->svis.scheme != NULL) ?
     gg->svis.scheme : gg->activeColorScheme;
 

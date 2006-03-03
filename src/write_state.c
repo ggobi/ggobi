@@ -140,7 +140,7 @@ write_ggobi_as_xml(ggobid *gg, const char *fileName, xmlDocPtr doc)
 }
 
 
-void add_brush_info(xmlNodePtr node, datad *d, ggobid *gg);
+void add_brush_info(xmlNodePtr node, GGobiData *d, ggobid *gg);
 
 /**
 
@@ -171,7 +171,7 @@ create_ggobi_xml(ggobid *gg, xmlDocPtr doc)
  {
    GSList *el;
   for(el = gg->d; el; el = el->next) {
-   datad *d = (datad *)el->data;
+   GGobiData *d = (GGobiData *)el->data;
    if(d->npts_under_brush > 0) {
       add_brush_info(XML_DOC_ROOT(doc), d, gg);
       break;
@@ -183,7 +183,7 @@ create_ggobi_xml(ggobid *gg, xmlDocPtr doc)
 }
 
 void
-add_brush_info(xmlNodePtr node, datad *d, ggobid *gg)
+add_brush_info(xmlNodePtr node, GGobiData *d, ggobid *gg)
 {
   char buf[10];
   gint i;
@@ -275,9 +275,9 @@ add_xml_display(displayd *dpy, xmlDocPtr doc)
  */
 
 xmlNodePtr
-XML_addVariable(xmlNodePtr node, gint j, datad *d)
+XML_addVariable(xmlNodePtr node, gint j, GGobiData *d)
 {
-  extern vartabled * vartable_element_get (gint, datad *);
+  extern vartabled * vartable_element_get (gint, GGobiData *);
   xmlNodePtr newNode;
   vartabled *vt = vartable_element_get (j, d);
 

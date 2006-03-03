@@ -400,7 +400,7 @@ print_attachments (ggobid *gg) {
 }
 
 gint
-address_check (datad *d, ggobid *gg) 
+address_check (GGobiData *d, ggobid *gg) 
 {
   g_printerr ("::: vars.h :::\n");
   g_printerr ("data_mode %d world %g nedges %d rowlab %s jitfac %f\n",

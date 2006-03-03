@@ -32,24 +32,24 @@ static gboolean barchartVarSel(GtkWidget *w, displayd * display, splotd * sp,
                                gint jvar, gint toggle, gint mouse,
                                cpaneld * cpanel, ggobid * gg);
 static gint barchartVarIsPlotted(displayd * dpy, gint * cols, gint ncols,
-                                 datad * d);
+                                 GGobiData * d);
 static gboolean barchartCPanelSet(displayd * dpy, cpaneld * cpanel,
                                   ggobid * gg);
 static void barchartDisplaySet(displayd * dpy, ggobid * gg);
 static void barchartDestroy(GtkObject *);
-static void barchartPlaneToScreen(splotd * sp, datad * d, ggobid * gg);
+static void barchartPlaneToScreen(splotd * sp, GGobiData * d, ggobid * gg);
 void barchart_clean_init(barchartSPlotd * sp);
-void barchart_recalc_counts(barchartSPlotd * sp, datad * d, ggobid * gg);
+void barchart_recalc_counts(barchartSPlotd * sp, GGobiData * d, ggobid * gg);
 
-static gboolean barchart_build_symbol_vectors(cpaneld *, datad *, ggobid *);
+static gboolean barchart_build_symbol_vectors(cpaneld *, GGobiData *, ggobid *);
 static void barchartVarpanelRefresh(displayd * display, splotd * sp,
-                                    datad * d);
+                                    GGobiData * d);
 static gboolean barchartHandlesInteraction(displayd * dpy, gint action);
 static void barchartVarpanelTooltipsSet(displayd * dpy, ggobid * gg,
                                         GtkWidget * wx, GtkWidget * wy,
                                         GtkWidget *wz, GtkWidget * label);
 static gint barchartPlottedColsGet(displayd * display, gint * cols,
-                                   datad * d, ggobid * gg);
+                                   GGobiData * d, ggobid * gg);
 static GtkWidget *barchartCPanelWidget(displayd * dpy,
                                        gchar ** modeName, ggobid * gg);
 //static GtkWidget *barchartMenusMake(displayd * dpy, ggobid * gg);
@@ -81,7 +81,7 @@ varpanelHighd(displayd *display)
 
 static gint
 barchart_is_variable_plotted(displayd * display, gint * cols, gint ncols,
-                             datad * d)
+                             GGobiData * d)
 {
   gint j;
   ggobid *gg = display->d->gg;
@@ -99,7 +99,7 @@ barchart_is_variable_plotted(displayd * display, gint * cols, gint ncols,
 
 
 /* barchart splot methods*/
-static gchar *barchart_tree_label(splotd * sp, datad * d, ggobid * gg)
+static gchar *barchart_tree_label(splotd * sp, GGobiData * d, ggobid * gg)
 {
   vartabled *vt;
   int n;
@@ -122,7 +122,7 @@ barchartVarSel(GtkWidget *w, displayd * display, splotd * sp, gint jvar,
   gboolean redraw = p1d_varsel(sp, jvar, &jvar_prev, toggle, mouse);
   if (redraw) {
     displayd *display = (displayd *) sp->displayptr;
-    datad *d = display->d;
+    GGobiData *d = display->d;
 
     barchart_clean_init(GGOBI_BARCHART_SPLOT(sp));
     barchart_recalc_counts(GGOBI_BARCHART_SPLOT(sp), d, d->gg);
@@ -132,7 +132,7 @@ barchartVarSel(GtkWidget *w, displayd * display, splotd * sp, gint jvar,
 }
 
 gint
-barchartVarIsPlotted(displayd * dpy, gint * cols, gint ncols, datad * d)
+barchartVarIsPlotted(displayd * dpy, gint * cols, gint ncols, GGobiData * d)
 {
   int j;
   splotd *sp = (splotd *) dpy->splots->data;
@@ -191,7 +191,7 @@ static void barchartDestroy(GtkObject *obj)
 }
 
 
-void barchartPlaneToScreen(splotd * sp, datad * d, ggobid * gg)
+void barchartPlaneToScreen(splotd * sp, GGobiData * d, ggobid * gg)
 {
   barchartSPlotd *bsp = GGOBI_BARCHART_SPLOT(sp);
 
@@ -199,7 +199,7 @@ void barchartPlaneToScreen(splotd * sp, datad * d, ggobid * gg)
   barchart_recalc_group_dimensions(bsp, gg);
 }
 
-void barchartWorldToPlane (splotd *sp, datad *d, ggobid *gg)
+void barchartWorldToPlane (splotd *sp, GGobiData *d, ggobid *gg)
 {
   barchartSPlotd *bsp = GGOBI_BARCHART_SPLOT(sp);
 
@@ -213,7 +213,7 @@ void barchartWorldToPlane (splotd *sp, datad *d, ggobid *gg)
 /*      called by build_symbol_vectors                                  */
 /*----------------------------------------------------------------------*/
 
-gboolean barchart_build_symbol_vectors (cpaneld *cpanel, datad * d, ggobid * gg)
+gboolean barchart_build_symbol_vectors (cpaneld *cpanel, GGobiData * d, ggobid * gg)
 {
   gboolean changed = FALSE;
   gint j, m;
@@ -258,7 +258,7 @@ gboolean barchart_build_symbol_vectors (cpaneld *cpanel, datad * d, ggobid * gg)
   return changed;
 }
 
-void barchartVarpanelRefresh(displayd * display, splotd * sp, datad * d)
+void barchartVarpanelRefresh(displayd * display, splotd * sp, GGobiData * d)
 {
   gint j;
   for (j = 0; j < d->ncols; j++) {
@@ -296,7 +296,7 @@ barchartVarpanelTooltipsSet(displayd * dpy, ggobid * gg, GtkWidget * wx,
 
 
 gint
-barchartPlottedColsGet(displayd * display, gint * cols, datad * d,
+barchartPlottedColsGet(displayd * display, gint * cols, GGobiData * d,
                        ggobid * gg)
 {
   gint ncols = 0;
@@ -380,7 +380,7 @@ barchartScreenToTform(cpaneld *cpanel, splotd *sp, icoords *scr,
   greal precis = (greal) PRECISION1;
   greal ftmp, max, min, rdiff;
   displayd *display = (displayd *) sp->displayptr;
-  datad *d = display->d;
+  GGobiData *d = display->d;
   gfloat scale_x, scale_y;
   vartabled *vt;
 

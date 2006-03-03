@@ -71,7 +71,7 @@ findAssociatedFile(InputDescription *desc, const gchar * const *extensions,
 /*------------------------------------------------------------------------*/
 
 static void
-collabels_process_word (gchar *word, gint field, gint j, datad *d) 
+collabels_process_word (gchar *word, gint field, gint j, GGobiData *d) 
 {
   gfloat var;
   vartabled *vt = vartable_element_get (j, d);
@@ -110,7 +110,7 @@ collabels_process_word (gchar *word, gint field, gint j, datad *d)
  * fields, which will contain min and max range values.
 */
 gboolean
-collabels_read (InputDescription *desc, gboolean init, datad *d, ggobid *gg)
+collabels_read (InputDescription *desc, gboolean init, GGobiData *d, ggobid *gg)
 {
   static const gchar * const suffixes[] = {
     "col", "column", "collab", "var"
@@ -237,7 +237,7 @@ readGlyphErr (void) {
 
 gboolean
 point_glyphs_read (InputDescription *desc, gboolean reinit,
-  datad *d, ggobid *gg)
+  GGobiData *d, ggobid *gg)
 {
   gboolean ok = true;
   static const gchar * const suffixes[] = {"glyphs"};
@@ -378,7 +378,7 @@ mapGlyphName (const gchar *gtype)
 
 gboolean
 point_colors_read (InputDescription *desc, gboolean reinit,
-  datad *d, ggobid *gg)
+  GGobiData *d, ggobid *gg)
 {
   gboolean ok = false;
   gboolean found = true;
@@ -449,7 +449,7 @@ point_colors_read (InputDescription *desc, gboolean reinit,
 /*------------------------------------------------------------------------*/
 
 gboolean
-hidden_read (InputDescription *desc, gboolean reinit, datad *d, ggobid *gg)
+hidden_read (InputDescription *desc, gboolean reinit, GGobiData *d, ggobid *gg)
 /*
  * Read in the hidden vector
 */
@@ -504,7 +504,7 @@ hidden_read (InputDescription *desc, gboolean reinit, datad *d, ggobid *gg)
 
 
 gboolean
-missing_values_read (InputDescription *desc, gboolean init, datad *d,
+missing_values_read (InputDescription *desc, gboolean init, GGobiData *d,
   ggobid *gg)
 {
   static const gchar *const suffixes[] = {"missing"};

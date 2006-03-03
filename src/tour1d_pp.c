@@ -736,7 +736,7 @@ gfloat t1d_calc_indx (array_f pd,
 gboolean t1d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
   ggobid *gg)
 {
-  datad *d = dsp->d;
+  GGobiData *d = dsp->d;
   gint kout, nrows = d->nrows_in_plot;
   gfloat *gdata;
   gint i, j;

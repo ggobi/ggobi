@@ -23,16 +23,16 @@
 
 /*-------------------------------------------------------------------------*/
 
-datad *
+GGobiData *
 datad_get_from_window (GtkWidget *window)
 {
-  datad *d = NULL;
+  GGobiData *d = NULL;
   GtkWidget *tree_view;
 
   if (window != NULL) {
     tree_view = get_tree_view_from_object (G_OBJECT(window));
     if (tree_view != NULL)
-      d = (datad *) g_object_get_data(G_OBJECT (tree_view), "datad");
+      d = (GGobiData *) g_object_get_data(G_OBJECT (tree_view), "datad");
   }
 
   return d;
@@ -58,7 +58,7 @@ void sphere_condnum_set (gfloat x, ggobid* gg)
   }
 }
 
-void sphere_variance_set (gfloat x, datad *d, ggobid* gg)
+void sphere_variance_set (gfloat x, GGobiData *d, ggobid* gg)
 {
   if (gg->sphere_ui.variance_entry != NULL) {
     gchar *lbl = g_strdup_printf ("%.2e", x);
@@ -117,7 +117,7 @@ deleteit (ggobid *gg) {
   gtk_widget_hide (gg->sphere_ui.window);
 
   for (l=gg->d; l; l=l->next)
-    sphere_free ((datad *) l->data);
+    sphere_free ((GGobiData *) l->data);
 
   gdk_pixmap_unref (gg->sphere_ui.scree_pixmap);
   gtk_widget_destroy (gg->sphere_ui.window);
@@ -136,7 +136,7 @@ void
 sphere_npcs_set_cb (GtkAdjustment *adj, ggobid *gg) 
 {
   gint n = (gint) adj->value;
-  datad *d = datad_get_from_window (gg->sphere_ui.window);
+  GGobiData *d = datad_get_from_window (gg->sphere_ui.window);
 
   if (d != NULL)
     sphere_npcs_set (n, d, gg);
@@ -145,13 +145,13 @@ sphere_npcs_set_cb (GtkAdjustment *adj, ggobid *gg)
 static void
 vars_stdized_cb (GtkToggleButton *btn, ggobid *gg)
 {
-  datad *d = datad_get_from_window (gg->sphere_ui.window);
+  GGobiData *d = datad_get_from_window (gg->sphere_ui.window);
 
   d->sphere.vars_stdized = btn->active;
 }
 
 void
-vars_stdized_send_event (datad *d, ggobid *gg)
+vars_stdized_send_event (GGobiData *d, ggobid *gg)
 {
   if (gg->sphere_ui.stdized_entry != NULL &&
       GTK_IS_WIDGET (gg->sphere_ui.stdized_entry) &&
@@ -172,7 +172,7 @@ sphere_apply_cb (GtkWidget *w, ggobid *gg) {
  * executed when the apply button is pressed
 */
   gfloat firstpc, lastpc;
-  datad *d = datad_get_from_window (gg->sphere_ui.window);
+  GGobiData *d = datad_get_from_window (gg->sphere_ui.window);
 
   if (d == NULL) return;
   if (d->sphere.eigenval.els == NULL) return;
@@ -213,8 +213,8 @@ sphere_apply_cb (GtkWidget *w, ggobid *gg) {
 static void
 scree_restore_cb (GtkWidget *w, ggobid *gg)
 { 
-  extern void sphere_malloc (gint, datad *, ggobid *);
-  datad *d = datad_get_from_window (gg->sphere_ui.window);
+  extern void sphere_malloc (gint, GGobiData *, ggobid *);
+  GGobiData *d = datad_get_from_window (gg->sphere_ui.window);
 
   if (d != NULL && d->sphere.vars_sphered.nels > 0) {
     gint ncols = d->sphere.vars_sphered.nels;
@@ -238,7 +238,7 @@ scree_restore_cb (GtkWidget *w, ggobid *gg)
  * variables has changed, or after the variables are transformed
 */
 static void
-scree_update_cb (GtkWidget *w, datad *d)
+scree_update_cb (GtkWidget *w, GGobiData *d)
 { 
   ggobid *gg = GGobiFromWidget (w, true);
   spherevars_set (gg);
@@ -286,7 +286,7 @@ scree_expose_cb (GtkWidget *w, GdkEventConfigure *event, ggobid *gg)
   gint xpos, ypos, xstrt, ystrt;
   gchar *tickmk;
   //GtkStyle *style = gtk_widget_get_style (gg->sphere_ui.scree_da);
-  datad *d = datad_get_from_window (gg->sphere_ui.window);
+  GGobiData *d = datad_get_from_window (gg->sphere_ui.window);
   gint wid = w->allocation.width, hgt = w->allocation.height;
   gint *sphvars, nels;
   gfloat *evals;
@@ -354,7 +354,7 @@ scree_expose_cb (GtkWidget *w, GdkEventConfigure *event, ggobid *gg)
 */
 void scree_plot_make (ggobid *gg)
 {
-  datad *d = datad_get_from_window (gg->sphere_ui.window);
+  GGobiData *d = datad_get_from_window (gg->sphere_ui.window);
 
   if (pca_calc (d, gg)) {  /*-- spherevars_set is called here --*/
     gboolean rval = false;
@@ -377,7 +377,7 @@ sphere_panel_open (ggobid *gg)
   GtkWidget *frame0, *vbox, *vb, *hb, *table, *frame;
   GtkWidget *label;
   GtkWidget *spinner;
-  datad *d;
+  GGobiData *d;
   GtkWidget *notebook;
   /*-- for the tree_view of sphered variables --*/
   GtkWidget *scrolled_window;
@@ -398,7 +398,7 @@ sphere_panel_open (ggobid *gg)
     d = gg->current_display->d;
   } else {
     GtkWidget *tree_view = get_tree_view_from_object (G_OBJECT(gg->sphere_ui.window));
-    d = (datad *) g_object_get_data(G_OBJECT (tree_view), "datad");
+    d = (GGobiData *) g_object_get_data(G_OBJECT (tree_view), "datad");
   }
 
   spherevars_set (gg); 

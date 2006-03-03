@@ -25,9 +25,9 @@
 */
 
 /* In sp_plot_edges.c */
-gboolean splot_plot_edge (gint m, datad *d, datad *e,
+gboolean splot_plot_edge (gint m, GGobiData *d, GGobiData *e,
 		 splotd *sp, displayd *display, ggobid *gg);
-gboolean splot_hidden_edge (gint m, datad *d, datad *e,
+gboolean splot_hidden_edge (gint m, GGobiData *d, GGobiData *e,
 		   splotd *sp, displayd *display, ggobid *gg);
 
 
@@ -100,7 +100,7 @@ stickylabels = list(list(index=, label=""),
                     list(index=, label=""), ...)),
 */
 void
-describe_sticky_labels (FILE *fp, datad *d, cpaneld *cpanel)
+describe_sticky_labels (FILE *fp, GGobiData *d, cpaneld *cpanel)
 {
   gint j;
 
@@ -188,8 +188,8 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
   gint i, j, m;
   gint k = -1;
   const gchar *const *gnames = GGOBI(getPModeNames)(&k);
-  datad *d = display->d;
-  datad *e = display->e;
+  GGobiData *d = display->d;
+  GGobiData *e = display->e;
   /*gboolean missing;*/
   icoords scr;
   fcoords tfmin, tfmax;
@@ -553,7 +553,7 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
   /* edges: source, dest, color, glyph type and size, hidden,
      sticky labels (not adding missing at the moment)
   */
-  if (d->idTable != NULL && e != (datad *) NULL && e->edge.n > 0) {
+  if (d->idTable != NULL && e != (GGobiData *) NULL && e->edge.n > 0) {
     endpointsd *endpoints;
     gint a, b;
 
@@ -630,7 +630,7 @@ describe_scatmat_display (FILE *fp, ggobid *gg, displayd *display,
   splotd *sp;
   gint ncols, *cols;
   ProjectionMode projection;
-  datad *d = display->d;
+  GGobiData *d = display->d;
 
   cols = (gint *) g_malloc(d->ncols * sizeof(gint));
   ncols = GGOBI_EXTENDED_DISPLAY_GET_CLASS(display)->plotted_vars_get(display, cols, d, gg);
@@ -765,7 +765,7 @@ desc_write (PluginInstance *inst)
     describe_scatterplot_display (fp, gg, display, desc);
   } else if (GGOBI_IS_SCATMAT_DISPLAY(display)) {
     gint ncols, *cols;
-    datad *d = display->d;
+    GGobiData *d = display->d;
     fprintf (fp, "type='scatmat',");
     /* ncols: display is symmetric */
     cols = (gint *) g_malloc(d->ncols * sizeof(gint));

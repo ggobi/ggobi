@@ -30,6 +30,7 @@ extern "C" {
 
 struct _ggobid;
 
+#include <libxml/parser.h>
 #include "defines.h"
 #include "types.h"
 #include "brushing.h"
@@ -350,7 +351,7 @@ struct _ggobid {
     GtkWidget *tree_view;
 
    /*-- a pointer to be compared with current_display->d --*/
-    datad *d;
+    GGobiData *d;
   } sphere_ui;
 
 /*-------------------- subsetting ------------------------------------*/
@@ -542,7 +543,7 @@ typedef struct {
   to listeners.
  */
 typedef struct {
-  datad *d;
+  GGobiData *d;
   int id;
 } GGobiPointMoveEvent;
 
@@ -580,7 +581,7 @@ extern guint GGobiSignals[MAX_GGOBI_SIGNALS];
 /**
   Should be in edges.h, if there were one.
  */
-datad *setDisplayEdge(displayd * dpy, datad * e);
+GGobiData *setDisplayEdge(displayd * dpy, GGobiData * e);
 
 
 gchar *getOptValue(const char *const name, const char *const value);
@@ -609,7 +610,7 @@ extern GSList *ExtendedDisplayTypes;
 typedef GType(*GTypeLoad) (void);
 
 
-void setMissingValue(int i, int j, datad *d, vartabled *vt);
+void setMissingValue(int i, int j, GGobiData *d, vartabled *vt);
 
 
 GList *getInputPluginSelections(ggobid *gg);

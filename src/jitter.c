@@ -77,7 +77,7 @@ jitter_randval (gint type)
 }
 
 void
-rejitter (gint *selected_cols, gint nselected_cols, datad *d, ggobid *gg) {
+rejitter (gint *selected_cols, gint nselected_cols, GGobiData *d, ggobid *gg) {
   gint i, j, k, m;
   greal frand, fworld, fjit;
   greal precis = (gfloat) PRECISION1;
@@ -116,7 +116,7 @@ rejitter (gint *selected_cols, gint nselected_cols, datad *d, ggobid *gg) {
 
 
 void
-jitter_value_set (gfloat value, datad *d, ggobid *gg) {
+jitter_value_set (gfloat value, GGobiData *d, ggobid *gg) {
   GtkWidget *tree_view = get_tree_view_from_object (G_OBJECT(gg->jitter_ui.window));
   gint *vars; // = (gint *) g_malloc (d->ncols * sizeof(gint));
   gint nvars;

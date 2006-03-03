@@ -90,12 +90,12 @@ static int csv_row_parse (Row *row, GIOChannel *channel, gint trim);
 static gboolean is_numeric(gchar *str, gint len);
 static gboolean has_column_labels(GList *rows, gboolean has_row_labels);
 static gboolean has_row_labels(GList *rows);
-static void load_column_labels(Row *row, datad *d, gboolean row_labels);
-static void load_row_labels(GList *rows, datad *d, gboolean has_labels);
+static void load_column_labels(Row *row, GGobiData *d, gboolean row_labels);
+static void load_row_labels(GList *rows, GGobiData *d, gboolean has_labels);
 static void load_levels_from_hash(gpointer key, gpointer value, vartabled *vt);
-static void load_row_values(GList *rows, datad *d, gboolean row_labels);
-static void load_row_data(GList *rows, datad *d);
-static gboolean name_set(datad* d, gchar* name);
+static void load_row_values(GList *rows, GGobiData *d, gboolean row_labels);
+static void load_row_data(GList *rows, GGobiData *d);
+static gboolean name_set(GGobiData* d, gchar* name);
 static void tokenize_row(Row *row);
 GSList* read_csv_data(InputDescription *desc, ggobid *gg);
 static void row_free(Row *r);
@@ -336,7 +336,7 @@ static gboolean has_row_labels(GList *rows)
 	return true;
 }
 
-static void load_column_labels(Row *row, datad *d, gboolean row_labels)
+static void load_column_labels(Row *row, GGobiData *d, gboolean row_labels)
 {
 	gint i;
 	gint offset = (row_labels ? 1 : 0);
@@ -350,7 +350,7 @@ static void load_column_labels(Row *row, datad *d, gboolean row_labels)
 	}
 }
 
-static void load_row_labels(GList *rows, datad *d, gboolean has_labels) {
+static void load_row_labels(GList *rows, GGobiData *d, gboolean has_labels) {
 	gint i;
 	for (i = 0; rows; rows = g_list_next(rows), i++) {
 		gchar *label;
@@ -369,7 +369,7 @@ static void load_levels_from_hash(gpointer key, gpointer value, vartabled *vt)
 	vt->level_names[val-1] = g_strdup(key);
 }
 
-static void load_row_values(GList *rows, datad *d, gboolean row_labels)
+static void load_row_values(GList *rows, GGobiData *d, gboolean row_labels)
 {
 	gint i, j, offset = (row_labels ? 1 : 0);
 	GList *cur;
@@ -425,10 +425,10 @@ static void load_row_values(GList *rows, datad *d, gboolean row_labels)
 	}
 }
 
-static datad *
+static GGobiData *
 create_data(GList *rows, gchar* name)
 {
-  datad* d;
+  GGobiData* d;
 	GList *cur;
 	guint nrows = g_list_length(rows), ncols = 0;
 	
@@ -453,9 +453,9 @@ create_data(GList *rows, gchar* name)
 	return(d);
 }
 
-static gboolean name_set(datad* d, gchar* name)
+static gboolean name_set(GGobiData* d, gchar* name)
 {
-  /* Initialize name structure in datad */      
+  /* Initialize name structure in GGobiData */      
   d->name = g_path_get_basename(name);
   d->nickname = g_strndup (d->name, 2);
   return (true);
@@ -473,7 +473,7 @@ static void tokenize_row(Row *row)
 GSList* 
 read_csv_data(InputDescription *desc, ggobid *gg)
 {
-	datad *d;
+	GGobiData *d;
 	GIOChannel *channel;
 	gint ret;
 	GList *rows = NULL;
@@ -512,7 +512,7 @@ read_csv_data(InputDescription *desc, ggobid *gg)
 	/* Close the file */
 	g_io_channel_shutdown(channel, FALSE, NULL);
 		
-	/* Load the parsed data into the datad */
+	/* Load the parsed data into the GGobiData */
 	d = create_data(rows, desc->baseName);
 	
 	/* Cleanup */

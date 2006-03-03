@@ -80,7 +80,7 @@ create_shepard_data_cb (GtkAction *action, PluginInstance *inst)
 
   if (n) {
     displayd *dspnew;
-    datad *dnew;
+    GGobiData *dnew;
 
     ggv->shepard_iter++;
 

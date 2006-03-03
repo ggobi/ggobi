@@ -33,8 +33,8 @@ init_edge_vectors (gboolean reinit, PluginInstance *inst)
 {
   /*ggobid *gg = inst->gg;*/
   graphactd *ga = graphactFromInst (inst);
-  datad *d = ga->d;
-  datad *e = ga->e;
+  GGobiData *d = ga->d;
+  GGobiData *e = ga->e;
   GList **inEdgeList, **outEdgeList, *l;
   gint a, b, i, k, n;
   endpointsd *endpoints;

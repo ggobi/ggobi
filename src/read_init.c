@@ -1061,10 +1061,10 @@ getInputPluginValues(xmlNodePtr node, GGobiInputPluginInfo *plugin,
 
 #endif /* end of SUPPORT_PLUGINS */
 
-gint resolveVariableName(const gchar *name, datad *d);
+gint resolveVariableName(const gchar *name, GGobiData *d);
 
 displayd *
-createExtendedDisplay(const gchar * const type, gint *vars, gint numVars, datad *d, ggobid *gg)
+createExtendedDisplay(const gchar * const type, gint *vars, gint numVars, GGobiData *d, ggobid *gg)
 {
   displayd *dpy;
 
@@ -1090,19 +1090,19 @@ displayd *
 createDisplayFromDescription(ggobid *gg, GGobiDisplayDescription *desc) 
 {
   displayd *dpy = NULL;
-  datad *data = NULL;
+  GGobiData *data = NULL;
   gint *vars, i;
 
   if(desc->canRecreate == false)
     return(NULL);
 
   if(desc->data > -1) {
-     data = (datad *)  g_slist_nth_data(gg->d, desc->data);
+     data = (GGobiData *)  g_slist_nth_data(gg->d, desc->data);
   } else if(desc->datasetName && desc->datasetName[0]) {
-     datad *tmp;
+     GGobiData *tmp;
      GSList *l;
      for(l = gg->d; l ; l = l->next) {
-        tmp = (datad *) l->data;
+        tmp = (GGobiData *) l->data;
 	if(strcmp(desc->datasetName, tmp->name) == 0) {
 	  data = tmp;
    	  break;
@@ -1133,7 +1133,7 @@ createDisplayFromDescription(ggobid *gg, GGobiDisplayDescription *desc)
 
 
 gint
-resolveVariableName(const gchar *name, datad *d)
+resolveVariableName(const gchar *name, GGobiData *d)
 { 
   gint j;
   vartabled *vt;

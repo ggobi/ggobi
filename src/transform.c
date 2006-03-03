@@ -65,7 +65,7 @@ gfloat inv_raise_min_to_1 (gfloat x, gfloat incr) { return (x + incr - 1.0); }
 
 static void
 mean_stddev (gdouble *x, gfloat *mean, gfloat *stddev, gint j, 
-  datad *d, ggobid *gg)
+  GGobiData *d, ggobid *gg)
 /*
  * Find the minimum and maximum values of a column 
  * scaling by mean and std_width standard deviations.
@@ -91,7 +91,7 @@ mean_stddev (gdouble *x, gfloat *mean, gfloat *stddev, gint j,
 }
 
 gfloat
-median (gfloat **data, gint jcol, datad *d, ggobid *gg)
+median (gfloat **data, gint jcol, GGobiData *d, ggobid *gg)
 {
 /*
  * Find the minimum and maximum values of each column,
@@ -170,14 +170,14 @@ vt_copy(vartabled *vtf, vartabled *vtt)
 }
 
 void
-transform_values_copy (gint jfrom, gint jto, datad *d)
+transform_values_copy (gint jfrom, gint jto, GGobiData *d)
 {
   vartabled *vtf = vartable_element_get (jfrom, d);
   vartabled *vtt = vartable_element_get (jto, d);
   vt_copy (vtf, vtt);
 }
 gboolean
-transform_values_compare (gint jfrom, gint jto, datad *d)
+transform_values_compare (gint jfrom, gint jto, GGobiData *d)
 {
   gboolean same = true;
   vartabled *vtf = vartable_element_get (jfrom, d);
@@ -195,7 +195,7 @@ transform_values_compare (gint jfrom, gint jto, datad *d)
 }
 
 void
-transform0_values_set (gint tform0, gint j, datad *d, ggobid *gg)
+transform0_values_set (gint tform0, gint j, GGobiData *d, ggobid *gg)
 {
   gfloat domain_incr;
   gfloat (*domain_adj) (gfloat x, gfloat incr) = no_change;
@@ -245,7 +245,7 @@ transform0_values_set (gint tform0, gint j, datad *d, ggobid *gg)
 
 void
 transform1_values_set (gint tform1, gfloat expt, gint j, 
-  datad *d, ggobid *gg)
+  GGobiData *d, ggobid *gg)
 {
   vartabled *vt = vartable_element_get (j, d);
 
@@ -257,7 +257,7 @@ transform1_values_set (gint tform1, gfloat expt, gint j,
 }
 
 gboolean 
-transform1_apply (gint j, datad *d, ggobid *gg)
+transform1_apply (gint j, GGobiData *d, ggobid *gg)
 {
   gint i, m, n;
   gfloat min, max, diff;
@@ -538,7 +538,7 @@ transform1_apply (gint j, datad *d, ggobid *gg)
 }
 
 void
-transform2_values_set (gint tform2, gint j, datad *d, ggobid *gg)
+transform2_values_set (gint tform2, gint j, GGobiData *d, ggobid *gg)
 {
   vartabled *vt = vartable_element_get (j, d);
 
@@ -549,7 +549,7 @@ transform2_values_set (gint tform2, gint j, datad *d, ggobid *gg)
 }
 
 gboolean 
-transform2_apply (gint jcol, datad *d, ggobid *gg)
+transform2_apply (gint jcol, GGobiData *d, ggobid *gg)
 {
   gint i, m;
   gboolean tform_ok = true;
@@ -725,7 +725,7 @@ transform2_apply (gint jcol, datad *d, ggobid *gg)
  * we're ready for any sort of success or failure
 */
 void
-collab_tform_update (gint j, datad *d, ggobid *gg)
+collab_tform_update (gint j, GGobiData *d, ggobid *gg)
 {
   gchar *lbl0, *lbl1;
   vartabled *vt = vartable_element_get (j, d);
@@ -791,7 +791,7 @@ collab_tform_update (gint j, datad *d, ggobid *gg)
   g_free ((gpointer) lbl1);
 }
 
-void tform_label_update (gint j, datad *d, ggobid *gg)
+void tform_label_update (gint j, GGobiData *d, ggobid *gg)
 {
   /*-- update the values of the variable labels --*/
   collab_tform_update (j, d, gg);
@@ -816,7 +816,7 @@ void tform_label_update (gint j, datad *d, ggobid *gg)
 */
 gboolean
 transform_variable (gint stage, gint tform_type, gfloat param, gint jcol,
-  datad *d, ggobid *gg)
+  GGobiData *d, ggobid *gg)
 {
   gboolean success = true;
 
@@ -869,7 +869,7 @@ transform_variable (gint stage, gint tform_type, gfloat param, gint jcol,
 
 void
 transform (gint stage, gint tform_type, gfloat param, gint *vars, gint nvars,
-  datad *d, ggobid *gg) 
+  GGobiData *d, ggobid *gg) 
 {
   gint k;
   gboolean ok = true;

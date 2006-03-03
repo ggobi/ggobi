@@ -31,7 +31,7 @@ launch_varcloud_cb (GtkWidget *w, PluginInstance *inst)
   static gchar *clab[] = {"D_ij", "diff_ij", "i", "j"};
   InputDescription *desc = NULL;
   gdouble *values;
-  datad *d = vcl->dsrc, *e, *dnew;
+  GGobiData *d = vcl->dsrc, *e, *dnew;
   gint var1 = vcl->var1, var2 = vcl->var2;
   gdouble xci, xcj, yci, ycj;
   gchar *lbl;
@@ -54,7 +54,7 @@ launch_varcloud_cb (GtkWidget *w, PluginInstance *inst)
   /* upper and lower triangle -- but skip the diagonal for now */
   npairs = d->nrows_in_plot*(d->nrows_in_plot-1);  
  
-  /* Step 1: if necessary, add record ids to the original datad */
+  /* Step 1: if necessary, add record ids to the original GGobiData */
   /*    Keep it simple: use row numbers */
   datad_record_ids_set(d, NULL, false);
 

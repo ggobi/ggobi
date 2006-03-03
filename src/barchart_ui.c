@@ -27,9 +27,9 @@ static gchar *display_mode_lbl[] = { "Bars", "Spines" };
 static gboolean barchart_scale(gboolean button1_p, gboolean button2_p,
                                splotd * sp);
 
-void barchart_set_initials(splotd * sp, datad * d);
-void barchart_allocate_structure(splotd * sp, datad * d);
-extern void barchart_set_breakpoints(gfloat width, splotd * sp, datad * d);
+void barchart_set_initials(splotd * sp, GGobiData * d);
+void barchart_allocate_structure(splotd * sp, GGobiData * d);
+extern void barchart_set_breakpoints(gfloat width, splotd * sp, GGobiData * d);
 
 static void display_mode_cb(GtkWidget * w, ggobid *gg)
 {
@@ -141,7 +141,7 @@ static gint key_press_cb(GtkWidget * w, GdkEventKey * event, splotd * sp)
   gboolean reallocate = FALSE;
 
   displayd *display = (displayd *) sp->displayptr;
-  datad *d = display->d;
+  GGobiData *d = display->d;
   vartabled *vtx;
 
   barchartSPlotd *bsp = GGOBI_BARCHART_SPLOT(sp);
@@ -173,7 +173,7 @@ static gint key_press_cb(GtkWidget * w, GdkEventKey * event, splotd * sp)
 
   if (reallocate) {
     displayd *display = (displayd *) sp->displayptr;
-    datad *d = display->d;
+    GGobiData *d = display->d;
     ggobid *gg = GGobiFromSPlot(sp);
 
     barchart_allocate_structure(sp, d);
@@ -278,7 +278,7 @@ barchart_scale(gboolean button1_p, gboolean button2_p, splotd * sp)
   ggobid *gg = GGobiFromSPlot(sp);
   cpaneld *cpanel = &display->cpanel;
   barchartSPlotd *bsp = GGOBI_BARCHART_SPLOT(sp);
-  datad *d = display->d;
+  GGobiData *d = display->d;
   GGobiExtendedSPlotClass *klass;
   klass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);  
 

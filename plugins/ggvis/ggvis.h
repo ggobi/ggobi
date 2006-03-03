@@ -54,9 +54,9 @@ typedef struct {
 
 typedef struct {
 
-  datad *dsrc;  /*-- original data values --*/
-  datad *dpos;  /*-- the new datad which contains the values in pos --*/
-  datad *e;     /*-- edge set, corresponds both to dsrc and dpos --*/
+  GGobiData *dsrc;  /*-- original data values --*/
+  GGobiData *dpos;  /*-- the new datad which contains the values in pos --*/
+  GGobiData *e;     /*-- edge set, corresponds both to dsrc and dpos --*/
 
   gboolean running_p;
   guint idle_id;
@@ -191,7 +191,7 @@ void mds_func (gboolean, PluginInstance *);
 void mds_once (gboolean doit, ggvisd *ggv, ggobid *gg);
 void mds_open_display_cb (GtkWidget *btn, PluginInstance *inst);
 
-void clusters_changed_cb (ggobid *, datad *, void *);
+void clusters_changed_cb (ggobid *, GGobiData *, void *);
 void create_shepard_data_cb (GtkAction *action, PluginInstance *inst);
 
 void ggv_free (ggvisd *);

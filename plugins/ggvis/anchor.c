@@ -34,7 +34,7 @@ symbol_show (GtkWidget *w, GdkEventExpose *event, gpointer cbd)
   ggvisd *ggv = ggvisFromInst (inst);
   icoords pos;
   glyphd g;
-  datad *d = ggv->dpos;
+  GGobiData *d = ggv->dpos;
   colorschemed *scheme = gg->activeColorScheme;
 
   if (d == NULL)
@@ -137,7 +137,7 @@ ggv_anchor_table_build (PluginInstance *inst)
   ggvisd *ggv = ggvisFromInst (inst);
   gint row, col, i;
   gint nrows = 2, ncols = 7;
-  datad *d;
+  GGobiData *d;
 
   if (inst->data == NULL)
     return;
@@ -176,7 +176,7 @@ ggv_anchor_table_build (PluginInstance *inst)
 }
 
 CHECK_EVENT_SIGNATURE(clusters_changed_cb, clusters_changed_f)
-void clusters_changed_cb (ggobid *gg, datad *d, void *inst)
+void clusters_changed_cb (ggobid *gg, GGobiData *d, void *inst)
 {  /* ignore the datad argument and use ggv->dpos or dsrc */
   ggv_anchor_table_build (inst);
 }

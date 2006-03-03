@@ -155,7 +155,7 @@ gg_write_to_statusbar (gchar *message, ggobid *gg)
     gtk_statusbar_push(GTK_STATUSBAR(statusbar), 0, message);
   else {
     /*-- by default, describe the current datad --*/
-    datad *d = datad_get_from_notebook (gg->varpanel_ui.notebook, gg);
+    GGobiData *d = datad_get_from_notebook (gg->varpanel_ui.notebook, gg);
     if (d) {
       gchar *msg = g_strdup_printf ("%s: %d x %d  (%s)",
         d->name, d->nrows, d->ncols, gg->input->fileName);
@@ -207,14 +207,14 @@ varpanel_highd (displayd *display)
  * Use the widget state to figure out which is currently displayed.
 */
 static gboolean
-varpanel_shows_circles (datad *d)
+varpanel_shows_circles (GGobiData *d)
 {
   return (d != NULL &&
           d->vcirc_ui.ebox != NULL &&
           GTK_WIDGET_REALIZED (d->vcirc_ui.ebox));
 }
 static gboolean
-varpanel_shows_checkboxes (datad *d)
+varpanel_shows_checkboxes (GGobiData *d)
 {
   return (d != NULL &&
           d->vcbox_ui.ebox != NULL &&
@@ -224,7 +224,7 @@ varpanel_shows_checkboxes (datad *d)
 void
 varpanel_reinit (ggobid *gg)
 {
-  datad *d;
+  GGobiData *d;
   gboolean highd;
   displayd *display = gg->current_display;
 
@@ -557,7 +557,7 @@ gboolean
 projection_ok (ProjectionMode m, displayd *display)
 {
   gboolean ok = true;
-  datad *d = display->d;
+  GGobiData *d = display->d;
 
   /*-- if the mode is a projection-setting mode ... --*/
   if (m <= COTOUR) {

@@ -33,7 +33,7 @@
 /*--------------------------------------------------------------------*/
 
 void
-missing_arrays_add_cols (datad *d, ggobid *gg)
+missing_arrays_add_cols (GGobiData *d, ggobid *gg)
 {
   if (d->nmissing > 0 && d->missing.ncols < d->ncols) {
     arrays_add_cols (&d->missing, d->ncols);
@@ -41,7 +41,7 @@ missing_arrays_add_cols (datad *d, ggobid *gg)
 }
 
 void
-missing_arrays_add_rows (gint nrows, datad *d)
+missing_arrays_add_rows (gint nrows, GGobiData *d)
 {
   if (d->nmissing > 0) {
     arrays_add_rows (&d->missing, nrows);
@@ -62,12 +62,12 @@ void missings_datad_cb (GtkWidget *w, ggobid *gg)
 {
   GObject *obj = G_OBJECT(gg->impute.window);
   GtkWidget *tree_view = get_tree_view_from_object (obj);
-  datad *d = (datad *) g_object_get_data(G_OBJECT (tree_view), "datad");
+  GGobiData *d = (GGobiData *) g_object_get_data(G_OBJECT (tree_view), "datad");
   static gchar *lnames[] = {"present", "missing"};
 
   if (d && d->nmissing > 0) {
     GtkWidget *notebook;
-    datad *dnew;
+    GGobiData *dnew;
     gint i, j, k;
     vartabled *vt, *vtnew;
     gint *cols;

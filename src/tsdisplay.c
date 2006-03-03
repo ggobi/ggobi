@@ -27,7 +27,7 @@
 #include <string.h>
 
 displayd *
-timeSeriesDisplayCreate(gboolean missing_p, splotd *sp, datad *d, ggobid *gg)
+timeSeriesDisplayCreate(gboolean missing_p, splotd *sp, GGobiData *d, ggobid *gg)
 {
   gint *selected_vars, nselected_vars = 0;
   displayd *dpy = NULL;
@@ -44,7 +44,7 @@ timeSeriesDisplayCreate(gboolean missing_p, splotd *sp, datad *d, ggobid *gg)
 
 
 gint
-tsplotIsVarPlotted(displayd *display, gint *cols, gint ncols, datad *d)
+tsplotIsVarPlotted(displayd *display, gint *cols, gint ncols, GGobiData *d)
 {
   GList *l;
   splotd *sp;
@@ -90,7 +90,7 @@ tsplotDisplaySet(displayd *dpy, ggobid *gg)
 }
 
 void
-tsplotVarpanelRefresh(displayd *display, splotd *sp, datad *d)
+tsplotVarpanelRefresh(displayd *display, splotd *sp, GGobiData *d)
 {
   gint j;
   GList *l;
@@ -156,7 +156,7 @@ tsplotVarpanelTooltipsSet(displayd *dpy, ggobid *gg, GtkWidget *wx, GtkWidget *w
 
 
 gint
-tsplotPlottedColsGet(displayd *display, gint *cols, datad *d, ggobid *gg)
+tsplotPlottedColsGet(displayd *display, gint *cols, GGobiData *d, ggobid *gg)
 {
   GList *l;
   splotd *s;
@@ -345,7 +345,7 @@ tsplotKeyEventHandled(GtkWidget *w, displayd *display, splotd *sp, GdkEventKey *
 
 
 gchar *
-tsplot_tree_label(splotd *sp, datad *d, ggobid *gg)
+tsplot_tree_label(splotd *sp, GGobiData *d, ggobid *gg)
 {
     vartabled *vty;
     int n;

@@ -576,7 +576,7 @@ mds_once (gboolean doit, ggvisd *ggv, ggobid *gg)
   gdouble step_mag, gsum, psum, gfactor;
   gdouble tmp;
 
-  datad *dpos = ggv->dpos;
+  GGobiData *dpos = ggv->dpos;
 
   /* preparation for transformation */
   if (ggv->trans_dist.nels < ggv->ndistances) {

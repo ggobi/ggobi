@@ -25,10 +25,10 @@
 /*----------------------------------------------------------------------*/
 
 gboolean
-symbol_link_by_id (gboolean persistentp, gint k, datad * sd, ggobid * gg)
+symbol_link_by_id (gboolean persistentp, gint k, GGobiData * sd, ggobid * gg)
 {
 /*-- sd = source_d --*/
-  datad *d;
+  GGobiData *d;
   GSList *l;
   gint i, id = -1;
   /*-- this is the cpanel for the display being brushed --*/
@@ -59,7 +59,7 @@ symbol_link_by_id (gboolean persistentp, gint k, datad * sd, ggobid * gg)
 /**/return false;
 
   for (l = gg->d; l; l = l->next) {
-    d = (datad *) l->data;
+    d = (GGobiData *) l->data;
     if (d == sd)
       continue;        /*-- skip the originating datad --*/
 
@@ -114,10 +114,10 @@ symbol_link_by_id (gboolean persistentp, gint k, datad * sd, ggobid * gg)
 }
 
 gboolean
-exclude_link_by_id (gint k, datad * sd, ggobid * gg)
+exclude_link_by_id (gint k, GGobiData * sd, ggobid * gg)
 {
 /*-- sd = source_d --*/
-  datad *d;
+  GGobiData *d;
   GSList *l;
   gint i, id = -1;
   gboolean changed = false;
@@ -134,7 +134,7 @@ exclude_link_by_id (gint k, datad * sd, ggobid * gg)
 /**/return false;
 
   for (l = gg->d; l; l = l->next) {
-    d = (datad *) l->data;
+    d = (GGobiData *) l->data;
     if (d == sd)
       continue;        /*-- skip the originating datad --*/
 
@@ -163,7 +163,7 @@ exclude_link_by_id (gint k, datad * sd, ggobid * gg)
 
 void
 brush_link_by_var(gint jlinkby, vector_b * levelv,
-                  cpaneld * cpanel, datad * d, ggobid * gg)
+                  cpaneld * cpanel, GGobiData * d, ggobid * gg)
 {
   gint m, i, level_value;
 
@@ -269,14 +269,14 @@ brush_link_by_var(gint jlinkby, vector_b * levelv,
  * of changed by keeping track of pts_under_brush_prev?
 */
 gboolean
-build_symbol_vectors_by_var(cpaneld * cpanel, datad * d, ggobid * gg)
+build_symbol_vectors_by_var(cpaneld * cpanel, GGobiData * d, ggobid * gg)
 {
   gint i, m, level_value, level_value_max;
   vector_b levelv;
   gint jlinkby;
   /*-- for other datad's --*/
   GSList *l;
-  datad *dd;
+  GGobiData *dd;
   vartabled *vtt;
   gboolean changed = false;
 
@@ -337,7 +337,7 @@ build_symbol_vectors_by_var(cpaneld * cpanel, datad * d, ggobid * gg)
 
 enum { LINKBYLIST_NAME, LINKBYLIST_VT, LINKBYLIST_NCOLS };
 
-void linkby_notebook_subwindow_add (datad *d, GtkWidget *notebook, ggobid *);
+void linkby_notebook_subwindow_add (GGobiData *d, GtkWidget *notebook, ggobid *);
 
 void varlist_append(GtkListStore *list, vartabled *vt) {
   gchar *row;
@@ -350,7 +350,7 @@ void varlist_append(GtkListStore *list, vartabled *vt) {
     g_free(row);
   }
 }
-void varlist_populate(GtkListStore *list, datad *d) {
+void varlist_populate(GtkListStore *list, GGobiData *d) {
   gint j;
   GtkTreeIter first;
   vartabled *vt;
@@ -369,7 +369,7 @@ void
 linkby_current_page_set (displayd *display, GtkWidget *notebook, ggobid *gg)
 {
   GtkWidget *swin, *treeview;
-  datad *d = display->d, *paged;
+  GGobiData *d = display->d, *paged;
   gint page_num, cur_page_num;
   cpaneld *cpanel = &display->cpanel;
   GList *children;
@@ -387,7 +387,7 @@ linkby_current_page_set (displayd *display, GtkWidget *notebook, ggobid *gg)
   page_num = 0;
   swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK(notebook), page_num);
   while (swin) {
-    paged = (datad *) g_object_get_data (G_OBJECT (swin), "datad");
+    paged = (GGobiData *) g_object_get_data (G_OBJECT (swin), "datad");
 
     gtk_widget_set_sensitive (swin, (paged == d));
     if (paged == d) {
@@ -408,7 +408,7 @@ linkby_current_page_set (displayd *display, GtkWidget *notebook, ggobid *gg)
 void
 linking_method_set_cb (GtkTreeSelection *treesel, ggobid *gg)
 {
-  datad *d = g_object_get_data (G_OBJECT(gtk_tree_selection_get_tree_view(treesel)), "datad");
+  GGobiData *d = g_object_get_data (G_OBJECT(gtk_tree_selection_get_tree_view(treesel)), "datad");
   GtkTreeModel *model;
   GtkTreeIter iter;
   GtkTreePath *path;
@@ -442,7 +442,7 @@ linking_method_set_cb (GtkTreeSelection *treesel, ggobid *gg)
 }
 
 GtkListStore *
-list_from_data(ggobid *gg, datad *data, GtkNotebook *notebook) {
+list_from_data(ggobid *gg, GGobiData *data, GtkNotebook *notebook) {
   GtkWidget *swin;
   GtkListStore *list = NULL;
 	
@@ -456,7 +456,7 @@ list_from_data(ggobid *gg, datad *data, GtkNotebook *notebook) {
 }
 
 void 
-linkby_notebook_varchanged_cb (ggobid *gg, datad *data, GtkNotebook *notebook) {
+linkby_notebook_varchanged_cb (ggobid *gg, GGobiData *data, GtkNotebook *notebook) {
   GtkListStore *list = list_from_data(gg, data, notebook);
   gtk_list_store_clear(list);
   varlist_populate(list, data);
@@ -464,7 +464,7 @@ linkby_notebook_varchanged_cb (ggobid *gg, datad *data, GtkNotebook *notebook) {
 
 void 
 linkby_notebook_varadded_cb (ggobid *gg, vartabled *vt, gint which,
-  datad *data, GtkNotebook *notebook)
+  GGobiData *data, GtkNotebook *notebook)
 {
   GtkListStore *model = list_from_data(gg, data, notebook);
   if (model)
@@ -472,7 +472,7 @@ linkby_notebook_varadded_cb (ggobid *gg, vartabled *vt, gint which,
 }
 
 void 
-linkby_notebook_list_changed_cb(ggobid *gg, datad *d, void *notebook)
+linkby_notebook_list_changed_cb(ggobid *gg, GGobiData *d, void *notebook)
 {
   linkby_notebook_varchanged_cb(gg, d, notebook);
 }
@@ -482,7 +482,7 @@ CHECK_EVENT_SIGNATURE(linkby_notebook_varchange_cb, variable_added_f)
 CHECK_EVENT_SIGNATURE(linkby_notebook_list_changed_cb, variable_list_changed_f)
 
 static void
-linkby_notebook_adddata_cb (ggobid *gg, datad *d, void *notebook, GtkSignalFunc func)
+linkby_notebook_adddata_cb (ggobid *gg, GGobiData *d, void *notebook, GtkSignalFunc func)
 {
   if (g_slist_length (d->vartable)) {
     linkby_notebook_subwindow_add (d, notebook, gg);
@@ -490,7 +490,7 @@ linkby_notebook_adddata_cb (ggobid *gg, datad *d, void *notebook, GtkSignalFunc 
 }
 
 void
-linkby_notebook_subwindow_add (datad *d, GtkWidget *notebook, ggobid *gg)
+linkby_notebook_subwindow_add (GGobiData *d, GtkWidget *notebook, ggobid *gg)
 {
   GtkWidget *swin, *treeview;
   GtkListStore *list;
@@ -547,7 +547,7 @@ create_linkby_notebook (GtkWidget *box, ggobid *gg)
   GtkWidget *notebook;
   gint nd = g_slist_length (gg->d);
   GSList *l;
-  datad *d;
+  GGobiData *d;
 
   GtkSelectionMode mode = GTK_SELECTION_SINGLE;
   vartyped vtype = categorical;
@@ -564,7 +564,7 @@ create_linkby_notebook (GtkWidget *box, ggobid *gg)
   g_object_set_data (G_OBJECT(notebook), "datatype", (gpointer) dtype);
 
   for (l = gg->d; l; l = l->next) {
-    d = (datad *) l->data;
+    d = (GGobiData *) l->data;
     if (g_slist_length (d->vartable)) {
       linkby_notebook_subwindow_add (d, notebook, gg);
     }

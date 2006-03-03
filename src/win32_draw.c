@@ -34,7 +34,7 @@
 
 #ifdef WIN32
 
-static void drawing_arrays_alloc (splotd *sp, datad *d, ggobid *gg);
+static void drawing_arrays_alloc (splotd *sp, GGobiData *d, ggobid *gg);
 static void build_circle (icoords *, gint, arcd *, gint, gshort);
 static void build_plus (icoords *, gint, GdkSegment *, gint, gshort);
 static void build_rect (icoords *, gint, rectd *, gint, gshort);
@@ -58,7 +58,7 @@ static arcd       *filled_arcs;
 */
 
 static void
-drawing_arrays_alloc (splotd *sp, datad *d, ggobid *gg) {
+drawing_arrays_alloc (splotd *sp, GGobiData *d, ggobid *gg) {
   gint n = d->nrows;
 
   if (sp->win32.npoints == 0) {
@@ -342,7 +342,7 @@ win32_draw_to_pixmap_unbinned (gint current_color, splotd *sp, gboolean draw_hid
 {
   displayd *display = (displayd *) sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
-  datad *d = display->d;
+  GGobiData *d = display->d;
 
   gint i, m;
   gint npt, nseg, nr_open, nr_filled, nc_open, nc_filled;
@@ -403,7 +403,7 @@ win32_draw_to_pixmap_binned (icoords *bin0, icoords *bin1,
   gint current_color, splotd *sp, gboolean draw_hidden, ggobid *gg)
 {
   displayd *display = (displayd *) sp->displayptr;
-  datad *d = display->d;
+  GGobiData *d = display->d;
   gint ih, iv;
   gint m, j;
   gint npt, nseg, nr_open, nr_filled, nc_open, nc_filled;

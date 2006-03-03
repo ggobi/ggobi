@@ -258,7 +258,7 @@ gint
 ggobi_remove_by_index (ggobid *gg, gint which)
 {
   GSList *l;
-  datad *d;
+  GGobiData *d;
   gint numDatasets, i;
 
   /* Move all the entries after the one being removed
@@ -285,7 +285,7 @@ ggobi_remove_by_index (ggobid *gg, gint which)
    */
   numDatasets = g_slist_length (gg->d);
   for (i=0,l = gg->d; l != NULL && i < numDatasets; i++, l = gg->d) {
-    d = (datad *) l->data;
+    d = (GGobiData *) l->data;
     datad_free (d, gg);
     gg->d = g_slist_remove (gg->d, d);
   }
@@ -775,23 +775,23 @@ ggobi_getIndex(ggobid *gg)
  return(-1);
 }
 
-datad *
+GGobiData *
 GGobi_get_data(gint which, const ggobid * const gg)
 {
-   datad *d;
+   GGobiData *d;
    d = g_slist_nth_data(gg->d, which);
 
    return(d);
 }
 
-datad *
+GGobiData *
 GGobi_get_data_by_name(const gchar * const name, const ggobid * const gg)
 {
-  datad *d;
+  GGobiData *d;
   GSList *l;
 
   for (l = gg->d; l; l = l->next) {
-    d = (datad *) l->data;
+    d = (GGobiData *) l->data;
     if(strcmp(d->name, name) == 0)
       return(d);
   }
@@ -818,8 +818,8 @@ ValidateGGobiRef(ggobid *gg, gboolean fatal)
  return(NULL);
 }
 
-datad *
-ValidateDatadRef(datad *d, ggobid *gg, gboolean fatal)
+GGobiData *
+ValidateDatadRef(GGobiData *d, ggobid *gg, gboolean fatal)
 {
   static gchar *error_msg = "Incorrect reference to datad.";
   gint i, n;

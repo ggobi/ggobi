@@ -87,9 +87,9 @@ void startXMLElement(void *user_data, const xmlChar *name, const xmlChar **attrs
 void endXMLElement(void *user_data, const xmlChar *name);
 void Characters(void *user_data, const xmlChar *ch, gint len);
 void cumulateRecordData(XMLParserData *data, const xmlChar *ch, gint len);
-void xmlSetMissingValue(XMLParserData *data, datad *d, vartabled *vt);
+void xmlSetMissingValue(XMLParserData *data, GGobiData *d, vartabled *vt);
 gint getAutoLevelIndex(const char * const label, XMLParserData *data, vartabled *el);
-static gboolean setRecordValue(const char *tmp, datad *d, XMLParserData *data);
+static gboolean setRecordValue(const char *tmp, GGobiData *d, XMLParserData *data);
 void resetRecordInfo(XMLParserData *data);
 static void releaseCurrentDataInfo(XMLParserData *parserData);
 
@@ -116,16 +116,15 @@ const gchar *XMLSuffixes[] = {"", ".xml", ".xml.gz", ".xmlz"};
  One can of course use a scripting language (e.g. R, Python, ...) to 
  create the dataset externall.
  
- One can have any number of randomuniformvariable elements in a
- dataset, which is different from the countervariable. This is
- implemented by introducing a new variable type (like categorical,
- real, ...)  in the vartyped enumeration in vartable.h. This means
- that we have to update code to handle this element in the switch
- statements and this is error-prone. (We can easily overlook some of
- the switch statements and get odd behavior). We would rather have the
- vartabled data structure as a class and have methods for it. Switch
- statements are simply not extensible.  For this case, we only have to
- update vartable_nbook.c.
+ One can have any number of randomuniformvariable elements in a dataset,
+ which is different from the countervariable. This is implemented by 
+ introducing a new variable type (like categorical, real, ...)
+ in the vartyped enumeration in vartable.h. This means that we have
+ to update code to handle this element in the switch statements
+ and this is error-prone. (We can easily overlook some of the switch statements
+ and get odd behavior). We would rather have the  vartabled data structure as
+ a class and have methods for it. Switch statements are simply not extensible.
+ For this case, we only have to update vartable_nbook.c.
 
 */
 const gchar * const xmlDataTagNames[] = {
@@ -293,13 +292,13 @@ data_xml_read (InputDescription *desc, ggobid *gg)
   g_free(xmlParserHandler);
   g_free (name);
 
-#ifdef ZZZ
+#ifdef XXX
   {
     GSList *l;
-    datad *d;
+    GGobiData *d;
     ok = true;
     for (l = gg->d; l; l = l->next) {
-      d = (datad *) l->data;
+      d = (GGobiData *) l->data;
       /* ok &= (d->ncols > 0 && d->nrows > 0); */
       /*-- a simple edge set has no variables --*/
       ok &= (d->nrows > 0);
@@ -317,7 +316,7 @@ initParserData(XMLParserData *data, xmlSAXHandlerPtr handler, ggobid *gg)
   data->current_record = 0;
   data->current_variable = 0;
   data->current_element = 0;
-  data->current_data = (datad *) NULL;
+  data->current_data = NULL;
 
   data->current_color = 0;
   data->reading_colormap_file_p = false;
@@ -456,10 +455,11 @@ setLevelIndex(const xmlChar **attrs, XMLParserData *data)
 {
   const gchar *tmp = getAttribute(attrs, "value");
   gint itmp;
-  datad *d = getCurrentXMLData(data);
+  GGobiData *d = getCurrentXMLData(data);
   vartabled *el = vartable_element_get (data->current_variable, d);
 
   data->current_level++; /*-- current_level here ranges from 0 to nlevels-1 --*/
+
 /*-- dfs: placeholder for proper debugging --*/
   if (data->current_level >=  el->nlevels) {
 /*XXX Put in a more terminal error! */
@@ -485,7 +485,7 @@ setLevelIndex(const xmlChar **attrs, XMLParserData *data)
 void
 completeCategoricalLevels (XMLParserData *data)
 {
-  datad *d = getCurrentXMLData(data);
+  GGobiData *d = getCurrentXMLData(data);
   vartabled *el = vartable_element_get (data->current_variable, d);
   gint min = 1;
 
@@ -512,7 +512,7 @@ completeCategoricalLevels (XMLParserData *data)
 void
 categoricalLevels(const xmlChar **attrs, XMLParserData *data)
 {
-  datad *d = getCurrentXMLData(data);
+  GGobiData *d = getCurrentXMLData(data);
   vartabled *el = vartable_element_get (data->current_variable, d);
   gint i;
 
@@ -544,7 +544,7 @@ categoricalLevels(const xmlChar **attrs, XMLParserData *data)
 void
 addLevel(XMLParserData *data, const gchar *c, gint len)
 {
-  datad *d = getCurrentXMLData(data);
+  GGobiData *d = getCurrentXMLData(data);
   vartabled *el = vartable_element_get (data->current_variable, d);
 
   gchar *val = g_strdup(c);
@@ -602,7 +602,7 @@ edgecompare (const void *val1, const void *val2)
 void 
 setEdgePartners (XMLParserData *parserData)
 {
-  datad *e = getCurrentXMLData(parserData);
+  GGobiData *e = getCurrentXMLData(parserData);
   SortableEndpoints *ep;
   gint i, k, n;
   gboolean dups = false;
@@ -680,7 +680,7 @@ endXMLElement(void *user_data, const xmlChar *name)
       resolveEdgeIds(data);
     case DATASET:
     {
-      datad *d = getCurrentXMLData(data);
+      GGobiData *d = getCurrentXMLData(data);
 
       setEdgePartners(data);
       releaseCurrentDataInfo(data);
@@ -925,13 +925,12 @@ gboolean
 setDatasetInfo (const xmlChar **attrs, XMLParserData *data)
 {
   const gchar *tmp = getAttribute(attrs, "count");
-  datad *d = getCurrentXMLData(data);  // Should be null here
+  GGobiData *d = getCurrentXMLData(data);
 
   if (tmp == NULL) {
     g_error("No count attribute");
   }
 
-  /* Should be in some datad allocation function */
   d->nrows = strToInteger(tmp);
   d->nrows_in_plot = d->nrows;  /*-- for now --*/
 
@@ -944,7 +943,6 @@ setDatasetInfo (const xmlChar **attrs, XMLParserData *data)
   br_color_ids_alloc (d);
   br_color_ids_init (d);
 
-  /* This initializes both d->glyph etc, but also data->defaults */
   setDefaultDatasetValues(attrs, data);
 
   if (tmp) {
@@ -952,7 +950,6 @@ setDatasetInfo (const xmlChar **attrs, XMLParserData *data)
     br_hidden_alloc (d);
     br_hidden_init (d);
   }
-  /*  */
 
   data->current_variable = 0;
   data->current_record = 0;
@@ -1005,6 +1002,8 @@ getAttribute(const xmlChar **attrs, gchar *name)
 gboolean 
 newRecord(const xmlChar **attrs, XMLParserData *data)
 {
+  GGobiData *d = getCurrentXMLData(data);
+
   readXMLRecord(attrs, data);
 
   return(true);
@@ -1014,7 +1013,7 @@ gboolean
 setHidden(const xmlChar **attrs, XMLParserData *data, gint i)
 {
   const gchar *tmp;
-  datad *d = getCurrentXMLData(data);
+  GGobiData *d = getCurrentXMLData(data);
 
   tmp = getAttribute(attrs, "hidden");
   if(tmp) {
@@ -1048,7 +1047,7 @@ setColor(const xmlChar **attrs, XMLParserData *data, gint i)
 {
   const gchar *tmp;
   gint value = data->defaults.color;
-  datad *d = getCurrentXMLData(data);
+  GGobiData *d = getCurrentXMLData(data);
   colorschemed *scheme = data->gg->activeColorScheme;
 
   tmp = getAttribute(attrs, "color");
@@ -1079,7 +1078,7 @@ setGlyph(const xmlChar **attrs, XMLParserData *data, gint i)
 {
   const gchar *tmp;
   gint value;
-  datad *d = getCurrentXMLData(data);
+  GGobiData *d = getCurrentXMLData(data);
 
 /*
  * glyphSize  0:7
@@ -1193,7 +1192,7 @@ xml_warning(const gchar *attribute, const gchar *value, const gchar *msg,
 }
 
 void
-setMissingValue(int i, int j, datad *d, vartabled *vt)
+setMissingValue(int i, int j, GGobiData *d, vartabled *vt)
 {
   if (d->nmissing == 0) {
     arrays_alloc (&d->missing, d->nrows, d->ncols);
@@ -1208,14 +1207,14 @@ setMissingValue(int i, int j, datad *d, vartabled *vt)
 }
 
 void
-xmlSetMissingValue(XMLParserData *data, datad *d, vartabled *vt)
+xmlSetMissingValue(XMLParserData *data, GGobiData *d, vartabled *vt)
 {
   setMissingValue(data->current_record, data->current_element, d, vt);
 }
 
 
 static vartabled *
-applyRandomUniforms(datad *d, XMLParserData *data)
+applyRandomUniforms(GGobiData *d, XMLParserData *data)
 {
   vartabled *vt = NULL;
   while(data->current_element < d->raw.ncols 
@@ -1228,7 +1227,7 @@ applyRandomUniforms(datad *d, XMLParserData *data)
 }
 
 static gboolean
-setRecordValue(const char *tmp, datad *d, XMLParserData *data)
+setRecordValue(const char *tmp, GGobiData *d, XMLParserData *data)
 {
   gdouble value;
   vartabled *vt;
@@ -1341,7 +1340,7 @@ gboolean
 setRecordValues (XMLParserData *data, const xmlChar *line, gint len, gint ncols)
 {
   const gchar *tmp;
-  datad *d = getCurrentXMLData(data);
+  GGobiData *d = getCurrentXMLData(data);
 
   if (ncols == -1) {
     ncols = d->ncols;
@@ -1404,7 +1403,7 @@ gboolean
 newVariable(const xmlChar **attrs, XMLParserData *data, const xmlChar *tagName)
 {
   const gchar *tmp, *tmp1;
-  datad *d = getCurrentXMLData(data);
+  GGobiData *d = getCurrentXMLData(data);
   vartabled *el;
 
   if(data->current_variable >= d->ncols) {
@@ -1512,7 +1511,7 @@ gboolean
 allocVariables (const xmlChar **attrs, XMLParserData *data)
 {
   const gchar *tmp = getAttribute (attrs, "count");
-  datad *d = getCurrentXMLData(data);
+  GGobiData *d = getCurrentXMLData(data);
 
   if(tmp == NULL) {
     g_error("No count for variables attribute\n");
@@ -1551,7 +1550,7 @@ gboolean
 setVariableName(XMLParserData *data, const xmlChar *name, gint len)
 {
   gchar *tmp = (gchar *) g_malloc (sizeof(gchar) * (len+1));
-  datad *d = getCurrentXMLData(data);
+  GGobiData *d = getCurrentXMLData(data);
   vartabled *el = vartable_element_get (data->current_variable, d);
   gchar *lbl = g_strdup_printf ("Var %d", data->current_variable);
 
@@ -1933,10 +1932,11 @@ releaseCurrentDataInfo(XMLParserData *parserData)
    }
 }
 
+
 gboolean
 setDataset(const xmlChar **attrs, XMLParserData *parserData, enum xmlDataState type) 
 {
-  datad *data = NULL;
+  GGobiData *data = NULL;
   gchar *name;
   const gchar *tmp;
 
@@ -1962,7 +1962,6 @@ setDataset(const xmlChar **attrs, XMLParserData *parserData, enum xmlDataState t
   parserData->current_data = data;
 
   if(type == EDGES) {
-    g_printerr ("type = EDGES\n");
     setDatasetInfo(attrs, parserData);
   }
 
@@ -1970,10 +1969,10 @@ setDataset(const xmlChar **attrs, XMLParserData *parserData, enum xmlDataState t
 }
 
 
-datad *
+GGobiData *
 getCurrentXMLData(XMLParserData* parserData)
 {
-  datad *data = parserData->current_data;
+  GGobiData *data = parserData->current_data;
   if(data == NULL) {
     data = ggobi_data_new(0, 0);
     parserData->current_data = data;
@@ -1985,7 +1984,7 @@ getCurrentXMLData(XMLParserData* parserData)
 
 
 void
-setEdge(gint start, gint end, gint i, datad *d)
+setEdge(gint start, gint end, gint i, GGobiData *d)
 {
   /*-- if encountering the first edge, allocate endpoints array --*/
   if (d->edge.n == 0) 
@@ -1995,7 +1994,7 @@ setEdge(gint start, gint end, gint i, datad *d)
 gboolean
 readXMLRecord(const xmlChar **attrs, XMLParserData *data)
 {
-  datad *d = getCurrentXMLData(data);
+  GGobiData *d = getCurrentXMLData(data);
   const gchar *tmp;
   gchar *stmp;
   gint i = data->current_record;

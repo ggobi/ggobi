@@ -4,7 +4,7 @@
 
 typedef struct {
 
-  datad *d, *e;
+  GGobiData *d, *e;
 
   gint nnodes;      /*-- nrows, not nrows_in_plot --*/
   gint nedges;

@@ -61,7 +61,7 @@ static void
 vcl_datad_set_cb (GtkTreeSelection *tree_sel, PluginInstance *inst)
 {
   vcld *vcl = vclFromInst (inst);
-  datad *d, *dprev;
+  GGobiData *d, *dprev;
   GtkTreeModel *model;
   GtkTreeIter iter;
 
@@ -98,7 +98,7 @@ vcl_datad_set_cb (GtkTreeSelection *tree_sel, PluginInstance *inst)
 }
 
 static void 
-vcl_tree_view_datad_added_cb (ggobid *gg, datad *d, GtkWidget *tree_view)
+vcl_tree_view_datad_added_cb (ggobid *gg, GGobiData *d, GtkWidget *tree_view)
 {
   GtkWidget *swin;
   GtkTreeModel *model;
@@ -152,7 +152,7 @@ create_vcl_window(vcld *vcl, PluginInstance *inst)
   GtkWidget *swin;
   gint j, nd;
   GSList *l;
-  datad *d;
+  GGobiData *d;
   ggobid *gg = inst->gg;
   vartabled *vt;
   GtkListStore *model;
@@ -197,7 +197,7 @@ create_vcl_window(vcld *vcl, PluginInstance *inst)
     /*-- --*/
 
     for (l = gg->d; l; l = l->next) {
-      d = (datad *) l->data;
+      d = (GGobiData *) l->data;
       gtk_list_store_append(GTK_LIST_STORE(model), &iter);
 	  gtk_list_store_set(GTK_LIST_STORE(model), &iter, 0, d->name, 1, d, -1);
     }

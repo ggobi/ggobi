@@ -28,7 +28,7 @@ generate_data(InputDescription *desc, ggobid *gg, GGobiPluginInfo *plugin)
 {
   int nr = 10, nc = 3;
   int i, j;
-  datad *d;
+  GGobiData *d;
   g_printerr("[generate_data %d %d]\n", nr, nc);
   d = ggobi_data_new(nr, nc);
 

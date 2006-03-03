@@ -17,7 +17,7 @@ gboolean postgres_read(InputDescription *desc, ggobid *gg, GGobiPluginInfo *);
 int read_postgres_data(DBMSLoginInfo *info, gboolean init, ggobid *gg);
 
 PGresult *query(const char * const query, PGconn *conn);
-datad *processResult(PGresult *result, ggobid *gg);
+GGobiData *processResult(PGresult *result, ggobid *gg);
 PGconn* makeConnection(DBMSLoginInfo *info);
 
 /**
@@ -76,7 +76,7 @@ read_postgres_data(DBMSLoginInfo *info, gboolean init, ggobid *gg)
 {
     PGconn *conn;
     PGresult *result;
-    datad *d;
+    GGobiData *d;
     conn = makeConnection(info);    
     if(!conn) {
 	quick_message("You haven't specified a data query!", false);
@@ -126,12 +126,12 @@ query(const char * const query, PGconn *conn)
     return(result);
 }
 
-datad *
+GGobiData *
 processResult(PGresult *result, ggobid *gg)
 {
   int i, j;
   int nr, nc;
-  datad *d;
+  GGobiData *d;
 
   nr = PQntuples(result);
   nc = PQnfields(result);

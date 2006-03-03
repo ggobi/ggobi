@@ -19,9 +19,9 @@ Perl_GetInputDescription(const char *const fileName, const char *const input, gg
     return(desc);
 }
 
-datad *createDataset(PerlPluginInstData *data, gint nrow, ggobid *gg);
+GGobiData *createDataset(PerlPluginInstData *data, gint nrow, ggobid *gg);
 gint getNumRows(PerlPluginInstData *instData);
-gint populateDataset(PerlPluginInstData *data, datad *gdata, gint nrow, ggobid *gg);
+gint populateDataset(PerlPluginInstData *data, GGobiData *gdata, gint nrow, ggobid *gg);
 char *getDatasetName(PerlPluginInstData *instData);
 
 /**
@@ -34,7 +34,7 @@ readInput(InputDescription *desc, ggobid *gg, GGobiPluginInfo *info)
 {
     PerlPluginInstData *instData;
     gint nrow;
-    datad *gdata;
+    GGobiData *gdata;
     char *name;
 
     instData = (PerlPluginInstData *)desc->userData;
@@ -53,10 +53,10 @@ readInput(InputDescription *desc, ggobid *gg, GGobiPluginInfo *info)
 }
 
 
-datad *
+GGobiData *
 createDataset(PerlPluginInstData *instData, gint nrow, ggobid *gg)
 {
-    datad *gdata;
+    GGobiData *gdata;
     gint nvars, j;
 
     dSP;
@@ -82,7 +82,7 @@ createDataset(PerlPluginInstData *instData, gint nrow, ggobid *gg)
 }
 
 gint
-populateDataset(PerlPluginInstData *instData, datad *gdata, gint nrow, ggobid *gg)
+populateDataset(PerlPluginInstData *instData, GGobiData *gdata, gint nrow, ggobid *gg)
 {
    dSP;
    int i, j, n;

@@ -23,7 +23,7 @@ xyplot_activate (gint state, displayd *display, ggobid *gg)
 {
   GList *slist;
   splotd *sp;
-  datad *d = display->d;
+  GGobiData *d = display->d;
   gboolean reset = false;
 
   if (state) {
@@ -88,7 +88,7 @@ xyplot_varsel (splotd *sp, gint jvar, gint *jvar_prev, gint toggle, gint mouse)
 }
 
 void
-xy_reproject (splotd *sp, greal **world_data, datad *d, ggobid *gg)
+xy_reproject (splotd *sp, greal **world_data, GGobiData *d, ggobid *gg)
 {
 /*
  * Project the data down from the ncols_used-dimensional world_data[]
@@ -111,7 +111,7 @@ xy_reproject (splotd *sp, greal **world_data, datad *d, ggobid *gg)
 /*--------------------------------------------------------------------*/
 
 void
-cycle_fixedx (splotd *sp, displayd *display, datad *d, ggobid *gg)
+cycle_fixedx (splotd *sp, displayd *display, GGobiData *d, ggobid *gg)
 {
   cpaneld *cpanel = &display->cpanel;
   gint varno, jvar_prev;
@@ -150,7 +150,7 @@ cycle_fixedx (splotd *sp, displayd *display, datad *d, ggobid *gg)
 }
 
 void
-cycle_fixedy (splotd *sp, displayd *display, datad *d, ggobid *gg)
+cycle_fixedy (splotd *sp, displayd *display, GGobiData *d, ggobid *gg)
 {
   cpaneld *cpanel = &display->cpanel;
   gint varno, jvar_prev;
@@ -198,7 +198,7 @@ cycle_fixedy (splotd *sp, displayd *display, datad *d, ggobid *gg)
  * users can select plots during cycling, too.)
 */
 void
-cycle_xy (splotd *sp, displayd *display, datad *d, ggobid *gg)
+cycle_xy (splotd *sp, displayd *display, GGobiData *d, ggobid *gg)
 {
   cpaneld *cpanel = &display->cpanel;
   gint jx, jy;
@@ -259,7 +259,7 @@ gint
 xycycle_func (ggobid *gg)
 {
   displayd *display = gg->current_display;
-  datad *d = gg->current_display->d;
+  GGobiData *d = gg->current_display->d;
   splotd *sp = gg->current_splot;
   cpaneld *cpanel = &display->cpanel;
   

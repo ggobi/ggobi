@@ -24,7 +24,7 @@ extern int strcasecmp(const char *, const char *);
 extern int strncasecmp(const char *, const char *, size_t);
 
 void
-subset_init (datad *d, ggobid *gg)
+subset_init (GGobiData *d, ggobid *gg)
 {
   gfloat fnr = (gfloat) d->nrows;
 
@@ -46,7 +46,7 @@ subset_init (datad *d, ggobid *gg)
 /*------------------------------------------------------------------*/
 
 static gboolean
-add_to_subset (gint i, datad *d, ggobid *gg) {
+add_to_subset (gint i, GGobiData *d, ggobid *gg) {
   gboolean added = false;
 
   added = true;
@@ -57,7 +57,7 @@ add_to_subset (gint i, datad *d, ggobid *gg) {
 
 /*-- remove everything from the subset before constructing a new one --*/
 static void
-subset_clear (datad *d, ggobid *gg) {
+subset_clear (GGobiData *d, ggobid *gg) {
   gint i;
 
   g_assert (d->sampled.nels == d->nrows);
@@ -69,7 +69,7 @@ subset_clear (datad *d, ggobid *gg) {
 /*------------------------------------------------------------------*/
 
 void
-subset_apply (datad *d, ggobid *gg) {
+subset_apply (GGobiData *d, ggobid *gg) {
 
   rows_in_plot_set (d, gg);
 
@@ -92,7 +92,7 @@ subset_apply (datad *d, ggobid *gg) {
 }
 
 void
-subset_include_all (datad *d, ggobid *gg) {
+subset_include_all (GGobiData *d, ggobid *gg) {
   gint i;
 
   g_assert (d->sampled.nels == d->nrows);
@@ -106,7 +106,7 @@ subset_include_all (datad *d, ggobid *gg) {
  * Vol 2 of his series.
 */
 gboolean
-subset_random (gint n, datad *d, ggobid *gg) {
+subset_random (gint n, GGobiData *d, ggobid *gg) {
   gint t, m;
   gboolean doneit = false;
   gfloat rrand;
@@ -132,7 +132,7 @@ subset_random (gint n, datad *d, ggobid *gg) {
 }
 
 gboolean
-subset_block (gint bstart, gint bsize, datad *d, ggobid *gg)
+subset_block (gint bstart, gint bsize, GGobiData *d, ggobid *gg)
 {
   gint i, k;
   gboolean subsetsize = 0;
@@ -153,7 +153,7 @@ subset_block (gint bstart, gint bsize, datad *d, ggobid *gg)
 }
 
 gboolean
-subset_range (datad *d, ggobid *gg)
+subset_range (GGobiData *d, ggobid *gg)
 {
   gint i, j;
   gint subsetsize = 0;
@@ -187,7 +187,7 @@ subset_range (datad *d, ggobid *gg)
 }
 
 gboolean
-subset_everyn (gint estart, gint estep, datad *d, ggobid *gg)
+subset_everyn (gint estart, gint estep, GGobiData *d, ggobid *gg)
 {
   gint i;
   gint top = d->nrows;
@@ -216,7 +216,7 @@ subset_everyn (gint estart, gint estep, datad *d, ggobid *gg)
 /*-- create a subset of only the points with sticky ids --*/
 /*-- Added by James Brook, Oct 1994 --*/
 gboolean
-subset_sticky (datad *d, ggobid *gg)
+subset_sticky (GGobiData *d, ggobid *gg)
 {
   gint id;
   GSList *l;
@@ -239,7 +239,7 @@ subset_sticky (datad *d, ggobid *gg)
 
 gboolean
 subset_rowlab (gchar *substr, gint substr_pos, gboolean ignore_case,
-  datad *d, ggobid *gg)
+  GGobiData *d, ggobid *gg)
 {
   gint i;
   gint top = d->nrows;

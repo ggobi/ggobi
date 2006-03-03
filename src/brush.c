@@ -23,9 +23,9 @@
 #include "externs.h"
 
 /* */
-static gboolean active_paint_points (splotd *, datad *d, ggobid *gg);
-static gboolean active_paint_edges (splotd *, datad *e, ggobid *gg);
-static gboolean build_symbol_vectors (cpaneld *, datad *, ggobid *);
+static gboolean active_paint_points (splotd *, GGobiData *d, ggobid *gg);
+static gboolean active_paint_edges (splotd *, GGobiData *e, ggobid *gg);
+static gboolean build_symbol_vectors (cpaneld *, GGobiData *, ggobid *);
 /* */
 
 /*----------------------------------------------------------------------*/
@@ -102,8 +102,8 @@ brush_once (gboolean force, splotd *sp, ggobid *gg)
  * brush; bin1 is the one containing of the lower right corner.
 */
   displayd *display = sp->displayptr;
-  datad *d = display->d;
-  datad *e = display->e;
+  GGobiData *d = display->d;
+  GGobiData *e = display->e;
 
   brush_coords *brush_pos = &sp->brush_pos;
 
@@ -156,7 +156,7 @@ brush_once (gboolean force, splotd *sp, ggobid *gg)
 }
 
 void
-brush_prev_vectors_update (datad *d, ggobid *gg) {
+brush_prev_vectors_update (GGobiData *d, ggobid *gg) {
   gint m, i;
 
   g_assert (d->color.nels == d->nrows);
@@ -177,7 +177,7 @@ brush_prev_vectors_update (datad *d, ggobid *gg) {
 }
 
 void
-brush_undo (splotd *sp, datad *d, ggobid *gg) {
+brush_undo (splotd *sp, GGobiData *d, ggobid *gg) {
   gint m, i;
   if(!d)
     return;
@@ -204,8 +204,8 @@ reinit_transient_brushing (displayd *dsp, ggobid *gg)
  * For now, don't make the same change for persistent brushing.
 */
   gint i, m, k;
-  datad *d = dsp->d;
-  datad *e = dsp->e;
+  GGobiData *d = dsp->d;
+  GGobiData *e = dsp->e;
   cpaneld *cpanel = &dsp->cpanel;
   gboolean point_painting_p = (cpanel->br.point_targets != br_off);
   gboolean edge_painting_p = (cpanel->br.edge_targets != br_off);
@@ -256,7 +256,7 @@ brush_set_pos (gint x, gint y, splotd *sp) {
 static gboolean
 binning_permitted (displayd *display, ggobid *gg)
 {
-  datad *e = display->e;
+  GGobiData *e = display->e;
   gboolean permitted = true;
 
   if (gg->linkby_cv)
@@ -364,7 +364,7 @@ under_brush (gint k, splotd *sp)
 static void
 brush_boundaries_set (cpaneld *cpanel,
   icoords *obin0, icoords *obin1,
-  icoords *imin, icoords *imax, datad *d, ggobid *gg)
+  icoords *imin, icoords *imax, GGobiData *d, ggobid *gg)
 {
   icoords *bin0 = &d->brush.bin0;
   icoords *bin1 = &d->brush.bin1;
@@ -384,7 +384,7 @@ brush_boundaries_set (cpaneld *cpanel,
 }
 
 void
-brush_draw_label (splotd *sp, GdkDrawable *drawable, datad *d, ggobid *gg)
+brush_draw_label (splotd *sp, GdkDrawable *drawable, GGobiData *d, ggobid *gg)
 {
   PangoRectangle rect;
   PangoLayout *layout = gtk_widget_create_pango_layout(GTK_WIDGET(sp->da), NULL);
@@ -400,7 +400,7 @@ brush_draw_label (splotd *sp, GdkDrawable *drawable, datad *d, ggobid *gg)
 }
 
 void
-brush_draw_brush (splotd *sp, GdkDrawable *drawable, datad *d, ggobid *gg) {
+brush_draw_brush (splotd *sp, GdkDrawable *drawable, GGobiData *d, ggobid *gg) {
 /*
  * Use brush_pos to draw the brush.
 */
@@ -502,7 +502,7 @@ brush_draw_brush (splotd *sp, GdkDrawable *drawable, datad *d, ggobid *gg) {
 */
 gboolean
 update_glyph_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
-  datad *d, ggobid *gg)
+  GGobiData *d, ggobid *gg)
 {
   cpaneld *cpanel = &gg->current_display->cpanel;
   gboolean doit = true;
@@ -549,7 +549,7 @@ update_glyph_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
 
 gboolean
 update_color_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
-  datad *d, ggobid *gg)
+  GGobiData *d, ggobid *gg)
 {
   cpaneld *cpanel = &gg->current_display->cpanel;
   gboolean doit = true;
@@ -591,7 +591,7 @@ update_color_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
 
 gboolean
 update_hidden_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
-  datad *d, ggobid *gg)
+  GGobiData *d, ggobid *gg)
 {
   cpaneld *cpanel = &gg->current_display->cpanel;
   gboolean doit = true;
@@ -636,7 +636,7 @@ update_hidden_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
    comics, where everything is backwards. */
 gboolean
 bizarro_update_hidden_vectors (gint i, gboolean changed, 
-  gboolean *hit_by_brush, datad *d, ggobid *gg)
+  gboolean *hit_by_brush, GGobiData *d, ggobid *gg)
 {
   cpaneld *cpanel = &gg->current_display->cpanel;
   gboolean doit = true;
@@ -692,7 +692,7 @@ bizarro_update_hidden_vectors (gint i, gboolean changed,
 /*----------------------------------------------------------------------*/
 
 static gboolean
-build_symbol_vectors (cpaneld *cpanel, datad *d, ggobid *gg)
+build_symbol_vectors (cpaneld *cpanel, GGobiData *d, ggobid *gg)
 {
   gint ih, iv, m, j, k;
   /*-- these look suspicious -- dfs --*/
@@ -701,7 +701,7 @@ build_symbol_vectors (cpaneld *cpanel, datad *d, ggobid *gg)
   icoords imin, imax;
   gboolean changed = false;
   gint nd = g_slist_length (gg->d);
-  gboolean (*f)(cpaneld *, datad *, ggobid *);
+  gboolean (*f)(cpaneld *, GGobiData *, ggobid *);
 
   /* These two are needed for the extended display.
      Should the method be on the extended splot or the display (as it is now).
@@ -785,13 +785,13 @@ build_symbol_vectors (cpaneld *cpanel, datad *d, ggobid *gg)
  * Set pts_under_brush[j] to 1 if point j is inside the rectangular brush.
 */
 gboolean
-active_paint_points (splotd *sp, datad *d, ggobid *gg)
+active_paint_points (splotd *sp, GGobiData *d, ggobid *gg)
 {
   gint ih, iv, j, pt;
   gboolean changed;
   displayd *display = (displayd *) sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
-  gint (*f)(splotd *sp, datad *, ggobid *) = NULL;
+  gint (*f)(splotd *sp, GGobiData *, ggobid *) = NULL;
   BrushTargetType ttype;
 
   g_assert (d->pts_under_brush.nels == d->nrows);
@@ -867,8 +867,8 @@ xed_by_brush (gint k, displayd *display, ggobid *gg)
  * Determine whether edge k intersects the brush
 */
 {
-  datad *d = display->d;
-  datad *e = display->e;
+  GGobiData *d = display->d;
+  GGobiData *e = display->e;
   splotd *sp = gg->current_splot;
   gboolean intersect;
   glong x1 = sp->brush_pos.x1;
@@ -912,7 +912,7 @@ xed_by_brush (gint k, displayd *display, ggobid *gg)
 
 /*-- link by id? --*/
 static gboolean
-build_edge_symbol_vectors (cpaneld *cpanel, datad *e, ggobid *gg)
+build_edge_symbol_vectors (cpaneld *cpanel, GGobiData *e, ggobid *gg)
 {
   gint i;
   gboolean changed = false;
@@ -961,7 +961,7 @@ build_edge_symbol_vectors (cpaneld *cpanel, datad *e, ggobid *gg)
 }
 
 static gboolean
-active_paint_edges (splotd *sp, datad *e, ggobid *gg)
+active_paint_edges (splotd *sp, GGobiData *e, ggobid *gg)
 {
   gint k;
   gboolean changed;

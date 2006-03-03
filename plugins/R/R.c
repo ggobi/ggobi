@@ -297,7 +297,7 @@ R_readInputFromDescription(InputDescription *desc, ggobid *gg, GGobiPluginInfo *
     USER_OBJECT_ obj = (USER_OBJECT_) desc->userData;
     USER_OBJECT_ varNames, e, tmp;
     int nrow, ncol, i, j;
-    datad *gdata;
+    GGobiData *gdata;
     int wasError;
 gboolean init = true;
 

@@ -60,8 +60,8 @@ static void
 test_edge_length (Agraph_t *graph, glayoutd *gl, ggobid *gg)
 {
   gint i, a, b;
-  datad *d = gl->dsrc;
-  datad *e = gl->e;
+  GGobiData *d = gl->dsrc;
+  GGobiData *e = gl->e;
   Agnode_t *head, *tail;
   Agedge_t *edge;
   gchar *name;
@@ -108,8 +108,8 @@ static gint
 neato_get_weight_var (Agraph_t *graph, GtkWidget *w, glayoutd *gl, ggobid *gg)
 {
   gint weightvar = -1;
-  datad *e = gl->e;
-  datad *e_clist;
+  GGobiData *e = gl->e;
+  GGobiData *e_clist;
   GtkWidget *tree_view;
 
   /*-- find the variable which will define the edge lengths --*/
@@ -134,10 +134,10 @@ neato_get_weight_var (Agraph_t *graph, GtkWidget *w, glayoutd *gl, ggobid *gg)
 
 static gboolean
 neato_apply_edge_length (Agraph_t *graph, gint weightvar, glong *visible,
-			 gint nvisible, datad *d, datad *e, ggobid *gg)
+			 gint nvisible, GGobiData *d, GGobiData *e, ggobid *gg)
 {
   gint i, a, b;
-  datad *e_clist;
+  GGobiData *e_clist;
   Agnode_t *head, *tail;
   Agedge_t *edge;
   gchar *name;
@@ -196,8 +196,8 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
 {
   ggobid *gg = inst->gg;
   glayoutd *gl = glayoutFromInst (inst);
-  datad *d = gl->dsrc;
-  datad *e = gl->e;
+  GGobiData *d = gl->dsrc;
+  GGobiData *e = gl->e;
   Agnode_t *node, *head, *tail;
   Agedge_t *edge;
   Agedge_t **edgev;
@@ -216,7 +216,7 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
 /*-- to add the new datad --*/
   gint m, nvisible, nc;
   InputDescription *desc = NULL;
-  datad *dnew;
+  GGobiData *dnew;
   gdouble *values;
   gchar **rownames, **colnames, **rowids;
   glong *visible;

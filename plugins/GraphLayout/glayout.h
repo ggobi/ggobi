@@ -37,8 +37,8 @@ typedef enum {
 
 typedef struct {
 
-  datad *dsrc, *e;
-  datad *d;  /* the last datad created */
+  GGobiData *dsrc, *e;
+  GGobiData *d;  /* the last datad created */
   GtkWidget *window;
 
   array_d dist;
@@ -65,14 +65,14 @@ void radial_new_data_cb (GtkToggleButton *, PluginInstance *);
 void radial_auto_update_cb (GtkToggleButton *, PluginInstance *);
 void glayout_init (glayoutd *);
 glayoutd* glayoutFromInst (PluginInstance *inst);
-void highlight_sticky_edges (ggobid *, gint, gint , datad *d, void *inst);
-gint visible_set (glong *visible, datad *d);
+void highlight_sticky_edges (ggobid *, gint, gint , GGobiData *d, void *inst);
+gint visible_set (glong *visible, GGobiData *d);
 
-void radial_center_set_cb (ggobid *gg, gint index, gint state, datad *d, PluginInstance *inst);
+void radial_center_set_cb (ggobid *gg, gint index, gint state, GGobiData *d, PluginInstance *inst);
 
 #ifdef CMDS
 gint cmds (array_d *D, array_d *X);
-void spring_once (gint ndims, datad *d, datad *e, array_d *dist, array_d *pos);
+void spring_once (gint ndims, GGobiData *d, GGobiData *e, array_d *dist, array_d *pos);
 #endif
 
 #if defined GRAPHVIZ || defined HAVE_LIBGVC

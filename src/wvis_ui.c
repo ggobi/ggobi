@@ -32,7 +32,7 @@
 static gint xmargin = 20;
 static gint ymargin = 20;
 
-static void bin_counts_reset (gint jvar, datad *d, ggobid *gg);
+static void bin_counts_reset (gint jvar, GGobiData *d, ggobid *gg);
 static void selection_made_cb (GtkTreeSelection *tree_sel, ggobid *gg);
 
 /*--------------------------------------------------------------------*/
@@ -48,7 +48,7 @@ static void selection_made_cb (GtkTreeSelection *tree_sel, ggobid *gg);
 */
 
 static void 
-wvis_variable_notebook_adddata_cb (ggobid *gg, datad *d, void *notebook)
+wvis_variable_notebook_adddata_cb (ggobid *gg, GGobiData *d, void *notebook)
 {
   GtkWidget *swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), 0);
   if (swin) {
@@ -84,7 +84,7 @@ wvis_create_variable_notebook (GtkWidget *box, GtkSelectionMode mode,
   GtkWidget *notebook;
   gint nd = g_slist_length (gg->d);
   GSList *l;
-  datad *d;
+  GGobiData *d;
 
   /* Create a notebook, set the position of the tabs */
   notebook = gtk_notebook_new ();
@@ -98,7 +98,7 @@ wvis_create_variable_notebook (GtkWidget *box, GtkSelectionMode mode,
   g_object_set_data(G_OBJECT(notebook), "datatype", (gpointer) all_datatypes);
 
   for (l = gg->d; l; l = l->next) {
-    d = (datad *) l->data;
+    d = (GGobiData *) l->data;
     if (g_slist_length (d->vartable)) {
       variable_notebook_subwindow_add (d, func, NULL, notebook,
         all_vartypes, all_datatypes, gg);
@@ -127,7 +127,7 @@ wvis_create_variable_notebook (GtkWidget *box, GtkSelectionMode mode,
 /*-------------------------------------------------------------------------*/
 
 static void
-bin_counts_reset (gint jvar, datad *d, ggobid *gg)
+bin_counts_reset (gint jvar, GGobiData *d, ggobid *gg)
 {
   gint i, k, m;
   gfloat val;
@@ -159,7 +159,7 @@ bin_counts_reset (gint jvar, datad *d, ggobid *gg)
 }
 
 static void
-record_colors_reset (gint selected_var, datad *d, ggobid *gg)
+record_colors_reset (gint selected_var, GGobiData *d, ggobid *gg)
 {
   gint i, k, m;
   gint nd = g_slist_length(gg->d);
@@ -213,14 +213,14 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, ggobid *gg)
   gfloat val;
 
   GtkWidget *tree_view = get_tree_view_from_object (G_OBJECT (w));
-  datad *d = NULL;
+  GGobiData *d = NULL;
   gint selected_var = -1;
 
   icoords *mousepos = &gg->wvis.mousepos;
   gint color = gg->wvis.nearest_color;
 
   if(tree_view) {
-    d = (datad *) g_object_get_data(G_OBJECT (tree_view), "datad");
+    d = (GGobiData *) g_object_get_data(G_OBJECT (tree_view), "datad");
     selected_var = get_one_selection_from_tree_view (tree_view, d);
   }
 
@@ -301,11 +301,11 @@ static gint
 button_release_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg)
 {
   GtkWidget *tree_view = get_tree_view_from_object (G_OBJECT (w));
-  datad *d = NULL; 
+  GGobiData *d = NULL; 
   gint selected_var = -1;
 
   if(tree_view) {
-      d = (datad *) g_object_get_data(G_OBJECT (tree_view), "datad");
+      d = (GGobiData *) g_object_get_data(G_OBJECT (tree_view), "datad");
       selected_var = get_one_selection_from_tree_view (tree_view, d);
   }
 
@@ -344,7 +344,7 @@ da_configure_cb (GtkWidget *w, GdkEventConfigure *event, ggobid *gg)
  * such that they contain equal numbers of points.
 */ 
 static void
-bin_boundaries_set (gint selected_var, datad *d, ggobid *gg)
+bin_boundaries_set (gint selected_var, GGobiData *d, ggobid *gg)
 {
   gint k;
 
@@ -449,14 +449,14 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
   colorschemed *scheme = gg->activeColorScheme;
 
   GtkWidget *tree_view = get_tree_view_from_object (G_OBJECT (w));
-  datad *d = NULL;
+  GGobiData *d = NULL;
   gint selected_var = -1;
 
   GtkWidget *da = gg->wvis.da;
   GdkPixmap *pix = gg->wvis.pix;
 
   if(tree_view) {
-   d = (datad *) g_object_get_data(G_OBJECT (tree_view), "datad");
+   d = (GGobiData *) g_object_get_data(G_OBJECT (tree_view), "datad");
    selected_var = get_one_selection_from_tree_view (tree_view, d);
   }
 
@@ -582,7 +582,7 @@ selection_made_cb (GtkTreeSelection *tree_sel, ggobid *gg)
 {
   gboolean rval = false;
   GtkTreeView *tree_view = gtk_tree_selection_get_tree_view(tree_sel);
-  datad *d = (datad *) g_object_get_data(G_OBJECT (tree_view), "datad");
+  GGobiData *d = (GGobiData *) g_object_get_data(G_OBJECT (tree_view), "datad");
   GtkWidget *btn;
   gint row;
 
@@ -605,7 +605,7 @@ selection_made_cb (GtkTreeSelection *tree_sel, ggobid *gg)
 static void scale_apply_cb (GtkWidget *w, ggobid* gg)
 {
   GtkWidget *tree_view = get_tree_view_from_object (G_OBJECT (w));
-  datad *d = (datad *) g_object_get_data(G_OBJECT (tree_view), "datad");
+  GGobiData *d = (GGobiData *) g_object_get_data(G_OBJECT (tree_view), "datad");
   gint selected_var = get_one_selection_from_tree_view (tree_view, d);
   colorschemed *scheme = gg->activeColorScheme;
 

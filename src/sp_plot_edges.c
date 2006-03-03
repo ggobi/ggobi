@@ -28,7 +28,7 @@
 /*------------------------------------------------------------------------*/
 
 gboolean
-splot_plot_edge (gint m, datad *d, datad *e,
+splot_plot_edge (gint m, GGobiData *d, GGobiData *e,
   splotd *sp, displayd *display, ggobid *gg)
 {
   gint a, b;
@@ -68,7 +68,7 @@ splot_plot_edge (gint m, datad *d, datad *e,
 }
 
 gboolean
-splot_hidden_edge (gint m, datad *d, datad *e,
+splot_hidden_edge (gint m, GGobiData *d, GGobiData *e,
   splotd *sp, displayd *display, ggobid *gg)
 {
   gint a, b;
@@ -104,15 +104,15 @@ splot_edges_draw (splotd *sp, gboolean draw_hidden, GdkDrawable *drawable,
   gint k, n, p, pp;
   gint a, b;
   displayd *display = (displayd *) sp->displayptr;
-  datad *d = display->d;
-  datad *e = display->e;
+  GGobiData *d = display->d;
+  GGobiData *e = display->e;
   endpointsd *endpoints;
   gboolean edges_show_p, arrowheads_show_p;
   gint lwidth, ltype;
   GlyphType gtype;
   colorschemed *scheme = gg->activeColorScheme;
 
-  if (e == (datad *) NULL || e->edge.n == 0) {
+  if (e == (GGobiData *) NULL || e->edge.n == 0) {
 /**/return;
   }
  
@@ -314,8 +314,8 @@ splot_add_edge_highlight_cue (splotd *sp, GdkDrawable *drawable, gint k,
   gboolean nearest, ggobid *gg)
 {
   displayd *dsp = (displayd *) sp->displayptr;
-  datad *d = dsp->d;
-  datad *e = dsp->e;
+  GGobiData *d = dsp->d;
+  GGobiData *e = dsp->e;
   gint a, b;
   endpointsd *endpoints;
   colorschemed *scheme = gg->activeColorScheme;
@@ -360,8 +360,8 @@ splot_add_edge_label (splotd *sp, GdkDrawable *drawable, gint k,
 {
   gchar *lbl;
   displayd *dsp = (displayd *) sp->displayptr;
-  datad *d = dsp->d;
-  datad *e = dsp->e;
+  GGobiData *d = dsp->d;
+  GGobiData *e = dsp->e;
   gint xp, yp;
   gint a, b;
   endpointsd *endpoints;
@@ -405,7 +405,7 @@ splot_add_identify_edge_cues (splotd *sp, GdkDrawable *drawable, gint k,
   gboolean nearest, ggobid *gg)
 {
   displayd *dsp = (displayd *) sp->displayptr;
-  datad *e = dsp->e;
+  GGobiData *e = dsp->e;
   gboolean useDefault = false;
 
   if (k >= e->edge.n) return;

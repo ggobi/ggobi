@@ -9,6 +9,7 @@ XML_UTILS=@XML_UTILS@
 UTILS=$(XML_UTILS:%=$(TOP)/bin/%)
 
 SRC=\
+  ggobi-data.c \
   @XML_SRC@ \
   array.c \
   ash1d.c \
@@ -25,7 +26,6 @@ SRC=\
   color.c \
   color_ui.c \
   cpanel.c \
-  datad.c \
   dbms.c \
   dbms_ui.c \
   display.c \
@@ -138,6 +138,11 @@ ifdef USE_XML
 # -lxml2
 endif
 
+%.c: ggobi-data.c
+
+ggobi-data.c ggobi-data.h ggobi-data-private.h: data.gob
+	gob2 $<
+
 ifdef USE_DBMS
  SRC+= dbms.c dbms_ui.c
 endif
@@ -182,7 +187,7 @@ libs:
 	@echo "$(LIBS)"
 
 clean:
-	for f in $(OBJ) ggobiMain.o xmlConvert.o marshal.c marshal.h; do \
+	for f in $(OBJ) ggobiMain.o xmlConvert.o marshal.c marshal.h ggobi-data*; do \
 	  if test -f $$f ; then rm $$f ; fi \
 	done
 

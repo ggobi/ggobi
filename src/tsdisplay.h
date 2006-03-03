@@ -60,7 +60,7 @@ typedef  struct {
 #define GGOBI_TIME_SERIES_DISPLAY_GET_CLASS(obj)  		(G_TYPE_INSTANCE_GET_CLASS ((obj), GGOBI_TYPE_TIME_SERIES_DISPLAY, GGobiTimeSeriesDisplayClass))
 
 GType ggobi_time_series_display_get_type();
-displayd *ggobi_time_series_display_new(gint type, gboolean missing_p, datad *d, ggobid *gg);
+displayd *ggobi_time_series_display_new(gint type, gboolean missing_p, GGobiData *d, ggobid *gg);
 
 typedef struct 
 {
@@ -78,17 +78,17 @@ typedef struct _timeSeriesDisplayd {
 
 
  /* Making these available to ggobiClass.c */
-displayd *timeSeriesDisplayCreate(gboolean missing_p, splotd *sp, datad *d, ggobid *gg);
-gint tsplotIsVarPlotted(displayd *display, gint *cols, gint ncols, datad *d);
+displayd *timeSeriesDisplayCreate(gboolean missing_p, splotd *sp, GGobiData *d, ggobid *gg);
+gint tsplotIsVarPlotted(displayd *display, gint *cols, gint ncols, GGobiData *d);
 gboolean tsplotCPanelSet(displayd *dpy, cpaneld *cpanel, ggobid *gg);
 void tsplotDisplaySet(displayd *dpy, ggobid *gg);
-void tsplotVarpanelRefresh(displayd *display, splotd *sp, datad *d);
+void tsplotVarpanelRefresh(displayd *display, splotd *sp, GGobiData *d);
 gboolean tsplotHandlesProjection(displayd *dpy, ProjectionMode mode);
 gboolean tsplotHandlesInteraction(displayd *, InteractionMode);
 
 void add_xml_tsplot_variables(xmlNodePtr node, GList *plots, displayd *dpy);
 void tsplotVarpanelTooltipsSet(displayd *dpy, ggobid *gg, GtkWidget *wx, GtkWidget *wy, GtkWidget *wz, GtkWidget *label);
-gint tsplotPlottedColsGet(displayd *display, gint *cols, datad *d, ggobid *gg);
+gint tsplotPlottedColsGet(displayd *display, gint *cols, GGobiData *d, ggobid *gg);
 
 //GtkWidget *tsplotMenusMake(displayd *dpy, ggobid *gg);
 
@@ -96,10 +96,10 @@ GtkWidget *tsplotCPanelWidget(displayd *dpy, gchar **modeName, ggobid *gg);
 
 gboolean tsplotEventHandlersToggle(displayd *dpy, splotd *sp, gboolean state, ProjectionMode, InteractionMode imode);
 gboolean tsplotKeyEventHandled(GtkWidget *, displayd *, splotd *sp, GdkEventKey *, ggobid *);
-gchar *tsplot_tree_label(splotd *sp, datad *d, ggobid *gg);
+gchar *tsplot_tree_label(splotd *sp, GGobiData *d, ggobid *gg);
 
-GdkSegment * tsplotAllocWhiskers(displayd *dpy, splotd *sp, gint nrows, datad *d);
-void tsplotAddPlotLabels(displayd *display, splotd *sp, GdkDrawable *drawable, datad *d, ggobid *gg);
+GdkSegment * tsplotAllocWhiskers(displayd *dpy, splotd *sp, gint nrows, GGobiData *d);
+void tsplotAddPlotLabels(displayd *display, splotd *sp, GdkDrawable *drawable, GGobiData *d, ggobid *gg);
 
 
 

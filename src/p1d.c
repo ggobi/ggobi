@@ -43,7 +43,7 @@ p1d_activate (gint state, displayd *display, ggobid *gg)
 {
   GList *slist;
   splotd *sp;
-  datad *d = display->d;
+  GGobiData *d = display->d;
 
   if (state) {
     for (slist = display->splots; slist; slist = slist->next) {
@@ -70,7 +70,7 @@ p1d_activate (gint state, displayd *display, ggobid *gg)
 
 
 void
-p1d_spread_var (displayd *display, gfloat *yy, splotd *sp, datad *d,
+p1d_spread_var (displayd *display, gfloat *yy, splotd *sp, GGobiData *d,
   ggobid *gg)
 {
 /*
@@ -119,7 +119,7 @@ p1d_spread_var (displayd *display, gfloat *yy, splotd *sp, datad *d,
 }
 
 void
-p1d_reproject (splotd *sp, greal **world_data, datad *d, ggobid *gg)
+p1d_reproject (splotd *sp, greal **world_data, GGobiData *d, ggobid *gg)
 {
 /*
  * Project the y variable down from the ncols-dimensional world_data[]
@@ -243,7 +243,7 @@ gint
 p1dcycle_func (ggobid *gg)
 {
   displayd *display = gg->current_display;
-  datad *d = gg->current_display->d;
+  GGobiData *d = gg->current_display->d;
   splotd *sp = gg->current_splot;
   cpaneld *cpanel = &display->cpanel;
 

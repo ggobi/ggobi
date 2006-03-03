@@ -53,7 +53,7 @@ typedef  struct {
 
 
 GType ggobi_scatterplot_display_get_type();
-displayd *ggobi_scatterplot_display_new(gint type, gboolean missing_p, datad *d, ggobid *gg);
+displayd *ggobi_scatterplot_display_new(gint type, gboolean missing_p, GGobiData *d, ggobid *gg);
 
 typedef struct 
 {
@@ -75,7 +75,7 @@ void scatterplotDisplayClassInit(GGobiScatterplotDisplayClass *display);
 void scatterplotDisplayInit(scatterplotDisplayd *display);
 
 
-displayd *createScatterplot(displayd *, gboolean missing_p, splotd *sp, gint numVars, gint *vars, datad *d, ggobid *gg);
+displayd *createScatterplot(displayd *, gboolean missing_p, splotd *sp, gint numVars, gint *vars, GGobiData *d, ggobid *gg);
 
 #endif
 

@@ -7,7 +7,7 @@
   Used to test the selection of variable events.
  */
 void
-test_variable_select(ggobid *gg, datad *d, gint whichVar, splotd *sp, void *val)
+test_variable_select(ggobid *gg, GGobiData *d, gint whichVar, splotd *sp, void *val)
 {
   vartabled *vartab = g_slist_nth_data(d->vartable, whichVar);
   fprintf(stderr,
@@ -17,13 +17,13 @@ test_variable_select(ggobid *gg, datad *d, gint whichVar, splotd *sp, void *val)
 }
 
 void
-test_point_move_cb(void *userData, splotd *sp, gint which, datad *d, ggobid *gg)
+test_point_move_cb(void *userData, splotd *sp, gint which, GGobiData *d, ggobid *gg)
 {
   fprintf(stderr, "Moving a point\n");fflush(stderr);
 }
 
 void
-test_brush_motion_cb(void *userData, splotd *sp, GdkEventMotion *ev, datad *d, ggobid *gg)
+test_brush_motion_cb(void *userData, splotd *sp, GdkEventMotion *ev, GGobiData *d, ggobid *gg)
 {
     fprintf(stderr, "brush motion callback (gg) %p (sp) %p (ev) %p, (userData) %s\n", 
             (void *) gg, (void *)sp, (void *)ev, (char *)userData);
@@ -54,7 +54,7 @@ CHECK_EVENT_SIGNATURE(test_variable_select, select_variable_f)
   use g_signal_connect() rather than ...._object().
  */
 void
-test_data_add_cb(ggobid *gg, datad *d, gpointer data)
+test_data_add_cb(ggobid *gg, GGobiData *d, gpointer data)
 {
   g_printerr ("(test_data_add_cb) adding datad\n");
   g_signal_connect(G_OBJECT(gg), "select_variable", G_CALLBACK(test_variable_select), "My String");
@@ -62,7 +62,7 @@ test_data_add_cb(ggobid *gg, datad *d, gpointer data)
 
 
 void
-test_sticky_points(ggobid *gg, gint index, gint state, datad *d, gpointer data)
+test_sticky_points(ggobid *gg, gint index, gint state, GGobiData *d, gpointer data)
 {
     fprintf(stderr, "[Sticky point identification] %d %s in %s\n",
 	    index, state == STICKY ? "sticky" : "unsticky", d->name);

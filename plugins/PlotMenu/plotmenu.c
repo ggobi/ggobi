@@ -23,7 +23,7 @@ gint showMenu(GtkWidget *src, GdkEvent *event, GtkMenu *menu);
 gint createParcoordsMenu(GtkWidget *menu, splotd *sp, ggobid *gg);
 gint createXYPlotMenu(GtkWidget *menu, splotd *sp, ggobid *gg);
 
-int addVariableElements(GtkWidget *menu, datad *d, splotd *sp, GtkSignalFunc f);
+int addVariableElements(GtkWidget *menu, GGobiData *d, splotd *sp, GtkSignalFunc f);
 void destroyMenu(splotd *sp, GtkWidget *menu);
 
 /*
@@ -208,7 +208,7 @@ insertParcoordsSPlot(GtkWidget *menuItem, ParCoordsPanelID *p)
 gint
 createParcoordsMenu(GtkWidget *menu, splotd *sp, ggobid *gg)
 {
-   datad *d = sp->displayptr->d;
+   GGobiData *d = sp->displayptr->d;
    GtkWidget *item, *submenu;
 
    addVariableElements(menu, d, sp, switchParCoordsVariable);
@@ -238,7 +238,7 @@ createParcoordsMenu(GtkWidget *menu, splotd *sp, ggobid *gg)
 gint
 createXYPlotMenu(GtkWidget *menu, splotd *sp, ggobid *gg)
 {
-   datad *d = sp->displayptr->d;
+   GGobiData *d = sp->displayptr->d;
    GtkWidget *el, *submenu;
 
    el = gtk_menu_item_new_with_label("X");
@@ -264,7 +264,7 @@ createXYPlotMenu(GtkWidget *menu, splotd *sp, ggobid *gg)
  and associates the callback function with each.
 */
 int
-addVariableElements(GtkWidget *menu, datad *d, splotd *sp, GtkSignalFunc f)
+addVariableElements(GtkWidget *menu, GGobiData *d, splotd *sp, GtkSignalFunc f)
 {
    vartabled *el;
    GtkWidget *item;

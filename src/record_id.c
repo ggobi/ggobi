@@ -24,26 +24,26 @@
 /*                   Memory allocation, initialization                */
 /*--------------------------------------------------------------------*/
 
-void rowids_init_null (datad *d)
+void rowids_init_null (GGobiData *d)
 {
   vectori_init_null (&d->rowid.id);
   vectori_init_null (&d->rowid.idv);
   d->rowid.maxId = -1;
 }
 
-void rowids_free (datad *d)
+void rowids_free (GGobiData *d)
 {
   vectori_free (&d->rowid.id);
 }
 
 void
-rowids_alloc (datad *d) 
+rowids_alloc (GGobiData *d) 
 {
   vectori_alloc (&d->rowid.id, d->nrows);
 }
 
 void
-rowidv_init (datad *d) 
+rowidv_init (GGobiData *d) 
 {
   gint i, k;
 

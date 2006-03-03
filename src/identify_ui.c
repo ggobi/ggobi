@@ -46,7 +46,7 @@ static void identify_target_cb (GtkWidget *w, ggobid *gg)
 static void
 recenter_cb (GtkWidget *w, ggobid *gg)
 {
-  datad *d = gg->current_display->d;
+  GGobiData *d = gg->current_display->d;
   gint k = -1;
   if (g_slist_length (d->sticky_ids) >= 1) {
     k = GPOINTER_TO_INT (d->sticky_ids->data);
@@ -59,7 +59,7 @@ id_remove_labels_cb (GtkWidget *w, ggobid *gg)
 {
   displayd *dsp = gg->current_display;
   cpaneld *cpanel = &gg->current_display->cpanel;
-  datad *d;
+  GGobiData *d;
   gboolean ok = true;
 
   if (cpanel->id_target_type == identify_points)
@@ -84,7 +84,7 @@ static void
 id_all_sticky_cb (GtkWidget *w, ggobid *gg)
 {
   gint i, m;
-  datad *d = NULL;
+  GGobiData *d = NULL;
   displayd *dsp = gg->current_display;
   cpaneld *cpanel = &dsp->cpanel;
 
@@ -162,7 +162,7 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
 {
   gint k;
   ggobid *gg = GGobiFromSPlot(sp);
-  datad *d = gg->current_display->d;
+  GGobiData *d = gg->current_display->d;
   gboolean button1_p, button2_p;
   gint nd = g_slist_length (gg->d);
   cpaneld *cpanel = &gg->current_display->cpanel;
@@ -177,7 +177,7 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
  
   if (GGOBI_IS_EXTENDED_SPLOT(sp)) {
     gboolean changed;
-    gboolean (*f)(icoords, splotd *sp, datad *, ggobid *);
+    gboolean (*f)(icoords, splotd *sp, GGobiData *, ggobid *);
 
     f = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp)->identify_notify;
     if(f) {
@@ -220,7 +220,7 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
       }
     }
   } else {
-    datad *e = gg->current_display->e;
+    GGobiData *e = gg->current_display->e;
     if (e && e->edge.n) {
       k = find_nearest_edge (sp, gg->current_display, gg);
       e->nearest_point = k;
@@ -250,7 +250,7 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   ggobid *gg = GGobiFromSPlot(sp);
   displayd *dsp = sp->displayptr;
   cpaneld *cpanel = &dsp->cpanel;
-  datad *d;
+  GGobiData *d;
 
   if (cpanel->id_target_type == identify_edges) {
     if (dsp->e != NULL) d = dsp->e;
@@ -298,7 +298,7 @@ static const gchar *label_prefices[] = {
 	"<i>Record Number</i>"
 };
 
-static const gchar **label_prefix_func(GtkWidget *notebook, datad *d, gint *sel_prefix, gint *n_prefices)
+static const gchar **label_prefix_func(GtkWidget *notebook, GGobiData *d, gint *sel_prefix, gint *n_prefices)
 {
   gint offset = d->rowIds ? 0 : 1;
   *n_prefices = G_N_ELEMENTS(label_prefices) - offset;
@@ -420,7 +420,7 @@ static void
 notebook_current_page_set (displayd *display, GtkWidget *notebook, ggobid *gg)
 {
   GtkWidget *swin;
-  datad *d = display->d, *paged;
+  GGobiData *d = display->d, *paged;
   gint page_num, cur_page_num;
 
   if (notebook == NULL) {
@@ -435,7 +435,7 @@ notebook_current_page_set (displayd *display, GtkWidget *notebook, ggobid *gg)
   page_num = 0;
   swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK(notebook), page_num);
   while (swin) {
-    paged = (datad *) g_object_get_data (G_OBJECT (swin), "datad");
+    paged = (GGobiData *) g_object_get_data (G_OBJECT (swin), "datad");
 
     //gtk_widget_set_sensitive (swin, (paged == d));
     if (paged == d) {

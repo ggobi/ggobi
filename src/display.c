@@ -170,7 +170,7 @@ set_display_option(gboolean active, guint action, displayd *display)
   ggobid *gg = display->ggobi;
   gchar *title;
   gint ne = 0;
-  datad *onlye = NULL;
+  GGobiData *onlye = NULL;
 
   g_return_if_fail(GGOBI_IS_DISPLAY(display));
   
@@ -179,10 +179,10 @@ set_display_option(gboolean active, guint action, displayd *display)
       action == DOPT_EDGES_A || action == DOPT_EDGES_H )
   {
     gint k, nd = g_slist_length (gg->d);
-    datad *e;
+    GGobiData *e;
     if (display->d->rowIds) {
       for (k=0; k<nd; k++) { 
-        e = (datad*) g_slist_nth_data (gg->d, k);
+        e = (GGobiData*) g_slist_nth_data (gg->d, k);
         if (e->edge.n > 0) {
           ne++;
           onlye = e;  /* meaningful if there's only one */
@@ -473,13 +473,13 @@ display_delete_cb (GtkWidget *w, GdkEvent *event, displayd *display)
  This display class is really a virtual class.
 */
 displayd *
-ggobi_display_new(gboolean missing_p, datad *d, ggobid *gg)
+ggobi_display_new(gboolean missing_p, GGobiData *d, ggobid *gg)
 {
   return(display_alloc_init(missing_p, d, gg));
 }
 
 void
-display_set_values(displayd *display, datad *d, ggobid *gg)
+display_set_values(displayd *display, GGobiData *d, ggobid *gg)
 {
   /* Should copy in the contents of DefaultOptions to create
      an indepedently modifiable configuration copied from
@@ -492,7 +492,7 @@ display_set_values(displayd *display, datad *d, ggobid *gg)
 }
 
 displayd *
-display_alloc_init (gboolean missing_p, datad *d, ggobid *gg)
+display_alloc_init (gboolean missing_p, GGobiData *d, ggobid *gg)
 {
   displayd *display;
 
@@ -882,9 +882,9 @@ display_tailpipe (displayd *display, RedrawStyle type, ggobid *gg)
         sp == gg->current_splot &&
         imode_get (gg) == BRUSH)
     {
-      datad *d = display->d;
+      GGobiData *d = display->d;
       if (GGOBI_IS_EXTENDED_SPLOT(sp)) {
-        void (*f)(datad *, splotd *, ggobid *);
+        void (*f)(GGobiData *, splotd *, ggobid *);
         GGobiExtendedSPlotClass *klass;
         klass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);
         f = klass->splot_assign_points_to_bins;

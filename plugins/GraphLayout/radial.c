@@ -14,11 +14,11 @@
 #include "glayout.h"
 
 static void initRadialLayout (glong *vis, gint nvis, ggobid *gg, glayoutd *gl);
-static gboolean setParentNodes (glayoutd *gl, datad *d);
-static void setNChildren (glayoutd *gl, datad *d);
-static gint setSubtreeSize (noded *, glayoutd *, datad *);
-static void setSubtreeSpans (glayoutd *, datad *);
-static void setNodePositions (glayoutd *, datad *);
+static gboolean setParentNodes (glayoutd *gl, GGobiData *d);
+static void setNChildren (glayoutd *gl, GGobiData *d);
+static gint setSubtreeSize (noded *, glayoutd *, GGobiData *);
+static void setSubtreeSpans (glayoutd *, GGobiData *);
+static void setNodePositions (glayoutd *, GGobiData *);
 
 /*-- utility --*/
 /*
@@ -72,7 +72,7 @@ void list_clear (GList *ab)
 
 /* unused */
 gboolean
-hasPathToCenter (noded *n, noded *referringnode, datad *d, datad *e,
+hasPathToCenter (noded *n, noded *referringnode, GGobiData *d, GGobiData *e,
   PluginInstance *inst)
 {
   gboolean hasPath = false;
@@ -138,22 +138,22 @@ void radial_new_data_cb (GtkToggleButton *btn, PluginInstance *inst)
 }
 
 
-void do_radial(glayoutd *gl, datad *d, datad *e, displayd *dsp, ggobid *gg);
+void do_radial(glayoutd *gl, GGobiData *d, GGobiData *e, displayd *dsp, ggobid *gg);
 void 
 radial_cb (GtkButton *button, PluginInstance *inst)
 {
   ggobid *gg = inst->gg;
   glayoutd *gl = glayoutFromInst (inst);
   displayd *dsp = gg->current_display;
-  datad *d = gl->dsrc;
-  datad *e = gl->e;
+  GGobiData *d = gl->dsrc;
+  GGobiData *e = gl->e;
 
   do_radial(gl, d, e, dsp, gg);
 }
 
 
 void 
-do_radial(glayoutd *gl, datad *d, datad *e, displayd *dsp, ggobid *gg)
+do_radial(glayoutd *gl, GGobiData *d, GGobiData *e, displayd *dsp, ggobid *gg)
 {
   glong *visible;
   gint nvisible;
@@ -166,7 +166,7 @@ do_radial(glayoutd *gl, datad *d, datad *e, displayd *dsp, ggobid *gg)
 /*-- to add the new datad --*/
   gint m, nc;
   InputDescription *desc = NULL;
-  datad *dnew;
+  GGobiData *dnew;
   gdouble *values;
   gchar **rownames, **colnames, **rowids;
   displayd *dspnew;
@@ -332,7 +332,7 @@ do_radial(glayoutd *gl, datad *d, datad *e, displayd *dsp, ggobid *gg)
       gl->d->nrows == nvisible && gl->d->ncols == 8)
   {
     gint j;
-    datad *d = gl->d;
+    GGobiData *d = gl->d;
 
     j = GGOBI(getVariableIndex)("x", d, gg);
     for (i=0; i<d->nrows; i++)
@@ -442,7 +442,7 @@ do_radial(glayoutd *gl, datad *d, datad *e, displayd *dsp, ggobid *gg)
 }
 
 void radial_center_set_cb (ggobid *gg, gint index,
-  gint state, datad *d, PluginInstance *inst)
+  gint state, GGobiData *d, PluginInstance *inst)
 {
   glayoutd *gl = glayoutFromInst (inst);
   GtkWidget *entry;
@@ -483,13 +483,13 @@ CHECK_EVENT_SIGNATURE(radial_highlight_sticky_edges, sticky_point_added_f)
 CHECK_EVENT_SIGNATURE(radial_highlight_sticky_edges, sticky_point_removed_f)
 
 static void radial_highlight_sticky_edges (ggobid *gg, gint index, gint state,
-  datad *d, void *data);
+  GGobiData *d, void *data);
 void radial_highlight_sticky_edges (ggobid *gg, gint index, gint state,
-  datad *d, void *data)
+  GGobiData *d, void *data)
 {
   PluginInstance *inst = (PluginInstance *)data;
   glayoutd *gl = glayoutFromInst (inst);
-  datad *e = gl->e;
+  GGobiData *e = gl->e;
   noded *n, *n1;
   GList *l, *connectedNodes, *connectedEdges;
   gint k;
@@ -554,7 +554,7 @@ void radial_highlight_sticky_edges (ggobid *gg, gint index, gint state,
 
 /*-- highlighting code that isn't peculiar to radial layouts --*/
 void highlight_sticky_edges (ggobid *gg, gint index, gint state,
-  datad *d, void *data)
+  GGobiData *d, void *data)
 {
 }
 
@@ -567,8 +567,8 @@ static void
 initRadialLayout (glong *visible, gint nvisible, ggobid *gg,
   glayoutd *gl)
 {
-  datad *d = gl->dsrc;
-  datad *e = gl->e;
+  GGobiData *d = gl->dsrc;
+  GGobiData *e = gl->e;
   gint i;
   noded *na, *nb;
   gint nedges = e->edge.n;
@@ -653,7 +653,7 @@ initRadialLayout (glong *visible, gint nvisible, ggobid *gg,
 }
 
 void
-setNStepsToCenter (noded *n, noded *prevNeighbor, datad *d) {
+setNStepsToCenter (noded *n, noded *prevNeighbor, GGobiData *d) {
   noded *n1;
   gint nsteps = n->nStepsToCenter + 1;
   GList *l;
@@ -681,7 +681,7 @@ setNStepsToCenter (noded *n, noded *prevNeighbor, datad *d) {
  * nStepsToCenter and parent node for each node.
 */
 gboolean
-setParentNodes (glayoutd *gl, datad *d) {
+setParentNodes (glayoutd *gl, GGobiData *d) {
   gint i;
   noded *n;
   gboolean nvisible_ok = true;
@@ -710,7 +710,7 @@ setParentNodes (glayoutd *gl, datad *d) {
 }
 
 
-void setNChildren (glayoutd *gl, datad *d)
+void setNChildren (glayoutd *gl, GGobiData *d)
 {
   gint i;
   noded *n;
@@ -761,7 +761,7 @@ childNodes (GList **children, noded *n) {
  * Work out from the center ...
 */
 gint
-setSubtreeSize (noded *n, glayoutd *gl, datad *d) {
+setSubtreeSize (noded *n, glayoutd *gl, GGobiData *d) {
   noded *nchild;
   GList *l, *children = NULL;
 
@@ -789,7 +789,7 @@ setSubtreeSize (noded *n, glayoutd *gl, datad *d) {
 /*---------------------------------------------------------------------*/
 
 static void
-setChildSubtreeSpans (noded *n, glayoutd *gl, datad *d)
+setChildSubtreeSpans (noded *n, glayoutd *gl, GGobiData *d)
 {
   noded *nchild;
   GList *l, *children = NULL;
@@ -815,7 +815,7 @@ setChildSubtreeSpans (noded *n, glayoutd *gl, datad *d)
 
 
 void
-setSubtreeSpans (glayoutd *gl, datad *d) {
+setSubtreeSpans (glayoutd *gl, GGobiData *d) {
   gl->radial->centerNode->span = 2*M_PI;
   setChildSubtreeSpans (gl->radial->centerNode, gl, d);
 }
@@ -824,7 +824,7 @@ setSubtreeSpans (glayoutd *gl, datad *d) {
 
 /* Set the node positions for the 2nd and later rings. */
 static void
-setChildNodePositions (noded *n, glayoutd *gl, datad *d)
+setChildNodePositions (noded *n, glayoutd *gl, GGobiData *d)
 {
   gint i;
   noded *nchild;
@@ -880,7 +880,7 @@ setChildNodePositions (noded *n, glayoutd *gl, datad *d)
 
 
 void
-setNodePositions (glayoutd *gl, datad *d) {
+setNodePositions (glayoutd *gl, GGobiData *d) {
 
   /* Set the position of the center node */
   gl->radial->centerNode->pos.x = 0;
@@ -891,7 +891,7 @@ setNodePositions (glayoutd *gl, datad *d) {
 }
 
 void
-do_radial_plugin (PluginInstance *inst, gint center, datad *d, datad *e, displayd *dsp, ggobid *gg)
+do_radial_plugin (PluginInstance *inst, gint center, GGobiData *d, GGobiData *e, displayd *dsp, ggobid *gg)
 {
    glayoutd *gl;
    gl = glayoutFromInst (inst);
@@ -919,7 +919,7 @@ USER_OBJECT_
 S_radial_cb(USER_OBJECT_ plugin, USER_OBJECT_ centerNode, USER_OBJECT_ data, 
               USER_OBJECT_ edges, USER_OBJECT_ display)
 {
-   datad *d, *e;
+   GGobiData *d, *e;
    glayoutd *gl;
    ggobid *gg;
    PluginInstance *inst;
@@ -938,8 +938,8 @@ S_radial_cb(USER_OBJECT_ plugin, USER_OBJECT_ centerNode, USER_OBJECT_ data,
    gl->centerNodeIndex = INTEGER_DATA(centerNode)[0];
 
    gg = inst->gg;
-   gl->dsrc = d = (datad *) R_ExternalPtrAddr(data);
-   gl->e = e = (datad *) R_ExternalPtrAddr(edges);
+   gl->dsrc = d = (GGobiData *) R_ExternalPtrAddr(data);
+   gl->e = e = (GGobiData *) R_ExternalPtrAddr(edges);
 
    dsp = (displayd *) R_ExternalPtrAddr(data);
 
