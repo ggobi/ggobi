@@ -210,40 +210,11 @@ class GGobi:Data from G:Object {
      
   signal private NONE (INT, INT, POINTER) void rows_in_plot_changed(self, int arg1, int arg2, ggobid* arg3);
   
-  /* technically, this entire function is not necessary, 
-    since GObject clears the mem already and most won't even be fields - Michael */
   init (self) {
-    arrayf_init_null(&self->raw);
-    arrayf_init_null(&self->tform);
-    arrayg_init_null(&self->world);
-    arrayg_init_null(&self->jitdata);
-    arrays_init_null(&self->missing);
-
-    vectori_init_null(&self->clusterid);
-
-    /*-- brushing and linking --*/
-    vectorb_init_null(&self->edge.xed_by_brush);
-
-    /*-- linking by categorical variable --*/
-    self->linkvar_vt = NULL;
-
-    /* necessary? memset(&self->vcbox_ui, '\0', sizeof(struct _Varpanel_cboxd)); */
-    
-    /* only useful thing is setting 'vars_stdized' to TRUE, but that's not going to be a field anyway */
     sphere_init(self); 
-    
-    self->rowIds = NULL;
-    self->idTable = NULL;
-    
-    /* sets some fields to non-NULL, but again, this should be an attribute */
-    jitter_vars_init (self);
-    
-    /* won't be fields */
-    self->nclusters = 0;
+
     self->nearest_point = -1;
     self->missings_show_p = true;
-    
-    vectori_init_null (&self->rows_in_plot);
   }
   
   override (G:Object) GObject*
