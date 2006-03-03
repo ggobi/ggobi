@@ -256,6 +256,7 @@ class GGobi:Data from G:Object {
     d->nrows_in_plot = d->nrows;  /*-- for now --*/
 
 	  arrayf_alloc (&d->raw, d->nrows, d->ncols); //FIXME: probably leaks memory
+	  arrays_alloc_zero (&d->missing, d->nrows, d->ncols);
 
     rowlabels_alloc (d);
 

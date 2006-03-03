@@ -374,9 +374,6 @@ static void load_row_values(GList *rows, GGobiData *d, gboolean row_labels)
 	gint i, j, offset = (row_labels ? 1 : 0);
 	GList *cur;
 	
-	/* Initialize short array */
-	arrays_alloc_zero (&d->missing, d->nrows, d->ncols);
-	
 	for (j = 0; j < d->ncols; j++) {
 		GHashTable *hash = g_hash_table_new((GHashFunc)g_str_hash, (GEqualFunc)g_str_equal);
 		vartabled *vt = vartable_element_get (j, d);
