@@ -374,8 +374,6 @@ static void load_row_values(GList *rows, GGobiData *d, gboolean row_labels)
 	gint i, j, offset = (row_labels ? 1 : 0);
 	GList *cur;
 	
-	/* Initialize floating point array */
-	arrayf_alloc (&d->raw, d->nrows, d->ncols);
 	/* Initialize short array */
 	arrays_alloc_zero (&d->missing, d->nrows, d->ncols);
 	
