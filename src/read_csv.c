@@ -352,7 +352,6 @@ static void load_column_labels(Row *row, datad *d, gboolean row_labels)
 
 static void load_row_labels(GList *rows, datad *d, gboolean has_labels) {
 	gint i;
-	rowlabels_alloc (d);
 	for (i = 0; rows; rows = g_list_next(rows), i++) {
 		gchar *label;
 		if (has_labels) {
@@ -443,10 +442,6 @@ create_data(GList *rows, gchar* name)
 	/* Initialize datad structure */
   d = ggobi_data_new(nrows - 1, ncols);
   name_set(d, name);
-	
-	/* Initialize vartable */
-  vartable_alloc(d);
-  vartable_init(d);
 	
 	load_column_labels((Row *)rows->data, d, row_labels);
 

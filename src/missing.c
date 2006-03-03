@@ -114,8 +114,6 @@ void missings_datad_cb (GtkWidget *w, ggobid *gg)
  * the future, we might want to support other categories:  censored,
  * left-censored, etc.
 */
-    vartable_alloc (dnew);
-    vartable_init (dnew);
     for (j=0; j<ncols_with_missings; j++) {
       k = cols_with_missings[j];
       vt = vartable_element_get (k, d);
@@ -145,7 +143,6 @@ void missings_datad_cb (GtkWidget *w, ggobid *gg)
       vtnew->jitter_factor = .2;
     }
 
-    rowlabels_alloc (dnew);
     for (i=0; i<d->nrows; i++) {
       g_array_append_val (dnew->rowlab, g_array_index (d->rowlab, gchar *, i));
     }
