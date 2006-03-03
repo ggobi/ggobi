@@ -22,7 +22,6 @@ SRC=\
   brush_init.c \
   brush_link.c \
   brush_ui.c \
-  cokus.c \
   color.c \
   color_ui.c \
   cpanel.c \
@@ -58,7 +57,6 @@ SRC=\
   missing.c \
   movepts.c \
   movepts_ui.c \
-  mt19937ar.c \
   noop-toggle.c \
   p1d.c \
   p1d_ui.c \

@@ -36,19 +36,6 @@
 extern "C" {
 #endif
 
-/*
- * We can either use the Mersenne Twister code in mt19937-1.c
- * or the rewrite by Shawn Cokus in cokus.c.
-*/
-#undef COKUS
-#ifdef COKUS
-extern void seedMT(guint32);
-extern guint32 randomMT(void);
-#else
-extern void init_genrand (unsigned long);
-extern double genrand_real1 (void);
-#endif
-
 #ifdef __cplusplus
 }
 #endif
@@ -58,36 +45,18 @@ sqdist (gint x1, gint y1, gint x2, gint y2) {
   return ((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1));
 }
 
-void
-init_random_seed () {
-#ifdef COKUS
-  seedMT ((guint32) time ((glong *) 0));
-#else
-  init_genrand ((glong) time ((glong *) 0));
-#endif
-}
-
 
 /* returns a random number on [0.0,1.0] */
 gdouble
 randvalue (void) {
-#ifdef COKUS
-  return (.5 * (gdouble) randomMT() / (gdouble) MAXLONG);
-#else
-  return (genrand_real1 ());   
-#endif
+  return g_random_double();
 }
 
 /*-- returns two random numbers on [-1,1] --*/
 void
 rnorm2 (gdouble *drand, gdouble *dsave) {
-#ifdef COKUS
-  *drand = (gdouble) randomMT () / (gdouble) MAXLONG - 1.0;
-  *dsave = (gdouble) randomMT () / (gdouble) MAXLONG - 1.0;
-#else
-  *drand = 2.0 * genrand_real1 () - 1.0;
-  *dsave = 2.0 * genrand_real1 () - 1.0;
-#endif
+  *drand = g_random_double_range(-1, 1);
+  *dsave = g_random_double_range(-1, 1);
 }
 
 gint
