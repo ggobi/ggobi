@@ -725,13 +725,6 @@ action_store_session_cb(GtkAction *action, ggobid *gg)
 {
 	store_session(gg);
 }
-#ifdef PRINTING_IMPLEMENTED
-static void
-action_print_cb(GtkAction *action, ggobid *gg)
-{
-	display_write_svg(gg);
-}
-#endif
 static void
 action_close_cb(GtkAction *action, ggobid *gg)
 {
@@ -866,10 +859,6 @@ static const gchar *main_ui_str =
 "			<separator/>"
 "			<menuitem action='StoreSession'/>"
 #endif
-#ifdef PRINTING_IMPLEMENTED
-"			<separator/>"
-"			<menuitem action='Print'/>"
-#endif
 "			<separator/>"
 "			<menu action='Options'>"
 "				<menuitem action='ShowTooltips'/>"
@@ -921,9 +910,6 @@ static GtkActionEntry entries[] = {
 	{ "StoreSession", GTK_STOCK_GOTO_BOTTOM, "Store Session", NULL, "Save this GGobi session", 
 		G_CALLBACK(action_store_session_cb) 
 	},
-	#ifdef PRINTING_IMPLEMENTED
-	{ "Print", GTK_STOCK_PRINT, "_Print", NULL, "Print the current display", G_CALLBACK(action_print_cb) },
-	#endif
 	{ "Close", GTK_STOCK_CLOSE, "_Close", "<control>C", "Close this GGobi instance", G_CALLBACK(action_close_cb) },
 	{ "Quit", GTK_STOCK_QUIT, "_Quit", "<control>Q", "Quit GGobi", G_CALLBACK(action_quit_cb) },
 	
