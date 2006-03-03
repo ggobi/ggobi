@@ -217,8 +217,6 @@ extern "C" {
 
   datad *getCurrentXMLData(XMLParserData * parserData);
 
-  gboolean readXMLRecord(const xmlChar ** attrs, XMLParserData * data);
-
   gchar * intern(XMLParserData *, const char * el);
 
 #ifdef __cplusplus

@@ -1005,9 +1005,7 @@ getAttribute(const xmlChar **attrs, gchar *name)
 gboolean 
 newRecord(const xmlChar **attrs, XMLParserData *data)
 {
-  datad *d = getCurrentXMLData(data);
-
-  d->readXMLRecord(attrs, data);
+  readXMLRecord(attrs, data);
 
   return(true);
 }
@@ -1945,7 +1943,6 @@ setDataset(const xmlChar **attrs, XMLParserData *parserData, enum xmlDataState t
   //data = ggobi_data_new(parserData->gg);
   data = ggobi_data_new(0, 0);
   
-  data->readXMLRecord = readXMLRecord;
   parserData->counterVariableIndex = -1;
 
   tmp = getAttribute(attrs, (gchar *) "name");
