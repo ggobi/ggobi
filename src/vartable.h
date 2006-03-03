@@ -31,7 +31,7 @@ typedef enum {real, categorical, integer, counter, uniform,  all_vartypes} varty
  * this structure.
 */
 typedef struct {
- struct _datad *d;  /*-- I want a pointer back to its parent datad --*/
+ GObject *d;  /*-- the parent datad --*/
 
  gchar *collab, *collab_tform;
  gchar *nickname;   /*-- very short name to use in tour axis labels --*/

@@ -239,7 +239,7 @@ vartable_element_new (GGobiData *d)
 {
   vartabled *vt = (vartabled *) g_malloc (sizeof (vartabled));
 
-  vt->d = (GGobiData *) d;
+  vt->d = G_OBJECT(d);
 
   vt->selected = false;
   vt->nmissing = 0;

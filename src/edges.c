@@ -382,7 +382,7 @@ do_resolveEdgePoints(GGobiData *e, GGobiData *d, gboolean compute)
   /* Get the entry in the table for this dataset (d). Use the name for now. */
   for(tmp = e->edge.endpointList; tmp ; tmp = tmp->next) {
      ptr = (DatadEndpoints *) tmp->data;
-     if(ptr->data == d) {
+     if(GGOBI_DATA(ptr->data) == d) {
        ans = ptr->endpoints;
        break;
      }
@@ -401,7 +401,7 @@ g_printerr ("   creating a new match\n");
 */
     ans = computeResolvedEdgePoints(e, d);
     ptr = (DatadEndpoints *) g_malloc(sizeof(DatadEndpoints));
-    ptr->data = d;
+    ptr->data = G_OBJECT(d);
     ptr->endpoints = ans; /* (ans == &DegenerateEndpoints) ? NULL : ans; */
 /*
 g_printerr ("   %d %d\n", ptr->endpoints[0].a, ptr->endpoints[0].b);
@@ -465,7 +465,7 @@ unresolveEdgePoints(GGobiData *e, GGobiData *d)
 
   for(tmp = e->edge.endpointList; tmp ; tmp = tmp->next) {
      ptr = (DatadEndpoints *) tmp->data;
-     if(ptr->data == d) {
+     if(GGOBI_DATA(ptr->data) == d) {
        if(ptr->endpoints)
           g_free(ptr->endpoints);
 
