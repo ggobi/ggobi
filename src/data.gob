@@ -1,0 +1,93 @@
+class GGobi:Data from G:Object {
+  %h{
+    #include "vars.h"
+    #include "externs.h"
+  }
+  
+  private guint nrows = 0;
+  property UINT nrows 
+    (nick = "nrows", blurb = "Number of rows in the dataset",
+     minimum = 0, maximum = INT_MAX, default_value = 0,
+     flags = CONSTRUCT_ONLY | READABLE, link, export)
+  private int ncols;
+  property UINT ncols 
+    (nick = "ncols", blurb = "Number of cols in the dataset",
+     minimum = 0, maximum = INT_MAX, default_value = 0,
+     flags = CONSTRUCT_ONLY | READABLE, link, export)
+     
+  signal private NONE (INT, INT, GGOBI) void rows_in_plot_changed(self);
+  
+  /* technically, this entire function is not necessary, 
+    since GObject clears the mem already and most won't even be fields - Michael */
+  init (self) {
+    arrayf_init_null(&d->raw);
+    arrayf_init_null(&d->tform);
+    arrayg_init_null(&d->world);
+    arrayg_init_null(&d->jitdata);
+    arrays_init_null(&d->missing);
+
+    vectori_init_null(&d->clusterid);
+
+    /*-- brushing and linking --*/
+    vectorb_init_null(&d->edge.xed_by_brush);
+
+    /*-- linking by categorical variable --*/
+    d->linkvar_vt = NULL;
+
+    /* necessary? memset(&d->vcbox_ui, '\0', sizeof(struct _Varpanel_cboxd)); */
+    
+    /* only useful thing is setting 'vars_stdized' to TRUE, but that's not going to be a field anyway */
+    sphere_init(d); 
+    
+    d->rowIds = NULL;
+    d->idTable = NULL;
+    
+    /* sets some fields to non-NULL, but again, this should be an attribute */
+    jitter_vars_init (d);
+    
+    /* won't be fields */
+    d->nclusters = 0;
+    d->nearest_point = -1;
+    d->missings_show_p = true;
+    
+    vectori_init_null (&d->rows_in_plot);
+  }
+  
+  override (G:Object) GObject*
+  constructor (GType type, guint n_construct_properties, GObjectConstructParam *construct_properties)
+  {
+    PARENT_HANDLER(type, n_construct_properties, construct_properties);
+    /* we can put these here OR we can put them in the setter for the 'ncols'
+       property, since we know that comes last (after 'nrows' has been set) */
+    
+    d->nrows_in_plot = d->nrows;  /*-- for now --*/
+
+    rowlabels_alloc (d);
+
+    vartable_alloc (d);
+    vartable_init (d);
+
+    br_glyph_ids_alloc (d);
+    br_glyph_ids_init (d);
+
+    br_color_ids_alloc (d);
+    br_color_ids_init (d);
+
+    br_hidden_alloc (d);
+    br_hidden_init (d);
+  }
+  
+  public datad* new(guint nrows, guint ncols)
+  {
+    datad* d = (datad*)GET_NEW_VARARG("ncols", ncols, "nrows", nrows, NULL);
+    return(d);
+  }
+  
+  /* General comments: 
+    1) the (broken) datad_free function may not be necessary, since we can specify
+       finalizers for all the fields using GOB
+    2) the (evil) datad_init function must be vanquished asap
+    3) an API needs to be defined for populating a dataset
+    ...
+  */
+}
