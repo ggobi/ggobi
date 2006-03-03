@@ -84,7 +84,7 @@ create_shepard_data_cb (GtkAction *action, PluginInstance *inst)
 
     ggv->shepard_iter++;
 
-    dnew = datad_create (n, nc, gg);
+    dnew = ggobi_data_new (n, nc);
     dnew->name = g_strdup_printf ("Shepard Plot %d", ggv->shepard_iter);
 
     GGOBI(setData) (values, rownames, colnames, n, nc, dnew,

@@ -377,7 +377,7 @@ do_radial(glayoutd *gl, datad *d, datad *e, displayd *dsp, ggobid *gg)
     tform_to_world (d, gg);
   }
   else {
-    gl->d = dnew = datad_create (nvisible, nc, gg);
+    gl->d = dnew = ggobi_data_new (nvisible, nc);
     dnew->name = g_strdup_printf ("rad:%s", 
       (gchar *) g_array_index (d->rowlab, gchar *, gl->centerNodeIndex));
     dnew->nickname = g_strdup ("rad");

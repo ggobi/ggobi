@@ -524,7 +524,7 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
   GGOBI_getSessionOptions()->info->createInitialScatterPlot = false;
   /*-- --*/
 
-  dnew = datad_create (nvisible, nc, gg);
+  dnew = ggobi_data_new (nvisible, nc);
   switch (layout_type) {
     case DOT_LAYOUT:
       dnew->name =  g_strdup ("dot");

@@ -237,7 +237,7 @@ GGOBI(mysql_warning)(const char *msg, MYSQL *conn, ggobid *gg)
   etc.
   This should go elsewhere also.
 
-  Can now use datad_create();
+  Can now use ggobi_data_new();
  */
 void
 GGOBI(setDimensions)(gint nrow, gint ncol, datad *d, ggobid *gg)

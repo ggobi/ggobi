@@ -31,7 +31,7 @@ ggv_scramble (ggvisd *ggv, ggobid *gg)
 }
 
 void
-ggv_datad_create (datad *dsrc, datad *e, displayd *dsp, PluginInstance *inst)
+ggv_ggobi_data_new (datad *dsrc, datad *e, displayd *dsp, PluginInstance *inst)
 {
   ggvisd *ggv = ggvisFromInst (inst); 
   ggobid *gg = inst->gg;
@@ -104,7 +104,7 @@ ggv_datad_create (datad *dsrc, datad *e, displayd *dsp, PluginInstance *inst)
 
   /*-- --*/
 
-  dnew = datad_create (dsrc->nrows, nc, gg);
+  dnew = ggobi_data_new (dsrc->nrows, nc);
   dnew->name = g_strdup ("MDS");
   dnew->nickname = g_strdup ("MDS");
 
@@ -303,7 +303,7 @@ mds_open_display (PluginInstance *inst)
     gint j;
     vartabled *vt;
     /*-- initialize, allocate and populate dpos --*/
-    ggv_datad_create (ggv->dsrc, ggv->e, gg->current_display, inst);
+    ggv_ggobi_data_new (ggv->dsrc, ggv->e, gg->current_display, inst);
     ggv_pos_init (ggv);
     /*-- update limits here? could force them to be -1, 1  --*/
     /*limits_set (true, true, ggv->dpos, gg);*/

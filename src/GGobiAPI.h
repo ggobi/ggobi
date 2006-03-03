@@ -1016,7 +1016,7 @@ ggobid *create_ggobi(InputDescription *desc);
 
 /**
  */
-GGOBI_EXPORT datad* datad_create(guint nr, guint nc, ggobid *gg);
+//GGOBI_EXPORT datad* ggobi_data_new(guint nr, guint nc);
 
 
 void GGobi_setSessionOptions(GGobiOptions *opts);

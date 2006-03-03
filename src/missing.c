@@ -82,7 +82,7 @@ void missings_datad_cb (GtkWidget *w, ggobid *gg)
     }
 
     notebook = (GtkWidget *) g_object_get_data (obj, "notebook");
-    dnew = datad_create (d->nrows, ncols_with_missings, gg);
+    dnew = ggobi_data_new (d->nrows, ncols_with_missings);
     dnew->name = g_strdup_printf ("%s (missing)", d->name);
 
     for (i=0; i<d->nrows; i++) {

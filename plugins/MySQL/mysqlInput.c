@@ -178,7 +178,7 @@ processResult(MYSQL_RES *result, MYSQL *conn, ggobid *gg)
   nr =  mysql_num_rows(result);
   nc = mysql_num_fields(result);
  
-  d = datad_create(nr, nc, gg);
+  d = ggobi_data_new(nr, nc);
 
   for(i = 0; i < nr; i++) {
       MYSQL_ROW row;

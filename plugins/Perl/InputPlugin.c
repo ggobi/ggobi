@@ -69,7 +69,7 @@ createDataset(PerlPluginInstData *instData, gint nrow, ggobid *gg)
     nvars = call_method("getVariableNames", G_KEEPERR | G_EVAL | G_ARRAY);
 
     SPAGAIN;
-    gdata = datad_create(nrow, nvars, gg);
+    gdata = ggobi_data_new(nrow, nvars);
     for(j = nvars; j > 0; j--) {
       char *varName = POPp;
       GGOBI(setVariableName)(j-1, g_strdup(varName), false, gdata, gg);

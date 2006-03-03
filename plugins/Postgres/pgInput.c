@@ -136,7 +136,7 @@ processResult(PGresult *result, ggobid *gg)
   nr = PQntuples(result);
   nc = PQnfields(result);
  
-  d = datad_create(nr, nc, gg);
+  d = ggobi_data_new(nr, nc);
 
   for(i = 0; i < nr; i++) {
       float f;

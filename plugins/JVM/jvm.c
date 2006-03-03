@@ -143,7 +143,7 @@ gboolean initJVM(GGobiPluginInfo *info)
  This method pulls the information to create the datad in GGobi from the Java
  plugin instance. 
  It asks for the dimensions of the dataset using the getNumRecords() and getNumVariables()
- methods. It uses this to initialize the datad via the C routine datad_create.
+ methods. It uses this to initialize the datad via the C routine ggobi_data_new.
  Then it queries the object for the variable names and assigns each one to the
  datad via  GGobi_setVariableName() method.
  Then it loops over the records and asks for an array of the values for each one.
@@ -176,7 +176,7 @@ gboolean init = true;
 	return(false);
 
       /* Create the new datad in the GGobi instance and get ready to populate it.*/
-    gdata = datad_create(nrow, ncol, gg);
+    gdata = ggobi_data_new(nrow, ncol);
 
     gdata->name = g_strdup(desc->fileName);
 

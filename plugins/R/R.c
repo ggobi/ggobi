@@ -307,7 +307,7 @@ gboolean init = true;
     varNames = getVariableNames(obj);
     if(varNames==NULL || varNames == NULL_USER_OBJECT)
 	return(false);
-    gdata = datad_create(nrow, ncol, gg);
+    gdata = ggobi_data_new(nrow, ncol);
     gdata->name = g_strdup("rrandom");
     for(j = 0; j < ncol; j++) {
 	const char *tmp;

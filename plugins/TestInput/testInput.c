@@ -30,7 +30,7 @@ generate_data(InputDescription *desc, ggobid *gg, GGobiPluginInfo *plugin)
   int i, j;
   datad *d;
   g_printerr("[generate_data %d %d]\n", nr, nc);
-  d = datad_create(nr, nc, gg);
+  d = ggobi_data_new(nr, nc);
 
   for(i = 0; i < nr; i++) {
       char *tmp;

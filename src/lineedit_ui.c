@@ -408,7 +408,7 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 
       if (e == NULL) {
         /*-- initialize e, the new datad --*/
-        e = datad_create (0, 0, gg);
+        e = ggobi_data_new (0, 0);
         e->name = g_strdup ("edges");
         /* Add it to the display */
         /*setDisplayEdge (display, e);*/  /* doesn't work, actually */

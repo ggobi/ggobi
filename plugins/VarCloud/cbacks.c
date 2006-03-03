@@ -66,7 +66,7 @@ launch_varcloud_cb (GtkWidget *w, PluginInstance *inst)
 
   recordids = (gchar **) g_malloc (npairs * sizeof(gchar *));
 
-  e = datad_create(npairs, 0, gg);
+  e = ggobi_data_new(npairs, 0);
   e->name = g_strdup("all pairs");
   rowlabels_alloc(e);
 
@@ -158,7 +158,7 @@ launch_varcloud_cb (GtkWidget *w, PluginInstance *inst)
   if (n) {
     displayd *dspnew;
 
-    dnew = datad_create (n, nc, gg);
+    dnew = ggobi_data_new (n, nc);
     dnew->name = "VarCloud";
     GGOBI(setData) (values, rownames, colnames, n, nc, dnew,
 		    false, gg, recordids, true, desc); 

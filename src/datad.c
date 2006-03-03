@@ -217,12 +217,6 @@ ggobi_data_new(guint nrows, guint ncols)
   return (d);
 }
 
-datad* 
-datad_create(guint nr, guint nc, ggobid *gg)
-{
-  ggobi_data_new(nr, nc);
-}
-
 void
 datad_free (datad *d, ggobid *gg) 
 {
