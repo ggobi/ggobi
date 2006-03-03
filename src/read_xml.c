@@ -116,15 +116,16 @@ const gchar *XMLSuffixes[] = {"", ".xml", ".xml.gz", ".xmlz"};
  One can of course use a scripting language (e.g. R, Python, ...) to 
  create the dataset externall.
  
- One can have any number of randomuniformvariable elements in a dataset,
- which is different from the countervariable. This is implemented by 
- introducing a new variable type (like categorical, real, ...)
- in the vartyped enumeration in vartable.h. This means that we have
- to update code to handle this element in the switch statements
- and this is error-prone. (We can easily overlook some of the switch statements
- and get odd behavior). We would rather have the  vartabled data structure as
- a class and have methods for it. Switch statements are simply not extensible.
- For this case, we only have to update vartable_nbook.c.
+ One can have any number of randomuniformvariable elements in a
+ dataset, which is different from the countervariable. This is
+ implemented by introducing a new variable type (like categorical,
+ real, ...)  in the vartyped enumeration in vartable.h. This means
+ that we have to update code to handle this element in the switch
+ statements and this is error-prone. (We can easily overlook some of
+ the switch statements and get odd behavior). We would rather have the
+ vartabled data structure as a class and have methods for it. Switch
+ statements are simply not extensible.  For this case, we only have to
+ update vartable_nbook.c.
 
 */
 const gchar * const xmlDataTagNames[] = {
@@ -292,7 +293,7 @@ data_xml_read (InputDescription *desc, ggobid *gg)
   g_free(xmlParserHandler);
   g_free (name);
 
-#ifdef XXX
+#ifdef ZZZ
   {
     GSList *l;
     datad *d;
@@ -316,7 +317,7 @@ initParserData(XMLParserData *data, xmlSAXHandlerPtr handler, ggobid *gg)
   data->current_record = 0;
   data->current_variable = 0;
   data->current_element = 0;
-  data->current_data = NULL;
+  data->current_data = (datad *) NULL;
 
   data->current_color = 0;
   data->reading_colormap_file_p = false;
@@ -459,7 +460,6 @@ setLevelIndex(const xmlChar **attrs, XMLParserData *data)
   vartabled *el = vartable_element_get (data->current_variable, d);
 
   data->current_level++; /*-- current_level here ranges from 0 to nlevels-1 --*/
-
 /*-- dfs: placeholder for proper debugging --*/
   if (data->current_level >=  el->nlevels) {
 /*XXX Put in a more terminal error! */
@@ -925,12 +925,13 @@ gboolean
 setDatasetInfo (const xmlChar **attrs, XMLParserData *data)
 {
   const gchar *tmp = getAttribute(attrs, "count");
-  datad *d = getCurrentXMLData(data);
+  datad *d = getCurrentXMLData(data);  // Should be null here
 
   if (tmp == NULL) {
     g_error("No count attribute");
   }
 
+  /* Should be in some datad allocation function */
   d->nrows = strToInteger(tmp);
   d->nrows_in_plot = d->nrows;  /*-- for now --*/
 
@@ -943,6 +944,7 @@ setDatasetInfo (const xmlChar **attrs, XMLParserData *data)
   br_color_ids_alloc (d);
   br_color_ids_init (d);
 
+  /* This initializes both d->glyph etc, but also data->defaults */
   setDefaultDatasetValues(attrs, data);
 
   if (tmp) {
@@ -950,6 +952,7 @@ setDatasetInfo (const xmlChar **attrs, XMLParserData *data)
     br_hidden_alloc (d);
     br_hidden_init (d);
   }
+  /*  */
 
   data->current_variable = 0;
   data->current_record = 0;
@@ -1932,7 +1935,6 @@ releaseCurrentDataInfo(XMLParserData *parserData)
    }
 }
 
-
 gboolean
 setDataset(const xmlChar **attrs, XMLParserData *parserData, enum xmlDataState type) 
 {
@@ -1963,6 +1965,7 @@ setDataset(const xmlChar **attrs, XMLParserData *parserData, enum xmlDataState t
   parserData->current_data = data;
 
   if(type == EDGES) {
+    g_printerr ("type = EDGES\n");
     setDatasetInfo(attrs, parserData);
   }
 
