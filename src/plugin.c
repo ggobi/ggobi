@@ -76,11 +76,12 @@ canRead(const char * const fileName)
 {
   gboolean val = false;
 #ifndef G_OS_WIN32
+/** FIXME: We need to use the Win32 API here to make sure we can read this */ 
   struct stat buf;
-  val = (stat(fileName, &buf) == 0);
+  val = (g_stat(fileName, &buf) == 0);
 #else
   gint ft=0;
-  val = (access(fileName, ft) == 0);
+  val = (g_access(fileName, ft) == 0);
 #endif
 
   return(val);
@@ -103,16 +104,10 @@ GGobi_checkPlugin(GGobiPluginDetails *plugin)
  return(ok);
 }
 
-char *
+gchar *
 installed_file_name(char *name)
 {
-  char *tmp;
-/*  char *dirPtr, *dir; */
-
-  tmp = (char *) g_malloc( (strlen(sessionOptions->ggobiHome)  + strlen(name)+ 3)*sizeof(char));
-  sprintf(tmp, "%s%s", sessionOptions->ggobiHome, name);
-
-  return(tmp);
+  return(g_build_filename(sessionOptions->ggobiHome, name, NULL));
 }
 
 HINSTANCE 

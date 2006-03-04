@@ -595,40 +595,12 @@ getGGobiHomeFromRegistry()
 static gchar *
 computeGGobiHome(char *str)
 {
-  gchar *dir, *dirPtr, *tmp;
+  gchar *dir;
 
-  tmp = getenv("GGOBI_HOME");
+  dir = g_strdup(g_getenv("GGOBI_HOME"));
 
-#ifdef WIN32
-  if(!tmp || !tmp[0]) 
-    tmp = getGGobiHomeFromRegistry(); 
-#endif
-
-  if(!tmp) {
-    dir = str;
-    dirPtr = strrchr(dir, G_DIR_SEPARATOR);
-
-    if(!dirPtr) {
-     return(g_strdup(""));
-    }
-
-    /*
-    This can't be right, based on the assignment a few characters
-    down.   -- dfs
-    tmp = (char *) g_malloc( ((dirPtr - dir) + 1)*sizeof(char));
-    */
-    tmp = (char *) g_malloc( ((dirPtr - dir) + 2)*sizeof(char));
-    strncpy(tmp, dir, dirPtr-dir + 1);
-    tmp[(dirPtr - dir) + 1] = '\0';
-  }
-
-  if(tmp[strlen(tmp)-1] == G_DIR_SEPARATOR)
-     dir = g_strdup(tmp);
-  else {
-       /* Make certain there is a / at the end of the string. */
-     dir = (char *) g_malloc( (strlen(tmp) + 2)*sizeof(char));
-     sprintf(dir, "%s%c", tmp, G_DIR_SEPARATOR);
-  }
+  if(!dir)
+    dir = g_get_current_dir();
 
   return(dir);
 }
@@ -660,11 +632,9 @@ initSessionOptions(int argc, char **argv)
   sessionOptions->info->numTimePlotVars = MAXNTSPLOTS;
 
   sessionOptions->useRadioMenuItems = false;
-
-  tmp = g_malloc(sizeof(gchar) * (strlen(sessionOptions->ggobiHome) + strlen("data/colorschemes.xml") + 2));
-  sprintf(tmp, "%s%s%c%s", sessionOptions->ggobiHome,
-	                   "share", G_DIR_SEPARATOR, "colorschemes.xml");
-  sessionOptions->info->colorSchemeFile = tmp;
+  
+  sessionOptions->info->colorSchemeFile = g_build_filename(sessionOptions->ggobiHome, 
+    "share", "colorschemes.xml", NULL);
 
   sessionOptions->defaultTourSpeed = 50.0;  
   sessionOptions->defaultTour1dSpeed = 40.0;  
@@ -862,37 +832,30 @@ ValidateDisplayRef(displayd *d, ggobid *gg, gboolean fatal)
     1) the -init command line option
     2) the GGOBIRC environment variable
     3) the $HOME/.ggobirc file.
-    4) ggobirc in the directory of the executable (argv[0]) 
+    4) ggobirc in GGOBI_HOME
  */
 void
 process_initialization_files()
 {
   GGobiInitInfo *info;
-  gchar buf[100];
-  const gchar *fileName = NULL;
+  gchar *fileName = NULL;
 
   if(sessionOptions->initializationFile)
-    fileName = sessionOptions->initializationFile;
+    fileName = g_strdup(sessionOptions->initializationFile);
   else {
-           /* This use of getenv() is not portable. */
-    fileName = getenv("GGOBIRC");
+    fileName = g_strdup(g_getenv("GGOBIRC"));
     if(!fileName || !fileName[0]) {
-      gchar *tmp;
-      /* HOME doesn't necessarily make sense in Windows. */
-      tmp = getenv("HOME");
+      const gchar *tmp;
+      tmp = g_get_home_dir();
       if(tmp) {
-        sprintf(buf, "%s/.ggobirc", tmp);
-	if(canRead(buf))
-          fileName = buf;
-        else 
+        fileName = g_build_filename(tmp, ".ggobirc", NULL);
+        if(!canRead(fileName)) {
+          g_free(fileName);
           fileName = NULL;
+        }
       }
-
-      if(!fileName) {
-        sprintf(buf, "%sggobirc",sessionOptions->ggobiHome);
-        fileName = buf;
-        /*g_free(tmp);*/ /* purify objects to this */
-      }
+      if(!fileName)
+        fileName = g_build_filename(sessionOptions->ggobiHome, "ggobirc", NULL);
     }
     if(fileName)
       sessionOptions->initializationFile = g_strdup(fileName);
@@ -900,6 +863,7 @@ process_initialization_files()
      
   if(fileName && fileName[0] && canRead(fileName)) {
     info = read_init_file(fileName, sessionOptions->info);
+    g_free(fileName);
     /* sessionOptions->info = info; */
   }
 
