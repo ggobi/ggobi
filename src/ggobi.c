@@ -552,42 +552,6 @@ processRestoreFile(const gchar * const fileName, ggobid *gg)
   return(true);
 }
 
-
-#ifdef WIN32
-gchar *
-getGGobiHomeFromRegistry()
-{
-  HRESULT hr;
-  gchar *tmp;
-  char *key;
-  BYTE *buf;
-  DWORD bufSize, type;
-  HKEY lkey;
-
-  key = "Software\\GGobi";
-
-  hr = RegOpenKeyEx(HKEY_LOCAL_MACHINE, key, 0, KEY_ALL_ACCESS, &lkey);
-  if(hr != ERROR_SUCCESS) {
-    fprintf(stderr, "GGobi not in registry: %s (%d)\n", key, (int) hr);fflush(stderr);
-    return(NULL);
-  }
-
-  RegQueryValueEx(lkey, "Home", NULL, NULL, NULL, &bufSize);
-  buf = (BYTE*) g_malloc(bufSize * sizeof(BYTE));
-
-  RegQueryValueEx(lkey, "Home", NULL, &type, buf, &bufSize);
-  RegCloseKey(lkey);
-
-  if(type == REG_SZ) {
-     tmp = (gchar*) buf;
-     fprintf(stderr, "Registry value of GGobi home: %s\n", tmp);
-  }
-
-  return(tmp);
-}
-#endif
-
-
 /*
  Computes where GGobi directory is located.
  Ensures that there is a trailing / at the end.
@@ -596,11 +560,13 @@ static gchar *
 computeGGobiHome(char *str)
 {
   gchar *dir;
+  const gchar *env;
 
-  dir = g_strdup(g_getenv("GGOBI_HOME"));
-
-  if(!dir)
-    dir = g_get_current_dir();
+  env = g_getenv("GGOBI_HOME");
+  
+  if (env)
+    dir = g_strdup(env);
+  else dir = g_path_get_dirname(str);
 
   return(dir);
 }
