@@ -395,7 +395,6 @@ dnl      AC_CHECK_HEADER(parserInternals.h, XML_INC_DIRS=$f$ext)
     echo "--with-xml=<dir>, or by setting the XML_INC_DIRS environment variable."
     exit 2
   else
-    XML_UTILS=xmlConvert
     XML_CFLAG_DEFINES="-DUSE_XML=${XML_VERSION} -DSUPPORT_PLUGINS=1 -DSUPPORT_INIT_FILES=1"
     USE_XML="USE_XML=${XML_VERSION}"
     XML_SRC="read_xml.c write_xml.c read_init.c plugin.c write_state.c read_color.c"
@@ -444,7 +443,6 @@ AC_SUBST(TOP_DIR)
 
 AC_SUBST(UNAME)
 
-AC_SUBST(XML_UTILS)
 AC_SUBST(USE_XML)
 AC_SUBST(XML_CFLAG_DEFINES)
 

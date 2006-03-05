@@ -554,7 +554,6 @@ processRestoreFile(const gchar * const fileName, ggobid *gg)
 
 /*
  Computes where GGobi directory is located.
- Ensures that there is a trailing / at the end.
 */
 static gchar *
 computeGGobiHome(char *str)

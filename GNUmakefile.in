@@ -142,7 +142,7 @@ clean-plugins:
 	done
 
 distclean: clean clean-plugins
-	for f in $(OBJ) config.log lib/*.so bin/ggobi.bin bin/xmlConvert@EXE_EXT@ ggobi ggobidb; do \
+	for f in $(OBJ) config.log lib/*.so bin/ggobi.bin ggobi ggobidb; do \
 	  if test -f $$f ; then rm $$f ; fi \
 	done
 

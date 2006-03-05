@@ -5,9 +5,6 @@ include $(TOP)/Makeconf
 XML_INC_DIRS=@XML_INC_DIRS@
 XML_LIB_DIRS=@XML_LIB_DIRS@
 
-XML_UTILS=@XML_UTILS@
-UTILS=$(XML_UTILS:%=$(TOP)/bin/%)
-
 SRC=\
   ggobi-data.c \
   @XML_SRC@ \
@@ -152,7 +149,7 @@ CFLAGS= @SRC_DEBUG@ $(GTK_CFLAGS) $(XML_INC_DIRS) @XML_CFLAG_DEFINES@
 
 LIBS=$(XML_LIBS) $(GTK_LIBS) @LIBS@
 
-all: marshal.h bin $(UTILS)
+all: marshal.h bin
 
 .PHONY: bin lib
 
@@ -185,7 +182,7 @@ libs:
 	@echo "$(LIBS)"
 
 clean:
-	for f in $(OBJ) ggobiMain.o xmlConvert.o marshal.c marshal.h ggobi-data*; do \
+	for f in $(OBJ) ggobiMain.o marshal.c marshal.h ggobi-data*; do \
 	  if test -f $$f ; then rm $$f ; fi \
 	done
 

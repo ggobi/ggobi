@@ -16,28 +16,50 @@ installed.  MinGW is Minimalist GNU for Windows,
 essentially gcc for Windows. MSYS is a build environment for MinGW. For MinGW, 
 there are options within the installation that allow you to customize which 
 packages are installed (this can also be done after the initial installation). 
-Be sure that you include the gcc-core and g77 (if you want to build Rggobi) 
-packages. You may also want the 
+First it asks you whether you want the previous, current, or candidate version. 
+Go ahead and choose 'candidate' so that we're on the bleeding edge. 
+The next step lets you decide which individual packages are installed. 
+Be sure that you include the MinGW base tools and the g77 
+package (if you want to build Rggobi2, it's an R thing). You'll also want the 
 <a href="http://prdownloads.sourceforge.net/mingw/msysDTK-1.0.1.exe?download">MSYS DTK</a> 
-for tools like autoconf. If you plan to build R packages, make sure that you do 
-not install Perl from this package, because it conflicts with R's build system,
-which requires ActivePerl. Go ahead and install MinGW and MSYS now.
+for tools like autoconf. Download and install these three packages.
 
-<h3>Setting up the build directories:</h3> Unzip the build.zip file in the pack.
-This file assumes you unzipped it to the root directory of your <code>C:</code> drive.
-The zip file contains all the necessary libraries and other necessities and creates
-a nice UNIXish directory structure.
+<h3>GTK development environment:</h3> Download the latest GTK+
+<a href="http://gladewin32.sourceforge.net/">developer package</a> and install it.
 
-<h3>Getting the latest ggobi.tar.gz:</h3> You can go to the <a
-href="http://www.ggobi.org/Download"> ggobi web site </a> and download
-the latest version of the tar.gz file. Place it in <code>/c/build/src</code>.
-Start MSYS, change to <code>/c/build/src</code> and untar the archive.
+<h3>pkg-config:</h3> The GTK developers pack includes pkg-config, but since we're using 
+MSYS we need at least version 0.20. At the time of this writing, the included pkg-config is 
+only 0.15, so we need to get the latest from the 
+<a href="http://www.gimp.org/~tml/gimp/win32/downloads.html">GTK+ win32 downloads page</a>.
+Unzip it into the toplevel GTK directory.
+
+<h3>GObject Builder:</h3> You need the 
+<a href="http://http://www.5z.com/jirka/gob.html">GObject builder</a> to build GGobi from SVN.
+First though you need the Flex library. Get the package offered by the 
+<a href="http://unxutils.sourceforge.net/">UnxUtils project</a> and move the contents 
+of the <code>/usr/local/lib</code> directory in the zip file to your <code>/GTK/lib</code> directory. 
+Now you can unpack the gob2 archive into your home directory, <code>configure</code>, 
+<code>make</code>, and <code>make install</code> it.
+
+<h3>Nullsoft Installer:</h3> GGobi uses the nullsoft installation system, so 
+if you want to build the GGobi installer (exe), download and install the latest 
+<a href="http://nsis.sourceforge.net/">nullsoft installer</a> now.
+
+<h3>Subversion:</h3> In order to get the latest source code, you'll need 
+<a href="http://subversion.tigris.org/">subversion</a>.
 
 <h3>Path setup:</h3>
-Add <code>/c/build/bin</code> to your PATH variable.
 
-<h2>Compilation:</h2> Change to <code>/c/build/src/ggobi</code>. Type
-<code>./configure --enable-local</code> and then <code>make</code>.
+
+<h2>Compilation:</h2> Start MSYS. You will find yourself in your "user" directory. 
+This is where we will do all of our work. Type <code>svn co http://ggobi.org/svn/ggobi ggobi</code> to 
+grab the entire repository, including Rggobi2, the website, the GGobi book, etc. 
+If you're not a core GGobi dev or you're only interested in GGobi itself, 
+<code>svn co http://ggobi.org/svn/ggobi/ggobi/trunk ggobi</code> should do. Next, switch to the 
+<code>~/ggobi/ggobi/trunk</code> (or <code>~/ggobi</code> if you only got GGobi) directory and type: 
+<code>./configure --enable-local --with-plugins="DataViewer ggvis VarCloud DescribeDisplay"</code> 
+and then <code>make</code>. Note that if you ever want to debug GGobi, you can add <code>--enable-debug</code> 
+to the configure line. To enable the plugins you built, run <code>make ggobirc</code> now.
 
 <P>If you have trouble send an <a href="mailto:ggobi-help@ggobi.org">email</a>, 
 complete with the error messages you got in the MSYS window. We'll aim to help as
@@ -45,21 +67,11 @@ possible.
 
 <h2>Building the Self-installing Executable</h2>
 
-<h3>Inno Installer</h3>
-To create the self-installing GGobi executable, you will need to
-<a href="http://www.jrsoftware.org/">download</a> Inno. Make sure that
+To create the self-installing GGobi executable, we will use the Nullsoft Scriptable 
+Installation System. Make sure that
 <code>iscc.exe</code> (the Inno compiler) is on your path.
 
 <p>Run <code>make win32-installer</code> to build the setup executable.
-
-<h2>Plugins:</h2>
-
-You should be able to simply do a <code>./configure</code> and <code>make</code> 
-in the plugin directory. You can also make plugins using the ggobi build system.
-Note that some of the plugins require additional libraries.
-
-<P> The next step is to edit the ggobirc file, and put it in a
-location that ggobi will look at so that the plugin will be loaded.
 
 <h1>Building RGGobi on Windows:</h1>
 
