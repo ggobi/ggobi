@@ -146,7 +146,7 @@ show_ggvis_window (GtkAction *action, PluginInstance *inst)
   GGobiData *d;
   gboolean ok = false;
 
-  /* Before doing anything making sure there is input data, and that
+  /* Before doing anything, make sure there is input data, and that
      it includes an edge set */
   if (g_slist_length(inst->gg->d) < 1) {
     g_printerr ("ggvis: can't initialize without data\n");
