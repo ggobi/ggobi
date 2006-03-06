@@ -285,25 +285,6 @@ delete_vars (gint *cols, gint ncols, GGobiData *d, ggobid *gg)
     return false;
   }
 
-
-  /* Help, I think this deletes the keepers intead of the elements to
-     be removed -- dfs 2006/2/15 */
-#if 0
-  /*-- delete rows from tree model; no copying is called for --*/
-  if (d->vartable_tree_view[real] != NULL) {
-    for (j = 0; j < nkeepers; j++) {
-	GtkTreeModel *model;
-	GtkTreeIter iter;
-	GtkTreePath *path = gtk_tree_path_new_from_indices(keepers[j], -1);
-	vt = vartable_element_get(keepers[j], d);
-	model = gtk_tree_view_get_model(GTK_TREE_VIEW(d->vartable_tree_view[vt->vartype]));
-	gtk_tree_model_get_iter(model, &iter, path);
-	gtk_list_store_remove(GTK_LIST_STORE(model), &iter);
-	gtk_tree_path_free(path);
-    }
-  }
-#endif
-  // Try this instead:
   if (d->vartable_tree_view[real] != NULL) {
     for (j = 0; j < ncols; j++) {
 	GtkTreeModel *model;
@@ -317,7 +298,6 @@ delete_vars (gint *cols, gint ncols, GGobiData *d, ggobid *gg)
     }
   }
 
-  // And doesn't this have to follow the changes to the model?
   for (j=0; j<ncols; j++) {
     vartable_element_remove (cols[j], d);
   }

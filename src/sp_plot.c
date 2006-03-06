@@ -529,29 +529,12 @@ splot_add_point_label (gboolean nearest_p, gint k, gboolean top_p, splotd *sp,
   	 sp->screen[k].x+diamond_dim,
 	 sp->screen[k].y-rect.height-diamond_dim,
 	 layout);
-#if 0
-      /*-- underline the nearest point label?  --*/
-      if (nearest_p)
-        gdk_draw_line (drawable, gg->plot_GC,
-          sp->screen[k].x+diamond_dim,
-          sp->screen[k].y-diamond_dim+1,
-          sp->screen[k].x+diamond_dim+rect.width,
-          sp->screen[k].y-diamond_dim+1);
-#endif
 
     } else {
       gdk_draw_layout(drawable, gg->plot_GC,
         sp->screen[k].x - rect.width - diamond_dim,
 	sp->screen[k].y - rect.height - diamond_dim,
 	layout);
-#if 0
-      if (nearest_p)
-        gdk_draw_line (drawable, gg->plot_GC,
-          sp->screen[k].x - rect.width - diamond_dim,
-          sp->screen[k].y - diamond_dim+1,
-          sp->screen[k].x - diamond_dim,
-          sp->screen[k].y - diamond_dim+1);
-#endif
     }
 #if 0
     /*-- display the label in the top center of the window as well --*/

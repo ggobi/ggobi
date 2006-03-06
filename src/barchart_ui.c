@@ -94,7 +94,7 @@ static const gchar* mode_ui_str =
 "		<menu action='IMode'>"
 "			<menuitem action='DefaultIMode'/>"
 "			<separator/>"
-#if 0
+#if BARCHART_SCALE
 "			<menuitem action='Scale'/>"
 #endif
 "			<menuitem action='Brush'/>"
@@ -365,7 +365,7 @@ barchart_scale(gboolean button1_p, gboolean button2_p, splotd * sp)
     }
   } else {   /*-- we're not dragging the bars, only scaling --*/
 
-#if 0  // No scaling at this time
+#if BARCHART_SCALE
       if (button1_p) {
         pan_by_drag(sp, gg);
       } 

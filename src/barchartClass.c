@@ -574,7 +574,7 @@ void barchartSPlotClassInit(GGobiBarChartSPlotClass * klass)
 
   klass->extendedSPlotClass.identify_notify = barchart_identify_bars;
   klass->extendedSPlotClass.add_markup_cues = barchart_add_bar_cues;
-#if 0  // No more scale mode
+#if BARCHART_SCALE
   klass->extendedSPlotClass.add_scaling_cues =
       barchart_scaling_visual_cues_draw;
 #endif

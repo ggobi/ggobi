@@ -409,21 +409,6 @@ splot_free (splotd *sp, displayd *display, ggobid *gg)
      gtk_widget_destroy (GTK_WIDGET(sp));
 }
 
-#if 0
-void
-splot_dimension_set (splotd* sp, gint width, gint height)
-{
-  sp->max.x = width;
-  sp->max.y = height;
-
-  sp->pmid.x = sp->pmid.y = 0;
-
-  if (sp->da != NULL && width != -1 && height != -1) {
-    gtk_drawing_area_size (GTK_DRAWING_AREA (sp->da), width, height);
-  }
-}
-#endif
-
 splotd *
 splot_new (displayd *display, gint width, gint height, ggobid *gg) 
 {

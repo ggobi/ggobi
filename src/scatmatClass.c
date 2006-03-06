@@ -156,30 +156,12 @@ plottedVarsGet(displayd *display, gint *vars, GGobiData *d, ggobid *gg)
   }
 
   return nvars;
-#if 0
-  GList *l;
-  splotd *s;
-  gint ncols = 0;
-  for (l=display->splots; l; l=l->next) {
-    s = (splotd *) l->data;
-    if (s->p1dvar == -1) {
-      if (!array_contains (cols, ncols, s->xyvars.x))
-        cols[ncols++] = s->xyvars.x;
-      if (!array_contains (cols, ncols, s->xyvars.y))
-        cols[ncols++] = s->xyvars.y;
-    } else {
-      if (!array_contains (cols, ncols, s->p1dvar))
-        cols[ncols++] = s->p1dvar;
-    }
-  }
-  return(ncols);
-#endif
 }
 
 displayd *
 createWithVars(gboolean missing_p, gint nvars, gint *vars, GGobiData *d, ggobid *gg)
 {
-   return(GGOBI(newScatmat)(vars, vars, nvars, nvars, d, gg));
+  return(GGOBI(newScatmat)(vars, vars, nvars, nvars, d, gg));
 }
 
 
