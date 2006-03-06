@@ -73,7 +73,7 @@ DataMode verifyDataMode(const gchar *fileName, DataMode mode, InputDescription *
 DataMode guessDataMode(const gchar *fileName, InputDescription *desc);
 gboolean isXMLFile(const gchar * fileName, ggobid *gg, GGobiPluginInfo *info);
 gboolean isCSVFile(const gchar * fileName, ggobid *gg, GGobiPluginInfo *info);
-gboolean isASCIIFile(const gchar * fileName, ggobid *gg, GGobiPluginInfo *plugin);
+
 gboolean endsWith(const gchar *str, const gchar *what);
 ExtensionList *getInputDescriptionGroup(DataMode mode);
 

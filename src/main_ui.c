@@ -27,9 +27,7 @@
 
 #include "write_state.h"
 
-#ifdef SUPPORT_PLUGINS
 #include "plugin.h"
-#endif
 
 
 #ifdef TEST_GGOBI_EVENTS
@@ -148,8 +146,8 @@ gg_write_to_statusbar (gchar *message, ggobid *gg)
   GtkWidget *statusbar = (GtkWidget *)
     g_object_get_data(G_OBJECT(gg->main_window), "MAIN:STATUSBAR");
 
-	// for now we pop by default to prevent memory leaking, but we could
-	// support a temporary statusbar message in which case we would not pop
+  // for now we pop by default to prevent memory leaking, but we could
+  // support a temporary statusbar message in which case we would not pop
   gtk_statusbar_pop(GTK_STATUSBAR(statusbar), 0);
   if (message)
     gtk_statusbar_push(GTK_STATUSBAR(statusbar), 0, message);
@@ -688,7 +686,6 @@ GGOBI(full_viewmode_set)(ProjectionMode pmode, InteractionMode imode, ggobid *gg
 void
 quit_ggobi(ggobid *gg)
 {
-#ifdef SUPPORT_PLUGINS
   extern void closePlugins(ggobid *gg);
   gint n, i;
   ggobid *el;
@@ -699,7 +696,7 @@ quit_ggobi(ggobid *gg)
       closePlugins(el);
   }
   closePlugins(gg);
-#endif
+
   procs_activate (off, gg->pmode, gg->current_display, gg);
   gtk_main_quit();
 }
@@ -797,13 +794,11 @@ action_about_cb(GtkAction *action, ggobid *gg)
 {
 	splash_show(gg);
 }
-#ifdef SUPPORT_PLUGINS
 static void
 action_plugins_cb(GtkAction *action, ggobid *gg)
 {
 	show_plugin_list(gg);
 }
-#endif
 static void
 action_toggle_tooltips_cb(GtkToggleAction *action, ggobid *gg)
 {
@@ -894,9 +889,7 @@ static const gchar *main_ui_str =
 "		</menu>"
 "		<menu action='Help'>"
 "			<menuitem action='AboutGGobi'/>"
-#ifdef SUPPORT_PLUGINS
 "			<menuitem action='AboutPlugins'/>"
-#endif
 "		</menu>"
 "	</menubar>"
 "</ui>";
@@ -957,11 +950,9 @@ static GtkActionEntry entries[] = {
 	{ "AboutGGobi", NULL, "About _GGobi", NULL, "Discover the magic behind GGobi",
 		G_CALLBACK(action_about_cb)
 	},
-	#ifdef SUPPORT_PLUGINS
 	{ "AboutPlugins", NULL, "About _Plugins", NULL, "Current plugin status",
 		G_CALLBACK(action_plugins_cb)
 	}
-	#endif
 };
 
 static GtkRadioActionEntry pmode_entries[] = {
@@ -1094,11 +1085,9 @@ make_ui (ggobid *gg)
   gg->main_menubar = create_menu_bar(gg->main_menu_manager, main_ui_str, window);
   gg->main_accel_group = gtk_ui_manager_get_accel_group(gg->main_menu_manager);
 
-#ifdef SUPPORT_INIT_FILES
   if (sessionOptions->info && sessionOptions->info->numInputs > 0) {
     addPreviousFilesMenu(sessionOptions->info, gg);
   }
-#endif
 
   display_menu_init (gg);
 
@@ -1184,7 +1173,6 @@ GGOBI(getPModeKeys)(int *n)
 }
 
 
-#ifdef SUPPORT_INIT_FILES
 
 void load_previous_file(GtkAction *action, gpointer cbd);
 /*
@@ -1270,7 +1258,6 @@ load_previous_file(GtkAction *action, gpointer cbd)
     }
   } 
 }
-#endif
 
 /*
  This replicates code elsewhere and the two should be merged.
@@ -1304,7 +1291,6 @@ create_ggobi(InputDescription *desc)
 }
 
 
-#ifdef SUPPORT_PLUGINS
 void
 show_plugin_list(ggobid *gg)
 {
@@ -1312,7 +1298,6 @@ show_plugin_list(ggobid *gg)
     showPluginInfo(sessionOptions->info->plugins,
       sessionOptions->info->inputPlugins, (ggobid*) gg);
 }
-#endif
 
 
 

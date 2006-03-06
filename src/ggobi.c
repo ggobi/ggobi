@@ -128,9 +128,6 @@ parse_command_line (gint *argc, gchar **av)
     else if (strcmp (av[1], "-csv") == 0) {
       sessionOptions->data_mode = csv_data;
       sessionOptions->data_type = g_strdup(av[1]+1);
-    } else if (strcmp (av[1], "-ascii") == 0) {
-      sessionOptions->data_mode = ascii_data;
-      sessionOptions->data_type = g_strdup(av[1]+1);
     }
     else if (strcmp (av[1], "-xml") == 0) {
       sessionOptions->data_mode = xml_data;
@@ -168,16 +165,10 @@ parse_command_line (gint *argc, gchar **av)
       g_printerr ("%s\n", GGOBI(getVersionString()));
       exit (0);
     } else if(strcmp(av[1], "-init") == 0) {
-#ifdef SUPPORT_INIT_FILES
       sessionOptions->initializationFile = g_strdup(av[2]);
-#else
-      g_printerr ("-init not supported without XML\n");fflush(stderr);
-#endif
       (*argc)--; av++;
     } else if((ptr = getOptValue("init", av[1]))) {
-#ifdef SUPPORT_INIT_FILES
       sessionOptions->initializationFile = ptr;
-#endif
     } else if(strcmp(av[1], "-noinit") == 0) {
       sessionOptions->initializationFile = g_strdup("");
     } else if(strcmp(av[1],"-colorschemes") == 0) {
@@ -464,9 +455,7 @@ GGOBI(main)(gint argc, gchar *argv[], gboolean processEvents)
 
   parse_command_line (&argc, argv);
 
-#ifdef SUPPORT_INIT_FILES
   process_initialization_files();
-#endif
 
   if(sessionOptions->verbose == GGOBI_VERBOSE)
     g_printerr("progname = %s\n", g_get_prgname());

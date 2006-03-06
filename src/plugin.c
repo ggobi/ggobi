@@ -680,31 +680,6 @@ GGobiPluginDetails CSVDetails = {
   "Dongshin Kim (Iowa State University) & GGobi core"
 };
 
-gchar *ASCIIModeNames[] = {"ascii"};
-
-/*GGobiInputPluginInfo ASCIIInputPluginInfo = {
-	NULL,
-	0,
-	"",
-	"",
-	"read_ascii_input_description",
-	false,
-	read_ascii,
-	read_ascii_input_description,
-	isASCIIFile,
-	ascii_data
-};
-
-
-GGobiPluginDetails ASCIIDetails = {
-  "ASCII data reader",
-  NULL,
-  NULL,
-  "Reads ASCII data in XGobi format of separate data, variable name, glyph, ... files",
-  "GGobi core"
-};*/
-
-
 
 GGobiPluginInfo  *
 createGGobiInputPluginInfo(GGobiInputPluginInfo *info, GGobiPluginDetails *details, gchar **modeNames, guint numModes)
@@ -750,7 +725,7 @@ createGGobiInputPluginInfo(GGobiInputPluginInfo *info, GGobiPluginDetails *detai
 
 /*
   Register the basic, built-in "plugins", specifically
-  the input plugins for XML, CSV, ASCII data formats.
+  the input plugins for XML, CSV.
 */
 void
 registerDefaultPlugins(GGobiInitInfo *info)
@@ -763,8 +738,6 @@ registerDefaultPlugins(GGobiInitInfo *info)
   plugin = createGGobiInputPluginInfo(&CSVInputPluginInfo, &CSVDetails, CSVModeNames, sizeof(CSVModeNames)/sizeof(CSVModeNames[0]));
   info->inputPlugins = g_list_append(info->inputPlugins, plugin);
 
-  //plugin = createGGobiInputPluginInfo(&ASCIIInputPluginInfo, &ASCIIDetails, ASCIIModeNames, sizeof(ASCIIModeNames)/sizeof(ASCIIModeNames[0]));
-  //info->inputPlugins = g_list_append(info->inputPlugins, plugin);
 }
 
 const gchar *DefaultUnknownInputModeName =  "unknown";

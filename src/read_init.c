@@ -26,9 +26,7 @@
 
 #include <string.h>
 
-#ifdef SUPPORT_PLUGINS
 #include "plugin.h"
-#endif
 
 #include "GGobiAPI.h"
 
@@ -48,8 +46,6 @@ gint     getPreviousFiles(const xmlDocPtr doc, GGobiInitInfo *info);
 DataMode getPreviousInput(xmlNode *node, InputDescription *input);
 DataMode getInputType(xmlNode *node);
 
-#ifdef SUPPORT_PLUGINS
-
 gboolean getLogicalPreference(xmlNodePtr node, const char *elName, gboolean defaultValue);
 
 int getPlugins(xmlDocPtr doc, GGobiInitInfo *info, gboolean single);
@@ -57,13 +53,11 @@ GGobiPluginInfo *processPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr d
 GGobiPluginInfo *processInputPlugin(xmlNodePtr node, GGobiInitInfo *info, xmlDocPtr doc);
 void getPluginSymbols(xmlNodePtr node, GGobiPluginInfo *plugin, xmlDocPtr doc, gboolean isLanguage);
 
-
 void getInputPluginValues(xmlNodePtr node, GGobiInputPluginInfo *plugin, xmlDocPtr doc);
 gboolean getPluginDetails(xmlNodePtr node, GGobiPluginDetails *plugin, xmlDocPtr doc);
 gboolean loadPluginLibrary(GGobiPluginDetails *plugin, GGobiPluginInfo *realPlugin);
 
 gboolean getPluginLanguage(xmlNodePtr node, GGobiPluginInfo *gplugin,  GGobiPluginType type, GGobiInitInfo *info);
-#endif
 
 GHashTable *getPluginNamedOptions(xmlNodePtr node, GGobiPluginDetails *info, xmlDocPtr doc);
 GSList *getPluginUnnamedArguments(xmlNodePtr node, GGobiPluginDetails *info, xmlDocPtr doc);
@@ -108,10 +102,8 @@ read_init_file(const gchar *filename, GGobiInitInfo *info)
   getPreferences(doc, info);
   getPreviousFiles(doc, info);
   getPreviousGGobiDisplays(doc, info);
-#if SUPPORT_PLUGINS
   info->plugins = NULL;
   getPlugins(doc, info, false);
-#endif
 
 #ifndef WIN32
   xmlDoValidityCheckingDefaultValue = oldValiditySetting;
@@ -405,8 +397,6 @@ getInputType(xmlNode *node)
     if(strcmp((char *)tag,"file") == 0) {
       if(strcmp((char *)mode, "xml") == 0)
         val = xml_data; 
-      else if(strcmp((char *)mode, "ascii") == 0)
-        val = ascii_data; 
     }
   }
     
@@ -515,7 +505,7 @@ getDisplayDescription(xmlNodePtr node)
 
 /*****************************************************************/
 
-#if SUPPORT_PLUGINS
+
 /*
  Handle the plugins section, looping over each <plugin>
  tag and passing it processPlugin().
@@ -1052,8 +1042,6 @@ getInputPluginValues(xmlNodePtr node, GGobiInputPluginInfo *plugin,
   GET_PROP_VALUE(probe_symbol_name, "probe");
   GET_PROP_VALUE(getDescription, "description");
 }
-
-#endif /* end of SUPPORT_PLUGINS */
 
 gint resolveVariableName(const gchar *name, GGobiData *d);
 

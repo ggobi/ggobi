@@ -24,12 +24,8 @@
 
 #include "vars.h"
 #include "externs.h"
-
 #include "read_xml.h"
-
-#ifdef SUPPORT_PLUGINS
 #include "plugin.h"
-#endif
 
 #ifdef USE_MYSQL
 #include "read_mysql.h"
@@ -160,21 +156,17 @@ make_ggobi(GGobiOptions * options, gboolean processEvents, ggobid * gg)
       init_data = true;
     }
   } else {
-#ifdef SUPPORT_PLUGINS
     if (runInteractiveInputPlugin(gg) == NULL) {
       if (sessionOptions->data_type)
         fprintf(stderr, "No available plugin to handle input mode %s\n",
                 sessionOptions->data_type);
       fflush(stderr);
     }
-#endif
   }
 
 
-#ifdef SUPPORT_PLUGINS
   if (sessionOptions->info != NULL)
     registerPlugins(gg, sessionOptions->info->plugins);
-#endif
 
   resetDataMode();
 

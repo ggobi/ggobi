@@ -1702,8 +1702,6 @@ setColorMap(const xmlChar **attrs, XMLParserData *data)
     if(type != NULL) {
       if(strcmp("xml", type) == 0)
         xmlParseColorMap(file, size, data);
-      else
-        asciiParseColorMap(file, size, data);
     } else {
        xmlParseColorMap(file, size, data);
     }
@@ -1873,21 +1871,6 @@ xmlParseColorMap(const gchar *fileName, gint size, XMLParserData *data)
 
   return (size);
 }
-
-
-/*
-  Reads color map entries from an ASCII file as a rectangular array
-  of size, at most, size by 3 rows.
-
-  Doesn't do anything at the moment.
- */
-
-gboolean
-asciiParseColorMap(const gchar *fileName, gint size, XMLParserData *data)
-{
-  return(false);
-}
-
 
 
 /* 

@@ -34,31 +34,13 @@
 #include <ctype.h>
 
 #include "GGobiAPI.h"
+#include "plugin.h"
 
 static gchar *XMLSuffixes[] = { "xml", "xml.gz", "xmlz" };
-
-#ifdef SUPPORT_PLUGINS
-#include "plugin.h"
-#endif
-
-gchar *ASCIISuffixes[] = { "dat" };
-gchar *BinarySuffixes[] = { "bin" };
 gchar *ExcelSuffixes[] = { "asc", "csv", "txt" };
 
 ExtensionList xmlFileTypes = {
   xml_data,
-  NULL,
-  0
-};
-
-ExtensionList asciiFileTypes = {
-  ascii_data,
-  NULL,
-  0
-};
-
-ExtensionList binaryFileTypes = {
-  binary_data,
   NULL,
   0
 };
@@ -85,17 +67,7 @@ GSList *initFileTypeGroups(void)
   xmlFileTypes.extensions = XMLSuffixes;
   xmlFileTypes.len = 3;
 
-  asciiFileTypes.extensions = ASCIISuffixes;
-  asciiFileTypes.len = 1;
-
-
-  binaryFileTypes.extensions = BinarySuffixes;
-  binaryFileTypes.len = 1;
-
   FileTypeGroups->data = (void *) &xmlFileTypes;
-  g_slist_append(FileTypeGroups, &asciiFileTypes);
-
-  g_slist_append(FileTypeGroups, &binaryFileTypes);
 
   g_slist_append(FileTypeGroups, &excelFileTypes);
 
@@ -137,14 +109,12 @@ fileset_generate(const gchar * fileName,
   if (FileTypeGroups == NULL)
     initFileTypeGroups();
 
-#ifdef SUPPORT_PLUGINS
   if(plugin) {
 	  InputDescription *desc;
 	  desc = callInputPluginGetDescription(fileName, modeName, plugin, gg);
 	  if(desc)
             return(desc);
   }
-#endif
 
   groups = FileTypeGroups;
 
@@ -152,7 +122,6 @@ fileset_generate(const gchar * fileName,
 
   desc = (InputDescription *) calloc(1, sizeof(InputDescription));
 
-#ifdef SUPPORT_PLUGINS
   if (1) {
     GList *els = sessionOptions->info->inputPlugins;
     if (els) {
@@ -185,7 +154,6 @@ fileset_generate(const gchar * fileName,
       }
     }
   }
-#endif
 
 
 #ifndef WIN32
@@ -414,66 +382,6 @@ gboolean isURL(const gchar * fileName)
 {
   return ((strncmp(fileName, "http:", 5) == 0 ||
            strncmp(fileName, "ftp:", 4) == 0));
-}
-
-gboolean isASCIIFile(const gchar * fileName, ggobid *gg, GGobiPluginInfo *plugin)
-{
-  FILE *f;
-  gchar word[128];
-  gboolean isascii = true;
-
-  if(!canRead(fileName)) {
-     /* first test whether fileName already ends with .dat! */
-     gchar buf[256];
-     gint slen = strlen(fileName);
-     if (slen >= 4 && strcmp(&fileName[slen-4], ".dat") != 0) {
-       sprintf(buf, "%s.dat", fileName);
-       return(isASCIIFile(buf, gg, plugin));
-     } else {
-       return (false);
-     }
-  }
-
-  f = fopen(fileName, "r");
-  if(!f)
-     return(false);
-
-/*
-  gdouble val;
-  if (fscanf(f, "%lf", &val) == 0) {
-    return (false);
-  }
-*/
-/*
- * This would be easy, but the ascii files might begin with
- * a missing value: NA, na, or even "."
-*/
-
-  if (fscanf(f, "%s", word) == 0)
-    return (false);
-  else {
-    if (strcmp (word, "NA") == 0 ||
-        strcmp (word, "na") == 0 ||
-        strcmp (word, ".") == 0)
-      ;  /* this might represent a missing value; could be ok */
-    else {
-      /*
-       * At worst, the word could begin with sign-decimalpoint
-      */
-      if (strlen(word) == 1 && !isdigit((int)word[0])) {
-        isascii = false;
-      } else if (strlen(word) == 2 && !isdigit((int)word[0]) &&
-                                      !isdigit((int)word[1])) {
-        isascii = false;
-      } else if (strlen(word) > 2 && !isdigit((int)word[0]) &&
-                                     !isdigit((int)word[1]) &&
-                                     !isdigit((int)word[2])) {
-        isascii = false;
-      }
-    }
-  }
-
-  return (isascii);
 }
 
 DataMode

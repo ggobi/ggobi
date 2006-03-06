@@ -110,17 +110,15 @@ const gchar *GGobi_getFileName(ggobid *gg);
 /**
  @ingroup GGobi
 
- Read the data from the specified file..
- To force a particular data mode (e.g. XML, ASCII, binary, etc.)
- rather than leaving it to the auto-detection,  use setDataMode()
- before calling this routine..
+ Read the data from the specified file..  To force a particular data
+ mode (e.g. XML, etc.) rather than leaving it to the auto-detection,
+ use setDataMode() before calling this routine..
 */
 const gchar *GGobi_setFileName(const gchar *fileName, DataMode data_mode, ggobid *gg);
 
 /**
  @ingroup GGobi
-  Returns whether the data was read from a binary
-  or ASCII file.
+  Returns mode of input data.
  */
 extern DataMode GGobi_getDataMode(ggobid *gg);
 

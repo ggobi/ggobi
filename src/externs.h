@@ -410,7 +410,6 @@ gdouble    randvalue (void);
 void       range_unset (ggobid *gg);
 void       raw_to_tform_copy (void);
 gboolean   reached_target(gfloat, gfloat, gint, gfloat *, gfloat *);
-//gboolean   read_ascii_data(InputDescription *desc, ggobid *gg);
 gint       realloc_optimize0_p(optimize0_param *, gint, vector_i);
 void       recenter_data (gint, GGobiData *, ggobid *);
 gboolean   record_add (eeMode, gint a, gint b, gchar *lbl, gchar *id, gchar **vals, GGobiData * d, GGobiData * e, ggobid *gg);
@@ -841,15 +840,11 @@ extern double erfc(double x);
 
 GSList * read_xml(InputDescription *desc, ggobid *gg, GGobiPluginInfo *plugin);
 GSList* read_csv(InputDescription *desc, ggobid *gg, GGobiPluginInfo *plugin);
-//gboolean read_ascii(InputDescription *desc, ggobid *gg, GGobiPluginInfo *plugin);
 
 InputDescription *read_xml_input_description(const char * const fileName, const char * const modeName, 
 					     ggobid *gg, GGobiPluginInfo *info);
 InputDescription *read_csv_input_description(const char * const fileName, const char * const modeName, 
 					     ggobid *gg, GGobiPluginInfo *info);
-//InputDescription *read_ascii_input_description(const char * const fileName, const char * const modeName, 
-//					       ggobid *gg, GGobiPluginInfo *info);
-
 
 void resetDataMode();
 vartabled *vartable_element_get(gint i, GGobiData *d);

@@ -27,12 +27,9 @@
 #include "vars.h"
 #include "externs.h"
 #include "display.h"
-
-#ifdef SUPPORT_PLUGINS
 #include "plugin.h"
-#endif
 
- extern const gchar * const GlyphNames[];
+extern const gchar * const GlyphNames[];
 
 void warning(const char *msg);
 
@@ -984,9 +981,7 @@ GGOBI(close)(ggobid *gg, gboolean closeWindow)
   gg->close_pending = true;
 
   /* close plugin instances */
-#if SUPPORT_PLUGINS
   closePlugins(gg);
-#endif
 
   procs_activate (off, gg->pmode, gg->current_display, gg);
 

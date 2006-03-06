@@ -30,13 +30,9 @@
 #include "externs.h"
 #include "writedata.h"
 
-static gboolean write_binary_data (gchar *, gint *, gint, gint *, gint, GGobiData *, ggobid *);
+#ifdef SAVE_UNTIL_WRITE_CSV_IMPLEMENTED
 static gboolean write_ascii_data (gchar *, gint *, gint, gint *, gint, GGobiData *, ggobid *);
-static gboolean save_collabels (gchar *, gint *colv, gint nc, GGobiData *, ggobid *);
-static gboolean save_rowlabels (gchar *, gint *rowv, gint nr, GGobiData *, ggobid *);
-static gboolean brush_save_colors (gchar *, gint *, gint, GGobiData *, ggobid *);
-static gboolean brush_save_erase (gchar *, gint *, gint, GGobiData *, ggobid *);
-static gboolean brush_save_glyphs (gchar *, gint *, gint, GGobiData *, ggobid *);
+#endif
 
 static gint
 set_rowv (gint *rowv, gchar *rootname, GGobiData *d, ggobid *gg)
@@ -122,6 +118,7 @@ set_colv (gint *colv, gchar *rootname, GGobiData *d, ggobid *gg)
   return (ncols);
 }
 
+#ifdef SAVE_UNTIL_WRITE_CSV_IMPLEMENTED
 gboolean
 write_ascii_data (gchar *rootname, gint *rowv, gint nr, gint *colv, gint nc,
   GGobiData *d, ggobid *gg)
@@ -166,16 +163,6 @@ write_ascii_data (gchar *rootname, gint *rowv, gint nr, gint *colv, gint nc,
   }
 }
 
-void
-strip_blanks (gchar *str)
-{
-  gint src, dest;
-
-  for (src=0, dest=0; src<(gint)(strlen(str)+1); src++)
-    if (str[src] != ' ')
-      str[dest++] = str[src];
-}
-
 gboolean
 ggobi_file_set_create (gchar *rootname, GGobiData *d, ggobid *gg)
 {
@@ -183,37 +170,6 @@ ggobi_file_set_create (gchar *rootname, GGobiData *d, ggobid *gg)
   gint *rowv, *colv;
   gint i;
   gboolean skipit;
-
-  /*
-   * An inconsistency:  Can't save binary data and still
-   * write out "na"
-  */
-  if (gg->save.format == BINARYDATA &&
-      d->nmissing > 0 &&
-        (gg->save.missing_ind == MISSINGSNA ||
-         gg->save.missing_ind == MISSINGSDOT))
-  {
-    gchar *message = g_strdup_printf (
-      "Sorry, GGobi can't write 'NA' or '.' in binary format.");
-    quick_message (message, false);
-    g_free (message);
-    return false;
-  }
-
-
-/* Step 1: verify that the rootname is writable */
-
-/*
-  if ((fp = fopen (rootname, "w")) == NULL) {
-    gchar *message = g_strdup_printf (
-      "The file '%s' can not be opened for writing\n", rootname);
-    quick_message (message, false);
-    g_free (message);
-    return false;
-  } else {
-    fclose (fp);
-  }
-*/
 
   if (d == NULL)
     d = (GGobiData *) g_slist_nth_data(gg->d, 0);
@@ -261,75 +217,6 @@ ggobi_file_set_create (gchar *rootname, GGobiData *d, ggobid *gg)
     }
   }
 
-/* Save column labels */
-  if (!save_collabels (rootname, colv, nc, d, gg)) {
-    g_free ((gchar *) rowv);
-    g_free ((gchar *) colv);
-    return false;
-  }
-
-/* Save row labels */
-  if (!save_rowlabels (rootname, rowv, nr, d, gg)) {
-    g_free ((gchar *) rowv);
-    g_free ((gchar *) colv);
-    return false;
-  }
-
-/* Save colors */
-  skipit = true;
-  /*-- if no color differs from the default color, don't save colors --*/
-  for (i=0; i<nr; i++) {
-    if (d->color_now.els[rowv[i]] != 0) {
-      skipit = false;
-      break;
-    }
-  }
-  if (!skipit) {
-    if (!brush_save_colors (rootname, rowv, nr, d, gg)) {
-      g_free ((gchar *) rowv);
-      g_free ((gchar *) colv);
-      return false;
-    }
-  }
-
-/* Save glyphs */
-  skipit = true;
-  /*-- if no glyph differs from the default, don't save glyphs --*/
-  for (i=0; i<nr; i++) {
-    if (d->glyph_now.els[rowv[i]].type != gg->glyph_0.type ||
-        d->glyph_now.els[rowv[i]].size != gg->glyph_0.size)
-    {
-      skipit = false;
-      break;
-    }
-  }
-  if (!skipit) {
-    if (!brush_save_glyphs (rootname, rowv, nr, d, gg)) {
-      g_free ((gchar *) rowv);
-      g_free ((gchar *) colv);
-      return false;
-    }
-  }
-
-/* Save erase -- unless using erase vector to choose what to copy */
-  if (gg->save.row_ind != DISPLAYEDROWS) {
-    skipit = true;
-    /*-- if nothing is erased, skip it --*/
-    for (i=0; i<nr; i++) {
-      if (d->hidden.els[rowv[i]] == 1) {
-        skipit = false;
-        break;
-      }
-    }
-    if (!skipit) {
-      if (!brush_save_erase (rootname, rowv, nr, d, gg)) {
-        g_free ((gchar *) rowv);
-        g_free ((gchar *) colv);
-        return false;
-      }
-    }
-  }
-
 /*
  * Continue saving files: .doc?
  * Don't bother with .missing
@@ -340,306 +227,7 @@ ggobi_file_set_create (gchar *rootname, GGobiData *d, ggobid *gg)
 
   return true;
 }
+#endif
 
-/*
- * Third section: routines that will be used by both the
- * first and the second sections to save individual files.
-*/
 
-gboolean
-write_binary_data (gchar *rootname, gint *rowv, gint nr, gint *colv, gint nc,
-  GGobiData *d, ggobid *gg)
-{
-  gchar *fname;
-  FILE *fp;
-  gint i, j, ir, jc;
-  gfloat xfoo;
-  gfloat **datap;
-
-  if (rowv == (gint *) NULL) {
-    rowv = (gint *) g_malloc (nr * sizeof(gint));
-    for (i=0; i<nr; i++)
-      rowv[i] = i;
-  }
-
-  fname = g_strdup_printf ("%s.bin", rootname);
-  fp = fopen (fname, "w");
-  g_free (fname);
-
-  if (fp == NULL) {
-    gchar *message = g_strdup_printf (
-      "The file '%s.bin' can not be created\n", rootname);
-    quick_message (message, false);
-    g_free (message);
-    return false;
-  } else {
-
-    /* First the number of rows and columns */
-    fwrite ((gchar *) &nr, sizeof (nr), 1, fp);
-    fwrite ((gchar *) &nc, sizeof (nc), 1, fp);
-
-    datap = (gg->save.stage == RAWDATA) ? d->raw.vals : d->tform.vals;
-
-    for (i=0; i<nr; i++) {
-      ir = rowv[i];
-      for (j=0; j<nc; j++)
-      {
-        if (colv == (gint *) NULL)  /* Write all columns, in default order */
-          jc = j;
-        else
-          jc = colv[j];  /* Write the columns as specified */
-        if (d->nmissing > 0 && d->missing.vals[i][j])
-          xfoo = FLT_MAX;
-        else
-          xfoo = datap[ir][jc];
-        fwrite ((gchar *) &xfoo, sizeof (xfoo), 1, fp);
-      }
-    }
-
-    fclose (fp);
-    return (true);
-  }
-}
-
-/*
- * save limits if they exist
-*/
-gboolean
-save_collabels (gchar *rootname, gint *colv, gint nc, GGobiData *d, ggobid *gg)
-{
-  gint j;
-  FILE *fp;
-  gchar *fname;
-  vartabled *vt;
-
-  fname = g_strdup_printf ("%s.col", rootname);
-  fp = fopen (fname, "w");
-  g_free (fname);
-
-  if (fp == NULL) {
-    gchar *message = g_strdup_printf (
-      "Failed to open %s.col for writing.\n", rootname);
-    quick_message (message, false);
-    g_free (message);
-    return false;
-  }
-  else {
-    if (gg->save.stage == RAWDATA) {
-      for (j=0; j<nc; j++) {
-        vt = vartable_element_get (colv[j], d);
-        fprintf (fp, "%s\n", vt->collab);
-      }
-    } else {  /*-- TFORMDATA --*/
-      for (j=0; j<nc; j++) {
-        vt = vartable_element_get (colv[j], d);
-        fprintf (fp, "%s\n", vt->collab_tform);
-      }
-    }
-    fclose (fp);
-    return true;
-  }
-}
-
-gboolean
-save_rowlabels (gchar *rootname, gint *rowv, gint nr, GGobiData *d, ggobid *gg)
-{
-  gint i;
-  FILE *fp;
-  gchar *fname;
-  gint nels = d->rowlab->len;
-
-  if (nels > 0) {
-    fname = g_strdup_printf ("%s.row", rootname);
-    fp = fopen (fname, "w");
-    g_free (fname);
-
-    if (fp == NULL) {
-      gchar *message = g_strdup_printf ("Failed to open %s.row for writing.\n",
-        rootname);
-      quick_message (message, false);
-      g_free (message);
-      return false;
-    }
-    else
-    {
-      for (i=0; i<nr; i++) {
-        fprintf (fp, "%s\n", 
-          (gchar *) g_array_index (d->rowlab, gchar *, rowv[i]));
-      }
-      fclose(fp);
-    }
-  }
-  return true;
-}
-
-gboolean
-brush_save_colors (gchar *rootname, gint *rowv, gint nr, GGobiData *d, ggobid *gg)
-{
-  gchar *fname;
-  gint i;
-  FILE *fp;
-
-  if (gg->mono_p)
-    return true;
-
-  fname = g_strdup_printf ("%s.colors", rootname);
-  fp = fopen (fname, "w");
-  g_free (fname);
-
-  if (fp == NULL)
-  {
-    gchar *message = g_strdup_printf (
-      "The file '%s.colors' can't be opened for writing\n", rootname);
-    quick_message (message, false);
-    g_free (message);
-    return (false);
-  }
-  else
-  {
-    for (i=0; i<nr; i++)
-      fprintf (fp, "%d\n", d->color_now.els[rowv[i]]);
-
-    if (fclose (fp) == EOF)
-      fprintf(stderr, "error in writing color vector\n");
-  }
-
-  return (true);
-}
-
-gboolean
-brush_save_glyphs (gchar *rootname, gint *rowv, gint nr, GGobiData *d, ggobid *gg)
-{
-  gchar *fname;
-  gint i;
-  FILE *fp;
-  gchar *gstr;
-
-  fname = g_strdup_printf ("%s.glyphs", rootname);
-  fp = fopen (fname, "w");
-  g_free (fname);
-
-  if (fp == NULL)
-  {
-    gchar *message = g_strdup_printf (
-      "The file '%s.colors' can't be opened for writing\n", rootname);
-    quick_message (message, false);
-    g_free (message);
-    g_free (fname);
-    return false;
-
-  } else {
-
-    for (i=0; i<nr; i++) {
-      switch (d->glyph.els[i].type) {
-        case PLUS:
-/*          gstr = "+";*/
-          gstr = "plus";
-        break;
-        case X:
-          gstr = "x";
-        break;
-        case OR:
-          gstr = "or";
-        break;
-        case FR:
-          gstr = "fr";
-        break;
-        case OC:
-          gstr = "oc";
-        break;
-        case FC:
-          gstr = "fc";
-        break;
-        case DOT_GLYPH:
-          gstr = ".";
-        break;
-        case UNKNOWN_GLYPH:
-        default:
-          gstr = ".";
-        break;
-      }
-
-      fprintf (fp, "%s %d\n", gstr, d->glyph.els[i].size);
-    }
-    if (fclose (fp) == EOF)
-      fprintf (stderr, "error in writing glyphs vector\n");
-    return true;
-  }
-}
-
-gboolean
-brush_save_erase (gchar *rootname, gint *rowv, gint nr, GGobiData *d, ggobid *gg)
-{
-  gchar *fname;
-  gint i;
-  FILE *fp;
-
-  fname = g_strdup_printf ("%s.erase", rootname);
-  fp = fopen (fname, "w");
-  g_free (fname);
-
-  if (fp == NULL) {
-    gchar *message = g_strdup_printf (
-      "The file '%s.erase' can't be opened for writing\n", rootname);
-    quick_message (message, false);
-    g_free (message);
-    return false;
-  }
-
-  for (i=0; i<nr; i++)
-    fprintf(fp, "%ld\n", (glong) d->hidden.els[rowv[i]]);
-
-  fclose(fp);
-  return true;
-}
-
-/*------------------------------------------------------------------------*/
-
-gboolean
-save_missing (gchar *rootname, gint *rowv, gint nr, gint *colv, gint nc,
-  GGobiData *d, ggobid *gg)
-{
-  gint i;
-  gchar *fname;
-  gboolean success = true;
-  FILE *fp;
-
-  if (rowv == (gint *) NULL) {
-    rowv = (gint *) g_malloc (nr * sizeof (gint));
-    for (i=0; i<nr; i++)
-      rowv[i] = i;
-  }
-
-  fname = g_strdup_printf ("%s.missing", rootname);
-  fp = fopen (fname, "w");
-  g_free (fname);
-
-  if (fp == NULL) {
-    gchar *message = g_strdup_printf (
-      "Problem writing out the missing file, %s\n", fname);
-    quick_message (message, false);
-    g_free (message);
-    return false;
-  }
-  else
-  {
-    gint i, j, jc, m;
-    for (i=0; i<nr; i++)
-    {
-      m = rowv[i];
-
-      for (j=0; j<nc; j++) {
-        if (colv == (gint *) NULL)  /* Write all columns, in default order */
-          jc = j;
-        else
-          jc = colv[j];  /* Write the columns as specified */
-          fprintf (fp, "%d ", d->missing.vals[m][jc]);
-      }
-      fprintf (fp, "\n");
-    }
-    fclose (fp);
-  }
-
-  return (success);
-}
 

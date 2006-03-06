@@ -21,9 +21,7 @@
 #include "writedata.h"
 
 static gchar *format_lbl[] =
-  {"XML"
-//, "File set (ascii)",
-};
+  {"XML"};
 void format_set (gint fmt, ggobid *gg) { gg->save.format = fmt; }
 static void format_set_cb (GtkWidget *w, ggobid *gg)
 {
@@ -120,7 +118,7 @@ writeall_window_open (ggobid *gg) {
     j = 0;
     opt = gtk_combo_box_new_text ();
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-      "Save the data in XML or in a ggobi file set (data in ascii or binary",
+      "Save the data in XML",
       NULL);
     populate_combo_box (opt, format_lbl, G_N_ELEMENTS(format_lbl),
       G_CALLBACK(format_set_cb), gg);

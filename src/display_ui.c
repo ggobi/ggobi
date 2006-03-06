@@ -17,9 +17,7 @@
 #include <gtk/gtk.h>
 #include "vars.h"
 #include "externs.h"
-#ifdef SUPPORT_PLUGINS  
 #include "plugin.h"
-#endif
 
 void buildExtendedDisplayMenu(ggobid *gg, int nd, GGobiData *d0);
 
@@ -82,11 +80,9 @@ display_menu_build (ggobid *gg)
                       (gpointer) gg);
   gtk_menu_shell_append (GTK_MENU_SHELL (gg->display_menu), item);
 
-#ifdef SUPPORT_PLUGINS  
   if (sessionOptions->info != NULL) {
     pluginsUpdateDisplayMenu(gg, gg->pluginInstances);
   }
-#endif
 
   /*-- these two lines replace gtk_menu_popup --*/
   if (nd) {

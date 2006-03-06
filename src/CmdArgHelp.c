@@ -1,6 +1,5 @@
 	"--activeColorScheme", "name of the default color scheme to use",
 	"-activeColorScheme", "",
-	"-ascii", "use the xgobi-style ASCII data mode",
 	"--colorschemes", "name of XML file containing color scheme descriptions.",
 	"-colorschemes", "",
 	"--datamode", "specify datamode (for plugins)",
