@@ -120,7 +120,6 @@ SRC=\
   vector.c \
   win32_draw.c \
   writedata_ui.c \
-  write_svg.c \
   wvis.c \
   wvis_ui.c \
   xlines.c \

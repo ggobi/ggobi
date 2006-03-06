@@ -22,14 +22,16 @@
 #include <string.h>
 #include <stdio.h>
 
+/*
+ * This wants to treat writing svg as the default, but we're deleting
+ * that code ...
+*/
 
 #if 0
 #include <libgnomeui/gnome-dialog.h>
 #include <libgnomeui/gnome-uidefs.h>
 #include <libgnomeui/gnome-stock.h>
 #endif
-
-gboolean PrintAsSVG(PrintOptions *options, PrintInfo *info, void *userData);
 
 //static void addDialogButtons(GtkWidget *dialog, PrintInfo *data);
 static void handlePrintOptions(PrintInfo *info);
@@ -159,17 +161,6 @@ addDialogButtons(GtkWidget *dialog, PrintInfo *data)
  We return true to indicate that the print was successful. 
  */
 
-gboolean
-PrintAsSVG(PrintOptions *options, PrintInfo *info, void *userData)
-{
- extern void display_write_svg (ggobid *gg);
-
-  display_write_svg(info->ggobi);
-
- return(true);
-}
-
-
 void 
 setStandardPrintHandlers()
 {
@@ -178,8 +169,8 @@ setStandardPrintHandlers()
   }
   if(DefaultPrintHandler.callback == NULL)
    DefaultPrintHandler.callback = &showPrintDialog;
-  if(DefaultPrintHandler.dialog == NULL)
-    DefaultPrintHandler.dialog = PrintAsSVG;
+  //if(DefaultPrintHandler.dialog == NULL)
+  //  DefaultPrintHandler.dialog = PrintAsSVG;
 }
 
 
@@ -194,7 +185,7 @@ getDefaultPrintOptions(PrintOptions *opts)
   opts->width = 480;
   opts->height = 400;
   opts->file = (OutputDescription *) g_malloc(sizeof(OutputDescription));
-  opts->file->fileName = g_strdup("foo.svg");
+  //opts->file->fileName = g_strdup("foo.svg");
 
  
   gdk_color_white(gdk_colormap_get_system (), &white);
