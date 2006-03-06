@@ -11,6 +11,8 @@
 #include "dspdesc.h"
 #include "macros.h"
 
+#define MAX_PER_ROW 100
+
 /*
  Jittering:  d->jitdata is added directly to world data, so the
    appropriate values of jitdata should be divided by PRECISION1
@@ -195,6 +197,7 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
   fcoords tfmin, tfmax;
   fcoords pmin, pmax;
   float ftmp;
+  gint counter;
 
   OPEN_LIST(fp);  /* plot; unlabelled */
 
@@ -267,15 +270,16 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
 
   /* raw row number -- the edges use these  */
   OPEN_NAMED_C(fp, "index");
-  for (m=0; m<d->nrows_in_plot; m++) {
+  for (m=0, counter=0; m<d->nrows_in_plot; m++, counter++) {
     i = d->rows_in_plot.els[m];
+    if (counter % MAX_PER_ROW == 0) ADD_CR(fp);
     fprintf (fp, "%d,", i);
   }
   CLOSE_C(fp); ADD_COMMA(fp); ADD_CR(fp);
 
   /* x coordinates */
   OPEN_NAMED_C(fp, "x");
-  for (m=0; m<d->nrows_in_plot; m++) {
+  for (m=0, counter=0; m<d->nrows_in_plot; m++, counter++) {
     i = d->rows_in_plot.els[m];
     if (projection == P1PLOT) {
       fprintf (fp, "%g,", d->tform.vals[i][sp->p1dvar]);
@@ -288,12 +292,13 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
     } else {  /* planar already includes jitdata! */
       fprintf (fp, "%g,", sp->planar[i].x);
     }
+    if (counter % MAX_PER_ROW == 0) ADD_CR(fp);
   }
   CLOSE_C(fp); ADD_COMMA(fp); ADD_CR(fp);
 
   /* y coordinates */
   OPEN_NAMED_C(fp, "y");
-  for (m=0; m<d->nrows_in_plot; m++) {
+  for (m=0, counter=0; m<d->nrows_in_plot; m++, counter++) {
     i = d->rows_in_plot.els[m];
     if (projection == P1PLOT) {
       /* I <think> spread_data is in tform coordinates, but it's hard
@@ -306,38 +311,43 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
     } else {
       fprintf (fp, "%g,", sp->planar[i].y);
     }
+    if (counter % MAX_PER_ROW == 0) ADD_CR(fp);
   }
   CLOSE_C(fp); ADD_COMMA(fp); ADD_CR(fp);
 
   /* color */
   OPEN_NAMED_C(fp, "color");
-  for (m=0; m<d->nrows_in_plot; m++) {
+  for (m=0, counter=0; m<d->nrows_in_plot; m++, counter++) {
     i = d->rows_in_plot.els[m];
     fprintf (fp, "%d,", d->color_now.els[i]);
+    if (counter % MAX_PER_ROW == 0) ADD_CR(fp);
   }
   CLOSE_C(fp); ADD_COMMA(fp); ADD_CR(fp);
 
   /* glyphtype */
   OPEN_NAMED_C(fp, "glyphtype");
-  for (m=0; m<d->nrows_in_plot; m++) {
+  for (m=0, counter=0; m<d->nrows_in_plot; m++, counter++) {
     i = d->rows_in_plot.els[m];
     fprintf (fp, "%d,", d->glyph_now.els[i].type);
+    if (counter % MAX_PER_ROW == 0) ADD_CR(fp);
   }
   CLOSE_C(fp); ADD_COMMA(fp); ADD_CR(fp);
 
   /* glyphsize */
   OPEN_NAMED_C(fp, "glyphsize");
-  for (m=0; m<d->nrows_in_plot; m++) {
+  for (m=0, counter=0; m<d->nrows_in_plot; m++, counter++) {
     i = d->rows_in_plot.els[m];
     fprintf (fp, "%d,", d->glyph_now.els[i].size);
+    if (counter % MAX_PER_ROW == 0) ADD_CR(fp);
   }
   CLOSE_C(fp); ADD_COMMA(fp); ADD_CR(fp);
 
   /* hiddenness */
   OPEN_NAMED_C(fp, "hidden");
-  for (m=0; m<d->nrows_in_plot; m++) {
+  for (m=0, counter=0; m<d->nrows_in_plot; m++, counter++) {
     i = d->rows_in_plot.els[m];
     fprintf (fp, "%d,", d->hidden_now.els[i]);
+    if (counter % MAX_PER_ROW == 0) ADD_CR(fp);
   }
   CLOSE_C(fp); ADD_COMMA(fp); ADD_CR(fp);
 
@@ -813,6 +823,7 @@ desc_write (PluginInstance *inst)
     display->options.edges_arrowheads_show_p);
 
   CLOSE_LIST(fp);
+  ADD_CR(fp);
 
   fclose(fp);
 
