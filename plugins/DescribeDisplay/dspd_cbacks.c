@@ -194,6 +194,7 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
   icoords scr;
   fcoords tfmin, tfmax;
   fcoords pmin, pmax;
+  float ftmp;
 
   OPEN_LIST(fp);  /* plot; unlabelled */
 
@@ -227,10 +228,15 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
      GGobiExtendedSPlotClass *klass;
      klass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);
      if(klass->screen_to_tform)
-       klass->screen_to_tform(cpanel, sp, &scr, &tfmin, gg);
+       klass->screen_to_tform(cpanel, sp, &scr, &tfmax, gg);
      else
        g_printerr ("screen_to_tform routine needed\n");
   }
+
+  // Swap ymin and ymax
+  ftmp = tfmin.y;
+  tfmin.y = tfmax.y;
+  tfmax.y = ftmp;
 
   fprintf (fp,
     "tformLims=c(xmin=%.3f, xmax=%.3f, ymin=%.3f, ymax=%.3f),",
@@ -244,10 +250,11 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
     planarx = gtmp + sp->pmid.x
     */
 
+  // Swap y min and max up front.
   pmin.x = scale_convert (sp, 0, sp->max.x, sp->pmid.x, sp->iscale.x);
-  pmin.y = scale_convert (sp, 0, sp->max.y, sp->pmid.y, sp->iscale.y);
+  pmax.y = scale_convert (sp, 0, sp->max.y, sp->pmid.y, sp->iscale.y);
   pmax.x = scale_convert (sp, sp->max.x, sp->max.x, sp->pmid.x, sp->iscale.x);
-  pmax.y = scale_convert (sp, sp->max.y, sp->max.y, sp->pmid.x, sp->iscale.y);
+  pmin.y = scale_convert (sp, sp->max.y, sp->max.y, sp->pmid.x, sp->iscale.y);
 
   fprintf (fp,
     "planarLims=c(xmin=%.3f, xmax=%.3f, ymin=%.3f, ymax=%.3f),",
