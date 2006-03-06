@@ -123,6 +123,10 @@ void colorscheme_init(colorschemed * scheme)
 colorschemed *default_scheme_init()
 {
   gint i, k;
+  /*
+   * This section may be useful for debugging in case of
+   * difficulties reading the colorscheme xml file.
+   */
 #ifdef SPECTRUM7
   static gfloat data[7][3] = {
     {0.890, 0.196, 0.122},

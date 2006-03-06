@@ -791,57 +791,6 @@ GGOBI(getCaseHiddens)(gint *pts, gint howMany, GGobiData *d, ggobid *gg)
 /*        setting and getting edges                                        */
 /*-------------------------------------------------------------------------*/
 
-#ifdef OBSOLETE_EDGE_CODE
-gboolean 
-GGOBI(isConnectedEdge)(gint a, gint b, GGobiData *d, GGobiData *e, ggobid *gg)
-{
-  gint tmp, i;
-
-/*
-  gint a = d->rowid.idv.els[endpoints[m].a];
-  gint b = d->rowid.idv.els[endpoints[m].b];
-*/
-
-  if(a > b) {
-     tmp = a;
-     a = b;
-     b = tmp;
-  }
-
-  for(i = 0; i < d->edge.n ; i++) {
-    
-    if(d->edge.endpoints[i].a == a && d->edge.endpoints[i].b == b)
-       return(true);
-
-    if(d->edge.endpoints[i].a > a) {
-      return(false);
-    } 
-  }
-
- return(false);
-}
-
-/*
-  The additional argument update allows one to pre-allocate
-  an entire block for edge.endpoints and then write into
-  it, rather than reallocate the vector for each new edge.
-  
-  To do this, the value of update should be false.
- */
-void
-GGOBI(setObservationEdge)(gint x, gint y, GGobiData *d, ggobid *gg, gboolean update)
-{
-  if (GGOBI(isConnectedEdge)(x, y, d, gg) == false) {
-    if (update)
-      edges_alloc (d->edge.n+1, d);
-    d->edge.endpoints[d->edge.n].a = x;
-    d->edge.endpoints[d->edge.n].b = y;
-    d->edge.n++;
-  }
-}
-#endif
-
-
 gboolean 
 GGOBI(getShowLines)()
 {

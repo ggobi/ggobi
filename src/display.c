@@ -102,62 +102,7 @@ display_plot_allbutone (displayd *display, splotd *splot,
 /*----------------------------------------------------------------------*/
 /*           Callbacks common to multiple display types                 */
 /*----------------------------------------------------------------------*/
-#if 0
-static void
-display_edges_directed_show (displayd *display, gboolean show)
-{
-  GtkWidget *w;
 
-  if(display->edge_merge == -1) {
-     /* set_display_options doesn't know whether to call this or not. */
-    return;
-  }
-
-  w  = widget_find_by_name (display->edge_menu,
-    "DISPLAYMENU:edges_d");
-
-  if (!show && display->options.edges_directed_show_p && w) {
-	GtkAction *action = gtk_ui_manager_get_action(display->menu_manager,
-	  "/menubar/Edges/ShowDirectedEdges");
-    gtk_check_menu_item_set_active ((GtkCheckMenuItem *) w, false);
-    display->options.edges_directed_show_p = false;
-  }
-}
-static void
-display_edges_undirected_show (displayd *display, gboolean show)
-{
-  GtkWidget *w;
-
-  if (!show) {
-    if (display->options.edges_undirected_show_p) { 
-      if ((w = widget_find_by_name (display->edge_menu,
-        "DISPLAYMENU:edges_u")) != NULL)
-      {
-        gtk_check_menu_item_set_active ((GtkCheckMenuItem *) w, false);
-        display->options.edges_undirected_show_p = false;
-      }
-    }
-  } else {
-  }
-}
-static void
-display_edges_arrowheads_show (displayd *display, gboolean show)
-{
-  GtkWidget *w;
-
-  if (!show) {
-    if (display->options.edges_arrowheads_show_p) { 
-      if ((w = widget_find_by_name (display->edge_menu,
-        "DISPLAYMENU:edges_a")) != NULL)
-      {
-        gtk_check_menu_item_set_active ((GtkCheckMenuItem *) w, false);
-        display->options.edges_arrowheads_show_p = false;
-
-      }
-    }
-  }
-}
-#endif
 /*
 We need to allow people to programmatically change a setting and force
 the update.  The current framework is all based on GUI events and so
@@ -661,9 +606,6 @@ display_free (displayd* display, gboolean force, ggobid *gg)
 
      gtk_widget_destroy (GGOBI_WINDOW_DISPLAY(display)->window);
     }
-#if 0 /*XX */
-    gtk_object_destroy(GTK_OBJECT(display));
-#endif
 
   }
 

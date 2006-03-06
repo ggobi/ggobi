@@ -70,7 +70,7 @@ filesel_ok (GtkWidget *chooser)
 		  /*-- destroy and rebuild the menu every time data is read in --*/
         display_menu_build (gg);
 
-	  g_free(pluginModeName);
+      g_free(pluginModeName);
 	  
       /*
        * If this is the first data read in, we need a call to
@@ -103,37 +103,6 @@ filesel_ok (GtkWidget *chooser)
           g_free (filename);
         }
         break;
-#ifdef WRITEASCII // Obsolete
-        case ASCIIDATA:
-        {
-          GGobiData *d = NULL;
-          GSList *l = gg->d;
-          gchar *name;
-          gint k;
-          gint nd = g_slist_length (gg->d);
-          
-          /*-- if fname already contains ".dat", then strip it off --*/
-          if (len >= 4 && g_strncasecmp (&fname[len-4], ".dat", 4) == 0)
-            filename = g_strndup (fname, len-4);
-          else
-            filename = g_strdup (fname);
-
-          k = 0;
-          while (l) {
-            d = (GGobiData *) l->data;
-            name = (nd > 1) ?
-              g_strdup_printf ("%s%d", filename, k) : g_strdup (filename);
-            ggobi_file_set_create (name, d, gg);
-            l = l->next;
-            k++;
-            g_free (name);
-          }
-
-
-          g_free (filename);
-        }
-        break;
-#endif
         case BINARYDATA:  /*-- not yet implemented --*/
         break;
         case MYSQL_DATA:  /*-- never will be implemented --*/
