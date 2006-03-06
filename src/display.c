@@ -606,7 +606,6 @@ display_free (displayd* display, gboolean force, ggobid *gg)
 
      gtk_widget_destroy (GGOBI_WINDOW_DISPLAY(display)->window);
     }
-
   }
 
   /*-- If there are no longer any displays, set ggobi's mode to NULLMODE --*/

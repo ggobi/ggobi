@@ -22,17 +22,6 @@
 #include <string.h>
 #include <stdio.h>
 
-/*
- * This wants to treat writing svg as the default, but we're deleting
- * that code ...
-*/
-
-#if 0
-#include <libgnomeui/gnome-dialog.h>
-#include <libgnomeui/gnome-uidefs.h>
-#include <libgnomeui/gnome-stock.h>
-#endif
-
 //static void addDialogButtons(GtkWidget *dialog, PrintInfo *data);
 static void handlePrintOptions(PrintInfo *info);
 
@@ -122,35 +111,6 @@ handlePrintOptions(PrintInfo *info)
   }
 }
 
-/*
- Adds the Okay and Cancel buttons to the specified dialog
- and establishes local handlers for the click actions.
- */
- #if 0
-static void
-addDialogButtons(GtkWidget *dialog, PrintInfo *data)
-{
-  GtkWidget *okay_button, *cancel_button, *help_button;
-  okay_button = gtk_button_new_with_label("Okay");
-  cancel_button = gtk_button_new_with_label("Cancel");
-  help_button = gtk_button_new_with_label("Help");
-  gtk_container_add (GTK_CONTAINER (GTK_DIALOG(dialog)->action_area),
-    okay_button);
-  gtk_container_add (GTK_CONTAINER (GTK_DIALOG(dialog)->action_area),
-    cancel_button);
-
-
-      /* Now setup the action/signal handlers. */  
-  g_signal_connect (G_OBJECT (cancel_button), "clicked",
-                      G_CALLBACK (cancelPrint), data);
-
-
-  g_signal_connect (G_OBJECT (okay_button), "clicked",
-                      G_CALLBACK (handlePrintOptions), data);
-
-  /*  gnome_dialog_set_default(GNOME_DIALOG(dlg), GNOME_OK); */
-}
-#endif
 /*
  This is the unfinished version of the default print handler
  for the stand-alone ggobi. 

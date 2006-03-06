@@ -25,11 +25,6 @@
 #include "vars.h"
 #include "externs.h"
 
-#ifdef GTK_2_0
-#undef __gtk_marshal_MARSHAL_H__
-#include "marshal.h"
-#endif
-
 #include "read_xml.h"
 
 #ifdef SUPPORT_PLUGINS

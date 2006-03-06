@@ -20,15 +20,9 @@
 #include "read_init.h"
 #include "read_xml.h" /* for asNumber() */
 
-#ifdef USE_GNOME_XML
-#include <gnome-xml/parser.h>
-#include <gnome-xml/tree.h>
-#include <gnome-xml/parserInternals.h> /* for xmlDoValidityChecking */
-#else
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 #include <libxml/parserInternals.h> /* for xmlDoValidityChecking */
-#endif
 
 #include <string.h>
 

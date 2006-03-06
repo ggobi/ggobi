@@ -622,23 +622,6 @@ GType ggobi_barchart_splot_get_type(void)
   return barchart_type;
 }
 
-
-#if 0
-allocCPanels(GGOBI_EXTENDED_DISPLAY(dpy));
-void allocCPanels(extendedDisplayd * dpy)
-{
-  GGobiExtendedDisplayClass *klass;
-  klass = GGOBI_EXTENDED_DISPLAY_GET_CLASS(dpy);
-
-  if (klass->numControlPanels > 0)
-    dpy->cpanel =
-        (cpaneld **) g_malloc(sizeof(cpaneld *) * klass->numControlPanels);
-}
-
-#endif
-
-
-
 /**************************************************************************/
 
 GType ggobi_time_series_splot_get_type(void)

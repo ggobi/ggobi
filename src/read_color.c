@@ -18,13 +18,8 @@
 
 #include <string.h>
 
-#ifdef USE_GNOME_XML
-#include <gnome-xml/parser.h>
-#include <gnome-xml/tree.h>
-#else
 #include <libxml/parser.h>
 #include <libxml/tree.h>
-#endif
 
 #include "read_init.h"
 #include "read_xml.h"

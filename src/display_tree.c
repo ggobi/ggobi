@@ -65,46 +65,6 @@ update_display_tree_plots_by_variable(ggobid *gg, GGobiData *d, gint whichVar, s
 	gtk_tree_store_set(GTK_TREE_STORE(model), &iter, DISPTREE_LABEL, label, -1);
 	if (label)
 		g_free(label);
-	
-#if 0
-    n = g_list_length(gg->displays);
-    for(i =0; i < n; i++) {
-        dpy = (displayd *) g_list_nth_data(gg->displays, i);
-	if(sp->displayptr == dpy) 
-	    break;
-    }
-
-    if(i == n) {
-	return;/*XXX give a warning message that this should never have happened! */
-    }
-
-      /* 
-        Now we know the particular element of the tree corresponding
-        to the display. So, this is a container with a single child
-        which is a GtkTreeItem object. We ask it for its subtree,
-        then we get its children. And now we loop over the splotd's
-        in the display and update the label in the corresponding
-        child in this containers children. Each child is a GtkTreeItem.
-       */    
-    kids = gtk_container_get_children(GTK_CONTAINER(tree->tree));
-    subTree = (GtkWidget*) g_list_nth_data(kids, i);
-    
-    kids = gtk_container_get_children(GTK_CONTAINER(GTK_TREE_ITEM_SUBTREE(GTK_TREE_ITEM(subTree))));
-
-
-    n = g_list_length(dpy->splots);
-    for(i = 0; i < n; i++) {
-	GtkWidget *tmp;
-        splotd *sp;
-	char *lab;
-        sp = (splotd*) g_list_nth_data(dpy->splots, i);
-        tmp = (GtkWidget *) g_list_nth_data(kids, i);
-        tmp = (GtkWidget *) g_list_nth_data(gtk_container_get_children(GTK_CONTAINER(tmp)), 0);
-	lab = splot_tree_label(sp, i, dpy->d, gg);
-        gtk_label_set_text(GTK_LABEL(tmp), lab);
-	g_free(lab);
-    }
-	#endif
 }
 
 CHECK_EVENT_SIGNATURE(update_display_tree_plots_by_variable, select_variable_f)
@@ -321,22 +281,6 @@ tree_display_entry_remove(displayd *display, GtkWidget *tree, ggobid *gg)
   return(gtk_tree_store_remove(GTK_TREE_STORE(model), &iter));
 }
 
-#if 0
-/**
-  Remove the specified entry from the top-level of the 
-  given tree.
- */
-gint  
-tree_display_entry_remove_by_index(gint which, GtkWidget *tree)
-{
-fprintf(stderr, "Removing display %d\n", which); fflush(stderr);
-  gtk_tree_clear_items(GTK_TREE(tree), which, which+1);
-
- return(which);
-}
-#endif
-
-
 /*
  Called when a node corresponding to a window/display is
  selected in the display tree.
@@ -376,26 +320,3 @@ display_tree_child_select(GtkTreeSelection *sel, gpointer data)
    /* And now make certain the window comes to the top.*/
   gdk_window_raise(GGOBI_WINDOW_DISPLAY(display)->window->window);
 }
-
-#if 0
-/*
- Called when a node corresponding to an splot is
- selected in the display tree.
- This makes the corresponding splot the current
- one.
- */
-void
-display_tree_splot_child_select(GtkWidget *item, splotd *plot)
-{
-  ggobid *gg = GGobiFromSPlot(plot);
-
-  if( &(plot->displayptr->ggobi->display_tree) == NULL) {
-    return;
-  }
-
-  if(plot != NULL) {
-    /* Set the associated splot to be the current one. */
-   splot_set_current(plot, on, gg);
-  }  
-}
-#endif

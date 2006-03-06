@@ -28,10 +28,6 @@
 #include "vars.h"
 #include "externs.h"
 
-#ifdef WIN32 
-#define   MAXLONG 0x7fffffff
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif

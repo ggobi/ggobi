@@ -37,14 +37,6 @@
 #include "read_init.h"
 #include "colorscheme.h"
 
-#ifdef WIN32
-#include <windows.h>
-#define DIR_SEPARATOR '\\'
-#else
-#define DIR_SEPARATOR '/'
-#endif
-
-
 #include "plugin.h" /* For registerDefaultPlugin. */
 
 
