@@ -23,8 +23,8 @@
 #include "externs.h"
 
 /* */
-static gboolean active_paint_points (splotd *, GGobiData *d, ggobid *gg);
-static gboolean active_paint_edges (splotd *, GGobiData *e, ggobid *gg);
+static gboolean active_paint_points (splotd *, GGobiData * d, ggobid * gg);
+static gboolean active_paint_edges (splotd *, GGobiData * e, ggobid * gg);
 static gboolean build_symbol_vectors (cpaneld *, GGobiData *, ggobid *);
 /* */
 
@@ -34,12 +34,14 @@ static gboolean build_symbol_vectors (cpaneld *, GGobiData *, ggobid *);
 
 /* convert a glyph size into a line width */
 gint
-lwidth_from_gsize(gint size)
+lwidth_from_gsize (gint size)
 {
-  return ((size<3) ? 0 : (size-2)*2);
+  return ((size < 3) ? 0 : (size - 2) * 2);
 }
-gint  /* This refers to the stored ltype, apparently */
-ltype_from_gtype(gint gtype) {
+
+gint                            /* This refers to the stored ltype, apparently */
+ltype_from_gtype (gint gtype)
+{
   gint ltype;
 
   /* These ltypes are the three EDGETYPES; should be an enum */
@@ -48,45 +50,48 @@ ltype_from_gtype(gint gtype) {
     ltype = SOLID;
   else if (gtype == OC || gtype == OR)
     ltype = WIDE_DASH;
-  else ltype = NARROW_DASH;
+  else
+    ltype = NARROW_DASH;
 
   return ltype;
 }
-gint /* sets dashes and returns a gtk line attribute */
-set_lattribute_from_ltype(gint ltype, ggobid *gg)
+
+gint                            /* sets dashes and returns a gtk line attribute */
+set_lattribute_from_ltype (gint ltype, ggobid * gg)
 {
   gint8 dash_list[2];
 
-  switch (ltype) {  /* one of the three EDGETYPES; should be an enum */
-    case SOLID:
-      ltype = GDK_LINE_SOLID;
+  switch (ltype) {              /* one of the three EDGETYPES; should be an enum */
+  case SOLID:
+    ltype = GDK_LINE_SOLID;
     break;
-    case WIDE_DASH:
-      ltype = GDK_LINE_ON_OFF_DASH;
-      dash_list[0] = 8;
-      dash_list[1] = 2;
-      gdk_gc_set_dashes (gg->plot_GC, 0, dash_list, 2);
+  case WIDE_DASH:
+    ltype = GDK_LINE_ON_OFF_DASH;
+    dash_list[0] = 8;
+    dash_list[1] = 2;
+    gdk_gc_set_dashes (gg->plot_GC, 0, dash_list, 2);
     break;
-    case NARROW_DASH:
-      ltype = GDK_LINE_ON_OFF_DASH;
-      dash_list[0] = 4;
-      dash_list[1] = 2;
-      gdk_gc_set_dashes (gg->plot_GC, 0, dash_list, 2);
+  case NARROW_DASH:
+    ltype = GDK_LINE_ON_OFF_DASH;
+    dash_list[0] = 4;
+    dash_list[1] = 2;
+    gdk_gc_set_dashes (gg->plot_GC, 0, dash_list, 2);
     break;
   }
 
 
-} 
+}
 
 void
-find_glyph_type_and_size (gint gid, glyphd *glyph)
+find_glyph_type_and_size (gint gid, glyphd * glyph)
 {
 /*  gid ranges from 0:42, type from 0 to 6, size from 0 to 7 */
   if (gid == 0) {
     glyph->type = glyph->size = 0;  /*-- single-pixel point --*/
-  } else {
-    glyph->type = ( (gid-1) / (gint) (NGLYPHSIZES) ) + 1 ;
-    glyph->size = ( (gid-1) % (gint) (NGLYPHSIZES) ) ;
+  }
+  else {
+    glyph->type = ((gid - 1) / (gint) (NGLYPHSIZES)) + 1;
+    glyph->size = ((gid - 1) % (gint) (NGLYPHSIZES));
   }
 }
 
@@ -94,7 +99,7 @@ find_glyph_type_and_size (gint gid, glyphd *glyph)
 
 /*-- called by brush_motion, brush_mode_cb, and in the api --*/
 gboolean
-brush_once (gboolean force, splotd *sp, ggobid *gg)
+brush_once (gboolean force, splotd * sp, ggobid * gg)
 {
 /*
  * Determine which bins the brush is currently sitting in.
@@ -119,7 +124,8 @@ brush_once (gboolean force, splotd *sp, ggobid *gg)
     bin1->x = d->brush.nbins - 1;
     bin1->y = d->brush.nbins - 1;
 
-  } else {
+  }
+  else {
 
     gint ulx = MIN (brush_pos->x1, brush_pos->x2);
     gint uly = MIN (brush_pos->y1, brush_pos->y2);
@@ -156,7 +162,8 @@ brush_once (gboolean force, splotd *sp, ggobid *gg)
 }
 
 void
-brush_prev_vectors_update (GGobiData *d, ggobid *gg) {
+brush_prev_vectors_update (GGobiData * d, ggobid * gg)
+{
   gint m, i;
 
   g_assert (d->color.nels == d->nrows);
@@ -167,7 +174,7 @@ brush_prev_vectors_update (GGobiData *d, ggobid *gg) {
     vectorg_realloc (&d->glyph_prev, d->nrows);
   }
 
-  for (m=0; m<d->nrows_in_plot; m++) {
+  for (m = 0; m < d->nrows_in_plot; m++) {
     i = d->rows_in_plot.els[m];
     d->color_prev.els[i] = d->color.els[i];
     d->hidden_prev.els[i] = d->hidden.els[i];
@@ -177,24 +184,27 @@ brush_prev_vectors_update (GGobiData *d, ggobid *gg) {
 }
 
 void
-brush_undo (splotd *sp, GGobiData *d, ggobid *gg) {
+brush_undo (splotd * sp, GGobiData * d, ggobid * gg)
+{
   gint m, i;
-  if(!d)
+  if (!d)
     return;
 
   g_assert (d->color.nels == d->nrows);
 
-  for (m=0; m<d->nrows_in_plot; m++) {
+  for (m = 0; m < d->nrows_in_plot; m++) {
     i = d->rows_in_plot.els[m];
     d->color.els[i] = d->color_now.els[i] = d->color_prev.els[i];
     d->hidden.els[i] = d->hidden_now.els[i] = d->hidden_prev.els[i];
-    d->glyph.els[i].type = d->glyph_now.els[i].type = d->glyph_prev.els[i].type;
-    d->glyph.els[i].size = d->glyph_now.els[i].size = d->glyph_prev.els[i].size;
+    d->glyph.els[i].type = d->glyph_now.els[i].type =
+      d->glyph_prev.els[i].type;
+    d->glyph.els[i].size = d->glyph_now.els[i].size =
+      d->glyph_prev.els[i].size;
   }
 }
 
 void
-reinit_transient_brushing (displayd *dsp, ggobid *gg)
+reinit_transient_brushing (displayd * dsp, ggobid * gg)
 {
 /*
  * If a new variable is selected or a variable is transformed
@@ -213,16 +223,16 @@ reinit_transient_brushing (displayd *dsp, ggobid *gg)
   g_assert (d->color.nels == d->nrows);
 
   if (point_painting_p) {
-    for (m=0; m<d->nrows_in_plot; m++) {
+    for (m = 0; m < d->nrows_in_plot; m++) {
       i = d->rows_in_plot.els[m];
-      d->color_now.els[i] = d->color.els[i] ;
+      d->color_now.els[i] = d->color.els[i];
       d->glyph_now.els[i].type = d->glyph.els[i].type;
       d->glyph_now.els[i].size = d->glyph.els[i].size;
       d->hidden_now.els[i] = d->hidden.els[i];
     }
   }
   if (edge_painting_p && e != NULL) {
-    for (k=0; k < e->edge.n; k++) {
+    for (k = 0; k < e->edge.n; k++) {
       e->color_now.els[k] = e->color.els[k];
       e->glyph_now.els[k].type = e->glyph.els[k].type;
       e->glyph_now.els[k].size = e->glyph.els[k].size;
@@ -232,11 +242,12 @@ reinit_transient_brushing (displayd *dsp, ggobid *gg)
 }
 
 void
-brush_set_pos (gint x, gint y, splotd *sp) {
+brush_set_pos (gint x, gint y, splotd * sp)
+{
   brush_coords *brush = &sp->brush_pos;
   brush_coords *obrush = &sp->brush_pos_o;
-  gint xdist = brush->x2 - brush->x1 ;
-  gint ydist = brush->y2 - brush->y1 ;
+  gint xdist = brush->x2 - brush->x1;
+  gint ydist = brush->y2 - brush->y1;
 
   /*-- copy the current coordinates to the backup brush structure --*/
   obrush->x1 = brush->x1;
@@ -246,30 +257,30 @@ brush_set_pos (gint x, gint y, splotd *sp) {
 
   /*
    * (x2,y2) is the corner that's moving.
-  */
-  brush->x1 = x - xdist ;
-  brush->x2 = x ;
-  brush->y1 = y - ydist ;
-  brush->y2 = y ;
+   */
+  brush->x1 = x - xdist;
+  brush->x2 = x;
+  brush->y1 = y - ydist;
+  brush->y2 = y;
 }
 
 static gboolean
-binning_permitted (displayd *display, ggobid *gg)
+binning_permitted (displayd * display, ggobid * gg)
 {
   GGobiData *e = display->e;
   gboolean permitted = true;
 
   if (gg->linkby_cv)
-    return(false);
+    return (false);
 
-  if(GGOBI_IS_EXTENDED_DISPLAY(display)) {
-     /* If there is a function to determine this, call it. Otherwise just 
-        get the value of binning_ok in the class. */
+  if (GGOBI_IS_EXTENDED_DISPLAY (display)) {
+    /* If there is a function to determine this, call it. Otherwise just 
+       get the value of binning_ok in the class. */
     GGobiExtendedDisplayClass *klass;
-    klass = GGOBI_EXTENDED_DISPLAY_GET_CLASS(display);
-    if(klass->binningPermitted)
-       return(klass->binningPermitted(display));
-    return(klass->binning_ok);
+    klass = GGOBI_EXTENDED_DISPLAY_GET_CLASS (display);
+    if (klass->binningPermitted)
+      return (klass->binningPermitted (display));
+    return (klass->binning_ok);
   }
 
 
@@ -277,8 +288,7 @@ binning_permitted (displayd *display, ggobid *gg)
   if (e != NULL && e->edge.n > 0) {
     if (display->options.edges_undirected_show_p ||
         display->options.edges_directed_show_p ||
-        display->options.whiskers_show_p)
-    {
+        display->options.whiskers_show_p) {
       permitted = false;
     }
   }
@@ -287,8 +297,8 @@ binning_permitted (displayd *display, ggobid *gg)
 }
 
 gboolean
-brush_once_and_redraw (gboolean binningp, splotd *sp, displayd *display,
-  ggobid *gg) 
+brush_once_and_redraw (gboolean binningp, splotd * sp, displayd * display,
+                       ggobid * gg)
 {
   cpaneld *cpanel = &display->cpanel;
   gboolean changed = false;
@@ -303,43 +313,47 @@ brush_once_and_redraw (gboolean binningp, splotd *sp, displayd *display,
           displays_plot (sp, FULL, gg);
         }
 
-      } else {  /*-- just redraw the brush --*/
-        splot_redraw (sp, QUICK, gg);  
+      }
+      else {    /*-- just redraw the brush --*/
+        splot_redraw (sp, QUICK, gg);
       }
 
-    } else {  /* no binning */
-      splot_redraw (sp, FULL, gg);  
+    }
+    else {                      /* no binning */
+      splot_redraw (sp, FULL, gg);
       if (cpanel->br.updateAlways_p)
-        displays_plot (sp, FULL, gg);  
+        displays_plot (sp, FULL, gg);
     }
 
-  } else {  /*-- we're not brushing, and we just need to redraw the brush --*/
+  }
+  else {    /*-- we're not brushing, and we just need to redraw the brush --*/
     splot_redraw (sp, QUICK, gg);
   }
 
-  return(changed);
+  return (changed);
 }
 
 gboolean
-brush_motion (icoords *mouse, gboolean button1_p, gboolean button2_p,
-  cpaneld *cpanel, splotd *sp, ggobid *gg)
+brush_motion (icoords * mouse, gboolean button1_p, gboolean button2_p,
+              cpaneld * cpanel, splotd * sp, ggobid * gg)
 {
   displayd *display = sp->displayptr;
   brush_coords *brush_pos = &sp->brush_pos;
 
   if (button1_p) {
     brush_set_pos (mouse->x, mouse->y, sp);
-  } else if (button2_p) {
-    brush_pos->x2 = mouse->x ;
-    brush_pos->y2 = mouse->y ;
+  }
+  else if (button2_p) {
+    brush_pos->x2 = mouse->x;
+    brush_pos->y2 = mouse->y;
   }
 
-  return(brush_once_and_redraw (true, sp, display, gg));  /* binning permitted */
+  return (brush_once_and_redraw (true, sp, display, gg)); /* binning permitted */
 }
 
 
 static gboolean
-under_brush (gint k, splotd *sp)
+under_brush (gint k, splotd * sp)
 /*
  * Determine whether point k is under the brush.
 */
@@ -362,9 +376,10 @@ under_brush (gint k, splotd *sp)
 /*----------------------------------------------------------------------*/
 
 static void
-brush_boundaries_set (cpaneld *cpanel,
-  icoords *obin0, icoords *obin1,
-  icoords *imin, icoords *imax, GGobiData *d, ggobid *gg)
+brush_boundaries_set (cpaneld * cpanel,
+                      icoords * obin0, icoords * obin1,
+                      icoords * imin, icoords * imax, GGobiData * d,
+                      ggobid * gg)
 {
   icoords *bin0 = &d->brush.bin0;
   icoords *bin1 = &d->brush.bin1;
@@ -384,23 +399,27 @@ brush_boundaries_set (cpaneld *cpanel,
 }
 
 void
-brush_draw_label (splotd *sp, GdkDrawable *drawable, GGobiData *d, ggobid *gg)
+brush_draw_label (splotd * sp, GdkDrawable * drawable, GGobiData * d,
+                  ggobid * gg)
 {
   PangoRectangle rect;
-  PangoLayout *layout = gtk_widget_create_pango_layout(GTK_WIDGET(sp->da), NULL);
-  
+  PangoLayout *layout =
+    gtk_widget_create_pango_layout (GTK_WIDGET (sp->da), NULL);
+
   if (d->npts_under_brush > 0) {
     gchar *str = g_strdup_printf ("%d", d->npts_under_brush);
-    layout_text(layout, str, &rect);
-    gdk_draw_layout(drawable, gg->plot_GC, 
-		sp->max.x - rect.width - 5, 5, layout);
+    layout_text (layout, str, &rect);
+    gdk_draw_layout (drawable, gg->plot_GC,
+                     sp->max.x - rect.width - 5, 5, layout);
     g_free (str);
   }
-  g_object_unref(G_OBJECT(layout));
+  g_object_unref (G_OBJECT (layout));
 }
 
 void
-brush_draw_brush (splotd *sp, GdkDrawable *drawable, GGobiData *d, ggobid *gg) {
+brush_draw_brush (splotd * sp, GdkDrawable * drawable, GGobiData * d,
+                  ggobid * gg)
+{
 /*
  * Use brush_pos to draw the brush.
 */
@@ -418,41 +437,47 @@ brush_draw_brush (splotd *sp, GdkDrawable *drawable, GGobiData *d, ggobid *gg) {
 
   if (cpanel->br.mode == BR_TRANSIENT)
     gdk_gc_set_line_attributes (gg->plot_GC,
-      0, GDK_LINE_ON_OFF_DASH, GDK_CAP_ROUND, GDK_JOIN_ROUND);
+                                0, GDK_LINE_ON_OFF_DASH, GDK_CAP_ROUND,
+                                GDK_JOIN_ROUND);
 
   if (point_painting_p) {
 
     /* set brush color for points */
     if (cpanel->br.point_targets == br_shadow) {
       gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_hidden);
-    } else if (cpanel->br.point_targets == br_unshadow) {
+    }
+    else if (cpanel->br.point_targets == br_unshadow) {
       gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
-    } else if ((scheme->rgb[gg->color_id].red != scheme->rgb_bg.red) ||
-      (scheme->rgb[gg->color_id].blue != scheme->rgb_bg.blue) ||
-      (scheme->rgb[gg->color_id].green != scheme->rgb_bg.green))
-    {
+    }
+    else if ((scheme->rgb[gg->color_id].red != scheme->rgb_bg.red) ||
+             (scheme->rgb[gg->color_id].blue != scheme->rgb_bg.blue) ||
+             (scheme->rgb[gg->color_id].green != scheme->rgb_bg.green)) {
       gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[gg->color_id]);
-    } else {
+    }
+    else {
       /* I don't remember what this is for ... -- dfs */
       gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
     }
 
     gdk_draw_rectangle (drawable, gg->plot_GC, false,
-      x1, y1, (x2>x1)?(x2-x1):(x1-x2), (y2>y1)?(y2-y1):(y1-y2));
+                        x1, y1, (x2 > x1) ? (x2 - x1) : (x1 - x2),
+                        (y2 > y1) ? (y2 - y1) : (y1 - y2));
     /* Mark the corner to which the cursor will be attached */
     gdk_draw_rectangle (drawable, gg->plot_GC, true,
-      brush_pos->x2-1, brush_pos->y2-1, 2, 2);
+                        brush_pos->x2 - 1, brush_pos->y2 - 1, 2, 2);
 
     /*
      * highlight brush: but only in the current display
-    */
+     */
     if (cpanel->br.brush_on_p && display == gg->current_display) {
       gdk_draw_rectangle (drawable, gg->plot_GC, false,
-        x1-1, y1-1, (x2>x1)?(x2-x1+2):(x1-x2+2), (y2>y1)?(y2-y1+2):(y1-y2+2)); 
+                          x1 - 1, y1 - 1,
+                          (x2 > x1) ? (x2 - x1 + 2) : (x1 - x2 + 2),
+                          (y2 > y1) ? (y2 - y1 + 2) : (y1 - y2 + 2));
 
       /* Mark the corner to which the cursor will be attached */
       gdk_draw_rectangle (drawable, gg->plot_GC, true,
-        brush_pos->x2-2, brush_pos->y2-2, 4, 4);
+                          brush_pos->x2 - 2, brush_pos->y2 - 2, 4, 4);
     }
   }
 
@@ -461,34 +486,37 @@ brush_draw_brush (splotd *sp, GdkDrawable *drawable, GGobiData *d, ggobid *gg) {
     /* set brush color for edges */
     if (cpanel->br.edge_targets == br_shadow) {
       gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_hidden);
-    } else if (cpanel->br.point_targets == br_unshadow) {
+    }
+    else if (cpanel->br.point_targets == br_unshadow) {
       gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
-    } else if ((scheme->rgb[gg->color_id].red != scheme->rgb_bg.red) ||
-      (scheme->rgb[gg->color_id].blue != scheme->rgb_bg.blue) ||
-      (scheme->rgb[gg->color_id].green != scheme->rgb_bg.green))
-    {
+    }
+    else if ((scheme->rgb[gg->color_id].red != scheme->rgb_bg.red) ||
+             (scheme->rgb[gg->color_id].blue != scheme->rgb_bg.blue) ||
+             (scheme->rgb[gg->color_id].green != scheme->rgb_bg.green)) {
       gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[gg->color_id]);
-    } else {
+    }
+    else {
       /* I don't remember what this is for ... -- dfs */
       gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
     }
 
     gdk_draw_line (drawable, gg->plot_GC,
-      x1 + (x2 - x1)/2, y1, x1 + (x2 - x1)/2, y2 );
+                   x1 + (x2 - x1) / 2, y1, x1 + (x2 - x1) / 2, y2);
     gdk_draw_line (drawable, gg->plot_GC,
-      x1, y1 + (y2 - y1)/2, x2, y1 + (y2 - y1)/2 );
+                   x1, y1 + (y2 - y1) / 2, x2, y1 + (y2 - y1) / 2);
 
     if (cpanel->br.brush_on_p) {
       gdk_draw_line (drawable, gg->plot_GC,
-        x1 + (x2 - x1)/2 + 1, y1, x1 + (x2 - x1)/2 + 1, y2 );
+                     x1 + (x2 - x1) / 2 + 1, y1, x1 + (x2 - x1) / 2 + 1, y2);
       gdk_draw_line (drawable, gg->plot_GC,
-        x1, y1 + (y2 - y1)/2 + 1, x2, y1 + (y2 - y1)/2 + 1 );
+                     x1, y1 + (y2 - y1) / 2 + 1, x2, y1 + (y2 - y1) / 2 + 1);
     }
 
   }
   if (cpanel->br.mode == BR_TRANSIENT)
     gdk_gc_set_line_attributes (gg->plot_GC,
-      0, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
+                                0, GDK_LINE_SOLID, GDK_CAP_ROUND,
+                                GDK_JOIN_ROUND);
 }
 
 /*----------------------------------------------------------------------*/
@@ -501,8 +529,8 @@ brush_draw_brush (splotd *sp, GdkDrawable *drawable, GGobiData *d, ggobid *gg) {
  * type yet.
 */
 gboolean
-update_glyph_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
-  GGobiData *d, ggobid *gg)
+update_glyph_vectors (gint i, gboolean changed, gboolean * hit_by_brush,
+                      GGobiData * d, ggobid * gg)
 {
   cpaneld *cpanel = &gg->current_display->cpanel;
   gboolean doit = true;
@@ -513,7 +541,8 @@ update_glyph_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
       doit = (d->glyph_now.els[i].size != gg->glyph_id.size ||
               d->glyph_now.els[i].type != gg->glyph_id.type);
 
-    } else {
+    }
+    else {
       doit = (d->glyph_now.els[i].size != d->glyph.els[i].size ||
               d->glyph_now.els[i].type != d->glyph.els[i].type);
     }
@@ -524,17 +553,18 @@ update_glyph_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
     if (hit_by_brush[i]) {
       switch (cpanel->br.mode) {
 
-        case BR_PERSISTENT:
-          d->glyph.els[i].size = d->glyph_now.els[i].size = gg->glyph_id.size;
-          d->glyph.els[i].type = d->glyph_now.els[i].type = gg->glyph_id.type;
+      case BR_PERSISTENT:
+        d->glyph.els[i].size = d->glyph_now.els[i].size = gg->glyph_id.size;
+        d->glyph.els[i].type = d->glyph_now.els[i].type = gg->glyph_id.type;
         break;
 
-        case BR_TRANSIENT:
-          d->glyph_now.els[i].size = gg->glyph_id.size;
-          d->glyph_now.els[i].type = gg->glyph_id.type;
+      case BR_TRANSIENT:
+        d->glyph_now.els[i].size = gg->glyph_id.size;
+        d->glyph_now.els[i].type = gg->glyph_id.type;
         break;
       }
-    } else {
+    }
+    else {
       d->glyph_now.els[i].size = d->glyph.els[i].size;
       d->glyph_now.els[i].type = d->glyph.els[i].type;
     }
@@ -548,8 +578,8 @@ update_glyph_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
 /*----------------------------------------------------------------------*/
 
 gboolean
-update_color_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
-  GGobiData *d, ggobid *gg)
+update_color_vectors (gint i, gboolean changed, gboolean * hit_by_brush,
+                      GGobiData * d, ggobid * gg)
 {
   cpaneld *cpanel = &gg->current_display->cpanel;
   gboolean doit = true;
@@ -559,8 +589,8 @@ update_color_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
     if (hit_by_brush[i])
       /*-- if persistent, compare against color instead of color_now --*/
       doit = (cpanel->br.mode == BR_TRANSIENT) ?
-               (d->color_now.els[i] != gg->color_id) :
-               (d->color.els[i] != gg->color_id);
+        (d->color_now.els[i] != gg->color_id) :
+        (d->color.els[i] != gg->color_id);
     else
       doit = (d->color_now.els[i] != d->color.els[i]);  /*-- ?? --*/
   }
@@ -568,18 +598,20 @@ update_color_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
 
   /*
    * If doit is false, it's guaranteed that there will be no change.
-  */
+   */
   if (doit) {
     if (hit_by_brush[i]) {
       switch (cpanel->br.mode) {
-        case BR_PERSISTENT:
-          d->color.els[i] = d->color_now.els[i] = gg->color_id;
+      case BR_PERSISTENT:
+        d->color.els[i] = d->color_now.els[i] = gg->color_id;
         break;
-        case BR_TRANSIENT:
-          d->color_now.els[i] = gg->color_id;
+      case BR_TRANSIENT:
+        d->color_now.els[i] = gg->color_id;
         break;
       }
-    } else d->color_now.els[i] = d->color.els[i];
+    }
+    else
+      d->color_now.els[i] = d->color.els[i];
   }
 
   return (doit);
@@ -590,8 +622,8 @@ update_color_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
 /*----------------------------------------------------------------------*/
 
 gboolean
-update_hidden_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
-  GGobiData *d, ggobid *gg)
+update_hidden_vectors (gint i, gboolean changed, gboolean * hit_by_brush,
+                       GGobiData * d, ggobid * gg)
 {
   cpaneld *cpanel = &gg->current_display->cpanel;
   gboolean doit = true;
@@ -599,14 +631,14 @@ update_hidden_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
   /*
    * First find out if this will result in a change; this in
    * order to be able to return that information.
-  */
+   */
   if (!changed) {
     if (hit_by_brush[i])
       /* This test covers the case where a transient brush has first
        * covered all the points of interest, and then persistent
        * brushing has been activated. -- dfs */
       doit = d->hidden_now.els[i] != true ||
-	(cpanel->br.mode == BR_PERSISTENT && d->hidden.els[i] != true);
+        (cpanel->br.mode == BR_PERSISTENT && d->hidden.els[i] != true);
     else
       doit = (d->hidden_now.els[i] != d->hidden.els[i]);
   }
@@ -619,14 +651,16 @@ update_hidden_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
   if (doit) {
     if (hit_by_brush[i]) {
       switch (cpanel->br.mode) {
-        case BR_PERSISTENT:
-          d->hidden.els[i] = d->hidden_now.els[i] = true;
+      case BR_PERSISTENT:
+        d->hidden.els[i] = d->hidden_now.els[i] = true;
         break;
-        case BR_TRANSIENT:
-          d->hidden_now.els[i] = true;
+      case BR_TRANSIENT:
+        d->hidden_now.els[i] = true;
         break;
       }
-    } else d->hidden_now.els[i] = d->hidden.els[i];
+    }
+    else
+      d->hidden_now.els[i] = d->hidden.els[i];
   }
 
   return (doit);
@@ -635,8 +669,9 @@ update_hidden_vectors (gint i, gboolean changed, gboolean *hit_by_brush,
 /* This routine named in honor of the Bizarro world of the Superman
    comics, where everything is backwards. */
 gboolean
-bizarro_update_hidden_vectors (gint i, gboolean changed, 
-  gboolean *hit_by_brush, GGobiData *d, ggobid *gg)
+bizarro_update_hidden_vectors (gint i, gboolean changed,
+                               gboolean * hit_by_brush, GGobiData * d,
+                               ggobid * gg)
 {
   cpaneld *cpanel = &gg->current_display->cpanel;
   gboolean doit = true;
@@ -644,14 +679,14 @@ bizarro_update_hidden_vectors (gint i, gboolean changed,
   /*
    * First find out if this will result in a change; this in
    * order to be able to return that information.
-  */
+   */
   if (!changed) {
     if (hit_by_brush[i])
       /* This test covers the case where a transient brush has first
        * covered all the points of interest, and then persistent
        * brushing has been activated. -- dfs */
       doit = d->hidden_now.els[i] == true ||
-	(cpanel->br.mode == BR_PERSISTENT && d->hidden.els[i] == true);
+        (cpanel->br.mode == BR_PERSISTENT && d->hidden.els[i] == true);
     else
       doit = (d->hidden_now.els[i] != d->hidden.els[i]);
   }
@@ -664,20 +699,21 @@ bizarro_update_hidden_vectors (gint i, gboolean changed,
   if (doit) {
     if (hit_by_brush[i]) {
       switch (cpanel->br.mode) {
-        case BR_PERSISTENT:
-          d->hidden.els[i] = d->hidden_now.els[i] = false;
+      case BR_PERSISTENT:
+        d->hidden.els[i] = d->hidden_now.els[i] = false;
         break;
-        case BR_TRANSIENT:
-          d->hidden_now.els[i] = false;
+      case BR_TRANSIENT:
+        d->hidden_now.els[i] = false;
         break;
       }
-    } else {
+    }
+    else {
       switch (cpanel->br.mode) {
-        case BR_PERSISTENT:
-          d->hidden_now.els[i] = d->hidden.els[i];
+      case BR_PERSISTENT:
+        d->hidden_now.els[i] = d->hidden.els[i];
         break;
-        case BR_TRANSIENT:
-          d->hidden_now.els[i] = true;
+      case BR_TRANSIENT:
+        d->hidden_now.els[i] = true;
         break;
       }
     }
@@ -692,16 +728,16 @@ bizarro_update_hidden_vectors (gint i, gboolean changed,
 /*----------------------------------------------------------------------*/
 
 static gboolean
-build_symbol_vectors (cpaneld *cpanel, GGobiData *d, ggobid *gg)
+build_symbol_vectors (cpaneld * cpanel, GGobiData * d, ggobid * gg)
 {
   gint ih, iv, m, j, k;
   /*-- these look suspicious -- dfs --*/
-  static icoords obin0 = {BRUSH_NBINS/2, BRUSH_NBINS/2};
-  static icoords obin1 = {BRUSH_NBINS/2, BRUSH_NBINS/2};
+  static icoords obin0 = { BRUSH_NBINS / 2, BRUSH_NBINS / 2 };
+  static icoords obin1 = { BRUSH_NBINS / 2, BRUSH_NBINS / 2 };
   icoords imin, imax;
   gboolean changed = false;
   gint nd = g_slist_length (gg->d);
-  gboolean (*f)(cpaneld *, GGobiData *, ggobid *);
+  gboolean (*f) (cpaneld *, GGobiData *, ggobid *);
 
   /* These two are needed for the extended display.
      Should the method be on the extended splot or the display (as it is now).
@@ -711,10 +747,10 @@ build_symbol_vectors (cpaneld *cpanel, GGobiData *d, ggobid *gg)
   splotd *sp = gg->current_splot;
   displayd *display = (displayd *) sp->displayptr;
 
-  if (GGOBI_IS_EXTENDED_DISPLAY(display)) {
-    f = GGOBI_EXTENDED_DISPLAY_GET_CLASS(display)->build_symbol_vectors; 
-    if(f) {
-      changed = f(cpanel, d, gg);
+  if (GGOBI_IS_EXTENDED_DISPLAY (display)) {
+    f = GGOBI_EXTENDED_DISPLAY_GET_CLASS (display)->build_symbol_vectors;
+    if (f) {
+      changed = f (cpanel, d, gg);
     }
   }
 
@@ -725,44 +761,46 @@ build_symbol_vectors (cpaneld *cpanel, GGobiData *d, ggobid *gg)
   if (!f) {
     brush_boundaries_set (cpanel, &obin0, &obin1, &imin, &imax, d, gg);
 
-    for (ih=imin.x; ih<=imax.x; ih++) {
-      for (iv=imin.y; iv<=imax.y; iv++) {
-        for (m=0; m<d->brush.binarray[ih][iv].nels; m++) {
+    for (ih = imin.x; ih <= imax.x; ih++) {
+      for (iv = imin.y; iv <= imax.y; iv++) {
+        for (m = 0; m < d->brush.binarray[ih][iv].nels; m++) {
           /*
            * j is the row number; k is the index of rows_in_plot.els[]
-          */
-          j = d->rows_in_plot.els[ k = d->brush.binarray[ih][iv].els[m] ] ;
+           */
+          j = d->rows_in_plot.els[k = d->brush.binarray[ih][iv].els[m]];
 
           switch (cpanel->br.point_targets) {
-            case br_candg:  /*-- color and glyph --*/
-              changed = update_color_vectors (j, changed,
-                d->pts_under_brush.els, d, gg);
-              changed = update_glyph_vectors (j, changed,
-                d->pts_under_brush.els, d, gg);
+          case br_candg:  /*-- color and glyph --*/
+            changed = update_color_vectors (j, changed,
+                                            d->pts_under_brush.els, d, gg);
+            changed = update_glyph_vectors (j, changed,
+                                            d->pts_under_brush.els, d, gg);
             break;
-            case br_color:
-              changed = update_color_vectors (j, changed,
-                d->pts_under_brush.els, d, gg);
+          case br_color:
+            changed = update_color_vectors (j, changed,
+                                            d->pts_under_brush.els, d, gg);
             break;
-            case br_glyph:  /*-- glyph type and size --*/
-              changed = update_glyph_vectors (j, changed,
-                d->pts_under_brush.els, d, gg);
+          case br_glyph:  /*-- glyph type and size --*/
+            changed = update_glyph_vectors (j, changed,
+                                            d->pts_under_brush.els, d, gg);
             break;
-            case br_shadow:  /*-- hidden --*/
-              changed = update_hidden_vectors (j, changed,
-                d->pts_under_brush.els, d, gg);
+          case br_shadow:  /*-- hidden --*/
+            changed = update_hidden_vectors (j, changed,
+                                             d->pts_under_brush.els, d, gg);
             break;
-            case br_unshadow:
-              changed = bizarro_update_hidden_vectors (j, changed,
-                d->pts_under_brush.els, d, gg);
+          case br_unshadow:
+            changed = bizarro_update_hidden_vectors (j, changed,
+                                                     d->pts_under_brush.els,
+                                                     d, gg);
             break;
-            case br_off:
-              ;
+          case br_off:
+            ;
             break;
           }
 
           /*-- link by id --*/
-          if (!gg->linkby_cv && nd > 1) symbol_link_by_id (false, j, d, gg);
+          if (!gg->linkby_cv && nd > 1)
+            symbol_link_by_id (false, j, d, gg);
           /*-- --*/
         }
       }
@@ -785,21 +823,21 @@ build_symbol_vectors (cpaneld *cpanel, GGobiData *d, ggobid *gg)
  * Set pts_under_brush[j] to 1 if point j is inside the rectangular brush.
 */
 gboolean
-active_paint_points (splotd *sp, GGobiData *d, ggobid *gg)
+active_paint_points (splotd * sp, GGobiData * d, ggobid * gg)
 {
   gint ih, iv, j, pt;
   gboolean changed;
   displayd *display = (displayd *) sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
-  gint (*f)(splotd *sp, GGobiData *, ggobid *) = NULL;
+  gint (*f) (splotd * sp, GGobiData *, ggobid *) = NULL;
   BrushTargetType ttype;
 
   g_assert (d->pts_under_brush.nels == d->nrows);
 
-  if (GGOBI_IS_EXTENDED_SPLOT(sp)) {
-    f = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp)->active_paint_points;
-    if(f) {
-       d->npts_under_brush = f(sp, d, gg);
+  if (GGOBI_IS_EXTENDED_SPLOT (sp)) {
+    f = GGOBI_EXTENDED_SPLOT_GET_CLASS (sp)->active_paint_points;
+    if (f) {
+      d->npts_under_brush = f (sp, d, gg);
     }
   }
 
@@ -807,32 +845,31 @@ active_paint_points (splotd *sp, GGobiData *d, ggobid *gg)
 
     /* Zero out pts_under_brush[] before looping */
     d->npts_under_brush = 0;
-    for (j=0; j<d->nrows_in_plot; j++)
+    for (j = 0; j < d->nrows_in_plot; j++)
       d->pts_under_brush.els[d->rows_in_plot.els[j]] = 0;
- 
+
     /*
      * d->brush.binarray[][] only represents the
      * cases in rows_in_plot.els[] so there's no need to test for that.
-    */
+     */
 
     ttype = cpanel->br.point_targets;
-    for (ih=d->brush.bin0.x; ih<=d->brush.bin1.x; ih++) {
-      for (iv=d->brush.bin0.y; iv<=d->brush.bin1.y; iv++) {
-        for (j=0; j<d->brush.binarray[ih][iv].nels; j++) {
+    for (ih = d->brush.bin0.x; ih <= d->brush.bin1.x; ih++) {
+      for (iv = d->brush.bin0.y; iv <= d->brush.bin1.y; iv++) {
+        for (j = 0; j < d->brush.binarray[ih][iv].nels; j++) {
           pt = d->rows_in_plot.els[d->brush.binarray[ih][iv].els[j]];
 
           /*
            * Ignore hidden cases unless shadow or unshadow brushing.
-          */
+           */
           if (d->hidden_now.els[pt] &&
-            (ttype != br_shadow && ttype != br_unshadow))
-          {
-              continue;
+              (ttype != br_shadow && ttype != br_unshadow)) {
+            continue;
           }
           if (splot_plot_case (pt, d, sp, display, gg)) {
             if (under_brush (pt, sp)) {
               if (pt < 100)
-              d->npts_under_brush++ ;
+                d->npts_under_brush++;
               d->pts_under_brush.els[pt] = 1;
             }
           }
@@ -847,9 +884,10 @@ active_paint_points (splotd *sp, GGobiData *d, ggobid *gg)
     if (gg->linkby_cv) {
       /*-- link by categorical variable --*/
       changed = build_symbol_vectors_by_var (cpanel, d, gg);
-    } else {
+    }
+    else {
       /*-- link by id --*/
-      changed = build_symbol_vectors (cpanel, d, gg); 
+      changed = build_symbol_vectors (cpanel, d, gg);
     }
   }
 
@@ -862,7 +900,7 @@ active_paint_points (splotd *sp, GGobiData *d, ggobid *gg)
 
 
 static gboolean
-xed_by_brush (gint k, displayd *display, ggobid *gg)
+xed_by_brush (gint k, displayd * display, ggobid * gg)
 /*
  * Determine whether edge k intersects the brush
 */
@@ -878,15 +916,15 @@ xed_by_brush (gint k, displayd *display, ggobid *gg)
   gint a, b;
 
   endpointsd *endpoints;
-  endpoints = resolveEdgePoints(e, d);
+  endpoints = resolveEdgePoints (e, d);
 
   if (!endpoints || !edge_endpoints_get (k, &a, &b, d, endpoints, e))
     return false;
 
   /*-- test for intersection with the vertical edge --*/
-  intersect = lines_intersect (x1 + (x2 - x1)/2, y1, x1 + (x2 - x1)/2, y2,
-    sp->screen[a].x, sp->screen[a].y,
-    sp->screen[b].x, sp->screen[b].y);
+  intersect = lines_intersect (x1 + (x2 - x1) / 2, y1, x1 + (x2 - x1) / 2, y2,
+                               sp->screen[a].x, sp->screen[a].y,
+                               sp->screen[b].x, sp->screen[b].y);
 /*
   intersect = isCrossed (x1 + (x2 - x1)/2, y1, x1 + (x2 - x1)/2, y2,
     (gdouble) sp->screen[a].x, (gdouble) sp->screen[a].y,
@@ -897,9 +935,10 @@ xed_by_brush (gint k, displayd *display, ggobid *gg)
      doubles, which forces me to do a lot of casting.  I should
      figure out how to test it --*/
   if (intersect != 1) {
-    intersect = lines_intersect (x1, y1 + (y2 - y1)/2, x2, y1 + (y2 - y1)/2,
-      sp->screen[a].x, sp->screen[a].y,
-      sp->screen[b].x, sp->screen[b].y);
+    intersect =
+      lines_intersect (x1, y1 + (y2 - y1) / 2, x2, y1 + (y2 - y1) / 2,
+                       sp->screen[a].x, sp->screen[a].y, sp->screen[b].x,
+                       sp->screen[b].y);
 /*
     intersect = isCrossed (x1, y1 + (y2 - y1)/2, x2, y1 + (y2 - y1)/2,
       (gdouble) sp->screen[a].x, (gdouble) sp->screen[a].y,
@@ -912,7 +951,7 @@ xed_by_brush (gint k, displayd *display, ggobid *gg)
 
 /*-- link by id? --*/
 static gboolean
-build_edge_symbol_vectors (cpaneld *cpanel, GGobiData *e, ggobid *gg)
+build_edge_symbol_vectors (cpaneld * cpanel, GGobiData * e, ggobid * gg)
 {
   gint i;
   gboolean changed = false;
@@ -922,38 +961,40 @@ build_edge_symbol_vectors (cpaneld *cpanel, GGobiData *e, ggobid *gg)
  * I'm not doing any checking here to verify that the edges
  * are displayed.
 */
-  for (i=0; i < e->edge.n ; i++) {
+  for (i = 0; i < e->edge.n; i++) {
 
     switch (cpanel->br.edge_targets) {
-      case br_candg:  /*-- color and glyph --*/
-        changed = update_color_vectors (i, changed,
-          e->edge.xed_by_brush.els, e, gg);
-        changed = update_glyph_vectors (i, changed,
-          e->edge.xed_by_brush.els, e, gg);
+    case br_candg:  /*-- color and glyph --*/
+      changed = update_color_vectors (i, changed,
+                                      e->edge.xed_by_brush.els, e, gg);
+      changed = update_glyph_vectors (i, changed,
+                                      e->edge.xed_by_brush.els, e, gg);
       break;
-      case br_color:  /*-- color --*/
-        changed = update_color_vectors (i, changed,
-          e->edge.xed_by_brush.els, e, gg);
+    case br_color:  /*-- color --*/
+      changed = update_color_vectors (i, changed,
+                                      e->edge.xed_by_brush.els, e, gg);
       break;
-      case br_glyph:  /*-- line width and line type --*/
-        changed = update_glyph_vectors (i, changed,
-          e->edge.xed_by_brush.els, e, gg);
+    case br_glyph:  /*-- line width and line type --*/
+      changed = update_glyph_vectors (i, changed,
+                                      e->edge.xed_by_brush.els, e, gg);
       break;
-      case br_shadow:  /*-- hidden --*/
-        changed = update_hidden_vectors (i, changed,
-          e->edge.xed_by_brush.els, e, gg);
+    case br_shadow:  /*-- hidden --*/
+      changed = update_hidden_vectors (i, changed,
+                                       e->edge.xed_by_brush.els, e, gg);
       break;
-      case br_unshadow:
-        changed = bizarro_update_hidden_vectors (i, changed,
-          e->edge.xed_by_brush.els, e, gg);
+    case br_unshadow:
+      changed = bizarro_update_hidden_vectors (i, changed,
+                                               e->edge.xed_by_brush.els, e,
+                                               gg);
       break;
-      case br_off:
-        ;
+    case br_off:
+      ;
       break;
     }
 
     /*-- link by id --*/
-    if (!gg->linkby_cv && nd > 1) symbol_link_by_id (false, i, e, gg);
+    if (!gg->linkby_cv && nd > 1)
+      symbol_link_by_id (false, i, e, gg);
     /*-- --*/
   }
 
@@ -961,7 +1002,7 @@ build_edge_symbol_vectors (cpaneld *cpanel, GGobiData *e, ggobid *gg)
 }
 
 static gboolean
-active_paint_edges (splotd *sp, GGobiData *e, ggobid *gg)
+active_paint_edges (splotd * sp, GGobiData * e, ggobid * gg)
 {
   gint k;
   gboolean changed;
@@ -972,12 +1013,12 @@ active_paint_edges (splotd *sp, GGobiData *e, ggobid *gg)
 
   /* Zero out xed_by_brush[] before looping */
   e->edge.nxed_by_brush = 0;
-  for (k=0; k<e->edge.n; k++)
+  for (k = 0; k < e->edge.n; k++)
     e->edge.xed_by_brush.els[k] = false;
- 
-  for (k=0; k<e->edge.n; k++) {
+
+  for (k = 0; k < e->edge.n; k++) {
     if (xed_by_brush (k, display, gg)) {
-      e->edge.nxed_by_brush++ ;
+      e->edge.nxed_by_brush++;
       e->edge.xed_by_brush.els[k] = true;
     }
   }
@@ -986,8 +1027,9 @@ active_paint_edges (splotd *sp, GGobiData *e, ggobid *gg)
   if (cpanel->br.brush_on_p) {
     if (gg->linkby_cv) {
       /*-- link by categorical variable --*/
-      /*changed = build_symbol_vectors_by_var (cpanel, e, gg);*/
-    } else {
+      /*changed = build_symbol_vectors_by_var (cpanel, e, gg); */
+    }
+    else {
       /*-- link by id  --*/
       changed = build_edge_symbol_vectors (cpanel, e, gg);
     }
@@ -995,4 +1037,3 @@ active_paint_edges (splotd *sp, GGobiData *e, ggobid *gg)
 
   return (changed);
 }
-

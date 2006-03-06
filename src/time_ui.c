@@ -31,10 +31,11 @@
  * Toggles between a single plot with all selected series and individual
  * plots of all selected series
  */
-static gchar *arrangement_lbl[] = {"Split", "Joint"};
-static void arrangement_cb (GtkWidget *w, ggobid *gg)
+static gchar *arrangement_lbl[] = { "Split", "Joint" };
+static void
+arrangement_cb (GtkWidget * w, ggobid * gg)
 {
-  gint indx = gtk_combo_box_get_active(GTK_COMBO_BOX(w));
+  gint indx = gtk_combo_box_get_active (GTK_COMBO_BOX (w));
   g_printerr ("cbd: %s\n", arrangement_lbl[indx]);
 
   if (indx != gg->current_display->cpanel.tsplot_arrangement)
@@ -51,10 +52,11 @@ static void arrangement_cb (GtkWidget *w, ggobid *gg)
  * while "Independent" scales each series independently by its min 
  * and max to [0,1].
  */
-static gchar *varscale_lbl[] = {"Common", "Independent"};
-static void varscale_cb (GtkWidget *w, ggobid *gg)
+static gchar *varscale_lbl[] = { "Common", "Independent" };
+static void
+varscale_cb (GtkWidget * w, ggobid * gg)
 {
-  gint indx = gtk_combo_box_get_active (GTK_COMBO_BOX(w));
+  gint indx = gtk_combo_box_get_active (GTK_COMBO_BOX (w));
   g_printerr ("cbd: %s\n", varscale_lbl[indx]);
 }
 #endif
@@ -64,7 +66,7 @@ static void varscale_cb (GtkWidget *w, ggobid *gg)
 /*--------------------------------------------------------------------*/
 
 GtkWidget *
-cpanel_tsplot_make (ggobid *gg) 
+cpanel_tsplot_make (ggobid * gg)
 {
   GtkWidget *vb, *lbl, *opt;
   GtkWidget *cpanel;
@@ -85,14 +87,14 @@ cpanel_tsplot_make (ggobid *gg)
   gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
 
   opt = gtk_combo_box_new_text ();
-  gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), lbl);
+  gtk_label_set_mnemonic_widget (GTK_LABEL (lbl), lbl);
   gtk_container_set_border_width (GTK_CONTAINER (opt), 4);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-			"Arrange the time series as single plot or several plots",
-			NULL);
+                        "Arrange the time series as single plot or several plots",
+                        NULL);
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
-  populate_combo_box (opt, arrangement_lbl, G_N_ELEMENTS(arrangement_lbl),
-    arrangement_cb, gg);
+  populate_combo_box (opt, arrangement_lbl, G_N_ELEMENTS (arrangement_lbl),
+                      arrangement_cb, gg);
 #endif
 
 /*
@@ -108,19 +110,19 @@ cpanel_tsplot_make (ggobid *gg)
   gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
 
   opt = gtk_combo_box_new_text ();
-  gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), opt);
+  gtk_label_set_mnemonic_widget (GTK_LABEL (lbl), opt);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-   "Scale variables (and variable groups) on a common scale, or independently",
-    NULL);
+                        "Scale variables (and variable groups) on a common scale, or independently",
+                        NULL);
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
-  populate_combo_box (opt, varscale_lbl, G_N_ELEMENTS(varscale_lbl),
-    varscale_cb, gg);
+  populate_combo_box (opt, varscale_lbl, G_N_ELEMENTS (varscale_lbl),
+                      varscale_cb, gg);
 #endif
 
 
   gtk_widget_show_all (cpanel);
 
-  return(cpanel);
+  return (cpanel);
 }
 
 
@@ -128,26 +130,23 @@ cpanel_tsplot_make (ggobid *gg)
 /*                   Resetting the main menubar                       */
 /*--------------------------------------------------------------------*/
 
-static const gchar* mode_ui_str =
-"<ui>"
-"	<menubar>"
-"		<menu action='IMode'>"
-"			<menuitem action='DefaultIMode'/>"
-"			<separator/>"
-"			<menuitem action='Brush'/>"
-"			<menuitem action='Identify'/>"
-"		</menu>"
-"	</menubar>"
-"</ui>";
+static const gchar *mode_ui_str =
+  "<ui>"
+  "	<menubar>"
+  "		<menu action='IMode'>"
+  "			<menuitem action='DefaultIMode'/>"
+  "			<separator/>"
+  "			<menuitem action='Brush'/>"
+  "			<menuitem action='Identify'/>" "		</menu>" "	</menubar>" "</ui>";
 
-const gchar*
-tsplot_mode_ui_get(displayd *display)
+const gchar *
+tsplot_mode_ui_get (displayd * display)
 {
-	return(mode_ui_str);
+  return (mode_ui_str);
 }
 
 /*--------------------------------------------------------------------*/
-/*                   End of main menubar section                      */  
+/*                   End of main menubar section                      */
 /*--------------------------------------------------------------------*/
 
 /*--------------------------------------------------------------------*/
@@ -157,6 +156,7 @@ tsplot_mode_ui_get(displayd *display)
 /*-- there already exists tsplot_cpanel_init --*/
 
 void
-cpanel_tsplot_set (displayd *display, cpaneld *cpanel, GtkWidget *panelWidget, ggobid *gg)
+cpanel_tsplot_set (displayd * display, cpaneld * cpanel,
+                   GtkWidget * panelWidget, ggobid * gg)
 {
 }

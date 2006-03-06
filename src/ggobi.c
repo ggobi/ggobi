@@ -37,7 +37,7 @@
 #include "read_init.h"
 #include "colorscheme.h"
 
-#include "plugin.h" /* For registerDefaultPlugin. */
+#include "plugin.h"             /* For registerDefaultPlugin. */
 
 
 GGobiApp *ggobiApp;
@@ -53,9 +53,9 @@ gint totalNumGGobis;
    /* Needs to be connected to MAXNVARS in scatmat.c
       and MAXNPCPLOTS in  parcoords.c
     */
-#define MAXNVARS 4 
+#define MAXNVARS 4
 #define MAXNPCPLOTS 5
-#define MAXNTSPLOTS 6 
+#define MAXNTSPLOTS 6
 
 #include "ggobiClass.h"
 
@@ -67,45 +67,48 @@ const GTypeLoad typeLoaders[] = {
   ggobi_barchart_display_get_type
 };
 
-const gchar * const ViewTypes[] = {
-  "Scatterplot", 
-  "Scatterplot Matrix", 
+const gchar *const ViewTypes[] = {
+  "Scatterplot",
+  "Scatterplot Matrix",
 };
 const gint ViewTypeIndices[];
 
-static gchar *computeGGobiHome(char *str);
+static gchar *computeGGobiHome (char *str);
 
 GGobiApp *
-getGGobiApp()
+getGGobiApp ()
 {
-   return(ggobiApp);
+  return (ggobiApp);
 }
 
 
 gchar *
-getOptValue(const gchar * const name, const gchar * const value)
+getOptValue (const gchar * const name, const gchar * const value)
 {
-  const gchar * ptr = (const gchar *) value;
+  const gchar *ptr = (const gchar *) value;
 
-  if(ptr[0] != '-' || ptr[1] != '-')
-    return(NULL);
+  if (ptr[0] != '-' || ptr[1] != '-')
+    return (NULL);
 
-  if(strncmp(name, value + 2, strlen(name)) == 0) {
-    ptr = value + strlen(name) + 2;
-    if(ptr[0] != '=' || ptr[1] == '\0') {
-      g_printerr("--%s must be given a value in the form --%s=value\n", name, name);
-    fflush(stderr);          
+  if (strncmp (name, value + 2, strlen (name)) == 0) {
+    ptr = value + strlen (name) + 2;
+    if (ptr[0] != '=' || ptr[1] == '\0') {
+      g_printerr ("--%s must be given a value in the form --%s=value\n", name,
+                  name);
+      fflush (stderr);
+      ptr = NULL;
+    }
+    else
+      ptr = g_strdup (ptr + 1);
+  }
+  else
     ptr = NULL;
-  } else
-    ptr = g_strdup(ptr+1);
-  } else
-    ptr = NULL;
 
-  return((gchar *)ptr);
+  return ((gchar *) ptr);
 }
 
 gint
-parse_command_line (gint *argc, gchar **av)
+parse_command_line (gint * argc, gchar ** av)
 {
   gboolean stdin_p = false;
   gchar *ptr;
@@ -113,96 +116,125 @@ parse_command_line (gint *argc, gchar **av)
 /*
  * Now parse the command line.
 */
-  for ( ; *argc>1 && av[1][0]=='-'; (*argc)--,av++) {
+  for (; *argc > 1 && av[1][0] == '-'; (*argc)--, av++) {
     /*
      * -s:  ggobi initiated from inside S
-    */
+     */
     if (strcmp (av[1], "--help") == 0 || strcmp (av[1], "-help") == 0) {
-      showHelp();
-      exit(0);
+      showHelp ();
+      exit (0);
     }
     else if (strcmp (av[1], "-s") == 0) {
       sessionOptions->data_mode = Sprocess_data;
-      sessionOptions->data_type = g_strdup(av[1]+1);
+      sessionOptions->data_type = g_strdup (av[1] + 1);
     }
     else if (strcmp (av[1], "-csv") == 0) {
       sessionOptions->data_mode = csv_data;
-      sessionOptions->data_type = g_strdup(av[1]+1);
+      sessionOptions->data_type = g_strdup (av[1] + 1);
     }
     else if (strcmp (av[1], "-xml") == 0) {
       sessionOptions->data_mode = xml_data;
-      sessionOptions->data_type = g_strdup(av[1]+1);
-    } else if (strcmp (av[1], "-v") == 0 || strcmp (av[1], "--validate") == 0) {
+      sessionOptions->data_type = g_strdup (av[1] + 1);
+    }
+    else if (strcmp (av[1], "-v") == 0 || strcmp (av[1], "--validate") == 0) {
       extern gint xmlDoValidityCheckingDefaultValue;
       xmlDoValidityCheckingDefaultValue = 1;
-   }
+    }
 
-   else if(strcmp(av[1], "--verbose") == 0  || strcmp(av[1], "-verbose") == 0  || strcmp(av[1], "-V") == 0) {
+    else if (strcmp (av[1], "--verbose") == 0
+             || strcmp (av[1], "-verbose") == 0
+             || strcmp (av[1], "-V") == 0) {
       sessionOptions->verbose = GGOBI_VERBOSE;
-   } 
+    }
 
-   else if(strcmp(av[1], "--silent") == 0  || strcmp(av[1], "-silent") == 0)  {
+    else if (strcmp (av[1], "--silent") == 0
+             || strcmp (av[1], "-silent") == 0) {
       sessionOptions->verbose = GGOBI_SILENT;
-   } 
+    }
 #ifdef USE_MYSQL
     else if (strcmp (av[1], "-mysql") == 0) {
     }
 #endif
     /*
      * -:  look to stdin for the input data
-    */
+     */
     else if (strcmp (av[1], "-") == 0) {
       stdin_p = true;
     }
 
     /*
      * -version:  print version date, return
-    */
+     */
     else if (strcmp (av[1], "-version") == 0) {
-      g_printerr ("This version of GGobi is dated %s\n", GGOBI(getVersionDate()));
+      g_printerr ("This version of GGobi is dated %s\n",
+                  GGOBI (getVersionDate ()));
       exit (0);
-    } else if (strcmp (av[1], "--version") == 0) {
-      g_printerr ("%s\n", GGOBI(getVersionString()));
+    }
+    else if (strcmp (av[1], "--version") == 0) {
+      g_printerr ("%s\n", GGOBI (getVersionString ()));
       exit (0);
-    } else if(strcmp(av[1], "-init") == 0) {
-      sessionOptions->initializationFile = g_strdup(av[2]);
-      (*argc)--; av++;
-    } else if((ptr = getOptValue("init", av[1]))) {
+    }
+    else if (strcmp (av[1], "-init") == 0) {
+      sessionOptions->initializationFile = g_strdup (av[2]);
+      (*argc)--;
+      av++;
+    }
+    else if ((ptr = getOptValue ("init", av[1]))) {
       sessionOptions->initializationFile = ptr;
-    } else if(strcmp(av[1], "-noinit") == 0) {
-      sessionOptions->initializationFile = g_strdup("");
-    } else if(strcmp(av[1],"-colorschemes") == 0) {
+    }
+    else if (strcmp (av[1], "-noinit") == 0) {
+      sessionOptions->initializationFile = g_strdup ("");
+    }
+    else if (strcmp (av[1], "-colorschemes") == 0) {
       sessionOptions->info->colorSchemeFile = av[2];
       /* read_colorscheme(av[2], &(sessionOptions->colorSchemes)); */
-      (*argc)--; av++;
-    } else if((ptr = getOptValue("colorschemes", av[1]))) {
-       sessionOptions->info->colorSchemeFile = ptr;
-    } else if(strcmp(av[1],"-activeColorScheme") == 0) {
-      sessionOptions->activeColorScheme = g_strdup(av[2]);
-      (*argc)--; av++;
-    } else if((ptr = getOptValue("activeColorScheme", av[1]))) {
+      (*argc)--;
+      av++;
+    }
+    else if ((ptr = getOptValue ("colorschemes", av[1]))) {
+      sessionOptions->info->colorSchemeFile = ptr;
+    }
+    else if (strcmp (av[1], "-activeColorScheme") == 0) {
+      sessionOptions->activeColorScheme = g_strdup (av[2]);
+      (*argc)--;
+      av++;
+    }
+    else if ((ptr = getOptValue ("activeColorScheme", av[1]))) {
       sessionOptions->activeColorScheme = ptr;
-    }  else if(strcmp(av[1], "-datamode") == 0) {
-      sessionOptions->data_type = g_strdup(av[2]);
-      (*argc)--; av++;
-    }  else if((ptr = getOptValue("datamode", av[1]))) {
+    }
+    else if (strcmp (av[1], "-datamode") == 0) {
+      sessionOptions->data_type = g_strdup (av[2]);
+      (*argc)--;
+      av++;
+    }
+    else if ((ptr = getOptValue ("datamode", av[1]))) {
       sessionOptions->data_type = ptr;
-    }  else if(strcmp(av[1], "--keepalive") == 0) {
-	  sessionOptions->info->quitWithNoGGobi = false;
-    } else if(strcmp(av[1], "-restore") == 0) {
-      sessionOptions->restoreFile = g_strdup(av[2]);
-      (*argc)--; av++;
-    } else if((ptr = getOptValue("restore", av[1]))) {
+    }
+    else if (strcmp (av[1], "--keepalive") == 0) {
+      sessionOptions->info->quitWithNoGGobi = false;
+    }
+    else if (strcmp (av[1], "-restore") == 0) {
+      sessionOptions->restoreFile = g_strdup (av[2]);
+      (*argc)--;
+      av++;
+    }
+    else if ((ptr = getOptValue ("restore", av[1]))) {
       sessionOptions->restoreFile = ptr;
-    } else if((ptr = getOptValue("tourSpeed", av[1]))) {
-      sessionOptions->defaultTourSpeed = atof(ptr);
-    } else if((ptr = getOptValue("tour1dSpeed", av[1]))) {
-      sessionOptions->defaultTour1dSpeed = atof(ptr);
-    } else if((ptr = getOptValue("plugin", av[1]))) {
-      sessionOptions->pluginFiles = g_slist_append(sessionOptions->pluginFiles, g_strdup(ptr));
-    } else if(strcmp(av[1], "-home") == 0 || strcmp(av[1], "--home") == 0) {
-      fprintf(stdout, "%s\n", computeGGobiHome(av[0]));fflush(stdout);
-      exit(0);
+    }
+    else if ((ptr = getOptValue ("tourSpeed", av[1]))) {
+      sessionOptions->defaultTourSpeed = atof (ptr);
+    }
+    else if ((ptr = getOptValue ("tour1dSpeed", av[1]))) {
+      sessionOptions->defaultTour1dSpeed = atof (ptr);
+    }
+    else if ((ptr = getOptValue ("plugin", av[1]))) {
+      sessionOptions->pluginFiles =
+        g_slist_append (sessionOptions->pluginFiles, g_strdup (ptr));
+    }
+    else if (strcmp (av[1], "-home") == 0 || strcmp (av[1], "--home") == 0) {
+      fprintf (stdout, "%s\n", computeGGobiHome (av[0]));
+      fflush (stdout);
+      exit (0);
     }
   }
 
@@ -216,14 +248,14 @@ parse_command_line (gint *argc, gchar **av)
   if (*argc == 0)
     sessionOptions->data_in = (stdin_p) ? g_strdup_printf ("stdin") : NULL;
   else
-    sessionOptions->data_in = g_strdup(av[0]);
+    sessionOptions->data_in = g_strdup (av[0]);
 
   return 1;
 }
 
 gint
-ggobi_remove (ggobid *gg)
-{ 
+ggobi_remove (ggobid * gg)
+{
   gint i;
   for (i = 0; i < num_ggobis; i++) {
     if (all_ggobis[i] == gg) {
@@ -238,7 +270,7 @@ ggobi_remove (ggobid *gg)
       Also, need to close and free the displays associated with the ggobi.
  */
 gint
-ggobi_remove_by_index (ggobid *gg, gint which)
+ggobi_remove_by_index (ggobid * gg, gint which)
 {
   GSList *l;
   GGobiData *d;
@@ -247,33 +279,32 @@ ggobi_remove_by_index (ggobid *gg, gint which)
   /* Move all the entries after the one being removed
      down by one in the array to compact it.
    */
-  if(which < num_ggobis -1) {
-     memcpy(all_ggobis + which,
+  if (which < num_ggobis - 1) {
+    memcpy (all_ggobis + which,
             all_ggobis + which +
-            1,
-            sizeof(ggobid*)*(num_ggobis-which-1));
+            1, sizeof (ggobid *) * (num_ggobis - which - 1));
   }
   /* Now patch up the array so that it has the correct number of elements. */
   num_ggobis--;
   if (num_ggobis > 0)
-    all_ggobis = (ggobid**)
-      g_realloc (all_ggobis, sizeof(ggobid*) * num_ggobis);
+    all_ggobis = (ggobid **)
+      g_realloc (all_ggobis, sizeof (ggobid *) * num_ggobis);
   else
     all_ggobis = NULL;
 
   /* 
-      This was crashing in R. Probably because when we exhaust the list
-      and remove the final element, we get back garbage.
-      This isn't a problem in stand-alone as it never gets called.
+     This was crashing in R. Probably because when we exhaust the list
+     and remove the final element, we get back garbage.
+     This isn't a problem in stand-alone as it never gets called.
    */
   numDatasets = g_slist_length (gg->d);
-  for (i=0,l = gg->d; l != NULL && i < numDatasets; i++, l = gg->d) {
+  for (i = 0, l = gg->d; l != NULL && i < numDatasets; i++, l = gg->d) {
     d = (GGobiData *) l->data;
     datad_free (d, gg);
     gg->d = g_slist_remove (gg->d, d);
   }
 
-  g_object_unref(G_OBJECT(gg));
+  g_object_unref (G_OBJECT (gg));
   /* gtk_object_destroy(GTK_OBJECT(gg)); */
 /*  g_free (gg); */
 
@@ -286,18 +317,19 @@ ggobi_remove_by_index (ggobid *gg, gint which)
  */
 #ifdef TEST_KEYS
 gboolean
-DummyKeyTest(guint keyval, GtkWidget *w, GdkEventKey *event,  cpaneld *cpanel, splotd *sp, ggobid *gg, void *userData)
+DummyKeyTest (guint keyval, GtkWidget * w, GdkEventKey * event,
+              cpaneld * cpanel, splotd * sp, ggobid * gg, void *userData)
 {
   static gint count = 0;
-  fprintf(stderr, "Key press event (count = %d): key = %d, data = %s\n", 
-                     count, (gint)keyval, (gchar *)userData);
-  fflush(stderr);
+  fprintf (stderr, "Key press event (count = %d): key = %d, data = %s\n",
+           count, (gint) keyval, (gchar *) userData);
+  fflush (stderr);
 
-  if(++count == 4) {
+  if (++count == 4) {
     count = 0;
-    GGOBI(removeNumberedKeyEventHandler)(gg);
+    GGOBI (removeNumberedKeyEventHandler) (gg);
   }
- return(true);
+  return (true);
 }
 #endif
 
@@ -306,29 +338,29 @@ DummyKeyTest(guint keyval, GtkWidget *w, GdkEventKey *event,  cpaneld *cpanel, s
   name.
  */
 colorschemed *
-findColorSchemeByName(GList *schemes, const gchar *name)
+findColorSchemeByName (GList * schemes, const gchar * name)
 {
   colorschemed *s;
   gint i, n;
 
-  n = g_list_length(schemes);
-  for(i = 0; i < n; i++) {
-   s = (colorschemed *)g_list_nth_data(schemes, i);
-   if(strcmp(name, s->name) == 0)
-       return(s);
+  n = g_list_length (schemes);
+  for (i = 0; i < n; i++) {
+    s = (colorschemed *) g_list_nth_data (schemes, i);
+    if (strcmp (name, s->name) == 0)
+      return (s);
   }
-  return(NULL);
+  return (NULL);
 }
 
-ggobid* /*XXX should be void. Change when gtk-object setup settles. */
-ggobi_alloc(ggobid *tmp)
+ggobid *                        /*XXX should be void. Change when gtk-object setup settles. */
+ggobi_alloc (ggobid * tmp)
 {
-  if(tmp == NULL) {
-      /* Should never happen in new GtkObject-based version. 
-	 tmp = (ggobid*) g_malloc (sizeof (ggobid));
-	 memset (tmp, '\0', sizeof (ggobid)); 
-      */
-	tmp = g_object_new(GGOBI_TYPE_GGOBI, NULL);
+  if (tmp == NULL) {
+    /* Should never happen in new GtkObject-based version. 
+       tmp = (ggobid*) g_malloc (sizeof (ggobid));
+       memset (tmp, '\0', sizeof (ggobid)); 
+     */
+    tmp = g_object_new (GGOBI_TYPE_GGOBI, NULL);
   }
 
   tmp->firsttime = true;
@@ -375,109 +407,119 @@ ggobi_alloc(ggobid *tmp)
 
   tmp->colorSchemes = sessionOptions->colorSchemes;
   if (sessionOptions->activeColorScheme)
-    tmp->activeColorScheme = findColorSchemeByName(tmp->colorSchemes,
-      sessionOptions->activeColorScheme);
+    tmp->activeColorScheme = findColorSchemeByName (tmp->colorSchemes,
+                                                    sessionOptions->
+                                                    activeColorScheme);
   else {
     /*-- use "Set1 9" by default, if it's present --*/
     sessionOptions->activeColorScheme = "Set1 9";
-    tmp->activeColorScheme = findColorSchemeByName(tmp->colorSchemes,
-      sessionOptions->activeColorScheme);
+    tmp->activeColorScheme = findColorSchemeByName (tmp->colorSchemes,
+                                                    sessionOptions->
+                                                    activeColorScheme);
     if (!tmp->activeColorScheme)
       tmp->activeColorScheme = (colorschemed *)
-        g_list_nth_data(tmp->colorSchemes, 0);
+        g_list_nth_data (tmp->colorSchemes, 0);
   }
   if (!tmp->activeColorScheme) {
     g_error ("failed to find color scheme");
-  } else colorscheme_init (tmp->activeColorScheme);
-    /*
-     * the number of colors in use will be tested against the
-     * scheme->n the first time we plot, and the color ids will
-     * be adjusted if necessary.
-    */
+  }
+  else
+    colorscheme_init (tmp->activeColorScheme);
+  /*
+   * the number of colors in use will be tested against the
+   * scheme->n the first time we plot, and the color ids will
+   * be adjusted if necessary.
+   */
 
   totalNumGGobis++;
 
   all_ggobis = (ggobid **)
-    g_realloc (all_ggobis, sizeof(ggobid*)*(num_ggobis+1));
+    g_realloc (all_ggobis, sizeof (ggobid *) * (num_ggobis + 1));
   all_ggobis[num_ggobis] = tmp;
   num_ggobis++;
 
 #ifdef TEST_KEYS
-  GGOBI(registerNumberedKeyEventHandler)(DummyKeyTest,
-    g_strdup("A string for the key handler"),"Test handler", NULL, tmp, C);
+  GGOBI (registerNumberedKeyEventHandler) (DummyKeyTest,
+                                           g_strdup
+                                           ("A string for the key handler"),
+                                           "Test handler", NULL, tmp, C);
 #endif
 
-  g_signal_emit_by_name(G_OBJECT(ggobiApp), "new_ggobi", tmp);
+  g_signal_emit_by_name (G_OBJECT (ggobiApp), "new_ggobi", tmp);
 
   return (tmp);
 }
 
 void
-ggobiInit(int *argc, char **argv[])
+ggobiInit (int *argc, char **argv[])
 {
 
 
-  if(ExtendedDisplayTypes) 
+  if (ExtendedDisplayTypes)
     return;
 
   gtk_init (argc, argv);
 
-  ggobiApp = g_object_new(GGOBI_TYPE_APP, NULL);
+  ggobiApp = g_object_new (GGOBI_TYPE_APP, NULL);
 
 #ifdef TEST_GGOBI_APPP
 /*XXX FIX */
-  GGOBI(registerNumberedKeyEventHandler)(DummyKeyTest,
-    g_strdup("A string for the key handler"),"Test handler", NULL, tmp, C);
+  GGOBI (registerNumberedKeyEventHandler) (DummyKeyTest,
+                                           g_strdup
+                                           ("A string for the key handler"),
+                                           "Test handler", NULL, tmp, C);
 #endif
 
-  initSessionOptions(*argc, *argv);
- 
-  GGOBI_TYPE_GGOBI;
-  registerDisplayTypes((GTypeLoad *) typeLoaders,
-		       sizeof(typeLoaders)/sizeof(typeLoaders)[0]);
+  initSessionOptions (*argc, *argv);
 
-  registerDefaultPlugins(sessionOptions->info);
+  GGOBI_TYPE_GGOBI;
+  registerDisplayTypes ((GTypeLoad *) typeLoaders,
+                        sizeof (typeLoaders) / sizeof (typeLoaders)[0]);
+
+  registerDefaultPlugins (sessionOptions->info);
 }
 
 
   /* Available so that we can call this from R
      without any confusion between which main().
    */
-gint 
-GGOBI(main)(gint argc, gchar *argv[], gboolean processEvents)
+gint GGOBI (main) (gint argc, gchar * argv[], gboolean processEvents)
 {
   GdkVisual *vis;
   ggobid *gg;
 
-  ggobiInit(&argc, &argv);
+  ggobiInit (&argc, &argv);
 
   vis = gdk_visual_get_system ();
 
   parse_command_line (&argc, argv);
 
-  process_initialization_files();
+  process_initialization_files ();
 
-  if(sessionOptions->verbose == GGOBI_VERBOSE)
-    g_printerr("progname = %s\n", g_get_prgname());
+  if (sessionOptions->verbose == GGOBI_VERBOSE)
+    g_printerr ("progname = %s\n", g_get_prgname ());
 
-  if(sessionOptions->verbose == GGOBI_VERBOSE)
-    g_printerr("data_in = %s\n", sessionOptions->data_in);
+  if (sessionOptions->verbose == GGOBI_VERBOSE)
+    g_printerr ("data_in = %s\n", sessionOptions->data_in);
 
-  if(DefaultPrintHandler.callback == NULL)
-    setStandardPrintHandlers();
+  if (DefaultPrintHandler.callback == NULL)
+    setStandardPrintHandlers ();
 
-  if(sessionOptions->info->colorSchemeFile && sessionOptions->colorSchemes == NULL) {
-      read_colorscheme(sessionOptions->info->colorSchemeFile, &sessionOptions->colorSchemes);
+  if (sessionOptions->info->colorSchemeFile
+      && sessionOptions->colorSchemes == NULL) {
+    read_colorscheme (sessionOptions->info->colorSchemeFile,
+                      &sessionOptions->colorSchemes);
   }
 
-  if(sessionOptions->colorSchemes == NULL) {
-    colorschemed *scheme = default_scheme_init();
-    sessionOptions->colorSchemes = g_list_append(sessionOptions->colorSchemes, scheme);
+  if (sessionOptions->colorSchemes == NULL) {
+    colorschemed *scheme = default_scheme_init ();
+    sessionOptions->colorSchemes =
+      g_list_append (sessionOptions->colorSchemes, scheme);
     sessionOptions->activeColorScheme = scheme->name;
   }
-  
 
-  gg = g_object_new(GGOBI_TYPE_GGOBI, NULL); 
+
+  gg = g_object_new (GGOBI_TYPE_GGOBI, NULL);
 
   gg->mono_p = (vis->depth == 1 ||
                 vis->type == GDK_VISUAL_STATIC_GRAY ||
@@ -501,58 +543,59 @@ GGOBI(main)(gint argc, gchar *argv[], gboolean processEvents)
  appropriate node. Probably the wisest.
 */
 gboolean
-processRestoreFile(const gchar * const fileName, ggobid *gg)
+processRestoreFile (const gchar * const fileName, ggobid * gg)
 {
   xmlDocPtr doc;
   xmlNodePtr node;
   GGobiDescription desc;
   GList *el;
-  doc = xmlParseFile(fileName); 
-  if(!doc)
-    return(false);
+  doc = xmlParseFile (fileName);
+  if (!doc)
+    return (false);
 
-  node = xmlDocGetRootElement(doc);
+  node = xmlDocGetRootElement (doc);
 
-  if(!node)
-    return(false);
+  if (!node)
+    return (false);
 
-  getPreviousDisplays(node, &desc);
+  getPreviousDisplays (node, &desc);
 
   el = desc.displays;
-  while(el) {
+  while (el) {
     displayd *dpy;
     GGobiDisplayDescription *dpyDesc;
     dpyDesc = (GGobiDisplayDescription *) el->data;
-    dpy = createDisplayFromDescription(gg, dpyDesc);    
+    dpy = createDisplayFromDescription (gg, dpyDesc);
     /*XX free dpyDesc here and remove from list. */
     el = el->next;
   }
 
-  xmlFreeDoc(doc);
+  xmlFreeDoc (doc);
 
-  return(true);
+  return (true);
 }
 
 /*
  Computes where GGobi directory is located.
 */
 static gchar *
-computeGGobiHome(char *str)
+computeGGobiHome (char *str)
 {
   gchar *dir;
   const gchar *env;
 
-  env = g_getenv("GGOBI_HOME");
-  
-  if (env)
-    dir = g_strdup(env);
-  else dir = g_path_get_dirname(str);
+  env = g_getenv ("GGOBI_HOME");
 
-  return(dir);
+  if (env)
+    dir = g_strdup (env);
+  else
+    dir = g_path_get_dirname (str);
+
+  return (dir);
 }
 
 void
-initSessionOptions(int argc, char **argv)
+initSessionOptions (int argc, char **argv)
 {
   gchar *tmp;
   sessionOptions = &sessionoptions;
@@ -564,33 +607,34 @@ initSessionOptions(int argc, char **argv)
   sessionOptions->cmdArgs = argv;
   sessionOptions->numArgs = argc;
 
-  sessionOptions->ggobiHome = computeGGobiHome(argv[0]);
+  sessionOptions->ggobiHome = computeGGobiHome (argv[0]);
 
 
-  sessionOptions->info = (GGobiInitInfo*) g_malloc(sizeof(GGobiInitInfo));
-  memset(sessionOptions->info, '\0', sizeof(GGobiInitInfo));
+  sessionOptions->info = (GGobiInitInfo *) g_malloc (sizeof (GGobiInitInfo));
+  memset (sessionOptions->info, '\0', sizeof (GGobiInitInfo));
   sessionOptions->info->glyph.size = sessionOptions->info->glyph.type = -1;
   sessionOptions->info->createInitialScatterPlot = true;
   sessionOptions->info->allowCloseLastDisplay = false;
-  sessionOptions->info->quitWithNoGGobi = true; 
+  sessionOptions->info->quitWithNoGGobi = true;
   sessionOptions->info->numScatMatrixVars = MAXNVARS;
   sessionOptions->info->numParCoordsVars = MAXNPCPLOTS;
   sessionOptions->info->numTimePlotVars = MAXNTSPLOTS;
 
   sessionOptions->useRadioMenuItems = false;
-  
-  sessionOptions->info->colorSchemeFile = g_build_filename(sessionOptions->ggobiHome, 
-    "share", "colorschemes.xml", NULL);
 
-  sessionOptions->defaultTourSpeed = 50.0;  
-  sessionOptions->defaultTour1dSpeed = 40.0;  
+  sessionOptions->info->colorSchemeFile =
+    g_build_filename (sessionOptions->ggobiHome, "share", "colorschemes.xml",
+                      NULL);
+
+  sessionOptions->defaultTourSpeed = 50.0;
+  sessionOptions->defaultTour1dSpeed = 40.0;
 }
 
 gboolean
-ggobi_close (ggobid *gg)
+ggobi_close (ggobid * gg)
 {
-  GGOBI(close)(gg, true);
-  return(true);
+  GGOBI (close) (gg, true);
+  return (true);
 }
 
 
@@ -598,9 +642,11 @@ ggobi_close (ggobid *gg)
    Key for storing a reference to a ggobid instance in a widget
    so that we can retrieve it within a callback.
 */
-static const gchar * GGobiGTKey = "GGobi";
+static const gchar *GGobiGTKey = "GGobi";
 
-const gchar* key_get (void) {
+const gchar *
+key_get (void)
+{
   return GGobiGTKey;
 }
 
@@ -611,165 +657,170 @@ const gchar* key_get (void) {
   This assumes that the ggobid reference was stored in the window 
   when it was created.
  */
-ggobid*
-GGobiFromWidget (GtkWidget *w, gboolean useWindow)
+ggobid *
+GGobiFromWidget (GtkWidget * w, gboolean useWindow)
 {
   ggobid *gg = NULL;
   GObject *obj;
-  obj = g_object_get_data(G_OBJECT(w), GGobiGTKey);
+  obj = g_object_get_data (G_OBJECT (w), GGobiGTKey);
   if (obj) {
-    gg = (ggobid*) obj;
+    gg = (ggobid *) obj;
     ValidateGGobiRef (gg, true);
   }
 
   return (gg);
 }
 
-ggobid* GGobiFromWindow (GdkWindow *win)
+ggobid *
+GGobiFromWindow (GdkWindow * win)
 {
   ggobid *gg = NULL;
   GObject *obj;
-  obj = g_object_get_data(G_OBJECT(win), GGobiGTKey);
+  obj = g_object_get_data (G_OBJECT (win), GGobiGTKey);
   if (obj) {
-    gg = (ggobid*) obj;
+    gg = (ggobid *) obj;
     ValidateGGobiRef (gg, true);
   }
 
-  return(gg);
+  return (gg);
 }
 
-ggobid* 
-GGobiFromSPlot(splotd *sp)
+ggobid *
+GGobiFromSPlot (splotd * sp)
 {
   ggobid *gg = NULL;
   displayd *display = NULL;
   if ((sp) && sp->displayptr) {
     display = (displayd *) sp->displayptr;
     if (display) {
-      gg = ValidateGGobiRef(display->ggobi, false);
+      gg = ValidateGGobiRef (display->ggobi, false);
     }
   }
   return gg;
 }
 
-ggobid* 
-GGobiFromDisplay(displayd *display)
+ggobid *
+GGobiFromDisplay (displayd * display)
 {
   return (display->ggobi);
 }
 
 void
-GGobi_widget_set (GtkWidget *w, ggobid *gg, gboolean asIs)
+GGobi_widget_set (GtkWidget * w, ggobid * gg, gboolean asIs)
 {
   GtkWidget *wid = w;
   if (!asIs)
-	  wid = GTK_WIDGET (gtk_widget_get_parent_window (wid));
+    wid = GTK_WIDGET (gtk_widget_get_parent_window (wid));
 
-  g_object_set_data (G_OBJECT(wid), GGobiGTKey, gg);
+  g_object_set_data (G_OBJECT (wid), GGobiGTKey, gg);
 }
 
 
 ggobid *
-ggobi_get(gint which)
+ggobi_get (gint which)
 {
- extern ggobid** all_ggobis;
- if(which > -1 && which < num_ggobis)
-   return (all_ggobis[which]);
- else
-   return(NULL);
+  extern ggobid **all_ggobis;
+  if (which > -1 && which < num_ggobis)
+    return (all_ggobis[which]);
+  else
+    return (NULL);
 }
 
 gint
-ggobi_getIndex(ggobid *gg)
+ggobi_getIndex (ggobid * gg)
 {
   gint i;
-  for(i = 0; i < num_ggobis ; i++) {
-    if(all_ggobis[i] == gg)
-      return(i);
+  for (i = 0; i < num_ggobis; i++) {
+    if (all_ggobis[i] == gg)
+      return (i);
   }
 
- return(-1);
+  return (-1);
 }
 
 GGobiData *
-GGobi_get_data(gint which, const ggobid * const gg)
+GGobi_get_data (gint which, const ggobid * const gg)
 {
-   GGobiData *d;
-   d = g_slist_nth_data(gg->d, which);
+  GGobiData *d;
+  d = g_slist_nth_data (gg->d, which);
 
-   return(d);
+  return (d);
 }
 
 GGobiData *
-GGobi_get_data_by_name(const gchar * const name, const ggobid * const gg)
+GGobi_get_data_by_name (const gchar * const name, const ggobid * const gg)
 {
   GGobiData *d;
   GSList *l;
 
   for (l = gg->d; l; l = l->next) {
     d = (GGobiData *) l->data;
-    if(strcmp(d->name, name) == 0)
-      return(d);
+    if (strcmp (d->name, name) == 0)
+      return (d);
   }
-  return(NULL);
+  return (NULL);
 }
 
 
-ggobid*
-ValidateGGobiRef(ggobid *gg, gboolean fatal)
-{ 
- static gchar *error_msg = "Incorrect reference to ggobid.";
- extern ggobid** all_ggobis;
- extern gint num_ggobis;
+ggobid *
+ValidateGGobiRef (ggobid * gg, gboolean fatal)
+{
+  static gchar *error_msg = "Incorrect reference to ggobid.";
+  extern ggobid **all_ggobis;
+  extern gint num_ggobis;
   gint i;
-  for(i = 0; i < num_ggobis ; i++) {
-   if(all_ggobis[i] == gg)
-    return(gg);
+  for (i = 0; i < num_ggobis; i++) {
+    if (all_ggobis[i] == gg)
+      return (gg);
   }
 
   if (fatal) {
-     g_error(error_msg);
-  } else g_critical(error_msg);
+    g_error (error_msg);
+  }
+  else
+    g_critical (error_msg);
 
- return(NULL);
+  return (NULL);
 }
 
 GGobiData *
-ValidateDatadRef(GGobiData *d, ggobid *gg, gboolean fatal)
+ValidateDatadRef (GGobiData * d, ggobid * gg, gboolean fatal)
 {
   static gchar *error_msg = "Incorrect reference to datad.";
   gint i, n;
-  n = g_slist_length(gg->d);
-  for(i = 0; i < n ; i++) {
-   if(g_slist_nth_data(gg->d, i) == d)
-    return(d);
+  n = g_slist_length (gg->d);
+  for (i = 0; i < n; i++) {
+    if (g_slist_nth_data (gg->d, i) == d)
+      return (d);
   }
 
- if (fatal)
-  g_error(error_msg);
- else g_critical(error_msg);
- 
- return(NULL); 
+  if (fatal)
+    g_error (error_msg);
+  else
+    g_critical (error_msg);
+
+  return (NULL);
 }
 
 
 
 displayd *
-ValidateDisplayRef(displayd *d, ggobid *gg, gboolean fatal)
+ValidateDisplayRef (displayd * d, ggobid * gg, gboolean fatal)
 {
   static gchar *error_msg = "Incorrect reference to display.";
   gint i, n;
-  n = g_list_length(gg->displays);
-  for(i = 0; i < n ; i++) {
-   if(g_list_nth_data(gg->displays, i) == d)
-    return(d);
+  n = g_list_length (gg->displays);
+  for (i = 0; i < n; i++) {
+    if (g_list_nth_data (gg->displays, i) == d)
+      return (d);
   }
 
- if (fatal)
-  g_error(error_msg);
- else g_critical(error_msg);
- 
- return(NULL); 
+  if (fatal)
+    g_error (error_msg);
+  else
+    g_critical (error_msg);
+
+  return (NULL);
 }
 
 /*
@@ -781,51 +832,52 @@ ValidateDisplayRef(displayd *d, ggobid *gg, gboolean fatal)
     4) ggobirc in GGOBI_HOME
  */
 void
-process_initialization_files()
+process_initialization_files ()
 {
   GGobiInitInfo *info;
   gchar *fileName = NULL;
 
-  if(sessionOptions->initializationFile)
-    fileName = g_strdup(sessionOptions->initializationFile);
+  if (sessionOptions->initializationFile)
+    fileName = g_strdup (sessionOptions->initializationFile);
   else {
-    fileName = g_strdup(g_getenv("GGOBIRC"));
-    if(!fileName || !fileName[0]) {
+    fileName = g_strdup (g_getenv ("GGOBIRC"));
+    if (!fileName || !fileName[0]) {
       const gchar *tmp;
-      tmp = g_get_home_dir();
-      if(tmp) {
-        fileName = g_build_filename(tmp, ".ggobirc", NULL);
-        if(!canRead(fileName)) {
-          g_free(fileName);
+      tmp = g_get_home_dir ();
+      if (tmp) {
+        fileName = g_build_filename (tmp, ".ggobirc", NULL);
+        if (!canRead (fileName)) {
+          g_free (fileName);
           fileName = NULL;
         }
       }
-      if(!fileName)
-        fileName = g_build_filename(sessionOptions->ggobiHome, "ggobirc", NULL);
+      if (!fileName)
+        fileName =
+          g_build_filename (sessionOptions->ggobiHome, "ggobirc", NULL);
     }
-    if(fileName)
-      sessionOptions->initializationFile = g_strdup(fileName);
+    if (fileName)
+      sessionOptions->initializationFile = g_strdup (fileName);
   }
-     
-  if(fileName && fileName[0] && canRead(fileName)) {
-    info = read_init_file(fileName, sessionOptions->info);
-    g_free(fileName);
+
+  if (fileName && fileName[0] && canRead (fileName)) {
+    info = read_init_file (fileName, sessionOptions->info);
+    g_free (fileName);
     /* sessionOptions->info = info; */
   }
 
-  if(sessionOptions->pluginFiles) {
+  if (sessionOptions->pluginFiles) {
     GSList *el = sessionOptions->pluginFiles;
-    while(el) {
-       readPluginFile((char *) el->data, sessionOptions->info);
-       el = el->next;
+    while (el) {
+      readPluginFile ((char *) el->data, sessionOptions->info);
+      el = el->next;
     }
   }
 }
 
 GGobiOptions *
-GGOBI_getSessionOptions()
+GGOBI_getSessionOptions ()
 {
-  return(sessionOptions);
+  return (sessionOptions);
 }
 
 
@@ -835,4 +887,3 @@ GGOBI_getSessionOptions()
 
 #define GGOBI_MAIN 1
 #include "GGStructSizes.c"
-

@@ -28,60 +28,62 @@
 
 
  /* Making these available to ggobiClass.c */
-static gboolean barchartVarSel(GtkWidget *w, displayd * display, splotd * sp,
-                               gint jvar, gint toggle, gint mouse,
-                               cpaneld * cpanel, ggobid * gg);
-static gint barchartVarIsPlotted(displayd * dpy, gint * cols, gint ncols,
-                                 GGobiData * d);
-static gboolean barchartCPanelSet(displayd * dpy, cpaneld * cpanel,
-                                  ggobid * gg);
-static void barchartDisplaySet(displayd * dpy, ggobid * gg);
-static void barchartDestroy(GtkObject *);
-static void barchartPlaneToScreen(splotd * sp, GGobiData * d, ggobid * gg);
-void barchart_clean_init(barchartSPlotd * sp);
-void barchart_recalc_counts(barchartSPlotd * sp, GGobiData * d, ggobid * gg);
+static gboolean barchartVarSel (GtkWidget * w, displayd * display,
+                                splotd * sp, gint jvar, gint toggle,
+                                gint mouse, cpaneld * cpanel, ggobid * gg);
+static gint barchartVarIsPlotted (displayd * dpy, gint * cols, gint ncols,
+                                  GGobiData * d);
+static gboolean barchartCPanelSet (displayd * dpy, cpaneld * cpanel,
+                                   ggobid * gg);
+static void barchartDisplaySet (displayd * dpy, ggobid * gg);
+static void barchartDestroy (GtkObject *);
+static void barchartPlaneToScreen (splotd * sp, GGobiData * d, ggobid * gg);
+void barchart_clean_init (barchartSPlotd * sp);
+void barchart_recalc_counts (barchartSPlotd * sp, GGobiData * d, ggobid * gg);
 
-static gboolean barchart_build_symbol_vectors(cpaneld *, GGobiData *, ggobid *);
-static void barchartVarpanelRefresh(displayd * display, splotd * sp,
-                                    GGobiData * d);
-static gboolean barchartHandlesInteraction(displayd * dpy, gint action);
-static void barchartVarpanelTooltipsSet(displayd * dpy, ggobid * gg,
-                                        GtkWidget * wx, GtkWidget * wy,
-                                        GtkWidget *wz, GtkWidget * label);
-static gint barchartPlottedColsGet(displayd * display, gint * cols,
-                                   GGobiData * d, ggobid * gg);
-static GtkWidget *barchartCPanelWidget(displayd * dpy,
-                                       gchar ** modeName, ggobid * gg);
+static gboolean barchart_build_symbol_vectors (cpaneld *, GGobiData *,
+                                               ggobid *);
+static void barchartVarpanelRefresh (displayd * display, splotd * sp,
+                                     GGobiData * d);
+static gboolean barchartHandlesInteraction (displayd * dpy, gint action);
+static void barchartVarpanelTooltipsSet (displayd * dpy, ggobid * gg,
+                                         GtkWidget * wx, GtkWidget * wy,
+                                         GtkWidget * wz, GtkWidget * label);
+static gint barchartPlottedColsGet (displayd * display, gint * cols,
+                                    GGobiData * d, ggobid * gg);
+static GtkWidget *barchartCPanelWidget (displayd * dpy,
+                                        gchar ** modeName, ggobid * gg);
 //static GtkWidget *barchartMenusMake(displayd * dpy, ggobid * gg);
-static gboolean barchartEventHandlersToggle(displayd * dpy, splotd * sp,
-                                            gboolean state, ProjectionMode,
-                                            InteractionMode);
-static gboolean barchartKeyEventHandled(GtkWidget *, displayd *, splotd *,
-					GdkEventKey *, ggobid *);
+static gboolean barchartEventHandlersToggle (displayd * dpy, splotd * sp,
+                                             gboolean state, ProjectionMode,
+                                             InteractionMode);
+static gboolean barchartKeyEventHandled (GtkWidget *, displayd *, splotd *,
+                                         GdkEventKey *, ggobid *);
 
 static void
-setShowAxesOption(displayd *display, gboolean active)
+setShowAxesOption (displayd * display, gboolean active)
 {
   switch (display->cpanel.pmode) {
-    case EXTENDED_DISPLAY_PMODE:
-      scatterplot_show_vrule (display, active);
+  case EXTENDED_DISPLAY_PMODE:
+    scatterplot_show_vrule (display, active);
     break;
-    default:
+  default:
     break;
   }
 }
 
 
 static gboolean
-varpanelHighd(displayd *display)
+varpanelHighd (displayd * display)
 {
   gint proj = display->cpanel.pmode;
-  return(proj == TOUR1D || proj == TOUR2D3 || proj == TOUR2D || proj == COTOUR);
+  return (proj == TOUR1D || proj == TOUR2D3 || proj == TOUR2D
+          || proj == COTOUR);
 }
 
 static gint
-barchart_is_variable_plotted(displayd * display, gint * cols, gint ncols,
-                             GGobiData * d)
+barchart_is_variable_plotted (displayd * display, gint * cols, gint ncols,
+                              GGobiData * d)
 {
   gint j;
   ggobid *gg = display->d->gg;
@@ -99,40 +101,41 @@ barchart_is_variable_plotted(displayd * display, gint * cols, gint ncols,
 
 
 /* barchart splot methods*/
-static gchar *barchart_tree_label(splotd * sp, GGobiData * d, ggobid * gg)
+static gchar *
+barchart_tree_label (splotd * sp, GGobiData * d, ggobid * gg)
 {
   vartabled *vt;
   int n;
   char *buf;
 
-  vt = vartable_element_get(sp->p1dvar, d);
-  n = strlen(vt->collab);
-  buf = (gchar *) g_malloc(n * sizeof(gchar *));
-  sprintf(buf, "%s", vt->collab);
+  vt = vartable_element_get (sp->p1dvar, d);
+  n = strlen (vt->collab);
+  buf = (gchar *) g_malloc (n * sizeof (gchar *));
+  sprintf (buf, "%s", vt->collab);
 
   return (buf);
 }
 
 
 gboolean
-barchartVarSel(GtkWidget *w, displayd * display, splotd * sp, gint jvar,
-               gint toggle, gint mouse, cpaneld * cpanel, ggobid * gg)
+barchartVarSel (GtkWidget * w, displayd * display, splotd * sp, gint jvar,
+                gint toggle, gint mouse, cpaneld * cpanel, ggobid * gg)
 {
   gint jvar_prev = -1;
-  gboolean redraw = p1d_varsel(sp, jvar, &jvar_prev, toggle, mouse);
+  gboolean redraw = p1d_varsel (sp, jvar, &jvar_prev, toggle, mouse);
   if (redraw) {
     displayd *display = (displayd *) sp->displayptr;
     GGobiData *d = display->d;
 
-    barchart_clean_init(GGOBI_BARCHART_SPLOT(sp));
-    barchart_recalc_counts(GGOBI_BARCHART_SPLOT(sp), d, d->gg);
+    barchart_clean_init (GGOBI_BARCHART_SPLOT (sp));
+    barchart_recalc_counts (GGOBI_BARCHART_SPLOT (sp), d, d->gg);
   }
 
   return (true);
 }
 
 gint
-barchartVarIsPlotted(displayd * dpy, gint * cols, gint ncols, GGobiData * d)
+barchartVarIsPlotted (displayd * dpy, gint * cols, gint ncols, GGobiData * d)
 {
   int j;
   splotd *sp = (splotd *) dpy->splots->data;
@@ -145,66 +148,71 @@ barchartVarIsPlotted(displayd * dpy, gint * cols, gint ncols, GGobiData * d)
   return (-1);
 }
 
-gboolean barchartCPanelSet(displayd * dpy, cpaneld * cpanel, ggobid * gg)
+gboolean
+barchartCPanelSet (displayd * dpy, cpaneld * cpanel, ggobid * gg)
 {
   GtkWidget *w;
-  w = GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget;
+  w = GGOBI_EXTENDED_DISPLAY (dpy)->cpanelWidget;
   if (!w) {
-    GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget = w =
-        cpanel_barchart_make(gg);
+    GGOBI_EXTENDED_DISPLAY (dpy)->cpanelWidget = w =
+      cpanel_barchart_make (gg);
   }
-  cpanel_barchart_set(dpy, cpanel, w, gg);
-  cpanel_brush_set(dpy, cpanel, gg);
-  cpanel_identify_set(dpy, cpanel, gg);
+  cpanel_barchart_set (dpy, cpanel, w, gg);
+  cpanel_brush_set (dpy, cpanel, gg);
+  cpanel_identify_set (dpy, cpanel, gg);
 
   return (true);
 }
 
-void barchartDisplaySet(displayd * dpy, ggobid * gg)
-{  
+void
+barchartDisplaySet (displayd * dpy, ggobid * gg)
+{
 }
 
 
 /* This is for the barchart SPlot Class */
-static void barchartDestroy(GtkObject *obj)
+static void
+barchartDestroy (GtkObject * obj)
 {
-  if(obj && GGOBI_BARCHART_SPLOT(obj)->bar) {
-	  GtkObjectClass *klass;
-	  barchartSPlotd *sp;
-	  
-	  sp = GGOBI_BARCHART_SPLOT(obj);
-      
-	  /* Goal here is to get the class object for the parent
-         of the GGOBI_TYPE_EXTENDED_SPLOT class so that we can call its
-         destroy method.
-         Need to get the class of the barchart and then constrain it to the 
-         extended splot class. */
-	  klass = g_type_class_peek_parent(GGOBI_EXTENDED_SPLOT_GET_CLASS(sp));
+  if (obj && GGOBI_BARCHART_SPLOT (obj)->bar) {
+    GtkObjectClass *klass;
+    barchartSPlotd *sp;
 
-	  barchart_free_structure(sp);
-	  vectori_free (&sp->bar->index_to_rank);
-	  g_free((gpointer) sp->bar);
-	  sp->bar = NULL;
+    sp = GGOBI_BARCHART_SPLOT (obj);
 
-	  klass->destroy(GTK_OBJECT(sp)); 
+    /* Goal here is to get the class object for the parent
+       of the GGOBI_TYPE_EXTENDED_SPLOT class so that we can call its
+       destroy method.
+       Need to get the class of the barchart and then constrain it to the 
+       extended splot class. */
+    klass = g_type_class_peek_parent (GGOBI_EXTENDED_SPLOT_GET_CLASS (sp));
+
+    barchart_free_structure (sp);
+    vectori_free (&sp->bar->index_to_rank);
+    g_free ((gpointer) sp->bar);
+    sp->bar = NULL;
+
+    klass->destroy (GTK_OBJECT (sp));
   }
 }
 
 
-void barchartPlaneToScreen(splotd * sp, GGobiData * d, ggobid * gg)
+void
+barchartPlaneToScreen (splotd * sp, GGobiData * d, ggobid * gg)
 {
-  barchartSPlotd *bsp = GGOBI_BARCHART_SPLOT(sp);
+  barchartSPlotd *bsp = GGOBI_BARCHART_SPLOT (sp);
 
-  barchart_recalc_dimensions(sp, d, gg);
-  barchart_recalc_group_dimensions(bsp, gg);
+  barchart_recalc_dimensions (sp, d, gg);
+  barchart_recalc_group_dimensions (bsp, gg);
 }
 
-void barchartWorldToPlane (splotd *sp, GGobiData *d, ggobid *gg)
+void
+barchartWorldToPlane (splotd * sp, GGobiData * d, ggobid * gg)
 {
-  barchartSPlotd *bsp = GGOBI_BARCHART_SPLOT(sp);
+  barchartSPlotd *bsp = GGOBI_BARCHART_SPLOT (sp);
 
-  /*  barchart_clean_init(bsp);*/
-  barchart_recalc_counts(bsp, d, gg);
+  /*  barchart_clean_init(bsp); */
+  barchart_recalc_counts (bsp, d, gg);
 }
 
 
@@ -213,7 +221,8 @@ void barchartWorldToPlane (splotd *sp, GGobiData *d, ggobid *gg)
 /*      called by build_symbol_vectors                                  */
 /*----------------------------------------------------------------------*/
 
-gboolean barchart_build_symbol_vectors (cpaneld *cpanel, GGobiData * d, ggobid * gg)
+gboolean
+barchart_build_symbol_vectors (cpaneld * cpanel, GGobiData * d, ggobid * gg)
 {
   gboolean changed = FALSE;
   gint j, m;
@@ -223,58 +232,61 @@ gboolean barchart_build_symbol_vectors (cpaneld *cpanel, GGobiData * d, ggobid *
     m = d->rows_in_plot.els[j];
 
     switch (cpanel->br.point_targets) {
-      case br_candg:  /*-- color and glyph --*/
-        changed = update_color_vectors(m, changed,
-          d->pts_under_brush.els, d, gg);
-        changed = update_glyph_vectors (m, changed,
-          d->pts_under_brush.els, d, gg);
+    case br_candg:  /*-- color and glyph --*/
+      changed = update_color_vectors (m, changed,
+                                      d->pts_under_brush.els, d, gg);
+      changed = update_glyph_vectors (m, changed,
+                                      d->pts_under_brush.els, d, gg);
       break;
-      case br_color:
-        changed = update_color_vectors(m, changed,
-          d->pts_under_brush.els, d, gg);
+    case br_color:
+      changed = update_color_vectors (m, changed,
+                                      d->pts_under_brush.els, d, gg);
       break;
-      case br_glyph:  /*-- glyph type and size --*/
-        changed = update_glyph_vectors (m, changed,
-          d->pts_under_brush.els, d, gg);
+    case br_glyph:  /*-- glyph type and size --*/
+      changed = update_glyph_vectors (m, changed,
+                                      d->pts_under_brush.els, d, gg);
       break;
-      case br_shadow:
-        changed = update_hidden_vectors (m, changed,
-          d->pts_under_brush.els, d, gg);
+    case br_shadow:
+      changed = update_hidden_vectors (m, changed,
+                                       d->pts_under_brush.els, d, gg);
       break;
-      case br_unshadow:
-        changed = bizarro_update_hidden_vectors (m, changed,
-          d->pts_under_brush.els, d, gg);
+    case br_unshadow:
+      changed = bizarro_update_hidden_vectors (m, changed,
+                                               d->pts_under_brush.els, d, gg);
       break;
-      case br_off:
-        ;
+    case br_off:
+      ;
       break;
     }
 
     /*-- link by id --*/
-    if (!gg->linkby_cv && nd > 1) symbol_link_by_id (false, j, d, gg);
+    if (!gg->linkby_cv && nd > 1)
+      symbol_link_by_id (false, j, d, gg);
     /*-- --*/
   }
 
   return changed;
 }
 
-void barchartVarpanelRefresh(displayd * display, splotd * sp, GGobiData * d)
+void
+barchartVarpanelRefresh (displayd * display, splotd * sp, GGobiData * d)
 {
   gint j;
   for (j = 0; j < d->ncols; j++) {
-    varpanel_toggle_set_active(VARSEL_X, j, (j == sp->p1dvar), d);
+    varpanel_toggle_set_active (VARSEL_X, j, (j == sp->p1dvar), d);
 
-    varpanel_toggle_set_active(VARSEL_Y, j, false, d);
-    varpanel_widget_set_visible(VARSEL_Y, j, false, d);
-    varpanel_toggle_set_active(VARSEL_Z, j, false, d);
-    varpanel_widget_set_visible(VARSEL_Z, j, false, d);
+    varpanel_toggle_set_active (VARSEL_Y, j, false, d);
+    varpanel_widget_set_visible (VARSEL_Y, j, false, d);
+    varpanel_toggle_set_active (VARSEL_Z, j, false, d);
+    varpanel_widget_set_visible (VARSEL_Z, j, false, d);
   }
 }
 
-gboolean barchartHandlesInteraction(displayd * dpy, gint action)
+gboolean
+barchartHandlesInteraction (displayd * dpy, gint action)
 {
   InteractionMode imode = (InteractionMode) action;
-  return (/*imode == SCALE ||*/ imode == BRUSH || imode == IDENT
+  return ( /*imode == SCALE || */ imode == BRUSH || imode == IDENT
           || imode == DEFAULT_IMODE);
 }
 
@@ -285,46 +297,50 @@ gboolean barchartHandlesInteraction(displayd * dpy, gint action)
 /*--------------------------------------------------------------------*/
 
 void
-barchartVarpanelTooltipsSet(displayd * dpy, ggobid * gg, GtkWidget * wx,
-                            GtkWidget * wy, GtkWidget *wz, GtkWidget * label)
+barchartVarpanelTooltipsSet (displayd * dpy, ggobid * gg, GtkWidget * wx,
+                             GtkWidget * wy, GtkWidget * wz,
+                             GtkWidget * label)
 {
-  gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), wx,
-                       "Click to replace a variable", NULL);
-  gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), label,
-                       "Click to replace a variable", NULL);
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
+                        "Click to replace a variable", NULL);
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
+                        "Click to replace a variable", NULL);
 }
 
 
 gint
-barchartPlottedColsGet(displayd * display, gint * cols, GGobiData * d,
-                       ggobid * gg)
+barchartPlottedColsGet (displayd * display, gint * cols, GGobiData * d,
+                        ggobid * gg)
 {
   gint ncols = 0;
   cols[ncols++] = gg->current_splot->p1dvar;
   return (ncols);
 }
 
-GtkWidget *barchartCPanelWidget(displayd * dpy, gchar ** modeName, ggobid * gg)
+GtkWidget *
+barchartCPanelWidget (displayd * dpy, gchar ** modeName, ggobid * gg)
 {
-  GtkWidget *w = GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget;
+  GtkWidget *w = GGOBI_EXTENDED_DISPLAY (dpy)->cpanelWidget;
   if (!w) {
-    GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget = w =
-        cpanel_barchart_make(gg);
+    GGOBI_EXTENDED_DISPLAY (dpy)->cpanelWidget = w =
+      cpanel_barchart_make (gg);
   }
   *modeName = "Bar Chart";
   return (w);
 }
 
 gboolean
-barchartEventHandlersToggle(displayd * dpy, splotd * sp, gboolean state,
-                            ProjectionMode pmode, InteractionMode imode)
+barchartEventHandlersToggle (displayd * dpy, splotd * sp, gboolean state,
+                             ProjectionMode pmode, InteractionMode imode)
 {
   if (imode == IDENT) {
-    identify_event_handlers_toggle (sp, state);  // Generic method
-  } else if (imode == BRUSH) {
+    identify_event_handlers_toggle (sp, state); // Generic method
+  }
+  else if (imode == BRUSH) {
     brush_event_handlers_toggle (sp, state);  // Generic method
-  } else if (imode == DEFAULT_IMODE) {
-    barchart_event_handlers_toggle(dpy, sp, state, pmode, imode);
+  }
+  else if (imode == DEFAULT_IMODE) {
+    barchart_event_handlers_toggle (dpy, sp, state, pmode, imode);
   }
 
   return (false);
@@ -332,7 +348,8 @@ barchartEventHandlersToggle(displayd * dpy, splotd * sp, gboolean state,
 
 
 static gboolean
-barchartKeyEventHandled(GtkWidget *w, displayd *display, splotd * sp, GdkEventKey *event, ggobid *gg)
+barchartKeyEventHandled (GtkWidget * w, displayd * display, splotd * sp,
+                         GdkEventKey * event, ggobid * gg)
 {
   gboolean ok = true;
   ProjectionMode pmode = NULL_PMODE;
@@ -340,41 +357,44 @@ barchartKeyEventHandled(GtkWidget *w, displayd *display, splotd * sp, GdkEventKe
 
   if (event->state == 0 || event->state == GDK_CONTROL_MASK) {
 
-  switch (event->keyval) {
+    switch (event->keyval) {
     case GDK_h:
     case GDK_H:
       pmode = EXTENDED_DISPLAY_PMODE;
-    break;
+      break;
     case GDK_t:
     case GDK_T:
       pmode = TOUR1D;
-    break;
+      break;
     case GDK_b:
     case GDK_B:
       imode = BRUSH;
-    break;
+      break;
     case GDK_i:
     case GDK_I:
       imode = IDENT;
-    break;
+      break;
 
     default:
       ok = false;
-    break;
-  }
+      break;
+    }
 
-  if (ok) {
-    GGOBI(full_viewmode_set)(pmode, imode, gg);
+    if (ok) {
+      GGOBI (full_viewmode_set) (pmode, imode, gg);
+    }
   }
-  } else { ok = false; }
+  else {
+    ok = false;
+  }
 
   return ok;
 }
 
 /* This is an abbreviated version of the scatterplot version */
 void
-barchartScreenToTform(cpaneld *cpanel, splotd *sp, icoords *scr,
-		   fcoords *tfd, ggobid *gg)
+barchartScreenToTform (cpaneld * cpanel, splotd * sp, icoords * scr,
+                       fcoords * tfd, ggobid * gg)
 {
   gcoords planar, world;
   greal precis = (greal) PRECISION1;
@@ -394,9 +414,9 @@ barchartScreenToTform(cpaneld *cpanel, splotd *sp, icoords *scr,
 /*
  * screen to plane 
 */
-  planar.x = (scr->x - sp->max.x/2) * precis / sp->iscale.x ;
+  planar.x = (scr->x - sp->max.x / 2) * precis / sp->iscale.x;
   planar.x += sp->pmid.x;
-  planar.y = (scr->y - sp->max.y/2) * precis / sp->iscale.y ;
+  planar.y = (scr->y - sp->max.y / 2) * precis / sp->iscale.y;
   planar.y += sp->pmid.y;
 
 /*
@@ -407,38 +427,39 @@ barchartScreenToTform(cpaneld *cpanel, splotd *sp, icoords *scr,
   case TOUR1D:
     break;
 
-    /* Sheesh, I haven't even decided what I want the pmode to be */  
+    /* Sheesh, I haven't even decided what I want the pmode to be */
   case EXTENDED_DISPLAY_PMODE:
   case DEFAULT_PMODE:
-      vt = vartable_element_get (sp->p1dvar, d);
-      max = vt->lim.max;
-      min = vt->lim.min;
-      rdiff = max - min;
+    vt = vartable_element_get (sp->p1dvar, d);
+    max = vt->lim.max;
+    min = vt->lim.min;
+    rdiff = max - min;
 
-      if (display->p1d_orientation == HORIZONTAL) {
-        /* x */
-        world.x = planar.x;
-        ftmp = world.x / precis;
-        tfd->x = (ftmp + 1.0) * .5 * rdiff;
-        tfd->x += min;
-      } else {
-        /* y */
-        world.y = planar.y;
-        ftmp = world.y / precis;
-        tfd->y = (ftmp + 1.0) * .5 * rdiff;
-        tfd->y += min;
-      }
+    if (display->p1d_orientation == HORIZONTAL) {
+      /* x */
+      world.x = planar.x;
+      ftmp = world.x / precis;
+      tfd->x = (ftmp + 1.0) * .5 * rdiff;
+      tfd->x += min;
+    }
+    else {
+      /* y */
+      world.y = planar.y;
+      ftmp = world.y / precis;
+      tfd->y = (ftmp + 1.0) * .5 * rdiff;
+      tfd->y += min;
+    }
     break;
 
-    default:
+  default:
     break;
   }
 }
 
-void barchartDisplayClassInit(GGobiBarChartDisplayClass * klass)
+void
+barchartDisplayClassInit (GGobiBarChartDisplayClass * klass)
 {
-  klass->parent_class.treeLabel = klass->parent_class.titleLabel =
-      "Barchart";
+  klass->parent_class.treeLabel = klass->parent_class.titleLabel = "Barchart";
   klass->parent_class.create = barchart_new;
   klass->parent_class.createWithVars = barchart_new_with_vars;
   klass->parent_class.variable_select = barchartVarSel;
@@ -472,18 +493,18 @@ void barchartDisplayClassInit(GGobiBarChartDisplayClass * klass)
 
   klass->parent_class.binning_ok = false;
   klass->parent_class.event_handlers_toggle = barchartEventHandlersToggle;
-  klass->parent_class.splot_key_event_handled =
-      barchartKeyEventHandled;
+  klass->parent_class.splot_key_event_handled = barchartKeyEventHandled;
 
   klass->parent_class.set_show_axes_option = setShowAxesOption;
 }
 
 void
-barchart_identify_cues_draw(gboolean nearest_p, gint k, splotd * rawsp, 
-  GdkDrawable * drawable, ggobid * gg)
+barchart_identify_cues_draw (gboolean nearest_p, gint k, splotd * rawsp,
+                             GdkDrawable * drawable, ggobid * gg)
 {
-  barchartSPlotd *sp = GGOBI_BARCHART_SPLOT(rawsp);
-  PangoLayout *layout = gtk_widget_create_pango_layout(GTK_WIDGET(rawsp->da), NULL);
+  barchartSPlotd *sp = GGOBI_BARCHART_SPLOT (rawsp);
+  PangoLayout *layout =
+    gtk_widget_create_pango_layout (GTK_WIDGET (rawsp->da), NULL);
   gint i, nbins;
   gchar *string;
   icoords mousepos = rawsp->mousepos;
@@ -492,81 +513,89 @@ barchart_identify_cues_draw(gboolean nearest_p, gint k, splotd * rawsp,
   gint j;
 
   nbins = sp->bar->nbins;
-  gdk_gc_set_foreground(gg->plot_GC, &scheme->rgb_accent);
+  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
 
   if (sp->bar->low_pts_missing && sp->bar->bar_hit[0]) {
     string = g_strdup_printf ("%ld point%s < %.2f", sp->bar->low_bin->count,
-      sp->bar->low_bin->count == 1 ? "" : "s",
-      sp->bar->breaks[0] + sp->bar->offset);
+                              sp->bar->low_bin->count == 1 ? "" : "s",
+                              sp->bar->breaks[0] + sp->bar->offset);
 
-    gdk_draw_rectangle(drawable, gg->plot_GC, FALSE,
-      sp->bar->low_bin->rect.x, sp->bar->low_bin->rect.y,
-      sp->bar->low_bin->rect.width, sp->bar->low_bin->rect.height);
-    layout_text(layout, string, NULL);
-    gdk_draw_layout(drawable, gg->plot_GC, mousepos.x, mousepos.y, layout);
-    g_free(string);
+    gdk_draw_rectangle (drawable, gg->plot_GC, FALSE,
+                        sp->bar->low_bin->rect.x, sp->bar->low_bin->rect.y,
+                        sp->bar->low_bin->rect.width,
+                        sp->bar->low_bin->rect.height);
+    layout_text (layout, string, NULL);
+    gdk_draw_layout (drawable, gg->plot_GC, mousepos.x, mousepos.y, layout);
+    g_free (string);
   }
   for (i = 1; i < nbins + 1; i++) {
     if (sp->bar->bar_hit[i]) {
       if (sp->bar->is_histogram) {
         string = g_strdup_printf ("%ld point%s in (%.2f,%.2f)",
-                sp->bar->bins[i - 1].count,
-                sp->bar->bins[i - 1].count == 1 ? "" : "s",
-                sp->bar->breaks[i - 1] + sp->bar->offset,
-                sp->bar->breaks[i] + sp->bar->offset);
-      } else {
+                                  sp->bar->bins[i - 1].count,
+                                  sp->bar->bins[i - 1].count == 1 ? "" : "s",
+                                  sp->bar->breaks[i - 1] + sp->bar->offset,
+                                  sp->bar->breaks[i] + sp->bar->offset);
+      }
+      else {
         gchar *levelName;
         vartabled *var;
-        var = (vartabled *) g_slist_nth_data(rawsp->displayptr->d->vartable,
-                                           rawsp->p1dvar);
+        var = (vartabled *) g_slist_nth_data (rawsp->displayptr->d->vartable,
+                                              rawsp->p1dvar);
 /* dfs */
-        j = i-1;
+        j = i - 1;
         level = checkLevelValue (var, (gdouble) sp->bar->bins[j].value);
 
         if (level == -1) {
           string = g_strdup_printf ("%ld point%s missing",
-                sp->bar->bins[j].count,
-                sp->bar->bins[j].count == 1 ? "" : "s");
-        } else {
+                                    sp->bar->bins[j].count,
+                                    sp->bar->bins[j].count == 1 ? "" : "s");
+        }
+        else {
           levelName = var->level_names[level];
           string = g_strdup_printf ("%ld point%s in %s",
-                sp->bar->bins[j].count,
-                sp->bar->bins[j].count == 1 ? "" : "s", levelName);
+                                    sp->bar->bins[j].count,
+                                    sp->bar->bins[j].count == 1 ? "" : "s",
+                                    levelName);
         }
 /* --- */
 #ifdef PREV
         levelName = var->level_names[i - 1];
-        sprintf(string, "%ld point%s in %s",
-                sp->bar->bins[i - 1].count,
-                sp->bar->bins[i - 1].count == 1 ? "" : "s", levelName);
+        sprintf (string, "%ld point%s in %s",
+                 sp->bar->bins[i - 1].count,
+                 sp->bar->bins[i - 1].count == 1 ? "" : "s", levelName);
 #endif
       }
-      gdk_draw_rectangle(drawable, gg->plot_GC, FALSE,
-        sp->bar->bins[i - 1].rect.x, sp->bar->bins[i - 1].rect.y,
-        sp->bar->bins[i - 1].rect.width, sp->bar->bins[i - 1].rect.height);
-      layout_text(layout, string, NULL);
-      gdk_draw_layout(drawable, gg->plot_GC, mousepos.x, mousepos.y, layout);
-      g_free(string);
+      gdk_draw_rectangle (drawable, gg->plot_GC, FALSE,
+                          sp->bar->bins[i - 1].rect.x,
+                          sp->bar->bins[i - 1].rect.y,
+                          sp->bar->bins[i - 1].rect.width,
+                          sp->bar->bins[i - 1].rect.height);
+      layout_text (layout, string, NULL);
+      gdk_draw_layout (drawable, gg->plot_GC, mousepos.x, mousepos.y, layout);
+      g_free (string);
     }
   }
 
   if (sp->bar->high_pts_missing && sp->bar->bar_hit[nbins + 1]) {
     string = g_strdup_printf ("%ld point%s > %.2f", sp->bar->high_bin->count,
-            sp->bar->high_bin->count == 1 ? "" : "s",
-            sp->bar->breaks[nbins] + sp->bar->offset);
+                              sp->bar->high_bin->count == 1 ? "" : "s",
+                              sp->bar->breaks[nbins] + sp->bar->offset);
 
-    gdk_draw_rectangle(drawable, gg->plot_GC, FALSE,
-      sp->bar->high_bin->rect.x, sp->bar->high_bin->rect.y,
-      sp->bar->high_bin->rect.width, sp->bar->high_bin->rect.height);
-    layout_text(layout, string, NULL);
-    gdk_draw_layout(drawable, gg->plot_GC, mousepos.x, mousepos.y, layout);
+    gdk_draw_rectangle (drawable, gg->plot_GC, FALSE,
+                        sp->bar->high_bin->rect.x, sp->bar->high_bin->rect.y,
+                        sp->bar->high_bin->rect.width,
+                        sp->bar->high_bin->rect.height);
+    layout_text (layout, string, NULL);
+    gdk_draw_layout (drawable, gg->plot_GC, mousepos.x, mousepos.y, layout);
     g_free (string);
   }
-  g_object_unref(G_OBJECT(layout));
+  g_object_unref (G_OBJECT (layout));
 
 }
 
-void barchartSPlotClassInit(GGobiBarChartSPlotClass * klass)
+void
+barchartSPlotClassInit (GGobiBarChartSPlotClass * klass)
 {
   /* barcharts need more attention than redrawing the brush */
   klass->extendedSPlotClass.splot.redraw = FULL;
@@ -576,11 +605,10 @@ void barchartSPlotClassInit(GGobiBarChartSPlotClass * klass)
   klass->extendedSPlotClass.add_markup_cues = barchart_add_bar_cues;
 #if BARCHART_SCALE
   klass->extendedSPlotClass.add_scaling_cues =
-      barchart_scaling_visual_cues_draw;
+    barchart_scaling_visual_cues_draw;
 #endif
   klass->extendedSPlotClass.add_identify_cues = barchart_identify_cues_draw;
-  klass->extendedSPlotClass.add_plot_labels =
-      barchart_splot_add_plot_labels;
+  klass->extendedSPlotClass.add_plot_labels = barchart_splot_add_plot_labels;
   klass->extendedSPlotClass.redraw = barchart_redraw;
 
   klass->extendedSPlotClass.screen_to_tform = barchartScreenToTform;
@@ -588,9 +616,9 @@ void barchartSPlotClassInit(GGobiBarChartSPlotClass * klass)
   klass->extendedSPlotClass.plane_to_screen = barchartPlaneToScreen;
 
   klass->extendedSPlotClass.active_paint_points =
-      barchart_active_paint_points;
+    barchart_active_paint_points;
 
-  GTK_OBJECT_CLASS(klass)->destroy = barchartDestroy;
+  GTK_OBJECT_CLASS (klass)->destroy = barchartDestroy;
 
   klass->extendedSPlotClass.plotted_vars_get = splot1DVariablesGet;
 }

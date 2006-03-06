@@ -23,67 +23,73 @@
 #include <stdio.h>
 
 //static void addDialogButtons(GtkWidget *dialog, PrintInfo *data);
-static void handlePrintOptions(PrintInfo *info);
+static void handlePrintOptions (PrintInfo * info);
 
 GGobiPrintHandler DefaultPrintHandler;
 
 PrintInfo *
-createPrintInfo(GtkWidget *dialog, PrintOptions *options, displayd *dpy, 
-	ggobid *gg, PrintDialogHandler print, void *userData)
+createPrintInfo (GtkWidget * dialog, PrintOptions * options, displayd * dpy,
+                 ggobid * gg, PrintDialogHandler print, void *userData)
 {
   PrintInfo *data;
-  data = (PrintInfo *)g_malloc( 1 * sizeof(PrintInfo));
+  data = (PrintInfo *) g_malloc (1 * sizeof (PrintInfo));
   data->options = options;
   data->dpy = dpy;
   data->ggobi = gg;
   data->dialog = dialog;
   data->handler = print;
   data->userData = userData;
-  return(data);
+  return (data);
 }
 
 PrintOptions *
-showPrintDialog(PrintOptions *options, displayd *dpy, ggobid *gg, GGobiPrintHandler *printHandler)
+showPrintDialog (PrintOptions * options, displayd * dpy, ggobid * gg,
+                 GGobiPrintHandler * printHandler)
 {
- GtkWidget *dlg;
- PrintInfo *info;
- 
- dlg = createPrintDialog(dpy);
- info = createPrintInfo(dlg, options, dpy, gg, printHandler->dialog, printHandler->userData);
- 
- if (gtk_dialog_run(GTK_DIALOG(dlg)) == GTK_RESPONSE_ACCEPT)
-	 handlePrintOptions(info);
- 
- gtk_widget_destroy(dlg);
- g_free(info);
-	 
- //gdk_window_show(dlg->window);
- //gdk_window_raise(dlg->window);
+  GtkWidget *dlg;
+  PrintInfo *info;
 
- return(options);
+  dlg = createPrintDialog (dpy);
+  info =
+    createPrintInfo (dlg, options, dpy, gg, printHandler->dialog,
+                     printHandler->userData);
+
+  if (gtk_dialog_run (GTK_DIALOG (dlg)) == GTK_RESPONSE_ACCEPT)
+    handlePrintOptions (info);
+
+  gtk_widget_destroy (dlg);
+  g_free (info);
+
+  //gdk_window_show(dlg->window);
+  //gdk_window_raise(dlg->window);
+
+  return (options);
 }
 
 
 
 GtkWidget *
-createPrintDialog(displayd *dpy)
+createPrintDialog (displayd * dpy)
 {
   gchar *title;
   GtkWidget *dialog;
-  
-  title = g_malloc((strlen("Print Options") +
-    strlen((dpy ? " for display" : "")) + 1 )* sizeof(gchar));
-  sprintf(title, "%s%s", "Print Options", (dpy ? " for display" : ""));
 
-  dialog = gtk_dialog_new_with_buttons(title, NULL, 0, 
-  	GTK_STOCK_OK, GTK_RESPONSE_ACCEPT, GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT, NULL);
+  title = g_malloc ((strlen ("Print Options") +
+                     strlen ((dpy ? " for display" : "")) +
+                     1) * sizeof (gchar));
+  sprintf (title, "%s%s", "Print Options", (dpy ? " for display" : ""));
+
+  dialog = gtk_dialog_new_with_buttons (title, NULL, 0,
+                                        GTK_STOCK_OK, GTK_RESPONSE_ACCEPT,
+                                        GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT,
+                                        NULL);
   //gtk_window_set_title(GTK_WINDOW(dialog), title);
 
-  
+
 
   //addDialogButtons(dialog, data);
   //gtk_widget_show_all(dialog);
-  return(dialog);
+  return (dialog);
 }
 
 /*
@@ -91,22 +97,23 @@ createPrintDialog(displayd *dpy)
  */
 
 static void
-handlePrintOptions(PrintInfo *info)
+handlePrintOptions (PrintInfo * info)
 {
   gboolean ok = true;
   PrintOptions localOptions;
   PrintOptions *opts;
 
-  opts =  (info->handler == NULL) ? &localOptions : info->ggobi->printOptions ;
+  opts = (info->handler == NULL) ? &localOptions : info->ggobi->printOptions;
 
-    /* Get the settings from the dialog elements. 
-       For the moment, just grab them from the defaults.
-     */    
-  getDefaultPrintOptions(opts);
+  /* Get the settings from the dialog elements. 
+     For the moment, just grab them from the defaults.
+   */
+  getDefaultPrintOptions (opts);
 
-  if(info->handler) {
-    ok = info->handler(opts, info, info->userData);
-  } else {
+  if (info->handler) {
+    ok = info->handler (opts, info, info->userData);
+  }
+  else {
     /* We already have set the options globally when we got them. */
   }
 }
@@ -121,36 +128,37 @@ handlePrintOptions(PrintInfo *info)
  We return true to indicate that the print was successful. 
  */
 
-void 
-setStandardPrintHandlers()
+void
+setStandardPrintHandlers ()
 {
-  if(DefaultPrintHandler.callback == NULL && DefaultPrintHandler.dialog == NULL) {
-   DefaultPrintHandler.userData = NULL;
+  if (DefaultPrintHandler.callback == NULL
+      && DefaultPrintHandler.dialog == NULL) {
+    DefaultPrintHandler.userData = NULL;
   }
-  if(DefaultPrintHandler.callback == NULL)
-   DefaultPrintHandler.callback = &showPrintDialog;
+  if (DefaultPrintHandler.callback == NULL)
+    DefaultPrintHandler.callback = &showPrintDialog;
   //if(DefaultPrintHandler.dialog == NULL)
   //  DefaultPrintHandler.dialog = PrintAsSVG;
 }
 
 
-PrintOptions*
-getDefaultPrintOptions(PrintOptions *opts)
+PrintOptions *
+getDefaultPrintOptions (PrintOptions * opts)
 {
- GdkColor black, white;
+  GdkColor black, white;
 
- if(opts == NULL)
-   opts = (PrintOptions *) g_malloc(sizeof(PrintOptions));
+  if (opts == NULL)
+    opts = (PrintOptions *) g_malloc (sizeof (PrintOptions));
 
   opts->width = 480;
   opts->height = 400;
-  opts->file = (OutputDescription *) g_malloc(sizeof(OutputDescription));
+  opts->file = (OutputDescription *) g_malloc (sizeof (OutputDescription));
   //opts->file->fileName = g_strdup("foo.svg");
 
- 
-  gdk_color_white(gdk_colormap_get_system (), &white);
-  gdk_color_black(gdk_colormap_get_system (), &black);
+
+  gdk_color_white (gdk_colormap_get_system (), &white);
+  gdk_color_black (gdk_colormap_get_system (), &black);
   opts->background = white;
   opts->foreground = black;
-  return(opts);
+  return (opts);
 }

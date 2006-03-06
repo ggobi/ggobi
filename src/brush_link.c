@@ -40,10 +40,11 @@ symbol_link_by_id (gboolean persistentp, gint k, GGobiData * sd, ggobid * gg)
   if (sd->rowIds) {
     gpointer ptr;
     if (sd->rowIds[k]) {
-      ptr = g_hash_table_lookup(sd->idTable, sd->rowIds[k]);
+      ptr = g_hash_table_lookup (sd->idTable, sd->rowIds[k]);
       if (ptr)
-        id = * ((guint *)ptr);
-    } else {
+        id = *((guint *) ptr);
+    }
+    else {
       /* 
        * I've only seen one thing that causes this, and that was in
        * an xml file with two datad's, nodes and edges, but in which
@@ -55,8 +56,8 @@ symbol_link_by_id (gboolean persistentp, gint k, GGobiData * sd, ggobid * gg)
     }
   }
 
-  if (id < 0)      /*-- this would indicate a bug --*/
-/**/return false;
+  if (id < 0)              /*-- this would indicate a bug --*/
+     /**/ return false;
 
   for (l = gg->d; l; l = l->next) {
     d = (GGobiData *) l->data;
@@ -64,15 +65,15 @@ symbol_link_by_id (gboolean persistentp, gint k, GGobiData * sd, ggobid * gg)
       continue;        /*-- skip the originating datad --*/
 
     i = -1;
-    if(sd->rowIds && d->idTable) {
-       gpointer ptr = g_hash_table_lookup(d->idTable, sd->rowIds[id]);
-       if(ptr) {
-         i = * ((guint *)ptr);
-       }        
+    if (sd->rowIds && d->idTable) {
+      gpointer ptr = g_hash_table_lookup (d->idTable, sd->rowIds[id]);
+      if (ptr) {
+        i = *((guint *) ptr);
+      }
     }
 
-    if (i < 0)      /*-- then no cases in d have this id --*/
-       continue;
+    if (i < 0)              /*-- then no cases in d have this id --*/
+      continue;
 
     /*-- if we get here, d has one case with the indicated id --*/
     changed = true;
@@ -99,7 +100,8 @@ symbol_link_by_id (gboolean persistentp, gint k, GGobiData * sd, ggobid * gg)
         /*-- should we handle this here?  --*/
         d->excluded.els[i] = sd->excluded.els[k];
 
-      } else if (cpanel->br.mode == BR_TRANSIENT) {
+      }
+      else if (cpanel->br.mode == BR_TRANSIENT) {
 
         if (!d->hidden_now.els[i]) {
           d->color_now.els[i] = sd->color_now.els[k];
@@ -125,13 +127,13 @@ exclude_link_by_id (gint k, GGobiData * sd, ggobid * gg)
   /*-- k is the row number in source_d --*/
 
   if (sd->rowIds) {
-    gpointer ptr = g_hash_table_lookup(sd->idTable, sd->rowIds[k]);
+    gpointer ptr = g_hash_table_lookup (sd->idTable, sd->rowIds[k]);
     if (ptr)
-      id = * ((guint *)ptr);
+      id = *((guint *) ptr);
   }
 
-  if (id < 0)      /*-- this would indicate a bug --*/
-/**/return false;
+  if (id < 0)              /*-- this would indicate a bug --*/
+     /**/ return false;
 
   for (l = gg->d; l; l = l->next) {
     d = (GGobiData *) l->data;
@@ -139,15 +141,15 @@ exclude_link_by_id (gint k, GGobiData * sd, ggobid * gg)
       continue;        /*-- skip the originating datad --*/
 
     i = -1;
-    if(sd->rowIds && d->idTable) {
-       gpointer ptr = g_hash_table_lookup(d->idTable, sd->rowIds[id]);
-       if(ptr) {
-         i = * ((guint *)ptr);
-       }        
+    if (sd->rowIds && d->idTable) {
+      gpointer ptr = g_hash_table_lookup (d->idTable, sd->rowIds[id]);
+      if (ptr) {
+        i = *((guint *) ptr);
+      }
     }
 
-    if (i < 0)      /*-- then no cases in d have this id --*/
-       continue;
+    if (i < 0)              /*-- then no cases in d have this id --*/
+      continue;
 
     /*-- if we get here, d has one case with the indicated id --*/
     changed = true;
@@ -162,8 +164,8 @@ exclude_link_by_id (gint k, GGobiData * sd, ggobid * gg)
 /*----------------------------------------------------------------------*/
 
 void
-brush_link_by_var(gint jlinkby, vector_b * levelv,
-                  cpaneld * cpanel, GGobiData * d, ggobid * gg)
+brush_link_by_var (gint jlinkby, vector_b * levelv,
+                   cpaneld * cpanel, GGobiData * d, ggobid * gg)
 {
   gint m, i, level_value;
 
@@ -178,85 +180,83 @@ brush_link_by_var(gint jlinkby, vector_b * levelv,
     if (levelv->els[level_value]) {  /*-- if it's to acquire the new symbol --*/
       if (cpanel->br.mode == BR_PERSISTENT) {
         switch (cpanel->br.point_targets) {
-          case br_candg:   /*-- color and glyph, type and size --*/
-            d->color.els[i] = d->color_now.els[i] = gg->color_id;
-            d->glyph.els[i].size = d->glyph_now.els[i].size =
-                gg->glyph_id.size;
-            d->glyph.els[i].type = d->glyph_now.els[i].type =
-                gg->glyph_id.type;
+        case br_candg:   /*-- color and glyph, type and size --*/
+          d->color.els[i] = d->color_now.els[i] = gg->color_id;
+          d->glyph.els[i].size = d->glyph_now.els[i].size = gg->glyph_id.size;
+          d->glyph.els[i].type = d->glyph_now.els[i].type = gg->glyph_id.type;
           break;
-          case br_color:   /*-- color only --*/
-            d->color.els[i] = d->color_now.els[i] = gg->color_id;
+        case br_color:   /*-- color only --*/
+          d->color.els[i] = d->color_now.els[i] = gg->color_id;
           break;
-          case br_glyph:   /*-- glyph type and size --*/
-            d->glyph.els[i].size = d->glyph_now.els[i].size =
-              gg->glyph_id.size;
-            d->glyph.els[i].type = d->glyph_now.els[i].type =
-              gg->glyph_id.type;
+        case br_glyph:   /*-- glyph type and size --*/
+          d->glyph.els[i].size = d->glyph_now.els[i].size = gg->glyph_id.size;
+          d->glyph.els[i].type = d->glyph_now.els[i].type = gg->glyph_id.type;
           break;
-          case br_shadow:   /*-- shadowed, hidden --*/
-            d->hidden.els[i] = d->hidden_now.els[i] = true;
+        case br_shadow:   /*-- shadowed, hidden --*/
+          d->hidden.els[i] = d->hidden_now.els[i] = true;
           break;
-	  /*
-          case br_unshadow:
-            d->hidden.els[i] = d->hidden_now.els[i] = false;
-          break;
-	  */
-          default:
+          /*
+             case br_unshadow:
+             d->hidden.els[i] = d->hidden_now.els[i] = false;
+             break;
+           */
+        default:
           break;
         }
 
-      } else if (cpanel->br.mode == BR_TRANSIENT) {
+      }
+      else if (cpanel->br.mode == BR_TRANSIENT) {
         switch (cpanel->br.point_targets) {
-          case br_candg:
-            d->color_now.els[i] = gg->color_id;
-            d->glyph_now.els[i].size = gg->glyph_id.size;
-            d->glyph_now.els[i].type = gg->glyph_id.type;
+        case br_candg:
+          d->color_now.els[i] = gg->color_id;
+          d->glyph_now.els[i].size = gg->glyph_id.size;
+          d->glyph_now.els[i].type = gg->glyph_id.type;
           break;
-          case br_color:
-            d->color_now.els[i] = gg->color_id;
+        case br_color:
+          d->color_now.els[i] = gg->color_id;
           break;
-          case br_glyph:   /*-- glyph type and size --*/
-            d->glyph_now.els[i].size = gg->glyph_id.size;
-            d->glyph_now.els[i].type = gg->glyph_id.type;
+        case br_glyph:   /*-- glyph type and size --*/
+          d->glyph_now.els[i].size = gg->glyph_id.size;
+          d->glyph_now.els[i].type = gg->glyph_id.type;
           break;
-          case br_shadow:   /*-- hidden --*/
-            d->hidden_now.els[i] = true;
+        case br_shadow:   /*-- hidden --*/
+          d->hidden_now.els[i] = true;
           break;
-	  /*
-          case br_unshadow:
-            d->hidden_now.els[i] = false;
-          break;
-	  */
-          default:
+          /*
+             case br_unshadow:
+             d->hidden_now.els[i] = false;
+             break;
+           */
+        default:
           break;
         }
       }
 
-    } else {  /*-- if it's to revert to the previous symbol --*/
+    }
+    else {    /*-- if it's to revert to the previous symbol --*/
       /*-- should only matter if transient, right? --*/
       switch (cpanel->br.point_targets) {
-        case br_candg:
-          d->color_now.els[i] = d->color.els[i];
-          d->glyph_now.els[i].size = d->glyph.els[i].size;
-          d->glyph_now.els[i].type = d->glyph.els[i].type;
+      case br_candg:
+        d->color_now.els[i] = d->color.els[i];
+        d->glyph_now.els[i].size = d->glyph.els[i].size;
+        d->glyph_now.els[i].type = d->glyph.els[i].type;
         break;
-        case br_color:
-          d->color_now.els[i] = d->color.els[i];
+      case br_color:
+        d->color_now.els[i] = d->color.els[i];
         break;
-        case br_glyph:   /*-- glyph type and size --*/
-          d->glyph_now.els[i].size = d->glyph.els[i].size;
-          d->glyph_now.els[i].type = d->glyph.els[i].type;
+      case br_glyph:   /*-- glyph type and size --*/
+        d->glyph_now.els[i].size = d->glyph.els[i].size;
+        d->glyph_now.els[i].type = d->glyph.els[i].type;
         break;
-        case br_shadow:   /*-- hidden --*/
-          d->hidden_now.els[i] = d->hidden.els[i];
+      case br_shadow:   /*-- hidden --*/
+        d->hidden_now.els[i] = d->hidden.els[i];
         break;
-	/* disabled
-        case br_unshadow:
-          d->hidden_now.els[i] = d->hidden.els[i];
-        break;
-	*/
-        default:
+        /* disabled
+           case br_unshadow:
+           d->hidden_now.els[i] = d->hidden.els[i];
+           break;
+         */
+      default:
         break;
       }
     }
@@ -269,7 +269,7 @@ brush_link_by_var(gint jlinkby, vector_b * levelv,
  * of changed by keeping track of pts_under_brush_prev?
 */
 gboolean
-build_symbol_vectors_by_var(cpaneld * cpanel, GGobiData * d, ggobid * gg)
+build_symbol_vectors_by_var (cpaneld * cpanel, GGobiData * d, ggobid * gg)
 {
   gint i, m, level_value, level_value_max;
   vector_b levelv;
@@ -283,7 +283,7 @@ build_symbol_vectors_by_var(cpaneld * cpanel, GGobiData * d, ggobid * gg)
   if (d->linkvar_vt == NULL)
     return false;
 
-  jlinkby = g_slist_index(d->vartable, d->linkvar_vt);
+  jlinkby = g_slist_index (d->vartable, d->linkvar_vt);
 /*
  * I may not want to allocate and free this guy every time the
  * brush moves.
@@ -295,9 +295,9 @@ build_symbol_vectors_by_var(cpaneld * cpanel, GGobiData * d, ggobid * gg)
       level_value_max = level_value;
   }
 
-  vectorb_init_null(&levelv);
-  vectorb_alloc(&levelv, level_value_max + 1);
-  vectorb_zero(&levelv);
+  vectorb_init_null (&levelv);
+  vectorb_alloc (&levelv, level_value_max + 1);
+  vectorb_zero (&levelv);
 
   /*-- find the levels which are among the points under the brush --*/
   for (m = 0; m < d->nrows_in_plot; m++) {
@@ -310,21 +310,21 @@ build_symbol_vectors_by_var(cpaneld * cpanel, GGobiData * d, ggobid * gg)
 
 
   /*-- first do this d --*/
-  brush_link_by_var(jlinkby, &levelv, cpanel, d, gg);
+  brush_link_by_var (jlinkby, &levelv, cpanel, d, gg);
 
   /*-- now for the rest of them --*/
   for (l = gg->d; l; l = l->next) {
     dd = l->data;
     if (dd != d) {
-      vtt = vartable_element_get_by_name(d->linkvar_vt->collab, dd);
+      vtt = vartable_element_get_by_name (d->linkvar_vt->collab, dd);
       if (vtt != NULL) {
-        jlinkby = g_slist_index(dd->vartable, vtt);
-        brush_link_by_var(jlinkby, &levelv, cpanel, dd, gg);
+        jlinkby = g_slist_index (dd->vartable, vtt);
+        brush_link_by_var (jlinkby, &levelv, cpanel, dd, gg);
       }
     }
   }
 
-  vectorb_free(&levelv);
+  vectorb_free (&levelv);
 
   changed = true;
   return (changed);
@@ -335,38 +335,46 @@ build_symbol_vectors_by_var(cpaneld * cpanel, GGobiData * d, ggobid * gg)
 /*          Create a variable notebook for brush linking rule        */
 /*********************************************************************/
 
-enum { LINKBYLIST_NAME, LINKBYLIST_VT, LINKBYLIST_NCOLS };
+enum
+{ LINKBYLIST_NAME, LINKBYLIST_VT, LINKBYLIST_NCOLS };
 
-void linkby_notebook_subwindow_add (GGobiData *d, GtkWidget *notebook, ggobid *);
+void linkby_notebook_subwindow_add (GGobiData * d, GtkWidget * notebook,
+                                    ggobid *);
 
-void varlist_append(GtkListStore *list, vartabled *vt) {
+void
+varlist_append (GtkListStore * list, vartabled * vt)
+{
   gchar *row;
   GtkTreeIter iter;
-	
+
   if (vt && vt->vartype == categorical) {
-    gtk_list_store_append(list, &iter);
-    row = g_strdup_printf("%s", vt->collab);
-    gtk_list_store_set(list, &iter, LINKBYLIST_NAME, row, LINKBYLIST_VT, vt, -1);
-    g_free(row);
+    gtk_list_store_append (list, &iter);
+    row = g_strdup_printf ("%s", vt->collab);
+    gtk_list_store_set (list, &iter, LINKBYLIST_NAME, row, LINKBYLIST_VT, vt,
+                        -1);
+    g_free (row);
   }
 }
-void varlist_populate(GtkListStore *list, GGobiData *d) {
+void
+varlist_populate (GtkListStore * list, GGobiData * d)
+{
   gint j;
   GtkTreeIter first;
   vartabled *vt;
-  
-  gtk_list_store_append(list, &first);
-  gtk_list_store_set(list, &first, LINKBYLIST_NAME, "<i>Case ID</i>", -1);
-  
-  for (j=0; j<d->ncols; j++) {
-    vt = vartable_element_get(j, d);
-    varlist_append(list, vt);
+
+  gtk_list_store_append (list, &first);
+  gtk_list_store_set (list, &first, LINKBYLIST_NAME, "<i>Case ID</i>", -1);
+
+  for (j = 0; j < d->ncols; j++) {
+    vt = vartable_element_get (j, d);
+    varlist_append (list, vt);
   }
 }
 
 /* called from cpanel_brush_set */
 void
-linkby_current_page_set (displayd *display, GtkWidget *notebook, ggobid *gg)
+linkby_current_page_set (displayd * display, GtkWidget * notebook,
+                         ggobid * gg)
 {
   GtkWidget *swin, *treeview;
   GGobiData *d = display->d, *paged;
@@ -385,104 +393,114 @@ linkby_current_page_set (displayd *display, GtkWidget *notebook, ggobid *gg)
    */
 
   page_num = 0;
-  swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK(notebook), page_num);
+  swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), page_num);
   while (swin) {
     paged = (GGobiData *) g_object_get_data (G_OBJECT (swin), "datad");
 
     gtk_widget_set_sensitive (swin, (paged == d));
     if (paged == d) {
-      gtk_notebook_set_current_page (GTK_NOTEBOOK(notebook), page_num);
+      gtk_notebook_set_current_page (GTK_NOTEBOOK (notebook), page_num);
 
       children = gtk_container_get_children (GTK_CONTAINER (swin));
       treeview = children->data;
       /* Set the selected row of the selected page */
-      select_tree_view_row(treeview, cpanel->br.linkby_row);
+      select_tree_view_row (treeview, cpanel->br.linkby_row);
       gg->linkby_cv = (cpanel->br.linkby_row > 0);
       break;
     }
     page_num += 1;
-    swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK(notebook), page_num);
+    swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), page_num);
   }
 }
 
 void
-linking_method_set_cb (GtkTreeSelection *treesel, ggobid *gg)
+linking_method_set_cb (GtkTreeSelection * treesel, ggobid * gg)
 {
-  GGobiData *d = g_object_get_data (G_OBJECT(gtk_tree_selection_get_tree_view(treesel)), "datad");
+  GGobiData *d =
+    g_object_get_data (G_OBJECT (gtk_tree_selection_get_tree_view (treesel)),
+                       "datad");
   GtkTreeModel *model;
   GtkTreeIter iter;
   GtkTreePath *path;
   gint row = -1;
 
-  if(gtk_tree_selection_get_selected(treesel, &model, &iter)) {
-    path = gtk_tree_model_get_path(model, &iter);
-    row = gtk_tree_path_get_indices(path)[0];
-    gtk_tree_path_free(path);
+  if (gtk_tree_selection_get_selected (treesel, &model, &iter)) {
+    path = gtk_tree_model_get_path (model, &iter);
+    row = gtk_tree_path_get_indices (path)[0];
+    gtk_tree_path_free (path);
   }
 
   /* Before  touching the  cpanel, make  sure the  display  and cpanel
    * actually correspond to the current data.  This looks more and
    * more like a kludge -- I do need to revisit this.  -- dfs
- */
+   */
   if (gg->current_display->d == d) {
     displayd *display = gg->current_display;
-    cpaneld *cpanel = &display->cpanel;  
+    cpaneld *cpanel = &display->cpanel;
     cpanel->br.linkby_row = row;
   }
 
   if (row <= 0) {
     gg->linkby_cv = false;
-    return;  /* link by case id; done */
-  } else {
+    return;                     /* link by case id; done */
+  }
+  else {
     vartabled *vt;
-    gtk_tree_model_get(model, &iter, LINKBYLIST_VT, &vt, -1);
+    gtk_tree_model_get (model, &iter, LINKBYLIST_VT, &vt, -1);
     gg->linkby_cv = true;
     d->linkvar_vt = vt;
   }
 }
 
 GtkListStore *
-list_from_data(ggobid *gg, GGobiData *data, GtkNotebook *notebook) {
+list_from_data (ggobid * gg, GGobiData * data, GtkNotebook * notebook)
+{
   GtkWidget *swin;
   GtkListStore *list = NULL;
-	
-  gint kd = g_slist_index(gg->d, data);
-  swin = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), kd);
-	
-  if(swin)
-    list = GTK_LIST_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(GTK_BIN(swin)->child)));
-	
-  return(list);
+
+  gint kd = g_slist_index (gg->d, data);
+  swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), kd);
+
+  if (swin)
+    list =
+      GTK_LIST_STORE (gtk_tree_view_get_model
+                      (GTK_TREE_VIEW (GTK_BIN (swin)->child)));
+
+  return (list);
 }
 
-void 
-linkby_notebook_varchanged_cb (ggobid *gg, GGobiData *data, GtkNotebook *notebook) {
-  GtkListStore *list = list_from_data(gg, data, notebook);
-  gtk_list_store_clear(list);
-  varlist_populate(list, data);
-}
-
-void 
-linkby_notebook_varadded_cb (ggobid *gg, vartabled *vt, gint which,
-  GGobiData *data, GtkNotebook *notebook)
+void
+linkby_notebook_varchanged_cb (ggobid * gg, GGobiData * data,
+                               GtkNotebook * notebook)
 {
-  GtkListStore *model = list_from_data(gg, data, notebook);
+  GtkListStore *list = list_from_data (gg, data, notebook);
+  gtk_list_store_clear (list);
+  varlist_populate (list, data);
+}
+
+void
+linkby_notebook_varadded_cb (ggobid * gg, vartabled * vt, gint which,
+                             GGobiData * data, GtkNotebook * notebook)
+{
+  GtkListStore *model = list_from_data (gg, data, notebook);
   if (model)
-    varlist_append(model, vt);
+    varlist_append (model, vt);
 }
 
-void 
-linkby_notebook_list_changed_cb(ggobid *gg, GGobiData *d, void *notebook)
+void
+linkby_notebook_list_changed_cb (ggobid * gg, GGobiData * d, void *notebook)
 {
-  linkby_notebook_varchanged_cb(gg, d, notebook);
+  linkby_notebook_varchanged_cb (gg, d, notebook);
 }
 
-CHECK_EVENT_SIGNATURE(linkby_notebook_adddata_cb, datad_added_f)
-CHECK_EVENT_SIGNATURE(linkby_notebook_varchange_cb, variable_added_f)
-CHECK_EVENT_SIGNATURE(linkby_notebook_list_changed_cb, variable_list_changed_f)
+CHECK_EVENT_SIGNATURE (linkby_notebook_adddata_cb, datad_added_f)
+  CHECK_EVENT_SIGNATURE (linkby_notebook_varchange_cb, variable_added_f)
+  CHECK_EVENT_SIGNATURE (linkby_notebook_list_changed_cb,
+                       variable_list_changed_f)
 
-static void
-linkby_notebook_adddata_cb (ggobid *gg, GGobiData *d, void *notebook, GtkSignalFunc func)
+     static void
+       linkby_notebook_adddata_cb (ggobid * gg, GGobiData * d, void *notebook,
+                                   GtkSignalFunc func)
 {
   if (g_slist_length (d->vartable)) {
     linkby_notebook_subwindow_add (d, notebook, gg);
@@ -490,7 +508,8 @@ linkby_notebook_adddata_cb (ggobid *gg, GGobiData *d, void *notebook, GtkSignalF
 }
 
 void
-linkby_notebook_subwindow_add (GGobiData *d, GtkWidget *notebook, ggobid *gg)
+linkby_notebook_subwindow_add (GGobiData * d, GtkWidget * notebook,
+                               ggobid * gg)
 {
   GtkWidget *swin, *treeview;
   GtkListStore *list;
@@ -502,47 +521,50 @@ linkby_notebook_subwindow_add (GGobiData *d, GtkWidget *notebook, ggobid *gg)
 
   /* Create a scrolled window to pack the CList widget into */
   swin = gtk_scrolled_window_new (NULL, NULL);
-  gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (swin), 
-    GTK_SHADOW_NONE);
-  
+  gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (swin),
+                                       GTK_SHADOW_NONE);
+
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (swin),
-    GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
+                                  GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
 
   /* If this is not the first child of the notebook, initialize it
    * as insensitive.
    */
 
-  if (g_list_length(gtk_container_get_children(GTK_CONTAINER(notebook))) != 0) {
+  if (g_list_length (gtk_container_get_children (GTK_CONTAINER (notebook))) !=
+      0) {
     gtk_widget_set_sensitive (swin, false);
   }
-  g_object_set_data(G_OBJECT(swin), "datad", d);  /*setdata*/
+  g_object_set_data (G_OBJECT (swin), "datad", d);  /*setdata */
 /*
  * name or nickname?  Which one we'd prefer to use depends on the
  * size of the space we're working in -- maybe this will become an
  * argument.
 */
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), swin,
-    (d->nickname != NULL) ?
-      gtk_label_new (d->nickname) : gtk_label_new (d->name)); 
+                            (d->nickname != NULL) ?
+                            gtk_label_new (d->nickname) : gtk_label_new (d->
+                                                                         name));
 
   /* add the treeview (list) */
-  list = gtk_list_store_new(LINKBYLIST_NCOLS, G_TYPE_STRING, G_TYPE_POINTER);
-  varlist_populate(list, d);
+  list = gtk_list_store_new (LINKBYLIST_NCOLS, G_TYPE_STRING, G_TYPE_POINTER);
+  varlist_populate (list, d);
 
-  treeview = gtk_tree_view_new_with_model(GTK_TREE_MODEL(list));
-  populate_tree_view(treeview, NULL, 1, false, mode, G_CALLBACK(linking_method_set_cb), gg);
+  treeview = gtk_tree_view_new_with_model (GTK_TREE_MODEL (list));
+  populate_tree_view (treeview, NULL, 1, false, mode,
+                      G_CALLBACK (linking_method_set_cb), gg);
 
   g_object_set_data (G_OBJECT (treeview), "datad", d);
   //g_object_set_data (G_OBJECT (clist), "notebook", notebook);
-  
+
   gtk_container_add (GTK_CONTAINER (swin), treeview);
   gtk_widget_show_all (swin);
-  
-  select_tree_view_row(treeview, 0);
+
+  select_tree_view_row (treeview, 0);
 }
 
 GtkWidget *
-create_linkby_notebook (GtkWidget *box, ggobid *gg)
+create_linkby_notebook (GtkWidget * box, ggobid * gg)
 {
   GtkWidget *notebook;
   gint nd = g_slist_length (gg->d);
@@ -559,9 +581,9 @@ create_linkby_notebook (GtkWidget *box, ggobid *gg)
   //gtk_notebook_set_show_tabs (GTK_NOTEBOOK (notebook), nd > 1);
   gtk_notebook_set_show_tabs (GTK_NOTEBOOK (notebook), false);
   gtk_box_pack_start (GTK_BOX (box), notebook, true, true, 2);
-  g_object_set_data (G_OBJECT(notebook), "SELECTION", (gpointer) mode);
-  g_object_set_data (G_OBJECT(notebook), "vartype", (gpointer) vtype);
-  g_object_set_data (G_OBJECT(notebook), "datatype", (gpointer) dtype);
+  g_object_set_data (G_OBJECT (notebook), "SELECTION", (gpointer) mode);
+  g_object_set_data (G_OBJECT (notebook), "vartype", (gpointer) vtype);
+  g_object_set_data (G_OBJECT (notebook), "datatype", (gpointer) dtype);
 
   for (l = gg->d; l; l = l->next) {
     d = (GGobiData *) l->data;
@@ -573,19 +595,19 @@ create_linkby_notebook (GtkWidget *box, ggobid *gg)
   /*-- listen for variable_added and _list_changed events on main_window --*/
   /*--   ... list_changed would be enough but it's only called on delete --*/
   g_signal_connect (G_OBJECT (gg),
-		      "variable_added", 
-		      G_CALLBACK (linkby_notebook_varadded_cb),
-		      GTK_OBJECT (notebook));
+                    "variable_added",
+                    G_CALLBACK (linkby_notebook_varadded_cb),
+                    GTK_OBJECT (notebook));
   g_signal_connect (G_OBJECT (gg),
-		      "variable_list_changed", 
-		      G_CALLBACK (linkby_notebook_varchanged_cb),
-		      GTK_OBJECT (notebook));
+                    "variable_list_changed",
+                    G_CALLBACK (linkby_notebook_varchanged_cb),
+                    GTK_OBJECT (notebook));
 
   /*-- listen for datad_added events on main_window --*/
   g_signal_connect (G_OBJECT (gg),
-		      "datad_added", 
-		      G_CALLBACK (linkby_notebook_adddata_cb),
-		      GTK_OBJECT (notebook));
+                    "datad_added",
+                    G_CALLBACK (linkby_notebook_adddata_cb),
+                    GTK_OBJECT (notebook));
 
   return notebook;
 }

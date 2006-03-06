@@ -30,11 +30,11 @@ const double AddVarBrushGroup = -1.0;
 
 
 static void
-addvar_vartable_expand (gint ncols, GGobiData *d, ggobid *gg)
+addvar_vartable_expand (gint ncols, GGobiData * d, ggobid * gg)
 {
   gint j;
 
-  for (j=d->ncols; j<d->ncols+ncols; j++) {
+  for (j = d->ncols; j < d->ncols + ncols; j++) {
     /*-- allocate the new vartable element, initialize with default values --*/
     vartabled *vt = vartable_element_new (d);
     transform_values_init (vt);
@@ -43,7 +43,7 @@ addvar_vartable_expand (gint ncols, GGobiData *d, ggobid *gg)
 
 /*-- specific adding variables --*/
 static void
-addvar_pipeline_realloc (GGobiData *d, ggobid *gg)
+addvar_pipeline_realloc (GGobiData * d, ggobid * gg)
 {
   /*-- realloc pipeline arrays --*/
   arrayf_add_cols (&d->raw, d->ncols);
@@ -72,11 +72,12 @@ variable_notebook_varchange_cb (ggobid *gg, vartabled *vt, gint which,
   GGobiData *data, void *notebook)
 */
 void
-addvar_propagate (gint ncols_prev, gint ncols_added, GGobiData *d, ggobid *gg)
+addvar_propagate (gint ncols_prev, gint ncols_added, GGobiData * d,
+                  ggobid * gg)
 {
   gint j, jvar;
 
-  for (j=0; j<ncols_added; j++) {
+  for (j = 0; j < ncols_added; j++) {
     jvar = ncols_prev + j;  /*-- its new index --*/
 
     /*-- update the tree_view widget (the visible table) --*/
@@ -92,11 +93,12 @@ addvar_propagate (gint ncols_prev, gint ncols_added, GGobiData *d, ggobid *gg)
 /* FIXME: all this stuff should be moved into the GGobiData API, so that
    datad allocation, in particular, is encapsulated. */
 void
-newvar_add_with_values (gdouble *vals, gint nvals, gchar *vname,
- vartyped type,
+newvar_add_with_values (gdouble * vals, gint nvals, gchar * vname,
+                        vartyped type,
  /*-- if categorical, we need ... --*/
- gint nlevels, gchar **level_names, gint *level_values, gint *level_counts,
- GGobiData *d, ggobid *gg)
+                        gint nlevels, gchar ** level_names,
+                        gint * level_values, gint * level_counts,
+                        GGobiData * d, ggobid * gg)
 {
   gint i;
   gint d_ncols_prev = d->ncols;
@@ -105,39 +107,43 @@ newvar_add_with_values (gdouble *vals, gint nvals, gchar *vname,
 
   if (nvals != d->nrows && d->ncols > 0)
     return;
-  
+
   d->ncols += 1;
-  if (d->ncols == 1) { // lazily allocate datad
-	  d->nrows = nvals;
+  if (d->ncols == 1) {          // lazily allocate datad
+    d->nrows = nvals;
     ///ggobi_data_alloc(d);
     pipeline_init (d, d->gg);
-  } else {
+  }
+  else {
     addvar_pipeline_realloc (d, gg);
   }
-  
+
   /* Create a new element in the vartable list iff we need
      to. Otherwise use the one in the current position. */
-  if(jvar >= g_slist_length(d->vartable))
+  if (jvar >= g_slist_length (d->vartable))
     vartable_element_new (d);
 
   vt = vartable_element_get (jvar, d);
   if (type == categorical)
     vartable_element_categorical_init (vt, nlevels, level_names,
-      level_values, level_counts);
+                                       level_values, level_counts);
   transform_values_init (vt);
 
-  for (i=0; i<d->nrows; i++) {
-    if(vals == &AddVarRowNumbers) {
-      d->raw.vals[i][jvar] = d->tform.vals[i][jvar] = (gfloat) (i+1);
-    } else if(vals == &AddVarBrushGroup) {
-      d->raw.vals[i][jvar] = d->tform.vals[i][jvar] = (gfloat) d->clusterid.els[i];
-    } else if(GGobiMissingValue && GGobiMissingValue(vals[i]))
-      setMissingValue(i, jvar, d, vt);
+  for (i = 0; i < d->nrows; i++) {
+    if (vals == &AddVarRowNumbers) {
+      d->raw.vals[i][jvar] = d->tform.vals[i][jvar] = (gfloat) (i + 1);
+    }
+    else if (vals == &AddVarBrushGroup) {
+      d->raw.vals[i][jvar] = d->tform.vals[i][jvar] =
+        (gfloat) d->clusterid.els[i];
+    }
+    else if (GGobiMissingValue && GGobiMissingValue (vals[i]))
+      setMissingValue (i, jvar, d, vt);
     else
       d->raw.vals[i][jvar] = d->tform.vals[i][jvar] = (gfloat) vals[i];
   }
 
-  
+
   /*-- update the vartable struct --*/
   limits_set_by_var (jvar, true, true, d, gg);
   limits_display_set_by_var (jvar, d, gg);
@@ -157,11 +163,11 @@ newvar_add_with_values (gdouble *vals, gint nvals, gchar *vname,
 */
   /*-- emit variable_added signal --*/
   g_signal_emit (G_OBJECT (gg),
-    GGobiSignals[VARIABLE_ADDED_SIGNAL], 0, vt, d->ncols-1, d); 
+                 GGobiSignals[VARIABLE_ADDED_SIGNAL], 0, vt, d->ncols - 1, d);
 }
 
 void
-clone_vars (gint *cols, gint ncols, GGobiData *d, ggobid *gg)
+clone_vars (gint * cols, gint ncols, GGobiData * d, ggobid * gg)
 {
   gint i, k, n, jvar;
   gint d_ncols_prev = d->ncols;
@@ -179,12 +185,12 @@ clone_vars (gint *cols, gint ncols, GGobiData *d, ggobid *gg)
   addvar_pipeline_realloc (d, gg);
 
 
-  for (k=0; k<ncols; k++) {
+  for (k = 0; k < ncols; k++) {
     n = cols[k];              /*-- variable being cloned --*/
     jvar = d_ncols_prev + k;  /*-- its new index --*/
 
     /*-- copy the data --*/
-    for (i=0; i<d->nrows; i++)
+    for (i = 0; i < d->nrows; i++)
       d->raw.vals[i][jvar] = d->tform.vals[i][jvar] = d->tform.vals[i][n];
 
     /*-- update the vartable struct --*/
@@ -194,26 +200,26 @@ clone_vars (gint *cols, gint ncols, GGobiData *d, ggobid *gg)
 
   addvar_propagate (d_ncols_prev, ncols, d, gg);
 
-  for (k=0; k<ncols; k++) {
+  for (k = 0; k < ncols; k++) {
     n = cols[k];
     vt = vartable_element_get (n, d);
 
     /*-- emit variable_added signal. Is n the correct index? --*/
     g_signal_emit (G_OBJECT (gg),
-      GGobiSignals[VARIABLE_ADDED_SIGNAL], 0, vt, n, d); 
+                   GGobiSignals[VARIABLE_ADDED_SIGNAL], 0, vt, n, d);
   }
 
   /*
    * I'm sending this expose event because sometimes the tree_view
    * is scrambled after a variable is cloned, with the entire list
    * of variables appearing twice.  -- dfs 1/16/2002
-  */
+   */
   {
     if (gg->vartable_ui.window) {
       gboolean rval = false;
       g_signal_emit_by_name (G_OBJECT (gg->vartable_ui.window),
-        "expose_event",
-        (gpointer) gg, (gpointer) &rval);
+                             "expose_event",
+                             (gpointer) gg, (gpointer) & rval);
     }
   }
 }
@@ -226,7 +232,7 @@ clone_vars (gint *cols, gint ncols, GGobiData *d, ggobid *gg)
 /*-------------------------------------------------------------------------*/
 
 static gint
-plotted (gint *cols, gint ncols, GGobiData *d, ggobid *gg)
+plotted (gint * cols, gint ncols, GGobiData * d, ggobid * gg)
 {
   GList *dlist;
   displayd *display;
@@ -241,10 +247,10 @@ plotted (gint *cols, gint ncols, GGobiData *d, ggobid *gg)
     if (jplotted >= 0)
       break;
 
-    if(GGOBI_IS_EXTENDED_DISPLAY(display)) {
+    if (GGOBI_IS_EXTENDED_DISPLAY (display)) {
       GGobiExtendedDisplayClass *klass;
-      klass = GGOBI_EXTENDED_DISPLAY_GET_CLASS(display);
-      jplotted = klass->variable_plotted_p(display, cols, ncols, d);
+      klass = GGOBI_EXTENDED_DISPLAY_GET_CLASS (display);
+      jplotted = klass->variable_plotted_p (display, cols, ncols, d);
     }
   }
 
@@ -252,7 +258,7 @@ plotted (gint *cols, gint ncols, GGobiData *d, ggobid *gg)
 }
 
 gboolean
-delete_vars (gint *cols, gint ncols, GGobiData *d, ggobid *gg) 
+delete_vars (gint * cols, gint ncols, GGobiData * d, ggobid * gg)
 {
   gint j;
   gint *keepers, nkeepers;
@@ -260,17 +266,19 @@ delete_vars (gint *cols, gint ncols, GGobiData *d, ggobid *gg)
 
   /*-- don't allow all variables to be deleted --*/
   if (ncols >= d->ncols)
-/**/return false;
+    /**/ return false;
 
   /*
    * If one of the variables to be deleted is currently plotted,
    * we won't proceed until the user cleans up.
-  */
+   */
   if ((j = plotted (cols, ncols, d, gg)) != -1) {
     gchar *message;
     vt = vartable_element_get (j, d);
-    message = g_strdup_printf ("Deletion failed; the variable '%s' is currently plotted\n",
-      vt->collab);
+    message =
+      g_strdup_printf
+      ("Deletion failed; the variable '%s' is currently plotted\n",
+       vt->collab);
     quick_message (message, false);
     g_free (message);
 
@@ -278,7 +286,7 @@ delete_vars (gint *cols, gint ncols, GGobiData *d, ggobid *gg)
   }
 
 
-  keepers = g_malloc ((d->ncols-ncols) * sizeof (gint));
+  keepers = g_malloc ((d->ncols - ncols) * sizeof (gint));
   nkeepers = find_keepers (d->ncols, ncols, cols, keepers);
   if (nkeepers == -1) {
     g_free (keepers);
@@ -287,18 +295,20 @@ delete_vars (gint *cols, gint ncols, GGobiData *d, ggobid *gg)
 
   if (d->vartable_tree_view[real] != NULL) {
     for (j = 0; j < ncols; j++) {
-	GtkTreeModel *model;
-	GtkTreeIter iter;
-	GtkTreePath *path = gtk_tree_path_new_from_indices(cols[j], -1);
-	vt = vartable_element_get(cols[j], d);
-	model = gtk_tree_view_get_model(GTK_TREE_VIEW(d->vartable_tree_view[vt->vartype]));
-	gtk_tree_model_get_iter(model, &iter, path);
-	gtk_list_store_remove(GTK_LIST_STORE(model), &iter);
-	gtk_tree_path_free(path);
+      GtkTreeModel *model;
+      GtkTreeIter iter;
+      GtkTreePath *path = gtk_tree_path_new_from_indices (cols[j], -1);
+      vt = vartable_element_get (cols[j], d);
+      model =
+        gtk_tree_view_get_model (GTK_TREE_VIEW
+                                 (d->vartable_tree_view[vt->vartype]));
+      gtk_tree_model_get_iter (model, &iter, path);
+      gtk_list_store_remove (GTK_LIST_STORE (model), &iter);
+      gtk_tree_path_free (path);
     }
   }
 
-  for (j=0; j<ncols; j++) {
+  for (j = 0; j < ncols; j++) {
     vartable_element_remove (cols[j], d);
   }
 
@@ -317,13 +327,13 @@ delete_vars (gint *cols, gint ncols, GGobiData *d, ggobid *gg)
   arrayg_alloc (&d->world, d->nrows, nkeepers);
 
 
-  /*-- delete checkboxes --*/ 
-  for (j=ncols-1; j>=0; j--) {
+  /*-- delete checkboxes --*/
+  for (j = ncols - 1; j >= 0; j--) {
     varpanel_delete_nth (cols[j], d);
   }
 
   /*-- delete variable circles --*/
-  for (j=ncols-1; j>=0; j--) {
+  for (j = ncols - 1; j >= 0; j--) {
     varcircles_delete_nth (cols[j], d);
   }
 
@@ -332,53 +342,52 @@ delete_vars (gint *cols, gint ncols, GGobiData *d, ggobid *gg)
   /*-- emit a single variable_list_changed signal when finished --*/
   /*-- doesn't need to give a variable index any more, really --*/
   g_signal_emit (G_OBJECT (gg),
-                 GGobiSignals[VARIABLE_LIST_CHANGED_SIGNAL], 0, d); 
+                 GGobiSignals[VARIABLE_LIST_CHANGED_SIGNAL], 0, d);
 
   /*-- run the first part of the pipeline  --*/
   tform_to_world (d, gg);
 
 
-  g_free(keepers);
+  g_free (keepers);
 
   return true;
 }
 
 
 vartyped
-ggobi_data_set_var_type(GGobiData *d, int which, vartyped value)
+ggobi_data_set_var_type (GGobiData * d, int which, vartyped value)
 {
-    vartabled *vt;
-    vartyped old;
+  vartabled *vt;
+  vartyped old;
 
-    if(value < real || value >= all_vartypes)
-        return(all_vartypes);
+  if (value < real || value >= all_vartypes)
+    return (all_vartypes);
 
-    vt = vartable_element_get(which, d);
-    if(!vt) {
-         return(all_vartypes);
-    }
+  vt = vartable_element_get (which, d);
+  if (!vt) {
+    return (all_vartypes);
+  }
 
-    old = vt->vartype;
-    vt->vartype = value;
+  old = vt->vartype;
+  vt->vartype = value;
 
-    return(old);
+  return (old);
 }
 
 
 gboolean
-ggobi_data_set_time_var(GGobiData *d, int which, gboolean value)
+ggobi_data_set_time_var (GGobiData * d, int which, gboolean value)
 {
-    vartabled *vt;
-    gboolean old;
+  vartabled *vt;
+  gboolean old;
 
-    vt = vartable_element_get(which, d);
-    if(!vt) {
-         return(all_vartypes);
-    }
+  vt = vartable_element_get (which, d);
+  if (!vt) {
+    return (all_vartypes);
+  }
 
-    old = vt->isTime;
-    vt->isTime = value;
+  old = vt->isTime;
+  vt->isTime = value;
 
-    return(old);
+  return (old);
 }
-

@@ -25,7 +25,7 @@
  * Change shift_wrld appropriately
 */
 void
-pan_by_drag (splotd *sp, ggobid *gg)
+pan_by_drag (splotd * sp, ggobid * gg)
 {
   greal dx, dy;
   greal scale_x, scale_y;
@@ -57,7 +57,7 @@ pan_by_drag (splotd *sp, ggobid *gg)
  * appropriate amounts.
 */
 void
-zoom_by_drag (splotd *sp, ggobid *gg)
+zoom_by_drag (splotd * sp, ggobid * gg)
 {
   gfloat *scale_x = &sp->scale.x;
   gfloat *scale_y = &sp->scale.y;
@@ -72,22 +72,22 @@ zoom_by_drag (splotd *sp, ggobid *gg)
   mid.y = sp->max.y / 2;
   scalefac.x = scalefac.y = 1.0;
 
-  if ((ABS(sp->mousepos.x - mid.x) >= npix) &&
-      (ABS(sp->mousepos.y - mid.y) >= npix))
-  {
+  if ((ABS (sp->mousepos.x - mid.x) >= npix) &&
+      (ABS (sp->mousepos.y - mid.y) >= npix)) {
     /*-- making the behavior identical to click zooming --*/
-    scalefac.x = 
+    scalefac.x =
       (gfloat) (sp->mousepos.x - mid.x) / (gfloat) (sp->mousepos_o.x - mid.x);
     scalefac.y =
       (gfloat) (sp->mousepos.y - mid.y) / (gfloat) (sp->mousepos_o.y - mid.y);
 
 
-   if (cpanel->scale.fixAspect_p) {
-     greal fac = MAX(scalefac.x, scalefac.y);
-     *scale_x = *scale_x * fac;
-     *scale_y = *scale_y * fac;
+    if (cpanel->scale.fixAspect_p) {
+      greal fac = MAX (scalefac.x, scalefac.y);
+      *scale_x = *scale_x * fac;
+      *scale_y = *scale_y * fac;
 
-   } else {
+    }
+    else {
       if (*scale_x * scalefac.x >= SCALE_MIN)
         *scale_x = *scale_x * scalefac.x;
       if (*scale_y * scalefac.y >= SCALE_MIN)
@@ -95,4 +95,3 @@ zoom_by_drag (splotd *sp, ggobid *gg)
     }
   }
 }
-

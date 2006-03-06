@@ -34,7 +34,8 @@
 guint GGobiSignals[MAX_GGOBI_SIGNALS];
 
 /*-- initialize variables which don't depend on the size of the data --*/
-void globals_init(ggobid * gg)
+void
+globals_init (ggobid * gg)
 {
   colorschemed *scheme = gg->activeColorScheme;
 
@@ -61,59 +62,62 @@ void globals_init(ggobid * gg)
 
 
 gboolean
-fileset_read_init(const gchar * ldata_in, const gchar *pluginModeName, GGobiPluginInfo *plugin, ggobid * gg)
+fileset_read_init (const gchar * ldata_in, const gchar * pluginModeName,
+                   GGobiPluginInfo * plugin, ggobid * gg)
 {
-  GSList *ds = fileset_read(ldata_in, pluginModeName, plugin, gg);
-  for(; ds; ds = ds->next) {
-    datad_init((GGobiData*) ds->data, gg, FALSE);
+  GSList *ds = fileset_read (ldata_in, pluginModeName, plugin, gg);
+  for (; ds; ds = ds->next) {
+    datad_init ((GGobiData *) ds->data, gg, FALSE);
   }
 
   return (ds != NULL);
 }
 
 // returns a list of datasets (some input types (eg. xml) may return multiple data types)
-GSList*
-fileset_read(const gchar * ldata_in, const gchar *pluginModeName, GGobiPluginInfo *plugin, ggobid * gg)
+GSList *
+fileset_read (const gchar * ldata_in, const gchar * pluginModeName,
+              GGobiPluginInfo * plugin, ggobid * gg)
 {
   InputDescription *desc;
   gboolean ok = true;
 
-  desc = fileset_generate(ldata_in, pluginModeName, plugin, gg);
+  desc = fileset_generate (ldata_in, pluginModeName, plugin, gg);
 
   if (desc == NULL) {
-    g_printerr("Cannot locate the file %s\n", ldata_in);
+    g_printerr ("Cannot locate the file %s\n", ldata_in);
     return (false);
   }
 
   if (desc->mode == unknown_data && desc->desc_read_input == NULL) {
-    g_printerr("Cannot determine the format of the data in file %s\n",
-               desc->fileName);
+    g_printerr ("Cannot determine the format of the data in file %s\n",
+                desc->fileName);
     return (false);
   }
 
   gg->input = desc;
 
-  return(read_input(desc, gg));
+  return (read_input (desc, gg));
 }
 
 
 // returns a list of datasets (some input types (eg. xml) may return multiple data types)
-GSList*
-read_input(InputDescription * desc, ggobid * gg)
+GSList *
+read_input (InputDescription * desc, ggobid * gg)
 {
-  GSList* ds;
+  GSList *ds;
   if (desc == NULL)
     return (NULL);
 
   if (desc->desc_read_input) {
-    if(!desc->baseName) 
-      completeFileDesc(desc->fileName, desc);
-      ds = desc->desc_read_input(desc, gg, NULL);
-  } else
-    g_printerr("Unknown data type in read_input\n");
+    if (!desc->baseName)
+      completeFileDesc (desc->fileName, desc);
+    ds = desc->desc_read_input (desc, gg, NULL);
+  }
+  else
+    g_printerr ("Unknown data type in read_input\n");
 
   if (ds && sessionOptions->verbose == GGOBI_VERBOSE) {
-    showInputDescription(desc, gg);
+    showInputDescription (desc, gg);
   }
 
   return (ds);
@@ -128,20 +132,20 @@ read_input(InputDescription * desc, ggobid * gg)
  * event handlers there as well
 */
 void
-make_ggobi(GGobiOptions * options, gboolean processEvents, ggobid * gg)
+make_ggobi (GGobiOptions * options, gboolean processEvents, ggobid * gg)
 {
   gboolean init_data = false;
 
   /*-- some initializations --*/
   gg->displays = NULL;
 
-  globals_init(gg);  /*-- variables that don't depend on the data --*/
+  globals_init (gg); /*-- variables that don't depend on the data --*/
 
   special_colors_init (gg);
 
-  wvis_init(gg);
-  svis_init(gg);
-  make_ui(gg);
+  wvis_init (gg);
+  svis_init (gg);
+  make_ui (gg);
 
   /* If the user specified a data file on the command line, then 
      try to load that. If not, then look through the input plugins
@@ -150,50 +154,51 @@ make_ggobi(GGobiOptions * options, gboolean processEvents, ggobid * gg)
      a user interface to query the user as to what to do.
    */
   if (options->data_in != NULL) {
-    if (fileset_read_init(options->data_in, sessionOptions->data_type, 
-      NULL, gg))
-    {
+    if (fileset_read_init (options->data_in, sessionOptions->data_type,
+                           NULL, gg)) {
       init_data = true;
     }
-  } else {
-    if (runInteractiveInputPlugin(gg) == NULL) {
+  }
+  else {
+    if (runInteractiveInputPlugin (gg) == NULL) {
       if (sessionOptions->data_type)
-        fprintf(stderr, "No available plugin to handle input mode %s\n",
-                sessionOptions->data_type);
-      fflush(stderr);
+        fprintf (stderr, "No available plugin to handle input mode %s\n",
+                 sessionOptions->data_type);
+      fflush (stderr);
     }
   }
 
 
   if (sessionOptions->info != NULL)
-    registerPlugins(gg, sessionOptions->info->plugins);
+    registerPlugins (gg, sessionOptions->info->plugins);
 
-  resetDataMode();
+  resetDataMode ();
 
-  start_ggobi(gg, init_data, sessionOptions->info->createInitialScatterPlot);
+  start_ggobi (gg, init_data, sessionOptions->info->createInitialScatterPlot);
 
   if (sessionOptions->restoreFile) {
-    processRestoreFile(sessionOptions->restoreFile, gg);
+    processRestoreFile (sessionOptions->restoreFile, gg);
   }
 
   gg->status_message_func = gg_write_to_statusbar;
 
 
   if (processEvents) {
-    gtk_main();
+    gtk_main ();
   }
 }
 
 void
-resetDataMode()
+resetDataMode ()
 {
-    if(sessionOptions->data_type)
-	free(sessionOptions->data_type);
-    sessionOptions->data_type = NULL;
-    sessionOptions->data_mode = unknown_data;
+  if (sessionOptions->data_type)
+    free (sessionOptions->data_type);
+  sessionOptions->data_type = NULL;
+  sessionOptions->data_mode = unknown_data;
 }
 
-void start_ggobi(ggobid * gg, gboolean init_data, gboolean createPlot)
+void
+start_ggobi (ggobid * gg, gboolean init_data, gboolean createPlot)
 {
   GGobiData *d;
   if (init_data) {
@@ -201,12 +206,12 @@ void start_ggobi(ggobid * gg, gboolean init_data, gboolean createPlot)
     gboolean firstd = createPlot;
     for (l = gg->d; l; l = l->next) {
       d = (GGobiData *) l->data;
-      datad_init(d, gg, firstd);
+      datad_init (d, gg, firstd);
       firstd = false;
     }
 
     /*-- destroy and rebuild the menu every time data is read in --*/
-    display_menu_build(gg);
+    display_menu_build (gg);
   }
 
   /*-- now that we've read some data, set the mode --*/
@@ -218,7 +223,8 @@ void start_ggobi(ggobid * gg, gboolean init_data, gboolean createPlot)
         gg->imode = DEFAULT_IMODE;
       }
     }
-  } else {
+  }
+  else {
     gg->pmode = NULL_PMODE;
     gg->imode = NULL_IMODE;
   }
@@ -226,5 +232,5 @@ void start_ggobi(ggobid * gg, gboolean init_data, gboolean createPlot)
   gg->pmode_prev = gg->pmode;
   gg->imode_prev = gg->imode;
   /*-- initialize the mode menus for the new mode --*/
-  /*main_miscmenus_update(NULL_PMODE, NULL_IMODE, (displayd *) NULL, gg);*/
+  /*main_miscmenus_update(NULL_PMODE, NULL_IMODE, (displayd *) NULL, gg); */
 }

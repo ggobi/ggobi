@@ -49,7 +49,7 @@ ExtensionList excelFileTypes = {
   csv_data,
   NULL,
   0
-  };
+};
 
 GSList *FileTypeGroups = NULL;
 
@@ -57,9 +57,10 @@ GSList *FileTypeGroups = NULL;
 /*               Initialization                                       */
 /*--------------------------------------------------------------------*/
 
-GSList *initFileTypeGroups(void)
+GSList *
+initFileTypeGroups (void)
 {
-  FileTypeGroups = g_slist_alloc();
+  FileTypeGroups = g_slist_alloc ();
 
   excelFileTypes.extensions = ExcelSuffixes;
   excelFileTypes.len = 3;
@@ -69,17 +70,18 @@ GSList *initFileTypeGroups(void)
 
   FileTypeGroups->data = (void *) &xmlFileTypes;
 
-  g_slist_append(FileTypeGroups, &excelFileTypes);
+  g_slist_append (FileTypeGroups, &excelFileTypes);
 
   return (FileTypeGroups);
 }
 
 static gboolean
-isUnknownInputMode(const gchar *modeName)
+isUnknownInputMode (const gchar * modeName)
 {
   gboolean status;
-  status = !modeName || modeName == "" || strcmp(modeName, DefaultUnknownInputModeName)==0;
-  return(status);
+  status = !modeName || modeName == ""
+    || strcmp (modeName, DefaultUnknownInputModeName) == 0;
+  return (status);
 }
 
 /*----------------------------------------------------------------------
@@ -89,10 +91,9 @@ isUnknownInputMode(const gchar *modeName)
 ----------------------------------------------------------------------*/
 
 InputDescription *
-fileset_generate(const gchar * fileName,
-		 const gchar *modeName, 
-		 GGobiPluginInfo *plugin, 
-		 ggobid * gg)
+fileset_generate (const gchar * fileName,
+                  const gchar * modeName,
+                  GGobiPluginInfo * plugin, ggobid * gg)
 {
   InputDescription *desc;
   DataMode guess = unknown_data;
@@ -107,49 +108,50 @@ fileset_generate(const gchar * fileName,
   gboolean isUnknownMode;
 
   if (FileTypeGroups == NULL)
-    initFileTypeGroups();
+    initFileTypeGroups ();
 
-  if(plugin) {
-	  InputDescription *desc;
-	  desc = callInputPluginGetDescription(fileName, modeName, plugin, gg);
-	  if(desc)
-            return(desc);
+  if (plugin) {
+    InputDescription *desc;
+    desc = callInputPluginGetDescription (fileName, modeName, plugin, gg);
+    if (desc)
+      return (desc);
   }
 
   groups = FileTypeGroups;
 
-  isUnknownMode = isUnknownInputMode(modeName);
+  isUnknownMode = isUnknownInputMode (modeName);
 
-  desc = (InputDescription *) calloc(1, sizeof(InputDescription));
+  desc = (InputDescription *) calloc (1, sizeof (InputDescription));
 
   if (1) {
     GList *els = sessionOptions->info->inputPlugins;
     if (els) {
       gint i, n;
-      n = g_list_length(els);
+      n = g_list_length (els);
       for (i = 0; i < n; i++) {
         gboolean handlesFile = false;
         GGobiPluginInfo *oplugin;
         GGobiInputPluginInfo *info;
-        oplugin = g_list_nth_data(els, i);
+        oplugin = g_list_nth_data (els, i);
         info = oplugin->info.i;
 
-         /* Use the probe only if the user has not given us a 
-            specific format/plugin. */
-	if(isUnknownMode) {
-          if(info->probe) 
-     	    handlesFile = info->probe(fileName, gg, oplugin);
-	  else
+        /* Use the probe only if the user has not given us a 
+           specific format/plugin. */
+        if (isUnknownMode) {
+          if (info->probe)
+            handlesFile = info->probe (fileName, gg, oplugin);
+          else
             handlesFile = true;
-	}
+        }
 
         if ((isUnknownMode && handlesFile)
-	    || (modeName && oplugin && pluginSupportsInputMode(modeName, oplugin))) 
-	{
+            || (modeName && oplugin
+                && pluginSupportsInputMode (modeName, oplugin))) {
           InputDescription *desc;
-	  desc = callInputPluginGetDescription(fileName, modeName, oplugin, gg);
-	  if(desc)
-  	     return(desc);
+          desc =
+            callInputPluginGetDescription (fileName, modeName, oplugin, gg);
+          if (desc)
+            return (desc);
         }
       }
     }
@@ -157,14 +159,14 @@ fileset_generate(const gchar * fileName,
 
 
 #ifndef WIN32
-  if (stat(fileName, &buf) != 0) {
+  if (stat (fileName, &buf) != 0) {
 #else
-  if (access(fileName, ft) != 0) {
+  if (access (fileName, ft) != 0) {
 #endif
-    if (isURL(fileName)) {
+    if (isURL (fileName)) {
       desc->mode = url_data;
-      desc->fileName = g_strdup(fileName);
-      completeFileDesc(fileName, desc);
+      desc->fileName = g_strdup (fileName);
+      completeFileDesc (fileName, desc);
       return (desc);
     }
 
@@ -173,55 +175,56 @@ fileset_generate(const gchar * fileName,
        each of these search through the different extensions for that type.
        If such a file exists, we assume it is of that format.
      */
-    numGroups = g_slist_length(groups);
+    numGroups = g_slist_length (groups);
     if (isUnknownMode) {
       for (i = 0; i < numGroups; i++) {
         gchar buf[1000];
         ExtensionList *group;
-        group = (ExtensionList *) g_slist_nth_data(groups, i);
+        group = (ExtensionList *) g_slist_nth_data (groups, i);
         for (j = 0; j < group->len; j++) {
           if (group->extensions[j] && group->extensions[j][0])
-            sprintf(buf, "%s.%s", fileName, group->extensions[j]);
+            sprintf (buf, "%s.%s", fileName, group->extensions[j]);
           else
-            sprintf(buf, "%s", fileName);
+            sprintf (buf, "%s", fileName);
 
-          if (check_file_exists(buf)) {
+          if (check_file_exists (buf)) {
             guess = group->mode;
             desc->mode = guess;
-            desc->fileName = g_strdup(buf);
-            desc->baseName = g_strdup(fileName);
-            desc->givenExtension = g_strdup(group->extensions[j]);
+            desc->fileName = g_strdup (buf);
+            desc->baseName = g_strdup (fileName);
+            desc->givenExtension = g_strdup (group->extensions[j]);
             break;
           }
         }
         if (guess != unknown_data)
           break;
       }
-    } else {
+    }
+    else {
       /* Attempt to find a file of this type. */
       /*     guess = unknown_data; */
       for (i = 0; i < numGroups; i++) {
         ExtensionList *group;
-        group = (ExtensionList *) g_slist_nth_data(groups, i);
+        group = (ExtensionList *) g_slist_nth_data (groups, i);
         if (group->mode != guess)
           continue;
 
         for (j = 0; j < group->len; j++) {
           gchar buf[1000];
-          if (endsWith(fileName, group->extensions[j])) {
-            g_printerr("%s does not exist!\n", fileName);
+          if (endsWith (fileName, group->extensions[j])) {
+            g_printerr ("%s does not exist!\n", fileName);
             return (NULL);
           }
           if (group->extensions[j] && group->extensions[j][0])
-            sprintf(buf, "%s.%s", fileName, group->extensions[j]);
+            sprintf (buf, "%s.%s", fileName, group->extensions[j]);
           else
-            sprintf(buf, "%s", fileName);
-          if (check_file_exists(buf)) {
-            DataMode ok = verifyDataMode(buf, group->mode, desc);
+            sprintf (buf, "%s", fileName);
+          if (check_file_exists (buf)) {
+            DataMode ok = verifyDataMode (buf, group->mode, desc);
             if (ok == guess && ok != unknown_data) {
-              desc->fileName = g_strdup(buf);
-              desc->baseName = g_strdup(fileName);
-              desc->givenExtension = g_strdup(group->extensions[j]);
+              desc->fileName = g_strdup (buf);
+              desc->baseName = g_strdup (fileName);
+              desc->givenExtension = g_strdup (group->extensions[j]);
               desc->mode = guess;
               guess = group->mode;
               break;
@@ -237,63 +240,68 @@ fileset_generate(const gchar * fileName,
       guess = unknown_data;
     }
 
-  } else {
-    desc->fileName = g_strdup(fileName);
-    desc->mode = guess = verifyDataMode(desc->fileName, desc->mode, desc);
+  }
+  else {
+    desc->fileName = g_strdup (fileName);
+    desc->mode = guess = verifyDataMode (desc->fileName, desc->mode, desc);
     if (desc->mode == unknown_data) {
-	g_printerr("Cannot determine mode of data file %s\n", desc->fileName);
-	return (NULL);
+      g_printerr ("Cannot determine mode of data file %s\n", desc->fileName);
+      return (NULL);
     }
   }
 
   switch (guess) {
   case unknown_data:
-    g_printerr("Cannot find a suitable file %s\n", fileName);
+    g_printerr ("Cannot find a suitable file %s\n", fileName);
     return (NULL);
     break;
   default:
     break;
   }
 
-  completeFileDesc(desc->fileName, desc);
+  completeFileDesc (desc->fileName, desc);
   return (desc);
 }
 
-gint addInputSuffix(InputDescription * desc, const gchar * suffix)
+gint
+addInputSuffix (InputDescription * desc, const gchar * suffix)
 {
   if (desc->extensions) {
-    g_slist_append(desc->extensions, g_strdup(suffix));
-  } else {
-    desc->extensions = g_slist_alloc();
-    desc->extensions->data = g_strdup(suffix);
+    g_slist_append (desc->extensions, g_strdup (suffix));
+  }
+  else {
+    desc->extensions = g_slist_alloc ();
+    desc->extensions->data = g_strdup (suffix);
   }
 
-  return (g_slist_length(desc->extensions));
+  return (g_slist_length (desc->extensions));
 }
 
-gint addInputFile(InputDescription * desc, const gchar * file)
+gint
+addInputFile (InputDescription * desc, const gchar * file)
 {
-  return (addInputSuffix(desc, file));
+  return (addInputSuffix (desc, file));
 }
 
-gchar *completeFileDesc(const gchar * fileName, InputDescription * desc)
+gchar *
+completeFileDesc (const gchar * fileName, InputDescription * desc)
 {
   gint n;
-  gchar *tmp = strrchr(fileName, '.');
+  gchar *tmp = strrchr (fileName, '.');
 
-  ExtensionList *group = getInputDescriptionGroup(desc->mode);
+  ExtensionList *group = getInputDescriptionGroup (desc->mode);
 
   if (group) {
     gint i;
     const gchar *ext;
-    n = strlen(fileName);
+    n = strlen (fileName);
     for (i = 0; i < group->len; i++) {
       ext = group->extensions[i];
-      if (endsWith(fileName, ext)) {
-        gint nbytes = strlen(fileName) - strlen(ext);
-        desc->baseName = (gchar *) g_malloc(sizeof(gchar) * nbytes);
-        g_snprintf(desc->baseName, nbytes, "%s", fileName);
-        desc->givenExtension = g_strdup(ext);
+      if (endsWith (fileName, ext)) {
+        gint nbytes = strlen (fileName) - strlen (ext);
+        desc->baseName = (gchar *) g_malloc (sizeof (gchar) * nbytes);
+        g_snprintf (desc->baseName, nbytes, "%s", fileName);
+        desc->givenExtension = g_strdup (ext);
         break;
       }
     }
@@ -301,12 +309,13 @@ gchar *completeFileDesc(const gchar * fileName, InputDescription * desc)
 
 #if 1
       if (tmp) {
-        desc->givenExtension = g_strdup(tmp + 1);
+        desc->givenExtension = g_strdup (tmp + 1);
         n = (tmp - fileName) + 1;
-        desc->baseName = g_malloc(sizeof(char) * n);
-        g_snprintf(desc->baseName, n, "%s", fileName);
-      } else {
-        desc->baseName = g_strdup(fileName);
+        desc->baseName = g_malloc (sizeof (char) * n);
+        g_snprintf (desc->baseName, n, "%s", fileName);
+      }
+      else {
+        desc->baseName = g_strdup (fileName);
       }
 #else
       return (NULL);
@@ -315,24 +324,26 @@ gchar *completeFileDesc(const gchar * fileName, InputDescription * desc)
   }
 
   if (!desc->baseName) {
-    desc->baseName = g_strdup(fileName);
+    desc->baseName = g_strdup (fileName);
   }
 
   /* Now compute the directory name. */
   if (desc->baseName) {
-    tmp = strrchr(desc->baseName, G_DIR_SEPARATOR);
+    tmp = strrchr (desc->baseName, G_DIR_SEPARATOR);
     if (tmp) {
       n = (tmp - desc->baseName) + 1;
-      desc->dirName = g_malloc(sizeof(char) * n);
-      g_snprintf(desc->dirName, n, "%s", desc->baseName);
-    } else {
-      desc->dirName = g_strdup(desc->baseName);
+      desc->dirName = g_malloc (sizeof (char) * n);
+      g_snprintf (desc->dirName, n, "%s", desc->baseName);
+    }
+    else {
+      desc->dirName = g_strdup (desc->baseName);
     }
   }
   return (tmp);
 }
 
-ExtensionList *getInputDescriptionGroup(DataMode mode)
+ExtensionList *
+getInputDescriptionGroup (DataMode mode)
 {
   GSList *groups = FileTypeGroups;
   ExtensionList *el;
@@ -350,54 +361,56 @@ ExtensionList *getInputDescriptionGroup(DataMode mode)
   return (NULL);
 }
 
-void showInputDescription(InputDescription * desc, ggobid * gg)
+void
+showInputDescription (InputDescription * desc, ggobid * gg)
 {
   FILE *out = stderr;
   gint i;
-  fprintf(out, "Input File Information:\n");
-  fprintf(out, "\tFile name: %s  (extension: %s)\n",
-          desc->fileName, desc->givenExtension);
-  fprintf(out, "\tDirectory: %s\n", desc->dirName);
+  fprintf (out, "Input File Information:\n");
+  fprintf (out, "\tFile name: %s  (extension: %s)\n",
+           desc->fileName, desc->givenExtension);
+  fprintf (out, "\tDirectory: %s\n", desc->dirName);
 #if 0
-  fprintf(out, "\tFormat: %s (%d), verified: %s\n",
-          GGOBI(getDataModeDescription) (desc->mode), desc->mode,
-          desc->canVerify ? "yes" : "no");
+  fprintf (out, "\tFormat: %s (%d), verified: %s\n",
+           GGOBI (getDataModeDescription) (desc->mode), desc->mode,
+           desc->canVerify ? "yes" : "no");
 #endif
 
   if (desc->extensions) {
-    fprintf(out, "Auxillary files\n");
-    for (i = 0; i < g_slist_length(desc->extensions); i++) {
-      fprintf(out, "  %d) %s\n",
-              i, (gchar *) g_slist_nth_data(desc->extensions, i));
+    fprintf (out, "Auxillary files\n");
+    for (i = 0; i < g_slist_length (desc->extensions); i++) {
+      fprintf (out, "  %d) %s\n",
+               i, (gchar *) g_slist_nth_data (desc->extensions, i));
     }
   }
-  fflush(out);
+  fflush (out);
 }
 
 /*--------------------------------------------------------------------*/
 /*          Determining the mode of the data                          */
 /*--------------------------------------------------------------------*/
 
-gboolean isURL(const gchar * fileName)
+gboolean
+isURL (const gchar * fileName)
 {
-  return ((strncmp(fileName, "http:", 5) == 0 ||
-           strncmp(fileName, "ftp:", 4) == 0));
+  return ((strncmp (fileName, "http:", 5) == 0 ||
+           strncmp (fileName, "ftp:", 4) == 0));
 }
 
 DataMode
-verifyDataMode(const gchar * fileName, DataMode mode,
-               InputDescription * desc)
+verifyDataMode (const gchar * fileName, DataMode mode,
+                InputDescription * desc)
 {
   switch (mode) {
   default:
-    mode = guessDataMode(fileName, desc);
+    mode = guessDataMode (fileName, desc);
   }
 
   return (mode);
 }
 
-gboolean 
-isXMLFile(const gchar * fileName, ggobid *gg, GGobiPluginInfo *info)
+gboolean
+isXMLFile (const gchar * fileName, ggobid * gg, GGobiPluginInfo * info)
 /*XXX InputDescription * desc) */
 {
 
@@ -405,40 +418,41 @@ isXMLFile(const gchar * fileName, ggobid *gg, GGobiPluginInfo *info)
   gint c;
   gchar *tmp;
 
-  if(isURL(fileName))
-    return(true);
+  if (isURL (fileName))
+    return (true);
 
 
-  tmp = strrchr(fileName, '.');
+  tmp = strrchr (fileName, '.');
 
-  if(!tmp) {
-     gchar buf[256];
-     sprintf(buf, "%s.xml",fileName);
-     if(isXMLFile(buf, gg, info))
-        return(true);
+  if (!tmp) {
+    gchar buf[256];
+    sprintf (buf, "%s.xml", fileName);
+    if (isXMLFile (buf, gg, info))
+      return (true);
   }
 
-  if (tmp && (strcmp(tmp, ".xmlz") == 0 || strcmp(tmp, ".gz") == 0)) {
-	  /* desc->canVerify = false; */
+  if (tmp && (strcmp (tmp, ".xmlz") == 0 || strcmp (tmp, ".gz") == 0)) {
+    /* desc->canVerify = false; */
     return (true);
   }
 
 
-  f = fopen(fileName, "r");
+  f = fopen (fileName, "r");
   if (f == NULL)
     return (false);
 
 /*  desc->canVerify = true; */
-  while ((c = getc(f)) != EOF) {
+  while ((c = getc (f)) != EOF) {
     if (c == ' ' || c == '\t' || c == '\n')
       continue;
     if (c == '<') {
       gchar buf[10];
-      fgets(buf, 5, f);
-      fclose(f);
-      if (strcmp(buf, "?xml") == 0) {
+      fgets (buf, 5, f);
+      fclose (f);
+      if (strcmp (buf, "?xml") == 0) {
         return (true);
-      } else
+      }
+      else
         return (false);
     }
   }
@@ -447,56 +461,53 @@ isXMLFile(const gchar * fileName, ggobid *gg, GGobiPluginInfo *info)
 }
 
 
-gboolean 
-isCSVFile(const gchar * fileName, ggobid *gg, GGobiPluginInfo *plugin)
+gboolean
+isCSVFile (const gchar * fileName, ggobid * gg, GGobiPluginInfo * plugin)
 {
   char tmp[20];
   char extention[20];
   int len;
-  int i,inx,inx2;
-  memset(tmp,'\0',20);
-  memset(extention,'\0',20);	
-  len = strlen(fileName);
+  int i, inx, inx2;
+  memset (tmp, '\0', 20);
+  memset (extention, '\0', 20);
+  len = strlen (fileName);
   inx = 0;
-  for(i=len-1;i>=0;i--)
-  {
-    if(fileName[i] == '.')
+  for (i = len - 1; i >= 0; i--) {
+    if (fileName[i] == '.')
       break;
     tmp[inx] = fileName[i];
     inx++;
   }
   tmp[inx] = '\0';
   inx2 = 0;
-  for(i=inx-1;i>=0;i--)
-  {
+  for (i = inx - 1; i >= 0; i--) {
     extention[inx2] = tmp[i];
     inx2++;
   }
-  if(
-  (strcmp(extention, "asc") == 0) ||
-  (strcmp(extention, "txt") == 0) ||
-  (strcmp(extention, "csv") == 0))
+  if ((strcmp (extention, "asc") == 0) ||
+      (strcmp (extention, "txt") == 0) || (strcmp (extention, "csv") == 0))
     return true;
   else
     return false;
 }
 
-DataMode guessDataMode(const gchar * fileName, InputDescription * desc)
+DataMode
+guessDataMode (const gchar * fileName, InputDescription * desc)
 {
   FILE *f;
 
-  f = fopen(fileName, "r");
+  f = fopen (fileName, "r");
   if (f == NULL)
     return (unknown_data);
 
 #if 0
-  if (isXMLFile(fileName, desc))
+  if (isXMLFile (fileName, desc))
     return (xml_data);
 #endif
 
 #if 0
-  if (isCSVFile(fileName))
-      return (csv_data);
+  if (isCSVFile (fileName))
+    return (csv_data);
 #endif
 
   return (unknown_data);
@@ -506,22 +517,25 @@ DataMode guessDataMode(const gchar * fileName, InputDescription * desc)
 /*                 Utility functions                                  */
 /*--------------------------------------------------------------------*/
 
-gboolean endsWith(const gchar * str, const gchar * what)
+gboolean
+endsWith (const gchar * str, const gchar * what)
 {
-  return (strcmp(str + strlen(str) - strlen(what), what) == 0);
+  return (strcmp (str + strlen (str) - strlen (what), what) == 0);
 }
 
 
 #ifdef WIN32
-gboolean check_file_exists(const gchar * fileName)
+gboolean
+check_file_exists (const gchar * fileName)
 {
   gint i = 0;
-  return (access(fileName, i) == 0);
+  return (access (fileName, i) == 0);
 }
 #else
-gboolean check_file_exists(const gchar * fileName)
+gboolean
+check_file_exists (const gchar * fileName)
 {
   struct stat buf;
-  return (stat(fileName, &buf) == 0);
+  return (stat (fileName, &buf) == 0);
 }
 #endif

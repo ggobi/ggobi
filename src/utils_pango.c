@@ -22,28 +22,28 @@
 /** Lays out the text using the given layout. If 'rect' is non-NULL it contains
 	the logical text extents. */
 void
-layout_text(PangoLayout *layout, const gchar *text, PangoRectangle *rect)
-{	
-	if (text) {
-		pango_layout_set_text(layout, text, -1);
-		if (rect)
-			pango_layout_get_pixel_extents(layout, NULL, rect);
-	}
+layout_text (PangoLayout * layout, const gchar * text, PangoRectangle * rect)
+{
+  if (text) {
+    pango_layout_set_text (layout, text, -1);
+    if (rect)
+      pango_layout_get_pixel_extents (layout, NULL, rect);
+  }
 }
 void
-underline_text(PangoLayout *layout)
+underline_text (PangoLayout * layout)
 {
-	PangoAttrList *list;
-	PangoAttribute *attr;
-	
-	attr = pango_attr_underline_new(PANGO_UNDERLINE_SINGLE);
-	attr->start_index = 0;
-	attr->end_index = strlen(pango_layout_get_text(layout));
-	
-	list = pango_attr_list_new();
-	pango_attr_list_insert(list, attr);
-	
-	pango_layout_set_attributes(layout, list);
-	
-	pango_attr_list_unref(list);
+  PangoAttrList *list;
+  PangoAttribute *attr;
+
+  attr = pango_attr_underline_new (PANGO_UNDERLINE_SINGLE);
+  attr->start_index = 0;
+  attr->end_index = strlen (pango_layout_get_text (layout));
+
+  list = pango_attr_list_new ();
+  pango_attr_list_insert (list, attr);
+
+  pango_layout_set_attributes (layout, list);
+
+  pango_attr_list_unref (list);
 }

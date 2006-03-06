@@ -23,7 +23,8 @@
 #include "externs.h"
 
 
-static void reset_all_cb (GtkButton *button, ggobid *gg)
+static void
+reset_all_cb (GtkButton * button, ggobid * gg)
 {
   GSList *l;
   GGobiData *d;
@@ -41,7 +42,8 @@ static void reset_all_cb (GtkButton *button, ggobid *gg)
   displays_tailpipe (FULL, gg);
 }
 
-static void undo_last_cb (GtkButton *button, ggobid *gg)
+static void
+undo_last_cb (GtkButton * button, ggobid * gg)
 {
   GGobiData *d = gg->current_display->d;
 
@@ -52,15 +54,18 @@ static void undo_last_cb (GtkButton *button, ggobid *gg)
   displays_tailpipe (FULL, gg);
 }
 
-static void move_cluster_cb (GtkWidget *w, ggobid *gg)
+static void
+move_cluster_cb (GtkWidget * w, ggobid * gg)
 {
   gg->movepts.cluster_p = GTK_TOGGLE_BUTTON (w)->active;
 }
 
-static gchar *mdir_lbl[] = {"Both", "Vertical", "Horizontal"};
-static void mdir_cb (GtkWidget *w, ggobid *gg)
+static gchar *mdir_lbl[] = { "Both", "Vertical", "Horizontal" };
+static void
+mdir_cb (GtkWidget * w, ggobid * gg)
 {
-  gg->movepts.direction = (enum directiond) gtk_combo_box_get_active(GTK_COMBO_BOX(w));
+  gg->movepts.direction =
+    (enum directiond) gtk_combo_box_get_active (GTK_COMBO_BOX (w));
 }
 
 /*--------------------------------------------------------------------*/
@@ -68,11 +73,11 @@ static void mdir_cb (GtkWidget *w, ggobid *gg)
 /*--------------------------------------------------------------------*/
 
 static gint
-key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
+key_press_cb (GtkWidget * w, GdkEventKey * event, splotd * sp)
 {
-  ggobid *gg = GGobiFromSPlot(sp);
+  ggobid *gg = GGobiFromSPlot (sp);
   cpaneld *cpanel = &gg->current_display->cpanel;
-  
+
 /*-- add a key_press_cb in each mode, and let it begin with these lines --*/
   if (splot_event_handled (w, event, cpanel, sp, gg))
     return true;
@@ -83,7 +88,7 @@ key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
 }
 
 static gint
-motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
+motion_notify_cb (GtkWidget * w, GdkEventMotion * event, splotd * sp)
 {
   ggobid *gg = GGobiFromSPlot (sp);
   displayd *display = sp->displayptr;
@@ -94,12 +99,12 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
    * allow point motion only for
    *   scatterplots 
    *   the splotd members of a scatmat that are xyplots.
-  */
-  if(GGOBI_IS_EXTENDED_DISPLAY(display)) {
-     GGobiExtendedDisplayClass *klass;
-     klass = GGOBI_EXTENDED_DISPLAY_GET_CLASS(display);
-     if(klass->move_points_motion_cb)
-         klass->move_points_motion_cb(display, sp, w, event, gg);
+   */
+  if (GGOBI_IS_EXTENDED_DISPLAY (display)) {
+    GGobiExtendedDisplayClass *klass;
+    klass = GGOBI_EXTENDED_DISPLAY_GET_CLASS (display);
+    if (klass->move_points_motion_cb)
+      klass->move_points_motion_cb (display, sp, w, event, gg);
   }
 
   return true;
@@ -107,11 +112,11 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
 
 
 static gint
-button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
+button_press_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
 {
   displayd *display = (displayd *) sp->displayptr;
   ggobid *gg = GGobiFromSPlot (sp);
-  
+
   gg->current_display = display;
   gg->current_splot = sp->displayptr->current_splot = sp;
 
@@ -119,20 +124,21 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
    * allow point motion only for
    *   scatterplots  
    *   the splotd members of a scatmat that are xyplots.
-  */
-  if(GGOBI_IS_EXTENDED_DISPLAY(display)) {
+   */
+  if (GGOBI_IS_EXTENDED_DISPLAY (display)) {
     GGobiExtendedDisplayClass *klass;
-    klass = GGOBI_EXTENDED_DISPLAY_GET_CLASS(display);
-    if(klass->move_points_button_cb) 
-        klass->move_points_button_cb(display, sp, w, event, gg);
-  } else 
+    klass = GGOBI_EXTENDED_DISPLAY_GET_CLASS (display);
+    if (klass->move_points_button_cb)
+      klass->move_points_button_cb (display, sp, w, event, gg);
+  }
+  else
     g_printerr ("Sorry, you can not points in this display or plot\n");
 
   return true;
 }
 
 static gint
-button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
+button_release_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
 {
   gboolean retval = true;
   ggobid *gg = GGobiFromSPlot (sp);
@@ -147,28 +153,27 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 }
 
 void
-movepts_event_handlers_toggle (splotd *sp, gboolean state) {
+movepts_event_handlers_toggle (splotd * sp, gboolean state)
+{
   displayd *display = sp->displayptr;
 
   if (state == on) {
-    if(GGOBI_IS_WINDOW_DISPLAY(display))
-      sp->key_press_id = g_signal_connect (G_OBJECT (GGOBI_WINDOW_DISPLAY(display)->window),
-       "key_press_event",
-       G_CALLBACK(key_press_cb),
-       (gpointer) sp);
-    sp->press_id = g_signal_connect (G_OBJECT (sp->da),
-                                       "button_press_event",
-                                       G_CALLBACK(button_press_cb),
-                                       (gpointer) sp);
-    sp->release_id = g_signal_connect (G_OBJECT (sp->da),
-                                         "button_release_event",
-                                         G_CALLBACK(button_release_cb),
-                                         (gpointer) sp);
-    sp->motion_id = g_signal_connect (G_OBJECT (sp->da),
-                                        "motion_notify_event",
-                                        G_CALLBACK(motion_notify_cb),
-                                        (gpointer) sp);
-  } else {
+    if (GGOBI_IS_WINDOW_DISPLAY (display))
+      sp->key_press_id =
+        g_signal_connect (G_OBJECT (GGOBI_WINDOW_DISPLAY (display)->window),
+                          "key_press_event", G_CALLBACK (key_press_cb),
+                          (gpointer) sp);
+    sp->press_id =
+      g_signal_connect (G_OBJECT (sp->da), "button_press_event",
+                        G_CALLBACK (button_press_cb), (gpointer) sp);
+    sp->release_id =
+      g_signal_connect (G_OBJECT (sp->da), "button_release_event",
+                        G_CALLBACK (button_release_cb), (gpointer) sp);
+    sp->motion_id =
+      g_signal_connect (G_OBJECT (sp->da), "motion_notify_event",
+                        G_CALLBACK (motion_notify_cb), (gpointer) sp);
+  }
+  else {
     disconnect_key_press_signal (sp);
     disconnect_button_press_signal (sp);
     disconnect_button_release_signal (sp);
@@ -177,65 +182,61 @@ movepts_event_handlers_toggle (splotd *sp, gboolean state) {
 }
 
 void
-cpanel_movepts_make (ggobid *gg) {
+cpanel_movepts_make (ggobid * gg)
+{
   modepaneld *panel;
   GtkWidget *btn, *opt, *box, *hb, *lbl;
 
-  panel = (modepaneld *) g_malloc(sizeof(modepaneld));
-  gg->control_panels = g_list_append(gg->control_panels, (gpointer) panel);
-  panel->name = g_strdup(GGOBI(getIModeName)(MOVEPTS));
-  
+  panel = (modepaneld *) g_malloc (sizeof (modepaneld));
+  gg->control_panels = g_list_append (gg->control_panels, (gpointer) panel);
+  panel->name = g_strdup (GGOBI (getIModeName) (MOVEPTS));
+
   panel->w = gtk_vbox_new (false, VBOX_SPACING);
-  gtk_container_set_border_width (GTK_CONTAINER (panel->w),
-                                  5);
+  gtk_container_set_border_width (GTK_CONTAINER (panel->w), 5);
 
   /*-- option menu: direction of motion --*/
   hb = gtk_vbox_new (false, 0);
-  gtk_box_pack_start (GTK_BOX (panel->w),
-                      hb, false, false, 0);
+  gtk_box_pack_start (GTK_BOX (panel->w), hb, false, false, 0);
 
   lbl = gtk_label_new_with_mnemonic ("Direction of _motion:");
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, 1);
   gtk_box_pack_start (GTK_BOX (hb), lbl, false, false, 0);
 
   opt = gtk_combo_box_new_text ();
-  gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), opt);
+  gtk_label_set_mnemonic_widget (GTK_LABEL (lbl), opt);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-    "Move freely, or constrain the motion vertically or horizontally",
-    NULL);
-  populate_combo_box (opt, mdir_lbl, G_N_ELEMENTS(mdir_lbl),
-    G_CALLBACK(mdir_cb), gg);
+                        "Move freely, or constrain the motion vertically or horizontally",
+                        NULL);
+  populate_combo_box (opt, mdir_lbl, G_N_ELEMENTS (mdir_lbl),
+                      G_CALLBACK (mdir_cb), gg);
   gtk_box_pack_start (GTK_BOX (hb), opt, false, false, 0);
 
   /*-- Use group toggle --*/
   btn = gtk_check_button_new_with_mnemonic ("Move brush _group");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-    "Move all points with the same symbol", NULL);
+                        "Move all points with the same symbol", NULL);
   g_signal_connect (G_OBJECT (btn), "toggled",
-                     G_CALLBACK (move_cluster_cb), (gpointer) gg);
-  gtk_box_pack_start (GTK_BOX (panel->w),
-    btn, false, false, 1);
+                    G_CALLBACK (move_cluster_cb), (gpointer) gg);
+  gtk_box_pack_start (GTK_BOX (panel->w), btn, false, false, 1);
 
   /*-- Box to hold reset buttons --*/
   box = gtk_hbox_new (true, 2);
 
   btn = gtk_button_new_with_mnemonic ("_Reset all");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-    "Reset all points to their original positions", NULL);
+                        "Reset all points to their original positions", NULL);
   g_signal_connect (G_OBJECT (btn), "clicked",
-                     G_CALLBACK (reset_all_cb), (gpointer) gg);
+                    G_CALLBACK (reset_all_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (box), btn, false, false, 1);
 
   btn = gtk_button_new_from_stock (GTK_STOCK_UNDO);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-    "Undo the previous move", NULL);
+                        "Undo the previous move", NULL);
   g_signal_connect (G_OBJECT (btn), "clicked",
-                     G_CALLBACK (undo_last_cb), (gpointer) gg);
+                    G_CALLBACK (undo_last_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (box), btn, false, false, 1);
 
-  gtk_box_pack_start (GTK_BOX (panel->w),
-                      box, false, false, 1);
+  gtk_box_pack_start (GTK_BOX (panel->w), box, false, false, 1);
 
   gtk_widget_show_all (panel->w);
 }
-

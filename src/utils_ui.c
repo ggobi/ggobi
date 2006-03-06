@@ -20,12 +20,13 @@
 #include "externs.h"
 
 
-GtkWidget *
-CreateMenuItemWithCheck (GtkWidget *menu,
- gchar *szName, gchar *szAccel, gchar *szTip,
- GtkWidget *win_main, GtkAccelGroup *accel_group,
- GtkSignalFunc func, gpointer data, ggobid *gg,
- GSList *radiogroup, gboolean check);
+GtkWidget *CreateMenuItemWithCheck (GtkWidget * menu,
+                                    gchar * szName, gchar * szAccel,
+                                    gchar * szTip, GtkWidget * win_main,
+                                    GtkAccelGroup * accel_group,
+                                    GtkSignalFunc func, gpointer data,
+                                    ggobid * gg, GSList * radiogroup,
+                                    gboolean check);
 
 /*
  * Taken from 'Developing Linux Applications with GTK+ and GDK'
@@ -47,47 +48,55 @@ CreateMenuItemWithCheck (GtkWidget *menu,
  * returns new menuitem
  */
 GtkWidget *
-CreateMenuItem (GtkWidget *menu,
-  gchar *szName, gchar *szAccel, gchar *szTip,
-  GtkWidget *win_main, GtkAccelGroup *accel_group,
-  GtkSignalFunc func, gpointer data, ggobid *gg)
+CreateMenuItem (GtkWidget * menu,
+                gchar * szName, gchar * szAccel, gchar * szTip,
+                GtkWidget * win_main, GtkAccelGroup * accel_group,
+                GtkSignalFunc func, gpointer data, ggobid * gg)
 {
-  return(CreateMenuItemWithCheck(menu, szName, szAccel, szTip,
-    win_main, accel_group, func, data, gg, NULL, false));
+  return (CreateMenuItemWithCheck (menu, szName, szAccel, szTip,
+                                   win_main, accel_group, func, data, gg,
+                                   NULL, false));
 }
 
 GtkWidget *
-CreateMenuItemWithCheck (GtkWidget *menu,
-  gchar *szName, gchar *szAccel, gchar *szTip,
-  GtkWidget *win_main, GtkAccelGroup *accel_group,
-  GtkSignalFunc func, gpointer data, ggobid *gg, 
-  GSList *RadioGroup, gboolean check)
+CreateMenuItemWithCheck (GtkWidget * menu,
+                         gchar * szName, gchar * szAccel, gchar * szTip,
+                         GtkWidget * win_main, GtkAccelGroup * accel_group,
+                         GtkSignalFunc func, gpointer data, ggobid * gg,
+                         GSList * RadioGroup, gboolean check)
 {
   GtkWidget *menuitem;
 
-  if(check && RadioGroup == NULL) {
-     menuitem = gtk_radio_menu_item_new(RadioGroup);
-     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(menuitem), TRUE);
-     RadioGroup = gtk_radio_menu_item_get_group (GTK_RADIO_MENU_ITEM (menuitem));
+  if (check && RadioGroup == NULL) {
+    menuitem = gtk_radio_menu_item_new (RadioGroup);
+    gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (menuitem), TRUE);
+    RadioGroup =
+      gtk_radio_menu_item_get_group (GTK_RADIO_MENU_ITEM (menuitem));
   }
 
   /* --- If there's a name, create the item and add the signal handler --- */
   if (szName && strlen (szName)) {
-    menuitem = check ? gtk_radio_menu_item_new_with_label(RadioGroup, szName) : gtk_menu_item_new_with_label (szName);
-    if(func)
+    menuitem =
+      check ? gtk_radio_menu_item_new_with_label (RadioGroup,
+                                                  szName) :
+      gtk_menu_item_new_with_label (szName);
+    if (func)
       g_signal_connect (G_OBJECT (menuitem), "activate",
-			  G_CALLBACK (func), data);
+                        G_CALLBACK (func), data);
 
-    GGobi_widget_set (GTK_WIDGET (menuitem), gg,  true);
+    GGobi_widget_set (GTK_WIDGET (menuitem), gg, true);
 
-  } else {
+  }
+  else {
     /* --- Create a separator --- */
-    menuitem = check ? gtk_radio_menu_item_new(RadioGroup) : gtk_menu_item_new ();
+    menuitem =
+      check ? gtk_radio_menu_item_new (RadioGroup) : gtk_menu_item_new ();
   }
 
 
-  if(check)
-     RadioGroup = gtk_radio_menu_item_get_group (GTK_RADIO_MENU_ITEM (menuitem));
+  if (check)
+    RadioGroup =
+      gtk_radio_menu_item_get_group (GTK_RADIO_MENU_ITEM (menuitem));
 
   /* --- Add menu item to the menu and show it. --- */
   gtk_menu_shell_append (GTK_MENU_SHELL (menu), menuitem);
@@ -95,23 +104,24 @@ CreateMenuItemWithCheck (GtkWidget *menu,
 
   /* --- If there was an accelerator --- */
   if (szAccel && accel_group) {
-    if (szAccel[0] == '^') {  /* control-keypress */
+    if (szAccel[0] == '^') {    /* control-keypress */
       gtk_widget_add_accelerator (menuitem, "activate", accel_group,
-        szAccel[1], GDK_CONTROL_MASK,
-        GTK_ACCEL_VISIBLE);
+                                  szAccel[1], GDK_CONTROL_MASK,
+                                  GTK_ACCEL_VISIBLE);
       /* How can I find out if there's an item already using this
-	 signal?  Sheesh, nothing seems to work. */
+         signal?  Sheesh, nothing seems to work. */
 
-    } else {                  /* alt-keypress */
+    }
+    else {                      /* alt-keypress */
       gtk_widget_add_accelerator (menuitem, "activate", accel_group,
-        szAccel[0], GDK_MOD1_MASK,
-        GTK_ACCEL_VISIBLE);
+                                  szAccel[0], GDK_MOD1_MASK,
+                                  GTK_ACCEL_VISIBLE);
     }
   }
 
   /* --- If there was a tool tip --- */
   if (szTip && strlen (szTip))
-      gtk_tooltips_set_tip (gg->tips, menuitem, szTip, NULL);
+    gtk_tooltips_set_tip (gg->tips, menuitem, szTip, NULL);
 
   return (menuitem);
 }
@@ -134,35 +144,34 @@ CreateMenuItemWithCheck (GtkWidget *menu,
  *
  * returns new menuitem
  */
-GtkWidget *CreateMenuCheck (GtkWidget *menu,
-                            gchar *szName,
-                            GtkSignalFunc func,
-                            gpointer data,
-                            gboolean state, ggobid *gg)
+GtkWidget *
+CreateMenuCheck (GtkWidget * menu,
+                 gchar * szName,
+                 GtkSignalFunc func,
+                 gpointer data, gboolean state, ggobid * gg)
 {
-    GtkWidget *menuitem;
+  GtkWidget *menuitem;
 
-    /* --- Create menu item --- */
-    menuitem = gtk_check_menu_item_new_with_label (szName);
+  /* --- Create menu item --- */
+  menuitem = gtk_check_menu_item_new_with_label (szName);
 
     /*-- display always, not just when the mouse floats over --*/
-	/* I don't even think this is possible in GTK2 - mfl */
-    //gtk_check_menu_item_set_show_toggle (GTK_CHECK_MENU_ITEM (menuitem), true);
+  /* I don't even think this is possible in GTK2 - mfl */
+  //gtk_check_menu_item_set_show_toggle (GTK_CHECK_MENU_ITEM (menuitem), true);
 
-    GGobi_widget_set(GTK_WIDGET(menuitem), gg, true);
+  GGobi_widget_set (GTK_WIDGET (menuitem), gg, true);
 
-    /* --- set its state --- */
-    gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (menuitem), state);
+  /* --- set its state --- */
+  gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (menuitem), state);
 
-    /* --- Add it to the menu --- */
-    gtk_menu_shell_append (GTK_MENU_SHELL (menu), menuitem);
-    gtk_widget_show (menuitem);
+  /* --- Add it to the menu --- */
+  gtk_menu_shell_append (GTK_MENU_SHELL (menu), menuitem);
+  gtk_widget_show (menuitem);
 
-    /* --- Listen for "toggled" messages --- */
-    g_signal_connect (G_OBJECT (menuitem), "toggled",
-                        G_CALLBACK (func), data);
+  /* --- Listen for "toggled" messages --- */
+  g_signal_connect (G_OBJECT (menuitem), "toggled", G_CALLBACK (func), data);
 
-    return (menuitem);
+  return (menuitem);
 }
 
 /*
@@ -170,38 +179,41 @@ GtkWidget *CreateMenuCheck (GtkWidget *menu,
  * Now based on GTK2 convenience class GtkMessageDialog
 */
 
-void quick_message (const gchar * const message, gboolean modal) {
+void
+quick_message (const gchar * const message, gboolean modal)
+{
 
   GtkWidget *dialog;
-    
+
   /* Create the widgets */
-    
-  dialog = gtk_message_dialog_new (NULL, 0, GTK_MESSAGE_INFO, GTK_BUTTONS_OK, message);
+
+  dialog =
+    gtk_message_dialog_new (NULL, 0, GTK_MESSAGE_INFO, GTK_BUTTONS_OK,
+                            message);
 
   if (modal)
     gtk_window_set_modal (GTK_WINDOW (dialog), true);
 
-  gtk_dialog_run(GTK_DIALOG(dialog));
-  
-  gtk_widget_destroy(dialog);
-  
-  #if 0
+  gtk_dialog_run (GTK_DIALOG (dialog));
+
+  gtk_widget_destroy (dialog);
+
+#if 0
   label = gtk_label_new (message);
   okay_button = gtk_button_new_with_label ("Okay");
-    
+
   /* Ensure that the dialog box is destroyed when the user clicks ok. */
-    /
-  g_signal_connect_swapped (G_OBJECT (okay_button), "clicked",
-    G_CALLBACK (gtk_widget_destroy), G_OBJECT (dialog));
+  /g_signal_connect_swapped (G_OBJECT (okay_button), "clicked",
+                             G_CALLBACK (gtk_widget_destroy),
+                             G_OBJECT (dialog));
   gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->action_area),
                      okay_button);
 
   /* Add the label, and show everything we've added to the dialog. */
 
-  gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->vbox),
-                     label);
+  gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->vbox), label);
   gtk_widget_show_all (dialog);
-  #endif
+#endif
 }
 
 /* This function produces a menu bar from a GtkUIManager and ui spec.
@@ -211,38 +223,42 @@ void quick_message (const gchar * const message, gboolean modal) {
 	accelerators from the GtkUIManager are loaded into the specified window.
 	*/
 GtkWidget *
-create_menu_bar (GtkUIManager *manager, const gchar *ui_xml, GtkWidget *window)
+create_menu_bar (GtkUIManager * manager, const gchar * ui_xml,
+                 GtkWidget * window)
 {
   GError *error = NULL;
   GtkWidget *mbar = NULL;
-  
-  if (!gtk_ui_manager_add_ui_from_string(manager, ui_xml, -1, &error)) {
-	  g_message("building ui failed: %s\n", error->message);
-	  g_error_free(error);
-  } else {
-	  if (window) {
-		  gtk_window_add_accel_group(GTK_WINDOW (window), 
-				  gtk_ui_manager_get_accel_group(manager));
-		  g_object_set_data_full(G_OBJECT(window), "ui-manager", manager, g_object_unref);
-	  }
-	  mbar = gtk_ui_manager_get_widget(manager, "/menubar");
+
+  if (!gtk_ui_manager_add_ui_from_string (manager, ui_xml, -1, &error)) {
+    g_message ("building ui failed: %s\n", error->message);
+    g_error_free (error);
+  }
+  else {
+    if (window) {
+      gtk_window_add_accel_group (GTK_WINDOW (window),
+                                  gtk_ui_manager_get_accel_group (manager));
+      g_object_set_data_full (G_OBJECT (window), "ui-manager", manager,
+                              g_object_unref);
+    }
+    mbar = gtk_ui_manager_get_widget (manager, "/menubar");
   }
 
-  return(mbar);
+  return (mbar);
 }
 
 void
-populate_combo_box(GtkWidget *combo_box, gchar **lbl, gint nitems,
-  GCallback func, gpointer obj)
+populate_combo_box (GtkWidget * combo_box, gchar ** lbl, gint nitems,
+                    GCallback func, gpointer obj)
 {
   gint i;
-  for (i=0; i<nitems; i++) {
-    gtk_combo_box_append_text(GTK_COMBO_BOX(combo_box), lbl[i]);
+  for (i = 0; i < nitems; i++) {
+    gtk_combo_box_append_text (GTK_COMBO_BOX (combo_box), lbl[i]);
   }
   //gtk_combo_box_set_add_tearoffs(GTK_COMBO_BOX(combo_box), true);
-  gtk_combo_box_set_active(GTK_COMBO_BOX(combo_box), 0);
+  gtk_combo_box_set_active (GTK_COMBO_BOX (combo_box), 0);
   if (func)
-    g_signal_connect(G_OBJECT(combo_box), "changed", G_CALLBACK(func), obj);
+    g_signal_connect (G_OBJECT (combo_box), "changed", G_CALLBACK (func),
+                      obj);
 }
 
 /* adds columns to the tree_view labeled by lbl. If headers is true,
@@ -252,29 +268,33 @@ populate_combo_box(GtkWidget *combo_box, gchar **lbl, gint nitems,
    signal of the associated GtkTreeSelection.  The columns render
    text from the corresponding model columns. */
 void
-populate_tree_view(GtkWidget *tree_view, gchar **lbl, gint nitems, 
- gboolean headers, GtkSelectionMode mode, GCallback func, gpointer obj)
+populate_tree_view (GtkWidget * tree_view, gchar ** lbl, gint nitems,
+                    gboolean headers, GtkSelectionMode mode, GCallback func,
+                    gpointer obj)
 {
   gint i;
   GtkTreeSelection *sel;
-	
-  for (i=0; i<nitems; i++) {
+
+  for (i = 0; i < nitems; i++) {
     if (!headers || lbl[i]) {
-      GtkTreeViewColumn *col = gtk_tree_view_column_new_with_attributes(
-	headers ? lbl[i] : NULL, gtk_cell_renderer_text_new(), "markup", i, NULL);
-      gtk_tree_view_column_set_sort_column_id(col, i);
-      gtk_tree_view_column_set_resizable(col, true);
-      gtk_tree_view_insert_column(GTK_TREE_VIEW(tree_view), col, -1);
+      GtkTreeViewColumn *col =
+        gtk_tree_view_column_new_with_attributes (headers ? lbl[i] : NULL,
+                                                  gtk_cell_renderer_text_new
+                                                  (), "markup", i, NULL);
+      gtk_tree_view_column_set_sort_column_id (col, i);
+      gtk_tree_view_column_set_resizable (col, true);
+      gtk_tree_view_insert_column (GTK_TREE_VIEW (tree_view), col, -1);
     }
   }
-  gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(tree_view), headers);
-  sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view));
-  gtk_tree_selection_set_mode(sel, mode);
+  gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (tree_view), headers);
+  sel = gtk_tree_view_get_selection (GTK_TREE_VIEW (tree_view));
+  gtk_tree_selection_set_mode (sel, mode);
   if (func)
-	g_signal_connect(G_OBJECT(sel), "changed", G_CALLBACK(func), obj);
+    g_signal_connect (G_OBJECT (sel), "changed", G_CALLBACK (func), obj);
 }
 
-void scale_set_default_values (GtkScale *scale)
+void
+scale_set_default_values (GtkScale * scale)
 {
   gtk_range_set_update_policy (GTK_RANGE (scale), GTK_UPDATE_CONTINUOUS);
   gtk_scale_set_draw_value (scale, false);
@@ -285,8 +305,9 @@ void scale_set_default_values (GtkScale *scale)
 /*--------------------------------------------------------------------*/
 
 void
-variable_notebook_subwindow_add (GGobiData *d, GCallback func, gpointer func_data,
-  GtkWidget *notebook, vartyped vtype, datatyped dtype, ggobid *gg)
+variable_notebook_subwindow_add (GGobiData * d, GCallback func,
+                                 gpointer func_data, GtkWidget * notebook,
+                                 vartyped vtype, datatyped dtype, ggobid * gg)
 {
   GtkWidget *swin, *tree_view;
   GtkListStore *model;
@@ -294,7 +315,7 @@ variable_notebook_subwindow_add (GGobiData *d, GCallback func, gpointer func_dat
   gint j;
   vartabled *vt;
   GtkSelectionMode mode = (GtkSelectionMode)
-          g_object_get_data(G_OBJECT(notebook), "SELECTION");
+    g_object_get_data (G_OBJECT (notebook), "SELECTION");
 
   if (d->ncols == 0)
     return;
@@ -302,7 +323,7 @@ variable_notebook_subwindow_add (GGobiData *d, GCallback func, gpointer func_dat
   if (vtype == categorical) {
     /* is there in fact a categorical variable? */
     gboolean categorical_variable_present = false;
-    for (j=0; j<g_slist_length (d->vartable); j++) {
+    for (j = 0; j < g_slist_length (d->vartable); j++) {
       vt = (vartabled *) g_slist_nth_data (d->vartable, j);
       if (vt->vartype == categorical) {
         categorical_variable_present = true;
@@ -316,43 +337,44 @@ variable_notebook_subwindow_add (GGobiData *d, GCallback func, gpointer func_dat
   /* Create a scrolled window to pack the tree view widget into */
   swin = gtk_scrolled_window_new (NULL, NULL);
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (swin),
-    GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
-  gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW(swin), 
-    GTK_SHADOW_NONE);
+                                  GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
+  gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (swin),
+                                       GTK_SHADOW_NONE);
 
-  g_object_set_data(G_OBJECT(swin), "datad", d);  /*setdata*/
+  g_object_set_data (G_OBJECT (swin), "datad", d);  /*setdata */
 /*
  * name or nickname?  Which one we'd prefer to use depends on the
  * size of the space we're working in -- maybe this will become an
  * argument.
 */
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), swin,
-    (d->nickname != NULL) ?
-      gtk_label_new (d->nickname) : gtk_label_new (d->name)); 
+                            (d->nickname != NULL) ?
+                            gtk_label_new (d->nickname) : gtk_label_new (d->
+                                                                         name));
 
   /* add the tree view */
-  model = gtk_list_store_new(VARLIST_NCOLS, G_TYPE_STRING, G_TYPE_INT);
-  tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(model));
-  gtk_widget_set_size_request(tree_view, -1, 70);
-  g_object_set_data(G_OBJECT (tree_view), "datad", d);
+  model = gtk_list_store_new (VARLIST_NCOLS, G_TYPE_STRING, G_TYPE_INT);
+  tree_view = gtk_tree_view_new_with_model (GTK_TREE_MODEL (model));
+  gtk_widget_set_size_request (tree_view, -1, 70);
+  g_object_set_data (G_OBJECT (tree_view), "datad", d);
   if (!func_data)
     func_data = gg;
-  populate_tree_view(tree_view, NULL, 1, false, mode, func, func_data);
-  gtk_tree_view_column_set_spacing(gtk_tree_view_get_column(GTK_TREE_VIEW(tree_view), 0), 0);
+  populate_tree_view (tree_view, NULL, 1, false, mode, func, func_data);
+  gtk_tree_view_column_set_spacing (gtk_tree_view_get_column
+                                    (GTK_TREE_VIEW (tree_view), 0), 0);
   //if(func)
   //   g_signal_connect (G_OBJECT (tree_view), "select_row", G_CALLBACK (func), gg);
 
-  for (j=0; j<d->ncols; j++) {
+  for (j = 0; j < d->ncols; j++) {
     vt = vartable_element_get (j, d);
     if (vtype == all_vartypes ||
         (vtype == categorical && vt->vartype == categorical) ||
         (vtype == integer && vt->vartype == integer) ||
-        (vtype == real && vt->vartype == real))
-    {
-      gtk_list_store_append(model, &iter);
-	  gtk_list_store_set(model, &iter, 
-	  	VARLIST_NAME, vt->collab_tform, 
-	  	VARLIST_INDEX, j, -1);
+        (vtype == real && vt->vartype == real)) {
+      gtk_list_store_append (model, &iter);
+      gtk_list_store_set (model, &iter,
+                          VARLIST_NAME, vt->collab_tform,
+                          VARLIST_INDEX, j, -1);
     }
   }
 
@@ -360,25 +382,26 @@ variable_notebook_subwindow_add (GGobiData *d, GCallback func, gpointer func_dat
   gtk_widget_show_all (swin);
 }
 
-static void 
-variable_notebook_adddata_cb (ggobid *gg, GGobiData *d, void *notebook)
+static void
+variable_notebook_adddata_cb (ggobid * gg, GGobiData * d, void *notebook)
 {
   GCallback func;
   gpointer func_data;
   vartyped vtype;
   datatyped dtype;
 
-  func = G_CALLBACK(g_object_get_data(G_OBJECT(notebook), "selection-func"));
-  func_data = g_object_get_data(G_OBJECT(notebook), "selection-func-data");
-  vtype = (vartyped) g_object_get_data(G_OBJECT(notebook), "vartype");
-  dtype = (vartyped) g_object_get_data(G_OBJECT(notebook), "datatype");
+  func =
+    G_CALLBACK (g_object_get_data (G_OBJECT (notebook), "selection-func"));
+  func_data = g_object_get_data (G_OBJECT (notebook), "selection-func-data");
+  vtype = (vartyped) g_object_get_data (G_OBJECT (notebook), "vartype");
+  dtype = (vartyped) g_object_get_data (G_OBJECT (notebook), "datatype");
 
   if ((dtype == all_datatypes) ||
       (dtype == no_edgesets && d->edge.n == 0) ||
-      (dtype == edgesets_only && d->edge.n > 0))
-  {
+      (dtype == edgesets_only && d->edge.n > 0)) {
     if (g_slist_length (d->vartable)) {
-      variable_notebook_subwindow_add (d, func, func_data, notebook, vtype, dtype, gg);
+      variable_notebook_subwindow_add (d, func, func_data, notebook, vtype,
+                                       dtype, gg);
     }
   }
 
@@ -389,21 +412,24 @@ variable_notebook_adddata_cb (ggobid *gg, GGobiData *d, void *notebook)
 }
 
 void
-variable_notebook_handlers_disconnect (GtkWidget *notebook, ggobid *gg)
+variable_notebook_handlers_disconnect (GtkWidget * notebook, ggobid * gg)
 {
   g_signal_handlers_disconnect_by_func (G_OBJECT (gg),
-		      G_CALLBACK (variable_notebook_varchange_cb),
-		      GTK_OBJECT (notebook));
+                                        G_CALLBACK
+                                        (variable_notebook_varchange_cb),
+                                        GTK_OBJECT (notebook));
   g_signal_handlers_disconnect_by_func (G_OBJECT (gg),
-		      G_CALLBACK (variable_notebook_varchange_cb),
-		      GTK_OBJECT (notebook));
+                                        G_CALLBACK
+                                        (variable_notebook_varchange_cb),
+                                        GTK_OBJECT (notebook));
   g_signal_handlers_disconnect_by_func (G_OBJECT (gg),
-		      G_CALLBACK (variable_notebook_adddata_cb),
-		      GTK_OBJECT (notebook));
+                                        G_CALLBACK
+                                        (variable_notebook_adddata_cb),
+                                        GTK_OBJECT (notebook));
 }
 
 GtkWidget *
-get_tree_view_from_object (GObject *obj)
+get_tree_view_from_object (GObject * obj)
 {
   GtkWidget *notebook = NULL, *swin = NULL, *tree_view = NULL;
   gint page;
@@ -412,7 +438,7 @@ get_tree_view_from_object (GObject *obj)
 
     /*-- find the current notebook page, then get the current tree_view --*/
     notebook = (GtkWidget *) g_object_get_data (obj, "notebook");
-    if (notebook && GTK_IS_NOTEBOOK(notebook)) {
+    if (notebook && GTK_IS_NOTEBOOK (notebook)) {
       page = gtk_notebook_get_current_page (GTK_NOTEBOOK (notebook));
       swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), page);
       if (swin) {
@@ -423,53 +449,58 @@ get_tree_view_from_object (GObject *obj)
 
   return tree_view;
 }
+
 gint  /*-- assumes GTK_SELECTION_SINGLE --*/
-get_one_selection_from_tree_view (GtkWidget *tree_view, GGobiData *d)
+get_one_selection_from_tree_view (GtkWidget * tree_view, GGobiData * d)
 {
-  GtkTreeSelection *sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view));
+  GtkTreeSelection *sel =
+    gtk_tree_view_get_selection (GTK_TREE_VIEW (tree_view));
   GtkTreeModel *model;
   GtkTreeIter iter;
   gint selected_var = -1;
-	
-  gboolean selected = gtk_tree_selection_get_selected(sel, &model, &iter);
+
+  gboolean selected = gtk_tree_selection_get_selected (sel, &model, &iter);
   if (selected)
-    gtk_tree_model_get(model, &iter, VARLIST_INDEX, &selected_var, -1);
+    gtk_tree_model_get (model, &iter, VARLIST_INDEX, &selected_var, -1);
 
   return selected_var;
 }
+
 /** returns the dataset indices of the view's selected variables */
 gint * /*-- assumes multiple selection is possible --*/
-get_selections_from_tree_view (GtkWidget *tree_view, gint *nvars)
+get_selections_from_tree_view (GtkWidget * tree_view, gint * nvars)
 {
-  GtkTreeSelection *sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view));
+  GtkTreeSelection *sel =
+    gtk_tree_view_get_selection (GTK_TREE_VIEW (tree_view));
   GtkTreeModel *model;
   GtkTreeIter iter;
   GList *rows, *l;
   gint selected_var, i;
   gint *vars;
-  
-  rows = gtk_tree_selection_get_selected_rows(sel, &model);
-  *nvars = g_list_length(rows);
-  vars = g_new(gint, *nvars);
+
+  rows = gtk_tree_selection_get_selected_rows (sel, &model);
+  *nvars = g_list_length (rows);
+  vars = g_new (gint, *nvars);
   for (l = rows, i = 0; l; l = l->next, i++) {
-	  GtkTreePath *path = (GtkTreePath*)l->data;
-	  gtk_tree_model_get_iter(model, &iter, path);
-	  gtk_tree_model_get(model, &iter, VARLIST_INDEX, &selected_var, -1);
-	  vars[i] = selected_var;
-	  gtk_tree_path_free(path);
+    GtkTreePath *path = (GtkTreePath *) l->data;
+    gtk_tree_model_get_iter (model, &iter, path);
+    gtk_tree_model_get (model, &iter, VARLIST_INDEX, &selected_var, -1);
+    vars[i] = selected_var;
+    gtk_tree_path_free (path);
   }
-  g_list_free(rows);
-  
+  g_list_free (rows);
+
   return vars;
 }
 
 void
-select_tree_view_row(GtkWidget *tree_view, gint row)
+select_tree_view_row (GtkWidget * tree_view, gint row)
 {
-  GtkTreeSelection *tree_sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view));
-  GtkTreePath *path = gtk_tree_path_new_from_indices(row, -1);
-  gtk_tree_selection_select_path(tree_sel, path);
-  gtk_tree_path_free(path);
+  GtkTreeSelection *tree_sel =
+    gtk_tree_view_get_selection (GTK_TREE_VIEW (tree_view));
+  GtkTreePath *path = gtk_tree_path_new_from_indices (row, -1);
+  gtk_tree_selection_select_path (tree_sel, path);
+  gtk_tree_path_free (path);
 }
 
 /** gets the selected row index from a GtkTreeSelection in 'single' mode.
@@ -477,30 +508,32 @@ select_tree_view_row(GtkWidget *tree_view, gint row)
 	note: only works for flat views
 */
 gint
-tree_selection_get_selected_row(GtkTreeSelection *tree_sel)
+tree_selection_get_selected_row (GtkTreeSelection * tree_sel)
 {
   GtkTreeIter iter;
   GtkTreeModel *model;
   GtkTreePath *path, *child_path;
   gint row = -1;
   gboolean selected;
-  
-  selected = gtk_tree_selection_get_selected(tree_sel, &model, &iter);
-  
+
+  selected = gtk_tree_selection_get_selected (tree_sel, &model, &iter);
+
   if (selected) {
-	  path = gtk_tree_model_get_path(model, &iter);
-	  if (GTK_IS_TREE_MODEL_SORT(model)) {
-		  child_path = gtk_tree_model_sort_convert_path_to_child_path(
-		  	GTK_TREE_MODEL_SORT(model), path);
-		  gtk_tree_path_free(path);
-		  path = child_path;
-	  }
-	  row = gtk_tree_path_get_indices(path)[0];
-	  gtk_tree_path_free(path);
+    path = gtk_tree_model_get_path (model, &iter);
+    if (GTK_IS_TREE_MODEL_SORT (model)) {
+      child_path =
+        gtk_tree_model_sort_convert_path_to_child_path (GTK_TREE_MODEL_SORT
+                                                        (model), path);
+      gtk_tree_path_free (path);
+      path = child_path;
+    }
+    row = gtk_tree_path_get_indices (path)[0];
+    gtk_tree_path_free (path);
   }
-  
-  return(row);
+
+  return (row);
 }
+
 /*-------------------------------------------------------------------------*/
 
 
@@ -510,55 +543,58 @@ tree_selection_get_selected_row(GtkTreeSelection *tree_sel)
 * number of variables; it just clears the list and then
 * rebuilds it.
 */
-void 
-variable_notebook_varchange_cb (ggobid *gg, vartabled *vt, gint which,
-  GGobiData *data, void *notebook)
+void
+variable_notebook_varchange_cb (ggobid * gg, vartabled * vt, gint which,
+                                GGobiData * data, void *notebook)
 {
   GtkWidget *swin, *tree_view;
   GGobiData *d;
   gint kd = -1;
 
   /*-- add one or more variables to this datad --*/
-  d = (GGobiData *) datad_get_from_notebook (GTK_WIDGET(notebook), gg);
+  d = (GGobiData *) datad_get_from_notebook (GTK_WIDGET (notebook), gg);
   kd = g_slist_index (gg->d, d);
 
   /*-- get the tree_view associated with this data; clear and rebuild --*/
-  swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK(notebook), kd);
+  swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), kd);
   if (swin) {
     gint j;
     vartabled *vt;
     GtkTreeModel *model;
     GtkTreeIter iter;
     tree_view = GTK_BIN (swin)->child;
-    model = gtk_tree_view_get_model(GTK_TREE_VIEW(tree_view));
-    
-    gtk_list_store_clear(GTK_LIST_STORE(model));
-    for (j=0; j<d->ncols; j++) {
+    model = gtk_tree_view_get_model (GTK_TREE_VIEW (tree_view));
+
+    gtk_list_store_clear (GTK_LIST_STORE (model));
+    for (j = 0; j < d->ncols; j++) {
       vt = vartable_element_get (j, d);
       if (vt) {
-        gtk_list_store_append(GTK_LIST_STORE(model), &iter);
-	gtk_list_store_set(GTK_LIST_STORE(model), &iter, 
-	  VARLIST_NAME, vt->collab_tform, 
-	  VARLIST_INDEX, j, -1);
+        gtk_list_store_append (GTK_LIST_STORE (model), &iter);
+        gtk_list_store_set (GTK_LIST_STORE (model), &iter,
+                            VARLIST_NAME, vt->collab_tform,
+                            VARLIST_INDEX, j, -1);
       }
     }
   }
 }
 
 
-void 
-variable_notebook_list_changed_cb(ggobid *gg, GGobiData *d, void *notebook)
+void
+variable_notebook_list_changed_cb (ggobid * gg, GGobiData * d, void *notebook)
 {
-  variable_notebook_varchange_cb(gg, NULL, -1, d, notebook);
+  variable_notebook_varchange_cb (gg, NULL, -1, d, notebook);
 }
 
-CHECK_EVENT_SIGNATURE(variable_notebook_adddata_cb, datad_added_f)
-CHECK_EVENT_SIGNATURE(variable_notebook_varchange_cb, variable_added_f)
-CHECK_EVENT_SIGNATURE(variable_notebook_list_changed_cb, variable_list_changed_f)
+CHECK_EVENT_SIGNATURE (variable_notebook_adddata_cb, datad_added_f)
+  CHECK_EVENT_SIGNATURE (variable_notebook_varchange_cb, variable_added_f)
+  CHECK_EVENT_SIGNATURE (variable_notebook_list_changed_cb,
+                       variable_list_changed_f)
 
-GtkWidget *
-create_variable_notebook (GtkWidget *box, GtkSelectionMode mode, 
-  vartyped vtype, datatyped dtype, GtkSignalFunc func, gpointer func_data, ggobid *gg)
+     GtkWidget *create_variable_notebook (GtkWidget * box,
+                                          GtkSelectionMode mode,
+                                          vartyped vtype, datatyped dtype,
+                                          GtkSignalFunc func,
+                                          gpointer func_data, ggobid * gg)
 {
   GtkWidget *notebook;
   gint nd = g_slist_length (gg->d);
@@ -572,20 +608,20 @@ create_variable_notebook (GtkWidget *box, GtkSelectionMode mode,
   // This will have to be done per notebook.
   //gtk_notebook_set_show_tabs (GTK_NOTEBOOK (notebook), nd > 1);
   gtk_box_pack_start (GTK_BOX (box), notebook, true, true, 2);
-  g_object_set_data(G_OBJECT(notebook), "SELECTION", (gpointer) mode);
-  g_object_set_data(G_OBJECT(notebook), "selection-func", func);
-  g_object_set_data(G_OBJECT(notebook), "selection-func-data", func_data);
-  g_object_set_data(G_OBJECT(notebook), "vartype", (gpointer) vtype);
-  g_object_set_data(G_OBJECT(notebook), "datatype", (gpointer) dtype);
+  g_object_set_data (G_OBJECT (notebook), "SELECTION", (gpointer) mode);
+  g_object_set_data (G_OBJECT (notebook), "selection-func", func);
+  g_object_set_data (G_OBJECT (notebook), "selection-func-data", func_data);
+  g_object_set_data (G_OBJECT (notebook), "vartype", (gpointer) vtype);
+  g_object_set_data (G_OBJECT (notebook), "datatype", (gpointer) dtype);
 
   for (l = gg->d; l; l = l->next) {
     d = (GGobiData *) l->data;
     if ((dtype == all_datatypes) ||
         (dtype == no_edgesets && d->edge.n == 0) ||
-        (dtype == edgesets_only && d->edge.n > 0))
-    {
+        (dtype == edgesets_only && d->edge.n > 0)) {
       if (g_slist_length (d->vartable)) {
-        variable_notebook_subwindow_add (d, func, func_data, notebook, vtype, dtype, gg);
+        variable_notebook_subwindow_add (d, func, func_data, notebook, vtype,
+                                         dtype, gg);
       }
     }
   }
@@ -593,76 +629,84 @@ create_variable_notebook (GtkWidget *box, GtkSelectionMode mode,
   /*-- listen for variable_added and _list_changed events on main_window --*/
   /*--   ... list_changed would be enough --*/
   g_signal_connect (G_OBJECT (gg),
-		      "variable_added", 
-		      G_CALLBACK (variable_notebook_varchange_cb),
-		      GTK_OBJECT (notebook));
+                    "variable_added",
+                    G_CALLBACK (variable_notebook_varchange_cb),
+                    GTK_OBJECT (notebook));
   g_signal_connect (G_OBJECT (gg),
-		      "variable_list_changed", 
-		      G_CALLBACK (variable_notebook_list_changed_cb),
-		      GTK_OBJECT (notebook));
+                    "variable_list_changed",
+                    G_CALLBACK (variable_notebook_list_changed_cb),
+                    GTK_OBJECT (notebook));
 
   /*-- listen for datad_added events on main_window --*/
   g_signal_connect (G_OBJECT (gg),
-		      "datad_added", 
-		      G_CALLBACK (variable_notebook_adddata_cb),
-		      GTK_OBJECT (notebook));
+                    "datad_added",
+                    G_CALLBACK (variable_notebook_adddata_cb),
+                    GTK_OBJECT (notebook));
 
   return notebook;
 }
-  
-static void variable_notebook_page_add_prefices(GtkWidget *notebook, gint page) {
+
+static void
+variable_notebook_page_add_prefices (GtkWidget * notebook, gint page)
+{
   GtkTreeIter iter;
   gint i, sel_prefix, n_prefices;
-  GtkWidget *nth_page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), page);
+  GtkWidget *nth_page =
+    gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), page);
   GGobiData *d;
   if (!nth_page)
-	return;
-  d = g_object_get_data(G_OBJECT(nth_page), "datad");
-  GtkWidget *view = GTK_BIN(nth_page)->child;
-  GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(view));
-  GGobiVariableNotebookPrefixFunc p_func = g_object_get_data(G_OBJECT(notebook), "prefix_func");
-  const gchar **prefices = p_func(notebook, d, &sel_prefix, &n_prefices);
+    return;
+  d = g_object_get_data (G_OBJECT (nth_page), "datad");
+  GtkWidget *view = GTK_BIN (nth_page)->child;
+  GtkTreeModel *model = gtk_tree_view_get_model (GTK_TREE_VIEW (view));
+  GGobiVariableNotebookPrefixFunc p_func =
+    g_object_get_data (G_OBJECT (notebook), "prefix_func");
+  const gchar **prefices = p_func (notebook, d, &sel_prefix, &n_prefices);
 
-  for (i = n_prefices-1; i >= 0; i--) {
-    gtk_list_store_insert(GTK_LIST_STORE(model), &iter, 0);
-    gtk_list_store_set(GTK_LIST_STORE(model), &iter, 
-	VARLIST_NAME, prefices[i], VARLIST_INDEX, -(n_prefices - i), -1);
+  for (i = n_prefices - 1; i >= 0; i--) {
+    gtk_list_store_insert (GTK_LIST_STORE (model), &iter, 0);
+    gtk_list_store_set (GTK_LIST_STORE (model), &iter,
+                        VARLIST_NAME, prefices[i], VARLIST_INDEX,
+                        -(n_prefices - i), -1);
   }
   if (sel_prefix >= 0) {
-    select_tree_view_row(view, sel_prefix);
+    select_tree_view_row (view, sel_prefix);
   }
 }
 
-static void 
-prefixed_variable_notebook_varchange_cb (ggobid *gg, vartabled *vt, gint which,
-  GGobiData *data, void *notebook)
+static void
+prefixed_variable_notebook_varchange_cb (ggobid * gg, vartabled * vt,
+                                         gint which, GGobiData * data,
+                                         void *notebook)
 {
   GGobiData *d;
   gint kd;
 
-  d = (GGobiData *) datad_get_from_notebook (GTK_WIDGET(notebook), gg);
+  d = (GGobiData *) datad_get_from_notebook (GTK_WIDGET (notebook), gg);
   kd = g_slist_index (gg->d, d);
 
-  variable_notebook_page_add_prefices(GTK_WIDGET(notebook), kd);
+  variable_notebook_page_add_prefices (GTK_WIDGET (notebook), kd);
 }
 
-void 
-prefixed_variable_notebook_list_changed_cb(ggobid *gg, GGobiData *d, GtkNotebook *notebook)
+void
+prefixed_variable_notebook_list_changed_cb (ggobid * gg, GGobiData * d,
+                                            GtkNotebook * notebook)
 {
-  prefixed_variable_notebook_varchange_cb(gg, NULL, -1, d, notebook);
+  prefixed_variable_notebook_varchange_cb (gg, NULL, -1, d, notebook);
 }
 
-static void 
-prefixed_variable_notebook_adddata_cb (ggobid *gg, GGobiData *d, void *notebook)
+static void
+prefixed_variable_notebook_adddata_cb (ggobid * gg, GGobiData * d,
+                                       void *notebook)
 {
-  datatyped dtype = (datatyped) g_object_get_data(G_OBJECT(notebook), "datatype");
-  if ((dtype == all_datatypes) ||
-      (dtype == no_edgesets && d->edge.n == 0) ||
-      (dtype == edgesets_only && d->edge.n > 0))
-  {
+  datatyped dtype =
+    (datatyped) g_object_get_data (G_OBJECT (notebook), "datatype");
+  if ((dtype == all_datatypes) || (dtype == no_edgesets && d->edge.n == 0)
+      || (dtype == edgesets_only && d->edge.n > 0)) {
     if (g_slist_length (d->vartable))
-      variable_notebook_page_add_prefices(GTK_WIDGET(notebook),	 
-	gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook))-1);
+      variable_notebook_page_add_prefices (GTK_WIDGET (notebook),
+                                           gtk_notebook_get_n_pages
+                                           (GTK_NOTEBOOK (notebook)) - 1);
   }
 }
 
@@ -695,31 +739,35 @@ prefixed_variable_notebook_current_page_set (displayd *display,
 }
 */
 
-GtkWidget *create_prefixed_variable_notebook(GtkWidget *box, 
-  GtkSelectionMode mode, vartyped vtype, datatyped dtype, GtkSignalFunc func, 
-  gpointer func_data, ggobid *gg, GGobiVariableNotebookPrefixFunc prefix_func)
+GtkWidget *
+create_prefixed_variable_notebook (GtkWidget * box,
+                                   GtkSelectionMode mode, vartyped vtype,
+                                   datatyped dtype, GtkSignalFunc func,
+                                   gpointer func_data, ggobid * gg,
+                                   GGobiVariableNotebookPrefixFunc
+                                   prefix_func)
 {
   gint i;
-  GtkWidget *notebook = create_variable_notebook(box, mode, vtype, dtype, 
-	func, func_data, gg);
-  g_object_set_data(G_OBJECT(notebook), "prefix_func", prefix_func);
-  for (i = 0; i < gtk_notebook_get_n_pages(GTK_NOTEBOOK(notebook)); i++)
-    variable_notebook_page_add_prefices(notebook, i);
+  GtkWidget *notebook = create_variable_notebook (box, mode, vtype, dtype,
+                                                  func, func_data, gg);
+  g_object_set_data (G_OBJECT (notebook), "prefix_func", prefix_func);
+  for (i = 0; i < gtk_notebook_get_n_pages (GTK_NOTEBOOK (notebook)); i++)
+    variable_notebook_page_add_prefices (notebook, i);
 
   g_signal_connect (G_OBJECT (gg),
-    "variable_added", 
-    G_CALLBACK (prefixed_variable_notebook_varchange_cb),
-    GTK_OBJECT (notebook));
+                    "variable_added",
+                    G_CALLBACK (prefixed_variable_notebook_varchange_cb),
+                    GTK_OBJECT (notebook));
   g_signal_connect (G_OBJECT (gg),
-    "variable_list_changed", 
-    G_CALLBACK (prefixed_variable_notebook_list_changed_cb),
-    GTK_OBJECT (notebook));
+                    "variable_list_changed",
+                    G_CALLBACK (prefixed_variable_notebook_list_changed_cb),
+                    GTK_OBJECT (notebook));
   g_signal_connect (G_OBJECT (gg),
-    "datad_added", 
-     G_CALLBACK (prefixed_variable_notebook_adddata_cb),
-     GTK_OBJECT (notebook));
+                    "datad_added",
+                    G_CALLBACK (prefixed_variable_notebook_adddata_cb),
+                    GTK_OBJECT (notebook));
 
-  return(notebook);
+  return (notebook);
 }
 
 /*--------------------------------------------------------------------*/
@@ -729,7 +777,7 @@ GtkWidget *create_prefixed_variable_notebook(GtkWidget *box,
 /*--------------------------------------------------------------------*/
 
 GtkWidget *
-GGobi_addDisplayMenuItem (const gchar *label, ggobid *gg)
+GGobi_addDisplayMenuItem (const gchar * label, ggobid * gg)
 {
   GtkWidget *entry = NULL;
 
@@ -738,8 +786,8 @@ GGobi_addDisplayMenuItem (const gchar *label, ggobid *gg)
 
   if (dpy_menu != NULL) {
     entry = gtk_menu_item_new_with_mnemonic (label);
-    data = GGobi_data_get(0, gg);
-    g_object_set_data(G_OBJECT(entry), "data", (gpointer) data);
+    data = GGobi_data_get (0, gg);
+    g_object_set_data (G_OBJECT (entry), "data", (gpointer) data);
 
     gtk_widget_show (entry);
 
@@ -749,54 +797,58 @@ GGobi_addDisplayMenuItem (const gchar *label, ggobid *gg)
     gtk_menu_shell_append (GTK_MENU_SHELL (dpy_menu), entry);
   }
 
-  return(entry);
+  return (entry);
 }
 
 
 gboolean
-GGobi_addToolsMenuWidget(GtkWidget *entry, ggobid *gg)
+GGobi_addToolsMenuWidget (GtkWidget * entry, ggobid * gg)
 {
   GtkWidget *tools_menu = NULL, *tools_item = NULL;
   GtkUIManager *manager;
 
-  manager = gg->main_menu_manager; /* gtk_item_factory_from_path ("<main>"); */
+  manager = gg->main_menu_manager;  /* gtk_item_factory_from_path ("<main>"); */
   tools_item = gtk_ui_manager_get_widget (manager, "/menubar/Tools");
-  
-  if (tools_item)
-	  tools_menu = gtk_menu_item_get_submenu(GTK_MENU_ITEM(tools_item));
-  
-  if (tools_menu) {
-      gtk_menu_shell_append (GTK_MENU_SHELL (tools_menu), entry);
-  } else
-      return(false);
 
-  return(true);
+  if (tools_item)
+    tools_menu = gtk_menu_item_get_submenu (GTK_MENU_ITEM (tools_item));
+
+  if (tools_menu) {
+    gtk_menu_shell_append (GTK_MENU_SHELL (tools_menu), entry);
+  }
+  else
+    return (false);
+
+  return (true);
 }
 
 void
-GGobi_addToolAction (GtkActionEntry *entry, gpointer *data, ggobid *gg) {
-	GtkActionGroup *actions = gtk_action_group_new(entry->name);
-	gtk_action_group_add_actions(actions, entry, 1, data);
-	gtk_ui_manager_insert_action_group(gg->main_menu_manager, actions, -1);
-	gtk_ui_manager_add_ui(gg->main_menu_manager, gtk_ui_manager_new_merge_id(gg->main_menu_manager),
-		"/menubar/Tools/", entry->name, entry->name, GTK_UI_MANAGER_AUTO, false);
+GGobi_addToolAction (GtkActionEntry * entry, gpointer * data, ggobid * gg)
+{
+  GtkActionGroup *actions = gtk_action_group_new (entry->name);
+  gtk_action_group_add_actions (actions, entry, 1, data);
+  gtk_ui_manager_insert_action_group (gg->main_menu_manager, actions, -1);
+  gtk_ui_manager_add_ui (gg->main_menu_manager,
+                         gtk_ui_manager_new_merge_id (gg->main_menu_manager),
+                         "/menubar/Tools/", entry->name, entry->name,
+                         GTK_UI_MANAGER_AUTO, false);
 }
 
 GtkWidget *
-GGobi_addToolsMenuItem (gchar *lbl, ggobid *gg)
+GGobi_addToolsMenuItem (gchar * lbl, ggobid * gg)
 {
   GtkWidget *entry;
-  if(!lbl) {
-      return(NULL);
+  if (!lbl) {
+    return (NULL);
   }
 
     /*-- purify goes crazy here, and I have no idea why -- dfs --*/
   entry = gtk_menu_item_new_with_mnemonic (lbl);
-  if(GGobi_addToolsMenuWidget(entry, gg) == false) {
-      gtk_widget_destroy(entry);
-  } else
-      gtk_widget_show (entry);
+  if (GGobi_addToolsMenuWidget (entry, gg) == false) {
+    gtk_widget_destroy (entry);
+  }
+  else
+    gtk_widget_show (entry);
 
   return (entry);
 }
-

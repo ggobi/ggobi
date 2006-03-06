@@ -28,15 +28,15 @@
 /*------------------------------------------------------------------------*/
 
 GtkWidget *
-cpanel_scatmat_make (ggobid *gg) {
+cpanel_scatmat_make (ggobid * gg)
+{
   modepaneld *panel;
-  
-  panel = (modepaneld *) g_malloc(sizeof(modepaneld));
-  gg->control_panels = g_list_append(gg->control_panels, (gpointer) panel);
-  panel->name = g_strdup("SCATMAT");
+
+  panel = (modepaneld *) g_malloc (sizeof (modepaneld));
+  gg->control_panels = g_list_append (gg->control_panels, (gpointer) panel);
+  panel->name = g_strdup ("SCATMAT");
   panel->w = gtk_vbox_new (false, VBOX_SPACING);
-  gtk_container_set_border_width (GTK_CONTAINER (panel->w),
-                                  5);
+  gtk_container_set_border_width (GTK_CONTAINER (panel->w), 5);
 
   gtk_widget_show_all (panel->w);
 
@@ -48,23 +48,20 @@ cpanel_scatmat_make (ggobid *gg) {
 /*                       Resetting the main menubar                       */
 /*------------------------------------------------------------------------*/
 
-static const gchar* mode_ui_str =
-"<ui>"
-"	<menubar>"
-"		<menu action='IMode'>"
-"			<menuitem action='DefaultIMode'/>"
-"			<separator/>"
-"			<menuitem action='Scale'/>"
-"			<menuitem action='Brush'/>"
-"			<menuitem action='Identify'/>"
-"		</menu>"
-"	</menubar>"
-"</ui>";
+static const gchar *mode_ui_str =
+  "<ui>"
+  "	<menubar>"
+  "		<menu action='IMode'>"
+  "			<menuitem action='DefaultIMode'/>"
+  "			<separator/>"
+  "			<menuitem action='Scale'/>"
+  "			<menuitem action='Brush'/>"
+  "			<menuitem action='Identify'/>" "		</menu>" "	</menubar>" "</ui>";
 
-const gchar*
-scatmat_mode_ui_get(displayd *display)
+const gchar *
+scatmat_mode_ui_get (displayd * display)
 {
-  return(mode_ui_str);
+  return (mode_ui_str);
 }
 
 
@@ -75,6 +72,6 @@ scatmat_mode_ui_get(displayd *display)
 /*-- there already exists scatmat_cpanel_init --*/
 
 void
-cpanel_scatmat_set (displayd *display, cpaneld *cpanel, ggobid *gg)
+cpanel_scatmat_set (displayd * display, cpaneld * cpanel, ggobid * gg)
 {
 }

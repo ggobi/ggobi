@@ -20,36 +20,38 @@
 #include <stdio.h>
 #include <string.h>
 
-HINSTANCE ggobi_dlopen(const char *name, GGobiPluginDetails *plugin);
-void ggobi_dlerror(char *buf, GGobiPluginDetails *plugin);
+HINSTANCE ggobi_dlopen (const char *name, GGobiPluginDetails * plugin);
+void ggobi_dlerror (char *buf, GGobiPluginDetails * plugin);
 
 #ifdef G_OS_WIN32
 
-int ggobi_dlclose(HINSTANCE handle);
-DLFUNC ggobi_dlsym(HINSTANCE handle, const char *name);
+int ggobi_dlclose (HINSTANCE handle);
+DLFUNC ggobi_dlsym (HINSTANCE handle, const char *name);
 
-static const Dynload winDynload = { 
-                        ggobi_dlopen, 
-                        ggobi_dlclose, 
-                        ggobi_dlsym,  /* warning because we use const char * */
-                        ggobi_dlerror};
+static const Dynload winDynload = {
+  ggobi_dlopen,
+  ggobi_dlclose,
+  ggobi_dlsym,                  /* warning because we use const char * */
+  ggobi_dlerror
+};
 const Dynload *dynload = &winDynload;
 
 #else
 
 #include <dlfcn.h>
-static const Dynload unixDynload = { ggobi_dlopen, 
-				     dlclose, 
-				     dlsym,  /* warning because we use const char * */
-				     ggobi_dlerror};
+static const Dynload unixDynload = { ggobi_dlopen,
+  dlclose,
+  dlsym,                        /* warning because we use const char * */
+  ggobi_dlerror
+};
 const Dynload *dynload = &unixDynload;
 
 #endif
 
 
-#ifndef G_OS_WIN32 
-#include <unistd.h> 
-#include <sys/stat.h> 
+#ifndef G_OS_WIN32
+#include <unistd.h>
+#include <sys/stat.h>
 #ifndef Darwin
 #define DLL_EXTENSION ".so"
 #else
@@ -57,239 +59,257 @@ const Dynload *dynload = &unixDynload;
 #endif
 #else
 
-#include <glib.h> 
-# ifdef __STRICT_ANSI__ 
-# undef   __STRICT_ANSI__ 
+#include <glib.h>
+# ifdef __STRICT_ANSI__
+# undef   __STRICT_ANSI__
 # endif
-# include <io.h> 
+# include <io.h>
 
 #define DLL_EXTENSION ".dll"
 
-#endif 
+#endif
 
-void addPluginDetails(GGobiPluginDetails *info, GtkWidget *list, ggobid *gg, gboolean active);
-void addInputPlugin(GGobiPluginInfo *info, GtkWidget *list, ggobid *gg);
-void addPlugin(GGobiPluginInfo *info, GtkWidget *list, ggobid *gg);
+void addPluginDetails (GGobiPluginDetails * info, GtkWidget * list,
+                       ggobid * gg, gboolean active);
+void addInputPlugin (GGobiPluginInfo * info, GtkWidget * list, ggobid * gg);
+void addPlugin (GGobiPluginInfo * info, GtkWidget * list, ggobid * gg);
 
 gboolean
-canRead(const char * const fileName)
+canRead (const char *const fileName)
 {
   gboolean val = false;
 #ifndef G_OS_WIN32
-/** FIXME: We need to use the Win32 API here to make sure we can read this */ 
+/** FIXME: We need to use the Win32 API here to make sure we can read this */
   struct stat buf;
-  val = (g_stat(fileName, &buf) == 0);
+  val = (g_stat (fileName, &buf) == 0);
 #else
-  gint ft=0;
-  val = (g_access(fileName, ft) == 0);
+  gint ft = 0;
+  val = (g_access (fileName, ft) == 0);
 #endif
 
-  return(val);
+  return (val);
 }
 
 gboolean
-GGobi_checkPlugin(GGobiPluginDetails *plugin)
+GGobi_checkPlugin (GGobiPluginDetails * plugin)
 {
- gboolean (*f)(const GGobiPluginDetails *);
- gboolean ok = true;
- f = (gboolean (*)(const GGobiPluginDetails *plugin)) getPluginSymbol("checkGGobiStructSizes", plugin);
- if(f) {
-   if(!(ok = f(plugin))) 
-     g_printerr("Problems with plugin %s. Incosistent view of ggobi's data structures.\n", plugin->name);
-   else if(sessionOptions->verbose == GGOBI_VERBOSE)
-     g_printerr("plugin %s appears consistent with ggobi structures.\n", plugin->name);   
- } else if(sessionOptions->verbose == GGOBI_VERBOSE)
-     g_printerr("plugin %s has no validation mechanism\n", plugin->name);   
+  gboolean (*f) (const GGobiPluginDetails *);
+  gboolean ok = true;
+  f =
+    (gboolean (*)(const GGobiPluginDetails * plugin))
+    getPluginSymbol ("checkGGobiStructSizes", plugin);
+  if (f) {
+    if (!(ok = f (plugin)))
+      g_printerr
+        ("Problems with plugin %s. Incosistent view of ggobi's data structures.\n",
+         plugin->name);
+    else if (sessionOptions->verbose == GGOBI_VERBOSE)
+      g_printerr ("plugin %s appears consistent with ggobi structures.\n",
+                  plugin->name);
+  }
+  else if (sessionOptions->verbose == GGOBI_VERBOSE)
+    g_printerr ("plugin %s has no validation mechanism\n", plugin->name);
 
- return(ok);
+  return (ok);
 }
 
 gchar *
-installed_file_name(char *name)
+installed_file_name (char *name)
 {
-  return(g_build_filename(sessionOptions->ggobiHome, name, NULL));
+  return (g_build_filename (sessionOptions->ggobiHome, name, NULL));
 }
 
-HINSTANCE 
-load_plugin_library(GGobiPluginDetails *plugin, gboolean recurse)
+HINSTANCE
+load_plugin_library (GGobiPluginDetails * plugin, gboolean recurse)
 {
   HINSTANCE handle;
   char *fileName;
   fileName = plugin->dllName;
 
-  if(!fileName || !fileName[0]) {
-    plugin->loaded = DL_UNLOADED;  
-    return(NULL);
+  if (!fileName || !fileName[0]) {
+    plugin->loaded = DL_UNLOADED;
+    return (NULL);
   }
 
-  if(canRead(fileName) == false)
-    fileName = g_strdup_printf("%s%s", plugin->dllName, DLL_EXTENSION);
+  if (canRead (fileName) == false)
+    fileName = g_strdup_printf ("%s%s", plugin->dllName, DLL_EXTENSION);
 
-  if(canRead(fileName) == false && recurse) {
-   char *tmp = plugin->dllName;  
-   if(fileName != plugin->dllName)
-     g_free(fileName);
+  if (canRead (fileName) == false && recurse) {
+    char *tmp = plugin->dllName;
+    if (fileName != plugin->dllName)
+      g_free (fileName);
 
-   plugin->dllName = installed_file_name(plugin->dllName);
+    plugin->dllName = installed_file_name (plugin->dllName);
 
-   handle = load_plugin_library(plugin, false);
-   if(!handle) {
-     g_free(plugin->dllName);
-     plugin->dllName = tmp;
-   } else {
-     g_free(tmp);
-   }
-   return(handle);
-  }
-
-  if(canRead(fileName) == false) {
-    if(sessionOptions->verbose != GGOBI_SILENT) {
-      fprintf(stderr, "can't locate plugin library %s:\n", plugin->dllName);
-      fflush(stderr);
+    handle = load_plugin_library (plugin, false);
+    if (!handle) {
+      g_free (plugin->dllName);
+      plugin->dllName = tmp;
     }
-    if(fileName != plugin->dllName)
-      g_free(fileName);
-    plugin->loaded = DL_LOADED;
-    return(NULL);
+    else {
+      g_free (tmp);
+    }
+    return (handle);
   }
 
-   handle = dynload->open(fileName, plugin);
-   if(!handle) {
-    if(sessionOptions->verbose != GGOBI_SILENT) {
-     char buf[1000];
-     dynload->getError(buf, plugin);
-     fprintf(stderr, "error on loading plugin library %s (%s): %s\n",
-       plugin->dllName, fileName, buf);
-     fflush(stderr);
+  if (canRead (fileName) == false) {
+    if (sessionOptions->verbose != GGOBI_SILENT) {
+      fprintf (stderr, "can't locate plugin library %s:\n", plugin->dllName);
+      fflush (stderr);
+    }
+    if (fileName != plugin->dllName)
+      g_free (fileName);
+    plugin->loaded = DL_LOADED;
+    return (NULL);
+  }
+
+  handle = dynload->open (fileName, plugin);
+  if (!handle) {
+    if (sessionOptions->verbose != GGOBI_SILENT) {
+      char buf[1000];
+      dynload->getError (buf, plugin);
+      fprintf (stderr, "error on loading plugin library %s (%s): %s\n",
+               plugin->dllName, fileName, buf);
+      fflush (stderr);
     }
     plugin->loaded = DL_FAILED;
-   } else {
+  }
+  else {
     plugin->loaded = DL_LOADED;
-   }
+  }
 
-   if(fileName != plugin->dllName)
-     g_free(fileName);
-   return(handle);
+  if (fileName != plugin->dllName)
+    g_free (fileName);
+  return (handle);
 }
 
 
-DLFUNC 
-getPluginSymbol(const char *name, GGobiPluginDetails *plugin)
+DLFUNC
+getPluginSymbol (const char *name, GGobiPluginDetails * plugin)
 {
   char tmp[100];
   HINSTANCE lib;
 #ifdef HAVE_UNDERSCORE_SYMBOL_PREFIX
-  sprintf(tmp, "_%s", name);
+  sprintf (tmp, "_%s", name);
 #else
-  sprintf(tmp, "%s", name);
+  sprintf (tmp, "%s", name);
 #endif
 
-  if(!plugin)
-     lib = NULL;
-  else if(plugin->library == NULL && plugin->loaded != DL_LOADED) {
-     lib = plugin->library = load_plugin_library(plugin, true);   
-  }  else
-     lib = plugin->library;
+  if (!plugin)
+    lib = NULL;
+  else if (plugin->library == NULL && plugin->loaded != DL_LOADED) {
+    lib = plugin->library = load_plugin_library (plugin, true);
+  }
+  else
+    lib = plugin->library;
 
-  return(dynload->resolve(lib, tmp));
+  return (dynload->resolve (lib, tmp));
 }
 
 
 gboolean
-registerPlugin(ggobid *gg, GGobiPluginInfo *plugin)
+registerPlugin (ggobid * gg, GGobiPluginInfo * plugin)
 {
   gboolean ok = true;
   OnCreate f;
   PluginInstance *inst;
 
-  if(plugin->type != GENERAL_PLUGIN) 
-     return(false);
+  if (plugin->type != GENERAL_PLUGIN)
+    return (false);
 
-    if(!plugin->details->loaded) {
-      loadPluginLibrary(plugin->details, plugin);
-    }
+  if (!plugin->details->loaded) {
+    loadPluginLibrary (plugin->details, plugin);
+  }
 
-    if(plugin->info.g->onCreate) {
-      f = (OnCreate) getPluginSymbol(plugin->info.g->onCreate, plugin->details);
-      if(f) {
-        inst = (PluginInstance *) g_malloc(sizeof(PluginInstance));
-        inst->data = NULL;
-        inst->info = plugin;
-        inst->active = true;
-        ok = f(gg, plugin, inst);
-        if(ok) {
-          GGOBI_addPluginInstance(inst, gg);
-        } else
-          g_free(inst);
-      } else {
-    fprintf(stderr, "can't locate routine %s\n", plugin->info.g->onCreate);fflush(stderr);
-      }
-    } else {
-      inst = (PluginInstance *) g_malloc(sizeof(PluginInstance));
+  if (plugin->info.g->onCreate) {
+    f =
+      (OnCreate) getPluginSymbol (plugin->info.g->onCreate, plugin->details);
+    if (f) {
+      inst = (PluginInstance *) g_malloc (sizeof (PluginInstance));
       inst->data = NULL;
       inst->info = plugin;
-      inst->gg = gg;
       inst->active = true;
-      GGOBI_addPluginInstance(inst, gg);
+      ok = f (gg, plugin, inst);
+      if (ok) {
+        GGOBI_addPluginInstance (inst, gg);
+      }
+      else
+        g_free (inst);
     }
-    return(ok);
+    else {
+      fprintf (stderr, "can't locate routine %s\n", plugin->info.g->onCreate);
+      fflush (stderr);
+    }
+  }
+  else {
+    inst = (PluginInstance *) g_malloc (sizeof (PluginInstance));
+    inst->data = NULL;
+    inst->info = plugin;
+    inst->gg = gg;
+    inst->active = true;
+    GGOBI_addPluginInstance (inst, gg);
+  }
+  return (ok);
 }
 
-gboolean 
-registerPlugins(ggobid *gg, GList *plugins)
+gboolean
+registerPlugins (ggobid * gg, GList * plugins)
 {
   GList *el = plugins;
   gboolean ok = false;
   GGobiPluginInfo *plugin;
 
-  while(el) {
+  while (el) {
     plugin = (GGobiPluginInfo *) el->data;
-    ok = registerPlugin(gg, plugin) || ok;
+    ok = registerPlugin (gg, plugin) || ok;
     el = el->next;
   }
 
-  return(ok);
+  return (ok);
 }
 
 
-gboolean 
-pluginsUpdateDisplayMenu(ggobid *gg, GList *plugins)
+gboolean
+pluginsUpdateDisplayMenu (ggobid * gg, GList * plugins)
 {
   GList *el = plugins;
   OnUpdateDisplayMenu f;
   PluginInstance *plugin;
   gboolean ok = true;
 
-  while(el) {
+  while (el) {
     plugin = (PluginInstance *) el->data;
-    if(plugin->info->type == GENERAL_PLUGIN && plugin->info->info.g->onUpdateDisplay) {
-      f = (OnUpdateDisplayMenu) getPluginSymbol(plugin->info->info.g->onUpdateDisplay,
-                                                plugin->info->details);
-      if(f) {
-        ok = f(gg, plugin);
+    if (plugin->info->type == GENERAL_PLUGIN
+        && plugin->info->info.g->onUpdateDisplay) {
+      f =
+        (OnUpdateDisplayMenu) getPluginSymbol (plugin->info->info.g->
+                                               onUpdateDisplay,
+                                               plugin->info->details);
+      if (f) {
+        ok = f (gg, plugin);
       }
     }
     el = el->next;
   }
 
-  return(ok);
+  return (ok);
 }
 
-int 
-GGOBI_addPluginInstance(PluginInstance *inst, ggobid *gg)
+int
+GGOBI_addPluginInstance (PluginInstance * inst, ggobid * gg)
 {
   inst->gg = gg;
-  gg->pluginInstances = g_list_append(gg->pluginInstances, inst);
-  return(g_list_length(gg->pluginInstances));
+  gg->pluginInstances = g_list_append (gg->pluginInstances, inst);
+  return (g_list_length (gg->pluginInstances));
 }
 
 gboolean
-GGOBI_removePluginInstance(PluginInstance *inst, ggobid *gg)
+GGOBI_removePluginInstance (PluginInstance * inst, ggobid * gg)
 {
   inst->gg = NULL;
-  gg->pluginInstances = g_list_remove(gg->pluginInstances, inst);
+  gg->pluginInstances = g_list_remove (gg->pluginInstances, inst);
   /* should return whether the instance was actually there. */
-  return(true);
+  return (true);
 }
 
 
@@ -297,42 +317,48 @@ GGOBI_removePluginInstance(PluginInstance *inst, ggobid *gg)
 
  */
 
-void addPlugins(GList *plugins, GtkWidget *list, ggobid *gg, GGobiPluginType);
-void addPlugin(GGobiPluginInfo *info, GtkWidget *list, ggobid *gg);
+void addPlugins (GList * plugins, GtkWidget * list, ggobid * gg,
+                 GGobiPluginType);
+void addPlugin (GGobiPluginInfo * info, GtkWidget * list, ggobid * gg);
 
 GtkWidget *
-createPluginList() 
+createPluginList ()
 {
-   /* Number of entries here should be the same as in set_column_width below and 
-      as the number of elements in addPlugin().
+  /* Number of entries here should be the same as in set_column_width below and 
+     as the number of elements in addPlugin().
    */
-  static gchar *titles[] = {"Name", "Description", "Author", "Location", "Loaded", "Active"};
-  static const gint widths[] = {100, 225, 150, 225, 50, 50};
-  
+  static gchar *titles[] =
+    { "Name", "Description", "Author", "Location", "Loaded", "Active" };
+  static const gint widths[] = { 100, 225, 150, 225, 50, 50 };
+
   gint i;
   GtkWidget *list;
   GList *cols, *l;
   //list = gtk_clist_new_with_titles(sizeof(titles)/sizeof(titles[0]), (gchar **) titles);
-  GtkListStore *model = gtk_list_store_new(6, G_TYPE_STRING, G_TYPE_STRING,
-  	G_TYPE_STRING, G_TYPE_STRING, G_TYPE_BOOLEAN, G_TYPE_BOOLEAN);
-  
-  list = gtk_tree_view_new_with_model(GTK_TREE_MODEL(model));
-  populate_tree_view(list, titles, G_N_ELEMENTS(titles), true, GTK_SELECTION_SINGLE, NULL, NULL);
-  cols = gtk_tree_view_get_columns(GTK_TREE_VIEW(list));
-  
+  GtkListStore *model = gtk_list_store_new (6, G_TYPE_STRING, G_TYPE_STRING,
+                                            G_TYPE_STRING, G_TYPE_STRING,
+                                            G_TYPE_BOOLEAN, G_TYPE_BOOLEAN);
+
+  list = gtk_tree_view_new_with_model (GTK_TREE_MODEL (model));
+  populate_tree_view (list, titles, G_N_ELEMENTS (titles), true,
+                      GTK_SELECTION_SINGLE, NULL, NULL);
+  cols = gtk_tree_view_get_columns (GTK_TREE_VIEW (list));
+
   for (i = 0, l = cols; l; l = l->next, i++) {
-	  gtk_tree_view_column_set_sizing(GTK_TREE_VIEW_COLUMN(l->data), GTK_TREE_VIEW_COLUMN_FIXED);
-	  gtk_tree_view_column_set_fixed_width(GTK_TREE_VIEW_COLUMN(l->data), widths[i]);
+    gtk_tree_view_column_set_sizing (GTK_TREE_VIEW_COLUMN (l->data),
+                                     GTK_TREE_VIEW_COLUMN_FIXED);
+    gtk_tree_view_column_set_fixed_width (GTK_TREE_VIEW_COLUMN (l->data),
+                                          widths[i]);
   }
   /*
-  gtk_clist_set_column_width(GTK_CLIST(list), 0, 100); 
-  gtk_clist_set_column_width(GTK_CLIST(list), 1, 225); 
-  gtk_clist_set_column_width(GTK_CLIST(list), 2, 150); 
-  gtk_clist_set_column_width(GTK_CLIST(list), 3, 225); 
-  gtk_clist_set_column_width(GTK_CLIST(list), 4,  50); 
-  gtk_clist_set_column_width(GTK_CLIST(list), 5,  50); 
-*/
-  return(list);
+     gtk_clist_set_column_width(GTK_CLIST(list), 0, 100); 
+     gtk_clist_set_column_width(GTK_CLIST(list), 1, 225); 
+     gtk_clist_set_column_width(GTK_CLIST(list), 2, 150); 
+     gtk_clist_set_column_width(GTK_CLIST(list), 3, 225); 
+     gtk_clist_set_column_width(GTK_CLIST(list), 4,  50); 
+     gtk_clist_set_column_width(GTK_CLIST(list), 5,  50); 
+   */
+  return (list);
 }
 
 /*
@@ -340,39 +366,39 @@ createPluginList()
  info list.
  */
 GtkWidget *
-showPluginInfo(GList *plugins, GList *inputPlugins, ggobid *gg)
+showPluginInfo (GList * plugins, GList * inputPlugins, ggobid * gg)
 {
- GtkWidget *win, *main_vbox, *list, *swin, *lbl = NULL;
+  GtkWidget *win, *main_vbox, *list, *swin, *lbl = NULL;
 
-  win = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-  gtk_window_set_default_size(GTK_WINDOW(win), 850, 200);
-  gtk_window_set_title(GTK_WINDOW(win), "About Plugins");
-  
-  main_vbox = gtk_notebook_new();
+  win = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  gtk_window_set_default_size (GTK_WINDOW (win), 850, 200);
+  gtk_window_set_title (GTK_WINDOW (win), "About Plugins");
 
-  gtk_container_set_border_width(GTK_CONTAINER(main_vbox),0); 
-  gtk_container_add(GTK_CONTAINER(win), main_vbox);
+  main_vbox = gtk_notebook_new ();
 
-  if(plugins) {
-	  swin = gtk_scrolled_window_new(NULL, NULL);
-      list = createPluginList();
-      gtk_container_add(GTK_CONTAINER(swin), list);
-    addPlugins(plugins, list, gg, GENERAL_PLUGIN);
-	lbl = gtk_label_new_with_mnemonic("_General");
-	gtk_notebook_append_page(GTK_NOTEBOOK(main_vbox), swin, lbl);
+  gtk_container_set_border_width (GTK_CONTAINER (main_vbox), 0);
+  gtk_container_add (GTK_CONTAINER (win), main_vbox);
+
+  if (plugins) {
+    swin = gtk_scrolled_window_new (NULL, NULL);
+    list = createPluginList ();
+    gtk_container_add (GTK_CONTAINER (swin), list);
+    addPlugins (plugins, list, gg, GENERAL_PLUGIN);
+    lbl = gtk_label_new_with_mnemonic ("_General");
+    gtk_notebook_append_page (GTK_NOTEBOOK (main_vbox), swin, lbl);
   }
-  if(inputPlugins) {
-	  swin = gtk_scrolled_window_new(NULL, NULL);
-	  list = createPluginList();
-	  gtk_container_add(GTK_CONTAINER(swin), list);
-    addPlugins(inputPlugins, list, gg, INPUT_PLUGIN);
-	lbl = gtk_label_new_with_mnemonic("_Input Readers");
-	gtk_notebook_append_page(GTK_NOTEBOOK(main_vbox), swin, lbl);
+  if (inputPlugins) {
+    swin = gtk_scrolled_window_new (NULL, NULL);
+    list = createPluginList ();
+    gtk_container_add (GTK_CONTAINER (swin), list);
+    addPlugins (inputPlugins, list, gg, INPUT_PLUGIN);
+    lbl = gtk_label_new_with_mnemonic ("_Input Readers");
+    gtk_notebook_append_page (GTK_NOTEBOOK (main_vbox), swin, lbl);
   }
-  
-  gtk_widget_show_all(win);
- 
-  return(win); 
+
+  gtk_widget_show_all (win);
+
+  return (win);
 }
 
 
@@ -382,20 +408,20 @@ showPluginInfo(GList *plugins, GList *inputPlugins, ggobid *gg)
  for the given GGobi instance.
  */
 gboolean
-isPluginActive(GGobiPluginInfo *info, ggobid *gg)
+isPluginActive (GGobiPluginInfo * info, ggobid * gg)
 {
   GList *el;
   PluginInstance *plugin;
 
-  el =  gg->pluginInstances;
-  while(el) { 
+  el = gg->pluginInstances;
+  while (el) {
     plugin = (PluginInstance *) el->data;
-    if(plugin->info == info)
-      return(true);
+    if (plugin->info == info)
+      return (true);
     el = el->next;
   }
 
-  return(false);
+  return (false);
 }
 
 /**
@@ -404,22 +430,23 @@ isPluginActive(GGobiPluginInfo *info, ggobid *gg)
  @see addPlugin()
  */
 void
-addPlugins(GList *plugins, GtkWidget *list, ggobid *gg, GGobiPluginType type)
+addPlugins (GList * plugins, GtkWidget * list, ggobid * gg,
+            GGobiPluginType type)
 {
-  gint n = g_list_length(plugins), i;
+  gint n = g_list_length (plugins), i;
   GGobiPluginInfo *plugin;
 
-  for(i = 0; i < n ; i++) {
-    plugin = (GGobiPluginInfo*) g_list_nth_data(plugins, i);
-    switch(type) {
-      case GENERAL_PLUGIN:
-         addPlugin(plugin, list, gg);
-       break;
-       case INPUT_PLUGIN:
-         addInputPlugin(plugin, list, gg);
-       break;
-       default:
-       break;
+  for (i = 0; i < n; i++) {
+    plugin = (GGobiPluginInfo *) g_list_nth_data (plugins, i);
+    switch (type) {
+    case GENERAL_PLUGIN:
+      addPlugin (plugin, list, gg);
+      break;
+    case INPUT_PLUGIN:
+      addInputPlugin (plugin, list, gg);
+      break;
+    default:
+      break;
     }
   }
 }
@@ -432,36 +459,38 @@ addPlugins(GList *plugins, GtkWidget *list, ggobid *gg, GGobiPluginType type)
   @see addPlugins() 
  */
 void
-addPlugin(GGobiPluginInfo *info, GtkWidget *list, ggobid *gg)
+addPlugin (GGobiPluginInfo * info, GtkWidget * list, ggobid * gg)
 {
-    addPluginDetails(info->details, list, gg, isPluginActive(info, gg));
+  addPluginDetails (info->details, list, gg, isPluginActive (info, gg));
 }
 
 void
-addInputPlugin(GGobiPluginInfo *info, GtkWidget *list, ggobid *gg)
+addInputPlugin (GGobiPluginInfo * info, GtkWidget * list, ggobid * gg)
 {
-    addPluginDetails(info->details, list, gg, true);
+  addPluginDetails (info->details, list, gg, true);
 }
 
 void
-addPluginDetails(GGobiPluginDetails *info, GtkWidget *list, ggobid *gg, gboolean active)
+addPluginDetails (GGobiPluginDetails * info, GtkWidget * list, ggobid * gg,
+                  gboolean active)
 {
-	GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(list));
-	GtkTreeIter iter;
-	gtk_list_store_append(GTK_LIST_STORE(model), &iter);
-	gtk_list_store_set(GTK_LIST_STORE(model), &iter, 0, info->name, 1, info->description, 
-		2, info->author, 3, info->dllName, 4, info->loaded, 5, active, -1);
-	/*
-  gchar **els = (gchar **) g_malloc(6*sizeof(gchar*));
-  els[0] = info->name;
-  els[1] = info->description;
-  els[2] = info->author;
-  els[3] = info->dllName;
-  els[4] = info->loaded ? "yes" : "no";
+  GtkTreeModel *model = gtk_tree_view_get_model (GTK_TREE_VIEW (list));
+  GtkTreeIter iter;
+  gtk_list_store_append (GTK_LIST_STORE (model), &iter);
+  gtk_list_store_set (GTK_LIST_STORE (model), &iter, 0, info->name, 1,
+                      info->description, 2, info->author, 3, info->dllName, 4,
+                      info->loaded, 5, active, -1);
+  /*
+     gchar **els = (gchar **) g_malloc(6*sizeof(gchar*));
+     els[0] = info->name;
+     els[1] = info->description;
+     els[2] = info->author;
+     els[3] = info->dllName;
+     els[4] = info->loaded ? "yes" : "no";
 
-  els[5] = active ? "yes" : "no";
+     els[5] = active ? "yes" : "no";
 
-  gtk_clist_append(GTK_CLIST(list), els);*/
+     gtk_clist_append(GTK_CLIST(list), els); */
 }
 
 /**
@@ -469,26 +498,28 @@ addPluginDetails(GGobiPluginDetails *info, GtkWidget *list, ggobid *gg, gboolean
   This doesn't unload the plugin.
  */
 void
-closePlugins(ggobid *gg)
+closePlugins (ggobid * gg)
 {
   GList *el, *tmp;
   PluginInstance *plugin;
 
   el = gg->pluginInstances;
-  if(!el || g_list_length(el) == 0) {
+  if (!el || g_list_length (el) == 0) {
     return;
   }
 
-  while(el) { 
+  while (el) {
     plugin = (PluginInstance *) el->data;
-    if(plugin->info->info.g->onClose) {
-      DLFUNC f =  getPluginSymbol(plugin->info->info.g->onClose, plugin->info->details);
+    if (plugin->info->info.g->onClose) {
+      DLFUNC f =
+        getPluginSymbol (plugin->info->info.g->onClose,
+                         plugin->info->details);
       if (f)
-        f(gg, plugin->info, plugin);
+        f (gg, plugin->info, plugin);
     }
     tmp = el;
     el = el->next;
-    g_free(plugin);    
+    g_free (plugin);
 /*  g_free(tmp); */
   }
   gg->pluginInstances = NULL;
@@ -500,46 +531,47 @@ closePlugins(ggobid *gg)
  Determine if the plugin handles this mode.
  */
 gboolean
-pluginSupportsInputMode(const gchar *modeName, GGobiPluginInfo *pluginInfo)
+pluginSupportsInputMode (const gchar * modeName, GGobiPluginInfo * pluginInfo)
 {
-   int i;
+  int i;
 
-   if(!modeName)
-     return(false);
+  if (!modeName)
+    return (false);
 
-   for(i = 0; i < pluginInfo->info.i->numModeNames; i++) {
-     if(strcmp(modeName, pluginInfo->info.i->modeNames[i]) == 0)
-       return(true);
-   }
+  for (i = 0; i < pluginInfo->info.i->numModeNames; i++) {
+    if (strcmp (modeName, pluginInfo->info.i->modeNames[i]) == 0)
+      return (true);
+  }
 
-   return(false);
+  return (false);
 }
 
 GGobiPluginInfo *
-runInteractiveInputPlugin(ggobid *gg)
+runInteractiveInputPlugin (ggobid * gg)
 {
-  GGobiPluginInfo* plugin = NULL;
+  GGobiPluginInfo *plugin = NULL;
   GList *l = sessionOptions->info->inputPlugins;
 
-  for(; l; l = l->next) {
-    plugin =  (GGobiPluginInfo*) l->data;
-    if(plugin->info.i->interactive) {
-      if(!sessionOptions->data_type ||
-	 pluginSupportsInputMode(sessionOptions->data_type, plugin))
-      {
+  for (; l; l = l->next) {
+    plugin = (GGobiPluginInfo *) l->data;
+    if (plugin->info.i->interactive) {
+      if (!sessionOptions->data_type ||
+          pluginSupportsInputMode (sessionOptions->data_type, plugin)) {
         InputGetDescription f;
-        if(!loadPluginLibrary(plugin->details, plugin)) {
-  	   g_printerr("Failed to load plugin %s\n", plugin->details->name);
-   	   continue;
-	}
-        f = (InputGetDescription) getPluginSymbol(plugin->info.i->getDescription,
-                                                  plugin->details);
-        if(f) {
+        if (!loadPluginLibrary (plugin->details, plugin)) {
+          g_printerr ("Failed to load plugin %s\n", plugin->details->name);
+          continue;
+        }
+        f =
+          (InputGetDescription) getPluginSymbol (plugin->info.i->
+                                                 getDescription,
+                                                 plugin->details);
+        if (f) {
           InputDescription *desc;
-          desc = f(NULL, sessionOptions->data_type, gg, plugin);
-          if(desc && desc->desc_read_input) {
+          desc = f (NULL, sessionOptions->data_type, gg, plugin);
+          if (desc && desc->desc_read_input) {
             gg->input = desc;
-            desc->desc_read_input(desc, gg, plugin);
+            desc->desc_read_input (desc, gg, plugin);
             break;
           }
         }
@@ -547,7 +579,7 @@ runInteractiveInputPlugin(ggobid *gg)
     }
   }
 
-  return(plugin); 
+  return (plugin);
 }
 
 
@@ -557,96 +589,93 @@ runInteractiveInputPlugin(ggobid *gg)
 #ifdef G_OS_WIN32
 
 HINSTANCE
-ggobi_dlopen(const char *name, GGobiPluginDetails *plugin)
+ggobi_dlopen (const char *name, GGobiPluginDetails * plugin)
 {
-  return(LoadLibrary(name));
+  return (LoadLibrary (name));
 }
 
 void
-ggobi_dlerror(char *buf, GGobiPluginDetails *plugin)
+ggobi_dlerror (char *buf, GGobiPluginDetails * plugin)
 {
   LPVOID lpMsgBuf;
-  FormatMessage( 
-      FORMAT_MESSAGE_ALLOCATE_BUFFER | 
-      FORMAT_MESSAGE_FROM_SYSTEM | 
-      FORMAT_MESSAGE_IGNORE_INSERTS,
-      NULL,
-      GetLastError(),
-      MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-      (LPTSTR) &lpMsgBuf,
-      0,
-      NULL 
-      );
-  strcpy(buf, "Failure in LoadLibrary:  ");
-  strcat(buf, lpMsgBuf);
-  LocalFree(lpMsgBuf);
+  FormatMessage (FORMAT_MESSAGE_ALLOCATE_BUFFER |
+                 FORMAT_MESSAGE_FROM_SYSTEM |
+                 FORMAT_MESSAGE_IGNORE_INSERTS,
+                 NULL,
+                 GetLastError (),
+                 MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT),
+                 (LPTSTR) & lpMsgBuf, 0, NULL);
+  strcpy (buf, "Failure in LoadLibrary:  ");
+  strcat (buf, lpMsgBuf);
+  LocalFree (lpMsgBuf);
 }
 
 int
-ggobi_dlclose(HINSTANCE handle)
+ggobi_dlclose (HINSTANCE handle)
 {
-  FreeLibrary(handle);
-  return(0);
+  FreeLibrary (handle);
+  return (0);
 }
 
 
 DLFUNC
-ggobi_dlsym(HINSTANCE handle, const char *name)
+ggobi_dlsym (HINSTANCE handle, const char *name)
 {
-  return((DLFUNC) GetProcAddress(handle, name));
+  return ((DLFUNC) GetProcAddress (handle, name));
 }
 
 
 #else
 
 HINSTANCE
-ggobi_dlopen(const char *name, GGobiPluginDetails *plugin)
+ggobi_dlopen (const char *name, GGobiPluginDetails * plugin)
 {
-  return(dlopen(name, RTLD_LOCAL | RTLD_NOW ));
+  return (dlopen (name, RTLD_LOCAL | RTLD_NOW));
 }
 
 void
-ggobi_dlerror(char *buf, GGobiPluginDetails *plugin)
+ggobi_dlerror (char *buf, GGobiPluginDetails * plugin)
 {
-  sprintf(buf, dlerror());
+  sprintf (buf, dlerror ());
 }
 
 #endif
 
 void
-checkDLL()
+checkDLL ()
 {
   HINSTANCE handle;
   DLFUNC f;
   char *fileName = "testDLL.dll";
-  fprintf(stderr, "Checking plugins on Windows\n");fflush(stderr);
-  handle = dynload->open(fileName, NULL);
-  if(!handle) {
-    fprintf(stderr, "Cannot load %s\n", fileName);
+  fprintf (stderr, "Checking plugins on Windows\n");
+  fflush (stderr);
+  handle = dynload->open (fileName, NULL);
+  if (!handle) {
+    fprintf (stderr, "Cannot load %s\n", fileName);
     return;
   }
 
-  f = (DLFUNC) dynload->resolve(handle, "testRun");
-  if(!f) {
-    fprintf(stderr, "Cannot find testRun routine\n");
+  f = (DLFUNC) dynload->resolve (handle, "testRun");
+  if (!f) {
+    fprintf (stderr, "Cannot find testRun routine\n");
     return;
   }
 
-  f();
+  f ();
 }
 
-gchar *XMLModeNames[] = {"xml", "url"};
+gchar *XMLModeNames[] = { "xml", "url" };
 GGobiInputPluginInfo XMLInputPluginInfo = {
-	NULL,
-	0,
-	"",
-	"",
-	"read_xml_input_description",
-	false,
-	read_xml,
-	&read_xml_input_description,
-	isXMLFile,
-	xml_data
+  NULL,
+  0,
+  "",
+  "",
+  "read_xml_input_description",
+  false,
+  read_xml,
+  &read_xml_input_description,
+  isXMLFile,
+  xml_data
 };
 
 GGobiPluginDetails XMLDetails = {
@@ -657,18 +686,18 @@ GGobiPluginDetails XMLDetails = {
   "GGobi core"
 };
 
-gchar *CSVModeNames[] = {"csv"};
+gchar *CSVModeNames[] = { "csv" };
 GGobiInputPluginInfo CSVInputPluginInfo = {
-	NULL,
-	0,
-	"",
-	"",
-	"read_csv_input_description",
-	false,
-	read_csv,
-	read_csv_input_description,
-	isCSVFile,
-	csv_data
+  NULL,
+  0,
+  "",
+  "",
+  "read_csv_input_description",
+  false,
+  read_csv,
+  read_csv_input_description,
+  isCSVFile,
+  csv_data
 };
 
 
@@ -681,23 +710,25 @@ GGobiPluginDetails CSVDetails = {
 };
 
 
-GGobiPluginInfo  *
-createGGobiInputPluginInfo(GGobiInputPluginInfo *info, GGobiPluginDetails *details, gchar **modeNames, guint numModes)
+GGobiPluginInfo *
+createGGobiInputPluginInfo (GGobiInputPluginInfo * info,
+                            GGobiPluginDetails * details, gchar ** modeNames,
+                            guint numModes)
 {
-  GGobiPluginInfo  *plugin; 
+  GGobiPluginInfo *plugin;
 #ifdef G_OS_WIN32
   static HINSTANCE ggobiLibrary = NULL;
- 
-  if(!details->dllName && !details->library) {
 
-    if(!ggobiLibrary) {
-      ggobiLibrary = ggobi_dlopen(sessionOptions->cmdArgs[0], details);
+  if (!details->dllName && !details->library) {
 
-      if(!ggobiLibrary) {
-	char buf[1000];
-	g_printerr("Failed to load ggobi as library\n");
-	ggobi_dlerror(buf, plugin);
-	g_printerr(buf);
+    if (!ggobiLibrary) {
+      ggobiLibrary = ggobi_dlopen (sessionOptions->cmdArgs[0], details);
+
+      if (!ggobiLibrary) {
+        char buf[1000];
+        g_printerr ("Failed to load ggobi as library\n");
+        ggobi_dlerror (buf, plugin);
+        g_printerr (buf);
       }
     }
 
@@ -705,22 +736,23 @@ createGGobiInputPluginInfo(GGobiInputPluginInfo *info, GGobiPluginDetails *detai
   }
 #endif
 
-  plugin = (GGobiPluginInfo *) g_malloc(sizeof(GGobiPluginInfo));
-  memset(plugin, '\0', sizeof(GGobiPluginInfo));
+  plugin = (GGobiPluginInfo *) g_malloc (sizeof (GGobiPluginInfo));
+  memset (plugin, '\0', sizeof (GGobiPluginInfo));
 
   plugin->type = INPUT_PLUGIN;
   plugin->info.i = info;
   plugin->details = details;
 
-  if(modeNames) {
-     guint i;
-     plugin->info.i->modeNames = (gchar**) g_malloc(sizeof(gchar*) * numModes);
-     plugin->info.i->numModeNames = numModes;
-     for(i = 0; i < numModes; i++)
-        plugin->info.i->modeNames[i] = g_strdup(modeNames[i]);
+  if (modeNames) {
+    guint i;
+    plugin->info.i->modeNames =
+      (gchar **) g_malloc (sizeof (gchar *) * numModes);
+    plugin->info.i->numModeNames = numModes;
+    for (i = 0; i < numModes; i++)
+      plugin->info.i->modeNames[i] = g_strdup (modeNames[i]);
   }
 
-  return(plugin);
+  return (plugin);
 }
 
 /*
@@ -728,94 +760,105 @@ createGGobiInputPluginInfo(GGobiInputPluginInfo *info, GGobiPluginDetails *detai
   the input plugins for XML, CSV.
 */
 void
-registerDefaultPlugins(GGobiInitInfo *info)
+registerDefaultPlugins (GGobiInitInfo * info)
 {
-  GGobiPluginInfo  *plugin; 
-  
-  plugin = createGGobiInputPluginInfo(&XMLInputPluginInfo, &XMLDetails, XMLModeNames, sizeof(XMLModeNames)/sizeof(XMLModeNames[0]));
-  info->inputPlugins = g_list_append(info->inputPlugins, plugin);
+  GGobiPluginInfo *plugin;
 
-  plugin = createGGobiInputPluginInfo(&CSVInputPluginInfo, &CSVDetails, CSVModeNames, sizeof(CSVModeNames)/sizeof(CSVModeNames[0]));
-  info->inputPlugins = g_list_append(info->inputPlugins, plugin);
+  plugin =
+    createGGobiInputPluginInfo (&XMLInputPluginInfo, &XMLDetails,
+                                XMLModeNames,
+                                sizeof (XMLModeNames) /
+                                sizeof (XMLModeNames[0]));
+  info->inputPlugins = g_list_append (info->inputPlugins, plugin);
+
+  plugin =
+    createGGobiInputPluginInfo (&CSVInputPluginInfo, &CSVDetails,
+                                CSVModeNames,
+                                sizeof (CSVModeNames) /
+                                sizeof (CSVModeNames[0]));
+  info->inputPlugins = g_list_append (info->inputPlugins, plugin);
 
 }
 
-const gchar *DefaultUnknownInputModeName =  "unknown";
+const gchar *DefaultUnknownInputModeName = "unknown";
 
 GList *
-getInputPluginSelections(ggobid *gg)
+getInputPluginSelections (ggobid * gg)
 {
-       GList *els = NULL, *plugins;
-       GGobiPluginInfo *plugin;
-       int i, n, k;
-	   gchar *buf;
+  GList *els = NULL, *plugins;
+  GGobiPluginInfo *plugin;
+  int i, n, k;
+  gchar *buf;
 
-       els = g_list_append(els, g_strdup(DefaultUnknownInputModeName));
-       plugins = sessionOptions->info->inputPlugins;
-       n = g_list_length(plugins);
-       for(i = 0; i < n; i++) {
-		   plugin = g_list_nth_data(plugins, i);
-		   for(k = 0; k < plugin->info.i->numModeNames; k++) {
-			   buf = g_strdup_printf("%s (%s)", plugin->info.i->modeNames[k], plugin->details->name);
-			   els = g_list_append(els, buf);
-		   }
-       }
+  els = g_list_append (els, g_strdup (DefaultUnknownInputModeName));
+  plugins = sessionOptions->info->inputPlugins;
+  n = g_list_length (plugins);
+  for (i = 0; i < n; i++) {
+    plugin = g_list_nth_data (plugins, i);
+    for (k = 0; k < plugin->info.i->numModeNames; k++) {
+      buf =
+        g_strdup_printf ("%s (%s)", plugin->info.i->modeNames[k],
+                         plugin->details->name);
+      els = g_list_append (els, buf);
+    }
+  }
 
-       return(els);
+  return (els);
 }
 
 GGobiPluginInfo *
-getInputPluginByModeNameIndex(gint which, gchar **modeName)
+getInputPluginByModeNameIndex (gint which, gchar ** modeName)
 {
-   gint ctr = 1, numPlugins, i; /* Start at 1 since guess/unknown is 0. */
-   GList *plugins = sessionOptions->info->inputPlugins;
-   GGobiPluginInfo *plugin;
+  gint ctr = 1, numPlugins, i;  /* Start at 1 since guess/unknown is 0. */
+  GList *plugins = sessionOptions->info->inputPlugins;
+  GGobiPluginInfo *plugin;
 
-   if(which == 0) {
-	  *modeName = g_strdup(DefaultUnknownInputModeName);
-      return(NULL);
-   }
+  if (which == 0) {
+    *modeName = g_strdup (DefaultUnknownInputModeName);
+    return (NULL);
+  }
 
-   numPlugins = g_list_length(plugins);
-   for(i = 0; i < numPlugins ; i++) {
-       plugin = g_list_nth_data(plugins, i);
-       if(which >= ctr && which < ctr + plugin->info.i->numModeNames) {
-		  *modeName = g_strdup(plugin->info.i->modeNames[which-ctr]);
-          return(plugin);
-	   }
-       ctr += plugin->info.i->numModeNames;
-   }
-   
-   return(NULL); /* Should never happen */
+  numPlugins = g_list_length (plugins);
+  for (i = 0; i < numPlugins; i++) {
+    plugin = g_list_nth_data (plugins, i);
+    if (which >= ctr && which < ctr + plugin->info.i->numModeNames) {
+      *modeName = g_strdup (plugin->info.i->modeNames[which - ctr]);
+      return (plugin);
+    }
+    ctr += plugin->info.i->numModeNames;
+  }
+
+  return (NULL);                /* Should never happen */
 }
 
 InputDescription *
-callInputPluginGetDescription(const gchar *fileName, const gchar *modeName, GGobiPluginInfo *plugin, ggobid *gg)
+callInputPluginGetDescription (const gchar * fileName, const gchar * modeName,
+                               GGobiPluginInfo * plugin, ggobid * gg)
 {
-        GGobiInputPluginInfo *info;
-        InputGetDescription f;
+  GGobiInputPluginInfo *info;
+  InputGetDescription f;
 
-	if(sessionOptions->verbose == GGOBI_VERBOSE) { 
-	  g_printerr("Checking input plugin %s.\n", plugin->details->name);   
-	}
+  if (sessionOptions->verbose == GGOBI_VERBOSE) {
+    g_printerr ("Checking input plugin %s.\n", plugin->details->name);
+  }
 
-	info = plugin->info.i;
-	if(info->get_description_f)
-    	      f = info->get_description_f;
-	else
-	      f = (InputGetDescription) getPluginSymbol(info->getDescription,
-							plugin->details);
+  info = plugin->info.i;
+  if (info->get_description_f)
+    f = info->get_description_f;
+  else
+    f = (InputGetDescription) getPluginSymbol (info->getDescription,
+                                               plugin->details);
 
-	if (f) {
-            InputDescription *desc;
-            desc = f(fileName, modeName, gg, plugin);
-            if (desc)
-              return (desc);
-	} else if(sessionOptions->verbose == GGOBI_VERBOSE) { 
-		g_printerr("No handler routine for plugin %s.: %s\n", plugin->details->name, info->getDescription);   
-	}
+  if (f) {
+    InputDescription *desc;
+    desc = f (fileName, modeName, gg, plugin);
+    if (desc)
+      return (desc);
+  }
+  else if (sessionOptions->verbose == GGOBI_VERBOSE) {
+    g_printerr ("No handler routine for plugin %s.: %s\n",
+                plugin->details->name, info->getDescription);
+  }
 
-	return(NULL);
+  return (NULL);
 }
-
-

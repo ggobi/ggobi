@@ -48,7 +48,7 @@ static ggobid *CurrentGGobi;
 gint
 psort (const void *arg1, const void *arg2)
 {
-ggobid *gg = CurrentGGobi;
+  ggobid *gg = CurrentGGobi;
 
   gint val = 0;
   gint *x1 = (gint *) arg1;
@@ -63,7 +63,7 @@ ggobid *gg = CurrentGGobi;
 }
 
 void
-next5 (gint *xlast, gint *perm)
+next5 (gint * xlast, gint * perm)
 {
 /*
  * Extend a 5-string by 5 more numbers:
@@ -76,29 +76,28 @@ next5 (gint *xlast, gint *perm)
 */
   gint i, j, last[5];
   gint nperms = 32;
-  static gint cumcnt[5] = {4,11,19,26,31};
+  static gint cumcnt[5] = { 4, 11, 19, 26, 31 };
   static gint perms[32][5] = {
-    {0,2,1,4,3},  {0,3,1,4,2},  {0,3,2,4,1},  {0,4,1,3,2},
-    {0,4,2,3,1},  {1,0,3,2,4},  {1,0,4,2,3},  {1,2,0,4,3},
-    {1,3,0,4,2},  {1,3,2,4,0},  {1,4,0,3,2},  {1,4,2,3,0},
-    {2,0,3,1,4},  {2,0,4,1,3},  {2,1,3,0,4},  {2,1,4,0,3},
-    {2,3,0,4,1},  {2,3,1,4,0},  {2,4,0,3,1},  {2,4,1,3,0},
-    {3,0,2,1,4},  {3,0,4,1,2},  {3,1,2,0,4},  {3,1,4,0,2},
-    {3,2,4,0,1},  {3,4,0,2,1},  {3,4,1,2,0},  {4,0,2,1,3},
-    {4,0,3,1,2},  {4,1,2,0,3},  {4,1,3,0,2},  {4,2,3,0,1}
+    {0, 2, 1, 4, 3}, {0, 3, 1, 4, 2}, {0, 3, 2, 4, 1}, {0, 4, 1, 3, 2},
+    {0, 4, 2, 3, 1}, {1, 0, 3, 2, 4}, {1, 0, 4, 2, 3}, {1, 2, 0, 4, 3},
+    {1, 3, 0, 4, 2}, {1, 3, 2, 4, 0}, {1, 4, 0, 3, 2}, {1, 4, 2, 3, 0},
+    {2, 0, 3, 1, 4}, {2, 0, 4, 1, 3}, {2, 1, 3, 0, 4}, {2, 1, 4, 0, 3},
+    {2, 3, 0, 4, 1}, {2, 3, 1, 4, 0}, {2, 4, 0, 3, 1}, {2, 4, 1, 3, 0},
+    {3, 0, 2, 1, 4}, {3, 0, 4, 1, 2}, {3, 1, 2, 0, 4}, {3, 1, 4, 0, 2},
+    {3, 2, 4, 0, 1}, {3, 4, 0, 2, 1}, {3, 4, 1, 2, 0}, {4, 0, 2, 1, 3},
+    {4, 0, 3, 1, 2}, {4, 1, 2, 0, 3}, {4, 1, 3, 0, 2}, {4, 2, 3, 0, 1}
   };
 
-  for (i=0; i<5; i++)
+  for (i = 0; i < 5; i++)
     last[i] = xlast[i];
 
-  if (last[0]==0 && last[1]==0)
-  {
-  /*
-   * Initialize a new perm by choosing a perm at random
-  */
-    j = myrnd(nperms) - 1;
-    for (i=0; i<5; i++)
-      last[i] = perms[j][i] ;
+  if (last[0] == 0 && last[1] == 0) {
+    /*
+     * Initialize a new perm by choosing a perm at random
+     */
+    j = myrnd (nperms) - 1;
+    for (i = 0; i < 5; i++)
+      last[i] = perms[j][i];
   }
 /*
  *  Randomly choose a permutation perm(1-5) from among those
@@ -106,16 +105,14 @@ next5 (gint *xlast, gint *perm)
  *  transition which reverses the previous direction.
 */
 
-  if (last[3] < last[4])
-  {
+  if (last[3] < last[4]) {
     j = myrnd (cumcnt[last[4]]) - 1;
-    for (i=0; i<5; i++)
+    for (i = 0; i < 5; i++)
       perm[i] = perms[j][i];
   }
-  else
-  {
-    j = myrnd (cumcnt[3-last[4]]) - 1;
-    for (i=0; i<5; i++)
+  else {
+    j = myrnd (cumcnt[3 - last[4]]) - 1;
+    for (i = 0; i < 5; i++)
       perm[i] = 4 - perms[j][i];
   }
   return;
@@ -123,7 +120,7 @@ next5 (gint *xlast, gint *perm)
 
 
 void
-next25 (gint *tt, gint *bigt, gint *smallt)
+next25 (gint * tt, gint * bigt, gint * smallt)
 {
 /*
  *  Calculate the next 25 values of a 2nd-stage shift vector
@@ -131,45 +128,44 @@ next25 (gint *tt, gint *bigt, gint *smallt)
 */
   gint i, j, k;
 
-  if (bigt[0]==0 && bigt[1]==0)
-  {
-  /*
-   * Force initialization
-  */
+  if (bigt[0] == 0 && bigt[1] == 0) {
+    /*
+     * Force initialization
+     */
     bigt[20] = 0;
     bigt[21] = 0;
-    for (i=0; i<25; i++)
+    for (i = 0; i < 25; i++)
       smallt[i] = 0;
   }
 
   /*
    * Get next 25 elements of bigt, 5 at a time
-  */
+   */
   next5 (&bigt[20], bigt);
-  for (j=5; j<21; j=j+5)
-    next5 (&bigt[j-5], &bigt[j]);
+  for (j = 5; j < 21; j = j + 5)
+    next5 (&bigt[j - 5], &bigt[j]);
 
   /*
    * Extend each of the smallt series by 5
-  */
-  for (j=0; j<21; j=j+5)
+   */
+  for (j = 0; j < 21; j = j + 5)
     next5 (&smallt[j], &smallt[j]);
 
   /*
    * Interleave the smallt series according to bigt
-  */
-  for (i=0; i<5; i++)
-    for (j=0; j<5; j++)
-    {
-      k   = 5*i + j;
-      tt[k] = smallt[i + 5*bigt[k]];
+   */
+  for (i = 0; i < 5; i++)
+    for (j = 0; j < 5; j++) {
+      k = 5 * i + j;
+      tt[k] = smallt[i + 5 * bigt[k]];
     }
 
   return;
 }
 
 void
-textur (gfloat *yy, gfloat *shft, gint ny, gint option, gfloat del, gint stages, ggobid *gg)
+textur (gfloat * yy, gfloat * shft, gint ny, gint option, gfloat del,
+        gint stages, ggobid * gg)
 {
 /*
  * Calculate a texturing shft vector based on data yy
@@ -194,7 +190,7 @@ textur (gfloat *yy, gfloat *shft, gint ny, gint option, gfloat del, gint stages,
 /*
  * Force initialization on first calls to next5.
 */
-  for (i=0; i<2; i++)
+  for (i = 0; i < 2; i++)
     tlarge[i] = tsmall[i] = 0;
 
   indx = (gint *) g_malloc (ny * sizeof (gint));
@@ -202,26 +198,25 @@ textur (gfloat *yy, gfloat *shft, gint ny, gint option, gfloat del, gint stages,
  * gy is needed solely for the psort routine:  psort is used by
  * qsort to put an index vector in the order that yy will assume.
 */
-   gg->p1d.gy = (gfloat *) g_malloc (ny * sizeof (gfloat));
+  gg->p1d.gy = (gfloat *) g_malloc (ny * sizeof (gfloat));
   xx = (gfloat *) g_malloc (ny * sizeof (gfloat));
 
-  for (i=0; i<ny; i++)
-  {
+  for (i = 0; i < ny; i++) {
     indx[i] = i;
     gg->p1d.gy[i] = yy[i];
   }
 
-CurrentGGobi = gg;
+  CurrentGGobi = gg;
 
   qsort ((void *) indx, (size_t) ny, sizeof (gint), psort);
   qsort ((void *) yy, (size_t) ny, sizeof (gfloat), fcompare);
-CurrentGGobi = NULL;
+  CurrentGGobi = NULL;
 /*
  * Bug here:  this is screwy if ny < 4.
 */
-  lohnge = yy[ny/4 - 1];
-  hihnge = yy[ny - ny/4 - 1];
-  delta  = del * .03 * (hihnge-lohnge);
+  lohnge = yy[ny / 4 - 1];
+  hihnge = yy[ny - ny / 4 - 1];
+  delta = del * .03 * (hihnge - lohnge);
 
 /*
  *  Do the first two stages of shift, based on 5-strings
@@ -232,23 +227,23 @@ CurrentGGobi = NULL;
  *    nny = MIN(nny, 50);
 */
 
-  for (i=0; i<nny; i++) {
+  for (i = 0; i < nny; i++) {
     ii = (i % 25);
-    if (ii==0)
+    if (ii == 0)
       next25 (tsmall, tlarge, tmp5x5);
 
     if (stages >= 2)
-      shft[i] = (gfloat) (20*tlarge[ii] + 4*tsmall[ii]) + 2;
+      shft[i] = (gfloat) (20 * tlarge[ii] + 4 * tsmall[ii]) + 2;
     else
-      shft[i] = (gfloat) (20*tlarge[ii]) + 2;
+      shft[i] = (gfloat) (20 * tlarge[ii]) + 2;
 
-  /*
-   *  Note: we use the same tlarge 5-string both for gross shift
-   *  and to interleave the 2nd-stage 5-strings.
-  */
+    /*
+     *  Note: we use the same tlarge 5-string both for gross shift
+     *  and to interleave the 2nd-stage 5-strings.
+     */
   }
 
-  if (stages<=1) {
+  if (stages <= 1) {
     g_free ((gpointer) indx);
     g_free ((gpointer) gg->p1d.gy);
     g_free ((gpointer) xx);
@@ -259,8 +254,8 @@ CurrentGGobi = NULL;
  * Optionally, add a tiny bit of uniform jitter on the smallest scale
 */
   if (option == 1) {
-    for (i=0; i<ny; i++) {
-      shft[i] = shft[i] + ((gfloat) randvalue()) * 4 - 2;
+    for (i = 0; i < ny; i++) {
+      shft[i] = shft[i] + ((gfloat) randvalue ()) * 4 - 2;
     }
   }
 
@@ -279,29 +274,27 @@ CurrentGGobi = NULL;
  * Now look at y values, and stretch bunched-up sections out to the edges
 */
   window = 5;
-  mid  = (window+1)/2;
-  h    = mid;
-  while (h-mid+window < ny)
-  {
-     /*for(k = h; k-mid+window < ny; k = k+window)*/ /* bug */
-     for (k = h; k-mid+window < ny && k+window < ny; k = k+window)
-       if (yy[k+window] > yy[h] + 10.*delta)
-          break;
-    if (k-mid+window >= ny)
+  mid = (window + 1) / 2;
+  h = mid;
+  while (h - mid + window < ny) {
+    /*for(k = h; k-mid+window < ny; k = k+window) *//* bug */
+    for (k = h; k - mid + window < ny && k + window < ny; k = k + window)
+      if (yy[k + window] > yy[h] + 10. * delta)
+        break;
+    if (k - mid + window >= ny)
       break;
     hh = h - mid;
     kk = k - h + window;
     slo = 5;
     shi = 0;
-    for (i=hh; i<hh+kk; i++)
-    {
-      if (shft[i]<slo)
+    for (i = hh; i < hh + kk; i++) {
+      if (shft[i] < slo)
         slo = shft[i];
-      if (shft[i]>shi)
+      if (shft[i] > shi)
         shi = shft[i];
     }
     srnge = shi - slo;
-    for (i=hh; i<kk; i++)
+    for (i = hh; i < kk; i++)
       shft[i] = 100 * (shft[i] - slo) / srnge;
     h = k + window;
   }
@@ -311,41 +304,39 @@ CurrentGGobi = NULL;
  * Again looking at y values, pull points back to center thread,
  * or to the 30% and 70% positions, in sparse regions
 */
-  for (i=1; i<ny-1; i++) {
-    if (( yy[i] - yy[i-1] > delta) && (yy[i+1] - yy[i] > delta)) {
+  for (i = 1; i < ny - 1; i++) {
+    if ((yy[i] - yy[i - 1] > delta) && (yy[i + 1] - yy[i] > delta)) {
       shft[i] = 50;
     }
   }
 
-  for (i=1; i<ny-2; i++) {
-    if ((yy[i] - yy[i-1] > delta) &&
-        (yy[i+2] - yy[i+1] > delta) &&
-        (yy[i+1] - yy[i] < delta))
-    {
-      shft[i]   = 30;
-      shft[i+1] = 70;
+  for (i = 1; i < ny - 2; i++) {
+    if ((yy[i] - yy[i - 1] > delta) &&
+        (yy[i + 2] - yy[i + 1] > delta) && (yy[i + 1] - yy[i] < delta)) {
+      shft[i] = 30;
+      shft[i + 1] = 70;
     }
   }
 
 
-  if ( yy[1] - yy[0] > delta )
-    shft[0]  = 50;
-  if ( yy[ny-1] - yy[ny-2] > delta )
-    shft[ny-1] = 50;
+  if (yy[1] - yy[0] > delta)
+    shft[0] = 50;
+  if (yy[ny - 1] - yy[ny - 2] > delta)
+    shft[ny - 1] = 50;
 
   if ((yy[2] - yy[1] > delta) && (yy[1] - yy[0] < delta)) {
     shft[0] = 30;
     shft[1] = 70;
   }
-  if ((yy[ny-1] - yy[ny-2] < delta) && (yy[ny-2] - yy[ny-3] > delta)) {
-    shft[ny-2] = 30;
-    shft[ny-1] = 70;
+  if ((yy[ny - 1] - yy[ny - 2] < delta) && (yy[ny - 2] - yy[ny - 3] > delta)) {
+    shft[ny - 2] = 30;
+    shft[ny - 1] = 70;
   }
 
-  for (i=0; i<ny; i++)
+  for (i = 0; i < ny; i++)
     xx[indx[i]] = shft[i];
 
-  for (i=0; i<ny; i++)
+  for (i = 0; i < ny; i++)
     shft[i] = xx[i];
 
   g_free ((gpointer) indx);
@@ -363,9 +354,9 @@ myrnd (gint n)
 */
   gint nn, myrndval;
   gfloat rrand;
-  nn = MAX(n,1);
+  nn = MAX (n, 1);
 
-  rrand = (gfloat) randvalue();
+  rrand = (gfloat) randvalue ();
   myrndval = MIN (nn, (gint) (rrand * (gfloat) nn) + 1);
   return (myrndval);
 }

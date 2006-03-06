@@ -29,7 +29,8 @@
 #include "externs.h"
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 #ifdef __cplusplus
@@ -37,22 +38,25 @@ extern "C" {
 #endif
 
 gint
-sqdist (gint x1, gint y1, gint x2, gint y2) {
-  return ((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1));
+sqdist (gint x1, gint y1, gint x2, gint y2)
+{
+  return ((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
 }
 
 
 /* returns a random number on [0.0,1.0] */
 gdouble
-randvalue (void) {
-  return g_random_double();
+randvalue (void)
+{
+  return g_random_double ();
 }
 
 /*-- returns two random numbers on [-1,1] --*/
 void
-rnorm2 (gdouble *drand, gdouble *dsave) {
-  *drand = g_random_double_range(-1, 1);
-  *dsave = g_random_double_range(-1, 1);
+rnorm2 (gdouble * drand, gdouble * dsave)
+{
+  *drand = g_random_double_range (-1, 1);
+  *dsave = g_random_double_range (-1, 1);
 }
 
 gint
@@ -87,14 +91,15 @@ pcompare (const void *val1, const void *val2)
 
 /* Not used anywhere yet ... */
 void
-fshuffle (gfloat *x, gint n) {
+fshuffle (gfloat * x, gint n)
+{
 /*
  * Knuth, Seminumerical Algorithms, Vol2; Algorithm P.
 */
   gint i, k;
   gfloat f;
 
-  for (i=0; i<n; i++) {
+  for (i = 0; i < n; i++) {
     k = (gint) (randvalue () * (gdouble) i);
     f = x[i];
     x[i] = x[k];
@@ -102,7 +107,9 @@ fshuffle (gfloat *x, gint n) {
   }
 }
 
-gdouble myrint (gdouble x) {
+gdouble
+myrint (gdouble x)
+{
   gdouble xrint;
   gdouble xmin = floor (x);
   gdouble xmax = ceil (x);
@@ -126,7 +133,8 @@ gdouble myrint (gdouble x) {
 /* ---------------------------------------------------------------------*/
 
 GlyphType
-glyphIDfromName (gchar *glyphName) {
+glyphIDfromName (gchar * glyphName)
+{
   GlyphType id = UNKNOWN_GLYPH;
 
   if (g_strcasecmp (glyphName, "plus") == 0)
@@ -156,12 +164,14 @@ glyphIDfromName (gchar *glyphName) {
 }
 
 gint
-glyphNames (gchar **names) {
+glyphNames (gchar ** names)
+{
   guint i;
-  static const gchar* const gnames[] =
-    {"plus", "x", "openrectangle",  "filledrectangle", "opencircle",
-    "filledcircle", "point"};
-  for (i=0; i < sizeof(gnames)/sizeof(gnames[0]); i++) 
+  static const gchar *const gnames[] =
+    { "plus", "x", "openrectangle", "filledrectangle", "opencircle",
+    "filledcircle", "point"
+  };
+  for (i = 0; i < sizeof (gnames) / sizeof (gnames[0]); i++)
     names[i] = (gchar *) gnames[i];
   return (NGLYPHTYPES);
 }
@@ -171,12 +181,13 @@ glyphNames (gchar **names) {
 /* ---------------------------------------------------------------------*/
 
 GtkTableChild *
-gtk_table_get_child (GtkWidget *w, gint left, gint top) {
+gtk_table_get_child (GtkWidget * w, gint left, gint top)
+{
   GtkTable *table = GTK_TABLE (w);
   GtkTableChild *ch, *child = NULL;
   GList *l;
 
-  for (l=table->children; l; l=l->next) {
+  for (l = table->children; l; l = l->next) {
     ch = (GtkTableChild *) l->data;
     if (ch->left_attach == left && ch->top_attach == top) {
       child = ch;
@@ -187,7 +198,8 @@ gtk_table_get_child (GtkWidget *w, gint left, gint top) {
 }
 
 GList *
-g_list_remove_nth (GList *list, gint indx) {
+g_list_remove_nth (GList * list, gint indx)
+{
   GList *tmp = list;
   gint k = 0;
 
@@ -199,10 +211,10 @@ g_list_remove_nth (GList *list, gint indx) {
         tmp->prev->next = tmp->next;
       if (tmp->next)
         tmp->next->prev = tmp->prev;
-      
+
       if (list == tmp)
         list = list->next;
-      
+
       g_list_free_1 (tmp);
       break;
     }
@@ -212,16 +224,17 @@ g_list_remove_nth (GList *list, gint indx) {
 }
 
 GList *
-g_list_replace_nth (GList *list, gpointer item, gint indx) {
+g_list_replace_nth (GList * list, gpointer item, gint indx)
+{
 
   /*
    * remove the item that's there now
-  */
+   */
   list = g_list_remove_nth (list, indx);
 
   /*
    * insert the replacement
-  */
+   */
   list = g_list_insert (list, item, indx);
 
   return list;
@@ -237,30 +250,32 @@ g_list_replace_nth (GList *list, gpointer item, gint indx) {
 */
 
 gboolean
-widget_initialized (GtkWidget *w) {
-  gboolean initd = GPOINTER_TO_INT (g_object_get_data(G_OBJECT (w),
-    "initialized"));
+widget_initialized (GtkWidget * w)
+{
+  gboolean initd = GPOINTER_TO_INT (g_object_get_data (G_OBJECT (w),
+                                                       "initialized"));
 
   return (initd != (gboolean) NULL && initd == true) ? true : false;
 }
+
 void
-widget_initialize (GtkWidget *w, gboolean initd) {
-  g_object_set_data(G_OBJECT (w),
-    "initialized",
-    GINT_TO_POINTER (initd));
+widget_initialize (GtkWidget * w, gboolean initd)
+{
+  g_object_set_data (G_OBJECT (w), "initialized", GINT_TO_POINTER (initd));
 }
 
 /*--------------------------------------------------------------------*/
 /*--- Find a widget by name, starting from an enclosing container ----*/
 /*--------------------------------------------------------------------*/
 
-static gboolean 
-widget_name_p (GtkWidget *w, gchar *name)
+static gboolean
+widget_name_p (GtkWidget * w, gchar * name)
 {
   if (strcmp (gtk_widget_get_name (w), name) == 0) {
     return true;
   }
-  else return false;
+  else
+    return false;
 }
 
 /*
@@ -268,7 +283,7 @@ widget_name_p (GtkWidget *w, gchar *name)
  * a widget with the name 'name'
 */
 GtkWidget *
-widget_find_by_name (GtkWidget *parent, gchar *name)
+widget_find_by_name (GtkWidget * parent, gchar * name)
 {
   GtkWidget *w, *namedw = NULL;
   GList *children, *l;
@@ -277,10 +292,10 @@ widget_find_by_name (GtkWidget *parent, gchar *name)
     namedw = parent;
 
   else {
-    if (GTK_CONTAINER(parent)) {
-      children = gtk_container_get_children (GTK_CONTAINER(parent));
-      for (l=children; l; l=l->next) {
-        if (GTK_IS_WIDGET(l->data)) {
+    if (GTK_CONTAINER (parent)) {
+      children = gtk_container_get_children (GTK_CONTAINER (parent));
+      for (l = children; l; l = l->next) {
+        if (GTK_IS_WIDGET (l->data)) {
           w = GTK_WIDGET (l->data);
           if (widget_name_p (w, name)) {
             namedw = w;
@@ -306,26 +321,27 @@ widget_find_by_name (GtkWidget *parent, gchar *name)
 /*-----------------------------------------------------------------------*/
 
 void
-print_attachments (ggobid *gg) {
+print_attachments (ggobid * gg)
+{
   GList *l;
   GtkTableChild *child;
 
   g_printerr ("attachments:\n");
-  for (l=(GTK_TABLE (gg->current_display->table))->children; l; l=l->next) {
+  for (l = (GTK_TABLE (gg->current_display->table))->children; l; l = l->next) {
     child = (GtkTableChild *) l->data;
     g_printerr (" %d %d, %d %d\n",
-      child->left_attach, child->right_attach,
-      child->top_attach, child->bottom_attach);
+                child->left_attach, child->right_attach,
+                child->top_attach, child->bottom_attach);
   }
 }
 
 gint
-address_check (GGobiData *d, ggobid *gg) 
+address_check (GGobiData * d, ggobid * gg)
 {
   g_printerr ("::: vars.h :::\n");
   g_printerr ("data_mode %d world %g nedges %d rowlab %s jitfac %f\n",
-    gg->input->mode, (gfloat) d->world.vals[0][0], d->edge.n,
-    g_array_index (d->rowlab, gchar *, 0), d->jitter.factor);
+              gg->input->mode, (gfloat) d->world.vals[0][0], d->edge.n,
+              g_array_index (d->rowlab, gchar *, 0), d->jitter.factor);
 
   return 1;
 }
@@ -335,26 +351,30 @@ address_check (GGobiData *d, ggobid *gg)
 /* ---------------------------------------------------------------------*/
 
 gint
-find_keepers (gint ncols_current, gint nc, gint *cols, gint *keepers)
+find_keepers (gint ncols_current, gint nc, gint * cols, gint * keepers)
 {
   gint nkeepers;
   gint j, k;
 
   j = nkeepers = k = 0;
-  for (j=0; j<ncols_current; j++) {
-    if (k < nc) { 
+  for (j = 0; j < ncols_current; j++) {
+    if (k < nc) {
       if (cols[k] != j) {
         keepers[nkeepers++] = j;
-      } else {
+      }
+      else {
         k++;
       }
-    } else {
+    }
+    else {
       keepers[nkeepers++] = j;
     }
   }
 
   if (nkeepers != ncols_current - nc) {
-    g_printerr ("your logic is wrong! nc = %d, nc_to_delete = %d, but ncols_to_keep = %d\n",ncols_current, nc, nkeepers);
+    g_printerr
+      ("your logic is wrong! nc = %d, nc_to_delete = %d, but ncols_to_keep = %d\n",
+       ncols_current, nc, nkeepers);
     nkeepers = -1;
   }
 
@@ -362,25 +382,25 @@ find_keepers (gint ncols_current, gint nc, gint *cols, gint *keepers)
 }
 
 static gint
-GGobiSleepTimer(gpointer data)
+GGobiSleepTimer (gpointer data)
 {
-   gtk_main_quit(); // Makes the innermost invocation of the main loop return when it regains control.
-   return(0);
+  gtk_main_quit ();             // Makes the innermost invocation of the main loop return when it regains control.
+  return (0);
 }
 
 void
-ggobi_sleep(guint interval)
+ggobi_sleep (guint interval)
 {
-  g_timeout_add(interval*1000, GGobiSleepTimer, NULL);
-  gtk_main();
+  g_timeout_add (interval * 1000, GGobiSleepTimer, NULL);
+  gtk_main ();
 }
 
 gboolean
-in_vector (gint k, gint *vec, gint nels)
+in_vector (gint k, gint * vec, gint nels)
 {
   gint j;
   gboolean in = false;
-  for (j=0; j<nels; j++) {
+  for (j = 0; j < nels; j++) {
     if (k == vec[j]) {
       in = true;
       break;
@@ -388,4 +408,3 @@ in_vector (gint k, gint *vec, gint nels)
   }
   return in;
 }
-

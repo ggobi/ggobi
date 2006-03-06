@@ -21,48 +21,51 @@
 #include "vars.h"
 #include "externs.h"
 
-gfloat mean_largest_dist (gfloat **, gint *, gint, gfloat *, gfloat *, GGobiData *, ggobid *);
-gfloat median_largest_dist (gfloat **, gint *, gint, gfloat *, gfloat *, GGobiData *, ggobid *);
+gfloat mean_largest_dist (gfloat **, gint *, gint, gfloat *, gfloat *,
+                          GGobiData *, ggobid *);
+gfloat median_largest_dist (gfloat **, gint *, gint, gfloat *, gfloat *,
+                            GGobiData *, ggobid *);
 
 /* ------------ Dynamic allocation, freeing section --------- */
 
-void pipeline_init(GGobiData * d, ggobid * gg)
+void
+pipeline_init (GGobiData * d, ggobid * gg)
 {
   gint i;
 
   /*-- a handful of allocations and initializations --*/
-  pipeline_arrays_alloc(d, gg);
+  pipeline_arrays_alloc (d, gg);
   for (i = 0; i < d->nrows; i++) {
     d->sampled.els[i] = true;
     d->excluded.els[i] = false;
   }
   /*-- maybe some points are tagged "hidden" in the data --*/
-  rows_in_plot_set(d, gg);
+  rows_in_plot_set (d, gg);
 
   /*-- some initializations --*/
-  edgeedit_init(gg);
-  brush_init(d, gg);
+  edgeedit_init (gg);
+  brush_init (d, gg);
 
 
   /*-- run the first half of the pipeline --*/
-  arrayf_copy(&d->raw, &d->tform);
+  arrayf_copy (&d->raw, &d->tform);
 
-  limits_set(true, true, d, gg);
+  limits_set (true, true, d, gg);
 
-  vartable_limits_set(d);   /*-- does this do something here?  --*/
-  vartable_stats_set(d);   /*-- does this do something here?  --*/
+  vartable_limits_set (d);  /*-- does this do something here?  --*/
+  vartable_stats_set (d);  /*-- does this do something here?  --*/
 
   /*
    * If there are missings, they've been initialized with a value
    * of 0.  Here, re-set that value to 15% below the minimum for each
    * variable.  (dfs -- done at Di's request, September 2004)
-  */
+   */
 
   if (d->nmissing > 0) {
     gint j;
     vartabled *vt;
     gint vars[1];
-    for (j=0; j<d->ncols; j++) {
+    for (j = 0; j < d->ncols; j++) {
       vt = vartable_element_get (j, d);
       if (vt->nmissing) {
         vars[0] = j;
@@ -70,15 +73,15 @@ void pipeline_init(GGobiData * d, ggobid * gg)
       }
     }
     limits_set (true, true, d, gg);
-    vartable_limits_set(d);
-    vartable_stats_set(d);
+    vartable_limits_set (d);
+    vartable_stats_set (d);
   }
 
-  tform_to_world(d, gg);
+  tform_to_world (d, gg);
 }
 
 void
-pipeline_arrays_free (GGobiData *d, ggobid *gg)
+pipeline_arrays_free (GGobiData * d, ggobid * gg)
 /*
  * Dynamically free arrays used in data pipeline.
 */
@@ -97,14 +100,15 @@ pipeline_arrays_free (GGobiData *d, ggobid *gg)
 }
 
 void
-pipeline_arrays_alloc (GGobiData *d, ggobid *gg)
+pipeline_arrays_alloc (GGobiData * d, ggobid * gg)
 /*
  * Dynamically allocate arrays.
 */
 {
   gint nc = d->ncols, nr = d->nrows;
 
-  if (d->tform.vals != NULL) pipeline_arrays_free (d, gg);
+  if (d->tform.vals != NULL)
+    pipeline_arrays_free (d, gg);
 
   arrayf_alloc (&d->tform, nr, nc);
 
@@ -117,7 +121,7 @@ pipeline_arrays_alloc (GGobiData *d, ggobid *gg)
 }
 
 void
-pipeline_arrays_check_dimensions (GGobiData *d)
+pipeline_arrays_check_dimensions (GGobiData * d)
 {
   gint n;
 
@@ -143,8 +147,8 @@ pipeline_arrays_check_dimensions (GGobiData *d)
   if (d->jitdata.ncols < d->ncols) {
     gint i, j, nc = d->jitdata.ncols;
     arrayg_add_cols (&d->jitdata, d->ncols);
-    for (j=nc; j<d->ncols; j++) {
-      for (i=0; i<d->nrows; i++)
+    for (j = nc; j < d->ncols; j++) {
+      for (i = 0; i < d->nrows; i++)
         d->jitdata.vals[i][j] = 0;
     }
   }
@@ -155,7 +159,7 @@ pipeline_arrays_check_dimensions (GGobiData *d)
     gint i;
     /*-- include any new rows in the sample -- add to rows_in_plot? --*/
     vectorb_realloc (&d->sampled, d->nrows);
-    for (i=n; i<d->nrows; i++)
+    for (i = n; i < d->nrows; i++)
       d->sampled.els[i] = true;
   }
 
@@ -163,7 +167,7 @@ pipeline_arrays_check_dimensions (GGobiData *d)
     gint i;
     /*-- don't excluded new rows --*/
     vectorb_realloc (&d->excluded, d->nrows);
-    for (i=n; i<d->nrows; i++)
+    for (i = n; i < d->nrows; i++)
       d->excluded.els[i] = false;
   }
 
@@ -177,7 +181,7 @@ pipeline_arrays_check_dimensions (GGobiData *d)
 /*-------------------------------------------------------------------------*/
 
 gint
-icompare (gint *x1, gint *x2)
+icompare (gint * x1, gint * x2)
 {
   gint val = 0;
 
@@ -190,8 +194,8 @@ icompare (gint *x1, gint *x2)
 }
 
 gfloat
-median_largest_dist (gfloat **vals, gint *cols, gint ncols,
-  gfloat *min, gfloat *max, GGobiData *d, ggobid *gg)
+median_largest_dist (gfloat ** vals, gint * cols, gint ncols,
+                     gfloat * min, gfloat * max, GGobiData * d, ggobid * gg)
 {
 /*
  * Find the minimum and maximum values of each variable,
@@ -204,27 +208,28 @@ median_largest_dist (gfloat **vals, gint *cols, gint ncols,
 
   np = ncols * d->nrows_in_plot;
   x = (gfloat *) g_malloc (np * sizeof (gfloat));
-  for (n=0; n<ncols; n++) {
+  for (n = 0; n < ncols; n++) {
     j = cols[n];
-    for (i=0; i<d->nrows_in_plot; i++) {
+    for (i = 0; i < d->nrows_in_plot; i++) {
       k = d->rows_in_plot.els[i];
-      x[n*d->nrows_in_plot + i] = vals[k][j];
+      x[n * d->nrows_in_plot + i] = vals[k][j];
     }
   }
 
   qsort ((void *) x, np, sizeof (gfloat), fcompare);
-  dmedian = ((np % 2) != 0) ?  x[(np-1)/2] : (x[np/2-1] + x[np/2])/2. ;
+  dmedian =
+    ((np % 2) != 0) ? x[(np - 1) / 2] : (x[np / 2 - 1] + x[np / 2]) / 2.;
 
   /*
    * Find the maximum of the sum of squared differences
    * from the mean over all rows
-  */
+   */
 
-  for (i=0; i<d->nrows_in_plot; i++) {
+  for (i = 0; i < d->nrows_in_plot; i++) {
     sumdist = 0.0;
-    for (j=0; j<ncols; j++) {
+    for (j = 0; j < ncols; j++) {
       dx = (gdouble) vals[d->rows_in_plot.els[i]][cols[j]] - dmedian;
-      sumdist += (dx*dx);
+      sumdist += (dx * dx);
     }
     if (sumdist > lgdist)
       lgdist = sumdist;
@@ -233,7 +238,7 @@ median_largest_dist (gfloat **vals, gint *cols, gint ncols,
   lgdist = sqrt (lgdist);
 
   g_free ((gchar *) x);
-  
+
   fmedian = (gfloat) dmedian;
   *min = fmedian - lgdist;
   *max = fmedian + lgdist;
@@ -242,8 +247,8 @@ median_largest_dist (gfloat **vals, gint *cols, gint ncols,
 }
 
 gfloat
-mean_largest_dist (gfloat **vals, gint *cols, gint ncols,
-  gfloat *min, gfloat *max, GGobiData *d, ggobid *gg)
+mean_largest_dist (gfloat ** vals, gint * cols, gint ncols,
+                   gfloat * min, gfloat * max, GGobiData * d, ggobid * gg)
 {
 /*
  * Find the minimum and maximum values of each variable,
@@ -254,10 +259,10 @@ mean_largest_dist (gfloat **vals, gint *cols, gint ncols,
 
   /*
    * Find the overall mean for the columns
-  */
+   */
   sumxi = 0.0;
-  for (j=0; j<ncols; j++) {
-    for (i=0; i<d->nrows_in_plot; i++) {
+  for (j = 0; j < ncols; j++) {
+    for (i = 0; i < d->nrows_in_plot; i++) {
       dx = (gdouble) vals[d->rows_in_plot.els[i]][cols[j]];
       sumxi += dx;
     }
@@ -267,20 +272,20 @@ mean_largest_dist (gfloat **vals, gint *cols, gint ncols,
   /*
    * Find the maximum of the sum of squared differences
    * from the mean over all rows
-  */
+   */
 
-  for (i=0; i<d->nrows_in_plot; i++) {
+  for (i = 0; i < d->nrows_in_plot; i++) {
     sumdist = 0.0;
-    for (j=0; j<ncols; j++) {
+    for (j = 0; j < ncols; j++) {
       dx = (gdouble) vals[d->rows_in_plot.els[i]][cols[j]] - mean;
-      sumdist += (dx*dx);
+      sumdist += (dx * dx);
     }
     if (sumdist > lgdist)
       lgdist = sumdist;
   }
 
   lgdist = sqrt (lgdist);
-  
+
   *min = mean - lgdist;
   *max = mean + lgdist;
 
@@ -288,7 +293,7 @@ mean_largest_dist (gfloat **vals, gint *cols, gint ncols,
 }
 
 void
-tform_to_world_by_var (gint j, GGobiData *d, ggobid *gg)
+tform_to_world_by_var (gint j, GGobiData * d, ggobid * gg)
 {
   gint i, m;
   greal max, min, range, ftmp;
@@ -306,9 +311,9 @@ tform_to_world_by_var (gint j, GGobiData *d, ggobid *gg)
   min = (greal) vt->lim.min;
   range = max - min;
 
-  for (i=0; i<d->nrows_in_plot; i++) {
+  for (i = 0; i < d->nrows_in_plot; i++) {
     m = d->rows_in_plot.els[i];
-    ftmp = -1.0 + 2.0*((greal)d->tform.vals[m][j] - min) / range;
+    ftmp = -1.0 + 2.0 * ((greal) d->tform.vals[m][j] - min) / range;
     d->world.vals[m][j] = (greal) (precis * ftmp);
 
     /* Add in the jitter values */
@@ -317,14 +322,14 @@ tform_to_world_by_var (gint j, GGobiData *d, ggobid *gg)
 }
 
 void
-tform_to_world (GGobiData *d, ggobid *gg)
+tform_to_world (GGobiData * d, ggobid * gg)
 {
 /*
  * Take tform.vals[][], one column at a time, and generate world[]
 */
   gint j;
 
-  for (j=0; j<d->ncols; j++)
+  for (j = 0; j < d->ncols; j++)
     tform_to_world_by_var (j, d, gg);
 }
 
@@ -342,23 +347,22 @@ tform_to_world (GGobiData *d, ggobid *gg)
 */
 
 void
-rows_in_plot_set (GGobiData *d, ggobid *gg) {
+rows_in_plot_set (GGobiData * d, ggobid * gg)
+{
   gint i;
   GGobiDataClass *klass;
   gint nprev = d->nrows_in_plot;
 
   d->nrows_in_plot = 0;
 
-  for (i=0; i<d->nrows; i++)
+  for (i = 0; i < d->nrows; i++)
     if (d->sampled.els[i] && !d->excluded.els[i])
       d->rows_in_plot.els[d->nrows_in_plot++] = i;
 
-  klass = GGOBI_DATA_GET_CLASS(d);
-  g_signal_emit_by_name (G_OBJECT(d),
-    "rows-in-plot-changed", 0,
-    nprev, -1, gg);  /* the argument shown with -1 has no current use */
+  klass = GGOBI_DATA_GET_CLASS (d);
+  g_signal_emit_by_name (G_OBJECT (d), "rows-in-plot-changed", 0, nprev, -1, gg); /* the argument shown with -1 has no current use */
 
-  return; /* (nprev == d->nrows_in_plot); */
+  return;                       /* (nprev == d->nrows_in_plot); */
 }
 
 /*-------------------------------------------------------------------------*/

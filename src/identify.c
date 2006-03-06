@@ -20,7 +20,8 @@
 #include "externs.h"
 
 gint
-find_nearest_point (icoords *lcursor_pos, splotd *splot, GGobiData *d, ggobid *gg)
+find_nearest_point (icoords * lcursor_pos, splotd * splot, GGobiData * d,
+                    ggobid * gg)
 {
 /*
  * Returns index of nearest un-hidden point
@@ -30,13 +31,13 @@ find_nearest_point (icoords *lcursor_pos, splotd *splot, GGobiData *d, ggobid *g
   g_assert (d->hidden.nels == d->nrows);
 
   npoint = -1;
-  near = 20*20;  /* If nothing is close, don't show any label */
+  near = 20 * 20;               /* If nothing is close, don't show any label */
 
-  for (i=0; i<d->nrows_in_plot; i++) {
-    if (!d->hidden_now.els[ k = d->rows_in_plot.els[i] ]) {
+  for (i = 0; i < d->nrows_in_plot; i++) {
+    if (!d->hidden_now.els[k = d->rows_in_plot.els[i]]) {
       xdist = splot->screen[k].x - lcursor_pos->x;
       ydist = splot->screen[k].y - lcursor_pos->y;
-      sqdist = xdist*xdist + ydist*ydist;
+      sqdist = xdist * xdist + ydist * ydist;
       if (sqdist < near) {
         near = sqdist;
         npoint = k;
@@ -48,14 +49,15 @@ find_nearest_point (icoords *lcursor_pos, splotd *splot, GGobiData *d, ggobid *g
 
 /*-- still having trouble getting identify turned off properly --*/
 RedrawStyle
-identify_activate (gint state, displayd *display, ggobid *gg)
+identify_activate (gint state, displayd * display, ggobid * gg)
 {
   RedrawStyle redraw_style = NONE;
   GGobiData *d = display->d;
 
 /* At the moment, do the same thing whether identify is turning on or off */
   if (state == on || state == off) {
-    if (d->nearest_point != -1) redraw_style = QUICK;
+    if (d->nearest_point != -1)
+      redraw_style = QUICK;
     d->nearest_point = -1;
   }
 
@@ -63,7 +65,7 @@ identify_activate (gint state, displayd *display, ggobid *gg)
 }
 
 void
-sticky_id_toggle (GGobiData *d, ggobid *gg)
+sticky_id_toggle (GGobiData * d, ggobid * gg)
 {
   gint i = 0;
   gboolean i_in_list = false;
@@ -86,20 +88,21 @@ sticky_id_toggle (GGobiData *d, ggobid *gg)
     if (i_in_list) {
       d->sticky_ids = g_slist_remove (d->sticky_ids, ptr);
       sticky_id_link_by_id (STICKY_REMOVE, d->nearest_point, d, gg);
-       /* This will become an event on the datad when we move to
-          Gtk objects (soon now!) */
-      g_signal_emit(G_OBJECT(gg),
-        GGobiSignals[STICKY_POINT_REMOVED_SIGNAL], 0, d->nearest_point,
-        (gint) UNSTICKY, d);
-    } else {
+      /* This will become an event on the datad when we move to
+         Gtk objects (soon now!) */
+      g_signal_emit (G_OBJECT (gg),
+                     GGobiSignals[STICKY_POINT_REMOVED_SIGNAL], 0,
+                     d->nearest_point, (gint) UNSTICKY, d);
+    }
+    else {
       ptr = GINT_TO_POINTER (d->nearest_point);
       d->sticky_ids = g_slist_append (d->sticky_ids, ptr);
       sticky_id_link_by_id (STICKY_ADD, d->nearest_point, d, gg);
-       /* This will become an event on the datad when we move to
-          Gtk objects (soon now!) */
-      g_signal_emit(G_OBJECT(gg),
-        GGobiSignals[STICKY_POINT_ADDED_SIGNAL], 0, d->nearest_point,
-        (gint) STICKY, d);
+      /* This will become an event on the datad when we move to
+         Gtk objects (soon now!) */
+      g_signal_emit (G_OBJECT (gg),
+                     GGobiSignals[STICKY_POINT_ADDED_SIGNAL], 0,
+                     d->nearest_point, (gint) STICKY, d);
     }
   }
 }
@@ -109,7 +112,7 @@ sticky_id_toggle (GGobiData *d, ggobid *gg)
 /*----------------------------------------------------------------------*/
 
 void
-identify_link_by_id (gint k, GGobiData *source_d, ggobid *gg)
+identify_link_by_id (gint k, GGobiData * source_d, ggobid * gg)
 {
   GGobiData *d;
   GSList *l;
@@ -127,9 +130,9 @@ identify_link_by_id (gint k, GGobiData *source_d, ggobid *gg)
   }
 
   if (source_d->rowIds) {
-           /* if there is no */
-    if(!source_d->rowIds[k]) {
-       return;
+    /* if there is no */
+    if (!source_d->rowIds[k]) {
+      return;
     }
     for (l = gg->d; l; l = l->next) {
       gpointer ptr;
@@ -139,11 +142,11 @@ identify_link_by_id (gint k, GGobiData *source_d, ggobid *gg)
       if (d == source_d || d->idTable == NULL)
         continue;        /*-- skip the originating datad --*/
 
-      ptr = g_hash_table_lookup(d->idTable, source_d->rowIds[k]);
-      if(ptr) {
+      ptr = g_hash_table_lookup (d->idTable, source_d->rowIds[k]);
+      if (ptr) {
         inrange = true;
         d->nearest_point_prev = d->nearest_point;
-        d->nearest_point = * ((guint *)ptr);
+        d->nearest_point = *((guint *) ptr);
       }
 
       if (!inrange) {
@@ -156,7 +159,8 @@ identify_link_by_id (gint k, GGobiData *source_d, ggobid *gg)
 }
 
 void
-sticky_id_link_by_id (gint whattodo, gint k, GGobiData *source_d, ggobid *gg)
+sticky_id_link_by_id (gint whattodo, gint k, GGobiData * source_d,
+                      ggobid * gg)
 {
   GGobiData *d;
   GSList *l;
@@ -168,13 +172,13 @@ sticky_id_link_by_id (gint whattodo, gint k, GGobiData *source_d, ggobid *gg)
 
   /*-- k is the row number in source_d --*/
 
-  if(source_d->rowIds && source_d->rowIds[k]) {
-      ptr = g_hash_table_lookup(source_d->idTable, source_d->rowIds[k]);
-      if(ptr) 
-         id = *(guint *) ptr;
+  if (source_d->rowIds && source_d->rowIds[k]) {
+    ptr = g_hash_table_lookup (source_d->idTable, source_d->rowIds[k]);
+    if (ptr)
+      id = *(guint *) ptr;
   }
 
-  if (id < 0)  /*-- this would indicate a bug --*/
+  if (id < 0)          /*-- this would indicate a bug --*/
     return;
 
   for (l = gg->d; l; l = l->next) {
@@ -185,13 +189,13 @@ sticky_id_link_by_id (gint whattodo, gint k, GGobiData *source_d, ggobid *gg)
     i = -1;
 
     /*-- if this id exists is in the range of d's ids ... --*/
-    if(d->idTable) {
-      gpointer ptr = g_hash_table_lookup(d->idTable, source_d->rowIds[k]);
-      if(ptr) 
-         i = *(guint *) ptr;        
+    if (d->idTable) {
+      gpointer ptr = g_hash_table_lookup (d->idTable, source_d->rowIds[k]);
+      if (ptr)
+        i = *(guint *) ptr;
     }
 
-    if (i < 0)  /*-- then no cases in d have this id --*/
+    if (i < 0)          /*-- then no cases in d have this id --*/
       continue;
 
     if (g_slist_length (d->sticky_ids) > 0) {
@@ -207,7 +211,8 @@ sticky_id_link_by_id (gint whattodo, gint k, GGobiData *source_d, ggobid *gg)
 
     if (i_in_list && whattodo == STICKY_REMOVE) {
       d->sticky_ids = g_slist_remove (d->sticky_ids, ptr);
-    } else if (!i_in_list && whattodo == STICKY_ADD) {
+    }
+    else if (!i_in_list && whattodo == STICKY_ADD) {
       ptr = GINT_TO_POINTER (i);
       d->sticky_ids = g_slist_append (d->sticky_ids, ptr);
     }
@@ -219,7 +224,7 @@ sticky_id_link_by_id (gint whattodo, gint k, GGobiData *source_d, ggobid *gg)
 /*----------------------------------------------------------------------*/
 
 gchar *
-identify_label_fetch (gint k, cpaneld *cpanel, GGobiData *d, ggobid *gg)
+identify_label_fetch (gint k, cpaneld * cpanel, GGobiData * d, ggobid * gg)
 {
   gchar *lbl = NULL;
   GList *labels = NULL, *l;
@@ -231,44 +236,50 @@ identify_label_fetch (gint k, cpaneld *cpanel, GGobiData *d, ggobid *gg)
 */
   /*-- if categorical, use level name ... --*/
   if (id_display_type & ID_VAR_LABELS) {
-    GtkWidget *pnl = mode_panel_get_by_name(GGOBI(getIModeName)(IDENT), gg);
+    GtkWidget *pnl =
+      mode_panel_get_by_name (GGOBI (getIModeName) (IDENT), gg);
     vartabled *vt;
     GtkWidget *tree_view;
     GGobiData *tree_view_d;
 
     tree_view = get_tree_view_from_object (G_OBJECT (pnl));
-    tree_view_d = (GGobiData *) g_object_get_data(G_OBJECT(tree_view), "datad");
+    tree_view_d =
+      (GGobiData *) g_object_get_data (G_OBJECT (tree_view), "datad");
 
     if (tree_view_d != d) {
       id_display_type = ID_RECORD_LABEL;
       /*-- this will be caught below --*/
-    } else {
-      gint *vars; // = (gint *) g_malloc (d->ncols * sizeof(gint));
+    }
+    else {
+      gint *vars;               // = (gint *) g_malloc (d->ncols * sizeof(gint));
       gint nvars;
       gint j, lval;
 
       vars = get_selections_from_tree_view (tree_view, &nvars);
-      
-      for (j=0; j<nvars; j++) {
-	if (vars[j] < 0) continue;
+
+      for (j = 0; j < nvars; j++) {
+        if (vars[j] < 0)
+          continue;
         vt = vartable_element_get (vars[j], d);
-        if (vt == NULL) continue;
+        if (vt == NULL)
+          continue;
 
         /*  missing value  */
         if (d->nmissing && d->missing.vals[k][vars[j]]) {
-            lbl = g_strdup_printf ("%s=NA", vt->collab_tform);
-        } else {   /* not missing */
+          lbl = g_strdup_printf ("%s=NA", vt->collab_tform);
+        }
+        else {                  /* not missing */
 
           if (vt->vartype == categorical) {
             /*
              * since the level values can be any arbitrary integers,
              * it's necessary to dig out the level name using the list
              * of level values.
-            */
+             */
             gint n, ktmp;
             gint kval = (gint) d->tform.vals[k][vars[j]];
             lval = -1;
-            for (n=0; n<vt->nlevels; n++) {
+            for (n = 0; n < vt->nlevels; n++) {
               ktmp = vt->level_values[n];
               if (ktmp == kval) {
                 lval = n;
@@ -278,17 +289,17 @@ identify_label_fetch (gint k, cpaneld *cpanel, GGobiData *d, ggobid *gg)
           }
           if (lval == -1) {
             g_printerr ("The levels for %s aren't specified correctly\n",
-              vt->collab);
+                        vt->collab);
             return NULL;
           }
-  
+
           lbl = (vt->vartype == categorical) ?
-		g_strdup_printf ("%s=%s",
-		  vt->collab_tform, vt->level_names[lval]) :
-		g_strdup_printf ("%s=%g",
-		  vt->collab_tform, d->tform.vals[k][vars[j]]);
+            g_strdup_printf ("%s=%s",
+                             vt->collab_tform, vt->level_names[lval]) :
+            g_strdup_printf ("%s=%g",
+                             vt->collab_tform, d->tform.vals[k][vars[j]]);
         }
-	labels = g_list_append(labels, lbl);
+        labels = g_list_append (labels, lbl);
       }
       g_free (vars);
     }
@@ -298,38 +309,42 @@ identify_label_fetch (gint k, cpaneld *cpanel, GGobiData *d, ggobid *gg)
   if (id_display_type & ID_RECORD_LABEL) {
     lbl = (gchar *) g_array_index (d->rowlab, gchar *, k);
     if (id_display_type & ~ID_RECORD_LABEL)
-      lbl = g_strdup_printf("label = %s", lbl);
-    else lbl = g_strdup(lbl);
-    labels = g_list_append(labels, lbl);
+      lbl = g_strdup_printf ("label = %s", lbl);
+    else
+      lbl = g_strdup (lbl);
+    labels = g_list_append (labels, lbl);
   }
 
   if (id_display_type & ID_RECORD_NO) {
     if (id_display_type & ~ID_RECORD_NO)
-	lbl = g_strdup_printf("num = %d", k);
-    else lbl = g_strdup_printf ("%d", k);
-	labels = g_list_append(labels, lbl);
-  } 
-  
+      lbl = g_strdup_printf ("num = %d", k);
+    else
+      lbl = g_strdup_printf ("%d", k);
+    labels = g_list_append (labels, lbl);
+  }
+
   if (id_display_type & ID_RECORD_ID) {
     if (d->rowIds && d->rowIds[k]) {
       if (id_display_type & ~ID_RECORD_ID)
-	 lbl = g_strdup_printf("id = %s", d->rowIds[k]);
-      else lbl = g_strdup_printf ("%s", d->rowIds[k]);
-    } else {
+        lbl = g_strdup_printf ("id = %s", d->rowIds[k]);
+      else
+        lbl = g_strdup_printf ("%s", d->rowIds[k]);
+    }
+    else {
       lbl = g_strdup ("");
     }
-    labels = g_list_append(labels, lbl);
+    labels = g_list_append (labels, lbl);
   }
 
   if (lbl) {
-    lbl = (gchar *)g_list_first(labels)->data;
+    lbl = (gchar *) g_list_first (labels)->data;
     for (l = labels->next; l; l = l->next) {
-      gchar *tmp_lbl = g_strdup_printf("%s, %s", lbl, l->data);
-      g_free(l->data);
-      g_free(lbl);
+      gchar *tmp_lbl = g_strdup_printf ("%s, %s", lbl, l->data);
+      g_free (l->data);
+      g_free (lbl);
       lbl = tmp_lbl;
     }
   }
-  
+
   return lbl;
 }

@@ -20,10 +20,11 @@
 #include "externs.h"
 
 void
-scatterplot_cpanel_init (cpaneld *cpanel, ProjectionMode pmode, InteractionMode imode, ggobid *gg)
+scatterplot_cpanel_init (cpaneld * cpanel, ProjectionMode pmode,
+                         InteractionMode imode, ggobid * gg)
 {
-  cpanel->pmode = pmode; /* XYPlot */
-  cpanel->imode = imode; /* DEFAULT */
+  cpanel->pmode = pmode;        /* XYPlot */
+  cpanel->imode = imode;        /* DEFAULT */
 
   /*-- 1d plots --*/
   cpanel->p1d.type = ASH;
@@ -41,7 +42,8 @@ scatterplot_cpanel_init (cpaneld *cpanel, ProjectionMode pmode, InteractionMode 
 }
 
 void
-scatmat_cpanel_init (cpaneld* cpanel, ggobid *gg) {
+scatmat_cpanel_init (cpaneld * cpanel, ggobid * gg)
+{
   cpanel->pmode = EXTENDED_DISPLAY_PMODE;
   cpanel->imode = DEFAULT_IMODE;
 
@@ -55,7 +57,7 @@ scatmat_cpanel_init (cpaneld* cpanel, ggobid *gg) {
 }
 
 void
-parcoords_cpanel_init (cpaneld* cpanel, ggobid *gg) 
+parcoords_cpanel_init (cpaneld * cpanel, ggobid * gg)
 {
   cpanel->pmode = EXTENDED_DISPLAY_PMODE;
   cpanel->imode = DEFAULT_IMODE;
@@ -73,16 +75,18 @@ parcoords_cpanel_init (cpaneld* cpanel, ggobid *gg)
 
 
 void
-cpanel_set (displayd *display, ggobid *gg)
+cpanel_set (displayd * display, ggobid * gg)
 {
   cpaneld *cpanel = &display->cpanel;
   gboolean displaytype_known = true;
 
-  if(GGOBI_IS_EXTENDED_DISPLAY(display)) {
-   displaytype_known = GGOBI_EXTENDED_DISPLAY_GET_CLASS(display)->cpanel_set(display, cpanel, gg);
+  if (GGOBI_IS_EXTENDED_DISPLAY (display)) {
+    displaytype_known =
+      GGOBI_EXTENDED_DISPLAY_GET_CLASS (display)->cpanel_set (display, cpanel,
+                                                              gg);
   }
 
-  if (displaytype_known) { 
+  if (displaytype_known) {
     viewmode_set (cpanel->pmode, cpanel->imode, gg);
   }
 }

@@ -52,14 +52,15 @@ splot_pan (splotd *sp, gint xstep, gint ystep, ggobid *gg)
 
 /*-- Set the current scale:  xsc, ysc are on (SCALE_MIN, ...) */
 void
-splot_zoom (splotd *sp, gfloat xsc, gfloat ysc, ggobid *gg) {
+splot_zoom (splotd * sp, gfloat xsc, gfloat ysc, ggobid * gg)
+{
   displayd *display = gg->current_display;
-  /*gint projection = projection_get (gg);*/
+  /*gint projection = projection_get (gg); */
   icoords mid;
   /*  gfloat *scale_x = (projection == TOUR2D) ? &sp->tour_scale.x : &sp->scale.x;
-      gfloat *scale_y = (projection == TOUR2D) ? &sp->tour_scale.y : &sp->scale.y;*/
-  gfloat *scale_x =  &sp->scale.x;
-  gfloat *scale_y =  &sp->scale.y;
+     gfloat *scale_y = (projection == TOUR2D) ? &sp->tour_scale.y : &sp->scale.y; */
+  gfloat *scale_x = &sp->scale.x;
+  gfloat *scale_y = &sp->scale.y;
   gfloat scalefac_x = xsc / *scale_x;
   gfloat scalefac_y = ysc / *scale_y;
 

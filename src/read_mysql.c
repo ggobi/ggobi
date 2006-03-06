@@ -26,7 +26,7 @@ static int initialized = 0;
 MySQLLoginInfo DefaultMySQLInfo = {
   NULL,
   NULL,
-  NULL, /* If present in the default file, will be filled in, even if no value is specified.*/
+  NULL,                         /* If present in the default file, will be filled in, even if no value is specified. */
   NULL,
   0,
   NULL,
@@ -38,13 +38,13 @@ MySQLLoginInfo DefaultMySQLInfo = {
 };
 
 
-MySQLLoginInfo *initMySQLLoginInfo(MySQLLoginInfo *login);
+MySQLLoginInfo *initMySQLLoginInfo (MySQLLoginInfo * login);
 
-void GGOBI(cancelMySQLGUI)(GtkButton *button, MySQLGUIInput *guiInput);
-void GGOBI(getMySQLGUIInfo)(GtkButton *button, MySQLGUIInput *guiInput);
-void GGOBI(getMySQLGUIHelp)(GtkButton *button, MySQLGUIInput *guiInput);
+void GGOBI (cancelMySQLGUI) (GtkButton * button, MySQLGUIInput * guiInput);
+void GGOBI (getMySQLGUIInfo) (GtkButton * button, MySQLGUIInput * guiInput);
+void GGOBI (getMySQLGUIHelp) (GtkButton * button, MySQLGUIInput * guiInput);
 
-char *getMySQLLoginElement(int i, int *isCopy, MySQLLoginInfo *info);
+char *getMySQLLoginElement (int i, int *isCopy, MySQLLoginInfo * info);
 
 
 /*
@@ -60,35 +60,35 @@ char *getMySQLLoginElement(int i, int *isCopy, MySQLLoginInfo *info);
   empty.
  */
 int
-read_mysql_data(MySQLLoginInfo *login, gint init, ggobid *gg)
+read_mysql_data (MySQLLoginInfo * login, gint init, ggobid * gg)
 {
   MYSQL *conn;
   GGobiData *d;
 
-  if(login->password == NULL) {
+  if (login->password == NULL) {
     /* The user hasn't specified a password.
        Even if they don't need one, they should declare
        this by leaving the password empty in the GUI
        dialog. This is the difference between NULL and "".
-       
+
        Note that when the gui's ok button is clicked,
        this routine will be called again. This is not recursive.
      */
-    GGOBI(get_mysql_login_info)(login, gg);
-    return(-1);
+    GGOBI (get_mysql_login_info) (login, gg);
+    return (-1);
   }
 
-    /* Now connect to the SQL. */
-  conn = GGOBI(mysql_connect)(login, gg);
-  if(conn == NULL) {
-    if(login != &DefaultMySQLInfo)
-      free(login); // maybe we should never be doing this here.
-    return(0);
+  /* Now connect to the SQL. */
+  conn = GGOBI (mysql_connect) (login, gg);
+  if (conn == NULL) {
+    if (login != &DefaultMySQLInfo)
+      free (login);             // maybe we should never be doing this here.
+    return (0);
   }
 
-    /* Execute the query specified by the user to get the data. */
-  if((d = GGOBI(get_mysql_data)(conn, login->dataQuery, gg)) != NULL) {
-    return(-1);
+  /* Execute the query specified by the user to get the data. */
+  if ((d = GGOBI (get_mysql_data) (conn, login->dataQuery, gg)) != NULL) {
+    return (-1);
   }
 
 
@@ -99,11 +99,11 @@ read_mysql_data(MySQLLoginInfo *login, gint init, ggobid *gg)
 */
 
 
-    /* Now we have to read in the glyph and color data. */
+  /* Now we have to read in the glyph and color data. */
   if (init && d)
     datad_init (d, gg, true);
 
-  return(1); /* everything was ok*/
+  return (1);                   /* everything was ok */
 }
 
 
@@ -113,30 +113,29 @@ read_mysql_data(MySQLLoginInfo *login, gint init, ggobid *gg)
    and gain access to the specified database.
  */
 
-MYSQL *
-GGOBI(mysql_connect)(MySQLLoginInfo *login, ggobid *gg)
+MYSQL *GGOBI (mysql_connect) (MySQLLoginInfo * login, ggobid * gg)
 {
   MYSQL *conn;
-  if(initialized == 0) {
+  if (initialized == 0) {
 
   }
 
-  conn = mysql_init(NULL);
-  if(conn == NULL) {
-    GGOBI(mysql_warning)("Can't initialize mysql!", conn, gg);
-    return(NULL);
+  conn = mysql_init (NULL);
+  if (conn == NULL) {
+    GGOBI (mysql_warning) ("Can't initialize mysql!", conn, gg);
+    return (NULL);
   }
 
-  conn = mysql_real_connect(conn, login->host, login->user, login->password,
-			      login->dbname, login->port, login->socket, login->flags
-                             );
+  conn = mysql_real_connect (conn, login->host, login->user, login->password,
+                             login->dbname, login->port, login->socket,
+                             login->flags);
 
-  if(conn == NULL) {
-    GGOBI(mysql_warning)("Can't connect to mysql!", conn, gg);   
-    return(NULL);
+  if (conn == NULL) {
+    GGOBI (mysql_warning) ("Can't connect to mysql!", conn, gg);
+    return (NULL);
   }
 
-  return(conn);
+  return (conn);
 }
 
 
@@ -145,29 +144,29 @@ GGOBI(mysql_connect)(MySQLLoginInfo *login, ggobid *gg)
    using the connection and then reads the data and 
    puts it in the ggobid raw.data array.
  */
-GGobiData*
-GGOBI(get_mysql_data)(MYSQL *conn, const char *query, ggobid *gg)
+GGobiData *GGOBI (get_mysql_data) (MYSQL * conn, const char *query,
+                                   ggobid * gg)
 {
   MYSQL_RES *res;
   int status;
   GGobiData *d = NULL;
 
-  if(query == NULL || query[0] == '\0')
-    return(NULL);
+  if (query == NULL || query[0] == '\0')
+    return (NULL);
 
-    status =  mysql_query(conn, query);
+  status = mysql_query (conn, query);
 
-    if(status ||  (res = mysql_store_result(conn)) == NULL ) {
-      GGOBI(mysql_warning)("Error from query", conn, gg);
-      return(NULL);
-    }
-
-  d = ggobi_data_new();
-  d->input = fileset_generate(query, "mysql", gg);  
-  if(d->input) {
-    d->input->baseName = g_strdup(query);
+  if (status || (res = mysql_store_result (conn)) == NULL) {
+    GGOBI (mysql_warning) ("Error from query", conn, gg);
+    return (NULL);
   }
-  GGOBI(register_mysql_data)(conn, res, 1, gg);
+
+  d = ggobi_data_new ();
+  d->input = fileset_generate (query, "mysql", gg);
+  if (d->input) {
+    d->input->baseName = g_strdup (query);
+  }
+  GGOBI (register_mysql_data) (conn, res, 1, gg);
 
   return (d);
 }
@@ -177,58 +176,59 @@ GGOBI(get_mysql_data)(MYSQL *conn, const char *query, ggobid *gg)
    from its meta-data and then the values for each observation.
  */
 int
-GGOBI(register_mysql_data)(MYSQL *conn, MYSQL_RES *res, gint preFetched,
-                            GGobiData *d, ggobid *gg)
+GGOBI (register_mysql_data) (MYSQL * conn, MYSQL_RES * res, gint preFetched,
+                             GGobiData * d, ggobid * gg)
 {
   unsigned glong j, rownum = 0;
   unsigned glong nrows, ncols;
   MYSQL_ROW row;
   vartabled *vt;
 
-  nrows =  mysql_num_rows(res);
-  ncols = mysql_num_fields(res);
+  nrows = mysql_num_rows (res);
+  ncols = mysql_num_fields (res);
 
-  GGOBI(setDimensions)(nrows, ncols, gg);
+  GGOBI (setDimensions) (nrows, ncols, gg);
 
-   for(j = 0; j < ncols; j++) {
-    MYSQL_FIELD *field = mysql_fetch_field(res);
+  for (j = 0; j < ncols; j++) {
+    MYSQL_FIELD *field = mysql_fetch_field (res);
     vt = vartable_element_get (j, d);
-    vt->collab = g_strdup(field->name);
-    vt->collab_tform = g_strdup(field->name);
- //XXX    vt->groupid = vt->groupid_ori = i;
-   }
+    vt->collab = g_strdup (field->name);
+    vt->collab_tform = g_strdup (field->name);
+    //XXX    vt->groupid = vt->groupid_ori = i;
+  }
 
-    while((row = mysql_fetch_row(res)) != NULL) { 
-      for(j = 0; j < ncols; j++) {
-        d->raw.vals[rownum][i] = atof(row[j]);
-      }
-      rownum++;
+  while ((row = mysql_fetch_row (res)) != NULL) {
+    for (j = 0; j < ncols; j++) {
+      d->raw.vals[rownum][i] = atof (row[j]);
     }
+    rownum++;
+  }
 
- return(j);
+  return (j);
 }
 
 /**
   Displays a warning/error from MySQL's error message using a dialog.
   Uses quick_message.
  */
-void
-GGOBI(mysql_warning)(const char *msg, MYSQL *conn, ggobid *gg)
+void GGOBI (mysql_warning) (const char *msg, MYSQL * conn, ggobid * gg)
 {
- char *errmsg = NULL; 
- char *buf;
- if(conn) {
-   errmsg = mysql_error(conn);
-   if(errmsg == NULL)
-     errmsg = ""; 
- } else 
-   errmsg = "";
+  char *errmsg = NULL;
+  char *buf;
+  if (conn) {
+    errmsg = mysql_error (conn);
+    if (errmsg == NULL)
+      errmsg = "";
+  }
+  else
+    errmsg = "";
 
-  buf = (char *) g_malloc(sizeof(char) * (strlen(errmsg) + strlen(msg) + 2));
-  sprintf(buf, "%s %s", msg, errmsg);
+  buf =
+    (char *) g_malloc (sizeof (char) * (strlen (errmsg) + strlen (msg) + 2));
+  sprintf (buf, "%s %s", msg, errmsg);
 
-  quick_message(buf,true);
-  free(buf);
+  quick_message (buf, true);
+  free (buf);
 }
 
 /*
@@ -239,8 +239,7 @@ GGOBI(mysql_warning)(const char *msg, MYSQL *conn, ggobid *gg)
 
   Can now use ggobi_data_new();
  */
-void
-GGOBI(setDimensions)(gint nrow, gint ncol, GGobiData *d, ggobid *gg)
+void GGOBI (setDimensions) (gint nrow, gint ncol, GGobiData * d, ggobid * gg)
 {
   d->nrows = nrow;
   d->nrows_in_plot = d->nrows;  /*-- for now --*/
@@ -266,92 +265,92 @@ GGOBI(setDimensions)(gint nrow, gint ncol, GGobiData *d, ggobid *gg)
   instance by copying the values from the DefaultMySQLInfo.
  */
 MySQLLoginInfo *
-initMySQLLoginInfo(MySQLLoginInfo *login)
+initMySQLLoginInfo (MySQLLoginInfo * login)
 {
-  if(login == NULL)
-    login = (MySQLLoginInfo*) g_malloc(sizeof(MySQLLoginInfo));
+  if (login == NULL)
+    login = (MySQLLoginInfo *) g_malloc (sizeof (MySQLLoginInfo));
 
 
-  memset(login, '\0', sizeof(MySQLLoginInfo));
+  memset (login, '\0', sizeof (MySQLLoginInfo));
 
   *login = DefaultMySQLInfo;
 
-  return(login);
+  return (login);
 }
 
 
 
-  const char *fieldNames[] = {"Host", 
-                              "User",
-                              "Password",
-                              "Database",
-                              "Port",
-                              "Socket",
-                              "Flags",
-                              NULL,
-                              "Data query",
-                              "Segments query",
-                              "Appearance query",
-                              "Color query"
-                             };
+const char *fieldNames[] = { "Host",
+  "User",
+  "Password",
+  "Database",
+  "Port",
+  "Socket",
+  "Flags",
+  NULL,
+  "Data query",
+  "Segments query",
+  "Appearance query",
+  "Color query"
+};
 
 
 /*
   This maps the "field" name of the MySQLLoginInfo
  */
 MySQLInfoElement
-getMySQLLoginElementIndex(const char *name)
+getMySQLLoginElementIndex (const char *name)
 {
   unsigned int i;
-  for(i = 0; i < sizeof(fieldNames)/sizeof(fieldNames[0]); i++) {
-    if(fieldNames[i] == NULL)
+  for (i = 0; i < sizeof (fieldNames) / sizeof (fieldNames[0]); i++) {
+    if (fieldNames[i] == NULL)
       continue;
-    if(strcmp(fieldNames[i], name)==0) 
-      return((MySQLInfoElement) i);
+    if (strcmp (fieldNames[i], name) == 0)
+      return ((MySQLInfoElement) i);
   }
 
-  return(MISS);
+  return (MISS);
 }
 
-int 
-setMySQLLoginElement(MySQLInfoElement i, char *val, MySQLLoginInfo *info)
+int
+setMySQLLoginElement (MySQLInfoElement i, char *val, MySQLLoginInfo * info)
 {
-   switch(i) {
-     case HOST:
-       info->host = val;
-       break;
-     case USER:
-       info->user = val;
-       break;
-     case PASSWORD:
-       info->password = val;
-       break;
-     case DATABASE:
-       info->dbname = val;
-       break;
-     case PORT:
-       info->port = atoi(val);
-       break;
-     case SOCKET:
-       info->socket = val;
-       break;
-     case FLAGS:
-       info->flags = atoi(val);
-       break;
-     case DATA_QUERY:
-       info->dataQuery = val;
-       break;
-     case COLOR_QUERY:
-       info->colorQuery = val;
-       break;
-     case SEGMENTS_QUERY:
-       info->segmentsQuery = val;
-       break;
-     default:
-       break;
-   }  
+  switch (i) {
+  case HOST:
+    info->host = val;
+    break;
+  case USER:
+    info->user = val;
+    break;
+  case PASSWORD:
+    info->password = val;
+    break;
+  case DATABASE:
+    info->dbname = val;
+    break;
+  case PORT:
+    info->port = atoi (val);
+    break;
+  case SOCKET:
+    info->socket = val;
+    break;
+  case FLAGS:
+    info->flags = atoi (val);
+    break;
+  case DATA_QUERY:
+    info->dataQuery = val;
+    break;
+  case COLOR_QUERY:
+    info->colorQuery = val;
+    break;
+  case SEGMENTS_QUERY:
+    info->segmentsQuery = val;
+    break;
+  default:
+    break;
+  }
 
-   return(i);
+  return (i);
 }
 
 /*
@@ -359,45 +358,45 @@ setMySQLLoginElement(MySQLInfoElement i, char *val, MySQLLoginInfo *info)
   associated with the identifier (i).
  */
 char *
-getMySQLLoginElement(MySQLInfoElement i, int *isCopy, MySQLLoginInfo *info)
-{ 
+getMySQLLoginElement (MySQLInfoElement i, int *isCopy, MySQLLoginInfo * info)
+{
   char *val = NULL;
-   switch(i) {
-     case HOST:
-       val = info->host;
-       break;
-     case USER:
-       val = info->user;
-       break;
-     case PASSWORD:
-       val = info->password;
-       break;
-     case DATABASE:
-       val = info->dbname;
-       break;
-     case PORT:
-       val = NULL;
-       break;
-     case SOCKET:
-       val = NULL;
-       break;
-     case FLAGS:
-       val = NULL;
-       break;
-     case DATA_QUERY:
-       val = info->dataQuery;
-       break;
-     case COLOR_QUERY:
-       val = info->colorQuery;
-       break;
-     case SEGMENTS_QUERY:
-       val = info->segmentsQuery;
-       break;
-     default:
-       break;
-   }  
+  switch (i) {
+  case HOST:
+    val = info->host;
+    break;
+  case USER:
+    val = info->user;
+    break;
+  case PASSWORD:
+    val = info->password;
+    break;
+  case DATABASE:
+    val = info->dbname;
+    break;
+  case PORT:
+    val = NULL;
+    break;
+  case SOCKET:
+    val = NULL;
+    break;
+  case FLAGS:
+    val = NULL;
+    break;
+  case DATA_QUERY:
+    val = info->dataQuery;
+    break;
+  case COLOR_QUERY:
+    val = info->colorQuery;
+    break;
+  case SEGMENTS_QUERY:
+    val = info->segmentsQuery;
+    break;
+  default:
+    break;
+  }
 
-   return(val);
+  return (val);
 }
 
 /*
@@ -409,23 +408,23 @@ getMySQLLoginElement(MySQLInfoElement i, int *isCopy, MySQLLoginInfo *info)
    DefaultMySQLInfo object.
  */
 int
-getDefaultValuesFromFile(char *fileName)
+getDefaultValuesFromFile (char *fileName)
 {
-  Properties *props = new TrimmedProperties(fileName);
+  Properties *props = new TrimmedProperties (fileName);
   Property *prop;
   unsigned int i, ctr = 0;
   MySQLInfoElement id;
 
-  for(i = 0; i < props->size() ; i++) {
-    prop = props->element(i);
-    id = getMySQLLoginElementIndex(prop->getName());
-    if(id > -1) {
-      setMySQLLoginElement(id, prop->getValue(), &DefaultMySQLInfo);
+  for (i = 0; i < props->size (); i++) {
+    prop = props->element (i);
+    id = getMySQLLoginElementIndex (prop->getName ());
+    if (id > -1) {
+      setMySQLLoginElement (id, prop->getValue (), &DefaultMySQLInfo);
       ctr++;
     }
   }
 
-  return(ctr);
+  return (ctr);
 }
 
 /* 
@@ -442,95 +441,98 @@ getDefaultValuesFromFile(char *fileName)
    is used. This allows the values read from an input file to be used
    as partial specification.
  */
-MySQLGUIInput *
-GGOBI(get_mysql_login_info)(MySQLLoginInfo *info, ggobid *gg)
+MySQLGUIInput *GGOBI (get_mysql_login_info) (MySQLLoginInfo * info,
+                                             ggobid * gg)
 {
   int i, ctr;
-  GtkWidget *dialog,*lab, *input, *table;
+  GtkWidget *dialog, *lab, *input, *table;
   GtkWidget *okay_button, *cancel_button, *help_button;
   MySQLGUIInput *guiInputs;
   char *tmpVal;
   int isCopy;
-  int n = sizeof(fieldNames)/sizeof(fieldNames[0]);
+  int n = sizeof (fieldNames) / sizeof (fieldNames[0]);
 
-  if(info == NULL)
+  if (info == NULL)
     info = &DefaultMySQLInfo;
 
-  guiInputs  = (MySQLGUIInput*) g_malloc(sizeof(MySQLGUIInput));
+  guiInputs = (MySQLGUIInput *) g_malloc (sizeof (MySQLGUIInput));
 
-    /* Create the GUI and its components. */
-  dialog = gtk_dialog_new_with_buttons("MySQL Login & Query Settings", NULL, 0, 
-  				GTK_STOCK_OK, GTK_RESPONSE_ACCEPT,
-				GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT,
-				GTK_STOCK_HELP, GTK_RESPONSE_HELP, NULL);
+  /* Create the GUI and its components. */
+  dialog =
+    gtk_dialog_new_with_buttons ("MySQL Login & Query Settings", NULL, 0,
+                                 GTK_STOCK_OK, GTK_RESPONSE_ACCEPT,
+                                 GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT,
+                                 GTK_STOCK_HELP, GTK_RESPONSE_HELP, NULL);
   //gtk_window_set_title(GTK_WINDOW(dialog), "MySQL Login & Query Settings");
 
   guiInputs->gg = gg;
   guiInputs->dialog = dialog;
-  guiInputs->textInput = (GtkWidget**) g_malloc(sizeof(GtkWidget*) * n);
+  guiInputs->textInput = (GtkWidget **) g_malloc (sizeof (GtkWidget *) * n);
   guiInputs->numInputs = n;
 
-  table = gtk_table_new(n, 2, 0);
-     /* Now run through all the entries of interest and generate  
-        the label, text entry pair. Store the entry widget
-        in the guiInputs array of textInput elements.
-        Then they can be queried in the handler of the Ok button click.
-      */
-  for(i = 0, ctr=0; i < n; i++) {
-    if(fieldNames[i] == NULL) {
+  table = gtk_table_new (n, 2, 0);
+  /* Now run through all the entries of interest and generate  
+     the label, text entry pair. Store the entry widget
+     in the guiInputs array of textInput elements.
+     Then they can be queried in the handler of the Ok button click.
+   */
+  for (i = 0, ctr = 0; i < n; i++) {
+    if (fieldNames[i] == NULL) {
       guiInputs->textInput[i] = NULL;
       continue;
     }
-    lab = gtk_label_new(fieldNames[i]);
-    gtk_label_set_justify(GTK_LABEL(lab), GTK_JUSTIFY_LEFT);
-    input = gtk_entry_new();
-    if(i == PASSWORD)
-      gtk_entry_set_visibility(GTK_ENTRY(input), FALSE);
+    lab = gtk_label_new (fieldNames[i]);
+    gtk_label_set_justify (GTK_LABEL (lab), GTK_JUSTIFY_LEFT);
+    input = gtk_entry_new ();
+    if (i == PASSWORD)
+      gtk_entry_set_visibility (GTK_ENTRY (input), FALSE);
     guiInputs->textInput[i] = input;
-    
-    tmpVal = getMySQLLoginElement((MySQLInfoElement) i, &isCopy, info);
-    if(tmpVal)
-      gtk_entry_set_text(GTK_ENTRY(input), tmpVal);
 
-    gtk_table_attach_defaults(GTK_TABLE(table), lab, 0, 1, ctr,ctr+1);
-    gtk_table_attach_defaults(GTK_TABLE(table), input, 1, 2, ctr, ctr+1);
+    tmpVal = getMySQLLoginElement ((MySQLInfoElement) i, &isCopy, info);
+    if (tmpVal)
+      gtk_entry_set_text (GTK_ENTRY (input), tmpVal);
+
+    gtk_table_attach_defaults (GTK_TABLE (table), lab, 0, 1, ctr, ctr + 1);
+    gtk_table_attach_defaults (GTK_TABLE (table), input, 1, 2, ctr, ctr + 1);
     ctr++;
   }
 
-  gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), table, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (GTK_DIALOG (dialog)->vbox), table, TRUE, TRUE,
+                      0);
 
-  while(true) {
-	  response = gtk_dialog_run(GTK_DIALOG(dialog));
-	  if (response == GTK_RESPONSE_HELP)
-		  GGOBI(getMySQLGUIHelp)(guiInputs);
-	  else if (response == GTK_RESPONSE_CANCEL || GGOBI(getMySQLGUIInfo)(guiInputs))
-		  break;
+  while (true) {
+    response = gtk_dialog_run (GTK_DIALOG (dialog));
+    if (response == GTK_RESPONSE_HELP)
+      GGOBI (getMySQLGUIHelp) (guiInputs);
+    else if (response == GTK_RESPONSE_CANCEL
+             || GGOBI (getMySQLGUIInfo) (guiInputs))
+      break;
   }
 
-      /* Now add the buttons at the bottom of the dialog. */
+  /* Now add the buttons at the bottom of the dialog. */
   /*okay_button = gtk_button_new_with_label("Okay");
-  cancel_button = gtk_button_new_with_label("Cancel");
-  help_button = gtk_button_new_with_label("Help");
-  gtk_container_add (GTK_CONTAINER (GTK_DIALOG(dialog)->action_area), okay_button);
-  gtk_container_add (GTK_CONTAINER (GTK_DIALOG(dialog)->action_area), cancel_button);
-  gtk_container_add (GTK_CONTAINER (GTK_DIALOG(dialog)->action_area), help_button);
+     cancel_button = gtk_button_new_with_label("Cancel");
+     help_button = gtk_button_new_with_label("Help");
+     gtk_container_add (GTK_CONTAINER (GTK_DIALOG(dialog)->action_area), okay_button);
+     gtk_container_add (GTK_CONTAINER (GTK_DIALOG(dialog)->action_area), cancel_button);
+     gtk_container_add (GTK_CONTAINER (GTK_DIALOG(dialog)->action_area), help_button);
 
-  gtk_widget_show_all(dialog);
-*/
-      /* Now setup the action/signal handlers. */  
+     gtk_widget_show_all(dialog);
+   */
+  /* Now setup the action/signal handlers. */
   /*g_signal_connect (G_OBJECT (cancel_button), "clicked",
-                      G_CALLBACK (GGOBI(cancelMySQLGUI)), guiInputs);
+     G_CALLBACK (GGOBI(cancelMySQLGUI)), guiInputs);
 
-  g_signal_connect (G_OBJECT (okay_button), "clicked",
-                      G_CALLBACK (GGOBI(getMySQLGUIInfo)), guiInputs);
-  g_signal_connect (G_OBJECT (help_button), "clicked",
-                      G_CALLBACK (GGOBI(getMySQLGUIHelp)), guiInputs);
-*/
+     g_signal_connect (G_OBJECT (okay_button), "clicked",
+     G_CALLBACK (GGOBI(getMySQLGUIInfo)), guiInputs);
+     g_signal_connect (G_OBJECT (help_button), "clicked",
+     G_CALLBACK (GGOBI(getMySQLGUIHelp)), guiInputs);
+   */
 
-  gtk_widget_destroy(dialog);
-  g_free(guiInputs);
-  
-  return(NULL);
+  gtk_widget_destroy (dialog);
+  g_free (guiInputs);
+
+  return (NULL);
 }
 
 
@@ -542,37 +544,37 @@ GGOBI(get_mysql_login_info)(MySQLLoginInfo *info, ggobid *gg)
    The guiInput argument contains the ggobid object reference
    and the array of input/entry widgets.
  */
-void
-GGOBI(getMySQLGUIInfo)(MySQLGUIInput *guiInput)
+void GGOBI (getMySQLGUIInfo) (MySQLGUIInput * guiInput)
 {
- ggobid *gg = guiInput->gg;
- gint i;
- gchar *val = NULL;
- MySQLLoginInfo* info = initMySQLLoginInfo(NULL);
+  ggobid *gg = guiInput->gg;
+  gint i;
+  gchar *val = NULL;
+  MySQLLoginInfo *info = initMySQLLoginInfo (NULL);
 
- for(i = 0; i < guiInput->numInputs; i++) {
-   if(guiInput->textInput[i] == NULL)
-     continue;
+  for (i = 0; i < guiInput->numInputs; i++) {
+    if (guiInput->textInput[i] == NULL)
+      continue;
 
-   val = gtk_editable_get_chars(GTK_EDITABLE(guiInput->textInput[i]), 0, -1);
+    val =
+      gtk_editable_get_chars (GTK_EDITABLE (guiInput->textInput[i]), 0, -1);
 
-   if(val)
-     /*val = g_strdup(val);*/ 
-     /* Is this necessary with gtk_editable_get_chars? I bet not.  dfs */
-     ;
-   else
-     continue;
+    if (val)
+      /*val = g_strdup(val); */
+      /* Is this necessary with gtk_editable_get_chars? I bet not.  dfs */
+      ;
+    else
+      continue;
 
-   setMySQLLoginElement((MySQLInfoElement) i, val, info);
-   val = NULL;
- }
+    setMySQLLoginElement ((MySQLInfoElement) i, val, info);
+    val = NULL;
+  }
 
   /* Only cancel if we read something. Otherwise,
      leave the display for the user to edit.
    */
-  if (read_mysql_data(info, TRUE, gg) > 0) {
-   GGOBI(cancelMySQLGUI)(button, guiInput);
-     /* Can we free the info here. */
+  if (read_mysql_data (info, TRUE, gg) > 0) {
+    GGOBI (cancelMySQLGUI) (button, guiInput);
+    /* Can we free the info here. */
   }
 }
 
@@ -587,8 +589,7 @@ GGOBI(cancelMySQLGUI)(GtkButton *button, MySQLGUIInput *guiInput)
   g_free (guiInput);
 }
 */
-void
-GGOBI(getMySQLGUIHelp)(MySQLGUIInput *guiInput)
+void GGOBI (getMySQLGUIHelp) (MySQLGUIInput * guiInput)
 {
-  quick_message("GGobi/MySQL help not implemented yet!", false);
+  quick_message ("GGobi/MySQL help not implemented yet!", false);
 }

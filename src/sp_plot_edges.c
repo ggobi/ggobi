@@ -28,19 +28,19 @@
 /*------------------------------------------------------------------------*/
 
 gboolean
-splot_plot_edge (gint m, GGobiData *d, GGobiData *e,
-  splotd *sp, displayd *display, ggobid *gg)
+splot_plot_edge (gint m, GGobiData * d, GGobiData * e,
+                 splotd * sp, displayd * display, ggobid * gg)
 {
   gint a, b;
   gboolean draw_edge;
   endpointsd *endpoints;
 
-  endpoints = resolveEdgePoints(e, d);
-  if(!endpoints)
-    return(false);
+  endpoints = resolveEdgePoints (e, d);
+  if (!endpoints)
+    return (false);
   draw_edge = edge_endpoints_get (m, &a, &b, d, endpoints, e);
 
-  if(!draw_edge)
+  if (!draw_edge)
     return (false);
 
   /*-- determine whether edge m should be plotted --*/
@@ -51,16 +51,16 @@ splot_plot_edge (gint m, GGobiData *d, GGobiData *e,
     draw_edge = false;
 
   else if (!splot_plot_case (a, d, sp, display, gg) ||
-    !splot_plot_case (b, d, sp, display, gg))
-      draw_edge = false;
-  
+           !splot_plot_case (b, d, sp, display, gg))
+    draw_edge = false;
+
   /*-- can prevent drawing of missings for parcoords or scatmat plots --*/
   else if (e->nmissing > 0 && !e->missings_show_p) {
-    if (GGOBI_IS_EXTENDED_SPLOT(sp)) {
+    if (GGOBI_IS_EXTENDED_SPLOT (sp)) {
       GGobiExtendedSPlotClass *klass;
-      klass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);
+      klass = GGOBI_EXTENDED_SPLOT_GET_CLASS (sp);
       if (klass->draw_edge_p) {
-        draw_edge = klass->draw_edge_p(sp, m, d, e, gg);
+        draw_edge = klass->draw_edge_p (sp, m, d, e, gg);
       }
     }
   }
@@ -68,18 +68,18 @@ splot_plot_edge (gint m, GGobiData *d, GGobiData *e,
 }
 
 gboolean
-splot_hidden_edge (gint m, GGobiData *d, GGobiData *e,
-  splotd *sp, displayd *display, ggobid *gg)
+splot_hidden_edge (gint m, GGobiData * d, GGobiData * e,
+                   splotd * sp, displayd * display, ggobid * gg)
 {
   gint a, b;
   gboolean hiddenp = false;
   endpointsd *endpoints;
 
-  endpoints = resolveEdgePoints(e, d);
+  endpoints = resolveEdgePoints (e, d);
   if (endpoints && edge_endpoints_get (m, &a, &b, d, endpoints, e))
     if (e->hidden_now.els[m] || d->hidden_now.els[a] || d->hidden_now.els[b])
       hiddenp = true;
-  
+
   /*-- can prevent drawing of missings for parcoords or scatmat plots --*/
 /*
   } else if (e->nmissing > 0 && !e->missings_show_p) {
@@ -97,8 +97,8 @@ splot_hidden_edge (gint m, GGobiData *d, GGobiData *e,
 
 /*-- the current color and line type need to be drawn last --*/
 void
-splot_edges_draw (splotd *sp, gboolean draw_hidden, GdkDrawable *drawable,
-  ggobid *gg)
+splot_edges_draw (splotd * sp, gboolean draw_hidden, GdkDrawable * drawable,
+                  ggobid * gg)
 {
   gint i, j, m;
   gint k, n, p, pp;
@@ -113,11 +113,11 @@ splot_edges_draw (splotd *sp, gboolean draw_hidden, GdkDrawable *drawable,
   colorschemed *scheme = gg->activeColorScheme;
 
   if (e == (GGobiData *) NULL || e->edge.n == 0) {
-/**/return;
+     /**/ return;
   }
- 
+
   if (d->idTable == NULL) {  /*-- d has no record ids --*/
-/**/return;
+     /**/ return;
   }
 
   edges_show_p = (display->options.edges_directed_show_p ||
@@ -128,41 +128,40 @@ splot_edges_draw (splotd *sp, gboolean draw_hidden, GdkDrawable *drawable,
 
     gint symbols_used[NGLYPHSIZES][NEDGETYPES][MAXNCOLORS];
     gint nl = 0;
-    gint ncolors = MIN(MAXNCOLORS, scheme->n);
+    gint ncolors = MIN (MAXNCOLORS, scheme->n);
     gint k_prev = -1, n_prev = -1, p_prev = -1;
 
     g_assert (e->color.nels == e->nrows);
 
-    endpoints = resolveEdgePoints(e, d);
-    if(!endpoints)
+    endpoints = resolveEdgePoints (e, d);
+    if (!endpoints)
       return;
 
-    for (k=0; k<NGLYPHSIZES; k++)
-      for (n=0; n<NEDGETYPES; n++)
-        for (p=0; p<ncolors; p++)
+    for (k = 0; k < NGLYPHSIZES; k++)
+      for (n = 0; n < NEDGETYPES; n++)
+        for (p = 0; p < ncolors; p++)
           symbols_used[k][n][p] = 0;
 
     /*
      * Use e->color_now[] and e->glyph_now[] to work out which
      * line symbols should be drawn
-    */
-    for (i=0; i<e->nrows_in_plot; i++) {
+     */
+    for (i = 0; i < e->nrows_in_plot; i++) {
       m = e->rows_in_plot.els[i];
       /* If we're drawing hiddens and this is hidden and plottable ... */
       if (((draw_hidden && splot_hidden_edge (m, d, e, sp, display, gg)) ||
-      /* Or if we're not drawing hiddens and this isn't hidden ... */
-          (!draw_hidden && !e->hidden_now.els[m])))
-      {
+           /* Or if we're not drawing hiddens and this isn't hidden ... */
+           (!draw_hidden && !e->hidden_now.els[m]))) {
 
         gtype = e->glyph_now.els[m].type;
-        ltype = ltype_from_gtype(gtype);
-	/*
-        if (gtype == FC || gtype == FR)
-          ltype = SOLID;
-        else if (gtype == OC || gtype == OR)
-          ltype = WIDE_DASH;
-        else ltype = NARROW_DASH;
-	*/
+        ltype = ltype_from_gtype (gtype);
+        /*
+           if (gtype == FC || gtype == FR)
+           ltype = SOLID;
+           else if (gtype == OC || gtype == OR)
+           ltype = WIDE_DASH;
+           else ltype = NARROW_DASH;
+         */
         symbols_used[e->glyph_now.els[m].size][ltype][e->color_now.els[m]]++;
       }
     }
@@ -171,62 +170,66 @@ splot_edges_draw (splotd *sp, gboolean draw_hidden, GdkDrawable *drawable,
     if (draw_hidden)
       gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_hidden);
 
-    for (k=0; k<NGLYPHSIZES; k++) {
-      for (n=0; n<NEDGETYPES; n++) {
-        for (pp=0; pp<ncolors+1; pp++) {
+    for (k = 0; k < NGLYPHSIZES; k++) {
+      for (n = 0; n < NEDGETYPES; n++) {
+        for (pp = 0; pp < ncolors + 1; pp++) {
           /* 
            * This is a little trick to draw the edges using the
            * current color last.  I skip over them the first time
            * through, and pick them up at the end.  It shouldn't
            * cost me anything, I don't think.  Should I do
            * the same for glyphs?     -- dfs, 4/2004
-          */
+           */
           if (pp < ncolors) {
             if (pp == gg->color_id)
               continue;
-            else p = pp;
-          } else p = gg->color_id;
-          
+            else
+              p = pp;
+          }
+          else
+            p = gg->color_id;
+
           if (symbols_used[k][n][p]) {
 
             /*
              * Now work through through symbols_used[], plotting the edges
              * of each color and type in a group.
-            */
+             */
             nl = 0;
 
-            for (j=0; j<e->edge.n; j++) {
+            for (j = 0; j < e->edge.n; j++) {
 
-              if (draw_hidden && !splot_hidden_edge (j, d, e, sp, display, gg))
-                  continue;
-              if (!draw_hidden && splot_hidden_edge (j, d, e, sp, display, gg))
-                  continue;
+              if (draw_hidden
+                  && !splot_hidden_edge (j, d, e, sp, display, gg))
+                continue;
+              if (!draw_hidden
+                  && splot_hidden_edge (j, d, e, sp, display, gg))
+                continue;
               if (!splot_plot_edge (j, d, e, sp, display, gg))
                 continue;
 
               edge_endpoints_get (j, &a, &b, d, endpoints, e);
 
               gtype = e->glyph_now.els[j].type;
-              ltype = ltype_from_gtype(gtype);
-	      /*
-              if (gtype == FC || gtype == FR)
-                ltype = SOLID;
-              else if (gtype == OC || gtype == OR)
-                ltype = WIDE_DASH;
-              else ltype = NARROW_DASH;
-	      */
+              ltype = ltype_from_gtype (gtype);
+              /*
+                 if (gtype == FC || gtype == FR)
+                 ltype = SOLID;
+                 else if (gtype == OC || gtype == OR)
+                 ltype = WIDE_DASH;
+                 else ltype = NARROW_DASH;
+               */
 
               if (e->color_now.els[j] == p &&
-                  ltype == n &&
-                  e->glyph_now.els[j].size == k)
-              {
+                  ltype == n && e->glyph_now.els[j].size == k) {
                 if (edges_show_p) {
                   if (endpoints[j].jpartner == -1) {
                     sp->edges[nl].x1 = sp->screen[a].x;
                     sp->edges[nl].y1 = sp->screen[a].y;
                     sp->edges[nl].x2 = sp->screen[b].x;
                     sp->edges[nl].y2 = sp->screen[b].y;
-                  } else {
+                  }
+                  else {
                     sp->edges[nl].x1 = sp->screen[a].x;
                     sp->edges[nl].y1 = sp->screen[a].y;
                     sp->edges[nl].x2 = sp->screen[a].x +
@@ -241,22 +244,23 @@ splot_edges_draw (splotd *sp, gboolean draw_hidden, GdkDrawable *drawable,
                    * Add thick piece of the lines to suggest a
                    * directional arrow.  How thick should it be
                    * compared to the current line thickness?
-                  */
-                  if (endpoints[j].jpartner == -1) { /* not bidirectional */
+                   */
+                  if (endpoints[j].jpartner == -1) {  /* not bidirectional */
                     sp->arrowheads[nl].x1 =
-                      (gint) (.2*sp->screen[a].x + .8*sp->screen[b].x);
+                      (gint) (.2 * sp->screen[a].x + .8 * sp->screen[b].x);
                     sp->arrowheads[nl].y1 =
-                      (gint) (.2*sp->screen[a].y + .8*sp->screen[b].y);
+                      (gint) (.2 * sp->screen[a].y + .8 * sp->screen[b].y);
                     sp->arrowheads[nl].x2 = sp->screen[b].x;
                     sp->arrowheads[nl].y2 = sp->screen[b].y;
-                  } else {  /*-- draw the partner's arrowhead --*/
+                  }
+                  else {    /*-- draw the partner's arrowhead --*/
                     gint ja, jb, jp = endpoints[j].jpartner;
                     edge_endpoints_get (jp, &ja, &jb, d, endpoints, e);
 
                     sp->arrowheads[nl].x1 =
-                      (gint) (.2*sp->screen[ja].x + .8*sp->screen[jb].x);
+                      (gint) (.2 * sp->screen[ja].x + .8 * sp->screen[jb].x);
                     sp->arrowheads[nl].y1 =
-                      (gint) (.2*sp->screen[ja].y + .8*sp->screen[jb].y);
+                      (gint) (.2 * sp->screen[ja].y + .8 * sp->screen[jb].y);
                     sp->arrowheads[nl].x2 = sp->screen[jb].x;
                     sp->arrowheads[nl].y2 = sp->screen[jb].y;
                   }
@@ -271,24 +275,27 @@ splot_edges_draw (splotd *sp, gboolean draw_hidden, GdkDrawable *drawable,
               }
             }
 
-            lwidth = lwidth_from_gsize(k);
+            lwidth = lwidth_from_gsize (k);
             if (edges_show_p) {
-              ltype = set_lattribute_from_ltype(n, gg);
+              ltype = set_lattribute_from_ltype (n, gg);
 
-	      if (k_prev == -1 || k_prev != i || n_prev == -1 || n_prev != n) {
+              if (k_prev == -1 || k_prev != i || n_prev == -1 || n_prev != n) {
                 gdk_gc_set_line_attributes (gg->plot_GC, lwidth,
-                  (gint) ltype, GDK_CAP_BUTT, GDK_JOIN_ROUND);
-	      }
+                                            (gint) ltype, GDK_CAP_BUTT,
+                                            GDK_JOIN_ROUND);
+              }
 
               gdk_draw_segments (drawable, gg->plot_GC, sp->edges, nl);
             }
 
             if (arrowheads_show_p) {
               gdk_gc_set_line_attributes (gg->plot_GC,
-                lwidth+2, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
+                                          lwidth + 2, GDK_LINE_SOLID,
+                                          GDK_CAP_ROUND, GDK_JOIN_ROUND);
               gdk_draw_segments (drawable, gg->plot_GC, sp->arrowheads, nl);
               gdk_gc_set_line_attributes (gg->plot_GC,
-                0, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
+                                          0, GDK_LINE_SOLID, GDK_CAP_ROUND,
+                                          GDK_JOIN_ROUND);
             }
           }
 
@@ -299,19 +306,22 @@ splot_edges_draw (splotd *sp, gboolean draw_hidden, GdkDrawable *drawable,
            * fix the problem, which may have been a result of my
            * skipping over the current points --- though I don't see
            * why.  dfs 5/2004
-          */
-          k_prev = k; n_prev = n; p_prev = p;
+           */
+          k_prev = k;
+          n_prev = n;
+          p_prev = p;
         }
       }
     }
   }
   gdk_gc_set_line_attributes (gg->plot_GC,
-    0, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
+                              0, GDK_LINE_SOLID, GDK_CAP_ROUND,
+                              GDK_JOIN_ROUND);
 }
 
 void
-splot_add_edge_highlight_cue (splotd *sp, GdkDrawable *drawable, gint k,
-  gboolean nearest, ggobid *gg)
+splot_add_edge_highlight_cue (splotd * sp, GdkDrawable * drawable, gint k,
+                              gboolean nearest, ggobid * gg)
 {
   displayd *dsp = (displayd *) sp->displayptr;
   GGobiData *d = dsp->d;
@@ -322,8 +332,8 @@ splot_add_edge_highlight_cue (splotd *sp, GdkDrawable *drawable, gint k,
   gboolean draw_edge = (dsp->options.edges_undirected_show_p ||
                         dsp->options.edges_directed_show_p);
 
-  endpoints = resolveEdgePoints(e, d);
-  if(!endpoints)
+  endpoints = resolveEdgePoints (e, d);
+  if (!endpoints)
     return;
   draw_edge = draw_edge && edge_endpoints_get (k, &a, &b, d, endpoints, e);
 
@@ -333,30 +343,34 @@ splot_add_edge_highlight_cue (splotd *sp, GdkDrawable *drawable, gint k,
   /*-- draw a thickened line only for nearest --*/
   if (nearest && draw_edge) {
     gdk_gc_set_line_attributes (gg->plot_GC,
-      3, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
-    gdk_gc_set_foreground (gg->plot_GC,
-      &scheme->rgb[ e->color_now.els[k] ]);
+                                3, GDK_LINE_SOLID, GDK_CAP_ROUND,
+                                GDK_JOIN_ROUND);
+    gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[e->color_now.els[k]]);
 
     if (endpoints[k].jpartner == -1) {
       gdk_draw_line (drawable, gg->plot_GC,
-        sp->screen[a].x, sp->screen[a].y,
-        sp->screen[b].x, sp->screen[b].y);
-     } else {  /* thicken only half the line */
+                     sp->screen[a].x, sp->screen[a].y,
+                     sp->screen[b].x, sp->screen[b].y);
+    }
+    else {                      /* thicken only half the line */
       gdk_draw_line (drawable, gg->plot_GC,
-        sp->screen[a].x, sp->screen[a].y,
-	sp->screen[a].x + (sp->screen[b].x - sp->screen[a].x) / 2,
-        sp->screen[a].y + (sp->screen[b].y - sp->screen[a].y) / 2);
+                     sp->screen[a].x, sp->screen[a].y,
+                     sp->screen[a].x + (sp->screen[b].x -
+                                        sp->screen[a].x) / 2,
+                     sp->screen[a].y + (sp->screen[b].y -
+                                        sp->screen[a].y) / 2);
     }
 
     gdk_gc_set_line_attributes (gg->plot_GC,
-      0, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
+                                0, GDK_LINE_SOLID, GDK_CAP_ROUND,
+                                GDK_JOIN_ROUND);
     gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
   }
 }
 
 void
-splot_add_edge_label (splotd *sp, GdkDrawable *drawable, gint k,
-  gboolean nearest, ggobid *gg)
+splot_add_edge_label (splotd * sp, GdkDrawable * drawable, gint k,
+                      gboolean nearest, ggobid * gg)
 {
   gchar *lbl;
   displayd *dsp = (displayd *) sp->displayptr;
@@ -365,15 +379,15 @@ splot_add_edge_label (splotd *sp, GdkDrawable *drawable, gint k,
   gint xp, yp;
   gint a, b;
   endpointsd *endpoints;
-  PangoLayout *layout = gtk_widget_create_pango_layout(sp->da, NULL);
+  PangoLayout *layout = gtk_widget_create_pango_layout (sp->da, NULL);
   PangoRectangle rect;
 
   gboolean draw_edge = (dsp->options.edges_undirected_show_p ||
                         dsp->options.edges_directed_show_p);
 
-  endpoints = resolveEdgePoints(e, d);
-  if(!endpoints)
-     return;
+  endpoints = resolveEdgePoints (e, d);
+  if (!endpoints)
+    return;
   draw_edge = draw_edge && edge_endpoints_get (k, &a, &b, d, endpoints, e);
 
   /*-- If the edge is bidirectional, use both labels --*/
@@ -384,40 +398,51 @@ splot_add_edge_label (splotd *sp, GdkDrawable *drawable, gint k,
 
     /* for edge labels, this is not the appropriate cpanel ... */
     lbl = identify_label_fetch (k, &dsp->cpanel, e, gg);
-    layout_text(layout, lbl, &rect);
+    layout_text (layout, lbl, &rect);
 
-    if (sp->screen[a].x > sp->screen[b].x) {gint itmp=b; b=a; a=itmp;}
-    xp = (sp->screen[b].x - sp->screen[a].x)/2 + sp->screen[a].x;
-    if (sp->screen[a].y > sp->screen[b].y) {gint itmp=b; b=a; a=itmp;}
-    yp = (sp->screen[b].y - sp->screen[a].y)/2 + sp->screen[a].y - rect.height;
+    if (sp->screen[a].x > sp->screen[b].x) {
+      gint itmp = b;
+      b = a;
+      a = itmp;
+    }
+    xp = (sp->screen[b].x - sp->screen[a].x) / 2 + sp->screen[a].x;
+    if (sp->screen[a].y > sp->screen[b].y) {
+      gint itmp = b;
+      b = a;
+      a = itmp;
+    }
+    yp =
+      (sp->screen[b].y - sp->screen[a].y) / 2 + sp->screen[a].y - rect.height;
 
     if (nearest) {
-      underline_text(layout);
-      gdk_draw_layout(drawable, gg->plot_GC, 
-	(sp->max.x - rect.width)/2, 5, layout);
+      underline_text (layout);
+      gdk_draw_layout (drawable, gg->plot_GC,
+                       (sp->max.x - rect.width) / 2, 5, layout);
     }
-    gdk_draw_layout(drawable, gg->plot_GC, xp, yp, layout);
+    gdk_draw_layout (drawable, gg->plot_GC, xp, yp, layout);
   }
 }
 
 void
-splot_add_identify_edge_cues (splotd *sp, GdkDrawable *drawable, gint k,
-  gboolean nearest, ggobid *gg)
+splot_add_identify_edge_cues (splotd * sp, GdkDrawable * drawable, gint k,
+                              gboolean nearest, ggobid * gg)
 {
   displayd *dsp = (displayd *) sp->displayptr;
   GGobiData *e = dsp->e;
   gboolean useDefault = false;
 
-  if (k >= e->edge.n) return;
+  if (k >= e->edge.n)
+    return;
 
-  if (e->hidden_now.els[k]) return;
+  if (e->hidden_now.els[k])
+    return;
 
-  if (GGOBI_IS_EXTENDED_SPLOT(sp)) {
+  if (GGOBI_IS_EXTENDED_SPLOT (sp)) {
     GGobiExtendedSPlotClass *klass;
-    klass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);
-    if(klass->add_identify_edge_cues)
-      klass->add_identify_edge_cues(k, sp, drawable, nearest, gg);
-    else 
+    klass = GGOBI_EXTENDED_SPLOT_GET_CLASS (sp);
+    if (klass->add_identify_edge_cues)
+      klass->add_identify_edge_cues (k, sp, drawable, nearest, gg);
+    else
       useDefault = true;
   }
 
@@ -428,8 +453,8 @@ splot_add_identify_edge_cues (splotd *sp, GdkDrawable *drawable, gint k,
 }
 
 void
-splot_add_edgeedit_cues (splotd *sp, GdkDrawable *drawable,
-  gint k, gboolean nearest, ggobid *gg)
+splot_add_edgeedit_cues (splotd * sp, GdkDrawable * drawable,
+                         gint k, gboolean nearest, ggobid * gg)
 {
   displayd *display = sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
@@ -447,19 +472,20 @@ splot_add_edgeedit_cues (splotd *sp, GdkDrawable *drawable,
       splot_add_diamond_cue (gg->edgeedit.a, sp, drawable, gg);
 
     if (gg->buttondown && gg->edgeedit.a != -1 &&
-      k != -1 &&
-      k != gg->edgeedit.a) {
+        k != -1 && k != gg->edgeedit.a) {
 
-      lwidth = lwidth_from_gsize(size);  // Not sure gsize is relevant.
+      lwidth = lwidth_from_gsize (size);  // Not sure gsize is relevant.
       gdk_gc_set_line_attributes (gg->plot_GC, lwidth,
-        GDK_LINE_SOLID, GDK_CAP_BUTT, GDK_JOIN_ROUND);
+                                  GDK_LINE_SOLID, GDK_CAP_BUTT,
+                                  GDK_JOIN_ROUND);
 
       /* This isn't really the color I want to use, but I don't know
-	 how to get at the color of the endpoints here. */
+         how to get at the color of the endpoints here. */
       gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[gg->color_id]);
       gdk_draw_line (drawable, gg->plot_GC,
-        sp->screen[ gg->edgeedit.a ].x, sp->screen[ gg->edgeedit.a ].y,
-        sp->screen[ k ].x, sp->screen[ k ].y);
+                     sp->screen[gg->edgeedit.a].x,
+                     sp->screen[gg->edgeedit.a].y, sp->screen[k].x,
+                     sp->screen[k].y);
     }
 /*  not ready to support deleting
   else if (cpanel->ee_deleting_p)

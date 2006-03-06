@@ -23,26 +23,26 @@
 
 #include "display_tree.h"
 
-#include <string.h> /* for memset */
+#include <string.h>             /* for memset */
 
 #include "print.h"
 
 DisplayOptions DefaultDisplayOptions = {
-                                         true,  /* points_show_p */
-                                         true,  /* axes_show_p */
-                                         true, /* axes_label_p */
-                                         false, /* axes_values_p */
-                                         false, /* edges_undirected_show_p */
-                                         false, /* edges_arrowheads_show_p */
-                                         false, /* edges_directed_show_p */
-                                         true,  /* whiskers_show_p*/
+  true,                         /* points_show_p */
+  true,                         /* axes_show_p */
+  true,                         /* axes_label_p */
+  false,                        /* axes_values_p */
+  false,                        /* edges_undirected_show_p */
+  false,                        /* edges_arrowheads_show_p */
+  false,                        /* edges_directed_show_p */
+  true,                         /* whiskers_show_p */
 /* unused
                                          true,  * missings_show_p  * 
                                          true,  * axes_center_p *
                                          true,  * double_buffer_p *
                                          true   * link_p *
 */
-                                       };
+};
 
 
 /*-- debugging utility --*/
@@ -70,7 +70,7 @@ displays_print (ggobid *gg) {
 /*-- replot all splots in display --*/
 /*-- type = EXPOSE, QUICK, BINNED, FULL --*/
 void
-display_plot (displayd *display, RedrawStyle type, ggobid *gg) 
+display_plot (displayd * display, RedrawStyle type, ggobid * gg)
 {
   GList *slist;
   splotd *sp;
@@ -78,24 +78,23 @@ display_plot (displayd *display, RedrawStyle type, ggobid *gg)
   for (slist = display->splots; slist; slist = slist->next) {
     sp = (splotd *) slist->data;
     if (sp != NULL) {
-      splot_redraw (sp, type, gg); 
+      splot_redraw (sp, type, gg);
     }
   }
 }
 
 static void
-display_plot_allbutone (displayd *display, splotd *splot,
-  RedrawStyle type, ggobid *gg)
+display_plot_allbutone (displayd * display, splotd * splot,
+                        RedrawStyle type, ggobid * gg)
 {
   GList *slist;
   splotd *sp;
 
   for (slist = display->splots; slist; slist = slist->next) {
     sp = (splotd *) slist->data;
-    if (sp == NULL)
-      ;
+    if (sp == NULL);
     else if (splot == NULL || sp != splot)
-      splot_redraw (sp, type, gg); 
+      splot_redraw (sp, type, gg);
   }
 }
 
@@ -110,41 +109,41 @@ we don't update the GUI components here as we assume they are set
 appropriately.  A Model View Controller approach is needed.
 */
 void
-set_display_option(gboolean active, guint action, displayd *display)
+set_display_option (gboolean active, guint action, displayd * display)
 {
   ggobid *gg = display->ggobi;
   gchar *title;
   gint ne = 0;
   GGobiData *onlye = NULL;
 
-  g_return_if_fail(GGOBI_IS_DISPLAY(display));
-  
+  g_return_if_fail (GGOBI_IS_DISPLAY (display));
+
   /*-- count edge sets --*/
   if (action == DOPT_EDGES_U || action == DOPT_EDGES_D ||
-      action == DOPT_EDGES_A || action == DOPT_EDGES_H )
-  {
+      action == DOPT_EDGES_A || action == DOPT_EDGES_H) {
     gint k, nd = g_slist_length (gg->d);
     GGobiData *e;
     if (display->d->rowIds) {
-      for (k=0; k<nd; k++) { 
-        e = (GGobiData*) g_slist_nth_data (gg->d, k);
+      for (k = 0; k < nd; k++) {
+        e = (GGobiData *) g_slist_nth_data (gg->d, k);
         if (e->edge.n > 0) {
           ne++;
-          onlye = e;  /* meaningful if there's only one */
+          onlye = e;            /* meaningful if there's only one */
         }
       }
     }
-    if (ne != 1) onlye = NULL;
+    if (ne != 1)
+      onlye = NULL;
   }
   /*--  --*/
 
   switch (action) {
-    case DOPT_POINTS:
-      display->options.points_show_p = active;
-      display_plot (display, FULL, gg);
+  case DOPT_POINTS:
+    display->options.points_show_p = active;
+    display_plot (display, FULL, gg);
     break;
 
-    case DOPT_EDGES_U:  /*-- undirected: edges only --*/
+  case DOPT_EDGES_U:  /*-- undirected: edges only --*/
 /* Problem:  edgeset_add calls setDisplayEdge, which updates this
    very menu, so that the item we clicked on is destroyed before we
    finish handling the event we received on it.  One upshot of this
@@ -153,95 +152,103 @@ set_display_option(gboolean active, guint action, displayd *display)
    have been correctly set, the problem vanishes!  -- dfs
 */
 
-      display->options.edges_undirected_show_p = active;
-      /*if (active) {
-		display_edges_directed_show (display, false);
-        display_edges_arrowheads_show (display, false);
-      }*/
+    display->options.edges_undirected_show_p = active;
+    /*if (active) {
+       display_edges_directed_show (display, false);
+       display_edges_arrowheads_show (display, false);
+       } */
 
-	  display->options.edges_directed_show_p = false;
-	  display->options.edges_arrowheads_show_p = false;
-        
-      if (display->e == NULL && ne == 1)
-        setDisplayEdge (display, onlye);   /* don't rebuild the menu */
-      if (display->e != NULL) {
-        title = computeTitle (false, gg->current_display, gg);
-        if (title) {
-          gtk_window_set_title (GTK_WINDOW (GGOBI_WINDOW_DISPLAY(display)->window), title);
-          g_free (title); 
-        }
+    display->options.edges_directed_show_p = false;
+    display->options.edges_arrowheads_show_p = false;
+
+    if (display->e == NULL && ne == 1)
+      setDisplayEdge (display, onlye);  /* don't rebuild the menu */
+    if (display->e != NULL) {
+      title = computeTitle (false, gg->current_display, gg);
+      if (title) {
+        gtk_window_set_title (GTK_WINDOW
+                              (GGOBI_WINDOW_DISPLAY (display)->window),
+                              title);
+        g_free (title);
       }
+    }
 
-      display_plot (display, FULL, gg);
+    display_plot (display, FULL, gg);
     break;
-    case DOPT_EDGES_D:  /*-- directed: both edges and arrowheads --*/
+  case DOPT_EDGES_D:  /*-- directed: both edges and arrowheads --*/
 
-      display->options.edges_directed_show_p = active;
-      /*if (active) {
-		display_edges_undirected_show (display, false);
-        display_edges_arrowheads_show (display, false);
-      }*/
-	  display->options.edges_undirected_show_p = false;
-      display->options.edges_arrowheads_show_p = false;
-       
+    display->options.edges_directed_show_p = active;
+    /*if (active) {
+       display_edges_undirected_show (display, false);
+       display_edges_arrowheads_show (display, false);
+       } */
+    display->options.edges_undirected_show_p = false;
+    display->options.edges_arrowheads_show_p = false;
 
-      if (display->e == NULL && ne == 1)
-        setDisplayEdge (display, onlye);   /* don't rebuild the menu */
-      if (display->e != NULL) {
-        title = computeTitle (false, gg->current_display, gg);
-        if (title) {
-          gtk_window_set_title (GTK_WINDOW (GGOBI_WINDOW_DISPLAY(display)->window), title);
-          g_free (title); 
-        }
+
+    if (display->e == NULL && ne == 1)
+      setDisplayEdge (display, onlye);  /* don't rebuild the menu */
+    if (display->e != NULL) {
+      title = computeTitle (false, gg->current_display, gg);
+      if (title) {
+        gtk_window_set_title (GTK_WINDOW
+                              (GGOBI_WINDOW_DISPLAY (display)->window),
+                              title);
+        g_free (title);
       }
+    }
 
-      display_plot (display, FULL, gg);
+    display_plot (display, FULL, gg);
     break;
-    case DOPT_EDGES_A:  /*-- arrowheads only --*/
-      display->options.edges_arrowheads_show_p = active;
-      /*if (active) {
-		display_edges_directed_show (display, false);
-        display_edges_undirected_show (display, false);
-      }*/
-	  display->options.edges_directed_show_p = false;
-      display->options.edges_undirected_show_p = false;
-        
+  case DOPT_EDGES_A:  /*-- arrowheads only --*/
+    display->options.edges_arrowheads_show_p = active;
+    /*if (active) {
+       display_edges_directed_show (display, false);
+       display_edges_undirected_show (display, false);
+       } */
+    display->options.edges_directed_show_p = false;
+    display->options.edges_undirected_show_p = false;
 
-      if (display->e == NULL && ne == 1)
-        setDisplayEdge (display, onlye);   /* don't rebuild the menu */
-      if (display->e != NULL) {
-        title = computeTitle (false, gg->current_display, gg);
-        if (title) {
-          gtk_window_set_title (GTK_WINDOW (GGOBI_WINDOW_DISPLAY(display)->window), title);
-          g_free (title); 
-        }
+
+    if (display->e == NULL && ne == 1)
+      setDisplayEdge (display, onlye);  /* don't rebuild the menu */
+    if (display->e != NULL) {
+      title = computeTitle (false, gg->current_display, gg);
+      if (title) {
+        gtk_window_set_title (GTK_WINDOW
+                              (GGOBI_WINDOW_DISPLAY (display)->window),
+                              title);
+        g_free (title);
       }
+    }
 
 
-      display_plot (display, FULL, gg);
+    display_plot (display, FULL, gg);
     break;
-	case DOPT_EDGES_H:  /*-- arrowheads only --*/
-      display->options.edges_arrowheads_show_p = false;
-	  display->options.edges_directed_show_p = false;
-	  display->options.edges_undirected_show_p = false;
-        
-      if (display->e == NULL && ne == 1)
-        setDisplayEdge (display, onlye);   /* don't rebuild the menu */
-      if (display->e != NULL) {
-        title = computeTitle (false, gg->current_display, gg);
-        if (title) {
-          gtk_window_set_title (GTK_WINDOW (GGOBI_WINDOW_DISPLAY(display)->window), title);
-          g_free (title); 
-        }
+  case DOPT_EDGES_H:/*-- arrowheads only --*/
+    display->options.edges_arrowheads_show_p = false;
+    display->options.edges_directed_show_p = false;
+    display->options.edges_undirected_show_p = false;
+
+    if (display->e == NULL && ne == 1)
+      setDisplayEdge (display, onlye);  /* don't rebuild the menu */
+    if (display->e != NULL) {
+      title = computeTitle (false, gg->current_display, gg);
+      if (title) {
+        gtk_window_set_title (GTK_WINDOW
+                              (GGOBI_WINDOW_DISPLAY (display)->window),
+                              title);
+        g_free (title);
       }
+    }
 
 
-      display_plot (display, FULL, gg);
+    display_plot (display, FULL, gg);
     break;
 
-    case DOPT_WHISKERS:
-      display->options.whiskers_show_p = active;
-      display_plot (display, FULL, gg);
+  case DOPT_WHISKERS:
+    display->options.whiskers_show_p = active;
+    display_plot (display, FULL, gg);
     break;
 /*
     case DOPT_MISSINGS:
@@ -269,37 +276,37 @@ set_display_option(gboolean active, guint action, displayd *display)
     break;
 */
 
-    case DOPT_AXES:
-      display->options.axes_show_p = active;
+  case DOPT_AXES:
+    display->options.axes_show_p = active;
 
-      if(GGOBI_IS_EXTENDED_DISPLAY(display)) {
-        GGobiExtendedDisplayClass *klass;
-        klass = GGOBI_EXTENDED_DISPLAY_GET_CLASS(display);
-        if(klass->set_show_axes_option)
-          klass->set_show_axes_option(display, active);
-      }
+    if (GGOBI_IS_EXTENDED_DISPLAY (display)) {
+      GGobiExtendedDisplayClass *klass;
+      klass = GGOBI_EXTENDED_DISPLAY_GET_CLASS (display);
+      if (klass->set_show_axes_option)
+        klass->set_show_axes_option (display, active);
+    }
     break;
 
-    case DOPT_AXESLAB:
-      display->options.axes_label_p = active;
+  case DOPT_AXESLAB:
+    display->options.axes_label_p = active;
 
-      if(GGOBI_IS_EXTENDED_DISPLAY(display)) {
-        GGobiExtendedDisplayClass *klass;
-        klass = GGOBI_EXTENDED_DISPLAY_GET_CLASS(display);
-        if(klass->set_show_axes_label_option)
-          klass->set_show_axes_label_option(display, active);
-      }      
+    if (GGOBI_IS_EXTENDED_DISPLAY (display)) {
+      GGobiExtendedDisplayClass *klass;
+      klass = GGOBI_EXTENDED_DISPLAY_GET_CLASS (display);
+      if (klass->set_show_axes_label_option)
+        klass->set_show_axes_label_option (display, active);
+    }
     break;
 
-    case DOPT_AXESVALS:
-      display->options.axes_values_p = active;
+  case DOPT_AXESVALS:
+    display->options.axes_values_p = active;
 
-      if(GGOBI_IS_EXTENDED_DISPLAY(display)) {
-        GGobiExtendedDisplayClass *klass;
-        klass = GGOBI_EXTENDED_DISPLAY_GET_CLASS(display);
-        if(klass->set_show_axes_values_option)
-          klass->set_show_axes_values_option(display, active);
-      }
+    if (GGOBI_IS_EXTENDED_DISPLAY (display)) {
+      GGobiExtendedDisplayClass *klass;
+      klass = GGOBI_EXTENDED_DISPLAY_GET_CLASS (display);
+      if (klass->set_show_axes_values_option)
+        klass->set_show_axes_values_option (display, active);
+    }
     break;
 
 /* unused
@@ -313,8 +320,8 @@ set_display_option(gboolean active, guint action, displayd *display)
       display->options.link_p = w->active;
     break;
 */
-    default:
-      g_printerr ("no variable is associated with %d\n", action);
+  default:
+    g_printerr ("no variable is associated with %d\n", action);
   }
 }
 
@@ -325,67 +332,67 @@ set_display_option(gboolean active, guint action, displayd *display)
  then force them to be applied.  This does not update the menus.
 */
 void
-set_display_options(displayd *display, ggobid *gg)
+set_display_options (displayd * display, ggobid * gg)
 {
-    int i;
-    gboolean active = true;
-    DisplayOptions *options = &display->options;
-    for(i = DOPT_POINTS ; i <=  DOPT_WHISKERS; i++) {
-       if (i == DOPT_EDGES_U || i == DOPT_EDGES_D ||  i == DOPT_EDGES_A || 
-		   i == DOPT_EDGES_H)
-         if(display->edge_merge == -1)
-   	   continue;
+  int i;
+  gboolean active = true;
+  DisplayOptions *options = &display->options;
+  for (i = DOPT_POINTS; i <= DOPT_WHISKERS; i++) {
+    if (i == DOPT_EDGES_U || i == DOPT_EDGES_D || i == DOPT_EDGES_A ||
+        i == DOPT_EDGES_H)
+      if (display->edge_merge == -1)
+        continue;
 
-         switch(i) {
-		 case DOPT_POINTS:
-			 active = options->points_show_p;
-			 break;
-		 case DOPT_AXES:
-			 active = options->axes_show_p;
-			 break;
-		 case DOPT_AXESLAB:
-			 active = options->axes_label_p;
-			 break;
-		 case DOPT_AXESVALS:
-			 active = options->axes_values_p;
-			 break;
-		 case DOPT_EDGES_U:
-			 active = options->edges_undirected_show_p;
-			 break;
-		 case DOPT_EDGES_A:
-			 active = options->edges_arrowheads_show_p;
-			 break;
-		 case DOPT_EDGES_D:
-			 active = options->edges_directed_show_p;
-			 break;
-		 case DOPT_WHISKERS:
-			 active = options->whiskers_show_p;
-			 break;
-	 }
-
-         set_display_option(active, i, display);
+    switch (i) {
+    case DOPT_POINTS:
+      active = options->points_show_p;
+      break;
+    case DOPT_AXES:
+      active = options->axes_show_p;
+      break;
+    case DOPT_AXESLAB:
+      active = options->axes_label_p;
+      break;
+    case DOPT_AXESVALS:
+      active = options->axes_values_p;
+      break;
+    case DOPT_EDGES_U:
+      active = options->edges_undirected_show_p;
+      break;
+    case DOPT_EDGES_A:
+      active = options->edges_arrowheads_show_p;
+      break;
+    case DOPT_EDGES_D:
+      active = options->edges_directed_show_p;
+      break;
+    case DOPT_WHISKERS:
+      active = options->whiskers_show_p;
+      break;
     }
+
+    set_display_option (active, i, display);
+  }
 }
 
 
 void
-display_print (displayd *display) 
+display_print (displayd * display)
 {
   ggobid *gg;
   gg = display->ggobi;
 
-  if(gg->printOptions == NULL) {
-    gg->printOptions = getDefaultPrintOptions(NULL);
+  if (gg->printOptions == NULL) {
+    gg->printOptions = getDefaultPrintOptions (NULL);
   }
 
-  if(DefaultPrintHandler.callback)
-    (*DefaultPrintHandler.callback)(gg->printOptions, display,
-      display->ggobi, &DefaultPrintHandler);
+  if (DefaultPrintHandler.callback)
+    (*DefaultPrintHandler.callback) (gg->printOptions, display,
+                                     display->ggobi, &DefaultPrintHandler);
 }
 
 /*-- Close a display --*/
 void
-display_close (displayd *display) 
+display_close (displayd * display)
 {
   ggobid *gg = GGobiFromDisplay (display);
   display_free (display, false, gg);
@@ -393,17 +400,17 @@ display_close (displayd *display)
 
 
 void
-show_display_control_panel(displayd *display) 
+show_display_control_panel (displayd * display)
 {
   ggobid *gg = GGobiFromDisplay (display);
-  /* gtk_window_present(GTK_WINDOW(gg->main_window()));*/
-  gdk_window_raise(gg->main_window->window);
+  /* gtk_window_present(GTK_WINDOW(gg->main_window())); */
+  gdk_window_raise (gg->main_window->window);
 }
 
 
 /*-- Called when a window is deleted from the window manager --*/
 void
-display_delete_cb (GtkWidget *w, GdkEvent *event, displayd *display) 
+display_delete_cb (GtkWidget * w, GdkEvent * event, displayd * display)
 {
   ggobid *gg = GGobiFromWidget (w, true);
   display_free (display, false, gg);
@@ -418,13 +425,13 @@ display_delete_cb (GtkWidget *w, GdkEvent *event, displayd *display)
  This display class is really a virtual class.
 */
 displayd *
-ggobi_display_new(gboolean missing_p, GGobiData *d, ggobid *gg)
+ggobi_display_new (gboolean missing_p, GGobiData * d, ggobid * gg)
 {
-  return(display_alloc_init(missing_p, d, gg));
+  return (display_alloc_init (missing_p, d, gg));
 }
 
 void
-display_set_values(displayd *display, GGobiData *d, ggobid *gg)
+display_set_values (displayd * display, GGobiData * d, ggobid * gg)
 {
   /* Should copy in the contents of DefaultOptions to create
      an indepedently modifiable configuration copied from
@@ -437,65 +444,67 @@ display_set_values(displayd *display, GGobiData *d, ggobid *gg)
 }
 
 displayd *
-display_alloc_init (gboolean missing_p, GGobiData *d, ggobid *gg)
+display_alloc_init (gboolean missing_p, GGobiData * d, ggobid * gg)
 {
   displayd *display;
 
-  display = g_object_new(GGOBI_TYPE_WINDOW_DISPLAY, NULL);
-  GGOBI_WINDOW_DISPLAY(display)->useWindow = true;
-  display_set_values(display, d, gg);
+  display = g_object_new (GGOBI_TYPE_WINDOW_DISPLAY, NULL);
+  GGOBI_WINDOW_DISPLAY (display)->useWindow = true;
+  display_set_values (display, d, gg);
 
   return (display);
 }
 
 
 gint
-display_add (displayd *display, ggobid *gg)
+display_add (displayd * display, ggobid * gg)
 {
   splotd *prev_splot = gg->current_splot;
   ProjectionMode pmode_prev = pmode_get (gg->current_display, gg);
   InteractionMode imode_prev = imode_get (gg);
   ///displayd *oldDisplay = gg->current_display;
 
- /* This is a safety test to avoid having a display be entered twice.
-    Deactivate if we want to be slightly more efficient.             */  
-  if(g_list_find(gg->displays, display)) {
-    g_printerr("Display has already been added to the displays list of this ggobi\n");
-    return(-1);
+  /* This is a safety test to avoid having a display be entered twice.
+     Deactivate if we want to be slightly more efficient.             */
+  if (g_list_find (gg->displays, display)) {
+    g_printerr
+      ("Display has already been added to the displays list of this ggobi\n");
+    return (-1);
   }
 
   /* moved this here so that the current splot is set when configuring
      cpanels - mfl */
-  if(g_list_length(display->splots)) {
-     gg->current_splot = (splotd *)
-       g_list_nth_data (display->splots, 0);
-     display->current_splot = gg->current_splot;
-     splot_set_current (gg->current_splot, on, gg);
+  if (g_list_length (display->splots)) {
+    gg->current_splot = (splotd *)
+      g_list_nth_data (display->splots, 0);
+    display->current_splot = gg->current_splot;
+    splot_set_current (gg->current_splot, on, gg);
   }
-  
-  if (GGOBI_IS_WINDOW_DISPLAY(display)  && GGOBI_WINDOW_DISPLAY(display)->useWindow) {
-    GGobi_widget_set(GGOBI_WINDOW_DISPLAY(display)->window, gg, true);
-    if(g_list_length(display->splots))
+
+  if (GGOBI_IS_WINDOW_DISPLAY (display)
+      && GGOBI_WINDOW_DISPLAY (display)->useWindow) {
+    GGobi_widget_set (GGOBI_WINDOW_DISPLAY (display)->window, gg, true);
+    if (g_list_length (display->splots))
       display_set_current (display, gg);  /*-- this initializes the mode --*/
   }
   gg->displays = g_list_append (gg->displays, (gpointer) display);
 
   /* If the tree of displays is active, add this to it. */
-  display_add_tree(display);
+  display_add_tree (display);
 
   // setting current splot was here
-  
+
   /*
    * The current display types start without signal handlers, but
    * I may need to add handlers later for some unforeseen display.
-  */
+   */
 
   /*-- if starting from the API, or changing mode, update the mode menus --*/
   if (pmode_prev != gg->current_display->cpanel.pmode ||
       imode_prev != gg->current_display->cpanel.imode) {
-    /*main_miscmenus_update (pmode_prev, imode_prev, oldDisplay, gg);*/
+    /*main_miscmenus_update (pmode_prev, imode_prev, oldDisplay, gg); */
     display_mode_menus_update (pmode_prev, imode_prev,
-      gg->current_display, gg);
+                               gg->current_display, gg);
   }
 
   /*-- Make sure the border for the previous plot is turned off --*/
@@ -504,7 +513,7 @@ display_add (displayd *display, ggobid *gg)
     gtk_widget_queue_draw (prev_splot->da);
   }
 
-  g_signal_emit(G_OBJECT(gg), GGobiSignals[DISPLAY_NEW_SIGNAL], 0, display);
+  g_signal_emit (G_OBJECT (gg), GGobiSignals[DISPLAY_NEW_SIGNAL], 0, display);
 
   return (g_list_length (gg->displays));
 }
@@ -513,17 +522,17 @@ display_add (displayd *display, ggobid *gg)
 /*
  * Remove display from the linked list of displays.  Reset
  * current_display and current_splot if necessary.
-*/ 
+*/
 void
-display_free (displayd* display, gboolean force, ggobid *gg) 
+display_free (displayd * display, gboolean force, ggobid * gg)
 {
   splotd *sp = NULL;
   extern gint num_ggobis;
   gint count;
   displayd *dsp;
 
-  if(force == false && sessionOptions->info->allowCloseLastDisplay)
-      force = true;
+  if (force == false && sessionOptions->info->allowCloseLastDisplay)
+    force = true;
 
   if (num_ggobis > 1 || force || g_list_length (gg->displays) > 0) {
 
@@ -532,23 +541,23 @@ display_free (displayd* display, gboolean force, ggobid *gg)
        wrong so we play on the safe side of the fence.
      */
 
-    if(display->t1d.idled) {
-      tour1d_func(false, display, gg);
+    if (display->t1d.idled) {
+      tour1d_func (false, display, gg);
     }
-    if (display->t1d_window)  /* XXX more to free or destroy here? */
+    if (display->t1d_window)    /* XXX more to free or destroy here? */
       gtk_widget_destroy (display->t1d_window);
 
-    if(display->t2d.idled) {
-      tour2d_func(false, display, gg);
+    if (display->t2d.idled) {
+      tour2d_func (false, display, gg);
     }
-    if (display->t2d_window)  /* XXX more to free or destroy here? */
+    if (display->t2d_window)    /* XXX more to free or destroy here? */
       gtk_widget_destroy (display->t2d_window);
 
-    if(display->tcorr1.idled) {
-      tourcorr_func(false, display, gg);
+    if (display->tcorr1.idled) {
+      tourcorr_func (false, display, gg);
     }
-    if(display->t2d3.idled) {
-      tour2d3_func(false, display, gg);
+    if (display->t2d3.idled) {
+      tour2d3_func (false, display, gg);
     }
 
 /*
@@ -562,40 +571,41 @@ display_free (displayd* display, gboolean force, ggobid *gg)
     dsp = (displayd *) gg->current_splot->displayptr;
     if (dsp == display) {
       sp_event_handlers_toggle (gg->current_splot, off, display->cpanel.pmode,
-        display->cpanel.imode);
+                                display->cpanel.imode);
     }
 
 
     /*-- If the display tree is active, remove the corresponding entry. --*/
-    tree_display_entry_remove (display, gg->display_tree.tree, gg); 
+    tree_display_entry_remove (display, gg->display_tree.tree, gg);
 
     gg->displays = g_list_remove (gg->displays, display);
 
     /*-- if the current_display was just removed, assign a new one --*/
     /*-- list length only has to be >=0 because a display was just removed --*/
     if (display == gg->current_display) {
-     if(g_list_length (gg->displays) > 0) {
-      dsp = (displayd *) g_list_nth_data (gg->displays, 0);
-      display_set_current (dsp, gg);
+      if (g_list_length (gg->displays) > 0) {
+        dsp = (displayd *) g_list_nth_data (gg->displays, 0);
+        display_set_current (dsp, gg);
 
-      gg->current_splot = (splotd *)
-        g_list_nth_data (gg->current_display->splots, 0);
-      dsp->current_splot = gg->current_splot;
-      splot_set_current (gg->current_splot, on, gg);
-      sp = gg->current_splot;
-      if (sp != NULL) {
-        sp->redraw_style = QUICK;
-        gtk_widget_queue_draw (sp->da);
+        gg->current_splot = (splotd *)
+          g_list_nth_data (gg->current_display->splots, 0);
+        dsp->current_splot = gg->current_splot;
+        splot_set_current (gg->current_splot, on, gg);
+        sp = gg->current_splot;
+        if (sp != NULL) {
+          sp->redraw_style = QUICK;
+          gtk_widget_queue_draw (sp->da);
+        }
       }
-     } else {
-       gg->current_display = NULL;
-       gg->current_splot = NULL;
-     }
+      else {
+        gg->current_display = NULL;
+        gg->current_splot = NULL;
+      }
     }
 
     count = g_list_length (display->splots);
 
-    if (GGOBI_IS_WINDOW_DISPLAY(display)) {
+    if (GGOBI_IS_WINDOW_DISPLAY (display)) {
 /*XX
       GList *l;
       for (l=display->splots; count > 0 && l; l=l->next, count--) {
@@ -604,24 +614,25 @@ display_free (displayd* display, gboolean force, ggobid *gg)
       }
 */
 
-     gtk_widget_destroy (GGOBI_WINDOW_DISPLAY(display)->window);
+      gtk_widget_destroy (GGOBI_WINDOW_DISPLAY (display)->window);
     }
   }
 
   /*-- If there are no longer any displays, set ggobi's mode to NULLMODE --*/
   if (g_list_length (gg->displays) == 0) {
-    GGOBI(full_viewmode_set) (NULL_PMODE, NULL_IMODE, gg);
+    GGOBI (full_viewmode_set) (NULL_PMODE, NULL_IMODE, gg);
   }
 }
 
 void
-display_free_all (ggobid *gg) {
+display_free_all (ggobid * gg)
+{
   GList *dlist;
   displayd *display;
   gint count;
 
-  if(gg->displays == NULL)
-      return;
+  if (gg->displays == NULL)
+    return;
 
 
   count = g_list_length (gg->displays);
@@ -630,35 +641,34 @@ display_free_all (ggobid *gg) {
      This is because when we remove the last entry, we get garbage,
      not a null value.
    */
-  for (dlist = gg->displays; count > 0 && dlist; count--)
-  {
+  for (dlist = gg->displays; count > 0 && dlist; count--) {
     gint nc;
     display = (displayd *) dlist->data;
     nc = display->d->ncols;
     if (display == NULL)
       break;
 
-    if(nc >= MIN_NVARS_FOR_TOUR1D && display->t1d.idled)
-      g_source_remove(display->t1d.idled);
-    if(nc >= MIN_NVARS_FOR_TOUR2D && display->t2d.idled)
-      g_source_remove(display->t2d.idled);
-    if(nc >= MIN_NVARS_FOR_COTOUR && display->tcorr1.idled)
-      g_source_remove(display->tcorr1.idled);
-    if(nc >= MIN_NVARS_FOR_COTOUR && display->tcorr2.idled)
-      g_source_remove(display->tcorr2.idled);
+    if (nc >= MIN_NVARS_FOR_TOUR1D && display->t1d.idled)
+      g_source_remove (display->t1d.idled);
+    if (nc >= MIN_NVARS_FOR_TOUR2D && display->t2d.idled)
+      g_source_remove (display->t2d.idled);
+    if (nc >= MIN_NVARS_FOR_COTOUR && display->tcorr1.idled)
+      g_source_remove (display->tcorr1.idled);
+    if (nc >= MIN_NVARS_FOR_COTOUR && display->tcorr2.idled)
+      g_source_remove (display->tcorr2.idled);
 
 
-     /* If the second argument 'force' is true, it eliminates the
-        final display.  It will work now if there is more than one
-        ggobi instance running.
-      */
+    /* If the second argument 'force' is true, it eliminates the
+       final display.  It will work now if there is more than one
+       ggobi instance running.
+     */
     dlist = dlist->next;
-    display_free (display, true, gg); 
+    display_free (display, true, gg);
   }
 }
 
 void
-display_set_current (displayd *new_display, ggobid *gg) 
+display_set_current (displayd * new_display, ggobid * gg)
 {
   gchar *title;
 
@@ -673,65 +683,70 @@ display_set_current (displayd *new_display, ggobid *gg)
      elements provided by the new display. */
 
   if (gg->firsttime == false && gg->current_display &&
-      GGOBI_IS_WINDOW_DISPLAY(gg->current_display))
-  {
+      GGOBI_IS_WINDOW_DISPLAY (gg->current_display)) {
     title = computeTitle (false, gg->current_display, gg);
-    if (title && GGOBI_WINDOW_DISPLAY(gg->current_display)->window) {
-      gtk_window_set_title (GTK_WINDOW (GGOBI_WINDOW_DISPLAY(gg->current_display)->window), title);
-      g_free (title); 
+    if (title && GGOBI_WINDOW_DISPLAY (gg->current_display)->window) {
+      gtk_window_set_title (GTK_WINDOW
+                            (GGOBI_WINDOW_DISPLAY (gg->current_display)->
+                             window), title);
+      g_free (title);
     }
 
     /* Now clean up the different control panel menus associated with
        this display.  Specifically, this deletes the imode and pmode
        menus.
      */
-    if(GGOBI_IS_EXTENDED_DISPLAY(gg->current_display)) {
-	gtk_ui_manager_remove_ui(gg->main_menu_manager, gg->mode_merge_id);
-     /* Allow the extended display to override the submenu_destroy
-        call.  If it doesn't provide a method, then call
-        submenu_destroy. */
-      void (*f)(displayd *dpy) =
-        GGOBI_EXTENDED_DISPLAY_GET_CLASS(gg->current_display)->display_unset;
-      if(f) {
-        f(gg->current_display);
-        f(gg->current_display);
+    if (GGOBI_IS_EXTENDED_DISPLAY (gg->current_display)) {
+      gtk_ui_manager_remove_ui (gg->main_menu_manager, gg->mode_merge_id);
+      /* Allow the extended display to override the submenu_destroy
+         call.  If it doesn't provide a method, then call
+         submenu_destroy. */
+      void (*f) (displayd * dpy) =
+        GGOBI_EXTENDED_DISPLAY_GET_CLASS (gg->current_display)->display_unset;
+      if (f) {
+        f (gg->current_display);
+        f (gg->current_display);
       }
     }
   }
 
   /* Now do the setup for the new display.  */
-  if (GGOBI_IS_WINDOW_DISPLAY(new_display)) {
-    if(GGOBI_WINDOW_DISPLAY(new_display)->useWindow) {
+  if (GGOBI_IS_WINDOW_DISPLAY (new_display)) {
+    if (GGOBI_WINDOW_DISPLAY (new_display)->useWindow) {
       title = computeTitle (true, new_display, gg);
       if (title) {
-        gtk_window_set_title (GTK_WINDOW (GGOBI_WINDOW_DISPLAY(new_display)->window), title);   
-        g_free (title); 
+        gtk_window_set_title (GTK_WINDOW
+                              (GGOBI_WINDOW_DISPLAY (new_display)->window),
+                              title);
+        g_free (title);
       }
     }
 
-    if(GGOBI_IS_EXTENDED_DISPLAY(new_display)) {
-      const gchar* (*ui_get)(displayd *dpy) = 
-	GGOBI_EXTENDED_DISPLAY_GET_CLASS(new_display)->mode_ui_get;
+    if (GGOBI_IS_EXTENDED_DISPLAY (new_display)) {
+      const gchar *(*ui_get) (displayd * dpy) =
+        GGOBI_EXTENDED_DISPLAY_GET_CLASS (new_display)->mode_ui_get;
       if (ui_get) {
-	GError *error = NULL;
-	const gchar *ui = ui_get(new_display);
-	gg->mode_merge_id = 
-	  gtk_ui_manager_add_ui_from_string(gg->main_menu_manager, ui, -1, &error);
-	if (error) {
-  	  g_message("Could not merge main mode ui from display");
-	  g_error_free(error);
-	}
+        GError *error = NULL;
+        const gchar *ui = ui_get (new_display);
+        gg->mode_merge_id =
+          gtk_ui_manager_add_ui_from_string (gg->main_menu_manager, ui, -1,
+                                             &error);
+        if (error) {
+          g_message ("Could not merge main mode ui from display");
+          g_error_free (error);
+        }
       }
-      void (*f)(displayd *dpy, ggobid *gg) =
-        GGOBI_EXTENDED_DISPLAY_GET_CLASS(new_display)->display_set;
-      if(f)
-        f(new_display, gg);
+      void (*f) (displayd * dpy, ggobid * gg) =
+        GGOBI_EXTENDED_DISPLAY_GET_CLASS (new_display)->display_set;
+      if (f)
+        f (new_display, gg);
     }
   }
 
   gg->current_display = new_display;
 
-  g_signal_emit(G_OBJECT(gg), GGobiSignals[DISPLAY_SELECTED_SIGNAL], 0, new_display);
+  g_signal_emit (G_OBJECT (gg), GGobiSignals[DISPLAY_SELECTED_SIGNAL], 0,
+                 new_display);
 
   // replaced by listeners -- dfs
   // cpanel_set (gg->current_display, gg);
@@ -749,31 +764,33 @@ display_set_current (displayd *new_display, ggobid *gg)
    Caller must free the return value.
  */
 gchar *
-computeTitle (gboolean current_p, displayd *display, ggobid *gg)
+computeTitle (gboolean current_p, displayd * display, ggobid * gg)
 {
   gint n;
   gchar *title = NULL, *description;
   const char *tmp = NULL;
 
-  if(GGOBI_IS_EXTENDED_DISPLAY(display)) {
-    tmp = ggobi_display_title_label(display);
+  if (GGOBI_IS_EXTENDED_DISPLAY (display)) {
+    tmp = ggobi_display_title_label (display);
   }
 
   if (display->d->name != NULL) {
     if (display->e != NULL && display->e->name != NULL)
       description = g_strdup_printf ("%s/%s",
-        display->d->name, display->e->name);
-    else description = g_strdup(display->d->name);
-  } else {
-    description = GGOBI (getDescription)(gg);
+                                     display->d->name, display->e->name);
+    else
+      description = g_strdup (display->d->name);
+  }
+  else {
+    description = GGOBI (getDescription) (gg);
   }
 
   n = strlen (tmp) + strlen (description) + 5 +
-   (current_p ? strlen("(current)") : 0);
-  title = (gchar *) g_malloc(sizeof(gchar) * n);
+    (current_p ? strlen ("(current)") : 0);
+  title = (gchar *) g_malloc (sizeof (gchar) * n);
   memset (title, '\0', n);
   sprintf (title, "%s: %s %s", description, tmp,
-   (current_p ? "(current)":""));
+           (current_p ? "(current)" : ""));
   g_free (description);
 
   return (title);
@@ -784,7 +801,8 @@ computeTitle (gboolean current_p, displayd *display, ggobid *gg)
  * replot all splots in all displays -- except splot, if present
 */
 void
-displays_plot (splotd *splot, RedrawStyle type, ggobid *gg) {
+displays_plot (splotd * splot, RedrawStyle type, ggobid * gg)
+{
   GList *dlist;
   displayd *display;
 
@@ -800,7 +818,7 @@ displays_plot (splotd *splot, RedrawStyle type, ggobid *gg) {
 
 /*-- reproject and replot all splots in display --*/
 void
-display_tailpipe (displayd *display, RedrawStyle type, ggobid *gg) 
+display_tailpipe (displayd * display, RedrawStyle type, ggobid * gg)
 {
   GList *splist = display->splots;
   splotd *sp;
@@ -820,29 +838,26 @@ display_tailpipe (displayd *display, RedrawStyle type, ggobid *gg)
 
 /*-- update transient brushing; I will also need to un-brush some points --*/
     if (display == gg->current_display &&
-        sp == gg->current_splot &&
-        imode_get (gg) == BRUSH)
-    {
+        sp == gg->current_splot && imode_get (gg) == BRUSH) {
       GGobiData *d = display->d;
-      if (GGOBI_IS_EXTENDED_SPLOT(sp)) {
-        void (*f)(GGobiData *, splotd *, ggobid *);
+      if (GGOBI_IS_EXTENDED_SPLOT (sp)) {
+        void (*f) (GGobiData *, splotd *, ggobid *);
         GGobiExtendedSPlotClass *klass;
-        klass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);
+        klass = GGOBI_EXTENDED_SPLOT_GET_CLASS (sp);
         f = klass->splot_assign_points_to_bins;
-        if(f) {
-          f(d, sp, gg);  // need to exclude area plots
+        if (f) {
+          f (d, sp, gg);        // need to exclude area plots
         }
       }
       //assign_points_to_bins (d, sp, gg); // damnit, not for area plots
     }
 
-    if(GGOBI_IS_EXTENDED_DISPLAY(display)) {
-      void (*f)(gboolean, displayd *, splotd *, ggobid *);
-      f = GGOBI_EXTENDED_DISPLAY_GET_CLASS(display)->ruler_ranges_set;
-      if(f) {
-        f(GTK_WIDGET_VISIBLE (display->hrule) ||
-          GTK_WIDGET_VISIBLE (display->vrule),
-          display, sp, gg);
+    if (GGOBI_IS_EXTENDED_DISPLAY (display)) {
+      void (*f) (gboolean, displayd *, splotd *, ggobid *);
+      f = GGOBI_EXTENDED_DISPLAY_GET_CLASS (display)->ruler_ranges_set;
+      if (f) {
+        f (GTK_WIDGET_VISIBLE (display->hrule) ||
+           GTK_WIDGET_VISIBLE (display->vrule), display, sp, gg);
       }
     }
 
@@ -854,7 +869,8 @@ display_tailpipe (displayd *display, RedrawStyle type, ggobid *gg)
 
 /*-- Reproject and plot all plots in all displays: modulo missingness --*/
 void
-displays_tailpipe (RedrawStyle type, ggobid *gg) {
+displays_tailpipe (RedrawStyle type, ggobid * gg)
+{
   GList *dlist;
   displayd *display;
 
@@ -865,31 +881,32 @@ displays_tailpipe (RedrawStyle type, ggobid *gg) {
 }
 
 void
-display_window_init (windowDisplayd *display, gint width, gint height, gint bwidth, ggobid *gg)
+display_window_init (windowDisplayd * display, gint width, gint height,
+                     gint bwidth, ggobid * gg)
 {
   display->window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-  g_object_set_data(G_OBJECT (display->window),
-                       "displayd",
-                       (gpointer) display);
+  g_object_set_data (G_OBJECT (display->window),
+                     "displayd", (gpointer) display);
   /* allowing shrink is considered a 'bad thing' - instead we no
      longer request a size for the drawing areas (splots), but instead
      we set a default window size and allow the splots to
      automatically fill the space - mfl */
   //gtk_window_set_policy (GTK_WINDOW (display->window), true, true, false);
-  gtk_window_set_default_size(GTK_WINDOW(display->window), width, height);
+  gtk_window_set_default_size (GTK_WINDOW (display->window), width, height);
   //gtk_container_set_border_width (GTK_CONTAINER (display->window), bwidth);
   g_signal_connect (G_OBJECT (display->window), "delete_event",
-                      G_CALLBACK (display_delete_cb), (gpointer) display);
+                    G_CALLBACK (display_delete_cb), (gpointer) display);
 
   GGobi_widget_set (GTK_WIDGET (display->window), gg, true);
 }
 
 
 gboolean
-isEmbeddedDisplay (displayd *dpy)
+isEmbeddedDisplay (displayd * dpy)
 {
   gboolean ans = false;
-  ans = (GGOBI_IS_WINDOW_DISPLAY(dpy) == false || GGOBI_WINDOW_DISPLAY(dpy)->useWindow);
+  ans = (GGOBI_IS_WINDOW_DISPLAY (dpy) == false
+         || GGOBI_WINDOW_DISPLAY (dpy)->useWindow);
 
   return (ans);
 }
@@ -900,63 +917,67 @@ isEmbeddedDisplay (displayd *dpy)
  * support which view modes
 */
 gboolean
-display_type_handles_projection (displayd *display, ProjectionMode pmode) 
+display_type_handles_projection (displayd * display, ProjectionMode pmode)
 {
   gboolean handles = false;
   ProjectionMode v = pmode;
 
-  if(GGOBI_IS_EXTENDED_DISPLAY(display)) {
-    handles = GGOBI_EXTENDED_DISPLAY_GET_CLASS(display)->handles_projection(display, v);
-  } 
+  if (GGOBI_IS_EXTENDED_DISPLAY (display)) {
+    handles =
+      GGOBI_EXTENDED_DISPLAY_GET_CLASS (display)->handles_projection (display,
+                                                                      v);
+  }
 
   return handles;
 }
+
 gboolean
-display_type_handles_interaction (displayd *display, InteractionMode imode) 
+display_type_handles_interaction (displayd * display, InteractionMode imode)
 {
   gboolean handles = false;
   InteractionMode v = imode;
 
-  if(GGOBI_IS_EXTENDED_DISPLAY(display)) {
-    handles = GGOBI_EXTENDED_DISPLAY_GET_CLASS(display)->handles_interaction(display, v);
-  } 
+  if (GGOBI_IS_EXTENDED_DISPLAY (display)) {
+    handles =
+      GGOBI_EXTENDED_DISPLAY_GET_CLASS (display)->
+      handles_interaction (display, v);
+  }
 
   return handles;
 }
 
 gboolean
-display_copy_edge_options (displayd *dsp, displayd *dspnew)
+display_copy_edge_options (displayd * dsp, displayd * dspnew)
 {
   GtkAction *action;
 
   dspnew->options.edges_undirected_show_p =
     dsp->options.edges_undirected_show_p;
-  action = gtk_ui_manager_get_action (dspnew->menu_manager, 
-    "/menubar/Edges/ShowUndirectedEdges");
+  action = gtk_ui_manager_get_action (dspnew->menu_manager,
+                                      "/menubar/Edges/ShowUndirectedEdges");
   if (action) {
-    gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action),
-      dspnew->options.edges_undirected_show_p);
+    gtk_toggle_action_set_active (GTK_TOGGLE_ACTION (action),
+                                  dspnew->options.edges_undirected_show_p);
   }
 
-  dspnew->options.edges_directed_show_p =
-    dsp->options.edges_directed_show_p;
-  action = gtk_ui_manager_get_action (dspnew->menu_manager, 
-    "/menubar/Edges/ShowDirectedEdges");
+  dspnew->options.edges_directed_show_p = dsp->options.edges_directed_show_p;
+  action = gtk_ui_manager_get_action (dspnew->menu_manager,
+                                      "/menubar/Edges/ShowDirectedEdges");
   if (action) {
-    gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action),
-      dspnew->options.edges_directed_show_p);
+    gtk_toggle_action_set_active (GTK_TOGGLE_ACTION (action),
+                                  dspnew->options.edges_directed_show_p);
   }
 
   dspnew->options.edges_arrowheads_show_p =
     dsp->options.edges_arrowheads_show_p;
-  action = gtk_ui_manager_get_action (dspnew->menu_manager, 
-    "/menubar/Edges/ShowArrowheadsOnly");
+  action = gtk_ui_manager_get_action (dspnew->menu_manager,
+                                      "/menubar/Edges/ShowArrowheadsOnly");
   if (action) {
-    gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action),
-      dspnew->options.edges_arrowheads_show_p);
+    gtk_toggle_action_set_active (GTK_TOGGLE_ACTION (action),
+                                  dspnew->options.edges_arrowheads_show_p);
   }
 
-  return (dspnew->options.edges_directed_show_p || 
+  return (dspnew->options.edges_directed_show_p ||
           dspnew->options.edges_undirected_show_p ||
           dspnew->options.edges_arrowheads_show_p);
 }

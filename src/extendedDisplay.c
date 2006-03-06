@@ -17,40 +17,40 @@
 #include "ggobi.h"
 #include "display.h"
 
-const gchar * /*const*/
-ggobi_display_tree_label(displayd *dpy)
+const gchar *                   /*const */
+ggobi_display_tree_label (displayd * dpy)
 {
   GGobiExtendedDisplayClass *klass;
-  gchar * const label = "?";
-  klass = GGOBI_EXTENDED_DISPLAY_GET_CLASS(dpy);
-  if(klass->treeLabel)
-    return(klass->treeLabel);
-  if(klass->tree_label)
-    return(klass->tree_label(dpy));
-  
-  return(label);
+  gchar *const label = "?";
+  klass = GGOBI_EXTENDED_DISPLAY_GET_CLASS (dpy);
+  if (klass->treeLabel)
+    return (klass->treeLabel);
+  if (klass->tree_label)
+    return (klass->tree_label (dpy));
+
+  return (label);
 }
 
-const gchar * /*const*/
-ggobi_display_title_label(displayd *dpy)
+const gchar *                   /*const */
+ggobi_display_title_label (displayd * dpy)
 {
-	GGobiExtendedDisplayClass *klass;
-	extendedDisplayd *edpy;
-	gchar * const label = "?";
+  GGobiExtendedDisplayClass *klass;
+  extendedDisplayd *edpy;
+  gchar *const label = "?";
 
-	edpy = GGOBI_EXTENDED_DISPLAY(dpy);
-	if(edpy->titleLabel) {
-		return(edpy->titleLabel);
-	}
+  edpy = GGOBI_EXTENDED_DISPLAY (dpy);
+  if (edpy->titleLabel) {
+    return (edpy->titleLabel);
+  }
 
-	klass = GGOBI_EXTENDED_DISPLAY_GET_CLASS(dpy);
-	if(klass->titleLabel)
-		return(klass->treeLabel);
-	if(klass->title_label)
-		return(klass->title_label(dpy));
+  klass = GGOBI_EXTENDED_DISPLAY_GET_CLASS (dpy);
+  if (klass->titleLabel)
+    return (klass->treeLabel);
+  if (klass->title_label)
+    return (klass->title_label (dpy));
 
 
-	return(label);
+  return (label);
 }
 
 
@@ -69,28 +69,27 @@ ggobi_display_title_label(displayd *dpy)
 GSList *ExtendedDisplayTypes = NULL;
 
 int
-addDisplayType(GType type)
+addDisplayType (GType type)
 {
-    GObjectClass *klass;
-    if(!g_type_is_a(type, GGOBI_TYPE_EXTENDED_DISPLAY)) {
-      g_printerr("%s is not a GType that extends GGobiExtendedDisplay", g_type_name(type));
-    }
-    klass = g_type_class_ref(type);
-    ExtendedDisplayTypes = g_slist_append(ExtendedDisplayTypes, klass);
-    return(g_slist_length(ExtendedDisplayTypes));
+  GObjectClass *klass;
+  if (!g_type_is_a (type, GGOBI_TYPE_EXTENDED_DISPLAY)) {
+    g_printerr ("%s is not a GType that extends GGobiExtendedDisplay",
+                g_type_name (type));
+  }
+  klass = g_type_class_ref (type);
+  ExtendedDisplayTypes = g_slist_append (ExtendedDisplayTypes, klass);
+  return (g_slist_length (ExtendedDisplayTypes));
 }
 
 
 void
-registerDisplayTypes(const GTypeLoad * const loaders, int n)
+registerDisplayTypes (const GTypeLoad * const loaders, int n)
 {
-   int i;
-   GType type;
+  int i;
+  GType type;
 
-   for(i = 0; i < n; i++) {
-     type = loaders[i]();
-     addDisplayType(type);
-   }
+  for (i = 0; i < n; i++) {
+    type = loaders[i] ();
+    addDisplayType (type);
+  }
 }
-
-

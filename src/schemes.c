@@ -12,7 +12,7 @@
  Initialize basic colors for this ggobid.
  */
 void
-svis_init (ggobid  *gg)
+svis_init (ggobid * gg)
 {
   gg->svis.window = NULL;
   gg->svis.npct = 0;

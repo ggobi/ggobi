@@ -22,7 +22,7 @@
 #include "vars.h"
 #include "externs.h"
 
-#include <string.h> /* for memset() */
+#include <string.h>             /* for memset() */
 
 /* external variables */
 
@@ -31,7 +31,7 @@
 /*-------------------------------------------------------------------------*/
 
 void
-br_glyph_ids_free (GGobiData *d)
+br_glyph_ids_free (GGobiData * d)
 {
   vectorg_free (&d->glyph);
   vectorg_free (&d->glyph_now);
@@ -39,7 +39,7 @@ br_glyph_ids_free (GGobiData *d)
 }
 
 void
-br_glyph_ids_alloc (GGobiData *d)
+br_glyph_ids_alloc (GGobiData * d)
 {
   vectorg_alloc (&d->glyph, d->nrows);
   vectorg_alloc (&d->glyph_now, d->nrows);
@@ -47,13 +47,13 @@ br_glyph_ids_alloc (GGobiData *d)
 }
 
 void
-br_glyph_ids_init (GGobiData *d)
+br_glyph_ids_init (GGobiData * d)
 {
   gint i;
 
   g_assert (d->glyph.nels == d->nrows);
 
-  for (i=0; i<d->nrows; i++) {
+  for (i = 0; i < d->nrows; i++) {
     d->glyph.els[i].type = d->glyph_now.els[i].type =
       d->glyph_prev.els[i].type = FC;
     d->glyph.els[i].size = d->glyph_now.els[i].size =
@@ -63,7 +63,7 @@ br_glyph_ids_init (GGobiData *d)
 
 /*-- reallocates and initializes to the current glyph type and size --*/
 void
-br_glyph_ids_add (GGobiData *d, ggobid *gg)
+br_glyph_ids_add (GGobiData * d, ggobid * gg)
 {
   gint i, nprev = d->glyph.nels;
 
@@ -71,7 +71,7 @@ br_glyph_ids_add (GGobiData *d, ggobid *gg)
   vectorg_realloc (&d->glyph_now, d->nrows);
   vectorg_realloc (&d->glyph_prev, d->nrows);
 
-  for (i=nprev; i<d->nrows; i++) {
+  for (i = nprev; i < d->nrows; i++) {
     d->glyph.els[i].type = d->glyph_now.els[i].type =
       d->glyph_prev.els[i].type = gg->glyph_id.type;
     d->glyph.els[i].size = d->glyph_now.els[i].size =
@@ -85,7 +85,7 @@ br_glyph_ids_add (GGobiData *d, ggobid *gg)
 /*-------------------------------------------------------------------------*/
 
 void
-br_color_ids_free (GGobiData *d)
+br_color_ids_free (GGobiData * d)
 {
   vectors_free (&d->color);
   vectors_free (&d->color_now);
@@ -93,7 +93,7 @@ br_color_ids_free (GGobiData *d)
 }
 
 void
-br_color_ids_alloc (GGobiData *d)
+br_color_ids_alloc (GGobiData * d)
 {
   vectors_realloc (&d->color, d->nrows);
   vectors_realloc (&d->color_now, d->nrows);
@@ -101,19 +101,19 @@ br_color_ids_alloc (GGobiData *d)
 }
 
 void
-br_color_ids_init (GGobiData *d)
+br_color_ids_init (GGobiData * d)
 {
   gint i;
 
   g_assert (d->color.nels == d->nrows);
 
-  for (i=0; i<d->nrows; i++)
+  for (i = 0; i < d->nrows; i++)
     d->color.els[i] = d->color_now.els[i] = d->color_prev.els[i] = 0;
 }
 
 /*-- reallocate and initialize colors --*/
 void
-br_color_ids_add (GGobiData *d, ggobid *gg)
+br_color_ids_add (GGobiData * d, ggobid * gg)
 {
   gint i, nprev = d->color.nels;
 
@@ -122,7 +122,7 @@ br_color_ids_add (GGobiData *d, ggobid *gg)
   vectors_realloc (&d->color_prev, d->nrows);
 
   /* initialize */
-  for (i=nprev; i<d->nrows; i++)
+  for (i = nprev; i < d->nrows; i++)
     d->color.els[i] = d->color_now.els[i] = d->color_prev.els[i] =
       gg->color_id;
 }
@@ -132,7 +132,7 @@ br_color_ids_add (GGobiData *d, ggobid *gg)
 /*-------------------------------------------------------------------------*/
 
 void
-br_hidden_alloc (GGobiData *d)
+br_hidden_alloc (GGobiData * d)
 {
   gint i, nprev = d->hidden.nels;
 
@@ -140,19 +140,19 @@ br_hidden_alloc (GGobiData *d)
   vectorb_realloc (&d->hidden_now, d->nrows);
   vectorb_realloc (&d->hidden_prev, d->nrows);
 
-  /* initialize to not hidden*/
-  for (i=nprev; i<d->nrows; i++)
+  /* initialize to not hidden */
+  for (i = nprev; i < d->nrows; i++)
     d->hidden.els[i] = d->hidden_now.els[i] = d->hidden_prev.els[i] = 0;
 }
 
 void
-br_hidden_init (GGobiData *d)
+br_hidden_init (GGobiData * d)
 {
   gint i;
 
   g_assert (d->hidden.nels == d->nrows);
 
-  for (i=0; i<d->nrows; i++)
+  for (i = 0; i < d->nrows; i++)
     d->hidden.els[i] = d->hidden_now.els[i] = d->hidden_prev.els[i] = false;
 }
 
@@ -162,13 +162,14 @@ br_hidden_init (GGobiData *d)
 /*-------------------------------------------------------------------------*/
 
 void
-br_edge_vectors_free (GGobiData *d, ggobid *gg)
+br_edge_vectors_free (GGobiData * d, ggobid * gg)
 {
   vectorb_free (&d->edge.xed_by_brush);
 }
 
 gboolean
-br_edge_vectors_check_size (gint ns, GGobiData *d, ggobid *gg) {
+br_edge_vectors_check_size (gint ns, GGobiData * d, ggobid * gg)
+{
   gboolean same = (d->edge.xed_by_brush.nels != ns);
 
   if (!same) {
@@ -183,7 +184,7 @@ br_edge_vectors_check_size (gint ns, GGobiData *d, ggobid *gg) {
 /*-------------------------------------------------------------------------*/
 
 void
-brush_pos_init (splotd *sp)
+brush_pos_init (splotd * sp)
 {
   sp->brush_pos.x1 = sp->brush_pos.y1 = 20;
   sp->brush_pos.x2 = sp->brush_pos.y2 = 40;
@@ -197,7 +198,7 @@ brush_pos_init (splotd *sp)
 /*----------------------------------------------------------------------*/
 
 void
-brush_alloc (GGobiData *d, ggobid *gg)
+brush_alloc (GGobiData * d, ggobid * gg)
 /*
  * Dynamically allocate arrays.
 */
@@ -212,24 +213,24 @@ brush_alloc (GGobiData *d, ggobid *gg)
   if (d->edge.n)
     vectorb_realloc (&d->edge.xed_by_brush, d->edge.n);
 
-  for (i=0; i<nr; i++) {
+  for (i = 0; i < nr; i++) {
     d->pts_under_brush.els[i] = false;
   }
 
   /*
    * color and glyph and their kin were allocated when
    * the data was read in.
-  */
+   */
 
   if (!initd) {
     /* binning the plot window; no need to realloc these */
     d->brush.binarray = (bin_struct **)
       g_malloc (d->brush.nbins * sizeof (bin_struct *));
-    for (ih=0; ih<d->brush.nbins; ih++) {
+    for (ih = 0; ih < d->brush.nbins; ih++) {
       d->brush.binarray[ih] = (bin_struct *)
         g_malloc (d->brush.nbins * sizeof (bin_struct));
 
-      for (iv=0; iv<d->brush.nbins; iv++) {
+      for (iv = 0; iv < d->brush.nbins; iv++) {
         d->brush.binarray[ih][iv].nels = 0;
         d->brush.binarray[ih][iv].nblocks = 1;
         d->brush.binarray[ih][iv].els = (gulong *)
@@ -241,20 +242,20 @@ brush_alloc (GGobiData *d, ggobid *gg)
 }
 
 void
-brush_free (GGobiData *d, ggobid *gg)
+brush_free (GGobiData * d, ggobid * gg)
 /*
  * Dynamically free arrays.
 */
 {
-  int j,k;
+  int j, k;
 
   br_glyph_ids_free (d);
   br_color_ids_free (d);
 
   vectorb_free (&d->pts_under_brush);
 
-  for (k=0; k<d->brush.nbins; k++) {
-    for (j=0; j<d->brush.nbins; j++)
+  for (k = 0; k < d->brush.nbins; k++) {
+    for (j = 0; j < d->brush.nbins; j++)
       g_free ((gpointer) d->brush.binarray[k][j].els);
     g_free ((gpointer) d->brush.binarray[k]);
   }
@@ -262,17 +263,17 @@ brush_free (GGobiData *d, ggobid *gg)
 }
 
 void
-brush_init (GGobiData *d, ggobid *gg)
+brush_init (GGobiData * d, ggobid * gg)
 {
   /*
    * Used in binning the plot window
-  */
+   */
   d->brush.nbins = BRUSH_NBINS;
 
   /*
    * These are initialized so that the first merge_brushbins()
    * call will behave reasonably.
-  */
+   */
   d->brush.bin0.x = d->brush.bin1.x = BRUSH_NBINS;
   d->brush.bin0.y = d->brush.bin1.y = BRUSH_NBINS;
 
@@ -281,7 +282,7 @@ brush_init (GGobiData *d, ggobid *gg)
 }
 
 RedrawStyle
-brush_activate (gboolean state, displayd *display, splotd *sp, ggobid *gg)
+brush_activate (gboolean state, displayd * display, splotd * sp, ggobid * gg)
 {
   GGobiData *d = display->d;
   RedrawStyle redraw_style = NONE;
@@ -289,14 +290,14 @@ brush_activate (gboolean state, displayd *display, splotd *sp, ggobid *gg)
   if (sp != gg->current_splot)
     return redraw_style;
 
-  if (GGOBI_IS_EXTENDED_SPLOT(sp)) {
-    void (*f)(GGobiData *, splotd *, ggobid *);
+  if (GGOBI_IS_EXTENDED_SPLOT (sp)) {
+    void (*f) (GGobiData *, splotd *, ggobid *);
     GGobiExtendedSPlotClass *klass;
-    klass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);
+    klass = GGOBI_EXTENDED_SPLOT_GET_CLASS (sp);
     if (state) {
       f = klass->splot_assign_points_to_bins;
-      if(f) {
-        f(d, sp, gg);  // need to exclude area plots
+      if (f) {
+        f (d, sp, gg);          // need to exclude area plots
       }
     }
   }

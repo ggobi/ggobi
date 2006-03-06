@@ -23,7 +23,7 @@
 /*----------------------------------------------------------------------*/
 
 static void
-ash_smoothness_cb (GtkAdjustment *adj, ggobid *gg)
+ash_smoothness_cb (GtkAdjustment * adj, ggobid * gg)
 {
   cpaneld *cpanel = &gg->current_display->cpanel;
 
@@ -33,10 +33,11 @@ ash_smoothness_cb (GtkAdjustment *adj, ggobid *gg)
   display_tailpipe (gg->current_display, FULL, gg);
 }
 
-static gchar *arrangement_lbl[] = {"Row", "Column"};
-static void arrangement_cb (GtkWidget *w, ggobid *gg)
+static gchar *arrangement_lbl[] = { "Row", "Column" };
+static void
+arrangement_cb (GtkWidget * w, ggobid * gg)
 {
-  gint indx = gtk_combo_box_get_active(GTK_COMBO_BOX(w));
+  gint indx = gtk_combo_box_get_active (GTK_COMBO_BOX (w));
 
   if (indx != gg->current_display->cpanel.parcoords_arrangement)
     parcoords_reset_arrangement (gg->current_display, indx, gg);
@@ -44,12 +45,13 @@ static void arrangement_cb (GtkWidget *w, ggobid *gg)
   gg->current_display->cpanel.parcoords_arrangement = indx;
 }
 
-static gchar *type_lbl[] = {"Texturing", "ASH", "Dotplot"};
-static void type_cb (GtkWidget *w, ggobid *gg)
+static gchar *type_lbl[] = { "Texturing", "ASH", "Dotplot" };
+static void
+type_cb (GtkWidget * w, ggobid * gg)
 {
   cpaneld *cpanel;
-    cpanel = &gg->current_display->cpanel;
-  cpanel->p1d.type = gtk_combo_box_get_active(GTK_COMBO_BOX(w));
+  cpanel = &gg->current_display->cpanel;
+  cpanel->p1d.type = gtk_combo_box_get_active (GTK_COMBO_BOX (w));
 
   display_tailpipe (gg->current_display, FULL, gg);
 }
@@ -75,15 +77,15 @@ static void varscale_cb (GtkWidget *w, gpointer cbd)
 /*--------------------------------------------------------------------*/
 
 GtkWidget *
-cpanel_parcoords_make (ggobid *gg) 
+cpanel_parcoords_make (ggobid * gg)
 {
   modepaneld *panel;
   GtkWidget *vbox, *vb, *lbl, *sbar, *opt;
   GtkObject *adj;
 
-  panel = (modepaneld *) g_malloc(sizeof(modepaneld));
-  gg->control_panels = g_list_append(gg->control_panels, (gpointer) panel);
-  panel->name = g_strdup("PCPLOT");
+  panel = (modepaneld *) g_malloc (sizeof (modepaneld));
+  gg->control_panels = g_list_append (gg->control_panels, (gpointer) panel);
+  panel->name = g_strdup ("PCPLOT");
 
   panel->w = gtk_vbox_new (false, VBOX_SPACING);
   gtk_container_set_border_width (GTK_CONTAINER (panel->w), 5);
@@ -99,15 +101,15 @@ cpanel_parcoords_make (ggobid *gg)
   gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
 
   opt = gtk_combo_box_new_text ();
-  gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), opt);
+  gtk_label_set_mnemonic_widget (GTK_LABEL (lbl), opt);
   gtk_widget_set_name (opt, "PCPLOT:sel_mode_option_menu");
   //gtk_container_set_border_width (GTK_CONTAINER (opt), 4);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-    "When opening a new parallel coordinates display, arrange the 1d plots in a row or a column",
-    NULL);
+                        "When opening a new parallel coordinates display, arrange the 1d plots in a row or a column",
+                        NULL);
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
-  populate_combo_box (opt, arrangement_lbl, G_N_ELEMENTS(arrangement_lbl),
-    G_CALLBACK(arrangement_cb), gg);
+  populate_combo_box (opt, arrangement_lbl, G_N_ELEMENTS (arrangement_lbl),
+                      G_CALLBACK (arrangement_cb), gg);
 
 /*
  * option menu
@@ -119,40 +121,39 @@ cpanel_parcoords_make (ggobid *gg)
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
   gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
 
-  opt = gtk_combo_box_new_text();
+  opt = gtk_combo_box_new_text ();
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-    "Display either textured dot plots or average shifted histograms", NULL);
+                        "Display either textured dot plots or average shifted histograms",
+                        NULL);
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
-  populate_combo_box (opt, type_lbl, G_N_ELEMENTS(type_lbl),
-    G_CALLBACK(type_cb), gg);
+  populate_combo_box (opt, type_lbl, G_N_ELEMENTS (type_lbl),
+                      G_CALLBACK (type_cb), gg);
   /*-- this should be set to the value of cpanel->p1d_type --*/
-  gtk_combo_box_set_active (GTK_COMBO_BOX(opt), DOTPLOT);
+  gtk_combo_box_set_active (GTK_COMBO_BOX (opt), DOTPLOT);
 
 /*
  * ASH smoothness
 */
   vbox = gtk_vbox_new (false, 0);
-  gtk_box_pack_start (GTK_BOX (panel->w), vbox,
-    false, false, 0);
+  gtk_box_pack_start (GTK_BOX (panel->w), vbox, false, false, 0);
 
   lbl = gtk_label_new_with_mnemonic ("ASH s_moothness:"),
-  gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
+    gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
   gtk_box_pack_start (GTK_BOX (vbox), lbl, false, false, 0);
 
   adj = gtk_adjustment_new (0.19, 0.02, 0.5, 0.01, .01, 0.0);
   g_signal_connect (G_OBJECT (adj), "value_changed",
-                      G_CALLBACK (ash_smoothness_cb), gg);
+                    G_CALLBACK (ash_smoothness_cb), gg);
 
   sbar = gtk_hscale_new (GTK_ADJUSTMENT (adj));
-  gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), sbar);
+  gtk_label_set_mnemonic_widget (GTK_LABEL (lbl), sbar);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
-    "Adjust ASH smoothness", NULL);
+                        "Adjust ASH smoothness", NULL);
   gtk_range_set_update_policy (GTK_RANGE (sbar), GTK_UPDATE_CONTINUOUS);
   gtk_scale_set_value_pos (GTK_SCALE (sbar), GTK_POS_BOTTOM);
   gtk_scale_set_digits (GTK_SCALE (sbar), 2);
 
-  gtk_box_pack_start (GTK_BOX (vbox), sbar,
-    false, false, 1);
+  gtk_box_pack_start (GTK_BOX (vbox), sbar, false, false, 1);
 
 /*
  * show cases: label and option menu
@@ -199,7 +200,7 @@ cpanel_parcoords_make (ggobid *gg)
 
   gtk_widget_show_all (panel->w);
 
-  return(panel->w);
+  return (panel->w);
 }
 
 
@@ -207,22 +208,19 @@ cpanel_parcoords_make (ggobid *gg)
 /*                   Resetting the main menubar                       */
 /*--------------------------------------------------------------------*/
 
-static const gchar* mode_ui_str = 
-"<ui>"
-"	<menubar>"
-"		<menu action='IMode'>"
-"			<menuitem action='DefaultIMode'/>"
-"			<separator/>"
-"			<menuitem action='Brush'/>"
-"			<menuitem action='Identify'/>"
-"		</menu>"
-"	</menubar>"
-"</ui>";
+static const gchar *mode_ui_str =
+  "<ui>"
+  "	<menubar>"
+  "		<menu action='IMode'>"
+  "			<menuitem action='DefaultIMode'/>"
+  "			<separator/>"
+  "			<menuitem action='Brush'/>"
+  "			<menuitem action='Identify'/>" "		</menu>" "	</menubar>" "</ui>";
 
 const gchar *
-parcoords_mode_ui_get(displayd *dsp)
+parcoords_mode_ui_get (displayd * dsp)
 {
-	return(mode_ui_str);
+  return (mode_ui_str);
 }
 
 /*
@@ -233,7 +231,7 @@ parcoords_mode_ui_get(displayd *dsp)
  */
 
 /*--------------------------------------------------------------------*/
-/*                   End of main menubar section                      */  
+/*                   End of main menubar section                      */
 /*--------------------------------------------------------------------*/
 
 /*--------------------------------------------------------------------*/
@@ -243,6 +241,7 @@ parcoords_mode_ui_get(displayd *dsp)
 /*-- there already exists parcoords_cpanel_init --*/
 
 void
-cpanel_parcoords_set (displayd *display, cpaneld *cpanel, GtkWidget *panel, ggobid *gg)
+cpanel_parcoords_set (displayd * display, cpaneld * cpanel, GtkWidget * panel,
+                      ggobid * gg)
 {
 }

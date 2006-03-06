@@ -39,7 +39,7 @@
 #define FORGETITAXIS_MAX 200.
 
 RedrawStyle
-p1d_activate (gint state, displayd *display, ggobid *gg)
+p1d_activate (gint state, displayd * display, ggobid * gg)
 {
   GList *slist;
   splotd *sp;
@@ -52,26 +52,27 @@ p1d_activate (gint state, displayd *display, ggobid *gg)
         sp->p1dvar = 0;
     }
     varpanel_refresh (display, gg);
-  } else {
+  }
+  else {
     /*
      * Turn cycling off when leaving the mode, but don't worry
      * for now about turning it on when re-entering.
-    */
+     */
     GtkWidget *pnl;
-    pnl = mode_panel_get_by_name(GGOBI(getPModeName)(P1PLOT), gg);
+    pnl = mode_panel_get_by_name (GGOBI (getPModeName) (P1PLOT), gg);
     if (pnl) {
       GtkWidget *w = widget_find_by_name (pnl, "P1PLOT:cycle_toggle");
-      gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(w), off);
+      gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (w), off);
     }
   }
 
   return NONE;
-}   
+}
 
 
 void
-p1d_spread_var (displayd *display, gfloat *yy, splotd *sp, GGobiData *d,
-  ggobid *gg)
+p1d_spread_var (displayd * display, gfloat * yy, splotd * sp, GGobiData * d,
+                ggobid * gg)
 {
 /*
  * Set up the next dot plot.
@@ -86,40 +87,40 @@ p1d_spread_var (displayd *display, gfloat *yy, splotd *sp, GGobiData *d,
     vectorf_realloc (&sp->p1d.spread_data, d->nrows);
 
   switch (cpanel->p1d.type) {
-    case TEXTURE:
-      sp->p1d.lim.min = FORGETITAXIS_MIN ;
-      sp->p1d.lim.max = FORGETITAXIS_MAX ;
+  case TEXTURE:
+    sp->p1d.lim.min = FORGETITAXIS_MIN;
+    sp->p1d.lim.max = FORGETITAXIS_MAX;
 
-      textur (yy, sp->p1d.spread_data.els, d->nrows_in_plot,
-        option, del, stages, gg);
+    textur (yy, sp->p1d.spread_data.els, d->nrows_in_plot,
+            option, del, stages, gg);
     break;
 
-    case ASH:
-      do_ash1d (yy, d->nrows_in_plot,
-               cpanel->p1d.nbins, cpanel->p1d.nASHes,
-               sp->p1d.spread_data.els, &min, &max, &mean);
-      /*
-       * Instead of using the returned minimum, set the minimum to 0.
-       * This scales the plot so that the baseline (also set to 0) is
-       * within the range, the connecting lines look terrific, and the
-       * plot makes more sense.
-      */
-      sp->p1d.lim.min = 0.0; 
-      sp->p1d.lim.max = max;
-      sp->p1d.mean = mean;
-    break;   
+  case ASH:
+    do_ash1d (yy, d->nrows_in_plot,
+              cpanel->p1d.nbins, cpanel->p1d.nASHes,
+              sp->p1d.spread_data.els, &min, &max, &mean);
+    /*
+     * Instead of using the returned minimum, set the minimum to 0.
+     * This scales the plot so that the baseline (also set to 0) is
+     * within the range, the connecting lines look terrific, and the
+     * plot makes more sense.
+     */
+    sp->p1d.lim.min = 0.0;
+    sp->p1d.lim.max = max;
+    sp->p1d.mean = mean;
+    break;
 
-    case DOTPLOT:
-      sp->p1d.lim.min = FORGETITAXIS_MIN ;
-      sp->p1d.lim.max = FORGETITAXIS_MAX ;
-      for (i=0; i<d->nrows_in_plot; i++)
-        sp->p1d.spread_data.els[i] = 50; /*-- halfway between _MIN and _MAX --*/
-    break;   
+  case DOTPLOT:
+    sp->p1d.lim.min = FORGETITAXIS_MIN;
+    sp->p1d.lim.max = FORGETITAXIS_MAX;
+    for (i = 0; i < d->nrows_in_plot; i++)
+      sp->p1d.spread_data.els[i] = 50;   /*-- halfway between _MIN and _MAX --*/
+    break;
   }
 }
 
 void
-p1d_reproject (splotd *sp, greal **world_data, GGobiData *d, ggobid *gg)
+p1d_reproject (splotd * sp, greal ** world_data, GGobiData * d, ggobid * gg)
 {
 /*
  * Project the y variable down from the ncols-dimensional world_data[]
@@ -145,28 +146,30 @@ p1d_reproject (splotd *sp, greal **world_data, GGobiData *d, ggobid *gg)
    * been added in.  That is, we have to ASH the world data instead
    * of the tform data.  By some unexpected miracle, all the scaling
    * still works.
-  */
-  for (i=0; i<d->nrows_in_plot; i++)
+   */
+  for (i = 0; i < d->nrows_in_plot; i++)
     yy[i] = d->world.vals[d->rows_in_plot.els[i]][jvar];
-    /*yy[i] = d->tform.vals[d->rows_in_plot.els[i]][jvar];*/
+  /*yy[i] = d->tform.vals[d->rows_in_plot.els[i]][jvar]; */
 
   p1d_spread_var (display, yy, sp, d, gg);
 
   /* Then project it */
   rdiff = sp->p1d.lim.max - sp->p1d.lim.min;
-  for (i=0; i<d->nrows_in_plot; i++) {
+  for (i = 0; i < d->nrows_in_plot; i++) {
     m = d->rows_in_plot.els[i];
 
     /*
      * Use p1d.spread_data[i] not [m] because p1d.spread_data[] is
      * populated only up to d->nrows_in_plot
-    */
-    ftmp = -1.0 + 2.0*(sp->p1d.spread_data.els[i] - sp->p1d.lim.min)/rdiff;
+     */
+    ftmp =
+      -1.0 + 2.0 * (sp->p1d.spread_data.els[i] - sp->p1d.lim.min) / rdiff;
 
     if (display->p1d_orientation == VERTICAL) {
       sp->planar[m].x = (glong) (precis * ftmp);
       sp->planar[m].y = (glong) world_data[m][jvar];
-    } else {
+    }
+    else {
       sp->planar[m].x = (glong) world_data[m][jvar];
       sp->planar[m].y = (glong) (precis * ftmp);
     }
@@ -176,20 +179,20 @@ p1d_reproject (splotd *sp, greal **world_data, GGobiData *d, ggobid *gg)
 }
 
 gboolean
-p1d_varsel (splotd *sp, gint jvar, gint *jprev, gint toggle, gint mouse)
+p1d_varsel (splotd * sp, gint jvar, gint * jprev, gint toggle, gint mouse)
 {
   gboolean redraw = true;
   displayd *display = (displayd *) sp->displayptr;
   gint orientation = display->p1d_orientation;
   gboolean allow = true;
 
-  if(GGOBI_IS_EXTENDED_DISPLAY(display)) {
-     allow = GGOBI_EXTENDED_DISPLAY_GET_CLASS(display)->allow_reorientation;
+  if (GGOBI_IS_EXTENDED_DISPLAY (display)) {
+    allow = GGOBI_EXTENDED_DISPLAY_GET_CLASS (display)->allow_reorientation;
   }
 
   /*-- if button == -1, don't change orientation. That protects
        changes made during cycling --*/
-  if (allow && mouse > 0) 
+  if (allow && mouse > 0)
     display->p1d_orientation = (mouse == 1) ? HORIZONTAL : VERTICAL;
 
   redraw = (orientation != display->p1d_orientation) || (jvar != sp->p1dvar);
@@ -206,7 +209,7 @@ p1d_varsel (splotd *sp, gint jvar, gint *jprev, gint toggle, gint mouse)
 /*---------------------------------------------------------------------*/
 
 void
-ash_baseline_set (icoords *baseline, splotd *sp)
+ash_baseline_set (icoords * baseline, splotd * sp)
 {
   greal ftmp, precis = (greal) PRECISION1;
   greal pl, gtmp;
@@ -216,7 +219,7 @@ ash_baseline_set (icoords *baseline, splotd *sp)
   ftmp = -1 + 2.0 * (0 - sp->p1d.lim.min)/
                     (sp->p1d.lim.max - sp->p1d.lim.min);
 */
-  ftmp = -1 /* and the rest of the usual expression is 0 now */;
+  ftmp = -1 /* and the rest of the usual expression is 0 now */ ;
   pl = (greal) (precis * ftmp);
 
 /*-- HORIZONTAL --*/
@@ -225,7 +228,7 @@ ash_baseline_set (icoords *baseline, splotd *sp)
   iscr += (sp->max.y / 2);
 
   baseline->y = iscr;
-            
+
 /*-- VERTICAL --*/
   gtmp = pl - sp->pmid.x;
   iscr = (gint) (gtmp * sp->iscale.x / precis);
@@ -240,7 +243,7 @@ ash_baseline_set (icoords *baseline, splotd *sp)
 
 
 gint
-p1dcycle_func (ggobid *gg)
+p1dcycle_func (ggobid * gg)
 {
   displayd *display = gg->current_display;
   GGobiData *d = gg->current_display->d;
@@ -255,11 +258,12 @@ p1dcycle_func (ggobid *gg)
     if (varno == d->ncols) {
       varno = 0;
     }
-  } else {
+  }
+  else {
     varno = sp->p1dvar - 1;
 
     if (varno < 0) {
-      varno = d->ncols-1;
+      varno = d->ncols - 1;
     }
   }
 
@@ -270,7 +274,6 @@ p1dcycle_func (ggobid *gg)
       display_tailpipe (display, FULL, gg);
     }
   }
-  
+
   return true;
 }
-

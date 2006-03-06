@@ -40,10 +40,11 @@ jitter_randval (gint type)
     drand = randvalue ();
     /*
      * Center and scale to [-1, 1]
-    */
+     */
     drand = (drand - .5) * 2;
 
-  } else if (type == NORMAL) {
+  }
+  else if (type == NORMAL) {
 
     gboolean check = true;
     gdouble d, dfac;
@@ -52,12 +53,13 @@ jitter_randval (gint type)
       isave = false;
       /* prepare to return the previously saved value */
       drand = dsave;
-    } else {
+    }
+    else {
       isave = true;
       while (check) {
 
         rnorm2 (&drand, &dsave);
-        d = drand*drand + dsave*dsave;
+        d = drand * drand + dsave * dsave;
 
         if (d < 1.0) {
           check = false;
@@ -65,19 +67,21 @@ jitter_randval (gint type)
           drand = drand * dfac;
           dsave = dsave * dfac;
         }
-      } /* end while */
-    } /* end else */
+      }                         /* end while */
+    }                           /* end else */
 
     /*
      * Already centered; scale to approximately [-1, 1]
-    */
+     */
     drand = (drand / 3.0);
   }
   return ((gfloat) drand);
 }
 
 void
-rejitter (gint *selected_cols, gint nselected_cols, GGobiData *d, ggobid *gg) {
+rejitter (gint * selected_cols, gint nselected_cols, GGobiData * d,
+          ggobid * gg)
+{
   gint i, j, k, m;
   greal frand, fworld, fjit;
   greal precis = (gfloat) PRECISION1;
@@ -86,11 +90,11 @@ rejitter (gint *selected_cols, gint nselected_cols, GGobiData *d, ggobid *gg) {
   g_assert (d->jitdata.nrows == d->nrows);
   g_assert (d->jitdata.ncols == d->ncols);
 
-  for (j=0; j<nselected_cols; j++) {
+  for (j = 0; j < nselected_cols; j++) {
     k = selected_cols[j];
     vt = vartable_element_get (k, d);
 
-    for (i=0; i<d->nrows_in_plot; i++) {
+    for (i = 0; i < d->nrows_in_plot; i++) {
       m = d->rows_in_plot.els[i];
       /*-- jitter_one_value (m, k); --*/
 
@@ -99,7 +103,7 @@ rejitter (gint *selected_cols, gint nselected_cols, GGobiData *d, ggobid *gg) {
       /*
        * The world.vals used here is already jittered:
        * subtract out the previous jittered value ...
-      */
+       */
       if (d->jitter.convex) {
         fworld = d->world.vals[m][k] - d->jitdata.vals[m][k];
         fjit = (greal) vt->jitter_factor * (frand - fworld);
@@ -116,20 +120,21 @@ rejitter (gint *selected_cols, gint nselected_cols, GGobiData *d, ggobid *gg) {
 
 
 void
-jitter_value_set (gfloat value, GGobiData *d, ggobid *gg) {
-  GtkWidget *tree_view = get_tree_view_from_object (G_OBJECT(gg->jitter_ui.window));
-  gint *vars; // = (gint *) g_malloc (d->ncols * sizeof(gint));
+jitter_value_set (gfloat value, GGobiData * d, ggobid * gg)
+{
+  GtkWidget *tree_view =
+    get_tree_view_from_object (G_OBJECT (gg->jitter_ui.window));
+  gint *vars;                   // = (gint *) g_malloc (d->ncols * sizeof(gint));
   gint nvars;
   gint j;
   vartabled *vt;
 
   vars = get_selections_from_tree_view (tree_view, &nvars);
-  
-  for (j=0; j<nvars; j++) {
+
+  for (j = 0; j < nvars; j++) {
     vt = vartable_element_get (vars[j], d);
     vt->jitter_factor = value;
   }
 
   g_free ((gpointer) vars);
 }
-

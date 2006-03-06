@@ -25,16 +25,16 @@
 #include "config.h"
 
 void
-splash_destroy (GtkWidget *w, GdkEventButton *event, GdkPixmap *pix)
+splash_destroy (GtkWidget * w, GdkEventButton * event, GdkPixmap * pix)
 {
-  GtkWidget *win = (GtkWidget *) g_object_get_data(G_OBJECT(w), "window");
+  GtkWidget *win = (GtkWidget *) g_object_get_data (G_OBJECT (w), "window");
 
   gdk_pixmap_unref (pix);
   gtk_widget_destroy (win);
 }
 
 void
-splash_show (ggobid *gg)
+splash_show (ggobid * gg)
 {
   char *versionInfo;
   GdkPixmap *splash_pix;
@@ -45,33 +45,36 @@ splash_show (ggobid *gg)
   GtkWidget *hbox = gtk_vbox_new (false, 0);
 
   splash_pix = gdk_pixmap_colormap_create_from_xpm_d (NULL,
-    gtk_widget_get_colormap (gg->main_window),
-    NULL, NULL, (gchar **) splash);
+                                                      gtk_widget_get_colormap
+                                                      (gg->main_window), NULL,
+                                                      NULL,
+                                                      (gchar **) splash);
   splashw = gtk_image_new_from_pixmap (splash_pix, NULL);
 
   gtk_container_add (GTK_CONTAINER (window), ebox);
   gtk_container_add (GTK_CONTAINER (ebox), hbox);
   gtk_box_pack_start (GTK_BOX (hbox), splashw, FALSE, FALSE, 0);
 
-  versionInfo = (char *) g_malloc(sizeof(gchar)*(strlen("Version ") + 
-                                                 strlen(GGOBI_VERSION_STRING) + 
-                                                 2 +
-                                                 strlen(GGOBI_RELEASE_DATE) + 1)
-				                 + strlen(homePrefix)
-				                 + strlen(sessionOptions->ggobiHome));
-  sprintf(versionInfo,"%s %s, %s%s%s", 
-	               "Version", GGOBI_VERSION_STRING, GGOBI_RELEASE_DATE,
-	               homePrefix, sessionOptions->ggobiHome);
-  label = gtk_label_new(versionInfo);
+  versionInfo = (char *) g_malloc (sizeof (gchar) * (strlen ("Version ") +
+                                                     strlen
+                                                     (GGOBI_VERSION_STRING) +
+                                                     2 +
+                                                     strlen
+                                                     (GGOBI_RELEASE_DATE) + 1)
+                                   + strlen (homePrefix)
+                                   + strlen (sessionOptions->ggobiHome));
+  sprintf (versionInfo, "%s %s, %s%s%s",
+           "Version", GGOBI_VERSION_STRING, GGOBI_RELEASE_DATE,
+           homePrefix, sessionOptions->ggobiHome);
+  label = gtk_label_new (versionInfo);
   gtk_box_pack_start (GTK_BOX (hbox), label, FALSE, FALSE, 0);
-  g_free(versionInfo);
+  g_free (versionInfo);
 
-  g_object_set_data(G_OBJECT (ebox), "window", (gpointer) window);
+  g_object_set_data (G_OBJECT (ebox), "window", (gpointer) window);
 
   g_signal_connect (G_OBJECT (ebox),
-                      "button_press_event",
-                      G_CALLBACK(splash_destroy),
-                      (gpointer) splash_pix);
+                    "button_press_event",
+                    G_CALLBACK (splash_destroy), (gpointer) splash_pix);
   gtk_widget_set_events (ebox, GDK_BUTTON_PRESS_MASK);
 
   gtk_widget_show_all (window);
