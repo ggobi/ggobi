@@ -391,7 +391,6 @@ void showInputDescription(InputDescription * desc, ggobid * gg)
           desc->fileName, desc->givenExtension);
   fprintf(out, "\tDirectory: %s\n", desc->dirName);
 #if 0
-/*XXX*/
   fprintf(out, "\tFormat: %s (%d), verified: %s\n",
           GGOBI(getDataModeDescription) (desc->mode), desc->mode,
           desc->canVerify ? "yes" : "no");
@@ -586,9 +585,6 @@ DataMode guessDataMode(const gchar * fileName, InputDescription * desc)
   if (isXMLFile(fileName, desc))
     return (xml_data);
 #endif
-
-  if (isASCIIFile(fileName, NULL, NULL))
-    return (ascii_data);
 
 #if 0
   if (isCSVFile(fileName))

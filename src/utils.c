@@ -250,51 +250,6 @@ widget_initialize (GtkWidget *w, gboolean initd) {
     GINT_TO_POINTER (initd));
 }
 
-/*-----------------------------------------------------------------------*/
-/*  a routine gtk should have for finding out which option is selected   */
-/*-----------------------------------------------------------------------*/
-/* GTK2 has this for GtkComboBox, forget about GtkOptionMenu */
-
-#if 0
-/**
- * option_menu_index:
- * @optionmenu: a gtkoptionmenu
- * 
- * Tries to find out (in an ugly way) the selected
- * item in @optionmenu
- * 
- * Return value: the selected index
- **/
-gint
-option_menu_index (GtkOptionMenu *optionmenu)
-{
-  GtkMenu *menu;
-  GtkMenuItem *selected;
-  GList *iterator;
-  gint index = -1;
-  gint i = 0;
-
-  g_return_val_if_fail (optionmenu != NULL, -1);
-
-  menu = (GtkMenu *) gtk_option_menu_get_menu (optionmenu);
-  iterator = GTK_MENU_SHELL (menu)->children;
-  selected = (GtkMenuItem *) gtk_menu_get_active (menu);
-
-  while (iterator) {
-
-    if (iterator->data == selected) {
-      index = i;
-      break;
-    }
-
-    iterator = iterator->next;
-    i++;
-  }
-
-  return index;
-}
-#endif
-
 /*--------------------------------------------------------------------*/
 /*--- Find a widget by name, starting from an enclosing container ----*/
 /*--------------------------------------------------------------------*/
@@ -414,9 +369,7 @@ data_mode_set (gchar *filename)
   gchar *suffix = (gchar *) &filename[len-4];
   DataMode data_mode = unknown_data;
 
-  if (strcmp (suffix, ".dat") == 0)
-    data_mode = ascii_data;
-  else if (strcmp (suffix, ".bin") == 0)
+  if (strcmp (suffix, ".bin") == 0)
     data_mode = binary_data;
 #if 0
   else if (strcmp (suffix, ".xml") == 0)

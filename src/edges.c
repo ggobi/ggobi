@@ -250,14 +250,15 @@ void edgeset_add_cb(GtkAction *action, GGobiData * e)
 	  GtkAction *action = gtk_ui_manager_get_action(display->menu_manager, 
 	  	"/menubar/Edges/ShowUndirectedEdges");
 	  gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action), true);
-    /*GtkWidget *ww = widget_find_by_name(display->edge_menu,
-      "DISPLAYMENU:edges_u");
-    if (ww) {
-      gtk_check_menu_item_set_active((GtkCheckMenuItem *) ww, true);
-    }*/
   }
 }
 
+/*
+ * I don't know who commented this out, but I know that we want to be
+ * sure this is done -- and probably after all edges have been read.
+ * We can eliminate duplicate edges as we read them in, but these
+ * reversed edges also need to be detected. dfs
+ */
 #if 0
 void
 GGobi_cleanUpEdgeRelationships(struct _EdgeData *edge, int startPosition)
@@ -392,20 +393,14 @@ do_resolveEdgePoints(GGobiData *e, GGobiData *d, gboolean compute)
   if(ans == &DegenerateEndpoints)
      return(NULL);
 
-  /* So no entry in the table yet. So compute the endpoints and add that to the table. */
+  /* So no entry in the table yet. So compute the endpoints and add
+     that to the table. */
   if(ans == NULL && compute) {
      /* resolve the endpoints */
-/*
-g_printerr ("resolving %s on %s (%d)\n", e->name, d->name, compute);
-g_printerr ("   creating a new match\n");
-*/
     ans = computeResolvedEdgePoints(e, d);
     ptr = (DatadEndpoints *) g_malloc(sizeof(DatadEndpoints));
     ptr->data = G_OBJECT(d);
     ptr->endpoints = ans; /* (ans == &DegenerateEndpoints) ? NULL : ans; */
-/*
-g_printerr ("   %d %d\n", ptr->endpoints[0].a, ptr->endpoints[0].b);
-*/
     e->edge.endpointList = g_list_append(e->edge.endpointList, ptr);
   }
 

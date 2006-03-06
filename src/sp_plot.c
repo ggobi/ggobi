@@ -836,13 +836,6 @@ splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
 void
 splot_pixmap_to_window (splotd *sp, GdkPixmap *pixmap, ggobid *gg) {
   GtkWidget *w = sp->da;
-#if 0
-  if(gg->plot_GC == NULL) {
-    init_plot_GC(w->window, gg);
-    fprintf(stderr, "Mmmm");
-    return;
-  }
-#endif
   gdk_draw_pixmap (sp->da->window, gg->plot_GC, pixmap,
                    0, 0, 0, 0,
                    w->allocation.width,

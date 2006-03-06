@@ -88,22 +88,17 @@ sphere_tree_view_size_alloc_cb (GtkWidget *w, GdkEvent *event, ggobid *gg)
     gint fheight;
     GtkTreeView *tree_view = GTK_TREE_VIEW (w);
     PangoContext *ctx = gtk_widget_get_pango_context(w);
-	PangoFontMetrics *metrics = pango_context_get_metrics(ctx, 
-		pango_context_get_font_description(ctx), NULL);
-	gint ascent = PANGO_PIXELS(pango_font_metrics_get_ascent(metrics));
-	gint descent = PANGO_PIXELS(pango_font_metrics_get_descent(metrics));
-	/*gdk_text_extents (
-      gtk_style_get_font (style),
-      "arbitrary string", strlen ("arbitrary string"),
-      &lbearing, &rbearing, &width, &ascent, &descent);
-    */
+    PangoFontMetrics *metrics = pango_context_get_metrics(ctx, 
+	pango_context_get_font_description(ctx), NULL);
+    gint ascent = PANGO_PIXELS(pango_font_metrics_get_ascent(metrics));
+    gint descent = PANGO_PIXELS(pango_font_metrics_get_descent(metrics));
+
     gtk_widget_set_usize (w, -1,
       4*(ascent+descent) + 3*1 +  /*-- 1 = CELL_SPACING --*/
       tree_view->column_title_area.height);
-
     widget_initialize (w, true);
-	
-	pango_font_metrics_unref(metrics);
+
+    pango_font_metrics_unref(metrics);
   }
 
   return true;
