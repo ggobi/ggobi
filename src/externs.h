@@ -343,7 +343,6 @@ void       move_pt (gint id, gint x, gint y, splotd *sp, GGobiData *d, ggobid *)
 void       movepts_event_handlers_toggle (splotd *, gboolean);
 void       movepts_history_add (gint id, splotd *sp, GGobiData *, ggobid *);
 void       movepts_history_delete_last (GGobiData *, ggobid *);
-cairo_t*   create_cairo_glitz(GdkDrawable *drawable);
 gdouble    myrint (gdouble x);
 gint       ndatad_with_vars_get (ggobid *gg);
 void       newvar_add_with_values (gdouble *, gint, gchar *, vartyped type, gint nlevels, gchar **level_names, gint *level_values, gint *level_counts, GGobiData *, ggobid *);
@@ -772,8 +771,6 @@ gboolean   registerPlugin(ggobid *gg, GGobiPluginInfo *plugin);
 
 GGobiOptions *GGOBI_getSessionOptions();
 
-
-
 #ifdef WIN32
 /* needed by transform.c */
 extern double erf(double x);
@@ -792,4 +789,8 @@ void resetDataMode();
 vartabled *vartable_element_get(gint i, GGobiData *d);
 
 gboolean parcoords_add_delete_splot(cpaneld *cpanel, splotd *sp, gint jvar, gint *jvar_prev, ggobid *gg, displayd *display);
+#endif
+
+#ifdef ENABLE_CAIRO
+cairo_t*   create_cairo_glitz(GdkDrawable *drawable);
 #endif
