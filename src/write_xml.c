@@ -124,7 +124,6 @@ write_xml_variables (FILE *f, GGobiData *d, ggobid *gg, XmlWriteInfo *xmlWriteIn
 {
   gint j;
 
-
   if (gg->save.column_ind == ALLCOLS) {
     fprintf(f,"<variables count=\"%d\">\n", d->ncols); 
     for(j = 0; j < d->ncols; j++) {
@@ -135,8 +134,8 @@ write_xml_variables (FILE *f, GGobiData *d, ggobid *gg, XmlWriteInfo *xmlWriteIn
     /*-- work out which columns to save --*/
     gint *cols = (gint *) g_malloc (d->ncols * sizeof (gint));
     gint ncols = selected_cols_get (cols, d, gg);
-	if (ncols == 0)
-		ncols = plotted_cols_get (cols, d, gg);
+	  if (ncols == 0)
+	  	ncols = plotted_cols_get (cols, d, gg);
     fprintf(f,"<variables count=\"%d\">\n", ncols); 
     for(j = 0; j < ncols; j++) {
       write_xml_variable (f, d, gg, cols[j], xmlWriteInfo);

@@ -118,9 +118,8 @@ set_colv (gint *colv, gchar *rootname, GGobiData *d, ggobid *gg)
   return (ncols);
 }
 
-#ifdef SAVE_UNTIL_WRITE_CSV_IMPLEMENTED
 gboolean
-write_ascii_data (gchar *rootname, gint *rowv, gint nr, gint *colv, gint nc,
+write_csv (gchar *rootname, gint *rowv, gint nr, gint *colv, gint nc,
   GGobiData *d, ggobid *gg)
 {
   gchar fname[164];
@@ -129,8 +128,7 @@ write_ascii_data (gchar *rootname, gint *rowv, gint nr, gint *colv, gint nc,
   gint i, j, ir, jc;
   gfloat **fdatap;
 
-  if (gg->save.stage == RAWDATA || gg->save.stage == TFORMDATA)
-    sprintf (fname, "%s.dat", rootname);
+  sprintf (fname, "%s.csv", rootname);
 
   if ((fp = fopen (fname, "w")) == NULL) {
     message = g_strdup_printf ("The file '%s' can not be created\n", fname);
@@ -227,7 +225,7 @@ ggobi_file_set_create (gchar *rootname, GGobiData *d, ggobid *gg)
 
   return true;
 }
-#endif
+
 
 
 

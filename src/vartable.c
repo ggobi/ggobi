@@ -104,6 +104,34 @@ vartable_element_remove (gint j, GGobiData *d)
   d->vartable = g_slist_remove (d->vartable, vt);
 }
 
+gchar *
+level_name_from_tform_value (gint i, gint j, vartabled *vt, GGobiData *d)
+{
+  gint n, ktmp;
+  gint kval = (gint) d->tform.vals[i][j];
+  gint lval = -1;
+  gchar *lname = NULL;
+
+  if (vt->vartype != categorical)
+    return lname;
+
+  for (n = 0; n < vt->nlevels; n++) {
+    ktmp = vt->level_values[n];
+    if (ktmp == kval) {
+      lval = n;
+      break;
+    }
+  }
+  if (lval == -1) {
+    g_printerr ("The levels for %s aren't specified correctly\n",
+                vt->collab);
+  } else {
+    lname = vt->level_names[lval];
+  }
+  return lname;
+}
+
+
 gint
 selected_cols_get (gint *cols, GGobiData *d, ggobid *gg)
 {
@@ -141,6 +169,7 @@ plotted_cols_get (gint *cols, GGobiData *d, ggobid *gg)
 
   return ncols;
 }
+
 
 /*-------------------------------------------------------------------------*/
 /*                         memory management                               */

@@ -320,6 +320,7 @@ gfloat     jitter_randval (gint);
 void       jitter_value_set (gfloat, GGobiData *, ggobid *);
 void       jitter_vars_init (GGobiData *);
 void       jitter_window_open (ggobid *);
+gchar *    level_name_from_tform_value (gint, gint, vartabled *, GGobiData *);
 void       limits_adjust (gfloat *, gfloat *);
 void       limits_display_set_by_var (gint j, GGobiData *d, ggobid *gg);
 void       limits_set (gboolean do_raw, gboolean do_tform, GGobiData *, ggobid *);  

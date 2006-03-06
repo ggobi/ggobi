@@ -528,15 +528,15 @@ vartable_collab_set_by_var (gint j, GGobiData *d)
     switch (vt->vartype) {
       case categorical:
 		
-	gtk_tree_store_set(GTK_TREE_STORE(model), &iter, 
-		VT_NLEVELS, vt->nlevels, -1);
-	gtk_tree_model_iter_children(model, &child, &iter);
-    	/*-- set the level fields --*/
-     	for (k=0; k<vt->nlevels; k++) {
+        gtk_tree_store_set(GTK_TREE_STORE(model), &iter, 
+          VT_NLEVELS, vt->nlevels, -1);
+        gtk_tree_model_iter_children(model, &child, &iter);
+        /*-- set the level fields --*/
+     	  for (k=0; k<vt->nlevels; k++) {
           gtk_tree_store_set(GTK_TREE_STORE(model), &child, VT_LEVEL_NAME,
-		vt->level_names[k], VT_LEVEL_VALUE, vt->level_values[k],
-		VT_LEVEL_COUNT, vt->level_counts[k], -1);
-	  gtk_tree_model_iter_next(model, &child);
+            vt->level_names[k], VT_LEVEL_VALUE, vt->level_values[k],
+            VT_LEVEL_COUNT, vt->level_counts[k], -1);
+          gtk_tree_model_iter_next(model, &child);
         }
 	   // no more break
       case integer:
@@ -544,7 +544,7 @@ vartable_collab_set_by_var (gint j, GGobiData *d)
       case uniform:
       case real:
         gtk_tree_store_set(GTK_TREE_STORE(model), &iter,
-			VT_VARNAME, vt->collab, -1);
+          VT_VARNAME, vt->collab, -1);
       break;
       case all_vartypes:
         g_printerr ("(vartable_collab_set_by_var) illegal variable type %d\n", all_vartypes);

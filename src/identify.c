@@ -254,6 +254,7 @@ identify_label_fetch (gint k, cpaneld * cpanel, GGobiData * d, ggobid * gg)
       gint *vars;               // = (gint *) g_malloc (d->ncols * sizeof(gint));
       gint nvars;
       gint j, lval;
+      gchar *lname;
 
       vars = get_selections_from_tree_view (tree_view, &nvars);
 
@@ -269,37 +270,24 @@ identify_label_fetch (gint k, cpaneld * cpanel, GGobiData * d, ggobid * gg)
           lbl = g_strdup_printf ("%s=NA", vt->collab_tform);
         }
         else {                  /* not missing */
-
           if (vt->vartype == categorical) {
             /*
              * since the level values can be any arbitrary integers,
              * it's necessary to dig out the level name using the list
              * of level values.
              */
-            gint n, ktmp;
-            gint kval = (gint) d->tform.vals[k][vars[j]];
-            lval = -1;
-            for (n = 0; n < vt->nlevels; n++) {
-              ktmp = vt->level_values[n];
-              if (ktmp == kval) {
-                lval = n;
-                break;
-              }
-            }
-          }
-          if (lval == -1) {
-            g_printerr ("The levels for %s aren't specified correctly\n",
-                        vt->collab);
-            return NULL;
-          }
+            lname = level_name_from_tform_value(k, vars[j], vt, d);
 
-          lbl = (vt->vartype == categorical) ?
-            g_strdup_printf ("%s=%s",
-                             vt->collab_tform, vt->level_names[lval]) :
-            g_strdup_printf ("%s=%g",
-                             vt->collab_tform, d->tform.vals[k][vars[j]]);
+            if (lname == NULL) return NULL;
+
+            lbl = (vt->vartype == categorical) ?
+              g_strdup_printf ("%s=%s",
+                               vt->collab_tform, lname) :
+              g_strdup_printf ("%s=%g",
+                               vt->collab_tform, d->tform.vals[k][vars[j]]);
+          }
+          labels = g_list_append (labels, lbl);
         }
-        labels = g_list_append (labels, lbl);
       }
       g_free (vars);
     }

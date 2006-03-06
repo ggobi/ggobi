@@ -2,8 +2,9 @@
 
 /*-- format --*/
 #define XMLDATA    0
-#define BINARYDATA 1
-#define MYSQL_DATA 2
+#define CSVDATA    1
+#define BINARYDATA 2
+#define MYSQL_DATA 3
 
 /*-- stage --*/
 #define RAWDATA    0

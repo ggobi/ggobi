@@ -90,20 +90,31 @@ filesel_ok (GtkWidget * chooser)
   case WRITE_FILESET:
     switch (gg->save.format) {
     case XMLDATA:
-      {
-        XmlWriteInfo info;
+    {
+      XmlWriteInfo info;
 
-          /*-- if fname already contains ".xml", then don't add it --*/
-        if (len >= 4 && g_strncasecmp (&fname[len - 4], ".xml", 4) == 0)
-          filename = g_strdup (fname);
-        else
-          filename = g_strdup_printf ("%s.xml", fname);
+      /*-- if fname already contains ".xml", then don't add it --*/
+      if (len >= 4 && g_strncasecmp (&fname[len - 4], ".xml", 4) == 0)
+        filename = g_strdup (fname);
+      else
+        filename = g_strdup_printf ("%s.xml", fname);
 
-        memset (&info, '0', sizeof (XmlWriteInfo));
-        info.useDefault = true;
-        write_xml ((const gchar *) filename, gg, &info);
-        g_free (filename);
-      }
+      memset (&info, '0', sizeof (XmlWriteInfo));
+      info.useDefault = true;
+      write_xml ((const gchar *) filename, gg, &info);
+      g_free (filename);
+    }
+    break;
+    case CSVDATA:
+      /*-- if fname already contains ".csv", then don't add it --*/
+      if (len >= 4 && g_strncasecmp (&fname[len - 4], ".csv", 4) == 0)
+        filename = g_strdup (fname);
+      else
+        filename = g_strdup_printf ("%s.csv", fname);
+
+      g_printerr ("writing %s\n", filename);
+      write_csv ((const gchar *) filename, gg);
+      g_free (filename);
       break;
     case BINARYDATA:    /*-- not yet implemented --*/
       break;
@@ -124,10 +135,7 @@ filename_get_configure (GtkWidget * chooser, guint type, ggobid * gg)
   const gchar *key = key_get ();
   g_object_set_data (G_OBJECT (chooser), "action", GINT_TO_POINTER (type));
   g_object_set_data (G_OBJECT (chooser), key, gg);
-
-
 }
-
 
 GtkWidget *
 createOutputFileSelectionDialog (const gchar * title)
@@ -242,16 +250,8 @@ filename_get_w (GtkWidget * w, ggobid * gg)
                                                           gg->input->
                                                           dirName));
 
-    /* Come to think of it, it's dangerous to print the name of the
-       current file, because it would be easy to overwrite it in error.
-       dfs
-     */
-    /*
-       gtk_file_chooser_set_filename(GTK_FILE_CHOOSER (chooser),
-       g_strdup_printf("%s%c%s.xml",
-       cwd, 
-       G_DIR_SEPARATOR,
-       gg->input->baseName));
+    /* Don't print the name of the current file, because it would be
+       easy to overwrite it in error.  dfs
      */
   }
 

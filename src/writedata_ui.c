@@ -20,8 +20,7 @@
 
 #include "writedata.h"
 
-static gchar *format_lbl[] =
-  {"XML"};
+static gchar *format_lbl[] = {"XML", "CSV"};
 void format_set (gint fmt, ggobid *gg) { gg->save.format = fmt; }
 static void format_set_cb (GtkWidget *w, ggobid *gg)
 {
@@ -102,7 +101,7 @@ writeall_window_open (ggobid *gg) {
     gg->save.window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     g_signal_connect (G_OBJECT (gg->save.window), "delete_event",
                         G_CALLBACK (delete_cb), (gpointer) gg);
-    gtk_window_set_title (GTK_WINDOW (gg->save.window), "Create GGobi File Set");
+    gtk_window_set_title (GTK_WINDOW (gg->save.window), "Write GGobi Data File");
     
     gtk_container_set_border_width (GTK_CONTAINER (gg->save.window), 10);
 
@@ -110,7 +109,6 @@ writeall_window_open (ggobid *gg) {
     gtk_container_add (GTK_CONTAINER (gg->save.window), vbox);
 
     table = gtk_table_new (7, 2, false);
-/*    gtk_container_add (GTK_CONTAINER (gg->save.window), table);*/
     gtk_box_pack_start (GTK_BOX (vbox), table,
       false, false, 3);
 
@@ -118,7 +116,7 @@ writeall_window_open (ggobid *gg) {
     j = 0;
     opt = gtk_combo_box_new_text ();
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-      "Save the data in XML",
+      "Save the data in XML or CSV",
       NULL);
     populate_combo_box (opt, format_lbl, G_N_ELEMENTS(format_lbl),
       G_CALLBACK(format_set_cb), gg);
