@@ -60,8 +60,6 @@ gboolean write_xml_edge(FILE *f, GGobiData *d, ggobid *gg, gint i, XmlWriteInfo 
 gboolean write_dataset_header(FILE *f, GGobiData *, ggobid *gg, XmlWriteInfo *xmlWriteInfo);
 gboolean write_dataset_footer(FILE *f, ggobid *gg, XmlWriteInfo *xmlWriteInfo);
 
-void writeFloat(FILE *f, double value);
-
 #ifdef __cplusplus 
 }
 #endif

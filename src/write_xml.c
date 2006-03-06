@@ -227,6 +227,13 @@ write_edge_record_p (gint i, GGobiData *e, ggobid *gg)
 }
 */
 
+static void
+writeFloat(FILE *f, double value)
+{
+  /*fprintf(f, "%.3f", value);*/
+  fprintf(f, "%g", value); 
+}
+
 gboolean
 write_xml_records(FILE *f, GGobiData *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 {
@@ -460,13 +467,6 @@ write_xml_edge(FILE *f, GGobiData *d, ggobid *gg, int i, XmlWriteInfo *xmlWriteI
   return(true);
 }
 */
-
-void
-writeFloat(FILE *f, double value)
-{
-  /*fprintf(f, "%.3f", value);*/
-  fprintf(f, "%g", value); 
-}
 
 gboolean
 write_dataset_header (FILE *f, GGobiData *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
