@@ -19,18 +19,10 @@
 #include <strings.h>
 #endif
 
+#define __USE_ISOC99
 #include <math.h>
-#if !defined __APPLE__ && !defined __GNUC__
-#include <malloc.h> /* Do we really need this?*/
-#endif
 #include <stdlib.h>
 #include <unistd.h>
-
-#ifdef WIN32 
-#include <windows.h>
-#include <float.h>
-extern gint _finite (gdouble);
-#endif
 
 #include "vars.h"
 #include "externs.h"
@@ -38,15 +30,6 @@ extern gint _finite (gdouble);
 #include "tour_pp.h"
 #include "tour1d_pp.h"
 
-/* */
-#ifdef __cplusplus
-extern "C" {
-#endif
-extern gint finite (gdouble);  /*-- not defined on all unixes --*/
-extern gdouble erf (gdouble);  /*-- not defined on all unixes --*/
-#ifdef __cplusplus
-}
-#endif
 /* */
 
 #define T1DON true
@@ -762,11 +745,7 @@ tour1d_run(displayd *dsp, ggobid *gg)
 
         if (!revert_random) {
           for (i=0; i<dsp->t1d.nactive; i++) {
-#ifdef WIN32
-            if (_finite((gdouble)dsp->t1d_pp_op.proj_best.vals[0][i]) != 0)
-#else
-            if (finite((gdouble)dsp->t1d_pp_op.proj_best.vals[0][i]) != 0)
-#endif
+            if (isfinite((gdouble)dsp->t1d_pp_op.proj_best.vals[0][i]) != 0)
               dsp->t1d.Fz.vals[0][dsp->t1d.active_vars.els[i]] = 
                 dsp->t1d_pp_op.proj_best.vals[0][i];
           }

@@ -177,7 +177,7 @@ read_xml_input_description (const char *const fileName,
   memset (desc, '\0', sizeof (InputDescription));
 
   desc->fileName = g_strdup (fileName);
-  if (canRead (desc->fileName) == false) {
+  if (file_is_readable (desc->fileName) == false) {
     g_free (desc->fileName);
     desc->fileName = g_malloc ((strlen (fileName) + 5) * sizeof (gchar));
     sprintf (desc->fileName, "%s.xml", fileName);

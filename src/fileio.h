@@ -54,7 +54,7 @@ gboolean isURL(const gchar *fileName);
 
 void completeFileDesc(const gchar *fileName, InputDescription *desc);
 
-extern gboolean canRead(const char * const fileName);
+gboolean file_is_readable(const gchar *fileName);
 
 #ifdef __cplusplus
 }

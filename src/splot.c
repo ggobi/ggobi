@@ -420,20 +420,6 @@ splot_new (displayd *display, gint width, gint height, ggobid *gg)
   return(sp);
 }
 
-#if 0
-/* 
-  Key action callback to raise the control panel window.
- */
-void
-raise_control_panel(GtkWidget *w, GdkEventKey *ev, ggobid *gg)
-{
-    /* Alt-M for "Main" */
-    if(ev->type == GDK_KEY_PRESS && 
-      (ev->state & GDK_MOD1_MASK) && ev->keyval == GDK_m)
-	gdk_window_raise(gg->main_window->window);
-}
-#endif
-
 void
 splot_init(splotd *sp, displayd *display, ggobid *gg) 
 {

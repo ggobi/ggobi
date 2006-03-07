@@ -629,18 +629,6 @@ static void scale_apply_cb (GtkWidget *w, ggobid* gg)
   }
 }
 
-/* Can close the window via an event or in the ggobi_close routine.
-   The former (i.e. events) are more extensible and localized. */
-void
-close_wvis_window_cb(GtkWidget *w, GdkEventButton *event, ggobid *gg)
-{
-fprintf(stderr, "Closing the automatic brushing window\n");fflush(stderr);
-#if 0
-   gtk_widget_destroy(gg->wvis.window);
-   gg->wvis.window = NULL;
-#endif
-}
-
 void
 wvis_window_open (ggobid *gg) 
 {
@@ -663,18 +651,6 @@ wvis_window_open (ggobid *gg)
       "Automatic Brushing by Variable");
     g_signal_connect (G_OBJECT (gg->wvis.window),
       "delete_event", G_CALLBACK (close_wmgr_cb), gg);
-
-#if 0 /* Testing */
-    g_signal_connect (G_OBJECT (gg->main_window),
-                        "delete_event",
-                        G_CALLBACK (close_wvis_window_cb),
-                        (gpointer) gg);
-
-    g_signal_connect (G_OBJECT (gg->main_window),
-                        "destroy",
-                        G_CALLBACK (close_wvis_window_cb),
-                        (gpointer) gg);
-#endif
 
     vbox = gtk_vbox_new (false, 0);
     gtk_container_set_border_width (GTK_CONTAINER (vbox), 5);

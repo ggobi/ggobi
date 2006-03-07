@@ -92,9 +92,7 @@ read_init_file (const gchar * filename, GGobiInitInfo * info)
   gint oldValiditySetting = xmlDoValidityCheckingDefaultValue;
 
   xmlSubstituteEntitiesDefault (1);
-#ifndef WIN32
   xmlDoValidityCheckingDefaultValue = false;
-#endif
 
   if (sessionOptions->verbose == GGOBI_VERBOSE)
     g_printerr ("Reading initialization file %s\n", filename);
@@ -117,9 +115,7 @@ read_init_file (const gchar * filename, GGobiInitInfo * info)
   info->plugins = NULL;
   getPlugins (doc, info, false);
 
-#ifndef WIN32
   xmlDoValidityCheckingDefaultValue = oldValiditySetting;
-#endif
 
   /* Causes a crash when started with -init notes/ggobirc,
      but not if there is a -colorschemes filename
@@ -1022,14 +1018,7 @@ processInputPlugin (xmlNodePtr node, GGobiInitInfo * info, xmlDocPtr doc)
     getPluginDependencies (node, plugin->details, doc);
 
   if (!getPluginLanguage (node, plugin, INPUT_PLUGIN, info)) {
-#if 0
-    g_free (plugin->details);
-    g_free (plugin->info.i);
-    g_free (plugin);
-    return (NULL);
-#else
     return (plugin);
-#endif
   }
 
 

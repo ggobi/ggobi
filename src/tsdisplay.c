@@ -295,11 +295,6 @@ tsplotEventHandlersToggle(displayd *dpy, splotd *sp, gboolean state, ProjectionM
   break;
   }
 
-#if 0
-  xyplot_event_handlers_toggle (sp, state);  /*-- ?? --*/
-    return(true);
-#endif
-
   return false;
 }
 

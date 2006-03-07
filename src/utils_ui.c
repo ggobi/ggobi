@@ -197,23 +197,6 @@ quick_message (const gchar * const message, gboolean modal)
   gtk_dialog_run (GTK_DIALOG (dialog));
 
   gtk_widget_destroy (dialog);
-
-#if 0
-  label = gtk_label_new (message);
-  okay_button = gtk_button_new_with_label ("Okay");
-
-  /* Ensure that the dialog box is destroyed when the user clicks ok. */
-  /g_signal_connect_swapped (G_OBJECT (okay_button), "clicked",
-                             G_CALLBACK (gtk_widget_destroy),
-                             G_OBJECT (dialog));
-  gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->action_area),
-                     okay_button);
-
-  /* Add the label, and show everything we've added to the dialog. */
-
-  gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->vbox), label);
-  gtk_widget_show_all (dialog);
-#endif
 }
 
 /* This function produces a menu bar from a GtkUIManager and ui spec.

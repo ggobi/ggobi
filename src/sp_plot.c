@@ -23,6 +23,8 @@
 #include "externs.h"
 #include "colorscheme.h"
 
+#undef WIN32
+
 static void splot_draw_border (splotd *, GdkDrawable *, ggobid *);
 
 static void
@@ -536,17 +538,6 @@ splot_add_point_label (gboolean nearest_p, gint k, gboolean top_p, splotd *sp,
 	sp->screen[k].y - rect.height - diamond_dim,
 	layout);
     }
-#if 0
-    /*-- display the label in the top center of the window as well --*/
-    if (nearest_p && top_p) {
-      gdk_draw_layout (drawable, gg->plot_GC,
-        (sp->max.x - rect.width)/2, 5, layout);
-      /*-- underline it there, too, for consistency --*/
-      gdk_draw_line (drawable, gg->plot_GC,
-        (sp->max.x - rect.width)/2, rect.height + 5 + 1,
-        (sp->max.x - rect.width)/2 + rect.width, rect.height + 5 + 1);
-    }
-#endif
     g_free(lbl);
     g_object_unref(layout);
   }

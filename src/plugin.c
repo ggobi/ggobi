@@ -52,8 +52,6 @@ const Dynload *dynload = &unixDynload;
 
 
 #ifndef G_OS_WIN32
-#include <unistd.h>
-#include <sys/stat.h>
 #ifndef Darwin
 #define DLL_EXTENSION ".so"
 #else
@@ -65,7 +63,6 @@ const Dynload *dynload = &unixDynload;
 # ifdef __STRICT_ANSI__
 # undef   __STRICT_ANSI__
 # endif
-# include <io.h>
 
 #define DLL_EXTENSION ".dll"
 
@@ -75,22 +72,6 @@ void addPluginDetails (GGobiPluginDetails * info, GtkWidget * list,
                        ggobid * gg, gboolean active);
 void addInputPlugin (GGobiPluginInfo * info, GtkWidget * list, ggobid * gg);
 void addPlugin (GGobiPluginInfo * info, GtkWidget * list, ggobid * gg);
-
-gboolean
-canRead (const char *const fileName)
-{
-  gboolean val = false;
-#ifndef G_OS_WIN32
-/** FIXME: We need to use the Win32 API here to make sure we can read this */
-  struct stat buf;
-  val = (g_stat (fileName, &buf) == 0);
-#else
-  gint ft = 0;
-  val = (g_access (fileName, ft) == 0);
-#endif
-
-  return (val);
-}
 
 gboolean
 GGobi_checkPlugin (GGobiPluginDetails * plugin)
@@ -133,10 +114,10 @@ load_plugin_library (GGobiPluginDetails * plugin, gboolean recurse)
     return (NULL);
   }
 
-  if (canRead (fileName) == false)
+  if (file_is_readable (fileName) == false)
     fileName = g_strdup_printf ("%s%s", plugin->dllName, DLL_EXTENSION);
 
-  if (canRead (fileName) == false && recurse) {
+  if (file_is_readable (fileName) == false && recurse) {
     char *tmp = plugin->dllName;
     if (fileName != plugin->dllName)
       g_free (fileName);
@@ -154,7 +135,7 @@ load_plugin_library (GGobiPluginDetails * plugin, gboolean recurse)
     return (handle);
   }
 
-  if (canRead (fileName) == false) {
+  if (file_is_readable (fileName) == false) {
     if (sessionOptions->verbose != GGOBI_SILENT) {
       fprintf (stderr, "can't locate plugin library %s:\n", plugin->dllName);
       fflush (stderr);

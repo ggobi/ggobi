@@ -19,10 +19,6 @@
 #include <strings.h>
 #endif
 
-#ifdef WIN32 
-#include <windows.h>
-#endif
-
 #include <math.h>
 #include <unistd.h>
 

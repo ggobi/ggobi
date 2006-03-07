@@ -19,16 +19,9 @@
 #include <strings.h>
 #endif
 
-#ifdef WIN32 
-#include <windows.h>
-#include <float.h>
-extern gint _finite (gdouble);
-#endif
+#define __USE_ISOC99
 
 #include <math.h>
-#if !defined __APPLE__ && !defined __GNUC__
-#include <malloc.h>
-#endif
 #include <stdlib.h>
 #include <unistd.h>
 
@@ -37,17 +30,6 @@ extern gint _finite (gdouble);
 
 #include "tour_pp.h"
 #include "tour2d_pp.h"
-
-/* */
-#ifdef __cplusplus
-extern "C" {
-#endif
-extern gint finite (gdouble);  /*-- not defined on all unixes --*/
-extern gdouble erf (gdouble);  /*-- not defined on all unixes --*/
-#ifdef __cplusplus
-}
-#endif
-/* */
 
 #define T2DON true
 #define T2DOFF false
@@ -767,11 +749,7 @@ tour2d_run(displayd *dsp, ggobid *gg)
         if (!revert_random) {
           for (i=0; i<2; i++)
             for (j=0; j<dsp->t2d.nactive; j++) {
-#ifdef WIN32
-	      if (_finite((gdouble)dsp->t2d_pp_op.proj_best.vals[i][j]) != 0)
-#else
-              if (finite((gdouble)dsp->t2d_pp_op.proj_best.vals[i][j]) != 0)
-#endif
+              if (isfinite((gdouble)dsp->t2d_pp_op.proj_best.vals[i][j]) != 0)
                 dsp->t2d.Fz.vals[i][dsp->t2d.active_vars.els[j]] = 
                   dsp->t2d_pp_op.proj_best.vals[i][j];
 	    }

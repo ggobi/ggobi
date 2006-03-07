@@ -50,7 +50,7 @@ read_colorscheme (gchar * fileName, GList ** list)
   xmlNodePtr node;
   colorschemed *scheme;
 
-  if (!canRead (fileName)
+  if (!file_is_readable (fileName)
       && !(strncmp ("http", fileName, 4) == 0
            || strncmp ("ftp", fileName, 3) == 0)) {
     fprintf (stderr, "Couldn't read colorscheme from %s\n", fileName);

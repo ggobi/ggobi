@@ -999,16 +999,6 @@ binningPermitted (displayd * dpy)
 gboolean
 cpanelSet (displayd * dpy, cpaneld * cpanel, ggobid * gg)
 {
-#if 0
-/*XX Add the creation of the widget here! */
-  GtkWidget *w;
-  w = GGOBI_EXTENDED_DISPLAY (dpy)->cpanelWidget;
-  if (!w) {
-    GGOBI_EXTENDED_DISPLAY (dpy)->cpanelWidget = w =
-      cpanel_scatterplot_make (gg);
-  }
-#endif
-
   cpanel_p1d_set (dpy, cpanel, gg);
   cpanel_xyplot_set (dpy, cpanel, gg);
   cpanel_tour1d_set (dpy, cpanel, gg);
@@ -1557,18 +1547,6 @@ void
 addScalingCues (splotd * sp, GdkDrawable * drawable, ggobid * gg)
 {
   cpaneld *cpanel = &gg->current_display->cpanel;
-
-  /* Let's try scaling without the use of the crosshair */
-#if 0
-  /*-- draw horizontal line --*/
-  gdk_draw_line (drawable, gg->plot_GC,
-                 0, sp->da->allocation.height / 2,
-                 sp->da->allocation.width, sp->da->allocation.height / 2);
-  /*-- draw vertical line --*/
-  gdk_draw_line (drawable, gg->plot_GC,
-                 sp->da->allocation.width / 2, 0,
-                 sp->da->allocation.width / 2, sp->da->allocation.height);
-#endif
 
   if (!cpanel->scale.updateAlways_p) {
     if (gg->buttondown)

@@ -23,29 +23,13 @@
 */
 
 #include <stdlib.h>
+#define __USE_ISOC99
 #include <math.h>
 #include <gtk/gtk.h>
 #include "vars.h"
 #include "externs.h"
 
-#ifdef WIN32
-#include <float.h>
-extern gint _finite (gdouble);
-#endif
-
-
 #define SIGNUM(x) (((x)<0.0)?(-1.0):(((x)>0.0)?(1.0):(0.0)))
-
-/* */
-#ifdef __cplusplus
-extern "C" {
-#endif
-extern gint finite (gdouble);  /*-- not defined on all unixes --*/
-extern gdouble erf (gdouble);  /*-- not defined on all unixes --*/
-#ifdef __cplusplus
-}
-#endif
-/* */
 
 static const gchar * const domain_error_message = "Data outside the domain of function.";
 static const gchar * const ldomain_error_message = "Limits outside the domain of function.";
@@ -350,11 +334,7 @@ transform1_apply (gint j, GGobiData *d, ggobid *gg)
           dtmp = (dtmp - 1.0) / boxcoxparam;
 
           /* If dtmp no good, return */
-#ifdef WIN32
-          if (!_finite (dtmp)) {
-#else
-          if (!finite (dtmp)) {
-#endif
+          if (!isfinite (dtmp)) {
             g_printerr ("%f %f %f (breaking, i=%d)\n",
               d->raw.vals[m][j],
               (*domain_adj)(d->raw.vals[m][j], incr),
@@ -370,21 +350,13 @@ transform1_apply (gint j, GGobiData *d, ggobid *gg)
         /*-- apply the same transformation to the specified limits --*/
         if (tform_ok && vt->lim_specified_p) {
           dtmp = pow ((gdouble) (*domain_adj)(slim.min, incr), boxcoxparam);
-#ifdef WIN32
-          if (!_finite (dtmp)) {
-#else
-          if (!finite (dtmp)) {
-#endif
+          if (isfinite (dtmp)) {
             quick_message (ldomain_error_message, false);
             tform_ok = false;
           }
           slim_tform.min = (gfloat) (dtmp - 1.0) / boxcoxparam;
           dtmp = pow ((gdouble) (*domain_adj)(slim.max, incr), boxcoxparam);
-#ifdef WIN32
-          if (!_finite (dtmp)) {
-#else
-          if (!finite (dtmp)) {
-#endif
+          if (isfinite (dtmp)) {
             quick_message (ldomain_error_message, false);
             tform_ok = false;
           }

@@ -20,22 +20,12 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <unistd.h>
 
 #include "GGobiAPI.h"
 #include "plugin.h"
 
-/*--------------------------------------------------------------------*/
-/*               Initialization                                       */
-/*--------------------------------------------------------------------*/
-
-static gboolean
-isUnknownInputMode (const gchar * modeName)
-{
-  gboolean status;
-  status = !modeName || modeName == ""
-    || strcmp (modeName, DefaultUnknownInputModeName) == 0;
-  return (status);
-}
+static gboolean isUnknownInputMode (const gchar * modeName);
 
 /*----------------------------------------------------------------------
   Initialize and populate in an InputDescription:  work out the
@@ -47,7 +37,6 @@ isUnknownInputMode (const gchar * modeName)
     Loop through all available plugins
       If the input mode is unknown
         ask the plugin to probe the file, if it can
-        (Currently no input plugins support probing)
         If it can't probe or probe returns true, ask the plugin for a description.
       If the mode is known
         ask the plugin if it supports it, if it does, ask for a description.
@@ -130,11 +119,10 @@ showInputDescription (InputDescription * desc, ggobid * gg)
   fprintf (out, "\tFile name: %s  (extension: %s)\n",
            desc->fileName, desc->givenExtension);
   fprintf (out, "\tDirectory: %s\n", desc->dirName);
-#if 0
+  /* FIXME: Convert DataMode to a GEnum, then we can get a string for this 
   fprintf (out, "\tFormat: %s (%d), verified: %s\n",
            GGOBI (getDataModeDescription) (desc->mode), desc->mode,
-           desc->canVerify ? "yes" : "no");
-#endif
+           desc->canVerify ? "yes" : "no");*/
 
   if (desc->extensions) {
     fprintf (out, "Auxillary files\n");
@@ -156,4 +144,27 @@ isURL (const gchar * fileName)
 {
   return ((strncmp (fileName, "http:", 5) == 0 ||
            strncmp (fileName, "ftp:", 4) == 0));
+}
+
+static gboolean
+isUnknownInputMode (const gchar * modeName)
+{
+  gboolean status;
+  status = !modeName || modeName == ""
+    || strcmp (modeName, DefaultUnknownInputModeName) == 0;
+  return (status);
+}
+
+/*--------------------------------------------------------------------*/
+/*          Utilities                                                 */
+/*--------------------------------------------------------------------*/
+
+/* Note the only way to reliably test readability on Windows is to actually 
+    try to open the file. Here we are basically checking for existence. */
+gboolean
+file_is_readable (const gchar *fileName)
+{
+  if (GLIB_CHECK_VERSION(2,8,0))
+    return(!g_access(fileName, R_OK));
+  return !access(fileName, R_OK);
 }

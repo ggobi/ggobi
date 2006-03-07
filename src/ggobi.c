@@ -846,7 +846,7 @@ process_initialization_files ()
       tmp = g_get_home_dir ();
       if (tmp) {
         fileName = g_build_filename (tmp, ".ggobirc", NULL);
-        if (!canRead (fileName)) {
+        if (!file_is_readable (fileName)) {
           g_free (fileName);
           fileName = NULL;
         }
@@ -859,7 +859,7 @@ process_initialization_files ()
       sessionOptions->initializationFile = g_strdup (fileName);
   }
 
-  if (fileName && fileName[0] && canRead (fileName)) {
+  if (fileName && fileName[0] && file_is_readable (fileName)) {
     info = read_init_file (fileName, sessionOptions->info);
     g_free (fileName);
     /* sessionOptions->info = info; */
