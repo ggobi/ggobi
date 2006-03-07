@@ -96,9 +96,6 @@ static gboolean setRecordValue (const char *tmp, GGobiData * d,
 void resetRecordInfo (XMLParserData * data);
 static void releaseCurrentDataInfo (XMLParserData * parserData);
 
-const gchar *XMLSuffixes[] = { "", ".xml", ".xml.gz", ".xmlz" };
-
-
 /*
  The different XML element names we recognize in the input format.
 
@@ -748,11 +745,6 @@ endXMLElement (void *user_data, const xmlChar * name)
     data->current_color++;
     break;
   case COLORMAP:
-    /* Only set this if we are reading from the main file 
-       and not a secondary colormap file.
-     */
-    if (data->reading_colormap_file_p == false)
-      GGOBI (registerColorMap) (data->gg);
     break;
   case CATEGORICAL_LEVELS:
     completeCategoricalLevels (data);
@@ -873,7 +865,6 @@ Characters (void *user_data, const xmlChar * ch, gint len)
     setVariableName (data, c, dlen);
     break;
   case COLOR:
-    setColorValue (data, c, dlen);
     break;
   case CATEGORICAL_LEVEL:
     addLevel (data, (const gchar *) c, dlen);
@@ -1642,292 +1633,12 @@ showAttributes (const xmlChar ** attrs)
   }
 }
 
-/* Finds the directory associated with the specified file.
-   Strips away the basename by looking for the last 
-   directory separator.
- */
-gchar *
-getFileDirectory (const gchar * filename)
-{
-  gchar *tmp;
-  tmp = strrchr (filename, G_DIR_SEPARATOR);
-  if (tmp) {
-    gint n = tmp - filename + 2;
-    tmp = (gchar *) g_malloc (n * sizeof (gchar));
-    memcpy (tmp, filename, n);
-    tmp[n - 1] = '\0';
-  }
-  else
-    tmp = g_strdup ("./");
-
-  return (tmp);
-}
-
-/*
-  Checks for files with different extensions.
-
-  The directory is needed so that we can resolve
-  files relative to the location of the original 
-  file from which it was referenced,
-   e.g. colormap file reference from flea.xml
-   should be relative to that one.
- */
-
-gchar *
-find_xml_file (const gchar * filename, const gchar * dir, ggobid * gg)
-{
-  gint i;
-  gchar *name = NULL;
-  FILE *f;
-  gint dirlen = 0;
-  const gchar **suffixes = XMLSuffixes;
-  gint nsuffixes = sizeof (suffixes) / sizeof (suffixes[0]);
-
-  if (dir)
-    dirlen = strlen (dir);
-
-  /* If filename starts with a /, so it is an absolute name,
-     then ignore the directory argument.
-   */
-  if (filename[0] == G_DIR_SEPARATOR)
-    dirlen = 0;
-
-  for (i = 0; i < nsuffixes; i++) {
-    name = (gchar *) g_malloc (sizeof (gchar) *
-                               (dirlen + strlen (filename) +
-                                strlen (suffixes[i]) + 2));
-    sprintf (name, "%s/%s%s", dirlen ? dir : "", filename, suffixes[i]);
-    if ((f = fopen (name, "r")) != NULL) {
-      fclose (f);
-      break;
-    }
-    if (name) {
-      g_free (name);
-      name = NULL;
-    }
-  }
-
-  if (name == NULL) {
-    /* If we can't find the file, then we should return the filename
-       as it might be an http or ftp prefix. Could check this. Later,
-       when we know more about the possibilities to expect.
-     */
-    name = g_strdup (filename);
-  }
-
-  return (name);
-}
-
-/* I suspect this is unused -- dfs */
-/*
-  This is reentrant.  
-  First we check the size attribute. Then we check the
-  for the specification of an external file.
- */
-gboolean
-setColorMap (const xmlChar ** attrs, XMLParserData * data)
-{
-  const gchar *tmp, *file;
-  gint size = 0;
-  tmp = getAttribute (attrs, "size");
-  file = getAttribute (attrs, "file");
-
-  if (tmp)
-    size = strToInteger (tmp);
-  else {
-    if (file == NULL)
-      return (false);
-  }
-
-  if (file) {
-    const gchar *type = getAttribute (attrs, "type");
-    if (type != NULL) {
-      if (strcmp ("xml", type) == 0)
-        xmlParseColorMap (file, size, data);
-    }
-    else {
-      xmlParseColorMap (file, size, data);
-    }
-  }
-
-  /*
-   * This appends the colors, but I don't want to allow more than
-   * MAXNCOLORS colors no matter what the user asks for, so I'll be
-   * ignoring some of the colors in the set.  -- dfs
-   if(size > 0 || file) {
-   ggobid *gg = data->gg;
-   if(file) {
-   gg->ncolors += size;
-   gg->ncolors = MIN (gg->ncolors, MAXNCOLORS);
-   gg->color_table = (GdkColor *)
-   g_realloc (gg->color_table, gg->ncolors * sizeof (GdkColor));
-   gg->colorNames = (gchar **)
-   g_realloc (gg->colorNames, gg->ncolors * sizeof (gchar *));
-   memset(gg->colorNames + (gg->ncolors-size), '\0', size*sizeof(gchar *));
-   } else {
-   gg->ncolors = size;
-   gg->ncolors = MIN (gg->ncolors, MAXNCOLORS);
-   gg->color_table = (GdkColor *) g_malloc (size * sizeof (GdkColor));
-   gg->colorNames = (gchar **) g_malloc (size * sizeof (gchar *));
-   memset(gg->colorNames, '\0', size * sizeof (gchar *));
-   }
-   }
-   */
-
-  return (true);
-}
-
-/* this is certainly unused -- dfs */
-gboolean
-setColormapEntry (const xmlChar ** attrs, XMLParserData * data)
-{
-  const gchar *const names[] = { "r", "g", "b" };
-  gdouble vals[3] = { -1., -1., -1. };
-  const gchar *tmp;
-  gboolean ok = true;
-  gint which = data->current_color, i;
-  GdkColor *color;
-  GdkColormap *cmap = gdk_colormap_get_system ();
-
-  tmp = getAttribute (attrs, "id");
-
-  if (tmp) {
-    if (strcmp ("bg", tmp) == 0) {
-      which = -1;
-      /*color = &data->gg->bg_color; *//* replaced using activeColorScheme */
-    }
-    else if (strcmp ("fg", tmp) == 0) {
-      which = -1;
-      /*color = &data->gg->bg_color; *//* ditto */
-    }
-    else {
-      /* Note that we set the current color to this index.
-         Thus we can skip values, etc.
-       */
-      which = data->current_color = strToInteger (tmp) - 1;
-      /*color = data->gg->color_table + which; *//* ditto */
-    }
-  }
-  else {
-    /*color = data->gg->color_table + data->current_color; *//* ditto */
-  }
-
-  for (i = 0; i < 3; i++) {
-    const gchar *tmp1 = getAttribute (attrs, (gchar *) names[i]);
-    if (tmp1) {
-      vals[i] = asNumber (tmp1);
-    }
-    else {
-      ok = false;
-      break;
-    }
-  }
-
-  if (which > -1 &&
-      /*which < data->gg->ncolors && *//* ditto */
-      (tmp = getAttribute (attrs, "name"))) {
-    /*data->gg->colorNames[which] = g_strdup(tmp); *//* ditto */
-  }
-
-  if (ok) {
-    setColorValues (color, vals);
-
-    /* If this is a foreground or background setting, then get the color.
-       Otherwise, wait until we have finished the entire 
-     */
-    if (which < 0)
-      gdk_colormap_alloc_color (cmap, color, false, true);
-  }
-
-  return (ok);
-}
-
-/*
-  An RGB value in simple text form.
- */
-gboolean
-setColorValue (XMLParserData * data, const xmlChar * line, gint len)
-{
-/*
-  gdouble values[3] = {-1, -1, -1};
-  gint which = 0;
-  const gchar *tmp = strtok((gchar*) line, " \t\n");
-
-  GdkColor *color = data->gg->color_table + data->current_color;
- 
-  while(tmp) {
-    values[which++] = asNumber(tmp);
-    tmp = strtok(NULL, " \t\n");
-  }
-
-  if(which == 3)
-    setColorValues(color, values);
-
-*/
-  return (true);
-}
-
-
-void
-setColorValues (GdkColor * color, gdouble * vals)
-{
-  color->red = (guint16) (vals[0] * 65535.0);
-  color->green = (guint16) (vals[1] * 65535.0);
-  color->blue = (guint16) (vals[2] * 65535.0);
-}
-
-
-/*
- The colormap file will have its own size.
- */
-
-gboolean
-xmlParseColorMap (const gchar * fileName, gint size, XMLParserData * data)
-{
-  xmlParserCtxtPtr ctx;
-  gchar *tmp, *tmp1;
-
-  tmp = g_strdup (data->input->dirName);  /* getFileDirectory(data->input->filename); */
-  tmp1 = find_xml_file (fileName, tmp, data->gg);
-
-  if (tmp1) {
-    ctx = xmlCreateFileParserCtxt (tmp1);
-
-    if (ctx == NULL)
-      return (false);
-
-    ctx->userData = data;
-    ctx->sax = data->handlers;
-    data->reading_colormap_file_p = true;
-
-    xmlParseDocument (ctx);
-
-    ctx->sax = NULL;
-    xmlFreeParserCtxt (ctx);
-
-    data->reading_colormap_file_p = false;
-
-    addInputFile (data->input, tmp1);
-    g_free (tmp1);
-  }
-
-  g_free (tmp);
-
-  return (size);
-}
-
-
-/* 
-  glib-2.0 defines this as a void routine, i.e. no return value.
-  glib-1.2 however expects a return value of type gboolean.
- */
 void
 freeLevelHashEntry (gpointer key, gpointer value, gpointer data)
 {
   g_free (value);
   if (data)
     g_free (key);
-/*  return(true); */
 }
 
 static void
@@ -2315,4 +2026,54 @@ getRowLabsFromTable (GHashTable * tbl, gchar ** names)
   g_hash_table_foreach (tbl, (GHFunc) getLabel, names);
 
   return (names);
+}
+
+gboolean
+isXMLFile (const gchar * fileName, ggobid * gg, GGobiPluginInfo * info)
+{
+
+  FILE *f;
+  gint c;
+  gchar *tmp;
+
+  if (isURL (fileName))
+    return (true);
+
+
+  tmp = strrchr (fileName, '.');
+
+  if (!tmp) {
+    gchar buf[256];
+    sprintf (buf, "%s.xml", fileName);
+    if (isXMLFile (buf, gg, info))
+      return (true);
+  }
+
+  if (tmp && (strcmp (tmp, ".xmlz") == 0 || strcmp (tmp, ".gz") == 0)) {
+    /* desc->canVerify = false; */
+    return (true);
+  }
+
+
+  f = fopen (fileName, "r");
+  if (f == NULL)
+    return (false);
+
+/*  desc->canVerify = true; */
+  while ((c = getc (f)) != EOF) {
+    if (c == ' ' || c == '\t' || c == '\n')
+      continue;
+    if (c == '<') {
+      gchar buf[10];
+      fgets (buf, 5, f);
+      fclose (f);
+      if (strcmp (buf, "?xml") == 0) {
+        return (true);
+      }
+      else
+        return (false);
+    }
+  }
+
+  return (false);
 }

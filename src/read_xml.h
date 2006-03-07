@@ -188,25 +188,6 @@ extern "C" {
 
   gboolean setHidden(const xmlChar ** attrs, XMLParserData * data, gint i);
 
-  gboolean setColorValue(XMLParserData * data, const xmlChar * name,
-                         gint len);
-  gboolean setColormapEntry(const xmlChar ** attrs, XMLParserData * data);
-  gboolean setColorMap(const xmlChar ** attrs, XMLParserData * data);
-  void setColorValues(GdkColor * color, double *values);
-
-  gboolean registerColorMap(ggobid * gg);
-
-  gboolean xmlParseColorMap(const gchar * fileName, int size,
-                            XMLParserData * data);
-  gboolean asciiParseColorMap(const gchar * fileName, int size,
-                              XMLParserData * data);
-
-  gchar *find_xml_file(const gchar * filename, const gchar * dir,
-                       ggobid * gg);
-  gchar *getFileDirectory(const gchar * filename);
-
-
-
   int asInteger(const gchar * tmp);
   double asNumber(const char *sval);
   gboolean asLogical(const gchar * sval);
@@ -216,6 +197,8 @@ extern "C" {
   gboolean readXMLRecord(const xmlChar ** attrs, XMLParserData * data);
 
   gchar * intern(XMLParserData *, const char * el);
+  
+  gboolean isXMLFile (const gchar * fileName, ggobid * gg, GGobiPluginInfo * info);
 
 #ifdef __cplusplus
 }

@@ -562,3 +562,33 @@ row_free (Row * row)
     g_free (row->entry);
   g_free (row);
 }
+
+gboolean
+isCSVFile (const gchar * fileName, ggobid * gg, GGobiPluginInfo * plugin)
+{
+  char tmp[20];
+  char extention[20];
+  int len;
+  int i, inx, inx2;
+  memset (tmp, '\0', 20);
+  memset (extention, '\0', 20);
+  len = strlen (fileName);
+  inx = 0;
+  for (i = len - 1; i >= 0; i--) {
+    if (fileName[i] == '.')
+      break;
+    tmp[inx] = fileName[i];
+    inx++;
+  }
+  tmp[inx] = '\0';
+  inx2 = 0;
+  for (i = inx - 1; i >= 0; i--) {
+    extention[inx2] = tmp[i];
+    inx2++;
+  }
+  if ((strcmp (extention, "asc") == 0) ||
+      (strcmp (extention, "txt") == 0) || (strcmp (extention, "csv") == 0))
+    return true;
+  else
+    return false;
+}

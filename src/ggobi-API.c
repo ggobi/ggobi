@@ -891,50 +891,6 @@ gint GGOBI (getNumGGobis) ()
   return (num_ggobis);
 }
 
-/* This needs to use colorschemes if we want to use it */
-gboolean GGOBI (setColorMap) (double *vals, int nr, ggobid * gg)
-{
-/*
- gint i;
-
- gg->color_table = (GdkColor*)   --color_table no longer exists--
-   g_realloc (gg->color_table, sizeof(GdkColor) * nr);
- gg->ncolors = nr;
-
- for(i = 0; i < nr; i++) {
-   gg->color_table[i].red = vals[i];
-   gg->color_table[i].green = vals[i + nr];
-   gg->color_table[i].blue = vals[i + 2*nr];
- }
-
- return(GGOBI(registerColorMap)(gg));
-*/
-  return false;
-}
-
-
-
-/* This needs to use colorschemes if we want to use it */
-gboolean GGOBI (registerColorMap) (ggobid * gg)
-{
-/*
-  gboolean *success;
-  GdkColormap *cmap = gdk_colormap_get_system ();
-
-  success = (gboolean *) g_malloc(sizeof(gboolean) * gg->ncolors);
-  gdk_colormap_alloc_colors (cmap, gg->color_table, gg->ncolors,
-    false, true, success);
-
-  g_free(success);
-
- return(true);
-*/
-  return false;
-}
-
-
-
-
 /*
   Whether to destory the window or not.  If this is being called from an
   event handler in response to the window being destroyed, we would get

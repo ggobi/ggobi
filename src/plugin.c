@@ -16,6 +16,8 @@
 
 #include "plugin.h"
 #include "externs.h"
+#include "read_xml.h"
+#include "read_csv.h"
 
 #include <stdio.h>
 #include <string.h>

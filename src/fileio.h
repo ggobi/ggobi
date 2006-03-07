@@ -50,43 +50,9 @@ struct _InputDescription {
  InputReader desc_read_input;
 };
 
-typedef struct {
-  DataMode mode;         /* The mode or format style to which the extensions
-                            apply. */
-
-  char **extensions;     /* A list of extensions to append to a file name
-                            when looking for a file 
-                            of this format.
-                            e.g.  xml, xml.gz, xmlz
-                                  dat
-                                  bin
-                         */
-
-  gint len;     /* Number of elements in the extensions array. */
-} ExtensionList;
-
-
 gboolean isURL(const gchar *fileName);
-gboolean check_file_exists(const gchar *fileName);
-GSList *initFileTypeGroups(void);
-DataMode verifyDataMode(const gchar *fileName, DataMode mode, InputDescription *desc);
-DataMode guessDataMode(const gchar *fileName, InputDescription *desc);
-gboolean isXMLFile(const gchar * fileName, ggobid *gg, GGobiPluginInfo *info);
-gboolean isCSVFile(const gchar * fileName, ggobid *gg, GGobiPluginInfo *info);
 
-gboolean endsWith(const gchar *str, const gchar *what);
-ExtensionList *getInputDescriptionGroup(DataMode mode);
-
-/*
-gchar *computeExtension(const gchar *fileName);
-*/
-
-gchar *completeFileDesc(const gchar *fileName, InputDescription *desc);
-
-
-//gchar *findAssociatedFile(InputDescription *desc, const gchar * const *suffixes, gint numSuffixes, gint *which, gboolean isError);
-gint addInputSuffix(InputDescription *desc, const gchar *suffix);
-gint addInputFile(InputDescription *desc, const gchar *file);
+void completeFileDesc(const gchar *fileName, InputDescription *desc);
 
 extern gboolean canRead(const char * const fileName);
 
