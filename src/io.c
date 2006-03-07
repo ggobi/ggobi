@@ -68,6 +68,20 @@ filesel_ok (GtkWidget * chooser)
       which = gtk_combo_box_get_active (GTK_COMBO_BOX (combo));
       plugin = getInputPluginByModeNameIndex (which, &pluginModeName);
       firsttime = (g_slist_length (gg->d) == 0);
+
+      { // Testing URL reading interface
+        GtkWidget *entry;
+        gchar *url;
+
+        entry = (GtkWidget *) g_object_get_data (G_OBJECT (chooser),
+                                                           "URLEntry");
+        if (entry) {
+          url = gtk_editable_get_chars (GTK_EDITABLE (entry), 0, -1);
+          if (url)
+            fname = url;
+        }
+      }
+
       if (fileset_read_init (fname, pluginModeName, plugin, gg))
       /*-- destroy and rebuild the menu every time data is read in --*/
         display_menu_build (gg);
@@ -178,8 +192,20 @@ createInputFileSelectionDialog (gchar * title, ggobid * gg)
   gtk_box_pack_start (GTK_BOX (hbox), combo, false, false, 0);
   g_object_set_data (G_OBJECT (chooser), "PluginTypeCombo", combo);
 
+  { // Testing URL reading interface
+  GtkWidget *entry;
+
+  lbl = gtk_label_new_with_mnemonic ("_URL:"); 
+  gtk_box_pack_start (GTK_BOX (hbox), lbl, false, false, 0);
+  entry = gtk_entry_new();
+  gtk_entry_set_width_chars(GTK_ENTRY(entry), 20);
+  gtk_label_set_mnemonic_widget (GTK_LABEL (lbl), entry);
+  gtk_box_pack_start (GTK_BOX (hbox), entry, true, true, 0);
+  g_object_set_data (G_OBJECT (chooser), "URLEntry", entry);
+  }
+
   /*button = gtk_button_new_with_mnemonic("Enter _Location");
-     gtk_box_pack_start(GTK_BOX(hbox), button, false, false, 0);
+    gtk_box_pack_start(GTK_BOX(hbox), button, false, false, 0);
      g_signal_connect(G_OBJECT(button), "clicked", 
      G_CALLBACK(location_button_clicked_cb), chooser); */
 
@@ -210,7 +236,6 @@ filename_get_r (ggobid * gg)
                                                           G_DIR_SEPARATOR,
                                                           gg->input->
                                                           dirName));
-    /*      gg->input->baseName); */
   }
 
   filename_get_configure (chooser, READ_FILESET, gg);
