@@ -103,11 +103,11 @@ completeFileDesc (const gchar * fileName, InputDescription * desc)
   gint n;
 
   if (!desc->baseName) {
-    desc->baseName = g_strdup (fileName);
+    desc->baseName = g_path_get_basename(fileName);
   }
 
   /* Now compute the directory name. */
-  desc->dirName = g_path_get_dirname(desc->baseName);
+  desc->dirName = g_path_get_dirname(fileName);
 }
 
 void

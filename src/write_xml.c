@@ -501,14 +501,10 @@ updateXmlWriteInfo(GGobiData *d, ggobid *gg, XmlWriteInfo *info)
   gchar *str;
   gint ncolors = gg->activeColorScheme->n;
 
-  colorCounts = g_malloc(sizeof(gint) * ncolors);
-  glyphTypeCounts = g_malloc(sizeof(gint) * UNKNOWN_GLYPH);
+  colorCounts = g_malloc0(sizeof(gint) * ncolors);
+  glyphTypeCounts = g_malloc0(sizeof(gint) * UNKNOWN_GLYPH);
   numGlyphSizes = NGLYPHSIZES;
-  glyphSizeCounts = g_malloc(sizeof(gint) * numGlyphSizes);
-
-  memset(colorCounts, '\0', sizeof(gint) * ncolors);
-  memset(glyphTypeCounts, '\0', sizeof(gint) * UNKNOWN_GLYPH);
-  memset(glyphSizeCounts, '\0', sizeof(gint) * numGlyphSizes);
+  glyphSizeCounts = g_malloc0(sizeof(gint) * numGlyphSizes);
 
   n = GGOBI(nrecords)(d);
   for(i = 0 ; i < n ; i++) {

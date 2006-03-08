@@ -719,8 +719,7 @@ createGGobiInputPluginInfo (GGobiInputPluginInfo * info,
   }
 #endif
 
-  plugin = (GGobiPluginInfo *) g_malloc (sizeof (GGobiPluginInfo));
-  memset (plugin, '\0', sizeof (GGobiPluginInfo));
+  plugin = (GGobiPluginInfo *) g_malloc0 (sizeof (GGobiPluginInfo));
 
   plugin->type = INPUT_PLUGIN;
   plugin->info.i = info;

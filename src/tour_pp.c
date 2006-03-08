@@ -143,12 +143,6 @@ gboolean iszero (array_f *data)
   return (sum<1e-6);
 }
 
-void initrandom(gfloat start)
-{ 
-  randomval = floor (fmod (fabs(start), 62748517.0));
-  nset   = 0;
-}
-
 gfloat uniformrandom()
 { 
   randomval = fmod (27132.0 * randomval + 7.0, 62748517.0);

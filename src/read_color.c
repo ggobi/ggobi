@@ -97,8 +97,7 @@ alloc_colorscheme ()
 {
   colorschemed *scheme;
 
-  scheme = (colorschemed *) g_malloc (sizeof (colorschemed));
-  memset (scheme, '\0', sizeof (colorschemed));
+  scheme = (colorschemed *) g_malloc0 (sizeof (colorschemed));
 
   scheme->rgb = NULL;
   scheme->rgb_bg.pixel = -1;

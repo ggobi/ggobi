@@ -17,7 +17,6 @@
 #include "dbms_ui.h"
 
 #include <stdlib.h>
-#include <string.h>             /* memset() */
 
 DBMSLoginInfo DefaultDBMSInfo;
 
@@ -32,10 +31,7 @@ DBMSLoginInfo *
 initDBMSLoginInfo (DBMSLoginInfo * login, GHashTable * tbl)
 {
   if (login == NULL)
-    login = (DBMSLoginInfo *) g_malloc (sizeof (DBMSLoginInfo));
-
-
-  memset (login, '\0', sizeof (DBMSLoginInfo));
+    login = (DBMSLoginInfo *) g_malloc0 (sizeof (DBMSLoginInfo));
 
   *login = DefaultDBMSInfo;
 

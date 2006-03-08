@@ -331,7 +331,7 @@ getPreviousFiles (const xmlDocPtr doc, GGobiInitInfo * info)
     el = el->next;
   }
 
-  info->descriptions = g_malloc (n * sizeof (GGobiDescription));
+  info->descriptions = g_malloc0 (n * sizeof (GGobiDescription));
   info->numInputs = n;
 
   el = XML_CHILDREN (node);
@@ -343,7 +343,6 @@ getPreviousFiles (const xmlDocPtr doc, GGobiInitInfo * info)
  * dfs; trying to get past my compiler
 */
       /*memset((void*) info->descriptions+i, '\0', sizeof(GGobiDescription)); */
-      memset (info->descriptions + i, '\0', sizeof (GGobiDescription));
       getPreviousInput (el, &(info->descriptions[i].input));
       i++;
     }
@@ -369,30 +368,7 @@ getPreviousInput (xmlNode * node, InputDescription * input)
      completeFileDesc(input->fileName, input);
    */
   if (input->fileName) {
-    gchar *ptr, *tmp1, *tmp2 = NULL;
-    gint i;
-    tmp1 = strrchr (input->fileName, G_DIR_SEPARATOR);
-    if (tmp1) {
-      tmp2 = strrchr (tmp1, '.');
-      if (tmp2)
-        input->givenExtension = g_strdup (tmp2 + 1);
-      input->baseName = g_malloc ((tmp2 - tmp1 + 1) * sizeof (gchar));
-      for (i = 0, ptr = tmp1 + 1; ptr < tmp2; ptr++, i++) {
-        input->baseName[i] = *ptr;
-      }
-      input->baseName[i] = '\0';
-      input->dirName =
-        g_malloc ((tmp1 - input->fileName + 1) * sizeof (gchar));
-      for (i = 0, ptr = input->fileName; ptr < tmp1; ptr++, i++) {
-        input->dirName[i] = *ptr;
-      }
-      input->dirName[i] = '\0';
-    }
-    else {
-      input->fileName = NULL;
-      input->dirName = NULL;
-      input->baseName = NULL;
-    }
+    completeFileDesc(input->fileName, input);
   }
 
   input->canVerify = 0;
@@ -488,8 +464,7 @@ getDisplayDescription (xmlNodePtr node)
   xmlChar *tmp;
 
   dpy =
-    (GGobiDisplayDescription *) g_malloc (sizeof (GGobiDisplayDescription));
-  memset (dpy, '\0', sizeof (GGobiDisplayDescription));
+    (GGobiDisplayDescription *) g_malloc0 (sizeof (GGobiDisplayDescription));
   dpy->canRecreate = true;
 
   tmp = xmlGetProp (node, (xmlChar *) "type");
@@ -649,12 +624,9 @@ processPlugin (xmlNodePtr node, GGobiInitInfo * info, xmlDocPtr doc)
   GGobiPluginInfo *plugin;
   gboolean isLanguage;
 
-  plugin = (GGobiPluginInfo *) g_malloc (sizeof (GGobiPluginInfo));
-  memset (plugin, '\0', sizeof (GGobiPluginInfo));
-  plugin->details = g_malloc (sizeof (GGobiPluginDetails));
-  memset (plugin->details, '\0', sizeof (GGobiPluginDetails));
-  plugin->info.g = g_malloc (sizeof (GGobiGeneralPluginInfo));
-  memset (plugin->info.g, '\0', sizeof (GGobiGeneralPluginInfo));
+  plugin = (GGobiPluginInfo *) g_malloc0 (sizeof (GGobiPluginInfo));
+  plugin->details = g_malloc0 (sizeof (GGobiPluginDetails));
+  plugin->info.g = g_malloc0 (sizeof (GGobiGeneralPluginInfo));
 
   load = getPluginDetails (node, plugin->details, doc);
 
@@ -1001,13 +973,9 @@ processInputPlugin (xmlNodePtr node, GGobiInitInfo * info, xmlDocPtr doc)
   GGobiPluginInfo *plugin;
   gboolean load;
 
-  plugin = (GGobiPluginInfo *) g_malloc (sizeof (GGobiPluginInfo));
-  memset (plugin, '\0', sizeof (GGobiPluginInfo));
-  plugin->details = g_malloc (sizeof (GGobiPluginDetails));
-  memset (plugin->details, '\0', sizeof (GGobiPluginDetails));
-  plugin->info.i = g_malloc (sizeof (GGobiInputPluginInfo));
-  memset (plugin->info.i, '\0', sizeof (GGobiInputPluginInfo));
-
+  plugin = (GGobiPluginInfo *) g_malloc0 (sizeof (GGobiPluginInfo));
+  plugin->details = g_malloc0 (sizeof (GGobiPluginDetails));
+  plugin->info.i = g_malloc0 (sizeof (GGobiInputPluginInfo));
 
   load = getPluginDetails (node, plugin->details, doc);
 

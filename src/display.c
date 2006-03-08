@@ -23,8 +23,6 @@
 
 #include "display_tree.h"
 
-#include <string.h>             /* for memset */
-
 #include "print.h"
 
 DisplayOptions DefaultDisplayOptions = {
@@ -787,8 +785,7 @@ computeTitle (gboolean current_p, displayd * display, ggobid * gg)
 
   n = strlen (tmp) + strlen (description) + 5 +
     (current_p ? strlen ("(current)") : 0);
-  title = (gchar *) g_malloc (sizeof (gchar) * n);
-  memset (title, '\0', n);
+  title = (gchar *) g_malloc0 (sizeof (gchar) * n);
   sprintf (title, "%s: %s %s", description, tmp,
            (current_p ? "(current)" : ""));
   g_free (description);

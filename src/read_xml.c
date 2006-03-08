@@ -173,9 +173,7 @@ read_xml_input_description (const char *const fileName,
                             GGobiPluginInfo * info)
 {
   InputDescription *desc;
-  desc = (InputDescription *) g_malloc (sizeof (InputDescription));
-  memset (desc, '\0', sizeof (InputDescription));
-
+  desc = (InputDescription *) g_malloc0 (sizeof (InputDescription));
   desc->fileName = g_strdup (fileName);
   if (file_is_readable (desc->fileName) == false) {
     g_free (desc->fileName);
@@ -202,7 +200,7 @@ ggobi_XML_warning_handler (void *data, const gchar * msg, ...)
   fprintf (stderr, "Warning from XML parsing [%d, %d]: ",
            (int) p->input->line, (int) p->input->col);
 
-  vfprintf (stderr, msg, ap);
+  g_vfprintf (stderr, msg, ap);
 
   fflush (stderr);
 }
@@ -217,7 +215,7 @@ ggobi_XML_error_handler (void *data, const gchar * msg, ...)
            (int) p->input->line, (int) p->input->col);
 
   va_start (ap, msg);
-  vfprintf (stderr, msg, ap);
+  g_vfprintf (stderr, msg, ap);
 
   fflush (stderr);
 }
@@ -250,16 +248,10 @@ data_xml_read (InputDescription * desc, ggobid * gg)
   if (name == NULL)
     return (false);
 
-  if (strcmp (name, desc->fileName) != 0) {
-    g_printerr
-      ("Different input file name and resolved file name. Please report.\n");
-  }
-
-  xmlParserHandler = (xmlSAXHandlerPtr) g_malloc (sizeof (xmlSAXHandler));
+  xmlParserHandler = (xmlSAXHandlerPtr) g_malloc0 (sizeof (xmlSAXHandler));
   /* Make certain this is initialized so that we don't have any references
      to unwanted routines!
    */
-  memset (xmlParserHandler, '\0', sizeof (xmlSAXHandler));
 
   xmlParserHandler->startElement = startXMLElement;
   xmlParserHandler->endElement = endXMLElement;
@@ -836,11 +828,7 @@ Characters (void *user_data, const xmlChar * ch, gint len)
     return;
 
   if (data->terminateStrings_p) {
-    tmp = (gchar *) g_malloc (sizeof (gchar) * (dlen + 1));
-
-    memcpy (tmp, c, dlen);
-    memset (tmp + dlen, '\0', 1);
-
+    tmp = g_strndup(c, dlen);
     c = (const xmlChar *) tmp;
   }
 
@@ -1498,9 +1486,7 @@ newVariable (const xmlChar ** attrs, XMLParserData * data,
     if ((tmp = getAttribute (attrs, "levels")) && strcmp (tmp, "auto") == 0) {
       if (data->autoLevels == NULL) {
         data->autoLevels = (GHashTable **)
-          g_malloc (sizeof (GHashTable *) * data->current_data->ncols);
-        memset (data->autoLevels, '\0',
-                sizeof (gboolean) * data->current_data->ncols);
+          g_malloc0 (sizeof (GHashTable *) * data->current_data->ncols);
       }
       /* glib-2.0 provides a g_hash_table_new_full with which we can
          specify the `free' routine for elements. This should simplify
@@ -1783,8 +1769,7 @@ readXMLRecord (const xmlChar ** attrs, XMLParserData * data)
     if (data->idTable == NULL) {
       data->idTable = g_hash_table_new (g_str_hash, g_str_equal);
       d->idTable = data->idTable;
-      d->rowIds = (gchar **) g_malloc (sizeof (gchar *) * d->nrows);
-      memset (d->rowIds, '\0', sizeof (gchar *) * d->nrows);
+      d->rowIds = (gchar **) g_malloc0 (sizeof (gchar *) * d->nrows);
     }
     else {
       if (g_hash_table_lookup (data->idTable, tmp))

@@ -77,7 +77,7 @@ filesel_ok (GtkWidget * chooser)
                                                            "URLEntry");
         if (entry) {
           url = gtk_editable_get_chars (GTK_EDITABLE (entry), 0, -1);
-          if (url) {
+          if (g_utf8_strlen(url, -1) > 0) {
             fname = url; // Reset fname
             if (which == 0) {
               els = getInputPluginSelections (gg);
@@ -94,7 +94,6 @@ filesel_ok (GtkWidget * chooser)
 
       plugin = getInputPluginByModeNameIndex (which, &pluginModeName);
       firsttime = (g_slist_length (gg->d) == 0);
-
       if (fileset_read_init (fname, pluginModeName, plugin, gg))
       /*-- destroy and rebuild the menu every time data is read in --*/
         display_menu_build (gg);
@@ -118,7 +117,7 @@ filesel_ok (GtkWidget * chooser)
     switch (gg->save.format) {
     case XMLDATA:
     {
-      XmlWriteInfo info;
+      XmlWriteInfo *info = g_new0(XmlWriteInfo, 1);
 
       /*-- if fname already contains ".xml", then don't add it --*/
       if (len >= 4 && g_strncasecmp (&fname[len - 4], ".xml", 4) == 0)
@@ -126,10 +125,10 @@ filesel_ok (GtkWidget * chooser)
       else
         filename = g_strdup_printf ("%s.xml", fname);
 
-      memset (&info, '0', sizeof (XmlWriteInfo));
-      info.useDefault = true;
-      write_xml ((const gchar *) filename, gg, &info);
+      info->useDefault = true;
+      write_xml ((const gchar *) filename, gg, info);
       g_free (filename);
+      g_free(info);
     }
     break;
     case CSVDATA:
@@ -239,16 +238,11 @@ filename_get_r (ggobid * gg)
   chooser = createInputFileSelectionDialog ("Read ggobi data", gg);
 
   if (gg->input && gg->input->baseName) {
-    char buf[256];
-    char *cwd;
-    cwd = getcwd (buf, (size_t) 256);
-
-    gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER (chooser),
-                                         g_strdup_printf ("%s%c%s",
-                                                          cwd,
-                                                          G_DIR_SEPARATOR,
-                                                          gg->input->
-                                                          dirName));
+    gchar *cwd = g_get_current_dir();
+    gchar *dir = g_build_filename(cwd, gg->input->dirName, NULL);
+    gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER (chooser), dir);
+    g_free(cwd);
+    g_free(dir);
   }
 
   filename_get_configure (chooser, READ_FILESET, gg);
@@ -278,21 +272,11 @@ filename_get_w (GtkWidget * w, ggobid * gg)
   chooser = createOutputFileSelectionDialog (title);
 
   if (gg->input && gg->input->baseName) {
-    char buf[256];
-    char *cwd;
-    cwd = getcwd (buf, (size_t) 256);
-
-    /* This needs to be the full path name of the data directory */
-    gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER (chooser),
-                                         g_strdup_printf ("%s%c%s",
-                                                          cwd,
-                                                          G_DIR_SEPARATOR,
-                                                          gg->input->
-                                                          dirName));
-
-    /* Don't print the name of the current file, because it would be
-       easy to overwrite it in error.  dfs
-     */
+    gchar *cwd = g_get_current_dir();
+    gchar *dir = g_build_filename(cwd, gg->input->dirName, NULL);
+    gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER (chooser), dir);
+    g_free(cwd);
+    g_free(dir);
   }
 
   filename_get_configure (chooser, WRITE_FILESET, gg);

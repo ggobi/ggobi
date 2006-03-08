@@ -92,15 +92,6 @@ static void subset_string_pos_cb (GtkWidget *w, ggobid *gg)
     g_object_get_data(G_OBJECT(gg->subset_ui.window), "SS:IGNORE_CASE");
 
   d->subset.string_pos = gtk_combo_box_get_active(GTK_COMBO_BOX(w));
-
-  /*
-   * I'm not allowing the user to ignore the case of the string
-   * when I'm using strstr to test whether the string is included
-  */
-  if (d->subset.string_pos == 1 || d->subset.string_pos == 4)
-    gtk_widget_set_sensitive (tgl, false);
-  else
-    gtk_widget_set_sensitive (tgl, true);
 }
 
 static void

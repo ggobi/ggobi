@@ -107,27 +107,6 @@ fshuffle (gfloat * x, gint n)
   }
 }
 
-gdouble
-myrint (gdouble x)
-{
-  gdouble xrint;
-  gdouble xmin = floor (x);
-  gdouble xmax = ceil (x);
-/*
- *  In the default rounding mode, round to nearest, rint(x) is the integer
- *  nearest x with the additional stipulation that if |rint(x)-x|=1/2 then
- *  rint(x) is even.  Other rounding modes can make rint act like floor,
- *  or like ceil, or round towards zero.
-*/
-  xrint = (x - xmin < xmax - x) ? xmin : xmax;
-
-  if (fabs (xrint - x) == .5) {
-    xrint = ((gint) xmin % 2 == 0) ? xmin : xmax;
-  }
-
-  return xrint;
-}
-
 /* ---------------------------------------------------------------------*/
 /* The routines below have been added for the R/S connection */
 /* ---------------------------------------------------------------------*/

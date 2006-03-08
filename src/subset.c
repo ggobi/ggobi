@@ -20,9 +20,6 @@
 #include "vars.h"
 #include "externs.h"
 
-extern int strcasecmp(const char *, const char *);
-extern int strncasecmp(const char *, const char *, size_t);
-
 void
 subset_init (GGobiData *d, ggobid *gg)
 {
@@ -243,13 +240,12 @@ subset_rowlab (gchar *substr, gint substr_pos, gboolean ignore_case,
 {
   gint i;
   gint top = d->nrows;
-  size_t slen, slen2;
-  gchar *lbl;
+  gssize slen;
   GtkWidget *w, *pnl;
   
   pnl = mode_panel_get_by_name(GGOBI(getIModeName)(IDENT), gg);
 
-  if (substr == NULL || (slen = strlen(substr)) == 0)
+  if (substr == NULL || (slen = g_utf8_strlen(substr, -1)) == 0)
     return false;
 
   /*-- remove all sticky labels --*/
@@ -259,53 +255,27 @@ subset_rowlab (gchar *substr, gint substr_pos, gboolean ignore_case,
 
   subset_clear (d, gg);
 
+  if (ignore_case)
+    substr = g_utf8_strdown(substr, -1);
+  else substr = g_strdup(substr);
   for (i=0; i<top; i++) {
-    switch (substr_pos) {
-      case 0:  /* is identical to the string */
-        if (ignore_case) {
-          if (!strcasecmp ((gchar *) g_array_index (d->rowlab, gchar *, i),
-            substr)) 
-              add_to_subset (i, d, gg);
-        } else {
-          if (!strcmp ((gchar *) g_array_index (d->rowlab, gchar *, i),
-            substr)) 
-              add_to_subset (i, d, gg);
-        }
-      break;
-      case 1:  /* includes the string -- I have to do more work
-                  to ignore case */
-        if (strstr ((gchar *) g_array_index (d->rowlab, gchar *, i), substr))
-          add_to_subset (i, d, gg);
-      break;
-      case 2:  /* begins with the string */
-        if (ignore_case) {
-          if (!strncasecmp ((gchar *) g_array_index (d->rowlab, gchar *, i),
-            substr, slen)) 
-              add_to_subset (i, d, gg);
-        } else {
-          if (!strncmp ((gchar *) g_array_index (d->rowlab, gchar *, i),
-            substr, slen)) 
-              add_to_subset (i, d, gg);
-        }
-      break;
-      case 3:  /* ends with the string */
-        lbl = (gchar *) g_array_index (d->rowlab, gchar *, i);
-        if ((slen2 = strlen(lbl)) >= slen) {
-          if (ignore_case) {
-            if (!strcmp (&lbl[slen2-slen], substr))
-              add_to_subset (i, d, gg);
-          } else {
-            if (!strcasecmp (&lbl[slen2-slen], substr))
-              add_to_subset (i, d, gg);
-          }
-        }
-      break;
-      case 4:  /* does not include the string: ditto about case */
-        if (!strstr ((gchar *) g_array_index (d->rowlab, gchar *, i), substr))
-          add_to_subset (i, d, gg);
-      break;
-    }
+    gchar *label = (gchar *) g_array_index (d->rowlab, gchar *, i);
+    gint llen = g_utf8_strlen(label, -1);
+    gint start = substr_pos == 3 ? llen - slen : 0;
+    gint safe_len = llen < slen ? llen : slen;
+    if (start < 0)
+      continue;
+    if (ignore_case)
+      label = g_utf8_strdown(label, substr_pos == 2 ? safe_len : llen);
+    else label = g_strndup(label, substr_pos == 2 ? safe_len : llen);
+    if (substr_pos == 1 || substr_pos == 4) {
+      gchar *inside = strstr(label, substr);
+      if (inside && substr_pos == 1 || !inside && substr_pos == 4)
+        add_to_subset (i, d, gg);
+    } else if (!g_utf8_collate(g_utf8_offset_to_pointer(label, start), substr))
+        add_to_subset (i, d, gg);
+    g_free(label);
   }
-
+  g_free(substr);
   return true;
 }

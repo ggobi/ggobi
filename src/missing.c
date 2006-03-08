@@ -20,8 +20,8 @@
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <limits.h>
-#include <float.h>
+/*#include <limits.h>*/
+/*#include <float.h>*/
 #include <math.h>
 
 #include <gtk/gtk.h>

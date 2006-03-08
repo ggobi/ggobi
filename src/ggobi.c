@@ -610,8 +610,7 @@ initSessionOptions (int argc, char **argv)
   sessionOptions->ggobiHome = computeGGobiHome (argv[0]);
 
 
-  sessionOptions->info = (GGobiInitInfo *) g_malloc (sizeof (GGobiInitInfo));
-  memset (sessionOptions->info, '\0', sizeof (GGobiInitInfo));
+  sessionOptions->info = (GGobiInitInfo *) g_malloc0 (sizeof (GGobiInitInfo));
   sessionOptions->info->glyph.size = sessionOptions->info->glyph.type = -1;
   sessionOptions->info->createInitialScatterPlot = true;
   sessionOptions->info->allowCloseLastDisplay = false;

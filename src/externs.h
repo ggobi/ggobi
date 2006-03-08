@@ -344,7 +344,6 @@ void       move_pt (gint id, gint x, gint y, splotd *sp, GGobiData *d, ggobid *)
 void       movepts_event_handlers_toggle (splotd *, gboolean);
 void       movepts_history_add (gint id, splotd *sp, GGobiData *, ggobid *);
 void       movepts_history_delete_last (GGobiData *, ggobid *);
-gdouble    myrint (gdouble x);
 gint       ndatad_with_vars_get (ggobid *gg);
 void       newvar_add_with_values (gdouble *, gint, gchar *, vartyped type, gint nlevels, gchar **level_names, gint *level_values, gint *level_counts, GGobiData * d);
 void       norm (gdouble *, gint);

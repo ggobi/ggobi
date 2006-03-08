@@ -309,8 +309,7 @@ read_csv_input_description (const char *const fileName,
                             GGobiPluginInfo * info)
 {
   InputDescription *desc;
-  desc = (InputDescription *) g_malloc (sizeof (InputDescription));
-  memset (desc, '\0', sizeof (InputDescription));
+  desc = (InputDescription *) g_malloc0 (sizeof (InputDescription));
 
   desc->fileName = g_strdup (fileName);
   desc->mode = csv_data;
@@ -566,29 +565,6 @@ row_free (Row * row)
 gboolean
 isCSVFile (const gchar * fileName, ggobid * gg, GGobiPluginInfo * plugin)
 {
-  char tmp[20];
-  char extention[20];
-  int len;
-  int i, inx, inx2;
-  memset (tmp, '\0', 20);
-  memset (extention, '\0', 20);
-  len = strlen (fileName);
-  inx = 0;
-  for (i = len - 1; i >= 0; i--) {
-    if (fileName[i] == '.')
-      break;
-    tmp[inx] = fileName[i];
-    inx++;
-  }
-  tmp[inx] = '\0';
-  inx2 = 0;
-  for (i = inx - 1; i >= 0; i--) {
-    extention[inx2] = tmp[i];
-    inx2++;
-  }
-  if ((strcmp (extention, "asc") == 0) ||
-      (strcmp (extention, "txt") == 0) || (strcmp (extention, "csv") == 0))
-    return true;
-  else
-    return false;
+  gchar *extension = strrchr (fileName, '.');
+  return(!strcmp (extension, "asc") || !strcmp (extension, "txt") || !strcmp (extension, "csv"));
 }

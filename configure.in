@@ -1,6 +1,6 @@
 dnl This is the configuration script for ggobi
 
-AC_INIT(src/ggobi.c)
+AC_INIT(ggobi, 2.0, ggobi-help@lists.ggobi.org)
 
 # Get the version information.
 . VersionInfo

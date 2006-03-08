@@ -22,8 +22,6 @@
 #include "vars.h"
 #include "externs.h"
 
-#include <string.h>             /* for memset() */
-
 /* external variables */
 
 /*-------------------------------------------------------------------------*/

@@ -18,8 +18,8 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <limits.h>
-#include <float.h>
+/*#include <limits.h>
+#include <float.h>*/
 #include <math.h>
 #include <gtk/gtk.h>
 
@@ -208,8 +208,8 @@ textur (gfloat * yy, gfloat * shft, gint ny, gint option, gfloat del,
 
   CurrentGGobi = gg;
 
-  qsort ((void *) indx, (size_t) ny, sizeof (gint), psort);
-  qsort ((void *) yy, (size_t) ny, sizeof (gfloat), fcompare);
+  qsort ((void *) indx, (gsize) ny, sizeof (gint), psort);
+  qsort ((void *) yy, (gsize) ny, sizeof (gfloat), fcompare);
   CurrentGGobi = NULL;
 /*
  * Bug here:  this is screwy if ny < 4.

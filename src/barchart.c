@@ -1341,7 +1341,7 @@ barchart_sort_index (gfloat * yy, gint ny, ggobid * gg, barchartSPlotd * sp)
   }
   CurrentGGobi = gg;
 
-  qsort ((void *) indx, (size_t) ny, sizeof (gint), barpsort);
+  qsort ((void *) indx, (gsize) ny, sizeof (gint), barpsort);
 
   CurrentGGobi = NULL;
 /*

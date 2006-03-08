@@ -268,10 +268,7 @@ MySQLLoginInfo *
 initMySQLLoginInfo (MySQLLoginInfo * login)
 {
   if (login == NULL)
-    login = (MySQLLoginInfo *) g_malloc (sizeof (MySQLLoginInfo));
-
-
-  memset (login, '\0', sizeof (MySQLLoginInfo));
+    login = (MySQLLoginInfo *) g_malloc0 (sizeof (MySQLLoginInfo));
 
   *login = DefaultMySQLInfo;
 
