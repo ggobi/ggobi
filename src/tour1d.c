@@ -839,6 +839,7 @@ tour1d_idle_func (displayd *dsp)
 
 void tour1d_func (gboolean state, displayd *dsp, ggobid *gg)
 {
+  printf("hi\n");
   if (state) {
     if (dsp->t1d.idled == 0) {
       dsp->t1d.idled = g_idle_add_full (G_PRIORITY_LOW,

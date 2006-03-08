@@ -122,7 +122,19 @@ barchartVarSel (GtkWidget * w, displayd * display, splotd * sp, gint jvar,
                 gint toggle, gint mouse, cpaneld * cpanel, ggobid * gg)
 {
   gint jvar_prev = -1;
-  gboolean redraw = p1d_varsel (sp, jvar, &jvar_prev, toggle, mouse);
+  gboolean redraw = false;
+  gboolean fade = gg->tour1d.fade_vars;
+  /*  displayd *display = (displayd *) sp->displayptr;*/
+  GGobiData *d = display->d;
+
+  switch (cpanel->pmode) {
+    case TOUR1D:
+      redraw = tour1d_varsel (w, jvar, toggle, mouse, display->d, gg);
+    default:
+      redraw = p1d_varsel(sp, jvar, &jvar_prev, toggle, mouse);
+    break;
+  }
+
   if (redraw) {
     displayd *display = (displayd *) sp->displayptr;
     GGobiData *d = display->d;
@@ -211,8 +223,8 @@ barchartWorldToPlane (splotd * sp, GGobiData * d, ggobid * gg)
 {
   barchartSPlotd *bsp = GGOBI_BARCHART_SPLOT (sp);
 
-  /*  barchart_clean_init(bsp); */
-  barchart_recalc_counts (bsp, d, gg);
+  barchart_clean_init(bsp);
+  barchart_recalc_counts(bsp, d, gg);
 }
 
 
@@ -271,14 +283,33 @@ barchart_build_symbol_vectors (cpaneld * cpanel, GGobiData * d, ggobid * gg)
 void
 barchartVarpanelRefresh (displayd * display, splotd * sp, GGobiData * d)
 {
+  cpaneld *cpanel = &display->cpanel;
   gint j;
-  for (j = 0; j < d->ncols; j++) {
-    varpanel_toggle_set_active (VARSEL_X, j, (j == sp->p1dvar), d);
 
-    varpanel_toggle_set_active (VARSEL_Y, j, false, d);
-    varpanel_widget_set_visible (VARSEL_Y, j, false, d);
-    varpanel_toggle_set_active (VARSEL_Z, j, false, d);
-    varpanel_widget_set_visible (VARSEL_Z, j, false, d);
+  switch (cpanel->pmode) {
+    case TOUR1D:
+      for (j=0; j<d->ncols; j++) {
+        varpanel_toggle_set_active (VARSEL_X, j, false, d);
+        varpanel_toggle_set_active (VARSEL_Y, j, false, d);
+        varpanel_widget_set_visible (VARSEL_Y, j, false, d);
+        varpanel_toggle_set_active (VARSEL_Z, j, false, d);
+        varpanel_widget_set_visible (VARSEL_Z, j, false, d);
+      }
+      for (j=0; j<display->t1d.nsubset; j++) {
+        varpanel_toggle_set_active (VARSEL_X,
+          display->t1d.subset_vars.els[j], true, d);
+      }
+      break;
+    default:
+      for (j = 0; j < d->ncols; j++) {
+        varpanel_toggle_set_active(VARSEL_X, j, (j == sp->p1dvar), d);
+
+        varpanel_toggle_set_active(VARSEL_Y, j, false, d);
+        varpanel_widget_set_visible(VARSEL_Y, j, false, d);
+        varpanel_toggle_set_active(VARSEL_Z, j, false, d);
+        varpanel_widget_set_visible(VARSEL_Z, j, false, d);
+      }
+    break;
   }
 }
 

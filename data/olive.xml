@@ -2,1767 +2,1756 @@
 <!DOCTYPE ggobidata SYSTEM "ggobi.dtd">
 
 <ggobidata count="1">
-<brush color="5" glyph="fc 3" />
-
 <data name="olive oil">
 <description>
-The olive oil data consists of the percentage composition of 8 fatty
-acids (palmitic, palmitoleic, stearic, oleic, linoleic, linolenic,
-arachidic, eicosenoic) found in the lipid fraction of 572 Italian
-olive oils. There are 9 collection areas, 4 from southern Italy (North
-and South Apulia, Calabria, Sicily), two from Sardinia (Inland and
-Coastal) and 3 from northern Italy (Umbria, East and West
-Liguria). Taken from Forina, M. and Armanino, C. and Lanteri, S. and
-Tiscornia, E., Classification of olive oils from their fatty acid
-composition, 1983, in Food Research and Data Analysis, edited by
-Martens, H. and Russwurm Jr, H, pages 189-214.
+This is XML created by GGobi
 </description>
 <variables count="10">
-  <categoricalvariable name="Region">
+  <categoricalvariable name="Region" nickname="Re">
     <levels count="3">
-      <level value="1"> 1 </level>
-      <level value="2"> 2 </level>
-      <level value="3"> 3 </level>
+      <level value="1"> 1  </level>
+      <level value="2"> 2  </level>
+      <level value="3"> 3  </level>
     </levels>
   </categoricalvariable>
-  <categoricalvariable name="Area">
+  <categoricalvariable name="Area" nickname="Ar">
     <levels count="9">
-      <level value="1"> North-Apulia </level>
-      <level value="2"> Calabria </level>
-      <level value="3"> South-Apulia </level>
-      <level value="4"> Sicily </level>
-      <level value="5"> Inland-Sardinia </level>
-      <level value="6"> Coast-Sardinia </level>
-      <level value="7"> East-Liguria </level>
-      <level value="8"> West-Liguria </level>
-      <level value="9"> Umbria </level>
+      <level value="1"> North-Apulia  </level>
+      <level value="2"> Calabria  </level>
+      <level value="3"> South-Apulia  </level>
+      <level value="4"> Sicily  </level>
+      <level value="5"> Inland-Sardinia  </level>
+      <level value="6"> Coast-Sardinia  </level>
+      <level value="7"> East-Liguria  </level>
+      <level value="8"> West-Liguria  </level>
+      <level value="9"> Umbria  </level>
     </levels>
   </categoricalvariable>
-<realvariable name="palmitic" nickname="p1" />
-<realvariable name="palmitoleic" nickname="p2" />
-<realvariable name="stearic" />
-<realvariable name="oleic" />
-<realvariable name="linoleic" nickname="l1" />
-<realvariable name="linolenic" nickname="l2" />
-<realvariable name="arachidic" />
-<realvariable name="eicosenoic" />
+  <realvariable name="palmitic" nickname="p1"/>
+  <realvariable name="palmitoleic" nickname="p2"/>
+  <realvariable name="stearic" nickname="st"/>
+  <realvariable name="oleic" nickname="ol"/>
+  <realvariable name="linoleic" nickname="l1"/>
+  <realvariable name="linolenic" nickname="l2"/>
+  <realvariable name="arachidic" nickname="ar"/>
+  <realvariable name="eicosenoic" nickname="ei"/>
 </variables>
-<records count="572" glyph="fc 2" color="1">
-<record label="North-Apulia">
-1.000 1.000 1075.000 75.000 226.000 7823.000 672.000 36.000 60.000 29.000
+<records count="572" glyph="x 4" color="2">
+<record label="North-Apulia" glyph="plus 4">
+1 1 1075 75 226 7823 672 36 60 29
 </record>
-<record label="North-Apulia">
-1.000 1.000 1088.000 73.000 224.000 7709.000 781.000 31.000 61.000 29.000
+<record label="North-Apulia" glyph="plus 4">
+1 1 1088 73 224 7709 781 31 61 29
 </record>
-<record label="North-Apulia">
-1.000 1.000 911.000 54.000 246.000 8113.000 549.000 31.000 63.000 29.000
+<record label="North-Apulia" glyph="plus 4">
+1 1 911 54 246 8113 549 31 63 29
 </record>
-<record label="North-Apulia">
-1.000 1.000 966.000 57.000 240.000 7952.000 619.000 50.000 78.000 35.000
+<record label="North-Apulia" glyph="plus 4">
+1 1 966 57 240 7952 619 50 78 35
 </record>
-<record label="North-Apulia">
-1.000 1.000 1051.000 67.000 259.000 7771.000 672.000 50.000 80.000 46.000
+<record label="North-Apulia" glyph="plus 4">
+1 1 1051 67 259 7771 672 50 80 46
 </record>
-<record label="North-Apulia">
-1.000 1.000 911.000 49.000 268.000 7924.000 678.000 51.000 70.000 44.000
+<record label="North-Apulia" glyph="plus 4">
+1 1 911 49 268 7924 678 51 70 44
 </record>
-<record label="North-Apulia">
-1.000 1.000 922.000 66.000 264.000 7990.000 618.000 49.000 56.000 29.000
+<record label="North-Apulia" glyph="plus 4">
+1 1 922 66 264 7990 618 49 56 29
 </record>
-<record label="North-Apulia">
-1.000 1.000 1100.000 61.000 235.000 7728.000 734.000 39.000 64.000 35.000
+<record label="North-Apulia" glyph="plus 4">
+1 1 1100 61 235 7728 734 39 64 35
 </record>
-<record label="North-Apulia">
-1.000 1.000 1082.000 60.000 239.000 7745.000 709.000 46.000 83.000 33.000
+<record label="North-Apulia" glyph="plus 4">
+1 1 1082 60 239 7745 709 46 83 33
 </record>
-<record label="North-Apulia">
-1.000 1.000 1037.000 55.000 213.000 7944.000 633.000 26.000 52.000 30.000
+<record label="North-Apulia" glyph="plus 4">
+1 1 1037 55 213 7944 633 26 52 30
 </record>
-<record label="North-Apulia">
-1.000 1.000 1051.000 35.000 219.000 7978.000 605.000 21.000 65.000 24.000
+<record label="North-Apulia" glyph="plus 4">
+1 1 1051 35 219 7978 605 21 65 24
 </record>
-<record label="North-Apulia">
-1.000 1.000 1036.000 59.000 235.000 7868.000 661.000 30.000 62.000 44.000
+<record label="North-Apulia" glyph="plus 4">
+1 1 1036 59 235 7868 661 30 62 44
 </record>
-<record label="North-Apulia">
-1.000 1.000 1074.000 70.000 214.000 7728.000 747.000 50.000 79.000 33.000
+<record label="North-Apulia" glyph="plus 4">
+1 1 1074 70 214 7728 747 50 79 33
 </record>
-<record label="North-Apulia">
-1.000 1.000 875.000 52.000 243.000 8018.000 655.000 41.000 79.000 32.000
+<record label="North-Apulia" glyph="plus 4">
+1 1 875 52 243 8018 655 41 79 32
 </record>
-<record label="North-Apulia">
-1.000 1.000 952.000 49.000 254.000 7795.000 780.000 50.000 75.000 41.000
+<record label="North-Apulia" glyph="plus 4">
+1 1 952 49 254 7795 780 50 75 41
 </record>
-<record label="North-Apulia">
-1.000 1.000 1155.000 98.000 201.000 7606.000 816.000 32.000 60.000 29.000
+<record label="North-Apulia" glyph="plus 4">
+1 1 1155 98 201 7606 816 32 60 29
 </record>
-<record label="North-Apulia">
-1.000 1.000 943.000 94.000 183.000 7840.000 788.000 42.000 75.000 31.000
+<record label="North-Apulia" glyph="plus 4">
+1 1 943 94 183 7840 788 42 75 31
 </record>
-<record label="North-Apulia">
-1.000 1.000 1278.000 69.000 205.000 7344.000 957.000 45.000 70.000 28.000
+<record label="North-Apulia" glyph="plus 4">
+1 1 1278 69 205 7344 957 45 70 28
 </record>
-<record label="North-Apulia">
-1.000 1.000 961.000 70.000 195.000 7958.000 742.000 46.000 75.000 30.000
+<record label="North-Apulia" glyph="plus 4">
+1 1 961 70 195 7958 742 46 75 30
 </record>
-<record label="North-Apulia">
-1.000 1.000 952.000 77.000 258.000 7820.000 736.000 43.000 78.000 33.000
+<record label="North-Apulia" glyph="plus 4">
+1 1 952 77 258 7820 736 43 78 33
 </record>
-<record label="North-Apulia">
-1.000 1.000 1074.000 67.000 236.000 7692.000 716.000 56.000 83.000 45.000
+<record label="North-Apulia" glyph="plus 4">
+1 1 1074 67 236 7692 716 56 83 45
 </record>
-<record label="North-Apulia">
-1.000 1.000 995.000 46.000 288.000 7806.000 679.000 56.000 86.000 40.000
+<record label="North-Apulia" glyph="plus 4">
+1 1 995 46 288 7806 679 56 86 40
 </record>
-<record label="North-Apulia">
-1.000 1.000 1056.000 53.000 247.000 7703.000 700.000 54.000 89.000 51.000
+<record label="North-Apulia" glyph="plus 4">
+1 1 1056 53 247 7703 700 54 89 51
 </record>
-<record label="North-Apulia">
-1.000 1.000 1065.000 39.000 234.000 7876.000 703.000 42.000 74.000 26.000
+<record label="North-Apulia" glyph="plus 4">
+1 1 1065 39 234 7876 703 42 74 26
 </record>
-<record label="North-Apulia">
-1.000 1.000 1065.000 45.000 245.000 7779.000 696.000 47.000 82.000 38.000
+<record label="North-Apulia" glyph="plus 4">
+1 1 1065 45 245 7779 696 47 82 38
 </record>
-<record label="Calabria">
-1.000 2.000 1315.000 139.000 230.000 7299.000 832.000 42.000 60.000 32.000
+<record label="Calabria" glyph="plus 2">
+1 2 1315 139 230 7299 832 42 60 32
 </record>
-<record label="Calabria">
-1.000 2.000 1321.000 136.000 217.000 7174.000 950.000 43.000 63.000 30.000
+<record label="Calabria" glyph="plus 2">
+1 2 1321 136 217 7174 950 43 63 30
 </record>
-<record label="Calabria">
-1.000 2.000 1359.000 115.000 246.000 7234.000 874.000 45.000 63.000 18.000
+<record label="Calabria" glyph="plus 2">
+1 2 1359 115 246 7234 874 45 63 18
 </record>
-<record label="Calabria">
-1.000 2.000 1378.000 111.000 272.000 7127.000 940.000 46.000 64.000 23.000
+<record label="Calabria" glyph="plus 2">
+1 2 1378 111 272 7127 940 46 64 23
 </record>
-<record label="Calabria">
-1.000 2.000 1295.000 109.000 245.000 7253.000 903.000 43.000 62.000 38.000
+<record label="Calabria" glyph="plus 2">
+1 2 1295 109 245 7253 903 43 62 38
 </record>
-<record label="Calabria">
-1.000 2.000 1275.000 121.000 215.000 7285.000 892.000 40.000 68.000 41.000
+<record label="Calabria" glyph="plus 2">
+1 2 1275 121 215 7285 892 40 68 41
 </record>
-<record label="Calabria">
-1.000 2.000 1336.000 120.000 318.000 7083.000 915.000 50.000 70.000 38.000
+<record label="Calabria" glyph="plus 2">
+1 2 1336 120 318 7083 915 50 70 38
 </record>
-<record label="Calabria">
-1.000 2.000 1309.000 122.000 241.000 7257.000 870.000 46.000 72.000 35.000
+<record label="Calabria" glyph="plus 2">
+1 2 1309 122 241 7257 870 46 72 35
 </record>
-<record label="Calabria">
-1.000 2.000 1340.000 114.000 189.000 7337.000 820.000 48.000 72.000 21.000
+<record label="Calabria" glyph="plus 2">
+1 2 1340 114 189 7337 820 48 72 21
 </record>
-<record label="Calabria">
-1.000 2.000 1299.000 116.000 253.000 7309.000 823.000 40.000 69.000 27.000
+<record label="Calabria" glyph="plus 2">
+1 2 1299 116 253 7309 823 40 69 27
 </record>
-<record label="Calabria">
-1.000 2.000 1221.000 107.000 221.000 7441.000 798.000 54.000 70.000 28.000
+<record label="Calabria" glyph="plus 2">
+1 2 1221 107 221 7441 798 54 70 28
 </record>
-<record label="Calabria">
-1.000 2.000 1245.000 72.000 283.000 7395.000 829.000 44.000 67.000 28.000
+<record label="Calabria" glyph="plus 2">
+1 2 1245 72 283 7395 829 44 67 28
 </record>
-<record label="Calabria">
-1.000 2.000 1285.000 129.000 244.000 7323.000 819.000 57.000 65.000 36.000
+<record label="Calabria" glyph="plus 2">
+1 2 1285 129 244 7323 819 57 65 36
 </record>
-<record label="Calabria">
-1.000 2.000 1248.000 107.000 313.000 7299.000 840.000 46.000 66.000 33.000
+<record label="Calabria" glyph="plus 2">
+1 2 1248 107 313 7299 840 46 66 33
 </record>
-<record label="Calabria">
-1.000 2.000 1356.000 106.000 236.000 7209.000 866.000 48.000 75.000 36.000
+<record label="Calabria" glyph="plus 2">
+1 2 1356 106 236 7209 866 48 75 36
 </record>
-<record label="Calabria">
-1.000 2.000 1260.000 102.000 228.000 7354.000 870.000 49.000 64.000 28.000
+<record label="Calabria" glyph="plus 2">
+1 2 1260 102 228 7354 870 49 64 28
 </record>
-<record label="Calabria">
-1.000 2.000 1261.000 121.000 312.000 7238.000 877.000 47.000 65.000 25.000
+<record label="Calabria" glyph="plus 2">
+1 2 1261 121 312 7238 877 47 65 25
 </record>
-<record label="Calabria">
-1.000 2.000 1304.000 124.000 279.000 7160.000 928.000 48.000 61.000 37.000
+<record label="Calabria" glyph="plus 2">
+1 2 1304 124 279 7160 928 48 61 37
 </record>
-<record label="Calabria">
-1.000 2.000 1344.000 117.000 287.000 7129.000 897.000 51.000 65.000 41.000
+<record label="Calabria" glyph="plus 2">
+1 2 1344 117 287 7129 897 51 65 41
 </record>
-<record label="Calabria">
-1.000 2.000 1323.000 96.000 300.000 7351.000 757.000 47.000 54.000 26.000
+<record label="Calabria" glyph="plus 2">
+1 2 1323 96 300 7351 757 47 54 26
 </record>
-<record label="Calabria">
-1.000 2.000 1292.000 117.000 215.000 7351.000 839.000 48.000 61.000 32.000
+<record label="Calabria" glyph="plus 2">
+1 2 1292 117 215 7351 839 48 61 32
 </record>
-<record label="Calabria">
-1.000 2.000 1254.000 118.000 244.000 7394.000 786.000 46.000 71.000 24.000
+<record label="Calabria" glyph="plus 2">
+1 2 1254 118 244 7394 786 46 71 24
 </record>
-<record label="Calabria">
-1.000 2.000 1312.000 131.000 259.000 7167.000 939.000 41.000 69.000 20.000
+<record label="Calabria" glyph="plus 2">
+1 2 1312 131 259 7167 939 41 69 20
 </record>
-<record label="Calabria">
-1.000 2.000 1213.000 109.000 301.000 7261.000 925.000 47.000 65.000 31.000
+<record label="Calabria" glyph="plus 2">
+1 2 1213 109 301 7261 925 47 65 31
 </record>
-<record label="Calabria">
-1.000 2.000 1359.000 98.000 351.000 7262.000 780.000 41.000 56.000 16.000
+<record label="Calabria" glyph="plus 2">
+1 2 1359 98 351 7262 780 41 56 16
 </record>
-<record label="Calabria">
-1.000 2.000 1266.000 97.000 263.000 7435.000 743.000 45.000 69.000 29.000
+<record label="Calabria" glyph="plus 2">
+1 2 1266 97 263 7435 743 45 69 29
 </record>
-<record label="Calabria">
-1.000 2.000 1298.000 99.000 311.000 7311.000 787.000 45.000 67.000 23.000
+<record label="Calabria" glyph="plus 2">
+1 2 1298 99 311 7311 787 45 67 23
 </record>
-<record label="Calabria">
-1.000 2.000 1272.000 116.000 279.000 7258.000 872.000 43.000 72.000 27.000
+<record label="Calabria" glyph="plus 2">
+1 2 1272 116 279 7258 872 43 72 27
 </record>
-<record label="Calabria">
-1.000 2.000 1278.000 87.000 332.000 7379.000 771.000 44.000 53.000 24.000
+<record label="Calabria" glyph="plus 2">
+1 2 1278 87 332 7379 771 44 53 24
 </record>
-<record label="Calabria">
-1.000 2.000 1184.000 112.000 311.000 7391.000 819.000 48.000 57.000 28.000
+<record label="Calabria" glyph="plus 2">
+1 2 1184 112 311 7391 819 48 57 28
 </record>
-<record label="Calabria">
-1.000 2.000 1382.000 110.000 268.000 7241.000 828.000 39.000 60.000 30.000
+<record label="Calabria" glyph="plus 2">
+1 2 1382 110 268 7241 828 39 60 30
 </record>
-<record label="Calabria">
-1.000 2.000 1183.000 146.000 292.000 7580.000 618.000 38.000 51.000 23.000
+<record label="Calabria" glyph="plus 2">
+1 2 1183 146 292 7580 618 38 51 23
 </record>
-<record label="Calabria">
-1.000 2.000 1261.000 153.000 219.000 7355.000 818.000 52.000 70.000 26.000
+<record label="Calabria" glyph="plus 2">
+1 2 1261 153 219 7355 818 52 70 26
 </record>
-<record label="Calabria">
-1.000 2.000 1198.000 136.000 239.000 7639.000 633.000 27.000 55.000 19.000
+<record label="Calabria" glyph="plus 2">
+1 2 1198 136 239 7639 633 27 55 19
 </record>
-<record label="Calabria">
-1.000 2.000 1225.000 134.000 232.000 7658.000 616.000 36.000 49.000 26.000
+<record label="Calabria" glyph="plus 2">
+1 2 1225 134 232 7658 616 36 49 26
 </record>
-<record label="Calabria">
-1.000 2.000 1339.000 166.000 208.000 7190.000 923.000 40.000 69.000 25.000
+<record label="Calabria" glyph="plus 2">
+1 2 1339 166 208 7190 923 40 69 25
 </record>
-<record label="Calabria">
-1.000 2.000 1132.000 157.000 240.000 7641.000 638.000 45.000 60.000 31.000
+<record label="Calabria" glyph="plus 2">
+1 2 1132 157 240 7641 638 45 60 31
 </record>
-<record label="Calabria">
-1.000 2.000 1381.000 183.000 245.000 7385.000 609.000 47.000 70.000 25.000
+<record label="Calabria" glyph="plus 2">
+1 2 1381 183 245 7385 609 47 70 25
 </record>
-<record label="Calabria">
-1.000 2.000 1409.000 128.000 257.000 7257.000 759.000 43.000 57.000 16.000
+<record label="Calabria" glyph="plus 2">
+1 2 1409 128 257 7257 759 43 57 16
 </record>
-<record label="Calabria">
-1.000 2.000 1306.000 127.000 250.000 7254.000 869.000 47.000 68.000 24.000
+<record label="Calabria" glyph="plus 2">
+1 2 1306 127 250 7254 869 47 68 24
 </record>
-<record label="Calabria">
-1.000 2.000 1372.000 120.000 250.000 7355.000 702.000 44.000 68.000 28.000
+<record label="Calabria" glyph="plus 2">
+1 2 1372 120 250 7355 702 44 68 28
 </record>
-<record label="Calabria">
-1.000 2.000 1336.000 113.000 242.000 7293.000 855.000 38.000 60.000 18.000
+<record label="Calabria" glyph="plus 2">
+1 2 1336 113 242 7293 855 38 60 18
 </record>
-<record label="Calabria">
-1.000 2.000 1401.000 151.000 238.000 7164.000 857.000 45.000 72.000 36.000
+<record label="Calabria" glyph="plus 2">
+1 2 1401 151 238 7164 857 45 72 36
 </record>
-<record label="Calabria">
-1.000 2.000 1390.000 119.000 234.000 7236.000 823.000 40.000 62.000 41.000
+<record label="Calabria" glyph="plus 2">
+1 2 1390 119 234 7236 823 40 62 41
 </record>
-<record label="Calabria">
-1.000 2.000 1432.000 152.000 281.000 7029.000 949.000 39.000 55.000 25.000
+<record label="Calabria" glyph="plus 2">
+1 2 1432 152 281 7029 949 39 55 25
 </record>
-<record label="Calabria">
-1.000 2.000 1412.000 124.000 298.000 7182.000 790.000 45.000 68.000 28.000
+<record label="Calabria" glyph="plus 2">
+1 2 1412 124 298 7182 790 45 68 28
 </record>
-<record label="Calabria">
-1.000 2.000 1366.000 147.000 291.000 7197.000 783.000 51.000 70.000 34.000
+<record label="Calabria" glyph="plus 2">
+1 2 1366 147 291 7197 783 51 70 34
 </record>
-<record label="Calabria">
-1.000 2.000 1383.000 118.000 273.000 7282.000 738.000 45.000 68.000 29.000
+<record label="Calabria" glyph="plus 2">
+1 2 1383 118 273 7282 738 45 68 29
 </record>
-<record label="Calabria">
-1.000 2.000 1283.000 102.000 263.000 7400.000 763.000 54.000 65.000 28.000
+<record label="Calabria" glyph="plus 2">
+1 2 1283 102 263 7400 763 54 65 28
 </record>
-<record label="Calabria">
-1.000 2.000 1296.000 136.000 260.000 7380.000 780.000 48.000 51.000 18.000
+<record label="Calabria" glyph="plus 2">
+1 2 1296 136 260 7380 780 48 51 18
 </record>
-<record label="Calabria">
-1.000 2.000 1287.000 108.000 287.000 7343.000 826.000 44.000 44.000 23.000
+<record label="Calabria" glyph="plus 2">
+1 2 1287 108 287 7343 826 44 44 23
 </record>
-<record label="Calabria">
-1.000 2.000 1351.000 159.000 296.000 7229.000 810.000 36.000 60.000 22.000
+<record label="Calabria" glyph="plus 2">
+1 2 1351 159 296 7229 810 36 60 22
 </record>
-<record label="Calabria">
-1.000 2.000 1241.000 97.000 268.000 7499.000 709.000 52.000 69.000 36.000
+<record label="Calabria" glyph="plus 2">
+1 2 1241 97 268 7499 709 52 69 36
 </record>
-<record label="Calabria">
-1.000 2.000 1267.000 101.000 300.000 7230.000 898.000 74.000 65.000 34.000
+<record label="Calabria" glyph="plus 2">
+1 2 1267 101 300 7230 898 74 65 34
 </record>
-<record label="Calabria">
-1.000 2.000 1235.000 138.000 252.000 7322.000 861.000 54.000 66.000 36.000
+<record label="Calabria" glyph="plus 2">
+1 2 1235 138 252 7322 861 54 66 36
 </record>
-<record label="Calabria">
-1.000 2.000 1255.000 103.000 223.000 7395.000 848.000 47.000 56.000 30.000
+<record label="Calabria" glyph="plus 2">
+1 2 1255 103 223 7395 848 47 56 30
 </record>
 <record label="South-Apulia">
-1.000 3.000 1454.000 183.000 196.000 7057.000 1014.000 27.000 46.000 19.000
+1 3 1454 183 196 7057 1014 27 46 19
 </record>
 <record label="South-Apulia">
-1.000 3.000 1347.000 194.000 197.000 7277.000 895.000 25.000 46.000 15.000
+1 3 1347 194 197 7277 895 25 46 15
 </record>
 <record label="South-Apulia">
-1.000 3.000 1364.000 204.000 225.000 6929.000 1084.000 21.000 50.000 14.000
+1 3 1364 204 225 6929 1084 21 50 14
 </record>
 <record label="South-Apulia">
-1.000 3.000 1410.000 199.000 216.000 7130.000 955.000 21.000 48.000 19.000
+1 3 1410 199 216 7130 955 21 48 19
 </record>
 <record label="South-Apulia">
-1.000 3.000 1384.000 178.000 208.000 7105.000 999.000 29.000 67.000 26.000
+1 3 1384 178 208 7105 999 29 67 26
 </record>
 <record label="South-Apulia">
-1.000 3.000 1412.000 185.000 217.000 6842.000 1203.000 34.000 72.000 32.000
+1 3 1412 185 217 6842 1203 34 72 32
 </record>
 <record label="South-Apulia">
-1.000 3.000 1410.000 232.000 280.000 6715.000 1233.000 32.000 60.000 24.000
+1 3 1410 232 280 6715 1233 32 60 24
 </record>
 <record label="South-Apulia">
-1.000 3.000 1509.000 209.000 257.000 6647.000 1240.000 42.000 62.000 30.000
+1 3 1509 209 257 6647 1240 42 62 30
 </record>
 <record label="South-Apulia">
-1.000 3.000 1317.000 197.000 256.000 7036.000 1067.000 40.000 60.000 22.000
+1 3 1317 197 256 7036 1067 40 60 22
 </record>
 <record label="South-Apulia">
-1.000 3.000 1286.000 192.000 203.000 7132.000 1053.000 38.000 65.000 28.000
+1 3 1286 192 203 7132 1053 38 65 28
 </record>
 <record label="South-Apulia">
-1.000 3.000 1273.000 191.000 202.000 6862.000 1303.000 43.000 70.000 28.000
+1 3 1273 191 202 6862 1303 43 70 28
 </record>
 <record label="South-Apulia">
-1.000 3.000 1463.000 183.000 183.000 6747.000 1307.000 36.000 60.000 24.000
+1 3 1463 183 183 6747 1307 36 60 24
 </record>
 <record label="South-Apulia">
-1.000 3.000 1399.000 187.000 191.000 6861.000 1233.000 38.000 60.000 17.000
+1 3 1399 187 191 6861 1233 38 60 17
 </record>
 <record label="South-Apulia">
-1.000 3.000 1413.000 193.000 208.000 6875.000 1202.000 30.000 60.000 18.000
+1 3 1413 193 208 6875 1202 30 60 18
 </record>
 <record label="South-Apulia">
-1.000 3.000 1369.000 206.000 203.000 6953.000 1168.000 35.000 50.000 16.000
+1 3 1369 206 203 6953 1168 35 50 16
 </record>
 <record label="South-Apulia">
-1.000 3.000 1488.000 172.000 170.000 6920.000 1144.000 37.000 54.000 14.000
+1 3 1488 172 170 6920 1144 37 54 14
 </record>
 <record label="South-Apulia">
-1.000 3.000 1323.000 160.000 205.000 6911.000 1298.000 24.000 50.000 17.000
+1 3 1323 160 205 6911 1298 24 50 17
 </record>
 <record label="South-Apulia">
-1.000 3.000 1311.000 166.000 170.000 6902.000 1312.000 41.000 69.000 28.000
+1 3 1311 166 170 6902 1312 41 69 28
 </record>
 <record label="South-Apulia">
-1.000 3.000 1286.000 163.000 183.000 7040.000 1230.000 29.000 57.000 12.000
+1 3 1286 163 183 7040 1230 29 57 12
 </record>
 <record label="South-Apulia">
-1.000 3.000 1380.000 173.000 188.000 7038.000 1139.000 31.000 44.000 14.000
+1 3 1380 173 188 7038 1139 31 44 14
 </record>
 <record label="South-Apulia">
-1.000 3.000 1394.000 164.000 223.000 7086.000 1042.000 24.000 43.000 23.000
+1 3 1394 164 223 7086 1042 24 43 23
 </record>
 <record label="South-Apulia">
-1.000 3.000 1324.000 174.000 198.000 6863.000 1289.000 36.000 70.000 21.000
+1 3 1324 174 198 6863 1289 36 70 21
 </record>
 <record label="South-Apulia">
-1.000 3.000 1290.000 157.000 192.000 7000.000 1263.000 26.000 51.000 19.000
+1 3 1290 157 192 7000 1263 26 51 19
 </record>
 <record label="South-Apulia">
-1.000 3.000 1361.000 163.000 196.000 6888.000 1273.000 37.000 58.000 24.000
+1 3 1361 163 196 6888 1273 37 58 24
 </record>
 <record label="South-Apulia">
-1.000 3.000 1387.000 182.000 242.000 6913.000 1101.000 44.000 68.000 30.000
+1 3 1387 182 242 6913 1101 44 68 30
 </record>
 <record label="South-Apulia">
-1.000 3.000 1369.000 180.000 181.000 7000.000 1130.000 39.000 45.000 24.000
+1 3 1369 180 181 7000 1130 39 45 24
 </record>
 <record label="South-Apulia">
-1.000 3.000 1303.000 165.000 175.000 7025.000 1243.000 31.000 41.000 16.000
+1 3 1303 165 175 7025 1243 31 41 16
 </record>
 <record label="South-Apulia">
-1.000 3.000 1346.000 160.000 169.000 7072.000 1151.000 39.000 48.000 15.000
+1 3 1346 160 169 7072 1151 39 48 15
 </record>
 <record label="South-Apulia">
-1.000 3.000 1369.000 171.000 184.000 6937.000 1246.000 30.000 48.000 15.000
+1 3 1369 171 184 6937 1246 30 48 15
 </record>
 <record label="South-Apulia">
-1.000 3.000 1305.000 172.000 169.000 7004.000 1260.000 28.000 50.000 11.000
+1 3 1305 172 169 7004 1260 28 50 11
 </record>
 <record label="South-Apulia">
-1.000 3.000 1351.000 179.000 186.000 6935.000 1243.000 36.000 50.000 19.000
+1 3 1351 179 186 6935 1243 36 50 19
 </record>
 <record label="South-Apulia">
-1.000 3.000 1283.000 151.000 182.000 7000.000 1271.000 40.000 52.000 21.000
+1 3 1283 151 182 7000 1271 40 52 21
 </record>
 <record label="South-Apulia">
-1.000 3.000 1449.000 175.000 198.000 6883.000 1162.000 40.000 70.000 22.000
+1 3 1449 175 198 6883 1162 40 70 22
 </record>
 <record label="South-Apulia">
-1.000 3.000 1310.000 180.000 183.000 7054.000 1202.000 26.000 32.000 12.000
+1 3 1310 180 183 7054 1202 26 32 12
 </record>
 <record label="South-Apulia">
-1.000 3.000 1360.000 163.000 176.000 6901.000 1280.000 28.000 65.000 27.000
+1 3 1360 163 176 6901 1280 28 65 27
 </record>
 <record label="South-Apulia">
-1.000 3.000 1300.000 187.000 196.000 6920.000 1253.000 41.000 76.000 25.000
+1 3 1300 187 196 6920 1253 41 76 25
 </record>
 <record label="South-Apulia">
-1.000 3.000 1368.000 171.000 218.000 7010.000 1057.000 41.000 54.000 26.000
+1 3 1368 171 218 7010 1057 41 54 26
 </record>
 <record label="South-Apulia">
-1.000 3.000 1207.000 151.000 156.000 7159.000 1234.000 27.000 51.000 14.000
+1 3 1207 151 156 7159 1234 27 51 14
 </record>
 <record label="South-Apulia">
-1.000 3.000 1348.000 154.000 183.000 6917.000 1277.000 48.000 56.000 16.000
+1 3 1348 154 183 6917 1277 48 56 16
 </record>
 <record label="South-Apulia">
-1.000 3.000 1334.000 186.000 229.000 7261.000 827.000 34.000 56.000 20.000
+1 3 1334 186 229 7261 827 34 56 20
 </record>
 <record label="South-Apulia">
-1.000 3.000 1301.000 156.000 207.000 7003.000 1229.000 41.000 48.000 14.000
+1 3 1301 156 207 7003 1229 41 48 14
 </record>
 <record label="South-Apulia">
-1.000 3.000 1226.000 181.000 213.000 6961.000 1230.000 47.000 74.000 26.000
+1 3 1226 181 213 6961 1230 47 74 26
 </record>
 <record label="South-Apulia">
-1.000 3.000 1201.000 168.000 190.000 7100.000 1216.000 43.000 64.000 16.000
+1 3 1201 168 190 7100 1216 43 64 16
 </record>
 <record label="South-Apulia">
-1.000 3.000 1297.000 153.000 177.000 7004.000 1260.000 35.000 60.000 16.000
+1 3 1297 153 177 7004 1260 35 60 16
 </record>
 <record label="South-Apulia">
-1.000 3.000 1248.000 163.000 158.000 7103.000 1222.000 31.000 60.000 14.000
+1 3 1248 163 158 7103 1222 31 60 14
 </record>
 <record label="South-Apulia">
-1.000 3.000 1335.000 159.000 197.000 6974.000 1220.000 36.000 60.000 17.000
+1 3 1335 159 197 6974 1220 36 60 17
 </record>
 <record label="South-Apulia">
-1.000 3.000 1219.000 167.000 171.000 7087.000 1254.000 35.000 50.000 16.000
+1 3 1219 167 171 7087 1254 35 50 16
 </record>
 <record label="South-Apulia">
-1.000 3.000 1318.000 179.000 177.000 7030.000 1194.000 35.000 42.000 25.000
+1 3 1318 179 177 7030 1194 35 42 25
 </record>
 <record label="South-Apulia">
-1.000 3.000 1264.000 167.000 166.000 7130.000 1187.000 22.000 52.000 12.000
+1 3 1264 167 166 7130 1187 22 52 12
 </record>
 <record label="South-Apulia">
-1.000 3.000 1201.000 175.000 201.000 7129.000 1193.000 36.000 49.000 15.000
+1 3 1201 175 201 7129 1193 36 49 15
 </record>
 <record label="South-Apulia">
-1.000 3.000 1252.000 180.000 181.000 7055.000 1214.000 31.000 59.000 38.000
+1 3 1252 180 181 7055 1214 31 59 38
 </record>
 <record label="South-Apulia">
-1.000 3.000 1273.000 182.000 209.000 6965.000 1191.000 43.000 74.000 23.000
+1 3 1273 182 209 6965 1191 43 74 23
 </record>
 <record label="South-Apulia">
-1.000 3.000 1351.000 179.000 170.000 7034.000 1154.000 35.000 66.000 10.000
+1 3 1351 179 170 7034 1154 35 66 10
 </record>
 <record label="South-Apulia">
-1.000 3.000 1336.000 155.000 212.000 7103.000 1086.000 33.000 55.000 20.000
+1 3 1336 155 212 7103 1086 33 55 20
 </record>
 <record label="South-Apulia">
-1.000 3.000 1499.000 201.000 182.000 6803.000 1204.000 30.000 56.000 24.000
+1 3 1499 201 182 6803 1204 30 56 24
 </record>
 <record label="South-Apulia">
-1.000 3.000 1425.000 198.000 193.000 7032.000 1041.000 31.000 52.000 17.000
+1 3 1425 198 193 7032 1041 31 52 17
 </record>
 <record label="South-Apulia">
-1.000 3.000 1358.000 204.000 227.000 6962.000 1109.000 41.000 65.000 34.000
+1 3 1358 204 227 6962 1109 41 65 34
 </record>
 <record label="South-Apulia">
-1.000 3.000 1346.000 181.000 257.000 7147.000 933.000 40.000 60.000 36.000
+1 3 1346 181 257 7147 933 40 60 36
 </record>
 <record label="South-Apulia">
-1.000 3.000 1392.000 186.000 256.000 6732.000 1278.000 53.000 64.000 29.000
+1 3 1392 186 256 6732 1278 53 64 29
 </record>
 <record label="South-Apulia">
-1.000 3.000 1311.000 166.000 222.000 7006.000 1147.000 41.000 80.000 27.000
+1 3 1311 166 222 7006 1147 41 80 27
 </record>
 <record label="South-Apulia">
-1.000 3.000 1314.000 171.000 229.000 6923.000 1198.000 47.000 76.000 42.000
+1 3 1314 171 229 6923 1198 47 76 42
 </record>
 <record label="South-Apulia">
-1.000 3.000 1409.000 200.000 207.000 6842.000 1224.000 31.000 60.000 27.000
+1 3 1409 200 207 6842 1224 31 60 27
 </record>
 <record label="South-Apulia">
-1.000 3.000 1342.000 174.000 221.000 6993.000 1147.000 36.000 64.000 23.000
+1 3 1342 174 221 6993 1147 36 64 23
 </record>
 <record label="South-Apulia">
-1.000 3.000 1387.000 182.000 206.000 7100.000 1020.000 34.000 54.000 17.000
+1 3 1387 182 206 7100 1020 34 54 17
 </record>
 <record label="South-Apulia">
-1.000 3.000 1413.000 202.000 205.000 6920.000 1165.000 36.000 46.000 13.000
+1 3 1413 202 205 6920 1165 36 46 13
 </record>
 <record label="South-Apulia">
-1.000 3.000 1430.000 209.000 225.000 6800.000 1200.000 32.000 59.000 27.000
+1 3 1430 209 225 6800 1200 32 59 27
 </record>
 <record label="South-Apulia">
-1.000 3.000 1336.000 185.000 223.000 6956.000 1155.000 56.000 73.000 16.000
+1 3 1336 185 223 6956 1155 56 73 16
 </record>
 <record label="South-Apulia">
-1.000 3.000 1372.000 200.000 200.000 6916.000 1189.000 33.000 50.000 22.000
+1 3 1372 200 200 6916 1189 33 50 22
 </record>
 <record label="South-Apulia">
-1.000 3.000 1330.000 157.000 228.000 7055.000 1108.000 42.000 55.000 25.000
+1 3 1330 157 228 7055 1108 42 55 25
 </record>
 <record label="South-Apulia">
-1.000 3.000 1412.000 207.000 208.000 6822.000 1239.000 36.000 51.000 28.000
+1 3 1412 207 208 6822 1239 36 51 28
 </record>
 <record label="South-Apulia">
-1.000 3.000 1321.000 209.000 217.000 6948.000 1178.000 42.000 62.000 23.000
+1 3 1321 209 217 6948 1178 42 62 23
 </record>
 <record label="South-Apulia">
-1.000 3.000 1401.000 200.000 217.000 6980.000 1073.000 40.000 68.000 21.000
+1 3 1401 200 217 6980 1073 40 68 21
 </record>
 <record label="South-Apulia">
-1.000 3.000 1401.000 214.000 217.000 6734.000 1293.000 44.000 69.000 27.000
+1 3 1401 214 217 6734 1293 44 69 27
 </record>
 <record label="South-Apulia">
-1.000 3.000 1457.000 168.000 242.000 6724.000 1266.000 54.000 59.000 30.000
+1 3 1457 168 242 6724 1266 54 59 30
 </record>
 <record label="South-Apulia">
-1.000 3.000 1451.000 199.000 221.000 6835.000 1177.000 37.000 51.000 29.000
+1 3 1451 199 221 6835 1177 37 51 29
 </record>
 <record label="South-Apulia">
-1.000 3.000 1438.000 206.000 248.000 6806.000 1183.000 34.000 57.000 28.000
+1 3 1438 206 248 6806 1183 34 57 28
 </record>
 <record label="South-Apulia">
-1.000 3.000 1462.000 204.000 237.000 6644.000 1309.000 42.000 54.000 28.000
+1 3 1462 204 237 6644 1309 42 54 28
 </record>
 <record label="South-Apulia">
-1.000 3.000 1529.000 215.000 203.000 6602.000 1310.000 45.000 69.000 27.000
+1 3 1529 215 203 6602 1310 45 69 27
 </record>
 <record label="South-Apulia">
-1.000 3.000 1510.000 189.000 245.000 6752.000 1188.000 36.000 52.000 28.000
+1 3 1510 189 245 6752 1188 36 52 28
 </record>
 <record label="South-Apulia">
-1.000 3.000 1437.000 222.000 184.000 6803.000 1240.000 43.000 56.000 16.000
+1 3 1437 222 184 6803 1240 43 56 16
 </record>
 <record label="South-Apulia">
-1.000 3.000 1327.000 129.000 247.000 7024.000 1157.000 38.000 56.000 22.000
+1 3 1327 129 247 7024 1157 38 56 22
 </record>
 <record label="South-Apulia">
-1.000 3.000 1438.000 172.000 252.000 6630.000 1380.000 40.000 64.000 24.000
+1 3 1438 172 252 6630 1380 40 64 24
 </record>
 <record label="South-Apulia">
-1.000 3.000 1447.000 176.000 189.000 6849.000 1180.000 42.000 64.000 26.000
+1 3 1447 176 189 6849 1180 42 64 26
 </record>
 <record label="South-Apulia">
-1.000 3.000 1355.000 144.000 214.000 6972.000 1198.000 33.000 60.000 24.000
+1 3 1355 144 214 6972 1198 33 60 24
 </record>
 <record label="South-Apulia">
-1.000 3.000 1369.000 156.000 241.000 6890.000 1209.000 42.000 63.000 30.000
+1 3 1369 156 241 6890 1209 42 63 30
 </record>
 <record label="South-Apulia">
-1.000 3.000 1471.000 188.000 276.000 6697.000 1269.000 34.000 51.000 16.000
+1 3 1471 188 276 6697 1269 34 51 16
 </record>
 <record label="South-Apulia">
-1.000 3.000 1456.000 179.000 240.000 6738.000 1267.000 41.000 65.000 14.000
+1 3 1456 179 240 6738 1267 41 65 14
 </record>
 <record label="South-Apulia">
-1.000 3.000 1314.000 140.000 207.000 7020.000 1220.000 28.000 59.000 12.000
+1 3 1314 140 207 7020 1220 28 59 12
 </record>
 <record label="South-Apulia">
-1.000 3.000 1408.000 176.000 192.000 6909.000 1195.000 45.000 50.000 25.000
+1 3 1408 176 192 6909 1195 45 50 25
 </record>
 <record label="South-Apulia">
-1.000 3.000 1397.000 172.000 191.000 7107.000 1018.000 36.000 50.000 29.000
+1 3 1397 172 191 7107 1018 36 50 29
 </record>
 <record label="South-Apulia">
-1.000 3.000 1413.000 191.000 186.000 6937.000 1180.000 31.000 46.000 13.000
+1 3 1413 191 186 6937 1180 31 46 13
 </record>
 <record label="South-Apulia">
-1.000 3.000 1539.000 194.000 213.000 6764.000 1178.000 38.000 58.000 16.000
+1 3 1539 194 213 6764 1178 38 58 16
 </record>
 <record label="South-Apulia">
-1.000 3.000 1304.000 159.000 234.000 7019.000 1174.000 38.000 53.000 19.000
+1 3 1304 159 234 7019 1174 38 53 19
 </record>
 <record label="South-Apulia">
-1.000 3.000 1341.000 160.000 231.000 7033.000 1069.000 40.000 67.000 33.000
+1 3 1341 160 231 7033 1069 40 67 33
 </record>
 <record label="South-Apulia">
-1.000 3.000 1508.000 208.000 249.000 6641.000 1311.000 25.000 43.000 20.000
+1 3 1508 208 249 6641 1311 25 43 20
 </record>
 <record label="South-Apulia">
-1.000 3.000 1515.000 226.000 257.000 6595.000 1287.000 41.000 63.000 16.000
+1 3 1515 226 257 6595 1287 41 63 16
 </record>
 <record label="South-Apulia">
-1.000 3.000 1262.000 165.000 235.000 7120.000 1113.000 32.000 51.000 21.000
+1 3 1262 165 235 7120 1113 32 51 21
 </record>
 <record label="South-Apulia">
-1.000 3.000 1307.000 197.000 238.000 7003.000 1144.000 37.000 50.000 24.000
+1 3 1307 197 238 7003 1144 37 50 24
 </record>
 <record label="South-Apulia">
-1.000 3.000 1294.000 159.000 253.000 7009.000 1190.000 30.000 52.000 13.000
+1 3 1294 159 253 7009 1190 30 52 13
 </record>
 <record label="South-Apulia">
-1.000 3.000 1460.000 187.000 215.000 6843.000 1172.000 35.000 56.000 32.000
+1 3 1460 187 215 6843 1172 35 56 32
 </record>
 <record label="South-Apulia">
-1.000 3.000 1476.000 187.000 203.000 6837.000 1197.000 36.000 48.000 22.000
+1 3 1476 187 203 6837 1197 36 48 22
 </record>
 <record label="South-Apulia">
-1.000 3.000 1482.000 178.000 197.000 6814.000 1201.000 40.000 64.000 24.000
+1 3 1482 178 197 6814 1201 40 64 24
 </record>
 <record label="South-Apulia">
-1.000 3.000 1388.000 176.000 185.000 7008.000 1111.000 48.000 53.000 31.000
+1 3 1388 176 185 7008 1111 48 53 31
 </record>
 <record label="South-Apulia">
-1.000 3.000 1367.000 172.000 235.000 7066.000 1054.000 35.000 45.000 26.000
+1 3 1367 172 235 7066 1054 35 45 26
 </record>
 <record label="South-Apulia">
-1.000 3.000 1272.000 207.000 205.000 7152.000 1098.000 37.000 52.000 22.000
+1 3 1272 207 205 7152 1098 37 52 22
 </record>
 <record label="South-Apulia">
-1.000 3.000 1323.000 157.000 234.000 7132.000 1022.000 38.000 58.000 31.000
+1 3 1323 157 234 7132 1022 38 58 31
 </record>
 <record label="South-Apulia">
-1.000 3.000 1206.000 218.000 242.000 7193.000 1002.000 37.000 54.000 25.000
+1 3 1206 218 242 7193 1002 37 54 25
 </record>
 <record label="South-Apulia">
-1.000 3.000 1383.000 157.000 217.000 7018.000 1090.000 40.000 60.000 37.000
+1 3 1383 157 217 7018 1090 40 60 37
 </record>
 <record label="South-Apulia">
-1.000 3.000 1521.000 190.000 238.000 6956.000 986.000 36.000 50.000 23.000
+1 3 1521 190 238 6956 986 36 50 23
 </record>
 <record label="South-Apulia">
-1.000 3.000 1350.000 168.000 227.000 6986.000 1165.000 29.000 58.000 17.000
+1 3 1350 168 227 6986 1165 29 58 17
 </record>
 <record label="South-Apulia">
-1.000 3.000 1422.000 181.000 218.000 6813.000 1230.000 30.000 59.000 21.000
+1 3 1422 181 218 6813 1230 30 59 21
 </record>
 <record label="South-Apulia">
-1.000 3.000 1298.000 166.000 224.000 6986.000 1162.000 34.000 65.000 31.000
+1 3 1298 166 224 6986 1162 34 65 31
 </record>
 <record label="South-Apulia">
-1.000 3.000 1447.000 236.000 245.000 6607.000 1336.000 33.000 51.000 21.000
+1 3 1447 236 245 6607 1336 33 51 21
 </record>
 <record label="South-Apulia">
-1.000 3.000 1347.000 197.000 211.000 6795.000 1300.000 32.000 59.000 34.000
+1 3 1347 197 211 6795 1300 32 59 34
 </record>
 <record label="South-Apulia">
-1.000 3.000 1339.000 170.000 253.000 6989.000 1110.000 29.000 63.000 23.000
+1 3 1339 170 253 6989 1110 29 63 23
 </record>
 <record label="South-Apulia">
-1.000 3.000 1388.000 183.000 216.000 6867.000 1208.000 28.000 61.000 21.000
+1 3 1388 183 216 6867 1208 28 61 21
 </record>
 <record label="South-Apulia">
-1.000 3.000 1527.000 260.000 232.000 6488.000 1370.000 31.000 45.000 20.000
+1 3 1527 260 232 6488 1370 31 45 20
 </record>
 <record label="South-Apulia">
-1.000 3.000 1495.000 237.000 236.000 6571.000 1318.000 32.000 58.000 26.000
+1 3 1495 237 236 6571 1318 32 58 26
 </record>
 <record label="South-Apulia">
-1.000 3.000 1487.000 246.000 251.000 6504.000 1390.000 29.000 53.000 19.000
+1 3 1487 246 251 6504 1390 29 53 19
 </record>
 <record label="South-Apulia">
-1.000 3.000 1399.000 180.000 232.000 6855.000 1190.000 32.000 66.000 22.000
+1 3 1399 180 232 6855 1190 32 66 22
 </record>
 <record label="South-Apulia">
-1.000 3.000 1489.000 215.000 242.000 6777.000 1145.000 30.000 60.000 22.000
+1 3 1489 215 242 6777 1145 30 60 22
 </record>
 <record label="South-Apulia">
-1.000 3.000 1339.000 166.000 226.000 6928.000 1198.000 30.000 60.000 23.000
+1 3 1339 166 226 6928 1198 30 60 23
 </record>
 <record label="South-Apulia">
-1.000 3.000 1482.000 246.000 238.000 6444.000 1462.000 27.000 50.000 20.000
+1 3 1482 246 238 6444 1462 27 50 20
 </record>
 <record label="South-Apulia">
-1.000 3.000 1434.000 172.000 255.000 6646.000 1354.000 27.000 59.000 25.000
+1 3 1434 172 255 6646 1354 27 59 25
 </record>
 <record label="South-Apulia">
-1.000 3.000 1347.000 156.000 214.000 6850.000 1313.000 25.000 48.000 19.000
+1 3 1347 156 214 6850 1313 25 48 19
 </record>
 <record label="South-Apulia">
-1.000 3.000 1340.000 158.000 233.000 6848.000 1272.000 32.000 63.000 25.000
+1 3 1340 158 233 6848 1272 32 63 25
 </record>
 <record label="South-Apulia">
-1.000 3.000 1453.000 180.000 244.000 6752.000 1238.000 34.000 54.000 23.000
+1 3 1453 180 244 6752 1238 34 54 23
 </record>
 <record label="South-Apulia">
-1.000 3.000 1306.000 149.000 226.000 7082.000 1097.000 33.000 61.000 24.000
+1 3 1306 149 226 7082 1097 33 61 24
 </record>
 <record label="South-Apulia">
-1.000 3.000 1349.000 161.000 217.000 6997.000 1138.000 31.000 62.000 23.000
+1 3 1349 161 217 6997 1138 31 62 23
 </record>
 <record label="South-Apulia">
-1.000 3.000 1254.000 151.000 205.000 7319.000 947.000 28.000 54.000 23.000
+1 3 1254 151 205 7319 947 28 54 23
 </record>
 <record label="South-Apulia">
-1.000 3.000 1168.000 144.000 220.000 7230.000 1109.000 31.000 52.000 28.000
+1 3 1168 144 220 7230 1109 31 52 28
 </record>
 <record label="South-Apulia">
-1.000 3.000 1346.000 167.000 224.000 6959.000 1111.000 30.000 49.000 23.000
+1 3 1346 167 224 6959 1111 30 49 23
 </record>
 <record label="South-Apulia">
-1.000 3.000 1390.000 184.000 212.000 6898.000 1189.000 29.000 44.000 19.000
+1 3 1390 184 212 6898 1189 29 44 19
 </record>
 <record label="South-Apulia">
-1.000 3.000 1283.000 149.000 224.000 7077.000 1104.000 30.000 57.000 32.000
+1 3 1283 149 224 7077 1104 30 57 32
 </record>
 <record label="South-Apulia">
-1.000 3.000 1214.000 137.000 232.000 7269.000 1005.000 32.000 55.000 23.000
+1 3 1214 137 232 7269 1005 32 55 23
 </record>
 <record label="South-Apulia">
-1.000 3.000 1491.000 227.000 205.000 6941.000 988.000 33.000 68.000 34.000
+1 3 1491 227 205 6941 988 33 68 34
 </record>
 <record label="South-Apulia">
-1.000 3.000 1479.000 218.000 207.000 7039.000 887.000 36.000 65.000 36.000
+1 3 1479 218 207 7039 887 36 65 36
 </record>
 <record label="South-Apulia">
-1.000 3.000 1445.000 174.000 228.000 6875.000 1123.000 29.000 69.000 31.000
+1 3 1445 174 228 6875 1123 29 69 31
 </record>
 <record label="South-Apulia">
-1.000 3.000 1439.000 183.000 218.000 6775.000 1226.000 32.000 66.000 29.000
+1 3 1439 183 218 6775 1226 32 66 29
 </record>
 <record label="South-Apulia">
-1.000 3.000 1387.000 154.000 204.000 6991.000 1090.000 34.000 74.000 32.000
+1 3 1387 154 204 6991 1090 34 74 32
 </record>
 <record label="South-Apulia">
-1.000 3.000 1426.000 169.000 192.000 7025.000 1043.000 31.000 64.000 27.000
+1 3 1426 169 192 7025 1043 31 64 27
 </record>
 <record label="South-Apulia">
-1.000 3.000 1451.000 200.000 208.000 6980.000 1006.000 30.000 62.000 31.000
+1 3 1451 200 208 6980 1006 30 62 31
 </record>
 <record label="South-Apulia">
-1.000 3.000 1493.000 204.000 188.000 6913.000 1044.000 32.000 61.000 35.000
+1 3 1493 204 188 6913 1044 32 61 35
 </record>
 <record label="South-Apulia">
-1.000 3.000 1419.000 192.000 207.000 6996.000 1014.000 36.000 70.000 36.000
+1 3 1419 192 207 6996 1014 36 70 36
 </record>
 <record label="South-Apulia">
-1.000 3.000 1342.000 177.000 199.000 7172.000 952.000 34.000 65.000 33.000
+1 3 1342 177 199 7172 952 34 65 33
 </record>
 <record label="South-Apulia">
-1.000 3.000 1349.000 152.000 236.000 7145.000 949.000 35.000 75.000 29.000
+1 3 1349 152 236 7145 949 35 75 29
 </record>
 <record label="South-Apulia">
-1.000 3.000 1440.000 196.000 208.000 6938.000 1070.000 32.000 61.000 26.000
+1 3 1440 196 208 6938 1070 32 61 26
 </record>
 <record label="South-Apulia">
-1.000 3.000 1460.000 215.000 197.000 6918.000 1081.000 28.000 55.000 23.000
+1 3 1460 215 197 6918 1081 28 55 23
 </record>
 <record label="South-Apulia">
-1.000 3.000 1249.000 133.000 205.000 7417.000 827.000 33.000 72.000 33.000
+1 3 1249 133 205 7417 827 33 72 33
 </record>
 <record label="South-Apulia">
-1.000 3.000 1348.000 159.000 238.000 7017.000 1081.000 31.000 67.000 25.000
+1 3 1348 159 238 7017 1081 31 67 25
 </record>
 <record label="South-Apulia">
-1.000 3.000 1341.000 155.000 244.000 6958.000 1144.000 32.000 68.000 26.000
+1 3 1341 155 244 6958 1144 32 68 26
 </record>
 <record label="South-Apulia">
-1.000 3.000 1398.000 149.000 204.000 7182.000 907.000 29.000 76.000 30.000
+1 3 1398 149 204 7182 907 29 76 30
 </record>
 <record label="South-Apulia">
-1.000 3.000 1454.000 200.000 199.000 6910.000 1090.000 30.000 62.000 25.000
+1 3 1454 200 199 6910 1090 30 62 25
 </record>
 <record label="South-Apulia">
-1.000 3.000 1334.000 153.000 219.000 6928.000 1214.000 33.000 66.000 24.000
+1 3 1334 153 219 6928 1214 33 66 24
 </record>
 <record label="South-Apulia">
-1.000 3.000 1438.000 204.000 189.000 7107.000 910.000 33.000 63.000 27.000
+1 3 1438 204 189 7107 910 33 63 27
 </record>
 <record label="South-Apulia">
-1.000 3.000 1303.000 138.000 212.000 7170.000 1016.000 34.000 69.000 25.000
+1 3 1303 138 212 7170 1016 34 69 25
 </record>
 <record label="South-Apulia">
-1.000 3.000 1323.000 147.000 210.000 7108.000 1070.000 33.000 61.000 20.000
+1 3 1323 147 210 7108 1070 33 61 20
 </record>
 <record label="South-Apulia">
-1.000 3.000 1417.000 169.000 207.000 6875.000 1184.000 34.000 57.000 27.000
+1 3 1417 169 207 6875 1184 34 57 27
 </record>
 <record label="South-Apulia">
-1.000 3.000 1360.000 167.000 225.000 6883.000 1220.000 31.000 55.000 27.000
+1 3 1360 167 225 6883 1220 31 55 27
 </record>
 <record label="South-Apulia">
-1.000 3.000 1420.000 179.000 214.000 6923.000 1121.000 33.000 56.000 27.000
+1 3 1420 179 214 6923 1121 33 56 27
 </record>
 <record label="South-Apulia">
-1.000 3.000 1472.000 218.000 214.000 6724.000 1238.000 29.000 53.000 23.000
+1 3 1472 218 214 6724 1238 29 53 23
 </record>
 <record label="South-Apulia">
-1.000 3.000 1368.000 174.000 205.000 7042.000 1066.000 31.000 57.000 26.000
+1 3 1368 174 205 7042 1066 31 57 26
 </record>
 <record label="South-Apulia">
-1.000 3.000 1367.000 173.000 228.000 6948.000 1141.000 32.000 53.000 24.000
+1 3 1367 173 228 6948 1141 32 53 24
 </record>
 <record label="South-Apulia">
-1.000 3.000 1403.000 173.000 209.000 6843.000 1210.000 33.000 63.000 33.000
+1 3 1403 173 209 6843 1210 33 63 33
 </record>
 <record label="South-Apulia">
-1.000 3.000 1413.000 197.000 206.000 6737.000 1387.000 34.000 60.000 31.000
+1 3 1413 197 206 6737 1387 34 60 31
 </record>
 <record label="South-Apulia">
-1.000 3.000 1201.000 138.000 207.000 7011.000 1269.000 37.000 64.000 35.000
+1 3 1201 138 207 7011 1269 37 64 35
 </record>
 <record label="South-Apulia">
-1.000 3.000 1359.000 180.000 207.000 6895.000 1203.000 33.000 61.000 30.000
+1 3 1359 180 207 6895 1203 33 61 30
 </record>
 <record label="South-Apulia">
-1.000 3.000 1518.000 198.000 225.000 6681.000 1243.000 29.000 57.000 24.000
+1 3 1518 198 225 6681 1243 29 57 24
 </record>
 <record label="South-Apulia">
-1.000 3.000 1434.000 185.000 189.000 6771.000 1269.000 30.000 62.000 25.000
+1 3 1434 185 189 6771 1269 30 62 25
 </record>
 <record label="South-Apulia">
-1.000 3.000 1367.000 162.000 179.000 6772.000 1368.000 33.000 64.000 27.000
+1 3 1367 162 179 6772 1368 33 64 27
 </record>
 <record label="South-Apulia">
-1.000 3.000 1461.000 181.000 197.000 6783.000 1246.000 26.000 57.000 23.000
+1 3 1461 181 197 6783 1246 26 57 23
 </record>
 <record label="South-Apulia">
-1.000 3.000 1368.000 161.000 198.000 7030.000 1095.000 33.000 59.000 31.000
+1 3 1368 161 198 7030 1095 33 59 31
 </record>
 <record label="South-Apulia">
-1.000 3.000 1419.000 159.000 215.000 6862.000 1193.000 35.000 60.000 31.000
+1 3 1419 159 215 6862 1193 35 60 31
 </record>
 <record label="South-Apulia">
-1.000 3.000 1514.000 162.000 298.000 6725.000 1119.000 45.000 93.000 30.000
+1 3 1514 162 298 6725 1119 45 93 30
 </record>
 <record label="South-Apulia">
-1.000 3.000 1328.000 171.000 253.000 6987.000 1030.000 38.000 83.000 39.000
+1 3 1328 171 253 6987 1030 38 83 39
 </record>
 <record label="South-Apulia">
-1.000 3.000 1469.000 160.000 337.000 6675.000 1127.000 44.000 94.000 36.000
+1 3 1469 160 337 6675 1127 44 94 36
 </record>
-<record label="Sicily">
-1.000 4.000 1222.000 133.000 227.000 7425.000 824.000 36.000 69.000 35.000
+<record label="Sicily" glyph="x 2">
+1 4 1222 133 227 7425 824 36 69 35
 </record>
-<record label="Sicily">
-1.000 4.000 1639.000 172.000 331.000 6510.000 1124.000 46.000 91.000 32.000
+<record label="Sicily" glyph="x 2">
+1 4 1639 172 331 6510 1124 46 91 32
 </record>
-<record label="Sicily">
-1.000 4.000 1345.000 133.000 272.000 6801.000 1194.000 48.000 83.000 37.000
+<record label="Sicily" glyph="x 2">
+1 4 1345 133 272 6801 1194 48 83 37
 </record>
-<record label="Sicily">
-1.000 4.000 1339.000 170.000 275.000 6838.000 1060.000 46.000 88.000 43.000
+<record label="Sicily" glyph="x 2">
+1 4 1339 170 275 6838 1060 46 88 43
 </record>
-<record label="Sicily">
-1.000 4.000 1194.000 135.000 263.000 7277.000 889.000 44.000 95.000 41.000
+<record label="Sicily" glyph="x 2">
+1 4 1194 135 263 7277 889 44 95 41
 </record>
-<record label="Sicily">
-1.000 4.000 1112.000 68.000 375.000 7770.000 448.000 52.000 69.000 45.000
+<record label="Sicily" glyph="x 2">
+1 4 1112 68 375 7770 448 52 69 45
 </record>
-<record label="Sicily">
-1.000 4.000 1222.000 70.000 329.000 7605.000 566.000 48.000 67.000 43.000
+<record label="Sicily" glyph="x 2">
+1 4 1222 70 329 7605 566 48 67 43
 </record>
-<record label="Sicily">
-1.000 4.000 1136.000 72.000 341.000 7616.000 661.000 49.000 65.000 32.000
+<record label="Sicily" glyph="x 2">
+1 4 1136 72 341 7616 661 49 65 32
 </record>
-<record label="Sicily">
-1.000 4.000 926.000 41.000 277.000 7815.000 784.000 45.000 65.000 25.000
+<record label="Sicily" glyph="x 2">
+1 4 926 41 277 7815 784 45 65 25
 </record>
-<record label="Sicily">
-1.000 4.000 1105.000 69.000 373.000 7714.000 532.000 51.000 68.000 37.000
+<record label="Sicily" glyph="x 2">
+1 4 1105 69 373 7714 532 51 68 37
 </record>
-<record label="Sicily">
-1.000 4.000 1109.000 79.000 305.000 7576.000 763.000 45.000 64.000 36.000
+<record label="Sicily" glyph="x 2">
+1 4 1109 79 305 7576 763 45 64 36
 </record>
-<record label="Sicily">
-1.000 4.000 1284.000 93.000 265.000 7235.000 893.000 43.000 77.000 46.000
+<record label="Sicily" glyph="x 2">
+1 4 1284 93 265 7235 893 43 77 46
 </record>
-<record label="Sicily">
-1.000 4.000 1120.000 69.000 277.000 7416.000 946.000 42.000 59.000 36.000
+<record label="Sicily" glyph="x 2">
+1 4 1120 69 277 7416 946 42 59 36
 </record>
-<record label="Sicily">
-1.000 4.000 916.000 52.000 281.000 7870.000 694.000 42.000 64.000 58.000
+<record label="Sicily" glyph="x 2">
+1 4 916 52 281 7870 694 42 64 58
 </record>
-<record label="Sicily">
-1.000 4.000 905.000 49.000 288.000 7747.000 812.000 49.000 71.000 56.000
+<record label="Sicily" glyph="x 2">
+1 4 905 49 288 7747 812 49 71 56
 </record>
-<record label="Sicily">
-1.000 4.000 1206.000 55.000 287.000 7329.000 935.000 44.000 74.000 42.000
+<record label="Sicily" glyph="x 2">
+1 4 1206 55 287 7329 935 44 74 42
 </record>
-<record label="Sicily">
-1.000 4.000 1457.000 182.000 267.000 7020.000 863.000 41.000 84.000 37.000
+<record label="Sicily" glyph="x 2">
+1 4 1457 182 267 7020 863 41 84 37
 </record>
-<record label="Sicily">
-1.000 4.000 1327.000 140.000 193.000 7328.000 823.000 36.000 87.000 35.000
+<record label="Sicily" glyph="x 2">
+1 4 1327 140 193 7328 823 36 87 35
 </record>
-<record label="Sicily">
-1.000 4.000 1303.000 100.000 251.000 7045.000 1049.000 40.000 86.000 40.000
+<record label="Sicily" glyph="x 2">
+1 4 1303 100 251 7045 1049 40 86 40
 </record>
-<record label="Sicily">
-1.000 4.000 1444.000 175.000 259.000 6876.000 1027.000 34.000 78.000 32.000
+<record label="Sicily" glyph="x 2">
+1 4 1444 175 259 6876 1027 34 78 32
 </record>
-<record label="Sicily">
-1.000 4.000 1505.000 243.000 226.000 6962.000 858.000 30.000 72.000 27.000
+<record label="Sicily" glyph="x 2">
+1 4 1505 243 226 6962 858 30 72 27
 </record>
-<record label="Sicily">
-1.000 4.000 1429.000 162.000 223.000 6917.000 1041.000 37.000 77.000 40.000
+<record label="Sicily" glyph="x 2">
+1 4 1429 162 223 6917 1041 37 77 40
 </record>
-<record label="Sicily">
-1.000 4.000 1491.000 162.000 211.000 6994.000 928.000 37.000 97.000 38.000
+<record label="Sicily" glyph="x 2">
+1 4 1491 162 211 6994 928 37 97 38
 </record>
-<record label="Sicily">
-1.000 4.000 1393.000 128.000 211.000 7189.000 870.000 38.000 93.000 40.000
+<record label="Sicily" glyph="x 2">
+1 4 1393 128 211 7189 870 38 93 40
 </record>
-<record label="Sicily">
-1.000 4.000 1404.000 134.000 210.000 7110.000 923.000 40.000 101.000 43.000
+<record label="Sicily" glyph="x 2">
+1 4 1404 134 210 7110 923 40 101 43
 </record>
-<record label="Sicily">
-1.000 4.000 1222.000 130.000 214.000 7374.000 856.000 38.000 89.000 45.000
+<record label="Sicily" glyph="x 2">
+1 4 1222 130 214 7374 856 38 89 45
 </record>
-<record label="Sicily">
-1.000 4.000 1153.000 74.000 316.000 7593.000 705.000 42.000 64.000 32.000
+<record label="Sicily" glyph="x 2">
+1 4 1153 74 316 7593 705 42 64 32
 </record>
-<record label="Sicily">
-1.000 4.000 1169.000 76.000 307.000 7553.000 728.000 43.000 69.000 32.000
+<record label="Sicily" glyph="x 2">
+1 4 1169 76 307 7553 728 43 69 32
 </record>
-<record label="Sicily">
-1.000 4.000 1369.000 104.000 237.000 7375.000 775.000 39.000 70.000 15.000
+<record label="Sicily" glyph="x 2">
+1 4 1369 104 237 7375 775 39 70 15
 </record>
-<record label="Sicily">
-1.000 4.000 993.000 58.000 267.000 7743.000 773.000 41.000 62.000 44.000
+<record label="Sicily" glyph="x 2">
+1 4 993 58 267 7743 773 41 62 44
 </record>
-<record label="Sicily">
-1.000 4.000 980.000 53.000 254.000 7719.000 815.000 44.000 69.000 47.000
+<record label="Sicily" glyph="x 2">
+1 4 980 53 254 7719 815 44 69 47
 </record>
-<record label="Sicily">
-1.000 4.000 967.000 55.000 273.000 7692.000 833.000 45.000 63.000 47.000
+<record label="Sicily" glyph="x 2">
+1 4 967 55 273 7692 833 45 63 47
 </record>
-<record label="Sicily">
-1.000 4.000 1128.000 73.000 354.000 7527.000 728.000 44.000 76.000 38.000
+<record label="Sicily" glyph="x 2">
+1 4 1128 73 354 7527 728 44 76 38
 </record>
-<record label="Sicily">
-1.000 4.000 1188.000 85.000 273.000 7445.000 814.000 44.000 73.000 42.000
+<record label="Sicily" glyph="x 2">
+1 4 1188 85 273 7445 814 44 73 42
 </record>
-<record label="Sicily">
-1.000 4.000 1257.000 95.000 247.000 7405.000 812.000 43.000 70.000 35.000
+<record label="Sicily" glyph="x 2">
+1 4 1257 95 247 7405 812 43 70 35
 </record>
-<record label="Sicily">
-1.000 4.000 1262.000 88.000 301.000 7471.000 704.000 43.000 71.000 31.000
+<record label="Sicily" glyph="x 2">
+1 4 1262 88 301 7471 704 43 71 31
 </record>
 <record label="South-Apulia">
-1.000 3.000 1283.000 153.000 196.000 7107.000 1115.000 37.000 60.000 28.000
+1 3 1283 153 196 7107 1115 37 60 28
 </record>
 <record label="South-Apulia">
-1.000 3.000 1263.000 155.000 199.000 7140.000 1148.000 31.000 42.000 18.000
+1 3 1263 155 199 7140 1148 31 42 18
 </record>
 <record label="South-Apulia">
-1.000 3.000 1369.000 158.000 215.000 7160.000 958.000 38.000 69.000 32.000
+1 3 1369 158 215 7160 958 38 69 32
 </record>
 <record label="South-Apulia">
-1.000 3.000 1353.000 172.000 175.000 6965.000 1212.000 28.000 75.000 19.000
+1 3 1353 172 175 6965 1212 28 75 19
 </record>
 <record label="South-Apulia">
-1.000 3.000 1187.000 139.000 185.000 7427.000 952.000 29.000 56.000 22.000
+1 3 1187 139 185 7427 952 29 56 22
 </record>
 <record label="South-Apulia">
-1.000 3.000 1732.000 231.000 156.000 6437.000 1313.000 45.000 62.000 23.000
+1 3 1732 231 156 6437 1313 45 62 23
 </record>
 <record label="South-Apulia">
-1.000 3.000 1620.000 255.000 166.000 6628.000 1212.000 29.000 62.000 27.000
+1 3 1620 255 166 6628 1212 29 62 27
 </record>
 <record label="South-Apulia">
-1.000 3.000 1543.000 172.000 193.000 6740.000 1157.000 52.000 87.000 34.000
+1 3 1543 172 193 6740 1157 52 87 34
 </record>
 <record label="South-Apulia">
-1.000 3.000 1498.000 170.000 195.000 6804.000 1206.000 35.000 66.000 23.000
+1 3 1498 170 195 6804 1206 35 66 23
 </record>
 <record label="South-Apulia">
-1.000 3.000 1399.000 169.000 171.000 7011.000 1100.000 36.000 72.000 16.000
+1 3 1399 169 171 7011 1100 36 72 16
 </record>
 <record label="South-Apulia">
-1.000 3.000 1293.000 156.000 191.000 7101.000 1111.000 32.000 60.000 31.000
+1 3 1293 156 191 7101 1111 32 60 31
 </record>
 <record label="South-Apulia">
-1.000 3.000 1420.000 175.000 152.000 7004.000 1149.000 27.000 50.000 20.000
+1 3 1420 175 152 7004 1149 27 50 20
 </record>
 <record label="South-Apulia">
-1.000 3.000 1721.000 238.000 255.000 6300.000 1350.000 35.000 70.000 28.000
+1 3 1721 238 255 6300 1350 35 70 28
 </record>
 <record label="South-Apulia">
-1.000 3.000 1742.000 221.000 156.000 6415.000 1315.000 43.000 82.000 23.000
+1 3 1742 221 156 6415 1315 43 82 23
 </record>
 <record label="South-Apulia">
-1.000 3.000 1391.000 187.000 189.000 6975.000 1062.000 52.000 70.000 45.000
+1 3 1391 187 189 6975 1062 52 70 45
 </record>
 <record label="South-Apulia">
-1.000 3.000 1517.000 206.000 249.000 6680.000 1205.000 33.000 80.000 27.000
+1 3 1517 206 249 6680 1205 33 80 27
 </record>
 <record label="South-Apulia">
-1.000 3.000 1269.000 157.000 193.000 7140.000 1148.000 31.000 40.000 18.000
+1 3 1269 157 193 7140 1148 31 40 18
 </record>
 <record label="South-Apulia">
-1.000 3.000 1577.000 204.000 208.000 6732.000 1183.000 20.000 52.000 20.000
+1 3 1577 204 208 6732 1183 20 52 20
 </record>
 <record label="South-Apulia">
-1.000 3.000 1590.000 241.000 195.000 6705.000 1149.000 27.000 68.000 21.000
+1 3 1590 241 195 6705 1149 27 68 21
 </record>
 <record label="South-Apulia">
-1.000 3.000 1621.000 280.000 197.000 6608.000 1179.000 28.000 58.000 27.000
+1 3 1621 280 197 6608 1179 28 58 27
 </record>
 <record label="South-Apulia">
-1.000 3.000 1753.000 275.000 236.000 6367.000 1214.000 23.000 61.000 27.000
+1 3 1753 275 236 6367 1214 23 61 27
 </record>
 <record label="South-Apulia">
-1.000 3.000 1679.000 260.000 177.000 6568.000 1191.000 30.000 59.000 33.000
+1 3 1679 260 177 6568 1191 30 59 33
 </record>
 <record label="South-Apulia">
-1.000 3.000 1419.000 203.000 176.000 6973.000 1083.000 38.000 78.000 27.000
+1 3 1419 203 176 6973 1083 38 78 27
 </record>
 <record label="South-Apulia">
-1.000 3.000 1693.000 236.000 174.000 6499.000 1204.000 51.000 102.000 37.000
+1 3 1693 236 174 6499 1204 51 102 37
 </record>
 <record label="South-Apulia">
-1.000 3.000 1692.000 270.000 234.000 6499.000 1196.000 31.000 59.000 15.000
+1 3 1692 270 234 6499 1196 31 59 15
 </record>
 <record label="South-Apulia">
-1.000 3.000 1638.000 252.000 215.000 6570.000 1199.000 39.000 53.000 29.000
+1 3 1638 252 215 6570 1199 39 53 29
 </record>
 <record label="South-Apulia">
-1.000 3.000 1497.000 247.000 219.000 6621.000 1270.000 36.000 73.000 32.000
+1 3 1497 247 219 6621 1270 36 73 32
 </record>
 <record label="South-Apulia">
-1.000 3.000 1442.000 222.000 194.000 6677.000 1314.000 36.000 72.000 38.000
+1 3 1442 222 194 6677 1314 36 72 38
 </record>
 <record label="South-Apulia">
-1.000 3.000 1680.000 270.000 170.000 6440.000 1310.000 31.000 62.000 28.000
+1 3 1680 270 170 6440 1310 31 62 28
 </record>
 <record label="South-Apulia">
-1.000 3.000 1463.000 164.000 185.000 6909.000 1154.000 49.000 58.000 17.000
+1 3 1463 164 185 6909 1154 49 58 17
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1129.000 120.000 222.000 7272.000 1112.000 43.000 98.000 2.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1129 120 222 7272 1112 43 98 2
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1042.000 135.000 210.000 7376.000 1116.000 35.000 90.000 3.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1042 135 210 7376 1116 35 90 3
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1103.000 96.000 210.000 7380.000 1085.000 32.000 94.000 3.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1103 96 210 7380 1085 32 94 3
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1118.000 97.000 221.000 7279.000 1154.000 35.000 94.000 2.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1118 97 221 7279 1154 35 94 2
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1052.000 95.000 215.000 7388.000 1126.000 31.000 92.000 1.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1052 95 215 7388 1126 31 92 1
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1116.000 102.000 231.000 7290.000 1168.000 26.000 66.000 1.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1116 102 231 7290 1168 26 66 1
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1108.000 132.000 231.000 7319.000 1101.000 20.000 66.000 2.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1108 132 231 7319 1101 20 66 2
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1129.000 108.000 212.000 7386.000 1074.000 28.000 62.000 3.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1129 108 212 7386 1074 28 62 3
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1085.000 91.000 223.000 7384.000 1126.000 28.000 62.000 3.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1085 91 223 7384 1126 28 62 3
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1104.000 103.000 233.000 7322.000 1147.000 27.000 61.000 2.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1104 103 233 7322 1147 27 61 2
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1098.000 88.000 212.000 7338.000 1140.000 28.000 67.000 1.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1098 88 212 7338 1140 28 67 1
 </record>
-<record label="Coast-Sardinia">
-2.000 6.000 1135.000 98.000 251.000 7120.000 1314.000 20.000 61.000 2.000
+<record label="Coast-Sardinia" color="4" glyph="fr 2">
+2 6 1135 98 251 7120 1314 20 61 2
 </record>
-<record label="Coast-Sardinia">
-2.000 6.000 1158.000 108.000 245.000 7065.000 1326.000 22.000 75.000 1.000
+<record label="Coast-Sardinia" color="4" glyph="fr 2">
+2 6 1158 108 245 7065 1326 22 75 1
 </record>
-<record label="Coast-Sardinia">
-2.000 6.000 1133.000 110.000 241.000 7080.000 1342.000 21.000 68.000 3.000
+<record label="Coast-Sardinia" color="4" glyph="fr 2">
+2 6 1133 110 241 7080 1342 21 68 3
 </record>
-<record label="Coast-Sardinia">
-2.000 6.000 1095.000 125.000 250.000 7120.000 1305.000 21.000 83.000 1.000
+<record label="Coast-Sardinia" color="4" glyph="fr 2">
+2 6 1095 125 250 7120 1305 21 83 1
 </record>
-<record label="Coast-Sardinia">
-2.000 6.000 1201.000 87.000 238.000 6990.000 1383.000 25.000 75.000 3.000
+<record label="Coast-Sardinia" color="4" glyph="fr 2">
+2 6 1201 87 238 6990 1383 25 75 3
 </record>
-<record label="Coast-Sardinia">
-2.000 6.000 1213.000 112.000 245.000 7007.000 1335.000 22.000 65.000 3.000
+<record label="Coast-Sardinia" color="4" glyph="fr 2">
+2 6 1213 112 245 7007 1335 22 65 3
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1108.000 92.000 231.000 7367.000 1110.000 29.000 62.000 3.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1108 92 231 7367 1110 29 62 3
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1075.000 103.000 207.000 7413.000 1096.000 32.000 68.000 2.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1075 103 207 7413 1096 32 68 2
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1059.000 96.000 228.000 7386.000 1128.000 25.000 72.000 2.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1059 96 228 7386 1128 25 72 2
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1176.000 92.000 207.000 7347.000 1057.000 35.000 82.000 1.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1176 92 207 7347 1057 35 82 1
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1159.000 98.000 213.000 7320.000 1108.000 38.000 64.000 1.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1159 98 213 7320 1108 38 64 1
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1132.000 80.000 201.000 7398.000 1095.000 27.000 67.000 2.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1132 80 201 7398 1095 27 67 2
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1107.000 75.000 220.000 7399.000 1096.000 29.000 90.000 1.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1107 75 220 7399 1096 29 90 1
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1092.000 104.000 234.000 7355.000 1126.000 28.000 58.000 2.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1092 104 234 7355 1126 28 58 2
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1119.000 81.000 219.000 7409.000 1057.000 33.000 81.000 2.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1119 81 219 7409 1057 33 81 2
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1106.000 93.000 212.000 7381.000 1104.000 35.000 68.000 1.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1106 93 212 7381 1104 35 68 1
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1047.000 101.000 238.000 7385.000 1120.000 28.000 89.000 1.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1047 101 238 7385 1120 28 89 1
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1165.000 99.000 214.000 7331.000 1101.000 22.000 67.000 3.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1165 99 214 7331 1101 22 67 3
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1158.000 84.000 201.000 7327.000 1123.000 29.000 77.000 2.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1158 84 201 7327 1123 29 77 2
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1095.000 88.000 203.000 7415.000 1093.000 37.000 78.000 1.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1095 88 203 7415 1093 37 78 1
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1176.000 75.000 205.000 7396.000 1107.000 33.000 74.000 2.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1176 75 205 7396 1107 33 74 2
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1103.000 109.000 220.000 7335.000 1140.000 28.000 59.000 2.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1103 109 220 7335 1140 28 59 2
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1112.000 92.000 209.000 7356.000 1125.000 32.000 73.000 2.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1112 92 209 7356 1125 32 73 2
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1091.000 93.000 222.000 7377.000 1113.000 20.000 53.000 2.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1091 93 222 7377 1113 20 53 2
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1080.000 98.000 219.000 7371.000 1125.000 33.000 78.000 1.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1080 98 219 7371 1125 33 78 1
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1051.000 108.000 227.000 7403.000 1114.000 30.000 66.000 3.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1051 108 227 7403 1114 30 66 3
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1096.000 84.000 211.000 7415.000 1091.000 30.000 71.000 2.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1096 84 211 7415 1091 30 71 2
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1142.000 97.000 225.000 7341.000 1101.000 28.000 65.000 1.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1142 97 225 7341 1101 28 65 1
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1047.000 96.000 236.000 7399.000 1107.000 32.000 80.000 3.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1047 96 236 7399 1107 32 80 3
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1114.000 86.000 210.000 7359.000 1116.000 31.000 83.000 2.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1114 86 210 7359 1116 31 83 2
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1140.000 93.000 241.000 7324.000 1098.000 23.000 74.000 1.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1140 93 241 7324 1098 23 74 1
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1075.000 91.000 200.000 7410.000 1107.000 36.000 80.000 1.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1075 91 200 7410 1107 36 80 1
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1092.000 106.000 219.000 7427.000 1125.000 33.000 77.000 1.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1092 106 219 7427 1125 33 77 1
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1076.000 95.000 204.000 7408.000 1130.000 27.000 79.000 2.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1076 95 204 7408 1130 27 79 2
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1178.000 89.000 201.000 7381.000 1099.000 34.000 87.000 2.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1178 89 201 7381 1099 34 87 2
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1095.000 104.000 223.000 7367.000 1111.000 43.000 56.000 2.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1095 104 223 7367 1111 43 56 2
 </record>
-<record label="Coast-Sardinia">
-2.000 6.000 1166.000 97.000 272.000 6971.000 1390.000 20.000 83.000 3.000
+<record label="Coast-Sardinia" color="4" glyph="fr 2">
+2 6 1166 97 272 6971 1390 20 83 3
 </record>
-<record label="Coast-Sardinia">
-2.000 6.000 1154.000 119.000 257.000 7130.000 1253.000 22.000 61.000 1.000
+<record label="Coast-Sardinia" color="4" glyph="fr 2">
+2 6 1154 119 257 7130 1253 22 61 1
 </record>
-<record label="Coast-Sardinia">
-2.000 6.000 1177.000 111.000 241.000 6882.000 1470.000 22.000 95.000 2.000
+<record label="Coast-Sardinia" color="4" glyph="fr 2">
+2 6 1177 111 241 6882 1470 22 95 2
 </record>
-<record label="Coast-Sardinia">
-2.000 6.000 1160.000 96.000 240.000 7043.000 1357.000 24.000 79.000 2.000
+<record label="Coast-Sardinia" color="4" glyph="fr 2">
+2 6 1160 96 240 7043 1357 24 79 2
 </record>
-<record label="Coast-Sardinia">
-2.000 6.000 1122.000 104.000 241.000 7145.000 1313.000 15.000 58.000 1.000
+<record label="Coast-Sardinia" color="4" glyph="fr 2">
+2 6 1122 104 241 7145 1313 15 58 1
 </record>
-<record label="Coast-Sardinia">
-2.000 6.000 1132.000 99.000 257.000 7065.000 1362.000 24.000 90.000 3.000
+<record label="Coast-Sardinia" color="4" glyph="fr 2">
+2 6 1132 99 257 7065 1362 24 90 3
 </record>
-<record label="Coast-Sardinia">
-2.000 6.000 1096.000 100.000 260.000 7162.000 1282.000 25.000 74.000 2.000
+<record label="Coast-Sardinia" color="4" glyph="fr 2">
+2 6 1096 100 260 7162 1282 25 74 2
 </record>
-<record label="Coast-Sardinia">
-2.000 6.000 1131.000 87.000 233.000 7144.000 1307.000 25.000 72.000 3.000
+<record label="Coast-Sardinia" color="4" glyph="fr 2">
+2 6 1131 87 233 7144 1307 25 72 3
 </record>
-<record label="Coast-Sardinia">
-2.000 6.000 1184.000 105.000 258.000 7020.000 1340.000 26.000 66.000 2.000
+<record label="Coast-Sardinia" color="4" glyph="fr 2">
+2 6 1184 105 258 7020 1340 26 66 2
 </record>
-<record label="Coast-Sardinia">
-2.000 6.000 1135.000 94.000 235.000 7123.000 1320.000 24.000 67.000 2.000
+<record label="Coast-Sardinia" color="4" glyph="fr 2">
+2 6 1135 94 235 7123 1320 24 67 2
 </record>
-<record label="Coast-Sardinia">
-2.000 6.000 1084.000 96.000 240.000 7164.000 1330.000 28.000 57.000 1.000
+<record label="Coast-Sardinia" color="4" glyph="fr 2">
+2 6 1084 96 240 7164 1330 28 57 1
 </record>
-<record label="Coast-Sardinia">
-2.000 6.000 1086.000 127.000 252.000 7159.000 1285.000 28.000 62.000 2.000
+<record label="Coast-Sardinia" color="4" glyph="fr 2">
+2 6 1086 127 252 7159 1285 28 62 2
 </record>
-<record label="Coast-Sardinia">
-2.000 6.000 1140.000 95.000 258.000 7085.000 1347.000 23.000 71.000 3.000
+<record label="Coast-Sardinia" color="4" glyph="fr 2">
+2 6 1140 95 258 7085 1347 23 71 3
 </record>
-<record label="Coast-Sardinia">
-2.000 6.000 1138.000 101.000 254.000 7103.000 1310.000 25.000 68.000 1.000
+<record label="Coast-Sardinia" color="4" glyph="fr 2">
+2 6 1138 101 254 7103 1310 25 68 1
 </record>
-<record label="Coast-Sardinia">
-2.000 6.000 1159.000 110.000 261.000 7068.000 1297.000 27.000 77.000 2.000
+<record label="Coast-Sardinia" color="4" glyph="fr 2">
+2 6 1159 110 261 7068 1297 27 77 2
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1051.000 78.000 211.000 7421.000 1146.000 30.000 82.000 2.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1051 78 211 7421 1146 30 82 2
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1048.000 79.000 213.000 7439.000 1130.000 28.000 61.000 2.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1048 79 213 7439 1130 28 61 2
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1061.000 86.000 220.000 7421.000 1102.000 29.000 79.000 3.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1061 86 220 7421 1102 29 79 3
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1105.000 88.000 210.000 7353.000 1142.000 28.000 72.000 1.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1105 88 210 7353 1142 28 72 1
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1145.000 35.000 237.000 7208.000 1118.000 20.000 46.000 2.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1145 35 237 7208 1118 20 46 2
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1049.000 96.000 219.000 7303.000 1168.000 22.000 47.000 2.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1049 96 219 7303 1168 22 47 2
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1105.000 120.000 218.000 7302.000 1158.000 23.000 45.000 3.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1105 120 218 7302 1158 23 45 3
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1030.000 84.000 214.000 7403.000 1177.000 21.000 70.000 1.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1030 84 214 7403 1177 21 70 1
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1070.000 98.000 215.000 7280.000 1240.000 28.000 68.000 3.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1070 98 215 7280 1240 28 68 3
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1103.000 81.000 208.000 7310.000 1177.000 30.000 90.000 3.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1103 81 208 7310 1177 30 90 3
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1040.000 101.000 205.000 7368.000 1176.000 25.000 85.000 3.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1040 101 205 7368 1176 25 85 3
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1100.000 95.000 210.000 7320.000 1113.000 22.000 72.000 3.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1100 95 210 7320 1113 22 72 3
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1118.000 85.000 199.000 7415.000 1060.000 36.000 86.000 3.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1118 85 199 7415 1060 36 86 3
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1065.000 98.000 230.000 7345.000 1163.000 24.000 74.000 1.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1065 98 230 7345 1163 24 74 1
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1131.000 78.000 221.000 7358.000 1120.000 22.000 69.000 2.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1131 78 221 7358 1120 22 69 2
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1080.000 120.000 218.000 7296.000 1145.000 35.000 105.000 2.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1080 120 218 7296 1145 35 105 2
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1075.000 86.000 231.000 7403.000 1109.000 22.000 73.000 3.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1075 86 231 7403 1109 22 73 3
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1040.000 103.000 228.000 7364.000 1173.000 25.000 66.000 2.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1040 103 228 7364 1173 25 66 2
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1128.000 82.000 203.000 7320.000 1148.000 30.000 88.000 1.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1128 82 203 7320 1148 30 88 1
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1060.000 111.000 231.000 7363.000 1149.000 20.000 65.000 1.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1060 111 231 7363 1149 20 65 1
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1103.000 78.000 220.000 7365.000 1149.000 20.000 65.000 2.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1103 78 220 7365 1149 20 65 2
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1110.000 91.000 201.000 7318.000 1185.000 24.000 74.000 2.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1110 91 201 7318 1185 24 74 2
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1091.000 108.000 218.000 7383.000 1183.000 28.000 88.000 3.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1091 108 218 7383 1183 28 88 3
 </record>
-<record label="Inland-Sardinia">
-2.000 5.000 1094.000 96.000 220.000 7341.000 1127.000 26.000 96.000 2.000
+<record label="Inland-Sardinia" color="4" glyph="or 4">
+2 5 1094 96 220 7341 1127 26 96 2
 </record>
-<record label="Coast-Sardinia">
-2.000 6.000 1131.000 87.000 208.000 7170.000 1308.000 28.000 57.000 2.000
+<record label="Coast-Sardinia" color="4" glyph="fr 2">
+2 6 1131 87 208 7170 1308 28 57 2
 </record>
-<record label="Coast-Sardinia">
-2.000 6.000 1175.000 108.000 214.000 7076.000 1307.000 33.000 85.000 2.000
+<record label="Coast-Sardinia" color="4" glyph="fr 2">
+2 6 1175 108 214 7076 1307 33 85 2
 </record>
-<record label="Coast-Sardinia">
-2.000 6.000 1076.000 77.000 202.000 7243.000 1305.000 29.000 67.000 1.000
+<record label="Coast-Sardinia" color="4" glyph="fr 2">
+2 6 1076 77 202 7243 1305 29 67 1
 </record>
-<record label="Coast-Sardinia">
-2.000 6.000 1120.000 90.000 240.000 7068.000 1383.000 23.000 75.000 1.000
+<record label="Coast-Sardinia" color="4" glyph="fr 2">
+2 6 1120 90 240 7068 1383 23 75 1
 </record>
-<record label="Coast-Sardinia">
-2.000 6.000 1152.000 111.000 238.000 7080.000 1372.000 25.000 81.000 2.000
+<record label="Coast-Sardinia" color="4" glyph="fr 2">
+2 6 1152 111 238 7080 1372 25 81 2
 </record>
-<record label="Coast-Sardinia">
-2.000 6.000 1141.000 95.000 250.000 7035.000 1388.000 22.000 68.000 2.000
+<record label="Coast-Sardinia" color="4" glyph="fr 2">
+2 6 1141 95 250 7035 1388 22 68 2
 </record>
-<record label="Coast-Sardinia">
-2.000 6.000 1098.000 103.000 267.000 7135.000 1301.000 24.000 76.000 2.000
+<record label="Coast-Sardinia" color="4" glyph="fr 2">
+2 6 1098 103 267 7135 1301 24 76 2
 </record>
-<record label="Coast-Sardinia">
-2.000 6.000 1126.000 100.000 236.000 7062.000 1380.000 26.000 69.000 1.000
+<record label="Coast-Sardinia" color="4" glyph="fr 2">
+2 6 1126 100 236 7062 1380 26 69 1
 </record>
-<record label="Coast-Sardinia">
-2.000 6.000 1087.000 89.000 243.000 7200.000 1302.000 18.000 60.000 1.000
+<record label="Coast-Sardinia" color="4" glyph="fr 2">
+2 6 1087 89 243 7200 1302 18 60 1
 </record>
-<record label="Coast-Sardinia">
-2.000 6.000 1115.000 96.000 236.000 7085.000 1372.000 20.000 75.000 2.000
+<record label="Coast-Sardinia" color="4" glyph="fr 2">
+2 6 1115 96 236 7085 1372 20 75 2
 </record>
-<record label="Coast-Sardinia">
-2.000 6.000 1178.000 92.000 241.000 7006.000 1376.000 22.000 84.000 1.000
+<record label="Coast-Sardinia" color="4" glyph="fr 2">
+2 6 1178 92 241 7006 1376 22 84 1
 </record>
-<record label="Coast-Sardinia">
-2.000 6.000 1162.000 106.000 242.000 7025.000 1368.000 25.000 71.000 2.000
+<record label="Coast-Sardinia" color="4" glyph="fr 2">
+2 6 1162 106 242 7025 1368 25 71 2
 </record>
-<record label="Umbria">
-3.000 9.000 1085.000 70.000 180.000 7955.000 605.000 20.000 50.000 1.000
+<record label="Umbria" color="0" glyph="oc 3">
+3 9 1085 70 180 7955 605 20 50 1
 </record>
-<record label="Umbria">
-3.000 9.000 1085.000 70.000 185.000 7955.000 600.000 25.000 55.000 1.000
+<record label="Umbria" color="0" glyph="oc 3">
+3 9 1085 70 185 7955 600 25 55 1
 </record>
-<record label="Umbria">
-3.000 9.000 1090.000 60.000 190.000 7950.000 600.000 28.000 47.000 2.000
+<record label="Umbria" color="0" glyph="oc 3">
+3 9 1090 60 190 7950 600 28 47 2
 </record>
-<record label="Umbria">
-3.000 9.000 1080.000 65.000 189.000 7960.000 602.000 35.000 20.000 1.000
+<record label="Umbria" color="0" glyph="oc 3">
+3 9 1080 65 189 7960 602 35 20 1
 </record>
-<record label="Umbria">
-3.000 9.000 1090.000 60.000 195.000 7955.000 600.000 28.000 42.000 2.000
+<record label="Umbria" color="0" glyph="oc 3">
+3 9 1090 60 195 7955 600 28 42 2
 </record>
-<record label="Umbria">
-3.000 9.000 1105.000 55.000 200.000 7900.000 600.000 37.000 55.000 2.000
+<record label="Umbria" color="0" glyph="oc 3">
+3 9 1105 55 200 7900 600 37 55 2
 </record>
-<record label="Umbria">
-3.000 9.000 1060.000 75.000 175.000 7975.000 610.000 20.000 55.000 2.000
+<record label="Umbria" color="0" glyph="oc 3">
+3 9 1060 75 175 7975 610 20 55 2
 </record>
-<record label="Umbria">
-3.000 9.000 1050.000 70.000 170.000 7977.000 605.000 28.000 65.000 1.000
+<record label="Umbria" color="0" glyph="oc 3">
+3 9 1050 70 170 7977 605 28 65 1
 </record>
-<record label="Umbria">
-3.000 9.000 1100.000 55.000 198.000 7905.000 600.000 35.000 50.000 3.000
+<record label="Umbria" color="0" glyph="oc 3">
+3 9 1100 55 198 7905 600 35 50 3
 </record>
-<record label="Umbria">
-3.000 9.000 1065.000 65.000 178.000 7965.000 605.000 22.000 65.000 2.000
+<record label="Umbria" color="0" glyph="oc 3">
+3 9 1065 65 178 7965 605 22 65 2
 </record>
-<record label="Umbria">
-3.000 9.000 1085.000 60.000 188.000 7955.000 602.000 30.000 50.000 2.000
+<record label="Umbria" color="0" glyph="oc 3">
+3 9 1085 60 188 7955 602 30 50 2
 </record>
-<record label="Umbria">
-3.000 9.000 1080.000 65.000 180.000 7960.000 605.000 25.000 55.000 1.000
+<record label="Umbria" color="0" glyph="oc 3">
+3 9 1080 65 180 7960 605 25 55 1
 </record>
-<record label="Umbria">
-3.000 9.000 1085.000 60.000 190.000 7955.000 602.000 30.000 53.000 1.000
+<record label="Umbria" color="0" glyph="oc 3">
+3 9 1085 60 190 7955 602 30 53 1
 </record>
-<record label="Umbria">
-3.000 9.000 1075.000 68.000 195.000 7960.000 602.000 20.000 40.000 3.000
+<record label="Umbria" color="0" glyph="oc 3">
+3 9 1075 68 195 7960 602 20 40 3
 </record>
-<record label="Umbria">
-3.000 9.000 1090.000 58.000 192.000 7950.000 600.000 35.000 40.000 3.000
+<record label="Umbria" color="0" glyph="oc 3">
+3 9 1090 58 192 7950 600 35 40 3
 </record>
-<record label="Umbria">
-3.000 9.000 1095.000 60.000 198.000 7945.000 600.000 38.000 34.000 2.000
+<record label="Umbria" color="0" glyph="oc 3">
+3 9 1095 60 198 7945 600 38 34 2
 </record>
-<record label="Umbria">
-3.000 9.000 1090.000 58.000 195.000 7950.000 600.000 30.000 42.000 2.000
+<record label="Umbria" color="0" glyph="oc 3">
+3 9 1090 58 195 7950 600 30 42 2
 </record>
-<record label="Umbria">
-3.000 9.000 1095.000 58.000 198.000 7950.000 602.000 35.000 32.000 1.000
+<record label="Umbria" color="0" glyph="oc 3">
+3 9 1095 58 198 7950 602 35 32 1
 </record>
-<record label="Umbria">
-3.000 9.000 1090.000 58.000 195.000 7940.000 600.000 35.000 42.000 2.000
+<record label="Umbria" color="0" glyph="oc 3">
+3 9 1090 58 195 7940 600 35 42 2
 </record>
-<record label="Umbria">
-3.000 9.000 1095.000 58.000 198.000 7945.000 600.000 35.000 34.000 1.000
+<record label="Umbria" color="0" glyph="oc 3">
+3 9 1095 58 198 7945 600 35 34 1
 </record>
-<record label="Umbria">
-3.000 9.000 1095.000 55.000 200.000 7940.000 600.000 35.000 45.000 3.000
+<record label="Umbria" color="0" glyph="oc 3">
+3 9 1095 55 200 7940 600 35 45 3
 </record>
-<record label="Umbria">
-3.000 9.000 1080.000 70.000 188.000 7965.000 608.000 28.000 36.000 3.000
+<record label="Umbria" color="0" glyph="oc 3">
+3 9 1080 70 188 7965 608 28 36 3
 </record>
-<record label="Umbria">
-3.000 9.000 1090.000 60.000 195.000 7950.000 600.000 32.000 38.000 2.000
+<record label="Umbria" color="0" glyph="oc 3">
+3 9 1090 60 195 7950 600 32 38 2
 </record>
-<record label="Umbria">
-3.000 9.000 1105.000 55.000 200.000 7900.000 595.000 39.000 56.000 1.000
+<record label="Umbria" color="0" glyph="oc 3">
+3 9 1105 55 200 7900 595 39 56 1
 </record>
-<record label="Umbria">
-3.000 9.000 1110.000 50.000 205.000 7900.000 595.000 40.000 52.000 1.000
+<record label="Umbria" color="0" glyph="oc 3">
+3 9 1110 50 205 7900 595 40 52 1
 </record>
-<record label="Umbria">
-3.000 9.000 1075.000 70.000 198.000 7978.000 608.000 28.000 33.000 2.000
+<record label="Umbria" color="0" glyph="oc 3">
+3 9 1075 70 198 7978 608 28 33 2
 </record>
-<record label="Umbria">
-3.000 9.000 1075.000 65.000 185.000 7980.000 608.000 35.000 42.000 3.000
+<record label="Umbria" color="0" glyph="oc 3">
+3 9 1075 65 185 7980 608 35 42 3
 </record>
-<record label="Umbria">
-3.000 9.000 1065.000 75.000 180.000 7975.000 610.000 25.000 50.000 3.000
+<record label="Umbria" color="0" glyph="oc 3">
+3 9 1065 75 180 7975 610 25 50 3
 </record>
-<record label="Umbria">
-3.000 9.000 1070.000 75.000 188.000 7980.000 602.000 22.000 45.000 2.000
+<record label="Umbria" color="0" glyph="oc 3">
+3 9 1070 75 188 7980 602 22 45 2
 </record>
-<record label="Umbria">
-3.000 9.000 1070.000 75.000 188.000 7980.000 602.000 22.000 45.000 1.000
+<record label="Umbria" color="0" glyph="oc 3">
+3 9 1070 75 188 7980 602 22 45 1
 </record>
-<record label="Umbria">
-3.000 9.000 1100.000 70.000 200.000 7910.000 610.000 39.000 44.000 1.000
+<record label="Umbria" color="0" glyph="oc 3">
+3 9 1100 70 200 7910 610 39 44 1
 </record>
-<record label="Umbria">
-3.000 9.000 1075.000 70.000 185.000 7960.000 610.000 22.000 58.000 2.000
+<record label="Umbria" color="0" glyph="oc 3">
+3 9 1075 70 185 7960 610 22 58 2
 </record>
-<record label="Umbria">
-3.000 9.000 1050.000 78.000 175.000 7990.000 610.000 18.000 59.000 3.000
+<record label="Umbria" color="0" glyph="oc 3">
+3 9 1050 78 175 7990 610 18 59 3
 </record>
-<record label="Umbria">
-3.000 9.000 1090.000 60.000 198.000 7945.000 600.000 32.000 35.000 2.000
+<record label="Umbria" color="0" glyph="oc 3">
+3 9 1090 60 198 7945 600 32 35 2
 </record>
-<record label="Umbria">
-3.000 9.000 1050.000 78.000 188.000 7990.000 608.000 28.000 23.000 3.000
+<record label="Umbria" color="0" glyph="oc 3">
+3 9 1050 78 188 7990 608 28 23 3
 </record>
-<record label="Umbria">
-3.000 9.000 1075.000 70.000 190.000 7975.000 605.000 28.000 27.000 3.000
+<record label="Umbria" color="0" glyph="oc 3">
+3 9 1075 70 190 7975 605 28 27 3
 </record>
-<record label="Umbria">
-3.000 9.000 1098.000 54.000 202.000 7945.000 595.000 42.000 32.000 2.000
+<record label="Umbria" color="0" glyph="oc 3">
+3 9 1098 54 202 7945 595 42 32 2
 </record>
-<record label="Umbria">
-3.000 9.000 1105.000 15.000 198.000 8005.000 575.000 52.000 20.000 2.000
+<record label="Umbria" color="0" glyph="oc 3">
+3 9 1105 15 198 8005 575 52 20 2
 </record>
-<record label="Umbria">
-3.000 9.000 1110.000 75.000 220.000 7915.000 510.000 55.000 65.000 2.000
+<record label="Umbria" color="0" glyph="oc 3">
+3 9 1110 75 220 7915 510 55 65 2
 </record>
-<record label="Umbria">
-3.000 9.000 1058.000 50.000 178.000 7988.000 626.000 40.000 55.000 3.000
+<record label="Umbria" color="0" glyph="oc 3">
+3 9 1058 50 178 7988 626 40 55 3
 </record>
-<record label="Umbria">
-3.000 9.000 1115.000 30.000 225.000 7955.000 600.000 55.000 15.000 2.000
+<record label="Umbria" color="0" glyph="oc 3">
+3 9 1115 30 225 7955 600 55 15 2
 </record>
-<record label="Umbria">
-3.000 9.000 1105.000 30.000 198.000 7995.000 570.000 52.000 20.000 3.000
+<record label="Umbria" color="0" glyph="oc 3">
+3 9 1105 30 198 7995 570 52 20 3
 </record>
-<record label="Umbria">
-3.000 9.000 1072.000 49.000 178.000 7980.000 615.000 48.000 48.000 2.000
+<record label="Umbria" color="0" glyph="oc 3">
+3 9 1072 49 178 7980 615 48 48 2
 </record>
-<record label="Umbria">
-3.000 9.000 1110.000 15.000 210.000 7990.000 570.000 50.000 20.000 2.000
+<record label="Umbria" color="0" glyph="oc 3">
+3 9 1110 15 210 7990 570 50 20 2
 </record>
-<record label="Umbria">
-3.000 9.000 1110.000 80.000 215.000 7910.000 525.000 50.000 60.000 1.000
+<record label="Umbria" color="0" glyph="oc 3">
+3 9 1110 80 215 7910 525 50 60 1
 </record>
-<record label="Umbria">
-3.000 9.000 1055.000 60.000 175.000 7985.000 620.000 45.000 50.000 1.000
+<record label="Umbria" color="0" glyph="oc 3">
+3 9 1055 60 175 7985 620 45 50 1
 </record>
-<record label="Umbria">
-3.000 9.000 1100.000 80.000 215.000 7930.000 535.000 45.000 60.000 2.000
+<record label="Umbria" color="0" glyph="oc 3">
+3 9 1100 80 215 7930 535 45 60 2
 </record>
-<record label="Umbria">
-3.000 9.000 1105.000 55.000 205.000 7965.000 600.000 25.000 20.000 2.000
+<record label="Umbria" color="0" glyph="oc 3">
+3 9 1105 55 205 7965 600 25 20 2
 </record>
-<record label="Umbria">
-3.000 9.000 1095.000 50.000 210.000 7948.000 600.000 25.000 35.000 2.000
+<record label="Umbria" color="0" glyph="oc 3">
+3 9 1095 50 210 7948 600 25 35 2
 </record>
-<record label="Umbria">
-3.000 9.000 1110.000 50.000 220.000 7950.000 600.000 52.000 10.000 2.000
+<record label="Umbria" color="0" glyph="oc 3">
+3 9 1110 50 220 7950 600 52 10 2
 </record>
-<record label="Umbria">
-3.000 9.000 1092.000 37.000 210.000 7955.000 600.000 40.000 40.000 3.000
+<record label="Umbria" color="0" glyph="oc 3">
+3 9 1092 37 210 7955 600 40 40 3
 </record>
-<record label="East-Liguria">
-3.000 7.000 1290.000 60.000 260.000 7550.000 670.000 70.000 100.000 2.000
+<record label="East-Liguria" color="0" glyph="fc 4">
+3 7 1290 60 260 7550 670 70 100 2
 </record>
-<record label="East-Liguria">
-3.000 7.000 1170.000 80.000 230.000 7690.000 720.000 40.000 70.000 1.000
+<record label="East-Liguria" color="0" glyph="fc 4">
+3 7 1170 80 230 7690 720 40 70 1
 </record>
-<record label="East-Liguria">
-3.000 7.000 1100.000 90.000 250.000 7680.000 760.000 30.000 80.000 2.000
+<record label="East-Liguria" color="0" glyph="fc 4">
+3 7 1100 90 250 7680 760 30 80 2
 </record>
-<record label="East-Liguria">
-3.000 7.000 1120.000 70.000 240.000 7720.000 730.000 40.000 80.000 2.000
+<record label="East-Liguria" color="0" glyph="fc 4">
+3 7 1120 70 240 7720 730 40 80 2
 </record>
-<record label="East-Liguria">
-3.000 7.000 1160.000 70.000 250.000 7650.000 750.000 30.000 90.000 1.000
+<record label="East-Liguria" color="0" glyph="fc 4">
+3 7 1160 70 250 7650 750 30 90 1
 </record>
-<record label="East-Liguria">
-3.000 7.000 1200.000 50.000 210.000 7770.000 690.000 20.000 50.000 3.000
+<record label="East-Liguria" color="0" glyph="fc 4">
+3 7 1200 50 210 7770 690 20 50 3
 </record>
-<record label="East-Liguria">
-3.000 7.000 1140.000 50.000 200.000 7990.000 580.000 10.000 20.000 1.000
+<record label="East-Liguria" color="0" glyph="fc 4">
+3 7 1140 50 200 7990 580 10 20 1
 </record>
-<record label="East-Liguria">
-3.000 7.000 1220.000 80.000 240.000 7610.000 760.000 30.000 60.000 2.000
+<record label="East-Liguria" color="0" glyph="fc 4">
+3 7 1220 80 240 7610 760 30 60 2
 </record>
-<record label="East-Liguria">
-3.000 7.000 1180.000 90.000 250.000 7520.000 800.000 50.000 100.000 2.000
+<record label="East-Liguria" color="0" glyph="fc 4">
+3 7 1180 90 250 7520 800 50 100 2
 </record>
-<record label="East-Liguria">
-3.000 7.000 1210.000 70.000 250.000 7560.000 780.000 40.000 90.000 2.000
+<record label="East-Liguria" color="0" glyph="fc 4">
+3 7 1210 70 250 7560 780 40 90 2
 </record>
-<record label="East-Liguria">
-3.000 7.000 1220.000 80.000 220.000 7540.000 770.000 60.000 100.000 2.000
+<record label="East-Liguria" color="0" glyph="fc 4">
+3 7 1220 80 220 7540 770 60 100 2
 </record>
-<record label="East-Liguria">
-3.000 7.000 1180.000 100.000 190.000 7520.000 820.000 50.000 100.000 1.000
+<record label="East-Liguria" color="0" glyph="fc 4">
+3 7 1180 100 190 7520 820 50 100 1
 </record>
-<record label="East-Liguria">
-3.000 7.000 1160.000 90.000 220.000 7580.000 790.000 40.000 90.000 1.000
+<record label="East-Liguria" color="0" glyph="fc 4">
+3 7 1160 90 220 7580 790 40 90 1
 </record>
-<record label="East-Liguria">
-3.000 7.000 1130.000 100.000 240.000 7620.000 780.000 30.000 90.000 1.000
+<record label="East-Liguria" color="0" glyph="fc 4">
+3 7 1130 100 240 7620 780 30 90 1
 </record>
-<record label="East-Liguria">
-3.000 7.000 1080.000 100.000 260.000 7710.000 750.000 20.000 70.000 2.000
+<record label="East-Liguria" color="0" glyph="fc 4">
+3 7 1080 100 260 7710 750 20 70 2
 </record>
-<record label="East-Liguria">
-3.000 7.000 1090.000 90.000 280.000 7730.000 720.000 50.000 100.000 1.000
+<record label="East-Liguria" color="0" glyph="fc 4">
+3 7 1090 90 280 7730 720 50 100 1
 </record>
-<record label="East-Liguria">
-3.000 7.000 1020.000 100.000 270.000 7770.000 710.000 40.000 90.000 1.000
+<record label="East-Liguria" color="0" glyph="fc 4">
+3 7 1020 100 270 7770 710 40 90 1
 </record>
-<record label="East-Liguria">
-3.000 7.000 1090.000 90.000 250.000 7680.000 760.000 60.000 80.000 1.000
+<record label="East-Liguria" color="0" glyph="fc 4">
+3 7 1090 90 250 7680 760 60 80 1
 </record>
-<record label="East-Liguria">
-3.000 7.000 1120.000 100.000 260.000 7720.000 680.000 30.000 80.000 2.000
+<record label="East-Liguria" color="0" glyph="fc 4">
+3 7 1120 100 260 7720 680 30 80 2
 </record>
-<record label="East-Liguria">
-3.000 7.000 1080.000 80.000 240.000 7830.000 670.000 30.000 70.000 2.000
+<record label="East-Liguria" color="0" glyph="fc 4">
+3 7 1080 80 240 7830 670 30 70 2
 </record>
-<record label="East-Liguria">
-3.000 7.000 1160.000 70.000 230.000 7860.000 640.000 10.000 20.000 1.000
+<record label="East-Liguria" color="0" glyph="fc 4">
+3 7 1160 70 230 7860 640 10 20 1
 </record>
-<record label="East-Liguria">
-3.000 7.000 1100.000 80.000 240.000 7820.000 670.000 20.000 70.000 2.000
+<record label="East-Liguria" color="0" glyph="fc 4">
+3 7 1100 80 240 7820 670 20 70 2
 </record>
-<record label="East-Liguria">
-3.000 7.000 1050.000 100.000 250.000 7930.000 630.000 10.000 30.000 3.000
+<record label="East-Liguria" color="0" glyph="fc 4">
+3 7 1050 100 250 7930 630 10 30 3
 </record>
-<record label="East-Liguria">
-3.000 7.000 1090.000 90.000 270.000 7780.000 690.000 30.000 50.000 3.000
+<record label="East-Liguria" color="0" glyph="fc 4">
+3 7 1090 90 270 7780 690 30 50 3
 </record>
-<record label="East-Liguria">
-3.000 7.000 1120.000 80.000 260.000 7750.000 680.000 30.000 80.000 3.000
+<record label="East-Liguria" color="0" glyph="fc 4">
+3 7 1120 80 260 7750 680 30 80 3
 </record>
-<record label="East-Liguria">
-3.000 7.000 1120.000 100.000 250.000 7680.000 730.000 40.000 70.000 2.000
+<record label="East-Liguria" color="0" glyph="fc 4">
+3 7 1120 100 250 7680 730 40 70 2
 </record>
-<record label="East-Liguria">
-3.000 7.000 1190.000 90.000 230.000 7670.000 710.000 30.000 80.000 2.000
+<record label="East-Liguria" color="0" glyph="fc 4">
+3 7 1190 90 230 7670 710 30 80 2
 </record>
-<record label="East-Liguria">
-3.000 7.000 1170.000 110.000 250.000 7620.000 740.000 20.000 90.000 1.000
+<record label="East-Liguria" color="0" glyph="fc 4">
+3 7 1170 110 250 7620 740 20 90 1
 </record>
-<record label="East-Liguria">
-3.000 7.000 1120.000 100.000 230.000 7720.000 730.000 20.000 70.000 1.000
+<record label="East-Liguria" color="0" glyph="fc 4">
+3 7 1120 100 230 7720 730 20 70 1
 </record>
-<record label="East-Liguria">
-3.000 7.000 1190.000 80.000 270.000 7690.000 720.000 10.000 40.000 2.000
+<record label="East-Liguria" color="0" glyph="fc 4">
+3 7 1190 80 270 7690 720 10 40 2
 </record>
-<record label="East-Liguria">
-3.000 7.000 1400.000 90.000 270.000 7420.000 800.000 0.000 20.000 2.000
+<record label="East-Liguria" color="0" glyph="fc 4">
+3 7 1400 90 270 7420 800 0 20 2
 </record>
-<record label="East-Liguria">
-3.000 7.000 1350.000 80.000 250.000 7520.000 760.000 10.000 30.000 1.000
+<record label="East-Liguria" color="0" glyph="fc 4">
+3 7 1350 80 250 7520 760 10 30 1
 </record>
-<record label="East-Liguria">
-3.000 7.000 1090.000 60.000 220.000 7890.000 670.000 10.000 60.000 2.000
+<record label="East-Liguria" color="0" glyph="fc 4">
+3 7 1090 60 220 7890 670 10 60 2
 </record>
-<record label="East-Liguria">
-3.000 7.000 1150.000 90.000 230.000 7790.000 650.000 30.000 60.000 1.000
+<record label="East-Liguria" color="0" glyph="fc 4">
+3 7 1150 90 230 7790 650 30 60 1
 </record>
-<record label="East-Liguria">
-3.000 7.000 1240.000 90.000 220.000 7820.000 590.000 10.000 30.000 1.000
+<record label="East-Liguria" color="0" glyph="fc 4">
+3 7 1240 90 220 7820 590 10 30 1
 </record>
-<record label="East-Liguria">
-3.000 7.000 1220.000 100.000 240.000 7890.000 530.000 0.000 10.000 2.000
+<record label="East-Liguria" color="0" glyph="fc 4">
+3 7 1220 100 240 7890 530 0 10 2
 </record>
-<record label="East-Liguria">
-3.000 7.000 1180.000 80.000 250.000 7870.000 580.000 10.000 30.000 2.000
+<record label="East-Liguria" color="0" glyph="fc 4">
+3 7 1180 80 250 7870 580 10 30 2
 </record>
-<record label="East-Liguria">
-3.000 7.000 1170.000 110.000 240.000 7730.000 630.000 30.000 90.000 1.000
+<record label="East-Liguria" color="0" glyph="fc 4">
+3 7 1170 110 240 7730 630 30 90 1
 </record>
-<record label="East-Liguria">
-3.000 7.000 1170.000 100.000 280.000 7710.000 640.000 20.000 70.000 3.000
+<record label="East-Liguria" color="0" glyph="fc 4">
+3 7 1170 100 280 7710 640 20 70 3
 </record>
-<record label="East-Liguria">
-3.000 7.000 1180.000 80.000 220.000 7790.000 680.000 10.000 40.000 1.000
+<record label="East-Liguria" color="0" glyph="fc 4">
+3 7 1180 80 220 7790 680 10 40 1
 </record>
-<record label="East-Liguria">
-3.000 7.000 1200.000 90.000 240.000 7820.000 590.000 10.000 50.000 2.000
+<record label="East-Liguria" color="0" glyph="fc 4">
+3 7 1200 90 240 7820 590 10 50 2
 </record>
-<record label="East-Liguria">
-3.000 7.000 1140.000 90.000 240.000 7880.000 570.000 20.000 60.000 3.000
+<record label="East-Liguria" color="0" glyph="fc 4">
+3 7 1140 90 240 7880 570 20 60 3
 </record>
-<record label="East-Liguria">
-3.000 7.000 1160.000 70.000 210.000 7870.000 580.000 30.000 80.000 3.000
+<record label="East-Liguria" color="0" glyph="fc 4">
+3 7 1160 70 210 7870 580 30 80 3
 </record>
-<record label="East-Liguria">
-3.000 7.000 1130.000 80.000 250.000 7780.000 650.000 40.000 60.000 3.000
+<record label="East-Liguria" color="0" glyph="fc 4">
+3 7 1130 80 250 7780 650 40 60 3
 </record>
-<record label="East-Liguria">
-3.000 7.000 1150.000 80.000 240.000 7800.000 630.000 30.000 70.000 2.000
+<record label="East-Liguria" color="0" glyph="fc 4">
+3 7 1150 80 240 7800 630 30 70 2
 </record>
-<record label="East-Liguria">
-3.000 7.000 1110.000 70.000 240.000 7820.000 670.000 20.000 70.000 3.000
+<record label="East-Liguria" color="0" glyph="fc 4">
+3 7 1110 70 240 7820 670 20 70 3
 </record>
-<record label="East-Liguria">
-3.000 7.000 1150.000 70.000 220.000 7850.000 620.000 20.000 40.000 2.000
+<record label="East-Liguria" color="0" glyph="fc 4">
+3 7 1150 70 220 7850 620 20 40 2
 </record>
-<record label="East-Liguria">
-3.000 7.000 1180.000 80.000 240.000 7760.000 670.000 20.000 50.000 2.000
+<record label="East-Liguria" color="0" glyph="fc 4">
+3 7 1180 80 240 7760 670 20 50 2
 </record>
-<record label="East-Liguria">
-3.000 7.000 1020.000 80.000 250.000 7920.000 680.000 10.000 30.000 3.000
+<record label="East-Liguria" color="0" glyph="fc 4">
+3 7 1020 80 250 7920 680 10 30 3
 </record>
-<record label="East-Liguria">
-3.000 7.000 610.000 80.000 230.000 8410.000 650.000 0.000 20.000 3.000
+<record label="East-Liguria" color="0" glyph="fc 4">
+3 7 610 80 230 8410 650 0 20 3
 </record>
-<record label="West-Liguria">
-3.000 8.000 1190.000 150.000 290.000 7340.000 1020.000 0.000 10.000 2.000
+<record label="West-Liguria" color="0" glyph="fc 2">
+3 8 1190 150 290 7340 1020 0 10 2
 </record>
-<record label="West-Liguria">
-3.000 8.000 1110.000 130.000 210.000 7550.000 1000.000 0.000 0.000 1.000
+<record label="West-Liguria" color="0" glyph="fc 2">
+3 8 1110 130 210 7550 1000 0 0 1
 </record>
-<record label="West-Liguria">
-3.000 8.000 1020.000 100.000 220.000 7530.000 1030.000 0.000 0.000 3.000
+<record label="West-Liguria" color="0" glyph="fc 2">
+3 8 1020 100 220 7530 1030 0 0 3
 </record>
-<record label="West-Liguria">
-3.000 8.000 1070.000 120.000 210.000 7600.000 990.000 0.000 10.000 3.000
+<record label="West-Liguria" color="0" glyph="fc 2">
+3 8 1070 120 210 7600 990 0 10 3
 </record>
-<record label="West-Liguria">
-3.000 8.000 1010.000 90.000 350.000 7480.000 1050.000 10.000 10.000 1.000
+<record label="West-Liguria" color="0" glyph="fc 2">
+3 8 1010 90 350 7480 1050 10 10 1
 </record>
-<record label="West-Liguria">
-3.000 8.000 1060.000 140.000 240.000 7680.000 830.000 10.000 40.000 2.000
+<record label="West-Liguria" color="0" glyph="fc 2">
+3 8 1060 140 240 7680 830 10 40 2
 </record>
-<record label="West-Liguria">
-3.000 8.000 1060.000 140.000 270.000 7620.000 880.000 10.000 20.000 1.000
+<record label="West-Liguria" color="0" glyph="fc 2">
+3 8 1060 140 270 7620 880 10 20 1
 </record>
-<record label="West-Liguria">
-3.000 8.000 1030.000 100.000 230.000 7740.000 900.000 0.000 0.000 2.000
+<record label="West-Liguria" color="0" glyph="fc 2">
+3 8 1030 100 230 7740 900 0 0 2
 </record>
-<record label="West-Liguria">
-3.000 8.000 1120.000 130.000 250.000 7530.000 970.000 0.000 0.000 3.000
+<record label="West-Liguria" color="0" glyph="fc 2">
+3 8 1120 130 250 7530 970 0 0 3
 </record>
-<record label="West-Liguria">
-3.000 8.000 1030.000 110.000 220.000 7760.000 980.000 0.000 0.000 2.000
+<record label="West-Liguria" color="0" glyph="fc 2">
+3 8 1030 110 220 7760 980 0 0 2
 </record>
-<record label="West-Liguria">
-3.000 8.000 1070.000 100.000 230.000 7600.000 990.000 10.000 0.000 1.000
+<record label="West-Liguria" color="0" glyph="fc 2">
+3 8 1070 100 230 7600 990 10 0 1
 </record>
-<record label="West-Liguria">
-3.000 8.000 1140.000 180.000 220.000 7610.000 850.000 10.000 10.000 2.000
+<record label="West-Liguria" color="0" glyph="fc 2">
+3 8 1140 180 220 7610 850 10 10 2
 </record>
-<record label="West-Liguria">
-3.000 8.000 1090.000 180.000 230.000 7590.000 860.000 10.000 40.000 2.000
+<record label="West-Liguria" color="0" glyph="fc 2">
+3 8 1090 180 230 7590 860 10 40 2
 </record>
-<record label="West-Liguria">
-3.000 8.000 980.000 110.000 300.000 7720.000 910.000 10.000 0.000 3.000
+<record label="West-Liguria" color="0" glyph="fc 2">
+3 8 980 110 300 7720 910 10 0 3
 </record>
-<record label="West-Liguria">
-3.000 8.000 980.000 90.000 330.000 7540.000 1040.000 0.000 0.000 2.000
+<record label="West-Liguria" color="0" glyph="fc 2">
+3 8 980 90 330 7540 1040 0 0 2
 </record>
-<record label="West-Liguria">
-3.000 8.000 960.000 90.000 200.000 7810.000 940.000 0.000 0.000 2.000
+<record label="West-Liguria" color="0" glyph="fc 2">
+3 8 960 90 200 7810 940 0 0 2
 </record>
-<record label="West-Liguria">
-3.000 8.000 990.000 90.000 210.000 7780.000 930.000 0.000 0.000 2.000
+<record label="West-Liguria" color="0" glyph="fc 2">
+3 8 990 90 210 7780 930 0 0 2
 </record>
-<record label="West-Liguria">
-3.000 8.000 1060.000 120.000 210.000 7600.000 1010.000 0.000 0.000 1.000
+<record label="West-Liguria" color="0" glyph="fc 2">
+3 8 1060 120 210 7600 1010 0 0 1
 </record>
-<record label="West-Liguria">
-3.000 8.000 1240.000 150.000 250.000 7610.000 730.000 10.000 10.000 1.000
+<record label="West-Liguria" color="0" glyph="fc 2">
+3 8 1240 150 250 7610 730 10 10 1
 </record>
-<record label="West-Liguria">
-3.000 8.000 1060.000 90.000 310.000 7850.000 690.000 0.000 0.000 2.000
+<record label="West-Liguria" color="0" glyph="fc 2">
+3 8 1060 90 310 7850 690 0 0 2
 </record>
-<record label="West-Liguria">
-3.000 8.000 1020.000 100.000 290.000 7620.000 960.000 0.000 10.000 2.000
+<record label="West-Liguria" color="0" glyph="fc 2">
+3 8 1020 100 290 7620 960 0 10 2
 </record>
-<record label="West-Liguria">
-3.000 8.000 970.000 90.000 220.000 7700.000 1020.000 0.000 0.000 3.000
+<record label="West-Liguria" color="0" glyph="fc 2">
+3 8 970 90 220 7700 1020 0 0 3
 </record>
-<record label="West-Liguria">
-3.000 8.000 1180.000 130.000 220.000 7450.000 1010.000 0.000 10.000 2.000
+<record label="West-Liguria" color="0" glyph="fc 2">
+3 8 1180 130 220 7450 1010 0 10 2
 </record>
-<record label="West-Liguria">
-3.000 8.000 1060.000 140.000 240.000 7690.000 850.000 10.000 10.000 1.000
+<record label="West-Liguria" color="0" glyph="fc 2">
+3 8 1060 140 240 7690 850 10 10 1
 </record>
-<record label="West-Liguria">
-3.000 8.000 990.000 100.000 250.000 7630.000 1030.000 0.000 0.000 3.000
+<record label="West-Liguria" color="0" glyph="fc 2">
+3 8 990 100 250 7630 1030 0 0 3
 </record>
-<record label="West-Liguria">
-3.000 8.000 1010.000 90.000 350.000 7630.000 940.000 10.000 0.000 3.000
+<record label="West-Liguria" color="0" glyph="fc 2">
+3 8 1010 90 350 7630 940 10 0 3
 </record>
-<record label="West-Liguria">
-3.000 8.000 1040.000 90.000 250.000 7780.000 820.000 10.000 10.000 1.000
+<record label="West-Liguria" color="0" glyph="fc 2">
+3 8 1040 90 250 7780 820 10 10 1
 </record>
-<record label="West-Liguria">
-3.000 8.000 1040.000 90.000 250.000 7810.000 810.000 10.000 10.000 2.000
+<record label="West-Liguria" color="0" glyph="fc 2">
+3 8 1040 90 250 7810 810 10 10 2
 </record>
-<record label="West-Liguria">
-3.000 8.000 1020.000 90.000 350.000 7620.000 920.000 10.000 0.000 3.000
+<record label="West-Liguria" color="0" glyph="fc 2">
+3 8 1020 90 350 7620 920 10 0 3
 </record>
-<record label="West-Liguria">
-3.000 8.000 1020.000 90.000 260.000 7620.000 1010.000 0.000 0.000 3.000
+<record label="West-Liguria" color="0" glyph="fc 2">
+3 8 1020 90 260 7620 1010 0 0 3
 </record>
-<record label="West-Liguria">
-3.000 8.000 1010.000 90.000 350.000 7610.000 930.000 10.000 0.000 3.000
+<record label="West-Liguria" color="0" glyph="fc 2">
+3 8 1010 90 350 7610 930 10 0 3
 </record>
-<record label="West-Liguria">
-3.000 8.000 920.000 110.000 340.000 7720.000 910.000 0.000 0.000 3.000
+<record label="West-Liguria" color="0" glyph="fc 2">
+3 8 920 110 340 7720 910 0 0 3
 </record>
-<record label="West-Liguria">
-3.000 8.000 1030.000 100.000 250.000 7710.000 900.000 0.000 10.000 2.000
+<record label="West-Liguria" color="0" glyph="fc 2">
+3 8 1030 100 250 7710 900 0 10 2
 </record>
-<record label="West-Liguria">
-3.000 8.000 960.000 90.000 300.000 7820.000 830.000 0.000 0.000 3.000
+<record label="West-Liguria" color="0" glyph="fc 2">
+3 8 960 90 300 7820 830 0 0 3
 </record>
-<record label="West-Liguria">
-3.000 8.000 1030.000 110.000 210.000 7810.000 840.000 0.000 0.000 1.000
+<record label="West-Liguria" color="0" glyph="fc 2">
+3 8 1030 110 210 7810 840 0 0 1
 </record>
-<record label="West-Liguria">
-3.000 8.000 1010.000 100.000 240.000 7710.000 910.000 10.000 20.000 2.000
+<record label="West-Liguria" color="0" glyph="fc 2">
+3 8 1010 100 240 7710 910 10 20 2
 </record>
-<record label="West-Liguria">
-3.000 8.000 1020.000 90.000 240.000 7800.000 850.000 0.000 0.000 2.000
+<record label="West-Liguria" color="0" glyph="fc 2">
+3 8 1020 90 240 7800 850 0 0 2
 </record>
-<record label="West-Liguria">
-3.000 8.000 1120.000 90.000 300.000 7650.000 830.000 0.000 10.000 1.000
+<record label="West-Liguria" color="0" glyph="fc 2">
+3 8 1120 90 300 7650 830 0 10 1
 </record>
-<record label="West-Liguria">
-3.000 8.000 1090.000 90.000 290.000 7710.000 800.000 10.000 0.000 2.000
+<record label="West-Liguria" color="0" glyph="fc 2">
+3 8 1090 90 290 7710 800 10 0 2
 </record>
-<record label="West-Liguria">
-3.000 8.000 1100.000 120.000 280.000 7630.000 770.000 10.000 10.000 2.000
+<record label="West-Liguria" color="0" glyph="fc 2">
+3 8 1100 120 280 7630 770 10 10 2
 </record>
-<record label="West-Liguria">
-3.000 8.000 1090.000 80.000 240.000 7820.000 760.000 10.000 0.000 2.000
+<record label="West-Liguria" color="0" glyph="fc 2">
+3 8 1090 80 240 7820 760 10 0 2
 </record>
-<record label="West-Liguria">
-3.000 8.000 1150.000 90.000 250.000 7720.000 810.000 0.000 10.000 3.000
+<record label="West-Liguria" color="0" glyph="fc 2">
+3 8 1150 90 250 7720 810 0 10 3
 </record>
-<record label="West-Liguria">
-3.000 8.000 1110.000 90.000 230.000 7810.000 750.000 0.000 10.000 2.000
+<record label="West-Liguria" color="0" glyph="fc 2">
+3 8 1110 90 230 7810 750 0 10 2
 </record>
-<record label="West-Liguria">
-3.000 8.000 1010.000 110.000 210.000 7720.000 950.000 0.000 0.000 1.000
+<record label="West-Liguria" color="0" glyph="fc 2">
+3 8 1010 110 210 7720 950 0 0 1
 </record>
-<record label="West-Liguria">
-3.000 8.000 1070.000 100.000 220.000 7730.000 870.000 10.000 10.000 2.000
+<record label="West-Liguria" color="0" glyph="fc 2">
+3 8 1070 100 220 7730 870 10 10 2
 </record>
-<record label="West-Liguria">
-3.000 8.000 1280.000 110.000 290.000 7490.000 790.000 10.000 10.000 2.000
+<record label="West-Liguria" color="0" glyph="fc 2">
+3 8 1280 110 290 7490 790 10 10 2
 </record>
-<record label="West-Liguria">
-3.000 8.000 1060.000 100.000 270.000 7740.000 810.000 10.000 10.000 3.000
+<record label="West-Liguria" color="0" glyph="fc 2">
+3 8 1060 100 270 7740 810 10 10 3
 </record>
-<record label="West-Liguria">
-3.000 8.000 1010.000 90.000 210.000 7720.000 970.000 0.000 0.000 2.000
+<record label="West-Liguria" color="0" glyph="fc 2">
+3 8 1010 90 210 7720 970 0 0 2
 </record>
-<record label="West-Liguria">
-3.000 8.000 990.000 120.000 250.000 7750.000 870.000 10.000 10.000 2.000
+<record label="West-Liguria" color="0" glyph="fc 2">
+3 8 990 120 250 7750 870 10 10 2
 </record>
-<record label="West-Liguria">
-3.000 8.000 960.000 80.000 240.000 7950.000 740.000 10.000 20.000 2.000
+<record label="West-Liguria" color="0" glyph="fc 2">
+3 8 960 80 240 7950 740 10 20 2
 </record>
 </records>
 </data>
