@@ -50,7 +50,7 @@ pipeline_init (GGobiData * d, ggobid * gg)
   /*-- run the first half of the pipeline --*/
   arrayf_copy (&d->raw, &d->tform);
 
-  limits_set (true, true, d, gg);
+  limits_set (d, true, true, gg->lims_use_visible);
 
   vartable_limits_set (d);  /*-- does this do something here?  --*/
   vartable_stats_set (d);  /*-- does this do something here?  --*/
@@ -72,7 +72,7 @@ pipeline_init (GGobiData * d, ggobid * gg)
         impute_fixed (IMP_BELOW, 15.0, 1, vars, d, gg);
       }
     }
-    limits_set (true, true, d, gg);
+    limits_set (d, true, true, gg->lims_use_visible);
     vartable_limits_set (d);
     vartable_stats_set (d);
   }

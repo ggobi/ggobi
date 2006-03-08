@@ -141,25 +141,6 @@ tour1d_realloc_down (gint nc, gint *cols, GGobiData *d, ggobid *gg)
   }
 }
 
-/*-- append columns for a total of nc columns --*/
-void
-tour1d_realloc_up (gint nc, GGobiData *d, ggobid *gg)
-{
-  displayd *dsp;
-  GList *l;
-
-  for (l=gg->displays; l; l=l->next) {
-    GGobiExtendedDisplayClass *klass;
-    dsp = (displayd *) l->data;
-
-    if(!GGOBI_IS_EXTENDED_DISPLAY(dsp))
-      continue;
-    klass = GGOBI_EXTENDED_DISPLAY_GET_CLASS(dsp);
-    if(klass->tour1d_realloc)
-        klass->tour1d_realloc(dsp, nc, d);
-  }
-}
-
 void
 free_tour1d(displayd *dsp)
 {

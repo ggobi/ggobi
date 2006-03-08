@@ -162,7 +162,7 @@ rescale_cb (GtkWidget *w, ggobid *gg)
 {
   GGobiData *d = datad_get_from_widget (w, gg);
   if (d) {
-    limits_set (true, true, d, gg);
+    limits_set (d, true, true, gg->lims_use_visible);
     vartable_limits_set (d);
     vartable_stats_set (d);
 

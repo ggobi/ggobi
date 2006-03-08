@@ -27,10 +27,11 @@
 
 const double AddVarRowNumbers = -1.0;
 const double AddVarBrushGroup = -1.0;
+void tour_realloc_up (GGobiData *d, gint nc);
 
 
 static void
-addvar_vartable_expand (gint ncols, GGobiData * d, ggobid * gg)
+addvar_vartable_expand (GGobiData * d, gint ncols)
 {
   gint j;
 
@@ -43,18 +44,44 @@ addvar_vartable_expand (gint ncols, GGobiData * d, ggobid * gg)
 
 /*-- specific adding variables --*/
 static void
-addvar_pipeline_realloc (GGobiData * d, ggobid * gg)
+addvar_pipeline_realloc (GGobiData * d)
 {
   /*-- realloc pipeline arrays --*/
   arrayf_add_cols (&d->raw, d->ncols);
   arrayf_add_cols (&d->tform, d->ncols);
 
-  tour1d_realloc_up (d->ncols, d, gg);
-  tour2d3_realloc_up (d->ncols, d, gg);
-  tour2d_realloc_up (d->ncols, d, gg);
-  tourcorr_realloc_up (d->ncols, d, gg);
+  tour_realloc_up (d, d->ncols);
 
-  missing_arrays_add_cols (d, gg);
+  missing_arrays_add_cols (d);
+}
+
+
+// displays should eventually listen to pipeline themselves
+void
+tour_realloc_up (GGobiData *d, gint nc)
+{
+  g_return_if_fail(GGOBI_IS_GGOBI(d->gg));
+  ggobid *gg = d->gg;
+
+  displayd *dsp;
+  GList *l;
+
+  for (l=gg->displays; l; l=l->next) {
+    GGobiExtendedDisplayClass *klass;
+    dsp = (displayd *) l->data;
+
+    if(!GGOBI_IS_EXTENDED_DISPLAY(dsp))
+      continue;
+    klass = GGOBI_EXTENDED_DISPLAY_GET_CLASS(dsp);
+    if(klass->tourcorr_realloc)
+        klass->tourcorr_realloc(dsp, nc, d);
+    if(klass->tour2d3_realloc)
+        klass->tour2d3_realloc(dsp, nc, d);
+    if(klass->tour2d_realloc)
+        klass->tour2d_realloc(dsp, nc, d);
+    if(klass->tour1d_realloc)
+        klass->tour1d_realloc(dsp, nc, d);
+  }
 }
 
 /* XXX this routine just should not exist.  The appropriate elements
@@ -72,8 +99,7 @@ variable_notebook_varchange_cb (ggobid *gg, vartabled *vt, gint which,
   GGobiData *data, void *notebook)
 */
 void
-addvar_propagate (gint ncols_prev, gint ncols_added, GGobiData * d,
-                  ggobid * gg)
+addvar_propagate (gint ncols_prev, gint ncols_added, GGobiData * d)
 {
   gint j, jvar;
 
@@ -81,13 +107,13 @@ addvar_propagate (gint ncols_prev, gint ncols_added, GGobiData * d,
     jvar = ncols_prev + j;  /*-- its new index --*/
 
     /*-- update the tree_view widget (the visible table) --*/
-    vartable_row_append (jvar, d, gg);          /*-- append empty --*/
-
+    vartable_row_append (jvar, d);          /*-- append empty --*/
     vartable_cells_set_by_var (jvar, d);  /*-- then populate --*/
   }
 
   /*-- in case some datad now has variables and it didn't before --*/
-  display_menu_build (gg);
+  g_return_if_fail(GGOBI_IS_GGOBI(d->gg));
+  display_menu_build (d->gg);
 }
 
 /* FIXME: all this stuff should be moved into the GGobiData API, so that
@@ -115,7 +141,7 @@ newvar_add_with_values (gdouble * vals, gint nvals, gchar * vname,
     pipeline_init (d, d->gg);
   }
   else {
-    addvar_pipeline_realloc (d, gg);
+    addvar_pipeline_realloc (d);
   }
 
   /* Create a new element in the vartable list iff we need
@@ -144,10 +170,7 @@ newvar_add_with_values (gdouble * vals, gint nvals, gchar * vname,
   }
 
 
-  /*-- update the vartable struct --*/
-  limits_set_by_var (jvar, true, true, d, gg);
-  limits_display_set_by_var (jvar, d, gg);
-
+  limits_set_by_var (d, jvar, true, true, gg->lims_use_visible);
 
   /*-- run the data through the head of the pipeline --*/
   tform_to_world_by_var (jvar, d, gg);
@@ -156,7 +179,7 @@ newvar_add_with_values (gdouble * vals, gint nvals, gchar * vname,
   vt->nickname = g_strndup (vname, 2);
   /*-- --*/
 
-  addvar_propagate (d_ncols_prev, 1, d, gg);
+  addvar_propagate (d_ncols_prev, 1, d);
 
 /* XXX be careful:  this could be emitted before the variable type
        is set.
@@ -173,7 +196,7 @@ clone_vars (gint * cols, gint ncols, GGobiData * d, ggobid * gg)
   gint d_ncols_prev = d->ncols;
   vartabled *vt;
 
-  addvar_vartable_expand (ncols, d, gg);
+  addvar_vartable_expand (d, ncols);
 
 /*
  * Be extremely careful here: make sure that d->ncols is
@@ -182,7 +205,7 @@ clone_vars (gint * cols, gint ncols, GGobiData * d, ggobid * gg)
 */
 
   d->ncols += ncols;
-  addvar_pipeline_realloc (d, gg);
+  addvar_pipeline_realloc (d);
 
 
   for (k = 0; k < ncols; k++) {
@@ -198,7 +221,7 @@ clone_vars (gint * cols, gint ncols, GGobiData * d, ggobid * gg)
     transform_values_copy (n, jvar, d);
   }
 
-  addvar_propagate (d_ncols_prev, ncols, d, gg);
+  addvar_propagate (d_ncols_prev, ncols, d);
 
   for (k = 0; k < ncols; k++) {
     n = cols[k];

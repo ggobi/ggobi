@@ -176,7 +176,7 @@ sphere_apply_cb (GtkWidget * w, ggobid * gg)
 /*      pc_axes_sensitive_set (true);*/
 
         /*-- these three lines replicated from transform.c --*/
-        limits_set (false, true, d, gg);
+        limits_set (d, false, true, gg->lims_use_visible);
         vartable_limits_set (d);
         vartable_stats_set (d);
 

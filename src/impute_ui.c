@@ -83,7 +83,7 @@ rescale_cb (GtkButton * button, ggobid * gg)
   GtkWidget *tv = get_tree_view_from_object (G_OBJECT (gg->impute.window));
   GGobiData *d = (GGobiData *) g_object_get_data (G_OBJECT (tv), "datad");
 
-  limits_set (true, true, d, gg);
+  limits_set (d, true, true, gg->lims_use_visible);
   vartable_limits_set (d);
   vartable_stats_set (d);
 

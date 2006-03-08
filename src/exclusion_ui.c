@@ -119,32 +119,6 @@ cluster_table_labels_update (GGobiData * d, ggobid * gg)
   }
 }
 
-/*
-static void rescale_cb(GtkWidget * w, ggobid * gg)
-{
-  GGobiData *d = datad_get_from_notebook(gg->cluster_ui.notebook, gg);
-  displayd *dsp = gg->current_display; 
-  cpaneld *cpanel = &dsp->cpanel;
-
-  limits_set(true, true, d, gg);
-  vartable_limits_set(d);
-  vartable_stats_set(d);
-
-  if (cpanel->projection == TOUR1D)
-    dsp->t1d.get_new_target = true;
-  else if (cpanel->projection == TOUR2D3) 
-    dsp->t2d3.get_new_target = true;
-  else if (cpanel->projection == TOUR2D) {
-    dsp->t2d.get_new_target = true;
-  else if (cpanel->projection == COTOUR) {
-    dsp->tcorr1.get_new_target = true;
-    dsp->tcorr2.get_new_target = true;
-  }
-
-  tform_to_world(d, gg);
-  displays_tailpipe(FULL, gg);
-}
-*/
 
 static gint
 hide_cluster_cb (GtkToggleButton * btn, gpointer cbd)
@@ -212,7 +186,7 @@ include_hiddens (gboolean include, GGobiData * d, ggobid * gg)
         rows_in_plot_set (dd, gg);
         clusters_set (dd, gg);
         cluster_table_labels_update (dd, gg);
-        limits_set (true, true, dd, gg);
+        limits_set (dd, true, true, gg->lims_use_visible);
         vartable_limits_set (dd);
         vartable_stats_set (dd);
         tform_to_world (dd, gg);
@@ -223,7 +197,7 @@ include_hiddens (gboolean include, GGobiData * d, ggobid * gg)
   rows_in_plot_set (d, gg);
   clusters_set (d, gg);
   cluster_table_labels_update (d, gg);
-  limits_set (true, true, d, gg);
+  limits_set (d, true, true, gg->lims_use_visible);
   vartable_limits_set (d);
   vartable_stats_set (d);
   tform_to_world (d, gg);

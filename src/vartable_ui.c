@@ -139,7 +139,7 @@ dialog_range_set (GtkWidget *w, ggobid *gg)
      * the first function could be needed if transformation has been
      * going on, because lim_tform could be out of step.
     */
-    limits_set (false, false, d, gg);  
+    limits_set (d, false, false, gg->lims_use_visible);  
     vartable_limits_set (d);
     vartable_stats_set (d);
 
@@ -159,7 +159,7 @@ range_unset_cb (GtkWidget *w, ggobid *gg)
 static void rescale_cb (GtkWidget *w, ggobid *gg) {
   GGobiData *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
 
-  limits_set (true, true, d, gg);  
+  limits_set (d, true, true, gg->lims_use_visible);  
   vartable_limits_set (d);
   vartable_stats_set (d);
 
@@ -326,7 +326,7 @@ void range_unset (ggobid *gg)
 
 
   /*-- these 4 lines the same as in dialog_range_set --*/
-  limits_set (false, false, d, gg);  
+  limits_set (d, false, false, gg->lims_use_visible);  
   vartable_limits_set (d);
   vartable_stats_set (d);
 

@@ -1265,7 +1265,7 @@ GGOBI (setVariableValues) (gint whichVar, gdouble * vals, gint num,
 
 void GGOBI (update_data) (GGobiData * d, ggobid * gg)
 {
-  limits_set (true, true, d, gg);
+  limits_set (d, true, true, gg->lims_use_visible);
   vartable_limits_set (d);
   vartable_stats_set (d);
 

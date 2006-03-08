@@ -33,7 +33,7 @@
 /*--------------------------------------------------------------------*/
 
 void
-missing_arrays_add_cols (GGobiData * d, ggobid * gg)
+missing_arrays_add_cols (GGobiData * d)
 {
   if (d->nmissing > 0 && d->missing.ncols < d->ncols) {
     arrays_add_cols (&d->missing, d->ncols);

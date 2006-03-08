@@ -278,7 +278,7 @@ selection_changed_cb (GtkTreeSelection *tree_sel, ggobid *gg)
 
 /** 'row' here corresponds to 'variable' (top-level rows) */
 void
-vartable_row_append (gint jvar, GGobiData *d, ggobid *gg)
+vartable_row_append (gint jvar, GGobiData *d)
 {
   gint k;
   vartabled *vt = vartable_element_get (jvar, d);
@@ -372,7 +372,7 @@ vartable_subwindow_init (GGobiData *d, ggobid *gg)
   
   /*-- populate the tables BEFORE attaching filters --*/
   for (j = 0 ; j < d->ncols ; j++) {
-    vartable_row_append(j, d, gg);
+    vartable_row_append(j, d);
     vartable_cells_set_by_var(j, d);
   }
   

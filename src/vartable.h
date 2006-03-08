@@ -6,22 +6,23 @@
 #include "types.h"
 
 enum { 
-      VT_VARNAME, VT_TFORM,
-      VT_REAL_USER_MIN, VT_REAL_USER_MAX,
-      VT_REAL_DATA_MIN, VT_REAL_DATA_MAX,
-      VT_MEAN, VT_MEDIAN,
-	  VT_NLEVELS, VT_LEVEL_NAME, VT_LEVEL_VALUE, VT_LEVEL_COUNT,
-      VT_CAT_USER_MIN, VT_CAT_USER_MAX,
-      VT_CAT_DATA_MIN, VT_CAT_DATA_MAX,
-      VT_NMISSING,
-      NCOLS_VT};
+  VT_VARNAME, VT_TFORM,
+  VT_REAL_USER_MIN, VT_REAL_USER_MAX,
+  VT_REAL_DATA_MIN, VT_REAL_DATA_MAX,
+  VT_MEAN, VT_MEDIAN,
+  VT_NLEVELS, VT_LEVEL_NAME, VT_LEVEL_VALUE, VT_LEVEL_COUNT,
+  VT_CAT_USER_MIN, VT_CAT_USER_MAX,
+  VT_CAT_DATA_MIN, VT_CAT_DATA_MAX,
+  VT_NMISSING,
+  NCOLS_VT
+};
 
 typedef enum {ADDVAR_ROWNOS = 0, ADDVAR_BGROUP} NewVariableType; 
 
 extern const double AddVarRowNumbers;
 extern const double AddVarBrushGroup;
 
-typedef enum {real, categorical, integer, counter, uniform,  all_vartypes} vartyped;
+typedef enum {real, categorical, integer, counter, uniform, all_vartypes} vartyped;
 
 /*
  * A vartabled object is not a table, but rather an entry in a table:

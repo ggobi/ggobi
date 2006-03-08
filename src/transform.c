@@ -855,7 +855,7 @@ transform (gint stage, gint tform_type, gfloat param, gint *vars, gint nvars,
     }
   }
   
-  limits_set (false, true, d, gg);  
+  limits_set (d, false, true, gg->lims_use_visible);  
   for (k=0; k<completed; k++) {
     vartable_limits_set_by_var (vars[k], d);
     vartable_stats_set_by_var (vars[k], d);

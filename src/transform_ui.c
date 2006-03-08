@@ -177,7 +177,7 @@ static void tform_reset_cb (GtkWidget *w, ggobid *gg)
     tform_label_update (j, d, gg);
   }
 
-  limits_set (true, true, d, gg);  
+  limits_set (d, true, true, gg->lims_use_visible);  
   vartable_limits_set (d);
   vartable_stats_set (d);
 
