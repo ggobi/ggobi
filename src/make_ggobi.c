@@ -55,8 +55,6 @@ globals_init (ggobid * gg)
 
   gg->d = NULL;
 
-  gg->save.window = NULL;
-
   gg->statusbar_p = true;
 }
 
