@@ -345,7 +345,7 @@ vartable_subwindow_init (GGobiData *d, ggobid *gg)
   g_signal_connect (G_OBJECT (nbook), "switch-page",
     G_CALLBACK (vartable_switch_page_cb), gg);
 
-  lbl = datasetName (d, gg);
+  lbl = ggobi_data_get_name (d);
   /*
    * We're showing all datasets for now, whether they have variables
    * or not.  That could change.

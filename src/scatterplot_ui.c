@@ -157,7 +157,7 @@ scatterplot_display_edge_menu_update (displayd * display,
             name = g_strdup ("edges");
           }
           else {
-            lbl = datasetName (e, gg);
+            lbl = ggobi_data_get_name (e);
             path = "/menubar/Edges/Edgesets";
             name = g_strdup_printf ("edgeset_%p", e);
           }

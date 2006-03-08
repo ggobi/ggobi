@@ -207,7 +207,6 @@ gboolean   datad_has_variables (GGobiData *d);
 displayd*  datad_init (GGobiData *, ggobid *, gboolean);
 void       datad_record_id_add (gchar *ids, GGobiData *d);
 void       datad_record_id_add (gchar *ids, GGobiData *d);
-gchar*     datasetName (GGobiData *d, ggobid *gg);
 gint       delete_vars (gint *, gint, GGobiData *);
 void       disconnect_button_press_signal (splotd *sp);
 void       disconnect_button_release_signal (splotd *sp);

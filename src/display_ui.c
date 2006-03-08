@@ -196,7 +196,7 @@ buildExtendedDisplayMenu (ggobid * gg, gint nd, GGobiData * d0)
 
         /*-- add an item for each datad with variables --*/
         if (g_slist_length (d->vartable) > 0) {
-          lbl = datasetName (d, gg);
+          lbl = ggobi_data_get_name (d);
           cbdata = (ExtendedDisplayCreateData *)
             g_malloc (sizeof (ExtendedDisplayCreateData));
           cbdata->d = d;
