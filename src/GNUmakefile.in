@@ -22,8 +22,6 @@ SRC=\
   color.c \
   color_ui.c \
   cpanel.c \
-  dbms.c \
-  dbms_ui.c \
   display.c \
   display_tree.c \
   display_ui.c \
@@ -75,7 +73,6 @@ SRC=\
   scatterplot_ui.c \
   schemes.c \
   schemes_ui.c \
-  smooth_ui.c \
   sphere.c \
   sphere_ui.c \
   splash.c \
