@@ -85,6 +85,12 @@ write_csv_record (gint i, gint *cols, gint ncols, FILE *f, GGobiData *d, ggobid 
   } else
     fprintf(f, "\"%d\",", i);
 
+  /* Source and destination, as strings, if edges are present */
+  if (gg->save.edges_p && d->edge.n) {
+    fprintf(f, "\"%s\",", g_strstrip(d->edge.sym_endpoints->a));
+    fprintf(f, "\"%s\",", g_strstrip(d->edge.sym_endpoints->b));
+  }
+
   /* record */  
   for(j = 0; j < ncols; j++) {
     jcol = cols[j];
