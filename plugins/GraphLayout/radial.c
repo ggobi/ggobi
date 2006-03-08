@@ -337,42 +337,35 @@ do_radial(glayoutd *gl, GGobiData *d, GGobiData *e, displayd *dsp, ggobid *gg)
     j = GGOBI(getVariableIndex)("x", d, gg);
     for (i=0; i<d->nrows; i++)
       d->raw.vals[i][j] = d->tform.vals[i][j] = x[i];
-    limits_set_by_var (j, true, true, d, gg);
 
     j = GGOBI(getVariableIndex)("y", d, gg);
     for (i=0; i<d->nrows; i++)
       d->raw.vals[i][j] = d->tform.vals[i][j] = y[i];
-    limits_set_by_var (j, true, true, d, gg);
 
     j = GGOBI(getVariableIndex)("depth", d, gg);
     for (i=0; i<d->nrows; i++)
       d->raw.vals[i][j] = d->tform.vals[i][j] = y[i];
-    limits_set_by_var (j, true, true, d, gg);
 
     j = GGOBI(getVariableIndex)("in degree", d, gg);
     for (i=0; i<d->nrows; i++)
       d->raw.vals[i][j] = d->tform.vals[i][j] = inDegree[i];
-    limits_set_by_var (j, true, true, d, gg);
 
     j = GGOBI(getVariableIndex)("out degree", d, gg);
     for (i=0; i<d->nrows; i++)
       d->raw.vals[i][j] = d->tform.vals[i][j] = outDegree[i];
-    limits_set_by_var (j, true, true, d, gg);
 
     j = GGOBI(getVariableIndex)("nParents", d, gg);
     for (i=0; i<d->nrows; i++)
       d->raw.vals[i][j] = d->tform.vals[i][j] = nParents[i];
-    limits_set_by_var (j, true, true, d, gg);
 
     j = GGOBI(getVariableIndex)("nChildren", d, gg);
     for (i=0; i<d->nrows; i++)
       d->raw.vals[i][j] = d->tform.vals[i][j] = nChildren[i];
-    limits_set_by_var (j, true, true, d, gg);
 
     j = GGOBI(getVariableIndex)("nSiblings", d, gg);
     for (i=0; i<d->nrows; i++)
       d->raw.vals[i][j] = d->tform.vals[i][j] = nSiblings[i];
-    limits_set_by_var (j, true, true, d, gg);
+    limits_set(d, true, true, gg->lims_use_visible);
 
     tform_to_world (d, gg);
   }
