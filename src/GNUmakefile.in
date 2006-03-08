@@ -2,12 +2,8 @@ TOP=..
 
 include $(TOP)/Makeconf
 
-XML_INC_DIRS=@XML_INC_DIRS@
-XML_LIB_DIRS=@XML_LIB_DIRS@
-
 SRC=\
   ggobi-data.c \
-  @XML_SRC@ \
   array.c \
   ash1d.c \
   barchart.c \
@@ -58,10 +54,14 @@ SRC=\
   parcoords.c \
   parcoordsClass.c \
   parcoords_ui.c \
+  plugin.c \
   pipeline.c \
   ppcorr_ui.c \
   print.c \
+  read_init.c \
+  read_color.c \
   read_csv.c \
+  read_xml.c \
   scale_api.c \
   scale_drag.c \
   scale_ui.c \
@@ -118,17 +118,13 @@ SRC=\
   win32_draw.c \
   writedata_ui.c \
   write_csv.c \
+  write_state.c \
+  write_xml.c \
   wvis.c \
   wvis_ui.c \
   xlines.c \
   xyplot.c \
   xyplot_ui.c
-
-ifdef USE_XML
- XML_INC_DIRS=$(foreach el,@XML_INC_DIRS@, $(el))
- XML_LIBS=$(foreach el,@XML_LIB_DIRS@, $(el))
-# -lxml2
-endif
 
 %.c: ggobi-data.c
 
@@ -141,10 +137,10 @@ endif
 
 OBJ=$(SRC:%.c=%.lo)
 
-CFLAGS= @SRC_DEBUG@ $(GTK_CFLAGS) $(XML_INC_DIRS) @XML_CFLAG_DEFINES@ 
+CFLAGS= @SRC_DEBUG@ $(GTK_CFLAGS) @LIBXML_CFLAGS@ 
 #@DEFS@ - contains the HAVE_CONFIG_H
 
-LIBS=$(XML_LIBS) $(GTK_LIBS) @LIBS@
+LIBS=@LIBXML_LIBS@ $(GTK_LIBS) @LIBS@
 
 all: marshal.h bin
 

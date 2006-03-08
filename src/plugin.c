@@ -137,8 +137,7 @@ load_plugin_library (GGobiPluginDetails * plugin, gboolean recurse)
 
   if (file_is_readable (fileName) == false) {
     if (sessionOptions->verbose != GGOBI_SILENT) {
-      fprintf (stderr, "can't locate plugin library %s:\n", plugin->dllName);
-      fflush (stderr);
+      g_warning("can't locate plugin library %s:", plugin->dllName);
     }
     if (fileName != plugin->dllName)
       g_free (fileName);

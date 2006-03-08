@@ -20,10 +20,6 @@
 #include <time.h>
 #include <math.h>
 
-#if !defined __APPLE__ && !defined __GNUC__ && !defined NO_VALUES_H
-#include <values.h>
-#endif
-
 #include <gtk/gtk.h>
 #include "vars.h"
 #include "externs.h"
