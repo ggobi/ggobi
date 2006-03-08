@@ -133,7 +133,7 @@ spherize_set_pcvars (GGobiData * d, ggobid * gg)
       vname = g_strdup_printf ("PC%d", j + 1);
       newvar_add_with_values (dtmp, d->nrows, vname,
                               real, 0, (gchar **) NULL, (gint *) NULL,
-                              (gint *) NULL, d, gg);
+                              (gint *) NULL, d);
       g_free (vname);
     }
     g_free (dtmp);
@@ -160,7 +160,7 @@ spherize_set_pcvars (GGobiData * d, ggobid * gg)
     /*-- add just the additional required variables? --*/
 
     /*-- try deleting them all and starting fresh? --*/
-    if (delete_vars (d->sphere.pcvars.els, d->sphere.pcvars.nels, d, gg)) {
+    if (delete_vars (d->sphere.pcvars.els, d->sphere.pcvars.nels, d)) {
 
       ncols_prev = d->ncols;
 
@@ -171,16 +171,8 @@ spherize_set_pcvars (GGobiData * d, ggobid * gg)
 
       /*-- variable labels updated at the end of this function;
             data updated when sphere_apply_cb calls spherize_data --*/
-      clone_vars (d->sphere.vars.els, d->sphere.npcs, d, gg);
-/*
-      dtmp = (gdouble *) g_malloc0 (d->nrows * sizeof (gfloat));
-      for (j=0; j<d->sphere.npcs; j++) {
-        vname = g_strdup_printf ("PC%d", j+1);
-        newvar_add_with_values (dtmp, d->nrows, vname, d, gg);
-        g_free (vname);
-      }
-      g_free (dtmp);
-*/
+      clone_vars (d->sphere.vars.els, d->sphere.npcs, d);
+
 
       for (j = ncols_prev, k = 0; j < d->ncols; j++)
         d->sphere.pcvars.els[k++] = j;
@@ -200,7 +192,7 @@ spherize_set_pcvars (GGobiData * d, ggobid * gg)
          j--)
       cols[k--] = d->sphere.pcvars.els[j];
 
-    if (delete_vars (cols, ncols, d, gg)) {
+    if (delete_vars (cols, ncols, d)) {
 
       /*-- then behave as above, when the lengths were the same --*/
       if (d->sphere.vars_sphered.nels != d->sphere.vars.nels)

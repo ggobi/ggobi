@@ -38,7 +38,7 @@ clone_vars_cb (GtkWidget *w, ggobid *gg)
   gint ncols = selected_cols_get (cols, d, gg);
 
   if (ncols > 0)
-    clone_vars (cols, ncols, d, gg);
+    clone_vars (cols, ncols, d);
 
   g_free (cols);
 }
@@ -53,7 +53,7 @@ delete_vars_cb (GtkWidget *w, ggobid *gg)
   gint ncols = selected_cols_get (cols, d, gg);
 
   if (ncols > 0)
-    delete_vars (cols, ncols, d, gg);
+    delete_vars (cols, ncols, d);
 
   g_free (cols);
 }
@@ -370,7 +370,7 @@ dialog_newvar_add (GtkWidget *w, ggobid *gg)
      newvar_add_with_values(vtype == ADDVAR_BGROUP ? 
        (gdouble *) &AddVarBrushGroup : (gdouble *) &AddVarRowNumbers,
        d->nrows, vname, real,
-       0, NULL, NULL, NULL, d, gg); 
+       0, NULL, NULL, NULL, d); 
 
 /* I think we still want to do this ... */
 #ifdef FORMERLY

@@ -124,12 +124,14 @@ newvar_add_with_values (gdouble * vals, gint nvals, gchar * vname,
  /*-- if categorical, we need ... --*/
                         gint nlevels, gchar ** level_names,
                         gint * level_values, gint * level_counts,
-                        GGobiData * d, ggobid * gg)
+                        GGobiData * d)
 {
   gint i;
   gint d_ncols_prev = d->ncols;
   gint jvar = d_ncols_prev;
   vartabled *vt;
+
+  g_return_if_fail(GGOBI_IS_GGOBI(d->gg));
 
   if (nvals != d->nrows && d->ncols > 0)
     return;
@@ -137,7 +139,6 @@ newvar_add_with_values (gdouble * vals, gint nvals, gchar * vname,
   d->ncols += 1;
   if (d->ncols == 1) {          // lazily allocate datad
     d->nrows = nvals;
-    ///ggobi_data_alloc(d);
     pipeline_init (d, d->gg);
   }
   else {
@@ -170,10 +171,10 @@ newvar_add_with_values (gdouble * vals, gint nvals, gchar * vname,
   }
 
 
-  limits_set_by_var (d, jvar, true, true, gg->lims_use_visible);
+  limits_set_by_var (d, jvar, true, true, d->gg->lims_use_visible);
 
   /*-- run the data through the head of the pipeline --*/
-  tform_to_world_by_var (jvar, d, gg);
+  tform_to_world_by_var (jvar, d, d->gg);
 
   vt->collab = vt->collab_tform = g_strdup (vname);
   vt->nickname = g_strndup (vname, 2);
@@ -185,16 +186,18 @@ newvar_add_with_values (gdouble * vals, gint nvals, gchar * vname,
        is set.
 */
   /*-- emit variable_added signal --*/
-  g_signal_emit (G_OBJECT (gg),
+  g_signal_emit (G_OBJECT (d->gg),
                  GGobiSignals[VARIABLE_ADDED_SIGNAL], 0, vt, d->ncols - 1, d);
 }
 
 void
-clone_vars (gint * cols, gint ncols, GGobiData * d, ggobid * gg)
+clone_vars (gint * cols, gint ncols, GGobiData * d)
 {
   gint i, k, n, jvar;
   gint d_ncols_prev = d->ncols;
   vartabled *vt;
+
+  g_return_if_fail(GGOBI_IS_GGOBI(d->gg));
 
   addvar_vartable_expand (d, ncols);
 
@@ -228,41 +231,24 @@ clone_vars (gint * cols, gint ncols, GGobiData * d, ggobid * gg)
     vt = vartable_element_get (n, d);
 
     /*-- emit variable_added signal. Is n the correct index? --*/
-    g_signal_emit (G_OBJECT (gg),
+    g_signal_emit (G_OBJECT (d->gg),
                    GGobiSignals[VARIABLE_ADDED_SIGNAL], 0, vt, n, d);
   }
 
-  /*
-   * I'm sending this expose event because sometimes the tree_view
-   * is scrambled after a variable is cloned, with the entire list
-   * of variables appearing twice.  -- dfs 1/16/2002
-   */
-  {
-    if (gg->vartable_ui.window) {
-      gboolean rval = false;
-      g_signal_emit_by_name (G_OBJECT (gg->vartable_ui.window),
-                             "expose_event",
-                             (gpointer) gg, (gpointer) & rval);
-    }
-  }
 }
 
 
-/*-------------------------------------------------------------------------*/
-/*                 eliminate the ncol columns in cols                      */
-/*                          not currently used                             */
-/*                but note that it's called by sphering!                   */
-/*-------------------------------------------------------------------------*/
-
 static gint
-plotted (gint * cols, gint ncols, GGobiData * d, ggobid * gg)
+is_variable_plotted (gint * cols, gint ncols, GGobiData * d)
 {
   GList *dlist;
   displayd *display;
   gint jplotted = -1;
 
+  g_return_if_fail(GGOBI_IS_GGOBI(d->gg));
+
   /*-- check each display for each variable --*/
-  for (dlist = gg->displays; dlist; dlist = dlist->next) {
+  for (dlist = d->gg->displays; dlist; dlist = dlist->next) {
     display = (displayd *) dlist->data;
     if (display->d != d)
       continue;
@@ -281,21 +267,22 @@ plotted (gint * cols, gint ncols, GGobiData * d, ggobid * gg)
 }
 
 gboolean
-delete_vars (gint * cols, gint ncols, GGobiData * d, ggobid * gg)
+delete_vars (gint * cols, gint ncols, GGobiData * d)
 {
   gint j;
   gint *keepers, nkeepers;
   vartabled *vt;
 
+  g_return_if_fail(GGOBI_IS_GGOBI(d->gg));
   /*-- don't allow all variables to be deleted --*/
   if (ncols >= d->ncols)
-    /**/ return false;
+    return false;
 
   /*
    * If one of the variables to be deleted is currently plotted,
    * we won't proceed until the user cleans up.
    */
-  if ((j = plotted (cols, ncols, d, gg)) != -1) {
+  if ((j = is_variable_plotted (cols, ncols, d)) != -1) {
     gchar *message;
     vt = vartable_element_get (j, d);
     message =
@@ -338,9 +325,9 @@ delete_vars (gint * cols, gint ncols, GGobiData * d, ggobid * gg)
   /*-- delete columns from pipeline arrays --*/
   arrayf_delete_cols (&d->raw, ncols, cols);
   arrayf_delete_cols (&d->tform, ncols, cols);
-  tour2d_realloc_down (ncols, cols, d, gg);
-  tour1d_realloc_down (ncols, cols, d, gg);
-  tourcorr_realloc_down (ncols, cols, d, gg);
+  tour2d_realloc_down (ncols, cols, d, d->gg);
+  tour1d_realloc_down (ncols, cols, d, d->gg);
+  tourcorr_realloc_down (ncols, cols, d, d->gg);
   if (d->nmissing)
     arrays_delete_cols (&d->missing, ncols, cols);
 
@@ -364,11 +351,11 @@ delete_vars (gint * cols, gint ncols, GGobiData * d, ggobid * gg)
 
   /*-- emit a single variable_list_changed signal when finished --*/
   /*-- doesn't need to give a variable index any more, really --*/
-  g_signal_emit (G_OBJECT (gg),
+  g_signal_emit (G_OBJECT (d->gg),
                  GGobiSignals[VARIABLE_LIST_CHANGED_SIGNAL], 0, d);
 
   /*-- run the first part of the pipeline  --*/
-  tform_to_world (d, gg);
+  tform_to_world (d, d->gg);
 
 
   g_free (keepers);
@@ -376,7 +363,7 @@ delete_vars (gint * cols, gint ncols, GGobiData * d, ggobid * gg)
   return true;
 }
 
-
+/* Not used?
 vartyped
 ggobi_data_set_var_type (GGobiData * d, int which, vartyped value)
 {
@@ -414,3 +401,4 @@ ggobi_data_set_time_var (GGobiData * d, int which, gboolean value)
 
   return (old);
 }
+*/

@@ -158,7 +158,6 @@ limits_tform_set_by_var (GGobiData * d, gint j, gboolean visible_only)
     }
   }
   else {
-
     for (i = 0; i < d->nrows; i++) {
       if (vt->nmissing > 0 && !d->missings_show_p && MISSING_P (i, j));
       else {

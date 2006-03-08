@@ -1200,7 +1200,7 @@ addVariableInternal (gdouble * vals, gint num, gchar * name,
   }
   newvar_add_with_values (vals, num, name,
                           numLevels > 0 ? categorical : real,
-                          numLevels, levels, values, counts, d, gg);
+                          numLevels, levels, values, counts, d);
 
   if (update)
     gdk_flush ();
