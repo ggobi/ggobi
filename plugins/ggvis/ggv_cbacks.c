@@ -605,7 +605,7 @@ void ggv_dims_cb (GtkAdjustment *adj, PluginInstance *inst)
         vname = g_strdup_printf ("Pos%d", j+1);
         newvar_add_with_values (dtmp, d->nrows, vname,
           real, 0, (gchar **) NULL, (gint *) NULL, (gint *) NULL,
-        d, gg);
+        d);
         g_free (vname);
       }
       g_free (dtmp);
