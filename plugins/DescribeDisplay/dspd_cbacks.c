@@ -153,8 +153,11 @@ scale_convert (splotd *sp, gint ival, gint max, greal mid, gint scale)
     list(
       projection = "",
       scale = c(x= , y= ),  # a float between 0 and 1
-      # limits are derived by converting the screen size into tform coords
-      #   and also into planar coordinates
+      # limits are derived by converting the screen size into tform
+      # coords and also into planar coordinates
+      # Update: these limits are not used in the R scripts
+      # that generate the plots, but we'll leave them in for
+      # a while just in case.  dfs, March 2006
       tformLims = c(xmin=, xmax=, ymin=, ymax=),
       planarLims = c(xmin=, xmax=, ymin=, ymax=),
       points = list(
@@ -241,6 +244,10 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
   tfmin.y = tfmax.y;
   tfmax.y = ftmp;
 
+  /* Update: none of these limits are now used in the R scripts that
+   * generate the plots, but we'll leave them in for a while just in
+   * case.  dfs, March 2006
+   */
   fprintf (fp,
     "tformLims=c(xmin=%.3f, xmax=%.3f, ymin=%.3f, ymax=%.3f),",
     tfmin.x, tfmax.x, tfmin.y, tfmax.y);
