@@ -43,6 +43,7 @@ datad_get_from_widget (GtkWidget *w, ggobid *gg)
 {
   GGobiData *d = NULL;
   GtkTreeSelection *sel;
+  gint kd;
   
   if (g_slist_length (gg->d) == 0)
     ;
@@ -52,10 +53,10 @@ datad_get_from_widget (GtkWidget *w, ggobid *gg)
     GtkWidget *tree_view = (GtkWidget *)
       g_object_get_data(G_OBJECT (w), "datad_tree_view");
     if (tree_view) {
-	sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view));
-	gint kd = tree_selection_get_selected_row(sel);
-        /*-- Assume that all datad's are included --*/
-        if (kd >= 0) d = (GGobiData *) g_slist_nth_data (gg->d, kd);
+      sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view));
+      kd = tree_selection_get_selected_row(sel);
+      /*-- Assume that all datad's are included --*/
+      if (kd >= 0) d = (GGobiData *) g_slist_nth_data (gg->d, kd);
     }
   }
 
@@ -150,9 +151,9 @@ subset_datad_set_cb (GtkTreeSelection *tree_sel, ggobid *gg)
   /*-- Assume that all datad's are included --*/
   gint row = tree_selection_get_selected_row(tree_sel);
   if (row != -1) {
-	  GGobiData *d = g_slist_nth_data (gg->d, row);
-	  if (d)
-		  subset_display_update (d, gg);
+    GGobiData *d = g_slist_nth_data (gg->d, row);
+    if (d)
+      subset_display_update (d, gg);
   }
 }
 
@@ -297,7 +298,7 @@ subset_window_open (ggobid *gg) {
       gtk_container_add (GTK_CONTAINER (gg->subset_ui.window), vbox);
 
 
-      /* Create a scrolled window to pack the CList widget into */
+      /* Create a scrolled window to pack the list widget into */
       swin = gtk_scrolled_window_new (NULL, NULL);
       gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (swin),
         GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
@@ -305,7 +306,7 @@ subset_window_open (ggobid *gg) {
       model = gtk_list_store_new(1, G_TYPE_STRING);
       tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(model));
       populate_tree_view(tree_view, tree_view_titles, G_N_ELEMENTS(tree_view_titles), 
-	true, GTK_SELECTION_SINGLE, G_CALLBACK(subset_datad_set_cb), gg);
+        true, GTK_SELECTION_SINGLE, G_CALLBACK(subset_datad_set_cb), gg);
       
       g_object_set_data(G_OBJECT (tree_view), "datad_swin", swin);
       g_signal_connect (G_OBJECT (gg), "datad_added",
@@ -314,14 +315,13 @@ subset_window_open (ggobid *gg) {
 
       /*-- All datad's are included. This assumption is used in two places. */
       for (l = gg->d; l; l = l->next) {
-	GtkTreeIter iter;
+        GtkTreeIter iter;
         d = (GGobiData *) l->data;
         subset_init (d, gg);
-	gtk_list_store_append(model, &iter);
-	gtk_list_store_set(model, &iter, 0, d->name, -1);
-	if (l == gg->d)
-	  gtk_tree_selection_select_iter(gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view)), 
-		&iter);
+        gtk_list_store_append(model, &iter);
+        gtk_list_store_set(model, &iter, 0, d->name, -1);
+        if (l == gg->d)
+          gtk_tree_selection_select_iter(gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view)), &iter);
       }
       gtk_container_add (GTK_CONTAINER (swin), tree_view);
       gtk_box_pack_start (GTK_BOX (vbox), swin, true, true, 2);
@@ -342,26 +342,26 @@ subset_window_open (ggobid *gg) {
       hb = gtk_hbox_new (false, 2);
       gtk_container_add (GTK_CONTAINER (frame), hb);
 
-	  label = gtk_label_new_with_mnemonic ("Sample si_ze");
+	    label = gtk_label_new_with_mnemonic ("Sample si_ze");
       gtk_box_pack_start (GTK_BOX (hb), label,
         false, false, 2);
   
       /*-- entry: random sample size --*/
       entry = gtk_entry_new ();
-	  gtk_label_set_mnemonic_widget(GTK_LABEL(label), entry);
+	    gtk_label_set_mnemonic_widget(GTK_LABEL(label), entry);
       g_object_set_data(G_OBJECT(gg->subset_ui.window),
         "SS:RANDOM_ENTRY", entry);
       gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), entry,
         "Type in the desired sample size", NULL);
       gtk_box_pack_start (GTK_BOX (hb), entry, true, true, 2);
 
-	  label = gtk_label_new_with_mnemonic ("_out of");
+	    label = gtk_label_new_with_mnemonic ("_out of");
       gtk_box_pack_start (GTK_BOX (hb), label,
         false, false, 2);
 
       /*-- entry: data size --*/
       entry = gtk_entry_new ();
-	  gtk_label_set_mnemonic_widget(GTK_LABEL(label), entry);
+	    gtk_label_set_mnemonic_widget(GTK_LABEL(label), entry);
       g_object_set_data(G_OBJECT(gg->subset_ui.window),
         "SS:NROWS_ENTRY", entry);
       gtk_editable_set_editable (GTK_EDITABLE (entry), false);
@@ -389,7 +389,7 @@ subset_window_open (ggobid *gg) {
       gtk_box_pack_start (GTK_BOX (vb), label, false, false, 0);
 
       spinbtn = gtk_spin_button_new (d->subset.bstart_adj, 0, 0);
-	  gtk_label_set_mnemonic_widget(GTK_LABEL(label), spinbtn);
+  	  gtk_label_set_mnemonic_widget(GTK_LABEL(label), spinbtn);
       g_object_set_data(G_OBJECT(d->subset.bstart_adj), "WIDGET", spinbtn);
       gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinbtn), false);
       gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
@@ -404,7 +404,7 @@ subset_window_open (ggobid *gg) {
       gtk_box_pack_start (GTK_BOX (vb), label, false, false, 0);
 
       spinbtn = gtk_spin_button_new (d->subset.bsize_adj, 0, 0);
-	  gtk_label_set_mnemonic_widget(GTK_LABEL(label), spinbtn);
+	    gtk_label_set_mnemonic_widget(GTK_LABEL(label), spinbtn);
       gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinbtn), false);
       gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
         spinbtn, "Specify the size of the block", NULL);
