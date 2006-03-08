@@ -1199,25 +1199,11 @@ xml_warning (const gchar * attribute, const gchar * value, const gchar * msg,
   g_printerr ("\t%s %s: value = %s\n", attribute, msg, value);
 }
 
-void
-setMissingValue (int i, int j, GGobiData * d, vartabled * vt)
-{
-  if (d->nmissing == 0) {
-    arrays_alloc (&d->missing, d->nrows, d->ncols);
-    arrays_zero (&d->missing);
-  }
-  d->missing.vals[i][j] = 1;
-  if (vt == NULL)
-    vt = vartable_element_get (j, d);
-  vt->nmissing++;
-  d->raw.vals[i][j] = 0;
-  d->nmissing++;
-}
 
 void
 xmlSetMissingValue (XMLParserData * data, GGobiData * d, vartabled * vt)
 {
-  setMissingValue (data->current_record, data->current_element, d, vt);
+  ggobi_data_set_missing(d, data->current_record, data->current_element);
 }
 
 

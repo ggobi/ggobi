@@ -165,7 +165,7 @@ newvar_add_with_values (gdouble * vals, gint nvals, gchar * vname,
         (gfloat) d->clusterid.els[i];
     }
     else if (GGobiMissingValue && GGobiMissingValue (vals[i]))
-      setMissingValue (i, jvar, d, vt);
+      ggobi_data_set_missing(d, i, jvar);
     else
       d->raw.vals[i][jvar] = d->tform.vals[i][jvar] = (gfloat) vals[i];
   }

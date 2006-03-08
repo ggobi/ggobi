@@ -278,6 +278,28 @@ class GGobi:Data from G:Object {
   {
   	self->name = g_strdup(name);
   }
+ 
+ 
+  /**
+   * set_missing:
+   * 
+   * Set specified cell to be a missing value
+   */
+  public void
+  set_missing (self, int i, int j)
+  {
+    vartabled *vt = vartable_element_get (j, self);
+    
+    if (self->nmissing == 0) {
+      arrays_alloc (&self->missing, self->nrows, self->ncols);
+      arrays_zero (&self->missing);
+    }
+    self->missing.vals[i][j] = 1;
+    self->raw.vals[i][j] = 0;
+
+    vt->nmissing++;
+    self->nmissing++;
+  }
   
 }
 
@@ -442,7 +464,7 @@ class GGobi:Data from G:Object {
   			vt->level_counts[level]++;
   		}
   		if(GGobiMissingValue && GGobiMissingValue(value))
-           setMissingValue(i, j, d, vt);
+           ggobi_data_set_missing(d, i, j);
           else d->raw.vals[i][j] = (gdouble)value;
   	}
   }
@@ -453,7 +475,7 @@ class GGobi:Data from G:Object {
   	vartabled *vt = vartable_element_get(j, d);
   	for (i = 0; i < d->nrows; i++) {
   		if(GGobiMissingValue && GGobiMissingValue(values[i]))
-           setMissingValue(i, j, d, vt);
+           ggobi_data_set_missing(d, i, j);
           else d->raw.vals[i][j] = values[i];
   	}
   }

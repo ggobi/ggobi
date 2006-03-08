@@ -610,8 +610,6 @@ extern GSList *ExtendedDisplayTypes;
 typedef GType(*GTypeLoad) (void);
 
 
-void setMissingValue(int i, int j, GGobiData *d, vartabled *vt);
-
 
 GList *getInputPluginSelections(ggobid *gg);
 

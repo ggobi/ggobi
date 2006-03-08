@@ -292,7 +292,7 @@ GGOBI (setData) (gdouble * values, gchar ** rownames, gchar ** colnames,
 
         if (values) {
           if (GGobiMissingValue && GGobiMissingValue (values[i + j * nr]))
-            setMissingValue (i, j, d, vt);
+            ggobi_data_set_missing(d, i, j);
           else
             d->raw.vals[i][j] = values[i + j * nr];
         }

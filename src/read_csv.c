@@ -417,10 +417,7 @@ load_row_values (GList * rows, GGobiData * d, gboolean row_labels)
       else {
         if (str[0] == '\0' || !g_ascii_strcasecmp (str, "na")
             || !strcmp (str, ".")) {
-          d->nmissing++;
-          vt->nmissing++;
-          d->missing.vals[i][j] = 1;
-          d->raw.vals[i][j] = 0.0;
+          ggobi_data_set_missing(d, i, j);
         }
         else {
           gint index;           /* values start from 1 */
