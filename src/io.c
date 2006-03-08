@@ -66,21 +66,34 @@ filesel_ok (GtkWidget * chooser)
         (GtkWidget *) g_object_get_data (G_OBJECT (chooser),
                                          "PluginTypeCombo");
       which = gtk_combo_box_get_active (GTK_COMBO_BOX (combo));
-      plugin = getInputPluginByModeNameIndex (which, &pluginModeName);
-      firsttime = (g_slist_length (gg->d) == 0);
 
       { // Testing URL reading interface
         GtkWidget *entry;
         gchar *url;
+        GList *els, *l;
+        gint k = 0;
 
         entry = (GtkWidget *) g_object_get_data (G_OBJECT (chooser),
                                                            "URLEntry");
         if (entry) {
           url = gtk_editable_get_chars (GTK_EDITABLE (entry), 0, -1);
-          if (url)
-            fname = url;
+          if (url) {
+            fname = url; // Reset fname
+            if (which == 0) {
+              els = getInputPluginSelections (gg);
+              for (l = els, k = 0; l; l = l->next, k++) {
+                if (g_ascii_strncasecmp((gchar *) l->data, "url", 3) == 0)
+                  break;
+              }
+              g_printerr ("%d\n", k);
+              which = k;
+            }
+          }
         }
       }
+
+      plugin = getInputPluginByModeNameIndex (which, &pluginModeName);
+      firsttime = (g_slist_length (gg->d) == 0);
 
       if (fileset_read_init (fname, pluginModeName, plugin, gg))
       /*-- destroy and rebuild the menu every time data is read in --*/
@@ -257,8 +270,10 @@ filename_get_w (GtkWidget * w, ggobid * gg)
 
   if (gg->save.format == XMLDATA)
     title = "Specify base name for new xml file";
-  else
-    title = "Specify base name for new file set";
+  else if (gg->save.format == CSVDATA)
+    title = "Specify base name for new csv file";
+  else 
+    title = "Specify base name"; // Should not happen
 
   chooser = createOutputFileSelectionDialog (title);
 
