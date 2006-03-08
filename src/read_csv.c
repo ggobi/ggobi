@@ -566,5 +566,5 @@ gboolean
 isCSVFile (const gchar * fileName, ggobid * gg, GGobiPluginInfo * plugin)
 {
   gchar *extension = strrchr (fileName, '.');
-  return(!strcmp (extension, "asc") || !strcmp (extension, "txt") || !strcmp (extension, "csv"));
+  return(extension && (!strcmp (extension, ".asc") || !strcmp (extension, ".txt") || !strcmp (extension, ".csv")));
 }
