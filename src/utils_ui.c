@@ -200,11 +200,11 @@ quick_message (const gchar * const message, gboolean modal)
 }
 
 /* This function produces a menu bar from a GtkUIManager and ui spec.
-	It accepts a GtkUIManager that is assumed to be configured with
-	the necessary actions referenced from the ui_xml that is loaded into the
-	manager before creation of the menubar. If window is non-NULL then the
-	accelerators from the GtkUIManager are loaded into the specified window.
-	*/
+   It accepts a GtkUIManager that is assumed to be configured with
+   the necessary actions referenced from the ui_xml that is loaded into the
+   manager before creation of the menubar. If window is non-NULL then the
+   accelerators from the GtkUIManager are loaded into the specified window.
+*/
 GtkWidget *
 create_menu_bar (GtkUIManager * manager, const gchar * ui_xml,
                  GtkWidget * window)
@@ -487,8 +487,8 @@ select_tree_view_row (GtkWidget * tree_view, gint row)
 }
 
 /** gets the selected row index from a GtkTreeSelection in 'single' mode.
-	if the model is a GtkTreeModelSort, it will get the row index in the child model
-	note: only works for flat views
+    if the model is a GtkTreeModelSort, it will get the row index in the child model
+    note: only works for flat views
 */
 gint
 tree_selection_get_selected_row (GtkTreeSelection * tree_sel)
@@ -755,7 +755,7 @@ create_prefixed_variable_notebook (GtkWidget * box,
 
 /*--------------------------------------------------------------------*/
 /* These are for the benefit of plugins, though they might have other */
-/* uses as well       													*/
+/* uses as well       				*/
 /* - might be nice to move to a GtkUIManager paradigm here... mfl 	*/
 /*--------------------------------------------------------------------*/
 

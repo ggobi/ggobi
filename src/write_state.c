@@ -242,8 +242,8 @@ add_xml_display(displayd *dpy, xmlDocPtr doc)
    
   /* write the width and height information so we can restore these.
      Currently, the query only returns -1! */
-	 /* should implement these as GObject properties, but I think the state
-	 will be saved via R (Rggobi) instead of here anyway - mfl */
+  /* should implement these as GObject properties, but I think the state
+     will be saved via R (Rggobi) instead of here anyway - mfl */
 /*
 #ifndef GTK_2_0
   for(i = 0; i < sizeof(props)/sizeof(props[0]); i++) {
@@ -400,15 +400,15 @@ create_plugin_xml(GGobiPluginInfo *plugin,  xmlNodePtr doc)
     el = xmlNewChild(node, NULL, BAD_CAST("author"), BAD_CAST(plugin->details->author));
 
     if(plugin->type == INPUT_PLUGIN) {
-        gchar buf[10];
-	gint k;
+      gchar buf[10];
+      gint k;
 
-        el = xmlNewChild(node, NULL, BAD_CAST("modeNames"), NULL);
-	sprintf(buf, "%d", plugin->info.i->numModeNames);
-	xmlSetProp(el,  BAD_CAST("numNodes"), BAD_CAST(buf));
+      el = xmlNewChild(node, NULL, BAD_CAST("modeNames"), NULL);
+      sprintf(buf, "%d", plugin->info.i->numModeNames);
+      xmlSetProp(el,  BAD_CAST("numNodes"), BAD_CAST(buf));
 
-	for(k = 0; k < plugin->info.i->numModeNames; k++)
-   	   xmlNewChild(el, NULL, BAD_CAST("modeName"), BAD_CAST(plugin->info.i->modeNames[k]));
+      for(k = 0; k < plugin->info.i->numModeNames; k++)
+        xmlNewChild(el, NULL, BAD_CAST("modeName"), BAD_CAST(plugin->info.i->modeNames[k]));
     }    
 
     el = xmlNewChild(node, NULL, BAD_CAST("dll"), NULL);

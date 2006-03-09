@@ -157,7 +157,7 @@ write_csv_file (FILE *f, GGobiData *d, ggobid *gg)
     cols = (gint *) g_malloc (d->ncols * sizeof (gint));
     ncols = selected_cols_get (cols, d, gg);
     if (ncols == 0)  // backup source of column selection
-	  	ncols = plotted_cols_get (cols, d, gg);
+      ncols = plotted_cols_get (cols, d, gg);
   }
 
   if (ncols) {

@@ -85,8 +85,7 @@ filesel_ok (GtkWidget * chooser)
                 if (g_ascii_strncasecmp((gchar *) l->data, "url", 3) == 0)
                   break;
               }
-              g_printerr ("%d\n", k);
-              which = k;
+              which = k;  // Reset combo box value
             }
           }
         }
@@ -268,6 +267,12 @@ filename_get_w (GtkWidget * w, ggobid * gg)
     title = "Specify base name for new csv file";
   else 
     title = "Specify base name"; // Should not happen
+
+  /* Here we would get from somewhere a list of datads in the save
+   * window.  If writing in csv, loop through the list, opening the
+   * chooser once for each csv file.   I think I'll stick with one
+   * file for the csv mode for the time being ...
+   */
 
   chooser = createOutputFileSelectionDialog (title);
 

@@ -58,9 +58,9 @@ wvis_variable_notebook_adddata_cb (ggobid *gg, GGobiData *d, void *notebook)
 
     tree_view = GTK_BIN (swin)->child;
     if (tree_view) {
-	GtkTreeSelection *tree_sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view));
-	mode = gtk_tree_selection_get_mode(tree_sel);
-	/* um is something supposed to happen here? mfl */
+      GtkTreeSelection *tree_sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view));
+      mode = gtk_tree_selection_get_mode(tree_sel);
+      /* um is something supposed to happen here? mfl */
       /*
        * should also be possible to retrieve the signal function that
        * responds to "select_row" signal
@@ -514,8 +514,8 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
     gfloat val;
     gchar *str;
     PangoRectangle rect;
-	PangoLayout *layout = gtk_widget_create_pango_layout(da, NULL);
-	
+    PangoLayout *layout = gtk_widget_create_pango_layout(da, NULL);
+
     vt = vartable_element_get (selected_var, d);
     if (vt) {
       min = vt->lim_tform.min;
@@ -527,48 +527,28 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
 
         val = min + gg->wvis.pct[k] * (max - min);
         str = g_strdup_printf ("%3.3g", val);
-		layout_text(layout, str, &rect);
-        /*gdk_text_extents (
-		  gtk_style_get_font (style),
-          str, strlen(str),
-          &lbearing, &rbearing, &width, &ascent, &descent);*/
+        layout_text(layout, str, &rect);
         x = xmargin + gg->wvis.pct[k] * (w->allocation.width - 2*xmargin);
         gdk_draw_layout(pix, gg->wvis.GC, x - rect.width/2, y - 2 - rect.height, layout);
-		/*gdk_draw_string (pix,
-          gtk_style_get_font (style),
-          gg->wvis.GC,
-          x - width/2,
-          y - 2,
-          str);*/
         g_free (str);
-	  }
+      }
 
       /*-- ... and the counts in the bottom margin --*/
       for (k=0; k<scheme->n; k++) {
         val = min + gg->wvis.pct[k] * (max - min);
         str = g_strdup_printf ("%d", gg->wvis.n[k]);
-		layout_text(layout, str, &rect);
-        /*gdk_text_extents (
-          gtk_style_get_font (style),
-          str, strlen(str),
-          &lbearing, &rbearing, &width, &ascent, &descent);*/
+        layout_text(layout, str, &rect);
         x = xmargin + gg->wvis.pct[k] * (w->allocation.width - 2*xmargin);
         diff = (k == 0) ? gg->wvis.pct[k] : gg->wvis.pct[k]-gg->wvis.pct[k-1]; 
         x -= diff/2 * (w->allocation.width - 2*xmargin);
-		gdk_draw_layout(pix, gg->wvis.GC, 
-			x - rect.width/2,
-			(w->allocation.height - ymargin) + 2,
-			layout);
-        /*gdk_draw_string (pix,
-          gtk_style_get_font (style),
-          gg->wvis.GC,
-          x - width/2,
-          (w->allocation.height - ymargin) + ascent + descent + 2,
-          str);*/
+        gdk_draw_layout(pix, gg->wvis.GC, 
+          x - rect.width/2,
+          (w->allocation.height - ymargin) + 2,
+          layout);
         g_free (str);
       }
     }
-	g_object_unref(G_OBJECT(layout));
+    g_object_unref(G_OBJECT(layout));
   }
 
   gdk_draw_pixmap (w->window, gg->wvis.GC, pix,
@@ -588,7 +568,7 @@ selection_made_cb (GtkTreeSelection *tree_sel, ggobid *gg)
 
   row = tree_selection_get_selected_row(tree_sel);
   if (row == -1)
-	  return;
+    return;
   
   bin_boundaries_set (row, d, gg);  /*-- in case the method changed --*/
   bin_counts_reset (row, d, gg);

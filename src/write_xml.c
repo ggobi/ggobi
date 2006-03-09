@@ -134,8 +134,8 @@ write_xml_variables (FILE *f, GGobiData *d, ggobid *gg, XmlWriteInfo *xmlWriteIn
     /*-- work out which columns to save --*/
     gint *cols = (gint *) g_malloc (d->ncols * sizeof (gint));
     gint ncols = selected_cols_get (cols, d, gg);
-	  if (ncols == 0)
-	  	ncols = plotted_cols_get (cols, d, gg);
+    if (ncols == 0)
+      ncols = plotted_cols_get (cols, d, gg);
     fprintf(f,"<variables count=\"%d\">\n", ncols); 
     for(j = 0; j < ncols; j++) {
       write_xml_variable (f, d, gg, cols[j], xmlWriteInfo);
@@ -166,7 +166,7 @@ write_xml_variable(FILE *f, GGobiData *d, ggobid *gg, gint j,
     fprintf(f, "    <levels count=\"%d\">\n", vt->nlevels);
     for (k=0; k<vt->nlevels; k++) {
       fprintf(f, "      <level value=\"%d\"> %s </level>\n",
-	    vt->level_values[k],
+        vt->level_values[k],
         vt->level_names[k]);
     }
     fprintf(f, "    </levels>\n");
@@ -401,7 +401,7 @@ write_xml_record (FILE *f, GGobiData *d, ggobid *gg, gint i,
     gint *cols = (gint *) g_malloc (d->ncols * sizeof (gint));
     gint ncols = selected_cols_get (cols, d, gg);
     if (ncols == 0)
-    	ncols = plotted_cols_get (cols, d, gg);
+      ncols = plotted_cols_get (cols, d, gg);
     for(j = 0; j < ncols; j++) {
       if (d->nmissing > 0 && d->missing.vals[i][j] &&
         gg->save.missing_ind != MISSINGSIMPUTED)
@@ -440,10 +440,10 @@ write_xml_edges (FILE *f, GGobiData *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
   */
   fprintf(f, 
     "<edges count=\"%d\" name=\"%s\" color=\"%d\" glyphType=\"%s\" glyphSize=\"%s\">\n",
-	  d->edge.n, d->name, 
-          xmlWriteInfo->defaultColor,
-	  xmlWriteInfo->defaultGlyphTypeName, 
-          xmlWriteInfo->defaultGlyphSizeName);
+    d->edge.n, d->name, 
+    xmlWriteInfo->defaultColor,
+    xmlWriteInfo->defaultGlyphTypeName, 
+    xmlWriteInfo->defaultGlyphSizeName);
 
   for(i = 0; i < d->edge.n; i++) {
     fprintf(f, "<edge");
