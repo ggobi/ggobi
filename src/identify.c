@@ -92,7 +92,7 @@ sticky_id_toggle (GGobiData * d, ggobid * gg)
          Gtk objects (soon now!) */
       g_signal_emit (G_OBJECT (gg),
                      GGobiSignals[STICKY_POINT_REMOVED_SIGNAL], 0,
-                     d->nearest_point, (gint) UNSTICKY, d);
+                     d->nearest_point, (gint) STICKY_REMOVE, d);
     }
     else {
       ptr = GINT_TO_POINTER (d->nearest_point);
@@ -102,7 +102,7 @@ sticky_id_toggle (GGobiData * d, ggobid * gg)
          Gtk objects (soon now!) */
       g_signal_emit (G_OBJECT (gg),
                      GGobiSignals[STICKY_POINT_ADDED_SIGNAL], 0,
-                     d->nearest_point, (gint) STICKY, d);
+                     d->nearest_point, (gint) STICKY_ADD, d);
     }
   }
 }
@@ -168,7 +168,6 @@ sticky_id_link_by_id (gint whattodo, gint k, GGobiData * source_d,
   gboolean i_in_list = false;
   GSList *ll;
   gpointer ptr = NULL;
-
 
   /*-- k is the row number in source_d --*/
 
