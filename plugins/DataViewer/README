@@ -1,0 +1,3 @@
+A simple spreadsheet-like display of a GGobi dataset. Allows 
+find-as-you-type searching on the rownames, editing of cells, and linked 
+selections with GGobi plots.
