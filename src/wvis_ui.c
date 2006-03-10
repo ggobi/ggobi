@@ -35,9 +35,9 @@ static gint ymargin = 20;
 static void bin_counts_reset (gint jvar, GGobiData *d, ggobid *gg);
 static void selection_made_cb (GtkTreeSelection *tree_sel, ggobid *gg);
 
-/*--------------------------------------------------------------------*/
-/*      Notebook containing the variable list for each datad          */
-/*--------------------------------------------------------------------*/
+/*----------------------------------------------------------------*/
+/*      Notebook containing the variable list for each datad      */
+/*----------------------------------------------------------------*/
 
 /*
  * Apparently I have to override these functions from utils_ui.c
@@ -456,8 +456,12 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
   GdkPixmap *pix = gg->wvis.pix;
 
   if(tree_view) {
-   d = (GGobiData *) g_object_get_data(G_OBJECT (tree_view), "datad");
-   selected_var = get_one_selection_from_tree_view (tree_view, d);
+    d = (GGobiData *) g_object_get_data(G_OBJECT (tree_view), "datad");
+    selected_var = get_one_selection_from_tree_view (tree_view, d);
+    if (selected_var == -1) {
+      selected_var = 0;
+      select_tree_view_row (GTK_TREE_VIEW(tree_view), selected_var);
+    }
   }
 
   if (gg->wvis.GC == NULL)

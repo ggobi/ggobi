@@ -486,9 +486,9 @@ select_tree_view_row (GtkWidget * tree_view, gint row)
   gtk_tree_path_free (path);
 }
 
-/** gets the selected row index from a GtkTreeSelection in 'single' mode.
-    if the model is a GtkTreeModelSort, it will get the row index in the child model
-    note: only works for flat views
+/** gets the selected row index from a GtkTreeSelection in 'single'
+    mode.  if the model is a GtkTreeModelSort, it will get the row
+    index in the child model note: only works for flat views
 */
 gint
 tree_selection_get_selected_row (GtkTreeSelection * tree_sel)
@@ -755,8 +755,8 @@ create_prefixed_variable_notebook (GtkWidget * box,
 
 /*--------------------------------------------------------------------*/
 /* These are for the benefit of plugins, though they might have other */
-/* uses as well       				*/
-/* - might be nice to move to a GtkUIManager paradigm here... mfl 	*/
+/* uses as well                                                       */
+/* - might be nice to move to a GtkUIManager paradigm here... mfl     */
 /*--------------------------------------------------------------------*/
 
 GtkWidget *
