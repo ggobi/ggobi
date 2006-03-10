@@ -1,3 +1,0 @@
-PKG=ggvis
-
-PLUGIN_CFLAGS+=-g

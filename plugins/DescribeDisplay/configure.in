@@ -1,4 +1,0 @@
-AC_INIT(dspdesc.c)
-
-AC_OUTPUT(local.config)
-

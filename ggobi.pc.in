@@ -1,15 +1,13 @@
 # File for pkg-config
 #
-
 prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
 
 Name: libggobi
 Version: @GGOBI_VERSION_STRING@
 Description: GGobi library for dynamic graphics.
 Requires: gtk+-2.0, libxml-2.0
-Libs: @INSTALL_SRC_LIBS@
-Cflags: @INSTALL_SRC_CFLAGS@ @OTHER_CFLAGS@
-# @DEFS@
-
-Home=@GGOBI_INSTALL_HOME@
-
+Libs: -L${libdir} -lggobi
+Cflags: @GGOBI_CFLAGS@

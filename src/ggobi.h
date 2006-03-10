@@ -609,7 +609,8 @@ void gtk_marshal_NONE__INT_POINTER_POINTER_POINTER(GtkObject * object,
 extern GSList *ExtendedDisplayTypes;
 typedef GType(*GTypeLoad) (void);
 
-
+gchar* ggobi_find_data_file(const gchar *name);
+gchar* ggobi_find_config_file(const gchar *name);
 
 GList *getInputPluginSelections(ggobid *gg);
 

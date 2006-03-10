@@ -1,4 +1,0 @@
-AC_INIT(ggvis.c)
-
-AC_OUTPUT(local.config)
-

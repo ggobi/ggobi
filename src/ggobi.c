@@ -471,6 +471,8 @@ ggobiInit (int *argc, char **argv[])
 #endif
 
   initSessionOptions (*argc, *argv);
+  
+  plugin_init ();
 
   GGOBI_TYPE_GGOBI;
   registerDisplayTypes ((GTypeLoad *) typeLoaders,
@@ -577,6 +579,7 @@ processRestoreFile (const gchar * const fileName, ggobid * gg)
 
 /*
  Computes where GGobi directory is located.
+ Search order: $GGOBI_HOME or 'str' stripped of file
 */
 static gchar *
 computeGGobiHome (char *str)
@@ -621,9 +624,9 @@ initSessionOptions (int argc, char **argv)
 
   sessionOptions->useRadioMenuItems = false;
 
-  sessionOptions->info->colorSchemeFile =
-    g_build_filename (sessionOptions->ggobiHome, "share", "colorschemes.xml",
-                      NULL);
+  tmp = g_build_filename("share", "colorschemes.xml", NULL);
+  sessionOptions->info->colorSchemeFile = ggobi_find_data_file(tmp);
+  g_free(tmp);
 
   sessionOptions->defaultTourSpeed = 50.0;
   sessionOptions->defaultTour1dSpeed = 40.0;
@@ -822,13 +825,81 @@ ValidateDisplayRef (displayd * d, ggobid * gg, gboolean fatal)
   return (NULL);
 }
 
+static gchar *
+ggobi_find_file_in_dir(const gchar *name, const gchar *dir, gboolean ggobi)
+{
+  gchar *tmp_name = g_build_filename(dir, ggobi ? "ggobi" : "", name, NULL);
+  if (file_is_readable(tmp_name))
+    return(tmp_name);
+  g_free(tmp_name);
+  return(NULL);
+}
+
+static gchar * 
+ggobi_find_file(const gchar *name, const gchar* const *systems, const gchar *user)
+{
+  gchar *tmp_name, *cur_dir = g_get_current_dir();
+  gint i;
+  
+  g_debug("Looking for %s", name);
+  tmp_name = ggobi_find_file_in_dir(name, sessionOptions->ggobiHome, false);
+  if (tmp_name)
+    return(tmp_name);
+  
+  tmp_name = ggobi_find_file_in_dir(name, cur_dir, false);
+  if (tmp_name)
+    return(tmp_name);
+  g_free(cur_dir);
+  
+  tmp_name = ggobi_find_file_in_dir(name, user, true);
+  if (tmp_name)
+    return(tmp_name);
+  
+  for (i = 0; systems[i]; i++) {
+    tmp_name = ggobi_find_file_in_dir(name, systems[i], true);
+    if (tmp_name)
+      return(tmp_name);
+  }
+  
+  return(NULL);
+}
+
+/* Looks in (by default):
+    $GGOBI_HOME
+    Current directory
+    $HOME/.local/share/ggobi (Windows: Documents, Application Data for user)
+    /usr/local/share/ggobi (Windows: Documents, Application Data for All Users)
+    /usr/share/ggobi (Windows: 'share' under dir with dll (maybe) or exe)
+*/
+gchar*
+ggobi_find_data_file(const gchar *name) 
+{
+  gchar *path = ggobi_find_file(name, g_get_system_data_dirs(), g_get_user_data_dir());
+  g_debug("Found data file: %s", path);
+  return(path);
+}
+/* Looks in (by default):
+    $GGOBI_HOME
+    Current directory
+    $HOME/.config/ggobi
+    /etc/xdg/ggobi
+    Windows behavior the same for data file above.
+*/
+gchar*
+ggobi_find_config_file(const gchar *name)
+{
+  gchar *path = ggobi_find_file(name, g_get_system_config_dirs(), g_get_user_config_dir());
+  g_debug("Found config file: %s", path);
+  return(path);
+}
+
 /*
   Determines which initialization file to use
   Checks for the one specified by
     1) the -init command line option
     2) the GGOBIRC environment variable
     3) the $HOME/.ggobirc file.
-    4) ggobirc in GGOBI_HOME
+    4) user and system GGobi config dirs
  */
 void
 process_initialization_files ()
@@ -851,8 +922,7 @@ process_initialization_files ()
         }
       }
       if (!fileName)
-        fileName =
-          g_build_filename (sessionOptions->ggobiHome, "ggobirc", NULL);
+        fileName = ggobi_find_config_file("ggobirc");
     }
     if (fileName)
       sessionOptions->initializationFile = g_strdup (fileName);

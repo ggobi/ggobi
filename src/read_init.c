@@ -61,8 +61,6 @@ void getInputPluginValues (xmlNodePtr node, GGobiInputPluginInfo * plugin,
                            xmlDocPtr doc);
 gboolean getPluginDetails (xmlNodePtr node, GGobiPluginDetails * plugin,
                            xmlDocPtr doc);
-gboolean loadPluginLibrary (GGobiPluginDetails * plugin,
-                            GGobiPluginInfo * realPlugin);
 
 gboolean getPluginLanguage (xmlNodePtr node, GGobiPluginInfo * gplugin,
                             GGobiPluginType type, GGobiInitInfo * info);
@@ -515,23 +513,6 @@ getDisplayDescription (xmlNodePtr node)
  tag and passing it processPlugin().
 */
 
-
-GGobiPluginInfo *
-getLanguagePlugin (GList * plugins, const char *name)
-{
-  GList *el = plugins;
-
-  while (el) {
-    GGobiPluginInfo *info;
-    info = (GGobiPluginInfo *) el->data;
-    if (strcmp (info->details->name, name) == 0)
-      return (info);
-    el = el->next;
-  }
-  return (NULL);
-}
-
-
 static gboolean
 processXMLPluginNode (xmlNodePtr el, GGobiInitInfo * info, xmlDocPtr doc)
 {
@@ -791,56 +772,6 @@ getPluginSymbols (xmlNodePtr node, GGobiPluginInfo * plugin, xmlDocPtr doc,
       fflush (stderr);
     }
   }
-}
-
-
-gboolean
-loadPluginLibrary (GGobiPluginDetails * plugin, GGobiPluginInfo * realPlugin)
-{
-  /* If it has already been loaded, just return. */
-  if (plugin->loaded != DL_UNLOADED) {
-    return (plugin->loaded == DL_FAILED ? false : true);
-  }
-
-  /* Load any plugins on which this one depends. Make certain they 
-     are fully loaded and initialized. Potential for inter-dependencies
-     that would make this an infinite loop. Hope the user doesn't get this
-     wrong as there are no checks at present.
-   */
-  if (plugin->depends) {
-    GSList *el = plugin->depends;
-    while (el) {
-      gchar *tmp = (gchar *) el->data;
-      GGobiPluginInfo *info;
-      info = getLanguagePlugin (sessionOptions->info->plugins, tmp);
-      if (sessionOptions->verbose == GGOBI_VERBOSE) {
-        fprintf (stderr, "Loading dependent plugin %s\n", tmp);
-        fflush (stderr);
-      }
-      if (!loadPluginLibrary (info->details, info))
-        return (false);
-      el = el->next;
-    }
-  }
-
-  plugin->library = load_plugin_library (plugin, true);
-  plugin->loaded = plugin->library != NULL ? DL_LOADED : DL_FAILED;
-
-  if (plugin->loaded == DL_LOADED && GGobi_checkPlugin (plugin)
-      && plugin->onLoad) {
-    OnLoad f = (OnLoad) getPluginSymbol (plugin->onLoad, plugin);
-    if (f) {
-      f (0, realPlugin);
-    }
-    else {
-      gchar buf[1000];
-      dynload->getError (buf, plugin);
-      fprintf (stderr, "error on loading plugin library %s: %s\n",
-               plugin->dllName, buf);
-      fflush (stderr);
-    }
-  }
-  return (plugin->loaded == DL_LOADED);
 }
 
 gboolean

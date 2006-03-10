@@ -1,8 +1,0 @@
-ifndef GGOBI_HOME
- GGOBI_HOME=../..
-endif
-
-DIR_NAME=DataViewer
-
-include $(GGOBI_HOME)/plugins/GNUmakefile.PluginAdmin
-

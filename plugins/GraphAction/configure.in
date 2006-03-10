@@ -1,4 +1,0 @@
-AC_INIT(graphact.c)
-
-AC_OUTPUT(local.config)
-

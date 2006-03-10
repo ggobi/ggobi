@@ -1,0 +1,50 @@
+lib_LTLIBRARIES     = libggobi.la
+libggobi_la_GOBS = data.gob
+libggobi_la_GOBSOURCES = $(libggobi_la_GOBS:%.gob=ggobi-%.c)
+libggobi_la_GOBOBJECTS = $(libggobi_la_GOBS:%.gob=ggobi-%.lo)
+libggobi_la_GOBHEADERS = $(libggobi_la_GOBS:%.gob=ggobi-%.h)
+libggobi_la_LDFLAGS  = @GTK_LIBS@ @LIBXML_LIBS@ -no-undefined
+libggobi_la_SOURCES = array.c ash1d.c barchart.c barchartClass.c \
+  barchart_ui.c brush.c brush_api.c brush_bins.c brush_init.c brush_link.c \
+  brush_ui.c color.c color_ui.c cpanel.c display.c display_tree.c display_ui.c \
+  edges.c exclusion.c exclusion_ui.c extendedDisplay.c fileio.c ggobi-API.c \
+  ggobi.c GGobiAppClass.c ggobiClass.c help.c identify.c identify_ui.c \
+  impute.c impute_ui.c io.c jitter.c jitter_ui.c limits.c lineedit.c \
+  lineedit_ui.c main_ui.c make_ggobi.c marshal.c menus.c missing.c \
+  movepts.c movepts_ui.c noop-toggle.c p1d.c p1d_ui.c parcoords.c \
+  parcoordsClass.c parcoords_ui.c plugin.c pipeline.c ppcorr_ui.c print.c \
+  read_init.c read_color.c read_csv.c read_xml.c scale_api.c scale_drag.c \
+  scale_ui.c scatmat.c scatmatClass.c scatmat_ui.c scatterplot.c \
+  scatterplotClass.c scatterplot_ui.c schemes.c schemes_ui.c sphere.c \
+  sphere_ui.c splash.c splot.c sp_plot.c sp_plot_axes.c sp_plot_edges.c \
+  subset.c subset_ui.c svd.c texture.c timeplot.c time_ui.c tour.c tour1d.c \
+  tour1d_pp.c tour1d_pp_ui.c tour1d_ui.c tour2d.c tour2d3.c tour2d3_ui.c \
+  tour2d_pp.c tour2d_pp_ui.c tour2d_ui.c tourcorr.c tourcorr_ui.c tour_pp.c \
+  transform.c transform_ui.c tsdisplay.c tsPlot.c utils.c utils_gdk.c \
+  utils_pango.c utils_ui.c varchange.c varcircles.c varpanel_ui.c vartable.c \
+  vartable_nbook.c vartable_ui.c vector.c win32_draw.c writedata_ui.c \
+  write_csv.c write_state.c write_xml.c wvis.c wvis_ui.c xlines.c xyplot.c \
+  xyplot_ui.c
+libggobi_la_LIBADD = $(libggobi_la_GOBOBJECTS) @LIBLTDL@
+libggobi_la_DEPENDENCIES = $(libggobi_la_GOBOBJECTS)
+include_HEADERS = GGobiAPI.h ggobiClass.h tour1d_pp.h GGobiApp.h \
+  noop-toggle.h tour2d_pp.h GGobiEvents.h parcoordsClass.h tour_pp.h \
+  barchartDisplay.h plugin.h tsPlot.h brushing.h print.h tsdisplay.h \
+  colorscheme.h read_csv.h types.h config.h read_init.h vars.h cpanel.h \
+  read_xml.h varseldata.h defines.h scatmatClass.h vartable.h display.h \
+  scatterplotClass.h write_state.h display_tree.h splash.h write_xml.h \
+  externs.h splot.h writedata.h fileio.h testEvents.h ggobi.h tour.h \
+  $(libggobi_la_GOBHEADERS)
+
+BUILT_SOURCES = $(libggobi_la_GOBSOURCES) $(libggobi_la_GOBHEADERS)
+
+MAINTAINERCLEANFILES = $(BUILT_SOURCES)
+
+$(libggobi_la_GOBSOURCES): $(libggobi_la_GOBSOURCES:ggobi-%.c=%.gob)
+	@GOB2@ --no-touch $<
+          
+bin_PROGRAMS  = ggobi
+ggobi_SOURCES = ggobiMain.c
+ggobi_LDADD   = libggobi.la
+
+INCLUDES = @SRC_DEBUG@ @GTK_CFLAGS@ @LIBXML_CFLAGS@ @INCLTDL@ 

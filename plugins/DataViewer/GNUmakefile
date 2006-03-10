@@ -1,3 +1,0 @@
-PKG=DataViewer
-
-PLUGIN_CFLAGS=-g

@@ -22,56 +22,23 @@
 #include <stdio.h>
 #include <string.h>
 
-HINSTANCE ggobi_dlopen (const char *name, GGobiPluginDetails * plugin);
-void ggobi_dlerror (char *buf, GGobiPluginDetails * plugin);
-
-#ifdef G_OS_WIN32
-
-int ggobi_dlclose (HINSTANCE handle);
-DLFUNC ggobi_dlsym (HINSTANCE handle, const char *name);
-
-static const Dynload winDynload = {
-  ggobi_dlopen,
-  ggobi_dlclose,
-  ggobi_dlsym,                  /* warning because we use const char * */
-  ggobi_dlerror
-};
-const Dynload *dynload = &winDynload;
-
-#else
-
-#include <dlfcn.h>
-static const Dynload unixDynload = { ggobi_dlopen,
-  dlclose,
-  dlsym,                        /* warning because we use const char * */
-  ggobi_dlerror
-};
-const Dynload *dynload = &unixDynload;
-
-#endif
-
-
-#ifndef G_OS_WIN32
-#ifndef Darwin
-#define DLL_EXTENSION ".so"
-#else
-#define DLL_EXTENSION ".dylib"
-#endif
-#else
-
-#include <glib.h>
-# ifdef __STRICT_ANSI__
-# undef   __STRICT_ANSI__
-# endif
-
-#define DLL_EXTENSION ".dll"
-
-#endif
-
 void addPluginDetails (GGobiPluginDetails * info, GtkWidget * list,
                        ggobid * gg, gboolean active);
 void addInputPlugin (GGobiPluginInfo * info, GtkWidget * list, ggobid * gg);
 void addPlugin (GGobiPluginInfo * info, GtkWidget * list, ggobid * gg);
+
+void plugin_init() {
+  const gchar * const *dirs = g_get_system_data_dirs();
+  gint i;
+  
+  lt_dlinit();
+  
+  lt_dladdsearchdir(sessionOptions->ggobiHome);
+  lt_dladdsearchdir(g_get_current_dir());
+  lt_dladdsearchdir(g_get_user_data_dir());
+  for (i = 0; dirs[i]; i++)
+    lt_dladdsearchdir(dirs[i]);
+}
 
 gboolean
 GGobi_checkPlugin (GGobiPluginDetails * plugin)
@@ -96,96 +63,101 @@ GGobi_checkPlugin (GGobiPluginDetails * plugin)
   return (ok);
 }
 
-gchar *
-installed_file_name (char *name)
+GGobiPluginInfo *
+getLanguagePlugin (GList * plugins, const char *name)
 {
-  return (g_build_filename (sessionOptions->ggobiHome, name, NULL));
+  GList *el = plugins;
+
+  while (el) {
+    GGobiPluginInfo *info;
+    info = (GGobiPluginInfo *) el->data;
+    if (strcmp (info->details->name, name) == 0)
+      return (info);
+    el = el->next;
+  }
+  return (NULL);
 }
 
-HINSTANCE
-load_plugin_library (GGobiPluginDetails * plugin, gboolean recurse)
+gboolean
+loadPluginLibrary (GGobiPluginDetails * plugin, GGobiPluginInfo * realPlugin)
 {
-  HINSTANCE handle;
-  char *fileName;
-  fileName = plugin->dllName;
-
-  if (!fileName || !fileName[0]) {
-    plugin->loaded = DL_UNLOADED;
-    return (NULL);
+  /* If it has already been loaded, just return. */
+  if (plugin->loaded != DL_UNLOADED) {
+    return (plugin->loaded == DL_FAILED ? false : true);
   }
 
-  if (file_is_readable (fileName) == false)
-    fileName = g_strdup_printf ("%s%s", plugin->dllName, DLL_EXTENSION);
+  /* Load any plugins on which this one depends. Make certain they 
+     are fully loaded and initialized. Potential for inter-dependencies
+     that would make this an infinite loop. Hope the user doesn't get this
+     wrong as there are no checks at present.
+   */
+  if (plugin->depends) {
+    GSList *el = plugin->depends;
+    while (el) {
+      gchar *tmp = (gchar *) el->data;
+      GGobiPluginInfo *info;
+      info = getLanguagePlugin (sessionOptions->info->plugins, tmp);
+      if (sessionOptions->verbose == GGOBI_VERBOSE) {
+        fprintf (stderr, "Loading dependent plugin %s\n", tmp);
+        fflush (stderr);
+      }
+      if (!loadPluginLibrary (info->details, info))
+        return (false);
+      el = el->next;
+    }
+  }
 
-  if (file_is_readable (fileName) == false && recurse) {
-    char *tmp = plugin->dllName;
-    if (fileName != plugin->dllName)
-      g_free (fileName);
+  plugin->library = load_plugin_library (plugin, true);
+  plugin->loaded = plugin->library != NULL ? DL_LOADED : DL_FAILED;
 
-    plugin->dllName = installed_file_name (plugin->dllName);
-
-    handle = load_plugin_library (plugin, false);
-    if (!handle) {
-      g_free (plugin->dllName);
-      plugin->dllName = tmp;
+  if (plugin->loaded == DL_LOADED && GGobi_checkPlugin (plugin)
+      && plugin->onLoad) {
+    OnLoad f = (OnLoad) getPluginSymbol (plugin->onLoad, plugin);
+    if (f) {
+      f (0, realPlugin);
     }
     else {
-      g_free (tmp);
+      g_critical("error loading plugin %s: %s",
+               plugin->dllName, lt_dlerror());
     }
-    return (handle);
   }
+  return (plugin->loaded == DL_LOADED);
+}
 
-  if (file_is_readable (fileName) == false) {
-    if (sessionOptions->verbose != GGOBI_SILENT) {
-      g_warning("can't locate plugin library %s:", plugin->dllName);
-    }
-    if (fileName != plugin->dllName)
-      g_free (fileName);
-    plugin->loaded = DL_LOADED;
-    return (NULL);
-  }
-
-  handle = dynload->open (fileName, plugin);
+lt_dlhandle
+load_plugin_library (GGobiPluginDetails * plugin, gboolean recurse)
+{
+  lt_dlhandle handle;
+  const char *fileName = plugin->dllName;
+  handle = lt_dlopen(fileName);
   if (!handle) {
     if (sessionOptions->verbose != GGOBI_SILENT) {
-      char buf[1000];
-      dynload->getError (buf, plugin);
-      fprintf (stderr, "error on loading plugin library %s (%s): %s\n",
-               plugin->dllName, fileName, buf);
-      fflush (stderr);
+      g_critical("Error on loading plugin library %s: %s",
+               plugin->dllName, lt_dlerror());
     }
     plugin->loaded = DL_FAILED;
   }
   else {
     plugin->loaded = DL_LOADED;
   }
-
-  if (fileName != plugin->dllName)
-    g_free (fileName);
   return (handle);
 }
 
 
-DLFUNC
+lt_ptr
 getPluginSymbol (const char *name, GGobiPluginDetails * plugin)
 {
-  char tmp[100];
-  HINSTANCE lib;
-#ifdef HAVE_UNDERSCORE_SYMBOL_PREFIX
-  sprintf (tmp, "_%s", name);
-#else
-  sprintf (tmp, "%s", name);
-#endif
+  lt_dlhandle lib;
 
   if (!plugin)
-    lib = NULL;
+    return(NULL);
   else if (plugin->library == NULL && plugin->loaded != DL_LOADED) {
     lib = plugin->library = load_plugin_library (plugin, true);
   }
   else
     lib = plugin->library;
 
-  return (dynload->resolve (lib, tmp));
+  return (lt_dlsym(lib, name));
 }
 
 
@@ -219,8 +191,8 @@ registerPlugin (ggobid * gg, GGobiPluginInfo * plugin)
         g_free (inst);
     }
     else {
-      fprintf (stderr, "can't locate routine %s\n", plugin->info.g->onCreate);
-      fflush (stderr);
+      g_critical("can't locate required plugin routine %s in %s", 
+        plugin->info.g->onCreate, plugin->details->name);
     }
   }
   else {
@@ -564,87 +536,7 @@ runInteractiveInputPlugin (ggobid * gg)
   return (plugin);
 }
 
-
-
 /***************************************************************************/
-
-#ifdef G_OS_WIN32
-
-HINSTANCE
-ggobi_dlopen (const char *name, GGobiPluginDetails * plugin)
-{
-  return (LoadLibrary (name));
-}
-
-void
-ggobi_dlerror (char *buf, GGobiPluginDetails * plugin)
-{
-  LPVOID lpMsgBuf;
-  FormatMessage (FORMAT_MESSAGE_ALLOCATE_BUFFER |
-                 FORMAT_MESSAGE_FROM_SYSTEM |
-                 FORMAT_MESSAGE_IGNORE_INSERTS,
-                 NULL,
-                 GetLastError (),
-                 MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT),
-                 (LPTSTR) & lpMsgBuf, 0, NULL);
-  strcpy (buf, "Failure in LoadLibrary:  ");
-  strcat (buf, lpMsgBuf);
-  LocalFree (lpMsgBuf);
-}
-
-int
-ggobi_dlclose (HINSTANCE handle)
-{
-  FreeLibrary (handle);
-  return (0);
-}
-
-
-DLFUNC
-ggobi_dlsym (HINSTANCE handle, const char *name)
-{
-  return ((DLFUNC) GetProcAddress (handle, name));
-}
-
-
-#else
-
-HINSTANCE
-ggobi_dlopen (const char *name, GGobiPluginDetails * plugin)
-{
-  return (dlopen (name, RTLD_LOCAL | RTLD_NOW));
-}
-
-void
-ggobi_dlerror (char *buf, GGobiPluginDetails * plugin)
-{
-  sprintf (buf, dlerror ());
-}
-
-#endif
-
-void
-checkDLL ()
-{
-  HINSTANCE handle;
-  DLFUNC f;
-  char *fileName = "testDLL.dll";
-  fprintf (stderr, "Checking plugins on Windows\n");
-  fflush (stderr);
-  handle = dynload->open (fileName, NULL);
-  if (!handle) {
-    fprintf (stderr, "Cannot load %s\n", fileName);
-    return;
-  }
-
-  f = (DLFUNC) dynload->resolve (handle, "testRun");
-  if (!f) {
-    fprintf (stderr, "Cannot find testRun routine\n");
-    return;
-  }
-
-  f ();
-}
 
 gchar *XMLModeNames[] = { "xml", "url" };
 GGobiInputPluginInfo XMLInputPluginInfo = {
@@ -698,25 +590,6 @@ createGGobiInputPluginInfo (GGobiInputPluginInfo * info,
                             guint numModes)
 {
   GGobiPluginInfo *plugin;
-#ifdef G_OS_WIN32
-  static HINSTANCE ggobiLibrary = NULL;
-
-  if (!details->dllName && !details->library) {
-
-    if (!ggobiLibrary) {
-      ggobiLibrary = ggobi_dlopen (sessionOptions->cmdArgs[0], details);
-
-      if (!ggobiLibrary) {
-        char buf[1000];
-        g_printerr ("Failed to load ggobi as library\n");
-        ggobi_dlerror (buf, plugin);
-        g_printerr (buf);
-      }
-    }
-
-    details->library = ggobiLibrary;
-  }
-#endif
 
   plugin = (GGobiPluginInfo *) g_malloc0 (sizeof (GGobiPluginInfo));
 

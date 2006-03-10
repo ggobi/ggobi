@@ -1,4 +1,0 @@
-AC_INIT(varcloud.c)
-
-AC_OUTPUT(local.config)
-

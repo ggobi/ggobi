@@ -17,13 +17,11 @@
 #ifndef GGOBI_PLUGIN_H
 #define GGOBI_PLUGIN_H
 
-#include "ggobi.h"
+#include <libxml/tree.h>
 
-#ifndef WIN32
-typedef void * HINSTANCE;
-#else
-#include <windows.h>
-#endif
+#include <ltdl.h>
+
+#include "ggobi.h"
 
 typedef enum {GENERAL_PLUGIN, INPUT_PLUGIN} GGobiPluginType;
 
@@ -34,7 +32,7 @@ typedef void (*DLFUNC)();
 typedef struct {
     gchar *name;
     gchar *dllName;
-    HINSTANCE library;
+    lt_dlhandle library;
 
     gchar *description;
     gchar *author;
@@ -64,9 +62,6 @@ typedef struct {
   The two plugin types should share the common information.
  */
 struct   _GGobiInputPluginInfo {
-#if 0
-    gchar *_modeName;
-#endif
     gchar **modeNames;
     guint numModeNames;
     gchar *read_symbol_name;
@@ -98,11 +93,6 @@ struct _GGobiPluginInfo {
 };
 
 
-#ifdef USE_GNOME_XML
-#include <gnome-xml/tree.h>
-#else
-#include <libxml/tree.h>
-#endif
 
 typedef gboolean (*ProcessPluginInfo)(xmlNodePtr, GGobiPluginInfo *, GGobiPluginType, GGobiPluginInfo *, GGobiInitInfo *info);
 
@@ -129,23 +119,11 @@ typedef gboolean (*OnUnload)(gboolean quitting, GGobiPluginInfo *plugin);
 
 typedef gboolean (*OnUpdateDisplayMenu)(ggobid *gg, PluginInstance *inst);
 
+lt_dlhandle load_plugin_library(GGobiPluginDetails *plugin, gboolean recurse);
 
-typedef struct {
+lt_ptr getPluginSymbol(const gchar *name, GGobiPluginDetails *plugin);
 
-  HINSTANCE (*open)(const gchar *name, GGobiPluginDetails *info);
-  int   (*close)(HINSTANCE);
-  DLFUNC  (*resolve)(HINSTANCE handle, const gchar *name);
-  void  (*getError)(gchar *buf, GGobiPluginDetails *info);
-
-} Dynload;
-
-
-
-extern const Dynload *dynload;
-
-HINSTANCE load_plugin_library(GGobiPluginDetails *plugin, gboolean recurse);
-
-DLFUNC getPluginSymbol(const gchar *name, GGobiPluginDetails *plugin);
+void plugin_init();
 
 gboolean registerPlugins(ggobid *gg, GList *plugins);
 gboolean pluginsUpdateDisplayMenu(ggobid *gg, GList *plugins);
@@ -158,6 +136,7 @@ void closePlugins(ggobid *gg);
 GGobiPluginInfo *runInteractiveInputPlugin(ggobid *gg);
 GtkWidget *showPluginInfo(GList *plugins, GList *inputPlugins, ggobid *gg);
 
+GGobiPluginInfo *getLanguagePlugin (GList * plugins, const char *name);
 gboolean loadPluginLibrary(GGobiPluginDetails *plugin, GGobiPluginInfo *realPlugin);
 gboolean GGobi_checkPlugin(GGobiPluginDetails *plugin);
 gboolean setLanguagePluginInfo(GGobiPluginDetails *details, const gchar *language, GGobiInitInfo *info);

@@ -3,19 +3,9 @@ implementation of a radial layout, in which it lays out the nodes in
 concentric circles, with the first node in the list appearing at the
 center.
 
-In order to use two more layout methods, pick up the graphviz package
-from graphviz.org.  Currently (May 11, 2004), you must use Version
-1.12 which can be obtained here:
+In order to use more layout methods, pick up the graphviz package
+from graphviz.org.  Currently (Mar 2006), you must use Version
+2.3 which can be obtained here:
    http://www.research.att.com/sw/tools/graphviz/download.html
-
-Other instructions to build and use the graphviz methods in this
-plugin:
-
-GRAPHVIZ must be defined in your local.config file, ie
-   GRAPHVIZ = 1
-The build process depends on dotneato-config being in your PATH, and
-the directory indicated by `dotneao-config --libs` must be in your
-LD_LIBRARY_PATH in order to use the layout methods.
-
 
 

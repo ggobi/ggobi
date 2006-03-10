@@ -1,3 +1,0 @@
-AC_INIT(worksheet.c)
-
-AC_OUTPUT(local.config)
