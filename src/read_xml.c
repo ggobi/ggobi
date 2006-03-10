@@ -189,7 +189,6 @@ read_xml_input_description (const char *const fileName,
 
 
 
-
 void
 ggobi_XML_warning_handler (void *data, const gchar * msg, ...)
 {
@@ -502,10 +501,7 @@ completeCategoricalLevels (XMLParserData * data)
              el->collab, min, min + el->nlevels - 1);
     for (k = 0; k < el->nlevels; k++) {
       el->level_values[k] = min + k;
-/* XXX
- * To be really correct, we should probably free any level_names
- * that may have been already created ...
-*/
+      if (el->level_names[k]) g_free(el->level_names[k]);
       el->level_names[k] = g_strdup_printf ("L%d", k + 1);
     }
   }
@@ -526,8 +522,10 @@ categoricalLevels (const xmlChar ** attrs, XMLParserData * data)
       el->level_values = (gint *) g_malloc (el->nlevels * sizeof (gint));
       el->level_counts = (gint *) g_malloc (el->nlevels * sizeof (gint));
       el->level_names = (gchar **) g_malloc (el->nlevels * sizeof (gchar *));
-      for (i = 0; i < el->nlevels; i++)
+      for (i = 0; i < el->nlevels; i++) {
         el->level_counts[i] = 0;
+        el->level_names[i] = NULL;
+      }
     }
     else {
       el->level_values = NULL;
@@ -549,15 +547,28 @@ addLevel (XMLParserData * data, const gchar * c, gint len)
 {
   GGobiData *d = getCurrentXMLData (data);
   vartabled *el = vartable_element_get (data->current_variable, d);
+  gint lev = data->current_level;
 
   gchar *val = g_strdup (c);
 
-/*-- dfs: placeholder for proper debugging --*/
+/*XXX check not off by one! If so, probably increment
+  data->current_level. */
   if (data->current_level >= el->nlevels)
     g_printerr ("trouble: adding too many levels to %s\n", el->collab);
 
-/*XXX check not off by one! If so, probably increment data->current_level. */
-  el->level_names[data->current_level] = g_strdup (val);
+  /*
+   * This is a kludge, I admit, but if a level name includes special
+   * characters (such as &), the string is somehow fed into this
+   * routine in pieces.  This section of code glues the separate
+   * pieces back together again.  -- dfs
+  */
+  if (el->level_names[lev]) {
+    gchar *tmp = g_strdup(el->level_names[lev]);
+    g_free(el->level_names[lev]);
+    el->level_names[lev] = g_strdup_printf ("%s%s", tmp, val);
+    g_free(tmp);
+  } else
+    el->level_names[lev] = g_strdup(val);
 
   g_free (val);
 }

@@ -520,7 +520,8 @@ vartable_collab_set_by_var (gint j, GGobiData *d)
   GtkTreeModel *model;
   GtkTreeIter iter;
   GtkTreeIter child;
-  
+  gchar *fmtname;
+
   if (!vartable_iter_from_varno(j, d, &model, &iter))
 	  return;
   
@@ -533,9 +534,11 @@ vartable_collab_set_by_var (gint j, GGobiData *d)
         gtk_tree_model_iter_children(model, &child, &iter);
         /*-- set the level fields --*/
      	  for (k=0; k<vt->nlevels; k++) {
+          fmtname = g_markup_printf_escaped("%s", vt->level_names[k]);
           gtk_tree_store_set(GTK_TREE_STORE(model), &child, VT_LEVEL_NAME,
-            vt->level_names[k], VT_LEVEL_VALUE, vt->level_values[k],
+            fmtname, VT_LEVEL_VALUE, vt->level_values[k],
             VT_LEVEL_COUNT, vt->level_counts[k], -1);
+          g_free(fmtname);
           gtk_tree_model_iter_next(model, &child);
         }
 	   // no more break

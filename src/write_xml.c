@@ -32,17 +32,13 @@
 
 XmlWriteInfo *updateXmlWriteInfo(GGobiData *d, ggobid *gg, XmlWriteInfo *info);
 
-/* if a string contains an ampersand, write it as &amp; --*/
+/* if a string contains an ampersand, write it as &amp; ... etc ... --*/
 static void
 write_xml_string(FILE *f, gchar *str)
 {
-  if (strchr (str, (gint) '&')) {
-    gchar *fmtstr = g_markup_printf_escaped("%s", str);
-    fprintf(f, fmtstr);
-    g_free(fmtstr);
-  } else {
-    fprintf(f, "%s", str);
-  }
+  gchar *fmtstr = g_markup_printf_escaped("%s", str);
+  fprintf(f, fmtstr);
+  g_free(fmtstr);
 }
 
 gboolean
@@ -178,22 +174,13 @@ write_xml_variable(FILE *f, GGobiData *d, ggobid *gg, gint j,
     fprintf(f, ">\n");
     fprintf(f, "    <levels count=\"%d\">\n", vt->nlevels);
     for (k=0; k<vt->nlevels; k++) {
-
-      fprintf(f, "      <level value=\"%d\">%s</level>\n",
-        vt->level_values[k],
-        vt->level_names[k]);
-    }
-#if 0
-    /* I can write these, but the var manip panel doesn't care for 
-       the unescaped ampersands -- apparently the tree wants us to 
-       retain the html escape, while it is our practice to strip 
-       it. dfs */
       fprintf(f, "      <level value=\"%d\">",
               vt->level_values[k]);
+      /* Add any needed html/xml markup to level names */
       write_xml_string(f, vt->level_names[k]);
       fprintf(f, "</level>\n");
     }
-#endif
+
     fprintf(f, "    </levels>\n");
     fprintf(f, "  </categoricalvariable>");
   } else if (vt->vartype == real) {
