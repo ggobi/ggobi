@@ -18,8 +18,8 @@ gboolean
 addToToolsMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 {
   static GtkActionEntry entry = {
-	"GGVis", NULL, "ggvis (MDS)", NULL, "Multi-dimensional scaling tool", 
-		G_CALLBACK (show_ggvis_window)
+    "GGVis", NULL, "ggvis (MDS)", NULL, "Multi-dimensional scaling tool", 
+    G_CALLBACK (show_ggvis_window)
   };
   GGOBI(addToolAction)(&entry, (gpointer)inst, gg);
   return(true);
@@ -48,75 +48,21 @@ static const gchar *menu_ui =
 "</ui>";
 
 static GtkActionEntry entries[] = {
-	{ "View", NULL, "_View" },
-	{ "ShepardPlot", NULL, "_Shepard Plot", "<control>S", "Display a Shepard Plot", 
-		G_CALLBACK(create_shepard_data_cb)
-	},
-	{ "Reset", NULL, "_Reset" },
-	{ "ReinitLayout", GTK_STOCK_REFRESH, "Reinit _Layout", "<control>L", "Reinitialize the layout",
-		G_CALLBACK(mds_reinit_cb)
-	},
-	{ "ScrambleLayout", NULL, "_Scramble Layout", "<control>A", "Scramble the layout",
-		G_CALLBACK(mds_scramble_cb)
-	},
-	{ "ResetMDSParameters", NULL, "Reset MDS _Parameters", "<control>P", "Reset the MDS Parameters",
-		G_CALLBACK(mds_reset_params_cb)
-	},
+  { "View", NULL, "_View" },
+  { "ShepardPlot", NULL, "_Shepard Plot", "<control>S", "Display a Shepard Plot", 
+    G_CALLBACK(create_shepard_data_cb)
+  },
+  { "Reset", NULL, "_Reset" },
+  { "ReinitLayout", GTK_STOCK_REFRESH, "Reinit _Layout", "<control>L", "Reinitialize the layout",
+    G_CALLBACK(mds_reinit_cb)
+  },
+  { "ScrambleLayout", NULL, "_Scramble Layout", "<control>A", "Scramble the layout",
+    G_CALLBACK(mds_scramble_cb)
+  },
+  { "ResetMDSParameters", NULL, "Reset MDS _Parameters", "<control>P", "Reset the MDS Parameters",
+    G_CALLBACK(mds_reset_params_cb)
+  },
 };
-	
-#if 0
-static GtkItemFactoryEntry menu_items[] = {
-/*
-  { "/_IO",            NULL,     NULL,             0, "<Branch>" },
-  { "/IO/Save distance matrix ...",
-       NULL,    
-       (GtkItemFactoryCallback) NULL,  
-       0 },
-  { "/_Reset",         NULL,     NULL,             0, "<Branch>" },
-  { "/Reset/Center and scale",
-       NULL,    
-       (GtkItemFactoryCallback) NULL,  
-       0 },
-*/
-  { "/_View",         NULL,     NULL,             0, "<Branch>" },
-  { "/View/Shepard Plot",
-       NULL,    
-       (GtkItemFactoryCallback) create_shepard_data_cb,  
-       0 },
-
-  { "/_Reset",        NULL,     NULL,             0, "<Branch>" },
-  { "/Reset/Reinit layout",
-       NULL,    
-       (GtkItemFactoryCallback) mds_reinit_cb,  
-       0 },
-  { "/Reset/Scramble layout",
-       NULL,
-       (GtkItemFactoryCallback) mds_scramble_cb,  
-       0 },
-  { "/Reset/Reset MDS parameters",
-       NULL,    
-       (GtkItemFactoryCallback) mds_reset_params_cb,  
-       0 },
-
-  { "/_Help",         NULL,     NULL,             0, "<LastBranch>" },
-  { "/Help/MDS Background",
-       NULL,    
-       (GtkItemFactoryCallback) NULL,  
-       0 },
-  { "/Help/MDS Controls",
-       NULL,    
-       (GtkItemFactoryCallback) NULL,  
-       0 },
-  { "/Help/Formula for Kruskal-Shepard distance scaling",
-       NULL,    
-       (GtkItemFactoryCallback) NULL,  
-       0 },
-  { "/Help/Formula for Torgerson-Gower dot-product scaling (classic)",
-       NULL,    
-       (GtkItemFactoryCallback) NULL,  
-       0 },
-  };
-#endif
 
 static const gchar *const dsource_lbl[] = {
   "Unweighted graph dist", 
@@ -211,7 +157,7 @@ ggv_datad_set_cb (GtkTreeSelection *tree_sel, PluginInstance *inst)
   GtkTreeIter iter;
   
   if (!gtk_tree_selection_get_selected(tree_sel, &model, &iter))
-	  return;
+    return;
   
   gtk_tree_model_get(model, &iter, 0, &dname, -1);
   
@@ -242,7 +188,7 @@ ggv_tree_view_datad_added_cb (ggobid *gg, GGobiData *d, GtkWidget *tree_view)
   const gchar *clname;
   GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(tree_view));
   GtkTreeIter iter;
-	
+
   if (tree_view == NULL)
     return;
 
@@ -252,11 +198,11 @@ ggv_tree_view_datad_added_cb (ggobid *gg, GGobiData *d, GtkWidget *tree_view)
 
   if (strcmp (clname, "nodeset") == 0 && d->rowIds != NULL) {
     gtk_list_store_append(GTK_LIST_STORE(model), &iter);
-	gtk_list_store_set(GTK_LIST_STORE(model), &iter, 0, d->name, -1); 
+    gtk_list_store_set(GTK_LIST_STORE(model), &iter, 0, d->name, -1); 
   }
   if (strcmp (clname, "edgeset") == 0 && d->edge.n > 0) {
     gtk_list_store_append(GTK_LIST_STORE(model), &iter);
-	gtk_list_store_set(GTK_LIST_STORE(model), &iter, 0, d->name, -1);
+    gtk_list_store_set(GTK_LIST_STORE(model), &iter, 0, d->name, -1);
   }
 
   gtk_widget_show_all (swin);
@@ -332,24 +278,21 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   model = gtk_list_store_new(1, G_TYPE_STRING);
   tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(model));
   populate_tree_view(tree_view, titles, 1, true, GTK_SELECTION_SINGLE, 
-  	G_CALLBACK(ggv_datad_set_cb), inst);
+    G_CALLBACK(ggv_datad_set_cb), inst);
 
   gtk_widget_set_name (GTK_WIDGET(tree_view), "nodeset");
   g_object_set_data(G_OBJECT (tree_view), "datad_swin", swin);
   g_signal_connect (G_OBJECT (gg), "datad_added",
-		    G_CALLBACK(ggv_tree_view_datad_added_cb), 
-                    (gpointer) tree_view);
+    G_CALLBACK(ggv_tree_view_datad_added_cb), 
+    (gpointer) tree_view);
   /*-- --*/
 
   for (l = gg->d; l; l = l->next) {
     d = (GGobiData *) l->data;
     if (d->rowIds != NULL) {  /*-- node sets --*/
       GtkTreeIter iter;
-	  gtk_list_store_append(GTK_LIST_STORE(model), &iter);
-	  gtk_list_store_set(GTK_LIST_STORE(model), &iter, 0, d->name, -1);
-	  /*row[0] = g_strdup (d->name);
-      gtk_tree_view_append (GTK_CLIST (tree_view), row);
-      g_free (row[0]);*/
+      gtk_list_store_append(GTK_LIST_STORE(model), &iter);
+      gtk_list_store_set(GTK_LIST_STORE(model), &iter, 0, d->name, -1);
     }
   }
   select_tree_view_row(tree_view, 0);
@@ -364,11 +307,12 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (swin),
     GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
 
-	model = gtk_list_store_new(1, G_TYPE_STRING);
-	tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(model));
-	populate_tree_view(tree_view, &titles[1], 1, true, GTK_SELECTION_SINGLE, 
-		G_CALLBACK(ggv_datad_set_cb), inst); 
-	gtk_widget_set_name (GTK_WIDGET(tree_view), "edgeset");
+  model = gtk_list_store_new(1, G_TYPE_STRING);
+  tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(model));
+  populate_tree_view(tree_view, &titles[1], 1, true, 
+    GTK_SELECTION_SINGLE, 
+    G_CALLBACK(ggv_datad_set_cb), inst); 
+  gtk_widget_set_name (GTK_WIDGET(tree_view), "edgeset");
   
   g_object_set_data(G_OBJECT (tree_view), "datad_swin", swin);
   g_signal_connect (G_OBJECT (gg), "datad_added",
@@ -379,8 +323,8 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
     d = (GGobiData *) l->data;
     if (d->edge.n != 0) {  /*-- edge sets --*/
       GtkTreeIter iter;
-	  gtk_list_store_append(GTK_LIST_STORE(model), &iter);
-	  gtk_list_store_set(GTK_LIST_STORE(model), &iter, 0, d->name, -1);
+      gtk_list_store_append(GTK_LIST_STORE(model), &iter);
+      gtk_list_store_set(GTK_LIST_STORE(model), &iter, 0, d->name, -1);
     }
   }
   select_tree_view_row(tree_view, 0);
@@ -477,7 +421,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
     ggv->tree_view_dist = GTK_BIN(swin)->child;
     /* Initialize, selecting first variable */
     if (ggv->mds_task == DissimAnalysis)
-		select_tree_view_row(ggv->tree_view_dist, 0);
+      select_tree_view_row(ggv->tree_view_dist, 0);
   } else ggv->tree_view_dist = NULL;
 
   /*-- Report on D --*/
@@ -959,35 +903,32 @@ void close_ggvis_window(GtkWidget *w, PluginInstance *inst)
     GtkWidget *tree_view_node = widget_find_by_name (window, "nodeset");
     GtkWidget *tree_view_edge = widget_find_by_name (window, "edgeset");
 
-    /*g_signal_connect (G_OBJECT (gg), "datad_added",
-     G_CALLBACK(ggv_tree_view_datad_added_cb),
-     GTK_OBJECT (tree_view));*/
     if (tree_view_node != NULL && tree_view_edge != NULL) {
       g_signal_handlers_disconnect_matched(G_OBJECT(gg),
-	(GSignalMatchType) G_SIGNAL_MATCH_FUNC, 0, 0, NULL, 
+        (GSignalMatchType) G_SIGNAL_MATCH_FUNC, 0, 0, NULL, 
         G_CALLBACK(ggv_tree_view_datad_added_cb),
         (gpointer) tree_view_node);
       g_signal_handlers_disconnect_matched(G_OBJECT(gg),
-	(GSignalMatchType) G_SIGNAL_MATCH_FUNC, 0, 0, NULL, 
+        (GSignalMatchType) G_SIGNAL_MATCH_FUNC, 0, 0, NULL, 
         G_CALLBACK(ggv_tree_view_datad_added_cb),
         (gpointer) tree_view_edge);
     }
 
-    // I would have thought destroying this was enough, but apparently not.
+    // I would have thought destroying this was enough, but apparently
+    // not.  Probably if mds is running, I have to turn it off.
+
+    if (ggv->running_p) mds_func (false, inst);
+
     variable_notebook_handlers_disconnect (ggv->varnotebook, gg);
 
-    /*  g_signal_connect (G_OBJECT(gg),
-	"clusters_changed", clusters_changed_cb, inst); */
     g_signal_handlers_disconnect_by_func (G_OBJECT(gg),
         G_CALLBACK(clusters_changed_cb),
         (gpointer) inst);
 
-    
     /*
      * This is the window, so it should serve to destroy
      * all the child widgets.
     */
-    //gtk_widget_destroy (ggv->varnotebook);
     gtk_widget_destroy ((GtkWidget *) inst->data);
 
     ggv_free (ggv);
