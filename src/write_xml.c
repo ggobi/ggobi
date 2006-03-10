@@ -36,30 +36,14 @@ XmlWriteInfo *updateXmlWriteInfo(GGobiData *d, ggobid *gg, XmlWriteInfo *info);
 static void
 write_xml_string(FILE *f, gchar *str)
 {
-
   if (strchr (str, (gint) '&')) {
-    gchar *next;
-    gboolean finalamp;
-    // Before tokenizing, check for initial and final &
-    if (str[0] == '&')
-      fprintf(f, "&amp;");
-    finalamp = (str[strlen(str)-1] == '&');
-
-    next = strtok (str, "&");
-    fprintf(f, "%s", next);    
-    while (next) {
-      next = strtok(NULL, "&");
-      if (next) {
-        fprintf(f, "&amp;%s", next);
-      }
-    }
-    if (finalamp)
-      fprintf(f, "&amp;");
+    gchar *fmtstr = g_markup_printf_escaped("%s", str);
+    fprintf(f, fmtstr);
+    g_free(fmtstr);
   } else {
     fprintf(f, "%s", str);
   }
 }
-
 
 gboolean
 write_xml (const gchar *filename,  ggobid *gg, XmlWriteInfo *xmlWriteInfo)
