@@ -32,6 +32,35 @@
 
 XmlWriteInfo *updateXmlWriteInfo(GGobiData *d, ggobid *gg, XmlWriteInfo *info);
 
+/* if a string contains an ampersand, write it as &amp; --*/
+static void
+write_xml_string(FILE *f, gchar *str)
+{
+
+  if (strchr (str, (gint) '&')) {
+    gchar *next;
+    gboolean finalamp;
+    // Before tokenizing, check for initial and final &
+    if (str[0] == '&')
+      fprintf(f, "&amp;");
+    finalamp = (str[strlen(str)-1] == '&');
+
+    next = strtok (str, "&");
+    fprintf(f, "%s", next);    
+    while (next) {
+      next = strtok(NULL, "&");
+      if (next) {
+        fprintf(f, "&amp;%s", next);
+      }
+    }
+    if (finalamp)
+      fprintf(f, "&amp;");
+  } else {
+    fprintf(f, "%s", str);
+  }
+}
+
+
 gboolean
 write_xml (const gchar *filename,  ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 {
@@ -165,10 +194,22 @@ write_xml_variable(FILE *f, GGobiData *d, ggobid *gg, gint j,
     fprintf(f, ">\n");
     fprintf(f, "    <levels count=\"%d\">\n", vt->nlevels);
     for (k=0; k<vt->nlevels; k++) {
-      fprintf(f, "      <level value=\"%d\"> %s </level>\n",
+
+      fprintf(f, "      <level value=\"%d\">%s</level>\n",
         vt->level_values[k],
         vt->level_names[k]);
     }
+#if 0
+    /* I can write these, but the var manip panel doesn't care for 
+       the unescaped ampersands -- apparently the tree wants us to 
+       retain the html escape, while it is our practice to strip 
+       it. dfs */
+      fprintf(f, "      <level value=\"%d\">",
+              vt->level_values[k]);
+      write_xml_string(f, vt->level_names[k]);
+      fprintf(f, "</level>\n");
+    }
+#endif
     fprintf(f, "    </levels>\n");
     fprintf(f, "  </categoricalvariable>");
   } else if (vt->vartype == real) {
@@ -287,6 +328,7 @@ write_xml_records(FILE *f, GGobiData *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
   return(true);
 }
 
+
 /*
  * I want this to write <edge> records as well as <record> records.
 */
@@ -314,22 +356,12 @@ write_xml_record (FILE *f, GGobiData *d, ggobid *gg, gint i,
   }
 
   if (d->rowlab && d->rowlab->data
-      && (gstr = (gchar *) g_array_index (d->rowlab, gchar *, i))) {  
-    /*-- if the label contains an ampersand, write it as &amp; --*/
-    if (strchr (gstr, (gint) '&')) {
-      gchar *next = strtok (gstr, "&");
-      fprintf(f, " label=\"%s", next);
-      while (next) {
-        next = strtok(NULL, "&");
-        if (next)
-          fprintf(f, "&amp;%s", next);
-      }
-      fprintf(f, "\"");
-    } else {
-      fprintf(f, " label=\"%s\"", gstr);
-    }
+      && (gstr = (gchar *) g_array_index (d->rowlab, gchar *, i))) 
+  {
+    fprintf(f, " label=\"");
+    write_xml_string(f, gstr);
+    fprintf(f, "\"");
   }
-
 
   if (!xmlWriteInfo->useDefault ||
       xmlWriteInfo->defaultColor != d->color.els[i])
