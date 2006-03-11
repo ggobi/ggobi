@@ -206,6 +206,7 @@ ga_leaf_hide_cb (GtkWidget *btn, PluginInstance *inst)
   }
 */
 
+  changing = true;
   while (changing) {
     gint ida, a, idb, b;
     changing = false;
@@ -416,7 +417,7 @@ void show_neighbors_sticky_cb (ggobid *gg, gint index, gint state,
   gint i;
   endpointsd *endpoints;
   /*GGobiData *d = ga->d;*/
-  enum {GRAPH_VIEW, EDGE_DATA_VIEW} idview;
+  enum {GRAPH_VIEW, EDGE_DATA_VIEW} idview = GRAPH_VIEW;
   displayd *display = gg->current_display;
 
   if (e == NULL) {
