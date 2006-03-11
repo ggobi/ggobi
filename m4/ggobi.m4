@@ -19,7 +19,7 @@ if test -n "$enable_local" && test "$enable_local" != "no"; then
   export PKG_CONFIG_PATH
 fi
 
-PKG_CHECK_MODULES(GGOBI, [ggobi],,[AC_MSG_ERROR([You must have GGobi to use this plugin!])])
+PKG_CHECK_MODULES(GGOBI, [ggobi])
 AC_SUBST(GGOBI_FLAGS)
 AC_SUBST(GGOBI_LIBS)
 

@@ -19,8 +19,7 @@ GGOBI_CONFIG_PLUGIN
 AC_PROG_LIBTOOL
 
 PKG_CHECK_MODULES(LIBGVC, [libgvc >= 2.3],
-        [HAVE_LIBGVC="1"],
-        [AC_MSG_ERROR(libgvc library not available)])
+        [HAVE_LIBGVC="1"])
 AC_SUBST(LIBGVC_CFLAGS)
 AC_SUBST(LIBGVC_LIBS)
 
