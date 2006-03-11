@@ -51,7 +51,7 @@ checkGGobiStructSizes ()
   const GGobi_StructSize *local, *internal;
   int nlocal, ninternal;
   int i, j;
-  gboolean ok;
+  gboolean ok = false;
 
   local = GGOBI (getStructs) (&nlocal);
   internal = GGOBI (getGGobiStructs) (&ninternal);
