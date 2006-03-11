@@ -9,12 +9,12 @@ ACLOCAL_AMFLAGS = -I ../../m4
 
 # Every plugin provides a single library to GGobi, define it here.
 # Its name should start with 'lib' and end with '.la'.
-lib_LTLIBRARIES        = libvarcloud.la
+lib_LTLIBRARIES        = varcloud.la
 
 # Most plugins will only require GGobi and its dependencies (gtk, libxml2)
-libvarcloud_la_LDFLAGS  = @GGOBI_LIBS@
-libvarcloud_la_CFLAGS   = @GGOBI_CFLAGS@ @SRC_DEBUG@
+varcloud_la_LDFLAGS  = @GGOBI_LIBS@ -module
+varcloud_la_CFLAGS   = @GGOBI_CFLAGS@ @SRC_DEBUG@
 
 # List the source files of the plugin here.
-libvarcloud_la_SOURCES  = cbacks.c init.c varcloud.c
+varcloud_la_SOURCES  = cbacks.c init.c varcloud.c
 

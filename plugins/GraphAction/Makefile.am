@@ -9,11 +9,11 @@ ACLOCAL_AMFLAGS = -I ../../m4
 
 # Every plugin provides a single library to GGobi, define it here.
 # Its name should start with 'lib' and end with '.la'.
-lib_LTLIBRARIES        = libgraphaction.la
+lib_LTLIBRARIES        = graphaction.la
 
 # Most plugins will only require GGobi and its dependencies (gtk, libxml2)
-libgraphaction_la_LDFLAGS  = @GGOBI_LIBS@
-libgraphaction_la_CFLAGS   = @GGOBI_CFLAGS@ @SRC_DEBUG@
+graphaction_la_LDFLAGS  = @GGOBI_LIBS@ -module
+graphaction_la_CFLAGS   = @GGOBI_CFLAGS@ @SRC_DEBUG@
 
 # List the source files of the plugin here.
-libgraphaction_la_SOURCES  = graphact.c ga_cbacks.c
+graphaction_la_SOURCES  = graphact.c ga_cbacks.c

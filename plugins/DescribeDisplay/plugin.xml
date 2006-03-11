@@ -4,7 +4,7 @@
 
    <author>Deborah Swayne</author>
 
-   <dll name="plugins/DescribeDisplay/libdescribedisplay.la">
+   <dll name="plugins/DescribeDisplay/describedisplay.la">
 
     <init onCreate="addToToolsMenu" onClose="closeWindow" />
 

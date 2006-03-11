@@ -1,7 +1,7 @@
 <plugin name="GraphLayout" load="immediate">
    <description>For graph layout and manipulation.</description>
    <author>Deborah Swayne</author>
-   <dll name="plugins/GraphLayout/libgraphlayout.la">
+   <dll name="plugins/GraphLayout/graphlayout.la">
     <init onCreate="addToToolsMenu" onClose="closeWindow" />
   </dll>
 </plugin>

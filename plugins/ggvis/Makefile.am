@@ -9,13 +9,13 @@ ACLOCAL_AMFLAGS = -I ../../m4
 
 # Every plugin provides a single library to GGobi, define it here.
 # Its name should start with 'lib' and end with '.la'.
-lib_LTLIBRARIES        = libggvis.la
+lib_LTLIBRARIES        = ggvis.la
 
 # Most plugins will only require GGobi and its dependencies (gtk, libxml2)
-libggvis_la_LDFLAGS  = @GGOBI_LIBS@
-libggvis_la_CFLAGS   = @GGOBI_CFLAGS@ @SRC_DEBUG@
+ggvis_la_LDFLAGS  = @GGOBI_LIBS@ -module
+ggvis_la_CFLAGS   = @GGOBI_CFLAGS@ @SRC_DEBUG@
 
 # List the source files of the plugin here.
-libggvis_la_SOURCES  = Dtarget.c ggv_cbacks.c ggv_utils.c histogram.c mds.c \
+ggvis_la_SOURCES  = Dtarget.c ggv_cbacks.c ggv_utils.c histogram.c mds.c \
   stressplot.c anchor.c ggv_qsort.c ggvis.c init.c shepard.c
 
