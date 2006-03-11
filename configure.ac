@@ -90,7 +90,6 @@ fi
 # This is obviously ugly, but AC_CONFIG_SUBDIRS *requires* a literal
 for p in ${PLUGIN_DIRS} ; do 
 if test "${p}" = "DataViewer"; then
-  echo "DATAVIEWER PLUGIN"
   AC_CONFIG_SUBDIRS(plugins/DataViewer)
 fi
 if test "${p}" = "VarCloud"; then
@@ -167,32 +166,21 @@ if test -n "${enable_debug}" && ! test "${enable_debug}" = "no" ;  then
 fi
 AC_SUBST(SRC_DEBUG)
 
-# Find uname binary
-
-AC_PATH_PROG(UNAME, uname,,$PATH)
-if test -z "${UNAME}" ; then
-   AC_MSG_ERROR(Cannot find uname)
-fi
-
 # Find GOB2 (don't fail if not found, not necessary for distributed builds)
 AC_PATH_PROG(GOB2, gob2,,$PATH)
 
 # FIND GTK2
 
  echo "Looking for gtk2"
- AC_PATH_PROG(PKG_CONFIG, pkg-config,, $PATH)
- if test -z "${PKG_CONFIG}" ; then
-   AC_MSG_ERROR(Cannot find pkg-config)
- fi
 
-PKG_CHECK_MODULES(GTK, [gtk+-2.0 >= 2.6.0],,[AC_MSG_ERROR(You must have GTK+ >= 2.6.0)])
+PKG_CHECK_MODULES(GTK, [gtk+-2.0 >= 2.6.0])
 
 AC_SUBST(GTK_CFLAGS)
 AC_SUBST(GTK_LIBS)
 
 echo "Setting gtk flags: cflags=$GTK_CFLAGS, libs=$GTK_LIBS"
 
-PKG_CHECK_MODULES(LIBXML, [libxml-2.0],,[AC_MSG_ERROR(You must have libxml2)])
+PKG_CHECK_MODULES(LIBXML, [libxml-2.0])
 
 AC_SUBST(LIBXML_CFLAGS)
 AC_SUBST(LIBXML_LIBS)

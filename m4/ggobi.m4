@@ -10,7 +10,6 @@ AC_C_CONST
 AC_HEADER_STDBOOL
 AC_DISABLE_STATIC
 AC_LIBTOOL_WIN32_DLL
-AC_PROG_LIBTOOL
 
 AC_ARG_ENABLE(debug, [--enable-debug          Compile with debugging symbols])
 AC_ARG_ENABLE(local, [--enable-local          Configure for use directly from this directory tree.])

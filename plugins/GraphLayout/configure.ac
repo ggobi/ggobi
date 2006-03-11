@@ -16,6 +16,7 @@ AC_CONFIG_AUX_DIR([.])
 # GGOBI_CFLAGS, GGOBI_LIBS, and SRC_DEBUG variables. It's smart enough to 
 # build against a local GGobi if necessary.
 GGOBI_CONFIG_PLUGIN
+AC_PROG_LIBTOOL
 
 PKG_CHECK_MODULES(LIBGVC, [libgvc >= 2.3],
         [HAVE_LIBGVC="1"],
