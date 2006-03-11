@@ -146,14 +146,19 @@ AC_HEADER_STDBOOL
 
 echo "Enable local ${enable_local}"
 
-if test -n "${enable_local}" &&  test "${enable_local}" != "no" ; then
+if test -n "${enable_local}" && test "${enable_local}" != "no" ; then
  echo "Installing into build directory."
- AC_PREFIX_DEFAULT(`pwd`)
- GGOBI_CFLAGS="-I${ac_default_prefix}/src"
+ ac_prefix=`pwd`
+ GGOBI_CFLAGS="-I${ac_prefix}/src"
 else
- GGOBI_CFLAGS="-I${prefix}/include/ggobi"
+ ac_prefix=$prefix
+ if test "x$ac_prefix" = "xNONE"; then
+   ac_prefix=$ac_default_prefix
+ fi
+ GGOBI_CFLAGS="-I${ac_prefix}/include/ggobi"
 fi
 
+AC_SUBST(ac_prefix)
 AC_SUBST(GGOBI_CFLAGS)
 
 # Debug?

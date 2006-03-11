@@ -1,6 +1,6 @@
 # File for pkg-config
 #
-prefix=@prefix@
+prefix=@ac_prefix@
 exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@
