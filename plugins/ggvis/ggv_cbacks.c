@@ -582,7 +582,6 @@ void ggv_stepsize_cb (GtkAdjustment *adj, PluginInstance *inst)
 void ggv_dims_cb (GtkAdjustment *adj, PluginInstance *inst)
 {
   ggvisd *ggv = ggvisFromInst (inst);
-  ggobid *gg = inst->gg;
   gint dim = (gint) adj->value;
   gint i, j;
   gchar *vname;

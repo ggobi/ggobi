@@ -183,7 +183,6 @@ ggv_datad_set_cb (GtkTreeSelection *tree_sel, PluginInstance *inst)
 static void 
 ggv_tree_view_datad_added_cb (ggobid *gg, GGobiData *d, GtkWidget *tree_view)
 {
-  gchar *row[1];
   GtkWidget *swin;
   const gchar *clname;
   GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(tree_view));
@@ -214,8 +213,8 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   GtkWidget *window, *main_vbox, *vbox_params;
   GtkWidget *notebook, *opt, *metric_opt;
   GtkWidget *label, *frame, *btn, *vbox, *hbox, *vb, *hscale, *table, *hb;
-  GtkWidget *menu, *child, *radio, *radio1, *radio2;
-  GList *children, *list;
+  GtkWidget *radio1, *radio2;
+  GtkWidget *radio = NULL;
   GSList *group;
   GtkObject *adj, *Dtarget_adj, *isotonic_mix_adj;
   gint i, top;
@@ -225,10 +224,8 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   GGobiData *d;
   ggobid *gg = inst->gg;
   GtkWidget *swin, *tree_view;
-  gchar *row[1];
   GSList *l;
   GtkListStore *model;
-  GtkTreeSelection *tree_sel;
   GtkUIManager *manager;
   GtkActionGroup *actions;
 
