@@ -378,7 +378,7 @@ linkby_current_page_set (displayd * display, GtkWidget * notebook,
 {
   GtkWidget *swin, *treeview;
   GGobiData *d = display->d, *paged;
-  gint page_num, cur_page_num;
+  gint page_num;
   cpaneld *cpanel = &display->cpanel;
   GList *children;
 
@@ -567,7 +567,7 @@ GtkWidget *
 create_linkby_notebook (GtkWidget * box, ggobid * gg)
 {
   GtkWidget *notebook;
-  gint nd = g_slist_length (gg->d);
+  //gint nd = g_slist_length (gg->d);
   GSList *l;
   GGobiData *d;
 

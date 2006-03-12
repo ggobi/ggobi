@@ -123,13 +123,12 @@ barchartVarSel (GtkWidget * w, displayd * display, splotd * sp, gint jvar,
 {
   gint jvar_prev = -1;
   gboolean redraw = false;
-  gboolean fade = gg->tour1d.fade_vars;
   /*  displayd *display = (displayd *) sp->displayptr;*/
   GGobiData *d = display->d;
 
   switch (cpanel->pmode) {
     case TOUR1D:
-      redraw = tour1d_varsel (w, jvar, toggle, mouse, display->d, gg);
+      redraw = tour1d_varsel (w, jvar, toggle, mouse, d, gg);
     default:
       redraw = p1d_varsel(sp, jvar, &jvar_prev, toggle, mouse);
     break;
@@ -137,7 +136,6 @@ barchartVarSel (GtkWidget * w, displayd * display, splotd * sp, gint jvar,
 
   if (redraw) {
     displayd *display = (displayd *) sp->displayptr;
-    GGobiData *d = display->d;
 
     barchart_clean_init (GGOBI_BARCHART_SPLOT (sp));
     barchart_recalc_counts (GGOBI_BARCHART_SPLOT (sp), d, d->gg);

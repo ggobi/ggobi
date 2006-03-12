@@ -128,7 +128,6 @@ enum
 static void
 label_selected_cb (GtkTreeSelection * treesel, ggobid * gg)
 {
-  GtkTreeModel *model;
   gint *vars, nvars, i;
   cpaneld *cpanel = &gg->current_display->cpanel;
   vars =
@@ -260,7 +259,7 @@ button_press_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
   ggobid *gg = GGobiFromSPlot (sp);
   displayd *dsp = sp->displayptr;
   cpaneld *cpanel = &dsp->cpanel;
-  GGobiData *d;
+  GGobiData *d = NULL;
 
   if (cpanel->id_target_type == identify_edges) {
     if (dsp->e != NULL)
@@ -268,6 +267,9 @@ button_press_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
   }
   else
     d = dsp->d;
+
+  if (!d)
+    return false;
 
   sticky_id_toggle (d, gg);
 
@@ -441,7 +443,7 @@ notebook_current_page_set (displayd * display, GtkWidget * notebook,
 {
   GtkWidget *swin;
   GGobiData *d = display->d, *paged;
-  gint page_num, cur_page_num;
+  gint page_num;
 
   if (notebook == NULL) {
     return;

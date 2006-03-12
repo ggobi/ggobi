@@ -251,8 +251,7 @@ identify_label_fetch (gint k, cpaneld * cpanel, GGobiData * d, ggobid * gg)
     }
     else {
       gint *vars;               // = (gint *) g_malloc (d->ncols * sizeof(gint));
-      gint nvars;
-      gint j, lval;
+      gint j, nvars;
       gchar *lname;
 
       vars = get_selections_from_tree_view (tree_view, &nvars);
@@ -326,7 +325,7 @@ identify_label_fetch (gint k, cpaneld * cpanel, GGobiData * d, ggobid * gg)
   if (lbl) {
     lbl = (gchar *) g_list_first (labels)->data;
     for (l = labels->next; l; l = l->next) {
-      gchar *tmp_lbl = g_strdup_printf ("%s, %s", lbl, l->data);
+      gchar *tmp_lbl = g_strdup_printf ("%s, %s", lbl, (gchar *)l->data);
       g_free (l->data);
       g_free (lbl);
       lbl = tmp_lbl;

@@ -117,6 +117,7 @@ void       arrays_init_null (array_s *);
 void       arrays_zero (array_s *);
 void       ash_baseline_set (icoords *, splotd *sp);
 void       assign_points_to_bins (GGobiData *, splotd *, ggobid *);
+gboolean   bizarro_update_hidden_vectors (gint i, gboolean changed, gboolean *hit_by_brush, GGobiData *d, ggobid *gg);
 void       br_color_ids_add (GGobiData *d, ggobid *gg);
 void       br_color_ids_alloc (GGobiData *);
 void       br_color_ids_init (GGobiData *);

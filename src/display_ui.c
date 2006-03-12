@@ -220,11 +220,13 @@ buildExtendedDisplayMenu (ggobid * gg, gint nd, GGobiData * d0)
     el = el->next;
   }
 }
+#if 0 // unused on 3/12/06
 static void
 action_show_control_panel_cb (GtkAction * action, displayd * display)
 {
   show_display_control_panel (display);
 }
+#endif
 static void
 action_close_cb (GtkAction * action, displayd * display)
 {

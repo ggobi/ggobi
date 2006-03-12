@@ -27,7 +27,7 @@ impute_fixed (ImputeType impute_type, gfloat val, gint nvars, gint * vars,
               GGobiData * d, ggobid * gg)
 {
   gint i, j, k, m;
-  gfloat maxval, minval, range, impval;
+  gfloat maxval, minval, range, impval = 0;
   gboolean ok = true;
   vartabled *vt;
 
@@ -57,7 +57,7 @@ impute_fixed (ImputeType impute_type, gfloat val, gint nvars, gint * vars,
         impval = maxval + (val / 100.) * range;
         jmult = (impval - maxval) * .2; /* using 20% of the space */
       }
-      else if (impute_type == IMP_BELOW) {
+      else {
         impval = minval - (val / 100.) * range;
         jmult = (minval - impval) * .2;
       }
@@ -139,7 +139,7 @@ impute_mean_or_median (gint type, gint nvars, gint * vars,
           if (gg->impute.type == IMP_MEAN) {
             val = sum / (greal) np;
           }
-          else if (gg->impute.type == IMP_MEDIAN) {
+          else { // if (gg->impute.type == IMP_MEDIAN) {
             qsort ((void *) x, np, sizeof (gfloat), fcompare);
             val =
               ((np % 2) !=

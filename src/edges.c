@@ -84,16 +84,19 @@ edge_add (gint a, gint b, gchar * lbl, gchar * id, GGobiData * d,
   e->nrows += 1;
 
   /*-- add a row label --*/
-  if (!lbl)
+  if (!lbl) {
     s1 = g_strdup_printf ("%d", n + 1);
-  rowlabel_add ((lbl) ? lbl : s1, e);
-                                   /*-- don't free s1 --*/
+    rowlabel_add(s1, e); 
+    /*-- don't free s1 --*/
+  } else rowlabel_add (lbl, e);
 
   /*-- if necessary, add an id --*/
   if (e->idTable) {
-    if (!id)
+    if (!id) {
       s2 = g_strdup_printf ("%d", n + 1);
-    datad_record_id_add (s2, e);  /*-- don't free s2 --*/
+      datad_record_id_add (s2, e); 
+      /*-- don't free s2 --*/
+    } // we never add the id itself?
   }
 
   pipeline_arrays_check_dimensions (e);

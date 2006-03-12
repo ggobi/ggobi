@@ -118,7 +118,7 @@ impute_fixed_cb (ImputeType impute_type, gfloat * val, ggobid * gg)
       w = widget_find_by_name (gg->impute.window, "IMPUTE:entry_above");
       val_str = gtk_editable_get_chars (GTK_EDITABLE (w), 0, -1);
     }
-    else if (impute_type == IMP_BELOW) {
+    else { // if (impute_type == IMP_BELOW) {
       w = widget_find_by_name (gg->impute.window, "IMPUTE:entry_below");
       val_str = gtk_editable_get_chars (GTK_EDITABLE (w), 0, -1);
     }

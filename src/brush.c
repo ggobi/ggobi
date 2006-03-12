@@ -56,30 +56,30 @@ ltype_from_gtype (gint gtype)
   return ltype;
 }
 
-gint                            /* sets dashes and returns a gtk line attribute */
+gint /* sets dashes and returns a gtk line attribute */
 set_lattribute_from_ltype (gint ltype, ggobid * gg)
 {
   gint8 dash_list[2];
+  gint lattr = GDK_LINE_SOLID;
 
-  switch (ltype) {              /* one of the three EDGETYPES; should be an enum */
+  switch (ltype) {    /* one of the three EDGETYPES; should be an enum */
   case SOLID:
-    ltype = GDK_LINE_SOLID;
+    lattr = GDK_LINE_SOLID;
     break;
   case WIDE_DASH:
-    ltype = GDK_LINE_ON_OFF_DASH;
+    lattr = GDK_LINE_ON_OFF_DASH;
     dash_list[0] = 8;
     dash_list[1] = 2;
     gdk_gc_set_dashes (gg->plot_GC, 0, dash_list, 2);
     break;
   case NARROW_DASH:
-    ltype = GDK_LINE_ON_OFF_DASH;
+    lattr = GDK_LINE_ON_OFF_DASH;
     dash_list[0] = 4;
     dash_list[1] = 2;
     gdk_gc_set_dashes (gg->plot_GC, 0, dash_list, 2);
     break;
   }
-
-
+  return lattr;
 }
 
 void
@@ -737,7 +737,7 @@ build_symbol_vectors (cpaneld * cpanel, GGobiData * d, ggobid * gg)
   icoords imin, imax;
   gboolean changed = false;
   gint nd = g_slist_length (gg->d);
-  gboolean (*f) (cpaneld *, GGobiData *, ggobid *);
+  gboolean (*f) (cpaneld *, GGobiData *, ggobid *) = NULL;
 
   /* These two are needed for the extended display.
      Should the method be on the extended splot or the display (as it is now).

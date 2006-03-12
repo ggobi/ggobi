@@ -235,7 +235,7 @@ key_press_cb (GtkWidget * w, GdkEventKey * event, splotd * sp)
   cpaneld *cpanel = &gg->current_display->cpanel;
 
   if (!sp || !gg || !cpanel)
-    return;
+    return false;
 
   /*-- handle the keys for setting the mode and launching generic events --*/
   if (splot_event_handled (w, event, cpanel, sp, gg))
@@ -305,7 +305,7 @@ button_press_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
   GGobiData *d, *e;
 
   if (!sp || !gg)
-    return;
+    return false;
 
   gg->current_splot = sp->displayptr->current_splot = sp;
   gg->current_display = sp->displayptr;
@@ -643,7 +643,6 @@ cpanel_brush_set (displayd * display, cpaneld * cpanel, ggobid * gg)
 {
   GtkWidget *w;
   GtkWidget *pnl = mode_panel_get_by_name (GGOBI (getIModeName) (BRUSH), gg);
-  GtkWidget *btn;
 
   if (pnl == (GtkWidget *) NULL)
     return;

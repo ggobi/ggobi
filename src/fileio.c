@@ -100,8 +100,6 @@ fileset_generate (const gchar * fileName,
 void
 completeFileDesc (const gchar * fileName, InputDescription * desc)
 {
-  gint n;
-
   if (!desc->baseName) {
     desc->baseName = g_path_get_basename(fileName);
   }
