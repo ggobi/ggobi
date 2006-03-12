@@ -1,13 +1,13 @@
 # File for pkg-config
 #
-prefix=@LOCAL_PREFIX@
-exec_prefix=${prefix}/src
-libdir=${prefix}/src
-includedir=${prefix}/src
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
 
 Name: libggobi
 Version: @GGOBI_VERSION_STRING@
 Description: GGobi library for dynamic graphics.
 Requires: gtk+-2.0, libxml-2.0
 Libs: -L${libdir} -lggobi
-Cflags: -I${includedir}
+Cflags: -I{$includedir}/ggobi

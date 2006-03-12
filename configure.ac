@@ -40,7 +40,6 @@ AC_DEFINE_UNQUOTED([PATCH_LEVEL], $PATCH_LEVEL, [The micro *.*.x version])
 # Configure options (debug? local? any plugins?)
 
 AC_ARG_ENABLE(debug, [--enable-debug          Compile with debugging symbols])
-AC_ARG_ENABLE(local, [--enable-local          Configure for use directly from this directory tree.])
 
 PLUGIN_DIRS=""
 
@@ -48,36 +47,37 @@ AC_ARG_WITH(all-plugins, [--with-all-plugins  Enable all (supported) plugins])
 
 #AC_ARG_WITH(mysql,
 #  --with-mysql        Enable plugin for reading data from MySQL databases, 
-#  MYSQL_PLUGIN=1; PLUGIN_DIRS="MySQL"; ENABLE_PLUGINS=1)
+#  MYSQL_PLUGIN=1; PLUGIN_DIRS="MySQL")
 
 #AC_ARG_WITH(postgres,
 #  --with-postgres          Enable plugin reading data from Postgres databases., 
-#  POSTGRES_PLUGIN=1; PLUGIN_DIRS="${PLUGIN_DIRS} Postgres"; ENABLE_PLUGINS=1)
+#  POSTGRES_PLUGIN=1; PLUGIN_DIRS="${PLUGIN_DIRS} Postgres")
 
 AC_ARG_WITH(dataviewer,
   --with-dataviewer          Enable plugin for viewing data in a datagrid., 
-  DATAVIEWER_PLUGIN=1;  PLUGIN_DIRS="${PLUGIN_DIRS} DataViewer"; ENABLE_PLUGINS=1)
+  DATAVIEWER_PLUGIN=1;  PLUGIN_DIRS="${PLUGIN_DIRS} DataViewer")
 
 AC_ARG_WITH(describedisplay,
   --with-describedisplay     Convert GGobi plots to R plots., 
-  DESCRIBEDISPLAY_PLUGIN=1;  PLUGIN_DIRS="${PLUGIN_DIRS} DescribeDisplay"; ENABLE_PLUGINS=1)
+  DESCRIBEDISPLAY_PLUGIN=1;  PLUGIN_DIRS="${PLUGIN_DIRS} DescribeDisplay")
   
 AC_ARG_WITH(graphlayout,
   [--with-graphlayout          Enable GraphLayout plugin], 
-  [echo "With graphlayout"; GRAPHLAYOUT_PLUGIN=1;  PLUGIN_DIRS="${PLUGIN_DIRS} GraphLayout"; ENABLE_PLUGINS=1])
+  [echo "With graphlayout"; GRAPHLAYOUT_PLUGIN=1;  PLUGIN_DIRS="${PLUGIN_DIRS} GraphLayout"])
 
 AC_ARG_WITH(ggvis,
   --with-ggvis          Enable ggvis plugin, 
-  [GGVIS_PLUGIN=1;  PLUGIN_DIRS="${PLUGIN_DIRS} ggvis"; ENABLE_PLUGINS=1])
+  [GGVIS_PLUGIN=1;  PLUGIN_DIRS="${PLUGIN_DIRS} ggvis"])
 
 AC_ARG_WITH(graphaction,
   --with-graphaction          Enable graph operations plugin, 
-  [GRAPHACTION_PLUGIN=1;  PLUGIN_DIRS="${PLUGIN_DIRS} GraphAction"; ENABLE_PLUGINS=1])
+  [GRAPHACTION_PLUGIN=1;  PLUGIN_DIRS="${PLUGIN_DIRS} GraphAction"])
 
 AC_ARG_WITH(varcloud,
   --with-varcloud          Enable variogram cloud plugin, 
-  [VARCLOUD_PLUGIN=1;  PLUGIN_DIRS="${PLUGIN_DIRS} VarCloud"; ENABLE_PLUGINS=1])
-AC_ARG_WITH(plugins, [--with-plugins          Enable all the plugins (no)], ENABLE_ALL_PLUGINS=1)
+  [VARCLOUD_PLUGIN=1;  PLUGIN_DIRS="${PLUGIN_DIRS} VarCloud"])
+  
+AC_ARG_WITH(plugins, [--with-plugins          With plugins in a quoted, space-separated list])
 
 if test "$with_plugins" != "" && test "$with_plugins" != "yes" && test "$with_plugins" != "y" &&  test "$with_plugins" != "no" && test "$with_plugins" != "n" ; then
  PLUGIN_DIRS=$with_plugins
@@ -140,25 +140,10 @@ AC_CHECK_HEADERS([stdlib.h string.h strings.h unistd.h])
 AC_C_CONST
 AC_HEADER_STDBOOL
 
-# A local install basically configures ggobi.pc to let us build plugins against
-# this GGobi instead of the system one
+# This is for our local ggobi.pc file.
 
-echo "Enable local ${enable_local}"
-
-if test -n "${enable_local}" && test "${enable_local}" != "no" ; then
- echo "Installing into build directory."
- ac_prefix=`pwd`
- GGOBI_CFLAGS="-I${ac_prefix}/src"
-else
- ac_prefix=$prefix
- if test "x$ac_prefix" = "xNONE"; then
-   ac_prefix=$ac_default_prefix
- fi
- GGOBI_CFLAGS="-I${ac_prefix}/include/ggobi"
-fi
-
-AC_SUBST(ac_prefix)
-AC_SUBST(GGOBI_CFLAGS)
+LOCAL_PREFIX=`pwd`
+AC_SUBST(LOCAL_PREFIX)
 
 # Debug?
 if test -n "${enable_debug}" && ! test "${enable_debug}" = "no" ;  then
@@ -187,7 +172,7 @@ AC_SUBST(LIBXML_LIBS)
 
  dnl Process the different .in files, substituting the values computed here in the configuration
  dnl script for the corresponding @variable@ in these files.
-AC_CONFIG_FILES(Makefile src/Makefile plugins/Makefile ggobi.pc)
+AC_CONFIG_FILES(Makefile src/Makefile plugins/Makefile ggobi.pc ggobi-system.pc)
 AC_OUTPUT
 
 echo "*******************************"

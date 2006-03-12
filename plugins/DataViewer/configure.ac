@@ -13,9 +13,11 @@ AC_CONFIG_SRCDIR([dataviewer.c])
 AC_CONFIG_AUX_DIR([.])
 
 # Use the custom GGobi macro for configuring the plugin. This provides 
-# GGOBI_CFLAGS, GGOBI_LIBS, and SRC_DEBUG variables. It's smart enough to 
-# build against a local GGobi if necessary.
-GGOBI_CONFIG_PLUGIN
+# GGOBI_CFLAGS, GGOBI_LIBS, and SRC_DEBUG variables.
+# We ensure that we look in the grandparent directory
+# (since this plugin is bundled with GGobi)
+GGOBI_CONFIG_PLUGIN([../..])
+
 # Put this here to make autoreconf happy
 AC_PROG_LIBTOOL
 
