@@ -1197,8 +1197,9 @@ barchart_recalc_dimensions (splotd * rawsp, GGobiData * d, ggobid * gg)
     }
 
 /* draw overflow bins */
+
     if (sp->bar->high_pts_missing) {
-      sp->bar->high_bin->rect.width = rawsp->max.x - 2 * rect->x;
+      sp->bar->high_bin->rect.width = rawsp->max.x - 2 * 10; //10=rect->x;
       sp->bar->high_bin->rect.x = 10;
       sp->bar->high_bin->rect.height =
         (gint) ((gfloat) sp->bar->high_bin->count / n * maxheight);
@@ -1209,7 +1210,7 @@ barchart_recalc_dimensions (splotd * rawsp, GGobiData * d, ggobid * gg)
     }
     if (sp->bar->low_pts_missing) {
       sp->bar->low_bin->rect.x = 10;
-      sp->bar->low_bin->rect.width = rawsp->max.x - 2 * rect->x;
+      sp->bar->low_bin->rect.width = rawsp->max.x - 2 * 10; //10=rect->x;
       sp->bar->low_bin->rect.height =
         (gint) ((gfloat) sp->bar->low_bin->count / n * maxheight);
       sp->bar->low_bin->rect.y =
