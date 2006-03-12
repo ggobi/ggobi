@@ -42,7 +42,7 @@ static gdouble PYTHAG (gdouble a, gdouble b)
 gint
 dsvd (gdouble **a, gint m, gint n, gfloat *w, gdouble **v)
 {
-  gint flag, i, its, j, jj, k, l, nm;
+  gint flag, i, its, j, jj, k, l = 0, nm = 0;  // compiler pacification
   gdouble c, f, h, s, x, y, z;
   gdouble anorm = 0.0, g = 0.0, scale = 0.0;
   gdouble *rv1;

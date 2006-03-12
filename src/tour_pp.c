@@ -1022,7 +1022,7 @@ gint cartgini (array_f *pdata, void *param, gfloat *val, gpointer unused)
 { 
   pp_param *pp = (pp_param *) param;
   gint i, k, n, p, g = pp->numgroups, left, right, l;
-  gfloat dev, prob, maxindex, index;
+  gfloat dev, prob, maxindex = 0, index;
 
   n = pdata->nrows;
   p = pdata->ncols;
@@ -1073,7 +1073,9 @@ gint cartgini (array_f *pdata, void *param, gfloat *val, gpointer unused)
       if (dev<index) index = dev;
     }
     if(l==0) maxindex = index; /* index is between 0 and 1 - need max */
-    else if(maxindex < index) maxindex = index;
+    else {
+      if(maxindex < index) maxindex = index;
+    }
   }
   *val = 1-maxindex ;
   return(0);
@@ -1083,7 +1085,7 @@ gint cartentropy (array_f *pdata, void *param, gfloat *val, gpointer unused)
 { 
   pp_param *pp = (pp_param *) param;
   gint i, k, n, p, g = pp->numgroups, left, right,l;
-  gfloat dev, prob, maxindex, index;
+  gfloat dev, prob, maxindex = 0, index;
 
   n = pdata->nrows;
   p = pdata->ncols;
@@ -1134,7 +1136,9 @@ gint cartentropy (array_f *pdata, void *param, gfloat *val, gpointer unused)
       if (dev<index) index = dev;
     }
     if(l==0) maxindex=index;
-    else if(maxindex < index) maxindex = index;
+    else {
+      if(maxindex < index) maxindex = index;
+    }
   } 
   *val = 1-maxindex/log(g) ;
   return(0);
