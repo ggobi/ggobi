@@ -56,35 +56,35 @@ const char *getDataName(displayd *dpy);
 gboolean
 saveDOMToFile(xmlDocPtr doc, const char *fileName)
 {
-    int status;
+  int status = 0;
 
-    xmlIndentTreeOutput = TRUE;
-    if(sessionOptions->info->compress > 0) {
-        int compressionLevel;
-        compressionLevel = xmlGetDocCompressMode(doc);
-        xmlSetDocCompressMode(doc, sessionOptions->info->compress);
-        status = xmlSaveFile(fileName, doc);
-        xmlSetDocCompressMode(doc, compressionLevel);
+  xmlIndentTreeOutput = TRUE;
+  if(sessionOptions->info->compress > 0) {
+    int compressionLevel;
+    compressionLevel = xmlGetDocCompressMode(doc);
+    xmlSetDocCompressMode(doc, sessionOptions->info->compress);
+    status = xmlSaveFile(fileName, doc);
+    xmlSetDocCompressMode(doc, compressionLevel);
+  }
+  else {
+    xmlChar *mem;
+    int size;
+    FILE *f;
+    xmlDocDumpFormatMemoryEnc(doc, &mem, &size, NULL, TRUE);
+    if( (f = fopen(fileName, "w"))) {
+      fprintf(f, "%s", mem);
+      status = 1;
+      fclose(f);
     }
-    else {
-        xmlChar *mem;
-        int size;
-        FILE *f;
-        xmlDocDumpFormatMemoryEnc(doc, &mem, &size, NULL, TRUE);
-        if( (f = fopen(fileName, "w"))) {
-            fprintf(f, "%s", mem);
-            status = 1;
-            fclose(f);
-        }
-        xmlFree(mem);
-    }
+    xmlFree(mem);
+  }
 
-    if(status < 0) {
-        char buf[1000];
-        sprintf(buf, "%s\n%s", "Couldn't save session in file ", fileName);
-        quick_message(buf, true);
-    }
-    return(status > 0);
+  if(status < 0) {
+    char buf[1000];
+    sprintf(buf, "%s\n%s", "Couldn't save session in file ", fileName);
+    quick_message(buf, true);
+  }
+  return(status > 0);
 }
 
 /**

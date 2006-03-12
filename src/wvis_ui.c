@@ -460,7 +460,7 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
     selected_var = get_one_selection_from_tree_view (tree_view, d);
     if (selected_var == -1) {
       selected_var = 0;
-      select_tree_view_row (GTK_TREE_VIEW(tree_view), selected_var);
+      select_tree_view_row (tree_view, selected_var);
     }
   }
 
@@ -618,7 +618,7 @@ wvis_window_open (ggobid *gg)
 {
   GtkWidget *vbox, *hb;
   GtkWidget *notebook = NULL;
-  GtkWidget *btn, *opt, *label;
+  GtkWidget *btn, *opt;
   static gchar *const binning_method_lbl[] = {
     "Constant bin width",
     "Constant bin count (approx)"};

@@ -315,14 +315,17 @@ tour2d3_active_vars_swap (gint jvar_out, gint jvar_in, GGobiData *d,
                             dsp->t2d3.subset_vars_p.els[jvar_in];
 
   if (both_in_subset) {  /* swap their positions in active_vars */
+    a = b = -1;
     for (k=0; k<dsp->t2d3.nactive; k++) {
       if (dsp->t2d3.active_vars.els[k] == jvar_in)
         a = k;
       else if (dsp->t2d3.active_vars.els[k] == jvar_out)
         b = k;
     }
-    dsp->t2d3.active_vars.els[a] = jvar_out;
-    dsp->t2d3.active_vars.els[b] = jvar_in;
+    if (a != -1 && b != -1) {
+      dsp->t2d3.active_vars.els[a] = jvar_out;
+      dsp->t2d3.active_vars.els[b] = jvar_in;
+    }
 
   } else {
     dsp->t2d3.active_vars_p.els[jvar_out] = false;
@@ -852,6 +855,7 @@ tour2d3_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
 
     if (actual_nvars > 1)
     {
+      distx = disty = 0;
       if (cpanel->t2d3.manip_mode != MANIP_ANGULAR)
       {
         if (cpanel->t2d3.manip_mode == MANIP_OBLIQUE) 
@@ -861,13 +865,11 @@ tour2d3_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
         }
         else if (cpanel->t2d3.manip_mode == MANIP_VERT) 
         {
-          distx = 0.;
           disty = dsp->t2d3_pos2_old - dsp->t2d3_pos2;
         }
         else if (cpanel->t2d3.manip_mode == MANIP_HOR) 
         {
           distx = dsp->t2d3_pos1 - dsp->t2d3_pos1_old;
-          disty = 0.;
         }
         else if (cpanel->t2d3.manip_mode == MANIP_RADIAL) 
         {

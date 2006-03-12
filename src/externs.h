@@ -297,6 +297,7 @@ vartyped   ggobi_data_set_var_type(GGobiData *d, int which, vartyped value);*/
 gboolean   ggobi_file_set_create (gchar *rootname, GGobiData *, ggobid *);
 ggobid*    ggobi_get (gint);
 gint       ggobi_getIndex(ggobid *gg);
+void       ggobi_sleep(guint);
 void       globals_init (ggobid *);
 gboolean   gram_schmidt (gdouble *, gdouble*, gint);
 void       gt_basis (array_d, gint, vector_i, gint, gint);

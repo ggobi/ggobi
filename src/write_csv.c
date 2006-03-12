@@ -67,6 +67,8 @@ write_csv_cell(gint i, gint j, FILE *f, GGobiData *d, ggobid *gg)
     writeFloat (f, (gg->save.stage == TFORMDATA) ? d->tform.vals[i][j] :
                                                    d->raw.vals[i][j]);
     break;
+  default:
+    break;
   }
 }
 

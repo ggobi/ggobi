@@ -249,7 +249,7 @@ writeFloat(FILE *f, double value)
 gboolean
 write_xml_records(FILE *f, GGobiData *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 {
-  gint i, m, n;
+  gint i, m, n = 0;
 
   /*-- figure out how many records we're about to save.  --*/
   if (gg->save.row_ind == ALLROWS)

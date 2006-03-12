@@ -80,7 +80,7 @@ dialog_range_set (GtkWidget *w, ggobid *gg)
   gint ncols = selected_cols_get (cols, d, gg);
   gint j, k;
   gchar *val_str;
-  gfloat min_val, max_val;
+  gfloat min_val = 0, max_val = 0; // compiler pacification
   gboolean min_p = false, max_p = false;
   vartabled *vt;
 

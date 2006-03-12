@@ -294,13 +294,13 @@ void tour2d_speed_set(gfloat slidepos, ggobid *gg) {
 static void tour2d_speed_set_display(gfloat slidepos, displayd *dsp) 
 {
   cpaneld *cpanel;
-  if (dsp != NULL)
+  if (dsp) {
     cpanel = &dsp->cpanel;
-  if (cpanel == NULL)
-    return;
-
-  cpanel->t2d.slidepos = slidepos;
-  speed_set(slidepos, &cpanel->t2d.step, &dsp->t2d.delta);
+    if (cpanel) {
+      cpanel->t2d.slidepos = slidepos;
+      speed_set(slidepos, &cpanel->t2d.step, &dsp->t2d.delta);
+    }
+  }
 }
 
 void tour2d_pause (cpaneld *cpanel, gboolean state, displayd *dsp, ggobid *gg) 
@@ -432,6 +432,7 @@ tour2d_active_var_set (gint jvar, GGobiData *d, displayd *dsp, ggobid *gg)
       dsp->t2d.active_vars.els[0] = jvar;
     }
     else {
+      jtmp = dsp->t2d.nactive;
       for (j=0; j<dsp->t2d.nactive-1; j++) {
         if (jvar > dsp->t2d.active_vars.els[j] &&
             jvar < dsp->t2d.active_vars.els[j+1])
@@ -1115,6 +1116,7 @@ tour2d_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
 
     if (actual_nvars > 1)
     {
+      distx = disty = 0;
       if (cpanel->t2d.manip_mode != MANIP_ANGULAR)
       {
         if (cpanel->t2d.manip_mode == MANIP_OBLIQUE) 
@@ -1124,13 +1126,11 @@ tour2d_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
         }
         else if (cpanel->t2d.manip_mode == MANIP_VERT) 
         {
-          distx = 0.;
           disty = dsp->t2d_pos2_old - dsp->t2d_pos2;
         }
         else if (cpanel->t2d.manip_mode == MANIP_HOR) 
         {
           distx = dsp->t2d_pos1 - dsp->t2d_pos1_old;
-          disty = 0.;
         }
         else if (cpanel->t2d.manip_mode == MANIP_RADIAL) 
         {

@@ -479,7 +479,7 @@ tour_pp_solve(gdouble *a,gdouble *b,gint n,gint *Pivot)
 gdouble ludcmp(gdouble *a, gint n, gint *Pivot) 
 { 
   gint i,j,k,ier;
-  gdouble *s,det,temp,c;
+  gdouble *s,det,temp,c = 0;
   det=1;
 
   s = (gdouble *) g_malloc(n*sizeof(gdouble));
@@ -1074,7 +1074,7 @@ gint cartgini (array_f *pdata, void *param, gfloat *val, gpointer unused)
     }
     if(l==0) maxindex = index; /* index is between 0 and 1 - need max */
     else if(maxindex < index) maxindex = index;
-  } 
+  }
   *val = 1-maxindex ;
   return(0);
 }

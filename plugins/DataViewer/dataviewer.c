@@ -280,8 +280,6 @@ CHECK_EVENT_SIGNATURE(identify_cell, identify_point_f)
 void
 connect_to_splot(splotd *sp, GtkWidget *sheet)
 {
-  ggobid *gg = sp->displayptr->ggobi;
-
   // nothing to do currently, all events come from GGobi itself, not the splot
 }
 

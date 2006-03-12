@@ -63,7 +63,7 @@ static void
 graphact_datad_set_cb (GtkTreeSelection *tree_sel, PluginInstance *inst)
 {
   graphactd *ga = graphactFromInst (inst);
-  GGobiData *d, *e;
+  GGobiData *d;
   const gchar *clname = gtk_widget_get_name(GTK_WIDGET(gtk_tree_selection_get_tree_view(tree_sel)));
   gboolean changed = false;
   GtkTreeModel *model;
@@ -73,11 +73,11 @@ graphact_datad_set_cb (GtkTreeSelection *tree_sel, PluginInstance *inst)
 	  return;
   gtk_tree_model_get(model, &iter, 1, &d, -1);
   if (strcmp (clname, "nodeset") == 0) {
-	  changed = ga->d != d;
-	  ga->d = d;
+    changed = ga->d != d;
+    ga->d = d;
   } else if (strcmp (clname, "edgeset") == 0) {
-	  changed = ga->e != e;
-	  ga->e = e;
+    changed = ga->e != d;
+    ga->e = d;
   }
   
   #if 0
