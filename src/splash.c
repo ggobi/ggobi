@@ -60,8 +60,8 @@ splash_show (ggobid * gg)
                                                      2 +
                                                      strlen
                                                      (GGOBI_RELEASE_DATE) + 1));
-  sprintf (versionInfo, "%s %s, %s%s%s",
-           "Version", GGOBI_VERSION_STRING, GGOBI_RELEASE_DATE);
+  sprintf (versionInfo, "Version %s, %s",
+           GGOBI_VERSION_STRING, GGOBI_RELEASE_DATE);
   label = gtk_label_new (versionInfo);
   gtk_box_pack_start (GTK_BOX (hbox), label, FALSE, FALSE, 0);
   g_free (versionInfo);

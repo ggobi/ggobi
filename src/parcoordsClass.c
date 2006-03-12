@@ -24,6 +24,17 @@
 static gboolean parcoordsKeyEventHandled (GtkWidget *, displayd *, splotd *,
                                           GdkEventKey *, ggobid *);
 
+static gboolean
+binningPermitted (displayd * dpy)
+{
+  /*
+     cpaneld *cpanel = &dpy->cpanel;
+     if (cpanel->br_point_targets == br_select)
+     return(false);
+   */
+  return (!dpy->options.whiskers_show_p);
+}
+
 static void
 splotAssignPointsToBins (GGobiData * d, splotd * sp, ggobid * gg)
 {
@@ -38,16 +49,6 @@ splot1DVariablesGet (splotd * sp, gint * cols, GGobiData * d)
   return (1);
 }
 
-static gboolean
-parcoordsBinningPermitted (displayd * dpy)
-{
-  /*
-     cpaneld *cpanel = &dpy->cpanel;
-     if (cpanel->br_point_targets == br_select)
-     return(false);
-   */
-  return (!dpy->options.whiskers_show_p);
-}
 
 static gboolean
 cpanelSet (displayd * dpy, cpaneld * cpanel, ggobid * gg)
@@ -98,7 +99,6 @@ receive_parcoords_drag (GtkWidget * src, GdkDragContext * context, int x,
 {
   splotd *to = GGOBI_SPLOT (src), *from, *sp;
   displayd *display;
-  guint tmp;
   display = to->displayptr;
   GList *l;
   gint k;
@@ -602,7 +602,7 @@ void
 parcoordsDisplayClassInit (GGobiParCoordsDisplayClass * klass)
 {
   klass->parent_class.loop_over_points = true;
-  klass->parent_class.binningPermitted = parcoordsBinningPermitted;
+  klass->parent_class.binningPermitted = binningPermitted;
 
   klass->parent_class.allow_reorientation = true;
   klass->parent_class.options_menu_p = true;

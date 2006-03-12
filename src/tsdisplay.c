@@ -193,7 +193,6 @@ receive_timeSeries_drag(GtkWidget *src, GdkDragContext *context, int x, int y, c
 {
   splotd *to = GGOBI_SPLOT(src), *from, *sp;
   displayd *display;
-  guint tmp;
   display = to->displayptr;
   GList *l;
   gint k;

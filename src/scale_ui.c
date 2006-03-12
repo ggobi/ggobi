@@ -19,6 +19,7 @@
 #ifdef USE_STRINGS_H
 #include <strings.h>
 #endif
+#include <string.h>
 #include "vars.h"
 #include "externs.h"
 #include <math.h>
@@ -52,7 +53,7 @@ scale_update_set (gboolean update, displayd * dsp, ggobid * gg)
 
 }
 
-/* Use the hscale widget name to find the correspoding adjustment */
+/* Use the hscale widget name to find the corresponding adjustment */
 static GtkAdjustment *
 scale_adjustment_find_by_name (gchar * name, ggobid * gg)
 {
@@ -62,6 +63,7 @@ scale_adjustment_find_by_name (gchar * name, ggobid * gg)
   w = widget_find_by_name (panel, name);
   if (GTK_IS_HSCALE (w))
     return (gtk_range_get_adjustment (GTK_RANGE (w)));
+  else return NULL;
 }
 
 static void
@@ -83,7 +85,6 @@ zoom_cb (GtkAdjustment * adj, ggobid * gg)
   gchar *name = (gchar *) g_object_get_data (G_OBJECT (adj), "name");
   greal oscalex = sp->scale.x, oscaley = sp->scale.y;
   GtkAdjustment *adj_other;
-  gdouble value_other;
   // step and eps are in the space of the adjustment values;
   // exp_eps is in the space of the scaling values.
   gdouble expvalue = pow (10., adj->value), step = 0.0; // exp10
@@ -179,7 +180,6 @@ scale_zoom_reset (displayd * dsp)
 {
   ggobid *gg = dsp->ggobi;
   splotd *sp = gg->current_splot;
-  cpaneld *cpanel = &dsp->cpanel;
   GtkAdjustment *adj;
   gdouble value = log10 (SCALE_DEFAULT);
 
@@ -224,7 +224,6 @@ If ctrl-alt-z is pressed, toggle on and off click-style zooming.
 static gint
 key_press_cb (GtkWidget * w, GdkEventKey * event, splotd * sp)
 {
-  gboolean redraw = false;
   ggobid *gg = GGobiFromSPlot (sp);
   cpaneld *cpanel = &gg->current_display->cpanel;
 
@@ -368,7 +367,7 @@ void
 cpanel_scale_make (ggobid * gg)
 {
   modepaneld *panel;
-  GtkWidget *f, *vb, *lbl;
+  GtkWidget *f, *vb;
   GtkAdjustment *adjx, *adjy;
   GtkWidget *sbarx, *sbary;
   GtkWidget *tgl;

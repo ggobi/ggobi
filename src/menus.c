@@ -102,8 +102,7 @@ display_mode_menus_update (ProjectionMode pmode_prev,
 {
   ProjectionMode pmode = display->cpanel.pmode;
   InteractionMode imode = display->cpanel.imode;
-  /* or imode_get (gg) */
-  const gchar *ui;
+  const gchar *ui = NULL;
   GError *error = NULL;
 
   if (imode != imode_prev) {
@@ -128,10 +127,11 @@ display_mode_menus_update (ProjectionMode pmode_prev,
         ui = scale_imode_ui;
       }
 
-      display->imode_merge_id =
-        gtk_ui_manager_add_ui_from_string (display->menu_manager, ui, -1,
-                                           &error);
-      if (error) {
+      if (ui)
+        display->imode_merge_id =
+          gtk_ui_manager_add_ui_from_string (display->menu_manager, ui, -1,
+                                             &error);
+      if (ui == NULL || error) {
         g_message ("Failed to load display imode ui!\n");
         g_error_free (error);
       }

@@ -196,10 +196,10 @@ jitter_window_open (ggobid * gg)
       g_signal_connect (G_OBJECT (btn), "clicked",
                         G_CALLBACK (close_btn_cb), gg);
       gtk_box_pack_start (GTK_BOX (hb), btn, true, false, 0);
-    }
 
-    g_object_set_data (G_OBJECT (gg->jitter_ui.window), "notebook", notebook);
-    gtk_widget_show_all (gg->jitter_ui.window);
+      g_object_set_data (G_OBJECT (gg->jitter_ui.window), "notebook", notebook);
+      gtk_widget_show_all (gg->jitter_ui.window);
+    }
   }
 
   gdk_window_raise (gg->jitter_ui.window->window);

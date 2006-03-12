@@ -35,7 +35,6 @@ static gint ymargin = 20;
 
 GtkWidget *createColorSchemeTree (int numTypes, gchar * schemeTypes[],
                                   ggobid * gg);
-static void selection_made_cb (GtkTreeSelection * tree_sel, ggobid * gg);
 static void entry_set_scheme_name (ggobid * gg);
 
 /*-------------------------------------------------------------------*/
@@ -146,17 +145,9 @@ da_expose_cb (GtkWidget * w, GdkEventExpose * event, ggobid * gg)
 {
   gint height = w->allocation.height - 2 * ymargin;
   gint x0, x1, k, hgt;
-  gint x = xmargin;
-  gint y = ymargin;
-  /*GdkPoint *points; */
-  gfloat diff;
-  vartabled *vt;
   colorschemed *scheme = (gg->svis.scheme != NULL) ?
     gg->svis.scheme : gg->activeColorScheme;
-
   GGobiData *d = NULL;
-
-  GtkWidget *da = gg->svis.da;
   GdkPixmap *pix = gg->svis.pix;
 
   if (gg->svis.GC == NULL)
@@ -190,29 +181,6 @@ da_expose_cb (GtkWidget * w, GdkEventExpose * event, ggobid * gg)
                    0, 0, 0, 0, w->allocation.width, w->allocation.height);
 }
 
-void
-selection_made_cb (GtkTreeSelection * tree_sel, ggobid * gg)
-{
-  gboolean rval = false;
-  GtkTreeView *tree_view = gtk_tree_selection_get_tree_view (tree_sel);
-  GGobiData *d =
-    (GGobiData *) g_object_get_data (G_OBJECT (tree_view), "datad");
-  GtkWidget *btn;
-  gint row;
-
-  row = tree_selection_get_selected_row (tree_sel);
-  if (row == -1)
-    return;
-
-  bin_boundaries_set (d, gg);  /*-- in case the method changed --*/
-  g_signal_emit_by_name (G_OBJECT (gg->svis.da), "expose_event",
-                         (gpointer) gg, (gpointer) & rval);
-
-  /*-- get the apply button, make it sensitive --*/
-  btn = widget_find_by_name (gg->svis.window, "WVIS:apply");
-  if (btn)
-    gtk_widget_set_sensitive (btn, true);
-}
 
 /*
  * Find out whether it's possible to use the new scheme
@@ -346,42 +314,6 @@ scale_set_cb (GtkWidget * w, ggobid * gg)
   cluster_table_update (d, gg);
 }
 
-static void
-scale_apply_cb (GtkWidget * w, ggobid * gg)
-{
-  GtkWidget *tree_view = get_tree_view_from_object (G_OBJECT (w));
-  GGobiData *d =
-    (GGobiData *) g_object_get_data (G_OBJECT (tree_view), "datad");
-  colorschemed *scheme =
-    (gg->svis.scheme != NULL) ? gg->svis.scheme : gg->activeColorScheme;
-
-  if (d) {
-    gboolean rval = false;
-
-    /*
-     * If we've been using gg->svis.scheme, set gg->activeColorScheme
-     * to this scheme.
-     */
-    if (gg->svis.scheme) {
-      gg->activeColorScheme = gg->svis.scheme;
-      entry_set_scheme_name (gg);
-    }
-
-    clusters_set (d, gg);
-
-    /*-- before calling displays_plot, reset brushing color if needed --*/
-    if (gg->color_id >= scheme->n)
-      gg->color_id = scheme->n - 1;
-
-    displays_plot (NULL, FULL, gg);
-
-    g_signal_emit_by_name (G_OBJECT (gg->svis.da), "expose_event",
-                           (gpointer) gg, (gpointer) & rval);
-
-    symbol_window_redraw (gg);
-    cluster_table_update (d, gg);
-  }
-}
 
 static void
 entry_set_scheme_name (ggobid * gg)
@@ -399,7 +331,7 @@ svis_window_open (ggobid * gg)
 {
   GtkWidget *vbox;
   GtkWidget *hb;
-  GtkWidget *btn, *opt, *label;
+  GtkWidget *btn, *label;
 
   /*-- for colorscales --*/
   GtkWidget *hpane, *tr, *sw;

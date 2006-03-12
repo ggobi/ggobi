@@ -188,21 +188,12 @@ static void tform_reset_cb (GtkWidget *w, ggobid *gg)
 void
 tfvar_selection_made_cb (GtkTreeSelection *tree_sel, ggobid *gg)
 {
-  gboolean rval = false;
   GtkTreeView *tree_view = gtk_tree_selection_get_tree_view(tree_sel);
   GGobiData *d = (GGobiData *) g_object_get_data(G_OBJECT (tree_view), "datad");
-  GtkWidget *btn;
   gint j, nvars, *rows;  // allocated in function
 
   /* Parameters of transformation */
   vartabled *vt0, *vtnew;
-  gint tform0;
-  gfloat domain_incr;  /*-- stage 0 --*/
-  gfloat (*domain_adj) (gfloat x, gfloat incr);
-  gfloat (*inv_domain_adj) (gfloat x, gfloat incr);
-  gint tform1;
-  gfloat param;
-  gint tform2;
 
   if (!d)
     return;

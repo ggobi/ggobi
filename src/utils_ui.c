@@ -580,7 +580,7 @@ CHECK_EVENT_SIGNATURE (variable_notebook_adddata_cb, datad_added_f)
                                           gpointer func_data, ggobid * gg)
 {
   GtkWidget *notebook;
-  gint nd = g_slist_length (gg->d);
+  //gint nd = g_slist_length (gg->d);
   GSList *l;
   GGobiData *d;
 

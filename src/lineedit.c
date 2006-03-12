@@ -75,7 +75,7 @@ record_add (eeMode mode, gint a, gint b, gchar * lbl, gchar * id,
         if (vt->vartype == categorical) {
           /* Loop over levels, and add to the one that is closest to x.
            * Also, increment vt->level_counts[level] */
-          gint k, level = 0, dist, ddist;
+          gint k, level = 0, dist, ddist = 0;
           for (k = 0; k < vt->nlevels; k++) {
             dist = fabs ((greal) vt->level_values[k] - x);
             if (k == 0)
@@ -625,7 +625,7 @@ fetch_default_record_values (gchar ** vals, GGobiData * dtarget,
       vt = vartable_element_get (j, dtarget);
       if (vt->vartype == categorical) {
         /* Loop over levels, and choose the one that is closest to x. */
-        gint k, level = 0, dist, ddist;
+        gint k, level = 0, dist, ddist = 0;
         for (k = 0; k < vt->nlevels; k++) {
           dist = fabs ((greal) vt->level_values[k] - raw[j]);
           if (k == 0)

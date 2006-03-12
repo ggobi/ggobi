@@ -268,9 +268,8 @@ scree_expose_cb (GtkWidget * w, GdkEventConfigure * event, ggobid * gg)
 {
   gint margin = 10;
   gint j;
-  gint xpos, ypos, xstrt, ystrt;
+  gint xpos, ypos, xstrt = 0, ystrt = 0; // compiler pacification
   gchar *tickmk;
-  //GtkStyle *style = gtk_widget_get_style (gg->sphere_ui.scree_da);
   GGobiData *d = datad_get_from_window (gg->sphere_ui.window);
   gint wid = w->allocation.width, hgt = w->allocation.height;
   gint *sphvars, nels;
@@ -313,9 +312,6 @@ scree_expose_cb (GtkWidget * w, GdkEventConfigure * event, ggobid * gg)
       gdk_draw_layout (gg->sphere_ui.scree_pixmap, gg->plot_GC, xpos,
                        hgt - margin / 2 - 0.75 * rect.height, layout);
       g_object_unref (G_OBJECT (layout));
-      /*gdk_draw_string (gg->sphere_ui.scree_pixmap,
-         gtk_style_get_font (style),
-         gg->plot_GC, xpos, hgt-margin/2, tickmk); */
       g_free (tickmk);
 
       if (j > 0)
@@ -367,7 +363,7 @@ sphere_panel_open (ggobid * gg)
   GtkWidget *label;
   GtkWidget *spinner;
   GGobiData *d;
-  GtkWidget *notebook;
+  GtkWidget *notebook = NULL; // compiler pacification
   /*-- for the tree_view of sphered variables --*/
   GtkWidget *scrolled_window;
   gchar *titles[1] = { "sphered variables" };
@@ -602,15 +598,15 @@ sphere_panel_open (ggobid * gg)
                       G_CALLBACK (close_btn_cb), gg);
 
     g_object_set_data (G_OBJECT (gg->sphere_ui.window), "notebook", notebook);
+
+    gtk_widget_show_all (vbox);
   }
 
-  gtk_widget_show_all (vbox);
   gdk_flush ();
-
   gtk_widget_show_all (gg->sphere_ui.window);
 
 /*-- play around with making this notebook larger --*/
-  if (g_list_length (GTK_NOTEBOOK (notebook)->children) > 0) {
+  if (notebook && GTK_IS_NOTEBOOK(notebook) && g_list_length (GTK_NOTEBOOK (notebook)->children) > 0) {
     gint page;
     GtkWidget *swin, *tree_view;
     GtkAdjustment *adj;

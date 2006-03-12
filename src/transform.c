@@ -733,6 +733,8 @@ collab_tform_update (gint j, GGobiData *d, ggobid *gg)
     case SCALE_AB:
       lbl1 = g_strdup_printf ("%s [a,b]", lbl0);
       break;
+    default:  // compiler pacification
+      lbl1 = "";
   }
 
   switch (vt->tform2) {

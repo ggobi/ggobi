@@ -135,8 +135,6 @@ barchartVarSel (GtkWidget * w, displayd * display, splotd * sp, gint jvar,
   }
 
   if (redraw) {
-    displayd *display = (displayd *) sp->displayptr;
-
     barchart_clean_init (GGOBI_BARCHART_SPLOT (sp));
     barchart_recalc_counts (GGOBI_BARCHART_SPLOT (sp), d, d->gg);
   }

@@ -77,19 +77,18 @@ fileset_read (const gchar * ldata_in, const gchar * pluginModeName,
               GGobiPluginInfo * plugin, ggobid * gg)
 {
   InputDescription *desc;
-  gboolean ok = true;
 
   desc = fileset_generate (ldata_in, pluginModeName, plugin, gg);
 
   if (desc == NULL) {
     g_printerr ("Cannot locate the file %s\n", ldata_in);
-    return (false);
+    return NULL;
   }
 
   if (desc->mode == unknown_data && desc->desc_read_input == NULL) {
     g_printerr ("Cannot determine the format of the data in file %s\n",
                 desc->fileName);
-    return (false);
+    return NULL;
   }
 
   gg->input = desc;
@@ -102,7 +101,7 @@ fileset_read (const gchar * ldata_in, const gchar * pluginModeName,
 GSList *
 read_input (InputDescription * desc, ggobid * gg)
 {
-  GSList *ds;
+  GSList *ds = NULL;
   if (desc == NULL)
     return (NULL);
 

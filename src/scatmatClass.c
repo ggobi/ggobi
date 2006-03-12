@@ -266,7 +266,6 @@ receive_scatmat_drag (GtkWidget * src, GdkDragContext * context, int x, int y,
 {
   splotd *to = GGOBI_SPLOT (src), *from, *sp;
   displayd *display;
-  guint tmp;
   GList *l;
   gint k, n, sprow, spcol;
   GtkWidget *da;

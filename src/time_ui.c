@@ -68,7 +68,9 @@ varscale_cb (GtkWidget * w, ggobid * gg)
 GtkWidget *
 cpanel_tsplot_make (ggobid * gg)
 {
+#ifdef TS_EXTENSIONS_IMPLEMENTED
   GtkWidget *vb, *lbl, *opt;
+#endif
   GtkWidget *cpanel;
 
   cpanel = gtk_vbox_new (false, VBOX_SPACING);

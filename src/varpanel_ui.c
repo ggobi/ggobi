@@ -213,7 +213,7 @@ varpanel_show_page (displayd * display, ggobid * gg)
 {
   GtkNotebook *nb;
   gint page, page_new;
-  GGobiData *d = display->d, *paged;
+  GGobiData *d = display->d, *paged = NULL;
   GList *l, *children;
   GtkWidget *child, *tab_label;
   GtkWidget *pagechild;
@@ -500,9 +500,8 @@ its own projection.  Add a variable to varpanel_ui in datad.h? -- dfs */
 void
 varpanel_set_sensitive (GGobiData * d, gboolean sensitive_p, ggobid * gg)
 {
-  gint i;
   GtkWidget *vbox = d->vcbox_ui.vbox, *hb;
-  GList *vblist, *hblist, *l;
+  GList *vblist, *hblist;
 
   /* The vbox has one child per row, an hbox. */
   vblist = gtk_container_get_children (GTK_CONTAINER (vbox));

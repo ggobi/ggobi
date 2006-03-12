@@ -59,6 +59,7 @@
 #include <stdio.h>
 #include "vars.h"
 #include "externs.h"
+#include "string.h"
 
 /* Error conditions */
 #define ERR_GARBAGE_AROUND_QUOTE (-1)
@@ -90,7 +91,6 @@ typedef struct _Row
 
 static int csv_row_parse (Row * row, GIOChannel * channel, gint trim);
 static gboolean is_numeric (gchar * str, gint len);
-static gboolean has_column_labels (GList * rows, gboolean has_row_labels);
 static gboolean has_row_labels (GList * rows);
 static void load_column_labels (Row * row, GGobiData * d,
                                 gboolean row_labels);
@@ -100,7 +100,6 @@ static void load_levels_from_hash (gpointer key, gpointer value,
                                    vartabled * vt);
 static void load_row_values (GList * rows, GGobiData * d,
                              gboolean row_labels);
-static void load_row_data (GList * rows, GGobiData * d);
 static gboolean name_set (GGobiData * d, gchar * name);
 static void tokenize_row (Row * row);
 GSList *read_csv_data (InputDescription * desc, ggobid * gg);
@@ -452,7 +451,6 @@ static GGobiData *
 create_data (GList * rows, gchar * name)
 {
   GGobiData *d;
-  GList *cur;
   guint nrows = g_list_length (rows), ncols = 0;
 
   gboolean row_labels = has_row_labels (rows);
@@ -503,7 +501,6 @@ read_csv_data (InputDescription * desc, ggobid * gg)
   gint ret;
   GList *rows = NULL;
   GSList *ds = NULL;
-  gint nrows, ncols = 0;
 
   fprintf (stderr, "Reading csv data\n");
 

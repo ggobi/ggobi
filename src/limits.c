@@ -253,7 +253,6 @@ limits_set (GGobiData * d, gboolean do_raw, gboolean do_tform,
             gboolean visible_only)
 {
   gint j;
-  gfloat min, max;
   vartabled *vt;
 
   if (do_raw)
@@ -272,7 +271,6 @@ void
 limits_set_by_var (GGobiData * d, gint j, gboolean do_raw, gboolean do_tform,
                    gboolean visible_only)
 {
-  gfloat min, max;
   vartabled *vt = vartable_element_get (j, d);
 
   if (do_raw)

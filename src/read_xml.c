@@ -73,6 +73,7 @@
 #include <string.h>
 #include <strings.h>
 #include <gtk/gtk.h>
+#include <glib/gprintf.h>
 
 #include "read_xml.h"
 
@@ -240,7 +241,6 @@ data_xml_read (InputDescription * desc, ggobid * gg)
   xmlParserCtxtPtr ctx =
     (xmlParserCtxtPtr) g_malloc (sizeof (xmlParserCtxtPtr));
   XMLParserData data;
-  gboolean ok = false;
   gchar *name = g_strdup (desc->fileName);  /* find_xml_file(desc->fileName, NULL, gg); */
   GSList *dlist;
 
@@ -1009,8 +1009,6 @@ getAttribute (const xmlChar ** attrs, gchar * name)
 gboolean
 newRecord (const xmlChar ** attrs, XMLParserData * data)
 {
-  GGobiData *d = getCurrentXMLData (data);
-
   readXMLRecord (attrs, data);
 
   return (true);
@@ -1312,7 +1310,7 @@ setRecordValue (const char *tmp, GGobiData * d, XMLParserData * data)
    */
   if (data->recordLabelsVariable == data->current_element) {
     gchar *tmp1;
-    /* If this is a categorical, lookup the level id. */
+    /* If this is a categorical, look up the level id. */
     gchar buf[100];
     if (d->missing.vals &&
         d->missing.vals[data->current_record][data->current_element]) {

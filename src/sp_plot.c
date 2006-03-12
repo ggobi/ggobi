@@ -306,7 +306,7 @@ splot_draw_to_pixmap0_binned (splotd *sp, gboolean draw_hidden, ggobid *gg)
 {
 #ifndef WIN32
   gint ih, iv;
-  gint i, m, j;
+  gint i, m;
 #endif
   gint k;
   displayd *display = (displayd *) sp->displayptr;
@@ -598,8 +598,6 @@ void
 splot_add_identify_sticky_cues (splotd *sp, GdkDrawable *drawable, gint k,
   ggobid *gg)
 {
-  displayd *display = sp->displayptr;
-
   if (GGOBI_IS_EXTENDED_SPLOT(sp)) {
     GGobiExtendedSPlotClass *klass;
     klass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);
@@ -639,7 +637,6 @@ splot_add_record_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
   GGobiData *d = display->d;
   GGobiData *e = display->e;
   InteractionMode imode = imode_get (gg);
-  cpaneld *cpanel = &display->cpanel;
 
   /*
      these are the cues added to

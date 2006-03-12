@@ -88,8 +88,6 @@ static const gchar *const substr_lbl[] = {
 static void subset_string_pos_cb (GtkWidget *w, ggobid *gg)
 {
   GGobiData *d = datad_get_from_widget (w, gg);
-  GtkWidget *tgl = (GtkWidget *)
-    g_object_get_data(G_OBJECT(gg->subset_ui.window), "SS:IGNORE_CASE");
 
   d->subset.string_pos = gtk_combo_box_get_active(GTK_COMBO_BOX(w));
 }
@@ -169,7 +167,7 @@ subset_cb (GtkWidget *w, ggobid *gg)
   gchar *sample_str, *substr;
   gint bstart, bsize;
   gint estart, estep;
-  gboolean redraw;
+  gboolean redraw = false;
   GGobiData *d = datad_get_from_widget (w, gg);
   GtkWidget *entry, *tgl;
 

@@ -270,7 +270,7 @@ subset_rowlab (gchar *substr, gint substr_pos, gboolean ignore_case,
     else label = g_strndup(label, substr_pos == 2 ? safe_len : llen);
     if (substr_pos == 1 || substr_pos == 4) {
       gchar *inside = strstr(label, substr);
-      if (inside && substr_pos == 1 || !inside && substr_pos == 4)
+      if ((inside && substr_pos == 1) || (!inside && substr_pos == 4))
         add_to_subset (i, d, gg);
     } else if (!g_utf8_collate(g_utf8_offset_to_pointer(label, start), substr))
         add_to_subset (i, d, gg);

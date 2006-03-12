@@ -48,7 +48,7 @@ read_colorscheme (gchar * fileName, GList ** list)
 {
   xmlDocPtr doc;
   xmlNodePtr node;
-  colorschemed *scheme;
+  colorschemed *scheme = NULL; // compiler pacification
 
   if (!file_is_readable (fileName)
       && !(strncmp ("http", fileName, 4) == 0

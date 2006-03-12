@@ -245,7 +245,8 @@ is_variable_plotted (gint * cols, gint ncols, GGobiData * d)
   displayd *display;
   gint jplotted = -1;
 
-  g_return_if_fail(GGOBI_IS_GGOBI(d->gg));
+  if (!GGOBI_IS_GGOBI(d->gg))
+    return 0;
 
   /*-- check each display for each variable --*/
   for (dlist = d->gg->displays; dlist; dlist = dlist->next) {
@@ -273,7 +274,9 @@ delete_vars (gint * cols, gint ncols, GGobiData * d)
   gint *keepers, nkeepers;
   vartabled *vt;
 
-  g_return_if_fail(GGOBI_IS_GGOBI(d->gg));
+  if (!GGOBI_IS_GGOBI(d->gg))
+    return false;
+
   /*-- don't allow all variables to be deleted --*/
   if (ncols >= d->ncols)
     return false;
@@ -383,7 +386,6 @@ ggobi_data_set_var_type (GGobiData * d, int which, vartyped value)
 
   return (old);
 }
-
 
 gboolean
 ggobi_data_set_time_var (GGobiData * d, int which, gboolean value)

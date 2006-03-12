@@ -297,9 +297,9 @@ parcoords_add_delete_splot(cpaneld *cpanel, splotd *sp, gint jvar, gint *jvar_pr
   gboolean redraw = true;
   gint nplots = g_list_length (display->splots);
   gint k;
-  gint indx, new_indx;
-  GList *l, *ltofree;
-  splotd *sp_jvar, *s, *sp_new;
+  gint indx = -1, new_indx;
+  GList *l, *ltofree = NULL;
+  splotd *sp_jvar = NULL, *s, *sp_new;
   GtkWidget *box;
 
   /* sp = gg->current_splot
@@ -324,6 +324,9 @@ parcoords_add_delete_splot(cpaneld *cpanel, splotd *sp, gint jvar, gint *jvar_pr
         l = l->next;
         k++;
       }
+
+      if (indx == -1 || ltofree == NULL || sp_jvar == NULL)
+        return false; // No plot was found.
 
       /*-- Delete the plot from the list without freeing it. --*/
       display->splots = g_list_remove_link (display->splots, ltofree);
