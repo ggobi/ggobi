@@ -70,11 +70,6 @@ gint visible_set (glong *visible, GGobiData *d);
 
 void radial_center_set_cb (ggobid *gg, gint index, gint state, GGobiData *d, PluginInstance *inst);
 
-#ifdef CMDS
-gint cmds (array_d *D, array_d *X);
-void spring_once (gint ndims, GGobiData *d, GGobiData *e, array_d *dist, array_d *pos);
-#endif
-
 #if defined GRAPHVIZ || defined HAVE_LIBGVC
 void neato_dim_cb (GtkAdjustment *adj, PluginInstance *inst);
 void neato_model_cb (GtkWidget *w, PluginInstance *inst);
