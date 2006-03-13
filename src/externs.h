@@ -203,8 +203,6 @@ colorschemed* default_scheme_init ();
 gushort    datad_colors_used_get (gint *ncolors_used, gushort *colors_used, GGobiData *, ggobid *); 
 void       datad_free (GGobiData *, ggobid *);
 GGobiData*     datad_get_from_notebook (GtkWidget *notebook, ggobid *);
-gboolean   datad_has_edges (GGobiData *d);
-gboolean   datad_has_variables (GGobiData *d);
 displayd*  datad_init (GGobiData *, ggobid *, gboolean);
 void       datad_record_id_add (gchar *ids, GGobiData *d);
 void       datad_record_id_add (gchar *ids, GGobiData *d);

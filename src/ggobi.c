@@ -956,3 +956,24 @@ GGOBI_getSessionOptions ()
 
 #define GGOBI_MAIN 1
 #include "GGStructSizes.c"
+
+gint
+ndatad_with_vars_get (ggobid *gg)
+{
+ gint nd;
+ GSList *l;
+ GGobiData *d;
+
+ /*-- silly to do this every time, perhaps, but harmless, I think --*/
+ if (g_slist_length (gg->d) > 1) {
+   nd = 0;
+   for (l = gg->d; l; l = l->next) {
+     d = (GGobiData *) l->data;
+     if (g_slist_length (d->vartable) > 0)
+       nd++;
+   }
+ }  else nd = 1;
+
+ return nd;
+}
+

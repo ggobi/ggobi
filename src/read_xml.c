@@ -1849,19 +1849,6 @@ intern (XMLParserData * data, const char *el)
 }
 
 
-gint
-checkLevelValue (vartabled * vt, double value)
-{
-  gint i;
-  for (i = 0; i < vt->nlevels; i++) {
-    if (vt->level_values[i] == (int) value)
-      return (i);
-  }
-
-  return (-1);
-}
-
-
 gboolean
 setBrushStyle (const xmlChar ** attrs, XMLParserData * data)
 {

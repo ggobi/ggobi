@@ -369,3 +369,15 @@ vartable_stats_print (GGobiData *d, ggobid *gg)
       vt->lim_tform.min, vt->lim_tform.max);
   }
 }
+
+gint
+checkLevelValue (vartabled *vt, double value)
+{
+  gint i;
+  for (i = 0; i < vt->nlevels; i++) {
+    if (vt->level_values[i] == (int) value)
+      return (i);
+  }
+
+  return (-1);
+}

@@ -412,7 +412,7 @@ load_row_values (GList * rows, GGobiData * d, gboolean row_labels)
       gchar *str = row->src->str + row->entry[j + offset].ofs;
       //fprintf(stderr, "string: %s\n", str);
       if (is_numeric (str, row->entry[j + offset].len))
-        d->raw.vals[i][j] = (gfloat) g_strtod (str, NULL);
+        ggobi_data_set_raw_value(d, i, j, (gfloat) g_strtod (str, NULL));
       else {
         if (str[0] == '\0' || !g_ascii_strcasecmp (str, "na")
             || !strcmp (str, ".")) {
@@ -462,7 +462,7 @@ create_data (GList * rows, gchar * name)
 
   /* Initialize datad structure */
   d = ggobi_data_new (nrows - 1, ncols);
-  name_set (d, name);
+  ggobi_data_set_name(d, name, NULL);
 
   load_column_labels ((Row *) rows->data, d, row_labels);
 
@@ -472,15 +472,6 @@ create_data (GList * rows, gchar * name)
   load_row_values (rows, d, row_labels);
 
   return (d);
-}
-
-static gboolean
-name_set (GGobiData * d, gchar * name)
-{
-  /* Initialize name structure in GGobiData */
-  d->name = g_path_get_basename (name);
-  d->nickname = g_strndup (d->name, 2);
-  return (true);
 }
 
 /* This makes things a lot easier - Michael */

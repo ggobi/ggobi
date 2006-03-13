@@ -546,7 +546,7 @@ CHECK_EVENT_SIGNATURE (exclusion_notebook_adddata_cb, datad_added_f)
     d = (GGobiData *) l->data;
 
     /*-- skip datasets without variables --*/
-    if (!datad_has_variables (d))
+    if (!ggobi_data_has_variables (d))
       continue;
 
     /* Create a scrolled window to hold the table */
