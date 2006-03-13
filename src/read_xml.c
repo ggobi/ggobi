@@ -326,6 +326,10 @@ initParserData (XMLParserData * data, xmlSAXHandlerPtr handler, ggobid * gg)
   data->defaults.edgeWidth = -1;  /*-- this has no home in ggobi --*/
   data->defaults.hidden = false;
 
+  /*
+   * I don't think we plan to support this feature, so I'm ifdef'ing
+   * out some buggy code later on in the file. dfs
+  */
   data->recordLabelsVariable = -1;
 
   data->recordString = NULL;
@@ -1308,6 +1312,10 @@ setRecordValue (const char *tmp, GGobiData * d, XMLParserData * data)
   /* If the dataset is using one of the variables as the row labels,
      then resolve the name.
    */
+  /*
+   *  I don't think we plan to support this, and it's buggy to boot -- dfs
+   */
+#if RECORD_LABELS_VARIABLE
   if (data->recordLabelsVariable == data->current_element) {
     gchar *tmp1;
     /* If this is a categorical, look up the level id. */
@@ -1333,6 +1341,7 @@ setRecordValue (const char *tmp, GGobiData * d, XMLParserData * data)
     g_array_insert_val (d->rowlab, data->current_record, tmp1);
     g_free (tmp1);
   }
+#endif
 
   return (true);
 }
@@ -1449,10 +1458,16 @@ newVariable (const xmlChar ** attrs, XMLParserData * data,
   else
     el->nickname = g_strndup (el->collab, 2);
 
+  /*
+   * I don't think we plan to support this, so I'm ifdef-ing out
+   * some buggy code elsewhere in the file -- dfs
+   */
+#if RECORD_LABELS_VARIABLE
   tmp = getAttribute (attrs, "recordLabel");
   if (tmp != NULL) {
     data->recordLabelsVariable = data->current_variable;
   }
+#endif
 
   tmp = getAttribute (attrs, "min");
   tmp1 = getAttribute (attrs, "max");
