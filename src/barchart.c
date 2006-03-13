@@ -838,9 +838,9 @@ barchart_set_initials (barchartSPlotd * sp, GGobiData * d)
 {
   splotd *rawsp = GGOBI_SPLOT (sp);
   vartabled *vtx = vartable_element_get (rawsp->p1dvar, d);
+  gboolean foundp = false;
 
   if (vtx->vartype == categorical) {
-/* dfs */
     if (vtx->nlevels > 1) {
       gint i, level;
       gfloat missing_val;
@@ -849,6 +849,7 @@ barchart_set_initials (barchartSPlotd * sp, GGobiData * d)
         for (i = 0; i < d->nrows_in_plot; i++) {
           if (MISSING_P (d->rows_in_plot.els[i], rawsp->p1dvar)) {
             missing_val = d->tform.vals[i][rawsp->p1dvar];
+            foundp = true;
             break;
           }
         }
@@ -856,7 +857,7 @@ barchart_set_initials (barchartSPlotd * sp, GGobiData * d)
            of the levels we already have, then we need an extra bin
            for the missings.
          */
-        if (checkLevelValue (vtx, missing_val) == -1) {
+        if (foundp && checkLevelValue (vtx, missing_val) == -1) {
           add_level = true;
           level = 0;
           for (i = 0; i < sp->bar->nbins; i++) {
