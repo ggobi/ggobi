@@ -137,7 +137,7 @@ neato_apply_edge_length (Agraph_t *graph, gint weightvar, glong *visible,
 			 gint nvisible, GGobiData *d, GGobiData *e, ggobid *gg)
 {
   gint i, a, b;
-  GGobiData *e_clist;
+  //GGobiData *e_clist;
   Agnode_t *head, *tail;
   Agedge_t *edge;
   gchar *name;
@@ -323,8 +323,9 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
 
   } else if (layout_type == TWOPI_LAYOUT) {
     Agnode_t *ctr = 0;
+#ifndef HAVE_LIBGVC
     Agraph_t **ccs;
-    int ncc;
+#endif
 
     /* Get the rowlab associated with the center node, if defined */
     if (gl->centerNodeIndex >= 0) {
