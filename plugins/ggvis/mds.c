@@ -9,8 +9,6 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <limits.h>
-#include <float.h>
 #include <string.h>
 
 #include <gtk/gtk.h>
@@ -187,8 +185,8 @@ set_weights (ggvisd *ggv)
     
     for (i=0; i<ggv->Dtarget.nrows; i++) {
       for (j=0; j<ggv->Dtarget.ncols; j++) {
-        if (ggv->Dtarget.vals[i][j] == DBL_MAX) {
-          ggv->weights.els[IJ] = DBL_MAX;
+        if (ggv->Dtarget.vals[i][j] == G_MAXDOUBLE) {
+          ggv->weights.els[IJ] = G_MAXDOUBLE;
           continue;
         }
         if (ggv->weight_power != 0.) {
@@ -256,7 +254,7 @@ update_stress (ggvisd *ggv, ggobid *gg)
   for (i=0; i < ggv->Dtarget.nrows; i++) 
     for (j=0; j < ggv->Dtarget.ncols; j++) {
       dist_trans  = ggv->trans_dist.els[IJ];
-      if (dist_trans == DBL_MAX) continue;
+      if (dist_trans == G_MAXDOUBLE) continue;
       dist_config = ggv->config_dist.els[IJ];
       if (ggv->weight_power == 0. && ggv->within_between == 1.) { 
         stress_dx += dist_trans  * dist_config;
@@ -297,13 +295,13 @@ power_transform (ggvisd *ggv)
     if (ggv->KruskalShepard_classic == KruskalShepard) { 
       for (i=0; i<ggv->ndistances; i++) {
         tmp = ggv->trans_dist.els[i];
-        if (tmp != DBL_MAX)
+        if (tmp != G_MAXDOUBLE)
           ggv->trans_dist.els[i] = tmp*tmp/ggv->Dtarget_max;
       }
     } else { 
       for (i=0; i<ggv->ndistances; i++) {
         tmp = ggv->trans_dist.els[i];
-        if (tmp != DBL_MAX)
+        if (tmp != G_MAXDOUBLE)
           ggv->trans_dist.els[i] = -tmp*tmp/ggv->Dtarget_max;
       }
     }
@@ -312,13 +310,13 @@ power_transform (ggvisd *ggv)
     if (ggv->KruskalShepard_classic == KruskalShepard) { 
       for(i=0; i<ggv->ndistances; i++) {
         tmp = ggv->trans_dist.els[i];
-        if (tmp != DBL_MAX)
+        if (tmp != G_MAXDOUBLE)
           ggv->trans_dist.els[i] = pow(tmp, ggv->Dtarget_power)/fac;
       }
     } else { 
       for(i=0; i<ggv->ndistances; i++) {
         tmp = ggv->trans_dist.els[i];
-        if(tmp != DBL_MAX)
+        if(tmp != G_MAXDOUBLE)
           ggv->trans_dist.els[i] = -pow(-tmp, ggv->Dtarget_power)/fac;
       }
     }
@@ -410,7 +408,7 @@ isotonic_transform (ggvisd *ggv, ggobid *gg)
   /* form initial block means (and weights if necessary); need to
      fill only first element of a block */
   for (i = 0; i < ggv->ndistances; i += ggv->bl.els[i]) {        
-    if (ggv->trans_dist.els[ggv->trans_dist_index.els[i]] != DBL_MAX) {
+    if (ggv->trans_dist.els[ggv->trans_dist_index.els[i]] != G_MAXDOUBLE) {
       ii = i + ggv->bl.els[i];
       if (ggv->weight_power == 0. && ggv->within_between == 1.) {
         tmp_distsum = 0.;  
@@ -474,7 +472,7 @@ isotonic_transform (ggvisd *ggv, ggobid *gg)
     for (i = 0 ; i < ggv->Dtarget.nrows; i++) 
       for (j = 0; j < ggv->Dtarget.ncols; j++) {
         ij = IJ;
-        if (ggv->trans_dist.els[ij] != DBL_MAX) {
+        if (ggv->trans_dist.els[ij] != G_MAXDOUBLE) {
           if (ggv->Dtarget_power == 1.0) {
             if (ggv->KruskalShepard_classic == KruskalShepard) {
               ggv->trans_dist.els[ij] =
@@ -499,7 +497,7 @@ isotonic_transform (ggvisd *ggv, ggobid *gg)
                 pow(ggv->Dtarget.vals[i][j], 2*ggv->Dtarget_power);
             }
           }
-        } /* end if(trans_dist[ij] != DBL_MAX) */
+        } /* end if(trans_dist[ij] != G_MAXDOUBLE) */
       } /* end for (j = 0; j < dist.ncols; j++) */
   } /* end if(isotonic_mix != 1.0) */
 
@@ -591,8 +589,8 @@ mds_once (gboolean doit, ggvisd *ggv, ggobid *gg)
       due to user interaction */
   for (i = 0 ; i < ggv->Dtarget.nrows; i++) {
     for (j = 0; j < ggv->Dtarget.ncols; j++) {
-      ggv->config_dist.els[IJ] = DBL_MAX;
-      ggv->trans_dist.els[IJ]  = DBL_MAX;
+      ggv->config_dist.els[IJ] = G_MAXDOUBLE;
+      ggv->trans_dist.els[IJ]  = G_MAXDOUBLE;
     } 
   }
 
@@ -679,7 +677,7 @@ mds_once (gboolean doit, ggvisd *ggv, ggobid *gg)
         continue;
 
       /* if the target distance is missing, skip */
-      if (ggv->Dtarget.vals[i][j] == DBL_MAX) continue;
+      if (ggv->Dtarget.vals[i][j] == G_MAXDOUBLE) continue;
 
       /* if weight is zero, skip */
       if (ggv->weights.nels != 0 && ggv->weights.els[IJ] == 0.) continue;
@@ -764,7 +762,7 @@ mds_once (gboolean doit, ggvisd *ggv, ggobid *gg)
     for (i = 0; i < ggv->Dtarget.nrows; i++) {
       for (j = 0; j < ggv->Dtarget.ncols; j++) {
         dist_trans  = ggv->trans_dist.els[IJ];
-        if (dist_trans  == DBL_MAX)
+        if (dist_trans  == G_MAXDOUBLE)
           continue;
         dist_config = ggv->config_dist.els[IJ];
         if (ggv->weight_power == 0. && ggv->within_between == 1.) {

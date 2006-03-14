@@ -1,9 +1,6 @@
 #include <sys/types.h>
 #include <math.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <limits.h>
-#include <float.h>
 #include <string.h>
 
 #include <gtk/gtk.h>

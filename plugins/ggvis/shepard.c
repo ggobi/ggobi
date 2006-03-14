@@ -1,10 +1,4 @@
 #include <sys/types.h>
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <limits.h>
-#include <float.h>
-#include <string.h>
 
 #include <gtk/gtk.h>
 #include "ggobi.h"
@@ -50,7 +44,7 @@ create_shepard_data_cb (GtkAction *action, PluginInstance *inst)
   n = 0;
   for (i = 0; i < ggv->Dtarget.nrows; i++) {
     for (j = 0; j < ggv->Dtarget.ncols; j++) {
-      if (ggv->trans_dist.els[IJ] == DBL_MAX)
+      if (ggv->trans_dist.els[IJ] == G_MAXDOUBLE)
         continue;
       else {
         if (n == nr) {

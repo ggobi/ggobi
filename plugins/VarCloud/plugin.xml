@@ -1,7 +1,7 @@
 <plugin name="VarCloud" load="immediate"><!-- load may be on demand. -->
    <description>generate variogram scatterplot</description>
    <author>Deborah Swayne and Juergen Symanzik</author>
-   <dll name="plugins/VarCloud/varcloud.la">
+   <dll name="plugins/VarCloud/plugin.la">
     <init onCreate="addToToolsMenu" onClose="closeWindow"/>
   </dll>
 </plugin>

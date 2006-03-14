@@ -6,7 +6,7 @@ libdir=@libdir@
 includedir=@includedir@
 
 Name: libggobi
-Version: @GGOBI_VERSION_STRING@
+Version: @PACKAGE_VERSION@
 Description: GGobi library for dynamic graphics.
 Requires: gtk+-2.0, libxml-2.0
 Libs: -L${libdir} -lggobi

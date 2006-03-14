@@ -107,8 +107,8 @@ ggvis_init (ggvisd *ggv, ggobid *gg)
 
   ggv->pos_scl = 0.0;
   ggv->freeze_var = 0;
-  ggv->Dtarget_max = DBL_MAX;
-  ggv->Dtarget_min = DBL_MIN;
+  ggv->Dtarget_max = G_MAXDOUBLE;
+  ggv->Dtarget_min = -G_MAXDOUBLE;
   ggv->prev_nonmetric_active_dist = 0;
   /* */
 

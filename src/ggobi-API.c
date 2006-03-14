@@ -1525,8 +1525,8 @@ KeyEventHandler *GGOBI (removeNumberedKeyEventHandler) (ggobid * gg)
 #include "config.h"
 static const gchar *version_date = GGOBI_RELEASE_DATE;
 static const int GgobiVersionNumbers[] =
-  { MAJOR_VERSION, MINOR_VERSION, PATCH_LEVEL };
-static const gchar *version_string = GGOBI_VERSION_STRING;
+  { MAJOR_VERSION, MINOR_VERSION, MICRO_VERSION };
+static const gchar *version_string = PACKAGE_VERSION;
 
 const char *GGOBI (getVersionDate) ()
 {

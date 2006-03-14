@@ -28,16 +28,17 @@ void addInputPlugin (GGobiPluginInfo * info, GtkWidget * list, ggobid * gg);
 void addPlugin (GGobiPluginInfo * info, GtkWidget * list, ggobid * gg);
 
 void plugin_init() {
-  const gchar * const *dirs = g_get_system_data_dirs();
-  gint i;
+  /*const gchar * const *dirs = g_get_system_data_dirs();
+  gint i;*/
   
   lt_dlinit();
   
-  lt_dladdsearchdir(sessionOptions->ggobiHome);
+  /*lt_dladdsearchdir(sessionOptions->ggobiHome);
   lt_dladdsearchdir(g_get_current_dir());
-  lt_dladdsearchdir(g_get_user_data_dir());
+  lt_dladdsearchdir(g_build_filename(g_get_user_data_dir(), "ggobi", NULL));
   for (i = 0; dirs[i]; i++)
-    lt_dladdsearchdir(dirs[i]);
+    lt_dladdsearchdir(g_build_filename(dirs[i], "ggobi", NULL));
+  */
 }
 
 gboolean
@@ -127,9 +128,12 @@ loadPluginLibrary (GGobiPluginDetails * plugin, GGobiPluginInfo * realPlugin)
 lt_dlhandle
 load_plugin_library (GGobiPluginDetails * plugin, gboolean recurse)
 {
-  lt_dlhandle handle;
-  const char *fileName = plugin->dllName;
-  handle = lt_dlopen(fileName);
+  lt_dlhandle handle = NULL;
+  gchar *fileName = ggobi_find_data_file(plugin->dllName);
+  if (fileName) {
+    handle = lt_dlopen(fileName);
+    g_free(fileName);
+  }
   if (!handle) {
     if (sessionOptions->verbose != GGOBI_SILENT) {
       g_critical("Error on loading plugin library %s: %s",
@@ -580,7 +584,7 @@ GGobiPluginDetails CSVDetails = {
   NULL,
   NULL,
   "Reads Comma-separated data from local files",
-  "Dongshin Kim (Iowa State University) & GGobi core"
+  "Michael Lawrence"
 };
 
 

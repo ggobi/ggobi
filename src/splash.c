@@ -56,12 +56,12 @@ splash_show (ggobid * gg)
 
   versionInfo = (char *) g_malloc (sizeof (gchar) * (strlen ("Version ") +
                                                      strlen
-                                                     (GGOBI_VERSION_STRING) +
+                                                     (PACKAGE_VERSION) +
                                                      2 +
                                                      strlen
                                                      (GGOBI_RELEASE_DATE) + 1));
   sprintf (versionInfo, "Version %s, %s",
-           GGOBI_VERSION_STRING, GGOBI_RELEASE_DATE);
+           PACKAGE_VERSION, GGOBI_RELEASE_DATE);
   label = gtk_label_new (versionInfo);
   gtk_box_pack_start (GTK_BOX (hbox), label, FALSE, FALSE, 0);
   g_free (versionInfo);

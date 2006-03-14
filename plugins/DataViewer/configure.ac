@@ -4,7 +4,7 @@
 AC_PREREQ(2.59)
 
 # Init autoconf
-AC_INIT([dataviewer], 0.1, lawremi@iastate.edu)
+AC_INIT([DataViewer], 0.1, lawremi@iastate.edu)
 
 # Point autoconf to a particular source file.
 AC_CONFIG_SRCDIR([dataviewer.c])

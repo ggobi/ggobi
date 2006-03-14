@@ -3,9 +3,6 @@
 /* Data of GGobi's release */
 #undef GGOBI_RELEASE_DATE
 
-/* GGobi's full version */
-#undef GGOBI_VERSION_STRING
-
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
 
@@ -67,6 +64,9 @@
 /* The major x.*.* version */
 #undef MAJOR_VERSION
 
+/* The micro *.*.x version */
+#undef MICRO_VERSION
+
 /* The minor *.x.* version */
 #undef MINOR_VERSION
 
@@ -87,9 +87,6 @@
 
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
-
-/* The micro *.*.x version */
-#undef PATCH_LEVEL
 
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS

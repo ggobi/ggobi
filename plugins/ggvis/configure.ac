@@ -12,6 +12,9 @@ AC_CONFIG_SRCDIR([ggvis.c])
 # Put all the extra scripts and stuff in the current directory
 AC_CONFIG_AUX_DIR([.])
 
+AC_CHECK_HEADERS([stdlib.h string.h])
+AC_CHECK_FUNCS([pow sqrt])
+
 # Use the custom GGobi macro for configuring the plugin. This provides 
 # GGOBI_CFLAGS, GGOBI_LIBS, and SRC_DEBUG variables.
 GGOBI_CONFIG_PLUGIN([../..])

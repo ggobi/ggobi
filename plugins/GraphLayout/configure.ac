@@ -4,7 +4,7 @@
 AC_PREREQ(2.59)
 
 # Init autoconf
-AC_INIT([graphlayout], 1.0, dfs@research.att.com)
+AC_INIT([GraphLayout], 1.0, dfs@research.att.com)
 
 # Point autoconf to a particular source file.
 AC_CONFIG_SRCDIR([glayout.c])

@@ -1,7 +1,15 @@
 dnl This is the configuration script for ggobi
 
+# Configure the version information here
+m4_define([ggobi_release_date], [March 13 2006])
+m4_define([ggobi_major_version], [2])
+m4_define([ggobi_minor_version], [1])
+m4_define([ggobi_micro_version], [0])
+m4_define([ggobi_version],
+          [ggobi_major_version.ggobi_minor_version.ggobi_micro_version])
+
 # Initialize autoconf
-AC_INIT(ggobi, 2.1, ggobi-help@lists.ggobi.org)
+AC_INIT(ggobi, ggobi_version, ggobi-help@lists.ggobi.org)
 AC_PREREQ(2.59)
 
 # Tell autoconf where our sources are
@@ -17,25 +25,22 @@ AC_SUBST(ac_aux_dir)
 # Initialize automake
 AM_INIT_AUTOMAKE
 
-# Get the version information.
-. VersionInfo
+MAJOR_VERSION=ggobi_major_version
+MINOR_VERSION=ggobi_minor_version
+MICRO_VERSION=ggobi_micro_version
 
-if test -d .svn ; then
- GGOBI_VERSION_STRING="SVN version (`date`)"
-fi
+GGOBI_RELEASE_DATE=ggobi_release_date
 
-AC_SUBST(GGOBI_VERSION_STRING)
 AC_SUBST(GGOBI_RELEASE_DATE)
 AC_SUBST(MAJOR_VERSION)
 AC_SUBST(MINOR_VERSION)
-AC_SUBST(PATCH_LEVEL)
+AC_SUBST(MICRO_VERSION)
 
 dnl These go into config.h as #define entries (used in about dialog).
-AC_DEFINE_UNQUOTED([GGOBI_VERSION_STRING], "$GGOBI_VERSION_STRING", [GGobi's full version])
 AC_DEFINE_UNQUOTED([GGOBI_RELEASE_DATE], "$GGOBI_RELEASE_DATE", [Data of GGobi's release])
 AC_DEFINE_UNQUOTED([MAJOR_VERSION], $MAJOR_VERSION, [The major x.*.* version])
 AC_DEFINE_UNQUOTED([MINOR_VERSION], $MINOR_VERSION, [The minor *.x.* version])
-AC_DEFINE_UNQUOTED([PATCH_LEVEL], $PATCH_LEVEL, [The micro *.*.x version])
+AC_DEFINE_UNQUOTED([MICRO_VERSION], $MICRO_VERSION, [The micro *.*.x version])
 
 # Configure options (debug? local? any plugins?)
 
@@ -140,11 +145,6 @@ AC_CHECK_HEADERS([stdlib.h string.h strings.h unistd.h])
 AC_C_CONST
 AC_HEADER_STDBOOL
 
-# This is for our local ggobi.pc file.
-
-LOCAL_PREFIX=`pwd`
-AC_SUBST(LOCAL_PREFIX)
-
 # Debug?
 if test -n "${enable_debug}" && ! test "${enable_debug}" = "no" ;  then
  SRC_DEBUG="-g -Wall"
@@ -178,7 +178,6 @@ AC_OUTPUT
 echo "*******************************"
 echo ""
 echo "GGobi"
-echo " Version:                $GGOBI_VERSION_STRING"
 echo " Plugins:                ${PLUGIN_DIRS}"
 echo " Installation directory: $GGOBI_INSTALL_HOME"
 echo ""

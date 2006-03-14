@@ -841,7 +841,7 @@ ggobi_find_file(const gchar *name, const gchar* const *systems, const gchar *use
   gchar *tmp_name, *cur_dir = g_get_current_dir();
   gint i;
   
-  g_debug("Looking for %s", name);
+  //g_debug("Looking for %s", name);
   tmp_name = ggobi_find_file_in_dir(name, sessionOptions->ggobiHome, false);
   if (tmp_name)
     return(tmp_name);
@@ -875,7 +875,7 @@ gchar*
 ggobi_find_data_file(const gchar *name) 
 {
   gchar *path = ggobi_find_file(name, g_get_system_data_dirs(), g_get_user_data_dir());
-  g_debug("Found data file: %s", path);
+  //g_debug("Found data file: %s", path);
   return(path);
 }
 /* Looks in (by default):
@@ -889,7 +889,7 @@ gchar*
 ggobi_find_config_file(const gchar *name)
 {
   gchar *path = ggobi_find_file(name, g_get_system_config_dirs(), g_get_user_config_dir());
-  g_debug("Found config file: %s", path);
+  //g_debug("Found config file: %s", path);
   return(path);
 }
 

@@ -1,22 +1,118 @@
-SUBDIRS                 = libltdl src plugins
+SUBDIRS = libltdl src plugins
 
-# Set up special distributed files. Most of this is necessary because we 
-# have our build scripts in the custom 'config' directory.
-AUX_DIST                = $(ac_aux_dir)/config.guess \
-                        $(ac_aux_dir)/config.sub \
-                        $(ac_aux_dir)/install-sh \
-                        $(ac_aux_dir)/ltconfig \
-                        $(ac_aux_dir)/ltmain.sh \
-                        $(ac_aux_dir)/mdate-sh \
-                        $(ac_aux_dir)/missing
-EXTRA_DIST              = bootstrap
+EXTRA_DIST = bootstrap CPLicense.txt
 
-dist-hook:
-	 (cd $(distdir) && mkdir $(ac_aux_dir))
-	 for file in $(AUX_DIST) $(AUX_DIST_EXTRA); do \
-		 cp $$file $(distdir)/$$file; \
-	 done
-	 
+datafilesdir = $(pkgdatadir)/data
+dist_datafiles_DATA = \
+	data/places.xml \
+  data/sleep.csv \
+  data/tmin.xml \
+  data/Shipman.csv \
+  data/laser.csv \
+  data/prim7.xml \
+  data/sleep.xml \
+  data/tmin1.csv \
+  data/Shipman.xml \
+  data/laser.xml \
+  data/ratcns.csv \
+  data/snetwork.xml \
+  data/tmin1.xml \
+  data/adhoc.xml \
+  data/morsecodes.xml \
+  data/ratcns.xml \
+  data/stdColorMap.xml \
+  data/tmin2.xml \
+  data/algal-bloom.xml \
+  data/olive.csv \
+  data/river.xml \
+  data/tao-nomiss.xml \
+  data/tmin3.xml \
+  data/buckyball.xml \
+  data/olive.xml \
+  data/roos.csv \
+  data/tao.csv \
+  data/tmin4.xml \
+  data/cube6.xml \
+  data/perm4.xml \
+  data/roos.xml \
+  data/tao.xml \
+  data/eies.xml \
+  data/perm5.xml \
+  data/sarsHK.xml \
+  data/tips.csv \
+  data/flea.csv \
+  data/pigs.xml \
+  data/sat.csv \
+  data/tips.xml \
+  data/flea.xml \
+  data/places.csv \
+  data/sat.xml \
+  data/tmin.csv
+
+docfilesdir = $(pkgdatadir)/doc
+dist_docfiles_DATA = \
+	doc/GNUmakefile \
+	doc/manual.tex \
+	doc/manual.bib \
+	doc/XML.tex
+
+figuresdir = $(docfilesdir)/Figures
+dist_figures_DATA = \
+  doc/Figures/dbmsGUI.jpg \
+  doc/Figures/olive-brush4.jpg \
+  doc/Figures/olive-t1da.jpg \
+  doc/Figures/rats1b.jpg \
+  doc/Figures/olive-1da.jpg \
+  doc/Figures/olive-colorchoose.jpg \
+  doc/Figures/olive-tour1.jpg \
+  doc/Figures/rats2a.jpg \
+  doc/Figures/olive-1db.jpg \
+  doc/Figures/olive-nth-1d.jpg \
+  doc/Figures/olive-tour2.jpg \
+  doc/Figures/rats2b.jpg \
+  doc/Figures/olive-1dc.jpg \
+  doc/Figures/olive-nth-2d.jpg \
+  doc/Figures/olive-var.jpg \
+  doc/Figures/rats3a.jpg \
+  doc/Figures/olive-1dd.jpg \
+  doc/Figures/olive-nth-t1da.jpg \
+  doc/Figures/olive1.jpg \
+  doc/Figures/rats3b.jpg \
+  doc/Figures/olive-2da.jpg \
+  doc/Figures/olive-nth-t1db.jpg \
+  doc/Figures/olive2.jpg \
+  doc/Figures/rats4a.jpg \
+  doc/Figures/olive-2db.jpg \
+  doc/Figures/olive-par.jpg \
+  doc/Figures/plotLayout12.jpg \
+  doc/Figures/rats4b.jpg \
+  doc/Figures/olive-brush1.jpg \
+  doc/Figures/olive-stha.jpg \
+  doc/Figures/plotLayout22.jpg \
+  doc/Figures/rats5a.jpg \
+  doc/Figures/olive-brush2.jpg \
+  doc/Figures/olive-sthb.jpg \
+  doc/Figures/plotLayout32.jpg \
+  doc/Figures/rats5b.jpg \
+  doc/Figures/olive-brush3.jpg \
+  doc/Figures/olive-sthc.jpg \
+  doc/Figures/rats1a.jpg
+
+sharedir = $(pkgdatadir)/share
+dist_share_DATA = share/colorschemes.xml
+
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = ggobi-system.pc
+
+install-data-hook:
+	cd $(DESTDIR)$(pkgconfigdir) && test -f ggobi-system.pc && \
+  mv ggobi-system.pc ggobi.pc
+
+uninstall-local:
+	rm -f $(DESTDIR)$(pkgconfigdir)/ggobi.pc
+
+DISTCHECK_CONFIGURE_FLAGS = --with-all-plugins
+
 # We add symlinks for developer convenience
 all-local: ggobi
 

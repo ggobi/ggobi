@@ -4,7 +4,7 @@
 AC_PREREQ(2.59)
 
 # Init autoconf
-AC_INIT([graphaction], 1.0, dfs@research.att.com)
+AC_INIT([GraphAction], 1.0, dfs@research.att.com)
 
 # Point autoconf to a particular source file.
 AC_CONFIG_SRCDIR([graphact.c])

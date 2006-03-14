@@ -133,16 +133,16 @@ for (i=0; i<n; i++) {
 
   ggv->ndistances = ggv->Dtarget.nrows * ggv->Dtarget.ncols;
 
-  ggv->Dtarget_max = DBL_MIN;  ggv->Dtarget_min = DBL_MAX;
+  ggv->Dtarget_max = -G_MAXDOUBLE;  ggv->Dtarget_min = G_MAXDOUBLE;
   for (i=0; i<ggv->Dtarget.nrows; i++) {
     for (j=0; j<ggv->Dtarget.ncols; j++) {
       dtmp = ggv->Dtarget.vals[i][j]; 
       if (dtmp < 0) {
         g_printerr ("negative dissimilarity: D[%d][%d] = %3.6f -> NA\n",
           i, j, dtmp);
-        dtmp = ggv->Dtarget.vals[i][j] = DBL_MAX;
+        dtmp = ggv->Dtarget.vals[i][j] = G_MAXDOUBLE;
       }
-      if(dtmp != DBL_MAX) {
+      if(dtmp != G_MAXDOUBLE) {
         if (dtmp > ggv->Dtarget_max) ggv->Dtarget_max = dtmp;
         if (dtmp < ggv->Dtarget_min) ggv->Dtarget_min = dtmp;
       }

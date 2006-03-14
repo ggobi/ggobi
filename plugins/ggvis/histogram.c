@@ -229,7 +229,7 @@ histogram_draw (ggvisd *ggv, ggobid *gg)
       ymax);
 
 
-  if (trans_dist_max == DBL_MIN)  /*-- not initialized -- why? --*/
+  if (trans_dist_max == -G_MAXDOUBLE)  /*-- not initialized -- why? --*/
     str = g_strdup_printf ("%s", "??");
   else
     str = g_strdup_printf ("%2.2f", trans_dist_max);
@@ -238,7 +238,7 @@ histogram_draw (ggvisd *ggv, ggobid *gg)
   	STR_VMARGIN, layout);
   g_free (str);
 
-  if (trans_dist_min == DBL_MAX)  /*-- not initialized -- why? --*/
+  if (trans_dist_min == G_MAXDOUBLE)  /*-- not initialized -- why? --*/
     str = g_strdup_printf ("%s", "??");
   else
     str = g_strdup_printf ("%2.2f", trans_dist_min);
@@ -390,7 +390,7 @@ histogram_bins_reset (ggvisd *ggv)
   xmax = xmin + pwidth;
 
   /* map trans_dist[i] to [0,1] and sort into bins */
-  trans_dist_min = DBL_MAX; trans_dist_max = DBL_MIN;
+  trans_dist_min = G_MAXDOUBLE; trans_dist_max = -G_MAXDOUBLE;
 
 /*
  * Probably I can initialize trans_dist before mds_once is run
@@ -398,7 +398,7 @@ histogram_bins_reset (ggvisd *ggv)
   if (ggv->trans_dist.nels > 0) {
     for (i=0; i<ggv->Dtarget.nrows*ggv->Dtarget.ncols; i++) {
       t_d = ggv->trans_dist.els[i];
-      if (t_d != DBL_MAX) {
+      if (t_d != G_MAXDOUBLE) {
         if (t_d > trans_dist_max) trans_dist_max = t_d;
         if (t_d < trans_dist_min) trans_dist_min = t_d;
       }
@@ -416,7 +416,7 @@ histogram_bins_reset (ggvisd *ggv)
 
   for (i=0; i < ggv->Dtarget.nrows*ggv->Dtarget.ncols; i++) {
     t_d = ggv->trans_dist.els[i];
-    if (t_d != DBL_MAX) {
+    if (t_d != G_MAXDOUBLE) {
       k = (gint) ((ggv->trans_dist.els[i]-trans_dist_min)/t_delta * fac);
       if (k >= D->bins.nels) g_printerr ("k too large: %d\n", k);
       D->bins.els[k]++;

@@ -4,13 +4,16 @@
 AC_PREREQ(2.59)
 
 # Init autoconf
-AC_INIT([varcloud], 1.0, dfs@research.att.com)
+AC_INIT([VarCloud], 1.0, dfs@research.att.com)
 
 # Point autoconf to a particular source file.
 AC_CONFIG_SRCDIR([varcloud.c])
 
 # Put all the extra scripts and stuff in the current directory
 AC_CONFIG_AUX_DIR([.])
+
+AC_CHECK_HEADERS([string.h])
+AC_CHECK_FUNCS([sqrt])
 
 # Use the custom GGobi macro for configuring the plugin. This provides 
 # GGOBI_CFLAGS, GGOBI_LIBS, and SRC_DEBUG variables. 
