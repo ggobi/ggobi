@@ -110,6 +110,64 @@ getOptValue (const gchar * const name, const gchar * const value)
 gint
 parse_command_line (gint * argc, gchar ** av)
 {
+  static gboolean print_version = false;
+  static gchar *active_color_scheme = NULL;
+  static gchar *color_scheme_file = NULL;
+  static gchar *data_mode = NULL;
+  static gchar *initialization_file = NULL;
+  static gboolean quit_with_no_ggobi = true;
+  static gint verbosity = GGOBI_CHATTY;
+  static GOptionEntry entries[] = 
+  {
+    {
+      "activeColorScheme", 'c', 0, G_OPTION_ARG_STRING, &active_color_scheme, 
+      "name of the default color scheme to use", "scheme" 
+    }, { 
+      "colorSchemes", 's', 0, G_OPTION_ARG_FILENAME, &color_scheme_file,
+      "name of XML file containing color scheme descriptions", "file" 
+    }, {
+      "dataMode", 'd', 0, G_OPTION_ARG_STRING, &data_mode,
+      "mode of data supplied on command line", "mode"
+    }, {
+      "init", 'i', 0, G_OPTION_ARG_FILENAME, &initialization_file,
+      "name of initialization file", "file"
+    }, {
+      "keepalive", 'k', G_OPTION_FLAG_HIDDEN | G_OPTION_FLAG_REVERSE, G_OPTION_ARG_NONE, 
+      &quit_with_no_ggobi, "do not quit GGobi if all windows are closed", NULL,
+    }, {
+      "verbosity", 'l', 0, G_OPTION_ARG_INT, &verbosity,
+      "verbosity of GGobi, 0 = silent, 1 = chatty (default), 2 = verbose", "level"
+    }, {
+      "version", 'v', 0, G_OPTION_ARG_NONE, &print_version,
+      "print the GGobi version and exit", NULL
+    }, { NULL }
+  };
+  
+  GError *error = NULL;
+  GOptionContext *ctx = g_option_context_new("- platform for interactive graphics");
+
+  g_option_context_add_main_entries (ctx, entries, PACKAGE);
+  g_option_context_add_group (ctx, gtk_get_option_group (TRUE));
+  g_option_context_parse (ctx, argc, &av, &error);
+  
+  if (error) {
+    g_printerr ("Error parsing command line: %s\n", error->message);
+    exit(0);
+  }
+    
+  if (print_version) {
+    g_printerr ("%s\n", GGOBI (getVersionString ()));
+    exit(0);
+  }
+  
+  sessionOptions->activeColorScheme = active_color_scheme;
+  sessionOptions->info->colorSchemeFile = color_scheme_file;
+  sessionOptions->data_type = data_mode;
+  sessionOptions->initializationFile = initialization_file;
+  sessionOptions->info->quitWithNoGGobi = quit_with_no_ggobi;
+  sessionOptions->verbose = verbosity;
+
+  #if 0                
   gboolean stdin_p = false;
   gchar *ptr;
 
@@ -237,7 +295,7 @@ parse_command_line (gint * argc, gchar ** av)
       exit (0);
     }
   }
-
+#endif
   (*argc)--;
   av++;
 
@@ -246,10 +304,12 @@ parse_command_line (gint * argc, gchar ** av)
 */
 
   if (*argc == 0)
-    sessionOptions->data_in = (stdin_p) ? g_strdup_printf ("stdin") : NULL;
+    sessionOptions->data_in = NULL;
   else
     sessionOptions->data_in = g_strdup (av[0]);
 
+  g_option_context_free(ctx);
+  
   return 1;
 }
 
@@ -489,6 +549,10 @@ gint GGOBI (main) (gint argc, gchar * argv[], gboolean processEvents)
 {
   GdkVisual *vis;
   ggobid *gg;
+
+  bindtextdomain (PACKAGE, GGOBI_LOCALEDIR);
+  bind_textdomain_codeset (PACKAGE, "UTF-8");
+  textdomain (PACKAGE);
 
   ggobiInit (&argc, &argv);
 

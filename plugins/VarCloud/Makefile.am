@@ -1,3 +1,5 @@
+ACLOCAL_AMFLAGS = -I ../../m4
+
 include ../Makefile.plugin
 
 # List the source files of the plugin here.

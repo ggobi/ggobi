@@ -12,6 +12,12 @@ AC_CONFIG_SRCDIR([graphact.c])
 # Put all the extra scripts and stuff in the current directory
 AC_CONFIG_AUX_DIR([.])
 
+# Generate config.h
+AC_CONFIG_HEADER([config.h])
+
+# Initialize automake
+AM_INIT_AUTOMAKE
+
 # Use the custom GGobi macro for configuring the plugin. This provides 
 # GGOBI_CFLAGS, GGOBI_LIBS, and SRC_DEBUG variables.
 GGOBI_CONFIG_PLUGIN([../..])

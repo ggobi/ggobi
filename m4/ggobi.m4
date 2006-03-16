@@ -4,8 +4,7 @@
 # Helper macro for configuring GGobi plugins
 
 AC_DEFUN([GGOBI_CONFIG_PLUGIN],
-[AC_CONFIG_HEADER([config.h])
-AM_INIT_AUTOMAKE
+[
 AC_C_CONST
 AC_HEADER_STDBOOL
 AC_DISABLE_STATIC

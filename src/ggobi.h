@@ -42,7 +42,7 @@ struct _ggobid;
 
 #include "colorscheme.h"
 
-
+#include "ggobi-intl.h"
 
 /*
  These are hooks for other applications (e.g. R) to 

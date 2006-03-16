@@ -25,6 +25,13 @@ AC_SUBST(ac_aux_dir)
 # Initialize automake
 AM_INIT_AUTOMAKE
 
+# Initialize gettext
+AM_GNU_GETTEXT([use-libtool])
+AM_GNU_GETTEXT_VERSION(0.14.5)
+
+GGOBI_LOCALEDIR="$datadir/locale"
+AC_DEFINE_UNQUOTED([GGOBI_LOCALEDIR],"$GGOBI_LOCALEDIR", [The directory with the locale files])
+
 MAJOR_VERSION=ggobi_major_version
 MINOR_VERSION=ggobi_minor_version
 MICRO_VERSION=ggobi_micro_version
@@ -172,7 +179,7 @@ AC_SUBST(LIBXML_LIBS)
 
  dnl Process the different .in files, substituting the values computed here in the configuration
  dnl script for the corresponding @variable@ in these files.
-AC_CONFIG_FILES(Makefile src/Makefile plugins/Makefile ggobi.pc ggobi-system.pc)
+AC_CONFIG_FILES(Makefile src/Makefile plugins/Makefile ggobi.pc ggobi-system.pc intl/Makefile po/Makefile.in)
 AC_OUTPUT
 
 echo "*******************************"

@@ -25,7 +25,7 @@ libggobi_la_SOURCES = array.c ash1d.c barchart.c barchartClass.c \
   vartable_nbook.c vartable_ui.c vector.c win32_draw.c writedata_ui.c \
   write_csv.c write_xml.c wvis.c wvis_ui.c xlines.c xyplot.c \
   xyplot_ui.c $(libggobi_la_GOBSOURCES)
-libggobi_la_LIBADD = $(libggobi_la_GOBOBJECTS) @LIBLTDL@ 
+libggobi_la_LIBADD = $(libggobi_la_GOBOBJECTS) @LIBLTDL@ @LTLIBINTL@
 libggobi_la_DEPENDENCIES = $(libggobi_la_GOBOBJECTS)
 pkginclude_HEADERS = GGobiAPI.h ggobiClass.h tour1d_pp.h GGobiApp.h \
   noop-toggle.h tour2d_pp.h GGobiEvents.h parcoordsClass.h tour_pp.h \
