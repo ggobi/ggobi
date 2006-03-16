@@ -350,10 +350,7 @@ variable_notebook_subwindow_add (GGobiData * d, GCallback func,
 
   for (j = 0; j < d->ncols; j++) {
     vt = vartable_element_get (j, d);
-    if (vtype == all_vartypes ||
-        (vtype == categorical && vt->vartype == categorical) ||
-        (vtype == integer && vt->vartype == integer) ||
-        (vtype == real && vt->vartype == real)) {
+    if (vtype == all_vartypes || vtype == vt->vartype) {
       gtk_list_store_append (model, &iter);
       gtk_list_store_set (model, &iter,
                           VARLIST_NAME, vt->collab_tform,

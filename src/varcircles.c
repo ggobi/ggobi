@@ -218,9 +218,8 @@ void
 varcircle_label_set (gint j, GGobiData * d)
 {
   GtkWidget *w = varcircles_get_nth (LBL, j, d);
-  vartabled *vt = vartable_element_get (j, d);
   if (w != NULL)
-    gtk_label_set_text (GTK_LABEL (w), vt->collab_tform);
+    gtk_label_set_text (GTK_LABEL (w), ggobi_data_get_transformed_col_name(d, j));
 }
 
 
@@ -571,7 +570,6 @@ static GtkWidget *
 varcircle_create (gint j, GGobiData * d, ggobid * gg)
 {
   GtkWidget *vb, *lbl, *da;
-  vartabled *vt = vartable_element_get (j, d);
 
   vb = gtk_hbox_new (false, 0);
   d->vcirc_ui.vb = g_slist_append (d->vcirc_ui.vb, vb);
@@ -602,7 +600,7 @@ varcircle_create (gint j, GGobiData * d, ggobid * gg)
   gtk_box_pack_start (GTK_BOX (vb), da, false, false, 0);
 
   /*-- label --*/
-  lbl = gtk_label_new (vt->collab);
+  lbl = gtk_label_new (ggobi_data_get_col_name(d, j));
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, .5);  /*- x: left, y: middle --*/
   d->vcirc_ui.label = g_slist_append (d->vcirc_ui.label, lbl);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),

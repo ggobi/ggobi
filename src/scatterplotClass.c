@@ -20,8 +20,6 @@
 
 #include <string.h>
 
-#include "write_state.h"
-
 #include <gtk/gtk.h>
 #include <gdk/gdkkeysyms.h>
 
@@ -1226,6 +1224,7 @@ plottedVarsGet (displayd * display, gint * cols, GGobiData * d, ggobid * gg)
   return (ncols);
 }
 
+#ifdef STORE_SESSION_ENABLED
 /*
   Write out the variables in a scatterplot
   to the current node in the XML tree.
@@ -1237,7 +1236,7 @@ add_xml_scatterplot_variables (xmlNodePtr node, GList * plots, displayd * dpy)
   XML_addVariable (node, plot->xyvars.x, dpy->d);
   XML_addVariable (node, plot->xyvars.y, dpy->d);
 }
-
+#endif
 
 /* Splot methods. */
 static gchar *
@@ -1246,43 +1245,30 @@ treeLabel (splotd * splot, GGobiData * d, ggobid * gg)
   gchar *buf = NULL;
   displayd *display = (displayd *) splot->displayptr;
   cpaneld *cpanel = &display->cpanel;
-  vartabled *vt, *vtx, *vty;
-  gint n;
 
   switch (cpanel->pmode) {
   case P1PLOT:
   case TOUR1D:
-    vt = vartable_element_get (splot->p1dvar, d);
-    n = strlen (vt->collab);
-    buf = (gchar *) g_malloc (n * sizeof (gchar *));
-    sprintf (buf, "%s", vt->collab);
+    buf = ggobi_data_get_col_name(d, splot->p1dvar);
     break;
 
   case XYPLOT:
-    vtx = vartable_element_get (splot->xyvars.x, d);
-    vty = vartable_element_get (splot->xyvars.y, d);
-
-    n = strlen (vtx->collab) + strlen (vty->collab) + 5;
-    buf = (gchar *) g_malloc (n * sizeof (gchar *));
-    sprintf (buf, "%s v %s", vtx->collab, vty->collab);
+    buf = g_strdup_printf("%s v %s", 
+      ggobi_data_get_col_name(d, splot->xyvars.x), 
+      ggobi_data_get_col_name(d, splot->xyvars.y)
+    );
     break;
 
   case TOUR2D:
-    n = strlen ("in grand tour");
-    buf = (gchar *) g_malloc (n * sizeof (gchar *));
-    sprintf (buf, "%s", "in grand tour");
+    buf = g_strdup("grand tour");
     break;
 
   case TOUR2D3:
-    n = strlen ("in rotation");
-    buf = (gchar *) g_malloc (n * sizeof (gchar *));
-    sprintf (buf, "%s", "in grand tour");
+    buf = g_strdup("rotation");
     break;
 
   case COTOUR:
-    n = strlen ("in correlation tour");
-    buf = (gchar *) g_malloc (n * sizeof (gchar *));
-    sprintf (buf, "%s", "in correlation tour");
+    buf = g_strdup("correlation tour");
     break;
   default:
     break;
@@ -1457,11 +1443,9 @@ scatter1DAddPlotLabels (splotd * sp, GdkDrawable * drawable, GdkGC * gc)
   PangoLayout *layout =
     gtk_widget_create_pango_layout (GTK_WIDGET (sp->da), NULL);
   PangoRectangle rect;
-  vartabled *vt;
   GGobiData *d = sp->displayptr->d;
 
-  vt = vartable_element_get (sp->p1dvar, d);
-  layout_text (layout, vt->collab_tform, &rect);
+  layout_text (layout, ggobi_data_get_transformed_col_name(d, sp->p1dvar), &rect);
   gdk_draw_layout (drawable, gc,
                    sp->max.x / 2 - rect.width / 2,
                    sp->max.y - rect.height - 5, layout);
@@ -1475,18 +1459,15 @@ scatterXYAddPlotLabels (splotd * sp, GdkDrawable * drawable, GdkGC * gc)
     gtk_widget_create_pango_layout (GTK_WIDGET (sp->da), NULL);
   PangoRectangle rect;
 
-  vartabled *vtx, *vty;
   GGobiData *d = sp->displayptr->d;
 
   /*-- xyplot: right justify the label --*/
-  vtx = vartable_element_get (sp->xyvars.x, d);
-  layout_text (layout, vtx->collab_tform, &rect);
+  layout_text (layout, ggobi_data_get_transformed_col_name(d, sp->xyvars.x), &rect);
   gdk_draw_layout (drawable, gc,
                    sp->max.x - rect.width - 5,
                    sp->max.y - rect.height - 5, layout);
 
-  vty = vartable_element_get (sp->xyvars.y, d);
-  layout_text (layout, vty->collab_tform, &rect);
+  layout_text (layout, ggobi_data_get_transformed_col_name(d, sp->xyvars.y), &rect);
   gdk_draw_layout (drawable, gc, 5, 5, layout);
   g_object_unref (G_OBJECT (layout));
 }
@@ -1668,7 +1649,9 @@ scatterplotDisplayClassInit (GGobiScatterplotDisplayClass * klass)
   klass->parent_class.titleLabel = "Scatterplot Display";
   klass->parent_class.treeLabel = "Scatterplot";
   klass->parent_class.ruler_ranges_set = ruler_ranges_set;
+  #ifdef STORE_SESSION_ENABLED
   klass->parent_class.xml_describe = add_xml_scatterplot_variables;
+  #endif
 
   klass->parent_class.varpanel_highd = varpanelHighd;
   klass->parent_class.varpanel_refresh = varpanelRefresh;
@@ -1684,7 +1667,9 @@ scatterplotDisplayClassInit (GGobiScatterplotDisplayClass * klass)
   klass->parent_class.tour2d_realloc = tour2dRealloc;
   klass->parent_class.tourcorr_realloc = tourCorrRealloc;
 
+  #ifdef STORE_SESSION_ENABLED
   klass->parent_class.xml_describe = add_xml_scatterplot_variables;
+  #endif
 
   klass->parent_class.set_show_axes_option = setShowAxesOption;
   klass->parent_class.set_show_axes_label_option = setShowAxesLabelOption;

@@ -316,7 +316,7 @@ build_symbol_vectors_by_var (cpaneld * cpanel, GGobiData * d, ggobid * gg)
   for (l = gg->d; l; l = l->next) {
     dd = l->data;
     if (dd != d) {
-      vtt = vartable_element_get_by_name (d->linkvar_vt->collab, dd);
+      vtt = vartable_element_get (jlinkby, dd);
       if (vtt != NULL) {
         jlinkby = g_slist_index (dd->vartable, vtt);
         brush_link_by_var (jlinkby, &levelv, cpanel, dd, gg);
@@ -341,6 +341,7 @@ enum
 void linkby_notebook_subwindow_add (GGobiData * d, GtkWidget * notebook,
                                     ggobid *);
 
+//FIXME: replace vt with index (see callback), also need is_categorical_variable
 void
 varlist_append (GtkListStore * list, vartabled * vt)
 {
@@ -349,7 +350,7 @@ varlist_append (GtkListStore * list, vartabled * vt)
 
   if (vt && vt->vartype == categorical) {
     gtk_list_store_append (list, &iter);
-    row = g_strdup_printf ("%s", vt->collab);
+    row = g_strdup (vt->collab);
     gtk_list_store_set (list, &iter, LINKBYLIST_NAME, row, LINKBYLIST_VT, vt,
                         -1);
     g_free (row);

@@ -119,7 +119,7 @@ splot_draw_tour_axes (splotd * sp, GdkDrawable * drawable, ggobid * gg)
 */
         if (ix != dawidth / 2) {
           vt = vartable_element_get (j, d);
-          varlab = g_strdup_printf ("%s:%4.3f(%.2f)", vt->collab_tform,
+          varlab = g_strdup_printf ("%s:%4.3f(%.2f)", ggobi_data_get_transformed_col_name(d, j),
                                     dsp->t1d.F.vals[0][j],
                                     vt->lim.max - vt->lim.min);
           layout_text (layout, varlab, &rect);
@@ -370,12 +370,12 @@ splot_draw_tour_axes (splotd * sp, GdkDrawable * drawable, ggobid * gg)
         if (dsp->tcorr1.subset_vars_p.els[j]) {
           val = (ABS (dsp->tcorr1.F.vals[0][j]) > .004) ?
             dsp->tcorr1.F.vals[0][j] : 0.0;
-          varlab = g_strdup_printf ("%s:%3.2f,0", vt->collab_tform, val);
+          varlab = g_strdup_printf ("%s:%3.2f,0", ggobi_data_get_transformed_col_name(d, j), val);
         }
         else {
           val = (ABS (dsp->tcorr2.F.vals[0][j]) > .004) ?
             dsp->tcorr2.F.vals[0][j] : 0.0;
-          varlab = g_strdup_printf ("%s:0,%3.2f", vt->collab_tform, val);
+          varlab = g_strdup_printf ("%s:0,%3.2f", ggobi_data_get_transformed_col_name(d, j), val);
         }
 
         /* horizontal */

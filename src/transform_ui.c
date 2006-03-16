@@ -174,7 +174,7 @@ static void tform_reset_cb (GtkWidget *w, ggobid *gg)
     transform1_apply (j, d, gg);
     transform2_apply (j, d, gg);
 
-    tform_label_update (j, d, gg);
+    tform_label_update (j, d);
   }
 
   limits_set (d, true, true, gg->lims_use_visible);  

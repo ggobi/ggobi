@@ -78,7 +78,6 @@ void
 varpanel_label_set (gint j, GGobiData * d)
 {
   GtkWidget *label = varpanel_widget_get_nth (VARSEL_LABEL, j, d);
-  vartabled *vt = vartable_element_get (j, d);
   /*-- the label is actually a button; this is the label --*/
   GtkWidget *labelw;
 
@@ -91,7 +90,7 @@ varpanel_label_set (gint j, GGobiData * d)
     return;
   /*-- make sure it stays left-aligned --*/
   gtk_misc_set_alignment (GTK_MISC (labelw), 0, .5);
-  gtk_label_set_text (GTK_LABEL (labelw), vt->collab_tform);
+  gtk_label_set_text (GTK_LABEL (labelw), ggobi_data_get_col_name(d, j));
 }
 
 GtkWidget *
@@ -389,10 +388,7 @@ varsel_cb (GtkWidget * w, GdkEvent * event, GGobiData * d)
 static void
 varpanel_add_row (gint j, GGobiData * d, ggobid * gg)
 {
-  vartabled *vt = vartable_element_get (j, d);
   GtkWidget *box, *xw, *yw, *zw, *label;
-  // This shouldn't be necessary.
-  //gboolean sens = (d == g_slist_nth_data(gg->d, 0));
   gboolean sens = false;
   GList *displays;
 
@@ -432,7 +428,7 @@ varpanel_add_row (gint j, GGobiData * d, ggobid * gg)
   /*-- hide this widget by default --*/
 
   /*-- the label is actually a button, with the old behavior --*/
-  label = gtk_button_new_with_label (vt->collab_tform);
+  label = gtk_button_new_with_label (ggobi_data_get_col_name(d, j));
   gtk_widget_set_sensitive (label, sens);
   gtk_button_set_relief (GTK_BUTTON (label), GTK_RELIEF_NONE);
   GGobi_widget_set (label, gg, true);

@@ -459,7 +459,6 @@ dialog_rename_var (GtkWidget *w, ggobid *gg)
   gchar *vname;
   gint *selected_vars, nselected_vars = 0;
   gint jvar;
-  vartabled *vt;
 
   /*-- find out what variables are selected in the var statistics panel --*/
   selected_vars = (gint *) g_malloc (d->ncols * sizeof (gint));
@@ -477,12 +476,10 @@ dialog_rename_var (GtkWidget *w, ggobid *gg)
   jvar = selected_vars[0];
   vname = gtk_editable_get_chars (GTK_EDITABLE (entry), 0, -1);
   if (vname != NULL && strlen(vname) > 1) {
-    vt = vartable_element_get (jvar, d);
-    vt->collab = g_strdup (vname);
-    vt->nickname = g_strndup (vname, 2);
+    ggobi_data_set_col_name(d, jvar, vname);
 
     vartable_collab_set_by_var (jvar, d);
-    tform_label_update (jvar, d, gg);
+    tform_label_update (jvar, d);
   }
 }
 
@@ -492,7 +489,6 @@ open_rename_dialog (GtkWidget *w, ggobid *gg)
   GtkWidget *dialog, *hb, *entry, *lbl;
   GGobiData *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
   gint *selected_vars, nselected_vars = 0;
-  vartabled *vt;
 
   /*-- find out what variables are selected in the var statistics panel --*/
   selected_vars = (gint *) g_malloc (d->ncols * sizeof (gint));
@@ -516,8 +512,7 @@ open_rename_dialog (GtkWidget *w, ggobid *gg)
   entry = gtk_entry_new();
   gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), entry);
   /*-- label it with the name of the variable being renamed --*/
-  vt = vartable_element_get (selected_vars[0], d);
-  gtk_entry_set_text (GTK_ENTRY (entry), vt->collab);
+  gtk_entry_set_text (GTK_ENTRY (entry), ggobi_data_get_col_name(d, selected_vars[0]));
   gtk_widget_set_name (entry, "rename_entry");
 
   gtk_box_pack_start (GTK_BOX (hb), entry, true, true, 2);

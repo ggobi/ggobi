@@ -13,7 +13,7 @@ test_variable_select (ggobid * gg, GGobiData * d, gint whichVar, splotd * sp,
   vartabled *vartab = g_slist_nth_data (d->vartable, whichVar);
   fprintf (stderr,
            "Selected variable: %d %s in %s.  User value %s. # plots in display %d\n",
-           whichVar, vartab->collab, d->name, (char *) val,
+           whichVar, ggobi_data_get_col_name(d, whichVar), d->name, (char *) val,
            g_list_length (sp->displayptr->splots));
 }
 

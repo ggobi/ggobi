@@ -106,14 +106,13 @@ public gint ncols;
 
 public struct _ggobid *gg; /*-- a pointer to the parent --*/
 
-public GArray *rowlab; /*-- allocates memory in chunks --*/
+public GArray *rowlab;
 
 /*-- row ids to support generalized linking --*/
 public GHashTable *idTable;
 public char **rowIds;
 /*-- to support brushing by categorical variable --*/
 public vartabled *linkvar_vt;  /*-- the linking variable --*/
-
 
 public Subset  subset;
 public Jitterd  jitter;
@@ -125,6 +124,7 @@ public EdgeData  edge;
 public BrushBins  brush;
 
 public GSList *vartable;
+
 public GtkWidget *vartable_tree_view[all_vartypes];
 public GtkTreeModel *vartable_tree_model; /* the root model, with all vars */
 
@@ -136,7 +136,7 @@ public array_g jitdata;
 /*----------------------- missing values ---------------------------*/
 
 public gint nmissing;
-public array_s missing; /*-- array of shorts --*/
+public array_s missing; 
 public gboolean missings_show_p; /*-- show/hide per datad, not per display --*/
 
 /*---------------- deleting the hidden points; subsetting ----------*/
@@ -188,6 +188,8 @@ property UINT ncols
    flags = CONSTRUCT_ONLY, link, export);
    
 signal private NONE (INT, INT, POINTER) void rows_in_plot_changed(self, int arg1, int arg2, ggobid* arg3);
+
+signal public NONE (INT) void col_name_changed(self, int j);
 
 init (self) {
   sphere_init(self); 
@@ -248,11 +250,60 @@ get_name (self)
 public void
 set_name (self, gchar *name, gchar *nickname)
 {
-  if (name == NULL) name = "unknown";
+  if (name == NULL) name = g_strdup("unknown");
   if (nickname == NULL) nickname = g_strndup(name, 5);
 
   self->name = g_strdup(name);
   self->nickname = g_strndup(name, 5);
+}
+
+public gchar* 
+get_col_name(self, guint j) 
+{
+  vartabled* vt = vartable_element_get (j, self);
+  return(vt->collab);
+}
+
+public void 
+set_col_name(self, guint j, gchar* value) 
+{
+  vartabled* vt = vartable_element_get (j, self);
+
+  //if (vt->collab) g_object_unref(vt->collab); 
+	//if (vt->nickname) g_object_unref(vt->nickname);
+  //if (vt->collab_tform) g_object_unref(vt->collab_tform);
+
+  if (value == NULL) value = g_strdup_printf("V%d", j + 1);
+
+  vt->collab = g_strdup(value);
+  vt->collab_tform = g_strdup(value);
+  vt->nickname = g_strndup (vt->collab, 2);
+
+  g_signal_emit_by_name (self, "col_name_changed", (gpointer) self, j);
+
+  // SEND COLUMN NAME CHANGED SIGNAL
+  // Listeners:
+  //  * vartable_collab_set_by_var (j, d);
+  //  * varpanel_label_set (j, d);   /*-- checkboxes --*/
+  //  * varcircle_label_set (j, d);  /*-- variable circles --*/
+  //  * tform_label_update (jvar, d);
+  
+}
+
+// FIXME: to be removed once pipeline in place
+public gchar* 
+get_transformed_col_name(self, guint j) 
+{
+  vartabled* vt = vartable_element_get (j, self);
+  return(vt->collab_tform);
+}
+
+public void 
+set_transformed_col_name(self, guint j, gchar* value) 
+{
+  vartabled* vt = vartable_element_get (j, self);
+  //if (vt->collab_tform) g_object_unref(vt->collab_tform);  //is this necessary?
+  vt->collab_tform = g_strdup(value);
 }
 
 
@@ -277,6 +328,41 @@ set_missing (self, guint i, guint j)
   self->nmissing++;
 }
 
+public gboolean
+is_missing (self, guint i, guint j) 
+{
+  if (self->nmissing == 0) return(FALSE);
+  
+  return (self->missing.vals[i][j] == 1);
+  
+}
+
+//FIXME: search and remove any references to d->nmissing
+public guint
+get_n_missing(self) 
+{
+  guint j, n = 0;
+
+  for(j = 0; j < self->ncols; j++) {
+    n += self_get_col_n_missing(self, j);
+  }
+
+  return(n);
+}
+
+
+//FIXME: search and remove any references to vt->nmissing
+public guint 
+get_col_n_missing(self, guint j) {
+  guint i, n = 0;
+
+  for(i = 0; i < self->nrows; i++) {
+    if (self_is_missing(self, i, j)) n++;
+  }
+  
+  return(n);
+}
+
 public void
 set_raw_values(self, guint j, gdouble *values)
 {
@@ -292,6 +378,32 @@ set_raw_value(self, guint i, guint j, gdouble value)
   if(GGobiMissingValue && GGobiMissingValue(value))
     self_set_missing(self, i, j);
   else self->raw.vals[i][j] = value;
+}
+
+public gchar*
+get_string_value(self, guint i, guint j, gboolean transformed) 
+{
+  gint n = 0, lval = -1;
+  vartabled *vt = vartable_element_get(j, self);
+  gdouble raw = transformed ? self->tform.vals[i][j] : self->raw.vals[i][j];
+  
+  if (self_is_missing(self, i, j)) 
+    return g_strdup("NA");
+  if (vt->vartype != categorical)
+    return g_strdup_printf("%g", raw);
+  
+  for (n = 0; n < vt->nlevels; n++) {
+    if (vt->level_values[n] == raw) {
+      lval = n;
+      break;
+    }
+  }
+  if (lval == -1) {
+    g_printerr ("The levels for %s aren't specified correctly\n",            vt->collab);
+    return(NULL);
+  }
+  
+  return vt->level_names[lval];
 }
 
 public gboolean 

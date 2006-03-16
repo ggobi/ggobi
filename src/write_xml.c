@@ -164,11 +164,15 @@ write_xml_variable(FILE *f, GGobiData *d, ggobid *gg, gint j,
   XmlWriteInfo *xmlWriteInfo)
 {
   vartabled *vt = vartable_element_get (j, d);
-
+  gchar* varname = g_strstrip(
+    (gg->save.stage == TFORMDATA) ? 
+      ggobi_data_get_transformed_col_name(d, j) : 
+      ggobi_data_get_col_name(d, j)
+  );
+  
   if (vt->vartype == categorical) {
     gint k;
-    fprintf(f, "  <categoricalvariable name=\"%s\"",
-      (gg->save.stage == TFORMDATA) ? vt->collab_tform : vt->collab);
+    fprintf(f, "  <categoricalvariable name=\"%s\"", varname);
     if (vt->nickname)
       fprintf(f, " nickname=\"%s\"", vt->nickname);
     fprintf(f, ">\n");
@@ -183,25 +187,16 @@ write_xml_variable(FILE *f, GGobiData *d, ggobid *gg, gint j,
 
     fprintf(f, "    </levels>\n");
     fprintf(f, "  </categoricalvariable>");
-  } else if (vt->vartype == real) {
-    fprintf(f, "  <realvariable name=\"%s\"",
-      (gg->save.stage == TFORMDATA) ? vt->collab_tform : vt->collab);
-    if (vt->nickname)
-      fprintf(f, " nickname=\"%s\"", vt->nickname);
+  } else {
+    fprintf(f, "   <");
+    if (vt->vartype == real)    fprintf(f, "realvariable");
+    if (vt->vartype == integer) fprintf(f, "integervariable");
+    if (vt->vartype == counter) fprintf(f, "countervariable");
+
+    fprintf(f, " name=\"%s\"", varname);
+    if (vt->nickname) fprintf(f, " nickname=\"%s\"", vt->nickname);
     fprintf(f, "/>");
-  } else if (vt->vartype == integer) {
-    fprintf(f, "  <integervariable name=\"%s\"",
-      (gg->save.stage == TFORMDATA) ? vt->collab_tform : vt->collab);
-    if (vt->nickname)
-      fprintf(f, " nickname=\"%s\"", vt->nickname);
-    fprintf(f, "/>");
-  } else if (vt->vartype == counter) {
-    fprintf(f, "  <countervariable name=\"%s\"",
-      (gg->save.stage == TFORMDATA) ? vt->collab_tform : vt->collab);
-    if (vt->nickname)
-      fprintf(f, " nickname=\"%s\"", vt->nickname);
-    fprintf(f, "/>");
-  }
+  } 
 
   return(true);
 }

@@ -86,7 +86,9 @@ void tsplotVarpanelRefresh(displayd *display, splotd *sp, GGobiData *d);
 gboolean tsplotHandlesProjection(displayd *dpy, ProjectionMode mode);
 gboolean tsplotHandlesInteraction(displayd *, InteractionMode);
 
+#ifdef STORE_SESSION_ENABLED
 void add_xml_tsplot_variables(xmlNodePtr node, GList *plots, displayd *dpy);
+#endif
 void tsplotVarpanelTooltipsSet(displayd *dpy, ggobid *gg, GtkWidget *wx, GtkWidget *wy, GtkWidget *wz, GtkWidget *label);
 gint tsplotPlottedColsGet(displayd *display, gint *cols, GGobiData *d, ggobid *gg);
 

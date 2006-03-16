@@ -50,6 +50,7 @@ array_contains (gint* arr, gint n, gint el)
   return false;
 }
 
+//FIXME: to become: ggobi_data_get_vartable(self, guint j) ?
 vartabled *
 vartable_element_get (gint j, GGobiData *d)
 {
@@ -62,36 +63,7 @@ vartable_element_get (gint j, GGobiData *d)
 
   return (vt);
 }
-gint
-vartable_index_get_by_name (gchar *collab, GGobiData *d)
-{
-  gint j = -1;
-  vartabled *vt;
 
-  for (j=0; j<g_slist_length (d->vartable); j++) {
-    vt = (vartabled *) g_slist_nth_data (d->vartable, j);
-    if (strcmp (vt->collab, collab) == 0) {
-      break;
-    }
-  }
-
-  return j;
-}
-vartabled *
-vartable_element_get_by_name (gchar *collab, GGobiData *d)
-{
-  gint j;
-  vartabled *vt;
-
-  for (j=0; j<g_slist_length (d->vartable); j++) {
-    vt = (vartabled *) g_slist_nth_data (d->vartable, j);
-    if (strcmp (vt->collab, collab) == 0) {
-      return (vt);
-    }
-  }
-
-  return ((vartabled *) NULL);
-}
 void
 vartable_element_append (vartabled *vt, GGobiData *d)
 {
@@ -103,34 +75,6 @@ vartable_element_remove (gint j, GGobiData *d)
   vartabled *vt = vartable_element_get (j, d);
   d->vartable = g_slist_remove (d->vartable, vt);
 }
-
-gchar *
-level_name_from_tform_value (gint i, gint j, vartabled *vt, GGobiData *d)
-{
-  gint n, ktmp;
-  gint kval = (gint) d->tform.vals[i][j];
-  gint lval = -1;
-  gchar *lname = NULL;
-
-  if (vt->vartype != categorical)
-    return lname;
-
-  for (n = 0; n < vt->nlevels; n++) {
-    ktmp = vt->level_values[n];
-    if (ktmp == kval) {
-      lval = n;
-      break;
-    }
-  }
-  if (lval == -1) {
-    g_printerr ("The levels for %s aren't specified correctly\n",
-                vt->collab);
-  } else {
-    lname = vt->level_names[lval];
-  }
-  return lname;
-}
-
 
 gint
 selected_cols_get (gint *cols, GGobiData *d, ggobid *gg)
@@ -181,9 +125,9 @@ vartable_free_element (gint j, GGobiData *d)
   vartabled *vt = vartable_element_get (j, d); 
 
   if (vt->collab != NULL)
-    g_free (vt->collab);
+    g_object_unref (vt->collab);
   if (vt->collab_tform != NULL)
-    g_free (vt->collab_tform);
+    g_object_unref (vt->collab_tform);
 
   vartable_element_remove (j, d);
 }
@@ -208,6 +152,9 @@ vartable_alloc (GGobiData *d)  /* weird -- nothing is allocated here --*/
   d->vartable = NULL;
 }
 
+
+//FIXME: should be removed and replaced by vartable_clone
+//also see code in missings.c
 void
 vartable_copy_var (gint jfrom, gint jto, GGobiData *d)
 {
@@ -259,7 +206,6 @@ vartable_copy_var (gint jfrom, gint jto, GGobiData *d)
   vt_to->nmissing = vt_from->nmissing;
   vt_to->lim_specified_p = vt_from->lim_specified_p;
 }
-
 
 /*-------------------------------------------------------------------------*/
 
@@ -317,18 +263,6 @@ void vartable_init (GGobiData *d)
 }
 
 void
-vartable_element_init(vartabled *vt, const gchar *label, const gchar *nickname)
-{
-  if (vt) {
-    vt->collab = g_strdup(label);
-    vt->collab_tform = g_strdup(label);
-    if (nickname)
-      vt->nickname = g_strdup(nickname);
-    else vt->nickname = g_strndup(vt->collab, 2);
-  }
-}
-
-void
 vartable_element_categorical_init(vartabled *vt,
   gint nlevels, gchar **level_names, gint *level_values, gint *level_counts)
 {
@@ -343,10 +277,10 @@ vartable_element_categorical_init(vartabled *vt,
       vt->level_names[i] = g_strdup(level_names[i]);
       if (level_counts)
         vt->level_counts[i] = level_counts[i];
-	  else vt->level_counts[i] = 0;
+	    else vt->level_counts[i] = 0;
       if (level_values)
    	    vt->level_values[i] = level_values[i];
-	  else vt->level_values[i] = i+1;
+	    else vt->level_values[i] = i+1;
    }
   }
 }

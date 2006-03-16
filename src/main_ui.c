@@ -25,7 +25,9 @@
 #include "externs.h"
 #include "display_tree.h"
 
+#ifdef STORE_SESSION_ENABLED
 #include "write_state.h"
+#endif
 
 #include "plugin.h"
 
@@ -61,7 +63,9 @@ GGOBI (IModeKeys)[] =
 
 void addPreviousFilesMenu (GGobiInitInfo * info, ggobid * gg);
 
+#ifdef STORE_SESSION_ENABLED
 void store_session (ggobid * gg);
+#endif
 void show_plugin_list (ggobid * gg);
 void create_new_ggobi ();
 
@@ -742,11 +746,13 @@ action_save_cb (GtkAction * action, ggobid * gg)
 {
   writeall_window_open (gg);
 }
+#ifdef STORE_SESSION_ENABLED
 static void
 action_store_session_cb (GtkAction * action, ggobid * gg)
 {
   store_session (gg);
 }
+#endif
 static void
 action_close_cb (GtkAction * action, ggobid * gg)
 {
@@ -926,10 +932,12 @@ static GtkActionEntry entries[] = {
   {"Save", GTK_STOCK_SAVE, "_Save", "<control>V", "Save some data",
    G_CALLBACK (action_save_cb)},
   {"Shortcuts", NULL, "Shortc_uts"},
+#ifdef STORE_SESSION_ENABLED
   {"StoreSession", GTK_STOCK_GOTO_BOTTOM, "Store Session", NULL,
    "Save this GGobi session",
    G_CALLBACK (action_store_session_cb)
    },
+#endif
   {"Close", GTK_STOCK_CLOSE, "_Close", "<control>C",
    "Close this GGobi instance", G_CALLBACK (action_close_cb)},
   {"Quit", GTK_STOCK_QUIT, "_Quit", "<control>Q", "Quit GGobi",
@@ -1344,7 +1352,7 @@ show_plugin_list (ggobid * gg)
 }
 
 
-
+#ifdef STORE_SESSION_ENABLED
 void
 store_session_in_file (GtkWidget * chooser)
 {
@@ -1387,7 +1395,7 @@ store_session (ggobid * gg)
     /* write_ggobi_as_xml(gg, sessionOptions->info->sessionFile); */
   }
 }
-
+#endif
 
 
 void

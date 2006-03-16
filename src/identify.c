@@ -233,11 +233,9 @@ identify_label_fetch (gint k, cpaneld * cpanel, GGobiData * d, ggobid * gg)
  * How can I tell if the current page of the notebook
  * corresponds to the data?
 */
-  /*-- if categorical, use level name ... --*/
   if (id_display_type & ID_VAR_LABELS) {
     GtkWidget *pnl =
       mode_panel_get_by_name (GGOBI (getIModeName) (IDENT), gg);
-    vartabled *vt;
     GtkWidget *tree_view;
     GGobiData *tree_view_d;
 
@@ -252,40 +250,18 @@ identify_label_fetch (gint k, cpaneld * cpanel, GGobiData * d, ggobid * gg)
     else {
       gint *vars;               // = (gint *) g_malloc (d->ncols * sizeof(gint));
       gint j, nvars;
-      gchar *lname;
-
+      gchar *colname = NULL, *value = NULL;
+      
       vars = get_selections_from_tree_view (tree_view, &nvars);
 
       for (j = 0; j < nvars; j++) {
-        if (vars[j] < 0)
-          continue;
-        vt = vartable_element_get (vars[j], d);
-        if (vt == NULL)
-          continue;
+        if (vars[j] < 0) continue;
 
-        /*  missing value  */
-        if (d->nmissing && d->missing.vals[k][vars[j]]) {
-          lbl = g_strdup_printf ("%s=NA", vt->collab_tform);
-        }
-        else {                  /* not missing */
-          if (vt->vartype == categorical) {
-            /*
-             * since the level values can be any arbitrary integers,
-             * it's necessary to dig out the level name using the list
-             * of level values.
-             */
-            lname = level_name_from_tform_value(k, vars[j], vt, d);
+        value = ggobi_data_get_string_value(d, k, vars[j], TRUE);
+        colname = ggobi_data_get_transformed_col_name(d, vars[j]);
+        lbl = g_strdup_printf ("%s=%s", colname, value);
+        labels = g_list_append (labels, lbl);
 
-            if (lname == NULL) return NULL;
-
-            lbl = (vt->vartype == categorical) ?
-              g_strdup_printf ("%s=%s",
-                               vt->collab_tform, lname) :
-              g_strdup_printf ("%s=%g",
-                               vt->collab_tform, d->tform.vals[k][vars[j]]);
-          }
-          labels = g_list_append (labels, lbl);
-        }
       }
       g_free (vars);
     }
@@ -295,7 +271,7 @@ identify_label_fetch (gint k, cpaneld * cpanel, GGobiData * d, ggobid * gg)
   if (id_display_type & ID_RECORD_LABEL) {
     lbl = (gchar *) g_array_index (d->rowlab, gchar *, k);
     if (id_display_type & ~ID_RECORD_LABEL)
-      lbl = g_strdup_printf ("label = %s", lbl);
+      lbl = g_strdup_printf ("label=%s", lbl);
     else
       lbl = g_strdup (lbl);
     labels = g_list_append (labels, lbl);
@@ -303,7 +279,7 @@ identify_label_fetch (gint k, cpaneld * cpanel, GGobiData * d, ggobid * gg)
 
   if (id_display_type & ID_RECORD_NO) {
     if (id_display_type & ~ID_RECORD_NO)
-      lbl = g_strdup_printf ("num = %d", k);
+      lbl = g_strdup_printf ("num=%d", k);
     else
       lbl = g_strdup_printf ("%d", k);
     labels = g_list_append (labels, lbl);
@@ -312,7 +288,7 @@ identify_label_fetch (gint k, cpaneld * cpanel, GGobiData * d, ggobid * gg)
   if (id_display_type & ID_RECORD_ID) {
     if (d->rowIds && d->rowIds[k]) {
       if (id_display_type & ~ID_RECORD_ID)
-        lbl = g_strdup_printf ("id = %s", d->rowIds[k]);
+        lbl = g_strdup_printf ("id=%s", d->rowIds[k]);
       else
         lbl = g_strdup_printf ("%s", d->rowIds[k]);
     }

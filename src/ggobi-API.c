@@ -116,13 +116,11 @@ gchar **GGOBI (getVariableNames) (gint transformed, GGobiData * d,
 {
   gchar **names;
   gint nc = d->ncols, j;
-  vartabled *vt;
 
   names = (gchar **) g_malloc (sizeof (gchar *) * nc);
 
   for (j = 0; j < nc; j++) {
-    vt = vartable_element_get (j, d);
-    names[j] = transformed ? vt->collab_tform : vt->collab;
+    names[j] = transformed ? ggobi_data_get_transformed_col_name(d, j) : ggobi_data_get_col_name(d, j);
   }
 
   return (names);
@@ -133,26 +131,12 @@ void
 GGOBI (setVariableName) (gint j, gchar * name, gboolean transformed,
                          GGobiData * d, ggobid * gg)
 {
-  vartabled *vt = vartable_element_get (j, d);
-
-  if (!transformed)
-    g_free (vt->collab);
-  g_free (vt->collab_tform);
 
   if (transformed)
-    vt->collab_tform = g_strdup (name);
-  else {
-/*
-    extern GtkWidget *checkbox_get_nth (gint, GGobiData *);
-    GtkWidget *w;
-    w = checkbox_get_nth (j, d);
-    if(w)
-      gtk_object_set (GTK_OBJECT(w), "label", name, NULL);
-*/
-    vt->collab = g_strdup (name);
-    vt->collab_tform = g_strdup (name);
-    varpanel_label_set (j, d);
-  }
+    ggobi_data_set_transformed_col_name(d, j, name);
+  else 
+    ggobi_data_set_col_name(d, j, name);
+
 }
 
 
@@ -222,7 +206,7 @@ GGOBI (setData) (gdouble * values, gchar ** rownames, gchar ** colnames,
 {
   gint i, j;
   gchar *lbl;
-  vartabled *vt;
+  gchar *varname;
 
   if (cleanup) {
     /* Release all the displays associated with this datad
@@ -276,11 +260,8 @@ GGOBI (setData) (gdouble * values, gchar ** rownames, gchar ** colnames,
   if (values && d->vartable) {
     /* the person who created the datad is taking care of populating it. */
     for (j = 0; j < nc; j++) {
-      vt = vartable_element_get (j, d);
-      vt->collab = (colnames != NULL && colnames[j] != NULL) ?
-        g_strdup (colnames[j]) : g_strdup_printf ("V%d", j + 1);
-      vt->collab_tform = g_strdup (vt->collab);
-      vt->nickname = g_strndup (vt->collab, 2);
+      varname = (colnames != NULL && colnames[j] != NULL) ? colnames[j] : NULL;
+      ggobi_data_set_col_name(d, j, varname);
 
       for (i = 0; i < nr; i++) {
         if (j == 0) {
@@ -290,12 +271,8 @@ GGOBI (setData) (gdouble * values, gchar ** rownames, gchar ** colnames,
           /* g_free (lbl); */
         }
 
-        if (values) {
-          if (GGobiMissingValue && GGobiMissingValue (values[i + j * nr]))
-            ggobi_data_set_missing(d, i, j);
-          else
-            d->raw.vals[i][j] = values[i + j * nr];
-        }
+        if (values)
+          ggobi_data_set_raw_value(d, i, j, values[i + j * nr]);
       }
     }
   }
@@ -369,30 +346,6 @@ void GGOBI (data_release) (GGobiData * d, ggobid * gg)
 
   vartable_free (d);
 }
-
-/*
-void
-GGOBI(vartable_free)(GGobiData *d, ggobid *gg)
-{
-  gint i;
-  for(i = 0; i < d->ncols ; i++) {
-    vartable_free_element (d->vartable+i, gg);
-  }
-  g_array_free (d->vartable);
-  d->vartable = NULL;
-}
-*/
-
-/*
-void 
-GGOBI(vardatum_free)(vartabled *var, ggobid *gg)
-{
-  if (var->collab)
-    g_free (var->collab);
-  if (var->collab_tform)
-    g_free (var->collab_tform);
-}
-*/
 
 
 /**XX*/
@@ -1299,11 +1252,9 @@ gint GGOBI (removeVariableByIndex) (gint which, GGobiData * d, ggobid * gg)
 gint GGOBI (getVariableIndex) (const gchar * name, GGobiData * d, ggobid * gg)
 {
   gint j;
-  vartabled *vt;
 
   for (j = 0; j < d->ncols; j++) {
-    vt = vartable_element_get (j, d);
-    if (strcmp (vt->collab, name) == 0)
+    if (strcmp (ggobi_data_get_col_name(d, j), name) == 0)
       return (j);
   }
 

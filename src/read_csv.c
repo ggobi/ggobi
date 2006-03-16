@@ -100,7 +100,6 @@ static void load_levels_from_hash (gpointer key, gpointer value,
                                    vartabled * vt);
 static void load_row_values (GList * rows, GGobiData * d,
                              gboolean row_labels);
-static gboolean name_set (GGobiData * d, gchar * name);
 static void tokenize_row (Row * row);
 GSList *read_csv_data (InputDescription * desc, ggobid * gg);
 static void row_free (Row * r);
@@ -362,13 +361,10 @@ load_column_labels (Row * row, GGobiData * d, gboolean row_labels)
   gint i;
   gint offset = (row_labels ? 1 : 0);
   for (i = 0; i < d->ncols; i++) {
-    vartabled *vt = vartable_element_get (i, d);
     if (row->entry[i + offset].len == 0)
-      vt->collab = g_strdup_printf ("Col %d", i + 1);
+      ggobi_data_set_col_name(d, i, NULL);
     else
-      vt->collab = g_strdup (row->src->str + row->entry[i + offset].ofs);
-    vt->nickname = g_strndup (vt->collab, 2);
-    vt->collab_tform = g_strdup (vt->collab);
+      ggobi_data_set_col_name(d, i, row->src->str + row->entry[i + offset].ofs);
   }
 }
 

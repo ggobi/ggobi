@@ -8,30 +8,17 @@
 #include "vartable.h"
 #include "externs.h"
 
-static void
-writeFloat(FILE *f, double value)
-{
-  fprintf(f, "%g", value); 
-}
-static void
-writeInteger(FILE *f, double value)
-{
-  fprintf(f, "%d", (gint)value); 
-}
-
 gboolean
 write_csv_header (gint *cols, gint ncols, FILE *f, GGobiData *d, ggobid *gg)
 {
   gboolean ok = true;
   gint j, jcol, rval;
-  vartabled *vt;
 
   fprintf (f, "\"\",");
   for (j=0; j<ncols; j++) {
     jcol = cols[j];
-    vt = vartable_element_get (jcol, d);
     rval = fprintf (f, "\"%s\"", 
-             g_strstrip((gg->save.stage == TFORMDATA) ? vt->collab_tform : vt->collab));
+             g_strstrip((gg->save.stage == TFORMDATA) ? ggobi_data_get_transformed_col_name(d, jcol) : ggobi_data_get_col_name(d, jcol)));
     if (rval < 0) {
       ok = false;
       break;
@@ -47,28 +34,15 @@ write_csv_header (gint *cols, gint ncols, FILE *f, GGobiData *d, ggobid *gg)
 void
 write_csv_cell(gint i, gint j, FILE *f, GGobiData *d, ggobid *gg)
 {
-  vartabled *vt;
-  gchar *lname;
-
-  vt = vartable_element_get (j, d);
+  vartabled *vt = vartable_element_get (j, d);
+  gchar* value = ggobi_data_get_string_value(d, i, j, gg->save.stage == TFORMDATA);
 
   switch (vt->vartype) {
   case categorical:
-    lname = g_strstrip(level_name_from_tform_value(i, j, vt, d));
-    fprintf(f, "\"%s\"", lname);
-    break;
-  case integer:
-  case counter:
-    writeInteger (f, (gg->save.stage == TFORMDATA) ? d->tform.vals[i][j] :
-                                                   d->raw.vals[i][j]);
-    break;
-  case uniform:
-  case real:
-    writeFloat (f, (gg->save.stage == TFORMDATA) ? d->tform.vals[i][j] :
-                                                   d->raw.vals[i][j]);
+    fprintf(f, "\"%s\"", value);
     break;
   default:
-    break;
+    fprintf(f, "%s", value);
   }
 }
 
@@ -189,15 +163,15 @@ write_csv (const gchar *filename,  ggobid *gg)
       if (gg->current_display->d != NULL)
         d = gg->current_display->d; 
     }
+  }
 
-    if (d) {
-      f = fopen (filename, "w");
-      if (f) {
-        if (write_csv_file (f, d, gg))
-          ok = true;
+  if (d) {
+    f = fopen (filename, "w");
+    if (f) {
+      if (write_csv_file (f, d, gg))
+        ok = true;
 
-        fclose(f);
-      }
+      fclose(f);
     }
   }
   return ok;

@@ -104,16 +104,7 @@ barchart_is_variable_plotted (displayd * display, gint * cols, gint ncols,
 static gchar *
 barchart_tree_label (splotd * sp, GGobiData * d, ggobid * gg)
 {
-  vartabled *vt;
-  int n;
-  char *buf;
-
-  vt = vartable_element_get (sp->p1dvar, d);
-  n = strlen (vt->collab);
-  buf = (gchar *) g_malloc (n * sizeof (gchar *));
-  sprintf (buf, "%s", vt->collab);
-
-  return (buf);
+  return(ggobi_data_get_col_name(d, sp->p1dvar));
 }
 
 

@@ -1068,11 +1068,9 @@ gint
 resolveVariableName (const gchar * name, GGobiData * d)
 {
   gint j;
-  vartabled *vt;
 
   for (j = 0; j < d->ncols; j++) {
-    vt = vartable_element_get (j, d);
-    if (strcmp (vt->collab, name) == 0)
+    if (strcmp (ggobi_data_get_col_name(d, j), name) == 0)
       return (j);
   }
 

@@ -212,7 +212,6 @@ add_record_dialog_open (GGobiData * d, GGobiData * e, displayd * dsp,
   /*-- Another table to contain variable name-value pairs --*/
   if (dtarget->ncols) {
     gint j;
-    vartabled *vt;
     GtkWidget *tablev;
     gchar **vals = (gchar **) g_malloc (dtarget->ncols * sizeof (gchar *));
 
@@ -227,8 +226,7 @@ add_record_dialog_open (GGobiData * d, GGobiData * e, displayd * dsp,
                         tablev, false, false, 5);
 
     for (j = 0; j < dtarget->ncols; j++) {
-      vt = vartable_element_get (j, d);
-      w = gtk_label_new (vt->collab);
+      w = gtk_label_new (ggobi_data_get_col_name(d, j));
       gtk_table_attach (GTK_TABLE (tablev),
                         w, 0, 1, j, j + 1, table_opt, table_opt, 1, 1);
 

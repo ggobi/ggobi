@@ -22,7 +22,6 @@
 #include <string.h>
 
 #include "externs.h"
-#include "write_state.h"
 
 static gboolean
 cpanelSet (displayd * dpy, cpaneld * cpanel, ggobid * gg)
@@ -172,6 +171,7 @@ createWithVars (gboolean missing_p, gint nvars, gint * vars, GGobiData * d,
   return (GGOBI (newScatmat) (vars, vars, nvars, nvars, d, gg));
 }
 
+#ifdef STORE_SESSION_ENABLED
 
 void
 add_xml_scatmat_variables (xmlNodePtr node, GList * plots, displayd * dpy)
@@ -187,7 +187,7 @@ add_xml_scatmat_variables (xmlNodePtr node, GList * plots, displayd * dpy)
     XML_addVariable (node, plot->xyvars.x, dpy->d);
   }
 }
-
+#endif
 
 static gboolean
 scatmatKeyEventHandled (GtkWidget * w, displayd * display, splotd * sp,
@@ -513,7 +513,9 @@ scatmatDisplayClassInit (GGobiScatmatDisplayClass * klass)
   klass->parent_class.cpanel_set = cpanelSet;
   klass->parent_class.imode_control_box = scatmatCPanelWidget;
 
+  #ifdef STORE_SESSION_ENABLED
   klass->parent_class.xml_describe = add_xml_scatmat_variables;
+  #endif
   klass->parent_class.move_points_motion_cb = movePointsMotionCb;
   klass->parent_class.move_points_button_cb = movePointsButtonCb;
 /* XXX duncan and dfs: you need to sort this out
@@ -538,16 +540,10 @@ scatmatDisplayClassInit (GGobiScatmatDisplayClass * klass)
 static gchar *
 treeLabel (splotd * splot, GGobiData * d, ggobid * gg)
 {
-  gint n;
-  vartabled *vtx, *vty;
-  gchar *buf;
-  vtx = vartable_element_get (splot->xyvars.x, d);
-  vty = vartable_element_get (splot->xyvars.y, d);
-
-  n = strlen (vtx->collab) + strlen (vty->collab) + 5;
-  buf = (gchar *) g_malloc (n * sizeof (gchar *));
-  sprintf (buf, "%s v %s", vtx->collab, vty->collab);
-  return (buf);
+  g_strdup_printf("%s v %s", 
+    ggobi_data_get_col_name(d, splot->xyvars.x), 
+    ggobi_data_get_col_name(d, splot->xyvars.y)
+  );
 }
 
 

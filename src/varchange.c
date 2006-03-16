@@ -176,9 +176,7 @@ newvar_add_with_values (gdouble * vals, gint nvals, gchar * vname,
   /*-- run the data through the head of the pipeline --*/
   tform_to_world_by_var (jvar, d, d->gg);
 
-  vt->collab = vt->collab_tform = g_strdup (vname);
-  vt->nickname = g_strndup (vname, 2);
-  /*-- --*/
+  ggobi_data_set_col_name(d, jvar, vname);
 
   addvar_propagate (d_ncols_prev, 1, d);
 
@@ -186,6 +184,7 @@ newvar_add_with_values (gdouble * vals, gint nvals, gchar * vname,
        is set.
 */
   /*-- emit variable_added signal --*/
+  //FIXME: send variable index instead of vartable
   g_signal_emit (G_OBJECT (d->gg),
                  GGobiSignals[VARIABLE_ADDED_SIGNAL], 0, vt, d->ncols - 1, d);
 }
@@ -287,11 +286,10 @@ delete_vars (gint * cols, gint ncols, GGobiData * d)
    */
   if ((j = is_variable_plotted (cols, ncols, d)) != -1) {
     gchar *message;
-    vt = vartable_element_get (j, d);
     message =
       g_strdup_printf
       ("Deletion failed; the variable '%s' is currently plotted\n",
-       vt->collab);
+       ggobi_data_get_col_name(d, j));
     quick_message (message, false);
     g_free (message);
 
@@ -365,42 +363,3 @@ delete_vars (gint * cols, gint ncols, GGobiData * d)
 
   return true;
 }
-
-/* Not used?
-vartyped
-ggobi_data_set_var_type (GGobiData * d, int which, vartyped value)
-{
-  vartabled *vt;
-  vartyped old;
-
-  if (value < real || value >= all_vartypes)
-    return (all_vartypes);
-
-  vt = vartable_element_get (which, d);
-  if (!vt) {
-    return (all_vartypes);
-  }
-
-  old = vt->vartype;
-  vt->vartype = value;
-
-  return (old);
-}
-
-gboolean
-ggobi_data_set_time_var (GGobiData * d, int which, gboolean value)
-{
-  vartabled *vt;
-  gboolean old;
-
-  vt = vartable_element_get (which, d);
-  if (!vt) {
-    return (all_vartypes);
-  }
-
-  old = vt->isTime;
-  vt->isTime = value;
-
-  return (old);
-}
-*/

@@ -22,8 +22,6 @@
 
 #include "externs.h"
 
-#include "write_state.h" /* for XML_addVariable */
-
 #include <string.h>
 
 displayd *
@@ -119,6 +117,8 @@ tsplotHandlesInteraction(displayd *dpy, InteractionMode mode)
   return(mode == BRUSH || mode == IDENT || mode == DEFAULT_IMODE);
 }
 
+#ifdef STORE_SESSION_ENABLED
+
 /*
   Write out the variables in a time series plot
   to the current node in the XML tree.
@@ -138,7 +138,7 @@ add_xml_tsplot_variables(xmlNodePtr node, GList *plots, displayd *dpy)
     plots = plots->next;
   }
 }
-
+#endif
 
 void
 tsplotVarpanelTooltipsSet(displayd *dpy, ggobid *gg, GtkWidget *wx, GtkWidget *wy, GtkWidget *wz, GtkWidget *label)
@@ -341,16 +341,7 @@ tsplotKeyEventHandled(GtkWidget *w, displayd *display, splotd *sp, GdkEventKey *
 gchar *
 tsplot_tree_label(splotd *sp, GGobiData *d, ggobid *gg)
 {
-    vartabled *vty;
-    int n;
-    char *buf;
-
-      vty = vartable_element_get (sp->xyvars.y, d);
-      n = strlen (vty->collab);
-      buf = (gchar*) g_malloc(n* sizeof (gchar*));
-      sprintf(buf, "%s", vty->collab);
- 
-    return(buf);
+    ggobi_data_get_col_name(d, sp->xyvars.y);
 }
 
 /*************************************************/

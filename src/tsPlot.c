@@ -87,43 +87,22 @@ tsDrawCase_p(splotd *sp, gint m, GGobiData *d, ggobid *gg)
 void
 tsAddPlotLabels(splotd *sp, GdkDrawable *drawable, ggobid *gg) 
 {
-    displayd *display = sp->displayptr;
-    GList *l = display->splots;
-    vartabled *vtx, *vty;
-	PangoLayout *layout = gtk_widget_create_pango_layout(sp->da, NULL);
-	PangoRectangle rect;
-	
-    if (l->data == sp) {
-      vtx = vartable_element_get (sp->xyvars.x, display->d);
-	  layout_text(layout, vtx->collab_tform, &rect);
-	  gdk_draw_layout(drawable, gg->plot_GC, 
-	  	sp->max.x - rect.width - 5,
-        sp->max.y - rect.height - 5,
-		layout);
-      /*gdk_text_extents (
-        gtk_style_get_font (style),
-        vtx->collab_tform, strlen (vtx->collab_tform),
-        &lbearing, &rbearing, &width, &ascent, &descent);
-      gdk_draw_string (drawable,
-        gtk_style_get_font (style),
-        gg->plot_GC,
-        sp->max.x - width - 5,
-        sp->max.y - 5,
-        vtx->collab_tform);*/
-    }
-    vty = vartable_element_get (sp->xyvars.y, display->d);
-	layout_text(layout, vty->collab_tform, &rect);
-	gdk_draw_layout(drawable, gg->plot_GC, 5, 5, layout);
-    /*gdk_text_extents (
-      gtk_style_get_font (style),
-      vty->collab_tform, strlen (vty->collab_tform),
-      &lbearing, &rbearing, &width, &ascent, &descent);
-    gdk_draw_string (drawable,
-      gtk_style_get_font (style),
-      gg->plot_GC,
-      5, 5 + ascent + descent,
-      vty->collab_tform);*/
-	  g_object_unref(G_OBJECT(layout));
+  displayd *display = sp->displayptr;
+  GList *l = display->splots;
+  PangoLayout *layout = gtk_widget_create_pango_layout(sp->da, NULL);
+  PangoRectangle rect;
+
+  if (l->data == sp) {
+    layout_text(layout, ggobi_data_get_transformed_col_name(display->d, sp->xyvars.x), &rect);
+      gdk_draw_layout(drawable, gg->plot_GC, 
+      sp->max.x - rect.width - 5,
+      sp->max.y - rect.height - 5,
+      layout
+    );
+  }
+  layout_text(layout, ggobi_data_get_transformed_col_name(display->d, sp->xyvars.y), &rect);
+  gdk_draw_layout(drawable, gg->plot_GC, 5, 5, layout);
+  g_object_unref(G_OBJECT(layout));
 }
 
 void
@@ -156,16 +135,7 @@ tsAllocWhiskers(GdkSegment *whiskers, splotd *sp, gint nrows, GGobiData *d)
 gchar *
 tsTreeLabel(splotd *sp, GGobiData *d, ggobid *gg)
 {
-  vartabled *vty;
-  int n;
-  char *buf;
-
-    vty = vartable_element_get (sp->xyvars.y, d);
-    n = strlen (vty->collab);
-    buf = (gchar*) g_malloc(n* sizeof (gchar*));
-   sprintf(buf, "%s", vty->collab);
-
-   return(buf);
+  ggobi_data_get_col_name(d, sp->xyvars.y);
 }
 
 
@@ -306,7 +276,9 @@ timeSeriesClassInit(GGobiTimeSeriesDisplayClass *klass)
 
     klass->parent_class.handles_interaction = tsplotHandlesInteraction;
 
+    #ifdef STORE_SESSION_ENABLED
     klass->parent_class.xml_describe = add_xml_tsplot_variables;
+    #endif
 
     klass->parent_class.varpanel_tooltips_set = tsplotVarpanelTooltipsSet;
     klass->parent_class.plotted_vars_get = tsplotPlottedColsGet;

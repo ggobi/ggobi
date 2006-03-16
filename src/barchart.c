@@ -775,7 +775,7 @@ barchart_splot_add_plot_labels (splotd * sp, GdkDrawable * drawable,
 
   vtx = vartable_element_get (sp->p1dvar, d);
 
-  layout_text (layout, vtx->collab_tform, &rect);
+  layout_text (layout, ggobi_data_get_col_name(d, sp->p1dvar), &rect);
   gdk_draw_layout (drawable, gg->plot_GC, sp->max.x - rect.width - 5,
                    sp->max.y - rect.height - 5, layout);
 

@@ -697,20 +697,18 @@ transform2_apply (gint jcol, GGobiData *d, ggobid *gg)
  * we're ready for any sort of success or failure
 */
 void
-collab_tform_update (gint j, GGobiData *d, ggobid *gg)
+collab_tform_update (gint j, GGobiData *d)
 {
-  gchar *lbl0, *lbl1;
+  gchar *lbl0, *lbl1, *lbl2;
   vartabled *vt = vartable_element_get (j, d);
-
-  g_free ((gpointer) vt->collab_tform);
 
   /*-- skip the stage0 changes except negation --*/
   switch (vt->tform0) {
     case NEGATE:
-      lbl0 = g_strdup_printf ("-%s", vt->collab);
+      lbl0 = g_strdup_printf ("-%s", ggobi_data_get_col_name(d, j));
       break;
     default:
-      lbl0 = g_strdup (vt->collab);
+      lbl0 = g_strdup (ggobi_data_get_col_name(d, j));
       break;
   }
 
@@ -738,37 +736,35 @@ collab_tform_update (gint j, GGobiData *d, ggobid *gg)
   }
 
   switch (vt->tform2) {
-    case NO_TFORM2:
-      vt->collab_tform = g_strdup (lbl1);
-    break;
     case STANDARDIZE:
-      vt->collab_tform = g_strdup_printf ("(%s-m)/s", lbl1);
+      lbl2 = g_strdup_printf ("(%s-m)/s", lbl1);
     break;
     case SORT:
-      vt->collab_tform = g_strdup_printf ("sort(%s)", lbl1);
+      lbl2 = g_strdup_printf ("sort(%s)", lbl1);
     break;
     case RANK:
-      vt->collab_tform = g_strdup_printf ("rank(%s)", lbl1);
+      lbl2 = g_strdup_printf ("rank(%s)", lbl1);
     break;
     case NORMSCORE:
-      vt->collab_tform = g_strdup_printf ("normsc(%s)", lbl1);
+      lbl2 = g_strdup_printf ("normsc(%s)", lbl1);
     break;
     case ZSCORE:
-      vt->collab_tform = g_strdup_printf ("zsc(%s)", lbl1);
+      lbl2 = g_strdup_printf ("zsc(%s)", lbl1);
     break;
     case DISCRETE2:
-      vt->collab_tform = g_strdup_printf ("%s:0,1", lbl1);
+      lbl2 = g_strdup_printf ("%s:0,1", lbl1);
     break;
+    default:
+      lbl2 = g_strdup (lbl1);
   }
-
-  g_free ((gpointer) lbl0);
-  g_free ((gpointer) lbl1);
+  
+  ggobi_data_set_transformed_col_name(d, j, lbl2);
 }
 
-void tform_label_update (gint j, GGobiData *d, ggobid *gg)
+void tform_label_update (gint j, GGobiData *d)
 {
   /*-- update the values of the variable labels --*/
-  collab_tform_update (j, d, gg);
+  collab_tform_update (j, d);
 
   /*-- update the displayed checkbox label --*/
   /*varlabel_set (j, d);*/
@@ -836,7 +832,7 @@ transform_variable (gint stage, gint tform_type, gfloat param, gint jcol,
     break;
   }
 
-  tform_label_update (jcol, d, gg);
+  tform_label_update (jcol, d);
 
   return success;
 }

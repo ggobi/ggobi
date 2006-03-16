@@ -89,7 +89,6 @@ void startXMLElement (void *user_data, const xmlChar * name,
 void endXMLElement (void *user_data, const xmlChar * name);
 void Characters (void *user_data, const xmlChar * ch, gint len);
 void cumulateRecordData (XMLParserData * data, const xmlChar * ch, gint len);
-void xmlSetMissingValue (XMLParserData * data, GGobiData * d, vartabled * vt);
 gint getAutoLevelIndex (const char *const label, XMLParserData * data,
                         vartabled * el);
 static gboolean setRecordValue (const char *tmp, GGobiData * d,
@@ -460,7 +459,7 @@ setLevelIndex (const xmlChar ** attrs, XMLParserData * data)
   const gchar *tmp = getAttribute (attrs, "value");
   gint itmp;
   GGobiData *d = getCurrentXMLData (data);
-  vartabled *el = vartable_element_get (data->current_variable, d);
+  vartabled *el = vartable_element_get(data->current_variable, d);
 
   data->current_level++; /*-- current_level here ranges from 0 to nlevels-1 --*/
 
@@ -468,7 +467,7 @@ setLevelIndex (const xmlChar ** attrs, XMLParserData * data)
   if (data->current_level >= el->nlevels) {
 /*XXX Put in a more terminal error! */
     ggobi_XML_error_handler (data, "trouble: adding too many levels to %s\n",
-                             el->collab);
+                             ggobi_data_get_col_name(d, data->current_variable));
   }
 /* */
 
@@ -502,7 +501,7 @@ completeCategoricalLevels (XMLParserData * data)
 
     /*-- Alert the user what we're about to do --*/
     g_print ("Supplying default level values for \"%s\" ranging from %d:%d\n",
-             el->collab, min, min + el->nlevels - 1);
+             ggobi_data_get_col_name(d, data->current_variable), min, min + el->nlevels - 1);
     for (k = 0; k < el->nlevels; k++) {
       el->level_values[k] = min + k;
       if (el->level_names[k]) g_free(el->level_names[k]);
@@ -511,6 +510,8 @@ completeCategoricalLevels (XMLParserData * data)
   }
 }
 
+
+//FIXME: need new vartable function: load from xml
 void
 categoricalLevels (const xmlChar ** attrs, XMLParserData * data)
 {
@@ -729,7 +730,7 @@ endXMLElement (void *user_data, const xmlChar * name)
     resetRecordInfo (data);
     break;
   case NA:
-    xmlSetMissingValue (data, getCurrentXMLData (data), NULL);
+    ggobi_data_set_missing(getCurrentXMLData(data), data->current_record, data->current_element);
     data->current_element++;
     break;
   case REAL:
@@ -1212,14 +1213,6 @@ xml_warning (const gchar * attribute, const gchar * value, const gchar * msg,
   g_printerr ("\t%s %s: value = %s\n", attribute, msg, value);
 }
 
-
-void
-xmlSetMissingValue (XMLParserData * data, GGobiData * d, vartabled * vt)
-{
-  ggobi_data_set_missing(d, data->current_record, data->current_element);
-}
-
-
 static vartabled *
 applyRandomUniforms (GGobiData * d, XMLParserData * data)
 {
@@ -1274,7 +1267,7 @@ setRecordValue (const char *tmp, GGobiData * d, XMLParserData * data)
         strcmp (tmp, "NA") == 0 ||
         strcmp (tmp, ".") == 0)) ||
       (data->NA_identifier && strcmp (tmp, data->NA_identifier) == 0)) {
-    xmlSetMissingValue (data, d, vt);
+    ggobi_data_set_missing(d, data->current_record, data->current_element);    
   }
   else {
 
@@ -1433,30 +1426,12 @@ newVariable (const xmlChar ** attrs, XMLParserData * data,
   el = vartable_element_get (data->current_variable, d);
 
   data->variable_transform_name_as_attribute = false;
-/*  we don't know what to do with this information yet
-  tmp = getAttribute(attrs, "transformName");
-  if (tmp) {
-    data->variable_transform_name_as_attribute = true;
-    el->collab_tform = g_strdup(tmp);
-  }
-*/
 
   tmp = getAttribute (attrs, "name");
-  /*-- invent a variable name here if the user didn't supply one  */
-  if (tmp == NULL)
-    tmp = g_strdup_printf ("Var %d", data->current_variable);
-  el->collab = g_strdup (tmp);
-  if (data->variable_transform_name_as_attribute == false)
-    el->collab_tform = g_strdup (tmp);
+  ggobi_data_set_col_name(d, data->current_variable, (gchar*) tmp);
 
   tmp = getAttribute (attrs, "nickname");
-  if (tmp != NULL) {
-    el->nickname = g_strdup (tmp);
-    /*-- no nickname_tform; defeats the purpose of having a 2-letter name --*/
-    /*-- if word is shorter than 2 characters, g_strndup pads with nulls --*/
-  }
-  else
-    el->nickname = g_strndup (el->collab, 2);
+  if (tmp != NULL) el->nickname = g_strdup (tmp);
 
   /*
    * I don't think we plan to support this, so I'm ifdef-ing out
@@ -1671,33 +1646,15 @@ gboolean
 setDataset (const xmlChar ** attrs, XMLParserData * parserData,
             enum xmlDataState type)
 {
-  GGobiData *data = NULL;
-  gchar *name;
-  const gchar *tmp;
+  GGobiData *data = ggobi_data_new (0, 0);
+  const gchar *name, *nickname;
 
-  //data = ggobi_data_new(parserData->gg);
-  data = ggobi_data_new (0, 0);
-
-  parserData->counterVariableIndex = -1;
-
-  tmp = getAttribute (attrs, (gchar *) "name");
-  if (tmp == NULL) {
-    name = (gchar *) malloc (sizeof (gchar) * 8);
-    sprintf (name, "data%d", (gint) g_slist_length (parserData->gg->d));
-  }
-  else
-    name = g_strdup (tmp);
-  data->name = name;
-
-  tmp = getAttribute (attrs, "nickname");
-  if (tmp != NULL) {
-    data->nickname = g_strdup (tmp);
-    /*-- if word is shorter than 5 characters, g_strndup pads with nulls --*/
-  }
-  else
-    data->nickname = g_strndup (data->name, 5);
+  name = getAttribute (attrs, "name");
+  nickname = getAttribute (attrs, "nickname");
+  ggobi_data_set_name(data, (gchar *) name, (gchar *) nickname);
 
   parserData->current_data = data;
+  parserData->counterVariableIndex = -1;
 
   if (type == EDGES) {
     setDatasetInfo (attrs, parserData);

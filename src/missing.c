@@ -57,6 +57,8 @@ missing_arrays_add_rows (gint nrows, GGobiData * d)
  * generate a new datad using d->missing.  Maybe I should only
  * create missingness variables for those variables which have
  * missing values ...
+ *
+ * FIXME: create with the GGobiData api
 */
 void
 missings_datad_cb (GtkWidget * w, ggobid * gg)
@@ -116,6 +118,7 @@ missings_datad_cb (GtkWidget * w, ggobid * gg)
  * the future, we might want to support other categories:  censored,
  * left-censored, etc.
 */
+
     for (j = 0; j < ncols_with_missings; j++) {
       k = cols_with_missings[j];
       vt = vartable_element_get (k, d);

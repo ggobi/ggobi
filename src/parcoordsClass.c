@@ -17,7 +17,9 @@
 #include "parcoordsClass.h"
 
 #include <string.h>
+#ifdef STORE_SESSION_ENABLED
 #include "write_state.h"
+#endif
 #include "externs.h"
 #include <gdk/gdkkeysyms.h>
 
@@ -254,14 +256,7 @@ parcoordsKeyEventHandled (GtkWidget * w, displayd * display, splotd * sp,
 gchar *
 treeLabel (splotd * splot, GGobiData * d, ggobid * gg)
 {
-  vartabled *vt;
-  int n;
-  gchar *buf;
-  vt = vartable_element_get (splot->p1dvar, d);
-  n = strlen (vt->collab);
-  buf = (gchar *) g_malloc (n * sizeof (gchar *));
-  sprintf (buf, "%s", vt->collab);
-  return (buf);
+  ggobi_data_get_col_name(d, splot->p1dvar);
 }
 
 static GdkSegment *
@@ -363,16 +358,13 @@ static void
 addPlotLabels (displayd * display, splotd * sp, GdkDrawable * drawable,
                GGobiData * d, ggobid * gg)
 {
-  vartabled *vt;
   PangoRectangle rect;
   PangoLayout *layout =
     gtk_widget_create_pango_layout (GTK_WIDGET (sp->da), NULL);
   cpaneld *cpanel = &display->cpanel;
 
-  vt = vartable_element_get (sp->p1dvar, d);
 
-
-  layout_text (layout, vt->collab_tform, &rect);
+  layout_text (layout, ggobi_data_get_transformed_col_name(d, sp->p1dvar), &rect);
   if (cpanel->parcoords_arrangement == ARRANGE_ROW)
     gdk_draw_layout (drawable, gg->plot_GC,
                      (rect.width <=
@@ -467,6 +459,8 @@ displaySet (displayd * display, ggobid * gg)
 {
 }
 
+#ifdef STORE_SESSION_ENABLED
+
 /*
   Write out the variables in a parallel coordinates plot
   to the current node in the  XML tree.
@@ -483,7 +477,7 @@ add_xml_parcoords_variables (xmlNodePtr node, GList * plots, displayd * dpy)
     plots = plots->next;
   }
 }
-
+#endif
 
 /*------------------------------------------------------------------------*/
 /*               case highlighting for points (and edges?)                */
@@ -632,7 +626,9 @@ parcoordsDisplayClassInit (GGobiParCoordsDisplayClass * klass)
 
   klass->parent_class.cpanel_set = cpanelSet;
 
+  #ifdef STORE_SESSION_ENABLED
   klass->parent_class.xml_describe = add_xml_parcoords_variables;
+  #endif
 
   klass->parent_class.varpanel_tooltips_set = varpanelTooltipsSet;
 

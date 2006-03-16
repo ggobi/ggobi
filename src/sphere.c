@@ -79,18 +79,6 @@ sphere_malloc (gint nc, GGobiData * d, ggobid * gg)
 /*         test the number of variables sphered last time                  */
 /*-------------------------------------------------------------------------*/
 
-void
-variable_set_label (GGobiData * d, gint j, gchar * lbl)
-{
-  vartabled *vt = vartable_element_get (j, d);
-
-  vt->collab = g_strdup (lbl);
-  vt->collab_tform = g_strdup (lbl);
-  vartable_collab_set_by_var (j, d);
-  varpanel_label_set (j, d);   /*-- checkboxes --*/
-  varcircle_label_set (j, d);  /*-- variable circles --*/
-}
-
 /*
  * before sphering 
  * if (npcvars > 0 && npcvars != npcs) {
@@ -112,7 +100,6 @@ spherize_set_pcvars (GGobiData * d, ggobid * gg)
   gboolean succeeded = true;
 
   /*-- for updating the tree view --*/
-  vartabled *vt;
   GtkWidget *tree_view = gg->sphere_ui.tree_view;
   GtkTreeModel *model = gtk_tree_view_get_model (GTK_TREE_VIEW (tree_view));
   GtkTreeIter iter;
@@ -215,7 +202,11 @@ spherize_set_pcvars (GGobiData * d, ggobid * gg)
     for (k = 0; k < d->sphere.pcvars.nels; k++) {
       j = d->sphere.pcvars.els[k];
       lbl = g_strdup_printf ("PC%d", (k + 1));
-      variable_set_label (d, j, lbl);
+      
+      ggobi_data_set_col_name (d, j, lbl);
+      
+      varpanel_label_set (j, d);   /*-- checkboxes --*/
+      varcircle_label_set (j, d);  /*-- variable circles --*/
       g_free (lbl);
     }
 
@@ -223,9 +214,8 @@ spherize_set_pcvars (GGobiData * d, ggobid * gg)
     gtk_list_store_clear (GTK_LIST_STORE (model));
     /*-- add the new labels to the 'sphered variables' tree view --*/
     for (j = 0; j < d->sphere.vars_sphered.nels; j++) {
-      vt = vartable_element_get (d->sphere.vars_sphered.els[j], d);
       gtk_list_store_append (GTK_LIST_STORE (model), &iter);
-      gtk_list_store_set (GTK_LIST_STORE (model), &iter, 0, vt->collab, -1);
+      gtk_list_store_set (GTK_LIST_STORE (model), &iter, 0, ggobi_data_get_col_name(d, d->sphere.vars_sphered.els[j]), -1);
     }
   }
 
