@@ -47,6 +47,6 @@ bin_PROGRAMS  = ggobi
 ggobi_SOURCES = ggobiMain.c
 ggobi_LDADD   = libggobi.la
 
-INCLUDES = @SRC_DEBUG@ @GTK_CFLAGS@ @LIBXML_CFLAGS@ @INCLTDL@
+INCLUDES = @SRC_DEBUG@ @GTK_CFLAGS@ @LIBXML_CFLAGS@ @INCLTDL@ @INCINTL@
 
 EXTRA_DIST = $(libggobi_la_GOBS)
