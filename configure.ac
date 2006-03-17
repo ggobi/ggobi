@@ -28,9 +28,7 @@ AM_INIT_AUTOMAKE
 # Initialize gettext
 AM_GNU_GETTEXT([use-libtool])
 AM_GNU_GETTEXT_VERSION(0.14.5)
-
-GGOBI_LOCALEDIR="$datadir/locale"
-AC_DEFINE_UNQUOTED([GGOBI_LOCALEDIR],"$GGOBI_LOCALEDIR", [The directory with the locale files])
+AM_GLIB_DEFINE_LOCALEDIR(GGOBI_LOCALEDIR)
 
 MAJOR_VERSION=ggobi_major_version
 MINOR_VERSION=ggobi_minor_version
@@ -44,7 +42,7 @@ AC_SUBST(MINOR_VERSION)
 AC_SUBST(MICRO_VERSION)
 
 dnl These go into config.h as #define entries (used in about dialog).
-AC_DEFINE_UNQUOTED([GGOBI_RELEASE_DATE], "$GGOBI_RELEASE_DATE", [Data of GGobi's release])
+AC_DEFINE_UNQUOTED([GGOBI_RELEASE_DATE], $GGOBI_RELEASE_DATE, [Date of GGobi's release])
 AC_DEFINE_UNQUOTED([MAJOR_VERSION], $MAJOR_VERSION, [The major x.*.* version])
 AC_DEFINE_UNQUOTED([MINOR_VERSION], $MINOR_VERSION, [The minor *.x.* version])
 AC_DEFINE_UNQUOTED([MICRO_VERSION], $MICRO_VERSION, [The micro *.*.x version])
