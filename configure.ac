@@ -1,7 +1,7 @@
 dnl This is the configuration script for ggobi
 
 # Configure the version information here
-m4_define([ggobi_release_date], [March 13 2006])
+m4_define([ggobi_release_date], ["March 13 2006"])
 m4_define([ggobi_major_version], [2])
 m4_define([ggobi_minor_version], [1])
 m4_define([ggobi_micro_version], [0])
@@ -42,7 +42,7 @@ AC_SUBST(MINOR_VERSION)
 AC_SUBST(MICRO_VERSION)
 
 dnl These go into config.h as #define entries (used in about dialog).
-AC_DEFINE_UNQUOTED([GGOBI_RELEASE_DATE], $GGOBI_RELEASE_DATE, [Date of GGobi's release])
+AC_DEFINE_UNQUOTED([GGOBI_RELEASE_DATE], "${GGOBI_RELEASE_DATE}", [Date of GGobi's release])
 AC_DEFINE_UNQUOTED([MAJOR_VERSION], $MAJOR_VERSION, [The major x.*.* version])
 AC_DEFINE_UNQUOTED([MINOR_VERSION], $MINOR_VERSION, [The minor *.x.* version])
 AC_DEFINE_UNQUOTED([MICRO_VERSION], $MICRO_VERSION, [The micro *.*.x version])

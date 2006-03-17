@@ -146,9 +146,9 @@ parse_command_line (gint * argc, gchar ** av)
   GError *error = NULL;
   GOptionContext *ctx = g_option_context_new("- platform for interactive graphics");
   
-  g_option_group_set_translation_domain (g_option_context_get_main_group (ctx), PACKAGE);
   g_option_context_add_main_entries (ctx, entries, PACKAGE);
   g_option_context_add_group (ctx, gtk_get_option_group (TRUE));
+  g_option_group_set_translation_domain (g_option_context_get_main_group (ctx), PACKAGE);
   g_option_context_parse (ctx, argc, &av, &error);
   
   if (error) {
@@ -162,7 +162,8 @@ parse_command_line (gint * argc, gchar ** av)
   }
   
   sessionOptions->activeColorScheme = active_color_scheme;
-  sessionOptions->info->colorSchemeFile = color_scheme_file;
+  if (color_scheme_file)
+    sessionOptions->info->colorSchemeFile = color_scheme_file;
   sessionOptions->data_type = data_mode;
   sessionOptions->initializationFile = initialization_file;
   sessionOptions->info->quitWithNoGGobi = quit_with_no_ggobi;
