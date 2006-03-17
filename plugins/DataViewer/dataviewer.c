@@ -358,7 +358,8 @@ add_ggobi_data(GGobiData *data, GtkTreeModel *model)
   for(j = 0; j < data->ncols; j++) {
     vt = g_slist_nth_data(data->vartable, j);
     /** FIXME: Handle missings */
-    if(data->nmissing && data->missing.vals[i][j] && vt->vartype != categorical);
+    if(ggobi_data_get_n_missing(data) && ggobi_data_is_missing(data, i, j) && 
+      vt->vartype != categorical);
 	  //	  gtk_list_store_set(GTK_LIST_STORE(model), &iter, j+1, NAN, -1);
 	  else {
       if(vt->vartype == categorical)  {
