@@ -140,6 +140,9 @@ AC_SUBST(INCLTDL)
 AC_SUBST(LIBLTDL)
 AC_CONFIG_SUBDIRS(libltdl)
 
+# Configure for building against local libintl
+AC_SUBST(INCINTL)
+
 # Check for questionable functions (kind of paranoid)
 AC_FUNC_MALLOC
 AC_CHECK_FUNCS([pow sqrt strchr strrchr strstr memset])
