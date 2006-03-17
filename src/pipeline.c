@@ -61,17 +61,17 @@ pipeline_init (GGobiData * d, ggobid * gg)
    * variable.  (dfs -- done at Di's request, September 2004)
    */
 
-   //FIXME!
-  /*if (ggobi_data_has_missings(d)) {
+  if (ggobi_data_has_missings(d)) {
     gint j;
-    gint *vars[d->ncols];
+    gint *vars = (gint *) g_malloc(d->ncols * sizeof(gint));
     for (j = 0; j < d->ncols; j++) vars[j] = j;
 
     impute_fixed (IMP_BELOW, 15.0, d->ncols, vars, d, gg);
     limits_set (d, true, true, gg->lims_use_visible);
     vartable_limits_set (d);
     vartable_stats_set (d);
-  }*/
+    g_free(vars);
+  }
 
   tform_to_world (d, gg);
 }
