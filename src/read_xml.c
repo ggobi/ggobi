@@ -1389,11 +1389,13 @@ setRecordValues (XMLParserData * data, const xmlChar * line, gint len,
 
 /*
   Convert the specified string to a numeric value.
+  This is now done in a locale-insensitive way, so all input that uses this
+  function needs to use the C locale (ie decimal points are '.')
  */
 gdouble
 asNumber (const char *sval)
 {
-  return (atof (sval));
+  return (g_ascii_strtod (sval, NULL));
 }
 
 
