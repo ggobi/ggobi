@@ -104,6 +104,8 @@ public InputDescription *input;
 public guint nrows;
 public gint ncols;
 
+public gboolean missings;
+
 public struct _ggobid *gg; /*-- a pointer to the parent --*/
 
 public GArray *rowlab;
@@ -135,7 +137,6 @@ public array_g jitdata;
 
 /*----------------------- missing values ---------------------------*/
 
-public gint nmissing;
 public array_s missing; 
 public gboolean missings_show_p; /*-- show/hide per datad, not per display --*/
 
@@ -210,7 +211,8 @@ constructor (GType type, guint n_construct_properties, GObjectConstructParam *co
   d->nrows_in_plot = d->nrows;  /*-- for now --*/
 
   arrayf_alloc (&d->raw, d->nrows, d->ncols); //FIXME: probably leaks memory
-  arrays_alloc_zero (&d->missing, d->nrows, d->ncols);
+  arrays_alloc (&d->missing, d->nrows, d->ncols);
+  //arrays_alloc_zero (&d->missing, d->nrows, d->ncols);
 
   rowlabels_alloc (d);
 
@@ -226,10 +228,12 @@ constructor (GType type, guint n_construct_properties, GObjectConstructParam *co
   br_hidden_alloc (d);
   br_hidden_init (d);
 
+
   return((GObject *)d);
 }
 
-public GGobiData* new(guint nrows, guint ncols)
+public GGobiData* 
+new(guint nrows, guint ncols)
 {
   GGobiData* d = (GGobiData*) g_object_new(GGOBI_TYPE_DATA, "ncols", ncols, "nrows", nrows, NULL);
   return(d);
@@ -256,6 +260,17 @@ set_name (self, gchar *name, gchar *nickname)
   self->name = g_strdup(name);
   self->nickname = g_strndup(name, 5);
 }
+
+public guint
+get_n_cols(self) {
+  return self->ncols;
+}
+
+public guint
+get_n_rows(self) {
+  return self->nrows;
+}
+
 
 public gchar* 
 get_col_name(self, guint j) 
@@ -315,43 +330,25 @@ set_transformed_col_name(self, guint j, gchar* value)
 public void
 set_missing (self, guint i, guint j)
 {
-  vartabled *vt = vartable_element_get (j, self);
-  
-  if (self->nmissing == 0) {
-    arrays_alloc (&self->missing, self->nrows, self->ncols);
-    arrays_zero (&self->missing);
-  }
   self->missing.vals[i][j] = 1;
   self->raw.vals[i][j] = 0;
 
-  vt->nmissing++;
-  self->nmissing++;
+  self->missings = TRUE;
 }
 
 public gboolean
 is_missing (self, guint i, guint j) 
 {
-  if (self->nmissing == 0) return(FALSE);
-  
-  return (self->missing.vals[i][j] == 1);
-  
+  return (self->missing.vals[i][j] == 1);  
 }
 
-//FIXME: search and remove any references to d->nmissing
-public guint
-get_n_missing(self) 
+public gboolean
+has_missings(self) 
 {
-  guint j, n = 0;
-
-  for(j = 0; j < self->ncols; j++) {
-    n += self_get_col_n_missing(self, j);
-  }
-
-  return(n);
+  return self->missings;
 }
 
 
-//FIXME: search and remove any references to vt->nmissing
 public guint 
 get_col_n_missing(self, guint j) {
   guint i, n = 0;
@@ -379,6 +376,46 @@ set_raw_value(self, guint i, guint j, gdouble value)
     self_set_missing(self, i, j);
   else self->raw.vals[i][j] = value;
 }
+
+/*
+public void
+set_catgorical_value(self, guint i, guint j, gchar* value) 
+{
+  vartabled *vt = vartable_element_get(j, self);
+  guint i, level = -1;
+  
+  g_assert(vt->vartype == categorical);
+  
+  for(i = 0; i < vt->nlevels; i++) {
+    if (g_ascii_strcasecmp(value, vt->level_names[i])) {
+      level = i;
+      break;
+    }
+  }
+  //not found, must be new variable
+  if (level == -1) {
+    level = vt->nlevels++;
+    
+    vt->level_values[level] == level;
+  }
+  
+  vt->level_counts[level]++;
+  self_set_raw_value(self, i, j, vt->level_values[level]);
+}
+
+public void
+set_string_value(self, guint i, guint j, gchar* value) 
+{
+  if (FALSE) {//FIXME: should be is_numeric
+    self_set_raw_value(self, i, j, (gfloat) g_strtod (value, NULL));
+  } else {
+    if (value[0] == '\0' || !g_ascii_strcasecmp (value, "na") || !strcmp (value, "."))  
+      self_set_missing(self, i, j);
+    else
+      self_set_categorical_value(self, i, j, value);
+  }
+}
+*/
 
 public gchar*
 get_string_value(self, guint i, guint j, gboolean transformed) 
@@ -443,8 +480,7 @@ datad_free (GGobiData *d, ggobid *gg)
   arrayf_free (&d->raw, 0, 0);
   pipeline_arrays_free (d, gg);
 
-  if (d->nmissing)
-    arrays_free (&d->missing, 0, 0);
+  arrays_free (&d->missing, 0, 0);
 
    /* rowIds and idTable are intrinsically linked !*/
   if(d->idTable) {
@@ -515,34 +551,6 @@ datad_init (GGobiData *d, ggobid *gg, gboolean cleanup)
   display_menu_build (gg);
 
   return (display);
-}
-
-
-
-/*
- * Several tables use notebook widgets to separate the controls
- * corresponding to different datad's.  This is a way to figure
- * out which datad we should be operating on in that case.
-*/
-GGobiData*
-datad_get_from_notebook (GtkWidget *notebook, ggobid *gg) {
-  GGobiData *d = NULL;
-  //gint nd = g_slist_length (gg->d);
-
-  //if (nd == 1) {
-  //  d = gg->d->data;
-  //} else {
-    GtkNotebook *nb = GTK_NOTEBOOK (notebook);
-    gint indx = gtk_notebook_get_current_page (nb);
-    GtkWidget *page = gtk_notebook_get_nth_page (nb, indx);
-
-    // Assume that each notebook page has a datad attached.
-    if (page) {
-      d = g_object_get_data (G_OBJECT(page), "datad");
-    }
-  //}
-
-  return d;
 }
 
 

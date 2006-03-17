@@ -67,7 +67,7 @@ splot_plot_case (gint m, GGobiData *d,
     draw_case = false;
 
   /*-- can prevent drawing of missings for parcoords or scatmat plots --*/
-  else if (d->nmissing > 0 && !d->missings_show_p) {
+  else if (ggobi_data_has_missings(d) && !d->missings_show_p) {
     if(GGOBI_IS_EXTENDED_SPLOT(sp)) {
       GGobiExtendedSPlotClass *klass;
       klass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);

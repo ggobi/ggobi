@@ -265,7 +265,7 @@ write_xml_records(FILE *f, GGobiData *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
     fprintf(f, " color=\"%s\"", xmlWriteInfo->defaultColorName);
   }
 
-  if (d->nmissing > 0) {
+  if (ggobi_data_has_missings(d)) {
     if (gg->save.missing_ind == MISSINGSNA)
       fprintf(f, " missingValue=\"%s\"", "na");
     else if (gg->save.missing_ind == MISSINGSDOT)
@@ -379,7 +379,7 @@ write_xml_record (FILE *f, GGobiData *d, ggobid *gg, gint i,
   if (gg->save.column_ind == ALLCOLS && d->ncols > 0) {
     for(j = 0; j < d->ncols; j++) {
       /*-- if missing, figure out what to write --*/
-      if (d->nmissing > 0 && d->missing.vals[i][j] &&
+      if (ggobi_data_is_missing(d, i, j) &&
         gg->save.missing_ind != MISSINGSIMPUTED)
       {
         if (gg->save.missing_ind == MISSINGSNA) {
@@ -401,7 +401,7 @@ write_xml_record (FILE *f, GGobiData *d, ggobid *gg, gint i,
     if (ncols == 0)
       ncols = plotted_cols_get (cols, d, gg);
     for(j = 0; j < ncols; j++) {
-      if (d->nmissing > 0 && d->missing.vals[i][j] &&
+      if (ggobi_data_is_missing(d, i, j) &&
         gg->save.missing_ind != MISSINGSIMPUTED)
       {
         if (gg->save.missing_ind == MISSINGSNA) {

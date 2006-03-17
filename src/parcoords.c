@@ -401,13 +401,8 @@ sp_rewhisker (splotd *sp_prev, splotd *sp, splotd *sp_next, ggobid *gg) {
     if (sp_prev == NULL)
       draw_whisker = false;
     /*-- .. also if we're not drawing missings, and an endpoint is missing --*/
-    else if (!d->missings_show_p && d->nmissing > 0 &&
-            (MISSING_P(i,sp->p1dvar) || MISSING_P(i,sp_prev->p1dvar)))
-/*
-    else if (d->nmissing > 0 && !d->missings_show_p &&
-      (d->missing.vals[i][sp->p1dvar] ||
-       d->missing.vals[i][sp_prev->p1dvar]))
-*/
+    else if (!d->missings_show_p &&
+            (ggobi_data_is_missing(d, i, sp->p1dvar) || ggobi_data_is_missing(d, i, sp_prev->p1dvar)))
     {
       draw_whisker = false;
     }
@@ -449,8 +444,8 @@ sp_rewhisker (splotd *sp_prev, splotd *sp, splotd *sp_next, ggobid *gg) {
     if (sp_next == NULL)
       draw_whisker = false;
     /*-- .. also if we're not drawing missings, and an endpoint is missing --*/
-    else if (!d->missings_show_p && d->nmissing > 0 &&
-            (MISSING_P(i,sp->p1dvar) || MISSING_P(i,sp_next->p1dvar)))
+    else if (!d->missings_show_p && 
+            (ggobi_data_is_missing(d, i, sp->p1dvar) || ggobi_data_is_missing(d, i, sp_next->p1dvar)))
     {
       draw_whisker = false;
     }

@@ -433,7 +433,7 @@ load_row_values (GList * rows, GGobiData * d, gboolean row_labels)
       vt->level_counts = (gint *) g_malloc0 (vt->nlevels * sizeof (gint));
       for (i = 0; i < d->nrows; i++) {
         gint inx;
-        if (vt->nmissing && MISSING_P (i, j))
+        if (ggobi_data_is_missing(d, i, j))
           continue;
         inx = (gint) d->raw.vals[i][j];
         vt->level_counts[inx - 1]++;

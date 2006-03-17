@@ -1328,18 +1328,18 @@ drawCase (splotd * sp, gint m, GGobiData * d, ggobid * gg)
 
   switch (proj) {
   case P1PLOT:
-    if (d->missing.vals[m][sp->p1dvar])
+    if (ggobi_data_is_missing(d, m, sp->p1dvar))
       draw_case = false;
     break;
   case XYPLOT:
-    if (d->missing.vals[m][sp->xyvars.x])
+    if (ggobi_data_is_missing(d, m, sp->xyvars.x))
       draw_case = false;
-    else if (d->missing.vals[m][sp->xyvars.y])
+    else if (ggobi_data_is_missing(d, m, sp->xyvars.y))
       draw_case = false;
     break;
   case TOUR1D:
     for (j = 0; j < display->t1d.nactive; j++) {
-      if (d->missing.vals[m][display->t1d.active_vars.els[j]]) {
+      if (ggobi_data_is_missing(d, m, display->t1d.active_vars.els[j])) {
         draw_case = false;
         break;
       }
@@ -1347,7 +1347,7 @@ drawCase (splotd * sp, gint m, GGobiData * d, ggobid * gg)
     break;
   case TOUR2D3:
     for (j = 0; j < display->t2d3.nactive; j++) {
-      if (d->missing.vals[m][display->t2d3.active_vars.els[j]]) {
+      if (ggobi_data_is_missing(d, m, display->t2d3.active_vars.els[j])) {
         draw_case = false;
         break;
       }
@@ -1355,7 +1355,7 @@ drawCase (splotd * sp, gint m, GGobiData * d, ggobid * gg)
     break;
   case TOUR2D:
     for (j = 0; j < display->t2d.nactive; j++) {
-      if (d->missing.vals[m][display->t2d.active_vars.els[j]]) {
+      if (ggobi_data_is_missing(d, m, display->t2d.active_vars.els[j])) {
         draw_case = false;
         break;
       }
@@ -1364,14 +1364,14 @@ drawCase (splotd * sp, gint m, GGobiData * d, ggobid * gg)
 
   case COTOUR:
     for (j = 0; j < display->tcorr1.nactive; j++) {
-      if (d->missing.vals[m][display->tcorr1.active_vars.els[j]]) {
+      if (ggobi_data_is_missing(d, m, display->tcorr1.active_vars.els[j])) {
         draw_case = false;
         break;
       }
     }
     if (draw_case) {
       for (j = 0; j < display->tcorr2.nactive; j++) {
-        if (d->missing.vals[m][display->tcorr2.active_vars.els[j]]) {
+        if (ggobi_data_is_missing(d, m, display->tcorr2.active_vars.els[j])) {
           draw_case = false;
           break;
         }
@@ -1398,33 +1398,33 @@ drawEdge (splotd * sp, gint m, GGobiData * d, GGobiData * e, ggobid * gg)
 
   switch (proj) {
   case P1PLOT:
-    if (e->missing.vals[m][sp->p1dvar])
+    if (ggobi_data_is_missing(e, m, sp->p1dvar))
       draw_edge = false;
     break;
   case XYPLOT:
-    if (e->missing.vals[m][sp->xyvars.x])
+    if (ggobi_data_is_missing(e, m, sp->xyvars.x))
       draw_edge = false;
-    else if (e->missing.vals[m][sp->xyvars.y])
+    else if (ggobi_data_is_missing(e, m, sp->xyvars.y))
       draw_edge = false;
     break;
   case TOUR1D:
-    if (e->missing.vals[m][sp->displayptr->t1d.active_vars.els[m]])
+    if (ggobi_data_is_missing(e, m, sp->displayptr->t1d.active_vars.els[m]))
       draw_edge = false;
     break;
 
   case TOUR2D3:
-    if (e->missing.vals[m][sp->displayptr->t2d3.active_vars.els[m]])
+    if (ggobi_data_is_missing(e, m, sp->displayptr->t2d3.active_vars.els[m]))
       draw_edge = false;
     break;
   case TOUR2D:
-    if (e->missing.vals[m][sp->displayptr->t2d.active_vars.els[m]])
+    if (ggobi_data_is_missing(e, m, sp->displayptr->t2d.active_vars.els[m]))
       draw_edge = false;
     break;
 
   case COTOUR:
-    if (e->missing.vals[m][sp->displayptr->tcorr1.active_vars.els[m]])
+    if (ggobi_data_is_missing(e, m, sp->displayptr->tcorr1.active_vars.els[m]))
       draw_edge = false;
-    else if (e->missing.vals[m][sp->displayptr->tcorr2.active_vars.els[m]])
+    else if (ggobi_data_is_missing(e, m, sp->displayptr->tcorr2.active_vars.els[m]))
       draw_edge = false;
     break;
   case NULL_PMODE:

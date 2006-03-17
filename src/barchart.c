@@ -304,8 +304,7 @@ barchart_recalc_group_counts (barchartSPlotd * sp, GGobiData * d, ggobid * gg)
     m = d->rows_in_plot.els[i];
 
     /*-- skip missings?  --*/
-    if (d->nmissing > 0 && !d->missings_show_p
-        && MISSING_P (m, GGOBI_SPLOT (sp)->p1dvar))
+    if (!d->missings_show_p && ggobi_data_is_missing(d, m, GGOBI_SPLOT (sp)->p1dvar))
       continue;
 
     /*-- skip hiddens?  here, yes. --*/
@@ -562,12 +561,7 @@ barchart_allocate_structure (barchartSPlotd * sp, GGobiData * d)
 
   if (sp->bar->new_nbins < 0) {
     if (vtx->vartype == categorical) {
-/* dfs */
-      nbins = (vtx->nmissing) ? vtx->nlevels + 1 : vtx->nlevels;
-/* --- */
-#ifdef BEFORE
-      nbins = vtx->nlevels;
-#endif
+      nbins = (ggobi_data_get_col_n_missing(d, rawsp->p1dvar)) ? vtx->nlevels + 1 : vtx->nlevels;
       sp->bar->is_histogram = FALSE;
     }
     else {
@@ -845,9 +839,9 @@ barchart_set_initials (barchartSPlotd * sp, GGobiData * d)
       gint i, level;
       gfloat missing_val;
       gboolean add_level = false;
-      if (vtx->nmissing) {
+      if (ggobi_data_get_col_n_missing(d, rawsp->p1dvar)) {
         for (i = 0; i < d->nrows_in_plot; i++) {
-          if (MISSING_P (d->rows_in_plot.els[i], rawsp->p1dvar)) {
+          if (ggobi_data_is_missing(d, d->rows_in_plot.els[i], rawsp->p1dvar)) {
             missing_val = d->tform.vals[i][rawsp->p1dvar];
             foundp = true;
             break;
@@ -940,8 +934,7 @@ barchart_recalc_counts (barchartSPlotd * sp, GGobiData * d, ggobid * gg)
       m = d->rows_in_plot.els[i];
 
       /*-- skip missings?  --*/
-      if (d->nmissing > 0 && !d->missings_show_p
-          && MISSING_P (m, rawsp->p1dvar))
+      if (!d->missings_show_p && ggobi_data_is_missing(d, m, rawsp->p1dvar))
         continue;
 
       bin = sp->bar->index_to_rank.els[i];
@@ -1264,8 +1257,7 @@ barchart_active_paint_points (splotd * rawsp, GGobiData * d, ggobid * gg)
     m = d->rows_in_plot.els[i];
 
     /*-- skip missings?  --*/
-    if (d->nmissing > 0 && !d->missings_show_p
-        && MISSING_P (m, rawsp->p1dvar))
+    if (!d->missings_show_p && ggobi_data_is_missing(d, m, rawsp->p1dvar))
       continue;
 
     if (d->hidden_now.els[m] &&

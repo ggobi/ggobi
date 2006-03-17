@@ -574,11 +574,11 @@ drawEdgeP (splotd * sp, gint m, GGobiData * d, GGobiData * e, ggobid * gg)
 {
   gboolean draw_edge = true;
   if (sp->p1dvar != -1) {
-    if (e->missing.vals[m][sp->p1dvar])
+    if (ggobi_data_is_missing(e, m, sp->p1dvar))
       draw_edge = false;
   }
   else {
-    if (e->missing.vals[m][sp->xyvars.x] || e->missing.vals[m][sp->xyvars.y]) {
+    if (ggobi_data_is_missing(e, m, sp->xyvars.x) || ggobi_data_is_missing(e, m, sp->xyvars.y)) {
       draw_edge = false;
     }
   }
@@ -590,11 +590,11 @@ drawCaseP (splotd * sp, gint m, GGobiData * d, ggobid * gg)
 {
   gboolean draw_case = true;
   if (sp->p1dvar != -1) {
-    if (d->missing.vals[m][sp->p1dvar])
+    if (ggobi_data_is_missing(d, m, sp->p1dvar))
       draw_case = false;
   }
   else {
-    if (d->missing.vals[m][sp->xyvars.x] || d->missing.vals[m][sp->xyvars.y]) {
+    if (ggobi_data_is_missing(d, m, sp->xyvars.x) || ggobi_data_is_missing(d, m, sp->xyvars.y)) {
       draw_case = false;
     }
   }

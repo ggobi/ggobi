@@ -61,30 +61,26 @@ pipeline_init (GGobiData * d, ggobid * gg)
    * variable.  (dfs -- done at Di's request, September 2004)
    */
 
-  if (d->nmissing > 0) {
+   //FIXME!
+  /*if (ggobi_data_has_missings(d)) {
     gint j;
-    vartabled *vt;
-    gint vars[1];
-    for (j = 0; j < d->ncols; j++) {
-      vt = vartable_element_get (j, d);
-      if (vt->nmissing) {
-        vars[0] = j;
-        impute_fixed (IMP_BELOW, 15.0, 1, vars, d, gg);
-      }
-    }
+    gint *vars[d->ncols];
+    for (j = 0; j < d->ncols; j++) vars[j] = j;
+
+    impute_fixed (IMP_BELOW, 15.0, d->ncols, vars, d, gg);
     limits_set (d, true, true, gg->lims_use_visible);
     vartable_limits_set (d);
     vartable_stats_set (d);
-  }
+  }*/
 
   tform_to_world (d, gg);
 }
 
-void
-pipeline_arrays_free (GGobiData * d, ggobid * gg)
 /*
  * Dynamically free arrays used in data pipeline.
 */
+void
+pipeline_arrays_free (GGobiData * d, ggobid * gg)
 {
   arrayf_free (&d->tform, 0, 0);
 
@@ -99,11 +95,11 @@ pipeline_arrays_free (GGobiData * d, ggobid * gg)
   vectorb_free (&d->excluded);
 }
 
-void
-pipeline_arrays_alloc (GGobiData * d, ggobid * gg)
 /*
  * Dynamically allocate arrays.
 */
+void
+pipeline_arrays_alloc (GGobiData * d, ggobid * gg)
 {
   gint nc = d->ncols, nr = d->nrows;
 

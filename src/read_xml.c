@@ -959,6 +959,7 @@ setDatasetInfo (const xmlChar ** attrs, XMLParserData * data)
 
   if (tmp) {
     arrayf_alloc (&d->raw, d->nrows, d->ncols);
+    arrays_alloc (&d->missing, d->nrows, d->ncols);
     br_hidden_alloc (d);
     br_hidden_init (d);
   }
@@ -1313,8 +1314,7 @@ setRecordValue (const char *tmp, GGobiData * d, XMLParserData * data)
     gchar *tmp1;
     /* If this is a categorical, look up the level id. */
     gchar buf[100];
-    if (d->missing.vals &&
-        d->missing.vals[data->current_record][data->current_element]) {
+    if (ggobi_data_is_missing(d, data->current_record, data->current_element)) {
       /* sprintf(buf, "%s", "NA"); */
       tmp1 = g_strdup ("NA");
     }
@@ -1530,6 +1530,7 @@ allocVariables (const xmlChar ** attrs, XMLParserData * data)
      in the top-level tag. */
   if (d->nrows > 0 && d->ncols > 0) {
     arrayf_alloc (&d->raw, d->nrows, d->ncols);
+    arrays_alloc (&d->missing, d->nrows, d->ncols);
     br_hidden_alloc (d);
   }
 

@@ -169,19 +169,10 @@ record_add (eeMode mode, gint a, gint b, gchar * lbl, gchar * id,
   clusters_set (dtarget, gg);
 
   if (found_missings) {
-    if (dtarget->nmissing == 0) {
-      arrays_alloc (&dtarget->missing, dtarget->nrows, dtarget->ncols);
-      arrays_zero (&dtarget->missing);
-    }
-    else {
-      arrays_add_rows (&dtarget->missing, dtarget->nrows);
-    }
+    arrays_add_rows (&dtarget->missing, dtarget->nrows);
     for (j = 0; j < dtarget->ncols; j++) {
       if (strcmp (vals[j], "NA") == 0) {  /*-- got a missing --*/
-        dtarget->nmissing++;
-        dtarget->missing.vals[dtarget->nrows - 1][j] = 1;
-        vt = vartable_element_get (j, dtarget);
-        vt->nmissing++;
+        ggobi_data_set_missing(dtarget, dtarget->nrows - 1, j);
       }
     }
   }

@@ -55,7 +55,7 @@ splot_plot_edge (gint m, GGobiData * d, GGobiData * e,
     draw_edge = false;
 
   /*-- can prevent drawing of missings for parcoords or scatmat plots --*/
-  else if (e->nmissing > 0 && !e->missings_show_p) {
+  else if (ggobi_data_has_missings(e) && !e->missings_show_p) {
     if (GGOBI_IS_EXTENDED_SPLOT (sp)) {
       GGobiExtendedSPlotClass *klass;
       klass = GGOBI_EXTENDED_SPLOT_GET_CLASS (sp);
@@ -82,7 +82,7 @@ splot_hidden_edge (gint m, GGobiData * d, GGobiData * e,
 
   /*-- can prevent drawing of missings for parcoords or scatmat plots --*/
 /*
-  } else if (e->nmissing > 0 && !e->missings_show_p) {
+  } else if (ggobi_data_has_missings(e) && !e->missings_show_p) {
     if (GGOBI_IS_EXTENDED_SPLOT(sp)) {
       GGobiExtendedSPlotClass *klass;
       klass = GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass);

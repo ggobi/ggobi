@@ -31,13 +31,6 @@ impute_fixed (ImputeType impute_type, gfloat val, gint nvars, gint * vars,
   gboolean ok = true;
   vartabled *vt;
 
-  if (d->missing.nrows == 0) {
-    quick_message ("There are no missings.\n", false);
-    return false;
-  }
-
-  g_assert (d->missing.nrows == d->nrows);
-  g_assert (d->missing.ncols == d->ncols);
 
   if (impute_type == IMP_ABOVE || impute_type == IMP_BELOW) {
     gdouble drand;
@@ -64,7 +57,7 @@ impute_fixed (ImputeType impute_type, gfloat val, gint nvars, gint * vars,
 
       for (i = 0; i < d->nrows_in_plot; i++) {
         m = d->rows_in_plot.els[i];
-        if (d->missing.vals[m][j]) {
+        if (ggobi_data_is_missing(d, m, j)) {
           drand = randvalue ();
           drand = (drand - .5) * jmult;
           d->raw.vals[m][j] = d->tform.vals[m][j] = impval + (gfloat) drand;
@@ -77,7 +70,7 @@ impute_fixed (ImputeType impute_type, gfloat val, gint nvars, gint * vars,
       m = d->rows_in_plot.els[i];
       for (k = 0; k < nvars; k++) {
         j = vars[k];
-        if (d->missing.vals[m][j]) {
+        if (ggobi_data_is_missing(d, m, j)) {
           d->raw.vals[m][j] = d->tform.vals[m][j] = val;
         }
       }
@@ -99,8 +92,8 @@ impute_mean_or_median (gint type, gint nvars, gint * vars,
   vartabled *vt;
   gboolean redraw = false;
 
-  if (d->nmissing == 0)
-    /**/ return false;
+  if (!ggobi_data_has_missings(d))
+    return false;
 
 
   /* If responding to brushing group ... */
@@ -126,7 +119,7 @@ impute_mean_or_median (gint type, gint nvars, gint * vars,
           k = d->rows_in_plot.els[i];
           if (d->clusterid.els[k] == n) {
             if (!d->hidden_now.els[k]) {  /* ignore erased values */
-              if (d->missing.vals[k][j])
+              if (ggobi_data_is_missing(d, k, j))
                 missv[nmissing++] = k;
               else {
                 sum += d->tform.vals[k][j]; /* for mean */
@@ -164,7 +157,7 @@ impute_mean_or_median (gint type, gint nvars, gint * vars,
       for (i = 0; i < d->nrows_in_plot; i++) {
         k = d->rows_in_plot.els[i];
         if (!d->hidden_now.els[k]) {  /* ignore erased values altogether */
-          if (d->missing.vals[k][j]) {
+          if (ggobi_data_is_missing(d, k, j)) {
             d->raw.vals[k][j] = d->tform.vals[k][j] = (type == IMP_MEAN) ?
               vt->mean : vt->median;
             redraw = true;
@@ -211,8 +204,8 @@ impute_random (GGobiData * d, gint nvars, gint * vars, ggobid * gg)
 
   gint i, j, k, n, m, npresent, *presv, nmissing, *missv;
 
-  if (d->nmissing == 0)
-    /**/ return;
+  if (!ggobi_data_has_missings(d))
+    return;
 
   presv = (gint *) g_malloc (d->nrows_in_plot * sizeof (gint));
   missv = (gint *) g_malloc (d->nrows_in_plot * sizeof (gint));
@@ -235,7 +228,7 @@ impute_random (GGobiData * d, gint nvars, gint * vars, ggobid * gg)
           k = d->rows_in_plot.els[i];
           if (d->clusterid.els[k] == n) {
             if (!d->hidden_now.els[k]) {  /* ignore erased values altogether */
-              if (d->missing.vals[k][j])
+              if (ggobi_data_is_missing(d, k, j))
                 missv[nmissing++] = k;
               else
                 presv[npresent++] = k;
@@ -258,7 +251,7 @@ impute_random (GGobiData * d, gint nvars, gint * vars, ggobid * gg)
       for (i = 0; i < d->nrows_in_plot; i++) {
         k = d->rows_in_plot.els[i];
         if (!d->hidden_now.els[k]) {  /* ignore erased values altogether */
-          if (d->missing.vals[k][j])
+          if (ggobi_data_is_missing(d, k, j))
             missv[nmissing++] = k;
           else
             presv[npresent++] = k;

@@ -281,13 +281,13 @@ withinPlaneToScreen (splotd * sp, displayd * display, GGobiData * d,
 gboolean
 drawEdge_p (splotd * sp, gint m, GGobiData * d, GGobiData * e, ggobid * gg)
 {
-  return (!e->missing.vals[m][sp->p1dvar]);
+  return (!ggobi_data_is_missing(e, m, sp->p1dvar));
 }
 
 gboolean
 drawCase_p (splotd * sp, gint m, GGobiData * d, ggobid * gg)
 {
-  return (!d->missing.vals[m][sp->p1dvar]);
+  return (!ggobi_data_is_missing(d, m, sp->p1dvar));
 }
 
 void

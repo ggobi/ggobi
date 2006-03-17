@@ -329,9 +329,7 @@ delete_vars (gint * cols, gint ncols, GGobiData * d)
   tour2d_realloc_down (ncols, cols, d, d->gg);
   tour1d_realloc_down (ncols, cols, d, d->gg);
   tourcorr_realloc_down (ncols, cols, d, d->gg);
-  if (d->nmissing)
-    arrays_delete_cols (&d->missing, ncols, cols);
-
+  arrays_delete_cols (&d->missing, ncols, cols);
   arrayg_delete_cols (&d->jitdata, ncols, cols);
 
   /*-- reallocate the rest of the arrays --*/

@@ -249,31 +249,6 @@ set_display_option (gboolean active, guint action, displayd * display)
     display->options.whiskers_show_p = active;
     display_plot (display, FULL, gg);
     break;
-/*
-    case DOPT_MISSINGS:
-      if (!display->missing_p && d->nmissing > 0) {
-        display->options.missings_show_p = w->active;
-
-        if (display->displaytype == parcoords) {
-          GList *splist;
-          splotd *sp;
-          for (splist = display->splots; splist; splist = splist->next) {
-            sp = (splotd *) splist->data;
-            sp_whiskers_make (sp, display, gg);
-          }
-        } else if (display->displaytype == tsplot) {
-          GList *splist;
-          splotd *sp;
-          for (splist = display->splots; splist; splist = splist->next) {
-            sp = (splotd *) splist->data;
-            tsplot_whiskers_make (sp, display, gg);
-          }
-        }
-
-        display_plot (display, FULL, gg);
-      }
-    break;
-*/
 
   case DOPT_AXES:
     display->options.axes_show_p = active;

@@ -92,7 +92,7 @@ limits_raw_set_by_var (GGobiData * d, gint j, gboolean visible_only)
   if (visible_only) {  /*-- if using visible cases only --*/
     for (m = 0; m < d->nrows_in_plot; m++) {
       i = d->rows_in_plot.els[m];
-      if (vt->nmissing > 0 && !d->missings_show_p && MISSING_P (i, j));
+      if (!d->missings_show_p && ggobi_data_is_missing(d, i,j));
       else {
         if (d->raw.vals[i][j] < min)
           min = d->raw.vals[i][j];
@@ -103,7 +103,7 @@ limits_raw_set_by_var (GGobiData * d, gint j, gboolean visible_only)
   }
   else {
     for (i = 0; i < d->nrows; i++) {
-      if (vt->nmissing > 0 && !d->missings_show_p && MISSING_P (i, j));
+      if (!d->missings_show_p && ggobi_data_is_missing(d, i,j));
       else {
         if (d->raw.vals[i][j] < min)
           min = d->raw.vals[i][j];
@@ -148,7 +148,7 @@ limits_tform_set_by_var (GGobiData * d, gint j, gboolean visible_only)
   if (visible_only) {
     for (m = 0; m < d->nrows_in_plot; m++) {
       i = d->rows_in_plot.els[m];
-      if (vt->nmissing > 0 && !d->missings_show_p && MISSING_P (i, j));
+      if (!d->missings_show_p && ggobi_data_is_missing(d, i, j));
       else {
         if (d->tform.vals[i][j] < min)
           min = d->tform.vals[i][j];
@@ -159,7 +159,7 @@ limits_tform_set_by_var (GGobiData * d, gint j, gboolean visible_only)
   }
   else {
     for (i = 0; i < d->nrows; i++) {
-      if (vt->nmissing > 0 && !d->missings_show_p && MISSING_P (i, j));
+      if (!d->missings_show_p && ggobi_data_is_missing(d, i, j));
       else {
         if (d->tform.vals[i][j] < min)
           min = d->tform.vals[i][j];
@@ -188,9 +188,8 @@ limits_display_set_by_var (GGobiData * d, gint j, gboolean visible_only)
 
     for (m = 0; m < d->nrows_in_plot; m++) {
       i = d->rows_in_plot.els[m];
-
       /*-- lim_display and stats: only use non-missing cases --*/
-      if (d->nmissing > 0 && MISSING_P (i, j));
+      if (ggobi_data_is_missing(d, i, j));
       else {
         if (d->tform.vals[i][j] < min)
           min = d->tform.vals[i][j];
@@ -207,7 +206,7 @@ limits_display_set_by_var (GGobiData * d, gint j, gboolean visible_only)
 
     for (i = 0; i < d->nrows; i++) {
 
-      if (d->nmissing > 0 && MISSING_P (i, j));
+      if (ggobi_data_is_missing(d, i, j));
       else {
         if (d->tform.vals[i][j] < min)
           min = d->tform.vals[i][j];

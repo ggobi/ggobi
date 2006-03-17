@@ -269,7 +269,6 @@ enum { VARLIST_NAME, VARLIST_INDEX, VARLIST_NCOLS };
 
 #define EVENT_METHOD(i,x) GTK_OBJECT_GET_CLASS(GTK_OBJECT(i))->x
 
-#define MISSING_P(i,j) (d->missing.vals[i][j] != 0)
 #define BETWEEN(a,b,x) ( ((a)<=(x) && (x)<=(b)) || ((a)>=(x) && (x)>=(b)) )
 
 typedef enum {

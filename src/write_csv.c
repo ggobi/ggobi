@@ -72,14 +72,15 @@ write_csv_record (gint i, gint *cols, gint ncols, FILE *f, GGobiData *d, ggobid 
     jcol = cols[j];
   
     /*-- if missing, figure out what to write --*/
-    if (d->nmissing > 0 && d->missing.vals[i][jcol] &&
-      gg->save.missing_ind != MISSINGSIMPUTED)
+    if (ggobi_data_is_missing(d, i, jcol) && gg->save.missing_ind != MISSINGSIMPUTED)
     {
-      if (gg->save.missing_ind == MISSINGSNA) {
-        fprintf (f, "na");
-      }  else if (gg->save.missing_ind == MISSINGSDOT) {
+      switch (gg->save.missing_ind) {
+      case MISSINGSNA:
+        fprintf (f, "NA");
+        break;
+      default: 
         fprintf (f, ".");
-      } 
+      }
     } else {  /*-- if not missing, just write the data --*/
       write_csv_cell (i, jcol, f, d, gg);
     }

@@ -74,14 +74,14 @@ tsDrawEdge_p(splotd *sp, gint m, GGobiData *d, GGobiData *e, ggobid *gg)
 {
    gboolean draw_edge = true;
 
-   draw_edge = !(e->missing.vals[m][sp->xyvars.y] ||  e->missing.vals[m][sp->xyvars.x]);
+   draw_edge = !(ggobi_data_is_missing(e, m, sp->xyvars.y) ||  ggobi_data_is_missing(e, m, sp->xyvars.x));
    return(draw_edge);
 }
 
 gboolean
 tsDrawCase_p(splotd *sp, gint m, GGobiData *d, ggobid *gg)
 {
-  return !(d->missing.vals[m][sp->xyvars.y] || d->missing.vals[m][sp->xyvars.x]);
+  return !(ggobi_data_is_missing(d, m, sp->xyvars.y) || ggobi_data_is_missing(d, m, sp->xyvars.x));
 }
 
 void

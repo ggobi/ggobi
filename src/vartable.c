@@ -165,8 +165,6 @@ vartable_copy_var (gint jfrom, gint jto, GGobiData *d)
   g_assert (vt_from->collab != NULL);
   g_assert (vt_from->collab_tform != NULL);
 
-  vt_to->jref = vt_from->jref;  /*-- jref or jfrom? --*/
-
   vt_to->collab = g_strdup (vt_from->collab);
   vt_to->collab_tform = g_strdup (vt_from->collab_tform);
   vt_to->nickname = g_strdup (vt_from->nickname);
@@ -203,7 +201,6 @@ vartable_copy_var (gint jfrom, gint jto, GGobiData *d)
   vt_to->lim_display.min = vt_from->lim_display.min;
   vt_to->lim_display.max = vt_from->lim_display.max;
 
-  vt_to->nmissing = vt_from->nmissing;
   vt_to->lim_specified_p = vt_from->lim_specified_p;
 }
 
@@ -217,12 +214,9 @@ vartable_element_new (GGobiData *d)
   vt->d = G_OBJECT(d);
 
   vt->selected = false;
-  vt->nmissing = 0;
 
   vt->vartype = real;  /*-- real-valued by default --*/
   vt->nlevels = 0;
-
-  vt->jref = -1;  /*-- not cloned --*/
 
   vt->mean = 0.0;
   vt->median = 0.0;

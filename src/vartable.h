@@ -36,7 +36,6 @@ typedef struct {
 
  gchar *collab, *collab_tform;
  gchar *nickname;   /*-- very short name to use in tour axis labels --*/
- gint nmissing;
 
  /*-- is this variable categorical? --*/
  vartyped vartype;
@@ -47,9 +46,6 @@ typedef struct {
  gint *level_values;
  gint *level_counts;
  gchar **level_names;  /*-- strings --*/
-
- /*-- reference variable:  jref=-1 except for cloned or sphered variables --*/
- gint jref;
 
  /*-- unadjusted, unaffected by imputation --*/
  gfloat mean, median;

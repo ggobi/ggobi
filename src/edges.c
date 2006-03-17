@@ -109,8 +109,7 @@ edge_add (gint a, gint b, gchar * lbl, gchar * id, GGobiData * d,
   vectorb_realloc (&e->pts_under_brush, e->nrows);
   clusters_set (e, gg);
 
-  if (e->nmissing)
-    arrays_add_rows (&e->missing, e->nrows);
+  arrays_add_rows (&e->missing, e->nrows);
 
   edges_alloc (e->nrows, e);
   e->edge.sym_endpoints[n].a = g_strdup (d->rowIds[a]);

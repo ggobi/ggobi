@@ -659,7 +659,7 @@ vartable_stats_set_by_var (gint j, GGobiData *d) {
       //break;
       case categorical:
         gtk_tree_store_set(GTK_TREE_STORE(model), &iter, 
-			VT_NMISSING, vt->nmissing, -1);
+			VT_NMISSING, ggobi_data_get_col_n_missing(d, j), -1);
       break;
       case all_vartypes:
         g_printerr ("(vartable_stats_set_by_var) %d: illegal variable type %d\n",

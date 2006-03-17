@@ -393,17 +393,12 @@ tsplot_rewhisker (splotd * sp, ggobid * gg)
   GGobiData *d = display->d;
   gboolean draw_whisker;
 
-  if (d->nmissing) {
-    g_assert (d->missing.nrows == d->nrows);
-    g_assert (d->missing.ncols == d->ncols);
-  }
-
   for (k = 0; k < (d->nrows_in_plot - 1); k++) {
     i = d->rows_in_plot.els[k];
     n = d->rows_in_plot.els[k + 1];
 
     /*-- .. also if we're not drawing missings, and an endpoint is missing --*/
-    if (d->nmissing > 0 && !d->missings_show_p && (d->missing.vals[i][sp->xyvars.x] || d->missing.vals[i][sp->xyvars.y] || d->missing.vals[n][sp->xyvars.x] || d->missing.vals[n][sp->xyvars.y]) && (sp->screen[i].x > sp->screen[n].x)) {  /* to keep time going
+    if (!d->missings_show_p && (ggobi_data_is_missing(d, i, sp->xyvars.x) || ggobi_data_is_missing(d, i, sp->xyvars.y) || ggobi_data_is_missing(d, n, sp->xyvars.x) || ggobi_data_is_missing(d, n, sp->xyvars.y)) && (sp->screen[i].x > sp->screen[n].x)) {  /* to keep time going
                                                                                                                                                                                                                                                forwards */
       draw_whisker = false;
     }

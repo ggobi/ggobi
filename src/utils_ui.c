@@ -832,3 +832,32 @@ GGobi_addToolsMenuItem (gchar * lbl, ggobid * gg)
 
   return (entry);
 }
+
+/*
+ * Several tables use notebook widgets to separate the controls
+ * corresponding to different datad's.  This is a way to figure
+ * out which datad we should be operating on in that case.
+*/
+GGobiData*
+datad_get_from_notebook (GtkWidget *notebook, ggobid *gg) {
+  GGobiData *d = NULL;
+  //gint nd = g_slist_length (gg->d);
+
+  //if (nd == 1) {
+  //  d = gg->d->data;
+  //} else {
+    GtkNotebook *nb = GTK_NOTEBOOK (notebook);
+    gint indx = gtk_notebook_get_current_page (nb);
+    GtkWidget *page = gtk_notebook_get_nth_page (nb, indx);
+
+    // Assume that each notebook page has a datad attached.
+    if (page) {
+      d = g_object_get_data (G_OBJECT(page), "datad");
+    }
+  //}
+
+  return d;
+}
+
+
+
