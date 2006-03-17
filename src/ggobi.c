@@ -124,7 +124,7 @@ parse_command_line (gint * argc, gchar ** av)
       "name of the default color scheme to use", "scheme" 
     }, { 
       "colorSchemes", 's', 0, G_OPTION_ARG_FILENAME, &color_scheme_file,
-      "name of XML file containing color scheme descriptions", "file" 
+      "name of XML file containing color schemes", "file" 
     }, {
       "dataMode", 'd', 0, G_OPTION_ARG_STRING, &data_mode,
       "mode of data supplied on command line", "mode"
