@@ -738,9 +738,9 @@ ValidateDisplayRef (displayd * d, ggobid * gg, gboolean fatal)
 }
 
 static gchar *
-ggobi_find_file_in_dir(const gchar *name, const gchar *dir)
+ggobi_find_file_in_dir(const gchar *name, const gchar *dir, gboolean ggobi)
 {
-  gchar *tmp_name = g_build_filename(dir, name, NULL);
+  gchar *tmp_name = g_build_filename(dir, ggobi ? "ggobi" : "", name, NULL);
   if (file_is_readable(tmp_name))
     return(tmp_name);
   g_free(tmp_name);
@@ -748,33 +748,35 @@ ggobi_find_file_in_dir(const gchar *name, const gchar *dir)
 }
 
 static gchar * 
-ggobi_find_file(const gchar *name, const gchar* const *dirs)
+ggobi_find_file(const gchar *name, const gchar* user, const gchar* const *dirs)
 {
   gchar *tmp_name, *cur_dir = g_get_current_dir();
   gint i;
   
   //g_debug("Looking for %s", name);
   if (sessionOptions->ggobiHome) {
-    tmp_name = ggobi_find_file_in_dir(name, sessionOptions->ggobiHome);
+    tmp_name = ggobi_find_file_in_dir(name, sessionOptions->ggobiHome, false);
     if (tmp_name)
       return(tmp_name);
   }
   
-  tmp_name = ggobi_find_file_in_dir(name, cur_dir);
+  tmp_name = ggobi_find_file_in_dir(name, cur_dir, false);
   g_free(cur_dir);
   if (tmp_name)
     return(tmp_name);
   
+  tmp_name = ggobi_find_file_in_dir(name, user, true);
+  if (tmp_name)
+    return(tmp_name);
+  
   for (i = 0; dirs[i]; i++) {
-    gchar *dir = g_build_filename(dirs[i], "ggobi", NULL);
-    tmp_name = ggobi_find_file_in_dir(name, dir);
-    g_free(dir);
+    tmp_name = ggobi_find_file_in_dir(name, dirs[i], true);
     if (tmp_name)
       return(tmp_name);
   }
   
   #ifdef WIN32
-  tmp_name = ggobi_find_file_in_dir(name, ggobi_win32_get_packagedir());
+  tmp_name = ggobi_find_file_in_dir(name, ggobi_win32_get_packagedir(), false);
   if (tmp_name)
     return(tmp_name);
   #endif
@@ -782,7 +784,7 @@ ggobi_find_file(const gchar *name, const gchar* const *dirs)
   return(NULL);
 }
 
-/* Looks in (by default):
+/* Looks in (by default, XDG environment can override some of these):
     $GGOBI_HOME
     Current directory
     $HOME/.local/share/ggobi (Windows: Documents, Application Data for user)
@@ -791,12 +793,12 @@ ggobi_find_file(const gchar *name, const gchar* const *dirs)
 gchar*
 ggobi_find_data_file(const gchar *name) 
 {
-  const gchar* data_dirs[] = { g_get_user_data_dir(), GGOBI_DATADIR, NULL };
-  gchar *path = ggobi_find_file(name, data_dirs);
+  const gchar* data_dirs[] = { GGOBI_DATADIR, NULL };
+  gchar *path = ggobi_find_file(name, g_get_user_data_dir(), data_dirs);
   //g_debug("Found data file: %s", path);
   return(path);
 }
-/* Looks in (by default):
+/* Looks in (by default, XDG environment can override some of these):
     $GGOBI_HOME
     Current directory
     $HOME/.config/ggobi (Windows: Documents, Application Data for user)
@@ -806,8 +808,7 @@ ggobi_find_data_file(const gchar *name)
 gchar*
 ggobi_find_config_file(const gchar *name)
 {
-  const gchar* config_dirs[] = { g_get_user_config_dir(), g_get_system_config_dirs()[0], NULL };
-  gchar *path = ggobi_find_file(name, config_dirs);
+  gchar *path = ggobi_find_file(name, g_get_user_config_dir(), g_get_system_config_dirs());
   //g_debug("Found config file: %s", path);
   return(path);
 }
