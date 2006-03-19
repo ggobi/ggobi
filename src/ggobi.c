@@ -738,9 +738,9 @@ ValidateDisplayRef (displayd * d, ggobid * gg, gboolean fatal)
 }
 
 static gchar *
-ggobi_find_file_in_dir(const gchar *name, const gchar *dir, gboolean ggobi)
+ggobi_find_file_in_dir(const gchar *name, const gchar *dir)
 {
-  gchar *tmp_name = g_build_filename(dir, ggobi ? "ggobi" : "", name, NULL);
+  gchar *tmp_name = g_build_filename(dir, name, NULL);
   if (file_is_readable(tmp_name))
     return(tmp_name);
   g_free(tmp_name);
@@ -748,35 +748,33 @@ ggobi_find_file_in_dir(const gchar *name, const gchar *dir, gboolean ggobi)
 }
 
 static gchar * 
-ggobi_find_file(const gchar *name, const gchar* const *systems, const gchar *user)
+ggobi_find_file(const gchar *name, const gchar* const *dirs)
 {
   gchar *tmp_name, *cur_dir = g_get_current_dir();
   gint i;
   
   //g_debug("Looking for %s", name);
   if (sessionOptions->ggobiHome) {
-    tmp_name = ggobi_find_file_in_dir(name, sessionOptions->ggobiHome, false);
+    tmp_name = ggobi_find_file_in_dir(name, sessionOptions->ggobiHome);
     if (tmp_name)
       return(tmp_name);
   }
   
-  tmp_name = ggobi_find_file_in_dir(name, cur_dir, false);
+  tmp_name = ggobi_find_file_in_dir(name, cur_dir);
   g_free(cur_dir);
   if (tmp_name)
     return(tmp_name);
   
-  tmp_name = ggobi_find_file_in_dir(name, user, true);
-  if (tmp_name)
-    return(tmp_name);
-  
-  for (i = 0; systems[i]; i++) {
-    tmp_name = ggobi_find_file_in_dir(name, systems[i], true);
+  for (i = 0; dirs[i]; i++) {
+    gchar *dir = g_build_filename(dirs[i], "ggobi", NULL);
+    tmp_name = ggobi_find_file_in_dir(name, dir);
+    g_free(dir);
     if (tmp_name)
       return(tmp_name);
   }
   
   #ifdef WIN32
-  tmp_name = ggobi_find_file_in_dir(name, ggobi_win32_get_packagedir(), false);
+  tmp_name = ggobi_find_file_in_dir(name, ggobi_win32_get_packagedir());
   if (tmp_name)
     return(tmp_name);
   #endif
@@ -793,8 +791,8 @@ ggobi_find_file(const gchar *name, const gchar* const *systems, const gchar *use
 gchar*
 ggobi_find_data_file(const gchar *name) 
 {
-  const gchar* system_data_dirs[] = { GGOBI_DATADIR, NULL };
-  gchar *path = ggobi_find_file(name, system_data_dirs, g_get_user_data_dir());
+  const gchar* data_dirs[] = { g_get_user_data_dir(), GGOBI_DATADIR, NULL };
+  gchar *path = ggobi_find_file(name, data_dirs);
   //g_debug("Found data file: %s", path);
   return(path);
 }
@@ -808,7 +806,8 @@ ggobi_find_data_file(const gchar *name)
 gchar*
 ggobi_find_config_file(const gchar *name)
 {
-  gchar *path = ggobi_find_file(name, g_get_system_config_dirs(), g_get_user_config_dir());
+  const gchar* config_dirs[] = { g_get_user_config_dir(), g_get_system_config_dirs()[0], NULL };
+  gchar *path = ggobi_find_file(name, config_dirs);
   //g_debug("Found config file: %s", path);
   return(path);
 }

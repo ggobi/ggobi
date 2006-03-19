@@ -30,10 +30,14 @@ if test "${prefix}" = "NONE"; then
   prefix=$ac_default_prefix
 fi
 
+# Remember where our GGobi data is installed
+GGOBI_DATADIR=`eval echo "${datadir}"`
+AC_DEFINE_UNQUOTED([GGOBI_DATADIR], "$GGOBI_DATADIR", [Location of GGobi data installation])
+
 # Initialize gettext
 AM_GNU_GETTEXT([use-libtool])
 AM_GNU_GETTEXT_VERSION(0.14.5)
-GGOBI_LOCALEDIR=`eval echo "${datadir}/locale"`
+GGOBI_LOCALEDIR="${GGOBI_DATADIR}/locale"
 AC_DEFINE_UNQUOTED([GGOBI_LOCALEDIR], "$GGOBI_LOCALEDIR", [Location of locale files])
 
 MAJOR_VERSION=ggobi_major_version
@@ -183,10 +187,6 @@ PKG_CHECK_MODULES(LIBXML, [libxml-2.0])
 
 AC_SUBST(LIBXML_CFLAGS)
 AC_SUBST(LIBXML_LIBS)
-
-# Remember where our GGobi is installed
-GGOBI_DATADIR=`eval echo "${datadir}/ggobi"`
-AC_DEFINE_UNQUOTED([GGOBI_DATADIR], "$GGOBI_DATADIR", [Location of GGobi installation])
 
  dnl Process the different .in files, substituting the values computed here in the configuration
  dnl script for the corresponding @variable@ in these files.
