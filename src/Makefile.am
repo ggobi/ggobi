@@ -25,14 +25,14 @@ libggobi_la_SOURCES = array.c ash1d.c barchart.c barchartClass.c \
   vartable_nbook.c vartable_ui.c vector.c win32_draw.c writedata_ui.c \
   write_csv.c write_xml.c wvis.c wvis_ui.c xlines.c xyplot.c \
   xyplot_ui.c $(libggobi_la_GOBSOURCES)
-libggobi_la_LIBADD = $(libggobi_la_GOBOBJECTS) @LIBLTDL@ @LTLIBINTL@
+libggobi_la_LIBADD = $(libggobi_la_GOBOBJECTS) @LIBLTDL@
 libggobi_la_DEPENDENCIES = $(libggobi_la_GOBOBJECTS)
 pkginclude_HEADERS = GGobiAPI.h ggobiClass.h tour1d_pp.h GGobiApp.h \
   noop-toggle.h tour2d_pp.h GGobiEvents.h parcoordsClass.h tour_pp.h \
   barchartDisplay.h plugin.h tsPlot.h brushing.h print.h tsdisplay.h \
   colorscheme.h read_csv.h types.h config.h read_init.h vars.h cpanel.h \
   read_xml.h varseldata.h defines.h scatmatClass.h vartable.h display.h \
-  scatterplotClass.h display_tree.h splash.h write_xml.h \
+  scatterplotClass.h display_tree.h splash.h write_xml.h ggobi-intl.h \
   externs.h splot.h writedata.h fileio.h testEvents.h ggobi.h tour.h \
   $(libggobi_la_GOBHEADERS) GGStructSizes.c marshal.h
 
@@ -47,6 +47,6 @@ bin_PROGRAMS  = ggobi
 ggobi_SOURCES = ggobiMain.c
 ggobi_LDADD   = libggobi.la
 
-INCLUDES = @SRC_DEBUG@ @GTK_CFLAGS@ @LIBXML_CFLAGS@ @INCLTDL@ @INCINTL@
+INCLUDES = @SRC_DEBUG@ @GTK_CFLAGS@ @LIBXML_CFLAGS@ @INCLTDL@
 
 EXTRA_DIST = $(libggobi_la_GOBS)

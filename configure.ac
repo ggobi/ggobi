@@ -4,7 +4,7 @@ dnl This is the configuration script for ggobi
 m4_define([ggobi_release_date], ["March 13 2006"])
 m4_define([ggobi_major_version], [2])
 m4_define([ggobi_minor_version], [1])
-m4_define([ggobi_micro_version], [0])
+m4_define([ggobi_micro_version], [1])
 m4_define([ggobi_version],
           [ggobi_major_version.ggobi_minor_version.ggobi_micro_version])
 
@@ -35,7 +35,7 @@ GGOBI_DATADIR=`eval echo "${datadir}"`
 AC_DEFINE_UNQUOTED([GGOBI_DATADIR], "$GGOBI_DATADIR", [Location of GGobi data installation])
 
 # Initialize gettext
-AM_GNU_GETTEXT([use-libtool])
+AM_GNU_GETTEXT([external])
 AM_GNU_GETTEXT_VERSION(0.14.5)
 GGOBI_LOCALEDIR="${GGOBI_DATADIR}/locale"
 AC_DEFINE_UNQUOTED([GGOBI_LOCALEDIR], "$GGOBI_LOCALEDIR", [Location of locale files])
@@ -190,7 +190,7 @@ AC_SUBST(LIBXML_LIBS)
 
  dnl Process the different .in files, substituting the values computed here in the configuration
  dnl script for the corresponding @variable@ in these files.
-AC_CONFIG_FILES(Makefile src/Makefile plugins/Makefile ggobi.pc ggobi-system.pc intl/Makefile po/Makefile.in)
+AC_CONFIG_FILES(Makefile src/Makefile plugins/Makefile ggobi.pc ggobi-system.pc po/Makefile.in)
 AC_OUTPUT
 
 echo "*******************************"
