@@ -23,14 +23,14 @@
 #include <string.h>
 #include <gtk/gtk.h>
 
+#include "config.h"
+
 #include "GGobiApp.h"
 
 #include "ggobi.h"
 
 #include "vars.h"
 #include "externs.h"
-
-#include "config.h"
 
 #include "print.h"
 
@@ -80,32 +80,6 @@ GGobiApp *
 getGGobiApp ()
 {
   return (ggobiApp);
-}
-
-
-gchar *
-getOptValue (const gchar * const name, const gchar * const value)
-{
-  const gchar *ptr = (const gchar *) value;
-
-  if (ptr[0] != '-' || ptr[1] != '-')
-    return (NULL);
-
-  if (strncmp (name, value + 2, strlen (name)) == 0) {
-    ptr = value + strlen (name) + 2;
-    if (ptr[0] != '=' || ptr[1] == '\0') {
-      g_printerr ("--%s must be given a value in the form --%s=value\n", name,
-                  name);
-      fflush (stderr);
-      ptr = NULL;
-    }
-    else
-      ptr = g_strdup (ptr + 1);
-  }
-  else
-    ptr = NULL;
-
-  return ((gchar *) ptr);
 }
 
 gint
@@ -290,7 +264,7 @@ ggobid *                        /*XXX should be void. Change when gtk-object set
 ggobi_alloc (ggobid * tmp)
 {
   if (tmp == NULL) {
-    /* Should never happen in new GtkObject-based version. 
+    /* Should never happen in new GObject-based version. 
        tmp = (ggobid*) g_malloc (sizeof (ggobid));
        memset (tmp, '\0', sizeof (ggobid)); 
      */
@@ -780,14 +754,16 @@ ggobi_find_file(const gchar *name, const gchar* const *systems, const gchar *use
   gint i;
   
   //g_debug("Looking for %s", name);
-  tmp_name = ggobi_find_file_in_dir(name, sessionOptions->ggobiHome, false);
-  if (tmp_name)
-    return(tmp_name);
+  if (sessionOptions->ggobiHome) {
+    tmp_name = ggobi_find_file_in_dir(name, sessionOptions->ggobiHome, false);
+    if (tmp_name)
+      return(tmp_name);
+  }
   
   tmp_name = ggobi_find_file_in_dir(name, cur_dir, false);
+  g_free(cur_dir);
   if (tmp_name)
     return(tmp_name);
-  g_free(cur_dir);
   
   tmp_name = ggobi_find_file_in_dir(name, user, true);
   if (tmp_name)
@@ -799,6 +775,12 @@ ggobi_find_file(const gchar *name, const gchar* const *systems, const gchar *use
       return(tmp_name);
   }
   
+  #ifdef WIN32
+  tmp_name = ggobi_find_file_in_dir(name, ggobi_win32_get_packagedir(), false);
+  if (tmp_name)
+    return(tmp_name);
+  #endif
+  
   return(NULL);
 }
 
@@ -806,22 +788,22 @@ ggobi_find_file(const gchar *name, const gchar* const *systems, const gchar *use
     $GGOBI_HOME
     Current directory
     $HOME/.local/share/ggobi (Windows: Documents, Application Data for user)
-    /usr/local/share/ggobi (Windows: Documents, Application Data for All Users)
-    /usr/share/ggobi (Windows: 'share' under dir with dll (maybe) or exe)
+    $prefix/share/ggobi (Windows: GGobi installation directory)
 */
 gchar*
 ggobi_find_data_file(const gchar *name) 
 {
-  gchar *path = ggobi_find_file(name, g_get_system_data_dirs(), g_get_user_data_dir());
+  const gchar* system_data_dirs[] = { GGOBI_DATADIR, NULL };
+  gchar *path = ggobi_find_file(name, system_data_dirs, g_get_user_data_dir());
   //g_debug("Found data file: %s", path);
   return(path);
 }
 /* Looks in (by default):
     $GGOBI_HOME
     Current directory
-    $HOME/.config/ggobi
-    /etc/xdg/ggobi
-    Windows behavior the same for data file above.
+    $HOME/.config/ggobi (Windows: Documents, Application Data for user)
+    /etc/xdg/ggobi (Windows: Documents, Application Data for All Users)
+    (Windows: GGobi installation directory)
 */
 gchar*
 ggobi_find_config_file(const gchar *name)
@@ -830,6 +812,37 @@ ggobi_find_config_file(const gchar *name)
   //g_debug("Found config file: %s", path);
   return(path);
 }
+
+#ifdef WIN32
+G_WIN32_DLLMAIN_FOR_DLL_NAME(static, dll_name)
+
+gchar*
+ggobi_win32_get_localedir()
+{
+  static char *ggobi_localedir = NULL;
+  if (ggobi_localedir == NULL) {
+    gchar *temp;
+
+    temp = g_win32_get_package_installation_subdirectory (PACKAGE, dll_name, "locale");
+
+    /* ggobi_localedir is passed to bindtextdomain() which isn't
+     * UTF-8-aware.
+     */
+    ggobi_localedir = g_win32_locale_filename_from_utf8 (temp);
+    g_free (temp);
+  }
+  return ggobi_localedir;
+}
+
+gchar*
+ggobi_win32_get_packagedir()
+{
+  static char *ggobi_datadir = NULL;
+  if (ggobi_datadir == NULL)
+    ggobi_datadir = g_win32_get_package_installation_directory (PACKAGE, dll_name);
+  return(ggobi_datadir);
+}
+#endif
 
 /*
   Determines which initialization file to use

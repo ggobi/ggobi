@@ -184,6 +184,10 @@ PKG_CHECK_MODULES(LIBXML, [libxml-2.0])
 AC_SUBST(LIBXML_CFLAGS)
 AC_SUBST(LIBXML_LIBS)
 
+# Remember where our GGobi is installed
+GGOBI_DATADIR=`eval echo "${datadir}/ggobi"`
+AC_DEFINE_UNQUOTED([GGOBI_DATADIR], "$GGOBI_DATADIR", [Location of GGobi installation])
+
  dnl Process the different .in files, substituting the values computed here in the configuration
  dnl script for the corresponding @variable@ in these files.
 AC_CONFIG_FILES(Makefile src/Makefile plugins/Makefile ggobi.pc ggobi-system.pc intl/Makefile po/Makefile.in)

@@ -1519,24 +1519,6 @@ GGobiData *GGOBI (data_get_by_name) (const gchar * const name,
   return (NULL);
 }
 
-
-const char *
-getCommandLineArgValue (const char *name)
-{
-  int i;
-  char **argv = sessionOptions->cmdArgs;
-  const char *tmp = NULL;
-  for (i = 1; i < sessionOptions->numArgs; i++) {
-    tmp = getOptValue (name, argv[i]);
-    if (tmp)
-      break;
-
-  }
-
-  return (tmp);
-}
-
-
 void
 GGobi_setSessionOptions (GGobiOptions * opts)
 {
