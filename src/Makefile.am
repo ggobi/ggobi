@@ -8,7 +8,7 @@ libggobi_la_SOURCES = array.c ash1d.c barchart.c barchartClass.c \
   barchart_ui.c brush.c brush_api.c brush_bins.c brush_init.c brush_link.c \
   brush_ui.c color.c color_ui.c cpanel.c display.c display_tree.c display_ui.c \
   edges.c exclusion.c exclusion_ui.c extendedDisplay.c fileio.c ggobi-API.c \
-  ggobi.c GGobiAppClass.c ggobiClass.c help.c identify.c identify_ui.c \
+  ggobi.c GGobiAppClass.c ggobiClass.c identify.c identify_ui.c \
   impute.c impute_ui.c io.c jitter.c jitter_ui.c limits.c lineedit.c \
   lineedit_ui.c main_ui.c make_ggobi.c marshal.c menus.c missing.c \
   movepts.c movepts_ui.c noop-toggle.c p1d.c p1d_ui.c parcoords.c \
@@ -34,7 +34,7 @@ pkginclude_HEADERS = GGobiAPI.h ggobiClass.h tour1d_pp.h GGobiApp.h \
   read_xml.h varseldata.h defines.h scatmatClass.h vartable.h display.h \
   scatterplotClass.h display_tree.h splash.h write_xml.h \
   externs.h splot.h writedata.h fileio.h testEvents.h ggobi.h tour.h \
-  $(libggobi_la_GOBHEADERS) GGStructSizes.c marshal.h CmdArgHelp.c
+  $(libggobi_la_GOBHEADERS) GGStructSizes.c marshal.h
 
 BUILT_SOURCES = $(libggobi_la_GOBSOURCES) $(libggobi_la_GOBHEADERS)
 
