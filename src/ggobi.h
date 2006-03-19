@@ -42,8 +42,6 @@ struct _ggobid;
 
 #include "colorscheme.h"
 
-#include "ggobi-intl.h"
-
 /*
  These are hooks for other applications (e.g. R) to 
  facilitate callbacks at a higher level that GTK events/signals.

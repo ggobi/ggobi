@@ -39,6 +39,7 @@
 
 #include "plugin.h"             /* For registerDefaultPlugin. */
 
+#include "ggobi-intl.h"
 
 GGobiApp *ggobiApp;
 

@@ -25,10 +25,16 @@ AC_SUBST(ac_aux_dir)
 # Initialize automake
 AM_INIT_AUTOMAKE
 
+# Figure out where we are installing immediately
+if test "${prefix}" = "NONE"; then
+  prefix=$ac_default_prefix
+fi
+
 # Initialize gettext
 AM_GNU_GETTEXT([use-libtool])
 AM_GNU_GETTEXT_VERSION(0.14.5)
-AM_GLIB_DEFINE_LOCALEDIR(GGOBI_LOCALEDIR)
+GGOBI_LOCALEDIR=`eval echo "${datadir}/locale"`
+AC_DEFINE_UNQUOTED([GGOBI_LOCALEDIR], "$GGOBI_LOCALEDIR", [Location of locale files])
 
 MAJOR_VERSION=ggobi_major_version
 MINOR_VERSION=ggobi_minor_version
@@ -187,7 +193,7 @@ echo "*******************************"
 echo ""
 echo "GGobi"
 echo " Plugins:                ${PLUGIN_DIRS}"
-echo " Installation directory: $GGOBI_INSTALL_HOME"
+echo " Installation directory: $prefix"
 echo ""
 echo "*******************************"
 
