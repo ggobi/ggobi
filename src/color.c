@@ -287,7 +287,7 @@ void
 init_var_GCs (GtkWidget * w, ggobid * gg)
 {
   GdkWindow *window = w->window;
-  GtkStyle *style = gtk_style_copy (gtk_widget_get_style (w));
+  GtkStyle *style = gtk_widget_get_style (w);
   GdkColor white, black, bg, *bblack;
 
   gdk_color_white (gdk_colormap_get_system (), &white);
@@ -337,8 +337,6 @@ init_var_GCs (GtkWidget * w, ggobid * gg)
                               0, GDK_LINE_SOLID, GDK_CAP_ROUND,
                               GDK_JOIN_ROUND);
   gdk_gc_set_foreground (gg->manipvarfg_GC, &gg->vcirc_manip_color);
-
-  g_free (style);
 }
 
 gushort  /*-- returns the maximum color id --*/
