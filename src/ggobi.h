@@ -19,8 +19,6 @@
 
 #ifdef WIN32
 #define GGOBI_EXPORT __declspec(dllexport)
-#define GGOBI_LOCALEDIR ggobi_win32_get_localedir()
-#define GGOBI_DATADIR NULL
 #else
 #define GGOBI_EXPORT 
 #endif

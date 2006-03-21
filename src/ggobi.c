@@ -41,6 +41,14 @@
 
 #include "ggobi-intl.h"
 
+#ifdef WIN32
+#undef GGOBI_LOCALEDIR
+#define GGOBI_LOCALEDIR ggobi_win32_get_localedir()
+#undef GGOBI_DATADIR
+#define GGOBI_DATADIR NULL
+#include <windows.h>
+#endif
+
 GGobiApp *ggobiApp;
 
 static GGobiOptions sessionoptions;
