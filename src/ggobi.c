@@ -755,6 +755,37 @@ ggobi_find_file_in_dir(const gchar *name, const gchar *dir, gboolean ggobi)
   return(NULL);
 }
 
+#ifdef WIN32
+G_WIN32_DLLMAIN_FOR_DLL_NAME(static, dll_name)
+
+static gchar*
+ggobi_win32_get_localedir()
+{
+  static char *ggobi_localedir = NULL;
+  if (ggobi_localedir == NULL) {
+    gchar *temp;
+
+    temp = g_win32_get_package_installation_subdirectory (PACKAGE, dll_name, "locale");
+
+    /* ggobi_localedir is passed to bindtextdomain() which isn't
+     * UTF-8-aware.
+     */
+    ggobi_localedir = g_win32_locale_filename_from_utf8 (temp);
+    g_free (temp);
+  }
+  return ggobi_localedir;
+}
+
+static gchar*
+ggobi_win32_get_packagedir()
+{
+  static char *ggobi_datadir = NULL;
+  if (ggobi_datadir == NULL)
+    ggobi_datadir = g_win32_get_package_installation_directory (PACKAGE, dll_name);
+  return(ggobi_datadir);
+}
+#endif
+
 static gchar * 
 ggobi_find_file(const gchar *name, const gchar* user, const gchar* const *dirs)
 {
@@ -820,37 +851,6 @@ ggobi_find_config_file(const gchar *name)
   //g_debug("Found config file: %s", path);
   return(path);
 }
-
-#ifdef WIN32
-G_WIN32_DLLMAIN_FOR_DLL_NAME(static, dll_name)
-
-gchar*
-ggobi_win32_get_localedir()
-{
-  static char *ggobi_localedir = NULL;
-  if (ggobi_localedir == NULL) {
-    gchar *temp;
-
-    temp = g_win32_get_package_installation_subdirectory (PACKAGE, dll_name, "locale");
-
-    /* ggobi_localedir is passed to bindtextdomain() which isn't
-     * UTF-8-aware.
-     */
-    ggobi_localedir = g_win32_locale_filename_from_utf8 (temp);
-    g_free (temp);
-  }
-  return ggobi_localedir;
-}
-
-gchar*
-ggobi_win32_get_packagedir()
-{
-  static char *ggobi_datadir = NULL;
-  if (ggobi_datadir == NULL)
-    ggobi_datadir = g_win32_get_package_installation_directory (PACKAGE, dll_name);
-  return(ggobi_datadir);
-}
-#endif
 
 /*
   Determines which initialization file to use
