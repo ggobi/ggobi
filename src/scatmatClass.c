@@ -540,10 +540,10 @@ scatmatDisplayClassInit (GGobiScatmatDisplayClass * klass)
 static gchar *
 treeLabel (splotd * splot, GGobiData * d, ggobid * gg)
 {
-  g_strdup_printf("%s v %s", 
+  return (g_strdup_printf("%s v %s", 
     ggobi_data_get_col_name(d, splot->xyvars.x), 
     ggobi_data_get_col_name(d, splot->xyvars.y)
-  );
+  ));
 }
 
 

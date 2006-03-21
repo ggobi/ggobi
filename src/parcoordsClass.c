@@ -256,7 +256,7 @@ parcoordsKeyEventHandled (GtkWidget * w, displayd * display, splotd * sp,
 gchar *
 treeLabel (splotd * splot, GGobiData * d, ggobid * gg)
 {
-  ggobi_data_get_col_name(d, splot->p1dvar);
+  return(ggobi_data_get_col_name(d, splot->p1dvar));
 }
 
 static GdkSegment *

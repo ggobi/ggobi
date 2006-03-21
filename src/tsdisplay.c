@@ -341,7 +341,7 @@ tsplotKeyEventHandled(GtkWidget *w, displayd *display, splotd *sp, GdkEventKey *
 gchar *
 tsplot_tree_label(splotd *sp, GGobiData *d, ggobid *gg)
 {
-    ggobi_data_get_col_name(d, sp->xyvars.y);
+  return(ggobi_data_get_col_name(d, sp->xyvars.y));
 }
 
 /*************************************************/

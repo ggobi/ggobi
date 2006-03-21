@@ -135,7 +135,7 @@ tsAllocWhiskers(GdkSegment *whiskers, splotd *sp, gint nrows, GGobiData *d)
 gchar *
 tsTreeLabel(splotd *sp, GGobiData *d, ggobid *gg)
 {
-  ggobi_data_get_col_name(d, sp->xyvars.y);
+  return(ggobi_data_get_col_name(d, sp->xyvars.y));
 }
 
 
