@@ -23,6 +23,8 @@
 #include "vars.h"
 #include "externs.h"
 
+static void notebook_current_page_set (displayd *, GtkWidget *, ggobid *);
+
 
 static void
 identify_target_cb (GtkWidget * w, ggobid * gg)
@@ -41,6 +43,14 @@ identify_target_cb (GtkWidget * w, ggobid * gg)
     quick_message ("Sorry, need to display edges before labeling them.",
                    false);
     gtk_combo_box_set_active (GTK_COMBO_BOX (w), (gint) identify_points);
+  } else {
+    GtkWidget *pnl, *notebook;
+    pnl = mode_panel_get_by_name (GGOBI (getIModeName) (IDENT), gg);
+    if (pnl) {
+      notebook = widget_find_by_name (pnl, "IDENTIFY:notebook");
+      if (notebook)
+        notebook_current_page_set (display, notebook, gg);
+    }
   }
 
   displays_plot (NULL, QUICK, gg);
@@ -336,13 +346,6 @@ label_prefix_func (GtkWidget * notebook, GGobiData * d, gint * sel_prefix,
 /*----------------------------------------------------------------------*/
 
 
-/*	
-static gchar *display_lbl[] = {
-  "Record id",
-  "Record label",
-  "Record number",
-  "Variable labels",
-  };*/
 static gchar *target_lbl[] = {
   "Points",
   "Edges",
@@ -360,6 +363,15 @@ cpanel_identify_make (ggobid * gg)
   panel->name = g_strdup (GGOBI (getIModeName) (IDENT));
   panel->w = gtk_vbox_new (false, VBOX_SPACING);
   gtk_container_set_border_width (GTK_CONTAINER (panel->w), 5);
+
+  /*-- option menu --*/
+  opt = gtk_combo_box_new_text ();
+  gtk_widget_set_name (opt, "IDENTIFY:target_option_menu");
+  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
+                        "Label points or edges", NULL);
+  gtk_box_pack_start (GTK_BOX (panel->w), opt, false, false, 0);
+  populate_combo_box (opt, target_lbl, G_N_ELEMENTS (target_lbl),
+                      G_CALLBACK (identify_target_cb), gg);
 
   /*-- provide a variable list so that any variable can be the label --*/
   notebook = create_prefixed_variable_notebook (panel->w,
@@ -392,15 +404,6 @@ cpanel_identify_make (ggobid * gg)
   g_signal_connect (G_OBJECT (btn), "clicked",
                     G_CALLBACK (id_all_sticky_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (panel->w), btn, false, false, 1);
-
-  /*-- option menu --*/
-  opt = gtk_combo_box_new_text ();
-  gtk_widget_set_name (opt, "IDENTIFY:target_option_menu");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-                        "Label points or edges", NULL);
-  gtk_box_pack_start (GTK_BOX (panel->w), opt, false, false, 0);
-  populate_combo_box (opt, target_lbl, G_N_ELEMENTS (target_lbl),
-                      G_CALLBACK (identify_target_cb), gg);
 
 
   /*-- frame around button for resetting center --*/
@@ -436,14 +439,15 @@ cpanel_identify_init (cpaneld * cpanel, ggobid * gg)
   cpanel->id_display_type = ID_RECORD_LABEL;
 }
 
-/* called from cpanel_identify_set */
+/* called from cpanel_identify_set and when id_target_type is selected */
 static void
 notebook_current_page_set (displayd * display, GtkWidget * notebook,
                            ggobid * gg)
 {
   GtkWidget *swin;
-  GGobiData *d = display->d, *paged;
+  GGobiData *d = display->d, *paged, *e = display->e;
   gint page_num;
+  cpaneld *cpanel = &display->cpanel;
 
   if (notebook == NULL) {
     return;
@@ -459,14 +463,17 @@ notebook_current_page_set (displayd * display, GtkWidget * notebook,
   while (swin) {
     paged = (GGobiData *) g_object_get_data (G_OBJECT (swin), "datad");
 
-    //gtk_widget_set_sensitive (swin, (paged == d));
-    if (paged == d) {
+    if (paged == d && cpanel->id_target_type == identify_points) {
+      gtk_notebook_set_current_page (GTK_NOTEBOOK (notebook), page_num);
+      break;
+    } else if (e != NULL && paged == e && cpanel->id_target_type == identify_edges) {
       gtk_notebook_set_current_page (GTK_NOTEBOOK (notebook), page_num);
       break;
     }
     page_num += 1;
     swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), page_num);
   }
+
   gtk_notebook_set_show_tabs (GTK_NOTEBOOK (notebook), false);
 }
 
