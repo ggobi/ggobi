@@ -40,7 +40,7 @@ binningPermitted (displayd * dpy)
 static void
 splotAssignPointsToBins (GGobiData * d, splotd * sp, ggobid * gg)
 {
-  if (sp == gg->current_splot && binningPermitted (sp->displayptr))
+  if (sp == gg->current_splot)
     assign_points_to_bins (d, sp, gg);
 }
 
