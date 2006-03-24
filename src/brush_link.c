@@ -277,13 +277,13 @@ build_symbol_vectors_by_var (cpaneld * cpanel, GGobiData * d, ggobid * gg)
   /*-- for other datad's --*/
   GSList *l;
   GGobiData *dd;
-  vartabled *vtt;
   gboolean changed = false;
 
   if (d->linkvar_vt == NULL)
     return false;
 
   jlinkby = g_slist_index (d->vartable, d->linkvar_vt);
+
 /*
  * I may not want to allocate and free this guy every time the
  * brush moves.
@@ -316,9 +316,9 @@ build_symbol_vectors_by_var (cpaneld * cpanel, GGobiData * d, ggobid * gg)
   for (l = gg->d; l; l = l->next) {
     dd = l->data;
     if (dd != d) {
-      vtt = vartable_element_get (jlinkby, dd);
-      if (vtt != NULL) {
-        jlinkby = g_slist_index (dd->vartable, vtt);
+      /* If the linking variable exists in the other datad ... */
+      jlinkby = vartable_index_get_by_name(d->linkvar_vt->collab, dd);
+      if (jlinkby != -1) {
         brush_link_by_var (jlinkby, &levelv, cpanel, dd, gg);
       }
     }
@@ -372,6 +372,8 @@ varlist_populate (GtkListStore * list, GGobiData * d)
   }
 }
 
+/* In this routine, we could show two pages if appropriate, one
+ * for points and one for edges. */
 /* called from cpanel_brush_set */
 void
 linkby_current_page_set (displayd * display, GtkWidget * notebook,

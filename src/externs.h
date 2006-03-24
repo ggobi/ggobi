@@ -608,6 +608,7 @@ void       varpanel_widgets_add (gint nc, GGobiData *d, ggobid *gg);
 void       vars_stdized_send_event (GGobiData *d, ggobid *gg);
 void       varsel (GtkWidget *w, cpaneld *, splotd *, gint jvar, gint toggle, gint btn, gint alt_mod, gint ctrl_mod, gint shift_mod, GGobiData *, ggobid *);
 void       vartable_alloc (GGobiData *);
+gint       vartable_index_get_by_name(gchar *name, GGobiData *d);
 gboolean   vartable_iter_from_varno(gint var, GGobiData *d, GtkTreeModel **model, GtkTreeIter *iter);
 gint	   vartable_varno_from_path(GtkTreeModel *model, GtkTreePath *path);
 void       vartable_cells_set_by_var (gint j, GGobiData *d);

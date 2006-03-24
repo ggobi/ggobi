@@ -497,34 +497,6 @@ cpanel_brush_make (ggobid * gg)
   /* initialize transient */
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (check_btn), false);
 
-  {                             /* I really ought to do this by adding an argument to
-                                 * populate_option_menu, but I'm not sure it's worth it just
-                                 * for a single pair of accelerators.  
-                                 * The other point about all these accelerator groups is
-                                 * that I should be able to add the accel_groups to each display
-                                 * instead of having separate key event management.  dfs 9/2/2005
-                                 * - unfortunately it is not possible to drive an accelerator from
-                                 * a window that is not the parent of the accelerated widget,
-                                 * therefore key events seem necessary - mfl
-                                 */
-    /* Add accelerators to the option menu */
-
-    /*GList *children = gtk_container_get_children(GTK_CONTAINER(menu));
-       GList *child;
-       GtkWidget *item; */
-    /*guint accel = 'p';
-       //gint i = 0;
-       GtkAccelGroup *accel_group = gtk_accel_group_new();
-       gtk_window_add_accel_group(GTK_WINDOW (gg->main_window), accel_group);
-       gtk_widget_add_accelerator(check_btn, "toggled", accel_group, accel, 
-       GDK_MOD2_MASK, GTK_ACCEL_VISIBLE); */
-    /*for (child=children; child; child=child->next) {
-       item = (GtkWidget *) child->data;
-       gtk_widget_add_accelerator (item, "activate", accel_group,
-       accels[i++], GDK_MOD2_MASK, GTK_ACCEL_VISIBLE);
-       } */
-  }
-
   btn = gtk_button_new_from_stock (GTK_STOCK_UNDO);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
                         "Undo the most recent persistent brushing changes, from button down to button up",
@@ -581,41 +553,17 @@ cpanel_brush_make (ggobid * gg)
   notebook = create_linkby_notebook (panel->w, gg);
   gtk_widget_set_name (notebook, "BRUSH:linkby_notebook");
 
-/*-- button for opening 'color schemes' panel --*/
-/*
-  btn = gtk_button_new_with_mnemonic("Color _schemes ...");
-  gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), btn,
-    "Open tools panel for automatic brushing by variable",
-    NULL);
-  g_signal_connect(G_OBJECT(btn), "clicked",
-    G_CALLBACK(wvis_window_cb), (gpointer) gg);
-  gtk_box_pack_start(GTK_BOX(panel->w),
-    btn, false, false, 1);
- */
-
-/*-- button for opening clusters table --*/
-/*
-  btn = gtk_button_new_with_mnemonic("Color & glyph _groups ...");
-  gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), btn,
-    "Open tools panel for hiding or excluding brushed groups",
-    NULL);
-  g_signal_connect(G_OBJECT(btn), "clicked",
-    G_CALLBACK(cluster_window_cb), (gpointer) gg);
-  gtk_box_pack_start(GTK_BOX(panel->w),
-    btn, false, false, 1);
-*/
-
   /*
-     btn = gtk_check_button_new_with_mnemonic("_Brush on");
-     gtk_widget_set_name(btn, "BRUSH:brush_on_button");
-     gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), btn,
-     "Make the brush active or inactive.  Drag the left button to brush and the right or middle button  to resize the brush.",
-     NULL);
-     g_signal_connect(G_OBJECT(btn), "toggled",
-     G_CALLBACK(brush_on_cb), (gpointer) gg);
-     gtk_box_pack_start(GTK_BOX(panel->w), btn, false,
+  btn = gtk_check_button_new_with_mnemonic("_Brush on");
+  gtk_widget_set_name(btn, "BRUSH:brush_on_button");
+  gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), btn,
+    "Make the brush active or inactive.  Drag the left button to brush and the right or middle button  to resize the brush.",
+    NULL);
+  g_signal_connect(G_OBJECT(btn), "toggled",
+    G_CALLBACK(brush_on_cb), (gpointer) gg);
+  gtk_box_pack_start(GTK_BOX(panel->w), btn, false,
      false, 0);
-   */
+  */
 
   gtk_widget_show_all (panel->w);
 }

@@ -39,7 +39,8 @@ lwidth_from_gsize (gint size)
   return ((size < 3) ? 0 : (size - 2) * 2);
 }
 
-gint                            /* This refers to the stored ltype, apparently */
+/* This refers to the stored ltype, apparently */
+gint
 ltype_from_gtype (gint gtype)
 {
   gint ltype;
@@ -56,7 +57,8 @@ ltype_from_gtype (gint gtype)
   return ltype;
 }
 
-gint /* sets dashes and returns a gtk line attribute */
+/* sets dashes and returns a gtk line attribute */
+gint
 set_lattribute_from_ltype (gint ltype, ggobid * gg)
 {
   gint8 dash_list[2];
@@ -278,8 +280,9 @@ binning_permitted (displayd * display, ggobid * gg)
        get the value of binning_ok in the class. */
     GGobiExtendedDisplayClass *klass;
     klass = GGOBI_EXTENDED_DISPLAY_GET_CLASS (display);
-    if (klass->binningPermitted)
+    if (klass->binningPermitted) {
       return (klass->binningPermitted (display));
+    }
     return (klass->binning_ok);
   }
 
@@ -586,13 +589,14 @@ update_color_vectors (gint i, gboolean changed, gboolean * hit_by_brush,
 
 /* setting the value of doit */
   if (!changed) {
-    if (hit_by_brush[i])
+    if (hit_by_brush[i]) {
       /*-- if persistent, compare against color instead of color_now --*/
       doit = (cpanel->br.mode == BR_TRANSIENT) ?
         (d->color_now.els[i] != gg->color_id) :
         (d->color.els[i] != gg->color_id);
-    else
+    } else {
       doit = (d->color_now.els[i] != d->color.els[i]);  /*-- ?? --*/
+    }
   }
 /* */
 
@@ -837,6 +841,7 @@ active_paint_points (splotd * sp, GGobiData * d, ggobid * gg)
   if (GGOBI_IS_EXTENDED_SPLOT (sp)) {
     f = GGOBI_EXTENDED_SPLOT_GET_CLASS (sp)->active_paint_points;
     if (f) {
+      g_printerr ("got an under_brush routine\n");
       d->npts_under_brush = f (sp, d, gg);
     }
   }
@@ -949,7 +954,7 @@ xed_by_brush (gint k, displayd * display, ggobid * gg)
   return (intersect == 1);
 }
 
-/*-- link by id? --*/
+/*-- link by id --*/
 static gboolean
 build_edge_symbol_vectors (cpaneld * cpanel, GGobiData * e, ggobid * gg)
 {
@@ -1026,8 +1031,11 @@ active_paint_edges (splotd * sp, GGobiData * e, ggobid * gg)
   changed = false;
   if (cpanel->br.brush_on_p) {
     if (gg->linkby_cv) {
-      /*-- link by categorical variable --*/
-      /*changed = build_symbol_vectors_by_var (cpanel, e, gg); */
+      g_printerr ("changed\n");
+      /*-- link by categorical variable: presently unavailable --*/
+      /*changed = build_symbol_vectors_by_var (cpanel, e, gg);*/
+      /* Simply brush without linking */
+      changed = build_edge_symbol_vectors (cpanel, e, gg);
     }
     else {
       /*-- link by id  --*/
