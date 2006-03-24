@@ -63,6 +63,21 @@ vartable_element_get (gint j, GGobiData *d)
 
   return (vt);
 }
+gint
+vartable_index_get_by_name(gchar *name, GGobiData *d)
+{
+  gint j;
+  gint index = -1;
+  vartabled *vt;
+  for (j=0; j<d->ncols; j++) {
+    vt = vartable_element_get(j, d);
+    if (strcmp(vt->collab, name) == 0) {
+      index = j;
+      break;
+    }
+  }
+  return index;
+}
 
 void
 vartable_element_append (vartabled *vt, GGobiData *d)
