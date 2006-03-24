@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<ggobidata count="2">
+
+<description>
+This is a tiny example to illustrate having two time series
+in the same display, and to test linked categorical brushing
+of points and edges.
+</description>
+
+<data name="points">
+<description>
+</description>
+<variables count="3">
+ <realvariable name="time" />
+ <realvariable name="x" />
+ <categoricalvariable name="TS" levels="auto"/>
+</variables>
+
+<records count="8">
+<record id="a1"><real>1</real><real>1</real><string>ts_a</string></record>
+<record id="a2"><real>2</real><real>2</real><string>ts_a</string></record>
+<record id="a3"><real>3</real><real>3</real><string>ts_a</string></record>
+<record id="a4"><real>4</real><real>4</real><string>ts_a</string></record>
+<record id="b1"><real>1</real><real>3</real><string>ts_b</string></record>
+<record id="b2"><real>2</real><real>4</real><string>ts_b</string></record>
+<record id="b3"><real>3</real><real>4</real><string>ts_b</string></record>
+<record id="b4"><real>4</real><real>5</real><string>ts_b</string></record>
+</records>
+</data>
+
+<data name="edges">
+<variables count="1">
+  <categoricalvariable name="TS" levels="auto" />
+</variables>
+<records count="6"> 
+<record source="a1" destination="a2"><string>ts_a</string></record>
+<record source="a2" destination="a3"><string>ts_a</string></record>
+<record source="a3" destination="a4"><string>ts_a</string></record>
+<record source="b1" destination="b2"><string>ts_b</string></record>
+<record source="b2" destination="b3"><string>ts_b</string></record>
+<record source="b3" destination="b4"><string>ts_b</string></record>
+</records>
+</data>
+</ggobidata>
