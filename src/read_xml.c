@@ -175,10 +175,17 @@ read_xml_input_description (const char *const fileName,
   InputDescription *desc;
   desc = (InputDescription *) g_malloc0 (sizeof (InputDescription));
   desc->fileName = g_strdup (fileName);
+  /*
+   * If fileName isn't the name of a readable file, append .xml and
+   * try again -- but only if it doesn't already end in .xml.
+   */
   if (file_is_readable (desc->fileName) == false) {
-    g_free (desc->fileName);
-    desc->fileName = g_malloc ((strlen (fileName) + 5) * sizeof (gchar));
-    sprintf (desc->fileName, "%s.xml", fileName);
+    gint len = strlen(desc->fileName);
+    if (len-4 > 0 && strcmp(&desc->fileName[len-4], ".xml")) {
+      g_free (desc->fileName);
+      desc->fileName = g_malloc ((strlen (fileName) + 5) * sizeof (gchar));
+      sprintf (desc->fileName, "%s.xml", fileName);
+    }
   }
 
   desc->mode = isURL (fileName) ? url_data : xml_data;
