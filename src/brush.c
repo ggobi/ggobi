@@ -841,7 +841,6 @@ active_paint_points (splotd * sp, GGobiData * d, ggobid * gg)
   if (GGOBI_IS_EXTENDED_SPLOT (sp)) {
     f = GGOBI_EXTENDED_SPLOT_GET_CLASS (sp)->active_paint_points;
     if (f) {
-      g_printerr ("got an under_brush routine\n");
       d->npts_under_brush = f (sp, d, gg);
     }
   }
@@ -1031,7 +1030,6 @@ active_paint_edges (splotd * sp, GGobiData * e, ggobid * gg)
   changed = false;
   if (cpanel->br.brush_on_p) {
     if (gg->linkby_cv) {
-      g_printerr ("changed\n");
       /*-- link by categorical variable: presently unavailable --*/
       /*changed = build_symbol_vectors_by_var (cpanel, e, gg);*/
       /* Simply brush without linking */
