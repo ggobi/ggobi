@@ -130,3 +130,6 @@ ggobirc: all
 	done
 	echo "</plugins>" >> $@ 
 	echo "</ggobirc>" >> $@
+
+win32-installer: ggobirc
+	makensis //DVERSION="@VERSION@" win32/ggobi.nsi

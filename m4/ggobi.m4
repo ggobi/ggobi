@@ -32,6 +32,19 @@ if test -n "$enable_debug" && ! test "$enable_debug" = "no" ;  then
  SRC_DEBUG="-g -Wall"
 fi
 AC_SUBST(SRC_DEBUG)
+
+AC_CANONICAL_HOST
+AC_MSG_CHECKING([for native Win32])
+case "$host" in
+  *-*-mingw*)
+    os_win32=yes
+    ;;
+  *)
+    os_win32=no
+    ;;
+esac
+echo "${os_win32}"
+AM_CONDITIONAL(OS_WIN32, test "$os_win32" = "yes")
 ])
 
 AC_DEFUN([GGOBI_TEST],

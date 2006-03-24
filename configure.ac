@@ -188,6 +188,20 @@ PKG_CHECK_MODULES(LIBXML, [libxml-2.0])
 AC_SUBST(LIBXML_CFLAGS)
 AC_SUBST(LIBXML_LIBS)
 
+# Are we on Windows?
+
+AC_MSG_CHECKING([for native Win32])
+case "$host" in
+  *-*-mingw*)
+    os_win32=yes
+    ;;
+  *)
+    os_win32=no
+    ;;
+esac
+echo "${os_win32}"
+AM_CONDITIONAL(OS_WIN32, test "$os_win32" = "yes")
+
  dnl Process the different .in files, substituting the values computed here in the configuration
  dnl script for the corresponding @variable@ in these files.
 AC_CONFIG_FILES(Makefile src/Makefile plugins/Makefile ggobi.pc ggobi-system.pc po/Makefile.in)
