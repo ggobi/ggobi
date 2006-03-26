@@ -793,7 +793,7 @@ ggobi_find_file(const gchar *name, const gchar* user, const gchar* const *dirs)
   gint i;
   
   //g_debug("Looking for %s", name);
-  if (sessionOptions->ggobiHome) {
+  if (sessionOptions && sessionOptions->ggobiHome) {
     tmp_name = ggobi_find_file_in_dir(name, sessionOptions->ggobiHome, false);
     if (tmp_name)
       return(tmp_name);

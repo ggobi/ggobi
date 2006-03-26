@@ -235,6 +235,7 @@ enum {ID_RECORD_ID = 1 << 3, ID_RECORD_LABEL = 1 << 2, ID_RECORD_NO = 1 << 1, ID
 #define SCALE_DEFAULT      0.7
 #define TOUR_SCALE_DEFAULT 0.6
 #define SCALE_MIN          0.02
+#define SCALE_SCROLL_INC   0.1
 
 #define DRAG  0
 #define CLICK 1
