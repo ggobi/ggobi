@@ -1274,7 +1274,7 @@ GGOBI (setPlotRange) (double *x, double *y, int plotNum, displayd * display,
   }
   else {
 
-    splot_zoom (sp, *x, *y, gg);
+    splot_zoom (sp, *x, *y);
   }
 
   /*

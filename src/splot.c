@@ -453,7 +453,7 @@ splot_init(splotd *sp, displayd *display, ggobid *gg)
                       G_CALLBACK(splot_set_current_cb),
                       (gpointer) sp);
 
-  gtk_widget_set_events (sp->da, GDK_EXPOSURE_MASK
+  gtk_widget_set_events (sp->da, GDK_EXPOSURE_MASK | GDK_SCROLL_MASK
              | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK
              | GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK);
 
@@ -878,6 +878,13 @@ disconnect_motion_signal (splotd *sp) {
   if (sp && sp->motion_id) {
     g_signal_handler_disconnect (G_OBJECT (sp->da), sp->motion_id);
     sp->motion_id = 0;
+  }
+}
+void
+disconnect_scroll_signal (splotd *sp) {
+  if (sp && sp->scroll_id) {
+    g_signal_handler_disconnect (G_OBJECT (sp->da), sp->scroll_id);
+    sp->scroll_id = 0;
   }
 }
 

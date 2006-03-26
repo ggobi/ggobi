@@ -277,6 +277,20 @@ motion_notify_cb (GtkWidget * w, GdkEventMotion * event, splotd * sp)
   return true;
 }
 
+static gint
+scroll_cb (GtkWidget *w, GdkEventScroll *event, splotd *sp)
+{
+  /* For now, make this a fixed-ratio zoom. Most people don't have horizontal
+     mouse wheels. */
+  gfloat factor = 1.0, scale = MAX(sp->scale.x, sp->scale.y);
+  if (event->direction == GDK_SCROLL_UP)
+    factor += 0.1;
+  else if (event->direction == GDK_SCROLL_DOWN)
+    factor -= 0.1;
+  scale *= factor;
+  splot_zoom(sp, scale, scale);
+  return(true);
+}
 
 static gint
 button_press_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
@@ -355,11 +369,16 @@ scale_event_handlers_toggle (splotd * sp, gboolean state)
                                        "button_release_event",
                                        G_CALLBACK (button_release_cb),
                                        (gpointer) sp);
+    sp->scroll_id = g_signal_connect (G_OBJECT (sp->da),
+                                       "scroll_event",
+                                       G_CALLBACK (scroll_cb),
+                                       (gpointer) sp);
   }
   else {
     disconnect_key_press_signal (sp);
     disconnect_button_press_signal (sp);
     disconnect_button_release_signal (sp);
+    disconnect_scroll_signal (sp);
   }
 }
 
