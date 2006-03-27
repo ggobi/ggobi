@@ -285,10 +285,13 @@ vartable_row_append (gint jvar, GGobiData *d)
   GtkTreeIter iter;
   GtkTreeIter child;
   if (!model)
-	  return;
+    return;
   gtk_tree_store_append(GTK_TREE_STORE(model), &iter, NULL);
+  /* If not categorical, we're finished */
+  if (ggobi_data_get_col_type(d, jvar) != categorical) return;
+  /* If categorical, continue: add a row for each level */
   for (k=0; k < ggobi_data_get_col_n_levels(d, jvar); k++)
-	  gtk_tree_store_append(GTK_TREE_STORE(model), &child, &iter);
+    gtk_tree_store_append(GTK_TREE_STORE(model), &child, &iter);
 }
 
 static gboolean
