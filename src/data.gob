@@ -189,7 +189,7 @@ property UINT ncols
    minimum = 0, maximum = INT_MAX, default_value = 0,
    flags = CONSTRUCT_ONLY, link, export);
    
-signal private NONE (INT, INT, POINTER) void 
+signal private NONE (INT, INT) void 
 rows_in_plot_changed(self, int arg1, int arg2);
 
 signal public NONE (INT) void 
@@ -737,7 +737,7 @@ has_variables (self)
  */
 public guint
 add_rows(self, guint n) {
-  guint nprev = self->nrows;
+  guint i, nprev = self->nrows;
   self->nrows += n;
   
   vectorb_realloc (&self->excluded, self->nrows);
@@ -749,24 +749,24 @@ add_rows(self, guint n) {
   vectorg_realloc (&self->glyph, self->nrows);
   vectorg_realloc (&self->glyph_now, self->nrows);
   vectorg_realloc (&self->glyph_prev, self->nrows);
-  vectori_realloc (&self->rows_in_plot, d->nrows);
+  vectori_realloc (&self->rows_in_plot, self->nrows);
   vectors_realloc (&self->color, self->nrows);
   vectors_realloc (&self->color_now, self->nrows);
   vectors_realloc (&self->color_prev, self->nrows);
     
-  for (i = nprev; i < d->nrows; i++) {
+  for (i = nprev; i < self->nrows; i++) {
+    self->color.els[i] =      self->gg ? self->gg->color_id : 0;
+    self->color_now.els[i] =  self->gg ? self->gg->color_id : 0;
+    self->color_prev.els[i] = self->gg ? self->gg->color_id : 0;
     self->excluded.els[i] = false;
-    self->hidden.els[i] = false;
+    self->glyph.els[i] =      self->gg ? self->gg->glyph_id : FC;
+    self->glyph_now.els[i] =  self->gg ? self->gg->glyph_id : FC;
+    self->glyph_prev.els[i] = self->gg ? self->gg->glyph_id : FC;
+    self->hidden.els[i] =  false;
     self->hidden_now.els[i] = false;
     self->hidden_prev.els[i] = false;
     self->pts_under_brush.els[i] = false; 
     self->sampled.els[i] = true;
-    self->glyph.els[i] = self->gg->glyph_id;
-    self->glyph_now.els[i] = self->gg->glyph_id;
-    self->glyph_prev.els[i] = self->gg->glyph_id;
-    self->color.els[i] = self->gg->color_id;
-    self->color_now.els[i] = self->gg->color_id;
-    self->color_prev.els[i] = self->gg->color_id;
   }
   clusters_set(self);
 
@@ -806,7 +806,7 @@ add_cols(self, guint n) {
   arrayg_add_cols (&self->world, self->ncols);
   arrays_add_cols (&self->missing, self->ncols);
 
-  tour_realloc_up (d, d->ncols);
+  //tour_realloc_up (self, self->ncols);
 
   g_signal_emit_by_name (self, "cols_added", (gpointer) self, n);  
   return nprev;
