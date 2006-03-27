@@ -54,5 +54,24 @@ Section "GGobi"
 	
 	WriteRegStr HKLM SOFTWARE\ggobi "InstallationDirectory" "$INSTDIR"
 	
-	WriteUninstaller $INSTDIR\uninstaller.exe
+	# Set up for uninstallation
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\ggobi" "DisplayName" "GGobi Interactive Graphics Platform"
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\ggobi" "UninstallString" '"$INSTDIR\uninstall.exe"'
+	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\ggobi" "NoModify" 1
+	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\ggobi" "NoRepair" 1
+	WriteUninstaller $INSTDIR\uninstall.exe
+	
+SectionEnd
+
+Section "Uninstall"
+	# Clean up registry
+	DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\ggobi"
+  	DeleteRegKey HKLM SOFTWARE\ggobi
+	# Remove from PATH
+	Push $INSTDIR
+	Call un.RemoveFromPath
+	# Get rid of shortcut
+	Delete "$DESKTOP\ggobi.lnk"
+	# Finally, get rid of our files
+	RMDir /r "$INSTDIR"
 SectionEnd
