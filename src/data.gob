@@ -592,17 +592,19 @@ public gfloat
 get_col_max(self, guint j)
 {
   vartabled *vt = vartable_element_get(j, self);
-  guint level_value, level_value_max=-G_MAXINT, i;
+  guint level_value, level_value_max=G_MININT, i;
 
   if (self_get_col_type(self, j) != categorical) {
     return vt->lim.max;
   }
 
-  // level_value_max = -G_MAXINT;
-  for (i = 0; i < vt->nlevels; i++) {
-    level_value = vt->level_values[i];
-    if (level_value > level_value_max)
-      level_value_max = level_value;
+  if (vt->nlevels && vt->nlevels > 0) {
+    level_value_max = vt->level_values[0];
+    for (i = 0; i < vt->nlevels; i++) {
+      level_value = vt->level_values[i];
+      if (level_value > level_value_max)
+        level_value_max = level_value;
+    }
   }
   
   return(gfloat) level_value_max;
@@ -629,11 +631,13 @@ get_col_min(self, guint j)
     return vt->lim.min;
   }
 
-  level_value_min = vt->nlevels;
-  for (i = 0; i < vt->nlevels; i++) {
-    level_value = vt->level_values[i];
-    if (level_value < level_value_min)
-      level_value_min = level_value;
+  if (vt->nlevels && vt->nlevels > 0) {
+    level_value_min = vt->level_values[0];
+    for (i = 0; i < vt->nlevels; i++) {
+      level_value = vt->level_values[i];
+      if (level_value < level_value_min)
+        level_value_min = level_value;
+    }
   }
   
   return(gfloat) level_value_min;
