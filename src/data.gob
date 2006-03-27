@@ -598,7 +598,7 @@ get_col_max(self, guint j)
     return vt->lim.max;
   }
 
-  level_value_max = vt->nlevels;
+  // level_value_max = -G_MAXINT;
   for (i = 0; i < vt->nlevels; i++) {
     level_value = vt->level_values[i];
     if (level_value > level_value_max)
