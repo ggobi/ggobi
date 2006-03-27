@@ -759,9 +759,12 @@ add_rows(self, guint n) {
     self->color_now.els[i] =  self->gg ? self->gg->color_id : 0;
     self->color_prev.els[i] = self->gg ? self->gg->color_id : 0;
     self->excluded.els[i] = false;
-    self->glyph.els[i] =      self->gg ? self->gg->glyph_id : FC;
-    self->glyph_now.els[i] =  self->gg ? self->gg->glyph_id : FC;
-    self->glyph_prev.els[i] = self->gg ? self->gg->glyph_id : FC;
+    self->glyph.els[i].type =      self->gg ? self->gg->glyph_id.type : FC;
+    self->glyph_now.els[i].type =  self->gg ? self->gg->glyph_id.type : FC;
+    self->glyph_prev.els[i].type = self->gg ? self->gg->glyph_id.type : FC;
+    self->glyph.els[i].size =      self->gg ? self->gg->glyph_id.size : 0;
+    self->glyph_now.els[i].size =  self->gg ? self->gg->glyph_id.size : 0;
+    self->glyph_prev.els[i].size = self->gg ? self->gg->glyph_id.size : 0;
     self->hidden.els[i] =  false;
     self->hidden_now.els[i] = false;
     self->hidden_prev.els[i] = false;
