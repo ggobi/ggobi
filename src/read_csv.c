@@ -90,14 +90,11 @@ typedef struct _Row
 } Row;
 
 static int csv_row_parse (Row * row, GIOChannel * channel, gint trim);
-static gboolean is_numeric (gchar * str, gint len);
 static gboolean has_row_labels (GList * rows);
 static void load_column_labels (Row * row, GGobiData * d,
                                 gboolean row_labels);
 static void load_row_labels (GList * rows, GGobiData * d,
                              gboolean has_labels);
-static void load_levels_from_hash (gpointer key, gpointer value,
-                                   vartabled * vt);
 static void load_row_values (GList * rows, GGobiData * d,
                              gboolean row_labels);
 static void tokenize_row (Row * row);
@@ -316,16 +313,6 @@ read_csv_input_description (const char *const fileName,
   return (desc);
 }
 
-/* string is null terminated, but pass len for maximum efficiency 
-   (since we always know it) 
-*/
-static gboolean
-is_numeric (gchar * str, gint len)
-{
-  gchar *end;
-  g_strtod (str, &end);
-  return len > 0 && end == str + len;
-}
 
 /*  Heuristic: If the first row has an empty in the first column and
 	and all the values in the first column are unique, we have row names.
@@ -385,61 +372,18 @@ load_row_labels (GList * rows, GGobiData * d, gboolean has_labels)
 }
 
 static void
-load_levels_from_hash (gpointer key, gpointer value, vartabled * vt)
-{
-  gint val = GPOINTER_TO_INT (value);
-  vt->level_values[val - 1] = val;
-  vt->level_names[val - 1] = g_strdup (key);
-}
-
-static void
 load_row_values (GList * rows, GGobiData * d, gboolean row_labels)
 {
   gint i, j, offset = (row_labels ? 1 : 0);
   GList *cur;
 
   for (j = 0; j < d->ncols; j++) {
-    GHashTable *hash =
-      g_hash_table_new ((GHashFunc) g_str_hash, (GEqualFunc) g_str_equal);
-    vartabled *vt = vartable_element_get (j, d);
-    vt->nlevels = 0;
     for (cur = rows, i = 0; cur; cur = cur->next, i++) {
       Row *row = (Row *) cur->data;
       gchar *str = row->src->str + row->entry[j + offset].ofs;
-      //fprintf(stderr, "string: %s\n", str);
-      if (is_numeric (str, row->entry[j + offset].len))
-        ggobi_data_set_raw_value(d, i, j, (gfloat) g_strtod (str, NULL));
-      else {
-        if (str[0] == '\0' || !g_ascii_strcasecmp (str, "na")
-            || !strcmp (str, ".")) {
-          ggobi_data_set_missing(d, i, j);
-        }
-        else {
-          gint index;           /* values start from 1 */
-          //fprintf(stderr, "string: %s (%d) at %d,%d\n", str, row->entry[j + offset].len, i, j);
-          if (!(index = GPOINTER_TO_INT (g_hash_table_lookup (hash, str)))) {
-            index = ++(vt->nlevels);
-            g_hash_table_insert (hash, str, GINT_TO_POINTER (index));
-          }
-          d->raw.vals[i][j] = index;
-        }
-      }
+      
+      ggobi_data_set_string_value(d, i, j, str);
     }
-    if (vt->nlevels > 0) {
-      vt->vartype = categorical;
-      vt->level_values = (gint *) g_malloc (vt->nlevels * sizeof (gint));
-      vt->level_names = (gchar **) g_malloc (vt->nlevels * sizeof (gchar *));
-      g_hash_table_foreach (hash, (GHFunc) load_levels_from_hash, vt);
-      vt->level_counts = (gint *) g_malloc0 (vt->nlevels * sizeof (gint));
-      for (i = 0; i < d->nrows; i++) {
-        gint inx;
-        if (ggobi_data_is_missing(d, i, j))
-          continue;
-        inx = (gint) d->raw.vals[i][j];
-        vt->level_counts[inx - 1]++;
-      }
-    }
-    g_hash_table_destroy (hash);
   }
 }
 

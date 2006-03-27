@@ -857,7 +857,7 @@ transform (gint stage, gint tform_type, gfloat param, gint *vars, gint nvars,
   for (k=0; k<completed; k++) {
     vartable_limits_set_by_var (vars[k], d);
     vartable_stats_set_by_var (vars[k], d);
-    tform_to_world_by_var (vars[k], d, gg);
+    tform_to_world_by_var (vars[k], d);
   }
 
 

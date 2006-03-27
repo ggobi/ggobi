@@ -36,7 +36,7 @@ reset_all_cb (GtkButton * button, ggobid * gg)
       movepts_history_delete_last (d, gg);
       movepts_history_delete_last (d, gg);
     }
-    tform_to_world (d, gg);
+    tform_to_world(d);
   }
 
   displays_tailpipe (FULL, gg);
@@ -50,7 +50,7 @@ undo_last_cb (GtkButton * button, ggobid * gg)
 /*-- remove the last two cells --*/
   movepts_history_delete_last (d, gg);
   movepts_history_delete_last (d, gg);
-  tform_to_world (d, gg);
+  tform_to_world(d);
   displays_tailpipe (FULL, gg);
 }
 

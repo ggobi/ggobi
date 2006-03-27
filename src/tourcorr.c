@@ -962,11 +962,9 @@ void tourcorr_snap(ggobid *gg)
   GGobiData *d = dsp->d;
   gint j;
   gdouble rnge;
-  vartabled *vt;
 
   for (j=0; j<d->ncols; j++) {
-    vt = vartable_element_get (j, d);
-    rnge = vt->lim.max - vt->lim.min;
+    rnge = ggobi_data_get_col_range(d, j);
     g_printerr("%f %f\n", dsp->tcorr1.F.vals[0][j]/rnge*sp->scale.x,
 	     dsp->tcorr2.F.vals[0][j]/rnge*sp->scale.y);
   }
@@ -993,7 +991,9 @@ void tourcorr_write_video(ggobid *gg)
   for (j=0; j<d->ncols; j++) {
     vt = vartable_element_get (j, d);
     g_printerr("%f %f %f %f\n", dsp->tcorr1.F.vals[0][j], 
-      dsp->tcorr2.F.vals[0][j], vt->lim.min, vt->lim.max);
+      dsp->tcorr2.F.vals[0][j], 
+      ggobi_data_get_col_min(d, j), ggobi_data_get_col_max(d, j)
+      );
   }
 }
 

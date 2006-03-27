@@ -85,12 +85,12 @@ missings_datad_cb (GtkWidget * w, ggobid * gg)
 
   notebook = (GtkWidget *) g_object_get_data (obj, "notebook");
   dnew = ggobi_data_new (d->nrows, ncols_with_missings);
-  dnew->name = g_strdup_printf ("%s (missing)", d->name);
+  ggobi_data_set_name(dnew, g_strdup_printf ("%s (missing)", ggobi_data_get_name(d)), NULL);
 
   for (i = 0; i < d->nrows; i++) {
     for (j = 0; j < ncols_with_missings; j++) {
       k = cols_with_missings[j];
-      dnew->raw.vals[i][j] = (gfloat) ggobi_data_is_missing(d, i, k);
+      ggobi_data_set_categorical_value(dnew, i, j, lnames[(gint) ggobi_data_is_missing(d, i, k)]);
     }
   }
 
@@ -121,28 +121,10 @@ missings_datad_cb (GtkWidget * w, ggobid * gg)
     k = cols_with_missings[j];
     vt = vartable_element_get (k, d);
     vtnew = vartable_element_get (j, dnew);
-    vtnew->collab = g_strdup (vt->collab);
-    vtnew->collab_tform = g_strdup (vtnew->collab);
 
-    /*-- categorical variable definitions --*/
-    vtnew->vartype = categorical;
-    vtnew->nlevels = 2;
-    vtnew->level_values = (gint *) g_malloc (sizeof (gint) * 2);
-    vtnew->level_counts = (gint *) g_malloc (sizeof (gchar *) * 2);
-    vtnew->level_names = (gchar **) g_malloc (sizeof (gchar *) * 2);
-    for (i = 0; i < 2; i++) {
-      vtnew->level_values[i] = i;
-      vtnew->level_names[i] = g_strdup (lnames[i]);
-    }
-    vtnew->level_counts[0] = d->nrows - ggobi_data_get_col_n_missing(d, j);
-    vtnew->level_counts[1] = ggobi_data_get_col_n_missing(d, j);
+    ggobi_data_set_col_name(dnew, j, ggobi_data_get_col_name(d, k));
+    limits_set(dnew, TRUE, FALSE, FALSE);
 
-    /*-- prepare to jitter, and set limits to [0,1] --*/
-    vtnew->lim_specified_p = true;  /*-- user-specified limits --*/
-    vtnew->lim_specified.min = 0.0;
-    vtnew->lim_specified_tform.min = 0.0;
-    vtnew->lim_specified.max = 1.0;
-    vtnew->lim_specified_tform.max = 1.0;
     vtnew->jitter_factor = .2;
   }
 

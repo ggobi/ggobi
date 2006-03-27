@@ -100,14 +100,14 @@ edge_add (gint a, gint b, gchar * lbl, gchar * id, GGobiData * d,
   }
 
   pipeline_arrays_check_dimensions (e);
-  rows_in_plot_set (e, gg);
+  rows_in_plot_set(e);
 
   /*-- allocate and initialize brushing arrays --*/
-  br_glyph_ids_add (e, gg);
-  br_color_ids_add (e, gg);
+  br_glyph_ids_add (e);
+  br_color_ids_add (e);
   br_hidden_alloc (e);
   vectorb_realloc (&e->pts_under_brush, e->nrows);
-  clusters_set (e, gg);
+  clusters_set(d);
 
   arrays_add_rows (&e->missing, e->nrows);
 

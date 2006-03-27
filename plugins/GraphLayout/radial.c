@@ -367,7 +367,7 @@ do_radial(glayoutd *gl, GGobiData *d, GGobiData *e, displayd *dsp, ggobid *gg)
       d->raw.vals[i][j] = d->tform.vals[i][j] = nSiblings[i];
     limits_set(d, true, true, gg->lims_use_visible);
 
-    tform_to_world (d, gg);
+    tform_to_world (d);
   }
   else {
     gl->d = dnew = ggobi_data_new (nvisible, nc);

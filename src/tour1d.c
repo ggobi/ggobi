@@ -175,11 +175,9 @@ void tour1d_snap(ggobid *gg)
   GGobiData *d = dsp->d;
   gint j;
   gdouble rnge;
-  vartabled *vt;
 
   for (j=0; j<d->ncols; j++) {
-    vt = vartable_element_get (j, d);
-    rnge = vt->lim.max - vt->lim.min;
+    rnge = ggobi_data_get_col_range(d, j);
     fprintf(stdout,"%f %f \n", dsp->t1d.F.vals[0][j], 
       dsp->t1d.F.vals[0][j]/rnge*sp->scale.x);
   }
@@ -201,7 +199,6 @@ void tour1d_write_video(ggobid *gg)
   GGobiData *d = dsp->d;
   gint j;
   gdouble rnge;
-  vartabled *vt;
   gfloat ppval;
 
   if (dsp->t1d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t1d_window))
@@ -209,8 +206,7 @@ void tour1d_write_video(ggobid *gg)
   else
     ppval = 0.;
   for (j=0; j<d->ncols; j++) {
-    vt = vartable_element_get (j, d);
-    rnge = vt->lim.max - vt->lim.min;
+    rnge = ggobi_data_get_col_range(d, j);
     fprintf(stdout,"%f %f %f \n", dsp->t1d.F.vals[0][j], 
       dsp->t1d.F.vals[0][j]/rnge*sp->scale.x, ppval);
   }
@@ -820,7 +816,6 @@ tour1d_idle_func (displayd *dsp)
 
 void tour1d_func (gboolean state, displayd *dsp, ggobid *gg)
 {
-  printf("hi\n");
   if (state) {
     if (dsp->t1d.idled == 0) {
       dsp->t1d.idled = g_idle_add_full (G_PRIORITY_LOW,

@@ -39,6 +39,14 @@ sqdist (gint x1, gint y1, gint x2, gint y2)
   return ((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
 }
 
+gboolean
+is_numeric (const gchar * str)
+{
+  gchar *end;
+  g_ascii_strtod (str, &end);
+  return (end - str == strlen(str));    
+}
+
 
 /* returns a random number on [0.0,1.0] */
 gdouble

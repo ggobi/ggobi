@@ -24,7 +24,7 @@
 
 gboolean
 impute_fixed (ImputeType impute_type, gfloat val, gint nvars, gint * vars,
-              GGobiData * d, ggobid * gg)
+              GGobiData * d)
 {
   gint i, j, k, m;
   gfloat maxval, minval, range, impval = 0;
@@ -82,7 +82,7 @@ impute_fixed (ImputeType impute_type, gfloat val, gint nvars, gint * vars,
 
 gboolean
 impute_mean_or_median (gint type, gint nvars, gint * vars,
-                       GGobiData * d, ggobid * gg)
+                       GGobiData * d)
 {
   gint i, j, k, m, n;
   gint np, nmissing;
@@ -95,9 +95,10 @@ impute_mean_or_median (gint type, gint nvars, gint * vars,
   if (!ggobi_data_has_missings(d))
     return false;
 
+  g_return_val_if_fail(GGOBI_IS_GGOBI(d->gg), false);
 
   /* If responding to brushing group ... */
-  if (gg->impute.bgroup_p && d->nclusters > 1) {
+  if (d->gg->impute.bgroup_p && d->nclusters > 1) {
 
     missv = (gint *) g_malloc (d->nrows_in_plot * sizeof (gint));
     x = (greal *) g_malloc (d->nrows_in_plot * sizeof (greal));
@@ -129,7 +130,7 @@ impute_mean_or_median (gint type, gint nvars, gint * vars,
           }
         }
         if (np && nmissing) {
-          if (gg->impute.type == IMP_MEAN) {
+          if (d->gg->impute.type == IMP_MEAN) {
             val = sum / (greal) np;
           }
           else { // if (gg->impute.type == IMP_MEDIAN) {
@@ -171,7 +172,7 @@ impute_mean_or_median (gint type, gint nvars, gint * vars,
 
 static void
 impute_single (gint * missv, gint nmissing, gint * presv, gint npresent,
-               gint col, GGobiData * d, ggobid * gg)
+               gint col, GGobiData * d)
 {
   gint i, k;
   gfloat rrand;
@@ -198,7 +199,7 @@ impute_single (gint * missv, gint nmissing, gint * presv, gint npresent,
 }
 
 void
-impute_random (GGobiData * d, gint nvars, gint * vars, ggobid * gg)
+impute_random (GGobiData * d, gint nvars, gint * vars)
 {
 /* Perform single random imputation */
 
@@ -207,10 +208,12 @@ impute_random (GGobiData * d, gint nvars, gint * vars, ggobid * gg)
   if (!ggobi_data_has_missings(d))
     return;
 
+  g_return_if_fail(GGOBI_IS_GGOBI(d->gg));
+
   presv = (gint *) g_malloc (d->nrows_in_plot * sizeof (gint));
   missv = (gint *) g_malloc (d->nrows_in_plot * sizeof (gint));
 
-  if (gg->impute.bgroup_p && d->nclusters > 1) {
+  if (d->gg->impute.bgroup_p && d->nclusters > 1) {
 
     /* Loop over the number of brushing groups */
     for (n = 0; n < d->nclusters; n++) {
@@ -235,7 +238,7 @@ impute_random (GGobiData * d, gint nvars, gint * vars, ggobid * gg)
             }
           }
         }
-        impute_single (missv, nmissing, presv, npresent, j, d, gg);
+        impute_single (missv, nmissing, presv, npresent, j, d);
       }
     }
   }
@@ -257,7 +260,7 @@ impute_random (GGobiData * d, gint nvars, gint * vars, ggobid * gg)
             presv[npresent++] = k;
         }
       }
-      impute_single (missv, nmissing, presv, npresent, j, d, gg);
+      impute_single (missv, nmissing, presv, npresent, j, d);
     }
   }
 

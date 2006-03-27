@@ -37,7 +37,7 @@ typedef void (*ggev_select_variable_f)(ggobid *, GGobiData *, gint, splotd *, vo
 typedef void (*ggev_splot_new_f)(ggobid *, splotd *, void*);
 typedef void (*ggev_r_splot_new_f)(void *, splotd *, ggobid *);
 
-typedef void (*ggev_variable_added_f)(ggobid *, vartabled*, gint, GGobiData *, void*);
+typedef void (*ggev_variable_added_f)(ggobid *, gint, GGobiData *, void*);
 typedef void (*ggev_variable_list_changed_f)(ggobid *, GGobiData *, void*);
 
 typedef void (*ggev_sticky_point_added_f)(ggobid *, gint, gint, GGobiData *, void*);

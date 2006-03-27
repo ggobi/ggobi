@@ -87,7 +87,7 @@ rescale_cb (GtkButton * button, ggobid * gg)
   vartable_limits_set (d);
   vartable_stats_set (d);
 
-  tform_to_world (d, gg);
+  tform_to_world(d);
   displays_tailpipe (FULL, gg);
 }
 static void
@@ -180,22 +180,22 @@ impute_cb (GtkWidget * w, ggobid * gg)
 
   switch (gg->impute.type) {
   case IMP_RANDOM:
-    impute_random (d, nvars, vars, gg);
+    impute_random (d, nvars, vars);
     break;
   case IMP_FIXED:
   case IMP_BELOW:
   case IMP_ABOVE:
     if (impute_fixed_cb (gg->impute.type, &val, gg))
-      redraw = impute_fixed (gg->impute.type, val, nvars, vars, d, gg);
+      redraw = impute_fixed (gg->impute.type, val, nvars, vars, d);
     break;
   case IMP_MEAN:
   case IMP_MEDIAN:
-    redraw = impute_mean_or_median (gg->impute.type, nvars, vars, d, gg);
+    redraw = impute_mean_or_median (gg->impute.type, nvars, vars, d);
     break;
   }
 
   if (redraw) {
-    tform_to_world (d, gg);
+    tform_to_world(d);
     displays_tailpipe (FULL, gg);
   }
 

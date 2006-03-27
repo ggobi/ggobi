@@ -260,7 +260,7 @@ selection_changed_cb (GtkTreeSelection *tree_sel, ggobid *gg)
   
   for (j = 0 ; j < d->ncols ; j++) { /* clear selection */
     vt = vartable_element_get (j, d);
-	vt->selected = false;
+    vt->selected = false;
   }
   
   rows = gtk_tree_selection_get_selected_rows(tree_sel, &model);
@@ -281,14 +281,13 @@ void
 vartable_row_append (gint jvar, GGobiData *d)
 {
   gint k;
-  vartabled *vt = vartable_element_get (jvar, d);
   GtkTreeModel *model = vartable_tree_model_get(d);
   GtkTreeIter iter;
   GtkTreeIter child;
   if (!model)
 	  return;
   gtk_tree_store_append(GTK_TREE_STORE(model), &iter, NULL);
-  for (k=0; k<vt->nlevels; k++)
+  for (k=0; k < ggobi_data_get_col_n_levels(d, jvar); k++)
 	  gtk_tree_store_append(GTK_TREE_STORE(model), &child, &iter);
 }
 
@@ -512,6 +511,7 @@ vartable_open (ggobid *gg)
 /*-------------------------------------------------------------------------*/
 
 /*-- sets the name of the un-transformed variable --*/
+//FIXME: ggobi_data_
 void
 vartable_collab_set_by_var (gint j, GGobiData *d)
 {
@@ -525,35 +525,23 @@ vartable_collab_set_by_var (gint j, GGobiData *d)
   if (!vartable_iter_from_varno(j, d, &model, &iter))
 	  return;
   
-  if (vt) {
-    switch (vt->vartype) {
-      case categorical:
-		
-        gtk_tree_store_set(GTK_TREE_STORE(model), &iter, 
-          VT_NLEVELS, vt->nlevels, -1);
-        gtk_tree_model_iter_children(model, &child, &iter);
-        /*-- set the level fields --*/
-     	  for (k=0; k<vt->nlevels; k++) {
-          fmtname = g_markup_printf_escaped("%s", vt->level_names[k]);
-          gtk_tree_store_set(GTK_TREE_STORE(model), &child, VT_LEVEL_NAME,
-            fmtname, VT_LEVEL_VALUE, vt->level_values[k],
-            VT_LEVEL_COUNT, vt->level_counts[k], -1);
-          g_free(fmtname);
-          gtk_tree_model_iter_next(model, &child);
-        }
-	   // no more break
-      case integer:
-      case counter:
-      case uniform:
-      case real:
-        gtk_tree_store_set(GTK_TREE_STORE(model), &iter,
-          VT_VARNAME, vt->collab, -1);
-      break;
-      case all_vartypes:
-        g_printerr ("(vartable_collab_set_by_var) illegal variable type %d\n", all_vartypes);
-      break;
+  if (ggobi_data_get_col_type(d, j) == categorical) {
+    gtk_tree_store_set(GTK_TREE_STORE(model), &iter, 
+      VT_NLEVELS, ggobi_data_get_col_n_levels(d, j), -1);
+    gtk_tree_model_iter_children(model, &child, &iter);
+    /*-- set the level fields --*/
+    for (k=0; k<vt->nlevels; k++) {
+      fmtname = g_markup_printf_escaped("%s", vt->level_names[k]);
+      gtk_tree_store_set(GTK_TREE_STORE(model), &child, VT_LEVEL_NAME,
+        fmtname, VT_LEVEL_VALUE, vt->level_values[k],
+        VT_LEVEL_COUNT, vt->level_counts[k], -1);
+      g_free(fmtname);
+      gtk_tree_model_iter_next(model, &child);
     }
   }
+  gtk_tree_store_set(GTK_TREE_STORE(model), &iter, VT_VARNAME, 
+    ggobi_data_get_col_name(d, j), -1);
+
 }
 
 /*-- sets the name of the transformed variable --*/
@@ -638,44 +626,37 @@ vartable_limits_set (GGobiData *d)
 void
 vartable_stats_set_by_var (gint j, GGobiData *d) {
   vartabled *vt = vartable_element_get (j, d);
-  vartyped type;
   GtkTreeModel *model;
   GtkTreeIter iter;
 
-  if (!vartable_iter_from_varno(j, d, &model, &iter))
-	  return;
+  if (!vt || !vartable_iter_from_varno(j, d, &model, &iter))
+    return;
   
-  if (vt) {
-    switch (vt->vartype) {
-      case integer:
-      case counter:
-      case uniform:
-      case real:
-        type = real;
-        /*-- for counter variables, don't display the mean --*/
-	if (vt->vartype != counter)
-	  gtk_tree_store_set(GTK_TREE_STORE(model), &iter, 
-		VT_MEAN, vt->mean, VT_MEDIAN, vt->median, -1);
-      //break;
-      case categorical:
-        gtk_tree_store_set(GTK_TREE_STORE(model), &iter, 
-			VT_NMISSING, ggobi_data_get_col_n_missing(d, j), -1);
+  switch (ggobi_data_get_col_type(d, j)) {
+    case counter:
       break;
-      case all_vartypes:
-        g_printerr ("(vartable_stats_set_by_var) %d: illegal variable type %d\n",
-          j, vt->vartype);
-      break;
-    }
+    case categorical:
+      gtk_tree_store_set(GTK_TREE_STORE(model), &iter, 
+        VT_NMISSING, ggobi_data_get_col_n_missing(d, j), -1);
+    break;
+    default:
+      gtk_tree_store_set(GTK_TREE_STORE(model), &iter, 
+        VT_MEAN, vt->mean, 
+        VT_MEDIAN, vt->median, 
+        -1
+      );
+    break;
   }
 }
-
 void
 vartable_stats_set (GGobiData *d) {
   gint j;
 
-  if (d->vartable_tree_model != NULL)
-    for (j=0; j<d->ncols; j++)
-      vartable_stats_set_by_var (j, d);
+  if (!d->vartable_tree_model)
+    return;
+    
+  for (j=0; j<d->ncols; j++)
+    vartable_stats_set_by_var (j, d);
 }
 
 /*

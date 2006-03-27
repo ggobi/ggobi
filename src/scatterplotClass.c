@@ -765,7 +765,7 @@ scatterplotMovePointsButtonCb (displayd * display, splotd * sp, GtkWidget * w,
 
     /*-- add the history information for the cluster here --*/
     if (gg->movepts.cluster_p) {
-      clusters_set (d, gg);
+      clusters_set(d);
       if (d->nclusters > 1) {
         gint i, k, id = d->nearest_point;
         gfloat cur_clust = d->clusterid.els[id];
@@ -1554,7 +1554,6 @@ splotScreenToTform (cpaneld * cpanel, splotd * sp, icoords * scr,
   displayd *display = (displayd *) sp->displayptr;
   GGobiData *d = display->d;
   gfloat scale_x, scale_y;
-  vartabled *vt, *vtx, *vty;
 
   scale_x = sp->scale.x;
   scale_y = sp->scale.y;
@@ -1577,9 +1576,8 @@ splotScreenToTform (cpaneld * cpanel, splotd * sp, icoords * scr,
 
   switch (cpanel->pmode) {
   case P1PLOT:
-    vt = vartable_element_get (sp->p1dvar, d);
-    max = vt->lim.max;
-    min = vt->lim.min;
+    max = ggobi_data_get_col_max(d, sp->p1dvar);
+    min = ggobi_data_get_col_min(d, sp->p1dvar);
     rdiff = max - min;
 
     if (display->p1d_orientation == HORIZONTAL) {
@@ -1600,9 +1598,8 @@ splotScreenToTform (cpaneld * cpanel, splotd * sp, icoords * scr,
 
   case XYPLOT:
     /* x */
-    vtx = vartable_element_get (sp->xyvars.x, d);
-    max = vtx->lim.max;
-    min = vtx->lim.min;
+    max = ggobi_data_get_col_max(d, sp->xyvars.x);
+    min = ggobi_data_get_col_min(d, sp->xyvars.x);
     rdiff = max - min;
     world.x = planar.x;
     ftmp = world.x / precis;
@@ -1610,9 +1607,8 @@ splotScreenToTform (cpaneld * cpanel, splotd * sp, icoords * scr,
     tfd->x += min;
 
     /* y */
-    vty = vartable_element_get (sp->xyvars.y, d);
-    max = vty->lim.max;
-    min = vty->lim.min;
+    max = ggobi_data_get_col_max(d, sp->xyvars.y);
+    min = ggobi_data_get_col_min(d, sp->xyvars.y);
     rdiff = max - min;
     world.y = planar.y;
     ftmp = world.y / precis;

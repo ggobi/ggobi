@@ -68,14 +68,14 @@ subset_clear (GGobiData *d, ggobid *gg) {
 void
 subset_apply (GGobiData *d, ggobid *gg) {
 
-  rows_in_plot_set (d, gg);
+  rows_in_plot_set(d);
 
-  clusters_set (d, gg);
+  clusters_set(d);
 
   if (gg->cluster_ui.window != NULL)
     cluster_table_update (d, gg);
 
-  tform_to_world (d, gg);
+  tform_to_world(d);
 
 /*
   if (gg->is_pp) {

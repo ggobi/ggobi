@@ -121,7 +121,7 @@ splot_draw_tour_axes (splotd * sp, GdkDrawable * drawable, ggobid * gg)
           vt = vartable_element_get (j, d);
           varlab = g_strdup_printf ("%s:%4.3f(%.2f)", ggobi_data_get_transformed_col_name(d, j),
                                     dsp->t1d.F.vals[0][j],
-                                    vt->lim.max - vt->lim.min);
+                                    ggobi_data_get_col_range(d, j));
           layout_text (layout, varlab, &rect);
           gdk_draw_layout (drawable, gg->plot_GC,
                            (ix >
@@ -183,8 +183,7 @@ splot_draw_tour_axes (splotd * sp, GdkDrawable * drawable, ggobid * gg)
         if (abs (ix - axindent - dawidth / 8) > 5 ||
             abs (iy + axindent - (daheight - daheight / 8)) > 5) {
           if (dsp->options.axes_label_p) {
-            vt = vartable_element_get (j, d);
-            varlab = g_strdup (vt->nickname);
+            varlab = ggobi_data_get_col_nickname(d, j);
           }
           else {
             varlab = g_strdup_printf ("%d", j + 1);
@@ -281,8 +280,7 @@ splot_draw_tour_axes (splotd * sp, GdkDrawable * drawable, ggobid * gg)
         if (abs (ix - axindent - daheight / 8) > 5 ||
             abs (iy + axindent - (daheight - daheight / 8)) > 5) {
           if (dsp->options.axes_label_p) {
-            vt = vartable_element_get (j, d);
-            varlab = g_strdup (vt->nickname);
+            varlab = ggobi_data_get_col_nickname(d, j);
           }
           else {
             varlab = g_strdup_printf ("%d", j + 1);
@@ -316,7 +314,7 @@ splot_draw_tour_axes (splotd * sp, GdkDrawable * drawable, ggobid * gg)
           varval = g_strdup_printf ("%d:%4.3f,%4.3f(%.2f)", j + 1,
                                     dsp->t2d.F.vals[0][j],
                                     dsp->t2d.F.vals[1][j],
-                                    vt->lim.max - vt->lim.min);
+                                    ggobi_data_get_col_range(d, j));
           //if (k == 0) {
           layout_text (layout, varval, &rect);
           textheight2 = rect.height;

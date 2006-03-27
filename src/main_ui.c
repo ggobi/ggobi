@@ -507,7 +507,7 @@ imode_activate (splotd * sp, ProjectionMode pmode, InteractionMode imode,
       }
       break;
     case BRUSH:
-      redraw_style = brush_activate (state, display, sp, gg);
+      redraw_style = brush_activate (state, display, sp);
       break;
     case IDENT:
       redraw_style = identify_activate (state, display, gg);
@@ -556,7 +556,7 @@ imode_activate (splotd * sp, ProjectionMode pmode, InteractionMode imode,
       }
       break;
     case BRUSH:
-      redraw_style = brush_activate (state, display, sp, gg);
+      redraw_style = brush_activate (state, display, sp);
       break;
     case IDENT:
       redraw_style = identify_activate (state, display, gg);

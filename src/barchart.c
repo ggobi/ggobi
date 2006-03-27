@@ -281,7 +281,6 @@ static void
 barchart_recalc_group_counts (barchartSPlotd * sp, GGobiData * d, ggobid * gg)
 {
   gint i, j, m, bin;
-  vartabled *vtx = vartable_element_get (GGOBI_SPLOT (sp)->p1dvar, d);
 
   g_assert (sp->bar->index_to_rank.nels == d->nrows_in_plot);
 
@@ -314,7 +313,7 @@ barchart_recalc_group_counts (barchartSPlotd * sp, GGobiData * d, ggobid * gg)
 
     bin = GGOBI_SPLOT (sp)->planar[m].x;
 /* dfs */
-    if (vtx->vartype == categorical)
+    if (ggobi_data_get_col_type(d, GGOBI_SPLOT (sp)->p1dvar) == categorical)
       bin = sp->bar->index_to_rank.els[i];
 /* --- */
     if ((bin >= 0) && (bin < sp->bar->nbins)) {
@@ -551,21 +550,18 @@ barchart_free_structure (barchartSPlotd * sp)
 void
 barchart_allocate_structure (barchartSPlotd * sp, GGobiData * d)
 {
-  vartabled *vtx;
   gint i, nbins;
   splotd *rawsp = GGOBI_SPLOT (sp);
   ggobid *gg = GGobiFromSPlot (rawsp);
   colorschemed *scheme = gg->activeColorScheme;
 
-  vtx = vartable_element_get (rawsp->p1dvar, d);
-
   if (sp->bar->new_nbins < 0) {
-    if (vtx->vartype == categorical) {
-      nbins = (ggobi_data_get_col_n_missing(d, rawsp->p1dvar)) ? vtx->nlevels + 1 : vtx->nlevels;
+    if (ggobi_data_get_col_type(d, rawsp->p1dvar) == categorical) {
+      nbins = ggobi_data_get_col_n_levels(d, rawsp->p1dvar);
       sp->bar->is_histogram = FALSE;
     }
     else {
-      nbins = 10;               /* replace by a more sophisticated rule */
+      nbins = 10;               // replace by a more sophisticated rule
       sp->bar->is_histogram = TRUE;
     }
   }
@@ -573,24 +569,12 @@ barchart_allocate_structure (barchartSPlotd * sp, GGobiData * d)
     nbins = sp->bar->new_nbins;
   sp->bar->new_nbins = -1;
 
-  if (vtx->lim_specified_p) {
-    rawsp->p1d.lim.min = vtx->lim_specified.min;
-    rawsp->p1d.lim.max = vtx->lim_specified.max;
-  }
-  else {
-    rawsp->p1d.lim.min = vtx->lim.min;
-    rawsp->p1d.lim.max = vtx->lim.max;
-/* dfs */
-    if (vtx->vartype == categorical) {
-      rawsp->p1d.lim.min = MIN (rawsp->p1d.lim.min, vtx->level_values[0]);
-      rawsp->p1d.lim.max = MAX (rawsp->p1d.lim.max,
-                                vtx->level_values[vtx->nlevels - 1]);
-    }
-/* --- */
-  }
+  rawsp->p1d.lim.min = ggobi_data_get_col_min(d, rawsp->p1dvar);
+  rawsp->p1d.lim.max = ggobi_data_get_col_max(d, rawsp->p1dvar);
 
+  // nothing else to be done
   if (sp->bar->nbins && nbins == sp->bar->nbins)
-    return;                     /* nothing else to be done */
+    return;                     
 
 
 /* free all previously allocated pointers */
@@ -622,7 +606,6 @@ barchart_init_categorical (barchartSPlotd * sp, GGobiData * d)
   gint proj = display->cpanel.pmode;
   gint i, j, m, jvar = rawsp->p1dvar;
   ggobid *gg = GGobiFromSPlot (rawsp);
-  vartabled *vtx = vartable_element_get (rawsp->p1dvar, d);
   gfloat mindist, maxheight;
   gfloat min, max;
 
@@ -647,14 +630,8 @@ barchart_init_categorical (barchartSPlotd * sp, GGobiData * d)
   mindist = barchart_sort_index (yy, d->nrows_in_plot, gg, sp);
   g_free ((gpointer) yy);
 
-  min = vtx->lim_tform.min;
-  max = vtx->lim_tform.max;
-/* dfs */
-  if (vtx->vartype == categorical) {
-    min = MIN (min, vtx->level_values[0]);
-    max = MAX (max, vtx->level_values[vtx->nlevels - 1]);
-  }
-/* --- */
+  min = ggobi_data_get_col_min(d, rawsp->p1dvar);
+  max = ggobi_data_get_col_max(d, rawsp->p1dvar);
 
   maxheight = max - min;
 
@@ -760,47 +737,36 @@ barchart_splot_add_plot_labels (splotd * sp, GdkDrawable * drawable,
                                 ggobid * gg)
 {
   displayd *display = (displayd *) sp->displayptr;
+  gint i = 0;
   GGobiData *d = display->d;
   PangoLayout *layout =
     gtk_widget_create_pango_layout (GTK_WIDGET (sp->da), NULL);
   PangoRectangle rect;
-
-  vartabled *vtx;
-
-  vtx = vartable_element_get (sp->p1dvar, d);
+  barchartSPlotd *bsp = GGOBI_BARCHART_SPLOT (sp);
 
   layout_text (layout, ggobi_data_get_col_name(d, sp->p1dvar), &rect);
   gdk_draw_layout (drawable, gg->plot_GC, sp->max.x - rect.width - 5,
                    sp->max.y - rect.height - 5, layout);
+  
+  if(ggobi_data_get_col_type(d, sp->p1dvar) != categorical) {
+    g_object_unref (G_OBJECT (layout));
+    return;
+  }
 
-  if (vtx->vartype == categorical) {
-    gint i;
-    gchar *catname;
-    barchartSPlotd *bsp = GGOBI_BARCHART_SPLOT (sp);
-    gint level;
+  /* is there enough space for labels? If not - return */
+  layout_text (layout, "  ", &rect);
+  if (!bsp->bar->is_spine && bsp->bar->bins[1].rect.height < rect.height)
+    return;
 
-    layout_text (layout, "yA", &rect);
+  for (i = 0; i < bsp->bar->nbins; i++) {
+    gchar* name = ggobi_data_get_col_level_name(d, sp->p1dvar, bsp->bar->bins[i].value);
+    layout_text (layout, name, NULL);
+    gdk_draw_layout (drawable, gg->plot_GC,
+                     bsp->bar->bins[i].rect.x + 2,
+                     bsp->bar->bins[i].rect.y +
+                     bsp->bar->bins[i].rect.height / 2 + 2, layout);
 
-    /* is there enough space for labels? If not - return */
-    if (!bsp->bar->is_spine) {
-      if (bsp->bar->bins[1].rect.height < rect.height)
-        return;
-    }
-
-    for (i = 0; i < bsp->bar->nbins; i++) {
-      level = checkLevelValue (vtx, (gdouble) bsp->bar->bins[i].value);
-      catname = g_strdup_printf ("%s",
-                                 (level ==
-                                  -1) ? "missing" : vtx->level_names[level]);
-
-      layout_text (layout, catname, NULL);
-      gdk_draw_layout (drawable, gg->plot_GC,
-                       bsp->bar->bins[i].rect.x + 2,
-                       bsp->bar->bins[i].rect.y +
-                       bsp->bar->bins[i].rect.height / 2 + 2, layout);
-
-      g_free (catname);
-    }
+    g_free (name);
   }
   g_object_unref (G_OBJECT (layout));
 }
@@ -831,71 +797,10 @@ void
 barchart_set_initials (barchartSPlotd * sp, GGobiData * d)
 {
   splotd *rawsp = GGOBI_SPLOT (sp);
-  vartabled *vtx = vartable_element_get (rawsp->p1dvar, d);
-  gboolean foundp = false;
+  gint i;
 
-  if (vtx->vartype == categorical) {
-    if (vtx->nlevels > 1) {
-      gint i, level;
-      gfloat missing_val;
-      gboolean add_level = false;
-      if (ggobi_data_get_col_n_missing(d, rawsp->p1dvar)) {
-        for (i = 0; i < d->nrows_in_plot; i++) {
-          if (ggobi_data_is_missing(d, d->rows_in_plot.els[i], rawsp->p1dvar)) {
-            missing_val = d->tform.vals[i][rawsp->p1dvar];
-            foundp = true;
-            break;
-          }
-        }
-        /* If the currently "imputed" value for missings is not one
-           of the levels we already have, then we need an extra bin
-           for the missings.
-         */
-        if (foundp && checkLevelValue (vtx, missing_val) == -1) {
-          add_level = true;
-          level = 0;
-          for (i = 0; i < sp->bar->nbins; i++) {
-            if (add_level && (gint) missing_val < vtx->level_values[level]) {
-              sp->bar->bins[i].value = (gint) missing_val;
-              add_level = false;
-            }
-            else {
-              sp->bar->bins[i].value = vtx->level_values[level++];
-            }
-          }
-          if (add_level &&
-              (gint) missing_val > vtx->level_values[vtx->nlevels - 1])
-            sp->bar->bins[sp->bar->nbins - 1].value = missing_val;
-        }
-        else {
-          for (i = 0; i < vtx->nlevels; i++)
-            sp->bar->bins[i].value = vtx->level_values[i];
-          sp->bar->nbins -= 1;
-
-          sp->bar->bins = (gbind *) g_realloc (sp->bar->bins,
-                                               sp->bar->nbins *
-                                               sizeof (gbind));
-          sp->bar->bar_hit =
-            (gboolean *) g_realloc (sp->bar->bar_hit,
-                                    (sp->bar->nbins + 2) * sizeof (gboolean));
-          sp->bar->old_bar_hit =
-            (gboolean *) g_realloc (sp->bar->old_bar_hit,
-                                    (sp->bar->nbins + 2) * sizeof (gboolean));
-
-          g_free ((gpointer) (sp->bar->cbins[sp->bar->nbins]));
-          sp->bar->cbins = (gbind **) g_realloc (sp->bar->cbins,
-                                                 sp->bar->nbins *
-                                                 sizeof (gbind *));
-        }
-      }
-      else {
-        for (i = 0; i < vtx->nlevels; i++)
-          sp->bar->bins[i].value = vtx->level_values[i];
-      }
-    }
-/* --- */
-  }
-  else {
+  // if continuous, break up into nbins equal ranges
+  if (ggobi_data_get_col_type(d, rawsp->p1dvar) != categorical) {
     gint i;
     gfloat rdiff = rawsp->p1d.lim.max - rawsp->p1d.lim.min;
 
@@ -903,7 +808,15 @@ barchart_set_initials (barchartSPlotd * sp, GGobiData * d)
       sp->bar->breaks[i] = rawsp->p1d.lim.min + rdiff / sp->bar->nbins * i;
     }
     sp->bar->breaks[sp->bar->nbins] = rawsp->p1d.lim.max;
+    return;
   }
+  
+  // if categorical, use the level value
+  for (i = 0; i < ggobi_data_get_col_n_levels(d, rawsp->p1dvar); i++) {
+    sp->bar->bins[i].value = ggobi_data_get_col_level_value(d, rawsp->p1dvar, i);
+  }
+  return;
+
 }
 
 void
@@ -912,15 +825,15 @@ barchart_recalc_counts (barchartSPlotd * sp, GGobiData * d, ggobid * gg)
   gfloat yy;
   gint i, bin, m;
   splotd *rawsp = GGOBI_SPLOT (sp);
-  vartabled *vtx = vartable_element_get (rawsp->p1dvar, d);
 
   if (sp->bar->index_to_rank.nels != d->nrows_in_plot) {
     vectori_realloc (&sp->bar->index_to_rank, d->nrows_in_plot);
     barchart_init_categorical (sp, d);
   }
 
-  if (vtx->vartype != categorical)
+  if (ggobi_data_get_col_type(d, rawsp->p1dvar) != categorical)
     rawsp->scale.y = 1 - (1 - SCALE_DEFAULT) / 2;
+
   for (i = 0; i < sp->bar->nbins; i++) {
     sp->bar->bins[i].count = 0;
     sp->bar->bins[i].nhidden = 0;
@@ -928,7 +841,7 @@ barchart_recalc_counts (barchartSPlotd * sp, GGobiData * d, ggobid * gg)
 
   sp->bar->high_pts_missing = sp->bar->low_pts_missing = FALSE;
 
-  if (vtx->vartype == categorical) {
+  if (ggobi_data_get_col_type(d, rawsp->p1dvar) == categorical) {
 
     for (i = 0; i < d->nrows_in_plot; i++) {
       m = d->rows_in_plot.els[i];
@@ -945,8 +858,7 @@ barchart_recalc_counts (barchartSPlotd * sp, GGobiData * d, ggobid * gg)
       }
       rawsp->planar[m].x = (greal) sp->bar->bins[bin].value;
     }
-  }
-  else {                        /* all vartypes but categorical */
+  } else {                        /* all vartypes but categorical */
     gint index, m, rank = 0;
 
     index = sp->bar->index_to_rank.els[rank];
@@ -1052,7 +964,6 @@ barchart_recalc_dimensions (splotd * rawsp, GGobiData * d, ggobid * gg)
 {
   gint i, maxbincount = 0, maxbin = -1;
   gfloat precis = PRECISION1;
-  vartabled *vtx;
 
   gfloat scale_y;
   gint index;
@@ -1070,9 +981,9 @@ barchart_recalc_dimensions (splotd * rawsp, GGobiData * d, ggobid * gg)
    * plot window (well, as much of the plot window as scale.x and
    * scale.y permit.)
    */
-  vtx = vartable_element_get (rawsp->p1dvar, d);
 
   rdiff = rawsp->p1d.lim.max - rawsp->p1d.lim.min;
+  
   index = 0;
   for (i = 0; i < sp->bar->nbins; i++) {
     bin = &sp->bar->bins[i];
@@ -1082,7 +993,7 @@ barchart_recalc_dimensions (splotd * rawsp, GGobiData * d, ggobid * gg)
     }
 
     sp->bar->bins[i].planar.x = -1;
-    if (vtx->vartype == categorical) {
+    if (ggobi_data_get_col_type(d, rawsp->p1dvar) == categorical) {
       ftmp = -1.0 + 2.0 * ((greal) bin->value - rawsp->p1d.lim.min)
         / rdiff;
       bin->planar.y = (greal) (PRECISION1 * ftmp);
@@ -1156,7 +1067,7 @@ barchart_recalc_dimensions (splotd * rawsp, GGobiData * d, ggobid * gg)
 
     minwidth = MAX ((gint) (0.9 * minwidth), 0);
     for (i = 0; i < sp->bar->nbins; i++) {
-      if (vtx->vartype != categorical)
+      if (ggobi_data_get_col_type(d, rawsp->p1dvar) != categorical)
         sp->bar->bins[i].rect.y -= sp->bar->bins[i].rect.height;
       else {
         sp->bar->bins[i].rect.height = minwidth;
@@ -1226,7 +1137,6 @@ barchart_active_paint_points (splotd * rawsp, GGobiData * d, ggobid * gg)
   gint y1 = MIN (brush_pos->y1, brush_pos->y2);
   gint y2 = MAX (brush_pos->y1, brush_pos->y2);
   gboolean *hits;
-  vartabled *vtx = vartable_element_get (rawsp->p1dvar, d);
   cpaneld *cpanel = &gg->current_display->cpanel;
 
   hits = (gboolean *) g_malloc ((sp->bar->nbins + 2) * sizeof (gboolean));
@@ -1269,7 +1179,7 @@ barchart_active_paint_points (splotd * rawsp, GGobiData * d, ggobid * gg)
     /*-- dfs -- this seems to assume that the values of planar begin at 0,
          which may not be true ... this change makes it work for categorical,
          but breaks it otherwise --*/
-    if (vtx->vartype == categorical) {
+    if (ggobi_data_get_col_type(d, rawsp->p1dvar) == categorical) {
       indx = (gint) (rawsp->planar[m].x - rawsp->p1d.lim.min + 1);
     }
     else {
@@ -1279,11 +1189,6 @@ barchart_active_paint_points (splotd * rawsp, GGobiData * d, ggobid * gg)
     d->pts_under_brush.els[m] = hits[indx];
     if (hits[indx])
       d->npts_under_brush++;
-#ifdef PREV
-    d->pts_under_brush.els[m] = hits[(gint) rawsp->planar[m].x + 1];
-    if (hits[(gint) rawsp->planar[m].x + 1])
-      d->npts_under_brush++;
-#endif
   }
 
   g_free ((gpointer) hits);
@@ -1388,25 +1293,6 @@ barchart_sort_index (gfloat * yy, gint ny, ggobid * gg, barchartSPlotd * sp)
       sp->bar->index_to_rank.els[indx[i]] = rank;
     }
 
-/* --- */
-#ifdef PREV
-    rank = 0;
-    for (i = 0; i < sp->bar->nbins; i++)
-      sp->bar->bins[i].index = -1;
-
-    mindist = yy[indx[ny - 1]] - yy[indx[0]];
-    sp->bar->bins[rank].index = indx[0];
-    for (i = 0; i < ny; i++) {
-      if (i > 0) {
-        if (yy[indx[i]] != yy[indx[i - 1]]) {
-          rank++;
-          mindist = MIN (yy[indx[i]] - yy[indx[i - 1]], mindist);
-          sp->bar->bins[rank].index = indx[i];
-        }
-      }
-      sp->bar->index_to_rank.els[indx[i]] = rank;
-    }
-#endif
 
   }
 
@@ -1420,66 +1306,64 @@ void
 barchart_default_visual_cues_draw (splotd * rawsp, GdkDrawable * drawable,
                                    ggobid * gg)
 {
-  vartabled *vtx;
   displayd *display = gg->current_display;
   GGobiData *d = display->d;
   barchartSPlotd *sp = GGOBI_BARCHART_SPLOT (rawsp);
-  vtx = vartable_element_get (GGOBI_SPLOT (sp)->p1dvar, d);
-
   GdkPoint btn[4];
+
+  if(ggobi_data_get_col_type(d, GGOBI_SPLOT(sp)->p1dvar) == categorical)
+    return;
+
   /* Experiment: ontinue to draw small triangular buttons, but allow
      the regions to grow into long rectangles running along the bars.
-     dfs
-   */
+     
+      */
+  
+  /* calculate & draw anchor_rgn */
+  gint y = sp->bar->bins[0].rect.y + sp->bar->bins[0].rect.height;
+  gint x = sp->bar->bins[0].rect.x;
+  gint halfwidth = sp->bar->bins[0].rect.height / 2 - 2;
+
+  sp->bar->anchor_rgn[0].x = sp->bar->anchor_rgn[1].x = x - 5;
+  sp->bar->anchor_rgn[2].x = x + GGOBI_SPLOT (sp)->max.x; // extend
+  sp->bar->anchor_rgn[0].y = y + halfwidth;
+  sp->bar->anchor_rgn[1].y = y - halfwidth;
+  //sp->bar->anchor_rgn[2].y = y;
+
+  // Rectangle instead of triangle
+  sp->bar->anchor_rgn[3].x = sp->bar->anchor_rgn[2].x;
+  sp->bar->anchor_rgn[2].y = sp->bar->anchor_rgn[1].y;
+  sp->bar->anchor_rgn[3].y = sp->bar->anchor_rgn[0].y;
+
+  btn[0].x = btn[1].x = x - 5;
+  btn[2].x = x;
+  btn[0].y = y + halfwidth;
+  btn[1].y = y - halfwidth;
+  btn[2].y = y;
+  button_draw_with_shadows (btn, drawable, gg);
+  //button_draw_with_shadows(sp->bar->anchor_rgn, drawable, gg);
+
+  /* calculate & draw offset_rgn */
+  y = sp->bar->bins[0].rect.y;
+  sp->bar->offset_rgn[0].x = sp->bar->offset_rgn[1].x = x - 5;
+  sp->bar->offset_rgn[2].x = x + GGOBI_SPLOT (sp)->max.x; // extend
+  sp->bar->offset_rgn[0].y = y + halfwidth;
+  sp->bar->offset_rgn[1].y = y - halfwidth;
+  //sp->bar->offset_rgn[2].y = y;
+
+  // Rectangle instead of triangle -- dfs
+  sp->bar->offset_rgn[3].x = sp->bar->offset_rgn[2].x;
+  sp->bar->offset_rgn[2].y = sp->bar->offset_rgn[1].y;
+  sp->bar->offset_rgn[3].y = sp->bar->offset_rgn[0].y;
 
 
-  if (vtx->vartype != categorical) {
-/* calculate & draw anchor_rgn */
-    gint y = sp->bar->bins[0].rect.y + sp->bar->bins[0].rect.height;
-    gint x = sp->bar->bins[0].rect.x;
-    gint halfwidth = sp->bar->bins[0].rect.height / 2 - 2;
-
-    sp->bar->anchor_rgn[0].x = sp->bar->anchor_rgn[1].x = x - 5;
-    sp->bar->anchor_rgn[2].x = x + GGOBI_SPLOT (sp)->max.x; // extend
-    sp->bar->anchor_rgn[0].y = y + halfwidth;
-    sp->bar->anchor_rgn[1].y = y - halfwidth;
-    //sp->bar->anchor_rgn[2].y = y;
-
-    // Rectangle instead of triangle
-    sp->bar->anchor_rgn[3].x = sp->bar->anchor_rgn[2].x;
-    sp->bar->anchor_rgn[2].y = sp->bar->anchor_rgn[1].y;
-    sp->bar->anchor_rgn[3].y = sp->bar->anchor_rgn[0].y;
-
-    btn[0].x = btn[1].x = x - 5;
-    btn[2].x = x;
-    btn[0].y = y + halfwidth;
-    btn[1].y = y - halfwidth;
-    btn[2].y = y;
-    button_draw_with_shadows (btn, drawable, gg);
-    //button_draw_with_shadows(sp->bar->anchor_rgn, drawable, gg);
-
-/* calculate & draw offset_rgn */
-    y = sp->bar->bins[0].rect.y;
-    sp->bar->offset_rgn[0].x = sp->bar->offset_rgn[1].x = x - 5;
-    sp->bar->offset_rgn[2].x = x + GGOBI_SPLOT (sp)->max.x; // extend
-    sp->bar->offset_rgn[0].y = y + halfwidth;
-    sp->bar->offset_rgn[1].y = y - halfwidth;
-    //sp->bar->offset_rgn[2].y = y;
-
-    // Rectangle instead of triangle -- dfs
-    sp->bar->offset_rgn[3].x = sp->bar->offset_rgn[2].x;
-    sp->bar->offset_rgn[2].y = sp->bar->offset_rgn[1].y;
-    sp->bar->offset_rgn[3].y = sp->bar->offset_rgn[0].y;
-
-
-    btn[0].x = btn[1].x = x - 5;
-    btn[2].x = x;
-    btn[0].y = y + halfwidth;
-    btn[1].y = y - halfwidth;
-    btn[2].y = y;
-    button_draw_with_shadows (btn, drawable, gg);
-    //button_draw_with_shadows(sp->bar->offset_rgn, drawable, gg);
-  }
+  btn[0].x = btn[1].x = x - 5;
+  btn[2].x = x;
+  btn[0].y = y + halfwidth;
+  btn[1].y = y - halfwidth;
+  btn[2].y = y;
+  button_draw_with_shadows (btn, drawable, gg);
+  //button_draw_with_shadows(sp->bar->offset_rgn, drawable, gg);
 }
 
 void

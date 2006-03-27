@@ -62,11 +62,14 @@ symbol_table_populate (GGobiData * d)
 }
 
 void
-clusters_set (GGobiData * d, ggobid * gg)
+clusters_set (GGobiData * d)
 {
   gint i, j, k, m;
   gint n, nclusters;
-  colorschemed *scheme = gg->activeColorScheme;
+  colorschemed *scheme;
+
+  g_return_if_fail(GGOBI_IS_GGOBI(d->gg));
+  scheme = d->gg->activeColorScheme;
 
   nclusters = symbol_table_populate (d);
 

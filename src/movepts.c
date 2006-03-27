@@ -215,7 +215,7 @@ move_pt (gint id, gint x, gint y, splotd * sp, GGobiData * d, ggobid * gg)
   }
 
   /* and now forward again, all the way ... */
-  tform_to_world (d, gg);
+  tform_to_world(d);
   displays_tailpipe (FULL, gg);
 
   {

@@ -146,7 +146,7 @@ hide_cluster_cb (GtkToggleButton * btn, gpointer cbd)
     }
   }
 
-  clusters_set (d, gg);
+  clusters_set(d);
   cluster_table_labels_update (d, gg);
 
   displays_plot (NULL, FULL, gg);
@@ -183,24 +183,24 @@ include_hiddens (gboolean include, GGobiData * d, ggobid * gg)
       if (dd == d)
         continue;
       if (dd->rowIds && dd->idTable) {
-        rows_in_plot_set (dd, gg);
-        clusters_set (dd, gg);
+        rows_in_plot_set(dd);
+        clusters_set(d);
         cluster_table_labels_update (dd, gg);
         limits_set (dd, true, true, gg->lims_use_visible);
         vartable_limits_set (dd);
         vartable_stats_set (dd);
-        tform_to_world (dd, gg);
+        tform_to_world(dd);
       }
     }
   }
 
-  rows_in_plot_set (d, gg);
-  clusters_set (d, gg);
+  rows_in_plot_set(d);
+  clusters_set(d);
   cluster_table_labels_update (d, gg);
   limits_set (d, true, true, gg->lims_use_visible);
   vartable_limits_set (d);
   vartable_stats_set (d);
-  tform_to_world (d, gg);
+  tform_to_world(d);
 
   if (cpanel->pmode == TOUR1D)
     dsp->t1d.get_new_target = true;
@@ -327,7 +327,7 @@ cluster_symbol_cb (GtkWidget * w, GdkEventExpose * event, gpointer cbd)
                          (gpointer) gg, (gpointer) & rval);
 
   /* clusters_set reorders clusv, so it's bad news here */
-  /*clusters_set (d, gg); */
+  /*clusters_set; */
 
   displays_plot (NULL, FULL, gg);
 
@@ -425,7 +425,7 @@ update_cb (GtkWidget * w, ggobid * gg)
   GGobiData *d = datad_get_from_notebook (gg->cluster_ui.notebook, gg);
   splotd *sp = gg->current_splot;
 
-  rows_in_plot_set (d, gg);
+  rows_in_plot_set(d);
   if (GGOBI_IS_EXTENDED_SPLOT (sp)) {
     void (*f) (GGobiData *, splotd *, ggobid *);
     GGobiExtendedSPlotClass *klass;
@@ -436,7 +436,7 @@ update_cb (GtkWidget * w, ggobid * gg)
     }
   }
   //assign_points_to_bins(d, sp, gg);
-  clusters_set (d, gg);
+  clusters_set(d);
 
   cluster_table_labels_update (d, gg);
   displays_plot (NULL, FULL, gg);

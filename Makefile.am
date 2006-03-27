@@ -1,4 +1,4 @@
-SUBDIRS = libltdl src plugins po
+SUBDIRS = libltdl src plugins po doc/reference
 
 EXTRA_DIST = bootstrap CPLicense.txt
 
@@ -111,7 +111,7 @@ install-data-hook:
 uninstall-local:
 	rm -f $(DESTDIR)$(pkgconfigdir)/ggobi.pc
 
-DISTCHECK_CONFIGURE_FLAGS = --with-all-plugins
+DISTCHECK_CONFIGURE_FLAGS = --with-all-plugins --enable-gtk-doc
 
 # We add symlinks for developer convenience
 all-local: ggobi

@@ -60,13 +60,12 @@ addvar_pipeline_realloc (GGobiData * d)
 void
 tour_realloc_up (GGobiData *d, gint nc)
 {
-  g_return_if_fail(GGOBI_IS_GGOBI(d->gg));
-  ggobid *gg = d->gg;
-
   displayd *dsp;
   GList *l;
 
-  for (l=gg->displays; l; l=l->next) {
+  g_return_if_fail(GGOBI_IS_GGOBI(d->gg));
+
+  for (l=d->gg->displays; l; l=l->next) {
     GGobiExtendedDisplayClass *klass;
     dsp = (displayd *) l->data;
 
@@ -137,13 +136,7 @@ newvar_add_with_values (gdouble * vals, gint nvals, gchar * vname,
     return;
 
   d->ncols += 1;
-  if (d->ncols == 1) {          // lazily allocate datad
-    d->nrows = nvals;
-    pipeline_init (d, d->gg);
-  }
-  else {
-    addvar_pipeline_realloc (d);
-  }
+  addvar_pipeline_realloc (d);
 
   /* Create a new element in the vartable list iff we need
      to. Otherwise use the one in the current position. */
@@ -152,8 +145,8 @@ newvar_add_with_values (gdouble * vals, gint nvals, gchar * vname,
 
   vt = vartable_element_get (jvar, d);
   if (type == categorical)
-    vartable_element_categorical_init (vt, nlevels, level_names,
-                                       level_values, level_counts);
+    ggobi_data_set_col_levels(d, jvar, nlevels, level_names, level_values, level_counts);
+
   transform_values_init (vt);
 
   for (i = 0; i < d->nrows; i++) {
@@ -174,7 +167,7 @@ newvar_add_with_values (gdouble * vals, gint nvals, gchar * vname,
   limits_set_by_var (d, jvar, true, true, d->gg->lims_use_visible);
 
   /*-- run the data through the head of the pipeline --*/
-  tform_to_world_by_var (jvar, d, d->gg);
+  tform_to_world_by_var (jvar, d);
 
   ggobi_data_set_col_name(d, jvar, vname);
 
@@ -184,9 +177,8 @@ newvar_add_with_values (gdouble * vals, gint nvals, gchar * vname,
        is set.
 */
   /*-- emit variable_added signal --*/
-  //FIXME: send variable index instead of vartable
   g_signal_emit (G_OBJECT (d->gg),
-                 GGobiSignals[VARIABLE_ADDED_SIGNAL], 0, vt, d->ncols - 1, d);
+                 GGobiSignals[VARIABLE_ADDED_SIGNAL], 0, d->ncols - 1, d);
 }
 
 void
@@ -194,7 +186,6 @@ clone_vars (gint * cols, gint ncols, GGobiData * d)
 {
   gint i, k, n, jvar;
   gint d_ncols_prev = d->ncols;
-  vartabled *vt;
 
   g_return_if_fail(GGOBI_IS_GGOBI(d->gg));
 
@@ -227,11 +218,9 @@ clone_vars (gint * cols, gint ncols, GGobiData * d)
 
   for (k = 0; k < ncols; k++) {
     n = cols[k];
-    vt = vartable_element_get (n, d);
 
-    /*-- emit variable_added signal. Is n the correct index? --*/
     g_signal_emit (G_OBJECT (d->gg),
-                   GGobiSignals[VARIABLE_ADDED_SIGNAL], 0, vt, n, d);
+                   GGobiSignals[VARIABLE_ADDED_SIGNAL], 0, n, d);
   }
 
 }
@@ -271,7 +260,6 @@ delete_vars (gint * cols, gint ncols, GGobiData * d)
 {
   gint j;
   gint *keepers, nkeepers;
-  vartabled *vt;
 
   if (!GGOBI_IS_GGOBI(d->gg))
     return false;
@@ -309,10 +297,9 @@ delete_vars (gint * cols, gint ncols, GGobiData * d)
       GtkTreeModel *model;
       GtkTreeIter iter;
       GtkTreePath *path = gtk_tree_path_new_from_indices (cols[j], -1);
-      vt = vartable_element_get (cols[j], d);
       model =
         gtk_tree_view_get_model (GTK_TREE_VIEW
-                                 (d->vartable_tree_view[vt->vartype]));
+                                 (d->vartable_tree_view[ggobi_data_get_col_type(d, cols[j])]));
       gtk_tree_model_get_iter (model, &iter, path);
       gtk_list_store_remove (GTK_LIST_STORE (model), &iter);
       gtk_tree_path_free (path);
@@ -354,7 +341,7 @@ delete_vars (gint * cols, gint ncols, GGobiData * d)
                  GGobiSignals[VARIABLE_LIST_CHANGED_SIGNAL], 0, d);
 
   /*-- run the first part of the pipeline  --*/
-  tform_to_world (d, d->gg);
+  tform_to_world(d);
 
 
   g_free (keepers);

@@ -21,39 +21,36 @@
 #include "vars.h"
 #include "externs.h"
 
-gfloat mean_largest_dist (gfloat **, gint *, gint, gfloat *, gfloat *,
-                          GGobiData *, ggobid *);
-gfloat median_largest_dist (gfloat **, gint *, gint, gfloat *, gfloat *,
-                            GGobiData *, ggobid *);
+gfloat mean_largest_dist  (gfloat **, gint *, gint, gfloat *, gfloat *, GGobiData *);
+gfloat median_largest_dist(gfloat **, gint *, gint, gfloat *, gfloat *, GGobiData *);
 
 /* ------------ Dynamic allocation, freeing section --------- */
 
+
 void
-pipeline_init (GGobiData * d, ggobid * gg)
+pipeline_init (GGobiData * d)
 {
   gint i;
-
+  
+  g_return_if_fail(d->gg);
+  
   /*-- a handful of allocations and initializations --*/
-  pipeline_arrays_alloc (d, gg);
+  pipeline_arrays_alloc (d);
   for (i = 0; i < d->nrows; i++) {
     d->sampled.els[i] = true;
     d->excluded.els[i] = false;
   }
   /*-- maybe some points are tagged "hidden" in the data --*/
-  rows_in_plot_set (d, gg);
+  rows_in_plot_set(d);
 
   /*-- some initializations --*/
-  edgeedit_init (gg);
-  brush_init (d, gg);
-
+  edgeedit_init (d->gg);
+  brush_init (d);
 
   /*-- run the first half of the pipeline --*/
   arrayf_copy (&d->raw, &d->tform);
 
-  limits_set (d, true, true, gg->lims_use_visible);
-
-  vartable_limits_set (d);  /*-- does this do something here?  --*/
-  vartable_stats_set (d);  /*-- does this do something here?  --*/
+  limits_set (d, true, true, d->gg->lims_use_visible);
 
   /*
    * If there are missings, they've been initialized with a value
@@ -66,21 +63,21 @@ pipeline_init (GGobiData * d, ggobid * gg)
     gint *vars = (gint *) g_malloc(d->ncols * sizeof(gint));
     for (j = 0; j < d->ncols; j++) vars[j] = j;
 
-    impute_fixed (IMP_BELOW, 15.0, d->ncols, vars, d, gg);
-    limits_set (d, true, true, gg->lims_use_visible);
+    impute_fixed (IMP_BELOW, 15.0, d->ncols, vars, d);
+    limits_set (d, true, true, d->gg->lims_use_visible);
     vartable_limits_set (d);
     vartable_stats_set (d);
     g_free(vars);
   }
 
-  tform_to_world (d, gg);
+  tform_to_world(d);
 }
 
 /*
  * Dynamically free arrays used in data pipeline.
 */
 void
-pipeline_arrays_free (GGobiData * d, ggobid * gg)
+pipeline_arrays_free (GGobiData * d)
 {
   arrayf_free (&d->tform, 0, 0);
 
@@ -99,12 +96,12 @@ pipeline_arrays_free (GGobiData * d, ggobid * gg)
  * Dynamically allocate arrays.
 */
 void
-pipeline_arrays_alloc (GGobiData * d, ggobid * gg)
+pipeline_arrays_alloc (GGobiData * d)
 {
   gint nc = d->ncols, nr = d->nrows;
 
   if (d->tform.vals != NULL)
-    pipeline_arrays_free (d, gg);
+    pipeline_arrays_free (d);
 
   arrayf_alloc (&d->tform, nr, nc);
 
@@ -191,7 +188,7 @@ icompare (gint * x1, gint * x2)
 
 gfloat
 median_largest_dist (gfloat ** vals, gint * cols, gint ncols,
-                     gfloat * min, gfloat * max, GGobiData * d, ggobid * gg)
+                     gfloat * min, gfloat * max, GGobiData * d)
 {
 /*
  * Find the minimum and maximum values of each variable,
@@ -244,7 +241,7 @@ median_largest_dist (gfloat ** vals, gint * cols, gint ncols,
 
 gfloat
 mean_largest_dist (gfloat ** vals, gint * cols, gint ncols,
-                   gfloat * min, gfloat * max, GGobiData * d, ggobid * gg)
+                   gfloat * min, gfloat * max, GGobiData * d)
 {
 /*
  * Find the minimum and maximum values of each variable,
@@ -289,12 +286,11 @@ mean_largest_dist (gfloat ** vals, gint * cols, gint ncols,
 }
 
 void
-tform_to_world_by_var (gint j, GGobiData * d, ggobid * gg)
+tform_to_world_by_var (gint j, GGobiData * d)
 {
   gint i, m;
   greal max, min, range, ftmp;
   gfloat precis = PRECISION1;
-  vartabled *vt = vartable_element_get (j, d);
 
   pipeline_arrays_check_dimensions (d);  /*-- realloc as necessary --*/
 
@@ -303,8 +299,8 @@ tform_to_world_by_var (gint j, GGobiData * d, ggobid * gg)
  * scaling, but we do want for display, so some more thought
  * is needed, or maybe another set of limits.
 */
-  max = (greal) vt->lim.max;
-  min = (greal) vt->lim.min;
+  max = ggobi_data_get_col_max(d, j);
+  min = ggobi_data_get_col_min(d, j);
   range = max - min;
 
   for (i = 0; i < d->nrows_in_plot; i++) {
@@ -318,15 +314,12 @@ tform_to_world_by_var (gint j, GGobiData * d, ggobid * gg)
 }
 
 void
-tform_to_world (GGobiData * d, ggobid * gg)
+tform_to_world (GGobiData * d)
 {
-/*
- * Take tform.vals[][], one column at a time, and generate world[]
-*/
   gint j;
 
   for (j = 0; j < d->ncols; j++)
-    tform_to_world_by_var (j, d, gg);
+    tform_to_world_by_var (j, d);
 }
 
 /*-------------------------------------------------------------------------*/
@@ -343,10 +336,9 @@ tform_to_world (GGobiData * d, ggobid * gg)
 */
 
 void
-rows_in_plot_set (GGobiData * d, ggobid * gg)
+rows_in_plot_set (GGobiData * d)
 {
   gint i;
-  GGobiDataClass *klass;
   gint nprev = d->nrows_in_plot;
 
   d->nrows_in_plot = 0;
@@ -355,10 +347,9 @@ rows_in_plot_set (GGobiData * d, ggobid * gg)
     if (d->sampled.els[i] && !d->excluded.els[i])
       d->rows_in_plot.els[d->nrows_in_plot++] = i;
 
-  klass = GGOBI_DATA_GET_CLASS (d);
-  g_signal_emit_by_name (G_OBJECT (d), "rows-in-plot-changed", 0, nprev, -1, gg); /* the argument shown with -1 has no current use */
+  g_signal_emit_by_name (G_OBJECT (d), "rows-in-plot-changed", 0, nprev, -1, d->gg); /* the argument shown with -1 has no current use */
 
-  return;                       /* (nprev == d->nrows_in_plot); */
+  return;
 }
 
 /*-------------------------------------------------------------------------*/
@@ -372,13 +363,12 @@ world_to_raw_by_var (gint pt, gint j, displayd *display, GGobiData *d, ggobid *g
   gfloat precis = PRECISION1;
   gfloat ftmp, rdiff;
   gfloat x;
-  vartabled *vt = vartable_element_get (j, d);
 
-  rdiff = vt->lim.max - vt->lim.min;
+  rdiff = ggobi_data_get_col_range(d, j);
 
   ftmp = (gfloat) (d->world.vals[pt][j] - d->jitdata.vals[pt][j]) / precis;
   x = (ftmp + 1.0) * .5 * rdiff;
-  x += vt->lim.min;
+  x += ggobi_data_get_col_min(d, j);
 
   d->raw.vals[pt][j] = d->tform.vals[pt][j] = x;
 }

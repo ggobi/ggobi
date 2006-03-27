@@ -311,34 +311,3 @@ identify_label_fetch (gint k, cpaneld * cpanel, GGobiData * d, ggobid * gg)
   return lbl;
 }
 
-/*  Recenter the data using the current sticky point */
-void
-recenter_data (gint i, GGobiData * d, ggobid * gg)
-{
-  vartabled *vt;
-  greal x;
-  gint j;
-
-  g_assert (d->tform.nrows == d->nrows);
-  g_assert (d->tform.ncols == d->ncols);
-
-  for (j = 0; j < d->ncols; j++) {
-    vt = vartable_element_get (j, d);
-    if (i >= 0) {
-      x = (vt->lim_tform.max - vt->lim_tform.min) / 2;
-      vt->lim_specified_p = true;
-      vt->lim_specified_tform.min = d->tform.vals[i][j] - x;
-      vt->lim_specified_tform.max = d->tform.vals[i][j] + x;
-    }
-    else {
-     /*-- if no point was specified, recenter using defaults --*/
-      vt->lim_specified_p = false;
-    }
-  }
-  limits_set (d, false, true, gg->lims_use_visible);
-  vartable_limits_set (d);
-  vartable_stats_set (d);
-
-  tform_to_world (d, gg);
-  displays_tailpipe (FULL, gg);
-}

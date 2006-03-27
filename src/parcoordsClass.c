@@ -546,7 +546,6 @@ splotScreenToTform (cpaneld * cpanel, splotd * sp, icoords * scr,
   displayd *display = (displayd *) sp->displayptr;
   GGobiData *d = display->d;
   gfloat scale_x, scale_y;
-  vartabled *vt;
 
   scale_x = sp->scale.x;
   scale_y = sp->scale.y;
@@ -569,9 +568,8 @@ splotScreenToTform (cpaneld * cpanel, splotd * sp, icoords * scr,
 
   if (sp->p1dvar != -1) {
 
-    vt = vartable_element_get (sp->p1dvar, d);
-    max = vt->lim.max;
-    min = vt->lim.min;
+    max = ggobi_data_get_col_max(d, sp->p1dvar);
+    min = ggobi_data_get_col_min(d, sp->p1dvar);
     rdiff = max - min;
 
     if (display->p1d_orientation == HORIZONTAL) {

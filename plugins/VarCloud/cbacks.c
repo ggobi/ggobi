@@ -80,7 +80,7 @@ launch_varcloud_cb (GtkWidget *w, PluginInstance *inst)
     }
       
   datad_record_ids_set(e, recordids, false);
-  pipeline_init(e, gg);
+  pipeline_init(e);
 
   edges_alloc (npairs, e);
   e->edge.sym_endpoints = (SymbolicEndpoints *)

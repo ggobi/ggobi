@@ -340,7 +340,7 @@ monitor_new_plot(GtkWidget *w, splotd *sp, ggobid *gg, GtkWidget *sheet)
 void 
 add_ggobi_data(GGobiData *data, GtkTreeModel *model)
 {
-  gint i, j, k, level;
+  gint i, j, k, level=0;
   gboolean level_ok;
   const gfloat **raw;
   vartabled *vt;
@@ -412,7 +412,7 @@ void
 update_cell(gint row, gint column, double value, GGobiData *data)
 {
     data->raw.vals[row][column] = data->tform.vals[row][column] = value;
-    tform_to_world (data, data->gg);
+    tform_to_world (data);
     displays_tailpipe (FULL, data->gg); 
 }
 

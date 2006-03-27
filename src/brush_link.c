@@ -37,6 +37,7 @@ symbol_link_by_id (gboolean persistentp, gint k, GGobiData * sd, ggobid * gg)
 
   /*-- k is the row number in source_d --*/
 
+  //g_return_val_if_fail(sd->rowIds, false);
   if (sd->rowIds) {
     gpointer ptr;
     if (sd->rowIds[k]) {
@@ -271,29 +272,15 @@ brush_link_by_var (gint jlinkby, vector_b * levelv,
 gboolean
 build_symbol_vectors_by_var (cpaneld * cpanel, GGobiData * d, ggobid * gg)
 {
-  gint i, m, level_value, level_value_max;
+  gint i, m, j, level_value, level_value_max;
   vector_b levelv;
-  gint jlinkby;
-  /*-- for other datad's --*/
   GSList *l;
-  GGobiData *dd;
-  gboolean changed = false;
 
-  if (d->linkvar_vt == NULL)
+  if (!d->linkvar)
     return false;
 
-  jlinkby = g_slist_index (d->vartable, d->linkvar_vt);
-
-/*
- * I may not want to allocate and free this guy every time the
- * brush moves.
-*/
-  level_value_max = d->linkvar_vt->nlevels;
-  for (i = 0; i < d->linkvar_vt->nlevels; i++) {
-    level_value = d->linkvar_vt->level_values[i];
-    if (level_value > level_value_max)
-      level_value_max = level_value;
-  }
+  j = ggobi_data_get_col_index_by_name(d, d->linkvar);
+  level_value_max = (gint) ggobi_data_get_col_max(d, j);
 
   vectorb_init_null (&levelv);
   vectorb_alloc (&levelv, level_value_max + 1);
@@ -303,31 +290,28 @@ build_symbol_vectors_by_var (cpaneld * cpanel, GGobiData * d, ggobid * gg)
   for (m = 0; m < d->nrows_in_plot; m++) {
     i = d->rows_in_plot.els[m];
     if (d->pts_under_brush.els[i]) {
-      level_value = (gint) d->raw.vals[i][jlinkby];
+      level_value = (gint) d->raw.vals[i][j];
       levelv.els[level_value] = true;
     }
   }
 
-
   /*-- first do this d --*/
-  brush_link_by_var (jlinkby, &levelv, cpanel, d, gg);
+  brush_link_by_var (j, &levelv, cpanel, d, gg);
 
   /*-- now for the rest of them --*/
   for (l = gg->d; l; l = l->next) {
-    dd = l->data;
-    if (dd != d) {
-      /* If the linking variable exists in the other datad ... */
-      jlinkby = vartable_index_get_by_name(d->linkvar_vt->collab, dd);
-      if (jlinkby != -1) {
-        brush_link_by_var (jlinkby, &levelv, cpanel, dd, gg);
-      }
+    GGobiData *dd = l->data;
+    if (dd == d) continue;
+
+    j = ggobi_data_get_col_index_by_name(dd, d->linkvar);
+    if (j != -1) {
+      brush_link_by_var (j, &levelv, cpanel, dd, gg);
     }
   }
 
   vectorb_free (&levelv);
 
-  changed = true;
-  return (changed);
+  return (true);
 }
 
 
@@ -336,39 +320,35 @@ build_symbol_vectors_by_var (cpaneld * cpanel, GGobiData * d, ggobid * gg)
 /*********************************************************************/
 
 enum
-{ LINKBYLIST_NAME, LINKBYLIST_VT, LINKBYLIST_NCOLS };
+{ LINKBYLIST_NAME, LINKBYLIST_NCOLS };
 
 void linkby_notebook_subwindow_add (GGobiData * d, GtkWidget * notebook,
                                     ggobid *);
 
-//FIXME: replace vt with index (see callback), also need is_categorical_variable
 void
-varlist_append (GtkListStore * list, vartabled * vt)
+varlist_append (GtkListStore * list, GGobiData *d, gchar* name)
 {
-  gchar *row;
   GtkTreeIter iter;
+  guint j = ggobi_data_get_col_index_by_name(d, name);
+  
+  if(ggobi_data_get_col_type(d, j) != categorical)
+    return;
 
-  if (vt && vt->vartype == categorical) {
-    gtk_list_store_append (list, &iter);
-    row = g_strdup (vt->collab);
-    gtk_list_store_set (list, &iter, LINKBYLIST_NAME, row, LINKBYLIST_VT, vt,
-                        -1);
-    g_free (row);
-  }
+  gtk_list_store_append (list, &iter);
+  gtk_list_store_set (list, &iter, LINKBYLIST_NAME, name, -1);
 }
+
 void
 varlist_populate (GtkListStore * list, GGobiData * d)
 {
   gint j;
   GtkTreeIter first;
-  vartabled *vt;
 
   gtk_list_store_append (list, &first);
   gtk_list_store_set (list, &first, LINKBYLIST_NAME, "<i>Case ID</i>", -1);
 
   for (j = 0; j < d->ncols; j++) {
-    vt = vartable_element_get (j, d);
-    varlist_append (list, vt);
+    varlist_append(list, d, ggobi_data_get_col_name(d, j));
   }
 }
 
@@ -445,13 +425,14 @@ linking_method_set_cb (GtkTreeSelection * treesel, ggobid * gg)
 
   if (row <= 0) {
     gg->linkby_cv = false;
+    d->linkvar = NULL;
     return;                     /* link by case id; done */
   }
   else {
-    vartabled *vt;
-    gtk_tree_model_get (model, &iter, LINKBYLIST_VT, &vt, -1);
+    gchar* name;
+    gtk_tree_model_get (model, &iter, LINKBYLIST_NAME, &name, -1);
     gg->linkby_cv = true;
-    d->linkvar_vt = vt;
+    d->linkvar = name;
   }
 }
 
@@ -482,12 +463,13 @@ linkby_notebook_varchanged_cb (ggobid * gg, GGobiData * data,
 }
 
 void
-linkby_notebook_varadded_cb (ggobid * gg, vartabled * vt, gint which,
-                             GGobiData * data, GtkNotebook * notebook)
+linkby_notebook_varadded_cb (ggobid * gg, gint which,
+                             GGobiData * d, GtkNotebook * notebook)
 {
-  GtkListStore *model = list_from_data (gg, data, notebook);
+  GtkListStore *model = list_from_data (gg, d, notebook);
+  
   if (model)
-    varlist_append (model, vt);
+    varlist_append (model, d, ggobi_data_get_col_name(d, which));
 }
 
 void
@@ -570,7 +552,6 @@ GtkWidget *
 create_linkby_notebook (GtkWidget * box, ggobid * gg)
 {
   GtkWidget *notebook;
-  //gint nd = g_slist_length (gg->d);
   GSList *l;
   GGobiData *d;
 
@@ -590,7 +571,7 @@ create_linkby_notebook (GtkWidget * box, ggobid * gg)
 
   for (l = gg->d; l; l = l->next) {
     d = (GGobiData *) l->data;
-    if (g_slist_length (d->vartable)) {
+    if (d->ncols) {
       linkby_notebook_subwindow_add (d, notebook, gg);
     }
   }

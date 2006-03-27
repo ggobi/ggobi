@@ -420,7 +420,6 @@ barchartScreenToTform (cpaneld * cpanel, splotd * sp, icoords * scr,
   displayd *display = (displayd *) sp->displayptr;
   GGobiData *d = display->d;
   gfloat scale_x, scale_y;
-  vartabled *vt;
 
   scale_x = sp->scale.x;
   scale_y = sp->scale.y;
@@ -448,9 +447,8 @@ barchartScreenToTform (cpaneld * cpanel, splotd * sp, icoords * scr,
     /* Sheesh, I haven't even decided what I want the pmode to be */
   case EXTENDED_DISPLAY_PMODE:
   case DEFAULT_PMODE:
-    vt = vartable_element_get (sp->p1dvar, d);
-    max = vt->lim.max;
-    min = vt->lim.min;
+    max = ggobi_data_get_col_max(d, sp->p1dvar);
+    min = ggobi_data_get_col_min(d, sp->p1dvar);
     rdiff = max - min;
 
     if (display->p1d_orientation == HORIZONTAL) {
@@ -527,7 +525,6 @@ barchart_identify_cues_draw (gboolean nearest_p, gint k, splotd * rawsp,
   gchar *string;
   icoords mousepos = rawsp->mousepos;
   colorschemed *scheme = gg->activeColorScheme;
-  gint level;
   gint j;
 
   nbins = sp->bar->nbins;
@@ -554,35 +551,16 @@ barchart_identify_cues_draw (gboolean nearest_p, gint k, splotd * rawsp,
                                   sp->bar->bins[i - 1].count == 1 ? "" : "s",
                                   sp->bar->breaks[i - 1] + sp->bar->offset,
                                   sp->bar->breaks[i] + sp->bar->offset);
-      }
-      else {
-        gchar *levelName;
-        vartabled *var;
-        var = (vartabled *) g_slist_nth_data (rawsp->displayptr->d->vartable,
-                                              rawsp->p1dvar);
-/* dfs */
+      } else {
+        gchar *level;
         j = i - 1;
-        level = checkLevelValue (var, (gdouble) sp->bar->bins[j].value);
+        level = ggobi_data_get_col_level_name(rawsp->displayptr->d, rawsp->p1dvar, sp->bar->bins[j].value);
 
-        if (level == -1) {
-          string = g_strdup_printf ("%ld point%s missing",
-                                    sp->bar->bins[j].count,
-                                    sp->bar->bins[j].count == 1 ? "" : "s");
-        }
-        else {
-          levelName = var->level_names[level];
-          string = g_strdup_printf ("%ld point%s in %s",
+        string = g_strdup_printf ("%ld point%s in %s",
                                     sp->bar->bins[j].count,
                                     sp->bar->bins[j].count == 1 ? "" : "s",
-                                    levelName);
-        }
-/* --- */
-#ifdef PREV
-        levelName = var->level_names[i - 1];
-        sprintf (string, "%ld point%s in %s",
-                 sp->bar->bins[i - 1].count,
-                 sp->bar->bins[i - 1].count == 1 ? "" : "s", levelName);
-#endif
+                                    level);
+
       }
       gdk_draw_rectangle (drawable, gg->plot_GC, FALSE,
                           sp->bar->bins[i - 1].rect.x,

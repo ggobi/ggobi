@@ -38,6 +38,8 @@ record_add (eeMode mode, gint a, gint b, gchar * lbl, gchar * id,
   vartabled *vt;
   gboolean found_missings = false;
 
+  g_return_if_fail(d->gg == e->gg);
+
   /*-- eventually check whether a->b already exists before adding --*/
   if (mode == ADDING_EDGES) {
     g_assert (e->edge.n == e->nrows);
@@ -65,37 +67,21 @@ record_add (eeMode mode, gint a, gint b, gchar * lbl, gchar * id,
   if (dtarget->ncols) {
     raw = (greal *) g_malloc (dtarget->ncols * sizeof (greal));
     for (j = 0; j < dtarget->ncols; j++) {
-      vt = vartable_element_get (j, dtarget);
       if (strcmp (vals[j], "NA") == 0) {  /*-- got a missing --*/
         raw[j] = (greal) 0.0;  /*-- or what? --*/
         found_missings = true;
       }
       else {
         x = (greal) atof (vals[j]);
-        if (vt->vartype == categorical) {
-          /* Loop over levels, and add to the one that is closest to x.
-           * Also, increment vt->level_counts[level] */
-          gint k, level = 0, dist, ddist = 0;
-          for (k = 0; k < vt->nlevels; k++) {
-            dist = fabs ((greal) vt->level_values[k] - x);
-            if (k == 0)
-              ddist = dist;     /* initialize ddist */
-            else {
-              if (dist < ddist) {
-                level = k;
-                ddist = dist;
-              }
-            }
-          }
-          raw[j] = (greal) vt->level_values[level];
-          vt->level_counts[level]++;
+        if (ggobi_data_get_col_type(dtarget, j) == categorical) {
+          raw[j] = ggobi_data_get_col_level_value_closest(dtarget, j, x);
 
+          
           /* then update the table -- ugh -- no event for this yet.  I
              should make the expose event repopulate the table ... and
              I should update the table whenever any cases are added,
              categorical or not, come to think of it.  nNAs could
              change, as well as Any of the real variable stats.
-           */
           {
             if (d->vartable_tree_view[categorical] != NULL) {
               GtkTreeIter iter;
@@ -104,7 +90,7 @@ record_add (eeMode mode, gint a, gint b, gchar * lbl, gchar * id,
 
               vartable_iter_from_varno (j, d, &model, &iter);
               path = gtk_tree_model_get_path (model, &iter);
-              gtk_tree_path_append_index (path, level);
+              gtk_tree_path_append_index (path, raw[j]);
               gtk_tree_model_get_iter (model, &iter, path);
               gtk_tree_path_free (path);
               gtk_list_store_set (GTK_LIST_STORE (model), &iter,
@@ -112,6 +98,7 @@ record_add (eeMode mode, gint a, gint b, gchar * lbl, gchar * id,
                                   -1);
             }
           }
+           */
         }
         else
           raw[j] = x;
@@ -151,13 +138,13 @@ record_add (eeMode mode, gint a, gint b, gchar * lbl, gchar * id,
    * Resetting rows_in_plot causes a rows_in_plot_changed
    * signal to be emitted, and the tour responds to that.
    */
-  rows_in_plot_set (dtarget, gg);
+  rows_in_plot_set(dtarget);
 
   /*-- allocate and initialize brushing arrays --*/
-  br_glyph_ids_add (dtarget, gg);
+  br_glyph_ids_add (dtarget);
   /*-- this is adding the brushing color when it should use the color
     of the points, really --*/
-  br_color_ids_add (dtarget, gg);
+  br_color_ids_add (dtarget);
   /* A default color was assigned during the reallocation; override it
    * only if adding edges */
   if (mode == ADDING_EDGES) {
@@ -166,7 +153,7 @@ record_add (eeMode mode, gint a, gint b, gchar * lbl, gchar * id,
   }
   br_hidden_alloc (dtarget);
   vectorb_realloc (&dtarget->pts_under_brush, dtarget->nrows);
-  clusters_set (dtarget, gg);
+  clusters_set(dtarget);
 
   if (found_missings) {
     arrays_add_rows (&dtarget->missing, dtarget->nrows);
@@ -182,7 +169,7 @@ record_add (eeMode mode, gint a, gint b, gchar * lbl, gchar * id,
     for (j = 0; j < dtarget->ncols; j++) {
       dtarget->raw.vals[dtarget->nrows - 1][j] =
         dtarget->tform.vals[dtarget->nrows - 1][j] = raw[j];
-      tform_to_world_by_var (j, dtarget, gg);
+      tform_to_world_by_var (j, dtarget);
     }
   }
 
@@ -570,13 +557,12 @@ pt_world_to_raw_by_var (gint j, greal * world, greal * raw, GGobiData * d)
   gfloat precis = PRECISION1;
   gfloat ftmp, rdiff;
   gfloat x;
-  vartabled *vt = vartable_element_get (j, d);
 
-  rdiff = vt->lim.max - vt->lim.min;
+  rdiff = ggobi_data_get_col_range(d, j);
 
   ftmp = (gfloat) (world[j]) / precis;
   x = (ftmp + 1.0) * .5 * rdiff;
-  x += vt->lim.min;
+  x += ggobi_data_get_col_min(d, j);
 
   raw[j] = x;
 }
@@ -605,7 +591,6 @@ fetch_default_record_values (gchar ** vals, GGobiData * dtarget,
 {
   gint j;
   gcoords eps;
-  vartabled *vt;
 
   if (dtarget == display->d) {
     /*-- use the screen position --*/
@@ -613,24 +598,8 @@ fetch_default_record_values (gchar ** vals, GGobiData * dtarget,
     pt_screen_to_raw (&gg->current_splot->mousepos, -1, true, true, /* no id, both horiz and vert are true */
                       raw, &eps, dtarget, gg->current_splot, gg);
     for (j = 0; j < dtarget->ncols; j++) {
-      vt = vartable_element_get (j, dtarget);
-      if (vt->vartype == categorical) {
-        /* Loop over levels, and choose the one that is closest to x. */
-        gint k, level = 0, dist, ddist = 0;
-        for (k = 0; k < vt->nlevels; k++) {
-          dist = fabs ((greal) vt->level_values[k] - raw[j]);
-          if (k == 0)
-            ddist = dist;       /* initialize ddist */
-          else {
-            if (dist < ddist) {
-              level = k;
-              ddist = dist;
-            }
-          }
-        }
-        vals[j] = g_strdup_printf ("%d", vt->level_values[level]);
-        /*vals[j] = g_strdup_printf ("%d", (gint) floor(raw[j]+.5)); */
-      }
+      if (ggobi_data_get_col_type(dtarget, j) == categorical) 
+        vals[j] = g_strdup_printf ("%d", ggobi_data_get_col_level_value_closest(dtarget, j, raw[j]));
       else
         vals[j] = g_strdup_printf ("%g", raw[j]);
     }

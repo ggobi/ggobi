@@ -585,7 +585,7 @@ void tour2d_snap(ggobid *gg)
 
   for (j=0; j<d->ncols; j++) {
     vt = vartable_element_get (j, d);
-    rnge = vt->lim.max - vt->lim.min;
+    rnge = ggobi_data_get_col_range(d, j);
     fprintf(stdout,"%f %f %f %f \n", dsp->t2d.F.vals[0][j], 
       dsp->t2d.F.vals[1][j],dsp->t2d.F.vals[0][j]/rnge*sp->scale.x,
       dsp->t2d.F.vals[1][j]/rnge*sp->scale.y);
@@ -607,18 +607,14 @@ void tour2d_write_video(ggobid *gg)
   splotd *sp = gg->current_splot;
   GGobiData *d = dsp->d;
   gint j;
-  vartabled *vt;
   gdouble rnge;
 
   /*  g_printerr("%f %f\n",sp->scale.x, sp->scale.y);*/
   for (j=0; j<d->ncols; j++) {
-    vt = vartable_element_get (j, d);
-    rnge = vt->lim.max - vt->lim.min;
+    rnge = ggobi_data_get_col_range(d, j);
     fprintf(stdout,"%f %f %f %f\n", dsp->t2d.F.vals[0][j], 
       dsp->t2d.F.vals[1][j], dsp->t2d.F.vals[0][j]/rnge*sp->scale.x,
       dsp->t2d.F.vals[1][j]/rnge*sp->scale.y);
-    /*    g_printerr("%f %f %f %f\n", dsp->t2d.F.vals[0][j], dsp->t2d.F.vals[1][j],
-	  vt->lim.min, vt->lim.max);*/
   }
 }
 

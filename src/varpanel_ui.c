@@ -470,7 +470,7 @@ varpanel_widgets_add (gint nc, GGobiData * d, ggobid * gg)
 /*-------------------------------------------------------------------------*/
 
 void
-varpanel_addvar_cb (ggobid * gg, vartabled * vt, gint which,
+varpanel_addvar_cb (ggobid * gg, gint which,
                     GGobiData * d, void *p)
 {
   /*-- variable toggle buttons and circles --*/

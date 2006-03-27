@@ -185,7 +185,6 @@ limits_display_set_by_var (GGobiData * d, gint j, gboolean visible_only)
   max = -G_MAXFLOAT;
 
   if (visible_only) {
-
     for (m = 0; m < d->nrows_in_plot; m++) {
       i = d->rows_in_plot.els[m];
       /*-- lim_display and stats: only use non-missing cases --*/
@@ -278,4 +277,33 @@ limits_set_by_var (GGobiData * d, gint j, gboolean do_raw, gboolean do_tform,
     limits_tform_set_by_var (d, j, visible_only);
 
   limits_set_from_vartable (vt);
+}
+
+/*  Recenter the data using the current sticky point */
+void
+recenter_data (gint i, GGobiData * d, ggobid * gg)
+{
+  vartabled *vt;
+  greal x;
+  gint j;
+
+  for (j = 0; j < d->ncols; j++) {
+    vt = vartable_element_get (j, d);
+    if (i >= 0) {
+      x = (vt->lim_tform.max - vt->lim_tform.min) / 2;
+      vt->lim_specified_p = true;
+      vt->lim_specified_tform.min = d->tform.vals[i][j] - x;
+      vt->lim_specified_tform.max = d->tform.vals[i][j] + x;
+    }
+    else {
+     /*-- if no point was specified, recenter using defaults --*/
+      vt->lim_specified_p = false;
+    }
+  }
+  limits_set (d, false, true, gg->lims_use_visible);
+  vartable_limits_set (d);
+  vartable_stats_set (d);
+
+  tform_to_world(d);
+  displays_tailpipe (FULL, gg);
 }

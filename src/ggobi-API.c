@@ -42,7 +42,6 @@ extern "C"
   void GGOBI (splot_release) (splotd * sp, displayd * display, ggobid * gg);
   void GGOBI (data_release) (GGobiData *, ggobid * gg);
   void GGOBI (vartable_free) (GGobiData *, ggobid * gg);
-  void GGOBI (vardatum_free) (vartabled * var, ggobid * gg);
 #ifdef __cplusplus
 }
 #endif
@@ -260,7 +259,8 @@ GGOBI (setData) (gdouble * values, gchar ** rownames, gchar ** colnames,
   if (values && d->vartable) {
     /* the person who created the datad is taking care of populating it. */
     for (j = 0; j < nc; j++) {
-      varname = (colnames != NULL && colnames[j] != NULL) ? colnames[j] : NULL;
+      varname = (colnames) ? colnames[j] : NULL;
+      g_debug("Column name %s", colnames[j]);
       ggobi_data_set_col_name(d, j, varname);
 
       for (i = 0; i < nr; i++) {
@@ -1222,7 +1222,7 @@ void GGOBI (update_data) (GGobiData * d, ggobid * gg)
   vartable_limits_set (d);
   vartable_stats_set (d);
 
-  tform_to_world (d, gg);
+  tform_to_world(d);
 }
 
 gint GGOBI (removeVariable) (gchar * name, GGobiData * d, ggobid * gg)
@@ -1523,29 +1523,6 @@ void
 GGobi_setSessionOptions (GGobiOptions * opts)
 {
   sessionOptions = opts;
-}
-
-const gchar *
-GGobi_getLevelName (vartabled * vt, double value)
-{
-  int which = 0;
-  for (which = 0; which < vt->nlevels; which++) {
-    if (vt->level_values[which] == (int) value)
-      return (vt->level_names[which]);
-  }
-
-  return (NULL);
-}
-
-
-void
-GGobi_setDataName (const char *const name, GGobiData * d)
-{
-  if (d->name)
-    g_free ((gchar *) d->name);
-
-  d->name = g_strdup (name);
-  /* Update the different labels. */
 }
 
 

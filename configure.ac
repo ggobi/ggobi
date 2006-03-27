@@ -181,6 +181,10 @@ PKG_CHECK_MODULES(GTK, [gtk+-2.0 >= 2.6.0])
 AC_SUBST(GTK_CFLAGS)
 AC_SUBST(GTK_LIBS)
 
+# Stuff for gtk doc
+GTK_DOC_CHECK(1.4)
+AC_CONFIG_MACRO_DIR(m4)
+
 echo "Setting gtk flags: cflags=$GTK_CFLAGS, libs=$GTK_LIBS"
 
 PKG_CHECK_MODULES(LIBXML, [libxml-2.0])
@@ -204,7 +208,7 @@ AM_CONDITIONAL(OS_WIN32, test "$os_win32" = "yes")
 
  dnl Process the different .in files, substituting the values computed here in the configuration
  dnl script for the corresponding @variable@ in these files.
-AC_CONFIG_FILES(Makefile src/Makefile plugins/Makefile ggobi.pc ggobi-system.pc po/Makefile.in)
+AC_CONFIG_FILES(Makefile src/Makefile plugins/Makefile ggobi.pc ggobi-system.pc po/Makefile.in )
 AC_OUTPUT
 
 echo "*******************************"

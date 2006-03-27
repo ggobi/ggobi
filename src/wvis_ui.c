@@ -108,7 +108,7 @@ wvis_create_variable_notebook (GtkWidget *box, GtkSelectionMode mode,
   /*-- listen for variable_added and _list_changed events on main_window --*/
   /*-- ... list_changed would be adequate --*/
   g_signal_connect (G_OBJECT (gg),
-    "variable_added",
+    "varcircle_label_set",
      G_CALLBACK (variable_notebook_varchange_cb),
      GTK_OBJECT (notebook));
   g_signal_connect (G_OBJECT (gg),
@@ -245,7 +245,7 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, ggobid *gg)
 
       if (gg->wvis.update_method == WVIS_UPDATE_CONTINUOUSLY) {
         record_colors_reset (selected_var, d, gg);
-        clusters_set (d, gg);
+        clusters_set(d);
         displays_plot (NULL, FULL, gg);
       }
     }
@@ -316,7 +316,7 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg)
 
   if (selected_var >= 0 && selected_var <= d->ncols) {
     record_colors_reset (selected_var, d, gg);
-    clusters_set (d, gg);
+    clusters_set(d);
     displays_plot (NULL, FULL, gg);
   }
 
@@ -597,7 +597,7 @@ static void scale_apply_cb (GtkWidget *w, ggobid* gg)
     gboolean rval = false;
 
     record_colors_reset (selected_var, d, gg);
-    clusters_set (d, gg);
+    clusters_set(d);
 
     /*-- before calling displays_plot, reset brushing color if needed --*/
     if (gg->color_id >= scheme->n) gg->color_id = scheme->n - 1;

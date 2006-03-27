@@ -180,7 +180,7 @@ sphere_apply_cb (GtkWidget * w, ggobid * gg)
         vartable_limits_set (d);
         vartable_stats_set (d);
 
-        tform_to_world (d, gg);
+        tform_to_world(d);
         displays_tailpipe (FULL, gg);
       }
     }

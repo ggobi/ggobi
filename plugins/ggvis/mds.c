@@ -518,7 +518,7 @@ update_ggobi (ggvisd *ggv, ggobid *gg)
     }
   }
 
-  tform_to_world (ggv->dpos, gg);
+  tform_to_world (ggv->dpos);
   displays_tailpipe (FULL, gg);
 }
 

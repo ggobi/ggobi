@@ -133,7 +133,7 @@ ggv_ggobi_data_new (GGobiData *dsrc, GGobiData *e, displayd *dsp, PluginInstance
   display_tailpipe (dspnew, FULL, gg);
 
   ggv->dpos = dnew;
-  clusters_set (ggv->dpos, gg);
+  clusters_set (ggv->dpos);
 
   g_free(values);
   g_free(colnames);

@@ -32,59 +32,52 @@ typedef enum {real, categorical, integer, counter, uniform, all_vartypes} vartyp
  * this structure.
 */
 typedef struct {
- GObject *d;  /*-- the parent datad --*/
+  GObject *d;  /*-- the parent datad --*/
 
- gchar *collab, *collab_tform;
- gchar *nickname;   /*-- very short name to use in tour axis labels --*/
+  gchar *collab, *collab_tform;
+  gchar *nickname;   /*-- very short name to use in tour axis labels --*/
 
- /*-- is this variable categorical? --*/
- vartyped vartype;
- gboolean isTime;
+  /*-- is this variable categorical? --*/
+  vartyped vartype;
+  gboolean isTime;
 
- /*-- categorical_p --*/
- gint nlevels;
- gint *level_values;
- gint *level_counts;
- gchar **level_names;  /*-- strings --*/
+  /*-- categorical_p --*/
+  gint nlevels;
+  gint *level_values;
+  gint *level_counts;
+  gchar **level_names;  /*-- strings --*/
 
- /*-- unadjusted, unaffected by imputation --*/
- gfloat mean, median;
+  /*-- unadjusted, unaffected by imputation --*/
+  gfloat mean, median;
 
- lims lim_raw;       /*-- range of the raw data          --*/
- lims lim_tform;     /*-- range of d->tform              --*/
+  // Limits
+  // =================================================
 
- /*
-  * the limits to be put into the table: presently, this is
-  * lim_tform but it excludes any missing values.
- */
- lims lim_display;  
+  lims lim;             // used: lim_specified_tform or lim_tform --*/
+  lims lim_raw;         // raw data
+  lims lim_tform;       // transformed data
+  lims lim_display;     // for vsartable, transformed sans missings
+  lims lim_specified;   // user specified
+  lims lim_specified_tform;
+  gboolean lim_specified_p;
 
- /*
-  * If the user has supplied limits, lim_specified_p = true
-  * and the limits are stored in lim_specified.{min,max}
- */
- gboolean lim_specified_p;
- lims lim_specified;
- lims lim_specified_tform;
+  // Transformations
+  // =================================================
 
- lims lim;      /*-- limits in use: lim_specified_tform or lim_tform --*/
+  gint tform0;
+  gfloat domain_incr;  /*-- stage 0 --*/
+  gfloat (*domain_adj) (gfloat x, gfloat incr);
+  gfloat (*inv_domain_adj) (gfloat x, gfloat incr);
+  gint tform1;
+  gfloat param;
+  gint tform2;
 
- /*-- transformations --*/
- gint tform0;
- gfloat domain_incr;  /*-- stage 0 --*/
- gfloat (*domain_adj) (gfloat x, gfloat incr);
- gfloat (*inv_domain_adj) (gfloat x, gfloat incr);
- gint tform1;
- gfloat param;
- gint tform2;
+  /*-- jittering --*/
+  gfloat jitter_factor;
 
- /*-- jittering --*/
- gfloat jitter_factor;
-
- /*-- in variable table --*/
- gboolean selected;
+  /*-- in variable table --*/
+  gboolean selected;
 
 } vartabled;
-
 
 #endif

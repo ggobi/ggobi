@@ -34,10 +34,9 @@ write_csv_header (gint *cols, gint ncols, FILE *f, GGobiData *d, ggobid *gg)
 void
 write_csv_cell(gint i, gint j, FILE *f, GGobiData *d, ggobid *gg)
 {
-  vartabled *vt = vartable_element_get (j, d);
   gchar* value = ggobi_data_get_string_value(d, i, j, gg->save.stage == TFORMDATA);
 
-  switch (vt->vartype) {
+  switch (ggobi_data_get_col_type(d, j)) {
   case categorical:
     fprintf(f, "\"%s\"", value);
     break;

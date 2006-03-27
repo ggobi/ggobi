@@ -54,7 +54,7 @@ brush_undo_cb (GtkToggleButton * button, ggobid * gg)
     brush_undo (sp, e, gg);
 
   /*-- when rows_in_plot changes ... --*/
-  rows_in_plot_set (d, gg);
+  rows_in_plot_set(d);
   if (GGOBI_IS_EXTENDED_SPLOT (sp)) {
     void (*f) (GGobiData *, splotd *, ggobid *);
     GGobiExtendedSPlotClass *klass;
@@ -64,7 +64,7 @@ brush_undo_cb (GtkToggleButton * button, ggobid * gg)
       f (d, sp, gg);            // need to exclude area plots
     }
   }
-  clusters_set (d, gg);
+  clusters_set(d);
   /*-- --*/
 
   if (gg->cluster_ui.window != NULL)
@@ -158,14 +158,14 @@ brush_reset (displayd * display, gint action)
   case RESET_UNSHADOW_POINTS: /*-- un-hide all points --*/
     for (i = 0; i < d->nrows; i++)
       d->hidden.els[i] = d->hidden_now.els[i] = false;
-    rows_in_plot_set (d, gg);
+    rows_in_plot_set(d);
 
       /*-- code borrowed from exclusion_ui.c, the 'show' routine --*/
-    clusters_set (d, gg);
+    clusters_set(d);
     cluster_table_labels_update (d, gg);
-    rows_in_plot_set (d, gg);
+    rows_in_plot_set(d);
 
-    tform_to_world (d, gg);
+    tform_to_world(d);
     displays_tailpipe (FULL, gg);
       /*-- --*/
     break;
@@ -188,14 +188,14 @@ brush_reset (displayd * display, gint action)
     if (e != NULL) {
       for (k = 0; k < e->edge.n; k++)
         e->hidden_now.els[k] = e->hidden.els[k] = false;
-      rows_in_plot_set (e, gg);
+      rows_in_plot_set(e);
 
         /*-- code borrowed from exclusion_ui.c, the 'show' routine --*/
-      clusters_set (e, gg);
+      clusters_set(d);
       cluster_table_labels_update (e, gg);
-      rows_in_plot_set (e, gg);
+      rows_in_plot_set(e);
 
-      tform_to_world (e, gg);
+      tform_to_world(e);
       displays_tailpipe (FULL, gg);
         /*-- --*/
     }
@@ -361,7 +361,7 @@ button_release_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
   gdk_pointer_ungrab (event->time);  /*-- grabbed in mousepos_get_pressed --*/
 
   if (cpanel->br.mode == BR_PERSISTENT) {
-    rows_in_plot_set (d, gg);
+    rows_in_plot_set(d);
 
     if (GGOBI_IS_EXTENDED_SPLOT (sp)) {
       void (*f) (GGobiData *, splotd *, ggobid *);
@@ -373,7 +373,7 @@ button_release_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
       }
     }
     /*-- reset the number and properties of the brush groups --*/
-    clusters_set (d, gg);
+    clusters_set(d);
 
 /*   ??
  *  g_signal_emit (GTK_OBJECT (gg->main_window),
@@ -383,7 +383,7 @@ button_release_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
     /*-- If we've also been brushing an edge set, set its clusters --*/
 /*
     if (display->e != NULL && cpanel->br.edge_targets != br_off) {
-      clusters_set(display->e, gg);
+      clusters_set;
     }
 */
     /*-- If we've been brushing by variable, set everybody's clusters --*/
@@ -400,7 +400,7 @@ button_release_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
       for (l = gg->d; l; l = l->next) {
         dd = (GGobiData *) l->data;
         if (dd != d) {
-          clusters_set (dd, gg);
+          clusters_set(d);
         }
       }
     }

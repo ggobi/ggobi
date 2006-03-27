@@ -143,11 +143,8 @@ key_press_cb (GtkWidget * w, GdkEventKey * event, splotd * sp)
 
   displayd *display = (displayd *) sp->displayptr;
   GGobiData *d = display->d;
-  vartabled *vtx;
 
   barchartSPlotd *bsp = GGOBI_BARCHART_SPLOT (sp);
-
-  vtx = vartable_element_get (sp->p1dvar, d);
 
 /*-- add a key_press_cb in each mode, and let it begin with these lines --*/
   if (splot_event_handled (w, event, cpanel, sp, gg))
@@ -156,14 +153,14 @@ key_press_cb (GtkWidget * w, GdkEventKey * event, splotd * sp)
   /*-- insert mode-specific key presses (if any) here --*/
   switch (event->keyval) {
   case GDK_plus:
-    if (vtx->vartype != categorical) {
+    if (ggobi_data_get_col_type(d, sp->p1dvar) != categorical) {
       bsp->bar->new_nbins = bsp->bar->nbins + 1;
       reallocate = TRUE;
     }
     break;
 
   case GDK_minus:
-    if (vtx->vartype != categorical) {
+    if (ggobi_data_get_col_type(d, sp->p1dvar) != categorical) {
       if (bsp->bar->nbins > 2) {
         bsp->bar->new_nbins = bsp->bar->nbins - 1;
         reallocate = TRUE;

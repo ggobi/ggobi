@@ -1287,7 +1287,7 @@ setRecordValue (const char *tmp, GGobiData * d, XMLParserData * data)
         vt->level_counts[(gint) value]++;
       }
       else {
-        gint level = checkLevelValue (vt, value);
+        gint level = ggobi_data_get_col_level_index(d, data->current_element, value);
         if (level == -1) {
           ggobi_XML_error_handler (data,
                                    "incorrect level in record %d, variable `%s', dataset `%s' in the XML input file\n",
@@ -1309,39 +1309,6 @@ setRecordValue (const char *tmp, GGobiData * d, XMLParserData * data)
 
     d->raw.vals[data->current_record][data->current_element] = value;
   }
-
-  /* If the dataset is using one of the variables as the row labels,
-     then resolve the name.
-   */
-  /*
-   *  I don't think we plan to support this, and it's buggy to boot -- dfs
-   */
-#if RECORD_LABELS_VARIABLE
-  if (data->recordLabelsVariable == data->current_element) {
-    gchar *tmp1;
-    /* If this is a categorical, look up the level id. */
-    gchar buf[100];
-    if (ggobi_data_is_missing(d, data->current_record, data->current_element)) {
-      /* sprintf(buf, "%s", "NA"); */
-      tmp1 = g_strdup ("NA");
-    }
-    else {
-      if (vt && vt->vartype == categorical) {
-        /* To be correct, we need to match the level_values and find the
-           corresponding entry. */
-        tmp1 = (gchar *) GGobi_getLevelName (vt, value);
-        if (tmp1)
-          tmp1 = g_strdup (tmp1);
-      }
-      else {
-        sprintf (buf, "%f", value);
-        tmp1 = g_strdup (buf);
-      }
-    }
-    g_array_insert_val (d->rowlab, data->current_record, tmp1);
-    g_free (tmp1);
-  }
-#endif
 
   return (true);
 }

@@ -696,10 +696,7 @@ ValidateGGobiRef (ggobid * gg, gboolean fatal)
       return (gg);
   }
 
-  if (fatal) {
-    g_error (error_msg);
-  }
-  else
+  if (fatal) 
     g_critical (error_msg);
 
   return (NULL);

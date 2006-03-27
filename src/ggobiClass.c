@@ -129,8 +129,7 @@ ggobi_ggobi_class_init (GGobiGGobiClass * klass)
   }
 
   if (g_signal_lookup ("variable_added", GGOBI_TYPE_GGOBI) == 0) {
-    GGobiSignals[VARIABLE_ADDED_SIGNAL] = g_signal_new ("variable_added", G_TYPE_FROM_CLASS (klass), G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION, 0, NULL, NULL, ggobi_marshal_VOID__POINTER_INT_OBJECT, G_TYPE_NONE, 3, G_TYPE_POINTER,  /*vartabled XX */
-                                                        G_TYPE_INT, /*index variable */
+    GGobiSignals[VARIABLE_ADDED_SIGNAL] = g_signal_new ("variable_added", G_TYPE_FROM_CLASS (klass), G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION, 0, NULL, NULL, ggobi_marshal_VOID__POINTER_INT_OBJECT, G_TYPE_NONE, 2, G_TYPE_INT, /*index variable */
                                                         GGOBI_TYPE_DATA);
   }
 

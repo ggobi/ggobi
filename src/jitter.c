@@ -114,7 +114,7 @@ rejitter (gint * selected_cols, gint nselected_cols, GGobiData * d,
       d->jitdata.vals[m][k] = fjit;
     }
   }
-  tform_to_world (d, gg);
+  tform_to_world(d);
   displays_tailpipe (FULL, gg);
 }
 

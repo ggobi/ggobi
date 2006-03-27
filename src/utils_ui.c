@@ -296,7 +296,6 @@ variable_notebook_subwindow_add (GGobiData * d, GCallback func,
   GtkListStore *model;
   GtkTreeIter iter;
   gint j;
-  vartabled *vt;
   GtkSelectionMode mode = (GtkSelectionMode)
     g_object_get_data (G_OBJECT (notebook), "SELECTION");
 
@@ -306,9 +305,8 @@ variable_notebook_subwindow_add (GGobiData * d, GCallback func,
   if (vtype == categorical) {
     /* is there in fact a categorical variable? */
     gboolean categorical_variable_present = false;
-    for (j = 0; j < g_slist_length (d->vartable); j++) {
-      vt = (vartabled *) g_slist_nth_data (d->vartable, j);
-      if (vt->vartype == categorical) {
+    for (j = 0; j < d->ncols; j++) {
+      if (ggobi_data_get_col_type(d, j) == categorical) {
         categorical_variable_present = true;
         break;
       }
@@ -349,11 +347,10 @@ variable_notebook_subwindow_add (GGobiData * d, GCallback func,
   //   g_signal_connect (G_OBJECT (tree_view), "select_row", G_CALLBACK (func), gg);
 
   for (j = 0; j < d->ncols; j++) {
-    vt = vartable_element_get (j, d);
-    if (vtype == all_vartypes || vtype == vt->vartype) {
+    if (vtype == all_vartypes || vtype == ggobi_data_get_col_type(d, j)) {
       gtk_list_store_append (model, &iter);
       gtk_list_store_set (model, &iter,
-                          VARLIST_NAME, vt->collab_tform,
+                          VARLIST_NAME, ggobi_data_get_transformed_col_name(d, j),
                           VARLIST_INDEX, j, -1);
     }
   }
@@ -524,7 +521,7 @@ tree_selection_get_selected_row (GtkTreeSelection * tree_sel)
 * rebuilds it.
 */
 void
-variable_notebook_varchange_cb (ggobid * gg, vartabled * vt, gint which,
+variable_notebook_varchange_cb (ggobid * gg, gint which,
                                 GGobiData * data, void *notebook)
 {
   GtkWidget *swin, *tree_view;
@@ -539,7 +536,6 @@ variable_notebook_varchange_cb (ggobid * gg, vartabled * vt, gint which,
   swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), kd);
   if (swin) {
     gint j;
-    vartabled *vt;
     GtkTreeModel *model;
     GtkTreeIter iter;
     tree_view = GTK_BIN (swin)->child;
@@ -547,13 +543,10 @@ variable_notebook_varchange_cb (ggobid * gg, vartabled * vt, gint which,
 
     gtk_list_store_clear (GTK_LIST_STORE (model));
     for (j = 0; j < d->ncols; j++) {
-      vt = vartable_element_get (j, d);
-      if (vt) {
-        gtk_list_store_append (GTK_LIST_STORE (model), &iter);
-        gtk_list_store_set (GTK_LIST_STORE (model), &iter,
-                            VARLIST_NAME, vt->collab_tform,
-                            VARLIST_INDEX, j, -1);
-      }
+      gtk_list_store_append (GTK_LIST_STORE (model), &iter);
+      gtk_list_store_set (GTK_LIST_STORE (model), &iter,
+                          VARLIST_NAME, ggobi_data_get_transformed_col_name(d, j),
+                          VARLIST_INDEX, j, -1);
     }
   }
 }
@@ -562,7 +555,7 @@ variable_notebook_varchange_cb (ggobid * gg, vartabled * vt, gint which,
 void
 variable_notebook_list_changed_cb (ggobid * gg, GGobiData * d, void *notebook)
 {
-  variable_notebook_varchange_cb (gg, NULL, -1, d, notebook);
+  variable_notebook_varchange_cb (gg, -1, d, notebook);
 }
 
 CHECK_EVENT_SIGNATURE (variable_notebook_adddata_cb, datad_added_f)
@@ -655,8 +648,7 @@ variable_notebook_page_add_prefices (GtkWidget * notebook, gint page)
 }
 
 static void
-prefixed_variable_notebook_varchange_cb (ggobid * gg, vartabled * vt,
-                                         gint which, GGobiData * data,
+prefixed_variable_notebook_varchange_cb (ggobid * gg, gint which, GGobiData * data,
                                          void *notebook)
 {
   GGobiData *d;
@@ -672,7 +664,7 @@ void
 prefixed_variable_notebook_list_changed_cb (ggobid * gg, GGobiData * d,
                                             GtkNotebook * notebook)
 {
-  prefixed_variable_notebook_varchange_cb (gg, NULL, -1, d, notebook);
+  prefixed_variable_notebook_varchange_cb (gg, -1, d, notebook);
 }
 
 static void
