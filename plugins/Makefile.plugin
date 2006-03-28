@@ -12,6 +12,10 @@ plugin_la_CFLAGS   = @GGOBI_CFLAGS@ @SRC_DEBUG@
 # Every plugin has an XML description and some docs
 EXTRA_DIST = plugin.xml Docs
 
+# Make sure to leave out the .svn dir in Docs
+dist-hook:
+	rm -rf `find $(distdir)/Docs -name .svn`
+
 if OS_WIN32
 plugin_la_DEPENDENCIES=plugin.def
 plugin_la_LDFLAGS+=-Wc,-s -no-undefined -export-symbols plugin.def

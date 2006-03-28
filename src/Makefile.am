@@ -3,7 +3,7 @@ libggobi_la_GOBS = data.gob
 libggobi_la_GOBSOURCES = $(libggobi_la_GOBS:%.gob=ggobi-%.c)
 libggobi_la_GOBHEADERS = $(libggobi_la_GOBS:%.gob=ggobi-%.h)
 libggobi_la_GOBOBJECTS = $(libggobi_la_GOBS:%.gob=ggobi-%.lo)
-libggobi_la_LDFLAGS  = @GTK_LIBS@ @LIBXML_LIBS@
+libggobi_la_LDFLAGS  = @GTK_LIBS@ @LIBXML_LIBS@ -version-info 2
 libggobi_la_SOURCES = array.c ash1d.c barchart.c barchartClass.c \
   barchart_ui.c brush.c brush_api.c brush_bins.c brush_init.c brush_link.c \
   brush_ui.c color.c color_ui.c cpanel.c display.c display_tree.c display_ui.c \
