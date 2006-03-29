@@ -49,16 +49,9 @@ gboolean
 write_csv_record (gint i, gint *cols, gint ncols, FILE *f, GGobiData *d, ggobid *gg)
 {
   gboolean ok = true;
-  gchar *gstr;
   gint j, jcol;
 
-  /*-- row label if present; else index --*/
-  if (d->rowlab && d->rowlab->data
-      && (gstr = (gchar *) g_array_index (d->rowlab, gchar *, i))) 
-  { 
-    fprintf(f, "\"%s\",", g_strstrip(gstr));
-  } else
-    fprintf(f, "\"%d\",", i);
+  fprintf(f, "\"%s\",", ggobi_data_get_row_id(d, i));
 
   /* Source and destination, as strings, if edges are present */
   if (gg->save.edges_p && d->edge.n) {
@@ -128,7 +121,7 @@ write_csv_file (FILE *f, GGobiData *d, ggobid *gg)
       cols[j] = j;
       ncols++;
     }
-  } else if (gg->save.column_ind == SELECTEDCOLS) {
+  } else { // gg->save.column_ind==SELECTEDCOLS
     /*-- work out which columns to save --*/
     cols = (gint *) g_malloc (d->ncols * sizeof (gint));
     ncols = selected_cols_get (cols, d, gg);

@@ -373,7 +373,7 @@ parcoords_add_delete_splot(cpaneld *cpanel, splotd *sp, gint jvar, gint *jvar_pr
        plot in brushing mode, I think it's best to switch back to the
        default mode.  -- dfs
        */
-    GGOBI(full_viewmode_set)(EXTENDED_DISPLAY_PMODE, DEFAULT_IMODE, gg);
+    ggobi_full_viewmode_set(EXTENDED_DISPLAY_PMODE, DEFAULT_IMODE, gg);
 
     redraw = true;
   }

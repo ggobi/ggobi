@@ -118,7 +118,7 @@ splot_draw_tour_axes (splotd * sp, GdkDrawable * drawable, ggobid * gg)
  * the left if negative.
 */
         if (ix != dawidth / 2) {
-          vt = vartable_element_get (j, d);
+          vt = ggobi_data_get_vartable(d, j);
           varlab = g_strdup_printf ("%s:%4.3f(%.2f)", ggobi_data_get_transformed_col_name(d, j),
                                     dsp->t1d.F.vals[0][j],
                                     ggobi_data_get_col_range(d, j));
@@ -310,7 +310,7 @@ splot_draw_tour_axes (splotd * sp, GdkDrawable * drawable, ggobid * gg)
 
         /* Drawing the axes values now */
         if (dsp->options.axes_values_p) {
-          vt = vartable_element_get (j, d);
+          vt = ggobi_data_get_vartable(d, j);
           varval = g_strdup_printf ("%d:%4.3f,%4.3f(%.2f)", j + 1,
                                     dsp->t2d.F.vals[0][j],
                                     dsp->t2d.F.vals[1][j],
@@ -364,7 +364,7 @@ splot_draw_tour_axes (splotd * sp, GdkDrawable * drawable, ggobid * gg)
             !dsp->tcorr2.subset_vars_p.els[j])
           continue;
 
-        vt = vartable_element_get (j, d);
+        vt = ggobi_data_get_vartable(d, j);
         if (dsp->tcorr1.subset_vars_p.els[j]) {
           val = (ABS (dsp->tcorr1.F.vals[0][j]) > .004) ?
             dsp->tcorr1.F.vals[0][j] : 0.0;

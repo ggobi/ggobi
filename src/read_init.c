@@ -469,7 +469,7 @@ getDisplayDescription (xmlNodePtr node)
   dpy->typeName = g_strdup ((gchar *) tmp);
   tmp = xmlGetProp (node, (xmlChar *) "data");
   if (tmp) {
-    dpy->data = strToInteger ((char *) tmp) - 1;
+    dpy->data = atoi ((char *) tmp) - 1;
     if (dpy->data < 0)
       dpy->datasetName = g_strdup ((gchar *) tmp);
   }

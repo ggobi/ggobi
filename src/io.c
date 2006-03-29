@@ -106,7 +106,7 @@ filesel_ok (GtkWidget * chooser)
        */
       if (firsttime) {
         gg->pmode = XYPLOT;
-        GGOBI (full_viewmode_set) (XYPLOT, DEFAULT_IMODE, gg);
+        ggobi_full_viewmode_set (XYPLOT, DEFAULT_IMODE, gg);
       }
     }
     break;

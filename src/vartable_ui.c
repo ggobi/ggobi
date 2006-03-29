@@ -122,7 +122,7 @@ dialog_range_set (GtkWidget *w, ggobid *gg)
       GtkTreeIter iter;
 	  
       j = cols[k];
-      vt = vartable_element_get (j, d);
+      vt = ggobi_data_get_vartable(d, j);
 
       vartable_iter_from_varno(j, d, &model, &iter);
       
@@ -188,7 +188,7 @@ open_range_set_dialog (GtkWidget *w, ggobid *gg)
   vartabled *vt;
 
   for (k=0; k<ncols; k++) {
-    vt = vartable_element_get (cols[k], d);
+    vt = ggobi_data_get_vartable(d, cols[k]);
     if (vt->tform0 != NO_TFORM0 ||
         vt->tform1 != NO_TFORM1 ||
         vt->tform2 != NO_TFORM2)
@@ -313,7 +313,7 @@ void range_unset (ggobid *gg)
     GtkTreeIter iter;
 	  
     j = cols[k];
-    vt = vartable_element_get (j, d);
+    vt = ggobi_data_get_vartable(d, j);
 	
     vartable_iter_from_varno(j, d, &model, &iter);
 	  
@@ -363,14 +363,11 @@ dialog_newvar_add (GtkWidget *w, ggobid *gg)
   entry = widget_find_by_name (GTK_DIALOG(dialog)->vbox, "newvar_entry");
   if (entry == NULL || !GTK_IS_ENTRY(entry)) {
     g_printerr ("found the wrong widget; bail out\n");
-/**/return;
+    return;
   }
   vname = gtk_editable_get_chars (GTK_EDITABLE (entry), 0, -1);
   if (vname != NULL && strlen(vname) > 0) {
-     newvar_add_with_values(vtype == ADDVAR_BGROUP ? 
-       (gdouble *) &AddVarBrushGroup : (gdouble *) &AddVarRowNumbers,
-       d->nrows, vname, real,
-       0, NULL, NULL, NULL, d); 
+     create_explicit_variable(d, vname, vtype);
 
 /* I think we still want to do this ... */
 #ifdef FORMERLY
@@ -477,9 +474,6 @@ dialog_rename_var (GtkWidget *w, ggobid *gg)
   vname = gtk_editable_get_chars (GTK_EDITABLE (entry), 0, -1);
   if (vname != NULL && strlen(vname) > 1) {
     ggobi_data_set_col_name(d, jvar, vname);
-
-    vartable_collab_set_by_var (jvar, d);
-    tform_label_update (jvar, d);
   }
 }
 

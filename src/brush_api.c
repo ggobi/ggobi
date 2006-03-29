@@ -20,7 +20,7 @@
 #include "externs.h"
 
 /*-- move brush and paint --*/
-void GGOBI (moveBrush) (gint ulx, gint uly, ggobid * gg)
+void ggobi_moveBrush (gint ulx, gint uly, ggobid * gg)
 {
   splotd *sp = gg->current_splot;
   displayd *display = (displayd *) sp->displayptr;
@@ -34,7 +34,7 @@ void GGOBI (moveBrush) (gint ulx, gint uly, ggobid * gg)
 }
 
 /*-- resize brush without painting --*/
-void GGOBI (sizeBrush) (gint width, gint height, splotd * sp, ggobid * gg)
+void ggobi_sizeBrush (gint width, gint height, splotd * sp, ggobid * gg)
 {
   brush_coords *brush_pos = &sp->brush_pos;
 

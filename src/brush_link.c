@@ -27,7 +27,6 @@
 gboolean
 symbol_link_by_id (gboolean persistentp, gint k, GGobiData * sd, ggobid * gg)
 {
-/*-- sd = source_d --*/
   GGobiData *d;
   GSList *l;
   gint i, id = -1;
@@ -38,40 +37,14 @@ symbol_link_by_id (gboolean persistentp, gint k, GGobiData * sd, ggobid * gg)
   /*-- k is the row number in source_d --*/
 
   //g_return_val_if_fail(sd->rowIds, false);
-  if (sd->rowIds) {
-    gpointer ptr;
-    if (sd->rowIds[k]) {
-      ptr = g_hash_table_lookup (sd->idTable, sd->rowIds[k]);
-      if (ptr)
-        id = *((guint *) ptr);
-    }
-    else {
-      /* 
-       * I've only seen one thing that causes this, and that was in
-       * an xml file with two datad's, nodes and edges, but in which
-       * the edge data mistakenly duplicated the record ids of the
-       * node data.  I removed those record ids, and the file was
-       * fine.  -- Debby
-       */
-      g_printerr ("rowIds[%d] is null\n", k);
-    }
-  }
-
-  if (id < 0)              /*-- this would indicate a bug --*/
-     /**/ return false;
+  id = ggobi_data_get_row_by_id(sd, sd->rowIds[k]);
 
   for (l = gg->d; l; l = l->next) {
     d = (GGobiData *) l->data;
     if (d == sd)
       continue;        /*-- skip the originating datad --*/
 
-    i = -1;
-    if (sd->rowIds && d->idTable) {
-      gpointer ptr = g_hash_table_lookup (d->idTable, sd->rowIds[id]);
-      if (ptr) {
-        i = *((guint *) ptr);
-      }
-    }
+    i = ggobi_data_get_row_by_id(d, sd->rowIds[id]);
 
     if (i < 0)              /*-- then no cases in d have this id --*/
       continue;
@@ -79,7 +52,6 @@ symbol_link_by_id (gboolean persistentp, gint k, GGobiData * sd, ggobid * gg)
     /*-- if we get here, d has one case with the indicated id --*/
     changed = true;
     if (d->sampled.els[i] && !d->excluded.els[i]) {
-
       if (persistentp || cpanel->br.mode == BR_PERSISTENT) {
 
         /*
@@ -99,7 +71,7 @@ symbol_link_by_id (gboolean persistentp, gint k, GGobiData * sd, ggobid * gg)
         d->hidden.els[i] = d->hidden_now.els[i] = sd->hidden.els[k];
 
         /*-- should we handle this here?  --*/
-        d->excluded.els[i] = sd->excluded.els[k];
+        //d->excluded.els[i] = sd->excluded.els[k];
 
       }
       else if (cpanel->br.mode == BR_TRANSIENT) {
@@ -117,7 +89,7 @@ symbol_link_by_id (gboolean persistentp, gint k, GGobiData * sd, ggobid * gg)
 }
 
 gboolean
-exclude_link_by_id (gint k, GGobiData * sd, ggobid * gg)
+exclude_link_by_id (guint k, GGobiData * sd, ggobid * gg)
 {
 /*-- sd = source_d --*/
   GGobiData *d;
@@ -126,28 +98,14 @@ exclude_link_by_id (gint k, GGobiData * sd, ggobid * gg)
   gboolean changed = false;
 
   /*-- k is the row number in source_d --*/
-
-  if (sd->rowIds) {
-    gpointer ptr = g_hash_table_lookup (sd->idTable, sd->rowIds[k]);
-    if (ptr)
-      id = *((guint *) ptr);
-  }
-
-  if (id < 0)              /*-- this would indicate a bug --*/
-     /**/ return false;
+  id = ggobi_data_get_row_by_id(sd, sd->rowIds[k]);
 
   for (l = gg->d; l; l = l->next) {
     d = (GGobiData *) l->data;
     if (d == sd)
       continue;        /*-- skip the originating datad --*/
 
-    i = -1;
-    if (sd->rowIds && d->idTable) {
-      gpointer ptr = g_hash_table_lookup (d->idTable, sd->rowIds[id]);
-      if (ptr) {
-        i = *((guint *) ptr);
-      }
-    }
+    i = ggobi_data_get_row_by_id(d, sd->rowIds[id]);
 
     if (i < 0)              /*-- then no cases in d have this id --*/
       continue;
@@ -483,13 +441,11 @@ CHECK_EVENT_SIGNATURE (linkby_notebook_adddata_cb, datad_added_f)
   CHECK_EVENT_SIGNATURE (linkby_notebook_list_changed_cb,
                        variable_list_changed_f)
 
-     static void
-       linkby_notebook_adddata_cb (ggobid * gg, GGobiData * d, void *notebook,
+static void
+linkby_notebook_adddata_cb (ggobid * gg, GGobiData * d, void *notebook,
                                    GtkSignalFunc func)
 {
-  if (g_slist_length (d->vartable)) {
-    linkby_notebook_subwindow_add (d, notebook, gg);
-  }
+  linkby_notebook_subwindow_add (d, notebook, gg);
 }
 
 void

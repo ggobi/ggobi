@@ -254,7 +254,7 @@ splot_set_current (splotd *sp, gboolean state, ggobid *gg) {
 }
 
 void
-GGOBI(splot_set_current_full)(displayd *display, splotd *sp, ggobid *gg)
+ggobi_splot_set_current_full(displayd *display, splotd *sp, ggobid *gg)
 {
   splotd *sp_prev = gg->current_splot;
   /*-- display and cpanel for outgoing current_splot --*/
@@ -322,7 +322,7 @@ splot_set_current_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
   ggobid *gg = GGobiFromSPlot(sp);
   displayd *display = (displayd *) sp->displayptr; 
-  GGOBI(splot_set_current_full)(display, sp, gg);
+  ggobi_splot_set_current_full(display, sp, gg);
 
   return false;  /* so that other button press handlers also get the event */
 }
@@ -436,7 +436,7 @@ splot_init(splotd *sp, displayd *display, ggobid *gg)
    * from the drawing area; and to gg as well.
   */
   g_object_set_data(G_OBJECT (sp->da), "splotd", (gpointer) sp);
-  GGobi_widget_set (sp->da, gg, true);
+  ggobi_widget_set (sp->da, gg, true);
 
   gtk_widget_set_double_buffered(sp->da, false);
 

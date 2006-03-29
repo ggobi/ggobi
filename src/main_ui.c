@@ -39,25 +39,25 @@
 #include "scatmatClass.h"
 
 const char *const
-GGOBI (PModeNames)[] =
+ggobi_PModeNames[] =
 {
 "DefaultPMode",
     "1D Plot",
     "XY Plot",
     "1D Tour", "Rotation", "2D Tour", "2x1D Tour", "ExtendedDisplayPMode"};
 const char *const
-GGOBI (IModeNames)[] =
+ggobi_IModeNames[] =
 {
 "DefaultIMode", "Scale", "Brush", "Identify", "Edit Edges", "Move Points",};
-static const char *const *pmode_name = GGOBI (PModeNames);
-static const char *const *imode_name = GGOBI (IModeNames);
+static const char *const *pmode_name = ggobi_PModeNames;
+static const char *const *imode_name = ggobi_IModeNames;
 
 const char *const
-GGOBI (PModeKeys)[] =
+ggobi_PModeKeys[] =
 {
 "", "d", "x", "t", "r", "g", "c", "", ""};
 const char *const
-GGOBI (IModeKeys)[] =
+ggobi_IModeKeys[] =
 {
 "", "s", "b", "i", "e", "m", "", ""};
 
@@ -309,19 +309,19 @@ rebuild_mode_menus (displayd * display, ggobid * gg)
     action = gtk_ui_manager_get_action (gg->main_menu_manager, path);
     if (action)
       g_object_set (G_OBJECT (action), "label",
-                    GGOBI (getPModeScreenName) (EXTENDED_DISPLAY_PMODE,
+                    ggobi_getPModeScreenName (EXTENDED_DISPLAY_PMODE,
                                                 display), NULL);
     g_free (path);
     path = g_strdup_printf ("%s%s", iprefix, "DefaultIMode");
     action = gtk_ui_manager_get_action (gg->main_menu_manager, path);
     if (action)
       g_object_set (G_OBJECT (action), "label",
-                    GGOBI (getIModeScreenName) (DEFAULT_IMODE, display),
+                    ggobi_getIModeScreenName (DEFAULT_IMODE, display),
                     NULL);
     g_free (path);
     /* force the radio actions to update */
     path = g_strdup_printf ("%s%s", pprefix,
-                            GGOBI (getPModeName) (pmode_get
+                            ggobi_getPModeName (pmode_get
                                                   (gg->current_display, gg)));
     action = gtk_ui_manager_get_action (gg->main_menu_manager, path);
     if (action)
@@ -329,7 +329,7 @@ rebuild_mode_menus (displayd * display, ggobid * gg)
     g_free (path);
     path =
       g_strdup_printf ("%s%s", iprefix,
-                       GGOBI (getIModeName) (imode_get (gg)));
+                       ggobi_getIModeName (imode_get (gg)));
     action = gtk_ui_manager_get_action (gg->main_menu_manager, path);
     if (action)
       gtk_toggle_action_set_active (GTK_TOGGLE_ACTION (action), true);
@@ -620,7 +620,7 @@ projection_ok (ProjectionMode m, displayd * display)
 
 /* Do everything in one routine for now; split later if apropriate */
 gint
-GGOBI (full_viewmode_set) (ProjectionMode pmode, InteractionMode imode,
+ggobi_full_viewmode_set (ProjectionMode pmode, InteractionMode imode,
                            ggobid * gg)
 {
   /*
@@ -718,9 +718,9 @@ quit_ggobi (ggobid * gg)
   extern void closePlugins (ggobid * gg);
   gint n, i;
   ggobid *el;
-  n = GGobi_getNumGGobis ();
+  n = ggobi_getNumGGobis ();
   for (i = 0; i < n; i++) {
-    el = GGobi_ggobi_get (i);
+    el = ggobi_ggobi_get (i);
     if (el != gg)
       closePlugins (el);
   }
@@ -861,7 +861,7 @@ action_radio_pmode_cb (GtkRadioAction * action, GtkRadioAction * current,
   if ((pm != gg->pmode /*|| gg->imode != DEFAULT_IMODE */ ) &&
       projection_ok (pm, gg->current_display)) {
     /* When the pmode is reset, the imode is set to the default */
-    GGOBI (full_viewmode_set) (pm, DEFAULT_IMODE, gg);
+    ggobi_full_viewmode_set (pm, DEFAULT_IMODE, gg);
   }
 }
 static void
@@ -872,7 +872,7 @@ action_radio_imode_cb (GtkRadioAction * action, GtkRadioAction * current,
 
   im = (InteractionMode) gtk_radio_action_get_current_value (action);
   if (im != gg->imode) {
-    GGOBI (full_viewmode_set) (NULL_PMODE, im, gg);
+    ggobi_full_viewmode_set (NULL_PMODE, im, gg);
   }
 }
 
@@ -1102,7 +1102,7 @@ make_ui (ggobid * gg)
   gtk_window_set_policy (GTK_WINDOW (window), true, true, false);
   gtk_window_set_default_size (GTK_WINDOW (window), 400, 500);
 
-  GGobi_widget_set (window, gg, true);
+  ggobi_widget_set (window, gg, true);
 
 #ifdef TEST_GGOBI_EVENTS
 /*  g_signal_connect (G_OBJECT(gg), "splot_new", test_new_plot_cb, (gpointer) "A new plot"); */
@@ -1205,21 +1205,21 @@ make_ui (ggobid * gg)
     gtk_widget_show_all (window);
 }
 
-const gchar *const *GGOBI (getPModeNames) (int *n)
+const gchar *const *ggobi_getPModeNames (int *n)
 {
-  *n = sizeof (GGOBI (PModeNames)) / sizeof (GGOBI (PModeNames)[0]);
-  return (GGOBI (PModeNames));
+  *n = sizeof (ggobi_PModeNames) / sizeof (ggobi_PModeNames[0]);
+  return (ggobi_PModeNames);
 }
-const gchar *const *GGOBI (getIModeNames) (int *n)
+const gchar *const *ggobi_getIModeNames (int *n)
 {
-  *n = sizeof (GGOBI (IModeNames)) / sizeof (GGOBI (IModeNames)[0]);
-  return (GGOBI (IModeNames));
+  *n = sizeof (ggobi_IModeNames) / sizeof (ggobi_IModeNames[0]);
+  return (ggobi_IModeNames);
 }
 
-const gchar *const *GGOBI (getPModeKeys) (int *n)
+const gchar *const *ggobi_getPModeKeys (int *n)
 {
-  *n = sizeof (GGOBI (PModeKeys)) / sizeof (GGOBI (PModeKeys)[0]);
-  return (GGOBI (PModeKeys));
+  *n = sizeof (ggobi_PModeKeys) / sizeof (ggobi_PModeKeys[0]);
+  return (ggobi_PModeKeys);
 }
 
 

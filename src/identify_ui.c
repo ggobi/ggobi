@@ -45,7 +45,7 @@ identify_target_cb (GtkWidget * w, ggobid * gg)
     gtk_combo_box_set_active (GTK_COMBO_BOX (w), (gint) identify_points);
   } else {
     GtkWidget *pnl, *notebook;
-    pnl = mode_panel_get_by_name (GGOBI (getIModeName) (IDENT), gg);
+    pnl = mode_panel_get_by_name (ggobi_getIModeName (IDENT), gg);
     if (pnl) {
       notebook = widget_find_by_name (pnl, "IDENTIFY:notebook");
       if (notebook)
@@ -335,10 +335,9 @@ static const gchar **
 label_prefix_func (GtkWidget * notebook, GGobiData * d, gint * sel_prefix,
                    gint * n_prefices)
 {
-  gint offset = d->rowIds ? 0 : 1;
-  *n_prefices = G_N_ELEMENTS (label_prefices) - offset;
-  *sel_prefix = 1 - offset;
-  return (label_prefices + offset);
+  *n_prefices = G_N_ELEMENTS (label_prefices);
+  *sel_prefix = 1 ;
+  return (label_prefices);
 }
 
 /*----------------------------------------------------------------------*/
@@ -360,7 +359,7 @@ cpanel_identify_make (ggobid * gg)
 
   panel = (modepaneld *) g_malloc (sizeof (modepaneld));
   gg->control_panels = g_list_append (gg->control_panels, (gpointer) panel);
-  panel->name = g_strdup (GGOBI (getIModeName) (IDENT));
+  panel->name = g_strdup (ggobi_getIModeName (IDENT));
   panel->w = gtk_vbox_new (false, VBOX_SPACING);
   gtk_container_set_border_width (GTK_CONTAINER (panel->w), 5);
 
@@ -481,7 +480,7 @@ void
 cpanel_identify_set (displayd * display, cpaneld * cpanel, ggobid * gg)
 {
   GtkWidget *w;
-  GtkWidget *pnl = mode_panel_get_by_name (GGOBI (getIModeName) (IDENT), gg);
+  GtkWidget *pnl = mode_panel_get_by_name (ggobi_getIModeName (IDENT), gg);
 
   if (pnl == (GtkWidget *) NULL)
     return;

@@ -36,7 +36,7 @@ void pmode_set_cb (GtkWidget *widget, gint action);
 void imode_set_cb (GtkWidget *widget, gint action);
 void main_miscmenus_update (ProjectionMode, InteractionMode, displayd *, ggobid *gg);
 void viewmode_set(ProjectionMode, InteractionMode, ggobid *);
-gint GGOBI(full_viewmode_set)(ProjectionMode, InteractionMode, ggobid*);
+gint ggobi_full_viewmode_set(ProjectionMode, InteractionMode, ggobid*);
 
 RedrawStyle brush_activate (gboolean, displayd *, splotd *);
 RedrawStyle edgeedit_activate (gboolean state, displayd *display, ggobid *gg);
@@ -61,10 +61,10 @@ ggobid*    GGobiFromDisplay (displayd *display);
 ggobid*    GGobiFromSPlot (splotd *sp);
 ggobid*    GGobiFromWidget (GtkWidget *w, gboolean);
 ggobid*    GGobiFromWindow (GdkWindow *w);
-void GGobi_addToolAction (GtkActionEntry *entry, gpointer *data, ggobid *gg);
-GtkWidget* GGobi_addToolsMenuItem (gchar *label, ggobid *gg);
-gboolean   GGobi_addToolsMenuWidget(GtkWidget *entry, ggobid *gg);
-void       GGobi_widget_set (GtkWidget *, ggobid *gg, gboolean isWindow);
+void ggobi_addToolAction (GtkActionEntry *entry, gpointer *data, ggobid *gg);
+GtkWidget* ggobi_addToolsMenuItem (gchar *label, ggobid *gg);
+gboolean   ggobi_addToolsMenuWidget(GtkWidget *entry, ggobid *gg);
+void       ggobi_widget_set (GtkWidget *, ggobid *gg, gboolean isWindow);
 GGobiData*     ValidateDatadRef (GGobiData *d, ggobid *gg, gboolean fatal);
 displayd*  ValidateDisplayRef(displayd *d, ggobid *gg, gboolean fatal);
 ggobid*    ValidateGGobiRef (ggobid *gg, gboolean fatal);
@@ -74,7 +74,6 @@ xmlNodePtr XML_addVariable(xmlNodePtr node, gint j, GGobiData *d);
 void       addvar_propagate (gint ncols_prev, gint ncols_added, GGobiData *);
 gint       alloc_optimize0_p (optimize0_param *op, gint nrows, gint ncols, gint ndim);
 gint       alloc_pp (pp_param *pp, gint nrows, gint ncols, gint ndim);
-gboolean   array_contains (gint* arr, gint n, gint el);
 void       arrayd_add_cols (array_d *, gint);
 void       arrayd_add_rows (array_d *, gint);
 void       arrayd_alloc (array_d *, gint, gint);
@@ -120,19 +119,10 @@ void       arrays_zero (array_s *);
 void       ash_baseline_set (icoords *, splotd *sp);
 void       assign_points_to_bins (GGobiData *, splotd *, ggobid *);
 gboolean   bizarro_update_hidden_vectors (gint i, gboolean changed, gboolean *hit_by_brush, GGobiData *d, ggobid *gg);
-void       br_color_ids_add (GGobiData *d);
-void       br_color_ids_alloc (GGobiData *);
-void       br_color_ids_init (GGobiData *);
 gboolean   br_edge_vectors_check_size (gint, GGobiData *);
-void       br_glyph_ids_add (GGobiData *d);
-void       br_glyph_ids_alloc (GGobiData *);
-void       br_glyph_ids_init (GGobiData *);
-void       br_hidden_alloc (GGobiData *);
-void       br_hidden_init (GGobiData *);
 void       brush_draw_brush (splotd *, GdkDrawable *, GGobiData *, ggobid *);
 void       brush_draw_label (splotd *, GdkDrawable *, GGobiData *, ggobid *);
 void       brush_event_handlers_toggle (splotd *, gboolean);
-void       brush_init (GGobiData *);
 gboolean   brush_motion (icoords *, gboolean, gboolean, cpaneld *, splotd *, ggobid *);
 void       brush_on_set (gboolean, displayd *, ggobid *);
 gboolean   brush_once (gboolean force, splotd *, ggobid *);
@@ -202,10 +192,7 @@ void       ctour_event_handlers_toggle (splotd *, gboolean);
 void       ctourpp_window_open (ggobid *);
 colorschemed* default_scheme_init ();
 gushort    datad_colors_used_get (gint *ncolors_used, gushort *colors_used, GGobiData *, ggobid *); 
-void       datad_free (GGobiData *, ggobid *);
 GGobiData*     datad_get_from_notebook (GtkWidget *notebook, ggobid *);
-displayd*  datad_init (GGobiData *, ggobid *, gboolean);
-void       datad_record_id_add (gchar *ids, GGobiData *d);
 void       datad_record_id_add (gchar *ids, GGobiData *d);
 gint       delete_vars (gint *, gint, GGobiData *);
 void       disconnect_button_press_signal (splotd *sp);
@@ -269,7 +256,7 @@ gboolean   edgeset_add (displayd *);
 void       edgeset_add_cb (GtkAction *action, GGobiData *e);
 gint       edgesets_count (ggobid *gg);
 void       eigenvals_get (gfloat *, GGobiData *);
-gboolean   exclude_link_by_id (gint k, GGobiData *source_d, ggobid *gg);
+gboolean   exclude_link_by_id (guint k, GGobiData *source_d, ggobid *gg);
 gint       fcompare (const void *x1, const void *x2);
 void       filename_get_r (ggobid *);
 void       filename_get_w (GtkWidget *, ggobid *);
@@ -292,8 +279,6 @@ void	   select_tree_view_row(GtkWidget *tree_view, gint row);
 gint	   tree_selection_get_selected_row(GtkTreeSelection *tree_sel);
 void       gg_write_to_statusbar (gchar *message, ggobid *gg);
 ggobid*    ggobi_alloc (ggobid *tmp);
-/*gboolean   ggobi_data_set_time_var(GGobiData *d, int which, gboolean value);
-vartyped   ggobi_data_set_var_type(GGobiData *d, int which, vartyped value);*/
 gboolean   ggobi_file_set_create (gchar *rootname, GGobiData *, ggobid *);
 ggobid*    ggobi_get (gint);
 gint       ggobi_getIndex(ggobid *gg);
@@ -345,7 +330,7 @@ void       movepts_event_handlers_toggle (splotd *, gboolean);
 void       movepts_history_add (gint id, splotd *sp, GGobiData *, ggobid *);
 void       movepts_history_delete_last (GGobiData *, ggobid *);
 gint       ndatad_with_vars_get (ggobid *gg);
-void       newvar_add_with_values (gdouble *, gint, gchar *, vartyped type, gint nlevels, gchar **level_names, gint *level_values, gint *level_counts, GGobiData * d);
+guint create_explicit_variable (GGobiData * d, gchar * vname, NewVariableType vtype);
 void       norm (gdouble *, gint);
 GtkWidget* create_menu_bar (GtkUIManager *, const gchar *, GtkWidget *);
 void       p1d_event_handlers_toggle (splotd *, gboolean);
@@ -366,7 +351,6 @@ void       pca_diagnostics_set (GGobiData *d, ggobid *);
 gint       pcompare (const void *, const void *);
 void       pipeline_arrays_alloc (GGobiData *);
 void       pipeline_arrays_check_dimensions (GGobiData *d);
-void       pipeline_arrays_free (GGobiData *d);
 void       pipeline_init (GGobiData *);
 gint       plotted_cols_get (gint *, GGobiData *, ggobid *);
 gboolean   point_in_which_bin (gint, gint, gint *, gint *, GGobiData *, splotd *);
@@ -388,10 +372,6 @@ void       rejitter (gint *, gint, GGobiData *, ggobid *);
 void       reset_pp(GGobiData *, gint, gint, ggobid *, void *);
 void       rnorm2 (gdouble *, gdouble *);
 void       rotation_event_handlers_toggle (splotd *, gboolean);
-void       rowlabel_add (gchar *label, GGobiData *d);
-void       rowlabels_alloc (GGobiData *d) ;
-void       rowlabels_free (GGobiData *d);
-void       rows_in_plot_set(GGobiData *d);
 void       ruler_ranges_set (gboolean force, displayd *, splotd *, ggobid *);
 void       scale_event_handlers_toggle (splotd *, gboolean);
 void       scale_set_default_values (GtkScale *scale);
@@ -464,7 +444,6 @@ gboolean   is_numeric (const gchar * str);
 void       statusbar_show (gboolean show, ggobid *gg);
 void       sticky_id_link_by_id (gint, gint, GGobiData *, ggobid *);
 void       sticky_id_toggle (GGobiData *, ggobid *);
-gint       strToInteger (const gchar *tmp);
 void       submenu_destroy (GtkWidget *);
 void       submenu_insert (GtkWidget *, GtkWidget *, gint);
 GtkWidget* submenu_make (gchar *, guint, GtkAccelGroup *);
@@ -493,7 +472,6 @@ void       t2d_ppcool_set(gfloat, displayd *, ggobid *);
 void       t2d_ppdraw (gfloat, displayd *, ggobid *);
 void       t2d_pptemp_set(gfloat, displayd *, ggobid *);
 void       textur (gfloat *, gfloat *, gint, gint, gfloat, gint, ggobid *);
-void       tform_label_update (gint, GGobiData *);
 void       tform_to_world (GGobiData *);
 void       tform_to_world_by_var (gint j, GGobiData *);
 void       tooltips_show (gboolean show, ggobid *gg);
@@ -548,6 +526,7 @@ void       tour2d_speed_set (gfloat, ggobid *);
 gboolean   tour2d_varsel (GtkWidget *, gint jvar, gint toggle, gint btn, GGobiData *, ggobid *);
 void       tour2dpp_window_open (ggobid *);
 gint       tour_path (array_d, array_d, array_d, gint, gint, array_d, array_d, array_d, vector_f, array_d, array_d, array_d, vector_f, vector_f, gfloat *, gfloat *);
+void tour_realloc_up (GGobiData *d, gint nc);
 void       tour_reproject (vector_f, array_d, array_d, array_d, array_d, array_d, gint, gint);
 void       tourcorr_fade_vars (gboolean, ggobid *);
 void       tourcorr_func (gboolean, displayd *, ggobid *);
@@ -581,8 +560,7 @@ void       transform_window_open (ggobid *);
 gboolean   update_color_vectors (gint i, gboolean changed, gboolean *hit_by_brush, GGobiData *d, ggobid *gg);
 gboolean   update_glyph_vectors (gint i, gboolean changed, gboolean *hit_by_brush, GGobiData *d, ggobid *gg);
 gboolean   update_hidden_vectors (gint i, gboolean changed, gboolean *hit_by_brush, GGobiData *d, ggobid *gg);
-void       varcircle_label_set (gint jvar, GGobiData *d);
-void       varcircle_label_set (gint, GGobiData *);
+void       varcircle_label_set (GGobiData *d, gint jvar);
 void       varcircles_add (gint ncols, GGobiData *, ggobid *);
 void       varcircles_cursor_set_default (GGobiData *d);
 void       varcircles_delete_nth (gint j, GGobiData *);
@@ -596,7 +574,7 @@ void       variable_notebook_subwindow_add (GGobiData *d, GtkSignalFunc func, gp
 void       variable_notebook_varchange_cb (ggobid *gg, gint which, GGobiData *, void *notebook);
 void       varpanel_clear (GGobiData *, ggobid *);
 void       varpanel_delete_nth (gint jvar, GGobiData *d);
-void       varpanel_label_set (gint, GGobiData *);
+void       varpanel_label_set (GGobiData *, gint);
 void       varpanel_make (GtkWidget *, ggobid *);
 void       varpanel_populate (GGobiData *, ggobid *);
 void       varpanel_refresh (displayd *, ggobid *);
@@ -614,21 +592,19 @@ gboolean   vartable_iter_from_varno(gint var, GGobiData *d, GtkTreeModel **model
 gint	   vartable_varno_from_path(GtkTreeModel *model, GtkTreePath *path);
 void       vartable_cells_set_by_var (gint j, GGobiData *d);
 GtkWidget*  vartable_tree_view_get (ggobid *gg);
-void       vartable_collab_set_by_var (gint, GGobiData *);
-void       vartable_collab_tform_set_by_var (gint j, GGobiData *d);
-void       vartable_copy_var (gint jfrom, gint jto, GGobiData *d);
-vartabled *vartable_element_get (gint j, GGobiData *d);
-vartabled *vartable_element_get_by_name (gchar *collab, GGobiData *d);
+void       vartable_collab_set_by_var (GGobiData *, guint);
+void       vartable_collab_tform_set_by_var (GGobiData *d, guint j);
+vartabled *vartable_copy_var (vartabled *vt, vartabled *vt_to);
 vartabled* vartable_element_new (GGobiData *d);
 void       vartable_element_remove (gint, GGobiData *);
 void       vartable_init (GGobiData *d);
 void       vartable_limits_set (GGobiData *);
-void       vartable_limits_set_by_var (gint j, GGobiData *d);
+void       vartable_limits_set_by_var (GGobiData *d, guint j);
 void       vartable_open (ggobid *);
 void       vartable_row_append (gint j, GGobiData *);
 void       vartable_show_page (GGobiData*, ggobid*);
 void       vartable_stats_set (GGobiData *);
-void       vartable_stats_set_by_var (gint j, GGobiData *);
+void       vartable_stats_set_by_var (GGobiData *, guint j);
 void       vectorb_alloc (vector_b *, gint);
 void       vectorb_alloc_zero (vector_b *, gint);
 void       vectorb_copy (vector_b *, vector_b *);
@@ -671,8 +647,6 @@ void       vectors_free (vector_s *);
 void       vectors_init_null (vector_s *);
 void       vectors_realloc (vector_s *, gint);
 void       vectors_realloc_zero (vector_s *, gint);
-void       vt_copy(vartabled *vtf, vartabled *vtt);
-void       vt_init(vartabled *);
 GtkWidget* widget_find_by_name (GtkWidget *, gchar *);
 void       widget_initialize (GtkWidget *w, gboolean initd);
 gboolean   widget_initialized (GtkWidget *w);
@@ -759,8 +733,6 @@ void       scatterplotMovePointsMotionCb(displayd *display, splotd *sp, GtkWidge
 void       scatterplotMovePointsButtonCb(displayd *display, splotd *sp, GtkWidget *w, GdkEventButton *event, ggobid *gg);
 displayd * scatterplot_new_with_vars(gboolean missing_p, gint numVars, gint *vars, GGobiData *d, ggobid *gg);
 
-gboolean   array_contains (gint* arr, gint n, gint el);
-
 void       ggobiInit(int *argc, char **argv[]);
 
 GGobiPluginInfo *readPluginFile(const char * const fileName, GGobiInitInfo *info);
@@ -782,7 +754,6 @@ InputDescription *read_xml_input_description(const char * const fileName, const 
 InputDescription *read_csv_input_description(const char * const fileName, const char * const modeName, ggobid *gg, GGobiPluginInfo *info);
 
 void resetDataMode();
-vartabled *vartable_element_get(gint i, GGobiData *d);
 
 gboolean parcoords_add_delete_splot(cpaneld *cpanel, splotd *sp, gint jvar, gint *jvar_prev, ggobid *gg, displayd *display);
 
@@ -792,3 +763,20 @@ cairo_t*   create_cairo_glitz(GdkDrawable *drawable);
 
 #endif
 
+void
+pt_world_to_raw_by_var (gint j, greal * world, greal * raw, GGobiData * d);
+
+void
+pt_screen_to_raw (icoords * screen, gint id, gboolean horiz, gboolean vert,
+                  greal * raw, gcoords * eps, GGobiData * d, splotd * sp,
+                  ggobid * gg);
+void
+pt_plane_to_world (splotd * sp, gcoords * planar, gcoords * eps,
+                   greal * world);
+void
+pt_screen_to_plane (icoords * screen, gint id, gboolean horiz, gboolean vert,
+                   gcoords * eps, gcoords * planar, splotd * sp);
+endpointsd *
+resolveEdgePoints (GGobiData * e, GGobiData * d);
+void
+unresolveAllEdgePoints (GGobiData * e);

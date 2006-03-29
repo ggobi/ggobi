@@ -466,7 +466,7 @@ setLevelIndex (const xmlChar ** attrs, XMLParserData * data)
   const gchar *tmp = getAttribute (attrs, "value");
   gint itmp;
   GGobiData *d = getCurrentXMLData (data);
-  vartabled *el = vartable_element_get(data->current_variable, d);
+  vartabled *el = ggobi_data_get_vartable(d, data->current_variable);
 
   data->current_level++; /*-- current_level here ranges from 0 to nlevels-1 --*/
 
@@ -480,7 +480,7 @@ setLevelIndex (const xmlChar ** attrs, XMLParserData * data)
 
   itmp = data->current_level;
   if (tmp != NULL) {
-    itmp = strToInteger (tmp);
+    itmp = atoi (tmp);
     if (itmp < 0)
       g_printerr ("trouble: levels must be >= 0\n");
   }
@@ -497,7 +497,7 @@ void
 completeCategoricalLevels (XMLParserData * data)
 {
   GGobiData *d = getCurrentXMLData (data);
-  vartabled *el = vartable_element_get (data->current_variable, d);
+  vartabled *el = ggobi_data_get_vartable(d, data->current_variable);
   gint min = 1;
 
   if (data->current_level == -1) {
@@ -523,13 +523,13 @@ void
 categoricalLevels (const xmlChar ** attrs, XMLParserData * data)
 {
   GGobiData *d = getCurrentXMLData (data);
-  vartabled *el = vartable_element_get (data->current_variable, d);
+  vartabled *el = ggobi_data_get_vartable(d, data->current_variable);
   gint i;
 
   const gchar *tmp = getAttribute (attrs, "count");
 
   if (tmp != NULL) {
-    el->nlevels = strToInteger (tmp);
+    el->nlevels = atoi (tmp);
     if (el->nlevels > 0) {
       el->level_values = (gint *) g_malloc (el->nlevels * sizeof (gint));
       el->level_counts = (gint *) g_malloc (el->nlevels * sizeof (gint));
@@ -558,7 +558,7 @@ void
 addLevel (XMLParserData * data, const gchar * c, gint len)
 {
   GGobiData *d = getCurrentXMLData (data);
-  vartabled *el = vartable_element_get (data->current_variable, d);
+  vartabled *el = ggobi_data_get_vartable(d, data->current_variable);
   gint lev = data->current_level;
 
   gchar *val = g_strdup (c);
@@ -931,7 +931,7 @@ setGeneralInfo (const xmlChar ** attrs, XMLParserData * data)
   const gchar *tmp = getAttribute (attrs, "count");
 
   if (tmp != NULL) {
-    data->expectedDatasetCount = strToInteger (tmp);
+    data->expectedDatasetCount = atoi (tmp);
   }
 
   tmp = getAttribute (attrs, "ids");
@@ -950,26 +950,11 @@ setDatasetInfo (const xmlChar ** attrs, XMLParserData * data)
     g_error ("No count attribute");
   }
 
-  d->nrows = strToInteger (tmp);
-  d->nrows_in_plot = d->nrows;  /*-- for now --*/
-
-  rowlabels_alloc (d);
-  br_glyph_ids_alloc (d);
-  br_glyph_ids_init (d);
+  ggobi_data_add_rows(d, atoi (tmp));
 
   d->edge.n = 0;
 
-  br_color_ids_alloc (d);
-  br_color_ids_init (d);
-
   setDefaultDatasetValues (attrs, data);
-
-  if (tmp) {
-    arrayf_alloc (&d->raw, d->nrows, d->ncols);
-    arrays_alloc (&d->missing, d->nrows, d->ncols);
-    br_hidden_alloc (d);
-    br_hidden_init (d);
-  }
 
   data->current_variable = 0;
   data->current_record = 0;
@@ -994,17 +979,6 @@ setDefaultDatasetValues (const xmlChar ** attrs, XMLParserData * data)
   setHidden (attrs, data, -1);
   return (true);
 }
-
-gint
-strToInteger (const gchar * tmp)
-{
-  gint value;
-
-  value = atoi (tmp);
-
-  return (value);
-}
-
 
 const gchar *
 getAttribute (const xmlChar ** attrs, gchar * name)
@@ -1072,7 +1046,7 @@ setColor (const xmlChar ** attrs, XMLParserData * data, gint i)
 
   tmp = getAttribute (attrs, "color");
   if (tmp) {
-    value = strToInteger (tmp);
+    value = atoi (tmp);
   }
 
 /*
@@ -1107,7 +1081,7 @@ setGlyph (const xmlChar ** attrs, XMLParserData * data, gint i)
   value = data->defaults.glyphSize;
   tmp = getAttribute (attrs, "glyphSize");
   if (tmp) {
-    value = strToInteger (tmp);
+    value = atoi (tmp);
   }
 
   if (value < 0 || value >= NGLYPHSIZES) {
@@ -1146,7 +1120,7 @@ setGlyph (const xmlChar ** attrs, XMLParserData * data, gint i)
                  tmp);
       }
 
-      value = strToInteger (tmp);
+      value = atoi (tmp);
     }
   }
   if (value < 0 || value >= NGLYPHTYPES) {
@@ -1189,7 +1163,7 @@ setGlyph (const xmlChar ** attrs, XMLParserData * data, gint i)
         }
       }
       else {                    /* size */
-        value = strToInteger (next);
+        value = atoi (next);
         if (i < 0) {
           if (value >= 0 && value < NGLYPHTYPES) {
             data->defaults.glyphSize = value;
@@ -1226,10 +1200,10 @@ applyRandomUniforms (GGobiData * d, XMLParserData * data)
 {
   vartabled *vt = NULL;
   while (data->current_element < d->raw.ncols
-         && (vt = vartable_element_get (data->current_element, d))
+         && (vt = ggobi_data_get_vartable(d, data->current_element))
          && vt->vartype == uniform) {
-    d->raw.vals[data->current_record][data->current_element] = randvalue ();
-    vt = vartable_element_get (++(data->current_element), d);
+    ggobi_data_set_raw_value(d, data->current_record, data->current_element, randvalue());
+    vt = ggobi_data_get_vartable(d, ++(data->current_element));
   }
 
   return (vt);
@@ -1245,8 +1219,7 @@ setRecordValue (const char *tmp, GGobiData * d, XMLParserData * data)
      cursor is at that. */
   if (data->counterVariableIndex > -1 &&
       data->current_element == data->counterVariableIndex) {
-    d->raw.vals[data->current_record][data->current_element] =
-      data->current_record + 1;
+    ggobi_data_set_raw_value(d, data->current_record, data->current_element, data->current_record + 1);
     data->current_element++;
   }
 
@@ -1259,7 +1232,7 @@ setRecordValue (const char *tmp, GGobiData * d, XMLParserData * data)
     return (false);
   }
 
-/*  vt = vartable_element_get (data->current_element, d); */
+/*  vt = ggobi_data_get_vartable(d, data->current_element); */
   vt = applyRandomUniforms (d, data);
   if (!vt)
     return (true);
@@ -1306,8 +1279,8 @@ setRecordValue (const char *tmp, GGobiData * d, XMLParserData * data)
                                vt->collab, (int) data->current_record + 1);
       value = 0;
     }
-
-    d->raw.vals[data->current_record][data->current_element] = value;
+    
+    ggobi_data_set_raw_value(d, data->current_record, data->current_element, value);
   }
 
   return (true);
@@ -1358,6 +1331,7 @@ setRecordValues (XMLParserData * data, const xmlChar * line, gint len,
 
 
   applyRandomUniforms (d, data);
+  limits_set (d, true, true, true);
   return (true);
 }
 
@@ -1399,7 +1373,7 @@ newVariable (const xmlChar ** attrs, XMLParserData * data,
     return (false);
   }
 
-  el = vartable_element_get (data->current_variable, d);
+  el = ggobi_data_get_vartable(d, data->current_variable);
 
   data->variable_transform_name_as_attribute = false;
 
@@ -1495,23 +1469,7 @@ allocVariables (const xmlChar ** attrs, XMLParserData * data)
     g_error ("No count for variables attribute\n");
   }
 
-  d->ncols = strToInteger (tmp);
-
-
-  /* The following is unlikely to happen as we have not got the count
-     of the number of rows at this stage. But we leave it here just
-     in case there are datasets for which the input gives the count
-     in the top-level tag. */
-  if (d->nrows > 0 && d->ncols > 0) {
-    arrayf_alloc (&d->raw, d->nrows, d->ncols);
-    arrays_alloc (&d->missing, d->nrows, d->ncols);
-    br_hidden_alloc (d);
-  }
-
-
-  vartable_alloc (d);
-  vartable_init (d);
-
+  ggobi_data_add_cols(d, atoi (tmp));
 
   return (true);
 }
@@ -1530,7 +1488,7 @@ setVariableName (XMLParserData * data, const xmlChar * name, gint len)
 {
   gchar *tmp = (gchar *) g_malloc (sizeof (gchar) * (len + 1));
   GGobiData *d = getCurrentXMLData (data);
-  vartabled *el = vartable_element_get (data->current_variable, d);
+  vartabled *el = ggobi_data_get_vartable(d, data->current_variable);
   gchar *lbl = g_strdup_printf ("Var %d", data->current_variable);
 
   tmp[len] = '\0';
@@ -1668,7 +1626,6 @@ readXMLRecord (const xmlChar ** attrs, XMLParserData * data)
 {
   GGobiData *d = getCurrentXMLData (data);
   const gchar *tmp;
-  gchar *stmp;
   gint i = data->current_record;
 
   if (i == d->nrows) {
@@ -1677,22 +1634,6 @@ readXMLRecord (const xmlChar ** attrs, XMLParserData * data)
   }
 
   data->current_element = 0;
-
-  tmp = getAttribute (attrs, "label");
-  if (!tmp) {
-    if (data->recordLabelsVariable > -1) {
-      /* Wait until we have read the specific values! */
-    }
-    else {
-      /* Length is to hold the current record number as a string. */
-      stmp = g_malloc (sizeof (gchar) * 10);
-      g_snprintf (stmp, 9, "%d", i);
-    }
-  }
-  else
-    stmp = g_strdup (tmp);
-
-  g_array_insert_val (d->rowlab, data->current_record, stmp);
 
   setColor (attrs, data, i);
   setGlyph (attrs, data, i);
@@ -1705,28 +1646,12 @@ readXMLRecord (const xmlChar ** attrs, XMLParserData * data)
 
   tmp = getAttribute (attrs, "id");
   if (tmp) {
-    guint *ptr;
-    /*int value; */
-    gchar *dupTmp;
-    /* No need to check since this will either be the first and hence
-       NULL or already created, so can use an else for this condition. */
-    if (data->idTable == NULL) {
-      data->idTable = g_hash_table_new (g_str_hash, g_str_equal);
-      d->idTable = data->idTable;
-      d->rowIds = (gchar **) g_malloc0 (sizeof (gchar *) * d->nrows);
-    }
-    else {
-      if (g_hash_table_lookup (data->idTable, tmp))
-        ggobi_XML_error_handler (data,
-                                 "duplicated id in record %d of dataset %s\n",
-                                 data->current_record + 1,
-                                 data->current_data->name);
-    }
-
-    ptr = (guint *) g_malloc (sizeof (guint));
-    ptr[0] = i;
-    g_hash_table_insert (data->idTable, dupTmp = intern (data, tmp), ptr);
-    d->rowIds[i] = dupTmp;
+    if (ggobi_data_get_row_by_id(d, (gchar*) tmp) != -1)
+      ggobi_XML_error_handler (data,
+                               "duplicated id in record %d of dataset %s\n",
+                               data->current_record + 1,
+                               data->current_data->name);
+    ggobi_data_set_row_id(d, i, (gchar*) tmp, false);
   }
 
 /*
@@ -1793,7 +1718,7 @@ setBrushStyle (const xmlChar ** attrs, XMLParserData * data)
   tmp = getAttribute (attrs, "color");
   if (tmp != NULL) {
     colorschemed *scheme = data->gg->activeColorScheme;
-    value = strToInteger (tmp);
+    value = atoi (tmp);
     if (value >= 0 && value < scheme->n) {
       data->gg->color_id = value;
     }
@@ -1820,7 +1745,7 @@ setBrushStyle (const xmlChar ** attrs, XMLParserData * data)
     }
     value = mapGlyphName (tmp);
     if (value == UNKNOWN_GLYPH)
-      value = strToInteger (tmp);
+      value = atoi (tmp);
 
     if (value < 0 || value >= NGLYPHTYPES) {
       xml_warning ("glyphType", tmp, "Out of range", data);
@@ -1836,7 +1761,7 @@ setBrushStyle (const xmlChar ** attrs, XMLParserData * data)
 */
   tmp = getAttribute (attrs, "glyphSize");
   if (tmp != NULL) {
-    value = strToInteger (tmp);
+    value = atoi (tmp);
 
     if (value < 0 || value >= NGLYPHSIZES) {
       xml_warning ("glyphSize", tmp, "Out of range", data);
@@ -1860,7 +1785,7 @@ setBrushStyle (const xmlChar ** attrs, XMLParserData * data)
         data->gg->glyph_id.type = value;
       }
       else {                    /* size */
-        value = strToInteger (next);
+        value = atoi (next);
         if (value >= 0 && value < NGLYPHTYPES) {
           data->gg->glyph_id.size = value;
         }

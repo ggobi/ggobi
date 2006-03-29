@@ -195,7 +195,7 @@ buildExtendedDisplayMenu (ggobid * gg, gint nd, GGobiData * d0)
         GGobiData *d = (GGobiData *) g_slist_nth_data (gg->d, k);
 
         /*-- add an item for each datad with variables --*/
-        if (g_slist_length (d->vartable) > 0) {
+        if (d->ncols > 0) {
           lbl = ggobi_data_get_name (d);
           cbdata = (ExtendedDisplayCreateData *)
             g_malloc (sizeof (ExtendedDisplayCreateData));
@@ -220,13 +220,7 @@ buildExtendedDisplayMenu (ggobid * gg, gint nd, GGobiData * d0)
     el = el->next;
   }
 }
-#if 0 // unused on 3/12/06
-static void
-action_show_control_panel_cb (GtkAction * action, displayd * display)
-{
-  show_display_control_panel (display);
-}
-#endif
+
 static void
 action_close_cb (GtkAction * action, displayd * display)
 {

@@ -115,7 +115,7 @@ tsplot_new (displayd * display, gboolean missing_p, gint nvars, gint * vars,
        and use the first of these as the horizontal axis. */
     for (i = 0; i < d->ncols; i++) {
       vartabled *el;
-      el = vartable_element_get (i, d);
+      el = ggobi_data_get_vartable(d, i);
       if (el->isTime) {
         timeVariable = i;
         break;
@@ -370,7 +370,7 @@ tsplot_varsel (GtkWidget * w, displayd * display, splotd * sp, gint jvar,
          plot in brushing mode, I think it's best to switch back to the
          default mode.  -- dfs
        */
-      GGOBI (full_viewmode_set) (EXTENDED_DISPLAY_PMODE, DEFAULT_IMODE, gg);
+      ggobi_full_viewmode_set (EXTENDED_DISPLAY_PMODE, DEFAULT_IMODE, gg);
 
       /* Initialize drag and drop for the new panel */
       sp_event_handlers_toggle (sp_new, on, cpanel->pmode, cpanel->imode);

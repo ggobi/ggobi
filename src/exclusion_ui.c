@@ -173,6 +173,7 @@ include_hiddens (gboolean include, GGobiData * d, ggobid * gg)
       changed = changed || exclude_link_by_id (i, d, gg);
     }
   }
+  ggobi_data_set_rows_in_plot(d);
 
   /*-- make the other datad's update their rows_in_plot, too --*/
   if (changed) {
@@ -182,19 +183,15 @@ include_hiddens (gboolean include, GGobiData * d, ggobid * gg)
       dd = (GGobiData *) l->data;
       if (dd == d)
         continue;
-      if (dd->rowIds && dd->idTable) {
-        rows_in_plot_set(dd);
-        clusters_set(d);
-        cluster_table_labels_update (dd, gg);
-        limits_set (dd, true, true, gg->lims_use_visible);
-        vartable_limits_set (dd);
-        vartable_stats_set (dd);
-        tform_to_world(dd);
-      }
+      clusters_set(d);
+      cluster_table_labels_update (dd, gg);
+      limits_set (dd, true, true, gg->lims_use_visible);
+      vartable_limits_set (dd);
+      vartable_stats_set (dd);
+      tform_to_world(dd);
     }
   }
 
-  rows_in_plot_set(d);
   clusters_set(d);
   cluster_table_labels_update (d, gg);
   limits_set (d, true, true, gg->lims_use_visible);
@@ -353,7 +350,7 @@ cluster_add (gint k, GGobiData * d, ggobid * gg)
                     G_CALLBACK (cluster_symbol_show), GINT_TO_POINTER (k));
   g_signal_connect (G_OBJECT (d->clusvui[k].da), "button_press_event",
                     G_CALLBACK (cluster_symbol_cb), GINT_TO_POINTER (k));
-  GGobi_widget_set (d->clusvui[k].da, gg, true);
+  ggobi_widget_set (d->clusvui[k].da, gg, true);
   gtk_table_attach (GTK_TABLE (d->cluster_table), d->clusvui[k].da,
                     0, 1, k + 1, k + 2,
                     (GtkAttachOptions) 0, (GtkAttachOptions) 0, 5, 2);
@@ -367,7 +364,7 @@ cluster_add (gint k, GGobiData * d, ggobid * gg)
                                 d->clusv[k].hidden_p);
   g_signal_connect (G_OBJECT (d->clusvui[k].h_btn), "toggled",
                     G_CALLBACK (hide_cluster_cb), GINT_TO_POINTER (k));
-  GGobi_widget_set (d->clusvui[k].h_btn, gg, true);
+  ggobi_widget_set (d->clusvui[k].h_btn, gg, true);
   gtk_table_attach (GTK_TABLE (d->cluster_table),
                     d->clusvui[k].h_btn,
                     1, 2, k + 1, k + 2, GTK_FILL, GTK_FILL, 5, 2);
@@ -378,7 +375,7 @@ cluster_add (gint k, GGobiData * d, ggobid * gg)
     d->clusv[k].excluded_p);
   g_signal_connect(G_OBJECT(d->clusvui[k].e_btn), "toggled",
     G_CALLBACK(exclude_cluster_cb), GINT_TO_POINTER(k));
-  GGobi_widget_set(d->clusvui[k].e_btn, gg, true);
+  ggobi_widget_set(d->clusvui[k].e_btn, gg, true);
   gtk_table_attach(GTK_TABLE(d->cluster_table),
     d->clusvui[k].e_btn,
     2, 3, k + 1, k + 2, GTK_FILL, GTK_FILL, 5, 2);
@@ -425,7 +422,7 @@ update_cb (GtkWidget * w, ggobid * gg)
   GGobiData *d = datad_get_from_notebook (gg->cluster_ui.notebook, gg);
   splotd *sp = gg->current_splot;
 
-  rows_in_plot_set(d);
+  ggobi_data_set_rows_in_plot(d);
   if (GGOBI_IS_EXTENDED_SPLOT (sp)) {
     void (*f) (GGobiData *, splotd *, ggobid *);
     GGobiExtendedSPlotClass *klass;

@@ -119,7 +119,7 @@ showInputDescription (InputDescription * desc, ggobid * gg)
   fprintf (out, "\tDirectory: %s\n", desc->dirName);
   /* FIXME: Convert DataMode to a GEnum, then we can get a string for this 
   fprintf (out, "\tFormat: %s (%d), verified: %s\n",
-           GGOBI (getDataModeDescription) (desc->mode), desc->mode,
+           ggobi_getDataModeDescription (desc->mode), desc->mode,
            desc->canVerify ? "yes" : "no");*/
 
   if (desc->extensions) {

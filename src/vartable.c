@@ -50,47 +50,6 @@ array_contains (gint* arr, gint n, gint el)
   return false;
 }
 
-//FIXME: to become: ggobi_data_get_vartable(self, guint j) ?
-vartabled *
-vartable_element_get (gint j, GGobiData *d)
-{
-  vartabled *vt = (vartabled *) NULL;
-
-  if (j < 0 || j >= d->ncols)
-    g_printerr ("(vartable_element_get) illegal variable number %d\n", j);
-  else
-    vt = (vartabled *) g_slist_nth_data (d->vartable, j);
-
-  return (vt);
-}
-gint
-vartable_index_get_by_name(gchar *name, GGobiData *d)
-{
-  gint j;
-  gint index = -1;
-  vartabled *vt;
-  for (j=0; j<d->ncols; j++) {
-    vt = vartable_element_get(j, d);
-    if (strcmp(vt->collab, name) == 0) {
-      index = j;
-      break;
-    }
-  }
-  return index;
-}
-
-void
-vartable_element_append (vartabled *vt, GGobiData *d)
-{
-  d->vartable = g_slist_append (d->vartable, vt);
-}
-void
-vartable_element_remove (gint j, GGobiData *d)
-{
-  vartabled *vt = vartable_element_get (j, d);
-  d->vartable = g_slist_remove (d->vartable, vt);
-}
-
 gint
 selected_cols_get (gint *cols, GGobiData *d, ggobid *gg)
 {
@@ -101,7 +60,7 @@ selected_cols_get (gint *cols, GGobiData *d, ggobid *gg)
   vartabled *vt;
 
   for (j=0; j<d->ncols; j++) {
-    vt = vartable_element_get (j, d);
+    vt = ggobi_data_get_vartable(d, j);
     if (vt->selected)
       cols[ncols++] = j;
   }
@@ -134,90 +93,58 @@ plotted_cols_get (gint *cols, GGobiData *d, ggobid *gg)
 /*                         memory management                               */
 /*-------------------------------------------------------------------------*/
 
-void
-vartable_free_element (gint j, GGobiData *d)
+vartabled *
+vartable_copy_var (vartabled *vt, vartabled *vt_to)
 {
-  vartabled *vt = vartable_element_get (j, d); 
+  vt_to->collab = g_strdup (vt->collab);
+  vt_to->collab_tform = g_strdup (vt->collab_tform);
+  vt_to->nickname = g_strdup (vt->nickname);
 
-  if (vt->collab != NULL)
-    g_object_unref (vt->collab);
-  if (vt->collab_tform != NULL)
-    g_object_unref (vt->collab_tform);
-
-  vartable_element_remove (j, d);
-}
-
-void
-vartable_free (GGobiData *d)
-{
-  gint j;
-  for (j=d->ncols-1; j >= 0; j--) {
-    vartable_free_element (j, d);
-  }
-  g_slist_free (d->vartable);
-  d->vartable = NULL;
-}
-
-void
-vartable_alloc (GGobiData *d)  /* weird -- nothing is allocated here --*/
-{
-  if (d->vartable != NULL)
-    vartable_free (d);
-
-  d->vartable = NULL;
-}
-
-
-//FIXME: should be removed and replaced by vartable_clone
-//also see code in missings.c
-void
-vartable_copy_var (gint jfrom, gint jto, GGobiData *d)
-{
-  gint k;
-  vartabled *vt_from = vartable_element_get (jfrom, d);
-  vartabled *vt_to = vartable_element_get (jto, d);
-
-  g_assert (vt_from->collab != NULL);
-  g_assert (vt_from->collab_tform != NULL);
-
-  vt_to->collab = g_strdup (vt_from->collab);
-  vt_to->collab_tform = g_strdup (vt_from->collab_tform);
-  vt_to->nickname = g_strdup (vt_from->nickname);
-
-  vt_to->vartype = vt_from->vartype;
-  vt_to->nlevels = vt_from->nlevels;
-  if (vt_from->nlevels && vt_from->vartype == categorical) {
+  vt_to->vartype = vt->vartype;
+  vt_to->nlevels = vt->nlevels;
+  if (vt->nlevels && vt->vartype == categorical) {
     vt_to->level_values = (gint*)
-      g_malloc(sizeof(gint) * vt_from->nlevels);
+      g_malloc(sizeof(gint) * vt->nlevels);
     vt_to->level_counts = (gint*)
-      g_malloc(sizeof(gint) * vt_from->nlevels);
+      g_malloc(sizeof(gint) * vt->nlevels);
     vt_to->level_names =  (gchar **)
-      g_malloc(sizeof(gchar *) * vt_from->nlevels);
+      g_malloc(sizeof(gchar *) * vt->nlevels);
   } else {
     vt_to->level_values = NULL;
     vt_to->level_counts = NULL;
     vt_to->level_names = NULL;
   }
-  for (k=0; k<vt_to->nlevels; k++) {
-    vt_to->level_values[k] = vt_from->level_values[k];
-    vt_to->level_counts[k] = vt_from->level_counts[k];
-    vt_to->level_names[k] = g_strdup(vt_from->level_names[k]);
+  for (gint k=0; k<vt_to->nlevels; k++) {
+    vt_to->level_values[k] = vt->level_values[k];
+    vt_to->level_counts[k] = vt->level_counts[k];
+    vt_to->level_names[k] = g_strdup(vt->level_names[k]);
   }
 
-  vt_to->mean = vt_from->mean;
-  vt_to->median = vt_from->median;
+  vt_to->mean = vt->mean;
+  vt_to->median = vt->median;
   vt_to->lim.min =
     vt_to->lim_raw.min =
-    vt_to->lim_tform.min = vt_from->lim_tform.min;
+    vt_to->lim_tform.min = vt->lim_tform.min;
   vt_to->lim.max =
     vt_to->lim_raw.max =
-    vt_to->lim_tform.max = vt_from->lim_tform.max;
+    vt_to->lim_tform.max = vt->lim_tform.max;
 
-  vt_to->lim_display.min = vt_from->lim_display.min;
-  vt_to->lim_display.max = vt_from->lim_display.max;
+  vt_to->lim_display.min = vt->lim_display.min;
+  vt_to->lim_display.max = vt->lim_display.max;
 
-  vt_to->lim_specified_p = vt_from->lim_specified_p;
+  vt_to->lim_specified_p = vt->lim_specified_p;
+  
+  vt_to->tform0 = vt->tform0;
+  vt_to->tform1 = vt->tform1;
+  vt_to->tform2 = vt->tform2;
+  vt_to->domain_incr = vt->domain_incr;
+  vt_to->param = vt->param;
+  vt_to->domain_adj = vt->domain_adj;
+  vt_to->inv_domain_adj = vt->inv_domain_adj;
+  
+  return vt_to;
 }
+
 
 /*-------------------------------------------------------------------------*/
 
@@ -226,7 +153,8 @@ vartable_element_new (GGobiData *d)
 {
   vartabled *vt = (vartabled *) g_malloc (sizeof (vartabled));
 
-  vt->d = G_OBJECT(d);
+  if (d) 
+    vt->d = G_OBJECT(d);
 
   vt->selected = false;
 
@@ -260,34 +188,5 @@ vartable_element_new (GGobiData *d)
   vt->collab = NULL;
   vt->collab_tform = NULL;
 
-  vartable_element_append (vt, d);
   return vt;
 }
-
-void vartable_init (GGobiData *d)
-{
-  gint j;
-  for (j=0; j<d->ncols; j++)
-    vartable_element_new (d);
-}
-
-
-/*-------------------------------------------------------------------------*/
-/*                 finding the statistics for the table                    */
-/*-------------------------------------------------------------------------*/
-
-void
-vartable_stats_print (GGobiData *d, ggobid *gg) 
-{
-  gint j;
-  vartabled *vt;
-
-  for (j=0; j<d->ncols; j++) {
-    vt = vartable_element_get (j, d);
-    g_printerr ("mean=%f, median=%f\n", vt->mean, vt->median);
-    g_printerr ("lims: %7.2f %7.2f %7.2f %7.2f\n",
-      vt->lim_raw.min, vt->lim_raw.max,
-      vt->lim_tform.min, vt->lim_tform.max);
-  }
-}
-

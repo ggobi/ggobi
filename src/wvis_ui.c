@@ -99,7 +99,7 @@ wvis_create_variable_notebook (GtkWidget *box, GtkSelectionMode mode,
 
   for (l = gg->d; l; l = l->next) {
     d = (GGobiData *) l->data;
-    if (g_slist_length (d->vartable)) {
+    if (d->ncols > 0) {
       variable_notebook_subwindow_add (d, func, NULL, notebook,
         all_vartypes, all_datatypes, gg);
     }
@@ -138,7 +138,7 @@ bin_counts_reset (gint jvar, GGobiData *d, ggobid *gg)
   if (jvar == -1)
     return;
 
-  vt = vartable_element_get (jvar, d);
+  vt = ggobi_data_get_vartable(d, jvar);
   min = vt->lim_tform.min;
   max = vt->lim_tform.max;
 
@@ -170,7 +170,7 @@ record_colors_reset (gint selected_var, GGobiData *d, ggobid *gg)
   if (selected_var < 0)
     return;
 
-  vt = vartable_element_get (selected_var, d);
+  vt = ggobi_data_get_vartable(d, selected_var);
   min = vt->lim_tform.min;
   max = vt->lim_tform.max;
 
@@ -360,11 +360,10 @@ bin_boundaries_set (gint selected_var, GGobiData *d, ggobid *gg)
   } else if (gg->wvis.binning_method == WVIS_EQUAL_COUNT_BINS) {
     gint i, m;
     gfloat min, max, range, midpt;
-    vartabled *vt = vartable_element_get (selected_var, d);
+    vartabled *vt = ggobi_data_get_vartable(d, selected_var);
     gint ngroups = gg->wvis.npct;
     gint groupsize = (gint) (d->nrows_in_plot / ngroups);
     paird *pairs = (paird *) g_malloc (d->nrows_in_plot * sizeof (paird));
-    guint varno = g_slist_index (d->vartable, vt);
 
     min = vt->lim_tform.min;
     max = vt->lim_tform.max;
@@ -372,7 +371,7 @@ bin_boundaries_set (gint selected_var, GGobiData *d, ggobid *gg)
 
     /*-- sort the selected variable --*/
     for (i=0; i<d->nrows_in_plot; i++) {
-      pairs[i].f = d->tform.vals[d->rows_in_plot.els[i]][varno];
+      pairs[i].f = d->tform.vals[d->rows_in_plot.els[i]][selected_var];
       pairs[i].indx = d->rows_in_plot.els[i];
     }
     qsort ((gchar *) pairs, d->nrows_in_plot, sizeof (paird), pcompare);
@@ -520,7 +519,7 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
     PangoRectangle rect;
     PangoLayout *layout = gtk_widget_create_pango_layout(da, NULL);
 
-    vt = vartable_element_get (selected_var, d);
+    vt = ggobi_data_get_vartable(d, selected_var);
     if (vt) {
       min = vt->lim_tform.min;
       max = vt->lim_tform.max;

@@ -28,17 +28,14 @@ gboolean
 record_add (eeMode mode, gint a, gint b, gchar * lbl, gchar * id,
             gchar ** vals, GGobiData * d, GGobiData * e, ggobid * gg)
 {
-  gchar *s1, *s2;
-  gint i, j;
+  guint i, j;
   GList *l, *sl;
   splotd *sp;
   displayd *dsp;
   GGobiData *dtarget = d;
   greal *raw = NULL, x;
-  vartabled *vt;
-  gboolean found_missings = false;
 
-  g_return_if_fail(d->gg == e->gg);
+  g_return_val_if_fail(d->gg == e->gg, false);
 
   /*-- eventually check whether a->b already exists before adding --*/
   if (mode == ADDING_EDGES) {
@@ -46,137 +43,44 @@ record_add (eeMode mode, gint a, gint b, gchar * lbl, gchar * id,
     g_assert (a >= 0 && b >= 0 && a != b);
     dtarget = e;
   }
-
-  /*-- Make sure the id is unique -- usually only if adding points --*/
-  if (dtarget->idTable && id) {
-    gchar *stmp;
-    if (id && strlen (id) > 0)
-      stmp = g_strdup (id);
-    else
-      stmp = g_strdup_printf ("%d", dtarget->nrows + 1);
-    for (i = 0; i < dtarget->nrows; i++) {
-      if (strcmp (stmp, dtarget->rowIds[i]) == 0) {
-        g_printerr ("That id (%s) is already used (record %d)\n", stmp, i);
-        g_free (stmp);
-        return false;
-      }
-    }
-    g_free (stmp);
+  
+  if (!id)
+    id = g_strdup_printf ("%d", dtarget->nrows + 1);
+  
+  if (ggobi_data_get_row_by_id(d, id) != -1) {
+    g_printerr ("That id (%s) is already used\n", id);
+    return false;
   }
 
+  i = ggobi_data_add_rows(dtarget, 1);
+  ggobi_data_set_row_id(dtarget, i, lbl, true);
+
   if (dtarget->ncols) {
-    raw = (greal *) g_malloc (dtarget->ncols * sizeof (greal));
     for (j = 0; j < dtarget->ncols; j++) {
       if (strcmp (vals[j], "NA") == 0) {  /*-- got a missing --*/
-        raw[j] = (greal) 0.0;  /*-- or what? --*/
-        found_missings = true;
-      }
-      else {
+        ggobi_data_set_missing(dtarget, i, j);
+      } else {
         x = (greal) atof (vals[j]);
         if (ggobi_data_get_col_type(dtarget, j) == categorical) {
-          raw[j] = ggobi_data_get_col_level_value_closest(dtarget, j, x);
-
           
-          /* then update the table -- ugh -- no event for this yet.  I
-             should make the expose event repopulate the table ... and
-             I should update the table whenever any cases are added,
-             categorical or not, come to think of it.  nNAs could
-             change, as well as Any of the real variable stats.
-          {
-            if (d->vartable_tree_view[categorical] != NULL) {
-              GtkTreeIter iter;
-              GtkTreeModel *model;
-              GtkTreePath *path;
-
-              vartable_iter_from_varno (j, d, &model, &iter);
-              path = gtk_tree_model_get_path (model, &iter);
-              gtk_tree_path_append_index (path, raw[j]);
-              gtk_tree_model_get_iter (model, &iter, path);
-              gtk_tree_path_free (path);
-              gtk_list_store_set (GTK_LIST_STORE (model), &iter,
-                                  VT_LEVEL_COUNT, vt->level_counts[level],
-                                  -1);
-            }
-          }
-           */
+          raw[j] = ggobi_data_get_col_level_value_closest(dtarget, j, x);
         }
         else
-          raw[j] = x;
+          ggobi_data_set_raw_value(dtarget, i, j, x);
+          
       }
+      g_signal_emit_by_name(d, "col_data_changed", j);
     }
   }
 
-  /*-- Here's what the datad needs --*/
-/*
- * some of this can be encapsulated as datad_record_add, as long
- * as problems with the sequence of operations don't arise.
-*/
-  dtarget->nrows += 1;
-
-  /*-- add a row label --*/
-  if (lbl && strlen (lbl) > 0) {
-    rowlabel_add (lbl, dtarget);
-  }
-  else {
-    s1 = g_strdup_printf ("%d", dtarget->nrows);
-    rowlabel_add (s1, dtarget);
-  }
-
-  /*-- if necessary, add an id --*/
-  if (dtarget->idTable) {
-    if (id && strlen (id) > 0) {
-      datad_record_id_add (id, dtarget);
-    }
-    else {
-      s2 = g_strdup_printf ("%d", dtarget->nrows);
-      datad_record_id_add (s2, dtarget);  /*-- don't free s2 --*/
-    }
-  }
-
-  pipeline_arrays_check_dimensions (dtarget);
-  /*
-   * Resetting rows_in_plot causes a rows_in_plot_changed
-   * signal to be emitted, and the tour responds to that.
-   */
-  rows_in_plot_set(dtarget);
-
-  /*-- allocate and initialize brushing arrays --*/
-  br_glyph_ids_add (dtarget);
-  /*-- this is adding the brushing color when it should use the color
-    of the points, really --*/
-  br_color_ids_add (dtarget);
-  /* A default color was assigned during the reallocation; override it
-   * only if adding edges */
-  if (mode == ADDING_EDGES) {
-    dtarget->color.els[dtarget->nrows - 1] =
-      dtarget->color_now.els[dtarget->nrows - 1] = d->color.els[a];
-  }
-  br_hidden_alloc (dtarget);
-  vectorb_realloc (&dtarget->pts_under_brush, dtarget->nrows);
-  clusters_set(dtarget);
-
-  if (found_missings) {
-    arrays_add_rows (&dtarget->missing, dtarget->nrows);
-    for (j = 0; j < dtarget->ncols; j++) {
-      if (strcmp (vals[j], "NA") == 0) {  /*-- got a missing --*/
-        ggobi_data_set_missing(dtarget, dtarget->nrows - 1, j);
-      }
-    }
-  }
-
-  /*-- read in the data, push it through the first part of the pipeline --*/
-  if (dtarget->ncols) {
-    for (j = 0; j < dtarget->ncols; j++) {
-      dtarget->raw.vals[dtarget->nrows - 1][j] =
-        dtarget->tform.vals[dtarget->nrows - 1][j] = raw[j];
-      tform_to_world_by_var (j, dtarget);
-    }
-  }
 
   if (mode == ADDING_EDGES) {
+    dtarget->color.els[i] =
+      dtarget->color_now.els[i] = d->color.els[a];
+
     edges_alloc (e->nrows, e);
-    e->edge.sym_endpoints[dtarget->nrows - 1].a = g_strdup (d->rowIds[a]);
-    e->edge.sym_endpoints[dtarget->nrows - 1].b = g_strdup (d->rowIds[b]);
+    e->edge.sym_endpoints[dtarget->nrows - 1].a = ggobi_data_get_row_id(d, a);
+    e->edge.sym_endpoints[dtarget->nrows - 1].b = ggobi_data_get_row_id(d, b);
     e->edge.sym_endpoints[dtarget->nrows - 1].jpartner = -1;  /* XXX */
     unresolveAllEdgePoints (e);
     resolveEdgePoints (e, d);
@@ -185,8 +89,8 @@ record_add (eeMode mode, gint a, gint b, gchar * lbl, gchar * id,
      * make it show up in the display menu.
      */
     if (e->nrows == 1) {
-      void GGOBI (edge_menus_update) (ggobid * gg);
-      GGOBI (edge_menus_update) (gg);
+      void ggobi_edge_menus_update (ggobid * gg);
+      ggobi_edge_menus_update (gg);
     }
 
   }
@@ -262,11 +166,6 @@ DTL: So need to call unresolveEdgePoints(e, d) to remove it from the
       }
     }
   }
-/*  */
-
-  /* Adding the first edge: This is almost working, but the edge menu
-     isn't being initialized, and the edges don't appear */
-
 
   displays_tailpipe (FULL, gg);
 
@@ -435,155 +334,6 @@ find_nearest_edge (splotd * sp, displayd * display, ggobid * gg)
   return (lineid);
 }
 
-
-/*--------------------------------------------------------------------*/
-/* Reverse pipeline code for populating the table of variable values  */
-/*--------------------------------------------------------------------*/
-/*
- * I want these routines to work for point motion (movepts.c) and
- * for line editing (lineedit.c).  They require different arguments.
- * And they all need to be moved now, too, maybe some to splot.c or
- * maybe all to pipeline.c.  ... and what about the class-based
- * methodology?  Hmm.
-*/
-
-void
-pt_screen_to_plane (icoords * screen, gint id, gboolean horiz, gboolean vert,
-                    gcoords * eps, gcoords * planar, splotd * sp)
-{
-  gcoords prev_planar;
-  gfloat scale_x, scale_y;
-  greal precis = (greal) PRECISION1;
-
-  scale_x = sp->scale.x;
-  scale_y = sp->scale.y;
-  scale_x /= 2;
-  sp->iscale.x = (greal) sp->max.x * scale_x;
-  scale_y /= 2;
-  sp->iscale.y = -1 * (greal) sp->max.y * scale_y;
-
-  if (id >= 0) {                /* when moving points, initialize new planar values */
-    eps->x = 0;
-    eps->y = 0;
-    planar->x = prev_planar.x = sp->planar[id].x;
-    planar->y = prev_planar.y = sp->planar[id].y;
-  }
-
-  if (horiz) {                  /* relevant distinction for moving points */
-    screen->x -= sp->max.x / 2;
-    planar->x = (greal) screen->x * precis / sp->iscale.x;
-    planar->x += (greal) sp->pmid.x;
-  }
-
-  if (vert) {                   /* relevant distinction for moving points */
-    screen->y -= sp->max.y / 2;
-    planar->y = (greal) screen->y * precis / sp->iscale.y;
-    planar->y += (greal) sp->pmid.y;
-  }
-
-  if (id >= 0) {                /* when moving points */
-    if (horiz)
-      eps->x = planar->x - prev_planar.x;
-    if (vert)
-      eps->y = planar->y - prev_planar.y;
-  }
-}
-
-void
-pt_plane_to_world (splotd * sp, gcoords * planar, gcoords * eps,
-                   greal * world)
-{
-  displayd *display = (displayd *) sp->displayptr;
-  cpaneld *cpanel = &display->cpanel;
-  gint j, var;
-
-  switch (cpanel->pmode) {      /* only valid for scatterplots? */
-  case P1PLOT:
-    if (display->p1d_orientation == VERTICAL)
-      world[sp->p1dvar] = planar->y;
-    else
-      world[sp->p1dvar] = planar->x;
-    break;
-  case XYPLOT:
-    world[sp->xyvars.x] = planar->x;
-    world[sp->xyvars.y] = planar->y;
-    break;
-  case TOUR1D:
-    /*if (!gg->is_pp) { */
-    for (j = 0; j < display->t1d.nactive; j++) {
-      var = display->t1d.active_vars.els[j];
-      world[var] += (eps->x * (greal) display->t1d.F.vals[0][var]);
-    }
-    /*} */
-    break;
-  case TOUR2D3:
-    for (j = 0; j < display->t2d3.nactive; j++) {
-      var = display->t2d3.active_vars.els[j];
-      world[var] +=
-        (eps->x * (greal) display->t2d3.F.vals[0][var] +
-         eps->y * (greal) display->t2d3.F.vals[1][var]);
-    }
-    break;
-  case TOUR2D:
-    /*if (!gg->is_pp) { */
-    for (j = 0; j < display->t2d.nactive; j++) {
-      var = display->t2d.active_vars.els[j];
-      world[var] +=
-        (eps->x * (greal) display->t2d.F.vals[0][var] +
-         eps->y * (greal) display->t2d.F.vals[1][var]);
-    }
-    /*} */
-    break;
-  case COTOUR:
-    /*if (!gg->is_pp) { */
-    for (j = 0; j < display->tcorr1.nactive; j++) {
-      var = display->tcorr1.active_vars.els[j];
-      world[var] += (eps->x * (greal) display->tcorr1.F.vals[0][var]);
-    }
-    for (j = 0; j < display->tcorr2.nactive; j++) {
-      var = display->tcorr2.active_vars.els[j];
-      world[var] += (eps->y * (greal) display->tcorr2.F.vals[0][var]);
-    }
-    /*} */
-    break;
-  default:
-    g_printerr ("reverse pipeline not yet implemented for this projection\n");
-  }
-}
-
-void
-pt_world_to_raw_by_var (gint j, greal * world, greal * raw, GGobiData * d)
-{
-  gfloat precis = PRECISION1;
-  gfloat ftmp, rdiff;
-  gfloat x;
-
-  rdiff = ggobi_data_get_col_range(d, j);
-
-  ftmp = (gfloat) (world[j]) / precis;
-  x = (ftmp + 1.0) * .5 * rdiff;
-  x += ggobi_data_get_col_min(d, j);
-
-  raw[j] = x;
-}
-
-void
-pt_screen_to_raw (icoords * screen, gint id, gboolean horiz, gboolean vert,
-                  greal * raw, gcoords * eps, GGobiData * d, splotd * sp,
-                  ggobid * gg)
-{
-  gint j;
-  gcoords planar;
-  greal *world = (greal *) g_malloc0 (d->ncols * sizeof (greal));
-
-  pt_screen_to_plane (screen, id, horiz, vert, eps, &planar, sp);
-  pt_plane_to_world (sp, &planar, &planar, world);
-
-  for (j = 0; j < d->ncols; j++)
-    pt_world_to_raw_by_var (j, world, raw, d);
-
-  g_free (world);
-}
 
 void
 fetch_default_record_values (gchar ** vals, GGobiData * dtarget,

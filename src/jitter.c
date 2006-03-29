@@ -84,21 +84,16 @@ rejitter (gint * selected_cols, gint nselected_cols, GGobiData * d,
 {
   gint i, j, k, m;
   greal frand, fworld, fjit;
-  greal precis = (gfloat) PRECISION1;
   vartabled *vt;
-
-  g_assert (d->jitdata.nrows == d->nrows);
-  g_assert (d->jitdata.ncols == d->ncols);
 
   for (j = 0; j < nselected_cols; j++) {
     k = selected_cols[j];
-    vt = vartable_element_get (k, d);
+    vt = ggobi_data_get_vartable(d, k);
 
     for (i = 0; i < d->nrows_in_plot; i++) {
       m = d->rows_in_plot.els[i];
-      /*-- jitter_one_value (m, k); --*/
 
-      frand = (greal) jitter_randval (d->jitter.type) * precis;
+      frand = (greal) jitter_randval (d->jitter.type) * PRECISION1;
 
       /*
        * The world.vals used here is already jittered:
@@ -132,7 +127,7 @@ jitter_value_set (gfloat value, GGobiData * d, ggobid * gg)
   vars = get_selections_from_tree_view (tree_view, &nvars);
 
   for (j = 0; j < nvars; j++) {
-    vt = vartable_element_get (vars[j], d);
+    vt = ggobi_data_get_vartable(d, vars[j]);
     vt->jitter_factor = value;
   }
 

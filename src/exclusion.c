@@ -68,7 +68,8 @@ clusters_set (GGobiData * d)
   gint n, nclusters;
   colorschemed *scheme;
 
-  g_return_if_fail(GGOBI_IS_GGOBI(d->gg));
+  if (!GGOBI_IS_GGOBI(d->gg))
+    return;
   scheme = d->gg->activeColorScheme;
 
   nclusters = symbol_table_populate (d);
@@ -112,7 +113,6 @@ clusters_set (GGobiData * d)
    *  clusterid is the groups vector: an integer for each case,
    *  indicating its cluster membership
    */
-  vectori_alloc_zero (&d->clusterid, d->nrows);
 
   if (nclusters > 0 && nclusters != 1) {
     for (i = 0; i < d->nrows; i++) {

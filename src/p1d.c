@@ -59,7 +59,7 @@ p1d_activate (gint state, displayd * display, ggobid * gg)
      * for now about turning it on when re-entering.
      */
     GtkWidget *pnl;
-    pnl = mode_panel_get_by_name (GGOBI (getPModeName) (P1PLOT), gg);
+    pnl = mode_panel_get_by_name (ggobi_getPModeName (P1PLOT), gg);
     if (pnl) {
       GtkWidget *w = widget_find_by_name (pnl, "P1PLOT:cycle_toggle");
       gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (w), off);

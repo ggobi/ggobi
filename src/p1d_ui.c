@@ -166,7 +166,7 @@ cpanel_p1dplot_make (ggobid * gg)
   GtkObject *adj;
 
   panel = (modepaneld *) g_malloc (sizeof (modepaneld));
-  panel->name = g_strdup (GGOBI (getPModeName) (P1PLOT));
+  panel->name = g_strdup (ggobi_getPModeName (P1PLOT));
   gg->control_panels = g_list_append (gg->control_panels, (gpointer) panel);
 
   panel->w = gtk_vbox_new (false, VBOX_SPACING);
@@ -303,7 +303,7 @@ cpanel_p1d_set (displayd * display, cpaneld * cpanel, ggobid * gg)
   GtkWidget *pnl, *w;
   GtkAdjustment *adj;
 
-  pnl = mode_panel_get_by_name (GGOBI (getPModeName) (P1PLOT), gg);
+  pnl = mode_panel_get_by_name (ggobi_getPModeName (P1PLOT), gg);
 
   /*-- Texturing or ASH --*/
   w = widget_find_by_name (pnl, "P1PLOT:type_option_menu");

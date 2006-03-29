@@ -8,6 +8,8 @@
 #include <gtk/gtk.h>
 #include <math.h>
 
+typedef enum {no_edgesets, edgesets_only, all_datatypes} datatyped;
+
 typedef struct _Subset {
   gint random_n;
   gint string_pos;
@@ -109,13 +111,11 @@ public gboolean missings;
 
 public struct _ggobid *gg; /*-- a pointer to the parent --*/
 
-public GArray *rowlab;
 
 /*-- row ids to support generalized linking --*/
 public GHashTable *idTable;
-public char **rowIds;
 /*-- to support brushing by categorical variable --*/
-public gchar* linkvar = NULL;  /*-- the linking variable column--*/
+public gchar* linkvar = NULL;  /*-- the linking variable name--*/
 
 public Subset  subset;
 public Jitterd  jitter;
@@ -126,19 +126,22 @@ public Sphere_d  sphere;
 public EdgeData  edge;
 public BrushBins  brush;
 
-public GSList *vartable;
-
 public GtkWidget *vartable_tree_view[all_vartypes];
 public GtkTreeModel *vartable_tree_model; /* the root model, with all vars */
 
+// Vectors of length ncol
+public vartabled **vartable;
 
 // Vectors of length nrows
+public char **rowIds;
 public vector_b excluded;
 public vector_b hidden;
 public vector_b hidden_now;
 public vector_b hidden_prev;
 public vector_b pts_under_brush;
 public vector_b sampled;
+public vector_i clusterid;
+public vector_i rows_in_plot;
 public vector_g glyph;
 public vector_g glyph_now;
 public vector_g glyph_prev;
@@ -155,7 +158,6 @@ public array_s missing;
 
 
 public gboolean missings_show_p; /*-- show/hide per datad, not per display --*/
-public vector_i rows_in_plot;  /*-- always of length self->nrows --*/
 public gint nrows_in_plot;     /*-- how many elements of rows_in_plot to use --*/
 
 /*--------------- clusters: hiding, excluding ----------------------*/
@@ -165,7 +167,6 @@ public GtkWidget *cluster_table; /*-- table of symbol groups from brushing --*/
 public gint nclusters;
 public clusterd *clusv;
 public clusteruid *clusvui;
-public vector_i clusterid;  /* cluster membership for each record */
 
 /*------------------------ brushing ----------------------------------*/
 
@@ -189,11 +190,14 @@ property UINT ncols
    minimum = 0, maximum = INT_MAX, default_value = 0,
    flags = CONSTRUCT_ONLY, link, export);
    
-signal private NONE (INT, INT) void 
-rows_in_plot_changed(self, int arg1, int arg2);
+signal private NONE (INT) void 
+rows_in_plot_changed(self, guint n);
 
 signal public NONE (INT) void 
 col_name_changed(self, guint j);
+
+signal public NONE (INT) void 
+col_data_changed(self, guint j);
 
 signal public NONE (INT) void
 col_limits_changed(self, guint j);
@@ -207,55 +211,24 @@ col_deleted(self, guint j);
 signal public NONE (INT) void
 rows_added(self, guint n);
 
-/*signal public NONE (INT) void
-col_added(self, guint j);
-
-*/
 
 init (self) {
   sphere_init(self); 
   
   self_set_name(self, "unknown", NULL);
 
+  self->idTable = g_hash_table_new(g_str_hash, g_str_equal);
+
   self->nearest_point = -1;
   self->missings_show_p = true;
-}
-
-override (G:Object) GObject*
-constructor (GType type, guint n_construct_properties, GObjectConstructParam *construct_properties)
-{
-  GGobiData* d = (GGobiData*) PARENT_HANDLER(type, n_construct_properties, construct_properties);
-  d->nrows_in_plot = d->nrows;  /*-- for now --*/
-
-  // should become:
-  // self_add_cols(self, 0, d->ncols)
-  // self_add_rows(self, 0, d->nrows)
-
-  arrayf_alloc (&d->raw, d->nrows, d->ncols);
-  arrays_alloc (&d->missing, d->nrows, d->ncols);
-
-  rowlabels_alloc (d);
-
-  vartable_alloc (d);
-  vartable_init (d);
-
-  br_glyph_ids_alloc (d);
-  br_glyph_ids_init (d);
-
-  br_color_ids_alloc (d);
-  br_color_ids_init (d);
-
-  br_hidden_alloc (d);
-  br_hidden_init (d);
-
-
-  return((GObject *)d);
 }
 
 public GGobiData* 
 new(guint nrows, guint ncols)
 {
-  GGobiData* d = (GGobiData*) g_object_new(GGOBI_TYPE_DATA, "ncols", ncols, "nrows", nrows, NULL);
+  GGobiData* d = (GGobiData*) g_object_new(GGOBI_TYPE_DATA, NULL);
+  self_add_cols(d, ncols);
+  self_add_rows(d, nrows);
   return(d);
 }
 
@@ -288,14 +261,14 @@ get_n_rows(self) {
 public gchar* 
 get_col_name(self, guint j) 
 {
-  vartabled* vt = vartable_element_get (j, self);
+  vartabled* vt = self_get_vartable(self, j);
   return g_strdup(vt->collab);
 }
 
 public gchar* 
 get_col_nickname(self, guint j) 
 {
-  vartabled* vt = vartable_element_get (j, self);
+  vartabled* vt = self_get_vartable(self, j);
   return g_strdup(vt->nickname);
 }
 
@@ -314,7 +287,7 @@ get_col_index_by_name(self, gchar* value)
 public void 
 set_col_name(self, guint j, gchar* value) 
 {
-  vartabled* vt = vartable_element_get (j, self);
+  vartabled* vt = self_get_vartable(self, j);
 
   if (value == NULL) value = g_strdup_printf("V%d", j + 1);
 
@@ -322,32 +295,74 @@ set_col_name(self, guint j, gchar* value)
   vt->collab_tform = g_strdup(value);
   vt->nickname = g_strndup (vt->collab, 2);
 
-  g_signal_emit_by_name (self, "col_name_changed", (gpointer) self, j);
+  g_signal_emit_by_name (self, "col_name_changed", j);
 
-  // SEND COLUMN NAME CHANGED SIGNAL
-  // Listeners:
-  //  * vartable_collab_set_by_var (j, d);
-  //  * varpanel_label_set (j, d);   /*-- checkboxes --*/
-  //  * varcircle_label_set (j, d);  /*-- variable circles --*/
-  //  * tform_label_update (jvar, d);
-  // these should be added as listeners in datad attach
-  
 }
 
 // FIXME: to be removed once pipeline in place
 public gchar* 
 get_transformed_col_name(self, guint j) 
 {
-  vartabled* vt = vartable_element_get (j, self);
-  return g_strdup(vt->collab_tform);
-}
+  gchar *lbl0, *lbl1, *lbl2;
+   vartabled *vt = self_get_vartable(self, j);
 
-public void 
-set_transformed_col_name(self, guint j, gchar* value) 
-{
-  vartabled* vt = vartable_element_get (j, self);
-  //if (vt->collab_tform) g_object_unref(vt->collab_tform);  //is this necessary?
-  vt->collab_tform = g_strdup(value);
+   /*-- skip the stage0 changes except negation --*/
+   switch (vt->tform0) {
+     case NEGATE:
+       lbl0 = g_strdup_printf ("-%s", self_get_col_name(self, j));
+       break;
+     default:
+       lbl0 = g_strdup (self_get_col_name(self, j));
+       break;
+   }
+
+   switch (vt->tform1) {
+     case NO_TFORM1:
+       lbl1 = g_strdup (lbl0);
+       break;
+     case BOXCOX:
+       lbl1 = g_strdup_printf ("B-C(%s,%.2f)", lbl0, vt->param);
+       break;
+     case LOG10:
+       lbl1 = g_strdup_printf ("log10(%s)", lbl0);
+       break;
+     case INVERSE:
+       lbl1 = g_strdup_printf ("1/%s", lbl0);
+       break;
+     case ABSVALUE:
+       lbl1 = g_strdup_printf ("abs(%s)", lbl0);
+       break;
+     case SCALE_AB:
+       lbl1 = g_strdup_printf ("%s [a,b]", lbl0);
+       break;
+     default:  // compiler pacification
+       lbl1 = "";
+   }
+
+   switch (vt->tform2) {
+     case STANDARDIZE:
+       lbl2 = g_strdup_printf ("(%s-m)/s", lbl1);
+     break;
+     case SORT:
+       lbl2 = g_strdup_printf ("sort(%s)", lbl1);
+     break;
+     case RANK:
+       lbl2 = g_strdup_printf ("rank(%s)", lbl1);
+     break;
+     case NORMSCORE:
+       lbl2 = g_strdup_printf ("normsc(%s)", lbl1);
+     break;
+     case ZSCORE:
+       lbl2 = g_strdup_printf ("zsc(%s)", lbl1);
+     break;
+     case DISCRETE2:
+       lbl2 = g_strdup_printf ("%s:0,1", lbl1);
+     break;
+     default:
+       lbl2 = g_strdup (lbl1);
+   }
+   
+   return lbl2;
 }
 
 
@@ -364,7 +379,7 @@ set_transformed_col_name(self, guint j, gchar* value)
  * will be created, and the raw value set to that.
  */
 public void
-set_missing (self, guint i, guint j)
+set_missing(self, guint i, guint j)
 {
   if (self_get_col_type(self, j) == categorical) {
     self_set_categorical_value(self, i, j, "MISSING");
@@ -378,7 +393,7 @@ set_missing (self, guint i, guint j)
 }
 
 public gboolean
-is_missing (self, guint i, guint j) 
+is_missing(self, guint i, guint j) 
 {
   return (self->missing.vals[i][j] == 1);  
 }
@@ -415,15 +430,17 @@ set_raw_value(self, guint i, guint j, gdouble value)
 {
   if(GGobiMissingValue && GGobiMissingValue(value))
     self_set_missing(self, i, j);
-  else self->raw.vals[i][j] = value;
+  else {
+    self->raw.vals[i][j] = value;
+    self->tform.vals[i][j] = value;
+  }
 }
-
 
 // replaces getAutoLevelIndex
 public void
 set_categorical_value(self, guint i, guint j, const gchar* value) 
 {
-  vartabled *vt = vartable_element_get(j, self);
+  vartabled *vt = self_get_vartable(self, j);
   guint k, level = -1;
 
   self_set_col_type(self, j, categorical);
@@ -478,23 +495,56 @@ set_string_value(self, guint i, guint j, const gchar* value)
 public vartyped 
 get_col_type(self, guint j)
 {
-  vartabled *vt = vartable_element_get(j, self);
+  vartabled *vt = self_get_vartable(self, j);
   return(vt->vartype);
 }
 
 public void 
 set_col_type(self, guint j, vartyped value)
 {
-  vartabled *vt = vartable_element_get(j, self);
+  vartabled *vt = self_get_vartable(self, j);
   vt->vartype = value;
 }
+
+/*
+ * get_vartable:
+ * Get variable meta data for specified column
+ *
+ * @self: #GGobiData object
+ * @j: column index
+ *
+ * Replaces vartable_element_get.  Should eventually become private.
+ */
+public vartabled*
+get_vartable (self, guint j)
+{
+  g_return_val_if_fail(j < self->ncols, NULL);
+  
+  return self->vartable[j];
+}
+
+/*
+ * set_vartable:
+ * Set variable meta data for specified column
+ *
+ * @self: #GGobiData object
+ * @j: column index
+ *
+ * Should eventually become private.
+ */
+public void
+set_vartable (self, guint j, vartabled* value)
+{
+  self->vartable[j] = value;
+}
+
 
 // All the API functions work with value, so you never need
 // worry about the actual position in the array
 public gchar  
 get_col_n_levels(self, guint j)
 {
-  vartabled *vt = vartable_element_get(j, self);
+  vartabled *vt = self_get_vartable(self, j);
   g_return_val_if_fail(self_get_col_type(self, j) == categorical, 0);  
   
   return(vt->nlevels);
@@ -502,7 +552,7 @@ get_col_n_levels(self, guint j)
 
 public guint
 get_col_level_index(self, guint j, guint value) {
-  vartabled *vt = vartable_element_get(j, self);
+  vartabled *vt = self_get_vartable(self, j);
   guint i = 0;
 
   g_return_val_if_fail(self_get_col_type(self, j) == categorical, -1);  
@@ -517,7 +567,7 @@ get_col_level_index(self, guint j, guint value) {
 public gchar* 
 get_col_level_name(self, guint j, guint value)
 {
-  vartabled *vt = vartable_element_get(j, self);
+  vartabled *vt = self_get_vartable(self, j);
   guint i = self_get_col_level_index(self, j, value);
 
   g_return_val_if_fail(self_get_col_type(self, j) == categorical, NULL);
@@ -529,7 +579,7 @@ get_col_level_name(self, guint j, guint value)
 public guint  
 get_col_level_count(self, guint j, guint value)
 {
-  vartabled *vt = vartable_element_get(j, self);
+  vartabled *vt = self_get_vartable(self, j);
   guint i = self_get_col_level_index(self, j, value);
 
   g_return_val_if_fail(self_get_col_type(self, j) == categorical, 0);  
@@ -543,8 +593,8 @@ get_col_level_count(self, guint j, guint value)
  * Get closest level value
  *
  * @self: #GGobiData object
- * @self: column index
- * @self: target value to search for 
+ * @j: column index
+ * @value: target value to search for 
  *
  * For a categorical categorical, this searches through all level
  * values and returns the level value that is closest to the desired
@@ -557,7 +607,7 @@ get_col_level_count(self, guint j, guint value)
 public guint  
 get_col_level_value_closest(self, guint j, guint value)
 {
-  vartabled *vt = vartable_element_get(j, self);
+  vartabled *vt = self_get_vartable(self, j);
   g_return_val_if_fail(self_get_col_type(self, j) == categorical, 0);  
 
   guint k, level = 0, dist = 0, ddist = G_MAXUINT;
@@ -574,7 +624,7 @@ get_col_level_value_closest(self, guint j, guint value)
 
 public guint
 get_col_level_value(self, guint j, guint k) {
-  vartabled *vt = vartable_element_get(j, self);
+  vartabled *vt = self_get_vartable(self, j);
   return vt->level_values[k];
 }
 
@@ -583,7 +633,7 @@ get_col_level_value(self, guint j, guint k) {
  * Find the biggest value in the column.
  *
  * @self: #GGobiData object
- * @self: column index
+ * @j: column index
  * 
  * For numerical columns, value is cached by limits_set()
  * Does the right thing for categorical variables too.  
@@ -591,7 +641,7 @@ get_col_level_value(self, guint j, guint k) {
 public gfloat
 get_col_max(self, guint j)
 {
-  vartabled *vt = vartable_element_get(j, self);
+  vartabled *vt = self_get_vartable(self, j);
   guint level_value, level_value_max=G_MININT, i;
 
   if (self_get_col_type(self, j) != categorical) {
@@ -624,7 +674,7 @@ get_col_max(self, guint j)
 public gfloat
 get_col_min(self, guint j)
 {
-  vartabled *vt = vartable_element_get(j, self);
+  vartabled *vt = self_get_vartable(self, j);
   guint level_value, level_value_min=G_MAXINT, i;
 
   if (self_get_col_type(self, j) != categorical) {
@@ -647,24 +697,24 @@ get_col_min(self, guint j)
 public gfloat
 get_col_range(self, guint j)
 {
-  vartabled *vt = vartable_element_get(j, self);
+  vartabled *vt = self_get_vartable(self, j);
   return vt->lim.max - vt->lim.min;
 }
 
 public gfloat
 get_col_mean(self, guint j)
 {
-  vartabled *vt = vartable_element_get(j, self);
+  vartabled *vt = self_get_vartable(self, j);
   return vt->mean;
 }
 
 public void  
-set_col_levels(self, guint j, guint levels, gchar** names, gchar* values, gchar* counts)
+set_col_levels(self, guint j, guint levels, gchar** names, guint* values, guint* counts)
 {
   guint i;
-  vartabled *vt = vartable_element_get(j, self);
+  vartabled *vt = self_get_vartable(self, j);
 
-  g_return_if_fail(self_get_col_type(self, j) == categorical);  
+  self_set_col_type(self, j, categorical);  
 
   vt->vartype = categorical;
   vt->nlevels = levels;
@@ -682,7 +732,7 @@ public gchar*
 get_string_value(self, guint i, guint j, gboolean transformed) 
 {
   guint n = 0, lval = -1;
-  vartabled *vt = vartable_element_get(j, self);
+  vartabled *vt = self_get_vartable(self, j);
   gdouble raw = transformed ? self->tform.vals[i][j] : self->raw.vals[i][j];
   
   if (self_is_missing(self, i, j)) 
@@ -696,7 +746,7 @@ get_string_value(self, guint i, guint j, gboolean transformed)
       break;
     }
   }
-  if (lval == -1) {
+  if (lval == -1) {  //useful for debugging
     g_printerr ("Levels for %s specified incorrectly\n", vt->collab);
     return g_strdup_printf("%g", raw);
   }
@@ -716,6 +766,28 @@ has_variables (self)
   return (self->ncols > 0);
 }
 
+public void
+set_row_id(self, guint i, gchar* value, gboolean check) {
+  if (value == NULL)
+    value = g_strdup_printf("%d", i+1);
+
+  g_hash_table_insert (self->idTable, value, GINT_TO_POINTER(i));
+  self->rowIds[i] = g_strdup(value);
+}
+
+public gchar*
+get_row_id(self, guint i) {
+  return g_strdup(self->rowIds[i]);
+}
+
+public guint 
+get_row_by_id(self, gchar *id) {
+  gpointer pos = g_hash_table_lookup(self->idTable, id);
+  if (pos == NULL)
+    return -1;
+  return GPOINTER_TO_INT(pos);
+}
+
 /*
  * add_rows: 
  * Add n rows to the dataset
@@ -724,16 +796,8 @@ has_variables (self)
  * @n: number of rows to add
  *
  * Adds extra rows, allocating space as needed.
- * Hasn't been tested yet.  
  *
- * Should replace significant amounts of code in:
- * edge_add, record_add.  Also need to search for all 
- * code using *_add_rows and *_realloc and make sure it is encapsulated into
- * this function, ensuring that all vectors/arrays in the data
- * are always the same size, probably including pipeline_arrays_check_dimensions.
- * (this will eliminate most of the code in brush_init.c)
- *
- * This does emits the rows_added signal.  Listeners to this signal should
+ * This emits the rows_added signal.  Listeners to this signal should
  * assume that there is no useful data in any of the new rows, and it should
  * be mainly for allocating space in other places.
  *
@@ -741,9 +805,13 @@ has_variables (self)
  */
 public guint
 add_rows(self, guint n) {
+  gint def_color = self->gg ? self->gg->color_id : 0;
+  gint def_type  = self->gg ? self->gg->glyph_id.type : FC;
+  gint def_size =  self->gg ? self->gg->glyph_id.size : 1;
   guint i, nprev = self->nrows;
   self->nrows += n;
   
+  self->rowIds = (gchar **) g_realloc (self->rowIds, sizeof(gchar *) * self->nrows);
   vectorb_realloc (&self->excluded, self->nrows);
   vectorb_realloc (&self->hidden, self->nrows);
   vectorb_realloc (&self->hidden_now, self->nrows);
@@ -754,27 +822,31 @@ add_rows(self, guint n) {
   vectorg_realloc (&self->glyph_now, self->nrows);
   vectorg_realloc (&self->glyph_prev, self->nrows);
   vectori_realloc (&self->rows_in_plot, self->nrows);
+  vectori_realloc (&self->clusterid, self->nrows);
   vectors_realloc (&self->color, self->nrows);
   vectors_realloc (&self->color_now, self->nrows);
   vectors_realloc (&self->color_prev, self->nrows);
-    
+
   for (i = nprev; i < self->nrows; i++) {
-    self->color.els[i] =      self->gg ? self->gg->color_id : 0;
-    self->color_now.els[i] =  self->gg ? self->gg->color_id : 0;
-    self->color_prev.els[i] = self->gg ? self->gg->color_id : 0;
+    self_set_row_id(self, i, NULL, false);
+    
+    self->color.els[i] = def_color;
+    self->color_now.els[i] = def_color;
+    self->color_prev.els[i] = def_color;
     self->excluded.els[i] = false;
-    self->glyph.els[i].type =      self->gg ? self->gg->glyph_id.type : FC;
-    self->glyph_now.els[i].type =  self->gg ? self->gg->glyph_id.type : FC;
-    self->glyph_prev.els[i].type = self->gg ? self->gg->glyph_id.type : FC;
-    self->glyph.els[i].size =      self->gg ? self->gg->glyph_id.size : 0;
-    self->glyph_now.els[i].size =  self->gg ? self->gg->glyph_id.size : 0;
-    self->glyph_prev.els[i].size = self->gg ? self->gg->glyph_id.size : 0;
+    self->glyph.els[i].type = def_type;
+    self->glyph_now.els[i].type = def_type;
+    self->glyph_prev.els[i].type = def_type;
+    self->glyph.els[i].size = def_size;
+    self->glyph_now.els[i].size = def_size;
+    self->glyph_prev.els[i].size = def_size;
     self->hidden.els[i] =  false;
     self->hidden_now.els[i] = false;
     self->hidden_prev.els[i] = false;
     self->pts_under_brush.els[i] = false; 
     self->sampled.els[i] = true;
   }
+  self_set_rows_in_plot(self);
   clusters_set(self);
 
   arrayf_add_rows (&self->raw, self->nrows);
@@ -783,7 +855,7 @@ add_rows(self, guint n) {
   arrayg_add_rows (&self->world, self->nrows);
   arrays_add_rows (&self->missing, self->nrows);
 
-  g_signal_emit_by_name (self, "cols_added", (gpointer) self, n);  
+  g_signal_emit_by_name (self, "rows_added", (gpointer) self, n);  
   return nprev;
 }
 
@@ -795,211 +867,189 @@ add_rows(self, guint n) {
  * @self: #GGobiData object
  * @n: number of rows to add
  *
- * Doesn't work yet.  Will do most of what is currently in
- * varchange.c
- *
  */ 
 public guint 
 add_cols(self, guint n) {
-  guint i, nprev = self->ncols;
+  guint nprev = self->ncols;
   self->ncols += n;
-  
-  for(i = 0; i < n; i++)
-    vartable_element_new(self);
 
+  self->vartable = (vartabled **) g_realloc (self->vartable, sizeof(vartabled *) * self->ncols);
+  for(guint j = nprev; j < self->ncols; j++) {
+    vartabled *vt = vartable_element_new(self);
+    self_set_vartable(self, j, vt);
+    g_debug("Setting vartable %i", j);
+  } 
   arrayf_add_cols (&self->raw, self->ncols);
   arrayf_add_cols (&self->tform, self->ncols);
   arrayg_add_cols (&self->jitdata, self->ncols);
   arrayg_add_cols (&self->world, self->ncols);
   arrays_add_cols (&self->missing, self->ncols);
 
-  //tour_realloc_up (self, self->ncols);
+  tour_realloc_up (self, self->ncols);
 
   g_signal_emit_by_name (self, "cols_added", (gpointer) self, n);  
+  
   return nprev;
 }
 
 // also need delete_cols and delete_rows
 
-}
-
-
-%h{
-
-void freeLevelHashEntry(gpointer key, gpointer value, gpointer data);
-
-/*-- used as an attribute of variable notebooks --*/
-typedef enum {no_edgesets, edgesets_only, all_datatypes} datatyped;
-
-extern endpointsd *resolveEdgePoints(GGobiData *e, GGobiData *d);
-void unresolveAllEdgePoints(GGobiData *e);
-
-void datad_record_ids_set(GGobiData *d, gchar **ids, gboolean duplicate);
-void ggobi_data_set_row_labels(GGobiData *d, gchar **labels);
-%}
-
-%{
-void
-datad_free (GGobiData *d, ggobid *gg) 
+public void
+free (self) 
 {
-  arrayf_free (&d->raw, 0, 0);
-  pipeline_arrays_free (d);
+  vectorb_free (&self->excluded);
+  vectorb_free (&self->hidden);
+  vectorb_free (&self->hidden_now);
+  vectorb_free (&self->hidden_prev);
+  vectorb_free (&self->pts_under_brush);
+  vectorb_free (&self->sampled);
+  vectorg_free (&self->glyph);
+  vectorg_free (&self->glyph_now);
+  vectorg_free (&self->glyph_prev);
+  vectori_free (&self->rows_in_plot);
+  vectori_free (&self->clusterid);
+  vectors_free (&self->color);
+  vectors_free (&self->color_now);
+  vectors_free (&self->color_prev);
 
-  arrays_free (&d->missing, 0, 0);
+  arrayf_free (&self->raw, self->nrows, self->ncols);
+  arrayf_free (&self->tform, self->nrows, self->ncols);
+  arrayg_free (&self->jitdata, self->nrows, self->ncols);
+  arrayg_free (&self->world, self->nrows, self->ncols);
+  arrays_free (&self->missing, self->nrows, self->ncols);
 
-   /* rowIds and idTable are intrinsically linked !*/
-  if(d->idTable) {
-    g_hash_table_foreach(d->idTable, freeLevelHashEntry, d->idTable);
-    g_hash_table_destroy(d->idTable); 
+  for (guint j = self->ncols-1; j >= 0; j--) {
+    vartabled *vt = self_get_vartable(self, j); 
+    if (vt->collab != NULL) g_object_unref (vt->collab);
+    if (vt->collab_tform != NULL) g_object_unref (vt->collab_tform);
+    g_free(vt);
   }
+  g_free (self->vartable);
 
-  if(d->rowIds) 
-    g_free(d->rowIds);
-
-  g_free (d);
+  if(self->idTable) {
+    //g_hash_table_foreach(self->idTable, freeLevelHashEntry, self->idTable);
+    g_hash_table_destroy(self->idTable); 
+  }
+  g_free(self->rowIds);
+  g_free(self);
 }
 
-displayd *
-datad_init (GGobiData *d, ggobid *gg, gboolean cleanup)
+public void 
+attach (self, ggobid *gg, gboolean cleanup)
 {
-  d->gg = gg;
-  gg->d = g_slist_append (gg->d, d);
+  self->gg = gg;
+  gg->d = g_slist_append (gg->d, self);
   displayd *display = NULL;
 
-  if (cleanup) {
-    varpanel_clear (d, gg);
+  gint *vars = (gint *) g_malloc(self->ncols * sizeof(gint));
+  
+  self->brush.bin0.x = self->brush.bin1.x = BRUSH_NBINS;
+  self->brush.bin0.y = self->brush.bin1.y = BRUSH_NBINS;
+
+  gint iv, ih;
+  self->brush.nbins = BRUSH_NBINS;
+
+  edgeedit_init (self->gg);
+  if (self->edge.n)
+    vectorb_realloc (&self->edge.xed_by_brush, self->edge.n);
+
+  /* binning the plot window; no need to realloc these */
+  self->brush.binarray = (bin_struct **)
+    g_malloc (self->brush.nbins * sizeof (bin_struct *));
+  for (ih = 0; ih < self->brush.nbins; ih++) {
+    self->brush.binarray[ih] = (bin_struct *)
+      g_malloc (self->brush.nbins * sizeof (bin_struct));
+
+    for (iv = 0; iv < self->brush.nbins; iv++) {
+      self->brush.binarray[ih][iv].nels = 0;
+      self->brush.binarray[ih][iv].nblocks = 1;
+      self->brush.binarray[ih][iv].els = (gulong *)
+        g_malloc (BINBLOCKSIZE * sizeof (gulong));
+    }
   }
 
-  varpanel_populate (d, gg);   /*-- toggles */
-  /*-- circles: build but don't show --*/
-  varcircles_populate (d, gg);
+  /*
+   * If there are missings, they've been initialized with a value
+   * of 0.  Here, re-set that value to 15% below the minimum for each
+   * variable.  (dfs -- done at Di's request, September 2004)
+   */
+  limits_set (self, true, true, self->gg->lims_use_visible);
+  for (guint j = 0; j < self->ncols; j++) vars[j] = j;
+  impute_fixed (IMP_BELOW, 15.0, self->ncols, vars, self);
+  limits_set (self, true, true, self->gg->lims_use_visible);
+  g_free(vars);
 
-  pipeline_init (d);
-  clusters_set(d);  /*-- find the clusters for data just read in --*/
+  clusters_set(self);  /*-- find the clusters for data just read in --*/
+
+  display_menu_build (gg);
+  
+  // Set up variable table and listen to important events
+  self_connect__col_data_changed(self, vartable_stats_set_by_var, NULL);
+  self_connect__col_data_changed(self, vartable_limits_set_by_var, NULL);
+  self_connect__col_name_changed(self, vartable_collab_set_by_var, NULL);
+  self_connect__col_name_changed(self, vartable_collab_tform_set_by_var, NULL);
+
+  varcircles_populate (self, gg);
+  self_connect__col_name_changed(self, varcircle_label_set, NULL);
+
+  if (cleanup)
+    varpanel_clear (self, gg);
+  varpanel_populate (self, gg);   
+  if (gg->current_display != NULL)
+    varpanel_refresh (gg->current_display, gg);
+  if (g_slist_index(gg->d, (gpointer)self) == 0)
+    varpanel_set_sensitive (self, true, gg);
+  self_connect__col_name_changed(self, varpanel_label_set, NULL);
+
+  
+
+  //"Pipeline"
+  tform_to_world(self);
+  self_connect__col_data_changed(self, tform_to_world_by_var, NULL);
 
   if (cleanup || g_list_length(gg->displays) == 0) {
     display_free_all (gg);  /*-- destroy any existing displays --*/
     gg->pmode = NULL_PMODE;
 
     /*-- initialize the first display --*/
-    if(sessionOptions->info->createInitialScatterPlot && d->ncols > 0) {
-/*XXX allow this to be specified as a gtk type name on the command
-      line, initialization file, etc.  and invoke the corresponding
-      create() method. */
-      display = scatterplot_new (false, NULL, d, gg);
-        /* Need to make certain this is the only one there. */
+    if(sessionOptions->info->createInitialScatterPlot && self->ncols > 0) {
+      display = scatterplot_new (false, NULL, self, gg);
 
-      if (display != NULL) {
-        gg->displays = g_list_append (gg->displays, (gpointer) display);
-	    gg->current_splot = (splotd *)
-        	g_list_nth_data (display->splots, 0);
-        display->current_splot = gg->current_splot;
-        display_set_current (display, gg);
+      gg->displays = g_list_append (gg->displays, (gpointer) display);
+      gg->current_splot = (splotd *)
+      g_list_nth_data (display->splots, 0);
+      display->current_splot = gg->current_splot;
+      display_set_current (display, gg);
 
-        /*-- turn on event handling in the very first plot --*/
-        /*-- ... but will it cause trouble for later plots?  ok so far
-	  --*/
-	/* Is imode set yet?  I hope so. */
-        sp_event_handlers_toggle (gg->current_splot, on, gg->pmode, gg->imode);
-      }
+      sp_event_handlers_toggle (gg->current_splot, on, gg->pmode, gg->imode);
     }
   }
-
-  if (gg->current_display != NULL)
-    varpanel_refresh (gg->current_display, gg);
-
-  if (g_slist_index(gg->d, (gpointer)d) == 0)
-    varpanel_set_sensitive (d, true, gg);
-
-  g_signal_emit (G_OBJECT (gg), GGobiSignals[DATAD_ADDED_SIGNAL], 0, d);
-
-  display_menu_build (gg);
-
-  return (display);
+  g_signal_emit_by_name (G_OBJECT (gg), "datad_added", self);
 }
 
-
-
-
-/*------------------------------------------------------------------------*/
-/*                          row labels                                    */
-/*------------------------------------------------------------------------*/
-/* This initializes rowIds to row numbers if ids are not provided */
-void
-datad_record_ids_set(GGobiData *d, gchar **ids, gboolean duplicate)
+/*
+ * set_rows_in_plot:
+ *
+ * @self: #GGobiData object
+ *
+ * Combine the values in two arrays:
+ *   excluded[] (which comes from the exclusion panel or from linking)
+ *   sampled[] (which come from the subset panel)
+ * to determine which cases should be plotted.
+ *
+ * rows_in_plot = sampled && !excluded
+*/
+public void
+set_rows_in_plot(self)
 {
-  gint i;
-  guint *index;
-  gchar *tmp;
+  guint i;
+  self->nrows_in_plot = 0;
 
-  d->idTable = g_hash_table_new(g_str_hash, g_str_equal);
-  d->rowIds = (gchar **) g_malloc(sizeof(gchar *) * d->nrows);
-  for(i = 0; i < d->nrows; i++) {
-     if(ids)
-       tmp = duplicate ? g_strdup(ids[i]) : ids[i];
-     else {
-       char buf[10];
-       sprintf(buf, "%d", i+1);
-       tmp = g_strdup(buf);
-     }
-     index = (guint *) g_malloc(sizeof(guint));
-     *index = i;
-     g_hash_table_insert(d->idTable, tmp, index);
-     d->rowIds[i] = tmp;     
-  }
+  for (i = 0; i < self->nrows; i++)
+    if (self->sampled.els[i] && !self->excluded.els[i])
+      self->rows_in_plot.els[self->nrows_in_plot++] = i;
+
+  g_signal_emit_by_name (self, "rows-in-plot-changed", self->nrows_in_plot); 
 }
 
-/* Add a record id */
-void
-datad_record_id_add (gchar *id, GGobiData *d)
-{
-  gint i;
-  guint *index;
-
-  d->rowIds = (gchar **) g_realloc (d->rowIds, sizeof(gchar *) * d->nrows);
-  i = d->nrows - 1;
-
-  index = (guint *) g_malloc(sizeof(guint));
-  *index = i;
-  g_hash_table_insert (d->idTable, id, index);
-  d->rowIds[i] = id;
 }
-
-/* FIXME: this only works the first time */
-void
-ggobi_data_set_row_labels(GGobiData *d, gchar **labels)
-{
-	gint i;
-	for (i = 0; i < d->nrows; i++) {
-		gchar *label;
-		if (labels && labels[i])
-			label = g_strdup(labels[i]);
-		else label = g_strdup_printf("%d", i);
-		g_array_append_val(d->rowlab, label);
-	}
-}
-
-void 
-rowlabels_free (GGobiData *d)
-{
-  g_array_free (d->rowlab, true);
-}
-
-
-void
-rowlabels_alloc (GGobiData *d) 
-{
-  if (d->rowlab != NULL) rowlabels_free (d);
-  d->rowlab = g_array_sized_new (false, false, sizeof (gchar *), d->nrows);
-}
-
-void
-rowlabel_add (gchar *label, GGobiData *d) 
-{
-  g_array_append_val (d->rowlab, label);
-
-  g_assert (d->rowlab->len == d->nrows);
-}
-
-
-%}

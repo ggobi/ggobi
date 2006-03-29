@@ -60,7 +60,7 @@ cpanel_tour1d_set (displayd *display, cpaneld *cpanel, ggobid* gg)
 */
 {
   GtkWidget *w, *btn;
-  GtkWidget *pnl = mode_panel_get_by_name(GGOBI(getPModeName)(TOUR1D), gg);
+  GtkWidget *pnl = mode_panel_get_by_name(ggobi_getPModeName(TOUR1D), gg);
   GtkAdjustment *adj;
 
   /*-- speed --*/
@@ -166,7 +166,7 @@ cpanel_tour1d_make (ggobid *gg) {
   
   panel = (modepaneld *) g_malloc(sizeof(modepaneld));
   gg->control_panels = g_list_append(gg->control_panels, (gpointer) panel);
-  panel->name = g_strdup(GGOBI(getPModeName)(TOUR1D));
+  panel->name = g_strdup(ggobi_getPModeName(TOUR1D));
   panel->w = gtk_vbox_new (false, VBOX_SPACING);
   gtk_container_set_border_width (GTK_CONTAINER (panel->w), 5);
 
@@ -666,7 +666,7 @@ key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
   /*-- insert mode-specific key presses (if any) here --*/
   if (event->keyval == GDK_w || event->keyval == GDK_W) {
     /*-- turn pause on and off --*/
-    GtkWidget *pnl = mode_panel_get_by_name(GGOBI(getPModeName)(TOUR1D), gg);
+    GtkWidget *pnl = mode_panel_get_by_name(ggobi_getPModeName(TOUR1D), gg);
     GtkWidget *pause_button = NULL;
 
     pause_button = widget_find_by_name (pnl, "TOUR1D:pause_button");

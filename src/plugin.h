@@ -138,7 +138,7 @@ GtkWidget *showPluginInfo(GList *plugins, GList *inputPlugins, ggobid *gg);
 
 GGobiPluginInfo *getLanguagePlugin (GList * plugins, const char *name);
 gboolean loadPluginLibrary(GGobiPluginDetails *plugin, GGobiPluginInfo *realPlugin);
-gboolean GGobi_checkPlugin(GGobiPluginDetails *plugin);
+gboolean ggobi_checkPlugin(GGobiPluginDetails *plugin);
 gboolean setLanguagePluginInfo(GGobiPluginDetails *details, const gchar *language, GGobiInitInfo *info);
 
 gboolean pluginSupportsInputMode(const gchar *modeName, GGobiPluginInfo *pluginInfo);

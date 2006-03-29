@@ -582,7 +582,7 @@ void tour2d_snap(ggobid *gg)
   vartabled *vt;
 
   for (j=0; j<d->ncols; j++) {
-    vt = vartable_element_get (j, d);
+    vt = ggobi_data_get_vartable(d, j);
     rnge = ggobi_data_get_col_range(d, j);
     fprintf(stdout,"%f %f %f %f \n", dsp->t2d.F.vals[0][j], 
       dsp->t2d.F.vals[1][j],dsp->t2d.F.vals[0][j]/rnge*sp->scale.x,

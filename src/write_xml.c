@@ -163,7 +163,7 @@ gboolean
 write_xml_variable(FILE *f, GGobiData *d, ggobid *gg, gint j,
   XmlWriteInfo *xmlWriteInfo)
 {
-  vartabled *vt = vartable_element_get (j, d);
+  vartabled *vt = ggobi_data_get_vartable(d, j);
   gchar* varname = g_strstrip(
     (gg->save.stage == TFORMDATA) ? 
       ggobi_data_get_transformed_col_name(d, j) : 
@@ -200,39 +200,6 @@ write_xml_variable(FILE *f, GGobiData *d, ggobid *gg, gint j,
 
   return(true);
 }
-
-/*
-gboolean
-write_edge_record_p (gint i, GGobiData *e, ggobid *gg)
-{
- * If e is an edge set, then
- * loop over all other datads and test their rowids to decide
- * whether this case should be drawn.  Use sampled and hidden.
- * XXX  We can't really do this, because we don't know what 
- *      edgeset may have been associated with what nodeset.
-  gboolean save_case = true;
-  GGobiData *d;
-  GSList *l;
-  gint a, b;
-
-  if (e->edge.n == e->nrows) {
-    for (l = gg->d; l; l=l->next) {
-      d = (GGobiData *) l->data;
-      endpointsd *endpoints = resolveEdgePoints(e, d);
-      if (endpoints) {
-        if (!edge_endpoints_get (i, &a, &b, d, endpoints, e) ||
-            !d->sampled.els[a] || !d->sampled.els[b] ||
-            d->excluded.els[a] || d->excluded.els[b])
-        {
-          save_case = false;
-          break;
-        }
-      }
-    }
-  }
-  return save_case;
-}
-*/
 
 static void
 writeFloat(FILE *f, double value)
@@ -303,12 +270,10 @@ write_xml_record (FILE *f, GGobiData *d, ggobid *gg, gint i,
   XmlWriteInfo *xmlWriteInfo)
 {
   gint j;
-  gchar *gstr, *gtypestr = NULL;
+  gchar *gtypestr = NULL;
 
   /*-- ids if present --*/
-  if (d->rowIds) {
-    fprintf(f, " id=\"%s\"", d->rowIds[i]);
-  }
+  fprintf(f, " id=\"%s\"", ggobi_data_get_row_id(d, i));
 
   /*-- if the record is hidden, indicate that --*/
   if (d->hidden_now.els[i]) {
@@ -319,14 +284,6 @@ write_xml_record (FILE *f, GGobiData *d, ggobid *gg, gint i,
   if (gg->save.edges_p && d->edge.n && i < d->edge.n) {
     fprintf(f, " source=\"%s\"", d->edge.sym_endpoints[i].a);
     fprintf(f, " destination=\"%s\"", d->edge.sym_endpoints[i].b);
-  }
-
-  if (d->rowlab && d->rowlab->data
-      && (gstr = (gchar *) g_array_index (d->rowlab, gchar *, i))) 
-  {
-    fprintf(f, " label=\"");
-    write_xml_string(f, gstr);
-    fprintf(f, "\"");
   }
 
   if (!xmlWriteInfo->useDefault ||
@@ -504,7 +461,7 @@ updateXmlWriteInfo(GGobiData *d, ggobid *gg, XmlWriteInfo *info)
   numGlyphSizes = NGLYPHSIZES;
   glyphSizeCounts = g_malloc0(sizeof(gint) * numGlyphSizes);
 
-  n = GGOBI(nrecords)(d);
+  n = ggobi_nrecords(d);
   for(i = 0 ; i < n ; i++) {
     colorCounts[d->color.els[i]]++;
     glyphSizeCounts[d->glyph.els[i].size]++;
@@ -549,7 +506,7 @@ updateXmlWriteInfo(GGobiData *d, ggobid *gg, XmlWriteInfo *info)
   info->defaultGlyphSizeName = str = g_malloc(5 * sizeof(char));
   sprintf(str, "%d", info->defaultGlyphSize);
 
-  str = (gchar *) GGOBI(getGlyphTypeName)(info->defaultGlyphType);  
+  str = (gchar *) ggobi_getGlyphTypeName(info->defaultGlyphType);  
   info->defaultGlyphTypeName = g_strdup(str);
 
   return(info);

@@ -29,7 +29,7 @@ scale_update_set (gboolean update, displayd * dsp, ggobid * gg)
 {
   cpaneld *cpanel = &dsp->cpanel;
   GtkWidget *panel =
-    mode_panel_get_by_name (GGOBI (getIModeName) (SCALE), gg);
+    mode_panel_get_by_name (ggobi_getIModeName (SCALE), gg);
   GtkWidget *w;
   GtkUpdateType policy;
 
@@ -394,7 +394,7 @@ cpanel_scale_make (ggobid * gg)
 
   panel = (modepaneld *) g_malloc (sizeof (modepaneld));
   gg->control_panels = g_list_append (gg->control_panels, (gpointer) panel);
-  panel->name = g_strdup (GGOBI (getIModeName) (SCALE));
+  panel->name = g_strdup (ggobi_getIModeName (SCALE));
   panel->w = gtk_vbox_new (false, VBOX_SPACING);
   gtk_container_set_border_width (GTK_CONTAINER (panel->w), 5);
 
@@ -496,7 +496,7 @@ cpanel_scale_set (displayd * display, cpaneld * cpanel, ggobid * gg)
 {
   GtkWidget *w;
   GtkWidget *panel =
-    mode_panel_get_by_name (GGOBI (getIModeName) (SCALE), gg);
+    mode_panel_get_by_name (ggobi_getIModeName (SCALE), gg);
   GtkAdjustment *adj;
 
   if (panel == (GtkWidget *) NULL)

@@ -65,7 +65,7 @@ fileset_read_init (const gchar * ldata_in, const gchar * pluginModeName,
 {
   GSList *ds = fileset_read (ldata_in, pluginModeName, plugin, gg);
   for (; ds; ds = ds->next) {
-    datad_init ((GGobiData *) ds->data, gg, FALSE);
+    ggobi_data_attach ((GGobiData *) ds->data, gg, FALSE);
   }
 
   return (ds != NULL);
@@ -125,7 +125,7 @@ read_input (InputDescription * desc, ggobid * gg)
 
 
 /*
- * the first display is initialized in datad_init, so turn on
+ * the first display is initialized in datad_attach, so turn on
  * event handlers there as well
 */
 void
@@ -203,7 +203,7 @@ start_ggobi (ggobid * gg, gboolean init_data, gboolean createPlot)
     gboolean firstd = createPlot;
     for (l = gg->d; l; l = l->next) {
       d = (GGobiData *) l->data;
-      datad_init (d, gg, firstd);
+      ggobi_data_attach (d, gg, firstd);
       firstd = false;
     }
 

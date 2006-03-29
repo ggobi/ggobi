@@ -75,7 +75,7 @@ varpanel_widget_get_nth (gint jbutton, gint jvar, GGobiData * d)
 }
 
 void
-varpanel_label_set (gint j, GGobiData * d)
+varpanel_label_set (GGobiData * d, gint j)
 {
   GtkWidget *label = varpanel_widget_get_nth (VARSEL_LABEL, j, d);
   /*-- the label is actually a button; this is the label --*/
@@ -403,7 +403,7 @@ varpanel_add_row (gint j, GGobiData * d, ggobid * gg)
   xw = ggobi_noop_toggle_button_new_with_label (" X ");
   gtk_widget_set_sensitive (xw, sens);
   gtk_box_pack_start (GTK_BOX (box), xw, false, false, 2);
-  GGobi_widget_set (xw, gg, true);
+  ggobi_widget_set (xw, gg, true);
   g_object_set_data (G_OBJECT (box), varpanel_names[VARSEL_X], xw);
   g_signal_connect (G_OBJECT (xw),
                     "button_press_event", G_CALLBACK (varsel_cb), d);
@@ -412,7 +412,7 @@ varpanel_add_row (gint j, GGobiData * d, ggobid * gg)
   yw = ggobi_noop_toggle_button_new_with_label (" Y ");
   gtk_widget_set_sensitive (yw, sens);
   gtk_box_pack_start (GTK_BOX (box), yw, false, false, 2);
-  GGobi_widget_set (yw, gg, true);
+  ggobi_widget_set (yw, gg, true);
   g_object_set_data (G_OBJECT (box), varpanel_names[VARSEL_Y], yw);
   g_signal_connect (G_OBJECT (yw),
                     "button_press_event", G_CALLBACK (varsel_cb), d);
@@ -421,7 +421,7 @@ varpanel_add_row (gint j, GGobiData * d, ggobid * gg)
   zw = ggobi_noop_toggle_button_new_with_label (" Z ");
   gtk_widget_set_sensitive (zw, sens);
   gtk_box_pack_start (GTK_BOX (box), zw, false, false, 2);
-  GGobi_widget_set (zw, gg, true);
+  ggobi_widget_set (zw, gg, true);
   g_object_set_data (G_OBJECT (box), varpanel_names[VARSEL_Z], zw);
   g_signal_connect (G_OBJECT (zw),
                     "button_press_event", G_CALLBACK (varsel_cb), d);
@@ -431,7 +431,7 @@ varpanel_add_row (gint j, GGobiData * d, ggobid * gg)
   label = gtk_button_new_with_label (ggobi_data_get_col_name(d, j));
   gtk_widget_set_sensitive (label, sens);
   gtk_button_set_relief (GTK_BUTTON (label), GTK_RELIEF_NONE);
-  GGobi_widget_set (label, gg, true);
+  ggobi_widget_set (label, gg, true);
   g_object_set_data (G_OBJECT (box), varpanel_names[VARSEL_LABEL], label);
   g_signal_connect (G_OBJECT (label),
                     "button_press_event", G_CALLBACK (varsel_cb), d);
@@ -595,7 +595,7 @@ varpanel_populate (GGobiData * d, ggobid * gg)
 
   g_object_set_data (G_OBJECT (d->varpanel_ui.hpane), "datad", d);  /*setdata */
   /*-- only add a tab if there are variables --*/
-  if (g_slist_length (d->vartable) > 0 || d->ncols > 0) {
+  if (d->ncols > 0) {
     gtk_notebook_append_page (GTK_NOTEBOOK (gg->varpanel_ui.notebook),
                               d->varpanel_ui.hpane, gtk_label_new (d->name));
   }
@@ -652,7 +652,7 @@ varpanel_populate (GGobiData * d, ggobid * gg)
 /*                          API; not used                                  */
 /*-------------------------------------------------------------------------*/
 
-void GGOBI (selectScatterplotX) (GtkWidget * w, gint jvar, ggobid * gg)
+void ggobi_selectScatterplotX (GtkWidget * w, gint jvar, ggobid * gg)
 {
   displayd *display = gg->current_display;
   GGobiExtendedDisplayClass *klass;

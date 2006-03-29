@@ -140,7 +140,7 @@ parse_command_line (gint * argc, gchar ** av)
   }
     
   if (print_version) {
-    g_printerr ("%s\n", GGOBI (getVersionString ()));
+    g_printerr ("%s\n", ggobi_getVersionString ());
     exit(0);
   }
   
@@ -216,13 +216,11 @@ ggobi_remove_by_index (ggobid * gg, gint which)
   numDatasets = g_slist_length (gg->d);
   for (i = 0, l = gg->d; l != NULL && i < numDatasets; i++, l = gg->d) {
     d = (GGobiData *) l->data;
-    datad_free (d, gg);
+    ggobi_data_free (d);
     gg->d = g_slist_remove (gg->d, d);
   }
 
   g_object_unref (G_OBJECT (gg));
-  /* gtk_object_destroy(GTK_OBJECT(gg)); */
-/*  g_free (gg); */
 
   return (which);
 }
@@ -243,7 +241,7 @@ DummyKeyTest (guint keyval, GtkWidget * w, GdkEventKey * event,
 
   if (++count == 4) {
     count = 0;
-    GGOBI (removeNumberedKeyEventHandler) (gg);
+    ggobi_removeNumberedKeyEventHandler (gg);
   }
   return (true);
 }
@@ -355,7 +353,7 @@ ggobi_alloc (ggobid * tmp)
   num_ggobis++;
 
 #ifdef TEST_KEYS
-  GGOBI (registerNumberedKeyEventHandler) (DummyKeyTest,
+  ggobi_registerNumberedKeyEventHandler (DummyKeyTest,
                                            g_strdup
                                            ("A string for the key handler"),
                                            "Test handler", NULL, tmp, C);
@@ -380,7 +378,7 @@ ggobiInit (int *argc, char **argv[])
 
 #ifdef TEST_GGOBI_APPP
 /*XXX FIX */
-  GGOBI (registerNumberedKeyEventHandler) (DummyKeyTest,
+  ggobi_registerNumberedKeyEventHandler (DummyKeyTest,
                                            g_strdup
                                            ("A string for the key handler"),
                                            "Test handler", NULL, tmp, C);
@@ -401,7 +399,7 @@ ggobiInit (int *argc, char **argv[])
   /* Available so that we can call this from R
      without any confusion between which main().
    */
-gint GGOBI (main) (gint argc, gchar * argv[], gboolean processEvents)
+gint ggobi_main (gint argc, gchar * argv[], gboolean processEvents)
 {
   GdkVisual *vis;
   ggobid *gg;
@@ -555,7 +553,7 @@ initSessionOptions (int argc, char **argv)
 gboolean
 ggobi_close (ggobid * gg)
 {
-  GGOBI (close) (gg, true);
+  ggobi_close2 (gg, true);
   return (true);
 }
 
@@ -628,7 +626,7 @@ GGobiFromDisplay (displayd * display)
 }
 
 void
-GGobi_widget_set (GtkWidget * w, ggobid * gg, gboolean asIs)
+ggobi_widget_set (GtkWidget * w, ggobid * gg, gboolean asIs)
 {
   GtkWidget *wid = w;
   if (!asIs)
@@ -661,7 +659,7 @@ ggobi_getIndex (ggobid * gg)
 }
 
 GGobiData *
-GGobi_get_data (gint which, const ggobid * const gg)
+ggobi_get_data (gint which, const ggobid * const gg)
 {
   GGobiData *d;
   d = g_slist_nth_data (gg->d, which);
@@ -670,7 +668,7 @@ GGobi_get_data (gint which, const ggobid * const gg)
 }
 
 GGobiData *
-GGobi_get_data_by_name (const gchar * const name, const ggobid * const gg)
+ggobi_get_data_by_name (const gchar * const name, const ggobid * const gg)
 {
   GGobiData *d;
   GSList *l;
@@ -925,7 +923,7 @@ ndatad_with_vars_get (ggobid *gg)
    nd = 0;
    for (l = gg->d; l; l = l->next) {
      d = (GGobiData *) l->data;
-     if (g_slist_length (d->vartable) > 0)
+     if (d->ncols > 0)
        nd++;
    }
  }  else nd = 1;

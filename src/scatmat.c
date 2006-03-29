@@ -355,7 +355,7 @@ scatmat_varsel_simple (cpaneld * cpanel, splotd * sp, gint jvar,
        plot in brushing mode, I think it's best to switch back to the
        default mode.  -- dfs
      */
-    GGOBI (full_viewmode_set) (EXTENDED_DISPLAY_PMODE, DEFAULT_IMODE, gg);
+    ggobi_full_viewmode_set (EXTENDED_DISPLAY_PMODE, DEFAULT_IMODE, gg);
 
     /* Set up the new splot for drag and drop */
     sp_event_handlers_toggle (sp_new, on, cpanel->pmode, cpanel->imode);

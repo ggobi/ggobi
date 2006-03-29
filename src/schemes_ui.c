@@ -491,7 +491,7 @@ createColorSchemeTree (gint numTypes, gchar * schemeTypes[], ggobid * gg)
   }
 
   tree_view = gtk_tree_view_new_with_model (GTK_TREE_MODEL (model));
-  GGobi_widget_set (tree_view, gg, true);
+  ggobi_widget_set (tree_view, gg, true);
 
   populate_tree_view (tree_view, NULL, 1, false, GTK_SELECTION_SINGLE,
                       G_CALLBACK (colorscheme_set_cb), tree_view);

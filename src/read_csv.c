@@ -360,14 +360,8 @@ load_row_labels (GList * rows, GGobiData * d, gboolean has_labels)
 {
   gint i;
   for (i = 0; rows; rows = g_list_next (rows), i++) {
-    gchar *label;
-    if (has_labels) {
-      Row *row = (Row *) rows->data;
-      label = g_strdup (row->src->str + row->entry[0].ofs);
-    }
-    else
-      label = g_strdup_printf ("%d", i);
-    g_array_append_val (d->rowlab, label);
+    Row *row = (Row *) rows->data;
+    ggobi_data_set_row_id(d, i, row->src->str + row->entry[0].ofs, false);
   }
 }
 

@@ -49,7 +49,7 @@ cpanel_tourcorr_set (displayd *display, cpaneld *cpanel, ggobid* gg)
   GtkWidget *pnl, *w, *btn;
   GtkAdjustment *adj;
 
-  pnl = (GtkWidget *) mode_panel_get_by_name(GGOBI(getPModeName)(COTOUR), gg);
+  pnl = (GtkWidget *) mode_panel_get_by_name(ggobi_getPModeName(COTOUR), gg);
 
   /*-- speed --*/
   w = widget_find_by_name (pnl, "COTOUR:speed_bar");
@@ -166,7 +166,7 @@ cpanel_ctour_make (ggobid *gg) {
   
   panel = (modepaneld *) g_malloc(sizeof(modepaneld));
   gg->control_panels = g_list_append(gg->control_panels, (gpointer) panel);
-  panel->name = g_strdup(GGOBI(getPModeName)(COTOUR));
+  panel->name = g_strdup(ggobi_getPModeName(COTOUR));
   panel->w = gtk_vbox_new (false, VBOX_SPACING);
   gtk_container_set_border_width (GTK_CONTAINER (panel->w), 5);
 
@@ -394,7 +394,7 @@ key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
     /*-- turn pause on and off --*/
     GtkWidget *pnl;
     GtkWidget *pause_button = NULL;
-    pnl = mode_panel_get_by_name(GGOBI(getPModeName)(COTOUR), gg);
+    pnl = mode_panel_get_by_name(ggobi_getPModeName(COTOUR), gg);
     if (pnl) {
       pause_button = widget_find_by_name (pnl, "COTOUR:pause_button");
       gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pause_button),

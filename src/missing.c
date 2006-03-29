@@ -28,52 +28,23 @@
 #include "vars.h"
 #include "externs.h"
 
-/*--------------------------------------------------------------------*/
-/*             Memory management routines                             */
-/*--------------------------------------------------------------------*/
-
-void
-missing_arrays_add_cols (GGobiData * d)
-{
-  if (d->missing.ncols < d->ncols) {
-    arrays_add_cols (&d->missing, d->ncols);
-  }
-}
-
-void
-missing_arrays_add_rows (gint nrows, GGobiData * d)
-{
-  arrays_add_rows (&d->missing, nrows);
-}
-
-/*------------------------------------------------------------------*/
-/*      Scaling and jittering missing value plots                   */
-/*------------------------------------------------------------------*/
 
 /*
  * For the datad currently selected in gg->impute.notebook,
- * generate a new datad using d->missing.  Maybe I should only
- * create missingness variables for those variables which have
- * missing values ...
+ * generate a new datad using d->missing.  
  *
 */
-// FIXME: create with the GGobiData api
 void
 missings_datad_cb (GtkWidget * w, ggobid * gg)
 {
   GObject *obj = G_OBJECT (gg->impute.window);
   GtkWidget *tree_view = get_tree_view_from_object (obj);
-  GGobiData *d =
-    (GGobiData *) g_object_get_data (G_OBJECT (tree_view), "datad");
+  GGobiData *d = (GGobiData *) g_object_get_data (G_OBJECT (tree_view), "datad");
   static gchar *lnames[] = { "present", "missing" };
   
   if (!ggobi_data_has_missings(d)) return;
   
-  GtkWidget *notebook;
-  GGobiData *dnew;
   gint i, j, k;
-  vartabled *vt, *vtnew;
-  gint *cols;
   gint *cols_with_missings, ncols_with_missings;
 
   ncols_with_missings = 0;
@@ -83,66 +54,18 @@ missings_datad_cb (GtkWidget * w, ggobid * gg)
       cols_with_missings[ncols_with_missings++] = j;
   }
 
-  notebook = (GtkWidget *) g_object_get_data (obj, "notebook");
-  dnew = ggobi_data_new (d->nrows, ncols_with_missings);
+  GGobiData *dnew = ggobi_data_new (d->nrows, ncols_with_missings);
   ggobi_data_set_name(dnew, g_strdup_printf ("%s (missing)", ggobi_data_get_name(d)), NULL);
 
-  for (i = 0; i < d->nrows; i++) {
-    for (j = 0; j < ncols_with_missings; j++) {
-      k = cols_with_missings[j];
+  for (j = 0; j < ncols_with_missings; j++) {
+    k = cols_with_missings[j];
+
+    ggobi_data_set_col_name(dnew, j, ggobi_data_get_col_name(d, k));
+    for (i = 0; i < d->nrows; i++) {
       ggobi_data_set_categorical_value(dnew, i, j, lnames[(gint) ggobi_data_is_missing(d, i, k)]);
     }
   }
 
-  /*
-   * ids to support linking: if the current datad doesn't
-   * have ids, they need to be assigned.
-   */
-  if (d->rowIds == NULL) {
-    gchar **rowids = (gchar **) g_malloc (d->nrows * sizeof (gchar *));
-    for (i = 0; i < d->nrows; i++)
-      rowids[i] = g_strdup_printf ("%d", i);
-    datad_record_ids_set (d, rowids, true);
-    for (i = 0; i < d->nrows; i++)
-      g_free (rowids[i]);
-    g_free (rowids);
-  }
-  datad_record_ids_set (dnew, d->rowIds, true);
-  /*-- --*/
-
-/*
-* I'm going to make all the variables categorical.  For the moment,
-* there can be only two categories: present (0), missing (1).  In
-* the future, we might want to support other categories:  censored,
-* left-censored, etc.
-*/
-
-  for (j = 0; j < ncols_with_missings; j++) {
-    k = cols_with_missings[j];
-    vt = vartable_element_get (k, d);
-    vtnew = vartable_element_get (j, dnew);
-
-    ggobi_data_set_col_name(dnew, j, ggobi_data_get_col_name(d, k));
-    limits_set(dnew, TRUE, FALSE, FALSE);
-
-    vtnew->jitter_factor = .2;
-  }
-
-  for (i = 0; i < d->nrows; i++) {
-    g_array_append_val (dnew->rowlab,
-                        g_array_index (d->rowlab, gchar *, i));
-  }
-
-  datad_init (dnew, gg, false);
-
-  /*-- jitter the data --*/
-  /*-- forces unnecessary redisplay, unfortunately --*/
-  cols = g_malloc (dnew->ncols * sizeof (gint));
-  for (i = 0; i < dnew->ncols; i++)
-    cols[i] = i;
-  rejitter (cols, dnew->ncols, dnew, gg);
-
-  /*-- copy the existing glyph and color --*/
   for (i = 0; i < d->nrows; i++) {
     dnew->color.els[i] = d->color.els[i];
     dnew->color_now.els[i] = d->color_now.els[i];
@@ -150,11 +73,12 @@ missings_datad_cb (GtkWidget * w, ggobid * gg)
     dnew->glyph_now.els[i].type = d->glyph_now.els[i].type;
     dnew->glyph.els[i].size = d->glyph.els[i].size;
     dnew->glyph_now.els[i].size = d->glyph_now.els[i].size;
+
+    ggobi_data_set_row_id(dnew, i, ggobi_data_get_row_id(dnew, i), false);
   }
+  limits_set(dnew, TRUE, FALSE, FALSE);
 
-  /*-- this should be executed in response to any datad_added event --*/
-  display_menu_build (gg);
+  ggobi_data_attach (dnew, gg, false);
 
-  g_free (cols);
   g_free (cols_with_missings);
 }

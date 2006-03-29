@@ -318,17 +318,6 @@ print_attachments (ggobid * gg)
   }
 }
 
-gint
-address_check (GGobiData * d, ggobid * gg)
-{
-  g_printerr ("::: vars.h :::\n");
-  g_printerr ("data_mode %d world %g nedges %d rowlab %s jitfac %f\n",
-              gg->input->mode, (gfloat) d->world.vals[0][0], d->edge.n,
-              g_array_index (d->rowlab, gchar *, 0), d->jitter.factor);
-
-  return 1;
-}
-
 /* ---------------------------------------------------------------------*/
 /*     Used in deleting: figure out which elements to keep              */
 /* ---------------------------------------------------------------------*/

@@ -38,7 +38,7 @@ impute_fixed (ImputeType impute_type, gfloat val, gint nvars, gint * vars,
     for (k = 0; k < nvars; k++) {
       gdouble jmult;
       j = vars[k];
-      vt = vartable_element_get (j, d);
+      vt = ggobi_data_get_vartable(d, j);
 
       /* Use find the limits of the non-missing data */
       minval = vt->lim_display.min;
@@ -154,7 +154,7 @@ impute_mean_or_median (gint type, gint nvars, gint * vars,
 
     for (m = 0; m < nvars; m++) {
       j = vars[m];
-      vt = vartable_element_get (j, d);
+      vt = ggobi_data_get_vartable(d, j);
       for (i = 0; i < d->nrows_in_plot; i++) {
         k = d->rows_in_plot.els[i];
         if (!d->hidden_now.els[k]) {  /* ignore erased values altogether */

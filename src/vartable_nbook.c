@@ -259,7 +259,7 @@ selection_changed_cb (GtkTreeSelection *tree_sel, ggobid *gg)
   GtkTreeModel *model;
   
   for (j = 0 ; j < d->ncols ; j++) { /* clear selection */
-    vt = vartable_element_get (j, d);
+    vt = ggobi_data_get_vartable(d, j);
     vt->selected = false;
   }
   
@@ -270,7 +270,7 @@ selection_changed_cb (GtkTreeSelection *tree_sel, ggobid *gg)
     varno = vartable_varno_from_path(model, path);
     gtk_tree_path_free(path);
 	  
-    vt = vartable_element_get (varno, d);
+    vt = ggobi_data_get_vartable(d, varno);
     vt->selected = true;
   }
   g_list_free(rows);
@@ -300,7 +300,7 @@ real_filter_func (GtkTreeModel *model, GtkTreeIter *iter, GGobiData *d)
   GtkTreePath *path = gtk_tree_model_get_path(model, iter);
   if (gtk_tree_path_get_depth(path) > 1)
     return(false);
-  vartabled *vt = vartable_element_get (gtk_tree_path_get_indices(path)[0], d);
+  vartabled *vt = ggobi_data_get_vartable(d, gtk_tree_path_get_indices(path)[0]);
   gtk_tree_path_free(path);
   return(vt->vartype != categorical);
 }
@@ -310,7 +310,7 @@ cat_filter_func (GtkTreeModel *model, GtkTreeIter *iter, GGobiData *d)
   GtkTreePath *path = gtk_tree_model_get_path(model, iter);
   if (gtk_tree_path_get_depth(path) > 1)
     return(true);
-  vartabled *vt = vartable_element_get (gtk_tree_path_get_indices(path)[0], d);
+  vartabled *vt = ggobi_data_get_vartable(d, gtk_tree_path_get_indices(path)[0]);
   gtk_tree_path_free(path);
   return(vt->vartype == categorical);
 }
@@ -514,11 +514,10 @@ vartable_open (ggobid *gg)
 /*-------------------------------------------------------------------------*/
 
 /*-- sets the name of the un-transformed variable --*/
-//FIXME: ggobi_data_
 void
-vartable_collab_set_by_var (gint j, GGobiData *d)
+vartable_collab_set_by_var (GGobiData *d, guint j)
 {
-  vartabled *vt = vartable_element_get (j, d);
+  vartabled *vt = ggobi_data_get_vartable(d, j);
   gint k;
   GtkTreeModel *model;
   GtkTreeIter iter;
@@ -532,6 +531,7 @@ vartable_collab_set_by_var (gint j, GGobiData *d)
     gtk_tree_store_set(GTK_TREE_STORE(model), &iter, 
       VT_NLEVELS, ggobi_data_get_col_n_levels(d, j), -1);
     gtk_tree_model_iter_children(model, &child, &iter);
+
     /*-- set the level fields --*/
     for (k=0; k<vt->nlevels; k++) {
       fmtname = g_markup_printf_escaped("%s", vt->level_names[k]);
@@ -549,33 +549,23 @@ vartable_collab_set_by_var (gint j, GGobiData *d)
 
 /*-- sets the name of the transformed variable --*/
 void
-vartable_collab_tform_set_by_var (gint j, GGobiData *d)
+vartable_collab_tform_set_by_var (GGobiData *d, guint j)
 {
-  vartabled *vt;
   GtkTreeModel *model;
   GtkTreeIter iter;
   
   if (!vartable_iter_from_varno(j, d, &model, &iter))
 	  return;
 
-  vt = vartable_element_get (j, d);
-  if (vt->tform0 == NO_TFORM0 &&
-	vt->tform1 == NO_TFORM1 &&
-	vt->tform2 == NO_TFORM2)
-  {
-    gtk_tree_store_set(GTK_TREE_STORE(model), &iter,
-			VT_TFORM, "", -1);
-  } else {
-    gtk_tree_store_set(GTK_TREE_STORE(model), &iter,
-			VT_TFORM, vt->collab_tform, -1);
-  }
+  gtk_tree_store_set(GTK_TREE_STORE(model), &iter,
+    VT_TFORM, ggobi_data_get_transformed_col_name(d, j), -1);
 }
 
 /*-- sets the limits for a variable --*/
 void
-vartable_limits_set_by_var (gint j, GGobiData *d)
+vartable_limits_set_by_var (GGobiData *d, guint j)
 {
-  vartabled *vt = vartable_element_get (j, d);
+  vartabled *vt = ggobi_data_get_vartable(d, j);
   GtkTreeModel *model;
   GtkTreeIter iter;
   
@@ -622,13 +612,13 @@ vartable_limits_set (GGobiData *d)
   gint j;
   if (d->vartable_tree_model != NULL)
     for (j=0; j<d->ncols; j++)
-      vartable_limits_set_by_var (j, d);
+      vartable_limits_set_by_var (d, j);
 }
 
 /*-- sets the mean, median, and number of missings for a variable --*/
 void
-vartable_stats_set_by_var (gint j, GGobiData *d) {
-  vartabled *vt = vartable_element_get (j, d);
+vartable_stats_set_by_var (GGobiData *d, guint j) {
+  vartabled *vt = ggobi_data_get_vartable(d, j);
   GtkTreeModel *model;
   GtkTreeIter iter;
 
@@ -659,7 +649,7 @@ vartable_stats_set (GGobiData *d) {
     return;
     
   for (j=0; j<d->ncols; j++)
-    vartable_stats_set_by_var (j, d);
+    vartable_stats_set_by_var (d, j);
 }
 
 /*
@@ -669,8 +659,33 @@ vartable_stats_set (GGobiData *d) {
 void
 vartable_cells_set_by_var (gint j, GGobiData *d) 
 {
-  vartable_stats_set_by_var (j, d);
-  vartable_limits_set_by_var (j, d);
-  vartable_collab_set_by_var (j, d);
-  vartable_collab_tform_set_by_var (j, d);
+  vartable_stats_set_by_var (d, j);
+  vartable_limits_set_by_var (d, j);
 }
+/*
+void 
+vartable_col_name_changed(GGobiData *d, guint j, GtkWidget* w) {
+}
+
+void 
+vartable_col_data_changed(GGobiData *d, guint j, GtkWidget* w) {
+}
+
+void 
+vartable_col_rows_added(GGobiData *d, guint n, GtkWidget* w) {  
+}
+
+
+void vartable_init(GGobiData *d) {
+  GtkWidget *widget = vartable_gui_init(d);
+  
+  vartable_col_rows_added(d, d->ncols);
+  for (guint j = 0; j < d->ncols; j++) {
+    vartable_col_name_changed(d, j);
+    vartable_col_data_changed(d, j);
+  }
+
+  ggobi_data_connect__cols_added(d, vartable_cols_added, widget);
+  ggobi_data_connect__col_name_changed(d, vartable_col_name_changed, widget;
+  ggobi_data_connect__col_data_changed(d, vartable_col_data_changed, widget);
+}*/

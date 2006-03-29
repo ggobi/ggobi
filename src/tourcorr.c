@@ -989,7 +989,7 @@ void tourcorr_write_video(ggobid *gg)
 
   g_printerr("%f %f\n",sp->scale.x, sp->scale.y);
   for (j=0; j<d->ncols; j++) {
-    vt = vartable_element_get (j, d);
+    vt = ggobi_data_get_vartable(d, j);
     g_printerr("%f %f %f %f\n", dsp->tcorr1.F.vals[0][j], 
       dsp->tcorr2.F.vals[0][j], 
       ggobi_data_get_col_min(d, j), ggobi_data_get_col_max(d, j)

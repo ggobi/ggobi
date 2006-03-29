@@ -423,7 +423,7 @@ sphere_panel_open (ggobid * gg)
 
     /*-- update scree plot when n selected vars changes --*/
     btn = gtk_button_new_with_mnemonic ("_Update scree plot");
-    GGobi_widget_set (btn, gg, true);
+    ggobi_widget_set (btn, gg, true);
     gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 0);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
                           "Update scree plot when a new set of variables is selected, or when variables are transformed",
@@ -574,7 +574,7 @@ sphere_panel_open (ggobid * gg)
 /*
  * Di and I decided there's no good reason to have this button.
     gg->sphere_ui.restore_btn = gtk_button_new_with_label ("Restore scree plot");
-    GGobi_widget_set (gg->sphere_ui.restore_btn, gg, true);
+    ggobi_widget_set (gg->sphere_ui.restore_btn, gg, true);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->sphere_ui.restore_btn,
       "Restore the scree plot to reflect the current principal components",
       NULL);

@@ -174,7 +174,7 @@ static void tform_reset_cb (GtkWidget *w, ggobid *gg)
     transform1_apply (j, d, gg);
     transform2_apply (j, d, gg);
 
-    tform_label_update (j, d);
+    g_signal_emit_by_name(d, "col_name_changed", j);
   }
 
   limits_set (d, true, true, gg->lims_use_visible);  
@@ -202,9 +202,9 @@ tfvar_selection_made_cb (GtkTreeSelection *tree_sel, ggobid *gg)
   if (nvars < 0)
     return;
 
-  vtnew = (vartabled *) g_malloc(sizeof(vartabled));
-  vt0 = vartable_element_get (rows[0], d);
-  vt_copy (vt0, vtnew);
+  vtnew = vartable_element_new(NULL);
+  vt0 = ggobi_data_get_vartable(d, rows[0]);
+  vartable_copy_var(vt0, vtnew);
 
   /* If there's only one selected variable, we're ready to reset the
    * variable selection panel.  If there are more, we have to find out
@@ -219,7 +219,7 @@ tfvar_selection_made_cb (GtkTreeSelection *tree_sel, ggobid *gg)
     }
     /* If they aren't all the same, use the default values */
     if (!same) {
-      vt_init(vtnew);
+      vtnew = vartable_element_new(NULL);
     }
   }
 
@@ -436,7 +436,7 @@ tf0_combo_box_set_value (vartabled *vt, gboolean force, ggobid *gg)
 void
 transform0_combo_box_set_value (gint j, gboolean force, GGobiData *d, ggobid *gg)
 {
-  vartabled *vt = vartable_element_get (j, d);
+  vartabled *vt = ggobi_data_get_vartable(d, j);
   if (vt != NULL)
     tf0_combo_box_set_value(vt, force, gg);
 }
@@ -463,7 +463,7 @@ tf1_combo_box_set_value(vartabled *vt, gboolean force, ggobid *gg)
 void
 transform1_combo_box_set_value (gint j, gboolean force, GGobiData *d, ggobid *gg)
 {
-  vartabled *vt = vartable_element_get (j, d);
+  vartabled *vt = ggobi_data_get_vartable(d, j);
   if (vt != NULL)
     tf1_combo_box_set_value(vt, force, gg);
 }
@@ -489,7 +489,7 @@ tf2_combo_box_set_value(vartabled *vt, gboolean force, ggobid *gg)
 void
 transform2_combo_box_set_value (gint j, gboolean force, GGobiData *d, ggobid *gg)
 {
-  vartabled *vt = vartable_element_get (j, d);
+  vartabled *vt = ggobi_data_get_vartable(d, j);
   if (vt != NULL)
     tf2_combo_box_set_value(vt, force, gg);
 }

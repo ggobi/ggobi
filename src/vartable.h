@@ -19,8 +19,6 @@ enum {
 
 typedef enum {ADDVAR_ROWNOS = 0, ADDVAR_BGROUP} NewVariableType; 
 
-extern const double AddVarRowNumbers;
-extern const double AddVarBrushGroup;
 
 typedef enum {real, categorical, integer, counter, uniform, all_vartypes} vartyped;
 
@@ -50,19 +48,19 @@ typedef struct {
   /*-- unadjusted, unaffected by imputation --*/
   gfloat mean, median;
 
-  // Limits
-  // =================================================
+  /* Limits
+    ================================================= */
 
-  lims lim;             // used: lim_specified_tform or lim_tform --*/
-  lims lim_raw;         // raw data
-  lims lim_tform;       // transformed data
-  lims lim_display;     // for vsartable, transformed sans missings
-  lims lim_specified;   // user specified
+  lims lim;             /*used: lim_specified_tform or lim_tform*/
+  lims lim_raw;         /* raw data*/
+  lims lim_tform;       /*transformed data*/
+  lims lim_display;     /*for vartable, transformed sans missings*/
+  lims lim_specified;   /*user specified*/
   lims lim_specified_tform;
   gboolean lim_specified_p;
 
-  // Transformations
-  // =================================================
+  /* Transformations
+     =================================================*/
 
   gint tform0;
   gfloat domain_incr;  /*-- stage 0 --*/

@@ -122,13 +122,11 @@ set_display_option (gboolean active, guint action, displayd * display)
       action == DOPT_EDGES_A || action == DOPT_EDGES_H) {
     gint k, nd = g_slist_length (gg->d);
     GGobiData *e;
-    if (display->d->rowIds) {
-      for (k = 0; k < nd; k++) {
-        e = (GGobiData *) g_slist_nth_data (gg->d, k);
-        if (e->edge.n > 0) {
-          ne++;
-          onlye = e;            /* meaningful if there's only one */
-        }
+    for (k = 0; k < nd; k++) {
+      e = (GGobiData *) g_slist_nth_data (gg->d, k);
+      if (e->edge.n > 0) {
+        ne++;
+        onlye = e;            /* meaningful if there's only one */
       }
     }
     if (ne != 1)
@@ -457,7 +455,7 @@ display_add (displayd * display, ggobid * gg)
 
   if (GGOBI_IS_WINDOW_DISPLAY (display)
       && GGOBI_WINDOW_DISPLAY (display)->useWindow) {
-    GGobi_widget_set (GGOBI_WINDOW_DISPLAY (display)->window, gg, true);
+    ggobi_widget_set (GGOBI_WINDOW_DISPLAY (display)->window, gg, true);
     if (g_list_length (display->splots))
       display_set_current (display, gg);  /*-- this initializes the mode --*/
   }
@@ -594,7 +592,7 @@ display_free (displayd * display, gboolean force, ggobid * gg)
 
   /*-- If there are no longer any displays, set ggobi's mode to NULLMODE --*/
   if (g_list_length (gg->displays) == 0) {
-    GGOBI (full_viewmode_set) (NULL_PMODE, NULL_IMODE, gg);
+    ggobi_full_viewmode_set (NULL_PMODE, NULL_IMODE, gg);
   }
 }
 
@@ -756,7 +754,7 @@ computeTitle (gboolean current_p, displayd * display, ggobid * gg)
       description = g_strdup (display->d->name);
   }
   else {
-    description = GGOBI (getDescription) (gg);
+    description = ggobi_getDescription (gg);
   }
 
   n = strlen (tmp) + strlen (description) + 5 +
@@ -870,7 +868,7 @@ display_window_init (windowDisplayd * display, gint width, gint height,
   g_signal_connect (G_OBJECT (display->window), "delete_event",
                     G_CALLBACK (display_delete_cb), (gpointer) display);
 
-  GGobi_widget_set (GTK_WIDGET (display->window), gg, true);
+  ggobi_widget_set (GTK_WIDGET (display->window), gg, true);
 }
 
 

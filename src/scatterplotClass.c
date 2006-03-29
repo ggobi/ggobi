@@ -934,7 +934,7 @@ scatterplotKeyEventHandled (GtkWidget * w, displayd * display, splotd * sp,
       if (pmode > -1 && !projection_ok (pmode, display))
         ok = false;
       else
-        GGOBI (full_viewmode_set) (pmode, imode, gg);
+        ggobi_full_viewmode_set (pmode, imode, gg);
     }
   }
   else {

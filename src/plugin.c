@@ -42,7 +42,7 @@ void plugin_init() {
 }
 
 gboolean
-GGobi_checkPlugin (GGobiPluginDetails * plugin)
+ggobi_checkPlugin (GGobiPluginDetails * plugin)
 {
   gboolean (*f) (const GGobiPluginDetails *);
   gboolean ok = true;
@@ -111,7 +111,7 @@ loadPluginLibrary (GGobiPluginDetails * plugin, GGobiPluginInfo * realPlugin)
   plugin->library = load_plugin_library (plugin, true);
   plugin->loaded = plugin->library != NULL ? DL_LOADED : DL_FAILED;
 
-  if (plugin->loaded == DL_LOADED && GGobi_checkPlugin (plugin)
+  if (plugin->loaded == DL_LOADED && ggobi_checkPlugin (plugin)
       && plugin->onLoad) {
     OnLoad f = (OnLoad) getPluginSymbol (plugin->onLoad, plugin);
     if (f) {

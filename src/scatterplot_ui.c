@@ -87,15 +87,13 @@ scatterplot_display_edge_menu_update (displayd * display,
   /*-- If this datad has ids, find the number of other datad's with
        edges --*/
 
-  if (d->rowIds) {
-    endpointsd *endpoints;
-    for (k = 0; k < nd; k++) {
-      e = (GGobiData *) g_slist_nth_data (gg->d, k);
-      if (e->edge.n > 0) {
-        endpoints = resolveEdgePoints (e, d);
-        if (endpoints != NULL) {
-          ne++;
-        }
+  endpointsd *endpoints;
+  for (k = 0; k < nd; k++) {
+    e = (GGobiData *) g_slist_nth_data (gg->d, k);
+    if (e->edge.n > 0) {
+      endpoints = resolveEdgePoints (e, d);
+      if (endpoints != NULL) {
+        ne++;
       }
     }
   }

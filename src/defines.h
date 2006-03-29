@@ -25,9 +25,9 @@
 /* External/public routines in the API should use this 
    to generate a suitable prefix for their name to avoid
    name-space pollution and symbol conflicts.
-    (e.g. GGOBI(setData)
+    (e.g. ggobi_setData
 */
-#define GGOBI(a) GGobi_##a
+#define ggobi_a ggobi_##a
 
 #define false 0
 #define true 1

@@ -25,37 +25,6 @@
 #include "vartable.h"
 
 
-const double AddVarRowNumbers = -1.0;
-const double AddVarBrushGroup = -1.0;
-void tour_realloc_up (GGobiData *d, gint nc);
-
-
-static void
-addvar_vartable_expand (GGobiData * d, gint ncols)
-{
-  gint j;
-
-  for (j = d->ncols; j < d->ncols + ncols; j++) {
-    /*-- allocate the new vartable element, initialize with default values --*/
-    vartabled *vt = vartable_element_new (d);
-    transform_values_init (vt);
-  }
-}
-
-/*-- specific adding variables --*/
-static void
-addvar_pipeline_realloc (GGobiData * d)
-{
-  /*-- realloc pipeline arrays --*/
-  arrayf_add_cols (&d->raw, d->ncols);
-  arrayf_add_cols (&d->tform, d->ncols);
-
-  tour_realloc_up (d, d->ncols);
-
-  missing_arrays_add_cols (d);
-}
-
-
 // displays should eventually listen to pipeline themselves
 void
 tour_realloc_up (GGobiData *d, gint nc)
@@ -63,7 +32,8 @@ tour_realloc_up (GGobiData *d, gint nc)
   displayd *dsp;
   GList *l;
 
-  g_return_if_fail(GGOBI_IS_GGOBI(d->gg));
+  if (!GGOBI_IS_GGOBI(d->gg))
+    return;
 
   for (l=d->gg->displays; l; l=l->next) {
     GGobiExtendedDisplayClass *klass;
@@ -83,144 +53,51 @@ tour_realloc_up (GGobiData *d, gint nc)
   }
 }
 
-/* XXX this routine just should not exist.  The appropriate elements
-   should be responding to the variable_added routine.  But that could
-   be messy, too, because they have to respond in a particular order ..
-   Oh man ...
 
-  g_signal_connect (G_OBJECT (gg),
-                      "variable_added", 
-                      G_CALLBACK (variable_notebook_varchange_cb),
-                      GTK_OBJECT (notebook));
-
-void 
-variable_notebook_varchange_cb (ggobid *gg, vartabled *vt, gint which,
-  GGobiData *data, void *notebook)
-*/
-void
-addvar_propagate (gint ncols_prev, gint ncols_added, GGobiData * d)
+guint
+create_explicit_variable (GGobiData * d, gchar * vname, NewVariableType vtype)
 {
-  gint j, jvar;
-
-  for (j = 0; j < ncols_added; j++) {
-    jvar = ncols_prev + j;  /*-- its new index --*/
-
-    /*-- update the tree_view widget (the visible table) --*/
-    vartable_row_append (jvar, d);          /*-- append empty --*/
-    vartable_cells_set_by_var (jvar, d);  /*-- then populate --*/
-  }
-
-  /*-- in case some datad now has variables and it didn't before --*/
-  g_return_if_fail(GGOBI_IS_GGOBI(d->gg));
-  display_menu_build (d->gg);
-}
-
-/* FIXME: all this stuff should be moved into the GGobiData API, so that
-   datad allocation, in particular, is encapsulated. */
-void
-newvar_add_with_values (gdouble * vals, gint nvals, gchar * vname,
-                        vartyped type,
- /*-- if categorical, we need ... --*/
-                        gint nlevels, gchar ** level_names,
-                        gint * level_values, gint * level_counts,
-                        GGobiData * d)
-{
-  gint i;
-  gint d_ncols_prev = d->ncols;
-  gint jvar = d_ncols_prev;
-  vartabled *vt;
-
-  g_return_if_fail(GGOBI_IS_GGOBI(d->gg));
-
-  if (nvals != d->nrows && d->ncols > 0)
-    return;
-
-  d->ncols += 1;
-  addvar_pipeline_realloc (d);
-
-  /* Create a new element in the vartable list iff we need
-     to. Otherwise use the one in the current position. */
-  if (jvar >= g_slist_length (d->vartable))
-    vartable_element_new (d);
-
-  vt = vartable_element_get (jvar, d);
-  if (type == categorical)
-    ggobi_data_set_col_levels(d, jvar, nlevels, level_names, level_values, level_counts);
-
-  transform_values_init (vt);
-
-  for (i = 0; i < d->nrows; i++) {
-    if (vals == &AddVarRowNumbers) {
-      d->raw.vals[i][jvar] = d->tform.vals[i][jvar] = (gfloat) (i + 1);
-    }
-    else if (vals == &AddVarBrushGroup) {
-      d->raw.vals[i][jvar] = d->tform.vals[i][jvar] =
-        (gfloat) d->clusterid.els[i];
-    }
-    else if (GGobiMissingValue && GGobiMissingValue (vals[i]))
-      ggobi_data_set_missing(d, i, jvar);
-    else
-      d->raw.vals[i][jvar] = d->tform.vals[i][jvar] = (gfloat) vals[i];
-  }
-
-
-  limits_set_by_var (d, jvar, true, true, d->gg->lims_use_visible);
-
-  /*-- run the data through the head of the pipeline --*/
-  tform_to_world_by_var (jvar, d);
-
+  guint jvar = ggobi_data_add_cols(d, 1);
   ggobi_data_set_col_name(d, jvar, vname);
 
-  addvar_propagate (d_ncols_prev, 1, d);
-
-/* XXX be careful:  this could be emitted before the variable type
-       is set.
-*/
-  /*-- emit variable_added signal --*/
-  g_signal_emit (G_OBJECT (d->gg),
-                 GGobiSignals[VARIABLE_ADDED_SIGNAL], 0, d->ncols - 1, d);
+  for (guint i = 0; i < d->nrows; i++) {
+    switch(vtype) {
+      case ADDVAR_ROWNOS:
+        ggobi_data_set_raw_value(d, i, jvar, (gfloat) (i + 1));
+        break;
+      case ADDVAR_BGROUP:
+        ggobi_data_set_raw_value(d, i, jvar, (gfloat) d->clusterid.els[i]);
+        break;
+    }
+  }
+  g_signal_emit_by_name(d, "col_data_changed", jvar);
+  return jvar;
 }
 
 void
 clone_vars (gint * cols, gint ncols, GGobiData * d)
 {
-  gint i, k, n, jvar;
-  gint d_ncols_prev = d->ncols;
-
-  g_return_if_fail(GGOBI_IS_GGOBI(d->gg));
-
-  addvar_vartable_expand (d, ncols);
-
-/*
- * Be extremely careful here: make sure that d->ncols is
- * incremented in the right place.  A problem in this sequence
- * just made me chase mysterious bugs for two days.
-*/
-
-  d->ncols += ncols;
-  addvar_pipeline_realloc (d);
-
-
+  gint i, k, jfrom, jto;
+  gint nprev = ggobi_data_add_cols(d, ncols);
+  
   for (k = 0; k < ncols; k++) {
-    n = cols[k];              /*-- variable being cloned --*/
-    jvar = d_ncols_prev + k;  /*-- its new index --*/
+    jfrom = cols[k];        
+    jto = nprev + k; 
 
     /*-- copy the data --*/
-    for (i = 0; i < d->nrows; i++)
-      d->raw.vals[i][jvar] = d->tform.vals[i][jvar] = d->tform.vals[i][n];
+    for (i = 0; i < d->nrows; i++) {
+      ggobi_data_set_raw_value(d, i, jto, d->tform.vals[i][jfrom]);
+      if (ggobi_data_is_missing(d, i, jfrom))
+        ggobi_data_set_missing(d, i, jto);
+    }
 
-    /*-- update the vartable struct --*/
-    vartable_copy_var (n, jvar, d);
-    transform_values_copy (n, jvar, d);
+    vartable_copy_var(
+      ggobi_data_get_vartable(d, jto), ggobi_data_get_vartable(d, jfrom)
+    );
   }
 
-  addvar_propagate (d_ncols_prev, ncols, d);
-
   for (k = 0; k < ncols; k++) {
-    n = cols[k];
-
-    g_signal_emit (G_OBJECT (d->gg),
-                   GGobiSignals[VARIABLE_ADDED_SIGNAL], 0, n, d);
+    g_signal_emit_by_name(d, "col_data_changed", cols[k]);
   }
 
 }

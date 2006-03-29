@@ -7,7 +7,7 @@ typedef struct
 {
   unsigned int size;
   const char *const name;
-} GGobi_StructSize;
+} ggobi_StructSize;
 
 #ifdef USE_DBMS
 #include "dbms.h"
@@ -15,7 +15,7 @@ typedef struct
 
 #define GG_StructEntry(type) {sizeof(type), #type}
 
-static const GGobi_StructSize ggobiStructs[] = {
+static const ggobi_StructSize ggobiStructs[] = {
   GG_StructEntry (ggobid),
   GG_StructEntry (GGobiData),
   GG_StructEntry (displayd),
@@ -27,13 +27,13 @@ static const GGobi_StructSize ggobiStructs[] = {
 #endif
 };
 
-extern const GGobi_StructSize *GGOBI (getStructs) (int *n);
+extern const ggobi_StructSize *ggobi_getStructs (int *n);
 
-const GGobi_StructSize *
+const ggobi_StructSize *
 #ifdef GGOBI_MAIN
-  GGOBI (getStructs) (int *n)
+  ggobi_getStructs (int *n)
 #else
-  GGOBI (getGGobiStructs) (int *n)
+  ggobi_getGGobiStructs (int *n)
 #endif
 {
   *n = sizeof (ggobiStructs) / sizeof (ggobiStructs[0]);
@@ -48,13 +48,13 @@ const GGobi_StructSize *
 gboolean
 checkGGobiStructSizes ()
 {
-  const GGobi_StructSize *local, *internal;
+  const ggobi_StructSize *local, *internal;
   int nlocal, ninternal;
   int i, j;
   gboolean ok = false;
 
-  local = GGOBI (getStructs) (&nlocal);
-  internal = GGOBI (getGGobiStructs) (&ninternal);
+  local = ggobi_getStructs (&nlocal);
+  internal = ggobi_getGGobiStructs (&ninternal);
 
   if (nlocal != ninternal)
     g_printerr ("Different number of structures in table (%d != %d)!\n",

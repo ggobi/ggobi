@@ -96,7 +96,6 @@ spherize_set_pcvars (GGobiData * d, ggobid * gg)
   gchar *lbl;
   /*-- for newvar_add.. the variable notebooks --*/
   gchar *vname;
-  gdouble *dtmp;
   gboolean succeeded = true;
 
   /*-- for updating the tree view --*/
@@ -115,15 +114,12 @@ spherize_set_pcvars (GGobiData * d, ggobid * gg)
 
     vectori_realloc (&d->sphere.pcvars, d->sphere.npcs);
 
-    dtmp = (gdouble *) g_malloc0 (d->nrows * sizeof (gdouble));
+    guint new = ggobi_data_add_cols(d, d->sphere.npcs);
     for (j = 0; j < d->sphere.npcs; j++) {
       vname = g_strdup_printf ("PC%d", j + 1);
-      newvar_add_with_values (dtmp, d->nrows, vname,
-                              real, 0, (gchar **) NULL, (gint *) NULL,
-                              (gint *) NULL, d);
+      ggobi_data_set_col_name(d, new+j, vname);
       g_free (vname);
     }
-    g_free (dtmp);
 
     for (j = ncols_prev, k = 0; j < d->ncols; j++) {
       d->sphere.pcvars.els[k++] = j;
@@ -204,9 +200,6 @@ spherize_set_pcvars (GGobiData * d, ggobid * gg)
       lbl = g_strdup_printf ("PC%d", (k + 1));
       
       ggobi_data_set_col_name (d, j, lbl);
-      
-      varpanel_label_set (j, d);   /*-- checkboxes --*/
-      varcircle_label_set (j, d);  /*-- variable circles --*/
       g_free (lbl);
     }
 

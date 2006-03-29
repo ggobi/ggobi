@@ -189,7 +189,7 @@ cpanel_movepts_make (ggobid * gg)
 
   panel = (modepaneld *) g_malloc (sizeof (modepaneld));
   gg->control_panels = g_list_append (gg->control_panels, (gpointer) panel);
-  panel->name = g_strdup (GGOBI (getIModeName) (MOVEPTS));
+  panel->name = g_strdup (ggobi_getIModeName (MOVEPTS));
 
   panel->w = gtk_vbox_new (false, VBOX_SPACING);
   gtk_container_set_border_width (GTK_CONTAINER (panel->w), 5);

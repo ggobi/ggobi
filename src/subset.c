@@ -61,17 +61,14 @@ subset_clear (GGobiData *d, ggobid *gg) {
 
   for (i=0; i<d->nrows; i++)
     d->sampled.els[i] = false;
+    
 }
 
 /*------------------------------------------------------------------*/
 
 void
 subset_apply (GGobiData *d, ggobid *gg) {
-
-  rows_in_plot_set(d);
-
-  clusters_set(d);
-
+  ggobi_data_set_rows_in_plot(d);
   if (gg->cluster_ui.window != NULL)
     cluster_table_update (d, gg);
 
@@ -162,7 +159,7 @@ subset_range (GGobiData *d, ggobid *gg)
   for (i=0; i<d->nrows; i++) {
     add = true;
     for (j=0; j<d->ncols; j++) {
-      vt = vartable_element_get (j, d);
+      vt = ggobi_data_get_vartable(d, j);
       if (vt->lim_specified_p) {
         if (d->tform.vals[i][j] < vt->lim_specified.min ||
             d->tform.vals[i][j] > vt->lim_specified.max)
@@ -243,7 +240,7 @@ subset_rowlab (gchar *substr, gint substr_pos, gboolean ignore_case,
   gssize slen;
   GtkWidget *w, *pnl;
   
-  pnl = mode_panel_get_by_name(GGOBI(getIModeName)(IDENT), gg);
+  pnl = mode_panel_get_by_name(ggobi_getIModeName(IDENT), gg);
 
   if (substr == NULL || (slen = g_utf8_strlen(substr, -1)) == 0)
     return false;
@@ -259,7 +256,7 @@ subset_rowlab (gchar *substr, gint substr_pos, gboolean ignore_case,
     substr = g_utf8_strdown(substr, -1);
   else substr = g_strdup(substr);
   for (i=0; i<top; i++) {
-    gchar *label = (gchar *) g_array_index (d->rowlab, gchar *, i);
+    gchar *label = ggobi_data_get_row_id(d, i);
     gint llen = g_utf8_strlen(label, -1);
     gint start = substr_pos == 3 ? llen - slen : 0;
     gint safe_len = llen < slen ? llen : slen;

@@ -106,9 +106,9 @@ typedef struct _PrintOptions PrintOptions;
 GType ggobi_ggobi_get_type(void);
 
 #define   GGOBI_TYPE_GGOBI ggobi_ggobi_get_type()
-#define GGOBI_GGOBI(obj)	 (G_TYPE_CHECK_INSTANCE_CAST ((obj), GGOBI_TYPE_GGOBI, ggobid))
+#define GGOBI_ggobi_obj	 (G_TYPE_CHECK_INSTANCE_CAST ((obj), GGOBI_TYPE_GGOBI, ggobid))
 #define GGOBI_GGOBI_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GGOBI_TYPE_GGOBI, GGobiGGobiClass))
-#define GGOBI_IS_GGOBI(obj)	 (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GGOBI_TYPE_GGOBI))
+#define GGOBI_IS_GGOBI(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GGOBI_TYPE_GGOBI))
 #define GGOBI_IS_GGOBI_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GGOBI_TYPE_GGOBI))
 #define GGOBI_GGOBI_GET_CLASS(obj)  		(G_TYPE_INSTANCE_GET_CLASS ((obj), GGOBI_TYPE_GGOBI, GGobiGGobiClass))
 
@@ -160,9 +160,7 @@ struct _ggobid {
   gboolean statusbar_p;
 
   gboolean close_pending;
-#ifdef EXPLICIT_IDENTIFY_HANDLER 
   IdentifyHandler identify_handler;
-#endif
 
 /*--------------------------------------------------------------------*/
 /*                      reading in the data                           */
@@ -593,7 +591,7 @@ void globals_init(ggobid * gg);
 
 guint getGGobiSignal(GGobiSignalType);
 
-GSList *GGOBI(getExtendedDisplayTypes)();
+GSList *ggobi_getExtendedDisplayTypes();
 #ifdef __cplusplus
 }
 #endif

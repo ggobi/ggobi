@@ -158,7 +158,7 @@ add_record_dialog_open (GGobiData * d, GGobiData * e, displayd * dsp,
     gtk_table_attach (GTK_TABLE (table),
                       w, 0, 1, row, row + 1, table_opt, table_opt, 1, 1);
     /* This label should include both the rowlab and the rowId */
-    lbl = (gchar *) g_array_index (d->rowlab, gchar *, gg->edgeedit.a);
+    lbl = ggobi_data_get_row_id(d, gg->edgeedit.a);
     w = gtk_label_new (lbl);
     gtk_misc_set_alignment (GTK_MISC (w), .5, .5);
     gtk_table_attach (GTK_TABLE (table),
@@ -169,7 +169,7 @@ add_record_dialog_open (GGobiData * d, GGobiData * e, displayd * dsp,
     gtk_misc_set_alignment (GTK_MISC (w), 1, .5);
     gtk_table_attach (GTK_TABLE (table),
                       w, 0, 1, row, row + 1, table_opt, table_opt, 1, 1);
-    lbl = (gchar *) g_array_index (d->rowlab, gchar *, d->nearest_point);
+    lbl = ggobi_data_get_row_id(d, d->nearest_point);
     w = gtk_label_new (lbl);
     gtk_misc_set_alignment (GTK_MISC (w), .5, .5);
     gtk_table_attach (GTK_TABLE (table),
@@ -274,7 +274,7 @@ add_edges_or_points_cb (GtkToggleButton * button, ggobid * gg)
   displayd *display = gg->current_display;
   cpaneld *cpanel = &display->cpanel;
   GtkWidget *panel =
-    mode_panel_get_by_name (GGOBI (getIModeName) (EDGEED), gg);
+    mode_panel_get_by_name (ggobi_getIModeName (EDGEED), gg);
   GtkWidget *w;
 
   w = widget_find_by_name (panel, "EDGEEDIT:tip_label");
@@ -373,7 +373,7 @@ button_release_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
   cpaneld *cpanel = &display->cpanel;
   GGobiData *d = display->d;
   GGobiData *e = display->e;
-  gint i, which_button = 1;
+  gint which_button = 1;
 
   void record_add_defaults (GGobiData * d, GGobiData * e, displayd * display,
                             ggobid * gg);
@@ -393,31 +393,15 @@ button_release_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
   /*
    * add the edge to display->e.  If display->e is NULL, then
    * initialize it first.
-   *
-   * If record indices are in use, use them; if not, initialize
-   * indices for display->d.
    */
   if (cpanel->ee_mode == ADDING_EDGES) {
-
     if (d->nearest_point >= 0 &&
         gg->edgeedit.a >= 0 && d->nearest_point != gg->edgeedit.a) {
-      /*-- Add rowids to d if necessary --*/
-      if (d->rowIds == NULL) {
-        gchar **rowids = (gchar **) g_malloc (d->nrows * sizeof (gchar *));
-        for (i = 0; i < d->nrows; i++)
-          rowids[i] = g_strdup_printf ("%d", i);
-        datad_record_ids_set (d, rowids, true);
-        for (i = 0; i < d->nrows; i++)
-          g_free (rowids[i]);
-        g_free (rowids);
-      }
 
       if (e == NULL) {
         /*-- initialize e, the new datad --*/
         e = ggobi_data_new (0, 0);
         e->name = g_strdup ("edges");
-        /* Add it to the display */
-        /*setDisplayEdge (display, e); *//* doesn't work, actually */
         display->e = e;
         display->options.edges_undirected_show_p = true;
       }
@@ -431,18 +415,6 @@ button_release_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
 
   }
   else if (cpanel->ee_mode == ADDING_POINTS) {
-
-    if (d->rowIds == NULL) {
-      /*-- Add rowids to d --*//* duplicate code -- see edges */
-      gchar **rowids = (gchar **) g_malloc (d->nrows * sizeof (gchar *));
-      for (i = 0; i < d->nrows; i++)
-        rowids[i] = g_strdup_printf ("%d", i);
-      datad_record_ids_set (d, rowids, true);
-      for (i = 0; i < d->nrows; i++)
-        g_free (rowids[i]);
-      g_free (rowids);
-      gdk_pointer_ungrab (event->time);
-    }
     if (which_button == 1)
       record_add_defaults (d, e, display, gg);
     else
@@ -500,7 +472,7 @@ cpanel_edgeedit_make (ggobid * gg)
 
   panel = (modepaneld *) g_malloc (sizeof (modepaneld));
   gg->control_panels = g_list_append (gg->control_panels, (gpointer) panel);
-  panel->name = g_strdup (GGOBI (getIModeName) (EDGEED));
+  panel->name = g_strdup (ggobi_getIModeName (EDGEED));
   panel->w = gtk_vbox_new (false, VBOX_SPACING);
   gtk_container_set_border_width (GTK_CONTAINER (panel->w), 5);
 
@@ -564,7 +536,7 @@ cpanel_edgeedit_set (displayd * display, cpaneld * cpanel, ggobid * gg)
 {
   GtkWidget *w;
   GtkWidget *panel =
-    mode_panel_get_by_name (GGOBI (getIModeName) (EDGEED), gg);
+    mode_panel_get_by_name (ggobi_getIModeName (EDGEED), gg);
 
   GtkWidget *lbl = widget_find_by_name (panel, "EDGEEDIT:tip_label");
 

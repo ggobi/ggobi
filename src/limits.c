@@ -83,7 +83,7 @@ static void
 limits_raw_set_by_var (GGobiData * d, gint j, gboolean visible_only)
 {
   gint i, m;
-  vartabled *vt = vartable_element_get (j, d);
+  vartabled *vt = ggobi_data_get_vartable(d, j);
   greal min, max;
 
   min = G_MAXFLOAT;
@@ -139,7 +139,7 @@ static void
 limits_tform_set_by_var (GGobiData * d, gint j, gboolean visible_only)
 {
   gint i, m;
-  vartabled *vt = vartable_element_get (j, d);
+  vartabled *vt = ggobi_data_get_vartable(d, j);
   greal min, max;
 
   min = G_MAXFLOAT;
@@ -178,7 +178,7 @@ limits_display_set_by_var (GGobiData * d, gint j, gboolean visible_only)
   gint i, m, np = 0;
   gfloat sum = 0.0;
   gfloat *x = (gfloat *) g_malloc (d->nrows * sizeof (gfloat));
-  vartabled *vt = vartable_element_get (j, d);
+  vartabled *vt = ggobi_data_get_vartable(d, j);
   greal min, max;
 
   min = G_MAXFLOAT;
@@ -259,7 +259,7 @@ limits_set (GGobiData * d, gboolean do_raw, gboolean do_tform,
     limits_tform_set (d, visible_only);
 
   for (j = 0; j < d->ncols; j++) {
-    vt = vartable_element_get (j, d);
+    vt = ggobi_data_get_vartable(d, j);
     limits_set_from_vartable (vt);
   }
 }
@@ -269,7 +269,7 @@ void
 limits_set_by_var (GGobiData * d, gint j, gboolean do_raw, gboolean do_tform,
                    gboolean visible_only)
 {
-  vartabled *vt = vartable_element_get (j, d);
+  vartabled *vt = ggobi_data_get_vartable(d, j);
 
   if (do_raw)
     limits_raw_set_by_var (d, j, visible_only);
@@ -288,7 +288,7 @@ recenter_data (gint i, GGobiData * d, ggobid * gg)
   gint j;
 
   for (j = 0; j < d->ncols; j++) {
-    vt = vartable_element_get (j, d);
+    vt = ggobi_data_get_vartable(d, j);
     if (i >= 0) {
       x = (vt->lim_tform.max - vt->lim_tform.min) / 2;
       vt->lim_specified_p = true;

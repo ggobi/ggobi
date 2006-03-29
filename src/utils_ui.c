@@ -84,7 +84,7 @@ CreateMenuItemWithCheck (GtkWidget * menu,
       g_signal_connect (G_OBJECT (menuitem), "activate",
                         G_CALLBACK (func), data);
 
-    GGobi_widget_set (GTK_WIDGET (menuitem), gg, true);
+    ggobi_widget_set (GTK_WIDGET (menuitem), gg, true);
 
   }
   else {
@@ -159,7 +159,7 @@ CreateMenuCheck (GtkWidget * menu,
   /* I don't even think this is possible in GTK2 - mfl */
   //gtk_check_menu_item_set_show_toggle (GTK_CHECK_MENU_ITEM (menuitem), true);
 
-  GGobi_widget_set (GTK_WIDGET (menuitem), gg, true);
+  ggobi_widget_set (GTK_WIDGET (menuitem), gg, true);
 
   /* --- set its state --- */
   gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (menuitem), state);
@@ -376,7 +376,7 @@ variable_notebook_adddata_cb (ggobid * gg, GGobiData * d, void *notebook)
   if ((dtype == all_datatypes) ||
       (dtype == no_edgesets && d->edge.n == 0) ||
       (dtype == edgesets_only && d->edge.n > 0)) {
-    if (g_slist_length (d->vartable)) {
+    if (d->ncols) {
       variable_notebook_subwindow_add (d, func, func_data, notebook, vtype,
                                        dtype, gg);
     }
@@ -592,7 +592,7 @@ CHECK_EVENT_SIGNATURE (variable_notebook_adddata_cb, datad_added_f)
     if ((dtype == all_datatypes) ||
         (dtype == no_edgesets && d->edge.n == 0) ||
         (dtype == edgesets_only && d->edge.n > 0)) {
-      if (g_slist_length (d->vartable)) {
+      if (d->ncols) {
         variable_notebook_subwindow_add (d, func, func_data, notebook, vtype,
                                          dtype, gg);
       }
@@ -675,7 +675,7 @@ prefixed_variable_notebook_adddata_cb (ggobid * gg, GGobiData * d,
     (datatyped) g_object_get_data (G_OBJECT (notebook), "datatype");
   if ((dtype == all_datatypes) || (dtype == no_edgesets && d->edge.n == 0)
       || (dtype == edgesets_only && d->edge.n > 0)) {
-    if (g_slist_length (d->vartable))
+    if (d->ncols)
       variable_notebook_page_add_prefices (GTK_WIDGET (notebook),
                                            gtk_notebook_get_n_pages
                                            (GTK_NOTEBOOK (notebook)) - 1);
@@ -749,7 +749,7 @@ create_prefixed_variable_notebook (GtkWidget * box,
 /*--------------------------------------------------------------------*/
 
 GtkWidget *
-GGobi_addDisplayMenuItem (const gchar * label, ggobid * gg)
+ggobi_addDisplayMenuItem (const gchar * label, ggobid * gg)
 {
   GtkWidget *entry = NULL;
 
@@ -758,7 +758,7 @@ GGobi_addDisplayMenuItem (const gchar * label, ggobid * gg)
 
   if (dpy_menu != NULL) {
     entry = gtk_menu_item_new_with_mnemonic (label);
-    data = GGobi_data_get (0, gg);
+    data = ggobi_data_get (0, gg);
     g_object_set_data (G_OBJECT (entry), "data", (gpointer) data);
 
     gtk_widget_show (entry);
@@ -774,7 +774,7 @@ GGobi_addDisplayMenuItem (const gchar * label, ggobid * gg)
 
 
 gboolean
-GGobi_addToolsMenuWidget (GtkWidget * entry, ggobid * gg)
+ggobi_addToolsMenuWidget (GtkWidget * entry, ggobid * gg)
 {
   GtkWidget *tools_menu = NULL, *tools_item = NULL;
   GtkUIManager *manager;
@@ -795,7 +795,7 @@ GGobi_addToolsMenuWidget (GtkWidget * entry, ggobid * gg)
 }
 
 void
-GGobi_addToolAction (GtkActionEntry * entry, gpointer * data, ggobid * gg)
+ggobi_addToolAction (GtkActionEntry * entry, gpointer * data, ggobid * gg)
 {
   GtkActionGroup *actions = gtk_action_group_new (entry->name);
   gtk_action_group_add_actions (actions, entry, 1, data);
@@ -807,7 +807,7 @@ GGobi_addToolAction (GtkActionEntry * entry, gpointer * data, ggobid * gg)
 }
 
 GtkWidget *
-GGobi_addToolsMenuItem (gchar * lbl, ggobid * gg)
+ggobi_addToolsMenuItem (gchar * lbl, ggobid * gg)
 {
   GtkWidget *entry;
   if (!lbl) {
@@ -816,7 +816,7 @@ GGobi_addToolsMenuItem (gchar * lbl, ggobid * gg)
 
     /*-- purify goes crazy here, and I have no idea why -- dfs --*/
   entry = gtk_menu_item_new_with_mnemonic (lbl);
-  if (GGobi_addToolsMenuWidget (entry, gg) == false) {
+  if (ggobi_addToolsMenuWidget (entry, gg) == false) {
     gtk_widget_destroy (entry);
   }
   else

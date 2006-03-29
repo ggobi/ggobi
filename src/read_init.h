@@ -47,10 +47,6 @@ typedef struct _GGobiInitInfo {
     gint numInputs;               /* number of previously read input sources */
     GGobiDescription *descriptions;
 
-#if 0
-    InputDescription *inputs;    /* previously read input sources. */
-#endif
-
     GList *plugins;  /* list of known available plugins */
     GList *inputPlugins;  /* list of the input reading plugins */
 
@@ -70,10 +66,6 @@ typedef struct _GGobiInitInfo {
 
     gchar   *sessionFile;
     gint     compress;
-
-#if 0
-    gboolean  useRadioMenuItems;
-#endif
 
 } GGobiInitInfo;
 

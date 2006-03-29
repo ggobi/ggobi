@@ -45,7 +45,7 @@ cpanel_tour2d3_set (displayd *display, cpaneld *cpanel, ggobid* gg)
 */
 {
   GtkWidget *w, *btn;
-  GtkWidget *pnl = mode_panel_get_by_name(GGOBI(getPModeName)(TOUR2D3), gg);
+  GtkWidget *pnl = mode_panel_get_by_name(ggobi_getPModeName(TOUR2D3), gg);
   GtkAdjustment *adj;
 
   /*-- speed --*/
@@ -113,7 +113,7 @@ cpanel_tour2d3_make (ggobid *gg) {
   
   panel = (modepaneld *) g_malloc(sizeof(modepaneld));
   gg->control_panels = g_list_append(gg->control_panels, (gpointer) panel);
-  panel->name = g_strdup(GGOBI(getPModeName)(TOUR2D3));
+  panel->name = g_strdup(ggobi_getPModeName(TOUR2D3));
   panel->w = gtk_vbox_new (false, VBOX_SPACING);
   gtk_container_set_border_width (GTK_CONTAINER (panel->w), 5);
 
@@ -229,7 +229,7 @@ key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
   /*-- insert mode-specific key presses (if any) here --*/
   if (event->keyval == GDK_w || event->keyval == GDK_W) {
     /*-- turn pause on and off --*/
-    GtkWidget *pnl = mode_panel_get_by_name(GGOBI(getPModeName)(TOUR2D3), gg);
+    GtkWidget *pnl = mode_panel_get_by_name(ggobi_getPModeName(TOUR2D3), gg);
     GtkWidget *pause_button = NULL;
     pause_button = widget_find_by_name (pnl, "TOUR2D3:pause_button");
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pause_button),

@@ -169,8 +169,8 @@ display_add_tree (displayd * display)
 
   label = display_tree_label (display);
   dataset = display->d->name;
-  imode = GGOBI (getIModeScreenName) (display->cpanel.imode, display);
-  pmode = GGOBI (getPModeScreenName) (display->cpanel.pmode, display);
+  imode = ggobi_getIModeScreenName (display->cpanel.imode, display);
+  pmode = ggobi_getPModeScreenName (display->cpanel.pmode, display);
 
   gtk_tree_store_append (GTK_TREE_STORE (tree), &disp_iter, NULL);
   gtk_tree_store_set (GTK_TREE_STORE (tree), &disp_iter,
@@ -332,7 +332,7 @@ display_tree_child_select (GtkTreeSelection * sel, gpointer data)
     splot = (splotd *) g_list_nth_data (display->splots, 0);
   }
   if (splot)
-    GGOBI (splot_set_current_full) (display, splot, gg);
+    ggobi_splot_set_current_full (display, splot, gg);
 
   gtk_widget_show (GGOBI_WINDOW_DISPLAY (display)->window);
   /* And now make certain the window comes to the top. */

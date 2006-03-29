@@ -41,12 +41,7 @@ typedef enum {
 #define BRUSH_NBINS  20
 #define BRUSH_MARGIN 10
 #define BINBLOCKSIZE 50
-#if 0  // Unused?
-/* br_linkby */
-#define BR_LINKBYID   0
-#define BR_LINKBYVAR  1
-/* */
-#endif
+
 
 /*-- for edge brushing:  all sizes, 3 types for now --*/
 #define NEDGETYPES 3

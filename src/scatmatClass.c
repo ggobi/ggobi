@@ -168,7 +168,7 @@ displayd *
 createWithVars (gboolean missing_p, gint nvars, gint * vars, GGobiData * d,
                 ggobid * gg)
 {
-  return (GGOBI (newScatmat) (vars, vars, nvars, nvars, d, gg));
+  return (ggobi_newScatmat (vars, vars, nvars, nvars, d, gg));
 }
 
 #ifdef STORE_SESSION_ENABLED
@@ -224,7 +224,7 @@ scatmatKeyEventHandled (GtkWidget * w, displayd * display, splotd * sp,
     }
 
     if (ok) {
-      GGOBI (full_viewmode_set) (pmode, imode, gg);
+      ggobi_full_viewmode_set (pmode, imode, gg);
     }
   }
   else {

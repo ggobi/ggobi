@@ -129,33 +129,26 @@ identify_link_by_id (gint k, GGobiData * source_d, ggobid * gg)
     return;
   }
 
-  if (source_d->rowIds) {
-    /* if there is no */
-    if (!source_d->rowIds[k]) {
-      return;
+  for (l = gg->d; l; l = l->next) {
+    d = (GGobiData *) l->data;
+    inrange = false;
+
+    if (d == source_d)
+      continue;        /*-- skip the originating datad --*/
+
+    guint id = ggobi_data_get_row_by_id(d, source_d->rowIds[k]);
+    if (id != -1) {
+      inrange = true;
+      d->nearest_point_prev = d->nearest_point;
+      d->nearest_point = id;
     }
-    for (l = gg->d; l; l = l->next) {
-      gpointer ptr;
-      d = (GGobiData *) l->data;
-      inrange = false;
 
-      if (d == source_d || d->idTable == NULL)
-        continue;        /*-- skip the originating datad --*/
-
-      ptr = g_hash_table_lookup (d->idTable, source_d->rowIds[k]);
-      if (ptr) {
-        inrange = true;
-        d->nearest_point_prev = d->nearest_point;
-        d->nearest_point = *((guint *) ptr);
-      }
-
-      if (!inrange) {
-        d->nearest_point_prev = d->nearest_point;
-        d->nearest_point = -1;
-      }
+    if (!inrange) {
+      d->nearest_point_prev = d->nearest_point;
+      d->nearest_point = -1;
     }
-    return;
   }
+  return;
 }
 
 void
@@ -170,29 +163,14 @@ sticky_id_link_by_id (gint whattodo, gint k, GGobiData * source_d,
   gpointer ptr = NULL;
 
   /*-- k is the row number in source_d --*/
-
-  if (source_d->rowIds && source_d->rowIds[k]) {
-    ptr = g_hash_table_lookup (source_d->idTable, source_d->rowIds[k]);
-    if (ptr)
-      id = *(guint *) ptr;
-  }
-
-  if (id < 0)          /*-- this would indicate a bug --*/
-    return;
+  id = ggobi_data_get_row_by_id(source_d, source_d->rowIds[k]);
 
   for (l = gg->d; l; l = l->next) {
     d = (GGobiData *) l->data;
     if (d == source_d)
       continue;        /*-- skip the originating datad --*/
 
-    i = -1;
-
-    /*-- if this id exists is in the range of d's ids ... --*/
-    if (d->idTable) {
-      gpointer ptr = g_hash_table_lookup (d->idTable, source_d->rowIds[k]);
-      if (ptr)
-        i = *(guint *) ptr;
-    }
+    i = ggobi_data_get_row_by_id(d, source_d->rowIds[k]);
 
     if (i < 0)          /*-- then no cases in d have this id --*/
       continue;
@@ -235,7 +213,7 @@ identify_label_fetch (gint k, cpaneld * cpanel, GGobiData * d, ggobid * gg)
 */
   if (id_display_type & ID_VAR_LABELS) {
     GtkWidget *pnl =
-      mode_panel_get_by_name (GGOBI (getIModeName) (IDENT), gg);
+      mode_panel_get_by_name (ggobi_getIModeName (IDENT), gg);
     GtkWidget *tree_view;
     GGobiData *tree_view_d;
 
@@ -267,16 +245,6 @@ identify_label_fetch (gint k, cpaneld * cpanel, GGobiData * d, ggobid * gg)
     }
   }
 
-  /* Should check here that d->rowlab is long enough */
-  if (id_display_type & ID_RECORD_LABEL) {
-    lbl = (gchar *) g_array_index (d->rowlab, gchar *, k);
-    if (id_display_type & ~ID_RECORD_LABEL)
-      lbl = g_strdup_printf ("label=%s", lbl);
-    else
-      lbl = g_strdup (lbl);
-    labels = g_list_append (labels, lbl);
-  }
-
   if (id_display_type & ID_RECORD_NO) {
     if (id_display_type & ~ID_RECORD_NO)
       lbl = g_strdup_printf ("num=%d", k);
@@ -286,15 +254,10 @@ identify_label_fetch (gint k, cpaneld * cpanel, GGobiData * d, ggobid * gg)
   }
 
   if (id_display_type & ID_RECORD_ID) {
-    if (d->rowIds && d->rowIds[k]) {
-      if (id_display_type & ~ID_RECORD_ID)
-        lbl = g_strdup_printf ("id=%s", d->rowIds[k]);
-      else
-        lbl = g_strdup_printf ("%s", d->rowIds[k]);
-    }
-    else {
-      lbl = g_strdup ("");
-    }
+    if (id_display_type & ~ID_RECORD_ID)
+      lbl = g_strdup_printf ("id=%s", ggobi_data_get_row_id(d, k));
+    else
+      ggobi_data_get_row_id(d, k);
     labels = g_list_append (labels, lbl);
   }
 

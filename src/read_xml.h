@@ -21,7 +21,7 @@
 
 #include <libxml/parser.h>
 
-enum xmlDataState {
+typedef enum xmlDataState {
   TOP = 0,
   DATASET, DESCRIPTION,
   RECORD, RECORDS, VARIABLES, VARIABLE,
@@ -36,9 +36,7 @@ enum xmlDataState {
   EDGES, EDGE,
 /* HELP, DESCRIPTION */
   UNKNOWN
-};
-
-typedef enum xmlDataState XmlTagType;
+} XmlTagType;
 
 typedef struct {
 
@@ -81,7 +79,7 @@ typedef struct _XMLUserData {
 
   /* The current data object to which new records are added. */
   GGobiData *current_data;
-  // The list of all datad's read.
+  /*  The list of all datad's read. */
   GSList *dlist; 
 
   /* Flag indicating whether we should convert

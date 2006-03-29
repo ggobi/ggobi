@@ -215,7 +215,7 @@ varcircles_delete_nth (gint jvar, GGobiData * d)
 
 
 void
-varcircle_label_set (gint j, GGobiData * d)
+varcircle_label_set (GGobiData * d, gint j)
 {
   GtkWidget *w = varcircles_get_nth (LBL, j, d);
   if (w != NULL)
@@ -430,7 +430,7 @@ varcircles_populate (GGobiData * d, ggobid * gg)
   gtk_widget_set_size_request (GTK_WIDGET (da), 8, 8);
   gtk_widget_set_events (da, GDK_EXPOSURE_MASK);
   gtk_box_pack_start (GTK_BOX (d->vcirc_ui.hbox), da, false, false, 2);
-  GGobi_widget_set (da, gg, true);
+  ggobi_widget_set (da, gg, true);
   g_signal_connect (G_OBJECT (da), "expose_event",
                     G_CALLBACK (da_manip_expose_cb), d);
   gtk_widget_show (da);
@@ -452,7 +452,7 @@ varcircles_populate (GGobiData * d, ggobid * gg)
   gtk_widget_set_size_request (GTK_WIDGET (da), 8, 8);
   gtk_widget_set_events (da, GDK_EXPOSURE_MASK);
   gtk_box_pack_start (GTK_BOX (d->vcirc_ui.hbox), da, false, false, 2);
-  GGobi_widget_set (da, gg, true);
+  ggobi_widget_set (da, gg, true);
   g_signal_connect (G_OBJECT (da), "expose_event",
                     G_CALLBACK (da_freeze_expose_cb), d);
   gtk_widget_show (da);
@@ -595,7 +595,7 @@ varcircle_create (gint j, GGobiData * d, ggobid * gg)
   g_signal_connect (G_OBJECT (da), "button_press_event",
                     G_CALLBACK (varcircle_sel_cb), GINT_TO_POINTER (j));
   g_object_set_data (G_OBJECT (da), "datad", d);
-  GGobi_widget_set (GTK_WIDGET (da), gg, true);
+  ggobi_widget_set (GTK_WIDGET (da), gg, true);
   /*gtk_container_add (GTK_CONTAINER (vb), da); */
   gtk_box_pack_start (GTK_BOX (vb), da, false, false, 0);
 
@@ -607,7 +607,7 @@ varcircle_create (gint j, GGobiData * d, ggobid * gg)
                         lbl, "Click left on the circle to select or deselect",
                         NULL);
   g_object_set_data (G_OBJECT (lbl), "datad", d);
-  GGobi_widget_set (GTK_WIDGET (lbl), gg, true);
+  ggobi_widget_set (GTK_WIDGET (lbl), gg, true);
   /*gtk_container_add (GTK_CONTAINER (vb), lbl); */
   gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
 

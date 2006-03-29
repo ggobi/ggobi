@@ -19,7 +19,7 @@
 #include "externs.h"
 
 /* Which include file should this be in? */
-void GGOBI (edge_menus_update) (ggobid * gg);
+void ggobi_edge_menus_update (ggobid * gg);
 
 /* --------------------------------------------------------------- */
 /*                   Dynamic allocation section                    */
@@ -63,7 +63,6 @@ gboolean
 edge_add (gint a, gint b, gchar * lbl, gchar * id, GGobiData * d,
           GGobiData * e, ggobid * gg)
 {
-  gchar *s1, *s2;
   gint n = e->edge.n;
   GList *l, *sl;
   splotd *sp;
@@ -77,43 +76,13 @@ edge_add (gint a, gint b, gchar * lbl, gchar * id, GGobiData * d,
   /*-- eventually check whether a->b already exists before adding --*/
 
   /*-- Here's what the datad needs --*/
-/*
- * some of this can be encapsulated as datad_record_add, as long
- * as problems with the sequence of operations don't arise.
-*/
-  e->nrows += 1;
 
-  /*-- add a row label --*/
-  if (!lbl) {
-    s1 = g_strdup_printf ("%d", n + 1);
-    rowlabel_add(s1, e); 
-    /*-- don't free s1 --*/
-  } else rowlabel_add (lbl, e);
-
-  /*-- if necessary, add an id --*/
-  if (e->idTable) {
-    if (!id) {
-      s2 = g_strdup_printf ("%d", n + 1);
-      datad_record_id_add (s2, e); 
-      /*-- don't free s2 --*/
-    } // we never add the id itself?
-  }
-
-  pipeline_arrays_check_dimensions (e);
-  rows_in_plot_set(e);
-
-  /*-- allocate and initialize brushing arrays --*/
-  br_glyph_ids_add (e);
-  br_color_ids_add (e);
-  br_hidden_alloc (e);
-  vectorb_realloc (&e->pts_under_brush, e->nrows);
-  clusters_set(d);
-
-  arrays_add_rows (&e->missing, e->nrows);
+  ggobi_data_add_rows(e, 1);
+  //ggobi_data_set_id(e, n+1, lbl)
 
   edges_alloc (e->nrows, e);
-  e->edge.sym_endpoints[n].a = g_strdup (d->rowIds[a]);
-  e->edge.sym_endpoints[n].b = g_strdup (d->rowIds[b]);
+  e->edge.sym_endpoints[n].a = ggobi_data_get_row_id(d, a);
+  e->edge.sym_endpoints[n].b = ggobi_data_get_row_id(d, b);
   e->edge.sym_endpoints[n].jpartner = -1; /* XXX */
   unresolveAllEdgePoints (e);
   resolveEdgePoints (e, d);
@@ -181,7 +150,7 @@ setDisplayEdge (displayd * dpy, GGobiData * e)
     dpy->e = e;
     /* Now update all displays, not just this one. Events could also be used,
        but this is not too bad. */
-    GGOBI (edge_menus_update) (e->gg);
+    ggobi_edge_menus_update (e->gg);
   }
 
   for (l = dpy->splots; l; l = l->next) {
@@ -272,7 +241,7 @@ edgeset_add_cb (GtkAction * action, GGobiData * e)
  */
 #if 0
 void
-GGobi_cleanUpEdgeRelationships (struct _EdgeData *edge, int startPosition)
+ggobi_cleanUpEdgeRelationships (struct _EdgeData *edge, int startPosition)
 {
   int k, i, start, end;
   for (i = startPosition; i < edge->n; i++) {

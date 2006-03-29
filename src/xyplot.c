@@ -47,7 +47,7 @@ xyplot_activate (gint state, displayd *display, ggobid *gg)
      * for now about turning it on when re-entering.
     */
     GtkWidget *pnl, *w;
-    pnl = mode_panel_get_by_name(GGOBI(getPModeName)(XYPLOT), gg);
+    pnl = mode_panel_get_by_name(ggobi_getPModeName(XYPLOT), gg);
     if (pnl != (GtkWidget *) NULL) {
       w = widget_find_by_name (pnl, "XYPLOT:cycle_toggle");
       gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(w), off);

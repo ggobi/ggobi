@@ -123,48 +123,13 @@ qnorm (gdouble pr)
   else return (eta - term);
 }
 
-void
-vt_init(vartabled *vt)
-{
-  vt->tform0 = NO_TFORM0;
-  vt->tform1 = NO_TFORM1;
-  vt->tform2 = NO_TFORM2;
-  vt->domain_incr = 0.;
-  vt->param = 0.;
-  vt->domain_adj = no_change;
-  vt->inv_domain_adj = no_change;
-}
-void
-transform_values_init (vartabled *vt) 
-{
-  vt_init(vt);
-}
 
-void
-vt_copy(vartabled *vtf, vartabled *vtt)
-{
-  vtt->tform0 = vtf->tform0;
-  vtt->tform1 = vtf->tform1;
-  vtt->tform2 = vtf->tform2;
-  vtt->domain_incr = vtf->domain_incr;
-  vtt->param = vtf->param;
-  vtt->domain_adj = vtf->domain_adj;
-  vtt->inv_domain_adj = vtf->inv_domain_adj;
-}
-
-void
-transform_values_copy (gint jfrom, gint jto, GGobiData *d)
-{
-  vartabled *vtf = vartable_element_get (jfrom, d);
-  vartabled *vtt = vartable_element_get (jto, d);
-  vt_copy (vtf, vtt);
-}
 gboolean
 transform_values_compare (gint jfrom, gint jto, GGobiData *d)
 {
   gboolean same = true;
-  vartabled *vtf = vartable_element_get (jfrom, d);
-  vartabled *vtt = vartable_element_get (jto, d);
+  vartabled *vtf = ggobi_data_get_vartable(d, jfrom);
+  vartabled *vtt = ggobi_data_get_vartable(d, jto);
 
   same = (
     vtt->tform1 == vtf->tform1 &&
@@ -183,7 +148,7 @@ transform0_values_set (gint tform0, gint j, GGobiData *d, ggobid *gg)
   gfloat domain_incr;
   gfloat (*domain_adj) (gfloat x, gfloat incr) = no_change;
   gfloat (*inv_domain_adj) (gfloat x, gfloat incr) = no_change;
-  vartabled *vt = vartable_element_get (j, d);
+  vartabled *vt = ggobi_data_get_vartable(d, j);
 
   switch (tform0) {
 
@@ -230,7 +195,7 @@ void
 transform1_values_set (gint tform1, gfloat expt, gint j, 
   GGobiData *d, ggobid *gg)
 {
-  vartabled *vt = vartable_element_get (j, d);
+  vartabled *vt = ggobi_data_get_vartable(d, j);
 
   vt->tform1 = tform1;
   vt->param = expt;
@@ -251,7 +216,7 @@ transform1_apply (gint j, GGobiData *d, ggobid *gg)
   GtkWidget *stage1_cbox;
   gint tform1;
   gfloat boxcoxparam = gg->tform_ui.boxcox_adj->value;
-  vartabled *vt = vartable_element_get (j, d);
+  vartabled *vt = ggobi_data_get_vartable(d, j);
   gfloat incr = vt->domain_incr;
   gfloat (*domain_adj) (gfloat x, gfloat incr) = vt->domain_adj;
 
@@ -511,7 +476,7 @@ transform1_apply (gint j, GGobiData *d, ggobid *gg)
 void
 transform2_values_set (gint tform2, gint j, GGobiData *d, ggobid *gg)
 {
-  vartabled *vt = vartable_element_get (j, d);
+  vartabled *vt = ggobi_data_get_vartable(d, j);
 
   vt->tform2 = tform2;
 
@@ -691,91 +656,6 @@ transform2_apply (gint jcol, GGobiData *d, ggobid *gg)
   return tform_ok;
 }
 
-/*
- * update the labels <after> transform has completed, so that
- * we're ready for any sort of success or failure
-*/
-void
-collab_tform_update (gint j, GGobiData *d)
-{
-  gchar *lbl0, *lbl1, *lbl2;
-  vartabled *vt = vartable_element_get (j, d);
-
-  /*-- skip the stage0 changes except negation --*/
-  switch (vt->tform0) {
-    case NEGATE:
-      lbl0 = g_strdup_printf ("-%s", ggobi_data_get_col_name(d, j));
-      break;
-    default:
-      lbl0 = g_strdup (ggobi_data_get_col_name(d, j));
-      break;
-  }
-
-  switch (vt->tform1) {
-    case NO_TFORM1:
-      lbl1 = g_strdup (lbl0);
-      break;
-    case BOXCOX:
-      lbl1 = g_strdup_printf ("B-C(%s,%.2f)", lbl0, vt->param);
-      break;
-    case LOG10:
-      lbl1 = g_strdup_printf ("log10(%s)", lbl0);
-      break;
-    case INVERSE:
-      lbl1 = g_strdup_printf ("1/%s", lbl0);
-      break;
-    case ABSVALUE:
-      lbl1 = g_strdup_printf ("abs(%s)", lbl0);
-      break;
-    case SCALE_AB:
-      lbl1 = g_strdup_printf ("%s [a,b]", lbl0);
-      break;
-    default:  // compiler pacification
-      lbl1 = "";
-  }
-
-  switch (vt->tform2) {
-    case STANDARDIZE:
-      lbl2 = g_strdup_printf ("(%s-m)/s", lbl1);
-    break;
-    case SORT:
-      lbl2 = g_strdup_printf ("sort(%s)", lbl1);
-    break;
-    case RANK:
-      lbl2 = g_strdup_printf ("rank(%s)", lbl1);
-    break;
-    case NORMSCORE:
-      lbl2 = g_strdup_printf ("normsc(%s)", lbl1);
-    break;
-    case ZSCORE:
-      lbl2 = g_strdup_printf ("zsc(%s)", lbl1);
-    break;
-    case DISCRETE2:
-      lbl2 = g_strdup_printf ("%s:0,1", lbl1);
-    break;
-    default:
-      lbl2 = g_strdup (lbl1);
-  }
-  
-  ggobi_data_set_transformed_col_name(d, j, lbl2);
-}
-
-void tform_label_update (gint j, GGobiData *d)
-{
-  /*-- update the values of the variable labels --*/
-  collab_tform_update (j, d);
-
-  /*-- update the displayed checkbox label --*/
-  /*varlabel_set (j, d);*/
-  varpanel_label_set (j, d);
-
-  /*-- update the displayed variable circle labels --*/
-  varcircle_label_set (j, d);
-
-  /*-- update the variable statistics table --*/
-  vartable_collab_tform_set_by_var (j, d);
-}
-
 /*---------------------------------------------------------------------*/
 
 /*
@@ -830,8 +710,7 @@ transform_variable (gint stage, gint tform_type, gfloat param, gint jcol,
       }
     break;
   }
-
-  tform_label_update (jcol, d);
+  g_signal_emit_by_name(d, "col_name_changed", jcol);
 
   return success;
 }
@@ -854,8 +733,8 @@ transform (gint stage, gint tform_type, gfloat param, gint *vars, gint nvars,
   
   limits_set (d, false, true, gg->lims_use_visible);  
   for (k=0; k<completed; k++) {
-    vartable_limits_set_by_var (vars[k], d);
-    vartable_stats_set_by_var (vars[k], d);
+    vartable_limits_set_by_var (d, vars[k]);
+    vartable_stats_set_by_var (d, vars[k]);
     tform_to_world_by_var (vars[k], d);
   }
 

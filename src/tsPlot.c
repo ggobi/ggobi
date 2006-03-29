@@ -209,7 +209,7 @@ splotScreenToTform(cpaneld *cpanel, splotd *sp, icoords *scr,
  * plane to tform
 */
   /* x */
-  vtx = vartable_element_get (sp->xyvars.x, d);
+  vtx = ggobi_data_get_vartable(d, sp->xyvars.x);
   max = vtx->lim.max;
   min = vtx->lim.min;
   rdiff = max - min;
@@ -219,7 +219,7 @@ splotScreenToTform(cpaneld *cpanel, splotd *sp, icoords *scr,
   tfd->x += min;
 
   /* y */
-  vty = vartable_element_get (sp->xyvars.y, d);
+  vty = ggobi_data_get_vartable(d, sp->xyvars.y);
   max = vty->lim.max;
   min = vty->lim.min;
   rdiff = max - min;

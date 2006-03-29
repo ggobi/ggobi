@@ -21,284 +21,13 @@
 #include "vars.h"
 #include "externs.h"
 
-gfloat mean_largest_dist  (gfloat **, gint *, gint, gfloat *, gfloat *, GGobiData *);
-gfloat median_largest_dist(gfloat **, gint *, gint, gfloat *, gfloat *, GGobiData *);
-
-/* ------------ Dynamic allocation, freeing section --------- */
-
-
-void
-pipeline_init (GGobiData * d)
-{
-  gint i;
-  
-  g_return_if_fail(d->gg);
-  
-  /*-- a handful of allocations and initializations --*/
-  pipeline_arrays_alloc (d);
-  for (i = 0; i < d->nrows; i++) {
-    d->sampled.els[i] = true;
-    d->excluded.els[i] = false;
-  }
-  /*-- maybe some points are tagged "hidden" in the data --*/
-  rows_in_plot_set(d);
-
-  /*-- some initializations --*/
-  edgeedit_init (d->gg);
-  brush_init (d);
-
-  /*-- run the first half of the pipeline --*/
-  arrayf_copy (&d->raw, &d->tform);
-
-  limits_set (d, true, true, d->gg->lims_use_visible);
-
-  /*
-   * If there are missings, they've been initialized with a value
-   * of 0.  Here, re-set that value to 15% below the minimum for each
-   * variable.  (dfs -- done at Di's request, September 2004)
-   */
-
-  if (ggobi_data_has_missings(d)) {
-    gint j;
-    gint *vars = (gint *) g_malloc(d->ncols * sizeof(gint));
-    for (j = 0; j < d->ncols; j++) vars[j] = j;
-
-    impute_fixed (IMP_BELOW, 15.0, d->ncols, vars, d);
-    limits_set (d, true, true, d->gg->lims_use_visible);
-    vartable_limits_set (d);
-    vartable_stats_set (d);
-    g_free(vars);
-  }
-
-  tform_to_world(d);
-}
-
-/*
- * Dynamically free arrays used in data pipeline.
-*/
-void
-pipeline_arrays_free (GGobiData * d)
-{
-  arrayf_free (&d->tform, 0, 0);
-
-  arrayg_free (&d->world, 0, 0);
-  arrayg_free (&d->jitdata, 0, 0);
-
-  /*-- should these be freed here as well? --*/
-  vectori_free (&d->clusterid);
-
-  vectori_free (&d->rows_in_plot);
-  vectorb_free (&d->sampled);
-  vectorb_free (&d->excluded);
-}
-
-/*
- * Dynamically allocate arrays.
-*/
-void
-pipeline_arrays_alloc (GGobiData * d)
-{
-  gint nc = d->ncols, nr = d->nrows;
-
-  if (d->tform.vals != NULL)
-    pipeline_arrays_free (d);
-
-  arrayf_alloc (&d->tform, nr, nc);
-
-  arrayg_alloc (&d->world, nr, nc);
-  arrayg_alloc_zero (&d->jitdata, nr, nc);
-
-  vectori_alloc (&d->rows_in_plot, nr);
-  vectorb_alloc (&d->sampled, nr);
-  vectorb_alloc (&d->excluded, nr);
-}
-
-void
-pipeline_arrays_check_dimensions (GGobiData * d)
-{
-  gint n;
-
-  /*-- d->raw --*/
-  if (d->raw.ncols < d->ncols)
-    arrayf_add_cols (&d->raw, d->ncols);
-  if (d->raw.nrows < d->nrows)
-    arrayf_add_rows (&d->raw, d->nrows);
-
-  /*-- d->tform --*/
-  if (d->tform.ncols < d->ncols)
-    arrayf_add_cols (&d->tform, d->ncols);
-  if (d->tform.nrows < d->nrows)
-    arrayf_add_rows (&d->tform, d->nrows);
-
-  /*-- d->world --*/
-  if (d->world.ncols < d->ncols)
-    arrayg_add_cols (&d->world, d->ncols);
-  if (d->world.nrows < d->nrows)
-    arrayg_add_rows (&d->world, d->nrows);
-
-  /*-- d->jitdata --*/
-  if (d->jitdata.ncols < d->ncols) {
-    gint i, j, nc = d->jitdata.ncols;
-    arrayg_add_cols (&d->jitdata, d->ncols);
-    for (j = nc; j < d->ncols; j++) {
-      for (i = 0; i < d->nrows; i++)
-        d->jitdata.vals[i][j] = 0;
-    }
-  }
-  if (d->jitdata.nrows < d->nrows)
-    arrayg_add_rows (&d->jitdata, d->nrows);
-
-  if ((n = d->sampled.nels) < d->nrows) {
-    gint i;
-    /*-- include any new rows in the sample -- add to rows_in_plot? --*/
-    vectorb_realloc (&d->sampled, d->nrows);
-    for (i = n; i < d->nrows; i++)
-      d->sampled.els[i] = true;
-  }
-
-  if ((n = d->excluded.nels) < d->nrows) {
-    gint i;
-    /*-- don't excluded new rows --*/
-    vectorb_realloc (&d->excluded, d->nrows);
-    for (i = n; i < d->nrows; i++)
-      d->excluded.els[i] = false;
-  }
-
-  /*-- d->rows_in_plot --*/
-  if (d->rows_in_plot.nels < d->nrows)
-    vectori_realloc (&d->rows_in_plot, d->nrows);
-}
-
-/*-------------------------------------------------------------------------*/
-/*                       pipeline                                          */
-/*-------------------------------------------------------------------------*/
-
-gint
-icompare (gint * x1, gint * x2)
-{
-  gint val = 0;
-
-  if (*x1 < *x2)
-    val = -1;
-  else if (*x1 > *x2)
-    val = 1;
-
-  return (val);
-}
-
-gfloat
-median_largest_dist (gfloat ** vals, gint * cols, gint ncols,
-                     gfloat * min, gfloat * max, GGobiData * d)
-{
-/*
- * Find the minimum and maximum values of each variable,
- * scaling by median and largest distance
-*/
-  gint i, j, k, n, np;
-  gdouble dx, sumdist, lgdist = 0.0;
-  gfloat *x, fmedian;
-  gdouble dmedian = 0;
-
-  np = ncols * d->nrows_in_plot;
-  x = (gfloat *) g_malloc (np * sizeof (gfloat));
-  for (n = 0; n < ncols; n++) {
-    j = cols[n];
-    for (i = 0; i < d->nrows_in_plot; i++) {
-      k = d->rows_in_plot.els[i];
-      x[n * d->nrows_in_plot + i] = vals[k][j];
-    }
-  }
-
-  qsort ((void *) x, np, sizeof (gfloat), fcompare);
-  dmedian =
-    ((np % 2) != 0) ? x[(np - 1) / 2] : (x[np / 2 - 1] + x[np / 2]) / 2.;
-
-  /*
-   * Find the maximum of the sum of squared differences
-   * from the mean over all rows
-   */
-
-  for (i = 0; i < d->nrows_in_plot; i++) {
-    sumdist = 0.0;
-    for (j = 0; j < ncols; j++) {
-      dx = (gdouble) vals[d->rows_in_plot.els[i]][cols[j]] - dmedian;
-      sumdist += (dx * dx);
-    }
-    if (sumdist > lgdist)
-      lgdist = sumdist;
-  }
-
-  lgdist = sqrt (lgdist);
-
-  g_free ((gchar *) x);
-
-  fmedian = (gfloat) dmedian;
-  *min = fmedian - lgdist;
-  *max = fmedian + lgdist;
-
-  return fmedian;
-}
-
-gfloat
-mean_largest_dist (gfloat ** vals, gint * cols, gint ncols,
-                   gfloat * min, gfloat * max, GGobiData * d)
-{
-/*
- * Find the minimum and maximum values of each variable,
- * scaling by mean and largest distance
-*/
-  gint i, j;
-  gdouble dx, sumxi, mean, sumdist, lgdist = 0.0;
-
-  /*
-   * Find the overall mean for the columns
-   */
-  sumxi = 0.0;
-  for (j = 0; j < ncols; j++) {
-    for (i = 0; i < d->nrows_in_plot; i++) {
-      dx = (gdouble) vals[d->rows_in_plot.els[i]][cols[j]];
-      sumxi += dx;
-    }
-  }
-  mean = sumxi / (gdouble) d->nrows_in_plot / (gdouble) ncols;
-
-  /*
-   * Find the maximum of the sum of squared differences
-   * from the mean over all rows
-   */
-
-  for (i = 0; i < d->nrows_in_plot; i++) {
-    sumdist = 0.0;
-    for (j = 0; j < ncols; j++) {
-      dx = (gdouble) vals[d->rows_in_plot.els[i]][cols[j]] - mean;
-      sumdist += (dx * dx);
-    }
-    if (sumdist > lgdist)
-      lgdist = sumdist;
-  }
-
-  lgdist = sqrt (lgdist);
-
-  *min = mean - lgdist;
-  *max = mean + lgdist;
-
-  return mean;
-}
 
 void
 tform_to_world_by_var (gint j, GGobiData * d)
 {
   gint i, m;
   greal max, min, range, ftmp;
-  gfloat precis = PRECISION1;
 
-  pipeline_arrays_check_dimensions (d);  /*-- realloc as necessary --*/
-
-/*
- * This is excluding missings -- which we don't want for
- * scaling, but we do want for display, so some more thought
- * is needed, or maybe another set of limits.
-*/
   max = ggobi_data_get_col_max(d, j);
   min = ggobi_data_get_col_min(d, j);
   range = max - min;
@@ -306,7 +35,7 @@ tform_to_world_by_var (gint j, GGobiData * d)
   for (i = 0; i < d->nrows_in_plot; i++) {
     m = d->rows_in_plot.els[i];
     ftmp = -1.0 + 2.0 * ((greal) d->tform.vals[m][j] - min) / range;
-    d->world.vals[m][j] = (greal) (precis * ftmp);
+    d->world.vals[m][j] = (greal) (PRECISION1 * ftmp);
 
     /* Add in the jitter values */
     d->world.vals[m][j] += d->jitdata.vals[m][j];
@@ -322,43 +51,129 @@ tform_to_world (GGobiData * d)
     tform_to_world_by_var (j, d);
 }
 
-/*-------------------------------------------------------------------------*/
-/*               keeping rows_in_plot up to date                           */
-/*-------------------------------------------------------------------------*/
 
-/*
- * Combine the values in two arrays:
- *   excluded[] (which comes from the exclusion panel or from linking)
- *   sampled[] (which come from the subset panel)
- * to determine which cases should be plotted.
- *
- * rows_in_plot = sampled && !excluded
-*/
-
-void
-rows_in_plot_set (GGobiData * d)
-{
-  gint i;
-  gint nprev = d->nrows_in_plot;
-
-  d->nrows_in_plot = 0;
-
-  for (i = 0; i < d->nrows; i++)
-    if (d->sampled.els[i] && !d->excluded.els[i])
-      d->rows_in_plot.els[d->nrows_in_plot++] = i;
-
-  g_signal_emit_by_name (G_OBJECT (d), "rows-in-plot-changed", 0, nprev, -1, d->gg); /* the argument shown with -1 has no current use */
-
-  return;
-}
 
 /*-------------------------------------------------------------------------*/
 /*                     reverse pipeline                                    */
 /*-------------------------------------------------------------------------*/
 
-/* XXX duncan and dfs: you need to sort this out
+/*--------------------------------------------------------------------*/
+/* Reverse pipeline code for populating the table of variable values  */
+/*--------------------------------------------------------------------*/
+/*
+ * I want these routines to work for point motion (movepts.c) and
+ * for line editing (lineedit.c).  They require different arguments.
+ * And they all need to be moved now, too, maybe some to splot.c or
+ * maybe all to pipeline.c.  ... and what about the class-based
+ * methodology?  Hmm.
+*/
+
 void
-world_to_raw_by_var (gint pt, gint j, displayd *display, GGobiData *d, ggobid *gg)
+pt_screen_to_plane (icoords * screen, gint id, gboolean horiz, gboolean vert,
+                    gcoords * eps, gcoords * planar, splotd * sp)
+{
+  gcoords prev_planar;
+  gfloat scale_x, scale_y;
+  greal precis = (greal) PRECISION1;
+
+  scale_x = sp->scale.x;
+  scale_y = sp->scale.y;
+  scale_x /= 2;
+  sp->iscale.x = (greal) sp->max.x * scale_x;
+  scale_y /= 2;
+  sp->iscale.y = -1 * (greal) sp->max.y * scale_y;
+
+  if (id >= 0) {                /* when moving points, initialize new planar values */
+    eps->x = 0;
+    eps->y = 0;
+    planar->x = prev_planar.x = sp->planar[id].x;
+    planar->y = prev_planar.y = sp->planar[id].y;
+  }
+
+  if (horiz) {                  /* relevant distinction for moving points */
+    screen->x -= sp->max.x / 2;
+    planar->x = (greal) screen->x * precis / sp->iscale.x;
+    planar->x += (greal) sp->pmid.x;
+  }
+
+  if (vert) {                   /* relevant distinction for moving points */
+    screen->y -= sp->max.y / 2;
+    planar->y = (greal) screen->y * precis / sp->iscale.y;
+    planar->y += (greal) sp->pmid.y;
+  }
+
+  if (id >= 0) {                /* when moving points */
+    if (horiz)
+      eps->x = planar->x - prev_planar.x;
+    if (vert)
+      eps->y = planar->y - prev_planar.y;
+  }
+}
+
+void
+pt_plane_to_world (splotd * sp, gcoords * planar, gcoords * eps,
+                   greal * world)
+{
+  displayd *display = (displayd *) sp->displayptr;
+  cpaneld *cpanel = &display->cpanel;
+  gint j, var;
+
+  switch (cpanel->pmode) {      /* only valid for scatterplots? */
+  case P1PLOT:
+    if (display->p1d_orientation == VERTICAL)
+      world[sp->p1dvar] = planar->y;
+    else
+      world[sp->p1dvar] = planar->x;
+    break;
+  case XYPLOT:
+    world[sp->xyvars.x] = planar->x;
+    world[sp->xyvars.y] = planar->y;
+    break;
+  case TOUR1D:
+    /*if (!gg->is_pp) { */
+    for (j = 0; j < display->t1d.nactive; j++) {
+      var = display->t1d.active_vars.els[j];
+      world[var] += (eps->x * (greal) display->t1d.F.vals[0][var]);
+    }
+    /*} */
+    break;
+  case TOUR2D3:
+    for (j = 0; j < display->t2d3.nactive; j++) {
+      var = display->t2d3.active_vars.els[j];
+      world[var] +=
+        (eps->x * (greal) display->t2d3.F.vals[0][var] +
+         eps->y * (greal) display->t2d3.F.vals[1][var]);
+    }
+    break;
+  case TOUR2D:
+    /*if (!gg->is_pp) { */
+    for (j = 0; j < display->t2d.nactive; j++) {
+      var = display->t2d.active_vars.els[j];
+      world[var] +=
+        (eps->x * (greal) display->t2d.F.vals[0][var] +
+         eps->y * (greal) display->t2d.F.vals[1][var]);
+    }
+    /*} */
+    break;
+  case COTOUR:
+    /*if (!gg->is_pp) { */
+    for (j = 0; j < display->tcorr1.nactive; j++) {
+      var = display->tcorr1.active_vars.els[j];
+      world[var] += (eps->x * (greal) display->tcorr1.F.vals[0][var]);
+    }
+    for (j = 0; j < display->tcorr2.nactive; j++) {
+      var = display->tcorr2.active_vars.els[j];
+      world[var] += (eps->y * (greal) display->tcorr2.F.vals[0][var]);
+    }
+    /*} */
+    break;
+  default:
+    g_printerr ("reverse pipeline not yet implemented for this projection\n");
+  }
+}
+
+void
+pt_world_to_raw_by_var (gint j, greal * world, greal * raw, GGobiData * d)
 {
   gfloat precis = PRECISION1;
   gfloat ftmp, rdiff;
@@ -366,30 +181,27 @@ world_to_raw_by_var (gint pt, gint j, displayd *display, GGobiData *d, ggobid *g
 
   rdiff = ggobi_data_get_col_range(d, j);
 
-  ftmp = (gfloat) (d->world.vals[pt][j] - d->jitdata.vals[pt][j]) / precis;
+  ftmp = (gfloat) (world[j]) / precis;
   x = (ftmp + 1.0) * .5 * rdiff;
   x += ggobi_data_get_col_min(d, j);
 
-  d->raw.vals[pt][j] = d->tform.vals[pt][j] = x;
+  raw[j] = x;
 }
-*/
 
-/*
- * allow the reverse pipeline only for
- *   scatterplots in xyplot mode
- *   the splotd members of a scatmat that are xyplots.
-*/
-/* XXX duncan and dfs: you need to sort this out
 void
-world_to_raw (gint pt, splotd *sp, GGobiData *d, ggobid *gg)
+pt_screen_to_raw (icoords * screen, gint id, gboolean horiz, gboolean vert,
+                  greal * raw, gcoords * eps, GGobiData * d, splotd * sp,
+                  ggobid * gg)
 {
-  displayd *display = (displayd *) sp->displayptr;
+  gint j;
+  gcoords planar;
+  greal *world = (greal *) g_malloc0 (d->ncols * sizeof (greal));
 
-  if(GGOBI_IS_EXTENDED_DISPLAY(display)) {
-     GGobiExtendedDisplayClass *klass;
-     klass = GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
-     if(klass->world_to_raw)
-         klass->world_to_raw(display, sp, pt, d, gg);
-  } 
+  pt_screen_to_plane (screen, id, horiz, vert, eps, &planar, sp);
+  pt_plane_to_world (sp, &planar, &planar, world);
+
+  for (j = 0; j < d->ncols; j++)
+    pt_world_to_raw_by_var (j, world, raw, d);
+
+  g_free (world);
 }
-*/

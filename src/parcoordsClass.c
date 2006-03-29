@@ -242,7 +242,7 @@ parcoordsKeyEventHandled (GtkWidget * w, displayd * display, splotd * sp,
     }
 
     if (ok) {
-      GGOBI (full_viewmode_set) (pmode, imode, gg);
+      ggobi_full_viewmode_set (pmode, imode, gg);
     }
   }
   else {

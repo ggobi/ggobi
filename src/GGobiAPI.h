@@ -62,12 +62,12 @@ extern "C" {
   date of this version of ggobi. 
   This is useful for determining if certain features are available,
   bugs have been fixed, etc. 
-  @see GGobi_getVersionString()
-  @see GGobi_getVersionNumbers()
+  @see ggobi_getVersionString()
+  @see ggobi_getVersionNumbers()
 */
-/*extern char const * GGOBI(getVersionDate)(void);*/
+/*extern char const * ggobi_getVersionDate(void);*/
 /* I think these should be 'const char *' and not 'char * const' - mfl */
-extern const char * GGOBI(getVersionDate)(void);
+extern const char * ggobi_getVersionDate(void);
 
 /**
  @ingroup Version
@@ -76,8 +76,8 @@ extern const char * GGOBI(getVersionDate)(void);
   This is useful for determining if certain features are available,
   bugs have been fixed, etc. 
 */
-/*extern  char const * GGobi_getVersionString();*/
-extern const char * GGobi_getVersionString();
+/*extern  char const * ggobi_getVersionString();*/
+extern const char * ggobi_getVersionString();
 
 /**
  @ingroup Version
@@ -87,8 +87,8 @@ extern const char * GGobi_getVersionString();
   These can be used to determine the characteristics
   of this version of the GGobi software.
 */
-/*extern  int const * GGobi_getVersionNumbers();*/
-extern const int * GGobi_getVersionNumbers();
+/*extern  int const * ggobi_getVersionNumbers();*/
+extern const int * ggobi_getVersionNumbers();
 
 
 /**
@@ -105,7 +105,7 @@ extern const int * GGobi_getVersionNumbers();
   and is used by ggobi. If you alter it, it will be altered
   in the GGobi instance also.
  */
-const gchar *GGobi_getFileName(ggobid *gg);
+const gchar *ggobi_getFileName(ggobid *gg);
 
 /**
  @ingroup GGobi
@@ -114,21 +114,21 @@ const gchar *GGobi_getFileName(ggobid *gg);
  mode (e.g. XML, etc.) rather than leaving it to the auto-detection,
  use setDataMode() before calling this routine..
 */
-const gchar *GGobi_setFileName(const gchar *fileName, DataMode data_mode, ggobid *gg);
+const gchar *ggobi_setFileName(const gchar *fileName, DataMode data_mode, ggobid *gg);
 
 /**
  @ingroup GGobi
   Returns mode of input data.
  */
-extern DataMode GGobi_getDataMode(ggobid *gg);
+extern DataMode ggobi_getDataMode(ggobid *gg);
 
 /* I don't think this is defined anymore - mfl */
-/*extern const gchar * const GGobi_getDataModeDescription(DataMode mode);*/
+/*extern const gchar * const ggobi_getDataModeDescription(DataMode mode);*/
 
 /**
  @ingroup GGobi
  */
-extern DataMode GGobi_setDataMode(DataMode newMode, ggobid *gg);
+extern DataMode ggobi_setDataMode(DataMode newMode, ggobid *gg);
 
 /**
  @ingroup GGobi
@@ -139,19 +139,19 @@ extern DataMode GGobi_setDataMode(DataMode newMode, ggobid *gg);
  * of doubles, arranged by column. Hence the double* for now.
  * A double array (double **) would be useful also.
 */
-extern void GGobi_setData(gdouble *values, gchar **rownames, gchar **colnames,
+extern void ggobi_setData(gdouble *values, gchar **rownames, gchar **colnames,
   gint nr, gint nc, GGobiData *d, gboolean initPlot, ggobid *gg,
-  gchar **ids, gboolean duplicate, InputDescription *);
+  gboolean duplicate, InputDescription *);
 
 
-extern void GGobi_setDataName(const char * const name, GGobiData *d);
+extern void ggobi_setDataName(const char * const name, GGobiData *d);
 
 /** 
  @ingroup GGobi
   Whether to get the transformed names or the regular ones. 
 
 */
-extern gchar **GGobi_getVariableNames(gboolean transformed, GGobiData *, ggobid *);
+extern gchar **ggobi_getVariableNames(gboolean transformed, GGobiData *, ggobid *);
 
 
 
@@ -160,7 +160,7 @@ extern gchar **GGobi_getVariableNames(gboolean transformed, GGobiData *, ggobid 
    Set the name of the jvar'th variable, either the regular
    name or that of the variable's tranformed counterpart.
  */
-extern void GGobi_setVariableName(gint jvar, gchar *name, gboolean transformed, GGobiData *, ggobid *gg);
+extern void ggobi_setVariableName(gint jvar, gchar *name, gboolean transformed, GGobiData *, ggobid *gg);
 
 
 /**
@@ -174,27 +174,27 @@ extern void GGobi_setVariableName(gint jvar, gchar *name, gboolean transformed, 
  This is used to when embedding GGobi in other applications that want
  control when and how GGobi events are processed.
  */
-extern gint GGobi_main(gint argc, gchar *argv[], gboolean processEvents);
+extern gint ggobi_main(gint argc, gchar *argv[], gboolean processEvents);
 
 /**
  @ingroup GGobi
    Maps the name of a view type to its symbolic constant.
  */
-extern gint GGobi_getViewTypeIndex(gchar *viewType);
+extern gint ggobi_getViewTypeIndex(gchar *viewType);
 
 /**
  @ingroup GGobi
   Converts a symbolic constant to the name of a view type.
   See getCurrentDisplay.
  */
-extern const gchar *GGobi_getViewTypeName(displayd *dpy);
+extern const gchar *ggobi_getViewTypeName(displayd *dpy);
 
 /**
  @ingroup GGobi
   Returns a description of the type of the currently
   active display window.
  */
-extern const gchar *GGobi_getCurrentDisplayType(ggobid *gg);
+extern const gchar *ggobi_getCurrentDisplayType(ggobid *gg);
 
 
 /**
@@ -203,7 +203,7 @@ extern const gchar *GGobi_getCurrentDisplayType(ggobid *gg);
    view types.
    See  ViewTypes[] and ViewTypeIndices[] in defines.h
  */
-extern const gchar * const *GGobi_getViewTypes(int *n);
+extern const gchar * const *ggobi_getViewTypes(int *n);
 
 /**
   Get the symblic constants associated identifying
@@ -213,7 +213,7 @@ extern const gchar * const *GGobi_getViewTypes(int *n);
   See getViewTypes.
       ViewTypes[] and ViewTypeIndices[] in defines.h
  */
-extern const gint  *GGobi_getViewTypeIndices(int *n);
+extern const gint  *ggobi_getViewTypeIndices(int *n);
 
 
 /**
@@ -221,14 +221,14 @@ extern const gint  *GGobi_getViewTypeIndices(int *n);
   This is not a copy, but the actual data used by the
   internals of GGobi.
  */
-extern const gfloat** GGobi_getRawData(GGobiData *, ggobid *);
+extern const gfloat** ggobi_getRawData(GGobiData *, ggobid *);
 
 /**
   Returns a pointer to the (second) transformation of the raw data.
   This is not a copy, but the actual data used by the
   internals of GGobi.
  */
-extern const gfloat** GGobi_getTFormData(GGobiData *, ggobid *);
+extern const gfloat** ggobi_getTFormData(GGobiData *, ggobid *);
 
 
 /**
@@ -238,18 +238,18 @@ extern const gfloat** GGobi_getTFormData(GGobiData *, ggobid *);
   argument of display_free, but this needs
   a little more finessing.
  */
-extern void GGobi_destroyCurrentDisplay();
+extern void ggobi_destroyCurrentDisplay();
 
 
 /**
     Returns a reference to the names of the observations
     used by GGobi to identify the rows in the data.
   */
-extern const gchar ** GGobi_getCaseNames();
+extern const gchar ** ggobi_getCaseNames();
 
 /**
  */
-extern void GGobi_setCaseName(gint pt, const gchar *lbl, GGobiData *d, ggobid *gg);
+extern void ggobi_setCaseName(gint pt, const gchar *lbl, GGobiData *d, ggobid *gg);
 
 /**
  @defgroup Displays Top-level Displays
@@ -271,7 +271,7 @@ extern void GGobi_setCaseName(gint pt, const gchar *lbl, GGobiData *d, ggobid *g
 
  @return a new top-level display object.
  */
-extern displayd *GGobi_newScatterplot(gint ix, gint iy, GGobiData *data, ggobid *gg);
+extern displayd *ggobi_newScatterplot(gint ix, gint iy, GGobiData *data, ggobid *gg);
 
 /**
 
@@ -285,7 +285,7 @@ extern displayd *GGobi_newScatterplot(gint ix, gint iy, GGobiData *data, ggobid 
  @param nr 
  @param nc
  */
-extern displayd *GGobi_newScatmat(gint *rows, gint *columns, gint nr, gint nc, GGobiData *, ggobid *gg);
+extern displayd *ggobi_newScatmat(gint *rows, gint *columns, gint nr, gint nc, GGobiData *, ggobid *gg);
 
 /**
  @ingroup Displays
@@ -296,7 +296,7 @@ extern displayd *GGobi_newScatmat(gint *rows, gint *columns, gint nr, gint nc, G
  The order of the plots is determined by the order
  in which the variables are given in the array.
  */
-extern displayd *GGobi_newParCoords(gint *vars, gint num, GGobiData *, ggobid *gg);
+extern displayd *ggobi_newParCoords(gint *vars, gint num, GGobiData *, ggobid *gg);
 
 /**
  @ingroup Displays
@@ -305,7 +305,7 @@ extern displayd *GGobi_newParCoords(gint *vars, gint num, GGobiData *, ggobid *g
  via the argument vars in the specified
  dataset within the GGobi instance.
  */
-extern displayd *GGobi_newTimeSeries(gint *yvars, gint numVars, GGobiData *d, ggobid *gg);
+extern displayd *ggobi_newTimeSeries(gint *yvars, gint numVars, GGobiData *d, ggobid *gg);
 
 /**
  @ingroup Displays
@@ -317,7 +317,7 @@ extern displayd *createPlot(gint type, gchar **varnames);
  @ingroup Displays
  Create a top-level display for a matrix of X-Y/scatter plots.
 
- See GGobi_newScatmat()
+ See ggobi_newScatmat()
  */
 gint  *createScatmatWindow(gint nrows, gint ncols, displayd *display, ggobid *gg, gboolean useWindow);
 
@@ -335,34 +335,34 @@ gint  *createScatmatWindow(gint nrows, gint ncols, displayd *display, ggobid *gg
 /**
  @ingroup DisplayAccess
  */
-extern displayd *GGobi_getDisplay(gint which, ggobid *gg);
+extern displayd *ggobi_getDisplay(gint which, ggobid *gg);
 
 /**
  @ingroup DisplayAccess
  */
-extern DisplayOptions *GGobi_getDefaultDisplayOptions();
+extern DisplayOptions *ggobi_getDefaultDisplayOptions();
 /**
  @ingroup DisplayAccess
  */
-extern DisplayOptions *GGobi_getDisplayOptions(gint displayNum, ggobid *gg);
+extern DisplayOptions *ggobi_getDisplayOptions(gint displayNum, ggobid *gg);
 /**
  @ingroup DisplayAccess
  */
-extern displayd *GGobi_setCurrentDisplay(gint which, ggobid *gg);
+extern displayd *ggobi_setCurrentDisplay(gint which, ggobid *gg);
 
 /**
  @ingroup DisplayAccess
  */
-extern displayd *GGobi_getCurrentDisplay(ggobid *gg);
+extern displayd *ggobi_getCurrentDisplay(ggobid *gg);
 
-extern gint GGobi_getCurrentDisplayIndex(ggobid *gg);
+extern gint ggobi_getCurrentDisplayIndex(ggobid *gg);
 
 
 /* @} */
 
 /**
  */
-extern void GGobi_setPlotRange(double *x, double *y, int plotNum, displayd *display, gboolean pixels, ggobid *gg);
+extern void ggobi_setPlotRange(double *x, double *y, int plotNum, displayd *display, gboolean pixels, ggobid *gg);
 
 
 /*-- point glyph types and sizes --*/
@@ -381,19 +381,19 @@ extern void GGobi_setPlotRange(double *x, double *y, int plotNum, displayd *disp
   glyph types. The number of elements in the array
   is contained in the value of the argument (n).
  */
-extern gint *GGobi_getGlyphTypes(gint *n);
+extern gint *ggobi_getGlyphTypes(gint *n);
 
 /**
  Retrieve the list of the symbolic names associated
  with the glyph types that GGobi understands.
  The elements returned correspond to the elements returned
- by GGobi_getGlyphTypes().
+ by ggobi_getGlyphTypes().
  @return an array of strings. The number of elements in the array
   is contained in the value of the argument (n).
  @ingroup Glyphs
  */
-extern const gchar * const * GGobi_getGlyphTypeNames(gint *n);
-/*extern const gchar ** const GGobi_getGlyphTypeNames(gint *n);*/
+extern const gchar * const * ggobi_getGlyphTypeNames(gint *n);
+/*extern const gchar ** const ggobi_getGlyphTypeNames(gint *n);*/
 
 /**
  Get the symbolic name of the glyph corresponding to the
@@ -403,23 +403,23 @@ extern const gchar * const * GGobi_getGlyphTypeNames(gint *n);
 
  @ingroup Glyphs
  */
-extern gchar const* GGobi_getGlyphTypeName(gint n);
+extern gchar const* ggobi_getGlyphTypeName(gint n);
 
 /**
  Retrieve the current glyph types for one or more observations.
  This returns the internal representation of the glyph type
  which can be converted to a symbolic, human-readable name
- using GGobi_getGlyphTypeName().
+ using ggobi_getGlyphTypeName().
 
  @return an array of length `n' whose i-th entry 
   contains the current glyph type
  for the observation identified by the i-th value in the argument
  `which'
- @see GGobi_getGlyphTypeName()
+ @see ggobi_getGlyphTypeName()
  
  @ingroup Glyphs
  */
-extern gint *GGobi_getCaseGlyphTypes(gint *which, gint n, GGobiData *dataset, ggobid *gg);
+extern gint *ggobi_getCaseGlyphTypes(gint *which, gint n, GGobiData *dataset, ggobid *gg);
 
 /**
  Get the glyph type attribute for a single observation
@@ -429,10 +429,10 @@ extern gint *GGobi_getCaseGlyphTypes(gint *which, gint n, GGobiData *dataset, gg
  @param gg the GGobi instance in which to find the dataset.
  @return the internal representation of a glyph, which is a symbolic constant.
 
- @see GGobi_getGlyphTypeName()
+ @see ggobi_getGlyphTypeName()
  @ingroup Glyphs
  */
-extern gint GGobi_getCaseGlyphType(gint id, GGobiData *dataset, ggobid *gg);
+extern gint ggobi_getCaseGlyphType(gint id, GGobiData *dataset, ggobid *gg);
 
 /**
  Get the glyph size attribute for a collection of observations.
@@ -445,10 +445,10 @@ extern gint GGobi_getCaseGlyphType(gint id, GGobiData *dataset, ggobid *gg);
    The i-th element corresponds to the observation identified by the i-th element
    of the array `which'.
 
- @see GGobi_getGlyphTypeName()
+ @see ggobi_getGlyphTypeName()
  @ingroup Glyphs
  */
-extern gint *GGobi_getCaseGlyphSizes(gint *which, gint n, GGobiData *dataset, ggobid *gg);
+extern gint *ggobi_getCaseGlyphSizes(gint *which, gint n, GGobiData *dataset, ggobid *gg);
 
 /**
  Get the glyph size attribute for a single observation
@@ -458,19 +458,19 @@ extern gint *GGobi_getCaseGlyphSizes(gint *which, gint n, GGobiData *dataset, gg
  @param gg the GGobi instance in which to find the dataset.
  @return the size of the glyph for the given observation
 
- @see GGobi_getGlyphTypeName()
- @see GGobi_getGlyphTypeName()
+ @see ggobi_getGlyphTypeName()
+ @see ggobi_getGlyphTypeName()
  @ingroup Glyphs
  */
-extern gint GGobi_getCaseGlyphSize(gint id, GGobiData *dataset, ggobid *gg);
+extern gint ggobi_getCaseGlyphSize(gint id, GGobiData *dataset, ggobid *gg);
 /**
  @ingroup Glyphs
  */
-extern void GGobi_setCaseGlyph(gint pt, gint type, gint size, GGobiData *d, ggobid *gg);
+extern void ggobi_setCaseGlyph(gint pt, gint type, gint size, GGobiData *d, ggobid *gg);
 /**
  @ingroup Glyphs
  */
-extern void GGobi_setCaseGlyphs(gint *pts, gint n, gint type, gint size, GGobiData *d, ggobid *gg);
+extern void ggobi_setCaseGlyphs(gint *pts, gint n, gint type, gint size, GGobiData *d, ggobid *gg);
 
 /* point colors */
 
@@ -481,7 +481,7 @@ extern void GGobi_setCaseGlyphs(gint *pts, gint n, gint type, gint size, GGobiDa
  @param gg the ggobi instance in which to find the dataset.
  @ingroup Glyphs
  */
-extern gint GGobi_getCaseColor(gint pt, GGobiData *dataset, ggobid *gg);
+extern gint ggobi_getCaseColor(gint pt, GGobiData *dataset, ggobid *gg);
 /**
  Query the color attribute of a collection of points.
  @param pts an array giving the indices of the different observations whose color
@@ -494,12 +494,12 @@ extern gint GGobi_getCaseColor(gint pt, GGobiData *dataset, ggobid *gg);
   array is `howMany' and the i-th element corresponds to observation
   identified by the i-th element of `pts'.
  
- @see GGobi_getCaseColor()
- @see GGobi_setCaseColor()
- @see GGobi_setCaseColors()
+ @see ggobi_getCaseColor()
+ @see ggobi_setCaseColor()
+ @see ggobi_setCaseColors()
  @ingroup Glyphs
  */
-extern gint * GGobi_getCaseColors(gint *pts, gint howMany, GGobiData *dataset, ggobid *gg);
+extern gint * ggobi_getCaseColors(gint *pts, gint howMany, GGobiData *dataset, ggobid *gg);
 
 /**
  Set the color (for each plot) for a single observation.
@@ -509,11 +509,11 @@ extern gint * GGobi_getCaseColors(gint *pts, gint howMany, GGobiData *dataset, g
  @param dataset the dataset  in which to resolve the observation
  @param gg the ggobi instance in which to find the dataset.
 
- @see GGobi_getCaseColor()
- @see GGobi_setCaseColors()
+ @see ggobi_getCaseColor()
+ @see ggobi_setCaseColors()
  @ingroup Glyphs
  */
-extern void GGobi_setCaseColor(gint pt, gint colorIndex, GGobiData *dataset, ggobid *gg);
+extern void ggobi_setCaseColor(gint pt, gint colorIndex, GGobiData *dataset, ggobid *gg);
 
 /**
  Set the color (for each plot) for a collection of observations
@@ -525,35 +525,35 @@ extern void GGobi_setCaseColor(gint pt, gint colorIndex, GGobiData *dataset, ggo
  @param dataset the dataset  in which to resolve the observation
  @param gg the ggobi instance in which to find the dataset.
 
- @see GGobi_setCaseColor()
- @see GGobi_getCaseColor()
+ @see ggobi_setCaseColor()
+ @see ggobi_getCaseColor()
  @ingroup Glyphs
  */
-extern void GGobi_setCaseColors(gint *pts, gint n, gint color, GGobiData *dataset, ggobid *gg);
+extern void ggobi_setCaseColors(gint *pts, gint n, gint color, GGobiData *dataset, ggobid *gg);
 
 
 /* point hidden state */
 
 /**
  */
-extern gboolean GGobi_getCaseHidden(gint pt, GGobiData *, ggobid *gg);
+extern gboolean ggobi_getCaseHidden(gint pt, GGobiData *, ggobid *gg);
 
 /**
  
  */
-extern gboolean * GGobi_getCaseHiddens(gint *pts, gint howMany, GGobiData *, ggobid *gg);
+extern gboolean * ggobi_getCaseHiddens(gint *pts, gint howMany, GGobiData *, ggobid *gg);
 
 /**
   Specify whether an individual record within the dataset is to be considered 
   hidden or not.
  */
-extern void GGobi_setCaseHidden(gint pt, gboolean hidden_p, GGobiData *, ggobid *gg);
+extern void ggobi_setCaseHidden(gint pt, gboolean hidden_p, GGobiData *, ggobid *gg);
 
 /**
  Control whether specific observations in a dataset are considered
  hidden or not for the purpose of displaying them.
  */
-extern void GGobi_setCaseHiddens(gint *pts, gint howMany, gboolean hidden_p, GGobiData *, ggobid *gg);
+extern void ggobi_setCaseHiddens(gint *pts, gint howMany, gboolean hidden_p, GGobiData *, ggobid *gg);
 
 
 
@@ -570,12 +570,12 @@ extern void GGobi_setCaseHiddens(gint *pts, gint howMany, gboolean hidden_p, GGo
 
  Get the index of the currently active plot within the specified
  GGobi instance. This can be used in conjunction with
- @link GGobi_getCurrentDisplay() to get the currently active
+ @link ggobi_getCurrentDisplay() to get the currently active
  plot.
 
- @see GGobi_getCurrentDisplay()
+ @see ggobi_getCurrentDisplay()
  */
-extern gint GGobi_getCurrentPlotIndex(ggobid *gg);
+extern gint ggobi_getCurrentPlotIndex(ggobid *gg);
 
 /**
  @ingroup Plots
@@ -584,14 +584,14 @@ extern gint GGobi_getCurrentPlotIndex(ggobid *gg);
  @param display
  @param which the index of the plot of interest.
  */
-extern splotd *GGobi_getPlot(displayd *display, gint which);
+extern splotd *ggobi_getPlot(displayd *display, gint which);
 
 /**
  @ingroup Plots
  Retrieve the plot within a top-level display, identifying
  the plot of interest by number.
  */
-extern splotd *GGobi_getSPlot(gint which, displayd *display);
+extern splotd *ggobi_getSPlot(gint which, displayd *display);
 
 
 /** 
@@ -608,7 +608,7 @@ extern splotd *GGobi_getSPlot(gint which, displayd *display);
   Relocate the top-left corner of the brushing region (rectangle)
   to the specified pixel.
  */
-extern void GGobi_moveBrush(gint ulx, gint uly, ggobid *gg);
+extern void ggobi_moveBrush(gint ulx, gint uly, ggobid *gg);
 
 /**
  @ingroup Brush
@@ -617,38 +617,38 @@ extern void GGobi_moveBrush(gint ulx, gint uly, ggobid *gg);
 
   @note Is the plot necessary? or does the setting apply to all plots?
  */
-extern void GGobi_sizeBrush(gint width, gint height, splotd *, ggobid *gg);
+extern void ggobi_sizeBrush(gint width, gint height, splotd *, ggobid *gg);
 
 /**
  @ingroup Brush
   Query the size and type of the glyph being used for the brushing
   area.
  */
-extern void GGobi_getBrushGlyph(gint *type, gint *size, ggobid *gg);
+extern void ggobi_getBrushGlyph(gint *type, gint *size, ggobid *gg);
 
 /** 
  @ingroup Brush
  Set the glyph for the brushing region, providing the glyph type and size.
  */
-extern gboolean GGobi_setBrushGlyph(gint type, gint size, ggobid *gg);
+extern gboolean ggobi_setBrushGlyph(gint type, gint size, ggobid *gg);
 
 /**
  @ingroup Brush
   Query the current size (width and height) of the brushing region.
 */
-extern void GGobi_getBrushSize(gint *w, gint *h, ggobid *gg);
+extern void ggobi_getBrushSize(gint *w, gint *h, ggobid *gg);
 
 /**
  @ingroup Brush
   Set the size (width and height) of the brushing region.
  */
-extern void GGobi_setBrushSize(gint w, gint h, ggobid *gg);
+extern void ggobi_setBrushSize(gint w, gint h, ggobid *gg);
 
 /**
  @ingroup Brush
   Query the current location (horizontal and vertical coordinates) of the brushing region.
  */
-extern void GGobi_getBrushLocation(gint *x, gint *y, ggobid *gg);
+extern void ggobi_getBrushLocation(gint *x, gint *y, ggobid *gg);
 
 
 /**
@@ -658,20 +658,20 @@ extern void GGobi_getBrushLocation(gint *x, gint *y, ggobid *gg);
 
  @note This will be enhanced/changed to allow specification in natural coordinates.
  */
-extern void GGobi_setBrushLocation(gint x, gint y, ggobid *gg);
+extern void ggobi_setBrushLocation(gint x, gint y, ggobid *gg);
 
 /** 
  @ingroup Brush
  Get the current color (index in the colormap) of the brushing region.
  */
-extern gint GGobi_getBrushColor(ggobid *gg);
+extern gint ggobi_getBrushColor(ggobid *gg);
 
 
 /** 
  @ingroup Brush
  Set the current color (specifying the index in the colormap) of the brushing region.
  */
-extern int GGobi_setBrushColor(gint cid, ggobid *gg);
+extern int ggobi_setBrushColor(gint cid, ggobid *gg);
 
 
 
@@ -686,7 +686,7 @@ extern int GGobi_setBrushColor(gint cid, ggobid *gg);
  @param nr
  @param gg
  */
-gboolean GGobi_setColorMap(gdouble *vals, gint nr, ggobid *gg);
+gboolean ggobi_setColorMap(gdouble *vals, gint nr, ggobid *gg);
 
 /**
  @ingroup Color
@@ -697,7 +697,7 @@ gboolean GGobi_setColorMap(gdouble *vals, gint nr, ggobid *gg);
  @param gg the GGobi instance in which the potential colormap
   entries are to be found.
  */
-gboolean GGobi_registerColorMap(ggobid *gg);
+gboolean ggobi_registerColorMap(ggobid *gg);
 
 /**
  @ingroup Color
@@ -708,8 +708,8 @@ gboolean GGobi_registerColorMap(ggobid *gg);
  @param inDefault
  @param gg
  */
-/*extern const gchar const * GGobi_getColorName(gint cid, ggobid *gg, gboolean inDefault);*/
-extern const gchar * /*const*/ GGobi_getColorName(gint cid, ggobid *gg, gboolean inDefault);
+/*extern const gchar const * ggobi_getColorName(gint cid, ggobid *gg, gboolean inDefault);*/
+extern const gchar * /*const*/ ggobi_getColorName(gint cid, ggobid *gg, gboolean inDefault);
 
 
 
@@ -719,7 +719,7 @@ extern const gchar * /*const*/ GGobi_getColorName(gint cid, ggobid *gg, gboolean
   panel is also eliminated. Otherwise, the GGobi instance can be re-used
   and a new dataset(s) loaded.
  */
-extern gboolean GGobi_close(ggobid *gg, gboolean closeWindow);
+extern gboolean ggobi_close2(ggobid *gg, gboolean closeWindow);
 
 
 
@@ -734,13 +734,13 @@ extern gboolean GGobi_close(ggobid *gg, gboolean closeWindow);
     The number of elements in the array is returned as the 
     value of the argument.
  */
-extern const gchar * const* GGobi_getPModeNames(int *n);
-extern const gchar * const* GGobi_getIModeNames(int *n);
+extern const gchar * const* ggobi_getPModeNames(int *n);
+extern const gchar * const* ggobi_getIModeNames(int *n);
 
   /* Attempting to imitate the style of getPModeName to get the string
      associated with the keyboard */
-extern const gchar * const* GGobi_getPModeKeys(int *n);
-extern const gchar *GGobi_getPModeKey(gint which);
+extern const gchar * const* ggobi_getPModeKeys(int *n);
+extern const gchar *ggobi_getPModeKey(gint which);
 
 /**
   Get the symbolic constant associated with the 
@@ -748,41 +748,41 @@ extern const gchar *GGobi_getPModeKey(gint which);
   The possible names are available from
   ggobi_getOpModeNames
  */
-  extern gint GGobi_getPModeId(const gchar *name);
-  extern gint GGobi_getIModeId(const gchar *name);
+  extern gint ggobi_getPModeId(const gchar *name);
+  extern gint ggobi_getIModeId(const gchar *name);
 
 /**
  Set the operation mode (e.g. brush, identify, ...) for this GGobi instance.
  @param name one of the entries.
  */
 
-extern gint GGobi_setPMode(const gchar *name, ggobid *gg);
-extern gint GGobi_setIMode(const gchar *name, ggobid *gg);
+extern gint ggobi_setPMode(const gchar *name, ggobid *gg);
+extern gint ggobi_setIMode(const gchar *name, ggobid *gg);
 /**
  Get the human-readable name of the user interaction mode
  associated with the internal symbolic identifier.
 
- @see GGobi_getModeId()
+ @see ggobi_getModeId()
  */
-extern const gchar *GGobi_getPModeName(gint which);
-extern const gchar *GGobi_getIModeName(gint which);
+extern const gchar *ggobi_getPModeName(gint which);
+extern const gchar *ggobi_getIModeName(gint which);
 /**
  As above, except it gives the name as it is displayed on the screen
 */
-const gchar *GGobi_getIModeScreenName(int which, displayd *display);
-const gchar *GGobi_getPModeScreenName(int which, displayd *display);
+const gchar *ggobi_getIModeScreenName(int which, displayd *display);
+const gchar *ggobi_getPModeScreenName(int which, displayd *display);
 
 
 /**
  ? 
  */
-extern int GGobi_full_viewmode_set(ProjectionMode, InteractionMode, ggobid *gg);
+extern int ggobi_full_viewmode_set(ProjectionMode, InteractionMode, ggobid *gg);
 
 /**
   Lower or raise a top-level display window associated with a ggobi
   instance, identifying the window of interest by number.
  */
-extern gboolean GGobi_raiseWindow(gint which, gboolean raiseOrIcon, gboolean up, ggobid *gg);
+extern gboolean ggobi_raiseWindow(gint which, gboolean raiseOrIcon, gboolean up, ggobid *gg);
 
 
 /**
@@ -790,28 +790,28 @@ extern gboolean GGobi_raiseWindow(gint which, gboolean raiseOrIcon, gboolean up,
  ggobid instance. This is usually related to the source of the
  data or how the ggobid was created by a host application.
  */
-extern gchar *GGobi_getDescription(ggobid *gg);
-extern void GGobi_splot_set_current_full(displayd *display, splotd *sp, ggobid *gg);
+extern gchar *ggobi_getDescription(ggobid *gg);
+extern void ggobi_splot_set_current_full(displayd *display, splotd *sp, ggobid *gg);
 
 /**
   Find the index of the dataset in the particular ggobid instance
   by matching the name of the dataset to the given name.
  */
-extern int GGobi_datasetIndex(const char *name,  const ggobid * const gg);
+extern int ggobi_datasetIndex(const char *name,  const ggobid * const gg);
 
 /**
  Get a particular ggobid instance from the global collection
  of ggobids in this session, identifying the ggobid of interest
  by index. 
  */
-extern ggobid * GGobi_ggobi_get(gint);
+extern ggobid * ggobi_ggobi_get(gint);
 
 /**
  Return the total number of ggobi instances that are currently
  in existence in this session.
- @see GGobi_ggobi_get()
+ @see ggobi_ggobi_get()
  */
-extern int GGobi_getNumGGobis();
+extern int ggobi_getNumGGobis();
 
 
 /**
@@ -828,9 +828,9 @@ extern int GGobi_getNumGGobis();
 
  @return a reference to the datad object that is accessed by the 
  ggobid instance. This is not a copy.
- @see GGobi_data_get_by_name()
+ @see ggobi_data_get_by_name()
  */
-extern GGobiData *GGobi_data_get(int which, const ggobid * const gg);
+extern GGobiData *ggobi_data_get(int which, const ggobid * const gg);
 
 /**
   @ingroup Data
@@ -840,33 +840,33 @@ extern GGobiData *GGobi_data_get(int which, const ggobid * const gg);
  @return a reference to the datad object that is accessed by the 
  ggobid instance. This is not a copy.
  */
-extern GGobiData *GGobi_data_get_by_name(const gchar * const name, const ggobid * const gg);
+extern GGobiData *ggobi_data_get_by_name(const gchar * const name, const ggobid * const gg);
 
 /**
   @ingroup Data
  Determine the number of variables in the dataset.
  */
-gint GGobi_ncols(GGobiData *d);
+gint ggobi_ncols(GGobiData *d);
 
 /**
   @ingroup Data
  Determine the number of records in the dataset.
  */
-gint GGobi_nrecords(GGobiData *dg);
+gint ggobi_nrecords(GGobiData *dg);
 
 /**
   @ingroup Data
  */
-extern int GGobi_getVariableIndex(const gchar *name, GGobiData *, ggobid *gg);
+extern int ggobi_getVariableIndex(const gchar *name, GGobiData *, ggobid *gg);
 /**
   @ingroup Data
  */
-extern int GGobi_removeVariableByIndex(gint which, GGobiData *, ggobid *gg);
+extern int ggobi_removeVariableByIndex(gint which, GGobiData *, ggobid *gg);
 
 /**
   @ingroup Data
  */
-extern gboolean GGobi_setVariableValues(gint whichVar, gdouble *vals, gint num, gboolean update, GGobiData *d, ggobid *gg);
+extern gboolean ggobi_setVariableValues(gint whichVar, gdouble *vals, gint num, gboolean update, GGobiData *d, ggobid *gg);
 
 
     /* Need len just in case there is no data in the instance */
@@ -890,9 +890,9 @@ extern gboolean GGobi_setVariableValues(gint whichVar, gdouble *vals, gint num, 
   @param d  the dataset into which the variable is to be added.
   @param gg  the GGobi instance in which the dataset to be augmented can be found.
  */
-extern int GGobi_addVariable(gdouble *vals, gint len, gchar *name, gboolean update, GGobiData *d, ggobid *gg);
+extern int ggobi_addVariable(gdouble *vals, gint len, gchar *name, gboolean update, GGobiData *d, ggobid *gg);
 
-extern int GGobi_addCategoricalVariable(gdouble *vals, gint len, gchar *name, 
+extern int ggobi_addCategoricalVariable(gdouble *vals, gint len, gchar *name, 
                                         gchar **levels, gint *values, gint *counts, gint numLevels, 
                                         gboolean update, GGobiData *d, ggobid *gg);
 
@@ -902,7 +902,7 @@ extern int GGobi_addCategoricalVariable(gdouble *vals, gint len, gchar *name,
   if necessary. This is used to force changes in the raw data to be reflected
   in the different plots.
  */
-extern void GGobi_update_data(GGobiData *, ggobid *gg);
+extern void ggobi_update_data(GGobiData *, ggobid *gg);
 
 
 /* @} */
@@ -915,7 +915,7 @@ extern void GGobi_update_data(GGobiData *, ggobid *gg);
  Caller is responsible for freeing the array, but not its
  elements!
  */
-const gchar ** GGobi_getDataModeNames(int *n);
+const gchar ** ggobi_getDataModeNames(int *n);
 
 
 /** 
@@ -930,13 +930,13 @@ const gchar ** GGobi_getDataModeNames(int *n);
   register a handler routine which is to be called when one of the
   number keys is pressed.
 */
-extern KeyEventHandler *GGobi_registerNumberedKeyEventHandler(KeyEventHandlerFunc routine, void *userData, char *description, ReleaseData *data, ggobid *gg, ProgrammingLanguage lang);
+extern KeyEventHandler *ggobi_registerNumberedKeyEventHandler(KeyEventHandlerFunc routine, void *userData, char *description, ReleaseData *data, ggobid *gg, ProgrammingLanguage lang);
 
 /**
   @ingroup EventHandlers
   Remove a number key handler routine.
  */
-extern KeyEventHandler *GGobi_removeNumberedKeyEventHandler(ggobid *gg);
+extern KeyEventHandler *ggobi_removeNumberedKeyEventHandler(ggobid *gg);
 
 /**
   @ingroup EventHandlers
@@ -952,7 +952,7 @@ extern KeyEventHandler *GGobi_removeNumberedKeyEventHandler(ggobid *gg);
   @param gg the ggobi instance in which the identify events are to be
  handled.
  */
-extern void GGobi_setIdentifyHandler(IdentifyProc proc,  void *data, ggobid *gg);
+extern void ggobi_setIdentifyHandler(IdentifyProc proc,  void *data, ggobid *gg);
 
 /* @} */
 
@@ -969,12 +969,12 @@ extern void GGobi_setIdentifyHandler(IdentifyProc proc,  void *data, ggobid *gg)
   Query whether the observations/records identified by number
   in the given dataset are connected by an edge.
  */
-extern gboolean  GGobi_isConnectedEdge(gint a, gint b, GGobiData *d, ggobid *gg);
+extern gboolean  ggobi_isConnectedEdge(gint a, gint b, GGobiData *d, ggobid *gg);
 
 /**
   @ingroup Edges
  */
-extern void GGobi_setObservationEdge(gint x, gint y, GGobiData *, ggobid *, gboolean update);
+extern void ggobi_setObservationEdge(gint x, gint y, GGobiData *, ggobid *, gboolean update);
 #endif
 
 /**
@@ -984,12 +984,12 @@ extern void GGobi_setObservationEdge(gint x, gint y, GGobiData *, ggobid *, gboo
 
   @note This probably needs a ggobid or displayd argument.
  */
-extern gboolean GGobi_getShowLines();
+extern gboolean ggobi_getShowLines();
 
 /**
   @ingroup Edges
  */
-extern gboolean GGobi_setShowLines(displayd *dsp, gboolean val);
+extern gboolean ggobi_setShowLines(displayd *dsp, gboolean val);
 
 /** @} */
 
@@ -1000,7 +1000,7 @@ extern gboolean GGobi_setShowLines(displayd *dsp, gboolean val);
 
  */
 
-extern GtkWidget *GGobi_addDisplayMenuItem(const char *label, ggobid *gg);
+extern GtkWidget *ggobi_addDisplayMenuItem(const char *label, ggobid *gg);
 
 
 /**
@@ -1015,7 +1015,7 @@ ggobid *create_ggobi(InputDescription *desc);
 /**
  */
 
-void GGobi_setSessionOptions(GGobiOptions *opts);
+void ggobi_setSessionOptions(GGobiOptions *opts);
 
 /**
 
@@ -1029,10 +1029,10 @@ colorschemed *alloc_colorscheme();
   of edges. This simply fixes up the internal data structure in `edge' given
   the basic edge connections by pairs of records.
  */
-void GGobi_cleanUpEdgeRelationships(struct _EdgeData *edge, int startPosition);
+void ggobi_cleanUpEdgeRelationships(struct _EdgeData *edge, int startPosition);
 
 typedef int (*MissingValue_p)(double);
-MissingValue_p GGobi_setMissingValueIdentifier(MissingValue_p f);
+MissingValue_p ggobi_setMissingValueIdentifier(MissingValue_p f);
 extern MissingValue_p GGobiMissingValue;
 
 #ifdef __cplusplus

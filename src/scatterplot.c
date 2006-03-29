@@ -216,7 +216,7 @@ scatterplot_new (gboolean missing_p, splotd * sp, GGobiData * d, ggobid * gg)
 
 
 
-void GGOBI (edge_menus_update) (ggobid * gg)
+void ggobi_edge_menus_update (ggobid * gg)
 {
   GList *dlist;
   displayd *display;
