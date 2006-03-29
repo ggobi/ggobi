@@ -28,8 +28,6 @@ find_nearest_point (icoords * lcursor_pos, splotd * splot, GGobiData * d,
 */
   gint i, k, sqdist, near, xdist, ydist, npoint;
 
-  g_assert (d->hidden.nels == d->nrows);
-
   npoint = -1;
   near = 20 * 20;               /* If nothing is close, don't show any label */
 
@@ -253,11 +251,11 @@ identify_label_fetch (gint k, cpaneld * cpanel, GGobiData * d, ggobid * gg)
     labels = g_list_append (labels, lbl);
   }
 
-  if (id_display_type & ID_RECORD_ID) {
-    if (id_display_type & ~ID_RECORD_ID)
+  if (id_display_type & ID_RECORD_LABEL) {
+    if (id_display_type & ~ID_RECORD_LABEL)
       lbl = g_strdup_printf ("id=%s", ggobi_data_get_row_id(d, k));
     else
-      ggobi_data_get_row_id(d, k);
+      lbl = ggobi_data_get_row_id(d, k);
     labels = g_list_append (labels, lbl);
   }
 

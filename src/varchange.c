@@ -92,14 +92,10 @@ clone_vars (gint * cols, gint ncols, GGobiData * d)
     }
 
     vartable_copy_var(
-      ggobi_data_get_vartable(d, jto), ggobi_data_get_vartable(d, jfrom)
+      ggobi_data_get_vartable(d, jfrom), ggobi_data_get_vartable(d, jto)
     );
+    g_signal_emit_by_name(d, "col_data_changed", (guint) jto);
   }
-
-  for (k = 0; k < ncols; k++) {
-    g_signal_emit_by_name(d, "col_data_changed", cols[k]);
-  }
-
 }
 
 

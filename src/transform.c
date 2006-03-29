@@ -719,7 +719,7 @@ void
 transform (gint stage, gint tform_type, gfloat param, gint *vars, gint nvars,
   GGobiData *d, ggobid *gg) 
 {
-  gint k;
+  guint k;
   gboolean ok = true;
   gint completed = nvars;
 
@@ -735,7 +735,7 @@ transform (gint stage, gint tform_type, gfloat param, gint *vars, gint nvars,
   for (k=0; k<completed; k++) {
     vartable_limits_set_by_var (d, vars[k]);
     vartable_stats_set_by_var (d, vars[k]);
-    tform_to_world_by_var (vars[k], d);
+    tform_to_world_by_var ((guint) vars[k], d);
   }
 
 

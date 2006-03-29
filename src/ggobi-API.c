@@ -200,7 +200,7 @@ ggobi_setData (gdouble * values, gchar ** rownames, gchar ** colnames,
     gg->input = desc;
 
   ggobi_data_add_rows(d, d->nrows - nr);
-  ggobi_data_add_cols(d, d->ncols - nr);
+  ggobi_data_add_cols(d, d->ncols - nc);
 
   if (values) {
     for (j = 0; j < nc; j++) {

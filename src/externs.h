@@ -473,7 +473,7 @@ void       t2d_ppdraw (gfloat, displayd *, ggobid *);
 void       t2d_pptemp_set(gfloat, displayd *, ggobid *);
 void       textur (gfloat *, gfloat *, gint, gint, gfloat, gint, ggobid *);
 void       tform_to_world (GGobiData *);
-void       tform_to_world_by_var (gint j, GGobiData *);
+void       tform_to_world_by_var (guint j, GGobiData *);
 void       tooltips_show (gboolean show, ggobid *gg);
 void       tour1d_all_vars (displayd *);
 void       tour1d_do_step (displayd *,ggobid *);

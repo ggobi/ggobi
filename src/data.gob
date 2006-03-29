@@ -190,25 +190,25 @@ property UINT ncols
    minimum = 0, maximum = INT_MAX, default_value = 0,
    flags = CONSTRUCT_ONLY, link, export);
    
-signal private NONE (INT) void 
+signal private NONE (UINT) void 
 rows_in_plot_changed(self, guint n);
 
-signal public NONE (INT) void 
+signal public NONE (UINT) void 
 col_name_changed(self, guint j);
 
-signal public NONE (INT) void 
+signal public NONE (UINT) void 
 col_data_changed(self, guint j);
 
-signal public NONE (INT) void
+signal public NONE (UINT) void
 col_limits_changed(self, guint j);
 
-signal public NONE (INT) void
+signal public NONE (UINT) void
 cols_added(self, guint n);
 
-signal public NONE (INT) void
+signal public NONE (UINT) void
 col_deleted(self, guint j);
 
-signal public NONE (INT) void
+signal public NONE (UINT) void
 rows_added(self, guint n);
 
 
@@ -877,7 +877,6 @@ add_cols(self, guint n) {
   for(guint j = nprev; j < self->ncols; j++) {
     vartabled *vt = vartable_element_new(self);
     self_set_vartable(self, j, vt);
-    g_debug("Setting vartable %i", j);
   } 
   arrayf_add_cols (&self->raw, self->ncols);
   arrayf_add_cols (&self->tform, self->ncols);
@@ -920,8 +919,8 @@ free (self)
 
   for (guint j = self->ncols-1; j >= 0; j--) {
     vartabled *vt = self_get_vartable(self, j); 
-    if (vt->collab != NULL) g_object_unref (vt->collab);
-    if (vt->collab_tform != NULL) g_object_unref (vt->collab_tform);
+    //if (vt->collab != NULL) g_object_unref (vt->collab);
+    //if (vt->collab_tform != NULL) g_object_unref (vt->collab_tform);
     g_free(vt);
   }
   g_free (self->vartable);
