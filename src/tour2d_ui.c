@@ -110,7 +110,7 @@ static void scramble_cb (GtkWidget *w, ggobid *gg) {
 {
   g_printerr ("pcaxes: %d\n", button->active);
 }*/
-
+/*
 static void t2d_snap_cb (GtkWidget *w, ggobid *gg) {
 
   tour2d_snap(gg);
@@ -120,7 +120,7 @@ static void t2d_video_cb (GtkToggleButton *button, ggobid *gg)
 {
   tour2d_video(gg);
 }
-
+*/
 /*static void pcaxes_cb (GtkToggleButton *button)
 {
   g_printerr ("pcaxes: %d\n", button->active);

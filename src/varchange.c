@@ -132,19 +132,18 @@ gboolean
 delete_vars (gint * cols, gint ncols, GGobiData * d)
 {
   gint j;
-  gint *keepers, nkeepers;
-
-  if (!GGOBI_IS_GGOBI(d->gg))
-    return false;
-
+  guint *ucols;
+  
   /*-- don't allow all variables to be deleted --*/
-  if (ncols >= d->ncols)
-    return false;
-
+  g_return_val_if_fail(ncols < d->ncols, d->ncols);
+  
   /*
    * If one of the variables to be deleted is currently plotted,
    * we won't proceed until the user cleans up.
    */
+   // FIXME: If we are to get rid of delete_vars(), we need to allow specification 
+   // of a 'hook' function that determines whether deleting a variable is valid
+   // given the current state.
   if ((j = is_variable_plotted (cols, ncols, d)) != -1) {
     gchar *message;
     message =
@@ -157,67 +156,14 @@ delete_vars (gint * cols, gint ncols, GGobiData * d)
     return false;
   }
 
+  // FIXME: Need to move everything to unsigned ints
+  ucols = g_new(guint, ncols);
+  for (j = 0; j < ncols; j++)
+    ucols[j] = (guint)cols[j];
+  
+  ggobi_data_delete_cols(d, ucols, ncols);
 
-  keepers = g_malloc ((d->ncols - ncols) * sizeof (gint));
-  nkeepers = find_keepers (d->ncols, ncols, cols, keepers);
-  if (nkeepers == -1) {
-    g_free (keepers);
-    return false;
-  }
-
-  if (d->vartable_tree_view[real] != NULL) {
-    for (j = 0; j < ncols; j++) {
-      GtkTreeModel *model;
-      GtkTreeIter iter;
-      GtkTreePath *path = gtk_tree_path_new_from_indices (cols[j], -1);
-      model =
-        gtk_tree_view_get_model (GTK_TREE_VIEW
-                                 (d->vartable_tree_view[ggobi_data_get_col_type(d, cols[j])]));
-      gtk_tree_model_get_iter (model, &iter, path);
-      gtk_list_store_remove (GTK_LIST_STORE (model), &iter);
-      gtk_tree_path_free (path);
-    }
-  }
-
-  for (j = 0; j < ncols; j++) {
-    //vartable_element_remove (cols[j], d);
-  }
-
-  /*-- delete columns from pipeline arrays --*/
-  arrayf_delete_cols (&d->raw, ncols, cols);
-  arrayf_delete_cols (&d->tform, ncols, cols);
-  tour2d_realloc_down (ncols, cols, d, d->gg);
-  tour1d_realloc_down (ncols, cols, d, d->gg);
-  tourcorr_realloc_down (ncols, cols, d, d->gg);
-  arrays_delete_cols (&d->missing, ncols, cols);
-  arrayg_delete_cols (&d->jitdata, ncols, cols);
-
-  /*-- reallocate the rest of the arrays --*/
-  arrayg_alloc (&d->world, d->nrows, nkeepers);
-
-
-  /*-- delete checkboxes --*/
-  for (j = ncols - 1; j >= 0; j--) {
-    varpanel_delete_nth (cols[j], d);
-  }
-
-  /*-- delete variable circles --*/
-  for (j = ncols - 1; j >= 0; j--) {
-    varcircles_delete_nth (cols[j], d);
-  }
-
-  d->ncols -= ncols;
-
-  /*-- emit a single variable_list_changed signal when finished --*/
-  /*-- doesn't need to give a variable index any more, really --*/
-  g_signal_emit (G_OBJECT (d->gg),
-                 GGobiSignals[VARIABLE_LIST_CHANGED_SIGNAL], 0, d);
-
-  /*-- run the first part of the pipeline  --*/
-  tform_to_world(d);
-
-
-  g_free (keepers);
-
+  g_free(ucols);
+  
   return true;
 }

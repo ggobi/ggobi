@@ -189,7 +189,7 @@ varcircles_get_nth (gint which, gint jvar, GGobiData * d)
 }
 
 void
-varcircles_delete_nth (gint jvar, GGobiData * d)
+varcircles_delete_nth (GGobiData * d, gint jvar)
 {
   GtkWidget *w;
   GdkPixmap *pix;
@@ -445,6 +445,8 @@ varcircles_populate (GGobiData * d, ggobid * gg)
                     "button_press_event", G_CALLBACK (manip_select_cb), d);
   gtk_widget_show (d->vcirc_ui.manip_btn);
 
+  ggobi_data_connect__col_deleted(d, varcircles_delete_nth, NULL);
+  
 #ifdef FREEZE_IMPLEMENTED
   /* -- a drawing area to place next to the freeze button as a color key -- */
   da = gtk_drawing_area_new ();

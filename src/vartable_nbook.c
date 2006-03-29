@@ -316,6 +316,18 @@ cat_filter_func (GtkTreeModel *model, GtkTreeIter *iter, GGobiData *d)
 }
 
 static void
+vartable_col_deleted_cb (GGobiData *d, guint j)
+{
+  GtkTreeModel *model;
+  GtkTreeIter iter;
+  GtkTreePath *path = gtk_tree_path_new_from_indices (j, -1);
+  model = gtk_tree_view_get_model(GTK_TREE_VIEW(d->vartable_tree_view[ggobi_data_get_col_type(d, j)]));
+  gtk_tree_model_get_iter (model, &iter, path);
+  gtk_list_store_remove (GTK_LIST_STORE (model), &iter);
+  gtk_tree_path_free (path);
+}
+
+static void
 vartable_subwindow_init (GGobiData *d, ggobid *gg)
 {
   gint j;
@@ -439,6 +451,8 @@ pages any more!
   gtk_notebook_append_page (GTK_NOTEBOOK (nbook), sw, wlbl);
 
   /*-- 3 = COLUMN_INSET --*/
+  
+  ggobi_data_connect__col_deleted(d, vartable_col_deleted_cb, NULL);
   
   gtk_widget_show_all (nbook);
 

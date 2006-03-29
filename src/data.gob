@@ -891,6 +891,60 @@ add_cols(self, guint n) {
   return nprev;
 }
 
+public guint
+delete_cols(self, guint *cols, gint ncols)
+{
+  gint j;
+  gint *keepers, nkeepers;
+  
+  g_return_val_if_fail(ncols < self->ncols, self->ncols);
+
+  // FIXME: shouldn't find_keepers be able to handle this allocation??
+  keepers = g_malloc ((self->ncols - ncols) * sizeof (gint));
+  nkeepers = find_keepers (self->ncols, ncols, cols, keepers);
+  if (nkeepers == -1) {
+    g_free (keepers);
+    g_return_val_if_reached(self->ncols);
+  }
+  
+  for (j = 0; j < nkeepers; j++) {
+    vartabled *vt = self_get_vartable(self, keepers[j]);
+    self_set_vartable(self, j, vt);
+  }
+
+  self->vartable = g_renew(vartabled*, self->vartable, nkeepers);
+  
+  /*-- delete columns from pipeline arrays --*/
+  arrayf_delete_cols (&self->raw, ncols, cols);
+  arrayf_delete_cols (&self->tform, ncols, cols);
+  tour2d_realloc_down (ncols, cols, self, self->gg);
+  tour1d_realloc_down (ncols, cols, self, self->gg);
+  tourcorr_realloc_down (ncols, cols, self, self->gg);
+  arrays_delete_cols (&self->missing, ncols, cols);
+  arrayg_delete_cols (&self->jitdata, ncols, cols);
+
+  /*-- reallocate the rest of the arrays --*/
+  arrayg_alloc (&self->world, self->nrows, nkeepers);
+  
+  self->ncols -= ncols;
+  
+  for (j = 0; j < ncols; j++) /* emit col deleted signal */
+    self_col_deleted(self, cols[j]);
+  
+  /*-- emit a single variable_list_changed signal when finished --*/
+  /*-- doesn't need to give a variable index any more, really --*/
+  // FIXME: emission of this is deprecated
+  g_signal_emit (G_OBJECT (self->gg),
+                 GGobiSignals[VARIABLE_LIST_CHANGED_SIGNAL], 0, self);
+
+    /*-- run the first part of the pipeline  --*/
+  tform_to_world(self);
+                 
+  g_free (keepers);
+  
+  return(self->ncols);
+}
+
 // also need delete_cols and delete_rows
 
 public void
@@ -917,10 +971,10 @@ free (self)
   arrayg_free (&self->world, self->nrows, self->ncols);
   arrays_free (&self->missing, self->nrows, self->ncols);
 
-  for (guint j = self->ncols-1; j >= 0; j--) {
-    vartabled *vt = self_get_vartable(self, j); 
-    //if (vt->collab != NULL) g_object_unref (vt->collab);
-    //if (vt->collab_tform != NULL) g_object_unref (vt->collab_tform);
+  for (gint j = self->ncols-1; j >= 0; j--) {
+    vartabled *vt = self_get_vartable(self, (guint)j); 
+    if (vt->collab != NULL) g_free (vt->collab);
+    if (vt->collab_tform != NULL) g_free (vt->collab_tform);
     g_free(vt);
   }
   g_free (self->vartable);

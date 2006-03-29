@@ -142,8 +142,7 @@ brush_reset (displayd * display, gint action)
   cpaneld *cpanel = &display->cpanel;
 
   g_assert (d->hidden.nels == d->nrows);
-  if (e)
-    g_assert (e->hidden.nels == e->nrows);
+  g_assert (!e || e->hidden.nels == e->nrows);
 
   switch (action) {
 

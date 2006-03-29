@@ -113,7 +113,7 @@ static void scramble_cb (GtkWidget *w, ggobid *gg) {
 
   tour1d_scramble(gg);
 }
-
+/*
 static void t1d_snap_cb (GtkWidget *w, ggobid *gg) {
 
   tour1d_snap(gg);
@@ -122,7 +122,7 @@ static void t1d_snap_cb (GtkWidget *w, ggobid *gg) {
 static void t1d_video_cb (GtkToggleButton *button, ggobid *gg)
 {
   tour1d_video(gg);
-}
+}*/
 
 static void t1d_ash_sm_cb (GtkAdjustment *adj, ggobid *gg) 
 {

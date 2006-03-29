@@ -563,7 +563,7 @@ gboolean   update_hidden_vectors (gint i, gboolean changed, gboolean *hit_by_bru
 void       varcircle_label_set (GGobiData *d, gint jvar);
 void       varcircles_add (gint ncols, GGobiData *, ggobid *);
 void       varcircles_cursor_set_default (GGobiData *d);
-void       varcircles_delete_nth (gint j, GGobiData *);
+void       varcircles_delete_nth (GGobiData *, gint j);
 void       varcircles_populate (GGobiData *, ggobid *);
 void       varcircles_refresh (GGobiData *, ggobid *);
 void       varcircles_show (gboolean, GGobiData *, displayd *, ggobid *);
@@ -573,7 +573,7 @@ void       variable_notebook_list_changed_cb(ggobid *gg, GGobiData *d, void *not
 void       variable_notebook_subwindow_add (GGobiData *d, GtkSignalFunc func, gpointer func_data, GtkWidget *notebook, vartyped, datatyped, ggobid *gg);
 void       variable_notebook_varchange_cb (ggobid *gg, gint which, GGobiData *, void *notebook);
 void       varpanel_clear (GGobiData *, ggobid *);
-void       varpanel_delete_nth (gint jvar, GGobiData *d);
+void       varpanel_delete_nth (GGobiData *d, gint jvar);
 void       varpanel_label_set (GGobiData *, gint);
 void       varpanel_make (GtkWidget *, ggobid *);
 void       varpanel_populate (GGobiData *, ggobid *);

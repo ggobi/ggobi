@@ -40,6 +40,7 @@ extern "C"
   void ggobi_displays_release (ggobid * gg);
   void ggobi_display_release (displayd * display, ggobid * gg);
   void ggobi_splot_release (splotd * sp, displayd * display, ggobid * gg);
+  /*void ggobi_data_release (GGobiData *, ggobid * gg);*/
 #ifdef __cplusplus
 }
 #endif
@@ -177,22 +178,6 @@ ggobi_setData (gdouble * values, gchar ** rownames, gchar ** colnames,
   gchar *lbl;
   gchar *varname;
 
-  if (cleanup) {
-    /* Release all the displays associated with this datad
-       and then release all the GUI components and memory
-       for this datad.
-
-       This may need some reworking in order to release
-       exactly the right things, no more and no less.
-     */
-    ggobi_displays_release (gg);
-    varpanel_clear (d, gg);
-    /* ?? */
-    gtk_ui_manager_remove_ui (gg->main_menu_manager, gg->mode_merge_id);
-    /*submenu_destroy (gg->pmode_item);
-       submenu_destroy (gg->imode_item); */
-  }
-
   d->input = desc;
   if (d->name == NULL)
     d->name = g_strdup (desc->fileName);
@@ -200,7 +185,7 @@ ggobi_setData (gdouble * values, gchar ** rownames, gchar ** colnames,
     gg->input = desc;
 
   ggobi_data_add_rows(d, d->nrows - nr);
-  ggobi_data_add_cols(d, d->ncols - nc);
+  ggobi_data_add_cols(d, d->ncols - nr);
 
   if (values) {
     for (j = 0; j < nc; j++) {

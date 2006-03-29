@@ -96,7 +96,7 @@ static void tourcorr_scramble_cb (GtkWidget *w, ggobid *gg) {
 
   tourcorr_scramble(gg);
 }
-
+/*
 static void tourcorr_snap_cb (GtkWidget *w, ggobid *gg) {
 
   tourcorr_snap(gg);
@@ -106,7 +106,7 @@ static void tourcorr_video_cb (GtkToggleButton *button, ggobid *gg)
 {
   tourcorr_video(gg);
 }
-
+*/
 /*
 static void syncaxes_cb (GtkToggleButton *button)
 {
