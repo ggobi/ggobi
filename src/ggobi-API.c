@@ -40,7 +40,6 @@ extern "C"
   void ggobi_displays_release (ggobid * gg);
   void ggobi_display_release (displayd * display, ggobid * gg);
   void ggobi_splot_release (splotd * sp, displayd * display, ggobid * gg);
-  void ggobi_data_release (GGobiData *, ggobid * gg);
 #ifdef __cplusplus
 }
 #endif
@@ -188,7 +187,6 @@ ggobi_setData (gdouble * values, gchar ** rownames, gchar ** colnames,
      */
     ggobi_displays_release (gg);
     varpanel_clear (d, gg);
-    ggobi_data_release (d, gg);
     /* ?? */
     gtk_ui_manager_remove_ui (gg->main_menu_manager, gg->mode_merge_id);
     /*submenu_destroy (gg->pmode_item);

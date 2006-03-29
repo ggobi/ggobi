@@ -184,7 +184,7 @@ delete_vars (gint * cols, gint ncols, GGobiData * d)
   }
 
   for (j = 0; j < ncols; j++) {
-    vartable_element_remove (cols[j], d);
+    //vartable_element_remove (cols[j], d);
   }
 
   /*-- delete columns from pipeline arrays --*/
