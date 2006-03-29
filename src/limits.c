@@ -266,7 +266,7 @@ limits_set (GGobiData * d, gboolean do_raw, gboolean do_tform,
 
 
 void
-limits_set_by_var (GGobiData * d, gint j, gboolean do_raw, gboolean do_tform,
+limits_set_by_var (GGobiData * d, guint j, gboolean do_raw, gboolean do_tform,
                    gboolean visible_only)
 {
   vartabled *vt = ggobi_data_get_vartable(d, j);
@@ -299,11 +299,7 @@ recenter_data (gint i, GGobiData * d, ggobid * gg)
      /*-- if no point was specified, recenter using defaults --*/
       vt->lim_specified_p = false;
     }
+    
+    g_signal_emit_by_name(d, "col_data_changed", (guint) j);
   }
-  limits_set (d, false, true, gg->lims_use_visible);
-  vartable_limits_set (d);
-  vartable_stats_set (d);
-
-  tform_to_world(d);
-  displays_tailpipe (FULL, gg);
 }

@@ -1024,7 +1024,8 @@ gint ggobi_getBrushColor (ggobid * gg)
   return (gg->color_id);
 }
 
-const gchar *ggobi_getColorName (gint cid, ggobid * gg, gboolean inDefault)
+const 
+gchar *ggobi_getColorName (gint cid, ggobid * gg, gboolean inDefault)
 {
   if (cid >= 0 && cid < gg->activeColorScheme->n) {
     return ((gchar *) g_array_index (gg->activeColorScheme->colorNames,
@@ -1034,17 +1035,8 @@ const gchar *ggobi_getColorName (gint cid, ggobid * gg, gboolean inDefault)
   return (NULL);
 }
 
-
-void ggobi_update_data (GGobiData * d, ggobid * gg)
-{
-  limits_set (d, true, true, gg->lims_use_visible);
-  vartable_limits_set (d);
-  vartable_stats_set (d);
-
-  tform_to_world(d);
-}
-
-gint ggobi_removeVariable (gchar * name, GGobiData * d, ggobid * gg)
+gint 
+ggobi_removeVariable (gchar * name, GGobiData * d, ggobid * gg)
 {
   gint which = ggobi_getVariableIndex (name, d, gg);
   if (which > -1 && which < d->ncols)
@@ -1053,7 +1045,8 @@ gint ggobi_removeVariable (gchar * name, GGobiData * d, ggobid * gg)
   return (-1);
 }
 
-gint ggobi_removeVariableByIndex (gint which, GGobiData * d, ggobid * gg)
+gint 
+ggobi_removeVariableByIndex (gint which, GGobiData * d, ggobid * gg)
 {
   gint i, j;
   for (i = 0; i < d->nrows; i++) {
@@ -1068,7 +1061,8 @@ gint ggobi_removeVariableByIndex (gint which, GGobiData * d, ggobid * gg)
 }
 
 
-gint ggobi_getVariableIndex (const gchar * name, GGobiData * d, ggobid * gg)
+gint 
+ggobi_getVariableIndex (const gchar * name, GGobiData * d, ggobid * gg)
 {
   gint j;
 

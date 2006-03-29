@@ -133,18 +133,9 @@ dialog_range_set (GtkWidget *w, ggobid *gg)
 	VT_REAL_USER_MIN, min_val, VT_REAL_USER_MAX, max_val, -1);
       
       vt->lim_specified_p = min_p && max_p;
+      
+      g_signal_emit_by_name(d, "col_data_changed", (guint) j);
     }
-
-    /*
-     * the first function could be needed if transformation has been
-     * going on, because lim_tform could be out of step.
-    */
-    limits_set (d, false, false, gg->lims_use_visible);  
-    vartable_limits_set (d);
-    vartable_stats_set (d);
-
-    tform_to_world(d);
-    displays_tailpipe (FULL, gg);
   }
 
   g_free (cols);
@@ -159,12 +150,12 @@ range_unset_cb (GtkWidget *w, ggobid *gg)
 static void rescale_cb (GtkWidget *w, ggobid *gg) {
   GGobiData *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
 
-  limits_set (d, true, true, gg->lims_use_visible);  
+  /*limits_set (d, true, true, gg->lims_use_visible);  
   vartable_limits_set (d);
   vartable_stats_set (d);
 
   tform_to_world(d);
-  displays_tailpipe (FULL, gg);
+  displays_tailpipe (FULL, gg);*/
 }
 
 
@@ -321,17 +312,10 @@ void range_unset (ggobid *gg)
     /*-- then null out the two entries in the table --*/
     gtk_tree_store_set(GTK_TREE_STORE(model), &iter, 
 	  	VT_REAL_USER_MIN, 0.0, VT_REAL_USER_MAX, 0.0, -1);
+	  
+	  g_signal_emit_by_name(d, "col_data_changed", (guint) j);
   }
   g_free ((gchar *) cols);
-
-
-  /*-- these 4 lines the same as in dialog_range_set --*/
-  limits_set (d, false, false, gg->lims_use_visible);  
-  vartable_limits_set (d);
-  vartable_stats_set (d);
-
-  tform_to_world(d);
-  displays_tailpipe (FULL, gg);
 }
 
 
@@ -356,8 +340,11 @@ dialog_newvar_add (GtkWidget *w, ggobid *gg)
   }
   if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (radio_brush)))
     vtype = ADDVAR_BGROUP;
-  else
+  else {
     vtype = ADDVAR_ROWNOS;
+    g_debug("Using brush group");
+    
+  }
 
   /*-- retrieve the entry widget and variable name --*/
   entry = widget_find_by_name (GTK_DIALOG(dialog)->vbox, "newvar_entry");

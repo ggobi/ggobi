@@ -190,25 +190,29 @@ property UINT ncols
    minimum = 0, maximum = INT_MAX, default_value = 0,
    flags = CONSTRUCT_ONLY, link, export);
    
-signal private NONE (UINT) void 
-rows_in_plot_changed(self, guint n);
+signal NONE (UINT) void 
+rows_in_plot_changed(self, guint n) {
+  tform_to_world(self);
+  displays_tailpipe (FULL, self->gg);
+}
 
-signal public NONE (UINT) void 
+signal first NONE (UINT) void 
 col_name_changed(self, guint j);
 
-signal public NONE (UINT) void 
-col_data_changed(self, guint j);
+signal first NONE (UINT) void 
+col_data_changed(self, guint j) {
+  limits_set_by_var(self, j, true, true, (self->gg) ? self->gg->lims_use_visible : true);
+  tform_to_world_by_var(self, j);
+  displays_tailpipe (FULL, self->gg);
+}
 
-signal public NONE (UINT) void
-col_limits_changed(self, guint j);
-
-signal public NONE (UINT) void
+signal NONE (UINT) void
 cols_added(self, guint n);
 
-signal public NONE (UINT) void
+signal NONE (UINT) void
 col_deleted(self, guint j);
 
-signal public NONE (UINT) void
+signal NONE (UINT) void
 rows_added(self, guint n);
 
 
@@ -1029,7 +1033,6 @@ attach (self, ggobid *gg, gboolean cleanup)
   limits_set (self, true, true, self->gg->lims_use_visible);
   for (guint j = 0; j < self->ncols; j++) vars[j] = j;
   impute_fixed (IMP_BELOW, 15.0, self->ncols, vars, self);
-  limits_set (self, true, true, self->gg->lims_use_visible);
   g_free(vars);
 
   clusters_set(self);  /*-- find the clusters for data just read in --*/
@@ -1055,11 +1058,6 @@ attach (self, ggobid *gg, gboolean cleanup)
   self_connect__col_name_changed(self, varpanel_label_set, NULL);
 
   
-
-  //"Pipeline"
-  tform_to_world(self);
-  self_connect__col_data_changed(self, tform_to_world_by_var, NULL);
-
   if (cleanup || g_list_length(gg->displays) == 0) {
     display_free_all (gg);  /*-- destroy any existing displays --*/
     gg->pmode = NULL_PMODE;

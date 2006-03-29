@@ -174,14 +174,7 @@ sphere_apply_cb (GtkWidget * w, ggobid * gg)
         spherize_data (&d->sphere.vars, &d->sphere.pcvars, d, gg);
         sphere_varcovar_set (d, gg);
 /*      pc_axes_sensitive_set (true);*/
-
-        /*-- these three lines replicated from transform.c --*/
-        limits_set (d, false, true, gg->lims_use_visible);
-        vartable_limits_set (d);
-        vartable_stats_set (d);
-
-        tform_to_world(d);
-        displays_tailpipe (FULL, gg);
+        
       }
     }
   }

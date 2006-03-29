@@ -711,6 +711,7 @@ transform_variable (gint stage, gint tform_type, gfloat param, gint jcol,
     break;
   }
   g_signal_emit_by_name(d, "col_name_changed", jcol);
+  g_signal_emit_by_name(d, "col_data_changed", jcol);
 
   return success;
 }
@@ -730,19 +731,4 @@ transform (gint stage, gint tform_type, gfloat param, gint *vars, gint nvars,
       break;
     }
   }
-  
-  limits_set (d, false, true, gg->lims_use_visible);  
-  for (k=0; k<completed; k++) {
-    vartable_limits_set_by_var (d, vars[k]);
-    vartable_stats_set_by_var (d, vars[k]);
-    tform_to_world_by_var ((guint) vars[k], d);
-  }
-
-
-  /*
-   * there's no need to reproject if the variables just transformed
-   * are not currently displayed, but we're doing it anyway.
-  */
-  /*-- do not redisplay the missing values displays --*/
-  displays_tailpipe (FULL, gg);
 }

@@ -175,14 +175,8 @@ static void tform_reset_cb (GtkWidget *w, ggobid *gg)
     transform2_apply (j, d, gg);
 
     g_signal_emit_by_name(d, "col_name_changed", j);
+    g_signal_emit_by_name(d, "col_data_changed", j);
   }
-
-  limits_set (d, true, true, gg->lims_use_visible);  
-  vartable_limits_set (d);
-  vartable_stats_set (d);
-
-  tform_to_world(d);
-  displays_tailpipe (FULL, gg);
 }
 
 void

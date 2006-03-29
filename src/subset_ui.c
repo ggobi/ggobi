@@ -150,14 +150,14 @@ static void
 rescale_cb (GtkWidget *w, ggobid *gg)
 {
   GGobiData *d = datad_get_from_widget (w, gg);
-  if (d) {
+  /*if (d) {
     limits_set (d, true, true, gg->lims_use_visible);
     vartable_limits_set (d);
     vartable_stats_set (d);
 
     tform_to_world(d);
     displays_tailpipe (FULL, gg);
-  }
+  }*/
 }
 
 static void

@@ -23,7 +23,7 @@
 
 
 void
-tform_to_world_by_var (guint j, GGobiData * d)
+tform_to_world_by_var (GGobiData * d, guint j)
 {
   gint i, m;
   greal max, min, range, ftmp;
@@ -48,7 +48,7 @@ tform_to_world (GGobiData * d)
   guint j;
 
   for (j = 0; j < d->ncols; j++)
-    tform_to_world_by_var (j, d);
+    tform_to_world_by_var (d, j);
 }
 
 

@@ -17,7 +17,7 @@ enum {
   NCOLS_VT
 };
 
-typedef enum {ADDVAR_ROWNOS = 0, ADDVAR_BGROUP} NewVariableType; 
+typedef enum {ADDVAR_ROWNOS, ADDVAR_BGROUP} NewVariableType; 
 
 
 typedef enum {real, categorical, integer, counter, uniform, all_vartypes} vartyped;

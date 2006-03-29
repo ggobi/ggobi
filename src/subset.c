@@ -71,18 +71,6 @@ subset_apply (GGobiData *d, ggobid *gg) {
   ggobi_data_set_rows_in_plot(d);
   if (gg->cluster_ui.window != NULL)
     cluster_table_update (d, gg);
-
-  tform_to_world(d);
-
-/*
-  if (gg->is_pp) {
-    gg->recalc_max_min = True;
-    reset_pp_plot ();
-    pp_index (gg, 0,1);
-  }
-*/
-
-  displays_tailpipe (FULL, gg);  /*-- points rebinned here --*/
 }
 
 void
