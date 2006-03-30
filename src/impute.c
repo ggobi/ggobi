@@ -62,6 +62,7 @@ impute_fixed (ImputeType impute_type, gfloat val, gint nvars, gint * vars,
           drand = (drand - .5) * jmult;
           d->raw.vals[m][j] = d->tform.vals[m][j] = impval + (gfloat) drand;
         }
+        g_signal_emit_by_name(d, "col_data_changed", j);
       }
     }
   }
@@ -73,6 +74,7 @@ impute_fixed (ImputeType impute_type, gfloat val, gint nvars, gint * vars,
         if (ggobi_data_is_missing(d, m, j)) {
           d->raw.vals[m][j] = d->tform.vals[m][j] = val;
         }
+        g_signal_emit_by_name(d, "col_data_changed", j);
       }
     }
   }
@@ -143,6 +145,7 @@ impute_mean_or_median (gint type, gint nvars, gint * vars,
           for (i = 0; i < nmissing; i++)
             d->raw.vals[missv[i]][j] = d->tform.vals[missv[i]][j] = val;
         }
+        g_signal_emit_by_name(d, "col_data_changed", j);
       }
     }
     g_free (missv);
@@ -164,6 +167,7 @@ impute_mean_or_median (gint type, gint nvars, gint * vars,
             redraw = true;
           }
         }
+        g_signal_emit_by_name(d, "col_data_changed", j);
       }
     }
   }
@@ -239,6 +243,7 @@ impute_random (GGobiData * d, gint nvars, gint * vars)
           }
         }
         impute_single (missv, nmissing, presv, npresent, j, d);
+        g_signal_emit_by_name(d, "col_data_changed", j);
       }
     }
   }
@@ -261,6 +266,7 @@ impute_random (GGobiData * d, gint nvars, gint * vars)
         }
       }
       impute_single (missv, nmissing, presv, npresent, j, d);
+      g_signal_emit_by_name(d, "col_data_changed", j);
     }
   }
 

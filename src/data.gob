@@ -190,17 +190,18 @@ property UINT ncols
    minimum = 0, maximum = INT_MAX, default_value = 0,
    flags = CONSTRUCT_ONLY, link, export);
    
-signal NONE (UINT) void 
+private signal first NONE (UINT) void 
 rows_in_plot_changed(self, guint n) {
+  g_debug("Rows in plot changed to %i", n);
   tform_to_world(self);
   if (self->gg)
     displays_tailpipe (FULL, self->gg);
 }
 
-signal first NONE (UINT) void 
+private signal NONE (UINT) void 
 col_name_changed(self, guint j);
 
-signal first NONE (UINT) void 
+private signal first NONE (UINT) void 
 col_data_changed(self, guint j) {
   limits_set_by_var(self, j, true, true, (self->gg) ? self->gg->lims_use_visible : true);
   tform_to_world_by_var(self, j);
@@ -208,15 +209,14 @@ col_data_changed(self, guint j) {
     displays_tailpipe (FULL, self->gg);
 }
 
-signal NONE (UINT) void
+private signal NONE (UINT) void
 cols_added(self, guint n);
 
-signal NONE (UINT) void
+private signal NONE (UINT) void
 col_deleted(self, guint j);
 
-signal NONE (UINT) void
+private signal NONE (UINT) void
 rows_added(self, guint n);
-
 
 init (self) {
   sphere_init(self); 
@@ -301,8 +301,7 @@ set_col_name(self, guint j, gchar* value)
   vt->collab_tform = g_strdup(value);
   vt->nickname = g_strndup (vt->collab, 2);
 
-  g_signal_emit_by_name (self, "col_name_changed", j);
-
+  self_col_name_changed(self, j);
 }
 
 // FIXME: to be removed once pipeline in place
@@ -816,7 +815,7 @@ add_rows(self, guint n) {
   gint def_size =  self->gg ? self->gg->glyph_id.size : 1;
   guint i, nprev = self->nrows;
   self->nrows += n;
-  
+
   self->rowIds = (gchar **) g_realloc (self->rowIds, sizeof(gchar *) * self->nrows);
   vectorb_realloc (&self->excluded, self->nrows);
   vectorb_realloc (&self->hidden, self->nrows);
@@ -832,6 +831,12 @@ add_rows(self, guint n) {
   vectors_realloc (&self->color, self->nrows);
   vectors_realloc (&self->color_now, self->nrows);
   vectors_realloc (&self->color_prev, self->nrows);
+
+  arrayf_add_rows (&self->raw, self->nrows);
+  arrayf_add_rows (&self->tform, self->nrows);
+  arrayg_add_rows (&self->jitdata, self->nrows);
+  arrayg_add_rows (&self->world, self->nrows);
+  arrays_add_rows (&self->missing, self->nrows);
 
   for (i = nprev; i < self->nrows; i++) {
     self_set_row_id(self, i, NULL, false);
@@ -852,16 +857,10 @@ add_rows(self, guint n) {
     self->pts_under_brush.els[i] = false; 
     self->sampled.els[i] = true;
   }
-  self_set_rows_in_plot(self);
   clusters_set(self);
-
-  arrayf_add_rows (&self->raw, self->nrows);
-  arrayf_add_rows (&self->tform, self->nrows);
-  arrayg_add_rows (&self->jitdata, self->nrows);
-  arrayg_add_rows (&self->world, self->nrows);
-  arrays_add_rows (&self->missing, self->nrows);
-
-  g_signal_emit_by_name (self, "rows_added", (gpointer) self, n);  
+  self_set_rows_in_plot(self);
+  
+  self_rows_added(self, n);
   return nprev;
 }
 
@@ -892,7 +891,7 @@ add_cols(self, guint n) {
 
   tour_realloc_up (self, self->ncols);
 
-  g_signal_emit_by_name (self, "cols_added", (gpointer) self, n);  
+  self_cols_added(self, n);
   
   return nprev;
 }
@@ -920,17 +919,16 @@ delete_cols(self, guint *cols, gint ncols)
 
   self->vartable = g_renew(vartabled*, self->vartable, nkeepers);
   
-  /*-- delete columns from pipeline arrays --*/
-  arrayf_delete_cols (&self->raw, ncols, cols);
-  arrayf_delete_cols (&self->tform, ncols, cols);
+  //FIXME: need function analogous to tour_relloc_up
   tour2d_realloc_down (ncols, cols, self, self->gg);
   tour1d_realloc_down (ncols, cols, self, self->gg);
   tourcorr_realloc_down (ncols, cols, self, self->gg);
-  arrays_delete_cols (&self->missing, ncols, cols);
-  arrayg_delete_cols (&self->jitdata, ncols, cols);
 
-  /*-- reallocate the rest of the arrays --*/
-  arrayg_alloc (&self->world, self->nrows, nkeepers);
+  arrayf_delete_cols (&self->raw, ncols, cols);
+  arrayf_delete_cols (&self->tform, ncols, cols);
+  arrayg_delete_cols (&self->jitdata, ncols, cols);
+  arrayg_delete_cols (&self->world, ncols, cols);
+  arrays_delete_cols (&self->missing, ncols, cols);
   
   self->ncols -= ncols;
   
@@ -1059,6 +1057,8 @@ attach (self, ggobid *gg, gboolean cleanup)
     varpanel_set_sensitive (self, true, gg);
   self_connect__col_name_changed(self, varpanel_label_set, NULL);
 
+  displays_tailpipe (FULL, self->gg);
+
   
   if (cleanup || g_list_length(gg->displays) == 0) {
     display_free_all (gg);  /*-- destroy any existing displays --*/
@@ -1101,8 +1101,8 @@ set_rows_in_plot(self)
   for (i = 0; i < self->nrows; i++)
     if (self->sampled.els[i] && !self->excluded.els[i])
       self->rows_in_plot.els[self->nrows_in_plot++] = i;
-
-  g_signal_emit_by_name (self, "rows-in-plot-changed", self->nrows_in_plot); 
+  
+  self_rows_in_plot_changed(self, (guint) self->nrows_in_plot); 
 }
 
 }

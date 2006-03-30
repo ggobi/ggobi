@@ -161,9 +161,6 @@ brush_reset (displayd * display, gint action)
     clusters_set(d);
     cluster_table_labels_update (d, gg);
 
-    tform_to_world(d);
-    displays_tailpipe (FULL, gg);
-      /*-- --*/
     break;
 
 /*
@@ -188,10 +185,6 @@ brush_reset (displayd * display, gint action)
         /*-- code borrowed from exclusion_ui.c, the 'show' routine --*/
       clusters_set(d);
       cluster_table_labels_update (e, gg);
-
-      tform_to_world(e);
-      displays_tailpipe (FULL, gg);
-        /*-- --*/
     }
     break;
 
