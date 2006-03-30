@@ -193,7 +193,8 @@ property UINT ncols
 signal NONE (UINT) void 
 rows_in_plot_changed(self, guint n) {
   tform_to_world(self);
-  displays_tailpipe (FULL, self->gg);
+  if (self->gg)
+    displays_tailpipe (FULL, self->gg);
 }
 
 signal first NONE (UINT) void 
@@ -203,7 +204,8 @@ signal first NONE (UINT) void
 col_data_changed(self, guint j) {
   limits_set_by_var(self, j, true, true, (self->gg) ? self->gg->lims_use_visible : true);
   tform_to_world_by_var(self, j);
-  displays_tailpipe (FULL, self->gg);
+  if (self->gg)
+    displays_tailpipe (FULL, self->gg);
 }
 
 signal NONE (UINT) void
