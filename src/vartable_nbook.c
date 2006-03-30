@@ -673,6 +673,8 @@ vartable_stats_set (GGobiData *d) {
 void
 vartable_cells_set_by_var (gint j, GGobiData *d) 
 {
+  vartable_collab_set_by_var (d, j);
+  vartable_collab_tform_set_by_var (d, j);
   vartable_stats_set_by_var (d, j);
   vartable_limits_set_by_var (d, j);
 }

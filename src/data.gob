@@ -1057,8 +1057,6 @@ attach (self, ggobid *gg, gboolean cleanup)
     varpanel_set_sensitive (self, true, gg);
   self_connect__col_name_changed(self, varpanel_label_set, NULL);
 
-  displays_tailpipe (FULL, self->gg);
-
   
   if (cleanup || g_list_length(gg->displays) == 0) {
     display_free_all (gg);  /*-- destroy any existing displays --*/
