@@ -1646,11 +1646,14 @@ readXMLRecord (const xmlChar ** attrs, XMLParserData * data)
 
   tmp = getAttribute (attrs, "id");
   if (tmp) {
-    if (ggobi_data_get_row_by_id(d, (gchar*) tmp) != -1)
+    gint m;
+    if ((m= ggobi_data_get_row_by_id(d, (gchar*) tmp)) != -1)
       ggobi_XML_error_handler (data,
-                               "duplicated id in record %d of dataset %s\n",
-                               data->current_record + 1,
-                               data->current_data->name);
+        "duplicated id (%s) in records %d and %d of dataset %s\n",
+        (gchar *) tmp,
+        data->current_record + 1,
+        m + 1,
+        data->current_data->name);
     ggobi_data_set_row_id(d, i, (gchar*) tmp, false);
   }
 
