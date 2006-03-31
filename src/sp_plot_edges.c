@@ -116,10 +116,6 @@ splot_edges_draw (splotd * sp, gboolean draw_hidden, GdkDrawable * drawable,
      /**/ return;
   }
 
-  if (d->idTable == NULL) {  /*-- d has no record ids --*/
-     /**/ return;
-  }
-
   edges_show_p = (display->options.edges_directed_show_p ||
                   display->options.edges_undirected_show_p);
   arrowheads_show_p = (display->options.edges_directed_show_p ||

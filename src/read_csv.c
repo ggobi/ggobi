@@ -361,7 +361,11 @@ load_row_labels (GList * rows, GGobiData * d, gboolean has_labels)
   gint i;
   for (i = 0; rows; rows = g_list_next (rows), i++) {
     Row *row = (Row *) rows->data;
-    ggobi_data_set_row_id(d, i, row->src->str + row->entry[0].ofs, false);
+    if (has_labels)
+      ggobi_data_set_row_id(d, i, row->src->str + row->entry[0].ofs, false);
+    else
+      ggobi_data_set_row_id(d, i, NULL, false);
+    
   }
 }
 
@@ -394,12 +398,10 @@ create_data (GList * rows, gchar * name)
   if (row_labels)
     ncols--;
 
-  /* Initialize datad structure */
   d = ggobi_data_new (nrows - 1, ncols);
   ggobi_data_set_name(d, name, NULL);
 
   load_column_labels ((Row *) rows->data, d, row_labels);
-
   rows = g_list_next (rows);    /* skip the column labels */
 
   load_row_labels (rows, d, row_labels);

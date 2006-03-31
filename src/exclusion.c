@@ -48,12 +48,14 @@ symbol_table_populate (GGobiData * d)
     j = d->glyph.els[i].type;
     k = d->glyph.els[i].size;
     m = d->color.els[i];
+
     if (d->symbol_table[j][k][m].n == 0)
       nclusters++;
+
     d->symbol_table[j][k][m].n++;
-    if (d->hidden.els[i]) {
+
+    if (d->hidden.els[i])
       d->symbol_table[j][k][m].nhidden++;
-    }
     else
       d->symbol_table[j][k][m].nshown++;
   }
@@ -113,7 +115,6 @@ clusters_set (GGobiData * d)
    *  clusterid is the groups vector: an integer for each case,
    *  indicating its cluster membership
    */
-
   if (nclusters > 0 && nclusters != 1) {
     for (i = 0; i < d->nrows; i++) {
       for (n = 0; n < nclusters; n++) {

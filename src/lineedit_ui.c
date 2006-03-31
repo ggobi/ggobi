@@ -192,8 +192,8 @@ add_record_dialog_open (GGobiData * d, GGobiData * e, displayd * dsp,
                     entry, 1, 2, row, row + 1, table_opt, table_opt, 1, 1);
   row++;
 
-  if ((cpanel->ee_mode == ADDING_POINTS && d->idTable) ||
-      (cpanel->ee_mode == ADDING_EDGES && e->idTable)) {
+  if ((cpanel->ee_mode == ADDING_POINTS) ||
+      (cpanel->ee_mode == ADDING_EDGES)) {
     w = gtk_label_new_with_mnemonic ("Record _id");
     gtk_misc_set_alignment (GTK_MISC (w), 1, .5);
     gtk_table_attach (GTK_TABLE (table),

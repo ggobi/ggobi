@@ -185,14 +185,12 @@ edgeset_add (displayd * display)
   if (gg->d != NULL) {
     gint nd = g_slist_length (gg->d);
 
-    if (d->idTable) {
-      for (k = 0; k < nd; k++) {
-        e = (GGobiData *) g_slist_nth_data (gg->d, k);
-        if ( /* e != d && */ e->edge.n > 0) {
-          setDisplayEdge (display, e);
-          added = true;
-          break;
-        }
+    for (k = 0; k < nd; k++) {
+      e = (GGobiData *) g_slist_nth_data (gg->d, k);
+      if ( /* e != d && */ e->edge.n > 0) {
+        setDisplayEdge (display, e);
+        added = true;
+        break;
       }
     }
   }
@@ -314,7 +312,7 @@ computeResolvedEdgePoints (GGobiData * e, GGobiData * d)
     guint row_b = ggobi_data_get_row_by_id(d, e->edge.sym_endpoints[i].b);
 
     ans[i].a = (gint) row_a;
-    ans[i].b = (gint) `row_b;
+    ans[i].b = (gint) row_b;
 
     if (row_a == -1 || row_b == -1)
       continue;

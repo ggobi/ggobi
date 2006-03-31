@@ -324,7 +324,6 @@ initParserData (XMLParserData * data, xmlSAXHandlerPtr handler, ggobid * gg)
   data->terminateStrings_p = true;
   data->NA_identifier = NULL;
 
-  data->idTable = NULL;
   data->handlers = handler;
   data->defaults.color = -1;
   data->defaults.glyphType = sessionOptions->info->glyph.type;
@@ -961,8 +960,6 @@ setDatasetInfo (const xmlChar ** attrs, XMLParserData * data)
   data->current_variable = 0;
   data->current_element = 0;
 
-  data->idTable = NULL;
-
   return (true);
 }
 
@@ -1553,13 +1550,6 @@ releaseCurrentDataInfo (XMLParserData * parserData)
   if (!parserData->current_data)
     return;
 
-/*
-   if(parserData->idTable && parserData->usesStringIds == false) {
-      g_hash_table_foreach(parserData->idTable,
-        (GHFunc) freeLevelHashEntry, parserData);
-      g_hash_table_destroy(parserData->idTable); 
-   }
-*/
 
   if (parserData->autoLevels) {
     int i;
