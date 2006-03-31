@@ -776,8 +776,8 @@ set_row_id(self, guint i, gchar* value, gboolean check) {
   if (value == NULL)
     value = g_strdup_printf("%d", i+1);
 
-  g_hash_table_insert (self->idTable, value, GINT_TO_POINTER(i));
   self->rowIds[i] = g_strdup(value);
+  g_hash_table_insert (self->idTable, self->rowIds[i], GINT_TO_POINTER(i));
 }
 
 public gchar*
@@ -839,7 +839,9 @@ add_rows(self, guint n) {
   arrays_add_rows (&self->missing, self->nrows);
 
   for (i = nprev; i < self->nrows; i++) {
+/* Do we need to initialize these at all?
     self_set_row_id(self, i, NULL, false);
+*/
     
     self->color.els[i] = def_color;
     self->color_now.els[i] = def_color;
