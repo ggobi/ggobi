@@ -306,47 +306,29 @@ static endpointsd DegenerateEndpoints;
 static endpointsd *
 computeResolvedEdgePoints (GGobiData * e, GGobiData * d)
 {
-  endpointsd *ans;
-  GHashTable *tbl = d->idTable;
-  int ctr = 0, i;
-  guint *tmp;
+  endpointsd *ans = g_malloc (sizeof (endpointsd) * e->edge.n);
   gboolean resolved_p = false;
 
-  ans = g_malloc (sizeof (endpointsd) * e->edge.n);
+  for (gint i = 0; i < e->edge.n; i++) {
+    guint row_a = ggobi_data_get_row_by_id(d, e->edge.sym_endpoints[i].a);
+    guint row_b = ggobi_data_get_row_by_id(d, e->edge.sym_endpoints[i].b);
 
-  if (tbl == NULL) {
-    ans = &DegenerateEndpoints;
+    ans[i].a = (gint) row_a;
+    ans[i].b = (gint) `row_b;
+
+    if (row_a == -1 || row_b == -1)
+      continue;
+
+    ans[i].jpartner = e->edge.sym_endpoints[i].jpartner;
+    if(!resolved_p)
+      resolved_p = true;
+  }
+  
+  if (resolved_p)
     return ans;
-  }
 
-  for (i = 0; i < e->edge.n; i++, ctr++) {
-    tmp = (guint *) g_hash_table_lookup (tbl, e->edge.sym_endpoints[i].a);
-    if (!tmp) {
-      ans[ctr].a = -1;
-      continue;
-    }
-
-    ans[ctr].a = *tmp;
-
-    tmp = (guint *) g_hash_table_lookup (tbl, e->edge.sym_endpoints[i].b);
-    if (!tmp) {
-      ans[ctr].a = ans[ctr].b = -1;
-      continue;
-    }
-    else {
-      ans[ctr].b = *tmp;
-      ans[ctr].jpartner = e->edge.sym_endpoints[i].jpartner;
-      if (!resolved_p && ans[ctr].a != -1)
-        resolved_p = true;
-    }
-  }
-
-  if (ctr == 0 || resolved_p == false) {
-    g_free (ans);
-    ans = &DegenerateEndpoints;
-  }
-
-  return (ans);
+  g_free (ans);
+  return &DegenerateEndpoints;
 }
 
 
