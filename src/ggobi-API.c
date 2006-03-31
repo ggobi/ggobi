@@ -145,14 +145,6 @@ ggobi_setMissingValueIdentifier (MissingValue_p f)
 }
 
 
-static const gchar *const DefaultRowNames = NULL;
-
-const gchar *const *
-getDefaultRowNamesPtr ()
-{
-  return ((const gchar * const *) &DefaultRowNames);
-}
-
 /*
   An initial attempt to allow new data to be introduced
   to the Ggobi session, replacing the existing contents.
@@ -185,7 +177,7 @@ ggobi_setData (gdouble * values, gchar ** rownames, gchar ** colnames,
     gg->input = desc;
 
   ggobi_data_add_rows(d, d->nrows - nr);
-  ggobi_data_add_cols(d, d->ncols - nr);
+  ggobi_data_add_cols(d, d->ncols - nc);
 
   if (values) {
     for (j = 0; j < nc; j++) {
@@ -203,17 +195,7 @@ ggobi_setData (gdouble * values, gchar ** rownames, gchar ** colnames,
     }
   }
 
-  /* Now recompute and display the top plot. */
-  //if (nc > 0 && datad_attach (d, gg, cleanup) != NULL) {
-    /* Have to patch up the displays list since we removed
-       every entry and that makes for meaningless entries.
-
-       IS THIS TRUE? Only if cleanup was specified!
-       This looks very dangerous. Should use g_list_remove();
-     */
-    //gg->displays->next = NULL;
-  //}
-  display_menu_build (gg);
+  ggobi_data_attach(d, gg, false);
 }
 
 
@@ -376,45 +358,6 @@ const gfloat **ggobi_getTFormData (GGobiData * d, ggobid * gg)
 {
   return ((const gfloat **) d->tform.vals);
 }
-
-
-/*
-  Returns a reference to the labels used to identify
-  the observations.
-  Do not change this as it is not a copy.
- */
-const gchar **ggobi_getCaseNames (GGobiData * d, ggobid * gg)
-{
-  gchar **rowlab = (gchar **) g_malloc (sizeof (gchar *) * d->nrows);
-  gint i;
-  for (i = 0; i < d->nrows; i++)
-    rowlab[i] = ggobi_data_get_row_id(d, i);
-
-  return ((const gchar **) rowlab);
-}
-
-/*
- This does not copy the label, so it is assumed
- that the caller has already allocated the space
- using the appropriate GTK memory model.
- If it is apparent that this is being called from 
- contexts that use a very different memory model (e.g. S/R),
- we can change the behaviour to copy this.
-
- Similarly, this can be modified to return the previous
- value, but the caller will have to free that pointer.
- */
-void
-ggobi_setCaseName (gint index, const gchar * label, GGobiData * d,
-                     ggobid * gg)
-{
-  if (index < 0 || index >= d->nrows) {
-    warning ("Index is out of range of observations in setCaseName");
-    return;
-  }
-  ggobi_data_set_row_id(d, index, (gchar*) label, true);
-}
-
 
 void
 warning (const gchar * msg)
@@ -1035,44 +978,6 @@ gchar *ggobi_getColorName (gint cid, ggobid * gg, gboolean inDefault)
   return (NULL);
 }
 
-gint 
-ggobi_removeVariable (gchar * name, GGobiData * d, ggobid * gg)
-{
-  gint which = ggobi_getVariableIndex (name, d, gg);
-  if (which > -1 && which < d->ncols)
-    return (ggobi_removeVariableByIndex (which, d, gg));
-
-  return (-1);
-}
-
-gint 
-ggobi_removeVariableByIndex (gint which, GGobiData * d, ggobid * gg)
-{
-  gint i, j;
-  for (i = 0; i < d->nrows; i++) {
-    for (j = which + 1; j < d->ncols; j++) {
-/*XXX Fill in */
-    }
-  }
-
-  d->ncols--;
-
-  return (-1);
-}
-
-
-gint 
-ggobi_getVariableIndex (const gchar * name, GGobiData * d, ggobid * gg)
-{
-  gint j;
-
-  for (j = 0; j < d->ncols; j++) {
-    if (strcmp (ggobi_data_get_col_name(d, j), name) == 0)
-      return (j);
-  }
-
-  return (-1);
-}
 
 void
 ggobi_setPlotRange (double *x, double *y, int plotNum, displayd * display,
