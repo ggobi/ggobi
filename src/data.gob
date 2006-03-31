@@ -733,6 +733,18 @@ set_col_levels(self, guint j, guint levels, gchar** names, guint* values, guint*
  }
 }
 
+/*
+ * get_string_value
+ * Get string representation of value
+ *
+ * @self: #GGobiData object
+ * @self: row
+ * @self: column
+ * @self: transformed or raw values?
+ *
+ * This currently returns a locale insensitive string, suitable for
+ * output into csv etc.  It may be sub-optimal for user display.
+ */
 public gchar*
 get_string_value(self, guint i, guint j, gboolean transformed) 
 {
@@ -742,7 +754,12 @@ get_string_value(self, guint i, guint j, gboolean transformed)
   
   if (self_is_missing(self, i, j)) 
     return g_strdup("NA");
-  if (vt->vartype != categorical)
+
+  if (vt->vartype != categorical) {
+    gchar *buf = g_new(gchar, G_ASCII_DTOSTR_BUF_SIZE);
+    g_ascii_dtostr(buf, G_ASCII_DTOSTR_BUF_SIZE, raw);
+    return buf;
+  }
     return g_strdup_printf("%g", raw);
   
   for (n = 0; n < vt->nlevels; n++) {
@@ -838,11 +855,7 @@ add_rows(self, guint n) {
   arrayg_add_rows (&self->world, self->nrows);
   arrays_add_rows (&self->missing, self->nrows);
 
-  for (i = nprev; i < self->nrows; i++) {
-/* Do we need to initialize these at all?
-    self_set_row_id(self, i, NULL, false);
-*/
-    
+  for (i = nprev; i < self->nrows; i++) {    
     self->color.els[i] = def_color;
     self->color_now.els[i] = def_color;
     self->color_prev.els[i] = def_color;
