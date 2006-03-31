@@ -104,6 +104,9 @@ dist_share_DATA = share/colorschemes.xml
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = ggobi-system.pc
 
+ggobiconfdir = $(sysconfdir)/xdg/ggobi
+ggobiconf_DATA = ggobirc
+
 install-data-hook:
 	cd $(DESTDIR)$(pkgconfigdir) && test -f ggobi-system.pc && \
   mv ggobi-system.pc ggobi.pc
@@ -114,13 +117,13 @@ uninstall-local:
 DISTCHECK_CONFIGURE_FLAGS = --with-all-plugins --enable-gtk-doc
 
 # We add symlinks for developer convenience
-all-local: ggobi
+all-local: ggobi ggobirc
 
 ggobi:
 	ln -s src/ggobi ggobi
 
 # Use this rule to build your ggobirc (for loading plugins)
-ggobirc: all
+ggobirc:
 	echo "<ggobirc>" > $@
 	echo "<plugins>" >> $@
 
