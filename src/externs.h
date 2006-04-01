@@ -297,7 +297,6 @@ void       impute_window_open (ggobid *);
 gboolean   in_vector (gint k, gint *vec, gint nels);
 gint       include_hiddens (gboolean include, GGobiData *d, ggobid *gg);
 void       increment_tour(vector_f, vector_f, gfloat, gfloat, gfloat *, gint);
-void       initSessionOptions(int argc, char **argv);
 void       init_plot_GC (GdkWindow *, ggobid *);
 void       init_var_GCs (GtkWidget *, ggobid *);
 gdouble    inner_prod (gdouble *, gdouble *, gint);
@@ -345,7 +344,6 @@ displayd*  parcoords_new (displayd *dpy, gboolean, gint, gint *, GGobiData *, gg
 void       parcoords_reset_arrangement (displayd *, gint, ggobid *);
 gboolean   parcoords_varsel (cpaneld *, splotd *, gint, gint *, ggobid *);
 void       parcoordsDragAndDropEnable(displayd *dsp, gboolean active);
-gint       parse_command_line (gint *argc, gchar **av);
 gboolean   pca_calc (GGobiData *, ggobid *);
 void       pca_diagnostics_set (GGobiData *d, ggobid *);
 gint       pcompare (const void *, const void *);
@@ -732,8 +730,6 @@ gboolean   processRestoreFile(const gchar * const fileName, ggobid *gg);
 void       scatterplotMovePointsMotionCb(displayd *display, splotd *sp, GtkWidget *w, GdkEventMotion *event, ggobid *gg);
 void       scatterplotMovePointsButtonCb(displayd *display, splotd *sp, GtkWidget *w, GdkEventButton *event, ggobid *gg);
 displayd * scatterplot_new_with_vars(gboolean missing_p, gint numVars, gint *vars, GGobiData *d, ggobid *gg);
-
-void       ggobiInit(int *argc, char **argv[]);
 
 GGobiPluginInfo *readPluginFile(const char * const fileName, GGobiInitInfo *info);
 gboolean   registerPlugin(ggobid *gg, GGobiPluginInfo *plugin);

@@ -174,7 +174,7 @@ extern void ggobi_setVariableName(gint jvar, gchar *name, gboolean transformed, 
  This is used to when embedding GGobi in other applications that want
  control when and how GGobi events are processed.
  */
-extern gint ggobi_main(gint argc, gchar *argv[], gboolean processEvents);
+extern gint ggobi_init(gint argc, gchar *argv[], gboolean processEvents);
 
 /**
  @ingroup GGobi

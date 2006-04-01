@@ -44,6 +44,10 @@ typedef struct {
   gint *level_values;
   gint *level_counts;
   gchar **level_names;  /*-- strings --*/
+  
+  /*-- fast mapping from names and values to indices --*/
+  GHashTable *name_to_level;
+  GHashTable *value_to_level;
 
   /*-- unadjusted, unaffected by imputation --*/
   gfloat mean, median;

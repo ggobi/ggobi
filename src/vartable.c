@@ -188,5 +188,8 @@ vartable_element_new (GGobiData *d)
   vt->collab = NULL;
   vt->collab_tform = NULL;
 
+  vt->name_to_level = g_hash_table_new(g_str_hash, g_str_equal);
+  vt->value_to_level = g_hash_table_new(NULL, NULL);
+  
   return vt;
 }

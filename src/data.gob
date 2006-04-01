@@ -96,6 +96,12 @@ typedef struct _BrushBins {
 %{
 #include "vars.h"
 #include "externs.h"
+
+static void
+print_entry (gpointer key, gpointer val, gpointer data)
+{
+    printf ("\t\"%d\" translates to \"%d\"\n", GPOINTER_TO_INT(val), GPOINTER_TO_INT(val));
+}
 %}
 
 class GGobi:Data from G:Object {
@@ -436,9 +442,38 @@ set_raw_value(self, guint i, guint j, gdouble value)
   if(GGobiMissingValue && GGobiMissingValue(value))
     self_set_missing(self, i, j);
   else {
+    if (self_get_col_type(self, j) == categorical)
+      if (self_get_col_level_for_value(self, j, (gint)value) == -1)
+        self_add_col_level(self, j, NULL, (gint)value);
     self->raw.vals[i][j] = value;
     self->tform.vals[i][j] = value;
   }
+}
+
+// FIXME: should these two really be public?
+public gint
+get_col_level_for_value(self, guint j, gint value)
+{
+  gpointer key, level_ptr;
+  vartabled *vt = self_get_vartable(self, j);
+  g_return_val_if_fail(self_get_col_type(self, j) == categorical, -1);
+  g_hash_table_foreach(vt->value_to_level, print_entry, NULL);
+  if(!g_hash_table_lookup_extended(vt->value_to_level, GINT_TO_POINTER(value), 
+      &key, &level_ptr))
+    return(-1);
+  g_debug("found: %d", GPOINTER_TO_INT(level_ptr));
+  return(GPOINTER_TO_INT(level_ptr));
+}
+
+public gint
+get_col_level_for_name(self, guint j, const gchar *name)
+{
+  gpointer key, level_ptr;
+  vartabled *vt = self_get_vartable(self, j);
+  g_return_val_if_fail(self_get_col_type(self, j) == categorical, -1);
+  if (!g_hash_table_lookup_extended(vt->name_to_level, name, &key, &level_ptr))
+    return(-1);
+  return(GPOINTER_TO_INT(level_ptr));
 }
 
 // replaces getAutoLevelIndex
@@ -446,40 +481,20 @@ public void
 set_categorical_value(self, guint i, guint j, const gchar* value) 
 {
   vartabled *vt = self_get_vartable(self, j);
-  guint k, level = -1;
+  guint level;
 
   self_set_col_type(self, j, categorical);
   
-  for(k = 0; k < vt->nlevels; k++) {
-    if (!g_ascii_strcasecmp(value, vt->level_names[k])) {
-      level = k;
-      break;
-    }
-  }
-
+  level = self_get_col_level_for_name(self, j, value);
+  
   if (level != -1) {
     vt->level_counts[level]++;
     self_set_raw_value(self, i, j, (gdouble) vt->level_values[level]);
     return;
   }
-
+  
   //not found, must be new level
-  level = vt->nlevels++;
-  if (vt->nlevels == 1) {
-    vt->level_values = (guint *)   g_malloc (sizeof (gint));
-    vt->level_counts = (guint *)   g_malloc (sizeof (gint));
-    vt->level_names  = (gchar **) g_malloc (sizeof (gchar *));
-  } else {
-    vt->level_values =
-      (gint *) g_realloc (vt->level_values, sizeof (guint) * vt->nlevels);
-    vt->level_counts =
-      (gint *) g_realloc (vt->level_counts, sizeof (guint) * vt->nlevels);
-    vt->level_names =
-      (gchar **) g_realloc (vt->level_names, sizeof (gchar *) * vt->nlevels);
-  }
-  vt->level_counts[level] = 1;
-  vt->level_values[level] = level+1;
-  vt->level_names[level] = g_strdup(value);
+  self_add_col_level(self, j, value, -1);
   
   self_set_raw_value(self, i, j, (gdouble) vt->level_values[level]);
 }
@@ -570,25 +585,11 @@ get_col_n_levels(self, guint j)
   return(vt->nlevels);
 }
 
-public guint
-get_col_level_index(self, guint j, guint value) {
-  vartabled *vt = self_get_vartable(self, j);
-  guint i = 0;
-
-  g_return_val_if_fail(self_get_col_type(self, j) == categorical, -1);  
-  
-  for (i = 0; i < vt->nlevels; i++) {
-    if (vt->level_values[i] == value)
-      return i;
-  }
-  return -1;
-}
-
 public gchar* 
 get_col_level_name(self, guint j, guint value)
 {
   vartabled *vt = self_get_vartable(self, j);
-  guint i = self_get_col_level_index(self, j, value);
+  gint i = self_get_col_level_for_value(self, j, value);
 
   g_return_val_if_fail(self_get_col_type(self, j) == categorical, NULL);
   
@@ -600,7 +601,7 @@ public guint
 get_col_level_count(self, guint j, guint value)
 {
   vartabled *vt = self_get_vartable(self, j);
-  guint i = self_get_col_level_index(self, j, value);
+  gint i = self_get_col_level_for_value(self, j, value);
 
   g_return_val_if_fail(self_get_col_type(self, j) == categorical, 0);  
 
@@ -728,6 +729,36 @@ get_col_mean(self, guint j)
   return vt->mean;
 }
 
+private void
+add_col_level(self, guint j, const gchar *name, gint value)
+{
+  vartabled *vt = self_get_vartable(self, j);
+  guint level = vt->nlevels++;
+  if (vt->nlevels == 1) {
+    vt->level_values = (gint *)   g_malloc (sizeof (gint));
+    vt->level_counts = (gint *)   g_malloc (sizeof (gint));
+    vt->level_names  = (gchar **) g_malloc (sizeof (gchar *));
+  } else {
+    vt->level_values =
+      (gint *) g_realloc (vt->level_values, sizeof (gint) * vt->nlevels);
+    vt->level_counts =
+      (gint *) g_realloc (vt->level_counts, sizeof (gint) * vt->nlevels);
+    vt->level_names =
+      (gchar **) g_realloc (vt->level_names, sizeof (gchar *) * vt->nlevels);
+  }
+  vt->level_counts[level] = 1;
+  if (value == -1)
+    value = level+1;
+  vt->level_values[level] = value;
+  if (!name)
+    vt->level_names[level] = g_strdup_printf("%d", value);
+  else vt->level_names[level] = g_strdup(name);
+  g_hash_table_insert(vt->name_to_level, vt->level_names[level], 
+    GINT_TO_POINTER(level));
+  g_hash_table_insert(vt->value_to_level, GINT_TO_POINTER(vt->level_values[level]), 
+    GINT_TO_POINTER(level));
+}
+  
 public void  
 set_col_levels(self, guint j, guint levels, gchar** names, guint* values, guint* counts)
 {
@@ -745,6 +776,10 @@ set_col_levels(self, guint j, guint levels, gchar** names, guint* values, guint*
     vt->level_names[i]  = g_strdup(names[i]);
     vt->level_counts[i] = (counts) ? counts[i] : 0;
     vt->level_values[i] = (values) ? values[i] : i+1;
+    g_hash_table_insert(vt->name_to_level, vt->level_names[i], 
+      GINT_TO_POINTER(i));
+    g_hash_table_insert(vt->value_to_level, GINT_TO_POINTER(vt->level_values[i]), 
+      GINT_TO_POINTER(i));
  }
 }
 
@@ -763,7 +798,7 @@ set_col_levels(self, guint j, guint levels, gchar** names, guint* values, guint*
 public gchar*
 get_string_value(self, guint i, guint j, gboolean transformed) 
 {
-  guint n = 0, lval = -1;
+  guint lval = -1;
   vartabled *vt = self_get_vartable(self, j);
   gdouble raw = transformed ? self->tform.vals[i][j] : self->raw.vals[i][j];
   
@@ -777,12 +812,7 @@ get_string_value(self, guint i, guint j, gboolean transformed)
   }
     return g_strdup_printf("%g", raw);
   
-  for (n = 0; n < vt->nlevels; n++) {
-    if (vt->level_values[n] == (guint) raw) {
-      lval = n;
-      break;
-    }
-  }
+  lval = self_get_col_level_for_value(self, j, (gint)raw);
   if (lval == -1) {  //useful for debugging
     g_warning ("Levels for %s specified incorrectly", vt->collab);
     return g_strdup_printf("%g", raw);
@@ -1009,6 +1039,8 @@ free (self)
     vartabled *vt = self_get_vartable(self, (guint)j); 
     if (vt->collab != NULL) g_free (vt->collab);
     if (vt->collab_tform != NULL) g_free (vt->collab_tform);
+    g_hash_table_destroy(vt->name_to_level);
+    g_hash_table_destroy(vt->value_to_level);
     g_free(vt);
   }
   g_free (self->vartable);

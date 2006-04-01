@@ -49,8 +49,6 @@
 #include <windows.h>
 #endif
 
-GGobiApp *ggobiApp;
-
 static GGobiOptions sessionoptions;
 GGobiOptions *sessionOptions;
 
@@ -83,15 +81,10 @@ const gchar *const ViewTypes[] = {
 const gint ViewTypeIndices[];
 
 static gchar *computeGGobiHome (char *str);
+static void initSessionOptions (int argc, char **argv);
 
-GGobiApp *
-getGGobiApp ()
-{
-  return (ggobiApp);
-}
-
-gint
-parse_command_line (gint * argc, gchar ** av)
+static gint
+parse_command_line (gint * argc, gchar ** av[])
 {
   static gboolean print_version = false;
   static gchar *active_color_scheme = NULL;
@@ -127,12 +120,8 @@ parse_command_line (gint * argc, gchar ** av)
   };
   
   GError *error = NULL;
-  GOptionContext *ctx = g_option_context_new("- platform for interactive graphics");
   
-  g_option_context_add_main_entries (ctx, entries, PACKAGE);
-  g_option_context_add_group (ctx, gtk_get_option_group (TRUE));
-  g_option_group_set_translation_domain (g_option_context_get_main_group (ctx), PACKAGE);
-  g_option_context_parse (ctx, argc, &av, &error);
+  gtk_init_with_args (argc, av, "- platform for interactive graphics", entries, PACKAGE, &error);
   
   if (error) {
     g_printerr ("Error parsing command line: %s\n", error->message);
@@ -153,7 +142,7 @@ parse_command_line (gint * argc, gchar ** av)
   sessionOptions->verbose = verbosity;
 
   (*argc)--;
-  av++;
+  (*av)++;
 
 /*
  * Test the values
@@ -162,9 +151,7 @@ parse_command_line (gint * argc, gchar ** av)
   if (*argc == 0)
     sessionOptions->data_in = NULL;
   else
-    sessionOptions->data_in = g_strdup (av[0]);
-
-  g_option_context_free(ctx);
+    sessionOptions->data_in = g_strdup ((*av)[0]);
   
   return 1;
 }
@@ -359,47 +346,13 @@ ggobi_alloc (ggobid * tmp)
                                            "Test handler", NULL, tmp, C);
 #endif
 
-  g_signal_emit_by_name (G_OBJECT (ggobiApp), "new_ggobi", tmp);
-
   return (tmp);
 }
-
-void
-ggobiInit (int *argc, char **argv[])
-{
-
-
-  if (ExtendedDisplayTypes)
-    return;
-
-  gtk_init (argc, argv);
-
-  ggobiApp = g_object_new (GGOBI_TYPE_APP, NULL);
-
-#ifdef TEST_GGOBI_APPP
-/*XXX FIX */
-  ggobi_registerNumberedKeyEventHandler (DummyKeyTest,
-                                           g_strdup
-                                           ("A string for the key handler"),
-                                           "Test handler", NULL, tmp, C);
-#endif
-
-  initSessionOptions (*argc, *argv);
-  
-  plugin_init ();
-
-  GGOBI_TYPE_GGOBI;
-  registerDisplayTypes ((GTypeLoad *) typeLoaders,
-                        sizeof (typeLoaders) / sizeof (typeLoaders)[0]);
-
-  registerDefaultPlugins (sessionOptions->info);
-}
-
 
   /* Available so that we can call this from R
      without any confusion between which main().
    */
-gint ggobi_main (gint argc, gchar * argv[], gboolean processEvents)
+gint ggobi_init (gint argc, gchar * argv[], gboolean processEvents)
 {
   GdkVisual *vis;
   ggobid *gg;
@@ -408,12 +361,20 @@ gint ggobi_main (gint argc, gchar * argv[], gboolean processEvents)
   bind_textdomain_codeset (PACKAGE, "UTF-8");
   textdomain (PACKAGE);
 
-  ggobiInit (&argc, &argv);
+  if (ExtendedDisplayTypes)
+    return 1;
 
-  vis = gdk_visual_get_system ();
+  initSessionOptions (argc, argv);
+  parse_command_line (&argc, &argv);
+  
+  plugin_init ();
 
-  parse_command_line (&argc, argv);
+  GGOBI_TYPE_GGOBI;
+  registerDisplayTypes ((GTypeLoad *) typeLoaders,
+                        sizeof (typeLoaders) / sizeof (typeLoaders)[0]);
 
+  registerDefaultPlugins (sessionOptions->info);
+  
   process_initialization_files ();
 
   if (sessionOptions->verbose == GGOBI_VERBOSE)
@@ -441,6 +402,7 @@ gint ggobi_main (gint argc, gchar * argv[], gboolean processEvents)
 
   gg = g_object_new (GGOBI_TYPE_GGOBI, NULL);
 
+  vis = gdk_visual_get_system ();
   gg->mono_p = (vis->depth == 1 ||
                 vis->type == GDK_VISUAL_STATIC_GRAY ||
                 vis->type == GDK_VISUAL_GRAYSCALE);
@@ -515,7 +477,7 @@ computeGGobiHome (char *str)
   return (dir);
 }
 
-void
+static void
 initSessionOptions (int argc, char **argv)
 {
   gchar *tmp;

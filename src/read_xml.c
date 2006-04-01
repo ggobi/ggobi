@@ -484,6 +484,8 @@ setLevelIndex (const xmlChar ** attrs, XMLParserData * data)
       g_printerr ("trouble: levels must be >= 0\n");
   }
   el->level_values[data->current_level] = itmp;
+  g_hash_table_insert(el->value_to_level, GINT_TO_POINTER(itmp), 
+    GINT_TO_POINTER(data->current_level));
 
   return (data->current_level);
 }
@@ -512,6 +514,10 @@ completeCategoricalLevels (XMLParserData * data)
       el->level_values[k] = min + k;
       if (el->level_names[k]) g_free(el->level_names[k]);
       el->level_names[k] = g_strdup_printf ("L%d", k + 1);
+      g_hash_table_insert(el->name_to_level, el->level_names[k], 
+        GINT_TO_POINTER(k));
+      g_hash_table_insert(el->value_to_level, GINT_TO_POINTER(el->level_values[k]), 
+        GINT_TO_POINTER(k));
     }
   }
 }
@@ -581,6 +587,9 @@ addLevel (XMLParserData * data, const gchar * c, gint len)
   } else
     el->level_names[lev] = g_strdup(val);
 
+  g_hash_table_insert(el->name_to_level, el->level_names[lev], 
+    GINT_TO_POINTER(lev));
+    
   g_free (val);
 }
 
@@ -1257,7 +1266,7 @@ setRecordValue (const char *tmp, GGobiData * d, XMLParserData * data)
         vt->level_counts[(gint) value]++;
       }
       else {
-        gint level = ggobi_data_get_col_level_index(d, data->current_element, value);
+        gint level = ggobi_data_get_col_level_for_value(d, data->current_element, (gint)value);
         if (level == -1) {
           ggobi_XML_error_handler (data,
                                    "incorrect level in record %d, variable `%s', dataset `%s' in the XML input file\n",
