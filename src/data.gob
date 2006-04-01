@@ -497,6 +497,21 @@ set_string_value(self, guint i, guint j, const gchar* value)
   }
 }
 
+public void
+set_integer_values(self, guint j, gint *values)
+{
+  guint i;
+  for (i = 0; i < self->nrows; i++) {
+    self_set_integer_value(self, i, j, values[i]);
+  }
+}
+
+public void
+set_integer_value(self, guint i, guint j, gint value)
+{
+  self_set_raw_value(self, i, j, (gdouble)value);
+}
+
 public vartyped 
 get_col_type(self, guint j)
 {
@@ -769,7 +784,7 @@ get_string_value(self, guint i, guint j, gboolean transformed)
     }
   }
   if (lval == -1) {  //useful for debugging
-    g_printerr ("Levels for %s specified incorrectly\n", vt->collab);
+    g_warning ("Levels for %s specified incorrectly", vt->collab);
     return g_strdup_printf("%g", raw);
   }
   
