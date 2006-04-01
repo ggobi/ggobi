@@ -24,8 +24,6 @@
 
 #include "display_tree.h"
 
-#include "print.h"
-
 DisplayOptions DefaultDisplayOptions = {
   true,                         /* points_show_p */
   true,                         /* axes_show_p */
@@ -141,14 +139,6 @@ set_display_option (gboolean active, guint action, displayd * display)
     break;
 
   case DOPT_EDGES_U:  /*-- undirected: edges only --*/
-/* Problem:  edgeset_add calls setDisplayEdge, which updates this
-   very menu, so that the item we clicked on is destroyed before we
-   finish handling the event we received on it.  One upshot of this
-   is that the checkbox isn't set correctly.
-   However ... if I don't add the edgeset until after all the options
-   have been correctly set, the problem vanishes!  -- dfs
-*/
-
     display->options.edges_undirected_show_p = active;
     /*if (active) {
        display_edges_directed_show (display, false);
@@ -344,22 +334,6 @@ set_display_options (displayd * display, ggobid * gg)
 
     set_display_option (active, i, display);
   }
-}
-
-
-void
-display_print (displayd * display)
-{
-  ggobid *gg;
-  gg = display->ggobi;
-
-  if (gg->printOptions == NULL) {
-    gg->printOptions = getDefaultPrintOptions (NULL);
-  }
-
-  if (DefaultPrintHandler.callback)
-    (*DefaultPrintHandler.callback) (gg->printOptions, display,
-                                     display->ggobi, &DefaultPrintHandler);
 }
 
 /*-- Close a display --*/
