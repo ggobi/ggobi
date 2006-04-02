@@ -128,7 +128,7 @@ typedef struct {
  } t1d;
 
  /*-- corr tour control panel --*/
- struct _TourCorrCpanel {s
+ struct _TourCorrCpanel {
    gfloat slidepos;
    gint manip_mode;
  } tcorr;
