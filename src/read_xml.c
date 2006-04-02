@@ -89,12 +89,11 @@ void startXMLElement (void *user_data, const xmlChar * name,
 void endXMLElement (void *user_data, const xmlChar * name);
 void Characters (void *user_data, const xmlChar * ch, gint len);
 void cumulateRecordData (XMLParserData * data, const xmlChar * ch, gint len);
-gint getAutoLevelIndex (const char *const label, XMLParserData * data,
-                        vartabled * el);
 static gboolean setRecordValue (const char *tmp, GGobiData * d,
                                 XMLParserData * data);
 void resetRecordInfo (XMLParserData * data);
 static void releaseCurrentDataInfo (XMLParserData * parserData);
+static void endVariable (XMLParserData *data);
 
 /*
  The different XML element names we recognize in the input format.
@@ -203,7 +202,7 @@ ggobi_XML_warning_handler (void *data, const gchar * msg, ...)
   xmlParserCtxtPtr p = (xmlParserCtxtPtr) ((XMLParserData *) data)->parser;
 
   va_start (ap, msg);
-  fprintf (stderr, "Warning from XML parsing [%d, %d]: ",
+  g_warning ("XML parsing [%d, %d]: ",
            (int) p->input->line, (int) p->input->col);
 
   g_vfprintf (stderr, msg, ap);
@@ -217,7 +216,7 @@ ggobi_XML_error_handler (void *data, const gchar * msg, ...)
   va_list ap;
   xmlParserCtxtPtr p = (xmlParserCtxtPtr) ((XMLParserData *) data)->parser;
 
-  fprintf (stderr, "Error in XML parsing [line %d, column %d]: ",
+  g_critical ("XML parsing [line %d, column %d]: ",
            (int) p->input->line, (int) p->input->col);
 
   va_start (ap, msg);
@@ -292,20 +291,6 @@ data_xml_read (InputDescription * desc, ggobid * gg)
   g_free (xmlParserHandler);
   g_free (name);
 
-#ifdef XXX
-  {
-    GSList *l;
-    GGobiData *d;
-    ok = true;
-    for (l = gg->d; l; l = l->next) {
-      d = (GGobiData *) l->data;
-      /* ok &= (d->ncols > 0 && d->nrows > 0); */
-      /*-- a simple edge set has no variables --*/
-      ok &= (d->nrows > 0);
-    }
-  }
-#endif
-
   return (dlist);
 }
 
@@ -317,6 +302,8 @@ initParserData (XMLParserData * data, xmlSAXHandlerPtr handler, ggobid * gg)
   data->current_variable = 0;
   data->current_element = 0;
   data->current_data = NULL;
+  data->current_level_value = 0;
+  data->current_level_name = NULL;
 
   data->current_color = 0;
   data->reading_colormap_file_p = false;
@@ -465,132 +452,66 @@ setLevelIndex (const xmlChar ** attrs, XMLParserData * data)
   const gchar *tmp = getAttribute (attrs, "value");
   gint itmp;
   GGobiData *d = getCurrentXMLData (data);
-  vartabled *el = ggobi_data_get_vartable(d, data->current_variable);
-
-  data->current_level++; /*-- current_level here ranges from 0 to nlevels-1 --*/
 
 /*-- dfs: placeholder for proper debugging --*/
-  if (data->current_level >= el->nlevels) {
-/*XXX Put in a more terminal error! */
-    ggobi_XML_error_handler (data, "trouble: adding too many levels to %s\n",
+  if (data->current_level >= data->current_nlevels) {
+    ggobi_XML_warning_handler (data, "adding too many levels to %s\n",
                              ggobi_data_get_col_name(d, data->current_variable));
   }
 /* */
 
-  itmp = data->current_level;
+  itmp = data->current_level + 1;
   if (tmp != NULL) {
     itmp = atoi (tmp);
-    if (itmp < 0)
-      g_printerr ("trouble: levels must be >= 0\n");
   }
-  el->level_values[data->current_level] = itmp;
-  g_hash_table_insert(el->value_to_level, GINT_TO_POINTER(itmp), 
-    GINT_TO_POINTER(data->current_level));
-
-  return (data->current_level);
+  data->current_level_value = itmp;
+  
+  return (data->current_level++);
 }
 
-/*
- * If the user hasn't supplied level names and values, fill in
- * default values:  Level 0 .... Level (nlevels-1)
-*/
-void
-completeCategoricalLevels (XMLParserData * data)
-{
-  GGobiData *d = getCurrentXMLData (data);
-  vartabled *el = ggobi_data_get_vartable(d, data->current_variable);
-  gint min = 1;
-
-  if (data->current_level == -1) {
-    gint k;
-
-    if (el->lim_specified_p)
-      min = (gint) el->lim_specified.min;
-
-    /*-- Alert the user what we're about to do --*/
-    g_print ("Supplying default level values for \"%s\" ranging from %d:%d\n",
-             ggobi_data_get_col_name(d, data->current_variable), min, min + el->nlevels - 1);
-    for (k = 0; k < el->nlevels; k++) {
-      el->level_values[k] = min + k;
-      if (el->level_names[k]) g_free(el->level_names[k]);
-      el->level_names[k] = g_strdup_printf ("L%d", k + 1);
-      g_hash_table_insert(el->name_to_level, el->level_names[k], 
-        GINT_TO_POINTER(k));
-      g_hash_table_insert(el->value_to_level, GINT_TO_POINTER(el->level_values[k]), 
-        GINT_TO_POINTER(k));
-    }
-  }
-}
-
-
-//FIXME: need new vartable function: load from xml
 void
 categoricalLevels (const xmlChar ** attrs, XMLParserData * data)
 {
   GGobiData *d = getCurrentXMLData (data);
-  vartabled *el = ggobi_data_get_vartable(d, data->current_variable);
-  gint i;
 
   const gchar *tmp = getAttribute (attrs, "count");
 
+  data->current_nlevels = G_MAXINT;
   if (tmp != NULL) {
-    el->nlevels = atoi (tmp);
-    if (el->nlevels > 0) {
-      el->level_values = (gint *) g_malloc (el->nlevels * sizeof (gint));
-      el->level_counts = (gint *) g_malloc (el->nlevels * sizeof (gint));
-      el->level_names = (gchar **) g_malloc (el->nlevels * sizeof (gchar *));
-      for (i = 0; i < el->nlevels; i++) {
-        el->level_counts[i] = 0;
-        el->level_names[i] = NULL;
-      }
-    }
-    else {
-      el->level_values = NULL;
-      el->level_counts = NULL;
-      el->level_names = NULL;
+    data->current_nlevels = atoi (tmp);
+    if (data->current_nlevels < 1) {
+      ggobi_XML_error_handler (stderr, "Level count for %s mis-specified\n", 
+        ggobi_data_get_col_name(d, data->current_variable));
     }
   }
 
-  data->current_level = -1;     /* We'll increment the first one. */
-
-  if (el->nlevels < 1) {
-    fprintf (stderr, "Levels for %s mis-specified\n", el->collab);
-    fflush (stderr);
-  }
+  data->current_level = 0;
 }
 
 void
 addLevel (XMLParserData * data, const gchar * c, gint len)
 {
-  GGobiData *d = getCurrentXMLData (data);
-  vartabled *el = ggobi_data_get_vartable(d, data->current_variable);
-  gint lev = data->current_level;
-
-  gchar *val = g_strdup (c);
-
-/*XXX check not off by one! If so, probably increment
-  data->current_level. */
-  if (data->current_level >= el->nlevels)
-    g_printerr ("trouble: adding too many levels to %s\n", el->collab);
-
   /*
    * This is a kludge, I admit, but if a level name includes special
    * characters (such as &), the string is somehow fed into this
    * routine in pieces.  This section of code glues the separate
    * pieces back together again.  -- dfs
   */
-  if (el->level_names[lev]) {
-    gchar *tmp = g_strdup(el->level_names[lev]);
-    g_free(el->level_names[lev]);
-    el->level_names[lev] = g_strdup_printf ("%s%s", tmp, val);
-    g_free(tmp);
-  } else
-    el->level_names[lev] = g_strdup(val);
+  if (data->current_level_name) {
+    gchar *tmp = g_strconcat(data->current_level_name, c, NULL);
+    g_free(data->current_level_name);
+    data->current_level_name = tmp;
+  } else data->current_level_name = g_strdup(c);
+}
 
-  g_hash_table_insert(el->name_to_level, el->level_names[lev], 
-    GINT_TO_POINTER(lev));
-    
-  g_free (val);
+void
+endCategoricalLevel (XMLParserData *data)
+{
+  GGobiData *d = getCurrentXMLData (data);
+  ggobi_data_add_col_level (d, data->current_variable, data->current_level_name, 
+    data->current_level_value);
+  g_free (data->current_level_name);
+  data->current_level_name = NULL;
 }
 
 void
@@ -757,6 +678,7 @@ endXMLElement (void *user_data, const xmlChar * name)
     data->current_element++;
     break;
   case VARIABLE:
+    endVariable(data);
   case REAL_VARIABLE:
   case CATEGORICAL_VARIABLE:
   case COUNTER_VARIABLE:
@@ -770,9 +692,9 @@ endXMLElement (void *user_data, const xmlChar * name)
   case COLORMAP:
     break;
   case CATEGORICAL_LEVELS:
-    completeCategoricalLevels (data);
     break;
   case CATEGORICAL_LEVEL:
+    endCategoricalLevel (data);
     break;
   case TOP:
     /* resolve all the edges */
@@ -1197,29 +1119,23 @@ void
 xml_warning (const gchar * attribute, const gchar * value, const gchar * msg,
              XMLParserData * data)
 {
-  g_printerr ("Incorrect data (record %d)\n", data->current_record);
-  g_printerr ("\t%s %s: value = %s\n", attribute, msg, value);
+  ggobi_XML_warning_handler(data, "%s %s: value = %s\n", 
+    attribute, msg, value);
 }
 
-static vartabled *
+static void
 applyRandomUniforms (GGobiData * d, XMLParserData * data)
 {
-  vartabled *vt = NULL;
-  while (data->current_element < d->raw.ncols
-         && (vt = ggobi_data_get_vartable(d, data->current_element))
-         && vt->vartype == uniform) {
+  gint j, ncols = ggobi_data_get_n_cols(d);
+  for (j = data->current_element; j < ncols && ggobi_data_get_col_type(d, j) == uniform; j++) {
     ggobi_data_set_raw_value(d, data->current_record, data->current_element, randvalue());
-    vt = ggobi_data_get_vartable(d, ++(data->current_element));
   }
-
-  return (vt);
 }
 
 static gboolean
 setRecordValue (const char *tmp, GGobiData * d, XMLParserData * data)
 {
   gdouble value;
-  vartabled *vt;
 
   /* If we have a counter variable in this dataset, check whether the
      cursor is at that. */
@@ -1238,9 +1154,8 @@ setRecordValue (const char *tmp, GGobiData * d, XMLParserData * data)
     return (false);
   }
 
-/*  vt = ggobi_data_get_vartable(d, data->current_element); */
-  vt = applyRandomUniforms (d, data);
-  if (!vt)
+  applyRandomUniforms (d, data);
+  if (!ggobi_data_get_n_cols(d))
     return (true);
 
   /*
@@ -1260,33 +1175,27 @@ setRecordValue (const char *tmp, GGobiData * d, XMLParserData * data)
 
     value = asNumber (tmp);
 
-    if (vt->vartype == categorical) {
+    if (ggobi_data_get_col_type(d, data->current_element) == categorical) {
       if (data->autoLevels && data->autoLevels[data->current_element]) {
-        value = getAutoLevelIndex (tmp, data, vt);
-        vt->level_counts[(gint) value]++;
+        ggobi_data_set_categorical_value(d, data->current_record, 
+          data->current_element, tmp);
       }
       else {
-        gint level = ggobi_data_get_col_level_for_value(d, data->current_element, (gint)value);
-        if (level == -1) {
-          ggobi_XML_error_handler (data,
-                                   "incorrect level in record %d, variable `%s', dataset `%s' in the XML input file\n",
-                                   (int) data->current_record + 1, vt->collab,
-                                   data->current_data->name ? data->
-                                   current_data->name : "");
+        if (ggobi_data_get_col_level_for_value(d, data->current_element, value) == -1) {
+          ggobi_XML_warning_handler (data,
+            "incorrect level in record %d, variable `%s', dataset `%s' in the XML input file\n",
+            (int) data->current_record + 1, ggobi_data_get_col_name(d, data->current_element),
+            data->current_data->name ? data->current_data->name : "");
         }
-        else {
-          vt->level_counts[level]++;
-        }
+        ggobi_data_set_raw_value(d, data->current_record, data->current_element, value);
       }
     }
     else if (data->state == STRING) {
       ggobi_XML_error_handler (data,
-                               "<string> element for non categorical variable (%s) in record %d\n",
-                               vt->collab, (int) data->current_record + 1);
+        "<string> element for non categorical variable (%s) in record %d\n",
+        ggobi_data_get_col_name(d, data->current_element), (int) data->current_record + 1);
       value = 0;
-    }
-    
-    ggobi_data_set_raw_value(d, data->current_record, data->current_element, value);
+    } else ggobi_data_set_raw_value(d, data->current_record, data->current_element, value);
   }
 
   return (true);
@@ -1371,10 +1280,10 @@ newVariable (const xmlChar ** attrs, XMLParserData * data,
   const gchar *tmp, *tmp1;
   GGobiData *d = getCurrentXMLData (data);
   vartabled *el;
-
+  
   if (data->current_variable >= d->ncols) {
-    g_printerr
-      ("Too many variables (%d) given number given in the <variables count='%d'> element for dataset %s\n",
+    ggobi_XML_error_handler
+      (data, "More variables (%d) than given in the <variables count='%d'> element for dataset %s\n",
        data->current_variable, d->raw.ncols, d->name);
     return (false);
   }
@@ -1384,10 +1293,10 @@ newVariable (const xmlChar ** attrs, XMLParserData * data,
   data->variable_transform_name_as_attribute = false;
 
   tmp = getAttribute (attrs, "name");
-  ggobi_data_set_col_name(d, data->current_variable, (gchar*) tmp);
+  ggobi_data_set_col_name(d, data->current_variable, tmp);
 
   tmp = getAttribute (attrs, "nickname");
-  if (tmp != NULL) el->nickname = g_strdup (tmp);
+  if (tmp != NULL) ggobi_data_set_col_nickname(d, data->current_variable, tmp);
 
   /*
    * I don't think we plan to support this, so I'm ifdef-ing out
@@ -1421,29 +1330,24 @@ newVariable (const xmlChar ** attrs, XMLParserData * data,
 
 
   if (strcmp ((const char *) tagName, "categoricalvariable") == 0) {
-    el->vartype = categorical;
+    ggobi_data_set_col_type(d, data->current_variable, categorical);
 
     /* Mark this as being a variable for which we must compute the levels. */
     if ((tmp = getAttribute (attrs, "levels")) && strcmp (tmp, "auto") == 0) {
       if (data->autoLevels == NULL) {
-        data->autoLevels = (GHashTable **)
-          g_malloc0 (sizeof (GHashTable *) * data->current_data->ncols);
+        data->autoLevels = g_new0(gboolean, data->current_data->ncols);
       }
-      /* glib-2.0 provides a g_hash_table_new_full with which we can
-         specify the `free' routine for elements. This should simplify
-         (slightly) releaseCurrentDataInfo(). */
-      data->autoLevels[data->current_variable] = g_hash_table_new (g_str_hash,
-                                                                   g_str_equal);
+      data->autoLevels[data->current_variable] = true;
     }
   }
   else if (strcmp ((const char *) tagName, "integervariable") == 0) {
-    el->vartype = integer;
+    ggobi_data_set_col_type(d, data->current_variable, integer);
   }
   else if (strcmp ((const char *) tagName, "countervariable") == 0) {
-    el->vartype = counter;
+    ggobi_data_set_col_type(d, data->current_variable, counter);
   }
   else if (strcmp ((const char *) tagName, "randomuniformvariable") == 0) {
-    el->vartype = uniform;
+    ggobi_data_set_col_type(d, data->current_variable, uniform);
   }                             /* real by default */
 
 
@@ -1480,6 +1384,14 @@ allocVariables (const xmlChar ** attrs, XMLParserData * data)
   return (true);
 }
 
+static void
+endVariable (XMLParserData *data)
+{
+  GGobiData *d = getCurrentXMLData (data);
+  ggobi_data_set_col_name(d, data->current_element, data->current_name);
+  g_free(data->current_name);
+  data->current_name = NULL;
+}
 
 /*
   Reads the text in name and assigns it as the name of the
@@ -1492,36 +1404,18 @@ allocVariables (const xmlChar ** attrs, XMLParserData * data)
 gboolean
 setVariableName (XMLParserData * data, const xmlChar * name, gint len)
 {
-  gchar *tmp = (gchar *) g_malloc (sizeof (gchar) * (len + 1));
-  GGobiData *d = getCurrentXMLData (data);
-  vartabled *el = ggobi_data_get_vartable(d, data->current_variable);
-  gchar *lbl = g_strdup_printf ("Var %d", data->current_variable);
-
-  tmp[len] = '\0';
-  memcpy (tmp, name, len);
-
+  gchar *tmp = g_strndup(name, len);
+  
   /* Handle the case where we have multiple calls to the characters
      handler for the same variable because the data is split
    */
-  if (el->collab != NULL) {
+  if (data->current_name != NULL) {
     /* need to append tmp to the existing value. */
-  }
+    gchar *name = g_strconcat(data->current_name, tmp);
+    g_free(data->current_name);
+    data->current_name = name;
+  } else data->current_name = g_strdup(tmp);
 
-  el->collab = tmp;
-
-  /* Note that if we do have multiple calls to this for the same
-     variable then we cannot handle the case where the 
-     user does not specify the transformation variable
-     unless we use a flag in XMLParserData. This is
-     variable_transform_name_as_attribute.
-   */
-  /* problem: this is never NULL, it's either 'Var n' or something specified */
-  /*if (el->collab_tform == NULL) { */
-  if (strcmp (el->collab_tform, lbl) == 0) {
-    el->collab_tform = g_strdup (tmp);
-  }
-
-  g_free (lbl);
   g_free (tmp);
 
   return (true);
@@ -1559,20 +1453,8 @@ releaseCurrentDataInfo (XMLParserData * parserData)
   if (!parserData->current_data)
     return;
 
-
-  if (parserData->autoLevels) {
-    int i;
-    for (i = 0; i < parserData->current_data->ncols; i++) {
-      if (parserData->autoLevels[i]) {
-        /* don't free the keys (so pass NULL as third argument) 
-           since these are used in the level_names array. */
-        g_hash_table_foreach (parserData->autoLevels[i],
-                              (GHFunc) freeLevelHashEntry, NULL);
-        g_hash_table_destroy (parserData->autoLevels[i]);
-      }
-    }
-    parserData->autoLevels = NULL;
-  }
+  if (parserData->autoLevels)
+    g_free(parserData->autoLevels);
 }
 
 
@@ -1585,7 +1467,7 @@ setDataset (const xmlChar ** attrs, XMLParserData * parserData,
 
   name = getAttribute (attrs, "name");
   nickname = getAttribute (attrs, "nickname");
-  ggobi_data_set_name(data, (gchar *) name, (gchar *) nickname);
+  ggobi_data_set_name(data, name, nickname);
 
   parserData->current_data = data;
   parserData->counterVariableIndex = -1;
@@ -1794,54 +1676,6 @@ setBrushStyle (const xmlChar ** attrs, XMLParserData * data)
   }
 
   return retval;
-}
-
-
-gint
-getAutoLevelIndex (const char *const label, XMLParserData * data,
-                   vartabled * el)
-{
-  GHashTable *tbl = data->autoLevels[data->current_element];
-  gpointer val;
-  gint index = -1;
-  gint i;
-  val = g_hash_table_lookup (tbl, (gconstpointer) label);
-
-  if (!val) {
-    gint *itmp;
-    gint n = el->nlevels + 1;
-    if (n == 1) {
-      el->level_values = (gint *) g_malloc (sizeof (gint) * n);
-      el->level_counts = (gint *) g_malloc (sizeof (gint) * n);
-      el->level_names = (gchar **) g_malloc (sizeof (gchar *) * n);
-      for (i = 0; i < el->nlevels; i++)
-        el->level_counts[i] = 0;
-    }
-    else {
-      el->level_values =
-        (gint *) g_realloc (el->level_values, sizeof (gint) * n);
-      el->level_counts =
-        (gint *) g_realloc (el->level_counts, sizeof (gint) * n);
-      el->level_names =
-        (gchar **) g_realloc (el->level_names, sizeof (gchar *) * n);
-    }
-    el->level_counts[n - 1] = 0;
-    el->level_values[n - 1] = n - 1;
-    el->level_names[n - 1] = g_strdup (label);
-    g_hash_table_insert(el->name_to_level, el->level_names[n - 1], 
-      GINT_TO_POINTER(n-1));
-    g_hash_table_insert(el->value_to_level, GINT_TO_POINTER(el->level_values[n - 1]), 
-      GINT_TO_POINTER(n-1));
-
-    itmp = (gint *) g_malloc (sizeof (gint));
-    *itmp = index = n - 1;
-    g_hash_table_insert (tbl, el->level_names[n - 1], itmp);
-    el->nlevels++;
-  }
-  else
-    index = *((gint *) val);
-
-  return (index);
 }
 
 /* Routines for walking the hash table and getting all the row labels

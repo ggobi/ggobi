@@ -32,8 +32,6 @@
 #include "vars.h"
 #include "externs.h"
 
-#include "print.h"
-
 #include "read_init.h"
 #include "colorscheme.h"
 

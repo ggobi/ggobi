@@ -12,7 +12,7 @@ libggobi_la_SOURCES = array.c ash1d.c barchart.c barchartClass.c \
   impute.c impute_ui.c io.c jitter.c jitter_ui.c limits.c lineedit.c \
   lineedit_ui.c main_ui.c make_ggobi.c marshal.c menus.c missing.c \
   movepts.c movepts_ui.c noop-toggle.c p1d.c p1d_ui.c parcoords.c \
-  parcoordsClass.c parcoords_ui.c plugin.c pipeline.c ppcorr_ui.c print.c \
+  parcoordsClass.c parcoords_ui.c plugin.c pipeline.c ppcorr_ui.c \
   read_init.c read_color.c read_csv.c read_xml.c scale_api.c scale_drag.c \
   scale_ui.c scatmat.c scatmatClass.c scatmat_ui.c scatterplot.c \
   scatterplotClass.c scatterplot_ui.c schemes.c schemes_ui.c sphere.c \
@@ -29,7 +29,7 @@ libggobi_la_LIBADD = $(libggobi_la_GOBOBJECTS) @LIBLTDL@
 libggobi_la_DEPENDENCIES = $(libggobi_la_GOBOBJECTS)
 pkginclude_HEADERS = GGobiAPI.h ggobiClass.h tour1d_pp.h GGobiApp.h \
   noop-toggle.h tour2d_pp.h GGobiEvents.h parcoordsClass.h tour_pp.h \
-  barchartDisplay.h plugin.h tsPlot.h brushing.h print.h tsdisplay.h \
+  barchartDisplay.h plugin.h tsPlot.h brushing.h tsdisplay.h \
   colorscheme.h read_csv.h types.h config.h read_init.h vars.h cpanel.h \
   read_xml.h varseldata.h defines.h scatmatClass.h vartable.h display.h \
   scatterplotClass.h display_tree.h splash.h write_xml.h ggobi-intl.h \

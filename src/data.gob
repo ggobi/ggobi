@@ -96,12 +96,6 @@ typedef struct _BrushBins {
 %{
 #include "vars.h"
 #include "externs.h"
-
-static void
-print_entry (gpointer key, gpointer val, gpointer data)
-{
-    printf ("\t\"%d\" translates to \"%d\"\n", GPOINTER_TO_INT(val), GPOINTER_TO_INT(val));
-}
 %}
 
 class GGobi:Data from G:Object {
@@ -251,7 +245,7 @@ get_name (self)
 }
 
 public void
-set_name (self, gchar *name, gchar *nickname)
+set_name (self, const gchar *name, const gchar *nickname)
 {
   if (name == NULL) name = g_strdup("unknown");
   if (nickname == NULL) nickname = g_strndup(name, 5);
@@ -285,7 +279,7 @@ get_col_nickname(self, guint j)
 }
 
 public guint
-get_col_index_by_name(self, gchar* value) 
+get_col_index_by_name(self, const gchar* value) 
 {
   guint i;
 
@@ -297,7 +291,7 @@ get_col_index_by_name(self, gchar* value)
 }
 
 public void 
-set_col_name(self, guint j, gchar* value) 
+set_col_name(self, guint j, const gchar* value) 
 {
   vartabled* vt = self_get_vartable(self, j);
 
@@ -305,9 +299,17 @@ set_col_name(self, guint j, gchar* value)
 
   vt->collab = g_strdup(value);
   vt->collab_tform = g_strdup(value);
-  vt->nickname = g_strndup (vt->collab, 2);
+  if (!vt->nickname)
+    vt->nickname = g_strndup (vt->collab, 2);
 
   self_col_name_changed(self, j);
+}
+
+public void 
+set_col_nickname(self, guint j, const gchar* value)
+{
+  vartabled* vt = self_get_vartable(self, j);
+  vt->nickname = g_strdup(value);
 }
 
 // FIXME: to be removed once pipeline in place
@@ -444,8 +446,9 @@ set_raw_value(self, guint i, guint j, gdouble value)
     self_set_missing(self, i, j);
   else {
     if (self_get_col_type(self, j) == categorical)
-      if (self_get_col_level_for_value(self, j, (gint)value) == -1)
-        self_add_col_level(self, j, NULL, (gint)value);
+      if (self_get_col_level_for_value(self, j, (gint) value) == -1) {
+        self_add_col_level(self, j, NULL, (gint) value);
+      }
     self->raw.vals[i][j] = value;
     self->tform.vals[i][j] = value;
   }
@@ -458,11 +461,9 @@ get_col_level_for_value(self, guint j, gint value)
   gpointer key, level_ptr;
   vartabled *vt = self_get_vartable(self, j);
   g_return_val_if_fail(self_get_col_type(self, j) == categorical, -1);
-  g_hash_table_foreach(vt->value_to_level, print_entry, NULL);
   if(!g_hash_table_lookup_extended(vt->value_to_level, GINT_TO_POINTER(value), 
       &key, &level_ptr))
     return(-1);
-  g_debug("found: %d", GPOINTER_TO_INT(level_ptr));
   return(GPOINTER_TO_INT(level_ptr));
 }
 
@@ -493,11 +494,10 @@ set_categorical_value(self, guint i, guint j, const gchar* value)
     self_set_raw_value(self, i, j, (gdouble) vt->level_values[level]);
     return;
   }
-  
   //not found, must be new level
   self_add_col_level(self, j, value, -1);
   
-  self_set_raw_value(self, i, j, (gdouble) vt->level_values[level]);
+  self_set_raw_value(self, i, j, (gdouble) vt->level_values[vt->nlevels-1]);
 }
 
 public void
@@ -703,7 +703,7 @@ get_col_min(self, guint j)
   if (self_get_col_type(self, j) != categorical) {
     return vt->lim.min;
   }
-
+// FIXME: shouldn't this also be cached?
   if (vt->nlevels && vt->nlevels > 0) {
     level_value_min = vt->level_values[0];
     for (i = 0; i < vt->nlevels; i++) {
@@ -731,7 +731,7 @@ get_col_mean(self, guint j)
   return vt->mean;
 }
 
-private void
+public void
 add_col_level(self, guint j, const gchar *name, gint value)
 {
   vartabled *vt = self_get_vartable(self, j);

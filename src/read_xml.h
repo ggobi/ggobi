@@ -54,7 +54,11 @@ typedef struct _XMLUserData {
   gint current_record;          /* Indexes the record we are currently working on. */
   gint current_element;         /* Indexes the values within a record. */
   gint current_level;           /* */
-
+  gint current_level_value;     /* Level value inside <level> */
+  gint current_nlevels;         /* Level count inside <levels> */
+  gchar *current_level_name;    /* Level name inside <level> character data */
+  gchar *current_name;          /* Variable name inside <variable> character data */
+  
   gint current_color;           /* The index of the current element
                                    being processed in the colormap */
 
@@ -118,7 +122,7 @@ typedef struct _XMLUserData {
 
   gint recordLabelsVariable;
 
-  GHashTable **autoLevels;
+  gboolean *autoLevels;
 
   gint counterVariableIndex;
 
