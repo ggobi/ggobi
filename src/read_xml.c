@@ -1837,6 +1837,10 @@ getAutoLevelIndex (const char *const label, XMLParserData * data,
     el->level_counts[n - 1] = 0;
     el->level_values[n - 1] = n - 1;
     el->level_names[n - 1] = g_strdup (label);
+    g_hash_table_insert(el->name_to_level, el->level_names[n - 1], 
+      GINT_TO_POINTER(n-1));
+    g_hash_table_insert(el->value_to_level, GINT_TO_POINTER(el->level_values[n - 1]), 
+      GINT_TO_POINTER(n-1));
 
     itmp = (gint *) g_malloc (sizeof (gint));
     *itmp = index = n - 1;
