@@ -168,8 +168,6 @@ brush_prev_vectors_update (GGobiData * d, ggobid * gg)
 {
   gint m, i;
 
-  g_assert (d->color.nels == d->nrows);
-
   if (d->color_prev.nels < d->nrows) {
     vectors_realloc (&d->color_prev, d->nrows);
     vectorb_realloc (&d->hidden_prev, d->nrows);
@@ -191,8 +189,6 @@ brush_undo (splotd * sp, GGobiData * d, ggobid * gg)
   gint m, i;
   if (!d)
     return;
-
-  g_assert (d->color.nels == d->nrows);
 
   for (m = 0; m < d->nrows_in_plot; m++) {
     i = d->rows_in_plot.els[m];
@@ -221,8 +217,6 @@ reinit_transient_brushing (displayd * dsp, ggobid * gg)
   cpaneld *cpanel = &dsp->cpanel;
   gboolean point_painting_p = (cpanel->br.point_targets != br_off);
   gboolean edge_painting_p = (cpanel->br.edge_targets != br_off);
-
-  g_assert (d->color.nels == d->nrows);
 
   if (point_painting_p) {
     for (m = 0; m < d->nrows_in_plot; m++) {
@@ -835,8 +829,6 @@ active_paint_points (splotd * sp, GGobiData * d, ggobid * gg)
   cpaneld *cpanel = &display->cpanel;
   gint (*f) (splotd * sp, GGobiData *, ggobid *) = NULL;
   BrushTargetType ttype;
-
-  g_assert (d->pts_under_brush.nels == d->nrows);
 
   if (GGOBI_IS_EXTENDED_SPLOT (sp)) {
     f = GGOBI_EXTENDED_SPLOT_GET_CLASS (sp)->active_paint_points;

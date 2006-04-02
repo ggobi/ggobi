@@ -141,9 +141,6 @@ brush_reset (displayd * display, gint action)
   GGobiData *e = display->e;
   cpaneld *cpanel = &display->cpanel;
 
-  g_assert (d->hidden.nels == d->nrows);
-  g_assert (!e || e->hidden.nels == e->nrows);
-
   switch (action) {
 
   case RESET_EXCLUDE_SHADOW_POINTS: /*-- exclude all shadowed points --*/

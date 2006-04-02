@@ -119,8 +119,6 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
   GGobiExtendedSPlotClass *klass = NULL;
   GGobiExtendedDisplayClass *displayKlass = NULL;
 
-  g_assert (d->hidden.nels == d->nrows);
-
   /*
    * There's a problem with parallel coordinates -- once 'draw points'
    * is turned off, we don't get whiskers, either.  Somehow we need to

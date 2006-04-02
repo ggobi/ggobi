@@ -127,8 +127,6 @@ splot_edges_draw (splotd * sp, gboolean draw_hidden, GdkDrawable * drawable,
     gint ncolors = MIN (MAXNCOLORS, scheme->n);
     gint k_prev = -1, n_prev = -1, p_prev = -1;
 
-    g_assert (e->color.nels == e->nrows);
-
     endpoints = resolveEdgePoints (e, d);
     if (!endpoints)
       return;

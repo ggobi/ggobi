@@ -318,12 +318,6 @@ initParserData (XMLParserData * data, xmlSAXHandlerPtr handler, ggobid * gg)
   data->defaults.edgeWidth = -1;  /*-- this has no home in ggobi --*/
   data->defaults.hidden = false;
 
-  /*
-   * I don't think we plan to support this feature, so I'm ifdef'ing
-   * out some buggy code later on in the file. dfs
-  */
-  data->recordLabelsVariable = -1;
-
   data->recordString = NULL;
   data->recordStringLength = 0;
 
@@ -1298,16 +1292,6 @@ newVariable (const xmlChar ** attrs, XMLParserData * data,
   tmp = getAttribute (attrs, "nickname");
   if (tmp != NULL) ggobi_data_set_col_nickname(d, data->current_variable, tmp);
 
-  /*
-   * I don't think we plan to support this, so I'm ifdef-ing out
-   * some buggy code elsewhere in the file -- dfs
-   */
-#if RECORD_LABELS_VARIABLE
-  tmp = getAttribute (attrs, "recordLabel");
-  if (tmp != NULL) {
-    data->recordLabelsVariable = data->current_variable;
-  }
-#endif
 
   tmp = getAttribute (attrs, "min");
   tmp1 = getAttribute (attrs, "max");

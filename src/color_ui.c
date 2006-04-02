@@ -390,8 +390,6 @@ set_color_fg (GtkWidget * w, GdkEventButton * event, ggobid * gg)
   displayd *display = (displayd *) sp->displayptr;
   GGobiData *d = display->d;
 
-  g_assert (d->color.nels == d->nrows);
-
   for (i = 0; i < d->nrows; i++)
     d->color_prev.els[i] = d->color.els[i];
   gg->color_id = k;

@@ -129,10 +129,6 @@ hide_cluster_cb (GtkToggleButton * btn, gpointer cbd)
   GGobiData *d = datad_get_from_notebook (gg->cluster_ui.notebook, gg);
   gboolean prev, changed = false;
 
-  g_assert (d->sampled.nels == d->nrows);
-  g_assert (d->clusterid.nels == d->nrows);
-  g_assert (d->hidden.nels == d->nrows);
-
   /*-- operating on the current sample, whether hidden or shown --*/
   for (i = 0; i < d->nrows; i++) {
     if (d->sampled.els[i]) {
@@ -162,8 +158,6 @@ include_hiddens (gboolean include, GGobiData * d, ggobid * gg)
   displayd *dsp = gg->current_display;
   cpaneld *cpanel = &dsp->cpanel;
   gboolean prev, changed = false;
-
-  g_assert (d->excluded.nels == d->nrows);
 
   for (i = 0; i < d->nrows; i++) {
     prev = d->excluded.els[i];
@@ -243,8 +237,6 @@ cluster_symbol_cb (GtkWidget * w, GdkEventExpose * event, gpointer cbd)
   gboolean proceed = true;
   gint targets = cpanel->br.point_targets;
   gint nd = g_slist_length (gg->d);
-
-  g_assert (d->clusterid.nels == d->nrows);
 
 /*
  * Almost surely the user is not trying to collapse groups, so

@@ -125,9 +125,6 @@ limits_raw_set (GGobiData * d, gboolean visible_only)
 {
   gint j;
 
-  g_assert (d->raw.nrows == d->nrows);
-  g_assert (d->raw.ncols == d->ncols);
-
   for (j = 0; j < d->ncols; j++)
     limits_raw_set_by_var (d, j, visible_only);
 }
@@ -235,9 +232,6 @@ static void
 limits_tform_set (GGobiData * d, gboolean visible_only)
 {
   gint j;
-
-  g_assert (d->tform.nrows == d->nrows);
-  g_assert (d->tform.ncols == d->ncols);
 
   for (j = 0; j < d->ncols; j++) {
     limits_tform_set_by_var (d, j, visible_only);

@@ -375,11 +375,10 @@ gint ggobi_init (gint argc, gchar * argv[], gboolean processEvents)
   
   process_initialization_files ();
 
-  if (sessionOptions->verbose == GGOBI_VERBOSE)
+  if (sessionOptions->verbose == GGOBI_VERBOSE) {
     g_printerr ("progname = %s\n", g_get_prgname ());
-
-  if (sessionOptions->verbose == GGOBI_VERBOSE)
-    g_printerr ("data_in = %s\n", sessionOptions->data_in);
+    g_printerr ("data_in = %s\n", sessionOptions->data_in);    
+  }
 
   if (sessionOptions->info->colorSchemeFile
       && sessionOptions->colorSchemes == NULL) {

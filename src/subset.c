@@ -57,8 +57,6 @@ static void
 subset_clear (GGobiData *d, ggobid *gg) {
   gint i;
 
-  g_assert (d->sampled.nels == d->nrows);
-
   for (i=0; i<d->nrows; i++)
     d->sampled.els[i] = false;
     
@@ -76,8 +74,6 @@ subset_apply (GGobiData *d, ggobid *gg) {
 void
 subset_include_all (GGobiData *d, ggobid *gg) {
   gint i;
-
-  g_assert (d->sampled.nels == d->nrows);
 
   for (i=0; i<d->nrows; i++)
     d->sampled.els[i] = true;

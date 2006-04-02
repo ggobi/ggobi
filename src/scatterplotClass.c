@@ -758,8 +758,6 @@ scatterplotMovePointsButtonCb (displayd * display, splotd * sp, GtkWidget * w,
 {
   GGobiData *d = gg->current_display->d;
 
-  g_assert (d->clusterid.nels == d->nrows);
-
   if (d->nearest_point != -1) {
     movepts_history_add (d->nearest_point, sp, d, gg);
 

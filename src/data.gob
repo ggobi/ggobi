@@ -496,7 +496,6 @@ set_categorical_value(self, guint i, guint j, const gchar* value)
   }
   //not found, must be new level
   self_add_col_level(self, j, value, -1);
-  
   self_set_raw_value(self, i, j, (gdouble) vt->level_values[vt->nlevels-1]);
 }
 
@@ -575,9 +574,6 @@ set_vartable (self, guint j, vartabled* value)
   self->vartable[j] = value;
 }
 
-
-// All the API functions work with value, so you never need
-// worry about the actual position in the array
 public gchar  
 get_col_n_levels(self, guint j)
 {
