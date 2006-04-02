@@ -1,6 +1,6 @@
 #include "ggobi.h"
 
-gint ggobi_main (gint argc, gchar * argv[], gboolean processEvents);
+gint ggobi_init (gint argc, gchar * argv[], gboolean processEvents);
 
 gint
 main (gint argc, gchar * argv[])

@@ -96,6 +96,12 @@ typedef struct _BrushBins {
 %{
 #include "vars.h"
 #include "externs.h"
+
+static void
+print_entry (gpointer key, gpointer val, gpointer data)
+{
+    printf ("\t\"%d\" translates to \"%d\"\n", GPOINTER_TO_INT(val), GPOINTER_TO_INT(val));
+}
 %}
 
 class GGobi:Data from G:Object {
@@ -428,6 +434,7 @@ set_raw_values(self, guint j, gdouble *values)
   for (i = 0; i < self->nrows; i++) {
     self_set_raw_value(self, i, j, values[i]);
   }
+  self_col_data_changed(self, j);
 }
 
 public void
@@ -451,9 +458,11 @@ get_col_level_for_value(self, guint j, gint value)
   gpointer key, level_ptr;
   vartabled *vt = self_get_vartable(self, j);
   g_return_val_if_fail(self_get_col_type(self, j) == categorical, -1);
+  g_hash_table_foreach(vt->value_to_level, print_entry, NULL);
   if(!g_hash_table_lookup_extended(vt->value_to_level, GINT_TO_POINTER(value), 
       &key, &level_ptr))
     return(-1);
+  g_debug("found: %d", GPOINTER_TO_INT(level_ptr));
   return(GPOINTER_TO_INT(level_ptr));
 }
 
@@ -488,7 +497,7 @@ set_categorical_value(self, guint i, guint j, const gchar* value)
   //not found, must be new level
   self_add_col_level(self, j, value, -1);
   
-  self_set_raw_value(self, i, j, (gdouble) vt->level_values[vt->nlevels-1]);
+  self_set_raw_value(self, i, j, (gdouble) vt->level_values[level]);
 }
 
 public void
@@ -511,6 +520,7 @@ set_integer_values(self, guint j, gint *values)
   for (i = 0; i < self->nrows; i++) {
     self_set_integer_value(self, i, j, values[i]);
   }
+  self_col_data_changed(self, j);
 }
 
 public void
@@ -802,11 +812,10 @@ get_string_value(self, guint i, guint j, gboolean transformed)
     g_ascii_dtostr(buf, G_ASCII_DTOSTR_BUF_SIZE, raw);
     return buf;
   }
-    return g_strdup_printf("%g", raw);
   
-  lval = self_get_col_level_for_value(self, j, (gint)raw);
+  lval = self_get_col_level_for_value(self, j, (gint) raw);
   if (lval == -1) {  //useful for debugging
-    g_warning ("Levels for %s specified incorrectly", vt->collab);
+    g_warning ("Levels for %s specified incorrectly", self_get_col_name(self, j));
     return g_strdup_printf("%g", raw);
   }
   
@@ -832,6 +841,7 @@ set_row_id(self, guint i, gchar* value, gboolean check) {
 
   self->rowIds[i] = g_strdup(value);
   g_hash_table_insert (self->idTable, self->rowIds[i], GINT_TO_POINTER(i));
+  g_debug("Setting row %i to %s", i, value);
 }
 
 public gchar*
@@ -841,6 +851,8 @@ get_row_id(self, guint i) {
 
 public guint 
 get_row_by_id(self, gchar *id) {
+  if (id == NULL)
+    return -1;
   gpointer pos = g_hash_table_lookup(self->idTable, id);
   if (pos == NULL)
     return -1;

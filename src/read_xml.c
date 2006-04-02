@@ -1611,15 +1611,6 @@ getCurrentXMLData (XMLParserData * parserData)
   return (data);
 }
 
-
-void
-setEdge (gint start, gint end, gint i, GGobiData * d)
-{
-  /*-- if encountering the first edge, allocate endpoints array --*/
-  if (d->edge.n == 0)
-    edges_alloc (d->nrows, d);
-}
-
 gboolean
 readXMLRecord (const xmlChar ** attrs, XMLParserData * data)
 {
@@ -1645,16 +1636,16 @@ readXMLRecord (const xmlChar ** attrs, XMLParserData * data)
 
   tmp = getAttribute (attrs, "id");
   if (tmp) {
-    gint m;
-    if ((m= ggobi_data_get_row_by_id(d, (gchar*) tmp)) != -1)
+    gint m = ggobi_data_get_row_by_id(d, (gchar*) tmp);
+    if (m != -1)
       ggobi_XML_error_handler (data,
         "duplicated id (%s) in records %d and %d of dataset %s\n",
         (gchar *) tmp,
         data->current_record + 1,
         m + 1,
         data->current_data->name);
-    ggobi_data_set_row_id(d, i, (gchar*) tmp, false);
   }
+  ggobi_data_set_row_id(d, (guint) i, (gchar*) tmp, false);
 
 /*
  * Probably something's missing here:  if edges should be

@@ -36,8 +36,9 @@ symbol_link_by_id (gboolean persistentp, gint k, GGobiData * sd, ggobid * gg)
 
   /*-- k is the row number in source_d --*/
 
-  //g_return_val_if_fail(sd->rowIds, false);
   id = ggobi_data_get_row_by_id(sd, sd->rowIds[k]);
+  if (id < 0)
+    return false;
 
   for (l = gg->d; l; l = l->next) {
     d = (GGobiData *) l->data;
@@ -99,6 +100,8 @@ exclude_link_by_id (guint k, GGobiData * sd, ggobid * gg)
 
   /*-- k is the row number in source_d --*/
   id = ggobi_data_get_row_by_id(sd, sd->rowIds[k]);
+  if (id < 0)
+    return false;
 
   for (l = gg->d; l; l = l->next) {
     d = (GGobiData *) l->data;

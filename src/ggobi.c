@@ -383,9 +383,6 @@ gint ggobi_init (gint argc, gchar * argv[], gboolean processEvents)
   if (sessionOptions->verbose == GGOBI_VERBOSE)
     g_printerr ("data_in = %s\n", sessionOptions->data_in);
 
-  if (DefaultPrintHandler.callback == NULL)
-    setStandardPrintHandlers ();
-
   if (sessionOptions->info->colorSchemeFile
       && sessionOptions->colorSchemes == NULL) {
     read_colorscheme (sessionOptions->info->colorSchemeFile,

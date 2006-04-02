@@ -197,20 +197,16 @@ move_pt (gint id, gint x, gint y, splotd * sp, GGobiData * d, ggobid * gg)
      */
     for (i = 0; i < d->nrows_in_plot; i++) {
       k = d->rows_in_plot.els[i];
-      if (k == id);
-      else {
-        if (d->clusterid.els[k] == cur_clust) {
-          if (!d->hidden_now.els[k]) {  /* ignore erased values altogether */
-            if (horiz)
-              sp->planar[k].x += gg->movepts.eps.x;
-            if (vert)
-              sp->planar[k].y += gg->movepts.eps.y;
+      if (k == id || d->clusterid.els[k] != cur_clust || d->hidden_now.els[k])
+        continue;
+        
+      if (horiz)
+        sp->planar[k].x += gg->movepts.eps.x;
+      if (vert)
+        sp->planar[k].y += gg->movepts.eps.y;
 
-            /*-- run only the latter portion of the reverse pipeline --*/
-            movept_plane_to_raw (sp, k, &gg->movepts.eps, d, gg);
-          }
-        }
-      }
+      /*-- run only the latter portion of the reverse pipeline --*/
+      movept_plane_to_raw (sp, k, &gg->movepts.eps, d, gg);
     }
   }
 

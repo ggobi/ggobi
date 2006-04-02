@@ -52,86 +52,6 @@ edges_free (GGobiData * d, ggobid * gg)
 }
 
 /* --------------------------------------------------------------- */
-/*               Add and delete edges                              */
-/* --------------------------------------------------------------- */
-
-/**
-  Allocate space for another edge observation and set the
-  locations of the rows.
- */
-gboolean
-edge_add (gint a, gint b, gchar * lbl, gchar * id, GGobiData * d,
-          GGobiData * e, ggobid * gg)
-{
-  gint n = e->edge.n;
-  GList *l, *sl;
-  splotd *sp;
-  displayd *dsp;
-
-/*-- while the code is evolving ... --*/
-  g_printerr ("lbl %s id %s\n", lbl, id);
-
-  g_assert (e->edge.n == e->nrows);
-
-  /*-- eventually check whether a->b already exists before adding --*/
-
-  /*-- Here's what the datad needs --*/
-
-  ggobi_data_add_rows(e, 1);
-  //ggobi_data_set_id(e, n+1, lbl)
-
-  edges_alloc (e->nrows, e);
-  e->edge.sym_endpoints[n].a = ggobi_data_get_row_id(d, a);
-  e->edge.sym_endpoints[n].b = ggobi_data_get_row_id(d, b);
-  e->edge.sym_endpoints[n].jpartner = -1; /* XXX */
-  unresolveAllEdgePoints (e);
-  resolveEdgePoints (e, d);
-
-/*
-DTL: So need to call unresolveEdgePoints(e, d) to remove it from the 
-     list of previously resolved entries.
-     Can do better by just re-allocing the endpoints in the
-     DatadEndpoints struct and putting the new entry into that,
-     except we have to check it resolves correctly, etc. So
-     unresolveEdgePoints() will just cause entire collection to be
-     recomputed.
-*/
-
-/*
- * This will be handled with signals, where each splotd listens
- * for (maybe) point_added or edge_added events.
-*/
-
-  for (l = gg->displays; l; l = l->next) {
-    dsp = (displayd *) l->data;
-    if (dsp->e == e) {
-      for (sl = dsp->splots; sl; sl = sl->next) {
-        sp = (splotd *) sl->data;
-        if (sp != NULL) {
-          splot_edges_realloc (n, sp, e);
-          /*-- this is only necessary if there are variables, I think --*/
-          if (e->ncols && GGOBI_IS_EXTENDED_SPLOT (sp)) {
-            GGobiExtendedSPlotClass *klass;
-            klass = GGOBI_EXTENDED_SPLOT_GET_CLASS (sp);
-            if (klass->alloc_whiskers)
-              sp->whiskers = klass->alloc_whiskers (sp->whiskers, sp,
-                                                    e->nrows, e);
-          }
-        }
-      }
-    }
-  }
-  /*-- I need to reallocate whiskers for some displays --*/
-
-  displays_tailpipe (FULL, gg);
-
-  /*-- I don't yet know what I need to reallocate for the tour --*/
-
-  return true;
-}
-
-
-/* --------------------------------------------------------------- */
 /*               Add an edgeset                                    */
 /* --------------------------------------------------------------- */
 
@@ -162,43 +82,6 @@ setDisplayEdge (displayd * dpy, GGobiData * e)
 }
 
 /**
-  This looks for the first dataset that can be used
-  as a source of edge information with the point dataset
-  associated with the given display.
-
-  @see setDisplayEdge.
- */
-gboolean
-edgeset_add (displayd * display)
-{
-  GGobiData *d;
-  GGobiData *e;
-  gint k;
-  gboolean added = false;
-  ggobid *gg;
-  if (!display)
-    return (false);
-
-  d = display->d;
-  gg = GGobiFromDisplay (display);
-
-  if (gg->d != NULL) {
-    gint nd = g_slist_length (gg->d);
-
-    for (k = 0; k < nd; k++) {
-      e = (GGobiData *) g_slist_nth_data (gg->d, k);
-      if ( /* e != d && */ e->edge.n > 0) {
-        setDisplayEdge (display, e);
-        added = true;
-        break;
-      }
-    }
-  }
-
-  return added;
-}
-
-/**
  Invoked when the user selected an item in the Edges menu 
  on a scatterplot to control whether edges are displayed or not
  on the plot.
@@ -207,8 +90,7 @@ void
 edgeset_add_cb (GtkAction * action, GGobiData * e)
 {
   ggobid *gg = e->gg;
-  displayd *display = GGOBI_DISPLAY (g_object_get_data (G_OBJECT (action),
-                                                        "display"));
+  displayd *display = GGOBI_DISPLAY (g_object_get_data (G_OBJECT (action), "display"));
 
   if (GTK_IS_TOGGLE_ACTION (action)
       && !gtk_toggle_action_get_active (GTK_TOGGLE_ACTION (action)))
