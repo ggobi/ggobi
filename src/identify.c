@@ -134,7 +134,7 @@ identify_link_by_id (gint k, GGobiData * source_d, ggobid * gg)
     if (d == source_d)
       continue;        /*-- skip the originating datad --*/
 
-    guint id = ggobi_data_get_row_by_id(d, source_d->rowIds[k]);
+    guint id = ggobi_data_get_row_for_id(d, source_d->rowIds[k]);
     if (id != -1) {
       inrange = true;
       d->nearest_point_prev = d->nearest_point;
@@ -161,14 +161,14 @@ sticky_id_link_by_id (gint whattodo, gint k, GGobiData * source_d,
   gpointer ptr = NULL;
 
   /*-- k is the row number in source_d --*/
-  id = ggobi_data_get_row_by_id(source_d, source_d->rowIds[k]);
+  id = ggobi_data_get_row_for_id(source_d, source_d->rowIds[k]);
 
   for (l = gg->d; l; l = l->next) {
     d = (GGobiData *) l->data;
     if (d == source_d)
       continue;        /*-- skip the originating datad --*/
 
-    i = ggobi_data_get_row_by_id(d, source_d->rowIds[k]);
+    i = ggobi_data_get_row_for_id(d, source_d->rowIds[k]);
 
     if (i < 0)          /*-- then no cases in d have this id --*/
       continue;

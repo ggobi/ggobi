@@ -37,7 +37,7 @@ clone_vars_cb (GtkWidget *w, ggobid *gg)
   gint *cols = (gint *) g_malloc (d->ncols * sizeof (gint));
   gint ncols = selected_cols_get (cols, d, gg);
 
-  if (ncols > 0)
+  if (ggobi_data_has_cols(d))
     clone_vars (cols, ncols, d);
 
   g_free (cols);
@@ -52,7 +52,7 @@ delete_vars_cb (GtkWidget *w, ggobid *gg)
   gint *cols = (gint *) g_malloc (d->ncols * sizeof (gint));
   gint ncols = selected_cols_get (cols, d, gg);
 
-  if (ncols > 0)
+  if (ggobi_data_has_cols(d))
     delete_vars (cols, ncols, d);
 
   g_free (cols);

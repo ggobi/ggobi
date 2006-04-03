@@ -879,7 +879,7 @@ ndatad_with_vars_get (ggobid *gg)
    nd = 0;
    for (l = gg->d; l; l = l->next) {
      d = (GGobiData *) l->data;
-     if (d->ncols > 0)
+     if (ggobi_data_has_cols(d))
        nd++;
    }
  }  else nd = 1;

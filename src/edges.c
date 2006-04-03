@@ -190,8 +190,8 @@ computeResolvedEdgePoints (GGobiData * e, GGobiData * d)
   gboolean resolved_p = false;
 
   for (gint i = 0; i < e->edge.n; i++) {
-    gint row_a = ggobi_data_get_row_by_id(d, e->edge.sym_endpoints[i].a);
-    gint row_b = ggobi_data_get_row_by_id(d, e->edge.sym_endpoints[i].b);
+    gint row_a = ggobi_data_get_row_for_id(d, e->edge.sym_endpoints[i].a);
+    gint row_b = ggobi_data_get_row_for_id(d, e->edge.sym_endpoints[i].b);
     g_debug("ids %s->%s : rows %i->%i", e->edge.sym_endpoints[i].a, e->edge.sym_endpoints[i].b, row_a, row_b);
 
     ans[i].a = (gint) row_a;

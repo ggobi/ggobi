@@ -588,7 +588,7 @@ projection_ok (ProjectionMode m, displayd * display)
   if (m <= COTOUR) {
     switch (m) {
     case P1PLOT:
-      if (d->ncols < 1)
+      if (!ggobi_data_has_cols(d))
         ok = false;
       break;
     case XYPLOT:

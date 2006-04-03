@@ -85,7 +85,7 @@ g_printerr ("numDatasets %d\n", numDatasets);
 gboolean
 write_xml_dataset(FILE *f, GGobiData *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 {
-  if (ggobi_data_has_edges(d) && !ggobi_data_has_variables(d)) {
+  if (ggobi_data_has_edges(d) && !ggobi_data_has_cols(d)) {
     write_xml_edges(f, d, gg, xmlWriteInfo);
   } else {
     write_dataset_header (f, d, gg, xmlWriteInfo);
@@ -333,7 +333,7 @@ write_xml_record (FILE *f, GGobiData *d, ggobid *gg, gint i,
 
   fprintf(f, ">\n");
 
-  if (gg->save.column_ind == ALLCOLS && d->ncols > 0) {
+  if (gg->save.column_ind == ALLCOLS && ggobi_data_has_cols(d)) {
     for(j = 0; j < d->ncols; j++) {
       /*-- if missing, figure out what to write --*/
       if (ggobi_data_is_missing(d, i, j) &&
@@ -351,7 +351,7 @@ write_xml_record (FILE *f, GGobiData *d, ggobid *gg, gint i,
       if (j < d->ncols-1 )
         fprintf(f, " ");
      }
-  } else if (gg->save.column_ind == SELECTEDCOLS && d->ncols > 0) {
+  } else if (gg->save.column_ind == SELECTEDCOLS && ggobi_data_has_cols(d)) {
     /*-- work out which columns to save --*/
     gint *cols = (gint *) g_malloc (d->ncols * sizeof (gint));
     gint ncols = selected_cols_get (cols, d, gg);

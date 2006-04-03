@@ -47,7 +47,7 @@ record_add (eeMode mode, gint a, gint b, gchar * lbl, gchar * id,
   if (!id)
     id = g_strdup_printf ("%d", dtarget->nrows + 1);
   
-  if (ggobi_data_get_row_by_id(d, id) != -1) {
+  if (ggobi_data_get_row_for_id(d, id) != -1) {
     g_printerr ("That id (%s) is already used\n", id);
     return false;
   }
@@ -55,7 +55,7 @@ record_add (eeMode mode, gint a, gint b, gchar * lbl, gchar * id,
   i = ggobi_data_add_rows(dtarget, 1);
   ggobi_data_set_row_id(dtarget, i, lbl, true);
 
-  if (dtarget->ncols) {
+  if (ggobi_data_has_cols(dtarget)) {
     for (j = 0; j < dtarget->ncols; j++) {
       if (strcmp (vals[j], "NA") == 0) {  /*-- got a missing --*/
         ggobi_data_set_missing(dtarget, i, j);
@@ -138,7 +138,7 @@ DTL: So need to call unresolveEdgePoints(e, d) to remove it from the
     }
   }
 
-  if (dtarget->ncols) {
+  if (ggobi_data_has_cols(dtarget)) {
     for (l = gg->displays; l; l = l->next) {
       dsp = (displayd *) l->data;
       if (dsp->d == dtarget) {
@@ -189,7 +189,7 @@ record_add_defaults (GGobiData * d, GGobiData * e, displayd * display,
 
   dtarget = (cpanel->ee_mode == ADDING_EDGES) ? e : d;
 
-  if (dtarget->ncols) {
+  if (ggobi_data_has_cols(dtarget)) {
     void fetch_default_record_values (gchar ** vals,
                                       GGobiData *, displayd *, ggobid * gg);
     vals = (gchar **) g_malloc (dtarget->ncols * sizeof (gchar *));
@@ -206,7 +206,7 @@ record_add_defaults (GGobiData * d, GGobiData * e, displayd * display,
     record_add (cpanel->ee_mode, -1, -1, lbl, lbl, vals, d, e, gg);
   }
 
-  if (dtarget->ncols) {
+  if (ggobi_data_has_cols(dtarget)) {
     for (j = 0; j < dtarget->ncols; j++)
       g_free (vals[j]);
     g_free (vals);

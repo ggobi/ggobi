@@ -1143,7 +1143,7 @@ setRecordValue (const char *tmp, GGobiData * d, XMLParserData * data)
   }
 
   applyRandomUniforms (d, data);
-  if (!ggobi_data_has_variables(d))
+  if (!ggobi_data_has_cols(d))
     return (true);
 
   /*
@@ -1497,7 +1497,7 @@ readXMLRecord (const xmlChar ** attrs, XMLParserData * data)
 
   tmp = getAttribute (attrs, "id");
   if (tmp) {
-    gint m = ggobi_data_get_row_by_id(d, (gchar*) tmp);
+    gint m = ggobi_data_get_row_for_id(d, (gchar*) tmp);
     if (m != -1)
       ggobi_XML_error_handler (data,
         "duplicated id (%s) in records %d and %d of dataset %s\n",

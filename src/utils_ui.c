@@ -299,7 +299,7 @@ variable_notebook_subwindow_add (GGobiData * d, GCallback func,
   GtkSelectionMode mode = (GtkSelectionMode)
     g_object_get_data (G_OBJECT (notebook), "SELECTION");
 
-  if (d->ncols == 0)
+  if (!ggobi_data_has_cols(d))
     return;
 
   if (vtype == categorical) {
@@ -376,7 +376,7 @@ variable_notebook_adddata_cb (ggobid * gg, GGobiData * d, void *notebook)
   if ((dtype == all_datatypes) ||
       (dtype == no_edgesets && d->edge.n == 0) ||
       (dtype == edgesets_only && d->edge.n > 0)) {
-    if (d->ncols) {
+    if (!ggobi_data_has_cols(d)) {
       variable_notebook_subwindow_add (d, func, func_data, notebook, vtype,
                                        dtype, gg);
     }
@@ -592,7 +592,7 @@ CHECK_EVENT_SIGNATURE (variable_notebook_adddata_cb, datad_added_f)
     if ((dtype == all_datatypes) ||
         (dtype == no_edgesets && d->edge.n == 0) ||
         (dtype == edgesets_only && d->edge.n > 0)) {
-      if (d->ncols) {
+      if (!ggobi_data_has_cols(d)) {
         variable_notebook_subwindow_add (d, func, func_data, notebook, vtype,
                                          dtype, gg);
       }
@@ -675,7 +675,7 @@ prefixed_variable_notebook_adddata_cb (ggobid * gg, GGobiData * d,
     (datatyped) g_object_get_data (G_OBJECT (notebook), "datatype");
   if ((dtype == all_datatypes) || (dtype == no_edgesets && d->edge.n == 0)
       || (dtype == edgesets_only && d->edge.n > 0)) {
-    if (d->ncols)
+    if (!ggobi_data_has_cols(d))
       variable_notebook_page_add_prefices (GTK_WIDGET (notebook),
                                            gtk_notebook_get_n_pages
                                            (GTK_NOTEBOOK (notebook)) - 1);

@@ -281,7 +281,7 @@ get_col_nickname(self, guint j)
 }
 
 public guint
-get_col_index_by_name(self, const gchar* value) 
+get_col_index_for_name(self, const gchar* value) 
 {
   guint i;
 
@@ -292,6 +292,17 @@ get_col_index_by_name(self, const gchar* value)
   return -1;
 }
 
+/** 
+ * set_col_name:
+ * Set column name
+ *
+ * @self: GGobiData object
+ * @j: column index
+ * @value: new column name (if NULL uses column index)
+ *
+ * Also sets nickname to the first two letters.
+ * Emits #col_name_changed signal.
+ */
 public void 
 set_col_name(self, guint j, const gchar* value) 
 {
@@ -796,12 +807,13 @@ set_col_levels(self, guint j, guint levels, gchar** names, guint* values, guint*
  * Get string representation of value
  *
  * @self: #GGobiData object
- * @self: row
- * @self: column
- * @self: transformed or raw values?
+ * @i: row index
+ * @j: column index
+ * @transformed: transformed or raw values?
  *
  * This currently returns a locale insensitive string, suitable for
- * output into csv etc.  It may be sub-optimal for user display.
+ * output into csv etc.  It may be sub-optimal for user display, because
+ * it does not use the users locale settings, and outputs full precision.
  */
 public gchar*
 get_string_value(self, guint i, guint j, gboolean transformed) 
@@ -841,13 +853,13 @@ has_edges (self)
 }
 
 /*
- * has_variables:
+ * has_cols:
  * Test if this dataset has any variables
  *
  * @self: #GGobiData object
  */
 public gboolean 
-has_variables (self) 
+has_cols (self) 
 {
   return (self->ncols > 0);
 }
@@ -869,13 +881,22 @@ set_row_id(self, guint i, gchar* value, gboolean check) {
   if (value == NULL)
     value = g_strdup_printf("%d", i+1);
 
-  //g_return_if_fail(check && self_get_row_by_id(self, value) == -1);
+  //g_return_if_fail(check && self_get_row_for_id(self, value) == -1);
 
   self->rowIds[i] = g_strdup(value);
   g_hash_table_replace (self->idTable, self->rowIds[i], GINT_TO_POINTER(i));
   g_debug("Setting row %i to %s", i, value);
 }
 
+/** 
+ * get_row_id:
+ * Retrive row id for specified row.
+ * 
+ * @self: #GGobiData object
+ * @i: row
+ * 
+ * Returns: duplicate of row id if present, NULL otherwise
+ */
 public gchar*
 get_row_id(self, guint i) {
   if (self->rowIds[i]) 
@@ -884,8 +905,17 @@ get_row_id(self, guint i) {
     return NULL;
 }
 
+/** 
+ * get_row_for_id:
+ * Get row index corresponding to row id
+ *  
+ * @self: #GGobiData object
+ * @id: row id string
+ * 
+ * Returns: row index if found, -1 otherwise
+ */
 public gint
-get_row_by_id(self, gchar *id) {
+get_row_for_id(self, gchar *id) {
   gpointer pos, key;
   if (id && g_hash_table_lookup_extended(self->idTable, id, &key, &pos))
     return GPOINTER_TO_INT(pos);
@@ -901,11 +931,10 @@ get_row_by_id(self, gchar *id) {
  *
  * Adds extra rows, allocating space as needed.
  *
- * This emits the rows_added signal.  Listeners to this signal should
- * assume that there is no useful data in any of the new rows, and it should
- * be mainly for allocating space in other places.
+ * This emits the cols_added signal and also runs
+ * #set_rows_in_plot which emits the rows_in_plot_changed signal.
  *
- * Returns: row index of first new row
+ * Returns: index of first new row
  */
 public guint
 add_rows(self, guint n) {
@@ -939,7 +968,6 @@ add_rows(self, guint n) {
 
   if (self_has_edges(self))
     vectorb_realloc (&self->edge.xed_by_brush, self->edge.n);
-    
 
   for (i = nprev; i < self->nrows; i++) {    
     self->color.els[i] = def_color;
@@ -975,6 +1003,7 @@ add_rows(self, guint n) {
  * @self: #GGobiData object
  * @n: number of rows to add
  *
+ * Returns: index of first new column
  */ 
 public guint 
 add_cols(self, guint n) {
@@ -1005,7 +1034,7 @@ delete_cols(self, guint *cols, gint ncols)
   gint j;
   gint *keepers, nkeepers;
   
-  g_return_val_if_fail(ncols < self->ncols, self->ncols);
+  g_return_val_if_fail(ncols < self->ncols, !self_has_cols(self));
 
   // FIXME: shouldn't find_keepers be able to handle this allocation??
   keepers = g_malloc ((self->ncols - ncols) * sizeof (gint));
@@ -1096,6 +1125,19 @@ free (self)
   g_free(self);
 }
 
+/*
+ * attach:
+ * Attach a GGobi object to this dataset
+ *
+ * @self: #GGobiData object
+ * @gg: GGobi object
+ * @cleanup: should cleanup occur?
+ *
+ * The purpose of this function is to hook up the #GGobiData object
+ * to all the gui components and make sure they stay in sync by
+ * listening to the correct signals.  This function still needs a lot of
+ * work.
+ */
 public void 
 attach (self, ggobid *gg, gboolean cleanup)
 {
@@ -1168,7 +1210,7 @@ attach (self, ggobid *gg, gboolean cleanup)
     gg->pmode = NULL_PMODE;
 
     /*-- initialize the first display --*/
-    if(sessionOptions->info->createInitialScatterPlot && self->ncols > 0) {
+    if(sessionOptions->info->createInitialScatterPlot && self_has_cols(self)) {
       display = scatterplot_new (false, NULL, self, gg);
 
       gg->displays = g_list_append (gg->displays, (gpointer) display);

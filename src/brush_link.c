@@ -36,7 +36,7 @@ symbol_link_by_id (gboolean persistentp, gint k, GGobiData * sd, ggobid * gg)
 
   /*-- k is the row number in source_d --*/
 
-  id = ggobi_data_get_row_by_id(sd, sd->rowIds[k]);
+  id = ggobi_data_get_row_for_id(sd, sd->rowIds[k]);
   if (id < 0)
     return false;
 
@@ -45,7 +45,7 @@ symbol_link_by_id (gboolean persistentp, gint k, GGobiData * sd, ggobid * gg)
     if (d == sd)
       continue;        /*-- skip the originating datad --*/
 
-    i = ggobi_data_get_row_by_id(d, sd->rowIds[id]);
+    i = ggobi_data_get_row_for_id(d, sd->rowIds[id]);
 
     if (i < 0)              /*-- then no cases in d have this id --*/
       continue;
@@ -99,7 +99,7 @@ exclude_link_by_id (guint k, GGobiData * sd, ggobid * gg)
   gboolean changed = false;
 
   /*-- k is the row number in source_d --*/
-  id = ggobi_data_get_row_by_id(sd, sd->rowIds[k]);
+  id = ggobi_data_get_row_for_id(sd, sd->rowIds[k]);
   if (id < 0)
     return false;
 
@@ -108,7 +108,7 @@ exclude_link_by_id (guint k, GGobiData * sd, ggobid * gg)
     if (d == sd)
       continue;        /*-- skip the originating datad --*/
 
-    i = ggobi_data_get_row_by_id(d, sd->rowIds[id]);
+    i = ggobi_data_get_row_for_id(d, sd->rowIds[id]);
 
     if (i < 0)              /*-- then no cases in d have this id --*/
       continue;
@@ -240,7 +240,7 @@ build_symbol_vectors_by_var (cpaneld * cpanel, GGobiData * d, ggobid * gg)
   if (!d->linkvar)
     return false;
 
-  j = ggobi_data_get_col_index_by_name(d, d->linkvar);
+  j = ggobi_data_get_col_index_for_name(d, d->linkvar);
   level_value_max = (gint) ggobi_data_get_col_max(d, j);
 
   vectorb_init_null (&levelv);
@@ -264,7 +264,7 @@ build_symbol_vectors_by_var (cpaneld * cpanel, GGobiData * d, ggobid * gg)
     GGobiData *dd = l->data;
     if (dd == d) continue;
 
-    j = ggobi_data_get_col_index_by_name(dd, d->linkvar);
+    j = ggobi_data_get_col_index_for_name(dd, d->linkvar);
     if (j != -1) {
       brush_link_by_var (j, &levelv, cpanel, dd, gg);
     }
@@ -290,7 +290,7 @@ void
 varlist_append (GtkListStore * list, GGobiData *d, gchar* name)
 {
   GtkTreeIter iter;
-  guint j = ggobi_data_get_col_index_by_name(d, name);
+  guint j = ggobi_data_get_col_index_for_name(d, name);
   
   if(ggobi_data_get_col_type(d, j) != categorical)
     return;
@@ -460,7 +460,7 @@ linkby_notebook_subwindow_add (GGobiData * d, GtkWidget * notebook,
 
   GtkSelectionMode mode = GTK_SELECTION_SINGLE;
 
-  if (d->ncols == 0)
+  if (!ggobi_data_has_cols(d))
     return;
 
   /* Create a scrolled window to pack the CList widget into */
@@ -530,7 +530,7 @@ create_linkby_notebook (GtkWidget * box, ggobid * gg)
 
   for (l = gg->d; l; l = l->next) {
     d = (GGobiData *) l->data;
-    if (d->ncols) {
+    if (ggobi_data_has_cols(d)) {
       linkby_notebook_subwindow_add (d, notebook, gg);
     }
   }

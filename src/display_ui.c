@@ -195,7 +195,7 @@ buildExtendedDisplayMenu (ggobid * gg, gint nd, GGobiData * d0)
         GGobiData *d = (GGobiData *) g_slist_nth_data (gg->d, k);
 
         /*-- add an item for each datad with variables --*/
-        if (d->ncols > 0) {
+        if (ggobi_data_has_cols(d)) {
           lbl = ggobi_data_get_name (d);
           cbdata = (ExtendedDisplayCreateData *)
             g_malloc (sizeof (ExtendedDisplayCreateData));
