@@ -982,7 +982,7 @@ binningPermitted (displayd * dpy)
      return(false);
    */
   /*-- if we're drawing edges --*/
-  if (e != NULL && e->edge.n > 0) {
+  if (e && ggobi_data_has_edges(e)) {
     if (dpy->options.edges_undirected_show_p ||
         dpy->options.edges_directed_show_p || dpy->options.whiskers_show_p) {
       return (false);

@@ -99,7 +99,7 @@ record_add (eeMode mode, gint a, gint b, gchar * lbl, gchar * id,
     GGobiData *dd;
     for (l = gg->d; l; l = l->next) {
       dd = (GGobiData *) l->data;
-      if (dd != dtarget && dd->edge.n > 0) {
+      if (dd != dtarget && ggobi_data_has_edges(dd)) {
         if (hasEdgePoints (dd, dtarget)) {
           unresolveAllEdgePoints (dd);
           resolveEdgePoints (dd, dtarget);
@@ -237,7 +237,7 @@ find_nearest_edge (splotd * sp, displayd * display, ggobid * gg)
   lineid = -1;
   near = 20 * 20;               /* If nothing is close, don't show any label */
 
-  if (e && e->edge.n > 0) {
+  if (e && ggobi_data_has_edges(e)) {
     endpointsd *endpoints = resolveEdgePoints (e, d);
     if (!endpoints)
       return (-1);

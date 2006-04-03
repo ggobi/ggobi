@@ -556,7 +556,7 @@ setEdgePartners (XMLParserData * parserData)
   gint i, k, n;
   gboolean dups = false;
 
-  if (e->edge.n <= 0)
+  if (!ggobi_data_has_edges(e))
     return;
 
   n = 2 * e->edge.n;
@@ -1143,7 +1143,7 @@ setRecordValue (const char *tmp, GGobiData * d, XMLParserData * data)
   }
 
   applyRandomUniforms (d, data);
-  if (!ggobi_data_get_n_cols(d))
+  if (!ggobi_data_has_variables(d))
     return (true);
 
   /*

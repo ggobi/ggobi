@@ -739,7 +739,7 @@ splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
    * ( What about stickies? )
   */
   /*-- moving this section breaks splot_redraw (QUICK) for adding edges --*/
-  if (sp != gg->current_splot && e && e->edge.n) {
+  if (sp != gg->current_splot && e && ggobi_data_has_edges(e)) {
     gboolean draw_edge;
     GGobiExtendedDisplayClass *displayKlass = NULL;
 

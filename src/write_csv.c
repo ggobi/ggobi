@@ -54,7 +54,7 @@ write_csv_record (gint i, gint *cols, gint ncols, FILE *f, GGobiData *d, ggobid 
   fprintf(f, "\"%s\",", ggobi_data_get_row_id(d, i));
 
   /* Source and destination, as strings, if edges are present */
-  if (gg->save.edges_p && d->edge.n) {
+  if (gg->save.edges_p && ggobi_data_has_edges(d)) {
     fprintf(f, "\"%s\",", g_strstrip(d->edge.sym_endpoints->a));
     fprintf(f, "\"%s\",", g_strstrip(d->edge.sym_endpoints->b));
   }

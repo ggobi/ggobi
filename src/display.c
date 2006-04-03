@@ -122,7 +122,7 @@ set_display_option (gboolean active, guint action, displayd * display)
     GGobiData *e;
     for (k = 0; k < nd; k++) {
       e = (GGobiData *) g_slist_nth_data (gg->d, k);
-      if (e->edge.n > 0) {
+      if (ggobi_data_has_edges(e)) {
         ne++;
         onlye = e;            /* meaningful if there's only one */
       }

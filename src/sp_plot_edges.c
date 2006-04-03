@@ -112,9 +112,8 @@ splot_edges_draw (splotd * sp, gboolean draw_hidden, GdkDrawable * drawable,
   GlyphType gtype;
   colorschemed *scheme = gg->activeColorScheme;
 
-  if (e == (GGobiData *) NULL || e->edge.n == 0) {
-     /**/ return;
-  }
+  if (e == NULL || !ggobi_data_has_edges(e))
+    return;
 
   edges_show_p = (display->options.edges_directed_show_p ||
                   display->options.edges_undirected_show_p);

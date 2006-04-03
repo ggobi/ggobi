@@ -85,7 +85,7 @@ g_printerr ("numDatasets %d\n", numDatasets);
 gboolean
 write_xml_dataset(FILE *f, GGobiData *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 {
-  if (d->edge.n && !d->ncols) {
+  if (ggobi_data_has_edges(d) && !ggobi_data_has_variables(d)) {
     write_xml_edges(f, d, gg, xmlWriteInfo);
   } else {
     write_dataset_header (f, d, gg, xmlWriteInfo);
@@ -281,7 +281,7 @@ write_xml_record (FILE *f, GGobiData *d, ggobid *gg, gint i,
   }
 
   /*-- edges if present and requested --*/
-  if (gg->save.edges_p && d->edge.n && i < d->edge.n) {
+  if (gg->save.edges_p && ggobi_data_has_edges(d) && i < d->edge.n) {
     fprintf(f, " source=\"%s\"", d->edge.sym_endpoints[i].a);
     fprintf(f, " destination=\"%s\"", d->edge.sym_endpoints[i].b);
   }
@@ -384,8 +384,9 @@ gboolean
 write_xml_edges (FILE *f, GGobiData *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 {
   gint i;
-  if (d->edge.n < 1)
-    return(true);
+  if (!ggobi_data_has_edges(d))
+    return true;
+
   /*
   fprintf(f, "<edges count=\"%d\" name=\"%s\">\n", d->edge.n,
   d->name); There seems to be a need to write the defaults in the case

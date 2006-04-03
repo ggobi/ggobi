@@ -90,7 +90,7 @@ scatterplot_display_edge_menu_update (displayd * display,
   endpointsd *endpoints;
   for (k = 0; k < nd; k++) {
     e = (GGobiData *) g_slist_nth_data (gg->d, k);
-    if (e->edge.n > 0) {
+    if (ggobi_data_has_edges(e)) {
       endpoints = resolveEdgePoints (e, d);
       if (endpoints != NULL) {
         ne++;
@@ -146,7 +146,7 @@ scatterplot_display_edge_menu_update (displayd * display,
 
     for (k = 0; k < nd; k++) {
       e = (GGobiData *) g_slist_nth_data (gg->d, k);
-      if (e->edge.n > 0) {
+      if (ggobi_data_has_edges(e)) {
         gchar *lbl, *path, *name;
         if (resolveEdgePoints (e, d) != NULL) {
           if (ne == 1) {

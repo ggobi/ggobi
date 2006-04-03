@@ -280,7 +280,7 @@ splot_draw_tour_axes (splotd * sp, GdkDrawable * drawable, ggobid * gg)
         if (abs (ix - axindent - daheight / 8) > 5 ||
             abs (iy + axindent - (daheight - daheight / 8)) > 5) {
           if (dsp->options.axes_label_p) {
-            varlab = ggobi_data_get_col_nickname(d, j);
+            varlab = ggobi_data_get_col_nickname(d, (guint) j);
           }
           else {
             varlab = g_strdup_printf ("%d", j + 1);

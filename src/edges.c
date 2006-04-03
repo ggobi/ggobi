@@ -165,7 +165,7 @@ edgesets_count (ggobid * gg)
 
   for (k = 0; k < nd; k++) {
     e = (GGobiData *) g_slist_nth_data (gg->d, k);
-    if (e->edge.n > 0)
+    if (ggobi_data_has_edges(e))
       ne++;
   }
 
@@ -222,7 +222,7 @@ do_resolveEdgePoints (GGobiData * e, GGobiData * d, gboolean compute)
   GList *tmp;
 
 
-  if (e->edge.n < 1)
+  if (!ggobi_data_has_edges(e))
     return (NULL);
 
   /* Get the entry in the table for this dataset (d). Use the name for now. */
@@ -300,7 +300,7 @@ unresolveEdgePoints (GGobiData * e, GGobiData * d)
   DatadEndpoints *ptr;
   GList *tmp;
 
-  if (e->edge.n < 1)
+  if (!ggobi_data_has_edges(e))
     return (false);
 
   for (tmp = e->edge.endpointList; tmp; tmp = tmp->next) {
