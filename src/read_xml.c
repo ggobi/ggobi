@@ -1162,7 +1162,6 @@ setRecordValue (const char *tmp, GGobiData * d, XMLParserData * data)
   else {
 
     value = asNumber (tmp);
-
     if (ggobi_data_get_col_type(d, data->current_element) == categorical) {
       if (data->autoLevels && data->autoLevels[data->current_element]) {
         ggobi_data_set_categorical_value(d, data->current_record, 
@@ -1431,8 +1430,10 @@ releaseCurrentDataInfo (XMLParserData * parserData)
   if (!parserData->current_data)
     return;
 
-  if (parserData->autoLevels)
+  if (parserData->autoLevels) {
     g_free(parserData->autoLevels);
+    parserData->autoLevels = NULL;
+  }
 }
 
 
