@@ -971,16 +971,10 @@ setColor (const xmlChar ** attrs, XMLParserData * data, gint i)
     value = atoi (tmp);
   }
 
-/*
- * this is testing against MAXNCOLORS, but it should test against the
- * current scheme
-*/
-  /*if(value < 0 || value > MAXNCOLORS) { */
   if (value < 0 || value >= scheme->n) {
     if (tmp)
       xml_warning ("color", tmp, "Out of range", data);
-  }
-  else {
+  } else {
     if (i < 0)
       data->defaults.color = value;
     else
@@ -1510,8 +1504,8 @@ readXMLRecord (const xmlChar ** attrs, XMLParserData * data)
         data->current_record + 1,
         m + 1,
         data->current_data->name);
+    ggobi_data_set_row_id(d, (guint) i, (gchar*) tmp, false);
   }
-  ggobi_data_set_row_id(d, (guint) i, (gchar*) tmp, false);
 
 /*
  * Probably something's missing here:  if edges should be

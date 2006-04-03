@@ -253,9 +253,9 @@ identify_label_fetch (gint k, cpaneld * cpanel, GGobiData * d, ggobid * gg)
 
   if (id_display_type & ID_RECORD_LABEL) {
     if (id_display_type & ~ID_RECORD_LABEL)
-      lbl = g_strdup_printf ("id=%s", ggobi_data_get_row_id(d, k));
+      lbl = g_strdup_printf ("id=%s", ggobi_data_get_row_id(d, (guint) k));
     else
-      lbl = ggobi_data_get_row_id(d, k);
+      lbl = ggobi_data_get_row_id(d, (guint) k);
     labels = g_list_append (labels, lbl);
   }
 
@@ -267,8 +267,9 @@ identify_label_fetch (gint k, cpaneld * cpanel, GGobiData * d, ggobid * gg)
       g_free (lbl);
       lbl = tmp_lbl;
     }
+    return lbl;
   }
-
-  return lbl;
+  
+  return g_strdup("");
 }
 

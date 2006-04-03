@@ -42,41 +42,21 @@ subset_init (GGobiData *d, ggobid *gg)
 /*         utilities used within this file                          */
 /*------------------------------------------------------------------*/
 
-static gboolean
-add_to_subset (gint i, GGobiData *d, ggobid *gg) {
-  gboolean added = false;
-
-  added = true;
-  d->sampled.els[i] = true;
-
-  return added;
-}
-
-/*-- remove everything from the subset before constructing a new one --*/
-static void
-subset_clear (GGobiData *d, ggobid *gg) {
+void
+subset_set_all(GGobiData *d, gboolean value) {
   gint i;
 
   for (i=0; i<d->nrows; i++)
-    d->sampled.els[i] = false;
-    
+    d->sampled.els[i] = value;
 }
 
 /*------------------------------------------------------------------*/
 
 void
-subset_apply (GGobiData *d, ggobid *gg) {
+subset_apply (GGobiData *d) {
   ggobi_data_set_rows_in_plot(d);
-  if (gg->cluster_ui.window != NULL)
-    cluster_table_update (d, gg);
-}
-
-void
-subset_include_all (GGobiData *d, ggobid *gg) {
-  gint i;
-
-  for (i=0; i<d->nrows; i++)
-    d->sampled.els[i] = true;
+  if (d->gg->cluster_ui.window != NULL)
+    cluster_table_update (d, d->gg);
 }
 
 /*
@@ -84,42 +64,37 @@ subset_include_all (GGobiData *d, ggobid *gg) {
  * Vol 2 of his series.
 */
 gboolean
-subset_random (gint n, GGobiData *d, ggobid *gg) {
-  gint t, m;
-  gboolean doneit = false;
+subset_random (gint n, GGobiData *d) {
+  gint t, m, top = d->nrows;
   gfloat rrand;
 
-  gint top = d->nrows;
+  subset_set_all(d, false);
 
-  subset_clear (d, gg);
+  if (n < 0 || n > top) 
+    return false;
 
-  if (n > 0 && n < top) {
-
-    for (t=0, m=0; t<top && m<n; t++) {
-      rrand = (gfloat) randvalue ();
-      if (((top - t) * rrand) < (n - m)) {
-        if (add_to_subset (t, d, gg))
-          m++;
-      }
+  for (t=0, m=0; t<top && m<n; t++) {
+    rrand = (gfloat) randvalue ();
+    if (((top - t) * rrand) < (n - m) && !d->sampled.els[t]) {
+      d->sampled.els[t] = true;
+      m++;            
     }
-
-    doneit = true;
   }
 
-  return (doneit);
+  return true;
 }
 
 gboolean
-subset_block (gint bstart, gint bsize, GGobiData *d, ggobid *gg)
+subset_block (gint bstart, gint bsize, GGobiData *d)
 {
   gint i, k;
   gboolean subsetsize = 0;
 
   if (bstart >= 0 && bstart < d->nrows && bsize > 0) {
-    subset_clear (d, gg);
+    subset_set_all(d, false);
 
     for (i=bstart, k=1; i<d->nrows && k<=bsize; i++, k++) {
-      add_to_subset (i, d, gg);
+      d->sampled.els[i] = true;
       subsetsize++;
     }
   }
@@ -131,14 +106,14 @@ subset_block (gint bstart, gint bsize, GGobiData *d, ggobid *gg)
 }
 
 gboolean
-subset_range (GGobiData *d, ggobid *gg)
+subset_range (GGobiData *d)
 {
   gint i, j;
   gint subsetsize = 0;
   vartabled *vt;
   gboolean add;
 
-  subset_clear (d, gg);
+  subset_set_all(d, false);
 
   for (i=0; i<d->nrows; i++) {
     add = true;
@@ -153,7 +128,7 @@ subset_range (GGobiData *d, ggobid *gg)
       }
     }
     if (add) {
-      add_to_subset (i, d, gg);
+      d->sampled.els[i] = true;
       subsetsize++;
     }
   }
@@ -165,51 +140,41 @@ subset_range (GGobiData *d, ggobid *gg)
 }
 
 gboolean
-subset_everyn (gint estart, gint estep, GGobiData *d, ggobid *gg)
+subset_everyn (gint estart, gint estep, GGobiData *d)
 {
   gint i;
   gint top = d->nrows;
 
-  gboolean doneit = false;
+  if (!(estart >= 0 && estart < top-1 && estep >= 0 && estep < top)) {
+    quick_message ("Interval not correctly specified.", false);
+    return(false);
+  }
+  
+  subset_set_all(d, false);
 
-  top -= 1;
-  if (estart >= 0 && estart < top-1 && estep >= 0 && estep < top) {
-    subset_clear (d, gg);
-
-    i = estart;
-    while (i < top) {
-      if (add_to_subset (i, d, gg))
-        i += estep;
-      else
-        i++;
-    }
-
-    doneit = true;
-
-  } else quick_message ("Interval not correctly specified.", false);
-
-  return doneit;
+  for(i = estart; i < top; i += estep)
+    d->sampled.els[i] = true;
+  
+  return true;
 }
 
 /*-- create a subset of only the points with sticky ids --*/
 /*-- Added by James Brook, Oct 1994 --*/
 gboolean
-subset_sticky (GGobiData *d, ggobid *gg)
+subset_sticky (GGobiData *d)
 {
   gint id;
   GSList *l;
-  gint top = d->nrows;
 
+  if (g_slist_length (d->sticky_ids) == 0)
+    return false;
+    
+  subset_set_all(d, false);
 
-  if (g_slist_length (d->sticky_ids) > 0) {
-
-    subset_clear (d, gg);
-
-    for (l = d->sticky_ids; l; l = l->next) {
-      id = GPOINTER_TO_INT (l->data);
-      if (id < top)
-        add_to_subset (id, d, gg);
-    }
+  for (l = d->sticky_ids; l; l = l->next) {
+    id = GPOINTER_TO_INT (l->data);
+    if (id < d->nrows)
+      d->sampled.els[id] = true;
   }
 
   return true;
@@ -217,44 +182,46 @@ subset_sticky (GGobiData *d, ggobid *gg)
 
 gboolean
 subset_rowlab (gchar *substr, gint substr_pos, gboolean ignore_case,
-  GGobiData *d, ggobid *gg)
+  GGobiData *d)
 {
   gint i;
-  gint top = d->nrows;
   gssize slen;
-  GtkWidget *w, *pnl;
-  
-  pnl = mode_panel_get_by_name(ggobi_getIModeName(IDENT), gg);
 
+  g_debug("Rowlab %s", substr);
+  
   if (substr == NULL || (slen = g_utf8_strlen(substr, -1)) == 0)
     return false;
 
-  /*-- remove all sticky labels --*/
-  w = widget_find_by_name (pnl, "IDENTIFY:remove_sticky_labels");
-  g_signal_emit_by_name (G_OBJECT (w), "clicked", gg);
-  /*-- --*/
-
-  subset_clear (d, gg);
+  subset_set_all(d, false);
 
   if (ignore_case)
     substr = g_utf8_strdown(substr, -1);
-  else substr = g_strdup(substr);
-  for (i=0; i<top; i++) {
+  else 
+    substr = g_strdup(substr);
+
+  for (i=0; i < d->nrows; i++) {
     gchar *label = ggobi_data_get_row_id(d, i);
+    
+    if (!label)
+      continue;
+    
     gint llen = g_utf8_strlen(label, -1);
     gint start = substr_pos == 3 ? llen - slen : 0;
     gint safe_len = llen < slen ? llen : slen;
+
     if (start < 0)
       continue;
     if (ignore_case)
       label = g_utf8_strdown(label, substr_pos == 2 ? safe_len : llen);
-    else label = g_strndup(label, substr_pos == 2 ? safe_len : llen);
+    else 
+      label = g_strndup(label, substr_pos == 2 ? safe_len : llen);
+
     if (substr_pos == 1 || substr_pos == 4) {
       gchar *inside = strstr(label, substr);
       if ((inside && substr_pos == 1) || (!inside && substr_pos == 4))
-        add_to_subset (i, d, gg);
+        d->sampled.els[i] = true;
     } else if (!g_utf8_collate(g_utf8_offset_to_pointer(label, start), substr))
-        add_to_subset (i, d, gg);
+        d->sampled.els[i] = true;
     g_free(label);
   }
   g_free(substr);

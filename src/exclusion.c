@@ -38,7 +38,7 @@ symbol_table_zero (GGobiData * d)
 gint
 symbol_table_populate (GGobiData * d)
 {
-  register gint i, j, k, m;
+  gint i, j, k, m;
   gint nclusters = 0;
 
   symbol_table_zero (d);
@@ -66,7 +66,7 @@ symbol_table_populate (GGobiData * d)
 void
 clusters_set (GGobiData * d)
 {
-  gint i, j, k, m;
+  guint i, j, k, m;
   gint n, nclusters;
   colorschemed *scheme;
 

@@ -192,6 +192,7 @@ computeResolvedEdgePoints (GGobiData * e, GGobiData * d)
   for (gint i = 0; i < e->edge.n; i++) {
     guint row_a = ggobi_data_get_row_by_id(d, e->edge.sym_endpoints[i].a);
     guint row_b = ggobi_data_get_row_by_id(d, e->edge.sym_endpoints[i].b);
+    g_debug("%s->%s : %i-%i", e->edge.sym_endpoints[i].a, e->edge.sym_endpoints[i].b, row_a, row_b);
 
     ans[i].a = (gint) row_a;
     ans[i].b = (gint) row_b;

@@ -150,14 +150,14 @@ static void
 rescale_cb (GtkWidget *w, ggobid *gg)
 {
   GGobiData *d = datad_get_from_widget (w, gg);
-  /*if (d) {
+  if (d) {
     limits_set (d, true, true, gg->lims_use_visible);
     vartable_limits_set (d);
     vartable_stats_set (d);
 
     tform_to_world(d);
     displays_tailpipe (FULL, gg);
-  }*/
+  }
 }
 
 static void
@@ -185,23 +185,23 @@ subset_cb (GtkWidget *w, ggobid *gg)
       sample_str = 
         gtk_editable_get_chars (GTK_EDITABLE (entry), 0, -1);
       d->subset.random_n = atoi (sample_str);
-      redraw = subset_random (d->subset.random_n, d, gg);
+      redraw = subset_random (d->subset.random_n, d);
     break;
     case SS_BLOCK:
       bstart = (gint) d->subset.bstart_adj->value;
       bsize = (gint) d->subset.bsize_adj->value;
-      redraw = subset_block (bstart-1, bsize, d, gg);
+      redraw = subset_block (bstart-1, bsize, d);
     break;
     case SS_RANGE:
-      redraw = subset_range (d, gg);
+      redraw = subset_range (d);
     break;
     case SS_EVERYN:
       estart = (gint) d->subset.estart_adj->value;
       estep = (gint) d->subset.estep_adj->value;
-      redraw = subset_everyn (estart-1, estep, d, gg);
+      redraw = subset_everyn (estart-1, estep, d);
     break;
     case SS_STICKY:
-      redraw = subset_sticky (d, gg);
+      redraw = subset_sticky (d);
     break;
     case SS_ROWLAB:
       /* use a toggle widget to specify whether to ignore case or not */
@@ -213,12 +213,12 @@ subset_cb (GtkWidget *w, ggobid *gg)
       substr = gtk_editable_get_chars (GTK_EDITABLE (entry), 0, -1);
       redraw = subset_rowlab (substr, d->subset.string_pos,
         gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(tgl)),
-        d, gg);
+        d);
     break;
   }
 
   if (redraw)
-    subset_apply (d, gg);
+    subset_apply (d);
 }
 
 static void
@@ -226,8 +226,8 @@ include_all_cb (GtkWidget *w, ggobid *gg) {
   GGobiData *d = datad_get_from_widget (w, gg);
 
   if (d != NULL) {
-    subset_include_all (d, gg);
-    subset_apply (d, gg);
+    subset_set_all (d, true);
+    subset_apply (d);
   }
 }
 

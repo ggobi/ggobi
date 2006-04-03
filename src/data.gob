@@ -192,7 +192,6 @@ property UINT ncols
    
 private signal first NONE (UINT) void 
 rows_in_plot_changed(self, guint n) {
-  g_debug("Rows in plot changed to %i", n);
   tform_to_world(self);
   if (self->gg)
     displays_tailpipe (FULL, self->gg);
@@ -842,7 +841,10 @@ set_row_id(self, guint i, gchar* value, gboolean check) {
 
 public gchar*
 get_row_id(self, guint i) {
-  return g_strdup(self->rowIds[i]);
+  if (self->rowIds[i]) 
+    return g_strdup(self->rowIds[i]);
+  else
+    return NULL;
 }
 
 public guint 
@@ -877,6 +879,8 @@ add_rows(self, guint n) {
   gint def_size =  self->gg ? self->gg->glyph_id.size : 1;
   guint i, nprev = self->nrows;
   self->nrows += n;
+  
+  g_debug("Default colour: %i", def_color);
 
   self->rowIds = (gchar **) g_realloc (self->rowIds, sizeof(gchar *) * self->nrows);
   vectorb_realloc (&self->excluded, self->nrows);
@@ -916,6 +920,8 @@ add_rows(self, guint n) {
     self->hidden_prev.els[i] = false;
     self->pts_under_brush.els[i] = false; 
     self->sampled.els[i] = true;
+    
+    self->rowIds[i] = NULL;
   }
   clusters_set(self);
   self_set_rows_in_plot(self);
