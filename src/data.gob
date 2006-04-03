@@ -847,14 +847,12 @@ get_row_id(self, guint i) {
     return NULL;
 }
 
-public guint 
+public gint
 get_row_by_id(self, gchar *id) {
-  if (id == NULL)
-    return -1;
-  gpointer pos = g_hash_table_lookup(self->idTable, id);
-  if (pos == NULL)
-    return -1;
-  return GPOINTER_TO_INT(pos);
+  gpointer pos, key;
+  if (id && g_hash_table_lookup_extended(self->idTable, id, &key, &pos))
+    return GPOINTER_TO_INT(pos);
+  return -1;
 }
 
 /*
