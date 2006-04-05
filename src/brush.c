@@ -164,26 +164,6 @@ brush_once (gboolean force, splotd * sp, ggobid * gg)
 }
 
 void
-brush_prev_vectors_update (GGobiData * d, ggobid * gg)
-{
-  gint m, i;
-
-  if (d->color_prev.nels < d->nrows) {
-    vectors_realloc (&d->color_prev, d->nrows);
-    vectorb_realloc (&d->hidden_prev, d->nrows);
-    vectorg_realloc (&d->glyph_prev, d->nrows);
-  }
-
-  for (m = 0; m < d->nrows_in_plot; m++) {
-    i = d->rows_in_plot.els[m];
-    d->color_prev.els[i] = d->color.els[i];
-    d->hidden_prev.els[i] = d->hidden.els[i];
-    d->glyph_prev.els[i].size = d->glyph.els[i].size;
-    d->glyph_prev.els[i].type = d->glyph.els[i].type;
-  }
-}
-
-void
 brush_undo (splotd * sp, GGobiData * d, ggobid * gg)
 {
   gint m, i;

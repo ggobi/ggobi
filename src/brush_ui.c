@@ -298,10 +298,6 @@ button_press_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
   d = display->d;
   e = display->e;
 
-  brush_prev_vectors_update (d, gg);
-  if (e != NULL)
-    brush_prev_vectors_update (e, gg);
-
   mousepos_get_pressed (w, event, &button1_p, &button2_p, sp);
 
   sp->motion_id = g_signal_connect (G_OBJECT (sp->da),

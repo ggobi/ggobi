@@ -55,7 +55,7 @@ typedef struct _Varpaneld {
 
 /*-------------------- transformation --------------------------------*/
 
-/* sphering transformation */
+/* sphering transformation **/
 typedef struct _Sphere_d {
   vector_i vars;        /*-- vars available to be sphered --*/
   vector_i vars_sphered;/*-- vars that have been sphered --*/
@@ -78,7 +78,7 @@ typedef struct _EdgeData {
   GList *endpointList;   
     /* a list of endpointsd elements corresponding to the resolved 
        record ids relative to a given datad. This is akin to a table
-       indexed by datad elements. */
+       indexed by datad elements. **/
 
   gint nxed_by_brush;
   vector_b xed_by_brush;
@@ -127,7 +127,7 @@ public EdgeData  edge;
 public BrushBins  brush;
 
 public GtkWidget *vartable_tree_view[all_vartypes];
-public GtkTreeModel *vartable_tree_model; /* the root model, with all vars */
+public GtkTreeModel *vartable_tree_model; /* the root model, with all vars **/
 
 // Vectors of length ncol
 public vartabled **vartable;
@@ -208,15 +208,41 @@ col_data_changed(self, guint j) {
     displays_tailpipe (FULL, self->gg);
 }
 
+/**
+ * cols_added:
+ * Columns added signal
+ * 
+ * @self: #GGobiData
+ * @n: number of new columns
+ **/
 private signal NONE (UINT) void
 cols_added(self, guint n);
 
+/**
+ * cols_deleted:
+ * @self: #GGobiData
+ * @j: Column deleted
+ *
+ * Columns deleted signal
+ **/
 private signal NONE (UINT) void
 col_deleted(self, guint j);
 
+/**
+ * rows_added:
+ * @self: #GGobiData
+ * @n: number of new rows
+ * 
+ * Rows added signal
+ **/
 private signal NONE (UINT) void
 rows_added(self, guint n);
 
+/** 
+ * init:
+ * @self: #GGobiData
+ * #GGobiData initialisation 
+ **/
 init (self) {
   sphere_init(self); 
   
@@ -228,6 +254,15 @@ init (self) {
   self->missings_show_p = true;
 }
 
+/** 
+ * new:
+ * @nrows: number of rows
+ * @ncols: number of columns
+ *
+ * Create new #GGobiData object
+ * 
+ * Returns: #GGobiData object
+ **/
 public GGobiData* 
 new(guint nrows, guint ncols)
 {
@@ -237,12 +272,29 @@ new(guint nrows, guint ncols)
   return(d);
 }
 
+/**
+ * get_name:
+ * @self: #GGobiData
+ *
+ * Get name of dataset
+ * 
+ * Returns: duplicate of dataset name
+ **/
 public gchar *
 get_name (self)
 {
   return g_strdup(self->name);
 }
 
+
+/**
+ * set_name:
+ * @self: #GGobiData
+ * @name: new name
+ * @nickname: new nickname (if NULL, uses first 5 characters of name)
+ *
+ * Get name of dataset
+ **/
 public void
 set_name (self, const gchar *name, const gchar *nickname)
 {
@@ -253,16 +305,38 @@ set_name (self, const gchar *name, const gchar *nickname)
   self->nickname = g_strndup(name, 5);
 }
 
+/** 
+ * get_n_cols:
+ * @self: #GGobiData
+ *
+ * Get number of columns.  This should be used in preference to referring to ncols
+ * directly, as future subclasses may not use the same structure
+ **/
 public guint
 get_n_cols(self) {
   return self->ncols;
 }
 
+/** 
+ * get_n_cols:
+ * @self: #GGobiData
+ *
+ * Get number of rows
+ * This should be used in preference to referring to nrows
+ * directly, as future subclasses may not use the same structure
+ **/
 public guint
 get_n_rows(self) {
   return self->nrows;
 }
 
+/**
+ * get_col_name:
+ * @self: #GGobiData
+ * @j: column index
+ *
+ * Returns: duplicate of column name
+ **/
 public gchar* 
 get_col_name(self, guint j) 
 {
@@ -270,6 +344,13 @@ get_col_name(self, guint j)
   return g_strdup(vt->collab);
 }
 
+/**
+ * get_col_nickname:
+ * @self: #GGobiData
+ * @j: column index
+ *
+ * Returns: duplicate of column nickname
+ **/
 public gchar* 
 get_col_nickname(self, guint j) 
 {
@@ -280,6 +361,13 @@ get_col_nickname(self, guint j)
     return NULL;
 }
 
+/**
+ * get_col_index_for_name:
+ * @self: #GGobiData
+ * @value: column name
+ *
+ * Returns: index of column with given name, or -1 if no matching columns
+ **/
 public guint
 get_col_index_for_name(self, const gchar* value) 
 {
@@ -294,15 +382,14 @@ get_col_index_for_name(self, const gchar* value)
 
 /** 
  * set_col_name:
- * Set column name
- *
  * @self: GGobiData object
  * @j: column index
  * @value: new column name (if NULL uses column index)
  *
+ * Set column name
  * Also sets nickname to the first two letters.
- * Emits #col_name_changed signal.
- */
+ * Emits col_name_changed() signal.
+ **/
 public void 
 set_col_name(self, guint j, const gchar* value) 
 {
@@ -318,6 +405,12 @@ set_col_name(self, guint j, const gchar* value)
   self_col_name_changed(self, j);
 }
 
+/** 
+ * set_col_nickname:
+ * @self: GGobiData object
+ * @j: column index
+ * @value: new column nickname
+ **/
 public void 
 set_col_nickname(self, guint j, const gchar* value)
 {
@@ -326,11 +419,18 @@ set_col_nickname(self, guint j, const gchar* value)
 }
 
 // FIXME: to be removed once pipeline in place
+/** 
+ * get_transformed_col_name:
+ * @self: GGobiData object
+ * @j: column index
+ * Returns: duplicate of transformed column name (brief description of transformation
+ * applied to variable)
+ **/
 public gchar* 
 get_transformed_col_name(self, guint j) 
 {
   gchar *lbl0, *lbl1, *lbl2;
-   vartabled *vt = self_get_vartable(self, j);
+  vartabled *vt = self_get_vartable(self, j);
 
    /*-- skip the stage0 changes except negation --*/
    switch (vt->tform0) {
@@ -343,9 +443,6 @@ get_transformed_col_name(self, guint j)
    }
 
    switch (vt->tform1) {
-     case NO_TFORM1:
-       lbl1 = g_strdup (lbl0);
-       break;
      case BOXCOX:
        lbl1 = g_strdup_printf ("B-C(%s,%.2f)", lbl0, vt->param);
        break;
@@ -361,8 +458,8 @@ get_transformed_col_name(self, guint j)
      case SCALE_AB:
        lbl1 = g_strdup_printf ("%s [a,b]", lbl0);
        break;
-     default:  // compiler pacification
-       lbl1 = "";
+     default:
+       lbl1 = g_strdup (lbl0);
    }
 
    switch (vt->tform2) {
@@ -394,16 +491,14 @@ get_transformed_col_name(self, guint j)
 
 /**
  * set_missing:
- * 
- * Set specified cell to be a missing value.  
- * 
  * @self: GGobiData object
  * @i: row index
  * @j: column index
  *
+ * Set specified cell to be a missing value.  
  * If the variable is categorical, a new level value ("MISSING")
  * will be created, and the raw value set to that.
- */
+ **/
 public void
 set_missing(self, guint i, guint j)
 {
@@ -418,19 +513,38 @@ set_missing(self, guint i, guint j)
   self->missings = TRUE;
 }
 
+
+/**
+ * is_missing:
+ * @self: GGobiData object
+ * @i: row index
+ * @j: column index
+ *
+ * Returns: if value at specified positive is missing or not
+ **/
 public gboolean
 is_missing(self, guint i, guint j) 
 {
   return (self->missing.vals[i][j] == 1);  
 }
 
+/**
+ * has_missings:
+ * @self: GGobiData object
+ * Returns: whether or not dataset contains any missing values
+ **/
 public gboolean
 has_missings(self) 
 {
   return self->missings;
 }
 
-
+/**
+ * get_col_n_missing:
+ * @self: GGobiData object
+ * @j: column index
+ * Returns: whether or not specified column contains any missing values
+ **/
 public guint 
 get_col_n_missing(self, guint j) {
   guint i, n = 0;
@@ -442,6 +556,16 @@ get_col_n_missing(self, guint j) {
   return(n);
 }
 
+
+/**
+ * set_raw_values:
+ * @self: GGobiData object
+ * @j: column index
+ * @values: vector of new values, of length self->nrows
+ * 
+ * Sets all values in the specified column.  
+ * Emits self_col_data_changed() signal.
+ **/
 public void
 set_raw_values(self, guint j, gdouble *values)
 {
@@ -452,6 +576,22 @@ set_raw_values(self, guint j, gdouble *values)
   self_col_data_changed(self, j);
 }
 
+
+/**
+ * set_raw_value:
+ * @self: GGobiData object
+ * @i: row index
+ * @j: column index
+ * @values: vector of new values, of length self->nrows
+ * 
+ * Sets a single value in the specified column.  
+ *
+ * This will set missing values if necessary and sets
+ * tform value as well to keep dataset consistent.
+ *
+ * You need to manually emits self_col_data_changed() signal after
+ * using this function if you want the data to continue down the pipeline.
+ **/
 public void
 set_raw_value(self, guint i, guint j, gdouble value)
 {
@@ -555,15 +695,14 @@ set_col_type(self, guint j, vartyped value)
   vt->vartype = value;
 }
 
-/*
+/**
  * get_vartable:
- * Get variable meta data for specified column
- *
  * @self: #GGobiData object
  * @j: column index
  *
+ * Get variable meta data for specified column
  * Replaces vartable_element_get.  Should eventually become private.
- */
+ **/
 public vartabled*
 get_vartable (self, guint j)
 {
@@ -572,29 +711,27 @@ get_vartable (self, guint j)
   return self->vartable[j];
 }
 
-/*
+/**
  * set_vartable:
- * Set variable meta data for specified column
- *
  * @self: #GGobiData object
  * @j: column index
  *
+ * Set variable meta data for specified column
  * Should eventually become private.
- */
+ **/
 public void
 set_vartable (self, guint j, vartabled* value)
 {
   self->vartable[j] = value;
 }
 
-/*
+/**
  * get_col_n_levels:
- * Get number of levels in a categorical variable
- *
  * @self: #GGobiData object
  * @j: column index
- * 
- */
+ *
+ * Get number of levels in a categorical variable
+ **/
 public gchar  
 get_col_n_levels(self, guint j)
 {
@@ -628,14 +765,13 @@ get_col_level_count(self, guint j, guint value)
   return(vt->level_counts[i]);
 }
 
-/*
+/**
  * get_col_level_value_closest: 
- * Get closest level value
- *
  * @self: #GGobiData object
  * @j: column index
  * @value: target value to search for 
  *
+ * Get closest level value
  * For a categorical categorical, this searches through all level
  * values and returns the level value that is closest to the desired
  * value.  Currently seems a little buggy in that it prefers one 
@@ -643,7 +779,7 @@ get_col_level_count(self, guint j, guint value)
  *
  * Returns: closest level value to target value
  *
-*/
+ **/
 public guint  
 get_col_level_value_closest(self, guint j, guint value)
 {
@@ -668,16 +804,15 @@ get_col_level_value(self, guint j, guint k) {
   return vt->level_values[k];
 }
 
-/*
+/**
  * get_col_max:
- * Find the biggest value in the column.
- *
  * @self: #GGobiData object
  * @j: column index
  * 
+ * Find the biggest value in the column.
  * For numerical columns, value is cached by limits_set()
  * Does the right thing for categorical variables too.  
- */
+ **/
 public gfloat
 get_col_max(self, guint j)
 {
@@ -701,16 +836,15 @@ get_col_max(self, guint j)
 }
 
 
-/*
+/**
  * get_col_min:
- * Find the smallest value in the column.
- *
  * @self: #GGobiData object
  * @j: column index
  * 
+ * Find the smallest value in the column.
  * For numerical columns, value is cached by limits_set()
  * Does the right thing for categorical variables too.
- */
+ **/
 public gfloat
 get_col_min(self, guint j)
 {
@@ -802,19 +936,18 @@ set_col_levels(self, guint j, guint levels, gchar** names, guint* values, guint*
  }
 }
 
-/*
- * get_string_value
- * Get string representation of value
- *
+/**
+ * get_string_value:
  * @self: #GGobiData object
  * @i: row index
  * @j: column index
  * @transformed: transformed or raw values?
  *
+ * Get string representation of value
  * This currently returns a locale insensitive string, suitable for
  * output into csv etc.  It may be sub-optimal for user display, because
  * it does not use the users locale settings, and outputs full precision.
- */
+ **/
 public gchar*
 get_string_value(self, guint i, guint j, gboolean transformed) 
 {
@@ -840,24 +973,24 @@ get_string_value(self, guint i, guint j, gboolean transformed)
   return g_strdup(vt->level_names[lval]);
 }
 
-/*
+/**
  * has_edges:
- * Test if this dataset has any edges
- *
  * @self: #GGobiData object
- */ 
+ *
+ * Test if this dataset has any edges
+ **/ 
 public gboolean 
 has_edges (self) 
 {
   return (self->edge.n > 0);
 }
 
-/*
+/**
  * has_cols:
- * Test if this dataset has any variables
- *
  * @self: #GGobiData object
- */
+ *
+ * Test if this dataset has any variables
+ **/
 public gboolean 
 has_cols (self) 
 {
@@ -866,16 +999,15 @@ has_cols (self)
 
 /* 
  * set_row_id:
- * Set the row id (a string) for specified row
- *
  * @self: #GGobiData object
  * @i: row
  * @value: new string value for row id
  * @check: throw error if id is already used?
  *
+ * Set the row id (a string) for specified row
  * A row id is a unique string reference to a given row.
  * These are hashed for O(1) lookup.
- */ 
+ **/ 
 public void
 set_row_id(self, guint i, gchar* value, gboolean check) {
   if (value == NULL)
@@ -890,13 +1022,12 @@ set_row_id(self, guint i, gchar* value, gboolean check) {
 
 /** 
  * get_row_id:
- * Retrive row id for specified row.
- * 
  * @self: #GGobiData object
  * @i: row
  * 
+ * Retrive row id for specified row.
  * Returns: duplicate of row id if present, NULL otherwise
- */
+ **/
 public gchar*
 get_row_id(self, guint i) {
   if (self->rowIds[i]) 
@@ -907,13 +1038,13 @@ get_row_id(self, guint i) {
 
 /** 
  * get_row_for_id:
- * Get row index corresponding to row id
- *  
  * @self: #GGobiData object
  * @id: row id string
  * 
+ * Get row index corresponding to row id
+ *
  * Returns: row index if found, -1 otherwise
- */
+ **/
 public gint
 get_row_for_id(self, gchar *id) {
   gpointer pos, key;
@@ -922,20 +1053,19 @@ get_row_for_id(self, gchar *id) {
   return -1;
 }
 
-/*
+/**
  * add_rows: 
- * Add n rows to the dataset
- * 
  * @self: #GGobiData object
  * @n: number of rows to add
  *
+ * Add n rows to the dataset
  * Adds extra rows, allocating space as needed.
  *
  * This emits the cols_added signal and also runs
  * #set_rows_in_plot which emits the rows_in_plot_changed signal.
  *
  * Returns: index of first new row
- */
+ **/
 public guint
 add_rows(self, guint n) {
   gint def_color = self->gg ? self->gg->color_id : 0;
@@ -998,13 +1128,12 @@ add_rows(self, guint n) {
 
 /* 
  * add_cols:
- * Add n empty rows to the dataset.
- *
  * @self: #GGobiData object
- * @n: number of rows to add
+ * @n: number of columns to add
  *
+ * Add n empty columns to the dataset.
  * Returns: index of first new column
- */ 
+ **/ 
 public guint 
 add_cols(self, guint n) {
   guint nprev = self->ncols;
@@ -1063,15 +1192,14 @@ delete_cols(self, guint *cols, gint ncols)
   arrays_delete_cols (&self->missing, ncols, cols);
   
   self->ncols -= ncols;
-  
   for (j = 0; j < ncols; j++) /* emit col deleted signal */
     self_col_deleted(self, cols[j]);
+  
   
   /*-- emit a single variable_list_changed signal when finished --*/
   /*-- doesn't need to give a variable index any more, really --*/
   // FIXME: emission of this is deprecated
-  g_signal_emit (G_OBJECT (self->gg),
-                 GGobiSignals[VARIABLE_LIST_CHANGED_SIGNAL], 0, self);
+  g_signal_emit_by_name(self->gg, "variable_list_changed", 0, self);
 
     /*-- run the first part of the pipeline  --*/
   tform_to_world(self);
@@ -1080,8 +1208,6 @@ delete_cols(self, guint *cols, gint ncols)
   
   return(self->ncols);
 }
-
-// also need delete_cols and delete_rows
 
 public void
 free (self) 
@@ -1125,19 +1251,18 @@ free (self)
   g_free(self);
 }
 
-/*
+/**
  * attach:
- * Attach a GGobi object to this dataset
- *
  * @self: #GGobiData object
  * @gg: GGobi object
  * @cleanup: should cleanup occur?
  *
+ * Attach a GGobi object to this dataset
  * The purpose of this function is to hook up the #GGobiData object
  * to all the gui components and make sure they stay in sync by
  * listening to the correct signals.  This function still needs a lot of
  * work.
- */
+ **/
 public void 
 attach (self, ggobid *gg, gboolean cleanup)
 {
@@ -1157,7 +1282,7 @@ attach (self, ggobid *gg, gboolean cleanup)
   if (self_has_edges(self))
     vectorb_realloc (&self->edge.xed_by_brush, self->edge.n);
 
-  /* binning the plot window; no need to realloc these */
+  /* binning the plot window; no need to realloc these **/
   self->brush.binarray = (bin_struct **)
     g_malloc (self->brush.nbins * sizeof (bin_struct *));
   for (ih = 0; ih < self->brush.nbins; ih++) {
@@ -1172,11 +1297,11 @@ attach (self, ggobid *gg, gboolean cleanup)
     }
   }
 
-  /*
+  /**
    * If there are missings, they've been initialized with a value
    * of 0.  Here, re-set that value to 15% below the minimum for each
    * variable.  (dfs -- done at Di's request, September 2004)
-   */
+   **/
   limits_set (self, true, true, self->gg->lims_use_visible);
   for (guint j = 0; j < self->ncols; j++) vars[j] = j;
   impute_fixed (IMP_BELOW, 15.0, self->ncols, vars, self);
@@ -1225,9 +1350,8 @@ attach (self, ggobid *gg, gboolean cleanup)
   g_signal_emit_by_name (G_OBJECT (gg), "datad_added", self);
 }
 
-/*
+/**
  * set_rows_in_plot:
- *
  * @self: #GGobiData object
  *
  * Combine the values in two arrays:
@@ -1236,7 +1360,7 @@ attach (self, ggobid *gg, gboolean cleanup)
  * to determine which cases should be plotted.
  *
  * rows_in_plot = sampled && !excluded
-*/
+ **/
 public void
 set_rows_in_plot(self)
 {

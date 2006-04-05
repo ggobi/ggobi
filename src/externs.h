@@ -128,7 +128,6 @@ void       brush_on_set (gboolean, displayd *, ggobid *);
 gboolean   brush_once (gboolean force, splotd *, ggobid *);
 gboolean   brush_once_and_redraw (gboolean binningp, splotd *sp, displayd *display, ggobid *gg);
 void       brush_pos_init (splotd *);
-void       brush_prev_vectors_update (GGobiData *, ggobid *);
 void       brush_reset(displayd *display, gint action);
 void       brush_set_pos (gint, gint, splotd *);
 void       brush_undo (splotd *, GGobiData *, ggobid *);
@@ -774,3 +773,5 @@ endpointsd *
 resolveEdgePoints (GGobiData * e, GGobiData * d);
 void
 unresolveAllEdgePoints (GGobiData * e);
+void
+edges_alloc (gint nsegs, GGobiData * d);
