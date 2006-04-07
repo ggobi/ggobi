@@ -1,0 +1,26 @@
+# $Id: $
+PortSystem        1.0
+name              ggobi
+version           2.1.1
+categories        math, science
+maintainers       h.wickham@gmail.com
+description       Interactive and dynamic graphics
+long_description  GGobi is an open source visualization program for exploring \
+                  high-dimensional data. It provides highly dynamic and interactive \
+                  graphics such as tours, as well as familiar graphics such as \
+                  the scatterplot, barchart and parallel coordinates plots. Plots \
+                  are interactive and linked with brushing and identification.
+homepage          http://www.ggobi.org
+master_sites      http://www.ggobi.org/downloads
+extract.suffix    .tar.bz2
+extract.cmd       bzip2
+checksums         md5 dee435e0a940a566d568dbfd70c18d10
+configure.args    --with-all-plugins  --with-libintl-prefix=/opt/local
+depends_build    port:gtk2 port:libxml2 port:graphviz
+
+post-build {
+	cd ${build.dir}
+	system "make ggobirc"
+	file delete ~/.ggobirc
+	file copy ggobirc ~/.ggobirc
+}
