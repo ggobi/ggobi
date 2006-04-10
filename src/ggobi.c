@@ -513,6 +513,54 @@ ggobi_close (ggobid * gg)
   return (true);
 }
 
+/*
+  Whether to destory the window or not.  If this is being called from an
+  event handler in response to the window being destroyed, we would get
+  a circularity. However, when called programmatically from within the
+  process (or from e.g. R) we need to force it to be closed. */
+gboolean ggobi_close2 (ggobid * gg, gboolean closeWindow)
+{
+  gboolean val = true;
+
+  if (gg->close_pending)
+    return (false);
+
+  gg->close_pending = true;
+
+  /* close plugin instances */
+  closePlugins (gg);
+
+  procs_activate (off, gg->pmode, gg->current_display, gg);
+
+  display_free_all (gg);
+
+  if (closeWindow && gg->main_window)
+    gtk_widget_destroy (gg->main_window);
+
+  if (gg->display_tree.window)
+    gtk_widget_destroy (gg->display_tree.window);
+  if (gg->vartable_ui.window)
+    gtk_widget_destroy (gg->vartable_ui.window);
+
+  if (gg->color_ui.symbol_window)
+    gtk_widget_destroy (gg->color_ui.symbol_window);
+
+  if (gg->wvis.window)
+    gtk_widget_destroy (gg->wvis.window);
+  if (gg->svis.window)
+    gtk_widget_destroy (gg->svis.window);
+
+  gg->close_pending = false;
+  /* Now fix up the list of ggobi's */
+  val = ggobi_remove (gg) != -1;
+
+  if (ggobi_getNumGGobis () == 0 && sessionOptions->info->quitWithNoGGobi &&
+      gtk_main_level () > 0) {
+    gtk_main_quit ();
+  }
+
+  return (val);
+}
 
 /*
    Key for storing a reference to a ggobid instance in a widget

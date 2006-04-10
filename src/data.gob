@@ -98,6 +98,19 @@ typedef struct _BrushBins {
 #include "externs.h"
 %}
 
+
+/**
+ * SECTION:GGobiData
+ * @short_description: Basic data storage and manipulation class.
+ * @stability: Unstable
+ *
+ * The GGobiData class provides all methods for manipulating 
+ * data within GGobi.  It is the starting point for the pipeline.
+ * 
+ * Eventually this will become an abstract class and subclass will
+ * provide the actual implementation.  This will make it easy to treat
+ * an R data frame, or a SQL query as the data source for GGobi.
+ */
 class GGobi:Data from G:Object {
 
 public const gchar *name;
@@ -111,12 +124,7 @@ public gboolean missings;
 
 public struct _ggobid *gg; /*-- a pointer to the parent --*/
 
-
-/*-- row ids to support generalized linking --*/
-public GHashTable *idTable;
-/*-- to support brushing by categorical variable --*/
-public gchar* linkvar = NULL;  /*-- the linking variable name--*/
-
+/* GUI related */
 public Subset  subset;
 public Jitterd  jitter;
 public Varpanel_cboxd  vcbox_ui;
@@ -128,9 +136,16 @@ public BrushBins  brush;
 
 public GtkWidget *vartable_tree_view[all_vartypes];
 public GtkTreeModel *vartable_tree_model; /* the root model, with all vars **/
+public GtkWidget *cluster_table; /*-- table of symbol groups from brushing --*/
+public clusteruid *clusvui;
+
+/*-- row ids to support generalized linking --*/
+public GHashTable *idTable;
+/*-- to support brushing by categorical variable --*/
+public gchar* linkvar = NULL;  /*-- the linking variable name--*/
 
 // Vectors of length ncol
-public vartabled **vartable;
+protected vartabled **vartable;
 
 // Vectors of length nrows
 public char **rowIds;
@@ -163,10 +178,8 @@ public gint nrows_in_plot;     /*-- how many elements of rows_in_plot to use --*
 /*--------------- clusters: hiding, excluding ----------------------*/
 
 public symbol_cell symbol_table[NGLYPHTYPES][NGLYPHSIZES][MAXNCOLORS];
-public GtkWidget *cluster_table; /*-- table of symbol groups from brushing --*/
 public gint nclusters;
 public clusterd *clusv;
-public clusteruid *clusvui;
 
 /*------------------------ brushing ----------------------------------*/
 
@@ -210,10 +223,10 @@ col_data_changed(self, guint j) {
 
 /**
  * cols_added:
- * Columns added signal
- * 
  * @self: #GGobiData
  * @n: number of new columns
+ *
+ * Columns added signal
  **/
 private signal NONE (UINT) void
 cols_added(self, guint n);
@@ -238,11 +251,6 @@ col_deleted(self, guint j);
 private signal NONE (UINT) void
 rows_added(self, guint n);
 
-/** 
- * init:
- * @self: #GGobiData
- * #GGobiData initialisation 
- **/
 init (self) {
   sphere_init(self); 
   
@@ -631,27 +639,45 @@ get_col_level_for_name(self, guint j, const gchar *name)
   return(GPOINTER_TO_INT(level_ptr));
 }
 
-// replaces getAutoLevelIndex
+/**
+ * set_categorical_value:
+ * @self: #GGobiData
+ * @i: row index
+ * @j: column index
+ * @value: new categorical value
+ * 
+ * This function sets the value of a cell in a categorical variable.
+ * It will automatically create a new level if necessary.
+ * If the column is not already categorical, this will make it so.
+ */
 public void
 set_categorical_value(self, guint i, guint j, const gchar* value) 
 {
-  vartabled *vt = self_get_vartable(self, j);
-  guint level;
-
+  vartabled* vt = self_get_vartable(self, j);
   self_set_col_type(self, j, categorical);
+  guint level = self_get_col_level_for_name(self, j, value);
   
-  level = self_get_col_level_for_name(self, j, value);
-  
-  if (level != -1) {
+  if (level == -1) {
+    level = self_add_col_level(self, j, value, -1);
+  } else {
     vt->level_counts[level]++;
-    self_set_raw_value(self, i, j, (gdouble) vt->level_values[level]);
-    return;
   }
-  //not found, must be new level
-  self_add_col_level(self, j, value, -1);
-  self_set_raw_value(self, i, j, (gdouble) vt->level_values[vt->nlevels-1]);
+
+  self_set_integer_value(self, i, j, self_get_col_level_value(self, j, level));
 }
 
+/**
+ * set_string_value:
+ * @self: #GGobiData
+ * @i: row index
+ * @j: column index
+ * @value: new value
+ *
+ * This function provides a convenient method for setting the
+ * value from a string.  Empty strings, . and NA will be treated as
+ * missings.  Strings that can be converted to an number will store
+ * that number.  Otherwise set_categorical_value() will be used
+ **/
 public void
 set_string_value(self, guint i, guint j, const gchar* value) 
 {
@@ -665,6 +691,15 @@ set_string_value(self, guint i, guint j, const gchar* value)
   }
 }
 
+/** 
+ * set_integer_values:
+ * @self: #GGobiData
+ * @i: row index
+ * @value: array of integer of length self->nrows
+ *
+ * Convenience method for setting entire column of integers.
+ * Emits self_col_data_changed() signal.
+ **/
 public void
 set_integer_values(self, guint j, gint *values)
 {
@@ -675,10 +710,46 @@ set_integer_values(self, guint j, gint *values)
   self_col_data_changed(self, j);
 }
 
+
+/** 
+ * set_integer_value:
+ * @self: #GGobiData
+ * @i: row index
+ * @j: column index
+ * @value: new value
+ *
+ * Convenience method for setting integer value.
+ **/
 public void
 set_integer_value(self, guint i, guint j, gint value)
 {
-  self_set_raw_value(self, i, j, (gdouble)value);
+  self_set_raw_value(self, i, j, (gdouble) value);
+}
+
+/** 
+ * get_integer_value:
+ * @self: #GGobiData
+ * @i: row index
+ * @j: column index
+ *
+ * Convenience method for getting integer value.
+ **/
+public gint
+get_integer_value(self, guint i, guint j)
+{
+  return (gint) self_get_raw_value(self, i, j);
+}
+
+/** 
+ * get_raw_value:
+ * @self: #GGobiData
+ * @i: row index
+ * @j: column index
+ **/
+public gdouble
+get_raw_value(self, guint i, guint j)
+{
+  return self->raw.vals[i][j];
 }
 
 public vartyped 
@@ -765,6 +836,13 @@ get_col_level_count(self, guint j, guint value)
   return(vt->level_counts[i]);
 }
 
+
+public guint
+get_col_level_value(self, guint j, guint k) {
+  vartabled *vt = self_get_vartable(self, j);
+  return vt->level_values[k];
+}
+
 /**
  * get_col_level_value_closest: 
  * @self: #GGobiData object
@@ -797,13 +875,6 @@ get_col_level_value_closest(self, guint j, guint value)
 
   return vt->level_values[level];
 }
-
-public guint
-get_col_level_value(self, guint j, guint k) {
-  vartabled *vt = self_get_vartable(self, j);
-  return vt->level_values[k];
-}
-
 /**
  * get_col_max:
  * @self: #GGobiData object
@@ -865,7 +936,6 @@ get_col_min(self, guint j)
   }
   
   return(gfloat) level_value_min;
-
 }
 
 public gfloat
@@ -882,11 +952,20 @@ get_col_mean(self, guint j)
   return vt->mean;
 }
 
-public void
+/**
+ * add_col_level:
+ * @self: #GGobiData object
+ * @j: column index
+ * @name: character description of level, if NULL uses value
+ * @value: level value, if -1 uses index + 1
+ * Returns: index of new level
+ **/
+public guint
 add_col_level(self, guint j, const gchar *name, gint value)
 {
   vartabled *vt = self_get_vartable(self, j);
   guint level = vt->nlevels++;
+
   if (vt->nlevels == 1) {
     vt->level_values = (gint *)   g_malloc (sizeof (gint));
     vt->level_counts = (gint *)   g_malloc (sizeof (gint));
@@ -900,16 +979,22 @@ add_col_level(self, guint j, const gchar *name, gint value)
       (gchar **) g_realloc (vt->level_names, sizeof (gchar *) * vt->nlevels);
   }
   vt->level_counts[level] = 1;
+
   if (value == -1)
     value = level+1;
   vt->level_values[level] = value;
+
   if (!name)
     vt->level_names[level] = g_strdup_printf("%d", value);
-  else vt->level_names[level] = g_strdup(name);
+  else 
+    vt->level_names[level] = g_strdup(name);
+
   g_hash_table_insert(vt->name_to_level, vt->level_names[level], 
     GINT_TO_POINTER(level));
   g_hash_table_insert(vt->value_to_level, GINT_TO_POINTER(vt->level_values[level]), 
     GINT_TO_POINTER(level));
+    
+  return vt->nlevels;
 }
   
 public void  
@@ -1199,7 +1284,7 @@ delete_cols(self, guint *cols, gint ncols)
   /*-- emit a single variable_list_changed signal when finished --*/
   /*-- doesn't need to give a variable index any more, really --*/
   // FIXME: emission of this is deprecated
-  g_signal_emit_by_name(self->gg, "variable_list_changed", 0, self);
+/*  g_signal_emit_by_name(self->gg, "variable_list_changed", 0, self);*/
 
     /*-- run the first part of the pipeline  --*/
   tform_to_world(self);

@@ -57,11 +57,10 @@ movepts_history_add (gint id, splotd * sp, GGobiData * d, ggobid * gg)
   cell = (celld *) g_malloc (sizeof (celld));
   cell->i = cell->j = -1;
   if (gg->movepts.direction == horizontal || gg->movepts.direction == both) {
-    /*-- the cell is (id, sp->xyvars.x), gg->raw.vals[id][sp->xyvars.x] --*/
     if (!movepts_history_contains (id, sp->xyvars.x, d, gg)) {
       cell->i = id;
       cell->j = sp->xyvars.x;
-      cell->val = d->raw.vals[id][sp->xyvars.x];
+      cell->val = ggobi_data_get_raw_value(d, id, sp->xyvars.x);
     }
   }
   d->movepts_history = g_slist_append (d->movepts_history, cell);
@@ -69,11 +68,10 @@ movepts_history_add (gint id, splotd * sp, GGobiData * d, ggobid * gg)
   cell = (celld *) g_malloc (sizeof (celld));
   cell->i = cell->j = -1;
   if (gg->movepts.direction == vertical || gg->movepts.direction == both) {
-    /*-- the cell is (id, sp->xyvars.y), gg->raw.vals[id][sp->xyvars.y] --*/
     if (!movepts_history_contains (id, sp->xyvars.y, d, gg)) {
       cell->i = id;
       cell->j = sp->xyvars.y;
-      cell->val = d->raw.vals[id][sp->xyvars.y];
+      cell->val = ggobi_data_get_raw_value(d, id, sp->xyvars.y);
     }
   }
   d->movepts_history = g_slist_append (d->movepts_history, cell);
@@ -90,8 +88,7 @@ movepts_history_delete_last (GGobiData * d, ggobid * gg)
     /*-- especially ignore cells with indices == -1 --*/
     if (cell->i > -1 && cell->i < d->nrows_in_plot) {
       if (cell->j > -1 && cell->j < d->ncols) {
-        d->raw.vals[cell->i][cell->j] =
-          d->tform.vals[cell->i][cell->j] = cell->val;
+        ggobi_data_set_raw_value(d, cell->i, cell->j, cell->val);
       }
     }
 
@@ -122,13 +119,11 @@ movept_screen_to_raw (splotd * sp, gint ipt, gcoords * eps,
   pt_screen_to_plane (&pos, ipt, horiz, vert, eps, &planar, sp);
   pt_plane_to_world (sp, &planar, eps, world);
 
-  for (j = 0; j < d->ncols; j++)
-    pt_world_to_raw_by_var (j, world, raw, d);
-
   for (j = 0; j < d->ncols; j++) {
-    d->raw.vals[ipt][j] = d->tform.vals[ipt][j] = raw[j];
-    d->world.vals[ipt][j] = world[j];
+    pt_world_to_raw_by_var (j, world, raw, d);
+    ggobi_data_set_raw_value(d, ipt, j, raw[j]);
   }
+
   sp->planar[ipt].x = planar.x;
   sp->planar[ipt].y = planar.y;
 
@@ -156,8 +151,7 @@ movept_plane_to_raw (splotd * sp, gint ipt, gcoords * eps, GGobiData * d,
     pt_world_to_raw_by_var (j, world, raw, d);
 
   for (j = 0; j < d->ncols; j++) {
-    d->raw.vals[ipt][j] = d->tform.vals[ipt][j] = raw[j];
-    d->world.vals[ipt][j] = world[j];
+    ggobi_data_set_raw_value(d, ipt, j, raw[j]);
   }
 
   g_free (raw);

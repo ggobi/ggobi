@@ -560,8 +560,7 @@ spherize_data (vector_i * svars, vector_i * pcvars, GGobiData * d,
       b[j] = tmpf / eigenval[j];
     }
     for (j = 0; j < pcvars->nels; j++)
-      d->raw.vals[i][pcvars->els[j]] = d->tform.vals[i][pcvars->els[j]] =
-        b[j];
+      ggobi_data_set_raw_value(d, i, pcvars->els[j], b[j]);
   }
 
   g_free (b);

@@ -358,11 +358,12 @@ load_column_labels (Row * row, GGobiData * d, gboolean row_labels)
 static void
 load_row_labels (GList * rows, GGobiData * d, gboolean has_labels)
 {
-  gint i;
-  for (i = 0; rows; rows = g_list_next (rows), i++) {
+  if (!has_labels)
+    return;
+
+  for (gint i = 0; rows; rows = g_list_next (rows), i++) {
     Row *row = (Row *) rows->data;
-    if (has_labels)
-      ggobi_data_set_row_id(d, i, row->src->str + row->entry[0].ofs, false);    
+    ggobi_data_set_row_id(d, i, row->src->str + row->entry[0].ofs, false);    
   }
 }
 

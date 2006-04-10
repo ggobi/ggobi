@@ -1134,8 +1134,8 @@ setRecordValue (const char *tmp, GGobiData * d, XMLParserData * data)
   }
 
   /* If reading past the last column or row, stop */
-  if (data->current_record >= d->raw.nrows ||
-      data->current_element >= d->raw.ncols) {
+  if (data->current_record >= d->nrows ||
+      data->current_element >= d->ncols) {
     g_printerr ("Row %d (counting from 1) has too many elements\n",
                 data->current_record + 1);
     data->current_element = 0;
@@ -1271,7 +1271,7 @@ newVariable (const xmlChar ** attrs, XMLParserData * data,
   if (data->current_variable >= d->ncols) {
     ggobi_XML_error_handler
       (data, "More variables (%d) than given in the <variables count='%d'> element for dataset %s\n",
-       data->current_variable, d->raw.ncols, d->name);
+       data->current_variable, d->ncols, d->name);
     return (false);
   }
 

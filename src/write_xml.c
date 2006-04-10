@@ -346,7 +346,7 @@ write_xml_record (FILE *f, GGobiData *d, ggobid *gg, gint i,
         } 
       } else {  /*-- if not missing, just write the data --*/
         writeFloat (f, (gg->save.stage == TFORMDATA) ? d->tform.vals[i][j] :
-                                                       d->raw.vals[i][j]);
+                                                       ggobi_data_get_raw_value(d, i, j));
       }
       if (j < d->ncols-1 )
         fprintf(f, " ");
@@ -369,7 +369,7 @@ write_xml_record (FILE *f, GGobiData *d, ggobid *gg, gint i,
       } else {
 
         writeFloat (f, (gg->save.stage == TFORMDATA) ? d->tform.vals[i][j] :
-                                                       d->raw.vals[i][cols[j]]);
+                                                       ggobi_data_get_raw_value(d, i, cols[j]));
       } 
       if (j < ncols-1 )
         fprintf(f, " ");

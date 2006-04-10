@@ -60,7 +60,7 @@ impute_fixed (ImputeType impute_type, gfloat val, gint nvars, gint * vars,
         if (ggobi_data_is_missing(d, m, j)) {
           drand = randvalue ();
           drand = (drand - .5) * jmult;
-          d->raw.vals[m][j] = d->tform.vals[m][j] = impval + (gfloat) drand;
+          ggobi_data_set_raw_value(d, m, j, impval + (gfloat) drand);
         }
         g_signal_emit_by_name(d, "col_data_changed", j);
       }
@@ -72,7 +72,7 @@ impute_fixed (ImputeType impute_type, gfloat val, gint nvars, gint * vars,
       for (k = 0; k < nvars; k++) {
         j = vars[k];
         if (ggobi_data_is_missing(d, m, j)) {
-          d->raw.vals[m][j] = d->tform.vals[m][j] = val;
+          ggobi_data_set_raw_value(d, m, j, val);
         }
         g_signal_emit_by_name(d, "col_data_changed", j);
       }
@@ -143,7 +143,7 @@ impute_mean_or_median (gint type, gint nvars, gint * vars,
           }
 
           for (i = 0; i < nmissing; i++)
-            d->raw.vals[missv[i]][j] = d->tform.vals[missv[i]][j] = val;
+            ggobi_data_set_raw_value(d, missv[i], j, val);
         }
         g_signal_emit_by_name(d, "col_data_changed", j);
       }
@@ -162,8 +162,7 @@ impute_mean_or_median (gint type, gint nvars, gint * vars,
         k = d->rows_in_plot.els[i];
         if (!d->hidden_now.els[k]) {  /* ignore erased values altogether */
           if (ggobi_data_is_missing(d, k, j)) {
-            d->raw.vals[k][j] = d->tform.vals[k][j] = (type == IMP_MEAN) ?
-              vt->mean : vt->median;
+            ggobi_data_set_raw_value(d, k, j, (type == IMP_MEAN) ? vt->mean : vt->median);
             redraw = true;
           }
         }
@@ -190,12 +189,7 @@ impute_single (gint * missv, gint nmissing, gint * presv, gint npresent,
       rrand = (gfloat) randvalue ();
 
       if (((npresent - k) * rrand) < 1.0) {
-        d->raw.vals[missv[i]][col] = d->raw.vals[presv[k]][col];
-        /*
-         * This is the default -- transformations will be applied
-         * later to those that need it.
-         */
-        d->tform.vals[missv[i]][col] = d->tform.vals[presv[k]][col];
+        ggobi_data_set_raw_value(d, missv[i], col, ggobi_data_get_raw_value(d, presv[k], col));
         break;
       }
     }

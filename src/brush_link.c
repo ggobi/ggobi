@@ -137,7 +137,7 @@ brush_link_by_var (gint jlinkby, vector_b * levelv,
   for (m = 0; m < d->nrows_in_plot; m++) {
     i = d->rows_in_plot.els[m];
 
-    level_value = (gint) d->raw.vals[i][jlinkby];
+    level_value = ggobi_data_get_integer_value(d, i, jlinkby);
 
     if (levelv->els[level_value]) {  /*-- if it's to acquire the new symbol --*/
       if (cpanel->br.mode == BR_PERSISTENT) {
@@ -251,7 +251,7 @@ build_symbol_vectors_by_var (cpaneld * cpanel, GGobiData * d, ggobid * gg)
   for (m = 0; m < d->nrows_in_plot; m++) {
     i = d->rows_in_plot.els[m];
     if (d->pts_under_brush.els[i]) {
-      level_value = (gint) d->raw.vals[i][j];
+      level_value = ggobi_data_get_integer_value(d, i, j);
       levelv.els[level_value] = true;
     }
   }
