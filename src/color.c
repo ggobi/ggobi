@@ -360,18 +360,17 @@ datad_colors_used_get (gint * ncolors_used, gushort * colors_used,
     m = d->rows_in_plot.els[i];
     if (d->hidden_now.els[m]) {  /*-- if it's hidden, we don't care --*/
       new_color = false;
-    }
-    else {
+    } else {
       new_color = true;
       for (k = 0; k < n; k++) {
-        if (colors_used[k] == d->color_now.els[m]) {
+        if (colors_used[k] == ggobi_data_get_attr_color(d, m)) {
           new_color = false;
           break;
         }
       }
     }
     if (new_color) {
-      colorid = d->color_now.els[m];
+      colorid = ggobi_data_get_attr_color(d, m);
       colors_used[n] = colorid;
       maxcolorid = MAX (colorid, maxcolorid);
       (n)++;
@@ -394,7 +393,7 @@ datad_colors_used_get (gint * ncolors_used, gushort * colors_used,
   /* insurance -- eg if using mono drawing on a color screen */
   if (n == 0) {
     n = 1;
-    colors_used[0] = d->color_now.els[0];
+    colors_used[0] = ggobi_data_get_attr_color(d, 0);
   }
 
   *ncolors_used = n;

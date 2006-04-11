@@ -75,8 +75,8 @@ record_add (eeMode mode, gint a, gint b, gchar * lbl, gchar * id,
 
 
   if (mode == ADDING_EDGES) {
-    dtarget->color.els[i] =
-      dtarget->color_now.els[i] = d->color.els[a];
+    ggobi_data_set_attr_color(dtarget, i, ggobi_data_get_attr_color(dtarget, i), ATTR_SET_PERSISTENT);
+    //dtarget->color.els[i] = dtarget->color_now.els[i] = d->color.els[a];
 
     edges_alloc (e->nrows, e);
     e->edge.sym_endpoints[dtarget->nrows - 1].a = ggobi_data_get_row_id(d, a);

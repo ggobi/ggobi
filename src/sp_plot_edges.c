@@ -155,7 +155,7 @@ splot_edges_draw (splotd * sp, gboolean draw_hidden, GdkDrawable * drawable,
            ltype = WIDE_DASH;
            else ltype = NARROW_DASH;
          */
-        symbols_used[e->glyph_now.els[m].size][ltype][e->color_now.els[m]]++;
+        symbols_used[e->glyph_now.els[m].size][ltype][ggobi_data_get_attr_color(e, m)]++;
       }
     }
 

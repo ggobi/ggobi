@@ -978,7 +978,7 @@ setColor (const xmlChar ** attrs, XMLParserData * data, gint i)
     if (i < 0)
       data->defaults.color = value;
     else
-      d->color.els[i] = d->color_now.els[i] = d->color_prev.els[i] = value;
+      ggobi_data_set_attr_color(d, i, value, ATTR_SET_PERSISTENT);
   }
 
   return (value != -1);

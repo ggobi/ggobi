@@ -361,7 +361,7 @@ win32_draw_to_pixmap_unbinned (gint current_color, splotd *sp, gboolean draw_hid
 
     if (splot_plot_case (m, d, sp, display, gg)) {
       if ((draw_hidden && d->hidden_now.els[m]) ||  /*-- drawing hiddens --*/
-         (d->color_now.els[m] == current_color &&   /*-- drawing unhiddens --*/
+         (ggobi_data_get_attr_color(d, m) == current_color &&   /*-- drawing unhiddens --*/
               !draw_hidden && !d->hidden_now.els[m]))
       {
         if (display->options.points_show_p) {
@@ -416,7 +416,7 @@ win32_draw_to_pixmap_binned (icoords *bin0, icoords *bin1,
         j = d->rows_in_plot.els[d->brush.binarray[ih][iv].els[m]];
         if (splot_plot_case (j, d, sp, display, gg)) {
           if ((draw_hidden && d->hidden_now.els[j]) ||  /*-- hiddens --*/
-             (d->color_now.els[j] == current_color &&   /*-- unhiddens --*/
+             (ggobi_data_get_attr_color(d, j) == current_color &&   /*-- unhiddens --*/
                   !draw_hidden && !d->hidden_now.els[j]))
           {
             build_glyph (&d->glyph_now.els[j], sp->screen, j,

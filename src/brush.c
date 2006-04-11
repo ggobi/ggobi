@@ -172,7 +172,7 @@ brush_undo (splotd * sp, GGobiData * d, ggobid * gg)
 
   for (m = 0; m < d->nrows_in_plot; m++) {
     i = d->rows_in_plot.els[m];
-    d->color.els[i] = d->color_now.els[i] = d->color_prev.els[i];
+    ggobi_data_reset_attr_color(d, i, ATTR_SET_PERSISTENT);
     d->hidden.els[i] = d->hidden_now.els[i] = d->hidden_prev.els[i];
     d->glyph.els[i].type = d->glyph_now.els[i].type =
       d->glyph_prev.els[i].type;
@@ -201,7 +201,7 @@ reinit_transient_brushing (displayd * dsp, ggobid * gg)
   if (point_painting_p) {
     for (m = 0; m < d->nrows_in_plot; m++) {
       i = d->rows_in_plot.els[m];
-      d->color_now.els[i] = d->color.els[i];
+      ggobi_data_reset_attr_color(d, i, ATTR_SET_TRANSIENT);
       d->glyph_now.els[i].type = d->glyph.els[i].type;
       d->glyph_now.els[i].size = d->glyph.els[i].size;
       d->hidden_now.els[i] = d->hidden.els[i];
@@ -209,7 +209,7 @@ reinit_transient_brushing (displayd * dsp, ggobid * gg)
   }
   if (edge_painting_p && e != NULL) {
     for (k = 0; k < e->edge.n; k++) {
-      e->color_now.els[k] = e->color.els[k];
+      ggobi_data_reset_attr_color(e, k, ATTR_SET_TRANSIENT);
       e->glyph_now.els[k].type = e->glyph.els[k].type;
       e->glyph_now.els[k].size = e->glyph.els[k].size;
       e->hidden_now.els[k] = e->hidden.els[k];
@@ -559,40 +559,13 @@ update_color_vectors (gint i, gboolean changed, gboolean * hit_by_brush,
                       GGobiData * d, ggobid * gg)
 {
   cpaneld *cpanel = &gg->current_display->cpanel;
-  gboolean doit = true;
-
-/* setting the value of doit */
-  if (!changed) {
-    if (hit_by_brush[i]) {
-      /*-- if persistent, compare against color instead of color_now --*/
-      doit = (cpanel->br.mode == BR_TRANSIENT) ?
-        (d->color_now.els[i] != gg->color_id) :
-        (d->color.els[i] != gg->color_id);
-    } else {
-      doit = (d->color_now.els[i] != d->color.els[i]);  /*-- ?? --*/
-    }
+  
+  if (hit_by_brush[i]) {
+    return ggobi_data_set_attr_color(d, i, gg->color_id, cpanel->br.mode) || changed;
   }
-/* */
+  
+  return ggobi_data_reset_attr_color(d, i, ATTR_SET_TRANSIENT) || changed;
 
-  /*
-   * If doit is false, it's guaranteed that there will be no change.
-   */
-  if (doit) {
-    if (hit_by_brush[i]) {
-      switch (cpanel->br.mode) {
-      case BR_PERSISTENT:
-        d->color.els[i] = d->color_now.els[i] = gg->color_id;
-        break;
-      case BR_TRANSIENT:
-        d->color_now.els[i] = gg->color_id;
-        break;
-      }
-    }
-    else
-      d->color_now.els[i] = d->color.els[i];
-  }
-
-  return (doit);
 }
 
 /*----------------------------------------------------------------------*/

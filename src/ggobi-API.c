@@ -485,47 +485,6 @@ ggobi_setCaseGlyphs (gint * ids, gint n, gint type, gint size,
       ggobi_setCaseGlyph (ids[i], type, size, d, gg);
 }
 
-/*-------------------------------------------------------------------------*/
-/*               setting and getting point colors                          */
-/*-------------------------------------------------------------------------*/
-
-void
-ggobi_setCaseColor (gint pt, gint colorIndex, GGobiData * d, ggobid * gg)
-{
-  colorschemed *scheme = gg->activeColorScheme;
-
-  /*-- temporary fix --*/
-  if (colorIndex < 0 || colorIndex > scheme->n - 1)
-    colorIndex = 0;
-  d->color.els[pt] = d->color_now.els[pt] = colorIndex;
-}
-
-void
-ggobi_setCaseColors (gint * pts, gint howMany, gint colorIndex,
-                       GGobiData * d, ggobid * gg)
-{
-  gint i;
-  for (i = 0; i < howMany; i++)
-    d->color.els[pts[i]] = d->color_now.els[pts[i]] = colorIndex;
-}
-
-
-gint ggobi_getCaseColor (gint pt, GGobiData * d, ggobid * gg)
-{
-  return (d->color_now.els[pt]);
-}
-
-gint *ggobi_getCaseColors (gint * pts, gint howMany, GGobiData * d,
-                             ggobid * gg)
-{
-  gint i;
-  gint *ans = (gint *) g_malloc (howMany * sizeof (gint));
-
-  for (i = 0; i < howMany; i++)
-    ans[i] = ggobi_getCaseColor (pts[i], d, gg);
-
-  return (ans);
-}
 
 /*-------------------------------------------------------------------------*/
 /*        setting and getting the point hidden state                       */

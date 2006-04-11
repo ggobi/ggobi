@@ -216,7 +216,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
 #else
         for (i=0; i<d->nrows_in_plot; i++) {
           m = d->rows_in_plot.els[i];
-          if (d->color_now.els[m] == current_color &&
+          if (ggobi_data_get_attr_color(d, m) == current_color &&
             !d->hidden_now.els[m] &&
             splot_plot_case (m, d, sp, display, gg))
           {
@@ -395,7 +395,7 @@ splot_draw_to_pixmap0_binned (splotd *sp, gboolean draw_hidden, ggobid *gg)
               i = d->rows_in_plot.els[d->brush.binarray[ih][iv].els[m]];
 
               if (!d->hidden_now.els[i] &&
-                  d->color_now.els[i] == current_color &&
+                  ggobi_data_get_attr_color(d, i) == current_color &&
                   splot_plot_case (i, d, sp, display, gg))
               {
                 draw_glyph (sp->pixmap0, &d->glyph_now.els[i],

@@ -179,7 +179,7 @@ record_colors_reset (gint selected_var, GGobiData *d, ggobid *gg)
     for (k=0; k<scheme->n; k++) {
       val = min + gg->wvis.pct[k] * (max - min);
       if (d->tform.vals[i][selected_var] <= val) {
-        d->color.els[i] = d->color_now.els[i] = k;
+        ggobi_data_set_attr_color(d, i, k, ATTR_SET_PERSISTENT);
         break;
       }
     }

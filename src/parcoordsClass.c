@@ -500,7 +500,7 @@ splot_add_whisker_cues (gboolean nearest_p, gint k, splotd * sp,
     gdk_gc_set_line_attributes (gg->plot_GC,
                                 3, GDK_LINE_SOLID, GDK_CAP_ROUND,
                                 GDK_JOIN_ROUND);
-    gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[d->color_now.els[k]]);
+    gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[ggobi_data_get_attr_color(d, k)]);
 
     n = 2 * k;
     gdk_draw_line (drawable, gg->plot_GC,

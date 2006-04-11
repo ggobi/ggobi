@@ -18,6 +18,16 @@
 #include "vars.h"
 #include "externs.h"
 
+//FIXME:  I think this can be considerably simplified by using
+// a hash function that takes a colour, and glyph and returns 
+// a unique identifier (maybe a double)
+//
+// This will also make it more flexibile if we introduce new
+// attribute mappings or make colour or size continuous.
+//
+// The functionality of this file could then be moved into data.gob
+// and this function deleted.
+
 void
 symbol_table_zero (GGobiData * d)
 {

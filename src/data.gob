@@ -99,6 +99,11 @@ typedef struct _BrushBins {
 %}
 
 
+enum ATTR_SET {
+  PERSISTENT,
+  TRANSIENT
+} GGobiData:AttrSetMethod;
+
 /**
  * SECTION:GGobiData
  * @short_description: Basic data storage and manipulation class.
@@ -160,12 +165,12 @@ public vector_i rows_in_plot;
 public vector_g glyph;
 public vector_g glyph_now;
 public vector_g glyph_prev;
-public vector_s color;
-public vector_s color_now; 
-public vector_s color_prev;
+protected vector_s color;
+protected vector_s color_now; 
+protected vector_s color_prev;
 
 // Arrays of ncols x nrows
-public array_f raw;
+protected array_f raw;
 public array_f tform;
 public array_g world;
 public array_g jitdata;
@@ -1102,7 +1107,6 @@ set_row_id(self, guint i, gchar* value, gboolean check) {
 
   self->rowIds[i] = g_strdup(value);
   g_hash_table_replace (self->idTable, self->rowIds[i], GINT_TO_POINTER(i));
-  g_debug("Setting row %i to %s", i, value);
 }
 
 /** 
@@ -1184,7 +1188,8 @@ add_rows(self, guint n) {
   if (self_has_edges(self))
     vectorb_realloc (&self->edge.xed_by_brush, self->edge.n);
 
-  for (i = nprev; i < self->nrows; i++) {    
+  for (i = nprev; i < self->nrows; i++) {
+    self_set_attr_color(self, i, def_color, ATTR_SET_PERSISTENT);
     self->color.els[i] = def_color;
     self->color_now.els[i] = def_color;
     self->color_prev.els[i] = def_color;
@@ -1457,6 +1462,72 @@ set_rows_in_plot(self)
       self->rows_in_plot.els[self->nrows_in_plot++] = i;
   
   self_rows_in_plot_changed(self, (guint) self->nrows_in_plot); 
+}
+
+
+/* Attributes
+ * ============================================================================
+ */
+
+/**
+ * reset_attr_color:
+ * @self: #GGobiData 
+ * @i: row index
+ * @brush: persistent or transient
+ *
+ * Resets color attribute to previous value
+**/
+public gboolean
+reset_attr_color(self, guint i, GGobiDataAttrSetMethod brush)
+{
+  switch(brush) {
+    case ATTR_SET_PERSISTENT:
+      return self_set_attr_color(self, i, self->color_prev.els[i], brush);
+    default:
+      return self_set_attr_color(self, i, self->color.els[i], brush);
+  }
+  
+}
+
+/**
+ * set_attr_colur:
+ * @self: #GGobiData
+ * @i: row index
+ * @brush: persistent or transient
+ *
+ * Sets color attribute to new value.
+ * Returns: true if value has changed, false otherwise
+**/
+public gboolean
+set_attr_color(self, guint i, gushort color, GGobiDataAttrSetMethod brush)
+{
+  if (brush == ATTR_SET_TRANSIENT ?
+    (self->color_now.els[i] == color) :
+    (self->color.els[i] == color))
+    return false;
+
+  //g_debug("Setting %i to color %i (%s)", i, color, brush == ATTR_SET_PERSISTENT ? "persistent":"transient" );
+
+  if (brush == ATTR_SET_PERSISTENT) {
+    self->color_prev.els[i] = self->color.els[i];
+    self->color.els[i] = color;
+  }
+
+  self->color_now.els[i] = color;
+  return true;
+}
+
+/**
+ * get_attr_color:
+ * @self: #GGobiData
+ * @i: row index
+ * 
+ * Retrieve current color
+**/
+public gushort
+get_attr_color(self, guint i)
+{
+  return self->color_now.els[i];
 }
 
 }

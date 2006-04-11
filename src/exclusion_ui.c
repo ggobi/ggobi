@@ -294,7 +294,7 @@ cluster_symbol_cb (GtkWidget * w, GdkEventExpose * event, gpointer cbd)
     i = d->rows_in_plot.els[m];
     if (d->clusterid.els[i] == n) {
       if (targets == br_candg || targets == br_color) {
-        d->color.els[i] = d->color_now.els[i] = gg->color_id;
+        ggobi_data_set_attr_color(d, i, gg->color_id, ATTR_SET_TRANSIENT);
         /*-- this will be done multiple times, but who cares? --*/
         d->clusv[n].color = gg->color_id;
       }

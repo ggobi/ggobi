@@ -63,7 +63,7 @@ symbol_link_by_id (gboolean persistentp, gint k, GGobiData * sd, ggobid * gg)
          */
 
         if (!d->hidden_now.els[i]) {
-          d->color.els[i] = d->color_now.els[i] = sd->color.els[k];
+          ggobi_data_set_attr_color(d, i, ggobi_data_get_attr_color(sd, k), cpanel->br.mode);
           d->glyph.els[i].size = d->glyph_now.els[i].size =
             sd->glyph.els[k].size;
           d->glyph.els[i].type = d->glyph_now.els[i].type =
@@ -78,7 +78,7 @@ symbol_link_by_id (gboolean persistentp, gint k, GGobiData * sd, ggobid * gg)
       else if (cpanel->br.mode == BR_TRANSIENT) {
 
         if (!d->hidden_now.els[i]) {
-          d->color_now.els[i] = sd->color_now.els[k];
+          ggobi_data_set_attr_color(d, i, ggobi_data_get_attr_color(sd, k), cpanel->br.mode);
           d->glyph_now.els[i].size = sd->glyph_now.els[k].size;
           d->glyph_now.els[i].type = sd->glyph_now.els[k].type;
         }
@@ -143,12 +143,12 @@ brush_link_by_var (gint jlinkby, vector_b * levelv,
       if (cpanel->br.mode == BR_PERSISTENT) {
         switch (cpanel->br.point_targets) {
         case br_candg:   /*-- color and glyph, type and size --*/
-          d->color.els[i] = d->color_now.els[i] = gg->color_id;
+          ggobi_data_set_attr_color(d, i, gg->color_id, cpanel->br.mode);
           d->glyph.els[i].size = d->glyph_now.els[i].size = gg->glyph_id.size;
           d->glyph.els[i].type = d->glyph_now.els[i].type = gg->glyph_id.type;
           break;
         case br_color:   /*-- color only --*/
-          d->color.els[i] = d->color_now.els[i] = gg->color_id;
+          ggobi_data_set_attr_color(d, i, gg->color_id, cpanel->br.mode);
           break;
         case br_glyph:   /*-- glyph type and size --*/
           d->glyph.els[i].size = d->glyph_now.els[i].size = gg->glyph_id.size;
@@ -170,12 +170,12 @@ brush_link_by_var (gint jlinkby, vector_b * levelv,
       else if (cpanel->br.mode == BR_TRANSIENT) {
         switch (cpanel->br.point_targets) {
         case br_candg:
-          d->color_now.els[i] = gg->color_id;
+          ggobi_data_set_attr_color(d, i, gg->color_id, cpanel->br.mode);
           d->glyph_now.els[i].size = gg->glyph_id.size;
           d->glyph_now.els[i].type = gg->glyph_id.type;
           break;
         case br_color:
-          d->color_now.els[i] = gg->color_id;
+          ggobi_data_set_attr_color(d, i, gg->color_id, cpanel->br.mode);
           break;
         case br_glyph:   /*-- glyph type and size --*/
           d->glyph_now.els[i].size = gg->glyph_id.size;
@@ -199,12 +199,12 @@ brush_link_by_var (gint jlinkby, vector_b * levelv,
       /*-- should only matter if transient, right? --*/
       switch (cpanel->br.point_targets) {
       case br_candg:
-        d->color_now.els[i] = d->color.els[i];
+        ggobi_data_reset_attr_color(d, i, cpanel->br.mode);
         d->glyph_now.els[i].size = d->glyph.els[i].size;
         d->glyph_now.els[i].type = d->glyph.els[i].type;
         break;
       case br_color:
-        d->color_now.els[i] = d->color.els[i];
+        ggobi_data_reset_attr_color(d, i, cpanel->br.mode);
         break;
       case br_glyph:   /*-- glyph type and size --*/
         d->glyph_now.els[i].size = d->glyph.els[i].size;

@@ -317,13 +317,13 @@ barchart_recalc_group_counts (barchartSPlotd * sp, GGobiData * d, ggobid * gg)
       bin = sp->bar->index_to_rank.els[i];
 /* --- */
     if ((bin >= 0) && (bin < sp->bar->nbins)) {
-      sp->bar->cbins[bin][d->color_now.els[m]].count++;
+      sp->bar->cbins[bin][ggobi_data_get_attr_color(d, m)].count++;
     }
     if (bin == -1) {
-      sp->bar->col_low_bin[d->color_now.els[m]].count++;
+      sp->bar->col_low_bin[ggobi_data_get_attr_color(d, m)].count++;
     }
     else if (bin == sp->bar->nbins) {
-      sp->bar->col_high_bin[d->color_now.els[m]].count++;
+      sp->bar->col_high_bin[ggobi_data_get_attr_color(d, m)].count++;
     }
   }
 
