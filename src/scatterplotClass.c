@@ -771,7 +771,7 @@ scatterplotMovePointsButtonCb (displayd * display, splotd * sp, GtkWidget * w,
           k = d->rows_in_plot.els[i];
           if (k == id);
           else if (d->clusterid.els[k] == cur_clust)
-            if (!d->hidden_now.els[k])
+            if (!ggobi_data_get_attr_hidden(d, k))
               movepts_history_add (k, sp, d, gg);
         }
       }

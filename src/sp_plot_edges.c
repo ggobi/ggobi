@@ -135,10 +135,6 @@ splot_edges_draw (splotd * sp, gboolean draw_hidden, GdkDrawable * drawable,
         for (p = 0; p < ncolors; p++)
           symbols_used[k][n][p] = 0;
 
-    /*
-     * Use e->color_now[] and e->glyph_now[] to work out which
-     * line symbols should be drawn
-     */
     for (i = 0; i < e->nrows_in_plot; i++) {
       m = e->rows_in_plot.els[i];
       /* If we're drawing hiddens and this is hidden and plottable ... */
@@ -146,16 +142,9 @@ splot_edges_draw (splotd * sp, gboolean draw_hidden, GdkDrawable * drawable,
            /* Or if we're not drawing hiddens and this isn't hidden ... */
            (!draw_hidden && !e->hidden_now.els[m]))) {
 
-        gtype = e->glyph_now.els[m].type;
+        gtype = ggobi_data_get_attr_glyph(e, m)->type;
         ltype = ltype_from_gtype (gtype);
-        /*
-           if (gtype == FC || gtype == FR)
-           ltype = SOLID;
-           else if (gtype == OC || gtype == OR)
-           ltype = WIDE_DASH;
-           else ltype = NARROW_DASH;
-         */
-        symbols_used[e->glyph_now.els[m].size][ltype][ggobi_data_get_attr_color(e, m)]++;
+        symbols_used[ggobi_data_get_attr_glyph(e, m)->size][ltype][ggobi_data_get_attr_color(e, m)]++;
       }
     }
 
@@ -203,18 +192,11 @@ splot_edges_draw (splotd * sp, gboolean draw_hidden, GdkDrawable * drawable,
 
               edge_endpoints_get (j, &a, &b, d, endpoints, e);
 
-              gtype = e->glyph_now.els[j].type;
+              gtype = ggobi_data_get_attr_glyph(e, j)->type;
               ltype = ltype_from_gtype (gtype);
-              /*
-                 if (gtype == FC || gtype == FR)
-                 ltype = SOLID;
-                 else if (gtype == OC || gtype == OR)
-                 ltype = WIDE_DASH;
-                 else ltype = NARROW_DASH;
-               */
 
-              if (e->color_now.els[j] == p &&
-                  ltype == n && e->glyph_now.els[j].size == k) {
+              if (ggobi_data_get_attr_color(e, j) == p &&
+                  ltype == n && ggobi_data_get_attr_glyph(e, j)->size == k) {
                 if (edges_show_p) {
                   if (endpoints[j].jpartner == -1) {
                     sp->edges[nl].x1 = sp->screen[a].x;
@@ -338,7 +320,7 @@ splot_add_edge_highlight_cue (splotd * sp, GdkDrawable * drawable, gint k,
     gdk_gc_set_line_attributes (gg->plot_GC,
                                 3, GDK_LINE_SOLID, GDK_CAP_ROUND,
                                 GDK_JOIN_ROUND);
-    gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[e->color_now.els[k]]);
+    gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[ggobi_data_get_attr_color(e, k)]);
 
     if (endpoints[k].jpartner == -1) {
       gdk_draw_line (drawable, gg->plot_GC,

@@ -29,6 +29,7 @@
 #include <strings.h>
 #include "writedata.h"
 
+extern const gchar* const GlyphNames;
 
 XmlWriteInfo *updateXmlWriteInfo(GGobiData *d, ggobid *gg, XmlWriteInfo *info);
 
@@ -222,10 +223,6 @@ write_xml_records(FILE *f, GGobiData *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
   fprintf(f, "<records ");
   fprintf(f, "count=\"%d\"", n);
   if(xmlWriteInfo->useDefault) {
-/*
-   fprintf(f, " glyphSize=\"%s\"", xmlWriteInfo->defaultGlyphSizeName);
-   fprintf(f, " glyphType=\"%s\"", xmlWriteInfo->defaultGlyphTypeName);
-*/
     fprintf(f, " glyph=\"%s %s\"",
       xmlWriteInfo->defaultGlyphTypeName,
       xmlWriteInfo->defaultGlyphSizeName);
@@ -270,7 +267,6 @@ write_xml_record (FILE *f, GGobiData *d, ggobid *gg, gint i,
   XmlWriteInfo *xmlWriteInfo)
 {
   gint j;
-  gchar *gtypestr = NULL;
 
   /*-- ids if present --*/
   fprintf(f, " id=\"%s\"", ggobi_data_get_row_id(d, i));
@@ -292,43 +288,12 @@ write_xml_record (FILE *f, GGobiData *d, ggobid *gg, gint i,
     fprintf(f, " color=\"%d\"", d->color.els[i]);
   }
 
-/*
-  fprintf(f, " glyphSize=\"%d\"", d->glyph[i].size);
-  fprintf(f, " glyphType=\"%d\"", d->glyph[i].type);
-*/
+
   if (!xmlWriteInfo->useDefault ||
      xmlWriteInfo->defaultGlyphType != d->glyph.els[i].type ||
-     xmlWriteInfo->defaultGlyphSize != d->glyph.els[i].size)
+     xmlWriteInfo->defaultGlyphSize != d->glyph.els[i].size) 
   {
-    switch (d->glyph.els[i].type) {
-      case PLUS:
-        gtypestr = "plus";
-      break;
-      case X:
-        gtypestr = "x";
-      break;
-      case OR:
-        gtypestr = "or";
-      break;
-      case FR:
-        gtypestr = "fr";
-      break;
-      case OC:
-        gtypestr = "oc";
-      break;
-      case FC:
-        gtypestr = "fc";
-      break;
-      case DOT_GLYPH:
-        gtypestr = ".";
-      break;
-      case UNKNOWN_GLYPH:
-      default:
-        gtypestr=NULL;
-      break;
-    }
-
-    fprintf (f, " glyph=\"%s %d\"", gtypestr, d->glyph.els[i].size);
+    fprintf (f, " glyph=\"%s %d\"", GlyphNames[d->glyph.els[i].type], d->glyph.els[i].size);
   }
 
   fprintf(f, ">\n");

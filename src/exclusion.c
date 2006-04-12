@@ -55,16 +55,16 @@ symbol_table_populate (GGobiData * d)
 
   /*-- loop over all data --*/
   for (i = 0; i < d->nrows; i++) {
-    j = d->glyph.els[i].type;
-    k = d->glyph.els[i].size;
-    m = d->color.els[i];
+    j = ggobi_data_get_attr_glyph(d, i)->type;
+    k = ggobi_data_get_attr_glyph(d, i)->size;
+    m = ggobi_data_get_attr_color(d, i);
 
     if (d->symbol_table[j][k][m].n == 0)
       nclusters++;
 
     d->symbol_table[j][k][m].n++;
 
-    if (d->hidden.els[i])
+    if (ggobi_data_get_attr_hidden(d, i))
       d->symbol_table[j][k][m].nhidden++;
     else
       d->symbol_table[j][k][m].nshown++;
@@ -129,9 +129,9 @@ clusters_set (GGobiData * d)
     for (i = 0; i < d->nrows; i++) {
       for (n = 0; n < nclusters; n++) {
         if (d->sampled.els[i]) {
-          if (d->glyph.els[i].type == d->clusv[n].glyphtype &&
-              d->glyph.els[i].size == d->clusv[n].glyphsize &&
-              d->color.els[i] == d->clusv[n].color) {
+          if (ggobi_data_get_attr_glyph(d, i)->type == d->clusv[n].glyphtype &&
+              ggobi_data_get_attr_glyph(d, i)->size == d->clusv[n].glyphsize &&
+              ggobi_data_get_attr_color(d, i) == d->clusv[n].color) {
             d->clusterid.els[i] = n;
             break;
           }

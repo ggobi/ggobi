@@ -127,15 +127,13 @@ hide_cluster_cb (GtkToggleButton * btn, gpointer cbd)
   gint i;
   ggobid *gg = GGobiFromWidget (GTK_WIDGET (btn), true);
   GGobiData *d = datad_get_from_notebook (gg->cluster_ui.notebook, gg);
-  gboolean prev, changed = false;
+  gboolean changed = false;
 
   /*-- operating on the current sample, whether hidden or shown --*/
   for (i = 0; i < d->nrows; i++) {
     if (d->sampled.els[i]) {
       if (d->clusterid.els[i] == k) {
-        prev = d->hidden.els[i];
-        d->hidden.els[i] = d->hidden_now.els[i] = btn->active;
-        if ((prev != d->hidden.els[i]) && !gg->linkby_cv) {
+        if (ggobi_data_set_attr_hidden(d, i, btn->active, ATTR_SET_PERSISTENT)) {
           changed = symbol_link_by_id (true, i, d, gg) || changed;
         }
       }
@@ -161,7 +159,7 @@ include_hiddens (gboolean include, GGobiData * d, ggobid * gg)
 
   for (i = 0; i < d->nrows; i++) {
     prev = d->excluded.els[i];
-    d->excluded.els[i] = (!include && d->hidden_now.els[i]);
+    d->excluded.els[i] = (!include && ggobi_data_get_attr_hidden(d, i));
     if ((prev != d->excluded.els[i]) && !gg->linkby_cv) {
       /*-- this doesn't link the value of excluded --*/
       changed = changed || exclude_link_by_id (i, d, gg);
@@ -299,8 +297,7 @@ cluster_symbol_cb (GtkWidget * w, GdkEventExpose * event, gpointer cbd)
         d->clusv[n].color = gg->color_id;
       }
       if (targets == br_candg || targets == br_glyph) {
-        d->glyph.els[i].type = d->glyph_now.els[i].type = gg->glyph_id.type;
-        d->glyph.els[i].size = d->glyph_now.els[i].size = gg->glyph_id.size;
+        ggobi_data_set_attr_glyph(d, i, &gg->glyph_id, ATTR_SET_PERSISTENT);
         /*-- this will be done multiple times, but who cares? --*/
         d->clusv[n].glyphtype = gg->glyph_id.type;
         d->clusv[n].glyphsize = gg->glyph_id.size;

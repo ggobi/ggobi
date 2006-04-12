@@ -121,7 +121,7 @@ impute_mean_or_median (gint type, gint nvars, gint * vars,
         for (i = 0; i < d->nrows_in_plot; i++) {
           k = d->rows_in_plot.els[i];
           if (d->clusterid.els[k] == n) {
-            if (!d->hidden_now.els[k]) {  /* ignore erased values */
+            if (!ggobi_data_get_attr_hidden(d, k)) {  /* ignore erased values */
               if (ggobi_data_is_missing(d, k, j))
                 missv[nmissing++] = k;
               else {
@@ -160,7 +160,7 @@ impute_mean_or_median (gint type, gint nvars, gint * vars,
       vt = ggobi_data_get_vartable(d, j);
       for (i = 0; i < d->nrows_in_plot; i++) {
         k = d->rows_in_plot.els[i];
-        if (!d->hidden_now.els[k]) {  /* ignore erased values altogether */
+        if (!ggobi_data_get_attr_hidden(d, k)) {  /* ignore erased values altogether */
           if (ggobi_data_is_missing(d, k, j)) {
             ggobi_data_set_raw_value(d, k, j, (type == IMP_MEAN) ? vt->mean : vt->median);
             redraw = true;
@@ -228,7 +228,7 @@ impute_random (GGobiData * d, gint nvars, gint * vars)
         for (i = 0; i < d->nrows_in_plot; i++) {
           k = d->rows_in_plot.els[i];
           if (d->clusterid.els[k] == n) {
-            if (!d->hidden_now.els[k]) {  /* ignore erased values altogether */
+            if (!ggobi_data_get_attr_hidden(d, k)) {  /* ignore erased values altogether */
               if (ggobi_data_is_missing(d, k, j))
                 missv[nmissing++] = k;
               else
@@ -252,7 +252,7 @@ impute_random (GGobiData * d, gint nvars, gint * vars)
        */
       for (i = 0; i < d->nrows_in_plot; i++) {
         k = d->rows_in_plot.els[i];
-        if (!d->hidden_now.els[k]) {  /* ignore erased values altogether */
+        if (!ggobi_data_get_attr_hidden(d, k)) {  /* ignore erased values altogether */
           if (ggobi_data_is_missing(d, k, j))
             missv[nmissing++] = k;
           else

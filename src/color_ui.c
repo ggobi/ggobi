@@ -36,12 +36,8 @@ choose_glyph_cb (GtkWidget * w, GdkEventButton * event, ggobid * gg)
   gint i, dsq, nearest_dsq, type, size, rval = false;
   icoords pos, ev;
   splotd *sp = gg->current_splot;
-  displayd *display = (displayd *) sp->displayptr;
-  GGobiData *d = display->d;
   gint spacing = gg->color_ui.spacing;
   gint margin = gg->color_ui.margin;
-
-  vectorg_copy (&d->glyph, &d->glyph_prev);  /*-- from, to --*/
 
   ev.x = (gint) event->x;
   ev.y = (gint) event->y;
@@ -383,15 +379,9 @@ set_one_color (GtkWidget * w, GdkEventButton * event, ggobid * gg)
 static void
 set_color_fg (GtkWidget * w, GdkEventButton * event, ggobid * gg)
 {
-  gint i;
   gint prev = gg->color_id;
   gint k = GPOINTER_TO_INT (g_object_get_data (G_OBJECT (w), "index"));
-  splotd *sp = gg->current_splot;
-  displayd *display = (displayd *) sp->displayptr;
-  GGobiData *d = display->d;
 
-  for (i = 0; i < d->nrows; i++)
-    d->color_prev.els[i] = d->color.els[i];
   gg->color_id = k;
 
   if (event->type == GDK_2BUTTON_PRESS || event->type == GDK_3BUTTON_PRESS) {

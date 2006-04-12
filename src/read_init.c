@@ -33,8 +33,6 @@
 #include "externs.h"
 #include "tour.h"
 
-
-
 const gchar *const GlyphNames[] = {
   /*        ".", "+", "x", "or", "fr", "oc", "fc", "" */
   ".", "plus", "x", "oc", "or", "fc", "fr", ""

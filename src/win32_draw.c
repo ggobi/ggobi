@@ -212,7 +212,7 @@ build_point (icoords *pos, gint nrow, GdkPoint * pointv, gint npt)
 }
 
 void
-build_glyph (glyphd *gl, icoords *xypos, gint jpos,
+build_glyph (glyphd gl, icoords *xypos, gint jpos,
   GdkPoint *pointv,   gint *np,
   GdkSegment *segv,   gint *ns,
   rectd *openrectv,   gint *nr_open,
@@ -221,8 +221,8 @@ build_glyph (glyphd *gl, icoords *xypos, gint jpos,
   arcd *filledarcv,   gint *nc_filled)
 {
   gshort size, type;
-  size = gl->size + 1;
-  type = gl->type;
+  size = gl.size + 1;
+  type = gl.type;
 
   switch (type) {
     case PLUS:
@@ -365,7 +365,7 @@ win32_draw_to_pixmap_unbinned (gint current_color, splotd *sp, gboolean draw_hid
               !draw_hidden && !d->hidden_now.els[m]))
       {
         if (display->options.points_show_p) {
-          build_glyph (&d->glyph_now.els[m], sp->screen, m,
+          build_glyph (ggobi_data_get_attr_glyph(d, m), sp->screen, m,
             sp->win32.points, &npt,         sp->win32.segs, &nseg,
             sp->win32.open_rects, &nr_open, sp->win32.filled_rects, &nr_filled,
             sp->win32.open_arcs, &nc_open,  sp->win32.filled_arcs, &nc_filled);
@@ -419,7 +419,7 @@ win32_draw_to_pixmap_binned (icoords *bin0, icoords *bin1,
              (ggobi_data_get_attr_color(d, j) == current_color &&   /*-- unhiddens --*/
                   !draw_hidden && !d->hidden_now.els[j]))
           {
-            build_glyph (&d->glyph_now.els[j], sp->screen, j,
+            build_glyph (ggobi_data_get_attr_glyph(d, j), sp->screen, j,
               sp->win32.points, &npt,          
               sp->win32.segs, &nseg,
               sp->win32.open_rects, &nr_open,  

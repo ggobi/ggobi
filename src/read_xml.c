@@ -937,8 +937,7 @@ setHidden (const xmlChar ** attrs, XMLParserData * data, gint i)
       data->defaults.hidden = hidden;
     }
     else
-      d->hidden.els[i] = d->hidden_now.els[i] = d->hidden_prev.els[i] =
-        hidden;
+      ggobi_data_set_attr_hidden(d, i, hidden, ATTR_SET_PERSISTENT);
   }
 
   return (tmp != NULL);
@@ -988,40 +987,31 @@ gboolean
 setGlyph (const xmlChar ** attrs, XMLParserData * data, gint i)
 {
   const gchar *tmp;
-  gint value;
+  gint size, type;
   GGobiData *d = getCurrentXMLData (data);
 
 /*
  * glyphSize  0:7
 */
-  value = data->defaults.glyphSize;
+  size = data->defaults.glyphSize;
   tmp = getAttribute (attrs, "glyphSize");
   if (tmp) {
-    value = atoi (tmp);
+    size = atoi (tmp);
   }
 
-  if (value < 0 || value >= NGLYPHSIZES) {
+  if (size < 0 || size >= NGLYPHSIZES) {
     if (tmp)
       xml_warning ("glyphSize", tmp, "Out of range", data);
   }
   else {
-    if (i < 0) {
-      data->defaults.glyphSize = value;
-    }
-    else {
-      /*
-       * note that even if defaults.glyphSize was set below, during
-       * the 'glyph' section, the values for record i are assigned here.
-       */
-      d->glyph.els[i].size = d->glyph_now.els[i].size
-        = d->glyph_prev.els[i].size = value;
-    }
+    if (i < 0)
+      data->defaults.glyphSize = size;
   }
 
 /*
  * glyphType  0:6
 */
-  value = data->defaults.glyphType;
+  type = data->defaults.glyphType;
   tmp = getAttribute (attrs, "glyphType");
   if (tmp) {
     /*
@@ -1029,32 +1019,27 @@ setGlyph (const xmlChar ** attrs, XMLParserData * data, gint i)
      * string here, like "plus" or "fc", value = 0 and the mistake
      * isn't caught later when value is tested.
      */
-    value = mapGlyphName (tmp);
-    if (value == UNKNOWN_GLYPH) {
+    type = mapGlyphName (tmp);
+    if (type == UNKNOWN_GLYPH) {
       if (tmp[0] < '0' || tmp[0] > '6') {
         g_error ("%s is an illegal value for glyphType; it must be on [0,6]",
                  tmp);
       }
 
-      value = atoi (tmp);
+      type = atoi (tmp);
     }
   }
-  if (value < 0 || value >= NGLYPHTYPES) {
+  if (type < 0 || type >= NGLYPHTYPES) {
     if (tmp)
       xml_warning ("glyphType", tmp, "Out of range", data);
   }
   else {
-    if (i < 0) {
-      data->defaults.glyphType = value;
-    }
-    else {
-      /*
-       * note that even if defaults.glyphType was set below, during
-       * the 'glyph' section, the values for record i are assigned here.
-       */
-      d->glyph.els[i].type = d->glyph_now.els[i].type =
-        d->glyph_prev.els[i].type = value;
-    }
+    if (i < 0)
+      data->defaults.glyphType = type;
+  }
+    
+  if (i >= 0) {
+    ggobi_data_set_attr_glyph_parts(d, i, type, size, ATTR_SET_PERSISTENT);
   }
 
 /*
@@ -1069,37 +1054,30 @@ setGlyph (const xmlChar ** attrs, XMLParserData * data, gint i)
     j = 0;
     while (next) {
       if (j == 0) {             /* type */
-        value = mapGlyphName (next);
+        type = mapGlyphName (next);
         if (i < 0) {
-          data->defaults.glyphType = value;
-        }
-        else {
-          d->glyph.els[i].type = d->glyph_now.els[i].type =
-            d->glyph_prev.els[i].type = value;
+          data->defaults.glyphType = type;
         }
       }
       else {                    /* size */
-        value = atoi (next);
+        size = atoi (next);
         if (i < 0) {
-          if (value >= 0 && value < NGLYPHTYPES) {
-            data->defaults.glyphSize = value;
+          if (size >= 0 && size < NGLYPHTYPES) {
+            data->defaults.glyphSize = size;
           }
           else {
             xml_warning ("File error:", next, "glyph improperly specified",
                          data);
           }
         }
-        else {
-          d->glyph.els[i].size = d->glyph_now.els[i].size =
-            d->glyph_prev.els[i].size = value;
-        }
       }
       j++;
       next = strtok (NULL, " ");
     }
+    ggobi_data_set_attr_glyph_parts(d, i, type, size, ATTR_SET_PERSISTENT);
   }
 
-  return (value != -1);
+  return (size != -1 && type != -1);
 }
 
 

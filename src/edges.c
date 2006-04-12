@@ -237,7 +237,7 @@ do_resolveEdgePoints (GGobiData * e, GGobiData * d, gboolean compute)
   /* If it is already computed but empty, then return NULL. */
   if (ans == &DegenerateEndpoints)
     return (NULL);
-
+  
   /* So no entry in the table yet. So compute the endpoints and add
      that to the table. */
   if (ans == NULL && compute) {

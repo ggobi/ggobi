@@ -245,7 +245,7 @@ find_nearest_edge (splotd * sp, displayd * display, ggobid * gg)
     xdist = sqdist = 1000 * 1000;
     for (j = 0; j < e->edge.n; j++) {
       doit = edge_endpoints_get (j, &from, &to, d, endpoints, e);
-      doit = doit && (!d->hidden_now.els[from] && !d->hidden_now.els[to]);
+      doit = doit && (!ggobi_data_get_attr_hidden(d, from) && !ggobi_data_get_attr_hidden(d, to));
 
       if (doit) {
         a.x = sp->screen[from].x;
@@ -313,7 +313,7 @@ find_nearest_edge (splotd * sp, displayd * display, ggobid * gg)
        mouse to the two endpoints to decide. */
     if (lineid != -1) {
       j = endpoints[lineid].jpartner;
-      if (j != -1 && !e->hidden_now.els[j]) {
+      if (j != -1 && !ggobi_data_get_attr_hidden(e, j)) {
 
         edge_endpoints_get (lineid, &from, &to, d, endpoints, e);
 

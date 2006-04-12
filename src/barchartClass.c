@@ -229,39 +229,11 @@ barchart_build_symbol_vectors (cpaneld * cpanel, GGobiData * d, ggobid * gg)
 
   for (j = 0; j < d->nrows_in_plot; j++) {
     m = d->rows_in_plot.els[j];
+    changed = ggobi_data_brush_point(d, m, d->pts_under_brush.els[m], 
+      cpanel->br.point_targets, ATTR_SET_TRANSIENT) || changed;
 
-    switch (cpanel->br.point_targets) {
-    case br_candg:  /*-- color and glyph --*/
-      changed = update_color_vectors (m, changed,
-                                      d->pts_under_brush.els, d, gg);
-      changed = update_glyph_vectors (m, changed,
-                                      d->pts_under_brush.els, d, gg);
-      break;
-    case br_color:
-      changed = update_color_vectors (m, changed,
-                                      d->pts_under_brush.els, d, gg);
-      break;
-    case br_glyph:  /*-- glyph type and size --*/
-      changed = update_glyph_vectors (m, changed,
-                                      d->pts_under_brush.els, d, gg);
-      break;
-    case br_shadow:
-      changed = update_hidden_vectors (m, changed,
-                                       d->pts_under_brush.els, d, gg);
-      break;
-    case br_unshadow:
-      changed = bizarro_update_hidden_vectors (m, changed,
-                                               d->pts_under_brush.els, d, gg);
-      break;
-    case br_off:
-      ;
-      break;
-    }
-
-    /*-- link by id --*/
     if (!gg->linkby_cv && nd > 1)
       symbol_link_by_id (false, j, d, gg);
-    /*-- --*/
   }
 
   return changed;

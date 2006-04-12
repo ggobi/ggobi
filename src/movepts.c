@@ -188,7 +188,7 @@ move_pt (gint id, gint x, gint y, splotd * sp, GGobiData * d, ggobid * gg)
      */
     for (i = 0; i < d->nrows_in_plot; i++) {
       k = d->rows_in_plot.els[i];
-      if (k == id || d->clusterid.els[k] != cur_clust || d->hidden_now.els[k])
+      if (k == id || d->clusterid.els[k] != cur_clust || ggobi_data_get_attr_hidden(d, k))
         continue;
         
       if (horiz)

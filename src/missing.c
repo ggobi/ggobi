@@ -68,12 +68,13 @@ missings_datad_cb (GtkWidget * w, ggobid * gg)
 
   for (i = 0; i < d->nrows; i++) {
     ggobi_data_set_attr_color(dnew, i, ggobi_data_get_attr_color(d, i), ATTR_SET_PERSISTENT);
+    ggobi_data_set_attr_glyph(dnew, i, ggobi_data_get_attr_glyph(d, i), ATTR_SET_PERSISTENT);
     //dnew->color.els[i] = d->color.els[i];
     //dnew->color_now.els[i] = d->color_now.els[i];
-    dnew->glyph.els[i].type = d->glyph.els[i].type;
-    dnew->glyph_now.els[i].type = d->glyph_now.els[i].type;
-    dnew->glyph.els[i].size = d->glyph.els[i].size;
-    dnew->glyph_now.els[i].size = d->glyph_now.els[i].size;
+    //dnew->glyph.els[i].type = d->glyph.els[i].type;
+    //dnew->glyph_now.els[i].type = d->glyph_now.els[i].type;
+    //dnew->glyph.els[i].size = d->glyph.els[i].size;
+    //dnew->glyph_now.els[i].size = d->glyph_now.els[i].size;
 
     ggobi_data_set_row_id(dnew, i, ggobi_data_get_row_id(dnew, i), false);
   }

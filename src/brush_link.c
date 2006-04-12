@@ -32,6 +32,8 @@ symbol_link_by_id (gboolean persistentp, gint k, GGobiData * sd, ggobid * gg)
   gint i, id = -1;
   /*-- this is the cpanel for the display being brushed --*/
   cpaneld *cpanel = &gg->current_display->cpanel;
+  GGobiDataAttrSetMethod brush = (persistentp || cpanel->br.mode == BR_PERSISTENT) ?
+    ATTR_SET_PERSISTENT : ATTR_SET_TRANSIENT;
   gboolean changed = false;
 
   /*-- k is the row number in source_d --*/
@@ -53,37 +55,11 @@ symbol_link_by_id (gboolean persistentp, gint k, GGobiData * sd, ggobid * gg)
     /*-- if we get here, d has one case with the indicated id --*/
     changed = true;
     if (d->sampled.els[i] && !d->excluded.els[i]) {
-      if (persistentp || cpanel->br.mode == BR_PERSISTENT) {
-
-        /*
-         * make it link for everything, no matter
-         * what kind of brushing is turned on, because
-         * otherwise, connections between points and edges
-         * gets messed up.
-         */
-
-        if (!d->hidden_now.els[i]) {
-          ggobi_data_set_attr_color(d, i, ggobi_data_get_attr_color(sd, k), cpanel->br.mode);
-          d->glyph.els[i].size = d->glyph_now.els[i].size =
-            sd->glyph.els[k].size;
-          d->glyph.els[i].type = d->glyph_now.els[i].type =
-            sd->glyph.els[k].type;
-        }
-        d->hidden.els[i] = d->hidden_now.els[i] = sd->hidden.els[k];
-
-        /*-- should we handle this here?  --*/
-        //d->excluded.els[i] = sd->excluded.els[k];
-
-      }
-      else if (cpanel->br.mode == BR_TRANSIENT) {
-
-        if (!d->hidden_now.els[i]) {
-          ggobi_data_set_attr_color(d, i, ggobi_data_get_attr_color(sd, k), cpanel->br.mode);
-          d->glyph_now.els[i].size = sd->glyph_now.els[k].size;
-          d->glyph_now.els[i].type = sd->glyph_now.els[k].type;
-        }
-        d->hidden_now.els[i] = sd->hidden_now.els[k];
-      }
+       if (!ggobi_data_get_attr_hidden(d, i)) {
+         ggobi_data_set_attr_color(d, i, ggobi_data_get_attr_color(sd, k), brush);
+         ggobi_data_set_attr_glyph(d, i, ggobi_data_get_attr_glyph(sd, k), brush);
+       }
+       ggobi_data_set_attr_hidden(d, i, ggobi_data_get_attr_hidden(sd, k), brush);
     }
   }
   return changed;
@@ -131,97 +107,11 @@ brush_link_by_var (gint jlinkby, vector_b * levelv,
 {
   gint m, i, level_value;
 
-  /*
-   * for this datad, loop once over all rows in plot 
-   */
   for (m = 0; m < d->nrows_in_plot; m++) {
     i = d->rows_in_plot.els[m];
 
     level_value = ggobi_data_get_integer_value(d, i, jlinkby);
-
-    if (levelv->els[level_value]) {  /*-- if it's to acquire the new symbol --*/
-      if (cpanel->br.mode == BR_PERSISTENT) {
-        switch (cpanel->br.point_targets) {
-        case br_candg:   /*-- color and glyph, type and size --*/
-          ggobi_data_set_attr_color(d, i, gg->color_id, cpanel->br.mode);
-          d->glyph.els[i].size = d->glyph_now.els[i].size = gg->glyph_id.size;
-          d->glyph.els[i].type = d->glyph_now.els[i].type = gg->glyph_id.type;
-          break;
-        case br_color:   /*-- color only --*/
-          ggobi_data_set_attr_color(d, i, gg->color_id, cpanel->br.mode);
-          break;
-        case br_glyph:   /*-- glyph type and size --*/
-          d->glyph.els[i].size = d->glyph_now.els[i].size = gg->glyph_id.size;
-          d->glyph.els[i].type = d->glyph_now.els[i].type = gg->glyph_id.type;
-          break;
-        case br_shadow:   /*-- shadowed, hidden --*/
-          d->hidden.els[i] = d->hidden_now.els[i] = true;
-          break;
-          /*
-             case br_unshadow:
-             d->hidden.els[i] = d->hidden_now.els[i] = false;
-             break;
-           */
-        default:
-          break;
-        }
-
-      }
-      else if (cpanel->br.mode == BR_TRANSIENT) {
-        switch (cpanel->br.point_targets) {
-        case br_candg:
-          ggobi_data_set_attr_color(d, i, gg->color_id, cpanel->br.mode);
-          d->glyph_now.els[i].size = gg->glyph_id.size;
-          d->glyph_now.els[i].type = gg->glyph_id.type;
-          break;
-        case br_color:
-          ggobi_data_set_attr_color(d, i, gg->color_id, cpanel->br.mode);
-          break;
-        case br_glyph:   /*-- glyph type and size --*/
-          d->glyph_now.els[i].size = gg->glyph_id.size;
-          d->glyph_now.els[i].type = gg->glyph_id.type;
-          break;
-        case br_shadow:   /*-- hidden --*/
-          d->hidden_now.els[i] = true;
-          break;
-          /*
-             case br_unshadow:
-             d->hidden_now.els[i] = false;
-             break;
-           */
-        default:
-          break;
-        }
-      }
-
-    }
-    else {    /*-- if it's to revert to the previous symbol --*/
-      /*-- should only matter if transient, right? --*/
-      switch (cpanel->br.point_targets) {
-      case br_candg:
-        ggobi_data_reset_attr_color(d, i, cpanel->br.mode);
-        d->glyph_now.els[i].size = d->glyph.els[i].size;
-        d->glyph_now.els[i].type = d->glyph.els[i].type;
-        break;
-      case br_color:
-        ggobi_data_reset_attr_color(d, i, cpanel->br.mode);
-        break;
-      case br_glyph:   /*-- glyph type and size --*/
-        d->glyph_now.els[i].size = d->glyph.els[i].size;
-        d->glyph_now.els[i].type = d->glyph.els[i].type;
-        break;
-      case br_shadow:   /*-- hidden --*/
-        d->hidden_now.els[i] = d->hidden.els[i];
-        break;
-        /* disabled
-           case br_unshadow:
-           d->hidden_now.els[i] = d->hidden.els[i];
-           break;
-         */
-      default:
-        break;
-      }
-    }
+    ggobi_data_brush_point(d, i, levelv->els[level_value], cpanel->br.point_targets, cpanel->br.mode);
   }
 }
 

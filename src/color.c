@@ -126,35 +126,7 @@ colorschemed *
 default_scheme_init ()
 {
   gint i, k;
-  /*
-   * This section may be useful for debugging in case of
-   * difficulties reading the colorscheme xml file.
-   */
-#ifdef SPECTRUM7
-  static gfloat data[7][3] = {
-    {0.890, 0.196, 0.122},
-    {1.000, 0.549, 0.000},
-    {0.988, 0.839, 0.051},
-    {0.988, 0.988, 0.000},
-    {0.604, 0.824, 0.294},
-    {0.235, 0.690, 0.616},
-    {0.149, 0.482, 0.671}
-  };
-  static gchar *colorNames[7] = {
-    "Red", "Orange", "Gold", "Yellow", "Green Yellow", "Teal", "Blue"
-  };
-  static gfloat bg[] = { 0.000, 0.000, 0.000 };
-  static gfloat accent[] = { 1.000, 1.000, 1.000 };
-  colorschemed *scheme = (colorschemed *) g_malloc (sizeof (colorschemed));
 
-  scheme->name = g_strdup ("Spectrum 7");
-  scheme->description = g_strdup ("From Cindy Brewer, a spectrum");
-  scheme->type = spectral;
-  scheme->system = rgb;
-  scheme->n = 7;
-  scheme->rgb = NULL;
-  scheme->criticalvalue = 0;  /*-- unused --*/
-#endif
 
   static gfloat data[][3] = {
     {1.0000, 1.0000, 0.2000},
@@ -358,7 +330,7 @@ datad_colors_used_get (gint * ncolors_used, gushort * colors_used,
    */
   for (i = 0; i < d->nrows_in_plot; i++) {
     m = d->rows_in_plot.els[i];
-    if (d->hidden_now.els[m]) {  /*-- if it's hidden, we don't care --*/
+    if (ggobi_data_get_attr_hidden(d, m)) {  /*-- if it's hidden, we don't care --*/
       new_color = false;
     } else {
       new_color = true;

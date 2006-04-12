@@ -169,51 +169,50 @@ GType ggobi_extended_splot_get_type(void);
 
 typedef struct 
 {
+  GGobiSPlotClass splot;
 
-   GGobiSPlotClass splot;
+  gchar *(*tree_label)(splotd *sp, GGobiData *d, ggobid *gg);
 
-   gchar *(*tree_label)(splotd *sp, GGobiData *d, ggobid *gg);
- 
-   gboolean (*identify_notify)(icoords, splotd *, GGobiData *, ggobid *);
+  gboolean (*identify_notify)(icoords, splotd *, GGobiData *, ggobid *);
 
-   void (*add_plot_labels)(splotd *, GdkDrawable *, ggobid *gg);
-   void (*add_markup_cues)(splotd *, GdkDrawable *, ggobid *);
-   void (*add_scaling_cues)(splotd *, GdkDrawable *, ggobid *);
-   void (*add_identify_cues)(gboolean, gint k, splotd *, GdkDrawable *, ggobid *);
-   void (*add_identify_edge_cues)(gint k, splotd *, GdkDrawable *, gboolean, ggobid *);
+  void (*add_plot_labels)(splotd *, GdkDrawable *, ggobid *gg);
+  void (*add_markup_cues)(splotd *, GdkDrawable *, ggobid *);
+  void (*add_scaling_cues)(splotd *, GdkDrawable *, ggobid *);
+  void (*add_identify_cues)(gboolean, gint k, splotd *, GdkDrawable *, ggobid *);
+  void (*add_identify_edge_cues)(gint k, splotd *, GdkDrawable *, gboolean, ggobid *);
 
-   gboolean (*redraw)(splotd *, GGobiData *, ggobid *, gboolean binned);
+  gboolean (*redraw)(splotd *, GGobiData *, ggobid *, gboolean binned);
 
   void (*screen_to_tform)(cpaneld *, splotd *, icoords *, fcoords *, ggobid *);
   void (*world_to_plane)(splotd *, GGobiData *, ggobid *);
 
-	/** Convenience to be called within the standard loop */
-   void (*sub_plane_to_screen)(splotd *sp, displayd *dpy, GGobiData *d, ggobid *gg);
-        /** Allows the class to take over the entire plane_to_screen.
-            Handling each row can be done using a method for sub_plane_to_screen. */
-   void (*plane_to_screen)(splotd *, GGobiData *, ggobid *);
+  /** Convenience to be called within the standard loop */
+  void (*sub_plane_to_screen)(splotd *sp, displayd *dpy, GGobiData *d, ggobid *gg);
+      /** Allows the class to take over the entire plane_to_screen.
+          Handling each row can be done using a method for sub_plane_to_screen. */
+  void (*plane_to_screen)(splotd *, GGobiData *, ggobid *);
 
-   gint (*active_paint_points)(splotd *, GGobiData *, ggobid *);
+  gint (*active_paint_points)(splotd *, GGobiData *, ggobid *);
 
 
-   GdkSegment *(*alloc_whiskers)(GdkSegment *, splotd *sp, gint nrows, GGobiData *d);
+  GdkSegment *(*alloc_whiskers)(GdkSegment *, splotd *sp, gint nrows, GGobiData *d);
 
-	/** called from splot_plot_edge */
-   gboolean (*draw_edge_p)(splotd *sp, gint m, GGobiData *d, GGobiData *e, ggobid *gg);
-	/** called from splot_plot_case. Should probably be the same as
-        draw_edge_p but doesn't take the edge argument! Could drop the
-        first datad in splot_plot_edge and just hand it the one dataset. */
-   gboolean (*draw_case_p)(splotd *sp, gint m, GGobiData *d, ggobid *gg);
+  /** called from splot_plot_edge */
+  gboolean (*draw_edge_p)(splotd *sp, gint m, GGobiData *d, GGobiData *e, ggobid *gg);
+  /** called from splot_plot_case. Should probably be the same as
+      draw_edge_p but doesn't take the edge argument! Could drop the
+      first datad in splot_plot_edge and just hand it the one dataset. */
+  gboolean (*draw_case_p)(splotd *sp, gint m, GGobiData *d, ggobid *gg);
 
-   void (*within_draw_to_binned)(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc);
-   void (*within_draw_to_unbinned)(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc);
+  void (*within_draw_to_binned)(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc);
+  void (*within_draw_to_unbinned)(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc);
 
   void (*splot_assign_points_to_bins)(GGobiData *, splotd *, ggobid *);
 
-   gint (*plotted_vars_get)(splotd *sp, gint *vars, GGobiData *d);
+  gint (*plotted_vars_get)(splotd *sp, gint *vars, GGobiData *d);
 
 
-   splotd * (*createWithVars)(displayd *dpy, gint *vars, gint nvars, ggobid *gg);
+  splotd * (*createWithVars)(displayd *dpy, gint *vars, gint nvars, ggobid *gg);
 
 } GGobiExtendedSPlotClass;
 

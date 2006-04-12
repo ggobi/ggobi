@@ -54,26 +54,21 @@ splot_check_colors (gushort maxcolorid, gint *ncolors_used,
 }
 
 
+/*-- determine whether case m should be plotted --*/
 gboolean
-splot_plot_case (gint m, GGobiData *d,
-  splotd *sp, displayd *display, ggobid *gg)
+splot_plot_case (gint m, GGobiData *d, splotd *sp, displayd *display, ggobid *gg)
 {
   gboolean draw_case = true;
 
-  /*-- determine whether case m should be plotted --*/
   /*-- usually checking sampled is redundant because we're looping
        over rows_in_plot, but maybe we're not always --*/
   if (d->excluded.els[m] || !d->sampled.els[m])
-    draw_case = false;
+    return false;
 
   /*-- can prevent drawing of missings for parcoords or scatmat plots --*/
-  else if (ggobi_data_has_missings(d) && !d->missings_show_p) {
-    if(GGOBI_IS_EXTENDED_SPLOT(sp)) {
-      GGobiExtendedSPlotClass *klass;
-      klass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);
-      if(klass->draw_case_p) {
-         draw_case = klass->draw_case_p(sp, m, d, gg);
-      }
+  if (ggobi_data_has_missings(d) && !d->missings_show_p) {
+    if(GGOBI_EXTENDED_SPLOT_GET_CLASS(sp)->draw_case_p) {
+       draw_case = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp)->draw_case_p(sp, m, d, gg);
     }
   }
   return draw_case;
@@ -191,7 +186,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
            * in order to draw the whiskers but not the points.
           */
           if (display->options.points_show_p)
-            draw_glyph (sp->pixmap0, &d->glyph_now.els[m], sp->screen,
+            draw_glyph (sp->pixmap0, ggobi_data_get_attr_glyph(d, m), sp->screen,
               m, gg);
           /* draw the whiskers ... or, potentially, other decorations */
           if (klass && klass->within_draw_to_unbinned) {
@@ -227,7 +222,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
              * but not the points.
             */
             if (display->options.points_show_p)
-              draw_glyph (sp->pixmap0, &d->glyph_now.els[m], sp->screen,
+              draw_glyph (sp->pixmap0, ggobi_data_get_attr_glyph(d, m), sp->screen,
                 m, gg);
 
             if (klass && klass->within_draw_to_unbinned) {
@@ -357,7 +352,7 @@ splot_draw_to_pixmap0_binned (splotd *sp, gboolean draw_hidden, ggobid *gg)
             if (d->hidden_now.els[i] &&
                 splot_plot_case (i, d, sp, display, gg))
             {
-              draw_glyph (sp->pixmap0, &d->glyph_now.els[i],
+              draw_glyph (sp->pixmap0, ggobi_data_get_attr_glyph(d, i),
                 sp->screen, i, gg);
 
               /* parallel coordinate plot and time series plot whiskers */
@@ -398,7 +393,7 @@ splot_draw_to_pixmap0_binned (splotd *sp, gboolean draw_hidden, ggobid *gg)
                   ggobi_data_get_attr_color(d, i) == current_color &&
                   splot_plot_case (i, d, sp, display, gg))
               {
-                draw_glyph (sp->pixmap0, &d->glyph_now.els[i],
+                draw_glyph (sp->pixmap0, ggobi_data_get_attr_glyph(d, i),
                   sp->screen, i, gg);
 
                 /* parallel coordinate plot whiskers */

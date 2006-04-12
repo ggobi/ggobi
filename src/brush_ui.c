@@ -49,9 +49,9 @@ brush_undo_cb (GtkToggleButton * button, ggobid * gg)
   GGobiData *e = display->e;
 
   if (cpanel->br.point_targets)
-    brush_undo (sp, d, gg);
+    brush_undo (d);
   if (cpanel->br.edge_targets)
-    brush_undo (sp, e, gg);
+    brush_undo (e);
 
   /*-- when rows_in_plot changes ... --*/
   if (GGOBI_IS_EXTENDED_SPLOT (sp)) {
@@ -152,7 +152,7 @@ brush_reset (displayd * display, gint action)
 
   case RESET_UNSHADOW_POINTS: /*-- un-hide all points --*/
     for (i = 0; i < d->nrows; i++)
-      d->hidden.els[i] = d->hidden_now.els[i] = false;
+      ggobi_data_set_attr_hidden(d, i, false, ATTR_SET_PERSISTENT);
 
       /*-- code borrowed from exclusion_ui.c, the 'show' routine --*/
     clusters_set(d);
@@ -177,7 +177,7 @@ brush_reset (displayd * display, gint action)
   case RESET_UNSHADOW_EDGES: /*-- un-hide all edges --*/
     if (e != NULL) {
       for (k = 0; k < e->edge.n; k++)
-        e->hidden_now.els[k] = e->hidden.els[k] = false;
+        ggobi_data_set_attr_hidden(e, k, false, ATTR_SET_PERSISTENT);
 
         /*-- code borrowed from exclusion_ui.c, the 'show' routine --*/
       clusters_set(d);
