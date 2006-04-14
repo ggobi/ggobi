@@ -1,0 +1,358 @@
+%h{
+  #include "types.h"
+  /* GUI specific */ 
+  enum { 
+  VT_VARNAME, VT_TFORM,
+  VT_REAL_USER_MIN, VT_REAL_USER_MAX,
+  VT_REAL_DATA_MIN, VT_REAL_DATA_MAX,
+  VT_MEAN, VT_MEDIAN,
+  VT_NLEVELS, VT_LEVEL_NAME, VT_LEVEL_VALUE, VT_LEVEL_COUNT,
+  VT_CAT_USER_MIN, VT_CAT_USER_MAX,
+  VT_CAT_DATA_MIN, VT_CAT_DATA_MAX,
+  VT_NMISSING,
+  NCOLS_VT
+  };
+  
+  /* GUI specific - does not belong here */
+  typedef enum {ADDVAR_ROWNOS, ADDVAR_BGROUP} NewVariableType;
+  
+  /*-- in variable table --*/
+  gboolean selected;
+  
+  /* to be covered by pipeline */
+  lims lim_raw;         /* raw data*/
+  lims lim_tform;       /*transformed data*/
+  lims lim_display;     /*for vartable, transformed sans missings*/
+  lims lim_specified;   /*user specified*/
+  lims lim_specified_tform;
+  gboolean lim_specified_p;
+  
+  gint tform0;
+  gfloat domain_incr;  /*-- stage 0 --*/
+  gfloat (*domain_adj) (gfloat x, gfloat incr);
+  gfloat (*inv_domain_adj) (gfloat x, gfloat incr);
+  gint tform1;
+  gfloat param;
+  gint tform2;
+  
+  /*-- jittering --*/
+  gfloat jitter_factor;
+  
+  /* Encode as GGobiVariable subclasses? */
+  typedef enum {real, categorical, integer, counter, uniform, all_vartypes} vartyped;
+  
+  /* move to categorical subclass? */
+  typedef struct level_s {
+    gint count;
+    gint value;
+    gchar *name;
+  } level_t;
+%}
+
+%{
+  static void
+  value_collector_func(gpointer key, gpointer value, gpointer data)
+  {
+    gint *array = (gint *)data;
+    array[GPOINTER_TO_INT(value)] = GPOINTER_TO_INT(key);
+  }
+%}
+
+enum GGOBI_VARIABLE {
+  real, categorical, integer, counter, uniform, all_vartypes
+} GGobi:Variable:Type;
+
+class GGobiVariable:GObject {
+  /* Right now this class is the default root implementation of a variable */
+  /* Eventually we need to make this more abstract with virtual methods that
+     delegate to parents, like GGobiData */
+  private GGobiVariable *parent; /* parent being proxied by this variable */
+  property OBJECT parent
+  (nick = "mommy", blurb = "The parent that this variable proxies",
+   object_type = GGobi:Variable, link, export);
+  
+  private GGobiData *d; /* dataset to which this variable belongs */
+  
+  private gchar *name, *nickname; /* ways to identify this variable */
+  property STRING name
+  (nick = "id", blurb = "The name of this variable",
+   default_value = "X", link, export);
+  property STRING nickname
+  (nick = "alias", blurb = "The alias for this variable",
+   default_value = "X", link, export);
+   
+  private GGobiVariableType type; /* should this become encoded in the class? */
+  property ENUM type
+  (nick = "class", blurb = "The type of this variable",
+   enum_type = GGobi:Variable:Type, default_value = GGOBI_VARIABLE_REAL, 
+   link, export);
+   
+  /* private gboolean isTime;  is this really necessary? */
+  
+  /*-- categorical stuff --*/
+  /*private gint nlevels;
+  private gint *level_values;
+  private gint *level_counts;
+  private gchar **level_names;*/  /*-- strings --*/
+  /*-- fast mapping from names and values to indices --*/
+  /* instead, the hash tables could map to the 'level' structure (see above)*/
+  private GHashTable *name_to_level;
+  private GHashTable *value_to_level;
+  
+  private lims lim;             /* limits for this variable */
+  private gdouble mean;
+
+  protected level_t *
+  get_level_for_value(self, gint value)
+  {
+    gpointer key;
+    level_t *level;
+    g_return_val_if_fail(self->_priv->type == GGOBI_VARIABLE_CATEGORICAL, NULL);
+    if(!g_hash_table_lookup_extended(self->_priv->value_to_level, GINT_TO_POINTER(value), 
+      &key, &level))
+        return(NULL);
+    return(level);
+  }
+  
+  protected level_t *
+  get_level_for_name(self, const gchar *name)
+  {
+    gpointer key;
+    level_t *level;
+    g_return_val_if_fail(self->_priv->type == GGOBI_VARIABLE_CATEGORICAL, NULL);
+    if (!g_hash_table_lookup_extended(self->_priv->name_to_level, name, &key, &level))
+      return(NULL);
+    return(level);
+  }
+
+  protected void
+  add_level_instance(self, const gchar *name, gint value)
+  {
+    level_t *level;
+    self_set_type(self, GGOBI_VARIABLE_CATEGORICAL);
+    if (name)
+      level = self_get_level_for_name(self, name);
+    else level = self_get_level_for_value(self, value);
+    if (level == NULL) {
+      self_add_level(self, name, value);
+    } else {
+      level->count++;
+    }
+  }
+  
+  /**
+  * get_col_n_levels:
+  * @self: #GGobiStage object
+  * @j: column index
+  *
+  * Get number of levels in a categorical variable
+  **/
+  public guint
+  get_n_levels(self, guint j)
+  {
+    g_return_val_if_fail(self->_priv->type == GGOBI_VARIABLE_CATEGORICAL, 0);  
+
+    return(g_hash_table_size(self->_priv->name_to_level));
+  }
+  
+  public gchar* 
+  get_level_name(self, gint value)
+  {
+    level_t *level;
+    g_return_val_if_fail(self->_priv->type == GGOBI_VARIABLE_CATEGORICAL, NULL);
+    
+    level = self_get_level_for_value(self, value);
+    g_return_val_if_fail(level != NULL, g_strdup("MISSING"));
+    
+    return g_strdup(level->name);
+  }
+  
+  public gint
+  get_level_value(self, const gchar *name) {
+    level_t *level = self_get_level_for_name(self, name);
+    g_return_val_if_fail(level != NULL, 0);
+    return level->value;
+  }
+
+  public guint  
+  get_level_count(self, gint value)
+  {
+    level_t *level;
+    g_return_val_if_fail(self->_priv->type == GGOBI_VARIABLE_CATEGORICAL, NULL);
+    
+    level = self_get_level_for_value(self, value);
+    g_return_val_if_fail(level != NULL, 0);  
+
+    return(level->count);
+  }
+  
+  public gint *
+  get_level_values(self)
+  {
+    gint *values;
+    g_return_val_if_fail(self->_priv->type == GGOBI_VARIABLE_CATEGORICAL, NULL);
+    
+    values = g_new(gint, self_get_level_count(self));
+    
+    g_hash_table_foreach(self->_priv->value_to_level, value_collector_func, values);
+    
+    return(values);
+  }
+  
+  /**
+  * get_col_level_value_closest: 
+  * @self: #GGobiStage object
+  * @j: column index
+  * @value: target value to search for 
+  *
+  * Get closest level value
+  * For a categorical categorical, this searches through all level
+  * values and returns the level value that is closest to the desired
+  * value.  Currently seems a little buggy in that it prefers one 
+  * direction over another
+  *
+  * Returns: closest level value to target value
+  *
+  **/
+ public gint  
+ get_level_value_closest(self, gint value)
+ {
+   gint *level_values;
+   guint k, level = 0, dist = 0, ddist = G_MAXUINT;
+   gint closest;
+   
+   g_return_val_if_fail(self->_priv->type == GGOBI_VARIABLE_CATEGORICAL, 0);
+
+   level_values = self_get_level_values(self);
+   
+   for (k = 0; k < vt->nlevels; k++) {
+     dist = fabs ((greal) level_values[k] - value);
+     if (dist < ddist) {
+       level = k;
+       ddist = dist;
+     }
+   }
+
+   closest = level_values[level];
+   g_free(level_values);
+   
+   return closest;
+ }
+
+ /**
+  * get_col_max:
+  * @self: #GGobiStage object
+  * @j: column index
+  * 
+  * Find the biggest value in the column.
+  * For numerical columns, value is cached by limits_set()
+  * Does the right thing for categorical variables too.  
+  **/
+  public gfloat
+  get_max(self, guint j)
+  {
+    gint *level_values;
+    guint level_value, nlevels, level_value_max=G_MININT, i;
+
+    if (self_get_col_type(self, j) != GGOBI_VARIABLE_CATEGORICAL) {
+      return self->_priv->lim.max;
+    }
+
+    // FIXME: Please cache me
+    if ((nlevels = self_get_level_count(self)) > 0) {
+      level_values = self_get_level_values(self);
+      level_value_max = level_values[0];
+      for (i = 0; i < nlevels; i++) {
+        level_value = level_values[i];
+        if (level_value > level_value_max)
+          level_value_max = level_value;
+      }
+      g_free(level_values);
+    }
+
+    return(gfloat) level_value_max;
+  }
+
+
+  /**
+  * get_col_min:
+  * @self: #GGobiStage object
+  * @j: column index
+  * 
+  * Find the smallest value in the column.
+  * For numerical columns, value is cached by limits_set()
+  * Does the right thing for categorical variables too.
+  **/
+  public gfloat
+  get_col_min(self, guint j)
+  {
+    guint level_value, level_value_min=G_MAXINT, i;
+    gint *level_values;
+    gint nlevels;
+  
+    if (self_get_col_type(self, j) != GGOBI_VARIABLE_CATEGORICAL) {
+      return self->_priv->lim.min;
+    }
+  
+    // FIXME: shouldn't this also be cached?
+    if ((nlevels = self_get_level_count(self)) > 0) {
+      level_values = self_get_level_values(self);
+      level_value_min = vt->level_values[0];
+      for (i = 0; i < nlevels; i++) {
+        level_value = level_values[i];
+        if (level_value < level_value_min)
+          level_value_min = level_value;
+      }
+      g_free(level_values);
+    }
+  
+    return(gfloat) level_value_min;
+  }
+
+  public gfloat
+  get_range(self)
+  {
+    // FIXME: Make work for categorical variables
+    return vt->_priv->lim.max - self->_priv->lim.min;
+  }
+
+  public gfloat
+  get_mean(self)
+  {
+    return self->_priv->mean;
+  }
+
+/**
+ * add_col_level:
+ * @self: #GGobiStage object
+ * @j: column index
+ * @name: character description of level, if NULL uses value
+ * @value: level value, if -1 uses index + 1
+ * Returns: index of new level
+ **/
+ public guint
+ add_level(self, const gchar *name, gint value)
+ {
+   level_t *level;
+   
+   g_return_val_if_fail(self->_priv->type == GGOBI_VARIABLE_CATEGORICAL, 0);
+  
+   level = g_new(level_t, 1);
+  
+   level->count = 1;
+
+   if (value == -1)
+     value = self_get_level_count(self) + 1;
+   level->value = value;
+
+   if (!name)
+     level->name = g_strdup_printf("%d", value);
+   else 
+     level->name = g_strdup(name);
+
+   g_hash_table_insert(vt->name_to_level, level->name, level);
+   g_hash_table_insert(vt->value_to_level, GINT_TO_POINTER(level->value), level);
+
+   return vt->nlevels;
+ }
+}
