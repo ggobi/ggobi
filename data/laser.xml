@@ -24,10 +24,10 @@ Janette Cooper asked Paul Tukey to help her analyze the data
 she had collected to describe the laser.
 </description>
 <variables count="4">
-<variable name="ifront"/>
-<variable name="iback"/>
-<variable name="power"/>
-<variable name="lambda"/>
+ <realvariable name="ifront"/>
+ <realvariable name="iback"/>
+ <realvariable name="power"/>
+ <realvariable name="lambda"/>
 </variables>
 <records
  count="64" glyph="fr 1" color="5">
