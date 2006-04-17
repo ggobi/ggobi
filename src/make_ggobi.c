@@ -171,6 +171,11 @@ make_ggobi (GGobiOptions * options, gboolean processEvents, ggobid * gg)
 
   resetDataMode ();
 
+  if (sessionOptions->timingp) {
+    // Initialize the time counter
+    set_time(gg);
+  }
+
   start_ggobi (gg, init_data, sessionOptions->info->createInitialScatterPlot);
 
   if (sessionOptions->restoreFile) {
@@ -179,6 +184,9 @@ make_ggobi (GGobiOptions * options, gboolean processEvents, ggobid * gg)
 
   gg->status_message_func = gg_write_to_statusbar;
 
+  if (sessionOptions->timingp) {
+    run_timing_tests (gg);
+  }
 
   if (processEvents) {
     gtk_main ();

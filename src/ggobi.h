@@ -386,13 +386,6 @@ struct _ggobid {
     gint update_method;
   } wvis;
 
-/*-------------------- scaling ---------------------------------------*/
-
-// Delete
-  struct _Scale {
-    rectd click_rect;
-  } scale;
-
 /*-------------------- imputation ------------------------------------*/
 
   struct _Impute {
@@ -437,7 +430,9 @@ struct _ggobid {
                      Since plugins, etc. may also use this, we might want 
                      a hashtable here similar to pthread's thread-specific data. */
 
-};                              /*  ggobid; */
+  GTimeVal time;
+  
+}; /*  ggobid; */
 
 #include "read_init.h"
 
@@ -530,6 +525,12 @@ typedef struct {
   gfloat defaultTour1dSpeed;
 
   gboolean useRadioMenuItems;
+
+  /**
+    @ingroup SessionOptions
+    If true, run timing tests.
+    */
+  gboolean timingp;
 
 } GGobiOptions;
 

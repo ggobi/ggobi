@@ -91,6 +91,7 @@ parse_command_line (gint * argc, gchar ** av[])
   static gchar *initialization_file = NULL;
   static gboolean quit_with_no_ggobi = true;
   static gint verbosity = GGOBI_CHATTY;
+  static gboolean time_ggobi = false;
   static GOptionEntry entries[] = 
   {
     {
@@ -114,6 +115,9 @@ parse_command_line (gint * argc, gchar ** av[])
     }, {
       "version", 'v', 0, G_OPTION_ARG_NONE, &print_version,
       "print the GGobi version and exit", NULL
+    }, {
+      "time", 't', 0, G_OPTION_ARG_NONE, &time_ggobi,
+      "run timing tests and exit", NULL
     }, { NULL }
   };
   
@@ -138,6 +142,8 @@ parse_command_line (gint * argc, gchar ** av[])
   sessionOptions->initializationFile = initialization_file;
   sessionOptions->info->quitWithNoGGobi = quit_with_no_ggobi;
   sessionOptions->verbose = verbosity;
+
+  sessionOptions->timingp = time_ggobi;
 
   (*argc)--;
   (*av)++;
@@ -504,6 +510,8 @@ initSessionOptions (int argc, char **argv)
 
   sessionOptions->defaultTourSpeed = 50.0;
   sessionOptions->defaultTour1dSpeed = 40.0;
+
+  sessionOptions->timingp = false;
 }
 
 gboolean
