@@ -29,7 +29,7 @@
 #include <strings.h>
 #include "writedata.h"
 
-extern const gchar* const GlyphNames;
+extern const gchar* const GlyphNames[];
 
 XmlWriteInfo *updateXmlWriteInfo(GGobiData *d, ggobid *gg, XmlWriteInfo *info);
 
