@@ -17,7 +17,7 @@ libggobi_la_SOURCES = array.c ash1d.c barchart.c barchartClass.c \
   scale_ui.c scatmat.c scatmatClass.c scatmat_ui.c scatterplot.c \
   scatterplotClass.c scatterplot_ui.c schemes.c schemes_ui.c sphere.c \
   sphere_ui.c splash.c splot.c sp_plot.c sp_plot_axes.c sp_plot_edges.c \
-  subset.c subset_ui.c svd.c texture.c timeplot.c time_ui.c tour.c tour1d.c \
+  subset.c subset_ui.c svd.c texture.c timeplot.c time_ui.c timing.c tour.c tour1d.c \
   tour1d_pp.c tour1d_pp_ui.c tour1d_ui.c tour2d.c tour2d3.c tour2d3_ui.c \
   tour2d_pp.c tour2d_pp_ui.c tour2d_ui.c tourcorr.c tourcorr_ui.c tour_pp.c \
   transform.c transform_ui.c tsdisplay.c tsPlot.c utils.c utils_gdk.c \
