@@ -354,20 +354,6 @@ button_release_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
     /*-- reset the number and properties of the brush groups --*/
     clusters_set(d);
 
-/*   ??
- *  g_signal_emit (GTK_OBJECT (gg->main_window),
- *    gg->signal_symbols_changed, gg); 
- */
-
-    /*-- If we've also been brushing an edge set, set its clusters --*/
-/*
-    if (display->e != NULL && cpanel->br.edge_targets != br_off) {
-      clusters_set;
-    }
-*/
-    /*-- If we've been brushing by variable, set everybody's clusters --*/
-    /*if (cpanel->br_linkby == BR_LINKBYVAR) { */
-
     /*
      * Since any datad might be linked to this one, reset
      * everybody's clusters until more elaborate tests are
@@ -387,6 +373,20 @@ button_release_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
     /*-- this updates the tables for every datad --*/
     cluster_table_update (d, gg);
   }
+
+  g_signal_emit_by_name(d, "col_data_changed", ggobi_data_get_col_index_for_name(d, "_color"));
+  g_signal_emit_by_name(d, "col_data_changed", ggobi_data_get_col_index_for_name(d, "_color_now"));
+  g_signal_emit_by_name(d, "col_data_changed", ggobi_data_get_col_index_for_name(d, "_color_prev"));
+  g_signal_emit_by_name(d, "col_data_changed", ggobi_data_get_col_index_for_name(d, "_glyph_type"));
+  g_signal_emit_by_name(d, "col_data_changed", ggobi_data_get_col_index_for_name(d, "_glyph_type_now"));
+  g_signal_emit_by_name(d, "col_data_changed", ggobi_data_get_col_index_for_name(d, "_glyph_type_prev"));
+  g_signal_emit_by_name(d, "col_data_changed", ggobi_data_get_col_index_for_name(d, "_glyph_size"));
+  g_signal_emit_by_name(d, "col_data_changed", ggobi_data_get_col_index_for_name(d, "_glyph_size_now"));
+  g_signal_emit_by_name(d, "col_data_changed", ggobi_data_get_col_index_for_name(d, "_glyph_size_prev"));
+  g_signal_emit_by_name(d, "col_data_changed", ggobi_data_get_col_index_for_name(d, "_hidden"));
+  g_signal_emit_by_name(d, "col_data_changed", ggobi_data_get_col_index_for_name(d, "_hidden_now"));
+  g_signal_emit_by_name(d, "col_data_changed", ggobi_data_get_col_index_for_name(d, "_hidden_prev"));
+
 
   /*-- if we're only doing linked brushing on mouse up, do it now --*/
   if (!cpanel->br.updateAlways_p)

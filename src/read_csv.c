@@ -122,8 +122,6 @@ csv_row_parse (Row * row, GIOChannel * channel, gint trim)
 
   g_string_append_c (row->src, '\r');
 
-  //fprintf(stderr, "%s\n", row->src->str);
-
   rowMlen = 4;                  /* Set smaller if this leads to too much memory usage */
   row->entry = g_new (struct RowEntry, rowMlen);
   if (row->entry == NULL) {
@@ -347,7 +345,7 @@ load_column_labels (Row * row, GGobiData * d, gboolean row_labels)
 {
   gint i;
   gint offset = (row_labels ? 1 : 0);
-  for (i = 0; i < d->ncols; i++) {
+  for (i = 0; i < ggobi_data_get_n_data_cols(d); i++) {
     if (row->entry[i + offset].len == 0)
       ggobi_data_set_col_name(d, i, NULL);
     else
@@ -373,7 +371,7 @@ load_row_values (GList * rows, GGobiData * d, gboolean row_labels)
   gint i, j, offset = (row_labels ? 1 : 0);
   GList *cur;
 
-  for (j = 0; j < d->ncols; j++) {
+  for (j = 0; j < ggobi_data_get_n_data_cols(d); j++) {
     for (cur = rows, i = 0; cur; cur = cur->next, i++) {
       Row *row = (Row *) cur->data;
       gchar *str = row->src->str + row->entry[j + offset].ofs;
@@ -397,6 +395,7 @@ create_data (GList * rows, gchar * name)
     ncols--;
 
   d = ggobi_data_new (nrows - 1, ncols);
+  ggobi_data_add_attributes(d);
   ggobi_data_set_name(d, name, NULL);
 
   load_column_labels ((Row *) rows->data, d, row_labels);
@@ -427,8 +426,6 @@ read_csv_data (InputDescription * desc, ggobid * gg)
   GList *rows = NULL;
   GSList *ds = NULL;
 
-  fprintf (stderr, "Reading csv data\n");
-
   memset (isSpaceTable, 0, sizeof (isSpaceTable));
   fastIsSpace ((gchar) ' ') = 1;
   fastIsSpace ((gchar) '\f') = 1;
@@ -455,8 +452,6 @@ read_csv_data (InputDescription * desc, ggobid * gg)
     else
       row_free (cur);
   } while (ret >= 0);
-
-  fprintf (stderr, "Finished parsing\n");
 
   /* Close the file */
   g_io_channel_shutdown (channel, FALSE, NULL);

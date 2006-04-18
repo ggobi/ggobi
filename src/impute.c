@@ -62,7 +62,7 @@ impute_fixed (ImputeType impute_type, gfloat val, gint nvars, gint * vars,
           drand = (drand - .5) * jmult;
           ggobi_data_set_raw_value(d, m, j, impval + (gfloat) drand);
         }
-        g_signal_emit_by_name(d, "col_data_changed", j);
+        //g_signal_emit_by_name(d, "col_data_changed", j);
       }
     }
   }
@@ -74,7 +74,7 @@ impute_fixed (ImputeType impute_type, gfloat val, gint nvars, gint * vars,
         if (ggobi_data_is_missing(d, m, j)) {
           ggobi_data_set_raw_value(d, m, j, val);
         }
-        g_signal_emit_by_name(d, "col_data_changed", j);
+        //g_signal_emit_by_name(d, "col_data_changed", j);
       }
     }
   }

@@ -179,7 +179,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
 #else
       for (i=0; i<d->nrows_in_plot; i++) {
         m = d->rows_in_plot.els[i];
-        if (d->hidden_now.els[m] && splot_plot_case (m, d, sp, display, gg)) {
+        if (ggobi_data_get_attr_hidden(d, m) && splot_plot_case (m, d, sp, display, gg)) {
           /*
            * This double-check accommodates the parallel coordinates and
            * time series displays, because we have to ignore points_show_p
@@ -212,7 +212,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
         for (i=0; i<d->nrows_in_plot; i++) {
           m = d->rows_in_plot.els[i];
           if (ggobi_data_get_attr_color(d, m) == current_color &&
-            !d->hidden_now.els[m] &&
+            !ggobi_data_get_attr_hidden(d, m) &&
             splot_plot_case (m, d, sp, display, gg))
           {
             /*
@@ -349,7 +349,7 @@ splot_draw_to_pixmap0_binned (splotd *sp, gboolean draw_hidden, ggobid *gg)
             i = d->rows_in_plot.els[d->brush.binarray[ih][iv].els[m]];
 
             /* if hidden && plottable */
-            if (d->hidden_now.els[i] &&
+            if (ggobi_data_get_attr_hidden(d, i) &&
                 splot_plot_case (i, d, sp, display, gg))
             {
               draw_glyph (sp->pixmap0, ggobi_data_get_attr_glyph(d, i),
@@ -389,7 +389,7 @@ splot_draw_to_pixmap0_binned (splotd *sp, gboolean draw_hidden, ggobid *gg)
             for (m=0; m<d->brush.binarray[ih][iv].nels ; m++) {
               i = d->rows_in_plot.els[d->brush.binarray[ih][iv].els[m]];
 
-              if (!d->hidden_now.els[i] &&
+              if (!ggobi_data_get_attr_hidden(d, i) &&
                   ggobi_data_get_attr_color(d, i) == current_color &&
                   splot_plot_case (i, d, sp, display, gg))
               {
@@ -653,7 +653,7 @@ splot_add_record_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
   if (d->sticky_ids != NULL && g_slist_length (d->sticky_ids) > 0) {
     for (l = d->sticky_ids; l; l = l->next) {
       id = GPOINTER_TO_INT (l->data);
-      if (!d->hidden_now.els[id])
+      if (!ggobi_data_get_attr_hidden(d, id))
         /*-- false = !nearest --*/
         splot_add_identify_sticky_cues (sp, drawable, id, gg);
     }
@@ -663,7 +663,7 @@ splot_add_record_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
   if (e && e->sticky_ids != NULL && g_slist_length (e->sticky_ids) > 0) {
     for (l = e->sticky_ids; l; l = l->next) {
       id = GPOINTER_TO_INT (l->data);
-      if (!e->hidden_now.els[id])
+      if (!ggobi_data_get_attr_hidden(d, id))
         /*-- false = !nearest --*/
         splot_add_identify_edge_cues (sp, drawable, id, false, gg);
     }

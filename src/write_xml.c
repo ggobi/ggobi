@@ -272,7 +272,7 @@ write_xml_record (FILE *f, GGobiData *d, ggobid *gg, gint i,
   fprintf(f, " id=\"%s\"", ggobi_data_get_row_id(d, i));
 
   /*-- if the record is hidden, indicate that --*/
-  if (d->hidden_now.els[i]) {
+  if (ggobi_data_get_attr_hidden(d, i)) {
     fprintf(f, " hidden=\"true\"");
   }
 
@@ -283,17 +283,19 @@ write_xml_record (FILE *f, GGobiData *d, ggobid *gg, gint i,
   }
 
   if (!xmlWriteInfo->useDefault ||
-      xmlWriteInfo->defaultColor != d->color.els[i])
+      xmlWriteInfo->defaultColor != ggobi_data_get_attr_color(d, i))
   {
-    fprintf(f, " color=\"%d\"", d->color.els[i]);
+    fprintf(f, " color=\"%d\"", ggobi_data_get_attr_color(d, i));
   }
 
 
   if (!xmlWriteInfo->useDefault ||
-     xmlWriteInfo->defaultGlyphType != d->glyph.els[i].type ||
-     xmlWriteInfo->defaultGlyphSize != d->glyph.els[i].size) 
+     xmlWriteInfo->defaultGlyphType != ggobi_data_get_attr_glyph_type(d, i) ||
+     xmlWriteInfo->defaultGlyphSize != ggobi_data_get_attr_glyph_size(d, i)) 
   {
-    fprintf (f, " glyph=\"%s %d\"", GlyphNames[d->glyph.els[i].type], d->glyph.els[i].size);
+    fprintf (f, " glyph=\"%s %d\"", 
+      GlyphNames[ggobi_data_get_attr_glyph_type(d, i)], 
+      ggobi_data_get_attr_glyph_size(d, i));
   }
 
   fprintf(f, ">\n");
@@ -429,9 +431,9 @@ updateXmlWriteInfo(GGobiData *d, ggobid *gg, XmlWriteInfo *info)
 
   n = ggobi_nrecords(d);
   for(i = 0 ; i < n ; i++) {
-    colorCounts[d->color.els[i]]++;
-    glyphSizeCounts[d->glyph.els[i].size]++;
-    glyphTypeCounts[d->glyph.els[i].type]++;
+    colorCounts[ggobi_data_get_attr_color(d, i)]++;
+    glyphSizeCounts[ggobi_data_get_attr_glyph_size(d, i)]++;
+    glyphTypeCounts[ggobi_data_get_attr_glyph_type(d, i)]++;
   }
 
   count = -1;

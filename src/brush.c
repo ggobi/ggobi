@@ -81,42 +81,19 @@ set_lattribute_from_ltype (gint ltype, ggobid * gg)
 /*                      Dealing with the brush                          */
 /*----------------------------------------------------------------------*/
 
-static void
-brush_boundaries_set (cpaneld * cpanel,
-                      icoords * obin0, icoords * obin1,
-                      icoords * imin, icoords * imax, GGobiData * d,
-                      ggobid * gg)
-{
-  icoords *bin0 = &d->brush.bin0;
-  icoords *bin1 = &d->brush.bin1;
-
-  // For transient brushing, need to update points in current AND previous bin
-  if (cpanel->br.mode == BR_TRANSIENT) {
-    imin->x = MIN (bin0->x, obin0->x);
-    imin->y = MIN (bin0->y, obin0->y);
-    imax->x = MAX (bin1->x, obin1->x);
-    imax->y = MAX (bin1->y, obin1->y);
-  } else {
-    imin->x = bin0->x;
-    imin->y = bin0->y;
-    imax->x = bin1->x;
-    imax->y = bin1->y;
-  }
-}
-
 void
 brush_draw_label (splotd * sp, GdkDrawable * drawable, GGobiData * d,
                   ggobid * gg)
 {
   PangoRectangle rect;
   
-  if (d->npts_under_brush == 0)
+  if (d->nrows_under_brush == 0)
    return;
   
   PangoLayout *layout =
     gtk_widget_create_pango_layout (GTK_WIDGET (sp->da), NULL);
 
-  gchar *str = g_strdup_printf ("%d", d->npts_under_brush);
+  gchar *str = g_strdup_printf ("%d", d->nrows_under_brush);
   layout_text (layout, str, &rect);
   gdk_draw_layout (drawable, gg->plot_GC,
                    sp->max.x - rect.width - 5, 5, layout);
@@ -311,7 +288,6 @@ binning_permitted (displayd * display, ggobid * gg)
 }
 
 
-
 gboolean
 brush_motion (icoords * mouse, gboolean button1_p, gboolean button2_p,
               cpaneld * cpanel, splotd * sp, ggobid * gg)
@@ -403,12 +379,6 @@ xed_by_brush (gint k, displayd * display, ggobid * gg)
 static gboolean
 paint_points (cpaneld * cpanel, GGobiData * d, ggobid * gg)
 {
-  gint ih, iv, m, j;
-  /*-- these look suspicious -- dfs --*/
-  static icoords obin0 = { BRUSH_NBINS / 2, BRUSH_NBINS / 2 };
-  static icoords obin1 = { BRUSH_NBINS / 2, BRUSH_NBINS / 2 };
-  icoords imin, imax;
-  gboolean changed = false;
   gint nd = g_slist_length (gg->d);
   gboolean (*f) (cpaneld *, GGobiData *, ggobid *) = NULL;
 
@@ -418,27 +388,56 @@ paint_points (cpaneld * cpanel, GGobiData * d, ggobid * gg)
   if (f)
     return f(cpanel, d, gg);
 
-  brush_boundaries_set(cpanel, &obin0, &obin1, &imin, &imax, d, gg);
+  for (guint i = 0; i < d->nrows_under_brush_prev; i++) {
+    ggobi_data_brush_point(d, (guint) d->rows_under_brush_prev.els[i], false,  
+      cpanel->br.point_targets, cpanel->br.mode);
 
-  for (ih = imin.x; ih <= imax.x; ih++) {
-    for (iv = imin.y; iv <= imax.y; iv++) {
-      for (m = 0; m < d->brush.binarray[ih][iv].nels; m++) {
-        j = d->rows_in_plot.els[d->brush.binarray[ih][iv].els[m]];
-        changed = ggobi_data_brush_point(d, j, d->pts_under_brush.els[j], 
-          cpanel->br.point_targets, cpanel->br.mode) || changed;
+    if (!gg->linkby_cv && nd > 1)
+      symbol_link_by_id (false, i, d, gg);
+  }
+  
+  for (guint i = 0; i < d->nrows_under_brush; i++) {
+    ggobi_data_brush_point(d, (guint) d->rows_under_brush.els[i], true,  
+      cpanel->br.point_targets, cpanel->br.mode);
 
-        if (!gg->linkby_cv && nd > 1)
-          symbol_link_by_id (false, j, d, gg);
-      }
-    }
+    if (!gg->linkby_cv && nd > 1)
+      symbol_link_by_id (false, i, d, gg);
   }
 
-  obin0.x = d->brush.bin0.x;
-  obin0.y = d->brush.bin0.y;
-  obin1.x = d->brush.bin1.x;
-  obin1.y = d->brush.bin1.y;
-
-  return changed;
+  /*
+  FIXME: should be possible to do this in one loop through
+  guint i = 0, j = 0;
+  gint cur, prev, pt;
+  gboolean brushed, changed = false;
+  while(i < d->nrows_under_brush || j < d->nrows_under_brush_prev) {
+    cur = d->rows_under_brush.els[i];
+    prev = d->rows_under_brush_prev.els[j];
+    
+    g_debug("cur: %i, %i  prev: %i, %i", i, cur, j, prev);
+    
+    if (cur == prev) { // in both current and previous, so don't change
+      i++; j++;
+      continue;
+    }
+      
+    if (cur < prev || j == d->nrows_under_brush_prev) {  // new point
+      pt = cur;
+      brushed = true;
+      i++;
+    } else {
+      pt = prev;
+      brushed = false;
+      j++;
+    }    
+    changed = ggobi_data_brush_point(d, pt, brushed, 
+      cpanel->br.point_targets, cpanel->br.mode);
+    if (!gg->linkby_cv && nd > 1)
+      symbol_link_by_id (false, pt, d, gg);
+      
+    changed = true;
+  }*/
+  
+  return true;
 }
 
 
@@ -482,14 +481,14 @@ update_points_under_brush(GGobiData *d, splotd *sp)
 
   f = GGOBI_EXTENDED_SPLOT_GET_CLASS (sp)->active_paint_points;
   if (f) {
-    d->npts_under_brush = f (sp, d, d->gg);
+    d->nrows_under_brush = f (sp, d, d->gg);
     return;
   }
 
-  /* Zero out pts_under_brush[] before looping */
-  d->npts_under_brush = 0;
-  for (j = 0; j < d->nrows_in_plot; j++)
-    d->pts_under_brush.els[d->rows_in_plot.els[j]] = false;
+  for(guint i = 0; i < d->nrows_under_brush; i++)
+    d->rows_under_brush_prev.els[i] = d->rows_under_brush.els[i];
+  d->nrows_under_brush_prev = d->nrows_under_brush;
+  d->nrows_under_brush = 0;
 
   for (ih = d->brush.bin0.x; ih <= d->brush.bin1.x; ih++) {
     for (iv = d->brush.bin0.y; iv <= d->brush.bin1.y; iv++) {
@@ -502,12 +501,8 @@ update_points_under_brush(GGobiData *d, splotd *sp)
         if (ggobi_data_get_attr_hidden(d, pt) && ttype != br_unshadow)
           continue;
 
-        if (splot_plot_case(pt, d, sp, display, d->gg) && under_brush (pt, sp)) {
-          d->npts_under_brush++;
-          d->pts_under_brush.els[pt] = true;
-        } else {
-          d->pts_under_brush.els[pt] = false;
-        }
+        if (splot_plot_case(pt, d, sp, display, d->gg) && under_brush (pt, sp))
+          d->rows_under_brush.els[d->nrows_under_brush++] = pt;
       }
     }
   }

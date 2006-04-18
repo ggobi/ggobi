@@ -223,20 +223,26 @@ barchartWorldToPlane (splotd * sp, GGobiData * d, ggobid * gg)
 gboolean
 barchart_build_symbol_vectors (cpaneld * cpanel, GGobiData * d, ggobid * gg)
 {
-  gboolean changed = FALSE;
-  gint j, m;
   gint nd = g_slist_length (gg->d);
 
-  for (j = 0; j < d->nrows_in_plot; j++) {
-    m = d->rows_in_plot.els[j];
-    changed = ggobi_data_brush_point(d, m, d->pts_under_brush.els[m], 
-      cpanel->br.point_targets, ATTR_SET_TRANSIENT) || changed;
+  // FIXME: copy code from paint points
+  for (guint i = 0; i < d->nrows_under_brush_prev; i++) {
+    ggobi_data_brush_point(d, (guint) d->rows_under_brush_prev.els[i], false,  
+      cpanel->br.point_targets, cpanel->br.mode);
 
     if (!gg->linkby_cv && nd > 1)
-      symbol_link_by_id (false, j, d, gg);
+      symbol_link_by_id (false, i, d, gg);
+  }
+  
+  for (guint i = 0; i < d->nrows_under_brush; i++) {
+    ggobi_data_brush_point(d, (guint) d->rows_under_brush.els[i], true,  
+      cpanel->br.point_targets, cpanel->br.mode);
+
+    if (!gg->linkby_cv && nd > 1)
+      symbol_link_by_id (false, i, d, gg);
   }
 
-  return changed;
+  return true;
 }
 
 void

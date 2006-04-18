@@ -77,7 +77,7 @@ splot_hidden_edge (gint m, GGobiData * d, GGobiData * e,
 
   endpoints = resolveEdgePoints (e, d);
   if (endpoints && edge_endpoints_get (m, &a, &b, d, endpoints, e))
-    if (e->hidden_now.els[m] || d->hidden_now.els[a] || d->hidden_now.els[b])
+    if (ggobi_data_get_attr_hidden(e, m) || ggobi_data_get_attr_hidden(d, a) || ggobi_data_get_attr_hidden(d, b))
       hiddenp = true;
 
   /*-- can prevent drawing of missings for parcoords or scatmat plots --*/
@@ -140,7 +140,7 @@ splot_edges_draw (splotd * sp, gboolean draw_hidden, GdkDrawable * drawable,
       /* If we're drawing hiddens and this is hidden and plottable ... */
       if (((draw_hidden && splot_hidden_edge (m, d, e, sp, display, gg)) ||
            /* Or if we're not drawing hiddens and this isn't hidden ... */
-           (!draw_hidden && !e->hidden_now.els[m]))) {
+           (!draw_hidden && !ggobi_data_get_attr_hidden(e, m)))) {
 
         gtype = ggobi_data_get_attr_glyph(e, m)->type;
         ltype = ltype_from_gtype (gtype);
@@ -409,7 +409,7 @@ splot_add_identify_edge_cues (splotd * sp, GdkDrawable * drawable, gint k,
   if (k >= e->edge.n)
     return;
 
-  if (e->hidden_now.els[k])
+  if (ggobi_data_get_attr_hidden(e, k))
     return;
 
   if (GGOBI_IS_EXTENDED_SPLOT (sp)) {

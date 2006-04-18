@@ -1161,7 +1161,10 @@ barchart_active_paint_points (splotd * rawsp, GGobiData * d, ggobid * gg)
   else
     hits[0] = FALSE;
 
-  d->npts_under_brush = 0;
+  for(guint i = 0; i < d->nrows_under_brush; i++)
+    d->rows_under_brush_prev.els[i] = d->rows_under_brush.els[i];
+  d->nrows_under_brush_prev = d->nrows_under_brush;
+  d->nrows_under_brush = 0;
 
   for (i = 0; i < d->nrows_in_plot; i++) {
     m = d->rows_in_plot.els[i];
@@ -1186,14 +1189,13 @@ barchart_active_paint_points (splotd * rawsp, GGobiData * d, ggobid * gg)
       indx = (gint) (rawsp->planar[m].x + 1);
     }
 
-    d->pts_under_brush.els[m] = hits[indx];
     if (hits[indx])
-      d->npts_under_brush++;
+      d->rows_under_brush.els[d->nrows_under_brush++] = m;
   }
 
   g_free ((gpointer) hits);
 
-  return d->npts_under_brush;
+  return d->nrows_under_brush;
 }
 
 static ggobid *CurrentGGobi = NULL;

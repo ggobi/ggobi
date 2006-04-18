@@ -82,6 +82,7 @@ limits_set_from_vartable (vartabled * vt)
 static void
 limits_raw_set_by_var (GGobiData * d, gint j, gboolean visible_only)
 {
+
   gint i, m;
   vartabled *vt = ggobi_data_get_vartable(d, j);
   greal min, max;
@@ -294,6 +295,6 @@ recenter_data (gint i, GGobiData * d, ggobid * gg)
       vt->lim_specified_p = false;
     }
     
-    g_signal_emit_by_name(d, "col_data_changed", (guint) j);
+    //g_signal_emit_by_name(d, "col_data_changed", (guint) j);
   }
 }

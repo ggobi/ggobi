@@ -349,6 +349,7 @@ datad_colors_used_get (gint * ncolors_used, gushort * colors_used,
     }
   }
 
+
   /*
    * Make sure that the current brushing color is
    * last in the list, so that it is drawn on top of

@@ -651,7 +651,7 @@ endXMLElement (void *user_data, const xmlChar * name)
     break;
   case RECORD:
     /* This processes every element in the record, and it will
-       become confused and complain if we don't feed d->ncols
+       become confused and complain if we don't feed ggobi_data_get_n_data_cols(d)
        elements to it.  I believe it also handles the </record>
        tag in the case where record elements have been individually
        tagged, and it does that without confusion. */
@@ -1038,10 +1038,6 @@ setGlyph (const xmlChar ** attrs, XMLParserData * data, gint i)
       data->defaults.glyphType = type;
   }
     
-  if (i >= 0) {
-    ggobi_data_set_attr_glyph_parts(d, i, type, size, ATTR_SET_PERSISTENT);
-  }
-
 /*
  * glyph:  strings like "plus 3" or "."
 */
@@ -1074,8 +1070,11 @@ setGlyph (const xmlChar ** attrs, XMLParserData * data, gint i)
       j++;
       next = strtok (NULL, " ");
     }
-    ggobi_data_set_attr_glyph_parts(d, i, type, size, ATTR_SET_PERSISTENT);
   }
+
+  if (i >= 0)
+    ggobi_data_set_attr_glyph_parts(d, i, type || data->defaults.glyphType, size || data->defaults.glyphSize, ATTR_SET_PERSISTENT);
+
 
   return (size != -1 && type != -1);
 }
@@ -1136,9 +1135,7 @@ setRecordValue (const char *tmp, GGobiData * d, XMLParserData * data)
         strcmp (tmp, ".") == 0)) ||
       (data->NA_identifier && strcmp (tmp, data->NA_identifier) == 0)) {
     ggobi_data_set_missing(d, data->current_record, data->current_element);    
-  }
-  else {
-
+  }  else {
     value = asNumber (tmp);
     if (ggobi_data_get_col_type(d, data->current_element) == categorical) {
       if (data->autoLevels && data->autoLevels[data->current_element]) {
@@ -1179,7 +1176,7 @@ setRecordValues (XMLParserData * data, const xmlChar * line, gint len,
   GGobiData *d = getCurrentXMLData (data);
 
   if (ncols == -1) {
-    ncols = d->ncols;
+    ncols = ggobi_data_get_n_data_cols(d);
   }
 
   if (!line) {
@@ -1205,13 +1202,11 @@ setRecordValues (XMLParserData * data, const xmlChar * line, gint len,
     /*
        g_printerr ("Record %d has insufficient elements: %d < %d\n",
        data->current_record, data->current_element,
-       d->ncols);
+       ggobi_data_get_n_data_cols(d));
      */
   }
 
-
-  applyRandomUniforms (d, data);
-  limits_set (d, true, true, true);
+  //applyRandomUniforms (d, data);
   return (true);
 }
 
@@ -1225,9 +1220,6 @@ asNumber (const char *sval)
 {
   return (g_ascii_strtod (sval, NULL));
 }
-
-
-
 
 /*
    Read the declaration of a variable, gathering its information
@@ -1246,10 +1238,10 @@ newVariable (const xmlChar ** attrs, XMLParserData * data,
   GGobiData *d = getCurrentXMLData (data);
   vartabled *el;
   
-  if (data->current_variable >= d->ncols) {
+  if (data->current_variable >= ggobi_data_get_n_data_cols(d)) {
     ggobi_XML_error_handler
       (data, "More variables (%d) than given in the <variables count='%d'> element for dataset %s\n",
-       data->current_variable, d->ncols, d->name);
+       data->current_variable, ggobi_data_get_n_data_cols(d), d->name);
     return (false);
   }
 
@@ -1335,7 +1327,8 @@ allocVariables (const xmlChar ** attrs, XMLParserData * data)
   }
 
   ggobi_data_add_cols(d, atoi (tmp));
-
+  ggobi_data_add_attributes(d);
+  
   return (true);
 }
 

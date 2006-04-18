@@ -110,7 +110,7 @@ brush_link_by_var (gint jlinkby, vector_b * levelv,
   for (m = 0; m < d->nrows_in_plot; m++) {
     i = d->rows_in_plot.els[m];
 
-    level_value = ggobi_data_get_integer_value(d, i, jlinkby);
+    level_value = ggobi_data_get_int_value(d, i, jlinkby);
     ggobi_data_brush_point(d, i, levelv->els[level_value], cpanel->br.point_targets, cpanel->br.mode);
   }
 }
@@ -118,7 +118,7 @@ brush_link_by_var (gint jlinkby, vector_b * levelv,
 /*
  * We're working too hard here, looping whether there's any
  * change or not.  Maybe there's an easy way to set the value
- * of changed by keeping track of pts_under_brush_prev?
+ * of changed by using pts_under_brush_prev?
 */
 gboolean
 build_symbol_vectors_by_var (cpaneld * cpanel, GGobiData * d, ggobid * gg)
@@ -131,19 +131,17 @@ build_symbol_vectors_by_var (cpaneld * cpanel, GGobiData * d, ggobid * gg)
     return false;
 
   j = ggobi_data_get_col_index_for_name(d, d->linkvar);
-  level_value_max = (gint) ggobi_data_get_col_max(d, j);
+  level_value_max = ggobi_data_get_col_max(d, j);
 
   vectorb_init_null (&levelv);
   vectorb_alloc (&levelv, level_value_max + 1);
   vectorb_zero (&levelv);
 
   /*-- find the levels which are among the points under the brush --*/
-  for (m = 0; m < d->nrows_in_plot; m++) {
-    i = d->rows_in_plot.els[m];
-    if (d->pts_under_brush.els[i]) {
-      level_value = ggobi_data_get_integer_value(d, i, j);
-      levelv.els[level_value] = true;
-    }
+  for (m = 0; m < d->nrows_under_brush; m++) {
+    i = d->rows_under_brush.els[m];
+    level_value = ggobi_data_get_int_value(d, i, j);
+    levelv.els[level_value] = true;
   }
 
   /*-- first do this d --*/
