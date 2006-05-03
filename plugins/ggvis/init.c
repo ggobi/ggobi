@@ -41,7 +41,6 @@ ggvis_init (ggvisd *ggv, ggobid *gg)
   vectori_init_null (&ggv->dissim->bins);
 
   ggv->dim = 3;
-  ggv->maxdim = 3;
 
   ggv->stepsize = 0.02;
   ggv->dist_power = 1.0;

@@ -14,6 +14,8 @@
 static void ggv_center_scale_pos_all (ggvisd *ggv);
 void mds_open_display (PluginInstance *inst);
 
+extern void ggv_center_scale_pos (ggvisd *ggv);
+
 void
 ggv_scramble (ggvisd *ggv, ggobid *gg)
 {
@@ -587,37 +589,66 @@ void ggv_dims_cb (GtkAdjustment *adj, PluginInstance *inst)
   gchar *vname;
   gboolean running = ggv->running_p;
   GGobiData *d = ggv->dpos;
+  GGobiData *dsrc = ggv->dsrc;
   gdouble *dtmp;
+  vartabled *vt0;
+  gdouble range;
 
-  if (ggv->dpos) {
+  if (d) {
 
     if (ggv->running_p) mds_func (false, inst);
   
-    if (dim > ggv->maxdim) {  /*-- add variables as needed --*/
+    if (dim > ggv->pos.ncols) {  /*-- add variables as needed --*/
       arrayd_add_cols (&ggv->pos, dim);
       vectord_realloc (&ggv->pos_mean, dim);
+    }
 
+    if (dim > d->ncols) {
       dtmp = (gdouble *) g_malloc0 (d->nrows * sizeof (gdouble));
-      for (i=0; i<d->nrows; i++)
-        dtmp[i] = 2 * (randvalue() - .5);  /* on [-1, 1] */
-      for (j=ggv->dim; j<dim; j++) {
+      /* Copying from dsrc, when possible, instead of using random
+         values -- or populate new columns with randoms, then call
+         ggv_pos_reinit */
+
+      /* Add new columns -- force them onto the scale of the
+         existing columns? If you can't beat 'em, join 'em. */
+      vt0 = vartable_element_get (0, d);
+      for (j=d->ncols; j<dim; j++) {
+        if (j < dsrc->ncols) {
+          vartabled *vt = vartable_element_get (j, dsrc);
+          range = vt->lim_tform.max - vt->lim_tform.min;
+          for (i=0; i<dsrc->nrows; i++) {
+            ggv->pos.vals[i][j] = dtmp[i] =
+              (dsrc->tform.vals[i][j] - vt->lim_tform.min) / range;
+            ggv->pos.vals[i][j] = dtmp[i] = (2*dtmp[i] - 1) * vt0->lim_tform.max;
+          }
+        } else {
+          for (i=0; i<dsrc->nrows; i++)
+            ggv->pos.vals[i][j] = dtmp[i] = ggv_randvalue(UNIFORM);
+            ggv->pos.vals[i][j] = dtmp[i] = (2*dtmp[i] - 1) * vt0->lim_tform.max;
+        }
         vname = g_strdup_printf ("Pos%d", j+1);
-        newvar_add_with_values (dtmp, d->nrows, vname,
-          real, 0, (gchar **) NULL, (gint *) NULL, (gint *) NULL,
-        d);
+        newvar_add_with_values (dtmp, d->nrows, vname, real,
+          0, (gchar **) NULL, (gint *) NULL, (gint *) NULL,
+          d);
         g_free (vname);
       }
       g_free (dtmp);
-      ggv->maxdim = MAX(ggv->dim, dim);
     }
+
     ggv->dim = dim;
+
+    // At the moment, I don't think these steps are needed.  dfs
+    //ggv_center_scale_pos (ggv);
+    //limits_set (d, true, true, true);
+    //tform_to_world (ggv->dpos, inst->gg);
+    //displays_tailpipe (FULL, inst->gg);
+
     if (running) mds_func (true, inst);
 
   } else {  /* User hasn't started running mds yet */
-    if (dim > ggv->maxdim) {
+    if (dim > ggv->pos.ncols) {
       arrayd_add_cols (&ggv->pos, dim);
       vectord_realloc (&ggv->pos_mean, dim);
-      ggv->maxdim = MAX(ggv->dim, dim);
     }
     ggv->dim = dim;
   }

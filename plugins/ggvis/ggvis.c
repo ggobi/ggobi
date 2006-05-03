@@ -245,7 +245,6 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gtk_container_add (GTK_CONTAINER(window), main_vbox);
 
   /* main menu bar */
-  //ggv_accel_group = gtk_accel_group_new ();
   manager = gtk_ui_manager_new();
   actions = gtk_action_group_new("ggvis");
   gtk_action_group_add_actions(actions, entries, G_N_ELEMENTS(entries), inst);

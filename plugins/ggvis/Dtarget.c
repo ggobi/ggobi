@@ -84,8 +84,6 @@ ggv_compute_Dtarget (gint selected_var, ggvisd *ggv)
     while (changing) {
       changing = false;
       for (i = 0; i < e->edge.n; i++) {
-        /*end1 = dsrc->rowid.idv.els[endpoints[i].a];*/
-        /*end2 = dsrc->rowid.idv.els[endpoints[i].b];*/
         end1 = endpoints[i].a;
         end2 = endpoints[i].b;
         d12 = 

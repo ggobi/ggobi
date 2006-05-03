@@ -72,7 +72,6 @@ typedef struct {
   dissimd *dissim;
 
   gint dim;
-  gint maxdim;  /*-- this increases only, never decreases --*/
   gdouble stepsize;
 
   gdouble Dtarget_power;  /* was mds_power */
