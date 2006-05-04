@@ -71,7 +71,8 @@ fileset_read_init (const gchar * ldata_in, const gchar * pluginModeName,
   return (ds != NULL);
 }
 
-// returns a list of datasets (some input types (eg. xml) may return multiple data types)
+// returns a list of datasets (some input types (eg. xml) may return 
+// multiple data types)
 GSList *
 fileset_read (const gchar * ldata_in, const gchar * pluginModeName,
               GGobiPluginInfo * plugin, ggobid * gg)
@@ -79,9 +80,11 @@ fileset_read (const gchar * ldata_in, const gchar * pluginModeName,
   InputDescription *desc;
 
   desc = fileset_generate (ldata_in, pluginModeName, plugin, gg);
-
   if (desc == NULL) {
-    g_printerr ("Cannot locate the file %s\n", ldata_in);
+    // We should be able to distinguish these two cases.  Could
+    // plugins report whether the file is readable?   -- dfs
+    g_printerr ("Cannot locate the file %s, or cannot recognize its format\n",
+      ldata_in);
     return NULL;
   }
 
