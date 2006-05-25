@@ -1033,7 +1033,7 @@ createDisplayFromDescription (ggobid * gg, GGobiDisplayDescription * desc)
     GSList *l;
     for (l = gg->d; l; l = l->next) {
       tmp = (GGobiData *) l->data;
-      if (strcmp (desc->datasetName, tmp->name) == 0) {
+      if (strcmp (desc->datasetName, ggobi_stage_get_name(GGOBI_STAGE(tmp))) == 0) {
         data = tmp;
         break;
       }
@@ -1067,8 +1067,8 @@ resolveVariableName (const gchar * name, GGobiData * d)
 {
   gint j;
 
-  for (j = 0; j < d->ncols; j++) {
-    if (strcmp (ggobi_data_get_col_name(d, j), name) == 0)
+  for (j = 0; j < GGOBI_STAGE(d)->n_cols; j++) {
+    if (strcmp (ggobi_stage_get_col_name(GGOBI_STAGE(d), j), name) == 0)
       return (j);
   }
 

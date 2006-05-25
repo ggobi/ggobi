@@ -285,8 +285,8 @@ scree_expose_cb (GtkWidget * w, GdkEventConfigure * event, ggobid * gg)
 
   if (d != NULL) {
 
-    sphvars = (gint *) g_malloc (d->ncols * sizeof (gint));
-    evals = (gfloat *) g_malloc (d->ncols * sizeof (gfloat));
+    sphvars = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof (gint));
+    evals = (gfloat *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof (gfloat));
 
     eigenvals_get (evals, d);
 
@@ -399,7 +399,7 @@ sphere_panel_open (ggobid * gg)
 
     /* Create a notebook, set the position of the tabs */
     notebook = create_variable_notebook (vbox,
-                                         GTK_SELECTION_MULTIPLE, all_vartypes,
+                                         GTK_SELECTION_MULTIPLE, GGOBI_VARIABLE_ALL_VARTYPES,
                                          all_datatypes, G_CALLBACK (NULL),
                                          NULL, gg);
 

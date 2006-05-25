@@ -126,7 +126,7 @@ subset_display_update (GGobiData *d, ggobid *gg)
   entry = (GtkWidget *)
     g_object_get_data(G_OBJECT(gg->subset_ui.window), "SS:NROWS_ENTRY");
   if (entry) {
-    gchar *txt = g_strdup_printf ("%d", d->nrows);
+    gchar *txt = g_strdup_printf ("%d", GGOBI_STAGE(d)->n_rows);
     gtk_entry_set_text (GTK_ENTRY (entry), txt);
     g_free (txt);
   }
@@ -243,7 +243,7 @@ subset_tree_view_datad_added_cb (ggobid *gg, GGobiData *d, GtkWidget *tree_view)
   subset_init (d, gg);
   model = gtk_tree_view_get_model(GTK_TREE_VIEW(tree_view));
   gtk_list_store_append(GTK_LIST_STORE(model), &iter);
-  gtk_list_store_set(GTK_LIST_STORE(model), &iter, 0, d->name);
+  gtk_list_store_set(GTK_LIST_STORE(model), &iter, 0, ggobi_stage_get_name(GGOBI_STAGE(d)));
 
   gtk_widget_show_all (swin);
 }
@@ -308,7 +308,7 @@ subset_window_open (ggobid *gg) {
         d = (GGobiData *) l->data;
         subset_init (d, gg);
         gtk_list_store_append(model, &iter);
-        gtk_list_store_set(model, &iter, 0, d->name, -1);
+        gtk_list_store_set(model, &iter, 0, ggobi_stage_get_name(GGOBI_STAGE(d)), -1);
         if (l == gg->d)
           gtk_tree_selection_select_iter(gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view)), &iter);
       }

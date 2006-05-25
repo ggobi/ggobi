@@ -23,7 +23,7 @@
 #include "vars.h"
 #include "externs.h"
 
-#include "vartable.h"
+#include "ggobi-variable.h"
 
 static void close_btn_cb (GtkWidget *w, ggobid *gg)
 {
@@ -34,10 +34,10 @@ static void
 clone_vars_cb (GtkWidget *w, ggobid *gg)
 {
   GGobiData *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
-  gint *cols = (gint *) g_malloc (d->ncols * sizeof (gint));
+  gint *cols = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof (gint));
   gint ncols = selected_cols_get (cols, d, gg);
 
-  if (ggobi_data_has_cols(d))
+  if (ggobi_stage_get_n_cols(GGOBI_STAGE(d)))
     clone_vars (cols, ncols, d);
 
   g_free (cols);
@@ -49,10 +49,10 @@ static void
 delete_vars_cb (GtkWidget *w, ggobid *gg)
 {
   GGobiData *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
-  gint *cols = (gint *) g_malloc (d->ncols * sizeof (gint));
+  gint *cols = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof (gint));
   gint ncols = selected_cols_get (cols, d, gg);
 
-  if (ggobi_data_has_cols(d))
+  if (ggobi_stage_get_n_cols(GGOBI_STAGE(d)))
     delete_vars (cols, ncols, d);
 
   g_free (cols);
@@ -76,13 +76,13 @@ dialog_range_set (GtkWidget *w, ggobid *gg)
   GtkWidget *umin_entry, *umax_entry;
   GtkTreeModel *model;
   GGobiData *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
-  gint *cols = (gint *) g_malloc (d->ncols * sizeof (gint));
+  gint *cols = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof (gint));
   gint ncols = selected_cols_get (cols, d, gg);
   gint j, k;
   gchar *val_str;
   gfloat min_val = 0, max_val = 0; // compiler pacification
   gboolean min_p = false, max_p = false;
-  vartabled *vt;
+  GGobiVariable *var;
 
   umin_entry = widget_find_by_name (GTK_DIALOG(dialog)->vbox, "umin_entry");
   if (umin_entry == NULL || !GTK_IS_ENTRY(umin_entry)) {
@@ -122,17 +122,17 @@ dialog_range_set (GtkWidget *w, ggobid *gg)
       GtkTreeIter iter;
 	  
       j = cols[k];
-      vt = ggobi_data_get_vartable(d, j);
+      var = ggobi_stage_get_variable(GGOBI_STAGE(d), j);
 
       vartable_iter_from_varno(j, d, &model, &iter);
       
-      vt->lim_specified.min = vt->lim_specified_tform.min = min_val;
-      vt->lim_specified.max = vt->lim_specified_tform.max = max_val;
+      var->lim_specified.min = var->lim_specified_tform.min = min_val;
+      var->lim_specified.max = var->lim_specified_tform.max = max_val;
 
       gtk_tree_store_set(GTK_TREE_STORE(model), &iter, 
 	VT_REAL_USER_MIN, min_val, VT_REAL_USER_MAX, max_val, -1);
       
-      vt->lim_specified_p = min_p && max_p;
+      var->lim_specified_p = min_p && max_p;
       
       g_signal_emit_by_name(d, "col_data_changed", (guint) j);
     }
@@ -148,7 +148,7 @@ range_unset_cb (GtkWidget *w, ggobid *gg)
 }
 
 static void rescale_cb (GtkWidget *w, ggobid *gg) {
-  GGobiData *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
+  /*GGobiData *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);*/
 
   /*limits_set (d, true, true, gg->lims_use_visible);  
   vartable_limits_set (d);
@@ -173,16 +173,16 @@ open_range_set_dialog (GtkWidget *w, ggobid *gg)
   GSList *group;
   gint k;
   GGobiData *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
-  gint *cols = (gint *) g_malloc (d->ncols * sizeof (gint));
+  gint *cols = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof (gint));
   gint ncols = selected_cols_get (cols, d, gg);
   gboolean ok = true;
-  vartabled *vt;
+  GGobiVariable *var;
 
   for (k=0; k<ncols; k++) {
-    vt = ggobi_data_get_vartable(d, cols[k]);
-    if (vt->tform0 != NO_TFORM0 ||
-        vt->tform1 != NO_TFORM1 ||
-        vt->tform2 != NO_TFORM2)
+    var = ggobi_stage_get_variable(GGOBI_STAGE(d), cols[k]);
+    if (var->tform0 != NO_TFORM0 ||
+        var->tform1 != NO_TFORM1 ||
+        var->tform2 != NO_TFORM2)
     {
       ok = false;
       quick_message ("Sorry, can't set the range for a transformed variable\n",
@@ -295,20 +295,20 @@ void range_unset (ggobid *gg)
 {
   GtkTreeModel *model;
   GGobiData *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
-  gint *cols = (gint *) g_malloc (d->ncols * sizeof (gint));
+  gint *cols = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof (gint));
   gint ncols = selected_cols_get (cols, d, gg);
   gint j, k;
-  vartabled *vt;
+  GGobiVariable *var;
 
   for (k=0; k<ncols; k++) {
     GtkTreeIter iter;
 	  
     j = cols[k];
-    vt = ggobi_data_get_vartable(d, j);
+    var = ggobi_stage_get_variable(GGOBI_STAGE(d), j);
 	
     vartable_iter_from_varno(j, d, &model, &iter);
 	  
-    vt->lim_specified_p = false;
+    var->lim_specified_p = false;
     /*-- then null out the two entries in the table --*/
     gtk_tree_store_set(GTK_TREE_STORE(model), &iter, 
 	  	VT_REAL_USER_MIN, 0.0, VT_REAL_USER_MAX, 0.0, -1);
@@ -329,7 +329,7 @@ dialog_newvar_add (GtkWidget *w, ggobid *gg)
   GtkWidget *dialog = w;
   GtkWidget *entry, *radio_brush;
   GGobiData *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
-  gint vtype;
+  gint vartype;
   gchar *vname;
 
   /*-- retrieve the radio button for the brushing groups --*/
@@ -339,9 +339,9 @@ dialog_newvar_add (GtkWidget *w, ggobid *gg)
     return;
   }
   if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (radio_brush)))
-    vtype = ADDVAR_BGROUP;
+    vartype = ADDVAR_BGROUP;
   else {
-    vtype = ADDVAR_ROWNOS;
+    vartype = ADDVAR_ROWNOS;
     g_debug("Using brush group");
     
   }
@@ -354,7 +354,7 @@ dialog_newvar_add (GtkWidget *w, ggobid *gg)
   }
   vname = gtk_editable_get_chars (GTK_EDITABLE (entry), 0, -1);
   if (vname != NULL && strlen(vname) > 0) {
-     create_explicit_variable(d, vname, vtype);
+     create_explicit_variable(d, vname, vartype);
 
 /* I think we still want to do this ... */
 #ifdef FORMERLY
@@ -445,7 +445,7 @@ dialog_rename_var (GtkWidget *w, ggobid *gg)
   gint jvar;
 
   /*-- find out what variables are selected in the var statistics panel --*/
-  selected_vars = (gint *) g_malloc (d->ncols * sizeof (gint));
+  selected_vars = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof (gint));
   nselected_vars = selected_cols_get (selected_vars, d, gg);
   if (nselected_vars == 0)
     return;
@@ -460,7 +460,7 @@ dialog_rename_var (GtkWidget *w, ggobid *gg)
   jvar = selected_vars[0];
   vname = gtk_editable_get_chars (GTK_EDITABLE (entry), 0, -1);
   if (vname != NULL && strlen(vname) > 1) {
-    ggobi_data_set_col_name(d, jvar, vname);
+    ggobi_stage_set_col_name(GGOBI_STAGE(d), jvar, vname);
   }
 }
 
@@ -472,7 +472,7 @@ open_rename_dialog (GtkWidget *w, ggobid *gg)
   gint *selected_vars, nselected_vars = 0;
 
   /*-- find out what variables are selected in the var statistics panel --*/
-  selected_vars = (gint *) g_malloc (d->ncols * sizeof (gint));
+  selected_vars = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof (gint));
   nselected_vars = selected_cols_get (selected_vars, d, gg);
 
   if (nselected_vars == 0) {
@@ -493,7 +493,7 @@ open_rename_dialog (GtkWidget *w, ggobid *gg)
   entry = gtk_entry_new();
   gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), entry);
   /*-- label it with the name of the variable being renamed --*/
-  gtk_entry_set_text (GTK_ENTRY (entry), ggobi_data_get_col_name(d, selected_vars[0]));
+  gtk_entry_set_text (GTK_ENTRY (entry), ggobi_stage_get_col_name(GGOBI_STAGE(d), selected_vars[0]));
   gtk_widget_set_name (entry, "rename_entry");
 
   gtk_box_pack_start (GTK_BOX (hb), entry, true, true, 2);

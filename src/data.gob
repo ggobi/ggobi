@@ -2,7 +2,8 @@
 
 #include "defines.h"
 #include "brushing.h"
-#include "vartable.h"
+#include "ggobi-variable.h"
+#include "ggobi-stage.h"
 #include "fileio.h"
 
 #include <gtk/gtk.h>
@@ -120,14 +121,15 @@ enum ATTR_SET {
  * provide the actual implementation.  This will make it easy to treat
  * an R data frame, or a SQL query as the data source for GGobi.
  */
-class GGobi:Data from G:Object {
+class GGobi:Data from GGobi:Stage {
 
-public const gchar *name;
-public const gchar *nickname;
+  // FIXME: make these fields private or get rid of them!
+public gchar *nickname;
+property STRING nickname
+  (nick = "alias", blurb = "The nickname of the dataset",
+   default_value = "dataset", link, export);
+   
 public InputDescription *input;
-
-public guint nrows;
-public guint ncols;
 
 public guint nattributes = 0;
 
@@ -145,19 +147,15 @@ public Sphere_d  sphere;
 public EdgeData  edge;
 public BrushBins  brush;
 
-public GtkWidget *vartable_tree_view[all_vartypes];
+public GtkWidget *vartable_tree_view[GGOBI_VARIABLE_ALL_VARTYPES];
 public GtkTreeModel *vartable_tree_model; /* the root model, with all vars **/
 public GtkWidget *cluster_table; /*-- table of symbol groups from brushing --*/
 public clusteruid *clusvui;
 
 public GHashTable* idTable;
-public GHashTable* var_name_lookup;
 
 /*-- to support brushing by categorical variable --*/
 public gchar* linkvar = NULL;  /*-- the linking variable name--*/
-
-// Vectors of length ncol
-protected vartabled **vartable;
 
 // Vectors of length nrows
 public char **rowIds;
@@ -193,16 +191,6 @@ public GSList *sticky_ids;
 
 /*-------------------- moving points ---------------------------------*/
 public GSList *movepts_history; /*-- a list of elements of type celld --*/
-
-
-property UINT nrows 
-  (nick = "nrows", blurb = "Number of rows in the dataset",
-   minimum = 0, maximum = INT_MAX, default_value = 0,
-   flags = CONSTRUCT_ONLY, link, export);
-property UINT ncols 
-  (nick = "ncols", blurb = "Number of cols in the dataset",
-   minimum = 0, maximum = INT_MAX, default_value = 0,
-   flags = CONSTRUCT_ONLY, link, export);
    
 private signal first NONE (UINT) void 
 rows_in_plot_changed(self, guint n) {
@@ -211,58 +199,24 @@ rows_in_plot_changed(self, guint n) {
     displays_tailpipe (FULL, self->gg);
 }
 
-private signal NONE (UINT) void 
-col_name_changed(self, guint j);
-
-private signal first NONE (UINT) void 
-col_data_changed(self, guint j) {
-  limits_set_by_var(self, j, true, true, (self->gg) ? self->gg->lims_use_visible : true);
-  tform_to_world_by_var(self, j);
-  if (self->gg)
-    displays_tailpipe (FULL, self->gg);
+override (GGobi:Stage) void 
+col_data_changed(GGobi:Stage *self (check null type), guint j) {
+  limits_set_by_var(SELF(self), j, true, true, (SELF(self)->gg) ? SELF(self)->gg->lims_use_visible : true);
+  tform_to_world_by_var(SELF(self), j);
+  if (SELF(self)->gg)
+    displays_tailpipe (FULL, SELF(self)->gg);
+  PARENT_HANDLER(self, j);
 }
-
-/**
- * cols_added:
- * @self: #GGobiData
- * @n: number of new columns
- *
- * Columns added signal
- **/
-private signal NONE (UINT) void
-cols_added(self, guint n);
-
-/**
- * cols_deleted:
- * @self: #GGobiData
- * @j: Column deleted
- *
- * Columns deleted signal
- **/
-private signal NONE (UINT) void
-col_deleted(self, guint j);
-
-/**
- * rows_added:
- * @self: #GGobiData
- * @n: number of new rows
- * 
- * Rows added signal
- **/
-private signal NONE (UINT) void
-rows_added(self, guint n);
 
 init (self) {
   sphere_init(self); 
   
-  self_set_name(self, "unknown", NULL);
+  ggobi_stage_set_name(GGOBI_STAGE(self), "unknown");
 
   self->idTable = g_hash_table_new(g_str_hash, g_str_equal);
-  self->var_name_lookup = g_hash_table_new(g_str_hash, g_str_equal);
 
   self->nearest_point = -1;
   self->missings_show_p = true;
-  
 }
 
 /** 
@@ -284,29 +238,30 @@ new(guint nrows, guint ncols)
   return(d);
 }
 
-
+// FIXME: abstract into a GGobiDataFactory
 public void
 add_attributes(self) {
+  GGobiStage *stage = GGOBI_STAGE(self);
   self->nattributes += 12;
   guint first_attr = self_add_cols(self, 12);
-  self_set_col_name(self, first_attr++, "_color");
-  self_set_col_name(self, first_attr++, "_glyph_size");
-  self_set_col_name(self, first_attr++, "_glyph_type");
-  self_set_col_name(self, first_attr++, "_hidden");
-  self_set_col_name(self, first_attr++, "_color_now");
-  self_set_col_name(self, first_attr++, "_glyph_size_now");
-  self_set_col_name(self, first_attr++, "_glyph_type_now");
-  self_set_col_name(self, first_attr++, "_hidden_now");
-  self_set_col_name(self, first_attr++, "_color_prev");
-  self_set_col_name(self, first_attr++, "_glyph_size_prev");
-  self_set_col_name(self, first_attr++, "_glyph_type_prev");
-  self_set_col_name(self, first_attr++, "_hidden_prev");
+  ggobi_stage_set_col_name(stage, first_attr++, "_color");
+  ggobi_stage_set_col_name(stage, first_attr++, "_glyph_size");
+  ggobi_stage_set_col_name(stage, first_attr++, "_glyph_type");
+  ggobi_stage_set_col_name(stage, first_attr++, "_hidden");
+  ggobi_stage_set_col_name(stage, first_attr++, "_color_now");
+  ggobi_stage_set_col_name(stage, first_attr++, "_glyph_size_now");
+  ggobi_stage_set_col_name(stage, first_attr++, "_glyph_type_now");
+  ggobi_stage_set_col_name(stage, first_attr++, "_hidden_now");
+  ggobi_stage_set_col_name(stage, first_attr++, "_color_prev");
+  ggobi_stage_set_col_name(stage, first_attr++, "_glyph_size_prev");
+  ggobi_stage_set_col_name(stage, first_attr++, "_glyph_type_prev");
+  ggobi_stage_set_col_name(stage, first_attr++, "_hidden_prev");
 
   gint def_color = self->gg ? self->gg->color_id : 0;
   gint def_type  = self->gg ? self->gg->glyph_id.type : FC;
   gint def_size =  self->gg ? self->gg->glyph_id.size : 1;
 
-  for (guint i = 0; i < self->nrows; i++) {
+  for (guint i = 0; i < ggobi_stage_get_n_rows(stage); i++) {
     self_set_attr_color(self, i, def_color, ATTR_SET_PERSISTENT);
     self_set_attr_glyph_parts(self, i, def_type, def_size, ATTR_SET_PERSISTENT);
     self_set_attr_hidden(self, i, false, ATTR_SET_PERSISTENT);
@@ -314,153 +269,10 @@ add_attributes(self) {
 
 }
 
+// FIXME: data/attribute distinction should be made by a pipeline stage
 public guint
 get_n_data_cols(self) {
-  return self->ncols - self->nattributes;
-}
-
-/**
- * get_name:
- * @self: #GGobiData
- *
- * Get name of dataset
- * 
- * Returns: duplicate of dataset name
- **/
-public gchar *
-get_name (self)
-{
-  return g_strdup(self->name);
-}
-
-
-/**
- * set_name:
- * @self: #GGobiData
- * @name: new name
- * @nickname: new nickname (if NULL, uses first 5 characters of name)
- *
- * Get name of dataset
- **/
-public void
-set_name (self, const gchar *name, const gchar *nickname)
-{
-  if (name == NULL) name = g_strdup("unknown");
-  if (nickname == NULL) nickname = g_strndup(name, 5);
-
-  self->name = g_strdup(name);
-  self->nickname = g_strndup(name, 5);
-}
-
-/** 
- * get_n_cols:
- * @self: #GGobiData
- *
- * Get number of columns.  This should be used in preference to referring to ncols
- * directly, as future subclasses may not use the same structure
- **/
-public guint
-get_n_cols(self) {
-  return self->ncols;
-}
-
-/** 
- * get_n_cols:
- * @self: #GGobiData
- *
- * Get number of rows
- * This should be used in preference to referring to nrows
- * directly, as future subclasses may not use the same structure
- **/
-public guint
-get_n_rows(self) {
-  return self->nrows;
-}
-
-/**
- * get_col_name:
- * @self: #GGobiData
- * @j: column index
- *
- * Returns: duplicate of column name
- **/
-public gchar* 
-get_col_name(self, guint j) 
-{
-  vartabled* vt = self_get_vartable(self, j);
-  return g_strdup(vt->collab);
-}
-
-/**
- * get_col_nickname:
- * @self: #GGobiData
- * @j: column index
- *
- * Returns: duplicate of column nickname
- **/
-public gchar* 
-get_col_nickname(self, guint j) 
-{
-  vartabled* vt = self_get_vartable(self, j);
-  if (vt->nickname)
-    return g_strdup(vt->nickname);
-  else
-    return NULL;
-}
-
-/**
- * get_col_index_for_name:
- * @self: #GGobiData
- * @value: column name
- *
- * Returns: index of column with given name, or -1 if no matching columns
- **/
-public guint
-get_col_index_for_name(self, const gchar* value) 
-{
-  gpointer pos, key;
-  if (value && g_hash_table_lookup_extended(self->var_name_lookup, value, &key, &pos))
-    return GPOINTER_TO_INT(pos);
-  return -1;
-}
-
-/** 
- * set_col_name:
- * @self: GGobiData object
- * @j: column index
- * @value: new column name (if NULL uses column index)
- *
- * Set column name
- * Also sets nickname to the first two letters.
- * Emits col_name_changed() signal.
- **/
-public void 
-set_col_name(self, guint j, const gchar* value) 
-{
-  vartabled* vt = self_get_vartable(self, j);
-
-  if (value == NULL) value = g_strdup_printf("V%d", j + 1);
-
-  vt->collab = g_strdup(value);
-  vt->collab_tform = g_strdup(value);
-  if (!vt->nickname)
-    vt->nickname = g_strndup (vt->collab, 2);
-
-  g_hash_table_replace (self->var_name_lookup, vt->collab, GINT_TO_POINTER(j));
-  self_col_name_changed(self, j);
-}
-
-/** 
- * set_col_nickname:
- * @self: GGobiData object
- * @j: column index
- * @value: new column nickname
- **/
-public void 
-set_col_nickname(self, guint j, const gchar* value)
-{
-  vartabled* vt = self_get_vartable(self, j);
-  vt->nickname = g_strdup(value);
+  return ggobi_stage_get_n_cols(GGOBI_STAGE(self)) - self->nattributes;
 }
 
 // FIXME: to be removed once pipeline in place
@@ -475,15 +287,15 @@ public gchar*
 get_transformed_col_name(self, guint j) 
 {
   gchar *lbl0, *lbl1, *lbl2;
-  vartabled *vt = self_get_vartable(self, j);
+  GGobiVariable *vt = ggobi_stage_get_variable(GGOBI_STAGE(self), j);
 
    /*-- skip the stage0 changes except negation --*/
    switch (vt->tform0) {
      case NEGATE:
-       lbl0 = g_strdup_printf ("-%s", self_get_col_name(self, j));
+       lbl0 = g_strdup_printf ("-%s", ggobi_stage_get_col_name(GGOBI_STAGE(self), j));
        break;
      default:
-       lbl0 = g_strdup (self_get_col_name(self, j));
+       lbl0 = g_strdup (ggobi_stage_get_col_name(GGOBI_STAGE(self), j));
        break;
    }
 
@@ -544,18 +356,18 @@ get_transformed_col_name(self, guint j)
  * If the variable is categorical, a new level value ("MISSING")
  * will be created, and the raw value set to that.
  **/
-public void
-set_missing(self, guint i, guint j)
+override (GGobi:Stage) void
+set_missing(GGobi:Stage *self (check null type), guint i, guint j)
 {
-  if (self_get_col_type(self, j) == categorical) {
-    self_set_categorical_value(self, i, j, "MISSING");
+  if (GGOBI_STAGE_IS_COL_CATEGORICAL(self, j)) {
+    ggobi_stage_set_categorical_value(self, i, j, "MISSING");
     return;
   }
 
-  self->missing.vals[i][j] = 1;
-  self->raw.vals[i][j] = 0;
+  SELF(self)->missing.vals[i][j] = 1;
+  SELF(self)->raw.vals[i][j] = 0;
 
-  self->missings = TRUE;
+  SELF(self)->missings = TRUE;
 }
 
 
@@ -567,10 +379,10 @@ set_missing(self, guint i, guint j)
  *
  * Returns: if value at specified positive is missing or not
  **/
-public gboolean
-is_missing(self, guint i, guint j) 
+override (GGobi:Stage) gboolean
+is_missing(GGobi:Stage *self, guint i, guint j) 
 {
-  return (self->missing.vals[i][j] == 1);  
+  return (SELF(self)->missing.vals[i][j] == 1);  
 }
 
 /**
@@ -578,47 +390,10 @@ is_missing(self, guint i, guint j)
  * @self: GGobiData object
  * Returns: whether or not dataset contains any missing values
  **/
-public gboolean
-has_missings(self) 
+override (GGobi:Stage) gboolean
+has_missings(GGobi:Stage *self (check null type)) 
 {
-  return self->missings;
-}
-
-/**
- * get_col_n_missing:
- * @self: GGobiData object
- * @j: column index
- * Returns: whether or not specified column contains any missing values
- **/
-public guint 
-get_col_n_missing(self, guint j) {
-  guint i, n = 0;
-
-  for(i = 0; i < self->nrows; i++) {
-    if (self_is_missing(self, i, j)) n++;
-  }
-  
-  return(n);
-}
-
-
-/**
- * set_raw_values:
- * @self: GGobiData object
- * @j: column index
- * @values: vector of new values, of length self->nrows
- * 
- * Sets all values in the specified column.  
- * Emits self_col_data_changed() signal.
- **/
-public void
-set_raw_values(self, guint j, gdouble *values)
-{
-  guint i;
-  for (i = 0; i < self->nrows; i++) {
-    self_set_raw_value(self, i, j, values[i]);
-  }
-  self_col_data_changed(self, j);
+  return SELF(self)->missings;
 }
 
 
@@ -637,94 +412,18 @@ set_raw_values(self, guint j, gdouble *values)
  * You need to manually emits self_col_data_changed() signal after
  * using this function if you want the data to continue down the pipeline.
  **/
-public void
-set_raw_value(self, guint i, guint j, gdouble value)
+override (GGobi:Stage) void
+set_raw_value(GGobi:Stage *self (check null type), guint i, guint j, gdouble value)
 {
   if(GGobiMissingValue && GGobiMissingValue(value))
-    self_set_missing(self, i, j);
+    ggobi_stage_set_missing(self, i, j);
   else {
-    if (self_get_col_type(self, j) == categorical)
-      if (self_get_col_level_for_value(self, j, (gint) value) == -1) {
-        self_add_col_level(self, j, NULL, (gint) value);
-      }
-    self->raw.vals[i][j] = value;
-    self->tform.vals[i][j] = value;
-  }
-}
-
-// FIXME: should these two really be public?
-public gint
-get_col_level_for_value(self, guint j, gint value)
-{
-  gpointer key, level_ptr;
-  vartabled *vt = self_get_vartable(self, j);
-  g_return_val_if_fail(self_get_col_type(self, j) == categorical, -1);
-  if(!g_hash_table_lookup_extended(vt->value_to_level, GINT_TO_POINTER(value), 
-      &key, &level_ptr))
-    return(-1);
-  return(GPOINTER_TO_INT(level_ptr));
-}
-
-public gint
-get_col_level_for_name(self, guint j, const gchar *name)
-{
-  gpointer key, level_ptr;
-  vartabled *vt = self_get_vartable(self, j);
-  g_return_val_if_fail(self_get_col_type(self, j) == categorical, -1);
-  if (!g_hash_table_lookup_extended(vt->name_to_level, name, &key, &level_ptr))
-    return(-1);
-  return(GPOINTER_TO_INT(level_ptr));
-}
-
-/**
- * set_categorical_value:
- * @self: #GGobiData
- * @i: row index
- * @j: column index
- * @value: new categorical value
- * 
- * This function sets the value of a cell in a categorical variable.
- * It will automatically create a new level if necessary.
- * If the column is not already categorical, this will make it so.
- */
-public void
-set_categorical_value(self, guint i, guint j, const gchar* value) 
-{
-  vartabled* vt = self_get_vartable(self, j);
-  self_set_col_type(self, j, categorical);
-  guint level = self_get_col_level_for_name(self, j, value);
-  
-  if (level == -1) {
-    level = self_add_col_level(self, j, value, -1);
-  } else {
-    vt->level_counts[level]++;
-  }
-
-  self_set_int_value(self, i, j, self_get_col_level_value(self, j, level));
-}
-
-/**
- * set_string_value:
- * @self: #GGobiData
- * @i: row index
- * @j: column index
- * @value: new value
- *
- * This function provides a convenient method for setting the
- * value from a string.  Empty strings, . and NA will be treated as
- * missings.  Strings that can be converted to an number will store
- * that number.  Otherwise set_categorical_value() will be used
- **/
-public void
-set_string_value(self, guint i, guint j, const gchar* value) 
-{
-  if (is_numeric(value)) {
-    self_set_raw_value(self, i, j, (gfloat) g_strtod (value, NULL));
-  } else {
-    if (!g_ascii_strcasecmp (value, "na") || !strcmp (value, ".") || !strcmp(value, ""))  
-      self_set_missing(self, i, j);
-    else
-      self_set_categorical_value(self, i, j, value);
+    GGobiVariable *var = ggobi_stage_get_variable(self, j);
+    if (GGOBI_VARIABLE_IS_CATEGORICAL(var))
+      if (!ggobi_variable_has_level(var, (gint) value))
+        ggobi_variable_add_level(var, NULL, (gint) value);
+    SELF(self)->raw.vals[i][j] = value;
+    SELF(self)->tform.vals[i][j] = value;
   }
 }
 
@@ -734,343 +433,42 @@ set_string_value(self, guint i, guint j, const gchar* value)
  * @i: row index
  * @j: column index
  **/
-public gdouble
-get_raw_value(self, guint i, guint j)
+override (GGobi:Stage) gdouble
+get_raw_value(GGobi:Stage *self (check null type), guint i, guint j)
 {
-  return self->raw.vals[i][j];
-}
-
-public vartyped 
-get_col_type(self, guint j)
-{
-  vartabled *vt = self_get_vartable(self, j);
-  return(vt->vartype);
+  return SELF(self)->raw.vals[i][j];
 }
 
 public void 
-set_col_type(self, guint j, vartyped value)
+set_col_type(self, guint j, GGobiVariableType value)
 {
-  vartabled *vt = self_get_vartable(self, j);
-  vt->vartype = value;
+  GGobiVariable *vt = ggobi_stage_get_variable(GGOBI_STAGE(self), j);
+  ggobi_variable_set_vartype(vt, value);
 }
 
 /**
- * get_vartable:
- * @self: #GGobiData object
- * @j: column index
- *
- * Get variable meta data for specified column
- * Replaces vartable_element_get.  Should eventually become private.
- **/
-public vartabled*
-get_vartable (self, guint j)
-{
-  g_return_val_if_fail(j < self->ncols, NULL);
-  
-  return self->vartable[j];
-}
-
-/**
- * set_vartable:
+ * set_variable:
  * @self: #GGobiData object
  * @j: column index
  *
  * Set variable meta data for specified column
- * Should eventually become private.
  **/
 public void
-set_vartable (self, guint j, vartabled* value)
+set_variable (self, guint j, GGobiVariable* value)
 {
-  self->vartable[j] = value;
+  // FIXME: This function should not exist
+  if (GGOBI_STAGE(self)->vartable[j])
+    g_object_unref(GGOBI_STAGE(self)->vartable[j]);
+  GGOBI_STAGE(self)->vartable[j] = value;
 }
 
-/**
- * get_col_n_levels:
- * @self: #GGobiData object
- * @j: column index
- *
- * Get number of levels in a categorical variable
- **/
-public gchar  
-get_col_n_levels(self, guint j)
+override (GGobi:Stage) guint
+get_n_edges (GGobiStage *self)
 {
-  vartabled *vt = self_get_vartable(self, j);
-  g_return_val_if_fail(self_get_col_type(self, j) == categorical, 0);  
-  
-  return(vt->nlevels);
+  return SELF(self)->edge.n; 
 }
 
-public gchar* 
-get_col_level_name(self, guint j, guint value)
-{
-  vartabled *vt = self_get_vartable(self, j);
-  gint i = self_get_col_level_for_value(self, j, value);
-
-  g_return_val_if_fail(self_get_col_type(self, j) == categorical, NULL);
-  
-  if (i == -1) return g_strdup("MISSING");
-  return(g_strdup(vt->level_names[i]));
-}
-
-public guint  
-get_col_level_count(self, guint j, guint value)
-{
-  vartabled *vt = self_get_vartable(self, j);
-  gint i = self_get_col_level_for_value(self, j, value);
-
-  g_return_val_if_fail(self_get_col_type(self, j) == categorical, 0);  
-
-  if (i == -1)  return 0;
-  return(vt->level_counts[i]);
-}
-
-
-public guint
-get_col_level_value(self, guint j, guint k) {
-  vartabled *vt = self_get_vartable(self, j);
-  return vt->level_values[k];
-}
-
-/**
- * get_col_level_value_closest: 
- * @self: #GGobiData object
- * @j: column index
- * @value: target value to search for 
- *
- * Get closest level value
- * For a categorical categorical, this searches through all level
- * values and returns the level value that is closest to the desired
- * value.  Currently seems a little buggy in that it prefers one 
- * direction over another
- *
- * Returns: closest level value to target value
- *
- **/
-public guint  
-get_col_level_value_closest(self, guint j, guint value)
-{
-  vartabled *vt = self_get_vartable(self, j);
-  g_return_val_if_fail(self_get_col_type(self, j) == categorical, 0);  
-
-  guint k, level = 0, dist = 0, ddist = G_MAXUINT;
-  for (k = 0; k < vt->nlevels; k++) {
-    dist = fabs ((greal) vt->level_values[k] - value);
-    if (dist < ddist) {
-        level = k;
-        ddist = dist;
-    }
-  }
-
-  return vt->level_values[level];
-}
-/**
- * get_col_max:
- * @self: #GGobiData object
- * @j: column index
- * 
- * Find the biggest value in the column.
- * For numerical columns, value is cached by limits_set()
- * Does the right thing for categorical variables too.  
- **/
-public gfloat
-get_col_max(self, guint j)
-{
-  vartabled *vt = self_get_vartable(self, j);
-  gint level_value, level_value_max=G_MININT, i;
-
-  if (self_get_col_type(self, j) != categorical) {
-    return vt->lim.max;
-  }
-
-  if (vt->nlevels && vt->nlevels > 0) {
-    level_value_max = vt->level_values[0];
-    for (i = 0; i < vt->nlevels; i++) {
-      level_value = vt->level_values[i];
-      if (level_value > level_value_max)
-        level_value_max = level_value;
-    }
-  }
-  
-  return (gfloat) level_value_max;
-}
-
-
-/**
- * get_col_min:
- * @self: #GGobiData object
- * @j: column index
- * 
- * Find the smallest value in the column.
- * For numerical columns, value is cached by limits_set()
- * Does the right thing for categorical variables too.
- **/
-public gfloat
-get_col_min(self, guint j)
-{
-  vartabled *vt = self_get_vartable(self, j);
-  guint level_value, level_value_min=G_MAXINT, i;
-
-  if (self_get_col_type(self, j) != categorical) {
-    return vt->lim.min;
-  }
-// FIXME: shouldn't this also be cached?
-  if (vt->nlevels && vt->nlevels > 0) {
-    level_value_min = vt->level_values[0];
-    for (i = 0; i < vt->nlevels; i++) {
-      level_value = vt->level_values[i];
-      if (level_value < level_value_min)
-        level_value_min = level_value;
-    }
-  }
-  
-  return(gfloat) level_value_min;
-}
-
-public gfloat
-get_col_range(self, guint j)
-{
-  vartabled *vt = self_get_vartable(self, j);
-  return vt->lim.max - vt->lim.min;
-}
-
-public gfloat
-get_col_mean(self, guint j)
-{
-  vartabled *vt = self_get_vartable(self, j);
-  return vt->mean;
-}
-
-/**
- * add_col_level:
- * @self: #GGobiData object
- * @j: column index
- * @name: character description of level, if NULL uses value
- * @value: level value, if -1 uses index + 1
- * Returns: index of new level
- **/
-public guint
-add_col_level(self, guint j, const gchar *name, gint value)
-{
-  vartabled *vt = self_get_vartable(self, j);
-  guint level = vt->nlevels++;
-
-  if (vt->nlevels == 1) {
-    vt->level_values = (gint *)   g_malloc (sizeof (gint));
-    vt->level_counts = (gint *)   g_malloc (sizeof (gint));
-    vt->level_names  = (gchar **) g_malloc (sizeof (gchar *));
-  } else {
-    vt->level_values =
-      (gint *) g_realloc (vt->level_values, sizeof (gint) * vt->nlevels);
-    vt->level_counts =
-      (gint *) g_realloc (vt->level_counts, sizeof (gint) * vt->nlevels);
-    vt->level_names =
-      (gchar **) g_realloc (vt->level_names, sizeof (gchar *) * vt->nlevels);
-  }
-  vt->level_counts[level] = 1;
-
-  if (value == -1)
-    value = level+1;
-  vt->level_values[level] = value;
-
-  if (!name)
-    vt->level_names[level] = g_strdup_printf("%d", value);
-  else 
-    vt->level_names[level] = g_strdup(name);
-
-  g_hash_table_insert(vt->name_to_level, vt->level_names[level], 
-    GINT_TO_POINTER(level));
-  g_hash_table_insert(vt->value_to_level, GINT_TO_POINTER(vt->level_values[level]), 
-    GINT_TO_POINTER(level));
-    
-  return level;
-}
-  
-public void  
-set_col_levels(self, guint j, guint levels, gchar** names, guint* values, guint* counts)
-{
-  guint i;
-  vartabled *vt = self_get_vartable(self, j);
-
-  self_set_col_type(self, j, categorical);  
-
-  vt->vartype = categorical;
-  vt->nlevels = levels;
-  vt->level_names = (gchar **) g_malloc(sizeof(gchar*) * levels);
-  vt->level_values = (guint *) g_malloc(sizeof(guint) * levels);
-  vt->level_counts = (guint *) g_malloc(sizeof(guint) * levels);
-  for(i = 0; i < levels; i++) {
-    vt->level_names[i]  = g_strdup(names[i]);
-    vt->level_counts[i] = (counts) ? counts[i] : 0;
-    vt->level_values[i] = (values) ? values[i] : i+1;
-    g_hash_table_insert(vt->name_to_level, vt->level_names[i], 
-      GINT_TO_POINTER(i));
-    g_hash_table_insert(vt->value_to_level, GINT_TO_POINTER(vt->level_values[i]), 
-      GINT_TO_POINTER(i));
- }
-}
-
-/**
- * get_string_value:
- * @self: #GGobiData object
- * @i: row index
- * @j: column index
- * @transformed: transformed or raw values?
- *
- * Get string representation of value
- * This currently returns a locale insensitive string, suitable for
- * output into csv etc.  It may be sub-optimal for user display, because
- * it does not use the users locale settings, and outputs full precision.
- **/
-public gchar*
-get_string_value(self, guint i, guint j, gboolean transformed) 
-{
-  guint lval = -1;
-  vartabled *vt = self_get_vartable(self, j);
-  gdouble raw = transformed ? self->tform.vals[i][j] : self->raw.vals[i][j];
-  
-  if (self_is_missing(self, i, j)) 
-    return g_strdup("NA");
-
-  if (vt->vartype != categorical) {
-    gchar *buf = g_new(gchar, G_ASCII_DTOSTR_BUF_SIZE);
-    g_ascii_dtostr(buf, G_ASCII_DTOSTR_BUF_SIZE, raw);
-    return buf;
-  }
-  
-  lval = self_get_col_level_for_value(self, j, (gint) raw);
-  if (lval == -1) {  //useful for debugging
-    g_warning ("Levels for %s specified incorrectly", self_get_col_name(self, j));
-    return g_strdup_printf("%g", raw);
-  }
-  
-  return g_strdup(vt->level_names[lval]);
-}
-
-/**
- * has_edges:
- * @self: #GGobiData object
- *
- * Test if this dataset has any edges
- **/ 
-public gboolean 
-has_edges (self) 
-{
-  return (self->edge.n > 0);
-}
-
-/**
- * has_cols:
- * @self: #GGobiData object
- *
- * Test if this dataset has any variables
- **/
-public gboolean 
-has_cols (self) 
-{
-  return (self->ncols > 0);
-}
-
-/* 
+/** 
  * set_row_id:
  * @self: #GGobiData object
  * @i: row
@@ -1081,15 +479,15 @@ has_cols (self)
  * A row id is a unique string reference to a given row.
  * These are hashed for O(1) lookup.
  **/ 
-public void
-set_row_id(self, guint i, gchar* value, gboolean check) {
+override (GGobi:Stage) void
+set_row_id(GGobiStage *self, guint i, gchar* value, gboolean check) {
   if (value == NULL)
     value = g_strdup_printf("%d", i+1);
 
   //g_return_if_fail(check && self_get_row_for_id(self, value) == -1);
 
-  self->rowIds[i] = g_strdup(value);
-  g_hash_table_replace (self->idTable, self->rowIds[i], GINT_TO_POINTER(i));
+  SELF(self)->rowIds[i] = g_strdup(value);
+  g_hash_table_replace (SELF(self)->idTable, SELF(self)->rowIds[i], GINT_TO_POINTER(i));
 }
 
 /** 
@@ -1100,10 +498,10 @@ set_row_id(self, guint i, gchar* value, gboolean check) {
  * Retrive row id for specified row.
  * Returns: duplicate of row id if present, NULL otherwise
  **/
-public gchar*
-get_row_id(self, guint i) {
-  if (self->rowIds[i]) 
-    return g_strdup(self->rowIds[i]);
+override (GGobi:Stage) gchar*
+get_row_id(GGobi:Stage *self, guint i) {
+  if (SELF(self)->rowIds[i]) 
+    return g_strdup(SELF(self)->rowIds[i]);
   else
     return NULL;
 }
@@ -1117,10 +515,10 @@ get_row_id(self, guint i) {
  *
  * Returns: row index if found, -1 otherwise
  **/
-public gint
-get_row_for_id(self, gchar *id) {
+override (GGobi:Stage) gint
+get_row_for_id(GGobi:Stage *self, gchar *id) {
   gpointer pos, key;
-  if (id && g_hash_table_lookup_extended(self->idTable, id, &key, &pos))
+  if (id && g_hash_table_lookup_extended(SELF(self)->idTable, id, &key, &pos))
     return GPOINTER_TO_INT(pos);
   return -1;
 }
@@ -1138,31 +536,34 @@ get_row_for_id(self, gchar *id) {
  *
  * Returns: index of first new row
  **/
+ // FIXME: This code should be the default handler for the n_rows property.
+ // Then this function would just increment that property.
 public guint
 add_rows(self, guint n) {
-  guint i, nprev = self->nrows;
-  self->nrows += n;
+  guint i, nrows, nprev = GGOBI_STAGE(self)->n_rows;
+  GGOBI_STAGE(self)->n_rows += n;
+  nrows = GGOBI_STAGE(self)->n_rows;
   
-  self->rowIds = (gchar **) g_realloc (self->rowIds, sizeof(gchar *) * self->nrows);
-  vectorb_realloc (&self->excluded, self->nrows);
-  vectorb_realloc (&self->sampled, self->nrows);
-  vectori_realloc (&self->rows_in_plot, self->nrows);
-  vectori_realloc (&self->rows_under_brush, self->nrows);
-  vectori_realloc (&self->rows_under_brush_prev, self->nrows);
-  vectori_realloc (&self->clusterid, self->nrows);
+  self->rowIds = (gchar **) g_realloc (self->rowIds, sizeof(gchar *) * nrows);
+  vectorb_realloc (&self->excluded, nrows);
+  vectorb_realloc (&self->sampled, nrows);
+  vectori_realloc (&self->rows_in_plot, nrows);
+  vectori_realloc (&self->rows_under_brush, nrows);
+  vectori_realloc (&self->rows_under_brush_prev, nrows);
+  vectori_realloc (&self->clusterid, nrows);
 
-  arrayf_add_rows (&self->raw, self->nrows);
-  arrayf_add_rows (&self->tform, self->nrows);
-  arrayg_add_rows (&self->jitdata, self->nrows);
-  arrayg_add_rows (&self->world, self->nrows);
-  arrays_add_rows (&self->missing, self->nrows);
+  arrayf_add_rows (&self->raw, nrows);
+  arrayf_add_rows (&self->tform, nrows);
+  arrayg_add_rows (&self->jitdata, nrows);
+  arrayg_add_rows (&self->world, nrows);
+  arrays_add_rows (&self->missing, nrows);
 
   self->nrows_under_brush = self->nrows_under_brush_prev = 0;
 
-  if (self_has_edges(self))
+  if (ggobi_stage_get_n_edges(GGOBI_STAGE(self)))
     vectorb_realloc (&self->edge.xed_by_brush, self->edge.n);
 
-  for (i = nprev; i < self->nrows; i++) {
+  for (i = nprev; i < nrows; i++) {
     self->excluded.els[i] = false;
     self->sampled.els[i] = true;
     
@@ -1177,7 +578,7 @@ add_rows(self, guint n) {
     gint def_type  = self->gg ? self->gg->glyph_id.type : FC;
     gint def_size  = self->gg ? self->gg->glyph_id.size : 1;
 
-    for (i = nprev; i < self->nrows; i++) {
+    for (i = nprev; i < nrows; i++) {
       self_set_attr_color(self, i, def_color, ATTR_SET_PERSISTENT);
       self_set_attr_glyph_parts(self, i, def_type, def_size, ATTR_SET_PERSISTENT);
       self_set_attr_hidden(self, i, false, ATTR_SET_PERSISTENT);
@@ -1186,12 +587,12 @@ add_rows(self, guint n) {
   clusters_set(self);
   self_set_rows_in_plot(self);
   
-  self_rows_added(self, n);
+  ggobi_stage_rows_added(GGOBI_STAGE(self), n);
   return nprev;
 }
 
 
-/* 
+/**
  * add_cols:
  * @self: #GGobiData object
  * @n: number of columns to add
@@ -1199,25 +600,22 @@ add_rows(self, guint n) {
  * Add n empty columns to the dataset.
  * Returns: index of first new column
  **/ 
+ // FIXME: This code should be the default handler for the n_cols property.
+ // Then this function would just increment that property.
 public guint 
 add_cols(self, guint n) {
-  guint nprev = self->ncols;
-  self->ncols += n;
+  guint ncols, nprev = GGOBI_STAGE(self)->n_cols;
+  ncols = nprev + n;
+  
+  arrayf_add_cols (&self->raw, ncols);
+  arrayf_add_cols (&self->tform, ncols);
+  arrayg_add_cols (&self->jitdata, ncols);
+  arrayg_add_cols (&self->world, ncols);
+  arrays_add_cols (&self->missing, ncols);
 
-  self->vartable = (vartabled **) g_realloc (self->vartable, sizeof(vartabled *) * self->ncols);
-  for(guint j = nprev; j < self->ncols; j++) {
-    vartabled *vt = vartable_element_new(self);
-    self_set_vartable(self, j, vt);
-  } 
-  arrayf_add_cols (&self->raw, self->ncols);
-  arrayf_add_cols (&self->tform, self->ncols);
-  arrayg_add_cols (&self->jitdata, self->ncols);
-  arrayg_add_cols (&self->world, self->ncols);
-  arrays_add_cols (&self->missing, self->ncols);
+  tour_realloc_up (self, ncols);
 
-  tour_realloc_up (self, self->ncols);
-
-  self_cols_added(self, n);
+  g_object_set(G_OBJECT(self), GGOBI_STAGE_PROP_N_COLS(ncols), NULL);
   
   return nprev;
 }
@@ -1226,24 +624,22 @@ public guint
 delete_cols(self, guint *cols, gint ncols)
 {
   gint j;
-  gint *keepers, nkeepers;
+  gint *keepers, nkeepers, old_ncols = GGOBI_STAGE(self)->n_cols;
   
-  g_return_val_if_fail(ncols < self->ncols, !self_has_cols(self));
+  g_return_val_if_fail(ncols < old_ncols, old_ncols);
 
   // FIXME: shouldn't find_keepers be able to handle this allocation??
-  keepers = g_malloc ((self->ncols - ncols) * sizeof (gint));
-  nkeepers = find_keepers (self->ncols, ncols, cols, keepers);
+  keepers = g_malloc ((old_ncols - ncols) * sizeof (gint));
+  nkeepers = find_keepers (old_ncols, ncols, cols, keepers);
   if (nkeepers == -1) {
     g_free (keepers);
-    g_return_val_if_reached(self->ncols);
+    g_return_val_if_reached(old_ncols);
   }
   
   for (j = 0; j < nkeepers; j++) {
-    vartabled *vt = self_get_vartable(self, keepers[j]);
-    self_set_vartable(self, j, vt);
+    GGobiVariable *vt = ggobi_stage_get_variable(GGOBI_STAGE(self), keepers[j]);
+    self_set_variable(self, j, vt);
   }
-
-  self->vartable = g_renew(vartabled*, self->vartable, nkeepers);
   
   //FIXME: need function analogous to tour_relloc_up
   tour2d_realloc_down (ncols, cols, self, self->gg);
@@ -1256,10 +652,9 @@ delete_cols(self, guint *cols, gint ncols)
   arrayg_delete_cols (&self->world, ncols, cols);
   arrays_delete_cols (&self->missing, ncols, cols);
   
-  self->ncols -= ncols;
+  g_object_set(G_OBJECT(self), GGOBI_STAGE_PROP_N_COLS(old_ncols - ncols), NULL);
   for (j = 0; j < ncols; j++) /* emit col deleted signal */
-    self_col_deleted(self, cols[j]);
-  
+    ggobi_stage_col_deleted(GGOBI_STAGE(self), cols[j]);
   
   /*-- emit a single variable_list_changed signal when finished --*/
   /*-- doesn't need to give a variable index any more, really --*/
@@ -1271,38 +666,7 @@ delete_cols(self, guint *cols, gint ncols)
                  
   g_free (keepers);
   
-  return(self->ncols);
-}
-
-public void
-free (self) 
-{
-  vectorb_free (&self->excluded);
-  vectorb_free (&self->sampled);
-  vectori_free (&self->rows_in_plot);
-  vectori_free (&self->clusterid);
-
-  arrayf_free (&self->raw, self->nrows, self->ncols);
-  arrayf_free (&self->tform, self->nrows, self->ncols);
-  arrayg_free (&self->jitdata, self->nrows, self->ncols);
-  arrayg_free (&self->world, self->nrows, self->ncols);
-  arrays_free (&self->missing, self->nrows, self->ncols);
-
-  for (gint j = self->ncols-1; j >= 0; j--) {
-    vartabled *vt = self_get_vartable(self, (guint)j); 
-    if (vt->collab != NULL) g_free (vt->collab);
-    if (vt->collab_tform != NULL) g_free (vt->collab_tform);
-    g_hash_table_destroy(vt->name_to_level);
-    g_hash_table_destroy(vt->value_to_level);
-    g_free(vt);
-  }
-  g_free (self->vartable);
-
-  g_hash_table_destroy(self->idTable); 
-  g_hash_table_destroy(self->var_name_lookup); 
-
-  g_free(self->rowIds);
-  g_free(self);
+  return(GGOBI_STAGE(self)->n_cols);
 }
 
 /**
@@ -1317,6 +681,7 @@ free (self)
  * listening to the correct signals.  This function still needs a lot of
  * work.
  **/
+ // FIXME: This should not exist.. we need a ggobi_add_data()
 public void 
 attach (self, ggobid *gg, gboolean cleanup)
 {
@@ -1324,7 +689,7 @@ attach (self, ggobid *gg, gboolean cleanup)
   gg->d = g_slist_append (gg->d, self);
   displayd *display = NULL;
 
-  gint *vars = (gint *) g_malloc(self->ncols * sizeof(gint));
+  gint *vars = (gint *) g_malloc(GGOBI_STAGE(self)->n_cols * sizeof(gint));
   
   self->brush.bin0.x = self->brush.bin1.x = BRUSH_NBINS;
   self->brush.bin0.y = self->brush.bin1.y = BRUSH_NBINS;
@@ -1333,7 +698,7 @@ attach (self, ggobid *gg, gboolean cleanup)
   self->brush.nbins = BRUSH_NBINS;
 
   edgeedit_init (self->gg);
-  if (self_has_edges(self))
+  if (ggobi_stage_get_n_edges(GGOBI_STAGE(self)))
     vectorb_realloc (&self->edge.xed_by_brush, self->edge.n);
 
   /* binning the plot window; no need to realloc these **/
@@ -1357,26 +722,26 @@ attach (self, ggobid *gg, gboolean cleanup)
    * variable.  (dfs -- done at Di's request, September 2004)
    **/
   limits_set (self, true, true, self->gg->lims_use_visible);
-  for (guint j = 0; j < self->ncols; j++) vars[j] = j;
-  impute_fixed (IMP_BELOW, 15.0, self->ncols, vars, self);
+  for (guint j = 0; j < GGOBI_STAGE(self)->n_cols; j++) vars[j] = j;
+  impute_fixed (IMP_BELOW, 15.0, GGOBI_STAGE(self)->n_cols, vars, self);
   limits_set (self, true, true, self->gg->lims_use_visible);
   g_free(vars);
 
   for(guint j = 0; j < self_get_n_data_cols(self); j++) 
-    self_col_data_changed(self, j);
+    ggobi_stage_col_data_changed(GGOBI_STAGE(self), j);
 
   clusters_set(self);  /*-- find the clusters for data just read in --*/
 
   display_menu_build (gg);
   
   // Set up variable table and listen to important events
-  self_connect__col_data_changed(self, vartable_stats_set_by_var, NULL);
-  self_connect__col_data_changed(self, vartable_limits_set_by_var, NULL);
-  self_connect__col_name_changed(self, vartable_collab_set_by_var, NULL);
-  self_connect__col_name_changed(self, vartable_collab_tform_set_by_var, NULL);
+  ggobi_stage_connect__col_data_changed(GGOBI_STAGE(self), vartable_stats_set_by_var, NULL);
+  ggobi_stage_connect__col_data_changed(GGOBI_STAGE(self), vartable_limits_set_by_var, NULL);
+  ggobi_stage_connect__col_name_changed(GGOBI_STAGE(self), vartable_collab_set_by_var, NULL);
+  ggobi_stage_connect__col_name_changed(GGOBI_STAGE(self), vartable_collab_tform_set_by_var, NULL);
 
   varcircles_populate (self, gg);
-  self_connect__col_name_changed(self, varcircle_label_set, NULL);
+  ggobi_stage_connect__col_name_changed(GGOBI_STAGE(self), varcircle_label_set, NULL);
 
   if (cleanup)
     varpanel_clear (self, gg);
@@ -1385,7 +750,7 @@ attach (self, ggobid *gg, gboolean cleanup)
     varpanel_refresh (gg->current_display, gg);
   if (g_slist_index(gg->d, (gpointer)self) == 0)
     varpanel_set_sensitive (self, true, gg);
-  self_connect__col_name_changed(self, varpanel_label_set, NULL);
+  ggobi_stage_connect__col_name_changed(GGOBI_STAGE(self), varpanel_label_set, NULL);
 
   
   if (cleanup || g_list_length(gg->displays) == 0) {
@@ -1393,7 +758,8 @@ attach (self, ggobid *gg, gboolean cleanup)
     gg->pmode = NULL_PMODE;
 
     /*-- initialize the first display --*/
-    if(sessionOptions->info->createInitialScatterPlot && self_has_cols(self)) {
+    if(sessionOptions->info->createInitialScatterPlot && 
+        ggobi_stage_get_n_cols(GGOBI_STAGE(self))) {
       display = scatterplot_new (false, NULL, self, gg);
 
       gg->displays = g_list_append (gg->displays, (gpointer) display);
@@ -1419,13 +785,14 @@ attach (self, ggobid *gg, gboolean cleanup)
  *
  * rows_in_plot = sampled && !excluded
  **/
+ // FIXME: Needs to go bye-bye
 public void
 set_rows_in_plot(self)
 {
   guint i;
   self->nrows_in_plot = 0;
 
-  for (i = 0; i < self->nrows; i++)
+  for (i = 0; i < GGOBI_STAGE(self)->n_rows; i++)
     if (self->sampled.els[i] && !self->excluded.els[i])
       self->rows_in_plot.els[self->nrows_in_plot++] = i;
   
@@ -1437,8 +804,11 @@ set_rows_in_plot(self)
  * ============================================================================
  */
 
+ // FIXME: Could convert to macros, but in order to handle the documentation
+ // we'll probably need to use gob's m4 support
 /* [[[cog
-   import cog, attraccessor
+   import cog, attraccessor\
+   
    cog.outl(attraccessor.attr_accessor("color", "gushort", "short"))
    cog.outl(attraccessor.attr_accessor("hidden", "gboolean", "boolean"))
    cog.outl(attraccessor.attr_accessor("glyph_type", "gint", "int"))
@@ -1819,7 +1189,7 @@ brush_point(self, guint i, gboolean condition, BrushTargetType brush_mode, GGobi
   return false;
 }
 
-
+// FIXME: Should become macros
 /* [[[cog
    import cog, attraccessor
    cog.outl(attraccessor.column_accessor("boolean", "gboolean"))
@@ -1838,7 +1208,7 @@ public gboolean
 get_boolean_value(self, guint i, guint j)
 {
   // This code is autogenerated, do not edit by hand
-  return (gboolean) self_get_raw_value(self, i, j);
+  return (gboolean) ggobi_stage_get_raw_value(GGOBI_STAGE(self), i, j);
 }
 
 
@@ -1854,8 +1224,8 @@ public gboolean*
 get_boolean_values(self, guint j)
 {
   // This code is autogenerated, do not edit by hand
-  gboolean* values = g_new(gboolean, self->nrows);
-  for (guint i = 0; i < self->nrows; i++)
+  gboolean* values = g_new(gboolean, GGOBI_STAGE(self)->n_rows);
+  for (guint i = 0; i < GGOBI_STAGE(self)->n_rows; i++)
     values[i] = self_get_boolean_value(self, i, j);
   return(values);
 }
@@ -1873,7 +1243,7 @@ public void
 set_boolean_value(self, guint i, guint j, gboolean value)
 {
   // This code is autogenerated, do not edit by hand
-  self_set_raw_value(self, i, j, (gdouble) value);
+  ggobi_stage_set_raw_value(GGOBI_STAGE(self), i, j, (gdouble) value);
 }
 
 /** 
@@ -1889,10 +1259,10 @@ public void
 set_boolean_values(self, guint j, gboolean *values)
 {
   // This code is autogenerated, do not edit by hand
-  for (guint i = 0; i < self->nrows; i++) {
+  for (guint i = 0; i < GGOBI_STAGE(self)->n_rows; i++) {
     self_set_boolean_value(self, i, j, values[i]);
   }
-  self_col_data_changed(self, j);
+  ggobi_stage_col_data_changed(GGOBI_STAGE(self), j);
 }
 
 
@@ -1908,7 +1278,7 @@ public gboolean
 get_boolean_value_for_col_name(self, guint i, gchar* name)
 {
   // This code is autogenerated, do not edit by hand
-  guint j = self_get_col_index_for_name(self, name);
+  guint j = ggobi_stage_get_col_index_for_name(GGOBI_STAGE(self), name);
   g_assert(j != -1);
   
   return self_get_boolean_value(self, i, j);
@@ -1927,7 +1297,7 @@ public gboolean*
 get_boolean_values_for_col_name(self, gchar* name)
 {
   // This code is autogenerated, do not edit by hand
-  guint j = self_get_col_index_for_name(self, name);
+  guint j = ggobi_stage_get_col_index_for_name(GGOBI_STAGE(self), name);
   g_assert(j != -1);
   
   return self_get_boolean_values(self, j);
@@ -1946,7 +1316,7 @@ public void
 set_boolean_value_for_col_name(self, guint i, gchar* name, gboolean value)
 {
   // This code is autogenerated, do not edit by hand
-  guint j = self_get_col_index_for_name(self, name);
+  guint j = ggobi_stage_get_col_index_for_name(GGOBI_STAGE(self), name);
   g_assert(j != -1);
   
   self_set_boolean_value(self, i, j, value);
@@ -1965,7 +1335,7 @@ public void
 set_boolean_values_for_col_name(self, gchar* name, gboolean *values)
 {
   // This code is autogenerated, do not edit by hand
-  guint j = self_get_col_index_for_name(self, name);
+  guint j = ggobi_stage_get_col_index_for_name(GGOBI_STAGE(self), name);
   g_assert(j != -1);
   
   self_set_boolean_values(self, j, values);
@@ -1983,7 +1353,7 @@ public gshort
 get_short_value(self, guint i, guint j)
 {
   // This code is autogenerated, do not edit by hand
-  return (gshort) self_get_raw_value(self, i, j);
+  return (gshort) ggobi_stage_get_raw_value(GGOBI_STAGE(self), i, j);
 }
 
 
@@ -1999,8 +1369,8 @@ public gshort*
 get_short_values(self, guint j)
 {
   // This code is autogenerated, do not edit by hand
-  gshort* values = g_new(gshort, self->nrows);
-  for (guint i = 0; i < self->nrows; i++)
+  gshort* values = g_new(gshort, GGOBI_STAGE(self)->n_rows);
+  for (guint i = 0; i < GGOBI_STAGE(self)->n_rows; i++)
     values[i] = self_get_short_value(self, i, j);
   return(values);
 }
@@ -2018,7 +1388,7 @@ public void
 set_short_value(self, guint i, guint j, gshort value)
 {
   // This code is autogenerated, do not edit by hand
-  self_set_raw_value(self, i, j, (gdouble) value);
+  ggobi_stage_set_raw_value(GGOBI_STAGE(self), i, j, (gdouble) value);
 }
 
 /** 
@@ -2034,10 +1404,10 @@ public void
 set_short_values(self, guint j, gshort *values)
 {
   // This code is autogenerated, do not edit by hand
-  for (guint i = 0; i < self->nrows; i++) {
+  for (guint i = 0; i < GGOBI_STAGE(self)->n_rows; i++) {
     self_set_short_value(self, i, j, values[i]);
   }
-  self_col_data_changed(self, j);
+  ggobi_stage_col_data_changed(GGOBI_STAGE(self), j);
 }
 
 
@@ -2053,7 +1423,7 @@ public gshort
 get_short_value_for_col_name(self, guint i, gchar* name)
 {
   // This code is autogenerated, do not edit by hand
-  guint j = self_get_col_index_for_name(self, name);
+  guint j = ggobi_stage_get_col_index_for_name(GGOBI_STAGE(self), name);
   g_assert(j != -1);
   
   return self_get_short_value(self, i, j);
@@ -2072,7 +1442,7 @@ public gshort*
 get_short_values_for_col_name(self, gchar* name)
 {
   // This code is autogenerated, do not edit by hand
-  guint j = self_get_col_index_for_name(self, name);
+  guint j = ggobi_stage_get_col_index_for_name(GGOBI_STAGE(self), name);
   g_assert(j != -1);
   
   return self_get_short_values(self, j);
@@ -2091,7 +1461,7 @@ public void
 set_short_value_for_col_name(self, guint i, gchar* name, gshort value)
 {
   // This code is autogenerated, do not edit by hand
-  guint j = self_get_col_index_for_name(self, name);
+  guint j = ggobi_stage_get_col_index_for_name(GGOBI_STAGE(self), name);
   g_assert(j != -1);
   
   self_set_short_value(self, i, j, value);
@@ -2110,7 +1480,7 @@ public void
 set_short_values_for_col_name(self, gchar* name, gshort *values)
 {
   // This code is autogenerated, do not edit by hand
-  guint j = self_get_col_index_for_name(self, name);
+  guint j = ggobi_stage_get_col_index_for_name(GGOBI_STAGE(self), name);
   g_assert(j != -1);
   
   self_set_short_values(self, j, values);
@@ -2128,7 +1498,7 @@ public gint
 get_int_value(self, guint i, guint j)
 {
   // This code is autogenerated, do not edit by hand
-  return (gint) self_get_raw_value(self, i, j);
+  return (gint) ggobi_stage_get_raw_value(GGOBI_STAGE(self), i, j);
 }
 
 
@@ -2144,8 +1514,8 @@ public gint*
 get_int_values(self, guint j)
 {
   // This code is autogenerated, do not edit by hand
-  gint* values = g_new(gint, self->nrows);
-  for (guint i = 0; i < self->nrows; i++)
+  gint* values = g_new(gint, GGOBI_STAGE(self)->n_rows);
+  for (guint i = 0; i < GGOBI_STAGE(self)->n_rows; i++)
     values[i] = self_get_int_value(self, i, j);
   return(values);
 }
@@ -2163,7 +1533,7 @@ public void
 set_int_value(self, guint i, guint j, gint value)
 {
   // This code is autogenerated, do not edit by hand
-  self_set_raw_value(self, i, j, (gdouble) value);
+  ggobi_stage_set_raw_value(GGOBI_STAGE(self), i, j, (gdouble) value);
 }
 
 /** 
@@ -2179,10 +1549,10 @@ public void
 set_int_values(self, guint j, gint *values)
 {
   // This code is autogenerated, do not edit by hand
-  for (guint i = 0; i < self->nrows; i++) {
+  for (guint i = 0; i < GGOBI_STAGE(self)->n_rows; i++) {
     self_set_int_value(self, i, j, values[i]);
   }
-  self_col_data_changed(self, j);
+  ggobi_stage_col_data_changed(GGOBI_STAGE(self), j);
 }
 
 
@@ -2198,7 +1568,7 @@ public gint
 get_int_value_for_col_name(self, guint i, gchar* name)
 {
   // This code is autogenerated, do not edit by hand
-  guint j = self_get_col_index_for_name(self, name);
+  guint j = ggobi_stage_get_col_index_for_name(GGOBI_STAGE(self), name);
   g_assert(j != -1);
   
   return self_get_int_value(self, i, j);
@@ -2217,7 +1587,7 @@ public gint*
 get_int_values_for_col_name(self, gchar* name)
 {
   // This code is autogenerated, do not edit by hand
-  guint j = self_get_col_index_for_name(self, name);
+  guint j = ggobi_stage_get_col_index_for_name(GGOBI_STAGE(self), name);
   g_assert(j != -1);
   
   return self_get_int_values(self, j);
@@ -2236,7 +1606,7 @@ public void
 set_int_value_for_col_name(self, guint i, gchar* name, gint value)
 {
   // This code is autogenerated, do not edit by hand
-  guint j = self_get_col_index_for_name(self, name);
+  guint j = ggobi_stage_get_col_index_for_name(GGOBI_STAGE(self), name);
   g_assert(j != -1);
   
   self_set_int_value(self, i, j, value);
@@ -2255,7 +1625,7 @@ public void
 set_int_values_for_col_name(self, gchar* name, gint *values)
 {
   // This code is autogenerated, do not edit by hand
-  guint j = self_get_col_index_for_name(self, name);
+  guint j = ggobi_stage_get_col_index_for_name(GGOBI_STAGE(self), name);
   g_assert(j != -1);
   
   self_set_int_values(self, j, values);

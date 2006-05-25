@@ -39,34 +39,34 @@ record_add (eeMode mode, gint a, gint b, gchar * lbl, gchar * id,
 
   /*-- eventually check whether a->b already exists before adding --*/
   if (mode == ADDING_EDGES) {
-    g_assert (e->edge.n == e->nrows);
+    g_assert (e->edge.n == GGOBI_STAGE(e)->n_rows);
     g_assert (a >= 0 && b >= 0 && a != b);
     dtarget = e;
   }
   
   if (!id)
-    id = g_strdup_printf ("%d", dtarget->nrows + 1);
+    id = g_strdup_printf ("%d", GGOBI_STAGE(dtarget)->n_rows + 1);
   
-  if (ggobi_data_get_row_for_id(d, id) != -1) {
+  if (ggobi_stage_get_row_for_id(GGOBI_STAGE(d), id) != -1) {
     g_printerr ("That id (%s) is already used\n", id);
     return false;
   }
 
   i = ggobi_data_add_rows(dtarget, 1);
-  ggobi_data_set_row_id(dtarget, i, lbl, true);
+  ggobi_stage_set_row_id(GGOBI_STAGE(dtarget), i, lbl, true);
 
-  if (ggobi_data_has_cols(dtarget)) {
-    for (j = 0; j < dtarget->ncols; j++) {
+  if (ggobi_stage_get_n_cols(GGOBI_STAGE(dtarget))) {
+    for (j = 0; j < GGOBI_STAGE(dtarget)->n_cols; j++) {
       if (strcmp (vals[j], "NA") == 0) {  /*-- got a missing --*/
-        ggobi_data_set_missing(dtarget, i, j);
+        ggobi_stage_set_missing(GGOBI_STAGE(dtarget), i, j);
       } else {
+        GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(d), j);
         x = (greal) atof (vals[j]);
-        if (ggobi_data_get_col_type(dtarget, j) == categorical) {
-          
-          raw[j] = ggobi_data_get_col_level_value_closest(dtarget, j, x);
+        if (GGOBI_VARIABLE_IS_CATEGORICAL(var)) {
+          raw[j] = ggobi_variable_get_level_value_closest(var, x);
         }
         else
-          ggobi_data_set_raw_value(dtarget, i, j, x);
+          ggobi_stage_set_raw_value(GGOBI_STAGE(dtarget), i, j, x);
           
       }
       g_signal_emit_by_name(d, "col_data_changed", j);
@@ -78,17 +78,17 @@ record_add (eeMode mode, gint a, gint b, gchar * lbl, gchar * id,
     ggobi_data_set_attr_color(dtarget, i, ggobi_data_get_attr_color(dtarget, i), ATTR_SET_PERSISTENT);
     //dtarget->color.els[i] = dtarget->color_now.els[i] = d->color.els[a];
 
-    edges_alloc (e->nrows, e);
-    e->edge.sym_endpoints[dtarget->nrows - 1].a = ggobi_data_get_row_id(d, a);
-    e->edge.sym_endpoints[dtarget->nrows - 1].b = ggobi_data_get_row_id(d, b);
-    e->edge.sym_endpoints[dtarget->nrows - 1].jpartner = -1;  /* XXX */
+    edges_alloc (GGOBI_STAGE(e)->n_rows, e);
+    e->edge.sym_endpoints[GGOBI_STAGE(dtarget)->n_rows - 1].a = ggobi_stage_get_row_id(GGOBI_STAGE(d), a);
+    e->edge.sym_endpoints[GGOBI_STAGE(dtarget)->n_rows - 1].b = ggobi_stage_get_row_id(GGOBI_STAGE(d), b);
+    e->edge.sym_endpoints[GGOBI_STAGE(dtarget)->n_rows - 1].jpartner = -1;  /* XXX */
     unresolveAllEdgePoints (e);
     resolveEdgePoints (e, d);
     /*
      * If this is the first edge in the edge set, do something to
      * make it show up in the display menu.
      */
-    if (e->nrows == 1) {
+    if (GGOBI_STAGE(e)->n_rows == 1) {
       void ggobi_edge_menus_update (ggobid * gg);
       ggobi_edge_menus_update (gg);
     }
@@ -99,7 +99,7 @@ record_add (eeMode mode, gint a, gint b, gchar * lbl, gchar * id,
     GGobiData *dd;
     for (l = gg->d; l; l = l->next) {
       dd = (GGobiData *) l->data;
-      if (dd != dtarget && ggobi_data_has_edges(dd)) {
+      if (dd != dtarget && ggobi_stage_get_n_edges(GGOBI_STAGE(dd))) {
         if (hasEdgePoints (dd, dtarget)) {
           unresolveAllEdgePoints (dd);
           resolveEdgePoints (dd, dtarget);
@@ -132,20 +132,20 @@ DTL: So need to call unresolveEdgePoints(e, d) to remove it from the
         for (sl = dsp->splots; sl; sl = sl->next) {
           sp = (splotd *) sl->data;
           if (sp != NULL)
-            splot_edges_realloc (dtarget->nrows - 1, sp, e);
+            splot_edges_realloc (GGOBI_STAGE(dtarget)->n_rows - 1, sp, e);
         }
       }
     }
   }
 
-  if (ggobi_data_has_cols(dtarget)) {
+  if (ggobi_stage_get_n_cols(GGOBI_STAGE(dtarget))) {
     for (l = gg->displays; l; l = l->next) {
       dsp = (displayd *) l->data;
       if (dsp->d == dtarget) {
         for (sl = dsp->splots; sl; sl = sl->next) {
           sp = (splotd *) sl->data;
           if (sp != NULL)
-            splot_points_realloc (dtarget->nrows - 1, sp, d);
+            splot_points_realloc (GGOBI_STAGE(dtarget)->n_rows - 1, sp, d);
 
           /*-- this is only necessary if there are variables, I think --*/
           if (GGOBI_IS_EXTENDED_SPLOT (sp)) {
@@ -153,7 +153,7 @@ DTL: So need to call unresolveEdgePoints(e, d) to remove it from the
             klass = GGOBI_EXTENDED_SPLOT_GET_CLASS (sp);
             if (klass->alloc_whiskers)
               sp->whiskers = klass->alloc_whiskers (sp->whiskers, sp,
-                                                    d->nrows, d);
+                                                    GGOBI_STAGE(d)->n_rows, d);
 
             /*-- each plot type should have its own realloc routines --*/
             if (GGOBI_IS_BARCHART_SPLOT (sp)) {
@@ -189,14 +189,14 @@ record_add_defaults (GGobiData * d, GGobiData * e, displayd * display,
 
   dtarget = (cpanel->ee_mode == ADDING_EDGES) ? e : d;
 
-  if (ggobi_data_has_cols(dtarget)) {
+  if (ggobi_stage_get_n_cols(GGOBI_STAGE(dtarget))) {
     void fetch_default_record_values (gchar ** vals,
                                       GGobiData *, displayd *, ggobid * gg);
-    vals = (gchar **) g_malloc (dtarget->ncols * sizeof (gchar *));
+    vals = (gchar **) g_malloc (GGOBI_STAGE(dtarget)->n_cols * sizeof (gchar *));
     fetch_default_record_values (vals, dtarget, display, gg);
   }
 
-  lbl = g_strdup_printf ("%d", dtarget->nrows + 1); /* record label and id */
+  lbl = g_strdup_printf ("%d", GGOBI_STAGE(dtarget)->n_rows + 1); /* record label and id */
 
   if (cpanel->ee_mode == ADDING_EDGES) {
     record_add (cpanel->ee_mode, gg->edgeedit.a, d->nearest_point,
@@ -206,8 +206,8 @@ record_add_defaults (GGobiData * d, GGobiData * e, displayd * display,
     record_add (cpanel->ee_mode, -1, -1, lbl, lbl, vals, d, e, gg);
   }
 
-  if (ggobi_data_has_cols(dtarget)) {
-    for (j = 0; j < dtarget->ncols; j++)
+  if (ggobi_stage_get_n_cols(GGOBI_STAGE(dtarget))) {
+    for (j = 0; j < GGOBI_STAGE(dtarget)->n_cols; j++)
       g_free (vals[j]);
     g_free (vals);
   }
@@ -237,7 +237,7 @@ find_nearest_edge (splotd * sp, displayd * display, ggobid * gg)
   lineid = -1;
   near = 20 * 20;               /* If nothing is close, don't show any label */
 
-  if (e && ggobi_data_has_edges(e)) {
+  if (e && ggobi_stage_get_n_edges(GGOBI_STAGE(e))) {
     endpointsd *endpoints = resolveEdgePoints (e, d);
     if (!endpoints)
       return (-1);
@@ -344,19 +344,20 @@ fetch_default_record_values (gchar ** vals, GGobiData * dtarget,
 
   if (dtarget == display->d) {
     /*-- use the screen position --*/
-    greal *raw = (greal *) g_malloc (dtarget->ncols * sizeof (greal));
+    greal *raw = (greal *) g_malloc (GGOBI_STAGE(dtarget)->n_cols * sizeof (greal));
     pt_screen_to_raw (&gg->current_splot->mousepos, -1, true, true, /* no id, both horiz and vert are true */
                       raw, &eps, dtarget, gg->current_splot, gg);
-    for (j = 0; j < dtarget->ncols; j++) {
-      if (ggobi_data_get_col_type(dtarget, j) == categorical) 
-        vals[j] = g_strdup_printf ("%d", ggobi_data_get_col_level_value_closest(dtarget, j, raw[j]));
+    for (j = 0; j < GGOBI_STAGE(dtarget)->n_cols; j++) {
+      GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(dtarget), j);
+      if (GGOBI_VARIABLE_IS_CATEGORICAL(var)) 
+        vals[j] = g_strdup_printf ("%d", ggobi_variable_get_level_value_closest(var, raw[j]));
       else
         vals[j] = g_strdup_printf ("%g", raw[j]);
     }
     g_free (raw);
   }
   else {                        /* for edges, use NA's */
-    for (j = 0; j < dtarget->ncols; j++)
+    for (j = 0; j < GGOBI_STAGE(dtarget)->n_cols; j++)
       vals[j] = g_strdup ("NA");
   }
 }

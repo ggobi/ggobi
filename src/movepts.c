@@ -60,7 +60,7 @@ movepts_history_add (gint id, splotd * sp, GGobiData * d, ggobid * gg)
     if (!movepts_history_contains (id, sp->xyvars.x, d, gg)) {
       cell->i = id;
       cell->j = sp->xyvars.x;
-      cell->val = ggobi_data_get_raw_value(d, id, sp->xyvars.x);
+      cell->val = ggobi_stage_get_raw_value(GGOBI_STAGE(d), id, sp->xyvars.x);
     }
   }
   d->movepts_history = g_slist_append (d->movepts_history, cell);
@@ -71,7 +71,7 @@ movepts_history_add (gint id, splotd * sp, GGobiData * d, ggobid * gg)
     if (!movepts_history_contains (id, sp->xyvars.y, d, gg)) {
       cell->i = id;
       cell->j = sp->xyvars.y;
-      cell->val = ggobi_data_get_raw_value(d, id, sp->xyvars.y);
+      cell->val = ggobi_stage_get_raw_value(GGOBI_STAGE(d), id, sp->xyvars.y);
     }
   }
   d->movepts_history = g_slist_append (d->movepts_history, cell);
@@ -87,8 +87,8 @@ movepts_history_delete_last (GGobiData * d, ggobid * gg)
 
     /*-- especially ignore cells with indices == -1 --*/
     if (cell->i > -1 && cell->i < d->nrows_in_plot) {
-      if (cell->j > -1 && cell->j < d->ncols) {
-        ggobi_data_set_raw_value(d, cell->i, cell->j, cell->val);
+      if (cell->j > -1 && cell->j < GGOBI_STAGE(d)->n_cols) {
+        ggobi_stage_set_raw_value(GGOBI_STAGE(d), cell->i, cell->j, cell->val);
       }
     }
 
@@ -107,21 +107,21 @@ movept_screen_to_raw (splotd * sp, gint ipt, gcoords * eps,
   gcoords planar;
   displayd *display = (displayd *) sp->displayptr;
   GGobiData *d = display->d;
-  greal *world = (greal *) g_malloc0 (d->ncols * sizeof (greal));
+  greal *world = (greal *) g_malloc0 (GGOBI_STAGE(d)->n_cols * sizeof (greal));
   icoords pos;
-  greal *raw = (greal *) g_malloc (d->ncols * sizeof (greal));
+  greal *raw = (greal *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof (greal));
 
   pos.x = sp->screen[ipt].x;
   pos.y = sp->screen[ipt].y;
-  for (j = 0; j < d->ncols; j++)
+  for (j = 0; j < GGOBI_STAGE(d)->n_cols; j++)
     world[j] = d->world.vals[ipt][j];
 
   pt_screen_to_plane (&pos, ipt, horiz, vert, eps, &planar, sp);
   pt_plane_to_world (sp, &planar, eps, world);
 
-  for (j = 0; j < d->ncols; j++) {
+  for (j = 0; j < GGOBI_STAGE(d)->n_cols; j++) {
     pt_world_to_raw_by_var (j, world, raw, d);
-    ggobi_data_set_raw_value(d, ipt, j, raw[j]);
+    ggobi_stage_set_raw_value(GGOBI_STAGE(d), ipt, j, raw[j]);
   }
 
   sp->planar[ipt].x = planar.x;
@@ -137,21 +137,21 @@ movept_plane_to_raw (splotd * sp, gint ipt, gcoords * eps, GGobiData * d,
 {
   gint j;
   gcoords planar;
-  greal *world = (greal *) g_malloc0 (d->ncols * sizeof (greal));
-  greal *raw = (greal *) g_malloc (d->ncols * sizeof (greal));
+  greal *world = (greal *) g_malloc0 (GGOBI_STAGE(d)->n_cols * sizeof (greal));
+  greal *raw = (greal *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof (greal));
 
   planar.x = sp->planar[ipt].x;
   planar.y = sp->planar[ipt].y;
-  for (j = 0; j < d->ncols; j++)
+  for (j = 0; j < GGOBI_STAGE(d)->n_cols; j++)
     world[j] = d->world.vals[ipt][j];
 
   pt_plane_to_world (sp, &planar, eps, world);
 
-  for (j = 0; j < d->ncols; j++)
+  for (j = 0; j < GGOBI_STAGE(d)->n_cols; j++)
     pt_world_to_raw_by_var (j, world, raw, d);
 
-  for (j = 0; j < d->ncols; j++) {
-    ggobi_data_set_raw_value(d, ipt, j, raw[j]);
+  for (j = 0; j < GGOBI_STAGE(d)->n_cols; j++) {
+    ggobi_stage_set_raw_value(GGOBI_STAGE(d), ipt, j, raw[j]);
   }
 
   g_free (raw);

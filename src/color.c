@@ -319,7 +319,7 @@ datad_colors_used_get (gint * ncolors_used, gushort * colors_used,
   gint i, k, m, n;
   gushort colorid, maxcolorid = 0;
 
-  if (d == NULL || d->nrows == 0)
+  if (d == NULL || GGOBI_STAGE(d)->n_rows== 0)
     /**/ return -1;
 
   n = 0;  /*-- *ncolors_used --*/

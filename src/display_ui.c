@@ -119,7 +119,7 @@ extended_display_open_cb (GtkWidget * w, ExtendedDisplayCreateData * data)
   ggobid *gg = data->d->gg;
   displayd *dpy;
 
-  if (data->d->nrows == 0)
+  if (GGOBI_STAGE(data->d)->n_rows== 0)
     return;
 
   splot_set_current (gg->current_splot, off, gg);
@@ -129,7 +129,7 @@ extended_display_open_cb (GtkWidget * w, ExtendedDisplayCreateData * data)
   else if (data->klass->createWithVars) {
     gint *selected_vars, nselected_vars = 0;
 
-    selected_vars = (gint *) g_malloc (data->d->ncols * sizeof (gint));
+    selected_vars = (gint *) g_malloc (GGOBI_STAGE(data->d)->n_cols * sizeof (gint));
     nselected_vars = selected_cols_get (selected_vars, data->d, gg);
     dpy =
       data->klass->createWithVars (false, nselected_vars, selected_vars,
@@ -195,8 +195,8 @@ buildExtendedDisplayMenu (ggobid * gg, gint nd, GGobiData * d0)
         GGobiData *d = (GGobiData *) g_slist_nth_data (gg->d, k);
 
         /*-- add an item for each datad with variables --*/
-        if (ggobi_data_has_cols(d)) {
-          lbl = ggobi_data_get_name (d);
+        if (ggobi_stage_get_n_cols(GGOBI_STAGE(d))) {
+          lbl = ggobi_stage_get_name(GGOBI_STAGE(d));
           cbdata = (ExtendedDisplayCreateData *)
             g_malloc (sizeof (ExtendedDisplayCreateData));
           cbdata->d = d;

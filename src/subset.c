@@ -23,9 +23,9 @@
 void
 subset_init (GGobiData *d, ggobid *gg)
 {
-  gfloat fnr = (gfloat) d->nrows;
+  gfloat fnr = (gfloat) GGOBI_STAGE(d)->n_rows;
 
-  d->subset.random_n = d->nrows;
+  d->subset.random_n = GGOBI_STAGE(d)->n_rows;
 
   d->subset.bstart_adj = (GtkAdjustment *)
     gtk_adjustment_new (1.0, 1.0, (fnr-2.0), 1.0, 5.0, 0.0);
@@ -46,7 +46,7 @@ void
 subset_set_all(GGobiData *d, gboolean value) {
   gint i;
 
-  for (i=0; i<d->nrows; i++)
+  for (i=0; i<GGOBI_STAGE(d)->n_rows; i++)
     d->sampled.els[i] = value;
 }
 
@@ -65,7 +65,7 @@ subset_apply (GGobiData *d) {
 */
 gboolean
 subset_random (gint n, GGobiData *d) {
-  gint t, m, top = d->nrows;
+  gint t, m, top = GGOBI_STAGE(d)->n_rows;
   gfloat rrand;
 
   subset_set_all(d, false);
@@ -90,10 +90,10 @@ subset_block (gint bstart, gint bsize, GGobiData *d)
   gint i, k;
   gboolean subsetsize = 0;
 
-  if (bstart >= 0 && bstart < d->nrows && bsize > 0) {
+  if (bstart >= 0 && bstart < GGOBI_STAGE(d)->n_rows && bsize > 0) {
     subset_set_all(d, false);
 
-    for (i=bstart, k=1; i<d->nrows && k<=bsize; i++, k++) {
+    for (i=bstart, k=1; i<GGOBI_STAGE(d)->n_rows && k<=bsize; i++, k++) {
       d->sampled.els[i] = true;
       subsetsize++;
     }
@@ -110,18 +110,18 @@ subset_range (GGobiData *d)
 {
   gint i, j;
   gint subsetsize = 0;
-  vartabled *vt;
+  GGobiVariable *var;
   gboolean add;
 
   subset_set_all(d, false);
 
-  for (i=0; i<d->nrows; i++) {
+  for (i=0; i<GGOBI_STAGE(d)->n_rows; i++) {
     add = true;
-    for (j=0; j<d->ncols; j++) {
-      vt = ggobi_data_get_vartable(d, j);
-      if (vt->lim_specified_p) {
-        if (d->tform.vals[i][j] < vt->lim_specified.min ||
-            d->tform.vals[i][j] > vt->lim_specified.max)
+    for (j=0; j<GGOBI_STAGE(d)->n_cols; j++) {
+      var = ggobi_stage_get_variable(GGOBI_STAGE(d), j);
+      if (var->lim_specified_p) {
+        if (d->tform.vals[i][j] < var->lim_specified.min ||
+            d->tform.vals[i][j] > var->lim_specified.max)
         {
           add = false;
         }
@@ -143,7 +143,7 @@ gboolean
 subset_everyn (gint estart, gint estep, GGobiData *d)
 {
   gint i;
-  gint top = d->nrows;
+  gint top = GGOBI_STAGE(d)->n_rows;
 
   if (!(estart >= 0 && estart < top-1 && estep >= 0 && estep < top)) {
     quick_message ("Interval not correctly specified.", false);
@@ -173,7 +173,7 @@ subset_sticky (GGobiData *d)
 
   for (l = d->sticky_ids; l; l = l->next) {
     id = GPOINTER_TO_INT (l->data);
-    if (id < d->nrows)
+    if (id < GGOBI_STAGE(d)->n_rows)
       d->sampled.els[id] = true;
   }
 
@@ -199,8 +199,8 @@ subset_rowlab (gchar *substr, gint substr_pos, gboolean ignore_case,
   else 
     substr = g_strdup(substr);
 
-  for (i=0; i < d->nrows; i++) {
-    gchar *label = ggobi_data_get_row_id(d, i);
+  for (i=0; i < GGOBI_STAGE(d)->n_rows; i++) {
+    gchar *label = ggobi_stage_get_row_id(GGOBI_STAGE(d), i);
     
     if (!label)
       continue;

@@ -55,7 +55,7 @@ splot_plot_edge (gint m, GGobiData * d, GGobiData * e,
     draw_edge = false;
 
   /*-- can prevent drawing of missings for parcoords or scatmat plots --*/
-  else if (ggobi_data_has_missings(e) && !e->missings_show_p) {
+  else if (ggobi_stage_has_missings(GGOBI_STAGE(e)) && !e->missings_show_p) {
     if (GGOBI_IS_EXTENDED_SPLOT (sp)) {
       GGobiExtendedSPlotClass *klass;
       klass = GGOBI_EXTENDED_SPLOT_GET_CLASS (sp);
@@ -82,7 +82,7 @@ splot_hidden_edge (gint m, GGobiData * d, GGobiData * e,
 
   /*-- can prevent drawing of missings for parcoords or scatmat plots --*/
 /*
-  } else if (ggobi_data_has_missings(e) && !e->missings_show_p) {
+  } else if (ggobi_stage_has_missings(GGOBI_STAGE(e)) && !e->missings_show_p) {
     if (GGOBI_IS_EXTENDED_SPLOT(sp)) {
       GGobiExtendedSPlotClass *klass;
       klass = GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass);
@@ -112,7 +112,7 @@ splot_edges_draw (splotd * sp, gboolean draw_hidden, GdkDrawable * drawable,
   GlyphType gtype;
   colorschemed *scheme = gg->activeColorScheme;
 
-  if (e == NULL || !ggobi_data_has_edges(e))
+  if (e == NULL || !ggobi_stage_get_n_edges(GGOBI_STAGE(e)))
     return;
 
   edges_show_p = (display->options.edges_directed_show_p ||
@@ -135,7 +135,7 @@ splot_edges_draw (splotd * sp, gboolean draw_hidden, GdkDrawable * drawable,
         for (p = 0; p < ncolors; p++)
           symbols_used[k][n][p] = 0;
 
-    for (i = 0; i < e->nrows_in_plot; i++) {
+    for (i = 0; i < GGOBI_DATA(e)->nrows_in_plot; i++) {
       m = e->rows_in_plot.els[i];
       /* If we're drawing hiddens and this is hidden and plottable ... */
       if (((draw_hidden && splot_hidden_edge (m, d, e, sp, display, gg)) ||

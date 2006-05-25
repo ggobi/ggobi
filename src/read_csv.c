@@ -347,9 +347,9 @@ load_column_labels (Row * row, GGobiData * d, gboolean row_labels)
   gint offset = (row_labels ? 1 : 0);
   for (i = 0; i < ggobi_data_get_n_data_cols(d); i++) {
     if (row->entry[i + offset].len == 0)
-      ggobi_data_set_col_name(d, i, NULL);
+      ggobi_stage_set_col_name(GGOBI_STAGE(d), i, NULL);
     else
-      ggobi_data_set_col_name(d, i, row->src->str + row->entry[i + offset].ofs);
+      ggobi_stage_set_col_name(GGOBI_STAGE(d), i, row->src->str + row->entry[i + offset].ofs);
   }
 }
 
@@ -361,7 +361,7 @@ load_row_labels (GList * rows, GGobiData * d, gboolean has_labels)
 
   for (gint i = 0; rows; rows = g_list_next (rows), i++) {
     Row *row = (Row *) rows->data;
-    ggobi_data_set_row_id(d, i, row->src->str + row->entry[0].ofs, false);    
+    ggobi_stage_set_row_id(GGOBI_STAGE(d), i, row->src->str + row->entry[0].ofs, false);    
   }
 }
 
@@ -376,7 +376,7 @@ load_row_values (GList * rows, GGobiData * d, gboolean row_labels)
       Row *row = (Row *) cur->data;
       gchar *str = row->src->str + row->entry[j + offset].ofs;
       
-      ggobi_data_set_string_value(d, i, j, str);
+      ggobi_stage_set_string_value(GGOBI_STAGE(d), i, j, str);
     }
   }
 }
@@ -396,7 +396,7 @@ create_data (GList * rows, gchar * name)
 
   d = ggobi_data_new (nrows - 1, ncols);
   ggobi_data_add_attributes(d);
-  ggobi_data_set_name(d, name, NULL);
+  ggobi_stage_set_name(GGOBI_STAGE(d), name);
 
   load_column_labels ((Row *) rows->data, d, row_labels);
   rows = g_list_next (rows);    /* skip the column labels */

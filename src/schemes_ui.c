@@ -263,7 +263,7 @@ colors_remap (colorschemed * scheme, gboolean force, ggobid * gg)
 
     for (l = gg->d; l; l = l->next) {
       d = (GGobiData *) l->data;
-      for (i = 0; i < d->nrows; i++) {
+      for (i = 0; i < GGOBI_STAGE(d)->n_rows; i++) {
         ggobi_data_set_attr_color(d, i, newind[ggobi_data_get_attr_color(d, i)], ATTR_SET_PERSISTENT);
         //d->color.els[i] = newind[d->color.els[i]];
         //d->color_now.els[i] = newind[d->color_now.els[i]];

@@ -79,7 +79,7 @@ void
 alloc_tour1d (displayd *dsp, ggobid *gg)
 {
   GGobiData *d = dsp->d;
-  gint nc = d->ncols;
+  gint nc = GGOBI_STAGE(d)->n_cols;
 
   arrayd_alloc(&dsp->t1d.Fa, 1, nc);
   arrayd_alloc(&dsp->t1d.Fz, 1, nc);
@@ -175,8 +175,8 @@ void tour1d_snap(ggobid *gg)
   gint j;
   gdouble rnge;
 
-  for (j=0; j<d->ncols; j++) {
-    rnge = ggobi_data_get_col_range(d, j);
+  for (j=0; j<GGOBI_STAGE(d)->n_cols; j++) {
+    rnge = ggobi_variable_get_range(ggobi_stage_get_variable(GGOBI_STAGE(d), j));
     fprintf(stdout,"%f %f \n", dsp->t1d.F.vals[0][j], 
       dsp->t1d.F.vals[0][j]/rnge*sp->scale.x);
   }
@@ -204,8 +204,8 @@ void tour1d_write_video(ggobid *gg)
     ppval = dsp->t1d.ppval;
   else
     ppval = 0.;
-  for (j=0; j<d->ncols; j++) {
-    rnge = ggobi_data_get_col_range(d, j);
+  for (j=0; j<GGOBI_STAGE(d)->n_cols; j++) {
+    rnge = ggobi_variable_get_range(ggobi_stage_get_variable(GGOBI_STAGE(d), j));
     fprintf(stdout,"%f %f %f \n", dsp->t1d.F.vals[0][j], 
       dsp->t1d.F.vals[0][j]/rnge*sp->scale.x, ppval);
   }
@@ -217,7 +217,7 @@ display_tour1d_init (displayd *dsp, ggobid *gg)
   gint i, j;
   GGobiData *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
-  gint nc = d->ncols;
+  gint nc = GGOBI_STAGE(d)->n_cols;
 
   alloc_tour1d(dsp, gg);
 
@@ -298,14 +298,14 @@ tour1d_all_vars (displayd *dsp)
 
   //if (gg->tour1d.all_vars)
   //{
-    for (j=0; j<d->ncols; j++) {
+    for (j=0; j<GGOBI_STAGE(d)->n_cols; j++) {
       dsp->t1d.subset_vars.els[j] = j;
       dsp->t1d.active_vars.els[j] = j;
       dsp->t1d.subset_vars_p.els[j] = true;
       dsp->t1d.active_vars_p.els[j] = true;
     }
-    dsp->t1d.nsubset = d->ncols;
-    dsp->t1d.nactive = d->ncols;
+    dsp->t1d.nsubset = GGOBI_STAGE(d)->n_cols;
+    dsp->t1d.nactive = GGOBI_STAGE(d)->n_cols;
     dsp->t1d.get_new_target = true;
     zero_tau(dsp->t1d.tau, 1);
     varcircles_visibility_set (dsp, gg);
@@ -386,7 +386,7 @@ tour1d_subset_var_set (gint jvar, GGobiData *d, displayd *dsp, ggobid *gg)
   /*-- reset subset_vars based on subset_vars_p --*/
   if (changed) {
     dsp->t1d_manipvar_inc = false;
-    for (j=0, k=0; j<d->ncols; j++) {
+    for (j=0, k=0; j<GGOBI_STAGE(d)->n_cols; j++) {
       if (dsp->t1d.subset_vars_p.els[j]) {
         dsp->t1d.subset_vars.els[k++] = j;
         if (j == dsp->t1d_manip_var)
@@ -438,9 +438,9 @@ tour1d_active_var_set (gint jvar, GGobiData *d, displayd *dsp, ggobid *gg)
       if (!gg->tour1d.fade_vars) /* set current position without sel var */
       {
         gt_basis(dsp->t1d.Fa, dsp->t1d.nactive, dsp->t1d.active_vars, 
-          d->ncols, (gint) 1);
+          GGOBI_STAGE(d)->n_cols, (gint) 1);
         arrayd_copy(&dsp->t1d.Fa, &dsp->t1d.F);
-/*      copy_mat(dsp->t1d.F.vals, dsp->t1d.Fa.vals, d->ncols, 1);*/
+/*      copy_mat(dsp->t1d.F.vals, dsp->t1d.Fa.vals, GGOBI_STAGE(d)->n_cols, 1);*/
       }
       dsp->t1d.active_vars_p.els[jvar] = false;
     }
@@ -565,8 +565,8 @@ tour1d_projdata(splotd *sp, greal **world_data, GGobiData *d, ggobid *gg)
 
   if (sp == NULL)
     return;
-  if (sp->p1d.spread_data.nels != d->nrows)
-    vectorf_realloc (&sp->p1d.spread_data, d->nrows);
+  if (sp->p1d.spread_data.nels != GGOBI_STAGE(d)->n_rows)
+    vectorf_realloc (&sp->p1d.spread_data, GGOBI_STAGE(d)->n_rows);
 
   yy = (gfloat *) g_malloc (d->nrows_in_plot * sizeof (gfloat));
 
@@ -574,7 +574,7 @@ tour1d_projdata(splotd *sp, greal **world_data, GGobiData *d, ggobid *gg)
     i = d->rows_in_plot.els[m];
     yy[m] = sp->planar[i].x = 0;
     sp->planar[i].y = 0;
-    for (j=0; j<d->ncols; j++)
+    for (j=0; j<GGOBI_STAGE(d)->n_cols; j++)
     {
       yy[m] += (gfloat)(dsp->t1d.F.vals[0][j]*world_data[i][j]);
     }
@@ -658,7 +658,7 @@ tour1d_run(displayd *dsp, ggobid *gg)
     increment_tour(dsp->t1d.tinc, dsp->t1d.tau, dsp->t1d.dist_az, 
       dsp->t1d.delta, &dsp->t1d.tang, (gint) 1);
     tour_reproject(dsp->t1d.tinc, dsp->t1d.G, dsp->t1d.Ga, dsp->t1d.Gz,
-      dsp->t1d.F, dsp->t1d.Va, d->ncols, (gint) 1);
+      dsp->t1d.F, dsp->t1d.Va, GGOBI_STAGE(d)->n_cols, (gint) 1);
 
     /* plot pp indx */
     if (dsp->t1d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t1d_window)) {
@@ -688,13 +688,13 @@ tour1d_run(displayd *dsp, ggobid *gg)
         do_last_increment(dsp->t1d.tinc, dsp->t1d.tau, 
           dsp->t1d.dist_az, (gint) 1);
         tour_reproject(dsp->t1d.tinc, dsp->t1d.G, dsp->t1d.Ga, dsp->t1d.Gz,
-          dsp->t1d.F, dsp->t1d.Va, d->ncols, (gint) 1);
+          dsp->t1d.F, dsp->t1d.Va, GGOBI_STAGE(d)->n_cols, (gint) 1);
       }
     }
     /* now cleanup: store the current basis into the starting basis */
     arrayd_copy(&dsp->t1d.F, &dsp->t1d.Fa);
     nv = 0;
-    for (i=0; i<d->ncols; i++)
+    for (i=0; i<GGOBI_STAGE(d)->n_cols; i++)
       if (fabs(dsp->t1d.Fa.vals[0][i]) > 0.01) {
         nv++;
       }
@@ -704,12 +704,12 @@ tour1d_run(displayd *dsp, ggobid *gg)
     else {
       if (dsp->t1d.target_selection_method == TOUR_RANDOM) {
         gt_basis(dsp->t1d.Fz, dsp->t1d.nactive, dsp->t1d.active_vars, 
-          d->ncols, (gint) 1);
+          GGOBI_STAGE(d)->n_cols, (gint) 1);
       }
       else if (dsp->t1d.target_selection_method == TOUR_PP) {
         /* pp guided tour  */
         /* get new target according to the selected pp index */
-        for (i=0; i<d->ncols; i++)
+        for (i=0; i<GGOBI_STAGE(d)->n_cols; i++)
           dsp->t1d.Fz.vals[0][i] = 0.0;
         dsp->t1d.Fz.vals[0][dsp->t1d.active_vars.els[0]]=1.0;
 
@@ -733,10 +733,10 @@ g_printerr ("\n");*/
 
           /* if the best projection is the same as the previous one, switch 
               to a random projection */
-/*          if (!checkequiv(dsp->t1d.Fa.vals, dsp->t1d.Fz.vals, d->ncols, 1)) {
+/*          if (!checkequiv(dsp->t1d.Fa.vals, dsp->t1d.Fz.vals, GGOBI_STAGE(d)->n_cols, 1)) {
             g_printerr ("Using random projection\n");
             gt_basis(dsp->t1d.Fz, dsp->t1d.nactive, dsp->t1d.active_vars, 
-              d->ncols, (gint) 1);
+              GGOBI_STAGE(d)->n_cols, (gint) 1);
             for (j=0; j<dsp->t1d.nactive; j++)
               dsp->t1d_pp_op.proj_best.vals[0][j] = 
                 dsp->t1d.Fz.vals[0][dsp->t1d.active_vars.els[j]];
@@ -750,11 +750,11 @@ g_printerr ("\n");*/
         else /* Use random target */
         {
 	  /*          gt_basis(dsp->t1d.Fz, dsp->t1d.nactive, dsp->t1d.active_vars, 
-            d->ncols, (gint) 1);
+            GGOBI_STAGE(d)->n_cols, (gint) 1);
 	    g_printerr ("Using random projection 2\n");*/
         }
       }
-      pathprob = tour_path(dsp->t1d.Fa, dsp->t1d.Fz, dsp->t1d.F, d->ncols, 
+      pathprob = tour_path(dsp->t1d.Fa, dsp->t1d.Fz, dsp->t1d.F, GGOBI_STAGE(d)->n_cols, 
         (gint) 1, dsp->t1d.Ga, dsp->t1d.Gz, dsp->t1d.G, 
         dsp->t1d.lambda, dsp->t1d.tv, dsp->t1d.Va,
         dsp->t1d.Vz, dsp->t1d.tau, dsp->t1d.tinc, 
@@ -763,7 +763,7 @@ g_printerr ("\n");*/
         dsp->t1d.get_new_target = false;
       else if (pathprob == 1) { /* problems with Fa so need to force a jump */
         tour1d_scramble(gg);
-        pathprob = tour_path(dsp->t1d.Fa, dsp->t1d.Fz, dsp->t1d.F, d->ncols, 
+        pathprob = tour_path(dsp->t1d.Fa, dsp->t1d.Fz, dsp->t1d.F, GGOBI_STAGE(d)->n_cols, 
           (gint) 1, dsp->t1d.Ga,
           dsp->t1d.Gz, dsp->t1d.G, dsp->t1d.lambda, dsp->t1d.tv, dsp->t1d.Va,
           dsp->t1d.Vz,  dsp->t1d.tau, dsp->t1d.tinc, 
@@ -838,7 +838,7 @@ void tour1d_reinit(ggobid *gg)
   splotd *sp = gg->current_splot;
 
   for (i=0; i<1; i++) {
-    for (j=0; j<d->ncols; j++) {
+    for (j=0; j<GGOBI_STAGE(d)->n_cols; j++) {
       dsp->t1d.Fa.vals[i][j] = 0.;
       dsp->t1d.F.vals[i][j] = 0.;
     }
@@ -864,7 +864,7 @@ void tour1d_scramble(ggobid *gg)
   int i, j;
   displayd *dsp = gg->current_display;
   GGobiData *d = dsp->d;
-  gint nc = d->ncols;
+  gint nc = GGOBI_STAGE(d)->n_cols;
 
   for (i=0; i<1; i++)
     for (j=0; j<nc; j++)
@@ -873,9 +873,9 @@ void tour1d_scramble(ggobid *gg)
         dsp->t1d.Gz.vals[i][j] = 0.0;
 
   gt_basis(dsp->t1d.Fa, dsp->t1d.nactive, dsp->t1d.active_vars, 
-    d->ncols, (gint) 1);
+    GGOBI_STAGE(d)->n_cols, (gint) 1);
   arrayd_copy(&dsp->t1d.Fa, &dsp->t1d.F);
-  /*  copy_mat(dsp->t1d.F.vals, dsp->t1d.Fa.vals, d->ncols, 1);*/
+  /*  copy_mat(dsp->t1d.F.vals, dsp->t1d.Fa.vals, GGOBI_STAGE(d)->n_cols, 1);*/
 
   dsp->t1d.get_new_target = true;
 
@@ -931,7 +931,7 @@ tour1d_manip_init(gint p1, gint p2, splotd *sp)
   /* make manip basis, from existing projection */
   /* 0 will be the remainder of the projection, and
      1 will be the indicator vector for the manip var */
-  for (j=0; j<d->ncols; j++) {
+  for (j=0; j<GGOBI_STAGE(d)->n_cols; j++) {
     dsp->t1d_manbasis.vals[0][j] = dsp->t1d.F.vals[0][j];
     dsp->t1d_manbasis.vals[1][j] = 0.;
   }
@@ -940,11 +940,11 @@ tour1d_manip_init(gint p1, gint p2, splotd *sp)
   if (n1vars > 0)
   {
     while (!gram_schmidt(dsp->t1d_manbasis.vals[0],  dsp->t1d_manbasis.vals[1],
-      d->ncols))
+      GGOBI_STAGE(d)->n_cols))
     {
        gt_basis(dsp->t1d.tv, dsp->t1d.nactive, dsp->t1d.active_vars, 
-        d->ncols, (gint) 1);
-      for (j=0; j<d->ncols; j++) 
+        GGOBI_STAGE(d)->n_cols, (gint) 1);
+      for (j=0; j<GGOBI_STAGE(d)->n_cols; j++) 
         dsp->t1d_manbasis.vals[1][j] = dsp->t1d.tv.vals[0][j];
     }
   }
@@ -1012,7 +1012,7 @@ tour1d_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
     /* generate the projection basis */
     if (actual_nxvars > 0) 
     {
-      for (j=0; j<d->ncols; j++)
+      for (j=0; j<GGOBI_STAGE(d)->n_cols; j++)
         dsp->t1d.F.vals[0][j] = xcosphi * dsp->t1d_manbasis.vals[0][j] + 
          xsinphi * dsp->t1d_manbasis.vals[1][j];
     }
@@ -1032,7 +1032,7 @@ tour1d_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
   else {
     disconnect_motion_signal (sp);
     arrayd_copy(&dsp->t1d.F, &dsp->t1d.Fa);
-    /*    copy_mat(dsp->t1d.Fa.vals, dsp->t1d.F.vals, d->ncols, 1);*/
+    /*    copy_mat(dsp->t1d.Fa.vals, dsp->t1d.F.vals, GGOBI_STAGE(d)->n_cols, 1);*/
     dsp->t1d.get_new_target = true;
     if (!cpanel->t1d.paused)
       tour1d_func(T1DON, gg->current_display, gg);
@@ -1049,7 +1049,7 @@ tour1d_manip_end(splotd *sp)
   disconnect_motion_signal (sp);
 
   arrayd_copy(&dsp->t1d.F, &dsp->t1d.Fa);
-  /*  copy_mat(dsp->t1d.Fa.vals, dsp->t1d.F.vals, d->ncols, 1);*/
+  /*  copy_mat(dsp->t1d.Fa.vals, dsp->t1d.F.vals, GGOBI_STAGE(d)->n_cols, 1);*/
   dsp->t1d.get_new_target = true;
 
   /* need to turn on tour? */

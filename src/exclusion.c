@@ -54,7 +54,7 @@ symbol_table_populate (GGobiData * d)
   symbol_table_zero (d);
 
   /*-- loop over all data --*/
-  for (i = 0; i < d->nrows; i++) {
+  for (i = 0; i < GGOBI_STAGE(d)->n_rows; i++) {
     j = ggobi_data_get_attr_glyph(d, i)->type;
     k = ggobi_data_get_attr_glyph(d, i)->size;
     m = ggobi_data_get_attr_color(d, i);
@@ -126,7 +126,7 @@ clusters_set (GGobiData * d)
    *  indicating its cluster membership
    */
   if (nclusters > 0 && nclusters != 1) {
-    for (i = 0; i < d->nrows; i++) {
+    for (i = 0; i < GGOBI_STAGE(d)->n_rows; i++) {
       for (n = 0; n < nclusters; n++) {
         if (d->sampled.els[i]) {
           if (ggobi_data_get_attr_glyph(d, i)->type == d->clusv[n].glyphtype &&

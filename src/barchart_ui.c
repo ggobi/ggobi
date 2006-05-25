@@ -153,14 +153,14 @@ key_press_cb (GtkWidget * w, GdkEventKey * event, splotd * sp)
   /*-- insert mode-specific key presses (if any) here --*/
   switch (event->keyval) {
   case GDK_plus:
-    if (ggobi_data_get_col_type(d, sp->p1dvar) != categorical) {
+    if (GGOBI_STAGE_IS_COL_CATEGORICAL(GGOBI_STAGE(d), sp->p1dvar)) {
       bsp->bar->new_nbins = bsp->bar->nbins + 1;
       reallocate = TRUE;
     }
     break;
 
   case GDK_minus:
-    if (ggobi_data_get_col_type(d, sp->p1dvar) != categorical) {
+    if (!GGOBI_STAGE_IS_COL_CATEGORICAL(GGOBI_STAGE(d), sp->p1dvar)) {
       if (bsp->bar->nbins > 2) {
         bsp->bar->new_nbins = bsp->bar->nbins - 1;
         reallocate = TRUE;

@@ -118,10 +118,10 @@ static void endVariable (XMLParserData *data);
  One can have any number of randomuniformvariable elements in a dataset,
  which is different from the countervariable. This is implemented by 
  introducing a new variable type (like categorical, real, ...)
- in the vartyped enumeration in vartable.h. This means that we have
+ in the GGobiVariableType enumeration in ggobi-variable.h. This means that we have
  to update code to handle this element in the switch statements
  and this is error-prone. (We can easily overlook some of the switch statements
- and get odd behavior). We would rather have the  vartabled data structure as
+ and get odd behavior). We would rather have the  GGobiVariable data structure as
  a class and have methods for it. Switch statements are simply not extensible.
  For this case, we only have to update vartable_nbook.c.
 
@@ -450,7 +450,7 @@ setLevelIndex (const xmlChar ** attrs, XMLParserData * data)
 /*-- dfs: placeholder for proper debugging --*/
   if (data->current_level >= data->current_nlevels) {
     ggobi_XML_warning_handler (data, "adding too many levels to %s\n",
-                             ggobi_data_get_col_name(d, data->current_variable));
+                             ggobi_stage_get_col_name(GGOBI_STAGE(d), data->current_variable));
   }
 /* */
 
@@ -475,7 +475,7 @@ categoricalLevels (const xmlChar ** attrs, XMLParserData * data)
     data->current_nlevels = atoi (tmp);
     if (data->current_nlevels < 1) {
       ggobi_XML_error_handler (stderr, "Level count for %s mis-specified\n", 
-        ggobi_data_get_col_name(d, data->current_variable));
+        ggobi_stage_get_col_name(GGOBI_STAGE(d), data->current_variable));
     }
   }
 
@@ -502,7 +502,8 @@ void
 endCategoricalLevel (XMLParserData *data)
 {
   GGobiData *d = getCurrentXMLData (data);
-  ggobi_data_add_col_level (d, data->current_variable, data->current_level_name, 
+  GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(d), data->current_variable);
+  ggobi_variable_add_level(var, data->current_level_name, 
     data->current_level_value);
   g_free (data->current_level_name);
   data->current_level_name = NULL;
@@ -556,7 +557,7 @@ setEdgePartners (XMLParserData * parserData)
   gint i, k, n;
   gboolean dups = false;
 
-  if (!ggobi_data_has_edges(e))
+  if (!ggobi_stage_get_n_edges(GGOBI_STAGE(e)))
     return;
 
   n = 2 * e->edge.n;
@@ -633,9 +634,9 @@ endXMLElement (void *user_data, const xmlChar * name)
 
       setEdgePartners (data);
       releaseCurrentDataInfo (data);
-      if (data->current_record < d->nrows) {
+      if (data->current_record < GGOBI_STAGE(d)->n_rows) {
         g_error ("There are fewer records than declared for '%s': %d < %d.",
-                 d->name, data->current_record, d->nrows);
+                 ggobi_stage_get_name(GGOBI_STAGE(d)), data->current_record, GGOBI_STAGE(d)->n_rows);
       }
 
       data->dlist = g_slist_append (data->dlist, d);
@@ -644,7 +645,7 @@ endXMLElement (void *user_data, const xmlChar * name)
     break;
 
   case EDGE:
-    if (data->current_element < data->current_data->ncols) {
+    if (data->current_element < GGOBI_STAGE(data->current_data)->n_cols) {
       ggobi_XML_error_handler (data, "Not enough elements\n");
     }
     data->current_record++;
@@ -660,7 +661,7 @@ endXMLElement (void *user_data, const xmlChar * name)
     resetRecordInfo (data);
     break;
   case NA:
-    ggobi_data_set_missing(getCurrentXMLData(data), data->current_record, data->current_element);
+    ggobi_stage_set_missing(GGOBI_STAGE(getCurrentXMLData(data)), data->current_record, data->current_element);
     data->current_element++;
     break;
   case REAL:
@@ -1091,9 +1092,10 @@ xml_warning (const gchar * attribute, const gchar * value, const gchar * msg,
 static void
 applyRandomUniforms (GGobiData * d, XMLParserData * data)
 {
-  gint j, ncols = ggobi_data_get_n_cols(d);
-  for (j = data->current_element; j < ncols && ggobi_data_get_col_type(d, j) == uniform; j++) {
-    ggobi_data_set_raw_value(d, data->current_record, data->current_element, randvalue());
+  gint j, ncols = ggobi_stage_get_n_cols(GGOBI_STAGE(d));
+  for (j = data->current_element; j < ncols && 
+   ggobi_stage_get_col_type(GGOBI_STAGE(d), j) == GGOBI_VARIABLE_UNIFORM; j++) {
+    ggobi_stage_set_raw_value(GGOBI_STAGE(d), data->current_record, data->current_element, randvalue());
   }
 }
 
@@ -1106,13 +1108,13 @@ setRecordValue (const char *tmp, GGobiData * d, XMLParserData * data)
      cursor is at that. */
   if (data->counterVariableIndex > -1 &&
       data->current_element == data->counterVariableIndex) {
-    ggobi_data_set_raw_value(d, data->current_record, data->current_element, data->current_record + 1);
+    ggobi_stage_set_raw_value(GGOBI_STAGE(d), data->current_record, data->current_element, data->current_record + 1);
     data->current_element++;
   }
 
   /* If reading past the last column or row, stop */
-  if (data->current_record >= d->nrows ||
-      data->current_element >= d->ncols) {
+  if (data->current_record >= GGOBI_STAGE(d)->n_rows||
+      data->current_element >= GGOBI_STAGE(d)->n_cols) {
     g_printerr ("Row %d (counting from 1) has too many elements\n",
                 data->current_record + 1);
     data->current_element = 0;
@@ -1120,7 +1122,7 @@ setRecordValue (const char *tmp, GGobiData * d, XMLParserData * data)
   }
 
   applyRandomUniforms (d, data);
-  if (!ggobi_data_has_cols(d))
+  if (!ggobi_stage_get_n_cols(GGOBI_STAGE(d)))
     return (true);
 
   /*
@@ -1134,30 +1136,32 @@ setRecordValue (const char *tmp, GGobiData * d, XMLParserData * data)
         strcmp (tmp, "NA") == 0 ||
         strcmp (tmp, ".") == 0)) ||
       (data->NA_identifier && strcmp (tmp, data->NA_identifier) == 0)) {
-    ggobi_data_set_missing(d, data->current_record, data->current_element);    
+    ggobi_stage_set_missing(GGOBI_STAGE(d), data->current_record, data->current_element);    
   }  else {
+    GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(d), data->current_element);
     value = asNumber (tmp);
-    if (ggobi_data_get_col_type(d, data->current_element) == categorical) {
+    if (GGOBI_VARIABLE_IS_CATEGORICAL(var)) {
       if (data->autoLevels && data->autoLevels[data->current_element]) {
-        ggobi_data_set_categorical_value(d, data->current_record, 
+        ggobi_stage_set_categorical_value(GGOBI_STAGE(d), data->current_record, 
           data->current_element, tmp);
       }
       else {
-        if (ggobi_data_get_col_level_for_value(d, data->current_element, value) == -1) {
+        if (!ggobi_variable_has_level(var, value)) {
           ggobi_XML_warning_handler (data,
             "incorrect level in record %d, variable `%s', dataset `%s' in the XML input file\n",
-            (int) data->current_record + 1, ggobi_data_get_col_name(d, data->current_element),
-            data->current_data->name ? data->current_data->name : "");
+            (int) data->current_record + 1, ggobi_variable_get_name(var),
+            ggobi_stage_get_name(GGOBI_STAGE(data->current_data)) ? 
+              ggobi_stage_get_name(GGOBI_STAGE(data->current_data)) : "");
         }
-        ggobi_data_set_raw_value(d, data->current_record, data->current_element, value);
+        ggobi_stage_set_raw_value(GGOBI_STAGE(d), data->current_record, data->current_element, value);
       }
     }
     else if (data->state == STRING) {
       ggobi_XML_error_handler (data,
         "<string> element for non categorical variable (%s) in record %d\n",
-        ggobi_data_get_col_name(d, data->current_element), (int) data->current_record + 1);
+        ggobi_variable_get_name(var), (int) data->current_record + 1);
       value = 0;
-    } else ggobi_data_set_raw_value(d, data->current_record, data->current_element, value);
+    } else ggobi_stage_set_raw_value(GGOBI_STAGE(d), data->current_record, data->current_element, value);
   }
 
   return (true);
@@ -1236,24 +1240,24 @@ newVariable (const xmlChar ** attrs, XMLParserData * data,
 {
   const gchar *tmp, *tmp1;
   GGobiData *d = getCurrentXMLData (data);
-  vartabled *el;
+  GGobiVariable *el;
   
   if (data->current_variable >= ggobi_data_get_n_data_cols(d)) {
     ggobi_XML_error_handler
       (data, "More variables (%d) than given in the <variables count='%d'> element for dataset %s\n",
-       data->current_variable, ggobi_data_get_n_data_cols(d), d->name);
+       data->current_variable, ggobi_data_get_n_data_cols(d), ggobi_stage_get_name(GGOBI_STAGE(d)));
     return (false);
   }
 
-  el = ggobi_data_get_vartable(d, data->current_variable);
+  el = ggobi_stage_get_variable(GGOBI_STAGE(d), data->current_variable);
 
   data->variable_transform_name_as_attribute = false;
 
   tmp = getAttribute (attrs, "name");
-  ggobi_data_set_col_name(d, data->current_variable, tmp);
+  ggobi_variable_set_name(el, (gchar *)tmp);
 
   tmp = getAttribute (attrs, "nickname");
-  if (tmp != NULL) ggobi_data_set_col_nickname(d, data->current_variable, tmp);
+  if (tmp != NULL) ggobi_variable_set_nickname(el, (gchar *)tmp);
 
 
   tmp = getAttribute (attrs, "min");
@@ -1270,39 +1274,39 @@ newVariable (const xmlChar ** attrs, XMLParserData * data,
 
     if (mn > mx) {
       g_printerr ("Minimum is greater than maximum for variable %s\n",
-                  el->collab);
+                  ggobi_variable_get_name(el));
     }
     el->lim_specified_p = true;
   }
 
 
   if (strcmp ((const char *) tagName, "categoricalvariable") == 0) {
-    ggobi_data_set_col_type(d, data->current_variable, categorical);
+    ggobi_data_set_col_type(d, data->current_variable, GGOBI_VARIABLE_CATEGORICAL);
 
     /* Mark this as being a variable for which we must compute the levels. */
     if ((tmp = getAttribute (attrs, "levels")) && strcmp (tmp, "auto") == 0) {
       if (data->autoLevels == NULL) {
-        data->autoLevels = g_new0(gboolean, data->current_data->ncols);
+        data->autoLevels = g_new0(gboolean, GGOBI_STAGE(data->current_data)->n_cols);
       }
       data->autoLevels[data->current_variable] = true;
     }
   }
   else if (strcmp ((const char *) tagName, "integervariable") == 0) {
-    ggobi_data_set_col_type(d, data->current_variable, integer);
+    ggobi_data_set_col_type(d, data->current_variable, GGOBI_VARIABLE_INTEGER);
   }
   else if (strcmp ((const char *) tagName, "countervariable") == 0) {
-    ggobi_data_set_col_type(d, data->current_variable, counter);
+    ggobi_data_set_col_type(d, data->current_variable, GGOBI_VARIABLE_COUNTER);
   }
   else if (strcmp ((const char *) tagName, "randomuniformvariable") == 0) {
-    ggobi_data_set_col_type(d, data->current_variable, uniform);
+    ggobi_data_set_col_type(d, data->current_variable, GGOBI_VARIABLE_UNIFORM);
   }                             /* real by default */
 
-
+/* This is now disabled - sorry if people like it
   tmp = getAttribute (attrs, "time");
   if (tmp && (strcmp (tmp, "yes") == 0 || strcmp (tmp, "true") == 0)) {
     el->isTime = true;
   }
-
+*/
 
   return (true);
 }
@@ -1336,7 +1340,7 @@ static void
 endVariable (XMLParserData *data)
 {
   GGobiData *d = getCurrentXMLData (data);
-  ggobi_data_set_col_name(d, data->current_element, data->current_name);
+  ggobi_stage_set_col_name(GGOBI_STAGE(d), data->current_element, data->current_name);
   g_free(data->current_name);
   data->current_name = NULL;
 }
@@ -1417,7 +1421,8 @@ setDataset (const xmlChar ** attrs, XMLParserData * parserData,
 
   name = getAttribute (attrs, "name");
   nickname = getAttribute (attrs, "nickname");
-  ggobi_data_set_name(data, name, nickname);
+  ggobi_stage_set_name(GGOBI_STAGE(data), (gchar *)name);
+  ggobi_data_set_nickname(data, (gchar *)nickname);
 
   parserData->current_data = data;
   parserData->counterVariableIndex = -1;
@@ -1450,9 +1455,9 @@ readXMLRecord (const xmlChar ** attrs, XMLParserData * data)
   const gchar *tmp;
   gint i = data->current_record;
 
-  if (i == d->nrows) {
+  if (i == GGOBI_STAGE(d)->n_rows) {
     g_error ("There are more records than declared for '%s'; exiting.",
-             d->name);
+             ggobi_stage_get_name(GGOBI_STAGE(d)));
   }
 
   data->current_element = 0;
@@ -1468,15 +1473,15 @@ readXMLRecord (const xmlChar ** attrs, XMLParserData * data)
 
   tmp = getAttribute (attrs, "id");
   if (tmp) {
-    gint m = ggobi_data_get_row_for_id(d, (gchar*) tmp);
+    gint m = ggobi_stage_get_row_for_id(GGOBI_STAGE(d), (gchar*) tmp);
     if (m != -1)
       ggobi_XML_error_handler (data,
         "duplicated id (%s) in records %d and %d of dataset %s\n",
         (gchar *) tmp,
         data->current_record + 1,
         m + 1,
-        data->current_data->name);
-    ggobi_data_set_row_id(d, (guint) i, (gchar*) tmp, false);
+        ggobi_stage_get_name(GGOBI_STAGE(data->current_data)));
+    ggobi_stage_set_row_id(GGOBI_STAGE(d), (guint) i, (gchar*) tmp, false);
   }
 
 /*
@@ -1502,7 +1507,7 @@ readXMLRecord (const xmlChar ** attrs, XMLParserData * data)
     }
 
     if (d->edge.sym_endpoints == NULL) {
-      d->edge.n = d->nrows;
+      d->edge.n = GGOBI_STAGE(d)->n_rows;
       d->edge.sym_endpoints = (SymbolicEndpoints *)
         g_malloc (sizeof (SymbolicEndpoints) * d->edge.n);
     }

@@ -86,7 +86,7 @@ g_printerr ("numDatasets %d\n", numDatasets);
 gboolean
 write_xml_dataset(FILE *f, GGobiData *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 {
-  if (ggobi_data_has_edges(d) && !ggobi_data_has_cols(d)) {
+  if (ggobi_stage_get_n_edges(GGOBI_STAGE(d)) && !ggobi_stage_get_n_cols(GGOBI_STAGE(d))) {
     write_xml_edges(f, d, gg, xmlWriteInfo);
   } else {
     write_dataset_header (f, d, gg, xmlWriteInfo);
@@ -135,14 +135,14 @@ write_xml_variables (FILE *f, GGobiData *d, ggobid *gg, XmlWriteInfo *xmlWriteIn
   gint j;
 
   if (gg->save.column_ind == ALLCOLS) {
-    fprintf(f,"<variables count=\"%d\">\n", d->ncols); 
-    for(j = 0; j < d->ncols; j++) {
+    fprintf(f,"<variables count=\"%d\">\n", GGOBI_STAGE(d)->n_cols); 
+    for(j = 0; j < GGOBI_STAGE(d)->n_cols; j++) {
       write_xml_variable (f, d, gg, j, xmlWriteInfo);
       fprintf(f,"\n");
     }
   } else if (gg->save.column_ind == SELECTEDCOLS) {
     /*-- work out which columns to save --*/
-    gint *cols = (gint *) g_malloc (d->ncols * sizeof (gint));
+    gint *cols = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof (gint));
     gint ncols = selected_cols_get (cols, d, gg);
     if (ncols == 0)
       ncols = plotted_cols_get (cols, d, gg);
@@ -164,38 +164,42 @@ gboolean
 write_xml_variable(FILE *f, GGobiData *d, ggobid *gg, gint j,
   XmlWriteInfo *xmlWriteInfo)
 {
-  vartabled *vt = ggobi_data_get_vartable(d, j);
+  GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(d), j);
   gchar* varname = g_strstrip(
     (gg->save.stage == TFORMDATA) ? 
       ggobi_data_get_transformed_col_name(d, j) : 
-      ggobi_data_get_col_name(d, j)
+      ggobi_stage_get_col_name(GGOBI_STAGE(d), j)
   );
   
-  if (vt->vartype == categorical) {
-    gint k;
-    fprintf(f, "  <categoricalvariable name=\"%s\"", varname);
-    if (vt->nickname)
-      fprintf(f, " nickname=\"%s\"", vt->nickname);
+  if (GGOBI_VARIABLE_IS_CATEGORICAL(var)) {
+    gint k, *values;
+    fprintf(f, "  <categoricalvariable name=\"%s\"", ggobi_variable_get_name(var));
+    if (ggobi_variable_get_nickname(var))
+      fprintf(f, " nickname=\"%s\"", ggobi_variable_get_nickname(var));
     fprintf(f, ">\n");
-    fprintf(f, "    <levels count=\"%d\">\n", vt->nlevels);
-    for (k=0; k<vt->nlevels; k++) {
-      fprintf(f, "      <level value=\"%d\">",
-              vt->level_values[k]);
+    fprintf(f, "    <levels count=\"%d\">\n", ggobi_variable_get_n_levels(var));
+    values = ggobi_variable_get_level_values(var);
+    for (k=0; k<ggobi_variable_get_n_levels(var); k++) {
+      fprintf(f, "      <level value=\"%d\">", values[k]);
       /* Add any needed html/xml markup to level names */
-      write_xml_string(f, vt->level_names[k]);
+      write_xml_string(f, ggobi_variable_get_level_name(var, values[k]));
       fprintf(f, "</level>\n");
     }
 
     fprintf(f, "    </levels>\n");
     fprintf(f, "  </categoricalvariable>");
   } else {
+    GGobiVariableType type = ggobi_variable_get_vartype(var);
+    gchar *nickname = ggobi_variable_get_nickname(var);
     fprintf(f, "   <");
-    if (vt->vartype == real)    fprintf(f, "realvariable");
-    if (vt->vartype == integer) fprintf(f, "integervariable");
-    if (vt->vartype == counter) fprintf(f, "countervariable");
-
+    if (type == GGOBI_VARIABLE_REAL)    fprintf(f, "realvariable");
+    else if (type == GGOBI_VARIABLE_INTEGER) fprintf(f, "integervariable");
+    else if (type == GGOBI_VARIABLE_COUNTER) fprintf(f, "countervariable");
     fprintf(f, " name=\"%s\"", varname);
-    if (vt->nickname) fprintf(f, " nickname=\"%s\"", vt->nickname);
+    if (nickname) {
+      fprintf(f, " nickname=\"%s\"", nickname);
+      g_free(nickname);
+    }
     fprintf(f, "/>");
   } 
 
@@ -216,7 +220,7 @@ write_xml_records(FILE *f, GGobiData *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 
   /*-- figure out how many records we're about to save.  --*/
   if (gg->save.row_ind == ALLROWS)
-    n = d->nrows;
+    n = GGOBI_STAGE(d)->n_rows;
   else if (gg->save.row_ind == DISPLAYEDROWS)
     n = d->nrows_in_plot;
 
@@ -229,7 +233,7 @@ write_xml_records(FILE *f, GGobiData *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
     fprintf(f, " color=\"%s\"", xmlWriteInfo->defaultColorName);
   }
 
-  if (ggobi_data_has_missings(d)) {
+  if (ggobi_stage_has_missings(GGOBI_STAGE(d))) {
     if (gg->save.missing_ind == MISSINGSNA)
       fprintf(f, " missingValue=\"%s\"", "na");
     else if (gg->save.missing_ind == MISSINGSDOT)
@@ -240,7 +244,7 @@ write_xml_records(FILE *f, GGobiData *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 
 
   if (gg->save.row_ind == ALLROWS) {
-    for (i = 0; i < d->nrows; i++) {
+    for (i = 0; i < GGOBI_STAGE(d)->n_rows; i++) {
       fprintf(f, "<record");
       write_xml_record (f, d, gg, i, xmlWriteInfo);
       fprintf(f, "\n</record>\n");
@@ -269,7 +273,7 @@ write_xml_record (FILE *f, GGobiData *d, ggobid *gg, gint i,
   gint j;
 
   /*-- ids if present --*/
-  fprintf(f, " id=\"%s\"", ggobi_data_get_row_id(d, i));
+  fprintf(f, " id=\"%s\"", ggobi_stage_get_row_id(GGOBI_STAGE(d), i));
 
   /*-- if the record is hidden, indicate that --*/
   if (ggobi_data_get_attr_hidden(d, i)) {
@@ -277,7 +281,7 @@ write_xml_record (FILE *f, GGobiData *d, ggobid *gg, gint i,
   }
 
   /*-- edges if present and requested --*/
-  if (gg->save.edges_p && ggobi_data_has_edges(d) && i < d->edge.n) {
+  if (gg->save.edges_p && ggobi_stage_get_n_edges(GGOBI_STAGE(d)) && i < d->edge.n) {
     fprintf(f, " source=\"%s\"", d->edge.sym_endpoints[i].a);
     fprintf(f, " destination=\"%s\"", d->edge.sym_endpoints[i].b);
   }
@@ -300,10 +304,10 @@ write_xml_record (FILE *f, GGobiData *d, ggobid *gg, gint i,
 
   fprintf(f, ">\n");
 
-  if (gg->save.column_ind == ALLCOLS && ggobi_data_has_cols(d)) {
-    for(j = 0; j < d->ncols; j++) {
+  if (gg->save.column_ind == ALLCOLS && ggobi_stage_get_n_cols(GGOBI_STAGE(d))) {
+    for(j = 0; j < GGOBI_STAGE(d)->n_cols; j++) {
       /*-- if missing, figure out what to write --*/
-      if (ggobi_data_is_missing(d, i, j) &&
+      if (ggobi_stage_is_missing(GGOBI_STAGE(d), i, j) &&
         gg->save.missing_ind != MISSINGSIMPUTED)
       {
         if (gg->save.missing_ind == MISSINGSNA) {
@@ -313,19 +317,19 @@ write_xml_record (FILE *f, GGobiData *d, ggobid *gg, gint i,
         } 
       } else {  /*-- if not missing, just write the data --*/
         writeFloat (f, (gg->save.stage == TFORMDATA) ? d->tform.vals[i][j] :
-                                                       ggobi_data_get_raw_value(d, i, j));
+                                                       ggobi_stage_get_raw_value(GGOBI_STAGE(d), i, j));
       }
-      if (j < d->ncols-1 )
+      if (j < GGOBI_STAGE(d)->n_cols-1 )
         fprintf(f, " ");
      }
-  } else if (gg->save.column_ind == SELECTEDCOLS && ggobi_data_has_cols(d)) {
+  } else if (gg->save.column_ind == SELECTEDCOLS && ggobi_stage_get_n_cols(GGOBI_STAGE(d))) {
     /*-- work out which columns to save --*/
-    gint *cols = (gint *) g_malloc (d->ncols * sizeof (gint));
+    gint *cols = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof (gint));
     gint ncols = selected_cols_get (cols, d, gg);
     if (ncols == 0)
       ncols = plotted_cols_get (cols, d, gg);
     for(j = 0; j < ncols; j++) {
-      if (ggobi_data_is_missing(d, i, j) &&
+      if (ggobi_stage_is_missing(GGOBI_STAGE(d), i, j) &&
         gg->save.missing_ind != MISSINGSIMPUTED)
       {
         if (gg->save.missing_ind == MISSINGSNA) {
@@ -336,7 +340,7 @@ write_xml_record (FILE *f, GGobiData *d, ggobid *gg, gint i,
       } else {
 
         writeFloat (f, (gg->save.stage == TFORMDATA) ? d->tform.vals[i][j] :
-                                                       ggobi_data_get_raw_value(d, i, cols[j]));
+                                                       ggobi_stage_get_raw_value(GGOBI_STAGE(d), i, cols[j]));
       } 
       if (j < ncols-1 )
         fprintf(f, " ");
@@ -351,19 +355,19 @@ gboolean
 write_xml_edges (FILE *f, GGobiData *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 {
   gint i;
-  if (!ggobi_data_has_edges(d))
+  if (!ggobi_stage_get_n_edges(GGOBI_STAGE(d)))
     return true;
 
   /*
   fprintf(f, "<edges count=\"%d\" name=\"%s\">\n", d->edge.n,
-  d->name); There seems to be a need to write the defaults in the case
+  ggobi_stage_get_name(GGOBI_STAGE(d))); There seems to be a need to write the defaults in the case
   where we started with ascii data and added edges; in this case the
   edges are written as <edges> rather than as a new datad, and maybe
   that's the problem.   dfs
   */
   fprintf(f, 
     "<edges count=\"%d\" name=\"%s\" color=\"%d\" glyphType=\"%s\" glyphSize=\"%s\">\n",
-    d->edge.n, d->name, 
+    d->edge.n, ggobi_stage_get_name(GGOBI_STAGE(d)), 
     xmlWriteInfo->defaultColor,
     xmlWriteInfo->defaultGlyphTypeName, 
     xmlWriteInfo->defaultGlyphSizeName);
@@ -395,8 +399,8 @@ gboolean
 write_dataset_header (FILE *f, GGobiData *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 {
  fprintf(f,"<data ");
-/*fprintf(f, "numRecords=\"%d\"", d->nrows);*/
- fprintf(f, "name=\"%s\"", d->name);
+/*fprintf(f, "numRecords=\"%d\"", GGOBI_STAGE(d)->n_rows;*/
+ fprintf(f, "name=\"%s\"", ggobi_stage_get_name(GGOBI_STAGE(d)));
  fprintf(f,">\n");
 
  return(true);

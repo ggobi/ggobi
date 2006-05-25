@@ -122,7 +122,7 @@ set_display_option (gboolean active, guint action, displayd * display)
     GGobiData *e;
     for (k = 0; k < nd; k++) {
       e = (GGobiData *) g_slist_nth_data (gg->d, k);
-      if (ggobi_data_has_edges(e)) {
+      if (ggobi_stage_get_n_edges(GGOBI_STAGE(e))) {
         ne++;
         onlye = e;            /* meaningful if there's only one */
       }
@@ -590,7 +590,7 @@ display_free_all (ggobid * gg)
   for (dlist = gg->displays; count > 0 && dlist; count--) {
     gint nc;
     display = (displayd *) dlist->data;
-    nc = display->d->ncols;
+    nc = GGOBI_STAGE(display->d)->n_cols;
     if (display == NULL)
       break;
 
@@ -720,12 +720,13 @@ computeTitle (gboolean current_p, displayd * display, ggobid * gg)
     tmp = ggobi_display_title_label (display);
   }
 
-  if (display->d->name != NULL) {
-    if (display->e != NULL && display->e->name != NULL)
+  if (ggobi_stage_get_name(GGOBI_STAGE(display->d)) != NULL) {
+    if (display->e != NULL && ggobi_stage_get_name(GGOBI_STAGE(display->e)) != NULL)
       description = g_strdup_printf ("%s/%s",
-                                     display->d->name, display->e->name);
+                                     ggobi_stage_get_name(GGOBI_STAGE(display->d)), 
+                                     ggobi_stage_get_name(GGOBI_STAGE(display->e)));
     else
-      description = g_strdup (display->d->name);
+      description = g_strdup (ggobi_stage_get_name(GGOBI_STAGE(display->d)));
   }
   else {
     description = ggobi_getDescription (gg);

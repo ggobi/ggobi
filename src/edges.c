@@ -151,7 +151,7 @@ edge_endpoints_get (gint k, gint * a, gint * b, GGobiData * d,
   *a = endpoints[k].a;
   *b = endpoints[k].b;
 
-  ok = (*a >= 0 && *a < d->nrows && *b >= 0 && *b < d->nrows);
+  ok = (*a >= 0 && *a < GGOBI_STAGE(d)->n_rows && *b >= 0 && *b < GGOBI_STAGE(d)->n_rows);
 
   return ok;
 }
@@ -165,7 +165,7 @@ edgesets_count (ggobid * gg)
 
   for (k = 0; k < nd; k++) {
     e = (GGobiData *) g_slist_nth_data (gg->d, k);
-    if (ggobi_data_has_edges(e))
+    if (ggobi_stage_get_n_edges(GGOBI_STAGE(e)))
       ne++;
   }
 
@@ -190,8 +190,8 @@ computeResolvedEdgePoints (GGobiData * e, GGobiData * d)
   gboolean resolved_p = false;
 
   for (gint i = 0; i < e->edge.n; i++) {
-    gint row_a = ggobi_data_get_row_for_id(d, e->edge.sym_endpoints[i].a);
-    gint row_b = ggobi_data_get_row_for_id(d, e->edge.sym_endpoints[i].b);
+    gint row_a = ggobi_stage_get_row_for_id(GGOBI_STAGE(d), e->edge.sym_endpoints[i].a);
+    gint row_b = ggobi_stage_get_row_for_id(GGOBI_STAGE(d), e->edge.sym_endpoints[i].b);
     g_debug("ids %s->%s : rows %i->%i", e->edge.sym_endpoints[i].a, e->edge.sym_endpoints[i].b, row_a, row_b);
 
     ans[i].a = (gint) row_a;
@@ -222,7 +222,7 @@ do_resolveEdgePoints (GGobiData * e, GGobiData * d, gboolean compute)
   GList *tmp;
 
 
-  if (!ggobi_data_has_edges(e))
+  if (!ggobi_stage_get_n_edges(GGOBI_STAGE(e)))
     return (NULL);
 
   /* Get the entry in the table for this dataset (d). Use the name for now. */
@@ -300,7 +300,7 @@ unresolveEdgePoints (GGobiData * e, GGobiData * d)
   DatadEndpoints *ptr;
   GList *tmp;
 
-  if (!ggobi_data_has_edges(e))
+  if (!ggobi_stage_get_n_edges(GGOBI_STAGE(e)))
     return (false);
 
   for (tmp = e->edge.endpointList; tmp; tmp = tmp->next) {

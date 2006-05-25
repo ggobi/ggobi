@@ -256,7 +256,7 @@ parcoordsKeyEventHandled (GtkWidget * w, displayd * display, splotd * sp,
 gchar *
 treeLabel (splotd * splot, GGobiData * d, ggobid * gg)
 {
-  return(ggobi_data_get_col_name(d, splot->p1dvar));
+  return(ggobi_stage_get_col_name(GGOBI_STAGE(d), splot->p1dvar));
 }
 
 static GdkSegment *
@@ -281,13 +281,13 @@ withinPlaneToScreen (splotd * sp, displayd * display, GGobiData * d,
 gboolean
 drawEdge_p (splotd * sp, gint m, GGobiData * d, GGobiData * e, ggobid * gg)
 {
-  return (!ggobi_data_is_missing(e, m, sp->p1dvar));
+  return (!ggobi_stage_is_missing(GGOBI_STAGE(e), m, sp->p1dvar));
 }
 
 gboolean
 drawCase_p (splotd * sp, gint m, GGobiData * d, ggobid * gg)
 {
-  return (!ggobi_data_is_missing(d, m, sp->p1dvar));
+  return (!ggobi_stage_is_missing(GGOBI_STAGE(d), m, sp->p1dvar));
 }
 
 void
@@ -384,7 +384,7 @@ varpanelRefresh (displayd * display, splotd * sp, GGobiData * d)
 {
   gint j;
   GList *l;
-  for (j = 0; j < d->ncols; j++) {
+  for (j = 0; j < GGOBI_STAGE(d)->n_cols; j++) {
     varpanel_toggle_set_active (VARSEL_X, j, false, d);
 
     varpanel_toggle_set_active (VARSEL_Y, j, false, d);
@@ -467,7 +467,7 @@ splot_add_whisker_cues (gboolean nearest_p, gint k, splotd * sp,
   GGobiData *d = display->d;
   colorschemed *scheme = gg->activeColorScheme;
 
-  if (k < 0 || k >= d->nrows)
+  if (k < 0 || k >= GGOBI_STAGE(d)->n_rows)
     return;
 
   if (display->options.whiskers_show_p) {
@@ -541,9 +541,8 @@ splotScreenToTform (cpaneld * cpanel, splotd * sp, icoords * scr,
 */
 
   if (sp->p1dvar != -1) {
-
-    max = ggobi_data_get_col_max(d, sp->p1dvar);
-    min = ggobi_data_get_col_min(d, sp->p1dvar);
+    GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(d), sp->p1dvar);
+    ggobi_variable_get_limits(var, &min, &max);
     rdiff = max - min;
 
     if (display->p1d_orientation == HORIZONTAL) {

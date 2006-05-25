@@ -66,7 +66,7 @@ splot_plot_case (gint m, GGobiData *d, splotd *sp, displayd *display, ggobid *gg
     return false;
 
   /*-- can prevent drawing of missings for parcoords or scatmat plots --*/
-  if (ggobi_data_has_missings(d) && !d->missings_show_p) {
+  if (ggobi_stage_has_missings(GGOBI_STAGE(d)) && !d->missings_show_p) {
     if(GGOBI_EXTENDED_SPLOT_GET_CLASS(sp)->draw_case_p) {
        draw_case = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp)->draw_case_p(sp, m, d, gg);
     }
@@ -472,7 +472,7 @@ splot_add_diamond_cue (gint k, splotd *sp, GdkDrawable *drawable, ggobid *gg)
   GdkPoint diamond[5];
   colorschemed *scheme = gg->activeColorScheme;
 
-  if (k < 0 || k >= d->nrows) return;
+  if (k < 0 || k >= GGOBI_STAGE(d)->n_rows) return;
 
   diamond[0].x = diamond[4].x = sp->screen[k].x - diamond_dim;
   diamond[0].y = diamond[4].y = sp->screen[k].y;
@@ -501,7 +501,7 @@ splot_add_point_label (gboolean nearest_p, gint k, gboolean top_p, splotd *sp,
   gint diamond_dim = DIAMOND_DIM;
   gchar *lbl = NULL;
 
-  if (k < 0 || k >= d->nrows) return;
+  if (k < 0 || k >= GGOBI_STAGE(d)->n_rows) return;
 
   lbl = identify_label_fetch (k, &dsp->cpanel, d, gg);
 
@@ -611,7 +611,7 @@ splot_add_movepts_cues (splotd *sp, GdkDrawable *drawable,
   displayd *dsp = (displayd *) sp->displayptr;
   GGobiData *d = dsp->d;
 
-  if (k < 0 || k >= d->nrows)
+  if (k < 0 || k >= GGOBI_STAGE(d)->n_rows)
     return;
 
   splot_add_diamond_cue (k, sp, drawable, gg);
@@ -734,7 +734,7 @@ splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
    * ( What about stickies? )
   */
   /*-- moving this section breaks splot_redraw (QUICK) for adding edges --*/
-  if (sp != gg->current_splot && e && ggobi_data_has_edges(e)) {
+  if (sp != gg->current_splot && e && ggobi_stage_get_n_edges(GGOBI_STAGE(e))) {
     gboolean draw_edge;
     GGobiExtendedDisplayClass *displayKlass = NULL;
 

@@ -68,7 +68,7 @@ wvis_variable_notebook_adddata_cb (ggobid *gg, GGobiData *d, void *notebook)
     }
 
     variable_notebook_subwindow_add (d, func, NULL, GTK_WIDGET(notebook),
-      all_vartypes, all_datatypes, gg);
+      GGOBI_VARIABLE_ALL_VARTYPES, all_datatypes, gg);
     gtk_notebook_set_show_tabs (GTK_NOTEBOOK (notebook),
                                 g_slist_length (gg->d) > 1);
   }
@@ -94,14 +94,14 @@ wvis_create_variable_notebook (GtkWidget *box, GtkSelectionMode mode,
   g_object_set_data(G_OBJECT(notebook), "SELECTION", (gpointer) mode);
   g_object_set_data(G_OBJECT(notebook), "selection-func", func);
   g_object_set_data(G_OBJECT(notebook), "selection-func-data", NULL);
-  g_object_set_data(G_OBJECT(notebook), "vartype", (gpointer) all_vartypes);
+  g_object_set_data(G_OBJECT(notebook), "vartype", (gpointer) GGOBI_VARIABLE_ALL_VARTYPES);
   g_object_set_data(G_OBJECT(notebook), "datatype", (gpointer) all_datatypes);
 
   for (l = gg->d; l; l = l->next) {
     d = (GGobiData *) l->data;
-    if (ggobi_data_has_cols(d)) {
+    if (ggobi_stage_get_n_cols(GGOBI_STAGE(d))) {
       variable_notebook_subwindow_add (d, func, NULL, notebook,
-        all_vartypes, all_datatypes, gg);
+        GGOBI_VARIABLE_ALL_VARTYPES, all_datatypes, gg);
     }
   }
 
@@ -131,16 +131,16 @@ bin_counts_reset (gint jvar, GGobiData *d, ggobid *gg)
 {
   gint i, k, m;
   gfloat val;
-  vartabled *vt;
+  GGobiVariable *var;
   gfloat min, max;
   colorschemed *scheme = gg->activeColorScheme;
 
   if (jvar == -1)
     return;
 
-  vt = ggobi_data_get_vartable(d, jvar);
-  min = vt->lim_tform.min;
-  max = vt->lim_tform.max;
+  var = ggobi_stage_get_variable(GGOBI_STAGE(d), jvar);
+  min = var->lim_tform.min;
+  max = var->lim_tform.max;
 
   for (k=0; k<gg->wvis.npct; k++)
     gg->wvis.n[k] = 0;
@@ -163,16 +163,16 @@ record_colors_reset (gint selected_var, GGobiData *d, ggobid *gg)
 {
   gint i, k, m;
   gint nd = g_slist_length(gg->d);
-  vartabled *vt;
+  GGobiVariable *var;
   gfloat min, max, val;
   colorschemed *scheme = gg->activeColorScheme;
 
   if (selected_var < 0)
     return;
 
-  vt = ggobi_data_get_vartable(d, selected_var);
-  min = vt->lim_tform.min;
-  max = vt->lim_tform.max;
+  var = ggobi_stage_get_variable(GGOBI_STAGE(d), selected_var);
+  min = var->lim_tform.min;
+  max = var->lim_tform.max;
 
   for (m=0; m<d->nrows_in_plot; m++) {
     i = d->rows_in_plot.els[m];
@@ -237,7 +237,7 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, ggobid *gg)
     {
       gg->wvis.pct[color] = val;
 
-      if (selected_var != -1 && selected_var < d->ncols)
+      if (selected_var != -1 && selected_var < GGOBI_STAGE(d)->n_cols)
         bin_counts_reset (selected_var, d, gg);
 
       g_signal_emit_by_name(G_OBJECT (w), "expose_event",
@@ -314,7 +314,7 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg)
     gg->wvis.motion_notify_id = 0;
   }
 
-  if (selected_var >= 0 && selected_var <= d->ncols) {
+  if (selected_var >= 0 && selected_var <= GGOBI_STAGE(d)->n_cols) {
     record_colors_reset (selected_var, d, gg);
     clusters_set(d);
     displays_plot (NULL, FULL, gg);
@@ -360,13 +360,13 @@ bin_boundaries_set (gint selected_var, GGobiData *d, ggobid *gg)
   } else if (gg->wvis.binning_method == WVIS_EQUAL_COUNT_BINS) {
     gint i, m;
     gfloat min, max, range, midpt;
-    vartabled *vt = ggobi_data_get_vartable(d, selected_var);
+    GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(d), selected_var);
     gint ngroups = gg->wvis.npct;
     gint groupsize = (gint) (d->nrows_in_plot / ngroups);
     paird *pairs = (paird *) g_malloc (d->nrows_in_plot * sizeof (paird));
 
-    min = vt->lim_tform.min;
-    max = vt->lim_tform.max;
+    min = var->lim_tform.min;
+    max = var->lim_tform.max;
     range = max - min;
 
     /*-- sort the selected variable --*/
@@ -444,7 +444,7 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
   gint x = xmargin;
   gint y = ymargin;
   gfloat diff;
-  vartabled *vt;
+  GGobiVariable *var;
   colorschemed *scheme = gg->activeColorScheme;
 
   GtkWidget *tree_view = get_tree_view_from_object (G_OBJECT (w));
@@ -519,10 +519,10 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
     PangoRectangle rect;
     PangoLayout *layout = gtk_widget_create_pango_layout(da, NULL);
 
-    vt = ggobi_data_get_vartable(d, selected_var);
-    if (vt) {
-      min = vt->lim_tform.min;
-      max = vt->lim_tform.max;
+    var = ggobi_stage_get_variable(GGOBI_STAGE(d), selected_var);
+    if (var) {
+      min = var->lim_tform.min;
+      max = var->lim_tform.max;
 
       gdk_gc_set_foreground (gg->wvis.GC, &scheme->rgb_accent);
       y = ymargin;

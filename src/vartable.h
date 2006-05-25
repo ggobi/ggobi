@@ -1,4 +1,4 @@
-/*-- vartable.h --*/
+/*-- ggobi-variable.h --*/
 
 #ifndef VARTABLE_H
 #define VARTABLE_H
@@ -20,10 +20,10 @@ enum {
 typedef enum {ADDVAR_ROWNOS, ADDVAR_BGROUP} NewVariableType; 
 
 
-typedef enum {real, categorical, integer, counter, uniform, all_vartypes} vartyped;
+typedef enum {real, categorical, integer, counter, uniform, all_vartypes} GGobiVariableType;
 
 /*
- * A vartabled object is not a table, but rather an entry in a table:
+ * A GGobiVariable object is not a table, but rather an entry in a table:
  * it's all the data for a single variable, and it is used to populate
  * a row in the variable manipulation table.  Now that is done using a
  * GtkTreeModel, so be careful before adding or moving an element in
@@ -36,7 +36,7 @@ typedef struct {
   gchar *nickname;   /*-- very short name to use in tour axis labels --*/
 
   /*-- is this variable categorical? --*/
-  vartyped vartype;
+  GGobiVariableType vartype;
   gboolean isTime;
 
   /*-- categorical_p --*/
@@ -80,6 +80,6 @@ typedef struct {
   /*-- in variable table --*/
   gboolean selected;
 
-} vartabled;
+} GGobiVariable;
 
 #endif

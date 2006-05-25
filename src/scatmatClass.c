@@ -100,7 +100,7 @@ varpanelRefresh (displayd * display, splotd * sp, GGobiData * d)
   gint j, n, *vars;
   ggobid *gg = GGobiFromDisplay (display);
 
-  for (j = 0; j < d->ncols; j++) {
+  for (j = 0; j < GGOBI_STAGE(d)->n_cols; j++) {
     varpanel_toggle_set_active (VARSEL_X, j, false, d);
 
     varpanel_toggle_set_active (VARSEL_Y, j, false, d);
@@ -109,7 +109,7 @@ varpanelRefresh (displayd * display, splotd * sp, GGobiData * d)
     varpanel_widget_set_visible (VARSEL_Z, j, false, d);
   }
 
-  vars = (gint *) g_malloc (d->ncols * sizeof (gint));
+  vars = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof (gint));
   n =
     GGOBI_EXTENDED_DISPLAY_GET_CLASS (display)->plotted_vars_get (display,
                                                                   vars, d,
@@ -293,7 +293,7 @@ receive_scatmat_drag (GtkWidget * src, GdkDragContext * context, int x, int y,
 
   if (from->p1dvar != -1 && to->p1dvar != -1) {
 
-    vars = (gint *) g_malloc (d->ncols * sizeof (gint));
+    vars = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof (gint));
     nvars =
       GGOBI_EXTENDED_DISPLAY_GET_CLASS (display)->plotted_vars_get (display,
                                                                     vars, d,
@@ -457,8 +457,8 @@ splotScreenToTform (cpaneld * cpanel, splotd * sp, icoords * scr,
 */
 
   if (sp->p1dvar != -1) {
-    max = ggobi_data_get_col_max(d, sp->p1dvar);
-    min = ggobi_data_get_col_min(d, sp->p1dvar);
+    GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(d), sp->p1dvar);
+    ggobi_variable_get_limits(var, &min, &max);
     rdiff = max - min;
 
     if (display->p1d_orientation == HORIZONTAL) {
@@ -477,10 +477,9 @@ splotScreenToTform (cpaneld * cpanel, splotd * sp, icoords * scr,
     }
   }
   else {
-
     /* x */
-    max = ggobi_data_get_col_max(d, sp->xyvars.x);
-    min = ggobi_data_get_col_min(d, sp->xyvars.x);
+    GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(d), sp->xyvars.x);
+    ggobi_variable_get_limits(var, &min, &max);
     rdiff = max - min;
     world.x = planar.x;
     ftmp = world.x / precis;
@@ -488,8 +487,8 @@ splotScreenToTform (cpaneld * cpanel, splotd * sp, icoords * scr,
     tfd->x += min;
 
     /* y */
-    max = ggobi_data_get_col_max(d, sp->xyvars.y);
-    min = ggobi_data_get_col_min(d, sp->xyvars.y);
+    var = ggobi_stage_get_variable(GGOBI_STAGE(d), sp->xyvars.y);
+    ggobi_variable_get_limits(var, &min, &max);
     rdiff = max - min;
     world.y = planar.y;
     ftmp = world.y / precis;
@@ -536,8 +535,8 @@ static gchar *
 treeLabel (splotd * splot, GGobiData * d, ggobid * gg)
 {
   return (g_strdup_printf("%s v %s", 
-    ggobi_data_get_col_name(d, splot->xyvars.x), 
-    ggobi_data_get_col_name(d, splot->xyvars.y)
+    ggobi_stage_get_col_name(GGOBI_STAGE(d), splot->xyvars.x), 
+    ggobi_stage_get_col_name(GGOBI_STAGE(d), splot->xyvars.y)
   ));
 }
 
@@ -569,11 +568,11 @@ drawEdgeP (splotd * sp, gint m, GGobiData * d, GGobiData * e, ggobid * gg)
 {
   gboolean draw_edge = true;
   if (sp->p1dvar != -1) {
-    if (ggobi_data_is_missing(e, m, sp->p1dvar))
+    if (ggobi_stage_is_missing(GGOBI_STAGE(e), m, sp->p1dvar))
       draw_edge = false;
   }
   else {
-    if (ggobi_data_is_missing(e, m, sp->xyvars.x) || ggobi_data_is_missing(e, m, sp->xyvars.y)) {
+    if (ggobi_stage_is_missing(GGOBI_STAGE(e), m, sp->xyvars.x) || ggobi_stage_is_missing(GGOBI_STAGE(e), m, sp->xyvars.y)) {
       draw_edge = false;
     }
   }
@@ -585,11 +584,11 @@ drawCaseP (splotd * sp, gint m, GGobiData * d, ggobid * gg)
 {
   gboolean draw_case = true;
   if (sp->p1dvar != -1) {
-    if (ggobi_data_is_missing(d, m, sp->p1dvar))
+    if (ggobi_stage_is_missing(GGOBI_STAGE(d), m, sp->p1dvar))
       draw_case = false;
   }
   else {
-    if (ggobi_data_is_missing(d, m, sp->xyvars.x) || ggobi_data_is_missing(d, m, sp->xyvars.y)) {
+    if (ggobi_stage_is_missing(GGOBI_STAGE(d), m, sp->xyvars.x) || ggobi_stage_is_missing(GGOBI_STAGE(d), m, sp->xyvars.y)) {
       draw_case = false;
     }
   }

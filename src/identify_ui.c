@@ -240,7 +240,7 @@ motion_notify_cb (GtkWidget * w, GdkEventMotion * event, splotd * sp)
   }
   else {
     GGobiData *e = gg->current_display->e;
-    if (e && ggobi_data_has_edges(e)) {
+    if (e && ggobi_stage_get_n_edges(GGOBI_STAGE(e))) {
       k = find_nearest_edge (sp, gg->current_display, gg);
       e->nearest_point = k;
       if (e->nearest_point != e->nearest_point_prev) {
@@ -374,7 +374,8 @@ cpanel_identify_make (ggobid * gg)
   /*-- provide a variable list so that any variable can be the label --*/
   notebook = create_prefixed_variable_notebook (panel->w,
                                                 GTK_SELECTION_MULTIPLE,
-                                                all_vartypes, all_datatypes,
+                                                GGOBI_VARIABLE_ALL_VARTYPES, 
+                                                all_datatypes,
                                                 G_CALLBACK
                                                 (label_selected_cb), NULL, gg,
                                                 label_prefix_func);

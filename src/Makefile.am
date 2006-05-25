@@ -1,5 +1,5 @@
 lib_LTLIBRARIES     = libggobi.la
-libggobi_la_GOBS = data.gob
+libggobi_la_GOBS = variable.gob stage.gob data.gob
 libggobi_la_GOBSOURCES = $(libggobi_la_GOBS:%.gob=ggobi-%.c)
 libggobi_la_GOBHEADERS = $(libggobi_la_GOBS:%.gob=ggobi-%.h)
 libggobi_la_GOBOBJECTS = $(libggobi_la_GOBS:%.gob=ggobi-%.lo)
@@ -41,8 +41,8 @@ BUILT_SOURCES = $(libggobi_la_GOBSOURCES) $(libggobi_la_GOBHEADERS)
 MAINTAINERCLEANFILES = $(BUILT_SOURCES)
 
 $(libggobi_la_GOBSOURCES): $(libggobi_la_GOBSOURCES:ggobi-%.c=%.gob)
-	@GOB2@ --no-touch $<
-          
+	@GOB2@ --no-touch $(patsubst ggobi-%.c,%.gob,$@)
+
 bin_PROGRAMS  = ggobi
 ggobi_SOURCES = ggobiMain.c
 ggobi_LDADD   = libggobi.la

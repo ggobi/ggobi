@@ -1,12 +1,37 @@
 %{
-  /* some silly macros you can ignore */
+  
+  // FIXME: temporary
+  #include "ggobi-data.h"
+  
+  // FIXME: these probably won't be necessary - we will not proxy properties
   #define SET_PARENT_PROP(prop) \
-    g_object_set_property(G_OBJECT(self->_priv->parent), (prop), VAL);
+    g_object_set_property(G_OBJECT(self->_priv->parent), (prop), VAL)
   #define GET_PARENT_PROP(prop) \
-    g_object_set_property(G_OBJECT(self->_priv->parent), (prop), VAL);
+    g_object_get_property(G_OBJECT(self->_priv->parent), (prop), VAL)
   
   #define RELAY_SIGNAL(signal) \
     g_signal_connect_swapped(G_OBJECT(parent), #signal, G_CALLBACK(self_##signal), self)
+    
+  /* signal handlers */
+  
+  static void 
+  variable_name_changed_cb(GGobiVariable *var, const gchar *old_name, GGobiStage *stage)
+  {
+    gint j = ggobi_stage_get_col_index_for_name(stage, old_name);
+    ggobi_stage_col_name_changed(stage, old_name, j);
+  }
+  
+%}
+
+%h{
+  #include "ggobi-variable.h"
+  #include "utils.h"
+  
+  /* for use in GOB parameter checks like: guint j (check < N_COLS) */
+  #define N_COLS self->n_cols
+  
+  #define GGOBI_STAGE_IS_COL_CATEGORICAL(stage, col) \
+    ggobi_stage_get_col_type((stage), (col)) == GGOBI_VARIABLE_CATEGORICAL
 %}
 
 /**
@@ -39,9 +64,9 @@ property OBJECT parent
     self->_priv->parent = parent;
     RELAY_SIGNAL(col_data_changed);
     RELAY_SIGNAL(col_name_changed);
-    RELAY_SIGNAL(col_cols_added);
-    RELAY_SIGNAL(col_col_deleted);
-    RELAY_SIGNAL(col_rows_added);
+    RELAY_SIGNAL(cols_added);
+    RELAY_SIGNAL(col_deleted);
+    RELAY_SIGNAL(rows_added);
   }
   get { g_value_set_object(VAL, self->_priv->parent); };
    
@@ -55,23 +80,62 @@ property STRING name
 
 /*-- a pointer to the application context --*/
 /*-- note that we don't want this -- the pipeline must be freed of GGobi! --*/
-private struct _ggobid *gg;
+/* private struct _ggobid *gg; */
+
+/* variables are now stored in the stage */
+// FIXME: should probably become a GArray
+public GGobiVariable **vartable;
+
+/* A note: GOB places 'private' fields in a separate structure, requiring us
+  to use '->_priv' to access them. That is a real pain. By making fields
+  'protected' they are placed in the object's structure, but are marked so
+  that they do not appear in documentation. This may be sufficient. 
+  In fact, if no methods are marked 'protected' then there is no need for a 
+  private header file and we can tell GOB not to generate one. */
 
 /* we cache the number of rows and columns */
-private guint n_rows;
-private guint n_cols;
+
+// FIXME: We may in fact leave these as public (read-only) fields since they
+// are so commonly used. This is convention in GObject.
+// Of course, 'read-only' is by contract and is not enforced by the language
+public guint n_rows;
+public guint n_cols;
 
 property UINT n_rows 
   (nick = "nrows", blurb = "Number of rows at this stage",
-   minimum = 0, maximum = INT_MAX, default_value = 0,
-   flags = CONSTRUCT_ONLY, link, export);
+   minimum = 0, maximum = INT_MAX, default_value = 0, link, export);
 property UINT n_cols 
   (nick = "ncols", blurb = "Number of cols at this stage",
-   minimum = 0, maximum = INT_MAX, default_value = 0,
-   flags = CONSTRUCT_ONLY, link, export);
+   minimum = 0, maximum = INT_MAX, default_value = 0, export)
+   set { 
+     gint nprev = self->n_cols;
+     self->n_cols = g_value_get_uint(VAL);
+     self->vartable = g_renew (GGobiVariable *, self->vartable, self->n_cols);
+     for(guint j = nprev; j < self->n_cols; j++)
+       self->vartable[j] = NULL; // or use memset above
+     /* we emit cols_added here, but we can't emit col_deleted */
+     if (nprev < self->n_cols)
+       self_cols_added(self, self->n_cols - nprev);
+   }
+   get { g_value_set_uint(VAL, self->n_cols); };
 
-private signal first NONE (UINT) void 
+public GHashTable* var_name_lookup = { 
+  g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL) 
+} destroywith g_hash_table_destroy;
+   
+
+public signal first NONE (UINT) void 
 col_data_changed(self, guint j);
+
+public signal first NONE (STRING, UINT) void 
+col_name_changed(self, const gchar *old_name, guint j) {
+  gchar *name = self_get_col_name(self, j);
+  if (old_name)
+    g_hash_table_remove(self->var_name_lookup, old_name);
+  g_hash_table_insert(self->var_name_lookup, name, GINT_TO_POINTER(j));
+}
+
+// FIXME: these signals can probably remain public - may want protected
 
 /**
  * cols_added:
@@ -80,8 +144,8 @@ col_data_changed(self, guint j);
  *
  * Columns added signal
  **/
-private signal NONE (UINT) void
-cols_added(self, guint n) { self_set_n_cols(self, self->_priv->n_cols + n); };
+public signal NONE (UINT) void
+cols_added(self, guint n);
 
 /**
  * cols_deleted:
@@ -90,8 +154,8 @@ cols_added(self, guint n) { self_set_n_cols(self, self->_priv->n_cols + n); };
  *
  * Columns deleted signal
  **/
-private signal NONE (UINT) void
-col_deleted(self, guint j) { self_set_n_cols(self, self->_priv->n_cols - 1); };
+public signal NONE (UINT) void
+col_deleted(self, guint j);
 
 /**
  * rows_added:
@@ -100,8 +164,8 @@ col_deleted(self, guint j) { self_set_n_cols(self, self->_priv->n_cols - 1); };
  * 
  * Rows added signal
  **/
-private signal NONE (UINT) void
-rows_added(self, guint n) { self_set_n_rows(self, self->_priv->n_rows + n); };
+public signal NONE (UINT) void
+rows_added(self, guint n);
 
 /** 
  * new:
@@ -127,7 +191,7 @@ new(const gchar *name, GGobiStage *parent)
 public gchar* 
 get_col_name(self, guint j) 
 {
-  GGobiVariable *var = self_get_vartable(self, j);
+  GGobiVariable *var = self_get_variable(self, j);
   g_return_val_if_fail(GGOBI_IS_VARIABLE(var), NULL);
   return ggobi_variable_get_name(var);
 }
@@ -142,7 +206,7 @@ get_col_name(self, guint j)
 public gchar* 
 get_col_nickname(self, guint j) 
 {
-  GGobiVariable *var = self_get_vartable(self, j);
+  GGobiVariable *var = self_get_variable(self, j);
   g_return_val_if_fail(GGOBI_IS_VARIABLE(var), NULL);
   return ggobi_variable_get_nickname(var);
 }
@@ -150,20 +214,60 @@ get_col_nickname(self, guint j)
 /**
  * get_col_index_for_name:
  * @self: #GGobiStage
- * @value: column name
+ * @name: column name
  *
  * Returns: index of column with given name, or -1 if no matching columns
  **/
-public guint
-get_col_index_for_name(self, const gchar* value) 
+public gint
+get_col_index_for_name(self, const gchar* name) onerror -1
 {
-  guint i, ncols = self_get_n_cols(self);
-  // FIXME: Why is this case insensitive? Also, variable names could easily be non-ascii.
-  for(i = 0; i < ncols; i++) {
-    if (!g_ascii_strcasecmp(self_get_col_name(self, i), value))
-      return(i);
-  }
+  gpointer pos, key;
+  if (!name)
+    G_BREAKPOINT();   
+  if (g_hash_table_lookup_extended(self->var_name_lookup, name, &key, &pos))
+    return GPOINTER_TO_INT(pos);
   return -1;
+}
+
+/** 
+ * set_col_name:
+ * @self: GGobiStage object
+ * @j: column index
+ * @value: new column name (if NULL uses column index)
+ *
+ * Set column name
+ * Also sets nickname to the first two letters.
+ * Emits col_name_changed() signal.
+ **/
+public void 
+set_col_name(self, guint j, const gchar* value) 
+{
+  GGobiVariable* vt = self_get_variable(self, j);
+  gchar *nick, *name;
+  
+  if (value)
+    name = g_strdup(value);
+  else name = g_strdup_printf("_Var %d", j);
+  nick = g_strndup(name, 2);
+  
+  ggobi_variable_set_name(vt, name);
+  ggobi_variable_set_nickname(vt, nick);
+  
+  g_free(nick);
+  g_free(name);
+}
+
+/** 
+ * set_col_nickname:
+ * @self: GGobiData object
+ * @j: column index
+ * @value: new column nickname
+ **/
+public void 
+set_col_nickname(self, guint j, const gchar* value)
+{
+  GGobiVariable* vt = self_get_variable(self, j);
+  ggobi_variable_set_nickname(vt, g_strdup(value));
 }
 
 /**
@@ -194,7 +298,7 @@ set_missing(self, guint i, guint j)
 virtual gboolean
 is_missing(self, guint i, guint j) 
 {
-  self_is_missing(self->_priv->parent, i, j);  
+  return(self_is_missing(self->_priv->parent, i, j));  
 }
 
 /**
@@ -205,7 +309,7 @@ is_missing(self, guint i, guint j)
 virtual gboolean
 has_missings(self) 
 {
-  self_has_missings(self->_priv->parent);
+  return(self_has_missings(self->_priv->parent));
 }
 
 /**
@@ -214,6 +318,7 @@ has_missings(self)
  * @j: column index
  * Returns: whether or not specified column contains any missing values
  **/
+ // FIXME: Should this be cached and made part of GGobiVariable?
 public guint 
 get_col_n_missing(self, guint j) {
   guint i, n = 0, nrows = self_get_n_rows(self);
@@ -268,21 +373,6 @@ set_raw_value(self, guint i, guint j, gdouble value)
   self_set_raw_value(self->_priv->parent, i, j, value);
 }
 
-/* Now for our private convenience */
-private gint
-get_col_level_for_value(self, guint j, gint value)
-{
-  GGobiVariable *var = self_get_variable(self, j);
-  return(ggobi_variable_get_level_for_value(var, value));
-}
-
-private gint
-get_col_level_for_name(self, guint j, const gchar *name)
-{
-  GGobiVariable *var = self_get_variable(self, j);
-  return(ggobi_variable_get_level_for_name(var, name));
-}
-
 /**
  * set_categorical_value:
  * @self: #GGobiStage
@@ -299,7 +389,7 @@ set_categorical_value(self, guint i, guint j, const gchar* value)
 {
   GGobiVariable* var = self_get_variable(self, j);
   ggobi_variable_add_level_instance(var, value, -1);
-  self_set_integer_value(self, i, j, ggobi_variable_get_level_value(var, value));
+  self_set_raw_value(self, i, j, (gdouble)ggobi_variable_get_level_value(var, value));
 }
 
 /**
@@ -328,56 +418,6 @@ set_string_value(self, guint i, guint j, const gchar* value)
 }
 
 /** 
- * set_integer_values:
- * @self: #GGobiStage
- * @i: row index
- * @value: array of integer of length self->nrows
- *
- * Convenience method for setting entire column of integers.
- * Emits self_col_data_changed() signal.
- **/
-public void
-set_integer_values(self, guint j, gint *values)
-{
-  guint i, nrows = self_get_n_rows(self);
-  
-  for (i = 0; i < nrows; i++) {
-    self_set_integer_value(self, i, j, values[i]);
-  }
-  self_col_data_changed(self, j);
-}
-
-
-/** 
- * set_integer_value:
- * @self: #GGobiStage
- * @i: row index
- * @j: column index
- * @value: new value
- *
- * Convenience method for setting integer value.
- **/
-public void
-set_integer_value(self, guint i, guint j, gint value)
-{
-  self_set_raw_value(self, i, j, (gdouble) value);
-}
-
-/** 
- * get_integer_value:
- * @self: #GGobiStage
- * @i: row index
- * @j: column index
- *
- * Convenience method for getting integer value.
- **/
-public gint
-get_integer_value(self, guint i, guint j)
-{
-  return (gint) self_get_raw_value(self, i, j);
-}
-
-/** 
  * get_raw_value:
  * @self: #GGobiStage
  * @i: row index
@@ -389,12 +429,18 @@ get_raw_value(self, guint i, guint j)
   return self_get_raw_value(self->_priv->parent, i, j);
 }
 
-public vartyped 
+public GGobiVariableType
 get_col_type(self, guint j)
 {
   GGobiVariable *var = self_get_variable(self, j);
   g_return_val_if_fail(GGOBI_IS_VARIABLE(var), -1);
-  return(ggobi_variable_get_type(var));
+  return(ggobi_variable_get_vartype(var));
+}
+
+virtual GGobiVariable*
+create_variable (self, guint j)
+{
+  return GGOBI_VARIABLE(ggobi_variable_new(self));
 }
 
 /**
@@ -403,12 +449,22 @@ get_col_type(self, guint j)
  * @j: column index
  *
  * Get variable meta data for specified column
- * Replaces vartable_element_get.  Should eventually become private.
  **/
-virtual GGobiVariable*
+public GGobiVariable*
 get_variable (self, guint j)
 {
-  return self_get_variable(self->_priv->parent, j);
+  /* here we use a lazy creation pattern, because most stages will not need
+    to provide variable objects. It could be costly to provide the full set
+    of variables for each stage. */
+  if (!self->vartable[j]) {
+    GGobiVariable *var = self_create_variable(self, j);
+    self->vartable[j] = var;
+    self_col_name_changed(self, NULL, j); /* changed from... undefined */
+    ggobi_variable_connect__name_changed(var, variable_name_changed_cb, self);
+    self_set_col_name(self, j, NULL);
+  }
+
+  return self->vartable[j];
 }
 
 /**
@@ -423,17 +479,19 @@ get_variable (self, guint j)
  * output into csv etc.  It may be sub-optimal for user display, because
  * it does not use the users locale settings, and outputs full precision.
  **/
+// FIXME: obviously broken
 public gchar*
 get_string_value(self, guint i, guint j, gboolean transformed) 
 {
-  guint lval = -1;
   GGobiVariable *var = self_get_variable(self, j);
-  gdouble raw = transformed ? self->tform.vals[i][j] : self->raw.vals[i][j];
+  gdouble raw = transformed ? GGOBI_DATA(self)->tform.vals[i][j] : 
+    GGOBI_DATA(self)->raw.vals[i][j];
+  //gdouble raw = self_get_raw_data(self, i, j);
   
   if (self_is_missing(self, i, j)) 
     return g_strdup("NA");
 
-  if (ggobi_variable_get_type(var) != GGOBI_VARIABLE_CATEGORICAL) {
+  if (!GGOBI_VARIABLE_IS_CATEGORICAL(var)) {
     gchar *buf = g_new(gchar, G_ASCII_DTOSTR_BUF_SIZE);
     g_ascii_dtostr(buf, G_ASCII_DTOSTR_BUF_SIZE, raw);
     return buf;
@@ -443,32 +501,18 @@ get_string_value(self, guint i, guint j, gboolean transformed)
 }
 
 /**
- * has_edges:
+ * get_edges_edges:
  * @self: #GGobiStage object
  *
- * Test if this dataset has any edges
+ * Get the number of edges in this dataset
  **/ 
- // Why not make this get_n_edges?
-public gboolean 
-has_edges (self) 
+virtual guint
+get_n_edges (self)
 {
-  return (self->edge.n > 0);
+  return(self_get_n_edges(self->_priv->parent));
 }
 
-/**
- * has_cols:
- * @self: #GGobiStage object
- *
- * Test if this dataset has any variables
- **/
- // This is sort of redundant isn't it? (get_n_cols() is sort of a superset)
-public gboolean 
-has_cols (self) 
-{
-  return (self_get_n_cols(self) > 0);
-}
-
-/* 
+/** 
  * set_row_id:
  * @self: #GGobiStage object
  * @i: row
@@ -481,7 +525,7 @@ has_cols (self)
  **/ 
 virtual void
 set_row_id(self, guint i, gchar* value, gboolean check) {
-  self_set_row_id(self->_priv->parent, value, check);
+  self_set_row_id(self->_priv->parent, i, value, check);
 }
 
 /** 
@@ -509,44 +553,6 @@ get_row_id(self, guint i) {
 virtual gint
 get_row_for_id(self, gchar *id) {
   return self_get_row_for_id(self->_priv->parent, id);
-}
-
-/**
- * add_rows: 
- * @self: #GGobiStage object
- * @n: number of rows to add
- *
- * Add n rows to the dataset
- * Adds extra rows, allocating space as needed.
- *
- * This emits the cols_added signal and also runs
- * #set_rows_in_plot which emits the rows_in_plot_changed signal.
- *
- * Returns: index of first new row
- **/
-virtual guint
-add_rows(self, guint n) {
-  return self_add_rows(self->_priv->parent, n);
-}
-
-
-/* 
- * add_cols:
- * @self: #GGobiStage object
- * @n: number of columns to add
- *
- * Add n empty columns to the dataset.
- * Returns: index of first new column
- **/ 
-virtual guint 
-add_cols(self, guint n) {
-  return self_add_cols(self->_priv->parent, n);
-}
-
-virtual guint
-delete_cols(self, guint *cols, gint ncols)
-{
-  return self_delete_cols(self->_priv->parent, cols, ncols);
 }
 
 }

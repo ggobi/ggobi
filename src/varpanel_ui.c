@@ -75,8 +75,9 @@ varpanel_widget_get_nth (gint jbutton, gint jvar, GGobiData * d)
 }
 
 void
-varpanel_label_set (GGobiData * d, gint j)
+varpanel_label_set (GGobiStage * s, gint j)
 {
+  GGobiData *d = GGOBI_DATA(s);
   GtkWidget *label = varpanel_widget_get_nth (VARSEL_LABEL, j, d);
   /*-- the label is actually a button; this is the label --*/
   GtkWidget *labelw;
@@ -90,7 +91,7 @@ varpanel_label_set (GGobiData * d, gint j)
     return;
   /*-- make sure it stays left-aligned --*/
   gtk_misc_set_alignment (GTK_MISC (labelw), 0, .5);
-  gtk_label_set_text (GTK_LABEL (labelw), ggobi_data_get_col_name(d, j));
+  gtk_label_set_text (GTK_LABEL (labelw), ggobi_stage_get_col_name(GGOBI_STAGE(d), j));
 }
 
 GtkWidget *
@@ -116,8 +117,9 @@ varpanel_widget_set_visible (gint jbutton, gint jvar, gboolean show,
 }
 
 void
-varpanel_delete_nth (GGobiData * d, gint jvar)
+varpanel_delete_nth (GGobiStage * s, gint jvar)
 {
+  GGobiData *d = GGOBI_DATA(s);
   GtkWidget *box = varpanel_container_get_nth (jvar, d);
   if (box != NULL) {
     d->vcbox_ui.box = g_slist_remove (d->vcbox_ui.box, (gpointer) box);
@@ -137,7 +139,7 @@ varpanel_toggle_set_active (gint jbutton, gint jvar, gboolean active,
   GtkWidget *w;
 
 
-  if (jvar >= 0 && jvar < d->ncols) {
+  if (jvar >= 0 && jvar < GGOBI_STAGE(d)->n_cols) {
     w = varpanel_widget_get_nth (jbutton, jvar, d);
 
     if (w && GTK_WIDGET_REALIZED (w)) {
@@ -233,7 +235,7 @@ varpanel_show_page (displayd * display, ggobid * gg)
     child = l->data;
     tab_label = (GtkWidget *) gtk_notebook_get_tab_label (nb, child);
     if (tab_label && GTK_IS_LABEL (tab_label)) {
-      if (strcmp (GTK_LABEL (tab_label)->label, d->name) == 0) {
+      if (strcmp (GTK_LABEL (tab_label)->label, ggobi_stage_get_name(GGOBI_STAGE(d))) == 0) {
         if (page != page_new) {
 
           // Set the buttons on 'page' to be insensitive
@@ -268,7 +270,7 @@ varpanel_switch_page_cb (GtkNotebook * notebook, GtkNotebookPage * page,
     GGobiData *d = (GGobiData *) g_slist_nth_data (gg->d, page_num);
     if (d) {
       gchar *msg = g_strdup_printf ("%s: %d x %d (%s)",
-                                    d->name, d->nrows, d->ncols,
+                                    ggobi_stage_get_name(GGOBI_STAGE(d)), GGOBI_STAGE(d)->n_rows, GGOBI_STAGE(d)->n_cols,
                                     gg->input->fileName);
       gg->status_message_func (msg, gg);
       g_free (msg);
@@ -303,7 +305,7 @@ varpanel_refresh (displayd * display, ggobid * gg)
       d = datad_get_from_notebook (gg->varpanel_ui.notebook, gg);
       if (d) {
         gint j;
-        for (j = 0; j < d->ncols; j++) {
+        for (j = 0; j < GGOBI_STAGE(d)->n_cols; j++) {
           /*varpanel_widget_set_visible (VARSEL_X, j, false, d); */
           varpanel_toggle_set_active (VARSEL_X, j, false, d);
           varpanel_widget_set_visible (VARSEL_Y, j, false, d);
@@ -341,7 +343,7 @@ varsel_cb (GtkWidget * w, GdkEvent * event, GGobiData * d)
     gint j, jvar;
 
     jvar = -1;
-    for (j = 0; j < d->ncols; j++) {
+    for (j = 0; j < GGOBI_STAGE(d)->n_cols; j++) {
       if (varpanel_widget_get_nth (VARSEL_X, j, d) == w) {
         togglebutton = VARSEL_X;
         jvar = j;
@@ -428,7 +430,7 @@ varpanel_add_row (gint j, GGobiData * d, ggobid * gg)
   /*-- hide this widget by default --*/
 
   /*-- the label is actually a button, with the old behavior --*/
-  label = gtk_button_new_with_label (ggobi_data_get_col_name(d, j));
+  label = gtk_button_new_with_label (ggobi_stage_get_col_name(GGOBI_STAGE(d), j));
   gtk_widget_set_sensitive (label, sens);
   gtk_button_set_relief (GTK_BUTTON (label), GTK_RELIEF_NONE);
   ggobi_widget_set (label, gg, true);
@@ -459,7 +461,7 @@ varpanel_widgets_add (gint nc, GGobiData * d, ggobid * gg)
    */
   if (n == 0) {
     gtk_notebook_append_page (GTK_NOTEBOOK (gg->varpanel_ui.notebook),
-                              d->varpanel_ui.hpane, gtk_label_new (d->name));
+                              d->varpanel_ui.hpane, gtk_label_new (ggobi_stage_get_name(GGOBI_STAGE(d))));
     gtk_notebook_set_show_tabs (GTK_NOTEBOOK (gg->varpanel_ui.notebook),
                                 nd > 1);
   }
@@ -474,8 +476,8 @@ varpanel_addvar_cb (ggobid * gg, gint which,
                     GGobiData * d, void *p)
 {
   /*-- variable toggle buttons and circles --*/
-  varpanel_widgets_add (d->ncols, d, gg);
-  varcircles_add (d->ncols, d, gg);
+  varpanel_widgets_add (GGOBI_STAGE(d)->n_cols, d, gg);
+  varcircles_add (GGOBI_STAGE(d)->n_cols, d, gg);
 
   /*-- make sure the right toggle widgets and circles are showing --*/
 /* this gives the wrong result when the variable being added is
@@ -595,9 +597,9 @@ varpanel_populate (GGobiData * d, ggobid * gg)
 
   g_object_set_data (G_OBJECT (d->varpanel_ui.hpane), "datad", d);  /*setdata */
   /*-- only add a tab if there are variables --*/
-  if (ggobi_data_has_cols(d)) {
+  if (ggobi_stage_get_n_cols(GGOBI_STAGE(d))) {
     gtk_notebook_append_page (GTK_NOTEBOOK (gg->varpanel_ui.notebook),
-                              d->varpanel_ui.hpane, gtk_label_new (d->name));
+                              d->varpanel_ui.hpane, gtk_label_new (ggobi_stage_get_name(GGOBI_STAGE(d))));
   }
 
   /* Check if we have been here before and already created the box, etc.. */
@@ -621,7 +623,7 @@ varpanel_populate (GGobiData * d, ggobid * gg)
   g_signal_connect (G_OBJECT (gg), "display_new",
                     G_CALLBACK (varpanel_set_sensitive_cb), NULL);
 
-  ggobi_data_connect__col_deleted (d, varpanel_delete_nth, NULL);
+  ggobi_stage_connect__col_deleted (GGOBI_STAGE(d), varpanel_delete_nth, NULL);
   
   /* Connecting to display_selected event */
   g_signal_connect (G_OBJECT (gg), "display_selected",
@@ -645,7 +647,7 @@ varpanel_populate (GGobiData * d, ggobid * gg)
   gdk_flush ();
 
   d->vcbox_ui.box = NULL;
-  for (j = 0; j < d->ncols; j++)
+  for (j = 0; j < GGOBI_STAGE(d)->n_cols; j++)
     varpanel_add_row (j, d, gg);
 }
 
@@ -680,7 +682,7 @@ varpanel_tooltips_set (displayd * display, ggobid * gg)
   if (display == NULL) {
     d = datad_get_from_notebook (gg->varpanel_ui.notebook, gg);
     if (d) {
-      for (j = 0; j < d->ncols; j++) {
+      for (j = 0; j < GGOBI_STAGE(d)->n_cols; j++) {
         if ((wx = varpanel_widget_get_nth (VARSEL_X, j, d)) == NULL)
           break;
         label = varpanel_widget_get_nth (VARSEL_LABEL, j, d);
@@ -696,7 +698,7 @@ varpanel_tooltips_set (displayd * display, ggobid * gg)
     d = display->d;
 
     /*-- for each variable, current datad only --*/
-    for (j = 0; j < d->ncols; j++) {
+    for (j = 0; j < GGOBI_STAGE(d)->n_cols; j++) {
       if ((wx = varpanel_widget_get_nth (VARSEL_X, j, d)) == NULL)
         break;
 

@@ -90,7 +90,7 @@ createBarchart (displayd * display, gboolean missing_p, splotd * sp, gint var,
 {
   GtkWidget *table, *vbox;
 
-  if (d == NULL || !ggobi_data_has_cols(d))
+  if (d == NULL || !ggobi_stage_get_n_cols(GGOBI_STAGE(d)))
     return (NULL);
 
   if (!display) {
@@ -162,7 +162,7 @@ createBarchart (displayd * display, gboolean missing_p, splotd * sp, gint var,
       gg->current_display->d == d &&
       GGOBI_IS_EXTENDED_DISPLAY (gg->current_display)) {
     gint nplotted_vars;
-    gint *plotted_vars = (gint *) g_malloc (d->ncols * sizeof (gint));
+    gint *plotted_vars = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof (gint));
     displayd *dsp = gg->current_display;
 
     nplotted_vars =
@@ -182,7 +182,7 @@ createBarchart (displayd * display, gboolean missing_p, splotd * sp, gint var,
 
   /*-- Initialize tours if possible --*/
   display_tour1d_init_null (display, gg);
-  if (d->ncols >= MIN_NVARS_FOR_TOUR1D)
+  if (GGOBI_STAGE(d)->n_cols >= MIN_NVARS_FOR_TOUR1D)
     display_tour1d_init (display, gg);
 
   table = gtk_table_new (3, 2, false);  /* rows, columns, homogeneous */
@@ -303,7 +303,7 @@ barchart_recalc_group_counts (barchartSPlotd * sp, GGobiData * d, ggobid * gg)
     m = d->rows_in_plot.els[i];
 
     /*-- skip missings?  --*/
-    if (!d->missings_show_p && ggobi_data_is_missing(d, m, GGOBI_SPLOT (sp)->p1dvar))
+    if (!d->missings_show_p && ggobi_stage_is_missing(GGOBI_STAGE(d), m, GGOBI_SPLOT (sp)->p1dvar))
       continue;
 
     /*-- skip hiddens?  here, yes. --*/
@@ -313,7 +313,7 @@ barchart_recalc_group_counts (barchartSPlotd * sp, GGobiData * d, ggobid * gg)
 
     bin = GGOBI_SPLOT (sp)->planar[m].x;
 /* dfs */
-    if (ggobi_data_get_col_type(d, GGOBI_SPLOT (sp)->p1dvar) == categorical)
+    if (GGOBI_STAGE_IS_COL_CATEGORICAL(GGOBI_STAGE(d), GGOBI_SPLOT (sp)->p1dvar))
       bin = sp->bar->index_to_rank.els[i];
 /* --- */
     if ((bin >= 0) && (bin < sp->bar->nbins)) {
@@ -554,10 +554,11 @@ barchart_allocate_structure (barchartSPlotd * sp, GGobiData * d)
   splotd *rawsp = GGOBI_SPLOT (sp);
   ggobid *gg = GGobiFromSPlot (rawsp);
   colorschemed *scheme = gg->activeColorScheme;
-
+  GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(d), rawsp->p1dvar);
+  
   if (sp->bar->new_nbins < 0) {
-    if (ggobi_data_get_col_type(d, rawsp->p1dvar) == categorical) {
-      nbins = ggobi_data_get_col_n_levels(d, rawsp->p1dvar);
+    if (ggobi_variable_get_vartype(var) == GGOBI_VARIABLE_CATEGORICAL) {
+      nbins = ggobi_variable_get_n_levels(var);
       sp->bar->is_histogram = FALSE;
     }
     else {
@@ -569,8 +570,8 @@ barchart_allocate_structure (barchartSPlotd * sp, GGobiData * d)
     nbins = sp->bar->new_nbins;
   sp->bar->new_nbins = -1;
 
-  rawsp->p1d.lim.min = ggobi_data_get_col_min(d, rawsp->p1dvar);
-  rawsp->p1d.lim.max = ggobi_data_get_col_max(d, rawsp->p1dvar);
+  rawsp->p1d.lim.min = ggobi_variable_get_min(var);
+  rawsp->p1d.lim.max = ggobi_variable_get_max(var);
 
   // nothing else to be done
   if (sp->bar->nbins && nbins == sp->bar->nbins)
@@ -608,6 +609,7 @@ barchart_init_categorical (barchartSPlotd * sp, GGobiData * d)
   ggobid *gg = GGobiFromSPlot (rawsp);
   gfloat mindist, maxheight;
   gfloat min, max;
+  GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(d), jvar);
 
   gfloat *yy;
   yy = (gfloat *) g_malloc (d->nrows_in_plot * sizeof (gfloat));
@@ -617,7 +619,7 @@ barchart_init_categorical (barchartSPlotd * sp, GGobiData * d)
       i = d->rows_in_plot.els[m];
       yy[m] = rawsp->planar[i].x = 0;
       rawsp->planar[i].y = 0;
-      for (j=0; j<d->ncols; j++)
+      for (j=0; j<GGOBI_STAGE(d)->n_cols; j++)
       {
         yy[m] += (gfloat)(display->t1d.F.vals[0][j]*d->world.vals[i][j]);
       }
@@ -630,8 +632,8 @@ barchart_init_categorical (barchartSPlotd * sp, GGobiData * d)
   mindist = barchart_sort_index (yy, d->nrows_in_plot, gg, sp);
   g_free ((gpointer) yy);
 
-  min = ggobi_data_get_col_min(d, rawsp->p1dvar);
-  max = ggobi_data_get_col_max(d, rawsp->p1dvar);
+  min = ggobi_variable_get_min(var);
+  max = ggobi_variable_get_max(var);
 
   maxheight = max - min;
 
@@ -743,12 +745,13 @@ barchart_splot_add_plot_labels (splotd * sp, GdkDrawable * drawable,
     gtk_widget_create_pango_layout (GTK_WIDGET (sp->da), NULL);
   PangoRectangle rect;
   barchartSPlotd *bsp = GGOBI_BARCHART_SPLOT (sp);
+  GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(d), sp->p1dvar);
 
-  layout_text (layout, ggobi_data_get_col_name(d, sp->p1dvar), &rect);
+  layout_text (layout, ggobi_variable_get_name(var), &rect);
   gdk_draw_layout (drawable, gg->plot_GC, sp->max.x - rect.width - 5,
                    sp->max.y - rect.height - 5, layout);
   
-  if(ggobi_data_get_col_type(d, sp->p1dvar) != categorical) {
+  if(!GGOBI_VARIABLE_IS_CATEGORICAL(var)) {
     g_object_unref (G_OBJECT (layout));
     return;
   }
@@ -759,7 +762,7 @@ barchart_splot_add_plot_labels (splotd * sp, GdkDrawable * drawable,
     return;
 
   for (i = 0; i < bsp->bar->nbins; i++) {
-    gchar* name = ggobi_data_get_col_level_name(d, sp->p1dvar, bsp->bar->bins[i].value);
+    gchar* name = ggobi_variable_get_level_name(var, bsp->bar->bins[i].value);
     layout_text (layout, name, NULL);
     gdk_draw_layout (drawable, gg->plot_GC,
                      bsp->bar->bins[i].rect.x + 2,
@@ -797,10 +800,11 @@ void
 barchart_set_initials (barchartSPlotd * sp, GGobiData * d)
 {
   splotd *rawsp = GGOBI_SPLOT (sp);
-  gint i;
+  gint i, *values;
+  GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(d), rawsp->p1dvar);
 
   // if continuous, break up into nbins equal ranges
-  if (ggobi_data_get_col_type(d, rawsp->p1dvar) != categorical) {
+  if (!GGOBI_VARIABLE_IS_CATEGORICAL(var)) {
     gint i;
     gfloat rdiff = rawsp->p1d.lim.max - rawsp->p1d.lim.min;
 
@@ -812,9 +816,11 @@ barchart_set_initials (barchartSPlotd * sp, GGobiData * d)
   }
   
   // if categorical, use the level value
-  for (i = 0; i < ggobi_data_get_col_n_levels(d, rawsp->p1dvar); i++) {
-    sp->bar->bins[i].value = ggobi_data_get_col_level_value(d, rawsp->p1dvar, i);
+  values = ggobi_variable_get_level_values(var);
+  for (i = 0; i < ggobi_variable_get_n_levels(var); i++) {
+    sp->bar->bins[i].value = values[i];
   }
+  g_free(values);
   return;
 
 }
@@ -831,7 +837,7 @@ barchart_recalc_counts (barchartSPlotd * sp, GGobiData * d, ggobid * gg)
     barchart_init_categorical (sp, d);
   }
 
-  if (ggobi_data_get_col_type(d, rawsp->p1dvar) != categorical)
+  if (!GGOBI_STAGE_IS_COL_CATEGORICAL(GGOBI_STAGE(d), rawsp->p1dvar))
     rawsp->scale.y = 1 - (1 - SCALE_DEFAULT) / 2;
 
   for (i = 0; i < sp->bar->nbins; i++) {
@@ -841,13 +847,13 @@ barchart_recalc_counts (barchartSPlotd * sp, GGobiData * d, ggobid * gg)
 
   sp->bar->high_pts_missing = sp->bar->low_pts_missing = FALSE;
 
-  if (ggobi_data_get_col_type(d, rawsp->p1dvar) == categorical) {
+  if (GGOBI_STAGE_IS_COL_CATEGORICAL(GGOBI_STAGE(d), rawsp->p1dvar)) {
 
     for (i = 0; i < d->nrows_in_plot; i++) {
       m = d->rows_in_plot.els[i];
 
       /*-- skip missings?  --*/
-      if (!d->missings_show_p && ggobi_data_is_missing(d, m, rawsp->p1dvar))
+      if (!d->missings_show_p && ggobi_stage_is_missing(GGOBI_STAGE(d), m, rawsp->p1dvar))
         continue;
 
       bin = sp->bar->index_to_rank.els[i];
@@ -993,7 +999,7 @@ barchart_recalc_dimensions (splotd * rawsp, GGobiData * d, ggobid * gg)
     }
 
     sp->bar->bins[i].planar.x = -1;
-    if (ggobi_data_get_col_type(d, rawsp->p1dvar) == categorical) {
+    if (GGOBI_STAGE_IS_COL_CATEGORICAL(GGOBI_STAGE(d), rawsp->p1dvar)) {
       ftmp = -1.0 + 2.0 * ((greal) bin->value - rawsp->p1d.lim.min)
         / rdiff;
       bin->planar.y = (greal) (PRECISION1 * ftmp);
@@ -1067,7 +1073,7 @@ barchart_recalc_dimensions (splotd * rawsp, GGobiData * d, ggobid * gg)
 
     minwidth = MAX ((gint) (0.9 * minwidth), 0);
     for (i = 0; i < sp->bar->nbins; i++) {
-      if (ggobi_data_get_col_type(d, rawsp->p1dvar) != categorical)
+      if (!GGOBI_STAGE_IS_COL_CATEGORICAL(GGOBI_STAGE(d), rawsp->p1dvar))
         sp->bar->bins[i].rect.y -= sp->bar->bins[i].rect.height;
       else {
         sp->bar->bins[i].rect.height = minwidth;
@@ -1170,7 +1176,7 @@ barchart_active_paint_points (splotd * rawsp, GGobiData * d, ggobid * gg)
     m = d->rows_in_plot.els[i];
 
     /*-- skip missings?  --*/
-    if (!d->missings_show_p && ggobi_data_is_missing(d, m, rawsp->p1dvar))
+    if (!d->missings_show_p && ggobi_stage_is_missing(GGOBI_STAGE(d), m, rawsp->p1dvar))
       continue;
 
     if (ggobi_data_get_attr_hidden(d, m) &&
@@ -1182,7 +1188,7 @@ barchart_active_paint_points (splotd * rawsp, GGobiData * d, ggobid * gg)
     /*-- dfs -- this seems to assume that the values of planar begin at 0,
          which may not be true ... this change makes it work for categorical,
          but breaks it otherwise --*/
-    if (ggobi_data_get_col_type(d, rawsp->p1dvar) == categorical) {
+    if (GGOBI_STAGE_IS_COL_CATEGORICAL(GGOBI_STAGE(d), rawsp->p1dvar)) {
       indx = (gint) (rawsp->planar[m].x - rawsp->p1d.lim.min + 1);
     }
     else {
@@ -1313,7 +1319,7 @@ barchart_default_visual_cues_draw (splotd * rawsp, GdkDrawable * drawable,
   barchartSPlotd *sp = GGOBI_BARCHART_SPLOT (rawsp);
   GdkPoint btn[4];
 
-  if(ggobi_data_get_col_type(d, GGOBI_SPLOT(sp)->p1dvar) == categorical)
+  if(GGOBI_STAGE_IS_COL_CATEGORICAL(GGOBI_STAGE(d), GGOBI_SPLOT(sp)->p1dvar))
     return;
 
   /* Experiment: ontinue to draw small triangular buttons, but allow

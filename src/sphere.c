@@ -91,7 +91,7 @@ sphere_malloc (gint nc, GGobiData * d, ggobid * gg)
 gboolean
 spherize_set_pcvars (GGobiData * d, ggobid * gg)
 {
-  gint ncols_prev = d->ncols;
+  gint ncols_prev = GGOBI_STAGE(d)->n_cols;
   gint j, k;
   gchar *lbl;
   /*-- for newvar_add.. the variable notebooks --*/
@@ -117,11 +117,11 @@ spherize_set_pcvars (GGobiData * d, ggobid * gg)
     guint new = ggobi_data_add_cols(d, d->sphere.npcs);
     for (j = 0; j < d->sphere.npcs; j++) {
       vname = g_strdup_printf ("PC%d", j + 1);
-      ggobi_data_set_col_name(d, new+j, vname);
+      ggobi_stage_set_col_name(GGOBI_STAGE(d), new+j, vname);
       g_free (vname);
     }
 
-    for (j = ncols_prev, k = 0; j < d->ncols; j++) {
+    for (j = ncols_prev, k = 0; j < GGOBI_STAGE(d)->n_cols; j++) {
       d->sphere.pcvars.els[k++] = j;
     }
 
@@ -145,7 +145,7 @@ spherize_set_pcvars (GGobiData * d, ggobid * gg)
     /*-- try deleting them all and starting fresh? --*/
     if (delete_vars (d->sphere.pcvars.els, d->sphere.pcvars.nels, d)) {
 
-      ncols_prev = d->ncols;
+      ncols_prev = GGOBI_STAGE(d)->n_cols;
 
       vectori_realloc (&d->sphere.vars_sphered, d->sphere.vars.nels);
       vectori_copy (&d->sphere.vars, &d->sphere.vars_sphered);  /* from, to */
@@ -157,7 +157,7 @@ spherize_set_pcvars (GGobiData * d, ggobid * gg)
       clone_vars (d->sphere.vars.els, d->sphere.npcs, d);
 
 
-      for (j = ncols_prev, k = 0; j < d->ncols; j++)
+      for (j = ncols_prev, k = 0; j < GGOBI_STAGE(d)->n_cols; j++)
         d->sphere.pcvars.els[k++] = j;
 
     }
@@ -199,7 +199,7 @@ spherize_set_pcvars (GGobiData * d, ggobid * gg)
       j = d->sphere.pcvars.els[k];
       lbl = g_strdup_printf ("PC%d", (k + 1));
       
-      ggobi_data_set_col_name (d, j, lbl);
+      ggobi_stage_set_col_name(GGOBI_STAGE(d), j, lbl);
       g_free (lbl);
     }
 
@@ -208,7 +208,7 @@ spherize_set_pcvars (GGobiData * d, ggobid * gg)
     /*-- add the new labels to the 'sphered variables' tree view --*/
     for (j = 0; j < d->sphere.vars_sphered.nels; j++) {
       gtk_list_store_append (GTK_LIST_STORE (model), &iter);
-      gtk_list_store_set (GTK_LIST_STORE (model), &iter, 0, ggobi_data_get_col_name(d, d->sphere.vars_sphered.els[j]), -1);
+      gtk_list_store_set (GTK_LIST_STORE (model), &iter, 0, ggobi_stage_get_col_name(GGOBI_STAGE(d), d->sphere.vars_sphered.els[j]), -1);
     }
   }
 
@@ -302,7 +302,7 @@ spherevars_set (ggobid * gg)
     d = gg->current_display->d;
     if (d == NULL)
       return;
-    vars = (gint *) g_malloc (d->ncols * sizeof (gint));
+    vars = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof (gint));
     nvars = 0;  /*-- initially, no variables are selected --*/
   }
   else {
@@ -310,7 +310,7 @@ spherevars_set (ggobid * gg)
     if (tree_view == NULL)
       return;
     d = (GGobiData *) g_object_get_data (G_OBJECT (tree_view), "datad");
-    //vars = (gint *) g_malloc (d->ncols * sizeof(gint));
+    //vars = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof(gint));
     vars = get_selections_from_tree_view (tree_view, &nvars);
   }
 
@@ -391,12 +391,12 @@ sphere_varcovar_set (GGobiData * d, ggobid * gg)
   for (k = 0; k < d->sphere.vars.nels; k++) {
     var = d->sphere.vars.els[k];
 
-    g_assert (var < d->ncols);
+    g_assert (var < GGOBI_STAGE(d)->n_cols);
     g_assert (k < d->sphere.tform_mean.nels);
 
 /*
  * This may not be necessary:  isn't tform_mean already
- * stored in vartabled?  dfs ...  Yes, but Andreas thinks
+ * stored in GGobiVariable?  dfs ...  Yes, but Andreas thinks
  * maybe it shouldn't be.
 */
     tmpf = 0.;
@@ -560,7 +560,7 @@ spherize_data (vector_i * svars, vector_i * pcvars, GGobiData * d,
       b[j] = tmpf / eigenval[j];
     }
     for (j = 0; j < pcvars->nels; j++)
-      ggobi_data_set_raw_value(d, i, pcvars->els[j], b[j]);
+      ggobi_stage_set_raw_value(GGOBI_STAGE(d), i, pcvars->els[j], b[j]);
   }
 
   g_free (b);

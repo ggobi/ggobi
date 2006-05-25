@@ -68,9 +68,9 @@ scatmat_new (displayd * display,
 
   if (numRows == 0 || numCols == 0) {
 
-    scatmat_nvars = MIN (d->ncols, sessionOptions->info->numScatMatrixVars);
+    scatmat_nvars = MIN (GGOBI_STAGE(d)->n_cols, sessionOptions->info->numScatMatrixVars);
     if (scatmat_nvars < 0) {
-      scatmat_nvars = d->ncols;
+      scatmat_nvars = GGOBI_STAGE(d)->n_cols;
     }
 
     /* Initialize display with the plotted variables in the current
@@ -79,7 +79,7 @@ scatmat_new (displayd * display,
         gg->current_display->d == d &&
         GGOBI_IS_EXTENDED_DISPLAY (gg->current_display)) {
       gint k, nplotted_vars;
-      gint *plotted_vars = (gint *) g_malloc (d->ncols * sizeof (gint));
+      gint *plotted_vars = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof (gint));
       displayd *dsp = gg->current_display;
 
       nplotted_vars =
@@ -91,7 +91,7 @@ scatmat_new (displayd * display,
       for (j = 0; j < nplotted_vars; j++)
         rows[j] = cols[j] = plotted_vars[j];
       j = nplotted_vars;
-      for (k = 0; k < d->ncols; k++) {
+      for (k = 0; k < GGOBI_STAGE(d)->n_cols; k++) {
         if (!in_vector (k, plotted_vars, nplotted_vars)) {
           rows[j] = cols[j] = k;
           j++;
@@ -311,7 +311,7 @@ scatmat_varsel_simple (cpaneld * cpanel, splotd * sp, gint jvar,
       }
     }
 
-    vars = (gint *) g_malloc (d->ncols * sizeof (gint));
+    vars = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof (gint));
     nvars =
       GGOBI_EXTENDED_DISPLAY_GET_CLASS (display)->plotted_vars_get (display,
                                                                     vars, d,
@@ -331,7 +331,7 @@ scatmat_varsel_simple (cpaneld * cpanel, splotd * sp, gint jvar,
 
   else {                        /* Append a variable.  Don't change current_splot. */
 
-    vars = (gint *) g_malloc (d->ncols * sizeof (gint));
+    vars = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof (gint));
     nvars =
       GGOBI_EXTENDED_DISPLAY_GET_CLASS (display)->plotted_vars_get (display,
                                                                     vars, d,

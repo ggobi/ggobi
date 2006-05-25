@@ -59,7 +59,7 @@ static arcd       *filled_arcs;
 
 static void
 drawing_arrays_alloc (splotd *sp, GGobiData *d, ggobid *gg) {
-  gint n = d->nrows;
+  gint n = GGOBI_STAGE(d)->n_rows
 
   if (sp->win32.npoints == 0) {
     sp->win32.points = (GdkPoint *) g_malloc (n * sizeof (GdkPoint));
@@ -353,7 +353,7 @@ win32_draw_to_pixmap_unbinned (gint current_color, splotd *sp, gboolean draw_hid
 #endif
   npt = nseg = nr_open = nr_filled = nc_open = nc_filled = 0;
 
-  if (sp->win32.npoints < d->nrows)
+  if (sp->win32.npoints < GGOBI_STAGE(d)->n_rows
     drawing_arrays_alloc (sp, d, gg);
 
   for (i=0; i<d->nrows_in_plot; i++) {

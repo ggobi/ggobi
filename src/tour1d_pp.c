@@ -823,7 +823,7 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
       /*    case CART_VAR: 
       alloc_cartvariance_p (&cvp, nrows, gdata);
       dsp->t1d.ppval = t1d_calc_indx (d->tform, 
-        dsp->t1d.F, d->rows_in_plot.els, d->nrows, d->ncols, 
+        dsp->t1d.F, d->rows_in_plot.els, GGOBI_STAGE(d)->n_rows GGOBI_STAGE(d)->n_cols, 
         cartvariance, &cvp);
       if (basismeth == 1)
         kout = optimize0 (&dsp->t1d_pp_op, cartentropy, &cep);
@@ -832,7 +832,7 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
     case SUBD: 
       alloc_subd_p (&sp, nrows, pdim);
       dsp->t1d.ppval  = t1d_calc_indx (d->tform, dsp->t1d.F, 
-        d->rows_in_plot.els, d->nrows, d->ncols, subd, &sp);
+        d->rows_in_plot.els, GGOBI_STAGE(d)->n_rows GGOBI_STAGE(d)->n_cols, subd, &sp);
       if (basismeth == 1)
         kout  = optimize0 (&dsp->t1d_pp_op, subd, &sp);
       free_subd_p (&sp);

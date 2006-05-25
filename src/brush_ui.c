@@ -151,7 +151,7 @@ brush_reset (displayd * display, gint action)
     break;
 
   case RESET_UNSHADOW_POINTS: /*-- un-hide all points --*/
-    for (i = 0; i < d->nrows; i++)
+    for (i = 0; i < GGOBI_STAGE(d)->n_rows; i++)
       ggobi_data_set_attr_hidden(d, i, false, ATTR_SET_PERSISTENT);
 
       /*-- code borrowed from exclusion_ui.c, the 'show' routine --*/
@@ -374,18 +374,18 @@ button_release_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
     cluster_table_update (d, gg);
   }
 
-  g_signal_emit_by_name(d, "col_data_changed", ggobi_data_get_col_index_for_name(d, "_color"));
-  g_signal_emit_by_name(d, "col_data_changed", ggobi_data_get_col_index_for_name(d, "_color_now"));
-  g_signal_emit_by_name(d, "col_data_changed", ggobi_data_get_col_index_for_name(d, "_color_prev"));
-  g_signal_emit_by_name(d, "col_data_changed", ggobi_data_get_col_index_for_name(d, "_glyph_type"));
-  g_signal_emit_by_name(d, "col_data_changed", ggobi_data_get_col_index_for_name(d, "_glyph_type_now"));
-  g_signal_emit_by_name(d, "col_data_changed", ggobi_data_get_col_index_for_name(d, "_glyph_type_prev"));
-  g_signal_emit_by_name(d, "col_data_changed", ggobi_data_get_col_index_for_name(d, "_glyph_size"));
-  g_signal_emit_by_name(d, "col_data_changed", ggobi_data_get_col_index_for_name(d, "_glyph_size_now"));
-  g_signal_emit_by_name(d, "col_data_changed", ggobi_data_get_col_index_for_name(d, "_glyph_size_prev"));
-  g_signal_emit_by_name(d, "col_data_changed", ggobi_data_get_col_index_for_name(d, "_hidden"));
-  g_signal_emit_by_name(d, "col_data_changed", ggobi_data_get_col_index_for_name(d, "_hidden_now"));
-  g_signal_emit_by_name(d, "col_data_changed", ggobi_data_get_col_index_for_name(d, "_hidden_prev"));
+  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(GGOBI_STAGE(d), "_color"));
+  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(GGOBI_STAGE(d), "_color_now"));
+  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(GGOBI_STAGE(d), "_color_prev"));
+  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(GGOBI_STAGE(d), "_glyph_type"));
+  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(GGOBI_STAGE(d), "_glyph_type_now"));
+  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(GGOBI_STAGE(d), "_glyph_type_prev"));
+  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(GGOBI_STAGE(d), "_glyph_size"));
+  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(GGOBI_STAGE(d), "_glyph_size_now"));
+  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(GGOBI_STAGE(d), "_glyph_size_prev"));
+  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(GGOBI_STAGE(d), "_hidden"));
+  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(GGOBI_STAGE(d), "_hidden_now"));
+  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(GGOBI_STAGE(d), "_hidden_prev"));
 
 
   /*-- if we're only doing linked brushing on mouse up, do it now --*/

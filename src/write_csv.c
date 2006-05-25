@@ -5,7 +5,7 @@
 #include <gtk/gtk.h>
 #include "writedata.h"
 #include "vars.h"
-#include "vartable.h"
+#include "ggobi-variable.h"
 #include "externs.h"
 
 gboolean
@@ -18,7 +18,7 @@ write_csv_header (gint *cols, gint ncols, FILE *f, GGobiData *d, ggobid *gg)
   for (j=0; j<ncols; j++) {
     jcol = cols[j];
     rval = fprintf (f, "\"%s\"", 
-             g_strstrip((gg->save.stage == TFORMDATA) ? ggobi_data_get_transformed_col_name(d, jcol) : ggobi_data_get_col_name(d, jcol)));
+             g_strstrip((gg->save.stage == TFORMDATA) ? ggobi_data_get_transformed_col_name(d, jcol) : ggobi_stage_get_col_name(GGOBI_STAGE(d), jcol)));
     if (rval < 0) {
       ok = false;
       break;
@@ -34,10 +34,10 @@ write_csv_header (gint *cols, gint ncols, FILE *f, GGobiData *d, ggobid *gg)
 void
 write_csv_cell(gint i, gint j, FILE *f, GGobiData *d, ggobid *gg)
 {
-  gchar* value = ggobi_data_get_string_value(d, i, j, gg->save.stage == TFORMDATA);
+  gchar* value = ggobi_stage_get_string_value(GGOBI_STAGE(d), i, j, gg->save.stage == TFORMDATA);
 
-  switch (ggobi_data_get_col_type(d, j)) {
-  case categorical:
+  switch (ggobi_stage_get_col_type(GGOBI_STAGE(d), j)) {
+  case GGOBI_VARIABLE_CATEGORICAL:
     fprintf(f, "\"%s\"", value);
     break;
   default:
@@ -51,10 +51,10 @@ write_csv_record (gint i, gint *cols, gint ncols, FILE *f, GGobiData *d, ggobid 
   gboolean ok = true;
   gint j, jcol;
 
-  fprintf(f, "\"%s\",", ggobi_data_get_row_id(d, i));
+  fprintf(f, "\"%s\",", ggobi_stage_get_row_id(GGOBI_STAGE(d), i));
 
   /* Source and destination, as strings, if edges are present */
-  if (gg->save.edges_p && ggobi_data_has_edges(d)) {
+  if (gg->save.edges_p && ggobi_stage_get_n_edges(GGOBI_STAGE(d))) {
     fprintf(f, "\"%s\",", g_strstrip(d->edge.sym_endpoints->a));
     fprintf(f, "\"%s\",", g_strstrip(d->edge.sym_endpoints->b));
   }
@@ -64,7 +64,7 @@ write_csv_record (gint i, gint *cols, gint ncols, FILE *f, GGobiData *d, ggobid 
     jcol = cols[j];
   
     /*-- if missing, figure out what to write --*/
-    if (ggobi_data_is_missing(d, i, jcol) && gg->save.missing_ind != MISSINGSIMPUTED)
+    if (ggobi_stage_is_missing(GGOBI_STAGE(d), i, jcol) && gg->save.missing_ind != MISSINGSIMPUTED)
     {
       switch (gg->save.missing_ind) {
       case MISSINGSNA:
@@ -90,7 +90,7 @@ write_csv_records (gint *cols, gint ncols, FILE *f, GGobiData *d, ggobid *gg)
   gint i, m;
 
   if (gg->save.row_ind == ALLROWS) {
-    for (i = 0; i < d->nrows; i++) {
+    for (i = 0; i < GGOBI_STAGE(d)->n_rows; i++) {
       write_csv_record (i, cols, ncols, f, d, gg);
       fprintf(f, "\n");
     }
@@ -116,14 +116,14 @@ write_csv_file (FILE *f, GGobiData *d, ggobid *gg)
 
   ncols = 0;
   if (gg->save.column_ind == ALLCOLS) {
-    cols = (gint *) g_malloc (d->ncols * sizeof(gint));
-    for(j = 0; j < d->ncols; j++) {
+    cols = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof(gint));
+    for(j = 0; j < GGOBI_STAGE(d)->n_cols; j++) {
       cols[j] = j;
       ncols++;
     }
   } else { // gg->save.column_ind==SELECTEDCOLS
     /*-- work out which columns to save --*/
-    cols = (gint *) g_malloc (d->ncols * sizeof (gint));
+    cols = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof (gint));
     ncols = selected_cols_get (cols, d, gg);
     if (ncols == 0)  // backup source of column selection
       ncols = plotted_cols_get (cols, d, gg);

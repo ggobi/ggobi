@@ -22,7 +22,7 @@
 #include "vars.h"
 #include "externs.h"
 
-#include "vartable.h"
+#include "ggobi-variable.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -57,11 +57,11 @@ selected_cols_get (gint *cols, GGobiData *d, ggobid *gg)
  * Figure out which columns are selected.
 */
   gint j, ncols = 0;
-  vartabled *vt;
+  GGobiVariable *var;
 
-  for (j=0; j<d->ncols; j++) {
-    vt = ggobi_data_get_vartable(d, j);
-    if (vt->selected)
+  for (j=0; j<GGOBI_STAGE(d)->n_cols; j++) {
+    var = ggobi_stage_get_variable(GGOBI_STAGE(d), j);
+    if (var->selected)
       cols[ncols++] = j;
   }
 
@@ -86,111 +86,4 @@ plotted_cols_get (gint *cols, GGobiData *d, ggobid *gg)
   }
 
   return ncols;
-}
-
-
-/*-------------------------------------------------------------------------*/
-/*                         memory management                               */
-/*-------------------------------------------------------------------------*/
-
-vartabled *
-vartable_copy_var (vartabled *vt, vartabled *vt_to)
-{
-  vt_to->collab = g_strdup (vt->collab);
-  vt_to->collab_tform = g_strdup (vt->collab_tform);
-  vt_to->nickname = g_strdup (vt->nickname);
-
-  vt_to->vartype = vt->vartype;
-  vt_to->nlevels = vt->nlevels;
-  if (vt->nlevels && vt->vartype == categorical) {
-    vt_to->level_values = (gint*)
-      g_malloc(sizeof(gint) * vt->nlevels);
-    vt_to->level_counts = (gint*)
-      g_malloc(sizeof(gint) * vt->nlevels);
-    vt_to->level_names =  (gchar **)
-      g_malloc(sizeof(gchar *) * vt->nlevels);
-  } else {
-    vt_to->level_values = NULL;
-    vt_to->level_counts = NULL;
-    vt_to->level_names = NULL;
-  }
-  for (gint k=0; k<vt_to->nlevels; k++) {
-    vt_to->level_values[k] = vt->level_values[k];
-    vt_to->level_counts[k] = vt->level_counts[k];
-    vt_to->level_names[k] = g_strdup(vt->level_names[k]);
-  }
-
-  vt_to->mean = vt->mean;
-  vt_to->median = vt->median;
-  vt_to->lim.min =
-    vt_to->lim_raw.min =
-    vt_to->lim_tform.min = vt->lim_tform.min;
-  vt_to->lim.max =
-    vt_to->lim_raw.max =
-    vt_to->lim_tform.max = vt->lim_tform.max;
-
-  vt_to->lim_display.min = vt->lim_display.min;
-  vt_to->lim_display.max = vt->lim_display.max;
-
-  vt_to->lim_specified_p = vt->lim_specified_p;
-  
-  vt_to->tform0 = vt->tform0;
-  vt_to->tform1 = vt->tform1;
-  vt_to->tform2 = vt->tform2;
-  vt_to->domain_incr = vt->domain_incr;
-  vt_to->param = vt->param;
-  vt_to->domain_adj = vt->domain_adj;
-  vt_to->inv_domain_adj = vt->inv_domain_adj;
-  
-  return vt_to;
-}
-
-
-/*-------------------------------------------------------------------------*/
-
-vartabled *
-vartable_element_new (GGobiData *d) 
-{
-  vartabled *vt = (vartabled *) g_malloc (sizeof (vartabled));
-
-  if (d) 
-    vt->d = G_OBJECT(d);
-
-  vt->selected = false;
-
-  vt->vartype = real;  /*-- real-valued by default --*/
-  vt->nlevels = 0;
-
-  vt->mean = 0.0;
-  vt->median = 0.0;
-
-  vt->lim_specified_p = false;  /*-- no user-specified limits --*/
-  vt->lim_specified.min = 0.0;
-  vt->lim_specified.max = 0.0;
-  vt->lim_specified_tform.min = 0.0;
-  vt->lim_specified_tform.max = 0.0;
-
-  vt->lim_raw.min = 0.0;
-  vt->lim_raw.max = 0.0;
-  vt->lim_tform.min = 0.0;
-  vt->lim_tform.max = 0.0;
-
-  vt->tform0 = NO_TFORM0;
-  vt->domain_incr = 0.;
-  vt->domain_adj = no_change;
-  vt->inv_domain_adj = no_change;
-  vt->tform1 = NO_TFORM1;
-  vt->param = 0.;
-  vt->tform2 = NO_TFORM2;
-
-  vt->jitter_factor = 0.0;
-
-  vt->collab = NULL;
-  vt->collab_tform = NULL;
-  vt->nickname = NULL;
-
-  vt->name_to_level = g_hash_table_new(g_str_hash, g_str_equal);
-  vt->value_to_level = g_hash_table_new(NULL, NULL);
-  
-  return vt;
 }

@@ -21,9 +21,9 @@
 #include "vars.h"
 #include "externs.h"
 
-static void tf0_combo_box_set_value(vartabled *vt, gboolean, ggobid *gg);
-static void tf1_combo_box_set_value(vartabled *vt, gboolean, ggobid *gg);
-static void tf2_combo_box_set_value(vartabled *vt, gboolean, ggobid *gg);
+static void tf0_combo_box_set_value(GGobiVariable *var, gboolean, ggobid *gg);
+static void tf1_combo_box_set_value(GGobiVariable *var, gboolean, ggobid *gg);
+static void tf2_combo_box_set_value(GGobiVariable *var, gboolean, ggobid *gg);
 
 
 /*-- called when closed from the close button --*/
@@ -44,7 +44,7 @@ static void stage0_cb (GtkWidget *w, ggobid *gg)
   gint indx = gtk_combo_box_get_active (GTK_COMBO_BOX(w));
   GtkWidget *tree_view = get_tree_view_from_object (G_OBJECT(gg->tform_ui.window));
   GGobiData *d = (GGobiData *) g_object_get_data(G_OBJECT (tree_view), "datad");
-  gint *vars;// = (gint *) g_malloc (d->ncols * sizeof(gint));
+  gint *vars;// = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof(gint));
   gint nvars;
   
   vars = get_selections_from_tree_view (tree_view, &nvars);
@@ -68,7 +68,7 @@ stage1_cb (GtkWidget *w, ggobid *gg)
   gint indx = gtk_combo_box_get_active (GTK_COMBO_BOX(w));
   GtkWidget *tree_view = get_tree_view_from_object (G_OBJECT(gg->tform_ui.window));
   GGobiData *d = (GGobiData *) g_object_get_data(G_OBJECT (tree_view), "datad");
-  gint *vars;// = (gint *) g_malloc (d->ncols * sizeof(gint));
+  gint *vars;// = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof(gint));
   gint nvars;
 
   vars = get_selections_from_tree_view (tree_view, &nvars);
@@ -86,7 +86,7 @@ void boxcox_cb (GtkAdjustment *adj, ggobid *gg)
 {
   GtkWidget *tree_view = get_tree_view_from_object (G_OBJECT(gg->tform_ui.window));
   GGobiData *d = (GGobiData *) g_object_get_data(G_OBJECT (tree_view), "datad");
-  gint *vars; // = (gint *) g_malloc (d->ncols * sizeof(gint));
+  gint *vars; // = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof(gint));
   gint nvars;
   
   vars = get_selections_from_tree_view (tree_view, &nvars);
@@ -148,7 +148,7 @@ static void stage2_cb (GtkWidget *w, ggobid *gg)
 {
   GtkWidget *tree_view = get_tree_view_from_object (G_OBJECT(gg->tform_ui.window));
   GGobiData *d = (GGobiData *) g_object_get_data(G_OBJECT (tree_view), "datad");
-  gint *vars;// = (gint *) g_malloc (d->ncols * sizeof(gint));
+  gint *vars;// = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof(gint));
   gint nvars;
   gint indx = gtk_combo_box_get_active (GTK_COMBO_BOX(w));
 
@@ -166,7 +166,7 @@ static void tform_reset_cb (GtkWidget *w, ggobid *gg)
   GtkWidget *tree_view = get_tree_view_from_object (G_OBJECT(gg->tform_ui.window));
   GGobiData *d = (GGobiData *) g_object_get_data(G_OBJECT (tree_view), "datad");
 
-  for (j=0; j<d->ncols; j++) {
+  for (j=0; j<GGOBI_STAGE(d)->n_cols; j++) {
     transform0_values_set (NO_TFORM0, j, d, gg);
     transform1_values_set (NO_TFORM1, 1.0, j, d, gg);
     transform2_values_set (NO_TFORM2, j, d, gg);
@@ -187,7 +187,7 @@ tfvar_selection_made_cb (GtkTreeSelection *tree_sel, ggobid *gg)
   gint j, nvars, *rows;  // allocated in function
 
   /* Parameters of transformation */
-  vartabled *vt0, *vtnew;
+  GGobiVariable *var0, *varnew;
 
   if (!d)
     return;
@@ -196,9 +196,8 @@ tfvar_selection_made_cb (GtkTreeSelection *tree_sel, ggobid *gg)
   if (nvars < 0)
     return;
 
-  vtnew = vartable_element_new(NULL);
-  vt0 = ggobi_data_get_vartable(d, rows[0]);
-  vartable_copy_var(vt0, vtnew);
+  var0 = ggobi_stage_get_variable(GGOBI_STAGE(d), rows[0]);
+  varnew = ggobi_variable_clone(var0);
 
   /* If there's only one selected variable, we're ready to reset the
    * variable selection panel.  If there are more, we have to find out
@@ -213,19 +212,19 @@ tfvar_selection_made_cb (GtkTreeSelection *tree_sel, ggobid *gg)
     }
     /* If they aren't all the same, use the default values */
     if (!same) {
-      vtnew = vartable_element_new(NULL);
+      varnew = GGOBI_VARIABLE(ggobi_variable_new(GGOBI_STAGE(d)));
     }
   }
 
   /* This causes an endless loop, somehow -- resetting the widgets
    * calls transform() .. */
   /* Reset the widgets on the panel */
-  tf0_combo_box_set_value(vtnew, false/*don't transform*/, gg);
-  tf1_combo_box_set_value(vtnew, false, gg);
-  tf2_combo_box_set_value(vtnew, false, gg);
+  tf0_combo_box_set_value(varnew, false/*don't transform*/, gg);
+  tf1_combo_box_set_value(varnew, false, gg);
+  tf2_combo_box_set_value(varnew, false, gg);
 
   g_free(rows);
-  g_free (vtnew);
+  g_free (varnew);
 }
 
 void
@@ -259,7 +258,7 @@ transform_window_open (ggobid *gg)
 
     /* Create a notebook, set the position of the tabs */
     notebook = create_variable_notebook (vbox,
-      GTK_SELECTION_MULTIPLE, all_vartypes, all_datatypes,
+      GTK_SELECTION_MULTIPLE, GGOBI_VARIABLE_ALL_VARTYPES, all_datatypes,
       G_CALLBACK(tfvar_selection_made_cb), NULL, gg);
 
     /*
@@ -409,7 +408,7 @@ transform_window_open (ggobid *gg)
 */
 /*----------------------------------------------------------------*/
 static void
-tf0_combo_box_set_value (vartabled *vt, gboolean force, ggobid *gg)
+tf0_combo_box_set_value (GGobiVariable *var, gboolean force, ggobid *gg)
 {
   GtkWidget *cbox;
   GCallback func = G_CALLBACK(stage0_cb);
@@ -421,7 +420,7 @@ tf0_combo_box_set_value (vartabled *vt, gboolean force, ggobid *gg)
       n = g_signal_handlers_block_by_func(G_OBJECT(cbox), func, gg);
     }
     // Set the combo box selection
-    gtk_combo_box_set_active (GTK_COMBO_BOX (cbox), vt->tform0);
+    gtk_combo_box_set_active (GTK_COMBO_BOX (cbox), var->tform0);
     if (!force) { // restore callback
       n = g_signal_handlers_unblock_by_func(G_OBJECT(cbox), func, gg);
     }
@@ -430,13 +429,13 @@ tf0_combo_box_set_value (vartabled *vt, gboolean force, ggobid *gg)
 void
 transform0_combo_box_set_value (gint j, gboolean force, GGobiData *d, ggobid *gg)
 {
-  vartabled *vt = ggobi_data_get_vartable(d, j);
-  if (vt != NULL)
-    tf0_combo_box_set_value(vt, force, gg);
+  GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(d), j);
+  if (var != NULL)
+    tf0_combo_box_set_value(var, force, gg);
 }
 /*-------------------------------------------------------------------*/
 static void
-tf1_combo_box_set_value(vartabled *vt, gboolean force, ggobid *gg)
+tf1_combo_box_set_value(GGobiVariable *var, gboolean force, ggobid *gg)
 {
   gint n = 0;
   GtkWidget *cbox;
@@ -448,7 +447,7 @@ tf1_combo_box_set_value(vartabled *vt, gboolean force, ggobid *gg)
       n = g_signal_handlers_block_by_func(G_OBJECT(cbox), func, gg);
     }
     // Set the combo box selection
-    gtk_combo_box_set_active (GTK_COMBO_BOX (cbox), vt->tform1);
+    gtk_combo_box_set_active (GTK_COMBO_BOX (cbox), var->tform1);
     if (!force) { // restore callback
       n = g_signal_handlers_unblock_by_func(G_OBJECT(cbox), func, gg);
     }
@@ -457,13 +456,13 @@ tf1_combo_box_set_value(vartabled *vt, gboolean force, ggobid *gg)
 void
 transform1_combo_box_set_value (gint j, gboolean force, GGobiData *d, ggobid *gg)
 {
-  vartabled *vt = ggobi_data_get_vartable(d, j);
-  if (vt != NULL)
-    tf1_combo_box_set_value(vt, force, gg);
+  GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(d), j);
+  if (var != NULL)
+    tf1_combo_box_set_value(var, force, gg);
 }
 /*-------------------------------------------------------------------*/
 static void
-tf2_combo_box_set_value(vartabled *vt, gboolean force, ggobid *gg)
+tf2_combo_box_set_value(GGobiVariable *var, gboolean force, ggobid *gg)
 {
   gint n;
   GtkWidget *cbox;
@@ -475,7 +474,7 @@ tf2_combo_box_set_value(vartabled *vt, gboolean force, ggobid *gg)
       n = g_signal_handlers_block_by_func(G_OBJECT(cbox), func, gg);
     }
     // Set the combo box selection
-    gtk_combo_box_set_active (GTK_COMBO_BOX (cbox), vt->tform2);
+    gtk_combo_box_set_active (GTK_COMBO_BOX (cbox), var->tform2);
     if (!force) { // restore callback
       n = g_signal_handlers_unblock_by_func(G_OBJECT(cbox), func, gg);
     }
@@ -483,7 +482,7 @@ tf2_combo_box_set_value(vartabled *vt, gboolean force, ggobid *gg)
 void
 transform2_combo_box_set_value (gint j, gboolean force, GGobiData *d, ggobid *gg)
 {
-  vartabled *vt = ggobi_data_get_vartable(d, j);
-  if (vt != NULL)
-    tf2_combo_box_set_value(vt, force, gg);
+  GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(d), j);
+  if (var != NULL)
+    tf2_combo_box_set_value(var, force, gg);
 }

@@ -30,7 +30,7 @@ timeSeriesDisplayCreate(gboolean missing_p, splotd *sp, GGobiData *d, ggobid *gg
   gint *selected_vars, nselected_vars = 0;
   displayd *dpy = NULL;
 
-  selected_vars = (gint *) g_malloc (d->ncols * sizeof (gint));
+  selected_vars = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof (gint));
   nselected_vars = selected_cols_get (selected_vars, d, gg);
 
   dpy = tsplot_new (dpy, false, nselected_vars, selected_vars, d, gg);
@@ -93,7 +93,7 @@ tsplotVarpanelRefresh(displayd *display, splotd *sp, GGobiData *d)
   gint j;
   GList *l;
 
-  for (j=0; j<d->ncols; j++) {
+  for (j=0; j<GGOBI_STAGE(d)->n_cols; j++) {
      varpanel_toggle_set_active (VARSEL_X, j, false, d);
      varpanel_toggle_set_active (VARSEL_Y, j, false, d);
      varpanel_widget_set_visible (VARSEL_Y, j, true, d);
@@ -341,7 +341,7 @@ tsplotKeyEventHandled(GtkWidget *w, displayd *display, splotd *sp, GdkEventKey *
 gchar *
 tsplot_tree_label(splotd *sp, GGobiData *d, ggobid *gg)
 {
-  return(ggobi_data_get_col_name(d, sp->xyvars.y));
+  return(ggobi_stage_get_col_name(GGOBI_STAGE(d), sp->xyvars.y));
 }
 
 /*************************************************/

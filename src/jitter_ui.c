@@ -32,7 +32,7 @@ jitter_cb (GtkButton * w, ggobid * gg)
     get_tree_view_from_object (G_OBJECT (gg->jitter_ui.window));
   GGobiData *d =
     (GGobiData *) g_object_get_data (G_OBJECT (tree_view), "datad");
-  gint *vars;                   // = (gint *) g_malloc (d->ncols * sizeof(gint));
+  gint *vars;                   // = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof(gint));
   gint nvars;
 
   vars = get_selections_from_tree_view (tree_view, &nvars);
@@ -53,7 +53,7 @@ degree_cb (GtkAdjustment * adj, ggobid * gg)
     get_tree_view_from_object (G_OBJECT (gg->jitter_ui.window));
   GGobiData *d =
     (GGobiData *) g_object_get_data (G_OBJECT (tree_view), "datad");
-  gint *vars;                   // = (gint *) g_malloc (d->ncols * sizeof(gint));
+  gint *vars;                   // = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof(gint));
   gint nvars;
 
   vars = get_selections_from_tree_view (tree_view, &nvars);
@@ -89,7 +89,7 @@ type_cb (GtkWidget * w, ggobid * gg)
     get_tree_view_from_object (G_OBJECT (gg->jitter_ui.window));
   GGobiData *d =
     (GGobiData *) g_object_get_data (G_OBJECT (tree_view), "datad");
-  gint *vars;                   // = (gint *) g_malloc (d->ncols * sizeof(gint));
+  gint *vars;                   // = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof(gint));
   gint nvars;
 
   vars = get_selections_from_tree_view (tree_view, &nvars);
@@ -143,7 +143,7 @@ jitter_window_open (ggobid * gg)
       /* Create a notebook, set the position of the tabs */
       notebook = create_variable_notebook (vbox,
                                            GTK_SELECTION_MULTIPLE,
-                                           all_vartypes, all_datatypes,
+                                           GGOBI_VARIABLE_ALL_VARTYPES, all_datatypes,
                                            G_CALLBACK (NULL), NULL, gg);
 
       /*-- option menu --*/

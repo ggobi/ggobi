@@ -60,7 +60,7 @@ varcircles_visibility_set (displayd * display, ggobid * gg)
   switch (projection) {
 
   case TOUR2D3:
-    for (j = 0; j < d->ncols; j++) {
+    for (j = 0; j < GGOBI_STAGE(d)->n_cols; j++) {
       box = varcircles_get_nth (VB, j, d);
       /* if in the subset but not among the children, pack and unref */
       if (display->t2d3.subset_vars_p.els[j]) {
@@ -86,7 +86,7 @@ varcircles_visibility_set (displayd * display, ggobid * gg)
     break;
 
   case TOUR1D:
-    for (j = 0; j < d->ncols; j++) {
+    for (j = 0; j < GGOBI_STAGE(d)->n_cols; j++) {
       box = varcircles_get_nth (VB, j, d);
       if (display->t1d.subset_vars_p.els[j]) {  /* in the subset */
         if (g_list_index (children, box) == -1) { /* but not among children */
@@ -110,7 +110,7 @@ varcircles_visibility_set (displayd * display, ggobid * gg)
     break;
 
   case TOUR2D:
-    for (j = 0; j < d->ncols; j++) {
+    for (j = 0; j < GGOBI_STAGE(d)->n_cols; j++) {
       box = varcircles_get_nth (VB, j, d);
       /* if in the subset but not among the children, pack and unref */
       if (display->t2d.subset_vars_p.els[j]) {
@@ -136,7 +136,7 @@ varcircles_visibility_set (displayd * display, ggobid * gg)
     break;
 
   case COTOUR:
-    for (j = 0; j < d->ncols; j++) {
+    for (j = 0; j < GGOBI_STAGE(d)->n_cols; j++) {
       box = varcircles_get_nth (VB, j, d);
       /* if in either subset but not among the children, pack and unref */
       if (display->tcorr1.subset_vars_p.els[j] ||
@@ -189,10 +189,11 @@ varcircles_get_nth (gint which, gint jvar, GGobiData * d)
 }
 
 void
-varcircles_delete_nth (GGobiData * d, gint jvar)
+varcircles_delete_nth (GGobiStage * s, guint jvar)
 {
   GtkWidget *w;
   GdkPixmap *pix;
+  GGobiData *d = GGOBI_DATA(s);
 
   w = varcircles_get_nth (LBL, jvar, d);
   d->vcirc_ui.label = g_slist_remove (d->vcirc_ui.label, (gpointer) w);
@@ -215,8 +216,9 @@ varcircles_delete_nth (GGobiData * d, gint jvar)
 
 
 void
-varcircle_label_set (GGobiData * d, gint j)
+varcircle_label_set (GGobiStage * s, gint j)
 {
+  GGobiData *d = GGOBI_DATA(s);
   GtkWidget *w = varcircles_get_nth (LBL, j, d);
   if (w != NULL)
     gtk_label_set_text (GTK_LABEL (w), ggobi_data_get_transformed_col_name(d, j));
@@ -413,7 +415,7 @@ varcircles_populate (GGobiData * d, ggobid * gg)
   d->vcirc_ui.label = NULL;
   d->vcirc_ui.da_pix = NULL;
 
-  for (j = 0; j < d->ncols; j++) {
+  for (j = 0; j < GGOBI_STAGE(d)->n_cols; j++) {
     vb = varcircle_create (j, d, gg);
     varcircle_pack (vb, d);
   }
@@ -445,7 +447,7 @@ varcircles_populate (GGobiData * d, ggobid * gg)
                     "button_press_event", G_CALLBACK (manip_select_cb), d);
   gtk_widget_show (d->vcirc_ui.manip_btn);
 
-  ggobi_data_connect__col_deleted(d, varcircles_delete_nth, NULL);
+  ggobi_stage_connect__col_deleted(GGOBI_STAGE(d), varcircles_delete_nth, NULL);
   
 #ifdef FREEZE_IMPLEMENTED
   /* -- a drawing area to place next to the freeze button as a color key -- */
@@ -478,7 +480,7 @@ varcircles_delete (gint nc, gint jvar, GGobiData * d, ggobid * gg)
   GtkWidget *w;
   GdkPixmap *pix;
 
-  if (nc > 0 && nc < d->ncols) {  /*-- forbid deleting every circle --*/
+  if (nc > 0 && nc < GGOBI_STAGE(d)->n_cols) {  /*-- forbid deleting every circle --*/
     for (j = jvar; j < jvar + nc; j++) {
       w = varcircles_get_nth (LBL, j, d);
       d->vcirc_ui.label = g_slist_remove (d->vcirc_ui.label, w);
@@ -602,7 +604,7 @@ varcircle_create (gint j, GGobiData * d, ggobid * gg)
   gtk_box_pack_start (GTK_BOX (vb), da, false, false, 0);
 
   /*-- label --*/
-  lbl = gtk_label_new (ggobi_data_get_col_name(d, j));
+  lbl = gtk_label_new (ggobi_stage_get_col_name(GGOBI_STAGE(d), j));
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, .5);  /*- x: left, y: middle --*/
   d->vcirc_ui.label = g_slist_append (d->vcirc_ui.label, lbl);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
@@ -629,7 +631,7 @@ varcircles_refresh (GGobiData * d, ggobid * gg)
   gint j;
   GtkWidget *da;
 
-  for (j = 0; j < d->ncols; j++) {
+  for (j = 0; j < GGOBI_STAGE(d)->n_cols; j++) {
     da = varcircles_get_nth (DA, j, d);
     if (GTK_WIDGET_REALIZED (da) && GTK_WIDGET_VISIBLE (da))
       varcircle_draw (j, d, gg);
@@ -651,7 +653,7 @@ varcircle_draw (gint jvar, GGobiData * d, ggobid * gg)
   double radius = VAR_CIRCLE_DIAM / 2.0;
 #endif
 
-  if (sp == NULL || jvar < 0 || jvar >= d->ncols)
+  if (sp == NULL || jvar < 0 || jvar >= GGOBI_STAGE(d)->n_cols)
     return;  /*-- return --*/
 
   display = (displayd *) sp->displayptr;
@@ -664,8 +666,8 @@ varcircle_draw (gint jvar, GGobiData * d, ggobid * gg)
   if (gg->selvarfg_GC == NULL)
     init_var_GCs (da, gg);
 
-  if ((len = g_slist_length (d->vcirc_ui.da_pix)) < d->ncols) {
-    for (k = len; k < d->ncols; k++) {
+  if ((len = g_slist_length (d->vcirc_ui.da_pix)) < GGOBI_STAGE(d)->n_cols) {
+    for (k = len; k < GGOBI_STAGE(d)->n_cols; k++) {
       d->vcirc_ui.da_pix = g_slist_append (d->vcirc_ui.da_pix,
                                            gdk_pixmap_new (da->window,
                                                            VAR_CIRCLE_DIAM +
@@ -760,7 +762,7 @@ tour_draw_circles (GGobiData * d, ggobid * gg)
 {
   gint j;
 
-  for (j = 0; j < d->ncols; j++) {
+  for (j = 0; j < GGOBI_STAGE(d)->n_cols; j++) {
     varcircle_draw (j, d, gg);
   }
 }
@@ -774,7 +776,7 @@ da_expose_cb (GtkWidget * w, GdkEventExpose * event, gpointer cbd)
   GtkWidget *da = varcircles_get_nth (DA, j, d);
   GdkPixmap *da_pix = g_slist_nth_data (d->vcirc_ui.da_pix, j);
 
-  if (j >= d->ncols)
+  if (j >= GGOBI_STAGE(d)->n_cols)
     return false;
 
   if (da_pix == NULL) {

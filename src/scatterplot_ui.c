@@ -90,7 +90,7 @@ scatterplot_display_edge_menu_update (displayd * display,
   endpointsd *endpoints;
   for (k = 0; k < nd; k++) {
     e = (GGobiData *) g_slist_nth_data (gg->d, k);
-    if (ggobi_data_has_edges(e)) {
+    if (ggobi_stage_get_n_edges(GGOBI_STAGE(e))) {
       endpoints = resolveEdgePoints (e, d);
       if (endpoints != NULL) {
         ne++;
@@ -146,16 +146,16 @@ scatterplot_display_edge_menu_update (displayd * display,
 
     for (k = 0; k < nd; k++) {
       e = (GGobiData *) g_slist_nth_data (gg->d, k);
-      if (ggobi_data_has_edges(e)) {
+      if (ggobi_stage_get_n_edges(GGOBI_STAGE(e))) {
         gchar *lbl, *path, *name;
         if (resolveEdgePoints (e, d) != NULL) {
           if (ne == 1) {
-            lbl = g_strdup_printf ("Attach edge set (%s)", e->name);
+            lbl = g_strdup_printf ("Attach edge set (%s)", ggobi_stage_get_name(GGOBI_STAGE(e)));
             path = "/menubar/Edges";
             name = g_strdup ("edges");
           }
           else {
-            lbl = ggobi_data_get_name (e);
+            lbl = ggobi_stage_get_name(GGOBI_STAGE(e));
             path = "/menubar/Edges/Edgesets";
             name = g_strdup_printf ("edgeset_%p", e);
           }

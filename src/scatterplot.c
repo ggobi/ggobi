@@ -260,7 +260,7 @@ createScatterplot (displayd * display, gboolean missing_p, splotd * sp,
   GtkWidget *table, *vbox;
   ProjectionMode projection;
 
-  if (d == NULL || d->ncols < 1)
+  if (d == NULL || GGOBI_STAGE(d)->n_cols < 1)
     return (NULL);
 
   if (!display) {
@@ -279,7 +279,7 @@ createScatterplot (displayd * display, gboolean missing_p, splotd * sp,
      display->options.axes_center_p = true;
    */
 
-  projection = (d->ncols >= 2) ? XYPLOT : P1PLOT;
+  projection = (GGOBI_STAGE(d)->n_cols >= 2) ? XYPLOT : P1PLOT;
   scatterplot_cpanel_init (&display->cpanel, projection, DEFAULT_IMODE, gg);
 
   vbox = GTK_WIDGET (display);  /* gtk_vbox_new (false, 1); */
@@ -330,7 +330,7 @@ createScatterplot (displayd * display, gboolean missing_p, splotd * sp,
           gg->current_display->d == d &&
           GGOBI_IS_EXTENDED_DISPLAY (gg->current_display)) {
         gint nplotted_vars;
-        gint *plotted_vars = (gint *) g_malloc (d->ncols * sizeof (gint));
+        gint *plotted_vars = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof (gint));
         displayd *dsp = gg->current_display;
 
         nplotted_vars =
@@ -368,19 +368,19 @@ createScatterplot (displayd * display, gboolean missing_p, splotd * sp,
   {
 /*XX seems like only scatterplot gets in here. (i.e. not scatmat) */
     display_tour1d_init_null (display, gg);
-    if (d->ncols >= MIN_NVARS_FOR_TOUR1D)
+    if (GGOBI_STAGE(d)->n_cols >= MIN_NVARS_FOR_TOUR1D)
       display_tour1d_init (display, gg);
 
     display_tour2d3_init_null (display, gg);
-    if (d->ncols >= MIN_NVARS_FOR_TOUR2D3)
+    if (GGOBI_STAGE(d)->n_cols >= MIN_NVARS_FOR_TOUR2D3)
       display_tour2d3_init (display, gg);
 
     display_tour2d_init_null (display, gg);
-    if (d->ncols >= MIN_NVARS_FOR_TOUR2D)
+    if (GGOBI_STAGE(d)->n_cols >= MIN_NVARS_FOR_TOUR2D)
       display_tour2d_init (display, gg);
 
     display_tourcorr_init_null (display, gg);
-    if (d->ncols >= MIN_NVARS_FOR_COTOUR)
+    if (GGOBI_STAGE(d)->n_cols >= MIN_NVARS_FOR_COTOUR)
       display_tourcorr_init (display, gg);
   }
 

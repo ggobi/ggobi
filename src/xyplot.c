@@ -30,11 +30,11 @@ xyplot_activate (gint state, displayd *display, ggobid *gg)
 
     for (slist = display->splots; slist; slist = slist->next) {
       sp = (splotd *) slist->data;
-      if (sp->xyvars.x >= d->ncols) {
+      if (sp->xyvars.x >= GGOBI_STAGE(d)->n_cols) {
         reset = true;
         sp->xyvars.x = (sp->xyvars.y == 0) ? 1 : 0;
       }
-      if (sp->xyvars.y >= d->ncols) {
+      if (sp->xyvars.y >= GGOBI_STAGE(d)->n_cols) {
         reset = true;
         sp->xyvars.y = (sp->xyvars.x == 0) ? 1 : 0;
       }
@@ -122,7 +122,7 @@ cycle_fixedx (splotd *sp, displayd *display, GGobiData *d, ggobid *gg)
     if (varno == sp->xyvars.x)
        varno++;
 
-    if (varno == d->ncols) {
+    if (varno == GGOBI_STAGE(d)->n_cols) {
       varno = 0;
       if (varno == sp->xyvars.x)
          varno++;
@@ -134,7 +134,7 @@ cycle_fixedx (splotd *sp, displayd *display, GGobiData *d, ggobid *gg)
        varno--;
 
     if (varno < 0) {
-      varno = d->ncols-1;
+      varno = GGOBI_STAGE(d)->n_cols-1;
       if (varno == sp->xyvars.x)
          varno--;
     }
@@ -161,7 +161,7 @@ cycle_fixedy (splotd *sp, displayd *display, GGobiData *d, ggobid *gg)
     if (varno == sp->xyvars.y)
        varno++;
 
-    if (varno == d->ncols) {
+    if (varno == GGOBI_STAGE(d)->n_cols) {
       varno = 0;
       if (varno == sp->xyvars.y)
         varno++;
@@ -173,7 +173,7 @@ cycle_fixedy (splotd *sp, displayd *display, GGobiData *d, ggobid *gg)
        varno--;
 
     if (varno < 0) {
-      varno = d->ncols-1;
+      varno = GGOBI_STAGE(d)->n_cols-1;
       if (varno == sp->xyvars.y)
         varno--;
     }
@@ -211,14 +211,14 @@ cycle_xy (splotd *sp, displayd *display, GGobiData *d, ggobid *gg)
   if (cpanel->xyplot.cycle_dir == 1) {
 
     /* case 1: x is maxed out. */
-    if ((jx == d->ncols-1) || (jx == d->ncols-2 && jy == d->ncols-1) ) {
+    if ((jx == GGOBI_STAGE(d)->n_cols-1) || (jx == GGOBI_STAGE(d)->n_cols-2 && jy == GGOBI_STAGE(d)->n_cols-1) ) {
       jx = 0;
       jy = jx+1;
     /* 2: this can occur due to variable selection, but not due to cycling */
     } else if (jy < jx) {
       jy = jx+1;
     /* y is maxed out, but not x */
-    } else if (jy == d->ncols-1) {
+    } else if (jy == GGOBI_STAGE(d)->n_cols-1) {
       jx++;
       jy = 0;
     } else jy++;
@@ -228,14 +228,14 @@ cycle_xy (splotd *sp, displayd *display, GGobiData *d, ggobid *gg)
     /* case 1: y is at a minimum, or x and y together are at a minimum */
     if ( jy == jx+1 ) {
       if (jx == 0) {
-        jx = d->ncols - 2;
+        jx = GGOBI_STAGE(d)->n_cols - 2;
       } else {
         jx--;
       }
-      jy = d->ncols - 1;
+      jy = GGOBI_STAGE(d)->n_cols - 1;
     /* 2: this can occur due to variable selection, but not due to cycling */
     } else if (jy < jx) {
-      jy = d->ncols-1;
+      jy = GGOBI_STAGE(d)->n_cols-1;
     /* 3: just decrement y */
     } else jy--;
   }

@@ -336,14 +336,14 @@ splot_points_realloc (gint nrows_prev, splotd *sp, GGobiData *d)
 {
   gint i;
 
-  vectorf_realloc (&sp->p1d.spread_data, d->nrows);
+  vectorf_realloc (&sp->p1d.spread_data, GGOBI_STAGE(d)->n_rows);
 
   sp->planar = (gcoords *) g_realloc (sp->planar,
-    d->nrows * sizeof (gcoords));
+    GGOBI_STAGE(d)->n_rows* sizeof (gcoords));
   sp->screen = (icoords *) g_realloc (sp->screen,
-    d->nrows * sizeof (icoords));
+    GGOBI_STAGE(d)->n_rows* sizeof (icoords));
 
-  for (i=nrows_prev; i<d->nrows; i++) {
+  for (i=nrows_prev; i<GGOBI_STAGE(d)->n_rows; i++) {
     sp->planar[i].x = sp->planar[i].y = 0.0;
     sp->screen[i].x = sp->screen[i].y = 0;
   }
@@ -376,7 +376,7 @@ splot_alloc (splotd *sp, displayd *display, ggobid *gg)
   if(!display)
     return;
   d = display->d;
-  nr = d->nrows;
+  nr = GGOBI_STAGE(d)->n_rows;
   sp->planar = (gcoords *) g_malloc (nr * sizeof (gcoords));
   sp->screen = (icoords *) g_malloc (nr * sizeof (icoords));
   vectorf_init_null (&sp->p1d.spread_data);
@@ -533,7 +533,7 @@ splot_world_to_plane (cpaneld *cpanel, splotd *sp, ggobid *gg)
  * This may be the place to respond to the possibility that a
  * plotted variable has just been deleted.  It's no big deal for
  * the scatterplot -- unless one of the plotted variables is now
- * beyond d->ncols.
+ * beyond GGOBI_STAGE(d)->n_cols.
 */
 
   if(GGOBI_IS_EXTENDED_SPLOT(sp)) {

@@ -128,16 +128,16 @@ gboolean
 transform_values_compare (gint jfrom, gint jto, GGobiData *d)
 {
   gboolean same = true;
-  vartabled *vtf = ggobi_data_get_vartable(d, jfrom);
-  vartabled *vtt = ggobi_data_get_vartable(d, jto);
+  GGobiVariable *varf = ggobi_stage_get_variable(GGOBI_STAGE(d), jfrom);
+  GGobiVariable *vart = ggobi_stage_get_variable(GGOBI_STAGE(d), jto);
 
   same = (
-    vtt->tform1 == vtf->tform1 &&
-    vtt->tform2 == vtf->tform2 &&
-    vtt->domain_incr == vtf->domain_incr &&
-    vtt->param == vtf->param &&
-    vtt->domain_adj == vtf->domain_adj &&
-    vtt->inv_domain_adj == vtf->inv_domain_adj);
+    vart->tform1 == varf->tform1 &&
+    vart->tform2 == varf->tform2 &&
+    vart->domain_incr == varf->domain_incr &&
+    vart->param == varf->param &&
+    vart->domain_adj == varf->domain_adj &&
+    vart->inv_domain_adj == varf->inv_domain_adj);
 
   return same;
 }
@@ -148,7 +148,7 @@ transform0_values_set (gint tform0, gint j, GGobiData *d, ggobid *gg)
   gfloat domain_incr;
   gfloat (*domain_adj) (gfloat x, gfloat incr) = no_change;
   gfloat (*inv_domain_adj) (gfloat x, gfloat incr) = no_change;
-  vartabled *vt = ggobi_data_get_vartable(d, j);
+  GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(d), j);
 
   switch (tform0) {
 
@@ -159,13 +159,13 @@ transform0_values_set (gint tform0, gint j, GGobiData *d, ggobid *gg)
     break;
 
     case RAISE_MIN_TO_0:
-      domain_incr = vt->lim_raw.min;
+      domain_incr = var->lim_raw.min;
       domain_adj = raise_min_to_0;
       inv_domain_adj = inv_raise_min_to_0;
     break;
 
     case RAISE_MIN_TO_1:
-      domain_incr = vt->lim_raw.min;
+      domain_incr = var->lim_raw.min;
       domain_adj = raise_min_to_1;
       inv_domain_adj = inv_raise_min_to_1;
     break;
@@ -182,10 +182,10 @@ transform0_values_set (gint tform0, gint j, GGobiData *d, ggobid *gg)
       inv_domain_adj = no_change;
   }
 
-  vt->tform0 = tform0;
-  vt->domain_incr = domain_incr;
-  vt->domain_adj = domain_adj;
-  vt->inv_domain_adj = inv_domain_adj;
+  var->tform0 = tform0;
+  var->domain_incr = domain_incr;
+  var->domain_adj = domain_adj;
+  var->inv_domain_adj = inv_domain_adj;
 
   /*-- set explicitly in case the routine is not called from the ui --*/
   transform0_combo_box_set_value (j, false/*transform*/, d, gg);
@@ -195,10 +195,10 @@ void
 transform1_values_set (gint tform1, gfloat expt, gint j, 
   GGobiData *d, ggobid *gg)
 {
-  vartabled *vt = ggobi_data_get_vartable(d, j);
+  GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(d), j);
 
-  vt->tform1 = tform1;
-  vt->param = expt;
+  var->tform1 = tform1;
+  var->param = expt;
 
   /*-- set explicitly in case the routine is not called from the ui --*/
   transform1_combo_box_set_value (j, false, d, gg);
@@ -216,9 +216,9 @@ transform1_apply (gint j, GGobiData *d, ggobid *gg)
   GtkWidget *stage1_cbox;
   gint tform1;
   gfloat boxcoxparam = gg->tform_ui.boxcox_adj->value;
-  vartabled *vt = ggobi_data_get_vartable(d, j);
-  gfloat incr = vt->domain_incr;
-  gfloat (*domain_adj) (gfloat x, gfloat incr) = vt->domain_adj;
+  GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(d), j);
+  gfloat incr = var->domain_incr;
+  gfloat (*domain_adj) (gfloat x, gfloat incr) = var->domain_adj;
 
   stage1_cbox = widget_find_by_name (gg->tform_ui.window,
     "TFORM:stage1_options");
@@ -229,9 +229,9 @@ transform1_apply (gint j, GGobiData *d, ggobid *gg)
   tform1 = gtk_combo_box_get_active (GTK_COMBO_BOX (stage1_cbox));
 
   /*-- adjust the transformed value of the user-supplied limits --*/
-  if (vt->lim_specified_p) {
-    slim.min = vt->lim_specified.min;
-    slim.max = vt->lim_specified.max;
+  if (var->lim_specified_p) {
+    slim.min = var->lim_specified.min;
+    slim.max = var->lim_specified.max;
   }
 
   switch (tform1)
@@ -242,7 +242,7 @@ transform1_apply (gint j, GGobiData *d, ggobid *gg)
         d->tform.vals[m][j] = (*domain_adj)(d->raw.vals[m][j], incr);
       }
       /*-- apply the same transformation to the specified limits --*/
-      if (vt->lim_specified_p) {
+      if (var->lim_specified_p) {
         slim_tform.min = (*domain_adj)(slim.min, incr);
         slim_tform.max = (*domain_adj)(slim.max, incr);
       }
@@ -262,7 +262,7 @@ transform1_apply (gint j, GGobiData *d, ggobid *gg)
           }
         }
         /*-- apply the same domain test to the specified limits --*/
-        if (tform_ok && vt->lim_specified_p) {
+        if (tform_ok && var->lim_specified_p) {
           if (((*domain_adj)(slim_tform.min, incr) <= 0) ||
               ((*domain_adj)(slim_tform.max, incr) <= 0))
           {
@@ -279,7 +279,7 @@ transform1_apply (gint j, GGobiData *d, ggobid *gg)
           }
 
           /*-- apply the same transformation to the specified limits --*/
-          if (vt->lim_specified_p) {
+          if (var->lim_specified_p) {
             slim_tform.min = (gfloat)
               log ((gdouble) ((*domain_adj)(slim.min, incr)));
             slim_tform.max = (gfloat)
@@ -312,7 +312,7 @@ transform1_apply (gint j, GGobiData *d, ggobid *gg)
         }
 
         /*-- apply the same transformation to the specified limits --*/
-        if (tform_ok && vt->lim_specified_p) {
+        if (tform_ok && var->lim_specified_p) {
           dtmp = pow ((gdouble) (*domain_adj)(slim.min, incr), boxcoxparam);
           if (isfinite (dtmp)) {
             quick_message (ldomain_error_message, false);
@@ -339,7 +339,7 @@ transform1_apply (gint j, GGobiData *d, ggobid *gg)
         }
       }
       /*-- apply the same domain test to the specified limits --*/
-      if (tform_ok && vt->lim_specified_p) {
+      if (tform_ok && var->lim_specified_p) {
         if (((*domain_adj)(slim_tform.min, incr) <= 0) ||
             ((*domain_adj)(slim_tform.max, incr) <= 0))
         {
@@ -355,7 +355,7 @@ transform1_apply (gint j, GGobiData *d, ggobid *gg)
             log10 ((gdouble) (*domain_adj)(d->raw.vals[m][j], incr));
         }
         /*-- apply the same transformation to the specified limits --*/
-        if (vt->lim_specified_p) {
+        if (var->lim_specified_p) {
           slim_tform.min = (gfloat)
             log10 ((gdouble) (*domain_adj)(slim.min, incr));
           slim_tform.max = (gfloat)
@@ -377,7 +377,7 @@ transform1_apply (gint j, GGobiData *d, ggobid *gg)
         }
       }
       /*-- apply the same domain test to the specified limits --*/
-      if (tform_ok && vt->lim_specified_p) {
+      if (tform_ok && var->lim_specified_p) {
         if (SIGNUM((*domain_adj)(slim_tform.min, incr)) !=
             SIGNUM((*domain_adj)(slim_tform.max, incr)))
         {
@@ -395,7 +395,7 @@ transform1_apply (gint j, GGobiData *d, ggobid *gg)
         }
 
         /*-- apply the same transformation to the specified limits --*/
-        if (vt->lim_specified_p) {
+        if (var->lim_specified_p) {
           slim_tform.min = (gfloat)
             pow ((gdouble) (*domain_adj)(slim.min, incr), (gdouble) (-1.0));
           slim_tform.max = (gfloat)
@@ -411,7 +411,7 @@ transform1_apply (gint j, GGobiData *d, ggobid *gg)
         d->tform.vals[m][j] = (ftmp >= 0 ? ftmp : -1 * ftmp);
       }
       /*-- apply the same transformation to the specified limits --*/
-      if (vt->lim_specified_p) {
+      if (var->lim_specified_p) {
         ftmp = (*domain_adj)(slim.min, incr);
         slim_tform.min = (ftmp >= 0 ? ftmp : -1 * ftmp);
 
@@ -437,7 +437,7 @@ transform1_apply (gint j, GGobiData *d, ggobid *gg)
       gfloat ftmp;
 
       /*-- Either use user-defined limits, or data min and max --*/
-      if (vt->lim_specified_p) {
+      if (var->lim_specified_p) {
         min = slim_tform.min;
         max = slim_tform.max;
       } else {
@@ -465,9 +465,9 @@ transform1_apply (gint j, GGobiData *d, ggobid *gg)
     break;
   }
 
-  if (tform_ok && vt->lim_specified_p) {
-    vt->lim_specified_tform.min = slim_tform.min;
-    vt->lim_specified_tform.max = slim_tform.max;
+  if (tform_ok && var->lim_specified_p) {
+    var->lim_specified_tform.min = slim_tform.min;
+    var->lim_specified_tform.max = slim_tform.max;
   }
 
   return (tform_ok);
@@ -476,9 +476,9 @@ transform1_apply (gint j, GGobiData *d, ggobid *gg)
 void
 transform2_values_set (gint tform2, gint j, GGobiData *d, ggobid *gg)
 {
-  vartabled *vt = ggobi_data_get_vartable(d, j);
+  GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(d), j);
 
-  vt->tform2 = tform2;
+  var->tform2 = tform2;
 
   /*-- set explicitly in case the routine is not called from the ui --*/
   transform2_combo_box_set_value (j, true, d, gg);

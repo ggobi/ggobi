@@ -64,7 +64,7 @@ void
 alloc_tour2d3 (displayd *dsp, ggobid *gg)
 {
   GGobiData *d = dsp->d;
-  gint nc = d->ncols;
+  gint nc = GGOBI_STAGE(d)->n_cols;
 
   /* first index is the projection dimensions, second dimension is ncols */
   arrayd_alloc(&dsp->t2d3.Fa, 2, nc);
@@ -164,7 +164,7 @@ display_tour2d3_init (displayd *dsp, ggobid *gg) {
   gint i, j;
   GGobiData *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
-  gint nc = d->ncols;
+  gint nc = GGOBI_STAGE(d)->n_cols;
 
   if (nc < MIN_NVARS_FOR_TOUR2D3)
     return;
@@ -284,7 +284,7 @@ tour2d3_subset_var_set (gint jvar, gint *jprev, gint toggle, GGobiData *d,
    unlike other tour modes --*/
   if (changed) {
     dsp->t2d3_manipvar_inc = false;
-    for (j=0; j<d->ncols; j++) {
+    for (j=0; j<GGOBI_STAGE(d)->n_cols; j++) {
       dsp->t2d3.subset_vars_p.els[j] = false;
     }
     for (j=0; j<3; j++) {
@@ -337,7 +337,7 @@ tour2d3_active_vars_swap (gint jvar_out, gint jvar_in, GGobiData *d,
   }
 
   gt_basis(dsp->t2d3.Fa, dsp->t2d3.nactive, dsp->t2d3.active_vars, 
-    d->ncols, (gint) 2);
+    GGOBI_STAGE(d)->n_cols, (gint) 2);
   arrayd_copy(&dsp->t2d3.Fa, &dsp->t2d3.F);
 
   zero_tau(dsp->t2d3.tau, 2);
@@ -413,7 +413,7 @@ tour2d3_projdata(splotd *sp, greal **world_data, GGobiData *d, ggobid *gg)
     i = d->rows_in_plot.els[m];
     sp->planar[i].x = 0;
     sp->planar[i].y = 0;
-    for (j=0; j<d->ncols; j++)
+    for (j=0; j<GGOBI_STAGE(d)->n_cols; j++)
     {
       sp->planar[i].x += (greal)(dsp->t2d3.F.vals[0][j]*world_data[i][j]);
       sp->planar[i].y += (greal)(dsp->t2d3.F.vals[1][j]*world_data[i][j]);
@@ -444,7 +444,7 @@ void tour2d3_scramble(ggobid *gg)
   arrayd_zero (&dsp->t2d3.Gz);
 
   gt_basis(dsp->t2d3.Fa, dsp->t2d3.nactive, dsp->t2d3.active_vars, 
-    d->ncols, (gint) 2);
+    GGOBI_STAGE(d)->n_cols, (gint) 2);
   arrayd_copy(&dsp->t2d3.Fa, &dsp->t2d3.F);
 
   dsp->t2d3.tau.els[0] = 0.0;
@@ -473,7 +473,7 @@ tour2d3_run(displayd *dsp, ggobid *gg)
     increment_tour(dsp->t2d3.tinc, dsp->t2d3.tau, dsp->t2d3.dist_az, 
       dsp->t2d3.delta, &dsp->t2d3.tang, (gint) 2);
     tour_reproject(dsp->t2d3.tinc, dsp->t2d3.G, dsp->t2d3.Ga, dsp->t2d3.Gz, 
-      dsp->t2d3.F, dsp->t2d3.Va, d->ncols, (gint) 2);
+      dsp->t2d3.F, dsp->t2d3.Va, GGOBI_STAGE(d)->n_cols, (gint) 2);
 
   }
   else { /* do final clean-up and get new target */
@@ -482,11 +482,11 @@ tour2d3_run(displayd *dsp, ggobid *gg)
         dsp->t2d3.dist_az, (gint) 2);
       tour_reproject(dsp->t2d3.tinc, dsp->t2d3.G, dsp->t2d3.Ga,
         dsp->t2d3.Gz,
-        dsp->t2d3.F, dsp->t2d3.Va, d->ncols, (gint) 2);
+        dsp->t2d3.F, dsp->t2d3.Va, GGOBI_STAGE(d)->n_cols, (gint) 2);
     }
 
     nv = 0;
-    for (i=0; i<d->ncols; i++) {
+    for (i=0; i<GGOBI_STAGE(d)->n_cols; i++) {
       chosen = false;
       for (k=0; k<dsp->t2d3.nactive; k++) {
         if (dsp->t2d3.active_vars.els[k] == i) {
@@ -514,9 +514,9 @@ tour2d3_run(displayd *dsp, ggobid *gg)
       dsp->t2d3.get_new_target = true;
     else {
       gt_basis(dsp->t2d3.Fz, dsp->t2d3.nactive, dsp->t2d3.active_vars, 
-        d->ncols, (gint) 2);
+        GGOBI_STAGE(d)->n_cols, (gint) 2);
 
-      pathprob = tour_path(dsp->t2d3.Fa, dsp->t2d3.Fz, dsp->t2d3.F, d->ncols, 
+      pathprob = tour_path(dsp->t2d3.Fa, dsp->t2d3.Fz, dsp->t2d3.F, GGOBI_STAGE(d)->n_cols, 
         (gint) 2, dsp->t2d3.Ga,
         dsp->t2d3.Gz, dsp->t2d3.G, dsp->t2d3.lambda, dsp->t2d3.tv, dsp->t2d3.Va,
         dsp->t2d3.Vz, dsp->t2d3.tau, dsp->t2d3.tinc, 
@@ -525,7 +525,7 @@ tour2d3_run(displayd *dsp, ggobid *gg)
         dsp->t2d3.get_new_target = false;
       else if (pathprob == 1) { /* problems with Fa so need to force a jump */
         tour2d3_scramble(gg);
-        pathprob = tour_path(dsp->t2d3.Fa, dsp->t2d3.Fz, dsp->t2d3.F, d->ncols, 
+        pathprob = tour_path(dsp->t2d3.Fa, dsp->t2d3.Fz, dsp->t2d3.F, GGOBI_STAGE(d)->n_cols, 
           (gint) 2, dsp->t2d3.Ga,
           dsp->t2d3.Gz, dsp->t2d3.G, dsp->t2d3.lambda, dsp->t2d3.tv,
           dsp->t2d3.Va,
@@ -628,17 +628,17 @@ tour2d3_manip_init(gint p1, gint p2, splotd *sp)
 
   /* If de-selected variables are still fading out of the tour
      we will need to take them out before starting manipulation */
-  for (j=0; j<d->ncols; j++)
+  for (j=0; j<GGOBI_STAGE(d)->n_cols; j++)
     if (dsp->t2d3.active_vars_p.els[j] == false) {
        if (dsp->t2d3.F.vals[0][j] > 0.0) 
          dsp->t2d3.F.vals[0][j] = 0.0;
        if (dsp->t2d3.F.vals[1][j] > 0.0)
          dsp->t2d3.F.vals[1][j] = 0.0;
     }
-  norm(dsp->t2d3.F.vals[0],d->ncols);
-  norm(dsp->t2d3.F.vals[1],d->ncols);
+  norm(dsp->t2d3.F.vals[0],GGOBI_STAGE(d)->n_cols);
+  norm(dsp->t2d3.F.vals[1],GGOBI_STAGE(d)->n_cols);
   if (!gram_schmidt(dsp->t2d3.F.vals[0], dsp->t2d3.F.vals[1],
-    d->ncols))
+    GGOBI_STAGE(d)->n_cols))
 #ifdef EXCEPTION_HANDLING
     g_printerr("");/*t2d3.F[0] equivalent to t2d3.F[1]\n");*/
 #else
@@ -672,7 +672,7 @@ tour2d3_manip_init(gint p1, gint p2, splotd *sp)
     /* make manip basis, from existing projection */
     /* 0,1 will be the remainder of the projection, and
        2 will be the indicator vector for the manip var */
-    for (j=0; j<d->ncols; j++) 
+    for (j=0; j<GGOBI_STAGE(d)->n_cols; j++) 
     {
       dsp->t2d3_manbasis.vals[0][j] = dsp->t2d3.F.vals[0][j];
       dsp->t2d3_manbasis.vals[1][j] = dsp->t2d3.F.vals[1][j];
@@ -686,36 +686,36 @@ tour2d3_manip_init(gint p1, gint p2, splotd *sp)
       dsp->t2d3_mvar_3dbasis.vals[j][j] = 1.;
     }
 
-    norm(dsp->t2d3_manbasis.vals[0], d->ncols); /* this is just in case */
-    norm(dsp->t2d3_manbasis.vals[1], d->ncols); /* it seems to work ok */
-    norm(dsp->t2d3_manbasis.vals[2], d->ncols); /* without normalizing here */
+    norm(dsp->t2d3_manbasis.vals[0], GGOBI_STAGE(d)->n_cols); /* this is just in case */
+    norm(dsp->t2d3_manbasis.vals[1], GGOBI_STAGE(d)->n_cols); /* it seems to work ok */
+    norm(dsp->t2d3_manbasis.vals[2], GGOBI_STAGE(d)->n_cols); /* without normalizing here */
 
     /* Check if column 3 (2) of manbasis is effectively equal to 
        column 1 (0) or 2(1). If they are then we'll have to randomly
        generate a new column 3. If not then we orthonormalize column 3
        on the other two. */
     while (!gram_schmidt(dsp->t2d3_manbasis.vals[0], 
-           dsp->t2d3_manbasis.vals[2], d->ncols))
+           dsp->t2d3_manbasis.vals[2], GGOBI_STAGE(d)->n_cols))
     {
       gt_basis(dsp->t2d3.tv, dsp->t2d3.nactive, dsp->t2d3.active_vars, 
-        d->ncols, (gint) 1);
-      for (j=0; j<d->ncols; j++) 
+        GGOBI_STAGE(d)->n_cols, (gint) 1);
+      for (j=0; j<GGOBI_STAGE(d)->n_cols; j++) 
         dsp->t2d3_manbasis.vals[2][j] = dsp->t2d3.tv.vals[0][j];
     }
     while (!gram_schmidt(dsp->t2d3_manbasis.vals[1], 
-           dsp->t2d3_manbasis.vals[2], d->ncols))
+           dsp->t2d3_manbasis.vals[2], GGOBI_STAGE(d)->n_cols))
     {
       gt_basis(dsp->t2d3.tv, dsp->t2d3.nactive, dsp->t2d3.active_vars, 
-        d->ncols, (gint) 1);
-      for (j=0; j<d->ncols; j++) 
+        GGOBI_STAGE(d)->n_cols, (gint) 1);
+      for (j=0; j<GGOBI_STAGE(d)->n_cols; j++) 
         dsp->t2d3_manbasis.vals[2][j] = dsp->t2d3.tv.vals[0][j];
     }
     while (!gram_schmidt(dsp->t2d3_manbasis.vals[0],
-           dsp->t2d3_manbasis.vals[1], d->ncols))
+           dsp->t2d3_manbasis.vals[1], GGOBI_STAGE(d)->n_cols))
     {
       gt_basis(dsp->t2d3.tv, dsp->t2d3.nactive, dsp->t2d3.active_vars, 
-        d->ncols, (gint) 1);
-      for (j=0; j<d->ncols; j++) 
+        GGOBI_STAGE(d)->n_cols, (gint) 1);
+      for (j=0; j<GGOBI_STAGE(d)->n_cols; j++) 
         dsp->t2d3_manbasis.vals[1][j] = dsp->t2d3.tv.vals[0][j];
     }
 
@@ -724,32 +724,32 @@ tour2d3_manip_init(gint p1, gint p2, splotd *sp)
        orthonormal and a new vector 1 was generated, it checks the o.n.
        of all 3 vectors again. */
     gram_schmidt(dsp->t2d3_manbasis.vals[0],  dsp->t2d3_manbasis.vals[1],
-      d->ncols);
+      GGOBI_STAGE(d)->n_cols);
     gram_schmidt(dsp->t2d3_manbasis.vals[0],  dsp->t2d3_manbasis.vals[2],
-      d->ncols);
+      GGOBI_STAGE(d)->n_cols);
     gram_schmidt(dsp->t2d3_manbasis.vals[1],  dsp->t2d3_manbasis.vals[2],
-      d->ncols);
+      GGOBI_STAGE(d)->n_cols);
 
     /*    ftmp = 0.0;
     while (ftmp < tol) {
     if ((fabs(inner_prod(dsp->t2d3_manbasis.vals[0],dsp->t2d3_manbasis.vals[2],
-       d->ncols))>1.0-tol) || 
+       GGOBI_STAGE(d)->n_cols))>1.0-tol) || 
        (fabs(inner_prod(dsp->t2d3_manbasis.vals[1],
-       dsp->t2d3_manbasis.vals[2],d->ncols))>1.0-tol))
+       dsp->t2d3_manbasis.vals[2],GGOBI_STAGE(d)->n_cols))>1.0-tol))
     {
       gt_basis(dsp->t2d3.tv, dsp->t2d3.nactive, dsp->t2d3.active_vars, 
-        d->ncols, (gint) 1);
-      for (j=0; j<d->ncols; j++) 
+        GGOBI_STAGE(d)->n_cols, (gint) 1);
+      for (j=0; j<GGOBI_STAGE(d)->n_cols; j++) 
         dsp->t2d3_manbasis.vals[2][j] = dsp->t2d3.tv.vals[0][j];
       g_printerr("0 manbasis2: ");
         for (i=0; i<3; i++)
           g_printerr("%f ",dsp->t2d3_manbasis.vals[2][i]);
       g_printerr("\n");
       if (!gram_schmidt(dsp->t2d3_manbasis.vals[0],  dsp->t2d3_manbasis.vals[2],
-        d->ncols)) 
+        GGOBI_STAGE(d)->n_cols)) 
         g_printerr("t2d3_manbasis[0] equivalent to t2d3_manbasis[2]\n");
       if (!gram_schmidt(dsp->t2d3_manbasis.vals[1],  dsp->t2d3_manbasis.vals[2],
-        d->ncols))
+        GGOBI_STAGE(d)->n_cols))
         g_printerr("t2d3_manbasis[1] equivalent to t2d3_manbasis[2]\n");
 
         g_printerr("1 manbasis0: ");
@@ -764,36 +764,36 @@ tour2d3_manip_init(gint p1, gint p2, splotd *sp)
         for (i=0; i<3; i++)
           g_printerr("%f ",dsp->t2d3_manbasis.vals[2][i]);
         g_printerr("\n");
-      ftmp = calc_norm (dsp->t2d3_manbasis.vals[2], d->ncols);
+      ftmp = calc_norm (dsp->t2d3_manbasis.vals[2], GGOBI_STAGE(d)->n_cols);
     }
     else if (fabs(inner_prod(dsp->t2d3_manbasis.vals[0],
-      dsp->t2d3_manbasis.vals[1],d->ncols))>1.0-tol) 
+      dsp->t2d3_manbasis.vals[1],GGOBI_STAGE(d)->n_cols))>1.0-tol) 
     {
       printf("1 = 0\n");
       gt_basis(dsp->t2d3.tv, dsp->t2d3.nactive, dsp->t2d3.active_vars, 
-        d->ncols, (gint) 1);
-      for (j=0; j<d->ncols; j++) 
+        GGOBI_STAGE(d)->n_cols, (gint) 1);
+      for (j=0; j<GGOBI_STAGE(d)->n_cols; j++) 
         dsp->t2d3_manbasis.vals[1][j] = dsp->t2d3.tv.vals[0][j];
       if (!gram_schmidt(dsp->t2d3_manbasis.vals[0],  dsp->t2d3_manbasis.vals[1],
-		   d->ncols))
+		   GGOBI_STAGE(d)->n_cols))
         g_printerr("t2d3_manbasis[0] equivalent to t2d3_manbasis[1]\n"); * this might not be necessary *
       if (!gram_schmidt(dsp->t2d3_manbasis.vals[0],  dsp->t2d3_manbasis.vals[2],
-        d->ncols))
+        GGOBI_STAGE(d)->n_cols))
         g_printerr("t2d3_manbasis[0] equivalent to t2d3_manbasis[2]\n");
       if (!gram_schmidt(dsp->t2d3_manbasis.vals[1],  dsp->t2d3_manbasis.vals[2],
-        d->ncols))
+        GGOBI_STAGE(d)->n_cols))
         g_printerr("t2d3_manbasis[1] equivalent to t2d3_manbasis[2]\n");
-      ftmp = calc_norm (dsp->t2d3_manbasis.vals[1], d->ncols);
+      ftmp = calc_norm (dsp->t2d3_manbasis.vals[1], GGOBI_STAGE(d)->n_cols);
     }      
     else {
       printf("ok\n");
       if (!gram_schmidt(dsp->t2d3_manbasis.vals[0],  dsp->t2d3_manbasis.vals[2],
-        d->ncols))
+        GGOBI_STAGE(d)->n_cols))
         g_printerr("t2d3_manbasis[0] equivalent to t2d3_manbasis[2]\n");
       if (!gram_schmidt(dsp->t2d3_manbasis.vals[1],  dsp->t2d3_manbasis.vals[2],
-        d->ncols))
+        GGOBI_STAGE(d)->n_cols))
         g_printerr("t2d3_manbasis[1] equivalent to t2d3_manbasis[2]\n");
-      ftmp = calc_norm (dsp->t2d3_manbasis.vals[2], d->ncols);
+      ftmp = calc_norm (dsp->t2d3_manbasis.vals[2], GGOBI_STAGE(d)->n_cols);
     }
     }*/
 
@@ -1008,7 +1008,7 @@ tour2d3_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
 
       /* Generate the projection of the data corresponding to 
          the 3D rotation in the manip space. */
-      for (j=0; j<d->ncols; j++)
+      for (j=0; j<GGOBI_STAGE(d)->n_cols; j++)
       {
         dsp->t2d3.F.vals[0][j] = 
           dsp->t2d3_manbasis.vals[0][j]*dsp->t2d3_mvar_3dbasis.vals[0][0] +
@@ -1019,9 +1019,9 @@ tour2d3_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
           dsp->t2d3_manbasis.vals[1][j]*dsp->t2d3_mvar_3dbasis.vals[1][1] +
           dsp->t2d3_manbasis.vals[2][j]*dsp->t2d3_mvar_3dbasis.vals[1][2];
       }
-      norm(dsp->t2d3.F.vals[0], d->ncols);
-      norm(dsp->t2d3.F.vals[1], d->ncols);
-      /*      if (calc_norm(dsp->t2d3.F.vals[0], d->ncols)>1.01) {
+      norm(dsp->t2d3.F.vals[0], GGOBI_STAGE(d)->n_cols);
+      norm(dsp->t2d3.F.vals[1], GGOBI_STAGE(d)->n_cols);
+      /*      if (calc_norm(dsp->t2d3.F.vals[0], GGOBI_STAGE(d)->n_cols)>1.01) {
 	g_printerr("1 F0 out of bounds\n");
         g_printerr("F0: ");
         for (i=0; i<3; i++)
@@ -1057,18 +1057,18 @@ tour2d3_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
         g_printerr("\n");
         g_printerr("distx %f disty %f\n",distx,disty);
       }
-      if (calc_norm(dsp->t2d3.F.vals[1], d->ncols)>1.01) 
+      if (calc_norm(dsp->t2d3.F.vals[1], GGOBI_STAGE(d)->n_cols)>1.01) 
       g_printerr("1 F1 out of bounds\n");*/
-      if (!gram_schmidt(dsp->t2d3.F.vals[0], dsp->t2d3.F.vals[1], d->ncols))
+      if (!gram_schmidt(dsp->t2d3.F.vals[0], dsp->t2d3.F.vals[1], GGOBI_STAGE(d)->n_cols))
 #ifdef EXCEPTION_HANDLING
         g_printerr("");/*t2d3.F[0] equivalent to t2d3.F[2]\n");*/
 #else
         ;
 #endif
 
-      /*      if (calc_norm(dsp->t2d3.F.vals[0], d->ncols)>1.0) 
+      /*      if (calc_norm(dsp->t2d3.F.vals[0], GGOBI_STAGE(d)->n_cols)>1.0) 
 	g_printerr("F0 out of bounds\n");
-      if (calc_norm(dsp->t2d3.F.vals[1], d->ncols)>1.0) 
+      if (calc_norm(dsp->t2d3.F.vals[1], GGOBI_STAGE(d)->n_cols)>1.0) 
 	g_printerr("F1 out of bounds\n");
       */
     }

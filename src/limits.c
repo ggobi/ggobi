@@ -58,22 +58,22 @@ limits_adjust (gfloat * min, gfloat * max)
  * Specify the limits used: from data or user specification
  */
 void
-limits_set_from_vartable (vartabled * vt)
+limits_set_from_vartable (GGobiVariable * var)
 {
   gfloat min, max;
 
-  if (vt->lim_specified_p) {
-    min = vt->lim_specified_tform.min;
-    max = vt->lim_specified_tform.max;
+  if (var->lim_specified_p) {
+    min = var->lim_specified_tform.min;
+    max = var->lim_specified_tform.max;
   }
   else {
-    min = vt->lim_tform.min;
-    max = vt->lim_tform.max;
+    min = var->lim_tform.min;
+    max = var->lim_tform.max;
   }
 
   limits_adjust (&min, &max);
-  vt->lim.min = min;
-  vt->lim.max = max;
+  var->lim.min = min;
+  var->lim.max = max;
 }
 
 /*
@@ -84,7 +84,7 @@ limits_raw_set_by_var (GGobiData * d, gint j, gboolean visible_only)
 {
 
   gint i, m;
-  vartabled *vt = ggobi_data_get_vartable(d, j);
+  GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(d), j);
   greal min, max;
 
   min = G_MAXFLOAT;
@@ -93,7 +93,7 @@ limits_raw_set_by_var (GGobiData * d, gint j, gboolean visible_only)
   if (visible_only) {  /*-- if using visible cases only --*/
     for (m = 0; m < d->nrows_in_plot; m++) {
       i = d->rows_in_plot.els[m];
-      if (!d->missings_show_p && ggobi_data_is_missing(d, i,j));
+      if (!d->missings_show_p && ggobi_stage_is_missing(GGOBI_STAGE(d), i,j));
       else {
         if (d->raw.vals[i][j] < min)
           min = d->raw.vals[i][j];
@@ -103,8 +103,8 @@ limits_raw_set_by_var (GGobiData * d, gint j, gboolean visible_only)
     }
   }
   else {
-    for (i = 0; i < d->nrows; i++) {
-      if (!d->missings_show_p && ggobi_data_is_missing(d, i,j));
+    for (i = 0; i < GGOBI_STAGE(d)->n_rows; i++) {
+      if (!d->missings_show_p && ggobi_stage_is_missing(GGOBI_STAGE(d), i,j));
       else {
         if (d->raw.vals[i][j] < min)
           min = d->raw.vals[i][j];
@@ -114,8 +114,8 @@ limits_raw_set_by_var (GGobiData * d, gint j, gboolean visible_only)
     }
   }
 
-  vt->lim_raw.min = min;
-  vt->lim_raw.max = max;
+  var->lim_raw.min = min;
+  var->lim_raw.max = max;
 }
 
 /*
@@ -126,7 +126,7 @@ limits_raw_set (GGobiData * d, gboolean visible_only)
 {
   gint j;
 
-  for (j = 0; j < d->ncols; j++)
+  for (j = 0; j < GGOBI_STAGE(d)->n_cols; j++)
     limits_raw_set_by_var (d, j, visible_only);
 }
 
@@ -137,7 +137,7 @@ static void
 limits_tform_set_by_var (GGobiData * d, gint j, gboolean visible_only)
 {
   gint i, m;
-  vartabled *vt = ggobi_data_get_vartable(d, j);
+  GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(d), j);
   greal min, max;
 
   min = G_MAXFLOAT;
@@ -146,7 +146,7 @@ limits_tform_set_by_var (GGobiData * d, gint j, gboolean visible_only)
   if (visible_only) {
     for (m = 0; m < d->nrows_in_plot; m++) {
       i = d->rows_in_plot.els[m];
-      if (!d->missings_show_p && ggobi_data_is_missing(d, i, j));
+      if (!d->missings_show_p && ggobi_stage_is_missing(GGOBI_STAGE(d), i, j));
       else {
         if (d->tform.vals[i][j] < min)
           min = d->tform.vals[i][j];
@@ -156,8 +156,8 @@ limits_tform_set_by_var (GGobiData * d, gint j, gboolean visible_only)
     }
   }
   else {
-    for (i = 0; i < d->nrows; i++) {
-      if (!d->missings_show_p && ggobi_data_is_missing(d, i, j));
+    for (i = 0; i < GGOBI_STAGE(d)->n_rows; i++) {
+      if (!d->missings_show_p && ggobi_stage_is_missing(GGOBI_STAGE(d), i, j));
       else {
         if (d->tform.vals[i][j] < min)
           min = d->tform.vals[i][j];
@@ -166,8 +166,8 @@ limits_tform_set_by_var (GGobiData * d, gint j, gboolean visible_only)
       }
     }
   }
-  vt->lim_tform.min = min;
-  vt->lim_tform.max = max;
+  var->lim_tform.min = min;
+  var->lim_tform.max = max;
 }
 
 void
@@ -175,8 +175,8 @@ limits_display_set_by_var (GGobiData * d, gint j, gboolean visible_only)
 {
   gint i, m, np = 0;
   gfloat sum = 0.0;
-  gfloat *x = (gfloat *) g_malloc (d->nrows * sizeof (gfloat));
-  vartabled *vt = ggobi_data_get_vartable(d, j);
+  gfloat *x = (gfloat *) g_malloc (GGOBI_STAGE(d)->n_rows* sizeof (gfloat));
+  GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(d), j);
   greal min, max;
 
   min = G_MAXFLOAT;
@@ -186,7 +186,7 @@ limits_display_set_by_var (GGobiData * d, gint j, gboolean visible_only)
     for (m = 0; m < d->nrows_in_plot; m++) {
       i = d->rows_in_plot.els[m];
       /*-- lim_display and stats: only use non-missing cases --*/
-      if (ggobi_data_is_missing(d, i, j));
+      if (ggobi_stage_is_missing(GGOBI_STAGE(d), i, j));
       else {
         if (d->tform.vals[i][j] < min)
           min = d->tform.vals[i][j];
@@ -201,9 +201,9 @@ limits_display_set_by_var (GGobiData * d, gint j, gboolean visible_only)
   }
   else {
 
-    for (i = 0; i < d->nrows; i++) {
+    for (i = 0; i < GGOBI_STAGE(d)->n_rows; i++) {
 
-      if (ggobi_data_is_missing(d, i, j));
+      if (ggobi_stage_is_missing(GGOBI_STAGE(d), i, j));
       else {
         if (d->tform.vals[i][j] < min)
           min = d->tform.vals[i][j];
@@ -217,14 +217,14 @@ limits_display_set_by_var (GGobiData * d, gint j, gboolean visible_only)
     }
   }
 
-  vt->lim_display.min = min;
-  vt->lim_display.max = max;
+  var->lim_display.min = min;
+  var->lim_display.max = max;
 
-  vt->mean = sum / np;
+  var->mean = sum / np;
 
   /*-- median: sort the temporary vector, and find its center --*/
   qsort ((void *) x, np, sizeof (gfloat), fcompare);
-  vt->median =
+  var->median =
     ((np % 2) != 0) ? x[(np - 1) / 2] : (x[np / 2 - 1] + x[np / 2]) / 2.;
 
   g_free ((gpointer) x);
@@ -234,7 +234,7 @@ limits_tform_set (GGobiData * d, gboolean visible_only)
 {
   gint j;
 
-  for (j = 0; j < d->ncols; j++) {
+  for (j = 0; j < GGOBI_STAGE(d)->n_cols; j++) {
     limits_tform_set_by_var (d, j, visible_only);
     limits_display_set_by_var (d, j, visible_only);
   }
@@ -246,16 +246,16 @@ limits_set (GGobiData * d, gboolean do_raw, gboolean do_tform,
             gboolean visible_only)
 {
   gint j;
-  vartabled *vt;
+  GGobiVariable *var;
 
   if (do_raw)
     limits_raw_set (d, visible_only);
   if (do_tform)
     limits_tform_set (d, visible_only);
 
-  for (j = 0; j < d->ncols; j++) {
-    vt = ggobi_data_get_vartable(d, j);
-    limits_set_from_vartable (vt);
+  for (j = 0; j < GGOBI_STAGE(d)->n_cols; j++) {
+    var = ggobi_stage_get_variable(GGOBI_STAGE(d), j);
+    limits_set_from_vartable (var);
   }
 }
 
@@ -264,35 +264,35 @@ void
 limits_set_by_var (GGobiData * d, guint j, gboolean do_raw, gboolean do_tform,
                    gboolean visible_only)
 {
-  vartabled *vt = ggobi_data_get_vartable(d, j);
+  GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(d), j);
 
   if (do_raw)
     limits_raw_set_by_var (d, j, visible_only);
   if (do_tform)
     limits_tform_set_by_var (d, j, visible_only);
 
-  limits_set_from_vartable (vt);
+  limits_set_from_vartable (var);
 }
 
 /*  Recenter the data using the current sticky point */
 void
 recenter_data (gint i, GGobiData * d, ggobid * gg)
 {
-  vartabled *vt;
+  GGobiVariable *var;
   greal x;
   gint j;
 
-  for (j = 0; j < d->ncols; j++) {
-    vt = ggobi_data_get_vartable(d, j);
+  for (j = 0; j < GGOBI_STAGE(d)->n_cols; j++) {
+    var = ggobi_stage_get_variable(GGOBI_STAGE(d), j);
     if (i >= 0) {
-      x = (vt->lim_tform.max - vt->lim_tform.min) / 2;
-      vt->lim_specified_p = true;
-      vt->lim_specified_tform.min = d->tform.vals[i][j] - x;
-      vt->lim_specified_tform.max = d->tform.vals[i][j] + x;
+      x = (var->lim_tform.max - var->lim_tform.min) / 2;
+      var->lim_specified_p = true;
+      var->lim_specified_tform.min = d->tform.vals[i][j] - x;
+      var->lim_specified_tform.max = d->tform.vals[i][j] + x;
     }
     else {
      /*-- if no point was specified, recenter using defaults --*/
-      vt->lim_specified_p = false;
+      var->lim_specified_p = false;
     }
     
     //g_signal_emit_by_name(d, "col_data_changed", (guint) j);

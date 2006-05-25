@@ -42,31 +42,31 @@ missings_datad_cb (GtkWidget * w, ggobid * gg)
   GGobiData *d = (GGobiData *) g_object_get_data (G_OBJECT (tree_view), "datad");
   static gchar *lnames[] = { "present", "missing" };
   
-  if (!ggobi_data_has_missings(d)) return;
+  if (!ggobi_stage_has_missings(GGOBI_STAGE(d))) return;
   
   gint i, j, k;
   gint *cols_with_missings, ncols_with_missings;
 
   ncols_with_missings = 0;
-  cols_with_missings = g_malloc (d->ncols * sizeof (gint));
-  for (j = 0; j < d->ncols; j++) {
-    if (ggobi_data_get_col_n_missing(d, j))
+  cols_with_missings = g_malloc (GGOBI_STAGE(d)->n_cols * sizeof (gint));
+  for (j = 0; j < GGOBI_STAGE(d)->n_cols; j++) {
+    if (ggobi_stage_get_col_n_missing(GGOBI_STAGE(d), j))
       cols_with_missings[ncols_with_missings++] = j;
   }
 
-  GGobiData *dnew = ggobi_data_new (d->nrows, ncols_with_missings);
-  ggobi_data_set_name(dnew, g_strdup_printf ("%s (missing)", ggobi_data_get_name(d)), NULL);
+  GGobiData *dnew = ggobi_data_new (GGOBI_STAGE(d)->n_rows, ncols_with_missings);
+  ggobi_stage_set_name(GGOBI_STAGE(dnew), g_strdup_printf ("%s (missing)", ggobi_stage_get_name(GGOBI_STAGE(d))));
 
   for (j = 0; j < ncols_with_missings; j++) {
     k = cols_with_missings[j];
 
-    ggobi_data_set_col_name(dnew, j, ggobi_data_get_col_name(d, k));
-    for (i = 0; i < d->nrows; i++) {
-      ggobi_data_set_categorical_value(dnew, i, j, lnames[(gint) ggobi_data_is_missing(d, i, k)]);
+    ggobi_stage_set_col_name(GGOBI_STAGE(dnew), j, ggobi_stage_get_col_name(GGOBI_STAGE(d), k));
+    for (i = 0; i < GGOBI_STAGE(d)->n_rows; i++) {
+      ggobi_stage_set_categorical_value(GGOBI_STAGE(dnew), i, j, lnames[(gint) ggobi_stage_is_missing(GGOBI_STAGE(d), i, k)]);
     }
   }
 
-  for (i = 0; i < d->nrows; i++) {
+  for (i = 0; i < GGOBI_STAGE(d)->n_rows; i++) {
     ggobi_data_set_attr_color(dnew, i, ggobi_data_get_attr_color(d, i), ATTR_SET_PERSISTENT);
     ggobi_data_set_attr_glyph(dnew, i, ggobi_data_get_attr_glyph(d, i), ATTR_SET_PERSISTENT);
     //dnew->color.els[i] = d->color.els[i];
@@ -76,7 +76,7 @@ missings_datad_cb (GtkWidget * w, ggobid * gg)
     //dnew->glyph.els[i].size = d->glyph.els[i].size;
     //dnew->glyph_now.els[i].size = d->glyph_now.els[i].size;
 
-    ggobi_data_set_row_id(dnew, i, ggobi_data_get_row_id(dnew, i), false);
+    ggobi_stage_set_row_id(GGOBI_STAGE(dnew), i, ggobi_stage_get_row_id(GGOBI_STAGE(dnew), i), false);
   }
   limits_set(dnew, TRUE, FALSE, FALSE);
 

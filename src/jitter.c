@@ -84,11 +84,11 @@ rejitter (gint * selected_cols, gint nselected_cols, GGobiData * d,
 {
   gint i, j, k, m;
   greal frand, fworld, fjit;
-  vartabled *vt;
+  GGobiVariable *var;
 
   for (j = 0; j < nselected_cols; j++) {
     k = selected_cols[j];
-    vt = ggobi_data_get_vartable(d, k);
+    var = ggobi_stage_get_variable(GGOBI_STAGE(d), k);
 
     for (i = 0; i < d->nrows_in_plot; i++) {
       m = d->rows_in_plot.els[i];
@@ -101,10 +101,10 @@ rejitter (gint * selected_cols, gint nselected_cols, GGobiData * d,
        */
       if (d->jitter.convex) {
         fworld = d->world.vals[m][k] - d->jitdata.vals[m][k];
-        fjit = (greal) vt->jitter_factor * (frand - fworld);
+        fjit = (greal) var->jitter_factor * (frand - fworld);
       }
       else
-        fjit = vt->jitter_factor * frand;
+        fjit = var->jitter_factor * frand;
 
       d->jitdata.vals[m][k] = fjit;
     }
@@ -119,16 +119,16 @@ jitter_value_set (gfloat value, GGobiData * d, ggobid * gg)
 {
   GtkWidget *tree_view =
     get_tree_view_from_object (G_OBJECT (gg->jitter_ui.window));
-  gint *vars;                   // = (gint *) g_malloc (d->ncols * sizeof(gint));
+  gint *vars;                   // = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof(gint));
   gint nvars;
   gint j;
-  vartabled *vt;
+  GGobiVariable *var;
 
   vars = get_selections_from_tree_view (tree_view, &nvars);
 
   for (j = 0; j < nvars; j++) {
-    vt = ggobi_data_get_vartable(d, vars[j]);
-    vt->jitter_factor = value;
+    var = ggobi_stage_get_variable(GGOBI_STAGE(d), vars[j]);
+    var->jitter_factor = value;
   }
 
   g_free ((gpointer) vars);

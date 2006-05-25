@@ -130,7 +130,7 @@ hide_cluster_cb (GtkToggleButton * btn, gpointer cbd)
   gboolean changed = false;
 
   /*-- operating on the current sample, whether hidden or shown --*/
-  for (i = 0; i < d->nrows; i++) {
+  for (i = 0; i < GGOBI_STAGE(d)->n_rows; i++) {
     if (d->sampled.els[i]) {
       if (d->clusterid.els[i] == k) {
         if (ggobi_data_set_attr_hidden(d, i, btn->active, ATTR_SET_PERSISTENT)) {
@@ -157,7 +157,7 @@ include_hiddens (gboolean include, GGobiData * d, ggobid * gg)
   cpaneld *cpanel = &dsp->cpanel;
   gboolean prev, changed = false;
 
-  for (i = 0; i < d->nrows; i++) {
+  for (i = 0; i < GGOBI_STAGE(d)->n_rows; i++) {
     prev = d->excluded.els[i];
     d->excluded.els[i] = (!include && ggobi_data_get_attr_hidden(d, i));
     if ((prev != d->excluded.els[i]) && !gg->linkby_cv) {
@@ -532,7 +532,7 @@ CHECK_EVENT_SIGNATURE (exclusion_notebook_adddata_cb, datad_added_f)
     d = (GGobiData *) l->data;
 
     /*-- skip datasets without variables --*/
-    if (!ggobi_data_has_cols (d))
+    if (!ggobi_stage_get_n_cols(GGOBI_STAGE(d)))
       continue;
 
     /* Create a scrolled window to hold the table */
@@ -542,7 +542,7 @@ CHECK_EVENT_SIGNATURE (exclusion_notebook_adddata_cb, datad_added_f)
 
     g_object_set_data (G_OBJECT (scrolled_window), "datad", d); /*setdata */
     gtk_notebook_append_page (GTK_NOTEBOOK (gg->cluster_ui.notebook),
-                              scrolled_window, gtk_label_new (d->name));
+                              scrolled_window, gtk_label_new (ggobi_stage_get_name(GGOBI_STAGE(d))));
     gtk_widget_show (scrolled_window);
 
     d->cluster_table = gtk_table_new (d->nclusters + 1, 5, true);

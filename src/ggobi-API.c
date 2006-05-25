@@ -111,12 +111,12 @@ gchar **ggobi_getVariableNames (gint transformed, GGobiData * d,
                                   ggobid * gg)
 {
   gchar **names;
-  gint nc = d->ncols, j;
+  gint nc = GGOBI_STAGE(d)->n_cols, j;
 
   names = (gchar **) g_malloc (sizeof (gchar *) * nc);
 
   for (j = 0; j < nc; j++) {
-    names[j] = transformed ? ggobi_data_get_transformed_col_name(d, j) : ggobi_data_get_col_name(d, j);
+    names[j] = transformed ? ggobi_data_get_transformed_col_name(d, j) : ggobi_stage_get_col_name(GGOBI_STAGE(d), j);
   }
 
   return (names);
@@ -169,27 +169,27 @@ ggobi_setData (gdouble * values, gchar ** rownames, gchar ** colnames,
   gchar *varname;
 
   d->input = desc;
-  if (d->name == NULL)
-    d->name = g_strdup (desc->fileName);
+  if (ggobi_stage_get_name(GGOBI_STAGE(d)) == NULL)
+    ggobi_stage_set_name(GGOBI_STAGE(d), desc->fileName);
   if (gg->input == NULL)
     gg->input = desc;
 
-  ggobi_data_add_rows(d, d->nrows - nr);
-  ggobi_data_add_cols(d, d->ncols - nc);
+  ggobi_data_add_rows(d, GGOBI_STAGE(d)->n_rows- nr);
+  ggobi_data_add_cols(d, GGOBI_STAGE(d)->n_cols - nc);
 
   if (values) {
     for (j = 0; j < nc; j++) {
       varname = (colnames) ? colnames[j] : NULL;
       g_debug("Column name %s", colnames[j]);
-      ggobi_data_set_col_name(d, j, varname);
+      ggobi_stage_set_col_name(GGOBI_STAGE(d), j, varname);
 
       for (i = 0; i < nr; i++) 
-        ggobi_data_set_raw_value(d, i, j, values[i + j * nr]);
+        ggobi_stage_set_raw_value(GGOBI_STAGE(d), i, j, values[i + j * nr]);
       
     }
     for (i = 0; i < nr; i++) {
       lbl = (rownames) ? rownames[i] : NULL;
-      ggobi_data_set_row_id(d, i, lbl, false);
+      ggobi_stage_set_row_id(GGOBI_STAGE(d), i, lbl, false);
     }
   }
 
@@ -849,7 +849,7 @@ int ggobi_datasetIndex (const char *name, const ggobid * const gg)
 
   while (tmp) {
     d = (GGobiData *) tmp->data;
-    if (strcmp (name, d->name) == 0)
+    if (strcmp (name, ggobi_stage_get_name(GGOBI_STAGE(d))) == 0)
       return (ctr);
     ctr++;
     tmp = tmp->next;
@@ -872,7 +872,7 @@ gchar **ggobi_getDatasetNames (gint * n, ggobid * gg)
   names = (gchar **) g_malloc (sizeof (gchar *) * (*n));
   for (i = 0; i < *n; i++) {
     d = (GGobiData *) tmp->data;
-    names[i] = g_strdup (d->name);
+    names[i] = g_strdup (ggobi_stage_get_name(GGOBI_STAGE(d)));
     tmp = tmp->next;
   }
 
@@ -890,12 +890,12 @@ ggobid *ggobi_ggobi_get (gint which)
 
 gint ggobi_ncols (GGobiData * data)
 {
-  return (data->ncols);
+  return (GGOBI_STAGE(data)->n_cols);
 }
 
 gint ggobi_nrecords (GGobiData * data)
 {
-  return (data->nrows);
+  return (GGOBI_STAGE(data)->n_rows);
 }
 
 
@@ -1006,7 +1006,7 @@ ggobi_setTour2DProjectionMatrix (gdouble * Fvalues, gint ncols, gint ndim,
   gboolean candoit = true;
   gint i, j;
 
-  if ((ncols != d->ncols) || ndim != 2)
+  if ((ncols != GGOBI_STAGE(d)->n_cols) || ndim != 2)
     candoit = false;
 
   if (candoit) {
@@ -1048,7 +1048,7 @@ const gdouble **ggobi_getTour2DProjectionMatrix (gint ncols, gint ndim,
   gdouble **Fvals;
   gint i, j;
 
-  ncols = d->ncols;
+  ncols = GGOBI_STAGE(d)->n_cols;
   ndim = 2;
 
   Fvals = (gdouble **) g_malloc (sizeof (gdouble *) * ncols);

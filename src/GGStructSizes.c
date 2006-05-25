@@ -20,7 +20,7 @@ static const ggobi_StructSize ggobiStructs[] = {
   GG_StructEntry (GGobiData),
   GG_StructEntry (displayd),
   GG_StructEntry (splotd),
-  GG_StructEntry (vartabled),
+  GG_StructEntry (GGobiVariable),
   GG_StructEntry (GGobiOptions)
 #ifdef USE_DBMS
     , GG_StructEntry (DBMSLoginInfo)

@@ -207,7 +207,8 @@ ggobi_remove_by_index (ggobid * gg, gint which)
   numDatasets = g_slist_length (gg->d);
   for (i = 0, l = gg->d; l != NULL && i < numDatasets; i++, l = gg->d) {
     d = (GGobiData *) l->data;
-    ggobi_data_free (d);
+    /* temporarily disabled - broken anyway */
+    //ggobi_data_free (d);
     gg->d = g_slist_remove (gg->d, d);
   }
 
@@ -687,7 +688,7 @@ ggobi_get_data_by_name (const gchar * const name, const ggobid * const gg)
 
   for (l = gg->d; l; l = l->next) {
     d = (GGobiData *) l->data;
-    if (strcmp (d->name, name) == 0)
+    if (strcmp (ggobi_stage_get_name(GGOBI_STAGE(d)), name) == 0)
       return (d);
   }
   return (NULL);
@@ -935,7 +936,7 @@ ndatad_with_vars_get (ggobid *gg)
    nd = 0;
    for (l = gg->d; l; l = l->next) {
      d = (GGobiData *) l->data;
-     if (ggobi_data_has_cols(d))
+     if (ggobi_stage_get_n_cols(GGOBI_STAGE(d)))
        nd++;
    }
  }  else nd = 1;

@@ -61,7 +61,7 @@ add_record_dialog_apply (GtkWidget * w, displayd * display)
   GGobiData *dtarget;
 
   dtarget = (cpanel->ee_mode == ADDING_EDGES) ? e : d;
-  if (ggobi_data_has_cols(dtarget)) {
+  if (ggobi_stage_get_n_cols(GGOBI_STAGE(dtarget))) {
     GList *list;
     GtkTableChild *child;
     GtkWidget *entry;
@@ -69,7 +69,7 @@ add_record_dialog_apply (GtkWidget * w, displayd * display)
     GtkWidget *table = widget_find_by_name (GTK_DIALOG (dialog)->vbox,
                                             "EE:tablev");
 
-    vals = (gchar **) g_malloc (d->ncols * sizeof (gchar *));
+    vals = (gchar **) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof (gchar *));
 
     for (list = GTK_TABLE (table)->children; list; list = list->next) {
       child = (GtkTableChild *) list->data;
@@ -103,7 +103,7 @@ add_record_dialog_apply (GtkWidget * w, displayd * display)
   }
 
   if (vals) {
-    for (j = 0; j < d->ncols; j++)
+    for (j = 0; j < GGOBI_STAGE(d)->n_cols; j++)
       g_free (vals[j]);
     g_free (vals);
   }
@@ -144,7 +144,7 @@ add_record_dialog_open (GGobiData * d, GGobiData * e, displayd * dsp,
   gtk_misc_set_alignment (GTK_MISC (w), 1, .5);
   gtk_table_attach (GTK_TABLE (table),
                     w, 0, 1, row, row + 1, table_opt, table_opt, 1, 1);
-  lbl = g_strdup_printf ("%d", dtarget->nrows);
+  lbl = g_strdup_printf ("%d", GGOBI_STAGE(dtarget)->n_rows);
   w = gtk_label_new (lbl);
   gtk_misc_set_alignment (GTK_MISC (w), .5, .5);
   gtk_table_attach (GTK_TABLE (table),
@@ -158,7 +158,7 @@ add_record_dialog_open (GGobiData * d, GGobiData * e, displayd * dsp,
     gtk_table_attach (GTK_TABLE (table),
                       w, 0, 1, row, row + 1, table_opt, table_opt, 1, 1);
     /* This label should include both the rowlab and the rowId */
-    lbl = ggobi_data_get_row_id(d, gg->edgeedit.a);
+    lbl = ggobi_stage_get_row_id(GGOBI_STAGE(d), gg->edgeedit.a);
     w = gtk_label_new (lbl);
     gtk_misc_set_alignment (GTK_MISC (w), .5, .5);
     gtk_table_attach (GTK_TABLE (table),
@@ -169,7 +169,7 @@ add_record_dialog_open (GGobiData * d, GGobiData * e, displayd * dsp,
     gtk_misc_set_alignment (GTK_MISC (w), 1, .5);
     gtk_table_attach (GTK_TABLE (table),
                       w, 0, 1, row, row + 1, table_opt, table_opt, 1, 1);
-    lbl = ggobi_data_get_row_id(d, d->nearest_point);
+    lbl = ggobi_stage_get_row_id(GGOBI_STAGE(d), d->nearest_point);
     w = gtk_label_new (lbl);
     gtk_misc_set_alignment (GTK_MISC (w), .5, .5);
     gtk_table_attach (GTK_TABLE (table),
@@ -183,7 +183,7 @@ add_record_dialog_open (GGobiData * d, GGobiData * e, displayd * dsp,
                     w, 0, 1, row, row + 1, table_opt, table_opt, 1, 1);
   entry = gtk_entry_new ();
   gtk_label_set_mnemonic_widget (GTK_LABEL (w), entry);
-  lbl = g_strdup_printf ("%d", dtarget->nrows + 1);
+  lbl = g_strdup_printf ("%d", GGOBI_STAGE(dtarget)->n_rows + 1);
   gtk_entry_set_text (GTK_ENTRY (entry), lbl);
   g_free (lbl);
 
@@ -200,7 +200,7 @@ add_record_dialog_open (GGobiData * d, GGobiData * e, displayd * dsp,
                       w, 0, 1, row, row + 1, table_opt, table_opt, 1, 1);
     entry = gtk_entry_new ();
     gtk_label_set_mnemonic_widget (GTK_LABEL (w), entry);
-    lbl = g_strdup_printf ("%d", dtarget->nrows + 1);
+    lbl = g_strdup_printf ("%d", GGOBI_STAGE(dtarget)->n_rows + 1);
     gtk_entry_set_text (GTK_ENTRY (entry), lbl);
     g_free (lbl);
     gtk_widget_set_name (entry, "EE:recordid");
@@ -210,23 +210,23 @@ add_record_dialog_open (GGobiData * d, GGobiData * e, displayd * dsp,
   }
 
   /*-- Another table to contain variable name-value pairs --*/
-  if (ggobi_data_has_cols(dtarget)) {
+  if (ggobi_stage_get_n_cols(GGOBI_STAGE(dtarget))) {
     gint j;
     GtkWidget *tablev;
-    gchar **vals = (gchar **) g_malloc (dtarget->ncols * sizeof (gchar *));
+    gchar **vals = (gchar **) g_malloc (GGOBI_STAGE(dtarget)->n_cols * sizeof (gchar *));
 
     extern void fetch_default_record_values (gchar ** vals,
                                              GGobiData *, displayd *,
                                              ggobid * gg);
     fetch_default_record_values (vals, dtarget, dsp, gg);
 
-    tablev = gtk_table_new (dtarget->ncols, 2, false);
+    tablev = gtk_table_new (GGOBI_STAGE(dtarget)->n_cols, 2, false);
     gtk_widget_set_name (tablev, "EE:tablev");
     gtk_box_pack_start (GTK_BOX (GTK_DIALOG (dialog)->vbox),
                         tablev, false, false, 5);
 
-    for (j = 0; j < dtarget->ncols; j++) {
-      w = gtk_label_new (ggobi_data_get_col_name(d, j));
+    for (j = 0; j < GGOBI_STAGE(dtarget)->n_cols; j++) {
+      w = gtk_label_new (ggobi_stage_get_col_name(GGOBI_STAGE(d), j));
       gtk_table_attach (GTK_TABLE (tablev),
                         w, 0, 1, j, j + 1, table_opt, table_opt, 1, 1);
 
@@ -237,7 +237,7 @@ add_record_dialog_open (GGobiData * d, GGobiData * e, displayd * dsp,
     }
 
     /* free vals, I think */
-    for (j = 0; j < dtarget->ncols; j++)
+    for (j = 0; j < GGOBI_STAGE(dtarget)->n_cols; j++)
       g_free (vals[j]);
     g_free (vals);
   }
@@ -401,7 +401,7 @@ button_release_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
       if (e == NULL) {
         /*-- initialize e, the new datad --*/
         e = ggobi_data_new (0, 0);
-        e->name = g_strdup ("edges");
+        ggobi_stage_set_name(GGOBI_STAGE(e), "edges");
         display->e = e;
         display->options.edges_undirected_show_p = true;
       }

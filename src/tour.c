@@ -159,7 +159,7 @@ gboolean checkequiv(gdouble **Fa, gdouble **Fz, gint datadim, gint projdim) {
 }
 
 /* matrix multiplication UV */
-gboolean matmult_uv(gdouble **ut, gdouble **vt, gint ur, gint uc, 
+gboolean matmult_uv(gdouble **ut, gdouble **var, gint ur, gint uc, 
   gint vr, gint vc, gdouble **ot) {
   gint i, j, k;
   gboolean ok = true;
@@ -173,7 +173,7 @@ gboolean matmult_uv(gdouble **ut, gdouble **vt, gint ur, gint uc,
     for (k=0; k<vc; k++) {
       ot[k][j] = 0.0;
       for (i=0; i<uc; i++) {
-        ot[k][j] += (ut[i][j]*vt[k][i]);
+        ot[k][j] += (ut[i][j]*var[k][i]);
       }
     }
   }
@@ -182,7 +182,7 @@ gboolean matmult_uv(gdouble **ut, gdouble **vt, gint ur, gint uc,
 }
 
 /* matrix multiplication U'V */
-gboolean matmult_utv(gdouble **ut, gdouble **vt, gint ur, gint uc, 
+gboolean matmult_utv(gdouble **ut, gdouble **var, gint ur, gint uc, 
   gint vr, gint vc, gdouble **ot) {
   gint i, j, k;
   gboolean ok = true;
@@ -196,7 +196,7 @@ gboolean matmult_utv(gdouble **ut, gdouble **vt, gint ur, gint uc,
     for (k=0; k<vc; k++) {
       ot[k][j] = 0.0;
       for (i=0; i<ur; i++) {
-        ot[k][j] += (ut[j][i]*vt[k][i]);
+        ot[k][j] += (ut[j][i]*var[k][i]);
       }
     }
   }
@@ -205,7 +205,7 @@ gboolean matmult_utv(gdouble **ut, gdouble **vt, gint ur, gint uc,
 }
 
 /* matrix multiplication UV */
-gboolean matmult_uvt(gdouble **ut, gdouble **vt, gint ur, gint uc, 
+gboolean matmult_uvar(gdouble **ut, gdouble **var, gint ur, gint uc, 
   gint vr, gint vc, gdouble **ot) {
   gint i, j, k;
   gboolean ok = true;
@@ -219,7 +219,7 @@ gboolean matmult_uvt(gdouble **ut, gdouble **vt, gint ur, gint uc,
     for (k=0; k<vr; k++) {
       ot[k][j] = 0.0;
       for (i=0; i<uc; i++) {
-        ot[k][j] += (ut[i][j]*vt[i][k]);
+        ot[k][j] += (ut[i][j]*var[i][k]);
       }
     }
   }
@@ -260,7 +260,7 @@ eigen_clear (array_d Ga, array_d Gz, vector_f lambda, vector_f tau,
   vector_f tinc, gint datadim)
 {
   /*  GGobiData *d = dsp->d;
-  gint datadim = d->ncols;*/
+  gint datadim = GGOBI_STAGE(d)->n_cols;*/
   gint j, k;
 
   for (j=0; j<datadim; j++) {
@@ -481,7 +481,7 @@ g_printerr ("\n");*/
       }
 
       /* rotate in space of plane to match Fa basis */
-      matmult_uvt(G.vals, Va.vals, datadim, projdim, projdim, projdim, F.vals);
+      matmult_uvar(G.vals, Va.vals, datadim, projdim, projdim, projdim, F.vals);
 
       /* orthonormal to correct round-off errors */
       for (i=0; i<projdim; i++)
@@ -586,7 +586,7 @@ void tour_reproject(vector_f tinc, array_d G, array_d Ga, array_d Gz,
   }
 
   /* rotate in space of plane to match Fa basis */
-  matmult_uvt(G.vals, Va.vals, datadim, projdim, projdim, projdim, F.vals);
+  matmult_uvar(G.vals, Va.vals, datadim, projdim, projdim, projdim, F.vals);
 
   /* orthonormalize to correct round-off errors */
   for (i=0; i<projdim; i++)

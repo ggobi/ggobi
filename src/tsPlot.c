@@ -74,14 +74,14 @@ tsDrawEdge_p(splotd *sp, gint m, GGobiData *d, GGobiData *e, ggobid *gg)
 {
    gboolean draw_edge = true;
 
-   draw_edge = !(ggobi_data_is_missing(e, m, sp->xyvars.y) ||  ggobi_data_is_missing(e, m, sp->xyvars.x));
+   draw_edge = !(ggobi_stage_is_missing(GGOBI_STAGE(e), m, sp->xyvars.y) ||  ggobi_stage_is_missing(GGOBI_STAGE(e), m, sp->xyvars.x));
    return(draw_edge);
 }
 
 gboolean
 tsDrawCase_p(splotd *sp, gint m, GGobiData *d, ggobid *gg)
 {
-  return !(ggobi_data_is_missing(d, m, sp->xyvars.y) || ggobi_data_is_missing(d, m, sp->xyvars.x));
+  return !(ggobi_stage_is_missing(GGOBI_STAGE(d), m, sp->xyvars.y) || ggobi_stage_is_missing(GGOBI_STAGE(d), m, sp->xyvars.x));
 }
 
 void
@@ -135,7 +135,7 @@ tsAllocWhiskers(GdkSegment *whiskers, splotd *sp, gint nrows, GGobiData *d)
 gchar *
 tsTreeLabel(splotd *sp, GGobiData *d, ggobid *gg)
 {
-  return(ggobi_data_get_col_name(d, sp->xyvars.y));
+  return(ggobi_stage_get_col_name(GGOBI_STAGE(d), sp->xyvars.y));
 }
 
 
@@ -188,7 +188,7 @@ splotScreenToTform(cpaneld *cpanel, splotd *sp, icoords *scr,
   displayd *display = (displayd *) sp->displayptr;
   GGobiData *d = display->d;
   gfloat scale_x, scale_y;
-  vartabled *vtx, *vty;
+  GGobiVariable *varx, *vary;
 
   scale_x = sp->scale.x;
   scale_y = sp->scale.y;
@@ -209,9 +209,9 @@ splotScreenToTform(cpaneld *cpanel, splotd *sp, icoords *scr,
  * plane to tform
 */
   /* x */
-  vtx = ggobi_data_get_vartable(d, sp->xyvars.x);
-  max = vtx->lim.max;
-  min = vtx->lim.min;
+  varx = ggobi_stage_get_variable(GGOBI_STAGE(d), sp->xyvars.x);
+  max = varx->lim.max;
+  min = varx->lim.min;
   rdiff = max - min;
   world.x = planar.x;
   ftmp = world.x / precis;
@@ -219,9 +219,9 @@ splotScreenToTform(cpaneld *cpanel, splotd *sp, icoords *scr,
   tfd->x += min;
 
   /* y */
-  vty = ggobi_data_get_vartable(d, sp->xyvars.y);
-  max = vty->lim.max;
-  min = vty->lim.min;
+  vary = ggobi_stage_get_variable(GGOBI_STAGE(d), sp->xyvars.y);
+  max = vary->lim.max;
+  min = vary->lim.min;
   rdiff = max - min;
   world.y = planar.y;
   ftmp = world.y / precis;

@@ -48,7 +48,7 @@ p1d_activate (gint state, displayd * display, ggobid * gg)
   if (state) {
     for (slist = display->splots; slist; slist = slist->next) {
       sp = (splotd *) slist->data;
-      if (sp->p1dvar >= d->ncols)
+      if (sp->p1dvar >= GGOBI_STAGE(d)->n_cols)
         sp->p1dvar = 0;
     }
     varpanel_refresh (display, gg);
@@ -83,8 +83,8 @@ p1d_spread_var (displayd * display, gfloat * yy, splotd * sp, GGobiData * d,
   gfloat min, max, mean;
   cpaneld *cpanel = &display->cpanel;
 
-  if (sp->p1d.spread_data.nels != d->nrows)
-    vectorf_realloc (&sp->p1d.spread_data, d->nrows);
+  if (sp->p1d.spread_data.nels != GGOBI_STAGE(d)->n_rows)
+    vectorf_realloc (&sp->p1d.spread_data, GGOBI_STAGE(d)->n_rows);
 
   switch (cpanel->p1d.type) {
   case TEXTURE:
@@ -255,7 +255,7 @@ p1dcycle_func (ggobid * gg)
   if (cpanel->p1d.cycle_dir == 1) {
     varno = sp->p1dvar + 1;
 
-    if (varno == d->ncols) {
+    if (varno == GGOBI_STAGE(d)->n_cols) {
       varno = 0;
     }
   }
@@ -263,7 +263,7 @@ p1dcycle_func (ggobid * gg)
     varno = sp->p1dvar - 1;
 
     if (varno < 0) {
-      varno = d->ncols - 1;
+      varno = GGOBI_STAGE(d)->n_cols - 1;
     }
   }
 

@@ -104,7 +104,7 @@ barchart_is_variable_plotted (displayd * display, gint * cols, gint ncols,
 static gchar *
 barchart_tree_label (splotd * sp, GGobiData * d, ggobid * gg)
 {
-  return(ggobi_data_get_col_name(d, sp->p1dvar));
+  return(ggobi_stage_get_col_name(GGOBI_STAGE(d), sp->p1dvar));
 }
 
 
@@ -253,7 +253,7 @@ barchartVarpanelRefresh (displayd * display, splotd * sp, GGobiData * d)
 
   switch (cpanel->pmode) {
     case TOUR1D:
-      for (j=0; j<d->ncols; j++) {
+      for (j=0; j<GGOBI_STAGE(d)->n_cols; j++) {
         varpanel_toggle_set_active (VARSEL_X, j, false, d);
         varpanel_toggle_set_active (VARSEL_Y, j, false, d);
         varpanel_widget_set_visible (VARSEL_Y, j, false, d);
@@ -266,7 +266,7 @@ barchartVarpanelRefresh (displayd * display, splotd * sp, GGobiData * d)
       }
       break;
     default:
-      for (j = 0; j < d->ncols; j++) {
+      for (j = 0; j < GGOBI_STAGE(d)->n_cols; j++) {
         varpanel_toggle_set_active(VARSEL_X, j, (j == sp->p1dvar), d);
 
         varpanel_toggle_set_active(VARSEL_Y, j, false, d);
@@ -397,6 +397,7 @@ barchartScreenToTform (cpaneld * cpanel, splotd * sp, icoords * scr,
   greal ftmp, max, min, rdiff;
   displayd *display = (displayd *) sp->displayptr;
   GGobiData *d = display->d;
+  GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(d), sp->p1dvar);
   gfloat scale_x, scale_y;
 
   scale_x = sp->scale.x;
@@ -425,8 +426,8 @@ barchartScreenToTform (cpaneld * cpanel, splotd * sp, icoords * scr,
     /* Sheesh, I haven't even decided what I want the pmode to be */
   case EXTENDED_DISPLAY_PMODE:
   case DEFAULT_PMODE:
-    max = ggobi_data_get_col_max(d, sp->p1dvar);
-    min = ggobi_data_get_col_min(d, sp->p1dvar);
+    max = ggobi_variable_get_min(var);
+    min = ggobi_variable_get_max(var);
     rdiff = max - min;
 
     if (display->p1d_orientation == HORIZONTAL) {
@@ -530,9 +531,10 @@ barchart_identify_cues_draw (gboolean nearest_p, gint k, splotd * rawsp,
                                   sp->bar->breaks[i - 1] + sp->bar->offset,
                                   sp->bar->breaks[i] + sp->bar->offset);
       } else {
-        gchar *level;
+        GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(rawsp->displayptr->d), 
+          rawsp->p1dvar);
+        gchar *level = ggobi_variable_get_level_name(var, sp->bar->bins[j].value);
         j = i - 1;
-        level = ggobi_data_get_col_level_name(rawsp->displayptr->d, rawsp->p1dvar, sp->bar->bins[j].value);
 
         string = g_strdup_printf ("%ld point%s in %s",
                                     sp->bar->bins[j].count,

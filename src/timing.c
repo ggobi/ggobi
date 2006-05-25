@@ -67,7 +67,7 @@ time_touring (ggobid *gg) {
   extern gboolean tour2d_subset_var_set (gint, GGobiData *, displayd *, ggobid *);
   extern void tour2d_active_var_set (gint, GGobiData *, displayd *, ggobid *);
 
-  if (ggobi_data_get_n_cols(d) < 3)
+  if (ggobi_stage_get_n_cols(GGOBI_STAGE(d)) < 3)
     return;
 
   ggobi_full_viewmode_set (TOUR2D, NULL_IMODE, gg);
@@ -81,7 +81,7 @@ time_touring (ggobid *gg) {
 
   // By default, three variables are selected.  Select the rest.
   gg->tour2d.fade_vars = false;
-  for (k=3; k<ggobi_data_get_n_cols(d); k++) {
+  for (k=3; k<ggobi_stage_get_n_cols(GGOBI_STAGE(d)); k++) {
     tour2d_subset_var_set(k, d, dsp, gg);
     tour2d_active_var_set (k, d, dsp, gg);
   }
