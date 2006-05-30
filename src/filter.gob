@@ -6,12 +6,18 @@ gboolean missing and nmissing (does that exist for each variable?)
   could have different values after the filter stage than they had
   before it.
 
+  -- The stage has virtuals for accessing missings, I think you have this right
+  
 Signal handling -- need to respond to changes in the values of the
   sampled and excluded vectors (or whatever the precise filter is to
   be) in the parent, as well as to changes in the number of rows.
 
+  -- Listen to col-data-changed and the property for n_rows
+  
 set_categorical_value is public in stage, but filter wants to
   override it.
+  
+  -- Why do you need to override this? Everything flows through set_raw_value()
 
 */
 
@@ -22,21 +28,30 @@ class GGobi:Filter from GGobi:Stage {
   // These are the indices to be used; n_rows_in_plot is just n_rows.
   // Initialize null; self_set_rows_in_plot as part of construction?
   // It will always be of dimension parent->n_rows.
+  
+  // -- I suggest using g_renew() in the notify signal for n_rows OR override
+  // the n_rows property setter. I do this in GGobiStage for n_cols and the
+  // array of variables.
   private guint *rows_in_plot;
 
   /* I see that data.gob has missings but stage doesn't;
      filter needs its own value.  Actually, I also don't see
      how data->missings is set.
+     
+     -- The missings are stored in GGobiData, but accessed through GGobiStage.
+     You shouldn't need this field.
   */
   public gboolean missings;
 
+  /* i is unsigned, so it must be >= 0, check for row limit like below: */
   private guint
-  get_raw_index (self, guint i) {
-    assert (i >= 0 && i <= self_get_n_rows(self));
+  get_raw_index (self, guint i (check < N_ROWS)) {
+    //assert (i >= 0 && i <= self_get_n_rows(self));
     return (self->rows_in_plot[i]);
   }
 
 // Does everything with a row index need to be overridden?
+// -- Yes
 
 /**
  * set_missing:
@@ -69,7 +84,11 @@ is_missing(GGobiStage self, guint i, guint j)
 /*  Other virtual methods that may need to be overridden.
 
   /* I don't know how this should be set, but this filter's
-     value may differ from its parent's. */
+     value may differ from its parent's. 
+     -- You will need to check at the beginning and upon each change in data
+     for missings.
+     */
+     
 /*
 override (GGobi:Stage) gboolean
 has_missings(GGobiStage self)
@@ -110,6 +129,7 @@ set_raw_value(GGobiStage self, guint i, guint j, gdouble value)
 
 /* This is public in stage.gob -- does it need to be virtual there
 so I can override it here? */
+/* Again, you don't need to override this. set_integer_value calls set_raw_value */
 /**
  * set_categorical_value:
  * @self: #GGobiStage
@@ -149,6 +169,10 @@ get_raw_value(GGobiStage self, guint i, guint j)
    It should be run when there are changes in sampled or excluded.
    It should also be run when rows are added or deleted in 
    preceding data stage.  
+   
+   -- You will probably have to split this up in handlers for changes in
+   data (col-data-changed) and changes in the number of rows (rows-added).
+   I think we might have to add a signal for the removal of rows.
 */
 /**
  * set_rows_in_plot:
