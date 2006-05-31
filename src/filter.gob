@@ -7,19 +7,34 @@ gboolean missing and nmissing (does that exist for each variable?)
   before it.
 
   -- The stage has virtuals for accessing missings, I think you have this right
-  
+
 Signal handling -- need to respond to changes in the values of the
   sampled and excluded vectors (or whatever the precise filter is to
   be) in the parent, as well as to changes in the number of rows.
 
   -- Listen to col-data-changed and the property for n_rows
   
-set_categorical_value is public in stage, but filter wants to
-  override it.
-  
-  -- Why do you need to override this? Everything flows through set_raw_value()
-
 */
+
+%{
+
+  // FIXME: temporary
+  #include "ggobi-data.h"
+  
+  /* signal handlers */
+  static void
+  col_data_changed_cb(GGobiVariable *var, const gchar *name, GGobiStage self)
+  {
+    set_rows_in_plot (self);
+  }
+
+  static void
+  rows_added_cb() 
+  {
+    set_rows_in_plot (self);
+  }
+
+%}
 
 class GGobi:Filter from GGobi:Stage {
 
@@ -40,18 +55,15 @@ class GGobi:Filter from GGobi:Stage {
      
      -- The missings are stored in GGobiData, but accessed through GGobiStage.
      You shouldn't need this field.
+
+     I'm still not clear about this.
   */
   public gboolean missings;
 
-  /* i is unsigned, so it must be >= 0, check for row limit like below: */
   private guint
   get_raw_index (self, guint i (check < N_ROWS)) {
-    //assert (i >= 0 && i <= self_get_n_rows(self));
     return (self->rows_in_plot[i]);
   }
-
-// Does everything with a row index need to be overridden?
-// -- Yes
 
 /**
  * set_missing:
@@ -60,7 +72,7 @@ class GGobi:Filter from GGobi:Stage {
  * @j: column index
  **/
 override (GGobi:Stage) void
-set_missing(GGobiStage self, guint i, guint j)
+set_missing(GGobiStage self, guint i (check < N_ROWS), guint j (check < N_ROWS))
 {
   SELF me = SELF(self);
   PARENT_HANDLER(self->_priv->parent, self_get_raw_index(me, i), j);
@@ -75,7 +87,7 @@ set_missing(GGobiStage self, guint i, guint j)
  * Returns: if value at specified position is missing or not
  **/
 override (GGobi:Stage) gboolean
-is_missing(GGobiStage self, guint i, guint j) 
+is_missing(GGobiStage self, guint i (check < N_ROWS), guint j (check < N_ROWS)) 
 {
   SELF me = SELF(self);
   PARENT_HANDLER(self->_priv->parent, self_get_raw_index(me, i), j);  
@@ -98,14 +110,16 @@ has_missings(GGobiStage self)
 */
 
 override (GGobi:Stage) gchar*
-get_row_id(GGobiStage self, guint i) {
+get_row_id(GGobiStage self, guint i (check < N_ROWS)) {
   SELF me = SELF(self);
   PARENT_HANDLER(self->_priv->parent, self_get_raw_index(me, i));  
 }
 
-/* This will return the raw row number, not the row number
+/* 
+   This will return the raw row number, not the row number
    for this stage.  That's probably the right thing to do, but
-   we need to work through a case where it's used. */
+   we need to work through a case where it's used.
+ */
 override (GGobi:Stage) gint
 get_row_for_id(self, gchar *id) {
   SELF me = SELF(self);
@@ -117,38 +131,20 @@ get_row_for_id(self, gchar *id) {
  * @self: GGobiStage object
  * @i: row index
  * @j: column index
- * @values: vector of new values, of length self->nrows
+ * @values: vector of new values, of length self->n_rows
  **/
 override (GGobi:Stage) void
-set_raw_value(GGobiStage self, guint i, guint j, gdouble value)
+set_raw_value(GGobiStage self, guint i (check < N_ROWS), guint j (check < N_ROWS), gdouble value)
 {
   SELF me = SELF(self);
   self_set_raw_value(self->_priv->parent, 
     self_get_raw_index(me, i), j, value);
 }
 
-/* This is public in stage.gob -- does it need to be virtual there
-so I can override it here? */
-/* Again, you don't need to override this. set_integer_value calls set_raw_value */
-/**
- * set_categorical_value:
- * @self: #GGobiStage
- * @i: row index
- * @j: column index
- * @value: new categorical value
- */
-public void
-set_categorical_value(GGobiStage self, guint i, guint j, const gchar* value) 
-{
-  SELF me = SELF(self);
-  GGobiVariable* var = self_get_variable(self, j);
-  ggobi_variable_add_level_instance(var, value, -1);
-  self_set_integer_value(self, self_get_raw_index(me, i), j, 
-    ggobi_variable_get_level_value(var, value));
-}
-
-// set_string_value shouldn't need to be overridden, because
-// it calls set_raw_value and set_categorical_value.
+/*
+ set_string_value and set_categorical_value shouldn't need to be
+ overridden, because they call set_raw_value.
+*/
 
 /** 
  * get_raw_value:
@@ -157,23 +153,13 @@ set_categorical_value(GGobiStage self, guint i, guint j, const gchar* value)
  * @j: column index
  **/
 override (GGobi:Stage) gdouble
-get_raw_value(GGobiStage self, guint i, guint j)
+get_raw_value(GGobiStage self, guint i (check < N_ROWS), guint j (check < N_ROWS))
 {
   SELF me = SELF(self);
   return self_get_raw_value(self->_priv->parent, 
     self_get_raw_index(me, i), j);
 }
 
-/*
-   Is this a signal handler?
-   It should be run when there are changes in sampled or excluded.
-   It should also be run when rows are added or deleted in 
-   preceding data stage.  
-   
-   -- You will probably have to split this up in handlers for changes in
-   data (col-data-changed) and changes in the number of rows (rows-added).
-   I think we might have to add a signal for the removal of rows.
-*/
 /**
  * set_rows_in_plot:
  * @self: #GGobiData object
@@ -191,17 +177,38 @@ set_rows_in_plot(GGobiStage self)
   SELF me = SELF(self);
   GGobiStage *parent = self->_priv->parent;
   guint i;
+  guint n_rows_prev = self->n_rows;
   self->n_rows = 0;
+  guint *rows_in_plot_prev = g_malloc(n_rows_prev * sizeof(guint));
 
-  rows_in_plot = g_realloc(me->nrows_in_plot, parent->nrows);
-  for (i = 0; i < parent->nrows; i++)
+  for (i=0; i<n_rows_prev; i++)
+    rows_in_plot_prev = me->rows_in_plot(
+
+  rows_in_plot = g_realloc(me->n_rows_in_plot, parent->n_rows);
+  for (i = 0; i < parent->n_rows; i++)
     if (parent->sampled.els[i] && !parent->excluded.els[i])
-      parent->rows_in_plot[self->nrows++] = i;
+      me->rows_in_plot[me->n_rows++] = i;
+  rows_in_plot = g_realloc(me->rows_in_plot, me->n_rows);
   
-  /* It should then emit an event -- rows_changed?  nrows can
-   * change, but rows_in_plot can change even when nrows does
-   * not */
-  self_rows_in_plot_changed(me, (guint) self->nrows); 
+  if (self->n_rows > n_rows_prev)
+    ggobi_stage_rows_added(self, n);
+  else if (self->n_rows < n_rows_prev)
+    ggobi_stage_rows_deleted(self, n);
+  else {
+    gboolean changed = false;
+    for (i=0; i<self->n_rows; i++) {
+      if (rows_in_plot_prev[i] != self->rows_in_plot[i]) {
+        changed = true;
+        break;
+      }
+    }
+    if (changed) {
+      for(guint j = 0; j < self_get_n_data_cols(self); j++) 
+        ggobi_stage_col_data_changed(self, j);
+    }
+  }
+
+  g_free(rows_in_plot_prev);
 }
 
-}
+} // end class definition
