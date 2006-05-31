@@ -101,7 +101,11 @@ tsplot_new (displayd * display, gboolean missing_p, gint nvars, gint * vars,
   gint i, timeVariable, cur;
   splotd *sp;
   gint nplots;
-
+  
+  /* make sure vars is of length n_cols */
+  vars = g_memdup(vars, nvars);
+  vars = g_renew(gint, vars, GGOBI_STAGE(d)->n_cols);
+      
   if (!display)
     display = g_object_new (GGOBI_TYPE_TIME_SERIES_DISPLAY, NULL);
 
@@ -139,6 +143,7 @@ tsplot_new (displayd * display, gboolean missing_p, gint nvars, gint * vars,
                                                                   d, gg);
 
       nplots = MAX (nplots, nplotted_vars);
+  
       vars[0] = timeVariable;
 
       /* Loop through plotted_vars.  Don't add timeVariable again, or
@@ -251,6 +256,8 @@ tsplot_new (displayd * display, gboolean missing_p, gint nvars, gint * vars,
   else
     gtk_widget_show_all (GTK_WIDGET (gg->tsplot.arrangement_box));
 
+  g_free(vars);
+  
   return display;
 }
 

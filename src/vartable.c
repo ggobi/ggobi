@@ -50,21 +50,44 @@ array_contains (gint* arr, gint n, gint el)
   return false;
 }
 
+/* we currently use the GGobiData to access the vartable widgets, but
+  in the future we will get these somehow from the ggobid, so we keep
+  both parameters for now */
 gint
-selected_cols_get (gint *cols, GGobiData *d, ggobid *gg)
+selected_cols_get (gint **cols, GGobiData *d, ggobid *gg)
 {
 /*
  * Figure out which columns are selected.
 */
+  
   gint j, ncols = 0;
-  GGobiVariable *var;
-
-  for (j=0; j<GGOBI_STAGE(d)->n_cols; j++) {
-    var = ggobi_stage_get_variable(GGOBI_STAGE(d), j);
-    if (var->selected)
-      cols[ncols++] = j;
+  
+  for (j = 0; j < GGOBI_VARIABLE_ALL_VARTYPES; j++) {
+    GtkTreeView *view = GTK_TREE_VIEW(d->vartable_tree_view[j]);
+    GtkTreeSelection *sel;
+    if (!view)
+      continue;
+    sel = gtk_tree_view_get_selection(view);
+    ncols += gtk_tree_selection_count_selected_rows(sel);
   }
-
+  *cols = g_new(gint, ncols);
+  ncols = 0;
+  for (j = 0; j < GGOBI_VARIABLE_ALL_VARTYPES; j++) {
+    GtkTreeModel *model;
+    GtkTreeView *view = GTK_TREE_VIEW(d->vartable_tree_view[j]);
+    GtkTreeSelection *sel;
+    if (!view)
+      continue;
+    sel = gtk_tree_view_get_selection(view);
+    GList *rows = gtk_tree_selection_get_selected_rows(sel, &model), *tmp_rows;
+    for (tmp_rows = rows; tmp_rows; tmp_rows = tmp_rows->next)
+      // FIXME: not efficient because we have to dig for the root model each time
+      (*cols)[ncols++] = vartable_varno_from_path(model, 
+        (GtkTreePath *)tmp_rows->data);
+    g_list_foreach(rows, (GFunc)gtk_tree_path_free, NULL);
+    g_list_free(rows);
+  }
+  
   return (ncols);
 }
 

@@ -1,0 +1,139 @@
+%h{
+  #include "ggobi-stage.h"
+  
+  typedef gdouble (*GGobiTransformFunc)(gdouble val, gpointer user_data);
+    
+  typedef struct _GGobiTransform {
+    GGobiTransformFunc forward;
+    GGobiTransformFunc reverse;
+    GGobiVariableNameTransformFunc name;
+    gpointer user_data;
+    GDestroyNotify destroy;
+    /*< private >*/
+    guint ref_count;
+  } GGobiTransform;
+%}
+
+%{
+  static void
+  get_transformed_cols_func(gpointer key, gpointer value, gpointer data)
+  {
+    gint **array = (gint **)data;
+    (*array)[0] = GPOINTER_TO_INT(key);
+    (*array)++;
+  }
+  
+  static gchar *
+  name_tform_func(const gchar *name, gpointer data)
+  {
+    GGobiTransform *tform = (GGobiTransform *)data;
+    return(tform->name(name, tform->user_data));
+  }
+  
+  // FIXME: should be declared publically somewhere eventually
+  
+  GGobiTransform *
+  ggobi_transform_create_full(GGobiTransformFunc forward, GGobiTransformFunc reverse,
+    GGobiVariableNameTransformFunc name, gpointer user_data, GDestroyNotify destroy)
+  {
+    GGobiTransform *tform = g_new(GGobiTransform, 1);
+    tform->forward = forward;
+    tform->reverse = reverse;
+    tform->name = name;
+    tform->user_data = user_data;
+    tform->destroy = destroy;
+    tform->ref_count = 1;
+    return(tform);
+  }
+  GGobiTransform *
+  ggobi_transform_create(GGobiTransformFunc forward, GGobiTransformFunc reverse,
+    GGobiVariableNameTransformFunc name, gpointer user_data)
+  {
+    return ggobi_transform_create_full(forward, reverse, name, user_data, NULL);
+  }
+    
+  void
+  ggobi_transform_destroy(GGobiTransform *tform)
+  {
+    if (tform->destroy)
+      tform->destroy(tform->user_data);
+    g_free(tform);
+  }
+  void
+  ggobi_transform_ref(GGobiTransform *tform)
+  {
+    g_return_if_fail(tform->ref_count > 0);
+    tform->ref_count++;
+  }
+  void
+  ggobi_transform_unref(GGobiTransform *tform)
+  {
+    g_return_if_fail(tform->ref_count > 0);
+    tform->ref_count--;
+    if (!tform->ref_count)
+      ggobi_transform_destroy(tform);
+  }
+  
+%}
+
+class GGobi:Stage:Transform from GGobi:Stage {
+  private GHashTable *tforms = { 
+      g_hash_table_new_full(NULL, NULL, NULL, (GDestroyNotify)ggobi_transform_unref) 
+  } destroywith g_hash_table_destroy;
+  
+  public GObject *
+  new(GGobiStage *parent)
+  {
+    GObject *o = G_OBJECT(GET_NEW_VARG("parent", parent, NULL));
+    return(o);
+  }
+  
+  public void 
+  set_transform(self, guint j (check < N_COLS), GGobiTransform *tform)
+  {
+    GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(self), j);
+    ggobi_transform_ref(tform);
+    ggobi_variable_set_name_transform_func(var, name_tform_func, tform);
+    g_hash_table_insert(self->_priv->tforms, GINT_TO_POINTER(j), tform);
+  }
+  
+  public void 
+  remove_transform(self, guint j (check < N_COLS))
+  {
+    GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(self), j);
+    ggobi_variable_set_name_transform_func(var, NULL, NULL);
+    g_hash_table_remove(self->_priv->tforms, GINT_TO_POINTER(j));
+  }
+  
+  /* don't modify this value */
+  public GGobiTransform *
+  get_transform(self, guint j (check < N_COLS))
+  {
+    return(g_hash_table_lookup(self->_priv->tforms, GINT_TO_POINTER(j)));
+  }
+  
+  public gint *
+  get_transformed_cols(self)
+  {
+    gint *cols = g_new(gint, g_hash_table_size(self->_priv->tforms));
+    gint *tmp_cols = cols;
+    g_hash_table_foreach(self->_priv->tforms, get_transformed_cols_func, &tmp_cols);
+    return(cols);
+  }
+  
+  override (GGobi:Stage) gdouble
+  get_raw_value(GGobi:Stage *self (check null type), guint i, guint j)
+  {
+    GGobiStage *parent = GGOBI_STAGE(ggobi_stage_get_parent(self));
+    GGobiTransform *tform = self_get_transform(SELF(self), j);
+    return(tform->forward(ggobi_stage_get_raw_value(parent, i, j), tform->user_data));
+  }
+  
+  override (GGobi:Stage) void
+  set_raw_value(GGobi:Stage *self (check null type), guint i, guint j, gdouble value)
+  {
+    GGobiStage *parent = GGOBI_STAGE(ggobi_stage_get_parent(self));
+    GGobiTransform *tform = self_get_transform(SELF(self), j);
+    ggobi_stage_set_raw_value(parent, i, j, tform->reverse(value, tform->user_data));
+  }
+}

@@ -27,7 +27,18 @@
 
 #include <string.h> /* for strcmp() */
 
-
+enum { 
+  VT_VARNAME, VT_TFORM,
+  VT_REAL_USER_MIN, VT_REAL_USER_MAX,
+  VT_REAL_DATA_MIN, VT_REAL_DATA_MAX,
+  VT_MEAN, VT_MEDIAN,
+  VT_NLEVELS, VT_LEVEL_NAME, VT_LEVEL_VALUE, VT_LEVEL_COUNT,
+  VT_CAT_USER_MIN, VT_CAT_USER_MAX,
+  VT_CAT_DATA_MIN, VT_CAT_DATA_MAX,
+  VT_NMISSING,
+  NCOLS_VT
+  };
+  
 extern GtkWidget * vartable_buttonbox_build (ggobid *gg);
 static void vartable_subwindow_init (GGobiData *d, ggobid *gg);
 
@@ -247,35 +258,6 @@ vartable_iter_from_varno(gint var, GGobiData *d, GtkTreeModel **model, GtkTreeIt
   return(valid);
 }
 
-/* GtkTreeSelection only tells us when the selection has changed,
-	so we have to reset the selected status of the vartable */
-void
-selection_changed_cb (GtkTreeSelection *tree_sel, ggobid *gg)
-{
-  gint j;
-  GGobiData *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
-  GGobiVariable *var;
-  GList *rows, *l;
-  GtkTreeModel *model;
-  
-  for (j = 0 ; j < GGOBI_STAGE(d)->n_cols ; j++) { /* clear selection */
-    var = ggobi_stage_get_variable(GGOBI_STAGE(d), j);
-    var->selected = false;
-  }
-  
-  rows = gtk_tree_selection_get_selected_rows(tree_sel, &model);
-  for (l = rows; l; l = l->next) {
-    gint varno;
-    GtkTreePath *path = (GtkTreePath*)l->data;
-    varno = vartable_varno_from_path(model, path);
-    gtk_tree_path_free(path);
-	  
-    var = ggobi_stage_get_variable(GGOBI_STAGE(d), varno);
-    var->selected = true;
-  }
-  g_list_free(rows);
-}
-
 /** 'row' here corresponds to 'variable' (top-level rows) */
 void
 vartable_row_append (gint jvar, GGobiData *d)
@@ -314,6 +296,13 @@ cat_filter_func (GtkTreeModel *model, GtkTreeIter *iter, GGobiData *d)
   GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(d), gtk_tree_path_get_indices(path)[0]);
   gtk_tree_path_free(path);
   return(GGOBI_VARIABLE_IS_CATEGORICAL(var));
+}
+
+static void
+vartable_col_data_changed_cb (GGobiStage *s, guint j)
+{
+  vartable_stats_set_by_var (s, j);
+  vartable_limits_set_by_var (s, j);
 }
 
 static void
@@ -399,7 +388,7 @@ vartable_subwindow_init (GGobiData *d, ggobid *gg)
   d->vartable_tree_view[GGOBI_VARIABLE_REAL] = gtk_tree_view_new_with_model(sort_model);
   populate_tree_view(d->vartable_tree_view[GGOBI_VARIABLE_REAL], titles, 
     G_N_ELEMENTS(titles), true,
-    GTK_SELECTION_MULTIPLE, G_CALLBACK(selection_changed_cb), gg);
+    GTK_SELECTION_MULTIPLE, /*G_CALLBACK(selection_changed_cb)*/ NULL, gg);
   gtk_tree_view_set_headers_clickable(GTK_TREE_VIEW(d->vartable_tree_view[GGOBI_VARIABLE_REAL]), true);
   
   /*-- right justify all the numerical columns --*/
@@ -434,7 +423,7 @@ pages any more!
   sort_model = gtk_tree_model_sort_new_with_model(filter_model);
   d->vartable_tree_view[GGOBI_VARIABLE_CATEGORICAL] = gtk_tree_view_new_with_model(sort_model);
   populate_tree_view(d->vartable_tree_view[GGOBI_VARIABLE_CATEGORICAL], titles_cat,
-  	G_N_ELEMENTS(titles_cat), true, GTK_SELECTION_MULTIPLE, G_CALLBACK(selection_changed_cb), gg);
+  	G_N_ELEMENTS(titles_cat), true, GTK_SELECTION_MULTIPLE, /*G_CALLBACK(selection_changed_cb)*/ NULL, gg);
   gtk_tree_view_set_headers_clickable(GTK_TREE_VIEW(d->vartable_tree_view[GGOBI_VARIABLE_CATEGORICAL]), true);
   
   /*-- right justify all the numerical columns --*/
@@ -455,7 +444,7 @@ pages any more!
   /*-- 3 = COLUMN_INSET --*/
   
   ggobi_stage_connect__col_deleted(GGOBI_STAGE(d), vartable_col_deleted_cb, NULL);
-  
+  ggobi_stage_connect__col_data_changed(GGOBI_STAGE(d), vartable_col_data_changed_cb, NULL);
   gtk_widget_show_all (nbook);
 
 }

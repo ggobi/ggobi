@@ -30,8 +30,7 @@ timeSeriesDisplayCreate(gboolean missing_p, splotd *sp, GGobiData *d, ggobid *gg
   gint *selected_vars, nselected_vars = 0;
   displayd *dpy = NULL;
 
-  selected_vars = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof (gint));
-  nselected_vars = selected_cols_get (selected_vars, d, gg);
+  nselected_vars = selected_cols_get (&selected_vars, d, gg);
 
   dpy = tsplot_new (dpy, false, nselected_vars, selected_vars, d, gg);
 

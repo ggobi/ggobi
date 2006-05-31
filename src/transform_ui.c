@@ -182,6 +182,8 @@ static void tform_reset_cb (GtkWidget *w, ggobid *gg)
 void
 tfvar_selection_made_cb (GtkTreeSelection *tree_sel, ggobid *gg)
 {
+  if (!tree_sel)
+    G_BREAKPOINT();
   GtkTreeView *tree_view = gtk_tree_selection_get_tree_view(tree_sel);
   GGobiData *d = (GGobiData *) g_object_get_data(G_OBJECT (tree_view), "datad");
   gint j, nvars, *rows;  // allocated in function

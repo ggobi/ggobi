@@ -404,7 +404,7 @@ create_linkby_notebook (GtkWidget * box, ggobid * gg)
 
   GtkSelectionMode mode = GTK_SELECTION_SINGLE;
   GGobiVariableType vartype = GGOBI_VARIABLE_CATEGORICAL;
-  datatyped dtype = all_datatypes;
+  //datatyped dtype = all_datatypes;
 
   /* Create a notebook, set the position of the tabs */
   notebook = gtk_notebook_new ();
@@ -414,7 +414,7 @@ create_linkby_notebook (GtkWidget * box, ggobid * gg)
   gtk_box_pack_start (GTK_BOX (box), notebook, true, true, 2);
   g_object_set_data (G_OBJECT (notebook), "SELECTION", (gpointer) mode);
   g_object_set_data (G_OBJECT (notebook), "vartype", (gpointer) vartype);
-  g_object_set_data (G_OBJECT (notebook), "datatype", (gpointer) dtype);
+  //g_object_set_data (G_OBJECT (notebook), "datatype", (gpointer) dtype);
 
   for (l = gg->d; l; l = l->next) {
     d = (GGobiData *) l->data;

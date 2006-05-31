@@ -9,6 +9,7 @@
 #include <gtk/gtk.h>
 #include <math.h>
 
+/* used for variable notebooks - this will go in variable_nbook.h */
 typedef enum {no_edgesets, edgesets_only, all_datatypes} datatyped;
 
 typedef struct _Subset {
@@ -75,12 +76,17 @@ typedef struct _Sphere_d {
 
 typedef struct _EdgeData {
   gint n;
+  /* maps from edge to row in edge dataset (mappinng not 1-1 due to polygons) */
+  guint *indices;
   SymbolicEndpoints *sym_endpoints;
+  
+  // To EDGE-RESOLVER stage
   GList *endpointList;   
     /* a list of endpointsd elements corresponding to the resolved 
        record ids relative to a given datad. This is akin to a table
        indexed by datad elements. **/
 
+  // To BRUSH stage
   gint nxed_by_brush;
   vector_b xed_by_brush;
 } EdgeData;
@@ -103,11 +109,12 @@ typedef struct _BrushBins {
 #include "externs.h"
 %}
 
-
+// FIXME: perhaps this could be replaced with a stage that masks arbitrary
+// attributes?
 enum ATTR_SET {
   PERSISTENT,
   TRANSIENT
-} GGobiData:AttrSetMethod;
+} GGobi:Data:Attr:Set:Method;
 
 /**
  * SECTION:GGobiData
@@ -128,70 +135,90 @@ public gchar *nickname;
 property STRING nickname
   (nick = "alias", blurb = "The nickname of the dataset",
    default_value = "dataset", link, export);
-   
+
+/* A description of the source of the GGobiData */
+// FIXME: this should be a boxed type and the field private
 public InputDescription *input;
 
-public guint nattributes = 0;
-
-public gboolean missings;
+private guint n_attributes;
+private gboolean missings;
 
 public struct _ggobid *gg; /*-- a pointer to the parent --*/
 
 /* GUI related */
-public Subset  subset;
-public Jitterd  jitter;
+/* The GUI components should likely hold references to the pipeline stages, 
+  not the other way around. If necessary, the GGobi context can map stages to
+  GUI components. */
 public Varpanel_cboxd  vcbox_ui;
 public Varpanel_circd  vcirc_ui;
 public Varpaneld  varpanel_ui;
-public Sphere_d  sphere;
-public EdgeData  edge;
-public BrushBins  brush;
-
 public GtkWidget *vartable_tree_view[GGOBI_VARIABLE_ALL_VARTYPES];
 public GtkTreeModel *vartable_tree_model; /* the root model, with all vars **/
 public GtkWidget *cluster_table; /*-- table of symbol groups from brushing --*/
 public clusteruid *clusvui;
 
-public GHashTable* idTable;
 
-/*-- to support brushing by categorical variable --*/
-public gchar* linkvar = NULL;  /*-- the linking variable name--*/
-
-// Vectors of length nrows
-public char **rowIds;
-public vector_b excluded;
-public vector_b sampled;
-public vector_i clusterid;
+/* PIPELINE */
+public Subset  subset;
+public Jitterd  jitter;
+public Sphere_d  sphere;
+public BrushBins  brush;
 
 protected vector_i rows_in_plot;
 public vector_i rows_under_brush;
 public vector_i rows_under_brush_prev;
 
-// Arrays of ncols x nrows
-protected array_f raw;
 public array_f tform;
 public array_g world;
 public array_g jitdata;
-public array_s missing; 
 
 public gboolean missings_show_p; /*-- show/hide per datad, not per display --*/
 public gint nrows_in_plot;     /*-- how many elements of rows_in_plot to use --*/
 public gint nrows_under_brush;
 public gint nrows_under_brush_prev;
+
 /*--------------- clusters: hiding, excluding ----------------------*/
 
+// A pipeline stage could map the data to its clusters
 public symbol_cell symbol_table[NGLYPHTYPES][NGLYPHSIZES][MAXNCOLORS];
 public gint nclusters;
 public clusterd *clusv;
 
+public GSList *sticky_ids; // as an attribute from IDENTIFY stage
+   
+/* END PIPELINE */
+
 /*-- used in identification, line editing, and point motion --*/
+// Could be moved to imode object or a boolean attribute or g_object_set_data()
 public gint nearest_point;
 public gint nearest_point_prev;
-public GSList *sticky_ids;
 
 /*-------------------- moving points ---------------------------------*/
+// To 'move points' imode?
 public GSList *movepts_history; /*-- a list of elements of type celld --*/
-   
+
+/* We'll fix edge/polygon stuff after pipeline */
+public EdgeData  edge;
+
+/* Maps row labels to row indices */
+public GHashTable* idTable;
+
+/*-- to support brushing by categorical variable --*/
+public gchar* linkvar = NULL;  /*-- the linking variable name--*/
+
+/* The row ids */
+public char **rowIds;
+
+// FIXME: make attributes
+public vector_b excluded;
+public vector_b sampled;
+public vector_i clusterid;
+
+/* The actual data in this default implementation */
+protected array_f raw;
+/* Tracking missing values per cell */
+public array_s missing; 
+
 private signal first NONE (UINT) void 
 rows_in_plot_changed(self, guint n) {
   tform_to_world(self);
@@ -242,7 +269,7 @@ new(guint nrows, guint ncols)
 public void
 add_attributes(self) {
   GGobiStage *stage = GGOBI_STAGE(self);
-  self->nattributes += 12;
+  self->_priv->n_attributes += 12;
   guint first_attr = self_add_cols(self, 12);
   ggobi_stage_set_col_name(stage, first_attr++, "_color");
   ggobi_stage_set_col_name(stage, first_attr++, "_glyph_size");
@@ -272,7 +299,7 @@ add_attributes(self) {
 // FIXME: data/attribute distinction should be made by a pipeline stage
 public guint
 get_n_data_cols(self) {
-  return ggobi_stage_get_n_cols(GGOBI_STAGE(self)) - self->nattributes;
+  return ggobi_stage_get_n_cols(GGOBI_STAGE(self)) - self->_priv->n_attributes;
 }
 
 // FIXME: to be removed once pipeline in place
@@ -367,7 +394,8 @@ set_missing(GGobi:Stage *self (check null type), guint i, guint j)
   SELF(self)->missing.vals[i][j] = 1;
   SELF(self)->raw.vals[i][j] = 0;
 
-  SELF(self)->missings = TRUE;
+  // FIXME: we need to set this to FALSE if all become non-missing
+  SELF(self)->_priv->missings = TRUE;
 }
 
 
@@ -388,12 +416,12 @@ is_missing(GGobi:Stage *self, guint i, guint j)
 /**
  * has_missings:
  * @self: GGobiData object
- * Returns: whether or not dataset contains any missing values
+ * Returns: whether there are missing values
  **/
-override (GGobi:Stage) gboolean
+override (GGobi:Stage) guint
 has_missings(GGobi:Stage *self (check null type)) 
 {
-  return SELF(self)->missings;
+  return SELF(self)->_priv->missings;
 }
 
 
@@ -418,10 +446,9 @@ set_raw_value(GGobi:Stage *self (check null type), guint i, guint j, gdouble val
   if(GGobiMissingValue && GGobiMissingValue(value))
     ggobi_stage_set_missing(self, i, j);
   else {
-    GGobiVariable *var = ggobi_stage_get_variable(self, j);
-    if (GGOBI_VARIABLE_IS_CATEGORICAL(var))
-      if (!ggobi_variable_has_level(var, (gint) value))
-        ggobi_variable_add_level(var, NULL, (gint) value);
+    //GGobiVariable *var = ggobi_stage_get_variable(self, j);
+    //if (GGOBI_VARIABLE_IS_CATEGORICAL(var))
+    //  ggobi_variable_add_level(var, NULL, (gint) value);
     SELF(self)->raw.vals[i][j] = value;
     SELF(self)->tform.vals[i][j] = value;
   }
@@ -457,9 +484,9 @@ public void
 set_variable (self, guint j, GGobiVariable* value)
 {
   // FIXME: This function should not exist
-  if (GGOBI_STAGE(self)->vartable[j])
-    g_object_unref(GGOBI_STAGE(self)->vartable[j]);
-  GGOBI_STAGE(self)->vartable[j] = value;
+  if (g_ptr_array_index(GGOBI_STAGE(self)->vartable, j))
+    g_object_unref(g_ptr_array_index(GGOBI_STAGE(self)->vartable, j));
+  g_ptr_array_index(GGOBI_STAGE(self)->vartable, j) = value;
 }
 
 override (GGobi:Stage) guint
@@ -573,7 +600,7 @@ add_rows(self, guint n) {
     self->rowIds[i] = NULL;
   }
 
-  if (self->nattributes > 0) {
+  if (self->_priv->n_attributes > 0) {
     gint def_color = self->gg ? self->gg->color_id : 0;
     gint def_type  = self->gg ? self->gg->glyph_id.type : FC;
     gint def_size  = self->gg ? self->gg->glyph_id.size : 1;

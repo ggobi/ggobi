@@ -28,7 +28,8 @@
   #include "utils.h"
   
   /* for use in GOB parameter checks like: guint j (check < N_COLS) */
-  #define N_COLS self->n_cols
+  #define N_COLS GGOBI_STAGE(self)->n_cols
+  #define N_ROWS GGOBI_STAGE(self)->n_rows;
   
   #define GGOBI_STAGE_IS_COL_CATEGORICAL(stage, col) \
     ggobi_stage_get_col_type((stage), (col)) == GGOBI_VARIABLE_CATEGORICAL
@@ -83,8 +84,11 @@ property STRING name
 /* private struct _ggobid *gg; */
 
 /* variables are now stored in the stage */
-// FIXME: should probably become a GArray
-public GGobiVariable **vartable;
+public GPtrArray *vartable = { g_ptr_array_new() } 
+  destroy { /* scrap the variables then the array */
+    g_ptr_array_foreach(VAR, (GFunc)g_object_unref, NULL); 
+    g_ptr_array_free(VAR, TRUE);
+  };
 
 /* A note: GOB places 'private' fields in a separate structure, requiring us
   to use '->_priv' to access them. That is a real pain. By making fields
@@ -110,9 +114,7 @@ property UINT n_cols
    set { 
      gint nprev = self->n_cols;
      self->n_cols = g_value_get_uint(VAL);
-     self->vartable = g_renew (GGobiVariable *, self->vartable, self->n_cols);
-     for(guint j = nprev; j < self->n_cols; j++)
-       self->vartable[j] = NULL; // or use memset above
+     g_ptr_array_set_size(self->vartable, self->n_cols);
      /* we emit cols_added here, but we can't emit col_deleted */
      if (nprev < self->n_cols)
        self_cols_added(self, self->n_cols - nprev);
@@ -125,7 +127,10 @@ public GHashTable* var_name_lookup = {
    
 
 public signal first NONE (UINT) void 
-col_data_changed(self, guint j);
+col_data_changed(self, guint j) {
+  GGobiVariable *var = self_get_variable(self, j);
+  ggobi_variable_update(var);
+}
 
 public signal first NONE (STRING, UINT) void 
 col_name_changed(self, const gchar *old_name, guint j) {
@@ -222,8 +227,6 @@ public gint
 get_col_index_for_name(self, const gchar* name) onerror -1
 {
   gpointer pos, key;
-  if (!name)
-    G_BREAKPOINT();   
   if (g_hash_table_lookup_extended(self->var_name_lookup, name, &key, &pos))
     return GPOINTER_TO_INT(pos);
   return -1;
@@ -243,17 +246,22 @@ public void
 set_col_name(self, guint j, const gchar* value) 
 {
   GGobiVariable* vt = self_get_variable(self, j);
-  gchar *nick, *name;
+  gchar *nick = NULL, *name;
   
   if (value)
     name = g_strdup(value);
-  else name = g_strdup_printf("_Var %d", j);
-  nick = g_strndup(name, 2);
+  else {
+    nick = g_strdup_printf("V%d", j);
+    name = g_strdup_printf("_Var %d", j);
+  }
   
   ggobi_variable_set_name(vt, name);
-  ggobi_variable_set_nickname(vt, nick);
   
-  g_free(nick);
+  if (nick) {
+    ggobi_variable_set_nickname(vt, nick);
+    g_free(nick);
+  }
+  
   g_free(name);
 }
 
@@ -304,9 +312,9 @@ is_missing(self, guint i, guint j)
 /**
  * has_missings:
  * @self: GGobiStage object
- * Returns: whether or not dataset contains any missing values
+ * Returns: whether there are missing values in the stage
  **/
-virtual gboolean
+virtual guint
 has_missings(self) 
 {
   return(self_has_missings(self->_priv->parent));
@@ -388,7 +396,8 @@ public void
 set_categorical_value(self, guint i, guint j, const gchar* value) 
 {
   GGobiVariable* var = self_get_variable(self, j);
-  ggobi_variable_add_level_instance(var, value, -1);
+  ggobi_variable_add_level(var, value, -1);
+  //ggobi_variable_add_level_instance(var, value, -1);
   self_set_raw_value(self, i, j, (gdouble)ggobi_variable_get_level_value(var, value));
 }
 
@@ -444,7 +453,7 @@ create_variable (self, guint j)
 }
 
 /**
- * get_vartable:
+ * get_variable:
  * @self: #GGobiStage object
  * @j: column index
  *
@@ -456,15 +465,15 @@ get_variable (self, guint j)
   /* here we use a lazy creation pattern, because most stages will not need
     to provide variable objects. It could be costly to provide the full set
     of variables for each stage. */
-  if (!self->vartable[j]) {
+  if (!g_ptr_array_index(self->vartable, j)) {
     GGobiVariable *var = self_create_variable(self, j);
-    self->vartable[j] = var;
+    g_ptr_array_index(self->vartable, j) = var;
     self_col_name_changed(self, NULL, j); /* changed from... undefined */
     ggobi_variable_connect__name_changed(var, variable_name_changed_cb, self);
     self_set_col_name(self, j, NULL);
   }
 
-  return self->vartable[j];
+  return g_ptr_array_index(self->vartable, j);
 }
 
 /**
@@ -479,7 +488,7 @@ get_variable (self, guint j)
  * output into csv etc.  It may be sub-optimal for user display, because
  * it does not use the users locale settings, and outputs full precision.
  **/
-// FIXME: obviously broken
+// FIXME: obviously broken, waiting on pipeline
 public gchar*
 get_string_value(self, guint i, guint j, gboolean transformed) 
 {

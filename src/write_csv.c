@@ -123,10 +123,11 @@ write_csv_file (FILE *f, GGobiData *d, ggobid *gg)
     }
   } else { // gg->save.column_ind==SELECTEDCOLS
     /*-- work out which columns to save --*/
-    cols = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof (gint));
-    ncols = selected_cols_get (cols, d, gg);
-    if (ncols == 0)  // backup source of column selection
+    ncols = selected_cols_get (&cols, d, gg);
+    if (ncols == 0)  { // backup source of column selection
+      cols = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof (gint));
       ncols = plotted_cols_get (cols, d, gg);
+    }
   }
 
   if (ncols) {

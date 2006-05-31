@@ -2,22 +2,6 @@
   #include "types.h"
   #include <math.h>
   
-  /* GUI specific */ 
-  enum { 
-  VT_VARNAME, VT_TFORM,
-  VT_REAL_USER_MIN, VT_REAL_USER_MAX,
-  VT_REAL_DATA_MIN, VT_REAL_DATA_MAX,
-  VT_MEAN, VT_MEDIAN,
-  VT_NLEVELS, VT_LEVEL_NAME, VT_LEVEL_VALUE, VT_LEVEL_COUNT,
-  VT_CAT_USER_MIN, VT_CAT_USER_MAX,
-  VT_CAT_DATA_MIN, VT_CAT_DATA_MAX,
-  VT_NMISSING,
-  NCOLS_VT
-  };
-  
-  /* GUI specific - does not belong here */
-  typedef enum {ADDVAR_ROWNOS, ADDVAR_BGROUP} NewVariableType;
-  
   /* move to categorical subclass? */
   typedef struct level_s {
     gint count;
@@ -25,17 +9,20 @@
     gchar *name;
   } level_t;
   
+  /* shortcut that would not be necessary with a categorical class */
   #define GGOBI_VARIABLE_IS_CATEGORICAL(var) \
     ggobi_variable_get_vartype((var)) == GGOBI_VARIABLE_CATEGORICAL
   
-  /* had to typedef this stuff so that gob can parse it */
+  /* we now allow implicit name transformation by GGobiVariable */
+  typedef gchar * (*GGobiVariableNameTransformFunc) (const gchar *name, gpointer data);
+  
+  /* had to typedef this stuff so that gob could parse it */
   typedef gfloat (*GGobiDomainAdjFunc) (gfloat x, gfloat incr);
   typedef gfloat (*GGobiInvDomainAdjFunc) (gfloat x, gfloat incr);
   
   /* this trick lets us use GGobiStage without including ggobi-stage.h,
       which would introduce a circular dependency
   */
-  /* Note: I am not sure if this hack will work with future GOB versions - michael */
   #ifndef __TYPEDEF_GGOBI_STAGE__
   #define __TYPEDEF_GGOBI_STAGE__
   typedef struct _GGobiStage GGobiStage;
@@ -44,7 +31,7 @@
 
 %{
   #include "ggobi-stage.h"
-  #define GGOBI_SMALLEST_DOUBLE -G_MAXDOUBLE
+  #define GGOBI_SMALLEST_DOUBLE -G_MAXDOUBLE /* get past the GOB parser */
   
   static void
   value_collector_func(gpointer key, gpointer value, gpointer data)
@@ -53,6 +40,13 @@
     (*array)[0] = GPOINTER_TO_INT(key);
     (*array)++;
   }
+  static void
+  level_count_clear_func(gpointer key, gpointer value, gpointer data)
+  {
+    level_t *l = (level_t *)value;
+    l->count = 0;
+  }
+  
   extern gfloat no_change (gfloat, gfloat);
 %}
 
@@ -61,8 +55,14 @@ enum GGOBI_VARIABLE {
 } GGobi:Variable:Type;
 
 /* This is meant to encapsulate per-column attributes in the Gobi pipeline.
-   The public interface is that exposed to pipeline clients, while pipeline
-   stage implementations are permitted to use the protected API (via the private header)
+   It simplifies the per-column GGobiData API and offers the conveniences of 
+   GObject for each column. The GGobiVariable is a essentially a utility for
+   GGobiData. Thus, the direction of control is from GGobiData to GGobiVariable.
+   The GGobiVariable maintains a reference to its GGobiStage, but it does not 
+   initiate any transactions with GGobiStage. The GGobiStage registers 
+   signal handlers to track the effects of GGobiVariable setter invocations
+   and explicitly invokes ggobi_variable_update() upon changes in the data at 
+   the GGobiVariable's column.
 */
 class GGobi:Variable from G:Object {
   private GGobiStage *stage; /* stage to which this variable belongs */
@@ -80,23 +80,24 @@ class GGobi:Variable from G:Object {
   set {
     // FIXME: for some reason the default value 'X' is not being set
     // This is a bug in something.
-    char *old = self->_priv->name; 
-    self->_priv->name = g_value_dup_string (VAL); 
+    gchar *name, *nick, *old = self->_priv->name;
+    const gchar *tmp_name = g_value_get_string (VAL);
+    if (self->_priv->name_transform_func)
+      name = self->_priv->name_transform_func(tmp_name, 
+        self->_priv->transform_user_data);
+    else name = g_strdup(tmp_name);
+    self->_priv->name = name;
+    nick = g_strndup(tmp_name, 2); /* prefix of untransformed name */
+    self_set_nickname(self, nick);
     self_name_changed(self, old);
     g_free (old);
+    g_free (nick);
   };
   property STRING nickname
   (nick = "alias", blurb = "The alias for this variable",
    default_value = "X", link, export);
    
-   /* should this become encoded in the class? */
-   /* pros: leverages the GType system, 
-            every variable type requires slightly different behavior
-            built-in type safety 
-   */
-   /* cons: the variable type is currently dynamic 
-            - we would need a coercion mechanism and GValue is one */
-     
+  // FIXME: we will likely move to a type hierarchy to encode this
   private GGobiVariableType vartype; 
   property ENUM vartype
   (nick = "class", blurb = "The type of this variable",
@@ -107,15 +108,19 @@ class GGobi:Variable from G:Object {
   property DOUBLE def
   (nick = "default", blurb = "The default value for a field of this variable",
     default_value = 0, minimum = GGOBI_SMALLEST_DOUBLE, maximum = G_MAXDOUBLE, link, export);
-  
+
+  /* In order to make transforming column names more convenient, the base
+    GGobiVariable class accepts a name transformation function at construction
+    time, which makes it unnecessary to extend GGobiVariable to change the name.
+    */
+  private GGobiVariableNameTransformFunc name_transform_func;
+  private gpointer transform_user_data;
+
   /* provides the old name for listeners that know the variable by its name */
-  public signal NONE (STRING) void 
+  private signal NONE (STRING) void 
     name_changed(self, const gchar *old_name);
-    
-  /*-- in variable table --*/
-  public gboolean selected;
   
-  /* to be covered by pipeline */
+  /* PIPELINE STUFF */
   public lims lim_raw;         /* raw data*/
   public lims lim_tform;       /*transformed data*/
   public lims lim_display;     /*for vartable, transformed sans missings*/
@@ -134,7 +139,7 @@ class GGobi:Variable from G:Object {
   /*-- jittering --*/
   public gfloat jitter_factor;
   
-  /* private gboolean isTime;  is this really necessary? */
+  /* END PIPELINE */
   
   /*-- categorical stuff --*/
   /*-- fast mapping from names and values to indices --*/
@@ -143,6 +148,7 @@ class GGobi:Variable from G:Object {
   private GHashTable *value_to_level = { g_hash_table_new(NULL, NULL) }
     destroywith g_hash_table_destroy;
   
+    // FIXME: these should be made private after pipeline in place
   public lims lim;             /* limits for this variable */
   public gfloat mean;
   public gfloat median;
@@ -179,6 +185,14 @@ class GGobi:Variable from G:Object {
     // default_value in the property isn't working
     GObject *o = G_OBJECT(GET_NEW_VARG("stage", stage, "name", "_X_", NULL));
     return(o);
+  }
+  
+  public void
+  set_name_transform_func(self, GGobiVariableNameTransformFunc func,
+    gpointer user_data)
+  {
+    self->_priv->name_transform_func = func;
+    self->_priv->transform_user_data = user_data;
   }
   
   /**
@@ -436,9 +450,7 @@ class GGobi:Variable from G:Object {
    return self_new;
  }
  
- // FIXME: This can likely be private, because the GGobiVariable can listen to
- // the stage and perform this when necessary
-  public void
+  private void
   add_level_instance(self, const gchar *name, gint value)
   {
     level_t *level;
@@ -470,6 +482,9 @@ class GGobi:Variable from G:Object {
    
    g_return_val_if_fail(GGOBI_VARIABLE_IS_CATEGORICAL(self), 0);
   
+   if (value != -1 && self_has_level(self, value))
+     return self_get_n_levels(self);
+   
    level = g_new(level_t, 1);
   
    level->count = 1;
@@ -487,5 +502,28 @@ class GGobi:Variable from G:Object {
    g_hash_table_insert(self->_priv->value_to_level, GINT_TO_POINTER(level->value), level);
 
    return self_get_n_levels(self);
+ }
+ 
+ public void
+ update(self)
+ {
+   guint n = ggobi_stage_get_n_rows(self->_priv->stage);
+   gint j = ggobi_stage_get_col_index_for_name(self->_priv->stage, 
+    self->_priv->name);
+   
+   /* update limits, mean, median */
+   // FIXME: todo once pipeline is in place
+   
+   /* recount levels if categorical */
+   
+   if (!GGOBI_VARIABLE_IS_CATEGORICAL(self))
+     return;
+   
+   g_hash_table_foreach(self->_priv->name_to_level, level_count_clear_func, NULL);
+   
+   for (guint i = 0; i < n; i++)
+     self_add_level_instance(self, NULL, 
+      (gint)ggobi_stage_get_raw_value(self->_priv->stage, i, j));
+   
  }
 }

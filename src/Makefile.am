@@ -1,5 +1,5 @@
 lib_LTLIBRARIES     = libggobi.la
-libggobi_la_GOBS = variable.gob stage.gob data.gob
+libggobi_la_GOBS = variable.gob stage.gob data.gob stage-transform.gob
 libggobi_la_GOBSOURCES = $(libggobi_la_GOBS:%.gob=ggobi-%.c)
 libggobi_la_GOBHEADERS = $(libggobi_la_GOBS:%.gob=ggobi-%.h)
 libggobi_la_GOBOBJECTS = $(libggobi_la_GOBS:%.gob=ggobi-%.lo)
@@ -31,7 +31,7 @@ pkginclude_HEADERS = GGobiAPI.h ggobiClass.h tour1d_pp.h GGobiApp.h \
   noop-toggle.h tour2d_pp.h GGobiEvents.h parcoordsClass.h tour_pp.h \
   barchartDisplay.h plugin.h tsPlot.h brushing.h tsdisplay.h \
   colorscheme.h read_csv.h types.h config.h read_init.h vars.h cpanel.h \
-  read_xml.h varseldata.h defines.h scatmatClass.h vartable.h display.h \
+  read_xml.h varseldata.h defines.h scatmatClass.h display.h \
   scatterplotClass.h display_tree.h splash.h write_xml.h ggobi-intl.h \
   externs.h splot.h writedata.h fileio.h testEvents.h ggobi.h tour.h \
   $(libggobi_la_GOBHEADERS) GGStructSizes.c marshal.h

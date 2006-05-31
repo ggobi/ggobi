@@ -287,6 +287,8 @@ scale_set_default_values (GtkScale * scale)
 /*      Notebook containing the variable list for each datad          */
 /*--------------------------------------------------------------------*/
 
+//FIXME: Probably belongs in its own files (variable_nbook.c/.h).
+//Also, the base notebook should be generalized to support prefices
 void
 variable_notebook_subwindow_add (GGobiData * d, GCallback func,
                                  gpointer func_data, GtkWidget * notebook,

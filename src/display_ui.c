@@ -128,9 +128,7 @@ extended_display_open_cb (GtkWidget * w, ExtendedDisplayCreateData * data)
   }
   else if (data->klass->createWithVars) {
     gint *selected_vars, nselected_vars = 0;
-
-    selected_vars = (gint *) g_malloc (GGOBI_STAGE(data->d)->n_cols * sizeof (gint));
-    nselected_vars = selected_cols_get (selected_vars, data->d, gg);
+    nselected_vars = selected_cols_get (&selected_vars,data->d, gg);
     dpy =
       data->klass->createWithVars (false, nselected_vars, selected_vars,
                                    data->d, gg);

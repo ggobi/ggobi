@@ -34,8 +34,8 @@ static void
 clone_vars_cb (GtkWidget *w, ggobid *gg)
 {
   GGobiData *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
-  gint *cols = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof (gint));
-  gint ncols = selected_cols_get (cols, d, gg);
+  gint *cols;
+  gint ncols = selected_cols_get (&cols, d, gg);
 
   if (ggobi_stage_get_n_cols(GGOBI_STAGE(d)))
     clone_vars (cols, ncols, d);
@@ -76,8 +76,8 @@ dialog_range_set (GtkWidget *w, ggobid *gg)
   GtkWidget *umin_entry, *umax_entry;
   GtkTreeModel *model;
   GGobiData *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
-  gint *cols = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof (gint));
-  gint ncols = selected_cols_get (cols, d, gg);
+  gint *cols;
+  gint ncols = selected_cols_get (&cols, d, gg);
   gint j, k;
   gchar *val_str;
   gfloat min_val = 0, max_val = 0; // compiler pacification
@@ -129,8 +129,8 @@ dialog_range_set (GtkWidget *w, ggobid *gg)
       var->lim_specified.min = var->lim_specified_tform.min = min_val;
       var->lim_specified.max = var->lim_specified_tform.max = max_val;
 
-      gtk_tree_store_set(GTK_TREE_STORE(model), &iter, 
-	VT_REAL_USER_MIN, min_val, VT_REAL_USER_MAX, max_val, -1);
+      /*gtk_tree_store_set(GTK_TREE_STORE(model), &iter, 
+	VT_REAL_USER_MIN, min_val, VT_REAL_USER_MAX, max_val, -1);*/
       
       var->lim_specified_p = min_p && max_p;
       
@@ -173,8 +173,8 @@ open_range_set_dialog (GtkWidget *w, ggobid *gg)
   GSList *group;
   gint k;
   GGobiData *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
-  gint *cols = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof (gint));
-  gint ncols = selected_cols_get (cols, d, gg);
+  gint *cols;
+  gint ncols = selected_cols_get (&cols, d, gg);
   gboolean ok = true;
   GGobiVariable *var;
 
@@ -295,8 +295,8 @@ void range_unset (ggobid *gg)
 {
   GtkTreeModel *model;
   GGobiData *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
-  gint *cols = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof (gint));
-  gint ncols = selected_cols_get (cols, d, gg);
+  gint *cols;
+  gint ncols = selected_cols_get (&cols, d, gg);
   gint j, k;
   GGobiVariable *var;
 
@@ -310,8 +310,8 @@ void range_unset (ggobid *gg)
 	  
     var->lim_specified_p = false;
     /*-- then null out the two entries in the table --*/
-    gtk_tree_store_set(GTK_TREE_STORE(model), &iter, 
-	  	VT_REAL_USER_MIN, 0.0, VT_REAL_USER_MAX, 0.0, -1);
+    /*gtk_tree_store_set(GTK_TREE_STORE(model), &iter, 
+	  	VT_REAL_USER_MIN, 0.0, VT_REAL_USER_MAX, 0.0, -1);*/
 	  
 	  g_signal_emit_by_name(d, "col_data_changed", (guint) j);
   }
@@ -322,6 +322,38 @@ void range_unset (ggobid *gg)
 /*-------------------------------------------------------------------------*/
 /*------- Adding derived variables (other than cloning, for now) ----------*/
 /*-------------------------------------------------------------------------*/
+
+// FIXME: In my (Michael) opinion, this is broken. UI's should be registered
+// for creating each type of variable. If no UI is registered for a type,
+// then the 'New' button should not be displayed.
+// Right now 'New' is displayed under categorical, but one can only make
+// real variables.
+
+/* I went ahead and moved this from varchange.c since it seemed specific
+  to this GUI. Adding variable seems simple enough that this is not
+  needed as a generic utility. */
+  
+typedef enum {ADDVAR_ROWNOS, ADDVAR_BGROUP} NewVariableType;
+
+static guint
+create_explicit_variable (GGobiData * d, gchar * vname, NewVariableType vartype)
+{
+  guint jvar = ggobi_data_add_cols(d, 1);
+  ggobi_stage_set_col_name(GGOBI_STAGE(d), jvar, vname);
+
+  for (guint i = 0; i < GGOBI_STAGE(d)->n_rows; i++) {
+    switch(vartype) {
+      case ADDVAR_ROWNOS:
+        ggobi_stage_set_raw_value(GGOBI_STAGE(d), i, jvar, (gfloat) (i + 1));
+        break;
+      case ADDVAR_BGROUP:
+        ggobi_stage_set_raw_value(GGOBI_STAGE(d), i, jvar, (gfloat) d->clusterid.els[i]);
+        break;
+    }
+  }
+  g_signal_emit_by_name(d, "col_data_changed", jvar);
+  return jvar;
+}
 
 static void
 dialog_newvar_add (GtkWidget *w, ggobid *gg) 
@@ -340,11 +372,7 @@ dialog_newvar_add (GtkWidget *w, ggobid *gg)
   }
   if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (radio_brush)))
     vartype = ADDVAR_BGROUP;
-  else {
-    vartype = ADDVAR_ROWNOS;
-    g_debug("Using brush group");
-    
-  }
+  else vartype = ADDVAR_ROWNOS;
 
   /*-- retrieve the entry widget and variable name --*/
   entry = widget_find_by_name (GTK_DIALOG(dialog)->vbox, "newvar_entry");
@@ -445,8 +473,7 @@ dialog_rename_var (GtkWidget *w, ggobid *gg)
   gint jvar;
 
   /*-- find out what variables are selected in the var statistics panel --*/
-  selected_vars = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof (gint));
-  nselected_vars = selected_cols_get (selected_vars, d, gg);
+  nselected_vars = selected_cols_get (&selected_vars, d, gg);
   if (nselected_vars == 0)
     return;
 
@@ -472,8 +499,7 @@ open_rename_dialog (GtkWidget *w, ggobid *gg)
   gint *selected_vars, nselected_vars = 0;
 
   /*-- find out what variables are selected in the var statistics panel --*/
-  selected_vars = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof (gint));
-  nselected_vars = selected_cols_get (selected_vars, d, gg);
+  nselected_vars = selected_cols_get (&selected_vars, d, gg);
 
   if (nselected_vars == 0) {
     gchar *message = g_strdup_printf ("You must select one variable.\n");

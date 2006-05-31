@@ -142,10 +142,12 @@ write_xml_variables (FILE *f, GGobiData *d, ggobid *gg, XmlWriteInfo *xmlWriteIn
     }
   } else if (gg->save.column_ind == SELECTEDCOLS) {
     /*-- work out which columns to save --*/
-    gint *cols = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof (gint));
-    gint ncols = selected_cols_get (cols, d, gg);
-    if (ncols == 0)
+    gint *cols;
+    gint ncols = selected_cols_get (&cols, d, gg);
+    if (ncols == 0) {
+      cols = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof (gint));
       ncols = plotted_cols_get (cols, d, gg);
+    }
     fprintf(f,"<variables count=\"%d\">\n", ncols); 
     for(j = 0; j < ncols; j++) {
       write_xml_variable (f, d, gg, cols[j], xmlWriteInfo);
@@ -324,10 +326,12 @@ write_xml_record (FILE *f, GGobiData *d, ggobid *gg, gint i,
      }
   } else if (gg->save.column_ind == SELECTEDCOLS && ggobi_stage_get_n_cols(GGOBI_STAGE(d))) {
     /*-- work out which columns to save --*/
-    gint *cols = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof (gint));
-    gint ncols = selected_cols_get (cols, d, gg);
-    if (ncols == 0)
+    gint *cols;
+    gint ncols = selected_cols_get (&cols, d, gg);
+    if (ncols == 0) {
+      cols = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof (gint));
       ncols = plotted_cols_get (cols, d, gg);
+    }
     for(j = 0; j < ncols; j++) {
       if (ggobi_stage_is_missing(GGOBI_STAGE(d), i, j) &&
         gg->save.missing_ind != MISSINGSIMPUTED)

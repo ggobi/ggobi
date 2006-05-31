@@ -53,27 +53,6 @@ tour_realloc_up (GGobiData *d, gint nc)
   }
 }
 
-
-guint
-create_explicit_variable (GGobiData * d, gchar * vname, NewVariableType vartype)
-{
-  guint jvar = ggobi_data_add_cols(d, 1);
-  ggobi_stage_set_col_name(GGOBI_STAGE(d), jvar, vname);
-
-  for (guint i = 0; i < GGOBI_STAGE(d)->n_rows; i++) {
-    switch(vartype) {
-      case ADDVAR_ROWNOS:
-        ggobi_stage_set_raw_value(GGOBI_STAGE(d), i, jvar, (gfloat) (i + 1));
-        break;
-      case ADDVAR_BGROUP:
-        ggobi_stage_set_raw_value(GGOBI_STAGE(d), i, jvar, (gfloat) d->clusterid.els[i]);
-        break;
-    }
-  }
-  g_signal_emit_by_name(d, "col_data_changed", jvar);
-  return jvar;
-}
-
 void
 clone_vars (gint * cols, gint ncols, GGobiData * d)
 {
