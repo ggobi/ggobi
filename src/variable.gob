@@ -329,7 +329,7 @@ class GGobi:Variable from G:Object {
       return self->lim.max;
     }
 
-    // FIXME: Please cache me
+    // FIXME: Please cache me (limits_set should cache this, wait until after filter to save lots of code)
     if ((nlevels = self_get_n_levels(self)) > 0) {
       level_values = self_get_level_values(self);
       level_value_max = level_values[0];
@@ -364,7 +364,7 @@ class GGobi:Variable from G:Object {
       return self->lim.min;
     }
   
-    // FIXME: shouldn't this also be cached?
+    // FIXME: Please cache me (limits_set should cache this, wait until after filter to save lots of code)
     if ((nlevels = self_get_n_levels(self)) > 0) {
       level_values = self_get_level_values(self);
       level_value_min = level_values[0];
@@ -504,15 +504,17 @@ class GGobi:Variable from G:Object {
    return self_get_n_levels(self);
  }
  
+ 
+ //FIXME: please document me
  public void
  update(self)
  {
    guint n = ggobi_stage_get_n_rows(self->_priv->stage);
-   gint j = ggobi_stage_get_col_index_for_name(self->_priv->stage, 
+   gint j  = ggobi_stage_get_col_index_for_name(self->_priv->stage, 
     self->_priv->name);
    
    /* update limits, mean, median */
-   // FIXME: todo once pipeline is in place
+   // FIXME: replace with lazy caching when pipeline in place
    
    /* recount levels if categorical */
    

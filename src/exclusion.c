@@ -55,8 +55,8 @@ symbol_table_populate (GGobiData * d)
 
   /*-- loop over all data --*/
   for (i = 0; i < GGOBI_STAGE(d)->n_rows; i++) {
-    j = ggobi_data_get_attr_glyph(d, i)->type;
-    k = ggobi_data_get_attr_glyph(d, i)->size;
+    j = ggobi_data_get_attr_glyph_type(d, i);
+    k = ggobi_data_get_attr_glyph_size(d, i);
     m = ggobi_data_get_attr_color(d, i);
 
     if (d->symbol_table[j][k][m].n == 0)

@@ -41,8 +41,6 @@ static void barchartPlaneToScreen (splotd * sp, GGobiData * d, ggobid * gg);
 void barchart_clean_init (barchartSPlotd * sp);
 void barchart_recalc_counts (barchartSPlotd * sp, GGobiData * d, ggobid * gg);
 
-static gboolean barchart_build_symbol_vectors (cpaneld *, GGobiData *,
-                                               ggobid *);
 static void barchartVarpanelRefresh (displayd * display, splotd * sp,
                                      GGobiData * d);
 static gboolean barchartHandlesInteraction (displayd * dpy, gint action);
@@ -219,31 +217,6 @@ barchartWorldToPlane (splotd * sp, GGobiData * d, ggobid * gg)
 /*      local helper function for barcharts,                            */
 /*      called by build_symbol_vectors                                  */
 /*----------------------------------------------------------------------*/
-
-gboolean
-barchart_build_symbol_vectors (cpaneld * cpanel, GGobiData * d, ggobid * gg)
-{
-  gint nd = g_slist_length (gg->d);
-
-  // FIXME: copy code from paint points
-  for (guint i = 0; i < d->nrows_under_brush_prev; i++) {
-    ggobi_data_brush_point(d, (guint) d->rows_under_brush_prev.els[i], false,  
-      cpanel->br.point_targets, cpanel->br.mode);
-
-    if (!gg->linkby_cv && nd > 1)
-      symbol_link_by_id (false, i, d, gg);
-  }
-  
-  for (guint i = 0; i < d->nrows_under_brush; i++) {
-    ggobi_data_brush_point(d, (guint) d->rows_under_brush.els[i], true,  
-      cpanel->br.point_targets, cpanel->br.mode);
-
-    if (!gg->linkby_cv && nd > 1)
-      symbol_link_by_id (false, i, d, gg);
-  }
-
-  return true;
-}
 
 void
 barchartVarpanelRefresh (displayd * display, splotd * sp, GGobiData * d)
@@ -464,8 +437,6 @@ barchartDisplayClassInit (GGobiBarChartDisplayClass * klass)
   klass->parent_class.display_set = barchartDisplaySet;
   klass->parent_class.mode_ui_get = barchart_mode_ui_get;
   klass->parent_class.variable_plotted_p = barchart_is_variable_plotted;
-
-  klass->parent_class.build_symbol_vectors = barchart_build_symbol_vectors;
 
   klass->parent_class.ruler_ranges_set = ruler_ranges_set;
 

@@ -256,13 +256,12 @@ set_col_name(self, guint j, const gchar* value)
   }
   
   ggobi_variable_set_name(vt, name);
+  g_free(name);
   
   if (nick) {
     ggobi_variable_set_nickname(vt, nick);
     g_free(nick);
-  }
-  
-  g_free(name);
+  }  
 }
 
 /** 

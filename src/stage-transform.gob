@@ -76,6 +76,8 @@
   
 %}
 
+
+//FIXME: please document me
 class GGobi:Stage:Transform from GGobi:Stage {
   private GHashTable *tforms = { 
       g_hash_table_new_full(NULL, NULL, NULL, (GDestroyNotify)ggobi_transform_unref) 
@@ -112,6 +114,12 @@ class GGobi:Stage:Transform from GGobi:Stage {
     return(g_hash_table_lookup(self->_priv->tforms, GINT_TO_POINTER(j)));
   }
   
+  /**
+   * get_transformed_cols:
+   * @self: #GGobiStageTransform
+   * 
+   * Some kind of list of the transformed columns?
+  **/
   public gint *
   get_transformed_cols(self)
   {

@@ -21,6 +21,10 @@
 #include "externs.h"
 
 
+//FIXME: all of this should be moved inside of GGobiVariable and
+// cached lazily.  Can remove a lot of duplication once FilterStage 
+// is in place
+
 /*-------------------------------------------------------------------------*/
 /*                       variable limits                                   */
 /*-------------------------------------------------------------------------*/
