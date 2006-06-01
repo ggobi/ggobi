@@ -57,6 +57,10 @@ class GGobi:Filter from GGobi:Stage {
      You shouldn't need this field.
 
      I'm still not clear about this.
+     
+     HW: Is it even worth worrying about?  How often do we need to know whether
+         a stage has any missing values?  I think most of it can be done on a variable
+         by variable basis using code in GGobiVariable
   */
   public gboolean missings;
 
@@ -72,7 +76,7 @@ class GGobi:Filter from GGobi:Stage {
  * @j: column index
  **/
 override (GGobi:Stage) void
-set_missing(GGobiStage self, guint i (check < N_ROWS), guint j (check < N_ROWS))
+set_missing(GGobiStage self, guint i (check < N_ROWS), guint j (check < N_COLS))
 {
   SELF me = SELF(self);
   PARENT_HANDLER(self->_priv->parent, self_get_raw_index(me, i), j);
@@ -87,7 +91,7 @@ set_missing(GGobiStage self, guint i (check < N_ROWS), guint j (check < N_ROWS))
  * Returns: if value at specified position is missing or not
  **/
 override (GGobi:Stage) gboolean
-is_missing(GGobiStage self, guint i (check < N_ROWS), guint j (check < N_ROWS)) 
+is_missing(GGobiStage self, guint i (check < N_ROWS), guint j (check < N_COLS)) 
 {
   SELF me = SELF(self);
   PARENT_HANDLER(self->_priv->parent, self_get_raw_index(me, i), j);  
@@ -119,6 +123,9 @@ get_row_id(GGobiStage self, guint i (check < N_ROWS)) {
    This will return the raw row number, not the row number
    for this stage.  That's probably the right thing to do, but
    we need to work through a case where it's used.
+   
+   HW: I think it should return the row index for this stage.  eg.
+   Imagine looking up a rowid and then going to modify that row.
  */
 override (GGobi:Stage) gint
 get_row_for_id(self, gchar *id) {
@@ -134,7 +141,7 @@ get_row_for_id(self, gchar *id) {
  * @values: vector of new values, of length self->n_rows
  **/
 override (GGobi:Stage) void
-set_raw_value(GGobiStage self, guint i (check < N_ROWS), guint j (check < N_ROWS), gdouble value)
+set_raw_value(GGobiStage self, guint i (check < N_ROWS), guint j (check < N_COLS), gdouble value)
 {
   SELF me = SELF(self);
   self_set_raw_value(self->_priv->parent, 
@@ -153,7 +160,7 @@ set_raw_value(GGobiStage self, guint i (check < N_ROWS), guint j (check < N_ROWS
  * @j: column index
  **/
 override (GGobi:Stage) gdouble
-get_raw_value(GGobiStage self, guint i (check < N_ROWS), guint j (check < N_ROWS))
+get_raw_value(GGobiStage self, guint i (check < N_ROWS), guint j (check < N_COLS))
 {
   SELF me = SELF(self);
   return self_get_raw_value(self->_priv->parent, 
