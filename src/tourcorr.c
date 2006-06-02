@@ -27,9 +27,9 @@
 #define CTON true
 #define CTOFF false
 
-static void tourcorr_active_horvar_set (gint jvar, GGobiData *, displayd *, ggobid *);
-static void tourcorr_active_vervar_set (gint jvar, GGobiData *, displayd *, ggobid *);
-static void tourcorr_active_var_set (gint jvar, GGobiData *d, displayd *dsp, ggobid *gg);
+static void tourcorr_active_horvar_set (gint jvar, GGobiStage *, displayd *, ggobid *);
+static void tourcorr_active_vervar_set (gint jvar, GGobiStage *, displayd *, ggobid *);
+static void tourcorr_active_var_set (gint jvar, GGobiStage *d, displayd *dsp, ggobid *gg);
 void tourcorr_write_video(ggobid *gg);
 
 void
@@ -88,8 +88,8 @@ display_tourcorr_init_null (displayd *dsp, ggobid *gg)
 void
 alloc_tourcorr (displayd *dsp, ggobid *gg)
 {
-  GGobiData *d = dsp->d;
-  gint nc = GGOBI_STAGE(d)->n_cols;
+  GGobiStage *d = dsp->d;
+  gint nc = d->n_cols;
 
   /* first index is the projection dimensions, second dimension is ncols */
   arrayd_alloc(&dsp->tcorr1.Fa, 1, nc);
@@ -144,7 +144,7 @@ alloc_tourcorr (displayd *dsp, ggobid *gg)
 
 /*-- eliminate the nc columns contained in *cols --*/
 void
-tourcorr_realloc_down (gint nc, gint *cols, GGobiData *d, ggobid *gg)
+tourcorr_realloc_down (gint nc, gint *cols, GGobiStage *d, ggobid *gg)
 {
   displayd *dsp;
   GList *l;
@@ -199,8 +199,8 @@ void
 free_tourcorr(displayd *dsp)
 {
   /*  gint k;*/
-  /*  GGobiData *d = dsp->d;*/
-  /*  gint nc = GGOBI_STAGE(d)->n_cols;*/
+  /*  GGobiStage *d = dsp->d;*/
+  /*  gint nc = d->n_cols;*/
 
   vectori_free(&dsp->tcorr1.subset_vars);
   vectorb_free(&dsp->tcorr1.subset_vars_p);
@@ -252,9 +252,9 @@ free_tourcorr(displayd *dsp)
 void 
 display_tourcorr_init (displayd *dsp, ggobid *gg) {
   gint i, j;
-  GGobiData *d = dsp->d;
+  GGobiStage *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
-  gint nc = GGOBI_STAGE(d)->n_cols;
+  gint nc = d->n_cols;
   gint nvert, nhoriz;
 
   if (nc < MIN_NVARS_FOR_COTOUR)
@@ -388,7 +388,7 @@ void tourcorr_pause (cpaneld *cpanel, gboolean state, ggobid *gg)
 }
 
 gboolean
-tourcorr_subset_horvar_set (gint jvar, GGobiData *d, displayd *dsp, ggobid *gg)
+tourcorr_subset_horvar_set (gint jvar, GGobiStage *d, displayd *dsp, ggobid *gg)
 {
   gboolean in_subset = dsp->tcorr1.subset_vars_p.els[jvar];
   gint j, k;
@@ -409,7 +409,7 @@ tourcorr_subset_horvar_set (gint jvar, GGobiData *d, displayd *dsp, ggobid *gg)
     dsp->tcorr2.nsubset -= 1;
 
     /*-- reset the horizontal subset_vars based on subset_vars_p --*/
-    for (j=0, k=0; j<GGOBI_STAGE(d)->n_cols; j++)
+    for (j=0, k=0; j<d->n_cols; j++)
       if (dsp->tcorr2.subset_vars_p.els[j])
         dsp->tcorr2.subset_vars.els[k++] = j;
 
@@ -428,7 +428,7 @@ tourcorr_subset_horvar_set (gint jvar, GGobiData *d, displayd *dsp, ggobid *gg)
     changed = true;
 
     /*-- reset subset_vars based on subset_vars_p --*/
-    for (j=0, k=0; j<GGOBI_STAGE(d)->n_cols; j++)
+    for (j=0, k=0; j<d->n_cols; j++)
       if (dsp->tcorr1.subset_vars_p.els[j])
         dsp->tcorr1.subset_vars.els[k++] = j;
 
@@ -455,7 +455,7 @@ tourcorr_subset_horvar_set (gint jvar, GGobiData *d, displayd *dsp, ggobid *gg)
     if (changed) {
       dsp->tc1_manipvar_inc = false;
       /*-- reset subset_vars based on subset_vars_p --*/
-      for (j=0, k=0; j<GGOBI_STAGE(d)->n_cols; j++)
+      for (j=0, k=0; j<d->n_cols; j++)
         if (dsp->tcorr1.subset_vars_p.els[j]) {
           dsp->tcorr1.subset_vars.els[k++] = j;
           if (j == dsp->tc1_manip_var)
@@ -481,7 +481,7 @@ tourcorr_subset_horvar_set (gint jvar, GGobiData *d, displayd *dsp, ggobid *gg)
 }
 
 static void 
-tourcorr_active_horvar_set (gint jvar, GGobiData *d, displayd *dsp, ggobid *gg)
+tourcorr_active_horvar_set (gint jvar, GGobiStage *d, displayd *dsp, ggobid *gg)
 {
   gint j, k;
   gboolean in_subset = dsp->tcorr1.subset_vars_p.els[jvar];
@@ -512,9 +512,9 @@ tourcorr_active_horvar_set (gint jvar, GGobiData *d, displayd *dsp, ggobid *gg)
       if (!gg->tourcorr.fade_vars) /* set current position without sel var */
       {
         gt_basis(dsp->tcorr1.Fa, dsp->tcorr1.nactive, dsp->tcorr1.active_vars, 
-          GGOBI_STAGE(d)->n_cols, (gint) 1);
+          d->n_cols, (gint) 1);
         arrayd_copy(&dsp->tcorr1.Fa, &dsp->tcorr1.F);
-	/*        copy_mat(dsp->tcorr1.F.vals, dsp->tcorr1.Fa.vals, GGOBI_STAGE(d)->n_cols, 1);*/
+	/*        copy_mat(dsp->tcorr1.F.vals, dsp->tcorr1.Fa.vals, d->n_cols, 1);*/
       }
       dsp->tcorr1.active_vars_p.els[jvar] = false;
     }
@@ -550,7 +550,7 @@ tourcorr_active_horvar_set (gint jvar, GGobiData *d, displayd *dsp, ggobid *gg)
 }
 
 gboolean
-tourcorr_subset_vervar_set (gint jvar, GGobiData *d, displayd *dsp, ggobid *gg)
+tourcorr_subset_vervar_set (gint jvar, GGobiStage *d, displayd *dsp, ggobid *gg)
 {
   gboolean in_subset = dsp->tcorr2.subset_vars_p.els[jvar];
   gint j, k;
@@ -571,7 +571,7 @@ tourcorr_subset_vervar_set (gint jvar, GGobiData *d, displayd *dsp, ggobid *gg)
     dsp->tcorr1.nsubset -= 1;
 
     /*-- reset the vertical subset_vars based on subset_vars_p --*/
-    for (j=0, k=0; j<GGOBI_STAGE(d)->n_cols; j++)
+    for (j=0, k=0; j<d->n_cols; j++)
       if (dsp->tcorr1.subset_vars_p.els[j])
         dsp->tcorr1.subset_vars.els[k++] = j;
 
@@ -590,7 +590,7 @@ tourcorr_subset_vervar_set (gint jvar, GGobiData *d, displayd *dsp, ggobid *gg)
     changed = true;
 
     /*-- reset subset_vars based on subset_vars_p --*/
-    for (j=0, k=0; j<GGOBI_STAGE(d)->n_cols; j++)
+    for (j=0, k=0; j<d->n_cols; j++)
       if (dsp->tcorr2.subset_vars_p.els[j])
         dsp->tcorr2.subset_vars.els[k++] = j;
 
@@ -617,7 +617,7 @@ tourcorr_subset_vervar_set (gint jvar, GGobiData *d, displayd *dsp, ggobid *gg)
     if (changed) {
       dsp->tc2_manipvar_inc = false;
       /*-- reset subset_vars based on subset_vars_p --*/
-      for (j=0, k=0; j<GGOBI_STAGE(d)->n_cols; j++)
+      for (j=0, k=0; j<d->n_cols; j++)
         if (dsp->tcorr2.subset_vars_p.els[j]) {
           dsp->tcorr2.subset_vars.els[k++] = j;
           if (j == dsp->tc2_manip_var)
@@ -643,7 +643,7 @@ tourcorr_subset_vervar_set (gint jvar, GGobiData *d, displayd *dsp, ggobid *gg)
 
 #ifdef OVER
 gboolean
-tourcorr_subset_vervar_set (gint jvar, GGobiData *d, displayd *dsp, ggobid *gg)
+tourcorr_subset_vervar_set (gint jvar, GGobiStage *d, displayd *dsp, ggobid *gg)
 {
   gboolean in_subset = dsp->tcorr2.subset_vars_p.els[jvar];
   gint j, k;
@@ -671,7 +671,7 @@ tourcorr_subset_vervar_set (gint jvar, GGobiData *d, displayd *dsp, ggobid *gg)
 
   /*-- reset subset_vars based on subset_vars_p --*/
   if (changed) {
-    for (j=0, k=0; j<GGOBI_STAGE(d)->n_cols; j++)
+    for (j=0, k=0; j<d->n_cols; j++)
       if (dsp->tcorr2.subset_vars_p.els[j])
         dsp->tcorr2.subset_vars.els[k++] = j;
 
@@ -686,7 +686,7 @@ tourcorr_subset_vervar_set (gint jvar, GGobiData *d, displayd *dsp, ggobid *gg)
 #endif
 
 static void 
-tourcorr_active_vervar_set (gint jvar, GGobiData *d, displayd *dsp, ggobid *gg)
+tourcorr_active_vervar_set (gint jvar, GGobiStage *d, displayd *dsp, ggobid *gg)
 {
   gint j, k;
   gboolean in_subset = dsp->tcorr2.subset_vars_p.els[jvar];
@@ -718,9 +718,9 @@ tourcorr_active_vervar_set (gint jvar, GGobiData *d, displayd *dsp, ggobid *gg)
       if (!gg->tourcorr.fade_vars) /* set current position without sel var */
       {
         gt_basis(dsp->tcorr2.Fa, dsp->tcorr2.nactive, dsp->tcorr2.active_vars, 
-          GGOBI_STAGE(d)->n_cols, (gint) 1);
+          d->n_cols, (gint) 1);
         arrayd_copy(&dsp->tcorr2.Fa, &dsp->tcorr2.F);
-	/*        copy_mat(dsp->tcorr2.F.vals, dsp->tcorr2.Fa.vals, GGOBI_STAGE(d)->n_cols, 1);*/
+	/*        copy_mat(dsp->tcorr2.F.vals, dsp->tcorr2.Fa.vals, d->n_cols, 1);*/
       }
       dsp->tcorr2.active_vars_p.els[jvar] = false;
 
@@ -757,7 +757,7 @@ tourcorr_active_vervar_set (gint jvar, GGobiData *d, displayd *dsp, ggobid *gg)
 }
 
 static void 
-tourcorr_active_var_set (gint jvar, GGobiData *d, displayd *dsp, ggobid *gg)
+tourcorr_active_var_set (gint jvar, GGobiStage *d, displayd *dsp, ggobid *gg)
 {
   gboolean in_subsethor = dsp->tcorr1.subset_vars_p.els[jvar];
   gboolean in_subsetver = dsp->tcorr2.subset_vars_p.els[jvar];
@@ -781,7 +781,7 @@ tourcorr_active_var_set (gint jvar, GGobiData *d, displayd *dsp, ggobid *gg)
     if (!gg->tourcorr.fade_vars) /* set current position without sel var */
     {
       gt_basis(dsp->tcorr1.Fa, dsp->tcorr1.nactive, dsp->tcorr1.active_vars, 
-        GGOBI_STAGE(d)->n_cols, (gint) 1);
+        d->n_cols, (gint) 1);
       arrayd_copy(&dsp->tcorr1.Fa, &dsp->tcorr1.F);
     }
     dsp->tcorr1.active_vars_p.els[jvar] = false;
@@ -831,7 +831,7 @@ tourcorr_active_var_set (gint jvar, GGobiData *d, displayd *dsp, ggobid *gg)
     if (!gg->tourcorr.fade_vars) /* set current position without sel var */
     {
       gt_basis(dsp->tcorr2.Fa, dsp->tcorr2.nactive, dsp->tcorr2.active_vars, 
-        GGOBI_STAGE(d)->n_cols, (gint) 1);
+        d->n_cols, (gint) 1);
       arrayd_copy(&dsp->tcorr2.Fa, &dsp->tcorr2.F);
     }
     dsp->tcorr2.active_vars_p.els[jvar] = false;
@@ -880,7 +880,7 @@ tourcorr_manip_var_set (gint j, gint btn, ggobid *gg)
 }
 
 gboolean
-tourcorr_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse, GGobiData *d, ggobid *gg)
+tourcorr_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse, GGobiStage *d, ggobid *gg)
 {
   displayd *dsp = gg->current_display;
   gboolean changed = true;
@@ -917,7 +917,7 @@ tourcorr_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse, GGobiData *d,
 }
 
 void
-tourcorr_projdata(splotd *sp, greal **world_data, GGobiData *d, ggobid *gg) {
+tourcorr_projdata(splotd *sp, greal **world_data, GGobiStage *d, ggobid *gg) {
   gint i, j, m;
   displayd *dsp = (displayd *) sp->displayptr;
   greal precis = (greal) PRECISION1;
@@ -936,7 +936,7 @@ tourcorr_projdata(splotd *sp, greal **world_data, GGobiData *d, ggobid *gg) {
     i = d->rows_in_plot.els[m];
     sp->planar[i].x = 0;
     sp->planar[i].y = 0;
-    for (j=0; j<GGOBI_STAGE(d)->n_cols; j++)
+    for (j=0; j<d->n_cols; j++)
     {
       sp->planar[i].x += (greal)(dsp->tcorr1.F.vals[0][j]*world_data[i][j]);
       sp->planar[i].y += (greal)(dsp->tcorr2.F.vals[0][j]*world_data[i][j]);
@@ -959,12 +959,12 @@ void tourcorr_snap(ggobid *gg)
 {
   displayd *dsp = gg->current_display;
   splotd *sp = gg->current_splot;
-  GGobiData *d = dsp->d;
+  GGobiStage *d = dsp->d;
   gint j;
   gdouble rnge;
 
-  for (j=0; j<GGOBI_STAGE(d)->n_cols; j++) {
-    rnge = ggobi_variable_get_range(ggobi_stage_get_variable(GGOBI_STAGE(d), j));
+  for (j=0; j<d->n_cols; j++) {
+    rnge = ggobi_variable_get_range(ggobi_stage_get_variable(d, j));
     g_printerr("%f %f\n", dsp->tcorr1.F.vals[0][j]/rnge*sp->scale.x,
 	     dsp->tcorr2.F.vals[0][j]/rnge*sp->scale.y);
   }
@@ -983,13 +983,13 @@ void tourcorr_write_video(ggobid *gg)
 {
   displayd *dsp = gg->current_display;
   splotd *sp = gg->current_splot;
-  GGobiData *d = dsp->d;
+  GGobiStage *d = dsp->d;
   gint j;
   GGobiVariable *var;
 
   g_printerr("%f %f\n",sp->scale.x, sp->scale.y);
-  for (j=0; j<GGOBI_STAGE(d)->n_cols; j++) {
-    var = ggobi_stage_get_variable(GGOBI_STAGE(d), j);
+  for (j=0; j<d->n_cols; j++) {
+    var = ggobi_stage_get_variable(d, j);
     g_printerr("%f %f %f %f\n", dsp->tcorr1.F.vals[0][j], 
       dsp->tcorr2.F.vals[0][j], 
       ggobi_variable_get_min(var), ggobi_variable_get_max(var)
@@ -1002,7 +1002,7 @@ void
 tourcorr_manip_init(gint p1, gint p2, splotd *sp) 
 {
   displayd *dsp = (displayd *) sp->displayptr;
-  GGobiData *d = dsp->d;
+  GGobiStage *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
   ggobid *gg = GGobiFromSPlot(sp);
   gint j;
@@ -1042,11 +1042,11 @@ tourcorr_manip_init(gint p1, gint p2, splotd *sp)
   /* make manip basis, from existing projection */
   /* 0 will be the remainder of the projection, and
      1 will be the indicator vector for the manip var */
-  for (j=0; j<GGOBI_STAGE(d)->n_cols; j++) {
+  for (j=0; j<d->n_cols; j++) {
     dsp->tc1_manbasis.vals[0][j] = dsp->tcorr1.F.vals[0][j];
     dsp->tc1_manbasis.vals[1][j] = 0.;
   }
-  for (j=0; j<GGOBI_STAGE(d)->n_cols; j++) {
+  for (j=0; j<d->n_cols; j++) {
     dsp->tc2_manbasis.vals[0][j] = dsp->tcorr2.F.vals[0][j];
     dsp->tc2_manbasis.vals[1][j] = 0.;
   }
@@ -1056,22 +1056,22 @@ tourcorr_manip_init(gint p1, gint p2, splotd *sp)
   if (n1vars > 0)
   {
     while (!gram_schmidt(dsp->tc1_manbasis.vals[0],  dsp->tc1_manbasis.vals[1],
-      GGOBI_STAGE(d)->n_cols))
+      d->n_cols))
     {
        gt_basis(dsp->tcorr1.tv, dsp->tcorr1.nactive, dsp->tcorr1.active_vars, 
-        GGOBI_STAGE(d)->n_cols, (gint) 1);
-      for (j=0; j<GGOBI_STAGE(d)->n_cols; j++) 
+        d->n_cols, (gint) 1);
+      for (j=0; j<d->n_cols; j++) 
         dsp->tc1_manbasis.vals[1][j] = dsp->tcorr1.tv.vals[0][j];
     }
   }
   if (n2vars > 0)
   {
     while (!gram_schmidt(dsp->tc2_manbasis.vals[0],  dsp->tc2_manbasis.vals[1],
-      GGOBI_STAGE(d)->n_cols))
+      d->n_cols))
     {
        gt_basis(dsp->tcorr2.tv, dsp->tcorr2.nactive, dsp->tcorr2.active_vars, 
-        GGOBI_STAGE(d)->n_cols, (gint) 1);
-      for (j=0; j<GGOBI_STAGE(d)->n_cols; j++) 
+        d->n_cols, (gint) 1);
+      for (j=0; j<d->n_cols; j++) 
         dsp->tc2_manbasis.vals[1][j] = dsp->tcorr2.tv.vals[0][j];
     }
   } 
@@ -1084,7 +1084,7 @@ tourcorr_manip_init(gint p1, gint p2, splotd *sp)
 void
 tourcorr_run(displayd *dsp, ggobid *gg)
 {
-  GGobiData *d = dsp->d;
+  GGobiStage *d = dsp->d;
   /*  cpaneld *cpanel = &dsp->cpanel;*/
   gint i, nv;
   gint pathprob = 0;
@@ -1097,20 +1097,20 @@ tourcorr_run(displayd *dsp, ggobid *gg)
       &dsp->tcorr1.tang, (gint) 1);
 
     tour_reproject(dsp->tcorr1.tinc, dsp->tcorr1.G, dsp->tcorr1.Ga, 
-      dsp->tcorr1.Gz, dsp->tcorr1.F, dsp->tcorr1.Va, GGOBI_STAGE(d)->n_cols, (gint) 1);
+      dsp->tcorr1.Gz, dsp->tcorr1.F, dsp->tcorr1.Va, d->n_cols, (gint) 1);
   }
   else { /* do final clean-up and get new target */
     if (!dsp->tcorr1.get_new_target) {
       do_last_increment(dsp->tcorr1.tinc, dsp->tcorr1.tau, 
         dsp->tcorr1.dist_az, (gint) 1);
       tour_reproject(dsp->tcorr1.tinc, dsp->tcorr1.G, dsp->tcorr1.Ga, 
-        dsp->tcorr1.Gz, dsp->tcorr1.F, dsp->tcorr1.Va, GGOBI_STAGE(d)->n_cols, (gint) 1);
+        dsp->tcorr1.Gz, dsp->tcorr1.F, dsp->tcorr1.Va, d->n_cols, (gint) 1);
       }
     
     arrayd_copy(&dsp->tcorr1.F, &dsp->tcorr1.Fa);
-    /*    copy_mat(dsp->tcorr1.Fa.vals, dsp->tcorr1.F.vals, GGOBI_STAGE(d)->n_cols, 1);*/
+    /*    copy_mat(dsp->tcorr1.Fa.vals, dsp->tcorr1.F.vals, d->n_cols, 1);*/
     nv = 0;
-    for (i=0; i<GGOBI_STAGE(d)->n_cols; i++) 
+    for (i=0; i<d->n_cols; i++) 
       if (fabs(dsp->tcorr1.Fa.vals[0][i]) > 0.01) {
         nv++;
       }
@@ -1119,10 +1119,10 @@ tourcorr_run(displayd *dsp, ggobid *gg)
       dsp->tcorr1.get_new_target = true;
     else {
       gt_basis(dsp->tcorr1.Fz, dsp->tcorr1.nactive, 
-        dsp->tcorr1.active_vars, GGOBI_STAGE(d)->n_cols, 
+        dsp->tcorr1.active_vars, d->n_cols, 
         (gint) 1);
       pathprob = tour_path(dsp->tcorr1.Fa, dsp->tcorr1.Fz, dsp->tcorr1.F, 
-        GGOBI_STAGE(d)->n_cols, (gint) 1, 
+        d->n_cols, (gint) 1, 
         dsp->tcorr1.Ga, dsp->tcorr1.Gz, dsp->tcorr1.G, dsp->tcorr1.lambda, 
         dsp->tcorr1.tv, dsp->tcorr1.Va, dsp->tcorr1.Vz,
         dsp->tcorr1.tau, dsp->tcorr1.tinc, 
@@ -1132,7 +1132,7 @@ tourcorr_run(displayd *dsp, ggobid *gg)
       else if (pathprob == 1) { /* problems with Fa so need to force a jump */
         tourcorr_scramble(gg);
         pathprob = tour_path(dsp->tcorr1.Fa, dsp->tcorr1.Fz, dsp->tcorr1.F, 
-          GGOBI_STAGE(d)->n_cols, (gint) 1, 
+          d->n_cols, (gint) 1, 
           dsp->tcorr1.Ga, dsp->tcorr1.Gz, dsp->tcorr1.G, dsp->tcorr1.lambda, 
           dsp->tcorr1.tv, dsp->tcorr1.Va, dsp->tcorr1.Vz,
           dsp->tcorr1.tau, dsp->tcorr1.tinc, 
@@ -1152,19 +1152,19 @@ tourcorr_run(displayd *dsp, ggobid *gg)
       &dsp->tcorr2.tang, (gint) 1);
 
     tour_reproject(dsp->tcorr2.tinc, dsp->tcorr2.G, dsp->tcorr2.Ga, 
-      dsp->tcorr2.Gz, dsp->tcorr2.F, dsp->tcorr2.Va, GGOBI_STAGE(d)->n_cols, (gint) 1);
+      dsp->tcorr2.Gz, dsp->tcorr2.F, dsp->tcorr2.Va, d->n_cols, (gint) 1);
   }
   else { /* do final clean-up and get new target */
     if (!dsp->tcorr2.get_new_target) {
       do_last_increment(dsp->tcorr2.tinc, dsp->tcorr2.tau, 
         dsp->tcorr2.dist_az, (gint) 1);
       tour_reproject(dsp->tcorr2.tinc, dsp->tcorr2.G, dsp->tcorr2.Ga, 
-        dsp->tcorr2.Gz, dsp->tcorr2.F, dsp->tcorr2.Va, GGOBI_STAGE(d)->n_cols, (gint) 1);
+        dsp->tcorr2.Gz, dsp->tcorr2.F, dsp->tcorr2.Va, d->n_cols, (gint) 1);
     }
     arrayd_copy(&dsp->tcorr2.F, &dsp->tcorr2.Fa);
-    /*    copy_mat(dsp->tcorr2.Fa.vals, dsp->tcorr2.F.vals, GGOBI_STAGE(d)->n_cols, 1);*/
+    /*    copy_mat(dsp->tcorr2.Fa.vals, dsp->tcorr2.F.vals, d->n_cols, 1);*/
     nv = 0;
-    for (i=0; i<GGOBI_STAGE(d)->n_cols; i++) 
+    for (i=0; i<d->n_cols; i++) 
       if (fabs(dsp->tcorr2.Fa.vals[0][i]) > 0.01) {
         nv++;
       }
@@ -1173,9 +1173,9 @@ tourcorr_run(displayd *dsp, ggobid *gg)
       dsp->tcorr2.get_new_target = true;
     else {
       gt_basis(dsp->tcorr2.Fz, dsp->tcorr2.nactive, dsp->tcorr2.active_vars, 
-        GGOBI_STAGE(d)->n_cols, (gint) 1);
+        d->n_cols, (gint) 1);
       pathprob = tour_path(dsp->tcorr2.Fa, dsp->tcorr2.Fz, dsp->tcorr2.F, 
-        GGOBI_STAGE(d)->n_cols, (gint) 1, 
+        d->n_cols, (gint) 1, 
         dsp->tcorr2.Ga, dsp->tcorr2.Gz, dsp->tcorr2.G, dsp->tcorr2.lambda, 
         dsp->tcorr2.tv, dsp->tcorr2.Va, dsp->tcorr2.Vz,
         dsp->tcorr2.tau, dsp->tcorr2.tinc, &dsp->tcorr2.dist_az, 
@@ -1185,7 +1185,7 @@ tourcorr_run(displayd *dsp, ggobid *gg)
       else if (pathprob == 1) { /* problems with Fa so need to force a jump */
         tourcorr_scramble(gg);
         pathprob = tour_path(dsp->tcorr2.Fa, dsp->tcorr2.Fz, dsp->tcorr2.F, 
-          GGOBI_STAGE(d)->n_cols, (gint) 1, 
+          d->n_cols, (gint) 1, 
           dsp->tcorr2.Ga, dsp->tcorr2.Gz, dsp->tcorr2.G, dsp->tcorr2.lambda, 
           dsp->tcorr2.tv, dsp->tcorr2.Va, dsp->tcorr2.Vz,
           dsp->tcorr2.tau, dsp->tcorr2.tinc, 
@@ -1246,10 +1246,10 @@ void tourcorr_reinit(ggobid *gg)
 {
   int j, m;
   displayd *dsp = gg->current_display;
-  GGobiData *d = dsp->d;
+  GGobiStage *d = dsp->d;
   splotd *sp = gg->current_splot;
 
-  for (j=0; j<GGOBI_STAGE(d)->n_cols; j++) {
+  for (j=0; j<d->n_cols; j++) {
     dsp->tcorr1.F.vals[0][j] = 0.;
     dsp->tcorr1.Fa.vals[0][j] = 0.;
   }
@@ -1259,7 +1259,7 @@ void tourcorr_reinit(ggobid *gg)
 
   dsp->tcorr1.get_new_target = true;
 
-  for (j=0; j<GGOBI_STAGE(d)->n_cols; j++) {
+  for (j=0; j<d->n_cols; j++) {
     dsp->tcorr2.F.vals[0][j] = 0.;
     dsp->tcorr2.Fa.vals[0][j] = 0.;
   }
@@ -1281,28 +1281,28 @@ void tourcorr_scramble(ggobid *gg)
 {
   gint j;
   displayd *dsp = gg->current_display;
-  GGobiData *d = dsp->d;
-  /*gint i, nc = GGOBI_STAGE(d)->n_cols;*/
+  GGobiStage *d = dsp->d;
+  /*gint i, nc = d->n_cols;*/
 
-  for (j=0; j<GGOBI_STAGE(d)->n_cols; j++) {
+  for (j=0; j<d->n_cols; j++) {
     dsp->tcorr1.F.vals[0][j] = 0.;
     dsp->tcorr1.Fa.vals[0][j] = 0.;
   }
 
-  for (j=0; j<GGOBI_STAGE(d)->n_cols; j++) {
+  for (j=0; j<d->n_cols; j++) {
     dsp->tcorr2.F.vals[0][j] = 0.;
     dsp->tcorr2.Fa.vals[0][j] = 0.;
   }
 
   gt_basis(dsp->tcorr1.Fa, dsp->tcorr1.nactive, dsp->tcorr1.active_vars, 
-    GGOBI_STAGE(d)->n_cols, (gint) 1);
+    d->n_cols, (gint) 1);
   arrayd_copy(&dsp->tcorr1.Fa, &dsp->tcorr1.F);
-  /*  copy_mat(dsp->tcorr1.F.vals, dsp->tcorr1.Fa.vals, GGOBI_STAGE(d)->n_cols, 1);*/
+  /*  copy_mat(dsp->tcorr1.F.vals, dsp->tcorr1.Fa.vals, d->n_cols, 1);*/
 
   gt_basis(dsp->tcorr2.Fa, dsp->tcorr2.nactive, dsp->tcorr2.active_vars, 
-    GGOBI_STAGE(d)->n_cols, (gint) 1);
+    d->n_cols, (gint) 1);
   arrayd_copy(&dsp->tcorr2.Fa, &dsp->tcorr2.F);
-  /*  copy_mat(dsp->tcorr2.F.vals, dsp->tcorr2.Fa.vals, GGOBI_STAGE(d)->n_cols, 1);*/
+  /*  copy_mat(dsp->tcorr2.F.vals, dsp->tcorr2.Fa.vals, d->n_cols, 1);*/
 
   dsp->tcorr1.get_new_target = true;
   dsp->tcorr2.get_new_target = true;
@@ -1316,7 +1316,7 @@ void
 tourcorr_manip(gint p1, gint p2, splotd *sp, ggobid *gg) 
 {
   displayd *dsp = (displayd *) sp->displayptr;
-  GGobiData *d = dsp->d;
+  GGobiStage *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
   gfloat xcosphi=1., xsinphi=0., ycosphi=1., ysinphi=0.;
   gfloat distx = 0., disty = 0.;
@@ -1409,14 +1409,14 @@ tourcorr_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
     /* generate the projection basis */
     if (actual_nxvars > 0) 
     {
-      for (j=0; j<GGOBI_STAGE(d)->n_cols; j++)
+      for (j=0; j<d->n_cols; j++)
         dsp->tcorr1.F.vals[0][j] = xcosphi * dsp->tc1_manbasis.vals[0][j] + 
          xsinphi * dsp->tc1_manbasis.vals[1][j];
     }
  
     if (actual_nyvars > 0)
     {
-      for (j=0; j<GGOBI_STAGE(d)->n_cols; j++)
+      for (j=0; j<d->n_cols; j++)
         dsp->tcorr2.F.vals[0][j] = ycosphi * dsp->tc2_manbasis.vals[0][j] + 
          ysinphi * dsp->tc2_manbasis.vals[1][j];
     }
@@ -1427,9 +1427,9 @@ tourcorr_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
   else {
     disconnect_motion_signal (sp);
     arrayd_copy(&dsp->tcorr1.F, &dsp->tcorr1.Fa);
-    /*    copy_mat(dsp->tcorr1.Fa.vals, dsp->tcorr1.F.vals, GGOBI_STAGE(d)->n_cols, 1);*/
+    /*    copy_mat(dsp->tcorr1.Fa.vals, dsp->tcorr1.F.vals, d->n_cols, 1);*/
     arrayd_copy(&dsp->tcorr2.F, &dsp->tcorr2.Fa);
-    /*    copy_mat(dsp->tcorr2.Fa.vals, dsp->tcorr2.F.vals, GGOBI_STAGE(d)->n_cols, 1);*/
+    /*    copy_mat(dsp->tcorr2.Fa.vals, dsp->tcorr2.F.vals, d->n_cols, 1);*/
     dsp->tcorr1.get_new_target = true;
     dsp->tcorr2.get_new_target = true;
     if (!cpanel->tcorr1.paused && !cpanel->tcorr2.paused)

@@ -259,8 +259,8 @@ void
 eigen_clear (array_d Ga, array_d Gz, vector_f lambda, vector_f tau, 
   vector_f tinc, gint datadim)
 {
-  /*  GGobiData *d = dsp->d;
-  gint datadim = GGOBI_STAGE(d)->n_cols;*/
+  /*  GGobiStage *d = dsp->d;
+  gint datadim = d->n_cols;*/
   gint j, k;
 
   for (j=0; j<datadim; j++) {

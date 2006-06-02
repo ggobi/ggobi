@@ -65,7 +65,7 @@ fileset_read_init (const gchar * ldata_in, const gchar * pluginModeName,
 {
   GSList *ds = fileset_read (ldata_in, pluginModeName, plugin, gg);
   for (; ds; ds = ds->next) {
-    ggobi_data_attach ((GGobiData *) ds->data, gg, FALSE);
+    ggobi_stage_attach(ds->data, gg, FALSE);
   }
 
   return (ds != NULL);
@@ -208,13 +208,12 @@ resetDataMode ()
 void
 start_ggobi (ggobid * gg, gboolean init_data, gboolean createPlot)
 {
-  GGobiData *d;
+  GGobiStage *d;
   if (init_data) {
     GSList *l;
     gboolean firstd = createPlot;
     for (l = gg->d; l; l = l->next) {
-      d = (GGobiData *) l->data;
-      ggobi_data_attach (d, gg, firstd);
+      ggobi_stage_attach(l->data, gg, firstd);
       firstd = false;
     }
 
@@ -224,9 +223,9 @@ start_ggobi (ggobid * gg, gboolean init_data, gboolean createPlot)
 
   /*-- now that we've read some data, set the mode --*/
   if (createPlot && gg->d) {
-    d = (GGobiData *) gg->d->data;
-    if (d != NULL && ggobi_stage_get_n_cols(GGOBI_STAGE(d))) {
-      gg->pmode = (GGOBI_STAGE(d)->n_cols == 1) ? P1PLOT : XYPLOT;
+    d = (GGobiStage *)gg->d->data;
+    if (d != NULL && ggobi_stage_get_n_cols(d)) {
+      gg->pmode = (d->n_cols == 1) ? P1PLOT : XYPLOT;
       gg->imode = DEFAULT_IMODE;
     }
   }

@@ -79,9 +79,9 @@ scatterplot_display_edge_menu_update (displayd * display,
                                       GtkAccelGroup * accel_group,
                                       ggobid * gg)
 {
-  GGobiData *d = display->d;  /*-- this dataset --*/
+  GGobiStage *d = display->d;  /*-- this dataset --*/
   gint nd = g_slist_length (gg->d);
-  GGobiData *e;
+  GGobiStage *e;
   gint k, ne = 0;
 
   /*-- If this datad has ids, find the number of other datad's with
@@ -89,8 +89,8 @@ scatterplot_display_edge_menu_update (displayd * display,
 
   endpointsd *endpoints;
   for (k = 0; k < nd; k++) {
-    e = (GGobiData *) g_slist_nth_data (gg->d, k);
-    if (ggobi_stage_get_n_edges(GGOBI_STAGE(e))) {
+    e = (GGobiStage *) g_slist_nth_data (gg->d, k);
+    if (ggobi_stage_get_n_edges(e)) {
       endpoints = resolveEdgePoints (e, d);
       if (endpoints != NULL) {
         ne++;
@@ -145,17 +145,17 @@ scatterplot_display_edge_menu_update (displayd * display,
      */
 
     for (k = 0; k < nd; k++) {
-      e = (GGobiData *) g_slist_nth_data (gg->d, k);
-      if (ggobi_stage_get_n_edges(GGOBI_STAGE(e))) {
+      e = (GGobiStage *) g_slist_nth_data (gg->d, k);
+      if (ggobi_stage_get_n_edges(e)) {
         gchar *lbl, *path, *name;
         if (resolveEdgePoints (e, d) != NULL) {
           if (ne == 1) {
-            lbl = g_strdup_printf ("Attach edge set (%s)", ggobi_stage_get_name(GGOBI_STAGE(e)));
+            lbl = g_strdup_printf ("Attach edge set (%s)", ggobi_stage_get_name(e));
             path = "/menubar/Edges";
             name = g_strdup ("edges");
           }
           else {
-            lbl = ggobi_stage_get_name(GGOBI_STAGE(e));
+            lbl = ggobi_stage_get_name(e);
             path = "/menubar/Edges/Edgesets";
             name = g_strdup_printf ("edgeset_%p", e);
           }

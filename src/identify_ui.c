@@ -59,7 +59,7 @@ identify_target_cb (GtkWidget * w, ggobid * gg)
 static void
 recenter_cb (GtkWidget * w, ggobid * gg)
 {
-  GGobiData *d = gg->current_display->d;
+  GGobiStage *d = gg->current_display->d;
   gint k = -1;
   if (g_slist_length (d->sticky_ids) >= 1) {
     k = GPOINTER_TO_INT (d->sticky_ids->data);
@@ -72,7 +72,7 @@ id_remove_labels_cb (GtkWidget * w, ggobid * gg)
 {
   displayd *dsp = gg->current_display;
   cpaneld *cpanel = &gg->current_display->cpanel;
-  GGobiData *d;
+  GGobiStage *d;
   gboolean ok = true;
 
   if (cpanel->id_target_type == identify_points)
@@ -97,7 +97,7 @@ static void
 id_all_sticky_cb (GtkWidget * w, ggobid * gg)
 {
   gint i, m;
-  GGobiData *d = NULL;
+  GGobiStage *d = NULL;
   displayd *dsp = gg->current_display;
   cpaneld *cpanel = &dsp->cpanel;
 
@@ -179,7 +179,7 @@ motion_notify_cb (GtkWidget * w, GdkEventMotion * event, splotd * sp)
 {
   gint k;
   ggobid *gg = GGobiFromSPlot (sp);
-  GGobiData *d = gg->current_display->d;
+  GGobiStage *d = gg->current_display->d;
   gboolean button1_p, button2_p;
   gint nd = g_slist_length (gg->d);
   cpaneld *cpanel = &gg->current_display->cpanel;
@@ -194,7 +194,7 @@ motion_notify_cb (GtkWidget * w, GdkEventMotion * event, splotd * sp)
 
   if (GGOBI_IS_EXTENDED_SPLOT (sp)) {
     gboolean changed;
-    gboolean (*f) (icoords, splotd * sp, GGobiData *, ggobid *);
+    gboolean (*f) (icoords, splotd * sp, GGobiStage *, ggobid *);
 
     f = GGOBI_EXTENDED_SPLOT_GET_CLASS (sp)->identify_notify;
     if (f) {
@@ -239,8 +239,8 @@ motion_notify_cb (GtkWidget * w, GdkEventMotion * event, splotd * sp)
     }
   }
   else {
-    GGobiData *e = gg->current_display->e;
-    if (e && ggobi_stage_get_n_edges(GGOBI_STAGE(e))) {
+    GGobiStage *e = gg->current_display->e;
+    if (e && ggobi_stage_get_n_edges(e)) {
       k = find_nearest_edge (sp, gg->current_display, gg);
       e->nearest_point = k;
       if (e->nearest_point != e->nearest_point_prev) {
@@ -269,7 +269,7 @@ button_press_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
   ggobid *gg = GGobiFromSPlot (sp);
   displayd *dsp = sp->displayptr;
   cpaneld *cpanel = &dsp->cpanel;
-  GGobiData *d = NULL;
+  GGobiStage *d = NULL;
 
   if (cpanel->id_target_type == identify_edges) {
     if (dsp->e != NULL)
@@ -331,7 +331,7 @@ static const gchar *label_prefices[] = {
 };
 
 static const gchar **
-label_prefix_func (GtkWidget * notebook, GGobiData * d, gint * sel_prefix,
+label_prefix_func (GtkWidget * notebook, GGobiStage * d, gint * sel_prefix,
                    gint * n_prefices)
 {
   *n_prefices = G_N_ELEMENTS (label_prefices);
@@ -444,7 +444,7 @@ notebook_current_page_set (displayd * display, GtkWidget * notebook,
                            ggobid * gg)
 {
   GtkWidget *swin;
-  GGobiData *d = display->d, *paged, *e = display->e;
+  GGobiStage *d = display->d, *paged, *e = display->e;
   gint page_num;
   cpaneld *cpanel = &display->cpanel;
 
@@ -460,7 +460,7 @@ notebook_current_page_set (displayd * display, GtkWidget * notebook,
   page_num = 0;
   swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), page_num);
   while (swin) {
-    paged = (GGobiData *) g_object_get_data (G_OBJECT (swin), "datad");
+    paged = (GGobiStage *) g_object_get_data (G_OBJECT (swin), "datad");
 
     if (paged == d && cpanel->id_target_type == identify_points) {
       gtk_notebook_set_current_page (GTK_NOTEBOOK (notebook), page_num);

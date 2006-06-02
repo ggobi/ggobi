@@ -57,7 +57,7 @@ display_tree_get_iter_for_object (GtkTreeModel * model, gpointer obj,
  */
 
 static void
-update_display_tree_plots_by_variable (ggobid * gg, GGobiData * d,
+update_display_tree_plots_by_variable (ggobid * gg, GGobiStage * d,
                                        gint whichVar, splotd * sp,
                                        GtkTreeModel * model)
 {
@@ -168,7 +168,7 @@ display_add_tree (displayd * display)
     return;
 
   label = display_tree_label (display);
-  dataset = ggobi_stage_get_name(GGOBI_STAGE(display->d));
+  dataset = ggobi_stage_get_name(display->d);
   imode = ggobi_getIModeScreenName (display->cpanel.imode, display);
   pmode = ggobi_getPModeScreenName (display->cpanel.pmode, display);
 
@@ -206,7 +206,7 @@ splot_add_tree (displayd * display, GtkTreeIter * parent)
   ggobid *gg = display->ggobi;
   GList *slist;
   splotd *sp;
-  GGobiData *d = display->d;
+  GGobiStage *d = display->d;
   gchar *buf;
   GtkTreeIter iter;
   GtkTreeModel *model = gg->display_tree.model;
@@ -250,7 +250,7 @@ display_tree_label (displayd * display)
   type `type'.
  */
 gchar *
-splot_tree_label (splotd * splot, GGobiData * d, ggobid * gg)
+splot_tree_label (splotd * splot, GGobiStage * d, ggobid * gg)
 {
   if (GGOBI_IS_EXTENDED_SPLOT (splot)) {
     return (GGOBI_EXTENDED_SPLOT_GET_CLASS (splot)->

@@ -81,7 +81,7 @@ static void
 rescale_cb (GtkButton * button, ggobid * gg)
 {
   //GtkWidget *tv = get_tree_view_from_object (G_OBJECT (gg->impute.window));
-  //GGobiData *d = (GGobiData *) g_object_get_data (G_OBJECT (tv), "datad");
+  //GGobiStage *d = (GGobiStage *) g_object_get_data (G_OBJECT (tv), "datad");
 
   /*limits_set (d, true, true, gg->lims_use_visible);
   vartable_limits_set (d);
@@ -99,7 +99,7 @@ static void
 show_missings_cb (GtkToggleButton * button, ggobid * gg)
 {
   GtkWidget *tv = get_tree_view_from_object (G_OBJECT (gg->impute.window));
-  GGobiData *d = (GGobiData *) g_object_get_data (G_OBJECT (tv), "datad");
+  GGobiStage *d = (GGobiStage *) g_object_get_data (G_OBJECT (tv), "datad");
 
   d->missings_show_p = button->active;
   displays_tailpipe (FULL, gg);
@@ -170,9 +170,9 @@ impute_cb (GtkWidget * w, ggobid * gg)
   gboolean redraw = true;
   GtkWidget *tree_view =
     get_tree_view_from_object (G_OBJECT (gg->impute.window));
-  GGobiData *d =
-    (GGobiData *) g_object_get_data (G_OBJECT (tree_view), "datad");
-  gint *vars;                   // = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof(gint));
+  GGobiStage *d =
+    (GGobiStage *) g_object_get_data (G_OBJECT (tree_view), "datad");
+  gint *vars;                   // = (gint *) g_malloc (d->n_cols * sizeof(gint));
   gint nvars;
   gfloat val;
 

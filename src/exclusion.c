@@ -29,7 +29,7 @@
 // and this function deleted.
 
 void
-symbol_table_zero (GGobiData * d)
+symbol_table_zero (GGobiStage * d)
 {
   gint j, k, m;
 
@@ -46,7 +46,7 @@ symbol_table_zero (GGobiData * d)
  * populate d->symbol_table
 */
 gint
-symbol_table_populate (GGobiData * d)
+symbol_table_populate (GGobiStage * d)
 {
   gint i, j, k, m;
   gint nclusters = 0;
@@ -54,17 +54,17 @@ symbol_table_populate (GGobiData * d)
   symbol_table_zero (d);
 
   /*-- loop over all data --*/
-  for (i = 0; i < GGOBI_STAGE(d)->n_rows; i++) {
-    j = ggobi_data_get_attr_glyph_type(d, i);
-    k = ggobi_data_get_attr_glyph_size(d, i);
-    m = ggobi_data_get_attr_color(d, i);
+  for (i = 0; i < d->n_rows; i++) {
+    j = ggobi_stage_get_attr_glyph_type(d, i);
+    k = ggobi_stage_get_attr_glyph_size(d, i);
+    m = ggobi_stage_get_attr_color(d, i);
 
     if (d->symbol_table[j][k][m].n == 0)
       nclusters++;
 
     d->symbol_table[j][k][m].n++;
 
-    if (ggobi_data_get_attr_hidden(d, i))
+    if (ggobi_stage_get_attr_hidden(d, i))
       d->symbol_table[j][k][m].nhidden++;
     else
       d->symbol_table[j][k][m].nshown++;
@@ -74,7 +74,7 @@ symbol_table_populate (GGobiData * d)
 }
 
 void
-clusters_set (GGobiData * d)
+clusters_set (GGobiStage * d)
 {
   guint i, j, k, m;
   gint n, nclusters;
@@ -126,12 +126,12 @@ clusters_set (GGobiData * d)
    *  indicating its cluster membership
    */
   if (nclusters > 0 && nclusters != 1) {
-    for (i = 0; i < GGOBI_STAGE(d)->n_rows; i++) {
+    for (i = 0; i < d->n_rows; i++) {
       for (n = 0; n < nclusters; n++) {
         if (d->sampled.els[i]) {
-          if (ggobi_data_get_attr_glyph(d, i)->type == d->clusv[n].glyphtype &&
-              ggobi_data_get_attr_glyph(d, i)->size == d->clusv[n].glyphsize &&
-              ggobi_data_get_attr_color(d, i) == d->clusv[n].color) {
+          if (ggobi_stage_get_attr_glyph(d, i)->type == d->clusv[n].glyphtype &&
+              ggobi_stage_get_attr_glyph(d, i)->size == d->clusv[n].glyphsize &&
+              ggobi_stage_get_attr_color(d, i) == d->clusv[n].color) {
             d->clusterid.els[i] = n;
             break;
           }

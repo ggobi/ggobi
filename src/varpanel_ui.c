@@ -34,14 +34,14 @@
 
 /* Update variable selection panel */
 void
-varpanel_show_page_cb (ggobid * gg, displayd * display, GGobiData * d)
+varpanel_show_page_cb (ggobid * gg, displayd * display, GGobiStage * d)
 {
   varpanel_show_page (display, gg);
 }
 
 /* Update tooltips */
 void
-varpanel_tooltips_set_cb (ggobid * gg, displayd * display, GGobiData * d)
+varpanel_tooltips_set_cb (ggobid * gg, displayd * display, GGobiStage * d)
 {
   varpanel_tooltips_set (display, gg);
 }
@@ -54,7 +54,7 @@ static gchar *varpanel_names[] = { "xtoggle", "ytoggle", "ztoggle", "label" };
 
 /*-- return the hbox --*/
 GtkWidget *
-varpanel_container_get_nth (gint jvar, GGobiData * d)
+varpanel_container_get_nth (gint jvar, GGobiStage * d)
 {
   GtkWidget *w;
   w = (GtkWidget *) g_slist_nth_data (d->vcbox_ui.box, jvar);
@@ -62,7 +62,7 @@ varpanel_container_get_nth (gint jvar, GGobiData * d)
 }
 
 GtkWidget *
-varpanel_widget_get_nth (gint jbutton, gint jvar, GGobiData * d)
+varpanel_widget_get_nth (gint jbutton, gint jvar, GGobiStage * d)
 {
   GtkWidget *box, *child;
   box = (GtkWidget *) varpanel_container_get_nth (jvar, d);
@@ -75,9 +75,8 @@ varpanel_widget_get_nth (gint jbutton, gint jvar, GGobiData * d)
 }
 
 void
-varpanel_label_set (GGobiStage * s, gint j)
+varpanel_label_set (GGobiStage * d, gint j)
 {
-  GGobiData *d = GGOBI_DATA(s);
   GtkWidget *label = varpanel_widget_get_nth (VARSEL_LABEL, j, d);
   /*-- the label is actually a button; this is the label --*/
   GtkWidget *labelw;
@@ -91,12 +90,12 @@ varpanel_label_set (GGobiStage * s, gint j)
     return;
   /*-- make sure it stays left-aligned --*/
   gtk_misc_set_alignment (GTK_MISC (labelw), 0, .5);
-  gtk_label_set_text (GTK_LABEL (labelw), ggobi_stage_get_col_name(GGOBI_STAGE(d), j));
+  gtk_label_set_text (GTK_LABEL (labelw), ggobi_stage_get_col_name(d, j));
 }
 
 GtkWidget *
 varpanel_widget_set_visible (gint jbutton, gint jvar, gboolean show,
-                             GGobiData * d)
+                             GGobiStage * d)
 {
   GtkWidget *box, *child;
   gboolean visible;
@@ -117,9 +116,8 @@ varpanel_widget_set_visible (gint jbutton, gint jvar, gboolean show,
 }
 
 void
-varpanel_delete_nth (GGobiStage * s, gint jvar)
+varpanel_delete_nth (GGobiStage * d, gint jvar)
 {
-  GGobiData *d = GGOBI_DATA(s);
   GtkWidget *box = varpanel_container_get_nth (jvar, d);
   if (box != NULL) {
     d->vcbox_ui.box = g_slist_remove (d->vcbox_ui.box, (gpointer) box);
@@ -133,13 +131,13 @@ varpanel_delete_nth (GGobiStage * s, gint jvar)
 
 void
 varpanel_toggle_set_active (gint jbutton, gint jvar, gboolean active,
-                            GGobiData * d)
+                            GGobiStage * d)
 {
   gboolean active_prev;
   GtkWidget *w;
 
 
-  if (jvar >= 0 && jvar < GGOBI_STAGE(d)->n_cols) {
+  if (jvar >= 0 && jvar < d->n_cols) {
     w = varpanel_widget_get_nth (jbutton, jvar, d);
 
     if (w && GTK_WIDGET_REALIZED (w)) {
@@ -156,7 +154,7 @@ varpanel_toggle_set_active (gint jbutton, gint jvar, gboolean active,
 void
 varsel (GtkWidget * w, cpaneld * cpanel, splotd * sp, gint jvar,
         gint toggle, gint mousebtn,
-        gint alt_mod, gint ctrl_mod, gint shift_mod, GGobiData * d,
+        gint alt_mod, gint ctrl_mod, gint shift_mod, GGobiStage * d,
         ggobid * gg)
 {
   displayd *display = (displayd *) sp->displayptr;
@@ -214,7 +212,7 @@ varpanel_show_page (displayd * display, ggobid * gg)
 {
   GtkNotebook *nb;
   gint page, page_new;
-  GGobiData *d = display->d, *paged = NULL;
+  GGobiStage *d = display->d, *paged = NULL;
   GList *l, *children;
   GtkWidget *child, *tab_label;
   GtkWidget *pagechild;
@@ -235,7 +233,7 @@ varpanel_show_page (displayd * display, ggobid * gg)
     child = l->data;
     tab_label = (GtkWidget *) gtk_notebook_get_tab_label (nb, child);
     if (tab_label && GTK_IS_LABEL (tab_label)) {
-      if (strcmp (GTK_LABEL (tab_label)->label, ggobi_stage_get_name(GGOBI_STAGE(d))) == 0) {
+      if (strcmp (GTK_LABEL (tab_label)->label, ggobi_stage_get_name(d)) == 0) {
         if (page != page_new) {
 
           // Set the buttons on 'page' to be insensitive
@@ -267,10 +265,10 @@ varpanel_switch_page_cb (GtkNotebook * notebook, GtkNotebookPage * page,
 
   /*-- describe the datad being selected in the console statusbar --*/
   if (gg->status_message_func) {
-    GGobiData *d = (GGobiData *) g_slist_nth_data (gg->d, page_num);
+    GGobiStage *d = (GGobiStage *) g_slist_nth_data (gg->d, page_num);
     if (d) {
       gchar *msg = g_strdup_printf ("%s: %d x %d (%s)",
-                                    ggobi_stage_get_name(GGOBI_STAGE(d)), GGOBI_STAGE(d)->n_rows, GGOBI_STAGE(d)->n_cols,
+                                    ggobi_stage_get_name(d), d->n_rows, d->n_cols,
                                     gg->input->fileName);
       gg->status_message_func (msg, gg);
       g_free (msg);
@@ -284,7 +282,7 @@ void
 varpanel_refresh (displayd * display, ggobid * gg)
 {
   splotd *sp = gg->current_splot;
-  GGobiData *d;
+  GGobiStage *d;
 
   if (display) {
     d = display->d;
@@ -305,7 +303,7 @@ varpanel_refresh (displayd * display, ggobid * gg)
       d = datad_get_from_notebook (gg->varpanel_ui.notebook, gg);
       if (d) {
         gint j;
-        for (j = 0; j < GGOBI_STAGE(d)->n_cols; j++) {
+        for (j = 0; j < d->n_cols; j++) {
           /*varpanel_widget_set_visible (VARSEL_X, j, false, d); */
           varpanel_toggle_set_active (VARSEL_X, j, false, d);
           varpanel_widget_set_visible (VARSEL_Y, j, false, d);
@@ -320,7 +318,7 @@ varpanel_refresh (displayd * display, ggobid * gg)
 
 /*-- responds to a button_press_event --*/
 static gint
-varsel_cb (GtkWidget * w, GdkEvent * event, GGobiData * d)
+varsel_cb (GtkWidget * w, GdkEvent * event, GGobiStage * d)
 {
   ggobid *gg = GGobiFromWidget (w, true);
   displayd *display = gg->current_display;
@@ -343,7 +341,7 @@ varsel_cb (GtkWidget * w, GdkEvent * event, GGobiData * d)
     gint j, jvar;
 
     jvar = -1;
-    for (j = 0; j < GGOBI_STAGE(d)->n_cols; j++) {
+    for (j = 0; j < d->n_cols; j++) {
       if (varpanel_widget_get_nth (VARSEL_X, j, d) == w) {
         togglebutton = VARSEL_X;
         jvar = j;
@@ -388,7 +386,7 @@ varsel_cb (GtkWidget * w, GdkEvent * event, GGobiData * d)
 /*------------------------------------------------------------------*/
 
 static void
-varpanel_add_row (gint j, GGobiData * d, ggobid * gg)
+varpanel_add_row (gint j, GGobiStage * d, ggobid * gg)
 {
   GtkWidget *box, *xw, *yw, *zw, *label;
   gboolean sens = false;
@@ -430,7 +428,7 @@ varpanel_add_row (gint j, GGobiData * d, ggobid * gg)
   /*-- hide this widget by default --*/
 
   /*-- the label is actually a button, with the old behavior --*/
-  label = gtk_button_new_with_label (ggobi_stage_get_col_name(GGOBI_STAGE(d), j));
+  label = gtk_button_new_with_label (ggobi_stage_get_col_name(d, j));
   gtk_widget_set_sensitive (label, sens);
   gtk_button_set_relief (GTK_BUTTON (label), GTK_RELIEF_NONE);
   ggobi_widget_set (label, gg, true);
@@ -445,7 +443,7 @@ varpanel_add_row (gint j, GGobiData * d, ggobid * gg)
 }
 
 void
-varpanel_widgets_add (gint nc, GGobiData * d, ggobid * gg)
+varpanel_widgets_add (gint nc, GGobiStage * d, ggobid * gg)
 {
   gint j;
   gint nd = g_slist_length (gg->d);
@@ -461,7 +459,7 @@ varpanel_widgets_add (gint nc, GGobiData * d, ggobid * gg)
    */
   if (n == 0) {
     gtk_notebook_append_page (GTK_NOTEBOOK (gg->varpanel_ui.notebook),
-                              d->varpanel_ui.hpane, gtk_label_new (ggobi_stage_get_name(GGOBI_STAGE(d))));
+                              d->varpanel_ui.hpane, gtk_label_new (ggobi_stage_get_name(d)));
     gtk_notebook_set_show_tabs (GTK_NOTEBOOK (gg->varpanel_ui.notebook),
                                 nd > 1);
   }
@@ -473,11 +471,11 @@ varpanel_widgets_add (gint nc, GGobiData * d, ggobid * gg)
 
 void
 varpanel_addvar_cb (ggobid * gg, gint which,
-                    GGobiData * d, void *p)
+                    GGobiStage * d, void *p)
 {
   /*-- variable toggle buttons and circles --*/
-  varpanel_widgets_add (GGOBI_STAGE(d)->n_cols, d, gg);
-  varcircles_add (GGOBI_STAGE(d)->n_cols, d, gg);
+  varpanel_widgets_add (d->n_cols, d, gg);
+  varcircles_add (d->n_cols, d, gg);
 
   /*-- make sure the right toggle widgets and circles are showing --*/
 /* this gives the wrong result when the variable being added is
@@ -496,7 +494,7 @@ its own projection.  Add a variable to varpanel_ui in datad.h? -- dfs */
 /*-------------------------------------------------------------------------*/
 
 void
-varpanel_set_sensitive (GGobiData * d, gboolean sensitive_p, ggobid * gg)
+varpanel_set_sensitive (GGobiStage * d, gboolean sensitive_p, ggobid * gg)
 {
   GtkWidget *vbox = d->vcbox_ui.vbox, *hb;
   GList *vblist, *hblist;
@@ -555,7 +553,7 @@ varpanel_make (GtkWidget * parent, ggobid * gg)
 }
 
 void
-varpanel_clear (GGobiData * d, ggobid * gg)
+varpanel_clear (GGobiStage * d, ggobid * gg)
 {
   GList *pages;
   gint npages;
@@ -576,7 +574,7 @@ varpanel_clear (GGobiData * d, ggobid * gg)
 /*-- for each datad:  hpane, ebox, scrolled window, vbox;
      in varpanel_add_row, an hbox, togglebuttons and label --*/
 void
-varpanel_populate (GGobiData * d, ggobid * gg)
+varpanel_populate (GGobiStage * d, ggobid * gg)
 {
   gint j, nd;
   GList *children;
@@ -597,9 +595,9 @@ varpanel_populate (GGobiData * d, ggobid * gg)
 
   g_object_set_data (G_OBJECT (d->varpanel_ui.hpane), "datad", d);  /*setdata */
   /*-- only add a tab if there are variables --*/
-  if (ggobi_stage_get_n_cols(GGOBI_STAGE(d))) {
+  if (ggobi_stage_get_n_cols(d)) {
     gtk_notebook_append_page (GTK_NOTEBOOK (gg->varpanel_ui.notebook),
-                              d->varpanel_ui.hpane, gtk_label_new (ggobi_stage_get_name(GGOBI_STAGE(d))));
+                              d->varpanel_ui.hpane, gtk_label_new (ggobi_stage_get_name(d)));
   }
 
   /* Check if we have been here before and already created the box, etc.. */
@@ -623,7 +621,7 @@ varpanel_populate (GGobiData * d, ggobid * gg)
   g_signal_connect (G_OBJECT (gg), "display_new",
                     G_CALLBACK (varpanel_set_sensitive_cb), NULL);
 
-  ggobi_stage_connect__col_deleted (GGOBI_STAGE(d), varpanel_delete_nth, NULL);
+  ggobi_stage_connect__col_deleted (d, varpanel_delete_nth, NULL);
   
   /* Connecting to display_selected event */
   g_signal_connect (G_OBJECT (gg), "display_selected",
@@ -647,7 +645,7 @@ varpanel_populate (GGobiData * d, ggobid * gg)
   gdk_flush ();
 
   d->vcbox_ui.box = NULL;
-  for (j = 0; j < GGOBI_STAGE(d)->n_cols; j++)
+  for (j = 0; j < d->n_cols; j++)
     varpanel_add_row (j, d, gg);
 }
 
@@ -676,13 +674,13 @@ void
 varpanel_tooltips_set (displayd * display, ggobid * gg)
 {
   gint j;
-  GGobiData *d;
+  GGobiStage *d;
   GtkWidget *wx, *wy, *wz, *label;
 
   if (display == NULL) {
     d = datad_get_from_notebook (gg->varpanel_ui.notebook, gg);
     if (d) {
-      for (j = 0; j < GGOBI_STAGE(d)->n_cols; j++) {
+      for (j = 0; j < d->n_cols; j++) {
         if ((wx = varpanel_widget_get_nth (VARSEL_X, j, d)) == NULL)
           break;
         label = varpanel_widget_get_nth (VARSEL_LABEL, j, d);
@@ -698,7 +696,7 @@ varpanel_tooltips_set (displayd * display, ggobid * gg)
     d = display->d;
 
     /*-- for each variable, current datad only --*/
-    for (j = 0; j < GGOBI_STAGE(d)->n_cols; j++) {
+    for (j = 0; j < d->n_cols; j++) {
       if ((wx = varpanel_widget_get_nth (VARSEL_X, j, d)) == NULL)
         break;
 

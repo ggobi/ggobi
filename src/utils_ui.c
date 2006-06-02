@@ -290,7 +290,7 @@ scale_set_default_values (GtkScale * scale)
 //FIXME: Probably belongs in its own files (variable_nbook.c/.h).
 //Also, the base notebook should be generalized to support prefices
 void
-variable_notebook_subwindow_add (GGobiData * d, GCallback func,
+variable_notebook_subwindow_add (GGobiStage * s, GCallback func,
                                  gpointer func_data, GtkWidget * notebook,
                                  GGobiVariableType vartype, datatyped dtype, ggobid * gg)
 {
@@ -300,15 +300,16 @@ variable_notebook_subwindow_add (GGobiData * d, GCallback func,
   gint j;
   GtkSelectionMode mode = (GtkSelectionMode)
     g_object_get_data (G_OBJECT (notebook), "SELECTION");
-
-  if (!ggobi_stage_get_n_cols(GGOBI_STAGE(d)))
+  GGobiStage *d = ggobi_stage_get_root(s);
+  
+  if (!ggobi_stage_get_n_cols(s))
     return;
 
   if (vartype == GGOBI_VARIABLE_CATEGORICAL) {
     /* is there in fact a categorical variable? */
     gboolean categorical_variable_present = false;
-    for (j = 0; j < GGOBI_STAGE(d)->n_cols; j++) {
-      if (GGOBI_STAGE_IS_COL_CATEGORICAL(GGOBI_STAGE(d), j)) {
+    for (j = 0; j < s->n_cols; j++) {
+      if (GGOBI_STAGE_IS_COL_CATEGORICAL(s, j)) {
         categorical_variable_present = true;
         break;
       }
@@ -324,22 +325,22 @@ variable_notebook_subwindow_add (GGobiData * d, GCallback func,
   gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (swin),
                                        GTK_SHADOW_NONE);
 
-  g_object_set_data (G_OBJECT (swin), "datad", d);  /*setdata */
+  g_object_set_data (G_OBJECT (swin), "datad", s);  /*setdata */
 /*
  * name or nickname?  Which one we'd prefer to use depends on the
  * size of the space we're working in -- maybe this will become an
  * argument.
 */
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), swin,
-                            (d->nickname != NULL) ?
-                            gtk_label_new (d->nickname) : 
-                            gtk_label_new (ggobi_stage_get_name(GGOBI_STAGE(d))));
+                            (ggobi_data_get_nickname(GGOBI_DATA(d)) != NULL) ?
+                            gtk_label_new (ggobi_data_get_nickname(GGOBI_DATA(d))) : 
+                            gtk_label_new (ggobi_stage_get_name(d)));
 
   /* add the tree view */
   model = gtk_list_store_new (VARLIST_NCOLS, G_TYPE_STRING, G_TYPE_INT);
   tree_view = gtk_tree_view_new_with_model (GTK_TREE_MODEL (model));
   gtk_widget_set_size_request (tree_view, -1, 70);
-  g_object_set_data (G_OBJECT (tree_view), "datad", d);
+  g_object_set_data (G_OBJECT (tree_view), "datad", s);
   if (!func_data)
     func_data = gg;
   populate_tree_view (tree_view, NULL, 1, false, mode, func, func_data);
@@ -348,11 +349,11 @@ variable_notebook_subwindow_add (GGobiData * d, GCallback func,
   //if(func)
   //   g_signal_connect (G_OBJECT (tree_view), "select_row", G_CALLBACK (func), gg);
 
-  for (j = 0; j < GGOBI_STAGE(d)->n_cols; j++) {
-    if (vartype == GGOBI_VARIABLE_ALL_VARTYPES || vartype == ggobi_stage_get_col_type(GGOBI_STAGE(d), j)) {
+  for (j = 0; j < s->n_cols; j++) {
+    if (vartype == GGOBI_VARIABLE_ALL_VARTYPES || vartype == ggobi_stage_get_col_type(s, j)) {
       gtk_list_store_append (model, &iter);
       gtk_list_store_set (model, &iter,
-                          VARLIST_NAME, ggobi_data_get_transformed_col_name(d, j),
+                          VARLIST_NAME, ggobi_stage_get_transformed_col_name(s, j),
                           VARLIST_INDEX, j, -1);
     }
   }
@@ -362,7 +363,7 @@ variable_notebook_subwindow_add (GGobiData * d, GCallback func,
 }
 
 static void
-variable_notebook_adddata_cb (ggobid * gg, GGobiData * d, void *notebook)
+variable_notebook_adddata_cb (ggobid * gg, GGobiStage * d, void *notebook)
 {
   GCallback func;
   gpointer func_data;
@@ -376,9 +377,9 @@ variable_notebook_adddata_cb (ggobid * gg, GGobiData * d, void *notebook)
   dtype = (GGobiVariableType) g_object_get_data (G_OBJECT (notebook), "datatype");
 
   if ((dtype == all_datatypes) ||
-      (dtype == no_edgesets && d->edge.n == 0) ||
-      (dtype == edgesets_only && d->edge.n > 0)) {
-    if (ggobi_stage_get_n_cols(GGOBI_STAGE(d))) {
+      (dtype == no_edgesets && ggobi_stage_get_n_edges(d) == 0) ||
+      (dtype == edgesets_only && ggobi_stage_get_n_edges(d) > 0)) {
+    if (ggobi_stage_get_n_cols(d)) {
       variable_notebook_subwindow_add (d, func, func_data, notebook, vartype,
                                        dtype, gg);
     }
@@ -430,7 +431,7 @@ get_tree_view_from_object (GObject * obj)
 }
 
 gint  /*-- assumes GTK_SELECTION_SINGLE --*/
-get_one_selection_from_tree_view (GtkWidget * tree_view, GGobiData * d)
+get_one_selection_from_tree_view (GtkWidget * tree_view, GGobiStage * d)
 {
   GtkTreeSelection *sel =
     gtk_tree_view_get_selection (GTK_TREE_VIEW (tree_view));
@@ -524,14 +525,14 @@ tree_selection_get_selected_row (GtkTreeSelection * tree_sel)
 */
 void
 variable_notebook_varchange_cb (ggobid * gg, gint which,
-                                GGobiData * data, void *notebook)
+                                GGobiStage * data, void *notebook)
 {
   GtkWidget *swin, *tree_view;
-  GGobiData *d;
+  GGobiStage *d;
   gint kd = -1;
 
   /*-- add one or more variables to this datad --*/
-  d = (GGobiData *) datad_get_from_notebook (GTK_WIDGET (notebook), gg);
+  d = (GGobiStage *) datad_get_from_notebook (GTK_WIDGET (notebook), gg);
   kd = g_slist_index (gg->d, d);
 
   /*-- get the tree_view associated with this data; clear and rebuild --*/
@@ -544,10 +545,10 @@ variable_notebook_varchange_cb (ggobid * gg, gint which,
     model = gtk_tree_view_get_model (GTK_TREE_VIEW (tree_view));
 
     gtk_list_store_clear (GTK_LIST_STORE (model));
-    for (j = 0; j < GGOBI_STAGE(d)->n_cols; j++) {
+    for (j = 0; j < d->n_cols; j++) {
       gtk_list_store_append (GTK_LIST_STORE (model), &iter);
       gtk_list_store_set (GTK_LIST_STORE (model), &iter,
-                          VARLIST_NAME, ggobi_data_get_transformed_col_name(d, j),
+                          VARLIST_NAME, ggobi_stage_get_transformed_col_name(d, j),
                           VARLIST_INDEX, j, -1);
     }
   }
@@ -555,7 +556,7 @@ variable_notebook_varchange_cb (ggobid * gg, gint which,
 
 
 void
-variable_notebook_list_changed_cb (ggobid * gg, GGobiData * d, void *notebook)
+variable_notebook_list_changed_cb (ggobid * gg, GGobiStage * d, void *notebook)
 {
   variable_notebook_varchange_cb (gg, -1, d, notebook);
 }
@@ -574,7 +575,7 @@ CHECK_EVENT_SIGNATURE (variable_notebook_adddata_cb, datad_added_f)
   GtkWidget *notebook;
   //gint nd = g_slist_length (gg->d);
   GSList *l;
-  GGobiData *d;
+  GGobiStage *d;
 
   /* Create a notebook, set the position of the tabs */
   notebook = gtk_notebook_new ();
@@ -590,11 +591,11 @@ CHECK_EVENT_SIGNATURE (variable_notebook_adddata_cb, datad_added_f)
   g_object_set_data (G_OBJECT (notebook), "datatype", (gpointer) dtype);
 
   for (l = gg->d; l; l = l->next) {
-    d = (GGobiData *) l->data;
+    d = (GGobiStage *) l->data;
     if ((dtype == all_datatypes) ||
-        (dtype == no_edgesets && d->edge.n == 0) ||
-        (dtype == edgesets_only && d->edge.n > 0)) {
-      if (ggobi_stage_get_n_cols(GGOBI_STAGE(d))) {
+        (dtype == no_edgesets && ggobi_stage_get_n_edges(d) == 0) ||
+        (dtype == edgesets_only && ggobi_stage_get_n_edges(d) > 0)) {
+      if (ggobi_stage_get_n_cols(d)) {
         variable_notebook_subwindow_add (d, func, func_data, notebook, vartype,
                                          dtype, gg);
       }
@@ -628,7 +629,7 @@ variable_notebook_page_add_prefices (GtkWidget * notebook, gint page)
   gint i, sel_prefix, n_prefices;
   GtkWidget *nth_page =
     gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), page);
-  GGobiData *d;
+  GGobiStage *d;
   if (!nth_page)
     return;
   d = g_object_get_data (G_OBJECT (nth_page), "datad");
@@ -650,34 +651,34 @@ variable_notebook_page_add_prefices (GtkWidget * notebook, gint page)
 }
 
 static void
-prefixed_variable_notebook_varchange_cb (ggobid * gg, gint which, GGobiData * data,
+prefixed_variable_notebook_varchange_cb (ggobid * gg, gint which, GGobiStage * data,
                                          void *notebook)
 {
-  GGobiData *d;
+  GGobiStage *d;
   gint kd;
 
-  d = (GGobiData *) datad_get_from_notebook (GTK_WIDGET (notebook), gg);
+  d = (GGobiStage *) datad_get_from_notebook (GTK_WIDGET (notebook), gg);
   kd = g_slist_index (gg->d, d);
 
   variable_notebook_page_add_prefices (GTK_WIDGET (notebook), kd);
 }
 
 void
-prefixed_variable_notebook_list_changed_cb (ggobid * gg, GGobiData * d,
+prefixed_variable_notebook_list_changed_cb (ggobid * gg, GGobiStage * d,
                                             GtkNotebook * notebook)
 {
   prefixed_variable_notebook_varchange_cb (gg, -1, d, notebook);
 }
 
 static void
-prefixed_variable_notebook_adddata_cb (ggobid * gg, GGobiData * d,
+prefixed_variable_notebook_adddata_cb (ggobid * gg, GGobiStage * d,
                                        void *notebook)
 {
   datatyped dtype =
     (datatyped) g_object_get_data (G_OBJECT (notebook), "datatype");
-  if ((dtype == all_datatypes) || (dtype == no_edgesets && d->edge.n == 0)
-      || (dtype == edgesets_only && d->edge.n > 0)) {
-    if (ggobi_stage_get_n_cols(GGOBI_STAGE(d)))
+  if ((dtype == all_datatypes) || (dtype == no_edgesets && ggobi_stage_get_n_edges(d) == 0)
+      || (dtype == edgesets_only && ggobi_stage_get_n_edges(d) > 0)) {
+    if (ggobi_stage_get_n_cols(d))
       variable_notebook_page_add_prefices (GTK_WIDGET (notebook),
                                            gtk_notebook_get_n_pages
                                            (GTK_NOTEBOOK (notebook)) - 1);
@@ -690,7 +691,7 @@ prefixed_variable_notebook_current_page_set (displayd *display,
   GtkWidget *notebook, ggobid *gg)
 {
   GtkWidget *swin;
-  GGobiData *d = display->d, *paged;
+  GGobiStage *d = display->d, *paged;
   gint page_num, cur_page_num;
 
   if (notebook == NULL) {
@@ -700,7 +701,7 @@ prefixed_variable_notebook_current_page_set (displayd *display,
   page_num = 0;
   swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK(notebook), page_num);
   while (swin) {
-    paged = (GGobiData *) g_object_get_data (G_OBJECT (swin), "datad");
+    paged = (GGobiStage *) g_object_get_data (G_OBJECT (swin), "datad");
 
     gtk_widget_set_sensitive (swin, (paged == d));
     if (paged == d) {
@@ -756,7 +757,7 @@ ggobi_addDisplayMenuItem (const gchar * label, ggobid * gg)
   GtkWidget *entry = NULL;
 
   GtkWidget *dpy_menu = gg->display_menu;  /*-- this is null --*/
-  GGobiData *data;
+  GGobiStage *data;
 
   if (dpy_menu != NULL) {
     entry = gtk_menu_item_new_with_mnemonic (label);
@@ -832,9 +833,9 @@ ggobi_addToolsMenuItem (gchar * lbl, ggobid * gg)
  * corresponding to different datad's.  This is a way to figure
  * out which datad we should be operating on in that case.
 */
-GGobiData*
+GGobiStage*
 datad_get_from_notebook (GtkWidget *notebook, ggobid *gg) {
-  GGobiData *d = NULL;
+  GGobiStage *d = NULL;
   //gint nd = g_slist_length (gg->d);
 
   //if (nd == 1) {

@@ -34,7 +34,7 @@ splot_configure_cb (GtkWidget *w, GdkEventConfigure *event, splotd *sp)
   ggobid *gg = GGobiFromSPlot(sp);
   displayd *display = (displayd *) sp->displayptr; 
   cpaneld *cpanel = &display->cpanel;
-  GGobiData *d = display->d;
+  GGobiStage *d = display->d;
 
   /*
    * Somehow when a new splot is added to a table, the initial
@@ -85,7 +85,7 @@ splot_configure_cb (GtkWidget *w, GdkEventConfigure *event, splotd *sp)
 
   if (cpanel->imode == BRUSH) {
     if (GGOBI_IS_EXTENDED_SPLOT(sp)) {
-      void (*f)(GGobiData *, splotd *, ggobid *);
+      void (*f)(GGobiStage *, splotd *, ggobid *);
       GGobiExtendedSPlotClass *klass;
       klass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);
       f = klass->splot_assign_points_to_bins;
@@ -332,36 +332,36 @@ splot_set_current_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 /* --------------------------------------------------------------- */
 
 void
-splot_points_realloc (gint nrows_prev, splotd *sp, GGobiData *d)
+splot_points_realloc (gint nrows_prev, splotd *sp, GGobiStage *d)
 {
   gint i;
 
-  vectorf_realloc (&sp->p1d.spread_data, GGOBI_STAGE(d)->n_rows);
+  vectorf_realloc (&sp->p1d.spread_data, d->n_rows);
 
   sp->planar = (gcoords *) g_realloc (sp->planar,
-    GGOBI_STAGE(d)->n_rows* sizeof (gcoords));
+    d->n_rows* sizeof (gcoords));
   sp->screen = (icoords *) g_realloc (sp->screen,
-    GGOBI_STAGE(d)->n_rows* sizeof (icoords));
+    d->n_rows* sizeof (icoords));
 
-  for (i=nrows_prev; i<GGOBI_STAGE(d)->n_rows; i++) {
+  for (i=nrows_prev; i<d->n_rows; i++) {
     sp->planar[i].x = sp->planar[i].y = 0.0;
     sp->screen[i].x = sp->screen[i].y = 0;
   }
 }
 
 void
-splot_edges_realloc (gint nedges_prev, splotd *sp, GGobiData *e) 
+splot_edges_realloc (gint nedges_prev, splotd *sp, GGobiStage *e) 
 {
   gint i;
 
   sp->edges = (GdkSegment *) g_realloc ((gpointer) sp->edges,
-    e->edge.n * sizeof (GdkSegment));
+    ggobi_stage_get_n_edges(e) * sizeof (GdkSegment));
   sp->arrowheads = (GdkSegment *) g_realloc ((gpointer) sp->arrowheads,
-    e->edge.n * sizeof (GdkSegment));
+    ggobi_stage_get_n_edges(e) * sizeof (GdkSegment));
 
   /*-- these aren't useful values, but they're finite --*/
   if (nedges_prev > 0) {
-    for (i=nedges_prev; i<e->edge.n; i++) {
+    for (i=nedges_prev; i<ggobi_stage_get_n_edges(e); i++) {
       sp->edges[i].x1 = sp->edges[i].x2 = 0;
       sp->arrowheads[i].x1 = sp->arrowheads[i].x2 = 0;
     }
@@ -371,12 +371,12 @@ splot_edges_realloc (gint nedges_prev, splotd *sp, GGobiData *e)
 void
 splot_alloc (splotd *sp, displayd *display, ggobid *gg) 
 {
-  GGobiData *d;
+  GGobiStage *d;
   gint nr; 
   if(!display)
     return;
   d = display->d;
-  nr = GGOBI_STAGE(d)->n_rows;
+  nr = d->n_rows;
   sp->planar = (gcoords *) g_malloc (nr * sizeof (gcoords));
   sp->screen = (icoords *) g_malloc (nr * sizeof (icoords));
   vectorf_init_null (&sp->p1d.spread_data);
@@ -527,13 +527,13 @@ splot_world_to_plane (cpaneld *cpanel, splotd *sp, ggobid *gg)
 */
 {
   displayd *display = (displayd *) sp->displayptr;
-  GGobiData *d = display->d;
+  GGobiStage *d = display->d;
 
 /*
  * This may be the place to respond to the possibility that a
  * plotted variable has just been deleted.  It's no big deal for
  * the scatterplot -- unless one of the plotted variables is now
- * beyond GGOBI_STAGE(d)->n_cols.
+ * beyond d->n_cols.
 */
 
   if(GGOBI_IS_EXTENDED_SPLOT(sp)) {
@@ -553,7 +553,7 @@ splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp,
 {
   gint i, k;
   greal scale_x, scale_y;
-  GGobiData *d = display->d;
+  GGobiStage *d = display->d;
   greal gtmp;
   GGobiExtendedSPlotClass *klass = NULL;
   greal precis = (greal) PRECISION1;
@@ -656,7 +656,7 @@ splot_plane_to_world (splotd *sp, gint ipt, ggobid *gg)
 {
   displayd *display = (displayd *) sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
-  GGobiData *d = display->d;
+  GGobiStage *d = display->d;
 
   switch (cpanel->pmode) {
     case P1PLOT:
@@ -735,7 +735,7 @@ splot_reverse_pipeline (splotd *sp, gint ipt, gcoords *eps,
                         gboolean horiz, gboolean vert, ggobid *gg)
 {
   displayd *display = (displayd *) sp->displayptr;
-  GGobiData *d = display->d;
+  GGobiStage *d = display->d;
   splot_screen_to_plane (sp, ipt, eps, horiz, vert);
   splot_plane_to_world (sp, ipt, gg);
   world_to_raw (ipt, sp, d, gg);

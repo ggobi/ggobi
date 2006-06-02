@@ -44,7 +44,7 @@ void show_display_tree_cb (GtkWidget *widget, ggobid *);
 void show_display_tree (ggobid *gg, GtkWidget *widget);
 
 void splot_add_tree(displayd *display, GtkTreeIter *parent);
-gchar *splot_tree_label (splotd *, GGobiData *, ggobid *);
+gchar *splot_tree_label (splotd *, GGobiStage *, ggobid *);
 
 void display_tree_delete_cb(GtkWidget *w, GdkEvent *event, ggobid *gg);
 

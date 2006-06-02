@@ -22,7 +22,7 @@
 #include "vars.h"
 #include "externs.h"
 
-static void exclusion_notebook_adddata_cb (ggobid *, GGobiData *,
+static void exclusion_notebook_adddata_cb (ggobid *, GGobiStage *,
                                            void *notebook);
 
 static void
@@ -30,10 +30,10 @@ destroyit (gboolean kill, ggobid * gg)
 {
   gint n, nrows;
   GSList *l;
-  GGobiData *d;
+  GGobiStage *d;
 
   for (l = gg->d; l; l = l->next) {
-    d = (GGobiData *) l->data;
+    d = (GGobiStage *) l->data;
     if (d->cluster_table) {
       nrows = GTK_TABLE (d->cluster_table)->nrows;
       for (n = 0; n < nrows - 1; n++)
@@ -75,7 +75,7 @@ cluster_symbol_show (GtkWidget * w, GdkEventExpose * event, gpointer cbd)
   ggobid *gg = GGobiFromWidget (w, true);
   icoords pos;
   glyphd g;
-  GGobiData *d = datad_get_from_notebook (gg->cluster_ui.notebook, gg);
+  GGobiStage *d = datad_get_from_notebook (gg->cluster_ui.notebook, gg);
   colorschemed *scheme = gg->activeColorScheme;
 
   /*-- fill in the background color --*/
@@ -96,7 +96,7 @@ cluster_symbol_show (GtkWidget * w, GdkEventExpose * event, gpointer cbd)
 }
 
 void
-cluster_table_labels_update (GGobiData * d, ggobid * gg)
+cluster_table_labels_update (GGobiStage * d, ggobid * gg)
 {
   gint k;
   gchar *str;
@@ -126,14 +126,14 @@ hide_cluster_cb (GtkToggleButton * btn, gpointer cbd)
   gint k = GPOINTER_TO_INT (cbd);
   gint i;
   ggobid *gg = GGobiFromWidget (GTK_WIDGET (btn), true);
-  GGobiData *d = datad_get_from_notebook (gg->cluster_ui.notebook, gg);
+  GGobiStage *d = datad_get_from_notebook (gg->cluster_ui.notebook, gg);
   gboolean changed = false;
 
   /*-- operating on the current sample, whether hidden or shown --*/
-  for (i = 0; i < GGOBI_STAGE(d)->n_rows; i++) {
+  for (i = 0; i < d->n_rows; i++) {
     if (d->sampled.els[i]) {
       if (d->clusterid.els[i] == k) {
-        if (ggobi_data_set_attr_hidden(d, i, btn->active, ATTR_SET_PERSISTENT)) {
+        if (ggobi_stage_set_attr_hidden(d, i, btn->active, ATTR_SET_PERSISTENT)) {
           changed = symbol_link_by_id (true, i, d, gg) || changed;
         }
       }
@@ -150,29 +150,29 @@ hide_cluster_cb (GtkToggleButton * btn, gpointer cbd)
 
 /*-- include or exclude hidden cases --*/
 gint
-include_hiddens (gboolean include, GGobiData * d, ggobid * gg)
+include_hiddens (gboolean include, GGobiStage * d, ggobid * gg)
 {
   gint i;
   displayd *dsp = gg->current_display;
   cpaneld *cpanel = &dsp->cpanel;
   gboolean prev, changed = false;
 
-  for (i = 0; i < GGOBI_STAGE(d)->n_rows; i++) {
+  for (i = 0; i < d->n_rows; i++) {
     prev = d->excluded.els[i];
-    d->excluded.els[i] = (!include && ggobi_data_get_attr_hidden(d, i));
+    d->excluded.els[i] = (!include && ggobi_stage_get_attr_hidden(d, i));
     if ((prev != d->excluded.els[i]) && !gg->linkby_cv) {
       /*-- this doesn't link the value of excluded --*/
       changed = changed || exclude_link_by_id (i, d, gg);
     }
   }
-  ggobi_data_set_rows_in_plot(d);
+  ggobi_stage_set_rows_in_plot(d);
 
   /*-- make the other datad's update their rows_in_plot, too --*/
   if (changed) {
-    GGobiData *dd;
+    GGobiStage *dd;
     GSList *l;
     for (l = gg->d; l; l = l->next) {
-      dd = (GGobiData *) l->data;
+      dd = (GGobiStage *) l->data;
       if (dd == d)
         continue;
       clusters_set(d);
@@ -211,13 +211,13 @@ include_hiddens (gboolean include, GGobiData * d, ggobid * gg)
 static void
 exclude_hiddens_cb (GtkWidget * w, ggobid * gg)
 {
-  GGobiData *d = datad_get_from_notebook (gg->cluster_ui.notebook, gg);
+  GGobiStage *d = datad_get_from_notebook (gg->cluster_ui.notebook, gg);
   include_hiddens (false, d, gg);
 }
 static void
 include_hiddens_cb (GtkWidget * w, ggobid * gg)
 {
-  GGobiData *d = datad_get_from_notebook (gg->cluster_ui.notebook, gg);
+  GGobiStage *d = datad_get_from_notebook (gg->cluster_ui.notebook, gg);
   include_hiddens (true, d, gg);
 }
 
@@ -227,7 +227,7 @@ cluster_symbol_cb (GtkWidget * w, GdkEventExpose * event, gpointer cbd)
   /*-- reset the glyph and color of this glyph to the current values --*/
   gint n = GPOINTER_TO_INT (cbd);
   ggobid *gg = GGobiFromWidget (w, true);
-  GGobiData *d = datad_get_from_notebook (gg->cluster_ui.notebook, gg);
+  GGobiStage *d = datad_get_from_notebook (gg->cluster_ui.notebook, gg);
   gint k, m, i;
   cpaneld *cpanel = &gg->current_display->cpanel;
   gboolean rval = false;
@@ -292,12 +292,12 @@ cluster_symbol_cb (GtkWidget * w, GdkEventExpose * event, gpointer cbd)
     i = d->rows_in_plot.els[m];
     if (d->clusterid.els[i] == n) {
       if (targets == br_candg || targets == br_color) {
-        ggobi_data_set_attr_color(d, i, gg->color_id, ATTR_SET_TRANSIENT);
+        ggobi_stage_set_attr_color(d, i, gg->color_id, ATTR_SET_TRANSIENT);
         /*-- this will be done multiple times, but who cares? --*/
         d->clusv[n].color = gg->color_id;
       }
       if (targets == br_candg || targets == br_glyph) {
-        ggobi_data_set_attr_glyph(d, i, &gg->glyph_id, ATTR_SET_PERSISTENT);
+        ggobi_stage_set_attr_glyph(d, i, &gg->glyph_id, ATTR_SET_PERSISTENT);
         /*-- this will be done multiple times, but who cares? --*/
         d->clusv[n].glyphtype = gg->glyph_id.type;
         d->clusv[n].glyphsize = gg->glyph_id.size;
@@ -321,7 +321,7 @@ cluster_symbol_cb (GtkWidget * w, GdkEventExpose * event, gpointer cbd)
 }
 
 void
-cluster_add (gint k, GGobiData * d, ggobid * gg)
+cluster_add (gint k, GGobiStage * d, ggobid * gg)
 {
   gchar *str;
   gint dawidth = 2 * NGLYPHSIZES + 1 + 10;
@@ -393,7 +393,7 @@ cluster_add (gint k, GGobiData * d, ggobid * gg)
 }
 
 void
-cluster_free (gint k, GGobiData * d, ggobid * gg)
+cluster_free (gint k, GGobiStage * d, ggobid * gg)
 {
   if (d->clusvui[k].da) {
     gtk_widget_destroy (d->clusvui[k].da);
@@ -408,12 +408,12 @@ cluster_free (gint k, GGobiData * d, ggobid * gg)
 static void
 update_cb (GtkWidget * w, ggobid * gg)
 {
-  GGobiData *d = datad_get_from_notebook (gg->cluster_ui.notebook, gg);
+  GGobiStage *d = datad_get_from_notebook (gg->cluster_ui.notebook, gg);
   splotd *sp = gg->current_splot;
 
-  ggobi_data_set_rows_in_plot(d);
+  ggobi_stage_set_rows_in_plot(d);
   if (GGOBI_IS_EXTENDED_SPLOT (sp)) {
-    void (*f) (GGobiData *, splotd *, ggobid *);
+    void (*f) (GGobiStage *, splotd *, ggobid *);
     GGobiExtendedSPlotClass *klass;
     klass = GGOBI_EXTENDED_SPLOT_GET_CLASS (sp);
     f = klass->splot_assign_points_to_bins;
@@ -433,7 +433,7 @@ update_cb (GtkWidget * w, ggobid * gg)
 static gboolean
 nclusters_changed (ggobid * gg)
 {
-  GGobiData *d;
+  GGobiStage *d;
   gint k, nrows = 0;
   GtkWidget *page;
   gboolean changed = false;
@@ -444,7 +444,7 @@ nclusters_changed (ggobid * gg)
     page = gtk_notebook_get_nth_page (GTK_NOTEBOOK (gg->cluster_ui.notebook),
                                       k);
     if (page) {
-      d = (GGobiData *) g_object_get_data (G_OBJECT (page), "datad");
+      d = (GGobiStage *) g_object_get_data (G_OBJECT (page), "datad");
       nrows = GTK_TABLE (d->cluster_table)->nrows;
 
       if (nrows != d->nclusters + 1) {/*-- add one for the titles --*/
@@ -462,7 +462,7 @@ nclusters_changed (ggobid * gg)
 
 
 void
-cluster_table_update (GGobiData * d, ggobid * gg)
+cluster_table_update (GGobiStage * d, ggobid * gg)
 {
   if (gg->cluster_ui.window != NULL) {
     if (nclusters_changed (gg)) {  /*-- for any of the datad's --*/
@@ -475,7 +475,7 @@ cluster_table_update (GGobiData * d, ggobid * gg)
 }
 
 static void
-exclusion_notebook_adddata_cb (ggobid * gg, GGobiData * d, void *notebook)
+exclusion_notebook_adddata_cb (ggobid * gg, GGobiStage * d, void *notebook)
 {
   cluster_window_open (gg);
   return;                       /* Should this return a boolean? */
@@ -491,7 +491,7 @@ CHECK_EVENT_SIGNATURE (exclusion_notebook_adddata_cb, datad_added_f)
   GtkWidget *ebox;
   gint k;
   GSList *l;
-  GGobiData *d;
+  GGobiStage *d;
   gboolean new = false;
 
   /*-- if used before we have data, bail out --*/
@@ -529,10 +529,10 @@ CHECK_EVENT_SIGNATURE (exclusion_notebook_adddata_cb, datad_added_f)
   gtk_container_add (GTK_CONTAINER (tebox), gg->cluster_ui.notebook);
 
   for (l = gg->d; l; l = l->next) {
-    d = (GGobiData *) l->data;
+    d = (GGobiStage *) l->data;
 
     /*-- skip datasets without variables --*/
-    if (!ggobi_stage_get_n_cols(GGOBI_STAGE(d)))
+    if (!ggobi_stage_get_n_cols(d))
       continue;
 
     /* Create a scrolled window to hold the table */
@@ -542,7 +542,7 @@ CHECK_EVENT_SIGNATURE (exclusion_notebook_adddata_cb, datad_added_f)
 
     g_object_set_data (G_OBJECT (scrolled_window), "datad", d); /*setdata */
     gtk_notebook_append_page (GTK_NOTEBOOK (gg->cluster_ui.notebook),
-                              scrolled_window, gtk_label_new (ggobi_stage_get_name(GGOBI_STAGE(d))));
+                              scrolled_window, gtk_label_new (ggobi_stage_get_name(d)));
     gtk_widget_show (scrolled_window);
 
     d->cluster_table = gtk_table_new (d->nclusters + 1, 5, true);
@@ -687,7 +687,7 @@ CHECK_EVENT_SIGNATURE (exclusion_notebook_adddata_cb, datad_added_f)
   gtk_widget_show_all (gg->cluster_ui.window);
 
   for (l = gg->d; l; l = l->next) {
-    d = (GGobiData *) l->data;
+    d = (GGobiStage *) l->data;
     /*-- this doesn't track cluster counts, just cluster identities --*/
     g_signal_emit (G_OBJECT (gg), GGobiSignals[CLUSTERS_CHANGED_SIGNAL], 0,
                    d);

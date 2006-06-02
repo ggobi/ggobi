@@ -24,20 +24,20 @@
 #include "externs.h"
 
 
-static void tsWorldToPlane(splotd *sp, GGobiData *d, ggobid *gg);
-static void tsWithinPlaneToScreen(splotd *sp, displayd *display, GGobiData *d, ggobid *gg);
-static gboolean tsDrawEdge_p(splotd *sp, gint m, GGobiData *d, GGobiData *e, ggobid *gg);
-static gboolean tsDrawCase_p(splotd *sp, gint m, GGobiData *d, ggobid *gg);
+static void tsWorldToPlane(splotd *sp, GGobiStage *d, ggobid *gg);
+static void tsWithinPlaneToScreen(splotd *sp, displayd *display, GGobiStage *d, ggobid *gg);
+static gboolean tsDrawEdge_p(splotd *sp, gint m, GGobiStage *d, GGobiStage *e, ggobid *gg);
+static gboolean tsDrawCase_p(splotd *sp, gint m, GGobiStage *d, ggobid *gg);
 static void tsAddPlotLabels(splotd *sp, GdkDrawable *drawable, ggobid *gg) ;
 static void tsWithinDrawBinned(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc);
 static void tsShowWhiskers(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc);
-static GdkSegment * tsAllocWhiskers(GdkSegment *, splotd *sp, gint nrows, GGobiData *d);
-static gchar *tsTreeLabel(splotd *sp, GGobiData *d, ggobid *gg);
+static GdkSegment * tsAllocWhiskers(GdkSegment *, splotd *sp, gint nrows, GGobiStage *d);
+static gchar *tsTreeLabel(splotd *sp, GGobiStage *d, ggobid *gg);
 
 
 
 void
-tsWorldToPlane(splotd *sp,  GGobiData *d, ggobid *gg)
+tsWorldToPlane(splotd *sp,  GGobiStage *d, ggobid *gg)
 {
       xy_reproject (sp, d->world.vals, d, gg);
 }
@@ -64,24 +64,24 @@ tsDestroy(splotd *sp)
 }
 
 void
-tsWithinPlaneToScreen(splotd *sp, displayd *display, GGobiData *d, ggobid *gg)
+tsWithinPlaneToScreen(splotd *sp, displayd *display, GGobiStage *d, ggobid *gg)
 {
       tsplot_whiskers_make (sp, display, gg);
 }
 
 gboolean
-tsDrawEdge_p(splotd *sp, gint m, GGobiData *d, GGobiData *e, ggobid *gg)
+tsDrawEdge_p(splotd *sp, gint m, GGobiStage *d, GGobiStage *e, ggobid *gg)
 {
    gboolean draw_edge = true;
 
-   draw_edge = !(ggobi_stage_is_missing(GGOBI_STAGE(e), m, sp->xyvars.y) ||  ggobi_stage_is_missing(GGOBI_STAGE(e), m, sp->xyvars.x));
+   draw_edge = !(ggobi_stage_is_missing(e, m, sp->xyvars.y) ||  ggobi_stage_is_missing(e, m, sp->xyvars.x));
    return(draw_edge);
 }
 
 gboolean
-tsDrawCase_p(splotd *sp, gint m, GGobiData *d, ggobid *gg)
+tsDrawCase_p(splotd *sp, gint m, GGobiStage *d, ggobid *gg)
 {
-  return !(ggobi_stage_is_missing(GGOBI_STAGE(d), m, sp->xyvars.y) || ggobi_stage_is_missing(GGOBI_STAGE(d), m, sp->xyvars.x));
+  return !(ggobi_stage_is_missing(d, m, sp->xyvars.y) || ggobi_stage_is_missing(d, m, sp->xyvars.x));
 }
 
 void
@@ -93,14 +93,14 @@ tsAddPlotLabels(splotd *sp, GdkDrawable *drawable, ggobid *gg)
   PangoRectangle rect;
 
   if (l->data == sp) {
-    layout_text(layout, ggobi_data_get_transformed_col_name(display->d, sp->xyvars.x), &rect);
+    layout_text(layout, ggobi_stage_get_transformed_col_name(display->d, sp->xyvars.x), &rect);
       gdk_draw_layout(drawable, gg->plot_GC, 
       sp->max.x - rect.width - 5,
       sp->max.y - rect.height - 5,
       layout
     );
   }
-  layout_text(layout, ggobi_data_get_transformed_col_name(display->d, sp->xyvars.y), &rect);
+  layout_text(layout, ggobi_stage_get_transformed_col_name(display->d, sp->xyvars.y), &rect);
   gdk_draw_layout(drawable, gg->plot_GC, 5, 5, layout);
   g_object_unref(G_OBJECT(layout));
 }
@@ -127,20 +127,20 @@ tsShowWhiskers(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc)
 
 
 GdkSegment * 
-tsAllocWhiskers(GdkSegment *whiskers, splotd *sp, gint nrows, GGobiData *d)
+tsAllocWhiskers(GdkSegment *whiskers, splotd *sp, gint nrows, GGobiStage *d)
 {
   return((GdkSegment *) g_realloc (whiskers, (nrows-1) * sizeof (GdkSegment)));
 }
 
 gchar *
-tsTreeLabel(splotd *sp, GGobiData *d, ggobid *gg)
+tsTreeLabel(splotd *sp, GGobiStage *d, ggobid *gg)
 {
-  return(ggobi_stage_get_col_name(GGOBI_STAGE(d), sp->xyvars.y));
+  return(ggobi_stage_get_col_name(d, sp->xyvars.y));
 }
 
 
 static gint
-splotVariablesGet(splotd *sp, gint *cols, GGobiData *d)
+splotVariablesGet(splotd *sp, gint *cols, GGobiStage *d)
 {
 	cols[0] = sp->xyvars.x;
 	cols[1] = sp->xyvars.y;
@@ -173,7 +173,7 @@ tsplotCreateWithVars(displayd *display, gint *vars, gint nvar, ggobid *gg)
 }
 
 static void
-splotAssignPointsToBins(GGobiData *d, splotd *sp, ggobid *gg)
+splotAssignPointsToBins(GGobiStage *d, splotd *sp, ggobid *gg)
 {
   assign_points_to_bins (d, sp, gg);
 }
@@ -186,7 +186,7 @@ splotScreenToTform(cpaneld *cpanel, splotd *sp, icoords *scr,
   greal precis = (greal) PRECISION1;
   greal ftmp, max, min, rdiff;
   displayd *display = (displayd *) sp->displayptr;
-  GGobiData *d = display->d;
+  GGobiStage *d = display->d;
   gfloat scale_x, scale_y;
   GGobiVariable *varx, *vary;
 
@@ -209,7 +209,7 @@ splotScreenToTform(cpaneld *cpanel, splotd *sp, icoords *scr,
  * plane to tform
 */
   /* x */
-  varx = ggobi_stage_get_variable(GGOBI_STAGE(d), sp->xyvars.x);
+  varx = ggobi_stage_get_variable(d, sp->xyvars.x);
   max = varx->lim.max;
   min = varx->lim.min;
   rdiff = max - min;
@@ -219,7 +219,7 @@ splotScreenToTform(cpaneld *cpanel, splotd *sp, icoords *scr,
   tfd->x += min;
 
   /* y */
-  vary = ggobi_stage_get_variable(GGOBI_STAGE(d), sp->xyvars.y);
+  vary = ggobi_stage_get_variable(d, sp->xyvars.y);
   max = vary->lim.max;
   min = vary->lim.min;
   rdiff = max - min;

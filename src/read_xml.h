@@ -82,7 +82,7 @@ typedef struct _XMLUserData {
   InputDescription *input;
 
   /* The current data object to which new records are added. */
-  GGobiData *current_data;
+  GGobiStage *current_data;
   /*  The list of all datad's read. */
   GSList *dlist; 
 
@@ -194,7 +194,7 @@ extern "C" {
   double asNumber(const char *sval);
   gboolean asLogical(const gchar * sval);
 
-  GGobiData *getCurrentXMLData(XMLParserData * parserData);
+  GGobiStage *getCurrentXMLData(XMLParserData * parserData);
 
   gboolean readXMLRecord(const xmlChar ** attrs, XMLParserData * data);
 

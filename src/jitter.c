@@ -79,7 +79,7 @@ jitter_randval (gint type)
 }
 
 void
-rejitter (gint * selected_cols, gint nselected_cols, GGobiData * d,
+rejitter (gint * selected_cols, gint nselected_cols, GGobiStage * d,
           ggobid * gg)
 {
   gint i, j, k, m;
@@ -88,7 +88,7 @@ rejitter (gint * selected_cols, gint nselected_cols, GGobiData * d,
 
   for (j = 0; j < nselected_cols; j++) {
     k = selected_cols[j];
-    var = ggobi_stage_get_variable(GGOBI_STAGE(d), k);
+    var = ggobi_stage_get_variable(d, k);
 
     for (i = 0; i < d->nrows_in_plot; i++) {
       m = d->rows_in_plot.els[i];
@@ -115,11 +115,11 @@ rejitter (gint * selected_cols, gint nselected_cols, GGobiData * d,
 
 
 void
-jitter_value_set (gfloat value, GGobiData * d, ggobid * gg)
+jitter_value_set (gfloat value, GGobiStage * d, ggobid * gg)
 {
   GtkWidget *tree_view =
     get_tree_view_from_object (G_OBJECT (gg->jitter_ui.window));
-  gint *vars;                   // = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof(gint));
+  gint *vars;                   // = (gint *) g_malloc (d->n_cols * sizeof(gint));
   gint nvars;
   gint j;
   GGobiVariable *var;
@@ -127,7 +127,7 @@ jitter_value_set (gfloat value, GGobiData * d, ggobid * gg)
   vars = get_selections_from_tree_view (tree_view, &nvars);
 
   for (j = 0; j < nvars; j++) {
-    var = ggobi_stage_get_variable(GGOBI_STAGE(d), vars[j]);
+    var = ggobi_stage_get_variable(d, vars[j]);
     var->jitter_factor = value;
   }
 

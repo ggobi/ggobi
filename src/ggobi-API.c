@@ -38,7 +38,7 @@ extern "C"
   void ggobi_displays_release (ggobid * gg);
   void ggobi_display_release (displayd * display, ggobid * gg);
   void ggobi_splot_release (splotd * sp, displayd * display, ggobid * gg);
-  /*void ggobi_data_release (GGobiData *, ggobid * gg);*/
+  /*void ggobi_data_release (GGobiStage *, ggobid * gg);*/
 #ifdef __cplusplus
 }
 #endif
@@ -107,16 +107,16 @@ const gchar **ggobi_getDataModeNames (int *n)
 }
 
 
-gchar **ggobi_getVariableNames (gint transformed, GGobiData * d,
+gchar **ggobi_getVariableNames (gint transformed, GGobiStage * d,
                                   ggobid * gg)
 {
   gchar **names;
-  gint nc = GGOBI_STAGE(d)->n_cols, j;
+  gint nc = d->n_cols, j;
 
   names = (gchar **) g_malloc (sizeof (gchar *) * nc);
 
   for (j = 0; j < nc; j++) {
-    names[j] = transformed ? ggobi_data_get_transformed_col_name(d, j) : ggobi_stage_get_col_name(GGOBI_STAGE(d), j);
+    names[j] = transformed ? ggobi_stage_get_transformed_col_name(d, j) : ggobi_stage_get_col_name(d, j);
   }
 
   return (names);
@@ -160,7 +160,7 @@ ggobi_setMissingValueIdentifier (MissingValue_p f)
 /*-- need two of these now, one to replace and one to append --*/
 void
 ggobi_setData (gdouble * values, gchar ** rownames, gchar ** colnames,
-                 gint nr, gint nc, GGobiData * d, gboolean cleanup,
+                 gint nr, gint nc, GGobiStage * d, gboolean cleanup,
                  ggobid * gg, gboolean duplicate,
                  InputDescription * desc)
 {
@@ -168,32 +168,32 @@ ggobi_setData (gdouble * values, gchar ** rownames, gchar ** colnames,
   gchar *lbl;
   gchar *varname;
 
-  d->input = desc;
-  if (ggobi_stage_get_name(GGOBI_STAGE(d)) == NULL)
-    ggobi_stage_set_name(GGOBI_STAGE(d), desc->fileName);
+  GGOBI_DATA(d)->input = desc;
+  if (ggobi_stage_get_name(d) == NULL)
+    ggobi_stage_set_name(d, desc->fileName);
   if (gg->input == NULL)
     gg->input = desc;
 
-  ggobi_data_add_rows(d, GGOBI_STAGE(d)->n_rows- nr);
-  ggobi_data_add_cols(d, GGOBI_STAGE(d)->n_cols - nc);
+  ggobi_data_add_rows(GGOBI_DATA(d), d->n_rows- nr);
+  ggobi_data_add_cols(GGOBI_DATA(d), d->n_cols - nc);
 
   if (values) {
     for (j = 0; j < nc; j++) {
       varname = (colnames) ? colnames[j] : NULL;
       g_debug("Column name %s", colnames[j]);
-      ggobi_stage_set_col_name(GGOBI_STAGE(d), j, varname);
+      ggobi_stage_set_col_name(d, j, varname);
 
       for (i = 0; i < nr; i++) 
-        ggobi_stage_set_raw_value(GGOBI_STAGE(d), i, j, values[i + j * nr]);
+        ggobi_stage_set_raw_value(d, i, j, values[i + j * nr]);
       
     }
     for (i = 0; i < nr; i++) {
       lbl = (rownames) ? rownames[i] : NULL;
-      ggobi_stage_set_row_id(GGOBI_STAGE(d), i, lbl, false);
+      ggobi_stage_set_row_id(d, i, lbl, false);
     }
   }
 
-  ggobi_data_attach(d, gg, false);
+  ggobi_stage_attach(d, gg, false);
 }
 
 
@@ -250,7 +250,7 @@ const gint *ggobi_getViewTypeIndices (gint * n)
 }
 
 
-displayd *ggobi_newScatterplot (gint ix, gint iy, GGobiData * d,
+displayd *ggobi_newScatterplot (gint ix, gint iy, GGobiStage * d,
                                   ggobid * gg)
 {
   displayd *display = NULL;
@@ -268,7 +268,7 @@ displayd *ggobi_newScatterplot (gint ix, gint iy, GGobiData * d,
 }
 
 displayd *ggobi_newScatmat (gint * rows, gint * columns, gint nr, gint nc,
-                              GGobiData * d, ggobid * gg)
+                              GGobiStage * d, ggobid * gg)
 {
   displayd *display;
 
@@ -280,7 +280,7 @@ displayd *ggobi_newScatmat (gint * rows, gint * columns, gint nr, gint nc,
   return (display);
 }
 
-displayd *ggobi_newParCoords (gint * vars, gint numVars, GGobiData * d,
+displayd *ggobi_newParCoords (gint * vars, gint numVars, GGobiStage * d,
                                 ggobid * gg)
 {
   displayd *display = NULL;
@@ -294,7 +294,7 @@ displayd *ggobi_newParCoords (gint * vars, gint numVars, GGobiData * d,
   return (display);
 }
 
-displayd *ggobi_newTimeSeries (gint * yvars, gint numVars, GGobiData * d,
+displayd *ggobi_newTimeSeries (gint * yvars, gint numVars, GGobiStage * d,
                                  ggobid * gg)
 {
   displayd *display = NULL;
@@ -336,25 +336,6 @@ const gchar *ggobi_getViewTypeName (displayd * dpy)
   val = GGOBI_EXTENDED_DISPLAY_GET_CLASS (dpy)->treeLabel;
 
   return (val);
-}
-
-
-/*
-  Pointer to the raw data managed by GGobi.
-  Don't touch this.
- */
-const gfloat **ggobi_getRawData (GGobiData * d, ggobid * gg)
-{
-  return ((const gfloat **) d->raw.vals);
-}
-
-/*
-  Pointer to the second transformation of the data managed by GGobi.
-  Don't touch this.
- */
-const gfloat **ggobi_getTFormData (GGobiData * d, ggobid * gg)
-{
-  return ((const gfloat **) d->tform.vals);
 }
 
 void
@@ -843,13 +824,13 @@ gchar *ggobi_getDescription (ggobid * gg)
  */
 int ggobi_datasetIndex (const char *name, const ggobid * const gg)
 {
-  GGobiData *d;
+  GGobiStage *d;
   int ctr = 0;
   GSList *tmp = gg->d;
 
   while (tmp) {
-    d = (GGobiData *) tmp->data;
-    if (strcmp (name, ggobi_stage_get_name(GGOBI_STAGE(d))) == 0)
+    d = (GGobiStage *) tmp->data;
+    if (strcmp (name, ggobi_stage_get_name(d)) == 0)
       return (ctr);
     ctr++;
     tmp = tmp->next;
@@ -865,14 +846,14 @@ int ggobi_datasetIndex (const char *name, const ggobid * const gg)
 gchar **ggobi_getDatasetNames (gint * n, ggobid * gg)
 {
   gint i;
-  GGobiData *d;
+  GGobiStage *d;
   gchar **names;
   GSList *tmp = gg->d;
   *n = g_slist_length (gg->d);
   names = (gchar **) g_malloc (sizeof (gchar *) * (*n));
   for (i = 0; i < *n; i++) {
-    d = (GGobiData *) tmp->data;
-    names[i] = g_strdup (ggobi_stage_get_name(GGOBI_STAGE(d)));
+    d = (GGobiStage *) tmp->data;
+    names[i] = g_strdup (ggobi_stage_get_name(d));
     tmp = tmp->next;
   }
 
@@ -888,14 +869,14 @@ ggobid *ggobi_ggobi_get (gint which)
   return (ggobi_get (which));
 }
 
-gint ggobi_ncols (GGobiData * data)
+gint ggobi_ncols (GGobiStage * data)
 {
-  return (GGOBI_STAGE(data)->n_cols);
+  return (data->n_cols);
 }
 
-gint ggobi_nrecords (GGobiData * data)
+gint ggobi_nrecords (GGobiStage * data)
 {
-  return (GGOBI_STAGE(data)->n_rows);
+  return (data->n_rows);
 }
 
 
@@ -963,9 +944,9 @@ const int *ggobi_getVersionNumbers ()
 }
 
 
-GGobiData *ggobi_data_get (gint which, const ggobid * const gg)
+GGobiStage *ggobi_data_get (gint which, const ggobid * const gg)
 {
-  GGobiData *data = NULL;
+  GGobiStage *data = NULL;
 
   if (gg->d != NULL)
     data = g_slist_nth_data (gg->d, which);
@@ -973,11 +954,11 @@ GGobiData *ggobi_data_get (gint which, const ggobid * const gg)
   return (data);
 }
 
-GGobiData *ggobi_data_get_by_name (const gchar * const name,
+GGobiStage *ggobi_data_get_by_name (const gchar * const name,
                                      const ggobid * const gg)
 {
   gint which;
-  GGobiData *data = NULL;
+  GGobiStage *data = NULL;
 
   which = ggobi_datasetIndex (name, gg);
   if (which > -1) {
@@ -1002,11 +983,11 @@ ggobi_setTour2DProjectionMatrix (gdouble * Fvalues, gint ncols, gint ndim,
   ProjectionMode vm = pmode_get (gg->current_display, gg);
   displayd *dsp = gg->current_display;
   cpaneld *cpanel = &dsp->cpanel;
-  GGobiData *d = dsp->d;
+  GGobiStage *d = dsp->d;
   gboolean candoit = true;
   gint i, j;
 
-  if ((ncols != GGOBI_STAGE(d)->n_cols) || ndim != 2)
+  if ((ncols != d->n_cols) || ndim != 2)
     candoit = false;
 
   if (candoit) {
@@ -1044,11 +1025,11 @@ const gdouble **ggobi_getTour2DProjectionMatrix (gint ncols, gint ndim,
                                                    ggobid * gg)
 {
   displayd *dsp = gg->current_display;
-  GGobiData *d = dsp->d;
+  GGobiStage *d = dsp->d;
   gdouble **Fvals;
   gint i, j;
 
-  ncols = GGOBI_STAGE(d)->n_cols;
+  ncols = d->n_cols;
   ndim = 2;
 
   Fvals = (gdouble **) g_malloc (sizeof (gdouble *) * ncols);

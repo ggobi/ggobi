@@ -88,23 +88,19 @@ tsplot_reset_arrangement (displayd * display, gint arrangement, ggobid * gg)
 
 displayd *
 tsplot_new_with_vars (gboolean missing_p, gint nvars, gint * vars,
-                      GGobiData * d, ggobid * gg)
+                      GGobiStage * d, ggobid * gg)
 {
   return (tsplot_new (NULL, missing_p, nvars, vars, d, gg));
 }
 
 displayd *
 tsplot_new (displayd * display, gboolean missing_p, gint nvars, gint * vars,
-            GGobiData * d, ggobid * gg)
+            GGobiStage * d, ggobid * gg)
 {
   GtkWidget *vbox, *frame;
   gint i, timeVariable, cur;
   splotd *sp;
   gint nplots;
-  
-  /* make sure vars is of length n_cols */
-  vars = g_memdup(vars, nvars);
-  vars = g_renew(gint, vars, GGOBI_STAGE(d)->n_cols);
       
   if (!display)
     display = g_object_new (GGOBI_TYPE_TIME_SERIES_DISPLAY, NULL);
@@ -117,24 +113,24 @@ tsplot_new (displayd * display, gboolean missing_p, gint nvars, gint * vars,
 
     /* See if there is a variable which has been marked as isTime
        and use the first of these as the horizontal axis. */
-    /*for (i = 0; i < GGOBI_STAGE(d)->n_cols; i++) {
+    /*for (i = 0; i < d->n_cols; i++) {
       GGobiVariable *el;
-      el = ggobi_stage_get_variable(GGOBI_STAGE(d), i);
+      el = ggobi_stage_get_variable(d, i);
       if (el->isTime) {
         timeVariable = i;
         break;
       }
     }*/
 
-    nplots = MIN ((GGOBI_STAGE(d)->n_cols - 1), sessionOptions->info->numTimePlotVars);
+    nplots = MIN ((d->n_cols - 1), sessionOptions->info->numTimePlotVars);
     if (nplots < 0)
-      nplots = GGOBI_STAGE(d)->n_cols;
+      nplots = d->n_cols;
 
     if (gg->current_display != NULL && gg->current_display != display &&
         gg->current_display->d == d &&
         GGOBI_IS_EXTENDED_DISPLAY (gg->current_display)) {
       gint j, k, nplotted_vars;
-      gint *plotted_vars = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof (gint));
+      gint *plotted_vars = (gint *) g_malloc (d->n_cols * sizeof (gint));
       displayd *dsp = gg->current_display;
 
       nplotted_vars =
@@ -162,7 +158,7 @@ tsplot_new (displayd * display, gboolean missing_p, gint nvars, gint * vars,
          variables.  Don't add timeVariable again, or exceed the
          number of plots */
       if (j < nplots) {
-        for (k = 0; k < GGOBI_STAGE(d)->n_cols; k++) {
+        for (k = 0; k < d->n_cols; k++) {
           if (!in_vector (k, plotted_vars, nplotted_vars) &&
               k != timeVariable) {
             vars[j] = k;
@@ -183,7 +179,7 @@ tsplot_new (displayd * display, gboolean missing_p, gint nvars, gint * vars,
         /* Check that we are not setting a variable to the timeVariable
            but also that we have enough variables. */
         if (cur == timeVariable) {
-          if (cur < GGOBI_STAGE(d)->n_cols - 1) {
+          if (cur < d->n_cols - 1) {
             vars[i] = ++cur;
           }
         }
@@ -255,8 +251,6 @@ tsplot_new (displayd * display, gboolean missing_p, gint nvars, gint * vars,
     gtk_widget_show_all (GGOBI_WINDOW_DISPLAY (display)->window);
   else
     gtk_widget_show_all (GTK_WIDGET (gg->tsplot.arrangement_box));
-
-  g_free(vars);
   
   return display;
 }
@@ -397,7 +391,7 @@ tsplot_rewhisker (splotd * sp, ggobid * gg)
 {
   gint i, k, n;
   displayd *display = (displayd *) sp->displayptr;
-  GGobiData *d = display->d;
+  GGobiStage *d = display->d;
   gboolean draw_whisker;
 
   for (k = 0; k < (d->nrows_in_plot - 1); k++) {
@@ -405,7 +399,7 @@ tsplot_rewhisker (splotd * sp, ggobid * gg)
     n = d->rows_in_plot.els[k + 1];
 
     /*-- .. also if we're not drawing missings, and an endpoint is missing --*/
-    if (!d->missings_show_p && (ggobi_stage_is_missing(GGOBI_STAGE(d), i, sp->xyvars.x) || ggobi_stage_is_missing(GGOBI_STAGE(d), i, sp->xyvars.y) || ggobi_stage_is_missing(GGOBI_STAGE(d), n, sp->xyvars.x) || ggobi_stage_is_missing(GGOBI_STAGE(d), n, sp->xyvars.y)) && (sp->screen[i].x > sp->screen[n].x)) {  /* to keep time going
+    if (!d->missings_show_p && (ggobi_stage_is_missing(d, i, sp->xyvars.x) || ggobi_stage_is_missing(d, i, sp->xyvars.y) || ggobi_stage_is_missing(d, n, sp->xyvars.x) || ggobi_stage_is_missing(d, n, sp->xyvars.y)) && (sp->screen[i].x > sp->screen[n].x)) {  /* to keep time going
                                                                                                                                                                                                                                                forwards */
       draw_whisker = false;
     }

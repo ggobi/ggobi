@@ -129,6 +129,12 @@ class GGobi:Stage:Transform from GGobi:Stage {
     return(cols);
   }
   
+  public guint
+  get_n_transformed_cols(self)
+  {
+    return (g_hash_table_size(self->_priv->tforms));
+  }
+  
   override (GGobi:Stage) gdouble
   get_raw_value(GGobi:Stage *self (check null type), guint i, guint j)
   {

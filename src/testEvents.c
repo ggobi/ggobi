@@ -7,18 +7,18 @@
   Used to test the selection of variable events.
  */
 void
-test_variable_select (ggobid * gg, GGobiData * d, gint whichVar, splotd * sp,
+test_variable_select (ggobid * gg, GGobiStage * d, gint whichVar, splotd * sp,
                       void *val)
 {
   GGobiVariable *vartab = g_slist_nth_data (d->vartable, whichVar);
   fprintf (stderr,
            "Selected variable: %d %s in %s.  User value %s. # plots in display %d\n",
-           whichVar, ggobi_stage_get_col_name(GGOBI_STAGE(d), whichVar), ggobi_stage_get_name(GGOBI_STAGE(d)), (char *) val,
+           whichVar, ggobi_stage_get_col_name(d, whichVar), ggobi_stage_get_name(d), (char *) val,
            g_list_length (sp->displayptr->splots));
 }
 
 void
-test_point_move_cb (void *userData, splotd * sp, gint which, GGobiData * d,
+test_point_move_cb (void *userData, splotd * sp, gint which, GGobiStage * d,
                     ggobid * gg)
 {
   fprintf (stderr, "Moving a point\n");
@@ -27,7 +27,7 @@ test_point_move_cb (void *userData, splotd * sp, gint which, GGobiData * d,
 
 void
 test_brush_motion_cb (void *userData, splotd * sp, GdkEventMotion * ev,
-                      GGobiData * d, ggobid * gg)
+                      GGobiStage * d, ggobid * gg)
 {
   fprintf (stderr,
            "brush motion callback (gg) %p (sp) %p (ev) %p, (userData) %s\n",
@@ -66,7 +66,7 @@ CHECK_EVENT_SIGNATURE (test_variable_select, select_variable_f)
 /*
   use g_signal_connect() rather than ...._object().
  */
-     void test_data_add_cb (ggobid * gg, GGobiData * d, gpointer data)
+     void test_data_add_cb (ggobid * gg, GGobiStage * d, gpointer data)
 {
   g_printerr ("(test_data_add_cb) adding datad\n");
   g_signal_connect (G_OBJECT (gg), "select_variable",
@@ -75,11 +75,11 @@ CHECK_EVENT_SIGNATURE (test_variable_select, select_variable_f)
 
 
 void
-test_sticky_points (ggobid * gg, gint index, gint state, GGobiData * d,
+test_sticky_points (ggobid * gg, gint index, gint state, GGobiStage * d,
                     gpointer data)
 {
   fprintf (stderr, "[Sticky point identification] %d %s in %s\n",
-           index, state == STICKY ? "sticky" : "unsticky", ggobi_stage_get_name(GGOBI_STAGE(d)));
+           index, state == STICKY ? "sticky" : "unsticky", ggobi_stage_get_name(d));
   fflush (stderr);
 }
 

@@ -27,10 +27,10 @@ static gchar *display_mode_lbl[] = { "Bars", "Spines" };
 static gboolean barchart_scale (gboolean button1_p, gboolean button2_p,
                                 splotd * sp);
 
-void barchart_set_initials (splotd * sp, GGobiData * d);
-void barchart_allocate_structure (splotd * sp, GGobiData * d);
+void barchart_set_initials (splotd * sp, GGobiStage * d);
+void barchart_allocate_structure (splotd * sp, GGobiStage * d);
 extern void barchart_set_breakpoints (gfloat width, splotd * sp,
-                                      GGobiData * d);
+                                      GGobiStage * d);
 
 static void
 display_mode_cb (GtkWidget * w, ggobid * gg)
@@ -142,7 +142,7 @@ key_press_cb (GtkWidget * w, GdkEventKey * event, splotd * sp)
   gboolean reallocate = FALSE;
 
   displayd *display = (displayd *) sp->displayptr;
-  GGobiData *d = display->d;
+  GGobiStage *d = display->d;
 
   barchartSPlotd *bsp = GGOBI_BARCHART_SPLOT (sp);
 
@@ -153,14 +153,14 @@ key_press_cb (GtkWidget * w, GdkEventKey * event, splotd * sp)
   /*-- insert mode-specific key presses (if any) here --*/
   switch (event->keyval) {
   case GDK_plus:
-    if (GGOBI_STAGE_IS_COL_CATEGORICAL(GGOBI_STAGE(d), sp->p1dvar)) {
+    if (GGOBI_STAGE_IS_COL_CATEGORICAL(d, sp->p1dvar)) {
       bsp->bar->new_nbins = bsp->bar->nbins + 1;
       reallocate = TRUE;
     }
     break;
 
   case GDK_minus:
-    if (!GGOBI_STAGE_IS_COL_CATEGORICAL(GGOBI_STAGE(d), sp->p1dvar)) {
+    if (!GGOBI_STAGE_IS_COL_CATEGORICAL(d, sp->p1dvar)) {
       if (bsp->bar->nbins > 2) {
         bsp->bar->new_nbins = bsp->bar->nbins - 1;
         reallocate = TRUE;
@@ -171,7 +171,7 @@ key_press_cb (GtkWidget * w, GdkEventKey * event, splotd * sp)
 
   if (reallocate) {
     displayd *display = (displayd *) sp->displayptr;
-    GGobiData *d = display->d;
+    GGobiStage *d = display->d;
     ggobid *gg = GGobiFromSPlot (sp);
 
     barchart_allocate_structure (sp, d);
@@ -276,7 +276,7 @@ barchart_scale (gboolean button1_p, gboolean button2_p, splotd * sp)
   ggobid *gg = GGobiFromSPlot (sp);
   cpaneld *cpanel = &display->cpanel;
   barchartSPlotd *bsp = GGOBI_BARCHART_SPLOT (sp);
-  GGobiData *d = display->d;
+  GGobiStage *d = display->d;
   GGobiExtendedSPlotClass *klass;
   klass = GGOBI_EXTENDED_SPLOT_GET_CLASS (sp);
 

@@ -50,7 +50,7 @@ movePointsButtonCb (displayd * display, splotd * sp, GtkWidget * w,
 
 /* XXX duncan and dfs: you need to sort this out
 static void
-worldToRaw(displayd *display, splotd *sp, gint pt, GGobiData *d, ggobid *gg)
+worldToRaw(displayd *display, splotd *sp, gint pt, GGobiStage *d, ggobid *gg)
 {
  if (sp->p1dvar == -1) {
     world_to_raw_by_var (pt, sp->xyvars.x, display, d, gg);
@@ -61,7 +61,7 @@ worldToRaw(displayd *display, splotd *sp, gint pt, GGobiData *d, ggobid *gg)
 
 
 static gint
-variablePlottedP (displayd * display, gint * cols, gint ncols, GGobiData * d)
+variablePlottedP (displayd * display, gint * cols, gint ncols, GGobiStage * d)
 {
   GList *l;
   gint j;
@@ -95,12 +95,12 @@ variableSelect (GtkWidget * w, displayd * dpy, splotd * sp, gint jvar,
 }
 
 static void
-varpanelRefresh (displayd * display, splotd * sp, GGobiData * d)
+varpanelRefresh (displayd * display, splotd * sp, GGobiStage * d)
 {
   gint j, n, *vars;
   ggobid *gg = GGobiFromDisplay (display);
 
-  for (j = 0; j < GGOBI_STAGE(d)->n_cols; j++) {
+  for (j = 0; j < d->n_cols; j++) {
     varpanel_toggle_set_active (VARSEL_X, j, false, d);
 
     varpanel_toggle_set_active (VARSEL_Y, j, false, d);
@@ -109,7 +109,7 @@ varpanelRefresh (displayd * display, splotd * sp, GGobiData * d)
     varpanel_widget_set_visible (VARSEL_Z, j, false, d);
   }
 
-  vars = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof (gint));
+  vars = (gint *) g_malloc (d->n_cols * sizeof (gint));
   n =
     GGOBI_EXTENDED_DISPLAY_GET_CLASS (display)->plotted_vars_get (display,
                                                                   vars, d,
@@ -134,7 +134,7 @@ varpanelTooltipsSet (displayd * display, ggobid * gg, GtkWidget * wx,
 }
 
 static gint
-plottedVarsGet (displayd * display, gint * vars, GGobiData * d, ggobid * gg)
+plottedVarsGet (displayd * display, gint * vars, GGobiStage * d, ggobid * gg)
 {
   GList *l;
   GtkTableChild *child;
@@ -165,7 +165,7 @@ plottedVarsGet (displayd * display, gint * vars, GGobiData * d, ggobid * gg)
 }
 
 displayd *
-createWithVars (gboolean missing_p, gint nvars, gint * vars, GGobiData * d,
+createWithVars (gboolean missing_p, gint nvars, gint * vars, GGobiStage * d,
                 ggobid * gg)
 {
   return (ggobi_newScatmat (vars, vars, nvars, nvars, d, gg));
@@ -272,7 +272,7 @@ receive_scatmat_drag (GtkWidget * src, GdkDragContext * context, int x, int y,
   GtkTableChild *child;
   GList *ivars = NULL;
   gint nvars, *vars;
-  GGobiData *d;
+  GGobiStage *d;
   ggobid *gg;
 
   display = to->displayptr;
@@ -293,7 +293,7 @@ receive_scatmat_drag (GtkWidget * src, GdkDragContext * context, int x, int y,
 
   if (from->p1dvar != -1 && to->p1dvar != -1) {
 
-    vars = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof (gint));
+    vars = (gint *) g_malloc (d->n_cols * sizeof (gint));
     nvars =
       GGOBI_EXTENDED_DISPLAY_GET_CLASS (display)->plotted_vars_get (display,
                                                                     vars, d,
@@ -420,7 +420,7 @@ scatmatCPanelWidget (displayd * dpy, gchar ** modeName, ggobid * gg)
 }
 
 static void
-splotAssignPointsToBins (GGobiData * d, splotd * sp, ggobid * gg)
+splotAssignPointsToBins (GGobiStage * d, splotd * sp, ggobid * gg)
 {
   if (sp == gg->current_splot)
     assign_points_to_bins (d, sp, gg);
@@ -434,7 +434,7 @@ splotScreenToTform (cpaneld * cpanel, splotd * sp, icoords * scr,
   greal precis = (greal) PRECISION1;
   greal ftmp, max, min, rdiff;
   displayd *display = (displayd *) sp->displayptr;
-  GGobiData *d = display->d;
+  GGobiStage *d = display->d;
   gfloat scale_x, scale_y;
 
   scale_x = sp->scale.x;
@@ -457,7 +457,7 @@ splotScreenToTform (cpaneld * cpanel, splotd * sp, icoords * scr,
 */
 
   if (sp->p1dvar != -1) {
-    GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(d), sp->p1dvar);
+    GGobiVariable *var = ggobi_stage_get_variable(d, sp->p1dvar);
     ggobi_variable_get_limits(var, &min, &max);
     rdiff = max - min;
 
@@ -478,7 +478,7 @@ splotScreenToTform (cpaneld * cpanel, splotd * sp, icoords * scr,
   }
   else {
     /* x */
-    GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(d), sp->xyvars.x);
+    GGobiVariable *var = ggobi_stage_get_variable(d, sp->xyvars.x);
     ggobi_variable_get_limits(var, &min, &max);
     rdiff = max - min;
     world.x = planar.x;
@@ -487,7 +487,7 @@ splotScreenToTform (cpaneld * cpanel, splotd * sp, icoords * scr,
     tfd->x += min;
 
     /* y */
-    var = ggobi_stage_get_variable(GGOBI_STAGE(d), sp->xyvars.y);
+    var = ggobi_stage_get_variable(d, sp->xyvars.y);
     ggobi_variable_get_limits(var, &min, &max);
     rdiff = max - min;
     world.y = planar.y;
@@ -532,17 +532,17 @@ scatmatDisplayClassInit (GGobiScatmatDisplayClass * klass)
 
 /* */
 static gchar *
-treeLabel (splotd * splot, GGobiData * d, ggobid * gg)
+treeLabel (splotd * splot, GGobiStage * d, ggobid * gg)
 {
   return (g_strdup_printf("%s v %s", 
-    ggobi_stage_get_col_name(GGOBI_STAGE(d), splot->xyvars.x), 
-    ggobi_stage_get_col_name(GGOBI_STAGE(d), splot->xyvars.y)
+    ggobi_stage_get_col_name(d, splot->xyvars.x), 
+    ggobi_stage_get_col_name(d, splot->xyvars.y)
   ));
 }
 
 
 static void
-worldToPlane (splotd * sp, GGobiData * d, ggobid * gg)
+worldToPlane (splotd * sp, GGobiStage * d, ggobid * gg)
 {
   if (sp->p1dvar == -1)
     xy_reproject (sp, d->world.vals, d, gg);
@@ -564,15 +564,15 @@ addIdentifyCues (gboolean nearest_p, gint k, splotd * sp,
 }
 
 gboolean
-drawEdgeP (splotd * sp, gint m, GGobiData * d, GGobiData * e, ggobid * gg)
+drawEdgeP (splotd * sp, gint m, GGobiStage * d, GGobiStage * e, ggobid * gg)
 {
   gboolean draw_edge = true;
   if (sp->p1dvar != -1) {
-    if (ggobi_stage_is_missing(GGOBI_STAGE(e), m, sp->p1dvar))
+    if (ggobi_stage_is_missing(e, m, sp->p1dvar))
       draw_edge = false;
   }
   else {
-    if (ggobi_stage_is_missing(GGOBI_STAGE(e), m, sp->xyvars.x) || ggobi_stage_is_missing(GGOBI_STAGE(e), m, sp->xyvars.y)) {
+    if (ggobi_stage_is_missing(e, m, sp->xyvars.x) || ggobi_stage_is_missing(e, m, sp->xyvars.y)) {
       draw_edge = false;
     }
   }
@@ -580,15 +580,15 @@ drawEdgeP (splotd * sp, gint m, GGobiData * d, GGobiData * e, ggobid * gg)
 }
 
 gboolean
-drawCaseP (splotd * sp, gint m, GGobiData * d, ggobid * gg)
+drawCaseP (splotd * sp, gint m, GGobiStage * d, ggobid * gg)
 {
   gboolean draw_case = true;
   if (sp->p1dvar != -1) {
-    if (ggobi_stage_is_missing(GGOBI_STAGE(d), m, sp->p1dvar))
+    if (ggobi_stage_is_missing(d, m, sp->p1dvar))
       draw_case = false;
   }
   else {
-    if (ggobi_stage_is_missing(GGOBI_STAGE(d), m, sp->xyvars.x) || ggobi_stage_is_missing(GGOBI_STAGE(d), m, sp->xyvars.y)) {
+    if (ggobi_stage_is_missing(d, m, sp->xyvars.x) || ggobi_stage_is_missing(d, m, sp->xyvars.y)) {
       draw_case = false;
     }
   }
@@ -608,7 +608,7 @@ addPlotLabels (splotd * sp, GdkDrawable * drawable, ggobid * gg)
 
 
 static gint
-splotVariablesGet (splotd * sp, gint * cols, GGobiData * d)
+splotVariablesGet (splotd * sp, gint * cols, GGobiStage * d)
 {
   if (sp->p1dvar > -1) {
     cols[0] = sp->p1dvar;

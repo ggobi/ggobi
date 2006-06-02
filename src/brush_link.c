@@ -25,29 +25,29 @@
 /*----------------------------------------------------------------------*/
 
 gboolean
-symbol_link_by_id (gboolean persistentp, gint k, GGobiData * sd, ggobid * gg)
+symbol_link_by_id (gboolean persistentp, gint k, GGobiStage * sd, ggobid * gg)
 {
-  GGobiData *d;
+  GGobiStage *d;
   GSList *l;
   gint i, id = -1;
   /*-- this is the cpanel for the display being brushed --*/
   cpaneld *cpanel = &gg->current_display->cpanel;
-  GGobiDataAttrSetMethod brush = (persistentp || cpanel->br.mode == BR_PERSISTENT) ?
+  GGobiAttrSetMethod brush = (persistentp || cpanel->br.mode == BR_PERSISTENT) ?
     ATTR_SET_PERSISTENT : ATTR_SET_TRANSIENT;
   gboolean changed = false;
 
   /*-- k is the row number in source_d --*/
 
-  id = ggobi_stage_get_row_for_id(GGOBI_STAGE(sd), sd->rowIds[k]);
+  id = ggobi_stage_get_row_for_id(sd, GGOBI_DATA(sd)->rowIds[k]);
   if (id < 0)
     return false;
 
   for (l = gg->d; l; l = l->next) {
-    d = (GGobiData *) l->data;
+    d = (GGobiStage *) l->data;
     if (d == sd)
       continue;        /*-- skip the originating datad --*/
 
-    i = ggobi_stage_get_row_for_id(GGOBI_STAGE(d), sd->rowIds[id]);
+    i = ggobi_stage_get_row_for_id(d, GGOBI_DATA(sd)->rowIds[id]);
 
     if (i < 0)              /*-- then no cases in d have this id --*/
       continue;
@@ -55,36 +55,36 @@ symbol_link_by_id (gboolean persistentp, gint k, GGobiData * sd, ggobid * gg)
     /*-- if we get here, d has one case with the indicated id --*/
     changed = true;
     if (d->sampled.els[i] && !d->excluded.els[i]) {
-       if (!ggobi_data_get_attr_hidden(d, i)) {
-         ggobi_data_set_attr_color(d, i, ggobi_data_get_attr_color(sd, k), brush);
-         ggobi_data_set_attr_glyph(d, i, ggobi_data_get_attr_glyph(sd, k), brush);
+       if (!ggobi_stage_get_attr_hidden(d, i)) {
+         ggobi_stage_set_attr_color(d, i, ggobi_stage_get_attr_color(sd, k), brush);
+         ggobi_stage_set_attr_glyph(d, i, ggobi_stage_get_attr_glyph(sd, k), brush);
        }
-       ggobi_data_set_attr_hidden(d, i, ggobi_data_get_attr_hidden(sd, k), brush);
+       ggobi_stage_set_attr_hidden(d, i, ggobi_stage_get_attr_hidden(sd, k), brush);
     }
   }
   return changed;
 }
 
 gboolean
-exclude_link_by_id (guint k, GGobiData * sd, ggobid * gg)
+exclude_link_by_id (guint k, GGobiStage * sd, ggobid * gg)
 {
 /*-- sd = source_d --*/
-  GGobiData *d;
+  GGobiStage *d;
   GSList *l;
   gint i, id = -1;
   gboolean changed = false;
 
   /*-- k is the row number in source_d --*/
-  id = ggobi_stage_get_row_for_id(GGOBI_STAGE(sd), sd->rowIds[k]);
+  id = ggobi_stage_get_row_for_id(sd, GGOBI_DATA(sd)->rowIds[k]);
   if (id < 0)
     return false;
 
   for (l = gg->d; l; l = l->next) {
-    d = (GGobiData *) l->data;
+    d = (GGobiStage *) l->data;
     if (d == sd)
       continue;        /*-- skip the originating datad --*/
 
-    i = ggobi_stage_get_row_for_id(GGOBI_STAGE(d), sd->rowIds[id]);
+    i = ggobi_stage_get_row_for_id(d, GGOBI_DATA(sd)->rowIds[id]);
 
     if (i < 0)              /*-- then no cases in d have this id --*/
       continue;
@@ -103,15 +103,15 @@ exclude_link_by_id (guint k, GGobiData * sd, ggobid * gg)
 
 void
 brush_link_by_var (gint jlinkby, vector_b * levelv,
-                   cpaneld * cpanel, GGobiData * d, ggobid * gg)
+                   cpaneld * cpanel, GGobiStage * d, ggobid * gg)
 {
   gint m, i, level_value;
 
   for (m = 0; m < d->nrows_in_plot; m++) {
     i = d->rows_in_plot.els[m];
 
-    level_value = ggobi_data_get_int_value(d, i, jlinkby);
-    ggobi_data_brush_point(d, i, levelv->els[level_value], cpanel->br.point_targets, cpanel->br.mode);
+    level_value = ggobi_stage_get_int_value(d, i, jlinkby);
+    ggobi_stage_brush_point(d, i, levelv->els[level_value], cpanel->br.point_targets, cpanel->br.mode);
   }
 }
 
@@ -121,7 +121,7 @@ brush_link_by_var (gint jlinkby, vector_b * levelv,
  * of changed by using pts_under_brush_prev?
 */
 gboolean
-build_symbol_vectors_by_var (cpaneld * cpanel, GGobiData * d, ggobid * gg)
+build_symbol_vectors_by_var (cpaneld * cpanel, GGobiStage * d, ggobid * gg)
 {
   gint i, m, j, level_value, level_value_max;
   vector_b levelv;
@@ -130,8 +130,8 @@ build_symbol_vectors_by_var (cpaneld * cpanel, GGobiData * d, ggobid * gg)
   if (!d->linkvar)
     return false;
 
-  j = ggobi_stage_get_col_index_for_name(GGOBI_STAGE(d), d->linkvar);
-  level_value_max = ggobi_variable_get_max(ggobi_stage_get_variable(GGOBI_STAGE(d), j));
+  j = ggobi_stage_get_col_index_for_name(d, d->linkvar);
+  level_value_max = ggobi_variable_get_max(ggobi_stage_get_variable(d, j));
 
   vectorb_init_null (&levelv);
   vectorb_alloc (&levelv, level_value_max + 1);
@@ -140,7 +140,7 @@ build_symbol_vectors_by_var (cpaneld * cpanel, GGobiData * d, ggobid * gg)
   /*-- find the levels which are among the points under the brush --*/
   for (m = 0; m < d->nrows_under_brush; m++) {
     i = d->rows_under_brush.els[m];
-    level_value = ggobi_data_get_int_value(d, i, j);
+    level_value = ggobi_stage_get_int_value(d, i, j);
     levelv.els[level_value] = true;
   }
 
@@ -149,10 +149,10 @@ build_symbol_vectors_by_var (cpaneld * cpanel, GGobiData * d, ggobid * gg)
 
   /*-- now for the rest of them --*/
   for (l = gg->d; l; l = l->next) {
-    GGobiData *dd = l->data;
+    GGobiStage *dd = l->data;
     if (dd == d) continue;
 
-    j = ggobi_stage_get_col_index_for_name(GGOBI_STAGE(dd), d->linkvar);
+    j = ggobi_stage_get_col_index_for_name(dd, d->linkvar);
     if (j != -1) {
       brush_link_by_var (j, &levelv, cpanel, dd, gg);
     }
@@ -171,16 +171,16 @@ build_symbol_vectors_by_var (cpaneld * cpanel, GGobiData * d, ggobid * gg)
 enum
 { LINKBYLIST_NAME, LINKBYLIST_NCOLS };
 
-void linkby_notebook_subwindow_add (GGobiData * d, GtkWidget * notebook,
+void linkby_notebook_subwindow_add (GGobiStage * d, GtkWidget * notebook,
                                     ggobid *);
 
 void
-varlist_append (GtkListStore * list, GGobiData *d, gchar* name)
+varlist_append (GtkListStore * list, GGobiStage *d, gchar* name)
 {
   GtkTreeIter iter;
-  guint j = ggobi_stage_get_col_index_for_name(GGOBI_STAGE(d), name);
+  guint j = ggobi_stage_get_col_index_for_name(d, name);
   
-  if(!GGOBI_STAGE_IS_COL_CATEGORICAL(GGOBI_STAGE(d), j))
+  if(!GGOBI_STAGE_IS_COL_CATEGORICAL(d, j))
     return;
 
   gtk_list_store_append (list, &iter);
@@ -188,7 +188,7 @@ varlist_append (GtkListStore * list, GGobiData *d, gchar* name)
 }
 
 void
-varlist_populate (GtkListStore * list, GGobiData * d)
+varlist_populate (GtkListStore * list, GGobiStage * d)
 {
   gint j;
   GtkTreeIter first;
@@ -196,8 +196,8 @@ varlist_populate (GtkListStore * list, GGobiData * d)
   gtk_list_store_append (list, &first);
   gtk_list_store_set (list, &first, LINKBYLIST_NAME, "<i>Case ID</i>", -1);
 
-  for (j = 0; j < GGOBI_STAGE(d)->n_cols; j++) {
-    varlist_append(list, d, ggobi_stage_get_col_name(GGOBI_STAGE(d), j));
+  for (j = 0; j < d->n_cols; j++) {
+    varlist_append(list, d, ggobi_stage_get_col_name(d, j));
   }
 }
 
@@ -209,7 +209,7 @@ linkby_current_page_set (displayd * display, GtkWidget * notebook,
                          ggobid * gg)
 {
   GtkWidget *swin, *treeview;
-  GGobiData *d = display->d, *paged;
+  GGobiStage *d = display->d, *paged;
   gint page_num;
   cpaneld *cpanel = &display->cpanel;
   GList *children;
@@ -227,7 +227,7 @@ linkby_current_page_set (displayd * display, GtkWidget * notebook,
   page_num = 0;
   swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), page_num);
   while (swin) {
-    paged = (GGobiData *) g_object_get_data (G_OBJECT (swin), "datad");
+    paged = (GGobiStage *) g_object_get_data (G_OBJECT (swin), "datad");
 
     gtk_widget_set_sensitive (swin, (paged == d));
     if (paged == d) {
@@ -248,7 +248,7 @@ linkby_current_page_set (displayd * display, GtkWidget * notebook,
 void
 linking_method_set_cb (GtkTreeSelection * treesel, ggobid * gg)
 {
-  GGobiData *d =
+  GGobiStage *d =
     g_object_get_data (G_OBJECT (gtk_tree_selection_get_tree_view (treesel)),
                        "datad");
   GtkTreeModel *model;
@@ -286,7 +286,7 @@ linking_method_set_cb (GtkTreeSelection * treesel, ggobid * gg)
 }
 
 GtkListStore *
-list_from_data (ggobid * gg, GGobiData * data, GtkNotebook * notebook)
+list_from_data (ggobid * gg, GGobiStage * data, GtkNotebook * notebook)
 {
   GtkWidget *swin;
   GtkListStore *list = NULL;
@@ -303,7 +303,7 @@ list_from_data (ggobid * gg, GGobiData * data, GtkNotebook * notebook)
 }
 
 void
-linkby_notebook_varchanged_cb (ggobid * gg, GGobiData * data,
+linkby_notebook_varchanged_cb (ggobid * gg, GGobiStage * data,
                                GtkNotebook * notebook)
 {
   GtkListStore *list = list_from_data (gg, data, notebook);
@@ -313,16 +313,16 @@ linkby_notebook_varchanged_cb (ggobid * gg, GGobiData * data,
 
 void
 linkby_notebook_varadded_cb (ggobid * gg, gint which,
-                             GGobiData * d, GtkNotebook * notebook)
+                             GGobiStage * d, GtkNotebook * notebook)
 {
   GtkListStore *model = list_from_data (gg, d, notebook);
   
   if (model)
-    varlist_append (model, d, ggobi_stage_get_col_name(GGOBI_STAGE(d), which));
+    varlist_append (model, d, ggobi_stage_get_col_name(d, which));
 }
 
 void
-linkby_notebook_list_changed_cb (ggobid * gg, GGobiData * d, void *notebook)
+linkby_notebook_list_changed_cb (ggobid * gg, GGobiStage * d, void *notebook)
 {
   linkby_notebook_varchanged_cb (gg, d, notebook);
 }
@@ -333,22 +333,23 @@ CHECK_EVENT_SIGNATURE (linkby_notebook_adddata_cb, datad_added_f)
                        variable_list_changed_f)
 
 static void
-linkby_notebook_adddata_cb (ggobid * gg, GGobiData * d, void *notebook,
+linkby_notebook_adddata_cb (ggobid * gg, GGobiStage * d, void *notebook,
                                    GtkSignalFunc func)
 {
   linkby_notebook_subwindow_add (d, notebook, gg);
 }
 
 void
-linkby_notebook_subwindow_add (GGobiData * d, GtkWidget * notebook,
+linkby_notebook_subwindow_add (GGobiStage * s, GtkWidget * notebook,
                                ggobid * gg)
 {
   GtkWidget *swin, *treeview;
   GtkListStore *list;
+  GGobiStage *d = ggobi_stage_get_root(s);
 
   GtkSelectionMode mode = GTK_SELECTION_SINGLE;
 
-  if (!ggobi_stage_get_n_cols(GGOBI_STAGE(d)))
+  if (!ggobi_stage_get_n_cols(s))
     return;
 
   /* Create a scrolled window to pack the CList widget into */
@@ -367,26 +368,26 @@ linkby_notebook_subwindow_add (GGobiData * d, GtkWidget * notebook,
       0) {
     gtk_widget_set_sensitive (swin, false);
   }
-  g_object_set_data (G_OBJECT (swin), "datad", d);  /*setdata */
+  g_object_set_data (G_OBJECT (swin), "datad", s);  /*setdata */
 /*
  * name or nickname?  Which one we'd prefer to use depends on the
  * size of the space we're working in -- maybe this will become an
  * argument.
 */
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), swin,
-                            (d->nickname != NULL) ?
-                            gtk_label_new (d->nickname) : 
-                            gtk_label_new (ggobi_stage_get_name(GGOBI_STAGE(d))));
+                            (ggobi_data_get_nickname(GGOBI_DATA(d)) != NULL) ?
+                            gtk_label_new (ggobi_data_get_nickname(GGOBI_DATA(d))) : 
+                            gtk_label_new (ggobi_stage_get_name(d)));
 
   /* add the treeview (list) */
   list = gtk_list_store_new (LINKBYLIST_NCOLS, G_TYPE_STRING, G_TYPE_POINTER);
-  varlist_populate (list, d);
+  varlist_populate (list, s);
 
   treeview = gtk_tree_view_new_with_model (GTK_TREE_MODEL (list));
   populate_tree_view (treeview, NULL, 1, false, mode,
                       G_CALLBACK (linking_method_set_cb), gg);
 
-  g_object_set_data (G_OBJECT (treeview), "datad", d);
+  g_object_set_data (G_OBJECT (treeview), "datad", s);
   //g_object_set_data (G_OBJECT (clist), "notebook", notebook);
 
   gtk_container_add (GTK_CONTAINER (swin), treeview);
@@ -400,7 +401,7 @@ create_linkby_notebook (GtkWidget * box, ggobid * gg)
 {
   GtkWidget *notebook;
   GSList *l;
-  GGobiData *d;
+  GGobiStage *d;
 
   GtkSelectionMode mode = GTK_SELECTION_SINGLE;
   GGobiVariableType vartype = GGOBI_VARIABLE_CATEGORICAL;
@@ -417,8 +418,8 @@ create_linkby_notebook (GtkWidget * box, ggobid * gg)
   //g_object_set_data (G_OBJECT (notebook), "datatype", (gpointer) dtype);
 
   for (l = gg->d; l; l = l->next) {
-    d = (GGobiData *) l->data;
-    if (ggobi_stage_get_n_cols(GGOBI_STAGE(d))) {
+    d = (GGobiStage *) l->data;
+    if (ggobi_stage_get_n_cols(d)) {
       linkby_notebook_subwindow_add (d, notebook, gg);
     }
   }

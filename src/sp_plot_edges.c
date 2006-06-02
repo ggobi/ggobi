@@ -28,7 +28,7 @@
 /*------------------------------------------------------------------------*/
 
 gboolean
-splot_plot_edge (gint m, GGobiData * d, GGobiData * e,
+splot_plot_edge (gint m, GGobiStage * d, GGobiStage * e,
                  splotd * sp, displayd * display, ggobid * gg)
 {
   gint a, b;
@@ -55,7 +55,7 @@ splot_plot_edge (gint m, GGobiData * d, GGobiData * e,
     draw_edge = false;
 
   /*-- can prevent drawing of missings for parcoords or scatmat plots --*/
-  else if (ggobi_stage_has_missings(GGOBI_STAGE(e)) && !e->missings_show_p) {
+  else if (ggobi_stage_get_n_missings(e) && !e->missings_show_p) {
     if (GGOBI_IS_EXTENDED_SPLOT (sp)) {
       GGobiExtendedSPlotClass *klass;
       klass = GGOBI_EXTENDED_SPLOT_GET_CLASS (sp);
@@ -68,7 +68,7 @@ splot_plot_edge (gint m, GGobiData * d, GGobiData * e,
 }
 
 gboolean
-splot_hidden_edge (gint m, GGobiData * d, GGobiData * e,
+splot_hidden_edge (gint m, GGobiStage * d, GGobiStage * e,
                    splotd * sp, displayd * display, ggobid * gg)
 {
   gint a, b;
@@ -77,12 +77,12 @@ splot_hidden_edge (gint m, GGobiData * d, GGobiData * e,
 
   endpoints = resolveEdgePoints (e, d);
   if (endpoints && edge_endpoints_get (m, &a, &b, d, endpoints, e))
-    if (ggobi_data_get_attr_hidden(e, m) || ggobi_data_get_attr_hidden(d, a) || ggobi_data_get_attr_hidden(d, b))
+    if (ggobi_stage_get_attr_hidden(e, m) || ggobi_stage_get_attr_hidden(d, a) || ggobi_stage_get_attr_hidden(d, b))
       hiddenp = true;
 
   /*-- can prevent drawing of missings for parcoords or scatmat plots --*/
 /*
-  } else if (ggobi_stage_has_missings(GGOBI_STAGE(e)) && !e->missings_show_p) {
+  } else if (ggobi_stage_get_n_missings(e) && !e->missings_show_p) {
     if (GGOBI_IS_EXTENDED_SPLOT(sp)) {
       GGobiExtendedSPlotClass *klass;
       klass = GGOBI_EXTENDED_SPLOT_CLASS(GTK_OBJECT(sp)->klass);
@@ -104,15 +104,15 @@ splot_edges_draw (splotd * sp, gboolean draw_hidden, GdkDrawable * drawable,
   gint k, n, p, pp;
   gint a, b;
   displayd *display = (displayd *) sp->displayptr;
-  GGobiData *d = display->d;
-  GGobiData *e = display->e;
+  GGobiStage *d = display->d;
+  GGobiStage *e = display->e;
   endpointsd *endpoints;
   gboolean edges_show_p, arrowheads_show_p;
   gint lwidth, ltype;
   GlyphType gtype;
   colorschemed *scheme = gg->activeColorScheme;
 
-  if (e == NULL || !ggobi_stage_get_n_edges(GGOBI_STAGE(e)))
+  if (e == NULL || !ggobi_stage_get_n_edges(e))
     return;
 
   edges_show_p = (display->options.edges_directed_show_p ||
@@ -135,16 +135,16 @@ splot_edges_draw (splotd * sp, gboolean draw_hidden, GdkDrawable * drawable,
         for (p = 0; p < ncolors; p++)
           symbols_used[k][n][p] = 0;
 
-    for (i = 0; i < GGOBI_DATA(e)->nrows_in_plot; i++) {
+    for (i = 0; i < e->nrows_in_plot; i++) {
       m = e->rows_in_plot.els[i];
       /* If we're drawing hiddens and this is hidden and plottable ... */
       if (((draw_hidden && splot_hidden_edge (m, d, e, sp, display, gg)) ||
            /* Or if we're not drawing hiddens and this isn't hidden ... */
-           (!draw_hidden && !ggobi_data_get_attr_hidden(e, m)))) {
+           (!draw_hidden && !ggobi_stage_get_attr_hidden(e, m)))) {
 
-        gtype = ggobi_data_get_attr_glyph(e, m)->type;
+        gtype = ggobi_stage_get_attr_glyph(e, m)->type;
         ltype = ltype_from_gtype (gtype);
-        symbols_used[ggobi_data_get_attr_glyph(e, m)->size][ltype][ggobi_data_get_attr_color(e, m)]++;
+        symbols_used[ggobi_stage_get_attr_glyph(e, m)->size][ltype][ggobi_stage_get_attr_color(e, m)]++;
       }
     }
 
@@ -179,7 +179,7 @@ splot_edges_draw (splotd * sp, gboolean draw_hidden, GdkDrawable * drawable,
              */
             nl = 0;
 
-            for (j = 0; j < e->edge.n; j++) {
+            for (j = 0; j < ggobi_stage_get_n_edges(e); j++) {
 
               if (draw_hidden
                   && !splot_hidden_edge (j, d, e, sp, display, gg))
@@ -192,11 +192,11 @@ splot_edges_draw (splotd * sp, gboolean draw_hidden, GdkDrawable * drawable,
 
               edge_endpoints_get (j, &a, &b, d, endpoints, e);
 
-              gtype = ggobi_data_get_attr_glyph(e, j)->type;
+              gtype = ggobi_stage_get_attr_glyph(e, j)->type;
               ltype = ltype_from_gtype (gtype);
 
-              if (ggobi_data_get_attr_color(e, j) == p &&
-                  ltype == n && ggobi_data_get_attr_glyph(e, j)->size == k) {
+              if (ggobi_stage_get_attr_color(e, j) == p &&
+                  ltype == n && ggobi_stage_get_attr_glyph(e, j)->size == k) {
                 if (edges_show_p) {
                   if (endpoints[j].jpartner == -1) {
                     sp->edges[nl].x1 = sp->screen[a].x;
@@ -299,8 +299,8 @@ splot_add_edge_highlight_cue (splotd * sp, GdkDrawable * drawable, gint k,
                               gboolean nearest, ggobid * gg)
 {
   displayd *dsp = (displayd *) sp->displayptr;
-  GGobiData *d = dsp->d;
-  GGobiData *e = dsp->e;
+  GGobiStage *d = dsp->d;
+  GGobiStage *e = dsp->e;
   gint a, b;
   endpointsd *endpoints;
   colorschemed *scheme = gg->activeColorScheme;
@@ -320,7 +320,7 @@ splot_add_edge_highlight_cue (splotd * sp, GdkDrawable * drawable, gint k,
     gdk_gc_set_line_attributes (gg->plot_GC,
                                 3, GDK_LINE_SOLID, GDK_CAP_ROUND,
                                 GDK_JOIN_ROUND);
-    gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[ggobi_data_get_attr_color(e, k)]);
+    gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[ggobi_stage_get_attr_color(e, k)]);
 
     if (endpoints[k].jpartner == -1) {
       gdk_draw_line (drawable, gg->plot_GC,
@@ -349,8 +349,8 @@ splot_add_edge_label (splotd * sp, GdkDrawable * drawable, gint k,
 {
   gchar *lbl;
   displayd *dsp = (displayd *) sp->displayptr;
-  GGobiData *d = dsp->d;
-  GGobiData *e = dsp->e;
+  GGobiStage *d = dsp->d;
+  GGobiStage *e = dsp->e;
   gint xp, yp;
   gint a, b;
   endpointsd *endpoints;
@@ -403,13 +403,13 @@ splot_add_identify_edge_cues (splotd * sp, GdkDrawable * drawable, gint k,
                               gboolean nearest, ggobid * gg)
 {
   displayd *dsp = (displayd *) sp->displayptr;
-  GGobiData *e = dsp->e;
+  GGobiStage *e = dsp->e;
   gboolean useDefault = false;
 
-  if (k >= e->edge.n)
+  if (k >= ggobi_stage_get_n_edges(e))
     return;
 
-  if (ggobi_data_get_attr_hidden(e, k))
+  if (ggobi_stage_get_attr_hidden(e, k))
     return;
 
   if (GGOBI_IS_EXTENDED_SPLOT (sp)) {

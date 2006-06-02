@@ -43,8 +43,8 @@ static void stage0_cb (GtkWidget *w, ggobid *gg)
 {
   gint indx = gtk_combo_box_get_active (GTK_COMBO_BOX(w));
   GtkWidget *tree_view = get_tree_view_from_object (G_OBJECT(gg->tform_ui.window));
-  GGobiData *d = (GGobiData *) g_object_get_data(G_OBJECT (tree_view), "datad");
-  gint *vars;// = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof(gint));
+  GGobiStage *d = (GGobiStage *) g_object_get_data(G_OBJECT (tree_view), "datad");
+  gint *vars;// = (gint *) g_malloc (d->n_cols * sizeof(gint));
   gint nvars;
   
   vars = get_selections_from_tree_view (tree_view, &nvars);
@@ -67,8 +67,8 @@ stage1_cb (GtkWidget *w, ggobid *gg)
 {
   gint indx = gtk_combo_box_get_active (GTK_COMBO_BOX(w));
   GtkWidget *tree_view = get_tree_view_from_object (G_OBJECT(gg->tform_ui.window));
-  GGobiData *d = (GGobiData *) g_object_get_data(G_OBJECT (tree_view), "datad");
-  gint *vars;// = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof(gint));
+  GGobiStage *d = (GGobiStage *) g_object_get_data(G_OBJECT (tree_view), "datad");
+  gint *vars;// = (gint *) g_malloc (d->n_cols * sizeof(gint));
   gint nvars;
 
   vars = get_selections_from_tree_view (tree_view, &nvars);
@@ -85,8 +85,8 @@ stage1_cb (GtkWidget *w, ggobid *gg)
 void boxcox_cb (GtkAdjustment *adj, ggobid *gg)
 {
   GtkWidget *tree_view = get_tree_view_from_object (G_OBJECT(gg->tform_ui.window));
-  GGobiData *d = (GGobiData *) g_object_get_data(G_OBJECT (tree_view), "datad");
-  gint *vars; // = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof(gint));
+  GGobiStage *d = (GGobiStage *) g_object_get_data(G_OBJECT (tree_view), "datad");
+  gint *vars; // = (gint *) g_malloc (d->n_cols * sizeof(gint));
   gint nvars;
   
   vars = get_selections_from_tree_view (tree_view, &nvars);
@@ -147,8 +147,8 @@ static gchar *stage2_lbl[] = {"No transformation",
 static void stage2_cb (GtkWidget *w, ggobid *gg)
 {
   GtkWidget *tree_view = get_tree_view_from_object (G_OBJECT(gg->tform_ui.window));
-  GGobiData *d = (GGobiData *) g_object_get_data(G_OBJECT (tree_view), "datad");
-  gint *vars;// = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof(gint));
+  GGobiStage *d = (GGobiStage *) g_object_get_data(G_OBJECT (tree_view), "datad");
+  gint *vars;// = (gint *) g_malloc (d->n_cols * sizeof(gint));
   gint nvars;
   gint indx = gtk_combo_box_get_active (GTK_COMBO_BOX(w));
 
@@ -164,9 +164,9 @@ static void tform_reset_cb (GtkWidget *w, ggobid *gg)
 {
   gint j;
   GtkWidget *tree_view = get_tree_view_from_object (G_OBJECT(gg->tform_ui.window));
-  GGobiData *d = (GGobiData *) g_object_get_data(G_OBJECT (tree_view), "datad");
+  GGobiStage *d = (GGobiStage *) g_object_get_data(G_OBJECT (tree_view), "datad");
 
-  for (j=0; j<GGOBI_STAGE(d)->n_cols; j++) {
+  for (j=0; j<d->n_cols; j++) {
     transform0_values_set (NO_TFORM0, j, d, gg);
     transform1_values_set (NO_TFORM1, 1.0, j, d, gg);
     transform2_values_set (NO_TFORM2, j, d, gg);
@@ -185,7 +185,7 @@ tfvar_selection_made_cb (GtkTreeSelection *tree_sel, ggobid *gg)
   if (!tree_sel)
     G_BREAKPOINT();
   GtkTreeView *tree_view = gtk_tree_selection_get_tree_view(tree_sel);
-  GGobiData *d = (GGobiData *) g_object_get_data(G_OBJECT (tree_view), "datad");
+  GGobiStage *d = (GGobiStage *) g_object_get_data(G_OBJECT (tree_view), "datad");
   gint j, nvars, *rows;  // allocated in function
 
   /* Parameters of transformation */
@@ -198,7 +198,7 @@ tfvar_selection_made_cb (GtkTreeSelection *tree_sel, ggobid *gg)
   if (nvars < 0)
     return;
 
-  var0 = ggobi_stage_get_variable(GGOBI_STAGE(d), rows[0]);
+  var0 = ggobi_stage_get_variable(d, rows[0]);
   varnew = ggobi_variable_clone(var0);
 
   /* If there's only one selected variable, we're ready to reset the
@@ -214,7 +214,7 @@ tfvar_selection_made_cb (GtkTreeSelection *tree_sel, ggobid *gg)
     }
     /* If they aren't all the same, use the default values */
     if (!same) {
-      varnew = GGOBI_VARIABLE(ggobi_variable_new(GGOBI_STAGE(d)));
+      varnew = GGOBI_VARIABLE(ggobi_variable_new(d));
     }
   }
 
@@ -429,9 +429,9 @@ tf0_combo_box_set_value (GGobiVariable *var, gboolean force, ggobid *gg)
   }
 }
 void
-transform0_combo_box_set_value (gint j, gboolean force, GGobiData *d, ggobid *gg)
+transform0_combo_box_set_value (gint j, gboolean force, GGobiStage *d, ggobid *gg)
 {
-  GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(d), j);
+  GGobiVariable *var = ggobi_stage_get_variable(d, j);
   if (var != NULL)
     tf0_combo_box_set_value(var, force, gg);
 }
@@ -456,9 +456,9 @@ tf1_combo_box_set_value(GGobiVariable *var, gboolean force, ggobid *gg)
   }
 }
 void
-transform1_combo_box_set_value (gint j, gboolean force, GGobiData *d, ggobid *gg)
+transform1_combo_box_set_value (gint j, gboolean force, GGobiStage *d, ggobid *gg)
 {
-  GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(d), j);
+  GGobiVariable *var = ggobi_stage_get_variable(d, j);
   if (var != NULL)
     tf1_combo_box_set_value(var, force, gg);
 }
@@ -482,9 +482,9 @@ tf2_combo_box_set_value(GGobiVariable *var, gboolean force, ggobid *gg)
     }
 }
 void
-transform2_combo_box_set_value (gint j, gboolean force, GGobiData *d, ggobid *gg)
+transform2_combo_box_set_value (gint j, gboolean force, GGobiStage *d, ggobid *gg)
 {
-  GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(d), j);
+  GGobiVariable *var = ggobi_stage_get_variable(d, j);
   if (var != NULL)
     tf2_combo_box_set_value(var, force, gg);
 }

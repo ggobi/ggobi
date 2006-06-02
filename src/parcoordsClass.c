@@ -38,14 +38,14 @@ binningPermitted (displayd * dpy)
 }
 
 static void
-splotAssignPointsToBins (GGobiData * d, splotd * sp, ggobid * gg)
+splotAssignPointsToBins (GGobiStage * d, splotd * sp, ggobid * gg)
 {
   if (sp == gg->current_splot)
     assign_points_to_bins (d, sp, gg);
 }
 
 gint
-splot1DVariablesGet (splotd * sp, gint * cols, GGobiData * d)
+splot1DVariablesGet (splotd * sp, gint * cols, GGobiStage * d)
 {
   cols[0] = sp->p1dvar;
   return (1);
@@ -254,47 +254,47 @@ parcoordsKeyEventHandled (GtkWidget * w, displayd * display, splotd * sp,
 
 
 gchar *
-treeLabel (splotd * splot, GGobiData * d, ggobid * gg)
+treeLabel (splotd * splot, GGobiStage * d, ggobid * gg)
 {
-  return(ggobi_stage_get_col_name(GGOBI_STAGE(d), splot->p1dvar));
+  return(ggobi_stage_get_col_name(d, splot->p1dvar));
 }
 
 static GdkSegment *
-allocWhiskers (GdkSegment * whiskers, splotd * sp, gint nr, GGobiData * d)
+allocWhiskers (GdkSegment * whiskers, splotd * sp, gint nr, GGobiStage * d)
 {
   return ((GdkSegment *) g_realloc (whiskers, 2 * nr * sizeof (GdkSegment)));
 }
 
 void
-worldToPlane (splotd * sp, GGobiData * d, ggobid * gg)
+worldToPlane (splotd * sp, GGobiStage * d, ggobid * gg)
 {
   p1d_reproject (sp, d->world.vals, d, gg);
 }
 
 void
-withinPlaneToScreen (splotd * sp, displayd * display, GGobiData * d,
+withinPlaneToScreen (splotd * sp, displayd * display, GGobiStage * d,
                      ggobid * gg)
 {
   sp_whiskers_make (sp, display, gg);
 }
 
 gboolean
-drawEdge_p (splotd * sp, gint m, GGobiData * d, GGobiData * e, ggobid * gg)
+drawEdge_p (splotd * sp, gint m, GGobiStage * d, GGobiStage * e, ggobid * gg)
 {
-  return (!ggobi_stage_is_missing(GGOBI_STAGE(e), m, sp->p1dvar));
+  return (!ggobi_stage_is_missing(e, m, sp->p1dvar));
 }
 
 gboolean
-drawCase_p (splotd * sp, gint m, GGobiData * d, ggobid * gg)
+drawCase_p (splotd * sp, gint m, GGobiStage * d, ggobid * gg)
 {
-  return (!ggobi_stage_is_missing(GGOBI_STAGE(d), m, sp->p1dvar));
+  return (!ggobi_stage_is_missing(d, m, sp->p1dvar));
 }
 
 void
 withinDrawBinned (splotd * sp, gint m, GdkDrawable * drawable, GdkGC * gc)
 {
   displayd *display = sp->displayptr;
-  GGobiData *d = display->d;
+  GGobiStage *d = display->d;
   ggobid *gg = GGobiFromSPlot (sp);
   gint n, lwidth, ltype, gtype;
 
@@ -303,8 +303,8 @@ withinDrawBinned (splotd * sp, gint m, GdkDrawable * drawable, GdkGC * gc)
 
   if (display->options.whiskers_show_p) {
     n = 2 * m;
-    lwidth = lwidth_from_gsize (ggobi_data_get_attr_glyph(d, m)->size);
-    gtype = ggobi_data_get_attr_glyph(d, m)->type;
+    lwidth = lwidth_from_gsize (ggobi_stage_get_attr_glyph(d, m)->size);
+    gtype = ggobi_stage_get_attr_glyph(d, m)->type;
     ltype = set_lattribute_from_ltype (ltype_from_gtype (gtype), gg);
     gdk_gc_set_line_attributes (gg->plot_GC, lwidth,
                                 ltype, GDK_CAP_BUTT, GDK_JOIN_ROUND);
@@ -330,7 +330,7 @@ withinDrawUnbinned (splotd * sp, gint m, GdkDrawable * drawable, GdkGC * gc)
 
 static void
 addPlotLabels (displayd * display, splotd * sp, GdkDrawable * drawable,
-               GGobiData * d, ggobid * gg)
+               GGobiStage * d, ggobid * gg)
 {
   PangoRectangle rect;
   PangoLayout *layout =
@@ -338,7 +338,7 @@ addPlotLabels (displayd * display, splotd * sp, GdkDrawable * drawable,
   cpaneld *cpanel = &display->cpanel;
 
 
-  layout_text (layout, ggobi_data_get_transformed_col_name(d, sp->p1dvar), &rect);
+  layout_text (layout, ggobi_stage_get_transformed_col_name(d, sp->p1dvar), &rect);
   if (cpanel->parcoords_arrangement == ARRANGE_ROW)
     gdk_draw_layout (drawable, gg->plot_GC,
                      (rect.width <=
@@ -353,7 +353,7 @@ addPlotLabels (displayd * display, splotd * sp, GdkDrawable * drawable,
 
 
 static gint
-plotted (displayd * display, gint * cols, gint ncols, GGobiData * d)
+plotted (displayd * display, gint * cols, gint ncols, GGobiStage * d)
 {
   GList *l;
   splotd *sp;
@@ -380,11 +380,11 @@ variableSelect (GtkWidget * w, displayd * dpy, splotd * sp, gint jvar,
 
 
 static void
-varpanelRefresh (displayd * display, splotd * sp, GGobiData * d)
+varpanelRefresh (displayd * display, splotd * sp, GGobiStage * d)
 {
   gint j;
   GList *l;
-  for (j = 0; j < GGOBI_STAGE(d)->n_cols; j++) {
+  for (j = 0; j < d->n_cols; j++) {
     varpanel_toggle_set_active (VARSEL_X, j, false, d);
 
     varpanel_toggle_set_active (VARSEL_Y, j, false, d);
@@ -415,7 +415,7 @@ varpanelTooltipsSet (displayd * dpy, ggobid * gg, GtkWidget * wx,
 
 /* Are these ordered?  Maybe so */
 static gint
-plottedVarsGet (displayd * display, gint * cols, GGobiData * d, ggobid * gg)
+plottedVarsGet (displayd * display, gint * cols, GGobiStage * d, ggobid * gg)
 {
   GList *l;
   splotd *s;
@@ -464,17 +464,17 @@ splot_add_whisker_cues (gboolean nearest_p, gint k, splotd * sp,
 {
   gint n;
   displayd *display = sp->displayptr;
-  GGobiData *d = display->d;
+  GGobiStage *d = display->d;
   colorschemed *scheme = gg->activeColorScheme;
 
-  if (k < 0 || k >= GGOBI_STAGE(d)->n_rows)
+  if (k < 0 || k >= d->n_rows)
     return;
 
   if (display->options.whiskers_show_p) {
     gdk_gc_set_line_attributes (gg->plot_GC,
                                 3, GDK_LINE_SOLID, GDK_CAP_ROUND,
                                 GDK_JOIN_ROUND);
-    gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[ggobi_data_get_attr_color(d, k)]);
+    gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[ggobi_stage_get_attr_color(d, k)]);
 
     n = 2 * k;
     gdk_draw_line (drawable, gg->plot_GC,
@@ -518,7 +518,7 @@ splotScreenToTform (cpaneld * cpanel, splotd * sp, icoords * scr,
   greal precis = (greal) PRECISION1;
   greal ftmp, max, min, rdiff;
   displayd *display = (displayd *) sp->displayptr;
-  GGobiData *d = display->d;
+  GGobiStage *d = display->d;
   gfloat scale_x, scale_y;
 
   scale_x = sp->scale.x;
@@ -541,7 +541,7 @@ splotScreenToTform (cpaneld * cpanel, splotd * sp, icoords * scr,
 */
 
   if (sp->p1dvar != -1) {
-    GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(d), sp->p1dvar);
+    GGobiVariable *var = ggobi_stage_get_variable(d, sp->p1dvar);
     ggobi_variable_get_limits(var, &min, &max);
     rdiff = max - min;
 

@@ -33,11 +33,11 @@ static void close_btn_cb (GtkWidget *w, ggobid *gg)
 static void
 clone_vars_cb (GtkWidget *w, ggobid *gg)
 {
-  GGobiData *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
+  GGobiStage *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
   gint *cols;
   gint ncols = selected_cols_get (&cols, d, gg);
 
-  if (ggobi_stage_get_n_cols(GGOBI_STAGE(d)))
+  if (ggobi_stage_get_n_cols(d))
     clone_vars (cols, ncols, d);
 
   g_free (cols);
@@ -48,11 +48,11 @@ clone_vars_cb (GtkWidget *w, ggobid *gg)
 static void
 delete_vars_cb (GtkWidget *w, ggobid *gg)
 {
-  GGobiData *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
-  gint *cols = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof (gint));
+  GGobiStage *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
+  gint *cols = (gint *) g_malloc (d->n_cols * sizeof (gint));
   gint ncols = selected_cols_get (cols, d, gg);
 
-  if (ggobi_stage_get_n_cols(GGOBI_STAGE(d)))
+  if (ggobi_stage_get_n_cols(d))
     delete_vars (cols, ncols, d);
 
   g_free (cols);
@@ -75,7 +75,7 @@ dialog_range_set (GtkWidget *w, ggobid *gg)
   GtkWidget *dialog = w;
   GtkWidget *umin_entry, *umax_entry;
   GtkTreeModel *model;
-  GGobiData *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
+  GGobiStage *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
   gint *cols;
   gint ncols = selected_cols_get (&cols, d, gg);
   gint j, k;
@@ -122,7 +122,7 @@ dialog_range_set (GtkWidget *w, ggobid *gg)
       GtkTreeIter iter;
 	  
       j = cols[k];
-      var = ggobi_stage_get_variable(GGOBI_STAGE(d), j);
+      var = ggobi_stage_get_variable(d, j);
 
       vartable_iter_from_varno(j, d, &model, &iter);
       
@@ -148,7 +148,7 @@ range_unset_cb (GtkWidget *w, ggobid *gg)
 }
 
 static void rescale_cb (GtkWidget *w, ggobid *gg) {
-  /*GGobiData *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);*/
+  /*GGobiStage *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);*/
 
   /*limits_set (d, true, true, gg->lims_use_visible);  
   vartable_limits_set (d);
@@ -172,14 +172,14 @@ open_range_set_dialog (GtkWidget *w, ggobid *gg)
   GtkWidget *radio1, *radio2;
   GSList *group;
   gint k;
-  GGobiData *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
+  GGobiStage *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
   gint *cols;
   gint ncols = selected_cols_get (&cols, d, gg);
   gboolean ok = true;
   GGobiVariable *var;
 
   for (k=0; k<ncols; k++) {
-    var = ggobi_stage_get_variable(GGOBI_STAGE(d), cols[k]);
+    var = ggobi_stage_get_variable(d, cols[k]);
     if (var->tform0 != NO_TFORM0 ||
         var->tform1 != NO_TFORM1 ||
         var->tform2 != NO_TFORM2)
@@ -294,7 +294,7 @@ open_range_set_dialog (GtkWidget *w, ggobid *gg)
 void range_unset (ggobid *gg)
 {
   GtkTreeModel *model;
-  GGobiData *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
+  GGobiStage *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
   gint *cols;
   gint ncols = selected_cols_get (&cols, d, gg);
   gint j, k;
@@ -304,7 +304,7 @@ void range_unset (ggobid *gg)
     GtkTreeIter iter;
 	  
     j = cols[k];
-    var = ggobi_stage_get_variable(GGOBI_STAGE(d), j);
+    var = ggobi_stage_get_variable(d, j);
 	
     vartable_iter_from_varno(j, d, &model, &iter);
 	  
@@ -336,18 +336,18 @@ void range_unset (ggobid *gg)
 typedef enum {ADDVAR_ROWNOS, ADDVAR_BGROUP} NewVariableType;
 
 static guint
-create_explicit_variable (GGobiData * d, gchar * vname, NewVariableType vartype)
+create_explicit_variable (GGobiStage * d, gchar * vname, NewVariableType vartype)
 {
-  guint jvar = ggobi_data_add_cols(d, 1);
-  ggobi_stage_set_col_name(GGOBI_STAGE(d), jvar, vname);
+  guint jvar = ggobi_data_add_cols(GGOBI_DATA(d), 1);
+  ggobi_stage_set_col_name(d, jvar, vname);
 
-  for (guint i = 0; i < GGOBI_STAGE(d)->n_rows; i++) {
+  for (guint i = 0; i < d->n_rows; i++) {
     switch(vartype) {
       case ADDVAR_ROWNOS:
-        ggobi_stage_set_raw_value(GGOBI_STAGE(d), i, jvar, (gfloat) (i + 1));
+        ggobi_stage_set_raw_value(d, i, jvar, (gfloat) (i + 1));
         break;
       case ADDVAR_BGROUP:
-        ggobi_stage_set_raw_value(GGOBI_STAGE(d), i, jvar, (gfloat) d->clusterid.els[i]);
+        ggobi_stage_set_raw_value(d, i, jvar, (gfloat) d->clusterid.els[i]);
         break;
     }
   }
@@ -360,7 +360,7 @@ dialog_newvar_add (GtkWidget *w, ggobid *gg)
 {
   GtkWidget *dialog = w;
   GtkWidget *entry, *radio_brush;
-  GGobiData *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
+  GGobiStage *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
   gint vartype;
   gchar *vname;
 
@@ -467,7 +467,7 @@ dialog_rename_var (GtkWidget *w, ggobid *gg)
 {
   GtkWidget *dialog = w;
   GtkWidget *entry;
-  GGobiData *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
+  GGobiStage *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
   gchar *vname;
   gint *selected_vars, nselected_vars = 0;
   gint jvar;
@@ -487,7 +487,7 @@ dialog_rename_var (GtkWidget *w, ggobid *gg)
   jvar = selected_vars[0];
   vname = gtk_editable_get_chars (GTK_EDITABLE (entry), 0, -1);
   if (vname != NULL && strlen(vname) > 1) {
-    ggobi_stage_set_col_name(GGOBI_STAGE(d), jvar, vname);
+    ggobi_stage_set_col_name(d, jvar, vname);
   }
 }
 
@@ -495,7 +495,7 @@ static void
 open_rename_dialog (GtkWidget *w, ggobid *gg)
 {
   GtkWidget *dialog, *hb, *entry, *lbl;
-  GGobiData *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
+  GGobiStage *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
   gint *selected_vars, nselected_vars = 0;
 
   /*-- find out what variables are selected in the var statistics panel --*/
@@ -519,7 +519,7 @@ open_rename_dialog (GtkWidget *w, ggobid *gg)
   entry = gtk_entry_new();
   gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), entry);
   /*-- label it with the name of the variable being renamed --*/
-  gtk_entry_set_text (GTK_ENTRY (entry), ggobi_stage_get_col_name(GGOBI_STAGE(d), selected_vars[0]));
+  gtk_entry_set_text (GTK_ENTRY (entry), ggobi_stage_get_col_name(d, selected_vars[0]));
   gtk_widget_set_name (entry, "rename_entry");
 
   gtk_box_pack_start (GTK_BOX (hb), entry, true, true, 2);

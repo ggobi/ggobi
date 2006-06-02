@@ -51,7 +51,7 @@ typedef  struct {
 
 
 GType ggobi_par_coords_display_get_type();
-displayd *ggobi_par_coords_display_new(gint type, gboolean missing_p, GGobiData *d, ggobid *gg);
+displayd *ggobi_par_coords_display_new(gint type, gboolean missing_p, GGobiStage *d, ggobid *gg);
 
 typedef struct 
 {

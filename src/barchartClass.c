@@ -32,23 +32,23 @@ static gboolean barchartVarSel (GtkWidget * w, displayd * display,
                                 splotd * sp, gint jvar, gint toggle,
                                 gint mouse, cpaneld * cpanel, ggobid * gg);
 static gint barchartVarIsPlotted (displayd * dpy, gint * cols, gint ncols,
-                                  GGobiData * d);
+                                  GGobiStage * d);
 static gboolean barchartCPanelSet (displayd * dpy, cpaneld * cpanel,
                                    ggobid * gg);
 static void barchartDisplaySet (displayd * dpy, ggobid * gg);
 static void barchartDestroy (GtkObject *);
-static void barchartPlaneToScreen (splotd * sp, GGobiData * d, ggobid * gg);
+static void barchartPlaneToScreen (splotd * sp, GGobiStage * d, ggobid * gg);
 void barchart_clean_init (barchartSPlotd * sp);
-void barchart_recalc_counts (barchartSPlotd * sp, GGobiData * d, ggobid * gg);
+void barchart_recalc_counts (barchartSPlotd * sp, GGobiStage * d, ggobid * gg);
 
 static void barchartVarpanelRefresh (displayd * display, splotd * sp,
-                                     GGobiData * d);
+                                     GGobiStage * d);
 static gboolean barchartHandlesInteraction (displayd * dpy, gint action);
 static void barchartVarpanelTooltipsSet (displayd * dpy, ggobid * gg,
                                          GtkWidget * wx, GtkWidget * wy,
                                          GtkWidget * wz, GtkWidget * label);
 static gint barchartPlottedColsGet (displayd * display, gint * cols,
-                                    GGobiData * d, ggobid * gg);
+                                    GGobiStage * d, ggobid * gg);
 static GtkWidget *barchartCPanelWidget (displayd * dpy,
                                         gchar ** modeName, ggobid * gg);
 //static GtkWidget *barchartMenusMake(displayd * dpy, ggobid * gg);
@@ -81,7 +81,7 @@ varpanelHighd (displayd * display)
 
 static gint
 barchart_is_variable_plotted (displayd * display, gint * cols, gint ncols,
-                              GGobiData * d)
+                              GGobiStage * d)
 {
   gint j;
   ggobid *gg = display->d->gg;
@@ -100,9 +100,9 @@ barchart_is_variable_plotted (displayd * display, gint * cols, gint ncols,
 
 /* barchart splot methods*/
 static gchar *
-barchart_tree_label (splotd * sp, GGobiData * d, ggobid * gg)
+barchart_tree_label (splotd * sp, GGobiStage * d, ggobid * gg)
 {
-  return(ggobi_stage_get_col_name(GGOBI_STAGE(d), sp->p1dvar));
+  return(ggobi_stage_get_col_name(d, sp->p1dvar));
 }
 
 
@@ -113,7 +113,7 @@ barchartVarSel (GtkWidget * w, displayd * display, splotd * sp, gint jvar,
   gint jvar_prev = -1;
   gboolean redraw = false;
   /*  displayd *display = (displayd *) sp->displayptr;*/
-  GGobiData *d = display->d;
+  GGobiStage *d = display->d;
 
   switch (cpanel->pmode) {
     case TOUR1D:
@@ -132,7 +132,7 @@ barchartVarSel (GtkWidget * w, displayd * display, splotd * sp, gint jvar,
 }
 
 gint
-barchartVarIsPlotted (displayd * dpy, gint * cols, gint ncols, GGobiData * d)
+barchartVarIsPlotted (displayd * dpy, gint * cols, gint ncols, GGobiStage * d)
 {
   int j;
   splotd *sp = (splotd *) dpy->splots->data;
@@ -195,7 +195,7 @@ barchartDestroy (GtkObject * obj)
 
 
 void
-barchartPlaneToScreen (splotd * sp, GGobiData * d, ggobid * gg)
+barchartPlaneToScreen (splotd * sp, GGobiStage * d, ggobid * gg)
 {
   barchartSPlotd *bsp = GGOBI_BARCHART_SPLOT (sp);
 
@@ -204,7 +204,7 @@ barchartPlaneToScreen (splotd * sp, GGobiData * d, ggobid * gg)
 }
 
 void
-barchartWorldToPlane (splotd * sp, GGobiData * d, ggobid * gg)
+barchartWorldToPlane (splotd * sp, GGobiStage * d, ggobid * gg)
 {
   barchartSPlotd *bsp = GGOBI_BARCHART_SPLOT (sp);
 
@@ -212,21 +212,15 @@ barchartWorldToPlane (splotd * sp, GGobiData * d, ggobid * gg)
   barchart_recalc_counts(bsp, d, gg);
 }
 
-
-/*----------------------------------------------------------------------*/
-/*      local helper function for barcharts,                            */
-/*      called by build_symbol_vectors                                  */
-/*----------------------------------------------------------------------*/
-
 void
-barchartVarpanelRefresh (displayd * display, splotd * sp, GGobiData * d)
+barchartVarpanelRefresh (displayd * display, splotd * sp, GGobiStage * d)
 {
   cpaneld *cpanel = &display->cpanel;
   gint j;
 
   switch (cpanel->pmode) {
     case TOUR1D:
-      for (j=0; j<GGOBI_STAGE(d)->n_cols; j++) {
+      for (j=0; j<d->n_cols; j++) {
         varpanel_toggle_set_active (VARSEL_X, j, false, d);
         varpanel_toggle_set_active (VARSEL_Y, j, false, d);
         varpanel_widget_set_visible (VARSEL_Y, j, false, d);
@@ -239,7 +233,7 @@ barchartVarpanelRefresh (displayd * display, splotd * sp, GGobiData * d)
       }
       break;
     default:
-      for (j = 0; j < GGOBI_STAGE(d)->n_cols; j++) {
+      for (j = 0; j < d->n_cols; j++) {
         varpanel_toggle_set_active(VARSEL_X, j, (j == sp->p1dvar), d);
 
         varpanel_toggle_set_active(VARSEL_Y, j, false, d);
@@ -278,7 +272,7 @@ barchartVarpanelTooltipsSet (displayd * dpy, ggobid * gg, GtkWidget * wx,
 
 
 gint
-barchartPlottedColsGet (displayd * display, gint * cols, GGobiData * d,
+barchartPlottedColsGet (displayd * display, gint * cols, GGobiStage * d,
                         ggobid * gg)
 {
   gint ncols = 0;
@@ -369,8 +363,8 @@ barchartScreenToTform (cpaneld * cpanel, splotd * sp, icoords * scr,
   greal precis = (greal) PRECISION1;
   greal ftmp, max, min, rdiff;
   displayd *display = (displayd *) sp->displayptr;
-  GGobiData *d = display->d;
-  GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(d), sp->p1dvar);
+  GGobiStage *d = display->d;
+  GGobiVariable *var = ggobi_stage_get_variable(d, sp->p1dvar);
   gfloat scale_x, scale_y;
 
   scale_x = sp->scale.x;
@@ -475,7 +469,7 @@ barchart_identify_cues_draw (gboolean nearest_p, gint k, splotd * rawsp,
   gchar *string;
   icoords mousepos = rawsp->mousepos;
   colorschemed *scheme = gg->activeColorScheme;
-  gint j;
+  gint j = 0;
 
   nbins = sp->bar->nbins;
   gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
@@ -502,7 +496,7 @@ barchart_identify_cues_draw (gboolean nearest_p, gint k, splotd * rawsp,
                                   sp->bar->breaks[i - 1] + sp->bar->offset,
                                   sp->bar->breaks[i] + sp->bar->offset);
       } else {
-        GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(rawsp->displayptr->d), 
+        GGobiVariable *var = ggobi_stage_get_variable(rawsp->displayptr->d, 
           rawsp->p1dvar);
         gchar *level = ggobi_variable_get_level_name(var, sp->bar->bins[j].value);
         j = i - 1;

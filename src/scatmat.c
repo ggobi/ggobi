@@ -42,7 +42,7 @@ static const gchar *scatmat_ui =
 displayd *
 scatmat_new (displayd * display,
              gboolean missing_p, gint numRows, gint * rows,
-             gint numCols, gint * cols, GGobiData * d, ggobid * gg)
+             gint numCols, gint * cols, GGobiStage * d, ggobid * gg)
 {
   GtkWidget *vbox, *frame;
   gint i, j, ctr;
@@ -51,7 +51,7 @@ scatmat_new (displayd * display,
   gint scatmat_nvars;
   splotd *sp;
   windowDisplayd *wdpy = NULL;
-
+  
   if (!display)
     display = g_object_new (GGOBI_TYPE_SCATMAT_DISPLAY, NULL);
 
@@ -68,9 +68,9 @@ scatmat_new (displayd * display,
 
   if (numRows == 0 || numCols == 0) {
 
-    scatmat_nvars = MIN (GGOBI_STAGE(d)->n_cols, sessionOptions->info->numScatMatrixVars);
+    scatmat_nvars = MIN (d->n_cols, sessionOptions->info->numScatMatrixVars);
     if (scatmat_nvars < 0) {
-      scatmat_nvars = GGOBI_STAGE(d)->n_cols;
+      scatmat_nvars = d->n_cols;
     }
 
     /* Initialize display with the plotted variables in the current
@@ -79,7 +79,7 @@ scatmat_new (displayd * display,
         gg->current_display->d == d &&
         GGOBI_IS_EXTENDED_DISPLAY (gg->current_display)) {
       gint k, nplotted_vars;
-      gint *plotted_vars = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof (gint));
+      gint *plotted_vars = (gint *) g_malloc (d->n_cols * sizeof (gint));
       displayd *dsp = gg->current_display;
 
       nplotted_vars =
@@ -91,7 +91,7 @@ scatmat_new (displayd * display,
       for (j = 0; j < nplotted_vars; j++)
         rows[j] = cols[j] = plotted_vars[j];
       j = nplotted_vars;
-      for (k = 0; k < GGOBI_STAGE(d)->n_cols; k++) {
+      for (k = 0; k < d->n_cols; k++) {
         if (!in_vector (k, plotted_vars, nplotted_vars)) {
           rows[j] = cols[j] = k;
           j++;
@@ -266,7 +266,7 @@ scatmat_varsel_simple (cpaneld * cpanel, splotd * sp, gint jvar,
   GtkTableChild *child;
   displayd *display = gg->current_display;
   gint jpos, *vars, nvars;
-  GGobiData *d = display->d;
+  GGobiStage *d = display->d;
 
   /* Simple:  if jvar is among the plotted variables, delete it;
      otherwise, append it */
@@ -311,7 +311,7 @@ scatmat_varsel_simple (cpaneld * cpanel, splotd * sp, gint jvar,
       }
     }
 
-    vars = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof (gint));
+    vars = (gint *) g_malloc (d->n_cols * sizeof (gint));
     nvars =
       GGOBI_EXTENDED_DISPLAY_GET_CLASS (display)->plotted_vars_get (display,
                                                                     vars, d,
@@ -331,7 +331,7 @@ scatmat_varsel_simple (cpaneld * cpanel, splotd * sp, gint jvar,
 
   else {                        /* Append a variable.  Don't change current_splot. */
 
-    vars = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof (gint));
+    vars = (gint *) g_malloc (d->n_cols * sizeof (gint));
     nvars =
       GGOBI_EXTENDED_DISPLAY_GET_CLASS (display)->plotted_vars_get (display,
                                                                     vars, d,

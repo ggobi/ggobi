@@ -31,24 +31,24 @@ void ggobi_edge_menus_update (ggobid * gg);
 */
 
 void
-edges_alloc (gint nsegs, GGobiData * d)
+edges_alloc (gint nsegs, GGobiStage * d)
 {
-  d->edge.n = nsegs;
-  d->edge.sym_endpoints = (SymbolicEndpoints *)
-    g_realloc (d->edge.sym_endpoints, nsegs * sizeof (SymbolicEndpoints));
+  ggobi_stage_get_edge_data(d)->n = nsegs;
+  ggobi_stage_get_edge_data(d)->sym_endpoints = (SymbolicEndpoints *)
+    g_realloc (ggobi_stage_get_edge_data(d)->sym_endpoints, nsegs * sizeof (SymbolicEndpoints));
 
-  vectorb_alloc (&d->edge.xed_by_brush, nsegs);
+  vectorb_alloc (&ggobi_stage_get_edge_data(d)->xed_by_brush, nsegs);
 }
 
 void
-edges_free (GGobiData * d, ggobid * gg)
+edges_free (GGobiStage * d, ggobid * gg)
 {
   gpointer ptr;
 
-  vectorb_free (&d->edge.xed_by_brush);
-  ptr = (gpointer) d->edge.sym_endpoints;
+  vectorb_free (&ggobi_stage_get_edge_data(d)->xed_by_brush);
+  ptr = (gpointer) ggobi_stage_get_edge_data(d)->sym_endpoints;
   g_free (ptr);
-  d->edge.n = 0;
+  ggobi_stage_get_edge_data(d)->n = 0;
 }
 
 /* --------------------------------------------------------------- */
@@ -60,11 +60,11 @@ edges_free (GGobiData * d, ggobid * gg)
   This sets the data set as the source of the edge information
   for all the plots within the display.
  */
-GGobiData *
-setDisplayEdge (displayd * dpy, GGobiData * e)
+GGobiStage *
+setDisplayEdge (displayd * dpy, GGobiStage * e)
 {
   GList *l;
-  GGobiData *old = NULL;
+  GGobiStage *old = NULL;
 
   if (resolveEdgePoints (e, dpy->d)) {
     dpy->e = e;
@@ -87,7 +87,7 @@ setDisplayEdge (displayd * dpy, GGobiData * e)
  on the plot.
  */
 void
-edgeset_add_cb (GtkAction * action, GGobiData * e)
+edgeset_add_cb (GtkAction * action, GGobiStage * e)
 {
   ggobid *gg = e->gg;
   displayd *display = GGOBI_DISPLAY (g_object_get_data (G_OBJECT (action), "display"));
@@ -143,15 +143,15 @@ ggobi_cleanUpEdgeRelationships (struct _EdgeData *edge, int startPosition)
 /* --------------------------------------------------------------- */
 
 gboolean
-edge_endpoints_get (gint k, gint * a, gint * b, GGobiData * d,
-                    endpointsd * endpoints, GGobiData * e)
+edge_endpoints_get (gint k, gint * a, gint * b, GGobiStage * d,
+                    endpointsd * endpoints, GGobiStage * e)
 {
   gboolean ok;
 
   *a = endpoints[k].a;
   *b = endpoints[k].b;
 
-  ok = (*a >= 0 && *a < GGOBI_STAGE(d)->n_rows && *b >= 0 && *b < GGOBI_STAGE(d)->n_rows);
+  ok = (*a >= 0 && *a < d->n_rows && *b >= 0 && *b < d->n_rows);
 
   return ok;
 }
@@ -161,11 +161,11 @@ edgesets_count (ggobid * gg)
 {
   gint k, ne = 0;
   gint nd = g_slist_length (gg->d);
-  GGobiData *e;
+  GGobiStage *e;
 
   for (k = 0; k < nd; k++) {
-    e = (GGobiData *) g_slist_nth_data (gg->d, k);
-    if (ggobi_stage_get_n_edges(GGOBI_STAGE(e)))
+    e = (GGobiStage *) g_slist_nth_data (gg->d, k);
+    if (ggobi_stage_get_n_edges(e))
       ne++;
   }
 
@@ -184,15 +184,15 @@ static endpointsd DegenerateEndpoints;
   given the symbolic names in the edgeset specification (sym).
 */
 static endpointsd *
-computeResolvedEdgePoints (GGobiData * e, GGobiData * d)
+computeResolvedEdgePoints (GGobiStage * e, GGobiStage * d)
 {
-  endpointsd *ans = g_malloc (sizeof (endpointsd) * e->edge.n);
+  endpointsd *ans = g_malloc (sizeof (endpointsd) * ggobi_stage_get_n_edges(e));
   gboolean resolved_p = false;
 
-  for (gint i = 0; i < e->edge.n; i++) {
-    gint row_a = ggobi_stage_get_row_for_id(GGOBI_STAGE(d), e->edge.sym_endpoints[i].a);
-    gint row_b = ggobi_stage_get_row_for_id(GGOBI_STAGE(d), e->edge.sym_endpoints[i].b);
-    g_debug("ids %s->%s : rows %i->%i", e->edge.sym_endpoints[i].a, e->edge.sym_endpoints[i].b, row_a, row_b);
+  for (gint i = 0; i < ggobi_stage_get_n_edges(e); i++) {
+    gint row_a = ggobi_stage_get_row_for_id(d, ggobi_stage_get_edge_data(e)->sym_endpoints[i].a);
+    gint row_b = ggobi_stage_get_row_for_id(d, ggobi_stage_get_edge_data(e)->sym_endpoints[i].b);
+    g_debug("ids %s->%s : rows %i->%i", ggobi_stage_get_edge_data(e)->sym_endpoints[i].a, ggobi_stage_get_edge_data(e)->sym_endpoints[i].b, row_a, row_b);
 
     ans[i].a = (gint) row_a;
     ans[i].b = (gint) row_b;
@@ -200,7 +200,7 @@ computeResolvedEdgePoints (GGobiData * e, GGobiData * d)
     if (row_a == -1 || row_b == -1)
       continue;
 
-    ans[i].jpartner = e->edge.sym_endpoints[i].jpartner;
+    ans[i].jpartner = ggobi_stage_get_edge_data(e)->sym_endpoints[i].jpartner;
     if(!resolved_p)
       resolved_p = true;
   }
@@ -215,20 +215,20 @@ computeResolvedEdgePoints (GGobiData * e, GGobiData * d)
 
 
 static endpointsd *
-do_resolveEdgePoints (GGobiData * e, GGobiData * d, gboolean compute)
+do_resolveEdgePoints (GGobiStage * e, GGobiStage * d, gboolean compute)
 {
   endpointsd *ans = NULL;
   DatadEndpoints *ptr;
   GList *tmp;
 
 
-  if (!ggobi_stage_get_n_edges(GGOBI_STAGE(e)))
+  if (!ggobi_stage_get_n_edges(e))
     return (NULL);
 
   /* Get the entry in the table for this dataset (d). Use the name for now. */
-  for (tmp = e->edge.endpointList; tmp; tmp = tmp->next) {
+  for (tmp = ggobi_stage_get_edge_data(e)->endpointList; tmp; tmp = tmp->next) {
     ptr = (DatadEndpoints *) tmp->data;
-    if (GGOBI_DATA (ptr->data) == d) {
+    if (GGOBI_STAGE (ptr->data) == d) {
       ans = ptr->endpoints;
       break;
     }
@@ -246,7 +246,7 @@ do_resolveEdgePoints (GGobiData * e, GGobiData * d, gboolean compute)
     ptr = (DatadEndpoints *) g_malloc (sizeof (DatadEndpoints));
     ptr->data = G_OBJECT (d);
     ptr->endpoints = ans;       /* (ans == &DegenerateEndpoints) ? NULL : ans; */
-    e->edge.endpointList = g_list_append (e->edge.endpointList, ptr);
+    ggobi_stage_get_edge_data(e)->endpointList = g_list_append (ggobi_stage_get_edge_data(e)->endpointList, ptr);
   }
 
   if (ans == &DegenerateEndpoints)
@@ -262,14 +262,14 @@ do_resolveEdgePoints (GGobiData * e, GGobiData * d, gboolean compute)
  in e.
 */
 endpointsd *
-resolveEdgePoints (GGobiData * e, GGobiData * d)
+resolveEdgePoints (GGobiStage * e, GGobiStage * d)
 {
   return (do_resolveEdgePoints (e, d, true));
 }
 
 
 gboolean
-hasEdgePoints (GGobiData * e, GGobiData * d)
+hasEdgePoints (GGobiStage * e, GGobiStage * d)
 {
   return (do_resolveEdgePoints (e, d, false) ? true : false);
 }
@@ -284,38 +284,38 @@ cleanEdgePoint (gpointer data, gpointer userData)
 }
 
 void
-unresolveAllEdgePoints (GGobiData * e)
+unresolveAllEdgePoints (GGobiStage * e)
 {
-  if (e->edge.endpointList) {
-    g_list_foreach (e->edge.endpointList, cleanEdgePoint, NULL);
-    g_list_free (e->edge.endpointList);
-    e->edge.endpointList = NULL;
+  if (ggobi_stage_get_edge_data(e)->endpointList) {
+    g_list_foreach (ggobi_stage_get_edge_data(e)->endpointList, cleanEdgePoint, NULL);
+    g_list_free (ggobi_stage_get_edge_data(e)->endpointList);
+    ggobi_stage_get_edge_data(e)->endpointList = NULL;
   }
 }
 
 
 gboolean
-unresolveEdgePoints (GGobiData * e, GGobiData * d)
+unresolveEdgePoints (GGobiStage * e, GGobiStage * d)
 {
   DatadEndpoints *ptr;
   GList *tmp;
 
-  if (!ggobi_stage_get_n_edges(GGOBI_STAGE(e)))
+  if (!ggobi_stage_get_n_edges(e))
     return (false);
 
-  for (tmp = e->edge.endpointList; tmp; tmp = tmp->next) {
+  for (tmp = ggobi_stage_get_edge_data(e)->endpointList; tmp; tmp = tmp->next) {
     ptr = (DatadEndpoints *) tmp->data;
-    if (GGOBI_DATA (ptr->data) == d) {
+    if (GGOBI_STAGE (ptr->data) == d) {
       if (ptr->endpoints)
         g_free (ptr->endpoints);
 
       /* equivalent to 
-         g_list_remove(e->edge.endpointList, tmp) 
+         g_list_remove(ggobi_stage_get_edge_data(e)->endpointList, tmp) 
          except we don't do the extra looping. Probably
          minute since # of datasets is small!
        */
-      if (tmp == e->edge.endpointList) {
-        e->edge.endpointList = tmp->next;
+      if (tmp == ggobi_stage_get_edge_data(e)->endpointList) {
+        ggobi_stage_get_edge_data(e)->endpointList = tmp->next;
       }
       else {
         tmp->prev = tmp->next;

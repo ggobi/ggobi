@@ -105,7 +105,7 @@ writeall_window_open (ggobid *gg) {
   GtkWidget *swin, *tree_view;
   GtkListStore *model;
   static gchar *tree_view_titles[1] = {"data"};
-  GGobiData *d;
+  GGobiStage *d;
   GSList *l;
   GtkTreeIter iter;
 
@@ -164,9 +164,9 @@ writeall_window_open (ggobid *gg) {
 
   /*-- All datad's are included. */
   for (l = gg->d; l; l = l->next) {
-    d = (GGobiData *) l->data;
+    d = (GGobiStage *) l->data;
     gtk_list_store_append(model, &iter);
-    gtk_list_store_set(model, &iter, 0, ggobi_stage_get_name(GGOBI_STAGE(d)), -1);
+    gtk_list_store_set(model, &iter, 0, ggobi_stage_get_name(d), -1);
   }
   gtk_tree_selection_select_all(gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view)));
   gtk_container_add (GTK_CONTAINER (swin), tree_view);

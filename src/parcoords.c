@@ -101,14 +101,14 @@ parcoords_reset_arrangement (displayd *display, gint arrangement, ggobid *gg) {
 
 displayd *
 parcoords_new_with_vars(gboolean missing_p, gint nvars, gint *vars,
-	       GGobiData *d, ggobid *gg) 
+	       GGobiStage *d, ggobid *gg) 
 {
 	return(parcoords_new(NULL, missing_p, nvars, vars, d, gg));
 }
 
 displayd *
 parcoords_new (displayd *display, gboolean missing_p, gint nvars, gint *vars,
-	       GGobiData *d, ggobid *gg) 
+	       GGobiStage *d, ggobid *gg) 
 {
   GtkWidget *vbox, *frame;
   gint i;
@@ -124,9 +124,9 @@ parcoords_new (displayd *display, gboolean missing_p, gint nvars, gint *vars,
   display_set_values(display, d, gg);
 
   if (nvars == 0) {
-    nplots = MIN (GGOBI_STAGE(d)->n_cols, sessionOptions->info->numParCoordsVars);
+    nplots = MIN (d->n_cols, sessionOptions->info->numParCoordsVars);
     if(nplots < 0) {
-      nplots = GGOBI_STAGE(d)->n_cols;
+      nplots = d->n_cols;
     }
 
     /* Initialize using the plotted variables in the current display,
@@ -136,7 +136,7 @@ parcoords_new (displayd *display, gboolean missing_p, gint nvars, gint *vars,
         GGOBI_IS_EXTENDED_DISPLAY(gg->current_display))
     {
       gint j, k, nplotted_vars;
-      gint *plotted_vars = (gint *) g_malloc(GGOBI_STAGE(d)->n_cols * sizeof(gint));
+      gint *plotted_vars = (gint *) g_malloc(d->n_cols * sizeof(gint));
       displayd *dsp = gg->current_display;
 
       nplotted_vars = GGOBI_EXTENDED_DISPLAY_GET_CLASS(dsp)->plotted_vars_get(dsp, plotted_vars, d, gg);
@@ -145,7 +145,7 @@ parcoords_new (displayd *display, gboolean missing_p, gint nvars, gint *vars,
       for (j=0; j<nplotted_vars; j++)
         vars[j] = plotted_vars[j];
       j = nplotted_vars;
-      for (k=0; k<GGOBI_STAGE(d)->n_cols; k++) {
+      for (k=0; k<d->n_cols; k++) {
         if (!in_vector(k, plotted_vars, nplotted_vars)) {
           vars[j] = k;
           j++;
@@ -390,7 +390,7 @@ sp_rewhisker (splotd *sp_prev, splotd *sp, splotd *sp_next, ggobid *gg) {
   gint i, k, m;
   displayd *display = (displayd *) sp->displayptr;
   cpaneld *cpanel = (cpaneld *) &display->cpanel;
-  GGobiData *d = display->d;
+  GGobiStage *d = display->d;
   gboolean draw_whisker;
 
   for (k=0; k<d->nrows_in_plot; k++) {
@@ -402,7 +402,7 @@ sp_rewhisker (splotd *sp_prev, splotd *sp, splotd *sp_next, ggobid *gg) {
       draw_whisker = false;
     /*-- .. also if we're not drawing missings, and an endpoint is missing --*/
     else if (!d->missings_show_p &&
-            (ggobi_stage_is_missing(GGOBI_STAGE(d), i, sp->p1dvar) || ggobi_stage_is_missing(GGOBI_STAGE(d), i, sp_prev->p1dvar)))
+            (ggobi_stage_is_missing(d, i, sp->p1dvar) || ggobi_stage_is_missing(d, i, sp_prev->p1dvar)))
     {
       draw_whisker = false;
     }
@@ -445,7 +445,7 @@ sp_rewhisker (splotd *sp_prev, splotd *sp, splotd *sp_next, ggobid *gg) {
       draw_whisker = false;
     /*-- .. also if we're not drawing missings, and an endpoint is missing --*/
     else if (!d->missings_show_p && 
-            (ggobi_stage_is_missing(GGOBI_STAGE(d), i, sp->p1dvar) || ggobi_stage_is_missing(GGOBI_STAGE(d), i, sp_next->p1dvar)))
+            (ggobi_stage_is_missing(d, i, sp->p1dvar) || ggobi_stage_is_missing(d, i, sp_next->p1dvar)))
     {
       draw_whisker = false;
     }

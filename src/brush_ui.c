@@ -45,8 +45,8 @@ brush_undo_cb (GtkToggleButton * button, ggobid * gg)
   cpaneld *cpanel = &gg->current_display->cpanel;
   splotd *sp = gg->current_splot;
   displayd *display = sp->displayptr;
-  GGobiData *d = display->d;
-  GGobiData *e = display->e;
+  GGobiStage *d = display->d;
+  GGobiStage *e = display->e;
 
   if (cpanel->br.point_targets)
     brush_undo (d);
@@ -55,7 +55,7 @@ brush_undo_cb (GtkToggleButton * button, ggobid * gg)
 
   /*-- when rows_in_plot changes ... --*/
   if (GGOBI_IS_EXTENDED_SPLOT (sp)) {
-    void (*f) (GGobiData *, splotd *, ggobid *);
+    void (*f) (GGobiStage *, splotd *, ggobid *);
     GGobiExtendedSPlotClass *klass;
     klass = GGOBI_EXTENDED_SPLOT_GET_CLASS (sp);
     f = klass->splot_assign_points_to_bins;
@@ -137,8 +137,8 @@ brush_reset (displayd * display, gint action)
 {
   gint i, k;
   ggobid *gg = display->ggobi;
-  GGobiData *d = display->d;
-  GGobiData *e = display->e;
+  GGobiStage *d = display->d;
+  GGobiStage *e = display->e;
   cpaneld *cpanel = &display->cpanel;
 
   switch (action) {
@@ -151,8 +151,8 @@ brush_reset (displayd * display, gint action)
     break;
 
   case RESET_UNSHADOW_POINTS: /*-- un-hide all points --*/
-    for (i = 0; i < GGOBI_STAGE(d)->n_rows; i++)
-      ggobi_data_set_attr_hidden(d, i, false, ATTR_SET_PERSISTENT);
+    for (i = 0; i < d->n_rows; i++)
+      ggobi_stage_set_attr_hidden(d, i, false, ATTR_SET_PERSISTENT);
 
       /*-- code borrowed from exclusion_ui.c, the 'show' routine --*/
     clusters_set(d);
@@ -176,8 +176,8 @@ brush_reset (displayd * display, gint action)
 
   case RESET_UNSHADOW_EDGES: /*-- un-hide all edges --*/
     if (e != NULL) {
-      for (k = 0; k < e->edge.n; k++)
-        ggobi_data_set_attr_hidden(e, k, false, ATTR_SET_PERSISTENT);
+      for (k = 0; k < ggobi_stage_get_n_edges(e); k++)
+        ggobi_stage_set_attr_hidden(e, k, false, ATTR_SET_PERSISTENT);
 
         /*-- code borrowed from exclusion_ui.c, the 'show' routine --*/
       clusters_set(d);
@@ -286,7 +286,7 @@ button_press_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
   gboolean retval = true;
   gboolean button1_p, button2_p;
   ggobid *gg = GGobiFromSPlot (sp);
-  GGobiData *d, *e;
+  GGobiStage *d, *e;
 
   if (!sp || !gg)
     return false;
@@ -328,7 +328,7 @@ button_release_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
   displayd *display = (displayd *) sp->displayptr;
   ggobid *gg = GGobiFromSPlot (sp);
   cpaneld *cpanel = &display->cpanel;
-  GGobiData *d = display->d;
+  GGobiStage *d = display->d;
   gboolean retval = true;
   GdkModifierType state;
 
@@ -343,7 +343,7 @@ button_release_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
   if (cpanel->br.mode == BR_PERSISTENT) {
 
     if (GGOBI_IS_EXTENDED_SPLOT (sp)) {
-      void (*f) (GGobiData *, splotd *, ggobid *);
+      void (*f) (GGobiStage *, splotd *, ggobid *);
       GGobiExtendedSPlotClass *klass;
       klass = GGOBI_EXTENDED_SPLOT_GET_CLASS (sp);
       f = klass->splot_assign_points_to_bins;
@@ -361,9 +361,9 @@ button_release_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
      */
     {
       GSList *l;
-      GGobiData *dd;
+      GGobiStage *dd;
       for (l = gg->d; l; l = l->next) {
-        dd = (GGobiData *) l->data;
+        dd = (GGobiStage *) l->data;
         if (dd != d) {
           clusters_set(d);
         }
@@ -374,18 +374,18 @@ button_release_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
     cluster_table_update (d, gg);
   }
 
-  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(GGOBI_STAGE(d), "_color"));
-  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(GGOBI_STAGE(d), "_color_now"));
-  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(GGOBI_STAGE(d), "_color_prev"));
-  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(GGOBI_STAGE(d), "_glyph_type"));
-  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(GGOBI_STAGE(d), "_glyph_type_now"));
-  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(GGOBI_STAGE(d), "_glyph_type_prev"));
-  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(GGOBI_STAGE(d), "_glyph_size"));
-  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(GGOBI_STAGE(d), "_glyph_size_now"));
-  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(GGOBI_STAGE(d), "_glyph_size_prev"));
-  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(GGOBI_STAGE(d), "_hidden"));
-  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(GGOBI_STAGE(d), "_hidden_now"));
-  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(GGOBI_STAGE(d), "_hidden_prev"));
+  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(d, "_color"));
+  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(d, "_color_now"));
+  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(d, "_color_prev"));
+  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(d, "_glyph_type"));
+  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(d, "_glyph_type_now"));
+  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(d, "_glyph_type_prev"));
+  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(d, "_glyph_size"));
+  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(d, "_glyph_size_now"));
+  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(d, "_glyph_size_prev"));
+  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(d, "_hidden"));
+  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(d, "_hidden_now"));
+  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(d, "_hidden_prev"));
 
 
   /*-- if we're only doing linked brushing on mouse up, do it now --*/

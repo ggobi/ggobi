@@ -23,18 +23,18 @@ xyplot_activate (gint state, displayd *display, ggobid *gg)
 {
   GList *slist;
   splotd *sp;
-  GGobiData *d = display->d;
+  GGobiStage *d = display->d;
   gboolean reset = false;
 
   if (state) {
 
     for (slist = display->splots; slist; slist = slist->next) {
       sp = (splotd *) slist->data;
-      if (sp->xyvars.x >= GGOBI_STAGE(d)->n_cols) {
+      if (sp->xyvars.x >= d->n_cols) {
         reset = true;
         sp->xyvars.x = (sp->xyvars.y == 0) ? 1 : 0;
       }
-      if (sp->xyvars.y >= GGOBI_STAGE(d)->n_cols) {
+      if (sp->xyvars.y >= d->n_cols) {
         reset = true;
         sp->xyvars.y = (sp->xyvars.x == 0) ? 1 : 0;
       }
@@ -88,7 +88,7 @@ xyplot_varsel (splotd *sp, gint jvar, gint *jvar_prev, gint toggle, gint mouse)
 }
 
 void
-xy_reproject (splotd *sp, greal **world_data, GGobiData *d, ggobid *gg)
+xy_reproject (splotd *sp, greal **world_data, GGobiStage *d, ggobid *gg)
 {
 /*
  * Project the data down from the ncols_used-dimensional world_data[]
@@ -111,7 +111,7 @@ xy_reproject (splotd *sp, greal **world_data, GGobiData *d, ggobid *gg)
 /*--------------------------------------------------------------------*/
 
 void
-cycle_fixedx (splotd *sp, displayd *display, GGobiData *d, ggobid *gg)
+cycle_fixedx (splotd *sp, displayd *display, GGobiStage *d, ggobid *gg)
 {
   cpaneld *cpanel = &display->cpanel;
   gint varno, jvar_prev;
@@ -122,7 +122,7 @@ cycle_fixedx (splotd *sp, displayd *display, GGobiData *d, ggobid *gg)
     if (varno == sp->xyvars.x)
        varno++;
 
-    if (varno == GGOBI_STAGE(d)->n_cols) {
+    if (varno == d->n_cols) {
       varno = 0;
       if (varno == sp->xyvars.x)
          varno++;
@@ -134,7 +134,7 @@ cycle_fixedx (splotd *sp, displayd *display, GGobiData *d, ggobid *gg)
        varno--;
 
     if (varno < 0) {
-      varno = GGOBI_STAGE(d)->n_cols-1;
+      varno = d->n_cols-1;
       if (varno == sp->xyvars.x)
          varno--;
     }
@@ -150,7 +150,7 @@ cycle_fixedx (splotd *sp, displayd *display, GGobiData *d, ggobid *gg)
 }
 
 void
-cycle_fixedy (splotd *sp, displayd *display, GGobiData *d, ggobid *gg)
+cycle_fixedy (splotd *sp, displayd *display, GGobiStage *d, ggobid *gg)
 {
   cpaneld *cpanel = &display->cpanel;
   gint varno, jvar_prev;
@@ -161,7 +161,7 @@ cycle_fixedy (splotd *sp, displayd *display, GGobiData *d, ggobid *gg)
     if (varno == sp->xyvars.y)
        varno++;
 
-    if (varno == GGOBI_STAGE(d)->n_cols) {
+    if (varno == d->n_cols) {
       varno = 0;
       if (varno == sp->xyvars.y)
         varno++;
@@ -173,7 +173,7 @@ cycle_fixedy (splotd *sp, displayd *display, GGobiData *d, ggobid *gg)
        varno--;
 
     if (varno < 0) {
-      varno = GGOBI_STAGE(d)->n_cols-1;
+      varno = d->n_cols-1;
       if (varno == sp->xyvars.y)
         varno--;
     }
@@ -198,7 +198,7 @@ cycle_fixedy (splotd *sp, displayd *display, GGobiData *d, ggobid *gg)
  * users can select plots during cycling, too.)
 */
 void
-cycle_xy (splotd *sp, displayd *display, GGobiData *d, ggobid *gg)
+cycle_xy (splotd *sp, displayd *display, GGobiStage *d, ggobid *gg)
 {
   cpaneld *cpanel = &display->cpanel;
   gint jx, jy;
@@ -211,14 +211,14 @@ cycle_xy (splotd *sp, displayd *display, GGobiData *d, ggobid *gg)
   if (cpanel->xyplot.cycle_dir == 1) {
 
     /* case 1: x is maxed out. */
-    if ((jx == GGOBI_STAGE(d)->n_cols-1) || (jx == GGOBI_STAGE(d)->n_cols-2 && jy == GGOBI_STAGE(d)->n_cols-1) ) {
+    if ((jx == d->n_cols-1) || (jx == d->n_cols-2 && jy == d->n_cols-1) ) {
       jx = 0;
       jy = jx+1;
     /* 2: this can occur due to variable selection, but not due to cycling */
     } else if (jy < jx) {
       jy = jx+1;
     /* y is maxed out, but not x */
-    } else if (jy == GGOBI_STAGE(d)->n_cols-1) {
+    } else if (jy == d->n_cols-1) {
       jx++;
       jy = 0;
     } else jy++;
@@ -228,14 +228,14 @@ cycle_xy (splotd *sp, displayd *display, GGobiData *d, ggobid *gg)
     /* case 1: y is at a minimum, or x and y together are at a minimum */
     if ( jy == jx+1 ) {
       if (jx == 0) {
-        jx = GGOBI_STAGE(d)->n_cols - 2;
+        jx = d->n_cols - 2;
       } else {
         jx--;
       }
-      jy = GGOBI_STAGE(d)->n_cols - 1;
+      jy = d->n_cols - 1;
     /* 2: this can occur due to variable selection, but not due to cycling */
     } else if (jy < jx) {
-      jy = GGOBI_STAGE(d)->n_cols-1;
+      jy = d->n_cols-1;
     /* 3: just decrement y */
     } else jy--;
   }
@@ -259,7 +259,7 @@ gint
 xycycle_func (ggobid *gg)
 {
   displayd *display = gg->current_display;
-  GGobiData *d = gg->current_display->d;
+  GGobiStage *d = gg->current_display->d;
   splotd *sp = gg->current_splot;
   cpaneld *cpanel = &display->cpanel;
   

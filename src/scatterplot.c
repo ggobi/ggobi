@@ -180,7 +180,7 @@ static const gchar *scatterplot_ui =
   "			<menuitem action='ShowAxes'/>" "		</menu>" "	</menubar>" "</ui>";
 
 static void
-display_datad_added_cb (ggobid * gg, GGobiData * d, void *win)
+display_datad_added_cb (ggobid * gg, GGobiStage * d, void *win)
 {
   windowDisplayd *display = GGOBI_WINDOW_DISPLAY (GTK_OBJECT (win));
 
@@ -203,13 +203,13 @@ CHECK_EVENT_SIGNATURE (display_datad_added_cb, datad_added_f)
 
 displayd *
 scatterplot_new_with_vars (gboolean missing_p, gint numVars, gint * vars,
-                           GGobiData * d, ggobid * gg)
+                           GGobiStage * d, ggobid * gg)
 {
   return (createScatterplot (NULL, missing_p, NULL, numVars, vars, d, gg));
 }
 
 displayd *
-scatterplot_new (gboolean missing_p, splotd * sp, GGobiData * d, ggobid * gg)
+scatterplot_new (gboolean missing_p, splotd * sp, GGobiStage * d, ggobid * gg)
 {
   return (createScatterplot (NULL, missing_p, sp, 0, NULL, d, gg));
 }
@@ -255,12 +255,12 @@ edge_options_cb (GtkRadioAction * action, GtkRadioAction * current,
 
 displayd *
 createScatterplot (displayd * display, gboolean missing_p, splotd * sp,
-                   gint numVars, gint * vars, GGobiData * d, ggobid * gg)
+                   gint numVars, gint * vars, GGobiStage * d, ggobid * gg)
 {
   GtkWidget *table, *vbox;
   ProjectionMode projection;
 
-  if (d == NULL || GGOBI_STAGE(d)->n_cols < 1)
+  if (d == NULL || d->n_cols < 1)
     return (NULL);
 
   if (!display) {
@@ -279,7 +279,7 @@ createScatterplot (displayd * display, gboolean missing_p, splotd * sp,
      display->options.axes_center_p = true;
    */
 
-  projection = (GGOBI_STAGE(d)->n_cols >= 2) ? XYPLOT : P1PLOT;
+  projection = (d->n_cols >= 2) ? XYPLOT : P1PLOT;
   scatterplot_cpanel_init (&display->cpanel, projection, DEFAULT_IMODE, gg);
 
   vbox = GTK_WIDGET (display);  /* gtk_vbox_new (false, 1); */
@@ -330,7 +330,7 @@ createScatterplot (displayd * display, gboolean missing_p, splotd * sp,
           gg->current_display->d == d &&
           GGOBI_IS_EXTENDED_DISPLAY (gg->current_display)) {
         gint nplotted_vars;
-        gint *plotted_vars = (gint *) g_malloc (GGOBI_STAGE(d)->n_cols * sizeof (gint));
+        gint *plotted_vars = (gint *) g_malloc (d->n_cols * sizeof (gint));
         displayd *dsp = gg->current_display;
 
         nplotted_vars =
@@ -368,19 +368,19 @@ createScatterplot (displayd * display, gboolean missing_p, splotd * sp,
   {
 /*XX seems like only scatterplot gets in here. (i.e. not scatmat) */
     display_tour1d_init_null (display, gg);
-    if (GGOBI_STAGE(d)->n_cols >= MIN_NVARS_FOR_TOUR1D)
+    if (d->n_cols >= MIN_NVARS_FOR_TOUR1D)
       display_tour1d_init (display, gg);
 
     display_tour2d3_init_null (display, gg);
-    if (GGOBI_STAGE(d)->n_cols >= MIN_NVARS_FOR_TOUR2D3)
+    if (d->n_cols >= MIN_NVARS_FOR_TOUR2D3)
       display_tour2d3_init (display, gg);
 
     display_tour2d_init_null (display, gg);
-    if (GGOBI_STAGE(d)->n_cols >= MIN_NVARS_FOR_TOUR2D)
+    if (d->n_cols >= MIN_NVARS_FOR_TOUR2D)
       display_tour2d_init (display, gg);
 
     display_tourcorr_init_null (display, gg);
-    if (GGOBI_STAGE(d)->n_cols >= MIN_NVARS_FOR_COTOUR)
+    if (d->n_cols >= MIN_NVARS_FOR_COTOUR)
       display_tourcorr_init (display, gg);
   }
 

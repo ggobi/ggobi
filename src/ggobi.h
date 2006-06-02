@@ -347,7 +347,7 @@ struct _ggobid {
     GtkWidget *tree_view;
 
    /*-- a pointer to be compared with current_display->d --*/
-    GGobiData *d;
+    GGobiStage *d;
   } sphere_ui;
 
 /*-------------------- subsetting ------------------------------------*/
@@ -540,7 +540,7 @@ typedef struct {
   to listeners.
  */
 typedef struct {
-  GGobiData *d;
+  GGobiStage *d;
   int id;
 } GGobiPointMoveEvent;
 
@@ -578,7 +578,7 @@ extern guint GGobiSignals[MAX_GGOBI_SIGNALS];
 /**
   Should be in edges.h, if there were one.
  */
-GGobiData *setDisplayEdge(displayd * dpy, GGobiData * e);
+GGobiStage *setDisplayEdge(displayd * dpy, GGobiStage * e);
 
 
 gchar *getOptValue(const char *const name, const char *const value);

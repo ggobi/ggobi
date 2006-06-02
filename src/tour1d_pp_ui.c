@@ -205,7 +205,7 @@ ppda_expose_cb (GtkWidget *w, GdkEventConfigure *event, displayd *dsp)
   gint xpos, ypos, xstrt, ystrt;
   gchar *tickmk;
   GtkStyle *style = gtk_widget_get_style (dsp->t1d_ppda);
-  GGobiData *d = dsp->d;
+  GGobiStage *d = dsp->d;
 */
   gint wid = w->allocation.width, hgt = w->allocation.height;
   /*  static gboolean init = true;*/
@@ -255,7 +255,7 @@ tour1dpp_window_open (ggobid *gg) {
   GtkObject *adj;
   /*GtkWidget *da, *label, *entry;*/
   displayd *dsp = gg->current_display;  /* ok as long as we only use the gui */
-  GGobiData *d = dsp->d;
+  GGobiStage *d = dsp->d;
   /*-- to initialize the checkboxes in the menu --*/
 
   if (dsp->t1d_window == NULL) {

@@ -329,7 +329,7 @@ class GGobi:Variable from G:Object {
       return self->lim.max;
     }
 
-    // FIXME: Please cache me (limits_set should cache this, wait until after filter to save lots of code)
+    // FIXME: Please cache me
     if ((nlevels = self_get_n_levels(self)) > 0) {
       level_values = self_get_level_values(self);
       level_value_max = level_values[0];
@@ -364,7 +364,7 @@ class GGobi:Variable from G:Object {
       return self->lim.min;
     }
   
-    // FIXME: Please cache me (limits_set should cache this, wait until after filter to save lots of code)
+    // FIXME: shouldn't this also be cached?
     if ((nlevels = self_get_n_levels(self)) > 0) {
       level_values = self_get_level_values(self);
       level_value_min = level_values[0];
@@ -504,28 +504,24 @@ class GGobi:Variable from G:Object {
    return self_get_n_levels(self);
  }
  
- 
- //FIXME: please document me
  public void
  update(self)
  {
    guint n = ggobi_stage_get_n_rows(self->_priv->stage);
-   gint j  = ggobi_stage_get_col_index_for_name(self->_priv->stage, 
+   gint j = ggobi_stage_get_col_index_for_name(self->_priv->stage, 
     self->_priv->name);
+   gboolean cat = GGOBI_VARIABLE_IS_CATEGORICAL(self);
    
-   /* update limits, mean, median */
-   // FIXME: replace with lazy caching when pipeline in place
+   // FIXME: make a dirty flag for each statistic and set to TRUE here
    
-   /* recount levels if categorical */
+   // FIXME: the level instances can probably be lazily cached as well.
+   if (cat)
+     g_hash_table_foreach(self->_priv->name_to_level, level_count_clear_func, NULL);
    
-   if (!GGOBI_VARIABLE_IS_CATEGORICAL(self))
-     return;
-   
-   g_hash_table_foreach(self->_priv->name_to_level, level_count_clear_func, NULL);
-   
-   for (guint i = 0; i < n; i++)
-     self_add_level_instance(self, NULL, 
-      (gint)ggobi_stage_get_raw_value(self->_priv->stage, i, j));
-   
+   for (guint i = 0; i < n; i++) {
+     gdouble val = ggobi_stage_get_raw_value(self->_priv->stage, i, j);
+     if (cat)
+       self_add_level_instance(self, NULL, (gint)val);
+   }
  }
 }

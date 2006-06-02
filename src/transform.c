@@ -48,7 +48,7 @@ gfloat inv_raise_min_to_1 (gfloat x, gfloat incr) { return (x + incr - 1.0); }
 
 static void
 mean_stddev (gdouble *x, gfloat *mean, gfloat *stddev, gint j, 
-  GGobiData *d, ggobid *gg)
+  GGobiStage *d, ggobid *gg)
 /*
  * Find the minimum and maximum values of a column 
  * scaling by mean and std_width standard deviations.
@@ -74,7 +74,7 @@ mean_stddev (gdouble *x, gfloat *mean, gfloat *stddev, gint j,
 }
 
 gfloat
-median (gfloat **data, gint jcol, GGobiData *d, ggobid *gg)
+median (gfloat **data, gint jcol, GGobiStage *d, ggobid *gg)
 {
 /*
  * Find the minimum and maximum values of each column,
@@ -125,11 +125,11 @@ qnorm (gdouble pr)
 
 
 gboolean
-transform_values_compare (gint jfrom, gint jto, GGobiData *d)
+transform_values_compare (gint jfrom, gint jto, GGobiStage *d)
 {
   gboolean same = true;
-  GGobiVariable *varf = ggobi_stage_get_variable(GGOBI_STAGE(d), jfrom);
-  GGobiVariable *vart = ggobi_stage_get_variable(GGOBI_STAGE(d), jto);
+  GGobiVariable *varf = ggobi_stage_get_variable(d, jfrom);
+  GGobiVariable *vart = ggobi_stage_get_variable(d, jto);
 
   same = (
     vart->tform1 == varf->tform1 &&
@@ -143,12 +143,12 @@ transform_values_compare (gint jfrom, gint jto, GGobiData *d)
 }
 
 void
-transform0_values_set (gint tform0, gint j, GGobiData *d, ggobid *gg)
+transform0_values_set (gint tform0, gint j, GGobiStage *d, ggobid *gg)
 {
   gfloat domain_incr;
   gfloat (*domain_adj) (gfloat x, gfloat incr) = no_change;
   gfloat (*inv_domain_adj) (gfloat x, gfloat incr) = no_change;
-  GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(d), j);
+  GGobiVariable *var = ggobi_stage_get_variable(d, j);
 
   switch (tform0) {
 
@@ -193,9 +193,9 @@ transform0_values_set (gint tform0, gint j, GGobiData *d, ggobid *gg)
 
 void
 transform1_values_set (gint tform1, gfloat expt, gint j, 
-  GGobiData *d, ggobid *gg)
+  GGobiStage *d, ggobid *gg)
 {
-  GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(d), j);
+  GGobiVariable *var = ggobi_stage_get_variable(d, j);
 
   var->tform1 = tform1;
   var->param = expt;
@@ -205,7 +205,7 @@ transform1_values_set (gint tform1, gfloat expt, gint j,
 }
 
 gboolean 
-transform1_apply (gint j, GGobiData *d, ggobid *gg)
+transform1_apply (gint j, GGobiStage *s, ggobid *gg)
 {
   gint i, m, n;
   gfloat min, max, diff;
@@ -216,9 +216,10 @@ transform1_apply (gint j, GGobiData *d, ggobid *gg)
   GtkWidget *stage1_cbox;
   gint tform1;
   gfloat boxcoxparam = gg->tform_ui.boxcox_adj->value;
-  GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(d), j);
+  GGobiVariable *var = ggobi_stage_get_variable(s, j);
   gfloat incr = var->domain_incr;
   gfloat (*domain_adj) (gfloat x, gfloat incr) = var->domain_adj;
+  GGobiData *d = GGOBI_DATA(ggobi_stage_get_root(s));
 
   stage1_cbox = widget_find_by_name (gg->tform_ui.window,
     "TFORM:stage1_options");
@@ -237,9 +238,9 @@ transform1_apply (gint j, GGobiData *d, ggobid *gg)
   switch (tform1)
   {
     case NO_TFORM1:    /*-- Apply the stage0 transformation --*/
-      for (i=0; i<d->nrows_in_plot; i++) {
-        m = d->rows_in_plot.els[i];
-        d->tform.vals[m][j] = (*domain_adj)(d->raw.vals[m][j], incr);
+      for (i=0; i<s->nrows_in_plot; i++) {
+        m = s->rows_in_plot.els[i];
+        s->tform.vals[m][j] = (*domain_adj)(d->raw.vals[m][j], incr);
       }
       /*-- apply the same transformation to the specified limits --*/
       if (var->lim_specified_p) {
@@ -250,8 +251,8 @@ transform1_apply (gint j, GGobiData *d, ggobid *gg)
 
     case BOXCOX:  /* Box-Cox power transform family */
       if (fabs (boxcoxparam-0) < .001) {       /* Natural log */
-        for (i=0; i<d->nrows_in_plot; i++) {
-          m = d->rows_in_plot.els[i];
+        for (i=0; i<s->nrows_in_plot; i++) {
+          m = s->rows_in_plot.els[i];
           if ((*domain_adj)(d->raw.vals[m][j], incr) <= 0) {
             g_printerr ("%f %f\n",
               d->raw.vals[m][j],
@@ -272,9 +273,9 @@ transform1_apply (gint j, GGobiData *d, ggobid *gg)
         }
 
         if (tform_ok) {  /*-- if all values are in the domain of log --*/
-          for (i=0; i<d->nrows_in_plot; i++) {
-            m = d->rows_in_plot.els[i];
-            d->tform.vals[m][j] = (gfloat)
+          for (i=0; i<s->nrows_in_plot; i++) {
+            m = s->rows_in_plot.els[i];
+            s->tform.vals[m][j] = (gfloat)
               log ((gdouble) ((*domain_adj)(d->raw.vals[m][j], incr)));
           }
 
@@ -290,9 +291,9 @@ transform1_apply (gint j, GGobiData *d, ggobid *gg)
 
       else {  /*-- if the exponent is outisde (-.001, .001) --*/
 
-        for (i=0; i<d->nrows_in_plot; i++) {
+        for (i=0; i<s->nrows_in_plot; i++) {
 
-          m = d->rows_in_plot.els[i];
+          m = s->rows_in_plot.els[i];
           dtmp = pow ((gdouble) (*domain_adj)(d->raw.vals[m][j], incr),
                       boxcoxparam);
           dtmp = (dtmp - 1.0) / boxcoxparam;
@@ -307,7 +308,7 @@ transform1_apply (gint j, GGobiData *d, ggobid *gg)
             tform_ok = false;
             break;
           } else {
-            d->tform.vals[m][j] = (gfloat) dtmp;
+            s->tform.vals[m][j] = (gfloat) dtmp;
           }
         }
 
@@ -330,8 +331,8 @@ transform1_apply (gint j, GGobiData *d, ggobid *gg)
     break;
 
     case LOG10:    /* Base 10 log */
-      for (i=0; i<d->nrows_in_plot; i++) {
-        m = d->rows_in_plot.els[i];
+      for (i=0; i<s->nrows_in_plot; i++) {
+        m = s->rows_in_plot.els[i];
         if ((*domain_adj)(d->raw.vals[m][j], incr) <= 0) {
           quick_message (domain_error_message, false);
           tform_ok = false;
@@ -349,9 +350,9 @@ transform1_apply (gint j, GGobiData *d, ggobid *gg)
       }
 
       if (tform_ok) {  /*-- if all values are in the domain of log10 --*/
-        for (i=0; i<d->nrows_in_plot; i++) {
-          m = d->rows_in_plot.els[i];
-          d->tform.vals[m][j] = (gfloat)
+        for (i=0; i<s->nrows_in_plot; i++) {
+          m = s->rows_in_plot.els[i];
+          s->tform.vals[m][j] = (gfloat)
             log10 ((gdouble) (*domain_adj)(d->raw.vals[m][j], incr));
         }
         /*-- apply the same transformation to the specified limits --*/
@@ -365,9 +366,9 @@ transform1_apply (gint j, GGobiData *d, ggobid *gg)
     break;
 
     case INVERSE:    /* 1/x: require all data to be of the same sign */
-      for (i=0; i<d->nrows_in_plot-1; i++) {
-        m = d->rows_in_plot.els[i];
-        n = d->rows_in_plot.els[i+1];
+      for (i=0; i<s->nrows_in_plot-1; i++) {
+        m = s->rows_in_plot.els[i];
+        n = s->rows_in_plot.els[i+1];
         if (SIGNUM((*domain_adj)(d->raw.vals[m][j], incr)) !=
             SIGNUM((*domain_adj)(d->raw.vals[n][j], incr)))
         {
@@ -387,9 +388,9 @@ transform1_apply (gint j, GGobiData *d, ggobid *gg)
       }
 
       if (tform_ok) {
-        for (i=0; i<d->nrows_in_plot; i++) {
-          m = d->rows_in_plot.els[i];
-          d->tform.vals[m][j] = (gfloat)
+        for (i=0; i<s->nrows_in_plot; i++) {
+          m = s->rows_in_plot.els[i];
+          s->tform.vals[m][j] = (gfloat)
             pow ((gdouble) (*domain_adj)(d->raw.vals[m][j], incr),
               (gdouble) (-1.0));
         }
@@ -405,10 +406,10 @@ transform1_apply (gint j, GGobiData *d, ggobid *gg)
     break;
 
     case ABSVALUE:
-      for (i=0; i<d->nrows_in_plot; i++) {
-        m = d->rows_in_plot.els[i];
+      for (i=0; i<s->nrows_in_plot; i++) {
+        m = s->rows_in_plot.els[i];
         ftmp = (*domain_adj)(d->raw.vals[m][j], incr);
-        d->tform.vals[m][j] = (ftmp >= 0 ? ftmp : -1 * ftmp);
+        s->tform.vals[m][j] = (ftmp >= 0 ? ftmp : -1 * ftmp);
       }
       /*-- apply the same transformation to the specified limits --*/
       if (var->lim_specified_p) {
@@ -442,8 +443,8 @@ transform1_apply (gint j, GGobiData *d, ggobid *gg)
         max = slim_tform.max;
       } else {
         min = max = (*domain_adj)(d->raw.vals[0][j], incr);
-        for (i=0; i<d->nrows_in_plot; i++) {
-          m = d->rows_in_plot.els[i];
+        for (i=0; i<s->nrows_in_plot; i++) {
+          m = s->rows_in_plot.els[i];
           ref = (*domain_adj)(d->raw.vals[m][j], incr);
           if (ref < min) min = ref;
           if (ref > max) max = ref;
@@ -453,10 +454,10 @@ transform1_apply (gint j, GGobiData *d, ggobid *gg)
       limits_adjust (&min, &max);
       diff = max - min;
 
-      for (i=0; i<d->nrows_in_plot; i++) {
-        m = d->rows_in_plot.els[i];
+      for (i=0; i<s->nrows_in_plot; i++) {
+        m = s->rows_in_plot.els[i];
         ftmp = ((*domain_adj)(d->raw.vals[m][j], incr) - min)/diff;
-        d->tform.vals[m][j] = (ftmp * bminusa) + a;
+        s->tform.vals[m][j] = (ftmp * bminusa) + a;
       }
     }
     break;
@@ -474,9 +475,9 @@ transform1_apply (gint j, GGobiData *d, ggobid *gg)
 }
 
 void
-transform2_values_set (gint tform2, gint j, GGobiData *d, ggobid *gg)
+transform2_values_set (gint tform2, gint j, GGobiStage *d, ggobid *gg)
 {
-  GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(d), j);
+  GGobiVariable *var = ggobi_stage_get_variable(d, j);
 
   var->tform2 = tform2;
 
@@ -485,7 +486,7 @@ transform2_values_set (gint tform2, gint j, GGobiData *d, ggobid *gg)
 }
 
 gboolean 
-transform2_apply (gint jcol, GGobiData *d, ggobid *gg)
+transform2_apply (gint jcol, GGobiStage *d, ggobid *gg)
 {
   gint i, m;
   gboolean tform_ok = true;
@@ -665,7 +666,7 @@ transform2_apply (gint jcol, GGobiData *d, ggobid *gg)
 */
 gboolean
 transform_variable (gint stage, gint tform_type, gfloat param, gint jcol,
-  GGobiData *d, ggobid *gg)
+  GGobiStage *d, ggobid *gg)
 {
   gboolean success = true;
 
@@ -718,7 +719,7 @@ transform_variable (gint stage, gint tform_type, gfloat param, gint jcol,
 
 void
 transform (gint stage, gint tform_type, gfloat param, gint *vars, gint nvars,
-  GGobiData *d, ggobid *gg) 
+  GGobiStage *d, ggobid *gg) 
 {
   guint k;
   gboolean ok = true;

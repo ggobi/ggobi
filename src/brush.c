@@ -82,7 +82,7 @@ set_lattribute_from_ltype (gint ltype, ggobid * gg)
 /*----------------------------------------------------------------------*/
 
 void
-brush_draw_label (splotd * sp, GdkDrawable * drawable, GGobiData * d,
+brush_draw_label (splotd * sp, GdkDrawable * drawable, GGobiStage * d,
                   ggobid * gg)
 {
   PangoRectangle rect;
@@ -103,7 +103,7 @@ brush_draw_label (splotd * sp, GdkDrawable * drawable, GGobiData * d,
 }
 
 void
-brush_draw_brush (splotd * sp, GdkDrawable * drawable, GGobiData * d,
+brush_draw_brush (splotd * sp, GdkDrawable * drawable, GGobiStage * d,
                   ggobid * gg)
 {
 /*
@@ -232,14 +232,14 @@ brush_set_pos (gint x, gint y, splotd * sp)
 
 
 void
-brush_undo (GGobiData * d)
+brush_undo (GGobiStage * d)
 {
   gint m, i;
   g_return_if_fail(d);
 
   for (m = 0; m < d->nrows_in_plot; m++) {
     i = d->rows_in_plot.els[m];
-    ggobi_data_reset_attr(d, i, ATTR_SET_PERSISTENT);
+    ggobi_stage_reset_attr(d, i, ATTR_SET_PERSISTENT);
   }
 }
 
@@ -254,8 +254,8 @@ reinit_transient_brushing (displayd * dsp, ggobid * gg)
  * For now, don't make the same change for persistent brushing.
 */
   gint i, m, k;
-  GGobiData *d = dsp->d;
-  GGobiData *e = dsp->e;
+  GGobiStage *d = dsp->d;
+  GGobiStage *e = dsp->e;
   cpaneld *cpanel = &dsp->cpanel;
   gboolean point_painting_p = (cpanel->br.point_targets != br_off);
   gboolean edge_painting_p = (cpanel->br.edge_targets != br_off);
@@ -263,12 +263,12 @@ reinit_transient_brushing (displayd * dsp, ggobid * gg)
   if (point_painting_p) {
     for (m = 0; m < d->nrows_in_plot; m++) {
       i = d->rows_in_plot.els[m];
-      ggobi_data_reset_attr(d, i, ATTR_SET_TRANSIENT);
+      ggobi_stage_reset_attr(d, i, ATTR_SET_TRANSIENT);
     }
   }
   if (edge_painting_p && e) {
-    for (k = 0; k < e->edge.n; k++)
-      ggobi_data_reset_attr(e, k, ATTR_SET_TRANSIENT);
+    for (k = 0; k < ggobi_stage_get_n_edges(e); k++)
+      ggobi_stage_reset_attr(e, k, ATTR_SET_TRANSIENT);
   }
 }
 
@@ -328,8 +328,8 @@ under_brush (gint k, splotd * sp)
 static gboolean
 xed_by_brush (gint k, displayd * display, ggobid * gg)
 {
-  GGobiData *d = display->d;
-  GGobiData *e = display->e;
+  GGobiStage *d = display->d;
+  GGobiStage *e = display->e;
   splotd *sp = gg->current_splot;
   gboolean intersect;
   glong x1 = sp->brush_pos.x1;
@@ -377,10 +377,10 @@ xed_by_brush (gint k, displayd * display, ggobid * gg)
 /*----------------------------------------------------------------------*/
 
 static gboolean
-paint_points (cpaneld * cpanel, GGobiData * d, ggobid * gg)
+paint_points (cpaneld * cpanel, GGobiStage * d, ggobid * gg)
 {
   gint nd = g_slist_length (gg->d);
-  gboolean (*f) (cpaneld *, GGobiData *, ggobid *) = NULL;
+  gboolean (*f) (cpaneld *, GGobiStage *, ggobid *) = NULL;
 
   splotd *sp = gg->current_splot;
   displayd *display = (displayd *) sp->displayptr;
@@ -389,7 +389,7 @@ paint_points (cpaneld * cpanel, GGobiData * d, ggobid * gg)
     return f(cpanel, d, gg);
 
   for (guint i = 0; i < d->nrows_under_brush_prev; i++) {
-    ggobi_data_brush_point(d, (guint) d->rows_under_brush_prev.els[i], false,  
+    ggobi_stage_brush_point(d, (guint) d->rows_under_brush_prev.els[i], false,  
       cpanel->br.point_targets, cpanel->br.mode);
 
     if (!gg->linkby_cv && nd > 1)
@@ -397,7 +397,7 @@ paint_points (cpaneld * cpanel, GGobiData * d, ggobid * gg)
   }
   
   for (guint i = 0; i < d->nrows_under_brush; i++) {
-    ggobi_data_brush_point(d, (guint) d->rows_under_brush.els[i], true,  
+    ggobi_stage_brush_point(d, (guint) d->rows_under_brush.els[i], true,  
       cpanel->br.point_targets, cpanel->br.mode);
 
     if (!gg->linkby_cv && nd > 1)
@@ -429,7 +429,7 @@ paint_points (cpaneld * cpanel, GGobiData * d, ggobid * gg)
       brushed = false;
       j++;
     }    
-    changed = ggobi_data_brush_point(d, pt, brushed, 
+    changed = ggobi_stage_brush_point(d, pt, brushed, 
       cpanel->br.point_targets, cpanel->br.mode);
     if (!gg->linkby_cv && nd > 1)
       symbol_link_by_id (false, pt, d, gg);
@@ -442,14 +442,14 @@ paint_points (cpaneld * cpanel, GGobiData * d, ggobid * gg)
 
 
 static gboolean
-paint_edges (cpaneld * cpanel, GGobiData * e, ggobid * gg)
+paint_edges (cpaneld * cpanel, GGobiStage * e, ggobid * gg)
 {
   gint i;
   gboolean changed = false;
   gint nd = g_slist_length (gg->d);
 
-  for (i = 0; i < e->edge.n; i++) {
-    changed = ggobi_data_brush_point(e, i, e->edge.xed_by_brush.els[i], 
+  for (i = 0; i < ggobi_stage_get_n_edges(e); i++) {
+    changed = ggobi_stage_brush_point(e, i, ggobi_stage_get_edge_data(e)->xed_by_brush.els[i], 
       cpanel->br.edge_targets, cpanel->br.mode) || changed;
 
     if (!gg->linkby_cv && nd > 1)
@@ -461,23 +461,23 @@ paint_edges (cpaneld * cpanel, GGobiData * e, ggobid * gg)
 
 /**
  * update_points_under_brush:
- * @d: #GGobiData
+ * @d: #GGobiStage
  * @splotd: plot in which brush is located
  * 
- * Update points under brush in #GGobiData object to
+ * Update points under brush in #GGobiStage object to
  * reflect which points are under the brush in the specified
  * plot.
  *
  * Will use points_update_paint method of #splotd object, if available
 **/
 static void
-update_points_under_brush(GGobiData *d, splotd *sp)
+update_points_under_brush(GGobiStage *d, splotd *sp)
 {
   displayd *display = (displayd *) sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
   guint ih, iv, j, pt;
   BrushTargetType ttype = cpanel->br.point_targets;
-  gint (*f) (splotd * sp, GGobiData *, ggobid *) = NULL;
+  gint (*f) (splotd * sp, GGobiStage *, ggobid *) = NULL;
 
   f = GGOBI_EXTENDED_SPLOT_GET_CLASS (sp)->active_paint_points;
   if (f) {
@@ -498,7 +498,7 @@ update_points_under_brush(GGobiData *d, splotd *sp)
         /*
          * Ignore hidden cases unless shadow or unshadow brushing.
          */
-        if (ggobi_data_get_attr_hidden(d, pt) && ttype != br_unshadow)
+        if (ggobi_stage_get_attr_hidden(d, pt) && ttype != br_unshadow)
           continue;
 
         if (splot_plot_case(pt, d, sp, display, d->gg) && under_brush (pt, sp))
@@ -511,34 +511,34 @@ update_points_under_brush(GGobiData *d, splotd *sp)
 
 /**
  * update_edges_under_brush:
- * @d: #GGobiData
+ * @d: #GGobiStage
  * @splotd: plot in which brush is located
  * 
- * Update edges under brush in #GGobiData object to
+ * Update edges under brush in #GGobiStage object to
  * reflect which edges are under the brush in the specified
  * plot.
 **/
 void
-update_edges_under_brush(GGobiData *d, splotd *sp)
+update_edges_under_brush(GGobiStage *d, splotd *sp)
 {
   gint k;
   displayd *display = sp->displayptr;
 
-  g_assert (d->edge.xed_by_brush.nels == d->edge.n);
+  g_assert (ggobi_stage_get_edge_data(d)->xed_by_brush.nels == ggobi_stage_get_n_edges(d));
 
-  for (k = 0; k < d->edge.n; k++) {
+  for (k = 0; k < ggobi_stage_get_n_edges(d); k++) {
     if (xed_by_brush (k, display, d->gg)) {
-      d->edge.nxed_by_brush++;
-      d->edge.xed_by_brush.els[k] = true;
+      ggobi_stage_get_edge_data(d)->nxed_by_brush++;
+      ggobi_stage_get_edge_data(d)->xed_by_brush.els[k] = true;
     } else {
-      d->edge.xed_by_brush.els[k] = false;
+      ggobi_stage_get_edge_data(d)->xed_by_brush.els[k] = false;
     }
   }
 }
 
 
 gboolean
-edges_update_paint (splotd * sp, GGobiData * e, ggobid * gg)
+edges_update_paint (splotd * sp, GGobiStage * e, ggobid * gg)
 {
   displayd *display = sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
@@ -553,7 +553,7 @@ edges_update_paint (splotd * sp, GGobiData * e, ggobid * gg)
 }
 
 gboolean
-points_update_paint (splotd * sp, GGobiData * d, ggobid * gg)
+points_update_paint (splotd * sp, GGobiStage * d, ggobid * gg)
 {
   displayd *display = sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
@@ -580,8 +580,8 @@ brush_once (gboolean force, splotd * sp, ggobid * gg)
  * brush; bin1 is the one containing of the lower right corner.
 */
   displayd *display = sp->displayptr;
-  GGobiData *d = display->d;
-  GGobiData *e = display->e;
+  GGobiStage *d = display->d;
+  GGobiStage *e = display->e;
 
   brush_coords *brush_pos = &sp->brush_pos;
 

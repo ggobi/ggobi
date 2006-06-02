@@ -23,11 +23,11 @@
 
 
 void
-tform_to_world_by_var (GGobiData * d, guint j)
+tform_to_world_by_var (GGobiStage * d, guint j)
 {
   gint i, m;
   greal max, min, range, ftmp;
-  GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(d), j);
+  GGobiVariable *var = ggobi_stage_get_variable(d, j);
 
   ggobi_variable_get_limits(var, &min, &max);
   range = max - min;
@@ -43,11 +43,11 @@ tform_to_world_by_var (GGobiData * d, guint j)
 }
 
 void
-tform_to_world (GGobiData * d)
+tform_to_world (GGobiStage * d)
 {
   guint j;
 
-  for (j = 0; j < GGOBI_STAGE(d)->n_cols; j++)
+  for (j = 0; j < d->n_cols; j++)
     tform_to_world_by_var (d, j);
 }
 
@@ -173,12 +173,12 @@ pt_plane_to_world (splotd * sp, gcoords * planar, gcoords * eps,
 }
 
 void
-pt_world_to_raw_by_var (gint j, greal * world, greal * raw, GGobiData * d)
+pt_world_to_raw_by_var (gint j, greal * world, greal * raw, GGobiStage * d)
 {
   gfloat precis = PRECISION1;
   gfloat ftmp, rdiff;
   gfloat x;
-  GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(d), j);
+  GGobiVariable *var = ggobi_stage_get_variable(d, j);
 
   rdiff = ggobi_variable_get_range(var);
 
@@ -191,17 +191,17 @@ pt_world_to_raw_by_var (gint j, greal * world, greal * raw, GGobiData * d)
 
 void
 pt_screen_to_raw (icoords * screen, gint id, gboolean horiz, gboolean vert,
-                  greal * raw, gcoords * eps, GGobiData * d, splotd * sp,
+                  greal * raw, gcoords * eps, GGobiStage * d, splotd * sp,
                   ggobid * gg)
 {
   gint j;
   gcoords planar;
-  greal *world = (greal *) g_malloc0 (GGOBI_STAGE(d)->n_cols * sizeof (greal));
+  greal *world = (greal *) g_malloc0 (d->n_cols * sizeof (greal));
 
   pt_screen_to_plane (screen, id, horiz, vert, eps, &planar, sp);
   pt_plane_to_world (sp, &planar, &planar, world);
 
-  for (j = 0; j < GGOBI_STAGE(d)->n_cols; j++)
+  for (j = 0; j < d->n_cols; j++)
     pt_world_to_raw_by_var (j, world, raw, d);
 
   g_free (world);

@@ -106,7 +106,7 @@ setShowAxesOption (displayd * display, gboolean active)
 static void
 selectXVar (GtkWidget * w, displayd * display, gint jvar, ggobid * gg)
 {
-  GGobiData *d = display->d;
+  GGobiStage *d = display->d;
   splotd *sp = (splotd *) display->splots->data;
   cpaneld *cpanel = &display->cpanel;
 
@@ -114,14 +114,14 @@ selectXVar (GtkWidget * w, displayd * display, gint jvar, ggobid * gg)
 }
 
 static void
-varpanelRefresh (displayd * display, splotd * sp, GGobiData * d)
+varpanelRefresh (displayd * display, splotd * sp, GGobiStage * d)
 {
   cpaneld *cpanel = &display->cpanel;
   gint j;
 
   switch (cpanel->pmode) {
   case P1PLOT:
-    for (j = 0; j < GGOBI_STAGE(d)->n_cols; j++) {
+    for (j = 0; j < d->n_cols; j++) {
       varpanel_toggle_set_active (VARSEL_X, j, j == sp->p1dvar, d);
 
       varpanel_toggle_set_active (VARSEL_Y, j, false, d);
@@ -131,7 +131,7 @@ varpanelRefresh (displayd * display, splotd * sp, GGobiData * d)
     }
     break;
   case XYPLOT:
-    for (j = 0; j < GGOBI_STAGE(d)->n_cols; j++) {
+    for (j = 0; j < d->n_cols; j++) {
       varpanel_toggle_set_active (VARSEL_X, j, (j == sp->xyvars.x), d);
       varpanel_widget_set_visible (VARSEL_Y, j, true, d);
       varpanel_toggle_set_active (VARSEL_Y, j, (j == sp->xyvars.y), d);
@@ -142,7 +142,7 @@ varpanelRefresh (displayd * display, splotd * sp, GGobiData * d)
     break;
 
   case TOUR1D:
-    for (j = 0; j < GGOBI_STAGE(d)->n_cols; j++) {
+    for (j = 0; j < d->n_cols; j++) {
       varpanel_toggle_set_active (VARSEL_X, j, false, d);
       varpanel_toggle_set_active (VARSEL_Y, j, false, d);
       varpanel_widget_set_visible (VARSEL_Y, j, false, d);
@@ -156,7 +156,7 @@ varpanelRefresh (displayd * display, splotd * sp, GGobiData * d)
     break;
 
   case TOUR2D3:
-    for (j = 0; j < GGOBI_STAGE(d)->n_cols; j++) {
+    for (j = 0; j < d->n_cols; j++) {
       varpanel_toggle_set_active (VARSEL_X, j, false, d);
       varpanel_toggle_set_active (VARSEL_Y, j, false, d);
       varpanel_widget_set_visible (VARSEL_Y, j, true, d);
@@ -173,7 +173,7 @@ varpanelRefresh (displayd * display, splotd * sp, GGobiData * d)
     break;
 
   case TOUR2D:
-    for (j = 0; j < GGOBI_STAGE(d)->n_cols; j++) {
+    for (j = 0; j < d->n_cols; j++) {
       varpanel_toggle_set_active (VARSEL_X, j, false, d);
       varpanel_toggle_set_active (VARSEL_Y, j, false, d);
       varpanel_widget_set_visible (VARSEL_Y, j, false, d);
@@ -186,7 +186,7 @@ varpanelRefresh (displayd * display, splotd * sp, GGobiData * d)
     }
     break;
   case COTOUR:
-    for (j = 0; j < GGOBI_STAGE(d)->n_cols; j++) {
+    for (j = 0; j < d->n_cols; j++) {
       varpanel_toggle_set_active (VARSEL_X, j, false, d);
       varpanel_toggle_set_active (VARSEL_Y, j, false, d);
       varpanel_widget_set_visible (VARSEL_Y, j, true, d);
@@ -427,7 +427,7 @@ varcircleDraw (displayd * display, gint jvar, GdkPixmap * da_pix, ggobid * gg)
 }
 
 static void
-tourCorrRealloc (displayd * dsp, gint nc, GGobiData * d)
+tourCorrRealloc (displayd * dsp, gint nc, GGobiStage * d)
 {
   /*
    * because display_tourcorr_init_null has been performed even if
@@ -528,7 +528,7 @@ tourCorrRealloc (displayd * dsp, gint nc, GGobiData * d)
 }
 
 static void
-tour2d3Realloc (displayd * dsp, gint nc, GGobiData * d)
+tour2d3Realloc (displayd * dsp, gint nc, GGobiStage * d)
 {
   gint old_ncols, i;
   /*
@@ -587,7 +587,7 @@ tour2d3Realloc (displayd * dsp, gint nc, GGobiData * d)
 }
 
 static void
-tour2dRealloc (displayd * dsp, gint nc, GGobiData * d)
+tour2dRealloc (displayd * dsp, gint nc, GGobiStage * d)
 {
   gint old_ncols, i;
   /*
@@ -646,7 +646,7 @@ tour2dRealloc (displayd * dsp, gint nc, GGobiData * d)
 }
 
 static void
-tour1dRealloc (displayd * dsp, gint nc, GGobiData * d)
+tour1dRealloc (displayd * dsp, gint nc, GGobiStage * d)
 {
   gint old_ncols, i;
   /*
@@ -705,7 +705,7 @@ tour1dRealloc (displayd * dsp, gint nc, GGobiData * d)
 
 /* XXX duncan and dfs: you need to sort this out
 void
-worldToRaw(displayd *display, splotd *sp, gint pt, GGobiData *d, ggobid *gg)
+worldToRaw(displayd *display, splotd *sp, gint pt, GGobiStage *d, ggobid *gg)
 {
   cpaneld *cpanel = &display->cpanel;
   ProjectionMode proj = cpanel->pmode;
@@ -756,7 +756,7 @@ void
 scatterplotMovePointsButtonCb (displayd * display, splotd * sp, GtkWidget * w,
                                GdkEventButton * event, ggobid * gg)
 {
-  GGobiData *d = gg->current_display->d;
+  GGobiStage *d = gg->current_display->d;
 
   if (d->nearest_point != -1) {
     movepts_history_add (d->nearest_point, sp, d, gg);
@@ -771,7 +771,7 @@ scatterplotMovePointsButtonCb (displayd * display, splotd * sp, GtkWidget * w,
           k = d->rows_in_plot.els[i];
           if (k == id);
           else if (d->clusterid.els[k] == cur_clust)
-            if (!ggobi_data_get_attr_hidden(d, k))
+            if (!ggobi_stage_get_attr_hidden(d, k))
               movepts_history_add (k, sp, d, gg);
         }
       }
@@ -785,7 +785,7 @@ void
 scatterplotMovePointsMotionCb (displayd * display, splotd * sp, GtkWidget * w,
                                GdkEventMotion * event, ggobid * gg)
 {
-  GGobiData *d = display->d;
+  GGobiStage *d = display->d;
   gboolean button1_p, button2_p;
   gboolean inwindow, wasinwindow;
 
@@ -951,7 +951,7 @@ varpanelHighd (displayd * display)
 }
 
 displayd *
-gtk_scatterplot_new (GGobiData * d, ggobid * gg)
+gtk_scatterplot_new (GGobiStage * d, ggobid * gg)
 {
   displayd *display;
   display = scatterplot_new (false, NULL, d, gg);
@@ -972,7 +972,7 @@ binningPermitted (displayd * dpy)
 {
   cpaneld *cpanel = &dpy->cpanel;
   ggobid *gg = dpy->ggobi;
-  GGobiData *e = dpy->e;
+  GGobiStage *e = dpy->e;
 
   if (pmode_get (dpy, gg) == P1PLOT &&
       cpanel->p1d.type == ASH && cpanel->p1d.ASH_add_lines_p)
@@ -982,7 +982,7 @@ binningPermitted (displayd * dpy)
      return(false);
    */
   /*-- if we're drawing edges --*/
-  if (e && ggobi_stage_get_n_edges(GGOBI_STAGE(e))) {
+  if (e && ggobi_stage_get_n_edges(e)) {
     if (dpy->options.edges_undirected_show_p ||
         dpy->options.edges_directed_show_p || dpy->options.whiskers_show_p) {
       return (false);
@@ -998,11 +998,11 @@ cpanelSet (displayd * dpy, cpaneld * cpanel, ggobid * gg)
   cpanel_p1d_set (dpy, cpanel, gg);
   cpanel_xyplot_set (dpy, cpanel, gg);
   cpanel_tour1d_set (dpy, cpanel, gg);
-  if (GGOBI_STAGE(dpy->d)->n_cols >= MIN_NVARS_FOR_TOUR2D3)
+  if (dpy->d->n_cols >= MIN_NVARS_FOR_TOUR2D3)
     cpanel_tour2d3_set (dpy, cpanel, gg);
-  if (GGOBI_STAGE(dpy->d)->n_cols >= MIN_NVARS_FOR_TOUR2D)
+  if (dpy->d->n_cols >= MIN_NVARS_FOR_TOUR2D)
     cpanel_tour2d_set (dpy, cpanel, gg);
-  if (GGOBI_STAGE(dpy->d)->n_cols >= MIN_NVARS_FOR_COTOUR)
+  if (dpy->d->n_cols >= MIN_NVARS_FOR_COTOUR)
     cpanel_tourcorr_set (dpy, cpanel, gg);
 
   cpanel_brush_set (dpy, cpanel, gg);
@@ -1033,7 +1033,7 @@ handlesInteraction (displayd * dpy, InteractionMode v)
 
 
 static gint
-plotted (displayd * display, gint * cols, gint ncols, GGobiData * d)
+plotted (displayd * display, gint * cols, gint ncols, GGobiStage * d)
 {
   gint j, k;
   splotd *sp = (splotd *) display->splots->data;  /*-- only one splot --*/
@@ -1184,7 +1184,7 @@ varpanelTooltipsReset (displayd * display, ggobid * gg, GtkWidget * wx,
 }
 
 static gint
-plottedVarsGet (displayd * display, gint * cols, GGobiData * d, ggobid * gg)
+plottedVarsGet (displayd * display, gint * cols, GGobiStage * d, ggobid * gg)
 {
   ProjectionMode mode = pmode_get (display, gg);
   gint ncols = 0, k;
@@ -1238,7 +1238,7 @@ add_xml_scatterplot_variables (xmlNodePtr node, GList * plots, displayd * dpy)
 
 /* Splot methods. */
 static gchar *
-treeLabel (splotd * splot, GGobiData * d, ggobid * gg)
+treeLabel (splotd * splot, GGobiStage * d, ggobid * gg)
 {
   gchar *buf = NULL;
   displayd *display = (displayd *) splot->displayptr;
@@ -1247,13 +1247,13 @@ treeLabel (splotd * splot, GGobiData * d, ggobid * gg)
   switch (cpanel->pmode) {
   case P1PLOT:
   case TOUR1D:
-    buf = ggobi_stage_get_col_name(GGOBI_STAGE(d), splot->p1dvar);
+    buf = ggobi_stage_get_col_name(d, splot->p1dvar);
     break;
 
   case XYPLOT:
     buf = g_strdup_printf("%s v %s", 
-      ggobi_stage_get_col_name(GGOBI_STAGE(d), splot->xyvars.x), 
-      ggobi_stage_get_col_name(GGOBI_STAGE(d), splot->xyvars.y)
+      ggobi_stage_get_col_name(d, splot->xyvars.x), 
+      ggobi_stage_get_col_name(d, splot->xyvars.y)
     );
     break;
 
@@ -1276,14 +1276,14 @@ treeLabel (splotd * splot, GGobiData * d, ggobid * gg)
 
 
 static void
-subPlaneToScreen (splotd * sp, displayd * dpy, GGobiData * d, ggobid * gg)
+subPlaneToScreen (splotd * sp, displayd * dpy, GGobiStage * d, ggobid * gg)
 {
   ash_baseline_set (&sp->p1d.ash_baseline, sp);
   ash_baseline_set (&sp->tour1d.ash_baseline, sp);
 }
 
 static void
-worldToPlane (splotd * sp, GGobiData * d, ggobid * gg)
+worldToPlane (splotd * sp, GGobiStage * d, ggobid * gg)
 {
   cpaneld *cpanel = &(sp->displayptr->cpanel);
 
@@ -1317,7 +1317,7 @@ worldToPlane (splotd * sp, GGobiData * d, ggobid * gg)
 }
 
 static gboolean
-drawCase (splotd * sp, gint m, GGobiData * d, ggobid * gg)
+drawCase (splotd * sp, gint m, GGobiStage * d, ggobid * gg)
 {
   displayd *display = sp->displayptr;
   gboolean draw_case = true;
@@ -1326,18 +1326,18 @@ drawCase (splotd * sp, gint m, GGobiData * d, ggobid * gg)
 
   switch (proj) {
   case P1PLOT:
-    if (ggobi_stage_is_missing(GGOBI_STAGE(d), m, sp->p1dvar))
+    if (ggobi_stage_is_missing(d, m, sp->p1dvar))
       draw_case = false;
     break;
   case XYPLOT:
-    if (ggobi_stage_is_missing(GGOBI_STAGE(d), m, sp->xyvars.x))
+    if (ggobi_stage_is_missing(d, m, sp->xyvars.x))
       draw_case = false;
-    else if (ggobi_stage_is_missing(GGOBI_STAGE(d), m, sp->xyvars.y))
+    else if (ggobi_stage_is_missing(d, m, sp->xyvars.y))
       draw_case = false;
     break;
   case TOUR1D:
     for (j = 0; j < display->t1d.nactive; j++) {
-      if (ggobi_stage_is_missing(GGOBI_STAGE(d), m, display->t1d.active_vars.els[j])) {
+      if (ggobi_stage_is_missing(d, m, display->t1d.active_vars.els[j])) {
         draw_case = false;
         break;
       }
@@ -1345,7 +1345,7 @@ drawCase (splotd * sp, gint m, GGobiData * d, ggobid * gg)
     break;
   case TOUR2D3:
     for (j = 0; j < display->t2d3.nactive; j++) {
-      if (ggobi_stage_is_missing(GGOBI_STAGE(d), m, display->t2d3.active_vars.els[j])) {
+      if (ggobi_stage_is_missing(d, m, display->t2d3.active_vars.els[j])) {
         draw_case = false;
         break;
       }
@@ -1353,7 +1353,7 @@ drawCase (splotd * sp, gint m, GGobiData * d, ggobid * gg)
     break;
   case TOUR2D:
     for (j = 0; j < display->t2d.nactive; j++) {
-      if (ggobi_stage_is_missing(GGOBI_STAGE(d), m, display->t2d.active_vars.els[j])) {
+      if (ggobi_stage_is_missing(d, m, display->t2d.active_vars.els[j])) {
         draw_case = false;
         break;
       }
@@ -1362,14 +1362,14 @@ drawCase (splotd * sp, gint m, GGobiData * d, ggobid * gg)
 
   case COTOUR:
     for (j = 0; j < display->tcorr1.nactive; j++) {
-      if (ggobi_stage_is_missing(GGOBI_STAGE(d), m, display->tcorr1.active_vars.els[j])) {
+      if (ggobi_stage_is_missing(d, m, display->tcorr1.active_vars.els[j])) {
         draw_case = false;
         break;
       }
     }
     if (draw_case) {
       for (j = 0; j < display->tcorr2.nactive; j++) {
-        if (ggobi_stage_is_missing(GGOBI_STAGE(d), m, display->tcorr2.active_vars.els[j])) {
+        if (ggobi_stage_is_missing(d, m, display->tcorr2.active_vars.els[j])) {
           draw_case = false;
           break;
         }
@@ -1388,7 +1388,7 @@ drawCase (splotd * sp, gint m, GGobiData * d, ggobid * gg)
 }
 
 static gboolean
-drawEdge (splotd * sp, gint m, GGobiData * d, GGobiData * e, ggobid * gg)
+drawEdge (splotd * sp, gint m, GGobiStage * d, GGobiStage * e, ggobid * gg)
 {
   displayd *display = sp->displayptr;
   gboolean draw_edge = true;
@@ -1396,33 +1396,33 @@ drawEdge (splotd * sp, gint m, GGobiData * d, GGobiData * e, ggobid * gg)
 
   switch (proj) {
   case P1PLOT:
-    if (ggobi_stage_is_missing(GGOBI_STAGE(e), m, sp->p1dvar))
+    if (ggobi_stage_is_missing(e, m, sp->p1dvar))
       draw_edge = false;
     break;
   case XYPLOT:
-    if (ggobi_stage_is_missing(GGOBI_STAGE(e), m, sp->xyvars.x))
+    if (ggobi_stage_is_missing(e, m, sp->xyvars.x))
       draw_edge = false;
-    else if (ggobi_stage_is_missing(GGOBI_STAGE(e), m, sp->xyvars.y))
+    else if (ggobi_stage_is_missing(e, m, sp->xyvars.y))
       draw_edge = false;
     break;
   case TOUR1D:
-    if (ggobi_stage_is_missing(GGOBI_STAGE(e), m, sp->displayptr->t1d.active_vars.els[m]))
+    if (ggobi_stage_is_missing(e, m, sp->displayptr->t1d.active_vars.els[m]))
       draw_edge = false;
     break;
 
   case TOUR2D3:
-    if (ggobi_stage_is_missing(GGOBI_STAGE(e), m, sp->displayptr->t2d3.active_vars.els[m]))
+    if (ggobi_stage_is_missing(e, m, sp->displayptr->t2d3.active_vars.els[m]))
       draw_edge = false;
     break;
   case TOUR2D:
-    if (ggobi_stage_is_missing(GGOBI_STAGE(e), m, sp->displayptr->t2d.active_vars.els[m]))
+    if (ggobi_stage_is_missing(e, m, sp->displayptr->t2d.active_vars.els[m]))
       draw_edge = false;
     break;
 
   case COTOUR:
-    if (ggobi_stage_is_missing(GGOBI_STAGE(e), m, sp->displayptr->tcorr1.active_vars.els[m]))
+    if (ggobi_stage_is_missing(e, m, sp->displayptr->tcorr1.active_vars.els[m]))
       draw_edge = false;
-    else if (ggobi_stage_is_missing(GGOBI_STAGE(e), m, sp->displayptr->tcorr2.active_vars.els[m]))
+    else if (ggobi_stage_is_missing(e, m, sp->displayptr->tcorr2.active_vars.els[m]))
       draw_edge = false;
     break;
   case NULL_PMODE:
@@ -1441,9 +1441,9 @@ scatter1DAddPlotLabels (splotd * sp, GdkDrawable * drawable, GdkGC * gc)
   PangoLayout *layout =
     gtk_widget_create_pango_layout (GTK_WIDGET (sp->da), NULL);
   PangoRectangle rect;
-  GGobiData *d = sp->displayptr->d;
+  GGobiStage *d = sp->displayptr->d;
 
-  layout_text (layout, ggobi_data_get_transformed_col_name(d, sp->p1dvar), &rect);
+  layout_text (layout, ggobi_stage_get_transformed_col_name(d, sp->p1dvar), &rect);
   gdk_draw_layout (drawable, gc,
                    sp->max.x / 2 - rect.width / 2,
                    sp->max.y - rect.height - 5, layout);
@@ -1457,15 +1457,15 @@ scatterXYAddPlotLabels (splotd * sp, GdkDrawable * drawable, GdkGC * gc)
     gtk_widget_create_pango_layout (GTK_WIDGET (sp->da), NULL);
   PangoRectangle rect;
 
-  GGobiData *d = sp->displayptr->d;
+  GGobiStage *d = sp->displayptr->d;
 
   /*-- xyplot: right justify the label --*/
-  layout_text (layout, ggobi_data_get_transformed_col_name(d, sp->xyvars.x), &rect);
+  layout_text (layout, ggobi_stage_get_transformed_col_name(d, sp->xyvars.x), &rect);
   gdk_draw_layout (drawable, gc,
                    sp->max.x - rect.width - 5,
                    sp->max.y - rect.height - 5, layout);
 
-  layout_text (layout, ggobi_data_get_transformed_col_name(d, sp->xyvars.y), &rect);
+  layout_text (layout, ggobi_stage_get_transformed_col_name(d, sp->xyvars.y), &rect);
   gdk_draw_layout (drawable, gc, 5, 5, layout);
   g_object_unref (G_OBJECT (layout));
 }
@@ -1512,7 +1512,7 @@ addMarkupCues (splotd * sp, GdkDrawable * drawable, ggobid * gg)
 {
 /* See splot_add_markup_to_pixmap */
   displayd *display = sp->displayptr;
-  GGobiData *e = display->e;
+  GGobiStage *e = display->e;
   if (e)
     if (display->options.edges_undirected_show_p ||
         display->options.edges_arrowheads_show_p ||
@@ -1536,7 +1536,7 @@ addScalingCues (splotd * sp, GdkDrawable * drawable, ggobid * gg)
 }
 
 static void
-splotAssignPointsToBins (GGobiData * d, splotd * sp, ggobid * gg)
+splotAssignPointsToBins (GGobiStage * d, splotd * sp, ggobid * gg)
 {
   if (sp == gg->current_splot)  /* whether binning permitted or not */
     assign_points_to_bins (d, sp, gg);
@@ -1550,7 +1550,7 @@ splotScreenToTform (cpaneld * cpanel, splotd * sp, icoords * scr,
   greal precis = (greal) PRECISION1;
   greal ftmp, max, min, rdiff;
   displayd *display = (displayd *) sp->displayptr;
-  GGobiData *d = display->d;
+  GGobiStage *d = display->d;
   gfloat scale_x, scale_y;
   GGobiVariable *var;
 
@@ -1575,7 +1575,7 @@ splotScreenToTform (cpaneld * cpanel, splotd * sp, icoords * scr,
 
   switch (cpanel->pmode) {
   case P1PLOT:
-    var = ggobi_stage_get_variable(GGOBI_STAGE(d), sp->p1dvar);
+    var = ggobi_stage_get_variable(d, sp->p1dvar);
     ggobi_variable_get_limits(var, &min, &max);
     rdiff = max - min;
 
@@ -1597,7 +1597,7 @@ splotScreenToTform (cpaneld * cpanel, splotd * sp, icoords * scr,
 
   case XYPLOT:
     /* x */
-    var = ggobi_stage_get_variable(GGOBI_STAGE(d), sp->xyvars.x);
+    var = ggobi_stage_get_variable(d, sp->xyvars.x);
     ggobi_variable_get_limits(var, &min, &max);
     rdiff = max - min;
     world.x = planar.x;
@@ -1606,7 +1606,7 @@ splotScreenToTform (cpaneld * cpanel, splotd * sp, icoords * scr,
     tfd->x += min;
 
     /* y */
-    var = ggobi_stage_get_variable(GGOBI_STAGE(d), sp->xyvars.y);
+    var = ggobi_stage_get_variable(d, sp->xyvars.y);
     ggobi_variable_get_limits(var, &min, &max);
     rdiff = max - min;
     world.y = planar.y;
@@ -1679,7 +1679,7 @@ scatterplotDisplayClassInit (GGobiScatterplotDisplayClass * klass)
 }
 
 static gint
-splotVariablesGet (splotd * sp, gint * cols, GGobiData * d)
+splotVariablesGet (splotd * sp, gint * cols, GGobiStage * d)
 {
   cols[0] = sp->xyvars.x;
   cols[1] = sp->xyvars.y;

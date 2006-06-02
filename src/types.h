@@ -93,7 +93,7 @@ typedef struct {
 } SortableEndpoints;
 typedef struct {
   endpointsd *endpoints;
-  GObject *data; /* GGobiData pointer*/
+  GObject *data; /* GGobiStage pointer*/
 } DatadEndpoints;
 
 

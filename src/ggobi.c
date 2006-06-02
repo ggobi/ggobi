@@ -180,7 +180,7 @@ gint
 ggobi_remove_by_index (ggobid * gg, gint which)
 {
   GSList *l;
-  GGobiData *d;
+  GGobiStage *d;
   gint numDatasets, i;
 
   /* Move all the entries after the one being removed
@@ -206,7 +206,7 @@ ggobi_remove_by_index (ggobid * gg, gint which)
    */
   numDatasets = g_slist_length (gg->d);
   for (i = 0, l = gg->d; l != NULL && i < numDatasets; i++, l = gg->d) {
-    d = (GGobiData *) l->data;
+    d = (GGobiStage *) l->data;
     /* temporarily disabled - broken anyway */
     //ggobi_data_free (d);
     gg->d = g_slist_remove (gg->d, d);
@@ -671,24 +671,24 @@ ggobi_getIndex (ggobid * gg)
   return (-1);
 }
 
-GGobiData *
+GGobiStage *
 ggobi_get_data (gint which, const ggobid * const gg)
 {
-  GGobiData *d;
+  GGobiStage *d;
   d = g_slist_nth_data (gg->d, which);
 
   return (d);
 }
 
-GGobiData *
+GGobiStage *
 ggobi_get_data_by_name (const gchar * const name, const ggobid * const gg)
 {
-  GGobiData *d;
+  GGobiStage *d;
   GSList *l;
 
   for (l = gg->d; l; l = l->next) {
-    d = (GGobiData *) l->data;
-    if (strcmp (ggobi_stage_get_name(GGOBI_STAGE(d)), name) == 0)
+    d = (GGobiStage *) l->data;
+    if (strcmp (ggobi_stage_get_name(d), name) == 0)
       return (d);
   }
   return (NULL);
@@ -713,8 +713,8 @@ ValidateGGobiRef (ggobid * gg, gboolean fatal)
   return (NULL);
 }
 
-GGobiData *
-ValidateDatadRef (GGobiData * d, ggobid * gg, gboolean fatal)
+GGobiStage *
+ValidateDatadRef (GGobiStage * d, ggobid * gg, gboolean fatal)
 {
   static gchar *error_msg = "Incorrect reference to datad.";
   gint i, n;
@@ -929,14 +929,14 @@ ndatad_with_vars_get (ggobid *gg)
 {
  gint nd;
  GSList *l;
- GGobiData *d;
+ GGobiStage *d;
 
  /*-- silly to do this every time, perhaps, but harmless, I think --*/
  if (g_slist_length (gg->d) > 1) {
    nd = 0;
    for (l = gg->d; l; l = l->next) {
-     d = (GGobiData *) l->data;
-     if (ggobi_stage_get_n_cols(GGOBI_STAGE(d)))
+     d = (GGobiStage *) l->data;
+     if (ggobi_stage_get_n_cols(d))
        nd++;
    }
  }  else nd = 1;

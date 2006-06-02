@@ -30,18 +30,18 @@
 /*-------------------------------------------------------------------------*/
 
 void
-br_edge_vectors_free (GGobiData * d)
+br_edge_vectors_free (GGobiStage * d)
 {
-  vectorb_free (&d->edge.xed_by_brush);
+  vectorb_free (&ggobi_stage_get_edge_data(d)->xed_by_brush);
 }
 
 gboolean
-br_edge_vectors_check_size (gint ns, GGobiData * d)
+br_edge_vectors_check_size (gint ns, GGobiStage * d)
 {
-  gboolean same = (d->edge.xed_by_brush.nels != ns);
+  gboolean same = (ggobi_stage_get_edge_data(d)->xed_by_brush.nels != ns);
 
   if (!same) {
-    vectorb_realloc (&d->edge.xed_by_brush, ns);
+    vectorb_realloc (&ggobi_stage_get_edge_data(d)->xed_by_brush, ns);
   }
 
   return same;
@@ -66,7 +66,7 @@ brush_pos_init (splotd * sp)
 /*----------------------------------------------------------------------*/
 
 void
-brush_free (GGobiData * d)
+brush_free (GGobiStage * d)
 /*
  * Dynamically free arrays.
 */
@@ -85,14 +85,14 @@ brush_free (GGobiData * d)
 RedrawStyle
 brush_activate (gboolean state, displayd * display, splotd * sp)
 {
-  GGobiData *d = display->d;
+  GGobiStage *d = display->d;
   RedrawStyle redraw_style = NONE;
 
   if (sp != d->gg->current_splot)
     return redraw_style;
 
   if (GGOBI_IS_EXTENDED_SPLOT (sp)) {
-    void (*f) (GGobiData *, splotd *, ggobid *);
+    void (*f) (GGobiStage *, splotd *, ggobid *);
     GGobiExtendedSPlotClass *klass;
     klass = GGOBI_EXTENDED_SPLOT_GET_CLASS (sp);
     if (state) {

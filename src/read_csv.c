@@ -91,11 +91,11 @@ typedef struct _Row
 
 static int csv_row_parse (Row * row, GIOChannel * channel, gint trim);
 static gboolean has_row_labels (GList * rows);
-static void load_column_labels (Row * row, GGobiData * d,
+static void load_column_labels (Row * row, GGobiStage * d,
                                 gboolean row_labels);
-static void load_row_labels (GList * rows, GGobiData * d,
+static void load_row_labels (GList * rows, GGobiStage * d,
                              gboolean has_labels);
-static void load_row_values (GList * rows, GGobiData * d,
+static void load_row_values (GList * rows, GGobiStage * d,
                              gboolean row_labels);
 static void tokenize_row (Row * row);
 GSList *read_csv_data (InputDescription * desc, ggobid * gg);
@@ -341,50 +341,50 @@ has_row_labels (GList * rows)
 }
 
 static void
-load_column_labels (Row * row, GGobiData * d, gboolean row_labels)
+load_column_labels (Row * row, GGobiStage * d, gboolean row_labels)
 {
   gint i;
   gint offset = (row_labels ? 1 : 0);
-  for (i = 0; i < ggobi_data_get_n_data_cols(d); i++) {
+  for (i = 0; i < ggobi_stage_get_n_data_cols(d); i++) {
     if (row->entry[i + offset].len == 0)
-      ggobi_stage_set_col_name(GGOBI_STAGE(d), i, NULL);
+      ggobi_stage_set_col_name(d, i, NULL);
     else
-      ggobi_stage_set_col_name(GGOBI_STAGE(d), i, row->src->str + row->entry[i + offset].ofs);
+      ggobi_stage_set_col_name(d, i, row->src->str + row->entry[i + offset].ofs);
   }
 }
 
 static void
-load_row_labels (GList * rows, GGobiData * d, gboolean has_labels)
+load_row_labels (GList * rows, GGobiStage * d, gboolean has_labels)
 {
   if (!has_labels)
     return;
 
   for (gint i = 0; rows; rows = g_list_next (rows), i++) {
     Row *row = (Row *) rows->data;
-    ggobi_stage_set_row_id(GGOBI_STAGE(d), i, row->src->str + row->entry[0].ofs, false);    
+    ggobi_stage_set_row_id(d, i, row->src->str + row->entry[0].ofs, false);    
   }
 }
 
 static void
-load_row_values (GList * rows, GGobiData * d, gboolean row_labels)
+load_row_values (GList * rows, GGobiStage * d, gboolean row_labels)
 {
   gint i, j, offset = (row_labels ? 1 : 0);
   GList *cur;
 
-  for (j = 0; j < ggobi_data_get_n_data_cols(d); j++) {
+  for (j = 0; j < ggobi_stage_get_n_data_cols(d); j++) {
     for (cur = rows, i = 0; cur; cur = cur->next, i++) {
       Row *row = (Row *) cur->data;
       gchar *str = row->src->str + row->entry[j + offset].ofs;
       
-      ggobi_stage_set_string_value(GGOBI_STAGE(d), i, j, str);
+      ggobi_stage_set_string_value(d, i, j, str);
     }
   }
 }
 
-static GGobiData *
+static GGobiStage *
 create_data (GList * rows, gchar * name)
 {
-  GGobiData *d;
+  GGobiStage *d;
   guint nrows = g_list_length (rows), ncols = 0;
 
   gboolean row_labels = has_row_labels (rows);
@@ -394,9 +394,9 @@ create_data (GList * rows, gchar * name)
   if (row_labels)
     ncols--;
 
-  d = ggobi_data_new (nrows - 1, ncols);
-  ggobi_data_add_attributes(d);
-  ggobi_stage_set_name(GGOBI_STAGE(d), name);
+  d = GGOBI_STAGE(ggobi_data_new (nrows - 1, ncols));
+  ggobi_data_add_attributes(GGOBI_DATA(d));
+  ggobi_stage_set_name(d, name);
 
   load_column_labels ((Row *) rows->data, d, row_labels);
   rows = g_list_next (rows);    /* skip the column labels */
@@ -420,7 +420,7 @@ tokenize_row (Row * row)
 GSList *
 read_csv_data (InputDescription * desc, ggobid * gg)
 {
-  GGobiData *d;
+  GGobiStage *d;
   GIOChannel *channel;
   gint ret;
   GList *rows = NULL;
@@ -456,7 +456,7 @@ read_csv_data (InputDescription * desc, ggobid * gg)
   /* Close the file */
   g_io_channel_shutdown (channel, FALSE, NULL);
 
-  /* Load the parsed data into the GGobiData */
+  /* Load the parsed data into the GGobiStage */
   d = create_data (rows, desc->baseName);
 
   /* Cleanup */

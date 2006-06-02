@@ -33,7 +33,7 @@ splot_draw_tour_axes (splotd * sp, GdkDrawable * drawable, ggobid * gg)
   displayd *dsp = (displayd *) sp->displayptr;
   cpaneld *cpanel = &dsp->cpanel;
   gint proj = cpanel->pmode;
-  GGobiData *d = dsp->d;
+  GGobiStage *d = dsp->d;
   gfloat dst, val;
   gint textheight = 0, textheight2;
   gchar *varlab, *varval;
@@ -73,10 +73,10 @@ splot_draw_tour_axes (splotd * sp, GdkDrawable * drawable, ggobid * gg)
 
         /*-- draw vertical lines to mark the min and max positions --*/
       gdk_draw_line (drawable, gg->plot_GC,
-                     dawidth / 4, daheight - textheight * GGOBI_STAGE(d)->n_cols - 10,
+                     dawidth / 4, daheight - textheight * d->n_cols - 10,
                      dawidth / 4, daheight);
       gdk_draw_line (drawable, gg->plot_GC,
-                     3 * dawidth / 4, daheight - textheight * GGOBI_STAGE(d)->n_cols - 10,
+                     3 * dawidth / 4, daheight - textheight * d->n_cols - 10,
                      3 * dawidth / 4, daheight);
 
       gdk_gc_set_line_attributes (gg->plot_GC, 2, GDK_LINE_SOLID,
@@ -118,8 +118,8 @@ splot_draw_tour_axes (splotd * sp, GdkDrawable * drawable, ggobid * gg)
  * the left if negative.
 */
         if (ix != dawidth / 2) {
-          var = ggobi_stage_get_variable(GGOBI_STAGE(d), j);
-          varlab = g_strdup_printf ("%s:%4.3f(%.2f)", ggobi_data_get_transformed_col_name(d, j),
+          var = ggobi_stage_get_variable(d, j);
+          varlab = g_strdup_printf ("%s:%4.3f(%.2f)", ggobi_stage_get_transformed_col_name(d, j),
                                     dsp->t1d.F.vals[0][j],
                                     ggobi_variable_get_range(var));
           layout_text (layout, varlab, &rect);
@@ -183,7 +183,7 @@ splot_draw_tour_axes (splotd * sp, GdkDrawable * drawable, ggobid * gg)
         if (abs (ix - axindent - dawidth / 8) > 5 ||
             abs (iy + axindent - (daheight - daheight / 8)) > 5) {
           if (dsp->options.axes_label_p) {
-            varlab = ggobi_stage_get_col_nickname(GGOBI_STAGE(d), j);
+            varlab = ggobi_stage_get_col_nickname(d, j);
           }
           else {
             varlab = g_strdup_printf ("%d", j + 1);
@@ -280,7 +280,7 @@ splot_draw_tour_axes (splotd * sp, GdkDrawable * drawable, ggobid * gg)
         if (abs (ix - axindent - daheight / 8) > 5 ||
             abs (iy + axindent - (daheight - daheight / 8)) > 5) {
           if (dsp->options.axes_label_p) {
-            varlab = ggobi_stage_get_col_nickname(GGOBI_STAGE(d), j);
+            varlab = ggobi_stage_get_col_nickname(d, j);
           }
           else {
             varlab = g_strdup_printf ("%d", j + 1);
@@ -310,7 +310,7 @@ splot_draw_tour_axes (splotd * sp, GdkDrawable * drawable, ggobid * gg)
 
         /* Drawing the axes values now */
         if (dsp->options.axes_values_p) {
-          var = ggobi_stage_get_variable(GGOBI_STAGE(d), j);
+          var = ggobi_stage_get_variable(d, j);
           varval = g_strdup_printf ("%d:%4.3f,%4.3f(%.2f)", j + 1,
                                     dsp->t2d.F.vals[0][j],
                                     dsp->t2d.F.vals[1][j],
@@ -332,7 +332,7 @@ splot_draw_tour_axes (splotd * sp, GdkDrawable * drawable, ggobid * gg)
 
       break;
     case COTOUR:
-      if (GGOBI_STAGE(d)->n_cols < MIN_NVARS_FOR_COTOUR)
+      if (d->n_cols < MIN_NVARS_FOR_COTOUR)
         break;
 
       nc = dsp->tcorr1.nsubset + dsp->tcorr2.nsubset;
@@ -359,21 +359,21 @@ splot_draw_tour_axes (splotd * sp, GdkDrawable * drawable, ggobid * gg)
                                   GDK_CAP_ROUND, GDK_JOIN_ROUND);
 
       k = 0;
-      for (j = 0; j < GGOBI_STAGE(d)->n_cols; j++) {
+      for (j = 0; j < d->n_cols; j++) {
         if (!dsp->tcorr1.subset_vars_p.els[j] &&
             !dsp->tcorr2.subset_vars_p.els[j])
           continue;
 
-        //var = ggobi_stage_get_variable(GGOBI_STAGE(d), j);
+        //var = ggobi_stage_get_variable(d, j);
         if (dsp->tcorr1.subset_vars_p.els[j]) {
           val = (ABS (dsp->tcorr1.F.vals[0][j]) > .004) ?
             dsp->tcorr1.F.vals[0][j] : 0.0;
-          varlab = g_strdup_printf ("%s:%3.2f,0", ggobi_data_get_transformed_col_name(d, j), val);
+          varlab = g_strdup_printf ("%s:%3.2f,0", ggobi_stage_get_transformed_col_name(d, j), val);
         }
         else {
           val = (ABS (dsp->tcorr2.F.vals[0][j]) > .004) ?
             dsp->tcorr2.F.vals[0][j] : 0.0;
-          varlab = g_strdup_printf ("%s:0,%3.2f", ggobi_data_get_transformed_col_name(d, j), val);
+          varlab = g_strdup_printf ("%s:0,%3.2f", ggobi_stage_get_transformed_col_name(d, j), val);
         }
 
         /* horizontal */

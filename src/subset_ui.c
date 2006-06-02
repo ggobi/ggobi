@@ -38,10 +38,10 @@ close_wmgr_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg) {
   gtk_widget_hide (gg->subset_ui.window);
 }
 
-static GGobiData *
+static GGobiStage *
 datad_get_from_widget (GtkWidget *w, ggobid *gg)
 {
-  GGobiData *d = NULL;
+  GGobiStage *d = NULL;
   GtkTreeSelection *sel;
   gint kd;
   
@@ -56,7 +56,7 @@ datad_get_from_widget (GtkWidget *w, ggobid *gg)
       sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view));
       kd = tree_selection_get_selected_row(sel);
       /*-- Assume that all datad's are included --*/
-      if (kd >= 0) d = (GGobiData *) g_slist_nth_data (gg->d, kd);
+      if (kd >= 0) d = (GGobiStage *) g_slist_nth_data (gg->d, kd);
     }
   }
 
@@ -87,13 +87,13 @@ static const gchar *const substr_lbl[] = {
 };
 static void subset_string_pos_cb (GtkWidget *w, ggobid *gg)
 {
-  GGobiData *d = datad_get_from_widget (w, gg);
+  GGobiStage *d = datad_get_from_widget (w, gg);
 
   d->subset.string_pos = gtk_combo_box_get_active(GTK_COMBO_BOX(w));
 }
 
 static void
-subset_display_update (GGobiData *d, ggobid *gg)
+subset_display_update (GGobiStage *d, ggobid *gg)
 {
   GtkWidget *spinbtn, *entry;
   /*
@@ -126,7 +126,7 @@ subset_display_update (GGobiData *d, ggobid *gg)
   entry = (GtkWidget *)
     g_object_get_data(G_OBJECT(gg->subset_ui.window), "SS:NROWS_ENTRY");
   if (entry) {
-    gchar *txt = g_strdup_printf ("%d", GGOBI_STAGE(d)->n_rows);
+    gchar *txt = g_strdup_printf ("%d", d->n_rows);
     gtk_entry_set_text (GTK_ENTRY (entry), txt);
     g_free (txt);
   }
@@ -140,7 +140,7 @@ subset_datad_set_cb (GtkTreeSelection *tree_sel, ggobid *gg)
   /*-- Assume that all datad's are included --*/
   gint row = tree_selection_get_selected_row(tree_sel);
   if (row != -1) {
-    GGobiData *d = g_slist_nth_data (gg->d, row);
+    GGobiStage *d = g_slist_nth_data (gg->d, row);
     if (d)
       subset_display_update (d, gg);
   }
@@ -149,7 +149,7 @@ subset_datad_set_cb (GtkTreeSelection *tree_sel, ggobid *gg)
 static void
 rescale_cb (GtkWidget *w, ggobid *gg)
 {
-  GGobiData *d = datad_get_from_widget (w, gg);
+  GGobiStage *d = datad_get_from_widget (w, gg);
   if (d) {
     limits_set (d, true, true, gg->lims_use_visible);
     vartable_limits_set (d);
@@ -168,7 +168,7 @@ subset_cb (GtkWidget *w, ggobid *gg)
   gint bstart, bsize;
   gint estart, estep;
   gboolean redraw = false;
-  GGobiData *d = datad_get_from_widget (w, gg);
+  GGobiStage *d = datad_get_from_widget (w, gg);
   GtkWidget *entry, *tgl;
 
   if (!d)
@@ -223,7 +223,7 @@ subset_cb (GtkWidget *w, ggobid *gg)
 
 static void
 include_all_cb (GtkWidget *w, ggobid *gg) {
-  GGobiData *d = datad_get_from_widget (w, gg);
+  GGobiStage *d = datad_get_from_widget (w, gg);
 
   if (d != NULL) {
     subset_set_all (d, true);
@@ -233,7 +233,7 @@ include_all_cb (GtkWidget *w, ggobid *gg) {
 
 
 static void 
-subset_tree_view_datad_added_cb (ggobid *gg, GGobiData *d, GtkWidget *tree_view)
+subset_tree_view_datad_added_cb (ggobid *gg, GGobiStage *d, GtkWidget *tree_view)
 {
   GtkTreeIter iter;
   GtkTreeModel *model;
@@ -243,7 +243,7 @@ subset_tree_view_datad_added_cb (ggobid *gg, GGobiData *d, GtkWidget *tree_view)
   subset_init (d, gg);
   model = gtk_tree_view_get_model(GTK_TREE_VIEW(tree_view));
   gtk_list_store_append(GTK_LIST_STORE(model), &iter);
-  gtk_list_store_set(GTK_LIST_STORE(model), &iter, 0, ggobi_stage_get_name(GGOBI_STAGE(d)));
+  gtk_list_store_set(GTK_LIST_STORE(model), &iter, 0, ggobi_stage_get_name(d));
 
   gtk_widget_show_all (swin);
 }
@@ -258,7 +258,7 @@ subset_window_open (ggobid *gg) {
   GtkWidget *button, *t;
   GtkWidget *vbox, *frame, *hb, *vb, *button_hbox, *close_hbox;
   GtkWidget *label, *btn, *spinbtn, *entry, *opt;
-  GGobiData *d;
+  GGobiStage *d;
   static gchar *tree_view_titles[1] = {"datasets"};
 
   GtkWidget *swin, *tree_view;
@@ -305,10 +305,10 @@ subset_window_open (ggobid *gg) {
       /*-- All datad's are included. This assumption is used in two places. */
       for (l = gg->d; l; l = l->next) {
         GtkTreeIter iter;
-        d = (GGobiData *) l->data;
+        d = (GGobiStage *) l->data;
         subset_init (d, gg);
         gtk_list_store_append(model, &iter);
-        gtk_list_store_set(model, &iter, 0, ggobi_stage_get_name(GGOBI_STAGE(d)), -1);
+        gtk_list_store_set(model, &iter, 0, ggobi_stage_get_name(d), -1);
         if (l == gg->d)
           gtk_tree_selection_select_iter(gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view)), &iter);
       }

@@ -313,13 +313,13 @@ init_var_GCs (GtkWidget * w, ggobid * gg)
 
 gushort  /*-- returns the maximum color id --*/
 datad_colors_used_get (gint * ncolors_used, gushort * colors_used,
-                       GGobiData * d, ggobid * gg)
+                       GGobiStage * d, ggobid * gg)
 {
   gboolean new_color;
   gint i, k, m, n;
   gushort colorid, maxcolorid = 0;
 
-  if (d == NULL || GGOBI_STAGE(d)->n_rows== 0)
+  if (d == NULL || d->n_rows== 0)
     /**/ return -1;
 
   n = 0;  /*-- *ncolors_used --*/
@@ -330,19 +330,19 @@ datad_colors_used_get (gint * ncolors_used, gushort * colors_used,
    */
   for (i = 0; i < d->nrows_in_plot; i++) {
     m = d->rows_in_plot.els[i];
-    if (ggobi_data_get_attr_hidden(d, m)) {  /*-- if it's hidden, we don't care --*/
+    if (ggobi_stage_get_attr_hidden(d, m)) {  /*-- if it's hidden, we don't care --*/
       new_color = false;
     } else {
       new_color = true;
       for (k = 0; k < n; k++) {
-        if (colors_used[k] == ggobi_data_get_attr_color(d, m)) {
+        if (colors_used[k] == ggobi_stage_get_attr_color(d, m)) {
           new_color = false;
           break;
         }
       }
     }
     if (new_color) {
-      colorid = ggobi_data_get_attr_color(d, m);
+      colorid = ggobi_stage_get_attr_color(d, m);
       colors_used[n] = colorid;
       maxcolorid = MAX (colorid, maxcolorid);
       (n)++;
@@ -366,7 +366,7 @@ datad_colors_used_get (gint * ncolors_used, gushort * colors_used,
   /* insurance -- eg if using mono drawing on a color screen */
   if (n == 0) {
     n = 1;
-    colors_used[0] = ggobi_data_get_attr_color(d, 0);
+    colors_used[0] = ggobi_stage_get_attr_color(d, 0);
   }
 
   *ncolors_used = n;

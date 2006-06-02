@@ -140,18 +140,18 @@ extern DataMode ggobi_setDataMode(DataMode newMode, ggobid *gg);
  * A double array (double **) would be useful also.
 */
 extern void ggobi_setData(gdouble *values, gchar **rownames, gchar **colnames,
-  gint nr, gint nc, GGobiData *d, gboolean initPlot, ggobid *gg,
+  gint nr, gint nc, GGobiStage *d, gboolean initPlot, ggobid *gg,
   gboolean duplicate, InputDescription *);
 
 
-extern void ggobi_setDataName(const char * const name, GGobiData *d);
+extern void ggobi_setDataName(const char * const name, GGobiStage *d);
 
 /** 
  @ingroup GGobi
   Whether to get the transformed names or the regular ones. 
 
 */
-extern gchar **ggobi_getVariableNames(gboolean transformed, GGobiData *, ggobid *);
+extern gchar **ggobi_getVariableNames(gboolean transformed, GGobiStage *, ggobid *);
 
 
 
@@ -160,7 +160,7 @@ extern gchar **ggobi_getVariableNames(gboolean transformed, GGobiData *, ggobid 
    Set the name of the jvar'th variable, either the regular
    name or that of the variable's tranformed counterpart.
  */
-extern void ggobi_setVariableName(gint jvar, gchar *name, gboolean transformed, GGobiData *, ggobid *gg);
+extern void ggobi_setVariableName(gint jvar, gchar *name, gboolean transformed, GGobiStage *, ggobid *gg);
 
 
 /**
@@ -221,14 +221,14 @@ extern const gint  *ggobi_getViewTypeIndices(int *n);
   This is not a copy, but the actual data used by the
   internals of GGobi.
  */
-extern const gfloat** ggobi_getRawData(GGobiData *, ggobid *);
+extern const gfloat** ggobi_getRawData(GGobiStage *, ggobid *);
 
 /**
   Returns a pointer to the (second) transformation of the raw data.
   This is not a copy, but the actual data used by the
   internals of GGobi.
  */
-extern const gfloat** ggobi_getTFormData(GGobiData *, ggobid *);
+extern const gfloat** ggobi_getTFormData(GGobiStage *, ggobid *);
 
 
 /**
@@ -249,7 +249,7 @@ extern const gchar ** ggobi_getCaseNames();
 
 /**
  */
-extern void ggobi_setCaseName(gint pt, const gchar *lbl, GGobiData *d, ggobid *gg);
+extern void ggobi_setCaseName(gint pt, const gchar *lbl, GGobiStage *d, ggobid *gg);
 
 /**
  @defgroup Displays Top-level Displays
@@ -271,7 +271,7 @@ extern void ggobi_setCaseName(gint pt, const gchar *lbl, GGobiData *d, ggobid *g
 
  @return a new top-level display object.
  */
-extern displayd *ggobi_newScatterplot(gint ix, gint iy, GGobiData *data, ggobid *gg);
+extern displayd *ggobi_newScatterplot(gint ix, gint iy, GGobiStage *data, ggobid *gg);
 
 /**
 
@@ -285,7 +285,7 @@ extern displayd *ggobi_newScatterplot(gint ix, gint iy, GGobiData *data, ggobid 
  @param nr 
  @param nc
  */
-extern displayd *ggobi_newScatmat(gint *rows, gint *columns, gint nr, gint nc, GGobiData *, ggobid *gg);
+extern displayd *ggobi_newScatmat(gint *rows, gint *columns, gint nr, gint nc, GGobiStage *, ggobid *gg);
 
 /**
  @ingroup Displays
@@ -296,7 +296,7 @@ extern displayd *ggobi_newScatmat(gint *rows, gint *columns, gint nr, gint nc, G
  The order of the plots is determined by the order
  in which the variables are given in the array.
  */
-extern displayd *ggobi_newParCoords(gint *vars, gint num, GGobiData *, ggobid *gg);
+extern displayd *ggobi_newParCoords(gint *vars, gint num, GGobiStage *, ggobid *gg);
 
 /**
  @ingroup Displays
@@ -305,7 +305,7 @@ extern displayd *ggobi_newParCoords(gint *vars, gint num, GGobiData *, ggobid *g
  via the argument vars in the specified
  dataset within the GGobi instance.
  */
-extern displayd *ggobi_newTimeSeries(gint *yvars, gint numVars, GGobiData *d, ggobid *gg);
+extern displayd *ggobi_newTimeSeries(gint *yvars, gint numVars, GGobiStage *d, ggobid *gg);
 
 /**
  @ingroup Displays
@@ -419,7 +419,7 @@ extern gchar const* ggobi_getGlyphTypeName(gint n);
  
  @ingroup Glyphs
  */
-extern gint *ggobi_getCaseGlyphTypes(gint *which, gint n, GGobiData *dataset, ggobid *gg);
+extern gint *ggobi_getCaseGlyphTypes(gint *which, gint n, GGobiStage *dataset, ggobid *gg);
 
 /**
  Get the glyph type attribute for a single observation
@@ -432,7 +432,7 @@ extern gint *ggobi_getCaseGlyphTypes(gint *which, gint n, GGobiData *dataset, gg
  @see ggobi_getGlyphTypeName()
  @ingroup Glyphs
  */
-extern gint ggobi_getCaseGlyphType(gint id, GGobiData *dataset, ggobid *gg);
+extern gint ggobi_getCaseGlyphType(gint id, GGobiStage *dataset, ggobid *gg);
 
 /**
  Get the glyph size attribute for a collection of observations.
@@ -448,7 +448,7 @@ extern gint ggobi_getCaseGlyphType(gint id, GGobiData *dataset, ggobid *gg);
  @see ggobi_getGlyphTypeName()
  @ingroup Glyphs
  */
-extern gint *ggobi_getCaseGlyphSizes(gint *which, gint n, GGobiData *dataset, ggobid *gg);
+extern gint *ggobi_getCaseGlyphSizes(gint *which, gint n, GGobiStage *dataset, ggobid *gg);
 
 /**
  Get the glyph size attribute for a single observation
@@ -462,15 +462,15 @@ extern gint *ggobi_getCaseGlyphSizes(gint *which, gint n, GGobiData *dataset, gg
  @see ggobi_getGlyphTypeName()
  @ingroup Glyphs
  */
-extern gint ggobi_getCaseGlyphSize(gint id, GGobiData *dataset, ggobid *gg);
+extern gint ggobi_getCaseGlyphSize(gint id, GGobiStage *dataset, ggobid *gg);
 /**
  @ingroup Glyphs
  */
-extern void ggobi_setCaseGlyph(gint pt, gint type, gint size, GGobiData *d, ggobid *gg);
+extern void ggobi_setCaseGlyph(gint pt, gint type, gint size, GGobiStage *d, ggobid *gg);
 /**
  @ingroup Glyphs
  */
-extern void ggobi_setCaseGlyphs(gint *pts, gint n, gint type, gint size, GGobiData *d, ggobid *gg);
+extern void ggobi_setCaseGlyphs(gint *pts, gint n, gint type, gint size, GGobiStage *d, ggobid *gg);
 
 /* point colors */
 
@@ -481,7 +481,7 @@ extern void ggobi_setCaseGlyphs(gint *pts, gint n, gint type, gint size, GGobiDa
  @param gg the ggobi instance in which to find the dataset.
  @ingroup Glyphs
  */
-extern gint ggobi_getCaseColor(gint pt, GGobiData *dataset, ggobid *gg);
+extern gint ggobi_getCaseColor(gint pt, GGobiStage *dataset, ggobid *gg);
 /**
  Query the color attribute of a collection of points.
  @param pts an array giving the indices of the different observations whose color
@@ -499,7 +499,7 @@ extern gint ggobi_getCaseColor(gint pt, GGobiData *dataset, ggobid *gg);
  @see ggobi_setCaseColors()
  @ingroup Glyphs
  */
-extern gint * ggobi_getCaseColors(gint *pts, gint howMany, GGobiData *dataset, ggobid *gg);
+extern gint * ggobi_getCaseColors(gint *pts, gint howMany, GGobiStage *dataset, ggobid *gg);
 
 /**
  Set the color (for each plot) for a single observation.
@@ -513,7 +513,7 @@ extern gint * ggobi_getCaseColors(gint *pts, gint howMany, GGobiData *dataset, g
  @see ggobi_setCaseColors()
  @ingroup Glyphs
  */
-extern void ggobi_setCaseColor(gint pt, gint colorIndex, GGobiData *dataset, ggobid *gg);
+extern void ggobi_setCaseColor(gint pt, gint colorIndex, GGobiStage *dataset, ggobid *gg);
 
 /**
  Set the color (for each plot) for a collection of observations
@@ -529,31 +529,31 @@ extern void ggobi_setCaseColor(gint pt, gint colorIndex, GGobiData *dataset, ggo
  @see ggobi_getCaseColor()
  @ingroup Glyphs
  */
-extern void ggobi_setCaseColors(gint *pts, gint n, gint color, GGobiData *dataset, ggobid *gg);
+extern void ggobi_setCaseColors(gint *pts, gint n, gint color, GGobiStage *dataset, ggobid *gg);
 
 
 /* point hidden state */
 
 /**
  */
-extern gboolean ggobi_getCaseHidden(gint pt, GGobiData *, ggobid *gg);
+extern gboolean ggobi_getCaseHidden(gint pt, GGobiStage *, ggobid *gg);
 
 /**
  
  */
-extern gboolean * ggobi_getCaseHiddens(gint *pts, gint howMany, GGobiData *, ggobid *gg);
+extern gboolean * ggobi_getCaseHiddens(gint *pts, gint howMany, GGobiStage *, ggobid *gg);
 
 /**
   Specify whether an individual record within the dataset is to be considered 
   hidden or not.
  */
-extern void ggobi_setCaseHidden(gint pt, gboolean hidden_p, GGobiData *, ggobid *gg);
+extern void ggobi_setCaseHidden(gint pt, gboolean hidden_p, GGobiStage *, ggobid *gg);
 
 /**
  Control whether specific observations in a dataset are considered
  hidden or not for the purpose of displaying them.
  */
-extern void ggobi_setCaseHiddens(gint *pts, gint howMany, gboolean hidden_p, GGobiData *, ggobid *gg);
+extern void ggobi_setCaseHiddens(gint *pts, gint howMany, gboolean hidden_p, GGobiStage *, ggobid *gg);
 
 
 
@@ -830,7 +830,7 @@ extern int ggobi_getNumGGobis();
  ggobid instance. This is not a copy.
  @see ggobi_data_get_by_name()
  */
-extern GGobiData *ggobi_data_get(int which, const ggobid * const gg);
+extern GGobiStage *ggobi_data_get(int which, const ggobid * const gg);
 
 /**
   @ingroup Data
@@ -840,33 +840,33 @@ extern GGobiData *ggobi_data_get(int which, const ggobid * const gg);
  @return a reference to the datad object that is accessed by the 
  ggobid instance. This is not a copy.
  */
-extern GGobiData *ggobi_data_get_by_name(const gchar * const name, const ggobid * const gg);
+extern GGobiStage *ggobi_data_get_by_name(const gchar * const name, const ggobid * const gg);
 
 /**
   @ingroup Data
  Determine the number of variables in the dataset.
  */
-gint ggobi_ncols(GGobiData *d);
+gint ggobi_ncols(GGobiStage *d);
 
 /**
   @ingroup Data
  Determine the number of records in the dataset.
  */
-gint ggobi_nrecords(GGobiData *dg);
+gint ggobi_nrecords(GGobiStage *dg);
 
 /**
   @ingroup Data
  */
-extern int ggobi_getVariableIndex(const gchar *name, GGobiData *, ggobid *gg);
+extern int ggobi_getVariableIndex(const gchar *name, GGobiStage *, ggobid *gg);
 /**
   @ingroup Data
  */
-extern int ggobi_removeVariableByIndex(gint which, GGobiData *, ggobid *gg);
+extern int ggobi_removeVariableByIndex(gint which, GGobiStage *, ggobid *gg);
 
 /**
   @ingroup Data
  */
-extern gboolean ggobi_setVariableValues(gint whichVar, gdouble *vals, gint num, gboolean update, GGobiData *d, ggobid *gg);
+extern gboolean ggobi_setVariableValues(gint whichVar, gdouble *vals, gint num, gboolean update, GGobiStage *d, ggobid *gg);
 
 
     /* Need len just in case there is no data in the instance */
@@ -890,11 +890,11 @@ extern gboolean ggobi_setVariableValues(gint whichVar, gdouble *vals, gint num, 
   @param d  the dataset into which the variable is to be added.
   @param gg  the GGobi instance in which the dataset to be augmented can be found.
  */
-extern int ggobi_addVariable(gdouble *vals, gint len, gchar *name, gboolean update, GGobiData *d, ggobid *gg);
+extern int ggobi_addVariable(gdouble *vals, gint len, gchar *name, gboolean update, GGobiStage *d, ggobid *gg);
 
 extern int ggobi_addCategoricalVariable(gdouble *vals, gint len, gchar *name, 
                                         gchar **levels, gint *values, gint *counts, gint numLevels, 
-                                        gboolean update, GGobiData *d, ggobid *gg);
+                                        gboolean update, GGobiStage *d, ggobid *gg);
 
 /**
   @ingroup Data
@@ -902,7 +902,7 @@ extern int ggobi_addCategoricalVariable(gdouble *vals, gint len, gchar *name,
   if necessary. This is used to force changes in the raw data to be reflected
   in the different plots.
  */
-extern void ggobi_update_data(GGobiData *, ggobid *gg);
+extern void ggobi_update_data(GGobiStage *, ggobid *gg);
 
 
 /* @} */
@@ -969,12 +969,12 @@ extern void ggobi_setIdentifyHandler(IdentifyProc proc,  void *data, ggobid *gg)
   Query whether the observations/records identified by number
   in the given dataset are connected by an edge.
  */
-extern gboolean  ggobi_isConnectedEdge(gint a, gint b, GGobiData *d, ggobid *gg);
+extern gboolean  ggobi_isConnectedEdge(gint a, gint b, GGobiStage *d, ggobid *gg);
 
 /**
   @ingroup Edges
  */
-extern void ggobi_setObservationEdge(gint x, gint y, GGobiData *, ggobid *, gboolean update);
+extern void ggobi_setObservationEdge(gint x, gint y, GGobiStage *, ggobid *, gboolean update);
 #endif
 
 /**

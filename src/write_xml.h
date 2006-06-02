@@ -45,19 +45,19 @@ typedef struct {
 
 gboolean write_xml (const gchar *filename, ggobid *gg, XmlWriteInfo *xmlWriteInfo);
 gboolean write_xml_stream (FILE *f, ggobid *gg, const gchar *, XmlWriteInfo *xmlWriteInfo);
-gboolean write_xml_dataset(FILE *f, GGobiData *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo);
+gboolean write_xml_dataset(FILE *f, GGobiStage *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo);
 gboolean write_xml_header (FILE *f, int numDatasets, ggobid *gg, XmlWriteInfo *xmlWriteInfo);
 gboolean write_xml_footer(FILE *f, ggobid *gg, XmlWriteInfo *xmlWriteInfo);
 gboolean write_xml_description (FILE *f, ggobid *gg, XmlWriteInfo *xmlWriteInfo);
-gboolean write_xml_variables (FILE *f, GGobiData *, ggobid *gg, XmlWriteInfo *xmlWriteInfo);
-gboolean write_xml_variable (FILE *f, GGobiData *, ggobid *gg, gint i, XmlWriteInfo *xmlWriteInfo);
-gboolean write_xml_records (FILE *f, GGobiData *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo);
-gboolean write_xml_record (FILE *f, GGobiData *d, ggobid *gg, gint i, XmlWriteInfo *xmlWriteInfo);
+gboolean write_xml_variables (FILE *f, GGobiStage *, ggobid *gg, XmlWriteInfo *xmlWriteInfo);
+gboolean write_xml_variable (FILE *f, GGobiStage *, ggobid *gg, gint i, XmlWriteInfo *xmlWriteInfo);
+gboolean write_xml_records (FILE *f, GGobiStage *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo);
+gboolean write_xml_record (FILE *f, GGobiStage *d, ggobid *gg, gint i, XmlWriteInfo *xmlWriteInfo);
 
-gboolean write_xml_edges(FILE *f, GGobiData *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo);
-gboolean write_xml_edge(FILE *f, GGobiData *d, ggobid *gg, gint i, XmlWriteInfo *xmlWriteInfo);
+gboolean write_xml_edges(FILE *f, GGobiStage *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo);
+gboolean write_xml_edge(FILE *f, GGobiStage *d, ggobid *gg, gint i, XmlWriteInfo *xmlWriteInfo);
 
-gboolean write_dataset_header(FILE *f, GGobiData *, ggobid *gg, XmlWriteInfo *xmlWriteInfo);
+gboolean write_dataset_header(FILE *f, GGobiStage *, ggobid *gg, XmlWriteInfo *xmlWriteInfo);
 gboolean write_dataset_footer(FILE *f, ggobid *gg, XmlWriteInfo *xmlWriteInfo);
 
 #ifdef __cplusplus 

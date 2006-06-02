@@ -2,7 +2,9 @@
   
   // FIXME: temporary
   #include "ggobi-data.h"
-  
+  #include "vars.h"
+  #include "externs.h"
+
   // FIXME: these probably won't be necessary - we will not proxy properties
   #define SET_PARENT_PROP(prop) \
     g_object_set_property(G_OBJECT(self->_priv->parent), (prop), VAL)
@@ -14,6 +16,8 @@
     
   /* signal handlers */
   
+  /* it may be possible to do this and other handlers within GOB using 
+    private methods and g_object_connect_swapped */
   static void 
   variable_name_changed_cb(GGobiVariable *var, const gchar *old_name, GGobiStage *stage)
   {
@@ -27,13 +31,119 @@
   #include "ggobi-variable.h"
   #include "utils.h"
   
+  /* temporarily */
+  #include "defines.h"
+  #include "brushing.h"
+  #include "fileio.h"
+  
   /* for use in GOB parameter checks like: guint j (check < N_COLS) */
   #define N_COLS GGOBI_STAGE(self)->n_cols
   #define N_ROWS GGOBI_STAGE(self)->n_rows;
   
   #define GGOBI_STAGE_IS_COL_CATEGORICAL(stage, col) \
     ggobi_stage_get_col_type((stage), (col)) == GGOBI_VARIABLE_CATEGORICAL
+    
+  /*---- STUFF FROM DATA.GOB ----*/
+typedef struct _Subset {
+  gint random_n;
+  gint string_pos;
+ /*-- adjustments from which to get values for blocksize, everyn --*/
+  GtkAdjustment *bstart_adj, *bsize_adj;
+  GtkAdjustment *estart_adj, *estep_adj;
+} Subset;
+
+
+typedef struct _Jitterd {
+  gfloat factor;
+  gboolean type;
+  gboolean convex;
+  gfloat *jitfacv;
+} Jitterd;
+
+typedef struct _Varpanel_cboxd {
+  GtkWidget *ebox;   /*-- child1 of pane widget --*/
+  GtkWidget *swin;   /*-- child of ebox --*/
+  GtkWidget *vbox;   /*-- child of swin --*/
+  GSList *box;       /*-- single column of hboxes --*/
+} Varpanel_cboxd;
+
+typedef struct _Varpanel_circd {
+  GtkWidget *ebox;        /*-- child2 of pane widget --*/
+  GtkWidget *vbox;        /*-- child of ebox --*/
+  GtkWidget *swin, *hbox; /*-- children of vbox --*/
+  GtkWidget *table;       /*-- sole child of swin; now a vbox --*/
+  GtkWidget *manip_btn, *freeze_btn; /*-- children of hbox --*/
+
+  GdkCursor *cursor;
+  gint jcursor;
+
+ /*-- components and properties of the table --*/
+  GSList *vb, *da, *label;
+  GSList *da_pix;         /*-- backing pixmaps --*/
+  gint nvars;
+} Varpanel_circd;
+
+typedef struct _Varpaneld {
+  GtkWidget *hpane;  /*-- child of the ebox --*/
+} Varpaneld;
+
+/*-------------------- transformation --------------------------------*/
+
+/* sphering transformation **/
+typedef struct _Sphere_d {
+  vector_i vars;        /*-- vars available to be sphered --*/
+  vector_i vars_sphered;/*-- vars that have been sphered --*/
+  gint npcs;      /*-- the first npcs vars of vars will be sphered --*/
+  vector_i pcvars;/*-- vars into which sphered data is written --*/
+
+  vector_f eigenval;
+  array_d eigenvec;
+  array_f vc;
+  vector_f tform_mean;
+  vector_f tform_stddev;
+
+  gboolean vars_stdized;
+} Sphere_d;
+
+typedef struct _BrushBins {
+  gint nbins;
+  bin_struct **binarray;
+  /*
+   * bin0 is the bin which contains of the upper left corner of the
+   * brush; bin1 is the one containing of the lower right corner.
+  */  
+  icoords bin0, bin1;
+} BrushBins;
+
+typedef struct _EdgeData {
+  gint n;
+  /* maps from edge to row in edge dataset (mapping not 1-1 due to polygons) */
+  guint *indices;
+  // FIXME: maybe SymbolicEndpoints could become some sort of boxed structure
+  // representing an edge, including its index into the edgeset
+  SymbolicEndpoints *sym_endpoints;
+  
+  // To EDGE-RESOLVER stage
+  GList *endpointList;   
+    /* a list of endpointsd elements corresponding to the resolved 
+       record ids relative to a given datad. This is akin to a table
+       indexed by datad elements. **/
+
+  // To BRUSH stage
+  gint nxed_by_brush;
+  vector_b xed_by_brush;
+} EdgeData;
+
+/* END DATA.GOB */
+
 %}
+
+// FIXME: perhaps this could be replaced with a stage that masks arbitrary
+// attributes?
+enum ATTR_SET {
+  PERSISTENT,
+  TRANSIENT
+} GGobi:Attr:Set:Method;
 
 /**
  * SECTION:GGobiStage
@@ -61,7 +171,7 @@ property OBJECT parent
     object_type = GGobi:Stage, export)
   set {
     // FIXME: does not yet support reparenting
-    GGobiStage *parent = GGOBI_STAGE(g_value_get_object(VAL));
+    GGobiStage *parent = g_value_get_object(VAL);
     self->_priv->parent = parent;
     RELAY_SIGNAL(col_data_changed);
     RELAY_SIGNAL(col_name_changed);
@@ -121,6 +231,74 @@ property UINT n_cols
    }
    get { g_value_set_uint(VAL, self->n_cols); };
 
+/*------ STUFF FROM DATA.GOB ---------*/
+
+public struct _ggobid *gg; /*-- a pointer to the parent --*/
+
+/* GUI related */
+/* The GUI components should likely hold references to the pipeline stages, 
+  not the other way around. If necessary, the GGobi context can map stages to
+  GUI components. */
+public Varpanel_cboxd  vcbox_ui;
+public Varpanel_circd  vcirc_ui;
+public Varpaneld  varpanel_ui;
+public GtkWidget *vartable_tree_view[GGOBI_VARIABLE_ALL_VARTYPES];
+public GtkTreeModel *vartable_tree_model; /* the root model, with all vars **/
+public GtkWidget *cluster_table; /*-- table of symbol groups from brushing --*/
+public clusteruid *clusvui;
+
+
+/* PIPELINE */
+public Subset  subset;
+public Jitterd  jitter;
+public Sphere_d  sphere;
+public BrushBins  brush;
+
+protected vector_i rows_in_plot;
+public vector_i rows_under_brush;
+public vector_i rows_under_brush_prev;
+
+public array_f tform;
+public array_g world;
+public array_g jitdata;
+
+public gboolean missings_show_p; /*-- show/hide per datad, not per display --*/
+public gint nrows_in_plot;     /*-- how many elements of rows_in_plot to use --*/
+public gint nrows_under_brush;
+public gint nrows_under_brush_prev;
+
+/*--------------- clusters: hiding, excluding ----------------------*/
+
+// A pipeline stage could map the data to its clusters
+public symbol_cell symbol_table[NGLYPHTYPES][NGLYPHSIZES][MAXNCOLORS];
+public gint nclusters;
+public clusterd *clusv;
+
+public GSList *sticky_ids; // as an attribute from IDENTIFY stage
+   
+/* END PIPELINE */
+
+/*-- used in identification, line editing, and point motion --*/
+// Could be moved to imode object or a boolean attribute or g_object_set_data()
+public gint nearest_point;
+public gint nearest_point_prev;
+
+/*-------------------- moving points ---------------------------------*/
+// To 'move points' imode?
+public GSList *movepts_history; /*-- a list of elements of type celld --*/
+
+/*-- to support brushing by categorical variable --*/
+public gchar* linkvar = NULL;  /*-- the linking variable name--*/
+
+// FIXME: make attributes
+public vector_b excluded;
+public vector_b sampled;
+public vector_i clusterid;
+
+protected guint n_attributes;
+
+/* END DATA.GOB */
+
 public GHashTable* var_name_lookup = { 
   g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL) 
 } destroywith g_hash_table_destroy;
@@ -130,6 +308,12 @@ public signal first NONE (UINT) void
 col_data_changed(self, guint j) {
   GGobiVariable *var = self_get_variable(self, j);
   ggobi_variable_update(var);
+  // FIXME: incorporate into variable_update
+  limits_set_by_var(SELF(self), j, true, true, (SELF(self)->gg) ? SELF(self)->gg->lims_use_visible : true);
+  // FIXME: rest of this stuff by pipeline
+  tform_to_world_by_var(SELF(self), j);
+  if (SELF(self)->gg)
+    displays_tailpipe (FULL, SELF(self)->gg);
 }
 
 public signal first NONE (STRING, UINT) void 
@@ -150,7 +334,15 @@ col_name_changed(self, const gchar *old_name, guint j) {
  * Columns added signal
  **/
 public signal NONE (UINT) void
-cols_added(self, guint n);
+cols_added(self, guint n) {
+  guint ncols = self->n_cols;
+  
+  arrayf_add_cols (&self->tform, ncols);
+  arrayg_add_cols (&self->jitdata, ncols);
+  arrayg_add_cols (&self->world, ncols);
+  
+  tour_realloc_up (self, ncols);
+};
 
 /**
  * cols_deleted:
@@ -160,7 +352,20 @@ cols_added(self, guint n);
  * Columns deleted signal
  **/
 public signal NONE (UINT) void
-col_deleted(self, guint j);
+col_deleted(self, guint j) {
+  self->n_cols--;
+  arrayf_delete_cols (&self->tform, 1, &j);
+  arrayg_delete_cols (&self->jitdata, 1, &j);
+  arrayg_delete_cols (&self->world, 1, &j);
+  
+  //FIXME: need function analogous to tour_relloc_up
+  tour2d_realloc_down (1, &j, self, self->gg);
+  tour1d_realloc_down (1, &j, self, self->gg);
+  tourcorr_realloc_down (1, &j, self, self->gg);
+  
+  /* clearly inefficient but will be OK for now */
+  tform_to_world(GGOBI_STAGE(self));
+};
 
 /**
  * rows_added:
@@ -170,7 +375,51 @@ col_deleted(self, guint j);
  * Rows added signal
  **/
 public signal NONE (UINT) void
-rows_added(self, guint n);
+rows_added(self, guint n) {
+  gint i, nprev = self->n_rows, nrows = self->n_rows + n;
+  self->n_rows = nrows;
+  
+  vectorb_realloc (&self->excluded, nrows);
+  vectorb_realloc (&self->sampled, nrows);
+  vectori_realloc (&self->rows_in_plot, nrows);
+  vectori_realloc (&self->rows_under_brush, nrows);
+  vectori_realloc (&self->rows_under_brush_prev, nrows);
+  vectori_realloc (&self->clusterid, nrows);
+  
+  arrayf_add_rows (&self->tform, nrows);
+  arrayg_add_rows (&self->jitdata, nrows);
+  arrayg_add_rows (&self->world, nrows);
+  
+  self->nrows_under_brush = self->nrows_under_brush_prev = 0;
+  
+  for (i = nprev; i < nrows; i++) {
+    self->excluded.els[i] = false;
+    self->sampled.els[i] = true;
+    
+    self->rows_under_brush.els[i] = 0;
+    self->rows_under_brush_prev.els[i] = 0;
+  }
+  
+  if (self->n_attributes > 0) {
+    gint def_color = self->gg ? self->gg->color_id : 0;
+    gint def_type  = self->gg ? self->gg->glyph_id.type : FC;
+    gint def_size  = self->gg ? self->gg->glyph_id.size : 1;
+
+    for (i = nprev; i < nrows; i++) {
+      self_set_attr_color(self, i, def_color, ATTR_SET_PERSISTENT);
+      self_set_attr_glyph_parts(self, i, def_type, def_size, ATTR_SET_PERSISTENT);
+      self_set_attr_hidden(self, i, false, ATTR_SET_PERSISTENT);
+    }
+  }
+  clusters_set(self);
+  self_set_rows_in_plot(self);
+};
+
+init (self) {
+  sphere_init(self);
+  self->nearest_point = -1;
+  self->missings_show_p = true;
+}
 
 /** 
  * new:
@@ -311,12 +560,12 @@ is_missing(self, guint i, guint j)
 /**
  * has_missings:
  * @self: GGobiStage object
- * Returns: whether there are missing values in the stage
+ * Returns: the number of missing values in the stage
  **/
 virtual guint
-has_missings(self) 
+get_n_missings(self) 
 {
-  return(self_has_missings(self->_priv->parent));
+  return(self_get_n_missings(self->_priv->parent));
 }
 
 /**
@@ -378,6 +627,7 @@ virtual void
 set_raw_value(self, guint i, guint j, gdouble value)
 {
   self_set_raw_value(self->_priv->parent, i, j, value);
+  self->tform.vals[i][j] = value;
 }
 
 /**
@@ -492,7 +742,7 @@ public gchar*
 get_string_value(self, guint i, guint j, gboolean transformed) 
 {
   GGobiVariable *var = self_get_variable(self, j);
-  gdouble raw = transformed ? GGOBI_DATA(self)->tform.vals[i][j] : 
+  gdouble raw = transformed ? self->tform.vals[i][j] : 
     GGOBI_DATA(self)->raw.vals[i][j];
   //gdouble raw = self_get_raw_data(self, i, j);
   
@@ -518,6 +768,14 @@ virtual guint
 get_n_edges (self)
 {
   return(self_get_n_edges(self->_priv->parent));
+}
+
+// FIXME: dirty hack so that we can keep the edge data in GGobiData where it belongs
+// We need to work out an actual API eventually
+virtual EdgeData *
+get_edge_data (self)
+{
+  return(self_get_edge_data(self->_priv->parent));
 }
 
 /** 
@@ -561,6 +819,1085 @@ get_row_id(self, guint i) {
 virtual gint
 get_row_for_id(self, gchar *id) {
   return self_get_row_for_id(self->_priv->parent, id);
+}
+
+
+public GGobiStage *
+get_root(self)
+{
+  GGobiStage *stage;
+  for (stage = self; stage->_priv->parent != NULL; stage = stage->_priv->parent);
+  return(stage);
+}
+
+/* Attributes
+ * ============================================================================
+ */
+
+ // FIXME: Could convert to macros, but in order to handle the documentation
+ // we'll probably need to use gob's m4 support
+ 
+ /* Moved to the stage since this seems to be the right place (for now) */
+ 
+/* [[[cog
+   import cog, attraccessor\
+   
+   cog.outl(attraccessor.attr_accessor("color", "gushort", "short"))
+   cog.outl(attraccessor.attr_accessor("hidden", "gboolean", "boolean"))
+   cog.outl(attraccessor.attr_accessor("glyph_type", "gint", "int"))
+   cog.outl(attraccessor.attr_accessor("glyph_size", "gint", "int"))
+   ]]]*/
+/**
+ * reset_attr_color:
+ * @self: #GGobiStage 
+ * @i: row index
+ * @brush: persistent or transient
+ *
+ * Resets color attribute to previous value
+**/
+public gboolean
+reset_attr_color(self, guint i, GGobiAttrSetMethod brush)
+{
+  gushort value;
+  // This code is autogenerated, do not edit by hand
+  switch(brush) {
+    case ATTR_SET_PERSISTENT:
+      value = self_get_short_value_for_col_name(self, i, "_color_prev");
+    default:
+      value = self_get_short_value_for_col_name(self, i, "_color");
+  }
+  
+  return self_set_attr_color(self, i, value, brush);
+
+}
+
+/**
+ * set_attr_color:
+ * @self: #GGobiStage
+ * @i: row index
+ * @brush: persistent or transient
+ *
+ * Sets color attribute to new value.
+ * Returns: true if value has changed, false otherwise
+**/
+public gboolean
+set_attr_color(self, guint i, gushort value, GGobiAttrSetMethod brush)
+{
+  // This code is autogenerated, do not edit by hand
+  if (brush == ATTR_SET_TRANSIENT ?
+    (self_get_short_value_for_col_name(self, i, "_color_now") == value) :
+    (self_get_short_value_for_col_name(self, i, "_color") == value))
+    return false;
+
+  if (brush == ATTR_SET_PERSISTENT) {
+    self_set_short_value_for_col_name(self, i, "_color_prev", 
+      self_get_short_value_for_col_name(self, i, "_color"));
+    self_set_short_value_for_col_name(self, i, "_color", value);
+  }
+
+  self_set_short_value_for_col_name(self, i, "_color_now", value);
+  return true;
+}
+
+/**
+ * get_attr_color:
+ * @self: #GGobiStage
+ * @i: row index
+ * 
+ * Retrieve current color
+**/
+public gushort
+get_attr_color(self, guint i)
+{
+  // This code is autogenerated, do not edit by hand
+  return self_get_short_value_for_col_name(self, i, "_color_now");
+}
+/**
+ * reset_attr_hidden:
+ * @self: #GGobiStage 
+ * @i: row index
+ * @brush: persistent or transient
+ *
+ * Resets hidden attribute to previous value
+**/
+public gboolean
+reset_attr_hidden(self, guint i, GGobiAttrSetMethod brush)
+{
+  gboolean value;
+  // This code is autogenerated, do not edit by hand
+  switch(brush) {
+    case ATTR_SET_PERSISTENT:
+      value = self_get_boolean_value_for_col_name(self, i, "_hidden_prev");
+    default:
+      value = self_get_boolean_value_for_col_name(self, i, "_hidden");
+  }
+  
+  return self_set_attr_hidden(self, i, value, brush);
+
+}
+
+/**
+ * set_attr_hidden:
+ * @self: #GGobiStage
+ * @i: row index
+ * @brush: persistent or transient
+ *
+ * Sets hidden attribute to new value.
+ * Returns: true if value has changed, false otherwise
+**/
+public gboolean
+set_attr_hidden(self, guint i, gboolean value, GGobiAttrSetMethod brush)
+{
+  // This code is autogenerated, do not edit by hand
+  if (brush == ATTR_SET_TRANSIENT ?
+    (self_get_boolean_value_for_col_name(self, i, "_hidden_now") == value) :
+    (self_get_boolean_value_for_col_name(self, i, "_hidden") == value))
+    return false;
+
+  if (brush == ATTR_SET_PERSISTENT) {
+    self_set_boolean_value_for_col_name(self, i, "_hidden_prev", 
+      self_get_boolean_value_for_col_name(self, i, "_hidden"));
+    self_set_boolean_value_for_col_name(self, i, "_hidden", value);
+  }
+
+  self_set_boolean_value_for_col_name(self, i, "_hidden_now", value);
+  return true;
+}
+
+/**
+ * get_attr_hidden:
+ * @self: #GGobiStage
+ * @i: row index
+ * 
+ * Retrieve current hidden
+**/
+public gboolean
+get_attr_hidden(self, guint i)
+{
+  // This code is autogenerated, do not edit by hand
+  return self_get_boolean_value_for_col_name(self, i, "_hidden_now");
+}
+/**
+ * reset_attr_glyph_type:
+ * @self: #GGobiStage 
+ * @i: row index
+ * @brush: persistent or transient
+ *
+ * Resets glyph_type attribute to previous value
+**/
+public gboolean
+reset_attr_glyph_type(self, guint i, GGobiAttrSetMethod brush)
+{
+  gint value;
+  // This code is autogenerated, do not edit by hand
+  switch(brush) {
+    case ATTR_SET_PERSISTENT:
+      value = self_get_int_value_for_col_name(self, i, "_glyph_type_prev");
+    default:
+      value = self_get_int_value_for_col_name(self, i, "_glyph_type");
+  }
+  
+  return self_set_attr_glyph_type(self, i, value, brush);
+
+}
+
+/**
+ * set_attr_glyph_type:
+ * @self: #GGobiStage
+ * @i: row index
+ * @brush: persistent or transient
+ *
+ * Sets glyph_type attribute to new value.
+ * Returns: true if value has changed, false otherwise
+**/
+public gboolean
+set_attr_glyph_type(self, guint i, gint value, GGobiAttrSetMethod brush)
+{
+  // This code is autogenerated, do not edit by hand
+  if (brush == ATTR_SET_TRANSIENT ?
+    (self_get_int_value_for_col_name(self, i, "_glyph_type_now") == value) :
+    (self_get_int_value_for_col_name(self, i, "_glyph_type") == value))
+    return false;
+
+  if (brush == ATTR_SET_PERSISTENT) {
+    self_set_int_value_for_col_name(self, i, "_glyph_type_prev", 
+      self_get_int_value_for_col_name(self, i, "_glyph_type"));
+    self_set_int_value_for_col_name(self, i, "_glyph_type", value);
+  }
+
+  self_set_int_value_for_col_name(self, i, "_glyph_type_now", value);
+  return true;
+}
+
+/**
+ * get_attr_glyph_type:
+ * @self: #GGobiStage
+ * @i: row index
+ * 
+ * Retrieve current glyph_type
+**/
+public gint
+get_attr_glyph_type(self, guint i)
+{
+  // This code is autogenerated, do not edit by hand
+  return self_get_int_value_for_col_name(self, i, "_glyph_type_now");
+}
+/**
+ * reset_attr_glyph_size:
+ * @self: #GGobiStage 
+ * @i: row index
+ * @brush: persistent or transient
+ *
+ * Resets glyph_size attribute to previous value
+**/
+public gboolean
+reset_attr_glyph_size(self, guint i, GGobiAttrSetMethod brush)
+{
+  gint value;
+  // This code is autogenerated, do not edit by hand
+  switch(brush) {
+    case ATTR_SET_PERSISTENT:
+      value = self_get_int_value_for_col_name(self, i, "_glyph_size_prev");
+    default:
+      value = self_get_int_value_for_col_name(self, i, "_glyph_size");
+  }
+  
+  return self_set_attr_glyph_size(self, i, value, brush);
+
+}
+
+/**
+ * set_attr_glyph_size:
+ * @self: #GGobiStage
+ * @i: row index
+ * @brush: persistent or transient
+ *
+ * Sets glyph_size attribute to new value.
+ * Returns: true if value has changed, false otherwise
+**/
+public gboolean
+set_attr_glyph_size(self, guint i, gint value, GGobiAttrSetMethod brush)
+{
+  // This code is autogenerated, do not edit by hand
+  if (brush == ATTR_SET_TRANSIENT ?
+    (self_get_int_value_for_col_name(self, i, "_glyph_size_now") == value) :
+    (self_get_int_value_for_col_name(self, i, "_glyph_size") == value))
+    return false;
+
+  if (brush == ATTR_SET_PERSISTENT) {
+    self_set_int_value_for_col_name(self, i, "_glyph_size_prev", 
+      self_get_int_value_for_col_name(self, i, "_glyph_size"));
+    self_set_int_value_for_col_name(self, i, "_glyph_size", value);
+  }
+
+  self_set_int_value_for_col_name(self, i, "_glyph_size_now", value);
+  return true;
+}
+
+/**
+ * get_attr_glyph_size:
+ * @self: #GGobiStage
+ * @i: row index
+ * 
+ * Retrieve current glyph_size
+**/
+public gint
+get_attr_glyph_size(self, guint i)
+{
+  // This code is autogenerated, do not edit by hand
+  return self_get_int_value_for_col_name(self, i, "_glyph_size_now");
+}
+/* [[[end]]] */
+
+/**
+ * reset_attr_glyph:
+ * @self: #GGobiStage 
+ * @i: row index
+ * @brush: persistent or transient
+ *
+ * Resets glyph attribute to previous value
+**/
+public gboolean
+reset_attr_glyph(self, guint i, GGobiAttrSetMethod brush)
+{
+  gboolean changed = false;
+  changed = self_reset_attr_glyph_size(self, i, brush) || changed;
+  changed = self_reset_attr_glyph_type(self, i, brush) || changed;
+  return changed;
+}
+
+/**
+ * set_attr_glyph:
+ * @self: #GGobiStage
+ * @i: row index
+ * @brush: persistent or transient
+ *
+ * Sets glyph attribute to new value.
+ * Returns: true if value has changed, false otherwise
+**/
+public gboolean
+set_attr_glyph_parts(self, guint i, GlyphType type, guint size, GGobiAttrSetMethod brush)
+{
+    gboolean changed = false;
+    changed = self_set_attr_glyph_size(self, i, type, brush) || changed;
+    changed = self_set_attr_glyph_type(self, i, size, brush) || changed;
+    return changed;
+}
+
+public gboolean
+set_attr_glyph(self, guint i, glyphd* value, GGobiAttrSetMethod brush)
+{
+  return self_set_attr_glyph_parts(self, i, value->type, value->size, brush);
+}
+
+/**
+ * get_attr_glyph:
+ * @self: #GGobiStage
+ * @i: row index
+ * 
+ * Retrieve current glyph
+**/
+public glyphd* 
+get_attr_glyph(self, guint i)
+{
+  glyphd* glyph = (glyphd*) g_malloc (sizeof (glyphd)); 
+  glyph->type = self_get_attr_glyph_type(self, i);
+  glyph->size = self_get_attr_glyph_size(self, i);
+  return glyph;
+}
+
+public gboolean 
+reset_attr(self, guint i, GGobiAttrSetMethod brush) {
+  gboolean changed = false;
+  changed = self_reset_attr_hidden(self, i, brush) || changed;
+  changed = self_reset_attr_glyph(self, i, brush) || changed;
+  changed = self_reset_attr_color(self, i, brush) || changed;
+  
+  return changed;
+}
+
+public gboolean
+brush_point(self, guint i, gboolean condition, BrushTargetType brush_mode, GGobiAttrSetMethod brush) {
+  if (condition) {
+   switch (brush_mode) {
+    case br_candg:
+      self_set_attr_color(self, i, self->gg->color_id, brush);
+      self_set_attr_glyph(self, i, &self->gg->glyph_id, brush);
+      break;
+    case br_color:
+      self_set_attr_color(self, i, self->gg->color_id, brush);
+      break;
+    case br_glyph:
+      self_set_attr_glyph(self, i, &self->gg->glyph_id, brush);
+      break;
+    case br_shadow:
+      self_set_attr_hidden(self, i, true, brush);
+      break;
+    case br_unshadow:
+      self_set_attr_hidden(self, i, false, brush);
+      break;
+    default:
+      break;
+    }
+  } else if (brush == ATTR_SET_TRANSIENT) {  
+    switch (brush_mode) {
+    case br_candg:
+      self_reset_attr_color(self, i, ATTR_SET_TRANSIENT);
+      self_reset_attr_glyph(self, i, ATTR_SET_TRANSIENT);
+      break;
+    case br_color:
+      self_reset_attr_color(self, i, ATTR_SET_TRANSIENT);
+      break;
+    case br_glyph:
+      self_reset_attr_glyph(self, i, ATTR_SET_TRANSIENT);
+      break;
+    case br_unshadow:
+    case br_shadow:
+      self_reset_attr_hidden(self, i, ATTR_SET_TRANSIENT);
+      break;
+    default:
+      break;
+    }
+  }
+  return false;
+}
+
+// FIXME: Should be done with M4
+/* Moved to stage, since there doesn't seem to be any special reason to be in
+  GGobiData besides the fact that we didn't want a ton of bloat in the stage. */
+  
+/* [[[cog
+   import cog, attraccessor
+   cog.outl(attraccessor.column_accessor("boolean", "gboolean"))
+   cog.outl(attraccessor.column_accessor("short", "gshort"))
+   cog.outl(attraccessor.column_accessor("int", "gint"))
+   ]]] */
+/** 
+ * get_boolean_value:
+ * @self: #GGobiStage
+ * @i: row index
+ * @j: column index
+ *
+ * Convenience method for getting boolean value.
+ **/
+public gboolean
+get_boolean_value(self, guint i, guint j)
+{
+  // This code is autogenerated, do not edit by hand
+  return (gboolean) self_get_raw_value(self, i, j);
+}
+
+
+/** 
+ * get_boolean_values:
+ * @self: #GGobiStage
+ * @i: row index
+ *
+ * Convenience method for creating a new array of type gboolean
+ * from the specified column.
+ **/
+public gboolean*
+get_boolean_values(self, guint j)
+{
+  // This code is autogenerated, do not edit by hand
+  gboolean* values = g_new(gboolean, self->n_rows);
+  for (guint i = 0; i < self->n_rows; i++)
+    values[i] = self_get_boolean_value(self, i, j);
+  return(values);
+}
+
+/** 
+ * set_boolean_value:
+ * @self: #GGobiStage
+ * @i: row index
+ * @j: column index
+ * @value: new value
+ *
+ * Convenience method for setting boolean value.
+ **/
+public void
+set_boolean_value(self, guint i, guint j, gboolean value)
+{
+  // This code is autogenerated, do not edit by hand
+  self_set_raw_value(self, i, j, (gdouble) value);
+}
+
+/** 
+ * set_boolean_values:
+ * @self: #GGobiStage
+ * @i: row index
+ * @value: array of boolean of length self->nrows
+ *
+ * Convenience method for setting entire column of booleans.
+ * Emits self_col_data_changed() signal.
+ **/
+public void
+set_boolean_values(self, guint j, gboolean *values)
+{
+  // This code is autogenerated, do not edit by hand
+  for (guint i = 0; i < self->n_rows; i++) {
+    self_set_boolean_value(self, i, j, values[i]);
+  }
+  self_col_data_changed(self, j);
+}
+
+
+/** 
+ * get_boolean_value_for_col_name:
+ * @self: #GGobiStage
+ * @i: row index
+ * @j: column index
+ *
+ * Convenience method for getting boolean value.
+ **/
+public gboolean
+get_boolean_value_for_col_name(self, guint i, gchar* name)
+{
+  // This code is autogenerated, do not edit by hand
+  guint j = self_get_col_index_for_name(self, name);
+  g_assert(j != -1);
+  
+  return self_get_boolean_value(self, i, j);
+}
+
+
+/** 
+ * get_boolean_values_for_col_names:
+ * @self: #GGobiStage
+ * @i: row index
+ *
+ * Convenience method for creating a new array of type gboolean
+ * from the specified column.
+ **/
+public gboolean*
+get_boolean_values_for_col_name(self, gchar* name)
+{
+  // This code is autogenerated, do not edit by hand
+  guint j = self_get_col_index_for_name(self, name);
+  g_assert(j != -1);
+  
+  return self_get_boolean_values(self, j);
+}
+
+/** 
+ * set_boolean_value_for_col_name:
+ * @self: #GGobiStage
+ * @i: row index
+ * @j: column index
+ * @value_for_col_name: new value_for_col_name
+ *
+ * Convenience method for setting boolean value.
+ **/
+public void
+set_boolean_value_for_col_name(self, guint i, gchar* name, gboolean value)
+{
+  // This code is autogenerated, do not edit by hand
+  guint j = self_get_col_index_for_name(self, name);
+  g_assert(j != -1);
+  
+  self_set_boolean_value(self, i, j, value);
+}
+
+/** 
+ * set_boolean_values_for_col_name:
+ * @self: #GGobiStage
+ * @i: row index
+ * @value_for_col_name: array of boolean of length self->nrows
+ *
+ * Convenience method for setting entire column of booleans.
+ * Emits self_col_data_changed() signal.
+ **/
+public void
+set_boolean_values_for_col_name(self, gchar* name, gboolean *values)
+{
+  // This code is autogenerated, do not edit by hand
+  guint j = self_get_col_index_for_name(self, name);
+  g_assert(j != -1);
+  
+  self_set_boolean_values(self, j, values);
+}
+
+/** 
+ * get_short_value:
+ * @self: #GGobiStage
+ * @i: row index
+ * @j: column index
+ *
+ * Convenience method for getting short value.
+ **/
+public gshort
+get_short_value(self, guint i, guint j)
+{
+  // This code is autogenerated, do not edit by hand
+  return (gshort) self_get_raw_value(self, i, j);
+}
+
+
+/** 
+ * get_short_values:
+ * @self: #GGobiStage
+ * @i: row index
+ *
+ * Convenience method for creating a new array of type gshort
+ * from the specified column.
+ **/
+public gshort*
+get_short_values(self, guint j)
+{
+  // This code is autogenerated, do not edit by hand
+  gshort* values = g_new(gshort, self->n_rows);
+  for (guint i = 0; i < self->n_rows; i++)
+    values[i] = self_get_short_value(self, i, j);
+  return(values);
+}
+
+/** 
+ * set_short_value:
+ * @self: #GGobiStage
+ * @i: row index
+ * @j: column index
+ * @value: new value
+ *
+ * Convenience method for setting short value.
+ **/
+public void
+set_short_value(self, guint i, guint j, gshort value)
+{
+  // This code is autogenerated, do not edit by hand
+  self_set_raw_value(self, i, j, (gdouble) value);
+}
+
+/** 
+ * set_short_values:
+ * @self: #GGobiStage
+ * @i: row index
+ * @value: array of short of length self->nrows
+ *
+ * Convenience method for setting entire column of shorts.
+ * Emits self_col_data_changed() signal.
+ **/
+public void
+set_short_values(self, guint j, gshort *values)
+{
+  // This code is autogenerated, do not edit by hand
+  for (guint i = 0; i < self->n_rows; i++) {
+    self_set_short_value(self, i, j, values[i]);
+  }
+  self_col_data_changed(self, j);
+}
+
+
+/** 
+ * get_short_value_for_col_name:
+ * @self: #GGobiStage
+ * @i: row index
+ * @j: column index
+ *
+ * Convenience method for getting short value.
+ **/
+public gshort
+get_short_value_for_col_name(self, guint i, gchar* name)
+{
+  // This code is autogenerated, do not edit by hand
+  guint j = self_get_col_index_for_name(self, name);
+  g_assert(j != -1);
+  
+  return self_get_short_value(self, i, j);
+}
+
+
+/** 
+ * get_short_values_for_col_names:
+ * @self: #GGobiStage
+ * @i: row index
+ *
+ * Convenience method for creating a new array of type gshort
+ * from the specified column.
+ **/
+public gshort*
+get_short_values_for_col_name(self, gchar* name)
+{
+  // This code is autogenerated, do not edit by hand
+  guint j = self_get_col_index_for_name(self, name);
+  g_assert(j != -1);
+  
+  return self_get_short_values(self, j);
+}
+
+/** 
+ * set_short_value_for_col_name:
+ * @self: #GGobiStage
+ * @i: row index
+ * @j: column index
+ * @value_for_col_name: new value_for_col_name
+ *
+ * Convenience method for setting short value.
+ **/
+public void
+set_short_value_for_col_name(self, guint i, gchar* name, gshort value)
+{
+  // This code is autogenerated, do not edit by hand
+  guint j = self_get_col_index_for_name(self, name);
+  g_assert(j != -1);
+  
+  self_set_short_value(self, i, j, value);
+}
+
+/** 
+ * set_short_values_for_col_name:
+ * @self: #GGobiStage
+ * @i: row index
+ * @value_for_col_name: array of short of length self->nrows
+ *
+ * Convenience method for setting entire column of shorts.
+ * Emits self_col_data_changed() signal.
+ **/
+public void
+set_short_values_for_col_name(self, gchar* name, gshort *values)
+{
+  // This code is autogenerated, do not edit by hand
+  guint j = self_get_col_index_for_name(self, name);
+  g_assert(j != -1);
+  
+  self_set_short_values(self, j, values);
+}
+
+/** 
+ * get_int_value:
+ * @self: #GGobiStage
+ * @i: row index
+ * @j: column index
+ *
+ * Convenience method for getting int value.
+ **/
+public gint
+get_int_value(self, guint i, guint j)
+{
+  // This code is autogenerated, do not edit by hand
+  return (gint) self_get_raw_value(self, i, j);
+}
+
+
+/** 
+ * get_int_values:
+ * @self: #GGobiStage
+ * @i: row index
+ *
+ * Convenience method for creating a new array of type gint
+ * from the specified column.
+ **/
+public gint*
+get_int_values(self, guint j)
+{
+  // This code is autogenerated, do not edit by hand
+  gint* values = g_new(gint, self->n_rows);
+  for (guint i = 0; i < self->n_rows; i++)
+    values[i] = self_get_int_value(self, i, j);
+  return(values);
+}
+
+/** 
+ * set_int_value:
+ * @self: #GGobiStage
+ * @i: row index
+ * @j: column index
+ * @value: new value
+ *
+ * Convenience method for setting int value.
+ **/
+public void
+set_int_value(self, guint i, guint j, gint value)
+{
+  // This code is autogenerated, do not edit by hand
+  self_set_raw_value(self, i, j, (gdouble) value);
+}
+
+/** 
+ * set_int_values:
+ * @self: #GGobiStage
+ * @i: row index
+ * @value: array of int of length self->nrows
+ *
+ * Convenience method for setting entire column of ints.
+ * Emits self_col_data_changed() signal.
+ **/
+public void
+set_int_values(self, guint j, gint *values)
+{
+  // This code is autogenerated, do not edit by hand
+  for (guint i = 0; i < self->n_rows; i++) {
+    self_set_int_value(self, i, j, values[i]);
+  }
+  self_col_data_changed(self, j);
+}
+
+
+/** 
+ * get_int_value_for_col_name:
+ * @self: #GGobiStage
+ * @i: row index
+ * @j: column index
+ *
+ * Convenience method for getting int value.
+ **/
+public gint
+get_int_value_for_col_name(self, guint i, gchar* name)
+{
+  // This code is autogenerated, do not edit by hand
+  guint j = self_get_col_index_for_name(self, name);
+  g_assert(j != -1);
+  
+  return self_get_int_value(self, i, j);
+}
+
+
+/** 
+ * get_int_values_for_col_names:
+ * @self: #GGobiStage
+ * @i: row index
+ *
+ * Convenience method for creating a new array of type gint
+ * from the specified column.
+ **/
+public gint*
+get_int_values_for_col_name(self, gchar* name)
+{
+  // This code is autogenerated, do not edit by hand
+  guint j = self_get_col_index_for_name(self, name);
+  g_assert(j != -1);
+  
+  return self_get_int_values(self, j);
+}
+
+/** 
+ * set_int_value_for_col_name:
+ * @self: #GGobiStage
+ * @i: row index
+ * @j: column index
+ * @value_for_col_name: new value_for_col_name
+ *
+ * Convenience method for setting int value.
+ **/
+public void
+set_int_value_for_col_name(self, guint i, gchar* name, gint value)
+{
+  // This code is autogenerated, do not edit by hand
+  guint j = self_get_col_index_for_name(self, name);
+  g_assert(j != -1);
+  
+  self_set_int_value(self, i, j, value);
+}
+
+/** 
+ * set_int_values_for_col_name:
+ * @self: #GGobiStage
+ * @i: row index
+ * @value_for_col_name: array of int of length self->nrows
+ *
+ * Convenience method for setting entire column of ints.
+ * Emits self_col_data_changed() signal.
+ **/
+public void
+set_int_values_for_col_name(self, gchar* name, gint *values)
+{
+  // This code is autogenerated, do not edit by hand
+  guint j = self_get_col_index_for_name(self, name);
+  g_assert(j != -1);
+  
+  self_set_int_values(self, j, values);
+}
+
+/* [[[end]]] */
+
+// FIXME: to be removed once pipeline in place
+/** 
+ * get_transformed_col_name:
+ * @self: GGobiStage object
+ * @j: column index
+ * Returns: duplicate of transformed column name (brief description of transformation
+ * applied to variable)
+ **/
+public gchar* 
+get_transformed_col_name(self, guint j) 
+{
+  gchar *lbl0, *lbl1, *lbl2;
+  GGobiVariable *vt = self_get_variable(self, j);
+
+   /*-- skip the stage0 changes except negation --*/
+   switch (vt->tform0) {
+     case NEGATE:
+       lbl0 = g_strdup_printf ("-%s", self_get_col_name(self, j));
+       break;
+     default:
+       lbl0 = g_strdup (self_get_col_name(self, j));
+       break;
+   }
+
+   switch (vt->tform1) {
+     case BOXCOX:
+       lbl1 = g_strdup_printf ("B-C(%s,%.2f)", lbl0, vt->param);
+       break;
+     case LOG10:
+       lbl1 = g_strdup_printf ("log10(%s)", lbl0);
+       break;
+     case INVERSE:
+       lbl1 = g_strdup_printf ("1/%s", lbl0);
+       break;
+     case ABSVALUE:
+       lbl1 = g_strdup_printf ("abs(%s)", lbl0);
+       break;
+     case SCALE_AB:
+       lbl1 = g_strdup_printf ("%s [a,b]", lbl0);
+       break;
+     default:
+       lbl1 = g_strdup (lbl0);
+   }
+
+   switch (vt->tform2) {
+     case STANDARDIZE:
+       lbl2 = g_strdup_printf ("(%s-m)/s", lbl1);
+     break;
+     case SORT:
+       lbl2 = g_strdup_printf ("sort(%s)", lbl1);
+     break;
+     case RANK:
+       lbl2 = g_strdup_printf ("rank(%s)", lbl1);
+     break;
+     case NORMSCORE:
+       lbl2 = g_strdup_printf ("normsc(%s)", lbl1);
+     break;
+     case ZSCORE:
+       lbl2 = g_strdup_printf ("zsc(%s)", lbl1);
+     break;
+     case DISCRETE2:
+       lbl2 = g_strdup_printf ("%s:0,1", lbl1);
+     break;
+     default:
+       lbl2 = g_strdup (lbl1);
+   }
+   
+   return lbl2;
+}
+
+// FIXME: data/attribute distinction should be made by a pipeline stage
+public guint
+get_n_data_cols(self) {
+  return self_get_n_cols(self) - self->n_attributes;
+}
+
+// FIXME: go away!
+private signal first NONE (UINT) void 
+rows_in_plot_changed(self, guint n) {
+  tform_to_world(self);
+  if (self->gg)
+    displays_tailpipe (FULL, self->gg);
+}
+
+/**
+ * set_rows_in_plot:
+ * @self: #GGobiData object
+ *
+ * Combine the values in two arrays:
+ *   excluded[] (which comes from the exclusion panel or from linking)
+ *   sampled[] (which come from the subset panel)
+ * to determine which cases should be plotted.
+ *
+ * rows_in_plot = sampled && !excluded
+ **/
+ // FIXME: Needs to go bye-bye
+public void
+set_rows_in_plot(self)
+{
+  guint i;
+  self->nrows_in_plot = 0;
+
+  for (i = 0; i < self->n_rows; i++)
+    if (self->sampled.els[i] && !self->excluded.els[i])
+      self->rows_in_plot.els[self->nrows_in_plot++] = i;
+  
+  self_rows_in_plot_changed(self, (guint) self->nrows_in_plot); 
+}
+
+/**
+ * attach:
+ * @self: #GGobiStage object
+ * @gg: GGobi object
+ * @cleanup: should cleanup occur?
+ *
+ * Attach a GGobi object to this dataset
+ * The purpose of this function is to hook up the #GGobiData object
+ * to all the gui components and make sure they stay in sync by
+ * listening to the correct signals.  This function still needs a lot of
+ * work.
+ **/
+ // FIXME: This should not exist.. we need a ggobi_add_data()
+public void 
+attach (self, ggobid *gg, gboolean cleanup)
+{
+  self->gg = gg;
+  gg->d = g_slist_append (gg->d, self);
+  displayd *display = NULL;
+  GGobiData *d = GGOBI_DATA(self_get_root(self));
+
+  gint *vars = (gint *) g_malloc(GGOBI_STAGE(self)->n_cols * sizeof(gint));
+  
+  self->brush.bin0.x = self->brush.bin1.x = BRUSH_NBINS;
+  self->brush.bin0.y = self->brush.bin1.y = BRUSH_NBINS;
+
+  gint iv, ih;
+  self->brush.nbins = BRUSH_NBINS;
+
+  edgeedit_init (self->gg);
+  if (ggobi_stage_get_n_edges(GGOBI_STAGE(self)))
+    vectorb_realloc (&d->edge.xed_by_brush, d->edge.n);
+
+  /* binning the plot window; no need to realloc these **/
+  self->brush.binarray = (bin_struct **)
+    g_malloc (self->brush.nbins * sizeof (bin_struct *));
+  for (ih = 0; ih < self->brush.nbins; ih++) {
+    self->brush.binarray[ih] = (bin_struct *)
+      g_malloc (self->brush.nbins * sizeof (bin_struct));
+
+    for (iv = 0; iv < self->brush.nbins; iv++) {
+      self->brush.binarray[ih][iv].nels = 0;
+      self->brush.binarray[ih][iv].nblocks = 1;
+      self->brush.binarray[ih][iv].els = (gulong *)
+        g_malloc (BINBLOCKSIZE * sizeof (gulong));
+    }
+  }
+
+  /**
+   * If there are missings, they've been initialized with a value
+   * of 0.  Here, re-set that value to 15% below the minimum for each
+   * variable.  (dfs -- done at Di's request, September 2004)
+   **/
+  limits_set (self, true, true, self->gg->lims_use_visible);
+  for (guint j = 0; j < self->n_cols; j++) vars[j] = j;
+  impute_fixed (IMP_BELOW, 15.0, self->n_cols, vars, self);
+  limits_set (self, true, true, self->gg->lims_use_visible);
+  g_free(vars);
+
+  for(guint j = 0; j < self_get_n_data_cols(self); j++) 
+    self_col_data_changed(self, j);
+
+  clusters_set(self);  /*-- find the clusters for data just read in --*/
+
+  display_menu_build (gg);
+  
+  // Set up variable table and listen to important events
+  self_connect__col_data_changed(self, vartable_stats_set_by_var, NULL);
+  self_connect__col_data_changed(self, vartable_limits_set_by_var, NULL);
+  self_connect__col_name_changed(self, vartable_collab_set_by_var, NULL);
+  self_connect__col_name_changed(self, vartable_collab_tform_set_by_var, NULL);
+
+  varcircles_populate (self, gg);
+  self_connect__col_name_changed(self, varcircle_label_set, NULL);
+
+  if (cleanup)
+    varpanel_clear (self, gg);
+  varpanel_populate (self, gg);   
+  if (gg->current_display != NULL)
+    varpanel_refresh (gg->current_display, gg);
+  if (g_slist_index(gg->d, (gpointer)self) == 0)
+    varpanel_set_sensitive (self, true, gg);
+  self_connect__col_name_changed(self, varpanel_label_set, NULL);
+  
+  if (cleanup || g_list_length(gg->displays) == 0) {
+    display_free_all (gg);  /*-- destroy any existing displays --*/
+    gg->pmode = NULL_PMODE;
+
+    /*-- initialize the first display --*/
+    if(sessionOptions->info->createInitialScatterPlot && 
+        self_get_n_cols(self)) {
+      display = scatterplot_new (false, NULL, self, gg);
+
+      gg->displays = g_list_append (gg->displays, (gpointer) display);
+      gg->current_splot = (splotd *)
+      g_list_nth_data (display->splots, 0);
+      display->current_splot = gg->current_splot;
+      display_set_current (display, gg);
+
+      sp_event_handlers_toggle (gg->current_splot, on, gg->pmode, gg->imode);
+    }
+  }
+  g_signal_emit_by_name (G_OBJECT (gg), "datad_added", self);
+}
+
+/**
+ * set_variable:
+ * @self: #GGobiStage object
+ * @j: column index
+ *
+ * Set variable meta data for specified column
+ **/
+public void
+set_variable (self, guint j, GGobiVariable* value)
+{
+  // FIXME: This function should not exist
+  // It's only use is in cloning of vars, which needs to be redone
+  if (g_ptr_array_index(self->vartable, j))
+    g_object_unref(g_ptr_array_index(self->vartable, j));
+  g_ptr_array_index(self->vartable, j) = value;
 }
 
 }

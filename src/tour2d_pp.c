@@ -638,7 +638,7 @@ gboolean
 t2d_switch_index(Tour2DCPanel controls, gint basismeth, displayd *dsp,
   ggobid *gg)
 {
-  GGobiData *d = dsp->d;
+  GGobiStage *d = dsp->d;
   gint kout, nrows = d->nrows_in_plot;
   gfloat *gdata;
   gint i, j, k;

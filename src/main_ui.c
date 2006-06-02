@@ -156,10 +156,10 @@ gg_write_to_statusbar (gchar * message, ggobid * gg)
     gtk_statusbar_push (GTK_STATUSBAR (statusbar), 0, message);
   else {
     /*-- by default, describe the current datad --*/
-    GGobiData *d = datad_get_from_notebook (gg->varpanel_ui.notebook, gg);
+    GGobiStage *d = datad_get_from_notebook (gg->varpanel_ui.notebook, gg);
     if (d) {
       gchar *msg = g_strdup_printf ("%s: %d x %d  (%s)",
-                                    ggobi_stage_get_name(GGOBI_STAGE(d)), GGOBI_STAGE(d)->n_rows, GGOBI_STAGE(d)->n_cols,
+                                    ggobi_stage_get_name(d), d->n_rows, d->n_cols,
                                     gg->input->fileName);
       gtk_statusbar_push (GTK_STATUSBAR (statusbar), 0, msg);
       g_free (msg);
@@ -216,14 +216,14 @@ varpanel_highd (displayd * display)
  * Use the widget state to figure out which is currently displayed.
 */
 static gboolean
-varpanel_shows_circles (GGobiData * d)
+varpanel_shows_circles (GGobiStage * d)
 {
   return (d != NULL &&
           d->vcirc_ui.ebox != NULL && GTK_WIDGET_REALIZED (d->vcirc_ui.ebox));
 }
 
 static gboolean
-varpanel_shows_checkboxes (GGobiData * d)
+varpanel_shows_checkboxes (GGobiStage * d)
 {
   return (d != NULL &&
           d->vcbox_ui.ebox != NULL && GTK_WIDGET_REALIZED (d->vcbox_ui.ebox));
@@ -232,7 +232,7 @@ varpanel_shows_checkboxes (GGobiData * d)
 void
 varpanel_reinit (ggobid * gg)
 {
-  GGobiData *d;
+  GGobiStage *d;
   gboolean highd;
   displayd *display = gg->current_display;
 
@@ -582,33 +582,33 @@ gboolean
 projection_ok (ProjectionMode m, displayd * display)
 {
   gboolean ok = true;
-  GGobiData *d = display->d;
+  GGobiStage *d = display->d;
 
   /*-- if the mode is a projection-setting mode ... --*/
   if (m <= COTOUR) {
     switch (m) {
     case P1PLOT:
-      if (!ggobi_stage_get_n_cols(GGOBI_STAGE(d)))
+      if (!ggobi_stage_get_n_cols(d))
         ok = false;
       break;
     case XYPLOT:
-      if (GGOBI_STAGE(d)->n_cols < 2)
+      if (d->n_cols < 2)
         ok = false;
       break;
     case TOUR2D3:
-      if (GGOBI_STAGE(d)->n_cols < MIN_NVARS_FOR_TOUR2D3)
+      if (d->n_cols < MIN_NVARS_FOR_TOUR2D3)
         ok = false;
       break;
     case TOUR1D:
-      if (GGOBI_STAGE(d)->n_cols < MIN_NVARS_FOR_TOUR1D)
+      if (d->n_cols < MIN_NVARS_FOR_TOUR1D)
         ok = false;
       break;
     case TOUR2D:
-      if (GGOBI_STAGE(d)->n_cols < MIN_NVARS_FOR_TOUR2D)
+      if (d->n_cols < MIN_NVARS_FOR_TOUR2D)
         ok = false;
       break;
     case COTOUR:
-      if (GGOBI_STAGE(d)->n_cols < MIN_NVARS_FOR_COTOUR)
+      if (d->n_cols < MIN_NVARS_FOR_COTOUR)
         ok = false;
       break;
     default:

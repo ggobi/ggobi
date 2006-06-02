@@ -224,7 +224,7 @@ t2d_ppda_expose_cb (GtkWidget *w, GdkEventConfigure *event, displayd *dsp)
   gint xpos, ypos, xstrt, ystrt;
   gchar *tickmk;
   GtkStyle *style = gtk_widget_get_style (dsp->t2d_ppda);
-  GGobiData *d = dsp->d;
+  GGobiStage *d = dsp->d;
 */
   gint wid = w->allocation.width, hgt = w->allocation.height;
   /*  static gboolean init = true;*/
@@ -275,7 +275,7 @@ tour2dpp_window_open (ggobid *gg) {
   GtkWidget *hbox, *vbox, *vbc, *vb, *frame, *tgl, *hb, *opt, *sbar, *lbl;
   GtkObject *adj;
   displayd *dsp = gg->current_display;  /* ok as long as we only use the gui */
-  GGobiData *d = dsp->d;
+  GGobiStage *d = dsp->d;
   gboolean vars_sphered = true;
   /*-- to initialize the checkboxes in the menu --*/
   GtkWidget *item;

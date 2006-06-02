@@ -89,7 +89,7 @@ void startXMLElement (void *user_data, const xmlChar * name,
 void endXMLElement (void *user_data, const xmlChar * name);
 void Characters (void *user_data, const xmlChar * ch, gint len);
 void cumulateRecordData (XMLParserData * data, const xmlChar * ch, gint len);
-static gboolean setRecordValue (const char *tmp, GGobiData * d,
+static gboolean setRecordValue (const char *tmp, GGobiStage * d,
                                 XMLParserData * data);
 void resetRecordInfo (XMLParserData * data);
 static void releaseCurrentDataInfo (XMLParserData * parserData);
@@ -445,12 +445,12 @@ setLevelIndex (const xmlChar ** attrs, XMLParserData * data)
 {
   const gchar *tmp = getAttribute (attrs, "value");
   gint itmp;
-  GGobiData *d = getCurrentXMLData (data);
+  GGobiStage *d = getCurrentXMLData (data);
 
 /*-- dfs: placeholder for proper debugging --*/
   if (data->current_level >= data->current_nlevels) {
     ggobi_XML_warning_handler (data, "adding too many levels to %s\n",
-                             ggobi_stage_get_col_name(GGOBI_STAGE(d), data->current_variable));
+                             ggobi_stage_get_col_name(d, data->current_variable));
   }
 /* */
 
@@ -466,7 +466,7 @@ setLevelIndex (const xmlChar ** attrs, XMLParserData * data)
 void
 categoricalLevels (const xmlChar ** attrs, XMLParserData * data)
 {
-  GGobiData *d = getCurrentXMLData (data);
+  GGobiStage *d = getCurrentXMLData (data);
 
   const gchar *tmp = getAttribute (attrs, "count");
 
@@ -475,7 +475,7 @@ categoricalLevels (const xmlChar ** attrs, XMLParserData * data)
     data->current_nlevels = atoi (tmp);
     if (data->current_nlevels < 1) {
       ggobi_XML_error_handler (stderr, "Level count for %s mis-specified\n", 
-        ggobi_stage_get_col_name(GGOBI_STAGE(d), data->current_variable));
+        ggobi_stage_get_col_name(d, data->current_variable));
     }
   }
 
@@ -501,8 +501,8 @@ addLevel (XMLParserData * data, const gchar * c, gint len)
 void
 endCategoricalLevel (XMLParserData *data)
 {
-  GGobiData *d = getCurrentXMLData (data);
-  GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(d), data->current_variable);
+  GGobiStage *d = getCurrentXMLData (data);
+  GGobiVariable *var = ggobi_stage_get_variable(d, data->current_variable);
   ggobi_variable_add_level(var, data->current_level_name, 
     data->current_level_value);
   g_free (data->current_level_name);
@@ -552,15 +552,15 @@ edgecompare (const void *val1, const void *val2)
 void
 setEdgePartners (XMLParserData * parserData)
 {
-  GGobiData *e = getCurrentXMLData (parserData);
+  GGobiStage *e = getCurrentXMLData (parserData);
   SortableEndpoints *ep;
   gint i, k, n;
   gboolean dups = false;
 
-  if (!ggobi_stage_get_n_edges(GGOBI_STAGE(e)))
+  if (!ggobi_stage_get_n_edges(e))
     return;
 
-  n = 2 * e->edge.n;
+  n = 2 * ggobi_stage_get_n_edges(e);
   ep = (SortableEndpoints *)
     g_malloc (n * sizeof (SortableEndpoints));
 
@@ -572,20 +572,20 @@ setEdgePartners (XMLParserData * parserData)
    * want them around.
    */
 
-  for (i = 0, k = 0; i < e->edge.n; i++) {
-    ep[k].a = g_strdup ((gchar *) e->edge.sym_endpoints[i].a);
-    ep[k].b = g_strdup ((gchar *) e->edge.sym_endpoints[i].b);
+  for (i = 0, k = 0; i < ggobi_stage_get_n_edges(e); i++) {
+    ep[k].a = g_strdup ((gchar *) ggobi_stage_get_edge_data(e)->sym_endpoints[i].a);
+    ep[k].b = g_strdup ((gchar *) ggobi_stage_get_edge_data(e)->sym_endpoints[i].b);
     ep[k].jcase = i;
     k++;
   }
-  qsort ((gchar *) ep, e->edge.n, sizeof (SortableEndpoints), edgecompare);
+  qsort ((gchar *) ep, ggobi_stage_get_n_edges(e), sizeof (SortableEndpoints), edgecompare);
 
-  for (i = 1; i < e->edge.n; i++) {
+  for (i = 1; i < ggobi_stage_get_n_edges(e); i++) {
     k = i - 1;
     if (strcmp (ep[i].a, ep[k].a) == 0 && strcmp (ep[i].b, ep[k].b) == 0) {
       g_critical ("Found duplicate edge from %s to %s",
-                  (gchar *) e->edge.sym_endpoints[ep[i].jcase].a,
-                  (gchar *) e->edge.sym_endpoints[ep[i].jcase].b);
+                  (gchar *) ggobi_stage_get_edge_data(e)->sym_endpoints[ep[i].jcase].a,
+                  (gchar *) ggobi_stage_get_edge_data(e)->sym_endpoints[ep[i].jcase].b);
       dups = true;
     }
   }
@@ -594,9 +594,9 @@ setEdgePartners (XMLParserData * parserData)
 
 
   /*-- If there are no dups, add the reverse of each edge and re-sort --*/
-  for (i = 0, k = e->edge.n; i < e->edge.n; i++) {
-    ep[k].a = g_strdup ((gchar *) e->edge.sym_endpoints[i].b);
-    ep[k].b = g_strdup ((gchar *) e->edge.sym_endpoints[i].a);
+  for (i = 0, k = ggobi_stage_get_n_edges(e); i < ggobi_stage_get_n_edges(e); i++) {
+    ep[k].a = g_strdup ((gchar *) ggobi_stage_get_edge_data(e)->sym_endpoints[i].b);
+    ep[k].b = g_strdup ((gchar *) ggobi_stage_get_edge_data(e)->sym_endpoints[i].a);
     ep[k].jcase = i;
     k++;
   }
@@ -606,8 +606,8 @@ setEdgePartners (XMLParserData * parserData)
   for (i = 1; i < n; i++) {
     k = i - 1;
     if (strcmp (ep[i].a, ep[k].a) == 0 && strcmp (ep[i].b, ep[k].b) == 0) {
-      e->edge.sym_endpoints[ep[i].jcase].jpartner = ep[k].jcase;
-      e->edge.sym_endpoints[ep[k].jcase].jpartner = ep[i].jcase;
+      ggobi_stage_get_edge_data(e)->sym_endpoints[ep[i].jcase].jpartner = ep[k].jcase;
+      ggobi_stage_get_edge_data(e)->sym_endpoints[ep[k].jcase].jpartner = ep[i].jcase;
     }
   }
 
@@ -630,13 +630,13 @@ endXMLElement (void *user_data, const xmlChar * name)
     resolveEdgeIds (data);
   case DATASET:
     {
-      GGobiData *d = getCurrentXMLData (data);
+      GGobiStage *d = getCurrentXMLData (data);
 
       setEdgePartners (data);
       releaseCurrentDataInfo (data);
-      if (data->current_record < GGOBI_STAGE(d)->n_rows) {
+      if (data->current_record < d->n_rows) {
         g_error ("There are fewer records than declared for '%s': %d < %d.",
-                 ggobi_stage_get_name(GGOBI_STAGE(d)), data->current_record, GGOBI_STAGE(d)->n_rows);
+                 ggobi_stage_get_name(d), data->current_record, d->n_rows);
       }
 
       data->dlist = g_slist_append (data->dlist, d);
@@ -645,14 +645,14 @@ endXMLElement (void *user_data, const xmlChar * name)
     break;
 
   case EDGE:
-    if (data->current_element < GGOBI_STAGE(data->current_data)->n_cols) {
+    if (data->current_element < data->current_data->n_cols) {
       ggobi_XML_error_handler (data, "Not enough elements\n");
     }
     data->current_record++;
     break;
   case RECORD:
     /* This processes every element in the record, and it will
-       become confused and complain if we don't feed ggobi_data_get_n_data_cols(d)
+       become confused and complain if we don't feed ggobi_stage_get_n_data_cols(d)
        elements to it.  I believe it also handles the </record>
        tag in the case where record elements have been individually
        tagged, and it does that without confusion. */
@@ -661,7 +661,7 @@ endXMLElement (void *user_data, const xmlChar * name)
     resetRecordInfo (data);
     break;
   case NA:
-    ggobi_stage_set_missing(GGOBI_STAGE(getCurrentXMLData(data)), data->current_record, data->current_element);
+    ggobi_stage_set_missing(getCurrentXMLData(data), data->current_record, data->current_element);
     data->current_element++;
     break;
   case REAL:
@@ -869,15 +869,15 @@ gboolean
 setDatasetInfo (const xmlChar ** attrs, XMLParserData * data)
 {
   const gchar *tmp = getAttribute (attrs, "count");
-  GGobiData *d = getCurrentXMLData (data);
+  GGobiStage *d = getCurrentXMLData (data);
 
   if (tmp == NULL) {
     g_error ("No count attribute");
   }
 
-  ggobi_data_add_rows(d, atoi (tmp));
+  ggobi_data_add_rows(GGOBI_DATA(d), atoi (tmp));
 
-  d->edge.n = 0;
+  GGOBI_DATA(d)->edge.n = 0;
 
   setDefaultDatasetValues (attrs, data);
 
@@ -928,7 +928,7 @@ gboolean
 setHidden (const xmlChar ** attrs, XMLParserData * data, gint i)
 {
   const gchar *tmp;
-  GGobiData *d = getCurrentXMLData (data);
+  GGobiStage *d = getCurrentXMLData (data);
 
   tmp = getAttribute (attrs, "hidden");
   if (tmp) {
@@ -938,7 +938,7 @@ setHidden (const xmlChar ** attrs, XMLParserData * data, gint i)
       data->defaults.hidden = hidden;
     }
     else
-      ggobi_data_set_attr_hidden(d, i, hidden, ATTR_SET_PERSISTENT);
+      ggobi_stage_set_attr_hidden(d, i, hidden, ATTR_SET_PERSISTENT);
   }
 
   return (tmp != NULL);
@@ -963,7 +963,7 @@ setColor (const xmlChar ** attrs, XMLParserData * data, gint i)
 {
   const gchar *tmp;
   gint value = data->defaults.color;
-  GGobiData *d = getCurrentXMLData (data);
+  GGobiStage *d = getCurrentXMLData (data);
   colorschemed *scheme = data->gg->activeColorScheme;
 
   tmp = getAttribute (attrs, "color");
@@ -978,7 +978,7 @@ setColor (const xmlChar ** attrs, XMLParserData * data, gint i)
     if (i < 0)
       data->defaults.color = value;
     else
-      ggobi_data_set_attr_color(d, i, value, ATTR_SET_PERSISTENT);
+      ggobi_stage_set_attr_color(d, i, value, ATTR_SET_PERSISTENT);
   }
 
   return (value != -1);
@@ -989,7 +989,7 @@ setGlyph (const xmlChar ** attrs, XMLParserData * data, gint i)
 {
   const gchar *tmp;
   gint size, type;
-  GGobiData *d = getCurrentXMLData (data);
+  GGobiStage *d = getCurrentXMLData (data);
 
 /*
  * glyphSize  0:7
@@ -1074,7 +1074,7 @@ setGlyph (const xmlChar ** attrs, XMLParserData * data, gint i)
   }
 
   if (i >= 0)
-    ggobi_data_set_attr_glyph_parts(d, i, type || data->defaults.glyphType, size || data->defaults.glyphSize, ATTR_SET_PERSISTENT);
+    ggobi_stage_set_attr_glyph_parts(d, i, type || data->defaults.glyphType, size || data->defaults.glyphSize, ATTR_SET_PERSISTENT);
 
 
   return (size != -1 && type != -1);
@@ -1090,17 +1090,17 @@ xml_warning (const gchar * attribute, const gchar * value, const gchar * msg,
 }
 
 static void
-applyRandomUniforms (GGobiData * d, XMLParserData * data)
+applyRandomUniforms (GGobiStage * d, XMLParserData * data)
 {
-  gint j, ncols = ggobi_stage_get_n_cols(GGOBI_STAGE(d));
+  gint j, ncols = ggobi_stage_get_n_cols(d);
   for (j = data->current_element; j < ncols && 
-   ggobi_stage_get_col_type(GGOBI_STAGE(d), j) == GGOBI_VARIABLE_UNIFORM; j++) {
-    ggobi_stage_set_raw_value(GGOBI_STAGE(d), data->current_record, data->current_element, randvalue());
+   ggobi_stage_get_col_type(d, j) == GGOBI_VARIABLE_UNIFORM; j++) {
+    ggobi_stage_set_raw_value(d, data->current_record, data->current_element, randvalue());
   }
 }
 
 static gboolean
-setRecordValue (const char *tmp, GGobiData * d, XMLParserData * data)
+setRecordValue (const char *tmp, GGobiStage * d, XMLParserData * data)
 {
   gdouble value;
 
@@ -1108,13 +1108,13 @@ setRecordValue (const char *tmp, GGobiData * d, XMLParserData * data)
      cursor is at that. */
   if (data->counterVariableIndex > -1 &&
       data->current_element == data->counterVariableIndex) {
-    ggobi_stage_set_raw_value(GGOBI_STAGE(d), data->current_record, data->current_element, data->current_record + 1);
+    ggobi_stage_set_raw_value(d, data->current_record, data->current_element, data->current_record + 1);
     data->current_element++;
   }
 
   /* If reading past the last column or row, stop */
-  if (data->current_record >= GGOBI_STAGE(d)->n_rows||
-      data->current_element >= GGOBI_STAGE(d)->n_cols) {
+  if (data->current_record >= d->n_rows||
+      data->current_element >= d->n_cols) {
     g_printerr ("Row %d (counting from 1) has too many elements\n",
                 data->current_record + 1);
     data->current_element = 0;
@@ -1122,7 +1122,7 @@ setRecordValue (const char *tmp, GGobiData * d, XMLParserData * data)
   }
 
   applyRandomUniforms (d, data);
-  if (!ggobi_stage_get_n_cols(GGOBI_STAGE(d)))
+  if (!ggobi_stage_get_n_cols(d))
     return (true);
 
   /*
@@ -1136,13 +1136,13 @@ setRecordValue (const char *tmp, GGobiData * d, XMLParserData * data)
         strcmp (tmp, "NA") == 0 ||
         strcmp (tmp, ".") == 0)) ||
       (data->NA_identifier && strcmp (tmp, data->NA_identifier) == 0)) {
-    ggobi_stage_set_missing(GGOBI_STAGE(d), data->current_record, data->current_element);    
+    ggobi_stage_set_missing(d, data->current_record, data->current_element);    
   }  else {
-    GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(d), data->current_element);
+    GGobiVariable *var = ggobi_stage_get_variable(d, data->current_element);
     value = asNumber (tmp);
     if (GGOBI_VARIABLE_IS_CATEGORICAL(var)) {
       if (data->autoLevels && data->autoLevels[data->current_element]) {
-        ggobi_stage_set_categorical_value(GGOBI_STAGE(d), data->current_record, 
+        ggobi_stage_set_categorical_value(d, data->current_record, 
           data->current_element, tmp);
       }
       else {
@@ -1150,10 +1150,10 @@ setRecordValue (const char *tmp, GGobiData * d, XMLParserData * data)
           ggobi_XML_warning_handler (data,
             "incorrect level in record %d, variable `%s', dataset `%s' in the XML input file\n",
             (int) data->current_record + 1, ggobi_variable_get_name(var),
-            ggobi_stage_get_name(GGOBI_STAGE(data->current_data)) ? 
-              ggobi_stage_get_name(GGOBI_STAGE(data->current_data)) : "");
+            ggobi_stage_get_name(data->current_data) ? 
+              ggobi_stage_get_name(data->current_data) : "");
         }
-        ggobi_stage_set_raw_value(GGOBI_STAGE(d), data->current_record, data->current_element, value);
+        ggobi_stage_set_raw_value(d, data->current_record, data->current_element, value);
       }
     }
     else if (data->state == STRING) {
@@ -1161,7 +1161,7 @@ setRecordValue (const char *tmp, GGobiData * d, XMLParserData * data)
         "<string> element for non categorical variable (%s) in record %d\n",
         ggobi_variable_get_name(var), (int) data->current_record + 1);
       value = 0;
-    } else ggobi_stage_set_raw_value(GGOBI_STAGE(d), data->current_record, data->current_element, value);
+    } else ggobi_stage_set_raw_value(d, data->current_record, data->current_element, value);
   }
 
   return (true);
@@ -1177,10 +1177,10 @@ setRecordValues (XMLParserData * data, const xmlChar * line, gint len,
                  gint ncols)
 {
   const gchar *tmp;
-  GGobiData *d = getCurrentXMLData (data);
+  GGobiStage *d = getCurrentXMLData (data);
 
   if (ncols == -1) {
-    ncols = ggobi_data_get_n_data_cols(d);
+    ncols = ggobi_stage_get_n_data_cols(d);
   }
 
   if (!line) {
@@ -1206,7 +1206,7 @@ setRecordValues (XMLParserData * data, const xmlChar * line, gint len,
     /*
        g_printerr ("Record %d has insufficient elements: %d < %d\n",
        data->current_record, data->current_element,
-       ggobi_data_get_n_data_cols(d));
+       ggobi_stage_get_n_data_cols(d));
      */
   }
 
@@ -1239,17 +1239,17 @@ newVariable (const xmlChar ** attrs, XMLParserData * data,
              const xmlChar * tagName)
 {
   const gchar *tmp, *tmp1;
-  GGobiData *d = getCurrentXMLData (data);
+  GGobiStage *d = getCurrentXMLData (data);
   GGobiVariable *el;
   
-  if (data->current_variable >= ggobi_data_get_n_data_cols(d)) {
+  if (data->current_variable >= ggobi_stage_get_n_data_cols(d)) {
     ggobi_XML_error_handler
       (data, "More variables (%d) than given in the <variables count='%d'> element for dataset %s\n",
-       data->current_variable, ggobi_data_get_n_data_cols(d), ggobi_stage_get_name(GGOBI_STAGE(d)));
+       data->current_variable, ggobi_stage_get_n_data_cols(d), ggobi_stage_get_name(d));
     return (false);
   }
 
-  el = ggobi_stage_get_variable(GGOBI_STAGE(d), data->current_variable);
+  el = ggobi_stage_get_variable(d, data->current_variable);
 
   data->variable_transform_name_as_attribute = false;
 
@@ -1281,24 +1281,24 @@ newVariable (const xmlChar ** attrs, XMLParserData * data,
 
 
   if (strcmp ((const char *) tagName, "categoricalvariable") == 0) {
-    ggobi_data_set_col_type(d, data->current_variable, GGOBI_VARIABLE_CATEGORICAL);
+    ggobi_data_set_col_type(GGOBI_DATA(d), data->current_variable, GGOBI_VARIABLE_CATEGORICAL);
 
     /* Mark this as being a variable for which we must compute the levels. */
     if ((tmp = getAttribute (attrs, "levels")) && strcmp (tmp, "auto") == 0) {
       if (data->autoLevels == NULL) {
-        data->autoLevels = g_new0(gboolean, GGOBI_STAGE(data->current_data)->n_cols);
+        data->autoLevels = g_new0(gboolean, data->current_data->n_cols);
       }
       data->autoLevels[data->current_variable] = true;
     }
   }
   else if (strcmp ((const char *) tagName, "integervariable") == 0) {
-    ggobi_data_set_col_type(d, data->current_variable, GGOBI_VARIABLE_INTEGER);
+    ggobi_data_set_col_type(GGOBI_DATA(d), data->current_variable, GGOBI_VARIABLE_INTEGER);
   }
   else if (strcmp ((const char *) tagName, "countervariable") == 0) {
-    ggobi_data_set_col_type(d, data->current_variable, GGOBI_VARIABLE_COUNTER);
+    ggobi_data_set_col_type(GGOBI_DATA(d), data->current_variable, GGOBI_VARIABLE_COUNTER);
   }
   else if (strcmp ((const char *) tagName, "randomuniformvariable") == 0) {
-    ggobi_data_set_col_type(d, data->current_variable, GGOBI_VARIABLE_UNIFORM);
+    ggobi_data_set_col_type(GGOBI_DATA(d), data->current_variable, GGOBI_VARIABLE_UNIFORM);
   }                             /* real by default */
 
 /* This is now disabled - sorry if people like it
@@ -1324,14 +1324,14 @@ gboolean
 allocVariables (const xmlChar ** attrs, XMLParserData * data)
 {
   const gchar *tmp = getAttribute (attrs, "count");
-  GGobiData *d = getCurrentXMLData (data);
+  GGobiStage *d = getCurrentXMLData (data);
 
   if (tmp == NULL) {
     g_error ("No count for variables attribute\n");
   }
 
-  ggobi_data_add_cols(d, atoi (tmp));
-  ggobi_data_add_attributes(d);
+  ggobi_data_add_cols(GGOBI_DATA(d), atoi (tmp));
+  ggobi_data_add_attributes(GGOBI_DATA(d));
   
   return (true);
 }
@@ -1339,8 +1339,8 @@ allocVariables (const xmlChar ** attrs, XMLParserData * data)
 static void
 endVariable (XMLParserData *data)
 {
-  GGobiData *d = getCurrentXMLData (data);
-  ggobi_stage_set_col_name(GGOBI_STAGE(d), data->current_element, data->current_name);
+  GGobiStage *d = getCurrentXMLData (data);
+  ggobi_stage_set_col_name(d, data->current_element, data->current_name);
   g_free(data->current_name);
   data->current_name = NULL;
 }
@@ -1416,13 +1416,13 @@ gboolean
 setDataset (const xmlChar ** attrs, XMLParserData * parserData,
             enum xmlDataState type)
 {
-  GGobiData *data = ggobi_data_new (0, 0);
+  GGobiStage *data = GGOBI_STAGE(ggobi_data_new (0, 0));
   const gchar *name, *nickname;
 
   name = getAttribute (attrs, "name");
   nickname = getAttribute (attrs, "nickname");
-  ggobi_stage_set_name(GGOBI_STAGE(data), (gchar *)name);
-  ggobi_data_set_nickname(data, (gchar *)nickname);
+  ggobi_stage_set_name(data, (gchar *)name);
+  ggobi_data_set_nickname(GGOBI_DATA(data), (gchar *)nickname);
 
   parserData->current_data = data;
   parserData->counterVariableIndex = -1;
@@ -1435,29 +1435,29 @@ setDataset (const xmlChar ** attrs, XMLParserData * parserData,
 }
 
 
-GGobiData *
+GGobiStage *
 getCurrentXMLData (XMLParserData * parserData)
 {
-  GGobiData *data = parserData->current_data;
+  GGobiStage *data = parserData->current_data;
   if (data == NULL) {
-    data = ggobi_data_new (0, 0);
+    data = GGOBI_STAGE(ggobi_data_new (0, 0));
     parserData->current_data = data;
   }
-  if (data->input == NULL)
-    data->input = parserData->input;
+  if (GGOBI_DATA(data)->input == NULL)
+    GGOBI_DATA(data)->input = parserData->input;
   return (data);
 }
 
 gboolean
 readXMLRecord (const xmlChar ** attrs, XMLParserData * data)
 {
-  GGobiData *d = getCurrentXMLData (data);
+  GGobiStage *d = getCurrentXMLData (data);
   const gchar *tmp;
   gint i = data->current_record;
 
-  if (i == GGOBI_STAGE(d)->n_rows) {
+  if (i == d->n_rows) {
     g_error ("There are more records than declared for '%s'; exiting.",
-             ggobi_stage_get_name(GGOBI_STAGE(d)));
+             ggobi_stage_get_name(d));
   }
 
   data->current_element = 0;
@@ -1473,15 +1473,15 @@ readXMLRecord (const xmlChar ** attrs, XMLParserData * data)
 
   tmp = getAttribute (attrs, "id");
   if (tmp) {
-    gint m = ggobi_stage_get_row_for_id(GGOBI_STAGE(d), (gchar*) tmp);
+    gint m = ggobi_stage_get_row_for_id(d, (gchar*) tmp);
     if (m != -1)
       ggobi_XML_error_handler (data,
         "duplicated id (%s) in records %d and %d of dataset %s\n",
         (gchar *) tmp,
         data->current_record + 1,
         m + 1,
-        ggobi_stage_get_name(GGOBI_STAGE(data->current_data)));
-    ggobi_stage_set_row_id(GGOBI_STAGE(d), (guint) i, (gchar*) tmp, false);
+        ggobi_stage_get_name(data->current_data));
+    ggobi_stage_set_row_id(d, (guint) i, (gchar*) tmp, false);
   }
 
 /*
@@ -1506,15 +1506,15 @@ readXMLRecord (const xmlChar ** attrs, XMLParserData * data)
       return (true);
     }
 
-    if (d->edge.sym_endpoints == NULL) {
-      d->edge.n = GGOBI_STAGE(d)->n_rows;
-      d->edge.sym_endpoints = (SymbolicEndpoints *)
-        g_malloc (sizeof (SymbolicEndpoints) * d->edge.n);
+    if (ggobi_stage_get_edge_data(d)->sym_endpoints == NULL) {
+      GGOBI_DATA(d)->edge.n = d->n_rows;
+      GGOBI_DATA(d)->edge.sym_endpoints = (SymbolicEndpoints *)
+        g_malloc (sizeof (SymbolicEndpoints) * ggobi_stage_get_n_edges(d));
     }
 
-    d->edge.sym_endpoints[data->current_record].a = intern (data, tmp);
-    d->edge.sym_endpoints[data->current_record].b = intern (data, dest);
-    d->edge.sym_endpoints[data->current_record].jpartner = -1;
+    ggobi_stage_get_edge_data(d)->sym_endpoints[data->current_record].a = intern (data, tmp);
+    ggobi_stage_get_edge_data(d)->sym_endpoints[data->current_record].b = intern (data, dest);
+    ggobi_stage_get_edge_data(d)->sym_endpoints[data->current_record].jpartner = -1;
   }
 
   return (true);

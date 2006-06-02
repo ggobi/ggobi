@@ -34,7 +34,7 @@
 
 #ifdef WIN32
 
-static void drawing_arrays_alloc (splotd *sp, GGobiData *d, ggobid *gg);
+static void drawing_arrays_alloc (splotd *sp, GGobiStage *d, ggobid *gg);
 static void build_circle (icoords *, gint, arcd *, gint, gshort);
 static void build_plus (icoords *, gint, GdkSegment *, gint, gshort);
 static void build_rect (icoords *, gint, rectd *, gint, gshort);
@@ -58,8 +58,8 @@ static arcd       *filled_arcs;
 */
 
 static void
-drawing_arrays_alloc (splotd *sp, GGobiData *d, ggobid *gg) {
-  gint n = GGOBI_STAGE(d)->n_rows
+drawing_arrays_alloc (splotd *sp, GGobiStage *d, ggobid *gg) {
+  gint n = d->n_rows
 
   if (sp->win32.npoints == 0) {
     sp->win32.points = (GdkPoint *) g_malloc (n * sizeof (GdkPoint));
@@ -342,7 +342,7 @@ win32_draw_to_pixmap_unbinned (gint current_color, splotd *sp, gboolean draw_hid
 {
   displayd *display = (displayd *) sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
-  GGobiData *d = display->d;
+  GGobiStage *d = display->d;
 
   gint i, m;
   gint npt, nseg, nr_open, nr_filled, nc_open, nc_filled;
@@ -353,19 +353,19 @@ win32_draw_to_pixmap_unbinned (gint current_color, splotd *sp, gboolean draw_hid
 #endif
   npt = nseg = nr_open = nr_filled = nc_open = nc_filled = 0;
 
-  if (sp->win32.npoints < GGOBI_STAGE(d)->n_rows
+  if (sp->win32.npoints < d->n_rows
     drawing_arrays_alloc (sp, d, gg);
 
   for (i=0; i<d->nrows_in_plot; i++) {
     m = d->rows_in_plot.els[i];
 
     if (splot_plot_case (m, d, sp, display, gg)) {
-      if ((draw_hidden && ggobi_data_get_attr_hidden(d, m)) ||  /*-- drawing hiddens --*/
-         (ggobi_data_get_attr_color(d, m) == current_color &&   /*-- drawing unhiddens --*/
-              !draw_hidden && !ggobi_data_get_attr_hidden(d, m)))
+      if ((draw_hidden && ggobi_stage_get_attr_hidden(d, m)) ||  /*-- drawing hiddens --*/
+         (ggobi_stage_get_attr_color(d, m) == current_color &&   /*-- drawing unhiddens --*/
+              !draw_hidden && !ggobi_stage_get_attr_hidden(d, m)))
       {
         if (display->options.points_show_p) {
-          build_glyph (ggobi_data_get_attr_glyph(d, m), sp->screen, m,
+          build_glyph (ggobi_stage_get_attr_glyph(d, m), sp->screen, m,
             sp->win32.points, &npt,         sp->win32.segs, &nseg,
             sp->win32.open_rects, &nr_open, sp->win32.filled_rects, &nr_filled,
             sp->win32.open_arcs, &nc_open,  sp->win32.filled_arcs, &nc_filled);
@@ -403,7 +403,7 @@ win32_draw_to_pixmap_binned (icoords *bin0, icoords *bin1,
   gint current_color, splotd *sp, gboolean draw_hidden, ggobid *gg)
 {
   displayd *display = (displayd *) sp->displayptr;
-  GGobiData *d = display->d;
+  GGobiStage *d = display->d;
   gint ih, iv;
   gint m, j;
   gint npt, nseg, nr_open, nr_filled, nc_open, nc_filled;
@@ -415,11 +415,11 @@ win32_draw_to_pixmap_binned (icoords *bin0, icoords *bin1,
       for (m=0; m<d->brush.binarray[ih][iv].nels; m++) {
         j = d->rows_in_plot.els[d->brush.binarray[ih][iv].els[m]];
         if (splot_plot_case (j, d, sp, display, gg)) {
-          if ((draw_hidden && ggobi_data_get_attr_hidden(d, j)) ||  /*-- hiddens --*/
-             (ggobi_data_get_attr_color(d, j) == current_color &&   /*-- unhiddens --*/
-                  !draw_hidden && !ggobi_data_get_attr_hidden(d, j)))
+          if ((draw_hidden && ggobi_stage_get_attr_hidden(d, j)) ||  /*-- hiddens --*/
+             (ggobi_stage_get_attr_color(d, j) == current_color &&   /*-- unhiddens --*/
+                  !draw_hidden && !ggobi_stage_get_attr_hidden(d, j)))
           {
-            build_glyph (ggobi_data_get_attr_glyph(d, j), sp->screen, j,
+            build_glyph (ggobi_stage_get_attr_glyph(d, j), sp->screen, j,
               sp->win32.points, &npt,          
               sp->win32.segs, &nseg,
               sp->win32.open_rects, &nr_open,  

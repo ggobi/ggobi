@@ -27,7 +27,7 @@
 
 // displays should eventually listen to pipeline themselves
 void
-tour_realloc_up (GGobiData *d, gint nc)
+tour_realloc_up (GGobiStage *d, gint nc)
 {
   displayd *dsp;
   GList *l;
@@ -53,11 +53,14 @@ tour_realloc_up (GGobiData *d, gint nc)
   }
 }
 
+/* How to fix this function: 
+  Instead of cloning the variable, just set the column name and everything else
+  should flow from the col_data_changed signal */
 void
-clone_vars (gint * cols, gint ncols, GGobiData * d)
+clone_vars (gint * cols, gint ncols, GGobiStage * d)
 {
   gint i, k, jfrom, jto;
-  gint nprev = ggobi_data_add_cols(d, ncols);
+  gint nprev = ggobi_data_add_cols(GGOBI_DATA(d), ncols);
   
   for (k = 0; k < ncols; k++) {
     GGobiVariable *clone;
@@ -66,21 +69,21 @@ clone_vars (gint * cols, gint ncols, GGobiData * d)
     jto = nprev + k; 
 
     /*-- copy the data --*/
-    for (i = 0; i < GGOBI_STAGE(d)->n_rows; i++) {
-      ggobi_stage_set_raw_value(GGOBI_STAGE(d), i, jto, d->tform.vals[i][jfrom]);
-      if (ggobi_stage_is_missing(GGOBI_STAGE(d), i, jfrom))
-        ggobi_stage_set_missing(GGOBI_STAGE(d), i, jto);
+    for (i = 0; i < d->n_rows; i++) {
+      ggobi_stage_set_raw_value(d, i, jto, d->tform.vals[i][jfrom]);
+      if (ggobi_stage_is_missing(d, i, jfrom))
+        ggobi_stage_set_missing(d, i, jto);
     }
 
-    clone = ggobi_variable_clone(ggobi_stage_get_variable(GGOBI_STAGE(d), jfrom));
-    ggobi_data_set_variable(d, jto, clone);
+    clone = ggobi_variable_clone(ggobi_stage_get_variable(d, jfrom));
+    ggobi_stage_set_variable(d, jto, clone);
     g_signal_emit_by_name(d, "col_data_changed", (guint) jto);
   }
 }
 
 
 static gint
-is_variable_plotted (gint * cols, gint ncols, GGobiData * d)
+is_variable_plotted (gint * cols, gint ncols, GGobiStage * d)
 {
   GList *dlist;
   displayd *display;
@@ -109,13 +112,13 @@ is_variable_plotted (gint * cols, gint ncols, GGobiData * d)
 }
 
 gboolean
-delete_vars (gint * cols, gint ncols, GGobiData * d)
+delete_vars (gint * cols, gint ncols, GGobiStage * d)
 {
   gint j;
   guint *ucols;
   
   /*-- don't allow all variables to be deleted --*/
-  g_return_val_if_fail(ncols < GGOBI_STAGE(d)->n_cols, GGOBI_STAGE(d)->n_cols);
+  g_return_val_if_fail(ncols < d->n_cols, d->n_cols);
   
   /*
    * If one of the variables to be deleted is currently plotted,
@@ -129,7 +132,7 @@ delete_vars (gint * cols, gint ncols, GGobiData * d)
     message =
       g_strdup_printf
       ("Deletion failed; the variable '%s' is currently plotted\n",
-       ggobi_stage_get_col_name(GGOBI_STAGE(d), j));
+       ggobi_stage_get_col_name(d, j));
     quick_message (message, false);
     g_free (message);
 
@@ -141,7 +144,7 @@ delete_vars (gint * cols, gint ncols, GGobiData * d)
   for (j = 0; j < ncols; j++)
     ucols[j] = (guint)cols[j];
   
-  ggobi_data_delete_cols(d, ucols, ncols);
+  ggobi_data_delete_cols(GGOBI_DATA(d), ucols, ncols);
 
   g_free(ucols);
   

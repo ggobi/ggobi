@@ -21,11 +21,11 @@
 #include "externs.h"
 
 void
-subset_init (GGobiData *d, ggobid *gg)
+subset_init (GGobiStage *d, ggobid *gg)
 {
-  gfloat fnr = (gfloat) GGOBI_STAGE(d)->n_rows;
+  gfloat fnr = (gfloat) d->n_rows;
 
-  d->subset.random_n = GGOBI_STAGE(d)->n_rows;
+  d->subset.random_n = d->n_rows;
 
   d->subset.bstart_adj = (GtkAdjustment *)
     gtk_adjustment_new (1.0, 1.0, (fnr-2.0), 1.0, 5.0, 0.0);
@@ -43,18 +43,18 @@ subset_init (GGobiData *d, ggobid *gg)
 /*------------------------------------------------------------------*/
 
 void
-subset_set_all(GGobiData *d, gboolean value) {
+subset_set_all(GGobiStage *d, gboolean value) {
   gint i;
 
-  for (i=0; i<GGOBI_STAGE(d)->n_rows; i++)
+  for (i=0; i<d->n_rows; i++)
     d->sampled.els[i] = value;
 }
 
 /*------------------------------------------------------------------*/
 
 void
-subset_apply (GGobiData *d) {
-  ggobi_data_set_rows_in_plot(d);
+subset_apply (GGobiStage *d) {
+  ggobi_stage_set_rows_in_plot(d);
   if (d->gg->cluster_ui.window != NULL)
     cluster_table_update (d, d->gg);
 }
@@ -64,8 +64,8 @@ subset_apply (GGobiData *d) {
  * Vol 2 of his series.
 */
 gboolean
-subset_random (gint n, GGobiData *d) {
-  gint t, m, top = GGOBI_STAGE(d)->n_rows;
+subset_random (gint n, GGobiStage *d) {
+  gint t, m, top = d->n_rows;
   gfloat rrand;
 
   subset_set_all(d, false);
@@ -85,15 +85,15 @@ subset_random (gint n, GGobiData *d) {
 }
 
 gboolean
-subset_block (gint bstart, gint bsize, GGobiData *d)
+subset_block (gint bstart, gint bsize, GGobiStage *d)
 {
   gint i, k;
   gboolean subsetsize = 0;
 
-  if (bstart >= 0 && bstart < GGOBI_STAGE(d)->n_rows && bsize > 0) {
+  if (bstart >= 0 && bstart < d->n_rows && bsize > 0) {
     subset_set_all(d, false);
 
-    for (i=bstart, k=1; i<GGOBI_STAGE(d)->n_rows && k<=bsize; i++, k++) {
+    for (i=bstart, k=1; i<d->n_rows && k<=bsize; i++, k++) {
       d->sampled.els[i] = true;
       subsetsize++;
     }
@@ -106,7 +106,7 @@ subset_block (gint bstart, gint bsize, GGobiData *d)
 }
 
 gboolean
-subset_range (GGobiData *d)
+subset_range (GGobiStage *d)
 {
   gint i, j;
   gint subsetsize = 0;
@@ -115,10 +115,10 @@ subset_range (GGobiData *d)
 
   subset_set_all(d, false);
 
-  for (i=0; i<GGOBI_STAGE(d)->n_rows; i++) {
+  for (i=0; i<d->n_rows; i++) {
     add = true;
-    for (j=0; j<GGOBI_STAGE(d)->n_cols; j++) {
-      var = ggobi_stage_get_variable(GGOBI_STAGE(d), j);
+    for (j=0; j<d->n_cols; j++) {
+      var = ggobi_stage_get_variable(d, j);
       if (var->lim_specified_p) {
         if (d->tform.vals[i][j] < var->lim_specified.min ||
             d->tform.vals[i][j] > var->lim_specified.max)
@@ -140,10 +140,10 @@ subset_range (GGobiData *d)
 }
 
 gboolean
-subset_everyn (gint estart, gint estep, GGobiData *d)
+subset_everyn (gint estart, gint estep, GGobiStage *d)
 {
   gint i;
-  gint top = GGOBI_STAGE(d)->n_rows;
+  gint top = d->n_rows;
 
   if (!(estart >= 0 && estart < top-1 && estep >= 0 && estep < top)) {
     quick_message ("Interval not correctly specified.", false);
@@ -161,7 +161,7 @@ subset_everyn (gint estart, gint estep, GGobiData *d)
 /*-- create a subset of only the points with sticky ids --*/
 /*-- Added by James Brook, Oct 1994 --*/
 gboolean
-subset_sticky (GGobiData *d)
+subset_sticky (GGobiStage *d)
 {
   gint id;
   GSList *l;
@@ -173,7 +173,7 @@ subset_sticky (GGobiData *d)
 
   for (l = d->sticky_ids; l; l = l->next) {
     id = GPOINTER_TO_INT (l->data);
-    if (id < GGOBI_STAGE(d)->n_rows)
+    if (id < d->n_rows)
       d->sampled.els[id] = true;
   }
 
@@ -182,7 +182,7 @@ subset_sticky (GGobiData *d)
 
 gboolean
 subset_rowlab (gchar *substr, gint substr_pos, gboolean ignore_case,
-  GGobiData *d)
+  GGobiStage *d)
 {
   gint i;
   gssize slen;
@@ -199,8 +199,8 @@ subset_rowlab (gchar *substr, gint substr_pos, gboolean ignore_case,
   else 
     substr = g_strdup(substr);
 
-  for (i=0; i < GGOBI_STAGE(d)->n_rows; i++) {
-    gchar *label = ggobi_stage_get_row_id(GGOBI_STAGE(d), i);
+  for (i=0; i < d->n_rows; i++) {
+    gchar *label = ggobi_stage_get_row_id(d, i);
     
     if (!label)
       continue;

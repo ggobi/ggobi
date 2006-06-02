@@ -19,7 +19,7 @@
 #include "externs.h"
 #include "plugin.h"
 
-void buildExtendedDisplayMenu (ggobid * gg, int nd, GGobiData * d0);
+void buildExtendedDisplayMenu (ggobid * gg, int nd, GGobiStage * d0);
 
 void
 display_set_position (windowDisplayd * display, ggobid * gg)
@@ -48,7 +48,7 @@ void
 display_menu_build (ggobid * gg)
 {
   gint nd;
-  GGobiData *d0;
+  GGobiStage *d0;
   GtkWidget *item;
 
   if (gg == NULL || gg->d == NULL)
@@ -56,7 +56,7 @@ display_menu_build (ggobid * gg)
 
   nd = ndatad_with_vars_get (gg);
 
-  d0 = (GGobiData *) gg->d->data;
+  d0 = (GGobiStage *) gg->d->data;
   if (gg->display_menu != NULL)
     gtk_widget_destroy (gg->display_menu);
 
@@ -110,7 +110,7 @@ display_menu_init (ggobid * gg)
 typedef struct
 {
   GGobiExtendedDisplayClass *klass;
-  GGobiData *d;
+  GGobiStage *d;
 } ExtendedDisplayCreateData;
 
 static void
@@ -119,7 +119,7 @@ extended_display_open_cb (GtkWidget * w, ExtendedDisplayCreateData * data)
   ggobid *gg = data->d->gg;
   displayd *dpy;
 
-  if (GGOBI_STAGE(data->d)->n_rows== 0)
+  if (data->d->n_rows== 0)
     return;
 
   splot_set_current (gg->current_splot, off, gg);
@@ -155,7 +155,7 @@ extended_display_open_cb (GtkWidget * w, ExtendedDisplayCreateData * data)
 }
 
 void
-buildExtendedDisplayMenu (ggobid * gg, gint nd, GGobiData * d0)
+buildExtendedDisplayMenu (ggobid * gg, gint nd, GGobiStage * d0)
 {
   gchar label[200], *lbl;
   GGobiExtendedDisplayClass *klass;
@@ -190,11 +190,11 @@ buildExtendedDisplayMenu (ggobid * gg, gint nd, GGobiData * d0)
 
       k = 0;
       for (k = 0; k < g_slist_length (gg->d); k++) {
-        GGobiData *d = (GGobiData *) g_slist_nth_data (gg->d, k);
+        GGobiStage *d = (GGobiStage *) g_slist_nth_data (gg->d, k);
 
         /*-- add an item for each datad with variables --*/
-        if (ggobi_stage_get_n_cols(GGOBI_STAGE(d))) {
-          lbl = ggobi_stage_get_name(GGOBI_STAGE(d));
+        if (ggobi_stage_get_n_cols(d)) {
+          lbl = ggobi_stage_get_name(d);
           cbdata = (ExtendedDisplayCreateData *)
             g_malloc (sizeof (ExtendedDisplayCreateData));
           cbdata->d = d;

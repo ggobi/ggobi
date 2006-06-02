@@ -40,7 +40,7 @@ enum {
   };
   
 extern GtkWidget * vartable_buttonbox_build (ggobid *gg);
-static void vartable_subwindow_init (GGobiData *d, ggobid *gg);
+static void vartable_subwindow_init (GGobiStage *d, ggobid *gg);
 
 /*-------------------------------------------------------------------------*/
 /*            Listen for display_selected events                           */
@@ -65,7 +65,7 @@ static void destroyit (ggobid *gg)
 }
 
 static void 
-vartable_notebook_adddata_cb (ggobid *gg, GGobiData *d, void *notebook)
+vartable_notebook_adddata_cb (ggobid *gg, GGobiStage *d, void *notebook)
 {
   vartable_subwindow_init (d, gg);
   gtk_notebook_set_show_tabs (GTK_NOTEBOOK (GTK_WIDGET(notebook)),
@@ -74,7 +74,7 @@ vartable_notebook_adddata_cb (ggobid *gg, GGobiData *d, void *notebook)
 CHECK_EVENT_SIGNATURE(vartable_notebook_adddata_cb, datad_added_f)
 
 GGobiVariableType
-tree_view_get_type (GGobiData *d, GtkWidget *tree_view)
+tree_view_get_type (GGobiStage *d, GtkWidget *tree_view)
 {
   GGobiVariableType vartype = GGOBI_VARIABLE_ALL_VARTYPES;
   if (d->vartable_tree_view[GGOBI_VARIABLE_REAL] != NULL) {
@@ -123,7 +123,7 @@ vartable_switch_page_cb (GtkNotebook *notebook, GtkNotebookPage *page,
   // yet.  dfs
   if (page_num > -1) {
     GGobiVariableType vartype;
-    GGobiData *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
+    GGobiStage *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
     swin = gtk_notebook_get_nth_page (notebook, page_num);
     children = gtk_container_get_children (GTK_CONTAINER (swin));
     tree_view = g_list_nth_data (children, 0);
@@ -136,7 +136,7 @@ vartable_switch_page_cb (GtkNotebook *notebook, GtkNotebookPage *page,
 }
 
 GtkTreeModel *
-vartable_tree_model_get (GGobiData *d)
+vartable_tree_model_get (GGobiStage *d)
 {
   return(d->vartable_tree_model);
 }
@@ -182,7 +182,7 @@ vartable_tree_view_get (ggobid *gg) {
 }
 
 void
-vartable_show_page (GGobiData *d, ggobid *gg)
+vartable_show_page (GGobiStage *d, ggobid *gg)
 {
   GtkNotebook *nb;
   gint page, page_new;
@@ -205,7 +205,7 @@ vartable_show_page (GGobiData *d, ggobid *gg)
     child = l->data;
     tab_label = (GtkWidget *) gtk_notebook_get_tab_label (nb, child);
     if (tab_label && GTK_IS_LABEL (tab_label)) {
-      if (strcmp (GTK_LABEL (tab_label)->label, ggobi_stage_get_name(GGOBI_STAGE(d))) == 0) {
+      if (strcmp (GTK_LABEL (tab_label)->label, ggobi_stage_get_name(d)) == 0) {
         if (page != page_new) {
           gtk_notebook_set_current_page (nb, page_new);
           break;
@@ -239,7 +239,7 @@ vartable_varno_from_path(GtkTreeModel *model, GtkTreePath *path)
   return(varno);
 }
 gboolean
-vartable_iter_from_varno(gint var, GGobiData *d, GtkTreeModel **model, GtkTreeIter *iter)
+vartable_iter_from_varno(gint var, GGobiStage *d, GtkTreeModel **model, GtkTreeIter *iter)
 {
   GtkTreeModel *loc_model;
   GtkTreePath *path;
@@ -260,13 +260,13 @@ vartable_iter_from_varno(gint var, GGobiData *d, GtkTreeModel **model, GtkTreeIt
 
 /** 'row' here corresponds to 'variable' (top-level rows) */
 void
-vartable_row_append (gint jvar, GGobiData *d)
+vartable_row_append (gint jvar, GGobiStage *d)
 {
   gint k;
   GtkTreeModel *model = vartable_tree_model_get(d);
   GtkTreeIter iter;
   GtkTreeIter child;
-  GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(d), jvar);
+  GGobiVariable *var = ggobi_stage_get_variable(d, jvar);
   if (!model)
     return;
   gtk_tree_store_append(GTK_TREE_STORE(model), &iter, NULL);
@@ -278,22 +278,22 @@ vartable_row_append (gint jvar, GGobiData *d)
 }
 
 static gboolean
-real_filter_func (GtkTreeModel *model, GtkTreeIter *iter, GGobiData *d)
+real_filter_func (GtkTreeModel *model, GtkTreeIter *iter, GGobiStage *d)
 {
   GtkTreePath *path = gtk_tree_model_get_path(model, iter);
   if (gtk_tree_path_get_depth(path) > 1)
     return(false);
-  GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(d), gtk_tree_path_get_indices(path)[0]);
+  GGobiVariable *var = ggobi_stage_get_variable(d, gtk_tree_path_get_indices(path)[0]);
   gtk_tree_path_free(path);
   return(!GGOBI_VARIABLE_IS_CATEGORICAL(var));
 }
 static gboolean
-cat_filter_func (GtkTreeModel *model, GtkTreeIter *iter, GGobiData *d)
+cat_filter_func (GtkTreeModel *model, GtkTreeIter *iter, GGobiStage *d)
 {
   GtkTreePath *path = gtk_tree_model_get_path(model, iter);
   if (gtk_tree_path_get_depth(path) > 1)
     return(true);
-  GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(d), gtk_tree_path_get_indices(path)[0]);
+  GGobiVariable *var = ggobi_stage_get_variable(d, gtk_tree_path_get_indices(path)[0]);
   gtk_tree_path_free(path);
   return(GGOBI_VARIABLE_IS_CATEGORICAL(var));
 }
@@ -306,20 +306,19 @@ vartable_col_data_changed_cb (GGobiStage *s, guint j)
 }
 
 static void
-vartable_col_deleted_cb (GGobiStage *s, guint j)
+vartable_col_deleted_cb (GGobiStage *d, guint j)
 {
-  GGobiData *d = GGOBI_DATA(s);
   GtkTreeModel *model;
   GtkTreeIter iter;
   GtkTreePath *path = gtk_tree_path_new_from_indices (j, -1);
-  model = gtk_tree_view_get_model(GTK_TREE_VIEW(d->vartable_tree_view[ggobi_stage_get_col_type(GGOBI_STAGE(d), j)]));
+  model = gtk_tree_view_get_model(GTK_TREE_VIEW(d->vartable_tree_view[ggobi_stage_get_col_type(d, j)]));
   gtk_tree_model_get_iter (model, &iter, path);
   gtk_list_store_remove (GTK_LIST_STORE (model), &iter);
   gtk_tree_path_free (path);
 }
 
 static void
-vartable_subwindow_init (GGobiData *d, ggobid *gg)
+vartable_subwindow_init (GGobiStage *d, ggobid *gg)
 {
   gint j;
   GtkWidget *sw, *wlbl;
@@ -350,7 +349,7 @@ vartable_subwindow_init (GGobiData *d, ggobid *gg)
   g_signal_connect (G_OBJECT (nbook), "switch-page",
     G_CALLBACK (vartable_switch_page_cb), gg);
 
-  lbl = ggobi_stage_get_name(GGOBI_STAGE(d));
+  lbl = ggobi_stage_get_name(d);
   /*
    * We're showing all datasets for now, whether they have variables
    * or not.  That could change.
@@ -376,7 +375,7 @@ vartable_subwindow_init (GGobiData *d, ggobid *gg)
   d->vartable_tree_model = GTK_TREE_MODEL(model);
   
   /*-- populate the tables BEFORE attaching filters --*/
-  for (j = 0 ; j < GGOBI_STAGE(d)->n_cols ; j++) {
+  for (j = 0 ; j < d->n_cols ; j++) {
     vartable_row_append(j, d);
     vartable_cells_set_by_var(j, d);
   }
@@ -443,8 +442,8 @@ pages any more!
 
   /*-- 3 = COLUMN_INSET --*/
   
-  ggobi_stage_connect__col_deleted(GGOBI_STAGE(d), vartable_col_deleted_cb, NULL);
-  ggobi_stage_connect__col_data_changed(GGOBI_STAGE(d), vartable_col_data_changed_cb, NULL);
+  ggobi_stage_connect__col_deleted(d, vartable_col_deleted_cb, NULL);
+  ggobi_stage_connect__col_data_changed(d, vartable_col_data_changed_cb, NULL);
   gtk_widget_show_all (nbook);
 
 }
@@ -454,7 +453,7 @@ vartable_open (ggobid *gg)
 {                                  
   GtkWidget *vbox, *hbox;
   GSList *l;
-  GGobiData *d;
+  GGobiStage *d;
 
   /*-- if used before we have data, bail out --*/
   if (gg->d == NULL || g_slist_length (gg->d) == 0) 
@@ -495,7 +494,7 @@ vartable_open (ggobid *gg)
   /* */
 
   for (l = gg->d; l; l = l->next) {
-    d = (GGobiData *) l->data;
+    d = (GGobiStage *) l->data;
     vartable_subwindow_init (d, gg);
   }
 
@@ -510,7 +509,7 @@ vartable_open (ggobid *gg)
   gtk_widget_show_all (gg->vartable_ui.window);
 
   /*-- set it to the page corresponding to the current display --*/
-  d = (gg->current_display ? gg->current_display->d : (GGobiData *)gg->d->data);
+  d = (gg->current_display ? gg->current_display->d : (GGobiStage *)gg->d->data);
   vartable_show_page (d, gg);
 }
 
@@ -520,10 +519,9 @@ vartable_open (ggobid *gg)
 
 /*-- sets the name of the un-transformed variable --*/
 void
-vartable_collab_set_by_var (GGobiStage *s, guint j)
+vartable_collab_set_by_var (GGobiStage *d, guint j)
 {
-  GGobiData *d = GGOBI_DATA(s);
-  GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(d), j);
+  GGobiVariable *var = ggobi_stage_get_variable(d, j);
   gint k;
   GtkTreeModel *model;
   GtkTreeIter iter;
@@ -551,31 +549,29 @@ vartable_collab_set_by_var (GGobiStage *s, guint j)
     g_free(values);
   }
   gtk_tree_store_set(GTK_TREE_STORE(model), &iter, VT_VARNAME, 
-    ggobi_stage_get_col_name(GGOBI_STAGE(d), j), -1);
+    ggobi_stage_get_col_name(d, j), -1);
 
 }
 
 /*-- sets the name of the transformed variable --*/
 void
-vartable_collab_tform_set_by_var (GGobiStage *s, guint j)
+vartable_collab_tform_set_by_var (GGobiStage *d, guint j)
 {
   GtkTreeModel *model;
   GtkTreeIter iter;
-  GGobiData *d = GGOBI_DATA(s);
   
   if (!vartable_iter_from_varno(j, d, &model, &iter))
 	  return;
 
   gtk_tree_store_set(GTK_TREE_STORE(model), &iter,
-    VT_TFORM, ggobi_data_get_transformed_col_name(d, j), -1);
+    VT_TFORM, ggobi_stage_get_transformed_col_name(d, j), -1);
 }
 
 /*-- sets the limits for a variable --*/
 void
-vartable_limits_set_by_var (GGobiStage *s, guint j)
+vartable_limits_set_by_var (GGobiStage *d, guint j)
 {
-  GGobiData *d = GGOBI_DATA(s);
-  GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(d), j);
+  GGobiVariable *var = ggobi_stage_get_variable(d, j);
   GtkTreeModel *model;
   GtkTreeIter iter;
   
@@ -617,31 +613,30 @@ vartable_limits_set_by_var (GGobiStage *s, guint j)
   }
 }
 void
-vartable_limits_set (GGobiData *d) 
+vartable_limits_set (GGobiStage *d) 
 {
   gint j;
   if (d->vartable_tree_model != NULL)
-    for (j=0; j<GGOBI_STAGE(d)->n_cols; j++)
-      vartable_limits_set_by_var (GGOBI_STAGE(d), j);
+    for (j=0; j<d->n_cols; j++)
+      vartable_limits_set_by_var (d, j);
 }
 
 /*-- sets the mean, median, and number of missings for a variable --*/
 void
-vartable_stats_set_by_var (GGobiStage *s, guint j) {
-  GGobiData *d = GGOBI_DATA(s);
-  GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(d), j);
+vartable_stats_set_by_var (GGobiStage *d, guint j) {
+  GGobiVariable *var = ggobi_stage_get_variable(d, j);
   GtkTreeModel *model;
   GtkTreeIter iter;
 
   if (!var || !vartable_iter_from_varno(j, d, &model, &iter))
     return;
   
-  switch (ggobi_stage_get_col_type(GGOBI_STAGE(d), j)) {
+  switch (ggobi_stage_get_col_type(d, j)) {
     case GGOBI_VARIABLE_COUNTER:
       break;
     case GGOBI_VARIABLE_CATEGORICAL:
       gtk_tree_store_set(GTK_TREE_STORE(model), &iter, 
-        VT_NMISSING, ggobi_stage_get_col_n_missing(GGOBI_STAGE(d), j), -1);
+        VT_NMISSING, ggobi_stage_get_col_n_missing(d, j), -1);
     break;
     default:
       gtk_tree_store_set(GTK_TREE_STORE(model), &iter, 
@@ -653,14 +648,14 @@ vartable_stats_set_by_var (GGobiStage *s, guint j) {
   }
 }
 void
-vartable_stats_set (GGobiData *d) {
+vartable_stats_set (GGobiStage *d) {
   gint j;
 
   if (!d->vartable_tree_model)
     return;
     
-  for (j=0; j<GGOBI_STAGE(d)->n_cols; j++)
-    vartable_stats_set_by_var (GGOBI_STAGE(d), j);
+  for (j=0; j<d->n_cols; j++)
+    vartable_stats_set_by_var (d, j);
 }
 
 /*
@@ -668,37 +663,37 @@ vartable_stats_set (GGobiData *d) {
  * functions call gtk_tree_view_set_text.
 */
 void
-vartable_cells_set_by_var (gint j, GGobiData *d) 
+vartable_cells_set_by_var (gint j, GGobiStage *d) 
 {
-  vartable_collab_set_by_var (GGOBI_STAGE(d), j);
-  vartable_collab_tform_set_by_var (GGOBI_STAGE(d), j);
-  vartable_stats_set_by_var (GGOBI_STAGE(d), j);
-  vartable_limits_set_by_var (GGOBI_STAGE(d), j);
+  vartable_collab_set_by_var (d, j);
+  vartable_collab_tform_set_by_var (d, j);
+  vartable_stats_set_by_var (d, j);
+  vartable_limits_set_by_var (d, j);
 }
 /*
 void 
-vartable_col_name_changed(GGobiData *d, guint j, GtkWidget* w) {
+vartable_col_name_changed(GGobiStage *d, guint j, GtkWidget* w) {
 }
 
 void 
-vartable_col_data_changed(GGobiData *d, guint j, GtkWidget* w) {
+vartable_col_data_changed(GGobiStage *d, guint j, GtkWidget* w) {
 }
 
 void 
-vartable_col_rows_added(GGobiData *d, guint n, GtkWidget* w) {  
+vartable_col_rows_added(GGobiStage *d, guint n, GtkWidget* w) {  
 }
 
 
-void vartable_init(GGobiData *d) {
+void vartable_init(GGobiStage *d) {
   GtkWidget *widget = vartable_gui_init(d);
   
-  vartable_col_rows_added(d, GGOBI_STAGE(d)->n_cols);
-  for (guint j = 0; j < GGOBI_STAGE(d)->n_cols; j++) {
+  vartable_col_rows_added(d, d->n_cols);
+  for (guint j = 0; j < d->n_cols; j++) {
     vartable_col_name_changed(d, j);
     vartable_col_data_changed(d, j);
   }
 
-  ggobi_data_connect__cols_added(d, vartable_cols_added, widget);
-  ggobi_data_connect__col_name_changed(d, vartable_col_name_changed, widget;
-  ggobi_data_connect__col_data_changed(d, vartable_col_data_changed, widget);
+  ggobi_data_connect__cols_added(GGOBI_DATA(d), vartable_cols_added, widget);
+  ggobi_data_connect__col_name_changed(GGOBI_DATA(d), vartable_col_name_changed, widget;
+  ggobi_data_connect__col_data_changed(GGOBI_DATA(d), vartable_col_data_changed, widget);
 }*/

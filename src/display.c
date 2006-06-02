@@ -111,7 +111,7 @@ set_display_option (gboolean active, guint action, displayd * display)
   ggobid *gg = display->ggobi;
   gchar *title;
   gint ne = 0;
-  GGobiData *onlye = NULL;
+  GGobiStage *onlye = NULL;
 
   g_return_if_fail (GGOBI_IS_DISPLAY (display));
 
@@ -119,10 +119,10 @@ set_display_option (gboolean active, guint action, displayd * display)
   if (action == DOPT_EDGES_U || action == DOPT_EDGES_D ||
       action == DOPT_EDGES_A || action == DOPT_EDGES_H) {
     gint k, nd = g_slist_length (gg->d);
-    GGobiData *e;
+    GGobiStage *e;
     for (k = 0; k < nd; k++) {
-      e = (GGobiData *) g_slist_nth_data (gg->d, k);
-      if (ggobi_stage_get_n_edges(GGOBI_STAGE(e))) {
+      e = (GGobiStage *) g_slist_nth_data (gg->d, k);
+      if (ggobi_stage_get_n_edges(e)) {
         ne++;
         onlye = e;            /* meaningful if there's only one */
       }
@@ -371,13 +371,13 @@ display_delete_cb (GtkWidget * w, GdkEvent * event, displayd * display)
  This display class is really a virtual class.
 */
 displayd *
-ggobi_display_new (gboolean missing_p, GGobiData * d, ggobid * gg)
+ggobi_display_new (gboolean missing_p, GGobiStage * d, ggobid * gg)
 {
   return (display_alloc_init (missing_p, d, gg));
 }
 
 void
-display_set_values (displayd * display, GGobiData * d, ggobid * gg)
+display_set_values (displayd * display, GGobiStage * d, ggobid * gg)
 {
   /* Should copy in the contents of DefaultOptions to create
      an indepedently modifiable configuration copied from
@@ -390,7 +390,7 @@ display_set_values (displayd * display, GGobiData * d, ggobid * gg)
 }
 
 displayd *
-display_alloc_init (gboolean missing_p, GGobiData * d, ggobid * gg)
+display_alloc_init (gboolean missing_p, GGobiStage * d, ggobid * gg)
 {
   displayd *display;
 
@@ -590,7 +590,7 @@ display_free_all (ggobid * gg)
   for (dlist = gg->displays; count > 0 && dlist; count--) {
     gint nc;
     display = (displayd *) dlist->data;
-    nc = GGOBI_STAGE(display->d)->n_cols;
+    nc = display->d->n_cols;
     if (display == NULL)
       break;
 
@@ -720,13 +720,13 @@ computeTitle (gboolean current_p, displayd * display, ggobid * gg)
     tmp = ggobi_display_title_label (display);
   }
 
-  if (ggobi_stage_get_name(GGOBI_STAGE(display->d)) != NULL) {
-    if (display->e != NULL && ggobi_stage_get_name(GGOBI_STAGE(display->e)) != NULL)
+  if (ggobi_stage_get_name(display->d) != NULL) {
+    if (display->e != NULL && ggobi_stage_get_name(display->e) != NULL)
       description = g_strdup_printf ("%s/%s",
-                                     ggobi_stage_get_name(GGOBI_STAGE(display->d)), 
-                                     ggobi_stage_get_name(GGOBI_STAGE(display->e)));
+                                     ggobi_stage_get_name(display->d), 
+                                     ggobi_stage_get_name(display->e));
     else
-      description = g_strdup (ggobi_stage_get_name(GGOBI_STAGE(display->d)));
+      description = g_strdup (ggobi_stage_get_name(display->d));
   }
   else {
     description = ggobi_getDescription (gg);
@@ -785,9 +785,9 @@ display_tailpipe (displayd * display, RedrawStyle type, ggobid * gg)
 /*-- update transient brushing; I will also need to un-brush some points --*/
     if (display == gg->current_display &&
         sp == gg->current_splot && imode_get (gg) == BRUSH) {
-      GGobiData *d = display->d;
+      GGobiStage *d = display->d;
       if (GGOBI_IS_EXTENDED_SPLOT (sp)) {
-        void (*f) (GGobiData *, splotd *, ggobid *);
+        void (*f) (GGobiStage *, splotd *, ggobid *);
         GGobiExtendedSPlotClass *klass;
         klass = GGOBI_EXTENDED_SPLOT_GET_CLASS (sp);
         f = klass->splot_assign_points_to_bins;

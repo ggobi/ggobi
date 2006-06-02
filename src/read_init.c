@@ -988,11 +988,11 @@ getInputPluginValues (xmlNodePtr node, GGobiInputPluginInfo * plugin,
   GET_PROP_VALUE (getDescription, "description");
 }
 
-gint resolveVariableName (const gchar * name, GGobiData * d);
+gint resolveVariableName (const gchar * name, GGobiStage * d);
 
 displayd *
 createExtendedDisplay (const gchar * const type, gint * vars, gint numVars,
-                       GGobiData * d, ggobid * gg)
+                       GGobiStage * d, ggobid * gg)
 {
   displayd *dpy;
 
@@ -1019,21 +1019,21 @@ displayd *
 createDisplayFromDescription (ggobid * gg, GGobiDisplayDescription * desc)
 {
   displayd *dpy = NULL;
-  GGobiData *data = NULL;
+  GGobiStage *data = NULL;
   gint *vars, i;
 
   if (desc->canRecreate == false)
     return (NULL);
 
   if (desc->data > -1) {
-    data = (GGobiData *) g_slist_nth_data (gg->d, desc->data);
+    data = (GGobiStage *) g_slist_nth_data (gg->d, desc->data);
   }
   else if (desc->datasetName && desc->datasetName[0]) {
-    GGobiData *tmp;
+    GGobiStage *tmp;
     GSList *l;
     for (l = gg->d; l; l = l->next) {
-      tmp = (GGobiData *) l->data;
-      if (strcmp (desc->datasetName, ggobi_stage_get_name(GGOBI_STAGE(tmp))) == 0) {
+      tmp = (GGobiStage *) l->data;
+      if (strcmp (desc->datasetName, ggobi_stage_get_name(tmp)) == 0) {
         data = tmp;
         break;
       }
@@ -1063,12 +1063,12 @@ createDisplayFromDescription (ggobid * gg, GGobiDisplayDescription * desc)
 
 
 gint
-resolveVariableName (const gchar * name, GGobiData * d)
+resolveVariableName (const gchar * name, GGobiStage * d)
 {
   gint j;
 
-  for (j = 0; j < GGOBI_STAGE(d)->n_cols; j++) {
-    if (strcmp (ggobi_stage_get_col_name(GGOBI_STAGE(d), j), name) == 0)
+  for (j = 0; j < d->n_cols; j++) {
+    if (strcmp (ggobi_stage_get_col_name(d, j), name) == 0)
       return (j);
   }
 

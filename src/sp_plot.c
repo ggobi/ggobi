@@ -29,7 +29,7 @@ static void splot_draw_border (splotd *, GdkDrawable *, ggobid *);
 
 static void
 splot_check_colors (gushort maxcolorid, gint *ncolors_used,
-  gushort *colors_used, GGobiData *d, ggobid *gg)
+  gushort *colors_used, GGobiStage *d, ggobid *gg)
 {
   colorschemed *scheme = gg->activeColorScheme;
   gchar *message;
@@ -56,7 +56,7 @@ splot_check_colors (gushort maxcolorid, gint *ncolors_used,
 
 /*-- determine whether case m should be plotted --*/
 gboolean
-splot_plot_case (gint m, GGobiData *d, splotd *sp, displayd *display, ggobid *gg)
+splot_plot_case (gint m, GGobiStage *d, splotd *sp, displayd *display, ggobid *gg)
 {
   gboolean draw_case = true;
 
@@ -66,7 +66,7 @@ splot_plot_case (gint m, GGobiData *d, splotd *sp, displayd *display, ggobid *gg
     return false;
 
   /*-- can prevent drawing of missings for parcoords or scatmat plots --*/
-  if (ggobi_stage_has_missings(GGOBI_STAGE(d)) && !d->missings_show_p) {
+  if (ggobi_stage_get_n_missings(d) && !d->missings_show_p) {
     if(GGOBI_EXTENDED_SPLOT_GET_CLASS(sp)->draw_case_p) {
        draw_case = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp)->draw_case_p(sp, m, d, gg);
     }
@@ -103,13 +103,13 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
   gint ncolors_used;
   gushort colors_used[MAXNCOLORS+2];
   displayd *display = (displayd *) sp->displayptr;
-  GGobiData *d = display->d;
+  GGobiStage *d = display->d;
   colorschemed *scheme = gg->activeColorScheme;
   gushort maxcolorid;
   gboolean loop_over_points;
 
   gint i, m;
-  gboolean (*f)(splotd *, GGobiData*, ggobid*, gboolean) = NULL;  /* redraw */
+  gboolean (*f)(splotd *, GGobiStage*, ggobid*, gboolean) = NULL;  /* redraw */
 
   GGobiExtendedSPlotClass *klass = NULL;
   GGobiExtendedDisplayClass *displayKlass = NULL;
@@ -179,14 +179,14 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
 #else
       for (i=0; i<d->nrows_in_plot; i++) {
         m = d->rows_in_plot.els[i];
-        if (ggobi_data_get_attr_hidden(d, m) && splot_plot_case (m, d, sp, display, gg)) {
+        if (ggobi_stage_get_attr_hidden(d, m) && splot_plot_case (m, d, sp, display, gg)) {
           /*
            * This double-check accommodates the parallel coordinates and
            * time series displays, because we have to ignore points_show_p
            * in order to draw the whiskers but not the points.
           */
           if (display->options.points_show_p)
-            draw_glyph (sp->pixmap0, ggobi_data_get_attr_glyph(d, m), sp->screen,
+            draw_glyph (sp->pixmap0, ggobi_stage_get_attr_glyph(d, m), sp->screen,
               m, gg);
           /* draw the whiskers ... or, potentially, other decorations */
           if (klass && klass->within_draw_to_unbinned) {
@@ -211,8 +211,8 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
 #else
         for (i=0; i<d->nrows_in_plot; i++) {
           m = d->rows_in_plot.els[i];
-          if (ggobi_data_get_attr_color(d, m) == current_color &&
-            !ggobi_data_get_attr_hidden(d, m) &&
+          if (ggobi_stage_get_attr_color(d, m) == current_color &&
+            !ggobi_stage_get_attr_hidden(d, m) &&
             splot_plot_case (m, d, sp, display, gg))
           {
             /*
@@ -222,7 +222,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
              * but not the points.
             */
             if (display->options.points_show_p)
-              draw_glyph (sp->pixmap0, ggobi_data_get_attr_glyph(d, m), sp->screen,
+              draw_glyph (sp->pixmap0, ggobi_stage_get_attr_glyph(d, m), sp->screen,
                 m, gg);
 
             if (klass && klass->within_draw_to_unbinned) {
@@ -249,7 +249,7 @@ splot_clear_pixmap0_binned (splotd *sp, ggobid *gg)
   icoords *loc0 = &gg->plot.loc0;
   icoords *loc1 = &gg->plot.loc1;
   displayd *display = (displayd *) sp->displayptr;
-  GGobiData *d = display->d;
+  GGobiStage *d = display->d;
   colorschemed *scheme = gg->activeColorScheme;
 
 /*
@@ -305,7 +305,7 @@ splot_draw_to_pixmap0_binned (splotd *sp, gboolean draw_hidden, ggobid *gg)
   displayd *display = (displayd *) sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
   ProjectionMode proj = cpanel->pmode;
-  GGobiData *d = display->d;
+  GGobiStage *d = display->d;
   colorschemed *scheme = gg->activeColorScheme;
   icoords *bin0 = &gg->plot.bin0;
   icoords *bin1 = &gg->plot.bin1;
@@ -326,7 +326,7 @@ splot_draw_to_pixmap0_binned (splotd *sp, gboolean draw_hidden, ggobid *gg)
     klass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);
     if(klass->redraw) {
       displayd *display = (displayd *) sp->displayptr;
-      GGobiData *d = display->d;
+      GGobiStage *d = display->d;
 /* XXX barcharts, for instance, don't know about this new approach yet */
       if(klass->redraw(sp, d, gg, true)) {
         return;
@@ -349,10 +349,10 @@ splot_draw_to_pixmap0_binned (splotd *sp, gboolean draw_hidden, ggobid *gg)
             i = d->rows_in_plot.els[d->brush.binarray[ih][iv].els[m]];
 
             /* if hidden && plottable */
-            if (ggobi_data_get_attr_hidden(d, i) &&
+            if (ggobi_stage_get_attr_hidden(d, i) &&
                 splot_plot_case (i, d, sp, display, gg))
             {
-              draw_glyph (sp->pixmap0, ggobi_data_get_attr_glyph(d, i),
+              draw_glyph (sp->pixmap0, ggobi_stage_get_attr_glyph(d, i),
                 sp->screen, i, gg);
 
               /* parallel coordinate plot and time series plot whiskers */
@@ -389,11 +389,11 @@ splot_draw_to_pixmap0_binned (splotd *sp, gboolean draw_hidden, ggobid *gg)
             for (m=0; m<d->brush.binarray[ih][iv].nels ; m++) {
               i = d->rows_in_plot.els[d->brush.binarray[ih][iv].els[m]];
 
-              if (!ggobi_data_get_attr_hidden(d, i) &&
-                  ggobi_data_get_attr_color(d, i) == current_color &&
+              if (!ggobi_stage_get_attr_hidden(d, i) &&
+                  ggobi_stage_get_attr_color(d, i) == current_color &&
                   splot_plot_case (i, d, sp, display, gg))
               {
-                draw_glyph (sp->pixmap0, ggobi_data_get_attr_glyph(d, i),
+                draw_glyph (sp->pixmap0, ggobi_stage_get_attr_glyph(d, i),
                   sp->screen, i, gg);
 
                 /* parallel coordinate plot whiskers */
@@ -427,7 +427,7 @@ splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *gg)
 {
   displayd *display = (displayd *) sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
-  GGobiData *d = display->d;
+  GGobiStage *d = display->d;
   colorschemed *scheme = gg->activeColorScheme;
 
   gboolean proceed = (cpanel->pmode == XYPLOT ||
@@ -451,7 +451,7 @@ splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *gg)
       have a special splot class for the display type but still need
       to do something special. */
   if(GGOBI_IS_EXTENDED_DISPLAY(display)) {
-    void (*f)(displayd *, splotd *, GdkDrawable*, GGobiData *, ggobid*);
+    void (*f)(displayd *, splotd *, GdkDrawable*, GGobiStage *, ggobid*);
     f =  GGOBI_EXTENDED_DISPLAY_GET_CLASS(display)->add_plot_labels;
     if(f)
       f(display, sp, drawable, d, gg);
@@ -467,12 +467,12 @@ splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *gg)
 void
 splot_add_diamond_cue (gint k, splotd *sp, GdkDrawable *drawable, ggobid *gg)
 {
-  GGobiData *d = sp->displayptr->d;
+  GGobiStage *d = sp->displayptr->d;
   gint diamond_dim = DIAMOND_DIM;
   GdkPoint diamond[5];
   colorschemed *scheme = gg->activeColorScheme;
 
-  if (k < 0 || k >= GGOBI_STAGE(d)->n_rows) return;
+  if (k < 0 || k >= d->n_rows) return;
 
   diamond[0].x = diamond[4].x = sp->screen[k].x - diamond_dim;
   diamond[0].y = diamond[4].y = sp->screen[k].y;
@@ -495,13 +495,13 @@ splot_add_point_label (gboolean nearest_p, gint k, gboolean top_p, splotd *sp,
   GdkDrawable *drawable, ggobid *gg)
 {
   displayd *dsp = sp->displayptr;
-  GGobiData *d = dsp->d;
+  GGobiStage *d = dsp->d;
   PangoLayout *layout;
   PangoRectangle rect;
   gint diamond_dim = DIAMOND_DIM;
   gchar *lbl = NULL;
 
-  if (k < 0 || k >= GGOBI_STAGE(d)->n_rows) return;
+  if (k < 0 || k >= d->n_rows) return;
 
   lbl = identify_label_fetch (k, &dsp->cpanel, d, gg);
 
@@ -572,12 +572,12 @@ splot_add_identify_nearest_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg)
     } else {
       cpaneld *cpanel = &display->cpanel;
       if (cpanel->id_target_type == identify_points) {
-        GGobiData *d = display->d;
+        GGobiStage *d = display->d;
         pt = d->nearest_point;
         splot_add_identify_point_cues (sp, drawable, pt, true, gg);
       } else {
         if (display->e) {
-          GGobiData *e = display->e;
+          GGobiStage *e = display->e;
           pt = e->nearest_point;
           splot_add_identify_edge_cues (sp, drawable, pt, true, gg);
         }
@@ -609,9 +609,9 @@ splot_add_movepts_cues (splotd *sp, GdkDrawable *drawable,
   gint k, gboolean nearest, ggobid *gg)
 {
   displayd *dsp = (displayd *) sp->displayptr;
-  GGobiData *d = dsp->d;
+  GGobiStage *d = dsp->d;
 
-  if (k < 0 || k >= GGOBI_STAGE(d)->n_rows)
+  if (k < 0 || k >= d->n_rows)
     return;
 
   splot_add_diamond_cue (k, sp, drawable, gg);
@@ -627,8 +627,8 @@ splot_add_record_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
   gint id;
   GSList *l;
   displayd *display = (displayd *) sp->displayptr;
-  GGobiData *d = display->d;
-  GGobiData *e = display->e;
+  GGobiStage *d = display->d;
+  GGobiStage *e = display->e;
   InteractionMode imode = imode_get (gg);
 
   /*
@@ -653,7 +653,7 @@ splot_add_record_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
   if (d->sticky_ids != NULL && g_slist_length (d->sticky_ids) > 0) {
     for (l = d->sticky_ids; l; l = l->next) {
       id = GPOINTER_TO_INT (l->data);
-      if (!ggobi_data_get_attr_hidden(d, id))
+      if (!ggobi_stage_get_attr_hidden(d, id))
         /*-- false = !nearest --*/
         splot_add_identify_sticky_cues (sp, drawable, id, gg);
     }
@@ -663,7 +663,7 @@ splot_add_record_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
   if (e && e->sticky_ids != NULL && g_slist_length (e->sticky_ids) > 0) {
     for (l = e->sticky_ids; l; l = l->next) {
       id = GPOINTER_TO_INT (l->data);
-      if (!ggobi_data_get_attr_hidden(d, id))
+      if (!ggobi_stage_get_attr_hidden(d, id))
         /*-- false = !nearest --*/
         splot_add_identify_edge_cues (sp, drawable, id, false, gg);
     }
@@ -721,8 +721,8 @@ static void
 splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
 {
   displayd *dsp = (displayd *) sp->displayptr;
-  GGobiData *e = dsp->e;
-  GGobiData *d = dsp->d;
+  GGobiStage *e = dsp->e;
+  GGobiStage *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
   gint proj = cpanel->pmode;
   GGobiExtendedSPlotClass *splotKlass;
@@ -734,7 +734,7 @@ splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
    * ( What about stickies? )
   */
   /*-- moving this section breaks splot_redraw (QUICK) for adding edges --*/
-  if (sp != gg->current_splot && e && ggobi_stage_get_n_edges(GGOBI_STAGE(e))) {
+  if (sp != gg->current_splot && e && ggobi_stage_get_n_edges(e)) {
     gboolean draw_edge;
     GGobiExtendedDisplayClass *displayKlass = NULL;
 

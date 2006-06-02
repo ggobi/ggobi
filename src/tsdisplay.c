@@ -25,7 +25,7 @@
 #include <string.h>
 
 displayd *
-timeSeriesDisplayCreate(gboolean missing_p, splotd *sp, GGobiData *d, ggobid *gg)
+timeSeriesDisplayCreate(gboolean missing_p, splotd *sp, GGobiStage *d, ggobid *gg)
 {
   gint *selected_vars, nselected_vars = 0;
   displayd *dpy = NULL;
@@ -41,7 +41,7 @@ timeSeriesDisplayCreate(gboolean missing_p, splotd *sp, GGobiData *d, ggobid *gg
 
 
 gint
-tsplotIsVarPlotted(displayd *display, gint *cols, gint ncols, GGobiData *d)
+tsplotIsVarPlotted(displayd *display, gint *cols, gint ncols, GGobiStage *d)
 {
   GList *l;
   splotd *sp;
@@ -87,12 +87,12 @@ tsplotDisplaySet(displayd *dpy, ggobid *gg)
 }
 
 void
-tsplotVarpanelRefresh(displayd *display, splotd *sp, GGobiData *d)
+tsplotVarpanelRefresh(displayd *display, splotd *sp, GGobiStage *d)
 {
   gint j;
   GList *l;
 
-  for (j=0; j<GGOBI_STAGE(d)->n_cols; j++) {
+  for (j=0; j<d->n_cols; j++) {
      varpanel_toggle_set_active (VARSEL_X, j, false, d);
      varpanel_toggle_set_active (VARSEL_Y, j, false, d);
      varpanel_widget_set_visible (VARSEL_Y, j, true, d);
@@ -155,7 +155,7 @@ tsplotVarpanelTooltipsSet(displayd *dpy, ggobid *gg, GtkWidget *wx, GtkWidget *w
 
 
 gint
-tsplotPlottedColsGet(displayd *display, gint *cols, GGobiData *d, ggobid *gg)
+tsplotPlottedColsGet(displayd *display, gint *cols, GGobiStage *d, ggobid *gg)
 {
   GList *l;
   splotd *s;
@@ -338,9 +338,9 @@ tsplotKeyEventHandled(GtkWidget *w, displayd *display, splotd *sp, GdkEventKey *
 
 
 gchar *
-tsplot_tree_label(splotd *sp, GGobiData *d, ggobid *gg)
+tsplot_tree_label(splotd *sp, GGobiStage *d, ggobid *gg)
 {
-  return(ggobi_stage_get_col_name(GGOBI_STAGE(d), sp->xyvars.y));
+  return(ggobi_stage_get_col_name(d, sp->xyvars.y));
 }
 
 /*************************************************/

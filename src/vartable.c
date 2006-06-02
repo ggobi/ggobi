@@ -50,18 +50,20 @@ array_contains (gint* arr, gint n, gint el)
   return false;
 }
 
-/* we currently use the GGobiData to access the vartable widgets, but
+/* we currently use the GGobiStage to access the vartable widgets, but
   in the future we will get these somehow from the ggobid, so we keep
   both parameters for now */
 gint
-selected_cols_get (gint **cols, GGobiData *d, ggobid *gg)
+selected_cols_get (gint **cols, GGobiStage *d, ggobid *gg)
 {
 /*
  * Figure out which columns are selected.
 */
   
-  gint j, ncols = 0;
-  
+  // FIXME: for now we just allocate memory for all cols, since clients often
+  // use this array as a template. They probably shouldn't.
+  gint j, ncols = d->n_cols;
+  /* Only allocate space for the number of selected cols
   for (j = 0; j < GGOBI_VARIABLE_ALL_VARTYPES; j++) {
     GtkTreeView *view = GTK_TREE_VIEW(d->vartable_tree_view[j]);
     GtkTreeSelection *sel;
@@ -69,7 +71,7 @@ selected_cols_get (gint **cols, GGobiData *d, ggobid *gg)
       continue;
     sel = gtk_tree_view_get_selection(view);
     ncols += gtk_tree_selection_count_selected_rows(sel);
-  }
+  } */
   *cols = g_new(gint, ncols);
   ncols = 0;
   for (j = 0; j < GGOBI_VARIABLE_ALL_VARTYPES; j++) {
@@ -96,7 +98,7 @@ selected_cols_get (gint **cols, GGobiData *d, ggobid *gg)
  * this is how we find out which columns are selected for plotting.
 */
 gint
-plotted_cols_get (gint *cols, GGobiData *d, ggobid *gg) 
+plotted_cols_get (gint *cols, GGobiStage *d, ggobid *gg) 
 {
   gint ncols = 0;
   splotd *sp = gg->current_splot;
