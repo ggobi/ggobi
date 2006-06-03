@@ -72,7 +72,7 @@ init(self) {
 public GGobiData* 
 new(guint nrows, guint ncols)
 {
-  GGobiData* d = GGOBI_DATA(GET_NEW());
+  GGobiData* d = GGOBI_DATA(GET_NEW);
   self_add_cols(d, ncols);
   self_add_rows(d, nrows);
 
@@ -335,7 +335,8 @@ add_cols(self, guint n) {
   arrayf_add_cols (&self->raw, ncols);
   arrays_add_cols (&self->missing, ncols);
 
-  g_object_set(G_OBJECT(self), GGOBI_STAGE_PROP_N_COLS(ncols), NULL);
+  //g_object_set(G_OBJECT(self), GGOBI_STAGE_PROP_N_COLS(ncols), NULL);
+  ggobi_stage_cols_added(GGOBI_STAGE(self), n);
   
   return nprev;
 }

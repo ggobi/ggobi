@@ -1,9 +1,10 @@
 /* Instantiates chains of pipeline stages from string descriptions */
 /* Encapsulates the logic of which stages should be singletons and which
    are created new upon every request (like per display stages). One 
-   factory will probably suffice for GGobi. Special cases presented 
-   by plugins / embedding environments could be handled by custom factories 
-   or simply by manual construction of the pipeline */
+   factory will probably suffice for GGobi. New stage types can be added
+   on the fly. Special cases presented by plugins / embedding environments 
+   could be handled local factory instances or simply by manual construction 
+   of the pipeline */
 /* Since this behavior is shared across datasets, there is no need for a
    separate factory for each GGobiData. Thus, most methods in this class
    accept a GGobiData as an argument, which represents the root of a
@@ -40,7 +41,7 @@ class GGobi:Pipeline:Factory from G:Object {
   {
   }
   public void
-  unregister_stage(self, const gchar *name)
+  unregister_stage(self, const gchar *name (check null))
   {
   }
   
@@ -51,22 +52,22 @@ class GGobi:Pipeline:Factory from G:Object {
   {
   }
   public gboolean
-  is_stage_singleton(self, const gchar *name)
+  is_stage_singleton(self, const gchar *name (check null))
   {
   }
   public const gchar *
-  get_stage_parent_name(self, const gchar *name)
+  get_stage_parent_name(self, const gchar *name (check null))
   {
   }
   public GType
-  get_stage_type(self, const gchar *name)
+  get_stage_type(self, const gchar *name (check null))
   {
   }
   
   /* factory */
   
   public GGobiStage *
-  get_pipeline(self, GGobiData *root, const gchar *path)
+  get_pipeline(self, GGobi:Data *root (check null type), const gchar *path (check null))
   {
   }
 }

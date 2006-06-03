@@ -13,7 +13,10 @@
   
   #define RELAY_SIGNAL(signal) \
     g_signal_connect_swapped(G_OBJECT(parent), #signal, G_CALLBACK(self_##signal), self)
-    
+  
+  /* how many signals are we proxying? */
+  #define N_HANDLERS 5
+  
   /* signal handlers */
   
   /* it may be possible to do this and other handlers within GOB using 
@@ -165,26 +168,31 @@ class GGobi:Stage from G:Object {
 
 /*-- this forms the pipeline --*/
 private GGobiStage *parent;
-
 property OBJECT parent
   (nick = "prev", blurb = "The stage preceeding this one in the pipeline",
     object_type = GGobi:Stage, export)
   set {
-    // FIXME: does not yet support reparenting
     GGobiStage *parent = g_value_get_object(VAL);
+    GGobiStage *former = self->_priv->parent;
+    
+    if (former)
+      for (guint i = 0; i < N_HANDLERS; i++)
+        g_signal_handler_disconnect(former, self->_priv->handlers[i]);
+      
     self->_priv->parent = parent;
-    RELAY_SIGNAL(col_data_changed);
-    RELAY_SIGNAL(col_name_changed);
-    RELAY_SIGNAL(cols_added);
-    RELAY_SIGNAL(col_deleted);
-    RELAY_SIGNAL(rows_added);
+    self->_priv->handlers[0] = RELAY_SIGNAL(col_data_changed);
+    self->_priv->handlers[1] = RELAY_SIGNAL(col_name_changed);
+    self->_priv->handlers[2] = RELAY_SIGNAL(cols_added);
+    self->_priv->handlers[3] = RELAY_SIGNAL(col_deleted);
+    self->_priv->handlers[4] = RELAY_SIGNAL(rows_added);
   }
   get { g_value_set_object(VAL, self->_priv->parent); };
-   
+
+private gulong *handlers = { g_new(gulong, N_HANDLERS) } destroywith g_free;
+
 /*-- every pipeline stage has a name --*/
 private gchar *name
   destroywith g_free;
-
 property STRING name
   (nick = "id", blurb = "The name of the pipeline stage",
    default_value = "identity", link, export);
@@ -215,6 +223,9 @@ public GPtrArray *vartable = { g_ptr_array_new() }
 public guint n_rows;
 public guint n_cols;
 
+// FIXME: right now we are 'export'ing these so they have public setters.
+// The cols_added, rows_added emitters are also public. Perhaps we need
+// to make them protected?
 property UINT n_rows 
   (nick = "nrows", blurb = "Number of rows at this stage",
    minimum = 0, maximum = INT_MAX, default_value = 0, link, export);
@@ -222,12 +233,8 @@ property UINT n_cols
   (nick = "ncols", blurb = "Number of cols at this stage",
    minimum = 0, maximum = INT_MAX, default_value = 0, export)
    set { 
-     gint nprev = self->n_cols;
      self->n_cols = g_value_get_uint(VAL);
      g_ptr_array_set_size(self->vartable, self->n_cols);
-     /* we emit cols_added here, but we can't emit col_deleted */
-     if (nprev < self->n_cols)
-       self_cols_added(self, self->n_cols - nprev);
    }
    get { g_value_set_uint(VAL, self->n_cols); };
 
@@ -335,7 +342,9 @@ col_name_changed(self, const gchar *old_name, guint j) {
  **/
 public signal NONE (UINT) void
 cols_added(self, guint n) {
-  guint ncols = self->n_cols;
+  guint ncols = self->n_cols + n;
+  
+  self_set_n_cols(self, ncols);
   
   arrayf_add_cols (&self->tform, ncols);
   arrayg_add_cols (&self->jitdata, ncols);
@@ -353,7 +362,8 @@ cols_added(self, guint n) {
  **/
 public signal NONE (UINT) void
 col_deleted(self, guint j) {
-  self->n_cols--;
+  self_set_n_cols(self, self->n_cols - 1);
+  
   arrayf_delete_cols (&self->tform, 1, &j);
   arrayg_delete_cols (&self->jitdata, 1, &j);
   arrayg_delete_cols (&self->world, 1, &j);
