@@ -30,8 +30,7 @@ typedef enum {no_edgesets, edgesets_only, all_datatypes} datatyped;
  */
 class GGobi:Data from GGobi:Stage {
 
-  // FIXME: make these fields private or get rid of them!
-public gchar *nickname;
+protected gchar *nickname;
 property STRING nickname
   (nick = "alias", blurb = "The nickname of the dataset",
    default_value = "dataset", link, export);
@@ -54,11 +53,10 @@ protected GHashTable* idTable;
 protected gchar **rowIds;
 
 /* We'll fix edge/polygon stuff after pipeline */
-public EdgeData  edge;
+protected EdgeData  edge;
 
-init (self) {
+init(self) {
   ggobi_stage_set_name(GGOBI_STAGE(self), "unknown");
-
   self->idTable = g_hash_table_new(g_str_hash, g_str_equal);
 }
 
@@ -74,14 +72,17 @@ init (self) {
 public GGobiData* 
 new(guint nrows, guint ncols)
 {
-  GGobiData* d = (GGobiData*) g_object_new(GGOBI_TYPE_DATA, NULL);
+  GGobiData* d = GGOBI_DATA(GET_NEW());
   self_add_cols(d, ncols);
   self_add_rows(d, nrows);
 
   return(d);
 }
 
-// FIXME: abstract into a GGobiDataFactory
+// FIXME: this stuff is _G_Gobi-specific, so it has to be added to every
+// GGobiData that participates in _G_Gobi, regardless of source.
+// Thus, this should probably be done when the GGobiData is added to the 
+// GGobiApp (ggobid) object.
 public void
 add_attributes(self) {
   GGobiStage *stage = GGOBI_STAGE(self);
