@@ -89,7 +89,7 @@ class GGobi:Variable from G:Object {
     self->_priv->name = name;
     nick = g_strndup(tmp_name, 2); /* prefix of untransformed name */
     self_set_nickname(self, nick);
-    self_name_changed(self, old);
+    self_name_changed(self, old, tmp_name);
     g_free (old);
     g_free (nick);
   };
@@ -104,8 +104,8 @@ class GGobi:Variable from G:Object {
    enum_type = GGobi:Variable:Type, default_value = GGOBI_VARIABLE_REAL, 
    link, export);
    
-  private gdouble def;
-  property DOUBLE def
+  private gdouble default_value = 0;
+  property DOUBLE default_value
   (nick = "default", blurb = "The default value for a field of this variable",
     default_value = 0, minimum = GGOBI_SMALLEST_DOUBLE, maximum = G_MAXDOUBLE, link, export);
 
@@ -117,8 +117,9 @@ class GGobi:Variable from G:Object {
   private gpointer transform_user_data;
 
   /* provides the old name for listeners that know the variable by its name */
-  private signal NONE (STRING) void 
-    name_changed(self, const gchar *old_name);
+  /* also gives the raw (untransformed) name for passing up the pipeline */
+  private signal NONE (STRING, STRING) void 
+    name_changed(self, const gchar *old_name, const gchar *raw_name);
   
   /* PIPELINE STUFF */
   public lims lim_raw;         /* raw data*/

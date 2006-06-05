@@ -72,11 +72,11 @@ init(self) {
 public GGobiData* 
 new(guint nrows, guint ncols)
 {
-  GGobiData* d = GGOBI_DATA(GET_NEW);
-  self_add_cols(d, ncols);
-  self_add_rows(d, nrows);
+  GObject* d = GET_NEW;
+  self_add_cols(GGOBI_DATA(d), ncols);
+  self_add_rows(GGOBI_DATA(d), nrows);
 
-  return(d);
+  return(GGOBI_DATA(d));
 }
 
 // FIXME: this stuff is _G_Gobi-specific, so it has to be added to every
@@ -86,31 +86,57 @@ new(guint nrows, guint ncols)
 public void
 add_attributes(self) {
   GGobiStage *stage = GGOBI_STAGE(self);
-  stage->n_attributes += 12;
-  guint first_attr = self_add_cols(self, 12);
-  ggobi_stage_set_col_name(stage, first_attr++, "_color");
-  ggobi_stage_set_col_name(stage, first_attr++, "_glyph_size");
-  ggobi_stage_set_col_name(stage, first_attr++, "_glyph_type");
-  ggobi_stage_set_col_name(stage, first_attr++, "_hidden");
-  ggobi_stage_set_col_name(stage, first_attr++, "_color_now");
-  ggobi_stage_set_col_name(stage, first_attr++, "_glyph_size_now");
-  ggobi_stage_set_col_name(stage, first_attr++, "_glyph_type_now");
-  ggobi_stage_set_col_name(stage, first_attr++, "_hidden_now");
-  ggobi_stage_set_col_name(stage, first_attr++, "_color_prev");
-  ggobi_stage_set_col_name(stage, first_attr++, "_glyph_size_prev");
-  ggobi_stage_set_col_name(stage, first_attr++, "_glyph_type_prev");
-  ggobi_stage_set_col_name(stage, first_attr++, "_hidden_prev");
-
+  guint attr = self_add_cols(self, 12);
   gint def_color = stage->gg ? stage->gg->color_id : 0;
   gint def_type  = stage->gg ? stage->gg->glyph_id.type : FC;
   gint def_size =  stage->gg ? stage->gg->glyph_id.size : 1;
-
+  
+  stage->n_attributes += 12;
+  
+  // FIXME: we set the default value here, even though the ggobid fields
+  // could easily change, though I don't think they actually do.
+  ggobi_stage_set_col_name(stage, attr, "_color");
+  self_set_col_default_value(self, attr++, (gdouble)def_color);
+  ggobi_stage_set_col_name(stage, attr, "_glyph_size");
+  self_set_col_default_value(self, attr++, (gdouble)def_size);
+  ggobi_stage_set_col_name(stage, attr, "_glyph_type");
+  self_set_col_default_value(self, attr++, (gdouble)def_type);
+  ggobi_stage_set_col_name(stage, attr++, "_hidden");
+  ggobi_stage_set_col_name(stage, attr, "_color_now");
+  self_set_col_default_value(self, attr++, (gdouble)def_color);
+  ggobi_stage_set_col_name(stage, attr, "_glyph_size_now");
+  self_set_col_default_value(self, attr++, (gdouble)def_size);
+  ggobi_stage_set_col_name(stage, attr, "_glyph_type_now");
+  self_set_col_default_value(self, attr++, (gdouble)def_type);
+  ggobi_stage_set_col_name(stage, attr++, "_hidden_now");
+  ggobi_stage_set_col_name(stage, attr, "_color_prev");
+  self_set_col_default_value(self, attr++, (gdouble)def_color);
+  ggobi_stage_set_col_name(stage, attr, "_glyph_size_prev");
+  self_set_col_default_value(self, attr++, (gdouble)def_size);
+  ggobi_stage_set_col_name(stage, attr, "_glyph_type_prev");
+  self_set_col_default_value(self, attr++, (gdouble)def_type);
+  ggobi_stage_set_col_name(stage, attr, "_hidden_prev");
+  
+  // FIXME: Perhaps make a convenience method for this, like reset_col()...
   for (guint i = 0; i < ggobi_stage_get_n_rows(stage); i++) {
     ggobi_stage_set_attr_color(stage, i, def_color, ATTR_SET_PERSISTENT);
     ggobi_stage_set_attr_glyph_parts(stage, i, def_type, def_size, ATTR_SET_PERSISTENT);
     ggobi_stage_set_attr_hidden(stage, i, false, ATTR_SET_PERSISTENT);
   }
+}
 
+public void 
+set_col_default_value(self, guint j, gdouble value)
+{
+  GGobiVariable* vt = ggobi_stage_get_variable(GGOBI_STAGE(self), j);
+  ggobi_variable_set_default_value(vt, value);
+}
+
+public gdouble
+get_col_default_value(self, guint j)
+{
+  GGobiVariable* vt = ggobi_stage_get_variable(GGOBI_STAGE(self), j);
+  return ggobi_variable_get_default_value(vt);
 }
 
 /**
@@ -295,9 +321,11 @@ get_row_for_id(GGobi:Stage *self, gchar *id) {
  **/
  // FIXME: This code should be the default handler for the n_rows property.
  // Then this function would just increment that property.
+ // -- We won't be able to set the property if we make it read-only in the
+ //    stage. In that case, this is probably OK.
 public guint
 add_rows(self, guint n) {
-  guint i, nprev = GGOBI_STAGE(self)->n_rows;
+  guint i, j, nprev = GGOBI_STAGE(self)->n_rows;
   guint nrows = nprev + n;
   
   self->rowIds = (gchar **) g_realloc (self->rowIds, sizeof(gchar *) * nrows);
@@ -313,6 +341,15 @@ add_rows(self, guint n) {
   }
   
   ggobi_stage_rows_added(GGOBI_STAGE(self), n);
+  
+  /* set default values here */
+  for (j = 0; j < GGOBI_STAGE(self)->n_cols; j++) {
+    gdouble default_val = self_get_col_default_value(self, j);
+    for (i = nprev; i < nrows; i++)
+      ggobi_stage_set_raw_value(GGOBI_STAGE(self), i, j, default_val);
+    ggobi_stage_col_data_changed(GGOBI_STAGE(self), j);
+  }
+  
   return nprev;
 }
 
@@ -335,7 +372,6 @@ add_cols(self, guint n) {
   arrayf_add_cols (&self->raw, ncols);
   arrays_add_cols (&self->missing, ncols);
 
-  //g_object_set(G_OBJECT(self), GGOBI_STAGE_PROP_N_COLS(ncols), NULL);
   ggobi_stage_cols_added(GGOBI_STAGE(self), n);
   
   return nprev;
