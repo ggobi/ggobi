@@ -7,9 +7,9 @@
 
   // FIXME: these probably won't be necessary - we will not proxy properties
   #define SET_PARENT_PROP(prop) \
-    g_object_set_property(G_OBJECT(self->_priv->parent), (prop), VAL)
+    g_object_set_property(G_OBJECT(self->parent), (prop), VAL)
   #define GET_PARENT_PROP(prop) \
-    g_object_get_property(G_OBJECT(self->_priv->parent), (prop), VAL)
+    g_object_get_property(G_OBJECT(self->parent), (prop), VAL)
   
   #define RELAY_SIGNAL(signal) \
     g_signal_connect_swapped(G_OBJECT(parent), #signal, G_CALLBACK(self_##signal), self)
@@ -174,30 +174,35 @@ enum ATTR_SET {
 class GGobi:Stage from G:Object {
 
 /*-- this forms the pipeline --*/
-private GGobiStage *parent;
+protected GGobiStage *parent;
 property OBJECT parent
   (nick = "prev", blurb = "The stage preceeding this one in the pipeline",
     object_type = GGobi:Stage, export)
   set {
     GGobiStage *parent = g_value_get_object(VAL);
-    GGobiStage *former = self->_priv->parent;
+    GGobiStage *former = self->parent;
     
     if (former) {
       for (guint i = 0; i < N_HANDLERS; i++)
         g_signal_handler_disconnect(former, self->_priv->handlers[i]);
-      // FIXME: emit col_deleted signals
+      for (guint j = 0; j < self->n_cols; j++)
+        self_col_deleted(self, j);
     }
       
-    self->_priv->parent = parent;
+    self->parent = parent;
+    // FIXME: In order to allow subclasses to block signal forwarding (like
+    // for row and column filters) we should not simply forward signals.
+    // They need to pass through a handler first. We can make the handlers
+    // virtuals that forward by default
     self->_priv->handlers[0] = RELAY_SIGNAL(col_data_changed);
     self->_priv->handlers[1] = RELAY_SIGNAL(col_name_changed);
     self->_priv->handlers[2] = RELAY_SIGNAL(cols_added);
     self->_priv->handlers[3] = RELAY_SIGNAL(col_deleted);
     self->_priv->handlers[4] = RELAY_SIGNAL(rows_added);
     
-    self_cols_added(self, self->_priv->parent->n_cols);
+    self_cols_added(self, self->parent->n_cols);
   }
-  get { g_value_set_object(VAL, self->_priv->parent); };
+  get { g_value_set_object(VAL, self->parent); };
 
 /* stores the ids of our handlers of parent signals */
 private gulong *handlers = { g_new(gulong, N_HANDLERS) } destroywith g_free;
@@ -266,10 +271,10 @@ public GtkWidget *vartable_tree_view[GGOBI_VARIABLE_ALL_VARTYPES];
 public GtkTreeModel *vartable_tree_model; /* the root model, with all vars **/
 public GtkWidget *cluster_table; /*-- table of symbol groups from brushing --*/
 public clusteruid *clusvui;
-
-
-/* PIPELINE */
 public Subset  subset;
+
+/* PIPELINE AND IMODE OBJECTS */
+
 public Jitterd  jitter;
 public Sphere_d  sphere;
 public BrushBins  brush;
@@ -325,10 +330,6 @@ public GHashTable* var_name_lookup = {
   g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL) 
 } destroywith g_hash_table_destroy;
 
-/* This stores the column name set from col_name_changed so that we don't
-   set it again in response to the name_changed signal from GGobiVariable */
-private gchar *last_col_name destroywith g_free;
-
 public signal first NONE (UINT) void 
 col_data_changed(self, guint j) {
   GGobiVariable *var = self_get_variable(self, j);
@@ -343,10 +344,10 @@ col_data_changed(self, guint j) {
 
 public signal first NONE (UINT) void 
 col_name_changed(self, guint j) {
-  if (self->_priv->parent) {
+  if (self->parent) {
     GGobiVariable *var = self_get_variable(self, j);
-    gchar *name = self_get_col_name(self->_priv->parent, j);
-    gchar *nickname = self_get_col_nickname(self->_priv->parent, j);
+    gchar *name = self_get_col_name(self->parent, j);
+    gchar *nickname = self_get_col_nickname(self->parent, j);
     self_set_variable_name(self, j, name);
     ggobi_variable_set_nickname(var, nickname);
     g_free(nickname);
@@ -456,6 +457,9 @@ rows_added(self, guint n) {
   clusters_set(self);
   self_set_rows_in_plot(self);
 };
+
+public signal NONE (UINT) void
+rows_deleted(self, guint n);
 
 init (self) {
   sphere_init(self);
@@ -591,7 +595,7 @@ set_col_nickname(self, guint j, const gchar* value)
 virtual void
 set_missing(self, guint i, guint j)
 {
-  self_set_missing(self->_priv->parent, i, j);
+  self_set_missing(self->parent, i, j);
 }
 
 
@@ -606,7 +610,7 @@ set_missing(self, guint i, guint j)
 virtual gboolean
 is_missing(self, guint i, guint j) 
 {
-  return(self_is_missing(self->_priv->parent, i, j));  
+  return(self_is_missing(self->parent, i, j));  
 }
 
 /**
@@ -617,7 +621,7 @@ is_missing(self, guint i, guint j)
 virtual guint
 get_n_missings(self) 
 {
-  return(self_get_n_missings(self->_priv->parent));
+  return(self_get_n_missings(self->parent));
 }
 
 /**
@@ -678,7 +682,7 @@ set_raw_values(self, guint j, gdouble *values)
 virtual void
 set_raw_value(self, guint i, guint j, gdouble value)
 {
-  self_set_raw_value(self->_priv->parent, i, j, value);
+  self_set_raw_value(self->parent, i, j, value);
   self->tform.vals[i][j] = value;
 }
 
@@ -736,7 +740,7 @@ set_string_value(self, guint i, guint j, const gchar* value)
 virtual gdouble
 get_raw_value(self, guint i, guint j)
 {
-  return self_get_raw_value(self->_priv->parent, i, j);
+  return self_get_raw_value(self->parent, i, j);
 }
 
 public GGobiVariableType
@@ -750,8 +754,8 @@ get_col_type(self, guint j)
 virtual GGobiVariable*
 create_variable (self, guint j)
 {
-  if (self->_priv->parent)
-    return ggobi_variable_clone(self_get_variable(self->_priv->parent, j));
+  if (self->parent)
+    return ggobi_variable_clone(self_get_variable(self->parent, j));
   return GGOBI_VARIABLE(ggobi_variable_new(self));
 }
 
@@ -810,7 +814,7 @@ get_string_value(self, guint i, guint j, gboolean transformed)
 virtual guint
 get_n_edges (self)
 {
-  return(self_get_n_edges(self->_priv->parent));
+  return(self_get_n_edges(self->parent));
 }
 
 // FIXME: dirty hack so that we can keep the edge data in GGobiData where it belongs
@@ -818,7 +822,7 @@ get_n_edges (self)
 virtual EdgeData *
 get_edge_data (self)
 {
-  return(self_get_edge_data(self->_priv->parent));
+  return(self_get_edge_data(self->parent));
 }
 
 /** 
@@ -834,7 +838,7 @@ get_edge_data (self)
  **/ 
 virtual void
 set_row_id(self, guint i, gchar* value, gboolean check) {
-  self_set_row_id(self->_priv->parent, i, value, check);
+  self_set_row_id(self->parent, i, value, check);
 }
 
 /** 
@@ -847,7 +851,7 @@ set_row_id(self, guint i, gchar* value, gboolean check) {
  **/
 virtual gchar*
 get_row_id(self, guint i) {
-  return self_get_row_id(self->_priv->parent, i);
+  return self_get_row_id(self->parent, i);
 }
 
 /** 
@@ -861,7 +865,7 @@ get_row_id(self, guint i) {
  **/
 virtual gint
 get_row_for_id(self, gchar *id) {
-  return self_get_row_for_id(self->_priv->parent, id);
+  return self_get_row_for_id(self->parent, id);
 }
 
 
@@ -869,7 +873,7 @@ public GGobiStage *
 get_root(self)
 {
   GGobiStage *stage;
-  for (stage = self; stage->_priv->parent != NULL; stage = stage->_priv->parent);
+  for (stage = self; stage->parent != NULL; stage = stage->parent);
   return(stage);
 }
 
@@ -1941,7 +1945,7 @@ set_variable (self, guint j, GGobiVariable* value)
   if (g_ptr_array_index(self->vartable, j))
     g_object_unref(g_ptr_array_index(self->vartable, j));
   g_ptr_array_index(self->vartable, j) = value;
-  if (!self->_priv->parent) /* for unique name */
+  if (!self->parent) /* for unique name */
     self_set_col_name(self, j, NULL);
   else self_update_var_name_hash(self, NULL, j);
   ggobi_variable_connect__name_changed(value, variable_name_changed_cb, self);

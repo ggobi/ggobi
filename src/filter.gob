@@ -1,68 +1,38 @@
 /*
  
-Questions:
-
-gboolean missing and nmissing (does that exist for each variable?)
-  could have different values after the filter stage than they had
-  before it.
-
-  -- The stage has virtuals for accessing missings, I think you have this right
-
-Signal handling -- need to respond to changes in the values of the
-  sampled and excluded vectors (or whatever the precise filter is to
-  be) in the parent, as well as to changes in the number of rows.
-
-  -- Listen to col-data-changed and the property for n_rows
   
 */
 
-%{
+%h{
+  #include "ggobi-stage.h"
+}
 
-  // FIXME: temporary
-  #include "ggobi-data.h"
+%{
   
   /* signal handlers */
   static void
   col_data_changed_cb(GGobiVariable *var, const gchar *name, GGobiStage self)
   {
+    // FIXME: check to make sure one of the relevant columns changed
+    // like sampled and excluded - but those aren't attributes yet
     set_rows_in_plot (self);
   }
 
   static void
-  rows_added_cb() 
+  rows_added_cb(self, guint n) 
   {
+    // FIXME: we can do this more efficiently by only looking at the last n
     set_rows_in_plot (self);
   }
 
 %}
 
-class GGobi:Filter from GGobi:Stage {
+class GGobi:Stage:Filter from GGobi:Stage {
 
   // parent is GGobi:Data; it is itself the parent of GGobi:Transform
 
   // These are the indices to be used; n_rows_in_plot is just n_rows.
-  // Initialize null; self_set_rows_in_plot as part of construction?
-  // It will always be of dimension parent->n_rows.
-  
-  // -- I suggest using g_renew() in the notify signal for n_rows OR override
-  // the n_rows property setter. I do this in GGobiStage for n_cols and the
-  // array of variables.
-  private guint *rows_in_plot;
-
-  /* I see that data.gob has missings but stage doesn't;
-     filter needs its own value.  Actually, I also don't see
-     how data->missings is set.
-     
-     -- The missings are stored in GGobiData, but accessed through GGobiStage.
-     You shouldn't need this field.
-
-     I'm still not clear about this.
-     
-     HW: Is it even worth worrying about?  How often do we need to know whether
-         a stage has any missing values?  I think most of it can be done on a variable
-         by variable basis using code in GGobiVariable
-  */
-  public gboolean missings;
+  protected guint *rows_in_plot;
 
   private guint
   get_raw_index (self, guint i (check < N_ROWS)) {
@@ -76,10 +46,10 @@ class GGobi:Filter from GGobi:Stage {
  * @j: column index
  **/
 override (GGobi:Stage) void
-set_missing(GGobiStage self, guint i (check < N_ROWS), guint j (check < N_COLS))
+set_missing(GGobi:Stage *self (check null type), guint i (check < N_ROWS), 
+  guint j (check < N_COLS))
 {
-  SELF me = SELF(self);
-  PARENT_HANDLER(self->_priv->parent, self_get_raw_index(me, i), j);
+  PARENT_HANDLER(self->parent, self_get_raw_index(SELF(self), i), j);
 }
 
 /**
@@ -91,10 +61,10 @@ set_missing(GGobiStage self, guint i (check < N_ROWS), guint j (check < N_COLS))
  * Returns: if value at specified position is missing or not
  **/
 override (GGobi:Stage) gboolean
-is_missing(GGobiStage self, guint i (check < N_ROWS), guint j (check < N_COLS)) 
+is_missing(GGobi:Stage *self (check null type), guint i (check < N_ROWS), 
+  guint j (check < N_COLS)) 
 {
-  SELF me = SELF(self);
-  PARENT_HANDLER(self->_priv->parent, self_get_raw_index(me, i), j);  
+  PARENT_HANDLER(self->parent, self_get_raw_index(SELF(self), i), j);  
 }
 
 /*  Other virtual methods that may need to be overridden.
@@ -114,9 +84,8 @@ has_missings(GGobiStage self)
 */
 
 override (GGobi:Stage) gchar*
-get_row_id(GGobiStage self, guint i (check < N_ROWS)) {
-  SELF me = SELF(self);
-  PARENT_HANDLER(self->_priv->parent, self_get_raw_index(me, i));  
+get_row_id(GGobi:Stage *self (check null type), guint i (check < N_ROWS)) {
+  PARENT_HANDLER(self->parent, self_get_raw_index(SELF(self), i));  
 }
 
 /* 
@@ -127,10 +96,11 @@ get_row_id(GGobiStage self, guint i (check < N_ROWS)) {
    HW: I think it should return the row index for this stage.  eg.
    Imagine looking up a rowid and then going to modify that row.
  */
+ // FIXME: This should return the row number after the filter. There needs
+ // to be a reverse mapping from raw -> filtered OR we need to hash the labels
 override (GGobi:Stage) gint
-get_row_for_id(self, gchar *id) {
-  SELF me = SELF(self);
-  PARENT_HANDLER(self->_priv->parent, self_get_raw_index(me, i));  
+get_row_for_id(GGobi:Stage *self (check null type), gchar *id (check null)) {
+  PARENT_HANDLER(self->parent, self_get_raw_index(SELF(self), i));  
 }
 
 /**
@@ -141,11 +111,10 @@ get_row_for_id(self, gchar *id) {
  * @values: vector of new values, of length self->n_rows
  **/
 override (GGobi:Stage) void
-set_raw_value(GGobiStage self, guint i (check < N_ROWS), guint j (check < N_COLS), gdouble value)
+set_raw_value(GGobi:Stage *self, guint i (check < N_ROWS), guint j (check < N_COLS), gdouble value)
 {
-  SELF me = SELF(self);
-  self_set_raw_value(self->_priv->parent, 
-    self_get_raw_index(me, i), j, value);
+  self_set_raw_value(self->parent, 
+    self_get_raw_index(SELF(self), i), j, value);
 }
 
 /*
@@ -160,16 +129,15 @@ set_raw_value(GGobiStage self, guint i (check < N_ROWS), guint j (check < N_COLS
  * @j: column index
  **/
 override (GGobi:Stage) gdouble
-get_raw_value(GGobiStage self, guint i (check < N_ROWS), guint j (check < N_COLS))
+get_raw_value(GGobi:Stage *self, guint i (check < N_ROWS), guint j (check < N_COLS))
 {
-  SELF me = SELF(self);
-  return self_get_raw_value(self->_priv->parent, 
-    self_get_raw_index(me, i), j);
+  return self_get_raw_value(self->parent, 
+    self_get_raw_index(SELF(self), i), j);
 }
 
 /**
  * set_rows_in_plot:
- * @self: #GGobiData object
+ * @self: #GGobiStageFilter object
  *
  * Combine the values in two arrays:
  *   excluded[] (which comes from the exclusion panel or from linking)
@@ -179,31 +147,30 @@ get_raw_value(GGobiStage self, guint i (check < N_ROWS), guint j (check < N_COLS
  * rows_in_plot = sampled && !excluded
  **/
 private void
-set_rows_in_plot(GGobiStage self)
+set_rows_in_plot(self)
 {
-  SELF me = SELF(self);
-  GGobiStage *parent = self->_priv->parent;
+  GGobiStage *parent = GGOBI_STAGE(self)->parent;
   guint i;
-  guint n_rows_prev = self->n_rows;
-  self->n_rows = 0;
+  guint n_rows_prev = GGOBI_STAGE(self)->n_rows;
+  GGOBI_STAGE(self)->n_rows = 0;
   guint *rows_in_plot_prev = g_malloc(n_rows_prev * sizeof(guint));
 
   for (i=0; i<n_rows_prev; i++)
-    rows_in_plot_prev = me->rows_in_plot(
+    rows_in_plot_prev = self->rows_in_plot;
 
-  rows_in_plot = g_realloc(me->n_rows_in_plot, parent->n_rows);
+  rows_in_plot = g_realloc(self->n_rows_in_plot, parent->n_rows);
   for (i = 0; i < parent->n_rows; i++)
     if (parent->sampled.els[i] && !parent->excluded.els[i])
-      me->rows_in_plot[me->n_rows++] = i;
-  rows_in_plot = g_realloc(me->rows_in_plot, me->n_rows);
+      self->rows_in_plot[GGOBI_STAGE(self)->n_rows++] = i;
+  rows_in_plot = g_realloc(self->rows_in_plot, GGOBI_STAGE(self)->n_rows);
   
-  if (self->n_rows > n_rows_prev)
-    ggobi_stage_rows_added(self, n);
-  else if (self->n_rows < n_rows_prev)
-    ggobi_stage_rows_deleted(self, n);
+  if (GGOBI_STAGE(self)->n_rows > n_rows_prev)
+    ggobi_stage_rows_added(GGOBI_STAGE(self), n);
+  else if (GGOBI_STAGE(self)->n_rows < n_rows_prev)
+    ggobi_stage_rows_deleted(GGOBI_STAGE(self), n);
   else {
     gboolean changed = false;
-    for (i=0; i<self->n_rows; i++) {
+    for (i=0; i<GGOBI_STAGE(self)->n_rows; i++) {
       if (rows_in_plot_prev[i] != self->rows_in_plot[i]) {
         changed = true;
         break;
@@ -211,7 +178,7 @@ set_rows_in_plot(GGobiStage self)
     }
     if (changed) {
       for(guint j = 0; j < self_get_n_data_cols(self); j++) 
-        ggobi_stage_col_data_changed(self, j);
+        ggobi_stage_col_data_changed(GGOBI_STAGE(self), j);
     }
   }
 
