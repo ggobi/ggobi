@@ -12,7 +12,7 @@
     g_object_get_property(G_OBJECT(self->parent), (prop), VAL)
   
   #define RELAY_SIGNAL(signal) \
-    g_signal_connect_swapped(G_OBJECT(parent), #signal, G_CALLBACK(self_##signal), self)
+    g_signal_connect_swapped(G_OBJECT(parent), #signal, G_CALLBACK(self_##signal##_handler), self)
   
   /* how many signals are we proxying? */
   #define N_HANDLERS 5
@@ -190,15 +190,18 @@ property OBJECT parent
     }
       
     self->parent = parent;
-    // FIXME: In order to allow subclasses to block signal forwarding (like
-    // for row and column filters) we should not simply forward signals.
-    // They need to pass through a handler first. We can make the handlers
-    // virtuals that forward by default
+    /* In order to allow subclasses to block signal forwarding (like
+       for row and column filters) we should not simply forward signals.
+       They need to pass through a handler first. We can make the handlers
+       virtuals that forward by default or we could make one virtual
+       for registering (and another for unregistering) the handlers.
+       The former seems more robust and convenient. */
     self->_priv->handlers[0] = RELAY_SIGNAL(col_data_changed);
     self->_priv->handlers[1] = RELAY_SIGNAL(col_name_changed);
     self->_priv->handlers[2] = RELAY_SIGNAL(cols_added);
     self->_priv->handlers[3] = RELAY_SIGNAL(col_deleted);
     self->_priv->handlers[4] = RELAY_SIGNAL(rows_added);
+    self->_priv->handlers[4] = RELAY_SIGNAL(rows_deleted);
     
     self_cols_added(self, self->parent->n_cols);
   }
@@ -458,6 +461,7 @@ rows_added(self, guint n) {
   self_set_rows_in_plot(self);
 };
 
+/* We probably want to say which rows here, lest clients must refresh all */
 public signal NONE (UINT) void
 rows_deleted(self, guint n);
 
@@ -1980,6 +1984,37 @@ set_variable_name(self, guint j, const gchar *name)
   g_signal_handlers_unblock_by_func(var, variable_name_changed_cb, self);
   self_update_var_name_hash(self, old_name, j);
   g_free(old_name);
+}
+
+private virtual void
+col_data_changed_handler(self, guint j)
+{
+  self_col_data_changed(self, j);
+}
+private virtual void
+col_deleted_handler(self, guint j)
+{
+  self_col_deleted(self, j);
+}
+private virtual void
+cols_added_handler(self, guint n)
+{
+  self_cols_added(self, n);
+}
+private virtual void
+rows_added_handler(self, guint n)
+{
+  self_rows_added(self, n);
+}
+private virtual void
+rows_deleted_handler(self, guint n)
+{
+  self_rows_deleted(self, n);
+}
+private virtual void
+col_name_changed_handler(self, guint j)
+{
+  self_col_name_changed(self, j);
 }
 
 }
