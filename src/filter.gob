@@ -49,7 +49,7 @@ override (GGobi:Stage) void
 set_missing(GGobi:Stage *self (check null type), guint i (check < N_ROWS), 
   guint j (check < N_COLS))
 {
-  PARENT_HANDLER(self->parent, self_get_raw_index(SELF(self), i), j);
+  PARENT_HANDLER(self, self_get_raw_index(SELF(self), i), j);
 }
 
 /**
@@ -64,7 +64,7 @@ override (GGobi:Stage) gboolean
 is_missing(GGobi:Stage *self (check null type), guint i (check < N_ROWS), 
   guint j (check < N_COLS)) 
 {
-  PARENT_HANDLER(self->parent, self_get_raw_index(SELF(self), i), j);  
+  PARENT_HANDLER(self, self_get_raw_index(SELF(self), i), j);  
 }
 
 /*  Other virtual methods that may need to be overridden.
@@ -85,7 +85,7 @@ has_missings(GGobiStage self)
 
 override (GGobi:Stage) gchar*
 get_row_id(GGobi:Stage *self (check null type), guint i (check < N_ROWS)) {
-  PARENT_HANDLER(self->parent, self_get_raw_index(SELF(self), i));  
+  PARENT_HANDLER(self, self_get_raw_index(SELF(self), i));  
 }
 
 /* 
@@ -100,7 +100,7 @@ get_row_id(GGobi:Stage *self (check null type), guint i (check < N_ROWS)) {
  // to be a reverse mapping from raw -> filtered OR we need to hash the labels
 override (GGobi:Stage) gint
 get_row_for_id(GGobi:Stage *self (check null type), gchar *id (check null)) {
-  PARENT_HANDLER(self->parent, self_get_raw_index(SELF(self), i));  
+  PARENT_HANDLER(self, self_get_raw_index(SELF(self), i));  
 }
 
 /**
@@ -113,8 +113,7 @@ get_row_for_id(GGobi:Stage *self (check null type), gchar *id (check null)) {
 override (GGobi:Stage) void
 set_raw_value(GGobi:Stage *self, guint i (check < N_ROWS), guint j (check < N_COLS), gdouble value)
 {
-  self_set_raw_value(self->parent, 
-    self_get_raw_index(SELF(self), i), j, value);
+  PARENT_HANDLER(self, self_get_raw_index(SELF(self), i), j, value);
 }
 
 /*
@@ -131,8 +130,7 @@ set_raw_value(GGobi:Stage *self, guint i (check < N_ROWS), guint j (check < N_CO
 override (GGobi:Stage) gdouble
 get_raw_value(GGobi:Stage *self, guint i (check < N_ROWS), guint j (check < N_COLS))
 {
-  return self_get_raw_value(self->parent, 
-    self_get_raw_index(SELF(self), i), j);
+  return PARENT_HANDLER(self, self_get_raw_index(SELF(self), i), j);
 }
 
 /**
@@ -164,6 +162,12 @@ set_rows_in_plot(self)
       self->rows_in_plot[GGOBI_STAGE(self)->n_rows++] = i;
   rows_in_plot = g_realloc(self->rows_in_plot, GGOBI_STAGE(self)->n_rows);
   
+  /* This may need some more thought. If we do not preserve the order of
+    the rows, then we can simply add the newly passing rows to the end, allowing
+    us to just emit rows_added for them. When rows come to no longer pass
+    the filter, rows_deleted will work, if we make it communicate the specific
+    rows that were "deleted." Thus, any change in the filter can be expressed
+    as rows_added and/or rows_deleted, but we don't need col_data_changed. */
   if (GGOBI_STAGE(self)->n_rows > n_rows_prev)
     ggobi_stage_rows_added(GGOBI_STAGE(self), n);
   else if (GGOBI_STAGE(self)->n_rows < n_rows_prev)

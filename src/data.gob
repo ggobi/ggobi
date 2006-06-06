@@ -180,18 +180,6 @@ is_missing(GGobi:Stage *self, guint i, guint j)
 }
 
 /**
- * get_n_missings:
- * @self: GGobiData object
- * Returns: the number of missing values
- **/
-override (GGobi:Stage) guint
-get_n_missings(GGobi:Stage *self (check null type)) 
-{
-  return SELF(self)->_priv->n_missings;
-}
-
-
-/**
  * set_raw_value:
  * @self: GGobiData object
  * @i: row index

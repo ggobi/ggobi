@@ -39,10 +39,10 @@ missings_datad_cb (GtkWidget * w, ggobid * gg)
 {
   GObject *obj = G_OBJECT (gg->impute.window);
   GtkWidget *tree_view = get_tree_view_from_object (obj);
-  GGobiStage *d = (GGobiStage *) g_object_get_data (G_OBJECT (tree_view), "datad");
+  GGobiStage *d = GGOBI_STAGE(g_object_get_data (G_OBJECT (tree_view), "datad"));
   static gchar *lnames[] = { "present", "missing" };
   
-  if (!ggobi_stage_get_n_missings(d)) return;
+  if (!ggobi_stage_has_missings(d)) return;
   
   gint i, j, k;
   gint *cols_with_missings, ncols_with_missings;
@@ -50,7 +50,7 @@ missings_datad_cb (GtkWidget * w, ggobid * gg)
   ncols_with_missings = 0;
   cols_with_missings = g_malloc (d->n_cols * sizeof (gint));
   for (j = 0; j < d->n_cols; j++) {
-    if (ggobi_stage_get_col_n_missing(d, j))
+    if (ggobi_variable_has_missings(ggobi_stage_get_variable(d, j)))
       cols_with_missings[ncols_with_missings++] = j;
   }
 

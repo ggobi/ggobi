@@ -235,7 +235,7 @@ write_xml_records(FILE *f, GGobiStage *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo
     fprintf(f, " color=\"%s\"", xmlWriteInfo->defaultColorName);
   }
 
-  if (ggobi_stage_get_n_missings(d)) {
+  if (ggobi_stage_has_missings(d)) {
     if (gg->save.missing_ind == MISSINGSNA)
       fprintf(f, " missingValue=\"%s\"", "na");
     else if (gg->save.missing_ind == MISSINGSDOT)

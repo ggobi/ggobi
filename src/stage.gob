@@ -620,21 +620,30 @@ is_missing(self, guint i, guint j)
 /**
  * has_missings:
  * @self: GGobiStage object
- * Returns: the number of missing values in the stage
+ * Returns: whether there are missing values in the stage
  **/
-virtual guint
-get_n_missings(self) 
+public gboolean
+has_missings(self) 
 {
-  return(self_get_n_missings(self->parent));
+  for (guint j = 0; j < self->n_cols; j++)
+    if (ggobi_variable_has_missings(self_get_variable(self, j)))
+      return(TRUE);
+  return(FALSE);
 }
 
 /**
  * get_col_n_missing:
  * @self: GGobiStage object
  * @j: column index
- * Returns: whether or not specified column contains any missing values
+ * Returns: how many missing values does a column have?
  **/
  // FIXME: Should this be cached and made part of GGobiVariable?
+ // Well, it takes longer (on average) to count missings than detect them
+ // This is only used in the variable notebook.
+ // We plan on basing the notebook on a GtkTreeModel implemented by
+ // the set of GGobiVariables in a stage. This model could actually be 
+ // more generally implemented by GObject properties, meaning that 
+ // n_missings would need to be a property. Need to think about this.
 public guint 
 get_col_n_missing(self, guint j) {
   guint i, n = 0, nrows = self_get_n_rows(self);

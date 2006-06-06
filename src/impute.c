@@ -94,7 +94,7 @@ impute_mean_or_median (gint type, gint nvars, gint * vars,
   GGobiVariable *var;
   gboolean redraw = false;
 
-  if (!ggobi_stage_get_n_missings(d))
+  if (!ggobi_stage_has_missings(d))
     return false;
 
   g_return_val_if_fail(GGOBI_IS_GGOBI(d->gg), false);
@@ -204,7 +204,7 @@ impute_random (GGobiStage * d, gint nvars, gint * vars)
 
   gint i, j, k, n, m, npresent, *presv, nmissing, *missv;
 
-  if (!ggobi_stage_get_n_missings(d))
+  if (!ggobi_stage_has_missings(d))
     return;
 
   g_return_if_fail(GGOBI_IS_GGOBI(d->gg));

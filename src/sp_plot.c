@@ -66,7 +66,7 @@ splot_plot_case (gint m, GGobiStage *d, splotd *sp, displayd *display, ggobid *g
     return false;
 
   /*-- can prevent drawing of missings for parcoords or scatmat plots --*/
-  if (ggobi_stage_get_n_missings(d) && !d->missings_show_p) {
+  if (ggobi_stage_has_missings(d) && !d->missings_show_p) {
     if(GGOBI_EXTENDED_SPLOT_GET_CLASS(sp)->draw_case_p) {
        draw_case = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp)->draw_case_p(sp, m, d, gg);
     }
