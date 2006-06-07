@@ -30,7 +30,7 @@ typedef enum {no_edgesets, edgesets_only, all_datatypes} datatyped;
  */
 class GGobi:Data from GGobi:Stage {
 
-protected gchar *nickname;
+private gchar *nickname;
 property STRING nickname
   (nick = "alias", blurb = "The nickname of the dataset",
    default_value = "dataset", link, export);
@@ -38,8 +38,6 @@ property STRING nickname
 /* A description of the source of the GGobiData */
 // FIXME: this should be a boxed type and the field private
 public InputDescription *input;
-
-private guint n_missings;
 
 /* The actual data in this default implementation */
 protected array_f raw;
@@ -159,9 +157,6 @@ set_missing(GGobi:Stage *self (check null type), guint i, guint j)
 
   SELF(self)->missing.vals[i][j] = 1;
   SELF(self)->raw.vals[i][j] = 0;
-
-  // FIXME: we need to decrement this when a stage becomes non-missing
-  SELF(self)->_priv->n_missings++;
 }
 
 

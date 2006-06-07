@@ -46,7 +46,7 @@
   
   /* for use in GOB parameter checks like: guint j (check < N_COLS) */
   #define N_COLS GGOBI_STAGE(self)->n_cols
-  #define N_ROWS GGOBI_STAGE(self)->n_rows;
+  #define N_ROWS GGOBI_STAGE(self)->n_rows
   
   #define GGOBI_STAGE_IS_COL_CATEGORICAL(stage, col) \
     ggobi_stage_get_col_type((stage), (col)) == GGOBI_VARIABLE_CATEGORICAL
@@ -184,7 +184,7 @@ property OBJECT parent
     
     if (former) {
       for (guint i = 0; i < N_HANDLERS; i++)
-        g_signal_handler_disconnect(former, self->_priv->handlers[i]);
+        g_signal_handler_disconnect(former, selfp->handlers[i]);
       for (guint j = 0; j < self->n_cols; j++)
         self_col_deleted(self, j);
     }
@@ -196,12 +196,12 @@ property OBJECT parent
        virtuals that forward by default or we could make one virtual
        for registering (and another for unregistering) the handlers.
        The former seems more robust and convenient. */
-    self->_priv->handlers[0] = RELAY_SIGNAL(col_data_changed);
-    self->_priv->handlers[1] = RELAY_SIGNAL(col_name_changed);
-    self->_priv->handlers[2] = RELAY_SIGNAL(cols_added);
-    self->_priv->handlers[3] = RELAY_SIGNAL(col_deleted);
-    self->_priv->handlers[4] = RELAY_SIGNAL(rows_added);
-    self->_priv->handlers[4] = RELAY_SIGNAL(rows_deleted);
+    selfp->handlers[0] = RELAY_SIGNAL(col_data_changed);
+    selfp->handlers[1] = RELAY_SIGNAL(col_name_changed);
+    selfp->handlers[2] = RELAY_SIGNAL(cols_added);
+    selfp->handlers[3] = RELAY_SIGNAL(col_deleted);
+    selfp->handlers[4] = RELAY_SIGNAL(rows_added);
+    selfp->handlers[4] = RELAY_SIGNAL(rows_deleted);
     
     self_cols_added(self, self->parent->n_cols);
   }
@@ -222,7 +222,7 @@ property STRING name
 /* private struct _ggobid *gg; */
 
 /* variables are now stored in the stage */
-public GPtrArray *vartable = { g_ptr_array_new() } 
+private GPtrArray *vartable = { g_ptr_array_new() } 
   destroy { /* scrap the variables then the array */
     g_ptr_array_foreach(VAR, (GFunc)g_object_unref, NULL); 
     g_ptr_array_free(VAR, TRUE);
@@ -255,7 +255,7 @@ property UINT n_cols
    minimum = 0, maximum = INT_MAX, default_value = 0, export)
    set { 
      self->n_cols = g_value_get_uint(VAL);
-     g_ptr_array_set_size(self->vartable, self->n_cols);
+     g_ptr_array_set_size(selfp->vartable, self->n_cols);
    }
    get { g_value_set_uint(VAL, self->n_cols); };
 
@@ -329,7 +329,7 @@ protected guint n_attributes;
 
 /* END DATA.GOB */
 
-public GHashTable* var_name_lookup = { 
+private GHashTable* var_name_lookup = { 
   g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL) 
 } destroywith g_hash_table_destroy;
 
@@ -526,7 +526,7 @@ public gint
 get_col_index_for_name(self, const gchar* name) onerror -1
 {
   gpointer pos, key;
-  if (g_hash_table_lookup_extended(self->var_name_lookup, name, &key, &pos))
+  if (g_hash_table_lookup_extended(selfp->var_name_lookup, name, &key, &pos))
     return GPOINTER_TO_INT(pos);
   return -1;
 }
@@ -778,7 +778,7 @@ create_variable (self, guint j)
 public GGobiVariable*
 get_variable (self, guint j)
 {
-  return g_ptr_array_index(self->vartable, j);
+  return g_ptr_array_index(selfp->vartable, j);
 }
 
 /**
@@ -1951,9 +1951,9 @@ set_variable (self, guint j, GGobiVariable* value)
 {
   // FIXME: This function should be private
   // It's only external use is in cloning of vars, which needs to be redone
-  if (g_ptr_array_index(self->vartable, j))
-    g_object_unref(g_ptr_array_index(self->vartable, j));
-  g_ptr_array_index(self->vartable, j) = value;
+  if (g_ptr_array_index(selfp->vartable, j))
+    g_object_unref(g_ptr_array_index(selfp->vartable, j));
+  g_ptr_array_index(selfp->vartable, j) = value;
   if (!self->parent) /* for unique name */
     self_set_col_name(self, j, NULL);
   else self_update_var_name_hash(self, NULL, j);
@@ -1967,8 +1967,8 @@ update_var_name_hash(self, const gchar *old_name, guint j)
 {
   gchar *name = self_get_col_name(self, j);
   if (old_name)
-    g_hash_table_remove(self->var_name_lookup, old_name);
-  g_hash_table_insert(self->var_name_lookup, name, GINT_TO_POINTER(j));
+    g_hash_table_remove(selfp->var_name_lookup, old_name);
+  g_hash_table_insert(selfp->var_name_lookup, name, GINT_TO_POINTER(j));
 }
 
 protected void

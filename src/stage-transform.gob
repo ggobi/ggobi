@@ -96,7 +96,7 @@ class GGobi:Stage:Transform from GGobi:Stage {
     GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(self), j);
     ggobi_transform_ref(tform);
     ggobi_variable_set_name_transform_func(var, name_tform_func, tform);
-    g_hash_table_insert(self->_priv->tforms, GINT_TO_POINTER(j), tform);
+    g_hash_table_insert(selfp->tforms, GINT_TO_POINTER(j), tform);
   }
   
   public void 
@@ -104,14 +104,14 @@ class GGobi:Stage:Transform from GGobi:Stage {
   {
     GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(self), j);
     ggobi_variable_set_name_transform_func(var, NULL, NULL);
-    g_hash_table_remove(self->_priv->tforms, GINT_TO_POINTER(j));
+    g_hash_table_remove(selfp->tforms, GINT_TO_POINTER(j));
   }
   
   /* don't modify this value */
   public GGobiTransform *
   get_transform(self, guint j (check < N_COLS))
   {
-    return(g_hash_table_lookup(self->_priv->tforms, GINT_TO_POINTER(j)));
+    return(g_hash_table_lookup(selfp->tforms, GINT_TO_POINTER(j)));
   }
   
   /**
@@ -123,16 +123,16 @@ class GGobi:Stage:Transform from GGobi:Stage {
   public gint *
   get_transformed_cols(self)
   {
-    gint *cols = g_new(gint, g_hash_table_size(self->_priv->tforms));
+    gint *cols = g_new(gint, g_hash_table_size(selfp->tforms));
     gint *tmp_cols = cols;
-    g_hash_table_foreach(self->_priv->tforms, get_transformed_cols_func, &tmp_cols);
+    g_hash_table_foreach(selfp->tforms, get_transformed_cols_func, &tmp_cols);
     return(cols);
   }
   
   public guint
   get_n_transformed_cols(self)
   {
-    return (g_hash_table_size(self->_priv->tforms));
+    return (g_hash_table_size(selfp->tforms));
   }
   
   override (GGobi:Stage) gdouble

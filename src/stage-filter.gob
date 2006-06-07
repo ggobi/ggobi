@@ -5,45 +5,23 @@
 
 %h{
   #include "ggobi-stage.h"
-}
-
-%{
-  
-  /* signal handlers */
-  
-  static void
-  rows_in_plot_changed_cb(GGobi:Stage *stage, guint n)
-  {
-    ggobi_stage_filter_update_included(SELF(stage), included);
-  }
-  
-  static void
-  col_data_changed_cb(GGobiVariable *var, const gchar *name, GGobiStage self)
-  {
-    // FIXME: check to make sure one of the relevant columns changed
-    // like sampled and excluded - but those aren't attributes yet
-    set_rows_in_plot (self);
-  }
-
-  static void
-  rows_added_cb(self, guint n) 
-  {
-    // FIXME: we can do this more efficiently by only looking at the last n
-    set_rows_in_plot (self);
-  }
-
 %}
 
 class GGobi:Stage:Filter from GGobi:Stage {
 
-  // parent is GGobi:Data; it is itself the parent of GGobi:Transform
+  /* filtered index ==> raw index */
+  protected guint *included_rows;
+  /* raw index ==> filtered index */
+  protected gint *included_rows_rev;
+  /* whether a (raw) row passes the filter */
+  private gboolean *included;
 
-  // These are the indices to be used; n_rows_in_plot is just n_rows.
-  protected guint *rows_in_plot;
-
-  private guint
-  get_raw_index (self, guint i (check < N_ROWS)) {
-    return (self->rows_in_plot[i]);
+  // FIXME: we want to override col_data_changed and update when certain
+  // columns change.
+  override (GGobi:Stage) void
+  rows_in_plot_changed(GGobi:Stage *stage, guint n)
+  {
+    ggobi_stage_filter_update_included(SELF(stage));
   }
 
 /**
@@ -56,7 +34,7 @@ override (GGobi:Stage) void
 set_missing(GGobi:Stage *self (check null type), guint i (check < N_ROWS), 
   guint j (check < N_COLS))
 {
-  PARENT_HANDLER(self, self_get_raw_index(SELF(self), i), j);
+  PARENT_HANDLER(self, SELF(self)->included_rows[i], j);
 }
 
 /**
@@ -71,19 +49,18 @@ override (GGobi:Stage) gboolean
 is_missing(GGobi:Stage *self (check null type), guint i (check < N_ROWS), 
   guint j (check < N_COLS)) 
 {
-  PARENT_HANDLER(self, self_get_raw_index(SELF(self), i), j);  
+  return(PARENT_HANDLER(self, SELF(self)->included_rows[i], j));  
 }
 
 override (GGobi:Stage) gchar*
 get_row_id(GGobi:Stage *self (check null type), guint i (check < N_ROWS)) {
-  PARENT_HANDLER(self, self_get_raw_index(SELF(self), i));  
+  return(PARENT_HANDLER(self, SELF(self)->included_rows[i]));  
 }
 
- // FIXME: This should return the row number after the filter. There needs
- // to be a reverse mapping from raw -> filtered OR we need to hash the labels
 override (GGobi:Stage) gint
 get_row_for_id(GGobi:Stage *self (check null type), gchar *id (check null)) {
-  PARENT_HANDLER(self, self_get_raw_index(SELF(self), i));  
+  gint row = PARENT_HANDLER(self, id);
+  return(SELF(self)->included_rows_rev[row]);
 }
 
 /**
@@ -96,7 +73,7 @@ get_row_for_id(GGobi:Stage *self (check null type), gchar *id (check null)) {
 override (GGobi:Stage) void
 set_raw_value(GGobi:Stage *self, guint i (check < N_ROWS), guint j (check < N_COLS), gdouble value)
 {
-  PARENT_HANDLER(self, self_get_raw_index(SELF(self), i), j, value);
+  PARENT_HANDLER(self, SELF(self)->included_rows[i], j, value);
 }
 
 /** 
@@ -108,7 +85,7 @@ set_raw_value(GGobi:Stage *self, guint i (check < N_ROWS), guint j (check < N_CO
 override (GGobi:Stage) gdouble
 get_raw_value(GGobi:Stage *self, guint i (check < N_ROWS), guint j (check < N_COLS))
 {
-  return PARENT_HANDLER(self, self_get_raw_index(SELF(self), i), j);
+  return PARENT_HANDLER(self, SELF(self)->included_rows[i], j);
 }
 
 /** 
@@ -120,12 +97,15 @@ get_raw_value(GGobi:Stage *self, guint i (check < N_ROWS), guint j (check < N_CO
  *   sampled[] (which come from the subset panel)
  * to determine which cases should be plotted.
  **/
+ /* something like this function could probably become virtual eventually,
+  allowing subclasses to redefine the filter rules */
 private gboolean *
 calc_included(self)
 {
   gboolean *included = g_new(gboolean, GGOBI_STAGE(self)->parent->n_rows);
   for (guint i = 0; i < GGOBI_STAGE(self)->parent->n_rows; i++)
-    included[i] = self->sampled.els[i] && !self->excluded.els[i];
+    included[i] = GGOBI_STAGE(self)->sampled.els[i] && 
+      !GGOBI_STAGE(self)->excluded.els[i];
   return(included);
 }
 
@@ -139,30 +119,41 @@ update_included(self)
 {
   guint deleted_rows[GGOBI_STAGE(self)->n_rows];
   guint added_rows[GGOBI_STAGE(self)->parent->n_rows];
-  guint n_included = 0, n_deleted = 0, n_added = 0;
+  guint n_included, n_both = 0, n_deleted = 0, n_added = 0;
   guint *included_rows = g_new(guint, GGOBI_STAGE(self)->parent->n_rows);
-  gboolean *included = calc_included(self);
+  gint *included_rows_rev = g_new(gint, GGOBI_STAGE(self)->parent->n_rows);
+  gboolean *included = self_calc_included(self);
   
   for (guint i = 0; i < GGOBI_STAGE(self)->parent->n_rows; i++) {
-    if (in_plot[i]) {
-      if (!self->included[i])
+    if (included[i]) {
+      if (!selfp->included[i])
         added_rows[n_added++] = i;
-      else included_rows[n_included++] = i;
-    } else if (self->included[i])
-      deleted_rows[n_deleted++] = i;
+      else {
+        included_rows_rev[i] = n_both;
+        included_rows[n_both++] = i;
+      }
+    } else {
+      included_rows_rev[i] = -1;
+      if (selfp->included[i])
+        deleted_rows[n_deleted++] = i;
+    }
   }
   
-  included_rows = g_renew(guint, included_rows, n_included + n_added);
-  for (guint i = 0; i < n_added; i++)
-    included_rows[n_included + i] = added_rows[i];
+  n_included = n_both + n_added;
+  included_rows = g_renew(guint, included_rows, n_included);
+  for (guint i = 0; i < n_added; i++) {
+    included_rows[n_both + i] = added_rows[i];
+    included_rows_rev[added_rows[i]] = n_both + i;
+  }
   
   if (n_added)
-    ggobi_stage_rows_added(self, n_added);
+    ggobi_stage_rows_added(GGOBI_STAGE(self), n_added);
   if (n_deleted)
-    ggobi_stage_rows_deleted(self, deleted_rows, n_deleted);
+    ggobi_stage_rows_deleted(GGOBI_STAGE(self), deleted_rows, n_deleted);
   
-  self->included = included;
+  selfp->included = included;
   self->included_rows = included_rows;
+  self->included_rows_rev = included_rows_rev;
   GGOBI_STAGE(self)->n_rows = n_included;
 }
 

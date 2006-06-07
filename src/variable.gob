@@ -82,9 +82,9 @@ class GGobi:Variable from G:Object {
     // This is a bug in something.
     gchar *name, *nick, *old = self->name;
     const gchar *tmp_name = g_value_get_string (VAL);
-    if (self->_priv->name_transform_func)
-      name = self->_priv->name_transform_func(tmp_name, 
-        self->_priv->transform_user_data);
+    if (selfp->name_transform_func)
+      name = selfp->name_transform_func(tmp_name, 
+        selfp->transform_user_data);
     else name = g_strdup(tmp_name);
     self->name = name;
     nick = g_strndup(tmp_name, 2); /* prefix of untransformed name */
@@ -164,7 +164,7 @@ class GGobi:Variable from G:Object {
     gpointer key;
     level_t *level;
     g_return_val_if_fail(GGOBI_VARIABLE_IS_CATEGORICAL(self), NULL);
-    if(!g_hash_table_lookup_extended(self->_priv->value_to_level, GINT_TO_POINTER(value), 
+    if(!g_hash_table_lookup_extended(selfp->value_to_level, GINT_TO_POINTER(value), 
       &key, (gpointer)&level))
         return(NULL);
     return(level);
@@ -176,7 +176,7 @@ class GGobi:Variable from G:Object {
     gpointer key;
     level_t *level;
     g_return_val_if_fail(GGOBI_VARIABLE_IS_CATEGORICAL(self), NULL);
-    if (!g_hash_table_lookup_extended(self->_priv->name_to_level, name, &key, 
+    if (!g_hash_table_lookup_extended(selfp->name_to_level, name, &key, 
         (gpointer)&level))
       return(NULL);
     return(level);
@@ -196,8 +196,8 @@ class GGobi:Variable from G:Object {
   set_name_transform_func(self, GGobiVariableNameTransformFunc func,
     gpointer user_data)
   {
-    self->_priv->name_transform_func = func;
-    self->_priv->transform_user_data = user_data;
+    selfp->name_transform_func = func;
+    selfp->transform_user_data = user_data;
   }
   
   /**
@@ -212,7 +212,7 @@ class GGobi:Variable from G:Object {
   {
     g_return_val_if_fail(GGOBI_VARIABLE_IS_CATEGORICAL(self), 0);  
 
-    return(g_hash_table_size(self->_priv->name_to_level));
+    return(g_hash_table_size(selfp->name_to_level));
   }
   
   public gchar* 
@@ -258,7 +258,7 @@ class GGobi:Variable from G:Object {
     
     tmp = values = g_new(gint, self_get_n_levels(self));
     
-    g_hash_table_foreach(self->_priv->value_to_level, value_collector_func, &tmp);
+    g_hash_table_foreach(selfp->value_to_level, value_collector_func, &tmp);
     
     return(values);
   }
@@ -413,16 +413,16 @@ class GGobi:Variable from G:Object {
   public gboolean
   has_missings(self)
   {
-    if (self->_priv->dirty_has_missings) {
+    if (selfp->dirty_has_missings) {
       gboolean missings = FALSE;
       gint j = ggobi_stage_get_col_index_for_name(self->stage, self->name);
       for (guint i = 0; i < self->stage->n_rows && !missings; i++)
         missings = ggobi_stage_is_missing(self->stage, i, j);
-      self->_priv->dirty_has_missings = FALSE;
-      self->_priv->has_missings = missings;
+      selfp->dirty_has_missings = FALSE;
+      selfp->has_missings = missings;
     }
     
-    return self->_priv->has_missings;
+    return selfp->has_missings;
   }
  
  public GGobiVariable*
@@ -430,7 +430,7 @@ class GGobi:Variable from G:Object {
  {
    GGobiVariable *self_new = GGOBI_VARIABLE(g_object_new(G_TYPE_FROM_INSTANCE(self),
     "name", self_get_name(self), "nickname", self_get_nickname(self), NULL));
-   //self_new->collab_tform = g_strdup (self->_priv->collab_tform);
+   //self_new->collab_tform = g_strdup (selfp->collab_tform);
 
    self_set_vartype(self_new, self_get_vartype(self));
    if (GGOBI_VARIABLE_IS_CATEGORICAL(self)) {
@@ -518,8 +518,8 @@ class GGobi:Variable from G:Object {
    else 
      level->name = g_strdup(name);
 
-   g_hash_table_insert(self->_priv->name_to_level, level->name, level);
-   g_hash_table_insert(self->_priv->value_to_level, GINT_TO_POINTER(level->value), level);
+   g_hash_table_insert(selfp->name_to_level, level->name, level);
+   g_hash_table_insert(selfp->value_to_level, GINT_TO_POINTER(level->value), level);
 
    return self_get_n_levels(self);
  }
@@ -534,11 +534,11 @@ class GGobi:Variable from G:Object {
    
    // FIXME: make a dirty flag for each statistic and set to TRUE here
    
-   self->_priv->dirty_has_missings = TRUE;
+   selfp->dirty_has_missings = TRUE;
    
    // FIXME: the level instances can probably be lazily cached as well.
    if (cat)
-     g_hash_table_foreach(self->_priv->name_to_level, level_count_clear_func, NULL);
+     g_hash_table_foreach(selfp->name_to_level, level_count_clear_func, NULL);
    
    for (guint i = 0; i < n; i++) {
      gdouble val = ggobi_stage_get_raw_value(self->stage, i, j);
