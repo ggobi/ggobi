@@ -10,6 +10,13 @@
 %{
   
   /* signal handlers */
+  
+  static void
+  rows_in_plot_changed_cb(GGobi:Stage *stage, guint n)
+  {
+    ggobi_stage_filter_update_included(SELF(stage), included);
+  }
+  
   static void
   col_data_changed_cb(GGobiVariable *var, const gchar *name, GGobiStage self)
   {
@@ -67,35 +74,11 @@ is_missing(GGobi:Stage *self (check null type), guint i (check < N_ROWS),
   PARENT_HANDLER(self, self_get_raw_index(SELF(self), i), j);  
 }
 
-/*  Other virtual methods that may need to be overridden.
-
-  /* I don't know how this should be set, but this filter's
-     value may differ from its parent's. 
-     -- You will need to check at the beginning and upon each change in data
-     for missings.
-     */
-     
-/*
-override (GGobi:Stage) gboolean
-has_missings(GGobiStage self)
-{
-  return SELF(self)->missings;
-}
-*/
-
 override (GGobi:Stage) gchar*
 get_row_id(GGobi:Stage *self (check null type), guint i (check < N_ROWS)) {
   PARENT_HANDLER(self, self_get_raw_index(SELF(self), i));  
 }
 
-/* 
-   This will return the raw row number, not the row number
-   for this stage.  That's probably the right thing to do, but
-   we need to work through a case where it's used.
-   
-   HW: I think it should return the row index for this stage.  eg.
-   Imagine looking up a rowid and then going to modify that row.
- */
  // FIXME: This should return the row number after the filter. There needs
  // to be a reverse mapping from raw -> filtered OR we need to hash the labels
 override (GGobi:Stage) gint
@@ -116,11 +99,6 @@ set_raw_value(GGobi:Stage *self, guint i (check < N_ROWS), guint j (check < N_CO
   PARENT_HANDLER(self, self_get_raw_index(SELF(self), i), j, value);
 }
 
-/*
- set_string_value and set_categorical_value shouldn't need to be
- overridden, because they call set_raw_value.
-*/
-
 /** 
  * get_raw_value:
  * @self: #GGobiStage
@@ -133,60 +111,59 @@ get_raw_value(GGobi:Stage *self, guint i (check < N_ROWS), guint j (check < N_CO
   return PARENT_HANDLER(self, self_get_raw_index(SELF(self), i), j);
 }
 
-/**
- * set_rows_in_plot:
+/** 
+ * calc_included:
  * @self: #GGobiStageFilter object
  *
  * Combine the values in two arrays:
  *   excluded[] (which comes from the exclusion panel or from linking)
  *   sampled[] (which come from the subset panel)
  * to determine which cases should be plotted.
+ **/
+private gboolean *
+calc_included(self)
+{
+  gboolean *included = g_new(gboolean, GGOBI_STAGE(self)->parent->n_rows);
+  for (guint i = 0; i < GGOBI_STAGE(self)->parent->n_rows; i++)
+    included[i] = self->sampled.els[i] && !self->excluded.els[i];
+  return(included);
+}
+
+/**
+ * update_included:
+ * @self: #GGobiStageFilter object
  *
- * rows_in_plot = sampled && !excluded
  **/
 private void
-set_rows_in_plot(self)
+update_included(self)
 {
-  GGobiStage *parent = GGOBI_STAGE(self)->parent;
-  guint i;
-  guint n_rows_prev = GGOBI_STAGE(self)->n_rows;
-  GGOBI_STAGE(self)->n_rows = 0;
-  guint *rows_in_plot_prev = g_malloc(n_rows_prev * sizeof(guint));
-
-  for (i=0; i<n_rows_prev; i++)
-    rows_in_plot_prev = self->rows_in_plot;
-
-  rows_in_plot = g_realloc(self->n_rows_in_plot, parent->n_rows);
-  for (i = 0; i < parent->n_rows; i++)
-    if (parent->sampled.els[i] && !parent->excluded.els[i])
-      self->rows_in_plot[GGOBI_STAGE(self)->n_rows++] = i;
-  rows_in_plot = g_realloc(self->rows_in_plot, GGOBI_STAGE(self)->n_rows);
+  guint deleted_rows[GGOBI_STAGE(self)->n_rows];
+  guint added_rows[GGOBI_STAGE(self)->parent->n_rows];
+  guint n_included = 0, n_deleted = 0, n_added = 0;
+  guint *included_rows = g_new(guint, GGOBI_STAGE(self)->parent->n_rows);
+  gboolean *included = calc_included(self);
   
-  /* This may need some more thought. If we do not preserve the order of
-    the rows, then we can simply add the newly passing rows to the end, allowing
-    us to just emit rows_added for them. When rows come to no longer pass
-    the filter, rows_deleted will work, if we make it communicate the specific
-    rows that were "deleted." Thus, any change in the filter can be expressed
-    as rows_added and/or rows_deleted, but we don't need col_data_changed. */
-  if (GGOBI_STAGE(self)->n_rows > n_rows_prev)
-    ggobi_stage_rows_added(GGOBI_STAGE(self), n);
-  else if (GGOBI_STAGE(self)->n_rows < n_rows_prev)
-    ggobi_stage_rows_deleted(GGOBI_STAGE(self), n);
-  else {
-    gboolean changed = false;
-    for (i=0; i<GGOBI_STAGE(self)->n_rows; i++) {
-      if (rows_in_plot_prev[i] != self->rows_in_plot[i]) {
-        changed = true;
-        break;
-      }
-    }
-    if (changed) {
-      for(guint j = 0; j < self_get_n_data_cols(self); j++) 
-        ggobi_stage_col_data_changed(GGOBI_STAGE(self), j);
-    }
+  for (guint i = 0; i < GGOBI_STAGE(self)->parent->n_rows; i++) {
+    if (in_plot[i]) {
+      if (!self->included[i])
+        added_rows[n_added++] = i;
+      else included_rows[n_included++] = i;
+    } else if (self->included[i])
+      deleted_rows[n_deleted++] = i;
   }
-
-  g_free(rows_in_plot_prev);
+  
+  included_rows = g_renew(guint, included_rows, n_included + n_added);
+  for (guint i = 0; i < n_added; i++)
+    included_rows[n_included + i] = added_rows[i];
+  
+  if (n_added)
+    ggobi_stage_rows_added(self, n_added);
+  if (n_deleted)
+    ggobi_stage_rows_deleted(self, deleted_rows, n_deleted);
+  
+  self->included = included;
+  self->included_rows = included_rows;
+  GGOBI_STAGE(self)->n_rows = n_included;
 }
 
 } // end class definition

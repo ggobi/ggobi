@@ -462,8 +462,8 @@ rows_added(self, guint n) {
 };
 
 /* We probably want to say which rows here, lest clients must refresh all */
-public signal NONE (UINT) void
-rows_deleted(self, guint n);
+public signal NONE (POINTER, UINT) void
+rows_deleted(self, guint *rows, guint n);
 
 init (self) {
   sphere_init(self);
@@ -639,11 +639,7 @@ has_missings(self)
  **/
  // FIXME: Should this be cached and made part of GGobiVariable?
  // Well, it takes longer (on average) to count missings than detect them
- // This is only used in the variable notebook.
- // We plan on basing the notebook on a GtkTreeModel implemented by
- // the set of GGobiVariables in a stage. This model could actually be 
- // more generally implemented by GObject properties, meaning that 
- // n_missings would need to be a property. Need to think about this.
+ // This is only used in the variable notebook, so maybe we could count there.
 public guint 
 get_col_n_missing(self, guint j) {
   guint i, n = 0, nrows = self_get_n_rows(self);
@@ -2016,9 +2012,9 @@ rows_added_handler(self, guint n)
   self_rows_added(self, n);
 }
 private virtual void
-rows_deleted_handler(self, guint n)
+rows_deleted_handler(self, guint *rows, guint n)
 {
-  self_rows_deleted(self, n);
+  self_rows_deleted(self, rows, n);
 }
 private virtual void
 col_name_changed_handler(self, guint j)
