@@ -24,6 +24,12 @@ class GGobi:Stage:Filter from GGobi:Stage {
     ggobi_stage_filter_update_included(SELF(stage));
   }
 
+  public GObject *
+  new(GGobiStage *parent)
+  {
+    return GET_NEW_VARG("parent", parent, NULL);
+  }
+  
 /**
  * set_missing:
  * @self: GGobiStage object

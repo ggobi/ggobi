@@ -1846,7 +1846,7 @@ set_rows_in_plot(self)
  * listening to the correct signals.  This function still needs a lot of
  * work.
  **/
- // FIXME: This should not exist.. we need a ggobi_add_data()
+ // FIXME: This should not exist.. we need a ggobi_app_add_data()
 public void 
 attach (self, ggobid *gg, gboolean cleanup)
 {

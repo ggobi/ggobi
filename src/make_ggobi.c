@@ -26,12 +26,22 @@
 #include "externs.h"
 #include "read_xml.h"
 #include "plugin.h"
+#include "ggobi-stage-filter.h"
 
 #ifdef USE_MYSQL
 #include "read_mysql.h"
 #endif
 
 guint GGobiSignals[MAX_GGOBI_SIGNALS];
+
+GGobiPipelineFactory *
+ggobi_create_pipeline_factory(ggobid *gg)
+{
+  GGobiPipelineFactory *factory = ggobi_pipeline_factory_new();
+  ggobi_pipeline_factory_register_stage(factory, "GGobiFilter", 
+    GGOBI_TYPE_STAGE_FILTER, TRUE, NULL);
+  return(factory);
+}
 
 /*-- initialize variables which don't depend on the size of the data --*/
 void
@@ -56,6 +66,8 @@ globals_init (ggobid * gg)
   gg->d = NULL;
 
   gg->statusbar_p = true;
+  
+  gg->pipeline_factory = ggobi_create_pipeline_factory(gg);
 }
 
 
@@ -65,6 +77,10 @@ fileset_read_init (const gchar * ldata_in, const gchar * pluginModeName,
 {
   GSList *ds = fileset_read (ldata_in, pluginModeName, plugin, gg);
   for (; ds; ds = ds->next) {
+    // Uncomment below to enable filter stage (good luck)
+    /*GGobiStage *s = ggobi_pipeline_factory_get_pipeline(gg->pipeline_factory,
+      ds->data, "GGobiFilter");
+    ggobi_stage_attach(s, gg, FALSE);*/
     ggobi_stage_attach(ds->data, gg, FALSE);
   }
 

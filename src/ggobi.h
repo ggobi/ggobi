@@ -14,6 +14,8 @@
  *   Andreas Buja        andreas.buja@wharton.upenn.edu
 */
 
+// FIXME: we need to make this a global header file
+
 #ifndef GGOBI_H
 #define GGOBI_H
 
@@ -37,6 +39,7 @@ struct _ggobid;
 #include "display.h"
 #include "display_tree.h"
 #include "read_init.h"
+#include "ggobi-pipeline-factory.h"
 
 #include "fileio.h"
 
@@ -431,6 +434,8 @@ struct _ggobid {
                      a hashtable here similar to pthread's thread-specific data. */
 
   GTimeVal time;
+  
+  GGobiPipelineFactory *pipeline_factory;
   
 }; /*  ggobid; */
 

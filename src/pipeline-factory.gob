@@ -13,36 +13,72 @@
    "filter:transform:world" */
 /* Some sort of introspection would be nice here, but it's not clear
    if we want to expose the Product structure or do something else */
+/* Exposing Product for input might be convenient (see GtkActionEntry
+   structure with GtkActionGroup).. we could call it GGobiPipelineEntry */
 
 %h{
   #include "ggobi-data.h"
-}
+%}
 
 %privateheader{
   typedef struct _Product {
     GType type; /* type of stage to instantiate */
     gchar *parent; /* name of default parent stage */
-    GGobiStage *stage; /* stored instance if singleton and already requested */
     gboolean singleton; /* whether only one instance of stage should exist */
   } Product; 
 %}
 
+%{
+  static void
+  product_free(Product *p)
+  {
+    if (p->parent)
+      g_free(p->parent);
+    g_free(p);
+  }
+  static void
+  remove_instance(gpointer key, gpointer value, gpointer name)
+  {
+    g_hash_table_remove((GHashTable *)value, name);
+  }
+%}
+
 class GGobi:Pipeline:Factory from G:Object {
-  /* GGobiData ==> GHashTable (Name ==> Product) */
+  /* Name ==> Product */
   protected GHashTable *products = { 
-    g_hash_table_new_full(NULL, NULL, g_object_unref, g_hash_table_destroy)
+    g_hash_table_new_full(g_str_hash, g_str_equal, g_free, (GDestroyNotify)product_free);
+  } destroywith g_hash_table_destroy;
+  /* GGobiData ==> GHashTable (Name ==> GGobiStage) */
+  protected GHashTable *instances = {
+    g_hash_table_new_full(NULL, NULL, g_object_unref, (GDestroyNotify)g_hash_table_destroy)
   } destroywith g_hash_table_destroy;
   
-  /* registry */
+  public GObject *
+  new(void)
+  {
+    GObject *o = (GObject *)GET_NEW;
+    return G_OBJECT(o);
+  }
+  
+    /* registry */
   
   public void
   register_stage(self, const gchar *name (check null), GType type, 
     gboolean singleton, const gchar *parent)
   {
+    Product *p = g_new(Product, 1);
+    p->type = type;
+    p->parent = g_strdup(parent);
+    p->singleton = singleton;
+    if (g_hash_table_lookup(self->products, name))
+      self_unregister_stage(self, name);
+    g_hash_table_insert(self->products, g_strdup(name), p);
   }
   public void
   unregister_stage(self, const gchar *name (check null))
   {
+    g_hash_table_remove(self->products, name);
+    g_hash_table_foreach(self->instances, remove_instance, (gchar *)name);
   }
   
   /* introspection */
@@ -50,24 +86,64 @@ class GGobi:Pipeline:Factory from G:Object {
   public GSList *
   get_stage_names(self)
   {
+    return NULL;
   }
   public gboolean
   is_stage_singleton(self, const gchar *name (check null))
   {
+    Product *p = g_hash_table_lookup(self->products, name);
+    g_return_val_if_fail(p != NULL, FALSE);
+    return p->singleton;
   }
   public const gchar *
   get_stage_parent_name(self, const gchar *name (check null))
   {
+    Product *p = g_hash_table_lookup(self->products, name);
+    g_return_val_if_fail(p != NULL, FALSE);
+    return p->parent;
   }
   public GType
   get_stage_type(self, const gchar *name (check null))
   {
+    Product *p = g_hash_table_lookup(self->products, name);
+    g_return_val_if_fail(p != NULL, FALSE);
+    return p->type;
   }
   
   /* factory */
   
+  // FIXME: doesn't support multi-stage paths yet
   public GGobiStage *
   get_pipeline(self, GGobi:Data *root (check null type), const gchar *path (check null))
   {
+    Product *p = g_hash_table_lookup(self->products, path);
+    GGobiStage *stage = NULL, *parent = NULL;
+    GHashTable *data_instances = NULL;
+    
+    g_return_val_if_fail(p != NULL, FALSE);
+    
+    g_object_ref(root);
+    
+    if (p->parent)
+      parent = self_get_pipeline(self, root, p->parent);
+    else parent = GGOBI_STAGE(root);
+    
+    if (p->singleton) {
+      data_instances = g_hash_table_lookup(self->instances, root);
+      if (!data_instances) {
+        data_instances = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, 
+          g_object_unref);
+        g_hash_table_insert(self->instances, root, data_instances);
+      } else stage = g_hash_table_lookup(data_instances, path);
+    }
+    
+    if (!stage) {
+      stage = GGOBI_STAGE(g_object_new(p->type, "parent", parent, NULL));
+      g_object_ref(stage);
+      if (p->singleton)
+        g_hash_table_insert(data_instances, g_strdup(path), stage);
+    }
+    
+    return(stage);
   }
 }
