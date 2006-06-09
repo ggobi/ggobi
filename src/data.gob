@@ -150,10 +150,12 @@ get_col_default_value(self, guint j)
 override (GGobi:Stage) void
 set_missing(GGobi:Stage *self (check null type), guint i, guint j)
 {
+  /* I am not a statistician, but this doesn't make sense to me. I think of 
+  missingness as the absence of data, so why do we add a level here? -mfl
   if (GGOBI_STAGE_IS_COL_CATEGORICAL(self, j)) {
     ggobi_stage_set_categorical_value(self, i, j, "MISSING");
     return;
-  }
+  }*/
 
   SELF(self)->missing.vals[i][j] = 1;
   SELF(self)->raw.vals[i][j] = 0;
@@ -195,10 +197,8 @@ set_raw_value(GGobi:Stage *self (check null type), guint i, guint j, gdouble val
   if(GGobiMissingValue && GGobiMissingValue(value))
     ggobi_stage_set_missing(self, i, j);
   else {
-    //GGobiVariable *var = ggobi_stage_get_variable(self, j);
-    //if (GGOBI_VARIABLE_IS_CATEGORICAL(var))
-    //  ggobi_variable_add_level(var, NULL, (gint) value);
     SELF(self)->raw.vals[i][j] = value;
+    SELF(self)->missing.vals[i][j] = 0;
     self->tform.vals[i][j] = value;
   }
 }
@@ -326,6 +326,8 @@ add_rows(self, guint n) {
   ggobi_stage_rows_added(GGOBI_STAGE(self), n);
   
   /* set default values here */
+  // FIXME: this can probably be moved before rows_added emission and not
+  // emit col_data_changed, once we have tform stage in place
   for (j = 0; j < GGOBI_STAGE(self)->n_cols; j++) {
     gdouble default_val = self_get_col_default_value(self, j);
     for (i = nprev; i < nrows; i++)
@@ -347,6 +349,7 @@ add_rows(self, guint n) {
  **/ 
  // FIXME: This code should be the default handler for the n_cols property.
  // Then this function would just increment that property.
+ // -- or not, see above
 public guint 
 add_cols(self, guint n) {
   guint nprev = GGOBI_STAGE(self)->n_cols;

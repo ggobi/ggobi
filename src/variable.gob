@@ -11,7 +11,7 @@
   
   /* shortcut that would not be necessary with a categorical class */
   #define GGOBI_VARIABLE_IS_CATEGORICAL(var) \
-    ggobi_variable_get_vartype((var)) == GGOBI_VARIABLE_CATEGORICAL
+    (ggobi_variable_get_vartype((var)) == GGOBI_VARIABLE_CATEGORICAL)
   
   /* we now allow implicit name transformation by GGobiVariable */
   typedef gchar * (*GGobiVariableNameTransformFunc) (const gchar *name, gpointer data);
@@ -103,11 +103,12 @@ class GGobi:Variable from G:Object {
   (nick = "class", blurb = "The type of this variable",
    enum_type = GGobi:Variable:Type, default_value = GGOBI_VARIABLE_REAL, 
    link, export);
-   
+
   private gdouble default_value = 0;
   property DOUBLE default_value
   (nick = "default", blurb = "The default value for a field of this variable",
-    default_value = 0, minimum = GGOBI_SMALLEST_DOUBLE, maximum = G_MAXDOUBLE, link, export);
+    default_value = 0, minimum = GGOBI_SMALLEST_DOUBLE, maximum = G_MAXDOUBLE, 
+    link, export);
 
   /* In order to make transforming column names more convenient, the base
     GGobiVariable class accepts a name transformation function at construction
@@ -157,6 +158,7 @@ class GGobi:Variable from G:Object {
   
   /* dirty flags */
   private gboolean dirty_has_missings = TRUE;
+  private gboolean dirty_levels = TRUE;
   
   protected level_t *
   get_level_for_value(self, gint value)
@@ -164,6 +166,7 @@ class GGobi:Variable from G:Object {
     gpointer key;
     level_t *level;
     g_return_val_if_fail(GGOBI_VARIABLE_IS_CATEGORICAL(self), NULL);
+    self_maybe_update_levels(self);
     if(!g_hash_table_lookup_extended(selfp->value_to_level, GINT_TO_POINTER(value), 
       &key, (gpointer)&level))
         return(NULL);
@@ -176,6 +179,7 @@ class GGobi:Variable from G:Object {
     gpointer key;
     level_t *level;
     g_return_val_if_fail(GGOBI_VARIABLE_IS_CATEGORICAL(self), NULL);
+    self_maybe_update_levels(self);
     if (!g_hash_table_lookup_extended(selfp->name_to_level, name, &key, 
         (gpointer)&level))
       return(NULL);
@@ -211,7 +215,7 @@ class GGobi:Variable from G:Object {
   get_n_levels(self)
   {
     g_return_val_if_fail(GGOBI_VARIABLE_IS_CATEGORICAL(self), 0);  
-
+    self_maybe_update_levels(self);
     return(g_hash_table_size(selfp->name_to_level));
   }
   
@@ -257,6 +261,8 @@ class GGobi:Variable from G:Object {
     g_return_val_if_fail(GGOBI_VARIABLE_IS_CATEGORICAL(self), NULL);
     
     tmp = values = g_new(gint, self_get_n_levels(self));
+    
+    self_maybe_update_levels(self);
     
     g_hash_table_foreach(selfp->value_to_level, value_collector_func, &tmp);
     
@@ -429,7 +435,7 @@ class GGobi:Variable from G:Object {
  clone(self)
  {
    GGobiVariable *self_new = GGOBI_VARIABLE(g_object_new(G_TYPE_FROM_INSTANCE(self),
-    "name", self_get_name(self), "nickname", self_get_nickname(self), NULL));
+    "name", self->name, "nickname", selfp->nickname, "stage", self->stage, NULL));
    //self_new->collab_tform = g_strdup (selfp->collab_tform);
 
    self_set_vartype(self_new, self_get_vartype(self));
@@ -474,7 +480,6 @@ class GGobi:Variable from G:Object {
   add_level_instance(self, const gchar *name, gint value)
   {
     level_t *level;
-    self_set_vartype(self, GGOBI_VARIABLE_CATEGORICAL);
     if (name)
       level = ggobi_variable_get_level_for_name(self, name);
     else level = ggobi_variable_get_level_for_value(self, value);
@@ -499,8 +504,16 @@ class GGobi:Variable from G:Object {
  add_level(self, const gchar *name, gint value)
  {
    level_t *level;
+   guint n_levels;
    
-   g_return_val_if_fail(GGOBI_VARIABLE_IS_CATEGORICAL(self), 0);
+   /* coerce to categorical */
+   if (!GGOBI_VARIABLE_IS_CATEGORICAL(self)) {
+     self_set_vartype(self, GGOBI_VARIABLE_CATEGORICAL);
+     /* since we didn't know this was categorical before, the existing
+     values are likely junk, so we don't want to update from them until 
+     the variable is told to update */
+     selfp->dirty_levels = FALSE;
+   }
   
    if (value != -1 && self_has_level(self, value))
      return self_get_n_levels(self);
@@ -521,29 +534,44 @@ class GGobi:Variable from G:Object {
    g_hash_table_insert(selfp->name_to_level, level->name, level);
    g_hash_table_insert(selfp->value_to_level, GINT_TO_POINTER(level->value), level);
 
-   return self_get_n_levels(self);
+   n_levels = self_get_n_levels(self);
+   
+   /* default value becomes the first level */
+   if (n_levels == 1)
+     self_set_default_value(self, (gdouble)level->value);
+   
+   return n_levels;
  }
  
  public void
  update(self)
  {
-   guint n = ggobi_stage_get_n_rows(self->stage);
-   gint j = ggobi_stage_get_col_index_for_name(self->stage, 
-    self->name);
-   gboolean cat = GGOBI_VARIABLE_IS_CATEGORICAL(self);
-   
    // FIXME: make a dirty flag for each statistic and set to TRUE here
    
    selfp->dirty_has_missings = TRUE;
+   selfp->dirty_levels = TRUE;
+ }
+ 
+protected void
+maybe_update_levels(self)
+{
+  /* Not sure if lazy caching is worth the trouble for these levels */
+  gint j;
+  guint n;
    
-   // FIXME: the level instances can probably be lazily cached as well.
-   if (cat)
-     g_hash_table_foreach(selfp->name_to_level, level_count_clear_func, NULL);
-   
-   for (guint i = 0; i < n; i++) {
-     gdouble val = ggobi_stage_get_raw_value(self->stage, i, j);
-     if (cat)
-       self_add_level_instance(self, NULL, (gint)val);
-   }
+  if (!selfp->dirty_levels)
+    return;
+  selfp->dirty_levels = FALSE;
+  
+  j = ggobi_stage_get_col_index_for_name(self->stage, self->name);
+  n = ggobi_stage_get_n_rows(self->stage);
+  
+  g_hash_table_foreach(selfp->name_to_level, level_count_clear_func, NULL);
+  
+  for (guint i = 0; i < n; i++) {
+    if (!ggobi_stage_is_missing(self->stage, i, j))
+      self_add_level_instance(self, NULL, 
+        (gint)ggobi_stage_get_raw_value(self->stage, i, j));
+  }
  }
 }

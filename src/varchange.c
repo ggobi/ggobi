@@ -77,7 +77,7 @@ clone_vars (gint * cols, gint ncols, GGobiStage * d)
 
     clone = ggobi_variable_clone(ggobi_stage_get_variable(d, jfrom));
     ggobi_stage_set_variable(d, jto, clone);
-    g_signal_emit_by_name(d, "col_data_changed", (guint) jto);
+    ggobi_stage_col_data_changed(d, (guint) jto);
   }
 }
 
