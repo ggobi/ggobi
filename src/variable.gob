@@ -260,9 +260,9 @@ class GGobi:Variable from G:Object {
     gint *values, *tmp;
     g_return_val_if_fail(GGOBI_VARIABLE_IS_CATEGORICAL(self), NULL);
     
-    tmp = values = g_new(gint, self_get_n_levels(self));
-    
     self_maybe_update_levels(self);
+    
+    tmp = values = g_new(gint, self_get_n_levels(self));
     
     g_hash_table_foreach(selfp->value_to_level, value_collector_func, &tmp);
     
@@ -440,7 +440,7 @@ class GGobi:Variable from G:Object {
 
    self_set_vartype(self_new, self_get_vartype(self));
    if (GGOBI_VARIABLE_IS_CATEGORICAL(self)) {
-     gint *values = ggobi_variable_get_level_values(self);
+     gint *values = self_get_level_values(self);
      for (gint k=0; k<self_get_n_levels(self); k++) {
        level_t *level;
        self_add_level(self_new, self_get_level_name(self, values[k]), values[k]);
@@ -515,7 +515,8 @@ class GGobi:Variable from G:Object {
      selfp->dirty_levels = FALSE;
    }
   
-   if (value != -1 && self_has_level(self, value))
+   if (value == -1 ? self_has_level_for_name(self, name) : 
+      self_has_level(self, value))
      return self_get_n_levels(self);
    
    level = g_new(level_t, 1);

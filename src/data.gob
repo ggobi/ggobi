@@ -150,15 +150,13 @@ get_col_default_value(self, guint j)
 override (GGobi:Stage) void
 set_missing(GGobi:Stage *self (check null type), guint i, guint j)
 {
-  /* I am not a statistician, but this doesn't make sense to me. I think of 
-  missingness as the absence of data, so why do we add a level here? -mfl
+  // FIXME: would be nice to treat all variables types the same wrt missingness
   if (GGOBI_STAGE_IS_COL_CATEGORICAL(self, j)) {
     ggobi_stage_set_categorical_value(self, i, j, "MISSING");
     return;
-  }*/
-
-  SELF(self)->missing.vals[i][j] = 1;
+  }
   SELF(self)->raw.vals[i][j] = 0;
+  SELF(self)->missing.vals[i][j] = 1;
 }
 
 
