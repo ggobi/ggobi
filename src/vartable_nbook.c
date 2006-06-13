@@ -205,7 +205,7 @@ vartable_show_page (GGobiStage *d, ggobid *gg)
     child = l->data;
     tab_label = (GtkWidget *) gtk_notebook_get_tab_label (nb, child);
     if (tab_label && GTK_IS_LABEL (tab_label)) {
-      if (strcmp (GTK_LABEL (tab_label)->label, ggobi_stage_get_name(d)) == 0) {
+      if (d->name && strcmp (GTK_LABEL (tab_label)->label, d->name) == 0) {
         if (page != page_new) {
           gtk_notebook_set_current_page (nb, page_new);
           break;
@@ -349,7 +349,7 @@ vartable_subwindow_init (GGobiStage *d, ggobid *gg)
   g_signal_connect (G_OBJECT (nbook), "switch-page",
     G_CALLBACK (vartable_switch_page_cb), gg);
 
-  lbl = ggobi_stage_get_name(d);
+  lbl = d->name;
   /*
    * We're showing all datasets for now, whether they have variables
    * or not.  That could change.

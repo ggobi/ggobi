@@ -483,11 +483,8 @@ class GGobi:Variable from G:Object {
     if (name)
       level = ggobi_variable_get_level_for_name(self, name);
     else level = ggobi_variable_get_level_for_value(self, value);
-    if (level == NULL) {
-      self_add_level(self, name, value);
-    } else {
+    if (level) 
       level->count++;
-    }
   }
   
  /**
@@ -507,13 +504,7 @@ class GGobi:Variable from G:Object {
    guint n_levels;
    
    /* coerce to categorical */
-   if (!GGOBI_VARIABLE_IS_CATEGORICAL(self)) {
-     self_set_vartype(self, GGOBI_VARIABLE_CATEGORICAL);
-     /* since we didn't know this was categorical before, the existing
-     values are likely junk, so we don't want to update from them until 
-     the variable is told to update */
-     selfp->dirty_levels = FALSE;
-   }
+   self_set_vartype(self, GGOBI_VARIABLE_CATEGORICAL);
   
    if (value == -1 ? self_has_level_for_name(self, name) : 
       self_has_level(self, value))

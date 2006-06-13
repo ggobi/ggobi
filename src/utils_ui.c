@@ -332,9 +332,9 @@ variable_notebook_subwindow_add (GGobiStage * s, GCallback func,
  * argument.
 */
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), swin,
-                            (ggobi_data_get_nickname(GGOBI_DATA(d)) != NULL) ?
-                            gtk_label_new (ggobi_data_get_nickname(GGOBI_DATA(d))) : 
-                            gtk_label_new (ggobi_stage_get_name(d)));
+                            (GGOBI_DATA(d)->nickname != NULL) ?
+                            gtk_label_new (GGOBI_DATA(d)->nickname) : 
+                            gtk_label_new (d->name));
 
   /* add the tree view */
   model = gtk_list_store_new (VARLIST_NCOLS, G_TYPE_STRING, G_TYPE_INT);

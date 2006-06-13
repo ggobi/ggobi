@@ -542,7 +542,7 @@ CHECK_EVENT_SIGNATURE (exclusion_notebook_adddata_cb, datad_added_f)
 
     g_object_set_data (G_OBJECT (scrolled_window), "datad", d); /*setdata */
     gtk_notebook_append_page (GTK_NOTEBOOK (gg->cluster_ui.notebook),
-                              scrolled_window, gtk_label_new (ggobi_stage_get_name(d)));
+                              scrolled_window, gtk_label_new (d->name));
     gtk_widget_show (scrolled_window);
 
     d->cluster_table = gtk_table_new (d->nclusters + 1, 5, true);

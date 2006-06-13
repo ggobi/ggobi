@@ -168,7 +168,7 @@ display_add_tree (displayd * display)
     return;
 
   label = display_tree_label (display);
-  dataset = ggobi_stage_get_name(display->d);
+  dataset = display->d->name;
   imode = ggobi_getIModeScreenName (display->cpanel.imode, display);
   pmode = ggobi_getPModeScreenName (display->cpanel.pmode, display);
 

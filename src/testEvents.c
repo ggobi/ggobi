@@ -13,7 +13,7 @@ test_variable_select (ggobid * gg, GGobiStage * d, gint whichVar, splotd * sp,
   GGobiVariable *vartab = g_slist_nth_data (d->vartable, whichVar);
   fprintf (stderr,
            "Selected variable: %d %s in %s.  User value %s. # plots in display %d\n",
-           whichVar, ggobi_stage_get_col_name(d, whichVar), ggobi_stage_get_name(d), (char *) val,
+           whichVar, ggobi_stage_get_col_name(d, whichVar), d->name, (char *) val,
            g_list_length (sp->displayptr->splots));
 }
 
@@ -79,7 +79,7 @@ test_sticky_points (ggobid * gg, gint index, gint state, GGobiStage * d,
                     gpointer data)
 {
   fprintf (stderr, "[Sticky point identification] %d %s in %s\n",
-           index, state == STICKY ? "sticky" : "unsticky", ggobi_stage_get_name(d));
+           index, state == STICKY ? "sticky" : "unsticky", d->name);
   fflush (stderr);
 }
 

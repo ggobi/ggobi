@@ -364,14 +364,14 @@ write_xml_edges (FILE *f, GGobiStage *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 
   /*
   fprintf(f, "<edges count=\"%d\" name=\"%s\">\n", ggobi_stage_get_n_edges(d),
-  ggobi_stage_get_name(d)); There seems to be a need to write the defaults in the case
+  d->name); There seems to be a need to write the defaults in the case
   where we started with ascii data and added edges; in this case the
   edges are written as <edges> rather than as a new datad, and maybe
   that's the problem.   dfs
   */
   fprintf(f, 
     "<edges count=\"%d\" name=\"%s\" color=\"%d\" glyphType=\"%s\" glyphSize=\"%s\">\n",
-    ggobi_stage_get_n_edges(d), ggobi_stage_get_name(d), 
+    ggobi_stage_get_n_edges(d), d->name, 
     xmlWriteInfo->defaultColor,
     xmlWriteInfo->defaultGlyphTypeName, 
     xmlWriteInfo->defaultGlyphSizeName);
@@ -404,7 +404,7 @@ write_dataset_header (FILE *f, GGobiStage *d, ggobid *gg, XmlWriteInfo *xmlWrite
 {
  fprintf(f,"<data ");
 /*fprintf(f, "numRecords=\"%d\"", d->n_rows;*/
- fprintf(f, "name=\"%s\"", ggobi_stage_get_name(d));
+ fprintf(f, "name=\"%s\"", d->name);
  fprintf(f,">\n");
 
  return(true);

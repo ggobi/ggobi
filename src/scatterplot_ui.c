@@ -150,12 +150,12 @@ scatterplot_display_edge_menu_update (displayd * display,
         gchar *lbl, *path, *name;
         if (resolveEdgePoints (e, d) != NULL) {
           if (ne == 1) {
-            lbl = g_strdup_printf ("Attach edge set (%s)", ggobi_stage_get_name(e));
+            lbl = g_strdup_printf ("Attach edge set (%s)", e->name);
             path = "/menubar/Edges";
             name = g_strdup ("edges");
           }
           else {
-            lbl = ggobi_stage_get_name(e);
+            lbl = e->name;
             path = "/menubar/Edges/Edgesets";
             name = g_strdup_printf ("edgeset_%p", e);
           }

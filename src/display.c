@@ -720,13 +720,13 @@ computeTitle (gboolean current_p, displayd * display, ggobid * gg)
     tmp = ggobi_display_title_label (display);
   }
 
-  if (ggobi_stage_get_name(display->d) != NULL) {
-    if (display->e != NULL && ggobi_stage_get_name(display->e) != NULL)
+  if (display->d->name != NULL) {
+    if (display->e != NULL && display->e->name != NULL)
       description = g_strdup_printf ("%s/%s",
-                                     ggobi_stage_get_name(display->d), 
-                                     ggobi_stage_get_name(display->e));
+                                     display->d->name, 
+                                     display->e->name);
     else
-      description = g_strdup (ggobi_stage_get_name(display->d));
+      description = g_strdup (display->d->name);
   }
   else {
     description = ggobi_getDescription (gg);

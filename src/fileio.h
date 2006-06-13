@@ -34,7 +34,7 @@ typedef InputDescription* (*InputGetDescription)(const char * const fileName, co
 
 struct _InputDescription {
  gchar *fileName;       /* the name of the file to read, fully expanded */
- gchar *baseName;       /* With the extension removed. */
+ gchar *baseName;       /* With the path removed. */
  gchar *givenExtension; /* the extension of the file to be read,
                            computed when processing the file name. */
  gchar *dirName;        /* The name of the directory in which the file is

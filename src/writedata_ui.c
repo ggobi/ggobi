@@ -166,7 +166,7 @@ writeall_window_open (ggobid *gg) {
   for (l = gg->d; l; l = l->next) {
     d = (GGobiStage *) l->data;
     gtk_list_store_append(model, &iter);
-    gtk_list_store_set(model, &iter, 0, ggobi_stage_get_name(d), -1);
+    gtk_list_store_set(model, &iter, 0, d->name, -1);
   }
   gtk_tree_selection_select_all(gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view)));
   gtk_container_add (GTK_CONTAINER (swin), tree_view);

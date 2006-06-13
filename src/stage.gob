@@ -211,7 +211,7 @@ property OBJECT parent
 private gulong *handlers = { g_new(gulong, N_HANDLERS) } destroywith g_free;
 
 /*-- every pipeline stage has a name --*/
-private gchar *name
+public gchar *name
   destroywith g_free;
 property STRING name
   (nick = "id", blurb = "The name of the pipeline stage",

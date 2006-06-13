@@ -1033,7 +1033,7 @@ createDisplayFromDescription (ggobid * gg, GGobiDisplayDescription * desc)
     GSList *l;
     for (l = gg->d; l; l = l->next) {
       tmp = (GGobiStage *) l->data;
-      if (strcmp (desc->datasetName, ggobi_stage_get_name(tmp)) == 0) {
+      if (strcmp (desc->datasetName, tmp->name) == 0) {
         data = tmp;
         break;
       }

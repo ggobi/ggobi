@@ -169,7 +169,7 @@ ggobi_setData (gdouble * values, gchar ** rownames, gchar ** colnames,
   gchar *varname;
 
   GGOBI_DATA(d)->input = desc;
-  if (ggobi_stage_get_name(d) == NULL)
+  if (d->name == NULL)
     ggobi_stage_set_name(d, desc->fileName);
   if (gg->input == NULL)
     gg->input = desc;
@@ -830,7 +830,7 @@ int ggobi_datasetIndex (const char *name, const ggobid * const gg)
 
   while (tmp) {
     d = (GGobiStage *) tmp->data;
-    if (strcmp (name, ggobi_stage_get_name(d)) == 0)
+    if (strcmp (name, d->name) == 0)
       return (ctr);
     ctr++;
     tmp = tmp->next;
@@ -853,7 +853,7 @@ gchar **ggobi_getDatasetNames (gint * n, ggobid * gg)
   names = (gchar **) g_malloc (sizeof (gchar *) * (*n));
   for (i = 0; i < *n; i++) {
     d = (GGobiStage *) tmp->data;
-    names[i] = g_strdup (ggobi_stage_get_name(d));
+    names[i] = g_strdup (d->name);
     tmp = tmp->next;
   }
 

@@ -30,7 +30,7 @@ typedef enum {no_edgesets, edgesets_only, all_datatypes} datatyped;
  */
 class GGobi:Data from GGobi:Stage {
 
-private gchar *nickname;
+public gchar *nickname;
 property STRING nickname
   (nick = "alias", blurb = "The nickname of the dataset",
    default_value = "dataset", link, export);

@@ -636,7 +636,7 @@ endXMLElement (void *user_data, const xmlChar * name)
       releaseCurrentDataInfo (data);
       if (data->current_record < d->n_rows) {
         g_error ("There are fewer records than declared for '%s': %d < %d.",
-                 ggobi_stage_get_name(d), data->current_record, d->n_rows);
+                 d->name, data->current_record, d->n_rows);
       }
 
       data->dlist = g_slist_append (data->dlist, d);
@@ -1150,8 +1150,8 @@ setRecordValue (const char *tmp, GGobiStage * d, XMLParserData * data)
           ggobi_XML_warning_handler (data,
             "incorrect level in record %d, variable `%s', dataset `%s' in the XML input file\n",
             (int) data->current_record + 1, ggobi_variable_get_name(var),
-            ggobi_stage_get_name(data->current_data) ? 
-              ggobi_stage_get_name(data->current_data) : "");
+            data->current_data->name ? 
+              data->current_data->name : "");
         }
         ggobi_stage_set_raw_value(d, data->current_record, data->current_element, value);
       }
@@ -1245,7 +1245,7 @@ newVariable (const xmlChar ** attrs, XMLParserData * data,
   if (data->current_variable >= ggobi_stage_get_n_data_cols(d)) {
     ggobi_XML_error_handler
       (data, "More variables (%d) than given in the <variables count='%d'> element for dataset %s\n",
-       data->current_variable, ggobi_stage_get_n_data_cols(d), ggobi_stage_get_name(d));
+       data->current_variable, ggobi_stage_get_n_data_cols(d), d->name);
     return (false);
   }
 
@@ -1421,6 +1421,8 @@ setDataset (const xmlChar ** attrs, XMLParserData * parserData,
 
   name = getAttribute (attrs, "name");
   nickname = getAttribute (attrs, "nickname");
+  if (!name)
+    name = parserData->input->baseName;
   ggobi_stage_set_name(data, (gchar *)name);
   ggobi_data_set_nickname(GGOBI_DATA(data), (gchar *)nickname);
 
@@ -1457,7 +1459,7 @@ readXMLRecord (const xmlChar ** attrs, XMLParserData * data)
 
   if (i == d->n_rows) {
     g_error ("There are more records than declared for '%s'; exiting.",
-             ggobi_stage_get_name(d));
+             d->name);
   }
 
   data->current_element = 0;
@@ -1480,7 +1482,7 @@ readXMLRecord (const xmlChar ** attrs, XMLParserData * data)
         (gchar *) tmp,
         data->current_record + 1,
         m + 1,
-        ggobi_stage_get_name(data->current_data));
+        data->current_data->name);
     ggobi_stage_set_row_id(d, (guint) i, (gchar*) tmp, false);
   }
 

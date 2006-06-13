@@ -233,7 +233,7 @@ varpanel_show_page (displayd * display, ggobid * gg)
     child = l->data;
     tab_label = (GtkWidget *) gtk_notebook_get_tab_label (nb, child);
     if (tab_label && GTK_IS_LABEL (tab_label)) {
-      if (strcmp (GTK_LABEL (tab_label)->label, ggobi_stage_get_name(d)) == 0) {
+      if (strcmp (GTK_LABEL (tab_label)->label, d->name) == 0) {
         if (page != page_new) {
 
           // Set the buttons on 'page' to be insensitive
@@ -268,7 +268,7 @@ varpanel_switch_page_cb (GtkNotebook * notebook, GtkNotebookPage * page,
     GGobiStage *d = (GGobiStage *) g_slist_nth_data (gg->d, page_num);
     if (d) {
       gchar *msg = g_strdup_printf ("%s: %d x %d (%s)",
-                                    ggobi_stage_get_name(d), d->n_rows, d->n_cols,
+                                    d->name, d->n_rows, d->n_cols,
                                     gg->input->fileName);
       gg->status_message_func (msg, gg);
       g_free (msg);
@@ -459,7 +459,7 @@ varpanel_widgets_add (gint nc, GGobiStage * d, ggobid * gg)
    */
   if (n == 0) {
     gtk_notebook_append_page (GTK_NOTEBOOK (gg->varpanel_ui.notebook),
-                              d->varpanel_ui.hpane, gtk_label_new (ggobi_stage_get_name(d)));
+                              d->varpanel_ui.hpane, gtk_label_new (d->name));
     gtk_notebook_set_show_tabs (GTK_NOTEBOOK (gg->varpanel_ui.notebook),
                                 nd > 1);
   }
@@ -597,7 +597,7 @@ varpanel_populate (GGobiStage * d, ggobid * gg)
   /*-- only add a tab if there are variables --*/
   if (ggobi_stage_get_n_cols(d)) {
     gtk_notebook_append_page (GTK_NOTEBOOK (gg->varpanel_ui.notebook),
-                              d->varpanel_ui.hpane, gtk_label_new (ggobi_stage_get_name(d)));
+                              d->varpanel_ui.hpane, gtk_label_new (d->name));
   }
 
   /* Check if we have been here before and already created the box, etc.. */

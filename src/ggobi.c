@@ -688,7 +688,7 @@ ggobi_get_data_by_name (const gchar * const name, const ggobid * const gg)
 
   for (l = gg->d; l; l = l->next) {
     d = (GGobiStage *) l->data;
-    if (strcmp (ggobi_stage_get_name(d), name) == 0)
+    if (strcmp (d->name, name) == 0)
       return (d);
   }
   return (NULL);

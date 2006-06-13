@@ -159,7 +159,7 @@ gg_write_to_statusbar (gchar * message, ggobid * gg)
     GGobiStage *d = datad_get_from_notebook (gg->varpanel_ui.notebook, gg);
     if (d) {
       gchar *msg = g_strdup_printf ("%s: %d x %d  (%s)",
-                                    ggobi_stage_get_name(d), d->n_rows, d->n_cols,
+                                    d->name, d->n_rows, d->n_cols,
                                     gg->input->fileName);
       gtk_statusbar_push (GTK_STATUSBAR (statusbar), 0, msg);
       g_free (msg);

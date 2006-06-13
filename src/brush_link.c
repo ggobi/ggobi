@@ -375,9 +375,9 @@ linkby_notebook_subwindow_add (GGobiStage * s, GtkWidget * notebook,
  * argument.
 */
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), swin,
-                            (ggobi_data_get_nickname(GGOBI_DATA(d)) != NULL) ?
-                            gtk_label_new (ggobi_data_get_nickname(GGOBI_DATA(d))) : 
-                            gtk_label_new (ggobi_stage_get_name(d)));
+                            (GGOBI_DATA(d)->nickname != NULL) ?
+                            gtk_label_new (GGOBI_DATA(d)->nickname) : 
+                            gtk_label_new (d->name));
 
   /* add the treeview (list) */
   list = gtk_list_store_new (LINKBYLIST_NCOLS, G_TYPE_STRING, G_TYPE_POINTER);
