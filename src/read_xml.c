@@ -708,12 +708,13 @@ endXMLElement (void *user_data, const xmlChar * name)
     {
       GGobiData *d = getCurrentXMLData (data);
 
-      setEdgePartners (data);
-      releaseCurrentDataInfo (data);
       if (data->current_record < d->nrows) {
         g_error ("There are fewer records than declared for '%s': %d < %d.",
                  d->name, data->current_record, d->nrows);
       }
+
+      setEdgePartners (data);
+      releaseCurrentDataInfo (data);
 
       data->dlist = g_slist_append (data->dlist, d);
 
