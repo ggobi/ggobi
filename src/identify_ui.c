@@ -139,19 +139,23 @@ static void
 label_selected_cb (GtkTreeSelection * treesel, ggobid * gg)
 {
   gint *vars, nvars, i;
-  cpaneld *cpanel = &gg->current_display->cpanel;
-  vars =
-    get_selections_from_tree_view (GTK_WIDGET
-                                   (gtk_tree_selection_get_tree_view
-                                    (treesel)), &nvars);
-  cpanel->id_display_type = 0;
-  for (i = 0; i < nvars; i++) {
-    if (vars[i] < 0)
-      cpanel->id_display_type |= 1 << -vars[i];
-    else
-      cpanel->id_display_type |= 1;
+  displayd *display = gg->current_display;
+
+  if (display) {
+    cpaneld *cpanel = &display->cpanel;
+    vars =
+      get_selections_from_tree_view (GTK_WIDGET
+                                     (gtk_tree_selection_get_tree_view
+                                      (treesel)), &nvars);
+    cpanel->id_display_type = 0;
+    for (i = 0; i < nvars; i++) {
+      if (vars[i] < 0)
+        cpanel->id_display_type |= 1 << -vars[i];
+      else
+        cpanel->id_display_type |= 1;
+    }
+    displays_plot (NULL, QUICK, gg);
   }
-  displays_plot (NULL, QUICK, gg);
 }
 
 /*--------------------------------------------------------------------*/
