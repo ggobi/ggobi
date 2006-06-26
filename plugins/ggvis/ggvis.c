@@ -106,7 +106,7 @@ show_ggvis_window (GtkAction *action, PluginInstance *inst)
     }
   }
   if (!ok) {
-    g_printerr ("ggvis: need an edgeset to define pairwise distances.\n");
+    quick_message ("ggvis requires edges to define pairwise distances", false);
     return;
   }
 
