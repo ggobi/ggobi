@@ -2,5 +2,5 @@ ACLOCAL_AMFLAGS = -I ../../m4
 
 include ../Makefile.plugin
 
-plugin_la_SOURCES  = graphact.c ga_cbacks.c
+plugin_la_SOURCES  = graphact.c ga_cbacks.c init.c
 noinst_HEADERS  = graphact.h
