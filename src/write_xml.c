@@ -35,7 +35,7 @@ XmlWriteInfo *updateXmlWriteInfo(GGobiStage *d, ggobid *gg, XmlWriteInfo *info);
 
 /* if a string contains an ampersand, write it as &amp; ... etc ... --*/
 static void
-write_xml_string(FILE *f, gchar *str)
+write_xml_string(FILE *f, const gchar *str)
 {
   gchar *fmtstr = g_markup_printf_escaped("%s", str);
   fprintf(f, fmtstr);

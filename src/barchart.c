@@ -762,14 +762,13 @@ barchart_splot_add_plot_labels (splotd * sp, GdkDrawable * drawable,
     return;
 
   for (i = 0; i < bsp->bar->nbins; i++) {
-    gchar* name = ggobi_variable_get_level_name(var, bsp->bar->bins[i].value);
+    const gchar* name = ggobi_variable_get_level_name(var, bsp->bar->bins[i].value);
     layout_text (layout, name, NULL);
     gdk_draw_layout (drawable, gg->plot_GC,
                      bsp->bar->bins[i].rect.x + 2,
                      bsp->bar->bins[i].rect.y +
                      bsp->bar->bins[i].rect.height / 2 + 2, layout);
 
-    g_free (name);
   }
   g_object_unref (G_OBJECT (layout));
 }

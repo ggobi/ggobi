@@ -27,10 +27,7 @@
   {
     GGobiStage *stage = GGOBI_STAGE(data);
     gint j = ggobi_stage_get_col_index_for_name(stage, old_name);
-    gchar *name = ggobi_variable_get_name(var);
-    ggobi_stage_set_col_name(stage, j, raw_name);
     ggobi_stage_update_var_name_hash(stage, old_name, j);
-    g_free(name);
   }
   
 %}
@@ -228,18 +225,8 @@ private GPtrArray *vartable = { g_ptr_array_new() }
     g_ptr_array_free(VAR, TRUE);
   };
 
-/* A note: GOB places 'private' fields in a separate structure, requiring us
-  to use '->_priv' to access them. That is a real pain. By making fields
-  'protected' they are placed in the object's structure, but are marked so
-  that they do not appear in documentation. This may be sufficient. 
-  In fact, if no methods are marked 'protected' then there is no need for a 
-  private header file and we can tell GOB not to generate one. */
-
 /* we cache the number of rows and columns */
 
-// FIXME: We may in fact leave these as public (read-only) fields since they
-// are so commonly used. This is convention in GObject.
-// Of course, 'read-only' is by contract and is not enforced by the language
 public guint n_rows;
 public guint n_cols;
 
@@ -351,7 +338,8 @@ col_name_changed(self, guint j) {
     GGobiVariable *var = self_get_variable(self, j);
     gchar *name = self_get_col_name(self->parent, j);
     gchar *nickname = self_get_col_nickname(self->parent, j);
-    self_set_variable_name(self, j, name);
+    ggobi_variable_set_name(var, name);
+    /* nicknames are not transformed */
     ggobi_variable_set_nickname(var, nickname);
     g_free(nickname);
     g_free(name);
@@ -481,7 +469,7 @@ init (self) {
 public GGobiStage* 
 new(const gchar *name, GGobiStage *parent)
 {
-  GObject* s = GET_NEW_VARG("name", name, "parent", parent, NULL);
+  GObject* s = (GObject *)GET_NEW_VARG("name", name, "parent", parent, NULL);
   return(GGOBI_STAGE(s));
 }
 
@@ -567,7 +555,7 @@ set_col_name(self, guint j, const gchar* value)
     g_free(nick);
   }
   
-  self_set_variable_name(self, j, name);
+  ggobi_variable_set_name(vt, name);
   g_free(name);
   
   self_col_name_changed(self, j);
@@ -706,13 +694,30 @@ set_raw_value(self, guint i, guint j, gdouble value)
  * It will automatically create a new level if necessary.
  * If the column is not already categorical, this will make it so.
  */
-public void
+virtual void
 set_categorical_value(self, guint i, guint j, const gchar* value) 
 {
-  GGobiVariable* var = self_get_variable(self, j);
-  ggobi_variable_add_level(var, value, -1);
-  //ggobi_variable_add_level_instance(var, value, -1);
-  self_set_raw_value(self, i, j, (gdouble)ggobi_variable_get_level_value(var, value));
+  if (self->parent)
+    self_set_categorical_value(self->parent, i, j, value);
+  else {
+    GGobiVariable *root_var = self_get_variable(self, j);
+    ggobi_variable_add_level(root_var, value, -1);
+    self_set_raw_value(self, i, j, 
+      (gdouble)ggobi_variable_get_level_value(root_var, value));
+  }
+}
+
+virtual const gchar *
+get_categorical_value(self, guint i, guint j)
+{
+  GGobiVariable *var = self_get_variable(self, j);
+  gint value = (gint)self_get_raw_value(self, i, j);
+  if (ggobi_variable_has_level(var, value))
+    return ggobi_variable_get_level_name(var, value);
+  /*g_return_val_if_fail(self->parent != NULL, NULL);*/
+  if (!self->parent)
+    return NULL;
+  return self_get_categorical_value(self->parent, i, j);
 }
 
 /**
@@ -811,7 +816,7 @@ get_string_value(self, guint i, guint j, gboolean transformed)
     return buf;
   }
   
-  return ggobi_variable_get_level_name(var, raw);
+  return g_strdup(ggobi_variable_get_level_name(var, raw));
 }
 
 /**
@@ -1956,12 +1961,12 @@ set_variable (self, guint j, GGobiVariable* value)
   g_ptr_array_index(selfp->vartable, j) = value;
   if (!self->parent) /* for unique name */
     self_set_col_name(self, j, NULL);
-  else self_update_var_name_hash(self, NULL, j);
+  self_update_var_name_hash(self, NULL, j);
   ggobi_variable_connect__name_changed(value, variable_name_changed_cb, self);
 }
 
 /* made this separate from col_name_changed() because we don't want to
-   emit that event when creating a variable */
+   emit that event when the GGobiVariable's name changes */
 protected void
 update_var_name_hash(self, const gchar *old_name, guint j)
 {
@@ -1969,26 +1974,6 @@ update_var_name_hash(self, const gchar *old_name, guint j)
   if (old_name)
     g_hash_table_remove(selfp->var_name_lookup, old_name);
   g_hash_table_insert(selfp->var_name_lookup, name, GINT_TO_POINTER(j));
-}
-
-protected void
-set_variable_name(self, guint j, const gchar *name)
-{
-  GGobiVariable *var = self_get_variable(self, j);
-  gchar *old_name = ggobi_variable_get_name(var);
-  /* We temporarily block the handler of the variable's name_changed signal
-     so that we don't restart the entire name change process from this stage.
-     This means that it is not possible to change the name (through
-     GGobiVariable) in a handler for its name_changed signal. This is probably
-     OK, since the behavior of the pipeline in that situation is undefined.
-     Due to the undefined order of signal handler invocations, any name
-     change in response to the signal might be overriden by the original name
-     change in downstream pipeline stages. */
-  g_signal_handlers_block_by_func(var, variable_name_changed_cb, self);
-  ggobi_variable_set_name(var, (gchar *)name);
-  g_signal_handlers_unblock_by_func(var, variable_name_changed_cb, self);
-  self_update_var_name_hash(self, old_name, j);
-  g_free(old_name);
 }
 
 private virtual void

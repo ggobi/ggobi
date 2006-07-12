@@ -505,9 +505,7 @@ initSessionOptions (int argc, char **argv)
 
   sessionOptions->useRadioMenuItems = false;
 
-  tmp = g_build_filename("share", "colorschemes.xml", NULL);
-  sessionOptions->info->colorSchemeFile = ggobi_find_data_file(tmp);
-  g_free(tmp);
+  sessionOptions->info->colorSchemeFile = ggobi_find_data_file("colorschemes.xml");
 
   sessionOptions->defaultTourSpeed = 50.0;
   sessionOptions->defaultTour1dSpeed = 40.0;

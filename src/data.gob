@@ -70,7 +70,7 @@ init(self) {
 public GGobiData* 
 new(guint nrows, guint ncols)
 {
-  GObject* d = GET_NEW;
+  GObject* d = (GObject *)GET_NEW;
   self_add_cols(GGOBI_DATA(d), ncols);
   self_add_rows(GGOBI_DATA(d), nrows);
 

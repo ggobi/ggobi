@@ -219,7 +219,7 @@ class GGobi:Variable from G:Object {
     return(g_hash_table_size(selfp->name_to_level));
   }
   
-  public gchar* 
+  public const gchar* 
   get_level_name(self, gint value)
   {
     level_t *level;
@@ -228,7 +228,7 @@ class GGobi:Variable from G:Object {
     level = self_get_level_for_value(self, value);
     g_return_val_if_fail(level != NULL, NULL);
     
-    return g_strdup(level->name);
+    return level->name;
   }
   
   public gint
@@ -476,14 +476,16 @@ class GGobi:Variable from G:Object {
    return self_new;
  }
  
+ /* adds an instance (increases the count) for a level with the given value
+    if a level with that value does not exist and name is non-NULL,
+    then a new level is added */
   private void
   add_level_instance(self, const gchar *name, gint value)
   {
-    level_t *level;
-    if (name)
-      level = ggobi_variable_get_level_for_name(self, name);
-    else level = ggobi_variable_get_level_for_value(self, value);
-    if (level) 
+    level_t *level = self_get_level_for_value(self, value);
+    if (!level && name)
+      self_add_level(self, name, value);
+    else if (level)
       level->count++;
   }
   
@@ -495,8 +497,6 @@ class GGobi:Variable from G:Object {
  * @value: level value, if -1 uses index + 1
  * Returns: index of new level
  **/
- // FIXME: We may be able to leave this as public. Adding a level does not
- // break consistency with the data (just the metadata).
  public guint
  add_level(self, const gchar *name, gint value)
  {
@@ -562,7 +562,9 @@ maybe_update_levels(self)
   
   for (guint i = 0; i < n; i++) {
     if (!ggobi_stage_is_missing(self->stage, i, j))
-      self_add_level_instance(self, NULL, 
+      /* if the categorical value is NULL, then we assume the value does not
+         correspond to a valid level and so it is not counted */
+      self_add_level_instance(self, ggobi_stage_get_categorical_value(self->stage, i, j), 
         (gint)ggobi_stage_get_raw_value(self->stage, i, j));
   }
  }
