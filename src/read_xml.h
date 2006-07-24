@@ -158,8 +158,7 @@ extern "C" {
   gboolean setDataset(const xmlChar ** attrs, XMLParserData * parserData, enum xmlDataState);
   gboolean setBrushStyle(const xmlChar ** attrs, XMLParserData * parserData);
 
-  gboolean setRecordValues(XMLParserData * data, const xmlChar * line,
-                           gint len, gint ncols);
+  gboolean setRecordValues(XMLParserData * data, const xmlChar * line, gint len);
   gboolean setVariableName(XMLParserData * data, const xmlChar * name,
                            gint len);
 

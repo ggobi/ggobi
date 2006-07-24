@@ -404,39 +404,6 @@ paint_points (cpaneld * cpanel, GGobiStage * d, ggobid * gg)
       symbol_link_by_id (false, i, d, gg);
   }
 
-  /*
-  FIXME: should be possible to do this in one loop through
-  guint i = 0, j = 0;
-  gint cur, prev, pt;
-  gboolean brushed, changed = false;
-  while(i < d->nrows_under_brush || j < d->nrows_under_brush_prev) {
-    cur = d->rows_under_brush.els[i];
-    prev = d->rows_under_brush_prev.els[j];
-    
-    g_debug("cur: %i, %i  prev: %i, %i", i, cur, j, prev);
-    
-    if (cur == prev) { // in both current and previous, so don't change
-      i++; j++;
-      continue;
-    }
-      
-    if (cur < prev || j == d->nrows_under_brush_prev) {  // new point
-      pt = cur;
-      brushed = true;
-      i++;
-    } else {
-      pt = prev;
-      brushed = false;
-      j++;
-    }    
-    changed = ggobi_stage_brush_point(d, pt, brushed, 
-      cpanel->br.point_targets, cpanel->br.mode);
-    if (!gg->linkby_cv && nd > 1)
-      symbol_link_by_id (false, pt, d, gg);
-      
-    changed = true;
-  }*/
-  
   return true;
 }
 

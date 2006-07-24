@@ -391,8 +391,7 @@ startXMLElement (void *user_data, const xmlChar * name,
   case STRING:
   case NA:
     if (data->recordString) {
-      setRecordValues (data, data->recordString, data->recordStringLength,
-                       -1);
+      setRecordValues (data, data->recordString, data->recordStringLength);
       if (type != NA && type != STRING)
         data->current_element++;
       resetRecordInfo (data);
@@ -651,12 +650,7 @@ endXMLElement (void *user_data, const xmlChar * name)
     data->current_record++;
     break;
   case RECORD:
-    /* This processes every element in the record, and it will
-       become confused and complain if we don't feed ggobi_stage_get_n_data_cols(d)
-       elements to it.  I believe it also handles the </record>
-       tag in the case where record elements have been individually
-       tagged, and it does that without confusion. */
-    setRecordValues (data, data->recordString, data->recordStringLength, -1);
+    setRecordValues (data, data->recordString, data->recordStringLength);
     data->current_record++;
     resetRecordInfo (data);
     break;
@@ -788,7 +782,6 @@ Characters (void *user_data, const xmlChar * ch, gint len)
   case INTEGER:
   case UNKNOWN:
     /* Now we call
-       setRecordValues (data, c, dlen); 
        after gathering the entire string for the record so that we
        don't get bizarre splits such as  "1.3 1.4 1"  followed by ".4..."
      */
@@ -1173,15 +1166,12 @@ setRecordValue (const char *tmp, GGobiStage * d, XMLParserData * data)
   that needs to be escaped.
 */
 gboolean
-setRecordValues (XMLParserData * data, const xmlChar * line, gint len,
-                 gint ncols)
+setRecordValues (XMLParserData * data, const xmlChar * line, gint len)
 {
   const gchar *tmp;
   GGobiStage *d = getCurrentXMLData (data);
 
-  if (ncols == -1) {
-    ncols = ggobi_stage_get_n_data_cols(d);
-  }
+  gint ncols = ggobi_stage_get_n_data_cols(d);
 
   if (!line) {
     applyRandomUniforms (d, data);
