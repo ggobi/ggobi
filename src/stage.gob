@@ -433,21 +433,10 @@ rows_added(self, guint n) {
     self->rows_under_brush_prev.els[i] = 0;
   }
   
-  if (self->n_attributes > 0) {
-    gint def_color = self->gg ? self->gg->color_id : 0;
-    gint def_type  = self->gg ? self->gg->glyph_id.type : FC;
-    gint def_size  = self->gg ? self->gg->glyph_id.size : 1;
-
-    for (i = nprev; i < nrows; i++) {
-      self_set_attr_color(self, i, def_color, ATTR_SET_PERSISTENT);
-      self_set_attr_glyph_parts(self, i, def_type, def_size, ATTR_SET_PERSISTENT);
-      self_set_attr_hidden(self, i, false, ATTR_SET_PERSISTENT);
-    }
-  }
-  
   clusters_set(self);
   self_set_rows_in_plot(self);
 };
+
 
 /* We probably want to say which rows here, lest clients must refresh all */
 public signal NONE (POINTER, UINT) void

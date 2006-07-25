@@ -84,43 +84,47 @@ new(guint nrows, guint ncols)
 public void
 add_attributes(self) {
   GGobiStage *stage = GGOBI_STAGE(self);
-  guint attr = self_add_cols(self, 12);
-  gint def_color = stage->gg ? stage->gg->color_id : 0;
-  gint def_type  = stage->gg ? stage->gg->glyph_id.type : FC;
-  gint def_size =  stage->gg ? stage->gg->glyph_id.size : 1;
-  
-  stage->n_attributes += 12;
+  gdouble def_color = (gdouble) (stage->gg ? stage->gg->color_id : 0);
+  gdouble def_type  = (gdouble) (stage->gg ? stage->gg->glyph_id.type : FC);
+  gdouble def_size =  (gdouble) (stage->gg ? stage->gg->glyph_id.size : 1);
   
   // FIXME: we set the default value here, even though the ggobid fields
-  // could easily change, though I don't think they actually do.
-  ggobi_stage_set_col_name(stage, attr, "_color");
-  self_set_col_default_value(self, attr++, (gdouble)def_color);
-  ggobi_stage_set_col_name(stage, attr, "_glyph_size");
-  self_set_col_default_value(self, attr++, (gdouble)def_size);
-  ggobi_stage_set_col_name(stage, attr, "_glyph_type");
-  self_set_col_default_value(self, attr++, (gdouble)def_type);
-  ggobi_stage_set_col_name(stage, attr++, "_hidden");
-  ggobi_stage_set_col_name(stage, attr, "_color_now");
-  self_set_col_default_value(self, attr++, (gdouble)def_color);
-  ggobi_stage_set_col_name(stage, attr, "_glyph_size_now");
-  self_set_col_default_value(self, attr++, (gdouble)def_size);
-  ggobi_stage_set_col_name(stage, attr, "_glyph_type_now");
-  self_set_col_default_value(self, attr++, (gdouble)def_type);
-  ggobi_stage_set_col_name(stage, attr++, "_hidden_now");
-  ggobi_stage_set_col_name(stage, attr, "_color_prev");
-  self_set_col_default_value(self, attr++, (gdouble)def_color);
-  ggobi_stage_set_col_name(stage, attr, "_glyph_size_prev");
-  self_set_col_default_value(self, attr++, (gdouble)def_size);
-  ggobi_stage_set_col_name(stage, attr, "_glyph_type_prev");
-  self_set_col_default_value(self, attr++, (gdouble)def_type);
-  ggobi_stage_set_col_name(stage, attr, "_hidden_prev");
+  // change to match the current brush colour
+  self_add_attribute(self, "_color", def_color);
+  self_add_attribute(self, "_glyph_size", def_size);
+  self_add_attribute(self, "_glyph_type", def_type);
+  self_add_attribute(self, "_hidden", 0);
+
+  self_add_attribute(self, "_color_now", def_color);
+  self_add_attribute(self, "_glyph_size_now", def_size);
+  self_add_attribute(self, "_glyph_type_now", def_type);
+  self_add_attribute(self,  "_hidden_now", 0);
+
+  self_add_attribute(self, "_color_prev", def_color);
+  self_add_attribute(self,  "_glyph_size_prev", def_size);
+  self_add_attribute(self, "_glyph_type_prev", def_type);
+  self_add_attribute(self, "_hidden_prev", 0);
   
-  // FIXME: Perhaps make a convenience method for this, like reset_col()...
-  for (guint i = 0; i < ggobi_stage_get_n_rows(stage); i++) {
-    ggobi_stage_set_attr_color(stage, i, def_color, ATTR_SET_PERSISTENT);
-    ggobi_stage_set_attr_glyph_parts(stage, i, def_type, def_size, ATTR_SET_PERSISTENT);
-    ggobi_stage_set_attr_hidden(stage, i, false, ATTR_SET_PERSISTENT);
-  }
+  self_reset_rows(self, 0, ggobi_stage_get_n_rows(stage));
+}
+
+/**
+ * add_attribute:
+ * @self: GGobiData object
+ * @i: attribute name (should begin with _)
+ * @j: default value
+ *
+ * Adds a new attribute column with specified name and default value.
+ *
+ * FIXME: should automatically check if attribute is already present
+ **/
+public void 
+add_attribute(self, gchar* name, gdouble value) {
+  guint j = self_add_cols(self, 1);
+  GGOBI_STAGE(self)->n_attributes += 1;
+
+  ggobi_stage_set_col_name(GGOBI_STAGE(self), j, name);
+  self_set_col_default_value(self, j, value);	
 }
 
 public void 
@@ -306,7 +310,7 @@ get_row_for_id(GGobi:Stage *self, gchar *id) {
  //    stage. In that case, this is probably OK.
 public guint
 add_rows(self, guint n) {
-  guint i, j, nprev = GGOBI_STAGE(self)->n_rows;
+  guint i, nprev = GGOBI_STAGE(self)->n_rows;
   guint nrows = nprev + n;
   
   self->rowIds = (gchar **) g_realloc (self->rowIds, sizeof(gchar *) * nrows);
@@ -322,20 +326,33 @@ add_rows(self, guint n) {
   }
   
   ggobi_stage_rows_added(GGOBI_STAGE(self), n);
-  
+  self_reset_rows(self, nprev, nrows);
   /* set default values here */
   // FIXME: this can probably be moved before rows_added emission and not
   // emit col_data_changed, once we have tform stage in place
-  for (j = 0; j < GGOBI_STAGE(self)->n_cols; j++) {
-    gdouble default_val = self_get_col_default_value(self, j);
-    for (i = nprev; i < nrows; i++)
-      ggobi_stage_set_raw_value(GGOBI_STAGE(self), i, j, default_val);
-    ggobi_stage_col_data_changed(GGOBI_STAGE(self), j);
-  }
   
   return nprev;
 }
 
+/**
+ * reset_rows:
+ * @self: #GGobiData object
+ * @from: row index to start at
+ * @to: row index to end at
+ *
+ * Resets values to their defaults for the specified 
+ * rows.  This is mainly used to set default values for 
+ * the attributes at the moment.
+ **/ 
+public void
+reset_rows(self, guint from, guint to) {
+  for (guint j = 0; j < GGOBI_STAGE(self)->n_cols; j++) {
+    gdouble default_val = self_get_col_default_value(self, j);
+    for (guint i = from; i < to; i++)
+      ggobi_stage_set_raw_value(GGOBI_STAGE(self), i, j, default_val);
+    ggobi_stage_col_data_changed(GGOBI_STAGE(self), j);
+  }
+}
 
 /**
  * add_cols:
