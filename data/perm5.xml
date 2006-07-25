@@ -132,6 +132,7 @@
 </records>
 </data>
 <data name="edges">
+<variables count="0" />
 <records count="240">
 <record source="12345" destination="12354" />
 <record source="12345" destination="12435" />

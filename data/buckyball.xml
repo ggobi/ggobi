@@ -75,6 +75,7 @@
 </data>
 
 <data name="edges">
+<variables count="0" />
 <records count="90" glyph="fr 0">
 <record source="59" destination="60" color="2"> </record>
 <record source="58" destination="59" color="2"> </record>

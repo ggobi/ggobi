@@ -43,7 +43,7 @@
 
 
 <!-- I don't see how a datad can have a colormap -->
-<!ELEMENT data ((description)?, (colormap)?, (variables)?, records, (edges)?)>
+<!ELEMENT data ((description)?, (colormap)?, variables, records, (edges)?)>
 
 <!ELEMENT color ( #PCDATA) >
 <!-- id is a number or either of "fg" and "bg" -->

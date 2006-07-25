@@ -179,6 +179,7 @@ HERDSZ: breeding herd size
 </data>
 
 <data name="edges">
+<variables count="0" />
 <records count="47">
 <record source="1" destination="2" color="2"> </record>
 <record source="2" destination="3" color="2"> </record>

@@ -276,6 +276,8 @@ years.
 </data>
 
 <data>
+	<variables count="0">
+	</variables>
 <records count="127">
 <record source="1" destination="2" />
 <record source="2" destination="3" />
