@@ -391,15 +391,16 @@ col_deleted(self, guint j) {
   g_object_unref(G_OBJECT(var));
   
   self_set_n_cols(self, self->n_cols - 1);
-  
-  arrayf_delete_cols (&self->tform, 1, &j);
-  arrayg_delete_cols (&self->jitdata, 1, &j);
-  arrayg_delete_cols (&self->world, 1, &j);
+
+  gint j1 = (gint) j;
+  arrayf_delete_cols (&self->tform, 1, &j1);
+  arrayg_delete_cols (&self->jitdata, 1, &j1);
+  arrayg_delete_cols (&self->world, 1, &j1);
   
   //FIXME: need function analogous to tour_relloc_up
-  tour2d_realloc_down (1, &j, self, self->gg);
-  tour1d_realloc_down (1, &j, self, self->gg);
-  tourcorr_realloc_down (1, &j, self, self->gg);
+  tour2d_realloc_down (1, &j1, self, self->gg);
+  tour1d_realloc_down (1, &j1, self, self->gg);
+  tourcorr_realloc_down (1, &j1, self, self->gg);
   
   /* clearly inefficient but will be OK for now */
   tform_to_world(GGOBI_STAGE(self));

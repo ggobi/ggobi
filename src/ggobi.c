@@ -481,7 +481,6 @@ computeGGobiHome (char *str)
 static void
 initSessionOptions (int argc, char **argv)
 {
-  gchar *tmp;
   sessionOptions = &sessionoptions;
   sessionOptions->data_mode = unknown_data;
 

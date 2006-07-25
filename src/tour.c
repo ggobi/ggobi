@@ -745,7 +745,7 @@ gt_basis (array_d Fz, gint nactive, vector_i active_vars,
 {
   gint i, j, k, check = 1, nvals = nactive*projdim, ntimes;
   gdouble frunif[2];
-  gdouble r, fac, frnorm[2];
+  gdouble r, fac, frnorm[2] = {0, 0};
   gboolean oddno;
 
   if ((nvals % 2) == 1) 

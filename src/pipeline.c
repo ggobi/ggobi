@@ -73,6 +73,9 @@ pt_screen_to_plane (icoords * screen, gint id, gboolean horiz, gboolean vert,
                     gcoords * eps, gcoords * planar, splotd * sp)
 {
   gcoords prev_planar;
+  prev_planar.x = 0;
+  prev_planar.y = 0;
+  
   gfloat scale_x, scale_y;
   greal precis = (greal) PRECISION1;
 

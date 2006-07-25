@@ -170,7 +170,7 @@ spherize_set_pcvars (GGobiStage * d, ggobid * gg)
   else if (d->sphere.pcvars.nels > d->sphere.npcs) {
     /*-- delete the last few variables --*/
     gint ncols = d->sphere.pcvars.nels - d->sphere.npcs;
-    guint *cols = (guint *) g_malloc (ncols * sizeof (guint));
+    gint *cols = (gint *) g_malloc (ncols * sizeof (gint));
     for (j = d->sphere.pcvars.nels - 1, k = ncols - 1; j >= d->sphere.npcs;
          j--)
       cols[k--] = d->sphere.pcvars.els[j];

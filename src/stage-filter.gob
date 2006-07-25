@@ -27,7 +27,7 @@ class GGobi:Stage:Filter from GGobi:Stage {
   public GObject *
   new(GGobiStage *parent)
   {
-    return GET_NEW_VARG("parent", parent, NULL);
+    return G_OBJECT(GET_NEW_VARG("parent", parent, NULL));
   }
   
 /**

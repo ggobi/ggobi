@@ -972,7 +972,7 @@ barchart_recalc_dimensions (splotd * rawsp, GGobiStage * d, ggobid * gg)
 
   gfloat scale_y;
   gint index;
-  gint minwidth;
+  gint minwidth = 0;
   gfloat rdiff, ftmp;
   gbind *bin;
 

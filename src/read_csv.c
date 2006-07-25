@@ -344,7 +344,6 @@ has_row_labels (GList * rows)
 static void
 load_column_labels (Row * row, GGobiStage * d, gboolean row_labels)
 {
-  gint i;
   gint offset = (row_labels ? 1 : 0);
   GGOBI_STAGE_VARIABLES_ITERATE(d) {
     if (row->entry[j + offset].len == 0)
@@ -369,7 +368,7 @@ load_row_labels (GList * rows, GGobiStage * d, gboolean has_labels)
 static void
 load_row_values (GList * rows, GGobiStage * d, gboolean row_labels)
 {
-  gint i, j, offset = (row_labels ? 1 : 0);
+  gint i, offset = (row_labels ? 1 : 0);
   GList *cur;
 
   GGOBI_STAGE_VARIABLES_ITERATE(d) {

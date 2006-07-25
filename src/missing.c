@@ -28,7 +28,6 @@
 #include "vars.h"
 #include "externs.h"
 
-
 /*
  * For the datad currently selected in gg->impute.notebook,
  * generate a new datad using d->missing.  
@@ -54,7 +53,7 @@ missings_datad_cb (GtkWidget * w, ggobid * gg)
       cols_with_missings[ncols_with_missings++] = j;
   }
 
-  GGobiStage *dnew = ggobi_data_new (d->n_rows, ncols_with_missings);
+  GGobiStage *dnew = GGOBI_STAGE(ggobi_data_new (d->n_rows, ncols_with_missings));
   ggobi_stage_set_name(dnew, g_strdup_printf ("%s (missing)", d->name));
 
   for (j = 0; j < ncols_with_missings; j++) {

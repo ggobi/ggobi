@@ -174,7 +174,7 @@ impute_cb (GtkWidget * w, ggobid * gg)
     (GGobiStage *) g_object_get_data (G_OBJECT (tree_view), "datad");
   gint *vars;                   // = (gint *) g_malloc (d->n_cols * sizeof(gint));
   gint nvars;
-  gfloat val;
+  gfloat val = 0;
 
   vars = get_selections_from_tree_view (tree_view, &nvars);
 

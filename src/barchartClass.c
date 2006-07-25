@@ -498,7 +498,7 @@ barchart_identify_cues_draw (gboolean nearest_p, gint k, splotd * rawsp,
       } else {
         GGobiVariable *var = ggobi_stage_get_variable(rawsp->displayptr->d, 
           rawsp->p1dvar);
-        gchar *level = ggobi_variable_get_level_name(var, sp->bar->bins[j].value);
+        const gchar *level = ggobi_variable_get_level_name(var, sp->bar->bins[j].value);
         j = i - 1;
 
         string = g_strdup_printf ("%ld point%s in %s",

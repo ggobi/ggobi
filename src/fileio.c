@@ -22,6 +22,8 @@
 #include <ctype.h>
 #include <unistd.h>
 
+#include <glib/gstdio.h>
+
 #include "GGobiAPI.h"
 #include "plugin.h"
 

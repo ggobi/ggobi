@@ -37,7 +37,7 @@ guint GGobiSignals[MAX_GGOBI_SIGNALS];
 GGobiPipelineFactory *
 ggobi_create_pipeline_factory(ggobid *gg)
 {
-  GGobiPipelineFactory *factory = ggobi_pipeline_factory_new();
+  GGobiPipelineFactory *factory = GGOBI_PIPELINE_FACTORY(ggobi_pipeline_factory_new());
   ggobi_pipeline_factory_register_stage(factory, "GGobiFilter", 
     GGOBI_TYPE_STAGE_FILTER, TRUE, NULL);
   return(factory);

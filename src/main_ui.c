@@ -105,7 +105,7 @@ mode_panel_get_by_name (const gchar * name, ggobid * gg)
 {
   GList *l;
   GtkWidget *w = NULL;
-  modepaneld *pnl = (modepaneld *) l;
+  modepaneld *pnl;
 
   for (l = gg->control_panels; l; l = l->next) {
     pnl = (modepaneld *) l->data;

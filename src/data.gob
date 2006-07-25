@@ -393,7 +393,7 @@ delete_cols(self, guint *cols, gint ncols)
 
   // FIXME: shouldn't find_keepers be able to handle this allocation??
   keepers = g_malloc ((old_ncols - ncols) * sizeof (gint));
-  nkeepers = find_keepers (old_ncols, ncols, cols, keepers);
+  nkeepers = find_keepers (old_ncols, ncols, (gint *) cols, keepers);
   if (nkeepers == -1) {
     g_free (keepers);
     g_return_val_if_reached(old_ncols);
@@ -404,8 +404,8 @@ delete_cols(self, guint *cols, gint ncols)
     ggobi_stage_set_variable(GGOBI_STAGE(self), j, vt);
   }
 
-  arrayf_delete_cols (&self->raw, ncols, cols);
-  arrays_delete_cols (&self->missing, ncols, cols);
+  arrayf_delete_cols (&self->raw, ncols, (gint *) cols);
+  arrays_delete_cols (&self->missing, ncols, (gint *) cols);
   
   g_object_set(G_OBJECT(self), GGOBI_STAGE_PROP_N_COLS(old_ncols - ncols), NULL);
   for (j = 0; j < ncols; j++) /* emit col deleted signal */

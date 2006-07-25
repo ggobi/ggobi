@@ -213,6 +213,10 @@ transform1_apply (gint j, GGobiStage *s, ggobid *gg)
   gboolean tform_ok = true;
   gdouble dtmp;
   lims slim, slim_tform;  /*-- specified limits --*/
+  slim_tform.min = 0;
+  slim_tform.max = 0;
+  slim.min = 0;
+  slim.max = 0;
   GtkWidget *stage1_cbox;
   gint tform1;
   gfloat boxcoxparam = gg->tform_ui.boxcox_adj->value;

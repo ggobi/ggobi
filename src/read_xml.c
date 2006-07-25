@@ -770,7 +770,7 @@ Characters (void *user_data, const xmlChar * ch, gint len)
     return;
 
   if (data->terminateStrings_p) {
-    tmp = g_strndup(c, dlen);
+    tmp = g_strndup(c, (gsize) dlen);
     c = (const xmlChar *) tmp;
   }
 
@@ -1353,14 +1353,14 @@ endVariable (XMLParserData *data)
 gboolean
 setVariableName (XMLParserData * data, const xmlChar * name, gint len)
 {
-  gchar *tmp = g_strndup(name, len);
+  gchar *tmp = g_strndup(name, (gsize) len);
   
   /* Handle the case where we have multiple calls to the characters
      handler for the same variable because the data is split
    */
   if (data->current_name != NULL) {
     /* need to append tmp to the existing value. */
-    gchar *name = g_strconcat(data->current_name, tmp);
+    gchar *name = g_strconcat(data->current_name, tmp, NULL);
     g_free(data->current_name);
     data->current_name = name;
   } else data->current_name = g_strdup(tmp);
