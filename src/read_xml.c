@@ -1066,8 +1066,13 @@ setGlyph (const xmlChar ** attrs, XMLParserData * data, gint i)
     }
   }
 
-  if (i >= 0)
-    ggobi_stage_set_attr_glyph_parts(d, i, type || data->defaults.glyphType, size || data->defaults.glyphSize, ATTR_SET_PERSISTENT);
+  if (i >= 0) {
+    if (type != -1) type = data->defaults.glyphType;
+    if (size != -1) type = data->defaults.glyphSize;
+    
+    if (type != -1) ggobi_stage_set_attr_glyph_type(d, i, type, ATTR_SET_PERSISTENT);
+    if (size != -1) ggobi_stage_set_attr_glyph_size(d, i, size, ATTR_SET_PERSISTENT);    
+  }
 
 
   return (size != -1 && type != -1);

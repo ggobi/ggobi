@@ -1097,7 +1097,7 @@ reset_attr_glyph_type(self, guint i, GGobiAttrSetMethod brush)
  * @self: #GGobiStage
  * @i: row index
  * @brush: persistent or transient
- *
+ *  
  * Sets glyph_type attribute to new value.
  * Returns: true if value has changed, false otherwise
 **/
@@ -1230,8 +1230,8 @@ public gboolean
 set_attr_glyph_parts(self, guint i, GlyphType type, guint size, GGobiAttrSetMethod brush)
 {
     gboolean changed = false;
-    changed = self_set_attr_glyph_size(self, i, type, brush) || changed;
-    changed = self_set_attr_glyph_type(self, i, size, brush) || changed;
+    changed = self_set_attr_glyph_size(self, i, size, brush) || changed;
+    changed = self_set_attr_glyph_type(self, i, type, brush) || changed;
     return changed;
 }
 
