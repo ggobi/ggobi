@@ -60,6 +60,7 @@
 #include "vars.h"
 #include "externs.h"
 #include "string.h"
+#include "ggobi-stage.h"
 
 /* Error conditions */
 #define ERR_GARBAGE_AROUND_QUOTE (-1)
@@ -345,11 +346,11 @@ load_column_labels (Row * row, GGobiStage * d, gboolean row_labels)
 {
   gint i;
   gint offset = (row_labels ? 1 : 0);
-  for (i = 0; i < ggobi_stage_get_n_data_cols(d); i++) {
-    if (row->entry[i + offset].len == 0)
-      ggobi_stage_set_col_name(d, i, NULL);
+  GGOBI_STAGE_VARIABLES_ITERATE(d) {
+    if (row->entry[j + offset].len == 0)
+      ggobi_stage_set_col_name(d, j, NULL);
     else
-      ggobi_stage_set_col_name(d, i, row->src->str + row->entry[i + offset].ofs);
+      ggobi_stage_set_col_name(d, j, row->src->str + row->entry[j + offset].ofs);
   }
 }
 
@@ -371,7 +372,7 @@ load_row_values (GList * rows, GGobiStage * d, gboolean row_labels)
   gint i, j, offset = (row_labels ? 1 : 0);
   GList *cur;
 
-  for (j = 0; j < ggobi_stage_get_n_data_cols(d); j++) {
+  GGOBI_STAGE_VARIABLES_ITERATE(d) {
     for (cur = rows, i = 0; cur; cur = cur->next, i++) {
       Row *row = (Row *) cur->data;
       gchar *str = row->src->str + row->entry[j + offset].ofs;
@@ -395,7 +396,6 @@ create_data (GList * rows, gchar * name)
     ncols--;
 
   d = GGOBI_STAGE(ggobi_data_new (nrows - 1, ncols));
-  ggobi_data_add_attributes(GGOBI_DATA(d));
   ggobi_stage_set_name(d, name);
 
   load_column_labels ((Row *) rows->data, d, row_labels);
@@ -403,6 +403,7 @@ create_data (GList * rows, gchar * name)
 
   load_row_labels (rows, d, row_labels);
   load_row_values (rows, d, row_labels);
+  ggobi_data_add_attributes(GGOBI_DATA(d));
 
   return (d);
 }

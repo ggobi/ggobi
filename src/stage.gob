@@ -33,20 +33,25 @@
 %}
 
 %h{
-  #include "ggobi-variable.h"
-  #include "utils.h"
-  
-  /* temporarily */
-  #include "defines.h"
-  #include "brushing.h"
-  #include "fileio.h"
-  
-  /* for use in GOB parameter checks like: guint j (check < N_COLS) */
-  #define N_COLS GGOBI_STAGE(self)->n_cols
-  #define N_ROWS GGOBI_STAGE(self)->n_rows
-  
-  #define GGOBI_STAGE_IS_COL_CATEGORICAL(stage, col) \
-    ggobi_stage_get_col_type((stage), (col)) == GGOBI_VARIABLE_CATEGORICAL
+#include "ggobi-variable.h"
+#include "utils.h"
+
+/* temporarily */
+#include "defines.h"
+#include "brushing.h"
+#include "fileio.h"
+
+/* for use in GOB parameter checks like: guint j (check < N_COLS) */
+#define N_COLS GGOBI_STAGE(self)->n_cols
+#define N_ROWS GGOBI_STAGE(self)->n_rows
+
+#define GGOBI_STAGE_IS_COL_CATEGORICAL(stage, col) \
+  ggobi_stage_get_col_type((stage), (col)) == GGOBI_VARIABLE_CATEGORICAL
+
+#define GGOBI_STAGE_VARIABLES_ITERATE(stage) \
+  guint* var_to_col = ggobi_stage_translate_var_to_col((stage)); \
+  guint jj = 0; \
+  for(guint j = 0; jj < ggobi_stage_get_n_vars(stage); jj++, j = var_to_col[jj]) 
     
   /*---- STUFF FROM DATA.GOB ----*/
 typedef struct _Subset {
@@ -753,6 +758,41 @@ get_col_type(self, guint j)
   g_return_val_if_fail(GGOBI_IS_VARIABLE(var), -1);
   return(ggobi_variable_get_vartype(var));
 }
+
+/** 
+ * get_col_is_attribute:
+ * @self: #GGobiStage
+ * @j: column index
+ *
+ * Returns: true if this column is an attribute
+ **/
+public gboolean
+col_is_attribute(self, guint j) {
+  GGobiVariable* vt = self_get_variable(self, j);
+  return vt->is_attribute;
+}
+
+/** 
+ * translate_var_to_col:
+ * @self: #GGobiStage
+ *
+ * Returns: an array of length n_vars, with value i
+ * indicating the column of variable i
+ **/
+public guint*
+translate_var_to_col(self) {
+  guint nvars = self_get_n_vars(self);
+  guint* translate = g_new(guint, nvars);
+  
+  guint var = 0;
+  for(guint j = 0; j < self->n_cols; j++) {
+    if (self_col_is_attribute(self, j)) continue;
+    translate[var++] = j;
+  }
+  
+  return(translate);
+}
+
 
 virtual GGobiVariable*
 create_variable (self, guint j)
@@ -1791,7 +1831,7 @@ get_transformed_col_name(self, guint j)
 
 // FIXME: data/attribute distinction should be made by a pipeline stage
 public guint
-get_n_data_cols(self) {
+get_n_vars(self) {
   return self_get_n_cols(self) - self->n_attributes;
 }
 
@@ -1887,7 +1927,7 @@ attach (self, ggobid *gg, gboolean cleanup)
   limits_set (self, true, true, self->gg->lims_use_visible);
   g_free(vars);
 
-  for(guint j = 0; j < self_get_n_data_cols(self); j++) 
+  for(guint j = 0; j < self_get_n_vars(self); j++) 
     self_col_data_changed(self, j);
 
   clusters_set(self);  /*-- find the clusters for data just read in --*/

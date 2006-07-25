@@ -1083,12 +1083,18 @@ xml_warning (const gchar * attribute, const gchar * value, const gchar * msg,
 }
 
 static void
+xml_set_value (GGobiStage* d, XMLParserData* data, gdouble value) {
+  guint col = data->var_to_col[data->current_element];
+  ggobi_stage_set_raw_value(d, data->current_record, col, value);
+}
+
+static void
 applyRandomUniforms (GGobiStage * d, XMLParserData * data)
 {
   gint j, ncols = ggobi_stage_get_n_cols(d);
   for (j = data->current_element; j < ncols && 
    ggobi_stage_get_col_type(d, j) == GGOBI_VARIABLE_UNIFORM; j++) {
-    ggobi_stage_set_raw_value(d, data->current_record, data->current_element, randvalue());
+     xml_set_value(d, data, randvalue());
   }
 }
 
@@ -1101,7 +1107,7 @@ setRecordValue (const char *tmp, GGobiStage * d, XMLParserData * data)
      cursor is at that. */
   if (data->counterVariableIndex > -1 &&
       data->current_element == data->counterVariableIndex) {
-    ggobi_stage_set_raw_value(d, data->current_record, data->current_element, data->current_record + 1);
+    xml_set_value(d, data, data->current_record + 1);
     data->current_element++;
   }
 
@@ -1146,7 +1152,7 @@ setRecordValue (const char *tmp, GGobiStage * d, XMLParserData * data)
             data->current_data->name ? 
               data->current_data->name : "");
         }
-        ggobi_stage_set_raw_value(d, data->current_record, data->current_element, value);
+        xml_set_value(d, data, value);
       }
     }
     else if (data->state == STRING) {
@@ -1154,7 +1160,7 @@ setRecordValue (const char *tmp, GGobiStage * d, XMLParserData * data)
         "<string> element for non categorical variable (%s) in record %d\n",
         ggobi_variable_get_name(var), (int) data->current_record + 1);
       value = 0;
-    } else ggobi_stage_set_raw_value(d, data->current_record, data->current_element, value);
+    } else xml_set_value(d, data, value);
   }
 
   return (true);
@@ -1171,7 +1177,7 @@ setRecordValues (XMLParserData * data, const xmlChar * line, gint len)
   const gchar *tmp;
   GGobiStage *d = getCurrentXMLData (data);
 
-  gint ncols = ggobi_stage_get_n_data_cols(d);
+  gint ncols = ggobi_stage_get_n_vars(d);
 
   if (!line) {
     applyRandomUniforms (d, data);
@@ -1196,7 +1202,7 @@ setRecordValues (XMLParserData * data, const xmlChar * line, gint len)
     /*
        g_printerr ("Record %d has insufficient elements: %d < %d\n",
        data->current_record, data->current_element,
-       ggobi_stage_get_n_data_cols(d));
+       ggobi_stage_get_n_vars(d));
      */
   }
 
@@ -1232,10 +1238,10 @@ newVariable (const xmlChar ** attrs, XMLParserData * data,
   GGobiStage *d = getCurrentXMLData (data);
   GGobiVariable *el;
   
-  if (data->current_variable >= ggobi_stage_get_n_data_cols(d)) {
+  if (data->current_variable >= ggobi_stage_get_n_vars(d)) {
     ggobi_XML_error_handler
       (data, "More variables (%d) than given in the <variables count='%d'> element for dataset %s\n",
-       data->current_variable, ggobi_stage_get_n_data_cols(d), d->name);
+       data->current_variable, ggobi_stage_get_n_vars(d), d->name);
     return (false);
   }
 
@@ -1322,6 +1328,7 @@ allocVariables (const xmlChar ** attrs, XMLParserData * data)
 
   ggobi_data_add_cols(GGOBI_DATA(d), atoi (tmp));
   ggobi_data_add_attributes(GGOBI_DATA(d));
+  data->var_to_col = ggobi_stage_translate_var_to_col(d);
   
   return (true);
 }

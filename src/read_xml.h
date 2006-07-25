@@ -59,6 +59,8 @@ typedef struct _XMLUserData {
   gchar *current_level_name;    /* Level name inside <level> character data */
   gchar *current_name;          /* Variable name inside <variable> character data */
   
+  guint* var_to_col;
+  
   gint current_color;           /* The index of the current element
                                    being processed in the colormap */
 
