@@ -47,7 +47,8 @@ splot_plot_edge (gint m, GGobiStage * d, GGobiStage * e,
   /*-- usually checking sampled is redundant because we're looping
        over rows_in_plot, but maybe we're not always --*/
 
-  if (e->excluded.els[m] || !e->sampled.els[m])
+  GGOBI_STAGE_ATTR_INIT_ALL(d);
+  if (GGOBI_STAGE_GET_ATTR_EXCLUDED(e, m) || !e->sampled.els[m])
     draw_edge = false;
 
   else if (!splot_plot_case (a, d, sp, display, gg) ||

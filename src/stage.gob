@@ -413,7 +413,6 @@ public GSList *movepts_history; /*-- a list of elements of type celld --*/
 public gchar* linkvar = NULL;  /*-- the linking variable name--*/
 
 // FIXME: make attributes
-public vector_b excluded;
 public vector_b sampled;
 public vector_i clusterid;
 
@@ -519,7 +518,6 @@ rows_added(self, guint n) {
   gint i, nprev = self->n_rows, nrows = self->n_rows + n;
   self_set_n_rows(self, nrows);
   
-  vectorb_realloc (&self->excluded, nrows);
   vectorb_realloc (&self->sampled, nrows);
   vectori_realloc (&self->rows_in_plot, nrows);
   vectori_realloc (&self->rows_under_brush, nrows);
@@ -533,7 +531,6 @@ rows_added(self, guint n) {
   self->nrows_under_brush = self->nrows_under_brush_prev = 0;
   
   for (i = nprev; i < nrows; i++) {
-    self->excluded.els[i] = false;
     self->sampled.els[i] = true;
     
     self->rows_under_brush.els[i] = 0;
@@ -1200,8 +1197,9 @@ set_rows_in_plot(self)
   guint i;
   self->nrows_in_plot = 0;
 
+  GGOBI_STAGE_ATTR_INIT_ALL(self);
   for (i = 0; i < self->n_rows; i++)
-    if (self->sampled.els[i] && !self->excluded.els[i])
+    if (self->sampled.els[i] && !GGOBI_STAGE_GET_ATTR_EXCLUDED(GGOBI_STAGE(self), i))
       self->rows_in_plot.els[self->nrows_in_plot++] = i;
   
   self_rows_in_plot_changed(self, (guint) self->nrows_in_plot); 

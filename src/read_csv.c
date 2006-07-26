@@ -395,6 +395,7 @@ create_data (GList * rows, gchar * name)
     ncols--;
 
   d = GGOBI_STAGE(ggobi_data_new (nrows - 1, ncols));
+  ggobi_data_add_attributes(GGOBI_DATA(d));
   ggobi_stage_set_name(d, name);
 
   load_column_labels ((Row *) rows->data, d, row_labels);
@@ -402,7 +403,6 @@ create_data (GList * rows, gchar * name)
 
   load_row_labels (rows, d, row_labels);
   load_row_values (rows, d, row_labels);
-  ggobi_data_add_attributes(GGOBI_DATA(d));
 
   return (d);
 }

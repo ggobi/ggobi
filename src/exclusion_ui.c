@@ -160,9 +160,9 @@ include_hiddens (gboolean include, GGobiStage * d, ggobid * gg)
 
   GGOBI_STAGE_ATTR_INIT_ALL(d);  
   for (i = 0; i < d->n_rows; i++) {
-    prev = d->excluded.els[i];
-    d->excluded.els[i] = (!include && GGOBI_STAGE_GET_ATTR_HIDDEN(d, i));
-    if ((prev != d->excluded.els[i]) && !gg->linkby_cv) {
+    prev = GGOBI_STAGE_GET_ATTR_EXCLUDED(d, i);
+    GGOBI_STAGE_SET_ATTR_EXCLUDED(d, i, (!include && GGOBI_STAGE_GET_ATTR_HIDDEN(d, i)));
+    if ((prev != GGOBI_STAGE_GET_ATTR_EXCLUDED(d, i)) && !gg->linkby_cv) {
       /*-- this doesn't link the value of excluded --*/
       changed = changed || exclude_link_by_id (i, d, gg);
     }

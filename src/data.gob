@@ -107,7 +107,7 @@ add_attributes(self) {
   self_add_attribute(self, "_hidden_prev", 0);
 
   self_add_attribute(self, "_cluster", 0);
-  self_add_attribute(self, "_sampled", true);
+  self_add_attribute(self, "_sampled", (gdouble) true);
   self_add_attribute(self, "_excluded", 0);
 
 } 
