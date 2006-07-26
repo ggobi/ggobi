@@ -315,8 +315,11 @@ find_nearest_edge (splotd * sp, displayd * display, ggobid * gg)
        mouse to the two endpoints to decide. */
     if (lineid != -1) {
       GGOBI_STAGE_ATTR_INIT(e, hidden);  
+
       j = endpoints[lineid].jpartner;
-      if (j != -1 && !GGOBI_STAGE_GET_ATTR_HIDDEN(e, j)) {
+
+      gboolean hidden = false; //FIXME: GGOBI_STAGE_GET_ATTR_HIDDEN(e, j);
+      if (j != -1 && !hidden) {
 
         edge_endpoints_get (lineid, &from, &to, d, endpoints, e);
 

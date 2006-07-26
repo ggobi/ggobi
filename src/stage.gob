@@ -56,19 +56,27 @@
 // Macros for getting and setting attribute values
 // -----------------------------------------------
 
+
 #define GGOBI_STAGE_ATTR_INIT(d, attribute) \
-  guint attr_ ## attribute [] = { \
-    ggobi_stage_get_col_index_for_name(d, "_" #attribute), \
-    ggobi_stage_get_col_index_for_name(d, "_" #attribute "_now"), \
-    ggobi_stage_get_col_index_for_name(d, "_" #attribute "_prev") \
-  }
+  guint attr_ ## attribute; \
+  (attr_ ## attribute = ggobi_stage_get_col_index_for_name(d, "_" #attribute))
+
+#define GGOBI_STAGE_BRUSH_ATTR_INIT(d, attribute) \
+  guint attr_ ## attribute [3]; \
+  (attr_ ## attribute[0] = ggobi_stage_get_col_index_for_name(d, "_" #attribute)); \
+  (attr_ ## attribute[1] = ggobi_stage_get_col_index_for_name(d, "_" #attribute "_now")); \
+  (attr_ ## attribute[2] = ggobi_stage_get_col_index_for_name(d, "_" #attribute "_prev"))
 
 #define GGOBI_STAGE_ATTR_INIT_ALL(d) \
-  GGOBI_STAGE_ATTR_INIT(d, color); \
-  GGOBI_STAGE_ATTR_INIT(d, size); \
-  GGOBI_STAGE_ATTR_INIT(d, hidden); \
-  GGOBI_STAGE_ATTR_INIT(d, type)
-
+  GGOBI_STAGE_BRUSH_ATTR_INIT(d, color); \
+  GGOBI_STAGE_BRUSH_ATTR_INIT(d, size); \
+  GGOBI_STAGE_BRUSH_ATTR_INIT(d, hidden); \
+  GGOBI_STAGE_BRUSH_ATTR_INIT(d, type); \
+  \
+  GGOBI_STAGE_ATTR_INIT(d, sampled); \
+  GGOBI_STAGE_ATTR_INIT(d, excluded); \
+  GGOBI_STAGE_ATTR_INIT(d, cluster)
+  
 #define GGOBI_STAGE_SET_ATTR(d, i, attribute, value, brush) \
   ggobi_stage_set_attr(d, i, attr_ ##attribute[0], attr_ ##attribute[1], attr_ ##attribute[2], (gdouble) value, brush)
 #define GGOBI_STAGE_GET_ATTR(d, i, attribute) \
@@ -80,11 +88,17 @@
 #define GGOBI_STAGE_SET_ATTR_TYPE(d, i,   value, brush)  GGOBI_STAGE_SET_ATTR(d, i, type,   value, brush)
 #define GGOBI_STAGE_SET_ATTR_SIZE(d, i,   value, brush)  GGOBI_STAGE_SET_ATTR(d, i, size,   value, brush)
 #define GGOBI_STAGE_SET_ATTR_HIDDEN(d, i, value, brush)  GGOBI_STAGE_SET_ATTR(d, i, hidden, value, brush)
+#define GGOBI_STAGE_SET_ATTR_SAMPLED(d, i, value)  ggobi_stage_set_raw_value(d, i, attr_sampled, (gdouble) value)
+#define GGOBI_STAGE_SET_ATTR_EXCLUDED(d, i, value) ggobi_stage_set_raw_value(d, i, attr_excluded, (gdouble) value)
+#define GGOBI_STAGE_SET_ATTR_CLUSTER(d, i, value)  ggobi_stage_set_raw_value(d, i, attr_cluster, (gdouble) value)
 
-#define GGOBI_STAGE_GET_ATTR_COLOR(d, i )  (gushort) GGOBI_STAGE_GET_ATTR(d, i, color  )
-#define GGOBI_STAGE_GET_ATTR_TYPE(d, i  )  (gint) GGOBI_STAGE_GET_ATTR(d, i, type   )
-#define GGOBI_STAGE_GET_ATTR_SIZE(d, i  )  (gint) GGOBI_STAGE_GET_ATTR(d, i, size   )
-#define GGOBI_STAGE_GET_ATTR_HIDDEN(d, i)  (gboolean) GGOBI_STAGE_GET_ATTR(d, i, hidden )
+#define GGOBI_STAGE_GET_ATTR_COLOR(d, i )  ((gushort) GGOBI_STAGE_GET_ATTR(d, i, color  ))
+#define GGOBI_STAGE_GET_ATTR_TYPE(d, i  )  ((gint) GGOBI_STAGE_GET_ATTR(d, i, type   ))
+#define GGOBI_STAGE_GET_ATTR_SIZE(d, i  )  ((gint) GGOBI_STAGE_GET_ATTR(d, i, size   ))
+#define GGOBI_STAGE_GET_ATTR_HIDDEN(d, i)  ((gboolean) GGOBI_STAGE_GET_ATTR(d, i, hidden ))
+#define GGOBI_STAGE_GET_ATTR_SAMPLED(d, i)  ((gboolean) ggobi_stage_get_raw_value(d, i, attr_sampled))
+#define GGOBI_STAGE_GET_ATTR_EXCLUDED(d, i) ((gboolean) ggobi_stage_get_raw_value(d, i, attr_excluded))
+#define GGOBI_STAGE_GET_ATTR_CLUSTER(d, i)  ((gint) ggobi_stage_get_raw_value(d, i, attr_cluster))
 
 #define GGOBI_STAGE_GET_ATTR_GLYPH(d, i)  ggobi_stage_get_attr_glyph(d, i, attr_type[1], attr_size[1])
 
