@@ -112,8 +112,8 @@ property DOUBLE default_value
 
 public gboolean is_attribute = false;
 property BOOLEAN is_attribute
-(nick = "is_attribute", blurb = "Is this variable an attribute",
-default_value = false, link, export);
+(nick = "is_attr", blurb = "Is this variable an attribute",
+  default_value = false, link, export);
 
 /* In order to make transforming column names more convenient, the base
   GGobiVariable class accepts a name transformation function at construction

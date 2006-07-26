@@ -185,6 +185,7 @@ default_scheme_init ()
 
 
 /* API */
+/*
 static guint m[MAXNCOLORS][3];
 guint **
 getColorTable (ggobid * gg)
@@ -199,7 +200,7 @@ getColorTable (ggobid * gg)
   }
 
   return (guint **) m;
-}
+}*/
 
 
 /*-- initialize the tour manip colors and the shades of gray --*/

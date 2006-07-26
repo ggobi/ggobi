@@ -426,7 +426,6 @@ static gboolean
 paint_edges (cpaneld * cpanel, GGobiStage * e, ggobid * gg)
 {
   gint i;
-  gboolean changed = false;
   gint nd = g_slist_length (gg->d);
 
   GGOBI_STAGE_ATTR_INIT_ALL(e); 

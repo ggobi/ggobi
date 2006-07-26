@@ -30,6 +30,37 @@
     ggobi_stage_update_var_name_hash(stage, old_name, j);
   }
   
+  static void 
+  vartable_stats_set_by_var_cb(GGobiStage *d, guint j, gpointer user_data)
+  {
+    vartable_stats_set_by_var(d, j);
+  }
+  static void 
+  vartable_limits_set_by_var_cb(GGobiStage *d, guint j, gpointer user_data)
+  {
+    vartable_limits_set_by_var(d, j);
+  }
+  static void 
+  vartable_collab_set_by_var_cb(GGobiStage *d, guint j, gpointer user_data)
+  {
+    vartable_collab_set_by_var(d, j);
+  }
+  static void 
+  vartable_collab_tform_set_by_var_cb(GGobiStage *d, guint j, gpointer user_data)
+  {
+    vartable_collab_tform_set_by_var(d, j);
+  }
+  static void
+  varcircle_label_set_cb(GGobiStage * d, guint j, gpointer user_data)
+  {
+    varcircle_label_set(d, j);
+  }
+  static void
+  varpanel_label_set_cb(GGobiStage * d, guint j, gpointer user_data)
+  {
+    varpanel_label_set(d, j);
+  }
+  
 %}
 
 %h{
@@ -1272,13 +1303,13 @@ attach (self, ggobid *gg, gboolean cleanup)
   display_menu_build (gg);
   
   // Set up variable table and listen to important events
-  self_connect__col_data_changed(self, vartable_stats_set_by_var, NULL);
-  self_connect__col_data_changed(self, vartable_limits_set_by_var, NULL);
-  self_connect__col_name_changed(self, vartable_collab_set_by_var, NULL);
-  self_connect__col_name_changed(self, vartable_collab_tform_set_by_var, NULL);
+  self_connect__col_data_changed(self, vartable_stats_set_by_var_cb, NULL);
+  self_connect__col_data_changed(self, vartable_limits_set_by_var_cb, NULL);
+  self_connect__col_name_changed(self, vartable_collab_set_by_var_cb, NULL);
+  self_connect__col_name_changed(self, vartable_collab_tform_set_by_var_cb, NULL);
 
   varcircles_populate (self, gg);
-  self_connect__col_name_changed(self, varcircle_label_set, NULL);
+  self_connect__col_name_changed(self, varcircle_label_set_cb, NULL);
 
   if (cleanup)
     varpanel_clear (self, gg);
@@ -1287,7 +1318,7 @@ attach (self, ggobid *gg, gboolean cleanup)
     varpanel_refresh (gg->current_display, gg);
   if (g_slist_index(gg->d, (gpointer)self) == 0)
     varpanel_set_sensitive (self, true, gg);
-  self_connect__col_name_changed(self, varpanel_label_set, NULL);
+  self_connect__col_name_changed(self, varpanel_label_set_cb, NULL);
   
   if (cleanup || g_list_length(gg->displays) == 0) {
     display_free_all (gg);  /*-- destroy any existing displays --*/

@@ -365,9 +365,10 @@ button_press_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
 }
 
 static gint
-button_release_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
+button_release_cb (GtkWidget * w, GdkEventButton * event, gpointer user_data)
 {
   gboolean retval = true;
+  splotd *sp = GGOBI_SPLOT(user_data);
   ggobid *gg = GGobiFromSPlot (sp);
   displayd *display = sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
@@ -400,7 +401,7 @@ button_release_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
 
       if (e == NULL) {
         /*-- initialize e, the new datad --*/
-        e = ggobi_data_new (0, 0);
+        e = GGOBI_STAGE(ggobi_data_new (0, 0));
         ggobi_stage_set_name(e, "edges");
         display->e = e;
         display->options.edges_undirected_show_p = true;

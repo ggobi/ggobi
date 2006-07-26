@@ -134,7 +134,7 @@ csv_row_parse (Row * row, GIOChannel * channel, gint trim)
 LPostProcessQuote:             /* Post-process quote enclosed strings */
   {
     gint ll, l, m;
-    guchar *v;
+    gchar *v;
     ll = l = row->entry[row->rIdx].len;
     v = row->src->str + row->entry[row->rIdx].ofs;
     m = k = 1;

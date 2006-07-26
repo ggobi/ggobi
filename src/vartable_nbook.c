@@ -299,14 +299,14 @@ cat_filter_func (GtkTreeModel *model, GtkTreeIter *iter, GGobiStage *d)
 }
 
 static void
-vartable_col_data_changed_cb (GGobiStage *s, guint j)
+vartable_col_data_changed_cb (GGobiStage *s, guint j, gpointer user_data)
 {
   vartable_stats_set_by_var (s, j);
   vartable_limits_set_by_var (s, j);
 }
 
 static void
-vartable_col_deleted_cb (GGobiStage *d, guint j)
+vartable_col_deleted_cb (GGobiStage *d, guint j, gpointer user_data)
 {
   GtkTreeModel *model;
   GtkTreeIter iter;

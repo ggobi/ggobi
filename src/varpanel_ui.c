@@ -116,6 +116,12 @@ varpanel_widget_set_visible (gint jbutton, gint jvar, gboolean show,
 }
 
 void
+varpanel_delete_nth_cb (GGobiStage * d, guint jvar, gpointer user_data) 
+{
+  varpanel_delete_nth (d, jvar);
+}
+
+void
 varpanel_delete_nth (GGobiStage * d, gint jvar)
 {
   GtkWidget *box = varpanel_container_get_nth (jvar, d);
@@ -621,7 +627,7 @@ varpanel_populate (GGobiStage * d, ggobid * gg)
   g_signal_connect (G_OBJECT (gg), "display_new",
                     G_CALLBACK (varpanel_set_sensitive_cb), NULL);
 
-  ggobi_stage_connect__col_deleted (d, varpanel_delete_nth, NULL);
+  ggobi_stage_connect__col_deleted (d, varpanel_delete_nth_cb, NULL);
   
   /* Connecting to display_selected event */
   g_signal_connect (G_OBJECT (gg), "display_selected",
