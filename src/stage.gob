@@ -52,8 +52,49 @@
   guint* var_to_col = ggobi_stage_translate_var_to_col((stage)); \
   guint jj = 0; \
   for(guint j = 0; jj < ggobi_stage_get_n_vars(stage); jj++, j = var_to_col[jj]) 
+
+// Macros for getting and setting attribute values
+// -----------------------------------------------
+
+#define GGOBI_STAGE_ATTR_INIT(d, attribute) \
+  guint attr_ ## attribute [] = { \
+    ggobi_stage_get_col_index_for_name(d, #attribute), \
+    ggobi_stage_get_col_index_for_name(d, #attribute "_now"), \
+    ggobi_stage_get_col_index_for_name(d, #attribute "_prev") \
+  }
+
+#define GGOBI_STAGE_ATTR_INIT_ALL(d) \
+  GGOBI_STAGE_ATTR_INIT(d, color); \
+  GGOBI_STAGE_ATTR_INIT(d, size); \
+  GGOBI_STAGE_ATTR_INIT(d, hidden); \
+  GGOBI_STAGE_ATTR_INIT(d, type)
+
+#define GGOBI_STAGE_SET_ATTR(d, i, attribute, value, brush) \
+  ggobi_stage_set_attr(d, i, attr_ ##attribute[0], attr_ ##attribute[1], attr_ ##attribute[2], (gdouble) value, brush)
+#define GGOBI_STAGE_GET_ATTR(d, i, attribute) \
+  ggobi_stage_get_attr(d, i, attr_ ##attribute[0], attr_ ##attribute[1], attr_ ##attribute[2])
+#define GGOBI_STAGE_RESET_ATTR(d, i, attribute, brush) \
+  ggobi_stage_reset_attr(d, i, attr_ ##attribute[0], attr_ ##attribute[1], attr_ ##attribute[2], brush)
+
+#define GGOBI_STAGE_SET_ATTR_COLOR(d, i,  value, brush)  GGOBI_STAGE_SET_ATTR(d, i, color,  value, brush)
+#define GGOBI_STAGE_SET_ATTR_TYPE(d, i,   value, brush)  GGOBI_STAGE_SET_ATTR(d, i, type,   value, brush)
+#define GGOBI_STAGE_SET_ATTR_SIZE(d, i,   value, brush)  GGOBI_STAGE_SET_ATTR(d, i, size,   value, brush)
+#define GGOBI_STAGE_SET_ATTR_HIDDEN(d, i, value, brush)  GGOBI_STAGE_SET_ATTR(d, i, hidden, value, brush)
+
+#define GGOBI_STAGE_GET_ATTR_COLOR(d, i )  GGOBI_STAGE_GET_ATTR(d, i, color  )
+#define GGOBI_STAGE_GET_ATTR_TYPE(d, i  )  GGOBI_STAGE_GET_ATTR(d, i, type   )
+#define GGOBI_STAGE_GET_ATTR_SIZE(d, i  )  GGOBI_STAGE_GET_ATTR(d, i, size   )
+#define GGOBI_STAGE_GET_ATTR_HIDDEN(d, i)  GGOBI_STAGE_GET_ATTR(d, i, hidden )
+
+#define GGOBI_STAGE_GET_ATTR_GLYPH(d, i)  ggobi_stage_get_attr_glyph(d, i, attr_type[1], attr_size[1])
+
+
+#define GGOBI_STAGE_RESET_ATTR_COLOR(d, i,  brush)  GGOBI_STAGE_RESET_ATTR(d, i, color,  brush)
+#define GGOBI_STAGE_RESET_ATTR_TYPE(d, i,   brush)  GGOBI_STAGE_RESET_ATTR(d, i, type,   brush)
+#define GGOBI_STAGE_RESET_ATTR_SIZE(d, i,   brush)  GGOBI_STAGE_RESET_ATTR(d, i, size,   brush)
+#define GGOBI_STAGE_RESET_ATTR_HIDDEN(d, i, brush)  GGOBI_STAGE_RESET_ATTR(d, i, hidden, brush)
     
-  /*---- STUFF FROM DATA.GOB ----*/
+/*---- STUFF FROM DATA.GOB ----*/
 typedef struct _Subset {
   gint random_n;
   gint string_pos;
@@ -925,6 +966,77 @@ get_root(self)
  * ============================================================================
  */
 
+/**
+ * set_attr_color:
+ * @self: #GGobiStage
+ * @i: row index
+ * @j: attribute column
+ * @j_now: column index for transient value of attribute
+ * @j_prev: column index for previous value of attribute
+ * @brush: persistent or transient
+ *
+ * Sets attribute to new value. Use with GGOBI_STAGE_ATTR_INIT and
+ * GGOBI_STAGE_ATTR_SET
+ * Returns: true if value has changed, false otherwise
+**/
+public gboolean
+set_attr(self, guint i, guint j, guint j_now, guint j_prev, gdouble value, GGobiAttrSetMethod brush)
+{
+  if (brush == ATTR_SET_TRANSIENT ?
+    (self_get_raw_value(self, i, j_now) == value) :
+    (self_get_raw_value(self, i, j) == value))
+    return false;
+
+  if (brush == ATTR_SET_PERSISTENT) {
+    self_set_raw_value(self, i, j_prev, self_get_raw_value(self, i, j));
+    self_set_raw_value(self, i, j, value);
+  }
+
+  self_set_raw_value(self, i, j_now, value);
+  return true;
+}
+
+public gboolean
+reset_attr(self, guint i, guint j, guint j_now, guint j_prev, GGobiAttrSetMethod brush)
+{
+  gdouble value;
+  switch(brush) {
+    case ATTR_SET_PERSISTENT:
+      value = self_get_raw_value(self, i, j_prev);
+    default:
+      value = self_get_raw_value(self, i, j_now);
+  }
+  
+  return self_set_attr(self, i, j, j_now, j_prev, value, brush);
+}
+
+public gdouble
+get_attr(self, guint i, guint j, guint j_now, guint j_prev)
+{
+  return self_get_raw_value(self, i, j_now);
+}
+
+/**
+ * get_attr_glyph:
+ * @self: #GGobiStage
+ * @i: row index
+ * 
+ * Retrieve current glyph
+**/
+public glyphd* 
+get_attr_glyph(self, guint i)//, guint j_type, guint j_size)
+{
+  glyphd* glyph = (glyphd*) g_malloc (sizeof (glyphd)); 
+  glyph->type = self_get_short_value_for_col_name(self, i, "_type_now");
+  glyph->size = self_get_short_value_for_col_name(self, i, "_size_now");
+  
+  //glyph->type = (gshort) self_get_raw_value(self, i, j_type);
+  //glyph->size = (gshort) self_get_raw_value(self, i, j_size);
+  return glyph;
+}
+
+
+
  // FIXME: Could convert to macros, but in order to handle the documentation
  // we'll probably need to use gob's m4 support
  
@@ -1069,7 +1181,7 @@ get_attr_hidden(self, guint i)
   return self_get_boolean_value_for_col_name(self, i, "_hidden_now");
 }
 /**
- * reset_attr_glyph_type:
+ * reset_attr_type:
  * @self: #GGobiStage 
  * @i: row index
  * @brush: persistent or transient
@@ -1077,23 +1189,23 @@ get_attr_hidden(self, guint i)
  * Resets glyph_type attribute to previous value
 **/
 public gboolean
-reset_attr_glyph_type(self, guint i, GGobiAttrSetMethod brush)
+reset_attr_type(self, guint i, GGobiAttrSetMethod brush)
 {
   gint value;
   // This code is autogenerated, do not edit by hand
   switch(brush) {
     case ATTR_SET_PERSISTENT:
-      value = self_get_int_value_for_col_name(self, i, "_glyph_type_prev");
+      value = self_get_int_value_for_col_name(self, i, "_type_prev");
     default:
-      value = self_get_int_value_for_col_name(self, i, "_glyph_type");
+      value = self_get_int_value_for_col_name(self, i, "_type");
   }
   
-  return self_set_attr_glyph_type(self, i, value, brush);
+  return self_set_attr_type(self, i, value, brush);
 
 }
 
 /**
- * set_attr_glyph_type:
+ * set_attr_type:
  * @self: #GGobiStage
  * @i: row index
  * @brush: persistent or transient
@@ -1102,39 +1214,39 @@ reset_attr_glyph_type(self, guint i, GGobiAttrSetMethod brush)
  * Returns: true if value has changed, false otherwise
 **/
 public gboolean
-set_attr_glyph_type(self, guint i, gint value, GGobiAttrSetMethod brush)
+set_attr_type(self, guint i, gint value, GGobiAttrSetMethod brush)
 {
   // This code is autogenerated, do not edit by hand
   if (brush == ATTR_SET_TRANSIENT ?
-    (self_get_int_value_for_col_name(self, i, "_glyph_type_now") == value) :
-    (self_get_int_value_for_col_name(self, i, "_glyph_type") == value))
+    (self_get_int_value_for_col_name(self, i, "_type_now") == value) :
+    (self_get_int_value_for_col_name(self, i, "_type") == value))
     return false;
 
   if (brush == ATTR_SET_PERSISTENT) {
-    self_set_int_value_for_col_name(self, i, "_glyph_type_prev", 
-      self_get_int_value_for_col_name(self, i, "_glyph_type"));
-    self_set_int_value_for_col_name(self, i, "_glyph_type", value);
+    self_set_int_value_for_col_name(self, i, "_type_prev", 
+      self_get_int_value_for_col_name(self, i, "_type"));
+    self_set_int_value_for_col_name(self, i, "_type", value);
   }
 
-  self_set_int_value_for_col_name(self, i, "_glyph_type_now", value);
+  self_set_int_value_for_col_name(self, i, "_type_now", value);
   return true;
 }
 
 /**
- * get_attr_glyph_type:
+ * get_attr_type:
  * @self: #GGobiStage
  * @i: row index
  * 
  * Retrieve current glyph_type
 **/
 public gint
-get_attr_glyph_type(self, guint i)
+get_attr_type(self, guint i)
 {
   // This code is autogenerated, do not edit by hand
-  return self_get_int_value_for_col_name(self, i, "_glyph_type_now");
+  return self_get_int_value_for_col_name(self, i, "_type_now");
 }
 /**
- * reset_attr_glyph_size:
+ * reset_attr_size:
  * @self: #GGobiStage 
  * @i: row index
  * @brush: persistent or transient
@@ -1142,23 +1254,23 @@ get_attr_glyph_type(self, guint i)
  * Resets glyph_size attribute to previous value
 **/
 public gboolean
-reset_attr_glyph_size(self, guint i, GGobiAttrSetMethod brush)
+reset_attr_size(self, guint i, GGobiAttrSetMethod brush)
 {
   gint value;
   // This code is autogenerated, do not edit by hand
   switch(brush) {
     case ATTR_SET_PERSISTENT:
-      value = self_get_int_value_for_col_name(self, i, "_glyph_size_prev");
+      value = self_get_int_value_for_col_name(self, i, "_size_prev");
     default:
-      value = self_get_int_value_for_col_name(self, i, "_glyph_size");
+      value = self_get_int_value_for_col_name(self, i, "_size");
   }
   
-  return self_set_attr_glyph_size(self, i, value, brush);
+  return self_set_attr_size(self, i, value, brush);
 
 }
 
 /**
- * set_attr_glyph_size:
+ * set_attr_size:
  * @self: #GGobiStage
  * @i: row index
  * @brush: persistent or transient
@@ -1167,105 +1279,40 @@ reset_attr_glyph_size(self, guint i, GGobiAttrSetMethod brush)
  * Returns: true if value has changed, false otherwise
 **/
 public gboolean
-set_attr_glyph_size(self, guint i, gint value, GGobiAttrSetMethod brush)
+set_attr_size(self, guint i, gint value, GGobiAttrSetMethod brush)
 {
   // This code is autogenerated, do not edit by hand
   if (brush == ATTR_SET_TRANSIENT ?
-    (self_get_int_value_for_col_name(self, i, "_glyph_size_now") == value) :
-    (self_get_int_value_for_col_name(self, i, "_glyph_size") == value))
+    (self_get_int_value_for_col_name(self, i, "_size_now") == value) :
+    (self_get_int_value_for_col_name(self, i, "_size") == value))
     return false;
 
   if (brush == ATTR_SET_PERSISTENT) {
-    self_set_int_value_for_col_name(self, i, "_glyph_size_prev", 
-      self_get_int_value_for_col_name(self, i, "_glyph_size"));
-    self_set_int_value_for_col_name(self, i, "_glyph_size", value);
+    self_set_int_value_for_col_name(self, i, "_size_prev", 
+      self_get_int_value_for_col_name(self, i, "_size"));
+    self_set_int_value_for_col_name(self, i, "_size", value);
   }
 
-  self_set_int_value_for_col_name(self, i, "_glyph_size_now", value);
+  self_set_int_value_for_col_name(self, i, "_size_now", value);
   return true;
 }
 
 /**
- * get_attr_glyph_size:
+ * get_attr_size:
  * @self: #GGobiStage
  * @i: row index
  * 
  * Retrieve current glyph_size
 **/
 public gint
-get_attr_glyph_size(self, guint i)
+get_attr_size(self, guint i)
 {
   // This code is autogenerated, do not edit by hand
-  return self_get_int_value_for_col_name(self, i, "_glyph_size_now");
+  return self_get_int_value_for_col_name(self, i, "_size_now");
 }
 /* [[[end]]] */
 
-/**
- * reset_attr_glyph:
- * @self: #GGobiStage 
- * @i: row index
- * @brush: persistent or transient
- *
- * Resets glyph attribute to previous value
-**/
-public gboolean
-reset_attr_glyph(self, guint i, GGobiAttrSetMethod brush)
-{
-  gboolean changed = false;
-  changed = self_reset_attr_glyph_size(self, i, brush) || changed;
-  changed = self_reset_attr_glyph_type(self, i, brush) || changed;
-  return changed;
-}
 
-/**
- * set_attr_glyph:
- * @self: #GGobiStage
- * @i: row index
- * @brush: persistent or transient
- *
- * Sets glyph attribute to new value.
- * Returns: true if value has changed, false otherwise
-**/
-public gboolean
-set_attr_glyph_parts(self, guint i, GlyphType type, guint size, GGobiAttrSetMethod brush)
-{
-    gboolean changed = false;
-    changed = self_set_attr_glyph_size(self, i, size, brush) || changed;
-    changed = self_set_attr_glyph_type(self, i, type, brush) || changed;
-    return changed;
-}
-
-public gboolean
-set_attr_glyph(self, guint i, glyphd* value, GGobiAttrSetMethod brush)
-{
-  return self_set_attr_glyph_parts(self, i, value->type, value->size, brush);
-}
-
-/**
- * get_attr_glyph:
- * @self: #GGobiStage
- * @i: row index
- * 
- * Retrieve current glyph
-**/
-public glyphd* 
-get_attr_glyph(self, guint i)
-{
-  glyphd* glyph = (glyphd*) g_malloc (sizeof (glyphd)); 
-  glyph->type = self_get_attr_glyph_type(self, i);
-  glyph->size = self_get_attr_glyph_size(self, i);
-  return glyph;
-}
-
-public gboolean 
-reset_attr(self, guint i, GGobiAttrSetMethod brush) {
-  gboolean changed = false;
-  changed = self_reset_attr_hidden(self, i, brush) || changed;
-  changed = self_reset_attr_glyph(self, i, brush) || changed;
-  changed = self_reset_attr_color(self, i, brush) || changed;
-  
-  return changed;
-}
 
 public gboolean
 brush_point(self, guint i, gboolean condition, BrushTargetType brush_mode, GGobiAttrSetMethod brush) {
@@ -1273,13 +1320,15 @@ brush_point(self, guint i, gboolean condition, BrushTargetType brush_mode, GGobi
    switch (brush_mode) {
     case br_candg:
       self_set_attr_color(self, i, self->gg->color_id, brush);
-      self_set_attr_glyph(self, i, &self->gg->glyph_id, brush);
+      self_set_attr_size(self, i, (&self->gg->glyph_id)->size, brush);
+      self_set_attr_type(self, i, (&self->gg->glyph_id)->type, brush);
       break;
     case br_color:
       self_set_attr_color(self, i, self->gg->color_id, brush);
       break;
     case br_glyph:
-      self_set_attr_glyph(self, i, &self->gg->glyph_id, brush);
+      self_set_attr_size(self, i, (&self->gg->glyph_id)->size, brush);
+      self_set_attr_type(self, i, (&self->gg->glyph_id)->type, brush);
       break;
     case br_shadow:
       self_set_attr_hidden(self, i, true, brush);
@@ -1294,13 +1343,15 @@ brush_point(self, guint i, gboolean condition, BrushTargetType brush_mode, GGobi
     switch (brush_mode) {
     case br_candg:
       self_reset_attr_color(self, i, ATTR_SET_TRANSIENT);
-      self_reset_attr_glyph(self, i, ATTR_SET_TRANSIENT);
+      self_reset_attr_size(self, i, ATTR_SET_TRANSIENT);
+      self_reset_attr_type(self, i, ATTR_SET_TRANSIENT);
       break;
     case br_color:
       self_reset_attr_color(self, i, ATTR_SET_TRANSIENT);
       break;
     case br_glyph:
-      self_reset_attr_glyph(self, i, ATTR_SET_TRANSIENT);
+      self_reset_attr_size(self, i, ATTR_SET_TRANSIENT);
+      self_reset_attr_type(self, i, ATTR_SET_TRANSIENT);
       break;
     case br_unshadow:
     case br_shadow:

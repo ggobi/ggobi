@@ -51,15 +51,18 @@ symbol_link_by_id (gboolean persistentp, gint k, GGobiStage * sd, ggobid * gg)
 
     if (i < 0)              /*-- then no cases in d have this id --*/
       continue;
-
+    
+    GGOBI_STAGE_ATTR_INIT_ALL(d);  
+    
     /*-- if we get here, d has one case with the indicated id --*/
     changed = true;
     if (d->sampled.els[i] && !d->excluded.els[i]) {
-       if (!ggobi_stage_get_attr_hidden(d, i)) {
-         ggobi_stage_set_attr_color(d, i, ggobi_stage_get_attr_color(sd, k), brush);
-         ggobi_stage_set_attr_glyph(d, i, ggobi_stage_get_attr_glyph(sd, k), brush);
+       if (!GGOBI_STAGE_GET_ATTR_HIDDEN(d, i)) {
+         GGOBI_STAGE_SET_ATTR_COLOR(d, i, GGOBI_STAGE_GET_ATTR_COLOR(sd, k), brush);
+         GGOBI_STAGE_SET_ATTR_SIZE(d, i, GGOBI_STAGE_GET_ATTR_SIZE(sd, k), brush);
+         GGOBI_STAGE_SET_ATTR_TYPE(d, i, GGOBI_STAGE_GET_ATTR_TYPE(sd, k), brush);
        }
-       ggobi_stage_set_attr_hidden(d, i, ggobi_stage_get_attr_hidden(sd, k), brush);
+       GGOBI_STAGE_SET_ATTR_HIDDEN(d, i, GGOBI_STAGE_GET_ATTR_HIDDEN(sd, k), brush);
     }
   }
   return changed;

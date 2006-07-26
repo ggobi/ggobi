@@ -239,7 +239,10 @@ brush_undo (GGobiStage * d)
 
   for (m = 0; m < d->nrows_in_plot; m++) {
     i = d->rows_in_plot.els[m];
-    ggobi_stage_reset_attr(d, i, ATTR_SET_PERSISTENT);
+    ggobi_stage_reset_attr_color (d, i, ATTR_SET_PERSISTENT);
+    ggobi_stage_reset_attr_type  (d, i, ATTR_SET_PERSISTENT);
+    ggobi_stage_reset_attr_size  (d, i, ATTR_SET_PERSISTENT);
+    ggobi_stage_reset_attr_hidden(d, i, ATTR_SET_PERSISTENT);
   }
 }
 
@@ -263,12 +266,18 @@ reinit_transient_brushing (displayd * dsp, ggobid * gg)
   if (point_painting_p) {
     for (m = 0; m < d->nrows_in_plot; m++) {
       i = d->rows_in_plot.els[m];
-      ggobi_stage_reset_attr(d, i, ATTR_SET_TRANSIENT);
+      ggobi_stage_reset_attr_color (d, i, ATTR_SET_TRANSIENT);
+      ggobi_stage_reset_attr_type  (d, i, ATTR_SET_TRANSIENT);
+      ggobi_stage_reset_attr_size  (d, i, ATTR_SET_TRANSIENT);
+      ggobi_stage_reset_attr_hidden(d, i, ATTR_SET_TRANSIENT);
     }
   }
   if (edge_painting_p && e) {
     for (k = 0; k < ggobi_stage_get_n_edges(e); k++)
-      ggobi_stage_reset_attr(e, k, ATTR_SET_TRANSIENT);
+      ggobi_stage_reset_attr_color (e, k, ATTR_SET_TRANSIENT);
+      ggobi_stage_reset_attr_type  (e, k, ATTR_SET_TRANSIENT);
+      ggobi_stage_reset_attr_size  (e, k, ATTR_SET_TRANSIENT);
+      ggobi_stage_reset_attr_hidden(e, k, ATTR_SET_TRANSIENT);
   }
 }
 

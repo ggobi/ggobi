@@ -180,6 +180,7 @@ Medford, Mass., June 1971.)
 </data>
 
 <data name="Lines for Exp Cond" nickname="ExpCondL">
+<variables count="0" />
 <records count="12">
  <record source="101" destination="102"> </record>
  <record source="101" destination="103"> </record>
@@ -197,6 +198,7 @@ Medford, Mass., June 1971.)
 </data>
 
 <data name="Lines for Meas" nickname="MsmntsL">
+<variables count="0" />
 <records count="92">
  <record source="1" destination="9"> </record>
  <record source="1" destination="17"> </record>

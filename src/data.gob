@@ -91,22 +91,22 @@ add_attributes(self) {
   // FIXME: we set the default value here, even though the ggobid fields
   // change to match the current brush colour
   self_add_attribute(self, "_color", def_color);
-  self_add_attribute(self, "_glyph_size", def_size);
-  self_add_attribute(self, "_glyph_type", def_type);
+  self_add_attribute(self, "_size", def_size);
+  self_add_attribute(self, "_type", def_type);
   self_add_attribute(self, "_hidden", 0);
 
   self_add_attribute(self, "_color_now", def_color);
-  self_add_attribute(self, "_glyph_size_now", def_size);
-  self_add_attribute(self, "_glyph_type_now", def_type);
+  self_add_attribute(self, "_size_now", def_size);
+  self_add_attribute(self, "_type_now", def_type);
   self_add_attribute(self,  "_hidden_now", 0);
 
   self_add_attribute(self, "_color_prev", def_color);
-  self_add_attribute(self,  "_glyph_size_prev", def_size);
-  self_add_attribute(self, "_glyph_type_prev", def_type);
+  self_add_attribute(self,  "_size_prev", def_size);
+  self_add_attribute(self, "_type_prev", def_type);
   self_add_attribute(self, "_hidden_prev", 0);
   
   //self_reset_rows(self, 0, ggobi_stage_get_n_rows(stage));
-}
+} 
 
 /**
  * add_attribute:
@@ -120,17 +120,19 @@ add_attributes(self) {
  **/
 public void 
 add_attribute(self, gchar* name, gdouble value) {
+  GGobiStage *stage = GGOBI_STAGE(self);
+  
   guint j = self_add_cols(self, 1);
-  GGOBI_STAGE(self)->n_attributes += 1;
+  stage->n_attributes += 1;
 
-  ggobi_stage_set_col_name(GGOBI_STAGE(self), j, name);
+  ggobi_stage_set_col_name(stage, j, name);
   self_set_col_default_value(self, j, value);	
   
-  for(guint i = 0; i < ggobi_stage_get_n_rows(GGOBI_STAGE(self)); i++) {
-    ggobi_stage_set_raw_value(GGOBI_STAGE(self), i, j, value);
+  for(guint i = 0; i < ggobi_stage_get_n_rows(stage); i++) {
+    ggobi_stage_set_raw_value(stage, i, j, value);
   }
 
-  GGobiVariable* vt = ggobi_stage_get_variable(GGOBI_STAGE(self), j);
+  GGobiVariable* vt = ggobi_stage_get_variable(stage, j);
   vt->is_attribute = true;
 }
 

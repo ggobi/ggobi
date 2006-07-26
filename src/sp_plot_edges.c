@@ -142,9 +142,9 @@ splot_edges_draw (splotd * sp, gboolean draw_hidden, GdkDrawable * drawable,
            /* Or if we're not drawing hiddens and this isn't hidden ... */
            (!draw_hidden && !ggobi_stage_get_attr_hidden(e, m)))) {
 
-        gtype = ggobi_stage_get_attr_glyph(e, m)->type;
+        gtype = ggobi_stage_get_attr_type(e, m);
         ltype = ltype_from_gtype (gtype);
-        symbols_used[ggobi_stage_get_attr_glyph(e, m)->size][ltype][ggobi_stage_get_attr_color(e, m)]++;
+        symbols_used[ggobi_stage_get_attr_size(e, m)][ltype][ggobi_stage_get_attr_color(e, m)]++;
       }
     }
 
@@ -192,11 +192,11 @@ splot_edges_draw (splotd * sp, gboolean draw_hidden, GdkDrawable * drawable,
 
               edge_endpoints_get (j, &a, &b, d, endpoints, e);
 
-              gtype = ggobi_stage_get_attr_glyph(e, j)->type;
+              gtype = ggobi_stage_get_attr_type(e, j);
               ltype = ltype_from_gtype (gtype);
 
               if (ggobi_stage_get_attr_color(e, j) == p &&
-                  ltype == n && ggobi_stage_get_attr_glyph(e, j)->size == k) {
+                  ltype == n && ggobi_stage_get_attr_size(e, j) == k) {
                 if (edges_show_p) {
                   if (endpoints[j].jpartner == -1) {
                     sp->edges[nl].x1 = sp->screen[a].x;

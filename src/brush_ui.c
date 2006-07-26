@@ -377,12 +377,12 @@ button_release_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
   g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(d, "_color"));
   g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(d, "_color_now"));
   g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(d, "_color_prev"));
-  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(d, "_glyph_type"));
-  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(d, "_glyph_type_now"));
-  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(d, "_glyph_type_prev"));
-  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(d, "_glyph_size"));
-  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(d, "_glyph_size_now"));
-  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(d, "_glyph_size_prev"));
+  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(d, "_type"));
+  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(d, "_type_now"));
+  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(d, "_type_prev"));
+  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(d, "_size"));
+  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(d, "_size_now"));
+  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(d, "_size_prev"));
   g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(d, "_hidden"));
   g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(d, "_hidden_now"));
   g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(d, "_hidden_prev"));

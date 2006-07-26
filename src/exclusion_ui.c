@@ -297,7 +297,8 @@ cluster_symbol_cb (GtkWidget * w, GdkEventExpose * event, gpointer cbd)
         d->clusv[n].color = gg->color_id;
       }
       if (targets == br_candg || targets == br_glyph) {
-        ggobi_stage_set_attr_glyph(d, i, &gg->glyph_id, ATTR_SET_PERSISTENT);
+        ggobi_stage_set_attr_size(d, i, (&gg->glyph_id)->size, ATTR_SET_PERSISTENT);
+        ggobi_stage_set_attr_type(d, i, (&gg->glyph_id)->type, ATTR_SET_PERSISTENT);
         /*-- this will be done multiple times, but who cares? --*/
         d->clusv[n].glyphtype = gg->glyph_id.type;
         d->clusv[n].glyphsize = gg->glyph_id.size;

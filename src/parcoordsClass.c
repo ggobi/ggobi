@@ -303,8 +303,8 @@ withinDrawBinned (splotd * sp, gint m, GdkDrawable * drawable, GdkGC * gc)
 
   if (display->options.whiskers_show_p) {
     n = 2 * m;
-    lwidth = lwidth_from_gsize (ggobi_stage_get_attr_glyph(d, m)->size);
-    gtype = ggobi_stage_get_attr_glyph(d, m)->type;
+    lwidth = lwidth_from_gsize (ggobi_stage_get_attr_size(d, m));
+    gtype = ggobi_stage_get_attr_type(d, m);
     ltype = set_lattribute_from_ltype (ltype_from_gtype (gtype), gg);
     gdk_gc_set_line_attributes (gg->plot_GC, lwidth,
                                 ltype, GDK_CAP_BUTT, GDK_JOIN_ROUND);

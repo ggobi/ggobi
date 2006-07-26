@@ -296,12 +296,12 @@ write_xml_record (FILE *f, GGobiStage *d, ggobid *gg, gint i,
 
 
   if (!xmlWriteInfo->useDefault ||
-     xmlWriteInfo->defaultGlyphType != ggobi_stage_get_attr_glyph_type(d, i) ||
-     xmlWriteInfo->defaultGlyphSize != ggobi_stage_get_attr_glyph_size(d, i)) 
+     xmlWriteInfo->defaultGlyphType != ggobi_stage_get_attr_type(d, i) ||
+     xmlWriteInfo->defaultGlyphSize != ggobi_stage_get_attr_size(d, i)) 
   {
     fprintf (f, " glyph=\"%s %d\"", 
-      GlyphNames[ggobi_stage_get_attr_glyph_type(d, i)], 
-      ggobi_stage_get_attr_glyph_size(d, i));
+      GlyphNames[ggobi_stage_get_attr_type(d, i)], 
+      ggobi_stage_get_attr_size(d, i));
   }
 
   fprintf(f, ">\n");
@@ -440,8 +440,8 @@ updateXmlWriteInfo(GGobiStage *d, ggobid *gg, XmlWriteInfo *info)
   n = ggobi_nrecords(d);
   for(i = 0 ; i < n ; i++) {
     colorCounts[ggobi_stage_get_attr_color(d, i)]++;
-    glyphSizeCounts[ggobi_stage_get_attr_glyph_size(d, i)]++;
-    glyphTypeCounts[ggobi_stage_get_attr_glyph_type(d, i)]++;
+    glyphSizeCounts[ggobi_stage_get_attr_size(d, i)]++;
+    glyphTypeCounts[ggobi_stage_get_attr_type(d, i)]++;
   }
 
   count = -1;
