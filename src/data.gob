@@ -91,21 +91,20 @@ add_attributes(self) {
   // FIXME: we set the default value here, even though the ggobid fields
   // change to match the current brush colour
   self_add_attribute(self, "_color", def_color);
-  self_add_attribute(self, "_size", def_size);
-  self_add_attribute(self, "_type", def_type);
-  self_add_attribute(self, "_hidden", 0);
-
   self_add_attribute(self, "_color_now", def_color);
-  self_add_attribute(self, "_size_now", def_size);
-  self_add_attribute(self, "_type_now", def_type);
-  self_add_attribute(self,  "_hidden_now", 0);
-
   self_add_attribute(self, "_color_prev", def_color);
-  self_add_attribute(self,  "_size_prev", def_size);
+
+  self_add_attribute(self, "_size", def_size);
+  self_add_attribute(self, "_size_now", def_size);
+  self_add_attribute(self, "_size_prev", def_size);
+
+  self_add_attribute(self, "_type", def_type);
+  self_add_attribute(self, "_type_now", def_type);
   self_add_attribute(self, "_type_prev", def_type);
+
+  self_add_attribute(self, "_hidden", 0);
+  self_add_attribute(self, "_hidden_now", 0);
   self_add_attribute(self, "_hidden_prev", 0);
-  
-  //self_reset_rows(self, 0, ggobi_stage_get_n_rows(stage));
 } 
 
 /**
@@ -119,8 +118,11 @@ add_attributes(self) {
  * FIXME: should automatically check if attribute is already present
  **/
 public void 
-add_attribute(self, gchar* name, gdouble value) {
+add_attribute(self, const gchar* name, gdouble value) {
   GGobiStage *stage = GGOBI_STAGE(self);
+
+  if (ggobi_stage_get_col_index_for_name(stage, name) != -1)
+    return;
   
   guint j = self_add_cols(self, 1);
   stage->n_attributes += 1;

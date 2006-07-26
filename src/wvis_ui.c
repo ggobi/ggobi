@@ -174,12 +174,13 @@ record_colors_reset (gint selected_var, GGobiStage *d, ggobid *gg)
   min = var->lim_tform.min;
   max = var->lim_tform.max;
 
+  GGOBI_STAGE_ATTR_INIT_ALL(d);  
   for (m=0; m<d->nrows_in_plot; m++) {
     i = d->rows_in_plot.els[m];
     for (k=0; k<scheme->n; k++) {
       val = min + gg->wvis.pct[k] * (max - min);
       if (d->tform.vals[i][selected_var] <= val) {
-        ggobi_stage_set_attr_color(d, i, k, ATTR_SET_PERSISTENT);
+        GGOBI_STAGE_SET_ATTR_COLOR(d, i, k, ATTR_SET_PERSISTENT);
         break;
       }
     }

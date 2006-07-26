@@ -75,7 +75,8 @@ record_add (eeMode mode, gint a, gint b, gchar * lbl, gchar * id,
 
 
   if (mode == ADDING_EDGES) {
-    ggobi_stage_set_attr_color(dtarget, i, ggobi_stage_get_attr_color(dtarget, i), ATTR_SET_PERSISTENT);
+    GGOBI_STAGE_ATTR_INIT_ALL(dtarget);  
+    GGOBI_STAGE_SET_ATTR_COLOR(dtarget, i, GGOBI_STAGE_GET_ATTR_COLOR(dtarget, i), ATTR_SET_PERSISTENT);
     //dtarget->color.els[i] = dtarget->color_now.els[i] = d->color.els[a];
 
     edges_alloc (e->n_rows, e);
@@ -243,9 +244,10 @@ find_nearest_edge (splotd * sp, displayd * display, ggobid * gg)
       return (-1);
 
     xdist = sqdist = 1000 * 1000;
+    GGOBI_STAGE_ATTR_INIT_ALL(d);  
     for (j = 0; j < ggobi_stage_get_n_edges(e); j++) {
       doit = edge_endpoints_get (j, &from, &to, d, endpoints, e);
-      doit = doit && (!ggobi_stage_get_attr_hidden(d, from) && !ggobi_stage_get_attr_hidden(d, to));
+      doit = doit && (!GGOBI_STAGE_GET_ATTR_HIDDEN(d, from) && !GGOBI_STAGE_GET_ATTR_HIDDEN(d, to));
 
       if (doit) {
         a.x = sp->screen[from].x;
@@ -312,8 +314,9 @@ find_nearest_edge (splotd * sp, displayd * display, ggobid * gg)
        we really want to highlight.  Use the distance from the
        mouse to the two endpoints to decide. */
     if (lineid != -1) {
+      GGOBI_STAGE_ATTR_INIT(e, hidden);  
       j = endpoints[lineid].jpartner;
-      if (j != -1 && !ggobi_stage_get_attr_hidden(e, j)) {
+      if (j != -1 && !GGOBI_STAGE_GET_ATTR_HIDDEN(e, j)) {
 
         edge_endpoints_get (lineid, &from, &to, d, endpoints, e);
 

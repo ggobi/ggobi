@@ -58,9 +58,9 @@
 
 #define GGOBI_STAGE_ATTR_INIT(d, attribute) \
   guint attr_ ## attribute [] = { \
-    ggobi_stage_get_col_index_for_name(d, #attribute), \
-    ggobi_stage_get_col_index_for_name(d, #attribute "_now"), \
-    ggobi_stage_get_col_index_for_name(d, #attribute "_prev") \
+    ggobi_stage_get_col_index_for_name(d, "_" #attribute), \
+    ggobi_stage_get_col_index_for_name(d, "_" #attribute "_now"), \
+    ggobi_stage_get_col_index_for_name(d, "_" #attribute "_prev") \
   }
 
 #define GGOBI_STAGE_ATTR_INIT_ALL(d) \
@@ -81,18 +81,64 @@
 #define GGOBI_STAGE_SET_ATTR_SIZE(d, i,   value, brush)  GGOBI_STAGE_SET_ATTR(d, i, size,   value, brush)
 #define GGOBI_STAGE_SET_ATTR_HIDDEN(d, i, value, brush)  GGOBI_STAGE_SET_ATTR(d, i, hidden, value, brush)
 
-#define GGOBI_STAGE_GET_ATTR_COLOR(d, i )  GGOBI_STAGE_GET_ATTR(d, i, color  )
-#define GGOBI_STAGE_GET_ATTR_TYPE(d, i  )  GGOBI_STAGE_GET_ATTR(d, i, type   )
-#define GGOBI_STAGE_GET_ATTR_SIZE(d, i  )  GGOBI_STAGE_GET_ATTR(d, i, size   )
-#define GGOBI_STAGE_GET_ATTR_HIDDEN(d, i)  GGOBI_STAGE_GET_ATTR(d, i, hidden )
+#define GGOBI_STAGE_GET_ATTR_COLOR(d, i )  (gushort) GGOBI_STAGE_GET_ATTR(d, i, color  )
+#define GGOBI_STAGE_GET_ATTR_TYPE(d, i  )  (gint) GGOBI_STAGE_GET_ATTR(d, i, type   )
+#define GGOBI_STAGE_GET_ATTR_SIZE(d, i  )  (gint) GGOBI_STAGE_GET_ATTR(d, i, size   )
+#define GGOBI_STAGE_GET_ATTR_HIDDEN(d, i)  (gboolean) GGOBI_STAGE_GET_ATTR(d, i, hidden )
 
 #define GGOBI_STAGE_GET_ATTR_GLYPH(d, i)  ggobi_stage_get_attr_glyph(d, i, attr_type[1], attr_size[1])
-
 
 #define GGOBI_STAGE_RESET_ATTR_COLOR(d, i,  brush)  GGOBI_STAGE_RESET_ATTR(d, i, color,  brush)
 #define GGOBI_STAGE_RESET_ATTR_TYPE(d, i,   brush)  GGOBI_STAGE_RESET_ATTR(d, i, type,   brush)
 #define GGOBI_STAGE_RESET_ATTR_SIZE(d, i,   brush)  GGOBI_STAGE_RESET_ATTR(d, i, size,   brush)
 #define GGOBI_STAGE_RESET_ATTR_HIDDEN(d, i, brush)  GGOBI_STAGE_RESET_ATTR(d, i, hidden, brush)
+
+#define GGOBI_STAGE_BRUSH_POINT(d, i, condition, brush_mode, brush) \
+  if (condition) {\
+   switch (brush_mode) {\
+    case br_candg:\
+      GGOBI_STAGE_SET_ATTR_COLOR(d, i, d->gg->color_id, brush);\
+      GGOBI_STAGE_SET_ATTR_SIZE(d, i, (&d->gg->glyph_id)->size, brush);\
+      GGOBI_STAGE_SET_ATTR_TYPE(d, i, (&d->gg->glyph_id)->type, brush);\
+      break;\
+    case br_color:\
+      GGOBI_STAGE_SET_ATTR_COLOR(d, i, d->gg->color_id, brush);\
+      break;\
+    case br_glyph:\
+      GGOBI_STAGE_SET_ATTR_SIZE(d, i, (&d->gg->glyph_id)->size, brush);\
+      GGOBI_STAGE_SET_ATTR_TYPE(d, i, (&d->gg->glyph_id)->type, brush);\
+      break;\
+    case br_shadow:\
+      GGOBI_STAGE_SET_ATTR_HIDDEN(d, i, true, brush);\
+      break;\
+    case br_unshadow:\
+      GGOBI_STAGE_SET_ATTR_HIDDEN(d, i, false, brush);\
+      break;\
+    default:\
+      break;\
+    }\
+  } else if (brush == ATTR_SET_TRANSIENT) {  \
+    switch (brush_mode) {\
+    case br_candg:\
+      GGOBI_STAGE_RESET_ATTR_COLOR(d, i, ATTR_SET_TRANSIENT);\
+      GGOBI_STAGE_RESET_ATTR_SIZE(d, i, ATTR_SET_TRANSIENT);\
+      GGOBI_STAGE_RESET_ATTR_TYPE(d, i, ATTR_SET_TRANSIENT);\
+      break;\
+    case br_color:\
+      GGOBI_STAGE_RESET_ATTR_COLOR(d, i, ATTR_SET_TRANSIENT);\
+      break;\
+    case br_glyph:\
+      GGOBI_STAGE_RESET_ATTR_SIZE(d, i, ATTR_SET_TRANSIENT);\
+      GGOBI_STAGE_RESET_ATTR_TYPE(d, i, ATTR_SET_TRANSIENT);\
+      break;\
+    case br_unshadow:\
+    case br_shadow:\
+      GGOBI_STAGE_RESET_ATTR_HIDDEN(d, i, ATTR_SET_TRANSIENT);\
+      break;\
+    default:\
+      break;\
+    }\
+  }
     
 /*---- STUFF FROM DATA.GOB ----*/
 typedef struct _Subset {
@@ -982,6 +1028,7 @@ get_root(self)
 public gboolean
 set_attr(self, guint i, guint j, guint j_now, guint j_prev, gdouble value, GGobiAttrSetMethod brush)
 {
+  //g_debug("(%i,%i %i %i) -> %g %s", i, j, j_now, j_prev, value, brush == ATTR_SET_TRANSIENT ? "t" : "p");
   if (brush == ATTR_SET_TRANSIENT ?
     (self_get_raw_value(self, i, j_now) == value) :
     (self_get_raw_value(self, i, j) == value))
@@ -1004,7 +1051,7 @@ reset_attr(self, guint i, guint j, guint j_now, guint j_prev, GGobiAttrSetMethod
     case ATTR_SET_PERSISTENT:
       value = self_get_raw_value(self, i, j_prev);
     default:
-      value = self_get_raw_value(self, i, j_now);
+      value = self_get_raw_value(self, i, j);
   }
   
   return self_set_attr(self, i, j, j_now, j_prev, value, brush);
@@ -1024,792 +1071,18 @@ get_attr(self, guint i, guint j, guint j_now, guint j_prev)
  * Retrieve current glyph
 **/
 public glyphd* 
-get_attr_glyph(self, guint i)//, guint j_type, guint j_size)
+get_attr_glyph(self, guint i, guint j_type, guint j_size)
 {
-  glyphd* glyph = (glyphd*) g_malloc (sizeof (glyphd)); 
-  glyph->type = self_get_short_value_for_col_name(self, i, "_type_now");
-  glyph->size = self_get_short_value_for_col_name(self, i, "_size_now");
-  
-  //glyph->type = (gshort) self_get_raw_value(self, i, j_type);
-  //glyph->size = (gshort) self_get_raw_value(self, i, j_size);
+  glyphd* glyph = (glyphd*) g_malloc (sizeof (glyphd));   
+  glyph->type = (gshort) self_get_raw_value(self, i, j_type);
+  glyph->size = (gshort) self_get_raw_value(self, i, j_size);
   return glyph;
 }
 
 
 
- // FIXME: Could convert to macros, but in order to handle the documentation
- // we'll probably need to use gob's m4 support
- 
- /* Moved to the stage since this seems to be the right place (for now) */
- 
-/* [[[cog
-   import cog, attraccessor\
-   
-   cog.outl(attraccessor.attr_accessor("color", "gushort", "short"))
-   cog.outl(attraccessor.attr_accessor("hidden", "gboolean", "boolean"))
-   cog.outl(attraccessor.attr_accessor("glyph_type", "gint", "int"))
-   cog.outl(attraccessor.attr_accessor("glyph_size", "gint", "int"))
-   ]]]*/
-/**
- * reset_attr_color:
- * @self: #GGobiStage 
- * @i: row index
- * @brush: persistent or transient
- *
- * Resets color attribute to previous value
-**/
-public gboolean
-reset_attr_color(self, guint i, GGobiAttrSetMethod brush)
-{
-  gushort value;
-  // This code is autogenerated, do not edit by hand
-  switch(brush) {
-    case ATTR_SET_PERSISTENT:
-      value = self_get_short_value_for_col_name(self, i, "_color_prev");
-    default:
-      value = self_get_short_value_for_col_name(self, i, "_color");
-  }
-  
-  return self_set_attr_color(self, i, value, brush);
-
-}
-
-/**
- * set_attr_color:
- * @self: #GGobiStage
- * @i: row index
- * @brush: persistent or transient
- *
- * Sets color attribute to new value.
- * Returns: true if value has changed, false otherwise
-**/
-public gboolean
-set_attr_color(self, guint i, gushort value, GGobiAttrSetMethod brush)
-{
-  // This code is autogenerated, do not edit by hand
-  if (brush == ATTR_SET_TRANSIENT ?
-    (self_get_short_value_for_col_name(self, i, "_color_now") == value) :
-    (self_get_short_value_for_col_name(self, i, "_color") == value))
-    return false;
-
-  if (brush == ATTR_SET_PERSISTENT) {
-    self_set_short_value_for_col_name(self, i, "_color_prev", 
-      self_get_short_value_for_col_name(self, i, "_color"));
-    self_set_short_value_for_col_name(self, i, "_color", value);
-  }
-
-  self_set_short_value_for_col_name(self, i, "_color_now", value);
-  return true;
-}
-
-/**
- * get_attr_color:
- * @self: #GGobiStage
- * @i: row index
- * 
- * Retrieve current color
-**/
-public gushort
-get_attr_color(self, guint i)
-{
-  // This code is autogenerated, do not edit by hand
-  return self_get_short_value_for_col_name(self, i, "_color_now");
-}
-/**
- * reset_attr_hidden:
- * @self: #GGobiStage 
- * @i: row index
- * @brush: persistent or transient
- *
- * Resets hidden attribute to previous value
-**/
-public gboolean
-reset_attr_hidden(self, guint i, GGobiAttrSetMethod brush)
-{
-  gboolean value;
-  // This code is autogenerated, do not edit by hand
-  switch(brush) {
-    case ATTR_SET_PERSISTENT:
-      value = self_get_boolean_value_for_col_name(self, i, "_hidden_prev");
-    default:
-      value = self_get_boolean_value_for_col_name(self, i, "_hidden");
-  }
-  
-  return self_set_attr_hidden(self, i, value, brush);
-
-}
-
-/**
- * set_attr_hidden:
- * @self: #GGobiStage
- * @i: row index
- * @brush: persistent or transient
- *
- * Sets hidden attribute to new value.
- * Returns: true if value has changed, false otherwise
-**/
-public gboolean
-set_attr_hidden(self, guint i, gboolean value, GGobiAttrSetMethod brush)
-{
-  // This code is autogenerated, do not edit by hand
-  if (brush == ATTR_SET_TRANSIENT ?
-    (self_get_boolean_value_for_col_name(self, i, "_hidden_now") == value) :
-    (self_get_boolean_value_for_col_name(self, i, "_hidden") == value))
-    return false;
-
-  if (brush == ATTR_SET_PERSISTENT) {
-    self_set_boolean_value_for_col_name(self, i, "_hidden_prev", 
-      self_get_boolean_value_for_col_name(self, i, "_hidden"));
-    self_set_boolean_value_for_col_name(self, i, "_hidden", value);
-  }
-
-  self_set_boolean_value_for_col_name(self, i, "_hidden_now", value);
-  return true;
-}
-
-/**
- * get_attr_hidden:
- * @self: #GGobiStage
- * @i: row index
- * 
- * Retrieve current hidden
-**/
-public gboolean
-get_attr_hidden(self, guint i)
-{
-  // This code is autogenerated, do not edit by hand
-  return self_get_boolean_value_for_col_name(self, i, "_hidden_now");
-}
-/**
- * reset_attr_type:
- * @self: #GGobiStage 
- * @i: row index
- * @brush: persistent or transient
- *
- * Resets glyph_type attribute to previous value
-**/
-public gboolean
-reset_attr_type(self, guint i, GGobiAttrSetMethod brush)
-{
-  gint value;
-  // This code is autogenerated, do not edit by hand
-  switch(brush) {
-    case ATTR_SET_PERSISTENT:
-      value = self_get_int_value_for_col_name(self, i, "_type_prev");
-    default:
-      value = self_get_int_value_for_col_name(self, i, "_type");
-  }
-  
-  return self_set_attr_type(self, i, value, brush);
-
-}
-
-/**
- * set_attr_type:
- * @self: #GGobiStage
- * @i: row index
- * @brush: persistent or transient
- *  
- * Sets glyph_type attribute to new value.
- * Returns: true if value has changed, false otherwise
-**/
-public gboolean
-set_attr_type(self, guint i, gint value, GGobiAttrSetMethod brush)
-{
-  // This code is autogenerated, do not edit by hand
-  if (brush == ATTR_SET_TRANSIENT ?
-    (self_get_int_value_for_col_name(self, i, "_type_now") == value) :
-    (self_get_int_value_for_col_name(self, i, "_type") == value))
-    return false;
-
-  if (brush == ATTR_SET_PERSISTENT) {
-    self_set_int_value_for_col_name(self, i, "_type_prev", 
-      self_get_int_value_for_col_name(self, i, "_type"));
-    self_set_int_value_for_col_name(self, i, "_type", value);
-  }
-
-  self_set_int_value_for_col_name(self, i, "_type_now", value);
-  return true;
-}
-
-/**
- * get_attr_type:
- * @self: #GGobiStage
- * @i: row index
- * 
- * Retrieve current glyph_type
-**/
-public gint
-get_attr_type(self, guint i)
-{
-  // This code is autogenerated, do not edit by hand
-  return self_get_int_value_for_col_name(self, i, "_type_now");
-}
-/**
- * reset_attr_size:
- * @self: #GGobiStage 
- * @i: row index
- * @brush: persistent or transient
- *
- * Resets glyph_size attribute to previous value
-**/
-public gboolean
-reset_attr_size(self, guint i, GGobiAttrSetMethod brush)
-{
-  gint value;
-  // This code is autogenerated, do not edit by hand
-  switch(brush) {
-    case ATTR_SET_PERSISTENT:
-      value = self_get_int_value_for_col_name(self, i, "_size_prev");
-    default:
-      value = self_get_int_value_for_col_name(self, i, "_size");
-  }
-  
-  return self_set_attr_size(self, i, value, brush);
-
-}
-
-/**
- * set_attr_size:
- * @self: #GGobiStage
- * @i: row index
- * @brush: persistent or transient
- *
- * Sets glyph_size attribute to new value.
- * Returns: true if value has changed, false otherwise
-**/
-public gboolean
-set_attr_size(self, guint i, gint value, GGobiAttrSetMethod brush)
-{
-  // This code is autogenerated, do not edit by hand
-  if (brush == ATTR_SET_TRANSIENT ?
-    (self_get_int_value_for_col_name(self, i, "_size_now") == value) :
-    (self_get_int_value_for_col_name(self, i, "_size") == value))
-    return false;
-
-  if (brush == ATTR_SET_PERSISTENT) {
-    self_set_int_value_for_col_name(self, i, "_size_prev", 
-      self_get_int_value_for_col_name(self, i, "_size"));
-    self_set_int_value_for_col_name(self, i, "_size", value);
-  }
-
-  self_set_int_value_for_col_name(self, i, "_size_now", value);
-  return true;
-}
-
-/**
- * get_attr_size:
- * @self: #GGobiStage
- * @i: row index
- * 
- * Retrieve current glyph_size
-**/
-public gint
-get_attr_size(self, guint i)
-{
-  // This code is autogenerated, do not edit by hand
-  return self_get_int_value_for_col_name(self, i, "_size_now");
-}
-/* [[[end]]] */
 
 
-
-public gboolean
-brush_point(self, guint i, gboolean condition, BrushTargetType brush_mode, GGobiAttrSetMethod brush) {
-  if (condition) {
-   switch (brush_mode) {
-    case br_candg:
-      self_set_attr_color(self, i, self->gg->color_id, brush);
-      self_set_attr_size(self, i, (&self->gg->glyph_id)->size, brush);
-      self_set_attr_type(self, i, (&self->gg->glyph_id)->type, brush);
-      break;
-    case br_color:
-      self_set_attr_color(self, i, self->gg->color_id, brush);
-      break;
-    case br_glyph:
-      self_set_attr_size(self, i, (&self->gg->glyph_id)->size, brush);
-      self_set_attr_type(self, i, (&self->gg->glyph_id)->type, brush);
-      break;
-    case br_shadow:
-      self_set_attr_hidden(self, i, true, brush);
-      break;
-    case br_unshadow:
-      self_set_attr_hidden(self, i, false, brush);
-      break;
-    default:
-      break;
-    }
-  } else if (brush == ATTR_SET_TRANSIENT) {  
-    switch (brush_mode) {
-    case br_candg:
-      self_reset_attr_color(self, i, ATTR_SET_TRANSIENT);
-      self_reset_attr_size(self, i, ATTR_SET_TRANSIENT);
-      self_reset_attr_type(self, i, ATTR_SET_TRANSIENT);
-      break;
-    case br_color:
-      self_reset_attr_color(self, i, ATTR_SET_TRANSIENT);
-      break;
-    case br_glyph:
-      self_reset_attr_size(self, i, ATTR_SET_TRANSIENT);
-      self_reset_attr_type(self, i, ATTR_SET_TRANSIENT);
-      break;
-    case br_unshadow:
-    case br_shadow:
-      self_reset_attr_hidden(self, i, ATTR_SET_TRANSIENT);
-      break;
-    default:
-      break;
-    }
-  }
-  return false;
-}
-
-// FIXME: Should be done with M4
-/* Moved to stage, since there doesn't seem to be any special reason to be in
-  GGobiData besides the fact that we didn't want a ton of bloat in the stage. */
-  
-/* [[[cog
-   import cog, attraccessor
-   cog.outl(attraccessor.column_accessor("boolean", "gboolean"))
-   cog.outl(attraccessor.column_accessor("short", "gshort"))
-   cog.outl(attraccessor.column_accessor("int", "gint"))
-   ]]] */
-/** 
- * get_boolean_value:
- * @self: #GGobiStage
- * @i: row index
- * @j: column index
- *
- * Convenience method for getting boolean value.
- **/
-public gboolean
-get_boolean_value(self, guint i, guint j)
-{
-  // This code is autogenerated, do not edit by hand
-  return (gboolean) self_get_raw_value(self, i, j);
-}
-
-
-/** 
- * get_boolean_values:
- * @self: #GGobiStage
- * @i: row index
- *
- * Convenience method for creating a new array of type gboolean
- * from the specified column.
- **/
-public gboolean*
-get_boolean_values(self, guint j)
-{
-  // This code is autogenerated, do not edit by hand
-  gboolean* values = g_new(gboolean, self->n_rows);
-  for (guint i = 0; i < self->n_rows; i++)
-    values[i] = self_get_boolean_value(self, i, j);
-  return(values);
-}
-
-/** 
- * set_boolean_value:
- * @self: #GGobiStage
- * @i: row index
- * @j: column index
- * @value: new value
- *
- * Convenience method for setting boolean value.
- **/
-public void
-set_boolean_value(self, guint i, guint j, gboolean value)
-{
-  // This code is autogenerated, do not edit by hand
-  self_set_raw_value(self, i, j, (gdouble) value);
-}
-
-/** 
- * set_boolean_values:
- * @self: #GGobiStage
- * @i: row index
- * @value: array of boolean of length self->nrows
- *
- * Convenience method for setting entire column of booleans.
- * Emits self_col_data_changed() signal.
- **/
-public void
-set_boolean_values(self, guint j, gboolean *values)
-{
-  // This code is autogenerated, do not edit by hand
-  for (guint i = 0; i < self->n_rows; i++) {
-    self_set_boolean_value(self, i, j, values[i]);
-  }
-  self_col_data_changed(self, j);
-}
-
-
-/** 
- * get_boolean_value_for_col_name:
- * @self: #GGobiStage
- * @i: row index
- * @j: column index
- *
- * Convenience method for getting boolean value.
- **/
-public gboolean
-get_boolean_value_for_col_name(self, guint i, gchar* name)
-{
-  // This code is autogenerated, do not edit by hand
-  guint j = self_get_col_index_for_name(self, name);
-  g_assert(j != -1);
-  
-  return self_get_boolean_value(self, i, j);
-}
-
-
-/** 
- * get_boolean_values_for_col_names:
- * @self: #GGobiStage
- * @i: row index
- *
- * Convenience method for creating a new array of type gboolean
- * from the specified column.
- **/
-public gboolean*
-get_boolean_values_for_col_name(self, gchar* name)
-{
-  // This code is autogenerated, do not edit by hand
-  guint j = self_get_col_index_for_name(self, name);
-  g_assert(j != -1);
-  
-  return self_get_boolean_values(self, j);
-}
-
-/** 
- * set_boolean_value_for_col_name:
- * @self: #GGobiStage
- * @i: row index
- * @j: column index
- * @value_for_col_name: new value_for_col_name
- *
- * Convenience method for setting boolean value.
- **/
-public void
-set_boolean_value_for_col_name(self, guint i, gchar* name, gboolean value)
-{
-  // This code is autogenerated, do not edit by hand
-  guint j = self_get_col_index_for_name(self, name);
-  g_assert(j != -1);
-  
-  self_set_boolean_value(self, i, j, value);
-}
-
-/** 
- * set_boolean_values_for_col_name:
- * @self: #GGobiStage
- * @i: row index
- * @value_for_col_name: array of boolean of length self->nrows
- *
- * Convenience method for setting entire column of booleans.
- * Emits self_col_data_changed() signal.
- **/
-public void
-set_boolean_values_for_col_name(self, gchar* name, gboolean *values)
-{
-  // This code is autogenerated, do not edit by hand
-  guint j = self_get_col_index_for_name(self, name);
-  g_assert(j != -1);
-  
-  self_set_boolean_values(self, j, values);
-}
-
-/** 
- * get_short_value:
- * @self: #GGobiStage
- * @i: row index
- * @j: column index
- *
- * Convenience method for getting short value.
- **/
-public gshort
-get_short_value(self, guint i, guint j)
-{
-  // This code is autogenerated, do not edit by hand
-  return (gshort) self_get_raw_value(self, i, j);
-}
-
-
-/** 
- * get_short_values:
- * @self: #GGobiStage
- * @i: row index
- *
- * Convenience method for creating a new array of type gshort
- * from the specified column.
- **/
-public gshort*
-get_short_values(self, guint j)
-{
-  // This code is autogenerated, do not edit by hand
-  gshort* values = g_new(gshort, self->n_rows);
-  for (guint i = 0; i < self->n_rows; i++)
-    values[i] = self_get_short_value(self, i, j);
-  return(values);
-}
-
-/** 
- * set_short_value:
- * @self: #GGobiStage
- * @i: row index
- * @j: column index
- * @value: new value
- *
- * Convenience method for setting short value.
- **/
-public void
-set_short_value(self, guint i, guint j, gshort value)
-{
-  // This code is autogenerated, do not edit by hand
-  self_set_raw_value(self, i, j, (gdouble) value);
-}
-
-/** 
- * set_short_values:
- * @self: #GGobiStage
- * @i: row index
- * @value: array of short of length self->nrows
- *
- * Convenience method for setting entire column of shorts.
- * Emits self_col_data_changed() signal.
- **/
-public void
-set_short_values(self, guint j, gshort *values)
-{
-  // This code is autogenerated, do not edit by hand
-  for (guint i = 0; i < self->n_rows; i++) {
-    self_set_short_value(self, i, j, values[i]);
-  }
-  self_col_data_changed(self, j);
-}
-
-
-/** 
- * get_short_value_for_col_name:
- * @self: #GGobiStage
- * @i: row index
- * @j: column index
- *
- * Convenience method for getting short value.
- **/
-public gshort
-get_short_value_for_col_name(self, guint i, gchar* name)
-{
-  // This code is autogenerated, do not edit by hand
-  guint j = self_get_col_index_for_name(self, name);
-  g_assert(j != -1);
-  
-  return self_get_short_value(self, i, j);
-}
-
-
-/** 
- * get_short_values_for_col_names:
- * @self: #GGobiStage
- * @i: row index
- *
- * Convenience method for creating a new array of type gshort
- * from the specified column.
- **/
-public gshort*
-get_short_values_for_col_name(self, gchar* name)
-{
-  // This code is autogenerated, do not edit by hand
-  guint j = self_get_col_index_for_name(self, name);
-  g_assert(j != -1);
-  
-  return self_get_short_values(self, j);
-}
-
-/** 
- * set_short_value_for_col_name:
- * @self: #GGobiStage
- * @i: row index
- * @j: column index
- * @value_for_col_name: new value_for_col_name
- *
- * Convenience method for setting short value.
- **/
-public void
-set_short_value_for_col_name(self, guint i, gchar* name, gshort value)
-{
-  // This code is autogenerated, do not edit by hand
-  guint j = self_get_col_index_for_name(self, name);
-  g_assert(j != -1);
-  
-  self_set_short_value(self, i, j, value);
-}
-
-/** 
- * set_short_values_for_col_name:
- * @self: #GGobiStage
- * @i: row index
- * @value_for_col_name: array of short of length self->nrows
- *
- * Convenience method for setting entire column of shorts.
- * Emits self_col_data_changed() signal.
- **/
-public void
-set_short_values_for_col_name(self, gchar* name, gshort *values)
-{
-  // This code is autogenerated, do not edit by hand
-  guint j = self_get_col_index_for_name(self, name);
-  g_assert(j != -1);
-  
-  self_set_short_values(self, j, values);
-}
-
-/** 
- * get_int_value:
- * @self: #GGobiStage
- * @i: row index
- * @j: column index
- *
- * Convenience method for getting int value.
- **/
-public gint
-get_int_value(self, guint i, guint j)
-{
-  // This code is autogenerated, do not edit by hand
-  return (gint) self_get_raw_value(self, i, j);
-}
-
-
-/** 
- * get_int_values:
- * @self: #GGobiStage
- * @i: row index
- *
- * Convenience method for creating a new array of type gint
- * from the specified column.
- **/
-public gint*
-get_int_values(self, guint j)
-{
-  // This code is autogenerated, do not edit by hand
-  gint* values = g_new(gint, self->n_rows);
-  for (guint i = 0; i < self->n_rows; i++)
-    values[i] = self_get_int_value(self, i, j);
-  return(values);
-}
-
-/** 
- * set_int_value:
- * @self: #GGobiStage
- * @i: row index
- * @j: column index
- * @value: new value
- *
- * Convenience method for setting int value.
- **/
-public void
-set_int_value(self, guint i, guint j, gint value)
-{
-  // This code is autogenerated, do not edit by hand
-  self_set_raw_value(self, i, j, (gdouble) value);
-}
-
-/** 
- * set_int_values:
- * @self: #GGobiStage
- * @i: row index
- * @value: array of int of length self->nrows
- *
- * Convenience method for setting entire column of ints.
- * Emits self_col_data_changed() signal.
- **/
-public void
-set_int_values(self, guint j, gint *values)
-{
-  // This code is autogenerated, do not edit by hand
-  for (guint i = 0; i < self->n_rows; i++) {
-    self_set_int_value(self, i, j, values[i]);
-  }
-  self_col_data_changed(self, j);
-}
-
-
-/** 
- * get_int_value_for_col_name:
- * @self: #GGobiStage
- * @i: row index
- * @j: column index
- *
- * Convenience method for getting int value.
- **/
-public gint
-get_int_value_for_col_name(self, guint i, gchar* name)
-{
-  // This code is autogenerated, do not edit by hand
-  guint j = self_get_col_index_for_name(self, name);
-  g_assert(j != -1);
-  
-  return self_get_int_value(self, i, j);
-}
-
-
-/** 
- * get_int_values_for_col_names:
- * @self: #GGobiStage
- * @i: row index
- *
- * Convenience method for creating a new array of type gint
- * from the specified column.
- **/
-public gint*
-get_int_values_for_col_name(self, gchar* name)
-{
-  // This code is autogenerated, do not edit by hand
-  guint j = self_get_col_index_for_name(self, name);
-  g_assert(j != -1);
-  
-  return self_get_int_values(self, j);
-}
-
-/** 
- * set_int_value_for_col_name:
- * @self: #GGobiStage
- * @i: row index
- * @j: column index
- * @value_for_col_name: new value_for_col_name
- *
- * Convenience method for setting int value.
- **/
-public void
-set_int_value_for_col_name(self, guint i, gchar* name, gint value)
-{
-  // This code is autogenerated, do not edit by hand
-  guint j = self_get_col_index_for_name(self, name);
-  g_assert(j != -1);
-  
-  self_set_int_value(self, i, j, value);
-}
-
-/** 
- * set_int_values_for_col_name:
- * @self: #GGobiStage
- * @i: row index
- * @value_for_col_name: array of int of length self->nrows
- *
- * Convenience method for setting entire column of ints.
- * Emits self_col_data_changed() signal.
- **/
-public void
-set_int_values_for_col_name(self, gchar* name, gint *values)
-{
-  // This code is autogenerated, do not edit by hand
-  guint j = self_get_col_index_for_name(self, name);
-  g_assert(j != -1);
-  
-  self_set_int_values(self, j, values);
-}
-
-/* [[[end]]] */
 
 // FIXME: to be removed once pipeline in place
 /** 

@@ -763,6 +763,7 @@ scatterplotMovePointsButtonCb (displayd * display, splotd * sp, GtkWidget * w,
 
     /*-- add the history information for the cluster here --*/
     if (gg->movepts.cluster_p) {
+      GGOBI_STAGE_ATTR_INIT_ALL(d);  
       clusters_set(d);
       if (d->nclusters > 1) {
         gint i, k, id = d->nearest_point;
@@ -771,7 +772,7 @@ scatterplotMovePointsButtonCb (displayd * display, splotd * sp, GtkWidget * w,
           k = d->rows_in_plot.els[i];
           if (k == id);
           else if (d->clusterid.els[k] == cur_clust)
-            if (!ggobi_stage_get_attr_hidden(d, k))
+            if (!GGOBI_STAGE_GET_ATTR_HIDDEN(d, k))
               movepts_history_add (k, sp, d, gg);
         }
       }

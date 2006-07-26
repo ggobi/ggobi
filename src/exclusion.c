@@ -53,18 +53,19 @@ symbol_table_populate (GGobiStage * d)
 
   symbol_table_zero (d);
 
+  GGOBI_STAGE_ATTR_INIT_ALL(d);  
   /*-- loop over all data --*/
   for (i = 0; i < d->n_rows; i++) {
-    j = ggobi_stage_get_attr_type(d, i);
-    k = ggobi_stage_get_attr_size(d, i);
-    m = ggobi_stage_get_attr_color(d, i);
+    j = GGOBI_STAGE_GET_ATTR_TYPE(d, i);
+    k = GGOBI_STAGE_GET_ATTR_SIZE(d, i);
+    m = GGOBI_STAGE_GET_ATTR_COLOR(d, i);
 
     if (d->symbol_table[j][k][m].n == 0)
       nclusters++;
 
     d->symbol_table[j][k][m].n++;
 
-    if (ggobi_stage_get_attr_hidden(d, i))
+    if (GGOBI_STAGE_GET_ATTR_HIDDEN(d, i))
       d->symbol_table[j][k][m].nhidden++;
     else
       d->symbol_table[j][k][m].nshown++;
@@ -96,6 +97,8 @@ clusters_set (GGobiStage * d)
    */
   for (i = d->nclusters; i < nclusters; i++)
     d->clusv[i].hidden_p = false;
+
+  GGOBI_STAGE_ATTR_INIT_ALL(d);  
 
   /*
    * populate the clusv structures using the information in the
@@ -129,9 +132,9 @@ clusters_set (GGobiStage * d)
     for (i = 0; i < d->n_rows; i++) {
       for (n = 0; n < nclusters; n++) {
         if (d->sampled.els[i]) {
-          if (ggobi_stage_get_attr_type(d, i) == d->clusv[n].glyphtype &&
-              ggobi_stage_get_attr_size(d, i) == d->clusv[n].glyphsize &&
-              ggobi_stage_get_attr_color(d, i) == d->clusv[n].color) {
+          if (GGOBI_STAGE_GET_ATTR_TYPE(d, i) == d->clusv[n].glyphtype &&
+              GGOBI_STAGE_GET_ATTR_SIZE(d, i) == d->clusv[n].glyphsize &&
+              GGOBI_STAGE_GET_ATTR_COLOR(d, i) == d->clusv[n].color) {
             d->clusterid.els[i] = n;
             break;
           }

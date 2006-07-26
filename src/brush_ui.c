@@ -151,12 +151,16 @@ brush_reset (displayd * display, gint action)
     break;
 
   case RESET_UNSHADOW_POINTS: /*-- un-hide all points --*/
-    for (i = 0; i < d->n_rows; i++)
-      ggobi_stage_set_attr_hidden(d, i, false, ATTR_SET_PERSISTENT);
+    { //necessary for block level definition of column cache
+      GGOBI_STAGE_ATTR_INIT_ALL(d);  
+      for (i = 0; i < d->n_rows; i++) {
+        GGOBI_STAGE_SET_ATTR_HIDDEN(d, i, false, ATTR_SET_PERSISTENT);
+      }
 
       /*-- code borrowed from exclusion_ui.c, the 'show' routine --*/
-    clusters_set(d);
-    cluster_table_labels_update (d, gg);
+      clusters_set(d);
+      cluster_table_labels_update (d, gg);
+    }
 
     break;
 
@@ -176,8 +180,9 @@ brush_reset (displayd * display, gint action)
 
   case RESET_UNSHADOW_EDGES: /*-- un-hide all edges --*/
     if (e != NULL) {
+      GGOBI_STAGE_ATTR_INIT_ALL(e);  
       for (k = 0; k < ggobi_stage_get_n_edges(e); k++)
-        ggobi_stage_set_attr_hidden(e, k, false, ATTR_SET_PERSISTENT);
+        GGOBI_STAGE_SET_ATTR_HIDDEN(e, k, false, ATTR_SET_PERSISTENT);
 
         /*-- code borrowed from exclusion_ui.c, the 'show' routine --*/
       clusters_set(d);

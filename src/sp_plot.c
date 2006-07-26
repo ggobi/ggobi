@@ -171,6 +171,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
 
   } else {
 
+    GGOBI_STAGE_ATTR_INIT_ALL(d);  
     if (draw_hidden) {
       gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_hidden);
 
@@ -179,14 +180,14 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
 #else
       for (i=0; i<d->nrows_in_plot; i++) {
         m = d->rows_in_plot.els[i];
-        if (ggobi_stage_get_attr_hidden(d, m) && splot_plot_case (m, d, sp, display, gg)) {
+        if (GGOBI_STAGE_GET_ATTR_HIDDEN(d, m) && splot_plot_case (m, d, sp, display, gg)) {
           /*
            * This double-check accommodates the parallel coordinates and
            * time series displays, because we have to ignore points_show_p
            * in order to draw the whiskers but not the points.
           */
           if (display->options.points_show_p)
-            draw_glyph (sp->pixmap0, ggobi_stage_get_attr_glyph(d, m), sp->screen,
+            draw_glyph (sp->pixmap0, GGOBI_STAGE_GET_ATTR_GLYPH(d, m), sp->screen,
               m, gg);
           /* draw the whiskers ... or, potentially, other decorations */
           if (klass && klass->within_draw_to_unbinned) {
@@ -211,8 +212,8 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
 #else
         for (i=0; i<d->nrows_in_plot; i++) {
           m = d->rows_in_plot.els[i];
-          if (ggobi_stage_get_attr_color(d, m) == current_color &&
-            !ggobi_stage_get_attr_hidden(d, m) &&
+          if (GGOBI_STAGE_GET_ATTR_COLOR(d, m) == current_color &&
+            !GGOBI_STAGE_GET_ATTR_HIDDEN(d, m) &&
             splot_plot_case (m, d, sp, display, gg))
           {
             /*
@@ -222,7 +223,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
              * but not the points.
             */
             if (display->options.points_show_p)
-              draw_glyph (sp->pixmap0, ggobi_stage_get_attr_glyph(d, m), sp->screen,
+              draw_glyph (sp->pixmap0, GGOBI_STAGE_GET_ATTR_GLYPH(d, m), sp->screen,
                 m, gg);
 
             if (klass && klass->within_draw_to_unbinned) {
@@ -334,6 +335,7 @@ splot_draw_to_pixmap0_binned (splotd *sp, gboolean draw_hidden, ggobid *gg)
     }
   }
 
+  GGOBI_STAGE_ATTR_INIT_ALL(d);  
   if (!gg->mono_p && display->options.points_show_p) {
 
     if (draw_hidden) {  /* draw only the hidden cases */
@@ -349,10 +351,10 @@ splot_draw_to_pixmap0_binned (splotd *sp, gboolean draw_hidden, ggobid *gg)
             i = d->rows_in_plot.els[d->brush.binarray[ih][iv].els[m]];
 
             /* if hidden && plottable */
-            if (ggobi_stage_get_attr_hidden(d, i) &&
+            if (GGOBI_STAGE_GET_ATTR_HIDDEN(d, i) &&
                 splot_plot_case (i, d, sp, display, gg))
             {
-              draw_glyph (sp->pixmap0, ggobi_stage_get_attr_glyph(d, i),
+              draw_glyph (sp->pixmap0, GGOBI_STAGE_GET_ATTR_GLYPH(d, i),
                 sp->screen, i, gg);
 
               /* parallel coordinate plot and time series plot whiskers */
@@ -389,11 +391,11 @@ splot_draw_to_pixmap0_binned (splotd *sp, gboolean draw_hidden, ggobid *gg)
             for (m=0; m<d->brush.binarray[ih][iv].nels ; m++) {
               i = d->rows_in_plot.els[d->brush.binarray[ih][iv].els[m]];
 
-              if (!ggobi_stage_get_attr_hidden(d, i) &&
-                  ggobi_stage_get_attr_color(d, i) == current_color &&
+              if (!GGOBI_STAGE_GET_ATTR_HIDDEN(d, i) &&
+                  GGOBI_STAGE_GET_ATTR_COLOR(d, i) == current_color &&
                   splot_plot_case (i, d, sp, display, gg))
               {
-                draw_glyph (sp->pixmap0, ggobi_stage_get_attr_glyph(d, i),
+                draw_glyph (sp->pixmap0, GGOBI_STAGE_GET_ATTR_GLYPH(d, i),
                   sp->screen, i, gg);
 
                 /* parallel coordinate plot whiskers */
@@ -649,11 +651,12 @@ splot_add_record_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
     splot_add_edgeedit_cues (sp, drawable, d->nearest_point, true, gg);
  
 
+  GGOBI_STAGE_ATTR_INIT_ALL(d);  
   /*-- and these are the sticky points, added in all modes --*/
   if (d->sticky_ids != NULL && g_slist_length (d->sticky_ids) > 0) {
     for (l = d->sticky_ids; l; l = l->next) {
       id = GPOINTER_TO_INT (l->data);
-      if (!ggobi_stage_get_attr_hidden(d, id))
+      if (!GGOBI_STAGE_GET_ATTR_HIDDEN(d, id))
         /*-- false = !nearest --*/
         splot_add_identify_sticky_cues (sp, drawable, id, gg);
     }
@@ -663,7 +666,7 @@ splot_add_record_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
   if (e && e->sticky_ids != NULL && g_slist_length (e->sticky_ids) > 0) {
     for (l = e->sticky_ids; l; l = l->next) {
       id = GPOINTER_TO_INT (l->data);
-      if (!ggobi_stage_get_attr_hidden(d, id))
+      if (!GGOBI_STAGE_GET_ATTR_HIDDEN(d, id))
         /*-- false = !nearest --*/
         splot_add_identify_edge_cues (sp, drawable, id, false, gg);
     }

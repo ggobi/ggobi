@@ -98,6 +98,7 @@ impute_mean_or_median (gint type, gint nvars, gint * vars,
     return false;
 
   g_return_val_if_fail(GGOBI_IS_GGOBI(d->gg), false);
+  GGOBI_STAGE_ATTR_INIT_ALL(d);  
 
   /* If responding to brushing group ... */
   if (d->gg->impute.bgroup_p && d->nclusters > 1) {
@@ -121,7 +122,7 @@ impute_mean_or_median (gint type, gint nvars, gint * vars,
         for (i = 0; i < d->nrows_in_plot; i++) {
           k = d->rows_in_plot.els[i];
           if (d->clusterid.els[k] == n) {
-            if (!ggobi_stage_get_attr_hidden(d, k)) {  /* ignore erased values */
+            if (!GGOBI_STAGE_GET_ATTR_HIDDEN(d, k)) {  /* ignore erased values */
               if (ggobi_stage_is_missing(d, k, j))
                 missv[nmissing++] = k;
               else {
@@ -160,7 +161,7 @@ impute_mean_or_median (gint type, gint nvars, gint * vars,
       var = ggobi_stage_get_variable(d, j);
       for (i = 0; i < d->nrows_in_plot; i++) {
         k = d->rows_in_plot.els[i];
-        if (!ggobi_stage_get_attr_hidden(d, k)) {  /* ignore erased values altogether */
+        if (!GGOBI_STAGE_GET_ATTR_HIDDEN(d, k)) {  /* ignore erased values altogether */
           if (ggobi_stage_is_missing(d, k, j)) {
             ggobi_stage_set_raw_value(d, k, j, (type == IMP_MEAN) ? 
               ggobi_variable_get_mean(var) : ggobi_variable_get_median(var));
@@ -212,6 +213,8 @@ impute_random (GGobiStage * d, gint nvars, gint * vars)
   presv = (gint *) g_malloc (d->nrows_in_plot * sizeof (gint));
   missv = (gint *) g_malloc (d->nrows_in_plot * sizeof (gint));
 
+  GGOBI_STAGE_ATTR_INIT_ALL(d);  
+
   if (d->gg->impute.bgroup_p && d->nclusters > 1) {
 
     /* Loop over the number of brushing groups */
@@ -229,7 +232,7 @@ impute_random (GGobiStage * d, gint nvars, gint * vars)
         for (i = 0; i < d->nrows_in_plot; i++) {
           k = d->rows_in_plot.els[i];
           if (d->clusterid.els[k] == n) {
-            if (!ggobi_stage_get_attr_hidden(d, k)) {  /* ignore erased values altogether */
+            if (!GGOBI_STAGE_GET_ATTR_HIDDEN(d, k)) {  /* ignore erased values altogether */
               if (ggobi_stage_is_missing(d, k, j))
                 missv[nmissing++] = k;
               else
@@ -253,7 +256,7 @@ impute_random (GGobiStage * d, gint nvars, gint * vars)
        */
       for (i = 0; i < d->nrows_in_plot; i++) {
         k = d->rows_in_plot.els[i];
-        if (!ggobi_stage_get_attr_hidden(d, k)) {  /* ignore erased values altogether */
+        if (!GGOBI_STAGE_GET_ATTR_HIDDEN(d, k)) {  /* ignore erased values altogether */
           if (ggobi_stage_is_missing(d, k, j))
             missv[nmissing++] = k;
           else

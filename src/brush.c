@@ -237,12 +237,13 @@ brush_undo (GGobiStage * d)
   gint m, i;
   g_return_if_fail(d);
 
+  GGOBI_STAGE_ATTR_INIT_ALL(d);  
   for (m = 0; m < d->nrows_in_plot; m++) {
     i = d->rows_in_plot.els[m];
-    ggobi_stage_reset_attr_color (d, i, ATTR_SET_PERSISTENT);
-    ggobi_stage_reset_attr_type  (d, i, ATTR_SET_PERSISTENT);
-    ggobi_stage_reset_attr_size  (d, i, ATTR_SET_PERSISTENT);
-    ggobi_stage_reset_attr_hidden(d, i, ATTR_SET_PERSISTENT);
+    GGOBI_STAGE_RESET_ATTR_COLOR (d, i, ATTR_SET_PERSISTENT);
+    GGOBI_STAGE_RESET_ATTR_TYPE  (d, i, ATTR_SET_PERSISTENT);
+    GGOBI_STAGE_RESET_ATTR_SIZE  (d, i, ATTR_SET_PERSISTENT);
+    GGOBI_STAGE_RESET_ATTR_HIDDEN(d, i, ATTR_SET_PERSISTENT);
   }
 }
 
@@ -266,18 +267,21 @@ reinit_transient_brushing (displayd * dsp, ggobid * gg)
   if (point_painting_p) {
     for (m = 0; m < d->nrows_in_plot; m++) {
       i = d->rows_in_plot.els[m];
-      ggobi_stage_reset_attr_color (d, i, ATTR_SET_TRANSIENT);
-      ggobi_stage_reset_attr_type  (d, i, ATTR_SET_TRANSIENT);
-      ggobi_stage_reset_attr_size  (d, i, ATTR_SET_TRANSIENT);
-      ggobi_stage_reset_attr_hidden(d, i, ATTR_SET_TRANSIENT);
+      GGOBI_STAGE_ATTR_INIT_ALL(d);  
+      GGOBI_STAGE_RESET_ATTR_COLOR (d, i, ATTR_SET_TRANSIENT);
+      GGOBI_STAGE_RESET_ATTR_TYPE  (d, i, ATTR_SET_TRANSIENT);
+      GGOBI_STAGE_RESET_ATTR_SIZE  (d, i, ATTR_SET_TRANSIENT);
+      GGOBI_STAGE_RESET_ATTR_HIDDEN(d, i, ATTR_SET_TRANSIENT);
     }
   }
   if (edge_painting_p && e) {
-    for (k = 0; k < ggobi_stage_get_n_edges(e); k++)
-      ggobi_stage_reset_attr_color (e, k, ATTR_SET_TRANSIENT);
-      ggobi_stage_reset_attr_type  (e, k, ATTR_SET_TRANSIENT);
-      ggobi_stage_reset_attr_size  (e, k, ATTR_SET_TRANSIENT);
-      ggobi_stage_reset_attr_hidden(e, k, ATTR_SET_TRANSIENT);
+    GGOBI_STAGE_ATTR_INIT_ALL(e);  
+    for (k = 0; k < ggobi_stage_get_n_edges(e); k++) {
+      GGOBI_STAGE_RESET_ATTR_COLOR (e, k, ATTR_SET_TRANSIENT);
+      GGOBI_STAGE_RESET_ATTR_TYPE  (e, k, ATTR_SET_TRANSIENT);
+      GGOBI_STAGE_RESET_ATTR_SIZE  (e, k, ATTR_SET_TRANSIENT);
+      GGOBI_STAGE_RESET_ATTR_HIDDEN(e, k, ATTR_SET_TRANSIENT);
+    }
   }
 }
 
@@ -397,8 +401,9 @@ paint_points (cpaneld * cpanel, GGobiStage * d, ggobid * gg)
   if (f)
     return f(cpanel, d, gg);
 
+  GGOBI_STAGE_ATTR_INIT_ALL(d); 
   for (guint i = 0; i < d->nrows_under_brush_prev; i++) {
-    ggobi_stage_brush_point(d, (guint) d->rows_under_brush_prev.els[i], false,  
+    GGOBI_STAGE_BRUSH_POINT(d, (guint) d->rows_under_brush_prev.els[i], false,  
       cpanel->br.point_targets, cpanel->br.mode);
 
     if (!gg->linkby_cv && nd > 1)
@@ -406,7 +411,7 @@ paint_points (cpaneld * cpanel, GGobiStage * d, ggobid * gg)
   }
   
   for (guint i = 0; i < d->nrows_under_brush; i++) {
-    ggobi_stage_brush_point(d, (guint) d->rows_under_brush.els[i], true,  
+    GGOBI_STAGE_BRUSH_POINT(d, (guint) d->rows_under_brush.els[i], true,  
       cpanel->br.point_targets, cpanel->br.mode);
 
     if (!gg->linkby_cv && nd > 1)
@@ -424,15 +429,17 @@ paint_edges (cpaneld * cpanel, GGobiStage * e, ggobid * gg)
   gboolean changed = false;
   gint nd = g_slist_length (gg->d);
 
+  GGOBI_STAGE_ATTR_INIT_ALL(e); 
   for (i = 0; i < ggobi_stage_get_n_edges(e); i++) {
-    changed = ggobi_stage_brush_point(e, i, ggobi_stage_get_edge_data(e)->xed_by_brush.els[i], 
-      cpanel->br.edge_targets, cpanel->br.mode) || changed;
+    GGOBI_STAGE_BRUSH_POINT(e, i, ggobi_stage_get_edge_data(e)->xed_by_brush.els[i], 
+      cpanel->br.edge_targets, cpanel->br.mode);
 
     if (!gg->linkby_cv && nd > 1)
       symbol_link_by_id (false, i, e, gg);
   }
 
-  return (changed);
+  //FIXME: only return true if there actually has been a change
+  return (true);
 }
 
 /**
@@ -466,6 +473,7 @@ update_points_under_brush(GGobiStage *d, splotd *sp)
   d->nrows_under_brush_prev = d->nrows_under_brush;
   d->nrows_under_brush = 0;
 
+  GGOBI_STAGE_ATTR_INIT_ALL(d);  
   for (ih = d->brush.bin0.x; ih <= d->brush.bin1.x; ih++) {
     for (iv = d->brush.bin0.y; iv <= d->brush.bin1.y; iv++) {
       for (j = 0; j < d->brush.binarray[ih][iv].nels; j++) {
@@ -474,7 +482,7 @@ update_points_under_brush(GGobiStage *d, splotd *sp)
         /*
          * Ignore hidden cases unless shadow or unshadow brushing.
          */
-        if (ggobi_stage_get_attr_hidden(d, pt) && ttype != br_unshadow)
+        if (GGOBI_STAGE_GET_ATTR_HIDDEN(d, pt) && ttype != br_unshadow)
           continue;
 
         if (splot_plot_case(pt, d, sp, display, d->gg) && under_brush (pt, sp))

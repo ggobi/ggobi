@@ -303,8 +303,9 @@ withinDrawBinned (splotd * sp, gint m, GdkDrawable * drawable, GdkGC * gc)
 
   if (display->options.whiskers_show_p) {
     n = 2 * m;
-    lwidth = lwidth_from_gsize (ggobi_stage_get_attr_size(d, m));
-    gtype = ggobi_stage_get_attr_type(d, m);
+    GGOBI_STAGE_ATTR_INIT_ALL(d);  
+    lwidth = lwidth_from_gsize (GGOBI_STAGE_GET_ATTR_SIZE(d, m));
+    gtype = GGOBI_STAGE_GET_ATTR_TYPE(d, m);
     ltype = set_lattribute_from_ltype (ltype_from_gtype (gtype), gg);
     gdk_gc_set_line_attributes (gg->plot_GC, lwidth,
                                 ltype, GDK_CAP_BUTT, GDK_JOIN_ROUND);
@@ -471,10 +472,11 @@ splot_add_whisker_cues (gboolean nearest_p, gint k, splotd * sp,
     return;
 
   if (display->options.whiskers_show_p) {
+    GGOBI_STAGE_ATTR_INIT_ALL(d);  
     gdk_gc_set_line_attributes (gg->plot_GC,
                                 3, GDK_LINE_SOLID, GDK_CAP_ROUND,
                                 GDK_JOIN_ROUND);
-    gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[ggobi_stage_get_attr_color(d, k)]);
+    gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[ GGOBI_STAGE_GET_ATTR_COLOR(d, k)]);
 
     n = 2 * k;
     gdk_draw_line (drawable, gg->plot_GC,

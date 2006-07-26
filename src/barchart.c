@@ -305,9 +305,10 @@ barchart_recalc_group_counts (barchartSPlotd * sp, GGobiStage * d, ggobid * gg)
     /*-- skip missings?  --*/
     if (!d->missings_show_p && ggobi_stage_is_missing(d, m, GGOBI_SPLOT (sp)->p1dvar))
       continue;
-
+    
+    GGOBI_STAGE_ATTR_INIT_ALL(d); 
     /*-- skip hiddens?  here, yes. --*/
-    if (ggobi_stage_get_attr_hidden(d, m)) {
+    if (GGOBI_STAGE_GET_ATTR_HIDDEN(d, m)) {
       continue;
     }
 
@@ -317,13 +318,13 @@ barchart_recalc_group_counts (barchartSPlotd * sp, GGobiStage * d, ggobid * gg)
       bin = sp->bar->index_to_rank.els[i];
 /* --- */
     if ((bin >= 0) && (bin < sp->bar->nbins)) {
-      sp->bar->cbins[bin][ggobi_stage_get_attr_color(d, m)].count++;
+      sp->bar->cbins[bin][ GGOBI_STAGE_GET_ATTR_COLOR(d, m)].count++;
     }
     if (bin == -1) {
-      sp->bar->col_low_bin[ggobi_stage_get_attr_color(d, m)].count++;
+      sp->bar->col_low_bin[ GGOBI_STAGE_GET_ATTR_COLOR(d, m)].count++;
     }
     else if (bin == sp->bar->nbins) {
-      sp->bar->col_high_bin[ggobi_stage_get_attr_color(d, m)].count++;
+      sp->bar->col_high_bin[ GGOBI_STAGE_GET_ATTR_COLOR(d, m)].count++;
     }
   }
 
@@ -846,6 +847,7 @@ barchart_recalc_counts (barchartSPlotd * sp, GGobiStage * d, ggobid * gg)
 
   sp->bar->high_pts_missing = sp->bar->low_pts_missing = FALSE;
 
+  GGOBI_STAGE_ATTR_INIT_ALL(d);  
   if (GGOBI_STAGE_IS_COL_CATEGORICAL(d, rawsp->p1dvar)) {
 
     for (i = 0; i < d->nrows_in_plot; i++) {
@@ -858,7 +860,7 @@ barchart_recalc_counts (barchartSPlotd * sp, GGobiStage * d, ggobid * gg)
       bin = sp->bar->index_to_rank.els[i];
       if ((bin >= 0) && (bin < sp->bar->nbins)) {
         sp->bar->bins[bin].count++;
-        if (ggobi_stage_get_attr_hidden(d, m))
+        if (GGOBI_STAGE_GET_ATTR_HIDDEN(d, m))
           sp->bar->bins[bin].nhidden++;
       }
       rawsp->planar[m].x = (greal) sp->bar->bins[bin].value;
@@ -893,7 +895,7 @@ barchart_recalc_counts (barchartSPlotd * sp, GGobiStage * d, ggobid * gg)
       for (k = 0; k < rank; k++) {
         index = sp->bar->index_to_rank.els[k];
         m = d->rows_in_plot.els[index];
-        if (ggobi_stage_get_attr_hidden(d, m))
+        if (GGOBI_STAGE_GET_ATTR_HIDDEN(d, m))
           sp->bar->low_bin->nhidden++;
       }
     }
@@ -915,7 +917,7 @@ barchart_recalc_counts (barchartSPlotd * sp, GGobiStage * d, ggobid * gg)
         if (yy == sp->bar->breaks[sp->bar->nbins] + sp->bar->offset) {
           bin--;
           sp->bar->bins[bin].count++;
-          if (ggobi_stage_get_attr_hidden(d, m))
+          if (GGOBI_STAGE_GET_ATTR_HIDDEN(d, m))
             sp->bar->bins[bin].nhidden++;
         }
         else {
@@ -931,13 +933,13 @@ barchart_recalc_counts (barchartSPlotd * sp, GGobiStage * d, ggobid * gg)
             sp->bar->high_bin->nhidden = 0;
           }
           sp->bar->high_bin->count++;
-          if (ggobi_stage_get_attr_hidden(d, m))
+          if (GGOBI_STAGE_GET_ATTR_HIDDEN(d, m))
             sp->bar->high_bin->nhidden++;
         }
       }
       else {
         sp->bar->bins[bin].count++;
-        if (ggobi_stage_get_attr_hidden(d, m))
+        if (GGOBI_STAGE_GET_ATTR_HIDDEN(d, m))
           sp->bar->bins[bin].nhidden++;
       }
       rawsp->planar[m].x = bin;
@@ -1178,7 +1180,8 @@ barchart_active_paint_points (splotd * rawsp, GGobiStage * d, ggobid * gg)
     if (!d->missings_show_p && ggobi_stage_is_missing(d, m, rawsp->p1dvar))
       continue;
 
-    if (ggobi_stage_get_attr_hidden(d, m) &&
+    GGOBI_STAGE_ATTR_INIT_ALL(d);  
+    if (GGOBI_STAGE_GET_ATTR_HIDDEN(d, m) &&
         (cpanel->br.point_targets != br_shadow
          && cpanel->br.point_targets != br_unshadow)) {
       continue;

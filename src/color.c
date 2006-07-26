@@ -323,6 +323,7 @@ datad_colors_used_get (gint * ncolors_used, gushort * colors_used,
     /**/ return -1;
 
   n = 0;  /*-- *ncolors_used --*/
+  GGOBI_STAGE_ATTR_INIT_ALL(d);  
 
   /*
    * Loop once through d->color[], collecting the colors currently
@@ -330,19 +331,19 @@ datad_colors_used_get (gint * ncolors_used, gushort * colors_used,
    */
   for (i = 0; i < d->nrows_in_plot; i++) {
     m = d->rows_in_plot.els[i];
-    if (ggobi_stage_get_attr_hidden(d, m)) {  /*-- if it's hidden, we don't care --*/
+    if (GGOBI_STAGE_GET_ATTR_HIDDEN(d, m)) {  /*-- if it's hidden, we don't care --*/
       new_color = false;
     } else {
       new_color = true;
       for (k = 0; k < n; k++) {
-        if (colors_used[k] == ggobi_stage_get_attr_color(d, m)) {
+        if (colors_used[k] == GGOBI_STAGE_GET_ATTR_COLOR(d, m)) {
           new_color = false;
           break;
         }
       }
     }
     if (new_color) {
-      colorid = ggobi_stage_get_attr_color(d, m);
+      colorid = GGOBI_STAGE_GET_ATTR_COLOR(d, m);
       colors_used[n] = colorid;
       maxcolorid = MAX (colorid, maxcolorid);
       (n)++;
@@ -366,7 +367,7 @@ datad_colors_used_get (gint * ncolors_used, gushort * colors_used,
   /* insurance -- eg if using mono drawing on a color screen */
   if (n == 0) {
     n = 1;
-    colors_used[0] = ggobi_stage_get_attr_color(d, 0);
+    colors_used[0] = GGOBI_STAGE_GET_ATTR_COLOR(d, 0);
   }
 
   *ncolors_used = n;

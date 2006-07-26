@@ -31,8 +31,9 @@ find_nearest_point (icoords * lcursor_pos, splotd * splot, GGobiStage * d,
   npoint = -1;
   near = 20 * 20;               /* If nothing is close, don't show any label */
 
+  GGOBI_STAGE_ATTR_INIT_ALL(d);  
   for (i = 0; i < d->nrows_in_plot; i++) {
-    if (!ggobi_stage_get_attr_hidden(d, k = d->rows_in_plot.els[i])) {
+    if (!GGOBI_STAGE_GET_ATTR_HIDDEN(d, k = d->rows_in_plot.els[i])) {
       xdist = splot->screen[k].x - lcursor_pos->x;
       ydist = splot->screen[k].y - lcursor_pos->y;
       sqdist = xdist * xdist + ydist * ydist;

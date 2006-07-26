@@ -75,9 +75,10 @@ splot_hidden_edge (gint m, GGobiStage * d, GGobiStage * e,
   gboolean hiddenp = false;
   endpointsd *endpoints;
 
+  GGOBI_STAGE_ATTR_INIT_ALL(e);  
   endpoints = resolveEdgePoints (e, d);
   if (endpoints && edge_endpoints_get (m, &a, &b, d, endpoints, e))
-    if (ggobi_stage_get_attr_hidden(e, m) || ggobi_stage_get_attr_hidden(d, a) || ggobi_stage_get_attr_hidden(d, b))
+    if (GGOBI_STAGE_GET_ATTR_HIDDEN(e, m) || GGOBI_STAGE_GET_ATTR_HIDDEN(d, a) || GGOBI_STAGE_GET_ATTR_HIDDEN(d, b))
       hiddenp = true;
 
   /*-- can prevent drawing of missings for parcoords or scatmat plots --*/
@@ -135,16 +136,17 @@ splot_edges_draw (splotd * sp, gboolean draw_hidden, GdkDrawable * drawable,
         for (p = 0; p < ncolors; p++)
           symbols_used[k][n][p] = 0;
 
+    GGOBI_STAGE_ATTR_INIT_ALL(e);  
     for (i = 0; i < e->nrows_in_plot; i++) {
       m = e->rows_in_plot.els[i];
       /* If we're drawing hiddens and this is hidden and plottable ... */
       if (((draw_hidden && splot_hidden_edge (m, d, e, sp, display, gg)) ||
            /* Or if we're not drawing hiddens and this isn't hidden ... */
-           (!draw_hidden && !ggobi_stage_get_attr_hidden(e, m)))) {
+           (!draw_hidden && !GGOBI_STAGE_GET_ATTR_HIDDEN(e, m)))) {
 
-        gtype = ggobi_stage_get_attr_type(e, m);
+        gtype = GGOBI_STAGE_GET_ATTR_TYPE(e, m);
         ltype = ltype_from_gtype (gtype);
-        symbols_used[ggobi_stage_get_attr_size(e, m)][ltype][ggobi_stage_get_attr_color(e, m)]++;
+        symbols_used[ GGOBI_STAGE_GET_ATTR_SIZE(e, m)][ltype][ GGOBI_STAGE_GET_ATTR_COLOR(e, m)]++;
       }
     }
 
@@ -192,11 +194,11 @@ splot_edges_draw (splotd * sp, gboolean draw_hidden, GdkDrawable * drawable,
 
               edge_endpoints_get (j, &a, &b, d, endpoints, e);
 
-              gtype = ggobi_stage_get_attr_type(e, j);
+              gtype = GGOBI_STAGE_GET_ATTR_TYPE(e, j);
               ltype = ltype_from_gtype (gtype);
 
-              if (ggobi_stage_get_attr_color(e, j) == p &&
-                  ltype == n && ggobi_stage_get_attr_size(e, j) == k) {
+              if (GGOBI_STAGE_GET_ATTR_COLOR(e, j) == p &&
+                  ltype == n && GGOBI_STAGE_GET_ATTR_SIZE(e, j) == k) {
                 if (edges_show_p) {
                   if (endpoints[j].jpartner == -1) {
                     sp->edges[nl].x1 = sp->screen[a].x;
@@ -316,11 +318,12 @@ splot_add_edge_highlight_cue (splotd * sp, GdkDrawable * drawable, gint k,
  * How to distinguish between sticky and nearest edges?
 */
   /*-- draw a thickened line only for nearest --*/
+  GGOBI_STAGE_ATTR_INIT_ALL(e);  
   if (nearest && draw_edge) {
     gdk_gc_set_line_attributes (gg->plot_GC,
                                 3, GDK_LINE_SOLID, GDK_CAP_ROUND,
                                 GDK_JOIN_ROUND);
-    gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[ggobi_stage_get_attr_color(e, k)]);
+    gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[ GGOBI_STAGE_GET_ATTR_COLOR(e, k)]);
 
     if (endpoints[k].jpartner == -1) {
       gdk_draw_line (drawable, gg->plot_GC,
@@ -409,7 +412,8 @@ splot_add_identify_edge_cues (splotd * sp, GdkDrawable * drawable, gint k,
   if (k >= ggobi_stage_get_n_edges(e))
     return;
 
-  if (ggobi_stage_get_attr_hidden(e, k))
+  GGOBI_STAGE_ATTR_INIT_ALL(e);  
+  if (GGOBI_STAGE_GET_ATTR_HIDDEN(e, k))
     return;
 
   if (GGOBI_IS_EXTENDED_SPLOT (sp)) {

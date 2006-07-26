@@ -923,6 +923,7 @@ setHidden (const xmlChar ** attrs, XMLParserData * data, gint i)
   const gchar *tmp;
   GGobiStage *d = getCurrentXMLData (data);
 
+  GGOBI_STAGE_ATTR_INIT_ALL(d);  
   tmp = getAttribute (attrs, "hidden");
   if (tmp) {
     gboolean hidden = asLogical (tmp);
@@ -931,7 +932,7 @@ setHidden (const xmlChar ** attrs, XMLParserData * data, gint i)
       data->defaults.hidden = hidden;
     }
     else
-      ggobi_stage_set_attr_hidden(d, i, hidden, ATTR_SET_PERSISTENT);
+      GGOBI_STAGE_SET_ATTR_HIDDEN(d, i, hidden, ATTR_SET_PERSISTENT);
   }
 
   return (tmp != NULL);
@@ -957,6 +958,7 @@ setColor (const xmlChar ** attrs, XMLParserData * data, gint i)
   const gchar *tmp;
   gint value = data->defaults.color;
   GGobiStage *d = getCurrentXMLData (data);
+  GGOBI_STAGE_ATTR_INIT_ALL(d);  
   colorschemed *scheme = data->gg->activeColorScheme;
 
   tmp = getAttribute (attrs, "color");
@@ -971,7 +973,7 @@ setColor (const xmlChar ** attrs, XMLParserData * data, gint i)
     if (i < 0)
       data->defaults.color = value;
     else
-      ggobi_stage_set_attr_color(d, i, value, ATTR_SET_PERSISTENT);
+      GGOBI_STAGE_SET_ATTR_COLOR(d, i, value, ATTR_SET_PERSISTENT);
   }
 
   return (value != -1);
@@ -1069,9 +1071,10 @@ setGlyph (const xmlChar ** attrs, XMLParserData * data, gint i)
   if (i >= 0) {
     if (type != -1) type = data->defaults.glyphType;
     if (size != -1) type = data->defaults.glyphSize;
+    GGOBI_STAGE_ATTR_INIT_ALL(d);  
     
-    if (type != -1) ggobi_stage_set_attr_type(d, i, type, ATTR_SET_PERSISTENT);
-    if (size != -1) ggobi_stage_set_attr_size(d, i, size, ATTR_SET_PERSISTENT);    
+    if (type != -1) GGOBI_STAGE_SET_ATTR_TYPE(d, i, type, ATTR_SET_PERSISTENT);
+    if (size != -1) GGOBI_STAGE_SET_ATTR_SIZE(d, i, size, ATTR_SET_PERSISTENT);    
   }
 
 

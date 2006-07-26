@@ -277,8 +277,9 @@ write_xml_record (FILE *f, GGobiStage *d, ggobid *gg, gint i,
   /*-- ids if present --*/
   fprintf(f, " id=\"%s\"", ggobi_stage_get_row_id(d, i));
 
+  GGOBI_STAGE_ATTR_INIT_ALL(d);  
   /*-- if the record is hidden, indicate that --*/
-  if (ggobi_stage_get_attr_hidden(d, i)) {
+  if (GGOBI_STAGE_GET_ATTR_HIDDEN(d, i)) {
     fprintf(f, " hidden=\"true\"");
   }
 
@@ -289,19 +290,19 @@ write_xml_record (FILE *f, GGobiStage *d, ggobid *gg, gint i,
   }
 
   if (!xmlWriteInfo->useDefault ||
-      xmlWriteInfo->defaultColor != ggobi_stage_get_attr_color(d, i))
+      xmlWriteInfo->defaultColor != GGOBI_STAGE_GET_ATTR_COLOR(d, i))
   {
-    fprintf(f, " color=\"%d\"", ggobi_stage_get_attr_color(d, i));
+    fprintf(f, " color=\"%d\"", (gint) GGOBI_STAGE_GET_ATTR_COLOR(d, i));
   }
 
 
   if (!xmlWriteInfo->useDefault ||
-     xmlWriteInfo->defaultGlyphType != ggobi_stage_get_attr_type(d, i) ||
-     xmlWriteInfo->defaultGlyphSize != ggobi_stage_get_attr_size(d, i)) 
+     xmlWriteInfo->defaultGlyphType != GGOBI_STAGE_GET_ATTR_TYPE(d, i) ||
+     xmlWriteInfo->defaultGlyphSize != GGOBI_STAGE_GET_ATTR_SIZE(d, i)) 
   {
     fprintf (f, " glyph=\"%s %d\"", 
-      GlyphNames[ggobi_stage_get_attr_type(d, i)], 
-      ggobi_stage_get_attr_size(d, i));
+      GlyphNames[ GGOBI_STAGE_GET_ATTR_TYPE(d, i)], 
+      (gint) GGOBI_STAGE_GET_ATTR_SIZE(d, i));
   }
 
   fprintf(f, ">\n");
@@ -437,11 +438,12 @@ updateXmlWriteInfo(GGobiStage *d, ggobid *gg, XmlWriteInfo *info)
   numGlyphSizes = NGLYPHSIZES;
   glyphSizeCounts = g_malloc0(sizeof(gint) * numGlyphSizes);
 
+  GGOBI_STAGE_ATTR_INIT_ALL(d);  
   n = ggobi_nrecords(d);
   for(i = 0 ; i < n ; i++) {
-    colorCounts[ggobi_stage_get_attr_color(d, i)]++;
-    glyphSizeCounts[ggobi_stage_get_attr_size(d, i)]++;
-    glyphTypeCounts[ggobi_stage_get_attr_type(d, i)]++;
+    colorCounts[ GGOBI_STAGE_GET_ATTR_COLOR(d, i)]++;
+    glyphSizeCounts[ GGOBI_STAGE_GET_ATTR_SIZE(d, i)]++;
+    glyphTypeCounts[ GGOBI_STAGE_GET_ATTR_TYPE(d, i)]++;
   }
 
   count = -1;

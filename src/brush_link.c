@@ -110,11 +110,12 @@ brush_link_by_var (gint jlinkby, vector_b * levelv,
 {
   gint m, i, level_value;
 
+  GGOBI_STAGE_ATTR_INIT_ALL(d); 
   for (m = 0; m < d->nrows_in_plot; m++) {
     i = d->rows_in_plot.els[m];
 
-    level_value = ggobi_stage_get_int_value(d, i, jlinkby);
-    ggobi_stage_brush_point(d, i, levelv->els[level_value], cpanel->br.point_targets, cpanel->br.mode);
+    level_value = (gint) ggobi_stage_get_raw_value(d, i, jlinkby);
+    GGOBI_STAGE_BRUSH_POINT(d, i, levelv->els[level_value], cpanel->br.point_targets, cpanel->br.mode);
   }
 }
 
@@ -143,7 +144,7 @@ build_symbol_vectors_by_var (cpaneld * cpanel, GGobiStage * d, ggobid * gg)
   /*-- find the levels which are among the points under the brush --*/
   for (m = 0; m < d->nrows_under_brush; m++) {
     i = d->rows_under_brush.els[m];
-    level_value = ggobi_stage_get_int_value(d, i, j);
+    level_value = (gint) ggobi_stage_get_raw_value(d, i, j);
     levelv.els[level_value] = true;
   }
 

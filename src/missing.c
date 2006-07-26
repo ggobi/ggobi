@@ -61,14 +61,15 @@ missings_datad_cb (GtkWidget * w, ggobid * gg)
 
     ggobi_stage_set_col_name(dnew, j, ggobi_stage_get_col_name(d, k));
     for (i = 0; i < d->n_rows; i++) {
-      ggobi_stage_set_categorical_value(dnew, i, j, lnames[(gint) ggobi_stage_is_missing(d, i, k)]);
+      ggobi_stage_set_categorical_value(dnew, i, j, lnames[ ggobi_stage_is_missing(d, i, k)]);
     }
   }
 
+  GGOBI_STAGE_ATTR_INIT_ALL(d);  
   for (i = 0; i < d->n_rows; i++) {
-    ggobi_stage_set_attr_color(dnew, i, ggobi_stage_get_attr_color(d, i), ATTR_SET_PERSISTENT);
-    ggobi_stage_set_attr_size(dnew, i, ggobi_stage_get_attr_size(d, i), ATTR_SET_PERSISTENT);
-    ggobi_stage_set_attr_type(dnew, i, ggobi_stage_get_attr_type(d, i), ATTR_SET_PERSISTENT);
+    GGOBI_STAGE_SET_ATTR_COLOR(dnew, i, GGOBI_STAGE_GET_ATTR_COLOR(d, i), ATTR_SET_PERSISTENT);
+    GGOBI_STAGE_SET_ATTR_SIZE(dnew, i, GGOBI_STAGE_GET_ATTR_SIZE(d, i), ATTR_SET_PERSISTENT);
+    GGOBI_STAGE_SET_ATTR_TYPE(dnew, i, GGOBI_STAGE_GET_ATTR_TYPE(d, i), ATTR_SET_PERSISTENT);
     //dnew->color.els[i] = d->color.els[i];
     //dnew->color_now.els[i] = d->color_now.els[i];
     //dnew->glyph.els[i].type = d->glyph.els[i].type;

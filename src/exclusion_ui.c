@@ -129,11 +129,12 @@ hide_cluster_cb (GtkToggleButton * btn, gpointer cbd)
   GGobiStage *d = datad_get_from_notebook (gg->cluster_ui.notebook, gg);
   gboolean changed = false;
 
+  GGOBI_STAGE_ATTR_INIT_ALL(d);  
   /*-- operating on the current sample, whether hidden or shown --*/
   for (i = 0; i < d->n_rows; i++) {
     if (d->sampled.els[i]) {
       if (d->clusterid.els[i] == k) {
-        if (ggobi_stage_set_attr_hidden(d, i, btn->active, ATTR_SET_PERSISTENT)) {
+        if (GGOBI_STAGE_SET_ATTR_HIDDEN(d, i, btn->active, ATTR_SET_PERSISTENT)) {
           changed = symbol_link_by_id (true, i, d, gg) || changed;
         }
       }
@@ -157,9 +158,10 @@ include_hiddens (gboolean include, GGobiStage * d, ggobid * gg)
   cpaneld *cpanel = &dsp->cpanel;
   gboolean prev, changed = false;
 
+  GGOBI_STAGE_ATTR_INIT_ALL(d);  
   for (i = 0; i < d->n_rows; i++) {
     prev = d->excluded.els[i];
-    d->excluded.els[i] = (!include && ggobi_stage_get_attr_hidden(d, i));
+    d->excluded.els[i] = (!include && GGOBI_STAGE_GET_ATTR_HIDDEN(d, i));
     if ((prev != d->excluded.els[i]) && !gg->linkby_cv) {
       /*-- this doesn't link the value of excluded --*/
       changed = changed || exclude_link_by_id (i, d, gg);
@@ -288,17 +290,18 @@ cluster_symbol_cb (GtkWidget * w, GdkEventExpose * event, gpointer cbd)
     return true;
   }
 
+  GGOBI_STAGE_ATTR_INIT_ALL(d);  
   for (m = 0; m < d->nrows_in_plot; m++) {
     i = d->rows_in_plot.els[m];
     if (d->clusterid.els[i] == n) {
       if (targets == br_candg || targets == br_color) {
-        ggobi_stage_set_attr_color(d, i, gg->color_id, ATTR_SET_TRANSIENT);
+        GGOBI_STAGE_SET_ATTR_COLOR(d, i, gg->color_id, ATTR_SET_TRANSIENT);
         /*-- this will be done multiple times, but who cares? --*/
         d->clusv[n].color = gg->color_id;
       }
       if (targets == br_candg || targets == br_glyph) {
-        ggobi_stage_set_attr_size(d, i, (&gg->glyph_id)->size, ATTR_SET_PERSISTENT);
-        ggobi_stage_set_attr_type(d, i, (&gg->glyph_id)->type, ATTR_SET_PERSISTENT);
+        GGOBI_STAGE_SET_ATTR_SIZE(d, i, (&gg->glyph_id)->size, ATTR_SET_PERSISTENT);
+        GGOBI_STAGE_SET_ATTR_TYPE(d, i, (&gg->glyph_id)->type, ATTR_SET_PERSISTENT);
         /*-- this will be done multiple times, but who cares? --*/
         d->clusv[n].glyphtype = gg->glyph_id.type;
         d->clusv[n].glyphsize = gg->glyph_id.size;
