@@ -361,7 +361,7 @@ button_release_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
   gdk_pointer_ungrab (event->time);  /*-- grabbed in mousepos_get_pressed --*/
 
   if (cpanel->br.mode == BR_PERSISTENT) {
-    rows_in_plot_set (d, gg);
+    //rows_in_plot_set (d, gg);
 
     if (GGOBI_IS_EXTENDED_SPLOT (sp)) {
       void (*f) (GGobiData *, splotd *, ggobid *);

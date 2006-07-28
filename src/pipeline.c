@@ -356,7 +356,7 @@ rows_in_plot_set (GGobiData * d, ggobid * gg)
       d->rows_in_plot.els[d->nrows_in_plot++] = i;
 
   klass = GGOBI_DATA_GET_CLASS (d);
-  g_signal_emit_by_name (G_OBJECT (d), "rows-in-plot-changed", 0, nprev, -1, gg); /* the argument shown with -1 has no current use */
+  g_signal_emit_by_name (G_OBJECT (d), "rows-in-plot-changed", 0, nprev, gg);
 
   return;                       /* (nprev == d->nrows_in_plot); */
 }
