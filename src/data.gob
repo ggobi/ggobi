@@ -211,8 +211,8 @@ constructor (GType type, guint n_construct_properties, GObjectConstructParam *co
   d->nrows_in_plot = d->nrows;  /*-- for now --*/
 
   arrayf_alloc (&d->raw, d->nrows, d->ncols); //FIXME: probably leaks memory
-  arrays_alloc (&d->missing, d->nrows, d->ncols);
-  //arrays_alloc_zero (&d->missing, d->nrows, d->ncols);
+  //arrays_alloc (&d->missing, d->nrows, d->ncols);
+  arrays_alloc_zero (&d->missing, d->nrows, d->ncols);
 
   rowlabels_alloc (d);
 
@@ -332,7 +332,6 @@ set_missing (self, guint i, guint j)
 {
   self->missing.vals[i][j] = 1;
   self->raw.vals[i][j] = 0;
-
   self->missings = TRUE;
 }
 
