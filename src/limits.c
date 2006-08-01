@@ -96,7 +96,7 @@ limits_raw_set_by_var (GGobiData * d, gint j, gboolean visible_only)
       else {
         if (d->raw.vals[i][j] < min)
           min = d->raw.vals[i][j];
-        else if (d->raw.vals[i][j] > max)
+        if (d->raw.vals[i][j] > max)
           max = d->raw.vals[i][j];
       }
     }
@@ -107,7 +107,7 @@ limits_raw_set_by_var (GGobiData * d, gint j, gboolean visible_only)
       else {
         if (d->raw.vals[i][j] < min)
           min = d->raw.vals[i][j];
-        else if (d->raw.vals[i][j] > max)
+        if (d->raw.vals[i][j] > max)
           max = d->raw.vals[i][j];
       }
     }
@@ -152,7 +152,7 @@ limits_tform_set_by_var (GGobiData * d, gint j, gboolean visible_only)
       else {
         if (d->tform.vals[i][j] < min)
           min = d->tform.vals[i][j];
-        else if (d->tform.vals[i][j] > max)
+        if (d->tform.vals[i][j] > max)
           max = d->tform.vals[i][j];
       }
     }
@@ -163,7 +163,7 @@ limits_tform_set_by_var (GGobiData * d, gint j, gboolean visible_only)
       else {
         if (d->tform.vals[i][j] < min)
           min = d->tform.vals[i][j];
-        else if (d->tform.vals[i][j] > max)
+        if (d->tform.vals[i][j] > max)
           max = d->tform.vals[i][j];
       }
     }
@@ -193,7 +193,7 @@ limits_display_set_by_var (GGobiData * d, gint j, gboolean visible_only)
       else {
         if (d->tform.vals[i][j] < min)
           min = d->tform.vals[i][j];
-        else if (d->tform.vals[i][j] > max)
+        if (d->tform.vals[i][j] > max)
           max = d->tform.vals[i][j];
 
         sum += d->tform.vals[i][j];
@@ -210,7 +210,7 @@ limits_display_set_by_var (GGobiData * d, gint j, gboolean visible_only)
       else {
         if (d->tform.vals[i][j] < min)
           min = d->tform.vals[i][j];
-        else if (d->tform.vals[i][j] > max)
+        if (d->tform.vals[i][j] > max)
           max = d->tform.vals[i][j];
 
         sum += d->tform.vals[i][j];

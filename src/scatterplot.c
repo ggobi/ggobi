@@ -483,7 +483,6 @@ ruler_motion_cb (GtkWidget * ruler, GdkEventMotion * event, GtkWidget * da)
 
   gtk_ruler_get_range (GTK_RULER (ruler), &lower, &upper, NULL, NULL);
   position = lower + pos * (upper - lower) / max;
-
   g_object_set (G_OBJECT (ruler), "position", position, NULL);
 
   return (false);
