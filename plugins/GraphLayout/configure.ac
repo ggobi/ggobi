@@ -24,7 +24,7 @@ GGOBI_CONFIG_PLUGIN([../..])
 AC_PROG_LIBTOOL
 
 PKG_CHECK_MODULES(LIBGVC, [libgvc >= 2.3],
-	AC_DEFINE_UNQUOTED([HAVE_LIBGVC], [1], [whether the system has support for libgvc - graphviz])
+	AC_DEFINE_UNQUOTED([HAVE_LIBGVC], [1], [whether the system has support for libgvc - graphviz]),
 	[HAVE_LIBGVC=0])
 AC_SUBST(LIBGVC_CFLAGS)
 AC_SUBST(LIBGVC_LIBS)
