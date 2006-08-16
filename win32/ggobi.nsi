@@ -34,6 +34,9 @@ Section "GGobi"
 	File ..\share\colorschemes.xml
 	
 	# Install the built plugins
+	SetOutPath $INSTDIR\plugins\GraphLayout
+	File ..\plugins\GraphLayout\plugin.la
+	File ..\plugins\GraphLayout\.libs\plugin-0.dll
 	SetOutPath $INSTDIR\plugins\DataViewer
 	File ..\plugins\DataViewer\plugin.la
 	File ..\plugins\DataViewer\.libs\plugin-0.dll
