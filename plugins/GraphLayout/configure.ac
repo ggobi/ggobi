@@ -23,7 +23,7 @@ AM_INIT_AUTOMAKE
 GGOBI_CONFIG_PLUGIN([../..])
 AC_PROG_LIBTOOL
 
-PKG_CHECK_MODULES(LIBGVC, [libgvc >= 2.3],
+PKG_CHECK_MODULES(LIBGVC, libgvc,
 	AC_DEFINE_UNQUOTED([HAVE_LIBGVC], [1], [whether the system has support for libgvc - graphviz]),
 	[HAVE_LIBGVC=0])
 AC_SUBST(LIBGVC_CFLAGS)
