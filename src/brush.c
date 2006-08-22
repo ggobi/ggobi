@@ -872,8 +872,7 @@ active_paint_points (splotd * sp, GGobiData * d, ggobid * gg)
           }
           if (splot_plot_case (pt, d, sp, display, gg)) {
             if (under_brush (pt, sp)) {
-              if (pt < 100)
-                d->npts_under_brush++;
+              d->npts_under_brush++;
               d->pts_under_brush.els[pt] = 1;
             }
           }
