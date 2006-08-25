@@ -31,7 +31,8 @@ if test "${prefix}" = "NONE"; then
 fi
 
 # Remember where our GGobi data is installed
-GGOBI_DATADIR=`eval echo "${prefix}/share"`
+GGOBI_DATADIR_TMP=`eval echo ${datadir}`
+GGOBI_DATADIR=`eval echo "${GGOBI_DATADIR_TMP}"`
 AC_DEFINE_UNQUOTED([GGOBI_DATADIR], "$GGOBI_DATADIR", [Location of GGobi data installation])
 
 # Initialize gettext
