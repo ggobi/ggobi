@@ -58,11 +58,12 @@ Deborah F. Swayne, AT\&T Labs -- Research \\
 Di Cook, Iowa State University \\
 Andreas Buja, The Wharton School, University of Pennsylvania \\
 Duncan Temple Lang, University of California at Davis \\
+Heike Hofmann,  Iowa State University \\
 Hadley Wickham, Iowa State University \\
 Michael Lawrence, Iowa State University 
 }
 
-\date{January 2006}
+\date{September 2006}
 
 \maketitle
 
@@ -128,40 +129,41 @@ We begin with a tutorial, and move on to describe GGobi in detail.
 
 Several sample data files are included with the GGobi distribution, in
 a directory called \File{data,} and there you will find the file
-\File{olive.xml}, a dataset on olive oil samples from Italy
-\cite{FALT83}.  This data set uses an XML format.  The olive oil data
-consists of the percentage composition of 8 fatty acids (palmitic,
-palmitoleic, stearic, oleic, linoleic, linolenic, arachidic,
-eicosenoic) found in the lipid fraction of 572 Italian olive
-oils. There are 9 collection areas, 4 from southern Italy (North and
-South Apulia, Calabria, Sicily), two from Sardinia (Inland and
+\File{olive.csv}, a dataset on olive oil samples from Italy
+\cite{FALT83}.  This data set uses comma-delimited format. Another
+file on the same data \File{olive.xml} uses XML format, which allows
+for specific descriptions of colors and symbols of points.  The olive
+oil data consists of the percentage composition of 8 fatty acids
+(palmitic, palmitoleic, stearic, oleic, linoleic, linolenic,
+arachidic, eicosenoic) found in the lipid fraction of 572 Italian
+olive oils. There are 9 collection areas, 4 from southern Italy (North
+and South Apulia, Calabria, Sicily), two from Sardinia (Inland and
 Coastal) and 3 from northern Italy (Umbria, East and West Liguria).
 
 The data is part of a quality control study of olive oils. It is proposed
 that the olive oils from different regions have different fatty acid
 signatures.
 
-Start GGobi for the olive oils data by typing:
-
-\begin{verbatim}
-ggobi olive
-\end{verbatim}
+Start {\tt ggobi} and open in the comma-delimited olive oils data
+using the {\tt FIle} menu.
 
 Two windows will appear, the GGobi console
 and a scatterplot, as shown in Figure~\ref{fig1}.
 
-The console has a panel of controls on the left, labeled \Widget{XYPlot}, and a variable selection region on the right.  You can see
-that the scatterplot contains a 2-dimensional projection of the data,
-a plot of Area vs Region.  Move the mouse to one of the variable labels
-in the variable selection region, and leave it in place until the
-tooltip appears, explaining how to select new variables for the
-plot.   Begin to get a feeling for the data by looking at several of
-the 2d plots:  Area vs palmitic, Region vs oleic, etc.
+The console has a panel of controls on the left, labeled
+\Widget{XY Plot}, and a variable selection region on the right.  You
+can see that the scatterplot contains a 2-dimensional projection of
+the data, a plot of Area vs Region.  Move the mouse to one of the
+variable labels in the variable selection region, and leave it in
+place until the tooltip appears, explaining how to select new
+variables for the plot.  Begin to get a feeling for the data by
+looking at several of the 2d plots: Area vs palmitic, Region vs oleic,
+etc.
 
 \begin{figure}[h]
 %\epsfxsize 6in \centerline{\epsfbox{figures/manual1.ps}}
-\hbox{\pdfimage width 3in {Figures/olive1.jpg}
-      \pdfimage width 3in {Figures/olive2.jpg}
+\centerline{\pdfimage width 3in {Figures/olive1.png}
+      \pdfimage width 2.9in {Figures/olive2.png}
 }
 %\vspace{.15in} \centerline{ \parbox{6in}
 \caption{Layout of a ggobi session.  The plotting window contains a
@@ -175,6 +177,8 @@ exploring each of its menus.  Pay particular attention to the
 Display, View, Interaction and Tools menus.
 
 \begin {itemize}
+\item The File menu contains the usual open and save data, option
+setting and close actions.
 \item The Display menu is the interface for opening new plotting
   windows.
 \item The View menu is the interface for specifying the
@@ -189,22 +193,36 @@ Display, View, Interaction and Tools menus.
   characteristics of the data and the view.
 \end {itemize}
 
-Using the Interaction menu, choose \Widget{Identify}. Look at the buttons
-inside the leftmost portion of the ggobi console. Notice that they're
-contained by a frame labeled \Widget{Identify,} which is the interaction mode
-of the current plot.  This frame contains most of the row labeling
-controls, which are described in section \ref{slbl:Identify}. Move the
-cursor around the plot window using the mouse, and observe the labels
-of the point closest to the cursor.  The labels for this data set show
-the geographic area where the sample was taken.
+Using the Interaction menu, choose \Widget{Identify} (Figure
+\ref{fig:identify}). Look at the buttons inside the leftmost portion
+of the ggobi console. Notice that they're contained by a frame labeled
+\Widget{Identify,} which is the interaction mode of the current plot.
+This frame contains most of the row labeling controls, which are
+described in section \ref{slbl:Identify}. There are several options
+for writing labels in the plot window. The default is the record
+label. Highlight the Region and Area in this panel, then the labels
+will be the geographic area. Move the cursor around the plot window
+using the mouse, and observe the labels of the point closest to the
+cursor.  The labels show the geographic area where the sample was
+taken. Using the variable checkboxes on the main ggobi control window
+change the variables shown to be linoleic plotted against eicosenoic.
 
-Using the Display menu, open a barchart display. Notice that the new
-window has a narrow white band drawn around the outside of the plotting
-area:  that means that the new window is now the ``current display''
-and its plot is the ``current plot.''  Click in the plotting region
-of the other scatterplot to make it the current plot, and notice what
-happens in the console when you alternate between the two.  Both the
-controls and the variable selection region correspond to the current plot.
+\begin{figure}[htp]
+\begin{center}
+\includegraphics[width=2.5in]{Figures/olive-identifypanel.png}\hspace{0.2in}\includegraphics[width=2.5in]{Figures/olive-identify.png}
+\end{center}
+\caption{The \Widget{Identify} panel and the labels showing in the plot window.}
+\label{fig:identify}
+\end{figure}
+
+Open a second display window, showing a barchart, using the Display
+menu. Notice that the new window has a narrow white band drawn around
+the outside of the plotting area: that means that the new window is
+now the ``current display'' and its plot is the ``current plot.''
+Click in the plotting region of the other scatterplot to make it the
+current plot, and notice what happens in the console when you
+alternate between the two.  Both the controls and the variable
+selection region correspond to the current plot.
 
 Now set up a plot of linoleic vs eicosenoic in the first scatterplot,
 and disply Region in the barchart, and make the barchart the current
@@ -234,7 +252,7 @@ is one way to explore the relationship among three variables.
 
 \begin{figure}[htp]
 \begin{center}
-\includegraphics[width=4in]{Figures/olive-colorchoose.jpg}
+\includegraphics[width=2.5in]{Figures/olive-brushpanel.png}\hspace{0.2in}\includegraphics[width=3.5in]{Figures/olive-colorchoose.png}
 \end{center}
 \caption{The chooser for selecting color and glyph for painting points,
 as well as type and thickness for painting lines. It also allows setting
@@ -245,8 +263,8 @@ colors.
 \end{figure}
 
 \begin{figure}[htp]
-\hbox{\pdfimage width 3in {Figures/olive-brush1.jpg}
-      \pdfimage width 3in {Figures/olive-brush2.jpg}
+\centerline{\pdfimage width 3in {Figures/olive-brush1.png}
+      \pdfimage width 3in {Figures/olive-brush2.png}
 }
 \caption{Brushing in a GGobi session. Brushing Region 1 shows that it
 corresponds to a cohesive cluster in the variables linoleic and 
@@ -274,19 +292,6 @@ But that was just an instructive detour; click ``Reset all'' to
 to turn off standardization and any other transformations you've
 explored.
 
-\begin{figure}[htp]
-%\vspace{-0.5in}
-%\epsfxsize 6in \centerline{\epsfbox{figures/manual1.ps}}
-\pdfimage width 6in {Figures/olive-var.jpg}
-%\vspace{.15in} \centerline{ \parbox{6in}
-\caption{The variable manipulation panel contains basic summary 
-statistics of variables. It can also be used for adding new variables
-and for variable subset selection before launching multi-plot
-displays.
-}%}
-\label{fig4}
-\end{figure}
-
 Now look at the plot of linoleic vs eicosenoic. Open up the
 \Widget{Color \& glyph groups ...} tool, and experiment with it: Use
 the ``Shadow'' toggle buttons to have groups of points drawn in a dim
@@ -297,7 +302,7 @@ region 1, and then use \Widget{Exclude shadows} to remove them from
 consideration.
 
 \begin{figure}[htp]
-\hbox{\pdfimage width 3in {Figures/olive-brush3.jpg}\pdfimage width 3.5in {Figures/olive-brush4.jpg}}
+\centerline{\pdfimage width 3in {Figures/olive-brush3.png}\hspace{0.2in}\pdfimage width 2.5in {Figures/olive-brush4.png}}
 \caption{Toggling clusters of points on and off according to color/glyph value.}
 \label{fig5}
 \end{figure}
@@ -330,15 +335,15 @@ the mouse, inducing a rotation of the scattercloud.  If the axes are
 still showing in the scatterplot window, the axis in magenta
 corresponds to the variable you're manipulating.  Similarly rotate
 oleic acid and arachidic acid in and out of the plot, with the aim of
-finding a projection where the two regions are well separated (for
-example, Figure \ref{fig6}).  There are 5 choices of manipulation mode
-(unconstrained oblique, vertical, horizontal, radial and angular) to
-explore.
+finding a projection where the two regions are well separated.  There
+are 5 choices of manipulation mode (unconstrained oblique, vertical,
+horizontal, radial and angular) to explore.
 
 \begin{figure}[htp]
-\hbox{\pdfimage width 3in {Figures/olive-tour1.jpg}\pdfimage width 3in {Figures/olive-tour2.jpg}}
-\caption{Tour plots revealing difference between regions 2 and 3 of the
-olive oils.}
+\centerline{\pdfimage width 3in {Figures/olive-tourpanel.png}\hspace{0.2in}\pdfimage width 2.5in {Figures/olive-tour1.png}}
+\caption{(Left) Tour panel showing the controls for the tour, and
+(right) a tour projection revealing a difference between regions 2 and
+3 of the olive oils.}
 \label{fig6}
 \end{figure}
 
@@ -352,6 +357,17 @@ or use the control and shift keys as modifiers to select more than one.
 Select all the fatty acid variables, all of which are in the table
 of real variables.
 
+\begin{figure}[htp]
+\centerline{\pdfimage width 3.2in {Figures/olive-var1.png}
+\pdfimage width 3.2in {Figures/olive-var2.png}}
+\caption{The variable manipulation panel contains basic summary 
+statistics of variables. It can also be used for adding new variables
+and for variable subset selection before launching multi-plot
+displays.
+}%}
+\label{fig4}
+\end{figure}
+
 Open a parallel coordinates display using the \Widget{Display} menu.
 Select the first plot in the parallel coordinates display by
 clicking on it, and use the \Widget{Interaction} menu to switch to 
@@ -361,7 +377,7 @@ and transiently paint the case with a very low value on palmitic
 acid, and low value for linolenic acid.
 
 \begin{figure}[htp]
-\hbox{\pdfimage width 6in {Figures/olive-par.jpg}}
+\centerline{\pdfimage width 4in {Figures/olive-par.png}}
 \caption{Brushing in a parallel coordinates display reveals an outlier in 
 palmitic, oleic and linolenic acids.}
 \label{fig7}
@@ -670,64 +686,7 @@ specification of color or glyph, for example, nor do they allow row
 ids, so they can't be used for linking across data sets and the
 display of graphs.
 
-\subsection {ASCII}
-\label{slbl:ASCII}
-
-GGobi can read files in the format used by XGobi, with some changes
-and some exclusions.  As new functionality is added to GGobi, it is
-not extended to this older format, so such features as row ids and
-categorical variables are not present.
-
-The only essential file is the one containing the data itself.  Each
-line in the file contains one row of the input data matrix, and lines
-must be separated by carriage returns.  Columns, or variables, can be
-separated by any number of tabs or spaces.  The file needs to have the
-suffix \File{.dat}.
-
-You can supply variable and case labels in associated files.  Variable
-(column) labels can be in a file named \File{datafile.col} (or
-\File{datafile.column}, \File{datafile.collab}, or
-\File{datafile.var}).  Variable ranges can be specified by adding two
-more fields, using $|$ as the field separator.  Case (row) labels can
-be supplied in a file named \File{datafile.row} (or
-\File{data\-file.row\-lab} or \File{data\-file.case}).  There should
-be one label per line, and the label can include blanks.  If variable
-or case labels are not supplied, default labels using column or row
-numbers are used.
-
-The files \File{datafile.glyphs} and \File{datafile.colors} can be
-used to set the plotting characters and colors to be used in
-drawing each point.  Glyphs can be specified in two ways:
-
-\begin{itemize}
-\item with a string for glyph type and a number for glyph size, where the
-glyph type is one of
-  \begin {itemize}
-  \itemsep 0em
-  \item ``.'' (a single-pixel point),
-  \item ``plus'',
-  \item ``x'',
-  \item ``oc'' (open circle),
-  \item ``or'' (open rectangle),
-  \item ``fc'' (filled circle), or
-  \item ``fr'' (filled rectangle).
-  \end {itemize}
-and the glyph size is between 0 and 7, or
-
-\item with one number per line, where the number is between 0 and
-43.  Here's how to generate that number: the type is between 0 and 6,
-using the ordering just presented, and the size is between 0 and 7.
-The number is then 0 for the single-pixel glyph, and
-$7 \times (type-1) + size + 1$ for all other glyphs.
-\end{itemize}
-
-% Don't know if this is true any longer; dfs.
-Filled circles may be the most visually appealing glyph, but take much
-longer to draw under Microsoft Windows.  Consequently, our sample data
-files usually use a small filled rectangle as the default glyph.
-
-Colors must be integers from 0 to one fewer than the number of colors in
-the colormap.
+% ascii section removed because its no longer supported.
 
 \begin{comment}
 % Should this be moved to a section on plugins?
@@ -1988,4 +1947,63 @@ documentation and a picture gallery.
 
 
 \end {document}
+
+\subsection {ASCII}
+\label{slbl:ASCII}
+
+GGobi can read files in the format used by XGobi, with some changes
+and some exclusions.  As new functionality is added to GGobi, it is
+not extended to this older format, so such features as row ids and
+categorical variables are not present.
+
+The only essential file is the one containing the data itself.  Each
+line in the file contains one row of the input data matrix, and lines
+must be separated by carriage returns.  Columns, or variables, can be
+separated by any number of tabs or spaces.  The file needs to have the
+suffix \File{.dat}.
+
+You can supply variable and case labels in associated files.  Variable
+(column) labels can be in a file named \File{datafile.col} (or
+\File{datafile.column}, \File{datafile.collab}, or
+\File{datafile.var}).  Variable ranges can be specified by adding two
+more fields, using $|$ as the field separator.  Case (row) labels can
+be supplied in a file named \File{datafile.row} (or
+\File{data\-file.row\-lab} or \File{data\-file.case}).  There should
+be one label per line, and the label can include blanks.  If variable
+or case labels are not supplied, default labels using column or row
+numbers are used.
+
+The files \File{datafile.glyphs} and \File{datafile.colors} can be
+used to set the plotting characters and colors to be used in
+drawing each point.  Glyphs can be specified in two ways:
+
+\begin{itemize}
+\item with a string for glyph type and a number for glyph size, where the
+glyph type is one of
+  \begin {itemize}
+  \itemsep 0em
+  \item ``.'' (a single-pixel point),
+  \item ``plus'',
+  \item ``x'',
+  \item ``oc'' (open circle),
+  \item ``or'' (open rectangle),
+  \item ``fc'' (filled circle), or
+  \item ``fr'' (filled rectangle).
+  \end {itemize}
+and the glyph size is between 0 and 7, or
+
+\item with one number per line, where the number is between 0 and
+43.  Here's how to generate that number: the type is between 0 and 6,
+using the ordering just presented, and the size is between 0 and 7.
+The number is then 0 for the single-pixel glyph, and
+$7 \times (type-1) + size + 1$ for all other glyphs.
+\end{itemize}
+
+% Don't know if this is true any longer; dfs.
+Filled circles may be the most visually appealing glyph, but take much
+longer to draw under Microsoft Windows.  Consequently, our sample data
+files usually use a small filled rectangle as the default glyph.
+
+Colors must be integers from 0 to one fewer than the number of colors in
+the colormap.
 
