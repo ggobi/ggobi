@@ -1,4 +1,4 @@
-\documentclass[11pt]{article}
+cd \documentclass[11pt]{article}
 \usepackage{fullpage}
 \usepackage{comment}
 \bibliographystyle{plain}
@@ -144,9 +144,8 @@ The data is part of a quality control study of olive oils. It is proposed
 that the olive oils from different regions have different fatty acid
 signatures.
 
-Start {\tt ggobi} and open in the comma-delimited olive oils data
-using the {\tt FIle} menu.
-
+Start {\tt ggobi} and open the comma-delimited olive oils data file
+using the {\tt File} menu.
 Two windows will appear, the GGobi console
 and a scatterplot, as shown in Figure~\ref{fig1}.
 
@@ -177,15 +176,14 @@ exploring each of its menus.  Pay particular attention to the
 Display, View, Interaction and Tools menus.
 
 \begin {itemize}
-\item The File menu contains the usual open and save data, option
-setting and close actions.
+\item The File menu contains items to open and save files, set options,
+  and exit ggobi.
 \item The Display menu is the interface for opening new plotting
   windows.
 \item The View menu is the interface for specifying the
-  projection (1d, 2d, 3d or higher) for the current display.  (For
-  some displays, such as the parallel coordinates display, there are
-  no choices in the projection used, so the View menu is not
-  always present.)
+  projection (1d, 2d, 3d or higher) for the current display, where
+  applicable.  (For some displays, like the barchart or parallel
+  coordinates display, no such choices are available.)
 \item The Interaction menu is the interface for specifying the mouse
   interactions (for scaling the plot, highlighting points, and so on)
   for the current plot.
@@ -199,13 +197,9 @@ of the ggobi console. Notice that they're contained by a frame labeled
 \Widget{Identify,} which is the interaction mode of the current plot.
 This frame contains most of the row labeling controls, which are
 described in section \ref{slbl:Identify}. There are several options
-for writing labels in the plot window. The default is the record
-label. Highlight the Region and Area in this panel, then the labels
-will be the geographic area. Move the cursor around the plot window
-using the mouse, and observe the labels of the point closest to the
-cursor.  The labels show the geographic area where the sample was
-taken. Using the variable checkboxes on the main ggobi control window
-change the variables shown to be linoleic plotted against eicosenoic.
+for adding labels to the plot window. The default is the record label,
+which is just a number for this data.  Instead, select Region and Area
+for more informative labels; mouse around the window to see them.
 
 \begin{figure}[htp]
 \begin{center}
@@ -215,40 +209,41 @@ change the variables shown to be linoleic plotted against eicosenoic.
 \label{fig:identify}
 \end{figure}
 
-Open a second display window, showing a barchart, using the Display
-menu. Notice that the new window has a narrow white band drawn around
-the outside of the plotting area: that means that the new window is
-now the ``current display'' and its plot is the ``current plot.''
-Click in the plotting region of the other scatterplot to make it the
-current plot, and notice what happens in the console when you
-alternate between the two.  Both the controls and the variable
-selection region correspond to the current plot.
+Use the Display menu to open a Barchart; notice that the new window
+has a narrow white band around the outside of the plotting area.  That
+means that the new window is now the ``current display'' and its plot
+is the ``current plot.''  Click in the plotting region of the other
+scatterplot to make it the current plot, and notice what happens in
+the console when you alternate between the two.  Both the controls and
+the variable selection region correspond to the current plot.
 
-Now set up a plot of linoleic vs eicosenoic in the first scatterplot,
-and disply Region in the barchart, and make the barchart the current
-plot.  Using the Interaction menu, choose \Widget{Brush.}  Look at the
-buttons and menus inside the leftmost portion of the ggobi console.
-Notice that they're contained by a frame labeled \Widget{Brush,} which is
-the view mode of the current plot.  This frame contains most of the
-brushing controls, which are described in the section
-\ref{slbl:Brush}.  A few of the brushing controls, though, are in the
-\Widget{Brush} menu in the display menubar, and some associated tools
-are in the \Widget{Tools} menu.
+Click on the scatterplot to make it the current plot, and use the
+variable selection region in the ggobi console to plot linoleic acid
+against eicosenoic acid.  Next make the barchart current and select
+Region.  You have now set up a useful pair of views for linked
+brushing.  Using the Interaction menu, choose \Widget{Brush.}  Look at
+the buttons and menus inside the leftmost portion of the ggobi
+console.  Notice that they're contained by a frame labeled
+\Widget{Brush,} which is the view mode of the current plot.  This
+frame contains most of the brushing controls, which are described in
+the section \ref{slbl:Brush}.  A few of the brushing controls, though,
+are in the \Widget{Brush} menu in the display menubar, and some
+associated tools are in the \Widget{Tools} menu.
 
 The rectangle that appears in the current plot is the ``paintbrush,''
-and dragging it over bars (or in a scatterplot the points) changes
-their color. Change the color of the brush by opening up the
-\Widget{Choose color \& glyph} panel (Figure \ref{fig2}). Hold down
-the left button and drag the mouse to paint the first region, then the
-second and third regions, or click on the bars.  Since you're brushing
-in the \Widget{Transient} style, the points resume their original
-color when the paintbrush no longer surrounds them.
+and dragging it over bars or points changes their color.  Reset the
+color of the brush by opening up the \Widget{Choose color \& glyph}
+panel. (In Figure \ref{fig2}, we have chosen an orange filled circle.)
+Hold down the left button and drag the mouse to paint the region
+regions one at a time.  Since you're brushing in the
+\Widget{Transient} style, the points resume their original color when
+the paintbrush no longer surrounds them.
 
 While you brush, keep an eye on the plot of linoleic vs eicosenoic,
 and notice where the painted points fall in that scatterplot (Figure
 \ref{fig3}).  The oils from region 1, south Italy, are separable from
-the other two regions using eicosenoic acid. Using two linked 2d plots
-is one way to explore the relationship among three variables.
+the oils of other two regions using eicosenoic acid. Using two linked
+2d plots is one way to explore the relationship among three variables.
 
 \begin{figure}[htp]
 \begin{center}
@@ -319,24 +314,24 @@ The scrollbar at the top of the tour controls is used to adjust the
 speed of the tour.  Drag it to the right to speed up the rotation.
 The circle at the bottom left of the plot window displays the axes for
 the tour. These can be removed by toggling the ``Show axes'' button on
-the display's \Widget{2D Tour} menu.  Pause the tour when you see a
+the display's \Widget{Tour2D} menu.  Pause the tour when you see a
 separation of the two regions (as seen in Figure \ref{fig6}).
 
 Now you are going to use manual tour controls to sharpen up the
 separation by manually changing the coefficients of the variables in
 the projection.  Click on the \Widget{Manip} (magenta) button below
 the variable selection region of the console, and then click on
-linoleic acid (a magenta circle will be seen now in the variable
-circle for linoleic acid).  \Widget{Oblique} is already selected in
-the \Widget{Manual manipulation} menu.  In the plot window, hold down
-any mouse button while you drag the cursor. The coefficient
-corresponding to linoleic acid will increase and decrease following
-the mouse, inducing a rotation of the scattercloud.  If the axes are
-still showing in the scatterplot window, the axis in magenta
-corresponds to the variable you're manipulating.  Similarly rotate
-oleic acid and arachidic acid in and out of the plot, with the aim of
-finding a projection where the two regions are well separated.  There
-are 5 choices of manipulation mode (unconstrained oblique, vertical,
+linoleic acid (a magenta circle appears in the variable circle for
+linoleic acid).  \Widget{Oblique} is already selected in the
+\Widget{Manual manipulation} menu.  In the plot window, hold down any
+mouse button while you drag the cursor. The coefficient corresponding
+to linoleic acid will increase and decrease following the mouse,
+inducing a rotation of the scattercloud.  If the axes are still
+showing in the scatterplot window, the axis in magenta corresponds to
+the variable you're manipulating.  Similarly rotate oleic acid and
+arachidic acid in and out of the plot, with the aim of finding a
+projection where the two regions are well separated.  There are 5
+choices of manipulation mode (unconstrained oblique, vertical,
 horizontal, radial and angular) to explore.
 
 \begin{figure}[htp]
@@ -385,9 +380,9 @@ palmitic, oleic and linolenic acids.}
 
 Using the \Widget{Color \& glyph groups} tool from the \Widget{Brush}
 controls, click on the appropriate `S' button to bring the Region 1
-cases back into the plot.  Using the \Widget{File} menu, save the data,
-preserving the colors and glyphs that have been assigned during this
-session.
+cases back into the plot.  Using the \Widget{File} menu, save the data
+(under a new name), preserving the colors and glyphs that have been
+assigned during this session.
 
 This has been a brief introduction to the use of GGobi. The following
 section contains more detailed information on its functionality.
@@ -471,7 +466,7 @@ The \Widget{Tools} menu gives access to
 \item jittering controls,
 \item a panel for selecting a new color scheme for drawing, and
  then for automatically brushing points and edges by mapping the
- color scheme onto a selected varriable.
+ color scheme onto a selected variable.
 \item a panel for brushing and excluding groups of cases,
 \item subsetting functions for systematic and random subsampling, 
 \item a tool for managing missing values.
@@ -835,8 +830,8 @@ Horizontal mouse motions in the plot window then alter the coefficient for
 the manipulation variable, constrained by the values of the coefficients
 of other active variables (which may also change).
 
-The variable axes and projection coeeficient values can be toggled on
-or off using the display's \Widget{1D Tour} menu.
+The variable axes and projection coefficient values can be toggled on
+or off using the display's \Widget{Tour1D} menu.
 
 To activate this view mode from the keyboard, type {\em t} or {\em T}
 with the focus in the plot window, or type Control-{\em t} or
@@ -899,7 +894,7 @@ direction of the variable keeping angle fixed, and {\it angular}
 manipulation allows rotating the variable axis in the plane of the plot
 window, keeping the length of the axis fixed.
 
-The variable axes can be toggled on or off using the \Widget{2D Tour}
+The variable axes can be toggled on or off using the \Widget{Tour2D}
 menu at the top of the display window.
 
 To activate this view mode from the keyboard, type {\em g} or {\em G}
@@ -938,7 +933,7 @@ situations.
 The rotation mode is essentially a 2D tour that is restricted to use
 three variables.  Its graphical user interface is a subset of the 2D
 tour interface, with the exception that the three axes are
-individually represented by toggle buttons labelled X,
+individually represented by toggle buttons labeled X,
 Y and Z, principally so that it's possible to
 unambiguously specify the variable to be replaced when selecting a new
 one.
@@ -1718,7 +1713,7 @@ involve postponing linked updates.
  ``Update brushing continuously.''  In that case, linked windows will only
  be redrawn when you lift your finger off the mouse button.  Sometimes you
  can go even further and perform all your brushing operations with only
- a single display open, and open the other displays afterwards.
+ a single display open, and open the other displays afterward.
 \item Turn off the brush until you have it shaped and positioned.
 \item Use the API instead of the GUI.  Using the Rggobi package, for
  example, you can brush a region in a single command if you can describe
