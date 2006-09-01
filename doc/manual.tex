@@ -1,4 +1,4 @@
-\documentclass[11pt]{article}
+\documentclass[11pt]{scrartcl}
 \usepackage{fullpage}
 \usepackage{comment}
 \bibliographystyle{plain}
@@ -9,14 +9,7 @@
 \def\Widget#1{\textbf{#1}}
 \def\File#1{\textsl{#1}}
 
-
-% Issues:
-%
-% Some pictures are now out of date, such as the variable
-% manipulation table.
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 \newif\ifpdf
 \ifx\pdfoutput\undefined
   \pdffalse
@@ -28,7 +21,6 @@
   \pdfoutput=1
   \usepackage[pdftex]{graphicx}  % uncomment if using graphicx
   \usepackage[pdftex,bookmarks,colorlinks,pdfpagemode=UseOutlines]{hyperref} 
-  % uncomment if using hyperref
 \else
   \usepackage{graphicx}  % uncomment if using graphicx
   \usepackage[colorlinks=true,
@@ -37,22 +29,18 @@
     citecolor=webgreen]{hyperref} % uncomment if using hyperref
   \definecolor{webgreen}{rgb}{0,.5,0}
   \definecolor{webbrown}{rgb}{.6,0,0}
-  % dvips -z
 \fi
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \hyphenation{XGobi}
 \hyphenation{GGobi}
-\hyphenation{ggobi}
 \hyphenation{di-men-sion-al two--di-men-sion-al}
-\input epsf
-\def\Rcirc{\mbox{\small{\ooalign{\hfil\raise.07ex\hbox{\tiny R}\hfil\crcr\mathhexbox20D}}}}
 
 \parindent 0in
 \parskip 6pt
 
 \begin{document}
-\title {Manual for {\tt ggobi} }
+\title {GGobi Manual}
 \author{
 Deborah F. Swayne, AT\&T Labs -- Research \\
 Di Cook, Iowa State University \\
@@ -62,92 +50,76 @@ Hadley Wickham, Iowa State University \\
 Michael Lawrence, Iowa State University 
 }
 
-\date{June 2006}
+\setcounter{tocdepth}{2}
+
+\date{September 2006}
 
 \maketitle
 
 \begin{abstract}
 
-The GGobi software is a data visualization system with state-of-the-art
-interactive and dynamic methods for the manipulation of views of
-data.  It represents a significant improvement on its predecessor, XGobi,
-with multiple plotting windows, more flexible color management, XML file
-handling, and better portability to Windows.
+GGobi is an open source visualization program for exploring
+high-dimensional data. It provides highly dynamic and interactive
+graphics such as tours, as well as familiar graphics such as the
+scatterplot, barchart and parallel coordinates plots. Plots are
+interactive and linked with brushing and identification.
 
-The most significant change may be that ggobi is so easy to extend, either
-with the addition of ``plugins'' or by embedding it in other software;
-either way, it can be controlled using an API (application programming
-interface).  When ggobi is embedded in R, for example, the result is a
-union of ggobi's direct manipulation graphical environment
-and R's familiar extensible environment for statistical data analysis.
-
-It has the same graphical functionality whether it is running
-standalone or embedded in other software.  That functionality includes
-2-D displays of projections of points and edges in high-dimensional
-spaces, as well as scatterplot matrices, parallel coordinate, time
-series plots and bar charts.  Projection tools include average shifted
-histograms of single variables, plots of pairs of variables, and grand
-tours of multiple variables.  Views of the data can be reshaped.
-Points can be labeled and brushed with glyphs and colors.  Several
-displays can be open simultaneously and linked for labeling and
-brushing.  Missing data are accommodated and their patterns can be
-examined.
-\end{abstract}
+It includes 2-D displays of projections of points and edges in
+high-dimensional spaces, scatterplot matrices, parallel coordinate,
+time series plots and bar charts. Projection tools include average
+shifted histograms of single variables, plots of pairs of variables,
+and grand tours of multiple variables. Points can be labelled and
+brushed with glyphs and colors. Several displays can be open
+simultaneously and linked for labelling and brushing. Missing data are
+accommodated and their patterns can be examined. \end{abstract}
 
 \newpage
-
-% I like this here, because otherwise there's no title page
 \tableofcontents
-\newpage
 
+\newpage
 \section{Introduction}
 
-This paper gives an overview of the layout and functionality of GGobi,
-interactive graphical software for exploratory data analysis.  Readers
+This manual gives an overview of the layout and functionality of GGobi,
+interactive graphical software for exploratory data analysis. Readers
 who are familiar with XGobi will find much that is familiar in GGobi's
 design, and might want to read section \ref{slbl:xgobi} first, where
 key differences between the two programs are described. There are
-several papers that describe parts of the functionality existing in
-both packages
-\cite{BCS95,SCB97,SB98,BAHM88,CBC93,CBCH95,CB95,BCAH95c}.
+several papers that describe the functionality which is present in both
+packages \cite{BCS95,SCB97,SB98,BAHM88,CBC93,CBCH95,CB95,BCAH95c}.
 
-You will find that you can use GGobi for simple tasks with virtually
-no instruction.  All that a user needs is some cursory knowledge of
-the developments in interactive statistical graphics of the last 15
-years, as well as a willingness to experiment with the sample data
-provided and guided by the tooltips.  In parallel with the hands-on
-learning process, it is probably useful to acquire a basic
-understanding of the overall layout and functionality of the system.
-The greatest success is obtained by users who have gained experience
-with the system and combine it with creativity and data analytic
-sophistication.
+You will find that you can use GGobi for simple tasks with virtually no
+instruction. All that you need is some cursory knowledge of the
+developments in interactive statistical graphics of the last 15 years,
+as well as a willingness to experiment with the sample data provided.
+In parallel with the hands-on learning process, it is probably useful
+to acquire a basic understanding of the overall layout and
+functionality of the system. You will be most sucessful if you gain
+experience with the system and combine it with creativity and data
+analytic sophistication.
 
 We begin with a tutorial, and move on to describe GGobi in detail.
 
 \section{Tutorial}
 
 Several sample data files are included with the GGobi distribution, in
-a directory called \File{data,} and there you will find the file
+a directory called \File{data}, and there you will find the file
 \File{olive.csv}, a dataset on olive oil samples from Italy
-\cite{FALT83}.  The olive oil data consists of the percentage
+\cite{FALT83}. The olive oil data consists of the percentage
 composition of 8 fatty acids (palmitic, palmitoleic, stearic, oleic,
-linoleic, linolenic, arachidic, eicosenoic) found in the lipid
-fraction of 572 Italian olive oils. There are 9 collection areas, 4
-from southern Italy (North and South Apulia, Calabria, Sicily), two
-from Sardinia (Inland and Coastal) and 3 from northern Italy (Umbria,
-East and West Liguria).
-
-The data is part of a quality control study of olive oils. It is proposed
-that the olive oils from different regions have different fatty acid
-signatures.
+linoleic, linolenic, arachidic, eicosenoic) found in the lipid fraction
+of 572 Italian olive oils. There are 9 collection areas, 4 from
+southern Italy (North and South Apulia, Calabria, Sicily), two from
+Sardinia (Inland and Coastal) and 3 from northern Italy (Umbria, East
+and West Liguria). The data is part of a quality control study of olive
+oils. It is proposed that the olive oils from different regions have
+different fatty acid signatures.
 
 Start GGobi. On Windows this will be as simple as double-clicking the
-ggobi icon on the screen. For linux and Mac users, you'll need to open
-up a unix terminal and type {\tt ggobi} (linux) or {\tt open-x11
-ggobi} (Mac). 
+GGobi icon on the screen. For linux and Mac users, you'll need to open
+up a unix terminal and type {\tt ggobi} (linux).
 
 From the \Widget{File} menu, choose \Widget{Open} and navigate to the
-ggobi {\tt data} directory to find the {\tt olive.csv} file.
+GGobi {\tt data} directory to find the {\tt olive.csv} file.
 
 Two windows will appear, the GGobi console and a scatterplot, as shown
 in Figure~\ref{fig1}.
@@ -162,15 +134,14 @@ variables for the plot.  Begin to get a feeling for the data by
 looking at several of the 2d plots: Area vs palmitic, Region vs oleic,
 etc.
 
-\begin{figure}[h]
-%\epsfxsize 6in \centerline{\epsfbox{figures/manual1.ps}}
-\centerline{\pdfimage width 3in {Figures/olive1.png}
-      \pdfimage width 2.9in {Figures/olive2.png}
-}
-%\vspace{.15in} \centerline{ \parbox{6in}
-\caption{Layout of a ggobi session.  The plotting window contains a
-scatterplot of the Area vs Region, from the olive oils data.
-}%}
+\begin{figure}[ht]
+\begin{center}
+	\includegraphics[height=3in]{Figures/olive1.png}%
+	\hspace{0.2in}%
+	\includegraphics[height=3in]{Figures/olive2.png}	
+\end{center}
+\caption{Layout of a GGobi session.  The plotting window contains a
+scatterplot of the Area vs Region, from the olive oils data.}
 \label{fig1}
 \end{figure}
 
@@ -197,7 +168,7 @@ setting and close actions.
 
 Using the Interaction menu, choose \Widget{Identify} (Figure
 \ref{fig:identify}). Look at the buttons inside the leftmost portion
-of the ggobi console. Notice that they're contained by a frame labeled
+of the GGobi console. Notice that they're contained by a frame labeled
 \Widget{Identify,} which is the interaction mode of the current plot.
 This frame contains most of the row labeling controls, which are
 described in section \ref{slbl:Identify}. There are several options
@@ -206,12 +177,14 @@ label. Highlight the Region and Area in this panel, then the labels
 will be the geographic area. Move the cursor around the plot window
 using the mouse, and observe the labels of the point closest to the
 cursor.  The labels show the geographic area where the sample was
-taken. Using the variable checkboxes on the main ggobi control window
+taken. Using the variable checkboxes on the main GGobi control window
 change the variables shown to be linoleic plotted against eicosenoic.
 
 \begin{figure}[htp]
 \begin{center}
-\includegraphics[width=2.5in]{Figures/olive-identifypanel.png}\hspace{0.2in}\includegraphics[width=2.5in]{Figures/olive-identify.png}
+	\includegraphics[width=2.5in]{Figures/olive-identifypanel.png}%
+	\hspace{0.2in}%
+	\includegraphics[width=2.5in]{Figures/olive-identify.png}
 \end{center}
 \caption{The \Widget{Identify} panel and the labels showing in the plot window.}
 \label{fig:identify}
@@ -229,7 +202,7 @@ selection region correspond to the current plot.
 Now set up a plot of linoleic vs eicosenoic in the first scatterplot,
 and disply Region in the barchart, and make the barchart the current
 plot.  Using the Interaction menu, choose \Widget{Brush.}  Look at the
-buttons and menus inside the leftmost portion of the ggobi console.
+buttons and menus inside the leftmost portion of the GGobi console.
 Notice that they're contained by a frame labeled \Widget{Brush,} which is
 the view mode of the current plot.  This frame contains most of the
 brushing controls, which are described in the section
@@ -265,9 +238,11 @@ colors.
 \end{figure}
 
 \begin{figure}[htp]
-\centerline{\pdfimage width 3in {Figures/olive-brush1.png}
-      \pdfimage width 3in {Figures/olive-brush2.png}
-}
+\begin{center}
+	\includegraphics[width=3in]{Figures/olive-brush1.png}%
+	\hspace{0.2in}%
+	\includegraphics[width=3in]{Figures/olive-brush2.png}
+\end{center}
 \caption{Brushing in a GGobi session. Brushing Region 1 shows that it
 corresponds to a cohesive cluster in the variables linoleic and 
 eicosenoic acid.
@@ -304,7 +279,11 @@ region 1, and then use \Widget{Exclude shadows} to remove them from
 consideration.
 
 \begin{figure}[htp]
-\centerline{\pdfimage width 3in {Figures/olive-brush3.png}\hspace{0.2in}\pdfimage width 2.5in {Figures/olive-brush4.png}}
+\begin{center}
+	\includegraphics[height=2in]{Figures/olive-brush3.png}%
+	\hspace{0.2in}%
+	\includegraphics[height=3in]{Figures/olive-brush4.png}	
+\end{center}
 \caption{Toggling clusters of points on and off according to color/glyph value.}
 \label{fig5}
 \end{figure}
@@ -342,7 +321,11 @@ are 5 choices of manipulation mode (unconstrained oblique, vertical,
 horizontal, radial and angular) to explore.
 
 \begin{figure}[htp]
-\centerline{\pdfimage width 3in {Figures/olive-tourpanel.png}\hspace{0.2in}\pdfimage width 2.5in {Figures/olive-tour1.png}}
+\begin{center}
+	\includegraphics[height=3in]{Figures/olive-tourpanel.png}%
+	\hspace{0.2in}%
+	\includegraphics[height=3in]{Figures/olive-tour1.png}	
+\end{center}
 \caption{(Left) Tour panel showing the controls for the tour, and
 (right) a tour projection revealing a difference between regions 2 and
 3 of the olive oils.}
@@ -360,13 +343,16 @@ Select all the fatty acid variables, all of which are in the table
 of real variables.
 
 \begin{figure}[htp]
-\centerline{\pdfimage width 3.2in {Figures/olive-var1.png}
-\pdfimage width 3.2in {Figures/olive-var2.png}}
+\begin{center}
+	\includegraphics[height=3in]{Figures/olive-var1.png}%
+	\hspace{0.2in}%
+	\includegraphics[height=3in]{Figures/olive-var2.png}	
+\end{center}
 \caption{The variable manipulation panel contains basic summary 
 statistics of variables. It can also be used for adding new variables
 and for variable subset selection before launching multi-plot
 displays.
-}%}
+}
 \label{fig4}
 \end{figure}
 
@@ -379,7 +365,9 @@ and transiently paint the case with a very low value on palmitic
 acid, and low value for linolenic acid.
 
 \begin{figure}[htp]
-\centerline{\pdfimage width 4in {Figures/olive-par.png}}
+\begin{center}
+	\includegraphics[height=3in]{Figures/olive-par.png}%
+\end{center}
 \caption{Brushing in a parallel coordinates display reveals an outlier in 
 palmitic, oleic and linolenic acids.}
 \label{fig7}
@@ -412,7 +400,7 @@ is shown.
 The \Widget{Display} menu allows a new plotting window to be opened. 
 The display types include
 \begin{itemize}
-\itemsep 0em
+
 \item scatterplot,
 \item scatterplot matrix, 
 \item parallel coordinates plot, 
@@ -430,7 +418,7 @@ which may contain several plots.
 The \Widget{View} menu contains items to set the projection; the
 full menu is available only for scatterplot displays:
 \begin{itemize}
-\itemsep 0em
+
 \item 1DPlot: 1-D dotplots and average shifted histograms,
 \item XYPlot: 2-D scatterplots,
 \item 1D Tour: 1-D tour,
@@ -450,7 +438,7 @@ the Interaction menu when selected.  The Interaction modes
 themselves are:
 
 \begin{itemize}
-\itemsep 0em
+
 \item Scale: axis scaling,
 \item Brush: setting point glyphs, edge types, and point and edge colors,
 \item Identify: labeling points,
@@ -466,14 +454,14 @@ section~\ref{slbl:InteractionModes}.
 
 The \Widget{Tools} menu gives access to 
 \begin{itemize}
-\itemsep 0em
+
 \item a variable manipulation table,
 \item a variable transformation pipeline,
 \item a variable sphering panel,
 \item jittering controls,
 \item a panel for selecting a new color scheme for drawing, and
  then for automatically brushing points and edges by mapping the
- color scheme onto a selected varriable.
+ color scheme onto a selected variable.
 \item a panel for brushing and excluding groups of cases,
 \item subsetting functions for systematic and random subsampling, 
 \item a tool for managing missing values.
@@ -536,17 +524,18 @@ actively touring, and they provide some feedback about current projection.
 The variable selection behavior for the tour modes will be described in
 the section for each mode.
 
-The \Widget{scatterplot matrix} is a window containing a symmetric matrix
-of scatterplots for the chosen variables.  The plots along the diagonal
-are ASHes (Average Shifted Histograms).  The matrix is required to be
-symmetric, and that constraint affects its variable selection behavior.
+The \Widget{scatterplot matrix} is a window containing a symmetric
+matrix of scatterplots for the chosen variables. The plots along the
+diagonal are ASHes (Average Shifted Histograms). The matrix is required
+to be symmetric, and that constraint affects its variable selection
+behavior.
 
 \begin{itemize}
 \item Replace:  First select one of the ASH plots along the diagonal
-  to tell ggobi uniquely which variable to replace, then click on
+  to tell GGobi uniquely which variable to replace, then click on
   one of the toggle buttons in the variable selection region.
 \item Insert:  First select one of the plots along the
-  diagonal to tell ggobi uniquely where to insert the new plot,
+  diagonal to tell GGobi uniquely where to insert the new plot,
   then click on one of the buttons.  (GGobi will
   not add a variable that's already plotted.)
 \item Append:  Click on one of the buttons to append
@@ -611,7 +600,7 @@ The behavior of the toggle buttons and labels depends on the state of the
   no plot selection is required; simply click the X toggle
   button for the variable you want.  To replace a vertical variable,
   first select the plot you want to change, and then click the
-  Y toggle for the variable you want.  (ggobi won't
+  Y toggle for the variable you want.  (GGobi won't
   let you plot the same variable twice.)
 \item Insert:  Select a plot in the display, and then click
   on a the Y toggle to add a new plot before the current plot.
@@ -694,30 +683,28 @@ display of graphs.
 \subsection {Database access}
 \label{slbl:MySQL}
 
-It is possible to interface ggobi with either a Postgres or MySQL
+It is possible to interface GGobi with either a Postgres or MySQL
 database. Details of this are described in the document {\em GGobi and
 Database Management Systems}, available through the web site. 
 
 Database access is implemented as a plugin.
-\end{comment}
 
-\section{Integration of ggobi with other software systems}
+\section{Integration of GGobi with other software systems}
 \label{slbl:Integration}
 
-There are two ways to integrate ggobi with other software: by embedding
-ggobi in other software (that is, compiling ggobi into a shared object
-file and linking against it) or by extending ggobi with plugins.  Either
+There are two ways to integrate GGobi with other software: by embedding
+GGobi in other software (that is, compiling GGobi into a shared object
+file and linking against it) or by extending GGobi with plugins.  Either
 way, the application programming interface (API) makes it possible to
-control ggobi ``from the outside.''
+control GGobi ``from the outside.''
 
-The main examplea of embedding that currently exists is the integration
-of ggobi in R. This is described in the document {\em Using the R-GGobi
-Link} available through the web site.   It will be possible to do the
-same thing from Perl and Python.  There also exists a ggobi plugin
-for Gnumeric.
+The main example of embedding the connection between R and GGobi in the
+{\tt rggobi} package.  This is described on the {\tt rggobi} website
+\url{http://www.ggobi.org/rggobi}
 
-There are several examples of plugins for ggobi now distributed with
+There are several examples of plugins for GGobi now distributed with
 the code, including a simple spreadsheet viewer.
+\end{comment}
 
 \section{View modes:~~projections}
 \label{slbl:ViewModes}
@@ -735,7 +722,7 @@ scatterplot window shows a 2-dimensional projection of the data.
 Now select \Widget{2D Tour} in the View menu.  
 
 \begin{itemize}
-\itemsep 0em
+
 \item The control panel at the left of the console changes, because
       the \Widget{2D Tour} has its own set of interactions.
 \item The variable selection panel changes, because the variable
@@ -765,7 +752,7 @@ The ASH is due to Scott (\cite{Scott92}), and the code is also his.
 In this method, several histograms are calculated using the same bin
 width but different origins, and the averaged results are plotted.
 His algorithm has two key parameters: the number of bins, which controls
-the bin width, and the number of histograms to be computed.  In ggobi,
+the bin width, and the number of histograms to be computed.  In GGobi,
 the number of bins is held constant (at 200), while the smoothing
 parameter available on the console controls the number of histograms
 (which ranges from 1 to 50).  The effect is a smoothed histogram ~--~
@@ -779,7 +766,7 @@ because it helps your eye make out the the shape of the ASH.
 The 1D plot will be arranged horizontally if you select a variable
 with a left click, and vertically if you use a middle or right click.
 
-The cycling controls can be used to make ggobi step through the
+The cycling controls can be used to make GGobi step through the
 plots automatically, one after another.
 
 To activate this view mode from the keyboard, type {\em d} or {\em D}
@@ -790,7 +777,7 @@ Control-{\em D} with the focus in the console.
 
 The XY plots are the rudimentary 2 variable scatterplot (or draughtsman
 plot) displays. Two variables are chosen, one to be plotted horizontally
-and the other vertically. The cycling controls can be used to make ggobi
+and the other vertically. The cycling controls can be used to make GGobi
 step automatically from one pairwise plot to the next.
 
 To activate this view mode from the keyboard, type {\em x} or {\em X}
@@ -1186,7 +1173,7 @@ To see these labels, simply move the cursor inside the plotting window.
 The label of the point nearest the cursor is displayed.  The possible
 labels are
 
-\begin{itemize} \itemsep 0em
+\begin{itemize}
 \item the record (case) label supplied by the user either in ASCII
       or XML (the default),
 \item the record number (the backup default in case no record label was
@@ -1259,10 +1246,10 @@ To activate this mode from the keyboard, type {\em e} or {\em E}
 with the focus in the plot window, or type Control-{\em e} or
 Control-{\em E} with the focus in the console.
 
-Note: This mode and the next, "Move Points," may seem like peculiar,
+Note: This mode and the next, ``Move Points,'' may seem like peculiar,
 even dangerous, additions to data analysis software.  They were
 initially added for the use of another community of xgobi users:
-discrete mathematicians use xgobi and ggobi to visualize graphs.  In
+discrete mathematicians use xgobi an GGobi to visualize graphs.  In
 that context, moving and editing graphs is quite natural ~--~ as it
 sometimes turns out to be in the context of data analysis, too.
 
@@ -1295,7 +1282,7 @@ Control-{\em M} with the focus in the console.
 
 This powerful tool is opened by selecting the first entry on the
 \Widget{Tools} menu.  It has several important functions:
-\begin{itemize} \itemsep 0em
+\begin{itemize} 
 \item the display of variable statistics,
 \item variable subset selection for launching multi-plot displays,
 \item setting variable ranges,
@@ -1308,7 +1295,7 @@ It begins by separating the variables by type: variables are
 currently classified as categorical or real, though more types
 can be specified in XML.  Categorical variables are displayed
 hierarchically, and the information reported includes the number
-of records for each level.  For ``real'' variables, ggobi report
+of records for each level.  For ``real'' variables, GGobi report
 the current variable transformation (if any); the minimum,
 maximum, mean, and median of the raw data; the number of missing values
 per variable.
@@ -1404,28 +1391,28 @@ The \Widget{Color schemes} tool has two purposes: to select a
 new color scheme, and to automatically color points
 using the current color scheme.
 
-\subsubsection{Specifying a color scheme on the command line}
-
-If you have specified a colorschemes.xml file in your .ggobirc file
-(Note: I don't know how to do this under Windows.),
-then you can also specify a color scheme on the command line when you
-start ggobi.  Use the name of the color scheme, which appears in the
-XML file, like this:
-
-\begin{verbatim}
-  ggobi -activeColorScheme "ColorScheme Name"
-\end{verbatim}
-  or   
-\begin{verbatim}
-  ggobi --activeColorScheme="ColorSchemeName"
-\end{verbatim}
-
-Warning: If you launch ggobi with a color scheme which does not have
-as many colors as you're specifying in the XML data file, strange
-things will happen; ggobi will attempt to catch this and warn you,
-but we aren't quite sure what it should do in this case.
-
-\subsubsection{Choosing a color scheme interactively}
+%\subsubsection{Specifying a color scheme on the command line}
+%
+%If you have specified a colorschemes.xml file in your .ggobirc file
+%(Note: I don't know how to do this under Windows.),
+%then you can also specify a color scheme on the command line when you
+%start ggobi.  Use the name of the color scheme, which appears in the
+%XML file, like this:
+%
+%\begin{verbatim}
+%  ggobi -activeColorScheme "ColorScheme Name"
+%\end{verbatim}
+%  or   
+%\begin{verbatim}
+%  ggobi --activeColorScheme="ColorSchemeName"
+%\end{verbatim}
+%
+%Warning: If you launch GGobi with a color scheme which does not have
+%as many colors as you're specifying in the XML data file, strange
+%things will happen; GGobi will attempt to catch this and warn you,
+%but we aren't quite sure what it should do in this case.
+%
+%\subsubsection{Choosing a color scheme interactively}
 
 Preview a new color scheme by selecting from the tree at the left.
 If you would like to apply it, click on the button ``Apply color scheme
@@ -1437,20 +1424,20 @@ selected has fewer than $n$ colors, you'll be prohibited from applying
 the new scheme.  If you want to use that scheme, you must use brushing
 to reduce of colors in use.
 
-The menu of color schemes is populated using a file specified in your
-.ggobirc file.  Here is a minimal .ggobirc file, in which the relevant
-line specifies the file {\tt colorschemes.xml}, which is included in the
-GGobi distribution.  (You will probably need to modify the path name.)
-
-\begin{verbatim}
-<?xml version="1.0"?>
-<!DOCTYPE ggobirc>
-<ggobirc>
-<preferences>
-  <colorschemes file="/usr/ggobi/data/colorschemes.xml" />
-</preferences>
-</ggobirc>
-\end{verbatim}
+%The menu of color schemes is populated using a file specified in your
+%.ggobirc file.  Here is a minimal .ggobirc file, in which the relevant
+%line specifies the file {\tt colorschemes.xml}, which is included in the
+%GGobi distribution.  (You will probably need to modify the path name.)
+%
+%\begin{verbatim}
+%<?xml version="1.0"?>
+%<!DOCTYPE ggobirc>
+%<ggobirc>
+%<preferences>
+%  <colorschemes file="/usr/ggobi/data/colorschemes.xml" />
+%</preferences>
+%</ggobirc>
+%\end{verbatim}
 
 The sample file presently contains 250 or so color schemes, of
 different types and sizes, and they're based on the work of
@@ -1542,21 +1529,23 @@ existing data which serves as an indicator for these ``clusters.''
 Select \Widget{Case subsetting and sampling ...} to open a panel
 that allows subsets to be specified in one of six ways.
 
-\Widget{Random sample without replacement}:  Specify the number of
+\begin{itemize}
+\item \Widget{Random sample without replacement}:  Specify the number of
      cases to be in the sample.
-\\\Widget{Consecutive block}:  Specify the first and last row of the block.
-     (The two controls in the second row control the increment used
-     in the control in the first row.)
-\\\Widget{Limits}:  Use the limits defined by the user in the variable
-     manipulation table to define the subset.
-\\\Widget{Every nth case}:  Specify the interval and the first row.
-\\\Widget{Sticky labels}:  All cases with a ``sticky'' label will
-  be in the subset.  If no points have a sticky label, this
-  will have no effect. (See section {\ref{slbl:Identify} for a description
-  of sticky labels.)
-\\\Widget{Row labels}: Type in a string, and specify where it should
+\item \Widget{Consecutive block}:  Specify the first and last row of the block.
+   (The two controls in the second row control the increment used
+   in the control in the first row.)
+\item \Widget{Limits}:  Use the limits defined by the user in the variable
+   manipulation table to define the subset.
+\item \Widget{Every nth case}:  Specify the interval and the first row.
+\item \Widget{Sticky labels}:  All cases with a ``sticky'' label will
+be in the subset.  If no points have a sticky label, this
+will have no effect. (See section {\ref{slbl:Identify} for a description
+of sticky labels.)
+\item \Widget{Row labels}: Type in a string, and specify where it should
   fall (or not fall) in the row labels, and whether case should
   be ignored.  Matches will be included in the subset.
+\end{itemize}
 
 Select one of those six, then click on \Widget{Subset} in the
 bottom row of the panel.  If you want to re-include all rows, 
@@ -1576,7 +1565,7 @@ a good chance it's not just an artifact of visualization.
 \subsection{Controls for missing data}
 
 When your data includes missing values, you can add a new dataset to
-the current ggobi using the button at the top of the \Widget{Missing
+the current GGobi using the button at the top of the \Widget{Missing
 data} tool.  The resulting dataset has the same number of rows as the
 original, but it may have fewer variables, since it only uses those
 variables which actually have missing values.  It has the same
@@ -1595,7 +1584,7 @@ joint distribution of missing values across variables.
 \subsubsection{Imputation}
 
 %
-By default, missing values are assigned the value $0$, but you
+By default, missing values are assigned a value 10\% lower than the minimum non-missing value for that variable, but you
 may sometimes find that to be an inconvenient choice.  Use the
 \Widget{Missing values} panel to assign alternative numbers.
 
@@ -1621,7 +1610,7 @@ above the maximum.
 Click the resale button when you want to update the view to
 respond to the new values.
 
-For more complex imputation, consider using GGobi from within R.
+For more complex imputation, consider using {\tt rggobi}
 
 %
 % End of tools section, so end of working through the main menubar
@@ -1635,7 +1624,7 @@ to each open data set appear above the variable selection window on
 the main controls window, and in various tool windows. The rules for
 linking these data sets is described in Section \ref{LinkingRules}.
 
-Several of the sample datasets included with ggobi use multiple
+Several of the sample datasets included with GGobi use multiple
 datasets.  In most cases, the additional datasets are used to add
 edges, but \File{algal-bloom.xml} contains four datasets, one of which
 contains the levels of a factorial experimental, while another
@@ -1721,7 +1710,7 @@ involve postponing linked updates.
  can go even further and perform all your brushing operations with only
  a single display open, and open the other displays afterwards.
 \item Turn off the brush until you have it shaped and positioned.
-\item Use the API instead of the GUI.  Using the Rggobi package, for
+\item Use the API instead of the GUI.  Using the {\tt rggobi} package, for
  example, you can brush a region in a single command if you can describe
  it in terms of variable values or indices.
 \item Working with edges slows down the drawing routines, so you might
@@ -1750,14 +1739,14 @@ This design change has had far-reaching effects.
 First, user interactions available for the simple scatterplot display
 can now be made available for other display types.  In xgobi, for
 instance, there is a parallel coordinates display, but it's not
-possible to brush it -- in ggobi, it is.
+possible to brush it -- in GGobi, it is.
 
 Unfortunately, having multiple displays introduces a new source of
-ambiguity: you now have to tell ggobi which display, and which plot
+ambiguity: you now have to tell GGobi which display, and which plot
 within a display, you want to address.  Do that by simply clicking
 inside the target plot.  GGobi will draw a thick white outline around
 that plot so that you can check which plot your actions will be
-addressing.  The interaction mode control panel in the ggobi console
+addressing.  The interaction mode control panel in the GGobi console
 should always correspond to the state of the current display, too.  We
 need more user experience before we can tell whether this approach is
 satisfactory.
@@ -1794,15 +1783,13 @@ awkward in XGobi.
 \subsection {Data format}
 
 Before we describe other key changes in the visible design, we'll
-introduce the changes in data format.  The XGobi format, in which a
-set of files with a common base name is used, is still supported,
-though some file formats have changed (\File{.colors}), and some are no
-longer supported (\File{.bin}, \File{.vgroups}, \File{.lines}).  (See
-section \ref{slbl:DataFormat} for more detail.) The functions served
-by the discarded file types are usually served now in a different
-way:  for example, XGobi uses the \File{.vgroups} file to force
-a group of variables to use the same axis ranges.  In GGobi, that's
-accomplished by setting limits in the variable manipulation tool.
+introduce the changes in data format. The XGobi format, in which a set of
+files with a common base name is used, is no longer supported. (See
+section \ref{slbl:DataFormat} for more detail.) The functions served by
+the discarded file types are usually served now in a different way: for
+example, XGobi uses the \File{.vgroups} file to force a group of variables
+to use the same axis ranges. In GGobi, that's accomplished by setting
+limits in the variable manipulation tool.
 
 The new format, in which all the data lives in one file, is written
 in XML.  XML (Extensible Markup Language) is a widely used language
@@ -1817,9 +1804,9 @@ old format up to date.  For instance, it's no longer possible
 to specify edges in the ascii data format, but they can be specified in
 XML -- and they can have associated data values.
 
-Several XML data files are included in the sample ggobi data, and
+Several XML data files are included in the sample GGobi data, and
 the details of their format is described in {\em The GGobi XML Input Format}
-(XML.pdf) which is included as part of the ggobi distribution.
+(XML.pdf) which is included as part of the GGobi distribution.
 
 % Not currently supported
 \begin{comment}
@@ -1837,16 +1824,13 @@ to achieve a more intimate connection, but made little headway with S,
 though interprocess communication was used successfully with ArcView
 \cite{SwayneBujaHubbell91,SMCM97}.
 
-With ggobi, that problem has been solved, and it's now possible
-to have real-time integration between ggobi and a variety of
+With GGobi, that problem has been solved, and it's now possible
+to have real-time integration between GGobi and a variety of
 other software environments.  An example of this integration is
-the embedding of ggobi into R (or S), with the addition of a set of
-R (or S) functions that manipulate GGobi data and displays,
-resetting data values, projection, and the appearance of the plot.
+the embedding of GGobi into R, with the addition of a set of
+R functions that manipulate GGobi data and displays.
 
-For more details, see section \ref{slbl:Integration}, or read
-{\em Using the R-GGobi Link} (in RGGobi.pdf), another piece of
-documentation included in the ggobi distribution.
+For more details, see section \ref{slbl:Integration}.
 
 \subsection {Variable selection}
 
@@ -1924,28 +1908,24 @@ the \Widget{File->Options} menu.
 
 %\section{Known problems}
 
-
-\section{Future work}
-
-\begin{itemize}
-\item Edge editing
-\item Maps~--~or the linking of GGobi to existing software for
-  spatial data analysis and display
-\end{itemize}
-
+%
+%\section{Future work}
+%
+%\begin{itemize}
+%\item Edge editing
+%\item Maps~--~or the linking of GGobi to existing software for
+%  spatial data analysis and display
+%\end{itemize}
+%
 \section*{Web Links}
 
-The web site for GGobi:
-
-\centerline{{\tt ggobi}: {\tt www.ggobi.org}}
-
-contains details on downloading and installing software, related
-documentation, a picture and video gallery.
+The GGobi web site, \url{http://www.ggobi.org}, contains details on 
+downloading and installing software, related documentation, a 
+picture and video gallery.
 
 \newpage
 \bibliography{manual}
 %\addcontentsline{toc}{section}{References}
 
 
-\end {document}
-
+\end{document}
