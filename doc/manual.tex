@@ -128,14 +128,14 @@ We begin with a tutorial, and move on to describe GGobi in detail.
 
 Several sample data files are included with the GGobi distribution, in
 a directory called \File{data,} and there you will find the file
-\File{olive.xml, .csv}, a dataset on olive oil samples from Italy
-\cite{FALT83}.  This data set uses an XML format.  The olive oil data
-consists of the percentage composition of 8 fatty acids (palmitic,
-palmitoleic, stearic, oleic, linoleic, linolenic, arachidic,
-eicosenoic) found in the lipid fraction of 572 Italian olive
-oils. There are 9 collection areas, 4 from southern Italy (North and
-South Apulia, Calabria, Sicily), two from Sardinia (Inland and
-Coastal) and 3 from northern Italy (Umbria, East and West Liguria).
+\File{olive.csv}, a dataset on olive oil samples from Italy
+\cite{FALT83}.  The olive oil data consists of the percentage
+composition of 8 fatty acids (palmitic, palmitoleic, stearic, oleic,
+linoleic, linolenic, arachidic, eicosenoic) found in the lipid
+fraction of 572 Italian olive oils. There are 9 collection areas, 4
+from southern Italy (North and South Apulia, Calabria, Sicily), two
+from Sardinia (Inland and Coastal) and 3 from northern Italy (Umbria,
+East and West Liguria).
 
 The data is part of a quality control study of olive oils. It is proposed
 that the olive oils from different regions have different fatty acid
@@ -143,7 +143,7 @@ signatures.
 
 Start GGobi. On Windows this will be as simple as double-clicking the
 ggobi icon on the screen. For linux and Mac users, you'll need to open
-up a unix terminal and type {\tt ggobi} (linux) or {\tt opne-x11
+up a unix terminal and type {\tt ggobi} (linux) or {\tt open-x11
 ggobi} (Mac). 
 
 From the \Widget{File} menu, choose \Widget{Open} and navigate to the
@@ -153,17 +153,19 @@ Two windows will appear, the GGobi console and a scatterplot, as shown
 in Figure~\ref{fig1}.
 
 The console has a panel of controls on the left, labeled
-\Widget{XYPlot}, and a variable selection region on the right.  You
-can see that the scatterplot shows two of the variables in the data, a
-plot of Area vs Region.  Move the mouse to one of the variable labels
-in the variable selection region, and leave it in place until the
-tooltip appears, explaining how to select new variables for the plot.
-Begin to get a feeling for the data by looking at several of the 2D
-plots: Area vs palmitic, Region vs oleic, etc.
+\Widget{XY Plot}, and a variable selection region on the right.  You
+can see that the scatterplot contains a 2-dimensional projection of
+the data, a plot of Area vs Region.  Move the mouse to one of the
+variable labels in the variable selection region, and leave it in
+place until the tooltip appears, explaining how to select new
+variables for the plot.  Begin to get a feeling for the data by
+looking at several of the 2d plots: Area vs palmitic, Region vs oleic,
+etc.
 
 \begin{figure}[h]
-\hbox{\pdfimage width 3.2in {Figures/olive1.png}
-      \pdfimage width 3in {Figures/olive2.png}
+%\epsfxsize 6in \centerline{\epsfbox{figures/manual1.ps}}
+\centerline{\pdfimage width 3in {Figures/olive1.png}
+      \pdfimage width 2.9in {Figures/olive2.png}
 }
 %\vspace{.15in} \centerline{ \parbox{6in}
 \caption{Layout of a ggobi session.  The plotting window contains a
@@ -177,6 +179,8 @@ exploring each of its menus.  Pay particular attention to the
 Display, View, Interaction and Tools menus.
 
 \begin {itemize}
+\item The File menu contains the usual open and save data, option
+setting and close actions.
 \item The Display menu is the interface for opening new plotting
   windows.
 \item The View menu is the interface for specifying the
@@ -191,84 +195,66 @@ Display, View, Interaction and Tools menus.
   characteristics of the data and the view.
 \end {itemize}
 
-Using the Interaction menu, choose \Widget{Identify}. Look at the
-buttons inside the leftmost portion of the ggobi console. Notice that
-they're contained by a frame labeled \Widget{Identify,} which is the
-interaction mode of the current plot.  This frame contains most of the
-row labeling controls, which are described in section
-\ref{slbl:Identify}. Move the cursor around the plot window using the
-mouse, and observe the labels of the point closest to the cursor.  The
-labels for this data set show the geographic area where the sample was
-taken. By default the label displayed is the record label. Change this
-to {\tt Region} by selecting this variable in the Identify control
-panel. Now move the mouse around the plot window to see the
-labels. Change the label to be Region and Area by selecting both
-variables in the Identify control panel (Figure \ref{fig1b}).
+Using the Interaction menu, choose \Widget{Identify} (Figure
+\ref{fig:identify}). Look at the buttons inside the leftmost portion
+of the ggobi console. Notice that they're contained by a frame labeled
+\Widget{Identify,} which is the interaction mode of the current plot.
+This frame contains most of the row labeling controls, which are
+described in section \ref{slbl:Identify}. There are several options
+for writing labels in the plot window. The default is the record
+label. Highlight the Region and Area in this panel, then the labels
+will be the geographic area. Move the cursor around the plot window
+using the mouse, and observe the labels of the point closest to the
+cursor.  The labels show the geographic area where the sample was
+taken. Using the variable checkboxes on the main ggobi control window
+change the variables shown to be linoleic plotted against eicosenoic.
 
-\begin{figure}[htpb]
-\hbox{\pdfimage width 3.2in {Figures/olive3.png}
-      \pdfimage width 3in {Figures/olive4.png}
-}
-%\vspace{.15in} \centerline{ \parbox{6in}
-\caption{Identifying points using labels corresponding to Region and Area.
-}%}
-\label{fig1b}
+\begin{figure}[htp]
+\begin{center}
+\includegraphics[width=2.5in]{Figures/olive-identifypanel.png}\hspace{0.2in}\includegraphics[width=2.5in]{Figures/olive-identify.png}
+\end{center}
+\caption{The \Widget{Identify} panel and the labels showing in the plot window.}
+\label{fig:identify}
 \end{figure}
 
-Using the Display menu, open a barchart display. Notice that the new
-window has a narrow white band drawn around the outside of the
-plotting area: that means that the new window is now the {\bf
-``current display''} and its plot is the {\bf ``current plot''}.  This
-is important! Interaction occurs on the current plot, and the control
-panel and variable selection interface shown in the main ggobi window
-corresponds to the current plot. Click in the plotting region of the
-other scatterplot to make it the current plot, and notice what happens
-in the console when you alternate between the two.  Both the controls
-and the variable selection region correspond to the current
-plot. Changing the current window focus from one plot to another is as
-simple as clicking on the plot.
+Open a second display window, showing a barchart, using the Display
+menu. Notice that the new window has a narrow white band drawn around
+the outside of the plotting area: that means that the new window is
+now the ``current display'' and its plot is the ``current plot.''
+Click in the plotting region of the other scatterplot to make it the
+current plot, and notice what happens in the console when you
+alternate between the two.  Both the controls and the variable
+selection region correspond to the current plot.
 
 Now set up a plot of linoleic vs eicosenoic in the first scatterplot,
-and disply Region in the barchart, and then make the barchart the
-current plot.  Using the Interaction menu, choose \Widget{Brush.}
-Look at the buttons and menus inside the leftmost portion of the ggobi
-console.  Notice that they're contained by a frame labeled
-\Widget{Brush,} which is the view mode of the current plot.  This
-frame contains most of the brushing controls, which are described in
-the section \ref{slbl:Brush}.  A few of the brushing controls, though,
-are in the \Widget{Brush} menu in the display menubar, and some
-associated tools are in the \Widget{Tools} menu.
+and disply Region in the barchart, and make the barchart the current
+plot.  Using the Interaction menu, choose \Widget{Brush.}  Look at the
+buttons and menus inside the leftmost portion of the ggobi console.
+Notice that they're contained by a frame labeled \Widget{Brush,} which is
+the view mode of the current plot.  This frame contains most of the
+brushing controls, which are described in the section
+\ref{slbl:Brush}.  A few of the brushing controls, though, are in the
+\Widget{Brush} menu in the display menubar, and some associated tools
+are in the \Widget{Tools} menu.
 
-The rectangle that appears in the current plot is the {\bf
-``paintbrush''}, and dragging it over bars changes their color (Figure
-\ref{fig2}). The color of corresponding points in the scatterplot are
-changed simultaneously. 
-
-Change the color of the brush by opening up the \Widget{Choose color
-\& glyph} panel (Figure \ref{fig2}). Hold down the left button and
-drag the mouse to paint the first region, then the second and third
-regions, or click on the bars.  Since you're brushing in the
-\Widget{Transient} style, the points resume their original color when
-the paintbrush no longer surrounds them.
-
-\begin{figure}[htpb]
-\hbox{\pdfimage width 3in {Figures/olive5.png}
-      \pdfimage width 3in {Figures/olive6.png}
-}
-\caption{Brushing on a barchart or Region, linked to a scatterplot of
-linoleic acid vs eicosenoic acid.  }%}
-\label{fig1c}
-\end{figure}
+The rectangle that appears in the current plot is the ``paintbrush,''
+and dragging it over bars (or in a scatterplot the points) changes
+their color. Change the color of the brush by opening up the
+\Widget{Choose color \& glyph} panel (Figure \ref{fig2}). Hold down
+the left button and drag the mouse to paint the first region, then the
+second and third regions, or click on the bars.  Since you're brushing
+in the \Widget{Transient} style, the points resume their original
+color when the paintbrush no longer surrounds them.
 
 While you brush, keep an eye on the plot of linoleic vs eicosenoic,
 and notice where the painted points fall in that scatterplot (Figure
-\ref{fig1c}).  The oils from region 1, south Italy, are separable from
-the other two regions using eicosenoic acid. Using two linked 2D plots
+\ref{fig3}).  The oils from region 1, south Italy, are separable from
+the other two regions using eicosenoic acid. Using two linked 2d plots
 is one way to explore the relationship among three variables.
 
-\begin{figure}[htpb]
+\begin{figure}[htp]
 \begin{center}
-\includegraphics[width=5in]{Figures/olive7.png}
+\includegraphics[width=2.5in]{Figures/olive-brushpanel.png}\hspace{0.2in}\includegraphics[width=3.5in]{Figures/olive-colorchoose.png}
 \end{center}
 \caption{The chooser for selecting color and glyph for painting points,
 as well as type and thickness for painting lines. It also allows setting
@@ -278,53 +264,47 @@ colors.
 \label{fig2}
 \end{figure}
 
-%\begin{figure}[htp]
-%\hbox{\pdfimage width 3in {Figures/olive-brush1.jpg}
-%      \pdfimage width 3in {Figures/olive-brush2.jpg}
-%}
-%\caption{Brushing in a GGobi session. Brushing Region 1 shows that it
-%corresponds to a cohesive cluster in the variables linoleic and 
-%eicosenoic acid.
-%}
-%\label{fig3}
-%\end{figure}
+\begin{figure}[htp]
+\centerline{\pdfimage width 3in {Figures/olive-brush1.png}
+      \pdfimage width 3in {Figures/olive-brush2.png}
+}
+\caption{Brushing in a GGobi session. Brushing Region 1 shows that it
+corresponds to a cohesive cluster in the variables linoleic and 
+eicosenoic acid.
+}
+\label{fig3}
+\end{figure}
 
 Change to \Widget{Persistent} brushing and paint the three Regions
 using different colors. 
 
-Open the \Widget{Variable transformation} tool.  This tool has
-numerous transformations, which can be applied in sequence.  Stage 0
-transformations are used to adjust variables' values so that they're
-within the range of some stage 1 transformations. Stage 2
+Open the \Widget{Variable transformation} tool, select all of the fatty
+acid variables -- either hold down the control button while selecting
+them one at a time, or select the first one, then hold down the
+shift button down while you select the last one.  Once they're all
+highlighted, choose \Widget{Standardize} in the ``Stage 2'' transformation
+panel to standardize all the variables to have mean 0 and variance 1.
+This tool has numerous transformations, which can be applied in sequence.
+Stage 0 transformations are used to adjust variables' values so that
+they're within the range of some stage 1 transformations. Stage 2
 transformations allow for post-processing of stage 1 transformations,
-so that the variables can be logged and then standardized, for
-example. Select all of the fatty acid variables.  Once they're all
-highlighted, choose \Widget{Standardize} in the ``Stage 2''
-transformation panel to standardize all the variables to have mean 0
-and variance 1.  Click ``Reset all'' to to turn off standardization
-and any other transformations you've explored.
+so that the variables can be logged and then standardized, for example.
 
-\begin{figure}[htpb]
-\begin{center}
-\includegraphics[width=2in]{Figures/olive8.png}
-\end{center}
-\caption{The variable transformation panel allows the user to transform variables.
-}
-\label{fig2a}
-\end{figure}
+But that was just an instructive detour; click ``Reset all'' to
+to turn off standardization and any other transformations you've
+explored.
 
-Return to look at the plot of linoleic vs eicosenoic. Open up the
-\Widget{Color \& glyph groups ...} tool. This tool allows color and
-glyph groups in the data to be hidden or even excluded from view.
-Experiment with it: Use the ``Shadow'' toggle buttons to have groups
-of points drawn in a dim color, and then use ``Exclude shadows'' to
-exclude them altogether, and ``Include shadows'' to re-include them.
-(Figure \ref{fig5}).  Finally, use these controls to shadow brush the
-cases from geographic region 1, and then use \Widget{Exclude shadows}
-to remove them from consideration.
+Now look at the plot of linoleic vs eicosenoic. Open up the
+\Widget{Color \& glyph groups ...} tool, and experiment with it: Use
+the ``Shadow'' toggle buttons to have groups of points drawn in a dim
+color, and then use ``Exclude shadows'' to exclude them altogether,
+and ``Include shadows'' to re-include them.  (Figure \ref{fig5}).
+Finally, use these controls to shadow brush the cases from geographic
+region 1, and then use \Widget{Exclude shadows} to remove them from
+consideration.
 
 \begin{figure}[htp]
-\hbox{\pdfimage width 3in {Figures/olive9.png}\pdfimage width 3.5in {Figures/olive10.png}}
+\centerline{\pdfimage width 3in {Figures/olive-brush3.png}\hspace{0.2in}\pdfimage width 2.5in {Figures/olive-brush4.png}}
 \caption{Toggling clusters of points on and off according to color/glyph value.}
 \label{fig5}
 \end{figure}
@@ -334,41 +314,60 @@ variable circles is added to the right of the variable toggles, one
 for each selected variable.  Click on the toggle widgets for the
 variables palmitoleic through arachidic to make these variables
 available for touring, and toggle Region and Area out of the tour.
-The tour should now include 7 variables, with one variable circle for
-each.
+Click the \Widget{Reinit} button.  The tour should now include 7
+variables, with one variable circle for each.
 
-The scrollbar at the top of the \Widget{2D Tour} controls is used to
-adjust the speed of the tour.  Drag it to the right to speed up the
-rotation. There is a toggle button to \Widget{Pause} and start the
-tour. \Widget{Reinit} and \Widget{Scramble} reset the projection
-displayed in the plot window.
-
+The scrollbar at the top of the tour controls is used to adjust the
+speed of the tour.  Drag it to the right to speed up the rotation.
 The circle at the bottom left of the plot window displays the axes for
 the tour. These can be removed by toggling the ``Show axes'' button on
-the plot's \Widget{2D Tour} menu.  You can also display the projection
-coefficients from this menu too.
+the display's \Widget{2D Tour} menu.  Pause the tour when you see a
+separation of the two regions (as seen in Figure \ref{fig6}).
 
-Pause the tour when you see a separation of the two regions (as seen
-in Figure \ref{fig6}).  Now you are going to use manual tour controls
-to sharpen up the separation by manually changing the coefficients of
-the variables in the projection.  Click on the \Widget{Manip}
-(magenta) button below the variable selection region of the console,
-and then click on linoleic acid (a magenta circle will be seen now in
-the variable circle for linoleic acid).   In the plot
-window, hold down any mouse button while you drag the cursor. The
-coefficient corresponding to linoleic acid will increase and decrease
-following the mouse, inducing a rotation of the scattercloud.  If the
-axes are still showing in the scatterplot window, the axis in magenta
+Now you are going to use manual tour controls to sharpen up the
+separation by manually changing the coefficients of the variables in
+the projection.  Click on the \Widget{Manip} (magenta) button below
+the variable selection region of the console, and then click on
+linoleic acid (a magenta circle will be seen now in the variable
+circle for linoleic acid).  \Widget{Oblique} is already selected in
+the \Widget{Manual manipulation} menu.  In the plot window, hold down
+any mouse button while you drag the cursor. The coefficient
+corresponding to linoleic acid will increase and decrease following
+the mouse, inducing a rotation of the scattercloud.  If the axes are
+still showing in the scatterplot window, the axis in magenta
 corresponds to the variable you're manipulating.  Similarly rotate
 oleic acid and arachidic acid in and out of the plot, with the aim of
-finding a projection where the two regions are well separated (for
-example, Figure \ref{fig6}).  
+finding a projection where the two regions are well separated.  There
+are 5 choices of manipulation mode (unconstrained oblique, vertical,
+horizontal, radial and angular) to explore.
 
 \begin{figure}[htp]
-\hbox{\pdfimage width 3in {Figures/olive11.png}\pdfimage width 3in {Figures/olive12.png}}
-\caption{Tour plots revealing difference between regions 2 and 3 of the
-olive oils.}
+\centerline{\pdfimage width 3in {Figures/olive-tourpanel.png}\hspace{0.2in}\pdfimage width 2.5in {Figures/olive-tour1.png}}
+\caption{(Left) Tour panel showing the controls for the tour, and
+(right) a tour projection revealing a difference between regions 2 and
+3 of the olive oils.}
 \label{fig6}
+\end{figure}
+
+Next use the Tools menu to open the \Widget{Variable manipulation} tool
+(Figure \ref{fig4}).  It contains a notebook widget which separates
+the variables by type, and displays information about them in a set
+of tables.  The buttons below the tables allow you to set variable
+limits, add new variables, and a few other things.  Try clicking the
+mouse in the table -- you can select one row of the table at a time,
+or use the control and shift keys as modifiers to select more than one.
+Select all the fatty acid variables, all of which are in the table
+of real variables.
+
+\begin{figure}[htp]
+\centerline{\pdfimage width 3.2in {Figures/olive-var1.png}
+\pdfimage width 3.2in {Figures/olive-var2.png}}
+\caption{The variable manipulation panel contains basic summary 
+statistics of variables. It can also be used for adding new variables
+and for variable subset selection before launching multi-plot
+displays.
+}%}
+\label{fig4}
 \end{figure}
 
 Open a parallel coordinates display using the \Widget{Display} menu.
@@ -377,51 +376,20 @@ clicking on it, and use the \Widget{Interaction} menu to switch to
 \Widget{Brush} mode. Choose a new color (say yellow) and large closed glyph,
 and transiently paint the case with a very low value on palmitic
 (Figure \ref{fig7}). This case also has a very high value for oleic
-acid, and low value for linolenic acid. 
+acid, and low value for linolenic acid.
 
 \begin{figure}[htp]
-\hbox{\pdfimage width 6in {Figures/olive13.png}}
+\centerline{\pdfimage width 4in {Figures/olive-par.png}}
 \caption{Brushing in a parallel coordinates display reveals an outlier in 
 palmitic, oleic and linolenic acids.}
 \label{fig7}
 \end{figure}
 
-Next use the Tools menu to open the \Widget{Variable manipulation}
-tool (Figure \ref{fig4}).  It contains a notebook widget which
-separates the variables by type, and displays information about them
-in a set of tables.  
-
-\begin{figure}[htp]
-\pdfimage width 6in {Figures/olive14.png}
-\pdfimage width 6in {Figures/olive17.png}
-\caption{The variable manipulation panel contains basic summary
-statistics of variables. It can also be used for changing scales or
-adding new variables and for variable subset selection before
-launching multi-plot displays. }
-\label{fig4}
-\end{figure}
-
-The buttons below the tables allow you to set variable limits, add new
-variables, and a few other things.  Select all the fatty acid
-variables, all of which are in the table of \Widget{Real}
-variables. Put the fatty acid variables on a common scale by set the
-\Widget{Limits} to 0,8500. Notice the change in the parallel
-coordinate plot: Now it is clear that all the olive oils are composed
-of mostly oleic acid.
-
-\begin{figure}[htp]
-\pdfimage width 3in {Figures/olive16.png}
-\pdfimage width 6in {Figures/olive15.png}
-\caption{The variable manipulation panel allows the variables to set
-to a common scale.}
-\label{fig4b}
-\end{figure}
-
-Using the \Widget{Color \& glyph groups} tool from the \Widget{Tools}
-controls, click on the appropriate `Shadow' button to bring the Region
-1 cases back into the plot.  Using the \Widget{File} menu, save the
-data, preserving the colors and glyphs that have been assigned during
-this session.
+Using the \Widget{Color \& glyph groups} tool from the \Widget{Brush}
+controls, click on the appropriate `S' button to bring the Region 1
+cases back into the plot.  Using the \Widget{File} menu, save the data,
+preserving the colors and glyphs that have been assigned during this
+session.
 
 This has been a brief introduction to the use of GGobi. The following
 section contains more detailed information on its functionality.
@@ -720,64 +688,6 @@ specification of color or glyph, for example, nor do they allow row
 ids, so they can't be used for linking across data sets and the
 display of graphs.
 
-\subsection {ASCII}
-\label{slbl:ASCII}
-
-GGobi can read files in the format used by XGobi, with some changes
-and some exclusions.  As new functionality is added to GGobi, it is
-not extended to this older format, so such features as row ids and
-categorical variables are not present.
-
-The only essential file is the one containing the data itself.  Each
-line in the file contains one row of the input data matrix, and lines
-must be separated by carriage returns.  Columns, or variables, can be
-separated by any number of tabs or spaces.  The file needs to have the
-suffix \File{.dat}.
-
-You can supply variable and case labels in associated files.  Variable
-(column) labels can be in a file named \File{datafile.col} (or
-\File{datafile.column}, \File{datafile.collab}, or
-\File{datafile.var}).  Variable ranges can be specified by adding two
-more fields, using $|$ as the field separator.  Case (row) labels can
-be supplied in a file named \File{datafile.row} (or
-\File{data\-file.row\-lab} or \File{data\-file.case}).  There should
-be one label per line, and the label can include blanks.  If variable
-or case labels are not supplied, default labels using column or row
-numbers are used.
-
-The files \File{datafile.glyphs} and \File{datafile.colors} can be
-used to set the plotting characters and colors to be used in
-drawing each point.  Glyphs can be specified in two ways:
-
-\begin{itemize}
-\item with a string for glyph type and a number for glyph size, where the
-glyph type is one of
-  \begin {itemize}
-  \itemsep 0em
-  \item ``.'' (a single-pixel point),
-  \item ``plus'',
-  \item ``x'',
-  \item ``oc'' (open circle),
-  \item ``or'' (open rectangle),
-  \item ``fc'' (filled circle), or
-  \item ``fr'' (filled rectangle).
-  \end {itemize}
-and the glyph size is between 0 and 7, or
-
-\item with one number per line, where the number is between 0 and
-43.  Here's how to generate that number: the type is between 0 and 6,
-using the ordering just presented, and the size is between 0 and 7.
-The number is then 0 for the single-pixel glyph, and
-$7 \times (type-1) + size + 1$ for all other glyphs.
-\end{itemize}
-
-% Don't know if this is true any longer; dfs.
-Filled circles may be the most visually appealing glyph, but take much
-longer to draw under Microsoft Windows.  Consequently, our sample data
-files usually use a small filled rectangle as the default glyph.
-
-Colors must be integers from 0 to one fewer than the number of colors in
-the colormap.
 
 \begin{comment}
 % Should this be moved to a section on plugins?
