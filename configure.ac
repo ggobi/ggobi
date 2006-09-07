@@ -1,10 +1,10 @@
 dnl This is the configuration script for ggobi
 
 # Configure the version information here
-m4_define([ggobi_release_date], ["August 14 2006"])
+m4_define([ggobi_release_date], ["September 7 2006"])
 m4_define([ggobi_major_version], [2])
 m4_define([ggobi_minor_version], [1])
-m4_define([ggobi_micro_version], [3])
+m4_define([ggobi_micro_version], [4])
 m4_define([ggobi_version],
           [ggobi_major_version.ggobi_minor_version.ggobi_micro_version])
 
@@ -40,6 +40,10 @@ AM_GNU_GETTEXT([external])
 AM_GNU_GETTEXT_VERSION(0.14.5)
 GGOBI_LOCALEDIR="${GGOBI_DATADIR}/locale"
 AC_DEFINE_UNQUOTED([GGOBI_LOCALEDIR], "$GGOBI_LOCALEDIR", [Location of locale files])
+
+# gettext needs MKINSTALLDIRS, but for some reason isn't getting it
+MKINSTALLDIRS="\$(top_builddir)/$ac_aux_dir/mkinstalldirs"
+AC_SUBST(MKINSTALLDIRS)
 
 MAJOR_VERSION=ggobi_major_version
 MINOR_VERSION=ggobi_minor_version
