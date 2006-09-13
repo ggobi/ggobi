@@ -736,6 +736,119 @@ describe_time_series_display (FILE *fp, ggobid *gg, displayd *display,
 }
 
 void
+describe_barchart_plot (FILE *fp, ggobid *gg, displayd *display,
+   splotd *sp, dspdescd *desc)
+{
+  GGobiData *d = display->d;
+  barchartSPlotd *bsp = GGOBI_BARCHART_SPLOT (sp);
+  vartabled *vtx = vartable_element_get (sp->p1dvar, d);
+  gint i, m, level, counter;
+
+  OPEN_LIST(fp);  /* plot; unlabelled */
+  if (vtx->vartype == categorical) {
+    if (bsp->bar->is_spine)
+      fprintf (fp, "type='spineplot'");
+    else
+      fprintf (fp, "type='barplot'");
+  } else {
+    fprintf (fp, "type='histogram'");
+  }
+  ADD_COMMA(fp);
+
+
+  OPEN_NAMED_LIST(fp, "points");
+  /* x coordinates */
+  OPEN_NAMED_C(fp, "x");
+  for (m=0, counter=0; m<d->nrows_in_plot; m++, counter++) {
+    i = d->rows_in_plot.els[m];
+    fprintf (fp, "%g,", d->tform.vals[i][sp->p1dvar]);
+    if (counter % MAX_PER_ROW == 0) ADD_CR(fp);
+  }
+  CLOSE_C(fp); ADD_COMMA(fp); ADD_CR(fp);
+
+  /* color */
+  OPEN_NAMED_C(fp, "color");
+  for (m=0, counter=0; m<d->nrows_in_plot; m++, counter++) {
+    i = d->rows_in_plot.els[m];
+    fprintf (fp, "%d,", d->color_now.els[i]);
+    if (counter % MAX_PER_ROW == 0) ADD_CR(fp);
+  }
+  CLOSE_C(fp); ADD_COMMA(fp); ADD_CR(fp);
+
+  /* hiddenness */
+  OPEN_NAMED_C(fp, "hidden");
+  for (m=0, counter=0; m<d->nrows_in_plot; m++, counter++) {
+    i = d->rows_in_plot.els[m];
+    fprintf (fp, "%d,", d->hidden_now.els[i]);
+    if (counter % MAX_PER_ROW == 0) ADD_CR(fp);
+  }
+  CLOSE_C(fp); ADD_COMMA(fp); ADD_CR(fp);
+
+  CLOSE_LIST(fp);  /* points */
+  ADD_COMMA(fp);
+  ADD_CR(fp);
+
+  /* parameters */
+  OPEN_NAMED_LIST(fp, "params");
+  /* Variable name */
+  fprintf (fp, "label='%s',", vtx->collab_tform);
+
+
+  if (vtx->vartype == categorical) {
+    gchar *catname;
+
+    /* level names */
+    OPEN_NAMED_C(fp, "levelnames");
+    for (i = 0; i < bsp->bar->nbins; i++) {
+      level = checkLevelValue (vtx, (gdouble) bsp->bar->bins[i].value);
+      catname = g_strdup_printf ("%s",
+                                 (level ==
+                                  -1) ? "missing" : vtx->level_names[level]);
+      fprintf (fp, "'%s',", catname);
+      if (i % MAX_PER_ROW == 0) ADD_CR(fp);
+    }
+    CLOSE_C(fp); ADD_COMMA(fp); ADD_CR(fp);
+
+    /* level values */
+    OPEN_NAMED_C(fp, "levelvalues");
+    for (i = 0; i < bsp->bar->nbins; i++) {
+      level = checkLevelValue (vtx, (gdouble) bsp->bar->bins[i].value);
+      fprintf (fp, "%d,", level);
+      if (i % MAX_PER_ROW == 0) ADD_CR(fp);
+    }
+    CLOSE_C(fp); ADD_COMMA(fp); ADD_CR(fp);
+  } else {
+    /* breaks */
+    OPEN_NAMED_C(fp, "breaks");
+    for (i = 0; i < bsp->bar->nbins; i++) {
+      fprintf (fp, "%.3f,", bsp->bar->breaks[i]);
+    }
+    CLOSE_C(fp); ADD_COMMA(fp); ADD_CR(fp);
+  }
+
+  CLOSE_LIST(fp);  /* params */
+  ADD_COMMA(fp);
+  ADD_CR(fp);
+
+  CLOSE_LIST(fp); /* plot */
+}
+
+void describe_barchart_display (FILE *fp, ggobid *gg, displayd *display, 
+		      dspdescd *desc)
+{
+  splotd *sp = (splotd *) display->splots->data;
+
+  fprintf (fp, "nplots=1");
+  ADD_COMMA(fp); ADD_CR(fp);
+  OPEN_NAMED_LIST(fp, "plots");
+
+  describe_barchart_plot (fp, gg, display, sp, desc);
+
+  CLOSE_LIST(fp);  /* plots */
+}
+
+
+void
 desc_setup (dspdescd *desc)
 {
   GtkWidget *entry;
@@ -805,12 +918,12 @@ desc_write (PluginInstance *inst)
     fprintf (fp, "type='timeseries',");
     fprintf (fp, "ncols = %d,", g_list_length (display->splots));
     describe_time_series_display (fp, gg, display, desc);
-  /*
   } else if (GGOBI_IS_BARCHART_DISPLAY(display)) {
-    fprintf (fp, "type='barchart',");
+    fprintf (fp, "type='barchart',");  /* barchart or histogram */
+    describe_barchart_display (fp, gg, display, desc);
+  /*
     -- is_histogram and is_spine are attributes of the plot, not the
        display : sp->bar->is_histogram, etc.
-    describe_barchart_display (gg, display, desc, display_node);
     -- this will call describe_barchart_plot
     -- other useful attributes: nbins, breaks
   */
