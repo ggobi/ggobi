@@ -13,5 +13,5 @@ To go after memory errors:
 If you don't have a purify license, and you're on linux, then
 try this:
 
-valgrind --workaround-gcc296-bugs=yes ggobi [datafile]
+valgrind --trace-children=yes ggobi [datafile]
 
