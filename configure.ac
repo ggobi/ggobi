@@ -31,7 +31,9 @@ if test "${prefix}" = "NONE"; then
 fi
 
 # Remember where our GGobi data is installed
-GGOBI_DATADIR=`eval echo "${datadir}"`
+# We evaluate datadir twice to resolve any symbols inside datadir
+GGOBI_DATADIR_TMP=`eval echo "${datadir}"`
+GGOBI_DATADIR=`eval echo "${GGOBI_DATADIR_TMP}"`
 AC_DEFINE_UNQUOTED([GGOBI_DATADIR], "$GGOBI_DATADIR", [Location of GGobi data installation])
 
 # Initialize gettext
@@ -187,10 +189,24 @@ AC_CONFIG_MACRO_DIR(m4)
 
 echo "Setting gtk flags: cflags=$GTK_CFLAGS, libs=$GTK_LIBS"
 
+# Find libxml2
+
 PKG_CHECK_MODULES(LIBXML, [libxml-2.0])
 
 AC_SUBST(LIBXML_CFLAGS)
 AC_SUBST(LIBXML_LIBS)
+
+# Find gsf
+
+PKG_CHECK_MODULES(LIBGSF, [libgsf-1])
+AC_SUBST(LIBGSF_CFLAGS)
+AC_SUBST(LIBGSF_LIBS)
+
+# Find gsl
+
+PKG_CHECK_MODULES(GSL, [gsl])
+AC_SUBST(GSL_CFLAGS)
+AC_SUBST(GSL_LIBS)
 
 # Are we on Windows?
 
