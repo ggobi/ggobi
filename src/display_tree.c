@@ -71,8 +71,10 @@ update_display_tree_plots_by_variable (ggobid * gg, GGobiData * d,
   label = splot_tree_label (sp, d, gg);
   gtk_tree_store_set (GTK_TREE_STORE (model), &iter, DISPTREE_LABEL, label,
                       -1);
+  /* dfs: don't free
   if (label)
     g_free (label);
+  */
 }
 
 CHECK_EVENT_SIGNATURE (update_display_tree_plots_by_variable,
@@ -223,8 +225,10 @@ g_signal_connect (G_OBJECT(tree), "select_child",
     gtk_tree_store_append (GTK_TREE_STORE (model), &iter, parent);
     gtk_tree_store_set (GTK_TREE_STORE (model), &iter, DISPTREE_LABEL, buf,
                         DISPTREE_OBJECT, sp, -1);
+    /* dfs: don't free
     if (buf)
       g_free (buf);
+    */
   }
 }
 
