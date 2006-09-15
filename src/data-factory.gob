@@ -1,0 +1,60 @@
+%h{
+  #include <gsf/gsf.h>
+  #include "ggobi-data.h"
+  #include "ggobi-input-source.h"
+%}
+%{
+  #include <libxml/uri.h>
+%}
+
+class GGobi:Data:Factory from G:Object (abstract) {
+  
+  virtual GSList *
+  create(self, GGobi:Input:Source *source  (check null type));
+  
+  virtual gboolean
+  supports_source(self, GGobi:Input:Source *source  (check null)) {
+    gchar *mode = ggobi_input_source_get_logical_mode(source);
+    gchar *p_mode = ggobi_input_source_get_physical_mode(source);
+    gboolean supports = FALSE;
+    if (mode || p_mode) {
+      GSList *modes = self_get_supported_modes(self);
+      supports = g_slist_find_custom(modes, mode ? mode : p_mode, (GCompareFunc)strcmp) != NULL;
+      g_slist_foreach(modes, (GFunc)g_free, NULL);
+      g_slist_free(modes);
+      g_free(mode);
+    }
+    if (!mode && !supports) { /* check file extensions for NULL mode */
+      gchar *uri = ggobi_input_source_get_uri(source);
+      xmlURIPtr parsed_uri = xmlParseURI(uri);
+      if (parsed_uri && parsed_uri->path) {
+        GSList *exts = self_get_file_exts_for_mode(self, mode);
+        char *unescaped = xmlURIUnescapeString(parsed_uri->path, 0, NULL);
+        gint len;
+        gchar *utf8_path = g_locale_to_utf8(unescaped, -1, NULL, &len, NULL);
+        if (utf8_path) {
+          gchar *path = g_utf8_casefold(utf8_path, -1);
+          const gchar *ext = strrchr(path, '.');
+          if (ext)
+            supports = g_slist_find_custom(exts, ++ext, (GCompareFunc)strcmp) != NULL;
+          g_free(path);
+          g_free(utf8_path);
+        } else g_warning("Could not convert path '%s' to UTF8", unescaped);
+        free(unescaped);
+        g_slist_foreach(exts, (GFunc)g_free, NULL);
+        g_slist_free(exts);
+      }
+      if (parsed_uri)
+        xmlFreeURI(parsed_uri);
+      else g_warning("Could not parse URI: %s", uri);
+      g_free(uri);
+    }
+    return supports;
+  }
+  
+  virtual GSList *
+  get_supported_modes(self);
+  
+  virtual GSList *
+  get_file_exts_for_mode(self, const gchar *mode);
+}

@@ -24,7 +24,6 @@
 
 #include "vars.h"
 #include "externs.h"
-#include "read_xml.h"
 #include "plugin.h"
 #include "ggobi-stage-filter.h"
 
@@ -71,77 +70,106 @@ globals_init (ggobid * gg)
 }
 
 
-gboolean
-fileset_read_init (const gchar * ldata_in, const gchar * pluginModeName,
-                   GGobiPluginInfo * plugin, ggobid * gg)
+GSList *
+load_data (const gchar * uri, const gchar * mode_name, ggobid * gg)
 {
-  GSList *ds = fileset_read (ldata_in, pluginModeName, plugin, gg);
-  for (; ds; ds = ds->next) {
-    // Uncomment below to enable filter stage (good luck)
-    /*GGobiStage *s = ggobi_pipeline_factory_get_pipeline(gg->pipeline_factory,
-      ds->data, "GGobiFilter");
-    ggobi_stage_attach(s, gg, FALSE);*/
-    ggobi_stage_attach(ds->data, gg, FALSE);
+  GGobiInputSource *source = create_input_source(uri, mode_name);
+  GSList *ds = NULL;
+  if (source) { // FIXME: report this error in gg->io_context
+    ds = load_data_source(source, gg);
+    g_object_unref(G_OBJECT(source));
   }
-
-  return (ds != NULL);
+  return (ds);
 }
 
 // returns a list of datasets (some input types (eg. xml) may return 
 // multiple data types)
 GSList *
-fileset_read (const gchar * ldata_in, const gchar * pluginModeName,
-              GGobiPluginInfo * plugin, ggobid * gg)
+load_data_source (GGobiInputSource *source, ggobid * gg)
 {
-  InputDescription *desc;
-
-  desc = fileset_generate (ldata_in, pluginModeName, plugin, gg);
-  if (desc == NULL) {
-    // We should be able to distinguish these two cases.  Could
-    // plugins report whether the file is readable?   -- dfs
-    g_printerr ("Cannot locate the file %s, or cannot recognize its format\n",
-      ldata_in);
+  GGobiDataFactory *factory;
+  GSList *datasets = NULL;
+  
+  /* somewhere around here we need to convert the input source */
+  
+  factory = get_data_factory(gg, source);
+  
+  if (factory == NULL) {
+    // FIXME: we should have some unified way of graphically reporting errors
+    // from some sort of IO context
+    g_critical("No data factory capable of parsing the data");
     return NULL;
   }
+  
+  datasets = ggobi_data_factory_create(factory, source);
+  for (; datasets; datasets = datasets->next) {
+    // Uncomment below to enable filter stage (good luck)
+    /*GGobiStage *s = ggobi_pipeline_factory_get_pipeline(gg->pipeline_factory,
+      ds->data, "GGobiFilter");
+    ggobi_stage_attach(s, gg, FALSE);*/
+    // And you want to comment this one
+    ggobi_stage_attach(datasets->data, gg, FALSE);
+  }
+  
+  return (datasets);
+}
 
-  if (desc->mode == unknown_data && desc->desc_read_input == NULL) {
-    g_printerr ("Cannot determine the format of the data in file %s\n",
-                desc->fileName);
+GGobiDataFactory *
+get_data_factory (ggobid *gg, GGobiInputSource *source)
+{
+  GType *factories;
+  GGobiDataFactory *factory = NULL;
+  gint i, n_factories;
+
+  // FIXME: it may be better to make our own registry for GGobiDataFactories
+  // that holds an instance, so that we aren't always instantiating them
+  factories = g_type_children(GGOBI_TYPE_DATA_FACTORY, &n_factories);
+  
+  for (i = 0; i < n_factories && !factory; i++) {
+    GObject *factory_obj = g_object_new(factories[i], NULL);
+    if (ggobi_data_factory_supports_source(GGOBI_DATA_FACTORY(factory_obj), source))
+      factory = GGOBI_DATA_FACTORY(factory_obj);
+    else g_object_unref(factory_obj);
+  }
+
+  g_free(factories);
+  
+  return (factory);
+}
+
+#include <libxml/uri.h>
+
+static gint
+scheme_compare_func(gconstpointer list_scheme, gconstpointer scheme)
+{
+  return list_scheme != scheme && g_ascii_strcasecmp(list_scheme, scheme);
+}
+
+GGobiInputSource *
+create_input_source(const gchar *uri, const gchar *mode)
+{
+  GGobiInputSource *source = NULL;
+  GType *source_types;
+  gint n_types, i;
+  
+  xmlURIPtr parsed_uri = xmlParseURI(uri);
+  if (!parsed_uri) {
+    g_critical("Failed to parse URI: %s", uri);
     return NULL;
   }
-
-  gg->input = desc;
-
-  return (read_input (desc, gg));
-}
-
-
-// returns a list of datasets (some input types (eg. xml) may return multiple data types)
-GSList *
-read_input (InputDescription * desc, ggobid * gg)
-{
-  GSList *ds = NULL;
-  if (desc == NULL)
-    return (NULL);
-
-  if (desc->desc_read_input) {
-    if (!desc->baseName)
-      completeFileDesc (desc->fileName, desc);
-    ds = desc->desc_read_input (desc, gg, NULL);
+  
+  source_types = g_type_children(GGOBI_TYPE_INPUT_SOURCE, &n_types);
+  for (i = 0; i < n_types && !source; i++) {
+    GGobiInputSourceClass *source_class = g_type_class_ref(source_types[i]);
+    GSList *supported_schemes = source_class->get_supported_schemes(NULL);
+    if (g_slist_find_custom(supported_schemes, parsed_uri->scheme, scheme_compare_func))
+      source = g_object_new(source_types[i], "uri", uri, "logical_mode", mode, NULL);
+    g_type_class_unref(source_class);
   }
-  else
-    g_printerr ("Unknown data type in read_input\n");
-
-  if (ds && sessionOptions->verbose == GGOBI_VERBOSE) {
-    showInputDescription (desc, gg);
-  }
-
-  return (ds);
+  
+  xmlFreeURI(parsed_uri);
+  return source;
 }
-
-
-
-
 
 /*
  * the first display is initialized in datad_attach, so turn on
@@ -164,46 +192,31 @@ make_ggobi (GGobiOptions * options, gboolean processEvents, ggobid * gg)
   make_ui (gg);
 
   /* If the user specified a data file on the command line, then 
-     try to load that. If not, then look through the input plugins
-     for the first interactive one (i.e. with an interactive="true" attribute)
-     and then we try to run that. This allows input plugins that provide
-     a user interface to query the user as to what to do.
+     try to load that.
    */
-  if (options->data_in != NULL) {
-    if (fileset_read_init (options->data_in, sessionOptions->data_type,
-                           NULL, gg)) {
+  if (options->data_in || options->data_type) {
+    if (load_data (options->data_in, options->data_type, gg)) {
       init_data = true;
     }
   }
-  else {
-    if (runInteractiveInputPlugin (gg) == NULL) {
-      if (sessionOptions->data_type)
-        fprintf (stderr, "No available plugin to handle input mode %s\n",
-                 sessionOptions->data_type);
-      fflush (stderr);
-    }
-  }
 
-
-  if (sessionOptions->info != NULL)
-    registerPlugins (gg, sessionOptions->info->plugins);
-
-  resetDataMode ();
-
-  if (sessionOptions->timingp) {
+  if (options->info != NULL)
+    registerPlugins (gg, options->info->plugins);
+  
+  if (options->timingp) {
     // Initialize the time counter
     set_time(gg);
   }
 
-  start_ggobi (gg, init_data, sessionOptions->info->createInitialScatterPlot);
+  start_ggobi (gg, init_data, options->info->createInitialScatterPlot);
 
-  if (sessionOptions->restoreFile) {
-    processRestoreFile (sessionOptions->restoreFile, gg);
+  if (options->restoreFile) {
+    processRestoreFile (options->restoreFile, gg);
   }
 
   gg->status_message_func = gg_write_to_statusbar;
 
-  if (sessionOptions->timingp) {
+  if (options->timingp) {
     run_timing_tests (gg);
   }
 
@@ -212,15 +225,8 @@ make_ggobi (GGobiOptions * options, gboolean processEvents, ggobid * gg)
   }
 }
 
-void
-resetDataMode ()
-{
-  if (sessionOptions->data_type)
-    free (sessionOptions->data_type);
-  sessionOptions->data_type = NULL;
-  sessionOptions->data_mode = unknown_data;
-}
-
+// FIXME: when this refactored, we need to emit a signal on GGobi "start"
+// to allow stuff like batch execution via plugins
 void
 start_ggobi (ggobid * gg, gboolean init_data, gboolean createPlot)
 {

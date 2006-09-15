@@ -39,6 +39,16 @@ sqdist (gint x1, gint y1, gint x2, gint y2)
   return ((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
 }
 
+/*
+  Convert the specified string to a numeric value.
+  This is now done in a locale-insensitive way, so all input that uses this
+  function needs to use the C locale (ie decimal points are '.')
+ */
+gdouble as_number (const char *sval)
+{
+  return (g_ascii_strtod (sval, NULL));
+}
+  
 gboolean
 is_numeric (const gchar * str)
 {
@@ -47,6 +57,19 @@ is_numeric (const gchar * str)
   return (end - str == strlen(str));    
 }
 
+gboolean as_logical (const gchar * sval)
+{
+  guint i;
+  gboolean val = false;
+  const gchar *const trues[] = { "T", "true", "True", "1" };
+  for (i = 0; i < sizeof (trues) / sizeof (trues[0]); i++)
+    {
+      if (strcmp (sval, trues[i]) == 0)
+        return (true);
+    }
+
+  return (val);
+}
 
 /* returns a random number on [0.0,1.0] */
 gdouble

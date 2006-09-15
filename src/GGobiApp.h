@@ -28,5 +28,4 @@ typedef struct {
    */
 } GGobiApp;
 
-
 #endif /* GGOBI_APP_H */

@@ -15,8 +15,6 @@
 */
 
 
-/*--         (should be called fileio_ui.c)                   --*/
-
 #include <string.h>
 #ifdef USE_STRINGS_H
 #include <strings.h>
@@ -31,6 +29,7 @@
 
 #include "writedata.h"
 #include "write_xml.h"
+#include "ggobi-input-source-file.h"
 
 #include "plugin.h"
 
@@ -38,66 +37,65 @@
 #define EXTEND_FILESET 1
 #define WRITE_FILESET  2
 
-
+// FIXME: eventually the GGobiDataFactory's should exist within a GGobi context
+// so that we don't have to instantiate them just to check the supported modes
+GSList *
+get_supported_data_modes(ggobid *gg)
+{
+  GType *factory_types;
+  gint n_factory_types, i;
+  GSList *modes = NULL;
+  
+  factory_types = g_type_children(GGOBI_TYPE_DATA_FACTORY, &n_factory_types);
+  
+  for (i = 0; i < n_factory_types; i++) {
+    GObject *factory = g_object_new(factory_types[i], NULL);
+    GSList *factory_modes = ggobi_data_factory_get_supported_modes(
+      GGOBI_DATA_FACTORY(factory));
+    modes = g_slist_concat(modes, factory_modes);
+    g_slist_free(factory_modes);
+    g_object_unref(factory);
+  }
+    
+  return modes;
+}
 
 void
 filesel_ok (GtkWidget * chooser)
 {
   extern const gchar *key_get (void);
-  gchar *pluginModeName;
   ggobid *gg;
   guint action, len;
-  gchar *fname, *filename;
+  gchar *uri, *filename;
   gboolean firsttime;
 
   gg = (ggobid *) g_object_get_data (G_OBJECT (chooser), key_get ());
-  fname = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (chooser));
+  uri = gtk_file_chooser_get_uri (GTK_FILE_CHOOSER (chooser));
   action = GPOINTER_TO_INT (g_object_get_data (G_OBJECT (chooser), "action"));
-  len = strlen (fname);
+  len = strlen (uri);
 
   switch (action) {
   case READ_FILESET:
     {
-      gint which;
-      GGobiPluginInfo *plugin;
+      const gchar *mode_name;
       GtkWidget *combo;
-
-      combo =
-        (GtkWidget *) g_object_get_data (G_OBJECT (chooser),
-                                         "PluginTypeCombo");
-      which = gtk_combo_box_get_active (GTK_COMBO_BOX (combo));
-
-      { // Testing URL reading interface
-        GtkWidget *entry;
-        gchar *url;
-        GList *els, *l;
-        gint k = 0;
-
-        entry = (GtkWidget *) g_object_get_data (G_OBJECT (chooser),
-                                                           "URLEntry");
-        if (entry) {
-          url = gtk_editable_get_chars (GTK_EDITABLE (entry), 0, -1);
-          if (g_utf8_strlen(url, -1) > 0) {
-            fname = url; // Reset fname
-            if (which == 0) {
-              els = getInputPluginSelections (gg);
-              for (l = els, k = 0; l; l = l->next, k++) {
-                if (g_ascii_strncasecmp((gchar *) l->data, "url", 3) == 0)
-                  break;
-              }
-              which = k;  // Reset combo box value
-            }
-          }
-        }
+      // FIXME: GTK+ 2.10 has a built-in entry, but it's not labeled "URL" like ours...
+      GtkWidget *entry = g_object_get_data(G_OBJECT (chooser), "URLEntry");
+      const gchar *url = gtk_entry_get_text(GTK_ENTRY(entry));
+      
+      if (url && strlen(url)) {
+        g_free(uri);
+        uri = g_strdup(url);
       }
+      
+      combo = (GtkWidget *) g_object_get_data (G_OBJECT (chooser),
+                                         "PluginTypeCombo");
+      mode_name = gtk_combo_box_get_active_text (GTK_COMBO_BOX (combo));
 
-      plugin = getInputPluginByModeNameIndex (which, &pluginModeName);
       firsttime = (g_slist_length (gg->d) == 0);
-      if (fileset_read_init (fname, pluginModeName, plugin, gg))
+      if (load_data (uri, mode_name, gg))
       /*-- destroy and rebuild the menu every time data is read in --*/
         display_menu_build (gg);
-
-      g_free (pluginModeName);
 
       /*
        * If this is the first data read in, we need a call to
@@ -118,11 +116,11 @@ filesel_ok (GtkWidget * chooser)
     {
       XmlWriteInfo *info = g_new0(XmlWriteInfo, 1);
 
-      /*-- if fname already contains ".xml", then don't add it --*/
-      if (len >= 4 && g_strncasecmp (&fname[len - 4], ".xml", 4) == 0)
-        filename = g_strdup (fname);
+      /*-- if uri already contains ".xml", then don't add it --*/
+      if (len >= 4 && g_strncasecmp (&uri[len - 4], ".xml", 4) == 0)
+        filename = g_strdup (uri);
       else
-        filename = g_strdup_printf ("%s.xml", fname);
+        filename = g_strdup_printf ("%s.xml", uri);
 
       info->useDefault = true;
       write_xml ((const gchar *) filename, gg, info);
@@ -131,11 +129,11 @@ filesel_ok (GtkWidget * chooser)
     }
     break;
     case CSVDATA:
-      /*-- if fname already contains ".csv", then don't add it --*/
-      if (len >= 4 && g_strncasecmp (&fname[len - 4], ".csv", 4) == 0)
-        filename = g_strdup (fname);
+      /*-- if uri already contains ".csv", then don't add it --*/
+      if (len >= 4 && g_strncasecmp (&uri[len - 4], ".csv", 4) == 0)
+        filename = g_strdup (uri);
       else
-        filename = g_strdup_printf ("%s.csv", fname);
+        filename = g_strdup_printf ("%s.csv", uri);
 
       g_printerr ("writing %s\n", filename);
       write_csv ((const gchar *) filename, gg);
@@ -149,7 +147,7 @@ filesel_ok (GtkWidget * chooser)
     break;
   }
 
-  g_free (fname);
+  g_free (uri);
 }
 
 static void
@@ -178,9 +176,9 @@ GtkWidget *
 createInputFileSelectionDialog (gchar * title, ggobid * gg)
 {
   GtkWidget *chooser, *combo, *hbox, *lbl;
-  GList *els, *l;
+  GSList *els, *l;
 
-  els = getInputPluginSelections (gg);
+  els = get_supported_data_modes(gg);
 
   chooser =
     gtk_file_chooser_dialog_new (title, NULL, GTK_FILE_CHOOSER_ACTION_OPEN,
@@ -198,7 +196,7 @@ createInputFileSelectionDialog (gchar * title, ggobid * gg)
     gtk_combo_box_append_text (GTK_COMBO_BOX (combo), l->data);
     g_free (l->data);
   }
-  g_list_free (els);
+  g_slist_free (els);
   gtk_combo_box_set_active (GTK_COMBO_BOX (combo), 0);
   gtk_box_pack_start (GTK_BOX (hbox), combo, false, false, 0);
   g_object_set_data (G_OBJECT (chooser), "PluginTypeCombo", combo);
@@ -226,6 +224,20 @@ createInputFileSelectionDialog (gchar * title, ggobid * gg)
   return (chooser);
 }
 
+void configure_file_chooser(GtkWidget *chooser, ggobid *gg)
+{
+  if (GGOBI_IS_INPUT_SOURCE_FILE(gg->data_source)) {
+    gchar *filename = ggobi_input_source_file_get_filename(
+      GGOBI_INPUT_SOURCE_FILE(gg->data_source));
+    if (filename) {
+      gchar *dir = g_path_get_dirname(filename);
+      gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER (chooser), dir);
+      g_free(filename);
+      g_free(dir);
+    } else g_warning("Could not get filename from file input source");
+  }
+}
+
 /*--------------------------------------------------------------------------*/
 /*                    reading files                                         */
 /*--------------------------------------------------------------------------*/
@@ -236,13 +248,7 @@ filename_get_r (ggobid * gg)
   GtkWidget *chooser;
   chooser = createInputFileSelectionDialog ("Read ggobi data", gg);
 
-  if (gg->input && gg->input->baseName) {
-    gchar *cwd = g_get_current_dir();
-    gchar *dir = g_build_filename(cwd, gg->input->dirName, NULL);
-    gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER (chooser), dir);
-    g_free(cwd);
-    g_free(dir);
-  }
+  configure_file_chooser(chooser, gg);
 
   filename_get_configure (chooser, READ_FILESET, gg);
 
@@ -276,13 +282,7 @@ filename_get_w (GtkWidget * w, ggobid * gg)
 
   chooser = createOutputFileSelectionDialog (title);
 
-  if (gg->input && gg->input->baseName) {
-    gchar *cwd = g_get_current_dir();
-    gchar *dir = g_build_filename(cwd, gg->input->dirName, NULL);
-    gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER (chooser), dir);
-    g_free(cwd);
-    g_free(dir);
-  }
+  configure_file_chooser(chooser, gg);
 
   filename_get_configure (chooser, WRITE_FILESET, gg);
 

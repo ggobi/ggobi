@@ -39,7 +39,7 @@ typedef struct {
 } GGobiDisplayDescription;
 
 typedef struct {
-  InputDescription input;
+  GGobiInputSource *source;
   GList *displays;
 } GGobiDescription;
 
@@ -69,6 +69,7 @@ typedef struct _GGobiInitInfo {
 
 } GGobiInitInfo;
 
+void readPluginFile (const char *const fileName, GGobiInitInfo * info);
 GGobiInitInfo *read_init_file(const gchar *filename, GGobiInitInfo *info);
 xmlNode *getXMLDocElement(const xmlDocPtr doc, const gchar *tagName);
 xmlNode *getXMLElement(const xmlNodePtr doc, const gchar *tagName);

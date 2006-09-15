@@ -80,10 +80,6 @@ display_menu_build (ggobid * gg)
                     G_CALLBACK (show_display_tree_cb), (gpointer) gg);
   gtk_menu_shell_append (GTK_MENU_SHELL (gg->display_menu), item);
 
-  if (sessionOptions->info != NULL) {
-    pluginsUpdateDisplayMenu (gg, gg->pluginInstances);
-  }
-
   /*-- these two lines replace gtk_menu_popup --*/
   if (nd) {
     gtk_widget_show_all (gg->display_menu);

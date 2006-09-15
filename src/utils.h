@@ -6,6 +6,8 @@ extern "C" {
 #endif
 
 gboolean   is_numeric (const gchar * str);
+gdouble as_number (const char *sval);
+gboolean as_logical (const gchar * sval);
 
 #ifdef __cplusplus
 }

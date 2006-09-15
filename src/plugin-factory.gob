@@ -1,0 +1,194 @@
+%h{
+  #include "ggobi-plugin.h"
+%}
+%{
+  #include <libxml/parser.h>
+  #define PROP_VALUE(field,name) ggobi_plugin_set_ ## field (plugin, (gchar *)xmlGetProp(c, BAD_CAST(name)))
+%}
+
+class GGobi:Plugin:Factory from G:Object {
+  
+  public GGobiPluginFactory *
+  new(void)
+  {
+    GObject *obj = (GObject *)GET_NEW;
+    return SELF(obj);
+  }  
+  
+  virtual GGobiPlugin *
+  create(self, xmlNodePtr node (check null), xmlDocPtr doc (check null))
+  {
+    GGobiPlugin *plugin;
+
+    plugin = ggobi_plugin_new();
+
+    self_parse_details(self, node, doc, plugin); /* metadata */
+    self_parse_symbols(self, node, doc, plugin); /* symbols to call (load,unload,etc) */
+    self_parse_options(self, node, doc, plugin); /* any options to pass */
+    self_parse_dependencies(self, node, doc, plugin); /* dependencies */
+  
+    return (plugin);
+  }
+  
+  /**
+  Pick up and store the named and unnamed arguments for this plugin.
+  These will be interpreted in a plugin-specific manner.
+ */
+ private gboolean
+ parse_options(self, xmlNodePtr node, xmlDocPtr doc, GGobiPlugin * plugin)
+ {
+   xmlNodePtr c;
+   c = getXMLElement (node, "options");
+   if (!c)
+     return (false);
+
+   self_parse_unnamed_args(self, c, doc, plugin);
+   self_parse_named_args(self, c, doc, plugin);
+
+   return (true);
+ }
+
+ /**
+  Collect the options for the plugin  that are enclosed within a
+  <args></args> element of the form <arg>value</arg>. 
+ */
+ private void
+ parse_unnamed_args(self, xmlNodePtr node, xmlDocPtr doc, GGobiPlugin * plugin)
+ {
+   xmlNodePtr c, el;
+   c = getXMLElement (node, "args");
+   if (!c)
+     return;
+
+   el = XML_CHILDREN (c);
+   while (el) {
+     if (el->type != XML_TEXT_NODE && el->type != XML_COMMENT_NODE) {
+       xmlChar *val;
+       val = xmlNodeListGetString (doc, XML_CHILDREN (el), 1);
+       ggobi_plugin_add_argument(plugin, NULL, (gchar *)val);
+     }
+     el = el->next;
+   }
+ }
+
+
+ /**
+  Collect the elements in the <options><named>...</named></options>
+  Each element is assumed to be a simple text element.
+ */
+ private void
+ parse_named_args(self, xmlNodePtr node, xmlDocPtr doc, GGobiPlugin * plugin)
+ {
+   xmlNodePtr c, el;
+   c = getXMLElement (node, "named");
+   if (!c)
+     return;
+
+   el = XML_CHILDREN (c);
+   while (el) {
+     if (el->type != XML_TEXT_NODE && el->type != XML_COMMENT_NODE) {
+       xmlChar *val;
+       val = xmlNodeListGetString (doc, XML_CHILDREN (el), 1);
+       ggobi_plugin_add_argument(plugin, (gchar *)el->name, (gchar *)val);
+     }
+     el = el->next;
+   }
+ }
+
+
+ /**
+  Pick up the names of all the plugins on which this one depends.
+  Then when we load this plugin, we will ensure that those plugins
+  are also loaded.
+ */
+ private void
+ parse_dependencies(self, xmlNodePtr node, xmlDocPtr doc, GGobiPlugin * plugin)
+ {
+  xmlNodePtr c, el;
+  c = getXMLElement (node, "dependencies");
+  if (!c)
+    return;
+
+  el = XML_CHILDREN (c);
+  while (el) {
+    if (el->type != XML_TEXT_NODE && el->type != XML_COMMENT_NODE) {
+      xmlChar *val;
+      val = xmlGetProp (el, (xmlChar *) "name");
+      if (val) {
+        GList *dep = g_list_find_custom(sessionOptions->info->plugins, 
+           val, self_plugin_has_name);
+        if (dep)
+          ggobi_plugin_add_dependency(plugin, GGOBI_PLUGIN(dep->data));
+        else g_critical("Could not find dependency '%s' for plugin '%s'",
+          val, G_TYPE_MODULE(plugin)->name);
+        xmlFree(val);
+      }
+    }
+    el = el->next;
+  }
+ }
+ 
+ private gint
+ plugin_has_name(gconstpointer plugin, gconstpointer name)
+ {
+   const gchar *plugin_name = G_TYPE_MODULE(plugin)->name;
+   return strcmp(plugin_name, name);
+ }
+ 
+ private void
+ parse_symbols(self, xmlNodePtr node, xmlDocPtr doc, GGobi:Plugin * plugin)
+ {
+   xmlNodePtr c;
+
+   c = getXMLElement (node, "dll");
+   if (!c)
+     return;
+   c = getXMLElement (c, "init");
+   if (!c)
+     return;
+
+   PROP_VALUE(on_load_name, "onLoad");
+   PROP_VALUE(on_unload_name, "onUnload");
+   PROP_VALUE(on_create_name, "onCreate");
+   PROP_VALUE(on_close_name, "onClose");
+ }
+
+ private gboolean
+ parse_details(self, xmlNodePtr node, xmlDocPtr doc, GGobiPlugin * plugin)
+ {
+   gboolean load = false;
+   const xmlChar *tmp;
+   xmlChar *val = NULL;
+   xmlNodePtr el;
+
+   tmp = xmlGetProp (node, (xmlChar *) "name");
+   if (tmp) {
+     g_type_module_set_name(G_TYPE_MODULE(plugin), (gchar *)tmp);
+   }
+
+   el = XML_CHILDREN (node);
+   while (el) {
+     if (el->type != XML_TEXT_NODE) {
+       if (strcmp ((char *) el->name, "author") == 0) {
+         val = xmlNodeListGetString (doc, XML_CHILDREN (el), 1);
+         ggobi_plugin_set_author(plugin, (gchar *)val);
+       }
+       else if (strcmp ((char *) el->name, "description") == 0) {
+         val = xmlNodeListGetString (doc, XML_CHILDREN (el), 1);
+         ggobi_plugin_set_description(plugin, (gchar *)val);
+       } 
+       else if (strcmp ((char *) el->name, "dll") == 0) {
+         val = xmlGetProp (el, BAD_CAST("name"));
+         ggobi_plugin_set_dll_name(plugin, (gchar *)val);
+       }
+       if (val) {
+         xmlFree(val);
+         val = NULL;
+       }
+     }
+     el = el->next;
+   }
+
+   return (load);
+ }
+}

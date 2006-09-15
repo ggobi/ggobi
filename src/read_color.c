@@ -22,7 +22,6 @@
 #include <libxml/tree.h>
 
 #include "read_init.h"
-#include "read_xml.h"
 
 /*
 extern int xmlDoValidityCheckingDefaultValue;
@@ -126,20 +125,20 @@ process_colorscheme (xmlNodePtr root, xmlDocPtr doc)
   scheme->system_min = 0.0;
   tmp = xmlGetProp(root, "system_min");
   if(tmp)
-    scheme->system_min = (gfloat) asNumber(tmp);
+    scheme->system_min = (gfloat) as_number(tmp);
   scheme->system_max = 1.0;
   tmp = xmlGetProp(root, "system_max");
   if(tmp)
-    scheme->system_max = (gfloat) asNumber(tmp);
+    scheme->system_max = (gfloat) as_number(tmp);
 */
 
   tmp = xmlGetProp (root, (xmlChar *) "criticalvalue");
   if (tmp)
-    scheme->criticalvalue = (gint) asNumber ((char *) tmp);
+    scheme->criticalvalue = (gint) as_number ((char *) tmp);
 
   tmp = xmlGetProp (root, (xmlChar *) "ncolors");
   if (tmp)
-    scheme->n = (gint) asNumber ((char *) tmp);
+    scheme->n = (gint) as_number ((char *) tmp);
 
   node = getXMLElement (root, "description");
   val = xmlNodeListGetString (doc, XML_CHILDREN (node), 1);
@@ -279,11 +278,11 @@ getColor (xmlNodePtr node, xmlDocPtr doc, gfloat ** original, GdkColor * col)
   gchar *tmpVal;
   tmpVal = (gchar *) xmlGetProp (node, (xmlChar *) "min");
   if (tmpVal) {
-    colorsystem_min /= asNumber (tmpVal);
+    colorsystem_min /= as_number (tmpVal);
   }
   tmpVal = (gchar *) xmlGetProp (node, (xmlChar *) "max");
   if (tmpVal) {
-    colorsystem_max /= asNumber (tmpVal);
+    colorsystem_max /= as_number (tmpVal);
   }
 
   tmp = XML_CHILDREN (node);
@@ -293,7 +292,7 @@ getColor (xmlNodePtr node, xmlDocPtr doc, gfloat ** original, GdkColor * col)
     xmlChar *val;
     if (tmp->type != XML_TEXT_NODE) {
       val = xmlNodeListGetString (doc, XML_CHILDREN (tmp), 1);
-      vals[i] = asNumber ((char *) val);
+      vals[i] = as_number ((char *) val);
       g_free (val);
       i++;
     }

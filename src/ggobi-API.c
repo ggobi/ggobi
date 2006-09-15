@@ -43,70 +43,6 @@ extern "C"
 }
 #endif
 
-const gchar *ggobi_getFileName (ggobid * gg)
-{
-  return (gg->input->fileName);
-}
-
-const gchar *ggobi_setFileName (const gchar * fileName, DataMode data_mode,
-                                  ggobid * gg)
-{
-  const gchar *old = g_strdup (ggobi_getFileName (gg));
-  fileset_read_init (fileName, NULL, NULL, gg);
-  display_menu_build (gg);
-  return (old);
-}
-
-
-DataMode ggobi_getDataMode (ggobid * gg)
-{
-  return (gg->input->mode);
-}
-
-DataMode ggobi_setDataMode (DataMode newMode, ggobid * gg)
-{
-  DataMode old = gg->input->mode;
-  sessionOptions->data_mode = newMode;
-  gg->input->mode = newMode;
-  return (old);
-}
-
-/**
- Caller should now free the return value, but not the elements of the
- array.
- This is computed dynamically by querying each of the input plugins 
- for its collection of mode names.
-*/
-const gchar **ggobi_getDataModeNames (int *n)
-{
-  int ctr = 0, num, k, i;
-  GList *plugins;
-  const gchar **ans;
-  GGobiPluginInfo *plugin;
-
-  plugins = sessionOptions->info->inputPlugins;
-  num = g_list_length (plugins);
-  for (i = 0; i < num; i++) {
-    plugin = g_list_nth_data (plugins, i);
-    ctr += plugin->info.i->numModeNames;
-  }
-
-  ans = (const gchar **) g_malloc (sizeof (gchar *) * ctr);
-  ctr = 0;
-  for (i = 0; i < num; i++) {
-    plugin = g_list_nth_data (plugins, i);
-    for (k = 0; k < plugin->info.i->numModeNames; k++) {
-      ans[ctr++] = plugin->info.i->modeNames[k];
-    }
-  }
-
-  if (n)
-    *n = ctr;
-
-  return (ans);
-}
-
-
 gchar **ggobi_getVariableNames (gint transformed, GGobiStage * d,
                                   ggobid * gg)
 {
@@ -141,61 +77,6 @@ ggobi_setMissingValueIdentifier (MissingValue_p f)
   GGobiMissingValue = f;
   return (old);
 }
-
-
-/*
-  An initial attempt to allow new data to be introduced
-  to the Ggobi session, replacing the existing contents.
- 
-  There are still a few details remaining regarding the scaling
-  on the axes, etc. (See ruler_ranges_set in scatterplot.c)
-  The reverse pipeline data has not been established correctly
-  and the computation is incorrect.
-  Specifically, the routine splot_screen_to_tform() is not
-  
-
-  When this works, we will take the calls for the different stages 
-  and put them in separate routines.
- */
-/*-- need two of these now, one to replace and one to append --*/
-void
-ggobi_setData (gdouble * values, gchar ** rownames, gchar ** colnames,
-                 gint nr, gint nc, GGobiStage * d, gboolean cleanup,
-                 ggobid * gg, gboolean duplicate,
-                 InputDescription * desc)
-{
-  gint i, j;
-  gchar *lbl;
-  gchar *varname;
-
-  GGOBI_DATA(d)->input = desc;
-  if (d->name == NULL)
-    ggobi_stage_set_name(d, desc->fileName);
-  if (gg->input == NULL)
-    gg->input = desc;
-
-  ggobi_data_add_rows(GGOBI_DATA(d), d->n_rows- nr);
-  ggobi_data_add_cols(GGOBI_DATA(d), d->n_cols - nc);
-
-  if (values) {
-    for (j = 0; j < nc; j++) {
-      varname = (colnames) ? colnames[j] : NULL;
-      g_debug("Column name %s", colnames[j]);
-      ggobi_stage_set_col_name(d, j, varname);
-
-      for (i = 0; i < nr; i++) 
-        ggobi_stage_set_raw_value(d, i, j, values[i + j * nr]);
-      
-    }
-    for (i = 0; i < nr; i++) {
-      lbl = (rownames) ? rownames[i] : NULL;
-      ggobi_stage_set_row_id(d, i, lbl, false);
-    }
-  }
-
-  ggobi_stage_attach(d, gg, false);
-}
-
 
 /* These are all for freeing the currently held data. */
 void ggobi_displays_release (ggobid * gg)
@@ -808,14 +689,6 @@ ggobi_raiseWindow (int which, gboolean raiseOrIcon, gboolean up,
 
   gdk_flush ();
   return (ok);
-}
-
-gchar *ggobi_getDescription (ggobid * gg)
-{
-  if (!gg->input)
-    return (NULL);
-
-  return (g_strdup (gg->input->fileName));
 }
 
 /*

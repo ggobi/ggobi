@@ -258,8 +258,6 @@ gboolean   exclude_link_by_id (guint k, GGobiStage *source_d, ggobid *gg);
 gint       fcompare (const void *x1, const void *x2);
 void       filename_get_r (ggobid *);
 void       filename_get_w (GtkWidget *, ggobid *);
-GSList*    fileset_read (const gchar *, const gchar *modeName, GGobiPluginInfo *, ggobid *);
-gboolean   fileset_read_init (const gchar *ldata_in, const gchar *, GGobiPluginInfo *, ggobid *);
 gint       find_keepers (gint ncols_current, gint nc, gint *cols, gint *keepers);
 gint       find_nearest_edge (splotd *sp, displayd *display, ggobid *gg);
 gint       find_nearest_point (icoords *, splotd *, GGobiStage *, ggobid *);
@@ -275,7 +273,7 @@ gint*      get_selections_from_tree_view (GtkWidget *, gint *);
 void	   select_tree_view_row(GtkWidget *tree_view, gint row);
 gint	   tree_selection_get_selected_row(GtkTreeSelection *tree_sel);
 void       gg_write_to_statusbar (gchar *message, ggobid *gg);
-ggobid*    ggobi_alloc (ggobid *tmp);
+void    ggobi_alloc (ggobid *tmp);
 gboolean   ggobi_file_set_create (gchar *rootname, GGobiStage *, ggobid *);
 ggobid*    ggobi_get (gint);
 gint       ggobi_getIndex(ggobid *gg);
@@ -390,7 +388,6 @@ void       scatterplot_show_vrule (displayd *, gboolean show);
 gboolean   scree_mapped_p (ggobid *);
 void       scree_plot_make (ggobid *);
 gint       selected_cols_get (gint **, GGobiStage *d, ggobid *);
-void       showInputDescription(InputDescription *desc, ggobid *gg);
 void       smooth_window_open (ggobid *);
 void       sp_event_handlers_toggle (splotd *, gboolean, ProjectionMode, InteractionMode);
 void       sp_whiskers_make (splotd *, displayd *, ggobid *);
@@ -723,10 +720,6 @@ void       scatterplotMovePointsMotionCb(displayd *display, splotd *sp, GtkWidge
 void       scatterplotMovePointsButtonCb(displayd *display, splotd *sp, GtkWidget *w, GdkEventButton *event, ggobid *gg);
 displayd * scatterplot_new_with_vars(gboolean missing_p, gint numVars, gint *vars, GGobiStage *d, ggobid *gg);
 
-GGobiPluginInfo *readPluginFile(const char * const fileName, GGobiInitInfo *info);
-gboolean   registerPlugin(ggobid *gg, GGobiPluginInfo *plugin);
-
-
 GGobiOptions *GGOBI_getSessionOptions();
 
 #ifdef WIN32
@@ -734,12 +727,6 @@ GGobiOptions *GGOBI_getSessionOptions();
 extern double erf(double x);
 extern double erfc(double x);
 #endif
-
-GSList * read_xml(InputDescription *desc, ggobid *gg, GGobiPluginInfo *plugin);
-GSList * read_csv(InputDescription *desc, ggobid *gg, GGobiPluginInfo *plugin);
-
-InputDescription *read_xml_input_description(const char * const fileName, const char * const modeName, ggobid *gg, GGobiPluginInfo *info);
-InputDescription *read_csv_input_description(const char * const fileName, const char * const modeName, ggobid *gg, GGobiPluginInfo *info);
 
 void resetDataMode();
 

@@ -130,20 +130,6 @@ extern DataMode ggobi_getDataMode(ggobid *gg);
  */
 extern DataMode ggobi_setDataMode(DataMode newMode, ggobid *gg);
 
-/**
- @ingroup GGobi
- * data, but also row and column labels, lines, colors, blahblah
- * how to do that from R?  Easier once we have xml i/o.
-
- * R and S would really like to provide a single vector/array
- * of doubles, arranged by column. Hence the double* for now.
- * A double array (double **) would be useful also.
-*/
-extern void ggobi_setData(gdouble *values, gchar **rownames, gchar **colnames,
-  gint nr, gint nc, GGobiStage *d, gboolean initPlot, ggobid *gg,
-  gboolean duplicate, InputDescription *);
-
-
 extern void ggobi_setDataName(const char * const name, GGobiStage *d);
 
 /** 
@@ -1002,15 +988,6 @@ extern gboolean ggobi_setShowLines(displayd *dsp, gboolean val);
 
 extern GtkWidget *ggobi_addDisplayMenuItem(const char *label, ggobid *gg);
 
-
-/**
- @group Creation
- */
-ggobid* ggobi_alloc(ggobid *tmp);
-
-/**
- */
-ggobid *create_ggobi(InputDescription *desc);
 
 /**
  */

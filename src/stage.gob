@@ -1,6 +1,7 @@
 %{
   
   // FIXME: temporary
+  #include "ggobi-input-source.h"
   #include "ggobi-data.h"
   #include "vars.h"
   #include "externs.h"
@@ -1248,7 +1249,7 @@ set_rows_in_plot(self)
  * listening to the correct signals.  This function still needs a lot of
  * work.
  **/
- // FIXME: This should not exist.. we need a ggobi_app_add_data()
+ // FIXME: This should not exist.. we need a ggobi_context_add_data()
 public void 
 attach (self, ggobid *gg, gboolean cleanup)
 {
@@ -1256,9 +1257,14 @@ attach (self, ggobid *gg, gboolean cleanup)
   gg->d = g_slist_append (gg->d, self);
   displayd *display = NULL;
   GGobiData *d = GGOBI_DATA(self_get_root(self));
-
   gint *vars = (gint *) g_malloc(GGOBI_STAGE(self)->n_cols * sizeof(gint));
+  GGobiInputSource *source = ggobi_data_get_source(d);
   
+  if (gg->data_source)
+    g_object_unref(gg->data_source);
+  g_object_ref(source);
+  gg->data_source = source;
+
   self->brush.bin0.x = self->brush.bin1.x = BRUSH_NBINS;
   self->brush.bin0.y = self->brush.bin1.y = BRUSH_NBINS;
 

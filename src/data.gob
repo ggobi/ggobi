@@ -1,5 +1,6 @@
 %h{
 
+#include "ggobi-input-source.h"
 #include "ggobi-variable.h"
 #include "ggobi-stage.h"
 #include "fileio.h"
@@ -36,8 +37,10 @@ property STRING nickname
    default_value = "dataset", link, export);
 
 /* A description of the source of the GGobiData */
-// FIXME: this should be a boxed type and the field private
-public InputDescription *input;
+private GGobiInputSource *source;
+property OBJECT source
+  (nick = "origin", blurb = "A representation of the source of this dataset",
+   object_type = GGobi:Input:Source, link, export);
 
 /* The actual data in this default implementation */
 protected array_f raw;
@@ -188,7 +191,7 @@ set_missing(GGobi:Stage *self (check null type), guint i, guint j)
  * @i: row index
  * @j: column index
  *
- * Returns: if value at specified positive is missing or not
+ * Returns: if value at specified position is missing or not
  **/
 override (GGobi:Stage) gboolean
 is_missing(GGobi:Stage *self, guint i, guint j) 

@@ -729,7 +729,7 @@ computeTitle (gboolean current_p, displayd * display, ggobid * gg)
       description = g_strdup (display->d->name);
   }
   else {
-    description = ggobi_getDescription (gg);
+    description = ggobi_input_source_get_display_name(gg->data_source);
   }
 
   n = strlen (tmp) + strlen (description) + 5 +

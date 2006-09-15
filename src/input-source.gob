@@ -1,0 +1,34 @@
+%h{
+  #include <gsf/gsf.h>
+%}
+class GGobi:Input:Source from G:Object (abstract) {
+
+  private gchar *uri destroywith g_free;
+  property STRING uri 
+    (nick = "URI", blurb = "URI identifying this data source", link, export);
+  private gchar *logical_mode destroywith g_free;
+  property STRING logical_mode 
+    (nick = "user mode", blurb = "The high-level format of the data", 
+      link, export);
+  private gchar *physical_mode destroywith g_free;
+  property STRING physical_mode 
+    (nick = "system mode", blurb = "The low-level format of the data", 
+      link, export);
+  private gchar *display_name destroywith g_free;
+  property STRING display_name 
+    (nick = "name", blurb = "The user visible name of this data source", export)
+    set {
+      char *old = selfp->display_name; 
+      selfp->display_name = g_value_dup_string (VAL); 
+      g_free (old);
+    } /* return URI if no display name specified */
+    get {
+      g_value_set_string(VAL, selfp->display_name ? selfp->display_name : selfp->uri);
+    };
+      
+  virtual GSList *
+  get_supported_schemes(self);
+  
+  virtual GsfInput *
+  get_input(self, GError **error);
+}

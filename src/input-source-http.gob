@@ -1,0 +1,31 @@
+%h{
+  #include "ggobi-input-source.h"
+%}
+%{
+  #include "ggobi-gsf-input-http.h"
+%}
+class GGobi:Input:Source:HTTP from GGobi:Input:Source
+{
+  override (GGobi:Input:Source) GSList *
+  get_supported_schemes(GGobi:Input:Source *source) 
+  { /* support missing (NULL) and "file" schemes */
+    GSList *schemes = g_slist_append(NULL, g_strdup("http"));
+    return(g_slist_append(schemes, g_strdup("https")));
+  }
+  
+  override (GGobi:Input:Source) GsfInput *
+  get_input(GGobi:Input:Source *source (check null type), GError **error) 
+  {
+    GsfInput *input;
+    gchar *uri = ggobi_input_source_get_uri(source), *content_type;
+    input = ggobi_gsf_input_http_new(uri, error);
+    g_free(uri);
+    content_type = ggobi_gsf_input_http_get_content_type(GGOBI_GSF_INPUT_HTTP(input));
+    if (content_type) {
+      ggobi_input_source_set_physical_mode(source, content_type);
+      g_free(content_type);
+    }
+    return input;
+  }
+  
+}

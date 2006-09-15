@@ -33,11 +33,14 @@ extern "C" {
 struct _ggobid;
 
 #include <libxml/parser.h>
+
 #include "defines.h"
 #include "types.h"
 #include "brushing.h"
 #include "display.h"
 #include "display_tree.h"
+#include "ggobi-data-factory.h"
+#include "ggobi-input-source.h"
 #include "read_init.h"
 #include "ggobi-pipeline-factory.h"
 
@@ -168,10 +171,9 @@ struct _ggobid {
 /*--------------------------------------------------------------------*/
 /*                      reading in the data                           */
 /*--------------------------------------------------------------------*/
-
-  InputDescription *input;      /* Information about input files for the default
-                                   data source, such as the name of the
-                                   file, directory, data mode, extension, etc.
+  
+  GGobiInputSource *data_source;/* Information about input files for the current
+                                   data source, such as the display name, uri, etc
                                  */
 
 /*----------------------- pipeline ---------------------------------*/
@@ -421,7 +423,6 @@ struct _ggobid {
   KeyEventHandler *NumberedKeyEventHandler;
 
   PrintOptions *printOptions;
-  GList *pluginInstances;
 
   GList *colorSchemes;
   colorschemed *activeColorScheme;
@@ -549,9 +550,6 @@ typedef struct {
   int id;
 } GGobiPointMoveEvent;
 
-
-
-GSList* read_input(InputDescription * desc, ggobid * gg);
 void start_ggobi(ggobid * gg, gboolean init_data, gboolean createPlot);
 void process_initialization_files();
 
@@ -618,13 +616,13 @@ GList *getInputPluginSelections(ggobid *gg);
 
 extern const gchar *DefaultUnknownInputModeName;
 	
+GSList*    load_data (const gchar *, const gchar *modeName, ggobid *);
+GSList*    load_data_source (GGobiInputSource *, ggobid *);
 
-InputDescription *
-fileset_generate(const gchar * fileName,
-		 const gchar *modeName, 
-		 GGobiPluginInfo *plugin, 
-		 ggobid * gg);
-
+// FIXME: not sure if this belongs here but we need somewhere to put 
+// "global" functions
+GGobiInputSource *create_input_source(const gchar *uri, const gchar *mode);
+GGobiDataFactory *get_data_factory (ggobid *gg, GGobiInputSource *source);
 
 #include "GGobiEvents.h"
 

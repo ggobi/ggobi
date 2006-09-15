@@ -1,0 +1,60 @@
+%h{
+  #include "ggobi-input-source.h"
+%}
+%{
+  #include "ggobi-input-source.h"
+  #include <libxml/uri.h>
+  #include <gsf/gsf-input-stdio.h>
+%}
+class GGobi:Input:Source:File from GGobi:Input:Source
+{
+  override (GGobi:Input:Source) GSList *
+  get_supported_schemes(GGobi:Input:Source *source) 
+  { /* support missing (NULL) and "file" schemes */
+    GSList *schemes = g_slist_append(NULL, NULL);
+    return(g_slist_append(schemes, g_strdup("file")));
+  }
+  
+  /** Get the system locale filename from the URI in this source */
+  public gchar *
+  get_filename(self)
+  {
+    gchar *raw_uri = ggobi_input_source_get_uri(GGOBI_INPUT_SOURCE(self));
+    xmlURIPtr parsed = xmlParseURI(raw_uri);
+    gchar *filename = NULL;
+    xmlChar *uri = NULL;
+    if (parsed && !parsed->scheme) {
+      /* we have a relative URI, resolve against current working dir file:// uri
+         note that if the path is already absolute, the path doesn't change
+         -- we're just trying to make a file:// uri with an absolute path,
+            so that glib can give us the (locale+platform)-dependent filename
+      */
+      gchar *dir = g_get_current_dir();
+      gchar *base = g_filename_to_uri(dir, NULL, NULL);
+      gchar *dir_base = g_strconcat(base, "/"); /* for resolution to work right */
+      uri = xmlBuildURI(BAD_CAST(raw_uri), BAD_CAST(dir_base));
+      g_free(dir);
+      g_free(base);
+      g_free(dir_base);
+    } else if (parsed) uri = xmlSaveUri(parsed);
+    else g_critical("Failed to parse URI: %s", raw_uri);
+    filename = g_filename_from_uri((gchar *)uri, NULL, NULL);
+    g_free(raw_uri);
+    if (uri)
+      xmlFree(uri);
+    if (parsed)
+      xmlFreeURI(parsed);
+    return filename;
+  }
+  
+  override (GGobi:Input:Source) GsfInput *
+  get_input(GGobi:Input:Source *source (check null type), GError **error) 
+  {
+    gchar *filename = self_get_filename(SELF(source));
+    if (!filename) {
+      g_critical("Cannot get filename to open from URI");
+      return NULL;
+    }
+    return gsf_input_stdio_new(filename, error);
+  }
+}

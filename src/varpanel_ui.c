@@ -273,11 +273,11 @@ varpanel_switch_page_cb (GtkNotebook * notebook, GtkNotebookPage * page,
   if (gg->status_message_func) {
     GGobiStage *d = (GGobiStage *) g_slist_nth_data (gg->d, page_num);
     if (d) {
-      gchar *msg = g_strdup_printf ("%s: %d x %d (%s)",
+      /*gchar *msg = g_strdup_printf ("%s: %d x %d (%s)",
                                     d->name, d->n_rows, d->n_cols,
-                                    gg->input->fileName);
-      gg->status_message_func (msg, gg);
-      g_free (msg);
+                                    gg->data_source->uri);*/
+      gg->status_message_func (NULL, gg);
+      /*g_free (msg);*/
     }
   }
 }

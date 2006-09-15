@@ -27,6 +27,13 @@
 
 #include "GGobiApp.h"
 
+/* the built-in input classes */
+#include "ggobi-data-factory-csv.h"
+#include "ggobi-data-factory-xml.h"
+#include "ggobi-input-source-http.h"
+/*#include "ggobi-input-source-ftp.h"*/
+#include "ggobi-input-source-file.h"
+
 #include "ggobi.h"
 
 #include "vars.h"
@@ -155,8 +162,8 @@ parse_command_line (gint * argc, gchar ** av[])
   if (*argc == 0)
     sessionOptions->data_in = NULL;
   else
-    sessionOptions->data_in = g_strdup ((*av)[0]);
-  
+    sessionOptions->data_in = g_strdup((*av)[0]);
+
   return 1;
 }
 
@@ -258,17 +265,9 @@ findColorSchemeByName (GList * schemes, const gchar * name)
   return (NULL);
 }
 
-ggobid *                        /*XXX should be void. Change when gtk-object setup settles. */
+void
 ggobi_alloc (ggobid * tmp)
 {
-  if (tmp == NULL) {
-    /* Should never happen in new GObject-based version. 
-       tmp = (ggobid*) g_malloc (sizeof (ggobid));
-       memset (tmp, '\0', sizeof (ggobid)); 
-     */
-    tmp = g_object_new (GGOBI_TYPE_GGOBI, NULL);
-  }
-
   tmp->firsttime = true;
   tmp->brush.firsttime = true;
 
@@ -306,10 +305,8 @@ ggobi_alloc (ggobid * tmp)
   tmp->tour2d3.idled = 0;
 
   tmp->printOptions = NULL;
-  tmp->pluginInstances = NULL;
 
   tmp->plot_GC = NULL;
-
 
   tmp->colorSchemes = sessionOptions->colorSchemes;
   if (sessionOptions->activeColorScheme)
@@ -351,7 +348,15 @@ ggobi_alloc (ggobid * tmp)
                                            "Test handler", NULL, tmp, C);
 #endif
 
-  return (tmp);
+}
+
+static void registerBuiltinTypes()
+{
+  GGOBI_TYPE_INPUT_SOURCE_FILE;
+  /*GGOBI_TYPE_INPUT_SOURCE_FTP;*/
+  GGOBI_TYPE_INPUT_SOURCE_HTTP;
+  GGOBI_TYPE_DATA_FACTORY_CSV;
+  GGOBI_TYPE_DATA_FACTORY_XML;
 }
 
   /* Available so that we can call this from R
@@ -371,14 +376,13 @@ gint ggobi_init (gint argc, gchar * argv[], gboolean processEvents)
 
   initSessionOptions (argc, argv);
   parse_command_line (&argc, &argv);
-  
-  plugin_init ();
 
   GGOBI_TYPE_GGOBI;
-  registerDisplayTypes ((GTypeLoad *) typeLoaders,
-                        sizeof (typeLoaders) / sizeof (typeLoaders)[0]);
-
-  registerDefaultPlugins (sessionOptions->info);
+  registerBuiltinTypes();
+  // FIXME: This should probably just be done inside registerBuiltinTypes()
+  // That is, register the types by calling the _TYPE_ macros and then
+  // using g_type_children to get the available display types
+  registerDisplayTypes ((GTypeLoad *) typeLoaders, G_N_ELEMENTS(typeLoaders));
   
   process_initialization_files ();
 
@@ -695,7 +699,7 @@ ggobi_get_data_by_name (const gchar * const name, const ggobid * const gg)
 ggobid *
 ValidateGGobiRef (ggobid * gg, gboolean fatal)
 {
-  static gchar *error_msg = "Incorrect reference to ggobid.";
+  static gchar *error_msg = "GGobi context does not exist within session";
   extern ggobid **all_ggobis;
   extern gint num_ggobis;
   gint i;
@@ -705,7 +709,8 @@ ValidateGGobiRef (ggobid * gg, gboolean fatal)
   }
 
   if (fatal) 
-    g_critical (error_msg);
+    g_error (error_msg);
+  else g_critical (error_msg);
 
   return (NULL);
 }
@@ -713,7 +718,7 @@ ValidateGGobiRef (ggobid * gg, gboolean fatal)
 GGobiStage *
 ValidateDatadRef (GGobiStage * d, ggobid * gg, gboolean fatal)
 {
-  static gchar *error_msg = "Incorrect reference to datad.";
+  static gchar *error_msg = "Dataset does not exist within GGobi context";
   gint i, n;
   n = g_slist_length (gg->d);
   for (i = 0; i < n; i++) {
@@ -734,7 +739,7 @@ ValidateDatadRef (GGobiStage * d, ggobid * gg, gboolean fatal)
 displayd *
 ValidateDisplayRef (displayd * d, ggobid * gg, gboolean fatal)
 {
-  static gchar *error_msg = "Incorrect reference to display.";
+  static gchar *error_msg = "Display does not exist within GGobi context";
   gint i, n;
   n = g_list_length (gg->displays);
   for (i = 0; i < n; i++) {
@@ -754,6 +759,7 @@ static gchar *
 ggobi_find_file_in_dir(const gchar *name, const gchar *dir, gboolean ggobi)
 {
   gchar *tmp_name = g_build_filename(dir, ggobi ? "ggobi" : "", name, NULL);
+  /*g_debug("Testing: %s", tmp_name);*/
   if (file_is_readable(tmp_name))
     return(tmp_name);
   g_free(tmp_name);
@@ -797,7 +803,7 @@ ggobi_find_file(const gchar *name, const gchar* user, const gchar* const *dirs)
   gchar *tmp_name, *cur_dir = g_get_current_dir();
   gint i;
   
-  //g_debug("Looking for %s", name);
+  /*g_debug("Looking for %s", name);*/
   if (sessionOptions && sessionOptions->ggobiHome) {
     tmp_name = ggobi_find_file_in_dir(name, sessionOptions->ggobiHome, false);
     if (tmp_name)
@@ -862,8 +868,9 @@ ggobi_find_config_file(const gchar *name)
   Checks for the one specified by
     1) the -init command line option
     2) the GGOBIRC environment variable
-    3) the $HOME/.ggobirc file.
-    4) user and system GGobi config dirs
+    3) ggobirc in current directory
+    4) $HOME/.ggobirc
+    5) ggobirc in user and system GGobi config dirs
  */
 void
 process_initialization_files ()
@@ -876,15 +883,14 @@ process_initialization_files ()
   else {
     fileName = g_strdup (g_getenv ("GGOBIRC"));
     if (!fileName || !fileName[0]) {
-      const gchar *tmp;
-      tmp = g_get_home_dir ();
-      if (tmp) {
-        fileName = g_build_filename (tmp, ".ggobirc", NULL);
-        if (!file_is_readable (fileName)) {
-          g_free (fileName);
-          fileName = NULL;
-        }
-      }
+      gchar *cur_dir = g_get_current_dir();
+      fileName = ggobi_find_file_in_dir("ggobirc", cur_dir, false);
+      g_free(cur_dir);
+    }
+    if (!fileName || !fileName[0]) {
+      const gchar *tmp = g_get_home_dir ();
+      if (tmp)
+        fileName = ggobi_find_file_in_dir(".ggobirc", tmp, false);
       if (!fileName)
         fileName = ggobi_find_config_file("ggobirc");
     }

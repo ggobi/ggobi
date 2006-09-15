@@ -24,6 +24,7 @@
 #include "vars.h"
 #include "externs.h"
 #include "display_tree.h"
+#include "ggobi-input-source.h"
 
 #ifdef STORE_SESSION_ENABLED
 #include "write_state.h"
@@ -67,7 +68,6 @@ void addPreviousFilesMenu (GGobiInitInfo * info, ggobid * gg);
 void store_session (ggobid * gg);
 #endif
 void show_plugin_list (ggobid * gg);
-void create_new_ggobi ();
 
 /* Listen for display_selected events; update control panel */
 void
@@ -158,11 +158,13 @@ gg_write_to_statusbar (gchar * message, ggobid * gg)
     /*-- by default, describe the current datad --*/
     GGobiStage *d = datad_get_from_notebook (gg->varpanel_ui.notebook, gg);
     if (d) {
+      gchar *display_name = ggobi_input_source_get_display_name(gg->data_source);
       gchar *msg = g_strdup_printf ("%s: %d x %d  (%s)",
                                     d->name, d->n_rows, d->n_cols,
-                                    gg->input->fileName);
+                                    display_name);
       gtk_statusbar_push (GTK_STATUSBAR (statusbar), 0, msg);
-      g_free (msg);
+      g_free(msg);
+      g_free(display_name);
     }
   }
 }
@@ -737,11 +739,6 @@ action_open_cb (GtkAction * action, ggobid * gg)
   filename_get_r (gg);
 }
 static void
-action_new_cb (GtkAction * action, ggobid * gg)
-{
-  create_new_ggobi ();
-}
-static void
 action_save_cb (GtkAction * action, ggobid * gg)
 {
   writeall_window_open (gg);
@@ -881,7 +878,6 @@ static const gchar *main_ui_str =
   "	<menubar>"
   "		<menu action='File'>"
   "			<menuitem action='Open'/>"
-  "			<menuitem action='New'/>"
   "			<menuitem action='Save'/>" "			<menu action='Shortcuts'/>"
 #ifdef STORE_SESSION_ENABLED
   "			<separator/>" "			<menuitem action='StoreSession'/>"
@@ -927,8 +923,6 @@ static GtkActionEntry entries[] = {
   {"File", NULL, "_File"},
   {"Open", GTK_STOCK_OPEN, "_Open", NULL, "Open a datafile",
    G_CALLBACK (action_open_cb)},
-  {"New", GTK_STOCK_NEW, "_New", NULL, "Create a new GGobi instance",
-   G_CALLBACK (action_new_cb)},
   {"Save", GTK_STOCK_SAVE, "_Save", "<control>V", "Save some data",
    G_CALLBACK (action_save_cb)},
   {"Shortcuts", NULL, "Shortc_uts"},
@@ -1205,20 +1199,20 @@ make_ui (ggobid * gg)
     gtk_widget_show_all (window);
 }
 
-const gchar *const *ggobi_getPModeNames (int *n)
+const gchar *const *ggobi_getPModeNames (gint *n)
 {
-  *n = sizeof (ggobi_PModeNames) / sizeof (ggobi_PModeNames[0]);
+  *n = G_N_ELEMENTS(ggobi_PModeNames);
   return (ggobi_PModeNames);
 }
-const gchar *const *ggobi_getIModeNames (int *n)
+const gchar *const *ggobi_getIModeNames (gint *n)
 {
-  *n = sizeof (ggobi_IModeNames) / sizeof (ggobi_IModeNames[0]);
+  *n = G_N_ELEMENTS(ggobi_PModeNames);
   return (ggobi_IModeNames);
 }
 
-const gchar *const *ggobi_getPModeKeys (int *n)
+const gchar *const *ggobi_getPModeKeys (gint *n)
 {
-  *n = sizeof (ggobi_PModeKeys) / sizeof (ggobi_PModeKeys[0]);
+  *n = G_N_ELEMENTS(ggobi_PModeKeys);
   return (ggobi_PModeKeys);
 }
 
@@ -1227,28 +1221,30 @@ const gchar *const *ggobi_getPModeKeys (int *n)
 void load_previous_file (GtkAction * action, gpointer cbd);
 /*
   Add the previous input sources to the menu.
+  Eventually this could be based on GtkRecentChooser (requires 2.10)
  */
 void
 addPreviousFilesMenu (GGobiInitInfo * info, ggobid * gg)
 {
   gint i;
-  InputDescription *input;
+  GGobiInputSource *source;
   if (info) {
     GtkUIManager *manager = gg->main_menu_manager;
     GtkActionGroup *actions = gtk_action_group_new ("Shortcuts");
     guint merge_id = gtk_ui_manager_new_merge_id (manager);
     gtk_ui_manager_insert_action_group (manager, actions, -1);
     for (i = 0; i < info->numInputs; i++) {
-      input = &(info->descriptions[i].input);
-      if (input && input->fileName) {
+      source = info->descriptions[i].source;
+      if (source) {
+        gchar *uri = ggobi_input_source_get_uri(source);
+        if (!uri) {
+          g_warning("Previous data source is missing its URI");
+          continue;
+        }
         gchar *action_name = g_strdup_printf ("Shortcut_%d", i);
-        GtkAction *action = gtk_action_new (action_name, input->fileName,
+        GtkAction *action = gtk_action_new (action_name, uri,
                                             "Open this shortcut",
-#if GTK_MAJOR_VERSION > 2 && GTK_MINOR_VERSION > 4
                                             GTK_STOCK_FILE);
-#else
-                                            NULL);
-#endif
         g_signal_connect (G_OBJECT (action), "activate",
                           G_CALLBACK (load_previous_file),
                           info->descriptions + i);
@@ -1265,29 +1261,21 @@ addPreviousFilesMenu (GGobiInitInfo * info, ggobid * gg)
   }
 }
 
-
-ggobid *create_ggobi (InputDescription * desc);
-
 void
 load_previous_file (GtkAction * action, gpointer cbd)
 {
-  InputDescription *desc;
+  GGobiInputSource *source;
   GGobiDescription *gdesc;
+  GGobiDataFactory *factory;
   ggobid *gg;
-
+  
   gg = (ggobid *) g_object_get_data (G_OBJECT (action), "ggobi");
   gdesc = (GGobiDescription *) cbd;
-  desc = &(gdesc->input);
+  load_data_source(gdesc->source, gg);
 
-  if (g_slist_length (gg->d) > 0)
-    create_ggobi (desc);
-  else {
-    read_input (desc, gg);
-    /* Need to avoid the initial scatterplot. */
-    start_ggobi (gg, true, gdesc->displays == NULL);
-  }
-
-
+  /* Need to avoid the initial scatterplot. */
+  start_ggobi (gg, true, gdesc->displays == NULL);
+  
   if (gdesc->displays) {
     gint i, n;
     GGobiDisplayDescription *dpy;
@@ -1311,44 +1299,11 @@ load_previous_file (GtkAction * action, gpointer cbd)
   }
 }
 
-/*
- This replicates code elsewhere and the two should be merged.
- */
-ggobid *
-create_ggobi (InputDescription * desc)
-{
-  gboolean init_data = true;
-  ggobid *gg;
-
-  gg = ggobi_alloc (NULL);
-
-     /*-- some initializations --*/
-  gg->displays = NULL;
-  gg->control_panels = NULL;
-  globals_init (gg);      /*-- variables that don't depend on the data --*/
-  special_colors_init (gg);
-  make_ui (gg);
-  gg->input = desc;
-
-  read_input (desc, gg);
-
-  if (sessionOptions->info != NULL) {
-    extern gboolean registerPlugins (ggobid * gg, GList * plugins);
-    registerPlugins (gg, sessionOptions->info->plugins);
-  }
-
-  start_ggobi (gg, init_data, sessionOptions->info->createInitialScatterPlot);
-
-  return (gg);
-}
-
-
 void
 show_plugin_list (ggobid * gg)
 {
   if (sessionOptions->info && sessionOptions->info->plugins)
-    showPluginInfo (sessionOptions->info->plugins,
-                    sessionOptions->info->inputPlugins, (ggobid *) gg);
+    showPluginInfo (sessionOptions->info->plugins, (ggobid *) gg);
 }
 
 
@@ -1397,9 +1352,3 @@ store_session (ggobid * gg)
 }
 #endif
 
-
-void
-create_new_ggobi ()
-{
-  create_ggobi (NULL);
-}
