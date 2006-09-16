@@ -1,5 +1,7 @@
 %h{
   #include "vars.h"
+%}
+%{
   #include <libxml/parser.h>
 
   typedef enum xmlDataState

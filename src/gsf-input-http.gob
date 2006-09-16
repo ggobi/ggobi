@@ -17,20 +17,25 @@ class GGobi:Gsf:Input:HTTP from Gsf:Input
     (nick = "mime type", blurb = "Content-Type in HTTP header", link, export);
   private gpointer ctx destroywith xmlNanoHTTPClose;
   
+  private guint8 *buf destroywith g_free;
+  private gsize buf_size;
+  
   public GsfInput *
   new(const gchar *url, GError **error)
   {
     GObject *obj = (GObject *)GET_NEW_VARG("url", url, NULL);
     GGobiGsfInputHTTP *input = SELF(obj);
-    gpointer ctx = input->_priv->ctx;
+    gpointer ctx;
     char *content_type;
     
-    ctx = xmlNanoHTTPOpen(input->_priv->url, &content_type);
-    if (!ctx) /* no meaningful errors provided */
+    ctx = SELF(obj)->_priv->ctx = xmlNanoHTTPOpen(input->_priv->url, &content_type);
+    if (!ctx) /* no meaningful errors provided by nanohttp */
       return NULL;
     
     if (content_type)
       self_set_content_type(input, content_type);
+    
+    gsf_input_set_size(GSF_INPUT(obj), xmlNanoHTTPContentLength(ctx));
     
     return GSF_INPUT(obj);
   }
@@ -47,6 +52,17 @@ class GGobi:Gsf:Input:HTTP from Gsf:Input
     int nread;
     size_t total_read;
     gpointer ctx = SELF(input)->_priv->ctx;
+    GGobiGsfInputHTTP *self = SELF(input);
+    
+    if (buffer == NULL) {
+      if (selfp->buf_size < num_bytes) {
+        selfp->buf_size = num_bytes;
+        g_free (selfp->buf);
+        selfp->buf = g_new (guint8, selfp->buf_size);
+      }
+      buffer = selfp->buf;
+    }
+  
     for (total_read = 0; total_read < num_bytes; total_read += nread) {
       nread = xmlNanoHTTPRead(ctx, buffer, num_bytes - total_read);
       if (nread <= 0)
