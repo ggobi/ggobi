@@ -143,27 +143,27 @@ glyphIDfromName (gchar * glyphName)
 {
   GlyphType id = UNKNOWN_GLYPH;
 
-  if (g_strcasecmp (glyphName, "plus") == 0)
+  if (g_ascii_strcasecmp (glyphName, "plus") == 0)
     id = PLUS;
-  else if (g_strcasecmp (glyphName, "x") == 0)
+  else if (g_ascii_strcasecmp (glyphName, "x") == 0)
     id = X;
-  else if (g_strcasecmp (glyphName, "point") == 0)
+  else if (g_ascii_strcasecmp (glyphName, "point") == 0)
     id = DOT_GLYPH;
-  else if ((g_strcasecmp (glyphName, "open rectangle") == 0) ||
-           (g_strcasecmp (glyphName, "open_rectangle") == 0) ||
-           (g_strcasecmp (glyphName, "openrectangle") == 0))
+  else if ((g_ascii_strcasecmp (glyphName, "open rectangle") == 0) ||
+           (g_ascii_strcasecmp (glyphName, "open_rectangle") == 0) ||
+           (g_ascii_strcasecmp (glyphName, "openrectangle") == 0))
     id = OR;
-  else if ((g_strcasecmp (glyphName, "filled rectangle") == 0) ||
-           (g_strcasecmp (glyphName, "filled_rectangle") == 0) ||
-           (g_strcasecmp (glyphName, "filledrectangle") == 0))
+  else if ((g_ascii_strcasecmp (glyphName, "filled rectangle") == 0) ||
+           (g_ascii_strcasecmp (glyphName, "filled_rectangle") == 0) ||
+           (g_ascii_strcasecmp (glyphName, "filledrectangle") == 0))
     id = FR;
-  else if ((g_strcasecmp (glyphName, "open circle") == 0) ||
-           (g_strcasecmp (glyphName, "open_circle") == 0) ||
-           (g_strcasecmp (glyphName, "opencircle") == 0))
+  else if ((g_ascii_strcasecmp (glyphName, "open circle") == 0) ||
+           (g_ascii_strcasecmp (glyphName, "open_circle") == 0) ||
+           (g_ascii_strcasecmp (glyphName, "opencircle") == 0))
     id = OC;
-  else if ((g_strcasecmp (glyphName, "filled circle") == 0) ||
-           (g_strcasecmp (glyphName, "filled_circle") == 0) ||
-           (g_strcasecmp (glyphName, "filledcircle") == 0))
+  else if ((g_ascii_strcasecmp (glyphName, "filled circle") == 0) ||
+           (g_ascii_strcasecmp (glyphName, "filled_circle") == 0) ||
+           (g_ascii_strcasecmp (glyphName, "filledcircle") == 0))
     id = FC;
 
   return id;

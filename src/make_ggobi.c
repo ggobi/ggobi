@@ -142,7 +142,8 @@ get_data_factory (ggobid *gg, GGobiInputSource *source)
 static gint
 scheme_compare_func(gconstpointer list_scheme, gconstpointer scheme)
 {
-  return list_scheme != scheme && g_ascii_strcasecmp(list_scheme, scheme);
+  return (list_scheme || scheme) && (!list_scheme || !scheme ||
+    g_ascii_strcasecmp(list_scheme, scheme));
 }
 
 GGobiInputSource *

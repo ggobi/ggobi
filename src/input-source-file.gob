@@ -31,7 +31,7 @@ class GGobi:Input:Source:File from GGobi:Input:Source
       */
       gchar *dir = g_get_current_dir();
       gchar *base = g_filename_to_uri(dir, NULL, NULL);
-      gchar *dir_base = g_strconcat(base, "/"); /* for resolution to work right */
+      gchar *dir_base = g_strconcat(base, "/", NULL); /* for resolution to work right */
       uri = xmlBuildURI(BAD_CAST(raw_uri), BAD_CAST(dir_base));
       g_free(dir);
       g_free(base);

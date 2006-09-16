@@ -21,9 +21,11 @@ class GGobi:Input:Source from G:Object (abstract) {
       char *old = selfp->display_name; 
       selfp->display_name = g_value_dup_string (VAL); 
       g_free (old);
-    } /* return URI if no display name specified */
+    } /* return basename of URI if no display name specified */
     get {
-      g_value_set_string(VAL, selfp->display_name ? selfp->display_name : selfp->uri);
+      if (selfp->display_name)
+        g_value_set_string(VAL, selfp->display_name); /* take gives ownership */
+      else g_value_take_string(VAL, g_path_get_basename(selfp->uri));
     };
       
   virtual GSList *
