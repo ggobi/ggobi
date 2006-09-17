@@ -1,0 +1,11 @@
+%h{
+  #include "ggobi-input-source.h"
+%}
+class GGobi:Input:Decoder from G:Object (abstract)
+{
+  virtual GsfInput *
+  decode(self, Gsf:Input *source);
+  
+  virtual GSList *
+  get_decoded_file_exts(self);
+}
