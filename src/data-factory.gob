@@ -5,12 +5,22 @@
 %}
 %{
   #include <libxml/uri.h>
+  #include "ggobi-input-decoder.h"
 %}
 
 class GGobi:Data:Factory from G:Object (abstract) {
   
   virtual GSList *
   create(self, GGobi:Input:Source *source  (check null type));
+  
+  private gint
+  is_ext(const gchar *ext, const gchar *path)
+  {
+    gchar *dot_ext = g_strconcat(".", ext, NULL);
+    gint ret = !g_str_has_suffix(path, dot_ext);
+    g_free(dot_ext);
+    return ret;
+  }
   
   virtual gboolean
   supports_source(self, GGobi:Input:Source *source  (check null)) {
@@ -34,9 +44,7 @@ class GGobi:Data:Factory from G:Object (abstract) {
         gchar *utf8_path = g_locale_to_utf8(unescaped, -1, NULL, &len, NULL);
         if (utf8_path) {
           gchar *path = g_utf8_casefold(utf8_path, -1);
-          const gchar *ext = strrchr(path, '.');
-          if (ext)
-            supports = g_slist_find_custom(exts, ++ext, (GCompareFunc)strcmp) != NULL;
+          supports = g_slist_find_custom(exts, path, (GCompareFunc)self_is_ext) != NULL;
           g_free(path);
           g_free(utf8_path);
         } else g_warning("Could not convert path '%s' to UTF8", unescaped);
@@ -55,6 +63,35 @@ class GGobi:Data:Factory from G:Object (abstract) {
   virtual GSList *
   get_supported_modes(self);
   
+  public GSList *
+  get_file_exts_for_mode(self, const gchar *mode)
+  {
+    GType *decoder_types;
+    gint i, n_decoder_types;
+    GSList *decoded_exts = NULL, *factory_exts, *exts = NULL;
+    
+    decoder_types = g_type_children(GGOBI_TYPE_INPUT_DECODER, &n_decoder_types);
+    
+    for (i = 0; i < n_decoder_types; i++) {
+      GObject *decoder = g_object_new(decoder_types[i], NULL);
+      GSList *d_exts = ggobi_input_decoder_get_decoded_file_exts(GGOBI_INPUT_DECODER(decoder));
+      decoded_exts = g_slist_concat(decoded_exts, d_exts);
+      g_object_unref(decoder);
+    }
+    
+    factory_exts = self_get_base_file_exts_for_mode(self, mode);
+    for (GSList *f_exts = factory_exts; f_exts; f_exts = f_exts->next) {
+      exts = g_slist_append(exts, g_strdup(f_exts->data));
+      for (GSList *d_exts = decoded_exts; d_exts; d_exts = d_exts->next)
+        exts = g_slist_append(exts, g_strconcat(f_exts->data, ".", d_exts->data, NULL));
+    }
+    
+    g_slist_foreach(decoded_exts, (GFunc)g_free, NULL);
+    g_slist_free(decoded_exts);
+    
+    return exts;
+  }
+  
   virtual GSList *
-  get_file_exts_for_mode(self, const gchar *mode);
+  get_base_file_exts_for_mode(self, const gchar *mode);
 }

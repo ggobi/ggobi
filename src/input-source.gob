@@ -1,6 +1,9 @@
 %h{
   #include <gsf/gsf.h>
 %}
+%{
+  #include "ggobi-input-decoder.h"
+%}
 class GGobi:Input:Source from G:Object (abstract) {
 
   private gchar *uri destroywith g_free;
@@ -31,6 +34,32 @@ class GGobi:Input:Source from G:Object (abstract) {
   virtual GSList *
   get_supported_schemes(self);
   
+  public GsfInput *
+  get_input(self, GError **error) {
+    GsfInput *decoded, *input = self_get_raw_input(self, error);
+    GType *decoder_types;
+    gint n_types, i;
+    
+    if (input == NULL)
+      return NULL;
+    
+    decoder_types = g_type_children(GGOBI_TYPE_INPUT_DECODER, &n_types);
+    do {
+      decoded = NULL;
+      for (i = 0; i < n_types; i++) {
+        GObject *decoder = g_object_new(decoder_types[i], NULL);
+        decoded = ggobi_input_decoder_decode(GGOBI_INPUT_DECODER(decoder), input);
+        if (decoded) {
+          g_object_unref(input);
+          input = decoded;
+        }
+        g_object_unref(decoder);
+      }
+    } while(decoded);
+    
+    return input;
+  }
+  
   virtual GsfInput *
-  get_input(self, GError **error);
+  get_raw_input(self, GError **error);
 }

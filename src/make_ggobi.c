@@ -90,10 +90,7 @@ load_data_source (GGobiInputSource *source, ggobid * gg)
   GGobiDataFactory *factory;
   GSList *datasets = NULL;
   
-  /* somewhere around here we need to convert the input source */
-  
-  factory = get_data_factory(gg, source);
-  
+  factory = create_data_factory(gg, source);
   if (factory == NULL) {
     // FIXME: we should have some unified way of graphically reporting errors
     // from some sort of IO context
@@ -115,7 +112,7 @@ load_data_source (GGobiInputSource *source, ggobid * gg)
 }
 
 GGobiDataFactory *
-get_data_factory (ggobid *gg, GGobiInputSource *source)
+create_data_factory (ggobid *gg, GGobiInputSource *source)
 {
   GType *factories;
   GGobiDataFactory *factory = NULL;

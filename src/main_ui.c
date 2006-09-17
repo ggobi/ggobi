@@ -1264,9 +1264,7 @@ addPreviousFilesMenu (GGobiInitInfo * info, ggobid * gg)
 void
 load_previous_file (GtkAction * action, gpointer cbd)
 {
-  GGobiInputSource *source;
   GGobiDescription *gdesc;
-  GGobiDataFactory *factory;
   ggobid *gg;
   
   gg = (ggobid *) g_object_get_data (G_OBJECT (action), "ggobi");

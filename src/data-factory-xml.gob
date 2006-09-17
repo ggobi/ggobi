@@ -296,7 +296,7 @@ class GGobi:Data:Factory:XML from GGobi:Data:Factory
   }
 
   override (GGobi:Data:Factory) GSList *
-  get_file_exts_for_mode(GGobi:Data:Factory *self (check null type), const gchar *mode) 
+  get_base_file_exts_for_mode(GGobi:Data:Factory *self (check null type), const gchar *mode) 
   {
     GSList *exts = NULL;
     if (!mode || !strcmp(mode, "xml"))

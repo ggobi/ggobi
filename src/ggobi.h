@@ -622,7 +622,7 @@ GSList*    load_data_source (GGobiInputSource *, ggobid *);
 // FIXME: not sure if this belongs here but we need somewhere to put 
 // "global" functions
 GGobiInputSource *create_input_source(const gchar *uri, const gchar *mode);
-GGobiDataFactory *get_data_factory (ggobid *gg, GGobiInputSource *source);
+GGobiDataFactory *create_data_factory(ggobid *gg, GGobiInputSource *source);
 
 #include "GGobiEvents.h"
 

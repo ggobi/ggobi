@@ -8,13 +8,13 @@ class GGobi:Input:Source:HTTP from GGobi:Input:Source
 {
   override (GGobi:Input:Source) GSList *
   get_supported_schemes(GGobi:Input:Source *source) 
-  { /* support missing (NULL) and "file" schemes */
+  { /* not sure if https is really supported */
     GSList *schemes = g_slist_append(NULL, g_strdup("http"));
     return(g_slist_append(schemes, g_strdup("https")));
   }
   
   override (GGobi:Input:Source) GsfInput *
-  get_input(GGobi:Input:Source *source (check null type), GError **error) 
+  get_raw_input(GGobi:Input:Source *source (check null type), GError **error) 
   {
     GsfInput *input;
     gchar *uri = ggobi_input_source_get_uri(source), *content_type;

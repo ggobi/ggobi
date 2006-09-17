@@ -75,7 +75,7 @@ get_file_filters(ggobid *gg)
     g_slist_free(factory_modes);
     g_object_unref(factory);
   }
-    
+  
   return filters;
 }
 
