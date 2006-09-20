@@ -1034,9 +1034,9 @@ static GtkRadioActionEntry imode_entries[] = {
    "Brush (color) points", BRUSH},
   {"Identify", NULL, "_Identify", "<control>I",
    "Identify points (query their values)", IDENT},
-  {"Edit edges", NULL, "_Edit Edges", "<control>E",
+  {"Edit Edges", NULL, "_Edit Edges", "<control>E",
    "Edit the edges in the plot", EDGEED},
-  {"Move points", NULL, "_Move Points", "<control>M",
+  {"Move Points", NULL, "_Move Points", "<control>M",
    "Move the points in the plot", MOVEPTS}
 };
 

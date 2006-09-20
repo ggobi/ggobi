@@ -39,8 +39,8 @@ static const gchar *mode_ui_str =
   "			<menuitem action='Scale'/>"
   "			<menuitem action='Brush'/>"
   "			<menuitem action='Identify'/>"
-  "			<menuitem action='Edit edges'/>"
-  "			<menuitem action='Move points'/>" "		</menu>" "	</menubar>" "</ui>";
+  "			<menuitem action='Edit Edges'/>"
+  "			<menuitem action='Move Points'/>" "		</menu>" "	</menubar>" "</ui>";
 
 const gchar *
 scatterplot_mode_ui_get (displayd * display)
