@@ -1,0 +1,4 @@
+CFBundleName = "GGobi";
+CFBundleShortVersionString = "1.0";
+CFBundleGetInfoString = "GGobi version 1.0 Copyright 2006 Hadley";
+NSHumanReadableCopyright = "Copyright 2006 Hadley.";
