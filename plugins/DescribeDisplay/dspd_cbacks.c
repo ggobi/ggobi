@@ -279,7 +279,7 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
 
   /* raw row number -- the edges use these  */
   OPEN_NAMED_C(fp, "index");
-  for (m=0, counter=0; m<d->nrows_in_plot; m++, counter++) {
+  for (m=0, counter=1; m<d->nrows_in_plot; m++, counter++) {
     i = d->rows_in_plot.els[m];
     if (counter % MAX_PER_ROW == 0) ADD_CR(fp);
     fprintf (fp, "%d", i);
@@ -290,7 +290,7 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
 
   /* x coordinates */
   OPEN_NAMED_C(fp, "x");
-  for (m=0, counter=0; m<d->nrows_in_plot; m++, counter++) {
+  for (m=0, counter=1; m<d->nrows_in_plot; m++, counter++) {
     i = d->rows_in_plot.els[m];
     if (projection == P1PLOT) {
       fprintf (fp, "%g", d->tform.vals[i][sp->p1dvar]);
@@ -311,7 +311,7 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
 
   /* y coordinates */
   OPEN_NAMED_C(fp, "y");
-  for (m=0, counter=0; m<d->nrows_in_plot; m++, counter++) {
+  for (m=0, counter=1; m<d->nrows_in_plot; m++, counter++) {
     i = d->rows_in_plot.els[m];
     if (projection == P1PLOT) {
       /* I <think> spread_data is in tform coordinates, but it's hard
@@ -332,7 +332,7 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
 
   /* color */
   OPEN_NAMED_C(fp, "color");
-  for (m=0, counter=0; m<d->nrows_in_plot; m++, counter++) {
+  for (m=0, counter=1; m<d->nrows_in_plot; m++, counter++) {
     i = d->rows_in_plot.els[m];
     fprintf (fp, "%d", d->color_now.els[i]);
     if (m < d->nrows_in_plot-1)
@@ -343,7 +343,7 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
 
   /* glyphtype */
   OPEN_NAMED_C(fp, "glyphtype");
-  for (m=0, counter=0; m<d->nrows_in_plot; m++, counter++) {
+  for (m=0, counter=1; m<d->nrows_in_plot; m++, counter++) {
     i = d->rows_in_plot.els[m];
     fprintf (fp, "%d", d->glyph_now.els[i].type);
     if (m < d->nrows_in_plot-1)
@@ -354,7 +354,7 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
 
   /* glyphsize */
   OPEN_NAMED_C(fp, "glyphsize");
-  for (m=0, counter=0; m<d->nrows_in_plot; m++, counter++) {
+  for (m=0, counter=1; m<d->nrows_in_plot; m++, counter++) {
     i = d->rows_in_plot.els[m];
     fprintf (fp, "%d", d->glyph_now.els[i].size);
     if (m < d->nrows_in_plot-1)
@@ -365,7 +365,7 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
 
   /* hiddenness */
   OPEN_NAMED_C(fp, "hidden");
-  for (m=0, counter=0; m<d->nrows_in_plot; m++, counter++) {
+  for (m=0, counter=1; m<d->nrows_in_plot; m++, counter++) {
     i = d->rows_in_plot.els[m];
     fprintf (fp, "%d", d->hidden_now.els[i]);
     if (m < d->nrows_in_plot-1)
@@ -414,7 +414,7 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
     vt = vartable_element_get (sp->xyvars.x, d);
     fprintf (fp, "xlabel='%s',", vt->collab_tform);
     vt = vartable_element_get (sp->xyvars.y, d);
-    fprintf (fp, "ylabel='%s',", vt->collab_tform);
+    fprintf (fp, "ylabel='%s'", vt->collab_tform);
     CLOSE_LIST(fp);  /* xyplot params */
   } else if (projection == TOUR1D) {
     /* F, variable labels, variable lims */
@@ -507,6 +507,7 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
       if (k < display->t2d.nsubset-1)
         ADD_COMMA(fp);
     }
+    ADD_COMMA(fp);
     for (k=0; k<display->t2d.nsubset; k++) {
       j = display->t2d.subset_vars.els[k];
       fprintf (fp, "%.3f", display->t2d.F.vals[1][j]);
@@ -807,7 +808,7 @@ describe_barchart_plot (FILE *fp, ggobid *gg, displayd *display,
   OPEN_NAMED_LIST(fp, "points");
   /* x coordinates */
   OPEN_NAMED_C(fp, "x");
-  for (m=0, counter=0; m<d->nrows_in_plot; m++, counter++) {
+  for (m=0, counter=1; m<d->nrows_in_plot; m++, counter++) {
     i = d->rows_in_plot.els[m];
     fprintf (fp, "%g", d->tform.vals[i][sp->p1dvar]);
     if (m < d->nrows_in_plot-1)
@@ -818,7 +819,7 @@ describe_barchart_plot (FILE *fp, ggobid *gg, displayd *display,
 
   /* color */
   OPEN_NAMED_C(fp, "color");
-  for (m=0, counter=0; m<d->nrows_in_plot; m++, counter++) {
+  for (m=0, counter=1; m<d->nrows_in_plot; m++, counter++) {
     i = d->rows_in_plot.els[m];
     fprintf (fp, "%d", d->color_now.els[i]);
     if (m < d->nrows_in_plot-1)
@@ -829,7 +830,7 @@ describe_barchart_plot (FILE *fp, ggobid *gg, displayd *display,
 
   /* hiddenness */
   OPEN_NAMED_C(fp, "hidden");
-  for (m=0, counter=0; m<d->nrows_in_plot; m++, counter++) {
+  for (m=0, counter=1; m<d->nrows_in_plot; m++, counter++) {
     i = d->rows_in_plot.els[m];
     fprintf (fp, "%d", d->hidden_now.els[i]);
     if (m < d->nrows_in_plot-1)
@@ -999,7 +1000,7 @@ desc_write (PluginInstance *inst)
     display->options.edges_directed_show_p);
   fprintf (fp, "showUndirectedEdges=%d,",
     display->options.edges_undirected_show_p);
-  fprintf (fp, "showArrowheads=%d,",
+  fprintf (fp, "showArrowheads=%d",
     display->options.edges_arrowheads_show_p);
 
   CLOSE_LIST(fp);
