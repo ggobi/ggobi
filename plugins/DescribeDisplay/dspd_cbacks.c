@@ -109,6 +109,7 @@ describe_sticky_labels (FILE *fp, GGobiData *d, cpaneld *cpanel)
 
   if (d->sticky_ids && g_slist_length (d->sticky_ids) > 0) {
     GSList *l;
+    ADD_COMMA(fp);
     OPEN_NAMED_LIST(fp, "stickylabels");
     for (l = d->sticky_ids; l; l = l->next) {
       OPEN_LIST(fp);  /* one sticky label */
@@ -372,7 +373,7 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
       ADD_COMMA(fp);
     if (counter % MAX_PER_ROW == 0) ADD_CR(fp);
   }
-  CLOSE_C(fp); ADD_COMMA(fp); ADD_CR(fp);
+  CLOSE_C(fp); /*ADD_COMMA(fp);*/ ADD_CR(fp);
 
   /* missingness */
   /*
@@ -615,7 +616,7 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
 
     CLOSE_LIST(fp);  /* tour2x1d params */
   }
-  ADD_COMMA(fp);
+  /*  ADD_COMMA(fp); */ 
 
   /* sticky labels */
   describe_sticky_labels (fp, d, cpanel);
@@ -635,6 +636,7 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
          display->options.edges_arrowheads_show_p ||
 	 display->options.edges_directed_show_p))
     {
+      ADD_COMMA(fp);
       OPEN_NAMED_LIST(fp, "edges");
 
       for (i=0; i<e->edge.n; i++) {
@@ -670,7 +672,7 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
       describe_sticky_labels (fp, e, cpanel);
     }
     CLOSE_LIST(fp);  /* edges */
-    ADD_COMMA(fp); ADD_CR(fp);
+    /*ADD_COMMA(fp); */ ADD_CR(fp);
   }
 
   CLOSE_LIST(fp); /* plot */
