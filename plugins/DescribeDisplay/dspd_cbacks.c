@@ -87,7 +87,8 @@ describe_colorscheme (FILE *fp, ggobid *gg)
     OPEN_C(fp);  /* one foreground color */
     describe_color (fp, scheme->rgb[i]);
     CLOSE_C(fp);  /* one foreground color */
-    ADD_COMMA(fp);
+    if (i < scheme->n-1)
+      ADD_COMMA(fp);
   }
   CLOSE_LIST(fp); /* foregroundColors */
 
@@ -128,7 +129,8 @@ describe_sticky_labels (FILE *fp, GGobiData *d, cpaneld *cpanel)
         }
       }
       CLOSE_LIST(fp);  /* one sticky label */
-      ADD_COMMA(fp);  /* an extra comma seems to do no harm */
+      if (l->next)
+        ADD_COMMA(fp); 
     }
     CLOSE_LIST(fp);  /* stickylabels */
   }
@@ -280,7 +282,9 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
   for (m=0, counter=0; m<d->nrows_in_plot; m++, counter++) {
     i = d->rows_in_plot.els[m];
     if (counter % MAX_PER_ROW == 0) ADD_CR(fp);
-    fprintf (fp, "%d,", i);
+    fprintf (fp, "%d", i);
+    if (m < d->nrows_in_plot-1)
+      ADD_COMMA(fp);
   }
   CLOSE_C(fp); ADD_COMMA(fp); ADD_CR(fp);
 
@@ -289,16 +293,18 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
   for (m=0, counter=0; m<d->nrows_in_plot; m++, counter++) {
     i = d->rows_in_plot.els[m];
     if (projection == P1PLOT) {
-      fprintf (fp, "%g,", d->tform.vals[i][sp->p1dvar]);
+      fprintf (fp, "%g", d->tform.vals[i][sp->p1dvar]);
     } else if (projection == XYPLOT) {
-      fprintf (fp, "%g,", d->tform.vals[i][sp->xyvars.x]);
+      fprintf (fp, "%g", d->tform.vals[i][sp->xyvars.x]);
       /*  Is this how to add jittering to tform?
-      fprintf (fp, "%g,", d->tform.vals[i][sp->xyvars.x] +
+      fprintf (fp, "%g", d->tform.vals[i][sp->xyvars.x] +
 	       d->jitdata.vals[i][sp->xyvars.x] / precis);
       */
     } else {  /* planar already includes jitdata! */
-      fprintf (fp, "%g,", sp->planar[i].x);
+      fprintf (fp, "%g", sp->planar[i].x);
     }
+    if (m < d->nrows_in_plot-1)
+      ADD_COMMA(fp);
     if (counter % MAX_PER_ROW == 0) ADD_CR(fp);
   }
   CLOSE_C(fp); ADD_COMMA(fp); ADD_CR(fp);
@@ -312,12 +318,14 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
          to tell.  And maybe it doesn't matter because the spread axis
          isn't going to be labelled.
       */
-      fprintf (fp, "%g,", sp->p1d.spread_data.els[m]);
+      fprintf (fp, "%g", sp->p1d.spread_data.els[m]);
     } else if (projection == XYPLOT) {
-      fprintf (fp, "%g,", d->tform.vals[i][sp->xyvars.y]);
+      fprintf (fp, "%g", d->tform.vals[i][sp->xyvars.y]);
     } else {
-      fprintf (fp, "%g,", sp->planar[i].y);
+      fprintf (fp, "%g", sp->planar[i].y);
     }
+    if (m < d->nrows_in_plot-1)
+      ADD_COMMA(fp);
     if (counter % MAX_PER_ROW == 0) ADD_CR(fp);
   }
   CLOSE_C(fp); ADD_COMMA(fp); ADD_CR(fp);
@@ -326,7 +334,9 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
   OPEN_NAMED_C(fp, "color");
   for (m=0, counter=0; m<d->nrows_in_plot; m++, counter++) {
     i = d->rows_in_plot.els[m];
-    fprintf (fp, "%d,", d->color_now.els[i]);
+    fprintf (fp, "%d", d->color_now.els[i]);
+    if (m < d->nrows_in_plot-1)
+      ADD_COMMA(fp);
     if (counter % MAX_PER_ROW == 0) ADD_CR(fp);
   }
   CLOSE_C(fp); ADD_COMMA(fp); ADD_CR(fp);
@@ -335,7 +345,9 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
   OPEN_NAMED_C(fp, "glyphtype");
   for (m=0, counter=0; m<d->nrows_in_plot; m++, counter++) {
     i = d->rows_in_plot.els[m];
-    fprintf (fp, "%d,", d->glyph_now.els[i].type);
+    fprintf (fp, "%d", d->glyph_now.els[i].type);
+    if (m < d->nrows_in_plot-1)
+      ADD_COMMA(fp);
     if (counter % MAX_PER_ROW == 0) ADD_CR(fp);
   }
   CLOSE_C(fp); ADD_COMMA(fp); ADD_CR(fp);
@@ -344,7 +356,9 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
   OPEN_NAMED_C(fp, "glyphsize");
   for (m=0, counter=0; m<d->nrows_in_plot; m++, counter++) {
     i = d->rows_in_plot.els[m];
-    fprintf (fp, "%d,", d->glyph_now.els[i].size);
+    fprintf (fp, "%d", d->glyph_now.els[i].size);
+    if (m < d->nrows_in_plot-1)
+      ADD_COMMA(fp);
     if (counter % MAX_PER_ROW == 0) ADD_CR(fp);
   }
   CLOSE_C(fp); ADD_COMMA(fp); ADD_CR(fp);
@@ -353,7 +367,9 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
   OPEN_NAMED_C(fp, "hidden");
   for (m=0, counter=0; m<d->nrows_in_plot; m++, counter++) {
     i = d->rows_in_plot.els[m];
-    fprintf (fp, "%d,", d->hidden_now.els[i]);
+    fprintf (fp, "%d", d->hidden_now.els[i]);
+    if (m < d->nrows_in_plot-1)
+      ADD_COMMA(fp);
     if (counter % MAX_PER_ROW == 0) ADD_CR(fp);
   }
   CLOSE_C(fp); ADD_COMMA(fp); ADD_CR(fp);
@@ -407,7 +423,9 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
     OPEN_NAMED_C(fp, "F");
     for (k=0; k<display->t1d.nsubset; k++) {
       j = display->t1d.subset_vars.els[k];
-      fprintf (fp, "%.3f,", display->t1d.F.vals[0][j]);
+      fprintf (fp, "%.3f", display->t1d.F.vals[0][j]);
+      if (k < display->t1d.nsubset-1)
+        ADD_COMMA(fp);
     }
     CLOSE_C(fp);
     ADD_COMMA(fp);
@@ -416,7 +434,9 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
     for (k=0; k<display->t1d.nsubset; k++) {
       j = display->t1d.subset_vars.els[k];
       vt = vartable_element_get (j, d);
-      fprintf (fp, "'%s',", vt->collab_tform);
+      fprintf (fp, "'%s'", vt->collab_tform);
+      if (k < display->t1d.nsubset-1)
+        ADD_COMMA(fp);
     }
     CLOSE_C(fp);
     ADD_COMMA(fp);
@@ -428,7 +448,8 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
       OPEN_C(fp);
       fprintf (fp, "%.3f, %.3f", vt->lim.min, vt->lim.max);
       CLOSE_C(fp);
-      ADD_COMMA(fp);
+      if (k < display->t1d.nsubset-1)
+        ADD_COMMA(fp);
     }
     CLOSE_LIST(fp);  /* tour1d ranges */
     CLOSE_LIST(fp);  /* tour1d params */
@@ -439,11 +460,15 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
     OPEN_NAMED_C(fp, "F");
     for (k=0; k<display->t2d3.nsubset; k++) {
       j = display->t2d3.subset_vars.els[k];
-      fprintf (fp, "%.3f,", display->t2d3.F.vals[0][j]);
+      fprintf (fp, "%.3f", display->t2d3.F.vals[0][j]);
+      if (k < display->t2d3.nsubset-1)
+        ADD_COMMA(fp);
     }
     for (k=0; k<display->t2d3.nsubset; k++) {
       j = display->t2d3.subset_vars.els[k];
-      fprintf (fp, "%.3f,", display->t2d3.F.vals[1][j]);
+      fprintf (fp, "%.3f", display->t2d3.F.vals[1][j]);
+      if (k < display->t2d3.nsubset-1)
+        ADD_COMMA(fp);
     }
     CLOSE_C(fp);
     ADD_COMMA(fp);
@@ -452,7 +477,9 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
     for (k=0; k<display->t2d3.nsubset; k++) {
       j = display->t2d3.subset_vars.els[k];
       vt = vartable_element_get (j, d);
-      fprintf (fp, "'%s',", vt->collab_tform);
+      fprintf (fp, "'%s'", vt->collab_tform);
+      if (k < display->t2d3.nsubset-1)
+        ADD_COMMA(fp);
     }
     CLOSE_C(fp);
     ADD_COMMA(fp);
@@ -464,7 +491,8 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
       OPEN_C(fp);
       fprintf (fp, "%.3f, %.3f", vt->lim.min, vt->lim.max);
       CLOSE_C(fp);
-      ADD_COMMA(fp);
+      if (k < display->t2d3.nsubset-1)
+        ADD_COMMA(fp);
     }
     CLOSE_LIST(fp);  /* tour2d3 ranges */
     CLOSE_LIST(fp);  /* tour2d3 params */
@@ -475,11 +503,15 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
     OPEN_NAMED_C(fp, "F");
     for (k=0; k<display->t2d.nsubset; k++) {
       j = display->t2d.subset_vars.els[k];
-      fprintf (fp, "%.3f,", display->t2d.F.vals[0][j]);
+      fprintf (fp, "%.3f", display->t2d.F.vals[0][j]);
+      if (k < display->t2d.nsubset-1)
+        ADD_COMMA(fp);
     }
     for (k=0; k<display->t2d.nsubset; k++) {
       j = display->t2d.subset_vars.els[k];
-      fprintf (fp, "%.3f,", display->t2d.F.vals[1][j]);
+      fprintf (fp, "%.3f", display->t2d.F.vals[1][j]);
+      if (k < display->t2d.nsubset-1)
+        ADD_COMMA(fp);
     }
     CLOSE_C(fp);  /* F */
     ADD_COMMA(fp);
@@ -488,7 +520,9 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
     for (k=0; k<display->t2d.nsubset; k++) {
       j = display->t2d.subset_vars.els[k];
       vt = vartable_element_get (j, d);
-      fprintf (fp, "'%s',", vt->collab_tform);
+      fprintf (fp, "'%s'", vt->collab_tform);
+      if (k < display->t2d.nsubset-1)
+        ADD_COMMA(fp);
     }
     CLOSE_C(fp); /* labels */
     ADD_COMMA(fp);
@@ -500,7 +534,8 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
       OPEN_C(fp);
       fprintf (fp, "%.3f, %.3f", vt->lim.min, vt->lim.max);
       CLOSE_C(fp);
-      ADD_COMMA(fp);
+      if (k < display->t2d.nsubset-1)
+        ADD_COMMA(fp);
     }
     CLOSE_LIST(fp);   /* tour2d ranges */
     CLOSE_LIST(fp);  /* tour2d params */
@@ -511,7 +546,9 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
     OPEN_NAMED_C(fp, "xF");
     for (k=0; k<display->tcorr1.nsubset; k++) {
       j = display->tcorr1.subset_vars.els[k];
-      fprintf (fp, "%.3f,", display->tcorr1.F.vals[0][j]);
+      fprintf (fp, "%.3f", display->tcorr1.F.vals[0][j]);
+      if (k < display->tcorr1.nsubset-1)
+        ADD_COMMA(fp);
     }
     CLOSE_C(fp);
     ADD_COMMA(fp);
@@ -520,7 +557,9 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
     for (k=0; k<display->tcorr1.nsubset; k++) {
       j = display->tcorr1.subset_vars.els[k];
       vt = vartable_element_get (j, d);
-      fprintf (fp, "'%s',", vt->collab_tform);
+      fprintf (fp, "'%s'", vt->collab_tform);
+      if (k < display->tcorr1.nsubset-1)
+        ADD_COMMA(fp);
     }
     CLOSE_C(fp);
     ADD_COMMA(fp);
@@ -532,7 +571,8 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
       OPEN_C(fp);
       fprintf (fp, "%.3f, %.3f", vt->lim.min, vt->lim.max);
       CLOSE_C(fp);
-      ADD_COMMA(fp);
+      if (k < display->tcorr1.nsubset-1)
+        ADD_COMMA(fp);
     }
     CLOSE_LIST(fp);  /* tour2x1d, x ranges */
 
@@ -542,7 +582,9 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
     OPEN_NAMED_C(fp, "yF");
     for (k=0; k<display->tcorr2.nsubset; k++) {
       j = display->tcorr2.subset_vars.els[k];
-      fprintf (fp, "%.3f,", display->tcorr2.F.vals[0][j]);
+      fprintf (fp, "%.3f", display->tcorr2.F.vals[0][j]);
+      if (k < display->tcorr2.nsubset-1)
+        ADD_COMMA(fp);
     }
     CLOSE_C(fp);
     ADD_COMMA(fp);
@@ -551,7 +593,9 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
     for (k=0; k<display->tcorr2.nsubset; k++) {
       j = display->tcorr2.subset_vars.els[k];
       vt = vartable_element_get (j, d);
-      fprintf (fp, "'%s',", vt->collab_tform);
+      fprintf (fp, "'%s'", vt->collab_tform);
+      if (k < display->tcorr2.nsubset-1)
+        ADD_COMMA(fp);
     }
     CLOSE_C(fp);
     ADD_COMMA(fp);
@@ -563,7 +607,8 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
       OPEN_C(fp);
       fprintf (fp, "%.3f, %.3f", vt->lim.min, vt->lim.max);
       CLOSE_C(fp);
-      ADD_COMMA(fp);
+      if (k < display->tcorr2.nsubset-1)
+        ADD_COMMA(fp);
     }
     CLOSE_LIST(fp);  /* tour2x1d, y ranges */
 
@@ -617,7 +662,8 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
           splot_hidden_edge (i, d, e, sp, display, gg));
 
         CLOSE_LIST(fp);  /* one edge */
-        ADD_COMMA(fp);
+        if (i < e->edge.n-1)
+          ADD_COMMA(fp);
       }
       /* sticky labels */
       describe_sticky_labels (fp, e, cpanel);
@@ -676,7 +722,8 @@ describe_scatmat_display (FILE *fp, ggobid *gg, displayd *display,
     sp = (splotd *) l->data;
     projection = (sp->p1dvar != -1) ? P1PLOT : XYPLOT;
     describe_scatterplot_plot (fp, gg, display, sp, desc, projection);
-    ADD_COMMA(fp);
+    if (l->next)
+      ADD_COMMA(fp);
   }
 
   CLOSE_LIST(fp);  /* plots */
@@ -729,7 +776,8 @@ describe_time_series_display (FILE *fp, ggobid *gg, displayd *display,
   for (l = display->splots; l; l = l->next) {
     sp = (splotd *) l->data;
     describe_scatterplot_plot (fp, gg, display, sp, desc, XYPLOT);
-    ADD_COMMA(fp);
+    if (l->next)
+      ADD_COMMA(fp);
   }
 
   CLOSE_LIST(fp);  /* plots */
@@ -761,7 +809,9 @@ describe_barchart_plot (FILE *fp, ggobid *gg, displayd *display,
   OPEN_NAMED_C(fp, "x");
   for (m=0, counter=0; m<d->nrows_in_plot; m++, counter++) {
     i = d->rows_in_plot.els[m];
-    fprintf (fp, "%g,", d->tform.vals[i][sp->p1dvar]);
+    fprintf (fp, "%g", d->tform.vals[i][sp->p1dvar]);
+    if (m < d->nrows_in_plot-1)
+      ADD_COMMA(fp);
     if (counter % MAX_PER_ROW == 0) ADD_CR(fp);
   }
   CLOSE_C(fp); ADD_COMMA(fp); ADD_CR(fp);
@@ -770,7 +820,9 @@ describe_barchart_plot (FILE *fp, ggobid *gg, displayd *display,
   OPEN_NAMED_C(fp, "color");
   for (m=0, counter=0; m<d->nrows_in_plot; m++, counter++) {
     i = d->rows_in_plot.els[m];
-    fprintf (fp, "%d,", d->color_now.els[i]);
+    fprintf (fp, "%d", d->color_now.els[i]);
+    if (m < d->nrows_in_plot-1)
+      ADD_COMMA(fp);
     if (counter % MAX_PER_ROW == 0) ADD_CR(fp);
   }
   CLOSE_C(fp); ADD_COMMA(fp); ADD_CR(fp);
@@ -779,7 +831,9 @@ describe_barchart_plot (FILE *fp, ggobid *gg, displayd *display,
   OPEN_NAMED_C(fp, "hidden");
   for (m=0, counter=0; m<d->nrows_in_plot; m++, counter++) {
     i = d->rows_in_plot.els[m];
-    fprintf (fp, "%d,", d->hidden_now.els[i]);
+    fprintf (fp, "%d", d->hidden_now.els[i]);
+    if (m < d->nrows_in_plot-1)
+      ADD_COMMA(fp);
     if (counter % MAX_PER_ROW == 0) ADD_CR(fp);
   }
   CLOSE_C(fp); ADD_COMMA(fp); ADD_CR(fp);
@@ -804,7 +858,9 @@ describe_barchart_plot (FILE *fp, ggobid *gg, displayd *display,
       catname = g_strdup_printf ("%s",
                                  (level ==
                                   -1) ? "missing" : vtx->level_names[level]);
-      fprintf (fp, "'%s',", catname);
+      fprintf (fp, "'%s'", catname);
+      if (i < bsp->bar->nbins-1) 
+        ADD_COMMA(fp);
       if (i % MAX_PER_ROW == 0) ADD_CR(fp);
     }
     CLOSE_C(fp); ADD_COMMA(fp); ADD_CR(fp);
@@ -813,7 +869,9 @@ describe_barchart_plot (FILE *fp, ggobid *gg, displayd *display,
     OPEN_NAMED_C(fp, "levelvalues");
     for (i = 0; i < bsp->bar->nbins; i++) {
       level = checkLevelValue (vtx, (gdouble) bsp->bar->bins[i].value);
-      fprintf (fp, "%d,", level);
+      fprintf (fp, "%d", level);
+      if (i < bsp->bar->nbins-1) 
+        ADD_COMMA(fp);
       if (i % MAX_PER_ROW == 0) ADD_CR(fp);
     }
     CLOSE_C(fp); ADD_COMMA(fp); ADD_CR(fp);
@@ -821,7 +879,9 @@ describe_barchart_plot (FILE *fp, ggobid *gg, displayd *display,
     /* breaks */
     OPEN_NAMED_C(fp, "breaks");
     for (i = 0; i < bsp->bar->nbins; i++) {
-      fprintf (fp, "%.3f,", bsp->bar->breaks[i]);
+      if (i < bsp->bar->nbins-1) 
+        ADD_COMMA(fp);
+      fprintf (fp, "%.3f", bsp->bar->breaks[i]);
     }
     CLOSE_C(fp); ADD_COMMA(fp); ADD_CR(fp);
   }
