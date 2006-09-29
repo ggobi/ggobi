@@ -852,7 +852,7 @@ Characters (void *user_data, const xmlChar * ch, gint len)
     return;
 
   if (data->terminateStrings_p) {
-    tmp = g_strndup(c, dlen);
+    tmp = g_strndup((gchar *)c, dlen);
     c = (const xmlChar *) tmp;
   }
 
@@ -1330,7 +1330,7 @@ setRecordValue (const char *tmp, GGobiData * d, XMLParserData * data)
       if (vt && vt->vartype == categorical) {
         /* To be correct, we need to match the level_values and find the
            corresponding entry. */
-        tmp1 = (gchar *) GGobi_getLevelName (vt, value);
+        tmp1 = g_strchomp((gchar *) GGobi_getLevelName (vt, value));
         if (tmp1)
           tmp1 = g_strdup (tmp1);
       }
