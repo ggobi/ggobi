@@ -704,6 +704,9 @@ describe_scatmat_display (FILE *fp, ggobid *gg, displayd *display,
   gint ncols, *cols;
   ProjectionMode projection;
   GGobiData *d = display->d;
+  gint i, j, nplotted_vars, *plotted_vars;
+  GtkTableChild *child;
+  GtkWidget *da;
 
   cols = (gint *) g_malloc(d->ncols * sizeof(gint));
   ncols = GGOBI_EXTENDED_DISPLAY_GET_CLASS(display)->plotted_vars_get(display, cols, d, gg);
@@ -713,14 +716,32 @@ describe_scatmat_display (FILE *fp, ggobid *gg, displayd *display,
   OPEN_NAMED_LIST(fp, "plots");
 
   /* This output relies on the idea that we'll use 
-     par(mfcol=, mfrow=) to layout the plots in composite displays,
+     par(mfcol=, mfrow=) to lay out the plots in composite displays,
      rather than using splom or any other utility. */
 
-  /* We seem to be working through the plots row-wise, but I don't
-  think that's something we can count on.  I hope we can make use of
-  the axis labels to figure out which plot belongs where.  Otherwise,
-  I'll have to add a position indicator to each plot. */
+  plotted_vars = (gint *) g_malloc (d->ncols * sizeof (gint));
+  nplotted_vars =
+    GGOBI_EXTENDED_DISPLAY_GET_CLASS (display)->plotted_vars_get (display,
+      plotted_vars, d, gg);
 
+  for (i=0; i<nplotted_vars; i++) {
+    for (j=0; j<nplotted_vars; j++) {
+
+      for (l = (GTK_TABLE (display->table))->children; l; l = l->next) {
+        child = (GtkTableChild *) l->data;
+        if (child->top_attach==i && child->left_attach==j) {
+          da = child->widget;
+          sp = (splotd *) g_object_get_data (G_OBJECT (da), "splotd");
+          projection = (sp->p1dvar != -1) ? P1PLOT : XYPLOT;
+          describe_scatterplot_plot (fp, gg, display, sp, desc, projection);
+          ADD_COMMA(fp);
+          break;
+        }
+      }
+    }
+  }
+
+  /*
   for (l = display->splots; l; l = l->next) {
     sp = (splotd *) l->data;
     projection = (sp->p1dvar != -1) ? P1PLOT : XYPLOT;
@@ -728,6 +749,7 @@ describe_scatmat_display (FILE *fp, ggobid *gg, displayd *display,
     if (l->next)
       ADD_COMMA(fp);
   }
+  */
 
   CLOSE_LIST(fp);  /* plots */
   g_free(cols);
