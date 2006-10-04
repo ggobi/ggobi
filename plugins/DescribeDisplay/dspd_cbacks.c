@@ -979,7 +979,8 @@ desc_write (PluginInstance *inst)
   /* describe the colorscheme here, once for all (potential) displays */
   describe_colorscheme (fp, gg);
 
-  fprintf (fp, "title='%s',", desc->title);
+  if (desc->title)
+    fprintf (fp, "title='%s',", desc->title);
 
   /* A display could report its own name, but I don't know if it can */
   if (GGOBI_IS_SCATTERPLOT_DISPLAY(display)) {
