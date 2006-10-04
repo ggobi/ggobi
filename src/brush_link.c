@@ -437,7 +437,7 @@ linking_method_set_cb (GtkTreeSelection * treesel, ggobid * gg)
    * actually correspond to the current data.  This looks more and
    * more like a kludge -- I do need to revisit this.  -- dfs
    */
-  if (gg->current_display->d == d) {
+  if (gg->current_display && gg->current_display->d == d) {
     displayd *display = gg->current_display;
     cpaneld *cpanel = &display->cpanel;
     cpanel->br.linkby_row = row;
