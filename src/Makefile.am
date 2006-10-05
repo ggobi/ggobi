@@ -10,7 +10,7 @@ libggobi_la_GOBOBJECTS = $(libggobi_la_GOBS:%.gob=ggobi-%.lo)
 libggobi_la_GOBSTAMPS = $(libggobi_la_GOBS:%.gob=.%.gob.stamp)
 libggobi_la_LDFLAGS  = @GTK_LIBS@ @LIBXML_LIBS@ @LIBGSF_LIBS@ @GSL_LIBS@ -version-info 2
 libggobi_la_SOURCES = array.c ash1d.c barchart.c barchartClass.c \
-  barchart_ui.c brush.c brush_api.c brush_bins.c brush_init.c brush_link.c \
+  barchart_ui.c brush.c brush_api.c brush_bins.c brush_init.c brush_link.c brush_link_ui.c \
   brush_ui.c color.c color_ui.c cpanel.c display.c display_tree.c display_ui.c \
   edges.c exclusion.c exclusion_ui.c extendedDisplay.c fileio.c ggobi-API.c \
   ggobi.c GGobiAppClass.c ggobiClass.c identify.c identify_ui.c \
