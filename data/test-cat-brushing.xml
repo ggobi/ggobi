@@ -1,0 +1,115 @@
+<?xml version="1.0"?>
+<!DOCTYPE ggobidata SYSTEM "ggobi.dtd">
+
+<ggobidata count="2">
+<data name="a">
+<description>
+This is XML created by GGobi
+</description>
+<variables count="3">
+   <realvariable name="x" nickname="x"/>
+   <realvariable name="y" nickname="y"/>
+  <categoricalvariable name="cat" nickname="ca">
+    <levels count="10">
+      <level value="1">a</level>
+      <level value="2">b</level>
+      <level value="3">c</level>
+      <level value="4">d</level>
+      <level value="5">e</level>
+      <level value="6">f</level>
+      <level value="7">g</level>
+      <level value="8">h</level>
+      <level value="9">i</level>
+      <level value="10">j</level>
+    </levels>
+  </categoricalvariable>
+</variables>
+<records count="10" glyph="fc 1" color="0">
+<record id="1" label="1">
+1 1 1
+</record>
+<record id="2" label="2">
+2 2 2
+</record>
+<record id="3" label="3">
+3 3 3
+</record>
+<record id="4" label="4">
+4 4 4
+</record>
+<record id="5" label="5">
+5 5 5
+</record>
+<record id="6" label="6">
+6 6 6
+</record>
+<record id="7" label="7">
+7 7 7
+</record>
+<record id="8" label="8">
+8 8 8
+</record>
+<record id="9" label="9">
+9 9 9
+</record>
+<record id="10" label="10">
+10 10 10
+</record>
+</records>
+</data>
+<data name="b">
+<description>
+This is XML created by GGobi
+</description>
+<variables count="3">
+   <realvariable name="x" nickname="x"/>
+   <realvariable name="y" nickname="y"/>
+  <categoricalvariable name="cat" nickname="ca">
+    <levels count="10">
+      <level value="10">a</level>
+      <level value="9">b</level>
+      <level value="8">c</level>
+      <level value="7">d</level>
+      <level value="6">e</level>
+      <level value="5">f</level>
+      <level value="4">g</level>
+      <level value="3">h</level>
+      <level value="2">i</level>
+      <level value="1">j</level>
+    </levels>
+  </categoricalvariable>
+</variables>
+<records count="10" glyph="fc 1" color="0">
+<record id="1" label="1">
+1 1 10
+</record>
+<record id="2" label="2">
+2 2 9
+</record>
+<record id="3" label="3">
+3 3 8
+</record>
+<record id="4" label="4">
+4 4 7
+</record>
+<record id="5" label="5">
+5 5 6
+</record>
+<record id="6" label="6">
+6 6 5
+</record>
+<record id="7" label="7">
+7 7 4
+</record>
+<record id="8" label="8">
+8 8 3
+</record>
+<record id="9" label="9">
+9 9 2
+</record>
+<record id="10" label="10">
+10 10 1
+</record>
+</records>
+</data>
+</ggobidata>
