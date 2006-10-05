@@ -31,6 +31,7 @@
 #include "ggobi-data-factory-csv.h"
 #include "ggobi-data-factory-xml.h"
 #include "ggobi-input-source-http.h"
+#include "ggobi-input-source-ftp.h"
 #include "ggobi-input-source-file.h"
 #include "ggobi-input-decoder-bgzip.h"
 
@@ -354,6 +355,7 @@ static void registerBuiltinTypes()
 {
   GGOBI_TYPE_INPUT_SOURCE_FILE;
   GGOBI_TYPE_INPUT_SOURCE_HTTP;
+  GGOBI_TYPE_INPUT_SOURCE_FTP;
   GGOBI_TYPE_DATA_FACTORY_CSV;
   GGOBI_TYPE_DATA_FACTORY_XML;
   GGOBI_TYPE_INPUT_DECODER_BGZIP;
