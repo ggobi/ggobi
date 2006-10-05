@@ -40,6 +40,13 @@ write_xml_string(FILE *f, gchar *str)
   fprintf(f, fmtstr);
   g_free(fmtstr);
 }
+static void
+write_xml_string_fmt(FILE *f, gchar *fmt, gchar *str)
+{
+  gchar *fmtstr = g_markup_printf_escaped(fmt, str);
+  fprintf(f, fmtstr);
+  g_free(fmtstr);
+}
 
 gboolean
 write_xml (const gchar *filename,  ggobid *gg, XmlWriteInfo *xmlWriteInfo)
@@ -172,9 +179,9 @@ write_xml_variable(FILE *f, GGobiData *d, ggobid *gg, gint j,
   
   if (vt->vartype == categorical) {
     gint k;
-    fprintf(f, "  <categoricalvariable name=\"%s\"", varname);
+    write_xml_string_fmt(f, "  <categoricalvariable name=\"%s\"", varname);
     if (vt->nickname)
-      fprintf(f, " nickname=\"%s\"", vt->nickname);
+      write_xml_string_fmt(f, " nickname=\"%s\"", vt->nickname);
     fprintf(f, ">\n");
     fprintf(f, "    <levels count=\"%d\">\n", vt->nlevels);
     for (k=0; k<vt->nlevels; k++) {
@@ -193,8 +200,9 @@ write_xml_variable(FILE *f, GGobiData *d, ggobid *gg, gint j,
     if (vt->vartype == integer) fprintf(f, "integervariable");
     if (vt->vartype == counter) fprintf(f, "countervariable");
 
-    fprintf(f, " name=\"%s\"", varname);
-    if (vt->nickname) fprintf(f, " nickname=\"%s\"", vt->nickname);
+    write_xml_string_fmt(f, " name=\"%s\"", varname);
+    if (vt->nickname) 
+      write_xml_string_fmt(f, " nickname=\"%s\"", vt->nickname);
     fprintf(f, "/>");
   } 
 
@@ -307,7 +315,7 @@ write_xml_record (FILE *f, GGobiData *d, ggobid *gg, gint i,
 
   /*-- ids if present --*/
   if (d->rowIds) {
-    fprintf(f, " id=\"%s\"", d->rowIds[i]);
+     write_xml_string_fmt(f, " id=\"%s\"", d->rowIds[i]);
   }
 
   /*-- if the record is hidden, indicate that --*/
@@ -317,8 +325,8 @@ write_xml_record (FILE *f, GGobiData *d, ggobid *gg, gint i,
 
   /*-- edges if present and requested --*/
   if (gg->save.edges_p && d->edge.n && i < d->edge.n) {
-    fprintf(f, " source=\"%s\"", d->edge.sym_endpoints[i].a);
-    fprintf(f, " destination=\"%s\"", d->edge.sym_endpoints[i].b);
+    write_xml_string_fmt(f, " source=\"%s\"", d->edge.sym_endpoints[i].a);
+    write_xml_string_fmt(f, " destination=\"%s\"", d->edge.sym_endpoints[i].b);
   }
 
   if (d->rowlab && d->rowlab->data
@@ -436,12 +444,13 @@ write_xml_edges (FILE *f, GGobiData *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
   edges are written as <edges> rather than as a new datad, and maybe
   that's the problem.   dfs
   */
-  fprintf(f, 
-    "<edges count=\"%d\" name=\"%s\" color=\"%d\" glyphType=\"%s\" glyphSize=\"%s\">\n",
-    d->edge.n, d->name, 
+  fprintf(f, "<edges count=\"%d\" ", d->edge.n);
+  write_xml_string_fmt(f, "name=\"%s\" ", (gchar *)d->name);
+  fprintf(f, "color=\"%d\" glyphType=\"%s\" glyphSize=\"%s\">\n",
     xmlWriteInfo->defaultColor,
     xmlWriteInfo->defaultGlyphTypeName, 
     xmlWriteInfo->defaultGlyphSizeName);
+
 
   for(i = 0; i < d->edge.n; i++) {
     fprintf(f, "<edge");
@@ -453,28 +462,16 @@ write_xml_edges (FILE *f, GGobiData *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
  return(true);
 }
 
-/*
-gboolean
-write_xml_edge(FILE *f, GGobiData *d, ggobid *gg, int i, XmlWriteInfo *xmlWriteInfo)
-{
-  fprintf(f, " <edge ");
-  fprintf(f, "source=\"%s\" destination=\"%s\"", d->edge.sym_endpoints[i].a
-                                               , d->edge.sym_endpoints[i].b);
-  fprintf(f, " />");
-
-  return(true);
-}
-*/
-
 gboolean
 write_dataset_header (FILE *f, GGobiData *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 {
- fprintf(f,"<data ");
-/*fprintf(f, "numRecords=\"%d\"", d->nrows);*/
- fprintf(f, "name=\"%s\"", d->name);
- fprintf(f,">\n");
 
- return(true);
+
+  fprintf(f,"<data ");
+  write_xml_string_fmt(f, "name=\"%s\"", (gchar *)d->name);
+  fprintf(f,">\n");
+
+  return(true);
 }
 
 gboolean
