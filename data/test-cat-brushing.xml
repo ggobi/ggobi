@@ -66,16 +66,16 @@ This is XML created by GGobi
    <realvariable name="y" nickname="y"/>
   <categoricalvariable name="cat" nickname="ca">
     <levels count="10">
-      <level value="10">a</level>
-      <level value="9">b</level>
-      <level value="8">c</level>
-      <level value="7">d</level>
-      <level value="6">e</level>
-      <level value="5">f</level>
-      <level value="4">g</level>
-      <level value="3">h</level>
-      <level value="2">i</level>
       <level value="1">j</level>
+      <level value="2">i</level>
+      <level value="3">h</level>
+      <level value="4">g</level>
+      <level value="5">f</level>
+      <level value="6">e</level>
+      <level value="7">d</level>
+      <level value="8">c</level>
+      <level value="9">b</level>
+      <level value="10">a</level>
     </levels>
   </categoricalvariable>
 </variables>
