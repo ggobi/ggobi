@@ -354,7 +354,7 @@ linkby_notebook_subwindow_add (GGobiStage * s, GtkWidget * notebook,
 
   GtkSelectionMode mode = GTK_SELECTION_SINGLE;
 
-  if (!ggobi_stage_get_n_cols(s))
+  if (!ggobi_stage_has_vars(s))
     return;
 
   /* Create a scrolled window to pack the CList widget into */
@@ -424,7 +424,7 @@ create_linkby_notebook (GtkWidget * box, ggobid * gg)
 
   for (l = gg->d; l; l = l->next) {
     d = (GGobiStage *) l->data;
-    if (ggobi_stage_get_n_cols(d)) {
+    if (ggobi_stage_has_vars(d)) {
       linkby_notebook_subwindow_add (d, notebook, gg);
     }
   }

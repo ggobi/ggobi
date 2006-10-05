@@ -90,7 +90,7 @@ createBarchart (displayd * display, gboolean missing_p, splotd * sp, gint var,
 {
   GtkWidget *table, *vbox;
 
-  if (d == NULL || !ggobi_stage_get_n_cols(d))
+  if (d == NULL || !ggobi_stage_has_vars(d))
     return (NULL);
 
   if (!display) {

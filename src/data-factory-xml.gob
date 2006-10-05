@@ -1309,7 +1309,7 @@ class GGobi:Data:Factory:XML from GGobi:Data:Factory
 
   private void apply_random_uniforms (GGobiStage * d, XMLParserData * data)
   {
-    gint j, ncols = ggobi_stage_get_n_cols (d);
+    gint j, ncols = ggobi_stage_has_vars (d);
     for (j = data->current_element; j < ncols &&
          ggobi_stage_get_col_type (d, j) == GGOBI_VARIABLE_UNIFORM; j++)
       {
@@ -1342,7 +1342,7 @@ class GGobi:Data:Factory:XML from GGobi:Data:Factory
       }
 
     self_apply_random_uniforms (d, data);
-    if (!ggobi_stage_get_n_cols (d))
+    if (!ggobi_stage_has_vars (d))
       return (true);
 
     /*

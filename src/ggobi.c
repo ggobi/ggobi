@@ -941,7 +941,7 @@ ndatad_with_vars_get (ggobid *gg)
    nd = 0;
    for (l = gg->d; l; l = l->next) {
      d = (GGobiStage *) l->data;
-     if (ggobi_stage_get_n_cols(d))
+     if (ggobi_stage_has_vars(d))
        nd++;
    }
  }  else nd = 1;

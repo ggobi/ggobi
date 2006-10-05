@@ -244,7 +244,7 @@ start_ggobi (ggobid * gg, gboolean init_data, gboolean createPlot)
   /*-- now that we've read some data, set the mode --*/
   if (createPlot && gg->d) {
     d = (GGobiStage *)gg->d->data;
-    if (d != NULL && ggobi_stage_get_n_cols(d)) {
+    if (d != NULL && ggobi_stage_has_vars(d)) {
       gg->pmode = (d->n_cols == 1) ? P1PLOT : XYPLOT;
       gg->imode = DEFAULT_IMODE;
     }

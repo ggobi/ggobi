@@ -61,7 +61,7 @@ add_record_dialog_apply (GtkWidget * w, displayd * display)
   GGobiStage *dtarget;
 
   dtarget = (cpanel->ee_mode == ADDING_EDGES) ? e : d;
-  if (ggobi_stage_get_n_cols(dtarget)) {
+  if (ggobi_stage_has_vars(dtarget)) {
     GList *list;
     GtkTableChild *child;
     GtkWidget *entry;
@@ -210,7 +210,7 @@ add_record_dialog_open (GGobiStage * d, GGobiStage * e, displayd * dsp,
   }
 
   /*-- Another table to contain variable name-value pairs --*/
-  if (ggobi_stage_get_n_cols(dtarget)) {
+  if (ggobi_stage_has_vars(dtarget)) {
     gint j;
     GtkWidget *tablev;
     gchar **vals = (gchar **) g_malloc (dtarget->n_cols * sizeof (gchar *));

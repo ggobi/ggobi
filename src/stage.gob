@@ -88,7 +88,6 @@
 // Macros for getting and setting attribute values
 // -----------------------------------------------
 
-
 #define GGOBI_STAGE_ATTR_INIT(d, attribute) \
   guint attr_ ## attribute; \
   (attr_ ## attribute = ggobi_stage_get_col_index_for_name(d, "_" #attribute))
@@ -1195,6 +1194,13 @@ public guint
 get_n_vars(self) {
   return self_get_n_cols(self) - self->n_attributes;
 }
+
+public guint
+has_vars(self) {
+  self_get_n_vars(self) > 0;
+}
+
+
 
 // FIXME: go away!
 private signal first NONE (UINT) void 

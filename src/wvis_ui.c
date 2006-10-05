@@ -99,7 +99,7 @@ wvis_create_variable_notebook (GtkWidget *box, GtkSelectionMode mode,
 
   for (l = gg->d; l; l = l->next) {
     d = (GGobiStage *) l->data;
-    if (ggobi_stage_get_n_cols(d)) {
+    if (ggobi_stage_has_vars(d)) {
       variable_notebook_subwindow_add (d, func, NULL, notebook,
         GGOBI_VARIABLE_ALL_VARTYPES, all_datatypes, gg);
     }

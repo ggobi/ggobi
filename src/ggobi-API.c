@@ -43,8 +43,8 @@ extern "C"
 }
 #endif
 
-gchar **ggobi_getVariableNames (gint transformed, GGobiStage * d,
-                                  ggobid * gg)
+gchar **
+ggobi_getVariableNames (gint transformed, GGobiStage * d, ggobid * gg)
 {
   gchar **names;
   gint nc = d->n_cols, j;

@@ -55,7 +55,7 @@ record_add (eeMode mode, gint a, gint b, gchar * lbl, gchar * id,
   i = ggobi_data_add_rows(GGOBI_DATA(dtarget), 1);
   ggobi_stage_set_row_id(dtarget, i, lbl, true);
 
-  if (ggobi_stage_get_n_cols(dtarget)) {
+  if (ggobi_stage_has_vars(dtarget)) {
     for (j = 0; j < dtarget->n_cols; j++) {
       if (strcmp (vals[j], "NA") == 0) {  /*-- got a missing --*/
         ggobi_stage_set_missing(dtarget, i, j);
@@ -139,7 +139,7 @@ DTL: So need to call unresolveEdgePoints(e, d) to remove it from the
     }
   }
 
-  if (ggobi_stage_get_n_cols(dtarget)) {
+  if (ggobi_stage_has_vars(dtarget)) {
     for (l = gg->displays; l; l = l->next) {
       dsp = (displayd *) l->data;
       if (dsp->d == dtarget) {
@@ -190,7 +190,7 @@ record_add_defaults (GGobiStage * d, GGobiStage * e, displayd * display,
 
   dtarget = (cpanel->ee_mode == ADDING_EDGES) ? e : d;
 
-  if (ggobi_stage_get_n_cols(dtarget)) {
+  if (ggobi_stage_has_vars(dtarget)) {
     void fetch_default_record_values (gchar ** vals,
                                       GGobiStage *, displayd *, ggobid * gg);
     vals = (gchar **) g_malloc (dtarget->n_cols * sizeof (gchar *));
@@ -207,7 +207,7 @@ record_add_defaults (GGobiStage * d, GGobiStage * e, displayd * display,
     record_add (cpanel->ee_mode, -1, -1, lbl, lbl, vals, d, e, gg);
   }
 
-  if (ggobi_stage_get_n_cols(dtarget)) {
+  if (ggobi_stage_has_vars(dtarget)) {
     for (j = 0; j < dtarget->n_cols; j++)
       g_free (vals[j]);
     g_free (vals);

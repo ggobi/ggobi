@@ -601,7 +601,7 @@ varpanel_populate (GGobiStage * d, ggobid * gg)
 
   g_object_set_data (G_OBJECT (d->varpanel_ui.hpane), "datad", d);  /*setdata */
   /*-- only add a tab if there are variables --*/
-  if (ggobi_stage_get_n_cols(d)) {
+  if (ggobi_stage_has_vars(d)) {
     gtk_notebook_append_page (GTK_NOTEBOOK (gg->varpanel_ui.notebook),
                               d->varpanel_ui.hpane, gtk_label_new (d->name));
   }

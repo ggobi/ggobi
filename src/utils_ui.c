@@ -302,7 +302,7 @@ variable_notebook_subwindow_add (GGobiStage * s, GCallback func,
     g_object_get_data (G_OBJECT (notebook), "SELECTION");
   GGobiStage *d = ggobi_stage_get_root(s);
   
-  if (!ggobi_stage_get_n_cols(s))
+  if (!ggobi_stage_has_vars(s))
     return;
 
   if (vartype == GGOBI_VARIABLE_CATEGORICAL) {
@@ -379,7 +379,7 @@ variable_notebook_adddata_cb (ggobid * gg, GGobiStage * d, void *notebook)
   if ((dtype == all_datatypes) ||
       (dtype == no_edgesets && ggobi_stage_get_n_edges(d) == 0) ||
       (dtype == edgesets_only && ggobi_stage_get_n_edges(d) > 0)) {
-    if (ggobi_stage_get_n_cols(d)) {
+    if (ggobi_stage_has_vars(d)) {
       variable_notebook_subwindow_add (d, func, func_data, notebook, vartype,
                                        dtype, gg);
     }
@@ -595,7 +595,7 @@ CHECK_EVENT_SIGNATURE (variable_notebook_adddata_cb, datad_added_f)
     if ((dtype == all_datatypes) ||
         (dtype == no_edgesets && ggobi_stage_get_n_edges(d) == 0) ||
         (dtype == edgesets_only && ggobi_stage_get_n_edges(d) > 0)) {
-      if (ggobi_stage_get_n_cols(d)) {
+      if (ggobi_stage_has_vars(d)) {
         variable_notebook_subwindow_add (d, func, func_data, notebook, vartype,
                                          dtype, gg);
       }
@@ -678,7 +678,7 @@ prefixed_variable_notebook_adddata_cb (ggobid * gg, GGobiStage * d,
     (datatyped) g_object_get_data (G_OBJECT (notebook), "datatype");
   if ((dtype == all_datatypes) || (dtype == no_edgesets && ggobi_stage_get_n_edges(d) == 0)
       || (dtype == edgesets_only && ggobi_stage_get_n_edges(d) > 0)) {
-    if (ggobi_stage_get_n_cols(d))
+    if (ggobi_stage_has_vars(d))
       variable_notebook_page_add_prefices (GTK_WIDGET (notebook),
                                            gtk_notebook_get_n_pages
                                            (GTK_NOTEBOOK (notebook)) - 1);
