@@ -132,7 +132,7 @@ hide_cluster_cb (GtkToggleButton * btn, gpointer cbd)
   GGOBI_STAGE_ATTR_INIT_ALL(d);  
   /*-- operating on the current sample, whether hidden or shown --*/
   for (i = 0; i < d->n_rows; i++) {
-    if (d->sampled.els[i]) {
+    if (GGOBI_STAGE_GET_ATTR_SAMPLED(d, i)) {
       if (d->clusterid.els[i] == k) {
         if (GGOBI_STAGE_SET_ATTR_HIDDEN(d, i, btn->active, ATTR_SET_PERSISTENT)) {
           changed = symbol_link_by_id (true, i, d, gg) || changed;

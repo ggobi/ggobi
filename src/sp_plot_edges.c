@@ -48,7 +48,7 @@ splot_plot_edge (gint m, GGobiStage * d, GGobiStage * e,
        over rows_in_plot, but maybe we're not always --*/
 
   GGOBI_STAGE_ATTR_INIT_ALL(d);
-  if (GGOBI_STAGE_GET_ATTR_EXCLUDED(e, m) || !e->sampled.els[m])
+  if (!GGOBI_STAGE_GET_ATTR_VISIBLE(e, m))
     draw_edge = false;
 
   else if (!splot_plot_case (a, d, sp, display, gg) ||

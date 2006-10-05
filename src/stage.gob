@@ -130,6 +130,7 @@
 #define GGOBI_STAGE_GET_ATTR_HIDDEN(d, i)  ((gboolean) GGOBI_STAGE_GET_ATTR(d, i, hidden ))
 #define GGOBI_STAGE_GET_ATTR_SAMPLED(d, i)  ((gboolean) ggobi_stage_get_raw_value(d, i, attr_sampled))
 #define GGOBI_STAGE_GET_ATTR_EXCLUDED(d, i) ((gboolean) ggobi_stage_get_raw_value(d, i, attr_excluded))
+#define GGOBI_STAGE_GET_ATTR_VISIBLE(d, i) GGOBI_STAGE_GET_ATTR_SAMPLED(d, i) && !GGOBI_STAGE_GET_ATTR_EXCLUDED(d, i)
 #define GGOBI_STAGE_GET_ATTR_CLUSTER(d, i)  ((gint) ggobi_stage_get_raw_value(d, i, attr_cluster))
 
 #define GGOBI_STAGE_GET_ATTR_GLYPH(d, i)  ggobi_stage_get_attr_glyph(d, i, attr_type[1], attr_size[1])
@@ -550,11 +551,11 @@ rows_added(self, guint n) {
   gint i, nprev = self->n_rows, nrows = self->n_rows + n;
   self_set_n_rows(self, nrows);
   
-  vectorb_realloc (&self->sampled, nrows);
+  vectori_realloc (&self->clusterid, nrows);
+
   vectori_realloc (&self->rows_in_plot, nrows);
   vectori_realloc (&self->rows_under_brush, nrows);
   vectori_realloc (&self->rows_under_brush_prev, nrows);
-  vectori_realloc (&self->clusterid, nrows);
   
   arrayf_add_rows (&self->tform, nrows);
   arrayg_add_rows (&self->jitdata, nrows);
@@ -563,8 +564,6 @@ rows_added(self, guint n) {
   self->nrows_under_brush = self->nrows_under_brush_prev = 0;
   
   for (i = nprev; i < nrows; i++) {
-    self->sampled.els[i] = true;
-    
     self->rows_under_brush.els[i] = 0;
     self->rows_under_brush_prev.els[i] = 0;
   }
@@ -1231,7 +1230,7 @@ set_rows_in_plot(self)
 
   GGOBI_STAGE_ATTR_INIT_ALL(self);
   for (i = 0; i < self->n_rows; i++)
-    if (self->sampled.els[i] && !GGOBI_STAGE_GET_ATTR_EXCLUDED(GGOBI_STAGE(self), i))
+    if (GGOBI_STAGE_GET_ATTR_SAMPLED(self, i) && !GGOBI_STAGE_GET_ATTR_EXCLUDED(GGOBI_STAGE(self), i))
       self->rows_in_plot.els[self->nrows_in_plot++] = i;
   
   self_rows_in_plot_changed(self, (guint) self->nrows_in_plot); 

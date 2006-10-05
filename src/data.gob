@@ -122,8 +122,6 @@ add_attributes(self) {
  * @j: default value
  *
  * Adds a new attribute column with specified name and default value.
- *
- * FIXME: should automatically check if attribute is already present
  **/
 public void 
 add_attribute(self, const gchar* name, gdouble value) {

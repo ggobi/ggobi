@@ -131,7 +131,7 @@ clusters_set (GGobiStage * d)
   if (nclusters > 0 && nclusters != 1) {
     for (i = 0; i < d->n_rows; i++) {
       for (n = 0; n < nclusters; n++) {
-        if (d->sampled.els[i]) {
+        if (GGOBI_STAGE_GET_ATTR_SAMPLED(d, i)) {
           if (GGOBI_STAGE_GET_ATTR_TYPE(d, i) == d->clusv[n].glyphtype &&
               GGOBI_STAGE_GET_ATTR_SIZE(d, i) == d->clusv[n].glyphsize &&
               GGOBI_STAGE_GET_ATTR_COLOR(d, i) == d->clusv[n].color) {

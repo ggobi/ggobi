@@ -111,8 +111,7 @@ calc_included(self)
   gboolean *included = g_new(gboolean, GGOBI_STAGE(self)->parent->n_rows);
   GGOBI_STAGE_ATTR_INIT_ALL(GGOBI_STAGE(self));
   for (guint i = 0; i < GGOBI_STAGE(self)->parent->n_rows; i++)
-    included[i] = GGOBI_STAGE(self)->sampled.els[i] && 
-      !GGOBI_STAGE_GET_ATTR_EXCLUDED(GGOBI_STAGE(self), i);
+    included[i] = GGOBI_STAGE_GET_ATTR_VISIBLE(self, i);
   return(included);
 }
 

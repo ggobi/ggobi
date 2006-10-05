@@ -46,8 +46,9 @@ void
 subset_set_all(GGobiStage *d, gboolean value) {
   gint i;
 
+  GGOBI_STAGE_ATTR_INIT(d, sampled);
   for (i=0; i<d->n_rows; i++)
-    d->sampled.els[i] = value;
+    GGOBI_STAGE_SET_ATTR_SAMPLED(d, i, value);
 }
 
 /*------------------------------------------------------------------*/
@@ -73,10 +74,11 @@ subset_random (gint n, GGobiStage *d) {
   if (n < 0 || n > top) 
     return false;
 
+  GGOBI_STAGE_ATTR_INIT(d, sampled);
   for (t=0, m=0; t<top && m<n; t++) {
     rrand = (gfloat) randvalue ();
-    if (((top - t) * rrand) < (n - m) && !d->sampled.els[t]) {
-      d->sampled.els[t] = true;
+    if (((top - t) * rrand) < (n - m) && !GGOBI_STAGE_GET_ATTR_SAMPLED(d, t)) {
+      GGOBI_STAGE_SET_ATTR_SAMPLED(d, t, true);
       m++;            
     }
   }
@@ -90,11 +92,12 @@ subset_block (gint bstart, gint bsize, GGobiStage *d)
   gint i, k;
   gboolean subsetsize = 0;
 
+  GGOBI_STAGE_ATTR_INIT(d, sampled);
   if (bstart >= 0 && bstart < d->n_rows && bsize > 0) {
     subset_set_all(d, false);
 
     for (i=bstart, k=1; i<d->n_rows && k<=bsize; i++, k++) {
-      d->sampled.els[i] = true;
+      GGOBI_STAGE_SET_ATTR_SAMPLED(d, i, true);
       subsetsize++;
     }
   }
@@ -115,6 +118,7 @@ subset_range (GGobiStage *d)
 
   subset_set_all(d, false);
 
+  GGOBI_STAGE_ATTR_INIT(d, sampled);
   for (i=0; i<d->n_rows; i++) {
     add = true;
     for (j=0; j<d->n_cols; j++) {
@@ -128,7 +132,7 @@ subset_range (GGobiStage *d)
       }
     }
     if (add) {
-      d->sampled.els[i] = true;
+      GGOBI_STAGE_SET_ATTR_SAMPLED(d, i, true);
       subsetsize++;
     }
   }
@@ -152,8 +156,9 @@ subset_everyn (gint estart, gint estep, GGobiStage *d)
   
   subset_set_all(d, false);
 
+  GGOBI_STAGE_ATTR_INIT(d, sampled);
   for(i = estart; i < top; i += estep)
-    d->sampled.els[i] = true;
+    GGOBI_STAGE_SET_ATTR_SAMPLED(d, i, true);
   
   return true;
 }
@@ -171,10 +176,11 @@ subset_sticky (GGobiStage *d)
     
   subset_set_all(d, false);
 
+  GGOBI_STAGE_ATTR_INIT(d, sampled);
   for (l = d->sticky_ids; l; l = l->next) {
     id = GPOINTER_TO_INT (l->data);
     if (id < d->n_rows)
-      d->sampled.els[id] = true;
+      GGOBI_STAGE_SET_ATTR_SAMPLED(d, id, true);
   }
 
   return true;
@@ -192,6 +198,7 @@ subset_rowlab (gchar *substr, gint substr_pos, gboolean ignore_case,
   if (substr == NULL || (slen = g_utf8_strlen(substr, -1)) == 0)
     return false;
 
+  GGOBI_STAGE_ATTR_INIT(d, sampled);
   subset_set_all(d, false);
 
   if (ignore_case)
@@ -219,9 +226,9 @@ subset_rowlab (gchar *substr, gint substr_pos, gboolean ignore_case,
     if (substr_pos == 1 || substr_pos == 4) {
       gchar *inside = strstr(label, substr);
       if ((inside && substr_pos == 1) || (!inside && substr_pos == 4))
-        d->sampled.els[i] = true;
+        GGOBI_STAGE_SET_ATTR_SAMPLED(d, i, true);
     } else if (!g_utf8_collate(g_utf8_offset_to_pointer(label, start), substr))
-        d->sampled.els[i] = true;
+        GGOBI_STAGE_SET_ATTR_SAMPLED(d, i, true);
     g_free(label);
   }
   g_free(substr);
