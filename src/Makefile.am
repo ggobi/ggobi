@@ -2,8 +2,8 @@ lib_LTLIBRARIES     = libggobi.la
 libggobi_la_GOBS = variable.gob stage.gob data.gob stage-transform.gob \
   stage-filter.gob pipeline-factory.gob input-source.gob data-factory.gob \
   plugin-factory.gob plugin.gob data-factory-csv.gob data-factory-xml.gob \
-  input-source-file.gob input-source-http.gob gsf-input-http.gob \
-  input-decoder.gob input-decoder-bgzip.gob
+  input-source-file.gob input-source-http.gob gsf-input-http.gob gsf-input-ftp.gob \
+  input-source-ftp.gob input-decoder.gob input-decoder-bgzip.gob
 libggobi_la_GOBSOURCES = $(libggobi_la_GOBS:%.gob=ggobi-%.c)
 libggobi_la_GOBHEADERS = $(libggobi_la_GOBS:%.gob=ggobi-%.h)
 libggobi_la_GOBOBJECTS = $(libggobi_la_GOBS:%.gob=ggobi-%.lo)
