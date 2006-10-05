@@ -135,7 +135,7 @@ exclude_link_by_id (gint k, GGobiData * sd, ggobid * gg)
   if (id < 0)              /*-- this would indicate a bug --*/
      /**/ return false;
 
-  for (l = gg->d; l; l = l->next) {
+   for (l = gg->d; l; l = l->next) {
     d = (GGobiData *) l->data;
     if (d == sd)
       continue;        /*-- skip the originating datad --*/
@@ -168,7 +168,7 @@ brush_link_by_var (gint jlinkby, vector_b * levelv,
                    cpaneld * cpanel, GGobiData * d, ggobid * gg)
 {
   gint m, i, level_value;
-
+ 
   /*
    * for this datad, loop once over all rows in plot 
    */
@@ -278,6 +278,7 @@ build_symbol_vectors_by_var (cpaneld * cpanel, GGobiData * d, ggobid * gg)
   GSList *l;
   GGobiData *dd;
   gboolean changed = false;
+  gint k, jlinkdd;
 
   if (d->linkvar_vt == NULL)
     return false;
@@ -317,9 +318,43 @@ build_symbol_vectors_by_var (cpaneld * cpanel, GGobiData * d, ggobid * gg)
     dd = l->data;
     if (dd != d) {
       /* If the linking variable exists in the other datad ... */
-      jlinkby = vartable_index_get_by_name(d->linkvar_vt->collab, dd);
-      if (jlinkby != -1) {
-        brush_link_by_var (jlinkby, &levelv, cpanel, dd, gg);
+      jlinkdd = vartable_index_get_by_name(d->linkvar_vt->collab, dd);
+      if (jlinkdd != -1) {
+
+        /* The level values in dd might not be the same as
+           the level values in the d */
+        vartabled *vtdd = vartable_element_get (jlinkdd, dd);
+        vector_b levelv_dd;
+
+        level_value_max = vtdd->nlevels;
+        for (i = 0; i < vtdd->nlevels; i++) {
+          level_value = vtdd->level_values[i];
+          if (level_value > level_value_max)
+            level_value_max = level_value;
+        }
+
+        vectorb_init_null (&levelv_dd);
+        vectorb_alloc (&levelv_dd, level_value_max + 1);
+        vectorb_zero (&levelv_dd);
+
+        /*
+        for (i=0; i<levelv.nels; i++) {
+          if (levelv.els[i] == true) {
+            for (k=0; k<vtdd->nlevels; k++) {
+              g_printerr ("[%d][%d] home name %s new name %s\n",  
+                i, k, d->linkvar_vt->level_names[i], vtdd->level_names[k]);
+              if (strcmp(vtdd->level_names[k], d->linkvar_vt->level_names[i]) == 0) 
+              {
+                levelv_dd.els[k] = true;
+                break;
+              }
+            }
+          }
+        }
+
+        brush_link_by_var (jlinkdd, &levelv_dd, cpanel, dd, gg);
+        vectorb_free (&levelv_dd);
+*/
       }
     }
   }
