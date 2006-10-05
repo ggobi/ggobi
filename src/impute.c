@@ -121,7 +121,7 @@ impute_mean_or_median (gint type, gint nvars, gint * vars,
          */
         for (i = 0; i < d->nrows_in_plot; i++) {
           k = d->rows_in_plot.els[i];
-          if (d->clusterid.els[k] == n) {
+          if (GGOBI_STAGE_GET_ATTR_CLUSTER(d, k) == n) {
             if (!GGOBI_STAGE_GET_ATTR_HIDDEN(d, k)) {  /* ignore erased values */
               if (ggobi_stage_is_missing(d, k, j))
                 missv[nmissing++] = k;
@@ -231,7 +231,7 @@ impute_random (GGobiStage * d, gint nvars, gint * vars)
          */
         for (i = 0; i < d->nrows_in_plot; i++) {
           k = d->rows_in_plot.els[i];
-          if (d->clusterid.els[k] == n) {
+          if (GGOBI_STAGE_GET_ATTR_CLUSTER(d, k) == n) {
             if (!GGOBI_STAGE_GET_ATTR_HIDDEN(d, k)) {  /* ignore erased values altogether */
               if (ggobi_stage_is_missing(d, k, j))
                 missv[nmissing++] = k;

@@ -445,10 +445,6 @@ public GSList *movepts_history; /*-- a list of elements of type celld --*/
 // to the brush imode object?
 public gchar* linkvar = NULL;  /*-- the linking variable name--*/
 
-// FIXME: make attributes
-public vector_b sampled;
-public vector_i clusterid;
-
 // FIXME: shouldn't need this - attributes should be filtered out by pipeline
 protected guint n_attributes;
 
@@ -551,8 +547,6 @@ rows_added(self, guint n) {
   gint i, nprev = self->n_rows, nrows = self->n_rows + n;
   self_set_n_rows(self, nrows);
   
-  vectori_realloc (&self->clusterid, nrows);
-
   vectori_realloc (&self->rows_in_plot, nrows);
   vectori_realloc (&self->rows_under_brush, nrows);
   vectori_realloc (&self->rows_under_brush_prev, nrows);

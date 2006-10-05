@@ -133,7 +133,7 @@ hide_cluster_cb (GtkToggleButton * btn, gpointer cbd)
   /*-- operating on the current sample, whether hidden or shown --*/
   for (i = 0; i < d->n_rows; i++) {
     if (GGOBI_STAGE_GET_ATTR_SAMPLED(d, i)) {
-      if (d->clusterid.els[i] == k) {
+      if (GGOBI_STAGE_GET_ATTR_CLUSTER(d, i) == k) {
         if (GGOBI_STAGE_SET_ATTR_HIDDEN(d, i, btn->active, ATTR_SET_PERSISTENT)) {
           changed = symbol_link_by_id (true, i, d, gg) || changed;
         }
@@ -293,7 +293,7 @@ cluster_symbol_cb (GtkWidget * w, GdkEventExpose * event, gpointer cbd)
   GGOBI_STAGE_ATTR_INIT_ALL(d);  
   for (m = 0; m < d->nrows_in_plot; m++) {
     i = d->rows_in_plot.els[m];
-    if (d->clusterid.els[i] == n) {
+    if (GGOBI_STAGE_GET_ATTR_CLUSTER(d, i) == n) {
       if (targets == br_candg || targets == br_color) {
         GGOBI_STAGE_SET_ATTR_COLOR(d, i, gg->color_id, ATTR_SET_TRANSIENT);
         /*-- this will be done multiple times, but who cares? --*/

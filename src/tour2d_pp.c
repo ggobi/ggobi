@@ -669,14 +669,11 @@ t2d_switch_index(Tour2DCPanel controls, gint basismeth, displayd *dsp,
           dsp->t2d_pp_op.proj_best.vals[k][j]);
     }
 
+  GGOBI_STAGE_ATTR_INIT(d, cluster);
   gdata  = g_malloc (nrows*sizeof(gfloat));
-  if (d->clusterid.els==NULL) printf ("No cluster information found\n");
   for (i = 0 ; i < nrows; i++)
   { 
-    if (d->clusterid.els!=NULL)
-      gdata[i] = d->clusterid.els[d->rows_in_plot.els[i]];
-    else
-      gdata[i] = 0;
+    gdata[i] = GGOBI_STAGE_GET_ATTR_CLUSTER(d, d->rows_in_plot.els[i]);
   }
 
   if(controls.ppindex.index_f) {

@@ -135,7 +135,7 @@ clusters_set (GGobiStage * d)
           if (GGOBI_STAGE_GET_ATTR_TYPE(d, i) == d->clusv[n].glyphtype &&
               GGOBI_STAGE_GET_ATTR_SIZE(d, i) == d->clusv[n].glyphsize &&
               GGOBI_STAGE_GET_ATTR_COLOR(d, i) == d->clusv[n].color) {
-            d->clusterid.els[i] = n;
+            GGOBI_STAGE_SET_ATTR_CLUSTER(d, i, n);
             break;
           }
         }

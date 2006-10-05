@@ -767,11 +767,11 @@ scatterplotMovePointsButtonCb (displayd * display, splotd * sp, GtkWidget * w,
       clusters_set(d);
       if (d->nclusters > 1) {
         gint i, k, id = d->nearest_point;
-        gfloat cur_clust = d->clusterid.els[id];
+        gfloat cur_clust = GGOBI_STAGE_GET_ATTR_CLUSTER(d, id);
         for (i = 0; i < d->nrows_in_plot; i++) {
           k = d->rows_in_plot.els[i];
           if (k == id);
-          else if (d->clusterid.els[k] == cur_clust)
+          else if (GGOBI_STAGE_GET_ATTR_CLUSTER(d, k) == cur_clust)
             if (!GGOBI_STAGE_GET_ATTR_HIDDEN(d, k))
               movepts_history_add (k, sp, d, gg);
         }

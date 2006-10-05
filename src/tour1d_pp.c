@@ -762,14 +762,11 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
         dsp->t1d.F.vals[0][dsp->t1d.active_vars.els[j]]);
   }
 
+  GGOBI_STAGE_ATTR_INIT(d, cluster);
   gdata  = g_malloc (nrows*sizeof(gfloat));
-  if (d->clusterid.els==NULL) printf ("No cluster information found\n");
   for (i=0; i<nrows; i++)
   { 
-    if (d->clusterid.els!=NULL)
-      gdata[i] = d->clusterid.els[d->rows_in_plot.els[i]];
-    else
-      gdata[i] = 0;
+    gdata[i] = GGOBI_STAGE_GET_ATTR_CLUSTER(d, d->rows_in_plot.els[i]);
   }
 
   switch (indxtype)

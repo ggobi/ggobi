@@ -181,7 +181,7 @@ move_pt (gint id, gint x, gint y, splotd * sp, GGobiStage * d, ggobid * gg)
   /* Let this work even if all points are the same glyph and color */
   GGOBI_STAGE_ATTR_INIT_ALL(d);  
   if (gg->movepts.cluster_p) {
-    gint cur_clust = d->clusterid.els[id];
+    gint cur_clust = GGOBI_STAGE_GET_ATTR_CLUSTER(d, id);
 
     /*
      * Move all points which belong to the same cluster
@@ -189,7 +189,7 @@ move_pt (gint id, gint x, gint y, splotd * sp, GGobiStage * d, ggobid * gg)
      */
     for (i = 0; i < d->nrows_in_plot; i++) {
       k = d->rows_in_plot.els[i];
-      if (k == id || d->clusterid.els[k] != cur_clust || GGOBI_STAGE_GET_ATTR_HIDDEN(d, k))
+      if (k == id || GGOBI_STAGE_GET_ATTR_CLUSTER(d, k) != cur_clust || GGOBI_STAGE_GET_ATTR_HIDDEN(d, k))
         continue;
         
       if (horiz)

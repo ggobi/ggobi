@@ -341,13 +341,14 @@ create_explicit_variable (GGobiStage * d, gchar * vname, NewVariableType vartype
   guint jvar = ggobi_data_add_cols(GGOBI_DATA(d), 1);
   ggobi_stage_set_col_name(d, jvar, vname);
 
+  GGOBI_STAGE_ATTR_INIT(d, cluster);
   for (guint i = 0; i < d->n_rows; i++) {
     switch(vartype) {
       case ADDVAR_ROWNOS:
         ggobi_stage_set_raw_value(d, i, jvar, (gfloat) (i + 1));
         break;
       case ADDVAR_BGROUP:
-        ggobi_stage_set_raw_value(d, i, jvar, (gfloat) d->clusterid.els[i]);
+        ggobi_stage_set_raw_value(d, i, jvar, (gfloat) GGOBI_STAGE_GET_ATTR_CLUSTER(d, i));
         break;
     }
   }
