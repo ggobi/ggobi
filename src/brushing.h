@@ -34,7 +34,7 @@
 
 /* br_point_targets and br_edge_targets */
 typedef enum {
-   br_off, br_candg, br_color, br_glyph, br_shadow, br_unshadow
+   br_off, br_candg, br_color, br_glyph, br_shadow, br_unshadow, br_exclude, br_include
 } BrushTargetType;
 
 /* for binning the screen */

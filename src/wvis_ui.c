@@ -185,7 +185,7 @@ record_colors_reset (gint selected_var, GGobiStage *d, ggobid *gg)
       }
     }
     if (nd > 1 && !gg->linkby_cv)
-      symbol_link_by_id (true, i, d, gg);  /*-- true = force persistent --*/
+      brush_all_matching_id (d, i, true, br_color, ATTR_SET_PERSISTENT);
   }
 }
 

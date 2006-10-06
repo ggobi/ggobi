@@ -111,7 +111,7 @@ add_attributes(self) {
 
   self_add_attribute(self, "_cluster", 0);
   self_add_attribute(self, "_sampled", (gdouble) true);
-  self_add_attribute(self, "_excluded", 0);
+  self_add_attribute(self, "_excluded", (gdouble) false);
 
 } 
 
@@ -345,8 +345,8 @@ add_rows(self, guint n) {
   }
   
   ggobi_stage_rows_added(GGOBI_STAGE(self), n);
-  self_reset_rows(self, nprev, nrows);
   /* set default values here */
+  self_reset_rows(self, nprev, nrows);
   // FIXME: this can probably be moved before rows_added emission and not
   // emit col_data_changed, once we have tform stage in place
   
@@ -367,7 +367,7 @@ public void
 reset_rows(self, guint from, guint to) {
   for (guint j = 0; j < GGOBI_STAGE(self)->n_cols; j++) {
     gdouble default_val = self_get_col_default_value(self, j);
-    for (guint i = from; i < to; i++)
+    for (guint i = from; i < to; i++) 
       ggobi_stage_set_raw_value(GGOBI_STAGE(self), i, j, default_val);
     ggobi_stage_col_data_changed(GGOBI_STAGE(self), j);
   }

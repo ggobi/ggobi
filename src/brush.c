@@ -389,6 +389,7 @@ xed_by_brush (gint k, displayd * display, ggobid * gg)
 /*         Handle all symbols in one loop through a bin                 */
 /*----------------------------------------------------------------------*/
 
+
 static gboolean
 paint_points (cpaneld * cpanel, GGobiStage * d, ggobid * gg)
 {
@@ -407,7 +408,7 @@ paint_points (cpaneld * cpanel, GGobiStage * d, ggobid * gg)
       cpanel->br.point_targets, cpanel->br.mode);
 
     if (!gg->linkby_cv && nd > 1)
-      symbol_link_by_id (false, i, d, gg);
+      brush_all_matching_id (d, i, true, cpanel->br.point_targets, cpanel->br.mode);
   }
   
   for (guint i = 0; i < d->nrows_under_brush; i++) {
@@ -415,7 +416,7 @@ paint_points (cpaneld * cpanel, GGobiStage * d, ggobid * gg)
       cpanel->br.point_targets, cpanel->br.mode);
 
     if (!gg->linkby_cv && nd > 1)
-      symbol_link_by_id (false, i, d, gg);
+      brush_all_matching_id (d, i, false, cpanel->br.point_targets, cpanel->br.mode);
   }
 
   return true;
@@ -434,7 +435,7 @@ paint_edges (cpaneld * cpanel, GGobiStage * e, ggobid * gg)
       cpanel->br.edge_targets, cpanel->br.mode);
 
     if (!gg->linkby_cv && nd > 1)
-      symbol_link_by_id (false, i, e, gg);
+      brush_all_matching_id (e, i, true, cpanel->br.edge_targets, cpanel->br.mode);
   }
 
   //FIXME: only return true if there actually has been a change
@@ -544,7 +545,7 @@ points_update_paint (splotd * sp, GGobiStage * d, ggobid * gg)
   update_points_under_brush(d, sp);
 
   if (gg->linkby_cv) {
-    return build_symbol_vectors_by_var (cpanel, d, gg);
+    return brush_all_matching_cv (cpanel, d, gg);
   } else {
     return paint_points (cpanel, d, gg);
   }

@@ -135,7 +135,7 @@ hide_cluster_cb (GtkToggleButton * btn, gpointer cbd)
     if (GGOBI_STAGE_GET_ATTR_SAMPLED(d, i)) {
       if (GGOBI_STAGE_GET_ATTR_CLUSTER(d, i) == k) {
         if (GGOBI_STAGE_SET_ATTR_HIDDEN(d, i, btn->active, ATTR_SET_PERSISTENT)) {
-          changed = symbol_link_by_id (true, i, d, gg) || changed;
+          changed = brush_all_matching_id (d, i, true, br_shadow, ATTR_SET_PERSISTENT) || changed;          
         }
       }
     }
@@ -164,7 +164,7 @@ include_hiddens (gboolean include, GGobiStage * d, ggobid * gg)
     GGOBI_STAGE_SET_ATTR_EXCLUDED(d, i, (!include && GGOBI_STAGE_GET_ATTR_HIDDEN(d, i)));
     if ((prev != GGOBI_STAGE_GET_ATTR_EXCLUDED(d, i)) && !gg->linkby_cv) {
       /*-- this doesn't link the value of excluded --*/
-      changed = changed || exclude_link_by_id (i, d, gg);
+      changed = changed || brush_all_matching_id (d, i, true, br_include, ATTR_SET_PERSISTENT);
     }
   }
   ggobi_stage_set_rows_in_plot(d);
@@ -294,30 +294,18 @@ cluster_symbol_cb (GtkWidget * w, GdkEventExpose * event, gpointer cbd)
   for (m = 0; m < d->nrows_in_plot; m++) {
     i = d->rows_in_plot.els[m];
     if (GGOBI_STAGE_GET_ATTR_CLUSTER(d, i) == n) {
-      if (targets == br_candg || targets == br_color) {
-        GGOBI_STAGE_SET_ATTR_COLOR(d, i, gg->color_id, ATTR_SET_TRANSIENT);
-        /*-- this will be done multiple times, but who cares? --*/
-        d->clusv[n].color = gg->color_id;
-      }
-      if (targets == br_candg || targets == br_glyph) {
-        GGOBI_STAGE_SET_ATTR_SIZE(d, i, (&gg->glyph_id)->size, ATTR_SET_PERSISTENT);
-        GGOBI_STAGE_SET_ATTR_TYPE(d, i, (&gg->glyph_id)->type, ATTR_SET_PERSISTENT);
-        /*-- this will be done multiple times, but who cares? --*/
-        d->clusv[n].glyphtype = gg->glyph_id.type;
-        d->clusv[n].glyphsize = gg->glyph_id.size;
-      }
-
+      GGOBI_STAGE_BRUSH_POINT(d, i, true, targets, ATTR_SET_PERSISTENT);
+      
       /*-- link so that displays of linked datad's will be brushed as well --*/
       if (nd > 1 && !gg->linkby_cv)
-        symbol_link_by_id (true, i, d, gg);
+        brush_all_matching_id (d, i, true, targets, ATTR_SET_PERSISTENT);
     }
   }
 
   g_signal_emit_by_name (G_OBJECT (w), "expose_event",
                          (gpointer) gg, (gpointer) & rval);
 
-  /* clusters_set reorders clusv, so it's bad news here */
-  /*clusters_set; */
+  clusters_set(d);
 
   displays_plot (NULL, FULL, gg);
 

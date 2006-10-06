@@ -63,7 +63,7 @@ splot_plot_case (gint m, GGobiStage *d, splotd *sp, displayd *display, ggobid *g
   GGOBI_STAGE_ATTR_INIT_ALL(d);
   /*-- usually checking sampled is redundant because we're looping
        over rows_in_plot, but maybe we're not always --*/
-  if (GGOBI_STAGE_GET_ATTR_VISIBLE(d, m))
+  if (!GGOBI_STAGE_GET_ATTR_VISIBLE(d, m))
     return false;
 
   /*-- can prevent drawing of missings for parcoords or scatmat plots --*/

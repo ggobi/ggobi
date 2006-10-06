@@ -119,17 +119,17 @@
 #define GGOBI_STAGE_SET_ATTR_TYPE(d, i,   value, brush)  GGOBI_STAGE_SET_ATTR(d, i, type,   value, brush)
 #define GGOBI_STAGE_SET_ATTR_SIZE(d, i,   value, brush)  GGOBI_STAGE_SET_ATTR(d, i, size,   value, brush)
 #define GGOBI_STAGE_SET_ATTR_HIDDEN(d, i, value, brush)  GGOBI_STAGE_SET_ATTR(d, i, hidden, value, brush)
-#define GGOBI_STAGE_SET_ATTR_SAMPLED(d, i, value)  ggobi_stage_set_raw_value(d, i, attr_sampled, (gdouble) value)
-#define GGOBI_STAGE_SET_ATTR_EXCLUDED(d, i, value) ggobi_stage_set_raw_value(d, i, attr_excluded, (gdouble) value)
-#define GGOBI_STAGE_SET_ATTR_CLUSTER(d, i, value)  ggobi_stage_set_raw_value(d, i, attr_cluster, (gdouble) value)
+#define GGOBI_STAGE_SET_ATTR_SAMPLED(d, i, value)        ggobi_stage_set_raw_value(d, i, attr_sampled, (gdouble) value)
+#define GGOBI_STAGE_SET_ATTR_EXCLUDED(d, i, value)       ggobi_stage_set_raw_value(d, i, attr_excluded, (gdouble) value)
+#define GGOBI_STAGE_SET_ATTR_CLUSTER(d, i, value)        ggobi_stage_set_raw_value(d, i, attr_cluster, (gdouble) value)
 
-#define GGOBI_STAGE_GET_ATTR_COLOR(d, i )  ((gushort) GGOBI_STAGE_GET_ATTR(d, i, color  ))
-#define GGOBI_STAGE_GET_ATTR_TYPE(d, i  )  ((gint) GGOBI_STAGE_GET_ATTR(d, i, type   ))
-#define GGOBI_STAGE_GET_ATTR_SIZE(d, i  )  ((gint) GGOBI_STAGE_GET_ATTR(d, i, size   ))
-#define GGOBI_STAGE_GET_ATTR_HIDDEN(d, i)  ((gboolean) GGOBI_STAGE_GET_ATTR(d, i, hidden ))
-#define GGOBI_STAGE_GET_ATTR_SAMPLED(d, i)  ((gboolean) ggobi_stage_get_raw_value(d, i, attr_sampled))
+#define GGOBI_STAGE_GET_ATTR_COLOR(d, i )   ((gushort) GGOBI_STAGE_GET_ATTR(d, i, color  ))
+#define GGOBI_STAGE_GET_ATTR_TYPE(d, i  )   ((gint) GGOBI_STAGE_GET_ATTR(d, i, type   ))
+#define GGOBI_STAGE_GET_ATTR_SIZE(d, i  )   ((gint) GGOBI_STAGE_GET_ATTR(d, i, size   ))
+#define GGOBI_STAGE_GET_ATTR_HIDDEN(d, i)   ((gboolean) GGOBI_STAGE_GET_ATTR(d, i, hidden ))
+#define GGOBI_STAGE_GET_ATTR_SAMPLED(d, i)  (ggobi_stage_get_raw_value(d, i, attr_sampled))
 #define GGOBI_STAGE_GET_ATTR_EXCLUDED(d, i) ((gboolean) ggobi_stage_get_raw_value(d, i, attr_excluded))
-#define GGOBI_STAGE_GET_ATTR_VISIBLE(d, i) GGOBI_STAGE_GET_ATTR_SAMPLED(d, i) && !GGOBI_STAGE_GET_ATTR_EXCLUDED(d, i)
+#define GGOBI_STAGE_GET_ATTR_VISIBLE(d, i)  true //(GGOBI_STAGE_GET_ATTR_SAMPLED(d, i) && !GGOBI_STAGE_GET_ATTR_EXCLUDED(d, i))
 #define GGOBI_STAGE_GET_ATTR_CLUSTER(d, i)  ((gint) ggobi_stage_get_raw_value(d, i, attr_cluster))
 
 #define GGOBI_STAGE_GET_ATTR_GLYPH(d, i)  ggobi_stage_get_attr_glyph(d, i, attr_type[1], attr_size[1])
@@ -159,6 +159,12 @@
       break;\
     case br_unshadow:\
       GGOBI_STAGE_SET_ATTR_HIDDEN(d, i, false, brush);\
+      break;\
+    case br_exclude:\
+      GGOBI_STAGE_SET_ATTR_EXCLUDED(d, i, true);\
+      break;\
+    case br_include:\
+      GGOBI_STAGE_SET_ATTR_EXCLUDED(d, i, false);\
       break;\
     default:\
       break;\
@@ -1197,7 +1203,7 @@ get_n_vars(self) {
 
 public guint
 has_vars(self) {
-  self_get_n_vars(self) > 0;
+  return self_get_n_vars(self) > 0;
 }
 
 
@@ -1229,8 +1235,8 @@ set_rows_in_plot(self)
   self->nrows_in_plot = 0;
 
   GGOBI_STAGE_ATTR_INIT_ALL(self);
-  for (i = 0; i < self->n_rows; i++)
-    if (GGOBI_STAGE_GET_ATTR_SAMPLED(self, i) && !GGOBI_STAGE_GET_ATTR_EXCLUDED(GGOBI_STAGE(self), i))
+  for (i = 0; i < self->n_rows; i++) 
+    if (!GGOBI_STAGE_GET_ATTR_EXCLUDED(self, i))
       self->rows_in_plot.els[self->nrows_in_plot++] = i;
   
   self_rows_in_plot_changed(self, (guint) self->nrows_in_plot); 
@@ -1258,7 +1264,7 @@ attach (self, ggobid *gg, gboolean cleanup)
   GGobiData *d = GGOBI_DATA(self_get_root(self));
   gint *vars = (gint *) g_malloc(GGOBI_STAGE(self)->n_cols * sizeof(gint));
   GGobiInputSource *source = ggobi_data_get_source(d);
-  
+
   if (gg->data_source)
     g_object_unref(gg->data_source);
   g_object_ref(source);
