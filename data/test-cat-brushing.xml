@@ -9,51 +9,41 @@ This is XML created by GGobi
 <variables count="3">
    <realvariable name="x" nickname="x"/>
    <realvariable name="y" nickname="y"/>
-  <categoricalvariable name="cat" nickname="ca">
-    <levels count="10">
+  <categoricalvariable name="cat">
+    <levels count="3">
       <level value="1">a</level>
       <level value="2">b</level>
       <level value="3">c</level>
-      <level value="4">d</level>
-      <level value="5">e</level>
-      <level value="6">f</level>
-      <level value="7">g</level>
-      <level value="8">h</level>
-      <level value="9">i</level>
-      <level value="10">j</level>
     </levels>
   </categoricalvariable>
 </variables>
-<records count="10" glyph="fc 1" color="0">
+<records count="9" glyph="fc 1" color="0">
 <record id="1" label="1">
 1 1 1
 </record>
 <record id="2" label="2">
-2 2 2
+2 2 1
 </record>
 <record id="3" label="3">
-3 3 3
+3 3 1
 </record>
 <record id="4" label="4">
-4 4 4
+4 4 2
 </record>
 <record id="5" label="5">
-5 5 5
+5 5 2
 </record>
 <record id="6" label="6">
-6 6 6
+6 6 2
 </record>
 <record id="7" label="7">
-7 7 7
+7 7 3
 </record>
 <record id="8" label="8">
-8 8 8
+8 8 3
 </record>
 <record id="9" label="9">
-9 9 9
-</record>
-<record id="10" label="10">
-10 10 10
+9 9 3
 </record>
 </records>
 </data>
@@ -65,50 +55,40 @@ This is XML created by GGobi
    <realvariable name="x" nickname="x"/>
    <realvariable name="y" nickname="y"/>
   <categoricalvariable name="cat" nickname="ca">
-    <levels count="10">
-      <level value="1">j</level>
-      <level value="2">i</level>
+    <levels count="3">
+      <level value="1">c</level>
+      <level value="2">a</level>
       <level value="3">h</level>
-      <level value="4">g</level>
-      <level value="5">f</level>
-      <level value="6">e</level>
-      <level value="7">d</level>
-      <level value="8">c</level>
-      <level value="9">b</level>
-      <level value="10">a</level>
     </levels>
   </categoricalvariable>
 </variables>
-<records count="10" glyph="fc 1" color="0">
+<records count="9" glyph="fc 1" color="0">
 <record id="1" label="1">
-1 1 10
+1 1 1
 </record>
 <record id="2" label="2">
-2 2 9
+2 2 1
 </record>
 <record id="3" label="3">
-3 3 8
+3 3 1
 </record>
 <record id="4" label="4">
-4 4 7
+4 4 2
 </record>
 <record id="5" label="5">
-5 5 6
+5 5 2
 </record>
 <record id="6" label="6">
-6 6 5
+6 6 2
 </record>
 <record id="7" label="7">
-7 7 4
+7 7 3
 </record>
 <record id="8" label="8">
 8 8 3
 </record>
 <record id="9" label="9">
-9 9 2
-</record>
-<record id="10" label="10">
-10 10 1
+9 9 3
 </record>
 </records>
 </data>
