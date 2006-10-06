@@ -337,15 +337,14 @@ build_symbol_vectors_by_var (cpaneld * cpanel, GGobiData * d, ggobid * gg)
         vectorb_alloc (&levelv_dd, level_value_max + 1);
         vectorb_zero (&levelv_dd);
 
-        /*
-        for (i=0; i<levelv.nels; i++) {
-          if (levelv.els[i] == true) {
-            for (k=0; k<vtdd->nlevels; k++) {
-              g_printerr ("[%d][%d] home name %s new name %s\n",  
-                i, k, d->linkvar_vt->level_names[i], vtdd->level_names[k]);
-              if (strcmp(vtdd->level_names[k], d->linkvar_vt->level_names[i]) == 0) 
+        for (i=0; i<d->linkvar_vt->nlevels; i++) {
+          if (levelv.els[ d->linkvar_vt->level_values[i] ] == true) {
+            for (k=0; k<vtdd->nlevels; k++) 
+            {
+              if (strcmp(vtdd->level_names[k], 
+                         d->linkvar_vt->level_names[i]) == 0) 
               {
-                levelv_dd.els[k] = true;
+                levelv_dd.els[ vtdd->level_values[k] ] = true;
                 break;
               }
             }
@@ -354,7 +353,7 @@ build_symbol_vectors_by_var (cpaneld * cpanel, GGobiData * d, ggobid * gg)
 
         brush_link_by_var (jlinkdd, &levelv_dd, cpanel, dd, gg);
         vectorb_free (&levelv_dd);
-*/
+
       }
     }
   }
@@ -461,6 +460,12 @@ linking_method_set_cb (GtkTreeSelection * treesel, ggobid * gg)
   GtkTreeIter iter;
   GtkTreePath *path;
   gint row = -1;
+
+  /*
+  g_printerr ("display %d d->d %d d %d\n", (gint)gg->current_display,
+	      (gint)gg->current_display->d,
+	      (gint)d);
+  */
 
   if (gtk_tree_selection_get_selected (treesel, &model, &iter)) {
     path = gtk_tree_model_get_path (model, &iter);
