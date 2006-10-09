@@ -9,22 +9,22 @@ This is XML created by GGobi
 <variables count="10">
   <categoricalvariable name="Region" nickname="Re">
     <levels count="3">
-      <level value="1"> 1  </level>
-      <level value="2"> 2  </level>
-      <level value="3"> 3  </level>
+      <level value="1">South</level>
+      <level value="2">Sardinia</level>
+      <level value="3">North</level>
     </levels>
   </categoricalvariable>
-  <categoricalvariable name="Area" nickname="Ar">
+  <categoricalvariable name="Subregion" nickname="Su">
     <levels count="9">
-      <level value="1"> North-Apulia  </level>
-      <level value="2"> Calabria  </level>
-      <level value="3"> South-Apulia  </level>
-      <level value="4"> Sicily  </level>
-      <level value="5"> Inland-Sardinia  </level>
-      <level value="6"> Coast-Sardinia  </level>
-      <level value="7"> East-Liguria  </level>
-      <level value="8"> West-Liguria  </level>
-      <level value="9"> Umbria  </level>
+      <level value="1">North-Apulia</level>
+      <level value="2">Calabria</level>
+      <level value="3">South-Apulia</level>
+      <level value="4">Sicily</level>
+      <level value="5">Inland-Sardinia</level>
+      <level value="6">Coast-Sardinia</level>
+      <level value="7">East-Liguria</level>
+      <level value="8">West-Liguria</level>
+      <level value="9">Umbria</level>
     </levels>
   </categoricalvariable>
   <realvariable name="palmitic" nickname="p1"/>
