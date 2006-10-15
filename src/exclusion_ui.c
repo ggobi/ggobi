@@ -520,15 +520,16 @@ CHECK_EVENT_SIGNATURE (exclusion_notebook_adddata_cb, datad_added_f)
 
   if (gg->cluster_ui.window == NULL ||
       !GTK_WIDGET_REALIZED (gg->cluster_ui.window)) {
-    dialog = gtk_dialog_new_with_buttons ("Color & Glyph Groups",
+    gg->cluster_ui.window = gtk_dialog_new_with_buttons ("Color & Glyph Groups",
       GTK_WINDOW(gg->main_window), GTK_DIALOG_DESTROY_WITH_PARENT, 
       GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE, NULL);
-    gg->cluster_ui.window = dialog;
     g_signal_connect (G_OBJECT (gg->cluster_ui.window), "delete_event",
                       G_CALLBACK (close_wmgr_cb), (gpointer) gg);
     new = true;
   }
 
+  dialog = gg->cluster_ui.window;
+  
   tebox = gtk_event_box_new ();
   gtk_box_pack_start (GTK_BOX (GTK_DIALOG(dialog)->vbox), tebox, true, true, 2);
 
