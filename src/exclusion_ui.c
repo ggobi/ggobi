@@ -56,7 +56,7 @@ destroyit (gboolean kill, ggobid * gg)
 
 /*-- called when closed from the close button --*/
 static void
-close_btn_cb (GtkWidget * w, ggobid * gg)
+close_btn_cb (GtkWidget * w, gint response, ggobid * gg)
 {
   destroyit (true, gg);
 }
@@ -529,10 +529,6 @@ CHECK_EVENT_SIGNATURE (exclusion_notebook_adddata_cb, datad_added_f)
     new = true;
   }
 
-  /*vbox = gtk_vbox_new (false, 5);
-  gtk_container_set_border_width (GTK_CONTAINER (vbox), 5);
-  gtk_container_add (GTK_CONTAINER (gg->cluster_ui.window), vbox);*/
-
   tebox = gtk_event_box_new ();
   gtk_box_pack_start (GTK_BOX (GTK_DIALOG(dialog)->vbox), tebox, true, true, 2);
 
@@ -695,10 +691,8 @@ CHECK_EVENT_SIGNATURE (exclusion_notebook_adddata_cb, datad_added_f)
   gtk_box_pack_start (GTK_BOX (hbox), btn, true, true, 0);
 
   /*-- Close button --*/
-  /*btn = gtk_button_new_from_stock (GTK_STOCK_CLOSE);
-  g_signal_connect (G_OBJECT (btn), "clicked",
+  g_signal_connect (G_OBJECT (dialog), "response",
                     G_CALLBACK (close_btn_cb), (gpointer) gg);
-  gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 0);*/
 
   gtk_widget_show_all (gg->cluster_ui.window);
 
