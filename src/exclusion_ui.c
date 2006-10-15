@@ -503,6 +503,7 @@ CHECK_EVENT_SIGNATURE (exclusion_notebook_adddata_cb, datad_added_f)
   GtkWidget *scrolled_window = NULL;
   GtkWidget *vbox, *tebox, *btn, *hbox, *lbl;
   GtkWidget *ebox;
+  GtkWidget *dialog;
   gint k;
   GSList *l;
   GGobiData *d;
@@ -519,20 +520,21 @@ CHECK_EVENT_SIGNATURE (exclusion_notebook_adddata_cb, datad_added_f)
 
   if (gg->cluster_ui.window == NULL ||
       !GTK_WIDGET_REALIZED (gg->cluster_ui.window)) {
-    gg->cluster_ui.window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+    dialog = gtk_dialog_new_with_buttons ("Color & Glyph Groups",
+      GTK_WINDOW(gg->main_window), GTK_DIALOG_DESTROY_WITH_PARENT, 
+      GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE, NULL);
+    gg->cluster_ui.window = dialog;
     g_signal_connect (G_OBJECT (gg->cluster_ui.window), "delete_event",
                       G_CALLBACK (close_wmgr_cb), (gpointer) gg);
-    gtk_window_set_title (GTK_WINDOW (gg->cluster_ui.window),
-                          "Color & Glyph Groups");
     new = true;
   }
 
-  vbox = gtk_vbox_new (false, 5);
+  /*vbox = gtk_vbox_new (false, 5);
   gtk_container_set_border_width (GTK_CONTAINER (vbox), 5);
-  gtk_container_add (GTK_CONTAINER (gg->cluster_ui.window), vbox);
+  gtk_container_add (GTK_CONTAINER (gg->cluster_ui.window), vbox);*/
 
   tebox = gtk_event_box_new ();
-  gtk_box_pack_start (GTK_BOX (vbox), tebox, true, true, 2);
+  gtk_box_pack_start (GTK_BOX (GTK_DIALOG(dialog)->vbox), tebox, true, true, 2);
 
   /* Create a notebook, set the position of the tabs */
   gg->cluster_ui.notebook = gtk_notebook_new ();
@@ -663,7 +665,7 @@ CHECK_EVENT_SIGNATURE (exclusion_notebook_adddata_cb, datad_added_f)
 
   /*-- horizontal box to hold a few buttons --*/
   hbox = gtk_hbox_new (false, 2);
-  gtk_box_pack_start (GTK_BOX (vbox), hbox, false, false, 0);
+  gtk_box_pack_start (GTK_BOX (GTK_DIALOG(dialog)->vbox), hbox, false, false, 0);
 
   /*-- Exclude button --*/
   btn = gtk_button_new_with_mnemonic ("E_xclude shadows");
@@ -693,10 +695,10 @@ CHECK_EVENT_SIGNATURE (exclusion_notebook_adddata_cb, datad_added_f)
   gtk_box_pack_start (GTK_BOX (hbox), btn, true, true, 0);
 
   /*-- Close button --*/
-  btn = gtk_button_new_from_stock (GTK_STOCK_CLOSE);
+  /*btn = gtk_button_new_from_stock (GTK_STOCK_CLOSE);
   g_signal_connect (G_OBJECT (btn), "clicked",
                     G_CALLBACK (close_btn_cb), (gpointer) gg);
-  gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 0);
+  gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 0);*/
 
   gtk_widget_show_all (gg->cluster_ui.window);
 
