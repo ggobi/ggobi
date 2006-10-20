@@ -43,7 +43,7 @@ GSList *
 get_file_filters(ggobid *gg)
 {
   GType *factory_types;
-  gint n_factory_types, i;
+  guint n_factory_types, i;
   GSList *filters = NULL;
   GtkFileFilter *unknown_filter = gtk_file_filter_new();
   
@@ -96,7 +96,7 @@ filesel_ok (GtkWidget * chooser)
   switch (action) {
   case READ_FILESET:
     {
-      const gchar *mode_name;
+      gchar *mode_name;
       GtkWidget *combo;
       GtkFileFilter *filter;
       // FIXME: GTK+ 2.10 has a built-in entry, but it's not labeled "URL" like ours...
@@ -109,11 +109,14 @@ filesel_ok (GtkWidget * chooser)
       }
       
       combo = (GtkWidget *) g_object_get_data (G_OBJECT (chooser),
-                                         "PluginTypeCombo");
+                                         "InputTypeCombo");
       filter = gtk_file_chooser_get_filter(GTK_FILE_CHOOSER(chooser));
-      mode_name = gtk_file_filter_get_name(filter);
-      if (!strcmp(mode_name, "any"))
+      //mode_name = gtk_file_filter_get_name(filter);
+      mode_name = gtk_combo_box_get_active_text(GTK_COMBO_BOX(combo));
+      if (!strcmp(mode_name, "any")) {
+        g_free(mode_name);
         mode_name = NULL;
+      }
 
       firsttime = (g_slist_length (gg->d) == 0);
       if (load_data (uri, mode_name, gg))
@@ -129,6 +132,8 @@ filesel_ok (GtkWidget * chooser)
         gg->pmode = XYPLOT;
         ggobi_full_viewmode_set (XYPLOT, DEFAULT_IMODE, gg);
       }
+      
+      g_free(mode_name);
     }
     break;
   case EXTEND_FILESET:  /*-- not yet enabled --*/
@@ -198,7 +203,7 @@ createOutputFileSelectionDialog (const gchar * title)
 GtkWidget *
 createInputFileSelectionDialog (gchar * title, ggobid * gg)
 {
-  GtkWidget *chooser, /* *combo,*/ *hbox, *lbl;
+  GtkWidget *chooser, *combo, *hbox, *lbl;
   GSList *filters, *l;
 
   filters = get_file_filters(gg);
@@ -209,21 +214,21 @@ createInputFileSelectionDialog (gchar * title, ggobid * gg)
                                  GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
 
   hbox = gtk_hbox_new (false, 5);
-/*
+
   lbl = gtk_label_new_with_mnemonic ("Input _Type:");
   gtk_box_pack_start (GTK_BOX (hbox), lbl, false, false, 0);
 
   combo = gtk_combo_box_new_text ();
-  gtk_label_set_mnemonic_widget (GTK_LABEL (lbl), combo);*/
+  gtk_label_set_mnemonic_widget (GTK_LABEL (lbl), combo);
   for (l = filters; l; l = l->next) {
-    gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(chooser), l->data);
-    /*gtk_combo_box_append_text (GTK_COMBO_BOX (combo), l->data);
-    g_free (l->data);*/
+    GtkFileFilter *filter = l->data;
+    gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(chooser), filter);
+    gtk_combo_box_append_text (GTK_COMBO_BOX (combo), gtk_file_filter_get_name(filter));
   }
   g_slist_free (filters);
-  /*gtk_combo_box_set_active (GTK_COMBO_BOX (combo), 0);
+  gtk_combo_box_set_active (GTK_COMBO_BOX (combo), 0);
   gtk_box_pack_start (GTK_BOX (hbox), combo, false, false, 0);
-  g_object_set_data (G_OBJECT (chooser), "PluginTypeCombo", combo);*/
+  g_object_set_data (G_OBJECT (chooser), "InputTypeCombo", combo);
 
   { // Testing URL reading interface
   GtkWidget *entry;
