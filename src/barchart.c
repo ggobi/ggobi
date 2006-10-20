@@ -1334,6 +1334,9 @@ barchart_default_visual_cues_draw (splotd * rawsp, GdkDrawable * drawable,
   gint x = sp->bar->bins[0].rect.x;
   gint halfwidth = sp->bar->bins[0].rect.height / 2 - 2;
 
+  if (halfwidth <= 0)
+      halfwidth = 1;
+  
   sp->bar->anchor_rgn[0].x = sp->bar->anchor_rgn[1].x = x - 5;
   sp->bar->anchor_rgn[2].x = x + GGOBI_SPLOT (sp)->max.x; // extend
   sp->bar->anchor_rgn[0].y = y + halfwidth;
