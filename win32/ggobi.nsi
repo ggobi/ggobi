@@ -54,11 +54,12 @@ Section "GGobi"
 	File ..\plugins\DescribeDisplay\.libs\plugin-0.dll
 	
 	# Include the header files and libs for those building against GGobi (rggobi)
-	#SetOutPath $INSTDIR\dev\include\ggobi
-	#File ..\src\*.h
-	#SetOutPath $INSTDIR\dev\lib
-	#File ..\src\.libs\libggobi.dll.a
-	#File ..\src\.libs\libggobi.la
+	SetOutPath $INSTDIR\dev\include\ggobi
+	File ..\src\*.h
+	File ..\src\GGStructSizes.c
+	SetOutPath $INSTDIR\dev\lib
+	File ..\src\.libs\libggobi.dll.a
+	File ..\src\.libs\libggobi.la
 	
 	# Shortcut
 	CreateShortCut "$DESKTOP\ggobi.lnk" "$INSTDIR\ggobi.exe" "" "$INSTDIR\ggobi.ico"
