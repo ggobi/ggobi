@@ -133,3 +133,6 @@ ggobirc: all
 
 win32-installer: ggobirc
 	makensis //DVERSION="@VERSION@" win32/ggobi.nsi
+
+win32-devpack: all
+	make -C src ggobi-@VERSION@-win32-devpack

@@ -66,3 +66,10 @@ libggobi.def:
 	sed -n '/^........ [T|C] _/s/^........ [T|C] _/ /p' tmp >> $@
 	rm tmp
 
+ggobi-@VERSION@-win32-devpack: all
+	mkdir -p $@/include/ggobi
+	cp $(pkginclude_HEADERS) $@/include/ggobi
+	mkdir -p $@/lib
+	cp .libs/libggobi.la .libs/libggobi.dll.a $@/lib
+	zip -r $@.zip $@
+	rm -r $@
