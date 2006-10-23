@@ -10,7 +10,7 @@ plugin_la_LDFLAGS  = @GGOBI_LIBS@ -module
 plugin_la_CFLAGS   = @GGOBI_CFLAGS@ @SRC_DEBUG@
 
 # Every plugin has an XML description and some docs
-EXTRA_DIST = plugin.xml Docs
+EXTRA_DIST = plugin.xml
 
 if OS_WIN32
 plugin_la_DEPENDENCIES=plugin.def
