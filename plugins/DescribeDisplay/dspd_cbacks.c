@@ -103,7 +103,7 @@ stickylabels = list(list(index=, label=""),
                     list(index=, label=""), ...)),
 */
 void
-describe_sticky_labels (FILE *fp, GGobiData *d, cpaneld *cpanel)
+describe_sticky_labels (FILE *fp, GGobiData *d, cpaneld *cpanel, ggobid *gg)
 {
   gint j;
 
@@ -118,17 +118,8 @@ describe_sticky_labels (FILE *fp, GGobiData *d, cpaneld *cpanel)
       ADD_COMMA(fp);
       fprintf (fp, "label=");
 
-      if (cpanel->id_display_type == ID_RECORD_LABEL)
-        fprintf (fp, "%s", (gchar *) g_array_index (d->rowlab, gchar *, j));
-      else if (cpanel->id_display_type == ID_RECORD_NO) {
-        fprintf (fp, "%d", j);
-      }  else if (cpanel->id_display_type == ID_RECORD_ID) {
-        if (d->rowIds && d->rowIds[j]) {
-          fprintf (fp, "%s", d->rowIds[j]);
-        } else {
-          fprintf (fp, "%s", "");
-        }
-      }
+      fprintf (fp, "'%s'", identify_label_fetch(j, cpanel, d, gg));
+
       CLOSE_LIST(fp);  /* one sticky label */
       if (l->next)
         ADD_COMMA(fp); 
@@ -619,7 +610,7 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
   /*  ADD_COMMA(fp); */ 
 
   /* sticky labels */
-  describe_sticky_labels (fp, d, cpanel);
+  describe_sticky_labels (fp, d, cpanel, gg);
 
   /* edges: source, dest, color, glyph type and size, hidden,
      sticky labels (not adding missing at the moment)
@@ -669,7 +660,7 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
           ADD_COMMA(fp);
       }
       /* sticky labels */
-      describe_sticky_labels (fp, e, cpanel);
+      describe_sticky_labels (fp, e, cpanel, gg);
     }
     CLOSE_LIST(fp);  /* edges */
     /*ADD_COMMA(fp); */ ADD_CR(fp);
