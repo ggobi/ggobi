@@ -338,7 +338,7 @@ set_missing (self, guint i, guint j)
 public gboolean
 is_missing (self, guint i, guint j) 
 {
-  return (self->missing.vals[i][j] == 1);  
+  return self->missings || (self->missing.vals[i][j] == 1);  
 }
 
 public gboolean
