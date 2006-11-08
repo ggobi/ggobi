@@ -387,14 +387,15 @@ write_xml_record (FILE *f, GGobiData *d, ggobid *gg, gint i,
   if (gg->save.column_ind == ALLCOLS && d->ncols > 0) {
     for(j = 0; j < d->ncols; j++) {
       /*-- if missing, figure out what to write --*/
-      if (ggobi_data_is_missing(d, i, j) &&
-        gg->save.missing_ind != MISSINGSIMPUTED)
+      if (ggobi_data_has_missings(d) && 
+          ggobi_data_is_missing(d, i, j) && 
+          gg->save.missing_ind != MISSINGSIMPUTED)
       {
-        if (gg->save.missing_ind == MISSINGSNA) {
-          fprintf (f, "na ");
-        }  else if (gg->save.missing_ind == MISSINGSDOT) {
-          fprintf (f, ". ");
-        } 
+          if (gg->save.missing_ind == MISSINGSNA) {
+            fprintf (f, "na ");
+          }  else if (gg->save.missing_ind == MISSINGSDOT) {
+            fprintf (f, ". ");
+          } 
       } else {  /*-- if not missing, just write the data --*/
         writeFloat (f, (gg->save.stage == TFORMDATA) ? d->tform.vals[i][j] :
                                                        d->raw.vals[i][j]);
