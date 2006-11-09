@@ -243,7 +243,7 @@ subset_tree_view_datad_added_cb (ggobid *gg, GGobiData *d, GtkWidget *tree_view)
   subset_init (d, gg);
   model = gtk_tree_view_get_model(GTK_TREE_VIEW(tree_view));
   gtk_list_store_append(GTK_LIST_STORE(model), &iter);
-  gtk_list_store_set(GTK_LIST_STORE(model), &iter, 0, d->name);
+  gtk_list_store_set(GTK_LIST_STORE(model), &iter, 0, d->name, -1);
 
   gtk_widget_show_all (swin);
 }
