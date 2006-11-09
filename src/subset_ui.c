@@ -295,7 +295,7 @@ subset_window_open (ggobid *gg) {
       model = gtk_list_store_new(1, G_TYPE_STRING);
       tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(model));
       populate_tree_view(tree_view, tree_view_titles, G_N_ELEMENTS(tree_view_titles), 
-        true, GTK_SELECTION_SINGLE, G_CALLBACK(subset_datad_set_cb), gg);
+        true, GTK_SELECTION_BROWSE, G_CALLBACK(subset_datad_set_cb), gg);
       
       g_object_set_data(G_OBJECT (tree_view), "datad_swin", swin);
       g_signal_connect (G_OBJECT (gg), "datad_added",
