@@ -895,7 +895,7 @@ describe_barchart_plot (FILE *fp, ggobid *gg, displayd *display,
     /* breaks */
     OPEN_NAMED_C(fp, "breaks");
     for (i = 0; i < bsp->bar->nbins; i++) {
-      if (i < bsp->bar->nbins-1) 
+      if (i < bsp->bar->nbins) 
         ADD_COMMA(fp);
       fprintf (fp, "%.3f", bsp->bar->breaks[i]);
     }
