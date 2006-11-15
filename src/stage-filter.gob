@@ -67,6 +67,7 @@ is_included(self, guint i)
 public void
 set_included(self, guint i, gboolean val)
 {
+  g_return_if_fail(selfp->filter_column != -1);
   ggobi_stage_set_raw_value(GGOBI_STAGE(self), i, selfp->filter_column, (gboolean)val);
 }
 

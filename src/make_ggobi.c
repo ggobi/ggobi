@@ -131,6 +131,11 @@ load_data_source (GGobiInputSource *source, ggobid * gg)
   datasets = ggobi_data_factory_create(factory, source);
   for (; datasets; datasets = datasets->next) {
     GGobiStage *dataset = GGOBI_STAGE(datasets->data);
+    /* hack: if there are no variables in the dataset (ie an edge set)
+       at least make sure there are attributes.
+       This will go away once we move to just storing attributes as variables */
+    if (!dataset->n_cols)
+      ggobi_data_add_attributes (GGOBI_DATA (dataset));
     ggobi_pipeline_factory_build(gg->pipeline_factory, dataset);
     /* eventually ggobi_stage_attach will happen implicitly when the 
        dataset is added to the main context. Right now we are sort of hacking
