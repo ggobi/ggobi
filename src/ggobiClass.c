@@ -84,7 +84,7 @@ ggobi_ggobi_class_init (GGobiGGobiClass * klass)
 
   if (g_signal_lookup ("brush_motion", GGOBI_TYPE_GGOBI) == 0) {
     GGobiSignals[BRUSH_MOTION_SIGNAL] = g_signal_new ("brush_motion", G_TYPE_FROM_CLASS (klass), G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION, 0, NULL, NULL, ggobi_marshal_VOID__OBJECT_POINTER_OBJECT, G_TYPE_NONE, 3, GGOBI_TYPE_SPLOT, G_TYPE_POINTER, /* GdkEventMotion pointer */
-                                                      GGOBI_TYPE_DATA);
+                                                      GGOBI_TYPE_STAGE);
   }
 
   if (g_signal_lookup ("move_point", GGOBI_TYPE_GGOBI) == 0) {
@@ -94,7 +94,7 @@ ggobi_ggobi_class_init (GGobiGGobiClass * klass)
                     G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION, 0, NULL, NULL,
                     ggobi_marshal_VOID__OBJECT_INT_OBJECT,
                     G_TYPE_NONE, 3,
-                    GGOBI_TYPE_SPLOT, G_TYPE_INT, GGOBI_TYPE_DATA);
+                    GGOBI_TYPE_SPLOT, G_TYPE_INT, GGOBI_TYPE_STAGE);
   }
 
   if (g_signal_lookup ("identify_point", GGOBI_TYPE_GGOBI) == 0) {
@@ -104,7 +104,7 @@ ggobi_ggobi_class_init (GGobiGGobiClass * klass)
                     G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION, 0, NULL, NULL,
                     ggobi_marshal_VOID__OBJECT_INT_OBJECT,
                     G_TYPE_NONE, 3,
-                    GGOBI_TYPE_SPLOT, G_TYPE_INT, GGOBI_TYPE_DATA);
+                    GGOBI_TYPE_SPLOT, G_TYPE_INT, GGOBI_TYPE_STAGE);
   }
 
   /* This should be for a ggobi datad rather than a widget. Make that a
@@ -130,7 +130,7 @@ ggobi_ggobi_class_init (GGobiGGobiClass * klass)
 
   if (g_signal_lookup ("variable_added", GGOBI_TYPE_GGOBI) == 0) {
     GGobiSignals[VARIABLE_ADDED_SIGNAL] = g_signal_new ("variable_added", G_TYPE_FROM_CLASS (klass), G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION, 0, NULL, NULL, ggobi_marshal_VOID__POINTER_INT_OBJECT, G_TYPE_NONE, 2, G_TYPE_INT, /*index variable */
-                                                        GGOBI_TYPE_DATA);
+                                                        GGOBI_TYPE_STAGE);
   }
 
   if (g_signal_lookup ("variable_list_changed", GGOBI_TYPE_GGOBI) == 0) {
@@ -139,19 +139,19 @@ ggobi_ggobi_class_init (GGobiGGobiClass * klass)
                     G_TYPE_FROM_CLASS (klass),
                     G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION, 0, NULL, NULL,
                     g_cclosure_marshal_VOID__OBJECT,
-                    G_TYPE_NONE, 1, GGOBI_TYPE_DATA);
+                    G_TYPE_NONE, 1, GGOBI_TYPE_STAGE);
   }
 
   if (g_signal_lookup ("sticky_point_added", GGOBI_TYPE_GGOBI) == 0) {
-    GGobiSignals[STICKY_POINT_ADDED_SIGNAL] = g_signal_new ("sticky_point_added", G_TYPE_FROM_CLASS (klass), G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION, 0, NULL, NULL, ggobi_marshal_VOID__INT_INT_OBJECT, G_TYPE_NONE, 3, G_TYPE_INT, G_TYPE_INT, GGOBI_TYPE_DATA);  /* record index and datad pointer */
+    GGobiSignals[STICKY_POINT_ADDED_SIGNAL] = g_signal_new ("sticky_point_added", G_TYPE_FROM_CLASS (klass), G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION, 0, NULL, NULL, ggobi_marshal_VOID__INT_INT_OBJECT, G_TYPE_NONE, 3, G_TYPE_INT, G_TYPE_INT, GGOBI_TYPE_STAGE);  /* record index and datad pointer */
   }
 
   if (g_signal_lookup ("sticky_point_removed", GGOBI_TYPE_GGOBI) == 0) {
-    GGobiSignals[STICKY_POINT_REMOVED_SIGNAL] = g_signal_new ("sticky_point_removed", G_TYPE_FROM_CLASS (klass), G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION, 0, NULL, NULL, ggobi_marshal_VOID__INT_INT_OBJECT, G_TYPE_NONE, 3, G_TYPE_INT, G_TYPE_INT, GGOBI_TYPE_DATA);  /* record index and datad pointer */
+    GGobiSignals[STICKY_POINT_REMOVED_SIGNAL] = g_signal_new ("sticky_point_removed", G_TYPE_FROM_CLASS (klass), G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION, 0, NULL, NULL, ggobi_marshal_VOID__INT_INT_OBJECT, G_TYPE_NONE, 3, G_TYPE_INT, G_TYPE_INT, GGOBI_TYPE_STAGE);  /* record index and datad pointer */
   }
 
   if (g_signal_lookup ("clusters_changed", GGOBI_TYPE_GGOBI) == 0) {
-    GGobiSignals[CLUSTERS_CHANGED_SIGNAL] = g_signal_new ("clusters_changed", G_TYPE_FROM_CLASS (klass), G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION, 0, NULL, NULL, g_cclosure_marshal_VOID__OBJECT, G_TYPE_NONE, 1, GGOBI_TYPE_DATA); /* datad pointer */
+    GGobiSignals[CLUSTERS_CHANGED_SIGNAL] = g_signal_new ("clusters_changed", G_TYPE_FROM_CLASS (klass), G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION, 0, NULL, NULL, g_cclosure_marshal_VOID__OBJECT, G_TYPE_NONE, 1, GGOBI_TYPE_STAGE); /* datad pointer */
   }
 
 

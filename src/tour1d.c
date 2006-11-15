@@ -313,10 +313,10 @@ tour1d_all_vars (displayd *dsp)
 
     if (dsp->t1d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t1d_window)) {
       free_optimize0_p(&dsp->t1d_pp_op);
-      alloc_optimize0_p(&dsp->t1d_pp_op, d->nrows_in_plot, dsp->t1d.nactive, 
+      alloc_optimize0_p(&dsp->t1d_pp_op, d->n_rows, dsp->t1d.nactive, 
         1);
       free_pp(&dsp->t1d_pp_param);
-      alloc_pp(&dsp->t1d_pp_param, d->nrows_in_plot, dsp->t1d.nactive, 1);
+      alloc_pp(&dsp->t1d_pp_param, d->n_rows, dsp->t1d.nactive, 1);
       t1d_pp_reinit(dsp, gg);
     }  
   //}
@@ -473,10 +473,10 @@ tour1d_active_var_set (gint jvar, GGobiStage *d, displayd *dsp, ggobid *gg)
 
   if (dsp->t1d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t1d_window)) {
     free_optimize0_p(&dsp->t1d_pp_op);
-    alloc_optimize0_p(&dsp->t1d_pp_op, d->nrows_in_plot, dsp->t1d.nactive, 
+    alloc_optimize0_p(&dsp->t1d_pp_op, d->n_rows, dsp->t1d.nactive, 
       1);
     free_pp(&dsp->t1d_pp_param);
-    alloc_pp(&dsp->t1d_pp_param, d->nrows_in_plot, dsp->t1d.nactive, 1);
+    alloc_pp(&dsp->t1d_pp_param, d->n_rows, dsp->t1d.nactive, 1);
     t1d_pp_reinit(dsp, gg);
   }  
   dsp->t1d.get_new_target = true;
@@ -521,10 +521,10 @@ tour1d_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse, GGobiStage *d, 
 
         if (dsp->t1d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t1d_window)) {
           free_optimize0_p(&dsp->t1d_pp_op);
-          alloc_optimize0_p(&dsp->t1d_pp_op, d->nrows_in_plot,
+          alloc_optimize0_p(&dsp->t1d_pp_op, d->n_rows,
             dsp->t1d.nactive, 1);
           free_pp(&dsp->t1d_pp_param);
-          alloc_pp(&dsp->t1d_pp_param, d->nrows_in_plot, dsp->t1d.nactive, 1);
+          alloc_pp(&dsp->t1d_pp_param, d->n_rows, dsp->t1d.nactive, 1);
           t1d_pp_reinit(dsp, gg);
         }
       }
@@ -541,10 +541,10 @@ tour1d_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse, GGobiStage *d, 
 
       if (dsp->t1d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t1d_window)) {
         free_optimize0_p(&dsp->t1d_pp_op);
-        alloc_optimize0_p(&dsp->t1d_pp_op, d->nrows_in_plot, dsp->t1d.nactive, 
+        alloc_optimize0_p(&dsp->t1d_pp_op, d->n_rows, dsp->t1d.nactive, 
           1);
         free_pp(&dsp->t1d_pp_param);
-        alloc_pp(&dsp->t1d_pp_param, d->nrows_in_plot, dsp->t1d.nactive, 1);
+        alloc_pp(&dsp->t1d_pp_param, d->n_rows, dsp->t1d.nactive, 1);
         t1d_pp_reinit(dsp, gg);
       }
     }
@@ -556,7 +556,7 @@ tour1d_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse, GGobiStage *d, 
 void
 tour1d_projdata(splotd *sp, greal **world_data, GGobiStage *d, ggobid *gg)
 {
-  gint i, j, m;
+  gint j, m;
   displayd *dsp = (displayd *) sp->displayptr;
   gfloat min, max, mean;
   gfloat precis = PRECISION1;
@@ -568,19 +568,18 @@ tour1d_projdata(splotd *sp, greal **world_data, GGobiStage *d, ggobid *gg)
   if (sp->p1d.spread_data.nels != d->n_rows)
     vectorf_realloc (&sp->p1d.spread_data, d->n_rows);
 
-  yy = (gfloat *) g_malloc (d->nrows_in_plot * sizeof (gfloat));
+  yy = (gfloat *) g_malloc (d->n_rows * sizeof (gfloat));
 
-  for (m=0; m < d->nrows_in_plot; m++) {
-    i = d->rows_in_plot.els[m];
-    yy[m] = sp->planar[i].x = 0;
-    sp->planar[i].y = 0;
+  for (m=0; m < d->n_rows; m++) {
+    yy[m] = sp->planar[m].x = 0;
+    sp->planar[m].y = 0;
     for (j=0; j<d->n_cols; j++)
     {
-      yy[m] += (gfloat)(dsp->t1d.F.vals[0][j]*world_data[i][j]);
+      yy[m] += (gfloat)(dsp->t1d.F.vals[0][j]*world_data[m][j]);
     }
   }
 
-  do_ash1d (yy, d->nrows_in_plot,
+  do_ash1d (yy, d->n_rows,
             cpanel->t1d.nbins, cpanel->t1d.nASHes,
             sp->p1d.spread_data.els, &min, &max, &mean);
 
@@ -597,7 +596,7 @@ tour1d_projdata(splotd *sp, greal **world_data, GGobiStage *d, ggobid *gg)
   /*max = 2*mean;  * try letting the max for scaling depend on the mean */
   max = sp->tour1d.maxcnt;
   if (cpanel->t1d.vert) {
-    for (m=0; m<d->nrows_in_plot; m++) {
+    for (m=0; m<d->n_rows; m++) {
       if (yy[m] < sp->tour1d.minscreenx) {
          sp->tour1d.minscreenx = yy[m];
       }
@@ -605,19 +604,18 @@ tour1d_projdata(splotd *sp, greal **world_data, GGobiStage *d, ggobid *gg)
          sp->tour1d.maxscreenx = yy[m];
       }
     }
-    for (m=0; m<d->nrows_in_plot; m++) {
-      i = d->rows_in_plot.els[m];
-      sp->planar[i].x = (greal) (precis*(-1.0+2.0*
+    for (m=0; m<d->n_rows; m++) {
+      sp->planar[m].x = (greal) (precis*(-1.0+2.0*
         sp->p1d.spread_data.els[m]/max));
         /*(sp->p1d_data.els[i]-min)/(max-min)));*/
       /*      sp->planar[i].y = yy[i];*/
-      sp->planar[i].y = (greal) (precis*(-1.0+2.0*
+      sp->planar[m].y = (greal) (precis*(-1.0+2.0*
         ((yy[m]-sp->tour1d.minscreenx)/
         (sp->tour1d.maxscreenx-sp->tour1d.minscreenx))));
     }
   }
   else {
-    for (m=0; m<d->nrows_in_plot; m++) {
+    for (m=0; m<d->n_rows; m++) {
       if (yy[m] < sp->tour1d.minscreenx) {
          sp->tour1d.minscreenx = yy[m];
       }
@@ -625,13 +623,12 @@ tour1d_projdata(splotd *sp, greal **world_data, GGobiStage *d, ggobid *gg)
          sp->tour1d.maxscreenx = yy[m];
       }
     }
-    for (m=0; m<d->nrows_in_plot; m++) {
-      i = d->rows_in_plot.els[m];
-      sp->planar[i].x = (greal) (precis*(-1.0+2.0*
+    for (m=0; m<d->n_rows; m++) {
+      sp->planar[m].x = (greal) (precis*(-1.0+2.0*
         ((yy[m]-sp->tour1d.minscreenx)/
         (sp->tour1d.maxscreenx-sp->tour1d.minscreenx))));
       /*      sp->planar[i].x = yy[i];*/
-      sp->planar[i].y = (greal) (precis*(-1.0+2.0*
+      sp->planar[m].y = (greal) (precis*(-1.0+2.0*
         sp->p1d.spread_data.els[m]/max));
         /*(sp->p1d_data.els[i]-min)/(max-min)));*/
     }

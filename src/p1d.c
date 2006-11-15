@@ -91,12 +91,12 @@ p1d_spread_var (displayd * display, gfloat * yy, splotd * sp, GGobiStage * d,
     sp->p1d.lim.min = FORGETITAXIS_MIN;
     sp->p1d.lim.max = FORGETITAXIS_MAX;
 
-    textur (yy, sp->p1d.spread_data.els, d->nrows_in_plot,
+    textur (yy, sp->p1d.spread_data.els, d->n_rows,
             option, del, stages, gg);
     break;
 
   case ASH:
-    do_ash1d (yy, d->nrows_in_plot,
+    do_ash1d (yy, d->n_rows,
               cpanel->p1d.nbins, cpanel->p1d.nASHes,
               sp->p1d.spread_data.els, &min, &max, &mean);
     /*
@@ -113,7 +113,7 @@ p1d_spread_var (displayd * display, gfloat * yy, splotd * sp, GGobiStage * d,
   case DOTPLOT:
     sp->p1d.lim.min = FORGETITAXIS_MIN;
     sp->p1d.lim.max = FORGETITAXIS_MAX;
-    for (i = 0; i < d->nrows_in_plot; i++)
+    for (i = 0; i < d->n_rows; i++)
       sp->p1d.spread_data.els[i] = 50;   /*-- halfway between _MIN and _MAX --*/
     break;
   }
@@ -127,7 +127,7 @@ p1d_reproject (splotd * sp, greal ** world_data, GGobiStage * d, ggobid * gg)
  * to the 2-dimensional array planar[]; get the x variable directly
  * from p1d.spread_data[].
 */
-  gint i, m, jvar = 0;
+  gint i, jvar = 0;
   gfloat rdiff, ftmp;
   gfloat precis = PRECISION1;
   displayd *display = (displayd *) sp->displayptr;
@@ -136,7 +136,7 @@ p1d_reproject (splotd * sp, greal ** world_data, GGobiStage * d, ggobid * gg)
   if (sp == NULL)
     return;
 
-  yy = (gfloat *) g_malloc (d->nrows_in_plot * sizeof (gfloat));
+  yy = (gfloat *) g_malloc (d->n_rows * sizeof (gfloat));
   jvar = sp->p1dvar;
 
   /*
@@ -147,16 +147,15 @@ p1d_reproject (splotd * sp, greal ** world_data, GGobiStage * d, ggobid * gg)
    * of the tform data.  By some unexpected miracle, all the scaling
    * still works.
    */
-  for (i = 0; i < d->nrows_in_plot; i++)
-    yy[i] = d->world.vals[d->rows_in_plot.els[i]][jvar];
+  for (i = 0; i < d->n_rows; i++)
+    yy[i] = d->world.vals[i][jvar];
   /*yy[i] = d->tform.vals[d->rows_in_plot.els[i]][jvar]; */
 
   p1d_spread_var (display, yy, sp, d, gg);
 
   /* Then project it */
   rdiff = sp->p1d.lim.max - sp->p1d.lim.min;
-  for (i = 0; i < d->nrows_in_plot; i++) {
-    m = d->rows_in_plot.els[i];
+  for (i = 0; i < d->n_rows; i++) {
 
     /*
      * Use p1d.spread_data[i] not [m] because p1d.spread_data[] is
@@ -166,12 +165,12 @@ p1d_reproject (splotd * sp, greal ** world_data, GGobiStage * d, ggobid * gg)
       -1.0 + 2.0 * (sp->p1d.spread_data.els[i] - sp->p1d.lim.min) / rdiff;
 
     if (display->p1d_orientation == VERTICAL) {
-      sp->planar[m].x = (glong) (precis * ftmp);
-      sp->planar[m].y = (glong) world_data[m][jvar];
+      sp->planar[i].x = (glong) (precis * ftmp);
+      sp->planar[i].y = (glong) world_data[i][jvar];
     }
     else {
-      sp->planar[m].x = (glong) world_data[m][jvar];
-      sp->planar[m].y = (glong) (precis * ftmp);
+      sp->planar[i].x = (glong) world_data[i][jvar];
+      sp->planar[i].y = (glong) (precis * ftmp);
     }
   }
 

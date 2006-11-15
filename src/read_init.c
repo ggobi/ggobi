@@ -328,7 +328,7 @@ parsePreviousInput (xmlNode * node, GGobiDescription *desc)
   xmlChar *mode = xmlGetProp (node, (xmlChar *) "mode");
   xmlChar *uri = xmlGetProp (node, (xmlChar *) "name");
   
-  source = create_input_source(uri, mode);
+  source = create_input_source((const gchar *)uri, (const gchar *)mode);
   
   xmlFree(mode);
   xmlFree(uri);

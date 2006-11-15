@@ -42,7 +42,7 @@ gfloat randomval, nrand;
 gint nset;
 
 /* reset pp variables */
-void reset_pp(GGobiStage *d, gint nprev, gint b, ggobid *gg, void *data)
+void reset_pp(GGobiStage *d, ggobid *gg)
 {
   displayd *dsp;
   GList *l;
@@ -50,13 +50,12 @@ void reset_pp(GGobiStage *d, gint nprev, gint b, ggobid *gg, void *data)
     dsp = (displayd *) l->data;
     if (dsp->t1d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t1d_window)) {
       free_optimize0_p(&dsp->t1d_pp_op);
-      alloc_optimize0_p(&dsp->t1d_pp_op, d->nrows_in_plot, dsp->t1d.nactive, 
-        1);
+      alloc_optimize0_p(&dsp->t1d_pp_op, d->n_rows, dsp->t1d.nactive, 1);
       t1d_pp_reinit(dsp, gg);
     }
     if (dsp->t2d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t2d_window)) {
       free_optimize0_p(&dsp->t2d_pp_op);
-      alloc_optimize0_p(&dsp->t2d_pp_op, d->nrows_in_plot, dsp->t2d.nactive, 
+      alloc_optimize0_p(&dsp->t2d_pp_op, d->n_rows, dsp->t2d.nactive, 
         2);
       t2d_pp_reinit(dsp, gg);
     }

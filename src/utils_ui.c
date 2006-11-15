@@ -533,7 +533,7 @@ variable_notebook_varchange_cb (ggobid * gg, gint which,
 
   /*-- add one or more variables to this datad --*/
   d = (GGobiStage *) datad_get_from_notebook (GTK_WIDGET (notebook), gg);
-  kd = g_slist_index (gg->d, d);
+  kd = g_slist_index (gg->d, ggobi_stage_get_root(d));
 
   /*-- get the tree_view associated with this data; clear and rebuild --*/
   swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), kd);
@@ -566,11 +566,11 @@ CHECK_EVENT_SIGNATURE (variable_notebook_adddata_cb, datad_added_f)
   CHECK_EVENT_SIGNATURE (variable_notebook_list_changed_cb,
                        variable_list_changed_f)
 
-     GtkWidget *create_variable_notebook (GtkWidget * box,
-                                          GtkSelectionMode mode,
-                                          GGobiVariableType vartype, datatyped dtype,
-                                          GtkSignalFunc func,
-                                          gpointer func_data, ggobid * gg)
+GtkWidget *create_variable_notebook (GtkWidget * box,
+                                     GtkSelectionMode mode,
+                                     GGobiVariableType vartype, datatyped dtype,
+                                     GtkSignalFunc func,
+                                     gpointer func_data, ggobid * gg)
 {
   GtkWidget *notebook;
   //gint nd = g_slist_length (gg->d);
@@ -591,7 +591,8 @@ CHECK_EVENT_SIGNATURE (variable_notebook_adddata_cb, datad_added_f)
   g_object_set_data (G_OBJECT (notebook), "datatype", (gpointer) dtype);
 
   for (l = gg->d; l; l = l->next) {
-    d = (GGobiStage *) l->data;
+    // FIXME: should probably let take the stage ID as an argument
+    d = ggobi_stage_find(GGOBI_STAGE(l->data), GGOBI_MAIN_STAGE_FILTER);
     if ((dtype == all_datatypes) ||
         (dtype == no_edgesets && ggobi_stage_get_n_edges(d) == 0) ||
         (dtype == edgesets_only && ggobi_stage_get_n_edges(d) > 0)) {

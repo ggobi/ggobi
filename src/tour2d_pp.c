@@ -639,18 +639,18 @@ t2d_switch_index(Tour2DCPanel controls, gint basismeth, displayd *dsp,
   ggobid *gg)
 {
   GGobiStage *d = dsp->d;
-  gint kout, nrows = d->nrows_in_plot;
+  gint kout, nrows = d->n_rows;
   gfloat *gdata;
   gint i, j, k;
 
-  if (d->nrows_in_plot == 1)  /* can't do pp on no data! */
+  if (d->n_rows == 1)  /* can't do pp on no data! */
     return(false);
 
   /* Copy data into pp opt'n data */
-  for (i=0; i<d->nrows_in_plot; i++)
+  for (i=0; i<d->n_rows; i++)
     for (j=0; j<dsp->t2d.nactive; j++)
       dsp->t2d_pp_op.data.vals[i][j] = 
-        d->tform.vals[d->rows_in_plot.els[i]][dsp->t2d.active_vars.els[j]];
+        d->tform.vals[i][dsp->t2d.active_vars.els[j]];
 
   /* Copy current projection into opt'n projection */
   for (i=0; i<2; i++)
@@ -659,13 +659,13 @@ t2d_switch_index(Tour2DCPanel controls, gint basismeth, displayd *dsp,
         dsp->t2d.F.vals[i][dsp->t2d.active_vars.els[j]];
 
   for (k=0; k<2; k++) 
-    for (i=0; i<d->nrows_in_plot; i++) {
+    for (i=0; i<d->n_rows; i++) {
       dsp->t2d_pp_op.pdata.vals[i][k] = 
-          (d->tform.vals[d->rows_in_plot.els[i]][dsp->t2d.active_vars.els[0]]*
+          (d->tform.vals[i][dsp->t2d.active_vars.els[0]]*
           dsp->t2d_pp_op.proj_best.vals[k][0]);
       for (j=1; j<dsp->t2d.nactive; j++)
         dsp->t2d_pp_op.pdata.vals[i][k] += 
-          (d->tform.vals[d->rows_in_plot.els[i]][dsp->t2d.active_vars.els[j]]*
+          (d->tform.vals[i][dsp->t2d.active_vars.els[j]]*
           dsp->t2d_pp_op.proj_best.vals[k][j]);
     }
 
@@ -673,7 +673,7 @@ t2d_switch_index(Tour2DCPanel controls, gint basismeth, displayd *dsp,
   gdata  = g_malloc (nrows*sizeof(gfloat));
   for (i = 0 ; i < nrows; i++)
   { 
-    gdata[i] = GGOBI_STAGE_GET_ATTR_CLUSTER(d, d->rows_in_plot.els[i]);
+    gdata[i] = GGOBI_STAGE_GET_ATTR_CLUSTER(d, i);
   }
 
   if(controls.ppindex.index_f) {

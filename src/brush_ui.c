@@ -379,18 +379,18 @@ button_release_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
     cluster_table_update (d, gg);
   }
 
-  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(d, "_color"));
-  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(d, "_color_now"));
-  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(d, "_color_prev"));
-  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(d, "_type"));
-  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(d, "_type_now"));
-  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(d, "_type_prev"));
-  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(d, "_size"));
-  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(d, "_size_now"));
-  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(d, "_size_prev"));
-  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(d, "_hidden"));
-  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(d, "_hidden_now"));
-  g_signal_emit_by_name(d, "col_data_changed", ggobi_stage_get_col_index_for_name(d, "_hidden_prev"));
+  ggobi_stage_update_col(d, ggobi_stage_get_col_index_for_name(d, "_color"));
+  ggobi_stage_update_col(d, ggobi_stage_get_col_index_for_name(d, "_color_now"));
+  ggobi_stage_update_col(d, ggobi_stage_get_col_index_for_name(d, "_color_prev"));
+  ggobi_stage_update_col(d, ggobi_stage_get_col_index_for_name(d, "_type"));
+  ggobi_stage_update_col(d, ggobi_stage_get_col_index_for_name(d, "_type_now"));
+  ggobi_stage_update_col(d, ggobi_stage_get_col_index_for_name(d, "_type_prev"));
+  ggobi_stage_update_col(d, ggobi_stage_get_col_index_for_name(d, "_size"));
+  ggobi_stage_update_col(d, ggobi_stage_get_col_index_for_name(d, "_size_now"));
+  ggobi_stage_update_col(d, ggobi_stage_get_col_index_for_name(d, "_size_prev"));
+  ggobi_stage_update_col(d, ggobi_stage_get_col_index_for_name(d, "_hidden"));
+  ggobi_stage_update_col(d, ggobi_stage_get_col_index_for_name(d, "_hidden_now"));
+  ggobi_stage_update_col(d, ggobi_stage_get_col_index_for_name(d, "_hidden_prev"));
 
 
   /*-- if we're only doing linked brushing on mouse up, do it now --*/

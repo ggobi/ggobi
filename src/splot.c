@@ -551,7 +551,7 @@ splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp,
  * dimensions of the current plotting window, writing it into screen.
 */
 {
-  gint i, k;
+  gint k;
   greal scale_x, scale_y;
   GGobiStage *d = display->d;
   greal gtmp;
@@ -589,18 +589,16 @@ splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp,
   /*
    * Calculate new coordinates.
   */
-  for (k=0; k<d->nrows_in_plot; k++) {
-    i = d->rows_in_plot.els[k];
-
+  for (k=0; k<d->n_rows; k++) {
     /*-- scale from world to plot window --*/
-    gtmp = sp->planar[i].x - sp->pmid.x;
-    sp->screen[i].x = (gint) (gtmp * sp->iscale.x / precis);
-    gtmp = sp->planar[i].y - sp->pmid.y;
-    sp->screen[i].y = (gint) (gtmp * sp->iscale.y / precis);
+    gtmp = sp->planar[k].x - sp->pmid.x;
+    sp->screen[k].x = (gint) (gtmp * sp->iscale.x / precis);
+    gtmp = sp->planar[k].y - sp->pmid.y;
+    sp->screen[k].y = (gint) (gtmp * sp->iscale.y / precis);
 
     /*-- shift into middle of plot window --*/
-    sp->screen[i].x += (sp->max.x / 2);
-    sp->screen[i].y += (sp->max.y / 2);
+    sp->screen[k].x += (sp->max.x / 2);
+    sp->screen[k].y += (sp->max.y / 2);
   }
 
   if(klass && klass->sub_plane_to_screen) {

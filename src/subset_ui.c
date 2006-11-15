@@ -20,62 +20,48 @@
 #include <gtk/gtk.h>
 #include "vars.h"
 #include "externs.h"
+#include "ggobi-stage-subset.h"
 
-#define SS_RANDOM 0
-#define SS_BLOCK  1
-#define SS_RANGE  2
-#define SS_EVERYN 3
-#define SS_STICKY 4
-#define SS_ROWLAB 5
+typedef enum { 
+  GGOBI_SUBSET_RANDOM, GGOBI_SUBSET_BLOCK, GGOBI_SUBSET_RANGE,
+  GGOBI_SUBSET_EVERYN, GGOBI_SUBSET_STICKY, GGOBI_SUBSET_ROWLAB 
+} GGobiSubsetType;
+
+static void
+subset_ui_add_data (GtkTreeModel *model, GGobiStage *d)
+{
+  GtkTreeIter iter;
+  GGobiStage *s = ggobi_stage_find(d, GGOBI_MAIN_STAGE_SUBSET);
+  gfloat fnr = (gfloat) s->n_rows;  
+  gtk_list_store_append(GTK_LIST_STORE(model), &iter);
+  gtk_list_store_set(GTK_LIST_STORE(model), &iter, 0, d->name, 1, 0, 2, fnr,
+    3, gtk_adjustment_new (1.0, 1.0, (fnr-2.0), 1.0, 5.0, 0.0),
+    4, gtk_adjustment_new (fnr/10.0, 1.0, fnr, 1.0, 5.0, 0.0),
+    5, gtk_adjustment_new (1.0, 1.0, fnr-2.0, 1.0, 5.0, 0.0),
+    6, gtk_adjustment_new (fnr/10.0, 1.0, fnr-1, 1.0, 5.0, 0.0),
+    7, s, -1);
+}
+
 
 /*-- called when closed from the close button --*/
-static void close_btn_cb (GtkWidget *w, ggobid *gg) {
-  gtk_widget_hide (gg->subset_ui.window);
+static void close_btn_cb (GtkWidget *w, GtkWidget *win) {
+  gtk_widget_hide (win);
 }
 /*-- called when closed from the window manager --*/
 static void
-close_wmgr_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg) {
-  gtk_widget_hide (gg->subset_ui.window);
+close_wmgr_cb (GtkWidget *w, GdkEventButton *event, GtkWidget *win) {
+  gtk_widget_hide (win);
 }
 
-static GGobiStage *
-datad_get_from_widget (GtkWidget *w, ggobid *gg)
+static GGobiStageSubset *
+subset_ui_get_selected_stage(GtkTreeSelection *tree_sel)
 {
-  GGobiStage *d = NULL;
-  GtkTreeSelection *sel;
-  gint kd;
-  
-  if (g_slist_length (gg->d) == 0)
-    ;
-  else if (g_slist_length (gg->d) == 1) 
-    d = gg->d->data;
-  else {
-    GtkWidget *tree_view = (GtkWidget *)
-      g_object_get_data(G_OBJECT (w), "datad_tree_view");
-    if (tree_view) {
-      sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view));
-      kd = tree_selection_get_selected_row(sel);
-      /*-- Assume that all datad's are included --*/
-      if (kd >= 0) d = (GGobiStage *) g_slist_nth_data (gg->d, kd);
-    }
-  }
-
-  return d;
-}
-
-static void
-set_adjustment (GtkWidget *w, GtkAdjustment *adj_new)
-{
-  GtkAdjustment *adj_current;
-  GtkSpinButton *btn;
-  if (w) {
-    btn = GTK_SPIN_BUTTON (w);
-    adj_current = gtk_spin_button_get_adjustment (btn);
-    if ((gint)adj_current != (gint)adj_new) {
-      g_object_ref (G_OBJECT(adj_current));
-      gtk_spin_button_set_adjustment (btn, adj_new);
-    }
-  }
+  GGobiStageSubset *s = NULL;
+  GtkTreeIter iter;
+  GtkTreeModel *model = NULL;
+  if (gtk_tree_selection_get_selected(tree_sel, &model, &iter))
+    gtk_tree_model_get(model, &iter, 7, &s, -1);
+  return s;
 }
 
 static const gchar *const substr_lbl[] = {
@@ -85,184 +71,180 @@ static const gchar *const substr_lbl[] = {
  "Ends with the string",
  "Does not include the string",
 };
-static void subset_string_pos_cb (GtkWidget *w, ggobid *gg)
+static void subset_ui_string_pos_cb (GtkWidget *w, GtkTreeSelection *tree_sel)
 {
-  GGobiStage *d = datad_get_from_widget (w, gg);
-
-  d->subset.string_pos = gtk_combo_box_get_active(GTK_COMBO_BOX(w));
+  GtkTreeIter iter;
+  GtkTreeModel *model = NULL;
+  
+  if (gtk_tree_selection_get_selected(tree_sel, &model, &iter))
+    gtk_list_store_set(GTK_LIST_STORE(model), &iter, 1, 
+      gtk_combo_box_get_active(GTK_COMBO_BOX(w)), -1);
 }
 
 static void
-subset_display_update (GGobiStage *d, ggobid *gg)
+set_adjustment(GtkTreeModel *model, GtkTreeIter *iter, gint col, const gchar* wid_key)
 {
-  GtkWidget *spinbtn, *entry;
-  /*
-   * If this is a different d than was used the last time
-   * the subset panel was opened, attach the right adjustments
-   * to the spin_buttons.
-  */
-  spinbtn = (GtkWidget *)
-    g_object_get_data(G_OBJECT(d->subset.bstart_adj), "WIDGET");
-  set_adjustment (spinbtn, d->subset.bstart_adj);
-  spinbtn = (GtkWidget *)
-    g_object_get_data(G_OBJECT(d->subset.bsize_adj), "WIDGET");
-  set_adjustment (spinbtn, d->subset.bsize_adj);
+  GtkAdjustment *adj;
+  GtkWidget *spinbtn = g_object_get_data(G_OBJECT(model), wid_key);
+  /* skip the name and two integers */
+  gtk_tree_model_get(model, iter, col + 3, &adj, -1);
+  gtk_spin_button_set_adjustment(GTK_SPIN_BUTTON(spinbtn), adj);
+}
 
-  spinbtn = (GtkWidget *)
-    g_object_get_data(G_OBJECT(d->subset.estart_adj), "WIDGET");
-  set_adjustment (spinbtn, d->subset.estart_adj);
-  spinbtn = (GtkWidget *)
-    g_object_get_data(G_OBJECT(d->subset.estep_adj), "WIDGET");
-  set_adjustment (spinbtn, d->subset.estep_adj);
-
+static void
+subset_ui_display_update (GtkTreeModel *model, GtkTreeIter *iter)
+{
+  GtkWidget *entry;
+  gint n;
+  GGobiStageSubset *stage;
+  gchar *txt;
+  
+  /* set/restore adjustments for the dataset at the given row */
+  set_adjustment (model, iter, 0, "ggobi-subset-bstart");
+  set_adjustment (model, iter, 1, "ggobi-subset-bsize");
+  set_adjustment (model, iter, 2, "ggobi-subset-estart");
+  set_adjustment (model, iter, 3, "ggobi-subset-estep");
+  
   /*-- ... and set the values of the text entries, too --*/
-  entry = (GtkWidget *)
-    g_object_get_data(G_OBJECT(gg->subset_ui.window), "SS:RANDOM_ENTRY");
-  if (entry) {
-    gchar *txt = g_strdup_printf ("%d", d->subset.random_n);
-    gtk_entry_set_text (GTK_ENTRY (entry), txt);
-    g_free (txt);
-  }
-  entry = (GtkWidget *)
-    g_object_get_data(G_OBJECT(gg->subset_ui.window), "SS:NROWS_ENTRY");
-  if (entry) {
-    gchar *txt = g_strdup_printf ("%d", d->n_rows);
-    gtk_entry_set_text (GTK_ENTRY (entry), txt);
-    g_free (txt);
-  }
-  /*-- --*/
+  entry = g_object_get_data(G_OBJECT(model), "ggobi-subset-random");
+  gtk_tree_model_get(model, iter, 2, &n);
+  txt = g_strdup_printf ("%d", n);
+  gtk_entry_set_text (GTK_ENTRY (entry), txt);
+  g_free (txt);
+  
+  entry = g_object_get_data(G_OBJECT(model), "ggobi-subset-nrows");
+  gtk_tree_model_get(model, iter, 7, &stage);
+  txt = g_strdup_printf ("%d", GGOBI_STAGE(stage)->n_rows);
+  gtk_entry_set_text (GTK_ENTRY (entry), txt);
+  g_free (txt);
 }
 
 
 static void
-subset_datad_set_cb (GtkTreeSelection *tree_sel, ggobid *gg)
+subset_ui_datad_set_cb (GtkTreeSelection *tree_sel, ggobid *gg)
 {
   /*-- Assume that all datad's are included --*/
-  gint row = tree_selection_get_selected_row(tree_sel);
-  if (row != -1) {
-    GGobiStage *d = g_slist_nth_data (gg->d, row);
-    if (d)
-      subset_display_update (d, gg);
-  }
+  GtkTreeIter iter;
+  GtkTreeModel *model = NULL;
+  
+  if (gtk_tree_selection_get_selected(tree_sel, &model, &iter))
+      subset_ui_display_update (model, &iter);
 }
 
 static void
-rescale_cb (GtkWidget *w, ggobid *gg)
+rescale_cb (GtkWidget *w, GtkTreeSelection *tree_sel)
 {
-  GGobiStage *d = datad_get_from_widget (w, gg);
+  GGobiStageSubset *subset = subset_ui_get_selected_stage(tree_sel);
+  GGobiStage *d = GGOBI_STAGE(subset);
   if (d) {
-    limits_set (d, true, true, gg->lims_use_visible);
+    limits_set (d, true, true, d->gg->lims_use_visible);
     vartable_limits_set (d);
     vartable_stats_set (d);
 
     tform_to_world(d);
-    displays_tailpipe (FULL, gg);
+    displays_tailpipe (FULL, d->gg);
   }
 }
 
 static void
-subset_cb (GtkWidget *w, ggobid *gg)
+subset_cb (GtkWidget *w, GtkTreeSelection *tree_sel)
 {
   gint subset_type;
   gchar *sample_str, *substr;
   gint bstart, bsize;
   gint estart, estep;
+  gint string_pos;
   gboolean redraw = false;
-  GGobiStage *d = datad_get_from_widget (w, gg);
+  GtkTreeModel *model;
+  GGobiStageSubset *d = subset_ui_get_selected_stage(tree_sel);
   GtkWidget *entry, *tgl;
+  GtkTreeIter iter;
 
   if (!d)
     return;
 
+  gtk_tree_selection_get_selected(tree_sel, &model, &iter);
+  
   subset_type = 
-    gtk_notebook_get_current_page (GTK_NOTEBOOK (gg->subset_ui.notebook));
+    gtk_notebook_get_current_page (GTK_NOTEBOOK (g_object_get_data(G_OBJECT(model), 
+      "ggobi-subset-notebook")));
 
   switch (subset_type) {
-    case SS_RANDOM:
-      entry = (GtkWidget *)
-        g_object_get_data(G_OBJECT(gg->subset_ui.window),
-        "SS:RANDOM_ENTRY");
+    case GGOBI_SUBSET_RANDOM:
+      entry = g_object_get_data(G_OBJECT(model), "ggobi-subset-random");
       sample_str = 
         gtk_editable_get_chars (GTK_EDITABLE (entry), 0, -1);
-      d->subset.random_n = atoi (sample_str);
-      redraw = subset_random (d->subset.random_n, d);
+      gtk_list_store_set(GTK_LIST_STORE(model), &iter, 2, atoi (sample_str), -1);
+      redraw = ggobi_stage_subset_random (d, atoi (sample_str));
     break;
-    case SS_BLOCK:
-      bstart = (gint) d->subset.bstart_adj->value;
-      bsize = (gint) d->subset.bsize_adj->value;
-      redraw = subset_block (bstart-1, bsize, d);
+    case GGOBI_SUBSET_BLOCK:
+      gtk_tree_model_get(model, &iter, 3, &bstart, 4, &bsize, -1);
+      redraw = ggobi_stage_subset_block (d, bstart-1, bsize);
     break;
-    case SS_RANGE:
-      redraw = subset_range (d);
+    case GGOBI_SUBSET_RANGE:
+      redraw = ggobi_stage_subset_range (d);
     break;
-    case SS_EVERYN:
-      estart = (gint) d->subset.estart_adj->value;
-      estep = (gint) d->subset.estep_adj->value;
-      redraw = subset_everyn (estart-1, estep, d);
+    case GGOBI_SUBSET_EVERYN:
+      gtk_tree_model_get(model, &iter, 5, &estart, 6, &estep, -1);
+      redraw = ggobi_stage_subset_everyn (d, estart-1, estep);
     break;
-    case SS_STICKY:
-      redraw = subset_sticky (d);
+    case GGOBI_SUBSET_STICKY:
+      redraw = ggobi_stage_subset_sticky (d);
     break;
-    case SS_ROWLAB:
+    case GGOBI_SUBSET_ROWLAB:
       /* use a toggle widget to specify whether to ignore case or not */
       entry = (GtkWidget *)
-        g_object_get_data(G_OBJECT(gg->subset_ui.window), "SS:ROWLAB");
+        g_object_get_data(G_OBJECT(model), "ggobi-subset-rowlab");
       tgl = (GtkWidget *)
-        g_object_get_data(G_OBJECT(gg->subset_ui.window),
-          "SS:IGNORE_CASE");
+        g_object_get_data(G_OBJECT(model), "ggobi-subset-casefold");
       substr = gtk_editable_get_chars (GTK_EDITABLE (entry), 0, -1);
-      redraw = subset_rowlab (substr, d->subset.string_pos,
-        gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(tgl)),
-        d);
+      gtk_tree_model_get(model, &iter, 1, &string_pos, -1);
+      redraw = ggobi_stage_subset_rowlab (d, substr, string_pos,
+        gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(tgl)));
     break;
   }
 
   if (redraw)
-    subset_apply (d);
+    ggobi_stage_subset_apply (d);
 }
 
 static void
-include_all_cb (GtkWidget *w, ggobid *gg) {
-  GGobiStage *d = datad_get_from_widget (w, gg);
+include_all_cb (GtkWidget *w, GtkTreeSelection *tree_sel) {
+  GGobiStageSubset *d = subset_ui_get_selected_stage(tree_sel);
 
   if (d != NULL) {
-    subset_set_all (d, true);
-    subset_apply (d);
+    ggobi_stage_filter_set_included_all (GGOBI_STAGE_FILTER(d), true);
+    ggobi_stage_subset_apply (d);
   }
 }
 
 
 static void 
-subset_tree_view_datad_added_cb (ggobid *gg, GGobiStage *d, GtkWidget *tree_view)
+subset_ui_tree_view_datad_added_cb (ggobid *gg, GGobiStage *d, GtkTreeModel *model)
 {
-  GtkTreeIter iter;
-  GtkTreeModel *model;
   GtkWidget *swin = (GtkWidget *)
-    g_object_get_data(G_OBJECT (tree_view), "datad_swin");
-
-  subset_init (d, gg);
-  model = gtk_tree_view_get_model(GTK_TREE_VIEW(tree_view));
-  gtk_list_store_append(GTK_LIST_STORE(model), &iter);
-  gtk_list_store_set(GTK_LIST_STORE(model), &iter, 0, d->name);
-
+    g_object_get_data(G_OBJECT (model), "ggobi-subset-swin");
+  subset_ui_add_data(model, d);
   gtk_widget_show_all (swin);
 }
 
-CHECK_EVENT_SIGNATURE(subset_tree_view_datad_added_cb,datad_added_f)
+CHECK_EVENT_SIGNATURE(subset_ui_tree_view_datad_added_cb,datad_added_f)
 
 /*------------------------------------------------------------------*/
 
 void
 subset_window_open (ggobid *gg) {
 
-  GtkWidget *button, *t;
+  GtkWidget *button, *t, *nbook;
   GtkWidget *vbox, *frame, *hb, *vb, *button_hbox, *close_hbox;
   GtkWidget *label, *btn, *spinbtn, *entry, *opt;
-  GGobiStage *d;
+  GGobiStageSubset *d;
+  GtkTreeSelection *tree_sel;
   static gchar *tree_view_titles[1] = {"datasets"};
-
+  GtkAdjustment *adj;
   GtkWidget *swin, *tree_view;
   GtkListStore *model;
+  GtkTreeIter first;
   GSList *l;
 
   /*-- if used before we have data, bail out --*/
@@ -279,7 +261,7 @@ subset_window_open (ggobid *gg) {
       gtk_window_set_title (GTK_WINDOW (gg->subset_ui.window),
         "Subset Data");
       g_signal_connect (G_OBJECT (gg->subset_ui.window),
-        "delete_event", G_CALLBACK (close_wmgr_cb), (gpointer) gg);
+        "delete_event", G_CALLBACK (close_wmgr_cb), gg->subset_ui.window);
   
       gtk_container_set_border_width (GTK_CONTAINER (gg->subset_ui.window), 5);
 
@@ -292,37 +274,34 @@ subset_window_open (ggobid *gg) {
       gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (swin),
         GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
 
-      model = gtk_list_store_new(1, G_TYPE_STRING);
+      model = gtk_list_store_new(8, G_TYPE_STRING, G_TYPE_INT, G_TYPE_INT, 
+        GTK_TYPE_ADJUSTMENT, GTK_TYPE_ADJUSTMENT, GTK_TYPE_ADJUSTMENT, 
+        GTK_TYPE_ADJUSTMENT, GGOBI_TYPE_STAGE_SUBSET);
       tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(model));
+      tree_sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view));
       populate_tree_view(tree_view, tree_view_titles, G_N_ELEMENTS(tree_view_titles), 
-        true, GTK_SELECTION_SINGLE, G_CALLBACK(subset_datad_set_cb), gg);
+        true, GTK_SELECTION_BROWSE, G_CALLBACK(subset_ui_datad_set_cb), gg);
       
-      g_object_set_data(G_OBJECT (tree_view), "datad_swin", swin);
+      g_object_set_data(G_OBJECT (model), "ggobi-subset-swin", swin);
       g_signal_connect (G_OBJECT (gg), "datad_added",
-        G_CALLBACK(subset_tree_view_datad_added_cb), tree_view);
+        G_CALLBACK(subset_ui_tree_view_datad_added_cb), model);
       /*-- --*/
 
       /*-- All datad's are included. This assumption is used in two places. */
-      for (l = gg->d; l; l = l->next) {
-        GtkTreeIter iter;
-        d = (GGobiStage *) l->data;
-        subset_init (d, gg);
-        gtk_list_store_append(model, &iter);
-        gtk_list_store_set(model, &iter, 0, d->name, -1);
-        if (l == gg->d)
-          gtk_tree_selection_select_iter(gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view)), &iter);
-      }
+      for (l = gg->d; l; l = l->next) 
+        subset_ui_add_data(GTK_TREE_MODEL(model), GGOBI_STAGE(l->data));
+      
+      gtk_tree_model_iter_nth_child(GTK_TREE_MODEL(model), &first, NULL, 0);
+      gtk_tree_selection_select_iter(tree_sel, &first);
+      
       gtk_container_add (GTK_CONTAINER (swin), tree_view);
       gtk_box_pack_start (GTK_BOX (vbox), swin, true, true, 2);
-
-      d = gg->d->data;
     
       /* Create a new notebook, place the position of the tabs */
-      gg->subset_ui.notebook = gtk_notebook_new ();
-      gtk_notebook_set_tab_pos (GTK_NOTEBOOK (gg->subset_ui.notebook),
-        GTK_POS_TOP);
-      gtk_box_pack_start (GTK_BOX (vbox), gg->subset_ui.notebook,
-        false, false, 2);
+      nbook = gtk_notebook_new ();
+      g_object_set_data(G_OBJECT(model), "ggobi-subset-notebook", nbook);
+      gtk_notebook_set_tab_pos (GTK_NOTEBOOK (nbook), GTK_POS_TOP);
+      gtk_box_pack_start (GTK_BOX (vbox), nbook, false, false, 2);
     
       /*-- Random sample without replacement --*/
       frame = gtk_frame_new ("Random sample without replacement");
@@ -332,14 +311,13 @@ subset_window_open (ggobid *gg) {
       gtk_container_add (GTK_CONTAINER (frame), hb);
 
 	    label = gtk_label_new_with_mnemonic ("Sample si_ze");
-      gtk_box_pack_start (GTK_BOX (hb), label,
-        false, false, 2);
+      gtk_box_pack_start (GTK_BOX (hb), label, false, false, 2);
   
       /*-- entry: random sample size --*/
       entry = gtk_entry_new ();
 	    gtk_label_set_mnemonic_widget(GTK_LABEL(label), entry);
-      g_object_set_data(G_OBJECT(gg->subset_ui.window),
-        "SS:RANDOM_ENTRY", entry);
+      g_object_set_data(G_OBJECT(gg->subset_ui.window), 
+        "ggobi-subset-random", entry);
       gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), entry,
         "Type in the desired sample size", NULL);
       gtk_box_pack_start (GTK_BOX (hb), entry, true, true, 2);
@@ -352,13 +330,12 @@ subset_window_open (ggobid *gg) {
       entry = gtk_entry_new ();
 	    gtk_label_set_mnemonic_widget(GTK_LABEL(label), entry);
       g_object_set_data(G_OBJECT(gg->subset_ui.window),
-        "SS:NROWS_ENTRY", entry);
+        "ggobi-subset-nrows", entry);
       gtk_editable_set_editable (GTK_EDITABLE (entry), false);
       gtk_box_pack_start (GTK_BOX (hb), entry, true, true, 2);
 
       label = gtk_label_new_with_mnemonic ("R_andom");
-      gtk_notebook_append_page (GTK_NOTEBOOK (gg->subset_ui.notebook),
-        frame, label);
+      gtk_notebook_append_page (GTK_NOTEBOOK (nbook), frame, label);
       
       /*-----------------------*/
       /*-- Consecutive block --*/
@@ -377,9 +354,10 @@ subset_window_open (ggobid *gg) {
       gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
       gtk_box_pack_start (GTK_BOX (vb), label, false, false, 0);
 
-      spinbtn = gtk_spin_button_new (d->subset.bstart_adj, 0, 0);
+      gtk_tree_model_get(GTK_TREE_MODEL(model), &first, 3, &adj, -1);
+      spinbtn = gtk_spin_button_new (adj, 0, 0);
   	  gtk_label_set_mnemonic_widget(GTK_LABEL(label), spinbtn);
-      g_object_set_data(G_OBJECT(d->subset.bstart_adj), "WIDGET", spinbtn);
+      g_object_set_data(G_OBJECT(model), "ggobi-subset-bstart", spinbtn);
       gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinbtn), false);
       gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
         spinbtn, "Specify the first row of the block", NULL);
@@ -392,8 +370,10 @@ subset_window_open (ggobid *gg) {
       gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
       gtk_box_pack_start (GTK_BOX (vb), label, false, false, 0);
 
-      spinbtn = gtk_spin_button_new (d->subset.bsize_adj, 0, 0);
+      gtk_tree_model_get(GTK_TREE_MODEL(model), &first, 4, &adj, -1);
+      spinbtn = gtk_spin_button_new (adj, 0, 0);
 	    gtk_label_set_mnemonic_widget(GTK_LABEL(label), spinbtn);
+      g_object_set_data(G_OBJECT(model), "ggobi-subset-bsize", spinbtn);
       gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinbtn), false);
       gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
         spinbtn, "Specify the size of the block", NULL);
@@ -403,8 +383,7 @@ subset_window_open (ggobid *gg) {
 
 
       label = gtk_label_new_with_mnemonic ("_Block");
-      gtk_notebook_append_page (GTK_NOTEBOOK (gg->subset_ui.notebook),
-        frame, label);
+      gtk_notebook_append_page (GTK_NOTEBOOK (nbook), frame, label);
 
       /*---------------------------*/
       /*-- Points within a range --*/
@@ -420,8 +399,7 @@ subset_window_open (ggobid *gg) {
         false, false, 0);
 
       label = gtk_label_new_with_mnemonic ("_Limits");
-      gtk_notebook_append_page (GTK_NOTEBOOK (gg->subset_ui.notebook),
-        frame, label);
+      gtk_notebook_append_page (GTK_NOTEBOOK (nbook), frame, label);
 
       /*--------------------*/
       /*-- Every nth case --*/
@@ -440,9 +418,10 @@ subset_window_open (ggobid *gg) {
       gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
       gtk_box_pack_start (GTK_BOX (vb), label, false, false, 0);
 
-      spinbtn = gtk_spin_button_new (d->subset.estart_adj, 0, 0);
-	  gtk_label_set_mnemonic_widget(GTK_LABEL(label), spinbtn);
-      g_object_set_data(G_OBJECT(d->subset.estart_adj), "WIDGET", spinbtn);
+      gtk_tree_model_get(GTK_TREE_MODEL(model), &first, 5, &adj, -1);
+      spinbtn = gtk_spin_button_new (adj, 0, 0);
+	    gtk_label_set_mnemonic_widget(GTK_LABEL(label), spinbtn);
+      g_object_set_data(G_OBJECT(model), "ggobi-subset-estart", spinbtn);
       gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinbtn), false);
       gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), spinbtn,
         "Specify the first row of the block", NULL);
@@ -455,9 +434,10 @@ subset_window_open (ggobid *gg) {
       gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
       gtk_box_pack_start (GTK_BOX (vb), label, false, false, 0);
 
-      spinbtn = gtk_spin_button_new (d->subset.estep_adj, 0, 0);
-	  gtk_label_set_mnemonic_widget(GTK_LABEL(label), spinbtn);
-      g_object_set_data(G_OBJECT(d->subset.estep_adj), "WIDGET", spinbtn);
+      gtk_tree_model_get(GTK_TREE_MODEL(model), &first, 6, &adj, -1);
+      spinbtn = gtk_spin_button_new (adj, 0, 0);
+      gtk_label_set_mnemonic_widget(GTK_LABEL(label), spinbtn);
+      g_object_set_data(G_OBJECT(model), "ggobi-subset-estep", spinbtn);
       gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinbtn), false);
       gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), spinbtn,
         "Specify the size of the block", NULL);
@@ -465,8 +445,7 @@ subset_window_open (ggobid *gg) {
       gtk_table_attach_defaults (GTK_TABLE (t), vb, 1,2,0,1);
 
       label = gtk_label_new_with_mnemonic ("_Every n");
-      gtk_notebook_append_page (GTK_NOTEBOOK (gg->subset_ui.notebook),
-        frame, label);
+      gtk_notebook_append_page (GTK_NOTEBOOK (nbook), frame, label);
 
       /*-------------------------------------------------------*/
       /*-- Cases whose row label is one of the sticky labels --*/
@@ -483,8 +462,7 @@ subset_window_open (ggobid *gg) {
         false, false, 0);
 
       label = gtk_label_new_with_mnemonic ("S_ticky");
-      gtk_notebook_append_page (GTK_NOTEBOOK (gg->subset_ui.notebook),
-        frame, label);
+      gtk_notebook_append_page (GTK_NOTEBOOK (nbook), frame, label);
 
       /*---------------------------------------------------------*/
       /*-- Cases whose row label includes the specified string --*/
@@ -502,9 +480,9 @@ subset_window_open (ggobid *gg) {
       gtk_box_pack_start (GTK_BOX (hb), label, false, false, 2);
 
       entry = gtk_entry_new ();
-	  gtk_label_set_mnemonic_widget(GTK_LABEL(label), entry);
+      gtk_label_set_mnemonic_widget(GTK_LABEL(label), entry);
       g_object_set_data(G_OBJECT(gg->subset_ui.window),
-        "SS:ROWLAB", entry);
+        "ggobi-filter-rowlab", entry);
       gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), entry,
         "Type in a string to specify the cases you want in the subset",
         NULL);
@@ -514,18 +492,16 @@ subset_window_open (ggobid *gg) {
       gtk_box_pack_start (GTK_BOX (vb), hb, false, false, 5);
 
       opt = gtk_combo_box_new_text ();
-      g_object_set_data(G_OBJECT(gg->subset_ui.window),
-        "SS:ROWLAB_POS", opt);
       gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
         "Specify the position in the row labels to check for the substring",
         NULL);
       gtk_box_pack_start (GTK_BOX (hb), opt, false, false, 0);
       populate_combo_box (opt, (gchar**) substr_lbl, G_N_ELEMENTS(substr_lbl),
-        G_CALLBACK(subset_string_pos_cb), gg);
+        G_CALLBACK(subset_ui_string_pos_cb), tree_sel);
 
       btn = gtk_check_button_new_with_mnemonic ("_Ignore case");
       g_object_set_data(G_OBJECT(gg->subset_ui.window),
-        "SS:IGNORE_CASE", btn);
+        "ggobi-subset-casefold", btn);
       gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(btn), true);
       gtk_box_pack_start (GTK_BOX (hb), btn, false, false, 0);
 
@@ -543,7 +519,7 @@ subset_window_open (ggobid *gg) {
         "Draw a new subset and update all plots", NULL);
       g_object_set_data(G_OBJECT (button), "datad_tree_view", tree_view);
       g_signal_connect (G_OBJECT (button), "clicked",
-                          G_CALLBACK (subset_cb), (gpointer) gg);
+                          G_CALLBACK (subset_cb), tree_sel);
       gtk_box_pack_start (GTK_BOX (button_hbox), button, true, true, 2);
 
       button = gtk_button_new_with_mnemonic ("_Rescale");
@@ -551,7 +527,7 @@ subset_window_open (ggobid *gg) {
         "Rescale the data after choosing a new subset", NULL);
       g_object_set_data(G_OBJECT (button), "datad_tree_view", tree_view);
       g_signal_connect (G_OBJECT (button), "clicked",
-                          G_CALLBACK (rescale_cb), (gpointer) gg);
+                          G_CALLBACK (rescale_cb), tree_sel);
       gtk_box_pack_start (GTK_BOX (button_hbox), button, true, true, 2);
     
       button = gtk_button_new_with_mnemonic ("Include _all");
@@ -559,7 +535,7 @@ subset_window_open (ggobid *gg) {
         "Stop subsetting: include all cases and update all plots", NULL);
       g_object_set_data(G_OBJECT (button), "datad_tree_view", tree_view);
       g_signal_connect (G_OBJECT (button), "clicked",
-                          G_CALLBACK (include_all_cb), (gpointer) gg);
+                          G_CALLBACK (include_all_cb), tree_sel);
       gtk_box_pack_start (GTK_BOX (button_hbox), button, true, true, 2);
 
       /*-- Separator --*/
@@ -576,14 +552,14 @@ subset_window_open (ggobid *gg) {
       gtk_box_pack_start (GTK_BOX (close_hbox), btn, true, false, 0);
 
       /*-- initialize display --*/
-      subset_display_update (gg->d->data, gg);
+      subset_ui_display_update (GTK_TREE_MODEL(model), &first);
 
       if (g_slist_length (gg->d) > 1)
         gtk_widget_show_all (swin);
       gtk_widget_show (vbox);
       gtk_widget_show_all (button_hbox);
       gtk_widget_show_all (close_hbox);
-      gtk_widget_show_all (gg->subset_ui.notebook);
+      gtk_widget_show_all (nbook);
     }  /*-- if window == NULL --*/
 
     gtk_widget_show (gg->subset_ui.window);

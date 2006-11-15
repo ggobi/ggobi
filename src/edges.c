@@ -67,7 +67,7 @@ setDisplayEdge (displayd * dpy, GGobiStage * e)
   GGobiStage *old = NULL;
 
   if (resolveEdgePoints (e, dpy->d)) {
-    dpy->e = e;
+    dpy->e = ggobi_stage_find(dpy->d, GGOBI_MAIN_STAGE_FILTER);
     /* Now update all displays, not just this one. Events could also be used,
        but this is not too bad. */
     ggobi_edge_menus_update (e->gg);

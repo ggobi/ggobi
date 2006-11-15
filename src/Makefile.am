@@ -2,8 +2,9 @@ lib_LTLIBRARIES     = libggobi.la
 libggobi_la_GOBS = variable.gob stage.gob data.gob stage-transform.gob \
   stage-filter.gob pipeline-factory.gob input-source.gob data-factory.gob \
   plugin-factory.gob plugin.gob data-factory-csv.gob data-factory-xml.gob \
-  input-source-file.gob input-source-http.gob gsf-input-http.gob gsf-input-ftp.gob \
-  input-source-ftp.gob input-decoder.gob input-decoder-bgzip.gob
+  input-source-file.gob input-source-http.gob gsf-input-http.gob \
+  gsf-input-ftp.gob input-source-ftp.gob input-decoder.gob \
+  input-decoder-bgzip.gob stage-subset.gob stage-group.gob
 libggobi_la_GOBSOURCES = $(libggobi_la_GOBS:%.gob=ggobi-%.c)
 libggobi_la_GOBHEADERS = $(libggobi_la_GOBS:%.gob=ggobi-%.h)
 libggobi_la_GOBOBJECTS = $(libggobi_la_GOBS:%.gob=ggobi-%.lo)
@@ -12,7 +13,7 @@ libggobi_la_LDFLAGS  = @GTK_LIBS@ @LIBXML_LIBS@ @LIBGSF_LIBS@ @GSL_LIBS@ -versio
 libggobi_la_SOURCES = array.c ash1d.c barchart.c barchartClass.c \
   barchart_ui.c brush.c brush_api.c brush_bins.c brush_init.c brush_link.c brush_link_ui.c \
   brush_ui.c color.c color_ui.c cpanel.c display.c display_tree.c display_ui.c \
-  edges.c exclusion.c cluster_ui.c extendedDisplay.c fileio.c ggobi-API.c \
+  edges.c cluster.c cluster_ui.c extendedDisplay.c fileio.c ggobi-API.c \
   ggobi.c GGobiAppClass.c ggobiClass.c identify.c identify_ui.c \
   impute.c impute_ui.c fileio_ui.c jitter.c jitter_ui.c limits.c lineedit.c \
   lineedit_ui.c main_ui.c make_ggobi.c marshal.c menus.c missing.c \
@@ -22,7 +23,7 @@ libggobi_la_SOURCES = array.c ash1d.c barchart.c barchartClass.c \
   scale_ui.c scatmat.c scatmatClass.c scatmat_ui.c scatterplot.c \
   scatterplotClass.c scatterplot_ui.c schemes.c schemes_ui.c sphere.c \
   sphere_ui.c splash.c splot.c sp_plot.c sp_plot_axes.c sp_plot_edges.c \
-  subset.c subset_ui.c svd.c texture.c timeplot.c time_ui.c timing.c tour.c tour1d.c \
+  subset_ui.c svd.c texture.c timeplot.c time_ui.c timing.c tour.c tour1d.c \
   tour1d_pp.c tour1d_pp_ui.c tour1d_ui.c tour2d.c tour2d3.c tour2d3_ui.c \
   tour2d_pp.c tour2d_pp_ui.c tour2d_ui.c tourcorr.c tourcorr_ui.c tour_pp.c \
   transform.c transform_ui.c tsdisplay.c tsPlot.c utils.c utils_gdk.c \

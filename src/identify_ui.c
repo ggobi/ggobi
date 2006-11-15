@@ -96,7 +96,7 @@ id_remove_labels_cb (GtkWidget * w, ggobid * gg)
 static void
 id_all_sticky_cb (GtkWidget * w, ggobid * gg)
 {
-  gint i, m;
+  gint m;
   GGobiStage *d = NULL;
   displayd *dsp = gg->current_display;
   cpaneld *cpanel = &dsp->cpanel;
@@ -118,9 +118,8 @@ id_all_sticky_cb (GtkWidget * w, ggobid * gg)
     /*-- clear the list before adding to avoid redundant entries --*/
     g_slist_free (d->sticky_ids);
     d->sticky_ids = (GSList *) NULL;
-    for (m = 0; m < d->nrows_in_plot; m++) {
-      i = d->rows_in_plot.els[m];
-      d->sticky_ids = g_slist_append (d->sticky_ids, GINT_TO_POINTER (i));
+    for (m = 0; m < d->n_rows; m++) {
+      d->sticky_ids = g_slist_append (d->sticky_ids, GINT_TO_POINTER (m));
     }
 
     /* This will become an event on the datad when we move to

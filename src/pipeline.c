@@ -25,20 +25,19 @@
 void
 tform_to_world_by_var (GGobiStage * d, guint j)
 {
-  gint i, m;
+  gint i;
   greal max, min, range, ftmp;
   GGobiVariable *var = ggobi_stage_get_variable(d, j);
 
   ggobi_variable_get_limits(var, &min, &max);
   range = max - min;
 
-  for (i = 0; i < d->nrows_in_plot; i++) {
-    m = d->rows_in_plot.els[i];
-    ftmp = -1.0 + 2.0 * ((greal) d->tform.vals[m][j] - min) / range;
-    d->world.vals[m][j] = (greal) (PRECISION1 * ftmp);
+  for (i = 0; i < d->n_rows; i++) {
+    ftmp = -1.0 + 2.0 * ((greal) d->tform.vals[i][j] - min) / range;
+    d->world.vals[i][j] = (greal) (PRECISION1 * ftmp);
 
     /* Add in the jitter values */
-    d->world.vals[m][j] += d->jitdata.vals[m][j];
+    d->world.vals[i][j] += d->jitdata.vals[i][j];
   }
 }
 

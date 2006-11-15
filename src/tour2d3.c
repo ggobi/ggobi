@@ -395,7 +395,7 @@ tour2d3_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse, GGobiStage *d,
 void
 tour2d3_projdata(splotd *sp, greal **world_data, GGobiStage *d, ggobid *gg)
 {
-  gint i, j, m;
+  gint j, m;
   displayd *dsp = (displayd *) sp->displayptr;
   greal precis = (greal) PRECISION1;
   greal tmpf, maxx, maxy;
@@ -408,22 +408,21 @@ tour2d3_projdata(splotd *sp, greal **world_data, GGobiStage *d, ggobid *gg)
   tmpf = precis/sp->tour2d3.maxscreen;
   maxx = sp->tour2d3.maxscreen;
   maxy = sp->tour2d3.maxscreen;
-  for (m=0; m<d->nrows_in_plot; m++)
+  for (m=0; m<d->n_rows; m++)
   {
-    i = d->rows_in_plot.els[m];
-    sp->planar[i].x = 0;
-    sp->planar[i].y = 0;
+    sp->planar[m].x = 0;
+    sp->planar[m].y = 0;
     for (j=0; j<d->n_cols; j++)
     {
-      sp->planar[i].x += (greal)(dsp->t2d3.F.vals[0][j]*world_data[i][j]);
-      sp->planar[i].y += (greal)(dsp->t2d3.F.vals[1][j]*world_data[i][j]);
+      sp->planar[m].x += (greal)(dsp->t2d3.F.vals[0][j]*world_data[m][j]);
+      sp->planar[m].y += (greal)(dsp->t2d3.F.vals[1][j]*world_data[m][j]);
     }
-    sp->planar[i].x *= tmpf;
-    sp->planar[i].y *= tmpf;
-    if (fabs(sp->planar[i].x) > maxx)
-      maxx = fabs(sp->planar[i].x);
-    if (fabs(sp->planar[i].y) > maxy)
-      maxy = fabs(sp->planar[i].y);
+    sp->planar[m].x *= tmpf;
+    sp->planar[m].y *= tmpf;
+    if (fabs(sp->planar[m].x) > maxx)
+      maxx = fabs(sp->planar[m].x);
+    if (fabs(sp->planar[m].y) > maxy)
+      maxy = fabs(sp->planar[m].y);
   }
 
   if ((maxx > precis) || (maxy > precis)) {

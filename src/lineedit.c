@@ -69,7 +69,7 @@ record_add (eeMode mode, gint a, gint b, gchar * lbl, gchar * id,
           ggobi_stage_set_raw_value(dtarget, i, j, x);
           
       }
-      g_signal_emit_by_name(d, "col_data_changed", j);
+      ggobi_stage_update_col(d, j);
     }
   }
 

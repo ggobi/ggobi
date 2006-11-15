@@ -86,7 +86,7 @@ movepts_history_delete_last (GGobiStage * d, ggobid * gg)
     celld *cell = (celld *) g_slist_nth_data (d->movepts_history, n - 1);
 
     /*-- especially ignore cells with indices == -1 --*/
-    if (cell->i > -1 && cell->i < d->nrows_in_plot) {
+    if (cell->i > -1 && cell->i < d->n_rows) {
       if (cell->j > -1 && cell->j < d->n_cols) {
         ggobi_stage_set_raw_value(d, cell->i, cell->j, cell->val);
       }
@@ -163,7 +163,7 @@ movept_plane_to_raw (splotd * sp, gint ipt, gcoords * eps, GGobiStage * d,
 void
 move_pt (gint id, gint x, gint y, splotd * sp, GGobiStage * d, ggobid * gg)
 {
-  gint i, k;
+  gint i;
   gboolean horiz, vert;
 
   horiz = gg->movepts.direction == horizontal
@@ -187,18 +187,17 @@ move_pt (gint id, gint x, gint y, splotd * sp, GGobiStage * d, ggobid * gg)
      * Move all points which belong to the same cluster
      * as the selected point.
      */
-    for (i = 0; i < d->nrows_in_plot; i++) {
-      k = d->rows_in_plot.els[i];
-      if (k == id || GGOBI_STAGE_GET_ATTR_CLUSTER(d, k) != cur_clust || GGOBI_STAGE_GET_ATTR_HIDDEN(d, k))
+    for (i = 0; i < d->n_rows; i++) {
+      if (i == id || GGOBI_STAGE_GET_ATTR_CLUSTER(d, i) != cur_clust || GGOBI_STAGE_GET_ATTR_HIDDEN(d, i))
         continue;
         
       if (horiz)
-        sp->planar[k].x += gg->movepts.eps.x;
+        sp->planar[i].x += gg->movepts.eps.x;
       if (vert)
-        sp->planar[k].y += gg->movepts.eps.y;
+        sp->planar[i].y += gg->movepts.eps.y;
 
       /*-- run only the latter portion of the reverse pipeline --*/
-      movept_plane_to_raw (sp, k, &gg->movepts.eps, d, gg);
+      movept_plane_to_raw (sp, i, &gg->movepts.eps, d, gg);
     }
   }
 

@@ -35,9 +35,9 @@
 #ifdef WIN32
 
 static void drawing_arrays_alloc (splotd *sp, GGobiStage *d, ggobid *gg);
-static void build_circle (icoords *, gint, arcd *, gint, gshort);
+static void build_circle (icoords *, gint, GdkRectangle *, gint, gshort);
 static void build_plus (icoords *, gint, GdkSegment *, gint, gshort);
-static void build_rect (icoords *, gint, rectd *, gint, gshort);
+static void build_rect (icoords *, gint, GdkRectangle *, gint, gshort);
 static void build_x (icoords *, gint, GdkSegment *, gint, gshort);
 static void build_whisker_segs (gint j, gint *nwhisker_segs, splotd *sp);
 static void build_ash_segs (gint, gint *nsegs, splotd *sp);
@@ -51,10 +51,10 @@ static GdkPoint   *points;
 static GdkSegment *segs;
 static GdkSegment *whisker_segs;
 static GdkSegment *ash_segs;
-static rectd      *open_rects;
-static rectd      *filled_rects;
-static arcd       *open_arcs;
-static arcd       *filled_arcs;
+static GdkRectangle      *open_rects;
+static GdkRectangle      *filled_rects;
+static GdkRectangle       *open_arcs;
+static GdkRectangle       *filled_arcs;
 */
 
 static void
@@ -66,10 +66,10 @@ drawing_arrays_alloc (splotd *sp, GGobiStage *d, ggobid *gg) {
     sp->win32.segs = (GdkSegment *) g_malloc (2 * n * sizeof (GdkSegment));
     sp->win32.whisker_segs = (GdkSegment *) g_malloc (2*n*sizeof (GdkSegment));
     sp->win32.ash_segs = (GdkSegment *) g_malloc (n * sizeof (GdkSegment));
-    sp->win32.open_rects = (rectd *) g_malloc (n * sizeof (rectd));
-    sp->win32.filled_rects = (rectd *) g_malloc (n * sizeof (rectd));
-    sp->win32.open_arcs = (arcd *) g_malloc (n * sizeof (arcd));
-    sp->win32.filled_arcs = (arcd *) g_malloc (n * sizeof (arcd));
+    sp->win32.open_rects = (GdkRectangle *) g_malloc (n * sizeof (GdkRectangle));
+    sp->win32.filled_rects = (GdkRectangle *) g_malloc (n * sizeof (GdkRectangle));
+    sp->win32.open_arcs = (GdkRectangle *) g_malloc (n * sizeof (GdkRectangle));
+    sp->win32.filled_arcs = (GdkRectangle *) g_malloc (n * sizeof (GdkRectangle));
   } else {
     sp->win32.points = (GdkPoint *)
       g_realloc (sp->win32.points, n * sizeof (GdkPoint));
@@ -79,14 +79,14 @@ drawing_arrays_alloc (splotd *sp, GGobiStage *d, ggobid *gg) {
       g_realloc (sp->win32.whisker_segs, 2 * n * sizeof (GdkSegment));
     sp->win32.ash_segs = (GdkSegment *)
       g_realloc (sp->win32.ash_segs, n * sizeof (GdkSegment));
-    sp->win32.open_rects = (rectd *)
-      g_realloc (sp->win32.open_rects, n * sizeof (rectd));
-    sp->win32.filled_rects = (rectd *)
-      g_realloc (sp->win32.filled_rects, n * sizeof (rectd));
-    sp->win32.open_arcs = (arcd *)
-      g_realloc (sp->win32.open_arcs, n * sizeof (arcd));
-    sp->win32.filled_arcs = (arcd *)
-      g_realloc (sp->win32.filled_arcs, n * sizeof (arcd));
+    sp->win32.open_rects = (GdkRectangle *)
+      g_realloc (sp->win32.open_rects, n * sizeof (GdkRectangle));
+    sp->win32.filled_rects = (GdkRectangle *)
+      g_realloc (sp->win32.filled_rects, n * sizeof (GdkRectangle));
+    sp->win32.open_arcs = (GdkRectangle *)
+      g_realloc (sp->win32.open_arcs, n * sizeof (GdkRectangle));
+    sp->win32.filled_arcs = (GdkRectangle *)
+      g_realloc (sp->win32.filled_arcs, n * sizeof (GdkRectangle));
   }
   sp->win32.npoints = n;
 }
@@ -109,7 +109,7 @@ void
 win32_draw_arcs (GdkDrawable *drawable,
                  GdkGC       *gc,
                  gint         filled,
-                 arcd         *arcs,
+                 GdkRectangle         *arcs,
                  gint         narcs)
 {
   gint i;
@@ -128,7 +128,7 @@ void
 win32_draw_rectangles (GdkDrawable *drawable,
                        GdkGC       *gc,
                        gint         filled,
-                       rectd        *rects,
+                       GdkRectangle        *rects,
                        gint         nrects)
 {
   gint i;
@@ -189,7 +189,7 @@ build_x (icoords *pos, gint nrow, GdkSegment *segv, gint nx, gshort size)
 }
 
 void
-build_circle (icoords *pos, gint nrow, arcd *circv, gint ncirc, gshort size)
+build_circle (icoords *pos, gint nrow, GdkRectangle *circv, gint ncirc, gshort size)
 {
   circv[ncirc].x = (gushort) (pos[nrow].x - size);
   circv[ncirc].y = (gushort) (pos[nrow].y - size);
@@ -197,7 +197,7 @@ build_circle (icoords *pos, gint nrow, arcd *circv, gint ncirc, gshort size)
 }
 
 void
-build_rect (icoords *pos, gint nrow, rectd * rectv, gint nrect, gshort size)
+build_rect (icoords *pos, gint nrow, GdkRectangle * rectv, gint nrect, gshort size)
 {
   rectv[nrect].x = (gushort) (pos[nrow].x - size);
   rectv[nrect].y = (gushort) (pos[nrow].y - size);
@@ -215,10 +215,10 @@ void
 build_glyph (glyphd gl, icoords *xypos, gint jpos,
   GdkPoint *pointv,   gint *np,
   GdkSegment *segv,   gint *ns,
-  rectd *openrectv,   gint *nr_open,
-  rectd *filledrectv, gint *nr_filled,
-  arcd *openarcv,     gint *nc_open,
-  arcd *filledarcv,   gint *nc_filled)
+  GdkRectangle *openrectv,   gint *nr_open,
+  GdkRectangle *filledrectv, gint *nr_filled,
+  GdkRectangle *openarcv,     gint *nc_open,
+  GdkRectangle *filledarcv,   gint *nc_filled)
 {
   gshort size, type;
   size = gl.size + 1;
@@ -312,10 +312,10 @@ static void
 draw_glyphs (splotd *sp, GdkDrawable *drawable,
   GdkPoint *points,    gint np,
   GdkSegment *segs,    gint ns,
-  rectd *open_rects,   gint nr_open,
-  rectd *filled_rects, gint nr_filled,
-  arcd *open_arcs,     gint nc_open,
-  arcd *filled_arcs,   gint nc_filled,
+  GdkRectangle *open_rects,   gint nr_open,
+  GdkRectangle *filled_rects, gint nr_filled,
+  GdkRectangle *open_arcs,     gint nc_open,
+  GdkRectangle *filled_arcs,   gint nc_filled,
   ggobid *gg)
 {
   if (gg->plot_GC == NULL)
@@ -357,16 +357,14 @@ win32_draw_to_pixmap_unbinned (gint current_color, splotd *sp, gboolean draw_hid
     drawing_arrays_alloc (sp, d, gg);
 
   GGOBI_STAGE_ATTR_INIT_ALL(d);  
-  for (i=0; i<d->nrows_in_plot; i++) {
-    m = d->rows_in_plot.els[i];
-
-    if (splot_plot_case (m, d, sp, display, gg)) {
-      if ((draw_hidden && GGOBI_STAGE_GET_ATTR_HIDDEN(d, m)) ||  /*-- drawing hiddens --*/
-         (GGOBI_STAGE_GET_ATTR_COLOR(d, m) == current_color &&   /*-- drawing unhiddens --*/
-              !draw_hidden && !GGOBI_STAGE_GET_ATTR_HIDDEN(d, m)))
+  for (i=0; i<d->n_rows; i++) {
+    if (splot_plot_case (i, d, sp, display, gg)) {
+      if ((draw_hidden && GGOBI_STAGE_GET_ATTR_HIDDEN(d, i)) ||  /*-- drawing hiddens --*/
+         (GGOBI_STAGE_GET_ATTR_COLOR(d, i) == current_color &&   /*-- drawing unhiddens --*/
+              !draw_hidden && !GGOBI_STAGE_GET_ATTR_HIDDEN(d, i)))
       {
         if (display->options.points_show_p) {
-          build_glyph (GGOBI_STAGE_GET_ATTR_GLYPH(d, m), sp->screen, m,
+          build_glyph (GGOBI_STAGE_GET_ATTR_GLYPH(d, i), sp->screen, i,
             sp->win32.points, &npt,         sp->win32.segs, &nseg,
             sp->win32.open_rects, &nr_open, sp->win32.filled_rects, &nr_filled,
             sp->win32.open_arcs, &nc_open,  sp->win32.filled_arcs, &nc_filled);
@@ -380,7 +378,7 @@ win32_draw_to_pixmap_unbinned (gint current_color, splotd *sp, gboolean draw_hid
             ((pmode_get(display, gg) == TOUR1D && cpanel->t1d.ASH_add_lines_p) ||
              (pmode_get(display, gg) == P1PLOT && cpanel->p1d.type == ASH &&
               cpanel->p1d.ASH_add_lines_p))) {
-            build_ash_segs (m, &nash_segs, sp);
+            build_ash_segs (i, &nash_segs, sp);
           }
         }
       }
@@ -415,7 +413,7 @@ win32_draw_to_pixmap_binned (icoords *bin0, icoords *bin1,
   for (ih=bin0->x; ih<=bin1->x; ih++) {
     for (iv=bin0->y; iv<=bin1->y; iv++) {
       for (m=0; m<d->brush.binarray[ih][iv].nels; m++) {
-        j = d->rows_in_plot.els[d->brush.binarray[ih][iv].els[m]];
+        j = d->brush.binarray[ih][iv].els[m];
         if (splot_plot_case (j, d, sp, display, gg)) {
           if ((draw_hidden && GGOBI_STAGE_GET_ATTR_HIDDEN(d, j)) ||  /*-- hiddens --*/
              (GGOBI_STAGE_GET_ATTR_COLOR(d, j) == current_color &&   /*-- unhiddens --*/

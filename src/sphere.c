@@ -384,7 +384,7 @@ sphere_varcovar_set (GGobiStage * d, ggobid * gg)
 {
   gint i, j, k, m, var;
   gfloat tmpf = 0.;
-  gint n = d->nrows_in_plot;
+  gint n = d->n_rows;
   gfloat *tform_mean = d->sphere.tform_mean.els;
   gfloat *tform_stddev = d->sphere.tform_stddev.els;
 
@@ -398,10 +398,13 @@ sphere_varcovar_set (GGobiStage * d, ggobid * gg)
  * This may not be necessary:  isn't tform_mean already
  * stored in GGobiVariable?  dfs ...  Yes, but Andreas thinks
  * maybe it shouldn't be.
+ * The purpose of the GGobiVariable structure is to store metadata about a 
+ * variable. Mean, median, etc are included in this. Just get the GGobiVariable
+ * from the tform stage to get the tform mean. - mfl
 */
     tmpf = 0.;
     for (i = 0; i < n; i++)
-      tmpf += d->tform.vals[d->rows_in_plot.els[i]][var];
+      tmpf += d->tform.vals[i][var];
     tform_mean[k] = tmpf / ((gfloat) n);
   }
 
@@ -409,10 +412,9 @@ sphere_varcovar_set (GGobiStage * d, ggobid * gg)
     for (j = 0; j < d->sphere.vc.ncols; j++) {
       tmpf = 0.;
       for (m = 0; m < n; m++) {
-        i = d->rows_in_plot.els[m];
         tmpf = tmpf +
-          (d->tform.vals[i][d->sphere.vars.els[k]] - tform_mean[k]) *
-          (d->tform.vals[i][d->sphere.vars.els[j]] - tform_mean[j]);
+          (d->tform.vals[m][d->sphere.vars.els[k]] - tform_mean[k]) *
+          (d->tform.vals[m][d->sphere.vars.els[j]] - tform_mean[j]);
       }
       tmpf /= ((gfloat) (n - 1));
       d->sphere.vc.vals[j][k] = tmpf;
@@ -532,7 +534,7 @@ void
 spherize_data (vector_i * svars, vector_i * pcvars, GGobiStage * d,
                ggobid * gg)
 {
-  gint i, j, k, m;
+  gint m, j, k;
   gfloat tmpf;
   gfloat *b = (gfloat *) g_malloc (svars->nels * sizeof (gfloat));
 
@@ -541,26 +543,24 @@ spherize_data (vector_i * svars, vector_i * pcvars, GGobiStage * d,
   gdouble **eigenvec = d->sphere.eigenvec.vals;
   gfloat *eigenval = d->sphere.eigenval.els;
 
-  for (m = 0; m < d->nrows_in_plot; m++) {
-    i = d->rows_in_plot.els[m];
-
+  for (m = 0; m < d->n_rows; m++) {
     for (j = 0; j < pcvars->nels; j++) {
       tmpf = 0.;
       for (k = 0; k < svars->nels; k++) {
         if (d->sphere.vars_stdized) {
           tmpf = tmpf + (gfloat) eigenvec[k][j] *
-            (d->tform.vals[i][svars->els[k]] -
+            (d->tform.vals[m][svars->els[k]] -
              tform_mean[k]) / tform_stddev[k];
         }
         else {
           tmpf = tmpf + (gfloat) eigenvec[k][j] *
-            (d->tform.vals[i][svars->els[k]] - tform_mean[k]);
+            (d->tform.vals[m][svars->els[k]] - tform_mean[k]);
         }
       }
       b[j] = tmpf / eigenval[j];
     }
     for (j = 0; j < pcvars->nels; j++)
-      ggobi_stage_set_raw_value(d, i, pcvars->els[j], b[j]);
+      ggobi_stage_set_raw_value(d, m, pcvars->els[j], b[j]);
   }
 
   g_free (b);

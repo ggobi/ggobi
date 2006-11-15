@@ -129,7 +129,7 @@ wvis_create_variable_notebook (GtkWidget *box, GtkSelectionMode mode,
 static void
 bin_counts_reset (gint jvar, GGobiStage *d, ggobid *gg)
 {
-  gint i, k, m;
+  gint k, m;
   gfloat val;
   GGobiVariable *var;
   gfloat min, max;
@@ -145,11 +145,10 @@ bin_counts_reset (gint jvar, GGobiStage *d, ggobid *gg)
   for (k=0; k<gg->wvis.npct; k++)
     gg->wvis.n[k] = 0;
 
-  for (m=0; m<d->nrows_in_plot; m++) {
-    i = d->rows_in_plot.els[m];
+  for (m=0; m<d->n_rows; m++) {
     for (k=0; k<scheme->n; k++) {
        val = min + gg->wvis.pct[k] * (max - min);
-      if (d->tform.vals[i][jvar] <= val) {
+      if (d->tform.vals[m][jvar] <= val) {
         gg->wvis.n[k]++;
         break;
       }
@@ -161,7 +160,7 @@ bin_counts_reset (gint jvar, GGobiStage *d, ggobid *gg)
 static void
 record_colors_reset (gint selected_var, GGobiStage *d, ggobid *gg)
 {
-  gint i, k, m;
+  gint k, m;
   gint nd = g_slist_length(gg->d);
   GGobiVariable *var;
   gfloat min, max, val;
@@ -175,17 +174,16 @@ record_colors_reset (gint selected_var, GGobiStage *d, ggobid *gg)
   max = var->lim_tform.max;
 
   GGOBI_STAGE_ATTR_INIT_ALL(d);  
-  for (m=0; m<d->nrows_in_plot; m++) {
-    i = d->rows_in_plot.els[m];
+  for (m=0; m<d->n_rows; m++) {
     for (k=0; k<scheme->n; k++) {
       val = min + gg->wvis.pct[k] * (max - min);
-      if (d->tform.vals[i][selected_var] <= val) {
-        GGOBI_STAGE_SET_ATTR_COLOR(d, i, k, ATTR_SET_PERSISTENT);
+      if (d->tform.vals[m][selected_var] <= val) {
+        GGOBI_STAGE_SET_ATTR_COLOR(d, m, k, ATTR_SET_PERSISTENT);
         break;
       }
     }
     if (nd > 1 && !gg->linkby_cv)
-      brush_all_matching_id (d, i, true, br_color, ATTR_SET_PERSISTENT);
+      brush_all_matching_id (d, m, true, br_color, ATTR_SET_PERSISTENT);
   }
 }
 
@@ -363,19 +361,19 @@ bin_boundaries_set (gint selected_var, GGobiStage *d, ggobid *gg)
     gfloat min, max, range, midpt;
     GGobiVariable *var = ggobi_stage_get_variable(d, selected_var);
     gint ngroups = gg->wvis.npct;
-    gint groupsize = (gint) (d->nrows_in_plot / ngroups);
-    paird *pairs = (paird *) g_malloc (d->nrows_in_plot * sizeof (paird));
+    gint groupsize = (gint) (d->n_rows / ngroups);
+    paird *pairs = (paird *) g_malloc (d->n_rows * sizeof (paird));
 
     min = var->lim_tform.min;
     max = var->lim_tform.max;
     range = max - min;
 
     /*-- sort the selected variable --*/
-    for (i=0; i<d->nrows_in_plot; i++) {
-      pairs[i].f = d->tform.vals[d->rows_in_plot.els[i]][selected_var];
-      pairs[i].indx = d->rows_in_plot.els[i];
+    for (i=0; i<d->n_rows; i++) {
+      pairs[i].f = d->tform.vals[i][selected_var];
+      pairs[i].indx = i;
     }
-    qsort ((gchar *) pairs, d->nrows_in_plot, sizeof (paird), pcompare);
+    qsort ((gchar *) pairs, d->n_rows, sizeof (paird), pcompare);
 
     /*
      * determine the boundaries that will result in equal-sized
@@ -396,13 +394,13 @@ bin_boundaries_set (gint selected_var, GGobiStage *d, ggobid *gg)
       while (m < groupsize || i == 0 || pairs[i].f == pairs[i-1].f) {
         m++;
         i++;
-        if (i == d->nrows_in_plot-1) 
+        if (i == d->n_rows-1) 
           break;
       }
-      midpt = (i == d->nrows_in_plot - 1) ?
+      midpt = (i == d->n_rows - 1) ?
         max : pairs[i].f + (pairs[i+1].f - pairs[i].f) / 2 ;
       gg->wvis.pct[k] = (midpt - min) / range;
-      if (i == d->nrows_in_plot-1) 
+      if (i == d->n_rows-1) 
         break;
     }
 

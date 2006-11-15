@@ -1,4 +1,4 @@
-/*-- exclusion_ui.c  --*/
+/*-- cluster_ui.c  --*/
 /*
  * ggobi
  * Copyright (C) AT&T, Duncan Temple Lang, Dianne Cook 1999-2005
@@ -17,6 +17,8 @@
 #include <gtk/gtk.h>
 #include "vars.h"
 #include "externs.h"
+
+#include "ggobi-stage-filter.h"
 
 static void exclusion_notebook_adddata_cb (ggobid *, GGobiStage *,
                                            void *notebook);
@@ -128,13 +130,13 @@ hide_cluster_cb (GtkToggleButton * btn, gpointer cbd)
   GGOBI_STAGE_ATTR_INIT_ALL(d);  
   /*-- operating on the current sample, whether hidden or shown --*/
   for (i = 0; i < d->n_rows; i++) {
-    if (GGOBI_STAGE_GET_ATTR_SAMPLED(d, i)) {
+    //if (GGOBI_STAGE_GET_ATTR_SAMPLED(d, i)) {
       if (GGOBI_STAGE_GET_ATTR_CLUSTER(d, i) == k) {
         if (GGOBI_STAGE_SET_ATTR_HIDDEN(d, i, btn->active, ATTR_SET_PERSISTENT)) {
           changed = brush_all_matching_id (d, i, true, br_shadow, ATTR_SET_PERSISTENT) || changed;          
         }
       }
-    }
+    //}
   }
 
   clusters_set(d);
@@ -153,25 +155,29 @@ include_hiddens (gboolean include, GGobiStage * d, ggobid * gg)
   displayd *dsp = gg->current_display;
   cpaneld *cpanel = &dsp->cpanel;
   gboolean prev, changed = false;
+  GGobiStage *f = ggobi_stage_find(d, GGOBI_MAIN_STAGE_FILTER);
 
-  GGOBI_STAGE_ATTR_INIT_ALL(d);  
+  GGOBI_STAGE_BRUSH_ATTR_INIT(f, hidden);  
   for (i = 0; i < d->n_rows; i++) {
-    prev = GGOBI_STAGE_GET_ATTR_EXCLUDED(d, i);
-    GGOBI_STAGE_SET_ATTR_EXCLUDED(d, i, (!include && GGOBI_STAGE_GET_ATTR_HIDDEN(d, i)));
-    if ((prev != GGOBI_STAGE_GET_ATTR_EXCLUDED(d, i)) && !gg->linkby_cv) {
+    prev = ggobi_stage_filter_is_included(GGOBI_STAGE_FILTER(f), i);
+    ggobi_stage_filter_set_included(GGOBI_STAGE_FILTER(f), i, 
+      (include || !GGOBI_STAGE_GET_ATTR_HIDDEN(d, i)));
+    if ((prev != ggobi_stage_filter_is_included(GGOBI_STAGE_FILTER(f), i)) 
+        && !gg->linkby_cv) 
       /*-- this doesn't link the value of excluded --*/
-      changed = changed || brush_all_matching_id (d, i, true, br_include, ATTR_SET_PERSISTENT);
-    }
+      changed = changed || brush_all_matching_id (d, i, true, 
+        br_include, ATTR_SET_PERSISTENT);
   }
-  ggobi_stage_set_rows_in_plot(d);
+  ggobi_stage_filter_update(GGOBI_STAGE_FILTER(f));
 
   /*-- make the other datad's update their rows_in_plot, too --*/
+  /* FIXME: Are we sure that this even works? Do we really want to do this? - mfl */
   if (changed) {
     GGobiStage *dd;
     GSList *l;
     for (l = gg->d; l; l = l->next) {
       dd = (GGobiStage *) l->data;
-      if (dd == d)
+      if (dd == ggobi_stage_get_root(d))
         continue;
       clusters_set(d);
       cluster_table_labels_update (dd, gg);
@@ -226,7 +232,8 @@ cluster_symbol_cb (GtkWidget * w, GdkEventExpose * event, gpointer cbd)
   gint n = GPOINTER_TO_INT (cbd);
   ggobid *gg = GGobiFromWidget (w, true);
   GGobiStage *d = datad_get_from_notebook (gg->cluster_ui.notebook, gg);
-  gint k, m, i;
+  GGobiStage *f = ggobi_stage_find(d, GGOBI_MAIN_STAGE_FILTER);
+  gint k, i;
   cpaneld *cpanel = &gg->current_display->cpanel;
   gboolean rval = false;
   gint nclusters = symbol_table_populate (d);
@@ -286,15 +293,14 @@ cluster_symbol_cb (GtkWidget * w, GdkEventExpose * event, gpointer cbd)
     return true;
   }
 
-  GGOBI_STAGE_ATTR_INIT_ALL(d);  
-  for (m = 0; m < d->nrows_in_plot; m++) {
-    i = d->rows_in_plot.els[m];
-    if (GGOBI_STAGE_GET_ATTR_CLUSTER(d, i) == n) {
-      GGOBI_STAGE_BRUSH_POINT(d, i, true, targets, ATTR_SET_PERSISTENT);
+  GGOBI_STAGE_ATTR_INIT_ALL(f);  
+  for (i = 0; i < f->n_rows; i++) {
+    if (GGOBI_STAGE_GET_ATTR_CLUSTER(f, i) == n) {
+      GGOBI_STAGE_BRUSH_POINT(f, i, true, targets, ATTR_SET_PERSISTENT);
       
       /*-- link so that displays of linked datad's will be brushed as well --*/
       if (nd > 1 && !gg->linkby_cv)
-        brush_all_matching_id (d, i, true, targets, ATTR_SET_PERSISTENT);
+        brush_all_matching_id (f, i, true, targets, ATTR_SET_PERSISTENT);
     }
   }
 
@@ -399,7 +405,7 @@ update_cb (GtkWidget * w, ggobid * gg)
   GGobiStage *d = datad_get_from_notebook (gg->cluster_ui.notebook, gg);
   splotd *sp = gg->current_splot;
 
-  ggobi_stage_set_rows_in_plot(d);
+  //ggobi_stage_set_rows_in_plot(d);
   if (GGOBI_IS_EXTENDED_SPLOT (sp)) {
     void (*f) (GGobiStage *, splotd *, ggobid *);
     GGobiExtendedSPlotClass *klass;
@@ -515,7 +521,7 @@ CHECK_EVENT_SIGNATURE (exclusion_notebook_adddata_cb, datad_added_f)
   gtk_container_add (GTK_CONTAINER (tebox), gg->cluster_ui.notebook);
 
   for (l = gg->d; l; l = l->next) {
-    d = (GGobiStage *) l->data;
+    d = ggobi_stage_find((GGobiStage *) l->data, GGOBI_MAIN_STAGE_SUBSET);
 
     /*-- skip datasets without variables --*/
     if (!ggobi_stage_has_vars(d))
@@ -528,7 +534,7 @@ CHECK_EVENT_SIGNATURE (exclusion_notebook_adddata_cb, datad_added_f)
 
     g_object_set_data (G_OBJECT (scrolled_window), "datad", d); /*setdata */
     gtk_notebook_append_page (GTK_NOTEBOOK (gg->cluster_ui.notebook),
-                              scrolled_window, gtk_label_new (d->name));
+      scrolled_window, gtk_label_new (((GGobiStage *)l->data)->name));
     gtk_widget_show (scrolled_window);
 
     d->cluster_table = gtk_table_new (d->nclusters + 1, 5, true);

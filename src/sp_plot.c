@@ -109,7 +109,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
   gushort maxcolorid;
   gboolean loop_over_points;
 
-  gint i, m;
+  gint i;
   gboolean (*f)(splotd *, GGobiStage*, ggobid*, gboolean) = NULL;  /* redraw */
 
   GGobiExtendedSPlotClass *klass = NULL;
@@ -179,20 +179,19 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
 #ifdef WIN32
       win32_draw_to_pixmap_unbinned (-1, sp, draw_hidden, gg);
 #else
-      for (i=0; i<d->nrows_in_plot; i++) {
-        m = d->rows_in_plot.els[i];
-        if (GGOBI_STAGE_GET_ATTR_HIDDEN(d, m) && splot_plot_case (m, d, sp, display, gg)) {
+      for (i=0; i<d->n_rows; i++) {
+        if (GGOBI_STAGE_GET_ATTR_HIDDEN(d, i) && splot_plot_case (i, d, sp, display, gg)) {
           /*
            * This double-check accommodates the parallel coordinates and
            * time series displays, because we have to ignore points_show_p
            * in order to draw the whiskers but not the points.
           */
           if (display->options.points_show_p)
-            draw_glyph (sp->pixmap0, GGOBI_STAGE_GET_ATTR_GLYPH(d, m), sp->screen,
-              m, gg);
+            draw_glyph (sp->pixmap0, GGOBI_STAGE_GET_ATTR_GLYPH(d, i), sp->screen,
+              i, gg);
           /* draw the whiskers ... or, potentially, other decorations */
           if (klass && klass->within_draw_to_unbinned) {
-            klass->within_draw_to_unbinned(sp, m, sp->pixmap0, gg->plot_GC);
+            klass->within_draw_to_unbinned(sp, i, sp->pixmap0, gg->plot_GC);
           }
         }
       }
@@ -211,11 +210,10 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
 #ifdef WIN32
         win32_draw_to_pixmap_unbinned (current_color, sp, draw_hidden, gg);
 #else
-        for (i=0; i<d->nrows_in_plot; i++) {
-          m = d->rows_in_plot.els[i];
-          if (GGOBI_STAGE_GET_ATTR_COLOR(d, m) == current_color &&
-            !GGOBI_STAGE_GET_ATTR_HIDDEN(d, m) &&
-            splot_plot_case (m, d, sp, display, gg))
+        for (i=0; i<d->n_rows; i++) {
+          if (GGOBI_STAGE_GET_ATTR_COLOR(d, i) == current_color &&
+            !GGOBI_STAGE_GET_ATTR_HIDDEN(d, i) &&
+            splot_plot_case (i, d, sp, display, gg))
           {
             /*
              * As above, this test accommodates the parallel
@@ -224,11 +222,11 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
              * but not the points.
             */
             if (display->options.points_show_p)
-              draw_glyph (sp->pixmap0, GGOBI_STAGE_GET_ATTR_GLYPH(d, m), sp->screen,
-                m, gg);
+              draw_glyph (sp->pixmap0, GGOBI_STAGE_GET_ATTR_GLYPH(d, i), sp->screen,
+                i, gg);
 
             if (klass && klass->within_draw_to_unbinned) {
-              klass->within_draw_to_unbinned(sp, m, 
+              klass->within_draw_to_unbinned(sp, i, 
               sp->pixmap0, gg->plot_GC);
             }
 
@@ -349,7 +347,7 @@ splot_draw_to_pixmap0_binned (splotd *sp, gboolean draw_hidden, ggobid *gg)
       for (ih=bin0->x; ih<=bin1->x; ih++) {
         for (iv=bin0->y; iv<=bin1->y; iv++) {
           for (m=0; m<d->brush.binarray[ih][iv].nels ; m++) {
-            i = d->rows_in_plot.els[d->brush.binarray[ih][iv].els[m]];
+            i = d->brush.binarray[ih][iv].els[m];
 
             /* if hidden && plottable */
             if (GGOBI_STAGE_GET_ATTR_HIDDEN(d, i) &&
@@ -390,7 +388,7 @@ splot_draw_to_pixmap0_binned (splotd *sp, gboolean draw_hidden, ggobid *gg)
         for (ih=bin0->x; ih<=bin1->x; ih++) {
           for (iv=bin0->y; iv<=bin1->y; iv++) {
             for (m=0; m<d->brush.binarray[ih][iv].nels ; m++) {
-              i = d->rows_in_plot.els[d->brush.binarray[ih][iv].els[m]];
+              i = d->brush.binarray[ih][iv].els[m];
 
               if (!GGOBI_STAGE_GET_ATTR_HIDDEN(d, i) &&
                   GGOBI_STAGE_GET_ATTR_COLOR(d, i) == current_color &&

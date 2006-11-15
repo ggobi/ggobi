@@ -4,7 +4,8 @@
   
   /* move to categorical subclass? */
   typedef struct level_s {
-    gint count;
+    guint index;
+    guint count;
     gint value;
     gchar *name;
   } level_t;
@@ -75,7 +76,7 @@ protected gchar *name destroywith g_free;
 private gchar *nickname destroywith g_free; 
 property STRING name
 (nick = "id", blurb = "The name of this variable",
-default_value = "_X_", export)
+  flags = CONSTRUCT, default_value = "_X_", export)
 get { g_value_set_string (VAL, self->name); }
 set {
   // FIXME: for some reason the default value 'X' is not being set
@@ -274,6 +275,23 @@ get_level_values(self)
   return(values);
 }
 
+public gint
+get_level_index(self, gint value)
+{
+  level_t *level;
+  g_return_val_if_fail(GGOBI_VARIABLE_IS_CATEGORICAL(self), FALSE);
+  level = self_get_level_for_value(self, value);
+  return(level ? level->index : -1);
+}
+public gint
+get_level_index_for_name(self, const gchar *name)
+{
+  level_t *level;
+  g_return_val_if_fail(GGOBI_VARIABLE_IS_CATEGORICAL(self), FALSE);
+  level = self_get_level_for_name(self, name);
+  return(level ? level->index : -1);
+}
+  
 public gboolean
 has_level(self, gint value)
 {
@@ -512,16 +530,20 @@ add_level(self, const gchar *name, gint value)
  /* coerce to categorical */
  self_set_vartype(self, GGOBI_VARIABLE_CATEGORICAL);
 
- if (value == -1 ? self_has_level_for_name(self, name) : 
-    self_has_level(self, value))
-   return self_get_n_levels(self);
+ if (value == -1 && self_has_level_for_name(self, name))
+   return self_get_level_index_for_name(self, name);
+ if (value >= 0 && self_has_level(self, value))
+   return self_get_level_index(self, value);
+
+ n_levels = self_get_n_levels(self);
  
  level = g_new(level_t, 1);
 
+ level->index = n_levels;
  level->count = 1;
 
  if (value == -1)
-   value = self_get_n_levels(self) + 1;
+   value = n_levels + 1;
  level->value = value;
 
  if (!name)
@@ -532,10 +554,8 @@ add_level(self, const gchar *name, gint value)
  g_hash_table_insert(selfp->name_to_level, level->name, level);
  g_hash_table_insert(selfp->value_to_level, GINT_TO_POINTER(level->value), level);
 
- n_levels = self_get_n_levels(self);
- 
  /* default value becomes the first level */
- if (n_levels == 1)
+ if (n_levels == 0)
    self_set_default_value(self, (gdouble)level->value);
  
  return n_levels;

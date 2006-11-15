@@ -28,14 +28,15 @@ gboolean
 brush_all_matching_id (GGobiStage * sd, gint k, gboolean condition, BrushTargetType brush_mode, GGobiAttrSetMethod brush)
 {
   gboolean changed = false;
-
+  GGobiStage *root = ggobi_stage_get_root(sd);
+  
   gchar* rowid = ggobi_stage_get_row_id(sd, k);
   if (!rowid)
     return false;
 
   for (GSList* l = sd->gg->d; l; l = l->next) {
     GGobiStage* d = l->data;
-    if (d == sd)
+    if (d == root)
       continue;        /*-- skip the originating datad --*/
 
     gint i = ggobi_stage_get_row_for_id(d, rowid);
@@ -58,14 +59,12 @@ void
 brush_matching_cv (gint jlinkby, vector_b * levelv,
                    cpaneld * cpanel, GGobiStage * d, ggobid * gg)
 {
-  gint m, i, level_value;
+  gint m, level_value;
 
   GGOBI_STAGE_ATTR_INIT_ALL(d); 
-  for (m = 0; m < d->nrows_in_plot; m++) {
-    i = d->rows_in_plot.els[m];
-
-    level_value = (gint) ggobi_stage_get_raw_value(d, i, jlinkby);
-    GGOBI_STAGE_BRUSH_POINT(d, i, levelv->els[level_value], cpanel->br.point_targets, cpanel->br.mode);
+  for (m = 0; m < d->n_rows; m++) {
+    level_value = (gint) ggobi_stage_get_raw_value(d, m, jlinkby);
+    GGOBI_STAGE_BRUSH_POINT(d, m, levelv->els[level_value], cpanel->br.point_targets, cpanel->br.mode);
   }
 }
 

@@ -24,6 +24,7 @@
 //FIXME: all of this should be moved inside of GGobiVariable and
 // cached lazily.  Can remove a lot of duplication once FilterStage 
 // is in place
+// This code will be gone after tform stage arrives.
 
 /*-------------------------------------------------------------------------*/
 /*                       variable limits                                   */
@@ -86,36 +87,28 @@ limits_set_from_vartable (GGobiVariable * var)
 static void
 limits_raw_set_by_var (GGobiStage * s, gint j, gboolean visible_only)
 {
-
-  gint i, m;
+  gint i;
   GGobiVariable *var = ggobi_stage_get_variable(s, j);
-  GGobiData *d = GGOBI_DATA(ggobi_stage_get_root(s));
   greal min, max;
 
   min = G_MAXFLOAT;
   max = -G_MAXFLOAT;
 
+  // FIXME: this isn't pretty but this limits stuff doesn't match the new design
+  s = ggobi_stage_get_root(s);
+  
   if (visible_only) {  /*-- if using visible cases only --*/
-    for (m = 0; m < s->nrows_in_plot; m++) {
-      i = s->rows_in_plot.els[m];
-      if (!s->missings_show_p && ggobi_stage_is_missing(s, i,j));
-      else {
-        if (d->raw.vals[i][j] < min)
-          min = d->raw.vals[i][j];
-        else if (d->raw.vals[i][j] > max)
-          max = d->raw.vals[i][j];
-      }
-    }
+    GGobiStage *tmp_s = ggobi_stage_find(s, GGOBI_MAIN_STAGE_FILTER);
+    if (tmp_s) /* this (obsolete) code can be called before pipeline is built */
+      s = tmp_s;
   }
-  else {
-    for (i = 0; i < s->n_rows; i++) {
-      if (!s->missings_show_p && ggobi_stage_is_missing(s, i,j));
-      else {
-        if (d->raw.vals[i][j] < min)
-          min = d->raw.vals[i][j];
-        else if (d->raw.vals[i][j] > max)
-          max = d->raw.vals[i][j];
-      }
+  for (i = 0; i < s->n_rows; i++) {
+    if (!s->missings_show_p && ggobi_stage_is_missing(s, i,j));
+    else {
+      if (ggobi_stage_get_raw_value(s, i, j) < min)
+        min = ggobi_stage_get_raw_value(s, i, j);
+      else if (ggobi_stage_get_raw_value(s, i, j) > max)
+        max = ggobi_stage_get_raw_value(s, i, j);
     }
   }
 
@@ -141,36 +134,30 @@ limits_raw_set (GGobiStage * d, gboolean visible_only)
 static void
 limits_tform_set_by_var (GGobiStage * d, gint j, gboolean visible_only)
 {
-  gint i, m;
+  gint i;
   GGobiVariable *var = ggobi_stage_get_variable(d, j);
   greal min, max;
 
   min = G_MAXFLOAT;
   max = -G_MAXFLOAT;
 
+  d = ggobi_stage_get_root(d);
   if (visible_only) {
-    for (m = 0; m < d->nrows_in_plot; m++) {
-      i = d->rows_in_plot.els[m];
-      if (!d->missings_show_p && ggobi_stage_is_missing(d, i, j));
-      else {
-        if (d->tform.vals[i][j] < min)
-          min = d->tform.vals[i][j];
-        else if (d->tform.vals[i][j] > max)
-          max = d->tform.vals[i][j];
-      }
+    GGobiStage *tmp_d = ggobi_stage_find(d, GGOBI_MAIN_STAGE_FILTER);
+    if (tmp_d) /* this (obsolete) code can be called before pipeline is built */
+      d = tmp_d;
+  }
+  
+  for (i = 0; i < d->n_rows; i++) {
+    if (!d->missings_show_p && ggobi_stage_is_missing(d, i, j));
+    else {
+      if (d->tform.vals[i][j] < min)
+        min = d->tform.vals[i][j];
+      else if (d->tform.vals[i][j] > max)
+        max = d->tform.vals[i][j];
     }
   }
-  else {
-    for (i = 0; i < d->n_rows; i++) {
-      if (!d->missings_show_p && ggobi_stage_is_missing(d, i, j));
-      else {
-        if (d->tform.vals[i][j] < min)
-          min = d->tform.vals[i][j];
-        else if (d->tform.vals[i][j] > max)
-          max = d->tform.vals[i][j];
-      }
-    }
-  }
+
   var->lim_tform.min = min;
   var->lim_tform.max = max;
 }
@@ -187,19 +174,20 @@ limits_display_set_by_var (GGobiStage * d, gint j, gboolean visible_only)
   min = G_MAXFLOAT;
   max = -G_MAXFLOAT;
 
+  d = ggobi_stage_get_root(d);
   if (visible_only) {
-    for (m = 0; m < d->nrows_in_plot; m++) {
-      i = d->rows_in_plot.els[m];
+    d = ggobi_stage_find(d, GGOBI_MAIN_STAGE_FILTER);
+    for (m = 0; m < d->n_rows; m++) {
       /*-- lim_display and stats: only use non-missing cases --*/
-      if (ggobi_stage_is_missing(d, i, j));
+      if (ggobi_stage_is_missing(d, m, j));
       else {
-        if (d->tform.vals[i][j] < min)
-          min = d->tform.vals[i][j];
-        else if (d->tform.vals[i][j] > max)
-          max = d->tform.vals[i][j];
+        if (d->tform.vals[m][j] < min)
+          min = d->tform.vals[m][j];
+        else if (d->tform.vals[m][j] > max)
+          max = d->tform.vals[m][j];
 
-        sum += d->tform.vals[i][j];
-        x[np] = d->tform.vals[i][j];
+        sum += d->tform.vals[m][j];
+        x[np] = d->tform.vals[m][j];
         np++;
       }
     }

@@ -434,11 +434,16 @@ struct _ggobid {
                      Since plugins, etc. may also use this, we might want 
                      a hashtable here similar to pthread's thread-specific data. */
 
-  GTimeVal time;
+  GTimeVal time;  
   
   GGobiPipelineFactory *pipeline_factory;
-  
 }; /*  ggobid; */
+
+/* the keys for the built-in stages. eventually these might become
+   functions that return a static GQuark, if we move to a GQuark-based ID system */
+
+#define GGOBI_MAIN_STAGE_SUBSET "ggobi-main-subset"
+#define GGOBI_MAIN_STAGE_FILTER "ggobi-main-filter"
 
 #include "read_init.h"
 

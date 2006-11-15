@@ -82,7 +82,7 @@ void
 rejitter (gint * selected_cols, gint nselected_cols, GGobiStage * d,
           ggobid * gg)
 {
-  gint i, j, k, m;
+  gint i, j, k;
   greal frand, fworld, fjit;
   GGobiVariable *var;
 
@@ -90,23 +90,21 @@ rejitter (gint * selected_cols, gint nselected_cols, GGobiStage * d,
     k = selected_cols[j];
     var = ggobi_stage_get_variable(d, k);
 
-    for (i = 0; i < d->nrows_in_plot; i++) {
-      m = d->rows_in_plot.els[i];
-
-      frand = (greal) jitter_randval (d->jitter.type) * PRECISION1;
+    for (i = 0; i < d->n_rows; i++) {
+     frand = (greal) jitter_randval (d->jitter.type) * PRECISION1;
 
       /*
        * The world.vals used here is already jittered:
        * subtract out the previous jittered value ...
        */
       if (d->jitter.convex) {
-        fworld = d->world.vals[m][k] - d->jitdata.vals[m][k];
+        fworld = d->world.vals[i][k] - d->jitdata.vals[i][k];
         fjit = (greal) var->jitter_factor * (frand - fworld);
       }
       else
         fjit = var->jitter_factor * frand;
 
-      d->jitdata.vals[m][k] = fjit;
+      d->jitdata.vals[i][k] = fjit;
     }
   }
   tform_to_world(d);

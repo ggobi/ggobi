@@ -119,7 +119,7 @@ tsShowWhiskers(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc)
 {
   displayd *dpy = sp->displayptr;
      /*-- there are n-1 whiskers --*/
-  if (dpy->options.whiskers_show_p && m < dpy->d->nrows_in_plot-1) 
+  if (dpy->options.whiskers_show_p && m < dpy->d->n_rows-1) 
      gdk_draw_line (drawable, gc,
        sp->whiskers[m].x1, sp->whiskers[m].y1,
        sp->whiskers[m].x2, sp->whiskers[m].y2);

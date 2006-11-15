@@ -234,16 +234,15 @@ brush_set_pos (gint x, gint y, splotd * sp)
 void
 brush_undo (GGobiStage * d)
 {
-  gint m, i;
+  gint m;
   g_return_if_fail(d);
 
   GGOBI_STAGE_ATTR_INIT_ALL(d);  
-  for (m = 0; m < d->nrows_in_plot; m++) {
-    i = d->rows_in_plot.els[m];
-    GGOBI_STAGE_RESET_ATTR_COLOR (d, i, ATTR_SET_PERSISTENT);
-    GGOBI_STAGE_RESET_ATTR_TYPE  (d, i, ATTR_SET_PERSISTENT);
-    GGOBI_STAGE_RESET_ATTR_SIZE  (d, i, ATTR_SET_PERSISTENT);
-    GGOBI_STAGE_RESET_ATTR_HIDDEN(d, i, ATTR_SET_PERSISTENT);
+  for (m = 0; m < d->n_rows; m++) {
+    GGOBI_STAGE_RESET_ATTR_COLOR (d, m, ATTR_SET_PERSISTENT);
+    GGOBI_STAGE_RESET_ATTR_TYPE  (d, m, ATTR_SET_PERSISTENT);
+    GGOBI_STAGE_RESET_ATTR_SIZE  (d, m, ATTR_SET_PERSISTENT);
+    GGOBI_STAGE_RESET_ATTR_HIDDEN(d, m, ATTR_SET_PERSISTENT);
   }
 }
 
@@ -257,7 +256,7 @@ reinit_transient_brushing (displayd * dsp, ggobid * gg)
  * brush_once() to brush the points that are now underneath the brush. 
  * For now, don't make the same change for persistent brushing.
 */
-  gint i, m, k;
+  gint m, k;
   GGobiStage *d = dsp->d;
   GGobiStage *e = dsp->e;
   cpaneld *cpanel = &dsp->cpanel;
@@ -265,13 +264,12 @@ reinit_transient_brushing (displayd * dsp, ggobid * gg)
   gboolean edge_painting_p = (cpanel->br.edge_targets != br_off);
 
   if (point_painting_p) {
-    for (m = 0; m < d->nrows_in_plot; m++) {
-      i = d->rows_in_plot.els[m];
+    for (m = 0; m < d->n_rows; m++) {
       GGOBI_STAGE_ATTR_INIT_ALL(d);  
-      GGOBI_STAGE_RESET_ATTR_COLOR (d, i, ATTR_SET_TRANSIENT);
-      GGOBI_STAGE_RESET_ATTR_TYPE  (d, i, ATTR_SET_TRANSIENT);
-      GGOBI_STAGE_RESET_ATTR_SIZE  (d, i, ATTR_SET_TRANSIENT);
-      GGOBI_STAGE_RESET_ATTR_HIDDEN(d, i, ATTR_SET_TRANSIENT);
+      GGOBI_STAGE_RESET_ATTR_COLOR (d, m, ATTR_SET_TRANSIENT);
+      GGOBI_STAGE_RESET_ATTR_TYPE  (d, m, ATTR_SET_TRANSIENT);
+      GGOBI_STAGE_RESET_ATTR_SIZE  (d, m, ATTR_SET_TRANSIENT);
+      GGOBI_STAGE_RESET_ATTR_HIDDEN(d, m, ATTR_SET_TRANSIENT);
     }
   }
   if (edge_painting_p && e) {
@@ -477,7 +475,7 @@ update_points_under_brush(GGobiStage *d, splotd *sp)
   for (ih = d->brush.bin0.x; ih <= d->brush.bin1.x; ih++) {
     for (iv = d->brush.bin0.y; iv <= d->brush.bin1.y; iv++) {
       for (j = 0; j < d->brush.binarray[ih][iv].nels; j++) {
-        pt = d->rows_in_plot.els[d->brush.binarray[ih][iv].els[j]];
+        pt = d->brush.binarray[ih][iv].els[j];
 
         /*
          * Ignore hidden cases unless shadow or unshadow brushing.

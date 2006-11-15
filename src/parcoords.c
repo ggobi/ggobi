@@ -387,22 +387,21 @@ parcoords_add_delete_splot(cpaneld *cpanel, splotd *sp, gint jvar, gint *jvar_pr
 
 static void
 sp_rewhisker (splotd *sp_prev, splotd *sp, splotd *sp_next, ggobid *gg) {
-  gint i, k, m;
+  gint k, m;
   displayd *display = (displayd *) sp->displayptr;
   cpaneld *cpanel = (cpaneld *) &display->cpanel;
   GGobiStage *d = display->d;
   gboolean draw_whisker;
 
-  for (k=0; k<d->nrows_in_plot; k++) {
-    i = d->rows_in_plot.els[k];
-    m = 2*i;
+  for (k=0; k<d->n_rows; k++) {
+    m = 2*k;
 
     /*-- if it's the leftmost plot, don't draw the left whisker --*/
     if (sp_prev == NULL)
       draw_whisker = false;
     /*-- .. also if we're not drawing missings, and an endpoint is missing --*/
     else if (!d->missings_show_p &&
-            (ggobi_stage_is_missing(d, i, sp->p1dvar) || ggobi_stage_is_missing(d, i, sp_prev->p1dvar)))
+            (ggobi_stage_is_missing(d, k, sp->p1dvar) || ggobi_stage_is_missing(d, k, sp_prev->p1dvar)))
     {
       draw_whisker = false;
     }
@@ -414,27 +413,27 @@ sp_rewhisker (splotd *sp_prev, splotd *sp, splotd *sp_next, ggobid *gg) {
 
       if (draw_whisker) {
         sp->whiskers[m].x1 = 0;
-        sp->whiskers[m].y1 = (sp_prev->screen[i].y + sp->screen[i].y) / 2;
-        sp->whiskers[m].x2 = sp->screen[i].x;
-        sp->whiskers[m].y2 = sp->screen[i].y;
+        sp->whiskers[m].y1 = (sp_prev->screen[k].y + sp->screen[k].y) / 2;
+        sp->whiskers[m].x2 = sp->screen[k].x;
+        sp->whiskers[m].y2 = sp->screen[k].y;
       } else {
-        sp->whiskers[m].x1 = sp->screen[i].x;
-        sp->whiskers[m].y1 = sp->screen[i].y;
-        sp->whiskers[m].x2 = sp->screen[i].x;
-        sp->whiskers[m].y2 = sp->screen[i].y;
+        sp->whiskers[m].x1 = sp->screen[k].x;
+        sp->whiskers[m].y1 = sp->screen[k].y;
+        sp->whiskers[m].x2 = sp->screen[k].x;
+        sp->whiskers[m].y2 = sp->screen[k].y;
       }
 
     } else {  /* ARRANGE_COLUMN */
       if (draw_whisker) {
-        sp->whiskers[m].x1 = (sp_prev->screen[i].x + sp->screen[i].x) / 2;
+        sp->whiskers[m].x1 = (sp_prev->screen[k].x + sp->screen[k].x) / 2;
         sp->whiskers[m].y1 = 0;
-        sp->whiskers[m].x2 = sp->screen[i].x;
-        sp->whiskers[m].y2 = sp->screen[i].y;
+        sp->whiskers[m].x2 = sp->screen[k].x;
+        sp->whiskers[m].y2 = sp->screen[k].y;
       } else {
-        sp->whiskers[m].x1 = sp->screen[i].x;
-        sp->whiskers[m].y1 = sp->screen[i].y;
-        sp->whiskers[m].x2 = sp->screen[i].x;
-        sp->whiskers[m].y2 = sp->screen[i].y;
+        sp->whiskers[m].x1 = sp->screen[k].x;
+        sp->whiskers[m].y1 = sp->screen[k].y;
+        sp->whiskers[m].x2 = sp->screen[k].x;
+        sp->whiskers[m].y2 = sp->screen[k].y;
       }
     }
 
@@ -445,7 +444,7 @@ sp_rewhisker (splotd *sp_prev, splotd *sp, splotd *sp_next, ggobid *gg) {
       draw_whisker = false;
     /*-- .. also if we're not drawing missings, and an endpoint is missing --*/
     else if (!d->missings_show_p && 
-            (ggobi_stage_is_missing(d, i, sp->p1dvar) || ggobi_stage_is_missing(d, i, sp_next->p1dvar)))
+            (ggobi_stage_is_missing(d, k, sp->p1dvar) || ggobi_stage_is_missing(d, k, sp_next->p1dvar)))
     {
       draw_whisker = false;
     }
@@ -456,27 +455,27 @@ sp_rewhisker (splotd *sp_prev, splotd *sp, splotd *sp_next, ggobid *gg) {
     if (cpanel->parcoords_arrangement == ARRANGE_ROW) {
 
       if (draw_whisker) {
-        sp->whiskers[m].x1 = sp->screen[i].x;
-        sp->whiskers[m].y1 = sp->screen[i].y;
+        sp->whiskers[m].x1 = sp->screen[k].x;
+        sp->whiskers[m].y1 = sp->screen[k].y;
         sp->whiskers[m].x2 = sp->max.x;
-        sp->whiskers[m].y2 = (sp->screen[i].y + sp_next->screen[i].y) / 2;
+        sp->whiskers[m].y2 = (sp->screen[k].y + sp_next->screen[k].y) / 2;
       } else {
-        sp->whiskers[m].x1 = sp->screen[i].x;
-        sp->whiskers[m].y1 = sp->screen[i].y;
-        sp->whiskers[m].x2 = sp->screen[i].x;
-        sp->whiskers[m].y2 = sp->screen[i].y;
+        sp->whiskers[m].x1 = sp->screen[k].x;
+        sp->whiskers[m].y1 = sp->screen[k].y;
+        sp->whiskers[m].x2 = sp->screen[k].x;
+        sp->whiskers[m].y2 = sp->screen[k].y;
       }
     } else {  /* ARRANGE_COLUMN */
       if (draw_whisker) {
-        sp->whiskers[m].x1 = sp->screen[i].x;
-        sp->whiskers[m].y1 = sp->screen[i].y;
-        sp->whiskers[m].x2 = (sp->screen[i].x + sp_next->screen[i].x) / 2;
+        sp->whiskers[m].x1 = sp->screen[k].x;
+        sp->whiskers[m].y1 = sp->screen[k].y;
+        sp->whiskers[m].x2 = (sp->screen[k].x + sp_next->screen[k].x) / 2;
         sp->whiskers[m].y2 = sp->max.y;
       } else {
-        sp->whiskers[m].x1 = sp->screen[i].x;
-        sp->whiskers[m].y1 = sp->screen[i].y;
-        sp->whiskers[m].x2 = sp->screen[i].x;
-        sp->whiskers[m].y2 = sp->screen[i].y;
+        sp->whiskers[m].x1 = sp->screen[k].x;
+        sp->whiskers[m].y1 = sp->screen[k].y;
+        sp->whiskers[m].x2 = sp->screen[k].x;
+        sp->whiskers[m].y2 = sp->screen[k].y;
       }
     }
   }

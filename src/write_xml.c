@@ -218,14 +218,14 @@ writeFloat(FILE *f, double value)
 gboolean
 write_xml_records(FILE *f, GGobiStage *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 {
-  gint i, m, n = 0;
+  gint i, n = 0;
 
-  /*-- figure out how many records we're about to save.  --*/
-  if (gg->save.row_ind == ALLROWS)
-    n = d->n_rows;
-  else if (gg->save.row_ind == DISPLAYEDROWS)
-    n = d->nrows_in_plot;
+  /* use the filter stage if only saving the visible rows */
+  if (gg->save.row_ind == DISPLAYEDROWS)
+    d = ggobi_stage_find(d, GGOBI_MAIN_STAGE_FILTER);
 
+  n = d->n_rows;
+  
   fprintf(f, "<records ");
   fprintf(f, "count=\"%d\"", n);
   if(xmlWriteInfo->useDefault) {
@@ -245,19 +245,10 @@ write_xml_records(FILE *f, GGobiStage *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo
   fprintf(f, ">\n");
 
 
-  if (gg->save.row_ind == ALLROWS) {
-    for (i = 0; i < d->n_rows; i++) {
-      fprintf(f, "<record");
-      write_xml_record (f, d, gg, i, xmlWriteInfo);
-      fprintf(f, "\n</record>\n");
-    }
-  } else {  /*-- if displaying visible rows only --*/
-    for (i=0; i<d->nrows_in_plot; i++) {
-      m = d->rows_in_plot.els[i];
-      fprintf(f, "<record");
-      write_xml_record (f, d, gg, m, xmlWriteInfo);
-      fprintf(f, "\n</record>\n");
-    }
+  for (i = 0; i < d->n_rows; i++) {
+    fprintf(f, "<record");
+    write_xml_record (f, d, gg, i, xmlWriteInfo);
+    fprintf(f, "\n</record>\n");
   }
 
   fprintf(f, "</records>\n");

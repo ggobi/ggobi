@@ -267,7 +267,16 @@ static GtkToggleActionEntry t_entries[] = {
 	}
 };
 
-
+static void
+rows_added_cb(GGobiStage *stage, guint n, ggobid *gg)
+{
+  reset_pp(stage, gg);
+}
+static void
+rows_deleted_cb(GGobiStage *stage, guint *rows, guint n, ggobid *gg)
+{
+  reset_pp(stage, gg);
+}
 
 void
 tour2dpp_window_open (ggobid *gg) {
@@ -317,8 +326,10 @@ tour2dpp_window_open (ggobid *gg) {
       g_signal_connect (G_OBJECT (dsp->t2d_window), "delete_event",
                           G_CALLBACK (close_wmgr_cb), (gpointer) dsp);
       /*gtk_window_set_policy (GTK_WINDOW (dsp->t2d_window), true, true, false);*/
-      g_signal_connect (G_OBJECT(d), "rows_in_plot_changed",
-        G_CALLBACK(reset_pp), gg);
+      g_signal_connect (G_OBJECT(d), "rows-added",
+        G_CALLBACK(rows_added_cb), gg);
+      g_signal_connect (G_OBJECT(d), "rows-deleted",
+        G_CALLBACK(rows_deleted_cb), gg);
 
       gtk_container_set_border_width (GTK_CONTAINER (dsp->t2d_window), 10);
       g_object_set_data(G_OBJECT (dsp->t2d_window), "displayd", dsp);
@@ -543,8 +554,8 @@ tour2dpp_window_open (ggobid *gg) {
 
     }
 
-    alloc_optimize0_p(&dsp->t2d_pp_op, d->nrows_in_plot, dsp->t2d.nactive, 2);
-    alloc_pp(&dsp->t2d_pp_param, d->nrows_in_plot, dsp->t2d.nactive, 2);
+    alloc_optimize0_p(&dsp->t2d_pp_op, d->n_rows, dsp->t2d.nactive, 2);
+    alloc_pp(&dsp->t2d_pp_param, d->n_rows, dsp->t2d.nactive, 2);
 
     gtk_widget_show_all (dsp->t2d_window);
   }

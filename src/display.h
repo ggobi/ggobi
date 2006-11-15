@@ -76,7 +76,7 @@ struct _displayd {
 
  GGobiStage *d;  /*-- pointer to a particular gg->d[] --*/
  GGobiStage *e;  /*-- pointer to a particular gg->d[] --*/
-
+ 
  /*-- --*/
 
 /*

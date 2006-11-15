@@ -102,7 +102,7 @@ void
 splot_edges_draw (splotd * sp, gboolean draw_hidden, GdkDrawable * drawable,
                   ggobid * gg)
 {
-  gint i, j, m;
+  gint i, j;
   gint k, n, p, pp;
   gint a, b;
   displayd *display = (displayd *) sp->displayptr;
@@ -138,16 +138,15 @@ splot_edges_draw (splotd * sp, gboolean draw_hidden, GdkDrawable * drawable,
           symbols_used[k][n][p] = 0;
 
     GGOBI_STAGE_ATTR_INIT_ALL(e);  
-    for (i = 0; i < e->nrows_in_plot; i++) {
-      m = e->rows_in_plot.els[i];
+    for (i = 0; i < e->n_rows; i++) {
       /* If we're drawing hiddens and this is hidden and plottable ... */
-      if (((draw_hidden && splot_hidden_edge (m, d, e, sp, display, gg)) ||
+      if (((draw_hidden && splot_hidden_edge (i, d, e, sp, display, gg)) ||
            /* Or if we're not drawing hiddens and this isn't hidden ... */
-           (!draw_hidden && !GGOBI_STAGE_GET_ATTR_HIDDEN(e, m)))) {
+           (!draw_hidden && !GGOBI_STAGE_GET_ATTR_HIDDEN(e, i)))) {
 
-        gtype = GGOBI_STAGE_GET_ATTR_TYPE(e, m);
+        gtype = GGOBI_STAGE_GET_ATTR_TYPE(e, i);
         ltype = ltype_from_gtype (gtype);
-        symbols_used[ GGOBI_STAGE_GET_ATTR_SIZE(e, m)][ltype][ GGOBI_STAGE_GET_ATTR_COLOR(e, m)]++;
+        symbols_used[ GGOBI_STAGE_GET_ATTR_SIZE(e, i)][ltype][ GGOBI_STAGE_GET_ATTR_COLOR(e, i)]++;
       }
     }
 

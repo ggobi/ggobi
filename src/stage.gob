@@ -6,62 +6,12 @@
   #include "vars.h"
   #include "externs.h"
 
-  // FIXME: these probably won't be necessary - we will not proxy properties
-  #define SET_PARENT_PROP(prop) \
-    g_object_set_property(G_OBJECT(self->parent), (prop), VAL)
-  #define GET_PARENT_PROP(prop) \
-    g_object_get_property(G_OBJECT(self->parent), (prop), VAL)
-  
+  /* convenience macro for connecting signal forwarding handles */
   #define RELAY_SIGNAL(signal) \
     g_signal_connect_swapped(G_OBJECT(parent), #signal, G_CALLBACK(self_##signal##_handler), self)
   
   /* how many signals are we proxying? */
-  #define N_HANDLERS 5
-  
-  /* signal handlers */
-  
-  /* it may be possible to do this and other handlers within GOB using 
-    private methods and g_object_connect_swapped */
-  static void 
-  variable_name_changed_cb(GGobiVariable *var, const gchar *old_name, 
-    const gchar *raw_name, gpointer data)
-  {
-    GGobiStage *stage = GGOBI_STAGE(data);
-    gint j = ggobi_stage_get_col_index_for_name(stage, old_name);
-    ggobi_stage_update_var_name_hash(stage, old_name, j);
-  }
-  
-  static void 
-  vartable_stats_set_by_var_cb(GGobiStage *d, guint j, gpointer user_data)
-  {
-    vartable_stats_set_by_var(d, j);
-  }
-  static void 
-  vartable_limits_set_by_var_cb(GGobiStage *d, guint j, gpointer user_data)
-  {
-    vartable_limits_set_by_var(d, j);
-  }
-  static void 
-  vartable_collab_set_by_var_cb(GGobiStage *d, guint j, gpointer user_data)
-  {
-    vartable_collab_set_by_var(d, j);
-  }
-  static void 
-  vartable_collab_tform_set_by_var_cb(GGobiStage *d, guint j, gpointer user_data)
-  {
-    vartable_collab_tform_set_by_var(d, j);
-  }
-  static void
-  varcircle_label_set_cb(GGobiStage * d, guint j, gpointer user_data)
-  {
-    varcircle_label_set(d, j);
-  }
-  static void
-  varpanel_label_set_cb(GGobiStage * d, guint j, gpointer user_data)
-  {
-    varpanel_label_set(d, j);
-  }
-  
+  #define N_HANDLERS 6
 %}
 
 %h{
@@ -77,6 +27,7 @@
 #define N_COLS GGOBI_STAGE(self)->n_cols
 #define N_ROWS GGOBI_STAGE(self)->n_rows
 
+/* shorthand for checking whether a column refers to a categorical variable */
 #define GGOBI_STAGE_IS_COL_CATEGORICAL(stage, col) \
   ggobi_stage_get_col_type((stage), (col)) == GGOBI_VARIABLE_CATEGORICAL
 
@@ -87,6 +38,17 @@
 
 // Macros for getting and setting attribute values
 // -----------------------------------------------
+
+/* FIXME: would be nice to just have macros for getting the column index.
+ * Instead of the _INIT macros, what about tracking the state in the stage. 
+ * At the beginning of a loop, some column name could be set on the stage, like 
+ * set_active_column(), then the client calls setter/getter functions that are 
+ * based on that column, like get_active_value(row) and set_active_value(row).
+ * This seems cleaner and works for more than just specific attributes.
+ * Of course, we'd still want some macro for getting the column of an attribute,
+ * so that we don't have to specify the name all the time. The brush-related
+ * macros would also be useful, since they maintain multiple columns.
+*/
 
 #define GGOBI_STAGE_ATTR_INIT(d, attribute) \
   guint attr_ ## attribute; \
@@ -193,14 +155,6 @@
   }
     
 /*---- STUFF FROM DATA.GOB ----*/
-typedef struct _Subset {
-  gint random_n;
-  gint string_pos;
- /*-- adjustments from which to get values for blocksize, everyn --*/
-  GtkAdjustment *bstart_adj, *bsize_adj;
-  GtkAdjustment *estart_adj, *estep_adj;
-} Subset;
-
 
 typedef struct _Jitterd {
   gfloat factor;
@@ -322,34 +276,37 @@ property OBJECT parent
   set {
     GGobiStage *parent = g_value_get_object(VAL);
     GGobiStage *former = self->parent;
-    
     if (former) {
       for (guint i = 0; i < N_HANDLERS; i++)
         g_signal_handler_disconnect(former, selfp->handlers[i]);
       for (guint j = 0; j < self->n_cols; j++)
         self_col_deleted(self, j);
+      self_remove_child(former, self);
     }
       
     self->parent = parent;
     /* In order to allow subclasses to block signal forwarding (like
-       for row and column filters) we should not simply forward signals.
-       They need to pass through a handler first. We can make the handlers
-       virtuals that forward by default or we could make one virtual
-       for registering (and another for unregistering) the handlers.
-       The former seems more robust and convenient. */
+       for row and column filters) we pass every single through a virtual */
     selfp->handlers[0] = RELAY_SIGNAL(col_data_changed);
     selfp->handlers[1] = RELAY_SIGNAL(col_name_changed);
     selfp->handlers[2] = RELAY_SIGNAL(cols_added);
     selfp->handlers[3] = RELAY_SIGNAL(col_deleted);
     selfp->handlers[4] = RELAY_SIGNAL(rows_added);
-    selfp->handlers[4] = RELAY_SIGNAL(rows_deleted);
+    selfp->handlers[5] = RELAY_SIGNAL(rows_deleted);
     
-    self_cols_added(self, self->parent->n_cols);
+    self_add_child(parent, self);
+    
+    /* pretend like the parent just said "here's some new rows and columns!" */
+    self_rows_added_handler(self, self->parent->n_rows);
+    self_cols_added_handler(self, self->parent->n_cols);
   }
   get { g_value_set_object(VAL, self->parent); };
 
 /* stores the ids of our handlers of parent signals */
 private gulong *handlers = { g_new(gulong, N_HANDLERS) } destroywith g_free;
+
+/* the children of this stage */
+private GSList *children destroywith g_slist_free;
 
 /*-- every pipeline stage has a name --*/
 public gchar *name
@@ -377,7 +334,7 @@ public guint n_cols;
 // FIXME: right now these properties are writable.
 // The cols_added, rows_added emitters are also public. Perhaps we need
 // to protect against this? It only seems (somewhat) valid at GGobiData
-// This would mean including ggobi-stage-private.h in stage subclasses.
+// This would mean manually emitting signals in stage subclasses.
 property UINT n_rows 
   (nick = "nrows", blurb = "Number of rows at this stage",
    minimum = 0, maximum = INT_MAX, default_value = 0, link, export);
@@ -405,7 +362,6 @@ public GtkWidget *vartable_tree_view[GGOBI_VARIABLE_ALL_VARTYPES];
 public GtkTreeModel *vartable_tree_model; /* the root model, with all vars **/
 public GtkWidget *cluster_table; /*-- table of symbol groups from brushing --*/
 public clusteruid *clusvui;
-public Subset  subset;
 
 /* PIPELINE AND IMODE OBJECTS */
 
@@ -413,7 +369,6 @@ public Jitterd  jitter;
 public Sphere_d  sphere;
 public BrushBins  brush;
 
-protected vector_i rows_in_plot;
 public vector_i rows_under_brush;
 public vector_i rows_under_brush_prev;
 
@@ -422,7 +377,6 @@ public array_g world;
 public array_g jitdata;
 
 public gboolean missings_show_p; /*-- show/hide per datad, not per display --*/
-public gint nrows_in_plot;     /*-- how many elements of rows_in_plot to use --*/
 public gint nrows_under_brush;
 public gint nrows_under_brush_prev;
 
@@ -459,9 +413,15 @@ private GHashTable* var_name_lookup = {
   g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL) 
 } destroywith g_hash_table_destroy;
 
-public signal first NONE (UINT) void 
+private signal first NONE (UINT) void 
 col_data_changed(self, guint j) {
   GGobiVariable *var = self_get_variable(self, j);
+  if (self->parent) {
+    // this hack will disappear once we have a tform stage
+    for (guint i = 0; i < self->n_rows; i++) {
+      self->tform.vals[i][j] = self->parent->tform.vals[i][j];
+    }
+  }
   ggobi_variable_update(var);
   // FIXME: incorporate into variable_update
   limits_set_by_var(SELF(self), j, true, true, (SELF(self)->gg) ? SELF(self)->gg->lims_use_visible : true);
@@ -485,7 +445,10 @@ col_name_changed(self, guint j) {
   }
 }
 
-// FIXME: these signals can probably remain public - may want protected
+// FIXME: these signals are really only of use to stage implementations
+// Maybe we should mark them private so that there is no public wrapper.
+// It would still be possible to emit them directly, but in that case
+// they should have the ACTION flag.
 
 /**
  * cols_added:
@@ -510,6 +473,10 @@ cols_added(self, guint n) {
   arrayg_add_cols (&self->world, ncols);
   
   tour_realloc_up (self, ncols);
+  
+  // The columns are going from undefined to defined.
+  for (guint j = nprev; j < ncols; j++)
+    self_col_data_changed(self, j);
 };
 
 /**
@@ -552,7 +519,6 @@ rows_added(self, guint n) {
   gint i, nprev = self->n_rows, nrows = self->n_rows + n;
   self_set_n_rows(self, nrows);
   
-  vectori_realloc (&self->rows_in_plot, nrows);
   vectori_realloc (&self->rows_under_brush, nrows);
   vectori_realloc (&self->rows_under_brush_prev, nrows);
   
@@ -567,8 +533,11 @@ rows_added(self, guint n) {
     self->rows_under_brush_prev.els[i] = 0;
   }
   
+  for (i = 0; i < self->n_cols; i++)
+    self_col_data_changed(self, i);
+  
   clusters_set(self);
-  self_set_rows_in_plot(self);
+  //self_set_rows_in_plot(self);
 };
 
 
@@ -652,6 +621,8 @@ get_col_index_for_name(self, const gchar* name) onerror -1
  * Also sets nickname to the first two letters.
  * Emits col_name_changed() signal.
  **/
+ // FIXME: this looks broken. it should probably be virtual and then
+ // chain up the pipeline like update_col() does
 public void 
 set_col_name(self, guint j, const gchar* value) 
 {
@@ -695,6 +666,16 @@ set_col_nickname(self, guint j, const gchar* value)
 {
   GGobiVariable* vt = self_get_variable(self, j);
   ggobi_variable_set_nickname(vt, g_strdup(value));
+}
+
+/* this recurses up the tree until the root, then emits col_data_changed,
+   which will propagate to the children */
+virtual void
+update_col(self, guint j)
+{
+  if (self->parent)
+    self_update_col(self->parent, j);
+  else self_col_data_changed(self, j);
 }
 
 /**
@@ -780,7 +761,7 @@ set_raw_values(self, guint j, gdouble *values)
   for (i = 0; i < nrows; i++) {
     self_set_raw_value(self, i, j, values[i]);
   }
-  self_col_data_changed(self, j);
+  self_update_col(self, j);
 }
 
 
@@ -796,14 +777,14 @@ set_raw_values(self, guint j, gdouble *values)
  * This will set missing values if necessary and sets
  * tform value as well to keep dataset consistent.
  *
- * You need to manually emits self_col_data_changed() signal after
- * using this function if you want the data to continue down the pipeline.
+ * You need to call ggobi_stage_update_col() after
+ * using this function to inform observers (like child stages) of the changes.
  **/
 virtual void
 set_raw_value(self, guint i, guint j, gdouble value)
 {
   self_set_raw_value(self->parent, i, j, value);
-  self->tform.vals[i][j] = value;
+  //self->tform.vals[i][j] = value;
 }
 
 /**
@@ -1041,6 +1022,10 @@ get_row_for_id(self, gchar *id) {
 }
 
 
+/* Pipeline structure 
+ * ============================================================================
+ */
+
 public GGobiStage *
 get_root(self)
 {
@@ -1049,12 +1034,62 @@ get_root(self)
   return(stage);
 }
 
+public GSList *
+get_children(self)
+{
+  return g_slist_copy(selfp->children);
+}
+
+/* Find (first) descendant with given name */
+private GGobiStage *
+find_recurse(self, const gchar *name)
+{
+  GSList *tmp_children, *children = self_get_children(self);
+  GGobiStage *result = NULL;
+  for (tmp_children = children; tmp_children && !result; tmp_children = tmp_children->next) {
+    GGobiStage *child = GGOBI_STAGE(tmp_children->data);
+    if (!strcmp(child->name, name))
+      result = child;
+    else result = ggobi_stage_find(child, name);
+  }
+  g_slist_free(children);
+  return result;
+}
+
+/* Currently, this is the main mechanism for looking up specific stages from
+   the pipeline. The various GGobi GUI components need this so that they 
+   can serve as view/controllers of specific stages. The pipeline factory
+   can provide alternative implementations for the built-in stages. */
+public GGobiStage *
+find(self, const gchar *name  (check null))
+{
+  if (!strcmp(self->name, name))
+    return self;
+  return self_find_recurse(self, name);
+}
+
+protected void
+add_child(self, GGobi:Stage *child  (check null type))
+{
+  g_object_ref(G_OBJECT(child));
+  selfp->children = g_slist_append(selfp->children, child);
+}
+protected void
+remove_child(self, GGobi:Stage *child  (check null type))
+{
+  GSList *el = g_slist_find(selfp->children, child);
+  if (el) {
+    g_object_unref(G_OBJECT(el->data));
+    selfp->children = g_slist_delete_link(selfp->children, el);
+  }
+}
+
 /* Attributes
  * ============================================================================
  */
 
 /**
- * set_attr_color:
+ * set_attr:
  * @self: #GGobiStage
  * @i: row index
  * @j: attribute column
@@ -1067,15 +1102,15 @@ get_root(self)
  * Returns: true if value has changed, false otherwise
 **/
 public gboolean
-set_attr(self, guint i, guint j, guint j_now, guint j_prev, gdouble value, GGobiAttrSetMethod brush)
+set_attr(self, guint i, guint j, guint j_now, guint j_prev, gdouble value, GGobiAttrSetMethod method)
 {
   //g_debug("(%i,%i %i %i) -> %g %s", i, j, j_now, j_prev, value, brush == ATTR_SET_TRANSIENT ? "t" : "p");
-  if (brush == ATTR_SET_TRANSIENT ?
+  if (method == ATTR_SET_TRANSIENT ?
     (self_get_raw_value(self, i, j_now) == value) :
     (self_get_raw_value(self, i, j) == value))
     return false;
 
-  if (brush == ATTR_SET_PERSISTENT) {
+  if (method == ATTR_SET_PERSISTENT) {
     self_set_raw_value(self, i, j_prev, self_get_raw_value(self, i, j));
     self_set_raw_value(self, i, j, value);
   }
@@ -1206,16 +1241,6 @@ has_vars(self) {
   return self_get_n_vars(self) > 0;
 }
 
-
-
-// FIXME: go away!
-private signal first NONE (UINT) void 
-rows_in_plot_changed(self, guint n) {
-  tform_to_world(self);
-  if (self->gg)
-    displays_tailpipe (FULL, self->gg);
-}
-
 /**
  * set_rows_in_plot:
  * @self: #GGobiData object
@@ -1228,7 +1253,7 @@ rows_in_plot_changed(self, guint n) {
  * rows_in_plot = sampled && !excluded
  **/
  // FIXME: Needs to go bye-bye
-public void
+/*public void
 set_rows_in_plot(self)
 {
   guint i;
@@ -1240,7 +1265,7 @@ set_rows_in_plot(self)
       self->rows_in_plot.els[self->nrows_in_plot++] = i;
   
   self_rows_in_plot_changed(self, (guint) self->nrows_in_plot); 
-}
+}*/
 
 /**
  * attach:
@@ -1254,17 +1279,18 @@ set_rows_in_plot(self)
  * listening to the correct signals.  This function still needs a lot of
  * work.
  **/
- // FIXME: This should not exist.. we need a ggobi_context_add_data()
+ // FIXME: This should not exist.. we need a ggobi_main_add_data()
 public void 
 attach (self, ggobid *gg, gboolean cleanup)
 {
-  self->gg = gg;
-  gg->d = g_slist_append (gg->d, self);
   displayd *display = NULL;
-  GGobiData *d = GGOBI_DATA(self_get_root(self));
+  GGobiStage *d = self_get_root(self);
   gint *vars = (gint *) g_malloc(GGOBI_STAGE(self)->n_cols * sizeof(gint));
-  GGobiInputSource *source = ggobi_data_get_source(d);
+  GGobiInputSource *source = ggobi_data_get_source(GGOBI_DATA(d));
 
+  d->gg = gg;
+  gg->d = g_slist_append (gg->d, GGOBI_DATA(d));
+  
   if (gg->data_source)
     g_object_unref(gg->data_source);
   g_object_ref(source);
@@ -1278,7 +1304,7 @@ attach (self, ggobid *gg, gboolean cleanup)
 
   edgeedit_init (self->gg);
   if (ggobi_stage_get_n_edges(GGOBI_STAGE(self)))
-    vectorb_realloc (&d->edge.xed_by_brush, d->edge.n);
+    vectorb_realloc (&GGOBI_DATA(d)->edge.xed_by_brush, GGOBI_DATA(d)->edge.n);
 
   /* binning the plot window; no need to realloc these **/
   self->brush.binarray = (bin_struct **)
@@ -1307,20 +1333,20 @@ attach (self, ggobid *gg, gboolean cleanup)
   g_free(vars);
 
   for(guint j = 0; j < self_get_n_vars(self); j++) 
-    self_col_data_changed(self, j);
+    self_update_col(self, j);
 
   clusters_set(self);  /*-- find the clusters for data just read in --*/
 
   display_menu_build (gg);
   
   // Set up variable table and listen to important events
-  self_connect__col_data_changed(self, vartable_stats_set_by_var_cb, NULL);
-  self_connect__col_data_changed(self, vartable_limits_set_by_var_cb, NULL);
-  self_connect__col_name_changed(self, vartable_collab_set_by_var_cb, NULL);
-  self_connect__col_name_changed(self, vartable_collab_tform_set_by_var_cb, NULL);
+  self_connect__col_data_changed(self, self_vartable_stats_set_by_var_cb, NULL);
+  self_connect__col_data_changed(self, self_vartable_limits_set_by_var_cb, NULL);
+  self_connect__col_name_changed(self, self_vartable_collab_set_by_var_cb, NULL);
+  self_connect__col_name_changed(self, self_vartable_collab_tform_set_by_var_cb, NULL);
 
   varcircles_populate (self, gg);
-  self_connect__col_name_changed(self, varcircle_label_set_cb, NULL);
+  self_connect__col_name_changed(self, self_varcircle_label_set_cb, NULL);
 
   if (cleanup)
     varpanel_clear (self, gg);
@@ -1329,7 +1355,7 @@ attach (self, ggobid *gg, gboolean cleanup)
     varpanel_refresh (gg->current_display, gg);
   if (g_slist_index(gg->d, (gpointer)self) == 0)
     varpanel_set_sensitive (self, true, gg);
-  self_connect__col_name_changed(self, varpanel_label_set_cb, NULL);
+  self_connect__col_name_changed(self, self_varpanel_label_set_cb, NULL);
   
   if (cleanup || g_list_length(gg->displays) == 0) {
     display_free_all (gg);  /*-- destroy any existing displays --*/
@@ -1349,7 +1375,7 @@ attach (self, ggobid *gg, gboolean cleanup)
       sp_event_handlers_toggle (gg->current_splot, on, gg->pmode, gg->imode);
     }
   }
-  g_signal_emit_by_name (G_OBJECT (gg), "datad_added", self);
+  g_signal_emit_by_name (G_OBJECT (gg), "datad_added", d);
 }
 
 /**
@@ -1370,7 +1396,7 @@ set_variable (self, guint j, GGobiVariable* value)
   if (!self->parent) /* for unique name */
     self_set_col_name(self, j, NULL);
   self_update_var_name_hash(self, NULL, j);
-  ggobi_variable_connect__name_changed(value, variable_name_changed_cb, self);
+  ggobi_variable_connect__name_changed(value, self_variable_name_changed_cb, self);
 }
 
 /* made this separate from col_name_changed() because we don't want to
@@ -1383,6 +1409,49 @@ update_var_name_hash(self, const gchar *old_name, guint j)
     g_hash_table_remove(selfp->var_name_lookup, old_name);
   g_hash_table_insert(selfp->var_name_lookup, name, GINT_TO_POINTER(j));
 }
+
+/* SIGNAL HANDLERS */
+
+private void 
+variable_name_changed_cb(GGobi:Variable *var, const gchar *old_name, 
+  const gchar *raw_name, gpointer data)
+{
+  gint j = self_get_col_index_for_name(SELF(data), old_name);
+  self_update_var_name_hash(SELF(data), old_name, j);
+}
+
+private void 
+vartable_stats_set_by_var_cb(GGobi:Stage *d, guint j, gpointer user_data)
+{
+  vartable_stats_set_by_var(d, j);
+}
+private void 
+vartable_limits_set_by_var_cb(GGobi:Stage *d, guint j, gpointer user_data)
+{
+  vartable_limits_set_by_var(d, j);
+}
+private void 
+vartable_collab_set_by_var_cb(GGobi:Stage *d, guint j, gpointer user_data)
+{
+  vartable_collab_set_by_var(d, j);
+}
+private void 
+vartable_collab_tform_set_by_var_cb(GGobi:Stage *d, guint j, gpointer user_data)
+{
+  vartable_collab_tform_set_by_var(d, j);
+}
+private void
+varcircle_label_set_cb(GGobi:Stage * d, guint j, gpointer user_data)
+{
+  varcircle_label_set(d, j);
+}
+private void
+varpanel_label_set_cb(GGobi:Stage * d, guint j, gpointer user_data)
+{
+  varpanel_label_set(d, j);
+}
+
+/* signal forwarding handlers */
 
 private virtual void
 col_data_changed_handler(self, guint j)

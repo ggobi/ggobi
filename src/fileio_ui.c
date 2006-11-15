@@ -96,7 +96,7 @@ filesel_ok (GtkWidget * chooser)
   switch (action) {
   case READ_FILESET:
     {
-      gchar *mode_name;
+      gchar *combo_text, *mode_name;
       GtkWidget *combo;
       GtkFileFilter *filter;
       // FIXME: GTK+ 2.10 has a built-in entry, but it's not labeled "URL" like ours...
@@ -112,11 +112,9 @@ filesel_ok (GtkWidget * chooser)
                                          "InputTypeCombo");
       filter = gtk_file_chooser_get_filter(GTK_FILE_CHOOSER(chooser));
       //mode_name = gtk_file_filter_get_name(filter);
-      mode_name = gtk_combo_box_get_active_text(GTK_COMBO_BOX(combo));
-      if (!strcmp(mode_name, "any")) {
-        g_free(mode_name);
+      combo_text = mode_name = gtk_combo_box_get_active_text(GTK_COMBO_BOX(combo));
+      if (!strcmp(mode_name, "any"))
         mode_name = NULL;
-      }
 
       firsttime = (g_slist_length (gg->d) == 0);
       if (load_data (uri, mode_name, gg))
@@ -133,7 +131,7 @@ filesel_ok (GtkWidget * chooser)
         ggobi_full_viewmode_set (XYPLOT, DEFAULT_IMODE, gg);
       }
       
-      g_free(mode_name);
+      g_free(combo_text);
     }
     break;
   case EXTEND_FILESET:  /*-- not yet enabled --*/

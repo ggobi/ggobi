@@ -736,29 +736,29 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
   ggobid *gg)
 {
   GGobiStage *d = dsp->d;
-  gint kout, nrows = d->nrows_in_plot;
+  gint kout, nrows = d->n_rows;
   gfloat *gdata;
   gint i, j;
 
-  if (d->nrows_in_plot == 1)  /* can't do pp on no data! */
+  if (d->n_rows == 1)  /* can't do pp on no data! */
     return(false);
 
-  for (i=0; i<d->nrows_in_plot; i++)
+  for (i=0; i<d->n_rows; i++)
     for (j=0; j<dsp->t1d.nactive; j++)
       dsp->t1d_pp_op.data.vals[i][j] = 
-        d->tform.vals[d->rows_in_plot.els[i]][dsp->t1d.active_vars.els[j]];
+        d->tform.vals[i][dsp->t1d.active_vars.els[j]];
 
   for (j=0; j<dsp->t1d.nactive; j++)
     dsp->t1d_pp_op.proj_best.vals[0][j] = 
       dsp->t1d.F.vals[0][dsp->t1d.active_vars.els[j]];
 
-  for (i=0; i<d->nrows_in_plot; i++) {
+  for (i=0; i<d->n_rows; i++) {
     dsp->t1d_pp_op.pdata.vals[i][0] = 
-        (d->tform.vals[d->rows_in_plot.els[i]][dsp->t1d.active_vars.els[0]]*
+        (d->tform.vals[i][dsp->t1d.active_vars.els[0]]*
         dsp->t1d.F.vals[0][dsp->t1d.active_vars.els[0]]);
     for (j=1; j<dsp->t1d.nactive; j++)
       dsp->t1d_pp_op.pdata.vals[i][0] += 
-        (d->tform.vals[d->rows_in_plot.els[i]][dsp->t1d.active_vars.els[j]]*
+        (d->tform.vals[i][dsp->t1d.active_vars.els[j]]*
         dsp->t1d.F.vals[0][dsp->t1d.active_vars.els[j]]);
   }
 
@@ -766,7 +766,7 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
   gdata  = g_malloc (nrows*sizeof(gfloat));
   for (i=0; i<nrows; i++)
   { 
-    gdata[i] = GGOBI_STAGE_GET_ATTR_CLUSTER(d, d->rows_in_plot.els[i]);
+    gdata[i] = GGOBI_STAGE_GET_ATTR_CLUSTER(d, i);
   }
 
   switch (indxtype)

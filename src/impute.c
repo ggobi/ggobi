@@ -26,7 +26,7 @@ gboolean
 impute_fixed (ImputeType impute_type, gfloat val, gint nvars, gint * vars,
               GGobiStage * d)
 {
-  gint i, j, k, m;
+  gint i, j, k;
   gfloat maxval, minval, range, impval = 0;
   gboolean ok = true;
   GGobiVariable *var;
@@ -55,24 +55,22 @@ impute_fixed (ImputeType impute_type, gfloat val, gint nvars, gint * vars,
         jmult = (minval - impval) * .2;
       }
 
-      for (i = 0; i < d->nrows_in_plot; i++) {
-        m = d->rows_in_plot.els[i];
-        if (ggobi_stage_is_missing(d, m, j)) {
+      for (i = 0; i < d->n_rows; i++) {
+        if (ggobi_stage_is_missing(d, i, j)) {
           drand = randvalue ();
           drand = (drand - .5) * jmult;
-          ggobi_stage_set_raw_value(d, m, j, impval + (gfloat) drand);
+          ggobi_stage_set_raw_value(d, i, j, impval + (gfloat) drand);
         }
         //g_signal_emit_by_name(d, "col_data_changed", j);
       }
     }
   }
   else if (impute_type == IMP_FIXED) {
-    for (i = 0; i < d->nrows_in_plot; i++) {
-      m = d->rows_in_plot.els[i];
+    for (i = 0; i < d->n_rows; i++) {
       for (k = 0; k < nvars; k++) {
         j = vars[k];
-        if (ggobi_stage_is_missing(d, m, j)) {
-          ggobi_stage_set_raw_value(d, m, j, val);
+        if (ggobi_stage_is_missing(d, i, j)) {
+          ggobi_stage_set_raw_value(d, i, j, val);
         }
         //g_signal_emit_by_name(d, "col_data_changed", j);
       }
@@ -86,7 +84,7 @@ gboolean
 impute_mean_or_median (gint type, gint nvars, gint * vars,
                        GGobiStage * d)
 {
-  gint i, j, k, m, n;
+  gint i, j, m, n;
   gint np, nmissing;
   greal sum, val;
   greal *x;
@@ -103,8 +101,8 @@ impute_mean_or_median (gint type, gint nvars, gint * vars,
   /* If responding to brushing group ... */
   if (d->gg->impute.bgroup_p && d->nclusters > 1) {
 
-    missv = (gint *) g_malloc (d->nrows_in_plot * sizeof (gint));
-    x = (greal *) g_malloc (d->nrows_in_plot * sizeof (greal));
+    missv = (gint *) g_malloc (d->n_rows * sizeof (gint));
+    x = (greal *) g_malloc (d->n_rows * sizeof (greal));
 
     /* Loop over the number of brushing groups */
     for (n = 0; n < d->nclusters; n++) {
@@ -119,15 +117,14 @@ impute_mean_or_median (gint type, gint nvars, gint * vars,
          * And finally over the rows, including only those rows
          * which belong to the current cluster
          */
-        for (i = 0; i < d->nrows_in_plot; i++) {
-          k = d->rows_in_plot.els[i];
-          if (GGOBI_STAGE_GET_ATTR_CLUSTER(d, k) == n) {
-            if (!GGOBI_STAGE_GET_ATTR_HIDDEN(d, k)) {  /* ignore erased values */
-              if (ggobi_stage_is_missing(d, k, j))
-                missv[nmissing++] = k;
+        for (i = 0; i < d->n_rows; i++) {
+          if (GGOBI_STAGE_GET_ATTR_CLUSTER(d, i) == n) {
+            if (!GGOBI_STAGE_GET_ATTR_HIDDEN(d, i)) {  /* ignore erased values */
+              if (ggobi_stage_is_missing(d, i, j))
+                missv[nmissing++] = i;
               else {
-                sum += d->tform.vals[k][j]; /* for mean */
-                x[np++] = d->tform.vals[k][j];  /* for median */
+                sum += d->tform.vals[i][j]; /* for mean */
+                x[np++] = d->tform.vals[i][j];  /* for median */
               }
             }
           }
@@ -146,7 +143,7 @@ impute_mean_or_median (gint type, gint nvars, gint * vars,
           for (i = 0; i < nmissing; i++)
             ggobi_stage_set_raw_value(d, missv[i], j, val);
         }
-        g_signal_emit_by_name(d, "col_data_changed", j);
+        ggobi_stage_update_col(d, j);
       }
     }
     g_free (missv);
@@ -159,16 +156,15 @@ impute_mean_or_median (gint type, gint nvars, gint * vars,
     for (m = 0; m < nvars; m++) {
       j = vars[m];
       var = ggobi_stage_get_variable(d, j);
-      for (i = 0; i < d->nrows_in_plot; i++) {
-        k = d->rows_in_plot.els[i];
-        if (!GGOBI_STAGE_GET_ATTR_HIDDEN(d, k)) {  /* ignore erased values altogether */
-          if (ggobi_stage_is_missing(d, k, j)) {
-            ggobi_stage_set_raw_value(d, k, j, (type == IMP_MEAN) ? 
+      for (i = 0; i < d->n_rows; i++) {
+        if (!GGOBI_STAGE_GET_ATTR_HIDDEN(d, i)) {  /* ignore erased values altogether */
+          if (ggobi_stage_is_missing(d, i, j)) {
+            ggobi_stage_set_raw_value(d, i, j, (type == IMP_MEAN) ? 
               ggobi_variable_get_mean(var) : ggobi_variable_get_median(var));
             redraw = true;
           }
         }
-        g_signal_emit_by_name(d, "col_data_changed", j);
+        ggobi_stage_update_col(d, j);
       }
     }
   }
@@ -203,15 +199,15 @@ impute_random (GGobiStage * d, gint nvars, gint * vars)
 {
 /* Perform single random imputation */
 
-  gint i, j, k, n, m, npresent, *presv, nmissing, *missv;
+  gint i, j, n, m, npresent, *presv, nmissing, *missv;
 
   if (!ggobi_stage_has_missings(d))
     return;
 
   g_return_if_fail(GGOBI_IS_GGOBI(d->gg));
 
-  presv = (gint *) g_malloc (d->nrows_in_plot * sizeof (gint));
-  missv = (gint *) g_malloc (d->nrows_in_plot * sizeof (gint));
+  presv = (gint *) g_malloc (d->n_rows * sizeof (gint));
+  missv = (gint *) g_malloc (d->n_rows * sizeof (gint));
 
   GGOBI_STAGE_ATTR_INIT_ALL(d);  
 
@@ -229,19 +225,18 @@ impute_random (GGobiStage * d, gint nvars, gint * vars)
          * And finally over the rows, including only those rows
          * which belong to the current cluster
          */
-        for (i = 0; i < d->nrows_in_plot; i++) {
-          k = d->rows_in_plot.els[i];
-          if (GGOBI_STAGE_GET_ATTR_CLUSTER(d, k) == n) {
-            if (!GGOBI_STAGE_GET_ATTR_HIDDEN(d, k)) {  /* ignore erased values altogether */
-              if (ggobi_stage_is_missing(d, k, j))
-                missv[nmissing++] = k;
+        for (i = 0; i < d->n_rows; i++) {
+          if (GGOBI_STAGE_GET_ATTR_CLUSTER(d, i) == n) {
+            if (!GGOBI_STAGE_GET_ATTR_HIDDEN(d, i)) {  /* ignore erased values altogether */
+              if (ggobi_stage_is_missing(d, i, j))
+                missv[nmissing++] = i;
               else
-                presv[npresent++] = k;
-            }
+                presv[npresent++] = i;
+            }                                 
           }
         }
         impute_single (missv, nmissing, presv, npresent, j, d);
-        g_signal_emit_by_name(d, "col_data_changed", j);
+        ggobi_stage_update_col(d, j);
       }
     }
   }
@@ -254,17 +249,16 @@ impute_random (GGobiStage * d, gint nvars, gint * vars)
        * Build the vector of indices of present values that can be used
        * to draw from.
        */
-      for (i = 0; i < d->nrows_in_plot; i++) {
-        k = d->rows_in_plot.els[i];
-        if (!GGOBI_STAGE_GET_ATTR_HIDDEN(d, k)) {  /* ignore erased values altogether */
-          if (ggobi_stage_is_missing(d, k, j))
-            missv[nmissing++] = k;
+      for (i = 0; i < d->n_rows; i++) {
+        if (!GGOBI_STAGE_GET_ATTR_HIDDEN(d, i)) {  /* ignore erased values altogether */
+          if (ggobi_stage_is_missing(d, i, j))
+            missv[nmissing++] = i;
           else
-            presv[npresent++] = k;
+            presv[npresent++] = i;
         }
       }
       impute_single (missv, nmissing, presv, npresent, j, d);
-      g_signal_emit_by_name(d, "col_data_changed", j);
+      ggobi_stage_update_col(d, j);
     }
   }
 

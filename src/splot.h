@@ -146,10 +146,10 @@ typedef struct
    GdkSegment *segs;
    GdkSegment *whisker_segs;
    GdkSegment *ash_segs;
-   rectd      *open_rects;
-   rectd      *filled_rects;
-   arcd       *open_arcs;
-   arcd       *filled_arcs;
+   GdkRectangle      *open_rects;
+   GdkRectangle      *filled_rects;
+   GdkRectangle       *open_arcs;
+   GdkRectangle       *filled_arcs;
  } win32;
 #endif
 

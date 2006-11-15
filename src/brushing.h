@@ -68,14 +68,15 @@ typedef struct {
 } brush_coords;
 
 /* these data types seem to be missing in gdk */
+/* actually, they're not */
+/*typedef struct {
+  gint x, y;
+  gint width, height;
+} GdkRectangle;
 typedef struct {
   gint x, y;
   gint width, height;
-} arcd; 
-typedef struct {
-  gint x, y;
-  gint width, height;
-} rectd; 
+} GdkRectangle;*/ 
 
 typedef struct {
   guint n, nhidden, nshown;

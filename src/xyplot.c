@@ -94,15 +94,13 @@ xy_reproject (splotd *sp, greal **world_data, GGobiStage *d, ggobid *gg)
  * Project the data down from the ncols_used-dimensional world_data[]
  * to the 2-dimensional array planar[].
 */
-  gint i, m;
+  gint i;
   gint jx = sp->xyvars.x;
   gint jy = sp->xyvars.y;
 
-  for (i=0; i<d->nrows_in_plot; i++) {
-    m = d->rows_in_plot.els[i];
-
-    sp->planar[m].x = world_data[m][jx];  /*-- regular or missings --*/
-    sp->planar[m].y = world_data[m][jy];
+  for (i=0; i<d->n_rows; i++) {
+    sp->planar[i].x = world_data[i][jx];  /*-- regular or missings --*/
+    sp->planar[i].y = world_data[i][jy];
   }
 }
 

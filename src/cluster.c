@@ -1,4 +1,4 @@
-/* exclusion.c -- for manipulating clusters */
+/* cluster.c -- for manipulating clusters */
 /*
  * ggobi
  * Copyright (C) AT&T, Duncan Temple Lang, Dianne Cook 1999-2005
@@ -20,13 +20,9 @@
 
 //FIXME:  I think this can be considerably simplified by using
 // a hash function that takes a colour, and glyph and returns 
-// a unique identifier (maybe a double)
+// a unique identifier (maybe a double) - hadley
 //
-// This will also make it more flexibile if we introduce new
-// attribute mappings or make colour or size continuous.
-//
-// The functionality of this file could then be moved into data.gob
-// and this function deleted.
+// The new categorical grouping stage should provide this functionality - mfl
 
 void
 symbol_table_zero (GGobiStage * d)
@@ -83,6 +79,11 @@ clusters_set (GGobiStage * d)
 
   if (!GGOBI_IS_GGOBI(d->gg))
     return;
+  
+  // FIXME: In the future, we shouldn't have to do this, because
+  // well, actually this entire function won't exist in the future
+  d = ggobi_stage_find(ggobi_stage_get_root(d), GGOBI_MAIN_STAGE_SUBSET);
+  
   scheme = d->gg->activeColorScheme;
 
   nclusters = symbol_table_populate (d);
@@ -131,14 +132,14 @@ clusters_set (GGobiStage * d)
   if (nclusters > 0 && nclusters != 1) {
     for (i = 0; i < d->n_rows; i++) {
       for (n = 0; n < nclusters; n++) {
-        if (GGOBI_STAGE_GET_ATTR_SAMPLED(d, i)) {
+        //if (GGOBI_STAGE_GET_ATTR_SAMPLED(d, i)) {
           if (GGOBI_STAGE_GET_ATTR_TYPE(d, i) == d->clusv[n].glyphtype &&
               GGOBI_STAGE_GET_ATTR_SIZE(d, i) == d->clusv[n].glyphsize &&
               GGOBI_STAGE_GET_ATTR_COLOR(d, i) == d->clusv[n].color) {
             GGOBI_STAGE_SET_ATTR_CLUSTER(d, i, n);
             break;
           }
-        }
+        //}
       }
     }
   }

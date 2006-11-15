@@ -134,7 +134,7 @@ dialog_range_set (GtkWidget *w, ggobid *gg)
       
       var->lim_specified_p = min_p && max_p;
       
-      g_signal_emit_by_name(d, "col_data_changed", (guint) j);
+      ggobi_stage_update_col(d, (guint) j);
     }
   }
 
@@ -313,7 +313,7 @@ void range_unset (ggobid *gg)
     /*gtk_tree_store_set(GTK_TREE_STORE(model), &iter, 
 	  	VT_REAL_USER_MIN, 0.0, VT_REAL_USER_MAX, 0.0, -1);*/
 	  
-	  g_signal_emit_by_name(d, "col_data_changed", (guint) j);
+	  ggobi_stage_update_col(d, (guint) j);
   }
   g_free ((gchar *) cols);
 }
@@ -352,7 +352,7 @@ create_explicit_variable (GGobiStage * d, gchar * vname, NewVariableType vartype
         break;
     }
   }
-  g_signal_emit_by_name(d, "col_data_changed", jvar);
+  ggobi_stage_update_col(d, jvar);
   return jvar;
 }
 

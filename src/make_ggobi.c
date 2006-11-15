@@ -25,7 +25,8 @@
 #include "vars.h"
 #include "externs.h"
 #include "plugin.h"
-#include "ggobi-stage-filter.h"
+
+#include "ggobi-stage-subset.h"
 
 #ifdef USE_MYSQL
 #include "read_mysql.h"
@@ -33,13 +34,42 @@
 
 guint GGobiSignals[MAX_GGOBI_SIGNALS];
 
+static void
+pipeline_create_cb(GGobiPipelineFactory *factory, GGobiStage *root, ggobid *gg)
+{
+  GObject *subset, *filter;
+  
+  subset = g_object_new(GGOBI_TYPE_STAGE_SUBSET, 
+    "name", GGOBI_MAIN_STAGE_SUBSET, "parent", root, NULL);
+  
+  /* Note: there is no way to control the order of property settings with
+     g_object_new, so we have to set the filter col here so that it
+     comes after the parent */
+  ggobi_stage_filter_set_filter_column(GGOBI_STAGE_FILTER(subset), 
+    ggobi_stage_get_col_index_for_name(root, "_sampled"));
+  
+  // FIXME: 'excluded' is actually 'included' now
+  filter = g_object_new(GGOBI_TYPE_STAGE_FILTER, 
+    "name", GGOBI_MAIN_STAGE_FILTER, "parent", subset, NULL);
+  
+  ggobi_stage_filter_set_filter_column(GGOBI_STAGE_FILTER(filter),
+    ggobi_stage_get_col_index_for_name(root, "_excluded"));
+  
+  // FIXME: get rid of these lines ASAP
+  // There is absolutely no reason for the pipeline to depend on ggobid
+  GGOBI_STAGE(subset)->gg = gg;
+  GGOBI_STAGE(filter)->gg = gg;
+  
+  g_object_unref(subset);
+  g_object_unref(filter);
+}
+
 GGobiPipelineFactory *
 ggobi_create_pipeline_factory(ggobid *gg)
 {
-  GGobiPipelineFactory *factory = GGOBI_PIPELINE_FACTORY(ggobi_pipeline_factory_new());
-  ggobi_pipeline_factory_register_stage(factory, "GGobiFilter", 
-    GGOBI_TYPE_STAGE_FILTER, TRUE, NULL);
-  return(factory);
+  GObject *factory = ggobi_pipeline_factory_new();
+  g_signal_connect(factory, "build", G_CALLBACK(pipeline_create_cb), gg);
+  return(GGOBI_PIPELINE_FACTORY(factory));
 }
 
 /*-- initialize variables which don't depend on the size of the data --*/
@@ -100,12 +130,13 @@ load_data_source (GGobiInputSource *source, ggobid * gg)
   
   datasets = ggobi_data_factory_create(factory, source);
   for (; datasets; datasets = datasets->next) {
-    // Uncomment below to enable filter stage (good luck)
-    /*GGobiStage *s = ggobi_pipeline_factory_get_pipeline(gg->pipeline_factory,
-      ds->data, "GGobiFilter");
-    ggobi_stage_attach(s, gg, FALSE);*/
-    // And you want to comment this one
-    ggobi_stage_attach(datasets->data, gg, FALSE);
+    GGobiStage *dataset = GGOBI_STAGE(datasets->data);
+    ggobi_pipeline_factory_build(gg->pipeline_factory, dataset);
+    /* eventually ggobi_stage_attach will happen implicitly when the 
+       dataset is added to the main context. Right now we are sort of hacking
+       it by attaching the filter stage rather than the dataset. The _attach()
+       method knows when to go back to the root. */
+    ggobi_stage_attach(ggobi_stage_find(dataset, GGOBI_MAIN_STAGE_FILTER), gg, FALSE);
   }
   
   return (datasets);
@@ -116,7 +147,7 @@ create_data_factory (ggobid *gg, GGobiInputSource *source)
 {
   GType *factories;
   GGobiDataFactory *factory = NULL;
-  gint i, n_factories;
+  guint i, n_factories;
 
   // FIXME: it may be better to make our own registry for GGobiDataFactories
   // that holds an instance, so that we aren't always instantiating them
@@ -148,7 +179,7 @@ create_input_source(const gchar *uri, const gchar *mode)
 {
   GGobiInputSource *source = NULL;
   GType *source_types;
-  gint n_types, i;
+  guint n_types, i;
   
   xmlURIPtr parsed_uri = xmlParseURI(uri);
   if (!parsed_uri) {

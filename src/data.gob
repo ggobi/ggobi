@@ -111,7 +111,7 @@ add_attributes(self) {
 
   self_add_attribute(self, "_cluster", 0);
   self_add_attribute(self, "_sampled", (gdouble) true);
-  self_add_attribute(self, "_excluded", (gdouble) false);
+  self_add_attribute(self, "_excluded", (gdouble) true);
 
 } 
 
@@ -325,8 +325,6 @@ get_row_for_id(GGobi:Stage *self, gchar *id) {
  **/
  // FIXME: This code should be the default handler for the n_rows property.
  // Then this function would just increment that property.
- // -- We won't be able to set the property if we make it read-only in the
- //    stage. In that case, this is probably OK.
 public guint
 add_rows(self, guint n) {
   guint i, nprev = GGOBI_STAGE(self)->n_rows;
@@ -369,7 +367,7 @@ reset_rows(self, guint from, guint to) {
     gdouble default_val = self_get_col_default_value(self, j);
     for (guint i = from; i < to; i++) 
       ggobi_stage_set_raw_value(GGOBI_STAGE(self), i, j, default_val);
-    ggobi_stage_col_data_changed(GGOBI_STAGE(self), j);
+    ggobi_stage_update_col(GGOBI_STAGE(self), j);
   }
 }
 

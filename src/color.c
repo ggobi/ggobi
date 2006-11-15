@@ -317,34 +317,33 @@ datad_colors_used_get (gint * ncolors_used, gushort * colors_used,
                        GGobiStage * d, ggobid * gg)
 {
   gboolean new_color;
-  gint i, k, m, n;
+  gint i, k, n;
   gushort colorid, maxcolorid = 0;
+  GGobiStage *p = ggobi_stage_find(d, GGOBI_MAIN_STAGE_FILTER);
 
-  if (d == NULL || d->n_rows== 0)
-    /**/ return -1;
-
+  g_return_val_if_fail(d != NULL && GGOBI_IS_STAGE(d), 0);
+  
   n = 0;  /*-- *ncolors_used --*/
-  GGOBI_STAGE_ATTR_INIT_ALL(d);  
+  GGOBI_STAGE_ATTR_INIT_ALL(p);  
 
   /*
    * Loop once through d->color[], collecting the colors currently
    * in use into the colors_used[] vector.
    */
-  for (i = 0; i < d->nrows_in_plot; i++) {
-    m = d->rows_in_plot.els[i];
-    if (GGOBI_STAGE_GET_ATTR_HIDDEN(d, m)) {  /*-- if it's hidden, we don't care --*/
+  for (i = 0; i < p->n_rows; i++) {
+    if (GGOBI_STAGE_GET_ATTR_HIDDEN(p, i)) {  /*-- if it's hidden, we don't care --*/
       new_color = false;
     } else {
       new_color = true;
       for (k = 0; k < n; k++) {
-        if (colors_used[k] == GGOBI_STAGE_GET_ATTR_COLOR(d, m)) {
+        if (colors_used[k] == GGOBI_STAGE_GET_ATTR_COLOR(p, i)) {
           new_color = false;
           break;
         }
       }
     }
     if (new_color) {
-      colorid = GGOBI_STAGE_GET_ATTR_COLOR(d, m);
+      colorid = GGOBI_STAGE_GET_ATTR_COLOR(p, i);
       colors_used[n] = colorid;
       maxcolorid = MAX (colorid, maxcolorid);
       (n)++;
@@ -365,10 +364,10 @@ datad_colors_used_get (gint * ncolors_used, gushort * colors_used,
     }
   }
 
-  /* insurance -- eg if using mono drawing on a color screen */
+  /* even if every row is filtered, this will still give a color */
   if (n == 0) {
     n = 1;
-    colors_used[0] = GGOBI_STAGE_GET_ATTR_COLOR(d, 0);
+    colors_used[0] = GGOBI_STAGE_GET_ATTR_COLOR(ggobi_stage_get_root(d), 0);
   }
 
   *ncolors_used = n;

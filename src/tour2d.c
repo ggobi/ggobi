@@ -274,10 +274,10 @@ tour2d_all_vars (displayd *dsp)
 
     if (dsp->t2d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t2d_window)) {
       free_optimize0_p(&dsp->t2d_pp_op);
-      alloc_optimize0_p(&dsp->t2d_pp_op, d->nrows_in_plot, dsp->t2d.nactive, 
+      alloc_optimize0_p(&dsp->t2d_pp_op, d->n_rows, dsp->t2d.nactive, 
         2);
       free_pp(&dsp->t2d_pp_param);
-      alloc_pp(&dsp->t2d_pp_param, d->nrows_in_plot, dsp->t2d.nactive, 2);
+      alloc_pp(&dsp->t2d_pp_param, d->n_rows, dsp->t2d.nactive, 2);
       t2d_pp_reinit(dsp, gg);
     }  
   //}
@@ -453,9 +453,9 @@ tour2d_active_var_set (gint jvar, GGobiStage *d, displayd *dsp, ggobid *gg)
      and re-initialize as necessary */
   if (dsp->t2d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t2d_window)) {
     free_optimize0_p(&dsp->t2d_pp_op);
-    alloc_optimize0_p(&dsp->t2d_pp_op, d->nrows_in_plot, dsp->t2d.nactive, 2);
+    alloc_optimize0_p(&dsp->t2d_pp_op, d->n_rows, dsp->t2d.nactive, 2);
     free_pp(&dsp->t2d_pp_param);
-    alloc_pp(&dsp->t2d_pp_param, d->nrows_in_plot, dsp->t2d.nactive, 2);
+    alloc_pp(&dsp->t2d_pp_param, d->n_rows, dsp->t2d.nactive, 2);
     t2d_pp_reinit(dsp, gg);
   }
 }
@@ -510,7 +510,7 @@ tour2d_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse,
 
 void
 tour2d_projdata(splotd *sp, greal **world_data, GGobiStage *d, ggobid *gg) {
-  gint i, j, m;
+  gint j, m;
   displayd *dsp = (displayd *) sp->displayptr;
   greal precis = (greal) PRECISION1;
   greal tmpf, maxx, maxy;
@@ -523,22 +523,21 @@ tour2d_projdata(splotd *sp, greal **world_data, GGobiStage *d, ggobid *gg) {
   tmpf = precis/sp->tour2d.maxscreen;
   maxx = sp->tour2d.maxscreen;
   maxy = sp->tour2d.maxscreen;
-  for (m=0; m<d->nrows_in_plot; m++)
+  for (m=0; m<d->n_rows; m++)
   {
-    i = d->rows_in_plot.els[m];
-    sp->planar[i].x = 0;
-    sp->planar[i].y = 0;
+    sp->planar[m].x = 0;
+    sp->planar[m].y = 0;
     for (j=0; j<d->n_cols; j++)
     {
-      sp->planar[i].x += (greal)(dsp->t2d.F.vals[0][j]*world_data[i][j]);
-      sp->planar[i].y += (greal)(dsp->t2d.F.vals[1][j]*world_data[i][j]);
+      sp->planar[m].x += (greal)(dsp->t2d.F.vals[0][j]*world_data[m][j]);
+      sp->planar[m].y += (greal)(dsp->t2d.F.vals[1][j]*world_data[m][j]);
     }
-    sp->planar[i].x *= tmpf;
-    sp->planar[i].y *= tmpf;
-    if (fabs(sp->planar[i].x) > maxx)
-      maxx = fabs(sp->planar[i].x);
-    if (fabs(sp->planar[i].y) > maxy)
-      maxy = fabs(sp->planar[i].y);
+    sp->planar[m].x *= tmpf;
+    sp->planar[m].y *= tmpf;
+    if (fabs(sp->planar[m].x) > maxx)
+      maxx = fabs(sp->planar[m].x);
+    if (fabs(sp->planar[m].y) > maxy)
+      maxy = fabs(sp->planar[m].y);
   }
 
   if ((maxx > precis) || (maxy > precis)) {

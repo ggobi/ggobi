@@ -32,8 +32,8 @@ find_nearest_point (icoords * lcursor_pos, splotd * splot, GGobiStage * d,
   near = 20 * 20;               /* If nothing is close, don't show any label */
 
   GGOBI_STAGE_ATTR_INIT_ALL(d);  
-  for (i = 0; i < d->nrows_in_plot; i++) {
-    if (!GGOBI_STAGE_GET_ATTR_HIDDEN(d, k = d->rows_in_plot.els[i])) {
+  for (i = 0; i < d->n_rows; i++) {
+    if (!GGOBI_STAGE_GET_ATTR_HIDDEN(d, k = i)) {
       xdist = splot->screen[k].x - lcursor_pos->x;
       ydist = splot->screen[k].y - lcursor_pos->y;
       sqdist = xdist * xdist + ydist * ydist;
@@ -113,7 +113,7 @@ sticky_id_toggle (GGobiStage * d, ggobid * gg)
 void
 identify_link_by_id (gint k, GGobiStage * source_d, ggobid * gg)
 {
-  GGobiStage *d;
+  GGobiStage *d, *source_root = ggobi_stage_get_root(source_d);
   GSList *l;
   gboolean inrange;
 
@@ -122,7 +122,7 @@ identify_link_by_id (gint k, GGobiStage * source_d, ggobid * gg)
   if (k < 0) {  /*-- handle this case separately --*/
     for (l = gg->d; l; l = l->next) {
       d = (GGobiStage *) l->data;
-      if (d != source_d)
+      if (d != source_root)
         d->nearest_point_prev = d->nearest_point = -1;
     }
     return;
@@ -132,7 +132,7 @@ identify_link_by_id (gint k, GGobiStage * source_d, ggobid * gg)
     d = (GGobiStage *) l->data;
     inrange = false;
 
-    if (d == source_d)
+    if (d == source_root)
       continue;        /*-- skip the originating datad --*/
 
     guint id = ggobi_stage_get_row_for_id(d, GGOBI_DATA(source_d)->rowIds[k]);
@@ -166,7 +166,7 @@ sticky_id_link_by_id (gint whattodo, gint k, GGobiStage * source_d,
 
   for (l = gg->d; l; l = l->next) {
     d = (GGobiStage *) l->data;
-    if (d == source_d)
+    if (d == ggobi_stage_get_root(source_d))
       continue;        /*-- skip the originating datad --*/
 
     i = ggobi_stage_get_row_for_id(d, GGOBI_DATA(source_d)->rowIds[k]);

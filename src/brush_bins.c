@@ -27,7 +27,7 @@
 void
 assign_points_to_bins (GGobiStage * d, splotd * sp, ggobid * gg)
 {
-  gint i, k, ih, iv;
+  gint k, ih, iv;
 
   /*
    * Reset bin counts to zero -- but don't bother to free any space.
@@ -36,12 +36,10 @@ assign_points_to_bins (GGobiStage * d, splotd * sp, ggobid * gg)
     for (iv = 0; iv < d->brush.nbins; iv++)
       d->brush.binarray[ih][iv].nels = 0;
 
-  for (k = 0; k < d->nrows_in_plot; k++) {
-    i = d->rows_in_plot.els[k];
-
-    if (sp->screen[i].x >= 0 && sp->screen[i].x <= sp->max.x &&
-        sp->screen[i].y >= 0 && sp->screen[i].y <= sp->max.y) {
-      if (point_in_which_bin (sp->screen[i].x, sp->screen[i].y,
+  for (k = 0; k < d->n_rows; k++) {
+    if (sp->screen[k].x >= 0 && sp->screen[k].x <= sp->max.x &&
+        sp->screen[k].y >= 0 && sp->screen[k].y <= sp->max.y) {
+      if (point_in_which_bin (sp->screen[k].x, sp->screen[k].y,
                               &ih, &iv, d, sp)) {
         /* See whether it's necessary to allocate more space for elements */
         if (d->brush.binarray[ih][iv].nels ==

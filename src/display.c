@@ -368,7 +368,7 @@ display_delete_cb (GtkWidget * w, GdkEvent * event, displayd * display)
 
 
 /*XXX consolidate this and display_alloc_init(), i.e. remove the latter! 
- This display class is really a virtual class.
+ This display class is really an abstract class.
 */
 displayd *
 ggobi_display_new (gboolean missing_p, GGobiStage * d, ggobid * gg)
@@ -386,7 +386,8 @@ display_set_values (displayd * display, GGobiStage * d, ggobid * gg)
   display->options = DefaultDisplayOptions;
 
   display->ggobi = gg;
-  display->d = d;
+  /* the data used by the display is that which passes the filters */
+  display->d = ggobi_stage_find(d, GGOBI_MAIN_STAGE_FILTER);
 }
 
 displayd *

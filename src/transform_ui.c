@@ -175,7 +175,7 @@ static void tform_reset_cb (GtkWidget *w, ggobid *gg)
     transform2_apply (j, d, gg);
 
     g_signal_emit_by_name(d, "col_name_changed", j);
-    g_signal_emit_by_name(d, "col_data_changed", j);
+    ggobi_stage_update_col(d, j);
   }
 }
 

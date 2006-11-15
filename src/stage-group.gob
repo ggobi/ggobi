@@ -1,0 +1,178 @@
+%h{
+#include "ggobi-stage.h"
+%}
+
+/* "Groups" the rows according to a list of factors. The group assignments
+   are communicated as columns appended on the data matrix. Each column
+   crosses another factor with the factors of the previous column. For example,
+   for factors A, B, and C, the grouping columns would be A, AxB, and AxBxC.
+   The counts for each column are easily obtained from the GGobiVariable.
+*/
+class GGobi:Stage:Group from GGobi:Stage {
+  
+private GList *factors destroywith g_list_free;
+private gdouble *groups destroywith g_free;
+
+public GObject *
+new(GGobiStage *parent)
+{
+  GObject *obj = (GObject *)GET_NEW_VARG("parent", parent, NULL);
+  return G_OBJECT(obj);
+}
+
+public GList *
+get_factors(self)
+{
+  return g_list_copy(selfp->factors);
+}
+public void
+insert_factor(self, const gchar *factor  (check null), gint pos)
+{
+  guint index = ggobi_stage_get_col_index_for_name(GGOBI_STAGE(self), factor);
+  g_return_if_fail(index >= 0);
+  selfp->factors = g_list_insert(selfp->factors, g_strdup(factor), pos);
+  self_groups_dirty(self);
+  ggobi_stage_cols_added(GGOBI_STAGE(self), 1);
+  ggobi_variable_set_vartype(ggobi_stage_get_variable(GGOBI_STAGE(self), 
+    GGOBI_STAGE(self)->n_cols - 1), GGOBI_VARIABLE_CATEGORICAL);
+}
+public void
+remove_factor(self, const gchar *factor)
+{
+  GList *element = g_list_find_custom(selfp->factors, factor, (GCompareFunc)strcmp);
+  if (element) {
+    g_free(element->data);
+    selfp->factors = g_list_delete_link(selfp->factors, element);
+    self_groups_dirty(self);
+    ggobi_stage_col_deleted(GGOBI_STAGE(self), GGOBI_STAGE(self)->n_cols - 1);
+  }
+}
+
+private void
+groups_dirty(self)
+{
+  if (selfp->groups) {
+    g_free(selfp->groups);
+    selfp->groups = NULL;
+  }
+}
+
+/**
+ * set_missing:
+ * @self: GGobiStage object
+ * @i: row index
+ * @j: column index
+ **/
+override (GGobi:Stage) void
+set_missing(GGobi:Stage *self  (check null type), guint i  (check < N_ROWS), 
+  guint j (check < N_COLS))
+{
+  // FIXME: what happens when a missing is set on a group column?
+  PARENT_HANDLER(self, i, j);
+}
+
+/**
+ * is_missing:
+ * @self: GGobiStage object
+ * @i: row index
+ * @j: column index
+ *
+ * Returns: if value at specified position is missing or not
+ **/
+override (GGobi:Stage) gboolean
+is_missing(GGobi:Stage *self  (check null type), guint i  (check < N_ROWS), 
+  guint j (check < N_COLS)) 
+{
+  /* Negative values indicate missings */
+  if (j >= self->parent->n_cols)
+    return(ggobi_stage_get_raw_value(self, i, j) < 0);
+  return(PARENT_HANDLER(self, i, j));  
+}
+
+override (GGobi:Stage) gchar*
+get_row_id(GGobi:Stage *self  (check null type), guint i  (check < N_ROWS)) {
+  return(PARENT_HANDLER(self, i));  
+}
+
+override (GGobi:Stage) gint
+get_row_for_id(GGobi:Stage *self  (check null type), gchar *id  (check null)) {
+  gint row = PARENT_HANDLER(self, id);
+  return(row);
+}
+
+/**
+ * set_raw_value:
+ * @self: GGobiStage object
+ * @i: row index
+ * @j: column index
+ * @values: vector of new values, of length self->n_rows
+ **/
+override (GGobi:Stage) void
+set_raw_value(GGobi:Stage *self, guint i  (check < N_ROWS), guint j  (check < N_COLS), gdouble value)
+{
+  if (j >= self->parent->n_cols)
+    self_set_levels_for_group(SELF(self), i, j - self->parent->n_cols, value);
+  else PARENT_HANDLER(self, i, j, value);
+}
+
+/** 
+ * get_raw_value:
+ * @self: #GGobiStage
+ * @i: row index
+ * @j: column index
+ **/
+override (GGobi:Stage) gdouble
+get_raw_value(GGobi:Stage *self, guint i  (check < N_ROWS), guint j  (check < N_COLS))
+{
+  Self *group = SELF(self);
+  if (j >= self->parent->n_cols) {
+    if (!group->_priv->groups)
+      self_find_groups(group);
+    return group->_priv->groups[self->n_rows * (j - self->parent->n_cols) + i];
+  }
+  return PARENT_HANDLER(self, i, j);
+}
+
+private void
+set_levels_for_group(self, guint i, guint j, gdouble value)
+{
+  GList *factors;
+  GGobiStage *stage = GGOBI_STAGE(self);
+  if (!selfp->groups)
+    self_find_groups(self);
+  for (factors = g_list_last(selfp->factors); factors; factors = factors->prev, j--) {
+    gint col = ggobi_stage_get_col_index_for_name(stage, factors->data);
+    GGobiVariable *var = ggobi_stage_get_variable(stage, col);
+    guint nlevels = ggobi_variable_get_n_levels(var);
+    gint *values = ggobi_variable_get_level_values(var);
+    /* the % operator doesn't work on doubles */
+    gdouble q = selfp->groups[j * stage->n_rows + i] / nlevels;
+    ggobi_stage_set_raw_value(stage, i, col, values[(guint)(q - (guint)q) * nlevels]);
+    g_free(values);
+  }
+}
+
+private void
+find_groups(self)
+{
+  guint j;
+  GList *factors;
+  GGobiStage *stage = GGOBI_STAGE(self);
+  
+  g_return_if_fail(selfp->groups == NULL);
+  
+  selfp->groups = g_new(gdouble, g_list_length(selfp->factors) * GGOBI_STAGE(self)->n_rows);
+  for (j = 0, factors = selfp->factors; factors; factors = factors->next, j++) {
+    gint col = ggobi_stage_get_col_index_for_name(stage, factors->data);
+    GGobiVariable *var = ggobi_stage_get_variable(stage, col);
+    guint nlevels = ggobi_variable_get_n_levels(var);
+    guint i;
+    for (i = 0; i < stage->n_rows; i++)
+      selfp->groups[j * stage->n_rows + i] = 
+        (j > 0 ? selfp->groups[(j-1) * stage->n_rows + i] : 0) * nlevels +
+        ggobi_variable_get_level_index(var, ggobi_stage_get_raw_value(stage, i, col));
+  }
+}
+
+}
+

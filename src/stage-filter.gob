@@ -1,6 +1,7 @@
 /*
- 
-  
+ A simple filter based on a specified boolean column in the data matrix.
+ For custom filters, just insert a stage before this one that modifies
+ the filter column.
 */
 
 %h{
@@ -9,27 +10,74 @@
 
 class GGobi:Stage:Filter from GGobi:Stage {
 
-  /* filtered index ==> raw index */
-  protected guint *included_rows;
-  /* raw index ==> filtered index */
-  protected gint *included_rows_rev;
-  /* whether a (raw) row passes the filter */
-  private gboolean *included;
-
-  // FIXME: we want to override col_data_changed and update when certain
-  // columns change.
-  override (GGobi:Stage) void
-  rows_in_plot_changed(GGobi:Stage *stage, guint n)
-  {
-    ggobi_stage_filter_update_included(SELF(stage));
+/* A boolean column that specifies the filter */
+private gint filter_column;
+property INT filter_column  
+  (nick = "fc", blurb = "The index of a boolean column that specifies the included rows",
+   flags = CONSTRUCT, minimum = -1, maximum = INT_MAX, default_value = -1, export)
+  set { 
+    gint filter_column = g_value_get_int(VAL);
+    g_return_if_fail(filter_column >= -1 && filter_column < (gint)GGOBI_STAGE(self)->n_cols);
+    selfp->filter_column = filter_column;
+    self_update(self);
   }
+  get { g_value_set_int(VAL, selfp->filter_column); };
 
-  public GObject *
-  new(GGobiStage *parent)
-  {
-    return G_OBJECT(GET_NEW_VARG("parent", parent, NULL));
-  }
-  
+/* filtered index ==> raw index */
+protected guint *included_rows destroywith g_free;
+/* raw index ==> filtered index */
+protected gint *included_rows_rev destroywith g_free;
+/* whether a (raw) row passes the filter */
+private gboolean *included destroywith g_free;
+private guint included_len;
+
+override (GGobi:Stage) void
+col_data_changed(GGobi:Stage *stage, guint j)
+{
+  if (SELF(stage)->_priv->filter_column == j)
+    self_update(GGOBI_STAGE_FILTER(stage));
+  PARENT_HANDLER(stage, j);
+}
+
+override (GGobi:Stage) void
+rows_added_handler(GGobi:Stage *stage, guint n)
+{
+  self_update(SELF(stage));
+}
+override (GGobi:Stage) void
+rows_deleted_handler(GGobi:Stage *stage, guint *rows, guint n)
+{
+  self_update(SELF(stage));
+}
+
+public GObject *
+new(GGobiStage *parent)
+{
+  GObject *obj = G_OBJECT(GET_NEW_VARG("parent", parent, NULL));
+  return obj;
+}
+
+public gboolean
+is_included(self, guint i)
+{
+  return selfp->included[i];
+}
+
+/* for convenience */
+public void
+set_included(self, guint i, gboolean val)
+{
+  ggobi_stage_set_raw_value(GGOBI_STAGE(self), i, selfp->filter_column, (gboolean)val);
+}
+
+/* for extra convenience */
+public void
+set_included_all(self, gboolean value) {
+  gint i;
+  for (i = 0; i < GGOBI_STAGE(self)->n_rows; i++)
+    self_set_included(self, i, value);
+}
+
 /**
  * set_missing:
  * @self: GGobiStage object
@@ -37,7 +85,7 @@ class GGobi:Stage:Filter from GGobi:Stage {
  * @j: column index
  **/
 override (GGobi:Stage) void
-set_missing(GGobi:Stage *self (check null type), guint i (check < N_ROWS), 
+set_missing(GGobi:Stage *self (check null type), guint i  (check < N_ROWS), 
   guint j (check < N_COLS))
 {
   PARENT_HANDLER(self, SELF(self)->included_rows[i], j);
@@ -52,19 +100,19 @@ set_missing(GGobi:Stage *self (check null type), guint i (check < N_ROWS),
  * Returns: if value at specified position is missing or not
  **/
 override (GGobi:Stage) gboolean
-is_missing(GGobi:Stage *self (check null type), guint i (check < N_ROWS), 
+is_missing(GGobi:Stage *self (check null type), guint i  (check < N_ROWS), 
   guint j (check < N_COLS)) 
 {
   return(PARENT_HANDLER(self, SELF(self)->included_rows[i], j));  
 }
 
 override (GGobi:Stage) gchar*
-get_row_id(GGobi:Stage *self (check null type), guint i (check < N_ROWS)) {
+get_row_id(GGobi:Stage *self (check null type), guint i  (check < N_ROWS)) {
   return(PARENT_HANDLER(self, SELF(self)->included_rows[i]));  
 }
 
 override (GGobi:Stage) gint
-get_row_for_id(GGobi:Stage *self (check null type), gchar *id (check null)) {
+get_row_for_id(GGobi:Stage *self (check null type), gchar *id  (check null)) {
   gint row = PARENT_HANDLER(self, id);
   return(SELF(self)->included_rows_rev[row]);
 }
@@ -77,7 +125,7 @@ get_row_for_id(GGobi:Stage *self (check null type), gchar *id (check null)) {
  * @values: vector of new values, of length self->n_rows
  **/
 override (GGobi:Stage) void
-set_raw_value(GGobi:Stage *self, guint i (check < N_ROWS), guint j (check < N_COLS), gdouble value)
+set_raw_value(GGobi:Stage *self, guint i  (check < N_ROWS), guint j  (check < N_COLS), gdouble value)
 {
   PARENT_HANDLER(self, SELF(self)->included_rows[i], j, value);
 }
@@ -89,50 +137,50 @@ set_raw_value(GGobi:Stage *self, guint i (check < N_ROWS), guint j (check < N_CO
  * @j: column index
  **/
 override (GGobi:Stage) gdouble
-get_raw_value(GGobi:Stage *self, guint i (check < N_ROWS), guint j (check < N_COLS))
+get_raw_value(GGobi:Stage *self, guint i  (check < N_ROWS), guint j  (check < N_COLS))
 {
   return PARENT_HANDLER(self, SELF(self)->included_rows[i], j);
 }
 
 /** 
- * calc_included:
+ * included:
  * @self: #GGobiStageFilter object
  *
- * Combine the values in two arrays:
- *   excluded[] (which comes from the exclusion panel or from linking)
- *   sampled[] (which come from the subset panel)
- * to determine which cases should be plotted.
  **/
- /* something like this function could probably become virtual eventually,
-  allowing subclasses to redefine the filter rules */
-private gboolean *
-calc_included(self)
+virtual gboolean *
+included(self)
 {
-  gboolean *included = g_new(gboolean, GGOBI_STAGE(self)->parent->n_rows);
-  GGOBI_STAGE_ATTR_INIT_ALL(GGOBI_STAGE(self));
-  for (guint i = 0; i < GGOBI_STAGE(self)->parent->n_rows; i++)
-    included[i] = GGOBI_STAGE_GET_ATTR_VISIBLE(self, i);
+  guint parent_nrows = GGOBI_STAGE(self)->parent ? GGOBI_STAGE(self)->parent->n_rows : 0;
+  gboolean *included = g_new(gboolean, parent_nrows);
+  /*GGOBI_STAGE_ATTR_INIT_ALL(GGOBI_STAGE(self));*/
+  for (guint i = 0; i < parent_nrows; i++)
+    included[i] = selfp->filter_column == -1 ? TRUE : 
+      (gboolean) ggobi_stage_get_raw_value(GGOBI_STAGE(self)->parent, 
+        i, selfp->filter_column);
+    /*included[i] = GGOBI_STAGE_GET_ATTR_VISIBLE(self, i);*/
+  
   return(included);
 }
 
 /**
- * update_included:
+ * update:
  * @self: #GGobiStageFilter object
  *
  **/
-private void
-update_included(self)
+public void
+update(self)
 {
+  guint parent_nrows = GGOBI_STAGE(self)->parent ? GGOBI_STAGE(self)->parent->n_rows : 0;
   guint deleted_rows[GGOBI_STAGE(self)->n_rows];
-  guint added_rows[GGOBI_STAGE(self)->parent->n_rows];
+  guint added_rows[parent_nrows];
   guint n_included, n_both = 0, n_deleted = 0, n_added = 0;
-  guint *included_rows = g_new(guint, GGOBI_STAGE(self)->parent->n_rows);
-  gint *included_rows_rev = g_new(gint, GGOBI_STAGE(self)->parent->n_rows);
-  gboolean *included = self_calc_included(self);
+  guint *included_rows = g_new(guint, parent_nrows);
+  gint *included_rows_rev = g_new(gint, parent_nrows);
+  gboolean *included = self_included(self);
   
-  for (guint i = 0; i < GGOBI_STAGE(self)->parent->n_rows; i++) {
+  for (guint i = 0; i < parent_nrows; i++) {
     if (included[i]) {
-      if (!selfp->included[i])
+      if (i >= selfp->included_len || !selfp->included[i])
         added_rows[n_added++] = i;
       else {
         included_rows_rev[i] = n_both;
@@ -140,7 +188,7 @@ update_included(self)
       }
     } else {
       included_rows_rev[i] = -1;
-      if (selfp->included[i])
+      if (i < selfp->included_len && selfp->included[i])
         deleted_rows[n_deleted++] = i;
     }
   }
@@ -157,6 +205,7 @@ update_included(self)
   if (n_deleted)
     ggobi_stage_rows_deleted(GGOBI_STAGE(self), deleted_rows, n_deleted);
   
+  selfp->included_len = parent_nrows;
   selfp->included = included;
   self->included_rows = included_rows;
   self->included_rows_rev = included_rows_rev;

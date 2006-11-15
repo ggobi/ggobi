@@ -26,10 +26,11 @@
 static void
 reset_all_cb (GtkButton * button, ggobid * gg)
 {
-  GSList *l;
+  //GSList *l;
   GGobiStage *d;
-  for (l = gg->d; l; l = l->next) {
-    d = (GGobiStage *) l->data;
+  /* do we really want reset over all the datasets?? - mfl */
+  //for (l = gg->d; l; l = l->next) {
+    d = (GGobiStage *) gg->current_display->d;
 
     while (g_slist_length (d->movepts_history) > 0) {
       /*-- yes, twice -- once for x motion, once for y motion --*/
@@ -37,7 +38,7 @@ reset_all_cb (GtkButton * button, ggobid * gg)
       movepts_history_delete_last (d, gg);
     }
     tform_to_world(d);
-  }
+  //}
 
   displays_tailpipe (FULL, gg);
 }
