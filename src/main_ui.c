@@ -156,7 +156,7 @@ gg_write_to_statusbar (gchar * message, ggobid * gg)
     gtk_statusbar_push (GTK_STATUSBAR (statusbar), 0, message);
   else {
     /*-- by default, describe the current datad --*/
-    GGobiStage *d = datad_get_from_notebook (gg->varpanel_ui.notebook, gg);
+    GGobiStage *d = ggobi_stage_get_root(datad_get_from_notebook (gg->varpanel_ui.notebook, gg));
     if (d) {
       gchar *display_name = ggobi_input_source_get_display_name(gg->data_source);
       gchar *msg = g_strdup_printf ("%s: %d x %d  (%s)",

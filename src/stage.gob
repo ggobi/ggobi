@@ -1353,7 +1353,7 @@ attach (self, ggobid *gg, gboolean cleanup)
   varpanel_populate (self, gg);   
   if (gg->current_display != NULL)
     varpanel_refresh (gg->current_display, gg);
-  if (g_slist_index(gg->d, (gpointer)self) == 0)
+  if (g_slist_index(gg->d, d) == 0)
     varpanel_set_sensitive (self, true, gg);
   self_connect__col_name_changed(self, self_varpanel_label_set_cb, NULL);
   

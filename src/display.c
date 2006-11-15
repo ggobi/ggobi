@@ -716,18 +716,18 @@ computeTitle (gboolean current_p, displayd * display, ggobid * gg)
   gint n;
   gchar *title = NULL, *description;
   const char *tmp = NULL;
+  GGobiStage *d = ggobi_stage_get_root(display->d);
+  GGobiStage *e = display->e ? ggobi_stage_get_root(display->e) : NULL;
 
   if (GGOBI_IS_EXTENDED_DISPLAY (display)) {
     tmp = ggobi_display_title_label (display);
   }
 
-  if (display->d->name != NULL) {
-    if (display->e != NULL && display->e->name != NULL)
-      description = g_strdup_printf ("%s/%s",
-                                     display->d->name, 
-                                     display->e->name);
+  if (d->name != NULL) {
+    if (e != NULL && e->name != NULL)
+      description = g_strdup_printf ("%s/%s", d->name, e->name);
     else
-      description = g_strdup (display->d->name);
+      description = g_strdup (d->name);
   }
   else {
     description = ggobi_input_source_get_display_name(gg->data_source);
