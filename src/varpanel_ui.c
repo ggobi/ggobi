@@ -465,7 +465,8 @@ varpanel_widgets_add (gint nc, GGobiStage * d, ggobid * gg)
    */
   if (n == 0) {
     gtk_notebook_append_page (GTK_NOTEBOOK (gg->varpanel_ui.notebook),
-                              d->varpanel_ui.hpane, gtk_label_new (d->name));
+                              d->varpanel_ui.hpane, 
+                              gtk_label_new (ggobi_stage_get_root(d)->name));
     gtk_notebook_set_show_tabs (GTK_NOTEBOOK (gg->varpanel_ui.notebook),
                                 nd > 1);
   }
@@ -603,7 +604,8 @@ varpanel_populate (GGobiStage * d, ggobid * gg)
   /*-- only add a tab if there are variables --*/
   if (ggobi_stage_has_vars(d)) {
     gtk_notebook_append_page (GTK_NOTEBOOK (gg->varpanel_ui.notebook),
-                              d->varpanel_ui.hpane, gtk_label_new (d->name));
+                              d->varpanel_ui.hpane, 
+                              gtk_label_new (ggobi_stage_get_root(d)->name));
   }
 
   /* Check if we have been here before and already created the box, etc.. */

@@ -190,7 +190,7 @@ buildExtendedDisplayMenu (ggobid * gg, gint nd, GGobiStage * d0)
 
         /*-- add an item for each datad with variables --*/
         if (ggobi_stage_has_vars(d)) {
-          lbl = d->name;
+          lbl = ggobi_stage_get_name(d);
           cbdata = (ExtendedDisplayCreateData *)
             g_malloc (sizeof (ExtendedDisplayCreateData));
           cbdata->d = d;
