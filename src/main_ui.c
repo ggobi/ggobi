@@ -158,7 +158,8 @@ gg_write_to_statusbar (gchar * message, ggobid * gg)
     /*-- by default, describe the current datad --*/
     GGobiStage *d = ggobi_stage_get_root(datad_get_from_notebook (gg->varpanel_ui.notebook, gg));
     if (d) {
-      gchar *display_name = ggobi_input_source_get_display_name(gg->data_source);
+      gchar *display_name = ggobi_input_source_get_display_name(
+        ggobi_data_get_source(GGOBI_DATA(d)));
       gchar *msg = g_strdup_printf ("%s: %d x %d  (%s)",
                                     d->name, d->n_rows, d->n_cols,
                                     display_name);

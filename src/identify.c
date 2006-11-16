@@ -129,13 +129,19 @@ identify_link_by_id (gint k, GGobiStage * source_d, ggobid * gg)
   }
 
   for (l = gg->d; l; l = l->next) {
+    guint id;
+    gchar *row_id;
+    
     d = (GGobiStage *) l->data;
     inrange = false;
 
     if (d == source_root)
       continue;        /*-- skip the originating datad --*/
-
-    guint id = ggobi_stage_get_row_for_id(d, GGOBI_DATA(source_d)->rowIds[k]);
+    
+    row_id = ggobi_stage_get_row_id(source_d, k);
+    id = ggobi_stage_get_row_for_id(d, row_id);
+    g_free(row_id);
+    
     if (id != -1) {
       inrange = true;
       d->nearest_point_prev = d->nearest_point;
@@ -156,21 +162,25 @@ sticky_id_link_by_id (gint whattodo, gint k, GGobiStage * source_d,
 {
   GGobiStage *d;
   GSList *l;
-  gint i, n, id = -1;
+  gint i, n/*, id = -1*/;
   gboolean i_in_list = false;
   GSList *ll;
   gpointer ptr = NULL;
 
   /*-- k is the row number in source_d --*/
-  id = ggobi_stage_get_row_for_id(source_d, GGOBI_DATA(source_d)->rowIds[k]);
+  /*id = ggobi_stage_get_row_for_id(source_d, GGOBI_DATA(source_d)->rowIds[k]);*/
 
   for (l = gg->d; l; l = l->next) {
+    gchar *id;
+    
     d = (GGobiStage *) l->data;
     if (d == ggobi_stage_get_root(source_d))
       continue;        /*-- skip the originating datad --*/
 
-    i = ggobi_stage_get_row_for_id(d, GGOBI_DATA(source_d)->rowIds[k]);
-
+    id = ggobi_stage_get_row_id(source_d, k);
+    i = ggobi_stage_get_row_for_id(d, id);
+    g_free(id);
+    
     if (i < 0)          /*-- then no cases in d have this id --*/
       continue;
 
@@ -230,7 +240,6 @@ identify_label_fetch (gint k, cpaneld * cpanel, GGobiStage * d, ggobid * gg)
       gchar *colname = NULL, *value = NULL;
       
       vars = get_selections_from_tree_view (tree_view, &nvars);
-
       for (j = 0; j < nvars; j++) {
         if (vars[j] < 0) continue;
 
@@ -238,6 +247,8 @@ identify_label_fetch (gint k, cpaneld * cpanel, GGobiStage * d, ggobid * gg)
         colname = ggobi_stage_get_transformed_col_name(d, vars[j]);
         lbl = g_strdup_printf ("%s=%s", colname, value);
         labels = g_list_append (labels, lbl);
+        g_free(colname);
+        g_free(value);
 
       }
       g_free (vars);
@@ -253,9 +264,11 @@ identify_label_fetch (gint k, cpaneld * cpanel, GGobiStage * d, ggobid * gg)
   }
 
   if (id_display_type & ID_RECORD_LABEL) {
-    if (id_display_type & ~ID_RECORD_LABEL)
-      lbl = g_strdup_printf ("id=%s", ggobi_stage_get_row_id(d, (guint) k));
-    else
+    if (id_display_type & ~ID_RECORD_LABEL) {
+      gchar *row_id = ggobi_stage_get_row_id(d, (guint) k);
+      lbl = g_strdup_printf ("id=%s", row_id);
+      g_free(row_id);
+    } else
       lbl = ggobi_stage_get_row_id(d, (guint) k);
     labels = g_list_append (labels, lbl);
   }
@@ -268,6 +281,7 @@ identify_label_fetch (gint k, cpaneld * cpanel, GGobiStage * d, ggobid * gg)
       g_free (lbl);
       lbl = tmp_lbl;
     }
+
     return lbl;
   }
   

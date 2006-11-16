@@ -116,7 +116,7 @@ ggobi_ggobi_class_init (GGobiGGobiClass * klass)
                     G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION, 0, NULL, NULL,
                     ggobi_marshal_VOID__OBJECT_INT_OBJECT,
                     G_TYPE_NONE, 3,
-                    GGOBI_TYPE_DATA, G_TYPE_INT, GGOBI_TYPE_SPLOT);
+                    GGOBI_TYPE_STAGE, G_TYPE_INT, GGOBI_TYPE_SPLOT);
   }
 
   if (g_signal_lookup ("splot_new", GGOBI_TYPE_GGOBI) == 0) {

@@ -290,7 +290,7 @@ scale_set_default_values (GtkScale * scale)
 //FIXME: Probably belongs in its own files (variable_nbook.c/.h).
 //Also, the base notebook should be generalized to support prefices
 void
-variable_notebook_subwindow_add (GGobiStage * s, GCallback func,
+variable_notebook_subwindow_add (GGobiStage * d, GCallback func,
                                  gpointer func_data, GtkWidget * notebook,
                                  GGobiVariableType vartype, datatyped dtype, ggobid * gg)
 {
@@ -300,7 +300,8 @@ variable_notebook_subwindow_add (GGobiStage * s, GCallback func,
   gint j;
   GtkSelectionMode mode = (GtkSelectionMode)
     g_object_get_data (G_OBJECT (notebook), "SELECTION");
-  GGobiStage *d = ggobi_stage_get_root(s);
+    // FIXME: should probably let take the stage ID as an argument
+  GGobiStage *s = ggobi_stage_find(d, GGOBI_MAIN_STAGE_FILTER);
   
   if (!ggobi_stage_has_vars(s))
     return;
@@ -575,7 +576,6 @@ GtkWidget *create_variable_notebook (GtkWidget * box,
   GtkWidget *notebook;
   //gint nd = g_slist_length (gg->d);
   GSList *l;
-  GGobiStage *d;
 
   /* Create a notebook, set the position of the tabs */
   notebook = gtk_notebook_new ();
@@ -591,8 +591,7 @@ GtkWidget *create_variable_notebook (GtkWidget * box,
   g_object_set_data (G_OBJECT (notebook), "datatype", (gpointer) dtype);
 
   for (l = gg->d; l; l = l->next) {
-    // FIXME: should probably let take the stage ID as an argument
-    d = ggobi_stage_find(GGOBI_STAGE(l->data), GGOBI_MAIN_STAGE_FILTER);
+    GGobiStage *d = GGOBI_STAGE(l->data);
     if ((dtype == all_datatypes) ||
         (dtype == no_edgesets && ggobi_stage_get_n_edges(d) == 0) ||
         (dtype == edgesets_only && ggobi_stage_get_n_edges(d) > 0)) {
