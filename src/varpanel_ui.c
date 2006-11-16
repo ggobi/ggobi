@@ -239,7 +239,7 @@ varpanel_show_page (displayd * display, ggobid * gg)
     child = l->data;
     tab_label = (GtkWidget *) gtk_notebook_get_tab_label (nb, child);
     if (tab_label && GTK_IS_LABEL (tab_label)) {
-      if (strcmp (GTK_LABEL (tab_label)->label, d->name) == 0) {
+      if (strcmp (GTK_LABEL (tab_label)->label, ggobi_stage_get_root(d)->name) == 0) {
         if (page != page_new) {
 
           // Set the buttons on 'page' to be insensitive
