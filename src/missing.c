@@ -77,7 +77,7 @@ missings_datad_cb (GtkWidget * w, ggobid * gg)
     //dnew->glyph.els[i].size = d->glyph.els[i].size;
     //dnew->glyph_now.els[i].size = d->glyph_now.els[i].size;
 
-    ggobi_stage_set_row_id(dnew, i, ggobi_stage_get_row_id(dnew, i), false);
+    ggobi_stage_set_row_id(dnew, i, ggobi_stage_get_row_id(dnew, i));
   }
   limits_set(dnew, TRUE, FALSE, FALSE);
 

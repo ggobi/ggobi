@@ -18,11 +18,7 @@
 #include "vars.h"
 #include "externs.h"
 
-//FIXME:  I think this can be considerably simplified by using
-// a hash function that takes a colour, and glyph and returns 
-// a unique identifier (maybe a double) - hadley
-//
-// The new categorical grouping stage should provide this functionality - mfl
+// The new categorical grouping stage should provide this functionality
 
 void
 symbol_table_zero (GGobiStage * d)
@@ -51,6 +47,7 @@ symbol_table_populate (GGobiStage * d)
 
   GGOBI_STAGE_ATTR_INIT_ALL(d);  
   /*-- loop over all data --*/
+
   for (i = 0; i < d->n_rows; i++) {
     j = GGOBI_STAGE_GET_ATTR_TYPE(d, i);
     k = GGOBI_STAGE_GET_ATTR_SIZE(d, i);

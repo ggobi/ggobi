@@ -48,17 +48,18 @@ protected array_f raw;
 protected array_s missing; 
 
 /* Maps row labels to row indices */
-protected GHashTable* idTable;
+protected GHashTable* idTable = {
+  g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL)
+} destroywith g_hash_table_destroy;
 
 /* The row ids */
-protected gchar **rowIds;
+protected gchar **rowIds destroywith g_free;
 
 /* We'll fix edge/polygon stuff after pipeline */
 protected EdgeData  edge;
 
 init(self) {
-  ggobi_stage_set_name(GGOBI_STAGE(self), "unknown");
-  self->idTable = g_hash_table_new(g_str_hash, g_str_equal);
+  ggobi_stage_set_name(GGOBI_STAGE(self), "unknown"); 
 }
 
 /** 
@@ -260,19 +261,15 @@ get_edge_data (GGobiStage *self)
  * @self: #GGobiData object
  * @i: row
  * @value: new string value for row id
- * @check: throw error if id is already used?
  *
  * Set the row id (a string) for specified row
  * A row id is a unique string reference to a given row.
  * These are hashed for O(1) lookup.
  **/ 
 override (GGobi:Stage) void
-set_row_id(GGobiStage *self, guint i, gchar* value, gboolean check) {
+set_row_id(GGobiStage *self, guint i, gchar* value) {
   if (value == NULL)
     value = g_strdup_printf("%d", i+1);
-
-  //g_return_if_fail(check && self_get_row_for_id(self, value) == -1);
-
   SELF(self)->rowIds[i] = g_strdup(value);
   g_hash_table_replace (SELF(self)->idTable, SELF(self)->rowIds[i], GINT_TO_POINTER(i));
 }
@@ -329,7 +326,7 @@ public guint
 add_rows(self, guint n) {
   guint i, nprev = GGOBI_STAGE(self)->n_rows;
   guint nrows = nprev + n;
-  
+
   self->rowIds = (gchar **) g_realloc (self->rowIds, sizeof(gchar *) * nrows);
 
   arrayf_add_rows (&self->raw, nrows);
@@ -339,33 +336,33 @@ add_rows(self, guint n) {
     vectorb_realloc (&self->edge.xed_by_brush, self->edge.n);
 
   for (i = nprev; i < nrows; i++) {    
-    self->rowIds[i] = NULL;
+    ggobi_stage_set_row_id(GGOBI_STAGE(self), i, NULL);
   }
   
   ggobi_stage_rows_added(GGOBI_STAGE(self), n);
   /* set default values here */
-  self_reset_rows(self, nprev, nrows);
   // FIXME: this can probably be moved before rows_added emission and not
   // emit col_data_changed, once we have tform stage in place
-  
+  self_reset_rows(self, nprev, nrows);
+
   return nprev;
 }
 
 /**
  * reset_rows:
  * @self: #GGobiData object
- * @from: row index to start at
- * @to: row index to end at
+ * @start: row index to start at
+ * @end: row index to end at
  *
  * Resets values to their defaults for the specified 
  * rows.  This is mainly used to set default values for 
  * the attributes at the moment.
  **/ 
 public void
-reset_rows(self, guint from, guint to) {
+reset_rows(self, guint start, guint end) {
   for (guint j = 0; j < GGOBI_STAGE(self)->n_cols; j++) {
     gdouble default_val = self_get_col_default_value(self, j);
-    for (guint i = from; i < to; i++) 
+    for (guint i = start; i < end; i++)
       ggobi_stage_set_raw_value(GGOBI_STAGE(self), i, j, default_val);
     ggobi_stage_update_col(GGOBI_STAGE(self), j);
   }
@@ -391,6 +388,10 @@ add_cols(self, guint n) {
   arrays_add_cols (&self->missing, ncols);
 
   ggobi_stage_cols_added(GGOBI_STAGE(self), n);
+  
+  // The columns are going from undefined to defined.
+  for (guint j = nprev; j < ncols; j++)
+    ggobi_stage_update_col(GGOBI_STAGE(self), j);
   
   return nprev;
 }

@@ -32,44 +32,43 @@ record_add (eeMode mode, gint a, gint b, gchar * lbl, gchar * id,
   GList *l, *sl;
   splotd *sp;
   displayd *dsp;
-  GGobiStage *dtarget = d;
-  greal *raw = NULL, x;
+  GGobiStage *dtarget = ggobi_stage_get_root(d);
+  greal x;
 
-  g_return_val_if_fail(d->gg == e->gg, false);
+  g_return_val_if_fail(e == NULL || d->gg == e->gg, false);
 
   /*-- eventually check whether a->b already exists before adding --*/
   if (mode == ADDING_EDGES) {
     g_assert (ggobi_stage_get_n_edges(e) == e->n_rows);
     g_assert (a >= 0 && b >= 0 && a != b);
-    dtarget = e;
+    dtarget = ggobi_stage_get_root(e);
   }
   
   if (!id)
     id = g_strdup_printf ("%d", dtarget->n_rows + 1);
   
-  if (ggobi_stage_get_row_for_id(d, id) != -1) {
-    g_printerr ("That id (%s) is already used\n", id);
+  if (ggobi_stage_get_row_for_id(dtarget, id) != -1) {
+    g_warning ("That id (%s) is already used at row %d", id,
+      ggobi_stage_get_row_for_id(dtarget, id));
     return false;
   }
 
   i = ggobi_data_add_rows(GGOBI_DATA(dtarget), 1);
-  ggobi_stage_set_row_id(dtarget, i, lbl, true);
+  ggobi_stage_set_row_id(dtarget, i, lbl);
 
   if (ggobi_stage_has_vars(dtarget)) {
     for (j = 0; j < dtarget->n_cols; j++) {
       if (strcmp (vals[j], "NA") == 0) {  /*-- got a missing --*/
         ggobi_stage_set_missing(dtarget, i, j);
       } else {
-        GGobiVariable *var = ggobi_stage_get_variable(d, j);
+        GGobiVariable *var = ggobi_stage_get_variable(dtarget, j);
         x = (greal) atof (vals[j]);
-        if (GGOBI_VARIABLE_IS_CATEGORICAL(var)) {
-          raw[j] = ggobi_variable_get_level_value_closest(var, x);
-        }
+        if (GGOBI_VARIABLE_IS_CATEGORICAL(var))
+          x = ggobi_variable_get_level_value_closest(var, x);
         else
           ggobi_stage_set_raw_value(dtarget, i, j, x);
-          
       }
-      ggobi_stage_update_col(d, j);
+      ggobi_stage_update_col(dtarget, j);
     }
   }
 
@@ -100,10 +99,10 @@ record_add (eeMode mode, gint a, gint b, gchar * lbl, gchar * id,
     GGobiStage *dd;
     for (l = gg->d; l; l = l->next) {
       dd = (GGobiStage *) l->data;
-      if (dd != dtarget && ggobi_stage_get_n_edges(dd)) {
-        if (hasEdgePoints (dd, dtarget)) {
+      if (dd != d && ggobi_stage_get_n_edges(dd)) {
+        if (hasEdgePoints (dd, d)) {
           unresolveAllEdgePoints (dd);
-          resolveEdgePoints (dd, dtarget);
+          resolveEdgePoints (dd, d);
         }
       }
     }
@@ -142,7 +141,7 @@ DTL: So need to call unresolveEdgePoints(e, d) to remove it from the
   if (ggobi_stage_has_vars(dtarget)) {
     for (l = gg->displays; l; l = l->next) {
       dsp = (displayd *) l->data;
-      if (dsp->d == dtarget) {
+      if (dsp->d == ggobi_stage_find(dtarget, GGOBI_MAIN_STAGE_FILTER)) {
         for (sl = dsp->splots; sl; sl = sl->next) {
           sp = (splotd *) sl->data;
           if (sp != NULL)

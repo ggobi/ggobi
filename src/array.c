@@ -374,6 +374,7 @@ arrayf_delete_rows (array_f * arrp, gint nr, gint * rows)
       g_free (arrp->vals[i]);
     arrp->vals = (gfloat **) g_realloc (arrp->vals,
                                         nkeepers * sizeof (gfloat *));
+    arrp->nrows -= nr;
   }
   g_free (keepers);
 }
@@ -904,6 +905,7 @@ arrayg_delete_rows (array_g * arrp, gint nr, gint * rows)
       g_free (arrp->vals[i]);
     arrp->vals = (greal **) g_realloc (arrp->vals,
                                        nkeepers * sizeof (greal *));
+    arrp->nrows -= nr;
   }
   g_free (keepers);
 }

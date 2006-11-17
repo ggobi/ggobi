@@ -335,14 +335,12 @@ void
 splot_points_realloc (gint nrows_prev, splotd *sp, GGobiStage *d)
 {
   gint i;
-
+g_debug("reallocing for %d rows", d->n_rows);
   vectorf_realloc (&sp->p1d.spread_data, d->n_rows);
 
-  sp->planar = (gcoords *) g_realloc (sp->planar,
-    d->n_rows* sizeof (gcoords));
-  sp->screen = (icoords *) g_realloc (sp->screen,
-    d->n_rows* sizeof (icoords));
-
+  sp->planar = (gcoords *) g_renew(gcoords, sp->planar, d->n_rows);
+  sp->screen = (icoords *) g_renew(icoords, sp->screen, d->n_rows);
+g_debug("finished");
   for (i=nrows_prev; i<d->n_rows; i++) {
     sp->planar[i].x = sp->planar[i].y = 0.0;
     sp->screen[i].x = sp->screen[i].y = 0;
@@ -377,8 +375,9 @@ splot_alloc (splotd *sp, displayd *display, ggobid *gg)
     return;
   d = display->d;
   nr = d->n_rows;
-  sp->planar = (gcoords *) g_malloc (nr * sizeof (gcoords));
-  sp->screen = (icoords *) g_malloc (nr * sizeof (icoords));
+
+  sp->planar = (gcoords *) g_new (gcoords, nr);
+  sp->screen = (icoords *) g_new (icoords, nr);
   vectorf_init_null (&sp->p1d.spread_data);
   vectorf_alloc (&sp->p1d.spread_data, nr);
 

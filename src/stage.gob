@@ -422,9 +422,12 @@ col_data_changed(self, guint j) {
       self->tform.vals[i][j] = self->parent->tform.vals[i][j];
     }
   }
+
   ggobi_variable_update(var);
+
   // FIXME: incorporate into variable_update
   limits_set_by_var(SELF(self), j, true, true, (SELF(self)->gg) ? SELF(self)->gg->lims_use_visible : true);
+  
   // FIXME: rest of this stuff by pipeline
   tform_to_world_by_var(SELF(self), j);
   if (SELF(self)->gg)
@@ -457,7 +460,7 @@ col_name_changed(self, guint j) {
  *
  * Columns added signal
  **/
-public signal NONE (UINT) void
+public signal first NONE (UINT) void
 cols_added(self, guint n) {
   guint nprev = self->n_cols, ncols = self->n_cols + n;
   
@@ -473,10 +476,6 @@ cols_added(self, guint n) {
   arrayg_add_cols (&self->world, ncols);
   
   tour_realloc_up (self, ncols);
-  
-  // The columns are going from undefined to defined.
-  for (guint j = nprev; j < ncols; j++)
-    self_col_data_changed(self, j);
 };
 
 /**
@@ -486,7 +485,7 @@ cols_added(self, guint n) {
  *
  * Columns deleted signal
  **/
-public signal NONE (UINT) void
+public signal first NONE (UINT) void
 col_deleted(self, guint j) {
   GGobiVariable *var = self_get_variable(self, j);
   g_object_unref(G_OBJECT(var));
@@ -514,7 +513,7 @@ col_deleted(self, guint j) {
  * 
  * Rows added signal
  **/
-public signal NONE (UINT) void
+public signal first NONE (UINT) void
 rows_added(self, guint n) {
   gint i, nprev = self->n_rows, nrows = self->n_rows + n;
   self_set_n_rows(self, nrows);
@@ -526,6 +525,13 @@ rows_added(self, guint n) {
   arrayg_add_rows (&self->jitdata, nrows);
   arrayg_add_rows (&self->world, nrows);
   
+  if (self->parent) {
+    // this hack will disappear once we have a tform stage
+    for (guint j = 0; j < self->n_cols; j++)
+      for (guint i = 0; i < self->n_rows; i++)
+        self->tform.vals[i][j] = self->parent->tform.vals[i][j];
+  }
+  
   self->nrows_under_brush = self->nrows_under_brush_prev = 0;
   
   for (i = nprev; i < nrows; i++) {
@@ -533,17 +539,26 @@ rows_added(self, guint n) {
     self->rows_under_brush_prev.els[i] = 0;
   }
   
-  for (i = 0; i < self->n_cols; i++)
-    self_col_data_changed(self, i);
-  
   clusters_set(self);
   //self_set_rows_in_plot(self);
 };
 
+public signal first NONE (POINTER, UINT) void
+rows_deleted(self, guint *rows, guint n) {
+  gint nrows = self->n_rows - n;
+  self_set_n_rows(self, nrows);
 
-/* We probably want to say which rows here, lest clients must refresh all */
-public signal NONE (POINTER, UINT) void
-rows_deleted(self, guint *rows, guint n);
+  vectori_realloc (&self->rows_under_brush, nrows);
+  vectori_realloc (&self->rows_under_brush_prev, nrows);
+  
+  arrayf_delete_rows (&self->tform, n, rows);
+  arrayg_delete_rows (&self->jitdata, n, rows);
+  arrayg_delete_rows (&self->world, n, rows);
+  
+  self->nrows_under_brush = self->nrows_under_brush_prev = 0;
+  
+  clusters_set(self);
+};
 
 init (self) {
   sphere_init(self);
@@ -983,15 +998,14 @@ get_edge_data (self)
  * @self: #GGobiStage object
  * @i: row
  * @value: new string value for row id
- * @check: throw error if id is already used?
  *
  * Set the row id (a string) for specified row
  * A row id is a unique string reference to a given row.
  * These are hashed for O(1) lookup.
  **/ 
 virtual void
-set_row_id(self, guint i, gchar* value, gboolean check) {
-  self_set_row_id(self->parent, i, value, check);
+set_row_id(self, guint i, gchar* value) {
+  self_set_row_id(self->parent, i, value);
 }
 
 /** 
@@ -1321,6 +1335,9 @@ attach (self, ggobid *gg, gboolean cleanup)
     }
   }
 
+  for(guint j = 0; j < self_get_n_vars(self); j++) 
+    self_update_col(self, j);
+  
   /**
    * If there are missings, they've been initialized with a value
    * of 0.  Here, re-set that value to 15% below the minimum for each
@@ -1331,9 +1348,6 @@ attach (self, ggobid *gg, gboolean cleanup)
   impute_fixed (IMP_BELOW, 15.0, self->n_cols, vars, self);
   limits_set (self, true, true, self->gg->lims_use_visible);
   g_free(vars);
-
-  for(guint j = 0; j < self_get_n_vars(self); j++) 
-    self_update_col(self, j);
 
   clusters_set(self);  /*-- find the clusters for data just read in --*/
 

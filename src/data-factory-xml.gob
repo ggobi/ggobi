@@ -1531,7 +1531,7 @@ class GGobi:Data:Factory:XML from GGobi:Data:Factory
                          (gchar *) tmp,
                          data->current_record + 1,
                          m + 1, data->current_data->name);
-        ggobi_stage_set_row_id (d, (guint) i, (gchar *) tmp, false);
+        ggobi_stage_set_row_id (d, (guint) i, (gchar *) tmp);
       }
 
 /*

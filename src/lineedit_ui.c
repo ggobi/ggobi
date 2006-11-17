@@ -402,6 +402,8 @@ button_release_cb (GtkWidget * w, GdkEventButton * event, gpointer user_data)
       if (e == NULL) {
         /*-- initialize e, the new datad --*/
         e = GGOBI_STAGE(ggobi_data_new (0, 0));
+        ggobi_pipeline_factory_build(gg->pipeline_factory, e);
+        ggobi_stage_attach(ggobi_stage_find(e, GGOBI_MAIN_STAGE_FILTER), gg, FALSE);
         ggobi_stage_set_name(e, "edges");
         display->e = e;
         display->options.edges_undirected_show_p = true;

@@ -34,7 +34,7 @@ subset_ui_add_data (GtkTreeModel *model, GGobiStage *d)
   GGobiStage *s = ggobi_stage_find(d, GGOBI_MAIN_STAGE_SUBSET);
   gfloat fnr = (gfloat) s->n_rows;  
   gtk_list_store_append(GTK_LIST_STORE(model), &iter);
-  gtk_list_store_set(GTK_LIST_STORE(model), &iter, 0, d->name, 1, 0, 2, fnr,
+  gtk_list_store_set(GTK_LIST_STORE(model), &iter, 0, d->name, 1, 0, 2, d->n_rows,
     3, gtk_adjustment_new (1.0, 1.0, (fnr-2.0), 1.0, 5.0, 0.0),
     4, gtk_adjustment_new (fnr/10.0, 1.0, fnr, 1.0, 5.0, 0.0),
     5, gtk_adjustment_new (1.0, 1.0, fnr-2.0, 1.0, 5.0, 0.0),
@@ -107,13 +107,13 @@ subset_ui_display_update (GtkTreeModel *model, GtkTreeIter *iter)
   
   /*-- ... and set the values of the text entries, too --*/
   entry = g_object_get_data(G_OBJECT(model), "ggobi-subset-random");
-  gtk_tree_model_get(model, iter, 2, &n);
+  gtk_tree_model_get(model, iter, 2, &n, -1);
   txt = g_strdup_printf ("%d", n);
   gtk_entry_set_text (GTK_ENTRY (entry), txt);
   g_free (txt);
   
   entry = g_object_get_data(G_OBJECT(model), "ggobi-subset-nrows");
-  gtk_tree_model_get(model, iter, 7, &stage);
+  gtk_tree_model_get(model, iter, 7, &stage, -1);
   txt = g_strdup_printf ("%d", GGOBI_STAGE(stage)->n_rows);
   gtk_entry_set_text (GTK_ENTRY (entry), txt);
   g_free (txt);
@@ -151,8 +151,8 @@ subset_cb (GtkWidget *w, GtkTreeSelection *tree_sel)
 {
   gint subset_type;
   gchar *sample_str, *substr;
-  gint bstart, bsize;
-  gint estart, estep;
+  GtkAdjustment *bstart, *bsize;
+  GtkAdjustment *estart, *estep;
   gint string_pos;
   gboolean redraw = false;
   GtkTreeModel *model;
@@ -179,14 +179,16 @@ subset_cb (GtkWidget *w, GtkTreeSelection *tree_sel)
     break;
     case GGOBI_SUBSET_BLOCK:
       gtk_tree_model_get(model, &iter, 3, &bstart, 4, &bsize, -1);
-      redraw = ggobi_stage_subset_block (d, bstart-1, bsize);
+      redraw = ggobi_stage_subset_block (d, gtk_adjustment_get_value(bstart)-1, 
+        gtk_adjustment_get_value(bsize));
     break;
     case GGOBI_SUBSET_RANGE:
       redraw = ggobi_stage_subset_range (d);
     break;
     case GGOBI_SUBSET_EVERYN:
       gtk_tree_model_get(model, &iter, 5, &estart, 6, &estep, -1);
-      redraw = ggobi_stage_subset_everyn (d, estart-1, estep);
+      redraw = ggobi_stage_subset_everyn (d, gtk_adjustment_get_value(estart)-1, 
+        gtk_adjustment_get_value(estep));
     break;
     case GGOBI_SUBSET_STICKY:
       redraw = ggobi_stage_subset_sticky (d);
@@ -279,8 +281,6 @@ subset_window_open (ggobid *gg) {
         GTK_TYPE_ADJUSTMENT, GGOBI_TYPE_STAGE_SUBSET);
       tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(model));
       tree_sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view));
-      populate_tree_view(tree_view, tree_view_titles, G_N_ELEMENTS(tree_view_titles), 
-        true, GTK_SELECTION_BROWSE, G_CALLBACK(subset_ui_datad_set_cb), gg);
       
       g_object_set_data(G_OBJECT (model), "ggobi-subset-swin", swin);
       g_signal_connect (G_OBJECT (gg), "datad_added",
@@ -506,7 +506,7 @@ subset_window_open (ggobid *gg) {
       gtk_box_pack_start (GTK_BOX (hb), btn, false, false, 0);
 
       label = gtk_label_new_with_mnemonic ("R_ow label");
-      gtk_notebook_append_page (GTK_NOTEBOOK (gg->subset_ui.notebook),
+      gtk_notebook_append_page (GTK_NOTEBOOK (nbook),
         frame, label);
 
       /*-- hbox to hold a few buttons --*/
@@ -548,11 +548,13 @@ subset_window_open (ggobid *gg) {
 
       btn = gtk_button_new_from_stock (GTK_STOCK_CLOSE);
       g_signal_connect (G_OBJECT (btn), "clicked",
-                          G_CALLBACK (close_btn_cb), (ggobid *) gg);
+                          G_CALLBACK (close_btn_cb), gg->subset_ui.window);
       gtk_box_pack_start (GTK_BOX (close_hbox), btn, true, false, 0);
 
       /*-- initialize display --*/
-      subset_ui_display_update (GTK_TREE_MODEL(model), &first);
+      populate_tree_view(tree_view, tree_view_titles, G_N_ELEMENTS(tree_view_titles), 
+        true, GTK_SELECTION_BROWSE, G_CALLBACK(subset_ui_datad_set_cb), gg);
+      //subset_ui_display_update (GTK_TREE_MODEL(model), &first);
 
       if (g_slist_length (gg->d) > 1)
         gtk_widget_show_all (swin);

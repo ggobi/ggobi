@@ -156,8 +156,7 @@ class GGobi:Data:Factory:CSV from GGobi:Data:Factory
     for (gint i = 0; rows; rows = g_list_next (rows), i++)
       {
         Row *row = (Row *) rows->data;
-        ggobi_stage_set_row_id (d, i, row->src->str + row->entry[0].ofs,
-                                false);
+        ggobi_stage_set_row_id (d, i, row->src->str + row->entry[0].ofs);
       }
   }
 

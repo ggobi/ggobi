@@ -108,7 +108,7 @@ wvis_create_variable_notebook (GtkWidget *box, GtkSelectionMode mode,
   /*-- listen for variable_added and _list_changed events on main_window --*/
   /*-- ... list_changed would be adequate --*/
   g_signal_connect (G_OBJECT (gg),
-    "varcircle_label_set",
+    "variable_added",
      G_CALLBACK (variable_notebook_varchange_cb),
      GTK_OBJECT (notebook));
   g_signal_connect (G_OBJECT (gg),

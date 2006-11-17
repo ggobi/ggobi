@@ -68,7 +68,7 @@ public void
 set_included(self, guint i, gboolean val)
 {
   g_return_if_fail(selfp->filter_column != -1);
-  ggobi_stage_set_raw_value(GGOBI_STAGE(self), i, selfp->filter_column, (gboolean)val);
+  ggobi_stage_set_raw_value(GGOBI_STAGE(self)->parent, i, selfp->filter_column, (gboolean)val);
 }
 
 /* for extra convenience */
@@ -115,6 +115,8 @@ get_row_id(GGobi:Stage *self (check null type), guint i  (check < N_ROWS)) {
 override (GGobi:Stage) gint
 get_row_for_id(GGobi:Stage *self (check null type), gchar *id  (check null)) {
   gint row = PARENT_HANDLER(self, id);
+  if (row == -1)
+    return -1;
   return(SELF(self)->included_rows_rev[row]);
 }
 
@@ -138,8 +140,10 @@ set_raw_value(GGobi:Stage *self, guint i  (check < N_ROWS), guint j  (check < N_
  * @j: column index
  **/
 override (GGobi:Stage) gdouble
-get_raw_value(GGobi:Stage *self, guint i  (check < N_ROWS), guint j  (check < N_COLS))
+get_raw_value(GGobi:Stage *self, guint i  , guint j  (check < N_COLS))
 {
+  if (i >= N_ROWS)
+    G_BREAKPOINT();
   return PARENT_HANDLER(self, SELF(self)->included_rows[i], j);
 }
 
@@ -186,6 +190,7 @@ update(self)
       else {
         included_rows_rev[i] = n_both;
         included_rows[n_both++] = i;
+        //g_debug("included: %d => %d", n_both-1, i);
       }
     } else {
       included_rows_rev[i] = -1;
@@ -194,23 +199,28 @@ update(self)
     }
   }
   
+  for (guint i = parent_nrows; i < selfp->included_len; i++)
+    deleted_rows[n_deleted++] = i;
+  
   n_included = n_both + n_added;
   included_rows = g_renew(guint, included_rows, n_included);
   for (guint i = 0; i < n_added; i++) {
     included_rows[n_both + i] = added_rows[i];
+    //g_debug("included (added): %d => %d", n_both+i, added_rows[i]);
     included_rows_rev[added_rows[i]] = n_both + i;
   }
+
+  selfp->included_len = parent_nrows;
+  selfp->included = included;
+  self->included_rows = included_rows;
+  self->included_rows_rev = included_rows_rev;
   
   if (n_added)
     ggobi_stage_rows_added(GGOBI_STAGE(self), n_added);
   if (n_deleted)
     ggobi_stage_rows_deleted(GGOBI_STAGE(self), deleted_rows, n_deleted);
   
-  selfp->included_len = parent_nrows;
-  selfp->included = included;
-  self->included_rows = included_rows;
-  self->included_rows_rev = included_rows_rev;
-  GGOBI_STAGE(self)->n_rows = n_included;
+  //g_debug("included: %d", n_included);
 }
 
 } // end class definition

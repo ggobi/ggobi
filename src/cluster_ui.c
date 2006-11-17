@@ -188,12 +188,12 @@ include_hiddens (gboolean include, GGobiStage * d, ggobid * gg)
     }
   }
 
-  clusters_set(d);
-  cluster_table_labels_update (d, gg);
-  limits_set (d, true, true, gg->lims_use_visible);
-  vartable_limits_set (d);
-  vartable_stats_set (d);
-  tform_to_world(d);
+  clusters_set(f);
+  cluster_table_labels_update (f, gg);
+  limits_set (f, true, true, gg->lims_use_visible);
+  vartable_limits_set (f);
+  vartable_stats_set (f);
+  tform_to_world(f);
 
   if (cpanel->pmode == TOUR1D)
     dsp->t1d.get_new_target = true;

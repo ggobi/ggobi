@@ -346,6 +346,8 @@ vartable_subwindow_init (GGobiStage *d, ggobid *gg)
   GtkTreeStore *model;
   GtkTreeModel *sort_model, *filter_model;
   
+  d = ggobi_stage_find(d, GGOBI_MAIN_STAGE_FILTER);
+  
   g_signal_connect (G_OBJECT (nbook), "switch-page",
     G_CALLBACK (vartable_switch_page_cb), gg);
 
@@ -574,7 +576,6 @@ vartable_limits_set_by_var (GGobiStage *d, guint j)
   GGobiVariable *var = ggobi_stage_get_variable(d, j);
   GtkTreeModel *model;
   GtkTreeIter iter;
-  
   if (!vartable_iter_from_varno(j, d, &model, &iter))
 	  return;
   
