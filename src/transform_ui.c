@@ -190,7 +190,7 @@ tfvar_selection_made_cb (GtkTreeSelection *tree_sel, ggobid *gg)
 {
   GtkTreeView *tree_view = gtk_tree_selection_get_tree_view(tree_sel);
   GGobiData *d = (GGobiData *) g_object_get_data(G_OBJECT (tree_view), "datad");
-  gint j, nvars, *rows;  // allocated in function
+  gint j, nvars, *rows;
 
   /* Parameters of transformation */
   vartabled *vt0, *vtnew;
@@ -199,7 +199,7 @@ tfvar_selection_made_cb (GtkTreeSelection *tree_sel, ggobid *gg)
     return;
 
   rows = get_selections_from_tree_view(GTK_WIDGET(tree_view), &nvars);
-  if (nvars < 0)
+  if (nvars <= 0)
     return;
 
   vtnew = (vartabled *) g_malloc(sizeof(vartabled));
