@@ -437,7 +437,7 @@ addPluginDetails (GGobiPluginDetails * info, GtkWidget * list, ggobid * gg,
   gtk_list_store_append (GTK_LIST_STORE (model), &iter);
   gtk_list_store_set (GTK_LIST_STORE (model), &iter, 0, info->name, 1,
                       info->description, 2, info->author, 3, info->dllName, 4,
-                      info->loaded, 5, active, -1);
+                      info->loaded == DL_LOADED, 5, active, -1);
   /*
      gchar **els = (gchar **) g_malloc(6*sizeof(gchar*));
      els[0] = info->name;
@@ -561,7 +561,8 @@ GGobiPluginDetails XMLDetails = {
   NULL,
   NULL,
   "Reads XML URLs (http, ftp, local files or zipped local files)",
-  "GGobi core"
+  "GGobi core",
+  TRUE
 };
 
 gchar *CSVModeNames[] = { "csv" };
@@ -584,7 +585,8 @@ GGobiPluginDetails CSVDetails = {
   NULL,
   NULL,
   "Reads Comma-separated data from local files",
-  "Michael Lawrence"
+  "Michael Lawrence",
+  TRUE
 };
 
 
