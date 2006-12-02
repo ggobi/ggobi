@@ -70,12 +70,12 @@ class GGobi:Transform:Boxcox from GGobi:Transform {
   override (GGobi:Transform) gchar *
   get_name(GGobi:Transform *self)
   {
-    return g_strdup("Box-Cox");
+    return g_strdup("Box-Cox transformation");
   }
   override (GGobi:Transform) gchar *
   get_description(GGobi:Transform *self)
   {
-    return g_strdup("Make a variable normally distributed");
+    return g_strdup("Flexible transformation to improve normality");
   }
   
   override (GGobi:Transform) gboolean

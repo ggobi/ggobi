@@ -25,7 +25,7 @@ class GGobi:Transform:Min:One from GGobi:Transform {
   override (GGobi:Transform) gchar *
   get_name(GGobi:Transform *self)
   {
-    return g_strdup("Bring min to one");
+    return g_strdup("Raise minimum to one");
   }
   override (GGobi:Transform) gchar *
   get_description(GGobi:Transform *self)

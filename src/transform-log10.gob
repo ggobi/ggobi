@@ -38,7 +38,7 @@ class GGobi:Transform:Log10 from GGobi:Transform {
   override (GGobi:Transform) gchar *
   get_name(GGobi:Transform *self)
   {
-    return g_strdup("Log base 10");
+    return g_strdup("Log, base 10");
   }
   override (GGobi:Transform) gchar *
   get_description(GGobi:Transform *self)
