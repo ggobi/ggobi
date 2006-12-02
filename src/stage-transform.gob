@@ -45,6 +45,8 @@ class GGobi:Stage:Transform from GGobi:Stage {
     PARENT_HANDLER(self, j);
     if (self_get_transform(SELF(self), j))
       self_transform(SELF(self), 0, j);
+    else for (guint i = 0; i < self->n_rows; i++)
+      SELF(self)->_priv->tform.vals[i][j] = ggobi_stage_get_raw_value(self, i, j);
     // FIXME: rest of this stuff by pipeline
     tform_to_world_by_var(self, j);
     if (self->gg)

@@ -13,7 +13,7 @@ AC_INIT(ggobi, ggobi_version, ggobi-help@lists.ggobi.org)
 AC_PREREQ(2.59)
 
 # Tell autoconf where our sources are
-AC_CONFIG_SRCDIR([src/transform_ui.c])
+AC_CONFIG_SRCDIR([src/ggobi.c])
 
 # Setup the header where our checks will be made available to the source
 AC_CONFIG_HEADER(src/config.h)
