@@ -1443,7 +1443,7 @@ scatter1DAddPlotLabels (splotd * sp, GdkDrawable * drawable, GdkGC * gc)
   PangoRectangle rect;
   GGobiStage *d = sp->displayptr->d;
 
-  layout_text (layout, ggobi_stage_get_transformed_col_name(d, sp->p1dvar), &rect);
+  layout_text (layout, ggobi_stage_get_col_name(d, sp->p1dvar), &rect);
   gdk_draw_layout (drawable, gc,
                    sp->max.x / 2 - rect.width / 2,
                    sp->max.y - rect.height - 5, layout);
@@ -1460,12 +1460,12 @@ scatterXYAddPlotLabels (splotd * sp, GdkDrawable * drawable, GdkGC * gc)
   GGobiStage *d = sp->displayptr->d;
 
   /*-- xyplot: right justify the label --*/
-  layout_text (layout, ggobi_stage_get_transformed_col_name(d, sp->xyvars.x), &rect);
+  layout_text (layout, ggobi_stage_get_col_name(d, sp->xyvars.x), &rect);
   gdk_draw_layout (drawable, gc,
                    sp->max.x - rect.width - 5,
                    sp->max.y - rect.height - 5, layout);
 
-  layout_text (layout, ggobi_stage_get_transformed_col_name(d, sp->xyvars.y), &rect);
+  layout_text (layout, ggobi_stage_get_col_name(d, sp->xyvars.y), &rect);
   gdk_draw_layout (drawable, gc, 5, 5, layout);
   g_object_unref (G_OBJECT (layout));
 }

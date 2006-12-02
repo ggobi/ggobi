@@ -650,7 +650,7 @@ t2d_switch_index(Tour2DCPanel controls, gint basismeth, displayd *dsp,
   for (i=0; i<d->n_rows; i++)
     for (j=0; j<dsp->t2d.nactive; j++)
       dsp->t2d_pp_op.data.vals[i][j] = 
-        d->tform.vals[i][dsp->t2d.active_vars.els[j]];
+        ggobi_stage_get_raw_value(d, i, dsp->t2d.active_vars.els[j]);
 
   /* Copy current projection into opt'n projection */
   for (i=0; i<2; i++)
@@ -661,11 +661,11 @@ t2d_switch_index(Tour2DCPanel controls, gint basismeth, displayd *dsp,
   for (k=0; k<2; k++) 
     for (i=0; i<d->n_rows; i++) {
       dsp->t2d_pp_op.pdata.vals[i][k] = 
-          (d->tform.vals[i][dsp->t2d.active_vars.els[0]]*
+          (ggobi_stage_get_raw_value(d, i, dsp->t2d.active_vars.els[0])*
           dsp->t2d_pp_op.proj_best.vals[k][0]);
       for (j=1; j<dsp->t2d.nactive; j++)
         dsp->t2d_pp_op.pdata.vals[i][k] += 
-          (d->tform.vals[i][dsp->t2d.active_vars.els[j]]*
+          (ggobi_stage_get_raw_value(d, i, dsp->t2d.active_vars.els[j])*
           dsp->t2d_pp_op.proj_best.vals[k][j]);
     }
 

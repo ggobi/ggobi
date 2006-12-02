@@ -169,7 +169,7 @@ write_xml_variable(FILE *f, GGobiStage *d, ggobid *gg, gint j,
   GGobiVariable *var = ggobi_stage_get_variable(d, j);
   gchar* varname = g_strstrip(
     (gg->save.stage == TFORMDATA) ? 
-      ggobi_stage_get_transformed_col_name(d, j) : 
+      ggobi_stage_get_col_name(d, j) : 
       ggobi_stage_get_col_name(d, j)
   );
   
@@ -264,7 +264,10 @@ write_xml_record (FILE *f, GGobiStage *d, ggobid *gg, gint i,
   XmlWriteInfo *xmlWriteInfo)
 {
   gint j;
-
+  
+  if (gg->save.stage == TFORMDATA)
+    d = ggobi_stage_find(d, GGOBI_MAIN_STAGE_TRANSFORM);
+  
   /*-- ids if present --*/
   fprintf(f, " id=\"%s\"", ggobi_stage_get_row_id(d, i));
 
@@ -310,8 +313,7 @@ write_xml_record (FILE *f, GGobiStage *d, ggobid *gg, gint i,
           fprintf (f, ". ");
         } 
       } else {  /*-- if not missing, just write the data --*/
-        writeFloat (f, (gg->save.stage == TFORMDATA) ? d->tform.vals[i][j] :
-                                                       ggobi_stage_get_raw_value(d, i, j));
+        writeFloat (f, ggobi_stage_get_raw_value(d, i, j));
       }
       if (j < d->n_cols-1 )
         fprintf(f, " ");
@@ -335,8 +337,7 @@ write_xml_record (FILE *f, GGobiStage *d, ggobid *gg, gint i,
         } 
       } else {
 
-        writeFloat (f, (gg->save.stage == TFORMDATA) ? d->tform.vals[i][j] :
-                                                       ggobi_stage_get_raw_value(d, i, cols[j]));
+        writeFloat (f, ggobi_stage_get_raw_value(d, i, cols[j]));
       } 
       if (j < ncols-1 )
         fprintf(f, " ");

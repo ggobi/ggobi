@@ -1,0 +1,59 @@
+%h{
+  #include "ggobi-stage.h"
+%}
+%{
+  /* for limits_adjust */
+  #include "vars.h"
+  #include "externs.h"
+%}
+class GGobi:Transform from G:Object (abstract) {
+
+  virtual gdouble *
+  forward(self, gdouble *vals, guint n, GGobiVariable *var);
+  
+  virtual gdouble *
+  reverse(self, gdouble *vals, guint n, GGobiVariable *var);
+  
+  virtual gchar *
+  variable_name(self, const gchar *name);
+  
+  virtual lims *
+  limits(self, lims limits, GGobiVariable *var)
+  { /* most of the time, limits can be transformed like any old data */
+    gdouble limit_vals[] = { limits.min, limits.max };
+    gdouble *result = self_forward(self, limit_vals, 2, var);
+    lims *result_limits = g_new(lims, 1);
+    result_limits->min = result[0];
+    result_limits->max = result[1];
+    limits_adjust(&result_limits->min, &result_limits->max);
+    return result_limits;
+  }
+  
+  /* convenience wrapper */
+  public gdouble *
+  column(self, GGobi:Stage *stage, guint first_row, guint j)
+  {
+    guint i, n = stage->n_rows - first_row;
+    GGobiVariable *var = ggobi_stage_get_variable(stage, j);
+    gdouble *vals = g_new(gdouble, n);
+    
+    for (i = first_row; i < stage->n_rows; i++)
+      vals[i] = ggobi_stage_get_raw_value(stage, i, j);
+    
+    return self_forward(self, vals, n, var);
+  }
+  
+  virtual gchar *
+  get_name(self);
+  
+  virtual gchar *
+  get_description(self);
+  
+  virtual gboolean
+  compare(self, GGobi:Transform *other  (check null type))
+  {
+    /* I wanted to do a property-based comparison here, but GValue
+       apparently does not support comparisons */
+    return G_OBJECT_TYPE(self) == G_OBJECT_TYPE(other);
+  }
+}

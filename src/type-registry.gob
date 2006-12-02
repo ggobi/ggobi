@@ -1,0 +1,60 @@
+class GGobi:Type:Registry from G:Object {
+  private GType type;
+  property UINT type
+    (nick = "gtype", blurb = "The common ancestor of all types in the registry",
+     flags = CONSTRUCT_ONLY, type = GType,
+     minimum = 0, maximum = G_MAXUINT, default_value = G_TYPE_OBJECT, link);
+     
+  private GSList *types destroywith g_slist_free;
+  
+  private signal NONE  (UINT) void
+  registered(self, GType type);
+  private signal NONE  (UINT) void
+  unregistered(self, GType type);
+  
+  public GGobiTypeRegistry *
+  new(GType type)
+  {
+    GObject *obj = (GObject *)GET_NEW_VARG("type", type, NULL);
+    return GGOBI_TYPE_REGISTRY(obj);
+  }
+  
+  public void 
+  register(self, GType type)
+  {
+    g_return_if_fail(g_type_is_a(type, selfp->type));
+    if (!self_is_registered(self, type)) {
+      selfp->types = g_slist_append(selfp->types, 
+        GINT_TO_POINTER(type));
+      self_registered(self, type);
+    }
+  }
+  public void
+  unregister(self, GType type)
+  {
+    if (self_is_registered(self, type)) {
+      selfp->types = g_slist_remove(selfp->types,
+        GINT_TO_POINTER(type));
+      self_unregistered(self, type);
+    }
+  }
+  public gboolean
+  is_registered(self, GType type)
+  {
+    return g_slist_find(selfp->types, GINT_TO_POINTER(type)) != NULL;
+  }
+  public GSList *
+  list_registered(self)
+  {
+    return g_slist_copy(selfp->types);
+  }
+  
+  public void
+  register_all(self)
+  {
+    guint i, n_types;
+    GType *types = g_type_children(selfp->type, &n_types);
+    for (i = 0; i < n_types; i++)
+      self_register(self, types[i]);
+  }
+}

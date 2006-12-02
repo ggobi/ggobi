@@ -221,7 +221,6 @@ set_raw_value(GGobi:Stage *self (check null type), guint i, guint j, gdouble val
   else {
     SELF(self)->raw.vals[i][j] = value;
     SELF(self)->missing.vals[i][j] = 0;
-    self->tform.vals[i][j] = value;
   }
 }
 

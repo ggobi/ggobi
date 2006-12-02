@@ -746,7 +746,7 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
   for (i=0; i<d->n_rows; i++)
     for (j=0; j<dsp->t1d.nactive; j++)
       dsp->t1d_pp_op.data.vals[i][j] = 
-        d->tform.vals[i][dsp->t1d.active_vars.els[j]];
+        ggobi_stage_get_raw_value(d, i, dsp->t1d.active_vars.els[j]);
 
   for (j=0; j<dsp->t1d.nactive; j++)
     dsp->t1d_pp_op.proj_best.vals[0][j] = 
@@ -754,11 +754,11 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
 
   for (i=0; i<d->n_rows; i++) {
     dsp->t1d_pp_op.pdata.vals[i][0] = 
-        (d->tform.vals[i][dsp->t1d.active_vars.els[0]]*
+        (ggobi_stage_get_raw_value(d, i, dsp->t1d.active_vars.els[0])*
         dsp->t1d.F.vals[0][dsp->t1d.active_vars.els[0]]);
     for (j=1; j<dsp->t1d.nactive; j++)
       dsp->t1d_pp_op.pdata.vals[i][0] += 
-        (d->tform.vals[i][dsp->t1d.active_vars.els[j]]*
+        (ggobi_stage_get_raw_value(d, i, dsp->t1d.active_vars.els[j])*
         dsp->t1d.F.vals[0][dsp->t1d.active_vars.els[j]]);
   }
 

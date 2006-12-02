@@ -336,11 +336,8 @@ struct _ggobid {
 
 /*-------------------- transformation --------------------------------*/
 
-  struct _Transformation {
-    GtkWidget *window;
-    GtkAdjustment *boxcox_adj;
-  } tform_ui;
-
+  GtkWidget *transform_gui;
+  
   struct _Sphere {
     GtkWidget *window;
     GtkWidget *scree_da;
@@ -444,6 +441,8 @@ struct _ggobid {
 
 #define GGOBI_MAIN_STAGE_SUBSET "ggobi-main-subset"
 #define GGOBI_MAIN_STAGE_FILTER "ggobi-main-filter"
+#define GGOBI_MAIN_STAGE_DOMAIN_ADJ "ggobi-main-domain-adj"
+#define GGOBI_MAIN_STAGE_TRANSFORM "ggobi-main-transform"
 
 #include "read_init.h"
 

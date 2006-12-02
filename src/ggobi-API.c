@@ -43,22 +43,6 @@ extern "C"
 }
 #endif
 
-gchar **
-ggobi_getVariableNames (gint transformed, GGobiStage * d, ggobid * gg)
-{
-  gchar **names;
-  gint nc = d->n_cols, j;
-
-  names = (gchar **) g_malloc (sizeof (gchar *) * nc);
-
-  for (j = 0; j < nc; j++) {
-    names[j] = transformed ? ggobi_stage_get_transformed_col_name(d, j) : ggobi_stage_get_col_name(d, j);
-  }
-
-  return (names);
-}
-
-
 /*
   Closes the specified display
  */

@@ -70,7 +70,7 @@ clone_vars (gint * cols, gint ncols, GGobiStage * d)
 
     /*-- copy the data --*/
     for (i = 0; i < d->n_rows; i++) {
-      ggobi_stage_set_raw_value(d, i, jto, d->tform.vals[i][jfrom]);
+      ggobi_stage_set_raw_value(d, i, jto, ggobi_stage_get_raw_value(d, i, jfrom));
       if (ggobi_stage_is_missing(d, i, jfrom))
         ggobi_stage_set_missing(d, i, jto);
     }

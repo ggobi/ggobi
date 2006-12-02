@@ -33,7 +33,7 @@ static void close_btn_cb (GtkWidget *w, ggobid *gg)
 static void
 clone_vars_cb (GtkWidget *w, ggobid *gg)
 {
-  GGobiStage *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
+  GGobiStage *d = datad_get_from_notebook(gg->vartable_ui.notebook);
   gint *cols;
   gint ncols = selected_cols_get (&cols, d, gg);
 
@@ -48,7 +48,7 @@ clone_vars_cb (GtkWidget *w, ggobid *gg)
 static void
 delete_vars_cb (GtkWidget *w, ggobid *gg)
 {
-  GGobiStage *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
+  GGobiStage *d = datad_get_from_notebook(gg->vartable_ui.notebook);
   gint *cols = (gint *) g_malloc (d->n_cols * sizeof (gint));
   gint ncols = selected_cols_get (cols, d, gg);
 
@@ -75,7 +75,7 @@ dialog_range_set (GtkWidget *w, ggobid *gg)
   GtkWidget *dialog = w;
   GtkWidget *umin_entry, *umax_entry;
   GtkTreeModel *model;
-  GGobiStage *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
+  GGobiStage *d = datad_get_from_notebook(gg->vartable_ui.notebook);
   gint *cols;
   gint ncols = selected_cols_get (&cols, d, gg);
   gint j, k;
@@ -126,8 +126,8 @@ dialog_range_set (GtkWidget *w, ggobid *gg)
 
       vartable_iter_from_varno(j, d, &model, &iter);
       
-      var->lim_specified.min = var->lim_specified_tform.min = min_val;
-      var->lim_specified.max = var->lim_specified_tform.max = max_val;
+      var->lim_specified.min = min_val;
+      var->lim_specified.max = max_val;
 
       /*gtk_tree_store_set(GTK_TREE_STORE(model), &iter, 
 	VT_REAL_USER_MIN, min_val, VT_REAL_USER_MAX, max_val, -1);*/
@@ -148,7 +148,7 @@ range_unset_cb (GtkWidget *w, ggobid *gg)
 }
 
 static void rescale_cb (GtkWidget *w, ggobid *gg) {
-  /*GGobiStage *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);*/
+  /*GGobiStage *d = datad_get_from_notebook(gg->vartable_ui.notebook);*/
 
   /*limits_set (d, true, true, gg->lims_use_visible);  
   vartable_limits_set (d);
@@ -171,25 +171,22 @@ open_range_set_dialog (GtkWidget *w, ggobid *gg)
   GtkWidget *dialog, *umin, *umax;
   GtkWidget *radio1, *radio2;
   GSList *group;
-  gint k;
-  GGobiStage *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
+  GGobiStage *d = datad_get_from_notebook(gg->vartable_ui.notebook);
   gint *cols;
-  gint ncols = selected_cols_get (&cols, d, gg);
   gboolean ok = true;
-  GGobiVariable *var;
-
-  for (k=0; k<ncols; k++) {
-    var = ggobi_stage_get_variable(d, cols[k]);
-    if (var->tform0 != NO_TFORM0 ||
-        var->tform1 != NO_TFORM1 ||
-        var->tform2 != NO_TFORM2)
+  /*gint ncols =*/ selected_cols_get (&cols, d, gg);
+  
+  // FIXME: Disabling this for convenience now - pretty sure all this range
+  // stuff is going to be removed soon
+  /*for (k=0; k<ncols; k++) {
+    if (ggobi_stage_transform_get_transform(d, k))
     {
       ok = false;
       quick_message ("Sorry, can't set the range for a transformed variable\n",
         false);
       break;
     }
-  }
+  }*/
   g_free (cols);
   if (!ok)
 	  return;
@@ -294,7 +291,7 @@ open_range_set_dialog (GtkWidget *w, ggobid *gg)
 void range_unset (ggobid *gg)
 {
   GtkTreeModel *model;
-  GGobiStage *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
+  GGobiStage *d = datad_get_from_notebook(gg->vartable_ui.notebook);
   gint *cols;
   gint ncols = selected_cols_get (&cols, d, gg);
   gint j, k;
@@ -361,7 +358,7 @@ dialog_newvar_add (GtkWidget *w, ggobid *gg)
 {
   GtkWidget *dialog = w;
   GtkWidget *entry, *radio_brush;
-  GGobiStage *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
+  GGobiStage *d = datad_get_from_notebook(gg->vartable_ui.notebook);
   gint vartype;
   gchar *vname;
 
@@ -468,7 +465,7 @@ dialog_rename_var (GtkWidget *w, ggobid *gg)
 {
   GtkWidget *dialog = w;
   GtkWidget *entry;
-  GGobiStage *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
+  GGobiStage *d = datad_get_from_notebook(gg->vartable_ui.notebook);
   gchar *vname;
   gint *selected_vars, nselected_vars = 0;
   gint jvar;
@@ -496,7 +493,7 @@ static void
 open_rename_dialog (GtkWidget *w, ggobid *gg)
 {
   GtkWidget *dialog, *hb, *entry, *lbl;
-  GGobiStage *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
+  GGobiStage *d = datad_get_from_notebook(gg->vartable_ui.notebook);
   gint *selected_vars, nselected_vars = 0;
 
   /*-- find out what variables are selected in the var statistics panel --*/

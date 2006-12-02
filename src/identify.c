@@ -243,8 +243,8 @@ identify_label_fetch (gint k, cpaneld * cpanel, GGobiStage * d, ggobid * gg)
       for (j = 0; j < nvars; j++) {
         if (vars[j] < 0) continue;
 
-        value = ggobi_stage_get_string_value(d, k, vars[j], TRUE);
-        colname = ggobi_stage_get_transformed_col_name(d, vars[j]);
+        value = ggobi_stage_get_string_value(d, k, vars[j]);
+        colname = ggobi_stage_get_col_name(d, vars[j]);
         lbl = g_strdup_printf ("%s=%s", colname, value);
         labels = g_list_append (labels, lbl);
         g_free(colname);
@@ -255,6 +255,8 @@ identify_label_fetch (gint k, cpaneld * cpanel, GGobiStage * d, ggobid * gg)
     }
   }
 
+  // FIXME: The record number no longer matches up to the index in the raw
+  // dataset, due to the new pipeline (ie filters). Is record no. even useful?
   if (id_display_type & ID_RECORD_NO) {
     if (id_display_type & ~ID_RECORD_NO)
       lbl = g_strdup_printf ("num=%d", k);

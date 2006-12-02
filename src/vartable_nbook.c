@@ -123,7 +123,7 @@ vartable_switch_page_cb (GtkNotebook *notebook, GtkNotebookPage *page,
   // yet.  dfs
   if (page_num > -1) {
     GGobiVariableType vartype;
-    GGobiStage *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
+    GGobiStage *d = datad_get_from_notebook(gg->vartable_ui.notebook);
     swin = gtk_notebook_get_nth_page (notebook, page_num);
     children = gtk_container_get_children (GTK_CONTAINER (swin));
     tree_view = g_list_nth_data (children, 0);
@@ -346,7 +346,7 @@ vartable_subwindow_init (GGobiStage *d, ggobid *gg)
   GtkTreeStore *model;
   GtkTreeModel *sort_model, *filter_model;
   
-  d = ggobi_stage_find(d, GGOBI_MAIN_STAGE_FILTER);
+  d = ggobi_stage_find(d, GGOBI_MAIN_STAGE_TRANSFORM);
   
   g_signal_connect (G_OBJECT (nbook), "switch-page",
     G_CALLBACK (vartable_switch_page_cb), gg);
@@ -551,7 +551,7 @@ vartable_collab_set_by_var (GGobiStage *d, guint j)
     g_free(values);
   }
   gtk_tree_store_set(GTK_TREE_STORE(model), &iter, VT_VARNAME, 
-    ggobi_stage_get_col_name(d, j), -1);
+    ggobi_stage_get_col_name(ggobi_stage_get_root(d), j), -1);
 
 }
 
@@ -566,7 +566,7 @@ vartable_collab_tform_set_by_var (GGobiStage *d, guint j)
 	  return;
 
   gtk_tree_store_set(GTK_TREE_STORE(model), &iter,
-    VT_TFORM, ggobi_stage_get_transformed_col_name(d, j), -1);
+    VT_TFORM, ggobi_stage_get_col_name(d, j), -1);
 }
 
 /*-- sets the limits for a variable --*/
@@ -591,8 +591,8 @@ vartable_limits_set_by_var (GGobiStage *d, guint j)
 		VT_REAL_DATA_MAX, var->lim_display.max, -1);
 	if (var->lim_specified_p) {
 		gtk_tree_store_set(GTK_TREE_STORE(model), &iter, 
-	  	  VT_REAL_USER_MIN, var->lim_specified_tform.min,
-		  VT_REAL_USER_MAX, var->lim_specified_tform.max, -1);
+	  	  VT_REAL_USER_MIN, var->lim_specified.min,
+		  VT_REAL_USER_MAX, var->lim_specified.max, -1);
         }
       break;
 
@@ -602,8 +602,8 @@ vartable_limits_set_by_var (GGobiStage *d, guint j)
 		VT_CAT_DATA_MAX, (gint)var->lim_display.max, -1); 
         if (var->lim_specified_p) {
 		gtk_tree_store_set(GTK_TREE_STORE(model), &iter, 
-	  	  VT_CAT_USER_MIN, (gint)var->lim_specified_tform.min,
-		  VT_CAT_USER_MAX, (gint)var->lim_specified_tform.max, -1);
+	  	  VT_CAT_USER_MIN, (gint)var->lim_specified.min,
+		  VT_CAT_USER_MAX, (gint)var->lim_specified.max, -1);
         }
       break;
       case GGOBI_VARIABLE_ALL_VARTYPES:

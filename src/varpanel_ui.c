@@ -306,7 +306,7 @@ varpanel_refresh (displayd * display, ggobid * gg)
      * use it to turn off all the buttons.
      */
     if (g_slist_length (gg->d) > 0) {
-      d = datad_get_from_notebook (gg->varpanel_ui.notebook, gg);
+      d = datad_get_from_notebook(gg->varpanel_ui.notebook);
       if (d) {
         gint j;
         for (j = 0; j < d->n_cols; j++) {
@@ -686,7 +686,7 @@ varpanel_tooltips_set (displayd * display, ggobid * gg)
   GtkWidget *wx, *wy, *wz, *label;
 
   if (display == NULL) {
-    d = datad_get_from_notebook (gg->varpanel_ui.notebook, gg);
+    d = datad_get_from_notebook(gg->varpanel_ui.notebook);
     if (d) {
       for (j = 0; j < d->n_cols; j++) {
         if ((wx = varpanel_widget_get_nth (VARSEL_X, j, d)) == NULL)

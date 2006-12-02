@@ -386,8 +386,8 @@ display_set_values (displayd * display, GGobiStage * d, ggobid * gg)
   display->options = DefaultDisplayOptions;
 
   display->ggobi = gg;
-  /* the data used by the display is that which passes the filters */
-  display->d = ggobi_stage_find(d, GGOBI_MAIN_STAGE_FILTER);
+  /* the display uses transformed data */
+  display->d = ggobi_stage_find(d, GGOBI_MAIN_STAGE_TRANSFORM);
 }
 
 displayd *

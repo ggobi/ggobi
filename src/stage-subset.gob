@@ -75,6 +75,9 @@ block (self, gint bstart, gint bsize)
   return (subsetsize > 0);
 }
 
+// FIXME: This range used to apply to the transformed values, but subset
+// comes before transform in the pipeline, so it now works on its own
+// values (the raw values, by default).
 public gboolean
 range (self)
 {
@@ -90,8 +93,8 @@ range (self)
     for (j=0; j < GGOBI_STAGE(self)->n_cols; j++) {
       var = ggobi_stage_get_variable(GGOBI_STAGE(self), j);
       if (var->lim_specified_p) {
-        if (GGOBI_STAGE(self)->tform.vals[i][j] < var->lim_specified.min ||
-            GGOBI_STAGE(self)->tform.vals[i][j] > var->lim_specified.max)
+        if (ggobi_stage_get_raw_value(GGOBI_STAGE(self), i, j) < var->lim_specified.min ||
+            ggobi_stage_get_raw_value(GGOBI_STAGE(self), i, j) > var->lim_specified.max)
         {
           add = false;
         }

@@ -33,7 +33,7 @@ tform_to_world_by_var (GGobiStage * d, guint j)
   range = max - min;
 
   for (i = 0; i < d->n_rows; i++) {
-    ftmp = -1.0 + 2.0 * ((greal) d->tform.vals[i][j] - min) / range;
+    ftmp = -1.0 + 2.0 * ((greal) ggobi_stage_get_raw_value(d, i, j) - min) / range;
     d->world.vals[i][j] = (greal) (PRECISION1 * ftmp);
 
     /* Add in the jitter values */

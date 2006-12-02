@@ -337,10 +337,10 @@ public guint n_cols;
 // This would mean manually emitting signals in stage subclasses.
 property UINT n_rows 
   (nick = "nrows", blurb = "Number of rows at this stage",
-   minimum = 0, maximum = INT_MAX, default_value = 0, link, export);
+   minimum = 0, maximum = G_MAXUINT, default_value = 0, link, export);
 property UINT n_cols 
   (nick = "ncols", blurb = "Number of cols at this stage",
-   minimum = 0, maximum = INT_MAX, default_value = 0, export)
+   minimum = 0, maximum = G_MAXUINT, default_value = 0, export)
    set { 
      self->n_cols = g_value_get_uint(VAL);
      g_ptr_array_set_size(selfp->vartable, self->n_cols);
@@ -372,7 +372,6 @@ public BrushBins  brush;
 public vector_i rows_under_brush;
 public vector_i rows_under_brush_prev;
 
-public array_f tform;
 public array_g world;
 public array_g jitdata;
 
@@ -413,25 +412,14 @@ private GHashTable* var_name_lookup = {
   g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL) 
 } destroywith g_hash_table_destroy;
 
-private signal first NONE (UINT) void 
+public signal first NONE (UINT) void 
 col_data_changed(self, guint j) {
   GGobiVariable *var = self_get_variable(self, j);
-  if (self->parent) {
-    // this hack will disappear once we have a tform stage
-    for (guint i = 0; i < self->n_rows; i++) {
-      self->tform.vals[i][j] = self->parent->tform.vals[i][j];
-    }
-  }
 
   ggobi_variable_update(var);
 
   // FIXME: incorporate into variable_update
-  limits_set_by_var(SELF(self), j, true, true, (SELF(self)->gg) ? SELF(self)->gg->lims_use_visible : true);
-  
-  // FIXME: rest of this stuff by pipeline
-  tform_to_world_by_var(SELF(self), j);
-  if (SELF(self)->gg)
-    displays_tailpipe (FULL, SELF(self)->gg);
+  limits_set_by_var(SELF(self), j, (SELF(self)->gg) ? SELF(self)->gg->lims_use_visible : true);
 }
 
 public signal first NONE (UINT) void 
@@ -470,8 +458,7 @@ cols_added(self, guint n) {
     GGobiVariable *var = self_create_variable(self, j);
     self_set_variable(self, j, var);
   }
-  
-  arrayf_add_cols (&self->tform, ncols);
+
   arrayg_add_cols (&self->jitdata, ncols);
   arrayg_add_cols (&self->world, ncols);
   
@@ -493,7 +480,6 @@ col_deleted(self, guint j) {
   self_set_n_cols(self, self->n_cols - 1);
 
   gint j1 = (gint) j;
-  arrayf_delete_cols (&self->tform, 1, &j1);
   arrayg_delete_cols (&self->jitdata, 1, &j1);
   arrayg_delete_cols (&self->world, 1, &j1);
   
@@ -521,16 +507,8 @@ rows_added(self, guint n) {
   vectori_realloc (&self->rows_under_brush, nrows);
   vectori_realloc (&self->rows_under_brush_prev, nrows);
   
-  arrayf_add_rows (&self->tform, nrows);
   arrayg_add_rows (&self->jitdata, nrows);
   arrayg_add_rows (&self->world, nrows);
-  
-  if (self->parent) {
-    // this hack will disappear once we have a tform stage
-    for (guint j = 0; j < self->n_cols; j++)
-      for (guint i = 0; i < self->n_rows; i++)
-        self->tform.vals[i][j] = self->parent->tform.vals[i][j];
-  }
   
   self->nrows_under_brush = self->nrows_under_brush_prev = 0;
   
@@ -551,7 +529,6 @@ rows_deleted(self, guint *rows, guint n) {
   vectori_realloc (&self->rows_under_brush, nrows);
   vectori_realloc (&self->rows_under_brush_prev, nrows);
   
-  arrayf_delete_rows (&self->tform, n, rows);
   arrayg_delete_rows (&self->jitdata, n, rows);
   arrayg_delete_rows (&self->world, n, rows);
   
@@ -864,6 +841,7 @@ set_string_value(self, guint i, guint j, const gchar* value)
   }
 }
 
+// FIXME: wouldn't simply get_value() work here?
 /** 
  * get_raw_value:
  * @self: #GGobiStage
@@ -952,14 +930,13 @@ get_variable (self, guint j)
  * output into csv etc.  It may be sub-optimal for user display, because
  * it does not use the users locale settings, and outputs full precision.
  **/
-// FIXME: obviously broken, waiting on pipeline
 public gchar*
-get_string_value(self, guint i, guint j, gboolean transformed) 
+get_string_value(self, guint i, guint j) 
 {
   GGobiVariable *var = self_get_variable(self, j);
-  gdouble raw = transformed ? self->tform.vals[i][j] : 
-    GGOBI_DATA(self)->raw.vals[i][j];
-  //gdouble raw = self_get_raw_data(self, i, j);
+  /*gdouble raw = transformed ? self->tform.vals[i][j] : 
+    GGOBI_DATA(self)->raw.vals[i][j];*/
+  gdouble raw = self_get_raw_value(self, i, j);
   
   if (self_is_missing(self, i, j)) 
     return g_strdup("NA");
@@ -1169,81 +1146,6 @@ get_attr_glyph(self, guint i, guint j_type, guint j_size)
   return glyph;
 }
 
-
-
-
-
-
-// FIXME: to be removed once pipeline in place
-/** 
- * get_transformed_col_name:
- * @self: GGobiStage object
- * @j: column index
- * Returns: duplicate of transformed column name (brief description of transformation
- * applied to variable)
- **/
-public gchar* 
-get_transformed_col_name(self, guint j) 
-{
-  gchar *lbl0, *lbl1, *lbl2;
-  GGobiVariable *vt = self_get_variable(self, j);
-
-   /*-- skip the stage0 changes except negation --*/
-   switch (vt->tform0) {
-     case NEGATE:
-       lbl0 = g_strdup_printf ("-%s", self_get_col_name(self, j));
-       break;
-     default:
-       lbl0 = g_strdup (self_get_col_name(self, j));
-       break;
-   }
-
-   switch (vt->tform1) {
-     case BOXCOX:
-       lbl1 = g_strdup_printf ("B-C(%s,%.2f)", lbl0, vt->param);
-       break;
-     case LOG10:
-       lbl1 = g_strdup_printf ("log10(%s)", lbl0);
-       break;
-     case INVERSE:
-       lbl1 = g_strdup_printf ("1/%s", lbl0);
-       break;
-     case ABSVALUE:
-       lbl1 = g_strdup_printf ("abs(%s)", lbl0);
-       break;
-     case SCALE_AB:
-       lbl1 = g_strdup_printf ("%s [a,b]", lbl0);
-       break;
-     default:
-       lbl1 = g_strdup (lbl0);
-   }
-
-   switch (vt->tform2) {
-     case STANDARDIZE:
-       lbl2 = g_strdup_printf ("(%s-m)/s", lbl1);
-     break;
-     case SORT:
-       lbl2 = g_strdup_printf ("sort(%s)", lbl1);
-     break;
-     case RANK:
-       lbl2 = g_strdup_printf ("rank(%s)", lbl1);
-     break;
-     case NORMSCORE:
-       lbl2 = g_strdup_printf ("normsc(%s)", lbl1);
-     break;
-     case ZSCORE:
-       lbl2 = g_strdup_printf ("zsc(%s)", lbl1);
-     break;
-     case DISCRETE2:
-       lbl2 = g_strdup_printf ("%s:0,1", lbl1);
-     break;
-     default:
-       lbl2 = g_strdup (lbl1);
-   }
-   
-   return lbl2;
-}
-
 // FIXME: data/attribute distinction should be made by a pipeline stage
 public guint
 get_n_vars(self) {
@@ -1343,10 +1245,10 @@ attach (self, ggobid *gg, gboolean cleanup)
    * of 0.  Here, re-set that value to 15% below the minimum for each
    * variable.  (dfs -- done at Di's request, September 2004)
    **/
-  limits_set (self, true, true, self->gg->lims_use_visible);
+  limits_set (self, self->gg->lims_use_visible);
   for (guint j = 0; j < self->n_cols; j++) vars[j] = j;
   impute_fixed (IMP_BELOW, 15.0, self->n_cols, vars, self);
-  limits_set (self, true, true, self->gg->lims_use_visible);
+  limits_set (self, self->gg->lims_use_visible);
   g_free(vars);
 
   clusters_set(self);  /*-- find the clusters for data just read in --*/

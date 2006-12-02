@@ -1,20 +1,13 @@
 %h{
   #include "ggobi-stage.h"
-  
-  typedef gdouble (*GGobiTransformFunc)(gdouble val, gpointer user_data);
-    
-  typedef struct _GGobiTransform {
-    GGobiTransformFunc forward;
-    GGobiTransformFunc reverse;
-    GGobiVariableNameTransformFunc name;
-    gpointer user_data;
-    GDestroyNotify destroy;
-    /*< private >*/
-    guint ref_count;
-  } GGobiTransform;
+  #include "ggobi-transform.h"
 %}
 
 %{
+  // temporary of course
+  #include "vars.h"
+  #include "externs.h"
+  
   static void
   get_transformed_cols_func(gpointer key, gpointer value, gpointer data)
   {
@@ -26,62 +19,66 @@
   static gchar *
   name_tform_func(const gchar *name, gpointer data)
   {
-    GGobiTransform *tform = (GGobiTransform *)data;
-    return(tform->name(name, tform->user_data));
+    GGobiTransform *tform = GGOBI_TRANSFORM(data);
+    return(ggobi_transform_variable_name(tform, name));
   }
-  
-  // FIXME: should be declared publically somewhere eventually
-  
-  GGobiTransform *
-  ggobi_transform_create_full(GGobiTransformFunc forward, GGobiTransformFunc reverse,
-    GGobiVariableNameTransformFunc name, gpointer user_data, GDestroyNotify destroy)
-  {
-    GGobiTransform *tform = g_new(GGobiTransform, 1);
-    tform->forward = forward;
-    tform->reverse = reverse;
-    tform->name = name;
-    tform->user_data = user_data;
-    tform->destroy = destroy;
-    tform->ref_count = 1;
-    return(tform);
-  }
-  GGobiTransform *
-  ggobi_transform_create(GGobiTransformFunc forward, GGobiTransformFunc reverse,
-    GGobiVariableNameTransformFunc name, gpointer user_data)
-  {
-    return ggobi_transform_create_full(forward, reverse, name, user_data, NULL);
-  }
-    
-  void
-  ggobi_transform_destroy(GGobiTransform *tform)
-  {
-    if (tform->destroy)
-      tform->destroy(tform->user_data);
-    g_free(tform);
-  }
-  void
-  ggobi_transform_ref(GGobiTransform *tform)
-  {
-    g_return_if_fail(tform->ref_count > 0);
-    tform->ref_count++;
-  }
-  void
-  ggobi_transform_unref(GGobiTransform *tform)
-  {
-    g_return_if_fail(tform->ref_count > 0);
-    tform->ref_count--;
-    if (!tform->ref_count)
-      ggobi_transform_destroy(tform);
-  }
-  
 %}
 
-
+// FIXME: This stage caches values that it does not transform.
+  
 //FIXME: please document me
 class GGobi:Stage:Transform from GGobi:Stage {
-  private GHashTable *tforms = { 
-      g_hash_table_new_full(NULL, NULL, NULL, (GDestroyNotify)ggobi_transform_unref) 
+  private array_f tform destroy {
+    if(&(VAR)) 
+      arrayf_free(&(VAR), 0, 0);
+  };
+  
+  private GHashTable *active_tforms = { 
+    g_hash_table_new_full(NULL, NULL, NULL, g_object_unref) 
   } destroywith g_hash_table_destroy;
+  
+  private signal NONE (UINT, OBJECT) void
+  applied(self, guint j, GGobiTransform *tform);
+  
+  override (GGobi:Stage) void 
+  col_data_changed(GGobiStage *self, guint j) {
+    PARENT_HANDLER(self, j);
+    if (self_get_transform(SELF(self), j))
+      self_transform(SELF(self), 0, j);
+    // FIXME: rest of this stuff by pipeline
+    tform_to_world_by_var(self, j);
+    if (self->gg)
+      displays_tailpipe (FULL, self->gg);
+  }
+  
+  override (GGobi:Stage) void
+  rows_deleted(GGobi:Stage *self, guint *rows, guint n) {
+    arrayf_delete_rows (&(SELF(self)->_priv->tform), n, rows);
+  }
+  
+  override (GGobi:Stage) void
+  rows_added(GGobi:Stage *self, guint n) {
+    guint j, nprev = self->n_rows;
+    guint ncols;
+    gint *tform_cols = self_get_transformed_cols(SELF(self), &ncols);
+    arrayf_add_rows (&(SELF(self)->_priv->tform), self->n_rows + n);
+    PARENT_HANDLER(self, n);
+    for (j = 0; j < ncols; j++)
+      self_transform(SELF(self), nprev, tform_cols[j]);
+    g_free(tform_cols);
+  }
+  
+  override (GGobi:Stage) void
+  cols_added(GGobi:Stage *self, guint n) {
+    PARENT_HANDLER(self, n);
+    arrayf_add_cols (&(SELF(self)->_priv->tform), self->n_cols);
+  }
+  
+  override (GGobi:Stage) void
+  col_deleted(GGobi:Stage *self, guint j) {
+    gint col = j;
+    arrayf_delete_cols (&(SELF(self)->_priv->tform), 1, &col);
+  }
   
   public GObject *
   new(GGobiStage *parent)
@@ -91,27 +88,40 @@ class GGobi:Stage:Transform from GGobi:Stage {
   }
   
   public void 
-  set_transform(self, guint j (check < N_COLS), GGobiTransform *tform)
+  apply(self, guint j  (check < N_COLS), GGobiTransform *tform)
   {
     GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(self), j);
-    ggobi_transform_ref(tform);
-    ggobi_variable_set_name_transform_func(var, name_tform_func, tform);
-    g_hash_table_insert(selfp->tforms, GINT_TO_POINTER(j), tform);
+    if (!tform) {
+      ggobi_variable_set_name_transform_func(var, NULL, NULL);
+      g_hash_table_remove(selfp->active_tforms, GINT_TO_POINTER(j));
+    } else {
+      g_object_ref(G_OBJECT(tform));
+      g_signal_connect(G_OBJECT(tform), "notify", 
+        G_CALLBACK(self_transform_notify_cb), self);
+      ggobi_variable_set_name_transform_func(var, name_tform_func, tform);
+      g_hash_table_insert(selfp->active_tforms, GINT_TO_POINTER(j), tform); 
+    }
+    self_applied(self, j, tform);
   }
-  
-  public void 
-  remove_transform(self, guint j (check < N_COLS))
+  public void
+  cancel(self, guint j  (check < N_COLS))
   {
-    GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(self), j);
-    ggobi_variable_set_name_transform_func(var, NULL, NULL);
-    g_hash_table_remove(selfp->tforms, GINT_TO_POINTER(j));
+    self_apply(self, j, NULL);
+  }
+  public void
+  cancel_all(self)
+  {
+    guint j, ncols;
+    gint *cols = self_get_transformed_cols(self, &ncols);
+    for (j = 0; j < ncols; j++)
+      self_cancel(self, cols[j]);
   }
   
   /* don't modify this value */
   public GGobiTransform *
   get_transform(self, guint j (check < N_COLS))
   {
-    return(g_hash_table_lookup(selfp->tforms, GINT_TO_POINTER(j)));
+    return(g_hash_table_lookup(selfp->active_tforms, GINT_TO_POINTER(j)));
   }
   
   /**
@@ -121,33 +131,81 @@ class GGobi:Stage:Transform from GGobi:Stage {
    * Some kind of list of the transformed columns?
   **/
   public gint *
-  get_transformed_cols(self)
+  get_transformed_cols(self, guint *ncols)
   {
-    gint *cols = g_new(gint, g_hash_table_size(selfp->tforms));
+    gint *cols = g_new(gint, g_hash_table_size(selfp->active_tforms));
     gint *tmp_cols = cols;
-    g_hash_table_foreach(selfp->tforms, get_transformed_cols_func, &tmp_cols);
+    g_hash_table_foreach(selfp->active_tforms, get_transformed_cols_func, &tmp_cols);
+    *ncols = self_get_n_transformed_cols(self);
     return(cols);
   }
   
   public guint
   get_n_transformed_cols(self)
   {
-    return (g_hash_table_size(selfp->tforms));
+    return (g_hash_table_size(selfp->active_tforms));
   }
   
   override (GGobi:Stage) gdouble
   get_raw_value(GGobi:Stage *self (check null type), guint i, guint j)
   {
-    GGobiStage *parent = GGOBI_STAGE(ggobi_stage_get_parent(self));
-    GGobiTransform *tform = self_get_transform(SELF(self), j);
-    return(tform->forward(ggobi_stage_get_raw_value(parent, i, j), tform->user_data));
+    return SELF(self)->_priv->tform.vals[i][j];
   }
   
+  // FIXME: make set_raw_value return a gboolean to indicate success?
   override (GGobi:Stage) void
   set_raw_value(GGobi:Stage *self (check null type), guint i, guint j, gdouble value)
   {
-    GGobiStage *parent = GGOBI_STAGE(ggobi_stage_get_parent(self));
     GGobiTransform *tform = self_get_transform(SELF(self), j);
-    ggobi_stage_set_raw_value(parent, i, j, tform->reverse(value, tform->user_data));
+    if (tform) {
+      GGobiVariable *var = ggobi_stage_get_variable(self->parent, j);
+      gdouble *result = ggobi_transform_reverse(tform, &value, 1, var);
+      if (result) {
+        PARENT_HANDLER(self, i, j, result[0]);
+        g_free(result);
+      } else self_transform_error(tform, j);
+    } else PARENT_HANDLER(self, i, j, value);
+  }
+  
+  private void
+  transform(self, guint start, guint j)
+  {
+    guint i;
+    GGobiTransform *tform = self_get_transform(self, j);
+    GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(self)->parent, j);
+    gdouble *result = ggobi_transform_column(tform, GGOBI_STAGE(self)->parent, 
+      start, j); 
+    if (result) {
+      // FIXME: The user limits will soon be handled by a viewporting stage
+      lims *limits = ggobi_transform_limits(tform, var->lim_specified, var);
+      for (i = start; i < GGOBI_STAGE(self)->n_rows; i++)
+        selfp->tform.vals[i][j] = result[i];
+      g_free(result);
+      if (limits) {
+        var->lim_specified.min = limits->min;
+        var->lim_specified.max = limits->max;
+        g_free(limits);
+      }
+    } else self_transform_error(tform, j);
+  }
+  
+  private void
+  transform_error(GGobiTransform *tform, guint j)
+  {
+     gchar *name = ggobi_transform_get_name(tform);
+     g_critical("Data outside the domain of transform %s at col %d.", name, j);
+     g_free(name);
+  }
+  
+  /* whenever a property of the transform changes, assume we need to update */
+  // FIXME: This may be too aggressive...
+  private void
+  transform_notify_cb(GGobiTransform *tform, GParamSpec *pspec, GGobiStageTransform *self)
+  {
+    guint j, ncols;
+    gint *cols = self_get_transformed_cols(self, &ncols);
+    for (j = 0; j < ncols; j++)
+      if (self_get_transform(self, cols[j]) == tform)
+        ggobi_stage_col_data_changed(GGOBI_STAGE(self), cols[j]);
   }
 }

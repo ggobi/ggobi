@@ -141,7 +141,7 @@ DTL: So need to call unresolveEdgePoints(e, d) to remove it from the
   if (ggobi_stage_has_vars(dtarget)) {
     for (l = gg->displays; l; l = l->next) {
       dsp = (displayd *) l->data;
-      if (dsp->d == ggobi_stage_find(dtarget, GGOBI_MAIN_STAGE_FILTER)) {
+      if (dsp->d == ggobi_stage_find(dtarget, GGOBI_MAIN_STAGE_TRANSFORM)) {
         for (sl = dsp->splots; sl; sl = sl->next) {
           sp = (splotd *) sl->data;
           if (sp != NULL)

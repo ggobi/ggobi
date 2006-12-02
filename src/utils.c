@@ -115,6 +115,21 @@ pcompare (const void *val1, const void *val2)
   else
     return (1);
 }
+/* new rank finder that doesn't need paird, thanks to g_qsort_with_data() */
+gint
+rank_compare (gconstpointer val1, gconstpointer val2, gpointer data)
+{
+  gint ind1 = GPOINTER_TO_INT(val1);
+  gint ind2 = GPOINTER_TO_INT(val2);
+  const gdouble *array = data;
+  
+  if (array[ind1] < array[ind2])
+    return (-1);
+  else if (array[ind1] == array[ind2])
+    return (0);
+  else
+    return (1);
+}
 
 /* Not used anywhere yet ... */
 void

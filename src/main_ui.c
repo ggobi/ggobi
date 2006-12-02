@@ -25,6 +25,7 @@
 #include "externs.h"
 #include "display_tree.h"
 #include "ggobi-input-source.h"
+#include "ggobi-gui-transform.h"
 
 #ifdef STORE_SESSION_ENABLED
 #include "write_state.h"
@@ -156,7 +157,7 @@ gg_write_to_statusbar (gchar * message, ggobid * gg)
     gtk_statusbar_push (GTK_STATUSBAR (statusbar), 0, message);
   else {
     /*-- by default, describe the current datad --*/
-    GGobiStage *d = ggobi_stage_get_root(datad_get_from_notebook (gg->varpanel_ui.notebook, gg));
+    GGobiStage *d = ggobi_stage_get_root(datad_get_from_notebook(gg->varpanel_ui.notebook));
     if (d) {
       gchar *display_name = ggobi_input_source_get_display_name(
         ggobi_data_get_source(GGOBI_DATA(d)));
@@ -241,7 +242,7 @@ varpanel_reinit (ggobid * gg)
 
   if (display == NULL) {
     if (g_slist_length (gg->d) > 0) {
-      d = datad_get_from_notebook (gg->varpanel_ui.notebook, gg);
+      d = datad_get_from_notebook(gg->varpanel_ui.notebook);
       /* if the circles are showing, hide them */
       if (varpanel_shows_circles (d)) {
         varcircles_show (false, d, display, gg);
@@ -731,6 +732,26 @@ quit_ggobi (ggobid * gg)
 
   procs_activate (off, gg->pmode, gg->current_display, gg);
   gtk_main_quit ();
+}
+
+static GtkWidget *
+subwindow_create(ggobid *gg, const gchar *title, GtkWidget *panel)
+{
+  GtkWidget *win = gtk_dialog_new_with_buttons(title, GTK_WINDOW(gg->main_window), 
+    GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE, NULL);
+  g_signal_connect (G_OBJECT (win), "response", G_CALLBACK(gtk_widget_hide), NULL);
+  gtk_container_add(GTK_CONTAINER(GTK_DIALOG(win)->vbox), panel);
+  return win;
+}
+
+// FIXME: May want to make this and its siblings public
+static void
+transform_window_open(ggobid *gg)
+{
+  if (!gg->transform_gui)
+    gg->transform_gui = subwindow_create(gg, "Transform Variables", 
+      ggobi_gui_transform_new(gg));
+  gtk_window_present(GTK_WINDOW(gg->transform_gui));
 }
 
 /* action callbacks */

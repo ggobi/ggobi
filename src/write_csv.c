@@ -18,7 +18,7 @@ write_csv_header (gint *cols, gint ncols, FILE *f, GGobiStage *d, ggobid *gg)
   for (j=0; j<ncols; j++) {
     jcol = cols[j];
     rval = fprintf (f, "\"%s\"", 
-             g_strstrip((gg->save.stage == TFORMDATA) ? ggobi_stage_get_transformed_col_name(d, jcol) : ggobi_stage_get_col_name(d, jcol)));
+             g_strstrip((gg->save.stage == TFORMDATA) ? ggobi_stage_get_col_name(d, jcol) : ggobi_stage_get_col_name(d, jcol)));
     if (rval < 0) {
       ok = false;
       break;
@@ -34,7 +34,7 @@ write_csv_header (gint *cols, gint ncols, FILE *f, GGobiStage *d, ggobid *gg)
 void
 write_csv_cell(gint i, gint j, FILE *f, GGobiStage *d, ggobid *gg)
 {
-  gchar* value = ggobi_stage_get_string_value(d, i, j, gg->save.stage == TFORMDATA);
+  gchar* value = ggobi_stage_get_string_value(d, i, j);
 
   switch (ggobi_stage_get_col_type(d, j)) {
   case GGOBI_VARIABLE_CATEGORICAL:

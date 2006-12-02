@@ -225,7 +225,7 @@ varcircle_label_set (GGobiStage * d, gint j)
 {
   GtkWidget *w = varcircles_get_nth (LBL, j, d);
   if (w != NULL)
-    gtk_label_set_text (GTK_LABEL (w), ggobi_stage_get_transformed_col_name(d, j));
+    gtk_label_set_text (GTK_LABEL (w), ggobi_stage_get_col_name(d, j));
 }
 
 
@@ -544,7 +544,7 @@ varcircle_sel_cb (GtkWidget * w, GdkEvent * event, gint jvar)
   displayd *display = gg->current_display;
   cpaneld *cpanel = &display->cpanel;
   splotd *sp = gg->current_splot;
-  GGobiStage *d = datad_get_from_notebook (gg->varpanel_ui.notebook, gg);
+  GGobiStage *d = datad_get_from_notebook(gg->varpanel_ui.notebook);
 
   if (d != display->d)
     return true;

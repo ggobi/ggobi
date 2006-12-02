@@ -35,6 +35,9 @@
 #define off 0
 #define on 1
 
+/* for specifying the min of double properties in GOB */
+#define GGOBI_NEG_MAXDOUBLE -G_MAXDOUBLE
+
 #define HORIZONTAL 0
 #define VERTICAL   1
 

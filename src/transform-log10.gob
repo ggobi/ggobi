@@ -1,0 +1,48 @@
+%h{
+  #include "ggobi-transform.h"
+%}
+%{
+  #include <math.h>
+%}
+class GGobi:Transform:Log10 from GGobi:Transform {
+  
+  override (GGobi:Transform) gchar *
+  variable_name (GGobi:Transform *self, const gchar *name)
+  {
+    return g_strdup_printf("log10(%s)", name);
+  }
+  
+  override (GGobi:Transform) gdouble *
+  forward (GGobi:Transform *self, gdouble *vals, guint n, GGobiVariable *var) 
+  { 
+    guint i;
+    gdouble *result = g_new(gdouble, n);
+    for (i=0; i < n; i++)
+      if (vals[i] <= 0)
+        return NULL;
+    for (i=0; i < n; i++)
+      result[i] = log10 (vals[i]);
+    return result;
+  }
+  
+  override (GGobi:Transform) gdouble *
+  reverse (GGobi:Transform *self, gdouble *vals, guint n, GGobiVariable *var) 
+  {
+    guint i;
+    gdouble *result = g_new(gdouble, n);
+    for (i=0; i < n; i++)
+      result[i] = pow(10, vals[i]);
+    return result;
+  }
+  
+  override (GGobi:Transform) gchar *
+  get_name(GGobi:Transform *self)
+  {
+    return g_strdup("Log base 10");
+  }
+  override (GGobi:Transform) gchar *
+  get_description(GGobi:Transform *self)
+  {
+    return g_strdup("Take the base 10 logarithm of each value");
+  }
+}

@@ -625,7 +625,7 @@ barchart_init_categorical (barchartSPlotd * sp, GGobiStage * d)
   } 
   else {
     for (i = 0; i < d->n_rows; i++)
-      yy[i] = d->tform.vals[i][jvar];
+      yy[i] = ggobi_stage_get_raw_value(d, i, jvar);
   }
   mindist = barchart_sort_index (yy, d->n_rows, gg, sp);
   g_free ((gpointer) yy);
@@ -864,14 +864,14 @@ barchart_recalc_counts (barchartSPlotd * sp, GGobiStage * d, ggobid * gg)
     gint index, rank = 0;
 
     index = sp->bar->index_to_rank.els[rank];
-    yy = d->tform.vals[index][rawsp->p1dvar];
+    yy = ggobi_stage_get_raw_value(d, index, rawsp->p1dvar);
 
     while ((yy < sp->bar->breaks[0] + sp->bar->offset) &&
            (rank < d->n_rows - 1)) {
       rawsp->planar[index].x = -1;
       rank++;
       index = sp->bar->index_to_rank.els[rank];
-      yy = d->tform.vals[index][rawsp->p1dvar];
+      yy = ggobi_stage_get_raw_value(d, index, rawsp->p1dvar);
     }
 
     if (rank > 0) {
@@ -895,7 +895,7 @@ barchart_recalc_counts (barchartSPlotd * sp, GGobiStage * d, ggobid * gg)
     bin = 0;
     while (rank < d->n_rows) {
       index = sp->bar->index_to_rank.els[rank];
-      yy = d->tform.vals[index][rawsp->p1dvar];
+      yy = ggobi_stage_get_raw_value(d, index, rawsp->p1dvar);
       while ((bin < sp->bar->nbins) &&
              (sp->bar->breaks[bin + 1] + sp->bar->offset < yy)) {
         bin++;

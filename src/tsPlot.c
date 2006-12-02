@@ -93,14 +93,14 @@ tsAddPlotLabels(splotd *sp, GdkDrawable *drawable, ggobid *gg)
   PangoRectangle rect;
 
   if (l->data == sp) {
-    layout_text(layout, ggobi_stage_get_transformed_col_name(display->d, sp->xyvars.x), &rect);
+    layout_text(layout, ggobi_stage_get_col_name(display->d, sp->xyvars.x), &rect);
       gdk_draw_layout(drawable, gg->plot_GC, 
       sp->max.x - rect.width - 5,
       sp->max.y - rect.height - 5,
       layout
     );
   }
-  layout_text(layout, ggobi_stage_get_transformed_col_name(display->d, sp->xyvars.y), &rect);
+  layout_text(layout, ggobi_stage_get_col_name(display->d, sp->xyvars.y), &rect);
   gdk_draw_layout(drawable, gg->plot_GC, 5, 5, layout);
   g_object_unref(G_OBJECT(layout));
 }

@@ -1,0 +1,35 @@
+%h{
+  #include "ggobi-transform.h"
+%}
+class GGobi:Transform:Min:One from GGobi:Transform {
+  override (GGobi:Transform) gdouble *
+  forward (GGobi:Transform *self, gdouble *vals, guint n, GGobiVariable *var) 
+  { 
+    gdouble *result = g_new(gdouble, n);
+    gdouble min = ggobi_variable_get_min(var);
+    for (guint i = 0; i < n; i++)
+      result[i] = vals[i] - min + 1.0;
+    return (result); 
+  }
+  
+  override (GGobi:Transform) gdouble *
+  reverse (GGobi:Transform *self, gdouble *vals, guint n, GGobiVariable *var) 
+  {
+    gdouble *result = g_new(gdouble, n);
+    gdouble min = ggobi_variable_get_min(var);
+    for (guint i = 0; i < n; i++)
+      result[i] = vals[i] + min - 1.0;
+    return (result);
+  }
+  
+  override (GGobi:Transform) gchar *
+  get_name(GGobi:Transform *self)
+  {
+    return g_strdup("Bring min to one");
+  }
+  override (GGobi:Transform) gchar *
+  get_description(GGobi:Transform *self)
+  {
+    return g_strdup("Subtract the variable minimum from each value, then add one");
+  }
+}

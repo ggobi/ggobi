@@ -14,12 +14,6 @@
  *   Andreas Buja        andreas.buja@wharton.upenn.edu
 */
 
-/*
- * Something here should respond to a variable transformation event,
- * I think.  We don't yet have such an event, so I won't spend the 
- * time now to work out what the response should be.  dfs 9/10/2002
-*/
-
 #include <string.h>
 #include <stdlib.h>
 
@@ -34,95 +28,6 @@ static gint ymargin = 20;
 
 static void bin_counts_reset (gint jvar, GGobiStage *d, ggobid *gg);
 static void selection_made_cb (GtkTreeSelection *tree_sel, ggobid *gg);
-
-/*----------------------------------------------------------------*/
-/*      Notebook containing the variable list for each datad      */
-/*----------------------------------------------------------------*/
-
-/*
- * Apparently I have to override these functions from utils_ui.c
- * so that I can add a signal appropriately to the new page in
- * the notebook.
- * Only one line is different:
-    GtkSignalFunc func = selection_made_cb;
-*/
-
-static void 
-wvis_variable_notebook_adddata_cb (ggobid *gg, GGobiStage *d, void *notebook)
-{
-  GtkWidget *swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), 0);
-  if (swin) {
-    GtkWidget *tree_view;
-    GtkSelectionMode mode = GTK_SELECTION_SINGLE;
-    GCallback func = G_CALLBACK(selection_made_cb);
-
-    tree_view = GTK_BIN (swin)->child;
-    if (tree_view) {
-      GtkTreeSelection *tree_sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view));
-      mode = gtk_tree_selection_get_mode(tree_sel);
-      /* um is something supposed to happen here? mfl */
-      /*
-       * should also be possible to retrieve the signal function that
-       * responds to "select_row" signal
-      */
-    }
-
-    variable_notebook_subwindow_add (d, func, NULL, GTK_WIDGET(notebook),
-      GGOBI_VARIABLE_ALL_VARTYPES, all_datatypes, gg);
-    gtk_notebook_set_show_tabs (GTK_NOTEBOOK (notebook),
-                                g_slist_length (gg->d) > 1);
-  }
-}
-
-CHECK_EVENT_SIGNATURE(wvis_variable_notebook_adddata_cb, datad_added_f)
-CHECK_EVENT_SIGNATURE(variable_notebook_list_changed_cb, variable_list_changed_f)
-
-GtkWidget *
-wvis_create_variable_notebook (GtkWidget *box, GtkSelectionMode mode, 
-  GtkSignalFunc func, ggobid *gg)
-{
-  GtkWidget *notebook;
-  gint nd = g_slist_length (gg->d);
-  GSList *l;
-  GGobiStage *d;
-
-  /* Create a notebook, set the position of the tabs */
-  notebook = gtk_notebook_new ();
-  gtk_notebook_set_tab_pos (GTK_NOTEBOOK (notebook), GTK_POS_TOP);
-  gtk_notebook_set_show_tabs (GTK_NOTEBOOK (notebook), nd > 1);
-  gtk_box_pack_start (GTK_BOX (box), notebook, true, true, 2);
-  g_object_set_data(G_OBJECT(notebook), "SELECTION", (gpointer) mode);
-  g_object_set_data(G_OBJECT(notebook), "selection-func", func);
-  g_object_set_data(G_OBJECT(notebook), "selection-func-data", NULL);
-  g_object_set_data(G_OBJECT(notebook), "vartype", (gpointer) GGOBI_VARIABLE_ALL_VARTYPES);
-  g_object_set_data(G_OBJECT(notebook), "datatype", (gpointer) all_datatypes);
-
-  for (l = gg->d; l; l = l->next) {
-    d = (GGobiStage *) l->data;
-    if (ggobi_stage_has_vars(d)) {
-      variable_notebook_subwindow_add (d, func, NULL, notebook,
-        GGOBI_VARIABLE_ALL_VARTYPES, all_datatypes, gg);
-    }
-  }
-
-  /*-- listen for variable_added and _list_changed events on main_window --*/
-  /*-- ... list_changed would be adequate --*/
-  g_signal_connect (G_OBJECT (gg),
-    "variable_added",
-     G_CALLBACK (variable_notebook_varchange_cb),
-     GTK_OBJECT (notebook));
-  g_signal_connect (G_OBJECT (gg),
-    "variable_list_changed",
-     G_CALLBACK (variable_notebook_list_changed_cb),
-     GTK_OBJECT (notebook));
-
-  /*-- listen for variable_added events on main_window --*/
-  g_signal_connect (G_OBJECT (gg),
-    "datad_added", G_CALLBACK (wvis_variable_notebook_adddata_cb),
-     GTK_OBJECT (notebook));
-
-  return notebook;
-}
 
 /*-------------------------------------------------------------------------*/
 
@@ -139,8 +44,8 @@ bin_counts_reset (gint jvar, GGobiStage *d, ggobid *gg)
     return;
 
   var = ggobi_stage_get_variable(d, jvar);
-  min = var->lim_tform.min;
-  max = var->lim_tform.max;
+  min = var->lim_raw.min;
+  max = var->lim_raw.max;
 
   for (k=0; k<gg->wvis.npct; k++)
     gg->wvis.n[k] = 0;
@@ -148,7 +53,7 @@ bin_counts_reset (gint jvar, GGobiStage *d, ggobid *gg)
   for (m=0; m<d->n_rows; m++) {
     for (k=0; k<scheme->n; k++) {
        val = min + gg->wvis.pct[k] * (max - min);
-      if (d->tform.vals[m][jvar] <= val) {
+      if (ggobi_stage_get_raw_value(d, m, jvar) <= val) {
         gg->wvis.n[k]++;
         break;
       }
@@ -170,14 +75,14 @@ record_colors_reset (gint selected_var, GGobiStage *d, ggobid *gg)
     return;
 
   var = ggobi_stage_get_variable(d, selected_var);
-  min = var->lim_tform.min;
-  max = var->lim_tform.max;
+  min = var->lim_raw.min;
+  max = var->lim_raw.max;
 
   GGOBI_STAGE_ATTR_INIT_ALL(d);  
   for (m=0; m<d->n_rows; m++) {
     for (k=0; k<scheme->n; k++) {
       val = min + gg->wvis.pct[k] * (max - min);
-      if (d->tform.vals[m][selected_var] <= val) {
+      if (ggobi_stage_get_raw_value(d, m, selected_var) <= val) {
         GGOBI_STAGE_SET_ATTR_COLOR(d, m, k, ATTR_SET_PERSISTENT);
         break;
       }
@@ -364,13 +269,13 @@ bin_boundaries_set (gint selected_var, GGobiStage *d, ggobid *gg)
     gint groupsize = (gint) (d->n_rows / ngroups);
     paird *pairs = (paird *) g_malloc (d->n_rows * sizeof (paird));
 
-    min = var->lim_tform.min;
-    max = var->lim_tform.max;
+    min = var->lim_raw.min;
+    max = var->lim_raw.max;
     range = max - min;
 
     /*-- sort the selected variable --*/
     for (i=0; i<d->n_rows; i++) {
-      pairs[i].f = d->tform.vals[i][selected_var];
+      pairs[i].f = ggobi_stage_get_raw_value(d, i, selected_var);
       pairs[i].indx = i;
     }
     qsort ((gchar *) pairs, d->n_rows, sizeof (paird), pcompare);
@@ -520,8 +425,8 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
 
     var = ggobi_stage_get_variable(d, selected_var);
     if (var) {
-      min = var->lim_tform.min;
-      max = var->lim_tform.max;
+      min = var->lim_raw.min;
+      max = var->lim_raw.max;
 
       gdk_gc_set_foreground (gg->wvis.GC, &scheme->rgb_accent);
       y = ymargin;
@@ -640,8 +545,9 @@ wvis_window_open (ggobid *gg)
     gtk_container_add (GTK_CONTAINER (gg->wvis.window), vbox);    
 
     /* Create a notebook, set the position of the tabs */
-    notebook = wvis_create_variable_notebook (vbox, GTK_SELECTION_SINGLE,
-      G_CALLBACK(selection_made_cb), gg);
+    notebook = create_variable_notebook (vbox, GTK_SELECTION_SINGLE,
+      GGOBI_VARIABLE_ALL_VARTYPES, all_datatypes,
+      G_CALLBACK(selection_made_cb), NULL, gg);
     gtk_widget_set_sensitive(notebook, true);
 
 

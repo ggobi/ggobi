@@ -73,7 +73,7 @@ cluster_symbol_show (GtkWidget * w, GdkEventExpose * event, gpointer cbd)
   ggobid *gg = GGobiFromWidget (w, true);
   icoords pos;
   glyphd g;
-  GGobiStage *d = datad_get_from_notebook (gg->cluster_ui.notebook, gg);
+  GGobiStage *d = datad_get_from_notebook(gg->cluster_ui.notebook);
   colorschemed *scheme = gg->activeColorScheme;
 
   /*-- fill in the background color --*/
@@ -124,13 +124,13 @@ hide_cluster_cb (GtkToggleButton * btn, gpointer cbd)
   gint k = GPOINTER_TO_INT (cbd);
   gint i;
   ggobid *gg = GGobiFromWidget (GTK_WIDGET (btn), true);
-  GGobiStage *d = datad_get_from_notebook (gg->cluster_ui.notebook, gg);
+  GGobiStage *d = datad_get_from_notebook(gg->cluster_ui.notebook);
   gboolean changed = false;
 
   GGOBI_STAGE_ATTR_INIT_ALL(d);  
   /*-- operating on the current sample, whether hidden or shown --*/
   for (i = 0; i < d->n_rows; i++) {
-    //if (GGOBI_STAGE_GET_ATTR_SAMPLED(d, i)) {
+    //if (GGOBI_STAGE_GET_ATTR_SAMPLED(d)) {
       if (GGOBI_STAGE_GET_ATTR_CLUSTER(d, i) == k) {
         if (GGOBI_STAGE_SET_ATTR_HIDDEN(d, i, btn->active, ATTR_SET_PERSISTENT)) {
           changed = brush_all_matching_id (d, i, true, br_shadow, ATTR_SET_PERSISTENT) || changed;          
@@ -155,7 +155,7 @@ include_hiddens (gboolean include, GGobiStage * d, ggobid * gg)
   displayd *dsp = gg->current_display;
   cpaneld *cpanel = &dsp->cpanel;
   gboolean prev, changed = false;
-  GGobiStage *f = ggobi_stage_find(d, GGOBI_MAIN_STAGE_FILTER);
+  GGobiStage *f = ggobi_stage_find(ggobi_stage_get_root(d), GGOBI_MAIN_STAGE_FILTER);
 
   GGOBI_STAGE_BRUSH_ATTR_INIT(f, hidden);  
   for (i = 0; i < d->n_rows; i++) {
@@ -181,7 +181,7 @@ include_hiddens (gboolean include, GGobiStage * d, ggobid * gg)
         continue;
       clusters_set(d);
       cluster_table_labels_update (dd, gg);
-      limits_set (dd, true, true, gg->lims_use_visible);
+      limits_set (dd, gg->lims_use_visible);
       vartable_limits_set (dd);
       vartable_stats_set (dd);
       tform_to_world(dd);
@@ -190,7 +190,7 @@ include_hiddens (gboolean include, GGobiStage * d, ggobid * gg)
 
   clusters_set(f);
   cluster_table_labels_update (f, gg);
-  limits_set (f, true, true, gg->lims_use_visible);
+  limits_set (f, gg->lims_use_visible);
   vartable_limits_set (f);
   vartable_stats_set (f);
   tform_to_world(f);
@@ -215,13 +215,13 @@ include_hiddens (gboolean include, GGobiStage * d, ggobid * gg)
 static void
 exclude_hiddens_cb (GtkWidget * w, ggobid * gg)
 {
-  GGobiStage *d = datad_get_from_notebook (gg->cluster_ui.notebook, gg);
+  GGobiStage *d = datad_get_from_notebook(gg->cluster_ui.notebook);
   include_hiddens (false, d, gg);
 }
 static void
 include_hiddens_cb (GtkWidget * w, ggobid * gg)
 {
-  GGobiStage *d = datad_get_from_notebook (gg->cluster_ui.notebook, gg);
+  GGobiStage *d = datad_get_from_notebook(gg->cluster_ui.notebook);
   include_hiddens (true, d, gg);
 }
 
@@ -231,8 +231,8 @@ cluster_symbol_cb (GtkWidget * w, GdkEventExpose * event, gpointer cbd)
   /*-- reset the glyph and color of this glyph to the current values --*/
   gint n = GPOINTER_TO_INT (cbd);
   ggobid *gg = GGobiFromWidget (w, true);
-  GGobiStage *d = datad_get_from_notebook (gg->cluster_ui.notebook, gg);
-  GGobiStage *f = ggobi_stage_find(d, GGOBI_MAIN_STAGE_FILTER);
+  GGobiStage *d = datad_get_from_notebook(gg->cluster_ui.notebook);
+  GGobiStage *f = ggobi_stage_find(ggobi_stage_get_root(d), GGOBI_MAIN_STAGE_FILTER);
   gint k, i;
   cpaneld *cpanel = &gg->current_display->cpanel;
   gboolean rval = false;
@@ -402,7 +402,7 @@ cluster_free (gint k, GGobiStage * d, ggobid * gg)
 static void
 update_cb (GtkWidget * w, ggobid * gg)
 {
-  GGobiStage *d = datad_get_from_notebook (gg->cluster_ui.notebook, gg);
+  GGobiStage *d = datad_get_from_notebook(gg->cluster_ui.notebook);
   splotd *sp = gg->current_splot;
 
   //ggobi_stage_set_rows_in_plot(d);

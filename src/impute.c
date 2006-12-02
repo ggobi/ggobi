@@ -123,8 +123,8 @@ impute_mean_or_median (gint type, gint nvars, gint * vars,
               if (ggobi_stage_is_missing(d, i, j))
                 missv[nmissing++] = i;
               else {
-                sum += d->tform.vals[i][j]; /* for mean */
-                x[np++] = d->tform.vals[i][j];  /* for median */
+                sum += ggobi_stage_get_raw_value(d, i, j); /* for mean */
+                x[np++] = ggobi_stage_get_raw_value(d, i, j);  /* for median */
               }
             }
           }

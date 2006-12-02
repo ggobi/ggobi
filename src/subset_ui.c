@@ -137,7 +137,7 @@ rescale_cb (GtkWidget *w, GtkTreeSelection *tree_sel)
   GGobiStageSubset *subset = subset_ui_get_selected_stage(tree_sel);
   GGobiStage *d = GGOBI_STAGE(subset);
   if (d) {
-    limits_set (d, true, true, d->gg->lims_use_visible);
+    limits_set (d, d->gg->lims_use_visible);
     vartable_limits_set (d);
     vartable_stats_set (d);
 

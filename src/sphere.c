@@ -398,13 +398,14 @@ sphere_varcovar_set (GGobiStage * d, ggobid * gg)
  * This may not be necessary:  isn't tform_mean already
  * stored in GGobiVariable?  dfs ...  Yes, but Andreas thinks
  * maybe it shouldn't be.
- * The purpose of the GGobiVariable structure is to store metadata about a 
+ *
+ * mfl - The purpose of the GGobiVariable structure is to store metadata about a 
  * variable. Mean, median, etc are included in this. Just get the GGobiVariable
- * from the tform stage to get the tform mean. - mfl
+ * from the tform stage to get the tform mean. 
 */
     tmpf = 0.;
     for (i = 0; i < n; i++)
-      tmpf += d->tform.vals[i][var];
+      tmpf += ggobi_stage_get_raw_value(d, i, var);
     tform_mean[k] = tmpf / ((gfloat) n);
   }
 
@@ -413,8 +414,8 @@ sphere_varcovar_set (GGobiStage * d, ggobid * gg)
       tmpf = 0.;
       for (m = 0; m < n; m++) {
         tmpf = tmpf +
-          (d->tform.vals[m][d->sphere.vars.els[k]] - tform_mean[k]) *
-          (d->tform.vals[m][d->sphere.vars.els[j]] - tform_mean[j]);
+          (ggobi_stage_get_raw_value(d, m, d->sphere.vars.els[k]) - tform_mean[k]) *
+          (ggobi_stage_get_raw_value(d, m, d->sphere.vars.els[j]) - tform_mean[j]);
       }
       tmpf /= ((gfloat) (n - 1));
       d->sphere.vc.vals[j][k] = tmpf;
@@ -549,12 +550,12 @@ spherize_data (vector_i * svars, vector_i * pcvars, GGobiStage * d,
       for (k = 0; k < svars->nels; k++) {
         if (d->sphere.vars_stdized) {
           tmpf = tmpf + (gfloat) eigenvec[k][j] *
-            (d->tform.vals[m][svars->els[k]] -
+            (ggobi_stage_get_raw_value(d, m, svars->els[k]) -
              tform_mean[k]) / tform_stddev[k];
         }
         else {
           tmpf = tmpf + (gfloat) eigenvec[k][j] *
-            (d->tform.vals[m][svars->els[k]] - tform_mean[k]);
+            (ggobi_stage_get_raw_value(d, m, svars->els[k]) - tform_mean[k]);
         }
       }
       b[j] = tmpf / eigenval[j];

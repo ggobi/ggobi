@@ -1,0 +1,29 @@
+%h{
+  #include "ggobi.h"
+%}
+/* Handles operations common to all GGobi GUI "components" (like tool dialogs).
+   Not sure how useful this one will be yet. Right now it just initializes
+   the component when the ggobid is provided (at construction). 
+   There may be other types of objects that depend on a reference to ggobid.
+   In that case, we may need to make this an interface, or something.
+*/
+class GGobi:GUI:Component from Gtk:VBox {
+  private ggobid *gg;
+  //FIXME: just specifying G:Object here until ggobid is refactored
+  property OBJECT gg
+  (nick = "ggobi", blurb = "The context in which this component exists",
+    flags = CONSTRUCT_ONLY, object_type = G:Object)
+  set {
+    ggobid *gg = g_value_get_object(VAL);
+    g_return_if_fail(gg != NULL);
+    selfp->gg = gg;
+    /* at construction time, initialize the component with its parent context */
+    self_initialize(self, gg);
+  }
+  get {
+    g_value_set_object(VAL, selfp->gg);
+  };
+  
+  private virtual void
+  initialize(self, ggobid *gg);
+}

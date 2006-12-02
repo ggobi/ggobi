@@ -1,0 +1,87 @@
+%h{
+  #include "ggobi-transform.h"
+%}
+%{
+  #include <math.h>
+%}
+class GGobi:Transform:Boxcox from GGobi:Transform {
+  private gdouble lambda;
+  property DOUBLE lambda
+   (nick = "L", blurb = "The Box-Cox parameter L in (Y^L - 1)/L",
+    minimum = GGOBI_NEG_MAXDOUBLE, maximum = G_MAXDOUBLE, default_value = 0,
+    export, link);
+  
+  override (GGobi:Transform) gchar *
+  variable_name (GGobi:Transform *self, const gchar *name)
+  {
+    return g_strdup_printf ("B-C(%s,%.2f)", name, SELF(self)->_priv->lambda);
+  }
+  
+  override (GGobi:Transform) gdouble *
+  forward (GGobi:Transform *self, gdouble *vals, guint n, GGobiVariable *var) 
+  { 
+    guint i;
+    gdouble *result = g_new(gdouble, n);
+    gdouble lambda = SELF(self)->_priv->lambda;
+    
+    if (fabs (lambda-0) < .001) {       /* Natural log */
+      for (i=0; i < n; i++) {
+        if (vals[i] <= 0)
+          return NULL;
+      }
+      /*-- if all values are in the domain of log --*/
+      for (i=0; i < n; i++) {
+        result[i] = log (vals[i]);
+      }
+    } else {  /*-- if the exponent is outisde (-.001, .001) --*/
+      for (i=0; i < n; i++) {
+        gdouble dtmp = (pow (vals[i], lambda) - 1.0) / lambda;
+        /* If dtmp no good, return */
+        if (!isfinite (dtmp))
+          return NULL;
+        else result[i] = dtmp;
+      }
+    }
+    return result;
+  }
+  
+  override (GGobi:Transform) gdouble *
+  reverse (GGobi:Transform *self, gdouble *vals, guint n, GGobiVariable *var) 
+  {
+    guint i;
+    gdouble *result = g_new(gdouble, n);
+    gdouble lambda = SELF(self)->_priv->lambda;
+    
+    if (fabs (lambda-0) < .001)
+      for (i=0; i < n; i++)
+        result[i] = exp (vals[i]);
+    else {  /*-- if the exponent is outside (-.001, .001) --*/
+      for (i=0; i < n; i++) {
+        gdouble dtmp = vals[i] * lambda + 1.0;
+        /* If domain outside of log, return */
+        if (dtmp <= 0)
+          return NULL;
+        else result[i] = log(dtmp) / log(lambda);
+      }
+    }
+    return result;
+  }
+  
+  override (GGobi:Transform) gchar *
+  get_name(GGobi:Transform *self)
+  {
+    return g_strdup("Box-Cox");
+  }
+  override (GGobi:Transform) gchar *
+  get_description(GGobi:Transform *self)
+  {
+    return g_strdup("Make a variable normally distributed");
+  }
+  
+  override (GGobi:Transform) gboolean
+  compare(GGobi:Transform *self, GGobi:Transform *other)
+  {
+    return PARENT_HANDLER(self, other) && 
+      SELF(self)->_priv->lambda == GGOBI_TRANSFORM_BOXCOX(other)->_priv->lambda;
+  }
+}

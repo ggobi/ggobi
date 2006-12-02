@@ -4,7 +4,9 @@ libggobi_la_GOBS = variable.gob stage.gob data.gob stage-transform.gob \
   plugin-factory.gob plugin.gob data-factory-csv.gob data-factory-xml.gob \
   input-source-file.gob input-source-http.gob gsf-input-http.gob \
   gsf-input-ftp.gob input-source-ftp.gob input-decoder.gob \
-  input-decoder-bgzip.gob stage-subset.gob stage-group.gob
+  input-decoder-bgzip.gob stage-subset.gob stage-group.gob transform.gob \
+  transform-min-one.gob transform-boxcox.gob transform-abs.gob transform-log10.gob \
+  gui-component.gob gui-transform.gob type-registry.gob
 libggobi_la_GOBSOURCES = $(libggobi_la_GOBS:%.gob=ggobi-%.c)
 libggobi_la_GOBHEADERS = $(libggobi_la_GOBS:%.gob=ggobi-%.h)
 libggobi_la_GOBOBJECTS = $(libggobi_la_GOBS:%.gob=ggobi-%.lo)
@@ -26,7 +28,7 @@ libggobi_la_SOURCES = array.c ash1d.c barchart.c barchartClass.c \
   subset_ui.c svd.c texture.c timeplot.c time_ui.c timing.c tour.c tour1d.c \
   tour1d_pp.c tour1d_pp_ui.c tour1d_ui.c tour2d.c tour2d3.c tour2d3_ui.c \
   tour2d_pp.c tour2d_pp_ui.c tour2d_ui.c tourcorr.c tourcorr_ui.c tour_pp.c \
-  transform.c transform_ui.c tsdisplay.c tsPlot.c utils.c utils_gdk.c \
+  tsdisplay.c tsPlot.c utils.c utils_gdk.c \
   utils_pango.c utils_ui.c varchange.c varcircles.c varpanel_ui.c vartable.c \
   vartable_nbook.c vartable_ui.c vector.c win32_draw.c writedata_ui.c \
   write_csv.c write_xml.c wvis.c wvis_ui.c xlines.c xyplot.c \

@@ -339,7 +339,7 @@ addPlotLabels (displayd * display, splotd * sp, GdkDrawable * drawable,
   cpaneld *cpanel = &display->cpanel;
 
 
-  layout_text (layout, ggobi_stage_get_transformed_col_name(d, sp->p1dvar), &rect);
+  layout_text (layout, ggobi_stage_get_col_name(d, sp->p1dvar), &rect);
   if (cpanel->parcoords_arrangement == ARRANGE_ROW)
     gdk_draw_layout (drawable, gg->plot_GC,
                      (rect.width <=

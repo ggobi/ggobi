@@ -215,10 +215,10 @@ update(self)
   self->included_rows = included_rows;
   self->included_rows_rev = included_rows_rev;
   
-  if (n_added)
-    ggobi_stage_rows_added(GGOBI_STAGE(self), n_added);
   if (n_deleted)
     ggobi_stage_rows_deleted(GGOBI_STAGE(self), deleted_rows, n_deleted);
+  if (n_added)
+    ggobi_stage_rows_added(GGOBI_STAGE(self), n_added);
   
   //g_debug("included: %d", n_included);
 }

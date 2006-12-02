@@ -319,7 +319,7 @@ datad_colors_used_get (gint * ncolors_used, gushort * colors_used,
   gboolean new_color;
   gint i, k, n;
   gushort colorid, maxcolorid = 0;
-  GGobiStage *p = ggobi_stage_find(d, GGOBI_MAIN_STAGE_FILTER);
+  GGobiStage *p = ggobi_stage_find(d, GGOBI_MAIN_STAGE_TRANSFORM);
 
   g_return_val_if_fail(d != NULL && GGOBI_IS_STAGE(d), 0);
   

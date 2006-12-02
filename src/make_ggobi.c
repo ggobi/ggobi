@@ -27,6 +27,7 @@
 #include "plugin.h"
 
 #include "ggobi-stage-subset.h"
+#include "ggobi-stage-transform.h"
 
 #ifdef USE_MYSQL
 #include "read_mysql.h"
@@ -37,7 +38,7 @@ guint GGobiSignals[MAX_GGOBI_SIGNALS];
 static void
 pipeline_create_cb(GGobiPipelineFactory *factory, GGobiStage *root, ggobid *gg)
 {
-  GObject *subset, *filter;
+  GObject *subset, *filter, *domain_adj, *transform;
   
   subset = g_object_new(GGOBI_TYPE_STAGE_SUBSET, 
     "name", GGOBI_MAIN_STAGE_SUBSET, "parent", root, NULL);
@@ -55,13 +56,22 @@ pipeline_create_cb(GGobiPipelineFactory *factory, GGobiStage *root, ggobid *gg)
   ggobi_stage_filter_set_filter_column(GGOBI_STAGE_FILTER(filter),
     ggobi_stage_get_col_index_for_name(root, "_excluded"));
   
+  domain_adj = g_object_new(GGOBI_TYPE_STAGE_TRANSFORM,
+    "name", GGOBI_MAIN_STAGE_DOMAIN_ADJ, "parent", filter, NULL);
+  transform = g_object_new(GGOBI_TYPE_STAGE_TRANSFORM,
+    "name", GGOBI_MAIN_STAGE_TRANSFORM, "parent", domain_adj, NULL);
+  
   // FIXME: get rid of these lines ASAP
   // There is absolutely no reason for the pipeline to depend on ggobid
   GGOBI_STAGE(subset)->gg = gg;
   GGOBI_STAGE(filter)->gg = gg;
+  GGOBI_STAGE(domain_adj)->gg = gg;
+  GGOBI_STAGE(transform)->gg = gg;
   
   g_object_unref(subset);
   g_object_unref(filter);
+  g_object_unref(domain_adj);
+  g_object_unref(transform);
 }
 
 GGobiPipelineFactory *
@@ -141,7 +151,7 @@ load_data_source (GGobiInputSource *source, ggobid * gg)
        dataset is added to the main context. Right now we are sort of hacking
        it by attaching the filter stage rather than the dataset. The _attach()
        method knows when to go back to the root. */
-    ggobi_stage_attach(ggobi_stage_find(dataset, GGOBI_MAIN_STAGE_FILTER), gg, FALSE);
+    ggobi_stage_attach(ggobi_stage_find(dataset, GGOBI_MAIN_STAGE_TRANSFORM), gg, FALSE);
   }
   
   return (datasets);

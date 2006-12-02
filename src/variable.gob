@@ -1,7 +1,4 @@
-%h{
-  #include "types.h"
-  #include <math.h>
-  
+%privateheader{
   /* move to categorical subclass? */
   typedef struct level_s {
     guint index;
@@ -9,6 +6,10 @@
     gint value;
     gchar *name;
   } level_t;
+%}
+
+%h{
+  #include "types.h"
   
   /* shortcut that would not be necessary with a categorical class */
   #define GGOBI_VARIABLE_IS_CATEGORICAL(var) \
@@ -16,10 +17,6 @@
   
   /* we now allow implicit name transformation by GGobiVariable */
   typedef gchar * (*GGobiVariableNameTransformFunc) (const gchar *name, gpointer data);
-  
-  /* had to typedef this stuff so that gob could parse it */
-  typedef gfloat (*GGobiDomainAdjFunc) (gfloat x, gfloat incr);
-  typedef gfloat (*GGobiInvDomainAdjFunc) (gfloat x, gfloat incr);
   
   /* this trick lets us use GGobiStage without including ggobi-stage.h,
       which would introduce a circular dependency
@@ -31,28 +28,28 @@
 %}
 
 %{
-#include "ggobi-stage.h"
-#define GGOBI_SMALLEST_DOUBLE -G_MAXDOUBLE /* get past the GOB parser */
-
-static void
-value_collector_func(gpointer key, gpointer value, gpointer data)
-{
-  gint **array = (gint **)data;
-  (*array)[0] = GPOINTER_TO_INT(key);
-  (*array)++;
-}
-static void
-level_count_clear_func(gpointer key, gpointer value, gpointer data)
-{
-  level_t *l = (level_t *)value;
-  l->count = 0;
-}
-
-extern gfloat no_change (gfloat, gfloat);
+  #include "ggobi-stage.h"
+  #include <math.h>
+    
+  static void
+  value_collector_func(gpointer key, gpointer value, gpointer data)
+  {
+    gint **array = (gint **)data;
+    (*array)[0] = GPOINTER_TO_INT(key);
+    (*array)++;
+  }
+  static void
+  level_count_clear_func(gpointer key, gpointer value, gpointer data)
+  {
+    level_t *l = (level_t *)value;
+    l->count = 0;
+  }
+  
+  extern gfloat no_change (gfloat, gfloat);
 %}
 
 enum GGOBI_VARIABLE {
-REAL, CATEGORICAL, INTEGER, COUNTER, UNIFORM, ALL_VARTYPES
+  REAL, CATEGORICAL, INTEGER, COUNTER, UNIFORM, ALL_VARTYPES
 } GGobi:Variable:Type;
 
 /* This is meant to encapsulate per-column attributes in the Gobi pipeline.
@@ -72,7 +69,7 @@ property OBJECT stage
  object_type = GGobi:Stage, flags = CONSTRUCT_ONLY, link);
  
 /* ways to identify this variable */
-protected gchar *name destroywith g_free;
+public gchar *name destroywith g_free;
 private gchar *nickname destroywith g_free; 
 property STRING name
 (nick = "id", blurb = "The name of this variable",
@@ -108,7 +105,7 @@ property ENUM vartype
 private gdouble default_value = 0;
 property DOUBLE default_value
 (nick = "default", blurb = "The default value for a field of this variable",
-  default_value = 0, minimum = GGOBI_SMALLEST_DOUBLE, maximum = G_MAXDOUBLE, 
+  default_value = 0, minimum = GGOBI_NEG_MAXDOUBLE, maximum = G_MAXDOUBLE, 
   link, export);
 
 public gboolean is_attribute = false;
@@ -130,19 +127,9 @@ private signal NONE (STRING, STRING) void
 
 /* PIPELINE STUFF */
 public lims lim_raw;         /* raw data*/
-public lims lim_tform;       /*transformed data*/
-public lims lim_display;     /*for vartable, transformed sans missings*/
+public lims lim_display;     /*for vartable, sans missings*/
 public lims lim_specified;   /*user specified*/
-public lims lim_specified_tform;
 public gboolean lim_specified_p;
-
-public gint tform0;
-public gfloat domain_incr;  /*-- stage 0 --*/
-public GGobiDomainAdjFunc domain_adj = { no_change };
-public GGobiInvDomainAdjFunc inv_domain_adj = { no_change };
-public gint tform1;
-public gfloat param;
-public gint tform2;
 
 /*-- jittering --*/
 public gfloat jitter_factor;
@@ -158,6 +145,7 @@ private GHashTable *value_to_level = { g_hash_table_new(NULL, NULL) }
 
   // FIXME: these should be made private after pipeline in place
 public lims lim;             /* limits for this variable */
+private gfloat variance;
 public gfloat mean;
 public gfloat median;
 private gboolean has_missings;
@@ -165,6 +153,9 @@ private gboolean has_missings;
 /* dirty flags */
 private gboolean dirty_has_missings = TRUE;
 private gboolean dirty_levels = TRUE;
+private gboolean dirty_variance = TRUE;
+private gboolean dirty_mean = TRUE;
+private gboolean dirty_median = TRUE;
 
 protected level_t *
 get_level_for_value(self, gint value)
@@ -429,6 +420,22 @@ get_range(self)
 }
 
 public gfloat
+get_variance(self)
+{
+  if (selfp->dirty_variance) {
+    gfloat sum_squares = 0, mean = ggobi_variable_get_mean(self);
+    guint i, j = ggobi_stage_get_col_index_for_name(self->stage, self->name);
+    for (i=0; i < self->stage->n_rows; i++) {
+      gdouble x = ggobi_stage_get_raw_value(self->stage, i, j); 
+      sum_squares = sum_squares + (x * x);
+    }
+    selfp->variance = (sum_squares / self->stage->n_rows) - (mean * mean);
+    selfp->dirty_variance = FALSE;
+  }
+  return selfp->variance;
+}
+
+public gfloat
 get_mean(self)
 {
   return self->mean;
@@ -458,46 +465,36 @@ has_missings(self)
 public GGobiVariable*
 clone(self)
 {
- GGobiVariable *self_new = GGOBI_VARIABLE(g_object_new(G_TYPE_FROM_INSTANCE(self),
-  "name", self->name, "nickname", selfp->nickname, "stage", self->stage, NULL));
- //self_new->collab_tform = g_strdup (selfp->collab_tform);
-
- self_set_vartype(self_new, self_get_vartype(self));
- if (GGOBI_VARIABLE_IS_CATEGORICAL(self)) {
-   gint *values = self_get_level_values(self);
-   for (gint k=0; k<self_get_n_levels(self); k++) {
-     level_t *level;
-     self_add_level(self_new, self_get_level_name(self, values[k]), values[k]);
-     /* this part is a bit ugly */
-     level = self_get_level_for_value(self_new, values[k]);
-     level->count = self_get_level_count(self, values[k]);
-   }
-   g_free(values);
- }
+  GGobiVariable *self_new = GGOBI_VARIABLE(g_object_new(G_TYPE_FROM_INSTANCE(self),
+    "name", self->name, "nickname", selfp->nickname, "stage", self->stage, NULL));
+  //self_new->collab_tform = g_strdup (selfp->collab_tform);
  
- self_new->mean = self_get_mean(self);
- self_new->median = self_get_median(self);
- self_new->lim.min =
-  self_new->lim_raw.min =
-  self_new->lim_tform.min = self_get_min(self);
- self_new->lim.max =
-  self_new->lim_raw.max =
-  self_new->lim_tform.max = self_get_max(self);
+  self_set_vartype(self_new, self_get_vartype(self));
+  if (GGOBI_VARIABLE_IS_CATEGORICAL(self)) {
+    gint *values = self_get_level_values(self);
+    for (gint k=0; k<self_get_n_levels(self); k++) {
+      level_t *level;
+      self_add_level(self_new, self_get_level_name(self, values[k]), values[k]);
+      /* this part is a bit ugly */
+      level = self_get_level_for_value(self_new, values[k]);
+      level->count = self_get_level_count(self, values[k]);
+    }
+    g_free(values);
+  }
+ 
+  self_new->mean = self_get_mean(self);
+  self_new->median = self_get_median(self);
+  self_new->lim.min =
+  self_new->lim_raw.min = self_get_min(self);
+  self_new->lim.max =
+  self_new->lim_raw.max = self_get_max(self);
 
- self_new->lim_display.min = self->lim_display.min;
- self_new->lim_display.max = self->lim_display.max;
+  self_new->lim_display.min = self->lim_display.min;
+  self_new->lim_display.max = self->lim_display.max;
 
- self_new->lim_specified_p = self->lim_specified_p;
+  self_new->lim_specified_p = self->lim_specified_p;
 
- self_new->tform0 = self->tform0;
- self_new->tform1 = self->tform1;
- self_new->tform2 = self->tform2;
- self_new->domain_incr = self->domain_incr;
- self_new->param = self->param;
- self_new->domain_adj = self->domain_adj;
- self_new->inv_domain_adj = self->inv_domain_adj;
-
- return self_new;
+  return self_new;
 }
 
 /* adds an instance (increases the count) for a level with the given value
@@ -568,30 +565,31 @@ update(self)
  
  selfp->dirty_has_missings = TRUE;
  selfp->dirty_levels = TRUE;
+ selfp->dirty_variance = TRUE;
 }
 
 protected void
 maybe_update_levels(self)
 {
-/* Not sure if lazy caching is worth the trouble for these levels */
-gint j;
-guint n;
- 
-if (!selfp->dirty_levels)
-  return;
-selfp->dirty_levels = FALSE;
-
-j = ggobi_stage_get_col_index_for_name(self->stage, self->name);
-n = ggobi_stage_get_n_rows(self->stage);
-
-g_hash_table_foreach(selfp->name_to_level, level_count_clear_func, NULL);
-
-for (guint i = 0; i < n; i++) {
-  if (!ggobi_stage_is_missing(self->stage, i, j))
-    /* if the categorical value is NULL, then we assume the value does not
-       correspond to a valid level and so it is not counted */
-    self_add_level_instance(self, ggobi_stage_get_categorical_value(self->stage, i, j), 
-      (gint)ggobi_stage_get_raw_value(self->stage, i, j));
-}
+  /* Not sure if lazy caching is worth the trouble for these levels */
+  gint j;
+  guint n;
+   
+  if (!selfp->dirty_levels)
+    return;
+  selfp->dirty_levels = FALSE;
+  
+  j = ggobi_stage_get_col_index_for_name(self->stage, self->name);
+  n = ggobi_stage_get_n_rows(self->stage);
+  
+  g_hash_table_foreach(selfp->name_to_level, level_count_clear_func, NULL);
+  
+  for (guint i = 0; i < n; i++) {
+    if (!ggobi_stage_is_missing(self->stage, i, j))
+      /* if the categorical value is NULL, then we assume the value does not
+         correspond to a valid level and so it is not counted */
+      self_add_level_instance(self, ggobi_stage_get_categorical_value(self->stage, i, j), 
+        (gint)ggobi_stage_get_raw_value(self->stage, i, j));
+  }
 }
 }

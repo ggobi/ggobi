@@ -722,9 +722,6 @@ class GGobi:Data:Factory:XML from GGobi:Data:Factory
         mx = as_number (tmp1);
         el->lim_specified.min = mn < mx ? mn : mx;
         el->lim_specified.max = mn > mx ? mn : mx;
-        /* ? */
-        el->lim_specified_tform.min = el->lim_specified.min;
-        el->lim_specified_tform.max = el->lim_specified.max;
 
         if (mn > mx)
           {
