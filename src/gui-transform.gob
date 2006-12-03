@@ -21,8 +21,9 @@
    the GUI (like the box-cox parameter).
 */
 class GGobi:GUI:Transform from GGobi:GUI:Component {
-  private GtkWidget *var_notebook;
-  private GtkWidget *boxcox_spinner; /* only shown when box-cox selected */
+  private GtkWidget *var_notebook; 
+  private GtkWidget *boxcox_box; /* only shown when box-cox selected */
+  private GtkAdjustment *boxcox_adj; /* for getting the parameter value */
   
   /* Comboboxes for domain adjustments and transforms */
   private GtkWidget *domain_adj_combo;
@@ -64,7 +65,7 @@ class GGobi:GUI:Transform from GGobi:GUI:Component {
       tform = g_object_new(tform_type, NULL);
     if (tform_type == GGOBI_TYPE_TRANSFORM_BOXCOX)
       ggobi_transform_boxcox_set_lambda(GGOBI_TRANSFORM_BOXCOX(tform),
-        gtk_spin_button_get_value(GTK_SPIN_BUTTON(selfp->boxcox_spinner)));
+        gtk_adjustment_get_value(selfp->boxcox_adj));
     for (i = 0; i < nvars; i++)
       ggobi_stage_transform_apply(GGOBI_STAGE_TRANSFORM(stage), i, GGOBI_TRANSFORM(tform));
   }
@@ -75,20 +76,22 @@ class GGobi:GUI:Transform from GGobi:GUI:Component {
   private GType
   combo_get_transform_type(GtkComboBox *combo)
   {
-    GtkTreeModel *model = gtk_combo_box_get_model(combo);
-    GtkTreeIter iter;
-    GType tform_type;
-    
-    gtk_combo_box_get_active_iter(combo, &iter);
-    gtk_tree_model_get(model, &iter, 1, &tform_type, -1);
-    
-    return tform_type;
+    GGobiTypeRegistry *registry = self_combo_get_registry(combo);
+    GSList *types = ggobi_type_registry_list_registered(registry);
+    gint index = gtk_combo_box_get_active(combo);
+    GType type = G_TYPE_NONE;
+    if (index)
+      type = GPOINTER_TO_INT(g_slist_nth_data(types, index - 1));
+    g_slist_free(types);
+    return type;
   }
+  
   /* The GGobiStage proxied by this combobox for a given ancestor (dataset). */
   private GGobiStage *
   combo_get_stage(GtkComboBox *combo, GGobiStage *ancestor)
   {
-    return(ggobi_stage_find(ancestor, 
+    // FIXME: finding the root won't be necessary after we fix up variable notebook
+    return(ggobi_stage_find(ggobi_stage_get_root(ancestor), 
       g_object_get_data(G_OBJECT (combo), "ggobi-gui-tform-stage-name")));
   }
   /* The registry holding the types presented by this combobox */
@@ -112,8 +115,8 @@ class GGobi:GUI:Transform from GGobi:GUI:Component {
     // FIXME: eventually every transform will be able to provide its own GUI,
     // so we won't need to hardcode the boxcox parameter spinner
     if (tform_type == GGOBI_TYPE_TRANSFORM_BOXCOX)
-      gtk_widget_show(selfp->boxcox_spinner);
-    else gtk_widget_hide(selfp->boxcox_spinner);
+      gtk_widget_show_all(selfp->boxcox_box);
+    else gtk_widget_hide(selfp->boxcox_box);
     
     vars = get_selections_from_tree_view (tree_view, &nvars);
   
@@ -169,7 +172,7 @@ class GGobi:GUI:Transform from GGobi:GUI:Component {
       GType tform_type = G_OBJECT_TYPE(tform);
       GGobiTypeRegistry *registry = self_combo_get_registry(combo);
       if (tform_type == GGOBI_TYPE_TRANSFORM_BOXCOX)
-        gtk_spin_button_set_value(GTK_SPIN_BUTTON(selfp->boxcox_spinner), 
+        gtk_adjustment_set_value(selfp->boxcox_adj, 
           ggobi_transform_boxcox_get_lambda(GGOBI_TRANSFORM_BOXCOX(tform)));
       /* ensure that the type exists in our registry */
       ggobi_type_registry_register(registry, tform_type);
@@ -242,33 +245,22 @@ class GGobi:GUI:Transform from GGobi:GUI:Component {
     ggobi_type_registry_register(registry, GGOBI_TYPE_TRANSFORM_ABS);
   }
   
-  private gboolean
-  unregister_foreach (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer ptr)
+  private void
+  tform_type_unregister_cb(GGobiTypeRegistry *registry, GType type, GtkComboBox *combo)
   {
-    GType type = GPOINTER_TO_INT(ptr);
-    GType cur_type;
-    gtk_tree_model_get(model, iter, 1, &cur_type, -1);
-    if (cur_type == type) {
-      gtk_list_store_remove(GTK_LIST_STORE(model), iter);
-      return TRUE;
-    }
-    return FALSE;
+    GSList *types = ggobi_type_registry_list_registered(registry);
+    gint index = g_slist_index(types, GINT_TO_POINTER(type)) + 1;
+    if (index)
+      gtk_combo_box_remove_text(combo, index);
+    g_slist_free(types);
   }
   
   private void
-  tform_type_unregister_cb(GGobiTypeRegistry *registry, GType type, GtkTreeModel *model)
+  tform_type_register_cb(GGobiTypeRegistry *registry, GType type, GtkComboBox *combo)
   {
-    gtk_tree_model_foreach(model, self_unregister_foreach, GINT_TO_POINTER(type));
-  }
-  
-  private void
-  tform_type_register_cb(GGobiTypeRegistry *registry, GType type, GtkTreeModel *model)
-  {
-    GtkTreeIter iter;
     GGobiTransform *tform = g_object_new(type, NULL);
     gchar *name = ggobi_transform_get_name(tform);
-    gtk_list_store_append(GTK_LIST_STORE(model), &iter);
-    gtk_list_store_set(GTK_LIST_STORE(model), 0, name, 1, type, -1);
+    gtk_combo_box_append_text(combo, name);
     g_free(name);
     g_object_unref(tform);
   }
@@ -277,17 +269,14 @@ class GGobi:GUI:Transform from GGobi:GUI:Component {
   private GtkWidget *
   combo_create(self, GGobiTypeRegistry *registry, gchar *stage_name)
   {
-    GtkListStore *model = gtk_list_store_new(2, G_TYPE_STRING, G_TYPE_UINT);
-    GtkTreeIter iter;
-    GtkWidget *combo = gtk_combo_box_new_with_model (GTK_TREE_MODEL(model));
-    g_object_unref(G_OBJECT(model));
-    gtk_list_store_append(model, &iter);
-    gtk_list_store_set(model, &iter, 0, "No transformation", 1, G_TYPE_NONE, -1);
+    GtkWidget *combo = gtk_combo_box_new_text();
+    gtk_combo_box_append_text(GTK_COMBO_BOX(combo), "Identity");
+    gtk_combo_box_set_active(GTK_COMBO_BOX(combo), 0);
     g_signal_connect (G_OBJECT (combo), "changed", G_CALLBACK (self_combo_cb), self);
-    g_signal_connect(G_OBJECT(registry), "register", 
-      G_CALLBACK(self_tform_type_register_cb), model);
-    g_signal_connect(G_OBJECT(registry), "unregister",
-      G_CALLBACK(self_tform_type_unregister_cb), model);
+    g_signal_connect(G_OBJECT(registry), "registered", 
+      G_CALLBACK(self_tform_type_register_cb), combo);
+    g_signal_connect(G_OBJECT(registry), "unregistered",
+      G_CALLBACK(self_tform_type_unregister_cb), combo);
     g_object_set_data(G_OBJECT(combo), "ggobi-gui-tform-registry", registry);
     /* please be sure that 'stage_name' will survive as long as the combo box */
     /* right now it's always statically allocated */
@@ -353,17 +342,21 @@ class GGobi:GUI:Transform from GGobi:GUI:Component {
     /* Create a variable notebook */
     SELF(self)->_priv->var_notebook = create_variable_notebook (GTK_WIDGET(self),
       GTK_SELECTION_MULTIPLE, GGOBI_VARIABLE_ALL_VARTYPES, all_datatypes,
-      G_CALLBACK(self_var_selected_cb), NULL, gg);
+      G_CALLBACK(self_var_selected_cb), self, gg);
 
     /*
      * Stage 0: Domain adjustment
     */
     frame = gtk_frame_new ("Domain adjustment");
     gtk_box_pack_start (GTK_BOX(self), frame, false, false, 1);
-
+    
+    vb = gtk_vbox_new (false, 5);
+    gtk_container_set_border_width (GTK_CONTAINER (vb), 5);
+    gtk_container_add (GTK_CONTAINER (frame), vb);
+    
     SELF(self)->_priv->domain_adj_combo = self_combo_create(SELF(self), 
       SELF(self)->_priv->domain_adj_registry, GGOBI_MAIN_STAGE_DOMAIN_ADJ);
-    gtk_container_add (GTK_CONTAINER (frame), SELF(self)->_priv->domain_adj_combo);
+    gtk_container_add (GTK_CONTAINER (vb), SELF(self)->_priv->domain_adj_combo);
       
     self_register_domain_adj_types(SELF(self), 
       SELF(self)->_priv->domain_adj_registry);
@@ -381,27 +374,6 @@ class GGobi:GUI:Transform from GGobi:GUI:Component {
       SELF(self)->_priv->tform_registry, GGOBI_MAIN_STAGE_TRANSFORM);
     gtk_box_pack_start (GTK_BOX (vb), SELF(self)->_priv->tform_combo, true, false, 1);
 
-    /*-- label and spin button for Box-Cox parameter --*/
-    hb = gtk_hbox_new (false, 2);
-    gtk_box_pack_start (GTK_BOX (vb), hb, false, false, 2);
-    
-    lbl = gtk_label_new_with_mnemonic ("_Box-Cox param:");
-    gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
-    gtk_box_pack_start (GTK_BOX (hb), lbl, false, false, 0);
-    adj = (GtkAdjustment *) gtk_adjustment_new (1.0,
-                          -4, 5, 0.05, .5, 0.0);
-    spinner = gtk_spin_button_new (adj, 0, 3);
-    gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), spinner);
-    gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinner), false);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), spinner,
-      "Set the Box-Cox power function parameter", NULL);
-    gtk_box_pack_end (GTK_BOX (hb), spinner, true, true, 0);
-    g_signal_connect (G_OBJECT (adj), "value_changed",
-      G_CALLBACK (self_boxcox_cb), self);
-
-    self_register_domain_adj_types(SELF(self), 
-      SELF(self)->_priv->tform_registry);
-    
     /*
      * A button or two
     */
@@ -421,6 +393,29 @@ class GGobi:GUI:Transform from GGobi:GUI:Component {
       G_CALLBACK (self_data_added_cb), self);
       
     gtk_widget_show_all(GTK_WIDGET(self));
+    
+    /* the boxcox spinner comes after 'show all' so that it is hidden by default */
+    
+    /*-- label and spin button for Box-Cox parameter --*/
+    SELF(self)->_priv->boxcox_box = hb = gtk_hbox_new (false, 2);
+    gtk_box_pack_start (GTK_BOX (vb), hb, false, false, 2);
+    
+    lbl = gtk_label_new_with_mnemonic ("_Box-Cox param:");
+    gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
+    gtk_box_pack_start (GTK_BOX (hb), lbl, false, false, 0);
+    SELF(self)->_priv->boxcox_adj = adj = (GtkAdjustment *) gtk_adjustment_new (1.0,
+                          -4, 5, 0.05, .5, 0.0);
+    spinner = gtk_spin_button_new (adj, 0, 3);
+    gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), spinner);
+    gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinner), false);
+    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), spinner,
+      "Set the Box-Cox power function parameter", NULL);
+    gtk_box_pack_end (GTK_BOX (hb), spinner, true, true, 0);
+    g_signal_connect (G_OBJECT (adj), "value_changed",
+      G_CALLBACK (self_boxcox_cb), self);
+
+    self_register_transform_types(SELF(self), 
+      SELF(self)->_priv->tform_registry);
   }
 
 }

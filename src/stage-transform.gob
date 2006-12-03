@@ -99,8 +99,9 @@ class GGobi:Stage:Transform from GGobi:Stage {
       g_signal_connect(G_OBJECT(tform), "notify", 
         G_CALLBACK(self_transform_notify_cb), self);
       ggobi_variable_set_name_transform_func(var, name_tform_func, tform);
-      g_hash_table_insert(selfp->active_tforms, GINT_TO_POINTER(j), tform); 
+      g_hash_table_insert(selfp->active_tforms, GINT_TO_POINTER(j), tform);
     }
+    ggobi_stage_col_data_changed(GGOBI_STAGE(self), j);
     self_applied(self, j, tform);
   }
   public void
@@ -177,20 +178,20 @@ class GGobi:Stage:Transform from GGobi:Stage {
         selfp->tform.vals[i][j] = 
           ggobi_stage_get_raw_value(GGOBI_STAGE(self)->parent, i, j);
     } else {
-      GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(self)->parent, j);
+      /*GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(self)->parent, j);*/
       gdouble *result = ggobi_transform_column(tform, GGOBI_STAGE(self)->parent, 
         start, j); 
       if (result) {
-        // FIXME: The user limits will soon be handled by a viewporting stage
-        lims *limits = ggobi_transform_limits(tform, var->lim_specified, var);
+        /* the user limits are deprecated, so I am just disabling this for now */
+        /*lims *limits = ggobi_transform_limits(tform, var->lim_specified, var);*/
         for (i = start; i < GGOBI_STAGE(self)->n_rows; i++)
           selfp->tform.vals[i][j] = result[i];
         g_free(result);
-        if (limits) {
+        /*if (limits) {
           var->lim_specified.min = limits->min;
           var->lim_specified.max = limits->max;
           g_free(limits);
-        }
+        }*/
       } else self_transform_error(tform, j);
     }
   }

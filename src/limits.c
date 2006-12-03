@@ -114,7 +114,7 @@ limits_raw_set_by_var (GGobiStage * s, gint j, gboolean visible_only)
         max = ggobi_stage_get_raw_value(s, i, j);
     }
   }
-
+  
   var->lim_raw.min = min;
   var->lim_raw.max = max;
 }
@@ -127,8 +127,10 @@ limits_raw_set (GGobiStage * d, gboolean visible_only)
 {
   gint j;
 
-  for (j = 0; j < d->n_cols; j++)
+  for (j = 0; j < d->n_cols; j++) {
     limits_raw_set_by_var (d, j, visible_only);
+    limits_display_set_by_var (d, j, visible_only);
+  }
 }
 
 void
@@ -181,14 +183,16 @@ limits_display_set_by_var (GGobiStage * d, gint j, gboolean visible_only)
   var->lim_display.min = min;
   var->lim_display.max = max;
 
-  var->mean = sum / np;
+  if (d->n_rows > 0) {
+    var->mean = sum / np;
+    /*-- median: sort the temporary vector, and find its center --*/
+    qsort ((void *) x, np, sizeof (gfloat), fcompare);
+    var->median =
+      ((np % 2) != 0) ? x[(np - 1) / 2] : (x[np / 2 - 1] + x[np / 2]) / 2.;
+    g_free ((gpointer) x);
+  }
 
-  /*-- median: sort the temporary vector, and find its center --*/
-  qsort ((void *) x, np, sizeof (gfloat), fcompare);
-  var->median =
-    ((np % 2) != 0) ? x[(np - 1) / 2] : (x[np / 2 - 1] + x[np / 2]) / 2.;
-
-  g_free ((gpointer) x);
+  
 }
 
 void
@@ -213,6 +217,7 @@ limits_set_by_var (GGobiStage * d, guint j,
   GGobiVariable *var = ggobi_stage_get_variable(d, j);
 
   limits_raw_set_by_var (d, j, visible_only);
+  limits_display_set_by_var (d, j, visible_only);
   
   limits_set_from_vartable (var);
 }

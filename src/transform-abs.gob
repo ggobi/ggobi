@@ -14,7 +14,7 @@ class GGobi:Transform:Abs from GGobi:Transform {
   { 
     gdouble *result = g_new(gdouble, n);
     for (guint i = 0; i < n; i++)
-      result[i] = -vals[i];
+      result[i] = fabs(vals[i]);
     return result;
   }
   
