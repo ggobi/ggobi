@@ -43,10 +43,7 @@ class GGobi:Stage:Transform from GGobi:Stage {
   override (GGobi:Stage) void 
   col_data_changed(GGobiStage *self, guint j) {
     PARENT_HANDLER(self, j);
-    if (self_get_transform(SELF(self), j))
-      self_transform(SELF(self), 0, j);
-    else for (guint i = 0; i < self->n_rows; i++)
-      SELF(self)->_priv->tform.vals[i][j] = ggobi_stage_get_raw_value(self, i, j);
+    self_transform(SELF(self), 0, j);
     // FIXME: rest of this stuff by pipeline
     tform_to_world_by_var(self, j);
     if (self->gg)
@@ -56,24 +53,25 @@ class GGobi:Stage:Transform from GGobi:Stage {
   override (GGobi:Stage) void
   rows_deleted(GGobi:Stage *self, guint *rows, guint n) {
     arrayf_delete_rows (&(SELF(self)->_priv->tform), n, rows);
+    for (guint j = 0; j < self->n_cols; j++)
+      self_transform(SELF(self), 0, j);
   }
   
   override (GGobi:Stage) void
   rows_added(GGobi:Stage *self, guint n) {
     guint j, nprev = self->n_rows;
-    guint ncols;
-    gint *tform_cols = self_get_transformed_cols(SELF(self), &ncols);
     arrayf_add_rows (&(SELF(self)->_priv->tform), self->n_rows + n);
     PARENT_HANDLER(self, n);
-    for (j = 0; j < ncols; j++)
-      self_transform(SELF(self), nprev, tform_cols[j]);
-    g_free(tform_cols);
+    for (j = 0; j < self->n_cols; j++)
+      self_transform(SELF(self), nprev, j);
   }
   
   override (GGobi:Stage) void
   cols_added(GGobi:Stage *self, guint n) {
     PARENT_HANDLER(self, n);
     arrayf_add_cols (&(SELF(self)->_priv->tform), self->n_cols);
+    for (guint j = self->n_cols - n; j < self->n_cols; j++)
+      self_transform(SELF(self), 0, j);
   }
   
   override (GGobi:Stage) void
@@ -174,21 +172,27 @@ class GGobi:Stage:Transform from GGobi:Stage {
   {
     guint i;
     GGobiTransform *tform = self_get_transform(self, j);
-    GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(self)->parent, j);
-    gdouble *result = ggobi_transform_column(tform, GGOBI_STAGE(self)->parent, 
-      start, j); 
-    if (result) {
-      // FIXME: The user limits will soon be handled by a viewporting stage
-      lims *limits = ggobi_transform_limits(tform, var->lim_specified, var);
-      for (i = start; i < GGOBI_STAGE(self)->n_rows; i++)
-        selfp->tform.vals[i][j] = result[i];
-      g_free(result);
-      if (limits) {
-        var->lim_specified.min = limits->min;
-        var->lim_specified.max = limits->max;
-        g_free(limits);
-      }
-    } else self_transform_error(tform, j);
+    if (!tform) { /* identity transformation */
+      for (i = 0; i < GGOBI_STAGE(self)->n_rows; i++)
+        selfp->tform.vals[i][j] = 
+          ggobi_stage_get_raw_value(GGOBI_STAGE(self)->parent, i, j);
+    } else {
+      GGobiVariable *var = ggobi_stage_get_variable(GGOBI_STAGE(self)->parent, j);
+      gdouble *result = ggobi_transform_column(tform, GGOBI_STAGE(self)->parent, 
+        start, j); 
+      if (result) {
+        // FIXME: The user limits will soon be handled by a viewporting stage
+        lims *limits = ggobi_transform_limits(tform, var->lim_specified, var);
+        for (i = start; i < GGOBI_STAGE(self)->n_rows; i++)
+          selfp->tform.vals[i][j] = result[i];
+        g_free(result);
+        if (limits) {
+          var->lim_specified.min = limits->min;
+          var->lim_specified.max = limits->max;
+          g_free(limits);
+        }
+      } else self_transform_error(tform, j);
+    }
   }
   
   private void
