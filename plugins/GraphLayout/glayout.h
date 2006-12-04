@@ -1,6 +1,7 @@
 #ifndef GLAYOUT_H
 
 #include "plugin.h"
+#include "config.h"
 
 typedef enum {deflt, within, between, anchorscales, anchorfixed} MDSGroupInd;
 
@@ -70,7 +71,7 @@ gint visible_set (glong *visible, GGobiData *d);
 
 void radial_center_set_cb (ggobid *gg, gint index, gint state, GGobiData *d, PluginInstance *inst);
 
-#if defined GRAPHVIZ || defined HAVE_LIBGVC
+#if defined HAVE_LIBGVC
 void neato_dim_cb (GtkAdjustment *adj, PluginInstance *inst);
 void neato_model_cb (GtkWidget *w, PluginInstance *inst);
 void dot_neato_layout_cb (GtkWidget *, PluginInstance *inst);

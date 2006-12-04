@@ -8,17 +8,13 @@
 #include <math.h>
 
 #include "plugin.h"
-#include "glayout.h"
+#include "glayout.h"  # includes config.h, which defines HAVE_LIBGVC
 
 #ifdef HAVE_LIBGVC
 #include <gvc.h>
-#else
- #ifdef GRAPHVIZ
- #include <dotneato.h>
- #endif
 #endif
 
-#if defined HAVE_LIBGVC || defined GRAPHVIZ
+#if defined HAVE_LIBGVC
 
 #ifndef HAVE_LIBGVC
 /* needed for 1.16 */
