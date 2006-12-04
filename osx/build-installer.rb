@@ -1,6 +1,7 @@
 require 'rubygems'
 require 'pathname'
 require 'arrayfields'
+require 'fileutils'
 
 # Check for prerequistes
 # gcc -v 4.0.3
@@ -88,10 +89,11 @@ $packages = Package.load([
   "ftp://ftp.gtk.org/pub/glib/2.12/glib-2.12.4.tar.gz", 
   "ftp://ftp.gtk.org/pub/gtk/v2.10/dependencies/atk-1.9.1.tar.bz2", 
   "ftp://ftp.gtk.org/pub/pango/1.14/pango-1.14.7.tar.gz", 
-  "ftp://ftp.gtk.org/pub/gtk/v2.10/gtk+-2.10.6.tar.gz"
+  "ftp://ftp.gtk.org/pub/gtk/v2.10/gtk+-2.10.6.tar.gz",
+  "http://ftp.gnome.org/pub/GNOME/sources/libxml2/2.6/libxml2-2.6.0.tar.bz2"
 ])
 
-$prefix = "/Users/hadley/ggobi/ggobi/osx/target"
+$prefix = "/usr/local/gtk2"  # /Users/hadley/ggobi/ggobi/osx/target
 $common_options="--prefix='#{$prefix}' --disable-static --enable-shared --disable-gtk-doc --disable-scrollkeeper"
 
 $packages["jpeg"].makeinst = "make install-lib"
@@ -106,13 +108,12 @@ def x.build!
 end
 
 
-
 def build() 
   # set_env(arch)
   # `mv target-#{$arch} target`
 
-  
-  File.mkdir_p $prefix unless File.exist? $prefix
+  FileUtils.mkdir_p "build"
+  FileUtils.mkdir_p $prefix unless File.exist? $prefix
   
   ENV['PREFIX'] =       $prefix
   ENV['PATH']=          ["/usr/local/gcc4.0/bin", "#{$prefix}/bin", ENV['PATH']].join(":")
@@ -132,9 +133,22 @@ def build()
   rescue Exception => e
     puts e
   ensure
-    #{}`mv target target-#{$arch}`    
+    #`mv target target-#{$arch}`    
   end
 end
 
 build 
-# Build to /Library/Frameworks/Gtk.framework
+# Build to /usr/local/gtk2
+
+# PKG_CONFIG=/usr/local/gtk2/lib/pkgconfig
+# export PATH=/usr/local/gcc4.0/bin:/usr/local/gtk2/bin:$PATH
+# svn co http://www.ggobi.org/svn/ggobi/ggobi/branches/ggobi-2.1.4
+# sudo mkdir /usr/local/ggobi
+# cd ggobi-2.1.4
+# ./bootstrap
+# ./configure --prefix=/usr/local/ggobi --with-all-plugins
+# make
+# sudo make install
+
+# mv to installer
+# 

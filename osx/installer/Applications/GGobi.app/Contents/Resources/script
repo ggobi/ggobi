@@ -1,0 +1,4 @@
+#!/bin/sh
+
+cd "$1"
+Contents/Resources/open-xapp.sh /usr/local/ggobi/bin/ggobi $2
