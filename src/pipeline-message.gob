@@ -1,0 +1,233 @@
+%h{
+  #include "ggobi-stage.h"
+%}
+/* Describes changes in the pipeline data matrix. It communicates five different
+   types of changes:
+   
+   1) Removal of columns
+   2) Appending of columns
+   3) Changing of columns
+   4) Removal of rows
+   5) Appending of rows
+   
+   Note that insertion is not supported. Also there is no event for row changes,
+   because it is redundant with column changes, which occur more often and 
+   are more efficiently handled by embedding environments, since there are 
+   usually less columns than rows.
+   
+   These changes obviously conflict with each other, so the order in which
+   they are considered is important. Removals are assumed to occur BEFORE
+   changes, which occur BEFORE additions. The reasoning for this is thus:
+   it is wasteful to add or change elements that will soon be deleted and
+   we also want to avoid changing elements that are still to be added.
+   
+   In the case of columns, this means that the indices of the changed columns 
+   take into account any removals. It also means that it is not possible to 
+   remove or change indices that have been appended, since appending takes place
+   after removal and changing.
+   
+   When a message is received, usually from the parent staage, its indexing 
+   should be compatible with that of the receiver. Some pipeline stages, 
+   specifically filters, change the indexing by removing rows and/or columns. 
+   It is the responsibility of those stages to use the filter_rows() and
+   filter_cols() convenience methods to modify the indexing by providing the
+   indices of the hidden rows and columns, respectively. Filtering blocks
+   all types of events: removals, changes, and additions.
+*/
+class GGobi:Pipeline:Message from G:Object {
+  /* The GByteArray is used essentially as a fast hash-set for indices */
+  private GByteArray *changed_cols destroy { 
+    if (VAR) g_byte_array_free(VAR, TRUE);
+  };
+  private GByteArray *removed_cols destroy { 
+    if (VAR) g_byte_array_free(VAR, TRUE);
+  };
+  private GByteArray *removed_rows destroy { 
+    if (VAR) g_byte_array_free(VAR, TRUE);
+  };
+  
+  /* since we only append (but not insert) rows/cols, the counts are enough */
+  private guint n_added_rows;
+  private guint n_added_cols;
+  
+  /* used to identify whether a row/col index has been appended */
+  private guint max_col;
+  private guint max_row;
+  
+  /* this doesn't have much use yet, beyond giving us the max col/row cutoffs */
+  /* note: the n_cols/n_rows should be updated AFTER creating the message */
+  /* this is natural given the current stage design */
+  private GGobiStage *source unrefwith g_object_unref;
+  property OBJECT source
+  (nick = "origin", blurb = "The pipeline stage that sent this message",
+    object_type = GGobi:Stage, flags = CONSTRUCT_ONLY)
+    set {
+      selfp->source = g_value_get_object(VAL);
+      selfp->max_col = selfp->source->n_cols;
+      selfp->max_row = selfp->source->n_rows;
+      /* these arrays should never have to change size again */
+      selfp->changed_cols = g_byte_array_sized_new(selfp->max_col);
+      selfp->removed_cols = g_byte_array_sized_new(selfp->max_col);
+      selfp->removed_rows = g_byte_array_sized_new(selfp->max_row);
+    }
+    get {
+      g_value_set_object(VAL, selfp->source);
+    };
+  
+  public GGobiPipelineMessage *
+  new(GGobiStage *source)
+  {
+    GObject *obj = (GObject *)GET_NEW_VARG("source", source, NULL);
+    return GGOBI_PIPELINE_MESSAGE(obj);
+  }
+  
+  public GGobiStage *
+  get_source(self)
+  {
+    return selfp->source;
+  }
+  
+  public GSList *
+  get_changed_cols(self)
+  {
+    return self_byte_array_to_indices(selfp->changed_cols);
+  }
+  public GSList *
+  get_removed_cols(self)
+  {
+    return self_byte_array_to_indices(selfp->removed_cols);
+  }
+  public GSList *
+  get_removed_rows(self)
+  {
+    return self_byte_array_to_indices(selfp->removed_rows);
+  }
+  
+  /* maybe it would be better to give ranges here just for convenience? */
+  
+  public guint
+  get_n_added_cols(self)
+  {
+    return selfp->n_added_cols;
+  }
+  public guint
+  get_n_added_rows(self)
+  {
+    return selfp->n_added_rows;
+  }
+  
+  /* accept only column changes that are not part of the appended set */
+  /* (no one cares that a column has changed if it's new to them) */
+  public void
+  change_cols(self, GSList *cols)
+  {
+    for (; cols; cols = cols->next) {
+      guint index = GPOINTER_TO_INT(cols->data);
+      g_return_if_fail(index < selfp->max_col);
+      selfp->changed_cols->data[index] = 1;
+    }
+  }
+  
+  /* Must update column change indices
+  */
+  public void
+  remove_cols(self, GSList *cols)
+  {
+    /* ensure sorted for index updating */
+    GSList *sorted_cols = g_slist_sort(cols, self_index_compare);
+    for (; cols; cols = cols->next) {
+      guint index = GPOINTER_TO_INT(cols->data);
+      /* add this index to the set */
+      g_return_if_fail(index < selfp->max_col);
+      selfp->removed_cols->data[index] = 1;
+    }
+    self_byte_array_remove_indices(selfp->changed_cols, sorted_cols);
+    g_slist_free(sorted_cols);
+  }
+
+  public void
+  remove_rows(self, GSList *rows)
+  {
+    for (; rows; rows = rows->next) {
+      guint index = GPOINTER_TO_INT(rows->data);
+      /* add this index to the set */
+      g_return_if_fail(index < selfp->max_row);
+      selfp->removed_rows->data[index] = 1;
+    }
+  }
+  
+  /* easy ones */
+  
+  public void
+  add_cols(self, guint n)
+  {
+    selfp->n_added_cols += n;
+  }
+  public void
+  add_rows(self, guint n)
+  {
+    selfp->n_added_rows += n;
+  }
+  
+  /* filtering */
+  
+  /* filter changed_cols and removed_cols */
+  public void
+  filter_cols(self, GSList *cols)
+  {
+    GSList *sorted_cols = g_slist_sort(cols, self_index_compare);
+    for (; cols; cols = cols->next)
+      if (GPOINTER_TO_INT(cols->data) >= selfp->max_col)
+        selfp->n_added_cols--;
+    self_byte_array_remove_indices(selfp->changed_cols, sorted_cols);
+    self_byte_array_remove_indices(selfp->removed_cols, sorted_cols);
+    g_slist_free(sorted_cols);
+  }
+  /* filter removed_rows */
+  public void
+  filter_rows(self, GSList *rows)
+  {
+    GSList *sorted_rows = g_slist_sort(rows, self_index_compare);
+    for (; rows; rows = rows->next)
+      if (GPOINTER_TO_INT(rows->data) >= selfp->max_row)
+        selfp->n_added_rows--;
+    self_byte_array_remove_indices(selfp->removed_rows, sorted_rows);
+    g_slist_free(sorted_rows);
+  }
+  
+  /* utilities */
+  
+  private void
+  byte_array_remove_indices(GByteArray *array, GSList *indices)
+  {
+    guint i = indices ? GPOINTER_TO_INT(indices->data) : 0, dec = 0;
+    for (; indices; indices = indices->next) {
+      guint index = GPOINTER_TO_INT(indices->data);
+      /* shift indices */
+      while(i < index) {
+        array->data[i - dec] = array->data[i];
+        i++;
+      }
+      /* remove col-changed index, if present */
+      array->data[i] = 0;
+      dec++;
+    }
+  }
+  
+  private GSList *
+  byte_array_to_indices(GByteArray *array)
+  {
+    guint i;
+    GSList *indices = NULL;
+    for (i = 0; i < array->len; i++)
+      if (array->data[i])
+        indices = g_slist_append(indices, GINT_TO_POINTER(i));
+    return indices;
+  }
+  
+  private gint
+  index_compare(gconstpointer a, gconstpointer b)
+  {
+    return GPOINTER_TO_INT(a) - GPOINTER_TO_INT(b);
+  }
+}

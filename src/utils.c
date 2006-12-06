@@ -413,3 +413,19 @@ in_vector (gint k, gint * vec, gint nels)
   }
   return in;
 }
+
+/* may be used eventually to list keys in hash tables */
+/*private void
+hash_table_keys_foreach(gpointer key, gpointer value, gpointer user_data)
+{
+  GSList **keys = user_data;
+  *keys = g_slist_append(*keys, key);
+}
+
+public GSList *
+hash_table_list_keys(GHashTable *hash)
+{
+  GSList *keys = NULL;
+  g_hash_table_foreach(hash, self_hash_table_keys_foreach, &keys);
+  return keys;
+}*/
