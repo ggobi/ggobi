@@ -4,28 +4,31 @@
 /* Describes changes in the pipeline data matrix. It communicates five different
    types of changes:
    
-   1) Removal of columns
-   2) Appending of columns
-   3) Changing of columns
-   4) Removal of rows
-   5) Appending of rows
-   
-   Note that insertion is not supported. Also there is no event for row changes,
-   because it is redundant with column changes, which occur more often and 
-   are more efficiently handled by embedding environments, since there are 
-   usually less columns than rows.
-   
-   These changes obviously conflict with each other, so the order in which
-   they are considered is important. Removals are assumed to occur BEFORE
-   changes, which occur BEFORE additions. The reasoning for this is thus:
-   it is wasteful to add or change elements that will soon be deleted and
-   we also want to avoid changing elements that are still to be added.
-   
-   In the case of columns, this means that the indices of the changed columns 
-   take into account any removals. It also means that it is not possible to 
-   remove or change indices that have been appended, since appending takes place
-   after removal and changing.
-   
+   1) Remove columns
+   2) Remov rows
+   3) Change data (indexed by column)
+   4) Add columns
+   5) Add rows
+
+   Note that insertion is not supported; all addition occur at the ends of the
+   matrix. Also there is no event for row changes, because it is redundant with
+   column changes, which occur more often and are more efficiently handled by
+   embedding environments, since there are usually less columns than rows.
+
+   These changes obviously conflict with each other, so the order in which they
+   are considered is important. Changes occur in the following order: deletion,
+   update, addition. The reasoning for this is thus: it is wasteful to add or
+   change elements that will soon be deleted and we also want to avoid changing
+   elements that are still to be added.
+
+   In the case of columns, this means that the indices of the changed columns
+   take into account any removals. It also means that it is not possible to
+   remove or change indices that have been appended, since appending takes
+   place after removal and changing.
+
+   HW: will this work in general for merging messages? eg. when merging two
+   messages, the first which creates a column, and the seconding deleting it
+
    When a message is received, usually from the parent staage, its indexing 
    should be compatible with that of the receiver. Some pipeline stages, 
    specifically filters, change the indexing by removing rows and/or columns. 
@@ -33,6 +36,9 @@
    filter_cols() convenience methods to modify the indexing by providing the
    indices of the hidden rows and columns, respectively. Filtering blocks
    all types of events: removals, changes, and additions.
+   
+   HW: So filter stages will modify the event and then pass it on?
+
 */
 class GGobi:Pipeline:Message from G:Object {
   /* The GByteArray is used essentially as a fast hash-set for indices */
@@ -57,6 +63,8 @@ class GGobi:Pipeline:Message from G:Object {
   /* this doesn't have much use yet, beyond giving us the max col/row cutoffs */
   /* note: the n_cols/n_rows should be updated AFTER creating the message */
   /* this is natural given the current stage design */
+  
+  /* HW: storing the source seems like a bad idea to me - it unnecessarily couples the event to its producer.  */
   private GGobiStage *source unrefwith g_object_unref;
   property OBJECT source
   (nick = "origin", blurb = "The pipeline stage that sent this message",
@@ -196,6 +204,7 @@ class GGobi:Pipeline:Message from G:Object {
   }
   
   /* utilities */
+  /* HW: since these don't use any references to self, shouldn't they be "class" methods? */
   
   private void
   byte_array_remove_indices(GByteArray *array, GSList *indices)
