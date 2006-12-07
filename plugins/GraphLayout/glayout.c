@@ -109,7 +109,7 @@ create_glayout_window(ggobid *gg, PluginInstance *inst)
 {
   GtkWidget *window, *main_vbox, *notebook, *label, *frame, *vbox, *btn;
   GtkWidget *hb, *entry;
-#if defined HAVE_LIBGVC || GRAPHVIZ
+#if defined HAVE_LIBGVC
   GtkWidget *hscale, *vb, *opt, *apply_btn, *varnotebook;
   GtkObject *adj;
 #endif
@@ -288,7 +288,7 @@ create_glayout_window(ggobid *gg, PluginInstance *inst)
 */
   frame = gtk_frame_new ("Neato layout");
   gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
-#if defined HAVE_LIBGVC || GRAPHVIZ
+#if defined HAVE_LIBGVC
 
   hbox = gtk_hbox_new (false, 5);
   gtk_container_set_border_width (GTK_CONTAINER(hbox), 5); 
@@ -380,7 +380,7 @@ Add an option:  Model either 'circuit resistance' or 'shortest path'
   frame = gtk_frame_new ("Dot layout");
   gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
 
-#if defined HAVE_LIBGVC || GRAPHVIZ
+#if defined HAVE_LIBGVC
   vbox = gtk_vbox_new (false, 5);
   gtk_container_set_border_width (GTK_CONTAINER(vbox), 5); 
   gtk_container_add (GTK_CONTAINER(frame), vbox);
@@ -398,14 +398,12 @@ Add an option:  Model either 'circuit resistance' or 'shortest path'
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), frame, label);
 
 /*
- * fdp tab -- disable for a while.  It crashes on snetwork.xml, and
- * I don't know why.
+ * fdp 
 */
-/*
   frame = gtk_frame_new ("fdp layout");
   gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
 
-#if defined HAVE_LIBGVC || GRAPHVIZ
+#if defined HAVE_LIBGVC
   vbox = gtk_vbox_new (false, 5);
   gtk_container_set_border_width (GTK_CONTAINER(vbox), 5); 
   gtk_container_add (GTK_CONTAINER(frame), vbox);
@@ -421,7 +419,6 @@ Add an option:  Model either 'circuit resistance' or 'shortest path'
 
   label = gtk_label_new_with_mnemonic ("_FDP");
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), frame, label);
- */
 
 /*
  * twopi tab
@@ -430,7 +427,7 @@ Add an option:  Model either 'circuit resistance' or 'shortest path'
   frame = gtk_frame_new ("twopi layout");
   gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
 
-#if defined HAVE_LIBGVC || GRAPHVIZ
+#if defined HAVE_LIBGVC
   vbox = gtk_vbox_new (false, 5);
   gtk_container_set_border_width (GTK_CONTAINER(vbox), 5); 
   gtk_container_add (GTK_CONTAINER(frame), vbox);
@@ -454,7 +451,7 @@ Add an option:  Model either 'circuit resistance' or 'shortest path'
   frame = gtk_frame_new ("circo layout");
   gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
 
-#if defined HAVE_LIBGVC || GRAPHVIZ
+#if defined HAVE_LIBGVC
   vbox = gtk_vbox_new (false, 5);
   gtk_container_set_border_width (GTK_CONTAINER(vbox), 5); 
   gtk_container_add (GTK_CONTAINER(frame), vbox);
