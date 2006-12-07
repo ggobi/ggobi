@@ -28,6 +28,11 @@
 
    HW: will this work in general for merging messages? eg. when merging two
    messages, the first which creates a column, and the seconding deleting it
+   
+   ML: the indices in the newer message will be relative to the changes made
+   by the previous message. this means that the added elements in the first
+   could be deleted in the second. internally this may work in the same way
+   that filter stages prevent additions that don't pass (by using filter_*()).
 
    When a message is received, usually from the parent staage, its indexing 
    should be compatible with that of the receiver. Some pipeline stages, 
@@ -37,18 +42,40 @@
    indices of the hidden rows and columns, respectively. Filtering blocks
    all types of events: removals, changes, and additions.
    
+   Some stages, which are extensions of filters, essentially replace the data
+   matrix by column (like in tours) or row or both (like generating a dataset
+   describing the variables, ie an experimental design matrix). In the first
+   two cases, it may be simpler to allow resetting the message by row or
+   column. This means clearing out all previous events and resetting the
+   initial dimension. This is achieved by the reset_*() functions. 
+   Redefining both rows and columns warrants the generation of a new message.
+   
    HW: So filter stages will modify the event and then pass it on?
-
+   
+   ML: That's correct - all stages will potentially modify the event, but 
+   filter stages (ie anything that deletes elements) are special in that they 
+   modify the indexing. Were you thinking that each stage would produce its
+   own messages and then merge those with a message in the queue? That would 
+   probably work. I was imagining a system where the current event emission
+   functions (like col_data_changed(), cols_added(), etc) are kept, but instead
+   of emitting events they make changes to the current message. This could be
+   a message received from the parent stage, or, if there isn't one of those,
+   a new message could be created. In order to dispatch the message, someone
+   (likely the handler that received the original message or the idle callback
+   in the case of a tour) would need to call a "flush" method. I see message 
+   merging as occurring in some sort of buffering situation, though the same
+   code is used whether the message is directly modified or modified by
+   another message.
 */
 class GGobi:Pipeline:Message from G:Object {
   /* The GByteArray is used essentially as a fast hash-set for indices */
-  private GByteArray *changed_cols destroy { 
+  private GByteArray *changed_cols = { g_byte_array_new() } destroy { 
     if (VAR) g_byte_array_free(VAR, TRUE);
   };
-  private GByteArray *removed_cols destroy { 
+  private GByteArray *removed_cols = { g_byte_array_new() } destroy { 
     if (VAR) g_byte_array_free(VAR, TRUE);
   };
-  private GByteArray *removed_rows destroy { 
+  private GByteArray *removed_rows = { g_byte_array_new() } destroy { 
     if (VAR) g_byte_array_free(VAR, TRUE);
   };
   
@@ -57,29 +84,30 @@ class GGobi:Pipeline:Message from G:Object {
   private guint n_added_cols;
   
   /* used to identify whether a row/col index has been appended */
-  private guint max_col;
-  private guint max_row;
+  private guint n_cols;
+  private guint n_rows;
   
-  /* this doesn't have much use yet, beyond giving us the max col/row cutoffs */
-  /* note: the n_cols/n_rows should be updated AFTER creating the message */
-  /* this is natural given the current stage design */
-  
-  /* HW: storing the source seems like a bad idea to me - it unnecessarily couples the event to its producer.  */
-  private GGobiStage *source unrefwith g_object_unref;
-  property OBJECT source
-  (nick = "origin", blurb = "The pipeline stage that sent this message",
-    object_type = GGobi:Stage, flags = CONSTRUCT_ONLY)
+  /* n_cols and n_rows are now writeable properties, because it is convenient
+     to change them when redefining the matrix in terms of rows or cols (tours).
+  */
+  property UINT n_cols
+  (nick = "cols", blurb = "The number of columns that are indexed, not appended",
+    minimum = 0, maximum = G_MAXUINT, default_value = 0, export)
     set {
-      selfp->source = g_value_get_object(VAL);
-      selfp->max_col = selfp->source->n_cols;
-      selfp->max_row = selfp->source->n_rows;
-      /* these arrays should never have to change size again */
-      selfp->changed_cols = g_byte_array_sized_new(selfp->max_col);
-      selfp->removed_cols = g_byte_array_sized_new(selfp->max_col);
-      selfp->removed_rows = g_byte_array_sized_new(selfp->max_row);
-    }
-    get {
-      g_value_set_object(VAL, selfp->source);
+      selfp->n_cols = g_value_get_uint(VAL);
+      g_byte_array_set_size(selfp->changed_cols, selfp->n_cols);
+      g_byte_array_set_size(selfp->removed_cols, selfp->n_cols);
+    } get {
+      g_value_set_uint(VAL, selfp->n_cols);
+    };
+  property UINT n_rows
+  (nick = "rows", blurb = "The number of rows that are indexed, not appended",
+    minimum = 0, maximum = G_MAXUINT, default_value = 0, export)
+    set {
+      selfp->n_rows = g_value_get_uint(VAL);
+      g_byte_array_set_size(selfp->removed_rows, selfp->n_rows);
+    } get {
+      g_value_set_uint(VAL, selfp->n_rows);
     };
   
   public GGobiPipelineMessage *
@@ -87,12 +115,6 @@ class GGobi:Pipeline:Message from G:Object {
   {
     GObject *obj = (GObject *)GET_NEW_VARG("source", source, NULL);
     return GGOBI_PIPELINE_MESSAGE(obj);
-  }
-  
-  public GGobiStage *
-  get_source(self)
-  {
-    return selfp->source;
   }
   
   public GSList *
@@ -131,7 +153,7 @@ class GGobi:Pipeline:Message from G:Object {
   {
     for (; cols; cols = cols->next) {
       guint index = GPOINTER_TO_INT(cols->data);
-      g_return_if_fail(index < selfp->max_col);
+      g_return_if_fail(index < selfp->n_cols);
       selfp->changed_cols->data[index] = 1;
     }
   }
@@ -146,7 +168,7 @@ class GGobi:Pipeline:Message from G:Object {
     for (; cols; cols = cols->next) {
       guint index = GPOINTER_TO_INT(cols->data);
       /* add this index to the set */
-      g_return_if_fail(index < selfp->max_col);
+      g_return_if_fail(index < selfp->n_cols);
       selfp->removed_cols->data[index] = 1;
     }
     self_byte_array_remove_indices(selfp->changed_cols, sorted_cols);
@@ -159,7 +181,7 @@ class GGobi:Pipeline:Message from G:Object {
     for (; rows; rows = rows->next) {
       guint index = GPOINTER_TO_INT(rows->data);
       /* add this index to the set */
-      g_return_if_fail(index < selfp->max_row);
+      g_return_if_fail(index < selfp->n_rows);
       selfp->removed_rows->data[index] = 1;
     }
   }
@@ -184,9 +206,12 @@ class GGobi:Pipeline:Message from G:Object {
   filter_cols(self, GSList *cols)
   {
     GSList *sorted_cols = g_slist_sort(cols, self_index_compare);
+    guint n_cols = selfp->n_cols;
     for (; cols; cols = cols->next)
-      if (GPOINTER_TO_INT(cols->data) >= selfp->max_col)
+      if (GPOINTER_TO_INT(cols->data) >= selfp->n_cols)
         selfp->n_added_cols--;
+      else n_cols--;
+    self_set_n_cols(self, n_cols);
     self_byte_array_remove_indices(selfp->changed_cols, sorted_cols);
     self_byte_array_remove_indices(selfp->removed_cols, sorted_cols);
     g_slist_free(sorted_cols);
@@ -195,17 +220,44 @@ class GGobi:Pipeline:Message from G:Object {
   public void
   filter_rows(self, GSList *rows)
   {
+    guint n_rows = selfp->n_rows;
     GSList *sorted_rows = g_slist_sort(rows, self_index_compare);
     for (; rows; rows = rows->next)
-      if (GPOINTER_TO_INT(rows->data) >= selfp->max_row)
+      if (GPOINTER_TO_INT(rows->data) >= selfp->n_rows)
         selfp->n_added_rows--;
+      else n_rows--;
+    self_set_n_rows(self, n_rows);
     self_byte_array_remove_indices(selfp->removed_rows, sorted_rows);
     g_slist_free(sorted_rows);
+    g_signal_emit_by_name(self, "notify::last_row");
+  }
+  
+  /* setup */
+  
+  public void
+  reset_rows(self, guint n_rows)
+  {
+    self_byte_array_clear_indices(selfp->removed_rows);
+    self_set_n_rows(self, n_rows);
+  }
+  public void
+  reset_cols(self, guint n_cols)
+  {
+    self_byte_array_clear_indices(selfp->removed_cols);
+    self_byte_array_clear_indices(selfp->changed_cols);
+    self_set_n_cols(self, n_cols);
   }
   
   /* utilities */
   /* HW: since these don't use any references to self, shouldn't they be "class" methods? */
-  
+  /* ML: what do you mean by a "class" method? does it bother you that they
+     have a self_ prefix even though they are not methods? I see the
+     self_ prefix as more general namespacing. to get around self_ we would
+     need to move these inside %{ ... %} blocks at the beginning. 
+     alternatively, these could be made into separate, more general utilities.
+     many gob files contain little functions like these though, so we need
+     to establish a convention.
+  */
   private void
   byte_array_remove_indices(GByteArray *array, GSList *indices)
   {
@@ -221,6 +273,14 @@ class GGobi:Pipeline:Message from G:Object {
       array->data[i] = 0;
       dec++;
     }
+  }
+  private void
+  byte_array_clear_indices(GByteArray *array)
+  {
+    guint i;
+    // or g_byte_array_remove_range(array, 0, array->len)?
+    for (i = 0; i < array->len; i++)
+      array->data[i] = 0;
   }
   
   private GSList *
