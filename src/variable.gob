@@ -76,8 +76,6 @@ property STRING name
   flags = CONSTRUCT, default_value = "_X_", export)
 get { g_value_set_string (VAL, self->name); }
 set {
-  // FIXME: for some reason the default value 'X' is not being set
-  // This is a bug in something.
   gchar *name, *nick, *old = self->name;
   const gchar *tmp_name = g_value_get_string (VAL);
   if (selfp->name_transform_func)

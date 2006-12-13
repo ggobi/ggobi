@@ -1502,7 +1502,7 @@ class GGobi:Data:Factory:XML from GGobi:Data:Factory
     gint i = data->current_record;
 
     if (i == d->n_rows)
-      {
+      {g_debug("%d", d->n_rows);
         g_error ("There are more records than declared for '%s'; exiting.",
                  d->name);
       }

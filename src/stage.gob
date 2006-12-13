@@ -274,6 +274,7 @@ property OBJECT parent
     
     if (former) {
       g_signal_handler_disconnect(former, selfp->changed_handler);
+      g_signal_handler_disconnect(former, selfp->col_name_changed_handler);
       for (guint j = 0; j < self->n_cols; j++)
         self_col_removed(self, j);
       self_flush_changes(self);
@@ -286,6 +287,8 @@ property OBJECT parent
        for row and column filters) we pass every single through a virtual */
     selfp->changed_handler = g_signal_connect_swapped(G_OBJECT(parent), "changed", 
       G_CALLBACK(self_changed_handler), self);
+    selfp->changed_handler = g_signal_connect_swapped(G_OBJECT(parent), 
+      "col-name-changed",  G_CALLBACK(self_col_name_changed_handler), self);
     
     self_add_child(parent, self);
     
@@ -308,7 +311,7 @@ property STRING name
 
 /*-- a pointer to the application context --*/
 /*-- note that we don't want this -- the pipeline must be freed of GGobi! --*/
-/* private struct _ggobid *gg; */
+public struct _ggobid *gg; /*-- a pointer to the parent --*/
 
 /* variables are now stored in the stage */
 private GPtrArray *vartable = { g_ptr_array_new() } 
@@ -322,30 +325,48 @@ private GPtrArray *vartable = { g_ptr_array_new() }
 public guint n_rows;
 public guint n_cols;
 
-// FIXME: In order for these properties to change, they must be writeable,
-// but that means that everyone can modify them. We need to synchronize
-// the rest of the class with changes here, so that the stage does not reach
-// an invalid state.
+/* warning: only set these properties if you know what you are doing */
 property UINT n_rows 
   (nick = "nrows", blurb = "Number of rows at this stage",
-   minimum = 0, maximum = G_MAXUINT, default_value = 0, link, export);
+   minimum = 0, maximum = G_MAXUINT, default_value = 0, export)
+   set { 
+     guint old_n_rows = self->n_rows;
+     self->n_rows = g_value_get_uint(VAL);
+     //g_debug("stage: %s nrows: %d, %d", self->name, self->n_rows, self_get_n_rows(self)); 
+     if (old_n_rows < self->n_rows) {
+       arrayg_add_rows (&self->jitdata, self->n_rows);
+       arrayg_add_rows (&self->world, self->n_rows);
+     }
+     if (old_n_rows != self->n_rows) {
+       vectori_realloc (&self->rows_under_brush, self->n_rows);
+       vectori_realloc (&self->rows_under_brush_prev, self->n_rows);
+       self->nrows_under_brush = self->nrows_under_brush_prev = 0;
+       clusters_set(self);
+     }
+   }
+   get { g_value_set_uint(VAL, self->n_rows); };
 property UINT n_cols 
   (nick = "ncols", blurb = "Number of cols at this stage",
    minimum = 0, maximum = G_MAXUINT, default_value = 0, export)
    set { 
+     guint old_n_cols = self->n_cols;
      self->n_cols = g_value_get_uint(VAL);
      g_ptr_array_set_size(selfp->vartable, self->n_cols);
+     for (guint j = old_n_cols; j < self->n_cols; j++) {
+       GGobiVariable *var = self_create_variable(self, j);
+       self_set_variable(self, j, var);
+     }
+     if (old_n_cols < self->n_cols) {
+       arrayg_add_cols (&self->jitdata, self->n_cols);
+       arrayg_add_cols (&self->world, self->n_cols);
+       tour_realloc_up (self, self->n_cols);
+     }
    }
    get { g_value_set_uint(VAL, self->n_cols); };
 
 /*------ STUFF FROM DATA.GOB ---------*/
 
-public struct _ggobid *gg; /*-- a pointer to the parent --*/
-
 /* GUI related */
-/* The GUI components should likely hold references to the pipeline stages, 
-  not the other way around. If necessary, the GGobi context can map stages to
-  GUI components. */
 public Varpanel_cboxd  vcbox_ui;
 public Varpanel_circd  vcirc_ui;
 public Varpaneld  varpanel_ui;
@@ -408,21 +429,22 @@ private GGobiPipelineMessage *queued_message;
 private GGobiPipelineMessage *working_message;
 
 private guint changed_handler;
+private guint col_name_changed_handler;
 
 /* This is kept separate from the 'changed' signal, since it's just metadata - 
    it is not part of the actual data matrix */
-public signal first NONE (UINT) void 
-col_name_changed(self, guint j) {
-  if (self->parent) {
-    GGobiVariable *var = self_get_variable(self, j);
-    gchar *name = self_get_col_name(self->parent, j);
-    gchar *nickname = self_get_col_nickname(self->parent, j);
-    ggobi_variable_set_name(var, name);
-    /* nicknames are not transformed */
-    ggobi_variable_set_nickname(var, nickname);
-    g_free(nickname);
-    g_free(name);
-  }
+/* Column name changing is somewhat complex. Column names are set in two ways:
+   1) Through the GGobiVariable object
+   2) With ggobi_stage_set_col_name
+   The latter chains up to the root, where it modifies the GGobiVariable,
+   which then degenerates to the first case. The stage listens to the 
+   name change signal of each GGobiVariable and responds by emitting the
+   col_name_changed signal. The default handler for the signal, below, 
+   updates the variable name hash table. */
+public signal first NONE (STRING, UINT) void 
+col_name_changed(self, const gchar *old_name, guint j)
+{
+  self_update_var_name_hash(self, old_name, j);
 }
 
 /* new pipeline message dispatch event */
@@ -632,8 +654,6 @@ get_col_index_for_name(self, const gchar* name) onerror -1
  * Also sets nickname to the first two letters.
  * Emits col_name_changed() signal.
  **/
- // FIXME: this looks broken. it should probably be virtual and then
- // chain up the pipeline like update_col() does
 public void 
 set_col_name(self, guint j, const gchar* value) 
 {
@@ -662,8 +682,6 @@ set_col_name(self, guint j, const gchar* value)
   
   ggobi_variable_set_name(vt, name);
   g_free(name);
-  
-  self_col_name_changed(self, j);
 }
 
 /** 
@@ -1352,26 +1370,26 @@ variable_name_changed_cb(GGobi:Variable *var, const gchar *old_name,
   const gchar *raw_name, gpointer data)
 {
   gint j = self_get_col_index_for_name(SELF(data), old_name);
-  self_update_var_name_hash(SELF(data), old_name, j);
+  self_col_name_changed(SELF(data), old_name, j);
 }
 
 private void 
-vartable_collab_set_by_var_cb(GGobi:Stage *d, guint j, gpointer user_data)
+vartable_collab_set_by_var_cb(GGobi:Stage *d, const gchar *old_name, guint j, gpointer user_data)
 {
   vartable_collab_set_by_var(d, j);
 }
 private void 
-vartable_collab_tform_set_by_var_cb(GGobi:Stage *d, guint j, gpointer user_data)
+vartable_collab_tform_set_by_var_cb(GGobi:Stage *d, const gchar *old_name, guint j, gpointer user_data)
 {
   vartable_collab_tform_set_by_var(d, j);
 }
 private void
-varcircle_label_set_cb(GGobi:Stage * d, guint j, gpointer user_data)
+varcircle_label_set_cb(GGobi:Stage * d, const gchar *old_name, guint j, gpointer user_data)
 {
   varcircle_label_set(d, j);
 }
 private void
-varpanel_label_set_cb(GGobi:Stage * d, guint j, gpointer user_data)
+varpanel_label_set_cb(GGobi:Stage * d, const gchar *old_name, guint j, gpointer user_data)
 {
   varpanel_label_set(d, j);
 }
@@ -1396,9 +1414,6 @@ process_outgoing(self, GGobiPipelineMessage *msg)
   guint col_change = n_added_cols - n_removed_cols;
   guint row_change = n_added_rows - n_removed_rows;
   
-  if (self->n_cols == 22 && col_change > 0)
-    G_BREAKPOINT();
-  
   if (col_change)
     self_set_n_cols(self, self->n_cols + col_change);
   
@@ -1412,17 +1427,6 @@ process_outgoing(self, GGobiPipelineMessage *msg)
     tourcorr_realloc_down (removed_cols, self, self->gg);
   }
   
-  if (n_added_cols) {
-    /* handle column addition */
-    for (guint j = self->n_cols - n_added_cols; j < self->n_cols; j++) {
-      GGobiVariable *var = self_create_variable(self, j);
-      self_set_variable(self, j, var);
-    }
-    arrayg_add_cols (&self->jitdata, self->n_cols);
-    arrayg_add_cols (&self->world, self->n_cols);
-    tour_realloc_up (self, self->n_cols);
-  }
-  
   /* handle column changes */
   g_slist_foreach(changed_cols, (GFunc)self_changed_col_foreach, self);
   
@@ -1433,24 +1437,6 @@ process_outgoing(self, GGobiPipelineMessage *msg)
     /* row removal */
     arrayg_delete_rows (&self->jitdata, removed_rows);
     arrayg_delete_rows (&self->world, removed_rows);
-  }
-  
-  if (n_added_rows) {
-    /* row addition */
-    arrayg_add_rows (&self->jitdata, self->n_rows);
-    arrayg_add_rows (&self->world, self->n_rows);
-  }
-  
-  if (row_change) {
-    vectori_realloc (&self->rows_under_brush, self->n_rows);
-    vectori_realloc (&self->rows_under_brush_prev, self->n_rows);
-    self->nrows_under_brush = self->nrows_under_brush_prev = 0;
-    clusters_set(self);
-  }
-  
-  for (guint i = self->n_rows - n_added_rows; i < self->n_rows; i++) {
-    self->rows_under_brush.els[i] = 0;
-    self->rows_under_brush_prev.els[i] = 0;
   }
   
   /* clean up */
@@ -1471,6 +1457,19 @@ changed_handler(self, GGobiPipelineMessage *msg)
 {
   self_process_incoming(self, msg); /* process incoming message */
   self_flush_changes(self); /* pass it on to listeners */
+}
+
+private void
+col_name_changed_handler(self, const gchar *old_name, guint j)
+{
+  GGobiVariable *var = self_get_variable(self, j);
+  gchar *name = self_get_col_name(self->parent, j);
+  gchar *nickname = self_get_col_nickname(self->parent, j);
+  ggobi_variable_set_name(var, name);
+  /* nicknames are not transformed */
+  ggobi_variable_set_nickname(var, nickname);
+  g_free(nickname);
+  g_free(name);
 }
 
 }
