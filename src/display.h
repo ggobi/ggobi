@@ -269,7 +269,7 @@ typedef struct
 
     gboolean (*variable_select)(GtkWidget *, displayd *, splotd *, gint jvar, gint toggle, gint mouse, cpaneld *cpanel, ggobid *gg);
 
-    gint  (*variable_plotted_p)(displayd *dpy, gint *cols, gint ncols, GGobiStage *d);
+    gint  (*variable_plotted_p)(displayd *dpy, GSList *cols, GGobiStage *d);
 
     gboolean (*cpanel_set)(displayd *dpy, cpaneld *cp, ggobid *gg);
 

@@ -61,27 +61,20 @@ worldToRaw(displayd *display, splotd *sp, gint pt, GGobiStage *d, ggobid *gg)
 
 
 static gint
-variablePlottedP (displayd * display, gint * cols, gint ncols, GGobiStage * d)
+variablePlottedP (displayd * display, GSList *cols, GGobiStage * d)
 {
   GList *l;
-  gint j;
   splotd *sp;
   for (l = display->splots; l; l = l->next) {
     sp = (splotd *) l->data;
-
-    for (j = 0; j < ncols; j++) {
-      if (sp->p1dvar == -1) {
-        if (sp->xyvars.x == cols[j]) {
-          return (sp->xyvars.x);
-        }
-        if (sp->xyvars.y == cols[j]) {
-          return (sp->xyvars.y);
-        }
-      }
-      else if (sp->p1dvar == cols[j]) {
-        return (sp->p1dvar);
-      }
-    }
+    if (sp->p1dvar == -1) {
+      if (g_slist_find(cols, GINT_TO_POINTER(sp->xyvars.x)))
+        return sp->xyvars.x;
+      if (g_slist_find(cols, GINT_TO_POINTER(sp->xyvars.y)))
+        return sp->xyvars.y;
+    } else
+      if (g_slist_find(cols, GINT_TO_POINTER(sp->p1dvar)))
+        return sp->p1dvar;
   }
   return (-1);
 }

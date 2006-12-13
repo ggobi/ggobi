@@ -19,35 +19,33 @@ property INT filter_column
     gint filter_column = g_value_get_int(VAL);
     g_return_if_fail(filter_column >= -1 && filter_column < (gint)GGOBI_STAGE(self)->n_cols);
     selfp->filter_column = filter_column;
-    self_update(self);
+    /*self_update(self);*/ /* leave this to the user */
   }
   get { g_value_set_int(VAL, selfp->filter_column); };
 
 /* filtered index ==> raw index */
 protected guint *included_rows destroywith g_free;
-/* raw index ==> filtered index */
+/* raw index ==> filtered index, -1 = filtered */
 protected gint *included_rows_rev destroywith g_free;
 /* whether a (raw) row passes the filter */
 private gboolean *included destroywith g_free;
 private guint included_len;
 
+/* incoming */
 override (GGobi:Stage) void
-col_data_changed(GGobi:Stage *stage, guint j)
+process_incoming(GGobi:Stage *stage, GGobiPipelineMessage *msg)
 {
-  if (SELF(stage)->_priv->filter_column == j)
-    self_update(GGOBI_STAGE_FILTER(stage));
-  PARENT_HANDLER(stage, j);
-}
-
-override (GGobi:Stage) void
-rows_added_handler(GGobi:Stage *stage, guint n)
-{
-  self_update(SELF(stage));
-}
-override (GGobi:Stage) void
-rows_deleted_handler(GGobi:Stage *stage, guint *rows, guint n)
-{
-  self_update(SELF(stage));
+  GSList *changed_cols = ggobi_pipeline_message_get_changed_cols(msg);
+  guint filter_col = SELF(stage)->_priv->filter_column;
+  guint rows_changed = ggobi_pipeline_message_get_n_added_rows(msg) + 
+    ggobi_pipeline_message_get_n_removed_rows(msg);
+  ggobi_pipeline_message_consume_rows(msg); /* we ignore any row changes */
+  PARENT_HANDLER(stage, msg);
+  // FIXME: need to check whether filter column has been shifted or removed
+  /* rows added, rows removed, or filter column changed: update filter */
+  if (rows_changed || g_slist_find(changed_cols, GINT_TO_POINTER(filter_col)))
+    self_process_filter(SELF(stage));
+  g_slist_free(changed_cols);
 }
 
 public GObject *
@@ -142,8 +140,6 @@ set_raw_value(GGobi:Stage *self, guint i  (check < N_ROWS), guint j  (check < N_
 override (GGobi:Stage) gdouble
 get_raw_value(GGobi:Stage *self, guint i  , guint j  (check < N_COLS))
 {
-  if (i >= N_ROWS)
-    G_BREAKPOINT();
   return PARENT_HANDLER(self, SELF(self)->included_rows[i], j);
 }
 
@@ -169,16 +165,26 @@ included(self)
 
 /**
  * update:
+ * Convenience method that refreshes the filter and
+ * and flushes the queued changes.
+ *
  * @self: #GGobiStageFilter object
  *
  **/
 public void
 update(self)
 {
+  self_process_filter(SELF(self));
+  ggobi_stage_flush_changes(GGOBI_STAGE(self));
+}
+
+public void
+process_filter(self)
+{
   guint parent_nrows = GGOBI_STAGE(self)->parent ? GGOBI_STAGE(self)->parent->n_rows : 0;
-  guint deleted_rows[GGOBI_STAGE(self)->n_rows];
+  GSList *removed_rows = NULL;
   guint added_rows[parent_nrows];
-  guint n_included, n_both = 0, n_deleted = 0, n_added = 0;
+  guint n_included, n_both = 0, n_added = 0;
   guint *included_rows = g_new(guint, parent_nrows);
   gint *included_rows_rev = g_new(gint, parent_nrows);
   gboolean *included = self_included(self);
@@ -195,12 +201,12 @@ update(self)
     } else {
       included_rows_rev[i] = -1;
       if (i < selfp->included_len && selfp->included[i])
-        deleted_rows[n_deleted++] = i;
+        removed_rows = g_slist_append(removed_rows, GINT_TO_POINTER(i));
     }
   }
   
   for (guint i = parent_nrows; i < selfp->included_len; i++)
-    deleted_rows[n_deleted++] = i;
+    removed_rows = g_slist_append(removed_rows, GINT_TO_POINTER(i));
   
   n_included = n_both + n_added;
   included_rows = g_renew(guint, included_rows, n_included);
@@ -215,10 +221,9 @@ update(self)
   self->included_rows = included_rows;
   self->included_rows_rev = included_rows_rev;
   
-  if (n_deleted)
-    ggobi_stage_rows_deleted(GGOBI_STAGE(self), deleted_rows, n_deleted);
-  if (n_added)
-    ggobi_stage_rows_added(GGOBI_STAGE(self), n_added);
+  ggobi_stage_rows_removed(GGOBI_STAGE(self), removed_rows);
+  g_slist_free(removed_rows);
+  ggobi_stage_rows_added(GGOBI_STAGE(self), n_added);
   
   //g_debug("included: %d", n_included);
 }

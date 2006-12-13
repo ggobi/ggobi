@@ -105,33 +105,33 @@ alloc_tour2d (displayd *dsp, ggobid *gg)
 
 /*-- eliminate the nc columns contained in *cols --*/
 void
-tour2d_realloc_down (gint nc, gint *cols, GGobiStage *d, ggobid *gg)
+tour2d_realloc_down (GSList *cols, GGobiStage *d, ggobid *gg)
 {
   displayd *dsp;
   GList *l;
   for (l=gg->displays; l; l=l->next) {
     dsp = (displayd *) l->data;
     if (dsp->d == d) {
-      arrayd_delete_cols (&dsp->t2d.Fa, nc, cols);
-      arrayd_delete_cols (&dsp->t2d.Fz, nc, cols);
-      arrayd_delete_cols (&dsp->t2d.F, nc, cols);
-      arrayd_delete_cols (&dsp->t2d.Ga, nc, cols);
-      arrayd_delete_cols (&dsp->t2d.Gz, nc, cols);
-      arrayd_delete_cols (&dsp->t2d.G, nc, cols);
-      arrayd_delete_cols (&dsp->t2d.Va, nc, cols);
-      arrayd_delete_cols (&dsp->t2d.Vz, nc, cols);
-      arrayd_delete_cols (&dsp->t2d.tv, nc, cols);
+      arrayd_delete_cols (&dsp->t2d.Fa, cols);
+      arrayd_delete_cols (&dsp->t2d.Fz, cols);
+      arrayd_delete_cols (&dsp->t2d.F, cols);
+      arrayd_delete_cols (&dsp->t2d.Ga, cols);
+      arrayd_delete_cols (&dsp->t2d.Gz, cols);
+      arrayd_delete_cols (&dsp->t2d.G, cols);
+      arrayd_delete_cols (&dsp->t2d.Va, cols);
+      arrayd_delete_cols (&dsp->t2d.Vz, cols);
+      arrayd_delete_cols (&dsp->t2d.tv, cols);
 
-      vectori_delete_els (&dsp->t2d.subset_vars, nc, cols);
-      vectorb_delete_els (&dsp->t2d.subset_vars_p, nc, cols);
-      vectori_delete_els (&dsp->t2d.active_vars, nc, cols);
-      vectorb_delete_els (&dsp->t2d.active_vars_p, nc, cols);
+      vectori_delete_els (&dsp->t2d.subset_vars, cols);
+      vectorb_delete_els (&dsp->t2d.subset_vars_p, cols);
+      vectori_delete_els (&dsp->t2d.active_vars, cols);
+      vectorb_delete_els (&dsp->t2d.active_vars_p, cols);
 
-      vectorf_delete_els (&dsp->t2d.lambda, nc, cols);
-      vectorf_delete_els (&dsp->t2d.tau, nc, cols);
-      vectorf_delete_els (&dsp->t2d.tinc, nc, cols);
+      vectorf_delete_els (&dsp->t2d.lambda, cols);
+      vectorf_delete_els (&dsp->t2d.tau, cols);
+      vectorf_delete_els (&dsp->t2d.tinc, cols);
 
-      arrayd_delete_cols (&dsp->t2d_manbasis, (gint) nc, cols);
+      arrayd_delete_cols (&dsp->t2d_manbasis, cols);
     }
   }
 }

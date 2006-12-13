@@ -249,13 +249,10 @@ static GtkToggleActionEntry t_entries[] = {
 };
 
 static void
-rows_added_cb(GGobiStage *stage, guint n, ggobid *gg)
+stage_changed_cb(GGobiStage *stage, GGobiPipelineMessage *msg, ggobid *gg)
 {
-  reset_pp(stage, gg);
-}
-static void
-rows_deleted_cb(GGobiStage *stage, guint *rows, guint n, ggobid *gg)
-{
+  if (ggobi_pipeline_message_get_n_added_rows(msg) + 
+    ggobi_pipeline_message_get_n_removed_rows(msg))
   reset_pp(stage, gg);
 }
 
@@ -278,11 +275,7 @@ tour1dpp_window_open (ggobid *gg) {
     g_signal_connect (G_OBJECT (dsp->t1d_window), "delete_event",
                         G_CALLBACK (close_wmgr_cb), (gpointer) dsp);
     /*gtk_window_set_policy (GTK_WINDOW (dsp->t1d_window), true, true, false);*/
-    g_signal_connect (G_OBJECT(d), "rows-added",
-      G_CALLBACK(rows_added_cb), gg);
-    g_signal_connect (G_OBJECT(d), "rows-deleted",
-      G_CALLBACK(rows_deleted_cb), gg);
-
+    g_signal_connect (G_OBJECT(d), "changed", G_CALLBACK(stage_changed_cb), gg);
     gtk_container_set_border_width (GTK_CONTAINER (dsp->t1d_window), 10);
 
 /*

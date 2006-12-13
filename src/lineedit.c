@@ -70,6 +70,7 @@ record_add (eeMode mode, gint a, gint b, gchar * lbl, gchar * id,
       }
       ggobi_stage_update_col(dtarget, j);
     }
+    ggobi_stage_flush_changes(d);
   }
 
 

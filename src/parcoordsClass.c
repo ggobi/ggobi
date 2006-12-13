@@ -354,19 +354,14 @@ addPlotLabels (displayd * display, splotd * sp, GdkDrawable * drawable,
 
 
 static gint
-plotted (displayd * display, gint * cols, gint ncols, GGobiStage * d)
+plotted (displayd * display, GSList *cols, GGobiStage * d)
 {
   GList *l;
   splotd *sp;
-  gint j;
   for (l = display->splots; l; l = l->next) {
     sp = (splotd *) l->data;
-
-    for (j = 0; j < ncols; j++) {
-      if (sp->xyvars.x == cols[j]) {
-        return (sp->xyvars.x);
-      }
-    }
+    if (g_slist_find(cols, GINT_TO_POINTER(sp->xyvars.x)))
+      return sp->xyvars.x;
   }
   return (-1);
 }

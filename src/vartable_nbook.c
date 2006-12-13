@@ -298,15 +298,16 @@ cat_filter_func (GtkTreeModel *model, GtkTreeIter *iter, GGobiStage *d)
   return(GGOBI_VARIABLE_IS_CATEGORICAL(var));
 }
 
+
 static void
-vartable_col_data_changed_cb (GGobiStage *s, guint j, gpointer user_data)
+vartable_changed_col_foreach (guint j, GGobiStage *s)
 {
   vartable_stats_set_by_var (s, j);
   vartable_limits_set_by_var (s, j);
 }
 
 static void
-vartable_col_deleted_cb (GGobiStage *d, guint j, gpointer user_data)
+vartable_removed_col_foreach (guint j, GGobiStage *d)
 {
   GtkTreeModel *model;
   GtkTreeIter iter;
@@ -315,6 +316,15 @@ vartable_col_deleted_cb (GGobiStage *d, guint j, gpointer user_data)
   gtk_tree_model_get_iter (model, &iter, path);
   gtk_list_store_remove (GTK_LIST_STORE (model), &iter);
   gtk_tree_path_free (path);
+}
+
+static void
+vartable_stage_changed_cb (GGobiStage *s, GGobiPipelineMessage *msg, gpointer user_data)
+{
+  ggobi_pipeline_message_changed_cols_foreach(msg, 
+    (GGobiIndexFunc)vartable_changed_col_foreach, s);
+  ggobi_pipeline_message_removed_cols_foreach(msg, 
+    (GGobiIndexFunc)vartable_removed_col_foreach, s);
 }
 
 static void
@@ -444,8 +454,7 @@ pages any more!
 
   /*-- 3 = COLUMN_INSET --*/
   
-  ggobi_stage_connect__col_deleted(d, vartable_col_deleted_cb, NULL);
-  ggobi_stage_connect__col_data_changed(d, vartable_col_data_changed_cb, NULL);
+  ggobi_stage_connect__changed(d, vartable_stage_changed_cb, NULL);
   gtk_widget_show_all (nbook);
 
 }

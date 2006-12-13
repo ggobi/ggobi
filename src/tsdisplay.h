@@ -79,7 +79,7 @@ typedef struct _timeSeriesDisplayd {
 
  /* Making these available to ggobiClass.c */
 displayd *timeSeriesDisplayCreate(gboolean missing_p, splotd *sp, GGobiStage *d, ggobid *gg);
-gint tsplotIsVarPlotted(displayd *display, gint *cols, gint ncols, GGobiStage *d);
+gint tsplotIsVarPlotted(displayd *display, GSList *cols, GGobiStage *d);
 gboolean tsplotCPanelSet(displayd *dpy, cpaneld *cpanel, ggobid *gg);
 void tsplotDisplaySet(displayd *dpy, ggobid *gg);
 void tsplotVarpanelRefresh(displayd *display, splotd *sp, GGobiStage *d);

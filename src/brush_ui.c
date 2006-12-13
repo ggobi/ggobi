@@ -379,6 +379,8 @@ button_release_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
     cluster_table_update (d, gg);
   }
 
+  // FIXME: If we make the assumption that these are in the dataset,
+  // then it would be more efficient to _get_root() and _col_data_changed()
   ggobi_stage_update_col(d, ggobi_stage_get_col_index_for_name(d, "_color"));
   ggobi_stage_update_col(d, ggobi_stage_get_col_index_for_name(d, "_color_now"));
   ggobi_stage_update_col(d, ggobi_stage_get_col_index_for_name(d, "_color_prev"));
@@ -391,7 +393,7 @@ button_release_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
   ggobi_stage_update_col(d, ggobi_stage_get_col_index_for_name(d, "_hidden"));
   ggobi_stage_update_col(d, ggobi_stage_get_col_index_for_name(d, "_hidden_now"));
   ggobi_stage_update_col(d, ggobi_stage_get_col_index_for_name(d, "_hidden_prev"));
-
+  ggobi_stage_flush_changes(d);
 
   /*-- if we're only doing linked brushing on mouse up, do it now --*/
   if (!cpanel->br.updateAlways_p)

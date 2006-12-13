@@ -31,8 +31,6 @@
 static gboolean barchartVarSel (GtkWidget * w, displayd * display,
                                 splotd * sp, gint jvar, gint toggle,
                                 gint mouse, cpaneld * cpanel, ggobid * gg);
-static gint barchartVarIsPlotted (displayd * dpy, gint * cols, gint ncols,
-                                  GGobiStage * d);
 static gboolean barchartCPanelSet (displayd * dpy, cpaneld * cpanel,
                                    ggobid * gg);
 static void barchartDisplaySet (displayd * dpy, ggobid * gg);
@@ -80,20 +78,12 @@ varpanelHighd (displayd * display)
 }
 
 static gint
-barchart_is_variable_plotted (displayd * display, gint * cols, gint ncols,
-                              GGobiStage * d)
+barchart_is_variable_plotted (displayd * display, GSList *cols, GGobiStage * d)
 {
-  gint j;
   ggobid *gg = display->d->gg;
   splotd *sp = gg->current_splot;
-  gint jplotted = -1;
-  for (j = 0; j < ncols; j++) {
-    if (sp->p1dvar == cols[j]) {
-      jplotted = sp->p1dvar;
-      return jplotted;
-    }
-  }
-
+  if (g_slist_find(cols, GINT_TO_POINTER(sp->p1dvar)))
+    return sp->p1dvar;
   return (-1);
 }
 
@@ -129,20 +119,6 @@ barchartVarSel (GtkWidget * w, displayd * display, splotd * sp, gint jvar,
   }
 
   return (true);
-}
-
-gint
-barchartVarIsPlotted (displayd * dpy, gint * cols, gint ncols, GGobiStage * d)
-{
-  int j;
-  splotd *sp = (splotd *) dpy->splots->data;
-  for (j = 0; j < ncols; j++) {
-    if (sp->p1dvar == cols[j]) {
-      return (sp->p1dvar);
-    }
-  }
-
-  return (-1);
 }
 
 gboolean
@@ -425,7 +401,7 @@ barchartDisplayClassInit (GGobiBarChartDisplayClass * klass)
   klass->parent_class.create = barchart_new;
   klass->parent_class.createWithVars = barchart_new_with_vars;
   klass->parent_class.variable_select = barchartVarSel;
-  klass->parent_class.variable_plotted_p = barchartVarIsPlotted;
+  //klass->parent_class.variable_plotted_p = barchartVarIsPlotted;
   klass->parent_class.cpanel_set = barchartCPanelSet;
   klass->parent_class.display_unset = NULL;
   klass->parent_class.display_set = barchartDisplaySet;

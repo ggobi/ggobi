@@ -149,7 +149,6 @@ impute_mean_or_median (gint type, gint nvars, gint * vars,
     g_free (missv);
     g_free (x);
     redraw = true;
-
   }
   else {
 
@@ -168,6 +167,7 @@ impute_mean_or_median (gint type, gint nvars, gint * vars,
       }
     }
   }
+  ggobi_stage_flush_changes(d);
   return redraw;
 }
 
@@ -262,6 +262,8 @@ impute_random (GGobiStage * d, gint nvars, gint * vars)
     }
   }
 
+  ggobi_stage_flush_changes(d);
+    
   g_free (presv);
   g_free (missv);
 }

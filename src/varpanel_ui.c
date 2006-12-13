@@ -116,9 +116,16 @@ varpanel_widget_set_visible (gint jbutton, gint jvar, gboolean show,
 }
 
 void
-varpanel_delete_nth_cb (GGobiStage * d, guint jvar, gpointer user_data) 
+varpanel_delete_nth_foreach (guint jvar, GGobiStage * d) 
 {
   varpanel_delete_nth (d, jvar);
+}
+
+static void 
+varpanel_stage_changed_cb (GGobiStage *d, GGobiPipelineMessage *msg, gpointer user_data)
+{
+  ggobi_pipeline_message_removed_cols_foreach(msg, 
+    (GGobiIndexFunc)varpanel_delete_nth_foreach, d); 
 }
 
 void
@@ -629,7 +636,7 @@ varpanel_populate (GGobiStage * d, ggobid * gg)
   g_signal_connect (G_OBJECT (gg), "display_new",
                     G_CALLBACK (varpanel_set_sensitive_cb), NULL);
 
-  ggobi_stage_connect__col_deleted (d, varpanel_delete_nth_cb, NULL);
+  ggobi_stage_connect__changed (d, varpanel_stage_changed_cb, NULL);
   
   /* Connecting to display_selected event */
   g_signal_connect (G_OBJECT (gg), "display_selected",

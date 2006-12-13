@@ -33,6 +33,7 @@ insert_factor(self, const gchar *factor  (check null), gint pos)
   selfp->factors = g_list_insert(selfp->factors, g_strdup(factor), pos);
   self_groups_dirty(self);
   ggobi_stage_cols_added(GGOBI_STAGE(self), 1);
+  ggobi_stage_flush_changes(GGOBI_STAGE(self));
   ggobi_variable_set_vartype(ggobi_stage_get_variable(GGOBI_STAGE(self), 
     GGOBI_STAGE(self)->n_cols - 1), GGOBI_VARIABLE_CATEGORICAL);
 }
@@ -44,7 +45,8 @@ remove_factor(self, const gchar *factor)
     g_free(element->data);
     selfp->factors = g_list_delete_link(selfp->factors, element);
     self_groups_dirty(self);
-    ggobi_stage_col_deleted(GGOBI_STAGE(self), GGOBI_STAGE(self)->n_cols - 1);
+    ggobi_stage_col_removed(GGOBI_STAGE(self), GGOBI_STAGE(self)->n_cols - 1);
+    ggobi_stage_flush_changes(GGOBI_STAGE(self));
   }
 }
 

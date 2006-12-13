@@ -339,6 +339,7 @@ add_rows(self, guint n) {
   }
   
   ggobi_stage_rows_added(GGOBI_STAGE(self), n);
+  
   /* set default values here */
   // FIXME: this can probably be moved before rows_added emission and not
   // emit col_data_changed, once we have tform stage in place
@@ -363,8 +364,9 @@ reset_rows(self, guint start, guint end) {
     gdouble default_val = self_get_col_default_value(self, j);
     for (guint i = start; i < end; i++)
       ggobi_stage_set_raw_value(GGOBI_STAGE(self), i, j, default_val);
-    ggobi_stage_update_col(GGOBI_STAGE(self), j);
+    ggobi_stage_col_data_changed(GGOBI_STAGE(self), j);
   }
+  ggobi_stage_flush_changes(GGOBI_STAGE(self));
 }
 
 /**
@@ -389,23 +391,24 @@ add_cols(self, guint n) {
   ggobi_stage_cols_added(GGOBI_STAGE(self), n);
   
   // The columns are going from undefined to defined.
-  for (guint j = nprev; j < ncols; j++)
-    ggobi_stage_update_col(GGOBI_STAGE(self), j);
+  /*for (guint j = nprev; j < ncols; j++)
+    ggobi_stage_col_data_changed(GGOBI_STAGE(self), j);*/
+  ggobi_stage_flush_changes(GGOBI_STAGE(self));
   
   return nprev;
 }
 
 public guint
-delete_cols(self, guint *cols, gint ncols)
+delete_cols(self, GSList *cols)
 {
   gint j;
-  gint *keepers, nkeepers, old_ncols = GGOBI_STAGE(self)->n_cols;
+  guint *keepers, nkeepers, old_ncols = GGOBI_STAGE(self)->n_cols;
+  guint ncols = g_slist_length(cols);
+  GGobiPipelineMessage *msg;
   
-  g_return_val_if_fail(ncols < old_ncols, old_ncols);
+  g_return_val_if_fail(ncols <= old_ncols, old_ncols);
 
-  // FIXME: shouldn't find_keepers be able to handle this allocation??
-  keepers = g_malloc ((old_ncols - ncols) * sizeof (gint));
-  nkeepers = find_keepers (old_ncols, ncols, (gint *) cols, keepers);
+  keepers = find_keepers (old_ncols, cols, &nkeepers);
   if (nkeepers == -1) {
     g_free (keepers);
     g_return_val_if_reached(old_ncols);
@@ -416,20 +419,14 @@ delete_cols(self, guint *cols, gint ncols)
     ggobi_stage_set_variable(GGOBI_STAGE(self), j, vt);
   }
 
-  arrayf_delete_cols (&self->raw, ncols, (gint *) cols);
-  arrays_delete_cols (&self->missing, ncols, (gint *) cols);
+  arrayf_delete_cols (&self->raw, cols);
+  arrays_delete_cols (&self->missing, cols);
   
-  g_object_set(G_OBJECT(self), GGOBI_STAGE_PROP_N_COLS(old_ncols - ncols), NULL);
-  for (j = 0; j < ncols; j++) /* emit col deleted signal */
-    ggobi_stage_col_deleted(GGOBI_STAGE(self), cols[j]);
+  msg = ggobi_stage_get_message(GGOBI_STAGE(self));
+  ggobi_pipeline_message_remove_cols(msg, cols);
   
-  /*-- emit a single variable_list_changed signal when finished --*/
-  /*-- doesn't need to give a variable index any more, really --*/
-  // FIXME: emission of this is deprecated
-/*  g_signal_emit_by_name(self->gg, "variable_list_changed", 0, self);*/
+  ggobi_stage_flush_changes(GGOBI_STAGE(self));
 
-    /*-- run the first part of the pipeline  --*/
-           
   g_free (keepers);
   
   return(GGOBI_STAGE(self)->n_cols);

@@ -1033,70 +1033,45 @@ handlesInteraction (displayd * dpy, InteractionMode v)
 
 
 static gint
-plotted (displayd * display, gint * cols, gint ncols, GGobiStage * d)
+plotted (displayd * display, GSList *cols, GGobiStage * d)
 {
-  gint j, k;
+  gint k;
   splotd *sp = (splotd *) display->splots->data;  /*-- only one splot --*/
   ProjectionMode projection = (gint) pmode_get (display, display->ggobi);
 
   switch (projection) {
   case P1PLOT:
-    for (j = 0; j < ncols; j++) {
-      if (sp->p1dvar == cols[j]) {
-        return (sp->p1dvar);
-      }
-    }
+    if (g_slist_find(cols, GINT_TO_POINTER(sp->p1dvar)))
+      return sp->p1dvar;
     break;
   case XYPLOT:
-    for (j = 0; j < ncols; j++) {
-      if (sp->xyvars.x == cols[j]) {
-        return (sp->xyvars.x);
-      }
-      if (sp->xyvars.y == cols[j]) {
-        return (sp->xyvars.y);
-      }
-    }
+    if (g_slist_find(cols, GINT_TO_POINTER(sp->xyvars.x)))
+      return sp->xyvars.x;
+    if (g_slist_find(cols, GINT_TO_POINTER(sp->xyvars.y)))
+      return sp->xyvars.y;
     break;
   case TOUR1D:
-    for (j = 0; j < ncols; j++) {
-      for (k = 0; k < display->t1d.nactive; k++) {
-        if (display->t1d.active_vars.els[k] == cols[j]) {
-          return (display->t1d.active_vars.els[k]);
-        }
-      }
-    }
+    for (k = 0; k < display->t1d.nactive; k++)
+      if (g_slist_find(cols, GINT_TO_POINTER(display->t1d.active_vars.els[k])))
+        return display->t1d.active_vars.els[k];
     break;
   case TOUR2D3:
-    for (j = 0; j < ncols; j++) {
-      for (k = 0; k < display->t2d3.nactive; k++) {
-        if (display->t2d3.active_vars.els[k] == cols[j]) {
-          return (display->t2d3.active_vars.els[k]);
-        }
-      }
-    }
+    for (k = 0; k < display->t2d3.nactive; k++)
+      if (g_slist_find(cols, GINT_TO_POINTER(display->t2d3.active_vars.els[k])))
+        return display->t2d3.active_vars.els[k];
     break;
   case TOUR2D:
-    for (j = 0; j < ncols; j++) {
-      for (k = 0; k < display->t2d.nactive; k++) {
-        if (display->t2d.active_vars.els[k] == cols[j]) {
-          return (display->t2d.active_vars.els[k]);
-        }
-      }
-    }
+    for (k = 0; k < display->t2d.nactive; k++)
+      if (g_slist_find(cols, GINT_TO_POINTER(display->t2d.active_vars.els[k])))
+        return display->t2d.active_vars.els[k];
     break;
   case COTOUR:
-    for (j = 0; j < ncols; j++) {
-      for (k = 0; k < display->tcorr1.nactive; k++) {
-        if (display->tcorr1.active_vars.els[k] == cols[j]) {
-          return (display->tcorr1.active_vars.els[k]);
-        }
-      }
-      for (k = 0; k < display->tcorr2.nactive; k++) {
-        if (display->tcorr2.active_vars.els[k] == cols[j]) {
-          return (display->tcorr2.active_vars.els[k]);
-        }
-      }
-    }
+    for (k = 0; k < display->tcorr1.nactive; k++)
+      if (g_slist_find(cols, GINT_TO_POINTER(display->tcorr1.active_vars.els[k])))
+        return display->tcorr1.active_vars.els[k];
+    for (k = 0; k < display->tcorr2.nactive; k++)
+      if (g_slist_find(cols, GINT_TO_POINTER(display->tcorr2.active_vars.els[k])))
+        return display->tcorr2.active_vars.els[k];
     break;
   case NULL_PMODE:
   case DEFAULT_PMODE:

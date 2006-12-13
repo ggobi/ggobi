@@ -1,21 +1,14 @@
 %{
-  
   // FIXME: temporary
   #include "ggobi-input-source.h"
   #include "ggobi-data.h"
   #include "vars.h"
   #include "externs.h"
-
-  /* convenience macro for connecting signal forwarding handles */
-  #define RELAY_SIGNAL(signal) \
-    g_signal_connect_swapped(G_OBJECT(parent), #signal, G_CALLBACK(self_##signal##_handler), self)
-  
-  /* how many signals are we proxying? */
-  #define N_HANDLERS 6
 %}
 
 %h{
 #include "ggobi-variable.h"
+#include "ggobi-pipeline-message.h"
 #include "utils.h"
 
 /* temporarily */
@@ -31,6 +24,7 @@
 #define GGOBI_STAGE_IS_COL_CATEGORICAL(stage, col) \
   ggobi_stage_get_col_type((stage), (col)) == GGOBI_VARIABLE_CATEGORICAL
 
+// FIXME: do we really need this? macros that declare variables are messy...
 #define GGOBI_STAGE_VARIABLES_ITERATE(stage) \
   guint* var_to_col = ggobi_stage_translate_var_to_col((stage)); \
   guint jj = 0; \
@@ -39,15 +33,15 @@
 // Macros for getting and setting attribute values
 // -----------------------------------------------
 
-/* FIXME: would be nice to just have macros for getting the column index.
- * Instead of the _INIT macros, what about tracking the state in the stage. 
- * At the beginning of a loop, some column name could be set on the stage, like 
- * set_active_column(), then the client calls setter/getter functions that are 
- * based on that column, like get_active_value(row) and set_active_value(row).
- * This seems cleaner and works for more than just specific attributes.
- * Of course, we'd still want some macro for getting the column of an attribute,
- * so that we don't have to specify the name all the time. The brush-related
- * macros would also be useful, since they maintain multiple columns.
+/* FIXME: Is there some way around having macros that declare variables
+   in the current scope? What about storing the attribute index inside the 
+   stage via methods named get/set_active_col(). There could be macros for
+   setting the active col for a particular attribute. Then get/set_active_value()
+   would modify the values. This might not work well when setting multiple
+   attributes at once. One way to solve this problem and the one above
+   (iterating only over the variables) is to make it easy to create different
+   "views" of a stage with regard to column indexing. This could be done
+   with additional pipeline stages, but that may be overkill.
 */
 
 #define GGOBI_STAGE_ATTR_INIT(d, attribute) \
@@ -276,41 +270,38 @@ property OBJECT parent
   set {
     GGobiStage *parent = g_value_get_object(VAL);
     GGobiStage *former = self->parent;
+    GGobiPipelineMessage *msg = ggobi_pipeline_message_new(0, 0);
+    
     if (former) {
-      for (guint i = 0; i < N_HANDLERS; i++)
-        g_signal_handler_disconnect(former, selfp->handlers[i]);
+      g_signal_handler_disconnect(former, selfp->changed_handler);
       for (guint j = 0; j < self->n_cols; j++)
-        self_col_deleted(self, j);
+        self_col_removed(self, j);
+      self_flush_changes(self);
       self_remove_child(former, self);
     }
       
     self->parent = parent;
+    
     /* In order to allow subclasses to block signal forwarding (like
        for row and column filters) we pass every single through a virtual */
-    selfp->handlers[0] = RELAY_SIGNAL(col_data_changed);
-    selfp->handlers[1] = RELAY_SIGNAL(col_name_changed);
-    selfp->handlers[2] = RELAY_SIGNAL(cols_added);
-    selfp->handlers[3] = RELAY_SIGNAL(col_deleted);
-    selfp->handlers[4] = RELAY_SIGNAL(rows_added);
-    selfp->handlers[5] = RELAY_SIGNAL(rows_deleted);
+    selfp->changed_handler = g_signal_connect_swapped(G_OBJECT(parent), "changed", 
+      G_CALLBACK(self_changed_handler), self);
     
     self_add_child(parent, self);
     
     /* pretend like the parent just said "here's some new rows and columns!" */
-    self_rows_added_handler(self, self->parent->n_rows);
-    self_cols_added_handler(self, self->parent->n_cols);
+    ggobi_pipeline_message_add_rows(msg, self->parent->n_rows);
+    ggobi_pipeline_message_add_cols(msg, self->parent->n_cols);
+    self_changed_handler(self, msg);
+    g_object_unref(G_OBJECT(msg));
   }
   get { g_value_set_object(VAL, self->parent); };
-
-/* stores the ids of our handlers of parent signals */
-private gulong *handlers = { g_new(gulong, N_HANDLERS) } destroywith g_free;
 
 /* the children of this stage */
 private GSList *children destroywith g_slist_free;
 
 /*-- every pipeline stage has a name --*/
-public gchar *name
-  destroywith g_free;
+public gchar *name destroywith g_free;
 property STRING name
   (nick = "id", blurb = "The name of the pipeline stage",
    default_value = "identity", link, export);
@@ -331,10 +322,10 @@ private GPtrArray *vartable = { g_ptr_array_new() }
 public guint n_rows;
 public guint n_cols;
 
-// FIXME: right now these properties are writable.
-// The cols_added, rows_added emitters are also public. Perhaps we need
-// to protect against this? It only seems (somewhat) valid at GGobiData
-// This would mean manually emitting signals in stage subclasses.
+// FIXME: In order for these properties to change, they must be writeable,
+// but that means that everyone can modify them. We need to synchronize
+// the rest of the class with changes here, so that the stage does not reach
+// an invalid state.
 property UINT n_rows 
   (nick = "nrows", blurb = "Number of rows at this stage",
    minimum = 0, maximum = G_MAXUINT, default_value = 0, link, export);
@@ -412,16 +403,14 @@ private GHashTable* var_name_lookup = {
   g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL) 
 } destroywith g_hash_table_destroy;
 
-public signal first NONE (UINT) void 
-col_data_changed(self, guint j) {
-  GGobiVariable *var = self_get_variable(self, j);
+/* messages */
+private GGobiPipelineMessage *queued_message;
+private GGobiPipelineMessage *working_message;
 
-  ggobi_variable_update(var);
+private guint changed_handler;
 
-  // FIXME: incorporate into variable_update
-  limits_set_by_var(SELF(self), j, (SELF(self)->gg) ? SELF(self)->gg->lims_use_visible : true);
-}
-
+/* This is kept separate from the 'changed' signal, since it's just metadata - 
+   it is not part of the actual data matrix */
 public signal first NONE (UINT) void 
 col_name_changed(self, guint j) {
   if (self->parent) {
@@ -436,106 +425,136 @@ col_name_changed(self, guint j) {
   }
 }
 
-// FIXME: these signals are really only of use to stage implementations
-// Maybe we should mark them private so that there is no public wrapper.
-// It would still be possible to emit them directly, but in that case
-// they should have the ACTION flag.
+/* new pipeline message dispatch event */
+
+/* Users should not emit this event directly, rather they should communicate 
+   changes to the stage using the convenience methods like _col_data_changed(). 
+   The changes are stored in an internal "working" message, which is sent to
+   listeners using _flush_changes(). The message may be retrieved with 
+   _get_message(). The user may then modify the message directly or merge it 
+   with another message. 
+   
+   Subclasses can override the processing at two places: when a message is
+   received from the parent and when it is queued for dispatch. When a message
+   is received, it first must be translated to the index space of the stage.
+   Fortunately, the parent and child index spaces are usually the same. The
+   primary exception to this are filters. The subclass is responsible for
+   adding the incoming changes to the outgoing queue, which may be accomplished
+   by chaining up to the parent handler of _process_incoming or by manually
+   invoking _queue_message(). Subclasses will often need to queue multiple
+   messages, as they proceed through different stages of processing. All
+   queued messages are assumed to be in the index space of the current stage.
+*/
+
+private signal NONE (OBJECT) void
+changed(self, GGobiPipelineMessage *msg);
+
+/* handlers for keeping GGobiVariable in sync */
+
+private void
+changed_col_foreach(guint j, GGobiStage *self)
+{
+  GGobiVariable *var = self_get_variable(self, j);
+  ggobi_variable_update(var);
+  // FIXME: incorporate into variable_update
+  limits_set_by_var(SELF(self), j, (SELF(self)->gg) ? SELF(self)->gg->lims_use_visible : true);
+  // we could still support atomic events like this
+  //g_signal_emit_by_name(self, "col-data-changed", j);
+}
+
+private void
+removed_col_foreach(guint j, GGobiStage *self)
+{
+  GGobiVariable *var = self_get_variable(self, j);
+  g_object_unref(G_OBJECT(var));
+  //g_signal_emit_by_name(self, "col-removed", j);
+}
+
+/* the messaging system */
+
+public GGobiPipelineMessage *
+get_message(self)
+{
+  if (!selfp->working_message)
+    selfp->working_message = ggobi_pipeline_message_new(self->n_rows, self->n_cols);
+  return selfp->working_message;
+}
+public void
+queue_message(self, GGobiPipelineMessage *msg)
+{
+  self_process_outgoing(self, msg);
+  if (selfp->queued_message)
+    ggobi_pipeline_message_merge(selfp->queued_message, msg);
+  else selfp->queued_message = g_object_ref(G_OBJECT(msg));
+}
+public void
+flush_changes(self)
+{
+  if (selfp->working_message) { /* make sure everything is in queue */
+    self_queue_message(self, selfp->working_message);
+    g_object_unref(G_OBJECT(selfp->working_message));
+    selfp->working_message = NULL;
+  }
+  if (selfp->queued_message) { /* send our changes to listeners */
+    self_changed(self, selfp->queued_message); 
+    g_object_unref(G_OBJECT(selfp->queued_message));
+    selfp->queued_message = NULL;
+  }
+}
+
+/* register changes on queued message */
+
+public void 
+col_data_changed(self, guint j) {
+  GGobiPipelineMessage *msg = self_get_message(self);
+  ggobi_pipeline_message_change_col(msg, j);
+}
 
 /**
  * cols_added:
  * @self: #GGobiStage
  * @n: number of new columns
  *
- * Columns added signal
  **/
-public signal first NONE (UINT) void
+public void
 cols_added(self, guint n) {
-  guint nprev = self->n_cols, ncols = self->n_cols + n;
-  
-  self_set_n_cols(self, ncols);
-  
-  for (guint j = nprev; j < ncols; j++) {
-    GGobiVariable *var = self_create_variable(self, j);
-    self_set_variable(self, j, var);
-  }
-
-  arrayg_add_cols (&self->jitdata, ncols);
-  arrayg_add_cols (&self->world, ncols);
-  
-  tour_realloc_up (self, ncols);
-};
+  GGobiPipelineMessage *msg = self_get_message(self);
+  ggobi_pipeline_message_add_cols(msg, n);
+}
 
 /**
  * cols_deleted:
  * @self: #GGobiStage
  * @j: Column deleted
  *
- * Columns deleted signal
  **/
-public signal first NONE (UINT) void
-col_deleted(self, guint j) {
-  GGobiVariable *var = self_get_variable(self, j);
-  g_object_unref(G_OBJECT(var));
-  
-  self_set_n_cols(self, self->n_cols - 1);
-
-  gint j1 = (gint) j;
-  arrayg_delete_cols (&self->jitdata, 1, &j1);
-  arrayg_delete_cols (&self->world, 1, &j1);
-  
-  //FIXME: need function analogous to tour_relloc_up
-  tour2d_realloc_down (1, &j1, self, self->gg);
-  tour1d_realloc_down (1, &j1, self, self->gg);
-  tourcorr_realloc_down (1, &j1, self, self->gg);
-  
-  /* clearly inefficient but will be OK for now */
-  tform_to_world(GGOBI_STAGE(self));
-};
+public void
+col_removed(self, guint j) {
+  GGobiPipelineMessage *msg = self_get_message(self);
+  GSList *col = g_slist_append(NULL, GINT_TO_POINTER(j));
+  ggobi_pipeline_message_remove_cols(msg, col);
+  g_slist_free(col);
+}
 
 /**
  * rows_added:
  * @self: #GGobiStage
  * @n: number of new rows
- * 
- * Rows added signal
+ *
  **/
-public signal first NONE (UINT) void
+public void
 rows_added(self, guint n) {
-  gint i, nprev = self->n_rows, nrows = self->n_rows + n;
-  self_set_n_rows(self, nrows);
-  
-  vectori_realloc (&self->rows_under_brush, nrows);
-  vectori_realloc (&self->rows_under_brush_prev, nrows);
-  
-  arrayg_add_rows (&self->jitdata, nrows);
-  arrayg_add_rows (&self->world, nrows);
-  
-  self->nrows_under_brush = self->nrows_under_brush_prev = 0;
-  
-  for (i = nprev; i < nrows; i++) {
-    self->rows_under_brush.els[i] = 0;
-    self->rows_under_brush_prev.els[i] = 0;
-  }
-  
-  clusters_set(self);
-  //self_set_rows_in_plot(self);
-};
+  GGobiPipelineMessage *msg = self_get_message(self);
+  ggobi_pipeline_message_add_rows(msg, n);
+}
 
-public signal first NONE (POINTER, UINT) void
-rows_deleted(self, guint *rows, guint n) {
-  gint nrows = self->n_rows - n;
-  self_set_n_rows(self, nrows);
+public void
+rows_removed(self, GSList *rows) {
+  GGobiPipelineMessage *msg = self_get_message(self);
+  ggobi_pipeline_message_remove_cols(msg, rows);
+}
 
-  vectori_realloc (&self->rows_under_brush, nrows);
-  vectori_realloc (&self->rows_under_brush_prev, nrows);
-  
-  arrayg_delete_rows (&self->jitdata, n, rows);
-  arrayg_delete_rows (&self->world, n, rows);
-  
-  self->nrows_under_brush = self->nrows_under_brush_prev = 0;
-  
-  clusters_set(self);
-};
+/* initializer */
 
 init (self) {
   sphere_init(self);
@@ -743,7 +762,7 @@ get_col_n_missing(self, guint j) {
  * @values: vector of new values, of length self->nrows
  * 
  * Sets all values in the specified column.  
- * Emits self_col_data_changed() signal.
+ * Emits "changed" signal.
  **/
 public void
 set_raw_values(self, guint j, gdouble *values)
@@ -754,6 +773,7 @@ set_raw_values(self, guint j, gdouble *values)
     self_set_raw_value(self, i, j, values[i]);
   }
   self_update_col(self, j);
+  self_flush_changes(self);
 }
 
 
@@ -1239,7 +1259,8 @@ attach (self, ggobid *gg, gboolean cleanup)
 
   for(guint j = 0; j < self_get_n_vars(self); j++) 
     self_update_col(self, j);
-  
+  self_flush_changes(self);
+    
   /**
    * If there are missings, they've been initialized with a value
    * of 0.  Here, re-set that value to 15% below the minimum for each
@@ -1256,8 +1277,6 @@ attach (self, ggobid *gg, gboolean cleanup)
   display_menu_build (gg);
   
   // Set up variable table and listen to important events
-  self_connect__col_data_changed(self, self_vartable_stats_set_by_var_cb, NULL);
-  self_connect__col_data_changed(self, self_vartable_limits_set_by_var_cb, NULL);
   self_connect__col_name_changed(self, self_vartable_collab_set_by_var_cb, NULL);
   self_connect__col_name_changed(self, self_vartable_collab_tform_set_by_var_cb, NULL);
 
@@ -1337,16 +1356,6 @@ variable_name_changed_cb(GGobi:Variable *var, const gchar *old_name,
 }
 
 private void 
-vartable_stats_set_by_var_cb(GGobi:Stage *d, guint j, gpointer user_data)
-{
-  vartable_stats_set_by_var(d, j);
-}
-private void 
-vartable_limits_set_by_var_cb(GGobi:Stage *d, guint j, gpointer user_data)
-{
-  vartable_limits_set_by_var(d, j);
-}
-private void 
 vartable_collab_set_by_var_cb(GGobi:Stage *d, guint j, gpointer user_data)
 {
   vartable_collab_set_by_var(d, j);
@@ -1367,37 +1376,101 @@ varpanel_label_set_cb(GGobi:Stage * d, guint j, gpointer user_data)
   varpanel_label_set(d, j);
 }
 
-/* signal forwarding handlers */
+/* message handling */
 
+/* override to process any local, outgoing changes */
 private virtual void
-col_data_changed_handler(self, guint j)
+process_outgoing(self, GGobiPipelineMessage *msg)
+/* Here we catch any changes that have occurred to our data matrix and update
+   various structures (like GGobiVariable) and fields (like n_rows, n_cols).
+   A LOT of this stuff will be gone after the pipeline is in place.
+*/
 {
-  self_col_data_changed(self, j);
+  GSList *removed_cols = ggobi_pipeline_message_get_removed_cols(msg);
+  GSList *changed_cols = ggobi_pipeline_message_get_changed_cols(msg);
+  GSList *removed_rows = ggobi_pipeline_message_get_removed_rows(msg);
+  guint n_added_cols = ggobi_pipeline_message_get_n_added_cols(msg);
+  guint n_added_rows = ggobi_pipeline_message_get_n_added_rows(msg);
+  guint n_removed_cols = g_slist_length(removed_cols);
+  guint n_removed_rows = g_slist_length(removed_rows);
+  guint col_change = n_added_cols - n_removed_cols;
+  guint row_change = n_added_rows - n_removed_rows;
+  
+  if (self->n_cols == 22 && col_change > 0)
+    G_BREAKPOINT();
+  
+  if (col_change)
+    self_set_n_cols(self, self->n_cols + col_change);
+  
+  /* handle column removal */
+  if (n_removed_cols) {
+    g_slist_foreach(removed_cols, (GFunc)self_removed_col_foreach, self);
+    arrayg_delete_cols (&self->jitdata, removed_cols);
+    arrayg_delete_cols (&self->world, removed_cols);
+    tour2d_realloc_down (removed_cols, self, self->gg);
+    tour1d_realloc_down (removed_cols, self, self->gg);
+    tourcorr_realloc_down (removed_cols, self, self->gg);
+  }
+  
+  if (n_added_cols) {
+    /* handle column addition */
+    for (guint j = self->n_cols - n_added_cols; j < self->n_cols; j++) {
+      GGobiVariable *var = self_create_variable(self, j);
+      self_set_variable(self, j, var);
+    }
+    arrayg_add_cols (&self->jitdata, self->n_cols);
+    arrayg_add_cols (&self->world, self->n_cols);
+    tour_realloc_up (self, self->n_cols);
+  }
+  
+  /* handle column changes */
+  g_slist_foreach(changed_cols, (GFunc)self_changed_col_foreach, self);
+  
+  if (row_change)
+    self_set_n_rows(self, self->n_rows + row_change);
+  
+  if (n_removed_rows) {
+    /* row removal */
+    arrayg_delete_rows (&self->jitdata, removed_rows);
+    arrayg_delete_rows (&self->world, removed_rows);
+  }
+  
+  if (n_added_rows) {
+    /* row addition */
+    arrayg_add_rows (&self->jitdata, self->n_rows);
+    arrayg_add_rows (&self->world, self->n_rows);
+  }
+  
+  if (row_change) {
+    vectori_realloc (&self->rows_under_brush, self->n_rows);
+    vectori_realloc (&self->rows_under_brush_prev, self->n_rows);
+    self->nrows_under_brush = self->nrows_under_brush_prev = 0;
+    clusters_set(self);
+  }
+  
+  for (guint i = self->n_rows - n_added_rows; i < self->n_rows; i++) {
+    self->rows_under_brush.els[i] = 0;
+    self->rows_under_brush_prev.els[i] = 0;
+  }
+  
+  /* clean up */
+  g_slist_free(removed_cols);
+  g_slist_free(removed_rows);
+  g_slist_free(changed_cols);
 }
+
+/* subclasses override this to respond to parent changes */
 private virtual void
-col_deleted_handler(self, guint j)
+process_incoming(self, GGobiPipelineMessage *msg)
 {
-  self_col_deleted(self, j);
+  self_queue_message(self, msg); /* queue for dispatch */
 }
-private virtual void
-cols_added_handler(self, guint n)
+
+private void
+changed_handler(self, GGobiPipelineMessage *msg)
 {
-  self_cols_added(self, n);
-}
-private virtual void
-rows_added_handler(self, guint n)
-{
-  self_rows_added(self, n);
-}
-private virtual void
-rows_deleted_handler(self, guint *rows, guint n)
-{
-  self_rows_deleted(self, rows, n);
-}
-private virtual void
-col_name_changed_handler(self, guint j)
-{
-  self_col_name_changed(self, j);
+  self_process_incoming(self, msg); /* process incoming message */
+  self_flush_changes(self); /* pass it on to listeners */
 }
 
 }

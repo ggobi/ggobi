@@ -24,9 +24,8 @@
   }
 %}
 
-// FIXME: This stage caches values that it does not transform.
-  
-//FIXME: please document me
+/* This stage caches every value, even those it does not transform */
+
 class GGobi:Stage:Transform from GGobi:Stage {
   private array_f tform destroy {
     if(&(VAR)) 
@@ -40,44 +39,43 @@ class GGobi:Stage:Transform from GGobi:Stage {
   private signal NONE (UINT, OBJECT) void
   applied(self, guint j, GGobiTransform *tform);
   
-  override (GGobi:Stage) void 
-  col_data_changed(GGobiStage *self, guint j) {
-    PARENT_HANDLER(self, j);
-    self_transform(SELF(self), 0, j);
-    // FIXME: rest of this stuff by pipeline
-    tform_to_world_by_var(self, j);
+  override (GGobi:Stage) void
+  process_incoming(GGobiStage *self, GGobiPipelineMessage *msg)
+  {
+    GSList *changed_cols = ggobi_pipeline_message_get_changed_cols(msg);
+    GSList *removed_rows = ggobi_pipeline_message_get_removed_rows(msg);
+    GSList *removed_cols = ggobi_pipeline_message_get_removed_cols(msg);
+    guint n_added_cols = ggobi_pipeline_message_get_n_added_cols(msg);
+    guint n_added_rows = ggobi_pipeline_message_get_n_added_rows(msg);
+    guint n_refresh = n_added_cols;
+    
+    PARENT_HANDLER(self, msg);
+    
+    arrayf_delete_rows (&(SELF(self)->_priv->tform), removed_rows);
+    arrayf_add_rows (&(SELF(self)->_priv->tform), self->n_rows);
+    arrayf_delete_cols (&(SELF(self)->_priv->tform), removed_cols);
+    arrayf_add_cols (&(SELF(self)->_priv->tform), self->n_cols);
+    
+    // FIXME: Need to update hash table in response to column deletions
+    
+    if (removed_rows || n_added_rows)
+      n_refresh = self->n_cols; /* if rows changed, refresh all transforms */
+    else g_slist_foreach(changed_cols, (GFunc)self_changed_col_foreach, self);
+    for (guint j = self->n_cols - n_refresh; j < self->n_cols; j++)
+      self_transform(SELF(self), 0, j);
+    
     if (self->gg)
       displays_tailpipe (FULL, self->gg);
+    
+    g_slist_free(removed_cols);
+    g_slist_free(removed_rows);
+    g_slist_free(changed_cols);
   }
   
-  override (GGobi:Stage) void
-  rows_deleted(GGobi:Stage *self, guint *rows, guint n) {
-    arrayf_delete_rows (&(SELF(self)->_priv->tform), n, rows);
-    for (guint j = 0; j < self->n_cols; j++)
-      self_transform(SELF(self), 0, j);
-  }
-  
-  override (GGobi:Stage) void
-  rows_added(GGobi:Stage *self, guint n) {
-    guint j, nprev = self->n_rows;
-    arrayf_add_rows (&(SELF(self)->_priv->tform), self->n_rows + n);
-    PARENT_HANDLER(self, n);
-    for (j = 0; j < self->n_cols; j++)
-      self_transform(SELF(self), nprev, j);
-  }
-  
-  override (GGobi:Stage) void
-  cols_added(GGobi:Stage *self, guint n) {
-    PARENT_HANDLER(self, n);
-    arrayf_add_cols (&(SELF(self)->_priv->tform), self->n_cols);
-    for (guint j = self->n_cols - n; j < self->n_cols; j++)
-      self_transform(SELF(self), 0, j);
-  }
-  
-  override (GGobi:Stage) void
-  col_deleted(GGobi:Stage *self, guint j) {
-    gint col = j;
-    arrayf_delete_cols (&(SELF(self)->_priv->tform), 1, &col);
+  private void
+  changed_col_foreach(guint j, GGobiStageTransform *self)
+  {
+    self_transform(self, 0, j);
   }
   
   public GObject *
@@ -101,7 +99,8 @@ class GGobi:Stage:Transform from GGobi:Stage {
       ggobi_variable_set_name_transform_func(var, name_tform_func, tform);
       g_hash_table_insert(selfp->active_tforms, GINT_TO_POINTER(j), tform);
     }
-    ggobi_stage_col_data_changed(GGOBI_STAGE(self), j);
+    self_transform(self, 0, j);
+    ggobi_stage_flush_changes(GGOBI_STAGE(self));
     self_applied(self, j, tform);
   }
   public void
@@ -194,6 +193,9 @@ class GGobi:Stage:Transform from GGobi:Stage {
         }*/
       } else self_transform_error(tform, j);
     }
+    // FIXME: world stage should take care of this
+    tform_to_world_by_var(GGOBI_STAGE(self), j);
+    ggobi_stage_col_data_changed(GGOBI_STAGE(self), j);
   }
   
   private void
@@ -213,6 +215,7 @@ class GGobi:Stage:Transform from GGobi:Stage {
     gint *cols = self_get_transformed_cols(self, &ncols);
     for (j = 0; j < ncols; j++)
       if (self_get_transform(self, cols[j]) == tform)
-        ggobi_stage_col_data_changed(GGOBI_STAGE(self), cols[j]);
+        self_transform(self, 0, cols[j]);
+    ggobi_stage_flush_changes(GGOBI_STAGE(self));
   }
 }

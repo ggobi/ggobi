@@ -360,30 +360,31 @@ print_attachments (ggobid * gg)
 /*     Used in deleting: figure out which elements to keep              */
 /* ---------------------------------------------------------------------*/
 
-gint
-find_keepers (gint ncols_current, gint nc, gint * cols, gint * keepers)
+guint *
+find_keepers (gint ncols_current, GSList *cols, guint * nkeepers)
 {
-  gint nkeepers;
-  gint j, k;
+  gint j;
+  guint nc = g_slist_length(cols);
+  guint *keepers = g_new(guint, ncols_current - nc);
 
-  j = nkeepers = k = 0;
+  j = *nkeepers = 0;
   for (j = 0; j < ncols_current; j++) {
-    if (k < nc) {
-      if (cols[k] != j) {
-        keepers[nkeepers++] = j;
+    if (cols) {
+      if (GPOINTER_TO_INT(cols->data) != j) {
+        keepers[(*nkeepers)++] = j;
       }
       else {
-        k++;
+        cols = cols->next;
       }
     }
     else {
-      keepers[nkeepers++] = j;
+      keepers[(*nkeepers)++] = j;
     }
   }
 
-  g_return_val_if_fail(nkeepers == ncols_current - nc, -1);
+  g_return_val_if_fail(*nkeepers == ncols_current - nc, NULL);
 
-  return nkeepers;
+  return keepers;
 }
 
 static gint

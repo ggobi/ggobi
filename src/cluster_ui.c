@@ -169,7 +169,7 @@ include_hiddens (gboolean include, GGobiStage * d, ggobid * gg)
         br_include, ATTR_SET_PERSISTENT);
   }
   ggobi_stage_filter_update(GGOBI_STAGE_FILTER(f));
-
+  
   /*-- make the other datad's update their rows_in_plot, too --*/
   /* FIXME: Are we sure that this even works? Do we really want to do this? - mfl */
   if (changed) {

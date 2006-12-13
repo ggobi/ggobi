@@ -136,6 +136,7 @@ dialog_range_set (GtkWidget *w, ggobid *gg)
       
       ggobi_stage_update_col(d, (guint) j);
     }
+    ggobi_stage_flush_changes(d);
   }
 
   g_free (cols);
@@ -312,6 +313,7 @@ void range_unset (ggobid *gg)
 	  
 	  ggobi_stage_update_col(d, (guint) j);
   }
+  ggobi_stage_flush_changes(d);
   g_free ((gchar *) cols);
 }
 
@@ -350,6 +352,7 @@ create_explicit_variable (GGobiStage * d, gchar * vname, NewVariableType vartype
     }
   }
   ggobi_stage_update_col(d, jvar);
+  ggobi_stage_flush_changes(d);
   return jvar;
 }
 

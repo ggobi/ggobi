@@ -41,23 +41,17 @@ timeSeriesDisplayCreate(gboolean missing_p, splotd *sp, GGobiStage *d, ggobid *g
 
 
 gint
-tsplotIsVarPlotted(displayd *display, gint *cols, gint ncols, GGobiStage *d)
+tsplotIsVarPlotted(displayd *display, GSList *cols, GGobiStage *d)
 {
   GList *l;
   splotd *sp;
-  int j;
 
   for (l = display->splots; l; l = l->next) {
     sp = (splotd *) l->data;
-
-    for (j=0; j<ncols; j++) {
-      if (sp->xyvars.x == cols[j]) {
-        return(sp->xyvars.x);
-      }
-      if (sp->xyvars.y == cols[j]) {
-        return(sp->xyvars.y);
-      }
-    }
+    if (g_slist_find(cols, GINT_TO_POINTER(sp->xyvars.x)))
+      return sp->xyvars.x;
+    if (g_slist_find(cols, GINT_TO_POINTER(sp->xyvars.y)))
+      return sp->xyvars.y;
   }
 
   return(-1);

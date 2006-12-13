@@ -79,11 +79,12 @@ clone_vars (gint * cols, gint ncols, GGobiStage * d)
     ggobi_stage_set_variable(d, jto, clone);
     ggobi_stage_update_col(d, (guint) jto);
   }
+  ggobi_stage_flush_changes(d);
 }
 
 
 static gint
-is_variable_plotted (gint * cols, gint ncols, GGobiStage * d)
+is_variable_plotted (GSList *cols, GGobiStage * d)
 {
   GList *dlist;
   displayd *display;
@@ -104,7 +105,7 @@ is_variable_plotted (gint * cols, gint ncols, GGobiStage * d)
     if (GGOBI_IS_EXTENDED_DISPLAY (display)) {
       GGobiExtendedDisplayClass *klass;
       klass = GGOBI_EXTENDED_DISPLAY_GET_CLASS (display);
-      jplotted = klass->variable_plotted_p (display, cols, ncols, d);
+      jplotted = klass->variable_plotted_p (display, cols, d);
     }
   }
 
@@ -112,13 +113,16 @@ is_variable_plotted (gint * cols, gint ncols, GGobiStage * d)
 }
 
 gboolean
-delete_vars (gint * cols, gint ncols, GGobiStage * d)
+delete_vars (gint *cols_arr, gint ncols, GGobiStage * d)
 {
   gint j;
-  guint *ucols;
+  GSList *cols = NULL;
   
   /*-- don't allow all variables to be deleted --*/
   g_return_val_if_fail(ncols < d->n_cols, d->n_cols);
+  
+  for (j = 0; j < ncols; j++)
+    cols = g_slist_append(cols, GINT_TO_POINTER(cols_arr[j]));
   
   /*
    * If one of the variables to be deleted is currently plotted,
@@ -127,7 +131,7 @@ delete_vars (gint * cols, gint ncols, GGobiStage * d)
    // FIXME: If we are to get rid of delete_vars(), we need to allow specification 
    // of a 'hook' function that determines whether deleting a variable is valid
    // given the current state.
-  if ((j = is_variable_plotted (cols, ncols, d)) != -1) {
+  if ((j = is_variable_plotted (cols, d)) != -1) {
     gchar *message;
     message =
       g_strdup_printf
@@ -138,15 +142,9 @@ delete_vars (gint * cols, gint ncols, GGobiStage * d)
 
     return false;
   }
-
-  // FIXME: Need to move everything to unsigned ints
-  ucols = g_new(guint, ncols);
-  for (j = 0; j < ncols; j++)
-    ucols[j] = (guint)cols[j];
   
-  ggobi_data_delete_cols(GGOBI_DATA(d), ucols, ncols);
-
-  g_free(ucols);
+  ggobi_data_delete_cols(GGOBI_DATA(d), cols);
   
+  g_slist_free(cols);
   return true;
 }

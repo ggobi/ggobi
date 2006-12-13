@@ -144,53 +144,53 @@ alloc_tourcorr (displayd *dsp, ggobid *gg)
 
 /*-- eliminate the nc columns contained in *cols --*/
 void
-tourcorr_realloc_down (gint nc, gint *cols, GGobiStage *d, ggobid *gg)
+tourcorr_realloc_down (GSList *cols, GGobiStage *d, ggobid *gg)
 {
   displayd *dsp;
   GList *l;
   for (l=gg->displays; l; l=l->next) {
     dsp = (displayd *) l->data;
     if (dsp->d == d) {
-      arrayd_delete_cols (&dsp->tcorr1.Fa, nc, cols);
-      arrayd_delete_cols (&dsp->tcorr1.Fz, nc, cols);
-      arrayd_delete_cols (&dsp->tcorr1.F, nc, cols);
-      arrayd_delete_cols (&dsp->tcorr1.Ga, nc, cols);
-      arrayd_delete_cols (&dsp->tcorr1.Gz, nc, cols);
-      arrayd_delete_cols (&dsp->tcorr1.G, nc, cols);
-      arrayd_delete_cols (&dsp->tcorr1.Va, nc, cols);
-      arrayd_delete_cols (&dsp->tcorr1.Vz, nc, cols);
-      arrayd_delete_cols (&dsp->tcorr1.tv, nc, cols);
+      arrayd_delete_cols (&dsp->tcorr1.Fa, cols);
+      arrayd_delete_cols (&dsp->tcorr1.Fz, cols);
+      arrayd_delete_cols (&dsp->tcorr1.F, cols);
+      arrayd_delete_cols (&dsp->tcorr1.Ga, cols);
+      arrayd_delete_cols (&dsp->tcorr1.Gz, cols);
+      arrayd_delete_cols (&dsp->tcorr1.G, cols);
+      arrayd_delete_cols (&dsp->tcorr1.Va, cols);
+      arrayd_delete_cols (&dsp->tcorr1.Vz, cols);
+      arrayd_delete_cols (&dsp->tcorr1.tv, cols);
 
-      vectori_delete_els (&dsp->tcorr1.subset_vars, nc, cols);
-      vectorb_delete_els (&dsp->tcorr1.subset_vars_p, nc, cols);
-      vectori_delete_els (&dsp->tcorr1.active_vars, nc, cols);
-      vectorb_delete_els (&dsp->tcorr1.active_vars_p, nc, cols);
+      vectori_delete_els (&dsp->tcorr1.subset_vars, cols);
+      vectorb_delete_els (&dsp->tcorr1.subset_vars_p, cols);
+      vectori_delete_els (&dsp->tcorr1.active_vars, cols);
+      vectorb_delete_els (&dsp->tcorr1.active_vars_p, cols);
 
-      vectorf_delete_els (&dsp->tcorr1.lambda, nc, cols);
-      vectorf_delete_els (&dsp->tcorr1.tau, nc, cols);
-      vectorf_delete_els (&dsp->tcorr1.tinc, nc, cols);
+      vectorf_delete_els (&dsp->tcorr1.lambda, cols);
+      vectorf_delete_els (&dsp->tcorr1.tau, cols);
+      vectorf_delete_els (&dsp->tcorr1.tinc, cols);
 
-      arrayd_delete_cols (&dsp->tc1_manbasis, (gint) nc, cols);
-      arrayd_delete_cols (&dsp->tc2_manbasis, (gint) nc, cols);
+      arrayd_delete_cols (&dsp->tc1_manbasis, cols);
+      arrayd_delete_cols (&dsp->tc2_manbasis, cols);
 
-      arrayd_delete_cols (&dsp->tcorr2.Fa, nc, cols);
-      arrayd_delete_cols (&dsp->tcorr2.Fz, nc, cols);
-      arrayd_delete_cols (&dsp->tcorr2.F, nc, cols);
-      arrayd_delete_cols (&dsp->tcorr2.Ga, nc, cols);
-      arrayd_delete_cols (&dsp->tcorr2.Gz, nc, cols);
-      arrayd_delete_cols (&dsp->tcorr2.G, nc, cols);
-      arrayd_delete_cols (&dsp->tcorr2.Va, nc, cols);
-      arrayd_delete_cols (&dsp->tcorr2.Vz, nc, cols);
-      arrayd_delete_cols (&dsp->tcorr2.tv, nc, cols);
+      arrayd_delete_cols (&dsp->tcorr2.Fa, cols);
+      arrayd_delete_cols (&dsp->tcorr2.Fz, cols);
+      arrayd_delete_cols (&dsp->tcorr2.F, cols);
+      arrayd_delete_cols (&dsp->tcorr2.Ga, cols);
+      arrayd_delete_cols (&dsp->tcorr2.Gz, cols);
+      arrayd_delete_cols (&dsp->tcorr2.G, cols);
+      arrayd_delete_cols (&dsp->tcorr2.Va, cols);
+      arrayd_delete_cols (&dsp->tcorr2.Vz, cols);
+      arrayd_delete_cols (&dsp->tcorr2.tv, cols);
 
-      vectori_delete_els (&dsp->tcorr2.subset_vars, nc, cols);
-      vectorb_delete_els (&dsp->tcorr2.subset_vars_p, nc, cols);
-      vectori_delete_els (&dsp->tcorr2.active_vars, nc, cols);
-      vectorb_delete_els (&dsp->tcorr2.active_vars_p, nc, cols);
+      vectori_delete_els (&dsp->tcorr2.subset_vars, cols);
+      vectorb_delete_els (&dsp->tcorr2.subset_vars_p, cols);
+      vectori_delete_els (&dsp->tcorr2.active_vars, cols);
+      vectorb_delete_els (&dsp->tcorr2.active_vars_p, cols);
 
-      vectorf_delete_els (&dsp->tcorr2.lambda, nc, cols);
-      vectorf_delete_els (&dsp->tcorr2.tau, nc, cols);
-      vectorf_delete_els (&dsp->tcorr2.tinc, nc, cols);
+      vectorf_delete_els (&dsp->tcorr2.lambda, cols);
+      vectorf_delete_els (&dsp->tcorr2.tau, cols);
+      vectorf_delete_els (&dsp->tcorr2.tinc, cols);
     }
   }
 }

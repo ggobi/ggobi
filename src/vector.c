@@ -70,14 +70,14 @@ vectord_realloc (vector_d *vecp, gint nels)
 }
 
 void
-vectord_delete_els (vector_d *vecp, gint nels, gint *els)
+vectord_delete_els (vector_d *vecp, GSList *els)
 {
   gint k;
   gint jto, jfrom;
-  gint *keepers = g_malloc ((vecp->nels - nels) * sizeof (gint));
-  gint nkeepers = find_keepers (vecp->nels, nels, els, keepers);
+  guint nkeepers;
+  guint *keepers = find_keepers (vecp->nels, els, &nkeepers);
 
-  if (nels > 0 && nkeepers > 0) {
+  if (els && nkeepers > 0) {
 
     /*-- copy before reallocating --*/
     for (k=0; k<nkeepers; k++) {
@@ -185,14 +185,14 @@ vectorf_realloc (vector_f *vecp, gint nels)
 }
 
 void
-vectorf_delete_els (vector_f *vecp, gint nels, gint *els)
+vectorf_delete_els (vector_f *vecp, GSList *els)
 {
   gint k;
   gint jto, jfrom;
-  gint *keepers = g_malloc ((vecp->nels - nels) * sizeof (gint));
-  gint nkeepers = find_keepers (vecp->nels, nels, els, keepers);
+  guint nkeepers;
+  guint *keepers = find_keepers (vecp->nels, els, &nkeepers);
 
-  if (nels > 0 && nkeepers > 0) {
+  if (els && nkeepers > 0) {
 
     /*-- copy before reallocating --*/
     for (k=0; k<nkeepers; k++) {
@@ -313,14 +313,14 @@ vectori_realloc (vector_i *vecp, gint nels)
 }
 
 void
-vectori_delete_els (vector_i *vecp, gint nels, gint *els)
+vectori_delete_els (vector_i *vecp, GSList *els)
 {
   gint k;
   gint jto, jfrom;
-  gint *keepers = g_malloc ((vecp->nels - nels) * sizeof (gint));
-  gint nkeepers = find_keepers (vecp->nels, nels, els, keepers);
+  guint nkeepers;
+  guint *keepers = find_keepers (vecp->nels, els, &nkeepers);
 
-  if (nels > 0 && nkeepers > 0) {
+  if (els && nkeepers > 0) {
 
     /*-- copy before reallocating --*/
     for (k=0; k<nkeepers; k++) {
@@ -424,14 +424,14 @@ vectorb_alloc_zero (vector_b *vecp, gint nels)
 }
 
 void
-vectorb_delete_els (vector_b *vecp, gint nels, gint *els)
+vectorb_delete_els (vector_b *vecp, GSList *els)
 {
   gint k;
   gint jto, jfrom;
-  gint *keepers = g_malloc ((vecp->nels - nels) * sizeof (gint));
-  gint nkeepers = find_keepers (vecp->nels, nels, els, keepers);
+  guint nkeepers;
+  guint *keepers = find_keepers (vecp->nels, els, &nkeepers);
 
-  if (nels > 0 && nkeepers > 0) {
+  if (els && nkeepers > 0) {
 
     /*-- copy before reallocating --*/
     for (k=0; k<nkeepers; k++) {

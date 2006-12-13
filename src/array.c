@@ -134,14 +134,15 @@ arrayd_add_cols (array_d * arrp, gint nc)
 
 /*-- eliminate the nc columns contained in *cols --*/
 void
-arrayd_delete_cols (array_d * arrp, gint nc, gint * cols)
+arrayd_delete_cols (array_d * arrp, GSList *cols)
 {
   gint i, k;
   gint jto, jfrom;
-  gint *keepers = g_malloc ((arrp->ncols - nc) * sizeof (gint));
-  gint nkeepers = find_keepers (arrp->ncols, nc, cols, keepers);
+  guint nkeepers;
+  guint *keepers = find_keepers (arrp->ncols, cols, &nkeepers);
 
-  if (nc > 0 && nkeepers > 0) {
+  // FIXME: What happens when nkeepers is zero (all cols deleted)?
+  if (cols && nkeepers > 0) {
 
     /*-- copy before reallocating --*/
     for (k = 0; k < nkeepers; k++) {
@@ -164,14 +165,14 @@ arrayd_delete_cols (array_d * arrp, gint nc, gint * cols)
 
 /*-- eliminate the nr rows contained in *rows --*/
 void
-arrayd_delete_rows (array_d * arrp, gint nr, gint * rows)
+arrayd_delete_rows (array_d * arrp, GSList *rows)
 {
   gint i, j, k;
   gint ito, ifrom;
-  gint *keepers = g_malloc ((arrp->nrows - nr) * sizeof (gint));
-  gint nkeepers = find_keepers (arrp->nrows, nr, rows, keepers);
+  guint nkeepers;
+  guint *keepers = find_keepers (arrp->nrows, rows, &nkeepers);
 
-  if (nr > 0 && nkeepers > 0) {
+  if (rows && nkeepers > 0) {
 
     /*-- copy before reallocating --*/
     for (k = 0; k < nkeepers; k++) {
@@ -188,6 +189,7 @@ arrayd_delete_rows (array_d * arrp, gint nr, gint * rows)
       g_free (arrp->vals[i]);
     arrp->vals = (gdouble **) g_realloc (arrp->vals,
                                          nkeepers * sizeof (gdouble *));
+    arrp->nrows = nkeepers;
   }
   g_free (keepers);
 }
@@ -320,14 +322,14 @@ arrayf_add_cols (array_f * arrp, gint nc)
 
 /*-- eliminate the nc columns contained in *cols --*/
 void
-arrayf_delete_cols (array_f * arrp, gint nc, gint * cols)
+arrayf_delete_cols (array_f * arrp, GSList *cols)
 {
   gint i, k;
   gint jto, jfrom;
-  gint *keepers = g_malloc ((arrp->ncols - nc) * sizeof (gint));
-  gint nkeepers = find_keepers (arrp->ncols, nc, cols, keepers);
+  guint nkeepers;
+  guint *keepers = find_keepers (arrp->ncols, cols, &nkeepers);
 
-  if (nc > 0 && nkeepers > 0) {
+  if (cols && nkeepers > 0) {
 
     /*-- copy before reallocating --*/
     for (k = 0; k < nkeepers; k++) {
@@ -350,14 +352,14 @@ arrayf_delete_cols (array_f * arrp, gint nc, gint * cols)
 
 /*-- eliminate the nr rows contained in *rows --*/
 void
-arrayf_delete_rows (array_f * arrp, gint nr, gint * rows)
+arrayf_delete_rows (array_f * arrp, GSList *rows)
 {
   gint i, j, k;
   gint ito, ifrom;
-  gint *keepers = g_malloc ((arrp->nrows - nr) * sizeof (gint));
-  gint nkeepers = find_keepers (arrp->nrows, nr, rows, keepers);
+  guint nkeepers;
+  guint *keepers = find_keepers (arrp->nrows, rows, &nkeepers);
 
-  if (nr > 0 && nkeepers > 0) {
+  if (rows && nkeepers > 0) {
 
     /*-- copy before reallocating --*/
     for (k = 0; k < nkeepers; k++) {
@@ -374,7 +376,7 @@ arrayf_delete_rows (array_f * arrp, gint nr, gint * rows)
       g_free (arrp->vals[i]);
     arrp->vals = (gfloat **) g_realloc (arrp->vals,
                                         nkeepers * sizeof (gfloat *));
-    arrp->nrows -= nr;
+    arrp->nrows = nkeepers;
   }
   g_free (keepers);
 }
@@ -509,14 +511,14 @@ arrays_add_cols (array_s * arrp, gint nc)
 
 /*-- eliminate the nc columns contained in *cols --*/
 void
-arrays_delete_cols (array_s * arrp, gint nc, gint * cols)
+arrays_delete_cols (array_s * arrp, GSList *cols)
 {
   gint i, k;
   gint jto, jfrom;
-  gint *keepers = g_malloc ((arrp->ncols - nc) * sizeof (gint));
-  gint nkeepers = find_keepers (arrp->ncols, nc, cols, keepers);
+  guint nkeepers;
+  guint *keepers = find_keepers (arrp->ncols, cols, &nkeepers);
 
-  if (nc > 0 && nkeepers > 0) {
+  if (cols && nkeepers > 0) {
 
     /*-- copy before reallocating --*/
     for (k = 0; k < nkeepers; k++) {
@@ -540,14 +542,14 @@ arrays_delete_cols (array_s * arrp, gint nc, gint * cols)
 
 /*-- eliminate the nr rows contained in *rows --*/
 void
-arrays_delete_rows (array_s * arrp, gint nr, gint * rows)
+arrays_delete_rows (array_s * arrp, GSList *rows)
 {
   gint i, j, k;
   gint ito, ifrom;
-  gint *keepers = g_malloc ((arrp->nrows - nr) * sizeof (gint));
-  gint nkeepers = find_keepers (arrp->nrows, nr, rows, keepers);
+  guint nkeepers;
+  guint *keepers = find_keepers (arrp->nrows, rows, &nkeepers);
 
-  if (nr > 0 && nkeepers > 0) {
+  if (rows && nkeepers > 0) {
 
     /*-- copy before reallocating --*/
     for (k = 0; k < nkeepers; k++) {
@@ -564,6 +566,7 @@ arrays_delete_rows (array_s * arrp, gint nr, gint * rows)
       g_free (arrp->vals[i]);
     arrp->vals = (gshort **) g_realloc (arrp->vals,
                                         nkeepers * sizeof (gshort *));
+    arrp->nrows = nkeepers;
   }
   g_free (keepers);
 }
@@ -680,14 +683,14 @@ arrayl_add_cols (array_l * arrp, gint nc)
 
 /*-- eliminate the nc columns contained in *cols --*/
 void
-arrayl_delete_cols (array_l * arrp, gint nc, gint * cols)
+arrayl_delete_cols (array_l * arrp, GSList *cols)
 {
   gint i, k;
   gint jto, jfrom;
-  gint *keepers = g_malloc ((arrp->ncols - nc) * sizeof (gint));
-  gint nkeepers = find_keepers (arrp->ncols, nc, cols, keepers);
+  guint nkeepers;
+  guint *keepers = find_keepers (arrp->ncols, cols, &nkeepers);
 
-  if (nc > 0 && nkeepers > 0) {
+  if (cols && nkeepers > 0) {
 
     /*-- copy before reallocating --*/
     for (k = 0; k < nkeepers; k++) {
@@ -710,14 +713,14 @@ arrayl_delete_cols (array_l * arrp, gint nc, gint * cols)
 
 /*-- eliminate the nr rows contained in *rows --*/
 void
-arrayl_delete_rows (array_l * arrp, gint nr, gint * rows)
+arrayl_delete_rows (array_l * arrp, GSList *rows)
 {
   gint i, j, k;
   gint ito, ifrom;
-  gint *keepers = g_malloc ((arrp->nrows - nr) * sizeof (gint));
-  gint nkeepers = find_keepers (arrp->nrows, nr, rows, keepers);
+  guint nkeepers;
+  guint *keepers = find_keepers (arrp->nrows, rows, &nkeepers);
 
-  if (nr > 0 && nkeepers > 0) {
+  if (rows && nkeepers > 0) {
 
     /*-- copy before reallocating --*/
     for (k = 0; k < nkeepers; k++) {
@@ -734,6 +737,7 @@ arrayl_delete_rows (array_l * arrp, gint nr, gint * rows)
       g_free (arrp->vals[i]);
     arrp->vals = (glong **) g_realloc (arrp->vals,
                                        nkeepers * sizeof (glong *));
+    arrp->nrows = nkeepers;
   }
   g_free (keepers);
 }
@@ -851,14 +855,14 @@ arrayg_add_cols (array_g * arrp, gint nc)
 
 /*-- eliminate the nc columns contained in *cols --*/
 void
-arrayg_delete_cols (array_g * arrp, gint nc, gint * cols)
+arrayg_delete_cols (array_g * arrp, GSList *cols)
 {
   gint i, k;
   gint jto, jfrom;
-  gint *keepers = g_malloc ((arrp->ncols - nc) * sizeof (gint));
-  gint nkeepers = find_keepers (arrp->ncols, nc, cols, keepers);
+  guint nkeepers;
+  guint *keepers = find_keepers (arrp->ncols, cols, &nkeepers);
 
-  if (nc > 0 && nkeepers > 0) {
+  if (cols && nkeepers > 0) {
 
     /*-- copy before reallocating --*/
     for (k = 0; k < nkeepers; k++) {
@@ -881,14 +885,14 @@ arrayg_delete_cols (array_g * arrp, gint nc, gint * cols)
 
 /*-- eliminate the nr rows contained in *rows --*/
 void
-arrayg_delete_rows (array_g * arrp, gint nr, gint * rows)
+arrayg_delete_rows (array_g * arrp, GSList *rows)
 {
   gint i, j, k;
   gint ito, ifrom;
-  gint *keepers = g_malloc ((arrp->nrows - nr) * sizeof (gint));
-  gint nkeepers = find_keepers (arrp->nrows, nr, rows, keepers);
+  guint nkeepers;
+  guint *keepers = find_keepers (arrp->nrows, rows, &nkeepers);
 
-  if (nr > 0 && nkeepers > 0) {
+  if (rows && nkeepers > 0) {
 
     /*-- copy before reallocating --*/
     for (k = 0; k < nkeepers; k++) {
@@ -905,7 +909,7 @@ arrayg_delete_rows (array_g * arrp, gint nr, gint * rows)
       g_free (arrp->vals[i]);
     arrp->vals = (greal **) g_realloc (arrp->vals,
                                        nkeepers * sizeof (greal *));
-    arrp->nrows -= nr;
+    arrp->nrows = nkeepers;
   }
   g_free (keepers);
 }
