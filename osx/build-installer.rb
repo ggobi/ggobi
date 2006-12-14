@@ -140,7 +140,6 @@ end
 build 
 # Build to /usr/local/gtk2
 
-# PKG_CONFIG=/usr/local/gtk2/lib/pkgconfig
 # export PATH=/usr/local/gcc4.0/bin:/usr/local/gtk2/bin:$PATH
 # svn co http://www.ggobi.org/svn/ggobi/ggobi/branches/ggobi-2.1.4
 # sudo mkdir /usr/local/ggobi
@@ -151,4 +150,8 @@ build
 # sudo make install
 
 # mv to installer
-# 
+# build rggobi
+
+# /Developer/Tools/packagemaker -build -proj ggobi-installer.pmproj -p GGobi.pkg 
+
+#hdiutil create -fs HFS+ -volname GGobi -srcfolder GGobi.pkg ggobi.dmg
