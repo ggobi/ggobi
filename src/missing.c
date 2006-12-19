@@ -79,7 +79,7 @@ missings_datad_cb (GtkWidget * w, ggobid * gg)
 
     ggobi_stage_set_row_id(dnew, i, ggobi_stage_get_row_id(dnew, i));
   }
-  limits_set(dnew, FALSE);
+  /*limits_set(dnew, FALSE);*/
 
   ggobi_stage_attach(dnew, gg, false);
 

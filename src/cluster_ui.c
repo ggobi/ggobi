@@ -181,7 +181,7 @@ include_hiddens (gboolean include, GGobiStage * d, ggobid * gg)
         continue;
       clusters_set(d);
       cluster_table_labels_update (dd, gg);
-      limits_set (dd, gg->lims_use_visible);
+      /*limits_set (dd, gg->lims_use_visible);*/
       vartable_limits_set (dd);
       vartable_stats_set (dd);
       tform_to_world(dd);
@@ -190,7 +190,7 @@ include_hiddens (gboolean include, GGobiStage * d, ggobid * gg)
 
   clusters_set(f);
   cluster_table_labels_update (f, gg);
-  limits_set (f, gg->lims_use_visible);
+  /*limits_set (f, gg->lims_use_visible);*/
   vartable_limits_set (f);
   vartable_stats_set (f);
   tform_to_world(f);

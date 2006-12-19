@@ -1,0 +1,60 @@
+%h{
+  #include "ggobi-variable.h"
+%}
+/* Groups variables so that they are scaled uniformly. The group min is simply
+   the min of all the constituent variable mins, and it's the same for max. 
+   This could also serve as a way to organize the variables in the user 
+   interface for datasets with large variable counts */
+/* A GGobiVariable could hold a reference to its group and delegate to it
+   when asked for the limits */
+/* It also seems like this could extend from GGobiVariable, but that might
+   be weird, since it is not associated with a column of data */
+/* Comments appreciated as always */
+class GGobi:Variable:Group from G:Object
+{
+  private gchar *name destroywith g_free;
+  property STRING name
+  (nick = "id", blurb = "The identifier for this group", 
+    default_value = "Variable Group", link, export);
+
+  private GSList *vars destroywith g_slist_free;
+  
+  public gdouble 
+  get_min(self)
+  { /* should probably be cached, if we can get a signal for limits changing */
+    /* but that's a little complicated, since we don't recalculate limits 
+       until someone actually asks for them */
+    /* GGobiVariable could emit a signal saying that it has become dirty */
+    GSList *vars = selfp->vars;
+    gdouble min = G_MAXDOUBLE;
+    for (; vars; vars = vars->next) {
+      gdouble var_min = ggobi_variable_get_min(GGOBI_VARIABLE(vars->data));
+      if (var_min < min)
+        min = var_min;
+    }
+    return min;
+  }
+  public gdouble 
+  get_max(self)
+  { // TODO
+    return 0;
+  }
+  
+  public GSList *
+  get_variables(self)
+  {
+    return g_slist_copy(selfp->vars);
+  }
+  // FIXME: could add signals for adding/removing variables
+  public void
+  add_variable(self, GGobiVariable *var)
+  {
+    selfp->vars = g_slist_append(selfp->vars, var);
+  }
+  public void
+  remove_variable(self, GGobiVariable *var)
+  {
+    selfp->vars = g_slist_remove(selfp->vars, var);
+  }
+ 
+}

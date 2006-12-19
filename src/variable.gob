@@ -1,5 +1,4 @@
 %privateheader{
-  /* move to categorical subclass? */
   typedef struct level_s {
     guint index;
     guint count;
@@ -11,7 +10,6 @@
 %h{
   #include "types.h"
   
-  /* shortcut that would not be necessary with a categorical class */
   #define GGOBI_VARIABLE_IS_CATEGORICAL(var) \
     (ggobi_variable_get_vartype((var)) == GGOBI_VARIABLE_CATEGORICAL)
   
@@ -29,7 +27,11 @@
 
 %{
   #include "ggobi-stage.h"
+  #include "vars.h"
+  #include "externs.h"
   #include <math.h>
+  /* for qsort */
+  #include <stdlib.h>
     
   static void
   value_collector_func(gpointer key, gpointer value, gpointer data)
@@ -44,8 +46,6 @@
     level_t *l = (level_t *)value;
     l->count = 0;
   }
-  
-  extern gfloat no_change (gfloat, gfloat);
 %}
 
 enum GGOBI_VARIABLE {
@@ -53,9 +53,9 @@ enum GGOBI_VARIABLE {
 } GGobi:Variable:Type;
 
 /* This is meant to encapsulate per-column attributes in the Gobi pipeline.
- It simplifies the per-column GGobiData API and offers the conveniences of 
+ It simplifies the per-column GGobiStage API and offers the conveniences of 
  GObject for each column. The GGobiVariable is a essentially a utility for
- GGobiData. Thus, the direction of control is from GGobiData to GGobiVariable.
+ GGobiStage. Thus, the direction of control is from GGobiStage to GGobiVariable.
  The GGobiVariable maintains a reference to its GGobiStage, but it does not 
  initiate any transactions with GGobiStage. The GGobiStage registers 
  signal handlers to track the effects of GGobiVariable setter invocations
@@ -93,7 +93,6 @@ property STRING nickname
 (nick = "alias", blurb = "The alias for this variable",
  default_value = "X", link, export);
  
-// FIXME: we will likely move to a type hierarchy to encode this
 private GGobiVariableType vartype; 
 property ENUM vartype
 (nick = "class", blurb = "The type of this variable",
@@ -124,8 +123,8 @@ private signal NONE (STRING, STRING) void
   name_changed(self, const gchar *old_name, const gchar *raw_name);
 
 /* PIPELINE STUFF */
-public lims lim_raw;         /* raw data*/
-public lims lim_display;     /*for vartable, sans missings*/
+
+// User limits are broken/deprecated - will go away as soon as alternative exists
 public lims lim_specified;   /*user specified*/
 public gboolean lim_specified_p;
 
@@ -141,19 +140,18 @@ private GHashTable *name_to_level = { g_hash_table_new(g_str_hash, g_str_equal) 
 private GHashTable *value_to_level = { g_hash_table_new(NULL, NULL) }
   destroywith g_hash_table_destroy;
 
-  // FIXME: these should be made private after pipeline in place
-public lims lim;             /* limits for this variable */
+private lims lim;             /* limits for this variable */
+private lims lim_display;     /*for vartable, sans missings*/
 private gfloat variance;
-public gfloat mean;
-public gfloat median;
+private gfloat mean;
+private gfloat median;
 private gboolean has_missings;
 
 /* dirty flags */
 private gboolean dirty_has_missings = TRUE;
 private gboolean dirty_levels = TRUE;
-private gboolean dirty_variance = TRUE;
-private gboolean dirty_mean = TRUE;
-private gboolean dirty_median = TRUE;
+private gboolean dirty_stats = TRUE;
+private gboolean dirty_limits = TRUE;
 
 protected level_t *
 get_level_for_value(self, gint value)
@@ -185,9 +183,7 @@ get_level_for_name(self, const gchar *name)
 public GObject *
 new(GGobiStage *stage)
 {
-  // FIXME: I shouldn't have to specify the 'name' property here but the
-  // default_value in the property isn't working
-  GObject *o = G_OBJECT(GET_NEW_VARG("stage", stage, "name", "_X_", NULL));
+  GObject *o = G_OBJECT(GET_NEW_VARG("stage", stage, NULL));
   return(o);
 }
 
@@ -334,6 +330,53 @@ get_level_value_closest(self, gint value)
  return closest;
 }
 
+private void
+refresh_limits(self)
+{    
+  GGobiStage *s = self->stage;
+  gint i, j = ggobi_stage_get_col_index_for_name(s, self->name);
+  greal min, max;
+  
+  if (!selfp->dirty_limits)
+    return;
+  
+  min = G_MAXFLOAT;
+  max = -G_MAXFLOAT;
+    
+  if (!GGOBI_VARIABLE_IS_CATEGORICAL(self)) {
+    for (i = 0; i < s->n_rows; i++) {
+      if (!s->missings_show_p && ggobi_stage_is_missing(s, i,j));
+      else {
+        if (ggobi_stage_get_raw_value(s, i, j) < min)
+          min = ggobi_stage_get_raw_value(s, i, j);
+        if (ggobi_stage_get_raw_value(s, i, j) > max)
+          max = ggobi_stage_get_raw_value(s, i, j);
+      }
+    }
+  } else {
+    guint level_value;
+    gint *level_values;
+    gint nlevels;
+    if ((nlevels = self_get_n_levels(self)) > 0) {
+      level_values = self_get_level_values(self);
+      for (i = 0; i < nlevels; i++) {
+        level_value = level_values[i];
+        if (level_value < min)
+          min = level_value;
+        if (level_value > max)
+          max = level_value;
+      }
+      g_free(level_values);
+    }
+  }
+  
+  selfp->lim.min = min;
+  selfp->lim.max = max;
+  selfp->lim_display.min = selfp->has_missings ? MIN(0, min) : min;
+  selfp->lim_display.max = selfp->has_missings ? MAX(0, max) : max;
+  
+  selfp->dirty_limits = FALSE;
+}
 
 /**
 * get_max:
@@ -346,28 +389,9 @@ get_level_value_closest(self, gint value)
 public gfloat
 get_max(self)
 {
-  gint *level_values;
-  guint level_value, nlevels, level_value_max=G_MININT, i;
-
-  if (self_get_vartype(self) != GGOBI_VARIABLE_CATEGORICAL) {
-    return self->lim.max;
-  }
-
-  // FIXME: Please cache me
-  if ((nlevels = self_get_n_levels(self)) > 0) {
-    level_values = self_get_level_values(self);
-    level_value_max = level_values[0];
-    for (i = 0; i < nlevels; i++) {
-      level_value = level_values[i];
-      if (level_value > level_value_max)
-        level_value_max = level_value;
-    }
-    g_free(level_values);
-  }
-
-  return(gfloat) level_value_max;
+  self_refresh_limits(self);
+  return(gfloat) selfp->lim.max;
 }
-
 
 /**
 * get_col_min:
@@ -380,27 +404,22 @@ get_max(self)
 public gfloat
 get_min(self)
 {
-  guint level_value, level_value_min=G_MAXINT, i;
-  gint *level_values;
-  gint nlevels;
+  self_refresh_limits(self);
+  return(gfloat) selfp->lim.min;
+}
 
-  if (!GGOBI_VARIABLE_IS_CATEGORICAL(self)) {
-    return self->lim.min;
-  }
+public gfloat
+get_display_max(self)
+{
+  self_refresh_limits(self);
+  return(gfloat) selfp->lim_display.max;
+}
 
-  // FIXME: shouldn't this also be cached?
-  if ((nlevels = self_get_n_levels(self)) > 0) {
-    level_values = self_get_level_values(self);
-    level_value_min = level_values[0];
-    for (i = 0; i < nlevels; i++) {
-      level_value = level_values[i];
-      if (level_value < level_value_min)
-        level_value_min = level_value;
-    }
-    g_free(level_values);
-  }
-
-  return(gfloat) level_value_min;
+public gfloat
+get_display_min(self)
+{
+  self_refresh_limits(self);
+  return(gfloat) selfp->lim_display.min;
 }
 
 public void
@@ -414,35 +433,51 @@ public gfloat
 get_range(self)
 {
   // FIXME: Make work for categorical variables
-  return self->lim.max - self->lim.min;
+  return selfp->lim.max - selfp->lim.min;
 }
 
-public gfloat
-get_variance(self)
+private void
+refresh_stats(self)
 {
-  if (selfp->dirty_variance) {
-    gfloat sum_squares = 0, mean = ggobi_variable_get_mean(self);
-    guint i, j = ggobi_stage_get_col_index_for_name(self->stage, self->name);
-    for (i=0; i < self->stage->n_rows; i++) {
-      gdouble x = ggobi_stage_get_raw_value(self->stage, i, j); 
-      sum_squares = sum_squares + (x * x);
-    }
-    selfp->variance = (sum_squares / self->stage->n_rows) - (mean * mean);
-    selfp->dirty_variance = FALSE;
+  guint n_row = self->stage->n_rows;
+  if (!selfp->dirty_stats)
+    return;
+  gfloat sum_squares = 0, sum = 0;
+  guint i, j = ggobi_stage_get_col_index_for_name(self->stage, self->name);
+  gfloat *x = g_new(gfloat, n_row);
+  for (i = 0; i < n_row; i++) {
+    x[i] = ggobi_stage_get_raw_value(self->stage, i, j); 
+    sum_squares = sum_squares + (x[i] * x[i]);
+    sum += x[i];
   }
-  return selfp->variance;
+  selfp->mean = sum / n_row;
+  selfp->variance = (sum_squares / n_row) - (selfp->mean * selfp->mean);
+  qsort(x, n_row, sizeof (gfloat), fcompare);
+  selfp->median = ((n_row % 2) != 0) ? x[(n_row - 1) / 2] : 
+    (x[n_row / 2 - 1] + x[n_row / 2]) / 2.;
+  g_free(x);
+  selfp->dirty_stats = FALSE;
 }
 
 public gfloat
 get_mean(self)
 {
-  return self->mean;
+  self_refresh_stats(self);
+  return selfp->mean;
 }
 
 public gfloat
 get_median(self)
 {
-  return self->median;
+  self_refresh_stats(self);
+  return selfp->median;
+}
+
+public gfloat
+get_variance(self)
+{
+  self_refresh_stats(self);
+  return selfp->variance;
 }
 
 public gboolean
@@ -465,7 +500,6 @@ clone(self)
 {
   GGobiVariable *self_new = GGOBI_VARIABLE(g_object_new(G_TYPE_FROM_INSTANCE(self),
     "name", self->name, "nickname", selfp->nickname, "stage", self->stage, NULL));
-  //self_new->collab_tform = g_strdup (selfp->collab_tform);
  
   self_set_vartype(self_new, self_get_vartype(self));
   if (GGOBI_VARIABLE_IS_CATEGORICAL(self)) {
@@ -480,15 +514,13 @@ clone(self)
     g_free(values);
   }
  
-  self_new->mean = self_get_mean(self);
-  self_new->median = self_get_median(self);
-  self_new->lim.min =
-  self_new->lim_raw.min = self_get_min(self);
-  self_new->lim.max =
-  self_new->lim_raw.max = self_get_max(self);
+  self_new->_priv->mean = self_get_mean(self);
+  self_new->_priv->median = self_get_median(self);
+  self_new->_priv->lim.min = self_get_min(self);
+  self_new->_priv->lim.max = self_get_max(self);
 
-  self_new->lim_display.min = self->lim_display.min;
-  self_new->lim_display.max = self->lim_display.max;
+  self_new->_priv->lim_display.min = selfp->lim_display.min;
+  self_new->_priv->lim_display.max = selfp->lim_display.max;
 
   self_new->lim_specified_p = self->lim_specified_p;
 
@@ -559,11 +591,13 @@ add_level(self, const gchar *name, gint value)
 public void
 update(self)
 {
- // FIXME: make a dirty flag for each statistic and set to TRUE here
+ /* make a dirty flag for each statistic and set to TRUE here */
+ /* may collapse some dirty flags for simplicity */
  
  selfp->dirty_has_missings = TRUE;
  selfp->dirty_levels = TRUE;
- selfp->dirty_variance = TRUE;
+ selfp->dirty_stats = TRUE;
+ selfp->dirty_limits = TRUE;
 }
 
 protected void

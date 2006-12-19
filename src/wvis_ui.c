@@ -44,8 +44,8 @@ bin_counts_reset (gint jvar, GGobiStage *d, ggobid *gg)
     return;
 
   var = ggobi_stage_get_variable(d, jvar);
-  min = var->lim_raw.min;
-  max = var->lim_raw.max;
+  min = ggobi_variable_get_min(var);
+  max = ggobi_variable_get_max(var);
 
   for (k=0; k<gg->wvis.npct; k++)
     gg->wvis.n[k] = 0;
@@ -75,8 +75,8 @@ record_colors_reset (gint selected_var, GGobiStage *d, ggobid *gg)
     return;
 
   var = ggobi_stage_get_variable(d, selected_var);
-  min = var->lim_raw.min;
-  max = var->lim_raw.max;
+  min = ggobi_variable_get_min(var);
+  max = ggobi_variable_get_max(var);
 
   GGOBI_STAGE_ATTR_INIT_ALL(d);  
   for (m=0; m<d->n_rows; m++) {
@@ -269,8 +269,8 @@ bin_boundaries_set (gint selected_var, GGobiStage *d, ggobid *gg)
     gint groupsize = (gint) (d->n_rows / ngroups);
     paird *pairs = (paird *) g_malloc (d->n_rows * sizeof (paird));
 
-    min = var->lim_raw.min;
-    max = var->lim_raw.max;
+    min = ggobi_variable_get_min(var);
+    max = ggobi_variable_get_max(var);
     range = max - min;
 
     /*-- sort the selected variable --*/
@@ -425,8 +425,8 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
 
     var = ggobi_stage_get_variable(d, selected_var);
     if (var) {
-      min = var->lim_raw.min;
-      max = var->lim_raw.max;
+      min = ggobi_variable_get_min(var);
+      max = ggobi_variable_get_max(var);
 
       gdk_gc_set_foreground (gg->wvis.GC, &scheme->rgb_accent);
       y = ymargin;

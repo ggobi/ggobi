@@ -332,7 +332,6 @@ property UINT n_rows
    set { 
      guint old_n_rows = self->n_rows;
      self->n_rows = g_value_get_uint(VAL);
-     //g_debug("stage: %s nrows: %d, %d", self->name, self->n_rows, self_get_n_rows(self)); 
      if (old_n_rows < self->n_rows) {
        arrayg_add_rows (&self->jitdata, self->n_rows);
        arrayg_add_rows (&self->world, self->n_rows);
@@ -428,6 +427,7 @@ private GHashTable* var_name_lookup = {
 private GGobiPipelineMessage *queued_message;
 private GGobiPipelineMessage *working_message;
 
+/* handler id's (for disconnecting when reparenting) */
 private guint changed_handler;
 private guint col_name_changed_handler;
 
@@ -470,27 +470,6 @@ col_name_changed(self, const gchar *old_name, guint j)
 
 private signal NONE (OBJECT) void
 changed(self, GGobiPipelineMessage *msg);
-
-/* handlers for keeping GGobiVariable in sync */
-
-private void
-changed_col_foreach(guint j, GGobiStage *self)
-{
-  GGobiVariable *var = self_get_variable(self, j);
-  ggobi_variable_update(var);
-  // FIXME: incorporate into variable_update
-  limits_set_by_var(SELF(self), j, (SELF(self)->gg) ? SELF(self)->gg->lims_use_visible : true);
-  // we could still support atomic events like this
-  //g_signal_emit_by_name(self, "col-data-changed", j);
-}
-
-private void
-removed_col_foreach(guint j, GGobiStage *self)
-{
-  GGobiVariable *var = self_get_variable(self, j);
-  g_object_unref(G_OBJECT(var));
-  //g_signal_emit_by_name(self, "col-removed", j);
-}
 
 /* the messaging system */
 
@@ -1284,10 +1263,10 @@ attach (self, ggobid *gg, gboolean cleanup)
    * of 0.  Here, re-set that value to 15% below the minimum for each
    * variable.  (dfs -- done at Di's request, September 2004)
    **/
-  limits_set (self, self->gg->lims_use_visible);
+  /*limits_set (self, self->gg->lims_use_visible);*/
   for (guint j = 0; j < self->n_cols; j++) vars[j] = j;
   impute_fixed (IMP_BELOW, 15.0, self->n_cols, vars, self);
-  limits_set (self, self->gg->lims_use_visible);
+  /*limits_set (self, self->gg->lims_use_visible);*/
   g_free(vars);
 
   clusters_set(self);  /*-- find the clusters for data just read in --*/
@@ -1443,6 +1422,27 @@ process_outgoing(self, GGobiPipelineMessage *msg)
   g_slist_free(removed_cols);
   g_slist_free(removed_rows);
   g_slist_free(changed_cols);
+}
+
+/* handlers for keeping GGobiVariable in sync */
+
+private void
+changed_col_foreach(guint j, GGobiStage *self)
+{
+  GGobiVariable *var = self_get_variable(self, j);
+  ggobi_variable_update(var);
+  // FIXME: incorporate into variable_update
+  //limits_set_by_var(SELF(self), j, (SELF(self)->gg) ? SELF(self)->gg->lims_use_visible : true);
+  // we could still support atomic events like this
+  //g_signal_emit_by_name(self, "col-data-changed", j);
+}
+
+private void
+removed_col_foreach(guint j, GGobiStage *self)
+{
+  GGobiVariable *var = self_get_variable(self, j);
+  g_object_unref(G_OBJECT(var));
+  //g_signal_emit_by_name(self, "col-removed", j);
 }
 
 /* subclasses override this to respond to parent changes */

@@ -137,12 +137,15 @@ rescale_cb (GtkWidget *w, GtkTreeSelection *tree_sel)
   GGobiStageSubset *subset = subset_ui_get_selected_stage(tree_sel);
   GGobiStage *d = GGOBI_STAGE(subset);
   if (d) {
-    limits_set (d, d->gg->lims_use_visible);
+    // FIXME: everything is rescaled by default with the new pipeline, if
+    // we want to support subsetting without rescaling, we'll need a special
+    // option that links the scales to the limits at a stage before "subset"
+    /*limits_set (d, d->gg->lims_use_visible);
     vartable_limits_set (d);
     vartable_stats_set (d);
 
     tform_to_world(d);
-    displays_tailpipe (FULL, d->gg);
+    displays_tailpipe (FULL, d->gg);*/
   }
 }
 

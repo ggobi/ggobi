@@ -41,8 +41,8 @@ impute_fixed (ImputeType impute_type, gfloat val, gint nvars, gint * vars,
       var = ggobi_stage_get_variable(d, j);
 
       /* Use find the limits of the non-missing data */
-      minval = var->lim_display.min;
-      maxval = var->lim_display.max;
+      minval = ggobi_variable_get_display_min(var);
+      maxval = ggobi_variable_get_display_max(var);
       range = maxval - minval;
 
       /* Then fill it in */

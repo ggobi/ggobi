@@ -210,8 +210,8 @@ splotScreenToTform(cpaneld *cpanel, splotd *sp, icoords *scr,
 */
   /* x */
   varx = ggobi_stage_get_variable(d, sp->xyvars.x);
-  max = varx->lim.max;
-  min = varx->lim.min;
+  max = ggobi_variable_get_max(varx);
+  min = ggobi_variable_get_min(varx);
   rdiff = max - min;
   world.x = planar.x;
   ftmp = world.x / precis;
@@ -220,8 +220,8 @@ splotScreenToTform(cpaneld *cpanel, splotd *sp, icoords *scr,
 
   /* y */
   vary = ggobi_stage_get_variable(d, sp->xyvars.y);
-  max = vary->lim.max;
-  min = vary->lim.min;
+  max = ggobi_variable_get_max(vary);
+  min = ggobi_variable_get_min(vary);
   rdiff = max - min;
   world.y = planar.y;
   ftmp = world.y / precis;

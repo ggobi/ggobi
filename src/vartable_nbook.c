@@ -596,8 +596,8 @@ vartable_limits_set_by_var (GGobiStage *d, guint j)
       case GGOBI_VARIABLE_UNIFORM:
       case GGOBI_VARIABLE_REAL:
 	gtk_tree_store_set(GTK_TREE_STORE(model), &iter,
-	 	VT_REAL_DATA_MIN, var->lim_display.min,
-		VT_REAL_DATA_MAX, var->lim_display.max, -1);
+	 	VT_REAL_DATA_MIN, ggobi_variable_get_display_min(var),
+		VT_REAL_DATA_MAX, ggobi_variable_get_display_max(var), -1);
 	if (var->lim_specified_p) {
 		gtk_tree_store_set(GTK_TREE_STORE(model), &iter, 
 	  	  VT_REAL_USER_MIN, var->lim_specified.min,
@@ -607,8 +607,8 @@ vartable_limits_set_by_var (GGobiStage *d, guint j)
 
       case GGOBI_VARIABLE_CATEGORICAL:
 	gtk_tree_store_set(GTK_TREE_STORE(model), &iter, 
-		VT_CAT_DATA_MIN, (gint)var->lim_display.min,
-		VT_CAT_DATA_MAX, (gint)var->lim_display.max, -1); 
+		VT_CAT_DATA_MIN, ggobi_variable_get_display_min((gint)var),
+		VT_CAT_DATA_MAX, ggobi_variable_get_display_max((gint)var), -1); 
         if (var->lim_specified_p) {
 		gtk_tree_store_set(GTK_TREE_STORE(model), &iter, 
 	  	  VT_CAT_USER_MIN, (gint)var->lim_specified.min,
@@ -650,8 +650,8 @@ vartable_stats_set_by_var (GGobiStage *d, guint j) {
     break;
     default:
       gtk_tree_store_set(GTK_TREE_STORE(model), &iter, 
-        VT_MEAN, var->mean, 
-        VT_MEDIAN, var->median, 
+        VT_MEAN, ggobi_variable_get_mean(var), 
+        VT_MEDIAN, ggobi_variable_get_median(var), 
         -1
       );
     break;
