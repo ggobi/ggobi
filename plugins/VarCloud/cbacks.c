@@ -15,10 +15,18 @@ void
 launch_varcloud_cb (GtkWidget *w, PluginInstance *inst)
 /*
  * Create a new datad containing the pairwise distance variables.
- * Juergen says there should be points corresponding to the edges {i=j}.
- * I haven't added them yet, but I could do so -- they don's have to be
- * linked to any edges, I don't think.
+ * Juergen says there should be points corresponding to the edges
+ * {i=j}.  I haven't added them yet, but I could do so -- they don't
+ * have to be linked to any edges, I don't think.
 */
+
+/* 
+  This code now includes changes so that a single datad, with edges,
+  is added.  Linking works by definition.  I haven't checked it in
+  yet ...
+*/
+
+
 {
   vcld *vcl = vclFromInst (inst);
   ggobid *gg = inst->gg;
@@ -28,7 +36,10 @@ launch_varcloud_cb (GtkWidget *w, PluginInstance *inst)
   static gchar *clab[] = {"D_ij", "diff_ij", "i", "j"};
   InputDescription *desc = NULL;
   gdouble *values;
-  GGobiData *d = vcl->dsrc, *e, *dnew;
+  GGobiData *d = vcl->dsrc, *dnew;
+#if 0
+  GGobiData *e;
+#endif
   gint var1 = vcl->var1, var2 = vcl->var2;
   gdouble xci, xcj, yci, ycj;
   gchar *lbl;
@@ -55,6 +66,8 @@ launch_varcloud_cb (GtkWidget *w, PluginInstance *inst)
   /*    Keep it simple: use row numbers */
   datad_record_ids_set(d, NULL, false);
 
+
+
   /* Step 2: if necessary, add an edge set for the complete graph.
       Call it 'allpairs'; it has no variables for now.
       This too needs record ids so it can be linked to the new data,
@@ -63,9 +76,11 @@ launch_varcloud_cb (GtkWidget *w, PluginInstance *inst)
 
   recordids = (gchar **) g_malloc (npairs * sizeof(gchar *));
 
+#if 0
   e = ggobi_data_new(npairs, 0);
   e->name = g_strdup("all pairs");
   rowlabels_alloc(e);
+#endif
 
   k = 0;
   for (i=0; i<d->nrows_in_plot; i++)
@@ -76,9 +91,12 @@ launch_varcloud_cb (GtkWidget *w, PluginInstance *inst)
         d->rows_in_plot.els[i], 
         d->rows_in_plot.els[j]);
       recordids[k++] = lbl;
+#if 0
       g_array_append_val(e->rowlab, lbl);
+#endif
     }
-      
+
+#if 0      
   datad_record_ids_set(e, recordids, false);
   pipeline_init(e, gg);
 
@@ -109,7 +127,7 @@ launch_varcloud_cb (GtkWidget *w, PluginInstance *inst)
     displays_plot(NULL, FULL, gg);
   }
   gdk_flush();
-
+#endif
 
   /* Step 3: Create the new dataset, npairs by nc */
   /*   The new data has to have the same record ids as the edges */
@@ -159,6 +177,36 @@ launch_varcloud_cb (GtkWidget *w, PluginInstance *inst)
     dnew->name = "VarCloud";
     GGOBI(setData) (values, rownames, colnames, n, nc, dnew,
 		    false, gg, recordids, true, desc); 
+
+
+  edges_alloc (npairs, dnew);
+  dnew->edge.sym_endpoints = (SymbolicEndpoints *)
+     g_malloc(sizeof(SymbolicEndpoints) * dnew->edge.n);
+
+  k = 0;
+  for (i=0; i<d->nrows_in_plot; i++) {
+    for (j=0; j<d->nrows_in_plot; j++) {
+      if (i == j)
+        continue;
+      ii = d->rows_in_plot.els[i];
+      jj = d->rows_in_plot.els[j];
+      dnew->edge.sym_endpoints[k].a = d->rowIds[ii];
+      dnew->edge.sym_endpoints[k].b = d->rowIds[jj];
+      dnew->edge.sym_endpoints[k].jpartner = -1;
+      k++;
+    }
+  }
+
+  /* Update the current display, which is presumably a scatterplot of
+     y vs x
+   */
+  if(gg->current_display) {
+    edgeset_add(gg->current_display);
+    displays_plot(NULL, FULL, gg);
+  }
+  gdk_flush();
+
+
 
     /* Open the new display */
     /* Now why does this new display have an Edges menu?  Something is
