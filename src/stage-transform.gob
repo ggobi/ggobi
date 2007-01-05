@@ -63,7 +63,7 @@ class GGobi:Stage:Transform from GGobi:Stage {
     else g_slist_foreach(changed_cols, (GFunc)self_changed_col_foreach, self);
     for (guint j = self->n_cols - n_refresh; j < self->n_cols; j++)
       self_transform(SELF(self), 0, j);
-    
+
     if (self->gg)
       displays_tailpipe (FULL, self->gg);
     
@@ -100,7 +100,7 @@ class GGobi:Stage:Transform from GGobi:Stage {
       g_hash_table_insert(selfp->active_tforms, GINT_TO_POINTER(j), tform);
     }
     self_transform(self, 0, j);
-    ggobi_stage_flush_changes(GGOBI_STAGE(self));
+    ggobi_stage_flush_changes_here(GGOBI_STAGE(self));
     self_applied(self, j, tform);
   }
   public void
@@ -216,6 +216,6 @@ class GGobi:Stage:Transform from GGobi:Stage {
     for (j = 0; j < ncols; j++)
       if (self_get_transform(self, cols[j]) == tform)
         self_transform(self, 0, cols[j]);
-    ggobi_stage_flush_changes(GGOBI_STAGE(self));
+    ggobi_stage_flush_changes_here(GGOBI_STAGE(self));
   }
 }

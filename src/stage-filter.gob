@@ -175,7 +175,7 @@ public void
 update(self)
 {
   self_process_filter(SELF(self));
-  ggobi_stage_flush_changes(GGOBI_STAGE(self));
+  ggobi_stage_flush_changes_here(GGOBI_STAGE(self));
 }
 
 public void

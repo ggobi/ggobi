@@ -277,7 +277,7 @@ property OBJECT parent
       g_signal_handler_disconnect(former, selfp->col_name_changed_handler);
       for (guint j = 0; j < self->n_cols; j++)
         self_col_removed(self, j);
-      self_flush_changes(self);
+      self_flush_changes_here(self);
       self_remove_child(former, self);
     }
       
@@ -488,8 +488,34 @@ queue_message(self, GGobiPipelineMessage *msg)
     ggobi_pipeline_message_merge(selfp->queued_message, msg);
   else selfp->queued_message = g_object_ref(G_OBJECT(msg));
 }
+public gboolean
+has_changes(self)
+{
+  return selfp->queued_message || selfp->working_message;
+}
+/* find the stage closest to the root with changes and flush them, then
+   repeat until everything is flushed */
 public void
 flush_changes(self)
+{
+  GGobiStage *dirty;
+  do {
+    GGobiStage *s;
+    dirty = NULL;
+    for (s = self; s; s = s->parent)
+      if (self_has_changes(s))
+        dirty = s;
+    if (dirty)
+      self_flush_changes_here(dirty);
+  } while(dirty);
+}
+/* dispatch the changes that have occurred at this stage */
+/* this probably only makes sense from within stage implementations - 
+   pipeline clients would prefer _flush_changes() since they don't know
+   where the changes they are flushing actually occurred.
+*/
+public void
+flush_changes_here(self)
 {
   if (selfp->working_message) { /* make sure everything is in queue */
     self_queue_message(self, selfp->working_message);
@@ -676,12 +702,12 @@ set_col_nickname(self, guint j, const gchar* value)
   ggobi_variable_set_nickname(vt, g_strdup(value));
 }
 
-/* this recurses up the tree until the root, then emits col_data_changed,
-   which will propagate to the children */
+/* this recurses up the tree until reaching the root or the stage that
+   appends the column, then registers the column as changed */
 virtual void
 update_col(self, guint j)
 {
-  if (self->parent)
+  if (self->parent && self->parent->n_cols > j)
     self_update_col(self->parent, j);
   else self_col_data_changed(self, j);
 }
@@ -770,7 +796,7 @@ set_raw_values(self, guint j, gdouble *values)
     self_set_raw_value(self, i, j, values[i]);
   }
   self_update_col(self, j);
-  self_flush_changes(self);
+  self_flush_changes_here(self);
 }
 
 
@@ -1417,7 +1443,7 @@ process_outgoing(self, GGobiPipelineMessage *msg)
     arrayg_delete_rows (&self->jitdata, removed_rows);
     arrayg_delete_rows (&self->world, removed_rows);
   }
-  
+
   /* clean up */
   g_slist_free(removed_cols);
   g_slist_free(removed_rows);
@@ -1456,7 +1482,7 @@ private void
 changed_handler(self, GGobiPipelineMessage *msg)
 {
   self_process_incoming(self, msg); /* process incoming message */
-  self_flush_changes(self); /* pass it on to listeners */
+  self_flush_changes_here(self); /* pass it on to listeners */
 }
 
 private void

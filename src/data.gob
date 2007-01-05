@@ -366,7 +366,7 @@ reset_rows(self, guint start, guint end) {
       ggobi_stage_set_raw_value(GGOBI_STAGE(self), i, j, default_val);
     ggobi_stage_col_data_changed(GGOBI_STAGE(self), j);
   }
-  ggobi_stage_flush_changes(GGOBI_STAGE(self));
+  ggobi_stage_flush_changes_here(GGOBI_STAGE(self));
 }
 
 /**
@@ -390,10 +390,9 @@ add_cols(self, guint n) {
 
   ggobi_stage_cols_added(GGOBI_STAGE(self), n);
   
-  // The columns are going from undefined to defined.
   /*for (guint j = nprev; j < ncols; j++)
     ggobi_stage_col_data_changed(GGOBI_STAGE(self), j);*/
-  ggobi_stage_flush_changes(GGOBI_STAGE(self));
+  ggobi_stage_flush_changes_here(GGOBI_STAGE(self));
   
   return nprev;
 }
@@ -425,7 +424,7 @@ delete_cols(self, GSList *cols)
   msg = ggobi_stage_get_message(GGOBI_STAGE(self));
   ggobi_pipeline_message_remove_cols(msg, cols);
   
-  ggobi_stage_flush_changes(GGOBI_STAGE(self));
+  ggobi_stage_flush_changes_here(GGOBI_STAGE(self));
 
   g_free (keepers);
   
