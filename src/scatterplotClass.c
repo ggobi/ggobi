@@ -1519,7 +1519,7 @@ addMarkupCues (splotd * sp, GdkDrawable * drawable, ggobid * gg)
     if (display->options.edges_undirected_show_p ||
         display->options.edges_arrowheads_show_p ||
         display->options.edges_directed_show_p)
-      if (e->nearest_point != -1 && display->cpanel.id_target_type == identify_edges)
+      if (e->nearest_point != -1)
         splot_add_identify_edge_cues (sp, drawable, e->nearest_point,
                                       true, gg);
 }

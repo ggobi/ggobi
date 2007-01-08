@@ -754,7 +754,7 @@ splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
         dsp->options.edges_directed_show_p;
     }
 
-    if (draw_edge && e->nearest_point != -1 && cpanel->id_target_type == identify_edges) {
+    if (draw_edge && e->nearest_point != -1) {
       splot_add_edge_highlight_cue (sp, drawable, e->nearest_point,
         true, gg);
       splot_add_edge_label (sp, drawable, e->nearest_point,
