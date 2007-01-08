@@ -29,6 +29,20 @@ PKG_CHECK_MODULES(LIBGVC, libgvc,
 AC_SUBST(LIBGVC_CFLAGS)
 AC_SUBST(LIBGVC_LIBS)
 
+# Check for 'bool' type to avoid graphviz logic.h issue
+AC_MSG_CHECKING([for bool])
+AC_TRY_COMPILE([
+    #ifdef HAVE_STDBOOL_H>
+    #include <stdbool.h>
+    #endif
+    ],[
+    bool foo = true, bar = false;
+    ],[
+AC_MSG_RESULT(yes)
+AC_DEFINE(HAVE_BOOL, 1,[Define to 1 if compiler supports bool])
+    ],[
+AC_MSG_RESULT(no)])
+
 # Finally, output the configuration
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
