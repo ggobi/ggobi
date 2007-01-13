@@ -1,4 +1,4 @@
-ruby build-installer.rb
+sudo ruby build-installer.rb
 export PATH=/usr/local/gcc4.0/bin:/usr/local/gtk2/bin:$PATH
 svn co http://www.ggobi.org/svn/ggobi/ggobi/branches/ggobi-2.1.4
 sudo mkdir /usr/local/ggobi
@@ -9,8 +9,8 @@ make
 sudo make install
 
 mkdir -p installer/usr/local
-rsync -rltz /usr/local/gtk2 installer/usr/local 
-rsync -rltz /usr/local/ggobi installer/usr/local 
+sudo rsync -rltz /usr/local/gtk2 installer/usr/local 
+sudo rsync -rltz /usr/local/ggobi installer/usr/local 
 mkdir -p installer/usr/local/gcc4.0/lib/
 cp /usr/local/gcc4.0/lib/libgcc_s.1.0.dylib installer/usr/local/gcc4.0/lib/ 
 
