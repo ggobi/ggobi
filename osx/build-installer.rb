@@ -58,6 +58,7 @@ class Package
   end
 
   def build!
+    `cd #{build_path}; PATH=/usr/local/gcc4.0:$PATH PREFIX=#{$prefix} make 1>&2`  
     `cd #{build_path}; PATH=/usr/local/gcc4.0:$PATH PREFIX=#{$prefix} #{@makeinst} 1>&2`  
     raise "Build failure" unless $?.exitstatus == 0
   end
@@ -90,10 +91,10 @@ $packages = Package.load([
   "ftp://ftp.gtk.org/pub/gtk/v2.10/dependencies/atk-1.9.1.tar.bz2", 
   "ftp://ftp.gtk.org/pub/pango/1.14/pango-1.14.7.tar.gz", 
   "ftp://ftp.gtk.org/pub/gtk/v2.10/gtk+-2.10.6.tar.gz",
-  "http://ftp.gnome.org/pub/GNOME/sources/libxml2/2.6/libxml2-2.6.0.tar.bz2"
+  "http://ftp.gnome.org/pub/GNOME/sources/libxml2/2.6/libxml2-2.6.26.tar.gz"
 ])
 
-$prefix = "/usr/local/gtk2"  # /Users/hadley/ggobi/ggobi/osx/target
+$prefix = "/usr/local/gtk2"
 $common_options="--prefix='#{$prefix}' --disable-static --enable-shared --disable-gtk-doc --disable-scrollkeeper"
 
 $packages["jpeg"].makeinst = "make install-lib"
@@ -138,20 +139,3 @@ def build()
 end
 
 build 
-# Build to /usr/local/gtk2
-
-# export PATH=/usr/local/gcc4.0/bin:/usr/local/gtk2/bin:$PATH
-# svn co http://www.ggobi.org/svn/ggobi/ggobi/branches/ggobi-2.1.4
-# sudo mkdir /usr/local/ggobi
-# cd ggobi-2.1.4
-# ./bootstrap
-# ./configure --prefix=/usr/local/ggobi --with-all-plugins
-# make
-# sudo make install
-
-# mv to installer
-# build rggobi
-
-# /Developer/Tools/packagemaker -build -proj ggobi-installer.pmproj -p GGobi.pkg 
-
-#hdiutil create -fs HFS+ -volname GGobi -srcfolder GGobi.pkg ggobi.dmg
