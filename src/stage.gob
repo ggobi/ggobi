@@ -897,6 +897,27 @@ get_raw_value(self, guint i, guint j)
   return self_get_raw_value(self->parent, i, j);
 }
 
+/**
+ * get_raw_values:
+ * @self: GGobiStage object
+ * @j: column index
+ * Returns: vector of values, of length self->nrows
+ * 
+ * Gets all values in the specified column.  
+ **/
+public gdouble *
+get_raw_values(self, guint j)
+{
+  guint i, nrows = self_get_n_rows(self);
+  gdouble *values = g_new(gdouble, nrows);
+  
+  for (i = 0; i < nrows; i++) {
+    values[i] = self_get_raw_value(self, i, j);
+  }
+  
+  return values;
+}
+
 public GGobiVariableType
 get_col_type(self, guint j)
 {
@@ -1028,6 +1049,13 @@ set_row_id(self, guint i, gchar* value) {
   self_set_row_id(self->parent, i, value);
 }
 
+public void
+set_row_ids(self, GSList *ids)
+{
+  for (guint i = 0; i < self->n_rows && ids; ids = ids->next, i++)
+    self_set_row_id(self, i, ids->data);
+}
+
 /** 
  * get_row_id:
  * @self: #GGobiStage object
@@ -1039,6 +1067,14 @@ set_row_id(self, guint i, gchar* value) {
 virtual gchar*
 get_row_id(self, guint i) {
   return self_get_row_id(self->parent, i);
+}
+
+public GSList *
+get_row_ids(self) {
+  GSList *ids = NULL;
+  for (guint i = 0; i < self->n_rows; i++)
+    ids = g_slist_append(ids, g_strdup(self_get_row_id(self, i)));
+  return ids;
 }
 
 /** 

@@ -2,7 +2,7 @@
 #
 prefix=@abs_top_srcdir@
 exec_prefix=${prefix}/src
-libdir=${prefix}/src
+libdir=${prefix}/src/.libs
 includedir=${prefix}/src
 
 Name: libggobi

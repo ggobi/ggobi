@@ -210,6 +210,30 @@ warning (const gchar * msg)
   fflush (stderr);
 }
 
+extern const gchar *const GlyphNames[];
+
+/* for introspecting the available glyph types / sizes */
+gint *ggobi_getGlyphTypes (int *n)
+{
+  static gint *glyphIds = NULL;
+  *n = UNKNOWN_GLYPH - 1;       /* -1 since we start at 1 */
+
+  if (glyphIds == NULL) {
+    gint i;
+    glyphIds = (gint *) g_malloc (*n * sizeof (gint));
+    for (i = 0; i < *n; i++) {
+      glyphIds[i] = mapGlyphName (GlyphNames[i]);
+    }
+  }
+
+  return (glyphIds);
+}
+
+const gchar *const *ggobi_getGlyphTypeNames (gint * n)
+{
+  *n = UNKNOWN_GLYPH - 1;       /* -1 since we start at 1; starting at 0 now */
+  return ((const gchar * const *) GlyphNames);
+}
 
 /*-------------------------------------------------------------------------*/
 /*        setting and getting edges                                        */

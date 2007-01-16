@@ -28,6 +28,7 @@
 
 #include "ggobi-stage-subset.h"
 #include "ggobi-stage-transform.h"
+#include "ggobi-input-source-factory.h"
 
 #ifdef USE_MYSQL
 #include "read_mysql.h"
@@ -149,7 +150,7 @@ load_data_source (GGobiInputSource *source, ggobid * gg)
     ggobi_pipeline_factory_build(gg->pipeline_factory, dataset);
     /* eventually ggobi_stage_attach will happen implicitly when the 
        dataset is added to the main context. Right now we are sort of hacking
-       it by attaching the filter stage rather than the dataset. The _attach()
+       it by attaching the transform stage rather than the dataset. The _attach()
        method knows when to go back to the root. */
     ggobi_stage_attach(ggobi_stage_find(dataset, GGOBI_MAIN_STAGE_TRANSFORM), gg, FALSE);
   }
@@ -192,26 +193,10 @@ scheme_compare_func(gconstpointer list_scheme, gconstpointer scheme)
 GGobiInputSource *
 create_input_source(const gchar *uri, const gchar *mode)
 {
-  GGobiInputSource *source = NULL;
-  GType *source_types;
-  guint n_types, i;
-  
-  xmlURIPtr parsed_uri = xmlParseURI(uri);
-  if (!parsed_uri) {
-    g_critical("Failed to parse URI: %s", uri);
-    return NULL;
-  }
-  
-  source_types = g_type_children(GGOBI_TYPE_INPUT_SOURCE, &n_types);
-  for (i = 0; i < n_types && !source; i++) {
-    GGobiInputSourceClass *source_class = g_type_class_ref(source_types[i]);
-    GSList *supported_schemes = source_class->get_supported_schemes(NULL);
-    if (g_slist_find_custom(supported_schemes, parsed_uri->scheme, scheme_compare_func))
-      source = g_object_new(source_types[i], "uri", uri, "logical_mode", mode, NULL);
-    g_type_class_unref(source_class);
-  }
-  
-  xmlFreeURI(parsed_uri);
+  // FIXME: eventually we should have a registry of factory instances
+  GGobiInputSourceFactory *factory = g_object_new(GGOBI_TYPE_INPUT_SOURCE_FACTORY, NULL);
+  GGobiInputSource *source = ggobi_input_source_factory_create(factory, uri, mode);
+  g_object_unref(G_OBJECT(factory));
   return source;
 }
 

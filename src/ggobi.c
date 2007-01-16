@@ -30,9 +30,6 @@
 /* the built-in input classes */
 #include "ggobi-data-factory-csv.h"
 #include "ggobi-data-factory-xml.h"
-#include "ggobi-input-source-http.h"
-#include "ggobi-input-source-ftp.h"
-#include "ggobi-input-source-file.h"
 #include "ggobi-input-decoder-bgzip.h"
 
 #include "ggobi.h"
@@ -128,14 +125,18 @@ parse_command_line (gint * argc, gchar ** av[])
       "run timing tests and exit", NULL
     }, { NULL }
   };
-  
   GError *error = NULL;
+  GOptionContext *ctx = g_option_context_new("- platform for interactive graphics");
   
-  gtk_init_with_args (argc, av, "- platform for interactive graphics", entries, PACKAGE, &error);
+  /* use the GOptionContext explicity, just in case GTK+ was already initialized */
+  g_option_context_add_main_entries (ctx, entries, PACKAGE);
+  g_option_context_add_group (ctx, gtk_get_option_group (TRUE));
+  g_option_group_set_translation_domain (g_option_context_get_main_group (ctx), PACKAGE);
+  g_option_context_parse (ctx, argc, av, &error);
+  /*gtk_init_with_args (argc, av, "- platform for interactive graphics", entries, PACKAGE, &error);*/
   
   if (error) {
-    g_printerr ("Error parsing command line: %s\n", error->message);
-    exit(0);
+    g_error ("Error parsing command line: %s\n", error->message);
   }
     
   if (print_version) {
@@ -165,6 +166,8 @@ parse_command_line (gint * argc, gchar ** av[])
   else
     sessionOptions->data_in = g_strdup((*av)[0]);
 
+  g_option_context_free(ctx);
+  
   return 1;
 }
 
@@ -353,9 +356,6 @@ ggobi_alloc (ggobid * tmp)
 
 static void registerBuiltinTypes()
 {
-  GGOBI_TYPE_INPUT_SOURCE_FILE;
-  GGOBI_TYPE_INPUT_SOURCE_HTTP;
-  GGOBI_TYPE_INPUT_SOURCE_FTP;
   GGOBI_TYPE_DATA_FACTORY_CSV;
   GGOBI_TYPE_DATA_FACTORY_XML;
   GGOBI_TYPE_INPUT_DECODER_BGZIP;

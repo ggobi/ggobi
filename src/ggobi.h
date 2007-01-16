@@ -112,7 +112,7 @@ typedef struct _PrintOptions PrintOptions;
 GType ggobi_ggobi_get_type(void);
 
 #define   GGOBI_TYPE_GGOBI ggobi_ggobi_get_type()
-#define GGOBI_ggobi_obj	 (G_TYPE_CHECK_INSTANCE_CAST ((obj), GGOBI_TYPE_GGOBI, ggobid))
+#define GGOBI_GGOBI	 (G_TYPE_CHECK_INSTANCE_CAST ((obj), GGOBI_TYPE_GGOBI, ggobid))
 #define GGOBI_GGOBI_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GGOBI_TYPE_GGOBI, GGobiGGobiClass))
 #define GGOBI_IS_GGOBI(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GGOBI_TYPE_GGOBI))
 #define GGOBI_IS_GGOBI_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GGOBI_TYPE_GGOBI))

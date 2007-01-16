@@ -31,9 +31,6 @@ class GGobi:Input:Source from G:Object (abstract) {
       else g_value_take_string(VAL, g_path_get_basename(selfp->uri));
     };
       
-  virtual GSList *
-  get_supported_schemes(self);
-  
   public GsfInput *
   get_input(self, GError **error) {
     GsfInput *decoded, *input = self_get_raw_input(self, error);

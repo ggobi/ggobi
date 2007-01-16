@@ -3,7 +3,7 @@ libggobi_la_GOBS = variable.gob stage.gob data.gob stage-transform.gob \
   stage-filter.gob pipeline-factory.gob input-source.gob data-factory.gob \
   plugin-factory.gob plugin.gob data-factory-csv.gob data-factory-xml.gob \
   input-source-file.gob input-source-http.gob gsf-input-http.gob \
-  gsf-input-ftp.gob input-source-ftp.gob input-decoder.gob \
+  gsf-input-ftp.gob input-source-ftp.gob input-source-factory.gob input-decoder.gob \
   input-decoder-bgzip.gob stage-subset.gob stage-group.gob transform.gob \
   transform-min-one.gob transform-boxcox.gob transform-abs.gob transform-log10.gob \
   gui-component.gob gui-transform.gob type-registry.gob pipeline-message.gob \

@@ -7,14 +7,7 @@
   #include <gsf/gsf-input-stdio.h>
 %}
 class GGobi:Input:Source:File from GGobi:Input:Source
-{
-  override (GGobi:Input:Source) GSList *
-  get_supported_schemes(GGobi:Input:Source *source) 
-  { /* support missing (NULL) and "file" schemes */
-    GSList *schemes = g_slist_append(NULL, NULL);
-    return(g_slist_append(schemes, g_strdup("file")));
-  }
-  
+{ 
   /** Get the system locale filename from the URI in this source */
   public gchar *
   get_filename(self)

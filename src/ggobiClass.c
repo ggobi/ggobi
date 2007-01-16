@@ -58,7 +58,7 @@ ggobi_ggobi_get_type (void)
     };
 
     ggobi_type =
-      g_type_register_static (G_TYPE_OBJECT, "GGobi", &ggobi_info, 0);
+      g_type_register_static (G_TYPE_OBJECT, "ggobid", &ggobi_info, 0);
   }
 
   return ggobi_type;

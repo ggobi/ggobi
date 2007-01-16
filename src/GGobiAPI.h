@@ -26,6 +26,43 @@
 #include "defines.h"
 #include "display.h"
 
+// FIXME: we include all GOB-generated public headers here
+// Eventually these will be placed in 'ggobi.h' but that is claimed by
+// ggobid. That will becomes GGobiApp (or something).
+
+#include "ggobi-data-factory-csv.h"
+#include "ggobi-data-factory-xml.h"
+#include "ggobi-data-factory.h"
+#include "ggobi-data.h"
+#include "ggobi-gsf-input-ftp.h"
+#include "ggobi-gsf-input-http.h"
+#include "ggobi-gui-component.h"
+#include "ggobi-gui-transform.h"
+#include "ggobi-input-decoder-bgzip.h"
+#include "ggobi-input-decoder.h"
+#include "ggobi-input-source-file.h"
+#include "ggobi-input-source-ftp.h"
+#include "ggobi-input-source-http.h"
+#include "ggobi-input-source.h"
+#include "ggobi-input-source-factory.h"
+#include "ggobi-pipeline-factory.h"
+#include "ggobi-pipeline-message.h"
+#include "ggobi-plugin-factory.h"
+#include "ggobi-plugin.h"
+#include "ggobi-stage-filter.h"
+#include "ggobi-stage-group.h"
+#include "ggobi-stage-subset.h"
+#include "ggobi-stage-transform.h"
+#include "ggobi-stage.h"
+#include "ggobi-transform-abs.h"
+#include "ggobi-transform-boxcox.h"
+#include "ggobi-transform-log10.h"
+#include "ggobi-transform-min-one.h"
+#include "ggobi-transform.h"
+#include "ggobi-type-registry.h"
+#include "ggobi-variable-group.h"
+#include "ggobi-variable.h"
+
 /**
  This is the publically accessible set of routines that allow a developer
  to access GGobi functionality from within their own application, 
@@ -892,17 +929,6 @@ extern void ggobi_update_data(GGobiStage *, ggobid *gg);
 
 
 /* @} */
-
-/**
- Get a list of the human readable names of the different 
- input modes for data  sources. These include
- ASCII, XML, database, URL, etc.
-
- Caller is responsible for freeing the array, but not its
- elements!
- */
-const gchar ** ggobi_getDataModeNames(int *n);
-
 
 /** 
  @defgroup EventHandlers Event handlers 

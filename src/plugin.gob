@@ -101,6 +101,8 @@ class GGobi:Plugin from G:Type:Module {
   }
   
   // FIXME: This obviously needs to become a signal handler
+  // FIXME: Shouldn't the plugin return a custom GGobiPluginInstance,
+  // where GGobiPluginInstance is a GObject class?
   virtual gboolean
   ggobi_created(self, ggobid *gg)
   {

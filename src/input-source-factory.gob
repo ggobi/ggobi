@@ -1,0 +1,50 @@
+%h{
+  #include "ggobi-input-source.h"
+%}
+%{
+  #include <libxml/uri.h>
+  #include "ggobi-input-source-ftp.h"
+  #include "ggobi-input-source-http.h"
+  #include "ggobi-input-source-file.h"
+%}
+class GGobi:Input:Source:Factory from G:Object
+{
+  virtual GSList *
+  get_supported_schemes(self)
+  {
+    GSList *schemes = NULL;
+    schemes = g_slist_append(schemes, g_strdup("http"));
+    schemes = g_slist_append(schemes, g_strdup("ftp"));
+    schemes = g_slist_append(schemes, g_strdup("file"));
+    schemes = g_slist_append(schemes, NULL);
+    return schemes;
+  }
+  
+  virtual GGobiInputSource *
+  create(self, const gchar *uri, const gchar *mode)
+  {
+    GGobiInputSource *source = NULL;
+    GType source_type = G_TYPE_INVALID;
+    
+    xmlURIPtr parsed_uri = xmlParseURI(uri);
+    if (!parsed_uri) {
+      g_critical("Failed to parse URI: %s", uri);
+      return NULL;
+    }
+    
+    /* no scheme assume file */
+    if (!parsed_uri->scheme || !strcmp(parsed_uri->scheme, "file"))
+      source_type = GGOBI_TYPE_INPUT_SOURCE_FILE;
+    else if (!strcmp(parsed_uri->scheme, "http"))
+      source_type = GGOBI_TYPE_INPUT_SOURCE_HTTP;
+    else if (!strcmp(parsed_uri->scheme, "ftp"))
+      source_type = GGOBI_TYPE_INPUT_SOURCE_FTP;
+    
+    if (source_type != G_TYPE_INVALID)
+      source = g_object_new(source_type, "uri", uri, "logical_mode", mode, NULL);
+    
+    xmlFreeURI(parsed_uri);
+    return source;
+  }
+}
+
