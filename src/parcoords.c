@@ -40,7 +40,7 @@ static const gchar* parcoords_ui =
 
 
 void
-parcoords_reset_arrangement (displayd *display, gint arrangement, ggobid *gg) {
+parcoords_reset_arrangement (displayd *display, gint arrangement, GGobiSession *gg) {
   GList *l;
   GtkWidget *frame, *w;
   splotd *sp;
@@ -101,14 +101,14 @@ parcoords_reset_arrangement (displayd *display, gint arrangement, ggobid *gg) {
 
 displayd *
 parcoords_new_with_vars(gboolean missing_p, gint nvars, gint *vars,
-	       GGobiStage *d, ggobid *gg) 
+	       GGobiStage *d, GGobiSession *gg) 
 {
 	return(parcoords_new(NULL, missing_p, nvars, vars, d, gg));
 }
 
 displayd *
 parcoords_new (displayd *display, gboolean missing_p, gint nvars, gint *vars,
-	       GGobiStage *d, ggobid *gg) 
+	       GGobiStage *d, GGobiSession *gg) 
 {
   GtkWidget *vbox, *frame;
   gint i;
@@ -282,7 +282,7 @@ parcoords_var_selected (gint jvar, displayd *display)
 
 gboolean
 parcoords_varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint *jvar_prev,
-  ggobid *gg)
+  GGobiSession *gg)
 {
   gboolean status = false;
 
@@ -292,7 +292,7 @@ parcoords_varsel (cpaneld *cpanel, splotd *sp, gint jvar, gint *jvar_prev,
 }
 
 gboolean
-parcoords_add_delete_splot(cpaneld *cpanel, splotd *sp, gint jvar, gint *jvar_prev, ggobid *gg, displayd *display)
+parcoords_add_delete_splot(cpaneld *cpanel, splotd *sp, gint jvar, gint *jvar_prev, GGobiSession *gg, displayd *display)
 {
   gboolean redraw = true;
   gint nplots = g_list_length (display->splots);
@@ -386,7 +386,7 @@ parcoords_add_delete_splot(cpaneld *cpanel, splotd *sp, gint jvar, gint *jvar_pr
 /*--------------------------------------------------------------------*/
 
 static void
-sp_rewhisker (splotd *sp_prev, splotd *sp, splotd *sp_next, ggobid *gg) {
+sp_rewhisker (splotd *sp_prev, splotd *sp, splotd *sp_next, GGobiSession *gg) {
   gint k, m;
   displayd *display = (displayd *) sp->displayptr;
   cpaneld *cpanel = (cpaneld *) &display->cpanel;
@@ -483,7 +483,7 @@ sp_rewhisker (splotd *sp_prev, splotd *sp, splotd *sp_next, ggobid *gg) {
 
 /*-- set the positions of the whiskers for sp and prev_sp --*/
 void
-sp_whiskers_make (splotd *sp, displayd *display, ggobid *gg) {
+sp_whiskers_make (splotd *sp, displayd *display, GGobiSession *gg) {
   GList *splist;
   splotd *splot;
   splotd *sp_prev = NULL, *sp_prev_prev = NULL, *sp_next = NULL;

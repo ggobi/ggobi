@@ -23,4 +23,4 @@ void center (array_f *);
 gint pca (array_f *, void *, gfloat *,  gpointer userData);
 
 gfloat t1d_calc_indx(array_f, Tour_PPIndex_f fun, void *param);
-gboolean t1d_switch_index(gint, gint, displayd *, ggobid *);
+gboolean t1d_switch_index(gint, gint, displayd *, GGobiSession *);

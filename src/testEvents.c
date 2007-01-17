@@ -7,7 +7,7 @@
   Used to test the selection of variable events.
  */
 void
-test_variable_select (ggobid * gg, GGobiStage * d, gint whichVar, splotd * sp,
+test_variable_select (GGobiSession * gg, GGobiStage * d, gint whichVar, splotd * sp,
                       void *val)
 {
   GGobiVariable *vartab = g_slist_nth_data (d->vartable, whichVar);
@@ -19,7 +19,7 @@ test_variable_select (ggobid * gg, GGobiStage * d, gint whichVar, splotd * sp,
 
 void
 test_point_move_cb (void *userData, splotd * sp, gint which, GGobiStage * d,
-                    ggobid * gg)
+                    GGobiSession * gg)
 {
   fprintf (stderr, "Moving a point\n");
   fflush (stderr);
@@ -27,7 +27,7 @@ test_point_move_cb (void *userData, splotd * sp, gint which, GGobiStage * d,
 
 void
 test_brush_motion_cb (void *userData, splotd * sp, GdkEventMotion * ev,
-                      GGobiStage * d, ggobid * gg)
+                      GGobiStage * d, GGobiSession * gg)
 {
   fprintf (stderr,
            "brush motion callback (gg) %p (sp) %p (ev) %p, (userData) %s\n",
@@ -40,7 +40,7 @@ test_brush_motion_cb (void *userData, splotd * sp, GdkEventMotion * ev,
   use g_signal_connect_swapped()
  */
 void
-test_new_plot_cb (void *userData, splotd * sp, ggobid * gg)
+test_new_plot_cb (void *userData, splotd * sp, GGobiSession * gg)
 {
   fprintf (stderr, "New plot: %s\n", (char *) userData);
   fflush (stderr);
@@ -66,7 +66,7 @@ CHECK_EVENT_SIGNATURE (test_variable_select, select_variable_f)
 /*
   use g_signal_connect() rather than ...._object().
  */
-     void test_data_add_cb (ggobid * gg, GGobiStage * d, gpointer data)
+     void test_data_add_cb (GGobiSession * gg, GGobiStage * d, gpointer data)
 {
   g_printerr ("(test_data_add_cb) adding datad\n");
   g_signal_connect (G_OBJECT (gg), "select_variable",
@@ -75,7 +75,7 @@ CHECK_EVENT_SIGNATURE (test_variable_select, select_variable_f)
 
 
 void
-test_sticky_points (ggobid * gg, gint index, gint state, GGobiStage * d,
+test_sticky_points (GGobiSession * gg, gint index, gint state, GGobiStage * d,
                     gpointer data)
 {
   fprintf (stderr, "[Sticky point identification] %d %s in %s\n",

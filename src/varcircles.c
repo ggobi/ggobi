@@ -25,8 +25,8 @@
 #endif
 
 
-static GtkWidget *varcircle_create (gint, GGobiStage *, ggobid * gg);
-static void varcircle_draw (gint, GGobiStage *, ggobid * gg);
+static GtkWidget *varcircle_create (gint, GGobiStage *, GGobiSession * gg);
+static void varcircle_draw (gint, GGobiStage *, GGobiSession * gg);
 static gboolean da_expose_cb (GtkWidget *, GdkEventExpose *, gpointer cbd);
 
 GtkWidget *varcircles_get_nth (gint which, gint jvar, GGobiStage * d);
@@ -41,7 +41,7 @@ static void varcircle_pack (GtkWidget *, GGobiStage *);
 #define DA  2
 
 void
-varcircles_visibility_set (displayd * display, ggobid * gg)
+varcircles_visibility_set (displayd * display, GGobiSession * gg)
 {
   ProjectionMode projection;
   gint j;
@@ -272,7 +272,7 @@ freeze_select_cb (GtkWidget * w, GdkEvent * event, GGobiStage * d)
 static gint
 da_manip_expose_cb (GtkWidget * w, GdkEvent * event, GGobiStage * d)
 {
-  ggobid *gg = GGobiFromWidget (w, true);
+  GGobiSession *gg = GGobiFromWidget (w, true);
 #ifdef ENABLE_CAIRO
   cairo_t *c = gdk_cairo_create (w->window);
   gdk_cairo_set_source_color (c, &gg->vcirc_manip_color);
@@ -295,7 +295,7 @@ da_manip_expose_cb (GtkWidget * w, GdkEvent * event, GGobiStage * d)
 static gint
 da_freeze_expose_cb (GtkWidget * w, GdkEvent * event, GGobiStage * d)
 {
-  ggobid *gg = GGobiFromWidget (w, true);
+  GGobiSession *gg = GGobiFromWidget (w, true);
 #ifdef ENABLE_CAIRO
   cairo_t *c = gdk_cairo_create (w->window);
   gdk_cairo_set_source_color (c, &gg->vcirc_freeze_color);
@@ -319,7 +319,7 @@ da_freeze_expose_cb (GtkWidget * w, GdkEvent * event, GGobiStage * d)
 /*-- hide the circles interface --*/
 void
 varcircles_show (gboolean show, GGobiStage * d, displayd * display,
-                 ggobid * gg)
+                 GGobiSession * gg)
 {
   GtkWidget *basement = widget_find_by_name (gg->main_window, "BASEMENT");
   GtkWidget *parent = (d->vcirc_ui.ebox)->parent;
@@ -375,7 +375,7 @@ varcircles_show (gboolean show, GGobiStage * d, displayd * display,
 
 /*-- create the variable circles interface --*/
 void
-varcircles_populate (GGobiStage * d, ggobid * gg)
+varcircles_populate (GGobiStage * d, GGobiSession * gg)
 {
   gint j;
   GtkWidget *vb, *da;
@@ -485,7 +485,7 @@ varcircles_populate (GGobiStage * d, ggobid * gg)
 }
 
 void
-varcircles_delete (gint nc, gint jvar, GGobiStage * d, ggobid * gg)
+varcircles_delete (gint nc, gint jvar, GGobiStage * d, GGobiSession * gg)
 {
   gint j;
   GtkWidget *w;
@@ -513,7 +513,7 @@ varcircles_delete (gint nc, gint jvar, GGobiStage * d, ggobid * gg)
 
 /*-- this destroys them all -- it's not yet called anywhere --*/
 void
-varcircles_clear (ggobid * gg)
+varcircles_clear (GGobiSession * gg)
 {
   GtkWidget *w;
   gint j;
@@ -547,7 +547,7 @@ varcircles_clear (ggobid * gg)
 static gint
 varcircle_sel_cb (GtkWidget * w, GdkEvent * event, gint jvar)
 {
-  ggobid *gg = GGobiFromWidget (w, true);
+  GGobiSession *gg = GGobiFromWidget (w, true);
   displayd *display = gg->current_display;
   cpaneld *cpanel = &display->cpanel;
   splotd *sp = gg->current_splot;
@@ -582,7 +582,7 @@ varcircle_sel_cb (GtkWidget * w, GdkEvent * event, gint jvar)
 }
 
 static GtkWidget *
-varcircle_create (gint j, GGobiStage * d, ggobid * gg)
+varcircle_create (gint j, GGobiStage * d, GGobiSession * gg)
 {
   GtkWidget *vb, *lbl, *da;
 
@@ -637,7 +637,7 @@ varcircle_pack (GtkWidget * vb, GGobiStage * d)
 }
 
 void
-varcircles_refresh (GGobiStage * d, ggobid * gg)
+varcircles_refresh (GGobiStage * d, GGobiSession * gg)
 {
   gint j;
   GtkWidget *da;
@@ -650,7 +650,7 @@ varcircles_refresh (GGobiStage * d, ggobid * gg)
 }
 
 void
-varcircle_draw (gint jvar, GGobiStage * d, ggobid * gg)
+varcircle_draw (gint jvar, GGobiStage * d, GGobiSession * gg)
 {
   gboolean chosen = false;
   splotd *sp = gg->current_splot;
@@ -769,7 +769,7 @@ varcircle_draw (gint jvar, GGobiStage * d, ggobid * gg)
 }
 
 void
-tour_draw_circles (GGobiStage * d, ggobid * gg)
+tour_draw_circles (GGobiStage * d, GGobiSession * gg)
 {
   gint j;
 
@@ -781,7 +781,7 @@ tour_draw_circles (GGobiStage * d, ggobid * gg)
 gboolean
 da_expose_cb (GtkWidget * w, GdkEventExpose * event, gpointer cbd)
 {
-  ggobid *gg = GGobiFromWidget (w, true);
+  GGobiSession *gg = GGobiFromWidget (w, true);
   gint j = GPOINTER_TO_INT (cbd);
   GGobiStage *d = (GGobiStage *) g_object_get_data (G_OBJECT (w), "datad");
   GtkWidget *da = varcircles_get_nth (DA, j, d);
@@ -804,7 +804,7 @@ da_expose_cb (GtkWidget * w, GdkEventExpose * event, gpointer cbd)
 
 /*-- used in cloning and appending variables; see vartable.c --*/
 void
-varcircles_add (gint nc, GGobiStage * d, ggobid * gg)
+varcircles_add (gint nc, GGobiStage * d, GGobiSession * gg)
 {
   gint j;
   GtkWidget *vb;

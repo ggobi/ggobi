@@ -33,7 +33,7 @@ extern void barchart_set_breakpoints (gfloat width, splotd * sp,
                                       GGobiStage * d);
 
 static void
-display_mode_cb (GtkWidget * w, ggobid * gg)
+display_mode_cb (GtkWidget * w, GGobiSession * gg)
 {
   cpaneld *cpanel = &gg->current_display->cpanel;
   barchartSPlotd *sp = GGOBI_BARCHART_SPLOT (gg->current_splot);
@@ -50,7 +50,7 @@ display_mode_cb (GtkWidget * w, ggobid * gg)
 /*--------------------------------------------------------------------*/
 
 GtkWidget *
-cpanel_barchart_make (ggobid * gg)
+cpanel_barchart_make (GGobiSession * gg)
 {
   GtkWidget *vb, *lbl, *opt;
   GtkWidget *panel;
@@ -120,7 +120,7 @@ barchart_mode_ui_get (displayd * display)
 
 void
 cpanel_barchart_set (displayd * display, cpaneld * cpanel, GtkWidget * panel,
-                     ggobid * gg)
+                     GGobiSession * gg)
 {
   GtkWidget *w;
 
@@ -137,7 +137,7 @@ cpanel_barchart_set (displayd * display, cpaneld * cpanel, GtkWidget * panel,
 static gint
 key_press_cb (GtkWidget * w, GdkEventKey * event, splotd * sp)
 {
-  ggobid *gg = GGobiFromSPlot (sp);
+  GGobiSession *gg = GGobiFromSPlot (sp);
   cpaneld *cpanel = &gg->current_display->cpanel;
   gboolean reallocate = FALSE;
 
@@ -172,7 +172,7 @@ key_press_cb (GtkWidget * w, GdkEventKey * event, splotd * sp)
   if (reallocate) {
     displayd *display = (displayd *) sp->displayptr;
     GGobiStage *d = display->d;
-    ggobid *gg = GGobiFromSPlot (sp);
+    GGobiSession *gg = GGobiFromSPlot (sp);
 
     barchart_allocate_structure (sp, d);
     barchart_set_initials (sp, d);
@@ -191,7 +191,7 @@ static gint
 button_release_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
 {
   gboolean retval = true;
-  ggobid *gg = GGobiFromSPlot (sp);
+  GGobiSession *gg = GGobiFromSPlot (sp);
   GdkModifierType state;
 
   disconnect_motion_signal (sp);
@@ -273,7 +273,7 @@ gboolean
 barchart_scale (gboolean button1_p, gboolean button2_p, splotd * sp)
 {
   displayd *display = sp->displayptr;
-  ggobid *gg = GGobiFromSPlot (sp);
+  GGobiSession *gg = GGobiFromSPlot (sp);
   cpaneld *cpanel = &display->cpanel;
   barchartSPlotd *bsp = GGOBI_BARCHART_SPLOT (sp);
   GGobiStage *d = display->d;
@@ -386,7 +386,7 @@ static gint
 button_press_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
 {
   gboolean retval = true;
-  ggobid *gg = GGobiFromSPlot (sp);
+  GGobiSession *gg = GGobiFromSPlot (sp);
   gboolean button1_p, button2_p;
   GdkRegion *region;
   barchartSPlotd *bsp = GGOBI_BARCHART_SPLOT (sp);

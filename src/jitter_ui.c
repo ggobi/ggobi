@@ -26,7 +26,7 @@ jitter_vars_init (GGobiStage * d)
 }
 
 static void
-jitter_cb (GtkButton * w, ggobid * gg)
+jitter_cb (GtkButton * w, GGobiSession * gg)
 {
   GtkWidget *tree_view =
     get_tree_view_from_object (G_OBJECT (gg->jitter_ui.window));
@@ -47,7 +47,7 @@ jitter_cb (GtkButton * w, ggobid * gg)
  * Set the degree of jittering
 */
 static void
-degree_cb (GtkAdjustment * adj, ggobid * gg)
+degree_cb (GtkAdjustment * adj, GGobiSession * gg)
 {
   GtkWidget *tree_view =
     get_tree_view_from_object (G_OBJECT (gg->jitter_ui.window));
@@ -67,14 +67,14 @@ degree_cb (GtkAdjustment * adj, ggobid * gg)
 
 /*-- called when closed from the close button --*/
 static void
-close_btn_cb (GtkWidget * w, ggobid * gg)
+close_btn_cb (GtkWidget * w, GGobiSession * gg)
 {
   gtk_widget_hide (gg->jitter_ui.window);
 }
 
 /*-- called when closed from the window manager --*/
 static void
-close_wmgr_cb (GtkWidget * w, GdkEvent * event, ggobid * gg)
+close_wmgr_cb (GtkWidget * w, GdkEvent * event, GGobiSession * gg)
 {
   gtk_widget_hide (gg->jitter_ui.window);
 }
@@ -82,7 +82,7 @@ close_wmgr_cb (GtkWidget * w, GdkEvent * event, ggobid * gg)
 static gchar *type_lbl[] = { "Uniform", "Normal" };
 
 static void
-type_cb (GtkWidget * w, ggobid * gg)
+type_cb (GtkWidget * w, GGobiSession * gg)
 {
   gint indx = gtk_combo_box_get_active (GTK_COMBO_BOX (w));
   GtkWidget *tree_view =
@@ -103,7 +103,7 @@ type_cb (GtkWidget * w, ggobid * gg)
 }
 
 void
-jitter_window_open (ggobid * gg)
+jitter_window_open (GGobiSession * gg)
 {
 
   GtkWidget *btn, *lbl;

@@ -98,7 +98,7 @@ imode_has_display_menu (InteractionMode imode)
 void
 display_mode_menus_update (ProjectionMode pmode_prev,
                            InteractionMode imode_prev, displayd * display,
-                           ggobid * gg)
+                           GGobiSession * gg)
 {
   ProjectionMode pmode = display->cpanel.pmode;
   InteractionMode imode = display->cpanel.imode;

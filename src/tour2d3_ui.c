@@ -30,7 +30,7 @@
 
 
 void 
-cpanel_t2d3_init (cpaneld *cpanel, ggobid *gg) {
+cpanel_t2d3_init (cpaneld *cpanel, GGobiSession *gg) {
   cpanel->t2d3.step = TOURSTEP0;
   cpanel->t2d3.paused = false;
   cpanel->t2d3.slidepos = sessionOptions->defaultTourSpeed;
@@ -38,7 +38,7 @@ cpanel_t2d3_init (cpaneld *cpanel, ggobid *gg) {
 }
 
 void
-cpanel_tour2d3_set (displayd *display, cpaneld *cpanel, ggobid* gg)
+cpanel_tour2d3_set (displayd *display, cpaneld *cpanel, GGobiSession* gg)
 /*
  * To handle the case where there are multiple scatterplots
  * which may have different tour options and parameters selected
@@ -66,23 +66,23 @@ cpanel_tour2d3_set (displayd *display, cpaneld *cpanel, ggobid* gg)
 
 
 static void
-speed2d3_set_cb (GtkAdjustment *adj, ggobid *gg)
+speed2d3_set_cb (GtkAdjustment *adj, GGobiSession *gg)
 {
   tour2d3_speed_set(adj->value, gg);
 }
 
 static void
-tour2d3_pause_cb (GtkToggleButton *button, ggobid *gg)
+tour2d3_pause_cb (GtkToggleButton *button, GGobiSession *gg)
 {
   tour2d3_pause (&gg->current_display->cpanel, button->active, gg);
 }
 
-static void reinit_cb (GtkWidget *w, ggobid *gg)
+static void reinit_cb (GtkWidget *w, GGobiSession *gg)
 {
   tour2d3_reinit(gg);
 }
 
-static void scramble_cb (GtkWidget *w, ggobid *gg)
+static void scramble_cb (GtkWidget *w, GGobiSession *gg)
 {
   tour2d3_scramble(gg);
 }
@@ -90,7 +90,7 @@ static void scramble_cb (GtkWidget *w, ggobid *gg)
 static gchar *manip_lbl[] = {"Off", "Oblique", "Vert", "Horiz", "Radial",
                              "Angular"};
 static void
-manip_cb (GtkWidget *w, ggobid *gg)
+manip_cb (GtkWidget *w, GGobiSession *gg)
 {
   displayd *dsp = gg->current_display;
   cpaneld *cpanel = &dsp->cpanel;
@@ -105,7 +105,7 @@ manip_cb (GtkWidget *w, ggobid *gg)
 }
 
 void
-cpanel_tour2d3_make (ggobid *gg) {
+cpanel_tour2d3_make (GGobiSession *gg) {
   modepaneld *panel;
   GtkWidget *box, *btn, *sbar, *lbl, *vb;
   GtkObject *adj;
@@ -219,7 +219,7 @@ void tour2d3_io_cb (GtkWidget *w, gpointer *cbd) {
 static gint
 key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
 {
-  ggobid *gg = GGobiFromSPlot(sp);
+  GGobiSession *gg = GGobiFromSPlot(sp);
   cpaneld *cpanel = &gg->current_display->cpanel;
   
 /*-- add a key_press_cb in each mode, and let it begin with these lines --*/
@@ -243,7 +243,7 @@ key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
 static gint
 motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
 {
-  ggobid *gg = GGobiFromSPlot(sp);
+  GGobiSession *gg = GGobiFromSPlot(sp);
   gboolean button1_p, button2_p;
 
   mousepos_get_motion (w, event, &button1_p, &button2_p, sp);
@@ -259,7 +259,7 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
 static gint
 button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
-  ggobid *gg = GGobiFromWidget(w, true);
+  GGobiSession *gg = GGobiFromWidget(w, true);
   displayd *dsp = gg->current_display;
   cpaneld *cpanel = &dsp->cpanel;
   gboolean button1_p, button2_p;

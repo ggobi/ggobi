@@ -29,7 +29,7 @@
    subset of variable might be used, or when there is new data. */
 
 void 
-cpanel_tcorr_init (cpaneld *cpanel, ggobid *gg) {
+cpanel_tcorr_init (cpaneld *cpanel, GGobiSession *gg) {
   cpanel->tcorr1.paused = false;
   cpanel->tcorr1.step = TOURSTEP0;
   cpanel->tcorr2.paused = false;
@@ -40,7 +40,7 @@ cpanel_tcorr_init (cpaneld *cpanel, ggobid *gg) {
 
 /*-- scatterplot only; need a different routine for parcoords --*/
 void
-cpanel_tourcorr_set (displayd *display, cpaneld *cpanel, ggobid* gg)
+cpanel_tourcorr_set (displayd *display, cpaneld *cpanel, GGobiSession* gg)
 /*
  * To handle the case where there are multiple scatterplots
  * which may have different tour options and parameters selected
@@ -76,33 +76,33 @@ cpanel_tourcorr_set (displayd *display, cpaneld *cpanel, ggobid* gg)
 static void ctouradv_window_open (void);
 #endif
 
-static void speedcorr_set_cb (GtkAdjustment *adj, ggobid *gg) {
+static void speedcorr_set_cb (GtkAdjustment *adj, GGobiSession *gg) {
 
   tourcorr_speed_set(adj->value, gg);
 }
 
-static void tourcorr_pause_cb (GtkToggleButton *button, ggobid *gg)
+static void tourcorr_pause_cb (GtkToggleButton *button, GGobiSession *gg)
 {
 
   tourcorr_pause (&gg->current_display->cpanel, button->active, gg);
 }
 
-static void tourcorr_reinit_cb (GtkWidget *w, ggobid *gg) {
+static void tourcorr_reinit_cb (GtkWidget *w, GGobiSession *gg) {
 
   tourcorr_reinit(gg);
 }
 
-static void tourcorr_scramble_cb (GtkWidget *w, ggobid *gg) {
+static void tourcorr_scramble_cb (GtkWidget *w, GGobiSession *gg) {
 
   tourcorr_scramble(gg);
 }
 /*
-static void tourcorr_snap_cb (GtkWidget *w, ggobid *gg) {
+static void tourcorr_snap_cb (GtkWidget *w, GGobiSession *gg) {
 
   tourcorr_snap(gg);
 }
 
-static void tourcorr_video_cb (GtkToggleButton *button, ggobid *gg)
+static void tourcorr_video_cb (GtkToggleButton *button, GGobiSession *gg)
 {
   tourcorr_video(gg);
 }
@@ -121,7 +121,7 @@ hide_cb (GtkWidget *w ) {
 */
 
 #ifdef TOUR_PP_IMPLEMENTED
-static void ctourpp_cb (GtkWidget *w, ggobid *gg) {
+static void ctourpp_cb (GtkWidget *w, GGobiSession *gg) {
   ctourpp_window_open (gg);
 }
 #endif
@@ -133,7 +133,7 @@ static void ctouradv_cb (GtkWidget *w, gpointer dummy) {
 
 static gchar *manip_lbl[] = {"Off", "Comb", "Vertical", "Horizontal", 
                              "EqualComb"};
-static void manip_cb (GtkWidget *w, ggobid *gg)
+static void manip_cb (GtkWidget *w, GGobiSession *gg)
 {
   displayd *dsp = gg->current_display;
   cpaneld *cpanel = &dsp->cpanel;
@@ -157,7 +157,7 @@ static void pathlen_cb (GtkWidget *w, gpointer cbd)
 */
 
 void
-cpanel_ctour_make (ggobid *gg) {
+cpanel_ctour_make (GGobiSession *gg) {
   modepaneld *panel;
   GtkWidget *box, *btn, *sbar, *vb, *lbl;
   GtkObject *adj;
@@ -382,7 +382,7 @@ void tourcorr_io_cb (GtkWidget *w, gpointer *cbd) {
 static gint
 key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
 {
-  ggobid *gg = GGobiFromSPlot(sp);
+  GGobiSession *gg = GGobiFromSPlot(sp);
   cpaneld *cpanel = &gg->current_display->cpanel;
   
 /*-- add a key_press_cb in each mode, and let it begin with these lines --*/
@@ -409,7 +409,7 @@ key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
 static gint
 motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
 {
-  ggobid *gg = GGobiFromSPlot(sp);
+  GGobiSession *gg = GGobiFromSPlot(sp);
   gboolean button1_p, button2_p;
 
   mousepos_get_motion (w, event, &button1_p, &button2_p, sp);
@@ -426,7 +426,7 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
 static gint
 button_press_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
-  ggobid *gg = GGobiFromWidget(w, true);
+  GGobiSession *gg = GGobiFromWidget(w, true);
   displayd *dsp = gg->current_display;
   cpaneld *cpanel = &dsp->cpanel;
   gboolean button1_p, button2_p;

@@ -59,7 +59,7 @@ NewColor (glong red, glong green, glong blue)
 */
 void
 draw_glyph (GdkDrawable * drawable, glyphd * gl, icoords * xypos, gint jpos,
-            ggobid * gg)
+            GGobiSession * gg)
 {
   gushort size = gl->size + 1;
 
@@ -121,7 +121,7 @@ mousepos_get_pressed (GtkWidget * w, GdkEventButton * event,
                       gboolean * btn1_down_p, gboolean * btn2_down_p,
                       splotd * sp)
 {
-  ggobid *gg = GGobiFromSPlot (sp);
+  GGobiSession *gg = GGobiFromSPlot (sp);
   gint grab_ok;
   GdkModifierType state;
 
@@ -156,7 +156,7 @@ mousepos_get_motion (GtkWidget * w, GdkEventMotion * event,
                      gboolean * btn1_down_p, gboolean * btn2_down_p,
                      splotd * sp)
 {
-  ggobid *gg = GGobiFromSPlot (sp);
+  GGobiSession *gg = GGobiFromSPlot (sp);
   GdkModifierType state;
 
   *btn1_down_p = false;
@@ -211,7 +211,7 @@ mouseinwindow (splotd * sp)
 /* (x,y) is the center of the rectangle */
 void
 draw_3drectangle (GtkWidget * widget, GdkDrawable * drawable,
-                  gint x, gint y, gint width, gint height, ggobid * gg)
+                  gint x, gint y, gint width, gint height, GGobiSession * gg)
 {
   GdkPoint points[7];
   gint w = width / 2;

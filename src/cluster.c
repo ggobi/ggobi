@@ -74,7 +74,7 @@ clusters_set (GGobiStage * d)
   gint n, nclusters;
   colorschemed *scheme;
 
-  if (!GGOBI_IS_GGOBI(d->gg))
+  if (!GGOBI_IS_SESSION(d->gg))
     return;
   
   // FIXME: In the future, we shouldn't have to do this, because

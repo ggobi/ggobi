@@ -80,7 +80,7 @@ jitter_randval (gint type)
 
 void
 rejitter (gint * selected_cols, gint nselected_cols, GGobiStage * d,
-          ggobid * gg)
+          GGobiSession * gg)
 {
   gint i, j, k;
   greal frand, fworld, fjit;
@@ -113,7 +113,7 @@ rejitter (gint * selected_cols, gint nselected_cols, GGobiStage * d,
 
 
 void
-jitter_value_set (gfloat value, GGobiStage * d, ggobid * gg)
+jitter_value_set (gfloat value, GGobiStage * d, GGobiSession * gg)
 {
   GtkWidget *tree_view =
     get_tree_view_from_object (G_OBJECT (gg->jitter_ui.window));

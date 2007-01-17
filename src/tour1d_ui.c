@@ -29,7 +29,7 @@
    subset of variable might be used, or when there is new data. */
 
 void 
-cpanel_t1d_init (cpaneld *cpanel, ggobid *gg) {
+cpanel_t1d_init (cpaneld *cpanel, GGobiSession *gg) {
   cpanel->t1d.paused = false;
   cpanel->t1d.step = TOURSTEP0;
   cpanel->t1d.nASHes = 20;
@@ -44,7 +44,7 @@ cpanel_t1d_init (cpaneld *cpanel, ggobid *gg) {
 }
 
 static void
-ASH_add_lines_cb (GtkToggleButton *button, ggobid *gg)
+ASH_add_lines_cb (GtkToggleButton *button, GGobiSession *gg)
 {
   cpaneld *cpanel = &gg->current_display->cpanel;
   cpanel->t1d.ASH_add_lines_p = button->active;
@@ -53,7 +53,7 @@ ASH_add_lines_cb (GtkToggleButton *button, ggobid *gg)
 
 /*-- scatterplot only; need a different routine for parcoords --*/
 void
-cpanel_tour1d_set (displayd *display, cpaneld *cpanel, ggobid* gg)
+cpanel_tour1d_set (displayd *display, cpaneld *cpanel, GGobiSession* gg)
 /*
  * To handle the case where there are multiple scatterplots
  * which may have different tour options and parameters selected
@@ -92,39 +92,39 @@ cpanel_tour1d_set (displayd *display, cpaneld *cpanel, ggobid* gg)
 }
 
 
-static void speed1d_set_cb (GtkAdjustment *adj, ggobid *gg) {
+static void speed1d_set_cb (GtkAdjustment *adj, GGobiSession *gg) {
 
   tour1d_speed_set(adj->value, gg);
 }
 
-static void tour1d_pause_cb (GtkToggleButton *button, ggobid *gg)
+static void tour1d_pause_cb (GtkToggleButton *button, GGobiSession *gg)
 {
   displayd *dsp = gg->current_display;
 
   tour1d_pause (&dsp->cpanel, button->active, dsp, gg);
 }
 
-static void reinit_cb (GtkWidget *w, ggobid *gg) {
+static void reinit_cb (GtkWidget *w, GGobiSession *gg) {
 
   tour1d_reinit(gg);
 }
 
-static void scramble_cb (GtkWidget *w, ggobid *gg) {
+static void scramble_cb (GtkWidget *w, GGobiSession *gg) {
 
   tour1d_scramble(gg);
 }
 /*
-static void t1d_snap_cb (GtkWidget *w, ggobid *gg) {
+static void t1d_snap_cb (GtkWidget *w, GGobiSession *gg) {
 
   tour1d_snap(gg);
 }
 
-static void t1d_video_cb (GtkToggleButton *button, ggobid *gg)
+static void t1d_video_cb (GtkToggleButton *button, GGobiSession *gg)
 {
   tour1d_video(gg);
 }*/
 
-static void t1d_ash_sm_cb (GtkAdjustment *adj, ggobid *gg) 
+static void t1d_ash_sm_cb (GtkAdjustment *adj, GGobiSession *gg) 
 {
   cpaneld *cpanel = &gg->current_display->cpanel;
   splotd *sp = gg->current_splot;
@@ -141,25 +141,25 @@ static void t1d_ash_sm_cb (GtkAdjustment *adj, ggobid *gg)
 }
 
 /*
-static void tour1d_vert_cb (GtkToggleButton *button, ggobid *gg)
+static void tour1d_vert_cb (GtkToggleButton *button, GGobiSession *gg)
 {
   tour1d_vert (&gg->current_display->cpanel, button->active);
 }
 */
 
-static void tour1dpp_cb (GtkWidget *w, ggobid *gg) 
+static void tour1dpp_cb (GtkWidget *w, GGobiSession *gg) 
 {
   tour1dpp_window_open (gg);
 }
 
 #ifdef TOUR_ADV_IMPLEMENTED
-static void tour1dadv_cb (GtkWidget *w, ggobid *gg) {
+static void tour1dadv_cb (GtkWidget *w, GGobiSession *gg) {
   tour1dadv_window_open (gg);
 }
 #endif
 
 void
-cpanel_tour1d_make (ggobid *gg) {
+cpanel_tour1d_make (GGobiSession *gg) {
   modepaneld *panel;
   GtkWidget *frame, *framevb, *box, *btn, *sbar, *vb, *lbl;
   GtkObject *adj;
@@ -362,7 +362,7 @@ The following are considered advanced features for now:
 #ifdef TOUR_ADV_IMPLEMENTED
 static gchar *pathlen_lbl[] = {"1/10", "1/5", "1/4", "1/3", "1/2", "1",
                                "2", "10", "Infinite"};
-static void pathlen_cb (GtkWidget *w, ggobid *gg)
+static void pathlen_cb (GtkWidget *w, GGobiSession *gg)
 {
   gint indx = gtk_combo_box_get_active(GTK_COMBO_BOX(w));
   g_printerr ("cbd: %s\n", pathlen_lbl[indx]);
@@ -371,7 +371,7 @@ static void pathlen_cb (GtkWidget *w, ggobid *gg)
 
 #ifdef TOUR_ADV_IMPLEMENTED
 static gchar *interp_lbl[] = {"Geodesic", "Householder", "Givens"};
-static void interp_cb (GtkWidget *w, ggobid *gg)
+static void interp_cb (GtkWidget *w, GGobiSession *gg)
 {
   gint indx = gtk_combo_box_get_active (GTK_COMBO_BOX(w));
   g_printerr ("cbd: %s\n", interp_lbl[indx]);
@@ -391,7 +391,7 @@ static void step_cb (GtkToggleButton *tgl, GtkWidget *btn)
   g_printerr ("step: %d\n", tgl->active);
   gtk_widget_set_sensitive (btn, tgl->active);
 }
-static void go_cb (GtkButton *button, ggobid *gg)
+static void go_cb (GtkButton *button, GGobiSession *gg)
 {
   displayd *dsp = gg->current_display; 
 
@@ -425,7 +425,7 @@ static void hide_cb (GtkWidget *w ) {
 
 #ifdef TOUR_ADV_IMPLEMENTED
 static GtkWidget *window = NULL; /* Note to self - this should be removed */
-static void tour1dadv_window_open (ggobid *gg) 
+static void tour1dadv_window_open (GGobiSession *gg) 
 {
   GtkWidget *vbox, *box, *btn, *opt, *tgl, *entry;
   GtkWidget *pathlen_opt, *vb, *hb, *lbl, *sbar, *notebook;
@@ -656,7 +656,7 @@ void tour1d_io_cb (GtkWidget *w, gpointer *cbd) {
 static gint
 key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
 {
-  ggobid *gg = GGobiFromSPlot(sp);
+  GGobiSession *gg = GGobiFromSPlot(sp);
   cpaneld *cpanel = &gg->current_display->cpanel;
   
 /*-- add a key_press_cb in each mode, and let it begin with these lines --*/
@@ -682,7 +682,7 @@ key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
 static gint
 motion_notify_cb (GtkWidget *w, GdkEventMotion *event, splotd *sp)
 {
-  ggobid *gg = GGobiFromSPlot(sp);
+  GGobiSession *gg = GGobiFromSPlot(sp);
   gboolean button1_p, button2_p;
 
   mousepos_get_motion (w, event, &button1_p, &button2_p, sp);

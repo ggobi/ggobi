@@ -19,14 +19,14 @@
 #include "vars.h"
 #include "externs.h"
 
-static gboolean movepts_history_contains (gint, gint, GGobiStage *, ggobid *);
+static gboolean movepts_history_contains (gint, gint, GGobiStage *, GGobiSession *);
 
 /*------------------------------------------------------------------------*/
 /*                       history                                          */
 /*------------------------------------------------------------------------*/
 
 static gboolean
-movepts_history_contains (gint i, gint j, GGobiStage * d, ggobid * gg)
+movepts_history_contains (gint i, gint j, GGobiStage * d, GGobiSession * gg)
 {
 
   if (g_slist_length (d->movepts_history) > 0) {
@@ -44,7 +44,7 @@ movepts_history_contains (gint i, gint j, GGobiStage * d, ggobid * gg)
 }
 
 void
-movepts_history_add (gint id, splotd * sp, GGobiStage * d, ggobid * gg)
+movepts_history_add (gint id, splotd * sp, GGobiStage * d, GGobiSession * gg)
 {
 /*
  * So that it's possible to do 'undo last', always add two
@@ -78,7 +78,7 @@ movepts_history_add (gint id, splotd * sp, GGobiStage * d, ggobid * gg)
 }
 
 void
-movepts_history_delete_last (GGobiStage * d, ggobid * gg)
+movepts_history_delete_last (GGobiStage * d, GGobiSession * gg)
 {
   gint n;
 
@@ -101,7 +101,7 @@ movepts_history_delete_last (GGobiStage * d, ggobid * gg)
 
 void
 movept_screen_to_raw (splotd * sp, gint ipt, gcoords * eps,
-                      gboolean horiz, gboolean vert, ggobid * gg)
+                      gboolean horiz, gboolean vert, GGobiSession * gg)
 {
   gint j;
   gcoords planar;
@@ -133,7 +133,7 @@ movept_screen_to_raw (splotd * sp, gint ipt, gcoords * eps,
 
 void
 movept_plane_to_raw (splotd * sp, gint ipt, gcoords * eps, GGobiStage * d,
-                     ggobid * gg)
+                     GGobiSession * gg)
 {
   gint j;
   gcoords planar;
@@ -161,7 +161,7 @@ movept_plane_to_raw (splotd * sp, gint ipt, gcoords * eps, GGobiStage * d,
 /*------------------------------------------------------------------------*/
 
 void
-move_pt (gint id, gint x, gint y, splotd * sp, GGobiStage * d, ggobid * gg)
+move_pt (gint id, gint x, gint y, splotd * sp, GGobiStage * d, GGobiSession * gg)
 {
   gint i;
   gboolean horiz, vert;

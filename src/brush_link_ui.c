@@ -29,7 +29,7 @@ enum
 { LINKBYLIST_NAME, LINKBYLIST_NCOLS };
 
 void linkby_notebook_subwindow_add (GGobiStage * d, GtkWidget * notebook,
-                                    ggobid *);
+                                    GGobiSession *);
 
 void
 varlist_append (GtkListStore * list, GGobiStage *d, gchar* name)
@@ -63,7 +63,7 @@ varlist_populate (GtkListStore * list, GGobiStage * d)
 /* called from cpanel_brush_set */
 void
 linkby_current_page_set (displayd * display, GtkWidget * notebook,
-                         ggobid * gg)
+                         GGobiSession * gg)
 {
   GtkWidget *swin, *treeview;
   GGobiStage *d = display->d, *paged;
@@ -103,7 +103,7 @@ linkby_current_page_set (displayd * display, GtkWidget * notebook,
 }
 
 void
-linking_method_set_cb (GtkTreeSelection * treesel, ggobid * gg)
+linking_method_set_cb (GtkTreeSelection * treesel, GGobiSession * gg)
 {
   GGobiStage *d =
     g_object_get_data (G_OBJECT (gtk_tree_selection_get_tree_view (treesel)),
@@ -143,7 +143,7 @@ linking_method_set_cb (GtkTreeSelection * treesel, ggobid * gg)
 }
 
 GtkListStore *
-list_from_data (ggobid * gg, GGobiStage * data, GtkNotebook * notebook)
+list_from_data (GGobiSession * gg, GGobiStage * data, GtkNotebook * notebook)
 {
   GtkWidget *swin;
   GtkListStore *list = NULL;
@@ -160,7 +160,7 @@ list_from_data (ggobid * gg, GGobiStage * data, GtkNotebook * notebook)
 }
 
 void
-linkby_notebook_varchanged_cb (ggobid * gg, GGobiStage * data,
+linkby_notebook_varchanged_cb (GGobiSession * gg, GGobiStage * data,
                                GtkNotebook * notebook)
 {
   GtkListStore *list = list_from_data (gg, data, notebook);
@@ -169,7 +169,7 @@ linkby_notebook_varchanged_cb (ggobid * gg, GGobiStage * data,
 }
 
 void
-linkby_notebook_varadded_cb (ggobid * gg, gint which,
+linkby_notebook_varadded_cb (GGobiSession * gg, gint which,
                              GGobiStage * d, GtkNotebook * notebook)
 {
   GtkListStore *model = list_from_data (gg, d, notebook);
@@ -179,7 +179,7 @@ linkby_notebook_varadded_cb (ggobid * gg, gint which,
 }
 
 void
-linkby_notebook_list_changed_cb (ggobid * gg, GGobiStage * d, void *notebook)
+linkby_notebook_list_changed_cb (GGobiSession * gg, GGobiStage * d, void *notebook)
 {
   linkby_notebook_varchanged_cb (gg, d, notebook);
 }
@@ -190,7 +190,7 @@ CHECK_EVENT_SIGNATURE (linkby_notebook_adddata_cb, datad_added_f)
                        variable_list_changed_f)
 
 static void
-linkby_notebook_adddata_cb (ggobid * gg, GGobiStage * d, void *notebook,
+linkby_notebook_adddata_cb (GGobiSession * gg, GGobiStage * d, void *notebook,
                                    GtkSignalFunc func)
 {
   linkby_notebook_subwindow_add (d, notebook, gg);
@@ -198,7 +198,7 @@ linkby_notebook_adddata_cb (ggobid * gg, GGobiStage * d, void *notebook,
 
 void
 linkby_notebook_subwindow_add (GGobiStage * d, GtkWidget * notebook,
-                               ggobid * gg)
+                               GGobiSession * gg)
 {
   GtkWidget *swin, *treeview;
   GtkListStore *list;
@@ -254,7 +254,7 @@ linkby_notebook_subwindow_add (GGobiStage * d, GtkWidget * notebook,
 }
 
 GtkWidget *
-create_linkby_notebook (GtkWidget * box, ggobid * gg)
+create_linkby_notebook (GtkWidget * box, GGobiSession * gg)
 {
   GtkWidget *notebook;
   GSList *l;

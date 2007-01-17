@@ -33,7 +33,7 @@ static gchar *tip_points =
 /*--------------------------------------------------------------------*/
 
 static void
-add_record_dialog_cancel (GtkWidget * w, ggobid * gg)
+add_record_dialog_cancel (GtkWidget * w, GGobiSession * gg)
 {
   GtkWidget *dialog = gtk_widget_get_toplevel (w);
   gboolean rval = false;
@@ -53,7 +53,7 @@ add_record_dialog_apply (GtkWidget * w, displayd * display)
   cpaneld *cpanel = &display->cpanel;
   GGobiStage *d = display->d;
   GGobiStage *e = display->e;
-  ggobid *gg = d->gg;
+  GGobiSession *gg = d->gg;
   GtkWidget *dialog = gtk_widget_get_toplevel (w);
   GtkWidget *label_entry, *id_entry;
   gchar *label = NULL, *id = NULL;
@@ -115,7 +115,7 @@ add_record_dialog_apply (GtkWidget * w, displayd * display)
 
 static void
 add_record_dialog_open (GGobiStage * d, GGobiStage * e, displayd * dsp,
-                        ggobid * gg)
+                        GGobiSession * gg)
 {
   GtkWidget *dialog, *table;
   GtkWidget *entry, *w;
@@ -217,7 +217,7 @@ add_record_dialog_open (GGobiStage * d, GGobiStage * e, displayd * dsp,
 
     extern void fetch_default_record_values (gchar ** vals,
                                              GGobiStage *, displayd *,
-                                             ggobid * gg);
+                                             GGobiSession * gg);
     fetch_default_record_values (vals, dtarget, dsp, gg);
 
     tablev = gtk_table_new (dtarget->n_cols, 2, false);
@@ -269,7 +269,7 @@ add_record_dialog_open (GGobiStage * d, GGobiStage * e, displayd * dsp,
 /*--------------------------------------------------------------------*/
 
 static void
-add_edges_or_points_cb (GtkToggleButton * button, ggobid * gg)
+add_edges_or_points_cb (GtkToggleButton * button, GGobiSession * gg)
 {
   displayd *display = gg->current_display;
   cpaneld *cpanel = &display->cpanel;
@@ -298,7 +298,7 @@ add_edges_or_points_cb (GtkToggleButton * button, ggobid * gg)
 static gint
 key_press_cb (GtkWidget * w, GdkEventKey * event, splotd * sp)
 {
-  ggobid *gg = GGobiFromSPlot (sp);
+  GGobiSession *gg = GGobiFromSPlot (sp);
   cpaneld *cpanel = &gg->current_display->cpanel;
 
   /*-- handle the keys for setting the mode and launching generic events --*/
@@ -316,7 +316,7 @@ motion_notify_cb (GtkWidget * w, GdkEventMotion * event, splotd * sp)
   displayd *display = sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
   GGobiStage *d = display->d;
-  ggobid *gg = GGobiFromSPlot (sp);
+  GGobiSession *gg = GGobiFromSPlot (sp);
   gboolean button1_p, button2_p;
   gint k;
 
@@ -350,7 +350,7 @@ motion_notify_cb (GtkWidget * w, GdkEventMotion * event, splotd * sp)
 static gint
 button_press_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
 {
-  ggobid *gg = GGobiFromSPlot (sp);
+  GGobiSession *gg = GGobiFromSPlot (sp);
   displayd *display = sp->displayptr;
   GGobiStage *d = display->d;
   gboolean button1_p, button2_p;
@@ -369,7 +369,7 @@ button_release_cb (GtkWidget * w, GdkEventButton * event, gpointer user_data)
 {
   gboolean retval = true;
   splotd *sp = GGOBI_SPLOT(user_data);
-  ggobid *gg = GGobiFromSPlot (sp);
+  GGobiSession *gg = GGobiFromSPlot (sp);
   displayd *display = sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
   GGobiStage *d = display->d;
@@ -377,7 +377,7 @@ button_release_cb (GtkWidget * w, GdkEventButton * event, gpointer user_data)
   gint which_button = 1;
 
   void record_add_defaults (GGobiStage * d, GGobiStage * e, displayd * display,
-                            ggobid * gg);
+                            GGobiSession * gg);
 
   if ((event->state & GDK_BUTTON1_MASK) == GDK_BUTTON1_MASK)
     which_button = 1;
@@ -465,7 +465,7 @@ edgeedit_event_handlers_toggle (splotd * sp, gboolean state)
 }
 
 void
-cpanel_edgeedit_make (ggobid * gg)
+cpanel_edgeedit_make (GGobiSession * gg)
 {
   modepaneld *panel;
   GtkWidget *vb, *radio1, *radio2, *w;
@@ -529,13 +529,13 @@ cpanel_edgeedit_make (ggobid * gg)
 /*--------------------------------------------------------------------*/
 
 void
-cpanel_edgeedit_init (cpaneld * cpanel, ggobid * gg)
+cpanel_edgeedit_init (cpaneld * cpanel, GGobiSession * gg)
 {
   cpanel->ee_mode = ADDING_EDGES;
 }
 
 void
-cpanel_edgeedit_set (displayd * display, cpaneld * cpanel, ggobid * gg)
+cpanel_edgeedit_set (displayd * display, cpaneld * cpanel, GGobiSession * gg)
 {
   GtkWidget *w;
   GtkWidget *panel =
@@ -559,7 +559,7 @@ cpanel_edgeedit_set (displayd * display, cpaneld * cpanel, ggobid * gg)
 /*--------------------------------------------------------------------*/
 
 RedrawStyle
-edgeedit_activate (gboolean state, displayd * display, ggobid * gg)
+edgeedit_activate (gboolean state, displayd * display, GGobiSession * gg)
 {
   cpaneld *cpanel = &display->cpanel;
   RedrawStyle redraw_style = QUICK;

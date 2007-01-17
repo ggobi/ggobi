@@ -43,7 +43,7 @@ datad_get_from_window (GtkWidget * window)
 /*-------------------------------------------------------------------------*/
 
 void
-sphere_enable (gboolean sens, ggobid * gg)
+sphere_enable (gboolean sens, GGobiSession * gg)
 {
   if (gg->sphere_ui.apply_btn != NULL) {
     gtk_widget_set_sensitive (gg->sphere_ui.apply_btn, sens);
@@ -51,7 +51,7 @@ sphere_enable (gboolean sens, ggobid * gg)
 }
 
 void
-sphere_condnum_set (gfloat x, ggobid * gg)
+sphere_condnum_set (gfloat x, GGobiSession * gg)
 {
   if (gg->sphere_ui.condnum_entry != NULL) {
     gchar *lbl = g_strdup_printf ("%5.1f", x);
@@ -61,7 +61,7 @@ sphere_condnum_set (gfloat x, ggobid * gg)
 }
 
 void
-sphere_variance_set (gfloat x, GGobiStage * d, ggobid * gg)
+sphere_variance_set (gfloat x, GGobiStage * d, GGobiSession * gg)
 {
   if (gg->sphere_ui.variance_entry != NULL) {
     gchar *lbl = g_strdup_printf ("%.2e", x);
@@ -72,7 +72,7 @@ sphere_variance_set (gfloat x, GGobiStage * d, ggobid * gg)
 
 /*-- reset the spinner max and value --*/
 void
-sphere_npcs_range_set (gint n, ggobid * gg)
+sphere_npcs_range_set (gint n, GGobiSession * gg)
 {
   if (gg->sphere_ui.npcs_adj != NULL) {
     GTK_ADJUSTMENT (gg->sphere_ui.npcs_adj)->upper = (gfloat) n;
@@ -86,7 +86,7 @@ sphere_npcs_range_set (gint n, ggobid * gg)
 /*-------------------------------------------------------------------------*/
 
 static void
-deleteit (ggobid * gg)
+deleteit (GGobiSession * gg)
 {
   GSList *l;
 
@@ -109,7 +109,7 @@ deleteit (ggobid * gg)
 }
 
 void
-sphere_npcs_set_cb (GtkAdjustment * adj, ggobid * gg)
+sphere_npcs_set_cb (GtkAdjustment * adj, GGobiSession * gg)
 {
   gint n = (gint) adj->value;
   GGobiStage *d = datad_get_from_window (gg->sphere_ui.window);
@@ -119,7 +119,7 @@ sphere_npcs_set_cb (GtkAdjustment * adj, ggobid * gg)
 }
 
 static void
-vars_stdized_cb (GtkToggleButton * btn, ggobid * gg)
+vars_stdized_cb (GtkToggleButton * btn, GGobiSession * gg)
 {
   GGobiStage *d = datad_get_from_window (gg->sphere_ui.window);
 
@@ -127,7 +127,7 @@ vars_stdized_cb (GtkToggleButton * btn, ggobid * gg)
 }
 
 void
-vars_stdized_send_event (GGobiStage * d, ggobid * gg)
+vars_stdized_send_event (GGobiStage * d, GGobiSession * gg)
 {
   if (gg->sphere_ui.stdized_entry != NULL &&
       GTK_IS_WIDGET (gg->sphere_ui.stdized_entry) &&
@@ -141,7 +141,7 @@ vars_stdized_send_event (GGobiStage * d, ggobid * gg)
 
 
 static void
-sphere_apply_cb (GtkWidget * w, ggobid * gg)
+sphere_apply_cb (GtkWidget * w, GGobiSession * gg)
 {
 /*
  * finally, sphere the number of principal components selected;
@@ -182,9 +182,9 @@ sphere_apply_cb (GtkWidget * w, ggobid * gg)
 
 /*
 static void
-scree_restore_cb (GtkWidget *w, ggobid *gg)
+scree_restore_cb (GtkWidget *w, GGobiSession *gg)
 { 
-  extern void sphere_malloc (gint, GGobiStage *, ggobid *);
+  extern void sphere_malloc (gint, GGobiStage *, GGobiSession *);
   GGobiStage *d = datad_get_from_window (gg->sphere_ui.window);
 
   if (d != NULL && d->sphere.vars_sphered.nels > 0) {
@@ -211,21 +211,21 @@ scree_restore_cb (GtkWidget *w, ggobid *gg)
 static void
 scree_update_cb (GtkWidget * w, GGobiStage * d)
 {
-  ggobid *gg = GGobiFromWidget (w, true);
+  GGobiSession *gg = GGobiFromWidget (w, true);
   spherevars_set (gg);
   scree_plot_make (gg);
 }
 
 /*-- called when closed from the close button --*/
 static void
-close_btn_cb (GtkWidget * w, ggobid * gg)
+close_btn_cb (GtkWidget * w, GGobiSession * gg)
 {
   deleteit (gg);
 }
 
 /*-- called when closed from the window manager --*/
 static void
-close_wmgr_cb (GtkWidget * w, GdkEvent * event, ggobid * gg)
+close_wmgr_cb (GtkWidget * w, GdkEvent * event, GGobiSession * gg)
 {
   deleteit (gg);
 }
@@ -238,13 +238,13 @@ close_wmgr_cb (GtkWidget * w, GdkEvent * event, ggobid * gg)
 #define SCREE_HEIGHT 100
 
 gboolean
-scree_mapped_p (ggobid * gg)
+scree_mapped_p (GGobiSession * gg)
 {
   return (gg->sphere_ui.scree_da != NULL);
 }
 
 static gint
-scree_configure_cb (GtkWidget * w, GdkEventConfigure * event, ggobid * gg)
+scree_configure_cb (GtkWidget * w, GdkEventConfigure * event, GGobiSession * gg)
 {
   if (gg->sphere_ui.scree_pixmap != NULL)
     gdk_pixmap_unref (gg->sphere_ui.scree_pixmap);
@@ -257,7 +257,7 @@ scree_configure_cb (GtkWidget * w, GdkEventConfigure * event, ggobid * gg)
 }
 
 static gint
-scree_expose_cb (GtkWidget * w, GdkEventConfigure * event, ggobid * gg)
+scree_expose_cb (GtkWidget * w, GdkEventConfigure * event, GGobiSession * gg)
 {
   gint margin = 10;
   gint j;
@@ -329,7 +329,7 @@ scree_expose_cb (GtkWidget * w, GdkEventConfigure * event, ggobid * gg)
  * button is pressed.
 */
 void
-scree_plot_make (ggobid * gg)
+scree_plot_make (GGobiSession * gg)
 {
   GGobiStage *d = datad_get_from_window (gg->sphere_ui.window);
 
@@ -350,7 +350,7 @@ scree_plot_make (ggobid * gg)
 /*-------------------------------------------------------------------------*/
 
 void
-sphere_panel_open (ggobid * gg)
+sphere_panel_open (GGobiSession * gg)
 {
   GtkWidget *frame0, *vbox, *vb, *hb, *table, *frame;
   GtkWidget *label;

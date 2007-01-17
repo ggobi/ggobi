@@ -24,7 +24,7 @@
 #include <gdk/gdkkeysyms.h>
 
 static gboolean parcoordsKeyEventHandled (GtkWidget *, displayd *, splotd *,
-                                          GdkEventKey *, ggobid *);
+                                          GdkEventKey *, GGobiSession *);
 
 static gboolean
 binningPermitted (displayd * dpy)
@@ -38,7 +38,7 @@ binningPermitted (displayd * dpy)
 }
 
 static void
-splotAssignPointsToBins (GGobiStage * d, splotd * sp, ggobid * gg)
+splotAssignPointsToBins (GGobiStage * d, splotd * sp, GGobiSession * gg)
 {
   if (sp == gg->current_splot)
     assign_points_to_bins (d, sp, gg);
@@ -53,7 +53,7 @@ splot1DVariablesGet (splotd * sp, gint * cols, GGobiStage * d)
 
 
 static gboolean
-cpanelSet (displayd * dpy, cpaneld * cpanel, ggobid * gg)
+cpanelSet (displayd * dpy, cpaneld * cpanel, GGobiSession * gg)
 {
   GtkWidget *w;
   w = GGOBI_EXTENDED_DISPLAY (dpy)->cpanelWidget;
@@ -213,7 +213,7 @@ parcoordsEventHandlersToggle (displayd * dpy, splotd * sp, gboolean state,
 
 static gboolean
 parcoordsKeyEventHandled (GtkWidget * w, displayd * display, splotd * sp,
-                          GdkEventKey * event, ggobid * gg)
+                          GdkEventKey * event, GGobiSession * gg)
 {
   gboolean ok = true;
   ProjectionMode pmode = NULL_PMODE;
@@ -254,7 +254,7 @@ parcoordsKeyEventHandled (GtkWidget * w, displayd * display, splotd * sp,
 
 
 gchar *
-treeLabel (splotd * splot, GGobiStage * d, ggobid * gg)
+treeLabel (splotd * splot, GGobiStage * d, GGobiSession * gg)
 {
   return(ggobi_stage_get_col_name(d, splot->p1dvar));
 }
@@ -266,26 +266,26 @@ allocWhiskers (GdkSegment * whiskers, splotd * sp, gint nr, GGobiStage * d)
 }
 
 void
-worldToPlane (splotd * sp, GGobiStage * d, ggobid * gg)
+worldToPlane (splotd * sp, GGobiStage * d, GGobiSession * gg)
 {
   p1d_reproject (sp, d->world.vals, d, gg);
 }
 
 void
 withinPlaneToScreen (splotd * sp, displayd * display, GGobiStage * d,
-                     ggobid * gg)
+                     GGobiSession * gg)
 {
   sp_whiskers_make (sp, display, gg);
 }
 
 gboolean
-drawEdge_p (splotd * sp, gint m, GGobiStage * d, GGobiStage * e, ggobid * gg)
+drawEdge_p (splotd * sp, gint m, GGobiStage * d, GGobiStage * e, GGobiSession * gg)
 {
   return (!ggobi_stage_is_missing(e, m, sp->p1dvar));
 }
 
 gboolean
-drawCase_p (splotd * sp, gint m, GGobiStage * d, ggobid * gg)
+drawCase_p (splotd * sp, gint m, GGobiStage * d, GGobiSession * gg)
 {
   return (!ggobi_stage_is_missing(d, m, sp->p1dvar));
 }
@@ -295,7 +295,7 @@ withinDrawBinned (splotd * sp, gint m, GdkDrawable * drawable, GdkGC * gc)
 {
   displayd *display = sp->displayptr;
   GGobiStage *d = display->d;
-  ggobid *gg = GGobiFromSPlot (sp);
+  GGobiSession *gg = GGobiFromSPlot (sp);
   gint n, lwidth, ltype, gtype;
 
   if (!gg || !display)
@@ -331,7 +331,7 @@ withinDrawUnbinned (splotd * sp, gint m, GdkDrawable * drawable, GdkGC * gc)
 
 static void
 addPlotLabels (displayd * display, splotd * sp, GdkDrawable * drawable,
-               GGobiStage * d, ggobid * gg)
+               GGobiStage * d, GGobiSession * gg)
 {
   PangoRectangle rect;
   PangoLayout *layout =
@@ -368,7 +368,7 @@ plotted (displayd * display, GSList *cols, GGobiStage * d)
 
 static gboolean
 variableSelect (GtkWidget * w, displayd * dpy, splotd * sp, gint jvar,
-                gint toggle, gint mouse, cpaneld * cpanel, ggobid * gg)
+                gint toggle, gint mouse, cpaneld * cpanel, GGobiSession * gg)
 {
   gint jvar_prev = -1;
   return (parcoords_varsel (cpanel, sp, jvar, &jvar_prev, gg));
@@ -398,7 +398,7 @@ varpanelRefresh (displayd * display, splotd * sp, GGobiStage * d)
 }
 
 static void
-varpanelTooltipsSet (displayd * dpy, ggobid * gg, GtkWidget * wx,
+varpanelTooltipsSet (displayd * dpy, GGobiSession * gg, GtkWidget * wx,
                      GtkWidget * wy, GtkWidget * xz, GtkWidget * label)
 {
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
@@ -411,7 +411,7 @@ varpanelTooltipsSet (displayd * dpy, ggobid * gg, GtkWidget * wx,
 
 /* Are these ordered?  Maybe so */
 static gint
-plottedVarsGet (displayd * display, gint * cols, GGobiStage * d, ggobid * gg)
+plottedVarsGet (displayd * display, gint * cols, GGobiStage * d, GGobiSession * gg)
 {
   GList *l;
   splotd *s;
@@ -425,7 +425,7 @@ plottedVarsGet (displayd * display, gint * cols, GGobiStage * d, ggobid * gg)
 }
 
 static void
-displaySet (displayd * display, ggobid * gg)
+displaySet (displayd * display, GGobiSession * gg)
 {
 }
 
@@ -456,7 +456,7 @@ add_xml_parcoords_variables (xmlNodePtr node, GList * plots, displayd * dpy)
 /*-- add highlighting for parallel coordinates plot --*/
 static void
 splot_add_whisker_cues (gboolean nearest_p, gint k, splotd * sp,
-                        GdkDrawable * drawable, ggobid * gg)
+                        GdkDrawable * drawable, GGobiSession * gg)
 {
   gint n;
   displayd *display = sp->displayptr;
@@ -496,7 +496,7 @@ splot_add_whisker_cues (gboolean nearest_p, gint k, splotd * sp,
 
 
 static GtkWidget *
-parcoordsCPanelWidget (displayd * dpy, gchar ** modeName, ggobid * gg)
+parcoordsCPanelWidget (displayd * dpy, gchar ** modeName, GGobiSession * gg)
 {
   GtkWidget *w = GGOBI_EXTENDED_DISPLAY (dpy)->cpanelWidget;
   if (!w) {
@@ -509,7 +509,7 @@ parcoordsCPanelWidget (displayd * dpy, gchar ** modeName, ggobid * gg)
 
 static void
 splotScreenToTform (cpaneld * cpanel, splotd * sp, icoords * scr,
-                    fcoords * tfd, ggobid * gg)
+                    fcoords * tfd, GGobiSession * gg)
 {
   gcoords planar, world;
   greal precis = (greal) PRECISION1;
@@ -640,7 +640,7 @@ parcoordsSPlotClassInit (GGobiParCoordsSPlotClass * klass)
 
 
 splotd *
-ggobi_parcoords_splot_new (displayd * dpy, ggobid * gg)
+ggobi_parcoords_splot_new (displayd * dpy, GGobiSession * gg)
 {
   splotd *sp = g_object_new (GGOBI_TYPE_PAR_COORDS_SPLOT, NULL);
   splot_init (sp, dpy, gg);

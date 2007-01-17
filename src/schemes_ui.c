@@ -34,8 +34,8 @@ static gint xmargin = 20;
 static gint ymargin = 20;
 
 GtkWidget *createColorSchemeTree (int numTypes, gchar * schemeTypes[],
-                                  ggobid * gg);
-static void entry_set_scheme_name (ggobid * gg);
+                                  GGobiSession * gg);
+static void entry_set_scheme_name (GGobiSession * gg);
 
 /*-------------------------------------------------------------------*/
 /*             Using colorschemed objects                            */
@@ -44,7 +44,7 @@ static void entry_set_scheme_name (ggobid * gg);
 void
 colorscheme_set_cb (GtkTreeSelection * sel, GtkTreeView * tree_view)
 {
-  ggobid *gg = GGobiFromWidget (GTK_WIDGET (tree_view), true);
+  GGobiSession *gg = GGobiFromWidget (GTK_WIDGET (tree_view), true);
   gboolean rval = false;
   GtkTreeModel *model;
   GGobiStage *d;
@@ -94,20 +94,20 @@ colorscheme_set_cb (GtkTreeSelection * sel, GtkTreeView * tree_view)
 
 /*-- called when closed from the close button --*/
 static void
-close_btn_cb (GtkWidget * w, ggobid * gg)
+close_btn_cb (GtkWidget * w, GGobiSession * gg)
 {
   gtk_widget_hide (gg->svis.window);
 }
 
 /*-- called when closed from the window manager --*/
 static void
-close_wmgr_cb (GtkWidget * w, GdkEventButton * event, ggobid * gg)
+close_wmgr_cb (GtkWidget * w, GdkEventButton * event, GGobiSession * gg)
 {
   gtk_widget_hide (gg->svis.window);
 }
 
 static gint
-da_configure_cb (GtkWidget * w, GdkEventConfigure * event, ggobid * gg)
+da_configure_cb (GtkWidget * w, GdkEventConfigure * event, GGobiSession * gg)
 {
   /*-- Create new backing pixmaps of the appropriate size --*/
   if (gg->svis.pix != NULL)
@@ -127,7 +127,7 @@ da_configure_cb (GtkWidget * w, GdkEventConfigure * event, ggobid * gg)
  * scheme->n equal-sized pieces
 */
 static void
-bin_boundaries_set (GGobiStage * d, ggobid * gg)
+bin_boundaries_set (GGobiStage * d, GGobiSession * gg)
 {
   gint k;
 
@@ -141,7 +141,7 @@ bin_boundaries_set (GGobiStage * d, ggobid * gg)
 }
 
 static void
-da_expose_cb (GtkWidget * w, GdkEventExpose * event, ggobid * gg)
+da_expose_cb (GtkWidget * w, GdkEventExpose * event, GGobiSession * gg)
 {
   gint height = w->allocation.height - 2 * ymargin;
   gint x0, x1, k, hgt;
@@ -192,7 +192,7 @@ da_expose_cb (GtkWidget * w, GdkEventExpose * event, ggobid * gg)
 */
 /*-- move this to color.c --*/
 gboolean
-colors_remap (colorschemed * scheme, gboolean force, ggobid * gg)
+colors_remap (colorschemed * scheme, gboolean force, GGobiSession * gg)
 {
   gint i, k;
   gboolean all_colors_p[MAXNCOLORS];
@@ -282,7 +282,7 @@ colors_remap (colorschemed * scheme, gboolean force, ggobid * gg)
 }
 
 static void
-scale_set_cb (GtkWidget * w, ggobid * gg)
+scale_set_cb (GtkWidget * w, GGobiSession * gg)
 {
   GtkWidget *tree_view = get_tree_view_from_object (G_OBJECT (w));
   GGobiStage *d = NULL;
@@ -318,7 +318,7 @@ scale_set_cb (GtkWidget * w, ggobid * gg)
 
 
 static void
-entry_set_scheme_name (ggobid * gg)
+entry_set_scheme_name (GGobiSession * gg)
 {
   gtk_entry_set_text (GTK_ENTRY (gg->svis.entry_preview),
                       (gg->svis.scheme != NULL) ? gg->svis.scheme->name :
@@ -329,7 +329,7 @@ entry_set_scheme_name (ggobid * gg)
 }
 
 void
-svis_window_open (ggobid * gg)
+svis_window_open (GGobiSession * gg)
 {
   GtkWidget *vbox;
   GtkWidget *hb;
@@ -462,7 +462,7 @@ GtkWidget *createSchemeColorsTree (colorschemed * scheme);
  
  */
 GtkWidget *
-createColorSchemeTree (gint numTypes, gchar * schemeTypes[], ggobid * gg)
+createColorSchemeTree (gint numTypes, gchar * schemeTypes[], GGobiSession * gg)
 {
   //GtkWidget *item;
   //GtkWidget **trees, *top;

@@ -33,7 +33,7 @@
  */
 static gchar *arrangement_lbl[] = { "Split", "Joint" };
 static void
-arrangement_cb (GtkWidget * w, ggobid * gg)
+arrangement_cb (GtkWidget * w, GGobiSession * gg)
 {
   gint indx = gtk_combo_box_get_active (GTK_COMBO_BOX (w));
   g_printerr ("cbd: %s\n", arrangement_lbl[indx]);
@@ -54,7 +54,7 @@ arrangement_cb (GtkWidget * w, ggobid * gg)
  */
 static gchar *varscale_lbl[] = { "Common", "Independent" };
 static void
-varscale_cb (GtkWidget * w, ggobid * gg)
+varscale_cb (GtkWidget * w, GGobiSession * gg)
 {
   gint indx = gtk_combo_box_get_active (GTK_COMBO_BOX (w));
   g_printerr ("cbd: %s\n", varscale_lbl[indx]);
@@ -66,7 +66,7 @@ varscale_cb (GtkWidget * w, ggobid * gg)
 /*--------------------------------------------------------------------*/
 
 GtkWidget *
-cpanel_tsplot_make (ggobid * gg)
+cpanel_tsplot_make (GGobiSession * gg)
 {
 #ifdef TS_EXTENSIONS_IMPLEMENTED
   GtkWidget *vb, *lbl, *opt;
@@ -159,6 +159,6 @@ tsplot_mode_ui_get (displayd * display)
 
 void
 cpanel_tsplot_set (displayd * display, cpaneld * cpanel,
-                   GtkWidget * panelWidget, ggobid * gg)
+                   GtkWidget * panelWidget, GGobiSession * gg)
 {
 }

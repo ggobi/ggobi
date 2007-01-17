@@ -51,7 +51,7 @@ ltype_from_gtype (gint gtype)
 
 /* sets dashes and returns a gtk line attribute */
 gint
-set_lattribute_from_ltype (gint ltype, ggobid * gg)
+set_lattribute_from_ltype (gint ltype, GGobiSession * gg)
 {
   gint8 dash_list[2];
   gint lattr = GDK_LINE_SOLID;
@@ -83,7 +83,7 @@ set_lattribute_from_ltype (gint ltype, ggobid * gg)
 
 void
 brush_draw_label (splotd * sp, GdkDrawable * drawable, GGobiStage * d,
-                  ggobid * gg)
+                  GGobiSession * gg)
 {
   PangoRectangle rect;
   
@@ -104,7 +104,7 @@ brush_draw_label (splotd * sp, GdkDrawable * drawable, GGobiStage * d,
 
 void
 brush_draw_brush (splotd * sp, GdkDrawable * drawable, GGobiStage * d,
-                  ggobid * gg)
+                  GGobiSession * gg)
 {
 /*
  * Use brush_pos to draw the brush.
@@ -247,7 +247,7 @@ brush_undo (GGobiStage * d)
 }
 
 void
-reinit_transient_brushing (displayd * dsp, ggobid * gg)
+reinit_transient_brushing (displayd * dsp, GGobiSession * gg)
 {
 /*
  * If a new variable is selected or a variable is transformed
@@ -284,7 +284,7 @@ reinit_transient_brushing (displayd * dsp, ggobid * gg)
 }
 
 static gboolean
-binning_permitted (displayd * display, ggobid * gg)
+binning_permitted (displayd * display, GGobiSession * gg)
 {
   if (gg->linkby_cv)
     return false;
@@ -301,7 +301,7 @@ binning_permitted (displayd * display, ggobid * gg)
 
 gboolean
 brush_motion (icoords * mouse, gboolean button1_p, gboolean button2_p,
-              cpaneld * cpanel, splotd * sp, ggobid * gg)
+              cpaneld * cpanel, splotd * sp, GGobiSession * gg)
 {
   displayd *display = sp->displayptr;
   brush_coords *brush_pos = &sp->brush_pos;
@@ -337,7 +337,7 @@ under_brush (gint k, splotd * sp)
  * Determine whether edge k intersects the brush
 */
 static gboolean
-xed_by_brush (gint k, displayd * display, ggobid * gg)
+xed_by_brush (gint k, displayd * display, GGobiSession * gg)
 {
   GGobiStage *d = display->d;
   GGobiStage *e = display->e;
@@ -389,10 +389,10 @@ xed_by_brush (gint k, displayd * display, ggobid * gg)
 
 
 static gboolean
-paint_points (cpaneld * cpanel, GGobiStage * d, ggobid * gg)
+paint_points (cpaneld * cpanel, GGobiStage * d, GGobiSession * gg)
 {
   gint nd = g_slist_length (gg->d);
-  gboolean (*f) (cpaneld *, GGobiStage *, ggobid *) = NULL;
+  gboolean (*f) (cpaneld *, GGobiStage *, GGobiSession *) = NULL;
 
   splotd *sp = gg->current_splot;
   displayd *display = (displayd *) sp->displayptr;
@@ -422,7 +422,7 @@ paint_points (cpaneld * cpanel, GGobiStage * d, ggobid * gg)
 
 
 static gboolean
-paint_edges (cpaneld * cpanel, GGobiStage * e, ggobid * gg)
+paint_edges (cpaneld * cpanel, GGobiStage * e, GGobiSession * gg)
 {
   gint i;
   gint nd = g_slist_length (gg->d);
@@ -458,7 +458,7 @@ update_points_under_brush(GGobiStage *d, splotd *sp)
   cpaneld *cpanel = &display->cpanel;
   guint ih, iv, j, pt;
   BrushTargetType ttype = cpanel->br.point_targets;
-  gint (*f) (splotd * sp, GGobiStage *, ggobid *) = NULL;
+  gint (*f) (splotd * sp, GGobiStage *, GGobiSession *) = NULL;
 
   f = GGOBI_EXTENDED_SPLOT_GET_CLASS (sp)->active_paint_points;
   if (f) {
@@ -520,7 +520,7 @@ update_edges_under_brush(GGobiStage *d, splotd *sp)
 
 
 gboolean
-edges_update_paint (splotd * sp, GGobiStage * e, ggobid * gg)
+edges_update_paint (splotd * sp, GGobiStage * e, GGobiSession * gg)
 {
   displayd *display = sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
@@ -535,7 +535,7 @@ edges_update_paint (splotd * sp, GGobiStage * e, ggobid * gg)
 }
 
 gboolean
-points_update_paint (splotd * sp, GGobiStage * d, ggobid * gg)
+points_update_paint (splotd * sp, GGobiStage * d, GGobiSession * gg)
 {
   displayd *display = sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
@@ -554,7 +554,7 @@ points_update_paint (splotd * sp, GGobiStage * d, ggobid * gg)
 
 /*-- called by brush_motion, brush_mode_cb, and in the api --*/
 gboolean
-brush_once (gboolean force, splotd * sp, ggobid * gg)
+brush_once (gboolean force, splotd * sp, GGobiSession * gg)
 {
 /*
  * Determine which bins the brush is currently sitting in.
@@ -614,7 +614,7 @@ brush_once (gboolean force, splotd * sp, ggobid * gg)
 
 gboolean
 brush_once_and_redraw (gboolean binningp, splotd * sp, displayd * display,
-                       ggobid * gg)
+                       GGobiSession * gg)
 {
   cpaneld *cpanel = &display->cpanel;
   gboolean changed = false;

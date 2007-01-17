@@ -19,10 +19,10 @@
 #include "externs.h"
 #include "plugin.h"
 
-void buildExtendedDisplayMenu (ggobid * gg, int nd, GGobiStage * d0);
+void buildExtendedDisplayMenu (GGobiSession * gg, int nd, GGobiStage * d0);
 
 void
-display_set_position (windowDisplayd * display, ggobid * gg)
+display_set_position (windowDisplayd * display, GGobiSession * gg)
 {
   gint x, y, width, height;
   gint posx, posy;
@@ -45,7 +45,7 @@ display_set_position (windowDisplayd * display, ggobid * gg)
 }
 
 void
-display_menu_build (ggobid * gg)
+display_menu_build (GGobiSession * gg)
 {
   gint nd;
   GGobiStage *d0;
@@ -91,7 +91,7 @@ display_menu_build (ggobid * gg)
 }
 
 void
-display_menu_init (ggobid * gg)
+display_menu_init (GGobiSession * gg)
 {                               /*
                                    gg->display_menu_item = submenu_make ("_Display", 'D',
                                    gg->main_accel_group);
@@ -112,7 +112,7 @@ typedef struct
 static void
 extended_display_open_cb (GtkWidget * w, ExtendedDisplayCreateData * data)
 {
-  ggobid *gg = data->d->gg;
+  GGobiSession *gg = data->d->gg;
   displayd *dpy;
 
   if (data->d->n_rows== 0)
@@ -151,7 +151,7 @@ extended_display_open_cb (GtkWidget * w, ExtendedDisplayCreateData * data)
 }
 
 void
-buildExtendedDisplayMenu (ggobid * gg, gint nd, GGobiStage * d0)
+buildExtendedDisplayMenu (GGobiSession * gg, gint nd, GGobiStage * d0)
 {
   gchar label[200], *lbl;
   GGobiExtendedDisplayClass *klass;

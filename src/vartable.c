@@ -51,10 +51,10 @@ array_contains (gint* arr, gint n, gint el)
 }
 
 /* we currently use the GGobiStage to access the vartable widgets, but
-  in the future we will get these somehow from the ggobid, so we keep
+  in the future we will get these somehow from the GGobiSession, so we keep
   both parameters for now */
 gint
-selected_cols_get (gint **cols, GGobiStage *d, ggobid *gg)
+selected_cols_get (gint **cols, GGobiStage *d, GGobiSession *gg)
 {
 /*
  * Figure out which columns are selected.
@@ -98,7 +98,7 @@ selected_cols_get (gint **cols, GGobiStage *d, ggobid *gg)
  * this is how we find out which columns are selected for plotting.
 */
 gint
-plotted_cols_get (gint *cols, GGobiStage *d, ggobid *gg) 
+plotted_cols_get (gint *cols, GGobiStage *d, GGobiSession *gg) 
 {
   gint ncols = 0;
   splotd *sp = gg->current_splot;

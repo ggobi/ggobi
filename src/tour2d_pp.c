@@ -44,11 +44,11 @@ typedef enum {HOLES, CENTRAL_MASS, LDA, CGINI, CENTROPY}  StandardPPIndexTypes;
 #define EXPMINUS1 0.3678794411714423
 #define ONEMINUSEXPMINUS1 0.63212056
 
-void t2d_pptemp_set(gfloat slidepos, displayd *dsp, ggobid *gg) {
+void t2d_pptemp_set(gfloat slidepos, displayd *dsp, GGobiSession *gg) {
   dsp->t2d_pp_op.temp_start = slidepos;
 }
 
-void t2d_ppcool_set(gfloat slidepos, displayd *dsp, ggobid *gg) {
+void t2d_ppcool_set(gfloat slidepos, displayd *dsp, GGobiSession *gg) {
   dsp->t2d_pp_op.cooling = slidepos;
 }
 
@@ -442,7 +442,7 @@ void t2d_optimz(gint optimz_on, gboolean *nt, gint *bm, displayd *dsp) {
   *bm = bas_meth;
 }
 
-void t2d_clear_pppixmap(displayd *dsp, ggobid *gg)
+void t2d_clear_pppixmap(displayd *dsp, GGobiSession *gg)
 {
   colorschemed *scheme = gg->activeColorScheme;
   gint margin=10;
@@ -466,7 +466,7 @@ void t2d_clear_pppixmap(displayd *dsp, ggobid *gg)
                    wid, hgt);
 }
 
-void t2d_clear_ppda(displayd *dsp, ggobid *gg)
+void t2d_clear_ppda(displayd *dsp, GGobiSession *gg)
 {
   gint i;
 
@@ -482,7 +482,7 @@ void t2d_clear_ppda(displayd *dsp, ggobid *gg)
   t2d_clear_pppixmap(dsp, gg);
 }
 
-void t2d_ppdraw_all(gint wid, gint hgt, gint margin, displayd *dsp, ggobid *gg)
+void t2d_ppdraw_all(gint wid, gint hgt, gint margin, displayd *dsp, GGobiSession *gg)
 {
   GdkPoint pptrace[100];
   gint i;
@@ -506,7 +506,7 @@ void t2d_ppdraw_all(gint wid, gint hgt, gint margin, displayd *dsp, ggobid *gg)
 
 /* This is writes text to the pp window to inform the
 user that optimize is finding a new maximum */ 
-void t2d_ppdraw_think(displayd *dsp, ggobid *gg)
+void t2d_ppdraw_think(displayd *dsp, GGobiSession *gg)
 {
   splotd *sp = (splotd *) g_list_nth_data (dsp->splots, 0);
   colorschemed *scheme = gg->activeColorScheme;
@@ -529,7 +529,7 @@ void t2d_ppdraw_think(displayd *dsp, ggobid *gg)
 }
 
 /* This is the pp index plot drawing routine */ 
-void t2d_ppdraw(gfloat pp_indx_val, displayd *dsp, ggobid *gg)
+void t2d_ppdraw(gfloat pp_indx_val, displayd *dsp, GGobiSession *gg)
 {
   colorschemed *scheme = gg->activeColorScheme;
   gint margin=10;
@@ -577,7 +577,7 @@ void t2d_ppdraw(gfloat pp_indx_val, displayd *dsp, ggobid *gg)
   g_free (label);
 }
 
-void t2d_pp_reinit(displayd *dsp, ggobid *gg)
+void t2d_pp_reinit(displayd *dsp, GGobiSession *gg)
 {
   gint i, j;
   gchar *label = g_strdup("PP index: (0.0) 0.0000 (0.0)");
@@ -636,7 +636,7 @@ gfloat t2d_calc_indx (array_f pd,
 */
 gboolean
 t2d_switch_index(Tour2DCPanel controls, gint basismeth, displayd *dsp,
-  ggobid *gg)
+  GGobiSession *gg)
 {
   GGobiStage *d = dsp->d;
   gint kout, nrows = d->n_rows;

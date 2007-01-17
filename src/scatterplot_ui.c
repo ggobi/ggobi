@@ -77,7 +77,7 @@ static const gchar *edge_option_ui =
 void
 scatterplot_display_edge_menu_update (displayd * display,
                                       GtkAccelGroup * accel_group,
-                                      ggobid * gg)
+                                      GGobiSession * gg)
 {
   GGobiStage *d = display->d;  /*-- this dataset --*/
   gint nd = g_slist_length (gg->d);

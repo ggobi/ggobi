@@ -60,7 +60,7 @@ typedef  struct {
 #define GGOBI_TIME_SERIES_DISPLAY_GET_CLASS(obj)  		(G_TYPE_INSTANCE_GET_CLASS ((obj), GGOBI_TYPE_TIME_SERIES_DISPLAY, GGobiTimeSeriesDisplayClass))
 
 GType ggobi_time_series_display_get_type();
-displayd *ggobi_time_series_display_new(gint type, gboolean missing_p, GGobiStage *d, ggobid *gg);
+displayd *ggobi_time_series_display_new(gint type, gboolean missing_p, GGobiStage *d, GGobiSession *gg);
 
 typedef struct 
 {
@@ -78,10 +78,10 @@ typedef struct _timeSeriesDisplayd {
 
 
  /* Making these available to ggobiClass.c */
-displayd *timeSeriesDisplayCreate(gboolean missing_p, splotd *sp, GGobiStage *d, ggobid *gg);
+displayd *timeSeriesDisplayCreate(gboolean missing_p, splotd *sp, GGobiStage *d, GGobiSession *gg);
 gint tsplotIsVarPlotted(displayd *display, GSList *cols, GGobiStage *d);
-gboolean tsplotCPanelSet(displayd *dpy, cpaneld *cpanel, ggobid *gg);
-void tsplotDisplaySet(displayd *dpy, ggobid *gg);
+gboolean tsplotCPanelSet(displayd *dpy, cpaneld *cpanel, GGobiSession *gg);
+void tsplotDisplaySet(displayd *dpy, GGobiSession *gg);
 void tsplotVarpanelRefresh(displayd *display, splotd *sp, GGobiStage *d);
 gboolean tsplotHandlesProjection(displayd *dpy, ProjectionMode mode);
 gboolean tsplotHandlesInteraction(displayd *, InteractionMode);
@@ -89,23 +89,23 @@ gboolean tsplotHandlesInteraction(displayd *, InteractionMode);
 #ifdef STORE_SESSION_ENABLED
 void add_xml_tsplot_variables(xmlNodePtr node, GList *plots, displayd *dpy);
 #endif
-void tsplotVarpanelTooltipsSet(displayd *dpy, ggobid *gg, GtkWidget *wx, GtkWidget *wy, GtkWidget *wz, GtkWidget *label);
-gint tsplotPlottedColsGet(displayd *display, gint *cols, GGobiStage *d, ggobid *gg);
+void tsplotVarpanelTooltipsSet(displayd *dpy, GGobiSession *gg, GtkWidget *wx, GtkWidget *wy, GtkWidget *wz, GtkWidget *label);
+gint tsplotPlottedColsGet(displayd *display, gint *cols, GGobiStage *d, GGobiSession *gg);
 
-//GtkWidget *tsplotMenusMake(displayd *dpy, ggobid *gg);
+//GtkWidget *tsplotMenusMake(displayd *dpy, GGobiSession *gg);
 
-GtkWidget *tsplotCPanelWidget(displayd *dpy, gchar **modeName, ggobid *gg);
+GtkWidget *tsplotCPanelWidget(displayd *dpy, gchar **modeName, GGobiSession *gg);
 
 gboolean tsplotEventHandlersToggle(displayd *dpy, splotd *sp, gboolean state, ProjectionMode, InteractionMode imode);
-gboolean tsplotKeyEventHandled(GtkWidget *, displayd *, splotd *sp, GdkEventKey *, ggobid *);
-gchar *tsplot_tree_label(splotd *sp, GGobiStage *d, ggobid *gg);
+gboolean tsplotKeyEventHandled(GtkWidget *, displayd *, splotd *sp, GdkEventKey *, GGobiSession *);
+gchar *tsplot_tree_label(splotd *sp, GGobiStage *d, GGobiSession *gg);
 
 GdkSegment * tsplotAllocWhiskers(displayd *dpy, splotd *sp, gint nrows, GGobiStage *d);
-void tsplotAddPlotLabels(displayd *display, splotd *sp, GdkDrawable *drawable, GGobiStage *d, ggobid *gg);
+void tsplotAddPlotLabels(displayd *display, splotd *sp, GdkDrawable *drawable, GGobiStage *d, GGobiSession *gg);
 
 
 
-splotd *ggobi_time_series_splot_new(displayd *dpy, ggobid *gg);
+splotd *ggobi_time_series_splot_new(displayd *dpy, GGobiSession *gg);
 
 #endif
 

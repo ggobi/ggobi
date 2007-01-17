@@ -132,7 +132,7 @@ static void t2d_ppcool_set_cb (GtkAdjustment *adj, displayd *dsp) {
 
 /*
 static void
-sphere_cb (GtkWidget  *w, ggobid *gg) {
+sphere_cb (GtkWidget  *w, GGobiSession *gg) {
 
   sphere_panel_open(gg);
 }
@@ -153,7 +153,7 @@ TourPPIndex StandardPPIndices[] = {
 
 void t2d_pp_func_cb (GtkWidget *w, displayd *dsp)
 {
-  ggobid *gg;
+  GGobiSession *gg;
   cpaneld *cpanel = NULL;
   gint indx = gtk_combo_box_get_active(GTK_COMBO_BOX(w));
   gchar *label = g_strdup("PP index: (0.000) 0.0000 (0.000)");
@@ -217,7 +217,7 @@ t2d_ppda_configure_cb (GtkWidget *w, GdkEventConfigure *event, displayd *dsp)
 static gint
 t2d_ppda_expose_cb (GtkWidget *w, GdkEventConfigure *event, displayd *dsp)
 {
-  ggobid *gg = dsp->d->gg;
+  GGobiSession *gg = dsp->d->gg;
 /*
   gint margin=10;
   gint j;
@@ -268,7 +268,7 @@ static GtkToggleActionEntry t_entries[] = {
 };
 
 static void
-stage_changed_cb(GGobiStage *stage, GGobiPipelineMessage *msg, ggobid *gg)
+stage_changed_cb(GGobiStage *stage, GGobiPipelineMessage *msg, GGobiSession *gg)
 {
   if (ggobi_pipeline_message_get_n_added_rows(msg) + 
     ggobi_pipeline_message_get_n_removed_rows(msg))
@@ -276,7 +276,7 @@ stage_changed_cb(GGobiStage *stage, GGobiPipelineMessage *msg, ggobid *gg)
 }
 
 void
-tour2dpp_window_open (ggobid *gg) {
+tour2dpp_window_open (GGobiSession *gg) {
   /*GtkWidget **btn, *label, *da, *entry;*/
   GtkWidget *hbox, *vbox, *vbc, *vb, *frame, *tgl, *hb, *opt, *sbar, *lbl;
   GtkObject *adj;

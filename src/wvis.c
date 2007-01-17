@@ -9,10 +9,10 @@
 
 
 /**
- Initialize basic colors for this ggobid.
+ Initialize basic colors for this GGobiSession.
  */
 void
-wvis_init (ggobid  *gg)
+wvis_init (GGobiSession  *gg)
 {
   gg->wvis.window = NULL;
   gg->wvis.npct = 0;

@@ -31,7 +31,7 @@
 static gint
 splot_configure_cb (GtkWidget *w, GdkEventConfigure *event, splotd *sp)
 {
-  ggobid *gg = GGobiFromSPlot(sp);
+  GGobiSession *gg = GGobiFromSPlot(sp);
   displayd *display = (displayd *) sp->displayptr; 
   cpaneld *cpanel = &display->cpanel;
   GGobiStage *d = display->d;
@@ -85,7 +85,7 @@ splot_configure_cb (GtkWidget *w, GdkEventConfigure *event, splotd *sp)
 
   if (cpanel->imode == BRUSH) {
     if (GGOBI_IS_EXTENDED_SPLOT(sp)) {
-      void (*f)(GGobiStage *, splotd *, ggobid *);
+      void (*f)(GGobiStage *, splotd *, GGobiSession *);
       GGobiExtendedSPlotClass *klass;
       klass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);
       f = klass->splot_assign_points_to_bins;
@@ -106,7 +106,7 @@ static gint
 splot_expose_cb (GtkWidget *w, GdkEventExpose *event, splotd *sp)
 {
   gboolean retval = true;
-  ggobid *gg = GGobiFromSPlot (sp);
+  GGobiSession *gg = GGobiFromSPlot (sp);
 
   /*-- sanity checks --*/
   if (sp->pixmap0 == NULL || sp->pixmap1 == NULL)
@@ -122,7 +122,7 @@ splot_expose_cb (GtkWidget *w, GdkEventExpose *event, splotd *sp)
 /*-- this will be called by a key_press_cb for each scatterplot mode --*/
 gboolean
 splot_event_handled (GtkWidget *w, GdkEventKey *event,
-  cpaneld *cpanel, splotd *sp, ggobid *gg)
+  cpaneld *cpanel, splotd *sp, GGobiSession *gg)
 {
   static guint32 etime = (guint32) 0;
   gboolean common_event = true;
@@ -231,7 +231,7 @@ sp_event_handlers_toggle (splotd *sp, gboolean state, ProjectionMode pmode, Inte
 }
 
 void
-splot_set_current (splotd *sp, gboolean state, ggobid *gg) {
+splot_set_current (splotd *sp, gboolean state, GGobiSession *gg) {
 /*
  * Turn on or off the event handlers in sp
 */
@@ -254,7 +254,7 @@ splot_set_current (splotd *sp, gboolean state, ggobid *gg) {
 }
 
 void
-ggobi_splot_set_current_full(displayd *display, splotd *sp, ggobid *gg)
+ggobi_splot_set_current_full(displayd *display, splotd *sp, GGobiSession *gg)
 {
   splotd *sp_prev = gg->current_splot;
   /*-- display and cpanel for outgoing current_splot --*/
@@ -320,7 +320,7 @@ ggobi_splot_set_current_full(displayd *display, splotd *sp, ggobid *gg)
 static gint
 splot_set_current_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
-  ggobid *gg = GGobiFromSPlot(sp);
+  GGobiSession *gg = GGobiFromSPlot(sp);
   displayd *display = (displayd *) sp->displayptr; 
   ggobi_splot_set_current_full(display, sp, gg);
 
@@ -367,7 +367,7 @@ splot_edges_realloc (gint nedges_prev, splotd *sp, GGobiStage *e)
 }
 
 void
-splot_alloc (splotd *sp, displayd *display, ggobid *gg) 
+splot_alloc (splotd *sp, displayd *display, GGobiSession *gg) 
 {
   GGobiStage *d;
   gint nr; 
@@ -390,7 +390,7 @@ splot_alloc (splotd *sp, displayd *display, ggobid *gg)
 }
 
 void
-splot_free (splotd *sp, displayd *display, ggobid *gg) 
+splot_free (splotd *sp, displayd *display, GGobiSession *gg) 
 {
   gtk_widget_hide (sp->da);
 
@@ -409,7 +409,7 @@ splot_free (splotd *sp, displayd *display, ggobid *gg)
 }
 
 splotd *
-splot_new (displayd *display, gint width, gint height, ggobid *gg) 
+splot_new (displayd *display, gint width, gint height, GGobiSession *gg) 
 {
   splotd *sp;
 
@@ -420,7 +420,7 @@ splot_new (displayd *display, gint width, gint height, ggobid *gg)
 }
 
 void
-splot_init(splotd *sp, displayd *display, ggobid *gg) 
+splot_init(splotd *sp, displayd *display, GGobiSession *gg) 
 {
 /*
  * Initialize the widget portion of the splot object
@@ -518,7 +518,7 @@ splot_get_dimensions (splotd *sp, gint *width, gint *height) {
 /*----------------------------------------------------------------------*/
 
 void
-splot_world_to_plane (cpaneld *cpanel, splotd *sp, ggobid *gg)
+splot_world_to_plane (cpaneld *cpanel, splotd *sp, GGobiSession *gg)
 /*
  * project the data from world_data[],
  * the data expressed in 'world coordinates,' to planar[], the
@@ -544,7 +544,7 @@ splot_world_to_plane (cpaneld *cpanel, splotd *sp, ggobid *gg)
 
 void
 splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp,
-  ggobid *gg)
+  GGobiSession *gg)
 /*
  * Use the data in projection coordinates and rescale it to the
  * dimensions of the current plotting window, writing it into screen.
@@ -649,7 +649,7 @@ splot_screen_to_plane (splotd *sp, gint pt, gcoords *eps,
 
 /*
 void
-splot_plane_to_world (splotd *sp, gint ipt, ggobid *gg) 
+splot_plane_to_world (splotd *sp, gint ipt, GGobiSession *gg) 
 {
   displayd *display = (displayd *) sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
@@ -729,7 +729,7 @@ splot_plane_to_world (splotd *sp, gint ipt, ggobid *gg)
 /*
 void
 splot_reverse_pipeline (splotd *sp, gint ipt, gcoords *eps,
-                        gboolean horiz, gboolean vert, ggobid *gg)
+                        gboolean horiz, gboolean vert, GGobiSession *gg)
 {
   displayd *display = (displayd *) sp->displayptr;
   GGobiStage *d = display->d;

@@ -25,11 +25,11 @@
 
 #undef WIN32
 
-static void splot_draw_border (splotd *, GdkDrawable *, ggobid *);
+static void splot_draw_border (splotd *, GdkDrawable *, GGobiSession *);
 
 static void
 splot_check_colors (gushort maxcolorid, gint *ncolors_used,
-  gushort *colors_used, GGobiStage *d, ggobid *gg)
+  gushort *colors_used, GGobiStage *d, GGobiSession *gg)
 {
   colorschemed *scheme = gg->activeColorScheme;
   gchar *message;
@@ -56,7 +56,7 @@ splot_check_colors (gushort maxcolorid, gint *ncolors_used,
 
 /*-- determine whether case m should be plotted --*/
 gboolean
-splot_plot_case (gint m, GGobiStage *d, splotd *sp, displayd *display, ggobid *gg)
+splot_plot_case (gint m, GGobiStage *d, splotd *sp, displayd *display, GGobiSession *gg)
 {
   gboolean draw_case = true;
 
@@ -80,7 +80,7 @@ splot_plot_case (gint m, GGobiStage *d, splotd *sp, displayd *display, ggobid *g
 /*------------------------------------------------------------------------*/
 
 void
-splot_clear_pixmap0 (splotd *sp, ggobid *gg)
+splot_clear_pixmap0 (splotd *sp, GGobiSession *gg)
 {
   colorschemed *scheme = gg->activeColorScheme;
 
@@ -97,7 +97,7 @@ splot_clear_pixmap0 (splotd *sp, ggobid *gg)
 }
 
 void
-splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
+splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, GGobiSession *gg)
 {
   gint k;
   gushort current_color;
@@ -110,7 +110,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
   gboolean loop_over_points;
 
   gint i;
-  gboolean (*f)(splotd *, GGobiStage*, ggobid*, gboolean) = NULL;  /* redraw */
+  gboolean (*f)(splotd *, GGobiStage*, GGobiSession*, gboolean) = NULL;  /* redraw */
 
   GGobiExtendedSPlotClass *klass = NULL;
   GGobiExtendedDisplayClass *displayKlass = NULL;
@@ -241,7 +241,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
 }
 
 void
-splot_clear_pixmap0_binned (splotd *sp, ggobid *gg)
+splot_clear_pixmap0_binned (splotd *sp, GGobiSession *gg)
 {
   icoords loc_clear0, loc_clear1;
   icoords *bin0 = &gg->plot.bin0;
@@ -295,7 +295,7 @@ splot_clear_pixmap0_binned (splotd *sp, ggobid *gg)
 }
 
 void
-splot_draw_to_pixmap0_binned (splotd *sp, gboolean draw_hidden, ggobid *gg)
+splot_draw_to_pixmap0_binned (splotd *sp, gboolean draw_hidden, GGobiSession *gg)
 {
 #ifndef WIN32
   gint ih, iv;
@@ -424,7 +424,7 @@ splot_draw_to_pixmap0_binned (splotd *sp, gboolean draw_hidden, ggobid *gg)
 /*------------------------------------------------------------------------*/
 
 static void
-splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *gg) 
+splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, GGobiSession *gg) 
 {
   displayd *display = (displayd *) sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
@@ -440,7 +440,7 @@ splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *gg)
   gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
 
   if(GGOBI_IS_EXTENDED_SPLOT(sp)) {
-    void (*f)(splotd *, GdkDrawable*, ggobid*);
+    void (*f)(splotd *, GdkDrawable*, GGobiSession*);
     f =  GGOBI_EXTENDED_SPLOT_GET_CLASS(sp)->add_plot_labels;
     if(f) {
       f(sp, drawable, gg);
@@ -452,7 +452,7 @@ splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *gg)
       have a special splot class for the display type but still need
       to do something special. */
   if(GGOBI_IS_EXTENDED_DISPLAY(display)) {
-    void (*f)(displayd *, splotd *, GdkDrawable*, GGobiStage *, ggobid*);
+    void (*f)(displayd *, splotd *, GdkDrawable*, GGobiStage *, GGobiSession*);
     f =  GGOBI_EXTENDED_DISPLAY_GET_CLASS(display)->add_plot_labels;
     if(f)
       f(display, sp, drawable, d, gg);
@@ -466,7 +466,7 @@ splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *gg)
 
 /*-- draw a diamond around the current case --*/
 void
-splot_add_diamond_cue (gint k, splotd *sp, GdkDrawable *drawable, ggobid *gg)
+splot_add_diamond_cue (gint k, splotd *sp, GdkDrawable *drawable, GGobiSession *gg)
 {
   GGobiStage *d = sp->displayptr->d;
   gint diamond_dim = DIAMOND_DIM;
@@ -493,7 +493,7 @@ splot_add_diamond_cue (gint k, splotd *sp, GdkDrawable *drawable, ggobid *gg)
   window. --*/
 void
 splot_add_point_label (gboolean nearest_p, gint k, gboolean top_p, splotd *sp,
-  GdkDrawable *drawable, ggobid *gg)
+  GdkDrawable *drawable, GGobiSession *gg)
 {
   displayd *dsp = sp->displayptr;
   GGobiStage *d = dsp->d;
@@ -540,7 +540,7 @@ splot_add_point_label (gboolean nearest_p, gint k, gboolean top_p, splotd *sp,
 // Generic, for scatterplots and cousins
 void
 splot_add_identify_point_cues(splotd *sp, GdkDrawable *drawable,
-  gint k, gboolean nearest_p, ggobid *gg)
+  gint k, gboolean nearest_p, GGobiSession *gg)
 {
   colorschemed *scheme = gg->activeColorScheme;
 
@@ -558,7 +558,7 @@ splot_add_identify_point_cues(splotd *sp, GdkDrawable *drawable,
 // Messy -- points, edges, bars, ... there's probably a better way
 // to sort this out.
 void
-splot_add_identify_nearest_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg)
+splot_add_identify_nearest_cues (splotd *sp, GdkDrawable *drawable, GGobiSession *gg)
 {
   displayd *display = sp->displayptr;
   gint pt;
@@ -590,7 +590,7 @@ splot_add_identify_nearest_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg)
 /* Points only, so not so messy */
 void
 splot_add_identify_sticky_cues (splotd *sp, GdkDrawable *drawable, gint k,
-  ggobid *gg)
+  GGobiSession *gg)
 {
   if (GGOBI_IS_EXTENDED_SPLOT(sp)) {
     GGobiExtendedSPlotClass *klass;
@@ -607,7 +607,7 @@ splot_add_identify_sticky_cues (splotd *sp, GdkDrawable *drawable, gint k,
 
 void
 splot_add_movepts_cues (splotd *sp, GdkDrawable *drawable,
-  gint k, gboolean nearest, ggobid *gg)
+  gint k, gboolean nearest, GGobiSession *gg)
 {
   displayd *dsp = (displayd *) sp->displayptr;
   GGobiStage *d = dsp->d;
@@ -624,7 +624,7 @@ splot_add_movepts_cues (splotd *sp, GdkDrawable *drawable,
 }
 
 static void
-splot_add_record_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
+splot_add_record_cues (splotd *sp, GdkDrawable *drawable, GGobiSession *gg) {
   gint id;
   GSList *l;
   displayd *display = (displayd *) sp->displayptr;
@@ -677,7 +677,7 @@ splot_add_record_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
 /*------------------------------------------------------------------------*/
 
 static void
-splot_draw_border (splotd *sp, GdkDrawable *drawable, ggobid *gg)
+splot_draw_border (splotd *sp, GdkDrawable *drawable, GGobiSession *gg)
 {
   colorschemed *scheme = gg->activeColorScheme;
 
@@ -700,7 +700,7 @@ splot_draw_border (splotd *sp, GdkDrawable *drawable, ggobid *gg)
 /*------------------------------------------------------------------------*/
 
 void
-splot_pixmap0_to_pixmap1 (splotd *sp, gboolean binned, ggobid *gg) {
+splot_pixmap0_to_pixmap1 (splotd *sp, gboolean binned, GGobiSession *gg) {
   GtkWidget *w = sp->da;
   icoords *loc0 = &gg->plot.loc0;
   icoords *loc1 = &gg->plot.loc1;
@@ -720,7 +720,7 @@ splot_pixmap0_to_pixmap1 (splotd *sp, gboolean binned, ggobid *gg) {
 }
 
 static void
-splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
+splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, GGobiSession *gg)
 {
   displayd *dsp = (displayd *) sp->displayptr;
   GGobiStage *e = dsp->e;
@@ -758,7 +758,7 @@ splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
   }
   
   if (GGOBI_IS_EXTENDED_SPLOT(sp)) {
-    void (*f)(splotd *, GdkDrawable*, ggobid*);
+    void (*f)(splotd *, GdkDrawable*, GGobiSession*);
     splotKlass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);
     f = splotKlass->add_markup_cues;
     if(f) {
@@ -784,7 +784,7 @@ splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
     } else if (cpanel->imode == SCALE) {
 
       if (GGOBI_IS_EXTENDED_SPLOT(sp)) {
-        void (*f)(splotd *, GdkDrawable*, ggobid*);
+        void (*f)(splotd *, GdkDrawable*, GGobiSession*);
         splotKlass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);
         f = splotKlass->add_scaling_cues;
         if(f)
@@ -800,7 +800,7 @@ splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
 
 
 void
-splot_pixmap_to_window (splotd *sp, GdkPixmap *pixmap, ggobid *gg) {
+splot_pixmap_to_window (splotd *sp, GdkPixmap *pixmap, GGobiSession *gg) {
   GtkWidget *w = sp->da;
   gdk_draw_pixmap (sp->da->window, gg->plot_GC, pixmap,
                    0, 0, 0, 0,
@@ -813,7 +813,7 @@ splot_pixmap_to_window (splotd *sp, GdkPixmap *pixmap, ggobid *gg) {
 /*------------------------------------------------------------------------*/
 
 void
-splot_redraw (splotd *sp, RedrawStyle redraw_style, ggobid *gg) {
+splot_redraw (splotd *sp, RedrawStyle redraw_style, GGobiSession *gg) {
   RedrawStyle style;
 
   /*-- sometimes the first draw happens before configure is called --*/

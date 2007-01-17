@@ -121,7 +121,7 @@ subset_ui_display_update (GtkTreeModel *model, GtkTreeIter *iter)
 
 
 static void
-subset_ui_datad_set_cb (GtkTreeSelection *tree_sel, ggobid *gg)
+subset_ui_datad_set_cb (GtkTreeSelection *tree_sel, GGobiSession *gg)
 {
   /*-- Assume that all datad's are included --*/
   GtkTreeIter iter;
@@ -225,7 +225,7 @@ include_all_cb (GtkWidget *w, GtkTreeSelection *tree_sel) {
 
 
 static void 
-subset_ui_tree_view_datad_added_cb (ggobid *gg, GGobiStage *d, GtkTreeModel *model)
+subset_ui_tree_view_datad_added_cb (GGobiSession *gg, GGobiStage *d, GtkTreeModel *model)
 {
   GtkWidget *swin = (GtkWidget *)
     g_object_get_data(G_OBJECT (model), "ggobi-subset-swin");
@@ -238,7 +238,7 @@ CHECK_EVENT_SIGNATURE(subset_ui_tree_view_datad_added_cb,datad_added_f)
 /*------------------------------------------------------------------*/
 
 void
-subset_window_open (ggobid *gg) {
+subset_window_open (GGobiSession *gg) {
 
   GtkWidget *button, *t, *nbook;
   GtkWidget *vbox, *frame, *hb, *vb, *button_hbox, *close_hbox;

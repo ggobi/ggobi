@@ -24,7 +24,7 @@
 
 
 static void
-reset_all_cb (GtkButton * button, ggobid * gg)
+reset_all_cb (GtkButton * button, GGobiSession * gg)
 {
   //GSList *l;
   GGobiStage *d;
@@ -44,7 +44,7 @@ reset_all_cb (GtkButton * button, ggobid * gg)
 }
 
 static void
-undo_last_cb (GtkButton * button, ggobid * gg)
+undo_last_cb (GtkButton * button, GGobiSession * gg)
 {
   GGobiStage *d = gg->current_display->d;
 
@@ -56,14 +56,14 @@ undo_last_cb (GtkButton * button, ggobid * gg)
 }
 
 static void
-move_cluster_cb (GtkWidget * w, ggobid * gg)
+move_cluster_cb (GtkWidget * w, GGobiSession * gg)
 {
   gg->movepts.cluster_p = GTK_TOGGLE_BUTTON (w)->active;
 }
 
 static gchar *mdir_lbl[] = { "Both", "Vertical", "Horizontal" };
 static void
-mdir_cb (GtkWidget * w, ggobid * gg)
+mdir_cb (GtkWidget * w, GGobiSession * gg)
 {
   gg->movepts.direction =
     (enum directiond) gtk_combo_box_get_active (GTK_COMBO_BOX (w));
@@ -76,7 +76,7 @@ mdir_cb (GtkWidget * w, ggobid * gg)
 static gint
 key_press_cb (GtkWidget * w, GdkEventKey * event, splotd * sp)
 {
-  ggobid *gg = GGobiFromSPlot (sp);
+  GGobiSession *gg = GGobiFromSPlot (sp);
   cpaneld *cpanel = &gg->current_display->cpanel;
 
 /*-- add a key_press_cb in each mode, and let it begin with these lines --*/
@@ -91,7 +91,7 @@ key_press_cb (GtkWidget * w, GdkEventKey * event, splotd * sp)
 static gint
 motion_notify_cb (GtkWidget * w, GdkEventMotion * event, splotd * sp)
 {
-  ggobid *gg = GGobiFromSPlot (sp);
+  GGobiSession *gg = GGobiFromSPlot (sp);
   displayd *display = sp->displayptr;
 
   gg->current_splot = sp->displayptr->current_splot = sp;/*-- just in case --*/
@@ -116,7 +116,7 @@ static gint
 button_press_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
 {
   displayd *display = (displayd *) sp->displayptr;
-  ggobid *gg = GGobiFromSPlot (sp);
+  GGobiSession *gg = GGobiFromSPlot (sp);
 
   gg->current_display = display;
   gg->current_splot = sp->displayptr->current_splot = sp;
@@ -142,7 +142,7 @@ static gint
 button_release_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
 {
   gboolean retval = true;
-  ggobid *gg = GGobiFromSPlot (sp);
+  GGobiSession *gg = GGobiFromSPlot (sp);
 
   gg->buttondown = 0;
 
@@ -183,7 +183,7 @@ movepts_event_handlers_toggle (splotd * sp, gboolean state)
 }
 
 void
-cpanel_movepts_make (ggobid * gg)
+cpanel_movepts_make (GGobiSession * gg)
 {
   modepaneld *panel;
   GtkWidget *btn, *opt, *box, *hb, *lbl;

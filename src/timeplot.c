@@ -40,7 +40,7 @@ static const gchar *timeplot_ui =
 
 
 void
-tsplot_reset_arrangement (displayd * display, gint arrangement, ggobid * gg)
+tsplot_reset_arrangement (displayd * display, gint arrangement, GGobiSession * gg)
 {
   GList *l;
   GtkWidget *frame, *w;
@@ -88,14 +88,14 @@ tsplot_reset_arrangement (displayd * display, gint arrangement, ggobid * gg)
 
 displayd *
 tsplot_new_with_vars (gboolean missing_p, gint nvars, gint * vars,
-                      GGobiStage * d, ggobid * gg)
+                      GGobiStage * d, GGobiSession * gg)
 {
   return (tsplot_new (NULL, missing_p, nvars, vars, d, gg));
 }
 
 displayd *
 tsplot_new (displayd * display, gboolean missing_p, gint nvars, gint * vars,
-            GGobiStage * d, ggobid * gg)
+            GGobiStage * d, GGobiSession * gg)
 {
   GtkWidget *vbox, *frame;
   gint i, timeVariable, cur;
@@ -274,7 +274,7 @@ tsplot_var_selected (gint jvar, displayd * display)
 
 gboolean
 tsplot_varsel (GtkWidget * w, displayd * display, splotd * sp, gint jvar,
-               gint toggle, gint mouse, cpaneld * cpanel, ggobid * gg)
+               gint toggle, gint mouse, cpaneld * cpanel, GGobiSession * gg)
 {
   gboolean redraw = true;
   gint nplots = g_list_length (gg->current_display->splots);
@@ -387,7 +387,7 @@ tsplot_varsel (GtkWidget * w, displayd * display, splotd * sp, gint jvar,
 /*--------------------------------------------------------------------*/
 
 static void
-tsplot_rewhisker (splotd * sp, ggobid * gg)
+tsplot_rewhisker (splotd * sp, GGobiSession * gg)
 {
   gint i, k, n;
   displayd *display = (displayd *) sp->displayptr;
@@ -418,7 +418,7 @@ tsplot_rewhisker (splotd * sp, ggobid * gg)
 
 /*-- set the positions of the whiskers for sp and prev_sp --*/
 void
-tsplot_whiskers_make (splotd * sp, displayd * display, ggobid * gg)
+tsplot_whiskers_make (splotd * sp, displayd * display, GGobiSession * gg)
 {
   GList *splist;
   splotd *splot;

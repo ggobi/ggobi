@@ -24,26 +24,26 @@
 #include "externs.h"
 
 
-static void tsWorldToPlane(splotd *sp, GGobiStage *d, ggobid *gg);
-static void tsWithinPlaneToScreen(splotd *sp, displayd *display, GGobiStage *d, ggobid *gg);
-static gboolean tsDrawEdge_p(splotd *sp, gint m, GGobiStage *d, GGobiStage *e, ggobid *gg);
-static gboolean tsDrawCase_p(splotd *sp, gint m, GGobiStage *d, ggobid *gg);
-static void tsAddPlotLabels(splotd *sp, GdkDrawable *drawable, ggobid *gg) ;
+static void tsWorldToPlane(splotd *sp, GGobiStage *d, GGobiSession *gg);
+static void tsWithinPlaneToScreen(splotd *sp, displayd *display, GGobiStage *d, GGobiSession *gg);
+static gboolean tsDrawEdge_p(splotd *sp, gint m, GGobiStage *d, GGobiStage *e, GGobiSession *gg);
+static gboolean tsDrawCase_p(splotd *sp, gint m, GGobiStage *d, GGobiSession *gg);
+static void tsAddPlotLabels(splotd *sp, GdkDrawable *drawable, GGobiSession *gg) ;
 static void tsWithinDrawBinned(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc);
 static void tsShowWhiskers(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc);
 static GdkSegment * tsAllocWhiskers(GdkSegment *, splotd *sp, gint nrows, GGobiStage *d);
-static gchar *tsTreeLabel(splotd *sp, GGobiStage *d, ggobid *gg);
+static gchar *tsTreeLabel(splotd *sp, GGobiStage *d, GGobiSession *gg);
 
 
 
 void
-tsWorldToPlane(splotd *sp,  GGobiStage *d, ggobid *gg)
+tsWorldToPlane(splotd *sp,  GGobiStage *d, GGobiSession *gg)
 {
       xy_reproject (sp, d->world.vals, d, gg);
 }
 
 splotd *
-ggobi_time_series_splot_new(displayd *dpy, ggobid *gg)
+ggobi_time_series_splot_new(displayd *dpy, GGobiSession *gg)
 {
   timeSeriesSPlotd *bsp;
   splotd *sp;
@@ -64,13 +64,13 @@ tsDestroy(splotd *sp)
 }
 
 void
-tsWithinPlaneToScreen(splotd *sp, displayd *display, GGobiStage *d, ggobid *gg)
+tsWithinPlaneToScreen(splotd *sp, displayd *display, GGobiStage *d, GGobiSession *gg)
 {
       tsplot_whiskers_make (sp, display, gg);
 }
 
 gboolean
-tsDrawEdge_p(splotd *sp, gint m, GGobiStage *d, GGobiStage *e, ggobid *gg)
+tsDrawEdge_p(splotd *sp, gint m, GGobiStage *d, GGobiStage *e, GGobiSession *gg)
 {
    gboolean draw_edge = true;
 
@@ -79,13 +79,13 @@ tsDrawEdge_p(splotd *sp, gint m, GGobiStage *d, GGobiStage *e, ggobid *gg)
 }
 
 gboolean
-tsDrawCase_p(splotd *sp, gint m, GGobiStage *d, ggobid *gg)
+tsDrawCase_p(splotd *sp, gint m, GGobiStage *d, GGobiSession *gg)
 {
   return !(ggobi_stage_is_missing(d, m, sp->xyvars.y) || ggobi_stage_is_missing(d, m, sp->xyvars.x));
 }
 
 void
-tsAddPlotLabels(splotd *sp, GdkDrawable *drawable, ggobid *gg) 
+tsAddPlotLabels(splotd *sp, GdkDrawable *drawable, GGobiSession *gg) 
 {
   displayd *display = sp->displayptr;
   GList *l = display->splots;
@@ -133,7 +133,7 @@ tsAllocWhiskers(GdkSegment *whiskers, splotd *sp, gint nrows, GGobiStage *d)
 }
 
 gchar *
-tsTreeLabel(splotd *sp, GGobiStage *d, ggobid *gg)
+tsTreeLabel(splotd *sp, GGobiStage *d, GGobiSession *gg)
 {
   return(ggobi_stage_get_col_name(d, sp->xyvars.y));
 }
@@ -152,7 +152,7 @@ XX Incomplete. Need to finish off the construction of splotd's directly
  from command line language rather than as part of the displayd.
 */
 splotd *
-tsplotCreateWithVars(displayd *display, gint *vars, gint nvar, ggobid *gg)
+tsplotCreateWithVars(displayd *display, gint *vars, gint nvar, GGobiSession *gg)
 {
    splotd *sp;
    if(nvar < 1) {
@@ -173,14 +173,14 @@ tsplotCreateWithVars(displayd *display, gint *vars, gint nvar, ggobid *gg)
 }
 
 static void
-splotAssignPointsToBins(GGobiStage *d, splotd *sp, ggobid *gg)
+splotAssignPointsToBins(GGobiStage *d, splotd *sp, GGobiSession *gg)
 {
   assign_points_to_bins (d, sp, gg);
 }
 
 static void
 splotScreenToTform(cpaneld *cpanel, splotd *sp, icoords *scr,
-		   fcoords *tfd, ggobid *gg)
+		   fcoords *tfd, GGobiSession *gg)
 {
   gcoords planar, world;
   greal precis = (greal) PRECISION1;

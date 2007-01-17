@@ -35,10 +35,10 @@
 #define T1DOFF false
 
 static void tour1d_speed_set_display(gfloat slidepos, displayd *dsp); 
-void tour1d_write_video(ggobid *gg);
+void tour1d_write_video(GGobiSession *gg);
 
 #ifdef TESTING_TOUR_STEP
-void tour1d_step_cb(displayd *dsp, tour td, gint projdim, ggobid *gg,
+void tour1d_step_cb(displayd *dsp, tour td, gint projdim, GGobiSession *gg,
   void *display)
 {
   g_printerr ("tour_step\n");
@@ -47,7 +47,7 @@ void tour1d_step_cb(displayd *dsp, tour td, gint projdim, ggobid *gg,
 
 
 void
-display_tour1d_init_null (displayd *dsp, ggobid *gg)
+display_tour1d_init_null (displayd *dsp, GGobiSession *gg)
 {
   arrayd_init_null(&dsp->t1d.Fa);
   arrayd_init_null(&dsp->t1d.Fz);
@@ -76,7 +76,7 @@ display_tour1d_init_null (displayd *dsp, ggobid *gg)
 }
 
 void
-alloc_tour1d (displayd *dsp, ggobid *gg)
+alloc_tour1d (displayd *dsp, GGobiSession *gg)
 {
   GGobiStage *d = dsp->d;
   gint nc = d->n_cols;
@@ -109,7 +109,7 @@ alloc_tour1d (displayd *dsp, ggobid *gg)
 
 /*-- eliminate the nc columns contained in *cols --*/
 void
-tour1d_realloc_down (GSList *cols, GGobiStage *d, ggobid *gg)
+tour1d_realloc_down (GSList *cols, GGobiStage *d, GGobiSession *gg)
 {
   displayd *dsp;
   GList *l;
@@ -167,7 +167,7 @@ free_tour1d(displayd *dsp)
   arrayd_free(&dsp->t1d_manbasis, 0, 0);
 }
 
-void tour1d_snap(ggobid *gg)
+void tour1d_snap(GGobiSession *gg)
 {
   displayd *dsp = gg->current_display;
   splotd *sp = gg->current_splot;
@@ -182,7 +182,7 @@ void tour1d_snap(ggobid *gg)
   }
 }
 
-void tour1d_video(ggobid *gg)
+void tour1d_video(GGobiSession *gg)
 {
   displayd *dsp = gg->current_display;
   if (dsp == NULL)
@@ -191,7 +191,7 @@ void tour1d_video(ggobid *gg)
   dsp->t1d_video = !dsp->t1d_video;
 }
 
-void tour1d_write_video(ggobid *gg) 
+void tour1d_write_video(GGobiSession *gg) 
 {
   displayd *dsp = gg->current_display;
   splotd *sp = gg->current_splot;
@@ -212,7 +212,7 @@ void tour1d_write_video(ggobid *gg)
 }
 
 void 
-display_tour1d_init (displayd *dsp, ggobid *gg) 
+display_tour1d_init (displayd *dsp, GGobiSession *gg) 
 {
   gint i, j;
   GGobiStage *d = dsp->d;
@@ -282,7 +282,7 @@ display_tour1d_init (displayd *dsp, ggobid *gg)
 }
 
 void
-tour1d_fade_vars (gboolean fade, ggobid *gg) 
+tour1d_fade_vars (gboolean fade, GGobiSession *gg) 
 {
   gg->tour1d.fade_vars = fade;
 }
@@ -290,7 +290,7 @@ tour1d_fade_vars (gboolean fade, ggobid *gg)
 void
 tour1d_all_vars (displayd *dsp) 
 {
-  ggobid *gg = dsp->ggobi;
+  GGobiSession *gg = dsp->ggobi;
   GGobiStage *d = dsp->d;
   gint j;
 
@@ -332,20 +332,20 @@ tour1d_speed_set_display(gfloat slidepos, displayd *dsp)
 
 }
 
-void tour1d_speed_set(gfloat slidepos, ggobid *gg) 
+void tour1d_speed_set(gfloat slidepos, GGobiSession *gg) 
 {
     tour1d_speed_set_display(slidepos, gg->current_display); 
 }
 
 #ifdef TESTING_TOUR_STEP
-void tour1d_step_cb(displayd *dsp, tour td, gint projdim, ggobid *gg,
+void tour1d_step_cb(displayd *dsp, tour td, gint projdim, GGobiSession *gg,
   void *display)
 {
   g_printerr ("tour_step\n");
 }
 #endif
 
-void tour1d_pause (cpaneld *cpanel, gboolean state, displayd *dsp, ggobid *gg)
+void tour1d_pause (cpaneld *cpanel, gboolean state, displayd *dsp, GGobiSession *gg)
 {
   if (dsp == NULL)
     return;
@@ -361,7 +361,7 @@ void tour1d_pause (cpaneld *cpanel, gboolean state, displayd *dsp, ggobid *gg)
 
 /*-- add/remove jvar to/from the subset of variables that <may> be active --*/
 static gboolean
-tour1d_subset_var_set (gint jvar, GGobiStage *d, displayd *dsp, ggobid *gg)
+tour1d_subset_var_set (gint jvar, GGobiStage *d, displayd *dsp, GGobiSession *gg)
 {
   gboolean in_subset = dsp->t1d.subset_vars_p.els[jvar];
   gint j, k;
@@ -406,7 +406,7 @@ tour1d_subset_var_set (gint jvar, GGobiStage *d, displayd *dsp, ggobid *gg)
 }
 
 void 
-tour1d_active_var_set (gint jvar, GGobiStage *d, displayd *dsp, ggobid *gg)
+tour1d_active_var_set (gint jvar, GGobiStage *d, displayd *dsp, GGobiSession *gg)
 {
   gint j, k;
   gboolean in_subset = dsp->t1d.subset_vars_p.els[jvar];
@@ -484,7 +484,7 @@ tour1d_active_var_set (gint jvar, GGobiStage *d, displayd *dsp, ggobid *gg)
 }
 
 static void
-tour1d_manip_var_set (gint j, gint btn, ggobid *gg)
+tour1d_manip_var_set (gint j, gint btn, GGobiSession *gg)
 {
   displayd *dsp = gg->current_display;
 
@@ -493,7 +493,7 @@ tour1d_manip_var_set (gint j, gint btn, ggobid *gg)
 }
 
 gboolean
-tour1d_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse, GGobiStage *d, ggobid *gg)
+tour1d_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse, GGobiStage *d, GGobiSession *gg)
 {
   displayd *dsp = gg->current_display;
   gboolean redraw = true;
@@ -554,7 +554,7 @@ tour1d_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse, GGobiStage *d, 
 }
 
 void
-tour1d_projdata(splotd *sp, greal **world_data, GGobiStage *d, ggobid *gg)
+tour1d_projdata(splotd *sp, greal **world_data, GGobiStage *d, GGobiSession *gg)
 {
   gint j, m;
   displayd *dsp = (displayd *) sp->displayptr;
@@ -638,7 +638,7 @@ tour1d_projdata(splotd *sp, greal **world_data, GGobiStage *d, ggobid *gg)
 }
 
 void
-tour1d_run(displayd *dsp, ggobid *gg)
+tour1d_run(displayd *dsp, GGobiSession *gg)
 {
   GGobiStage *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
@@ -646,7 +646,7 @@ tour1d_run(displayd *dsp, ggobid *gg)
   gboolean revert_random = false;
   gint pathprob = 0;
   gint i, nv;
-  extern void t1d_ppdraw_think(displayd *, ggobid *);
+  extern void t1d_ppdraw_think(displayd *, GGobiSession *);
 
   /* Controls interpolation steps */
   if (!dsp->t1d.get_new_target && 
@@ -790,7 +790,7 @@ g_printerr ("\n");*/
 }
 
 void
-tour1d_do_step(displayd *dsp, ggobid *gg)
+tour1d_do_step(displayd *dsp, GGobiSession *gg)
 {
   tour1d_run(dsp, gg);
 }
@@ -798,7 +798,7 @@ tour1d_do_step(displayd *dsp, ggobid *gg)
 gint
 tour1d_idle_func (displayd *dsp)
 {
-  ggobid *gg = GGobiFromDisplay (dsp);
+  GGobiSession *gg = GGobiFromDisplay (dsp);
   cpaneld *cpanel = &dsp->cpanel;
   gboolean doit = !cpanel->t1d.paused;
 
@@ -810,7 +810,7 @@ tour1d_idle_func (displayd *dsp)
   return (doit);
 }
 
-void tour1d_func (gboolean state, displayd *dsp, ggobid *gg)
+void tour1d_func (gboolean state, displayd *dsp, GGobiSession *gg)
 {
   if (state) {
     if (dsp->t1d.idled == 0) {
@@ -827,7 +827,7 @@ void tour1d_func (gboolean state, displayd *dsp, ggobid *gg)
   }
 }
 
-void tour1d_reinit(ggobid *gg)
+void tour1d_reinit(GGobiSession *gg)
 {
   gint i, j;
   displayd *dsp = gg->current_display;
@@ -856,7 +856,7 @@ void tour1d_reinit(ggobid *gg)
     t1d_pp_reinit(dsp, gg);
 }
 
-void tour1d_scramble(ggobid *gg)
+void tour1d_scramble(GGobiSession *gg)
 {
   int i, j;
   displayd *dsp = gg->current_display;
@@ -896,7 +896,7 @@ tour1d_manip_init(gint p1, gint p2, splotd *sp)
   displayd *dsp = (displayd *) sp->displayptr;
   GGobiStage *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
-  ggobid *gg = GGobiFromSPlot(sp);
+  GGobiSession *gg = GGobiFromSPlot(sp);
   gint j;
   gint n1vars = dsp->t1d.nactive;
   gboolean dontdoit = false;
@@ -951,7 +951,7 @@ tour1d_manip_init(gint p1, gint p2, splotd *sp)
 }
 
 void
-tour1d_manip(gint p1, gint p2, splotd *sp, ggobid *gg) 
+tour1d_manip(gint p1, gint p2, splotd *sp, GGobiSession *gg) 
 {
   displayd *dsp = (displayd *) sp->displayptr;
   GGobiStage *d = dsp->d;
@@ -1041,7 +1041,7 @@ tour1d_manip_end(splotd *sp)
 {
   displayd *dsp = (displayd *) sp->displayptr;
   cpaneld *cpanel = &dsp->cpanel;
-  ggobid *gg = GGobiFromSPlot(sp);
+  GGobiSession *gg = GGobiFromSPlot(sp);
 
   disconnect_motion_signal (sp);
 

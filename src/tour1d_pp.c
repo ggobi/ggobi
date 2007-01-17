@@ -60,11 +60,11 @@ The authors can be contacted at the following email addresses:
   }
 }*/
 
-void t1d_pptemp_set(gfloat slidepos, displayd *dsp, ggobid *gg) {
+void t1d_pptemp_set(gfloat slidepos, displayd *dsp, GGobiSession *gg) {
   dsp->t1d_pp_op.temp_start = slidepos;
 }
 
-void t1d_ppcool_set(gfloat slidepos, displayd *dsp, ggobid *gg) {
+void t1d_ppcool_set(gfloat slidepos, displayd *dsp, GGobiSession *gg) {
   dsp->t1d_pp_op.cooling = slidepos;
 }
 
@@ -544,7 +544,7 @@ void t1d_optimz(gint optimz_on, gboolean *nt, gint *bm, displayd *dsp) {
   *bm = bas_meth;
 }
 
-void t1d_clear_pppixmap(displayd *dsp, ggobid *gg)
+void t1d_clear_pppixmap(displayd *dsp, GGobiSession *gg)
 {
   colorschemed *scheme = gg->activeColorScheme;
   gint margin=10;
@@ -568,7 +568,7 @@ void t1d_clear_pppixmap(displayd *dsp, ggobid *gg)
                    wid, hgt);
 }
 
-void t1d_clear_ppda(displayd *dsp, ggobid *gg)
+void t1d_clear_ppda(displayd *dsp, GGobiSession *gg)
 {
   gint i;
 
@@ -584,7 +584,7 @@ void t1d_clear_ppda(displayd *dsp, ggobid *gg)
   t1d_clear_pppixmap(dsp, gg);
 }
 
-void t1d_ppdraw_all(gint wid, gint hgt, gint margin, displayd *dsp, ggobid *gg)
+void t1d_ppdraw_all(gint wid, gint hgt, gint margin, displayd *dsp, GGobiSession *gg)
 {
   /*gint xpos, ypos, xstrt, ystrt;*/
   GdkPoint pptrace[100];
@@ -609,7 +609,7 @@ void t1d_ppdraw_all(gint wid, gint hgt, gint margin, displayd *dsp, ggobid *gg)
 
 /* This is writes text to the pp window to in form the
 user that optimize is finding a new maximum */ 
-void t1d_ppdraw_think(displayd *dsp, ggobid *gg)
+void t1d_ppdraw_think(displayd *dsp, GGobiSession *gg)
 {
   splotd *sp = (splotd *) g_list_nth_data (dsp->splots, 0);
   colorschemed *scheme = gg->activeColorScheme;
@@ -632,7 +632,7 @@ void t1d_ppdraw_think(displayd *dsp, ggobid *gg)
 }
 
 /* This is the pp index plot drawing routine */ 
-void t1d_ppdraw(gfloat pp_indx_val, displayd *dsp, ggobid *gg)
+void t1d_ppdraw(gfloat pp_indx_val, displayd *dsp, GGobiSession *gg)
 {
   colorschemed *scheme = gg->activeColorScheme;
   gint margin=10;
@@ -680,7 +680,7 @@ void t1d_ppdraw(gfloat pp_indx_val, displayd *dsp, ggobid *gg)
   g_free (label);
 }
 
-void t1d_pp_reinit(displayd *dsp, ggobid *gg)
+void t1d_pp_reinit(displayd *dsp, GGobiSession *gg)
 {
   gint i, j;
   gchar *label = g_strdup("PP index: (0.0) 0.0000 (0.0)");
@@ -733,7 +733,7 @@ gfloat t1d_calc_indx (array_f pd,
 }
 
 gboolean t1d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
-  ggobid *gg)
+  GGobiSession *gg)
 {
   GGobiStage *d = dsp->d;
   gint kout, nrows = d->n_rows;

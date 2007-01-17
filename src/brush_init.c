@@ -92,7 +92,7 @@ brush_activate (gboolean state, displayd * display, splotd * sp)
     return redraw_style;
 
   if (GGOBI_IS_EXTENDED_SPLOT (sp)) {
-    void (*f) (GGobiStage *, splotd *, ggobid *);
+    void (*f) (GGobiStage *, splotd *, GGobiSession *);
     GGobiExtendedSPlotClass *klass;
     klass = GGOBI_EXTENDED_SPLOT_GET_CLASS (sp);
     if (state) {

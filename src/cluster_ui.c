@@ -20,11 +20,11 @@
 
 #include "ggobi-stage-filter.h"
 
-static void exclusion_notebook_adddata_cb (ggobid *, GGobiStage *,
+static void exclusion_notebook_adddata_cb (GGobiSession *, GGobiStage *,
                                            void *notebook);
 
 static void
-destroyit (gboolean kill, ggobid * gg)
+destroyit (gboolean kill, GGobiSession * gg)
 {
   gint n, nrows;
   GSList *l;
@@ -54,14 +54,14 @@ destroyit (gboolean kill, ggobid * gg)
 
 /*-- called when closed from the close button --*/
 static void
-close_btn_cb (GtkWidget * w, gint response, ggobid * gg)
+close_btn_cb (GtkWidget * w, gint response, GGobiSession * gg)
 {
   destroyit (true, gg);
 }
 
 /*-- called when closed from the window manager --*/
 static void
-close_wmgr_cb (GtkWidget * w, GdkEvent * event, ggobid * gg)
+close_wmgr_cb (GtkWidget * w, GdkEvent * event, GGobiSession * gg)
 {
   destroyit (true, gg);
 }
@@ -70,7 +70,7 @@ static gint
 cluster_symbol_show (GtkWidget * w, GdkEventExpose * event, gpointer cbd)
 {
   gint k = GPOINTER_TO_INT (cbd);
-  ggobid *gg = GGobiFromWidget (w, true);
+  GGobiSession *gg = GGobiFromWidget (w, true);
   icoords pos;
   glyphd g;
   GGobiStage *d = datad_get_from_notebook(gg->cluster_ui.notebook);
@@ -94,7 +94,7 @@ cluster_symbol_show (GtkWidget * w, GdkEventExpose * event, gpointer cbd)
 }
 
 void
-cluster_table_labels_update (GGobiStage * d, ggobid * gg)
+cluster_table_labels_update (GGobiStage * d, GGobiSession * gg)
 {
   gint k;
   gchar *str;
@@ -123,7 +123,7 @@ hide_cluster_cb (GtkToggleButton * btn, gpointer cbd)
 {
   gint k = GPOINTER_TO_INT (cbd);
   gint i;
-  ggobid *gg = GGobiFromWidget (GTK_WIDGET (btn), true);
+  GGobiSession *gg = GGobiFromWidget (GTK_WIDGET (btn), true);
   GGobiStage *d = datad_get_from_notebook(gg->cluster_ui.notebook);
   gboolean changed = false;
 
@@ -149,7 +149,7 @@ hide_cluster_cb (GtkToggleButton * btn, gpointer cbd)
 
 /*-- include or exclude hidden cases --*/
 gint
-include_hiddens (gboolean include, GGobiStage * d, ggobid * gg)
+include_hiddens (gboolean include, GGobiStage * d, GGobiSession * gg)
 {
   gint i;
   displayd *dsp = gg->current_display;
@@ -213,13 +213,13 @@ include_hiddens (gboolean include, GGobiStage * d, ggobid * gg)
 }
 
 static void
-exclude_hiddens_cb (GtkWidget * w, ggobid * gg)
+exclude_hiddens_cb (GtkWidget * w, GGobiSession * gg)
 {
   GGobiStage *d = datad_get_from_notebook(gg->cluster_ui.notebook);
   include_hiddens (false, d, gg);
 }
 static void
-include_hiddens_cb (GtkWidget * w, ggobid * gg)
+include_hiddens_cb (GtkWidget * w, GGobiSession * gg)
 {
   GGobiStage *d = datad_get_from_notebook(gg->cluster_ui.notebook);
   include_hiddens (true, d, gg);
@@ -230,7 +230,7 @@ cluster_symbol_cb (GtkWidget * w, GdkEventExpose * event, gpointer cbd)
 {
   /*-- reset the glyph and color of this glyph to the current values --*/
   gint n = GPOINTER_TO_INT (cbd);
-  ggobid *gg = GGobiFromWidget (w, true);
+  GGobiSession *gg = GGobiFromWidget (w, true);
   GGobiStage *d = datad_get_from_notebook(gg->cluster_ui.notebook);
   GGobiStage *f = ggobi_stage_find(ggobi_stage_get_root(d), GGOBI_MAIN_STAGE_FILTER);
   gint k, i;
@@ -315,7 +315,7 @@ cluster_symbol_cb (GtkWidget * w, GdkEventExpose * event, gpointer cbd)
 }
 
 void
-cluster_add (gint k, GGobiStage * d, ggobid * gg)
+cluster_add (gint k, GGobiStage * d, GGobiSession * gg)
 {
   gchar *str;
   gint dawidth = 2 * NGLYPHSIZES + 1 + 10;
@@ -387,7 +387,7 @@ cluster_add (gint k, GGobiStage * d, ggobid * gg)
 }
 
 void
-cluster_free (gint k, GGobiStage * d, ggobid * gg)
+cluster_free (gint k, GGobiStage * d, GGobiSession * gg)
 {
   if (d->clusvui[k].da) {
     gtk_widget_destroy (d->clusvui[k].da);
@@ -400,14 +400,14 @@ cluster_free (gint k, GGobiStage * d, ggobid * gg)
 
 
 static void
-update_cb (GtkWidget * w, ggobid * gg)
+update_cb (GtkWidget * w, GGobiSession * gg)
 {
   GGobiStage *d = datad_get_from_notebook(gg->cluster_ui.notebook);
   splotd *sp = gg->current_splot;
 
   //ggobi_stage_set_rows_in_plot(d);
   if (GGOBI_IS_EXTENDED_SPLOT (sp)) {
-    void (*f) (GGobiStage *, splotd *, ggobid *);
+    void (*f) (GGobiStage *, splotd *, GGobiSession *);
     GGobiExtendedSPlotClass *klass;
     klass = GGOBI_EXTENDED_SPLOT_GET_CLASS (sp);
     f = klass->splot_assign_points_to_bins;
@@ -425,7 +425,7 @@ update_cb (GtkWidget * w, ggobid * gg)
 }
 
 static gboolean
-nclusters_changed (ggobid * gg)
+nclusters_changed (GGobiSession * gg)
 {
   GGobiStage *d;
   gint k, nrows = 0;
@@ -456,7 +456,7 @@ nclusters_changed (ggobid * gg)
 
 
 void
-cluster_table_update (GGobiStage * d, ggobid * gg)
+cluster_table_update (GGobiStage * d, GGobiSession * gg)
 {
   if (gg->cluster_ui.window != NULL) {
     if (nclusters_changed (gg)) {  /*-- for any of the datad's --*/
@@ -469,7 +469,7 @@ cluster_table_update (GGobiStage * d, ggobid * gg)
 }
 
 static void
-exclusion_notebook_adddata_cb (ggobid * gg, GGobiStage * d, void *notebook)
+exclusion_notebook_adddata_cb (GGobiSession * gg, GGobiStage * d, void *notebook)
 {
   cluster_window_open (gg);
   return;                       /* Should this return a boolean? */
@@ -478,7 +478,7 @@ exclusion_notebook_adddata_cb (ggobid * gg, GGobiStage * d, void *notebook)
 CHECK_EVENT_SIGNATURE (exclusion_notebook_adddata_cb, datad_added_f)
 
 
-     void cluster_window_open (ggobid * gg)
+     void cluster_window_open (GGobiSession * gg)
 {
   GtkWidget *scrolled_window = NULL;
   GtkWidget *tebox, *btn, *hbox, *lbl;

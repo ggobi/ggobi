@@ -27,7 +27,7 @@
 /*                   draw tour axes                                       */
 /*------------------------------------------------------------------------*/
 void
-splot_draw_tour_axes (splotd * sp, GdkDrawable * drawable, ggobid * gg)
+splot_draw_tour_axes (splotd * sp, GdkDrawable * drawable, GGobiSession * gg)
 {
   gint j, k, ix, iy, nc;
   displayd *dsp = (displayd *) sp->displayptr;

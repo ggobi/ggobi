@@ -25,7 +25,7 @@
 #include <math.h>
 
 void
-scale_update_set (gboolean update, displayd * dsp, ggobid * gg)
+scale_update_set (gboolean update, displayd * dsp, GGobiSession * gg)
 {
   cpaneld *cpanel = &dsp->cpanel;
   GtkWidget *panel =
@@ -55,7 +55,7 @@ scale_update_set (gboolean update, displayd * dsp, ggobid * gg)
 
 /* Use the hscale widget name to find the corresponding adjustment */
 static GtkAdjustment *
-scale_adjustment_find_by_name (gchar * name, ggobid * gg)
+scale_adjustment_find_by_name (gchar * name, GGobiSession * gg)
 {
   GtkWidget *panel, *w;
 
@@ -77,7 +77,7 @@ increment_adjustment (GtkAdjustment * adj, gdouble step, gdouble eps)
 }
 
 static void
-zoom_cb (GtkAdjustment * adj, ggobid * gg)
+zoom_cb (GtkAdjustment * adj, GGobiSession * gg)
 {
   displayd *display = gg->current_display;
   splotd *sp = gg->current_splot;
@@ -125,7 +125,7 @@ zoom_cb (GtkAdjustment * adj, ggobid * gg)
 }
 
 static void
-pan_cb (GtkAdjustment * adj, ggobid * gg)
+pan_cb (GtkAdjustment * adj, GGobiSession * gg)
 {
   displayd *display = gg->current_display;
   splotd *sp = gg->current_splot;
@@ -154,7 +154,7 @@ pan_cb (GtkAdjustment * adj, ggobid * gg)
 void
 scale_pan_reset (displayd * display)
 {
-  ggobid *gg = display->ggobi;
+  GGobiSession *gg = display->ggobi;
   splotd *sp = gg->current_splot;
   GtkAdjustment *adj;
   gdouble value = 0.0;
@@ -178,7 +178,7 @@ scale_pan_reset (displayd * display)
 void
 scale_zoom_reset (displayd * dsp)
 {
-  ggobid *gg = dsp->ggobi;
+  GGobiSession *gg = dsp->ggobi;
   splotd *sp = gg->current_splot;
   GtkAdjustment *adj;
   gdouble value = log10 (SCALE_DEFAULT);
@@ -204,7 +204,7 @@ scale_zoom_reset (displayd * dsp)
 /*--------------------------------------------------------------------*/
 
 static void
-aspect_ratio_cb (GtkToggleButton * button, ggobid * gg)
+aspect_ratio_cb (GtkToggleButton * button, GGobiSession * gg)
 {
   displayd *display = gg->current_display;
   cpaneld *cpanel = &display->cpanel;
@@ -224,7 +224,7 @@ If ctrl-alt-z is pressed, toggle on and off click-style zooming.
 static gint
 key_press_cb (GtkWidget * w, GdkEventKey * event, splotd * sp)
 {
-  ggobid *gg = GGobiFromSPlot (sp);
+  GGobiSession *gg = GGobiFromSPlot (sp);
   cpaneld *cpanel = &gg->current_display->cpanel;
 
 /*-- add a key_press_cb in each mode, and let it begin with these lines --*/
@@ -238,7 +238,7 @@ static gint
 motion_notify_cb (GtkWidget * w, GdkEventMotion * event, splotd * sp)
 {
   gboolean button1_p, button2_p;
-  ggobid *gg = GGobiFromSPlot (sp);
+  GGobiSession *gg = GGobiFromSPlot (sp);
   displayd *display = (displayd *) sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
 
@@ -297,7 +297,7 @@ static gint
 button_press_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
 {
   gboolean retval = true;
-  ggobid *gg = GGobiFromSPlot (sp);
+  GGobiSession *gg = GGobiFromSPlot (sp);
   gboolean button1_p, button2_p;
   mousepos_get_pressed (w, event, &button1_p, &button2_p, sp);
 
@@ -321,7 +321,7 @@ static gint
 button_release_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
 {
   gboolean retval = true;
-  ggobid *gg = GGobiFromSPlot (sp);
+  GGobiSession *gg = GGobiFromSPlot (sp);
   GdkModifierType state;
   displayd *dsp = sp->displayptr;
   cpaneld *cpanel = &dsp->cpanel;
@@ -384,7 +384,7 @@ scale_event_handlers_toggle (splotd * sp, gboolean state)
 }
 
 void
-cpanel_scale_make (ggobid * gg)
+cpanel_scale_make (GGobiSession * gg)
 {
   modepaneld *panel;
   GtkWidget *f, *vb;
@@ -479,7 +479,7 @@ cpanel_scale_make (ggobid * gg)
 /*--------------------------------------------------------------------*/
 
 void
-cpanel_scale_init (cpaneld * cpanel, ggobid * gg)
+cpanel_scale_init (cpaneld * cpanel, GGobiSession * gg)
 {
 
   cpanel->scale.updateAlways_p = true;
@@ -492,7 +492,7 @@ cpanel_scale_init (cpaneld * cpanel, ggobid * gg)
 }
 
 void
-cpanel_scale_set (displayd * display, cpaneld * cpanel, ggobid * gg)
+cpanel_scale_set (displayd * display, cpaneld * cpanel, GGobiSession * gg)
 {
   GtkWidget *w;
   GtkWidget *panel =

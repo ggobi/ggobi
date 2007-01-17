@@ -27,20 +27,20 @@
 #include "externs.h"
 
 void
-brush_update_set (gboolean update, displayd * dsp, ggobid * gg)
+brush_update_set (gboolean update, displayd * dsp, GGobiSession * gg)
 {
   dsp->cpanel.br.updateAlways_p = update;
 }
 
 void
-brush_on_set (gboolean brushon, displayd * dsp, ggobid * gg)
+brush_on_set (gboolean brushon, displayd * dsp, GGobiSession * gg)
 {
   dsp->cpanel.br.brush_on_p = brushon;
   splot_redraw (gg->current_splot, QUICK, gg);
 }
 
 static void
-brush_undo_cb (GtkToggleButton * button, ggobid * gg)
+brush_undo_cb (GtkToggleButton * button, GGobiSession * gg)
 {
   cpaneld *cpanel = &gg->current_display->cpanel;
   splotd *sp = gg->current_splot;
@@ -55,7 +55,7 @@ brush_undo_cb (GtkToggleButton * button, ggobid * gg)
 
   /*-- when rows_in_plot changes ... --*/
   if (GGOBI_IS_EXTENDED_SPLOT (sp)) {
-    void (*f) (GGobiStage *, splotd *, ggobid *);
+    void (*f) (GGobiStage *, splotd *, GGobiSession *);
     GGobiExtendedSPlotClass *klass;
     klass = GGOBI_EXTENDED_SPLOT_GET_CLASS (sp);
     f = klass->splot_assign_points_to_bins;
@@ -76,7 +76,7 @@ static gchar *point_targets_lbl[] = {
   "Off", "Color and glyph", "Color only", "Glyph only", "Shadow", "Unshadow"
 };
 static void
-brush_point_targets_cb (GtkWidget * w, ggobid * gg)
+brush_point_targets_cb (GtkWidget * w, GGobiSession * gg)
 {
   cpaneld *cpanel = &gg->current_display->cpanel;
 
@@ -93,7 +93,7 @@ static gchar *edge_targets_lbl[] = {
   "Off", "Color and line", "Color only", "Line only", "Shadow", "Unshadow"
 };
 static void
-brush_edge_targets_cb (GtkWidget * w, ggobid * gg)
+brush_edge_targets_cb (GtkWidget * w, GGobiSession * gg)
 {
   cpaneld *cpanel = &gg->current_display->cpanel;
 
@@ -107,7 +107,7 @@ brush_edge_targets_cb (GtkWidget * w, ggobid * gg)
 }
 
 void
-brush_mode_set (gint mode, splotd * sp, displayd * display, ggobid * gg)
+brush_mode_set (gint mode, splotd * sp, displayd * display, GGobiSession * gg)
 {
   cpaneld *cpanel = &gg->current_display->cpanel;
 
@@ -119,7 +119,7 @@ brush_mode_set (gint mode, splotd * sp, displayd * display, ggobid * gg)
   display_plot (display, QUICK, gg);
 }
 static void
-brush_mode_cb (GtkWidget * w, ggobid * gg)
+brush_mode_cb (GtkWidget * w, GGobiSession * gg)
 {
   splotd *sp = gg->current_splot;
   brush_mode_set (!gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (w)),
@@ -127,7 +127,7 @@ brush_mode_cb (GtkWidget * w, ggobid * gg)
 }
 
 static void
-open_symbol_window_cb (GtkWidget * w, ggobid * gg)
+open_symbol_window_cb (GtkWidget * w, GGobiSession * gg)
 {
   make_symbol_window (gg);
 }
@@ -136,7 +136,7 @@ void
 brush_reset (displayd * display, gint action)
 {
   gint i, k;
-  ggobid *gg = display->ggobi;
+  GGobiSession *gg = display->ggobi;
   GGobiStage *d = display->d;
   GGobiStage *e = display->e;
   cpaneld *cpanel = &display->cpanel;
@@ -220,7 +220,7 @@ brush_reset (displayd * display, gint action)
 static gint
 key_press_cb (GtkWidget * w, GdkEventKey * event, splotd * sp)
 {
-  ggobid *gg = GGobiFromSPlot (sp);
+  GGobiSession *gg = GGobiFromSPlot (sp);
   cpaneld *cpanel = &gg->current_display->cpanel;
 
   if (!sp || !gg || !cpanel)
@@ -250,7 +250,7 @@ static gint
 motion_notify_cb (GtkWidget * w, GdkEventMotion * event, cpaneld * cpanel)
 {
   gboolean button1_p, button2_p;
-  ggobid *gg = GGobiFromWidget (w, true);
+  GGobiSession *gg = GGobiFromWidget (w, true);
   splotd *sp = gg->current_splot;
 
   /*-- get the mouse position and find out which buttons are pressed --*/
@@ -290,7 +290,7 @@ button_press_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
   cpaneld *cpanel;
   gboolean retval = true;
   gboolean button1_p, button2_p;
-  ggobid *gg = GGobiFromSPlot (sp);
+  GGobiSession *gg = GGobiFromSPlot (sp);
   GGobiStage *d, *e;
 
   if (!sp || !gg)
@@ -331,7 +331,7 @@ static gint
 button_release_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
 {
   displayd *display = (displayd *) sp->displayptr;
-  ggobid *gg = GGobiFromSPlot (sp);
+  GGobiSession *gg = GGobiFromSPlot (sp);
   cpaneld *cpanel = &display->cpanel;
   GGobiStage *d = display->d;
   gboolean retval = true;
@@ -348,7 +348,7 @@ button_release_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
   if (cpanel->br.mode == BR_PERSISTENT) {
 
     if (GGOBI_IS_EXTENDED_SPLOT (sp)) {
-      void (*f) (GGobiStage *, splotd *, ggobid *);
+      void (*f) (GGobiStage *, splotd *, GGobiSession *);
       GGobiExtendedSPlotClass *klass;
       klass = GGOBI_EXTENDED_SPLOT_GET_CLASS (sp);
       f = klass->splot_assign_points_to_bins;
@@ -440,10 +440,10 @@ brush_event_handlers_toggle (splotd * sp, gboolean state)
 /*                   Resetting the main menubar                       */
 /*--------------------------------------------------------------------*/
 
-GtkWidget *create_linkby_notebook (GtkWidget *, ggobid *);
+GtkWidget *create_linkby_notebook (GtkWidget *, GGobiSession *);
 
 void
-cpanel_brush_make (ggobid * gg)
+cpanel_brush_make (GGobiSession * gg)
 {
   modepaneld *panel;
   GtkWidget *btn, *hb;
@@ -559,7 +559,7 @@ cpanel_brush_make (ggobid * gg)
 /*--------------------------------------------------------------------*/
 
 void
-cpanel_brush_init (cpaneld * cpanel, ggobid * gg)
+cpanel_brush_init (cpaneld * cpanel, GGobiSession * gg)
 {
   cpanel->br.brush_on_p = true;
   cpanel->br.updateAlways_p = true;
@@ -573,7 +573,7 @@ cpanel_brush_init (cpaneld * cpanel, ggobid * gg)
 }
 
 void
-cpanel_brush_set (displayd * display, cpaneld * cpanel, ggobid * gg)
+cpanel_brush_set (displayd * display, cpaneld * cpanel, GGobiSession * gg)
 {
   GtkWidget *w;
   GtkWidget *pnl = mode_panel_get_by_name (ggobi_getIModeName (BRUSH), gg);

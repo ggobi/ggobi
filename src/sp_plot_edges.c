@@ -29,7 +29,7 @@
 
 gboolean
 splot_plot_edge (gint m, GGobiStage * d, GGobiStage * e,
-                 splotd * sp, displayd * display, ggobid * gg)
+                 splotd * sp, displayd * display, GGobiSession * gg)
 {
   gint a, b;
   gboolean draw_edge;
@@ -70,7 +70,7 @@ splot_plot_edge (gint m, GGobiStage * d, GGobiStage * e,
 
 gboolean
 splot_hidden_edge (gint m, GGobiStage * d, GGobiStage * e,
-                   splotd * sp, displayd * display, ggobid * gg)
+                   splotd * sp, displayd * display, GGobiSession * gg)
 {
   gint a, b;
   gboolean hiddenp = false;
@@ -100,7 +100,7 @@ splot_hidden_edge (gint m, GGobiStage * d, GGobiStage * e,
 /*-- the current color and line type need to be drawn last --*/
 void
 splot_edges_draw (splotd * sp, gboolean draw_hidden, GdkDrawable * drawable,
-                  ggobid * gg)
+                  GGobiSession * gg)
 {
   gint i, j;
   gint k, n, p, pp;
@@ -298,7 +298,7 @@ splot_edges_draw (splotd * sp, gboolean draw_hidden, GdkDrawable * drawable,
 
 void
 splot_add_edge_highlight_cue (splotd * sp, GdkDrawable * drawable, gint k,
-                              gboolean nearest, ggobid * gg)
+                              gboolean nearest, GGobiSession * gg)
 {
   displayd *dsp = (displayd *) sp->displayptr;
   GGobiStage *d = dsp->d;
@@ -348,7 +348,7 @@ splot_add_edge_highlight_cue (splotd * sp, GdkDrawable * drawable, gint k,
 
 void
 splot_add_edge_label (splotd * sp, GdkDrawable * drawable, gint k,
-                      gboolean nearest, ggobid * gg)
+                      gboolean nearest, GGobiSession * gg)
 {
   gchar *lbl;
   displayd *dsp = (displayd *) sp->displayptr;
@@ -403,7 +403,7 @@ splot_add_edge_label (splotd * sp, GdkDrawable * drawable, gint k,
 
 void
 splot_add_identify_edge_cues (splotd * sp, GdkDrawable * drawable, gint k,
-                              gboolean nearest, ggobid * gg)
+                              gboolean nearest, GGobiSession * gg)
 {
   displayd *dsp = (displayd *) sp->displayptr;
   GGobiStage *e = dsp->e;
@@ -433,7 +433,7 @@ splot_add_identify_edge_cues (splotd * sp, GdkDrawable * drawable, gint k,
 
 void
 splot_add_edgeedit_cues (splotd * sp, GdkDrawable * drawable,
-                         gint k, gboolean nearest, ggobid * gg)
+                         gint k, gboolean nearest, GGobiSession * gg)
 {
   displayd *display = sp->displayptr;
   cpaneld *cpanel = &display->cpanel;

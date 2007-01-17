@@ -188,7 +188,7 @@ default_scheme_init ()
 /*
 static guint m[MAXNCOLORS][3];
 guint **
-getColorTable (ggobid * gg)
+getColorTable (GGobiSession * gg)
 {
   gint k;
   colorschemed *scheme = gg->activeColorScheme;
@@ -205,7 +205,7 @@ getColorTable (ggobid * gg)
 
 /*-- initialize the tour manip colors and the shades of gray --*/
 void
-special_colors_init (ggobid * gg)
+special_colors_init (GGobiSession * gg)
 {
   GdkColormap *cmap = gdk_colormap_get_system ();
   gboolean writeable = false, best_match = true;
@@ -243,7 +243,7 @@ special_colors_init (ggobid * gg)
 }
 
 void
-init_plot_GC (GdkWindow * w, ggobid * gg)
+init_plot_GC (GdkWindow * w, GGobiSession * gg)
 {
   colorschemed *scheme = gg->activeColorScheme;
 
@@ -257,7 +257,7 @@ init_plot_GC (GdkWindow * w, ggobid * gg)
 }
 
 void
-init_var_GCs (GtkWidget * w, ggobid * gg)
+init_var_GCs (GtkWidget * w, GGobiSession * gg)
 {
   GdkWindow *window = w->window;
   GtkStyle *style = gtk_widget_get_style (w);
@@ -314,7 +314,7 @@ init_var_GCs (GtkWidget * w, ggobid * gg)
 
 gushort  /*-- returns the maximum color id --*/
 datad_colors_used_get (gint * ncolors_used, gushort * colors_used,
-                       GGobiStage * d, ggobid * gg)
+                       GGobiStage * d, GGobiSession * gg)
 {
   gboolean new_color;
   gint i, k, n;

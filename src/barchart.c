@@ -32,14 +32,14 @@
 #define WIDTH   370
 #define HEIGHT  370
 
-gfloat barchart_sort_index (gfloat * yy, gint ny, ggobid * gg,
+gfloat barchart_sort_index (gfloat * yy, gint ny, GGobiSession * gg,
                             barchartSPlotd * sp);
 void barchart_init_categorical (barchartSPlotd * sp, GGobiStage * d);
 void barchart_set_initials (barchartSPlotd * sp, GGobiStage * d);
 void rectangle_inset (gbind * bin);
 void barchart_allocate_structure (barchartSPlotd * sp, GGobiStage * d);
 void button_draw_with_shadows (GdkPoint * region, GdkDrawable * drawable,
-                               ggobid * gg);
+                               GGobiSession * gg);
 gboolean rect_intersect (GdkRectangle * rect1, GdkRectangle * rect2,
                          GdkRectangle * dest);
 gboolean pt_in_rect (icoords pt, GdkRectangle rect);
@@ -72,21 +72,21 @@ static GtkToggleActionEntry toggle_entries[] = {
 static guint n_toggle_entries = G_N_ELEMENTS (toggle_entries);
 
 displayd *
-barchart_new (gboolean missing_p, splotd * sp, GGobiStage * d, ggobid * gg)
+barchart_new (gboolean missing_p, splotd * sp, GGobiStage * d, GGobiSession * gg)
 {
   return (createBarchart (NULL, missing_p, sp, -1, d, gg));
 }
 
 displayd *
 barchart_new_with_vars (gboolean missing_p, gint nvars, gint * vars,
-                        GGobiStage * d, ggobid * gg)
+                        GGobiStage * d, GGobiSession * gg)
 {
   return (createBarchart (NULL, missing_p, NULL, vars ? vars[0] : 0, d, gg));
 }
 
 displayd *
 createBarchart (displayd * display, gboolean missing_p, splotd * sp, gint var,
-                GGobiStage * d, ggobid * gg)
+                GGobiStage * d, GGobiSession * gg)
 {
   GtkWidget *table, *vbox;
 
@@ -278,7 +278,7 @@ barchart_clean_init (barchartSPlotd * sp)
 }
 
 static void
-barchart_recalc_group_counts (barchartSPlotd * sp, GGobiStage * d, ggobid * gg)
+barchart_recalc_group_counts (barchartSPlotd * sp, GGobiStage * d, GGobiSession * gg)
 {
   gint i, j, bin;
   
@@ -331,7 +331,7 @@ barchart_recalc_group_counts (barchartSPlotd * sp, GGobiStage * d, ggobid * gg)
 
 
 void
-barchart_recalc_group_dimensions (barchartSPlotd * sp, ggobid * gg)
+barchart_recalc_group_dimensions (barchartSPlotd * sp, GGobiSession * gg)
 {
   gint colorwidth, i, j, xoffset;
 
@@ -551,7 +551,7 @@ barchart_allocate_structure (barchartSPlotd * sp, GGobiStage * d)
 {
   gint i, nbins;
   splotd *rawsp = GGOBI_SPLOT (sp);
-  ggobid *gg = GGobiFromSPlot (rawsp);
+  GGobiSession *gg = GGobiFromSPlot (rawsp);
   colorschemed *scheme = gg->activeColorScheme;
   GGobiVariable *var = ggobi_stage_get_variable(d, rawsp->p1dvar);
   
@@ -605,7 +605,7 @@ barchart_init_categorical (barchartSPlotd * sp, GGobiStage * d)
   displayd *display = (displayd *) rawsp->displayptr;
   gint proj = display->cpanel.pmode;
   gint i, j, m, jvar = rawsp->p1dvar;
-  ggobid *gg = GGobiFromSPlot (rawsp);
+  GGobiSession *gg = GGobiFromSPlot (rawsp);
   gfloat mindist, maxheight;
   gfloat min, max;
   GGobiVariable *var = ggobi_stage_get_variable(d, jvar);
@@ -641,7 +641,7 @@ barchart_init_categorical (barchartSPlotd * sp, GGobiStage * d)
 
 
 gboolean
-barchart_redraw (splotd * rawsp, GGobiStage * d, ggobid * gg, gboolean binned)
+barchart_redraw (splotd * rawsp, GGobiStage * d, GGobiSession * gg, gboolean binned)
 {
   gint i, j, radius;
   colorschemed *scheme = gg->activeColorScheme;
@@ -734,7 +734,7 @@ barchart_redraw (splotd * rawsp, GGobiStage * d, ggobid * gg, gboolean binned)
 
 void
 barchart_splot_add_plot_labels (splotd * sp, GdkDrawable * drawable,
-                                ggobid * gg)
+                                GGobiSession * gg)
 {
   displayd *display = (displayd *) sp->displayptr;
   gint i = 0;
@@ -823,7 +823,7 @@ barchart_set_initials (barchartSPlotd * sp, GGobiStage * d)
 }
 
 void
-barchart_recalc_counts (barchartSPlotd * sp, GGobiStage * d, ggobid * gg)
+barchart_recalc_counts (barchartSPlotd * sp, GGobiStage * d, GGobiSession * gg)
 {
   gfloat yy;
   gint i, bin;
@@ -957,7 +957,7 @@ barchart_recalc_counts (barchartSPlotd * sp, GGobiStage * d, ggobid * gg)
 }
 
 void
-barchart_recalc_dimensions (splotd * rawsp, GGobiStage * d, ggobid * gg)
+barchart_recalc_dimensions (splotd * rawsp, GGobiStage * d, GGobiSession * gg)
 {
   gint i, maxbincount = 0, maxbin = -1;
   gfloat precis = PRECISION1;
@@ -1122,7 +1122,7 @@ barchart_recalc_dimensions (splotd * rawsp, GGobiStage * d, ggobid * gg)
 }
 
 gboolean
-barchart_active_paint_points (splotd * rawsp, GGobiStage * d, ggobid * gg)
+barchart_active_paint_points (splotd * rawsp, GGobiStage * d, GGobiSession * gg)
 {
   barchartSPlotd *sp = GGOBI_BARCHART_SPLOT (rawsp);
   brush_coords *brush_pos = &rawsp->brush_pos;
@@ -1194,12 +1194,12 @@ barchart_active_paint_points (splotd * rawsp, GGobiStage * d, ggobid * gg)
   return d->nrows_under_brush;
 }
 
-static ggobid *CurrentGGobi = NULL;
+static GGobiSession *CurrentGGobi = NULL;
 
 gint
 barpsort (const void *arg1, const void *arg2)
 {
-  ggobid *gg = CurrentGGobi;
+  GGobiSession *gg = CurrentGGobi;
 
   gint val = 0;
   gint *x1 = (gint *) arg1;
@@ -1219,7 +1219,7 @@ barpsort (const void *arg1, const void *arg2)
 
 
 gfloat
-barchart_sort_index (gfloat * yy, gint ny, ggobid * gg, barchartSPlotd * sp)
+barchart_sort_index (gfloat * yy, gint ny, GGobiSession * gg, barchartSPlotd * sp)
 {
   gint i, *indx;
   gint rank;
@@ -1302,7 +1302,7 @@ barchart_sort_index (gfloat * yy, gint ny, ggobid * gg, barchartSPlotd * sp)
 
 void
 barchart_default_visual_cues_draw (splotd * rawsp, GdkDrawable * drawable,
-                                   ggobid * gg)
+                                   GGobiSession * gg)
 {
   displayd *display = gg->current_display;
   GGobiStage *d = display->d;
@@ -1369,7 +1369,7 @@ barchart_default_visual_cues_draw (splotd * rawsp, GdkDrawable * drawable,
 
 void
 button_draw_with_shadows (GdkPoint * region, GdkDrawable * drawable,
-                          ggobid * gg)
+                          GGobiSession * gg)
 {
   colorschemed *scheme = gg->activeColorScheme;
 
@@ -1426,7 +1426,7 @@ pt_in_rect (icoords pt, GdkRectangle rect)
 /* Cues that are drawn in the default mode, indicating that the
  * binwidth and anchor point can be changed. */
 void
-barchart_add_bar_cues (splotd * rawsp, GdkDrawable * drawable, ggobid * gg)
+barchart_add_bar_cues (splotd * rawsp, GdkDrawable * drawable, GGobiSession * gg)
 {
   displayd *display = rawsp->displayptr;
   cpaneld *cpanel = &display->cpanel;
@@ -1440,7 +1440,7 @@ barchart_add_bar_cues (splotd * rawsp, GdkDrawable * drawable, ggobid * gg)
 
 gboolean
 barchart_identify_bars (icoords mousepos, splotd * rawsp, GGobiStage * d,
-                        ggobid * gg)
+                        GGobiSession * gg)
 {
 /* returns 0 if nothing has changed from the last time */
 /*         1 if different bars are hit */
@@ -1491,7 +1491,7 @@ barchart_identify_bars (icoords mousepos, splotd * rawsp, GGobiStage * d,
 }
 
 splotd *
-ggobi_barchart_splot_new (displayd * dpy, ggobid * gg)
+ggobi_barchart_splot_new (displayd * dpy, GGobiSession * gg)
 {
   barchartSPlotd *bsp;
   splotd *sp;
@@ -1510,7 +1510,7 @@ ggobi_barchart_splot_new (displayd * dpy, ggobid * gg)
  Called when we create the barchart.
 */
 void
-barchart_cpanel_init (cpaneld * cpanel, ggobid * gg)
+barchart_cpanel_init (cpaneld * cpanel, GGobiSession * gg)
 {
   cpanel->imode = DEFAULT_IMODE;
   cpanel->pmode = EXTENDED_DISPLAY_PMODE;

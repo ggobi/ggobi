@@ -25,13 +25,13 @@
 
 #include "ggobi-variable.h"
 
-static void close_btn_cb (GtkWidget *w, ggobid *gg)
+static void close_btn_cb (GtkWidget *w, GGobiSession *gg)
 {
   gtk_widget_hide (gg->vartable_ui.window);
 }
 
 static void
-clone_vars_cb (GtkWidget *w, ggobid *gg)
+clone_vars_cb (GtkWidget *w, GGobiSession *gg)
 {
   GGobiStage *d = datad_get_from_notebook(gg->vartable_ui.notebook);
   gint *cols;
@@ -46,7 +46,7 @@ clone_vars_cb (GtkWidget *w, ggobid *gg)
 
 /* not implemented
 static void
-delete_vars_cb (GtkWidget *w, ggobid *gg)
+delete_vars_cb (GtkWidget *w, GGobiSession *gg)
 {
   GGobiStage *d = datad_get_from_notebook(gg->vartable_ui.notebook);
   gint *cols = (gint *) g_malloc (d->n_cols * sizeof (gint));
@@ -64,13 +64,13 @@ delete_vars_cb (GtkWidget *w, ggobid *gg)
 /*-------------------------------------------------------------------------*/
 
 static void
-limits_type_cb (GtkToggleButton *w, ggobid *gg) 
+limits_type_cb (GtkToggleButton *w, GGobiSession *gg) 
 {
   gg->lims_use_visible = w->active;
 }
 
 static void
-dialog_range_set (GtkWidget *w, ggobid *gg) 
+dialog_range_set (GtkWidget *w, GGobiSession *gg) 
 {
   GtkWidget *dialog = w;
   GtkWidget *umin_entry, *umax_entry;
@@ -143,12 +143,12 @@ dialog_range_set (GtkWidget *w, ggobid *gg)
 }
 
 static void
-range_unset_cb (GtkWidget *w, ggobid *gg)
+range_unset_cb (GtkWidget *w, GGobiSession *gg)
 {
   range_unset (gg);
 }
 
-static void rescale_cb (GtkWidget *w, ggobid *gg) {
+static void rescale_cb (GtkWidget *w, GGobiSession *gg) {
   /*GGobiStage *d = datad_get_from_notebook(gg->vartable_ui.notebook);*/
 
   /*limits_set (d, true, true, gg->lims_use_visible);  
@@ -166,7 +166,7 @@ static void rescale_cb (GtkWidget *w, ggobid *gg) {
  * dialog_range_set.
 */
 static void
-open_range_set_dialog (GtkWidget *w, ggobid *gg)
+open_range_set_dialog (GtkWidget *w, GGobiSession *gg)
 {
   GtkWidget *frame, *vb, *hb, *btn, *lbl;
   GtkWidget *dialog, *umin, *umax;
@@ -289,7 +289,7 @@ open_range_set_dialog (GtkWidget *w, ggobid *gg)
   gtk_widget_destroy(dialog);
 }
 
-void range_unset (ggobid *gg)
+void range_unset (GGobiSession *gg)
 {
   GtkTreeModel *model;
   GGobiStage *d = datad_get_from_notebook(gg->vartable_ui.notebook);
@@ -357,7 +357,7 @@ create_explicit_variable (GGobiStage * d, gchar * vname, NewVariableType vartype
 }
 
 static void
-dialog_newvar_add (GtkWidget *w, ggobid *gg) 
+dialog_newvar_add (GtkWidget *w, GGobiSession *gg) 
 {
   GtkWidget *dialog = w;
   GtkWidget *entry, *radio_brush;
@@ -401,7 +401,7 @@ dialog_newvar_add (GtkWidget *w, ggobid *gg)
 }
 
 static void
-open_newvar_dialog (GtkWidget *w, ggobid *gg)
+open_newvar_dialog (GtkWidget *w, GGobiSession *gg)
 {
   GtkWidget *dialog;
   GtkWidget *frame, *vb, *hb, *lbl;
@@ -464,7 +464,7 @@ open_newvar_dialog (GtkWidget *w, ggobid *gg)
 /*-------------------------------------------------------------------------*/
 
 static void
-dialog_rename_var (GtkWidget *w, ggobid *gg) 
+dialog_rename_var (GtkWidget *w, GGobiSession *gg) 
 {
   GtkWidget *dialog = w;
   GtkWidget *entry;
@@ -493,7 +493,7 @@ dialog_rename_var (GtkWidget *w, ggobid *gg)
 }
 
 static void
-open_rename_dialog (GtkWidget *w, ggobid *gg)
+open_rename_dialog (GtkWidget *w, GGobiSession *gg)
 {
   GtkWidget *dialog, *hb, *entry, *lbl;
   GGobiStage *d = datad_get_from_notebook(gg->vartable_ui.notebook);
@@ -538,13 +538,13 @@ open_rename_dialog (GtkWidget *w, ggobid *gg)
 
 /*-------------------------------------------------------------------------*/
 
-void select_all_cb (GtkWidget *w, ggobid *gg)
+void select_all_cb (GtkWidget *w, GGobiSession *gg)
 {
   GtkWidget *tree_view = vartable_tree_view_get (gg);
   GtkTreeSelection *tree_sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view));
   gtk_tree_selection_select_all(tree_sel);
 }
-void deselect_all_cb (GtkWidget *w, ggobid *gg)
+void deselect_all_cb (GtkWidget *w, GGobiSession *gg)
 {
   GtkWidget *tree_view = vartable_tree_view_get (gg);
   GtkTreeSelection *tree_sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view));
@@ -552,7 +552,7 @@ void deselect_all_cb (GtkWidget *w, ggobid *gg)
 }
 
 GtkWidget *
-vartable_buttonbox_build (ggobid *gg) {
+vartable_buttonbox_build (GGobiSession *gg) {
   GtkWidget *hbox, *hb, *btn;
 
   /*-- hbox for the buttons along the bottom --*/

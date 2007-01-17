@@ -22,9 +22,9 @@
 #include "ggobi.h"
 #include "ggobi-plugin.h"
 
-gboolean registerPlugins(ggobid *gg, GList *plugins);
-GtkWidget * showPluginInfo (GList * plugins, ggobid * gg);
-void closePlugins(ggobid *gg);
+gboolean registerPlugins(GGobiSession *gg, GList *plugins);
+GtkWidget * showPluginInfo (GList * plugins, GGobiSession * gg);
+void closePlugins(GGobiSession *gg);
 
 void registerDefaultPlugins(GGobiInitInfo *info);
 

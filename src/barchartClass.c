@@ -30,31 +30,31 @@
  /* Making these available to ggobiClass.c */
 static gboolean barchartVarSel (GtkWidget * w, displayd * display,
                                 splotd * sp, gint jvar, gint toggle,
-                                gint mouse, cpaneld * cpanel, ggobid * gg);
+                                gint mouse, cpaneld * cpanel, GGobiSession * gg);
 static gboolean barchartCPanelSet (displayd * dpy, cpaneld * cpanel,
-                                   ggobid * gg);
-static void barchartDisplaySet (displayd * dpy, ggobid * gg);
+                                   GGobiSession * gg);
+static void barchartDisplaySet (displayd * dpy, GGobiSession * gg);
 static void barchartDestroy (GtkObject *);
-static void barchartPlaneToScreen (splotd * sp, GGobiStage * d, ggobid * gg);
+static void barchartPlaneToScreen (splotd * sp, GGobiStage * d, GGobiSession * gg);
 void barchart_clean_init (barchartSPlotd * sp);
-void barchart_recalc_counts (barchartSPlotd * sp, GGobiStage * d, ggobid * gg);
+void barchart_recalc_counts (barchartSPlotd * sp, GGobiStage * d, GGobiSession * gg);
 
 static void barchartVarpanelRefresh (displayd * display, splotd * sp,
                                      GGobiStage * d);
 static gboolean barchartHandlesInteraction (displayd * dpy, gint action);
-static void barchartVarpanelTooltipsSet (displayd * dpy, ggobid * gg,
+static void barchartVarpanelTooltipsSet (displayd * dpy, GGobiSession * gg,
                                          GtkWidget * wx, GtkWidget * wy,
                                          GtkWidget * wz, GtkWidget * label);
 static gint barchartPlottedColsGet (displayd * display, gint * cols,
-                                    GGobiStage * d, ggobid * gg);
+                                    GGobiStage * d, GGobiSession * gg);
 static GtkWidget *barchartCPanelWidget (displayd * dpy,
-                                        gchar ** modeName, ggobid * gg);
-//static GtkWidget *barchartMenusMake(displayd * dpy, ggobid * gg);
+                                        gchar ** modeName, GGobiSession * gg);
+//static GtkWidget *barchartMenusMake(displayd * dpy, GGobiSession * gg);
 static gboolean barchartEventHandlersToggle (displayd * dpy, splotd * sp,
                                              gboolean state, ProjectionMode,
                                              InteractionMode);
 static gboolean barchartKeyEventHandled (GtkWidget *, displayd *, splotd *,
-                                         GdkEventKey *, ggobid *);
+                                         GdkEventKey *, GGobiSession *);
 
 static void
 setShowAxesOption (displayd * display, gboolean active)
@@ -80,7 +80,7 @@ varpanelHighd (displayd * display)
 static gint
 barchart_is_variable_plotted (displayd * display, GSList *cols, GGobiStage * d)
 {
-  ggobid *gg = display->d->gg;
+  GGobiSession *gg = display->d->gg;
   splotd *sp = gg->current_splot;
   if (g_slist_find(cols, GINT_TO_POINTER(sp->p1dvar)))
     return sp->p1dvar;
@@ -90,7 +90,7 @@ barchart_is_variable_plotted (displayd * display, GSList *cols, GGobiStage * d)
 
 /* barchart splot methods*/
 static gchar *
-barchart_tree_label (splotd * sp, GGobiStage * d, ggobid * gg)
+barchart_tree_label (splotd * sp, GGobiStage * d, GGobiSession * gg)
 {
   return(ggobi_stage_get_col_name(d, sp->p1dvar));
 }
@@ -98,7 +98,7 @@ barchart_tree_label (splotd * sp, GGobiStage * d, ggobid * gg)
 
 gboolean
 barchartVarSel (GtkWidget * w, displayd * display, splotd * sp, gint jvar,
-                gint toggle, gint mouse, cpaneld * cpanel, ggobid * gg)
+                gint toggle, gint mouse, cpaneld * cpanel, GGobiSession * gg)
 {
   gint jvar_prev = -1;
   gboolean redraw = false;
@@ -122,7 +122,7 @@ barchartVarSel (GtkWidget * w, displayd * display, splotd * sp, gint jvar,
 }
 
 gboolean
-barchartCPanelSet (displayd * dpy, cpaneld * cpanel, ggobid * gg)
+barchartCPanelSet (displayd * dpy, cpaneld * cpanel, GGobiSession * gg)
 {
   GtkWidget *w;
   w = GGOBI_EXTENDED_DISPLAY (dpy)->cpanelWidget;
@@ -138,7 +138,7 @@ barchartCPanelSet (displayd * dpy, cpaneld * cpanel, ggobid * gg)
 }
 
 void
-barchartDisplaySet (displayd * dpy, ggobid * gg)
+barchartDisplaySet (displayd * dpy, GGobiSession * gg)
 {
 }
 
@@ -171,7 +171,7 @@ barchartDestroy (GtkObject * obj)
 
 
 void
-barchartPlaneToScreen (splotd * sp, GGobiStage * d, ggobid * gg)
+barchartPlaneToScreen (splotd * sp, GGobiStage * d, GGobiSession * gg)
 {
   barchartSPlotd *bsp = GGOBI_BARCHART_SPLOT (sp);
 
@@ -180,7 +180,7 @@ barchartPlaneToScreen (splotd * sp, GGobiStage * d, ggobid * gg)
 }
 
 void
-barchartWorldToPlane (splotd * sp, GGobiStage * d, ggobid * gg)
+barchartWorldToPlane (splotd * sp, GGobiStage * d, GGobiSession * gg)
 {
   barchartSPlotd *bsp = GGOBI_BARCHART_SPLOT (sp);
 
@@ -236,7 +236,7 @@ barchartHandlesInteraction (displayd * dpy, gint action)
 /*--------------------------------------------------------------------*/
 
 void
-barchartVarpanelTooltipsSet (displayd * dpy, ggobid * gg, GtkWidget * wx,
+barchartVarpanelTooltipsSet (displayd * dpy, GGobiSession * gg, GtkWidget * wx,
                              GtkWidget * wy, GtkWidget * wz,
                              GtkWidget * label)
 {
@@ -249,7 +249,7 @@ barchartVarpanelTooltipsSet (displayd * dpy, ggobid * gg, GtkWidget * wx,
 
 gint
 barchartPlottedColsGet (displayd * display, gint * cols, GGobiStage * d,
-                        ggobid * gg)
+                        GGobiSession * gg)
 {
   gint ncols = 0;
   cols[ncols++] = gg->current_splot->p1dvar;
@@ -257,7 +257,7 @@ barchartPlottedColsGet (displayd * display, gint * cols, GGobiStage * d,
 }
 
 GtkWidget *
-barchartCPanelWidget (displayd * dpy, gchar ** modeName, ggobid * gg)
+barchartCPanelWidget (displayd * dpy, gchar ** modeName, GGobiSession * gg)
 {
   GtkWidget *w = GGOBI_EXTENDED_DISPLAY (dpy)->cpanelWidget;
   if (!w) {
@@ -288,7 +288,7 @@ barchartEventHandlersToggle (displayd * dpy, splotd * sp, gboolean state,
 
 static gboolean
 barchartKeyEventHandled (GtkWidget * w, displayd * display, splotd * sp,
-                         GdkEventKey * event, ggobid * gg)
+                         GdkEventKey * event, GGobiSession * gg)
 {
   gboolean ok = true;
   ProjectionMode pmode = NULL_PMODE;
@@ -333,7 +333,7 @@ barchartKeyEventHandled (GtkWidget * w, displayd * display, splotd * sp,
 /* This is an abbreviated version of the scatterplot version */
 void
 barchartScreenToTform (cpaneld * cpanel, splotd * sp, icoords * scr,
-                       fcoords * tfd, ggobid * gg)
+                       fcoords * tfd, GGobiSession * gg)
 {
   gcoords planar, world;
   greal precis = (greal) PRECISION1;
@@ -436,7 +436,7 @@ barchartDisplayClassInit (GGobiBarChartDisplayClass * klass)
 
 void
 barchart_identify_cues_draw (gboolean nearest_p, gint k, splotd * rawsp,
-                             GdkDrawable * drawable, ggobid * gg)
+                             GdkDrawable * drawable, GGobiSession * gg)
 {
   barchartSPlotd *sp = GGOBI_BARCHART_SPLOT (rawsp);
   PangoLayout *layout =

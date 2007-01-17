@@ -311,7 +311,7 @@ property STRING name
 
 /*-- a pointer to the application context --*/
 /*-- note that we don't want this -- the pipeline must be freed of GGobi! --*/
-public struct _ggobid *gg; /*-- a pointer to the parent --*/
+public struct _GGobiSession *gg; /*-- a pointer to the parent --*/
 
 /* variables are now stored in the stage */
 private GPtrArray *vartable = { g_ptr_array_new() } 
@@ -1276,7 +1276,7 @@ set_rows_in_plot(self)
  **/
  // FIXME: This should not exist.. we need a ggobi_main_add_data()
 public void 
-attach (self, ggobid *gg, gboolean cleanup)
+attach (self, GGobiSession *gg, gboolean cleanup)
 {
   displayd *display = NULL;
   GGobiStage *d = self_get_root(self);

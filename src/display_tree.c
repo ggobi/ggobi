@@ -57,7 +57,7 @@ display_tree_get_iter_for_object (GtkTreeModel * model, gpointer obj,
  */
 
 static void
-update_display_tree_plots_by_variable (ggobid * gg, GGobiStage * d,
+update_display_tree_plots_by_variable (GGobiSession * gg, GGobiStage * d,
                                        gint whichVar, splotd * sp,
                                        GtkTreeModel * model)
 {
@@ -99,7 +99,7 @@ CHECK_EVENT_SIGNATURE (update_display_tree_plots_by_variable,
   here from display_new() and display_free(), respectively.
  */
 GtkTreeView *
-plot_tree_display (ggobid * gg)
+plot_tree_display (GGobiSession * gg)
 {
   GList *dlist;
   displayd *display;
@@ -161,7 +161,7 @@ display_add_tree (displayd * display)
 {
   gchar *label;
   const gchar *dataset, *pmode, *imode;
-  ggobid *gg = display->ggobi;
+  GGobiSession *gg = display->ggobi;
   GtkTreeIter disp_iter;
   GtkTreeModel *tree = gg->display_tree.model;
   if (tree == NULL)
@@ -186,7 +186,7 @@ display_add_tree (displayd * display)
   Called when the display tree window is closed.
  */
 void
-display_tree_delete_cb (GtkWidget * w, GdkEvent * event, ggobid * gg)
+display_tree_delete_cb (GtkWidget * w, GdkEvent * event, GGobiSession * gg)
 {
   gtk_widget_destroy (gg->display_tree.window);
   gg->display_tree.tree = NULL;
@@ -203,7 +203,7 @@ display_tree_delete_cb (GtkWidget * w, GdkEvent * event, ggobid * gg)
 void
 splot_add_tree (displayd * display, GtkTreeIter * parent)
 {
-  ggobid *gg = display->ggobi;
+  GGobiSession *gg = display->ggobi;
   GList *slist;
   splotd *sp;
   GGobiStage *d = display->d;
@@ -250,7 +250,7 @@ display_tree_label (displayd * display)
   type `type'.
  */
 gchar *
-splot_tree_label (splotd * splot, GGobiStage * d, ggobid * gg)
+splot_tree_label (splotd * splot, GGobiStage * d, GGobiSession * gg)
 {
   if (GGOBI_IS_EXTENDED_SPLOT (splot)) {
     return (GGOBI_EXTENDED_SPLOT_GET_CLASS (splot)->
@@ -266,13 +266,13 @@ splot_tree_label (splotd * splot, GGobiStage * d, ggobid * gg)
  */
 void                            /* used when DisplayTree is part of the ItemFactory in the main
                                    menubar */
-show_display_tree (ggobid * gg, GtkWidget * widget)
+show_display_tree (GGobiSession * gg, GtkWidget * widget)
 {
   plot_tree_display (gg);
 }
 
 void                            /* used when DisplayTree is part of the Display menu */
-show_display_tree_cb (GtkWidget * w, ggobid * gg)
+show_display_tree_cb (GtkWidget * w, GGobiSession * gg)
 {
   plot_tree_display (gg);
 }
@@ -282,7 +282,7 @@ show_display_tree_cb (GtkWidget * w, ggobid * gg)
  the corresponding node in the display_tree.
  */
 gboolean
-tree_display_entry_remove (displayd * display, GtkWidget * tree, ggobid * gg)
+tree_display_entry_remove (displayd * display, GtkWidget * tree, GGobiSession * gg)
 {
   GtkTreeIter iter;
   GtkTreeModel *model;
@@ -306,7 +306,7 @@ display_tree_child_select (GtkTreeSelection * sel, gpointer data)
 {
   displayd *display;
   splotd *splot = NULL;
-  ggobid *gg;
+  GGobiSession *gg;
   gpointer obj;
   GtkTreeModel *model;
   GtkTreeIter iter;

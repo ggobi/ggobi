@@ -30,7 +30,7 @@
 extern "C" {
 #endif
 
-struct _ggobid;
+struct _GGobiSession;
 
 #include <libxml/parser.h>
 
@@ -54,7 +54,7 @@ struct _ggobid;
  This one is used for responding to identifying points.
  */
 typedef void (*IdentifyProc) (void *user_data, gint id, splotd * sp,
-                              GtkWidget * w, ggobid * gg);
+                              GtkWidget * w, GGobiSession * gg);
 
 typedef struct {
   IdentifyProc handler;
@@ -83,7 +83,7 @@ typedef struct {
 typedef gboolean(*KeyEventHandlerFunc) (guint keyval, GtkWidget * w,
                                         GdkEventKey * event,
                                         cpaneld * cpanel, splotd * sp,
-                                        ggobid * gg, void *userData);
+                                        GGobiSession * gg, void *userData);
 
 typedef void (*ReleaseData) (void *userData);
   /* This is the variable that stores the registered handler */
@@ -99,7 +99,7 @@ typedef struct {
 typedef struct {
 /*-- ggobi --*/
 
-  struct _ggobid *thisGG;
+  struct _GGobiSession *thisGG;
 
   GtkAccelGroup *sp_accel_group; /*-- sp = scatterplot here --*/
 
@@ -109,26 +109,26 @@ typedef struct _PrintOptions PrintOptions;
 
 
 
-GType ggobi_ggobi_get_type(void);
+GType ggobi_session_get_type(void);
 
-#define   GGOBI_TYPE_GGOBI ggobi_ggobi_get_type()
-#define GGOBI_GGOBI	 (G_TYPE_CHECK_INSTANCE_CAST ((obj), GGOBI_TYPE_GGOBI, ggobid))
-#define GGOBI_GGOBI_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GGOBI_TYPE_GGOBI, GGobiGGobiClass))
-#define GGOBI_IS_GGOBI(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GGOBI_TYPE_GGOBI))
-#define GGOBI_IS_GGOBI_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GGOBI_TYPE_GGOBI))
-#define GGOBI_GGOBI_GET_CLASS(obj)  		(G_TYPE_INSTANCE_GET_CLASS ((obj), GGOBI_TYPE_GGOBI, GGobiGGobiClass))
+#define GGOBI_TYPE_SESSION ggobi_session_get_type()
+#define GGOBI_SESSION	 (G_TYPE_CHECK_INSTANCE_CAST ((obj), GGOBI_TYPE_SESSION, GGobiSession))
+#define GGOBI_SESSION_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GGOBI_TYPE_SESSION, GGobiSessionClass))
+#define GGOBI_IS_SESSION(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GGOBI_TYPE_SESSION))
+#define GGOBI_IS_SESSION_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GGOBI_TYPE_SESSION))
+#define GGOBI_SESSION_GET_CLASS(obj)  		(G_TYPE_INSTANCE_GET_CLASS ((obj), GGOBI_TYPE_SESSION, GGobiSessionClass))
 
-typedef struct _GGobiGGobiClass {
+typedef struct _GGobiSessionClass {
   GObjectClass parent_class;
-} GGobiGGobiClass;
+} GGobiSessionClass;
 
 
 /**
-  @defgroup ggobid the ggobid instance structure.
+  @defgroup GGobiSession the GGobiSession instance structure.
   @brief This is the top-level structure representing a 
   ggobi instance.
  */
-struct _ggobid {
+struct _GGobiSession {
 
   GObject object;
 
@@ -162,7 +162,7 @@ struct _ggobid {
   guint mode_merge_id;
 
   /* status bar in main console window */
-  void (*status_message_func) (gchar *, ggobid *);
+  void (*status_message_func) (gchar *, GGobiSession *);
   gboolean statusbar_p;
 
   gboolean close_pending;
@@ -434,7 +434,7 @@ struct _ggobid {
   GTimeVal time;  
   
   GGobiPipelineFactory *pipeline_factory;
-}; /*  ggobid; */
+}; /*  GGobiSession; */
 
 /* the keys for the built-in stages. eventually these might become
    functions that return a static GQuark, if we move to a GQuark-based ID system */
@@ -554,7 +554,7 @@ typedef struct {
   int id;
 } GGobiPointMoveEvent;
 
-void start_ggobi(ggobid * gg, gboolean init_data, gboolean createPlot);
+void start_ggobi(GGobiSession * gg, gboolean init_data, gboolean createPlot);
 void process_initialization_files();
 
 extern GGobiOptions *sessionOptions;
@@ -595,7 +595,7 @@ void showHelp();
 #ifdef __cplusplus
 extern "C" {
 #endif
-void globals_init(ggobid * gg);
+void globals_init(GGobiSession * gg);
 
 guint getGGobiSignal(GGobiSignalType);
 
@@ -616,17 +616,17 @@ typedef GType(*GTypeLoad) (void);
 gchar* ggobi_find_data_file(const gchar *name);
 gchar* ggobi_find_config_file(const gchar *name);
 
-GList *getInputPluginSelections(ggobid *gg);
+GList *getInputPluginSelections(GGobiSession *gg);
 
 extern const gchar *DefaultUnknownInputModeName;
 	
-GSList*    load_data (const gchar *, const gchar *modeName, ggobid *);
-GSList*    load_data_source (GGobiInputSource *, ggobid *);
+GSList*    load_data (const gchar *, const gchar *modeName, GGobiSession *);
+GSList*    load_data_source (GGobiInputSource *, GGobiSession *);
 
 // FIXME: not sure if this belongs here but we need somewhere to put 
 // "global" functions
 GGobiInputSource *create_input_source(const gchar *uri, const gchar *mode);
-GGobiDataFactory *create_data_factory(ggobid *gg, GGobiInputSource *source);
+GGobiDataFactory *create_data_factory(GGobiSession *gg, GGobiInputSource *source);
 
 #include "GGobiEvents.h"
 

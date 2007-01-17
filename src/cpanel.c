@@ -21,7 +21,7 @@
 
 void
 scatterplot_cpanel_init (cpaneld * cpanel, ProjectionMode pmode,
-                         InteractionMode imode, ggobid * gg)
+                         InteractionMode imode, GGobiSession * gg)
 {
   cpanel->pmode = pmode;        /* XYPlot */
   cpanel->imode = imode;        /* DEFAULT */
@@ -42,7 +42,7 @@ scatterplot_cpanel_init (cpaneld * cpanel, ProjectionMode pmode,
 }
 
 void
-scatmat_cpanel_init (cpaneld * cpanel, ggobid * gg)
+scatmat_cpanel_init (cpaneld * cpanel, GGobiSession * gg)
 {
   cpanel->pmode = EXTENDED_DISPLAY_PMODE;
   cpanel->imode = DEFAULT_IMODE;
@@ -57,7 +57,7 @@ scatmat_cpanel_init (cpaneld * cpanel, ggobid * gg)
 }
 
 void
-parcoords_cpanel_init (cpaneld * cpanel, ggobid * gg)
+parcoords_cpanel_init (cpaneld * cpanel, GGobiSession * gg)
 {
   cpanel->pmode = EXTENDED_DISPLAY_PMODE;
   cpanel->imode = DEFAULT_IMODE;
@@ -75,7 +75,7 @@ parcoords_cpanel_init (cpaneld * cpanel, ggobid * gg)
 
 
 void
-cpanel_set (displayd * display, ggobid * gg)
+cpanel_set (displayd * display, GGobiSession * gg)
 {
   cpaneld *cpanel = &display->cpanel;
   gboolean displaytype_known = true;

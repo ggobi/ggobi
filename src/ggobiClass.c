@@ -32,9 +32,9 @@
 #include "marshal.h"
 
 extern gint num_ggobis, totalNumGGobis;
-extern ggobid **all_ggobis;
+extern GGobiSession **all_ggobis;
 
-void ggobi_ggobi_class_init (GGobiGGobiClass * klass);
+void ggobi_session_class_init (GGobiSessionClass * klass);
 
 
 /**
@@ -42,26 +42,26 @@ void ggobi_ggobi_class_init (GGobiGGobiClass * klass);
   the ggobi class.
  */
 GType
-ggobi_ggobi_get_type (void)
+ggobi_session_get_type (void)
 {
-  static GType ggobi_type = 0;
+  static GType ggobi_session_type = 0;
 
-  if (!ggobi_type) {
-    static const GTypeInfo ggobi_info = {
-      sizeof (GGobiGGobiClass),
+  if (!ggobi_session_type) {
+    static const GTypeInfo ggobi_session_info = {
+      sizeof (GGobiSessionClass),
       NULL, NULL,
-      (GClassInitFunc) ggobi_ggobi_class_init,
+      (GClassInitFunc) ggobi_session_class_init,
       NULL, NULL,
-      sizeof (ggobid), 0,
+      sizeof (GGobiSession), 0,
       (GInstanceInitFunc) ggobi_alloc,
       NULL
     };
 
-    ggobi_type =
-      g_type_register_static (G_TYPE_OBJECT, "ggobid", &ggobi_info, 0);
+    ggobi_session_type =
+      g_type_register_static (G_TYPE_OBJECT, "GGobiSession", &ggobi_session_info, 0);
   }
 
-  return ggobi_type;
+  return ggobi_session_type;
 }
 
 
@@ -71,9 +71,9 @@ ggobi_ggobi_get_type (void)
    This registers
  */
 void
-ggobi_ggobi_class_init (GGobiGGobiClass * klass)
+ggobi_session_class_init (GGobiSessionClass * klass)
 {
-  if (g_signal_lookup ("datad_added", GGOBI_TYPE_GGOBI) == 0) {
+  if (g_signal_lookup ("datad_added", GGOBI_TYPE_SESSION) == 0) {
     GGobiSignals[DATAD_ADDED_SIGNAL] =
       g_signal_new ("datad_added",
                     G_TYPE_FROM_CLASS (klass),
@@ -82,12 +82,12 @@ ggobi_ggobi_class_init (GGobiGGobiClass * klass)
                     G_TYPE_NONE, 1, GGOBI_TYPE_DATA);
   }
 
-  if (g_signal_lookup ("brush_motion", GGOBI_TYPE_GGOBI) == 0) {
+  if (g_signal_lookup ("brush_motion", GGOBI_TYPE_SESSION) == 0) {
     GGobiSignals[BRUSH_MOTION_SIGNAL] = g_signal_new ("brush_motion", G_TYPE_FROM_CLASS (klass), G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION, 0, NULL, NULL, ggobi_marshal_VOID__OBJECT_POINTER_OBJECT, G_TYPE_NONE, 3, GGOBI_TYPE_SPLOT, G_TYPE_POINTER, /* GdkEventMotion pointer */
                                                       GGOBI_TYPE_STAGE);
   }
 
-  if (g_signal_lookup ("move_point", GGOBI_TYPE_GGOBI) == 0) {
+  if (g_signal_lookup ("move_point", GGOBI_TYPE_SESSION) == 0) {
     GGobiSignals[POINT_MOVE_SIGNAL] =
       g_signal_new ("move_point",
                     G_TYPE_FROM_CLASS (klass),
@@ -97,7 +97,7 @@ ggobi_ggobi_class_init (GGobiGGobiClass * klass)
                     GGOBI_TYPE_SPLOT, G_TYPE_INT, GGOBI_TYPE_STAGE);
   }
 
-  if (g_signal_lookup ("identify_point", GGOBI_TYPE_GGOBI) == 0) {
+  if (g_signal_lookup ("identify_point", GGOBI_TYPE_SESSION) == 0) {
     GGobiSignals[IDENTIFY_POINT_SIGNAL] =
       g_signal_new ("identify_point",
                     G_TYPE_FROM_CLASS (klass),
@@ -109,7 +109,7 @@ ggobi_ggobi_class_init (GGobiGGobiClass * klass)
 
   /* This should be for a ggobi datad rather than a widget. Make that a
      GObject and give it a type. */
-  if (g_signal_lookup ("select_variable", GGOBI_TYPE_GGOBI) == 0) {
+  if (g_signal_lookup ("select_variable", GGOBI_TYPE_SESSION) == 0) {
     GGobiSignals[VARIABLE_SELECTION_SIGNAL] =
       g_signal_new ("select_variable",
                     G_TYPE_FROM_CLASS (klass),
@@ -119,7 +119,7 @@ ggobi_ggobi_class_init (GGobiGGobiClass * klass)
                     GGOBI_TYPE_STAGE, G_TYPE_INT, GGOBI_TYPE_SPLOT);
   }
 
-  if (g_signal_lookup ("splot_new", GGOBI_TYPE_GGOBI) == 0) {
+  if (g_signal_lookup ("splot_new", GGOBI_TYPE_SESSION) == 0) {
     GGobiSignals[SPLOT_NEW_SIGNAL] =
       g_signal_new ("splot_new",
                     G_TYPE_FROM_CLASS (klass),
@@ -128,12 +128,12 @@ ggobi_ggobi_class_init (GGobiGGobiClass * klass)
                     G_TYPE_NONE, 1, GGOBI_TYPE_SPLOT);
   }
 
-  if (g_signal_lookup ("variable_added", GGOBI_TYPE_GGOBI) == 0) {
+  if (g_signal_lookup ("variable_added", GGOBI_TYPE_SESSION) == 0) {
     GGobiSignals[VARIABLE_ADDED_SIGNAL] = g_signal_new ("variable_added", G_TYPE_FROM_CLASS (klass), G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION, 0, NULL, NULL, ggobi_marshal_VOID__POINTER_INT_OBJECT, G_TYPE_NONE, 2, G_TYPE_INT, /*index variable */
                                                         GGOBI_TYPE_STAGE);
   }
 
-  if (g_signal_lookup ("variable_list_changed", GGOBI_TYPE_GGOBI) == 0) {
+  if (g_signal_lookup ("variable_list_changed", GGOBI_TYPE_SESSION) == 0) {
     GGobiSignals[VARIABLE_LIST_CHANGED_SIGNAL] =
       g_signal_new ("variable_list_changed",
                     G_TYPE_FROM_CLASS (klass),
@@ -142,27 +142,27 @@ ggobi_ggobi_class_init (GGobiGGobiClass * klass)
                     G_TYPE_NONE, 1, GGOBI_TYPE_STAGE);
   }
 
-  if (g_signal_lookup ("sticky_point_added", GGOBI_TYPE_GGOBI) == 0) {
+  if (g_signal_lookup ("sticky_point_added", GGOBI_TYPE_SESSION) == 0) {
     GGobiSignals[STICKY_POINT_ADDED_SIGNAL] = g_signal_new ("sticky_point_added", G_TYPE_FROM_CLASS (klass), G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION, 0, NULL, NULL, ggobi_marshal_VOID__INT_INT_OBJECT, G_TYPE_NONE, 3, G_TYPE_INT, G_TYPE_INT, GGOBI_TYPE_STAGE);  /* record index and datad pointer */
   }
 
-  if (g_signal_lookup ("sticky_point_removed", GGOBI_TYPE_GGOBI) == 0) {
+  if (g_signal_lookup ("sticky_point_removed", GGOBI_TYPE_SESSION) == 0) {
     GGobiSignals[STICKY_POINT_REMOVED_SIGNAL] = g_signal_new ("sticky_point_removed", G_TYPE_FROM_CLASS (klass), G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION, 0, NULL, NULL, ggobi_marshal_VOID__INT_INT_OBJECT, G_TYPE_NONE, 3, G_TYPE_INT, G_TYPE_INT, GGOBI_TYPE_STAGE);  /* record index and datad pointer */
   }
 
-  if (g_signal_lookup ("clusters_changed", GGOBI_TYPE_GGOBI) == 0) {
+  if (g_signal_lookup ("clusters_changed", GGOBI_TYPE_SESSION) == 0) {
     GGobiSignals[CLUSTERS_CHANGED_SIGNAL] = g_signal_new ("clusters_changed", G_TYPE_FROM_CLASS (klass), G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION, 0, NULL, NULL, g_cclosure_marshal_VOID__OBJECT, G_TYPE_NONE, 1, GGOBI_TYPE_STAGE); /* datad pointer */
   }
 
 
-  if (g_signal_lookup ("display_new", GGOBI_TYPE_GGOBI) == 0) {
+  if (g_signal_lookup ("display_new", GGOBI_TYPE_SESSION) == 0) {
     GGobiSignals[DISPLAY_NEW_SIGNAL] = g_signal_new ("display_new", G_TYPE_FROM_CLASS (klass), G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION, 0, NULL, NULL, g_cclosure_marshal_VOID__OBJECT, G_TYPE_NONE, 1, GGOBI_TYPE_DISPLAY);  /* displayd pointer */
   }
 
 
   /* This signal is to be emitted by display_set_current, and picked
      up by the console. */
-  if (g_signal_lookup ("display_selected", GGOBI_TYPE_GGOBI) == 0) {
+  if (g_signal_lookup ("display_selected", GGOBI_TYPE_SESSION) == 0) {
     GGobiSignals[DISPLAY_SELECTED_SIGNAL] = g_signal_new ("display_selected", G_TYPE_FROM_CLASS (klass), G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION, 0, NULL, NULL, g_cclosure_marshal_VOID__OBJECT, G_TYPE_NONE, 1, GGOBI_TYPE_DISPLAY);  /* displayd pointer */
   }
 
@@ -205,7 +205,7 @@ ggobi_display_class_init (GGobiDisplayClass * klass)
                     G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION, 0, NULL, NULL,
                     ggobi_marshal_VOID__POINTER_INT_OBJECT,
                     G_TYPE_NONE, 3,
-                    G_TYPE_POINTER, G_TYPE_INT, GGOBI_TYPE_GGOBI);
+                    G_TYPE_POINTER, G_TYPE_INT, GGOBI_TYPE_SESSION);
   }
 }
 
@@ -438,7 +438,7 @@ extendedDisplayInit (extendedDisplayd * dpy)
 
 static GtkWidget *
 getExtendedDisplayCPanelWidget (displayd * dpy,
-                                gchar ** modeName, ggobid * gg)
+                                gchar ** modeName, GGobiSession * gg)
 {
   *modeName = "Unknown mode!";
   return (GGOBI_EXTENDED_DISPLAY (dpy)->cpanelWidget);

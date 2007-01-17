@@ -26,13 +26,13 @@
 static gint xmargin = 20;
 static gint ymargin = 20;
 
-static void bin_counts_reset (gint jvar, GGobiStage *d, ggobid *gg);
-static void selection_made_cb (GtkTreeSelection *tree_sel, ggobid *gg);
+static void bin_counts_reset (gint jvar, GGobiStage *d, GGobiSession *gg);
+static void selection_made_cb (GtkTreeSelection *tree_sel, GGobiSession *gg);
 
 /*-------------------------------------------------------------------------*/
 
 static void
-bin_counts_reset (gint jvar, GGobiStage *d, ggobid *gg)
+bin_counts_reset (gint jvar, GGobiStage *d, GGobiSession *gg)
 {
   gint k, m;
   gfloat val;
@@ -63,7 +63,7 @@ bin_counts_reset (gint jvar, GGobiStage *d, ggobid *gg)
 }
 
 static void
-record_colors_reset (gint selected_var, GGobiStage *d, ggobid *gg)
+record_colors_reset (gint selected_var, GGobiStage *d, GGobiSession *gg)
 {
   gint k, m;
   gint nd = g_slist_length(gg->d);
@@ -94,12 +94,12 @@ record_colors_reset (gint selected_var, GGobiStage *d, ggobid *gg)
 
 
 /*-- called when closed from the close button --*/
-static void close_btn_cb (GtkWidget *w, ggobid *gg) {
+static void close_btn_cb (GtkWidget *w, GGobiSession *gg) {
   gtk_widget_hide (gg->wvis.window);
 }
 /*-- called when closed from the window manager --*/
 static void
-close_wmgr_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg)
+close_wmgr_cb (GtkWidget *w, GdkEventButton *event, GGobiSession *gg)
 {
   gtk_widget_hide (gg->wvis.window);
 }
@@ -109,7 +109,7 @@ close_wmgr_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg)
  * boundary
 */
 static gint
-motion_notify_cb (GtkWidget *w, GdkEventMotion *event, ggobid *gg)
+motion_notify_cb (GtkWidget *w, GdkEventMotion *event, GGobiSession *gg)
 {
   GdkModifierType state;
   icoords pos;
@@ -162,7 +162,7 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, ggobid *gg)
 
 /*-- when the button is pressed, listen for motion notify events --*/
 static gint
-button_press_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg)
+button_press_cb (GtkWidget *w, GdkEventButton *event, GGobiSession *gg)
 {
   GdkModifierType state;
   icoords pos;
@@ -202,7 +202,7 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg)
 }
 
 static gint
-button_release_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg)
+button_release_cb (GtkWidget *w, GdkEventButton *event, GGobiSession *gg)
 {
   GtkWidget *tree_view = get_tree_view_from_object (G_OBJECT (w));
   GGobiStage *d = NULL; 
@@ -228,7 +228,7 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg)
 }
 
 static gint
-da_configure_cb (GtkWidget *w, GdkEventConfigure *event, ggobid *gg)
+da_configure_cb (GtkWidget *w, GdkEventConfigure *event, GGobiSession *gg)
 {
   /*-- Create new backing pixmaps of the appropriate size --*/
   if (gg->wvis.pix != NULL)
@@ -248,7 +248,7 @@ da_configure_cb (GtkWidget *w, GdkEventConfigure *event, ggobid *gg)
  * such that they contain equal numbers of points.
 */ 
 static void
-bin_boundaries_set (gint selected_var, GGobiStage *d, ggobid *gg)
+bin_boundaries_set (gint selected_var, GGobiStage *d, GGobiSession *gg)
 {
   gint k;
 
@@ -313,7 +313,7 @@ bin_boundaries_set (gint selected_var, GGobiStage *d, ggobid *gg)
   }
 }
 
-static void binning_method_cb (GtkWidget *w, ggobid *gg)
+static void binning_method_cb (GtkWidget *w, GGobiSession *gg)
 {
   gboolean rval = false;
   gg->wvis.binning_method = gtk_combo_box_get_active(GTK_COMBO_BOX(w));
@@ -323,12 +323,12 @@ static void binning_method_cb (GtkWidget *w, ggobid *gg)
     (gpointer) gg, (gpointer) &rval);
 }
 
-static void update_method_cb (GtkWidget *w, ggobid *gg)
+static void update_method_cb (GtkWidget *w, GGobiSession *gg)
 {
   gg->wvis.update_method = gtk_combo_box_get_active(GTK_COMBO_BOX(w));
 }
 
-static void alloc_pct (ggobid *gg)
+static void alloc_pct (GGobiSession *gg)
 {
   colorschemed *scheme = gg->activeColorScheme;
   if (gg->wvis.npct != scheme->n) {
@@ -341,7 +341,7 @@ static void alloc_pct (ggobid *gg)
 }
 
 static void
-da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
+da_expose_cb (GtkWidget *w, GdkEventExpose *event, GGobiSession *gg)
 {
   gint height = w->allocation.height - 2*ymargin;
   gint x0, x1, k, hgt;
@@ -465,7 +465,7 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
 }
 
 void
-selection_made_cb (GtkTreeSelection *tree_sel, ggobid *gg)
+selection_made_cb (GtkTreeSelection *tree_sel, GGobiSession *gg)
 {
   gboolean rval = false;
   GtkTreeView *tree_view = gtk_tree_selection_get_tree_view(tree_sel);
@@ -489,7 +489,7 @@ selection_made_cb (GtkTreeSelection *tree_sel, ggobid *gg)
 }
 
 
-static void scale_apply_cb (GtkWidget *w, ggobid* gg)
+static void scale_apply_cb (GtkWidget *w, GGobiSession* gg)
 {
   GtkWidget *tree_view = get_tree_view_from_object (G_OBJECT (w));
   GGobiStage *d = (GGobiStage *) g_object_get_data(G_OBJECT (tree_view), "datad");
@@ -517,7 +517,7 @@ static void scale_apply_cb (GtkWidget *w, ggobid* gg)
 }
 
 void
-wvis_window_open (ggobid *gg) 
+wvis_window_open (GGobiSession *gg) 
 {
   GtkWidget *vbox, *hb;
   GtkWidget *notebook = NULL;

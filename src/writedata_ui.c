@@ -21,7 +21,7 @@
 #include "writedata.h"
 
 static gchar *format_lbl[] = {"XML", "CSV"};
-void format_set (gint fmt, ggobid *gg) { 
+void format_set (gint fmt, GGobiSession *gg) { 
   GtkTreeSelection *sel = gtk_tree_view_get_selection (GTK_TREE_VIEW (gg->save.tree_view));
 
   gg->save.format = fmt;
@@ -30,24 +30,24 @@ void format_set (gint fmt, ggobid *gg) {
   else // CSV
     gtk_tree_selection_set_mode (sel, GTK_SELECTION_SINGLE);      
 }
-static void format_set_cb (GtkWidget *w, ggobid *gg)
+static void format_set_cb (GtkWidget *w, GGobiSession *gg)
 {
   format_set (gtk_combo_box_get_active(GTK_COMBO_BOX(w)), gg);
 }
 
 static gchar *stage_lbl[] = {"Raw data", "Transformed data"};
-void stage_set (gint stage, ggobid *gg) { gg->save.stage = stage; }
-static void stage_set_cb (GtkWidget *w, ggobid *gg)
+void stage_set (gint stage, GGobiSession *gg) { gg->save.stage = stage; }
+static void stage_set_cb (GtkWidget *w, GGobiSession *gg)
 {
   stage_set (gtk_combo_box_get_active(GTK_COMBO_BOX(w)), gg);
 }
 
 /*
 static gchar *jitter_lbl[] = {"Don't add jitter", "Add jitter"};
-void jitterp_set (gboolean jitterp, ggobid *gg) { gg->save.jitter_p = jitterp; }
+void jitterp_set (gboolean jitterp, GGobiSession *gg) { gg->save.jitter_p = jitterp; }
 static void jitterp_set_cb (GtkWidget *w, gpointer cbd)
 {
-  ggobid *gg = GGobiFromWidget (w, true);
+  GGobiSession *gg = GGobiFromWidget (w, true);
   jitterp_set ((gboolean ) GPOINTER_TO_INT (cbd), gg);
 }
 */
@@ -55,16 +55,16 @@ static void jitterp_set_cb (GtkWidget *w, gpointer cbd)
 static gchar *rowdata_lbl[] = {"All cases",
                                "Displayed cases",
                                /*"Labeled cases"*/};
-void rowind_set (gint ind, ggobid *gg) { gg->save.row_ind = ind; }
-static void rowind_set_cb (GtkWidget *w, ggobid *gg)
+void rowind_set (gint ind, GGobiSession *gg) { gg->save.row_ind = ind; }
+static void rowind_set_cb (GtkWidget *w, GGobiSession *gg)
 {
   rowind_set (gtk_combo_box_get_active(GTK_COMBO_BOX(w)), gg);
 }
 
 static gchar *columndata_lbl[] = {"All variables",
                                   "Selected variables"};
-void columnind_set (gint ind, ggobid *gg) { gg->save.column_ind = ind; }
-static void columnind_set_cb (GtkWidget *w, ggobid *gg)
+void columnind_set (gint ind, GGobiSession *gg) { gg->save.column_ind = ind; }
+static void columnind_set_cb (GtkWidget *w, GGobiSession *gg)
 {
   columnind_set (gtk_combo_box_get_active(GTK_COMBO_BOX(w)), gg);
 }
@@ -72,15 +72,15 @@ static void columnind_set_cb (GtkWidget *w, ggobid *gg)
 static gchar *missing_lbl[] = {"Missings as 'na'",
                                "Missings as '.'",
                                "Imputed values"};
-void missingind_set (gint ind, ggobid *gg) { gg->save.missing_ind = ind; }
-static void missingind_set_cb (GtkWidget *w, ggobid *gg)
+void missingind_set (gint ind, GGobiSession *gg) { gg->save.missing_ind = ind; }
+static void missingind_set_cb (GtkWidget *w, GGobiSession *gg)
 {
   missingind_set (gtk_combo_box_get_active(GTK_COMBO_BOX(w)), gg);
 }
 
 static gchar *edges_lbl[] = {"Don't save edges", "Save edges"};
-void edgesp_set (gboolean edgesp, ggobid *gg) { gg->save.edges_p = edgesp; }
-static void edgesp_set_cb (GtkWidget *w, ggobid *gg)
+void edgesp_set (gboolean edgesp, GGobiSession *gg) { gg->save.edges_p = edgesp; }
+static void edgesp_set_cb (GtkWidget *w, GGobiSession *gg)
 {
   edgesp_set ((gboolean ) gtk_combo_box_get_active(GTK_COMBO_BOX(w)), gg);
 }
@@ -94,12 +94,12 @@ close_cb (GtkWidget *w) {
 }
 */
 /*-- called when closed from the window manager --*/
-static void delete_cb (GtkWidget *w, GdkEvent *event, ggobid *gg) {
+static void delete_cb (GtkWidget *w, GdkEvent *event, GGobiSession *gg) {
   gtk_widget_destroy (w);
 }
 
 void
-writeall_window_open (ggobid *gg) {
+writeall_window_open (GGobiSession *gg) {
   GtkWidget *window, *vbox, *table, *opt, *btn, *lbl;
   gint j;
   GtkWidget *swin, *tree_view;

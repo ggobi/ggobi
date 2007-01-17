@@ -25,7 +25,7 @@
 
 
 void
-assign_points_to_bins (GGobiStage * d, splotd * sp, ggobid * gg)
+assign_points_to_bins (GGobiStage * d, splotd * sp, GGobiSession * gg)
 {
   gint k, ih, iv;
 

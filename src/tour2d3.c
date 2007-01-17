@@ -29,7 +29,7 @@
 #define T2D3OFF false
 
 void
-display_tour2d3_init_null (displayd *dsp, ggobid *gg)
+display_tour2d3_init_null (displayd *dsp, GGobiSession *gg)
 {
   arrayd_init_null(&dsp->t2d3.Fa);
   arrayd_init_null(&dsp->t2d3.Fz);
@@ -61,7 +61,7 @@ display_tour2d3_init_null (displayd *dsp, ggobid *gg)
 }
 
 void
-alloc_tour2d3 (displayd *dsp, ggobid *gg)
+alloc_tour2d3 (displayd *dsp, GGobiSession *gg)
 {
   GGobiStage *d = dsp->d;
   gint nc = d->n_cols;
@@ -98,7 +98,7 @@ alloc_tour2d3 (displayd *dsp, ggobid *gg)
 
 /*-- eliminate the nc columns contained in *cols --*/
 void
-tour2d3_realloc_down (GSList *cols, GGobiStage *d, ggobid *gg)
+tour2d3_realloc_down (GSList *cols, GGobiStage *d, GGobiSession *gg)
 {
   displayd *dsp;
   GList *l;
@@ -160,7 +160,7 @@ free_tour2d3(displayd *dsp)
 }
 
 void 
-display_tour2d3_init (displayd *dsp, ggobid *gg) {
+display_tour2d3_init (displayd *dsp, GGobiSession *gg) {
   gint i, j;
   GGobiStage *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
@@ -214,7 +214,7 @@ display_tour2d3_init (displayd *dsp, ggobid *gg) {
   dsp->t2d.target_selection_method = 0;
 }
 
-void tour2d3_speed_set(gfloat slidepos, ggobid *gg) {
+void tour2d3_speed_set(gfloat slidepos, GGobiSession *gg) {
   displayd *dsp = gg->current_display; 
   cpaneld *cpanel = &dsp->cpanel;
 
@@ -222,7 +222,7 @@ void tour2d3_speed_set(gfloat slidepos, ggobid *gg) {
   speed_set(slidepos, &cpanel->t2d3.step, &dsp->t2d3.delta);
 }
 
-void tour2d3_pause (cpaneld *cpanel, gboolean state, ggobid *gg) {
+void tour2d3_pause (cpaneld *cpanel, gboolean state, GGobiSession *gg) {
   displayd *dsp = gg->current_display;
   GGobiStage *d = dsp->d;
   cpanel->t2d3.paused = state;
@@ -239,7 +239,7 @@ void tour2d3_pause (cpaneld *cpanel, gboolean state, ggobid *gg) {
 /*-- add/remove jvar to/from the subset of variables that <may> be active --*/
 gboolean
 tour2d3_subset_var_set (gint jvar, gint *jprev, gint toggle, GGobiStage *d,
-  displayd *dsp, ggobid *gg)
+  displayd *dsp, GGobiSession *gg)
 {
   gboolean in_subset = dsp->t2d3.subset_vars_p.els[jvar];
   gint j, k;
@@ -307,7 +307,7 @@ tour2d3_subset_var_set (gint jvar, gint *jprev, gint toggle, GGobiStage *d,
 /*-- add or remove jvar from the set of active variables --*/
 void 
 tour2d3_active_vars_swap (gint jvar_out, gint jvar_in, GGobiStage *d,
-  displayd *dsp, ggobid *gg)
+  displayd *dsp, GGobiSession *gg)
 {
   gint k;
   gint a, b;
@@ -345,7 +345,7 @@ tour2d3_active_vars_swap (gint jvar_out, gint jvar_in, GGobiStage *d,
 }
 
 static void
-tour2d3_manip_var_set (gint j, ggobid *gg)
+tour2d3_manip_var_set (gint j, GGobiSession *gg)
 {
   displayd *dsp = gg->current_display;
 
@@ -354,7 +354,7 @@ tour2d3_manip_var_set (gint j, ggobid *gg)
 
 gboolean
 tour2d3_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse, GGobiStage *d,
-  ggobid *gg)
+  GGobiSession *gg)
 {
   displayd *dsp = gg->current_display;
   gboolean changed = true;
@@ -393,7 +393,7 @@ tour2d3_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse, GGobiStage *d,
 }
 
 void
-tour2d3_projdata(splotd *sp, greal **world_data, GGobiStage *d, ggobid *gg)
+tour2d3_projdata(splotd *sp, greal **world_data, GGobiStage *d, GGobiSession *gg)
 {
   gint j, m;
   displayd *dsp = (displayd *) sp->displayptr;
@@ -431,7 +431,7 @@ tour2d3_projdata(splotd *sp, greal **world_data, GGobiStage *d, ggobid *gg)
   }
 }
 
-void tour2d3_scramble(ggobid *gg)
+void tour2d3_scramble(GGobiSession *gg)
 {
   displayd *dsp = gg->current_display;
   GGobiStage *d = dsp->d;
@@ -456,7 +456,7 @@ void tour2d3_scramble(ggobid *gg)
 }
 
 void
-tour2d3_run(displayd *dsp, ggobid *gg)
+tour2d3_run(displayd *dsp, GGobiSession *gg)
 {
   GGobiStage *d = dsp->d;
   gint i, nv;
@@ -543,7 +543,7 @@ tour2d3_run(displayd *dsp, ggobid *gg)
 }
 
 void
-tour2d3_do_step(displayd *dsp, ggobid *gg)
+tour2d3_do_step(displayd *dsp, GGobiSession *gg)
 {
   tour2d3_run(dsp, gg);
 }
@@ -551,7 +551,7 @@ tour2d3_do_step(displayd *dsp, ggobid *gg)
 gint
 tour2d3_idle_func (displayd *dsp)
 {
-  ggobid *gg = GGobiFromDisplay (dsp);
+  GGobiSession *gg = GGobiFromDisplay (dsp);
   cpaneld *cpanel = &dsp->cpanel;
   gboolean doit = !cpanel->t2d3.paused;
 
@@ -563,7 +563,7 @@ tour2d3_idle_func (displayd *dsp)
   return (doit);
 }
 
-void tour2d3_func (gboolean state, displayd *dsp, ggobid *gg)
+void tour2d3_func (gboolean state, displayd *dsp, GGobiSession *gg)
 {
   if (state) {
     if (dsp->t2d3.idled == 0) {
@@ -580,7 +580,7 @@ void tour2d3_func (gboolean state, displayd *dsp, ggobid *gg)
   }
 }
 
-void tour2d3_reinit(ggobid *gg)
+void tour2d3_reinit(GGobiSession *gg)
 {
   gint i;
   displayd *dsp = gg->current_display;
@@ -615,7 +615,7 @@ tour2d3_manip_init(gint p1, gint p2, splotd *sp)
   displayd *dsp = (displayd *) sp->displayptr;
   GGobiStage *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
-  ggobid *gg = GGobiFromSPlot(sp);
+  GGobiSession *gg = GGobiFromSPlot(sp);
   gint j, k;
   gint n1vars = dsp->t2d3.nactive;
   gfloat tol = 0.05; 
@@ -822,7 +822,7 @@ tour2d3_manip_init(gint p1, gint p2, splotd *sp)
 }
 
 void
-tour2d3_manip(gint p1, gint p2, splotd *sp, ggobid *gg) 
+tour2d3_manip(gint p1, gint p2, splotd *sp, GGobiSession *gg) 
 {
   displayd *dsp = (displayd *) sp->displayptr;
   GGobiStage *d = dsp->d;
@@ -1082,7 +1082,7 @@ tour2d3_manip_end(splotd *sp)
 {
   displayd *dsp = (displayd *) sp->displayptr;
   cpaneld *cpanel = &dsp->cpanel;
-  ggobid *gg = GGobiFromSPlot(sp);
+  GGobiSession *gg = GGobiFromSPlot(sp);
 
   disconnect_motion_signal (sp);
 

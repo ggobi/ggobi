@@ -40,7 +40,7 @@
 // FIXME: eventually the GGobiDataFactory's should exist within a GGobi context
 // so that we don't have to instantiate them just to check the supported modes
 GSList *
-get_file_filters(ggobid *gg)
+get_file_filters(GGobiSession *gg)
 {
   GType *factory_types;
   guint n_factory_types, i;
@@ -83,12 +83,12 @@ void
 filesel_ok (GtkWidget * chooser)
 {
   extern const gchar *key_get (void);
-  ggobid *gg;
+  GGobiSession *gg;
   guint action, len;
   gchar *uri, *filename;
   gboolean firsttime;
 
-  gg = (ggobid *) g_object_get_data (G_OBJECT (chooser), key_get ());
+  gg = (GGobiSession *) g_object_get_data (G_OBJECT (chooser), key_get ());
   uri = gtk_file_chooser_get_uri (GTK_FILE_CHOOSER (chooser));
   action = GPOINTER_TO_INT (g_object_get_data (G_OBJECT (chooser), "action"));
   len = strlen (uri);
@@ -177,7 +177,7 @@ filesel_ok (GtkWidget * chooser)
 }
 
 static void
-filename_get_configure (GtkWidget * chooser, guint type, ggobid * gg)
+filename_get_configure (GtkWidget * chooser, guint type, GGobiSession * gg)
 {
   extern const gchar *key_get (void);
 
@@ -199,7 +199,7 @@ createOutputFileSelectionDialog (const gchar * title)
 }
 
 GtkWidget *
-createInputFileSelectionDialog (gchar * title, ggobid * gg)
+createInputFileSelectionDialog (gchar * title, GGobiSession * gg)
 {
   GtkWidget *chooser, *combo, *hbox, *lbl;
   GSList *filters, *l;
@@ -251,7 +251,7 @@ createInputFileSelectionDialog (gchar * title, ggobid * gg)
   return (chooser);
 }
 
-void configure_file_chooser(GtkWidget *chooser, ggobid *gg)
+void configure_file_chooser(GtkWidget *chooser, GGobiSession *gg)
 {
   if (GGOBI_IS_INPUT_SOURCE_FILE(gg->data_source)) {
     gchar *filename = ggobi_input_source_file_get_filename(
@@ -270,7 +270,7 @@ void configure_file_chooser(GtkWidget *chooser, ggobid *gg)
 /*--------------------------------------------------------------------------*/
 
 void
-filename_get_r (ggobid * gg)
+filename_get_r (GGobiSession * gg)
 {
   GtkWidget *chooser;
   chooser = createInputFileSelectionDialog ("Read ggobi data", gg);
@@ -289,7 +289,7 @@ filename_get_r (ggobid * gg)
 /*--------------------------------------------------------------------------*/
 
 void
-filename_get_w (GtkWidget * w, ggobid * gg)
+filename_get_w (GtkWidget * w, GGobiSession * gg)
 {
   GtkWidget *chooser;
   const gchar *title;

@@ -63,22 +63,22 @@ ggobi_IModeKeys[] =
 {
 "", "s", "b", "i", "e", "m", "", ""};
 
-void addPreviousFilesMenu (GGobiInitInfo * info, ggobid * gg);
+void addPreviousFilesMenu (GGobiInitInfo * info, GGobiSession * gg);
 
 #ifdef STORE_SESSION_ENABLED
-void store_session (ggobid * gg);
+void store_session (GGobiSession * gg);
 #endif
-void show_plugin_list (ggobid * gg);
+void show_plugin_list (GGobiSession * gg);
 
 /* Listen for display_selected events; update control panel */
 void
-control_panel_display_selected_cb (ggobid * gg, displayd * display)
+control_panel_display_selected_cb (GGobiSession * gg, displayd * display)
 {
   cpanel_set (display, gg);
 }
 
 void
-make_control_panels (ggobid * gg)
+make_control_panels (GGobiSession * gg)
 {
   cpanel_p1dplot_make (gg);
   cpanel_xyplot_make (gg);
@@ -102,7 +102,7 @@ make_control_panels (ggobid * gg)
 
 /* This can return NULL, so calling routines must check */
 GtkWidget *
-mode_panel_get_by_name (const gchar * name, ggobid * gg)
+mode_panel_get_by_name (const gchar * name, GGobiSession * gg)
 {
   GList *l;
   GtkWidget *w = NULL;
@@ -119,7 +119,7 @@ mode_panel_get_by_name (const gchar * name, ggobid * gg)
 }
 
 void
-tooltips_show (gboolean show, ggobid * gg)
+tooltips_show (gboolean show, GGobiSession * gg)
 {
   if (show)
     gtk_tooltips_enable (gg->tips);
@@ -128,7 +128,7 @@ tooltips_show (gboolean show, ggobid * gg)
 }
 
 void
-statusbar_show (gboolean show, ggobid * gg)
+statusbar_show (gboolean show, GGobiSession * gg)
 {
   GtkWidget *entry = (GtkWidget *)
     g_object_get_data (G_OBJECT (gg->main_window), "MAIN:STATUSBAR");
@@ -145,7 +145,7 @@ statusbar_show (gboolean show, ggobid * gg)
   gg->status_message_func((gchar *)domain_error_message, gg);
 */
 void
-gg_write_to_statusbar (gchar * message, ggobid * gg)
+gg_write_to_statusbar (gchar * message, GGobiSession * gg)
 {
   GtkWidget *statusbar = (GtkWidget *)
     g_object_get_data (G_OBJECT (gg->main_window), "MAIN:STATUSBAR");
@@ -172,7 +172,7 @@ gg_write_to_statusbar (gchar * message, ggobid * gg)
 }
 
 void
-cpanel_show (gboolean show, ggobid * gg)
+cpanel_show (gboolean show, GGobiSession * gg)
 {
   if (gg->imode_frame) {
     if (show)
@@ -183,7 +183,7 @@ cpanel_show (gboolean show, ggobid * gg)
 }
 
 ProjectionMode
-pmode_get (displayd * dsp, ggobid * gg)
+pmode_get (displayd * dsp, GGobiSession * gg)
 {
   if (dsp == NULL)
     return gg->pmode;
@@ -192,7 +192,7 @@ pmode_get (displayd * dsp, ggobid * gg)
 }
 
 InteractionMode
-imode_get (ggobid * gg)
+imode_get (GGobiSession * gg)
 {
   return gg->imode;
 }
@@ -234,7 +234,7 @@ varpanel_shows_checkboxes (GGobiStage * d)
 }
 
 void
-varpanel_reinit (ggobid * gg)
+varpanel_reinit (GGobiSession * gg)
 {
   GGobiStage *d;
   gboolean highd;
@@ -263,7 +263,7 @@ varpanel_reinit (ggobid * gg)
 }
 
 void
-rebuild_mode_menus (displayd * display, ggobid * gg)
+rebuild_mode_menus (displayd * display, GGobiSession * gg)
 {
   static const gchar *iprefix = "/menubar/IMode/", *pprefix =
     "/menubar/PMode/";
@@ -303,7 +303,7 @@ rebuild_mode_menus (displayd * display, ggobid * gg)
         g_error_free (error);
       }
     }
-    void (*f) (displayd * dpy, ggobid * gg) =
+    void (*f) (displayd * dpy, GGobiSession * gg) =
       GGOBI_EXTENDED_DISPLAY_GET_CLASS (display)->display_set;
     if (f)
       f (display, gg);
@@ -343,7 +343,7 @@ rebuild_mode_menus (displayd * display, ggobid * gg)
 }
 
 void
-viewmode_set (ProjectionMode pmode, InteractionMode imode, ggobid * gg)
+viewmode_set (ProjectionMode pmode, InteractionMode imode, GGobiSession * gg)
 {
   displayd *display = gg->current_display;
 
@@ -444,7 +444,7 @@ viewmode_set (ProjectionMode pmode, InteractionMode imode, ggobid * gg)
 */
 void
 procs_activate (gboolean state, ProjectionMode pmode, displayd * display,
-                ggobid * gg)
+                GGobiSession * gg)
 {
   if (!display)
     return;
@@ -473,7 +473,7 @@ procs_activate (gboolean state, ProjectionMode pmode, displayd * display,
 
 RedrawStyle
 imode_activate (splotd * sp, ProjectionMode pmode, InteractionMode imode,
-                gboolean state, ggobid * gg)
+                gboolean state, GGobiSession * gg)
 {
   displayd *display = (displayd *) sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
@@ -625,7 +625,7 @@ projection_ok (ProjectionMode m, displayd * display)
 /* Do everything in one routine for now; split later if apropriate */
 gint
 ggobi_full_viewmode_set (ProjectionMode pmode, InteractionMode imode,
-                           ggobid * gg)
+                           GGobiSession * gg)
 {
   /*
    * When a new pmode is selected, it sets a new pmode and then calls
@@ -717,11 +717,11 @@ ggobi_full_viewmode_set (ProjectionMode pmode, InteractionMode imode,
   the Quit button.
  */
 void
-quit_ggobi (ggobid * gg)
+quit_ggobi (GGobiSession * gg)
 {
-  extern void closePlugins (ggobid * gg);
+  extern void closePlugins (GGobiSession * gg);
   gint n, i;
-  ggobid *el;
+  GGobiSession *el;
   n = ggobi_getNumGGobis ();
   for (i = 0; i < n; i++) {
     el = ggobi_ggobi_get (i);
@@ -735,7 +735,7 @@ quit_ggobi (ggobid * gg)
 }
 
 static GtkWidget *
-subwindow_create(ggobid *gg, const gchar *title, GtkWidget *panel)
+subwindow_create(GGobiSession *gg, const gchar *title, GtkWidget *panel)
 {
   GtkWidget *win = gtk_dialog_new_with_buttons(title, GTK_WINDOW(gg->main_window), 
     GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE, NULL);
@@ -746,7 +746,7 @@ subwindow_create(ggobid *gg, const gchar *title, GtkWidget *panel)
 
 // FIXME: May want to make this and its siblings public
 static void
-transform_window_open(ggobid *gg)
+transform_window_open(GGobiSession *gg)
 {
   if (!gg->transform_gui)
     gg->transform_gui = subwindow_create(gg, "Transform Variables", 
@@ -756,119 +756,119 @@ transform_window_open(ggobid *gg)
 
 /* action callbacks */
 static void
-action_open_cb (GtkAction * action, ggobid * gg)
+action_open_cb (GtkAction * action, GGobiSession * gg)
 {
   filename_get_r (gg);
 }
 static void
-action_save_cb (GtkAction * action, ggobid * gg)
+action_save_cb (GtkAction * action, GGobiSession * gg)
 {
   writeall_window_open (gg);
 }
 #ifdef STORE_SESSION_ENABLED
 static void
-action_store_session_cb (GtkAction * action, ggobid * gg)
+action_store_session_cb (GtkAction * action, GGobiSession * gg)
 {
   store_session (gg);
 }
 #endif
 static void
-action_close_cb (GtkAction * action, ggobid * gg)
+action_close_cb (GtkAction * action, GGobiSession * gg)
 {
   ggobi_close (gg);
 }
 static void                     /* this is to connect to the delete signal (window closed) */
-signal_delete_cb (ggobid * gg, GdkEvent * ev, GtkWidget * w)
+signal_delete_cb (GGobiSession * gg, GdkEvent * ev, GtkWidget * w)
 {
   ggobi_close (gg);
 }
 static void
-action_quit_cb (GtkAction * action, ggobid * gg)
+action_quit_cb (GtkAction * action, GGobiSession * gg)
 {
   quit_ggobi (gg);
 }
 static void
-action_manipulate_cb (GtkAction * action, ggobid * gg)
+action_manipulate_cb (GtkAction * action, GGobiSession * gg)
 {
   vartable_open (gg);
 }
 static void
-action_transform_cb (GtkAction * action, ggobid * gg)
+action_transform_cb (GtkAction * action, GGobiSession * gg)
 {
   transform_window_open (gg);
 }
 static void
-action_sphere_cb (GtkAction * action, ggobid * gg)
+action_sphere_cb (GtkAction * action, GGobiSession * gg)
 {
   sphere_panel_open (gg);
 }
 static void
-action_jitter_cb (GtkAction * action, ggobid * gg)
+action_jitter_cb (GtkAction * action, GGobiSession * gg)
 {
   jitter_window_open (gg);
 }
 static void
-action_color_schemes_cb (GtkAction * action, ggobid * gg)
+action_color_schemes_cb (GtkAction * action, GGobiSession * gg)
 {
   svis_window_open (gg);
 }
 static void
-action_autobrush_cb (GtkAction * action, ggobid * gg)
+action_autobrush_cb (GtkAction * action, GGobiSession * gg)
 {
   wvis_window_open (gg);
 }
 static void
-action_color_glyph_groups_cb (GtkAction * action, ggobid * gg)
+action_color_glyph_groups_cb (GtkAction * action, GGobiSession * gg)
 {
   cluster_window_open (gg);
 }
 static void
-action_subset_cb (GtkAction * action, ggobid * gg)
+action_subset_cb (GtkAction * action, GGobiSession * gg)
 {
   subset_window_open (gg);
 }
 
 #ifdef SMOOTH_IMPLEMENTED
 static void
-action_smooth_cb (GtkAction * action, ggobid * gg)
+action_smooth_cb (GtkAction * action, GGobiSession * gg)
 {
   smooth_window_open (gg);
 }
 #endif
 static void
-action_impute_cb (GtkAction * action, ggobid * gg)
+action_impute_cb (GtkAction * action, GGobiSession * gg)
 {
   impute_window_open (gg);
 }
 static void
-action_about_cb (GtkAction * action, ggobid * gg)
+action_about_cb (GtkAction * action, GGobiSession * gg)
 {
   splash_show (gg);
 }
 static void
-action_plugins_cb (GtkAction * action, ggobid * gg)
+action_plugins_cb (GtkAction * action, GGobiSession * gg)
 {
   show_plugin_list (gg);
 }
 static void
-action_toggle_tooltips_cb (GtkToggleAction * action, ggobid * gg)
+action_toggle_tooltips_cb (GtkToggleAction * action, GGobiSession * gg)
 {
   tooltips_show (gtk_toggle_action_get_active (action), gg);
 }
 static void
-action_toggle_cpanel_cb (GtkToggleAction * action, ggobid * gg)
+action_toggle_cpanel_cb (GtkToggleAction * action, GGobiSession * gg)
 {
   cpanel_show (gtk_toggle_action_get_active (action), gg);
 }
 static void
-action_toggle_statusbar_cb (GtkToggleAction * action, ggobid * gg)
+action_toggle_statusbar_cb (GtkToggleAction * action, GGobiSession * gg)
 {
   statusbar_show (gtk_toggle_action_get_active (action), gg);
 }
 
 static void
 action_radio_pmode_cb (GtkRadioAction * action, GtkRadioAction * current,
-                       ggobid * gg)
+                       GGobiSession * gg)
 {
   ProjectionMode pm =
     (ProjectionMode) gtk_radio_action_get_current_value (action);
@@ -885,7 +885,7 @@ action_radio_pmode_cb (GtkRadioAction * action, GtkRadioAction * current,
 }
 static void
 action_radio_imode_cb (GtkRadioAction * action, GtkRadioAction * current,
-                       ggobid * gg)
+                       GGobiSession * gg)
 {
   InteractionMode im;
 
@@ -1057,7 +1057,7 @@ static GtkRadioActionEntry imode_entries[] = {
 };
 
 GtkActionGroup *
-ggobi_actions_create (ggobid * gg)
+ggobi_actions_create (GGobiSession * gg)
 {
   GtkToggleActionEntry t_entries[] = {  /* not global because depends on gg state */
     {"ShowTooltips", NULL, "Show _Tooltips", NULL,
@@ -1094,7 +1094,7 @@ ggobi_actions_create (ggobid * gg)
 }
 
 GtkUIManager *
-ggobi_menu_manager_create (ggobid * gg)
+ggobi_menu_manager_create (GGobiSession * gg)
 {
   GtkUIManager *manager = gtk_ui_manager_new ();
   GtkActionGroup *actions = ggobi_actions_create (gg);
@@ -1105,7 +1105,7 @@ ggobi_menu_manager_create (ggobid * gg)
 }
 
 void
-make_ui (ggobid * gg)
+make_ui (GGobiSession * gg)
 {
   GtkWidget *window;
   GtkWidget *hbox, *vbox, *statusbar;
@@ -1213,7 +1213,7 @@ make_ui (ggobid * gg)
 
   /*-- at this point, the mode could be NULLMODE, P1PLOT, or XYPLOT --*/
   {
-    void main_miscmenus_initialize (ggobid * gg);
+    void main_miscmenus_initialize (GGobiSession * gg);
     /*main_miscmenus_initialize (gg); */
   }
 
@@ -1246,7 +1246,7 @@ void load_previous_file (GtkAction * action, gpointer cbd);
   Eventually this could be based on GtkRecentChooser (requires 2.10)
  */
 void
-addPreviousFilesMenu (GGobiInitInfo * info, ggobid * gg)
+addPreviousFilesMenu (GGobiInitInfo * info, GGobiSession * gg)
 {
   gint i;
   GGobiInputSource *source;
@@ -1287,9 +1287,9 @@ void
 load_previous_file (GtkAction * action, gpointer cbd)
 {
   GGobiDescription *gdesc;
-  ggobid *gg;
+  GGobiSession *gg;
   
-  gg = (ggobid *) g_object_get_data (G_OBJECT (action), "ggobi");
+  gg = (GGobiSession *) g_object_get_data (G_OBJECT (action), "ggobi");
   gdesc = (GGobiDescription *) cbd;
   load_data_source(gdesc->source, gg);
 
@@ -1320,10 +1320,10 @@ load_previous_file (GtkAction * action, gpointer cbd)
 }
 
 void
-show_plugin_list (ggobid * gg)
+show_plugin_list (GGobiSession * gg)
 {
   if (sessionOptions->info && sessionOptions->info->plugins)
-    showPluginInfo (sessionOptions->info->plugins, (ggobid *) gg);
+    showPluginInfo (sessionOptions->info->plugins, (GGobiSession *) gg);
 }
 
 
@@ -1332,7 +1332,7 @@ void
 store_session_in_file (GtkWidget * chooser)
 {
   gchar *fileName;
-  ggobid *gg;
+  GGobiSession *gg;
 
   fileName = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (chooser));
   if (fileName && fileName[0]) {
@@ -1343,7 +1343,7 @@ store_session_in_file (GtkWidget * chooser)
 }
 
 void
-store_session (ggobid * gg)
+store_session (GGobiSession * gg)
 {
   GtkWidget *dlg;
   gchar *buf;

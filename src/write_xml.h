@@ -16,7 +16,7 @@ extern "C" {
   /*
     An instance of this structure is passed to all the routines
     that are called when writing the XML representation of a
-    ggobid object (its datad elements). 
+    GGobiSession object (its datad elements). 
     Thus it can be used to store additional information that
     may be needed by the output engine for particular elements
     and attributes.
@@ -43,22 +43,22 @@ typedef struct {
 
 
 
-gboolean write_xml (const gchar *filename, ggobid *gg, XmlWriteInfo *xmlWriteInfo);
-gboolean write_xml_stream (FILE *f, ggobid *gg, const gchar *, XmlWriteInfo *xmlWriteInfo);
-gboolean write_xml_dataset(FILE *f, GGobiStage *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo);
-gboolean write_xml_header (FILE *f, int numDatasets, ggobid *gg, XmlWriteInfo *xmlWriteInfo);
-gboolean write_xml_footer(FILE *f, ggobid *gg, XmlWriteInfo *xmlWriteInfo);
-gboolean write_xml_description (FILE *f, ggobid *gg, XmlWriteInfo *xmlWriteInfo);
-gboolean write_xml_variables (FILE *f, GGobiStage *, ggobid *gg, XmlWriteInfo *xmlWriteInfo);
-gboolean write_xml_variable (FILE *f, GGobiStage *, ggobid *gg, gint i, XmlWriteInfo *xmlWriteInfo);
-gboolean write_xml_records (FILE *f, GGobiStage *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo);
-gboolean write_xml_record (FILE *f, GGobiStage *d, ggobid *gg, gint i, XmlWriteInfo *xmlWriteInfo);
+gboolean write_xml (const gchar *filename, GGobiSession *gg, XmlWriteInfo *xmlWriteInfo);
+gboolean write_xml_stream (FILE *f, GGobiSession *gg, const gchar *, XmlWriteInfo *xmlWriteInfo);
+gboolean write_xml_dataset(FILE *f, GGobiStage *d, GGobiSession *gg, XmlWriteInfo *xmlWriteInfo);
+gboolean write_xml_header (FILE *f, int numDatasets, GGobiSession *gg, XmlWriteInfo *xmlWriteInfo);
+gboolean write_xml_footer(FILE *f, GGobiSession *gg, XmlWriteInfo *xmlWriteInfo);
+gboolean write_xml_description (FILE *f, GGobiSession *gg, XmlWriteInfo *xmlWriteInfo);
+gboolean write_xml_variables (FILE *f, GGobiStage *, GGobiSession *gg, XmlWriteInfo *xmlWriteInfo);
+gboolean write_xml_variable (FILE *f, GGobiStage *, GGobiSession *gg, gint i, XmlWriteInfo *xmlWriteInfo);
+gboolean write_xml_records (FILE *f, GGobiStage *d, GGobiSession *gg, XmlWriteInfo *xmlWriteInfo);
+gboolean write_xml_record (FILE *f, GGobiStage *d, GGobiSession *gg, gint i, XmlWriteInfo *xmlWriteInfo);
 
-gboolean write_xml_edges(FILE *f, GGobiStage *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo);
-gboolean write_xml_edge(FILE *f, GGobiStage *d, ggobid *gg, gint i, XmlWriteInfo *xmlWriteInfo);
+gboolean write_xml_edges(FILE *f, GGobiStage *d, GGobiSession *gg, XmlWriteInfo *xmlWriteInfo);
+gboolean write_xml_edge(FILE *f, GGobiStage *d, GGobiSession *gg, gint i, XmlWriteInfo *xmlWriteInfo);
 
-gboolean write_dataset_header(FILE *f, GGobiStage *, ggobid *gg, XmlWriteInfo *xmlWriteInfo);
-gboolean write_dataset_footer(FILE *f, ggobid *gg, XmlWriteInfo *xmlWriteInfo);
+gboolean write_dataset_header(FILE *f, GGobiStage *, GGobiSession *gg, XmlWriteInfo *xmlWriteInfo);
+gboolean write_dataset_footer(FILE *f, GGobiSession *gg, XmlWriteInfo *xmlWriteInfo);
 
 #ifdef __cplusplus 
 }

@@ -342,7 +342,7 @@ widget_find_by_name (GtkWidget * parent, gchar * name)
 /*-----------------------------------------------------------------------*/
 
 void
-print_attachments (ggobid * gg)
+print_attachments (GGobiSession * gg)
 {
   GList *l;
   GtkTableChild *child;

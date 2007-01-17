@@ -84,7 +84,7 @@ new(guint nrows, guint ncols)
 // FIXME: this stuff is _G_Gobi-specific, so it has to be added to every
 // GGobiData that participates in _G_Gobi, regardless of source.
 // Thus, this should probably be done when the GGobiData is added to the 
-// GGobiApp (ggobid) object.
+// GGobiApp (GGobiSession) object.
 public void
 add_attributes(self) {
   GGobiStage *stage = GGOBI_STAGE(self);
@@ -92,7 +92,7 @@ add_attributes(self) {
   gdouble def_type  = (gdouble) (stage->gg ? stage->gg->glyph_id.type : FC);
   gdouble def_size =  (gdouble) (stage->gg ? stage->gg->glyph_id.size : 1);
   
-  // FIXME: we set the default value here, even though the ggobid fields
+  // FIXME: we set the default value here, even though the GGobiSession fields
   // change to match the current brush colour
   self_add_attribute(self, "_color", def_color);
   self_add_attribute(self, "_color_now", def_color);

@@ -38,17 +38,17 @@ void display_add_tree(displayd *display);
 
 gchar *display_tree_label(displayd *display);
 
-GtkTreeView *plot_tree_display(ggobid *gg);
+GtkTreeView *plot_tree_display(GGobiSession *gg);
 
-void show_display_tree_cb (GtkWidget *widget, ggobid *);
-void show_display_tree (ggobid *gg, GtkWidget *widget);
+void show_display_tree_cb (GtkWidget *widget, GGobiSession *);
+void show_display_tree (GGobiSession *gg, GtkWidget *widget);
 
 void splot_add_tree(displayd *display, GtkTreeIter *parent);
-gchar *splot_tree_label (splotd *, GGobiStage *, ggobid *);
+gchar *splot_tree_label (splotd *, GGobiStage *, GGobiSession *);
 
-void display_tree_delete_cb(GtkWidget *w, GdkEvent *event, ggobid *gg);
+void display_tree_delete_cb(GtkWidget *w, GdkEvent *event, GGobiSession *gg);
 
-gboolean  tree_display_entry_remove(displayd *display, GtkWidget *w, ggobid *gg);
+gboolean  tree_display_entry_remove(displayd *display, GtkWidget *w, GGobiSession *gg);
 
 void display_tree_child_select(GtkTreeSelection *, gpointer cbd);
 

@@ -39,8 +39,8 @@ enum {
   NCOLS_VT
   };
   
-extern GtkWidget * vartable_buttonbox_build (ggobid *gg);
-static void vartable_subwindow_init (GGobiStage *d, ggobid *gg);
+extern GtkWidget * vartable_buttonbox_build (GGobiSession *gg);
+static void vartable_subwindow_init (GGobiStage *d, GGobiSession *gg);
 
 /*-------------------------------------------------------------------------*/
 /*            Listen for display_selected events                           */
@@ -48,24 +48,24 @@ static void vartable_subwindow_init (GGobiStage *d, ggobid *gg);
 
 /* Update variable selection panel */
 void 
-vartable_show_page_cb (ggobid *gg, displayd *display) {
+vartable_show_page_cb (GGobiSession *gg, displayd *display) {
   vartable_show_page(display->d, gg);
 }
 
 /*-------------------------------------------------------------------------*/
 
-static void close_wmgr_cb (GtkWidget *cl, GdkEventButton *event, ggobid *gg)
+static void close_wmgr_cb (GtkWidget *cl, GdkEventButton *event, GGobiSession *gg)
 {
   gtk_widget_hide (gg->vartable_ui.window);
 }
-static void destroyit (ggobid *gg)
+static void destroyit (GGobiSession *gg)
 {
   gtk_widget_destroy (gg->vartable_ui.window);
   gg->vartable_ui.window = NULL;
 }
 
 static void 
-vartable_notebook_adddata_cb (ggobid *gg, GGobiStage *d, void *notebook)
+vartable_notebook_adddata_cb (GGobiSession *gg, GGobiStage *d, void *notebook)
 {
   vartable_subwindow_init (d, gg);
   gtk_notebook_set_show_tabs (GTK_NOTEBOOK (GTK_WIDGET(notebook)),
@@ -104,7 +104,7 @@ tree_view_get_type (GGobiStage *d, GtkWidget *tree_view)
 */
 void
 vartable_switch_page_cb (GtkNotebook *notebook, GtkNotebookPage *page,
-  gint page_num, ggobid *gg)
+  gint page_num, GGobiSession *gg)
 {
   gint prev_page = gtk_notebook_get_current_page (notebook);
   GtkWidget *swin, *tree_view;
@@ -142,7 +142,7 @@ vartable_tree_model_get (GGobiStage *d)
 }
 
 GtkWidget *
-vartable_tree_view_get (ggobid *gg) {
+vartable_tree_view_get (GGobiSession *gg) {
   GtkNotebook *nb, *subnb;
   gint indx, subindx;
   GtkWidget *swin;
@@ -182,7 +182,7 @@ vartable_tree_view_get (ggobid *gg) {
 }
 
 void
-vartable_show_page (GGobiStage *d, ggobid *gg)
+vartable_show_page (GGobiStage *d, GGobiSession *gg)
 {
   GtkNotebook *nb;
   gint page, page_new;
@@ -328,7 +328,7 @@ vartable_stage_changed_cb (GGobiStage *s, GGobiPipelineMessage *msg, gpointer us
 }
 
 static void
-vartable_subwindow_init (GGobiStage *d, ggobid *gg)
+vartable_subwindow_init (GGobiStage *d, GGobiSession *gg)
 {
   gint j;
   GtkWidget *sw, *wlbl;
@@ -460,7 +460,7 @@ pages any more!
 }
 
 void
-vartable_open (ggobid *gg)
+vartable_open (GGobiSession *gg)
 {                                  
   GtkWidget *vbox, *hbox;
   GSList *l;

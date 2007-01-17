@@ -34,14 +34,14 @@
 
 /* Update variable selection panel */
 void
-varpanel_show_page_cb (ggobid * gg, displayd * display, GGobiStage * d)
+varpanel_show_page_cb (GGobiSession * gg, displayd * display, GGobiStage * d)
 {
   varpanel_show_page (display, gg);
 }
 
 /* Update tooltips */
 void
-varpanel_tooltips_set_cb (ggobid * gg, displayd * display, GGobiStage * d)
+varpanel_tooltips_set_cb (GGobiSession * gg, displayd * display, GGobiStage * d)
 {
   varpanel_tooltips_set (display, gg);
 }
@@ -168,7 +168,7 @@ void
 varsel (GtkWidget * w, cpaneld * cpanel, splotd * sp, gint jvar,
         gint toggle, gint mousebtn,
         gint alt_mod, gint ctrl_mod, gint shift_mod, GGobiStage * d,
-        ggobid * gg)
+        GGobiSession * gg)
 {
   displayd *display = (displayd *) sp->displayptr;
   gboolean redraw = false;
@@ -221,7 +221,7 @@ varsel (GtkWidget * w, cpaneld * cpanel, splotd * sp, gint jvar,
 /*------------------------------------------------------------------------*/
 
 void
-varpanel_show_page (displayd * display, ggobid * gg)
+varpanel_show_page (displayd * display, GGobiSession * gg)
 {
   GtkNotebook *nb;
   gint page, page_new;
@@ -271,7 +271,7 @@ varpanel_show_page (displayd * display, ggobid * gg)
 
 void
 varpanel_switch_page_cb (GtkNotebook * notebook, GtkNotebookPage * page,
-                         gint page_num, ggobid * gg)
+                         gint page_num, GGobiSession * gg)
 {
   varpanel_reinit (gg);
   gdk_flush ();
@@ -292,7 +292,7 @@ varpanel_switch_page_cb (GtkNotebook * notebook, GtkNotebookPage * page,
 
 /*-- here's where we'd reset what's selected according to the current mode --*/
 void
-varpanel_refresh (displayd * display, ggobid * gg)
+varpanel_refresh (displayd * display, GGobiSession * gg)
 {
   splotd *sp = gg->current_splot;
   GGobiStage *d;
@@ -333,7 +333,7 @@ varpanel_refresh (displayd * display, ggobid * gg)
 static gint
 varsel_cb (GtkWidget * w, GdkEvent * event, GGobiStage * d)
 {
-  ggobid *gg = GGobiFromWidget (w, true);
+  GGobiSession *gg = GGobiFromWidget (w, true);
   displayd *display = gg->current_display;
   splotd *sp = gg->current_splot;
   cpaneld *cpanel;
@@ -399,7 +399,7 @@ varsel_cb (GtkWidget * w, GdkEvent * event, GGobiStage * d)
 /*------------------------------------------------------------------*/
 
 static void
-varpanel_add_row (gint j, GGobiStage * d, ggobid * gg)
+varpanel_add_row (gint j, GGobiStage * d, GGobiSession * gg)
 {
   GtkWidget *box, *xw, *yw, *zw, *label;
   gboolean sens = false;
@@ -456,7 +456,7 @@ varpanel_add_row (gint j, GGobiStage * d, ggobid * gg)
 }
 
 void
-varpanel_widgets_add (gint nc, GGobiStage * d, ggobid * gg)
+varpanel_widgets_add (gint nc, GGobiStage * d, GGobiSession * gg)
 {
   gint j;
   gint nd = g_slist_length (gg->d);
@@ -484,7 +484,7 @@ varpanel_widgets_add (gint nc, GGobiStage * d, ggobid * gg)
 /*-------------------------------------------------------------------------*/
 
 void
-varpanel_addvar_cb (ggobid * gg, gint which,
+varpanel_addvar_cb (GGobiSession * gg, gint which,
                     GGobiStage * d, void *p)
 {
   /*-- variable toggle buttons and circles --*/
@@ -508,7 +508,7 @@ its own projection.  Add a variable to varpanel_ui in datad.h? -- dfs */
 /*-------------------------------------------------------------------------*/
 
 void
-varpanel_set_sensitive (GGobiStage * d, gboolean sensitive_p, ggobid * gg)
+varpanel_set_sensitive (GGobiStage * d, gboolean sensitive_p, GGobiSession * gg)
 {
   GtkWidget *vbox = d->vcbox_ui.vbox, *hb;
   GList *vblist, *hblist;
@@ -528,7 +528,7 @@ varpanel_set_sensitive (GGobiStage * d, gboolean sensitive_p, ggobid * gg)
 
 /* Respond to display_new events */
 void
-varpanel_set_sensitive_cb (ggobid * gg, displayd * display)
+varpanel_set_sensitive_cb (GGobiSession * gg, displayd * display)
 {
   varpanel_set_sensitive (display->d, true, gg);
 }
@@ -541,7 +541,7 @@ varpanel_set_sensitive_cb (ggobid * gg, displayd * display)
  * checkboxes on the left and circles/rectangles on the right
 */
 void
-varpanel_make (GtkWidget * parent, ggobid * gg)
+varpanel_make (GtkWidget * parent, GGobiSession * gg)
 {
 
   gg->varpanel_ui.layoutByRow = true;  /*-- for the circles --*/
@@ -567,7 +567,7 @@ varpanel_make (GtkWidget * parent, ggobid * gg)
 }
 
 void
-varpanel_clear (GGobiStage * d, ggobid * gg)
+varpanel_clear (GGobiStage * d, GGobiSession * gg)
 {
   GList *pages;
   gint npages;
@@ -588,7 +588,7 @@ varpanel_clear (GGobiStage * d, ggobid * gg)
 /*-- for each datad:  hpane, ebox, scrolled window, vbox;
      in varpanel_add_row, an hbox, togglebuttons and label --*/
 void
-varpanel_populate (GGobiStage * d, ggobid * gg)
+varpanel_populate (GGobiStage * d, GGobiSession * gg)
 {
   gint j, nd;
   GList *children;
@@ -669,7 +669,7 @@ varpanel_populate (GGobiStage * d, ggobid * gg)
 /*                          API; not used                                  */
 /*-------------------------------------------------------------------------*/
 
-void ggobi_selectScatterplotX (GtkWidget * w, gint jvar, ggobid * gg)
+void ggobi_selectScatterplotX (GtkWidget * w, gint jvar, GGobiSession * gg)
 {
   displayd *display = gg->current_display;
   GGobiExtendedDisplayClass *klass;
@@ -686,7 +686,7 @@ void ggobi_selectScatterplotX (GtkWidget * w, gint jvar, ggobid * gg)
 /*-------------------------------------------------------------------------*/
 
 void
-varpanel_tooltips_set (displayd * display, ggobid * gg)
+varpanel_tooltips_set (displayd * display, GGobiSession * gg)
 {
   gint j;
   GGobiStage *d;

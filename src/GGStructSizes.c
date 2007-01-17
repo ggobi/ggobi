@@ -16,7 +16,7 @@ typedef struct
 #define GG_StructEntry(type) {sizeof(type), #type}
 
 static const ggobi_StructSize ggobiStructs[] = {
-  GG_StructEntry (ggobid),
+  GG_StructEntry (GGobiSession),
   GG_StructEntry (GGobiStage),
   GG_StructEntry (displayd),
   GG_StructEntry (splotd),

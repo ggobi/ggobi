@@ -29,7 +29,7 @@
 
 /*
 void
-splot_pan (splotd *sp, gint xstep, gint ystep, ggobid *gg)
+splot_pan (splotd *sp, gint xstep, gint ystep, GGobiSession *gg)
 {
   cpaneld *cpanel = &gg->current_display->cpanel;
   displayd *display = gg->current_display;
@@ -54,7 +54,7 @@ splot_pan (splotd *sp, gint xstep, gint ystep, ggobid *gg)
 void
 splot_zoom (splotd * sp, gfloat xsc, gfloat ysc)
 {
-  ggobid *gg = GGobiFromSPlot(sp);
+  GGobiSession *gg = GGobiFromSPlot(sp);
   displayd *display = gg->current_display;
   /*gint projection = projection_get (gg); */
   icoords mid;

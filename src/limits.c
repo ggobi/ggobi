@@ -60,7 +60,7 @@ limits_adjust (gfloat * min, gfloat * max)
 // FIXME: This should probably just operate at the plot/viewport level, especially
 // since specified limits are going away
 void
-recenter_data (gint i, GGobiStage * d, ggobid * gg)
+recenter_data (gint i, GGobiStage * d, GGobiSession * gg)
 {
   GGobiVariable *var;
   greal x;

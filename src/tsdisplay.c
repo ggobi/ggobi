@@ -25,7 +25,7 @@
 #include <string.h>
 
 displayd *
-timeSeriesDisplayCreate(gboolean missing_p, splotd *sp, GGobiStage *d, ggobid *gg)
+timeSeriesDisplayCreate(gboolean missing_p, splotd *sp, GGobiStage *d, GGobiSession *gg)
 {
   gint *selected_vars, nselected_vars = 0;
   displayd *dpy = NULL;
@@ -58,7 +58,7 @@ tsplotIsVarPlotted(displayd *display, GSList *cols, GGobiStage *d)
 }
 
 gboolean
-tsplotCPanelSet(displayd *dpy, cpaneld *cpanel, ggobid *gg)
+tsplotCPanelSet(displayd *dpy, cpaneld *cpanel, GGobiSession *gg)
 { 
   GtkWidget *w;
   w = GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget;
@@ -76,7 +76,7 @@ tsplotCPanelSet(displayd *dpy, cpaneld *cpanel, ggobid *gg)
 }
 
 void
-tsplotDisplaySet(displayd *dpy, ggobid *gg)
+tsplotDisplaySet(displayd *dpy, GGobiSession *gg)
 {
 }
 
@@ -134,7 +134,7 @@ add_xml_tsplot_variables(xmlNodePtr node, GList *plots, displayd *dpy)
 #endif
 
 void
-tsplotVarpanelTooltipsSet(displayd *dpy, ggobid *gg, GtkWidget *wx, GtkWidget *wy, GtkWidget *wz, GtkWidget *label)
+tsplotVarpanelTooltipsSet(displayd *dpy, GGobiSession *gg, GtkWidget *wx, GtkWidget *wy, GtkWidget *wz, GtkWidget *label)
 {
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
     "Select to replace the horizontal (time) variable.",
@@ -149,7 +149,7 @@ tsplotVarpanelTooltipsSet(displayd *dpy, ggobid *gg, GtkWidget *wx, GtkWidget *w
 
 
 gint
-tsplotPlottedColsGet(displayd *display, gint *cols, GGobiStage *d, ggobid *gg)
+tsplotPlottedColsGet(displayd *display, gint *cols, GGobiStage *d, GGobiSession *gg)
 {
   GList *l;
   splotd *s;
@@ -164,7 +164,7 @@ tsplotPlottedColsGet(displayd *display, gint *cols, GGobiStage *d, ggobid *gg)
 }
 
 GtkWidget *
-tsplotCPanelWidget(displayd *dpy, gchar **modeName, ggobid *gg)
+tsplotCPanelWidget(displayd *dpy, gchar **modeName, GGobiSession *gg)
 {
   GtkWidget *w = GGOBI_EXTENDED_DISPLAY(dpy)->cpanelWidget;
   if(!w) {
@@ -294,7 +294,7 @@ tsplotEventHandlersToggle(displayd *dpy, splotd *sp, gboolean state, ProjectionM
 #include <gdk/gdkkeysyms.h>
 
 gboolean
-tsplotKeyEventHandled(GtkWidget *w, displayd *display, splotd *sp, GdkEventKey *event, ggobid *gg)
+tsplotKeyEventHandled(GtkWidget *w, displayd *display, splotd *sp, GdkEventKey *event, GGobiSession *gg)
 {
   gboolean ok = true;
   ProjectionMode pmode = NULL_PMODE;
@@ -332,7 +332,7 @@ tsplotKeyEventHandled(GtkWidget *w, displayd *display, splotd *sp, GdkEventKey *
 
 
 gchar *
-tsplot_tree_label(splotd *sp, GGobiStage *d, ggobid *gg)
+tsplot_tree_label(splotd *sp, GGobiStage *d, GGobiSession *gg)
 {
   return(ggobi_stage_get_col_name(d, sp->xyvars.y));
 }
@@ -340,7 +340,7 @@ tsplot_tree_label(splotd *sp, GGobiStage *d, ggobid *gg)
 /*************************************************/
 
 void
-tsplot_cpanel_init (cpaneld* cpanel, ggobid *gg) 
+tsplot_cpanel_init (cpaneld* cpanel, GGobiSession *gg) 
 {
   cpanel->pmode = EXTENDED_DISPLAY_PMODE;
   cpanel->imode = DEFAULT_IMODE;

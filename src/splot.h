@@ -171,48 +171,48 @@ typedef struct
 {
   GGobiSPlotClass splot;
 
-  gchar *(*tree_label)(splotd *sp, GGobiStage *d, ggobid *gg);
+  gchar *(*tree_label)(splotd *sp, GGobiStage *d, GGobiSession *gg);
 
-  gboolean (*identify_notify)(icoords, splotd *, GGobiStage *, ggobid *);
+  gboolean (*identify_notify)(icoords, splotd *, GGobiStage *, GGobiSession *);
 
-  void (*add_plot_labels)(splotd *, GdkDrawable *, ggobid *gg);
-  void (*add_markup_cues)(splotd *, GdkDrawable *, ggobid *);
-  void (*add_scaling_cues)(splotd *, GdkDrawable *, ggobid *);
-  void (*add_identify_cues)(gboolean, gint k, splotd *, GdkDrawable *, ggobid *);
-  void (*add_identify_edge_cues)(gint k, splotd *, GdkDrawable *, gboolean, ggobid *);
+  void (*add_plot_labels)(splotd *, GdkDrawable *, GGobiSession *gg);
+  void (*add_markup_cues)(splotd *, GdkDrawable *, GGobiSession *);
+  void (*add_scaling_cues)(splotd *, GdkDrawable *, GGobiSession *);
+  void (*add_identify_cues)(gboolean, gint k, splotd *, GdkDrawable *, GGobiSession *);
+  void (*add_identify_edge_cues)(gint k, splotd *, GdkDrawable *, gboolean, GGobiSession *);
 
-  gboolean (*redraw)(splotd *, GGobiStage *, ggobid *, gboolean binned);
+  gboolean (*redraw)(splotd *, GGobiStage *, GGobiSession *, gboolean binned);
 
-  void (*screen_to_tform)(cpaneld *, splotd *, icoords *, fcoords *, ggobid *);
-  void (*world_to_plane)(splotd *, GGobiStage *, ggobid *);
+  void (*screen_to_tform)(cpaneld *, splotd *, icoords *, fcoords *, GGobiSession *);
+  void (*world_to_plane)(splotd *, GGobiStage *, GGobiSession *);
 
   /** Convenience to be called within the standard loop */
-  void (*sub_plane_to_screen)(splotd *sp, displayd *dpy, GGobiStage *d, ggobid *gg);
+  void (*sub_plane_to_screen)(splotd *sp, displayd *dpy, GGobiStage *d, GGobiSession *gg);
       /** Allows the class to take over the entire plane_to_screen.
           Handling each row can be done using a method for sub_plane_to_screen. */
-  void (*plane_to_screen)(splotd *, GGobiStage *, ggobid *);
+  void (*plane_to_screen)(splotd *, GGobiStage *, GGobiSession *);
 
-  gint (*active_paint_points)(splotd *, GGobiStage *, ggobid *);
+  gint (*active_paint_points)(splotd *, GGobiStage *, GGobiSession *);
 
 
   GdkSegment *(*alloc_whiskers)(GdkSegment *, splotd *sp, gint nrows, GGobiStage *d);
 
   /** called from splot_plot_edge */
-  gboolean (*draw_edge_p)(splotd *sp, gint m, GGobiStage *d, GGobiStage *e, ggobid *gg);
+  gboolean (*draw_edge_p)(splotd *sp, gint m, GGobiStage *d, GGobiStage *e, GGobiSession *gg);
   /** called from splot_plot_case. Should probably be the same as
       draw_edge_p but doesn't take the edge argument! Could drop the
       first datad in splot_plot_edge and just hand it the one dataset. */
-  gboolean (*draw_case_p)(splotd *sp, gint m, GGobiStage *d, ggobid *gg);
+  gboolean (*draw_case_p)(splotd *sp, gint m, GGobiStage *d, GGobiSession *gg);
 
   void (*within_draw_to_binned)(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc);
   void (*within_draw_to_unbinned)(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc);
 
-  void (*splot_assign_points_to_bins)(GGobiStage *, splotd *, ggobid *);
+  void (*splot_assign_points_to_bins)(GGobiStage *, splotd *, GGobiSession *);
 
   gint (*plotted_vars_get)(splotd *sp, gint *vars, GGobiStage *d);
 
 
-  splotd * (*createWithVars)(displayd *dpy, gint *vars, gint nvars, ggobid *gg);
+  splotd * (*createWithVars)(displayd *dpy, gint *vars, gint nvars, GGobiSession *gg);
 
 } GGobiExtendedSPlotClass;
 
@@ -225,7 +225,7 @@ typedef struct
 
 
 
-void splot_init(splotd *sp, displayd *display, struct _ggobid *gg);
+void splot_init(splotd *sp, displayd *display, struct _GGobiSession *gg);
 
 /* shared by barchart and parcoords. */
 gint splot1DVariablesGet(splotd *sp, gint *cols, GGobiStage *d);

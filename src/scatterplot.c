@@ -107,7 +107,7 @@ scatterplot_show_rulers (displayd * display, gint projection)
 
 void
 ruler_ranges_set (gboolean force, displayd * display, splotd * sp,
-                  ggobid * gg)
+                  GGobiSession * gg)
 {
   /*
    * Run 0 and sp->max through the reverse pipeline to find out
@@ -180,7 +180,7 @@ static const gchar *scatterplot_ui =
   "			<menuitem action='ShowAxes'/>" "		</menu>" "	</menubar>" "</ui>";
 
 static void
-display_datad_added_cb (ggobid * gg, GGobiStage * d, void *win)
+display_datad_added_cb (GGobiSession * gg, GGobiStage * d, void *win)
 {
   windowDisplayd *display = GGOBI_WINDOW_DISPLAY (GTK_OBJECT (win));
 
@@ -194,7 +194,7 @@ display_datad_added_cb (ggobid * gg, GGobiStage * d, void *win)
 CHECK_EVENT_SIGNATURE (display_datad_added_cb, datad_added_f)
 
 
-     splotd *ggobi_scatter_plot_new (displayd * dpy, ggobid * gg)
+     splotd *ggobi_scatter_plot_new (displayd * dpy, GGobiSession * gg)
 {
   splotd *sp = g_object_new (GGOBI_TYPE_SCATTER_SPLOT, NULL);
   splot_init (sp, dpy, gg);
@@ -203,20 +203,20 @@ CHECK_EVENT_SIGNATURE (display_datad_added_cb, datad_added_f)
 
 displayd *
 scatterplot_new_with_vars (gboolean missing_p, gint numVars, gint * vars,
-                           GGobiStage * d, ggobid * gg)
+                           GGobiStage * d, GGobiSession * gg)
 {
   return (createScatterplot (NULL, missing_p, NULL, numVars, vars, d, gg));
 }
 
 displayd *
-scatterplot_new (gboolean missing_p, splotd * sp, GGobiStage * d, ggobid * gg)
+scatterplot_new (gboolean missing_p, splotd * sp, GGobiStage * d, GGobiSession * gg)
 {
   return (createScatterplot (NULL, missing_p, sp, 0, NULL, d, gg));
 }
 
 
 
-void ggobi_edge_menus_update (ggobid * gg)
+void ggobi_edge_menus_update (GGobiSession * gg)
 {
   GList *dlist;
   displayd *display;
@@ -255,7 +255,7 @@ edge_options_cb (GtkRadioAction * action, GtkRadioAction * current,
 
 displayd *
 createScatterplot (displayd * display, gboolean missing_p, splotd * sp,
-                   gint numVars, gint * vars, GGobiStage * d, ggobid * gg)
+                   gint numVars, gint * vars, GGobiStage * d, GGobiSession * gg)
 {
   GtkWidget *table, *vbox;
   ProjectionMode projection;
@@ -504,7 +504,7 @@ ruler_shift_cb (GtkWidget * w, GdkEventMotion * event, splotd * sp)
 {
   displayd *display = (displayd *) sp->displayptr;
   /*cpaneld *cpanel = &display->cpanel; */
-  ggobid *gg = display->ggobi;
+  GGobiSession *gg = display->ggobi;
   gboolean button1_p, button2_p;
   gint direction = (w == display->hrule) ? HORIZONTAL : VERTICAL;
   gboolean redraw = false;

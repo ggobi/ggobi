@@ -19,7 +19,7 @@
 #include "externs.h"
 
 /* Which include file should this be in? */
-void ggobi_edge_menus_update (ggobid * gg);
+void ggobi_edge_menus_update (GGobiSession * gg);
 
 /* --------------------------------------------------------------- */
 /*                   Dynamic allocation section                    */
@@ -41,7 +41,7 @@ edges_alloc (gint nsegs, GGobiStage * d)
 }
 
 void
-edges_free (GGobiStage * d, ggobid * gg)
+edges_free (GGobiStage * d, GGobiSession * gg)
 {
   gpointer ptr;
 
@@ -89,7 +89,7 @@ setDisplayEdge (displayd * dpy, GGobiStage * e)
 void
 edgeset_add_cb (GtkAction * action, GGobiStage * e)
 {
-  ggobid *gg = e->gg;
+  GGobiSession *gg = e->gg;
   displayd *display = GGOBI_DISPLAY (g_object_get_data (G_OBJECT (action), "display"));
 
   if (GTK_IS_TOGGLE_ACTION (action)
@@ -157,7 +157,7 @@ edge_endpoints_get (gint k, gint * a, gint * b, GGobiStage * d,
 }
 
 gint
-edgesets_count (ggobid * gg)
+edgesets_count (GGobiSession * gg)
 {
   gint k, ne = 0;
   gint nd = g_slist_length (gg->d);

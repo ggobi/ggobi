@@ -24,7 +24,7 @@
 #include "externs.h"
 
 static gboolean
-cpanelSet (displayd * dpy, cpaneld * cpanel, ggobid * gg)
+cpanelSet (displayd * dpy, cpaneld * cpanel, GGobiSession * gg)
 {
   cpanel_scatmat_set (dpy, cpanel, gg);
   cpanel_brush_set (dpy, cpanel, gg);
@@ -34,7 +34,7 @@ cpanelSet (displayd * dpy, cpaneld * cpanel, ggobid * gg)
 
 static void
 movePointsMotionCb (displayd * display, splotd * sp, GtkWidget * w,
-                    GdkEventMotion * event, ggobid * gg)
+                    GdkEventMotion * event, GGobiSession * gg)
 {
   if (sp->p1dvar == -1)
     scatterplotMovePointsMotionCb (display, sp, w, event, gg);
@@ -42,7 +42,7 @@ movePointsMotionCb (displayd * display, splotd * sp, GtkWidget * w,
 
 static void
 movePointsButtonCb (displayd * display, splotd * sp, GtkWidget * w,
-                    GdkEventButton * event, ggobid * gg)
+                    GdkEventButton * event, GGobiSession * gg)
 {
   if (sp->p1dvar == -1)
     scatterplotMovePointsButtonCb (display, sp, w, event, gg);
@@ -50,7 +50,7 @@ movePointsButtonCb (displayd * display, splotd * sp, GtkWidget * w,
 
 /* XXX duncan and dfs: you need to sort this out
 static void
-worldToRaw(displayd *display, splotd *sp, gint pt, GGobiStage *d, ggobid *gg)
+worldToRaw(displayd *display, splotd *sp, gint pt, GGobiStage *d, GGobiSession *gg)
 {
  if (sp->p1dvar == -1) {
     world_to_raw_by_var (pt, sp->xyvars.x, display, d, gg);
@@ -81,7 +81,7 @@ variablePlottedP (displayd * display, GSList *cols, GGobiStage * d)
 
 static gboolean
 variableSelect (GtkWidget * w, displayd * dpy, splotd * sp, gint jvar,
-                gint toggle, gint mouse, cpaneld * cpanel, ggobid * gg)
+                gint toggle, gint mouse, cpaneld * cpanel, GGobiSession * gg)
 {
   gint jvar_prev;
   return (scatmat_varsel_simple (cpanel, sp, jvar, &jvar_prev, gg));
@@ -91,7 +91,7 @@ static void
 varpanelRefresh (displayd * display, splotd * sp, GGobiStage * d)
 {
   gint j, n, *vars;
-  ggobid *gg = GGobiFromDisplay (display);
+  GGobiSession *gg = GGobiFromDisplay (display);
 
   for (j = 0; j < d->n_cols; j++) {
     varpanel_toggle_set_active (VARSEL_X, j, false, d);
@@ -115,7 +115,7 @@ varpanelRefresh (displayd * display, splotd * sp, GGobiStage * d)
 }
 
 static void
-varpanelTooltipsSet (displayd * display, ggobid * gg, GtkWidget * wx,
+varpanelTooltipsSet (displayd * display, GGobiSession * gg, GtkWidget * wx,
                      GtkWidget * wy, GtkWidget * wz, GtkWidget * label)
 {
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
@@ -127,7 +127,7 @@ varpanelTooltipsSet (displayd * display, ggobid * gg, GtkWidget * wx,
 }
 
 static gint
-plottedVarsGet (displayd * display, gint * vars, GGobiStage * d, ggobid * gg)
+plottedVarsGet (displayd * display, gint * vars, GGobiStage * d, GGobiSession * gg)
 {
   GList *l;
   GtkTableChild *child;
@@ -159,7 +159,7 @@ plottedVarsGet (displayd * display, gint * vars, GGobiStage * d, ggobid * gg)
 
 displayd *
 createWithVars (gboolean missing_p, gint nvars, gint * vars, GGobiStage * d,
-                ggobid * gg)
+                GGobiSession * gg)
 {
   return (ggobi_newScatmat (vars, vars, nvars, nvars, d, gg));
 }
@@ -184,7 +184,7 @@ add_xml_scatmat_variables (xmlNodePtr node, GList * plots, displayd * dpy)
 
 static gboolean
 scatmatKeyEventHandled (GtkWidget * w, displayd * display, splotd * sp,
-                        GdkEventKey * event, ggobid * gg)
+                        GdkEventKey * event, GGobiSession * gg)
 {
   gboolean ok = true;
   ProjectionMode pmode = NULL_PMODE;
@@ -228,7 +228,7 @@ scatmatKeyEventHandled (GtkWidget * w, displayd * display, splotd * sp,
 }
 
 static void
-displaySet (displayd * display, ggobid * gg)
+displaySet (displayd * display, GGobiSession * gg)
 {
 }
 
@@ -266,7 +266,7 @@ receive_scatmat_drag (GtkWidget * src, GdkDragContext * context, int x, int y,
   GList *ivars = NULL;
   gint nvars, *vars;
   GGobiStage *d;
-  ggobid *gg;
+  GGobiSession *gg;
 
   display = to->displayptr;
   d = display->d;
@@ -402,7 +402,7 @@ scatmatEventHandlersToggle (displayd * dpy, splotd * sp, gboolean state,
 /*-------------------------------------------------------------------*/
 
 static GtkWidget *
-scatmatCPanelWidget (displayd * dpy, gchar ** modeName, ggobid * gg)
+scatmatCPanelWidget (displayd * dpy, gchar ** modeName, GGobiSession * gg)
 {
   GtkWidget *w = GGOBI_EXTENDED_DISPLAY (dpy)->cpanelWidget;
   if (!w) {
@@ -413,7 +413,7 @@ scatmatCPanelWidget (displayd * dpy, gchar ** modeName, ggobid * gg)
 }
 
 static void
-splotAssignPointsToBins (GGobiStage * d, splotd * sp, ggobid * gg)
+splotAssignPointsToBins (GGobiStage * d, splotd * sp, GGobiSession * gg)
 {
   if (sp == gg->current_splot)
     assign_points_to_bins (d, sp, gg);
@@ -421,7 +421,7 @@ splotAssignPointsToBins (GGobiStage * d, splotd * sp, ggobid * gg)
 
 static void
 splotScreenToTform (cpaneld * cpanel, splotd * sp, icoords * scr,
-                    fcoords * tfd, ggobid * gg)
+                    fcoords * tfd, GGobiSession * gg)
 {
   gcoords planar, world;
   greal precis = (greal) PRECISION1;
@@ -525,7 +525,7 @@ scatmatDisplayClassInit (GGobiScatmatDisplayClass * klass)
 
 /* */
 static gchar *
-treeLabel (splotd * splot, GGobiStage * d, ggobid * gg)
+treeLabel (splotd * splot, GGobiStage * d, GGobiSession * gg)
 {
   return (g_strdup_printf("%s v %s", 
     ggobi_stage_get_col_name(d, splot->xyvars.x), 
@@ -535,7 +535,7 @@ treeLabel (splotd * splot, GGobiStage * d, ggobid * gg)
 
 
 static void
-worldToPlane (splotd * sp, GGobiStage * d, ggobid * gg)
+worldToPlane (splotd * sp, GGobiStage * d, GGobiSession * gg)
 {
   if (sp->p1dvar == -1)
     xy_reproject (sp, d->world.vals, d, gg);
@@ -545,7 +545,7 @@ worldToPlane (splotd * sp, GGobiStage * d, ggobid * gg)
 
 static void
 addIdentifyCues (gboolean nearest_p, gint k, splotd * sp,
-                 GdkDrawable * drawable, ggobid * gg)
+                 GdkDrawable * drawable, GGobiSession * gg)
 {
   colorschemed *scheme = gg->activeColorScheme;
 
@@ -557,7 +557,7 @@ addIdentifyCues (gboolean nearest_p, gint k, splotd * sp,
 }
 
 gboolean
-drawEdgeP (splotd * sp, gint m, GGobiStage * d, GGobiStage * e, ggobid * gg)
+drawEdgeP (splotd * sp, gint m, GGobiStage * d, GGobiStage * e, GGobiSession * gg)
 {
   gboolean draw_edge = true;
   if (sp->p1dvar != -1) {
@@ -573,7 +573,7 @@ drawEdgeP (splotd * sp, gint m, GGobiStage * d, GGobiStage * e, ggobid * gg)
 }
 
 gboolean
-drawCaseP (splotd * sp, gint m, GGobiStage * d, ggobid * gg)
+drawCaseP (splotd * sp, gint m, GGobiStage * d, GGobiSession * gg)
 {
   gboolean draw_case = true;
   if (sp->p1dvar != -1) {
@@ -589,7 +589,7 @@ drawCaseP (splotd * sp, gint m, GGobiStage * d, ggobid * gg)
 }
 
 void
-addPlotLabels (splotd * sp, GdkDrawable * drawable, ggobid * gg)
+addPlotLabels (splotd * sp, GdkDrawable * drawable, GGobiSession * gg)
 {
   if (sp->p1dvar == -1)
     scatterXYAddPlotLabels (sp, drawable, gg->plot_GC);

@@ -56,7 +56,7 @@ static GGobiOptions sessionoptions;
 GGobiOptions *sessionOptions;
 
 
-ggobid **all_ggobis;
+GGobiSession **all_ggobis;
 gint num_ggobis;
 gint totalNumGGobis;
 
@@ -172,7 +172,7 @@ parse_command_line (gint * argc, gchar ** av[])
 }
 
 gint
-ggobi_remove (ggobid * gg)
+ggobi_remove (GGobiSession * gg)
 {
   gint i;
   for (i = 0; i < num_ggobis; i++) {
@@ -188,7 +188,7 @@ ggobi_remove (ggobid * gg)
       Also, need to close and free the displays associated with the ggobi.
  */
 gint
-ggobi_remove_by_index (ggobid * gg, gint which)
+ggobi_remove_by_index (GGobiSession * gg, gint which)
 {
   GSList *l;
   GGobiStage *d;
@@ -200,13 +200,13 @@ ggobi_remove_by_index (ggobid * gg, gint which)
   if (which < num_ggobis - 1) {
     memcpy (all_ggobis + which,
             all_ggobis + which +
-            1, sizeof (ggobid *) * (num_ggobis - which - 1));
+            1, sizeof (GGobiSession *) * (num_ggobis - which - 1));
   }
   /* Now patch up the array so that it has the correct number of elements. */
   num_ggobis--;
   if (num_ggobis > 0)
-    all_ggobis = (ggobid **)
-      g_realloc (all_ggobis, sizeof (ggobid *) * num_ggobis);
+    all_ggobis = (GGobiSession **)
+      g_realloc (all_ggobis, sizeof (GGobiSession *) * num_ggobis);
   else
     all_ggobis = NULL;
 
@@ -235,7 +235,7 @@ ggobi_remove_by_index (ggobid * gg, gint which)
 #ifdef TEST_KEYS
 gboolean
 DummyKeyTest (guint keyval, GtkWidget * w, GdkEventKey * event,
-              cpaneld * cpanel, splotd * sp, ggobid * gg, void *userData)
+              cpaneld * cpanel, splotd * sp, GGobiSession * gg, void *userData)
 {
   static gint count = 0;
   fprintf (stderr, "Key press event (count = %d): key = %d, data = %s\n",
@@ -270,7 +270,7 @@ findColorSchemeByName (GList * schemes, const gchar * name)
 }
 
 void
-ggobi_alloc (ggobid * tmp)
+ggobi_alloc (GGobiSession * tmp)
 {
   tmp->firsttime = true;
   tmp->brush.firsttime = true;
@@ -340,8 +340,8 @@ ggobi_alloc (ggobid * tmp)
 
   totalNumGGobis++;
 
-  all_ggobis = (ggobid **)
-    g_realloc (all_ggobis, sizeof (ggobid *) * (num_ggobis + 1));
+  all_ggobis = (GGobiSession **)
+    g_realloc (all_ggobis, sizeof (GGobiSession *) * (num_ggobis + 1));
   all_ggobis[num_ggobis] = tmp;
   num_ggobis++;
 
@@ -367,7 +367,7 @@ static void registerBuiltinTypes()
 gint ggobi_init (gint argc, gchar * argv[], gboolean processEvents)
 {
   GdkVisual *vis;
-  ggobid *gg;
+  GGobiSession *gg;
 
   bindtextdomain (PACKAGE, GGOBI_LOCALEDIR);
   bind_textdomain_codeset (PACKAGE, "UTF-8");
@@ -379,7 +379,7 @@ gint ggobi_init (gint argc, gchar * argv[], gboolean processEvents)
   initSessionOptions (argc, argv);
   parse_command_line (&argc, &argv);
 
-  GGOBI_TYPE_GGOBI;
+  GGOBI_TYPE_SESSION;
   registerBuiltinTypes();
   // FIXME: This should probably just be done inside registerBuiltinTypes()
   // That is, register the types by calling the _TYPE_ macros and then
@@ -407,7 +407,7 @@ gint ggobi_init (gint argc, gchar * argv[], gboolean processEvents)
   }
 
 
-  gg = g_object_new (GGOBI_TYPE_GGOBI, NULL);
+  gg = g_object_new (GGOBI_TYPE_SESSION, NULL);
 
   vis = gdk_visual_get_system ();
   gg->mono_p = (vis->depth == 1 ||
@@ -427,12 +427,12 @@ gint ggobi_init (gint argc, gchar * argv[], gboolean processEvents)
  As we include more information (e.g. brushing information)
  we end up copying it for little reason. 
  However, this works for the restore file, but not necessarily
- the initialization file as we won't have created the ggobid
+ the initialization file as we won't have created the GGobiSession
  when we read that. We could just re-parse the file and find the
  appropriate node. Probably the wisest.
 */
 gboolean
-processRestoreFile (const gchar * const fileName, ggobid * gg)
+processRestoreFile (const gchar * const fileName, GGobiSession * gg)
 {
   xmlDocPtr doc;
   xmlNodePtr node;
@@ -519,7 +519,7 @@ initSessionOptions (int argc, char **argv)
 }
 
 gboolean
-ggobi_close (ggobid * gg)
+ggobi_close (GGobiSession * gg)
 {
   ggobi_close2 (gg, true);
   return (true);
@@ -530,7 +530,7 @@ ggobi_close (ggobid * gg)
   event handler in response to the window being destroyed, we would get
   a circularity. However, when called programmatically from within the
   process (or from e.g. R) we need to force it to be closed. */
-gboolean ggobi_close2 (ggobid * gg, gboolean closeWindow)
+gboolean ggobi_close2 (GGobiSession * gg, gboolean closeWindow)
 {
   gboolean val = true;
 
@@ -575,7 +575,7 @@ gboolean ggobi_close2 (ggobid * gg, gboolean closeWindow)
 }
 
 /*
-   Key for storing a reference to a ggobid instance in a widget
+   Key for storing a reference to a GGobiSession instance in a widget
    so that we can retrieve it within a callback.
 */
 static const gchar *GGobiGTKey = "GGobi";
@@ -587,44 +587,44 @@ key_get (void)
 }
 
 /*
-  Computes the ggobid pointer associated with the specified
+  Computes the GGobiSession pointer associated with the specified
   widget. It does so by looking in the window associated with the widget
   and then looking for an entry in the window's association table.
-  This assumes that the ggobid reference was stored in the window 
+  This assumes that the GGobiSession reference was stored in the window 
   when it was created.
  */
-ggobid *
+GGobiSession *
 GGobiFromWidget (GtkWidget * w, gboolean useWindow)
 {
-  ggobid *gg = NULL;
+  GGobiSession *gg = NULL;
   GObject *obj;
   obj = g_object_get_data (G_OBJECT (w), GGobiGTKey);
   if (obj) {
-    gg = (ggobid *) obj;
+    gg = (GGobiSession *) obj;
     ValidateGGobiRef (gg, true);
   }
 
   return (gg);
 }
 
-ggobid *
+GGobiSession *
 GGobiFromWindow (GdkWindow * win)
 {
-  ggobid *gg = NULL;
+  GGobiSession *gg = NULL;
   GObject *obj;
   obj = g_object_get_data (G_OBJECT (win), GGobiGTKey);
   if (obj) {
-    gg = (ggobid *) obj;
+    gg = (GGobiSession *) obj;
     ValidateGGobiRef (gg, true);
   }
 
   return (gg);
 }
 
-ggobid *
+GGobiSession *
 GGobiFromSPlot (splotd * sp)
 {
-  ggobid *gg = NULL;
+  GGobiSession *gg = NULL;
   displayd *display = NULL;
   if ((sp) && sp->displayptr) {
     display = (displayd *) sp->displayptr;
@@ -635,14 +635,14 @@ GGobiFromSPlot (splotd * sp)
   return gg;
 }
 
-ggobid *
+GGobiSession *
 GGobiFromDisplay (displayd * display)
 {
   return (display->ggobi);
 }
 
 void
-ggobi_widget_set (GtkWidget * w, ggobid * gg, gboolean asIs)
+ggobi_widget_set (GtkWidget * w, GGobiSession * gg, gboolean asIs)
 {
   GtkWidget *wid = w;
   if (!asIs)
@@ -652,10 +652,10 @@ ggobi_widget_set (GtkWidget * w, ggobid * gg, gboolean asIs)
 }
 
 
-ggobid *
+GGobiSession *
 ggobi_get (gint which)
 {
-  extern ggobid **all_ggobis;
+  extern GGobiSession **all_ggobis;
   if (which > -1 && which < num_ggobis)
     return (all_ggobis[which]);
   else
@@ -663,7 +663,7 @@ ggobi_get (gint which)
 }
 
 gint
-ggobi_getIndex (ggobid * gg)
+ggobi_getIndex (GGobiSession * gg)
 {
   gint i;
   for (i = 0; i < num_ggobis; i++) {
@@ -675,7 +675,7 @@ ggobi_getIndex (ggobid * gg)
 }
 
 GGobiStage *
-ggobi_get_data (gint which, const ggobid * const gg)
+ggobi_get_data (gint which, const GGobiSession * const gg)
 {
   GGobiStage *d;
   d = g_slist_nth_data (gg->d, which);
@@ -684,7 +684,7 @@ ggobi_get_data (gint which, const ggobid * const gg)
 }
 
 GGobiStage *
-ggobi_get_data_by_name (const gchar * const name, const ggobid * const gg)
+ggobi_get_data_by_name (const gchar * const name, const GGobiSession * const gg)
 {
   GGobiStage *d;
   GSList *l;
@@ -698,11 +698,11 @@ ggobi_get_data_by_name (const gchar * const name, const ggobid * const gg)
 }
 
 
-ggobid *
-ValidateGGobiRef (ggobid * gg, gboolean fatal)
+GGobiSession *
+ValidateGGobiRef (GGobiSession * gg, gboolean fatal)
 {
   static gchar *error_msg = "GGobi context does not exist within session";
-  extern ggobid **all_ggobis;
+  extern GGobiSession **all_ggobis;
   extern gint num_ggobis;
   gint i;
   for (i = 0; i < num_ggobis; i++) {
@@ -718,7 +718,7 @@ ValidateGGobiRef (ggobid * gg, gboolean fatal)
 }
 
 GGobiStage *
-ValidateDatadRef (GGobiStage * d, ggobid * gg, gboolean fatal)
+ValidateDatadRef (GGobiStage * d, GGobiSession * gg, gboolean fatal)
 {
   static gchar *error_msg = "Dataset does not exist within GGobi context";
   gint i, n;
@@ -739,7 +739,7 @@ ValidateDatadRef (GGobiStage * d, ggobid * gg, gboolean fatal)
 
 
 displayd *
-ValidateDisplayRef (displayd * d, ggobid * gg, gboolean fatal)
+ValidateDisplayRef (displayd * d, GGobiSession * gg, gboolean fatal)
 {
   static gchar *error_msg = "Display does not exist within GGobi context";
   gint i, n;
@@ -930,7 +930,7 @@ GGOBI_getSessionOptions ()
 #include "GGStructSizes.c"
 
 gint
-ndatad_with_vars_get (ggobid *gg)
+ndatad_with_vars_get (GGobiSession *gg)
 {
  gint nd;
  GSList *l;

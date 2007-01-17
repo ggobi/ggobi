@@ -87,7 +87,7 @@
 
     /* A set of values that apply to records when an attribute
        is not specified for that specific record but is set
-       in the ggobidata tag.
+       in the GGobiSessionata tag.
      */
     DataOptions defaults;
 
@@ -175,7 +175,7 @@
 
    */
   static const gchar *const xmlDataTagNames[] = {
-    "ggobidata",
+    "GGobiSessionata",
     "data",                     /* DATASET */
     "description",
     "record",
@@ -226,10 +226,10 @@
    we pass an XMLParserData * object (defined in read_xml.h).
    This basically stores what state in the document we currently have
    and indicates how to interpret the future callbacks, and also
-   the ggobid structure which we are attempting to fill in.
+   the GGobiSession structure which we are attempting to fill in.
    Additionally, it maintains a list of default settings that are 
    to be applied to each row, but which can be set generically in the
-   top-level element (ggobidata).
+   top-level element (GGobiSessionata).
   
 
    When we encounter the start of tag, we are given the tag name, the
@@ -237,9 +237,9 @@
    parser instance XMLParserData object we specified at the start of the
    parsing. This handler is start_xml_element.  Here, we dispatch
    a call to the appropriate method based on the tag name. Generally,
-   this either allocates storage space in the ggobid structure being
+   this either allocates storage space in the GGobiSession structure being
    filled in, or stores partial information needed to do this.
-   Additionally, for the tag ggobidata, the attributes are processed
+   Additionally, for the tag GGobiSessionata, the attributes are processed
    to store the default values for record attributes. These are
    attributes such as color, glyph (size and type). 
 
@@ -777,9 +777,9 @@ class GGobi:Data:Factory:XML from GGobi:Data:Factory
 
 /*
    Reads the number of variables in the dataset from the attributes
-   and allocates space for them in the ggobid structure.
+   and allocates space for them in the GGobiSession structure.
    At this point, we have the number of records and variables
-   and can initialize the data areas of the ggobid structure.
+   and can initialize the data areas of the GGobiSession structure.
 
     Called in response to a <variables> tag. (Note the plural.)
  */
@@ -1052,7 +1052,7 @@ class GGobi:Data:Factory:XML from GGobi:Data:Factory
 
 
 /**
-  Called in response to a ggobidata tag which contains
+  Called in response to a GGobiSessionata tag which contains
   the different datasets. The count element here is the
   number of datasets to expect.
  */

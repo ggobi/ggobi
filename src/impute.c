@@ -95,7 +95,7 @@ impute_mean_or_median (gint type, gint nvars, gint * vars,
   if (!ggobi_stage_has_missings(d))
     return false;
 
-  g_return_val_if_fail(GGOBI_IS_GGOBI(d->gg), false);
+  g_return_val_if_fail(GGOBI_IS_SESSION(d->gg), false);
   GGOBI_STAGE_ATTR_INIT_ALL(d);  
 
   /* If responding to brushing group ... */
@@ -204,7 +204,7 @@ impute_random (GGobiStage * d, gint nvars, gint * vars)
   if (!ggobi_stage_has_missings(d))
     return;
 
-  g_return_if_fail(GGOBI_IS_GGOBI(d->gg));
+  g_return_if_fail(GGOBI_IS_SESSION(d->gg));
 
   presv = (gint *) g_malloc (d->n_rows * sizeof (gint));
   missv = (gint *) g_malloc (d->n_rows * sizeof (gint));

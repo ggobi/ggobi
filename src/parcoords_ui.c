@@ -23,7 +23,7 @@
 /*----------------------------------------------------------------------*/
 
 static void
-ash_smoothness_cb (GtkAdjustment * adj, ggobid * gg)
+ash_smoothness_cb (GtkAdjustment * adj, GGobiSession * gg)
 {
   cpaneld *cpanel = &gg->current_display->cpanel;
 
@@ -35,7 +35,7 @@ ash_smoothness_cb (GtkAdjustment * adj, ggobid * gg)
 
 static gchar *arrangement_lbl[] = { "Row", "Column" };
 static void
-arrangement_cb (GtkWidget * w, ggobid * gg)
+arrangement_cb (GtkWidget * w, GGobiSession * gg)
 {
   gint indx = gtk_combo_box_get_active (GTK_COMBO_BOX (w));
 
@@ -47,7 +47,7 @@ arrangement_cb (GtkWidget * w, ggobid * gg)
 
 static gchar *type_lbl[] = { "Texturing", "ASH", "Dotplot" };
 static void
-type_cb (GtkWidget * w, ggobid * gg)
+type_cb (GtkWidget * w, GGobiSession * gg)
 {
   cpaneld *cpanel;
   cpanel = &gg->current_display->cpanel;
@@ -77,7 +77,7 @@ static void varscale_cb (GtkWidget *w, gpointer cbd)
 /*--------------------------------------------------------------------*/
 
 GtkWidget *
-cpanel_parcoords_make (ggobid * gg)
+cpanel_parcoords_make (GGobiSession * gg)
 {
   modepaneld *panel;
   GtkWidget *vbox, *vb, *lbl, *sbar, *opt;
@@ -242,6 +242,6 @@ parcoords_mode_ui_get (displayd * dsp)
 
 void
 cpanel_parcoords_set (displayd * display, cpaneld * cpanel, GtkWidget * panel,
-                      ggobid * gg)
+                      GGobiSession * gg)
 {
 }

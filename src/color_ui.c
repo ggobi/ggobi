@@ -21,15 +21,15 @@
 
 #define PSIZE 20
 
-static gint open_colorsel_dialog (GtkWidget * w, ggobid * gg);
-static void redraw_fg (GtkWidget * w, gint k, ggobid * gg);
+static gint open_colorsel_dialog (GtkWidget * w, GGobiSession * gg);
+static void redraw_fg (GtkWidget * w, gint k, GGobiSession * gg);
 
 /*------------------------------------------------------------------------*/
 /*                    symbol display routines                             */
 /*------------------------------------------------------------------------*/
 
 static void
-choose_glyph_cb (GtkWidget * w, GdkEventButton * event, ggobid * gg)
+choose_glyph_cb (GtkWidget * w, GdkEventButton * event, GGobiSession * gg)
 {
 /*-- Reset glyph_id to the nearest glyph.  --*/
   glyphd g;
@@ -113,7 +113,7 @@ choose_glyph_cb (GtkWidget * w, GdkEventButton * event, ggobid * gg)
 }
 
 static void
-find_symbol_selection_circle_pos (icoords * pos, ggobid * gg)
+find_symbol_selection_circle_pos (icoords * pos, GGobiSession * gg)
 {
   gint i;
   glyphd g;
@@ -160,7 +160,7 @@ find_symbol_selection_circle_pos (icoords * pos, ggobid * gg)
 }
 
 static void
-redraw_symbol_display (GtkWidget * w, ggobid * gg)
+redraw_symbol_display (GtkWidget * w, GGobiSession * gg)
 {
   gint i;
   glyphd g;
@@ -237,7 +237,7 @@ redraw_symbol_display (GtkWidget * w, ggobid * gg)
 }
 
 static gint
-symbol_display_expose_cb (GtkWidget * w, GdkEventExpose * event, ggobid * gg)
+symbol_display_expose_cb (GtkWidget * w, GdkEventExpose * event, GGobiSession * gg)
 {
   redraw_symbol_display (w, gg);
   return FALSE;
@@ -254,7 +254,7 @@ symbol_display_expose_cb (GtkWidget * w, GdkEventExpose * event, ggobid * gg)
  * filled circle and rectangle -> solid line
 */
 static void
-find_line_selection_pos (icoords * pos, ggobid * gg)
+find_line_selection_pos (icoords * pos, GGobiSession * gg)
 {
   gint i;
   glyphd g;
@@ -293,7 +293,7 @@ find_line_selection_pos (icoords * pos, ggobid * gg)
 }
 
 static void
-redraw_line_display (GtkWidget * w, ggobid * gg)
+redraw_line_display (GtkWidget * w, GGobiSession * gg)
 {
   gint i, linewidth;
   icoords pos;
@@ -360,7 +360,7 @@ redraw_line_display (GtkWidget * w, ggobid * gg)
 }
 
 static gint
-line_display_expose_cb (GtkWidget * w, GdkEventExpose * event, ggobid * gg)
+line_display_expose_cb (GtkWidget * w, GdkEventExpose * event, GGobiSession * gg)
 {
   redraw_line_display (w, gg);
   return FALSE;
@@ -371,13 +371,13 @@ line_display_expose_cb (GtkWidget * w, GdkEventExpose * event, ggobid * gg)
 /*          foreground, background, accent color widgets                  */
 /*------------------------------------------------------------------------*/
 static void
-set_one_color (GtkWidget * w, GdkEventButton * event, ggobid * gg)
+set_one_color (GtkWidget * w, GdkEventButton * event, GGobiSession * gg)
 {
   if (event->type == GDK_2BUTTON_PRESS || event->type == GDK_3BUTTON_PRESS)
     open_colorsel_dialog (w, gg);
 }
 static void
-set_color_fg (GtkWidget * w, GdkEventButton * event, ggobid * gg)
+set_color_fg (GtkWidget * w, GdkEventButton * event, GGobiSession * gg)
 {
   gint prev = gg->color_id;
   gint k = GPOINTER_TO_INT (g_object_get_data (G_OBJECT (w), "index"));
@@ -400,7 +400,7 @@ set_color_fg (GtkWidget * w, GdkEventButton * event, ggobid * gg)
 }
 
 static gint
-set_color_id (GtkWidget * w, GdkEventButton * event, ggobid * gg)
+set_color_id (GtkWidget * w, GdkEventButton * event, GGobiSession * gg)
 {
   /*
    * So that the same routines can be used to handle both the foreground
@@ -424,7 +424,7 @@ set_color_id (GtkWidget * w, GdkEventButton * event, ggobid * gg)
 
 /*-- Redraw one of the foreground color swatches --*/
 static void
-redraw_fg (GtkWidget * w, gint k, ggobid * gg)
+redraw_fg (GtkWidget * w, gint k, GGobiSession * gg)
 {
   colorschemed *scheme = gg->activeColorScheme;
 
@@ -449,7 +449,7 @@ redraw_fg (GtkWidget * w, gint k, ggobid * gg)
 }
 
 static gint
-color_expose_fg (GtkWidget * w, GdkEventExpose * event, ggobid * gg)
+color_expose_fg (GtkWidget * w, GdkEventExpose * event, GGobiSession * gg)
 {
   gint k = GPOINTER_TO_INT (g_object_get_data (G_OBJECT (w), "index"));
 
@@ -461,7 +461,7 @@ color_expose_fg (GtkWidget * w, GdkEventExpose * event, ggobid * gg)
 
 
 static void
-redraw_bg (GtkWidget * w, ggobid * gg)
+redraw_bg (GtkWidget * w, GGobiSession * gg)
 {
   colorschemed *scheme = gg->activeColorScheme;
 
@@ -474,14 +474,14 @@ redraw_bg (GtkWidget * w, ggobid * gg)
 }
 
 static gint
-color_expose_bg (GtkWidget * w, GdkEventExpose * event, ggobid * gg)
+color_expose_bg (GtkWidget * w, GdkEventExpose * event, GGobiSession * gg)
 {
   redraw_bg (w, gg);
   return FALSE;
 }
 
 static void
-redraw_accent (GtkWidget * w, ggobid * gg)
+redraw_accent (GtkWidget * w, GGobiSession * gg)
 {
   colorschemed *scheme = gg->activeColorScheme;
 
@@ -494,14 +494,14 @@ redraw_accent (GtkWidget * w, ggobid * gg)
 }
 
 static gint
-color_expose_accent (GtkWidget * w, GdkEventExpose * event, ggobid * gg)
+color_expose_accent (GtkWidget * w, GdkEventExpose * event, GGobiSession * gg)
 {
   redraw_accent (w, gg);
   return FALSE;
 }
 
 static void
-redraw_hidden (GtkWidget * w, ggobid * gg)
+redraw_hidden (GtkWidget * w, GGobiSession * gg)
 {
   colorschemed *scheme = gg->activeColorScheme;
 
@@ -514,13 +514,13 @@ redraw_hidden (GtkWidget * w, ggobid * gg)
 }
 
 static gint
-color_expose_hidden (GtkWidget * w, GdkEventExpose * event, ggobid * gg)
+color_expose_hidden (GtkWidget * w, GdkEventExpose * event, GGobiSession * gg)
 {
   redraw_hidden (w, gg);
   return FALSE;
 }
 static void
-reverse_video_cb (GtkWidget * ok_button, ggobid * gg)
+reverse_video_cb (GtkWidget * ok_button, GGobiSession * gg)
 {
   gulong pixel;
   gushort r, g, b;
@@ -567,7 +567,7 @@ reverse_video_cb (GtkWidget * ok_button, ggobid * gg)
 /*------------------------------------------------------------------------*/
 
 void
-color_changed_cb (GtkWidget * colorsel, ggobid * gg)
+color_changed_cb (GtkWidget * colorsel, GGobiSession * gg)
 {
   GdkColor gdk_color;
   GdkColormap *cmap = gdk_colormap_get_system ();
@@ -632,13 +632,13 @@ color_changed_cb (GtkWidget * colorsel, ggobid * gg)
 }
 
 static void
-dlg_close_cb (GtkWidget * ok_button, ggobid * gg)
+dlg_close_cb (GtkWidget * ok_button, GGobiSession * gg)
 {
   gtk_widget_hide (gg->color_ui.colorseldlg);
 }
 
 static gint
-open_colorsel_dialog (GtkWidget * w, ggobid * gg)
+open_colorsel_dialog (GtkWidget * w, GGobiSession * gg)
 {
   gint handled = FALSE;
   GtkWidget *colorsel, *ok_button, *cancel_button, *help_button;
@@ -718,7 +718,7 @@ open_colorsel_dialog (GtkWidget * w, ggobid * gg)
 /*------------------------------------------------------------------------*/
 
 static void
-hide_symbol_window (ggobid * gg)
+hide_symbol_window (GGobiSession * gg)
 {
 
   gtk_widget_hide (gg->color_ui.symbol_window);
@@ -732,14 +732,14 @@ hide_symbol_window (ggobid * gg)
 
 /*-- catch a click on the close button --*/
 static void
-hide_symbol_window_cb (GtkWidget * w, ggobid * gg)
+hide_symbol_window_cb (GtkWidget * w, GGobiSession * gg)
 {
   hide_symbol_window (gg);
 }
 
 /*-- catch the delete (close) event from the window manager --*/
 static void
-delete_symbol_window_cb (GtkWidget * w, GdkEventButton * event, ggobid * gg)
+delete_symbol_window_cb (GtkWidget * w, GdkEventButton * event, GGobiSession * gg)
 {
   hide_symbol_window (gg);
 }
@@ -749,7 +749,7 @@ delete_symbol_window_cb (GtkWidget * w, GdkEventButton * event, ggobid * gg)
 /*------------------------------------------------------------------------*/
 
 void
-symbol_window_redraw (ggobid * gg)
+symbol_window_redraw (GGobiSession * gg)
 {
 /*
  * Send expose events where necessary; show the appropriate
@@ -779,7 +779,7 @@ symbol_window_redraw (ggobid * gg)
 }
 
 void
-close_symbol_window_cb (GtkWidget * w, GdkEventButton * event, ggobid * gg)
+close_symbol_window_cb (GtkWidget * w, GdkEventButton * event, GGobiSession * gg)
 {
   fprintf (stderr, "Closing the color scheme window\n");
   fflush (stderr);
@@ -792,7 +792,7 @@ close_symbol_window_cb (GtkWidget * w, GdkEventButton * event, ggobid * gg)
 /*------------------------------------------------------------------------*/
 
 void
-make_symbol_window (ggobid * gg)
+make_symbol_window (GGobiSession * gg)
 {
 
   GtkWidget *vbox, *fg_frame, *bg_frame, *accent_frame, *hidden_frame, *btn;
@@ -822,7 +822,7 @@ make_symbol_window (ggobid * gg)
                       G_CALLBACK (delete_symbol_window_cb), (gpointer) gg);
 
 
-    /* Track when the ggobid instance is closed and shut this one down too. */
+    /* Track when the GGobiSession instance is closed and shut this one down too. */
     g_signal_connect (G_OBJECT (gg->main_window),
                       "delete_event",
                       G_CALLBACK (close_symbol_window_cb), (gpointer) gg);

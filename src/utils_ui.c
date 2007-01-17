@@ -25,7 +25,7 @@ GtkWidget *CreateMenuItemWithCheck (GtkWidget * menu,
                                     gchar * szTip, GtkWidget * win_main,
                                     GtkAccelGroup * accel_group,
                                     GtkSignalFunc func, gpointer data,
-                                    ggobid * gg, GSList * radiogroup,
+                                    GGobiSession * gg, GSList * radiogroup,
                                     gboolean check);
 
 /*
@@ -51,7 +51,7 @@ GtkWidget *
 CreateMenuItem (GtkWidget * menu,
                 gchar * szName, gchar * szAccel, gchar * szTip,
                 GtkWidget * win_main, GtkAccelGroup * accel_group,
-                GtkSignalFunc func, gpointer data, ggobid * gg)
+                GtkSignalFunc func, gpointer data, GGobiSession * gg)
 {
   return (CreateMenuItemWithCheck (menu, szName, szAccel, szTip,
                                    win_main, accel_group, func, data, gg,
@@ -62,7 +62,7 @@ GtkWidget *
 CreateMenuItemWithCheck (GtkWidget * menu,
                          gchar * szName, gchar * szAccel, gchar * szTip,
                          GtkWidget * win_main, GtkAccelGroup * accel_group,
-                         GtkSignalFunc func, gpointer data, ggobid * gg,
+                         GtkSignalFunc func, gpointer data, GGobiSession * gg,
                          GSList * RadioGroup, gboolean check)
 {
   GtkWidget *menuitem;
@@ -148,7 +148,7 @@ GtkWidget *
 CreateMenuCheck (GtkWidget * menu,
                  gchar * szName,
                  GtkSignalFunc func,
-                 gpointer data, gboolean state, ggobid * gg)
+                 gpointer data, gboolean state, GGobiSession * gg)
 {
   GtkWidget *menuitem;
 
@@ -294,7 +294,7 @@ void
 variable_notebook_subwindow_add (GGobiStage * d, GCallback func,
                                  gpointer func_data, GtkWidget * notebook,
                                  GGobiVariableType vartype, datatyped dtype, 
-                                 const gchar *stage_name, ggobid * gg)
+                                 const gchar *stage_name, GGobiSession * gg)
 {
   GtkWidget *swin, *tree_view;
   GtkListStore *model;
@@ -366,7 +366,7 @@ variable_notebook_subwindow_add (GGobiStage * d, GCallback func,
 }
 
 static void
-variable_notebook_adddata_cb (ggobid * gg, GGobiStage * d, void *notebook)
+variable_notebook_adddata_cb (GGobiSession * gg, GGobiStage * d, void *notebook)
 {
   GCallback func;
   gpointer func_data;
@@ -397,7 +397,7 @@ variable_notebook_adddata_cb (ggobid * gg, GGobiStage * d, void *notebook)
 }
 
 void
-variable_notebook_handlers_disconnect (GtkWidget * notebook, ggobid * gg)
+variable_notebook_handlers_disconnect (GtkWidget * notebook, GGobiSession * gg)
 {
   g_signal_handlers_disconnect_by_func (G_OBJECT (gg),
                                         G_CALLBACK
@@ -534,7 +534,7 @@ tree_selection_get_selected_row (GtkTreeSelection * tree_sel)
 * rebuilds it.
 */
 void
-variable_notebook_varchange_cb (ggobid * gg, gint which,
+variable_notebook_varchange_cb (GGobiSession * gg, gint which,
                                 GGobiStage * data, void *notebook)
 {
   GtkWidget *swin, *tree_view;
@@ -566,7 +566,7 @@ variable_notebook_varchange_cb (ggobid * gg, gint which,
 
 
 void
-variable_notebook_list_changed_cb (ggobid * gg, GGobiStage * d, void *notebook)
+variable_notebook_list_changed_cb (GGobiSession * gg, GGobiStage * d, void *notebook)
 {
   variable_notebook_varchange_cb (gg, -1, d, notebook);
 }
@@ -580,7 +580,7 @@ GtkWidget *create_variable_notebook (GtkWidget * box,
                                      GtkSelectionMode mode,
                                      GGobiVariableType vartype, datatyped dtype,
                                      GtkSignalFunc func,
-                                     gpointer func_data, ggobid * gg)
+                                     gpointer func_data, GGobiSession * gg)
 {
   GtkWidget *notebook;
   const gchar *stage_name = GGOBI_MAIN_STAGE_TRANSFORM;
@@ -662,7 +662,7 @@ variable_notebook_page_add_prefices (GtkWidget * notebook, gint page)
 }
 
 static void
-prefixed_variable_notebook_varchange_cb (ggobid * gg, gint which, GGobiStage * data,
+prefixed_variable_notebook_varchange_cb (GGobiSession * gg, gint which, GGobiStage * data,
                                          void *notebook)
 {
   GGobiStage *d;
@@ -675,14 +675,14 @@ prefixed_variable_notebook_varchange_cb (ggobid * gg, gint which, GGobiStage * d
 }
 
 void
-prefixed_variable_notebook_list_changed_cb (ggobid * gg, GGobiStage * d,
+prefixed_variable_notebook_list_changed_cb (GGobiSession * gg, GGobiStage * d,
                                             GtkNotebook * notebook)
 {
   prefixed_variable_notebook_varchange_cb (gg, -1, d, notebook);
 }
 
 static void
-prefixed_variable_notebook_adddata_cb (ggobid * gg, GGobiStage * d,
+prefixed_variable_notebook_adddata_cb (GGobiSession * gg, GGobiStage * d,
                                        void *notebook)
 {
   datatyped dtype =
@@ -699,7 +699,7 @@ prefixed_variable_notebook_adddata_cb (ggobid * gg, GGobiStage * d,
 /*  modeled on the routine in brush_link.c
 void
 prefixed_variable_notebook_current_page_set (displayd *display, 
-  GtkWidget *notebook, ggobid *gg)
+  GtkWidget *notebook, GGobiSession *gg)
 {
   GtkWidget *swin;
   GGobiStage *d = display->d, *paged;
@@ -729,7 +729,7 @@ GtkWidget *
 create_prefixed_variable_notebook (GtkWidget * box,
                                    GtkSelectionMode mode, GGobiVariableType vartype,
                                    datatyped dtype, GtkSignalFunc func,
-                                   gpointer func_data, ggobid * gg,
+                                   gpointer func_data, GGobiSession * gg,
                                    GGobiVariableNotebookPrefixFunc
                                    prefix_func)
 {
@@ -763,7 +763,7 @@ create_prefixed_variable_notebook (GtkWidget * box,
 /*--------------------------------------------------------------------*/
 
 GtkWidget *
-ggobi_addDisplayMenuItem (const gchar * label, ggobid * gg)
+ggobi_addDisplayMenuItem (const gchar * label, GGobiSession * gg)
 {
   GtkWidget *entry = NULL;
 
@@ -788,7 +788,7 @@ ggobi_addDisplayMenuItem (const gchar * label, ggobid * gg)
 
 
 gboolean
-ggobi_addToolsMenuWidget (GtkWidget * entry, ggobid * gg)
+ggobi_addToolsMenuWidget (GtkWidget * entry, GGobiSession * gg)
 {
   GtkWidget *tools_menu = NULL, *tools_item = NULL;
   GtkUIManager *manager;
@@ -809,7 +809,7 @@ ggobi_addToolsMenuWidget (GtkWidget * entry, ggobid * gg)
 }
 
 void
-ggobi_addToolAction (GtkActionEntry * entry, gpointer * data, ggobid * gg)
+ggobi_addToolAction (GtkActionEntry * entry, gpointer * data, GGobiSession * gg)
 {
   GtkActionGroup *actions = gtk_action_group_new (entry->name);
   gtk_action_group_add_actions (actions, entry, 1, data);
@@ -821,7 +821,7 @@ ggobi_addToolAction (GtkActionEntry * entry, gpointer * data, ggobid * gg)
 }
 
 GtkWidget *
-ggobi_addToolsMenuItem (gchar * lbl, ggobid * gg)
+ggobi_addToolsMenuItem (gchar * lbl, GGobiSession * gg)
 {
   GtkWidget *entry;
   if (!lbl) {

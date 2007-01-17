@@ -30,7 +30,7 @@ class GGobi:GUI:Transform from GGobi:GUI:Component {
   private GtkWidget *tform_combo;
   
   public GtkWidget *
-  new(ggobid *gg)
+  new(GGobiSession *gg)
   {
     GObject *obj = (GObject *)GET_NEW_VARG("gg", gg, NULL);
     return GTK_WIDGET(obj);
@@ -321,13 +321,13 @@ class GGobi:GUI:Transform from GGobi:GUI:Component {
   }
   
   private void
-  data_added_cb(ggobid *gg, GGobiData *d, GGobiGUITransform *self)
+  data_added_cb(GGobiSession *gg, GGobiData *d, GGobiGUITransform *self)
   {
     self_add_data(self, d);
   }
   
   override (GGobi:GUI:Component) void
-  initialize(GGobi:GUI:Component *self, ggobid *gg) 
+  initialize(GGobi:GUI:Component *self, GGobiSession *gg) 
   {
     GtkWidget *frame, *hb, *vb, *btn, *lbl, *spinner;
     GtkAdjustment *adj;

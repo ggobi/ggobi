@@ -37,7 +37,7 @@
 guint GGobiSignals[MAX_GGOBI_SIGNALS];
 
 static void
-pipeline_create_cb(GGobiPipelineFactory *factory, GGobiStage *root, ggobid *gg)
+pipeline_create_cb(GGobiPipelineFactory *factory, GGobiStage *root, GGobiSession *gg)
 {
   GObject *subset, *filter, *domain_adj, *transform;
   
@@ -63,7 +63,7 @@ pipeline_create_cb(GGobiPipelineFactory *factory, GGobiStage *root, ggobid *gg)
     "name", GGOBI_MAIN_STAGE_TRANSFORM, "parent", domain_adj, NULL);
   
   // FIXME: get rid of these lines ASAP
-  // There is absolutely no reason for the pipeline to depend on ggobid
+  // There is absolutely no reason for the pipeline to depend on GGobiSession
   GGOBI_STAGE(subset)->gg = gg;
   GGOBI_STAGE(filter)->gg = gg;
   GGOBI_STAGE(domain_adj)->gg = gg;
@@ -76,7 +76,7 @@ pipeline_create_cb(GGobiPipelineFactory *factory, GGobiStage *root, ggobid *gg)
 }
 
 GGobiPipelineFactory *
-ggobi_create_pipeline_factory(ggobid *gg)
+ggobi_create_pipeline_factory(GGobiSession *gg)
 {
   GObject *factory = ggobi_pipeline_factory_new();
   g_signal_connect(factory, "build", G_CALLBACK(pipeline_create_cb), gg);
@@ -85,7 +85,7 @@ ggobi_create_pipeline_factory(ggobid *gg)
 
 /*-- initialize variables which don't depend on the size of the data --*/
 void
-globals_init (ggobid * gg)
+globals_init (GGobiSession * gg)
 {
   colorschemed *scheme = gg->activeColorScheme;
 
@@ -112,7 +112,7 @@ globals_init (ggobid * gg)
 
 
 GSList *
-load_data (const gchar * uri, const gchar * mode_name, ggobid * gg)
+load_data (const gchar * uri, const gchar * mode_name, GGobiSession * gg)
 {
   GGobiInputSource *source = create_input_source(uri, mode_name);
   GSList *ds = NULL;
@@ -126,7 +126,7 @@ load_data (const gchar * uri, const gchar * mode_name, ggobid * gg)
 // returns a list of datasets (some input types (eg. xml) may return 
 // multiple data types)
 GSList *
-load_data_source (GGobiInputSource *source, ggobid * gg)
+load_data_source (GGobiInputSource *source, GGobiSession * gg)
 {
   GGobiDataFactory *factory;
   GSList *datasets = NULL;
@@ -159,7 +159,7 @@ load_data_source (GGobiInputSource *source, ggobid * gg)
 }
 
 GGobiDataFactory *
-create_data_factory (ggobid *gg, GGobiInputSource *source)
+create_data_factory (GGobiSession *gg, GGobiInputSource *source)
 {
   GType *factories;
   GGobiDataFactory *factory = NULL;
@@ -205,7 +205,7 @@ create_input_source(const gchar *uri, const gchar *mode)
  * event handlers there as well
 */
 void
-make_ggobi (GGobiOptions * options, gboolean processEvents, ggobid * gg)
+make_ggobi (GGobiOptions * options, gboolean processEvents, GGobiSession * gg)
 {
   gboolean init_data = false;
 
@@ -257,7 +257,7 @@ make_ggobi (GGobiOptions * options, gboolean processEvents, ggobid * gg)
 // FIXME: when this refactored, we need to emit a signal on GGobi "start"
 // to allow stuff like batch execution via plugins
 void
-start_ggobi (ggobid * gg, gboolean init_data, gboolean createPlot)
+start_ggobi (GGobiSession * gg, gboolean init_data, gboolean createPlot)
 {
   GGobiStage *d;
   if (init_data) {

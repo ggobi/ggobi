@@ -19,7 +19,7 @@
 #include "externs.h"
 
 RedrawStyle
-xyplot_activate (gint state, displayd *display, ggobid *gg)
+xyplot_activate (gint state, displayd *display, GGobiSession *gg)
 {
   GList *slist;
   splotd *sp;
@@ -88,7 +88,7 @@ xyplot_varsel (splotd *sp, gint jvar, gint *jvar_prev, gint toggle, gint mouse)
 }
 
 void
-xy_reproject (splotd *sp, greal **world_data, GGobiStage *d, ggobid *gg)
+xy_reproject (splotd *sp, greal **world_data, GGobiStage *d, GGobiSession *gg)
 {
 /*
  * Project the data down from the ncols_used-dimensional world_data[]
@@ -109,7 +109,7 @@ xy_reproject (splotd *sp, greal **world_data, GGobiStage *d, ggobid *gg)
 /*--------------------------------------------------------------------*/
 
 void
-cycle_fixedx (splotd *sp, displayd *display, GGobiStage *d, ggobid *gg)
+cycle_fixedx (splotd *sp, displayd *display, GGobiStage *d, GGobiSession *gg)
 {
   cpaneld *cpanel = &display->cpanel;
   gint varno, jvar_prev;
@@ -148,7 +148,7 @@ cycle_fixedx (splotd *sp, displayd *display, GGobiStage *d, ggobid *gg)
 }
 
 void
-cycle_fixedy (splotd *sp, displayd *display, GGobiStage *d, ggobid *gg)
+cycle_fixedy (splotd *sp, displayd *display, GGobiStage *d, GGobiSession *gg)
 {
   cpaneld *cpanel = &display->cpanel;
   gint varno, jvar_prev;
@@ -196,7 +196,7 @@ cycle_fixedy (splotd *sp, displayd *display, GGobiStage *d, ggobid *gg)
  * users can select plots during cycling, too.)
 */
 void
-cycle_xy (splotd *sp, displayd *display, GGobiStage *d, ggobid *gg)
+cycle_xy (splotd *sp, displayd *display, GGobiStage *d, GGobiSession *gg)
 {
   cpaneld *cpanel = &display->cpanel;
   gint jx, jy;
@@ -254,7 +254,7 @@ cycle_xy (splotd *sp, displayd *display, GGobiStage *d, ggobid *gg)
 }
 
 gint
-xycycle_func (ggobid *gg)
+xycycle_func (GGobiSession *gg)
 {
   displayd *display = gg->current_display;
   GGobiStage *d = gg->current_display->d;

@@ -6,6 +6,6 @@
 
 void timeSeriesClassInit(GGobiTimeSeriesDisplayClass *klass);
 void timeSeriesSPlotClassInit(GGobiTimeSeriesSPlotClass *klass);
-splotd *ggobi_time_series_splot_new(displayd *dpy, ggobid *gg);
+splotd *ggobi_time_series_splot_new(displayd *dpy, GGobiSession *gg);
 
 #endif

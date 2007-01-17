@@ -23,11 +23,11 @@
 #include "vars.h"
 #include "externs.h"
 
-static void notebook_current_page_set (displayd *, GtkWidget *, ggobid *);
+static void notebook_current_page_set (displayd *, GtkWidget *, GGobiSession *);
 
 
 static void
-identify_target_cb (GtkWidget * w, ggobid * gg)
+identify_target_cb (GtkWidget * w, GGobiSession * gg)
 {
   displayd *display = gg->current_display;
   cpaneld *cpanel = &display->cpanel;
@@ -57,7 +57,7 @@ identify_target_cb (GtkWidget * w, ggobid * gg)
 }
 
 static void
-recenter_cb (GtkWidget * w, ggobid * gg)
+recenter_cb (GtkWidget * w, GGobiSession * gg)
 {
   GGobiStage *d = gg->current_display->d;
   gint k = -1;
@@ -68,7 +68,7 @@ recenter_cb (GtkWidget * w, ggobid * gg)
 }
 
 static void
-id_remove_labels_cb (GtkWidget * w, ggobid * gg)
+id_remove_labels_cb (GtkWidget * w, GGobiSession * gg)
 {
   displayd *dsp = gg->current_display;
   cpaneld *cpanel = &gg->current_display->cpanel;
@@ -94,7 +94,7 @@ id_remove_labels_cb (GtkWidget * w, ggobid * gg)
 }
 
 static void
-id_all_sticky_cb (GtkWidget * w, ggobid * gg)
+id_all_sticky_cb (GtkWidget * w, GGobiSession * gg)
 {
   gint m;
   GGobiStage *d = NULL;
@@ -135,7 +135,7 @@ enum
 { RECORD_ID_INDEX = -3, RECORD_LABEL_INDEX, RECORD_NUMBER_INDEX };
 
 static void
-label_selected_cb (GtkTreeSelection * treesel, ggobid * gg)
+label_selected_cb (GtkTreeSelection * treesel, GGobiSession * gg)
 {
   gint *vars, nvars, i;
   cpaneld *cpanel = &gg->current_display->cpanel;
@@ -160,7 +160,7 @@ label_selected_cb (GtkTreeSelection * treesel, ggobid * gg)
 static gint
 key_press_cb (GtkWidget * w, GdkEventKey * event, splotd * sp)
 {
-  ggobid *gg = GGobiFromSPlot (sp);
+  GGobiSession *gg = GGobiFromSPlot (sp);
   cpaneld *cpanel = &gg->current_display->cpanel;
 
 /*-- add a key_press_cb in each mode, and let it begin with these lines --*/
@@ -177,7 +177,7 @@ static gint
 motion_notify_cb (GtkWidget * w, GdkEventMotion * event, splotd * sp)
 {
   gint k;
-  ggobid *gg = GGobiFromSPlot (sp);
+  GGobiSession *gg = GGobiFromSPlot (sp);
   GGobiStage *d = gg->current_display->d;
   gboolean button1_p, button2_p;
   gint nd = g_slist_length (gg->d);
@@ -193,7 +193,7 @@ motion_notify_cb (GtkWidget * w, GdkEventMotion * event, splotd * sp)
 
   if (GGOBI_IS_EXTENDED_SPLOT (sp)) {
     gboolean changed;
-    gboolean (*f) (icoords, splotd * sp, GGobiStage *, ggobid *);
+    gboolean (*f) (icoords, splotd * sp, GGobiStage *, GGobiSession *);
 
     f = GGOBI_EXTENDED_SPLOT_GET_CLASS (sp)->identify_notify;
     if (f) {
@@ -265,7 +265,7 @@ button_press_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
  * If nearest_point is a member of gg->sticky_ids, remove it; if
  * it isn't, add it.
 */
-  ggobid *gg = GGobiFromSPlot (sp);
+  GGobiSession *gg = GGobiFromSPlot (sp);
   displayd *dsp = sp->displayptr;
   cpaneld *cpanel = &dsp->cpanel;
   GGobiStage *d = NULL;
@@ -288,7 +288,7 @@ button_press_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
 static gint
 button_release_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
 {
-  ggobid *gg = GGobiFromSPlot (sp);
+  GGobiSession *gg = GGobiFromSPlot (sp);
   gg->buttondown = 0;
   return true;
 }
@@ -348,7 +348,7 @@ static gchar *target_lbl[] = {
   "Edges",
 };
 void
-cpanel_identify_make (ggobid * gg)
+cpanel_identify_make (GGobiSession * gg)
 {
   modepaneld *panel;
   GtkWidget *btn, *opt;
@@ -432,7 +432,7 @@ cpanel_identify_make (ggobid * gg)
 /*--------------------------------------------------------------------*/
 
 void
-cpanel_identify_init (cpaneld * cpanel, ggobid * gg)
+cpanel_identify_init (cpaneld * cpanel, GGobiSession * gg)
 {
   cpanel->id_display_type = ID_RECORD_LABEL;
 }
@@ -440,7 +440,7 @@ cpanel_identify_init (cpaneld * cpanel, ggobid * gg)
 /* called from cpanel_identify_set and when id_target_type is selected */
 static void
 notebook_current_page_set (displayd * display, GtkWidget * notebook,
-                           ggobid * gg)
+                           GGobiSession * gg)
 {
   GtkWidget *swin;
   GGobiStage *d = display->d, *paged, *e = display->e;
@@ -476,7 +476,7 @@ notebook_current_page_set (displayd * display, GtkWidget * notebook,
 }
 
 void
-cpanel_identify_set (displayd * display, cpaneld * cpanel, ggobid * gg)
+cpanel_identify_set (displayd * display, cpaneld * cpanel, GGobiSession * gg)
 {
   GtkWidget *w;
   GtkWidget *pnl = mode_panel_get_by_name (ggobi_getIModeName (IDENT), gg);

@@ -25,7 +25,7 @@
 static gchar *type_lbl[] = { "Texturing", "ASH" };
 
 static void
-type_cb (GtkWidget * w, ggobid * gg)
+type_cb (GtkWidget * w, GGobiSession * gg)
 {
   cpaneld *cpanel = &gg->current_display->cpanel;
   cpanel->p1d.type = gtk_combo_box_get_active (GTK_COMBO_BOX (w));
@@ -34,7 +34,7 @@ type_cb (GtkWidget * w, ggobid * gg)
 }
 
 static void
-ASH_add_lines_cb (GtkToggleButton * button, ggobid * gg)
+ASH_add_lines_cb (GtkToggleButton * button, GGobiSession * gg)
 {
   cpaneld *cpanel = &gg->current_display->cpanel;
   cpanel->p1d.ASH_add_lines_p = button->active;
@@ -42,7 +42,7 @@ ASH_add_lines_cb (GtkToggleButton * button, ggobid * gg)
 }
 
 static void
-ash_smoothness_cb (GtkAdjustment * adj, ggobid * gg)
+ash_smoothness_cb (GtkAdjustment * adj, GGobiSession * gg)
 {
   cpaneld *cpanel = &gg->current_display->cpanel;
 
@@ -59,7 +59,7 @@ ash_smoothness_cb (GtkAdjustment * adj, ggobid * gg)
 /*--------------------------------------------------------------------*/
 
 void
-p1d_cycle_activate (gboolean state, cpaneld * cpanel, ggobid * gg)
+p1d_cycle_activate (gboolean state, cpaneld * cpanel, GGobiSession * gg)
 {
   if (state) {
     gg->p1d.cycle_id = g_timeout_add (cpanel->p1d.cycle_delay,
@@ -77,7 +77,7 @@ p1d_cycle_activate (gboolean state, cpaneld * cpanel, ggobid * gg)
 }
 
 static void
-cycle_cb (GtkToggleButton * button, ggobid * gg)
+cycle_cb (GtkToggleButton * button, GGobiSession * gg)
 {
   displayd *display = gg->current_display;
   cpaneld *cpanel = &display->cpanel;
@@ -86,7 +86,7 @@ cycle_cb (GtkToggleButton * button, ggobid * gg)
   p1d_cycle_activate (cpanel->p1d.cycle_p, cpanel, gg);
 }
 static void
-cycle_speed_cb (GtkAdjustment * adj, ggobid * gg)
+cycle_speed_cb (GtkAdjustment * adj, GGobiSession * gg)
 {
   displayd *display = gg->current_display;
   cpaneld *cpanel = &display->cpanel;
@@ -101,7 +101,7 @@ cycle_speed_cb (GtkAdjustment * adj, ggobid * gg)
 }
 
 static void
-chdir_cb (GtkButton * button, ggobid * gg)
+chdir_cb (GtkButton * button, GGobiSession * gg)
 {
   displayd *display = gg->current_display;
   cpaneld *cpanel = &display->cpanel;
@@ -116,7 +116,7 @@ chdir_cb (GtkButton * button, ggobid * gg)
 static gint
 key_press_cb (GtkWidget * w, GdkEventKey * event, splotd * sp)
 {
-  ggobid *gg;
+  GGobiSession *gg;
   cpaneld *cpanel;
 
   gg = GGobiFromSPlot (sp);
@@ -158,7 +158,7 @@ p1d_event_handlers_toggle (splotd * sp, gboolean state)
 /*--------------------------------------------------------------------*/
 
 void
-cpanel_p1dplot_make (ggobid * gg)
+cpanel_p1dplot_make (GGobiSession * gg)
 {
   modepaneld *panel;
   GtkWidget *frame, *framevb, *tgl, *btn, *vbox, *vb, *opt, *lbl;
@@ -280,7 +280,7 @@ cpanel_p1dplot_make (ggobid * gg)
 
 /*-- for all plot modes, for now: it excludes the changing variable --*/
 void
-cpanel_p1d_init (cpaneld * cpanel, ggobid * gg)
+cpanel_p1d_init (cpaneld * cpanel, GGobiSession * gg)
 {
   cpanel->p1d.nASHes = 20;
   cpanel->p1d.nbins = 200;
@@ -294,7 +294,7 @@ cpanel_p1d_init (cpaneld * cpanel, ggobid * gg)
 
 /*-- scatterplot only; need a different routine for parcoords --*/
 void
-cpanel_p1d_set (displayd * display, cpaneld * cpanel, ggobid * gg)
+cpanel_p1d_set (displayd * display, cpaneld * cpanel, GGobiSession * gg)
 /*
  * To handle the case where there are multiple scatterplots
  * which may have different p1d options and parameters selected

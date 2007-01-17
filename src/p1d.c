@@ -39,7 +39,7 @@
 #define FORGETITAXIS_MAX 200.
 
 RedrawStyle
-p1d_activate (gint state, displayd * display, ggobid * gg)
+p1d_activate (gint state, displayd * display, GGobiSession * gg)
 {
   GList *slist;
   splotd *sp;
@@ -72,7 +72,7 @@ p1d_activate (gint state, displayd * display, ggobid * gg)
 
 void
 p1d_spread_var (displayd * display, gfloat * yy, splotd * sp, GGobiStage * d,
-                ggobid * gg)
+                GGobiSession * gg)
 {
 /*
  * Set up the next dot plot.
@@ -120,7 +120,7 @@ p1d_spread_var (displayd * display, gfloat * yy, splotd * sp, GGobiStage * d,
 }
 
 void
-p1d_reproject (splotd * sp, greal ** world_data, GGobiStage * d, ggobid * gg)
+p1d_reproject (splotd * sp, greal ** world_data, GGobiStage * d, GGobiSession * gg)
 {
 /*
  * Project the y variable down from the ncols-dimensional world_data[]
@@ -242,7 +242,7 @@ ash_baseline_set (icoords * baseline, splotd * sp)
 
 
 gint
-p1dcycle_func (ggobid * gg)
+p1dcycle_func (GGobiSession * gg)
 {
   displayd *display = gg->current_display;
   GGobiStage *d = gg->current_display->d;

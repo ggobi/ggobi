@@ -39,7 +39,7 @@
 
 GType ggobi_barchart_display_get_type();
 displayd *ggobi_barchart_display_new(gint type, gboolean missing_p,
-                                         GGobiStage * d, ggobid * gg);
+                                         GGobiStage * d, GGobiSession * gg);
 
 typedef struct {
   GGobiExtendedDisplayClass parent_class;
@@ -81,8 +81,8 @@ typedef struct {
 
 extern void barchart_display_menus_make(displayd * display,
                                         GtkAccelGroup *, GtkSignalFunc,
-                                        ggobid *);
-extern splotd *ggobi_barchart_splot_new(displayd * dpy, ggobid * gg);
+                                        GGobiSession *);
+extern splotd *ggobi_barchart_splot_new(displayd * dpy, GGobiSession * gg);
 
 /* Make these available to ggobiClass.c. 
   (Could put the _get_type routines in the barchartClass.h file.) */

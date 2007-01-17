@@ -57,7 +57,7 @@ brush_all_matching_id (GGobiStage * sd, gint k, gboolean condition, BrushTargetT
 
 void
 brush_matching_cv (gint jlinkby, vector_b * levelv,
-                   cpaneld * cpanel, GGobiStage * d, ggobid * gg)
+                   cpaneld * cpanel, GGobiStage * d, GGobiSession * gg)
 {
   gint m, level_value;
 
@@ -74,7 +74,7 @@ brush_matching_cv (gint jlinkby, vector_b * levelv,
  * of changed by using pts_under_brush_prev?
 */
 gboolean
-brush_all_matching_cv (cpaneld * cpanel, GGobiStage * d, ggobid * gg)
+brush_all_matching_cv (cpaneld * cpanel, GGobiStage * d, GGobiSession * gg)
 {
   gint i, m, j, level_value, level_value_max;
   vector_b levelv;

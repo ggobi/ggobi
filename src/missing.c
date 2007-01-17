@@ -34,7 +34,7 @@
  *
 */
 void
-missings_datad_cb (GtkWidget * w, ggobid * gg)
+missings_datad_cb (GtkWidget * w, GGobiSession * gg)
 {
   GObject *obj = G_OBJECT (gg->impute.window);
   GtkWidget *tree_view = get_tree_view_from_object (obj);

@@ -21,7 +21,7 @@
 
 gint
 find_nearest_point (icoords * lcursor_pos, splotd * splot, GGobiStage * d,
-                    ggobid * gg)
+                    GGobiSession * gg)
 {
 /*
  * Returns index of nearest un-hidden point
@@ -48,7 +48,7 @@ find_nearest_point (icoords * lcursor_pos, splotd * splot, GGobiStage * d,
 
 /*-- still having trouble getting identify turned off properly --*/
 RedrawStyle
-identify_activate (gint state, displayd * display, ggobid * gg)
+identify_activate (gint state, displayd * display, GGobiSession * gg)
 {
   RedrawStyle redraw_style = NONE;
   GGobiStage *d = display->d;
@@ -64,7 +64,7 @@ identify_activate (gint state, displayd * display, ggobid * gg)
 }
 
 void
-sticky_id_toggle (GGobiStage * d, ggobid * gg)
+sticky_id_toggle (GGobiStage * d, GGobiSession * gg)
 {
   gint i = 0;
   gboolean i_in_list = false;
@@ -111,7 +111,7 @@ sticky_id_toggle (GGobiStage * d, ggobid * gg)
 /*----------------------------------------------------------------------*/
 
 void
-identify_link_by_id (gint k, GGobiStage * source_d, ggobid * gg)
+identify_link_by_id (gint k, GGobiStage * source_d, GGobiSession * gg)
 {
   GGobiStage *d, *source_root = ggobi_stage_get_root(source_d);
   GSList *l;
@@ -158,7 +158,7 @@ identify_link_by_id (gint k, GGobiStage * source_d, ggobid * gg)
 
 void
 sticky_id_link_by_id (gint whattodo, gint k, GGobiStage * source_d,
-                      ggobid * gg)
+                      GGobiSession * gg)
 {
   GGobiStage *d;
   GSList *l;
@@ -210,7 +210,7 @@ sticky_id_link_by_id (gint whattodo, gint k, GGobiStage * source_d,
 /*----------------------------------------------------------------------*/
 
 gchar *
-identify_label_fetch (gint k, cpaneld * cpanel, GGobiStage * d, ggobid * gg)
+identify_label_fetch (gint k, cpaneld * cpanel, GGobiStage * d, GGobiSession * gg)
 {
   gchar *lbl = NULL;
   GList *labels = NULL, *l;

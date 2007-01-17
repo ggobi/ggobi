@@ -9,10 +9,10 @@
 
 
 /**
- Initialize basic colors for this ggobid.
+ Initialize basic colors for this GGobiSession.
  */
 void
-svis_init (ggobid * gg)
+svis_init (GGobiSession * gg)
 {
   gg->svis.window = NULL;
   gg->svis.npct = 0;

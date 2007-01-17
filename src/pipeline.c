@@ -194,7 +194,7 @@ pt_world_to_raw_by_var (gint j, greal * world, greal * raw, GGobiStage * d)
 void
 pt_screen_to_raw (icoords * screen, gint id, gboolean horiz, gboolean vert,
                   greal * raw, gcoords * eps, GGobiStage * d, splotd * sp,
-                  ggobid * gg)
+                  GGobiSession * gg)
 {
   gint j;
   gcoords planar;

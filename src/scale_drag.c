@@ -25,7 +25,7 @@
  * Change shift_wrld appropriately
 */
 void
-pan_by_drag (splotd * sp, ggobid * gg)
+pan_by_drag (splotd * sp, GGobiSession * gg)
 {
   greal dx, dy;
   greal scale_x, scale_y;
@@ -57,7 +57,7 @@ pan_by_drag (splotd * sp, ggobid * gg)
  * appropriate amounts.
 */
 void
-zoom_by_drag (splotd * sp, ggobid * gg)
+zoom_by_drag (splotd * sp, GGobiSession * gg)
 {
   gfloat *scale_x = &sp->scale.x;
   gfloat *scale_y = &sp->scale.y;

@@ -27,7 +27,7 @@
 /*--------------------------------------------------------------------*/
 
 static const gchar *const fix_axis_lbl[] = {"No fixed axes", "Fix X", "Fix Y"};
-static void fix_axis_cb (GtkWidget *w, ggobid *gg)
+static void fix_axis_cb (GtkWidget *w, GGobiSession *gg)
 {
   displayd *display = gg->current_display;
   cpaneld *cpanel = &display->cpanel;
@@ -36,7 +36,7 @@ static void fix_axis_cb (GtkWidget *w, ggobid *gg)
 }
 
 void
-xyplot_cycle_activate (gboolean state, cpaneld *cpanel, ggobid *gg)
+xyplot_cycle_activate (gboolean state, cpaneld *cpanel, GGobiSession *gg)
 {
   if (state) {
     gg->xyplot.cycle_id = g_timeout_add (cpanel->xyplot.cycle_delay,
@@ -50,7 +50,7 @@ xyplot_cycle_activate (gboolean state, cpaneld *cpanel, ggobid *gg)
     }
   }
 }
-static void cycle_cb (GtkToggleButton *button, ggobid *gg)
+static void cycle_cb (GtkToggleButton *button, GGobiSession *gg)
 {
   displayd *display = gg->current_display;
   cpaneld *cpanel = &display->cpanel;
@@ -59,7 +59,7 @@ static void cycle_cb (GtkToggleButton *button, ggobid *gg)
   xyplot_cycle_activate (cpanel->xyplot.cycle_p, cpanel, gg);
 }
 
-static void cycle_speed_cb (GtkAdjustment *adj, ggobid *gg) {
+static void cycle_speed_cb (GtkAdjustment *adj, GGobiSession *gg) {
   displayd *display = gg->current_display;
   cpaneld *cpanel = &display->cpanel;
 
@@ -71,7 +71,7 @@ static void cycle_speed_cb (GtkAdjustment *adj, ggobid *gg) {
   }
 }
 
-static void chdir_cb (GtkButton *button, ggobid* gg)
+static void chdir_cb (GtkButton *button, GGobiSession* gg)
 {
   displayd *display = gg->current_display;
   cpaneld *cpanel = &display->cpanel;
@@ -86,7 +86,7 @@ static void chdir_cb (GtkButton *button, ggobid* gg)
 static gint
 key_press_cb (GtkWidget *w, GdkEventKey *event, splotd *sp)
 {
-  ggobid *gg = GGobiFromSPlot(sp);
+  GGobiSession *gg = GGobiFromSPlot(sp);
   cpaneld *cpanel = &gg->current_display->cpanel;
   
 /*-- add a key_press_cb in each mode, and let it begin with these lines --*/
@@ -116,7 +116,7 @@ xyplot_event_handlers_toggle (splotd *sp, gboolean state) {
 /*--------------------------------------------------------------------*/
 
 void
-cpanel_xyplot_make (ggobid *gg) {
+cpanel_xyplot_make (GGobiSession *gg) {
   modepaneld *panel;
   GtkWidget *frame, *vb, *cycle_tgl, *chdir_btn, *cycle_sbar, *opt;
 
@@ -194,7 +194,7 @@ cpanel_xyplot_make (ggobid *gg) {
 /*--------------------------------------------------------------------*/
 
 void
-cpanel_xyplot_init (cpaneld *cpanel, ggobid *gg)
+cpanel_xyplot_init (cpaneld *cpanel, GGobiSession *gg)
 {
   /*-- cycling --*/
   cpanel->xyplot.cycle_dir = FORWARD;
@@ -204,7 +204,7 @@ cpanel_xyplot_init (cpaneld *cpanel, ggobid *gg)
 }
 
 void
-cpanel_xyplot_set (displayd *display, cpaneld *cpanel, ggobid* gg)
+cpanel_xyplot_set (displayd *display, cpaneld *cpanel, GGobiSession* gg)
 /*
  * To handle the case where there are multiple scatterplots
  * which may have different xyplot cycling options and parameters selected

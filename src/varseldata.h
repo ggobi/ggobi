@@ -5,7 +5,7 @@
 
 
 /*
- typedef struct _ggobid ggobid;
+ typedef struct _GGobiSession GGobiSession;
 */
 
 typedef struct {
@@ -15,7 +15,7 @@ typedef struct {
   gint alt_mod;   /*-- emulate the alt key --*/
   gint shift_mod; /*-- emulate the shift key --*/
   gint ctrl_mod;  /*-- emulate the control key --*/
-  ggobid *gg;
+  GGobiSession *gg;
 } varseldatad;
 
 #endif

@@ -58,7 +58,7 @@ sphere_free (GGobiStage * d)
 }
 
 void
-sphere_malloc (gint nc, GGobiStage * d, ggobid * gg)
+sphere_malloc (gint nc, GGobiStage * d, GGobiSession * gg)
 {
   if (d->sphere.vars.nels != 0)
     sphere_free (d);
@@ -89,7 +89,7 @@ sphere_malloc (gint nc, GGobiStage * d, ggobid * gg)
  * }
 */
 gboolean
-spherize_set_pcvars (GGobiStage * d, ggobid * gg)
+spherize_set_pcvars (GGobiStage * d, GGobiSession * gg)
 {
   gint ncols_prev = d->n_cols;
   gint j, k;
@@ -221,7 +221,7 @@ spherize_set_pcvars (GGobiStage * d, ggobid * gg)
 /*-------------------------------------------------------------------------*/
 
 void
-pca_diagnostics_set (GGobiStage * d, ggobid * gg)
+pca_diagnostics_set (GGobiStage * d, GGobiSession * gg)
 {
 /*
  * Compute and set the total variance and the condition number
@@ -254,7 +254,7 @@ pca_diagnostics_set (GGobiStage * d, ggobid * gg)
 }
 
 void
-sphere_npcs_set (gint n, GGobiStage * d, ggobid * gg)
+sphere_npcs_set (gint n, GGobiStage * d, GGobiSession * gg)
 {
   d->sphere.npcs = n;
   if (!scree_mapped_p (gg)) {
@@ -281,7 +281,7 @@ sphere_npcs_set (gint n, GGobiStage * d, ggobid * gg)
 }
 
 gint
-npcs_get (GGobiStage * d, ggobid * gg)
+npcs_get (GGobiStage * d, GGobiSession * gg)
 {
   return d->sphere.npcs;
 }
@@ -292,7 +292,7 @@ npcs_get (GGobiStage * d, ggobid * gg)
 /*-------------------------------------------------------------------------*/
 
 void
-spherevars_set (ggobid * gg)
+spherevars_set (GGobiSession * gg)
 {
   gint j, nvars, *vars;
   GGobiStage *d;
@@ -349,7 +349,7 @@ eigenval_zero (GGobiStage * d)
 }
 
 void
-eigenvec_zero (GGobiStage * d, ggobid * gg)
+eigenvec_zero (GGobiStage * d, GGobiSession * gg)
 {
   arrayd_zero (&d->sphere.eigenvec);
 }
@@ -361,7 +361,7 @@ eigenvec_zero (GGobiStage * d, ggobid * gg)
  * eigenvectors, and the eigenvalues are returned in a.
 */
 void
-eigenvec_set (GGobiStage * d, ggobid * gg)
+eigenvec_set (GGobiStage * d, GGobiSession * gg)
 {
   gint i, j;
   gint nels = d->sphere.vars.nels;
@@ -380,7 +380,7 @@ eigenvec_set (GGobiStage * d, ggobid * gg)
 /*-------------------------------------------------------------------------*/
 
 void
-sphere_varcovar_set (GGobiStage * d, ggobid * gg)
+sphere_varcovar_set (GGobiStage * d, GGobiSession * gg)
 {
   gint i, j, k, m, var;
   gfloat tmpf = 0.;
@@ -467,7 +467,7 @@ vc_identity_p (gdouble ** matrx, gint n)
  * perform a singular value decomposition.
 */
 gboolean
-sphere_svd (GGobiStage * d, ggobid * gg)
+sphere_svd (GGobiStage * d, GGobiSession * gg)
 {
   gint i, j, k, rank;
   gint nels = d->sphere.vars.nels;
@@ -533,7 +533,7 @@ sphere_svd (GGobiStage * d, ggobid * gg)
 /*-- sphere data from svars[] into pcvars[] --*/
 void
 spherize_data (vector_i * svars, vector_i * pcvars, GGobiStage * d,
-               ggobid * gg)
+               GGobiSession * gg)
 {
   gint m, j, k;
   gfloat tmpf;
@@ -573,7 +573,7 @@ spherize_data (vector_i * svars, vector_i * pcvars, GGobiStage * d,
 /*-------------------------------------------------------------------------*/
 
 gboolean
-pca_calc (GGobiStage * d, ggobid * gg)
+pca_calc (GGobiStage * d, GGobiSession * gg)
 {
   gboolean svd_ok = false;
 

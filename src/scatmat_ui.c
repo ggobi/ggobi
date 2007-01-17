@@ -28,7 +28,7 @@
 /*------------------------------------------------------------------------*/
 
 GtkWidget *
-cpanel_scatmat_make (ggobid * gg)
+cpanel_scatmat_make (GGobiSession * gg)
 {
   modepaneld *panel;
 
@@ -72,6 +72,6 @@ scatmat_mode_ui_get (displayd * display)
 /*-- there already exists scatmat_cpanel_init --*/
 
 void
-cpanel_scatmat_set (displayd * display, cpaneld * cpanel, ggobid * gg)
+cpanel_scatmat_set (displayd * display, cpaneld * cpanel, GGobiSession * gg)
 {
 }

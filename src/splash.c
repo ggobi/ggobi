@@ -34,7 +34,7 @@ splash_destroy (GtkWidget * w, GdkEventButton * event, GdkPixmap * pix)
 }
 
 void
-splash_show (ggobid * gg)
+splash_show (GGobiSession * gg)
 {
   char *versionInfo;
   GdkPixmap *splash_pix;

@@ -104,7 +104,7 @@ class GGobi:Plugin from G:Type:Module {
   // FIXME: Shouldn't the plugin return a custom GGobiPluginInstance,
   // where GGobiPluginInstance is a GObject class?
   virtual gboolean
-  ggobi_created(self, ggobid *gg)
+  ggobi_created(self, GGobiSession *gg)
   {
     OnCreateFunc f;
     gboolean success = TRUE;
@@ -123,7 +123,7 @@ class GGobi:Plugin from G:Type:Module {
   }
   
   virtual gboolean
-  ggobi_destroyed(self, ggobid *gg)
+  ggobi_destroyed(self, GGobiSession *gg)
   {
     gboolean success = TRUE;
     GGobiPluginInstance *instance = g_hash_table_lookup(selfp->instances, gg);
@@ -142,7 +142,7 @@ class GGobi:Plugin from G:Type:Module {
   }
   
   private GGobiPluginInstance *
-  create_instance(self, ggobid *gg)
+  create_instance(self, GGobiSession *gg)
   {
     GGobiPluginInstance *inst = g_new0(GGobiPluginInstance, 1);
     inst->gg = gg;
@@ -238,7 +238,7 @@ class GGobi:Plugin from G:Type:Module {
 %h{
   typedef struct _GGobiPluginInstance {
     GGobiPlugin *plugin;
-    ggobid *gg;
+    GGobiSession *gg;
     void *data;
   } GGobiPluginInstance;
   typedef gboolean (*OnLoadFunc)(GGobiPlugin *plugin);

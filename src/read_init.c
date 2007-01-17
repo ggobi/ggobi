@@ -501,7 +501,7 @@ gint resolveVariableName (const gchar * name, GGobiStage * d);
 
 displayd *
 createExtendedDisplay (const gchar * const type, gint * vars, gint numVars,
-                       GGobiStage * d, ggobid * gg)
+                       GGobiStage * d, GGobiSession * gg)
 {
   displayd *dpy;
 
@@ -525,7 +525,7 @@ createExtendedDisplay (const gchar * const type, gint * vars, gint numVars,
 
 
 displayd *
-createDisplayFromDescription (ggobid * gg, GGobiDisplayDescription * desc)
+createDisplayFromDescription (GGobiSession * gg, GGobiDisplayDescription * desc)
 {
   displayd *dpy = NULL;
   GGobiStage *data = NULL;

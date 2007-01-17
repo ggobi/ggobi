@@ -45,7 +45,7 @@ DisplayOptions DefaultDisplayOptions = {
 /*-- debugging utility --*/
 /*
 static void
-displays_print (ggobid *gg) {
+displays_print (GGobiSession *gg) {
   GList *l;
   displayd *dsp;
 
@@ -67,7 +67,7 @@ displays_print (ggobid *gg) {
 /*-- replot all splots in display --*/
 /*-- type = EXPOSE, QUICK, BINNED, FULL --*/
 void
-display_plot (displayd * display, RedrawStyle type, ggobid * gg)
+display_plot (displayd * display, RedrawStyle type, GGobiSession * gg)
 {
   GList *slist;
   splotd *sp;
@@ -82,7 +82,7 @@ display_plot (displayd * display, RedrawStyle type, ggobid * gg)
 
 static void
 display_plot_allbutone (displayd * display, splotd * splot,
-                        RedrawStyle type, ggobid * gg)
+                        RedrawStyle type, GGobiSession * gg)
 {
   GList *slist;
   splotd *sp;
@@ -108,7 +108,7 @@ appropriately.  A Model View Controller approach is needed.
 void
 set_display_option (gboolean active, guint action, displayd * display)
 {
-  ggobid *gg = display->ggobi;
+  GGobiSession *gg = display->ggobi;
   gchar *title;
   gint ne = 0;
   GGobiStage *onlye = NULL;
@@ -294,7 +294,7 @@ set_display_option (gboolean active, guint action, displayd * display)
  then force them to be applied.  This does not update the menus.
 */
 void
-set_display_options (displayd * display, ggobid * gg)
+set_display_options (displayd * display, GGobiSession * gg)
 {
   int i;
   gboolean active = true;
@@ -340,7 +340,7 @@ set_display_options (displayd * display, ggobid * gg)
 void
 display_close (displayd * display)
 {
-  ggobid *gg = GGobiFromDisplay (display);
+  GGobiSession *gg = GGobiFromDisplay (display);
   display_free (display, false, gg);
 }
 
@@ -348,7 +348,7 @@ display_close (displayd * display)
 void
 show_display_control_panel (displayd * display)
 {
-  ggobid *gg = GGobiFromDisplay (display);
+  GGobiSession *gg = GGobiFromDisplay (display);
   /* gtk_window_present(GTK_WINDOW(gg->main_window())); */
   gdk_window_raise (gg->main_window->window);
 }
@@ -358,7 +358,7 @@ show_display_control_panel (displayd * display)
 void
 display_delete_cb (GtkWidget * w, GdkEvent * event, displayd * display)
 {
-  ggobid *gg = GGobiFromWidget (w, true);
+  GGobiSession *gg = GGobiFromWidget (w, true);
   display_free (display, false, gg);
 }
 
@@ -371,13 +371,13 @@ display_delete_cb (GtkWidget * w, GdkEvent * event, displayd * display)
  This display class is really an abstract class.
 */
 displayd *
-ggobi_display_new (gboolean missing_p, GGobiStage * d, ggobid * gg)
+ggobi_display_new (gboolean missing_p, GGobiStage * d, GGobiSession * gg)
 {
   return (display_alloc_init (missing_p, d, gg));
 }
 
 void
-display_set_values (displayd * display, GGobiStage * d, ggobid * gg)
+display_set_values (displayd * display, GGobiStage * d, GGobiSession * gg)
 {
   /* Should copy in the contents of DefaultOptions to create
      an indepedently modifiable configuration copied from
@@ -391,7 +391,7 @@ display_set_values (displayd * display, GGobiStage * d, ggobid * gg)
 }
 
 displayd *
-display_alloc_init (gboolean missing_p, GGobiStage * d, ggobid * gg)
+display_alloc_init (gboolean missing_p, GGobiStage * d, GGobiSession * gg)
 {
   displayd *display;
 
@@ -404,7 +404,7 @@ display_alloc_init (gboolean missing_p, GGobiStage * d, ggobid * gg)
 
 
 gint
-display_add (displayd * display, ggobid * gg)
+display_add (displayd * display, GGobiSession * gg)
 {
   splotd *prev_splot = gg->current_splot;
   ProjectionMode pmode_prev = pmode_get (gg->current_display, gg);
@@ -471,7 +471,7 @@ display_add (displayd * display, ggobid * gg)
  * current_display and current_splot if necessary.
 */
 void
-display_free (displayd * display, gboolean force, ggobid * gg)
+display_free (displayd * display, gboolean force, GGobiSession * gg)
 {
   splotd *sp = NULL;
   extern gint num_ggobis;
@@ -572,7 +572,7 @@ display_free (displayd * display, gboolean force, ggobid * gg)
 }
 
 void
-display_free_all (ggobid * gg)
+display_free_all (GGobiSession * gg)
 {
   GList *dlist;
   displayd *display;
@@ -615,7 +615,7 @@ display_free_all (ggobid * gg)
 }
 
 void
-display_set_current (displayd * new_display, ggobid * gg)
+display_set_current (displayd * new_display, GGobiSession * gg)
 {
   gchar *title;
 
@@ -683,7 +683,7 @@ display_set_current (displayd * new_display, ggobid * gg)
           g_error_free (error);
         }
       }
-      void (*f) (displayd * dpy, ggobid * gg) =
+      void (*f) (displayd * dpy, GGobiSession * gg) =
         GGOBI_EXTENDED_DISPLAY_GET_CLASS (new_display)->display_set;
       if (f)
         f (new_display, gg);
@@ -711,7 +711,7 @@ display_set_current (displayd * new_display, ggobid * gg)
    Caller must free the return value.
  */
 gchar *
-computeTitle (gboolean current_p, displayd * display, ggobid * gg)
+computeTitle (gboolean current_p, displayd * display, GGobiSession * gg)
 {
   gint n;
   gchar *title = NULL, *description;
@@ -748,7 +748,7 @@ computeTitle (gboolean current_p, displayd * display, ggobid * gg)
  * replot all splots in all displays -- except splot, if present
 */
 void
-displays_plot (splotd * splot, RedrawStyle type, ggobid * gg)
+displays_plot (splotd * splot, RedrawStyle type, GGobiSession * gg)
 {
   GList *dlist;
   displayd *display;
@@ -765,7 +765,7 @@ displays_plot (splotd * splot, RedrawStyle type, ggobid * gg)
 
 /*-- reproject and replot all splots in display --*/
 void
-display_tailpipe (displayd * display, RedrawStyle type, ggobid * gg)
+display_tailpipe (displayd * display, RedrawStyle type, GGobiSession * gg)
 {
   GList *splist = display->splots;
   splotd *sp;
@@ -788,7 +788,7 @@ display_tailpipe (displayd * display, RedrawStyle type, ggobid * gg)
         sp == gg->current_splot && imode_get (gg) == BRUSH) {
       GGobiStage *d = display->d;
       if (GGOBI_IS_EXTENDED_SPLOT (sp)) {
-        void (*f) (GGobiStage *, splotd *, ggobid *);
+        void (*f) (GGobiStage *, splotd *, GGobiSession *);
         GGobiExtendedSPlotClass *klass;
         klass = GGOBI_EXTENDED_SPLOT_GET_CLASS (sp);
         f = klass->splot_assign_points_to_bins;
@@ -800,7 +800,7 @@ display_tailpipe (displayd * display, RedrawStyle type, ggobid * gg)
     }
 
     if (GGOBI_IS_EXTENDED_DISPLAY (display)) {
-      void (*f) (gboolean, displayd *, splotd *, ggobid *);
+      void (*f) (gboolean, displayd *, splotd *, GGobiSession *);
       f = GGOBI_EXTENDED_DISPLAY_GET_CLASS (display)->ruler_ranges_set;
       if (f) {
         f (GTK_WIDGET_VISIBLE (display->hrule) ||
@@ -816,7 +816,7 @@ display_tailpipe (displayd * display, RedrawStyle type, ggobid * gg)
 
 /*-- Reproject and plot all plots in all displays: modulo missingness --*/
 void
-displays_tailpipe (RedrawStyle type, ggobid * gg)
+displays_tailpipe (RedrawStyle type, GGobiSession * gg)
 {
   GList *dlist;
   displayd *display;
@@ -829,7 +829,7 @@ displays_tailpipe (RedrawStyle type, ggobid * gg)
 
 void
 display_window_init (windowDisplayd * display, gint width, gint height,
-                     gint bwidth, ggobid * gg)
+                     gint bwidth, GGobiSession * gg)
 {
   display->window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   g_object_set_data (G_OBJECT (display->window),

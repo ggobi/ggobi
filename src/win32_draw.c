@@ -34,7 +34,7 @@
 
 #ifdef WIN32
 
-static void drawing_arrays_alloc (splotd *sp, GGobiStage *d, ggobid *gg);
+static void drawing_arrays_alloc (splotd *sp, GGobiStage *d, GGobiSession *gg);
 static void build_circle (icoords *, gint, GdkRectangle *, gint, gshort);
 static void build_plus (icoords *, gint, GdkSegment *, gint, gshort);
 static void build_rect (icoords *, gint, GdkRectangle *, gint, gshort);
@@ -58,7 +58,7 @@ static GdkRectangle       *filled_arcs;
 */
 
 static void
-drawing_arrays_alloc (splotd *sp, GGobiStage *d, ggobid *gg) {
+drawing_arrays_alloc (splotd *sp, GGobiStage *d, GGobiSession *gg) {
   gint n = d->n_rows
 
   if (sp->win32.npoints == 0) {
@@ -316,7 +316,7 @@ draw_glyphs (splotd *sp, GdkDrawable *drawable,
   GdkRectangle *filled_rects, gint nr_filled,
   GdkRectangle *open_arcs,     gint nc_open,
   GdkRectangle *filled_arcs,   gint nc_filled,
-  ggobid *gg)
+  GGobiSession *gg)
 {
   if (gg->plot_GC == NULL)
     init_plot_GC (drawable, gg);
@@ -338,7 +338,7 @@ draw_glyphs (splotd *sp, GdkDrawable *drawable,
 }
 
 void
-win32_draw_to_pixmap_unbinned (gint current_color, splotd *sp, gboolean draw_hidden, ggobid *gg)
+win32_draw_to_pixmap_unbinned (gint current_color, splotd *sp, gboolean draw_hidden, GGobiSession *gg)
 {
   displayd *display = (displayd *) sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
@@ -399,7 +399,7 @@ win32_draw_to_pixmap_unbinned (gint current_color, splotd *sp, gboolean draw_hid
 
 void
 win32_draw_to_pixmap_binned (icoords *bin0, icoords *bin1,
-  gint current_color, splotd *sp, gboolean draw_hidden, ggobid *gg)
+  gint current_color, splotd *sp, gboolean draw_hidden, GGobiSession *gg)
 {
   displayd *display = (displayd *) sp->displayptr;
   GGobiStage *d = display->d;

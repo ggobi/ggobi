@@ -42,7 +42,7 @@ static const gchar *scatmat_ui =
 displayd *
 scatmat_new (displayd * display,
              gboolean missing_p, gint numRows, gint * rows,
-             gint numCols, gint * cols, GGobiStage * d, ggobid * gg)
+             gint numCols, gint * cols, GGobiStage * d, GGobiSession * gg)
 {
   GtkWidget *vbox, *frame;
   gint i, j, ctr;
@@ -229,7 +229,7 @@ scatmat_var_selected (gint jvar, displayd * display)
 
 static splotd *
 scatmat_add_plot (gint xvar, gint yvar, gint col, gint row,
-                  displayd * display, ggobid * gg)
+                  displayd * display, GGobiSession * gg)
 {
   splotd *sp_new;
 
@@ -255,7 +255,7 @@ scatmat_add_plot (gint xvar, gint yvar, gint col, gint row,
 
 gboolean
 scatmat_varsel_simple (cpaneld * cpanel, splotd * sp, gint jvar,
-                       gint * jvar_prev, ggobid * gg)
+                       gint * jvar_prev, GGobiSession * gg)
 {
   gboolean redraw = true;
   gboolean Delete = false;

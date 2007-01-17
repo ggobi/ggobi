@@ -28,7 +28,7 @@
 extern "C" {
 #endif
 
-struct _ggobid; 
+struct _GGobiSession; 
 
 
 #define GGOBI_TYPE_DISPLAY	 (ggobi_display_get_type ())
@@ -167,7 +167,7 @@ struct _displayd {
  gfloat t2d_indx_min, t2d_indx_max, t1d_indx_min, t1d_indx_max;
  gint t2d_ppindx_count, t1d_ppindx_count;
 
- struct _ggobid *ggobi;
+ struct _GGobiSession *ggobi;
 
 };  /* displayd; */
 
@@ -205,7 +205,7 @@ typedef struct _embeddedDisplayd {
 #define GGOBI_WINDOW_DISPLAY_GET_CLASS(obj)  		(G_TYPE_INSTANCE_GET_CLASS ((obj), GGOBI_TYPE_WINDOW_DISPLAY, GGobiWindowDisplayClass))
 
 GType ggobi_window_display_get_type();
-displayd *ggobi_window_display_new(gint type, gboolean missing_p, GGobiStage *d, ggobid *gg);
+displayd *ggobi_window_display_new(gint type, gboolean missing_p, GGobiStage *d, GGobiSession *gg);
 
 typedef struct 
 {
@@ -264,23 +264,23 @@ typedef struct
     gchar * titleLabel;
     gchar const *  (*title_label)(displayd *dpy);
 
-    displayd *(*create)(gboolean missing_p, splotd *sp, GGobiStage *d, ggobid *gg);
-    displayd *(*createWithVars)(gboolean missing_p, gint nvars, gint *vars, GGobiStage *d, ggobid *gg);
+    displayd *(*create)(gboolean missing_p, splotd *sp, GGobiStage *d, GGobiSession *gg);
+    displayd *(*createWithVars)(gboolean missing_p, gint nvars, gint *vars, GGobiStage *d, GGobiSession *gg);
 
-    gboolean (*variable_select)(GtkWidget *, displayd *, splotd *, gint jvar, gint toggle, gint mouse, cpaneld *cpanel, ggobid *gg);
+    gboolean (*variable_select)(GtkWidget *, displayd *, splotd *, gint jvar, gint toggle, gint mouse, cpaneld *cpanel, GGobiSession *gg);
 
     gint  (*variable_plotted_p)(displayd *dpy, GSList *cols, GGobiStage *d);
 
-    gboolean (*cpanel_set)(displayd *dpy, cpaneld *cp, ggobid *gg);
+    gboolean (*cpanel_set)(displayd *dpy, cpaneld *cp, GGobiSession *gg);
 
 	const gchar *(*mode_ui_get)(displayd *dpy);
 	
     void (*display_unset)(displayd *dpy);
-    void (*display_set)(displayd *dpy, ggobid *gg);
+    void (*display_set)(displayd *dpy, GGobiSession *gg);
 
-    gboolean (*build_symbol_vectors)(cpaneld *, GGobiStage *, ggobid *);
+    gboolean (*build_symbol_vectors)(cpaneld *, GGobiStage *, GGobiSession *);
 
-    void (*ruler_ranges_set)(gboolean, displayd *, splotd *, ggobid *);
+    void (*ruler_ranges_set)(gboolean, displayd *, splotd *, GGobiSession *);
 
     void (*varpanel_refresh)(displayd *dpy, splotd *sp, GGobiStage *d);
 
@@ -290,38 +290,38 @@ typedef struct
 	/* Probably should arrange for displayd to come first and no need to pass the splots. */
     void (*xml_describe)(xmlNodePtr node, GList *splots, displayd *dpy);
 
-    void (*varpanel_tooltips_set)(displayd *dpy, ggobid *gg, GtkWidget *wx, GtkWidget *wy, GtkWidget *wz, GtkWidget *label);
+    void (*varpanel_tooltips_set)(displayd *dpy, GGobiSession *gg, GtkWidget *wx, GtkWidget *wy, GtkWidget *wz, GtkWidget *label);
 
-    gint (*plotted_vars_get)(displayd *display, gint *cols, GGobiStage *d, ggobid *gg);
+    gint (*plotted_vars_get)(displayd *display, gint *cols, GGobiStage *d, GGobiSession *gg);
 
-    GtkWidget *(*imode_control_box)(displayd *, gchar **modeName, ggobid *gg);
+    GtkWidget *(*imode_control_box)(displayd *, gchar **modeName, GGobiSession *gg);
 
-  GtkWidget *(*menus_make)(displayd *dpy, ggobid *gg);
+  GtkWidget *(*menus_make)(displayd *dpy, GGobiSession *gg);
 
   gboolean (*event_handlers_toggle)(displayd *dpy, splotd *sp, gboolean state, ProjectionMode, InteractionMode);
 
     gint (*splot_key_event_handler)(displayd *dpy, splotd *sp, gint keval);
   /* new - dfs */
-  gint (*splot_key_event_handled)(GtkWidget *, displayd *, splotd *, GdkEventKey *, ggobid *);
+  gint (*splot_key_event_handled)(GtkWidget *, displayd *, splotd *, GdkEventKey *, GGobiSession *);
 
-    void (*add_plot_labels)(displayd *dpy, splotd *sp, GdkDrawable *, GGobiStage *, ggobid *);
+    void (*add_plot_labels)(displayd *dpy, splotd *sp, GdkDrawable *, GGobiStage *, GGobiSession *);
 
   gboolean (*varpanel_highd)(displayd *dpy);
 
-  void (*move_points_motion_cb)(displayd *, splotd *, GtkWidget *w, GdkEventMotion *event, ggobid *);
-  void (*move_points_button_cb)(displayd *, splotd *, GtkWidget *w, GdkEventButton *event, ggobid *);
+  void (*move_points_motion_cb)(displayd *, splotd *, GtkWidget *w, GdkEventMotion *event, GGobiSession *);
+  void (*move_points_button_cb)(displayd *, splotd *, GtkWidget *w, GdkEventButton *event, GGobiSession *);
 
 /* XXX duncan and dfs: you need to sort this out
-    void (*world_to_raw)(displayd *, splotd *, gint, GGobiStage *, ggobid *);
+    void (*world_to_raw)(displayd *, splotd *, gint, GGobiStage *, GGobiSession *);
 */
 
   /* time will tell which of these we need -- dfs */
-  void (*viewmode_set)(displayd *, ggobid *);
-  void (*pmode_set)(ProjectionMode, displayd *, ggobid *);
+  void (*viewmode_set)(displayd *, GGobiSession *);
+  void (*pmode_set)(ProjectionMode, displayd *, GGobiSession *);
   /* */
 
-  gboolean (*varcircle_draw)(displayd *, gint jvar, GdkPixmap *da_pix, ggobid *gg);
-  void (*select_X)(GtkWidget *, displayd *, gint, ggobid *);
+  gboolean (*varcircle_draw)(displayd *, gint jvar, GdkPixmap *da_pix, GGobiSession *gg);
+  void (*select_X)(GtkWidget *, displayd *, gint, GGobiSession *);
 
   void (*tour1d_realloc)(displayd *, gint, GGobiStage *);
   void (*tour2d3_realloc)(displayd *, gint, GGobiStage *);
@@ -341,7 +341,7 @@ typedef struct {
    GtkWidget *cpanelWidget;
 } extendedDisplayd;
 
-void display_set_values(displayd *display, GGobiStage *d, ggobid *gg);
+void display_set_values(displayd *display, GGobiStage *d, GGobiSession *gg);
 
 /* These functions are no longer const, because this is dangerous, given
    that the input is a pointer and the data it points to could change,
@@ -350,7 +350,7 @@ const gchar * /*const*/ ggobi_display_tree_label(displayd *dpy);
 const gchar * /*const*/ ggobi_display_title_label(displayd *dpy);
 
 
-displayd *ggobi_display_new(gboolean missing_p, GGobiStage *d, ggobid *gg);
+displayd *ggobi_display_new(gboolean missing_p, GGobiStage *d, GGobiSession *gg);
 
 #ifdef __cplusplus
 } /* end of extern "C" */

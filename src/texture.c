@@ -44,11 +44,11 @@ gint myrnd (gint);
 
  In a multi-threaded version, we would need to protect this.
 */
-static ggobid *CurrentGGobi;
+static GGobiSession *CurrentGGobi;
 gint
 psort (const void *arg1, const void *arg2)
 {
-  ggobid *gg = CurrentGGobi;
+  GGobiSession *gg = CurrentGGobi;
 
   gint val = 0;
   gint *x1 = (gint *) arg1;
@@ -165,7 +165,7 @@ next25 (gint * tt, gint * bigt, gint * smallt)
 
 void
 textur (gfloat * yy, gfloat * shft, gint ny, gint option, gfloat del,
-        gint stages, ggobid * gg)
+        gint stages, GGobiSession * gg)
 {
 /*
  * Calculate a texturing shft vector based on data yy

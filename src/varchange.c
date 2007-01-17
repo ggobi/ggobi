@@ -32,7 +32,7 @@ tour_realloc_up (GGobiStage *d, gint nc)
   displayd *dsp;
   GList *l;
 
-  if (!GGOBI_IS_GGOBI(d->gg))
+  if (!GGOBI_IS_SESSION(d->gg))
     return;
 
   for (l=d->gg->displays; l; l=l->next) {
@@ -90,7 +90,7 @@ is_variable_plotted (GSList *cols, GGobiStage * d)
   displayd *display;
   gint jplotted = -1;
 
-  if (!GGOBI_IS_GGOBI(d->gg))
+  if (!GGOBI_IS_SESSION(d->gg))
     return 0;
 
   /*-- check each display for each variable --*/

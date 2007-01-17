@@ -35,10 +35,10 @@ void warning (const char *msg);
 extern "C"
 {
 #endif
-  void ggobi_displays_release (ggobid * gg);
-  void ggobi_display_release (displayd * display, ggobid * gg);
-  void ggobi_splot_release (splotd * sp, displayd * display, ggobid * gg);
-  /*void ggobi_data_release (GGobiStage *, ggobid * gg);*/
+  void ggobi_displays_release (GGobiSession * gg);
+  void ggobi_display_release (displayd * display, GGobiSession * gg);
+  void ggobi_splot_release (splotd * sp, displayd * display, GGobiSession * gg);
+  /*void ggobi_data_release (GGobiStage *, GGobiSession * gg);*/
 #ifdef __cplusplus
 }
 #endif
@@ -46,7 +46,7 @@ extern "C"
 /*
   Closes the specified display
  */
-void ggobi_destroyCurrentDisplay (ggobid * gg)
+void ggobi_destroyCurrentDisplay (GGobiSession * gg)
 {
   display_free (gg->current_display, false, gg);
 }
@@ -63,7 +63,7 @@ ggobi_setMissingValueIdentifier (MissingValue_p f)
 }
 
 /* These are all for freeing the currently held data. */
-void ggobi_displays_release (ggobid * gg)
+void ggobi_displays_release (GGobiSession * gg)
 {
   GList *dlist;
   displayd *display;
@@ -88,13 +88,13 @@ void ggobi_displays_release (ggobid * gg)
   }
 }
 
-void ggobi_display_release (displayd * display, ggobid * gg)
+void ggobi_display_release (displayd * display, GGobiSession * gg)
 {
   display_free (display, true, gg);
 }
 
 
-void ggobi_splot_release (splotd * sp, displayd * display, ggobid * gg)
+void ggobi_splot_release (splotd * sp, displayd * display, GGobiSession * gg)
 {
   splot_free (sp, display, gg);
 }
@@ -116,7 +116,7 @@ const gint *ggobi_getViewTypeIndices (gint * n)
 
 
 displayd *ggobi_newScatterplot (gint ix, gint iy, GGobiStage * d,
-                                  ggobid * gg)
+                                  GGobiSession * gg)
 {
   displayd *display = NULL;
   gint vars[2];
@@ -133,7 +133,7 @@ displayd *ggobi_newScatterplot (gint ix, gint iy, GGobiStage * d,
 }
 
 displayd *ggobi_newScatmat (gint * rows, gint * columns, gint nr, gint nc,
-                              GGobiStage * d, ggobid * gg)
+                              GGobiStage * d, GGobiSession * gg)
 {
   displayd *display;
 
@@ -146,7 +146,7 @@ displayd *ggobi_newScatmat (gint * rows, gint * columns, gint nr, gint nc,
 }
 
 displayd *ggobi_newParCoords (gint * vars, gint numVars, GGobiStage * d,
-                                ggobid * gg)
+                                GGobiSession * gg)
 {
   displayd *display = NULL;
 
@@ -160,7 +160,7 @@ displayd *ggobi_newParCoords (gint * vars, gint numVars, GGobiStage * d,
 }
 
 displayd *ggobi_newTimeSeries (gint * yvars, gint numVars, GGobiStage * d,
-                                 ggobid * gg)
+                                 GGobiSession * gg)
 {
   displayd *display = NULL;
 
@@ -182,7 +182,7 @@ displayd *ggobi_createPlot (int type, char **varnames)
 }
 
 
-const gchar *ggobi_getCurrentDisplayType (ggobid * gg)
+const gchar *ggobi_getCurrentDisplayType (GGobiSession * gg)
 {
 /*XX */
   return (ggobi_getViewTypeName (gg->current_display));
@@ -285,7 +285,7 @@ DisplayOptions *ggobi_getDefaultDisplayOptions ()
 }
 
 
-displayd *ggobi_getDisplay (gint which, ggobid * gg)
+displayd *ggobi_getDisplay (gint which, GGobiSession * gg)
 {
   displayd *display = NULL;
 
@@ -295,7 +295,7 @@ displayd *ggobi_getDisplay (gint which, ggobid * gg)
   return (display);
 }
 
-DisplayOptions *ggobi_getDisplayOptions (int displayNum, ggobid * gg)
+DisplayOptions *ggobi_getDisplayOptions (int displayNum, GGobiSession * gg)
 {
   DisplayOptions *options = NULL;
   if (displayNum < 0)
@@ -311,17 +311,17 @@ DisplayOptions *ggobi_getDisplayOptions (int displayNum, ggobid * gg)
 }
 
 
-displayd *ggobi_getCurrentDisplay (ggobid * gg)
+displayd *ggobi_getCurrentDisplay (GGobiSession * gg)
 {
   return (gg->current_display);
 }
 
-gint ggobi_getCurrentDisplayIndex (ggobid * gg)
+gint ggobi_getCurrentDisplayIndex (GGobiSession * gg)
 {
   return (g_list_index (gg->displays, gg->current_display));
 }
 
-gint ggobi_getCurrentPlotIndex (ggobid * gg)
+gint ggobi_getCurrentPlotIndex (GGobiSession * gg)
 {
   int val = -1;
   displayd *d;
@@ -333,7 +333,7 @@ gint ggobi_getCurrentPlotIndex (ggobid * gg)
   return (val);
 }
 
-displayd *ggobi_setCurrentDisplay (int which, ggobid * gg)
+displayd *ggobi_setCurrentDisplay (int which, GGobiSession * gg)
 {
   displayd *d;
 
@@ -360,14 +360,14 @@ gint ggobi_getNumGGobis ()
 }
 
 #ifdef EXPLICIT_IDENTIFY_HANDLER
-void ggobi_setIdentifyHandler (IdentifyProc proc, void *data, ggobid * gg)
+void ggobi_setIdentifyHandler (IdentifyProc proc, void *data, GGobiSession * gg)
 {
   gg->identify_handler.handler = proc;
   gg->identify_handler.user_data = data;
 }
 #endif
 
-void ggobi_getBrushSize (gint * w, gint * h, ggobid * gg)
+void ggobi_getBrushSize (gint * w, gint * h, GGobiSession * gg)
 {
   splotd *sp = gg->current_splot;
 
@@ -375,7 +375,7 @@ void ggobi_getBrushSize (gint * w, gint * h, ggobid * gg)
   *h = ABS (sp->brush_pos.y1 - sp->brush_pos.y2);
 }
 
-void ggobi_getBrushLocation (gint * x, gint * y, ggobid * gg)
+void ggobi_getBrushLocation (gint * x, gint * y, GGobiSession * gg)
 {
   splotd *sp = gg->current_splot;
 
@@ -384,14 +384,14 @@ void ggobi_getBrushLocation (gint * x, gint * y, ggobid * gg)
 }
 
 void
-redraw (splotd * sp, ggobid * gg)
+redraw (splotd * sp, GGobiSession * gg)
 {
   brush_once (true, sp, gg);
   display_plot (sp->displayptr, FULL, gg);
 }
 
 
-void ggobi_setBrushSize (int w, int h, ggobid * gg)
+void ggobi_setBrushSize (int w, int h, GGobiSession * gg)
 {
   splotd *sp = gg->current_splot;
   displayd *display = sp->displayptr;
@@ -408,7 +408,7 @@ void ggobi_setBrushSize (int w, int h, ggobid * gg)
 }
 
 
-void ggobi_setBrushLocation (gint x, gint y, ggobid * gg)
+void ggobi_setBrushLocation (gint x, gint y, GGobiSession * gg)
 {
   gint wd, ht;
   splotd *sp = gg->current_splot;
@@ -425,7 +425,7 @@ void ggobi_setBrushLocation (gint x, gint y, ggobid * gg)
   redraw (sp, gg);
 }
 
-gboolean ggobi_setBrushGlyph (gint type, gint size, ggobid * gg)
+gboolean ggobi_setBrushGlyph (gint type, gint size, GGobiSession * gg)
 {
   if (type > -1)
     gg->glyph_id.type = type;
@@ -435,7 +435,7 @@ gboolean ggobi_setBrushGlyph (gint type, gint size, ggobid * gg)
   return (true);                /* Should be true iff there is a change. */
 }
 
-void ggobi_getBrushGlyph (gint * type, gint * size, ggobid * gg)
+void ggobi_getBrushGlyph (gint * type, gint * size, GGobiSession * gg)
 {
   *type = gg->glyph_id.type;
   *size = gg->glyph_id.size;
@@ -461,7 +461,7 @@ splotd *ggobi_getSPlot (gint which, displayd * display)
   return (sp);
 }
 
-gint ggobi_setPMode (const gchar * name, ggobid * gg)
+gint ggobi_setPMode (const gchar * name, GGobiSession * gg)
 {
   ProjectionMode old = pmode_get (gg->current_display, gg);
   ProjectionMode newMode = (ProjectionMode) ggobi_getPModeId (name);
@@ -505,7 +505,7 @@ const gchar *ggobi_getPModeScreenName (int which, displayd * display)
   return (ggobi_getPModeName (which));
 }
 
-gint ggobi_setIMode (const gchar * name, ggobid * gg)
+gint ggobi_setIMode (const gchar * name, GGobiSession * gg)
 {
   InteractionMode old = imode_get (gg);
   InteractionMode newMode = (InteractionMode) ggobi_getIModeId (name);
@@ -574,7 +574,7 @@ ggobi_getModeName(int which)
 }
 */
 
-gint ggobi_setBrushColor (gint cid, ggobid * gg)
+gint ggobi_setBrushColor (gint cid, GGobiSession * gg)
 {
   gint old = gg->color_id;
   if (cid > -1 && cid < gg->activeColorScheme->n)
@@ -583,13 +583,13 @@ gint ggobi_setBrushColor (gint cid, ggobid * gg)
   return (old);
 }
 
-gint ggobi_getBrushColor (ggobid * gg)
+gint ggobi_getBrushColor (GGobiSession * gg)
 {
   return (gg->color_id);
 }
 
 const 
-gchar *ggobi_getColorName (gint cid, ggobid * gg, gboolean inDefault)
+gchar *ggobi_getColorName (gint cid, GGobiSession * gg, gboolean inDefault)
 {
   if (cid >= 0 && cid < gg->activeColorScheme->n) {
     return ((gchar *) g_array_index (gg->activeColorScheme->colorNames,
@@ -602,7 +602,7 @@ gchar *ggobi_getColorName (gint cid, ggobid * gg, gboolean inDefault)
 
 void
 ggobi_setPlotRange (double *x, double *y, int plotNum, displayd * display,
-                      gboolean pixels, ggobid * gg)
+                      gboolean pixels, GGobiSession * gg)
 {
   splotd *sp;
 
@@ -647,7 +647,7 @@ ggobi_setPlotRange (double *x, double *y, int plotNum, displayd * display,
 /*
   This handles the raising and lowering or the iconifying or
   de-iconifying of one or more windows.  If which is negative,
-  the operation applies to all the displays with the ggobid
+  the operation applies to all the displays with the GGobiSession
   instance.  Otherwise, the operation applies just to the
   display indexed by which.
 
@@ -658,7 +658,7 @@ ggobi_setPlotRange (double *x, double *y, int plotNum, displayd * display,
  */
 gboolean
 ggobi_raiseWindow (int which, gboolean raiseOrIcon, gboolean up,
-                     ggobid * gg)
+                     GGobiSession * gg)
 {
   windowDisplayd *display;
   gboolean ok = false;
@@ -701,9 +701,9 @@ ggobi_raiseWindow (int which, gboolean raiseOrIcon, gboolean up,
 
 /*
   Finds the index of the dataset named `name'
-  in the specified ggobid object.
+  in the specified GGobiSession object.
  */
-int ggobi_datasetIndex (const char *name, const ggobid * const gg)
+int ggobi_datasetIndex (const char *name, const GGobiSession * const gg)
 {
   GGobiStage *d;
   int ctr = 0;
@@ -722,9 +722,9 @@ int ggobi_datasetIndex (const char *name, const ggobid * const gg)
 
 /*
   Returns the names of the different datasets
-  maintained in the specified ggobid object.
+  maintained in the specified GGobiSession object.
  */
-gchar **ggobi_getDatasetNames (gint * n, ggobid * gg)
+gchar **ggobi_getDatasetNames (gint * n, GGobiSession * gg)
 {
   gint i;
   GGobiStage *d;
@@ -745,7 +745,7 @@ gchar **ggobi_getDatasetNames (gint * n, ggobid * gg)
  Added to the API and to avoid breaking code (e.g. in RSggobi)
  we add it here with a new name ggobi_ggobi_get.
 */
-ggobid *ggobi_ggobi_get (gint which)
+GGobiSession *ggobi_ggobi_get (gint which)
 {
   return (ggobi_get (which));
 }
@@ -775,7 +775,7 @@ KeyEventHandler *ggobi_registerNumberedKeyEventHandler (KeyEventHandlerFunc
                                                           char *description,
                                                           ReleaseData *
                                                           releaseData,
-                                                          ggobid * gg,
+                                                          GGobiSession * gg,
                                                           ProgrammingLanguage
                                                           lang)
 {
@@ -797,7 +797,7 @@ KeyEventHandler *ggobi_registerNumberedKeyEventHandler (KeyEventHandlerFunc
   return (old);
 }
 
-KeyEventHandler *ggobi_removeNumberedKeyEventHandler (ggobid * gg)
+KeyEventHandler *ggobi_removeNumberedKeyEventHandler (GGobiSession * gg)
 {
   return (ggobi_registerNumberedKeyEventHandler (NULL, NULL, NULL, NULL, gg, C));
 }
@@ -825,7 +825,7 @@ const int *ggobi_getVersionNumbers ()
 }
 
 
-GGobiStage *ggobi_data_get (gint which, const ggobid * const gg)
+GGobiStage *ggobi_data_get (gint which, const GGobiSession * const gg)
 {
   GGobiStage *data = NULL;
 
@@ -836,7 +836,7 @@ GGobiStage *ggobi_data_get (gint which, const ggobid * const gg)
 }
 
 GGobiStage *ggobi_data_get_by_name (const gchar * const name,
-                                     const ggobid * const gg)
+                                     const GGobiSession * const gg)
 {
   gint which;
   GGobiStage *data = NULL;
@@ -859,7 +859,7 @@ ggobi_setSessionOptions (GGobiOptions * opts)
 /* sets the tour projection matrix, F */
 gboolean
 ggobi_setTour2DProjectionMatrix (gdouble * Fvalues, gint ncols, gint ndim,
-                                   gboolean vals_scaled, ggobid * gg)
+                                   gboolean vals_scaled, GGobiSession * gg)
 {
   ProjectionMode vm = pmode_get (gg->current_display, gg);
   displayd *dsp = gg->current_display;
@@ -903,7 +903,7 @@ ggobi_setTour2DProjectionMatrix (gdouble * Fvalues, gint ncols, gint ndim,
 
 const gdouble **ggobi_getTour2DProjectionMatrix (gint ncols, gint ndim,
                                                    gboolean vals_scaled,
-                                                   ggobid * gg)
+                                                   GGobiSession * gg)
 {
   displayd *dsp = gg->current_display;
   GGobiStage *d = dsp->d;

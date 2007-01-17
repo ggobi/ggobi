@@ -14,7 +14,7 @@
 */
 
 void
-set_time (ggobid *gg) {
+set_time (GGobiSession *gg) {
   gdk_flush();
   g_get_current_time(&gg->time);
   //g_printerr ("(set time) %d %d\n", gg->time.tv_sec, gg->time.tv_usec);
@@ -22,7 +22,7 @@ set_time (ggobid *gg) {
 }
 
 void
-print_time_interval(gchar *where, ggobid *gg) {
+print_time_interval(gchar *where, GGobiSession *gg) {
   GTimeVal now;
   glong tdiff_usec;
 
@@ -39,7 +39,7 @@ print_time_interval(gchar *where, ggobid *gg) {
 
 
 void
-time_brushing (ggobid *gg) {
+time_brushing (GGobiSession *gg) {
   displayd *display = gg->current_display;
   splotd *sp = gg->current_splot;
   gint k;
@@ -58,14 +58,14 @@ time_brushing (ggobid *gg) {
 
 
 void
-time_touring (ggobid *gg) {
+time_touring (GGobiSession *gg) {
   displayd *dsp = gg->current_display;
   GGobiStage *d = dsp->d;
   gint k;
   gint nsteps = 10;
-  extern void tour2d_run(displayd *dsp, ggobid *gg);
-  extern gboolean tour2d_subset_var_set (gint, GGobiStage *, displayd *, ggobid *);
-  extern void tour2d_active_var_set (gint, GGobiStage *, displayd *, ggobid *);
+  extern void tour2d_run(displayd *dsp, GGobiSession *gg);
+  extern gboolean tour2d_subset_var_set (gint, GGobiStage *, displayd *, GGobiSession *);
+  extern void tour2d_active_var_set (gint, GGobiStage *, displayd *, GGobiSession *);
 
   if (ggobi_stage_get_n_vars(d) < 3)
     return;
@@ -95,7 +95,7 @@ time_touring (ggobid *gg) {
 }
 
 void
-run_timing_tests (ggobid *gg) {
+run_timing_tests (GGobiSession *gg) {
   print_time_interval("init", gg);
   time_brushing(gg);
   time_touring(gg);

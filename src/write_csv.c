@@ -9,7 +9,7 @@
 #include "externs.h"
 
 gboolean
-write_csv_header (gint *cols, gint ncols, FILE *f, GGobiStage *d, ggobid *gg)
+write_csv_header (gint *cols, gint ncols, FILE *f, GGobiStage *d, GGobiSession *gg)
 {
   gboolean ok = true;
   gint j, jcol, rval;
@@ -32,7 +32,7 @@ write_csv_header (gint *cols, gint ncols, FILE *f, GGobiStage *d, ggobid *gg)
 }
 
 void
-write_csv_cell(gint i, gint j, FILE *f, GGobiStage *d, ggobid *gg)
+write_csv_cell(gint i, gint j, FILE *f, GGobiStage *d, GGobiSession *gg)
 {
   gchar* value = ggobi_stage_get_string_value(d, i, j);
 
@@ -46,7 +46,7 @@ write_csv_cell(gint i, gint j, FILE *f, GGobiStage *d, ggobid *gg)
 }
 
 gboolean
-write_csv_record (gint i, gint *cols, gint ncols, FILE *f, GGobiStage *d, ggobid *gg)
+write_csv_record (gint i, gint *cols, gint ncols, FILE *f, GGobiStage *d, GGobiSession *gg)
 {
   gboolean ok = true;
   gint j, jcol;
@@ -84,7 +84,7 @@ write_csv_record (gint i, gint *cols, gint ncols, FILE *f, GGobiStage *d, ggobid
 }
 
 gboolean
-write_csv_records (gint *cols, gint ncols, FILE *f, GGobiStage *d, ggobid *gg)
+write_csv_records (gint *cols, gint ncols, FILE *f, GGobiStage *d, GGobiSession *gg)
 {
   gboolean ok = true;
   gint i;
@@ -109,7 +109,7 @@ write_csv_records (gint *cols, gint ncols, FILE *f, GGobiStage *d, ggobid *gg)
 
 
 gboolean
-write_csv_file (FILE *f, GGobiStage *d, ggobid *gg)
+write_csv_file (FILE *f, GGobiStage *d, GGobiSession *gg)
 {
   gboolean ok = false;
   gint j;
@@ -143,7 +143,7 @@ write_csv_file (FILE *f, GGobiStage *d, ggobid *gg)
 }
 
 gboolean
-write_csv (const gchar *filename,  ggobid *gg)
+write_csv (const gchar *filename,  GGobiSession *gg)
 {
   FILE *f;
   gboolean ok = false;

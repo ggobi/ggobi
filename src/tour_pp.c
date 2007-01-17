@@ -42,7 +42,7 @@ gfloat randomval, nrand;
 gint nset;
 
 /* reset pp variables */
-void reset_pp(GGobiStage *d, ggobid *gg)
+void reset_pp(GGobiStage *d, GGobiSession *gg)
 {
   displayd *dsp;
   GList *l;

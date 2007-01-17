@@ -26,7 +26,7 @@
 
 gboolean
 record_add (eeMode mode, gint a, gint b, gchar * lbl, gchar * id,
-            gchar ** vals, GGobiStage * d, GGobiStage * e, ggobid * gg)
+            gchar ** vals, GGobiStage * d, GGobiStage * e, GGobiSession * gg)
 {
   guint i, j;
   GList *l, *sl;
@@ -90,7 +90,7 @@ record_add (eeMode mode, gint a, gint b, gchar * lbl, gchar * id,
      * make it show up in the display menu.
      */
     if (e->n_rows == 1) {
-      void ggobi_edge_menus_update (ggobid * gg);
+      void ggobi_edge_menus_update (GGobiSession * gg);
       ggobi_edge_menus_update (gg);
     }
 
@@ -180,7 +180,7 @@ DTL: So need to call unresolveEdgePoints(e, d) to remove it from the
 */
 void
 record_add_defaults (GGobiStage * d, GGobiStage * e, displayd * display,
-                     ggobid * gg)
+                     GGobiSession * gg)
 {
   cpaneld *cpanel = &display->cpanel;
   GGobiStage *dtarget;
@@ -192,7 +192,7 @@ record_add_defaults (GGobiStage * d, GGobiStage * e, displayd * display,
 
   if (ggobi_stage_has_vars(dtarget)) {
     void fetch_default_record_values (gchar ** vals,
-                                      GGobiStage *, displayd *, ggobid * gg);
+                                      GGobiStage *, displayd *, GGobiSession * gg);
     vals = (gchar **) g_malloc (dtarget->n_cols * sizeof (gchar *));
     fetch_default_record_values (vals, dtarget, display, gg);
   }
@@ -218,13 +218,13 @@ record_add_defaults (GGobiStage * d, GGobiStage * e, displayd * display,
 /*--------------------------------------------------------------------*/
 
 void
-edgeedit_init (ggobid * gg)
+edgeedit_init (GGobiSession * gg)
 {
   gg->edgeedit.a = -1;  /*-- index of point where new edge begins --*/
 }
 
 gint
-find_nearest_edge (splotd * sp, displayd * display, ggobid * gg)
+find_nearest_edge (splotd * sp, displayd * display, GGobiSession * gg)
 {
   gint sqdist, near, j, lineid, xdist;
   gint from, to, yd;
@@ -343,7 +343,7 @@ find_nearest_edge (splotd * sp, displayd * display, ggobid * gg)
 
 void
 fetch_default_record_values (gchar ** vals, GGobiStage * dtarget,
-                             displayd * display, ggobid * gg)
+                             displayd * display, GGobiSession * gg)
 {
   gint j;
   gcoords eps;

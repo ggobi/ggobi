@@ -24,26 +24,26 @@
  Similarly, the ggev_r_... are for the routines used with g_signal_connect_object.
 */
 
-typedef void (*ggev_datad_added_f)(ggobid *, GGobiStage *, void *);
-typedef void (*ggev_brush_motion_f)(ggobid *, splotd *, GdkEventMotion *ev, GGobiStage *, void*);
-typedef void (*ggev_r_brush_motion_f)(void *,  splotd *, GdkEventMotion *ev, GGobiStage *, ggobid *);
+typedef void (*ggev_datad_added_f)(GGobiSession *, GGobiStage *, void *);
+typedef void (*ggev_brush_motion_f)(GGobiSession *, splotd *, GdkEventMotion *ev, GGobiStage *, void*);
+typedef void (*ggev_r_brush_motion_f)(void *,  splotd *, GdkEventMotion *ev, GGobiStage *, GGobiSession *);
 
-typedef void (*ggev_move_point_f)(ggobid *, splotd *, gint, GGobiStage *, void*);
-typedef void (*ggev_r_move_point_f)(void*, splotd *, gint, GGobiStage *, ggobid *);
+typedef void (*ggev_move_point_f)(GGobiSession *, splotd *, gint, GGobiStage *, void*);
+typedef void (*ggev_r_move_point_f)(void*, splotd *, gint, GGobiStage *, GGobiSession *);
 
-typedef void (*ggev_identify_point_f)(ggobid *, splotd *, gint, GGobiStage *, void*);
-typedef void (*ggev_select_variable_f)(ggobid *, GGobiStage *, gint, splotd *, void*);
+typedef void (*ggev_identify_point_f)(GGobiSession *, splotd *, gint, GGobiStage *, void*);
+typedef void (*ggev_select_variable_f)(GGobiSession *, GGobiStage *, gint, splotd *, void*);
 
-typedef void (*ggev_splot_new_f)(ggobid *, splotd *, void*);
-typedef void (*ggev_r_splot_new_f)(void *, splotd *, ggobid *);
+typedef void (*ggev_splot_new_f)(GGobiSession *, splotd *, void*);
+typedef void (*ggev_r_splot_new_f)(void *, splotd *, GGobiSession *);
 
-typedef void (*ggev_variable_added_f)(ggobid *, gint, GGobiStage *, void*);
-typedef void (*ggev_variable_list_changed_f)(ggobid *, GGobiStage *, void*);
+typedef void (*ggev_variable_added_f)(GGobiSession *, gint, GGobiStage *, void*);
+typedef void (*ggev_variable_list_changed_f)(GGobiSession *, GGobiStage *, void*);
 
-typedef void (*ggev_sticky_point_added_f)(ggobid *, gint, gint, GGobiStage *, void*);
-typedef void (*ggev_sticky_point_removed_f)(ggobid *, gint, gint, GGobiStage *, void*);
+typedef void (*ggev_sticky_point_added_f)(GGobiSession *, gint, gint, GGobiStage *, void*);
+typedef void (*ggev_sticky_point_removed_f)(GGobiSession *, gint, gint, GGobiStage *, void*);
 
-typedef void (*ggev_clusters_changed_f)(ggobid *, GGobiStage *, void *);
+typedef void (*ggev_clusters_changed_f)(GGobiSession *, GGobiStage *, void *);
 
 #ifdef CHECK_EVENT_SIGNATURES
 #ifdef __GNUC__

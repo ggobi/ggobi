@@ -26,7 +26,7 @@
 // is created, so that the plugins can listen to that
 // That's pretty much all this function does now.
 gboolean
-registerPlugin (ggobid * gg, GGobiPlugin * plugin)
+registerPlugin (GGobiSession * gg, GGobiPlugin * plugin)
 {
   gboolean ok = true;
   
@@ -42,7 +42,7 @@ registerPlugin (ggobid * gg, GGobiPlugin * plugin)
 }
 
 gboolean
-registerPlugins (ggobid * gg, GList * plugins)
+registerPlugins (GGobiSession * gg, GList * plugins)
 {
   GList *el = plugins;
   gboolean ok = false;
@@ -61,8 +61,8 @@ registerPlugins (ggobid * gg, GList * plugins)
 
  */
 
-void addPlugins (GList * plugins, GtkWidget * list, ggobid * gg);
-void addPlugin (GGobiPlugin * info, GtkWidget * list, ggobid * gg);
+void addPlugins (GList * plugins, GtkWidget * list, GGobiSession * gg);
+void addPlugin (GGobiPlugin * info, GtkWidget * list, GGobiSession * gg);
 
 GtkWidget *
 createPluginList ()
@@ -100,7 +100,7 @@ createPluginList ()
  info list.
  */
 GtkWidget *
-showPluginInfo (GList * plugins, ggobid * gg)
+showPluginInfo (GList * plugins, GGobiSession * gg)
 {
   GtkWidget *win, *list, *swin;
 
@@ -126,7 +126,7 @@ showPluginInfo (GList * plugins, ggobid * gg)
  @see addPlugin()
  */
 void
-addPlugins (GList * plugins, GtkWidget * list, ggobid * gg)
+addPlugins (GList * plugins, GtkWidget * list, GGobiSession * gg)
 {
   gint n = g_list_length (plugins), i;
   GGobiPlugin *plugin;
@@ -145,7 +145,7 @@ addPlugins (GList * plugins, GtkWidget * list, ggobid * gg)
   @see addPlugins() 
  */
 void
-addPlugin (GGobiPlugin * plugin, GtkWidget * list, ggobid * gg)
+addPlugin (GGobiPlugin * plugin, GtkWidget * list, GGobiSession * gg)
 {
   GtkTreeModel *model = gtk_tree_view_get_model (GTK_TREE_VIEW (list));
   GtkTreeIter iter;
@@ -166,7 +166,7 @@ addPlugin (GGobiPlugin * plugin, GtkWidget * list, ggobid * gg)
  */
  // FIXME: This also must be done via signals
 void
-closePlugins (ggobid * gg)
+closePlugins (GGobiSession * gg)
 {
   GList *el, *tmp;
   GGobiPlugin *plugin;

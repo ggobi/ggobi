@@ -23,62 +23,62 @@
 
 /*-- called when closed from the close button --*/
 static void
-close_btn_cb (GtkWidget * w, ggobid * gg)
+close_btn_cb (GtkWidget * w, GGobiSession * gg)
 {
   gtk_widget_hide (gg->impute.window);
 }
 
 /*-- called when closed from the window manager --*/
 static void
-close_wmgr_cb (GtkWidget * w, GdkEvent * event, ggobid * gg)
+close_wmgr_cb (GtkWidget * w, GdkEvent * event, GGobiSession * gg)
 {
   gtk_widget_hide (gg->impute.window);
 }
 
 /* Random */
 static void
-set_random_cb (GtkToggleButton * w, ggobid * gg)
+set_random_cb (GtkToggleButton * w, GGobiSession * gg)
 {
   gg->impute.type = IMP_RANDOM;
 }
 
 /* Fixed */
 static void
-set_fixed_cb (GtkToggleButton * w, ggobid * gg)
+set_fixed_cb (GtkToggleButton * w, GGobiSession * gg)
 {
   gg->impute.type = IMP_FIXED;
 }
 
 /* Below */
 static void
-set_fixed_below_cb (GtkToggleButton * w, ggobid * gg)
+set_fixed_below_cb (GtkToggleButton * w, GGobiSession * gg)
 {
   gg->impute.type = IMP_BELOW;
 }
 
 /* Above */
 static void
-set_fixed_above_cb (GtkToggleButton * w, ggobid * gg)
+set_fixed_above_cb (GtkToggleButton * w, GGobiSession * gg)
 {
   gg->impute.type = IMP_ABOVE;
 }
 
 /* Mean */
 static void
-set_mean_cb (GtkToggleButton * w, ggobid * gg)
+set_mean_cb (GtkToggleButton * w, GGobiSession * gg)
 {
   gg->impute.type = IMP_MEAN;
 }
 
 /* Median */
 static void
-set_median_cb (GtkToggleButton * w, ggobid * gg)
+set_median_cb (GtkToggleButton * w, GGobiSession * gg)
 {
   gg->impute.type = IMP_MEDIAN;
 }
 
 static void
-rescale_cb (GtkButton * button, ggobid * gg)
+rescale_cb (GtkButton * button, GGobiSession * gg)
 {
   //GtkWidget *tv = get_tree_view_from_object (G_OBJECT (gg->impute.window));
   //GGobiStage *d = (GGobiStage *) g_object_get_data (G_OBJECT (tv), "datad");
@@ -91,12 +91,12 @@ rescale_cb (GtkButton * button, ggobid * gg)
   displays_tailpipe (FULL, gg);*/
 }
 static void
-group_cb (GtkToggleButton * button, ggobid * gg)
+group_cb (GtkToggleButton * button, GGobiSession * gg)
 {
   gg->impute.bgroup_p = button->active;
 }
 static void
-show_missings_cb (GtkToggleButton * button, ggobid * gg)
+show_missings_cb (GtkToggleButton * button, GGobiSession * gg)
 {
   GtkWidget *tv = get_tree_view_from_object (G_OBJECT (gg->impute.window));
   GGobiStage *d = (GGobiStage *) g_object_get_data (G_OBJECT (tv), "datad");
@@ -106,7 +106,7 @@ show_missings_cb (GtkToggleButton * button, ggobid * gg)
 }
 
 static gboolean
-impute_fixed_cb (ImputeType impute_type, gfloat * val, ggobid * gg)
+impute_fixed_cb (ImputeType impute_type, gfloat * val, GGobiSession * gg)
 {
   GtkWidget *w;
   gchar *val_str;
@@ -165,7 +165,7 @@ impute_fixed_cb (ImputeType impute_type, gfloat * val, ggobid * gg)
 }
 
 static void
-impute_cb (GtkWidget * w, ggobid * gg)
+impute_cb (GtkWidget * w, GGobiSession * gg)
 {
   gboolean redraw = true;
   GtkWidget *tree_view =
@@ -205,7 +205,7 @@ impute_cb (GtkWidget * w, ggobid * gg)
 /*------------------------------------------------------------------*/
 
 void
-impute_window_open (ggobid * gg)
+impute_window_open (GGobiSession * gg)
 {
   GtkWidget *frame0, *vb;
   GtkWidget *btn, *tgl, *notebook;

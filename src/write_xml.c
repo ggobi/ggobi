@@ -16,7 +16,7 @@
 
 #include "write_xml.h"
 /*
-  Takes the current data in the specified ggobid structure
+  Takes the current data in the specified GGobiSession structure
   and writes the XML file corresponding to this configuration.
   This can be used to convert the original data formats to XML, if
   that is desired.  (More likely to be correct than writing a Perl
@@ -31,7 +31,7 @@
 
 extern const gchar* const GlyphNames[];
 
-XmlWriteInfo *updateXmlWriteInfo(GGobiStage *d, ggobid *gg, XmlWriteInfo *info);
+XmlWriteInfo *updateXmlWriteInfo(GGobiStage *d, GGobiSession *gg, XmlWriteInfo *info);
 
 /* if a string contains an ampersand, write it as &amp; ... etc ... --*/
 static void
@@ -43,7 +43,7 @@ write_xml_string(FILE *f, const gchar *str)
 }
 
 gboolean
-write_xml (const gchar *filename,  ggobid *gg, XmlWriteInfo *xmlWriteInfo)
+write_xml (const gchar *filename,  GGobiSession *gg, XmlWriteInfo *xmlWriteInfo)
 {
   FILE *f;
   gboolean ok = false;
@@ -63,7 +63,7 @@ write_xml (const gchar *filename,  ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 }
 
 gboolean
-write_xml_stream (FILE *f, ggobid *gg, const gchar *filename, XmlWriteInfo *xmlWriteInfo)
+write_xml_stream (FILE *f, GGobiSession *gg, const gchar *filename, XmlWriteInfo *xmlWriteInfo)
 {
  gint numDatasets, i;
  GGobiStage *d;
@@ -84,7 +84,7 @@ g_printerr ("numDatasets %d\n", numDatasets);
 }
 
 gboolean
-write_xml_dataset(FILE *f, GGobiStage *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
+write_xml_dataset(FILE *f, GGobiStage *d, GGobiSession *gg, XmlWriteInfo *xmlWriteInfo)
 {
   if (ggobi_stage_get_n_edges(d) && !ggobi_stage_has_vars(d)) {
     write_xml_edges(f, d, gg, xmlWriteInfo);
@@ -100,17 +100,17 @@ write_xml_dataset(FILE *f, GGobiStage *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo
 }
 
 gboolean
-write_xml_header (FILE *f, int numDatasets, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
+write_xml_header (FILE *f, int numDatasets, GGobiSession *gg, XmlWriteInfo *xmlWriteInfo)
 {
  fprintf(f, "<?xml version=\"1.0\"?>");
  fprintf(f, "\n");
- fprintf(f, "<!DOCTYPE ggobidata SYSTEM \"ggobi.dtd\">");
+ fprintf(f, "<!DOCTYPE GGobiSessionata SYSTEM \"ggobi.dtd\">");
  fprintf(f, "\n\n");
 
  if(numDatasets < 0)
     numDatasets = g_slist_length(gg->d);
 
- fprintf(f, "<ggobidata count=\"%d\">\n", numDatasets);
+ fprintf(f, "<GGobiSessionata count=\"%d\">\n", numDatasets);
 
 /* fflush(f);*/
 
@@ -118,7 +118,7 @@ write_xml_header (FILE *f, int numDatasets, ggobid *gg, XmlWriteInfo *xmlWriteIn
 }
 
 gboolean
-write_xml_description (FILE *f, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
+write_xml_description (FILE *f, GGobiSession *gg, XmlWriteInfo *xmlWriteInfo)
 {
  fprintf(f,"<description>\n");
 /*XXX*/
@@ -130,7 +130,7 @@ write_xml_description (FILE *f, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 }
 
 gboolean
-write_xml_variables (FILE *f, GGobiStage *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
+write_xml_variables (FILE *f, GGobiStage *d, GGobiSession *gg, XmlWriteInfo *xmlWriteInfo)
 {
   gint j;
 
@@ -163,7 +163,7 @@ write_xml_variables (FILE *f, GGobiStage *d, ggobid *gg, XmlWriteInfo *xmlWriteI
 }
 
 gboolean
-write_xml_variable(FILE *f, GGobiStage *d, ggobid *gg, gint j,
+write_xml_variable(FILE *f, GGobiStage *d, GGobiSession *gg, gint j,
   XmlWriteInfo *xmlWriteInfo)
 {
   GGobiVariable *var = ggobi_stage_get_variable(d, j);
@@ -216,7 +216,7 @@ writeFloat(FILE *f, double value)
 }
 
 gboolean
-write_xml_records(FILE *f, GGobiStage *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
+write_xml_records(FILE *f, GGobiStage *d, GGobiSession *gg, XmlWriteInfo *xmlWriteInfo)
 {
   gint i, n = 0;
 
@@ -260,7 +260,7 @@ write_xml_records(FILE *f, GGobiStage *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo
  * I want this to write <edge> records as well as <record> records.
 */
 gboolean
-write_xml_record (FILE *f, GGobiStage *d, ggobid *gg, gint i,
+write_xml_record (FILE *f, GGobiStage *d, GGobiSession *gg, gint i,
   XmlWriteInfo *xmlWriteInfo)
 {
   gint j;
@@ -349,7 +349,7 @@ write_xml_record (FILE *f, GGobiStage *d, ggobid *gg, gint i,
 }
 
 gboolean
-write_xml_edges (FILE *f, GGobiStage *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
+write_xml_edges (FILE *f, GGobiStage *d, GGobiSession *gg, XmlWriteInfo *xmlWriteInfo)
 {
   gint i;
   if (!ggobi_stage_get_n_edges(d))
@@ -381,7 +381,7 @@ write_xml_edges (FILE *f, GGobiStage *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 
 /*
 gboolean
-write_xml_edge(FILE *f, GGobiStage *d, ggobid *gg, int i, XmlWriteInfo *xmlWriteInfo)
+write_xml_edge(FILE *f, GGobiStage *d, GGobiSession *gg, int i, XmlWriteInfo *xmlWriteInfo)
 {
   fprintf(f, " <edge ");
   fprintf(f, "source=\"%s\" destination=\"%s\"", ggobi_stage_get_edge_data(d)->sym_endpoints[i].a
@@ -393,7 +393,7 @@ write_xml_edge(FILE *f, GGobiStage *d, ggobid *gg, int i, XmlWriteInfo *xmlWrite
 */
 
 gboolean
-write_dataset_header (FILE *f, GGobiStage *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
+write_dataset_header (FILE *f, GGobiStage *d, GGobiSession *gg, XmlWriteInfo *xmlWriteInfo)
 {
  fprintf(f,"<data ");
 /*fprintf(f, "numRecords=\"%d\"", d->n_rows;*/
@@ -404,21 +404,21 @@ write_dataset_header (FILE *f, GGobiStage *d, ggobid *gg, XmlWriteInfo *xmlWrite
 }
 
 gboolean
-write_dataset_footer(FILE *f, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
+write_dataset_footer(FILE *f, GGobiSession *gg, XmlWriteInfo *xmlWriteInfo)
 {
  fprintf(f,"</data>\n");
  return(true);
 }
 
 gboolean
-write_xml_footer(FILE *f, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
+write_xml_footer(FILE *f, GGobiSession *gg, XmlWriteInfo *xmlWriteInfo)
 {
- fprintf(f,"</ggobidata>\n");
+ fprintf(f,"</GGobiSessionata>\n");
  return(true);
 }
 
 XmlWriteInfo *
-updateXmlWriteInfo(GGobiStage *d, ggobid *gg, XmlWriteInfo *info)
+updateXmlWriteInfo(GGobiStage *d, GGobiSession *gg, XmlWriteInfo *info)
 {
   int i, n, numGlyphSizes;
   gint *colorCounts, *glyphTypeCounts, *glyphSizeCounts, count;
