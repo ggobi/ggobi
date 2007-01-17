@@ -111,8 +111,8 @@ typedef struct _PrintOptions PrintOptions;
 
 GType ggobi_session_get_type(void);
 
-#define GGOBI_TYPE_SESSION ggobi_session_get_type()
-#define GGOBI_SESSION	 (G_TYPE_CHECK_INSTANCE_CAST ((obj), GGOBI_TYPE_SESSION, GGobiSession))
+#define GGOBI_TYPE_SESSION (ggobi_session_get_type())
+#define GGOBI_SESSION(obj)	G_TYPE_CHECK_INSTANCE_CAST((obj), ggobi_session_get_type(), GGobiSession)
 #define GGOBI_SESSION_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GGOBI_TYPE_SESSION, GGobiSessionClass))
 #define GGOBI_IS_SESSION(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GGOBI_TYPE_SESSION))
 #define GGOBI_IS_SESSION_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GGOBI_TYPE_SESSION))

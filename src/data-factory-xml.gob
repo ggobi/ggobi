@@ -175,7 +175,7 @@
 
    */
   static const gchar *const xmlDataTagNames[] = {
-    "GGobiSessionata",
+    "ggobidata",
     "data",                     /* DATASET */
     "description",
     "record",
