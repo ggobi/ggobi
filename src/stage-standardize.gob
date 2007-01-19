@@ -1,0 +1,46 @@
+/* Standardise stage
+
+	This stage ensures all variables are on a common scale.  Curently,
+	GGobi scales all variables to [0, 1] * 16384, but we may want to
+	make this more flexible to allow common scales, or scaling to mean 0,
+	variance 1 etc.
+	
+	Do we even need this stage any more??
+	
+*/
+%h{
+  #include "ggobi-stage.h"
+%}
+
+%{
+%}
+
+class GGobi:Stage:Standardise from GGobi:Stage {
+  private array_f tform destroy {
+    if(&(VAR)) 
+      arrayf_free(&(VAR), 0, 0);
+  };
+  
+  override (GGobi:Stage) void
+  process_incoming(GGobiStage *self, GGobiPipelineMessage *msg)
+  {
+  }
+  
+  public GObject *
+  new(GGobiStage *parent)
+  {
+    GObject *o = G_OBJECT(GET_NEW_VARG("parent", parent, NULL));
+    return(o);
+  }
+  
+  override (GGobi:Stage) gdouble
+  get_raw_value(GGobi:Stage *self (check null type), guint i, guint j)
+  {
+  }
+  
+  override (GGobi:Stage) void
+  set_raw_value(GGobi:Stage *self (check null type), guint i, guint j, gdouble value)
+  {
+  }
+  
+}
