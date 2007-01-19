@@ -61,11 +61,11 @@ sphere_condnum_set (gfloat x, GGobiSession * gg)
 }
 
 void
-sphere_variance_set (gfloat x, GGobiStage * d, GGobiSession * gg)
+sphere_variance_set (gfloat x, GGobiStage * d)
 {
-  if (gg->sphere_ui.variance_entry != NULL) {
+  if (d->gg->sphere_ui.variance_entry != NULL) {
     gchar *lbl = g_strdup_printf ("%.2e", x);
-    gtk_entry_set_text (GTK_ENTRY (gg->sphere_ui.variance_entry), lbl);
+    gtk_entry_set_text (GTK_ENTRY (d->gg->sphere_ui.variance_entry), lbl);
     g_free (lbl);
   }
 }
@@ -172,7 +172,7 @@ sphere_apply_cb (GtkWidget * w, GGobiSession * gg)
          * into the variables in d->sphere.pcvars
          */
         spherize_data (&d->sphere.vars, &d->sphere.pcvars, d, gg);
-        sphere_varcovar_set (d, gg);
+        sphere_varcovar_set (d);
 /*      pc_axes_sensitive_set (true);*/
         
       }
@@ -333,7 +333,7 @@ scree_plot_make (GGobiSession * gg)
 {
   GGobiStage *d = datad_get_from_window (gg->sphere_ui.window);
 
-  if (pca_calc (d, gg)) {  /*-- spherevars_set is called here --*/
+  if (pca_calc (d)) {  /*-- spherevars_set is called here --*/
     gboolean rval = false;
     g_signal_emit_by_name (G_OBJECT (gg->sphere_ui.scree_da),
                            "expose_event", (gpointer) gg, (gpointer) & rval);

@@ -64,7 +64,7 @@ recenter_cb (GtkWidget * w, GGobiSession * gg)
   if (g_slist_length (d->sticky_ids) >= 1) {
     k = GPOINTER_TO_INT (d->sticky_ids->data);
   }
-  recenter_data (k, d, gg);
+  recenter_data (k, d);
 }
 
 static void

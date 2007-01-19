@@ -149,7 +149,7 @@ class GGobi:Stage:Transform from GGobi:Stage {
   override (GGobi:Stage) gdouble
   get_raw_value(GGobi:Stage *self (check null type), guint i, guint j)
   {
-    return SELF(self)->_priv->tform.vals[i][j];
+    	return SELF(self)->_priv->tform.vals[i][j];
   }
   
   // FIXME: make set_raw_value return a gboolean to indicate success?

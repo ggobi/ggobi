@@ -58,7 +58,7 @@ sphere_free (GGobiStage * d)
 }
 
 void
-sphere_malloc (gint nc, GGobiStage * d, GGobiSession * gg)
+sphere_malloc (gint nc, GGobiStage * d)
 {
   if (d->sphere.vars.nels != 0)
     sphere_free (d);
@@ -244,9 +244,9 @@ pca_diagnostics_set (GGobiStage * d, GGobiSession * gg)
     ftmp2 += d->sphere.eigenval.els[j];
 
   if (ftmp2 != 0)
-    sphere_variance_set (ftmp1 / ftmp2, d, gg);
+    sphere_variance_set (ftmp1 / ftmp2, d);
   else
-    sphere_variance_set (-999.0, d, gg);
+    sphere_variance_set (-999.0, d);
   if (lastpc != 0)
     sphere_condnum_set (firstpc / lastpc, gg);
   else
@@ -281,7 +281,7 @@ sphere_npcs_set (gint n, GGobiStage * d, GGobiSession * gg)
 }
 
 gint
-npcs_get (GGobiStage * d, GGobiSession * gg)
+npcs_get (GGobiStage * d)
 {
   return d->sphere.npcs;
 }
@@ -315,7 +315,7 @@ spherevars_set (GGobiSession * gg)
   }
 
   if (d->sphere.vars.els == NULL || d->sphere.vars.nels != nvars) {
-    sphere_malloc (nvars, d, gg);
+    sphere_malloc (nvars, d);
   }
 
   for (j = 0; j < nvars; j++)
@@ -349,7 +349,7 @@ eigenval_zero (GGobiStage * d)
 }
 
 void
-eigenvec_zero (GGobiStage * d, GGobiSession * gg)
+eigenvec_zero (GGobiStage * d)
 {
   arrayd_zero (&d->sphere.eigenvec);
 }
@@ -361,7 +361,7 @@ eigenvec_zero (GGobiStage * d, GGobiSession * gg)
  * eigenvectors, and the eigenvalues are returned in a.
 */
 void
-eigenvec_set (GGobiStage * d, GGobiSession * gg)
+eigenvec_set (GGobiStage * d)
 {
   gint i, j;
   gint nels = d->sphere.vars.nels;
@@ -380,7 +380,7 @@ eigenvec_set (GGobiStage * d, GGobiSession * gg)
 /*-------------------------------------------------------------------------*/
 
 void
-sphere_varcovar_set (GGobiStage * d, GGobiSession * gg)
+sphere_varcovar_set (GGobiStage * d)
 {
   gint i, j, k, m, var;
   gfloat tmpf = 0.;
@@ -467,7 +467,7 @@ vc_identity_p (gdouble ** matrx, gint n)
  * perform a singular value decomposition.
 */
 gboolean
-sphere_svd (GGobiStage * d, GGobiSession * gg)
+sphere_svd (GGobiStage * d)
 {
   gint i, j, k, rank;
   gint nels = d->sphere.vars.nels;
@@ -573,18 +573,18 @@ spherize_data (vector_i * svars, vector_i * pcvars, GGobiStage * d,
 /*-------------------------------------------------------------------------*/
 
 gboolean
-pca_calc (GGobiStage * d, GGobiSession * gg)
+pca_calc (GGobiStage * d)
 {
   gboolean svd_ok = false;
 
-  eigenvec_zero (d, gg);
+  eigenvec_zero (d);
 
-  sphere_varcovar_set (d, gg);
+  sphere_varcovar_set (d);
 
   /* If nspherevars > 1 use svd routine, otherwise just standardize */
   if (d->sphere.vars.nels > 1) {
-    eigenvec_set (d, gg);
-    svd_ok = sphere_svd (d, gg);
+    eigenvec_set (d);
+    svd_ok = sphere_svd (d);
   }
 
   return svd_ok;
