@@ -57,6 +57,8 @@ class GGobi:Input:Source from G:Object (abstract) {
     return input;
   }
   
+  /* implementation of this is optional, but necessary if one wishes to 
+     provide a GsfInput via get_input() */
   virtual GsfInput *
   get_raw_input(self, GError **error);
 }

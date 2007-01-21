@@ -159,14 +159,15 @@ gg_write_to_statusbar (gchar * message, GGobiSession * gg)
     /*-- by default, describe the current datad --*/
     GGobiStage *d = ggobi_stage_get_root(datad_get_from_notebook(gg->varpanel_ui.notebook));
     if (d) {
-      gchar *display_name = ggobi_input_source_get_display_name(
-        ggobi_data_get_source(GGOBI_DATA(d)));
+      GGobiInputSource *source = ggobi_data_get_source(GGOBI_DATA(d));
+      gchar *display_name = ggobi_input_source_get_display_name(source);
       gchar *msg = g_strdup_printf ("%s: %d x %d  (%s)",
                                     d->name, d->n_rows, d->n_cols,
                                     display_name);
       gtk_statusbar_push (GTK_STATUSBAR (statusbar), 0, msg);
       g_free(msg);
       g_free(display_name);
+      g_object_unref(G_OBJECT(source));
     }
   }
 }
