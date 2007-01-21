@@ -1,4 +1,7 @@
+# set PATH for all users - requires admin but I think we do anyway
+!define ALL_USERS 1
 !include "AddToPath.NSH"
+
 !include "MUI.nsh"
 
 Name GGobi
@@ -62,6 +65,7 @@ Section "GGobi"
 	File ..\src\.libs\libggobi.la
 	
 	# Shortcut
+  SetOutPath $INSTDIR\data
 	CreateShortCut "$DESKTOP\ggobi.lnk" "$INSTDIR\ggobi.exe" "" "$INSTDIR\ggobi.ico"
 
 	Push $INSTDIR
