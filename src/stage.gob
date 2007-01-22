@@ -287,7 +287,7 @@ property OBJECT parent
        for row and column filters) we pass every single through a virtual */
     selfp->changed_handler = g_signal_connect_swapped(G_OBJECT(parent), "changed", 
       G_CALLBACK(self_changed_handler), self);
-    selfp->changed_handler = g_signal_connect_swapped(G_OBJECT(parent), 
+    selfp->col_name_changed_handler = g_signal_connect_swapped(G_OBJECT(parent), 
       "col-name-changed",  G_CALLBACK(self_col_name_changed_handler), self);
     
     self_add_child(parent, self);
@@ -578,7 +578,7 @@ rows_added(self, guint n) {
 public void
 rows_removed(self, GSList *rows) {
   GGobiPipelineMessage *msg = self_get_message(self);
-  ggobi_pipeline_message_remove_cols(msg, rows);
+  ggobi_pipeline_message_remove_rows(msg, rows);
 }
 
 /* initializer */
@@ -664,10 +664,9 @@ set_col_name(self, guint j, const gchar* value)
 {
   GGobiVariable* vt;
   gchar *nick = NULL, *name;
-  GGobiStage *root = self_get_root(self);
   
-  if (self != root) {
-    self_set_col_name(root, j, value);
+  if (self->parent && self->parent->n_cols > j) {
+    self_set_col_name(self->parent, j, value);
     return;
   }
 
@@ -1073,8 +1072,8 @@ public GSList *
 get_row_ids(self) {
   GSList *ids = NULL;
   for (guint i = 0; i < self->n_rows; i++)
-    ids = g_slist_append(ids, g_strdup(self_get_row_id(self, i)));
-  return ids;
+    ids = g_slist_prepend(ids, g_strdup(self_get_row_id(self, i)));
+  return g_slist_reverse(ids);
 }
 
 /** 
@@ -1460,12 +1459,14 @@ process_outgoing(self, GGobiPipelineMessage *msg)
   
   /* handle column removal */
   if (n_removed_cols) {
+    g_debug("removing cols");
     g_slist_foreach(removed_cols, (GFunc)self_removed_col_foreach, self);
     arrayg_delete_cols (&self->jitdata, removed_cols);
     arrayg_delete_cols (&self->world, removed_cols);
     tour2d_realloc_down (removed_cols, self, self->gg);
     tour1d_realloc_down (removed_cols, self, self->gg);
     tourcorr_realloc_down (removed_cols, self, self->gg);
+    g_debug("removed");
   }
   
   /* handle column changes */

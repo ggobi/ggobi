@@ -67,7 +67,7 @@ get_file_filters(GGobiSession *gg)
         g_free(pattern);
       }
       gtk_file_filter_set_name(filter, modes->data);
-      filters = g_slist_append(filters, filter);
+      filters = g_slist_prepend(filters, filter);
       g_slist_foreach(factory_exts, (GFunc)g_free, NULL);
       g_slist_free(factory_exts);
     }
@@ -76,7 +76,7 @@ get_file_filters(GGobiSession *gg)
     g_object_unref(factory);
   }
   
-  return filters;
+  return g_slist_reverse(filters);
 }
 
 void

@@ -7,7 +7,7 @@ libggobi_la_GOBS = variable.gob stage.gob data.gob stage-transform.gob \
   input-decoder-bgzip.gob stage-subset.gob stage-group.gob transform.gob \
   transform-min-one.gob transform-boxcox.gob transform-abs.gob transform-log10.gob \
   gui-component.gob gui-transform.gob type-registry.gob pipeline-message.gob \
-  variable-group.gob
+  variable-group.gob bitset.gob
 libggobi_la_GOBSOURCES = $(libggobi_la_GOBS:%.gob=ggobi-%.c)
 libggobi_la_GOBHEADERS = $(libggobi_la_GOBS:%.gob=ggobi-%.h)
 libggobi_la_GOBOBJECTS = $(libggobi_la_GOBS:%.gob=ggobi-%.lo)

@@ -13,10 +13,10 @@ class GGobi:Input:Source:Factory from G:Object
   get_supported_schemes(self)
   {
     GSList *schemes = NULL;
-    schemes = g_slist_append(schemes, g_strdup("http"));
-    schemes = g_slist_append(schemes, g_strdup("ftp"));
-    schemes = g_slist_append(schemes, g_strdup("file"));
-    schemes = g_slist_append(schemes, NULL);
+    schemes = g_slist_prepend(schemes, g_strdup("http"));
+    schemes = g_slist_prepend(schemes, g_strdup("ftp"));
+    schemes = g_slist_prepend(schemes, g_strdup("file"));
+    schemes = g_slist_prepend(schemes, NULL);
     return schemes;
   }
   

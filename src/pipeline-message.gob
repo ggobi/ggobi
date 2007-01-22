@@ -1,5 +1,8 @@
+%privateheader{
+  #include "ggobi-bitset.h"
+%}
 %h{
-  typedef void (*GGobiIndexFunc)(guint j, gpointer user_data);
+  #include "utils.h"
 %}
 /* Describes changes in the pipeline data matrix. It communicates five different
    types of changes:
@@ -68,16 +71,13 @@
    another message.
 */
 class GGobi:Pipeline:Message from G:Object {
-  /* The GByteArray is used essentially as a fast hash-set for indices */
-  private GByteArray *changed_cols = { g_byte_array_new() } destroy { 
-    if (VAR) g_byte_array_free(VAR, TRUE);
-  };
-  private GByteArray *removed_cols = { g_byte_array_new() } destroy { 
-    if (VAR) g_byte_array_free(VAR, TRUE);
-  };
-  private GByteArray *removed_rows = { g_byte_array_new() } destroy { 
-    if (VAR) g_byte_array_free(VAR, TRUE);
-  };
+  /* The GGobiBitset is used essentially as a fast set of indices */
+  private GGobiBitset *changed_cols = { ggobi_bitset_new() } 
+    unrefwith g_object_unref;
+  private GGobiBitset *removed_cols = { ggobi_bitset_new() } 
+    unrefwith g_object_unref;
+  private GGobiBitset *removed_rows = { ggobi_bitset_new() } 
+    unrefwith g_object_unref;
   
   /* since we only append (but not insert) rows/cols, the counts are enough */
   private guint n_added_rows;
@@ -95,10 +95,8 @@ class GGobi:Pipeline:Message from G:Object {
     minimum = 0, maximum = G_MAXUINT, default_value = 0, export)
     set {
       selfp->n_cols = g_value_get_uint(VAL);
-      g_byte_array_set_size(selfp->changed_cols, selfp->n_cols);
-      self_byte_array_clear_indices(selfp->changed_cols);
-      g_byte_array_set_size(selfp->removed_cols, selfp->n_cols);
-      self_byte_array_clear_indices(selfp->removed_cols);
+      ggobi_bitset_set_size(selfp->changed_cols, selfp->n_cols);
+      ggobi_bitset_set_size(selfp->removed_cols, selfp->n_cols);
     } get {
       g_value_set_uint(VAL, selfp->n_cols);
     };
@@ -107,8 +105,7 @@ class GGobi:Pipeline:Message from G:Object {
     minimum = 0, maximum = G_MAXUINT, default_value = 0, export)
     set {
       selfp->n_rows = g_value_get_uint(VAL);
-      g_byte_array_set_size(selfp->removed_rows, selfp->n_rows);
-      self_byte_array_clear_indices(selfp->removed_rows);
+      ggobi_bitset_set_size(selfp->removed_rows, selfp->n_rows);
     } get {
       g_value_set_uint(VAL, selfp->n_rows);
     };
@@ -123,17 +120,17 @@ class GGobi:Pipeline:Message from G:Object {
   public GSList *
   get_changed_cols(self)
   {
-    return self_byte_array_to_indices(selfp->changed_cols);
+    return ggobi_bitset_get_indices(selfp->changed_cols);
   }
   public GSList *
   get_removed_cols(self)
   {
-    return self_byte_array_to_indices(selfp->removed_cols);
+    return ggobi_bitset_get_indices(selfp->removed_cols);
   }
   public GSList *
   get_removed_rows(self)
   {
-    return self_byte_array_to_indices(selfp->removed_rows);
+    return ggobi_bitset_get_indices(selfp->removed_rows);
   }
   
   /* maybe it would be better to also give ranges here just for convenience? */
@@ -152,17 +149,17 @@ class GGobi:Pipeline:Message from G:Object {
   public guint
   get_n_removed_rows(self)
   {
-    return self_byte_array_get_n_indices(selfp->removed_rows);
+    return ggobi_bitset_get_n_indices(selfp->removed_rows);
   }
   public guint
   get_n_changed_cols(self)
   {
-    return self_byte_array_get_n_indices(selfp->changed_cols);
+    return ggobi_bitset_get_n_indices(selfp->changed_cols);
   }
   public guint
   get_n_removed_cols(self)
   {
-    return self_byte_array_get_n_indices(selfp->removed_cols);
+    return ggobi_bitset_get_n_indices(selfp->removed_cols);
   }
   
   /* convenience functions for iterating over changes */
@@ -170,17 +167,17 @@ class GGobi:Pipeline:Message from G:Object {
   public void
   changed_cols_foreach(self, GGobiIndexFunc func, gpointer data)
   {
-    self_byte_array_foreach(selfp->changed_cols, func, data);
+    ggobi_bitset_foreach(selfp->changed_cols, func, data);
   }
   public void
   removed_cols_foreach(self, GGobiIndexFunc func, gpointer data)
   {
-    self_byte_array_foreach(selfp->removed_cols, func, data);
+    ggobi_bitset_foreach(selfp->removed_cols, func, data);
   }
   public void
   removed_rows_foreach(self, GGobiIndexFunc func, gpointer data)
   {
-    self_byte_array_foreach(selfp->removed_rows, func, data);
+    ggobi_bitset_foreach(selfp->removed_rows, func, data);
   }
   public void
   added_rows_foreach(self, GGobiIndexFunc func, gpointer data)
@@ -204,7 +201,7 @@ class GGobi:Pipeline:Message from G:Object {
   {
     g_return_if_fail(j < selfp->n_cols + selfp->n_added_cols);
     if (j < selfp->n_cols)
-      selfp->changed_cols->data[j] = 1;
+      ggobi_bitset_set(selfp->changed_cols, j);
   }
   
   public void
@@ -220,15 +217,15 @@ class GGobi:Pipeline:Message from G:Object {
   remove_cols(self, GSList *cols)
   {
     /* ensure sorted for index updating */
-    GSList *sorted_cols = g_slist_sort(cols, self_index_compare);
+    GSList *sorted_cols = g_slist_sort(cols, index_compare);
     for (; cols; cols = cols->next) {
       guint index = GPOINTER_TO_INT(cols->data);
       /* add this index to the set */
       g_return_if_fail(index < selfp->n_cols + selfp->n_added_cols);
       if (index < selfp->n_cols)
-        selfp->removed_cols->data[index] = 1;
+        ggobi_bitset_set(selfp->removed_cols, index);
     }
-    self_byte_array_remove_indices(selfp->changed_cols, sorted_cols);
+    ggobi_bitset_remove_indices(selfp->changed_cols, sorted_cols);
     g_slist_free(sorted_cols);
   }
 
@@ -238,8 +235,9 @@ class GGobi:Pipeline:Message from G:Object {
     for (; rows; rows = rows->next) {
       guint index = GPOINTER_TO_INT(rows->data);
       /* add this index to the set */
-      g_return_if_fail(index < selfp->n_rows);
-      selfp->removed_rows->data[index] = 1;
+      g_return_if_fail(index < selfp->n_rows + selfp->n_added_rows);
+      if (index < selfp->n_rows)
+        ggobi_bitset_set(selfp->removed_rows, index);
     }
   }
   
@@ -262,15 +260,15 @@ class GGobi:Pipeline:Message from G:Object {
   public void
   filter_cols(self, GSList *cols)
   {
-    GSList *sorted_cols = g_slist_sort(cols, self_index_compare);
+    GSList *sorted_cols = g_slist_sort(cols, index_compare);
     guint n_cols = selfp->n_cols;
     for (; cols; cols = cols->next)
       if (GPOINTER_TO_INT(cols->data) >= selfp->n_cols)
         selfp->n_added_cols--;
       else n_cols--;
     self_set_n_cols(self, n_cols);
-    self_byte_array_remove_indices(selfp->changed_cols, sorted_cols);
-    self_byte_array_remove_indices(selfp->removed_cols, sorted_cols);
+    ggobi_bitset_remove_indices(selfp->changed_cols, sorted_cols);
+    ggobi_bitset_remove_indices(selfp->removed_cols, sorted_cols);
     g_slist_free(sorted_cols);
   }
   /* filter removed_rows */
@@ -278,13 +276,13 @@ class GGobi:Pipeline:Message from G:Object {
   filter_rows(self, GSList *rows)
   {
     guint n_rows = selfp->n_rows;
-    GSList *sorted_rows = g_slist_sort(rows, self_index_compare);
+    GSList *sorted_rows = g_slist_sort(rows, index_compare);
     for (; rows; rows = rows->next)
       if (GPOINTER_TO_INT(rows->data) >= selfp->n_rows)
         selfp->n_added_rows--;
       else n_rows--;
     self_set_n_rows(self, n_rows);
-    self_byte_array_remove_indices(selfp->removed_rows, sorted_rows);
+    ggobi_bitset_remove_indices(selfp->removed_rows, sorted_rows);
     g_slist_free(sorted_rows);
     g_signal_emit_by_name(self, "notify::last_row");
   }
@@ -294,14 +292,14 @@ class GGobi:Pipeline:Message from G:Object {
   public void
   consume_rows(self)
   {
-    self_byte_array_clear_indices(selfp->removed_rows);
+    ggobi_bitset_clear(selfp->removed_rows);
     selfp->n_added_rows = 0;
   }
   public void
   consume_cols(self)
   {
-    self_byte_array_clear_indices(selfp->removed_cols);
-    self_byte_array_clear_indices(selfp->changed_cols);
+    ggobi_bitset_clear(selfp->removed_cols);
+    ggobi_bitset_clear(selfp->changed_cols);
     selfp->n_added_cols = 0;
   }
   
@@ -338,82 +336,21 @@ class GGobi:Pipeline:Message from G:Object {
   }
   
   /* utilities */
-  // FIXME: This will soon become a separate bitset module.
-  private void
-  byte_array_remove_indices(GByteArray *array, GSList *indices)
-  {
-    guint i = indices ? GPOINTER_TO_INT(indices->data) : 0, dec = 0;
-    for (; indices; indices = indices->next) {
-      guint index = GPOINTER_TO_INT(indices->data);
-      /* shift indices */
-      while(i < index) {
-        array->data[i - dec] = array->data[i];
-        i++;
-      }
-      /* remove col-changed index, if present */
-      array->data[i] = 0;
-      dec++;
-    }
-  }
-  private void
-  byte_array_clear_indices(GByteArray *array)
-  {
-    guint i;
-    // or g_byte_array_remove_range(array, 0, array->len)?
-    for (i = 0; i < array->len; i++)
-      array->data[i] = 0;
-  }
   
   private GSList *
-  byte_array_to_indices(GByteArray *array)
+  shift_indices(GSList *indices, GGobiBitset *bs, guint *over)
   {
-    guint i;
-    GSList *indices = NULL;
-    for (i = 0; i < array->len; i++)
-      if (array->data[i])
-        indices = g_slist_append(indices, GINT_TO_POINTER(i));
-    return indices;
-  }
-  private guint
-  byte_array_get_n_indices(GByteArray *array)
-  {
-    guint i, n_indices = 0;
-    for (i = 0; i < array->len; i++)
-      n_indices += array->data[i];
-    return n_indices;
-  }
-  
-  private void
-  byte_array_foreach(GByteArray *array, GGobiIndexFunc func, gpointer data)
-  {
-    GSList *indices = self_byte_array_to_indices(array);
-    g_slist_foreach(indices, (GFunc)func, data);
-    g_slist_free(indices);
-  }
-  
-  // FIXME: Once we have bitsets, we could clone the bitset from which
-  // we got 'indices', perform an insertion, and get the indices back out
-  private GSList *
-  shift_indices(GSList *indices, GByteArray *array, guint *over)
-  {
-    GSList *sorted = g_slist_sort(indices, self_index_compare), *shifted = NULL;
-    guint i = 0, inc = 0;
-    *over = 0;
-    for (; sorted; sorted = sorted->next) {
-      guint index = GPOINTER_TO_INT(sorted->data);
-      if (index < array->len) {
-        for (; i < index; i++)
-          inc += array->data[i];
-        shifted = g_slist_append(shifted, GINT_TO_POINTER(index + inc));
-      } else (*over)++;
-    }
+    GSList *sorted = g_slist_sort(indices, index_compare), *shifted;
+    guint my_size = ggobi_bitset_get_size(bs);
+    GGobiBitset *clone = ggobi_bitset_clone(bs);
+    ggobi_bitset_insert_indices(clone, sorted);
+    shifted = ggobi_bitset_get_indices(clone);
     g_slist_free(sorted);
+    g_object_unref(G_OBJECT(clone));
+    *over = 0;
+    for (; indices; indices = indices->next)
+      if (GPOINTER_TO_INT(indices->data) >= my_size)
+        (*over)++;
     return shifted;
-  }
-  
-  private gint
-  index_compare(gconstpointer a, gconstpointer b)
-  {
-    return GPOINTER_TO_INT(a) - GPOINTER_TO_INT(b);
   }
 }

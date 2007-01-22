@@ -45,9 +45,9 @@ class GGobi:Data:Factory:CSV from GGobi:Data:Factory
   {
     GSList *exts = NULL;
     if (!mode || !strcmp(mode, "csv")) {
-      exts = g_slist_append(exts, g_utf8_casefold("csv", -1));
-      exts = g_slist_append(exts, g_utf8_casefold("txt", -1));
-      exts = g_slist_append(exts, g_utf8_casefold("asc", -1));
+      exts = g_slist_prepend(exts, g_utf8_casefold("csv", -1));
+      exts = g_slist_prepend(exts, g_utf8_casefold("txt", -1));
+      exts = g_slist_prepend(exts, g_utf8_casefold("asc", -1));
     }
     return exts;
   }

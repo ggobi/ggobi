@@ -24,7 +24,7 @@ class GGobi:Type:Registry from G:Object {
   {
     g_return_if_fail(g_type_is_a(type, selfp->type));
     if (!self_is_registered(self, type)) {
-      selfp->types = g_slist_append(selfp->types, 
+      selfp->types = g_slist_prepend(selfp->types, 
         GINT_TO_POINTER(type));
       self_registered(self, type);
     }

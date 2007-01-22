@@ -78,7 +78,7 @@ class GGobi:Plugin from G:Type:Module {
   add_dependency(self, GGobi:Plugin *plugin (check null type))
   {
     g_object_ref(G_OBJECT(plugin));
-    selfp->dependencies = g_slist_append(selfp->dependencies, plugin);
+    selfp->dependencies = g_slist_prepend(selfp->dependencies, plugin);
   }
   
   public GSList *
@@ -97,7 +97,7 @@ class GGobi:Plugin from G:Type:Module {
     gchar *tmp_arg = g_strdup(arg);
     if (name)
       g_hash_table_insert(selfp->arg_table, g_strdup(name), tmp_arg);
-    selfp->args = g_slist_append(selfp->args, tmp_arg);
+    selfp->args = g_slist_prepend(selfp->args, tmp_arg);
   }
   
   // FIXME: This obviously needs to become a signal handler

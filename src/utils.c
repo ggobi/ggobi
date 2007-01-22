@@ -101,6 +101,12 @@ fcompare (const void *x1, const void *x2)
   return (val);
 }
 
+gint
+index_compare(gconstpointer a, gconstpointer b)
+{
+  return GPOINTER_TO_INT(a) - GPOINTER_TO_INT(b);
+}
+
 /*-- used to find ranks --*/
 gint
 pcompare (const void *val1, const void *val2)

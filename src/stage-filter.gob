@@ -201,12 +201,12 @@ process_filter(self)
     } else {
       included_rows_rev[i] = -1;
       if (i < selfp->included_len && selfp->included[i])
-        removed_rows = g_slist_append(removed_rows, GINT_TO_POINTER(i));
+        removed_rows = g_slist_prepend(removed_rows, GINT_TO_POINTER(i));
     }
   }
   
   for (guint i = parent_nrows; i < selfp->included_len; i++)
-    removed_rows = g_slist_append(removed_rows, GINT_TO_POINTER(i));
+    removed_rows = g_slist_prepend(removed_rows, GINT_TO_POINTER(i));
   
   n_included = n_both + n_added;
   included_rows = g_renew(guint, included_rows, n_included);
