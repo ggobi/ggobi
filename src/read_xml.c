@@ -649,6 +649,14 @@ setEdgePartners (XMLParserData * parserData)
    */
 
   for (i = 0, k = 0; i < e->edge.n; i++) {
+    if (e->edge.sym_endpoints[i].a == NULL || 
+        e->edge.sym_endpoints[i].b == NULL)
+    {
+      g_critical ("Not as many edges as expected in '%s': Edge %d is missing\n",
+		  e->name, i);
+      exit(0);
+    }
+
     ep[k].a = g_strdup ((gchar *) e->edge.sym_endpoints[i].a);
     ep[k].b = g_strdup ((gchar *) e->edge.sym_endpoints[i].b);
     ep[k].jcase = i;
