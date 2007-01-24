@@ -83,10 +83,19 @@ create_shepard_data_cb (GtkAction *action, PluginInstance *inst)
 
     GGOBI(setData) (values, rownames, colnames, n, nc, dnew,
       false, gg, /*rowids*/NULL, false, desc);  /*no rowids to start */
+	
+    /* Because n tends to be quite large, and Windows drawing is
+     * so slow, use a single pixel point. (Suggestion made by
+     * Brian Ripley) */
+    for (i=0; i<n; i++)
+      dnew->glyph.els[i].type = dnew->glyph.els[i].size = 
+        dnew->glyph_now.els[i].type = dnew->glyph_now.els[i].size = 
+	dnew->glyph_prev.els[i].type = dnew->glyph_prev.els[i].size = 0;
+
     dspnew = GGOBI(newScatterplot) (0, 1, dnew, gg); 
     display_add(dspnew, gg);
     varpanel_refresh(dspnew, gg);
-   display_tailpipe (dspnew, FULL, gg);
+    display_tailpipe (dspnew, FULL, gg);
   }
 
   g_free (rownames);
