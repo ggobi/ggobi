@@ -451,8 +451,15 @@ create_data (GList * rows, gchar * name)
 
   gboolean row_labels = has_row_labels (rows);
 
-  if (nrows > 0)
-    ncols = ((Row *) rows->data)->rIdx;
+  /* must have at least 2 CSV rows (first is column names) */
+  if (nrows <= 1) {
+    g_critical("CSV file does not contain any data rows; not loading");
+    return(NULL);
+  }
+    
+  g_return_val_if_fail(nrows > 1, NULL);
+  
+  ncols = ((Row *) rows->data)->rIdx;
   if (row_labels)
     ncols--;
 
@@ -489,7 +496,7 @@ read_csv_data (InputDescription * desc, ggobid * gg)
   GList *rows = NULL;
   GSList *ds = NULL;
 
-  fprintf (stderr, "Reading csv data\n");
+  /*fprintf (stderr, "Reading csv data\n");*/
 
   memset (isSpaceTable, 0, sizeof (isSpaceTable));
   fastIsSpace ((gchar) ' ') = 1;
@@ -518,7 +525,7 @@ read_csv_data (InputDescription * desc, ggobid * gg)
       row_free (cur);
   } while (ret >= 0);
 
-  fprintf (stderr, "Finished parsing\n");
+  /*fprintf (stderr, "Finished parsing\n");*/
 
   /* Close the file */
   g_io_channel_shutdown (channel, FALSE, NULL);
@@ -530,7 +537,8 @@ read_csv_data (InputDescription * desc, ggobid * gg)
   g_list_foreach (rows, (GFunc) row_free, NULL);
   g_list_free (rows);
 
-  ds = g_slist_append (ds, d);
+  if (d)
+    ds = g_slist_append (ds, d);
   return (ds);
 }
 

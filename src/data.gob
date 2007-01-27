@@ -496,6 +496,8 @@ datad_free (GGobiData *d, ggobid *gg)
 displayd *
 datad_init (GGobiData *d, ggobid *gg, gboolean cleanup)
 {
+  /* GGobi assumes datasets have at least one row */
+  g_return_val_if_fail(d->nrows > 0, NULL);
   d->gg = gg;
   gg->d = g_slist_append (gg->d, d);
   displayd *display = NULL;
