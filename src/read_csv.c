@@ -517,7 +517,7 @@ read_csv_data (InputDescription * desc, ggobid * gg)
   do {
     Row *cur = g_new0 (Row, 1);
     ret = csv_row_parse (cur, channel, 1);
-    if (ret >= 0) {
+    if (ret >= 0 && cur->rIdx > 0) { /* skip empty rows */
       tokenize_row (cur);
       rows = g_list_append (rows, cur);
     }
