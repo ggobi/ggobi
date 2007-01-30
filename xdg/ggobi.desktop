@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=GGobi
+GenericName=Data Analysis Tool
+Comment=Multivariate interactive graphics for exploratory data analysis
+TryExec=ggobi
+Exec=ggobi
+Icon=ggobi.png
+Categories=Graphics;2DGraphics
+MimeType=text/comma-separated-values;text/csv;application/csv;

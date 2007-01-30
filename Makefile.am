@@ -98,6 +98,12 @@ dist_figures_DATA = \
   doc/Figures/olive-sthc.jpg \
   doc/Figures/rats1a.jpg
 
+desktopdir = $(datadir)/applications
+desktop_DATA = xdg/ggobi.desktop
+
+iconsdir = $(datadir)/pixmaps
+icons_DATA = xdg/ggobi.png
+
 sharedir = $(pkgdatadir)/share
 dist_share_DATA = share/colorschemes.xml
 
