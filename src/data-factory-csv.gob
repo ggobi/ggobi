@@ -82,7 +82,7 @@ class GGobi:Data:Factory:CSV from GGobi:Data:Factory
     do {
       Row *cur = g_new0(Row, 1);
       ret = self_parse_row(cur, GSF_INPUT_TEXTLINE(lines), 1);
-      if (ret >= 0) {
+      if (ret >= 0 && cur->rIdx > 0) {
         self_tokenize_row(cur);
         rows = g_list_append(rows, cur);
       } else self_row_free (cur);
@@ -185,8 +185,13 @@ class GGobi:Data:Factory:CSV from GGobi:Data:Factory
 
     gboolean row_labels = self_has_row_labels (rows);
 
-    if (nrows > 0)
-      ncols = ((Row *) rows->data)->rIdx;
+    /* must have at least 2 CSV rows (first is column names) */
+    if (nrows <= 1) {
+      g_critical("CSV file does not contain any data rows; not loading");
+      return(NULL);
+    }
+  
+    ncols = ((Row *) rows->data)->rIdx;
     if (row_labels)
       ncols--;
 
@@ -259,7 +264,7 @@ class GGobi:Data:Factory:CSV from GGobi:Data:Factory
     line = gsf_input_textline_utf8_gets(lines);
     if (line == NULL)
       return ERR_STREAM_READ;
-    row->src = g_string_new(line);
+    row->src = g_string_new((gchar *)line);
     
     g_string_append_c (row->src, '\r');
 
@@ -406,7 +411,7 @@ class GGobi:Data:Factory:CSV from GGobi:Data:Factory
                 GString *tmp_str = NULL;
                 if (!(line = gsf_input_textline_utf8_gets(lines)))
                   return ERR_STREAM_READ;
-                tmp_str = g_string_new(line);
+                tmp_str = g_string_new((gchar *)line);
                 if (tmp_str->len <= 0)
                   return ERR_DANGLING_QUOTE;
                 g_string_append(row->src, tmp_str->str);

@@ -381,8 +381,8 @@ vartable_subwindow_init (GGobiStage *d, GGobiSession *gg)
 */
   model = gtk_tree_store_new(NCOLS_VT, G_TYPE_STRING, G_TYPE_STRING,
     G_TYPE_DOUBLE, G_TYPE_DOUBLE, G_TYPE_DOUBLE, G_TYPE_DOUBLE, G_TYPE_DOUBLE, 
-    G_TYPE_DOUBLE, G_TYPE_INT, G_TYPE_STRING, G_TYPE_INT, G_TYPE_INT, G_TYPE_INT, 
-    G_TYPE_INT, G_TYPE_INT, G_TYPE_INT, G_TYPE_INT);
+    G_TYPE_DOUBLE, G_TYPE_UINT, G_TYPE_STRING, G_TYPE_INT, G_TYPE_UINT, G_TYPE_INT, 
+    G_TYPE_INT, G_TYPE_INT, G_TYPE_INT, G_TYPE_UINT);
 	
   d->vartable_tree_model = GTK_TREE_MODEL(model);
   

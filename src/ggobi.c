@@ -373,18 +373,18 @@ gint ggobi_init (gint argc, gchar * argv[], gboolean processEvents)
   bind_textdomain_codeset (PACKAGE, "UTF-8");
   textdomain (PACKAGE);
 
-  if (ExtendedDisplayTypes)
-    return 1;
-
-  initSessionOptions (argc, argv);
+  if (!ExtendedDisplayTypes) {
+    registerBuiltinTypes();
+    // FIXME: This should probably just be done inside registerBuiltinTypes()
+    // That is, register the types by calling the _TYPE_ macros and then
+    // using g_type_children to get the available display types
+    registerDisplayTypes ((GTypeLoad *) typeLoaders, G_N_ELEMENTS(typeLoaders));
+    initSessionOptions (argc, argv);
+  }
+  
   parse_command_line (&argc, &argv);
 
-  GGOBI_TYPE_SESSION;
-  registerBuiltinTypes();
-  // FIXME: This should probably just be done inside registerBuiltinTypes()
-  // That is, register the types by calling the _TYPE_ macros and then
-  // using g_type_children to get the available display types
-  registerDisplayTypes ((GTypeLoad *) typeLoaders, G_N_ELEMENTS(typeLoaders));
+  /*GGOBI_TYPE_SESSION;*/
   
   process_initialization_files ();
 

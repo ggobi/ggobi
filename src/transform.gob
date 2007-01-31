@@ -17,9 +17,9 @@ class GGobi:Transform from G:Object (abstract) {
   virtual gchar *
   variable_name(self, const gchar *name);
   
-  virtual lims *
+  /*virtual lims *
   limits(self, lims limits, GGobiVariable *var)
-  { /* most of the time, limits can be transformed like any old data */
+  {
     gdouble limit_vals[] = { limits.min, limits.max };
     gdouble *result = self_forward(self, limit_vals, 2, var);
     lims *result_limits = g_new(lims, 1);
@@ -27,7 +27,7 @@ class GGobi:Transform from G:Object (abstract) {
     result_limits->max = result[1];
     limits_adjust(&result_limits->min, &result_limits->max);
     return result_limits;
-  }
+  }*/
   
   /* convenience wrapper */
   public gdouble *
