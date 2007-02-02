@@ -1459,14 +1459,12 @@ process_outgoing(self, GGobiPipelineMessage *msg)
   
   /* handle column removal */
   if (n_removed_cols) {
-    g_debug("removing cols");
     g_slist_foreach(removed_cols, (GFunc)self_removed_col_foreach, self);
     arrayg_delete_cols (&self->jitdata, removed_cols);
     arrayg_delete_cols (&self->world, removed_cols);
     tour2d_realloc_down (removed_cols, self, self->gg);
     tour1d_realloc_down (removed_cols, self, self->gg);
     tourcorr_realloc_down (removed_cols, self, self->gg);
-    g_debug("removed");
   }
   
   /* handle column changes */

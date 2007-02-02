@@ -115,19 +115,42 @@ varpanel_widget_set_visible (gint jbutton, gint jvar, gboolean show,
   return child;
 }
 
-void
-varpanel_delete_nth_foreach (guint jvar, GGobiStage * d) 
+/*-------------------------------------------------------------------------*/
+/*                  handle the addition of new variables                   */
+/*-------------------------------------------------------------------------*/
+
+static void
+varpanel_add_vars (GGobiStage * d)
 {
-  varpanel_delete_nth (d, jvar);
+  GGobiSession *gg = d->gg;
+  
+  /*-- variable toggle buttons and circles --*/
+  varpanel_widgets_add (d->n_cols, d, gg);
+  varcircles_add (d->n_cols, d, gg);
+
+  /*-- make sure the right toggle widgets and circles are showing --*/
+/* this gives the wrong result when the variable being added is
+not displayed in the current display.  And I don't know what the mode
+is for the other datad.  This suggests that I have to run these two
+routines whenever the tab changes in the variable selection panel.
+But even then it may not correspond to the current display.  So it
+really suggests that the variable selection panel has to keep track of
+its own projection.  Add a variable to varpanel_ui in datad.h? -- dfs */
+  varpanel_refresh (gg->current_display, gg);
+  varcircles_visibility_set (gg->current_display, gg);
 }
 
 static void 
 varpanel_stage_changed_cb (GGobiStage *d, GGobiPipelineMessage *msg, gpointer user_data)
 {
-  ggobi_pipeline_message_removed_cols_foreach(msg, 
-    (GGobiIndexFunc)varpanel_delete_nth_foreach, d); 
+  GSList *removed_cols = ggobi_pipeline_message_get_removed_cols(msg);
+  guint n_removed = 0;
+  for (; removed_cols; removed_cols = removed_cols->next)
+    varpanel_delete_nth(d, GPOINTER_TO_INT(removed_cols->data) - n_removed++);
+  varpanel_add_vars(d);
 }
 
+// FIXME: inefficient
 void
 varpanel_delete_nth (GGobiStage * d, gint jvar)
 {
@@ -467,40 +490,15 @@ varpanel_widgets_add (gint nc, GGobiStage * d, GGobiSession * gg)
     varpanel_add_row (j, d, gg);
 
   /* 
-   * If there were no variables before, a tab hasn't been added;
-   * add one now.
+   * If not in a tab, add it to a tab now
    */
-  if (n == 0) {
+  if (!gtk_widget_get_parent(d->varpanel_ui.hpane)) {
     gtk_notebook_append_page (GTK_NOTEBOOK (gg->varpanel_ui.notebook),
                               d->varpanel_ui.hpane, 
                               gtk_label_new (ggobi_stage_get_root(d)->name));
     gtk_notebook_set_show_tabs (GTK_NOTEBOOK (gg->varpanel_ui.notebook),
                                 nd > 1);
   }
-}
-
-/*-------------------------------------------------------------------------*/
-/*                  handle the addition of new variables                   */
-/*-------------------------------------------------------------------------*/
-
-void
-varpanel_addvar_cb (GGobiSession * gg, gint which,
-                    GGobiStage * d, void *p)
-{
-  /*-- variable toggle buttons and circles --*/
-  varpanel_widgets_add (d->n_cols, d, gg);
-  varcircles_add (d->n_cols, d, gg);
-
-  /*-- make sure the right toggle widgets and circles are showing --*/
-/* this gives the wrong result when the variable being added is
-not displayed in the current display.  And I don't know what the mode
-is for the other datad.  This suggests that I have to run these two
-routines whenever the tab changes in the variable selection panel.
-But even then it may not correspond to the current display.  So it
-really suggests that the variable selection panel has to keep track of
-its own projection.  Add a variable to varpanel_ui in datad.h? -- dfs */
-  varpanel_refresh (gg->current_display, gg);
-  varcircles_visibility_set (gg->current_display, gg);
 }
 
 /*-------------------------------------------------------------------------*/
@@ -560,8 +558,8 @@ varpanel_make (GtkWidget * parent, GGobiSession * gg)
                       true, true, 2);
 
   /*-- prepare to respond to variable_added events --*/
-  g_signal_connect (G_OBJECT (gg), "variable_added",
-                    G_CALLBACK (varpanel_addvar_cb), NULL);
+  /*g_signal_connect (G_OBJECT (gg), "variable_added",
+                    G_CALLBACK (varpanel_addvar_cb), NULL);*/
 
   gtk_widget_show (gg->varpanel_ui.notebook);
 }

@@ -217,15 +217,16 @@ class GGobi:Pipeline:Message from G:Object {
   remove_cols(self, GSList *cols)
   {
     /* ensure sorted for index updating */
-    GSList *sorted_cols = g_slist_sort(cols, index_compare), *tmp_cols;
-    for (tmp_cols = sorted_cols; tmp_cols; tmp_cols = tmp_cols->next) {
-      guint index = GPOINTER_TO_INT(tmp_cols->data);
+    GSList *sorted_cols = g_slist_sort(g_slist_copy(cols), index_compare);
+    for (; cols; cols = cols->next) {
+      guint index = GPOINTER_TO_INT(cols->data);
       /* add this index to the set */
       g_return_if_fail(index < selfp->n_cols + selfp->n_added_cols);
       if (index < selfp->n_cols)
         ggobi_bitset_set(selfp->removed_cols, index);
     }
     ggobi_bitset_remove_indices(selfp->changed_cols, sorted_cols);
+    g_slist_free(sorted_cols);
   }
 
   public void
@@ -259,7 +260,7 @@ class GGobi:Pipeline:Message from G:Object {
   public void
   filter_cols(self, GSList *cols)
   {
-    GSList *sorted_cols = g_slist_sort(cols, index_compare);
+    GSList *sorted_cols = g_slist_sort(g_slist_copy(cols), index_compare);
     guint n_cols = selfp->n_cols;
     for (; cols; cols = cols->next)
       if (GPOINTER_TO_INT(cols->data) >= selfp->n_cols)
@@ -275,7 +276,7 @@ class GGobi:Pipeline:Message from G:Object {
   filter_rows(self, GSList *rows)
   {
     guint n_rows = selfp->n_rows;
-    GSList *sorted_rows = g_slist_sort(rows, index_compare);
+    GSList *sorted_rows = g_slist_sort(g_slist_copy(rows), index_compare);
     for (; rows; rows = rows->next)
       if (GPOINTER_TO_INT(rows->data) >= selfp->n_rows)
         selfp->n_added_rows--;
@@ -339,7 +340,7 @@ class GGobi:Pipeline:Message from G:Object {
   private GSList *
   shift_indices(GSList *indices, GGobiBitset *bs, guint *over)
   {
-    GSList *sorted = g_slist_sort(indices, index_compare), *shifted;
+    GSList *sorted = g_slist_sort(g_slist_copy(indices), index_compare), *shifted;
     guint my_size = ggobi_bitset_get_size(bs);
     GGobiBitset *clone = ggobi_bitset_clone(bs);
     ggobi_bitset_insert_indices(clone, sorted);

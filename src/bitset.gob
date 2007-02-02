@@ -85,7 +85,7 @@ class GGobi:Bitset from G:Object {
   public void /* just the opposite of removal */
   insert_indices(self, GSList *indices)
   {
-    GSList *rev_indices = g_slist_reverse(indices);
+    GSList *rev_indices = g_slist_reverse(g_slist_copy(indices));
     guint i = self->bits->len, inc = g_slist_length(indices);
     for (; rev_indices; rev_indices = rev_indices->next) {
       guint index = GPOINTER_TO_INT(rev_indices->data);
