@@ -217,16 +217,15 @@ class GGobi:Pipeline:Message from G:Object {
   remove_cols(self, GSList *cols)
   {
     /* ensure sorted for index updating */
-    GSList *sorted_cols = g_slist_sort(cols, index_compare);
-    for (; cols; cols = cols->next) {
-      guint index = GPOINTER_TO_INT(cols->data);
+    GSList *sorted_cols = g_slist_sort(cols, index_compare), *tmp_cols;
+    for (tmp_cols = sorted_cols; tmp_cols; tmp_cols = tmp_cols->next) {
+      guint index = GPOINTER_TO_INT(tmp_cols->data);
       /* add this index to the set */
       g_return_if_fail(index < selfp->n_cols + selfp->n_added_cols);
       if (index < selfp->n_cols)
         ggobi_bitset_set(selfp->removed_cols, index);
     }
     ggobi_bitset_remove_indices(selfp->changed_cols, sorted_cols);
-    g_slist_free(sorted_cols);
   }
 
   public void

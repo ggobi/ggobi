@@ -116,7 +116,7 @@ class GGobi:Bitset from G:Object {
         }
       }
     }
-    return indices;
+    return g_slist_reverse(indices);
   }
   public guint
   get_n_indices(self)
