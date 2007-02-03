@@ -49,55 +49,6 @@ dist_datafiles_DATA = \
   data/sat.xml \
   data/tmin.csv
 
-docfilesdir = $(pkgdatadir)/doc
-dist_docfiles_DATA = \
-	doc/GNUmakefile \
-	doc/manual.tex \
-	doc/manual.bib \
-	doc/XML.tex
-
-figuresdir = $(docfilesdir)/Figures
-dist_figures_DATA = \
-  doc/Figures/dbmsGUI.jpg \
-  doc/Figures/olive-brush4.jpg \
-  doc/Figures/olive-t1da.jpg \
-  doc/Figures/rats1b.jpg \
-  doc/Figures/olive-1da.jpg \
-  doc/Figures/olive-colorchoose.jpg \
-  doc/Figures/olive-tour1.jpg \
-  doc/Figures/rats2a.jpg \
-  doc/Figures/olive-1db.jpg \
-  doc/Figures/olive-nth-1d.jpg \
-  doc/Figures/olive-tour2.jpg \
-  doc/Figures/rats2b.jpg \
-  doc/Figures/olive-1dc.jpg \
-  doc/Figures/olive-nth-2d.jpg \
-  doc/Figures/olive-var.jpg \
-  doc/Figures/rats3a.jpg \
-  doc/Figures/olive-1dd.jpg \
-  doc/Figures/olive-nth-t1da.jpg \
-  doc/Figures/olive1.jpg \
-  doc/Figures/rats3b.jpg \
-  doc/Figures/olive-2da.jpg \
-  doc/Figures/olive-nth-t1db.jpg \
-  doc/Figures/olive2.jpg \
-  doc/Figures/rats4a.jpg \
-  doc/Figures/olive-2db.jpg \
-  doc/Figures/olive-par.jpg \
-  doc/Figures/plotLayout12.jpg \
-  doc/Figures/rats4b.jpg \
-  doc/Figures/olive-brush1.jpg \
-  doc/Figures/olive-stha.jpg \
-  doc/Figures/plotLayout22.jpg \
-  doc/Figures/rats5a.jpg \
-  doc/Figures/olive-brush2.jpg \
-  doc/Figures/olive-sthb.jpg \
-  doc/Figures/plotLayout32.jpg \
-  doc/Figures/rats5b.jpg \
-  doc/Figures/olive-brush3.jpg \
-  doc/Figures/olive-sthc.jpg \
-  doc/Figures/rats1a.jpg
-
 desktopdir = $(datadir)/applications
 desktop_DATA = xdg/ggobi.desktop
 
