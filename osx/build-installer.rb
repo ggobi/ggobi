@@ -3,9 +3,6 @@ require 'pathname'
 require 'arrayfields'
 require 'fileutils'
 
-# Check for prerequistes
-# gcc -v 4.0.3
-
 class Package 
   attr_reader :source
   attr_accessor :makeinst, :extraconf
@@ -88,9 +85,9 @@ $packages = Package.load([
   "http://ftp.gnome.org/pub/GNOME/sources/gnome-icon-theme/2.14/gnome-icon-theme-2.14.2.tar.bz2",
   "http://cairographics.org/releases/cairo-1.2.4.tar.gz",
   "ftp://ftp.gtk.org/pub/glib/2.12/glib-2.12.4.tar.gz", 
-  "ftp://ftp.gtk.org/pub/gtk/v2.10/dependencies/atk-1.9.1.tar.bz2", 
+  "http://ftp.gnome.org/pub/GNOME/sources/atk/1.12/atk-1.12.4.tar.gz", 
   "ftp://ftp.gtk.org/pub/pango/1.14/pango-1.14.7.tar.gz", 
-  "ftp://ftp.gtk.org/pub/gtk/v2.10/gtk+-2.10.6.tar.gz",
+  "ftp://ftp.gtk.org/pub/gtk/v2.10/gtk+-2.10.9.tar.gz",
   "http://ftp.gnome.org/pub/GNOME/sources/libxml2/2.6/libxml2-2.6.26.tar.gz"
 ])
 
