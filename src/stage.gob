@@ -436,7 +436,8 @@ private guint col_name_changed_handler;
 /* Column name changing is somewhat complex. Column names are set in two ways:
    1) Through the GGobiVariable object
    2) With ggobi_stage_set_col_name
-   The latter chains up to the root, where it modifies the GGobiVariable,
+   The latter chains up to the stage that provides the column, 
+   where it modifies the GGobiVariable,
    which then degenerates to the first case. The stage listens to the 
    name change signal of each GGobiVariable and responds by emitting the
    col_name_changed signal. The default handler for the signal, below, 
@@ -483,6 +484,8 @@ get_message(self)
 public void
 queue_message(self, GGobiPipelineMessage *msg)
 {
+  if (!msg)
+    msg = self_get_message(self);
   self_process_outgoing(self, msg);
   if (selfp->queued_message)
     ggobi_pipeline_message_merge(selfp->queued_message, msg);
@@ -665,7 +668,7 @@ set_col_name(self, guint j, const gchar* value)
   GGobiVariable* vt;
   gchar *nick = NULL, *name;
   
-  if (self->parent && self->parent->n_cols > j) {
+  if (self->parent && j < self->parent->n_cols) {
     self_set_col_name(self->parent, j, value);
     return;
   }
@@ -963,7 +966,7 @@ translate_var_to_col(self) {
 virtual GGobiVariable*
 create_variable (self, guint j)
 {
-  if (self->parent)
+  if (self->parent && j < self->parent->n_cols)
     return ggobi_variable_clone(self_get_variable(self->parent, j));
   return GGOBI_VARIABLE(ggobi_variable_new(self));
 }
@@ -1386,7 +1389,7 @@ set_variable (self, guint j, GGobiVariable* value)
   if (g_ptr_array_index(selfp->vartable, j))
     g_object_unref(g_ptr_array_index(selfp->vartable, j));
   g_ptr_array_index(selfp->vartable, j) = value;
-  if (!self->parent) /* for unique name */
+  if (!self->parent || j >= self->parent->n_cols) /* for unique name */
     self_set_col_name(self, j, NULL);
   self_update_var_name_hash(self, NULL, j);
   ggobi_variable_connect__name_changed(value, self_variable_name_changed_cb, self);
@@ -1527,7 +1530,6 @@ col_name_changed_handler(self, const gchar *old_name, guint j)
   gchar *name = self_get_col_name(self->parent, j);
   gchar *nickname = self_get_col_nickname(self->parent, j);
   ggobi_variable_set_name(var, name);
-  /* nicknames are not transformed */
   ggobi_variable_set_nickname(var, nickname);
   g_free(nickname);
   g_free(name);
