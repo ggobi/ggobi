@@ -53,7 +53,7 @@
 #endif
 
 static GGobiOptions sessionoptions;
-GGobiOptions *sessionOptions;
+GGobiOptions *sessionOptions = NULL;
 
 
 GGobiSession **all_ggobis;
@@ -128,7 +128,7 @@ parse_command_line (gint * argc, gchar ** av[])
   GError *error = NULL;
   GOptionContext *ctx = g_option_context_new("- platform for interactive graphics");
   
-  /* use the GOptionContext explicity, just in case GTK+ was already initialized */
+  /* use the GOptionContext explicity, because GTK+ is already initialized */
   g_option_context_add_main_entries (ctx, entries, PACKAGE);
   g_option_context_add_group (ctx, gtk_get_option_group (TRUE));
   g_option_group_set_translation_domain (g_option_context_get_main_group (ctx), PACKAGE);
@@ -373,17 +373,20 @@ gint ggobi_init (gint argc, gchar * argv[], gboolean processEvents)
   bind_textdomain_codeset (PACKAGE, "UTF-8");
   textdomain (PACKAGE);
 
+  if (!sessionOptions) /* init session options before command line parsing */
+    initSessionOptions (argc, argv);
+  
+  /* this parses command line AND initializes GTK+ */
+  parse_command_line (&argc, &argv);
+
   if (!ExtendedDisplayTypes) {
     registerBuiltinTypes();
     // FIXME: This should probably just be done inside registerBuiltinTypes()
     // That is, register the types by calling the _TYPE_ macros and then
     // using g_type_children to get the available display types
     registerDisplayTypes ((GTypeLoad *) typeLoaders, G_N_ELEMENTS(typeLoaders));
-    initSessionOptions (argc, argv);
   }
   
-  parse_command_line (&argc, &argv);
-
   /*GGOBI_TYPE_SESSION;*/
   
   process_initialization_files ();

@@ -222,6 +222,17 @@ esac
 echo "${os_win32}"
 AM_CONDITIONAL(OS_WIN32, test "$os_win32" = "yes")
 
+# Find glitz
+
+if test "$os_win32" != "yes" ; then
+  PKG_CHECK_MODULES(GLITZ, [glitz-glx])
+else
+  PKG_CHECK_MODULES(GLITZ, [glitz-wgl])
+fi
+
+AC_SUBST(GLITZ_CFLAGS)
+AC_SUBST(GLITZ_LIBS)
+
  dnl Process the different .in files, substituting the values computed here in the configuration
  dnl script for the corresponding @variable@ in these files.
 AC_CONFIG_FILES(Makefile src/Makefile plugins/Makefile ggobi.pc ggobi-system.pc po/Makefile.in doc/reference/Makefile)

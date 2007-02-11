@@ -7,12 +7,13 @@ libggobi_la_GOBS = variable.gob stage.gob data.gob stage-transform.gob \
   input-decoder-bgzip.gob stage-subset.gob stage-group.gob transform.gob \
   transform-min-one.gob transform-boxcox.gob transform-abs.gob transform-log10.gob \
   gui-component.gob gui-transform.gob type-registry.gob pipeline-message.gob \
-  variable-group.gob bitset.gob
+  variable-group.gob bitset.gob renderer.gob renderer-cairo.gob renderer-factory.gob
 libggobi_la_GOBSOURCES = $(libggobi_la_GOBS:%.gob=ggobi-%.c)
 libggobi_la_GOBHEADERS = $(libggobi_la_GOBS:%.gob=ggobi-%.h)
 libggobi_la_GOBOBJECTS = $(libggobi_la_GOBS:%.gob=ggobi-%.lo)
 libggobi_la_GOBSTAMPS = $(libggobi_la_GOBS:%.gob=.%.gob.stamp)
-libggobi_la_LDFLAGS  = @GTK_LIBS@ @LIBXML_LIBS@ @LIBGSF_LIBS@ @GSL_LIBS@ -version-info 2
+libggobi_la_LDFLAGS  = @GTK_LIBS@ @LIBXML_LIBS@ @LIBGSF_LIBS@ @GSL_LIBS@ \
+  @GLITZ_LIBS@ -version-info 2
 libggobi_la_SOURCES = array.c ash1d.c barchart.c barchartClass.c \
   barchart_ui.c brush.c brush_api.c brush_bins.c brush_init.c brush_link.c brush_link_ui.c \
   brush_ui.c color.c color_ui.c cpanel.c display.c display_tree.c display_ui.c \
@@ -60,7 +61,8 @@ bin_PROGRAMS  = ggobi
 ggobi_SOURCES = ggobiMain.c
 ggobi_LDADD   = libggobi.la
 
-AM_CPPFLAGS = @SRC_DEBUG@ @GTK_CFLAGS@ @LIBXML_CFLAGS@ @LIBGSF_CFLAGS@ @GSL_CFLAGS@ @INCLTDL@
+AM_CPPFLAGS = @SRC_DEBUG@ @GTK_CFLAGS@ @LIBXML_CFLAGS@ @LIBGSF_CFLAGS@ \
+  @GSL_CFLAGS@ @GLITZ_CFLAGS@ @INCLTDL@
 AM_CFLAGS   = -std=gnu99
 
 EXTRA_DIST = $(libggobi_la_GOBS)

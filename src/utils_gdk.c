@@ -20,16 +20,6 @@
 #include "vars.h"
 #include "externs.h"
 
-#ifdef ENABLE_CAIRO
-#ifndef WIN32
-#include <gdk/gdkx.h>
-#include <glitz-glx.h>
-#else
-  // win32 includes
-#endif
-#include <cairo-glitz.h>
-#endif
-
 GdkColor *
 NewColor (glong red, glong green, glong blue)
 {
@@ -268,51 +258,3 @@ draw_3drectangle (GtkWidget * widget, GdkDrawable * drawable,
   gdk_draw_polygon (drawable, gg->rectangle_GC, TRUE, points, 7);
   gdk_draw_line (drawable, gg->rectangle_GC, x, y - (h - 1), x, y + (h - 2));
 }
-
-#ifdef ENABLE_CAIRO
-cairo_t *
-create_cairo_glitz (GdkDrawable * drawable)
-{
-  cairo_surface_t *cairo_surface =
-    g_object_get_data (G_OBJECT (drawable), "glitz_surface");
-
-  if (!cairo_surface) {
-    guint width, height;
-    glitz_drawable_t *glitz_d = NULL;
-    glitz_surface_t *glitz_s;
-    glitz_format_t *format;
-    GdkVisual *visual = gdk_drawable_get_visual (drawable);
-    g_return_val_if_fail (visual != NULL, NULL);
-    gdk_drawable_get_size (drawable, &width, &height);
-#ifndef WIN32
-    glitz_glx_init (NULL);
-    {
-      Display *dpy = GDK_DRAWABLE_XDISPLAY (drawable);
-      glitz_drawable_format_t *d_format =
-        glitz_glx_find_drawable_format_for_visual (dpy, DefaultScreen (dpy),
-                                                   GDK_VISUAL_XVISUAL
-                                                   (visual)->visualid);
-      if (GDK_IS_WINDOW (drawable))
-        glitz_d =
-          glitz_glx_create_drawable_for_window (dpy, DefaultScreen (dpy),
-                                                d_format,
-                                                GDK_WINDOW_XID (GDK_WINDOW
-                                                                (drawable)),
-                                                width, height);
-      else
-        glitz_d = glitz_glx_create_pbuffer_drawable (dpy, DefaultScreen (dpy),
-                                                     d_format, width, height);
-    }
-#else
-    // windows implementation
-#endif
-    g_return_val_if_fail (glitz_d != NULL, NULL);
-    format = glitz_find_standard_format (glitz_d, GLITZ_STANDARD_ARGB32);
-    glitz_s = glitz_surface_create (glitz_d, format, width, height, 0, NULL);
-    g_object_set_data_full (G_OBJECT (drawable), "glitz_surface",
-                            cairo_glitz_surface_create (glitz_s),
-                            (GDestroyNotify) cairo_surface_destroy);
-  }
-  return (cairo_create (cairo_surface));
-}
-#endif
