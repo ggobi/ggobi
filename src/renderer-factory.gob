@@ -10,10 +10,10 @@ class GGobi:Renderer:Factory from G:Object {
   }
   
   virtual GGobiRenderer *
-  create(self, GdkDrawable *target) 
+  create(self, GdkDrawable *parent) 
   {
-    GObject *renderer = g_object_new(GGOBI_TYPE_RENDERER_CAIRO, "parent", target, NULL);
-    return GGOBI_RENDERER(renderer);
+    GObject *obj = g_object_new(GGOBI_TYPE_RENDERER_CAIRO, "parent", parent, NULL);
+    return GGOBI_RENDERER(obj);
   }
 }
   

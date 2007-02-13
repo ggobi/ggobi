@@ -9,8 +9,7 @@
    off-screen devices that take "snapshots" of GGobi plots */
 class GGobi:Renderer from Gdk:Drawable
 {
-  /* draw to this buffer */
-  /* to use a custom buffer, override 'resize', 'flush', and all drawing */
+  /* everything passes through to this drawable by default */
   private GdkDrawable *buffer unrefwith g_object_unref;
   
   /* buffer should be flushed to this drawable */
@@ -19,41 +18,32 @@ class GGobi:Renderer from Gdk:Drawable
   (nick = "out", blurb = "The drawable to which this renderer is flushed",
    object_type = Gdk:Drawable, flags = CONSTRUCT_ONLY)
    set {
-     gint width, height;
      GObject *obj = g_value_dup_object(VAL);
      if (selfp->parent)
        g_object_unref(G_OBJECT(selfp->parent));
      selfp->parent = GDK_DRAWABLE(obj);
-     gdk_drawable_get_size(selfp->parent, &width, &height);
-     self_resize(self, width, height);
+     if (selfp->buffer)
+       g_object_unref(G_OBJECT(selfp->buffer));
+     selfp->buffer = self_create_target(self, selfp->parent);
    } get {
      g_value_set_object(VAL, selfp->parent);
    };
   
-  public signal first NONE (UINT, UINT) void
-  resize(self, guint width, guint height) {
-    if (selfp->buffer)
-      g_object_unref(G_OBJECT(selfp->buffer));
-    selfp->buffer = self_create_buffer(self, width, height);
-  }
-  
-  /* override to create custom contexts around the buffer */
+  /* if you already have a special GdkDrawable, and want to make it into a 
+     GGobiRenderer, just override this to provide it */
   private virtual GdkDrawable *
-  create_buffer(self, guint width, guint height)
+  create_target(self, GdkDrawable *parent)
   {
-    return gdk_pixmap_new(selfp->parent, width, height, -1);
+    gint width, height;
+    gdk_drawable_get_size(parent, &width, &height);
+    return gdk_pixmap_new(parent, width, height, -1);
   }
   
   /* buffers are created by cloning (prototype approach) */
   public virtual GGobiRenderer *
   buffer(self)
   {
-    GType type = G_OBJECT_TYPE(self);
-    gint width, height;
-    GObject *obj;
-    gdk_drawable_get_size(GDK_DRAWABLE(self), &width, &height);
-    obj = g_object_new(type, "parent", self, NULL);
-    g_signal_connect_swapped(G_OBJECT(self), "resize", G_CALLBACK(self_resize), obj);
+    GObject *obj = g_object_new(G_OBJECT_TYPE(self), "parent", self, NULL);
     return GGOBI_RENDERER(obj);
   }
   
@@ -65,7 +55,7 @@ class GGobi:Renderer from Gdk:Drawable
       width, height);
   }
 
-  /* commonly overriden renderer methods */
+  /* pass everything through to underlying drawable */
   
   override (Gdk:Drawable) void 
   draw_rectangle (GdkDrawable  *self, GdkGC *gc, gboolean filled,
@@ -114,8 +104,6 @@ class GGobi:Renderer from Gdk:Drawable
       SELF(self)->_priv->buffer, gc, trapezoids, n_trapezoids);
   }
   
-  /* text renderering methods */
-  
   override (Gdk:Drawable) void 
   draw_text(GdkDrawable  *self, GdkFont *font, GdkGC *gc, gint x, gint y, 
     const gchar  *text, gint text_length)
@@ -144,8 +132,6 @@ class GGobi:Renderer from Gdk:Drawable
     GDK_DRAWABLE_GET_CLASS(SELF(self)->_priv->buffer)->draw_glyphs_transformed(
       SELF(self)->_priv->buffer, gc, matrix, font, x, y, glyphs);
   }
-  
-  /* low-level / uncommonly overriden renderer methods */
   
   override (Gdk:Drawable) GdkGC *
   create_gc(GdkDrawable *self, GdkGCValues *values, GdkGCValuesMask mask)

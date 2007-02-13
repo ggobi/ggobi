@@ -7,9 +7,7 @@
 %}
 %h{
   #include "ggobi-renderer.h"
-  #include <cairo/cairo-pdf.h>
-  #include <cairo/cairo-ps.h>
-  #include <cairo/cairo-svg.h>
+  #include <cairo/cairo.h>
   #if CAIRO_HAS_GLITZ_SURFACE
   #include <cairo/cairo-glitz.h>
   #ifndef WIN32
@@ -21,97 +19,47 @@
   #endif
 %}
 
-enum GGOBI_CAIRO_SURFACE {
-  DEFAULT, IMAGE, PDF, PS, GLITZ, SVG
-} GGobi:Cairo:Surface:Type;
-
 class GGobi:Renderer:Cairo from GGobi:Renderer
 {
-  private cairo_t *cr destroywith cairo_destroy;
-  private cairo_surface_t *surface destroywith cairo_surface_destroy;
-  private glitz_surface_t *glitz destroywith glitz_surface_destroy;
-  
-  private GGobiCairoSurfaceType surface_type;
-  property ENUM surface_type
-  (nick = "backend", blurb = "The type of cairo surface to use",
-   enum_type = GGobi:Cairo:Surface:Type, 
-   default_value = GGOBI_CAIRO_SURFACE_DEFAULT, link, flags = CONSTRUCT_ONLY);
-  
-  private gchar *filename destroywith g_free;
-  property STRING filename
-  (nick = "fn", blurb = "When using file backends, the output filename",
-   link, flags = CONSTRUCT_ONLY);
+  private cairo_t *cairo destroywith cairo_destroy;
+  /* This should only be changed for "once off" operations like saving to a 
+     file or printing - set to NULL to reset to blank surface */
+  property POINTER cairo
+  (nick = "cr", blurb = "The cairo context to which this renders", 
+   type = cairo_t *, flags = CONSTRUCT_ONLY, export)
+   set {
+     if (g_value_get_pointer(VAL)) {
+       if (selfp->cairo)
+         cairo_destroy(selfp->cairo);
+       selfp->cairo = cairo_reference(g_value_get_pointer(VAL));
+     }
+   }
+   get {
+     g_value_set_pointer(VAL, selfp->cairo);
+   };
    
   override (GGobi:Renderer) GdkDrawable *
-  create_buffer(GGobi:Renderer *self, guint width, guint height)
-  {
-    GdkDrawable *buffer = PARENT_HANDLER(self, width, height);
-    if (SELF(self)->_priv->cr)
-      cairo_destroy(SELF(self)->_priv->cr);
-    SELF(self)->_priv->cr = self_create_cairo(SELF(self), buffer);
-    g_return_val_if_fail(SELF(self)->_priv->cr != NULL, NULL);
-    return buffer;
+  create_target(GGobi:Renderer *self, GdkDrawable *parent)
+  { // FIXME: eventually we don't want to use the parent's drawable at all
+    // -- we should override everything with cairo
+    GdkDrawable *target = PARENT_HANDLER(self, parent);
+    /* if we do not have a cairo context yet, try for a glitz (pbuffer)
+       surface, otherwise fallback to image surface */
+    if (!SELF(self)->_priv->cairo)
+      SELF(self)->_priv->cairo = self_create_cairo(SELF(self), target);
+    return target;
   }
   
   private virtual cairo_t *
-  create_cairo(self, GdkDrawable *buffer)
+  create_cairo(self, GdkDrawable *target)
   {
     cairo_t *cr;
-    if (selfp->surface_type == GGOBI_CAIRO_SURFACE_DEFAULT)
-      cr = gdk_cairo_create(buffer);
-    else {
-      cairo_surface_t *surf = NULL;
-      gint width, height;
-      gdk_drawable_get_size(buffer, &width, &height);
-      if (selfp->surface_type == GGOBI_CAIRO_SURFACE_IMAGE)
-        surf = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, width, height);
-      #if CAIRO_HAS_GLITZ_SURFACE
-      else if (selfp->surface_type == GGOBI_CAIRO_SURFACE_GLITZ) {
-        /* first get the glitz surface and save a reference */
-        selfp->glitz = self_create_glitz(buffer);
-        /* wrap a cairo surface around the glitz surface */
-        surf = cairo_glitz_surface_create(selfp->glitz);
-      }
-      #endif
-      else {
-        width = 72.*width*gdk_screen_width_mm()/gdk_screen_width()/MM_PER_INCH;
-        height = 72.*width*gdk_screen_height_mm()/gdk_screen_height()/MM_PER_INCH;
-        #if CAIRO_HAS_PDF_SURFACE
-        if (selfp->surface_type == GGOBI_CAIRO_SURFACE_PDF)
-          surf = cairo_pdf_surface_create(selfp->filename, width, height);
-        #endif
-        #if CAIRO_HAS_PS_SURFACE
-        if (!surf && selfp->surface_type == GGOBI_CAIRO_SURFACE_PS)
-          surf = cairo_ps_surface_create(selfp->filename, width, height);
-        #endif
-        #if CAIRO_HAS_SVG_SURFACE
-        if (!surf && selfp->surface_type == GGOBI_CAIRO_SURFACE_SVG)
-          surf = cairo_svg_surface_create(selfp->filename, width, height);
-        #endif
-      }
-      g_return_val_if_fail(surf != NULL, NULL);
-      selfp->surface = surf;
-      cr = cairo_create(surf);
-    }
+    cairo_surface_t *surf = self_create_cairo_glitz(target);
+    if (!surf)
+      //surf = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, width, height);
+      cr = gdk_cairo_create(target);
+    else cr = cairo_create(surf);
     return cr;
-  }
-  
-  override (GGobi:Renderer) void
-  flush(GGobi:Renderer *self, GdkGC *gc, gint xsrc, gint ysrc, 
-    gint xdest, gint ydest, gint width, gint height)
-  {
-    switch(SELF(self)->_priv->surface_type) {
-      case GGOBI_CAIRO_SURFACE_PDF:
-      case GGOBI_CAIRO_SURFACE_PS:
-      case GGOBI_CAIRO_SURFACE_SVG:
-        cairo_show_page(SELF(self)->_priv->cr);
-      break;
-      case GGOBI_CAIRO_SURFACE_IMAGE:
-        cairo_surface_write_to_png(SELF(self)->_priv->surface, SELF(self)->_priv->filename);
-      break;
-      default:
-        PARENT_HANDLER(self, gc, xsrc, ysrc, xdest, ydest, width, height);
-    }
   }
   
   private void
@@ -122,7 +70,7 @@ class GGobi:Renderer:Cairo from GGobi:Renderer
     /*static double dashes[8];
     gint i;*/
     
-    cairo_set_line_width(selfp->cr, values->line_width+1);
+    cairo_set_line_width(selfp->cairo, values->line_width+1);
     
     switch(values->cap_style) {
       case GDK_CAP_ROUND:
@@ -136,7 +84,7 @@ class GGobi:Renderer:Cairo from GGobi:Renderer
         cap = CAIRO_LINE_CAP_SQUARE;
       break;
     }
-    cairo_set_line_cap(selfp->cr, cap);
+    cairo_set_line_cap(selfp->cairo, cap);
     
     switch(values->join_style) {
       case GDK_JOIN_ROUND:
@@ -144,13 +92,13 @@ class GGobi:Renderer:Cairo from GGobi:Renderer
       break;
       case GDK_JOIN_MITER:
         join = CAIRO_LINE_JOIN_MITER;
-        //cairo_set_miter_limit(selfp->cr, gc->lmitre);
+        //cairo_set_miter_limit(selfp->cairo, gc->lmitre);
       break;
       case GDK_JOIN_BEVEL:
         join = CAIRO_LINE_JOIN_BEVEL;
       break;
     }
-    cairo_set_line_join(selfp->cr, join);
+    cairo_set_line_join(selfp->cairo, join);
     // FIXME: Don't know how to get the dashes out of the GdkGC
     // Perhaps we could extend GdkGC
     /*
@@ -172,23 +120,19 @@ class GGobi:Renderer:Cairo from GGobi:Renderer
     gdk_gc_get_values(gc, &values);
     gdk_colormap_query_color(colors, values.foreground.pixel, &color);
     //g_debug("color: %d %d %d", color.red, color.green, color.blue);
-    gdk_cairo_set_source_color(selfp->cr, &color);
-    if (filled) {
-      /*gdk_colormap_query_color(colors, values.background.pixel, &color);
-      g_debug("background color: %d %d %d", color.red, color.green, color.blue);
-      gdk_cairo_set_source_color(selfp->cr, &color);*/
-      cairo_fill_preserve(selfp->cr);
-    }
+    gdk_cairo_set_source_color(selfp->cairo, &color);
+    if (filled)
+      cairo_fill_preserve(selfp->cairo);
     self_line_type(self, &values);
-    cairo_stroke(selfp->cr);
+    cairo_stroke(selfp->cairo);
   }
   private void
   polypath(self, guint npoints, GdkPoint *points)
   {
     gint i;
-    cairo_move_to(selfp->cr, points[0].x, points[0].y);
+    cairo_move_to(selfp->cairo, points[0].x, points[0].y);
     for (i = 1; i < npoints; i++)
-      cairo_line_to(selfp->cr, points[i].x, points[i].y);
+      cairo_line_to(selfp->cairo, points[i].x, points[i].y);
   }
   
   override (Gdk:Drawable) void 
@@ -196,7 +140,7 @@ class GGobi:Renderer:Cairo from GGobi:Renderer
     gint x, gint y, gint width, gint height)
   {
     //g_debug("drawing rect: %d %d %d %d", x, y, width, height);
-    cairo_rectangle(SELF(self)->_priv->cr, x, y, width, height);
+    cairo_rectangle(SELF(self)->_priv->cairo, x, y, width, height);
     self_stroke(SELF(self), gc, filled);
   }
   override (Gdk:Drawable) void 
@@ -204,7 +148,7 @@ class GGobi:Renderer:Cairo from GGobi:Renderer
     gint width, gint height, gint angle1, gint angle2)
   {
     //cairo_move_to(cr, x+r, y);
-    cairo_t *cr = SELF(self)->_priv->cr;
+    cairo_t *cr = SELF(self)->_priv->cairo;
     cairo_save(cr);
     cairo_translate (cr, x + width / 2., y + height / 2.);
     cairo_scale (cr, (width / 2.), (height / 2.));
@@ -219,7 +163,7 @@ class GGobi:Renderer:Cairo from GGobi:Renderer
   {
     //g_debug("POLYGON");
     self_polypath(SELF(self), npoints, points);
-    cairo_close_path(SELF(self)->_priv->cr);
+    cairo_close_path(SELF(self)->_priv->cairo);
     self_stroke(SELF(self), gc, filled);
   }
   override (Gdk:Drawable) void 
@@ -227,7 +171,7 @@ class GGobi:Renderer:Cairo from GGobi:Renderer
   {
     guint i;
     //g_debug("POINTS");
-    cairo_t *cr = SELF(self)->_priv->cr;
+    cairo_t *cr = SELF(self)->_priv->cairo;
     for (i = 0; i < npoints; i++)
       cairo_rectangle(cr, points[i].x - 0.5, points[i].y - 0.5, 1., 1.);
     self_stroke(SELF(self), gc, FALSE);
@@ -237,7 +181,7 @@ class GGobi:Renderer:Cairo from GGobi:Renderer
   {
     guint i;
     //g_debug("SEGMENTS");
-    cairo_t *cr = SELF(self)->_priv->cr;
+    cairo_t *cr = SELF(self)->_priv->cairo;
     for (i = 0; i < nsegs; i++) {
       cairo_move_to(cr, segs[i].x1, segs[i].y1);
       cairo_line_to(cr, segs[i].x2, segs[i].y2);
@@ -255,7 +199,7 @@ class GGobi:Renderer:Cairo from GGobi:Renderer
     gint n_trapezoids)
   {
     guint i;
-    cairo_t *cr = SELF(self)->_priv->cr;
+    cairo_t *cr = SELF(self)->_priv->cairo;
     for (i = 0; i < n_trapezoids; i++) {
       cairo_move_to(cr, trapezoids[i].x11, trapezoids[i].y1);
       cairo_line_to(cr, trapezoids[i].x21, trapezoids[i].y1);
@@ -266,62 +210,68 @@ class GGobi:Renderer:Cairo from GGobi:Renderer
     self_stroke(SELF(self), gc, FALSE);
   }
   
-  //#ifdef CAIRO_HAS_GLITZ_SURFACE
-  /* glitz utilities */
-  private glitz_surface_t *
-  create_glitz(GdkDrawable * drawable)
+  /* attempt to create a glitz cairo surface, returning NULL on failure */
+  private cairo_surface_t *
+  create_cairo_glitz(GdkDrawable * drawable)
   {
+    #if CAIRO_HAS_GLITZ_SURFACE
+    gulong mask;
     gint width, height;
+    cairo_surface_t *cairo_s;
     glitz_drawable_t *glitz_d = NULL;
     glitz_surface_t *glitz_s;
     glitz_format_t *format;
-    glitz_drawable_buffer_t buffer_type;
-    glitz_drawable_format_t *d_format;
-    GdkVisual *visual = gdk_drawable_get_visual(drawable);
-    GdkDisplay *display = gdk_drawable_get_display(drawable);
+    glitz_drawable_format_t *d_format, templ = { 0, };
     
-    g_return_val_if_fail (visual != NULL, NULL);
-    gdk_drawable_get_size (drawable, &width, &height);
+    gdk_drawable_get_size(drawable, &width, &height);
     
-  #ifndef WIN32
+    /* ask glitz for a 32 bit rgb drawable, 1 sample, single-buffer */
+    templ.color.red_size = 8;
+    templ.color.green_size = 8;
+    templ.color.blue_size = 8;
+    templ.color.alpha_size = 8;
+    templ.color.fourcc = GLITZ_FOURCC_RGB;
+    templ.samples = 1;
+    
+    mask = GLITZ_FORMAT_SAMPLES_MASK | GLITZ_FORMAT_FOURCC_MASK |
+      GLITZ_FORMAT_RED_SIZE_MASK | GLITZ_FORMAT_GREEN_SIZE_MASK |
+      GLITZ_FORMAT_BLUE_SIZE_MASK | GLITZ_FORMAT_ALPHA_SIZE_MASK |
+      GLITZ_FORMAT_DOUBLEBUFFER_MASK;
+    
+    #ifndef WIN32
     {
+      GdkDisplay *display = gdk_drawable_get_display(drawable);
       Display *dpy = gdk_x11_display_get_xdisplay(display);
-      /* First, get drawable format - may need to do this separately for
-         windows and pbuffers, but maybe this visual trick will work */
-      d_format = glitz_glx_find_drawable_format_for_visual (dpy, 
-        DefaultScreen (dpy), GDK_VISUAL_XVISUAL(visual)->visualid);
-      g_return_val_if_fail(d_format != NULL, NULL);
-      /* now create a glitz drawable depending on whether we are drawing to a
-         window or something off-screen */
-      if (GDK_IS_WINDOW (drawable))
-        glitz_d = glitz_glx_create_drawable_for_window (dpy, DefaultScreen (dpy),
-          d_format, GDK_WINDOW_XID(GDK_WINDOW(drawable)), width, height);
-      else
-        glitz_d = glitz_glx_create_pbuffer_drawable (dpy, DefaultScreen (dpy),
-          d_format, width, height);
+      /* First, get drawable format for our pbuffer */
+      d_format = glitz_glx_find_pbuffer_format(dpy, DefaultScreen (dpy), 
+        mask, &templ, 0);
+      if (!d_format) return NULL;
+      /* now create the pbuffer */
+      glitz_d = glitz_glx_create_pbuffer_drawable (dpy, DefaultScreen (dpy),
+        d_format, width, height);
     }
-    
-  #else
-      // windows implementation
-  #endif
+    #else
+    d_format = glitz_wgl_find_pbuffer_format (mask, &templ, 0);
+    if (!d_format) return NULL;
+    glitz_d = glitz_wgl_create_pbuffer_drawable (d_format, width, height);
+    #endif
   
-    g_return_val_if_fail (glitz_d != NULL, NULL);
     /* if we have a glitz drawable, get a glitz format */
     format = glitz_find_standard_format (glitz_d, GLITZ_STANDARD_ARGB32);
-    g_return_val_if_fail(format != NULL, NULL);
     /* use the glitz format to create a glitz surface */
     glitz_s = glitz_surface_create (glitz_d, format, width, height, 0, NULL);
-    /* buffer type depends on whether drawable is double buffered */
-    if (d_format->doublebuffer)
-      buffer_type = GLITZ_DRAWABLE_BUFFER_BACK_COLOR;
-    else buffer_type = GLITZ_DRAWABLE_BUFFER_FRONT_COLOR;
     /* attach the glitz surface to the glitz drawable */
-    glitz_surface_attach(glitz_s, glitz_d, buffer_type);
+    glitz_surface_attach(glitz_s, glitz_d, GLITZ_DRAWABLE_BUFFER_FRONT_COLOR);
+    /* create our cairo_surface */
+    cairo_s = cairo_glitz_surface_create(glitz_s);
     
     /* cleanup */
     glitz_drawable_destroy(glitz_d);
+    glitz_surface_destroy(glitz_s);
     
-    return (glitz_s);
+    return (cairo_s);
+    #else
+    return NULL;
+    #endif
   }
-  //#endif
 }
