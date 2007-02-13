@@ -210,6 +210,74 @@ class GGobi:Renderer:Cairo from GGobi:Renderer
     self_stroke(SELF(self), gc, FALSE);
   }
   
+  /* we do not support the old GDK text stuff (yet) */
+  override (Gdk:Drawable) void 
+  draw_text(GdkDrawable  *self, GdkFont *font, GdkGC *gc, gint x, gint y, 
+    const gchar  *text, gint text_length)
+  {
+  }
+  override (Gdk:Drawable) void 
+  draw_text_wc(GdkDrawable *self, GdkFont *font, GdkGC *gc, gint x, gint y, 
+    const GdkWChar *text, gint text_length)
+  {
+  }
+  /* here is the modern pango stuff */
+  override (Gdk:Drawable) void 
+  draw_glyphs(GdkDrawable *self, GdkGC *gc, PangoFont *font, gint x, gint y, 
+    PangoGlyphString *glyphs)
+  {
+    cairo_move_to(SELF(self)->_priv->cairo, x, y);
+    pango_cairo_show_glyph_string(SELF(self)->_priv->cairo, font, glyphs);
+  }
+  override (Gdk:Drawable) void 
+  draw_glyphs_transformed(GdkDrawable *self, GdkGC *gc, PangoMatrix *matrix, 
+    PangoFont *font, gint x, gint y, PangoGlyphString *glyphs)
+  {
+    cairo_t *cr = SELF(self)->_priv->cairo;
+    cairo_matrix_t cr_matrix = 
+    { matrix->xx, matrix->xy, matrix->yx, matrix->yy, matrix->x0, matrix->y0 };
+    cairo_save(cr);
+    cairo_set_matrix(cr, &cr_matrix);
+    GDK_DRAWABLE_GET_CLASS(self)->draw_glyphs(self, gc, font, x, y, glyphs);
+    cairo_restore(cr);
+  }
+  
+  override (Gdk:Drawable) void 
+  draw_drawable(GdkDrawable  *self, GdkGC *gc, GdkDrawable  *src, gint xsrc, 
+    gint ysrc, gint xdest, gint ydest, gint width, gint height)
+  {
+    cairo_t *cr = SELF(self)->_priv->cairo;
+    gdk_cairo_set_source_pixmap(cr, src, xdest - xsrc, ydest - ysrc);
+    cairo_save(cr);
+    cairo_rectangle(cr, xdest, ydest, width, height);
+    cairo_clip(cr);
+    cairo_paint(cr);
+    cairo_restore(cr);
+  }
+  
+  override (Gdk:Drawable) GdkDrawable* 
+  get_composite_drawable(GdkDrawable *self, gint x, gint y, gint width, 
+    gint height, gint *composite_x_offset, gint *composite_y_offset)
+  {
+    GdkDrawable *parent, *composite;
+    cairo_t *cr;
+    g_object_get(G_OBJECT(self), "parent", &parent, NULL);
+    composite = gdk_pixmap_new(parent, width, height, -1);
+    cr = gdk_cairo_create(composite);
+    gdk_cairo_set_source_pixmap(cr, self, -1*x, -1*y);
+    cairo_paint(cr);
+    cairo_destroy(cr);
+    *composite_x_offset = 0;
+    *composite_y_offset = 0;
+    return composite;
+  }
+  
+  override (Gdk:Drawable) cairo_surface_t *
+  ref_cairo_surface(GdkDrawable *self)
+  {
+    return cairo_surface_reference(cairo_get_target(SELF(self)->_priv->cairo));
+  }
+  
   /* attempt to create a glitz cairo surface, returning NULL on failure */
   private cairo_surface_t *
   create_cairo_glitz(GdkDrawable * drawable)
