@@ -1,9 +1,10 @@
 lib_LTLIBRARIES     = libggobi.la
-libggobi_la_GOBS = data.gob
+libggobi_la_GOBS = data.gob renderer.gob renderer-factory.gob renderer-cairo.gob
 libggobi_la_GOBSOURCES = $(libggobi_la_GOBS:%.gob=ggobi-%.c)
 libggobi_la_GOBHEADERS = $(libggobi_la_GOBS:%.gob=ggobi-%.h)
 libggobi_la_GOBOBJECTS = $(libggobi_la_GOBS:%.gob=ggobi-%.lo)
-libggobi_la_LDFLAGS  = @GTK_LIBS@ @LIBXML_LIBS@
+libggobi_la_GOBSTAMPS = $(libggobi_la_GOBS:%.gob=.%.gob.stamp)
+libggobi_la_LDFLAGS  = @GTK_LIBS@ @LIBXML_LIBS@ @GLITZ_LIBS@
 libggobi_la_SOURCES = array.c ash1d.c barchart.c barchartClass.c \
   barchart_ui.c brush.c brush_api.c brush_bins.c brush_init.c brush_link.c \
   brush_ui.c color.c color_ui.c cpanel.c display.c display_tree.c display_ui.c \
@@ -24,7 +25,7 @@ libggobi_la_SOURCES = array.c ash1d.c barchart.c barchartClass.c \
   utils_pango.c utils_ui.c varchange.c varcircles.c varpanel_ui.c vartable.c \
   vartable_nbook.c vartable_ui.c vector.c win32_draw.c writedata_ui.c \
   write_csv.c write_xml.c wvis.c wvis_ui.c xlines.c xyplot.c \
-  xyplot_ui.c $(libggobi_la_GOBSOURCES)
+  xyplot_ui.c $(libggobi_la_GOBSOURCES) $(libggobi_la_GOBSTAMPS)
 libggobi_la_LIBADD = $(libggobi_la_GOBOBJECTS) @LIBLTDL@
 libggobi_la_DEPENDENCIES = $(libggobi_la_GOBOBJECTS)
 pkginclude_HEADERS = GGobiAPI.h ggobiClass.h tour1d_pp.h GGobiApp.h \
@@ -36,18 +37,21 @@ pkginclude_HEADERS = GGobiAPI.h ggobiClass.h tour1d_pp.h GGobiApp.h \
   externs.h splot.h writedata.h fileio.h testEvents.h ggobi.h tour.h \
   $(libggobi_la_GOBHEADERS) GGStructSizes.c marshal.h
 
-BUILT_SOURCES = $(libggobi_la_GOBSOURCES) $(libggobi_la_GOBHEADERS)
+BUILT_SOURCES =  $(libggobi_la_GOBSTAMPS) $(libggobi_la_GOBSOURCES) $(libggobi_la_GOBHEADERS)
 
 MAINTAINERCLEANFILES = $(BUILT_SOURCES)
 
-$(libggobi_la_GOBSOURCES): $(libggobi_la_GOBSOURCES:ggobi-%.c=%.gob)
+#$(libggobi_la_GOBSOURCES): $(libggobi_la_GOBSOURCES:ggobi-%.c=%.gob)
+#	@GOB2@ --no-touch $(patsubst ggobi-%.c,%.gob,$@)
+.%.gob.stamp: %.gob
 	@GOB2@ --no-touch $<
+	@touch $@
           
 bin_PROGRAMS  = ggobi
 ggobi_SOURCES = ggobiMain.c
 ggobi_LDADD   = libggobi.la
 
-INCLUDES = @SRC_DEBUG@ @GTK_CFLAGS@ @LIBXML_CFLAGS@ @INCLTDL@
+INCLUDES = @SRC_DEBUG@ @GTK_CFLAGS@ @LIBXML_CFLAGS@ @GLITZ_CFLAGS@ @INCLTDL@
 
 EXTRA_DIST = $(libggobi_la_GOBS)
 
