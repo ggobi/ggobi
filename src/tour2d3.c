@@ -218,6 +218,16 @@ void tour2d3_speed_set(gfloat slidepos, GGobiSession *gg) {
   displayd *dsp = gg->current_display; 
   cpaneld *cpanel = &dsp->cpanel;
 
+  // Tour timeout testing -- dfs
+#if 0
+  {
+    if (fabs(cpanel->t2d3.slidepos - slidepos) > .001) {
+      // Remove and re-add the timeout in order to change delay
+      tour2d3_func(off, dsp, gg);
+      tour2d3_func(on, dsp, gg);
+    }
+  }
+#endif
   cpanel->t2d3.slidepos = slidepos;
   speed_set(slidepos, &cpanel->t2d3.step, &dsp->t2d3.delta);
 }
@@ -470,7 +480,8 @@ tour2d3_run(displayd *dsp, GGobiSession *gg)
        dsp->t2d3.target_selection_method, &dsp->t2d3.ppval, &dsp->t2d3.oppval))
   {
     increment_tour(dsp->t2d3.tinc, dsp->t2d3.tau, dsp->t2d3.dist_az, 
-      dsp->t2d3.delta, &dsp->t2d3.tang, (gint) 2);
+      .01, &dsp->t2d3.tang, (gint) 2);
+    /*      dsp->t2d3.delta, &dsp->t2d3.tang, (gint) 2); */
     tour_reproject(dsp->t2d3.tinc, dsp->t2d3.G, dsp->t2d3.Ga, dsp->t2d3.Gz, 
       dsp->t2d3.F, dsp->t2d3.Va, d->n_cols, (gint) 2);
 
@@ -565,20 +576,44 @@ tour2d3_idle_func (displayd *dsp)
 
 void tour2d3_func (gboolean state, displayd *dsp, GGobiSession *gg)
 {
+  splotd *sp = (splotd *) g_list_nth_data (dsp->splots, 0);
+
   if (state) {
     if (dsp->t2d3.idled == 0) {
       dsp->t2d3.idled = g_idle_add_full (G_PRIORITY_LOW,
                                    (GtkFunction) tour2d3_idle_func, dsp, NULL);
     }
-    gg->tour2d3.idled = 1;
+    gg->tour2d3.idled = 1; // Is this ever used?
   } else {
     if (dsp->t2d3.idled != 0) {
       g_source_remove (dsp->t2d3.idled);
       dsp->t2d3.idled = 0;
     }
-    gg->tour2d3.idled = 0;
+    gg->tour2d3.idled = 0;  // Is this ever used?
+  }
+
+  splot_connect_expose_handler (dsp->t2d3.idled, sp);
+}
+
+#if 0
+// Tour timeout testing -- dfs
+void tour2d3_func (gboolean state, displayd *dsp, ggobid *gg)
+{
+  if (state) {
+    if (dsp->t2d3.timeout_id == 0) {
+      cpaneld *cpanel = &dsp->cpanel;
+      dsp->t2d3.timeout_id = g_timeout_add (1*(100-cpanel->t2d3.slidepos),
+				       (GSourceFunc) tour2d3_idle_func,
+      				       (gpointer) dsp);
+    }
+  } else {
+    if (dsp->t2d3.timeout_id != 0) {
+      g_source_remove (dsp->t2d3.timeout_id);
+      dsp->t2d3.timeout_id = 0;
+    }
   }
 }
+#endif
 
 void tour2d3_reinit(GGobiSession *gg)
 {

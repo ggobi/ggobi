@@ -812,6 +812,8 @@ tour1d_idle_func (displayd *dsp)
 
 void tour1d_func (gboolean state, displayd *dsp, GGobiSession *gg)
 {
+  splotd *sp = (splotd *) g_list_nth_data (dsp->splots, 0);
+
   if (state) {
     if (dsp->t1d.idled == 0) {
       dsp->t1d.idled = g_idle_add_full (G_PRIORITY_LOW,
@@ -825,6 +827,8 @@ void tour1d_func (gboolean state, displayd *dsp, GGobiSession *gg)
     }
     gg->tour1d.idled = 0;
   }
+
+  splot_connect_expose_handler (dsp->t1d.idled, sp);
 }
 
 void tour1d_reinit(GGobiSession *gg)

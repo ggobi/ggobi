@@ -813,8 +813,7 @@ splot_pixmap_to_window (splotd *sp, GdkPixmap *pixmap, GGobiSession *gg) {
 /*------------------------------------------------------------------------*/
 
 void
-splot_redraw (splotd *sp, RedrawStyle redraw_style, GGobiSession *gg) {
-  RedrawStyle style;
+splot_redraw (splotd *sp, RedrawStyle style, GGobiSession *gg) {
 
   /*-- sometimes the first draw happens before configure is called --*/
   if (sp == NULL || sp->da == NULL || sp->pixmap0 == NULL) {
@@ -824,11 +823,10 @@ splot_redraw (splotd *sp, RedrawStyle redraw_style, GGobiSession *gg) {
   /*
    * Event compression is, I think, causing only the last redraw event
    * to get through, so that a full redraw can be blocked by a
-   * subsequent expose.  Can I set a flag when a full redraw is
-   * needed, and then override the setting here?  Or maybe this simple
-   * act will do it:
+   * subsequent expose. 
+   *
+   * Fixed by turning off expose event handlers during tour idle procs.
   */
-  style = MAX(sp->redraw_style, redraw_style);
 
   switch (style) {
     case FULL:  /*-- FULL_2PIXMAP --*/

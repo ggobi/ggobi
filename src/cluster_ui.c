@@ -52,13 +52,6 @@ destroyit (gboolean kill, GGobiSession * gg)
       child = (GtkWidget *) gl->data;
       gtk_widget_destroy (child);
     }
-
- /*
-    GList *gl =
-      gtk_container_get_children (GTK_CONTAINER (gg->cluster_ui.window));
-    GtkWidget *child = (GtkWidget *) gl->data;
-    gtk_widget_destroy (child);
- */
   }
 }
 

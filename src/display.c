@@ -601,8 +601,10 @@ display_free_all (GGobiSession * gg)
       g_source_remove (display->t2d.idled);
     if (nc >= MIN_NVARS_FOR_COTOUR && display->tcorr1.idled)
       g_source_remove (display->tcorr1.idled);
+    /* This doesn't seem to be in use.
     if (nc >= MIN_NVARS_FOR_COTOUR && display->tcorr2.idled)
       g_source_remove (display->tcorr2.idled);
+    */
 
 
     /* If the second argument 'force' is true, it eliminates the
