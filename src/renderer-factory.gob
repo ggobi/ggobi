@@ -3,7 +3,7 @@
 %}
 %{
   #include <gtk/gtk.h>
-  #if GTK_CHECK_VERSION(2,10,0)
+  #if GTK_CHECK_VERSION(2,8,0)
   #include "ggobi-renderer-cairo.h"
   #else
   #define GGOBI_TYPE_RENDERER_CAIRO GGOBI_TYPE_RENDERER

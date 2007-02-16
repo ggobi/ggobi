@@ -1,6 +1,6 @@
 %a{ /* only use cairo when GTK+ 2.8.0 or higher installed */
   #include <gtk/gtk.h>
-  #if GTK_CHECK_VERSION(2,10,0)
+  #if GTK_CHECK_VERSION(2,8,0)
 %}
 %{
   #include <math.h>
@@ -251,7 +251,8 @@ class GGobi:Renderer:Cairo from GGobi:Renderer
     gint ysrc, gint xdest, gint ydest, gint width, gint height)
   {
     cairo_t *cr = SELF(self)->_priv->cairo;
-    gdk_cairo_set_source_pixmap(cr, src, xdest - xsrc, ydest - ysrc);
+    cairo_surface_t *surf = GDK_DRAWABLE_GET_CLASS(src)->ref_cairo_surface(src);
+    cairo_set_source_surface(cr, surf, xdest - xsrc, ydest - ysrc);
     cairo_save(cr);
     cairo_rectangle(cr, xdest, ydest, width, height);
     cairo_clip(cr);
@@ -268,7 +269,8 @@ class GGobi:Renderer:Cairo from GGobi:Renderer
     g_object_get(G_OBJECT(self), "parent", &parent, NULL);
     composite = gdk_pixmap_new(parent, width, height, -1);
     cr = gdk_cairo_create(composite);
-    gdk_cairo_set_source_pixmap(cr, self, -1*x, -1*y);
+    cairo_set_source_surface(cr, cairo_get_target(SELF(self)->_priv->cairo), 
+      -1*x, -1*y);
     cairo_paint(cr);
     cairo_destroy(cr);
     *composite_x_offset = 0;
