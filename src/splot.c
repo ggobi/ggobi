@@ -129,6 +129,17 @@ splot_expose_cb (GtkWidget *w, GdkEventExpose *event, splotd *sp)
   return retval;
 }
 
+void
+splot_connect_expose_handler (gboolean idled, splotd *sp) 
+{
+  if (idled)  // if idle_proc running
+    g_signal_handlers_disconnect_by_func (G_OBJECT (sp->da),
+       G_CALLBACK(splot_expose_cb), GTK_OBJECT (sp));
+  else
+    g_signal_connect (G_OBJECT (sp->da),
+      "expose_event", G_CALLBACK(splot_expose_cb), (gpointer) sp);
+}
+
 /*-- this will be called by a key_press_cb for each scatterplot mode --*/
 gboolean
 splot_event_handled (GtkWidget *w, GdkEventKey *event,

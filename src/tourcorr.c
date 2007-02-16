@@ -1227,6 +1227,8 @@ tourcorr_idle_func (displayd *dsp)
 
 void tourcorr_func (gboolean state, displayd *dsp, ggobid *gg)
 {
+  splotd *sp = (splotd *) g_list_nth_data (dsp->splots, 0);
+
   if (state) {
     if (dsp->tcorr1.idled == 0) {
       dsp->tcorr1.idled = g_idle_add_full (G_PRIORITY_LOW,
@@ -1240,6 +1242,8 @@ void tourcorr_func (gboolean state, displayd *dsp, ggobid *gg)
     }
     gg->tourcorr.idled = 0;
   }
+
+  splot_connect_expose_handler (dsp->t2d.idled, sp);
 }
 
 void tourcorr_reinit(ggobid *gg)

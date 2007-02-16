@@ -566,6 +566,8 @@ tour2d3_idle_func (displayd *dsp)
 
 void tour2d3_func (gboolean state, displayd *dsp, ggobid *gg)
 {
+  splotd *sp = (splotd *) g_list_nth_data (dsp->splots, 0);
+
   if (state) {
     if (dsp->t2d3.idled == 0) {
       dsp->t2d3.idled = g_idle_add_full (G_PRIORITY_LOW,
@@ -579,6 +581,8 @@ void tour2d3_func (gboolean state, displayd *dsp, ggobid *gg)
     }
     gg->tour2d3.idled = 0;
   }
+
+  splot_connect_expose_handler (dsp->t2d.idled, sp);
 }
 
 void tour2d3_reinit(ggobid *gg)

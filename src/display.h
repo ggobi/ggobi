@@ -104,11 +104,6 @@ struct _displayd {
   gint p1d_orientation;
 
 /*
- * Tour display
-  gint tour_idled;
-*/
-
-/*
  * Manipulation Vars
 */
   array_d tc1_manbasis, tc2_manbasis, t1d_manbasis;

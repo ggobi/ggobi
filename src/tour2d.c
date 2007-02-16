@@ -813,6 +813,13 @@ tour2d_idle_func (displayd *dsp)
 
 void tour2d_func (gboolean state, displayd *dsp, ggobid *gg)
 {
+  /* 
+   * Since the tour variables are stored at the display level,
+   * assume for the time being that a display with a tour must
+   * be running in the first and only splot.
+   */
+  splotd *sp = (splotd *) g_list_nth_data (dsp->splots, 0);
+
   if (state) {
     if (dsp->t2d.idled == 0) {
       dsp->t2d.idled = g_idle_add_full (G_PRIORITY_LOW,
@@ -827,6 +834,8 @@ void tour2d_func (gboolean state, displayd *dsp, ggobid *gg)
     }
     gg->tour2d.idled = 0;
   }
+
+  splot_connect_expose_handler (dsp->t2d.idled, sp);
 }
 
 void tour2d_reinit(ggobid *gg)
