@@ -225,9 +225,9 @@ AM_CONDITIONAL(OS_WIN32, test "$os_win32" = "yes")
 # Find glitz
 
 if test "$os_win32" != "yes" ; then
-  PKG_CHECK_MODULES(GLITZ, [glitz-glx])
+  PKG_CHECK_MODULES(GLITZ, [glitz-glx], HAVE_GLITZ = 1, HAVE_GLITZ = 0)
 else
-  PKG_CHECK_MODULES(GLITZ, [glitz-wgl])
+  PKG_CHECK_MODULES(GLITZ, [glitz-wgl], HAVE_GLITZ = 1, HAVE_GLITZ = 0)
 fi
 
 AC_SUBST(GLITZ_CFLAGS)

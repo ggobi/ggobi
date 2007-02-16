@@ -53,10 +53,10 @@ docfilesdir = $(datadir)/doc/ggobi
 dist_docfiles_DATA = doc/manual.pdf
 
 desktopdir = $(datadir)/applications
-desktop_DATA = xdg/ggobi.desktop
+dist_desktop_DATA = xdg/ggobi.desktop
 
 iconsdir = $(datadir)/pixmaps
-icons_DATA = xdg/ggobi.png
+dist_icons_DATA = xdg/ggobi.png
 
 sharedir = $(pkgdatadir)
 dist_share_DATA = share/colorschemes.xml

@@ -53,7 +53,7 @@ MAINTAINERCLEANFILES = $(BUILT_SOURCES)
 #$(libggobi_la_GOBSOURCES): $(libggobi_la_GOBSOURCES:ggobi-%.c=%.gob)
 #	@GOB2@ --no-touch $(patsubst ggobi-%.c,%.gob,$@)
 .%.gob.stamp: %.gob
-	@GOB2@ --no-touch $<
+	@GOB2@ --no-touch --no-private-header $<
 	@touch $@
 
 

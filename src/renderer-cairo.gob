@@ -2,8 +2,6 @@
   #include <math.h>
   /* Takes 1/64 degrees to radians and reverses */
   #define CAIRO_ANGLE(x) ((360 - (x/64.)) * M_PI / 180)
-  /* millimeters per inch */
-  #define MM_PER_INCH 25.4
 %}
 %h{
   #include "ggobi-renderer.h"
@@ -292,7 +290,7 @@ class GGobi:Renderer:Cairo from GGobi:Renderer
     glitz_drawable_format_t *d_format, templ = { 0, };
     
     gdk_drawable_get_size(drawable, &width, &height);
-    
+
     /* ask glitz for a 32 bit rgb drawable, 1 sample, single-buffer */
     templ.color.red_size = 8;
     templ.color.green_size = 8;
