@@ -29,6 +29,7 @@ destroyit (gboolean kill, GGobiSession * gg)
   gint n, nrows;
   GSList *l;
   GGobiStage *d;
+  GtkWidget *child;
 
   for (l = gg->d; l; l = l->next) {
     d = (GGobiStage *) l->data;
@@ -44,11 +45,20 @@ destroyit (gboolean kill, GGobiSession * gg)
     gg->cluster_ui.window = NULL;
   }
   else {
-    /*-- the window should have just one child.  Find it and kill it --*/
+    /*-- kill all the children of the window --*/
+    GList *gl, *children =
+      gtk_container_get_children (GTK_CONTAINER(GTK_DIALOG(gg->cluster_ui.window)->vbox));
+    for (gl = children; gl; gl = gl->next) {
+      child = (GtkWidget *) gl->data;
+      gtk_widget_destroy (child);
+    }
+
+ /*
     GList *gl =
       gtk_container_get_children (GTK_CONTAINER (gg->cluster_ui.window));
     GtkWidget *child = (GtkWidget *) gl->data;
     gtk_widget_destroy (child);
+ */
   }
 }
 
