@@ -31,6 +31,7 @@ destroyit (gboolean kill, ggobid * gg)
   gint n, nrows;
   GSList *l;
   GGobiData *d;
+  GtkWidget *child;
 
   for (l = gg->d; l; l = l->next) {
     d = (GGobiData *) l->data;
@@ -46,11 +47,13 @@ destroyit (gboolean kill, ggobid * gg)
     gg->cluster_ui.window = NULL;
   }
   else {
-    /*-- the window should have just one child.  Find it and kill it --*/
-    GList *gl =
-      gtk_container_get_children (GTK_CONTAINER (gg->cluster_ui.window));
-    GtkWidget *child = (GtkWidget *) gl->data;
-    gtk_widget_destroy (child);
+    /*-- kill all the children of the window --*/
+    GList *gl, *children =
+      gtk_container_get_children (GTK_CONTAINER(GTK_DIALOG(gg->cluster_ui.window)->vbox));
+    for (gl = children; gl; gl = gl->next) {
+      child = (GtkWidget *) gl->data;
+      gtk_widget_destroy (child);
+    }
   }
 }
 
@@ -519,7 +522,8 @@ CHECK_EVENT_SIGNATURE (exclusion_notebook_adddata_cb, datad_added_f)
   }
 
   if (gg->cluster_ui.window == NULL ||
-      !GTK_WIDGET_REALIZED (gg->cluster_ui.window)) {
+    !GTK_WIDGET_REALIZED (gg->cluster_ui.window)) 
+  {
     gg->cluster_ui.window = gtk_dialog_new_with_buttons ("Color & Glyph Groups",
       GTK_WINDOW(gg->main_window), GTK_DIALOG_DESTROY_WITH_PARENT, 
       GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE, NULL);
