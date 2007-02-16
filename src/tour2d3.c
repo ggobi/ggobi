@@ -582,7 +582,7 @@ void tour2d3_func (gboolean state, displayd *dsp, ggobid *gg)
     gg->tour2d3.idled = 0;
   }
 
-  splot_connect_expose_handler (dsp->t2d.idled, sp);
+  splot_connect_expose_handler (dsp->t2d3.idled, sp);
 }
 
 void tour2d3_reinit(ggobid *gg)
