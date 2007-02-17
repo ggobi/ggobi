@@ -156,8 +156,8 @@ class GGobi:Renderer:Cairo from GGobi:Renderer
     cairo_scale (cr, (width / 2.), (height / 2.));
     //g_debug("drawing arc from: %f to %f", CAIRO_ANGLE(angle2), CAIRO_ANGLE(angle1));
     cairo_arc_negative (cr, 0., 0., 1., CAIRO_ANGLE(angle1), CAIRO_ANGLE(angle2));
-    self_stroke(SELF(self), gc, filled);
     cairo_restore(cr);
+    self_stroke(SELF(self), gc, filled);
   }
   override (Gdk:Drawable) void 
   draw_polygon(GdkDrawable  *self, GdkGC *gc, gboolean filled, 
