@@ -406,7 +406,7 @@ paint_points (cpaneld * cpanel, GGobiStage * d, GGobiSession * gg)
       cpanel->br.point_targets, cpanel->br.mode);
 
     if (!gg->linkby_cv && nd > 1)
-      brush_all_matching_id (d, i, true, cpanel->br.point_targets, cpanel->br.mode);
+      brush_all_matching_id (d, i, false, cpanel->br.point_targets, cpanel->br.mode);
   }
   
   for (guint i = 0; i < d->nrows_under_brush; i++) {
@@ -414,9 +414,10 @@ paint_points (cpaneld * cpanel, GGobiStage * d, GGobiSession * gg)
       cpanel->br.point_targets, cpanel->br.mode);
 
     if (!gg->linkby_cv && nd > 1)
-      brush_all_matching_id (d, i, false, cpanel->br.point_targets, cpanel->br.mode);
+      brush_all_matching_id (d, i, true, cpanel->br.point_targets, cpanel->br.mode);
   }
 
+  // FIXME: is there a reason we always return true here? it seems inefficient
   return true;
 }
 
@@ -612,6 +613,26 @@ brush_once (gboolean force, splotd * sp, GGobiSession * gg)
   return (changed);
 }
 
+static void
+brush_flush(GGobiStage *d)
+{
+  // FIXME: If we make the assumption that these are in the dataset,
+  // then it would be more efficient to _get_root() and _col_data_changed()
+  ggobi_stage_update_col(d, ggobi_stage_get_col_index_for_name(d, "_color"));
+  ggobi_stage_update_col(d, ggobi_stage_get_col_index_for_name(d, "_color_now"));
+  ggobi_stage_update_col(d, ggobi_stage_get_col_index_for_name(d, "_color_prev"));
+  ggobi_stage_update_col(d, ggobi_stage_get_col_index_for_name(d, "_type"));
+  ggobi_stage_update_col(d, ggobi_stage_get_col_index_for_name(d, "_type_now"));
+  ggobi_stage_update_col(d, ggobi_stage_get_col_index_for_name(d, "_type_prev"));
+  ggobi_stage_update_col(d, ggobi_stage_get_col_index_for_name(d, "_size"));
+  ggobi_stage_update_col(d, ggobi_stage_get_col_index_for_name(d, "_size_now"));
+  ggobi_stage_update_col(d, ggobi_stage_get_col_index_for_name(d, "_size_prev"));
+  ggobi_stage_update_col(d, ggobi_stage_get_col_index_for_name(d, "_hidden"));
+  ggobi_stage_update_col(d, ggobi_stage_get_col_index_for_name(d, "_hidden_now"));
+  ggobi_stage_update_col(d, ggobi_stage_get_col_index_for_name(d, "_hidden_prev"));
+  ggobi_stage_flush_changes(d);
+}
+
 gboolean
 brush_once_and_redraw (gboolean binningp, splotd * sp, displayd * display,
                        GGobiSession * gg)
@@ -624,13 +645,24 @@ brush_once_and_redraw (gboolean binningp, splotd * sp, displayd * display,
     return false;    
   }
 
-  if (binningp && binning_permitted (display, gg)) {
+  // FIXME: we no longer use "binning" since changing the pipeline redraws
+  // all displays in FULL. Binning (or partial redrawing) should probably
+  // be internal to the plot object.
+  /*if (binningp && binning_permitted (display, gg)) {
     splot_redraw (sp, BINNED, gg);
-  } else {                      /* no binning */
+  } else {
     splot_redraw (sp, FULL, gg);
-  }
-  if (cpanel->br.updateAlways_p)
-    displays_plot (sp, FULL, gg);
+  }*/
+  
+  
+  if (cpanel->br.point_targets)
+    brush_flush(display->d);
+  if (display->e && cpanel->br.edge_targets)
+    brush_flush(display->e);
+  
+  // FIXME: need some sort of "freeze" pipeline stage
+  /*if (cpanel->br.updateAlways_p)
+    displays_plot(sp, FULl, gg);*/
 
   return changed;
 }

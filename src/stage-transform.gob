@@ -163,10 +163,15 @@ class GGobi:Stage:Transform from GGobi:Stage {
       GGobiVariable *var = ggobi_stage_get_variable(self->parent, j);
       gdouble *result = ggobi_transform_reverse(tform, &value, 1, var);
       if (result) {
-        PARENT_HANDLER(self, i, j, result[0]);
+        value = result[0];
         g_free(result);
-      } else self_transform_error(tform, j);
-    } else PARENT_HANDLER(self, i, j, value);
+      } else {
+        self_transform_error(tform, j);
+        return;
+      }
+    }
+    PARENT_HANDLER(self, i, j, value);
+    SELF(self)->_priv->tform.vals[i][j] = value;
   }
   
   private void

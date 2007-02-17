@@ -379,25 +379,12 @@ button_release_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
     cluster_table_update (d, gg);
   }
 
-  // FIXME: If we make the assumption that these are in the dataset,
-  // then it would be more efficient to _get_root() and _col_data_changed()
-  ggobi_stage_update_col(d, ggobi_stage_get_col_index_for_name(d, "_color"));
-  ggobi_stage_update_col(d, ggobi_stage_get_col_index_for_name(d, "_color_now"));
-  ggobi_stage_update_col(d, ggobi_stage_get_col_index_for_name(d, "_color_prev"));
-  ggobi_stage_update_col(d, ggobi_stage_get_col_index_for_name(d, "_type"));
-  ggobi_stage_update_col(d, ggobi_stage_get_col_index_for_name(d, "_type_now"));
-  ggobi_stage_update_col(d, ggobi_stage_get_col_index_for_name(d, "_type_prev"));
-  ggobi_stage_update_col(d, ggobi_stage_get_col_index_for_name(d, "_size"));
-  ggobi_stage_update_col(d, ggobi_stage_get_col_index_for_name(d, "_size_now"));
-  ggobi_stage_update_col(d, ggobi_stage_get_col_index_for_name(d, "_size_prev"));
-  ggobi_stage_update_col(d, ggobi_stage_get_col_index_for_name(d, "_hidden"));
-  ggobi_stage_update_col(d, ggobi_stage_get_col_index_for_name(d, "_hidden_now"));
-  ggobi_stage_update_col(d, ggobi_stage_get_col_index_for_name(d, "_hidden_prev"));
-  ggobi_stage_flush_changes(d);
-
   /*-- if we're only doing linked brushing on mouse up, do it now --*/
-  if (!cpanel->br.updateAlways_p)
-    displays_plot (sp, FULL, gg);
+  // FIXME: This no longer has an effect, since updating the pipeline refreshes
+  // all displays implicitly. Eventually we could "freeze" the pipeline
+  // of other plots, but that will take a lot more work.
+  /*if (!cpanel->br.updateAlways_p)
+    displays_plot(sp, FULL, gg);*/
 
   return retval;
 }
