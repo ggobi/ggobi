@@ -330,6 +330,38 @@ get_level_value_closest(self, gint value)
  return closest;
 }
 
+/**
+ * limits_adjust:
+ * @min: minimum value
+ * @max: maximumum value
+ *
+ * Adjusts limits so that:
+ *   1) if they are equal, they are separated by 20%, unless they are zero,
+ *      in which case they become [-1.0, 1.0]
+ *   2) the lesser one is the min
+ *
+ */
+private void
+limits_adjust (greal * min, greal * max)
+{
+  if (*max - *min == 0) {
+    if (*min == 0.0) {
+      *min = -1.0;
+      *max = 1.0;
+    }
+    else {
+      *min = 0.9 * *min;
+      *max = 1.1 * *max;
+    }
+  }
+
+  if (*max < *min) {
+    greal ftmp = *max;
+    *max = *min;
+    *min = ftmp;
+  }
+}
+
 private void
 refresh_limits(self)
 {    
@@ -369,6 +401,8 @@ refresh_limits(self)
       g_free(level_values);
     }
   }
+  
+  self_limits_adjust(&min, &max);
   
   selfp->lim.min = min;
   selfp->lim.max = max;

@@ -24,38 +24,6 @@
 /*                       variable limits                                   */
 /*-------------------------------------------------------------------------*/
 
-/**
- * limits_adjust:
- * @min: minimum value
- * @max: maximumum value
- *
- * Adjusts limits so that:
- *   1) if they are equal, they are separated by 20%, unless they are zero,
- *      in which case they become [-1.0, 1.0]
- *   2) the lesser one is the min
- *
- */
-void
-limits_adjust (gfloat * min, gfloat * max)
-{
-  if (*max - *min == 0) {
-    if (*min == 0.0) {
-      *min = -1.0;
-      *max = 1.0;
-    }
-    else {
-      *min = 0.9 * *min;
-      *max = 1.1 * *max;
-    }
-  }
-
-  if (*max < *min) {
-    gfloat ftmp = *max;
-    *max = *min;
-    *min = ftmp;
-  }
-}
-
 /*  Recenter the data using the current sticky point */
 // FIXME: This should probably just operate at the plot/viewport level, especially
 // since specified limits are going away
