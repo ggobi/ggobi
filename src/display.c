@@ -773,6 +773,25 @@ display_tailpipe (displayd * display, RedrawStyle type, GGobiSession * gg)
   splotd *sp;
   cpaneld *cpanel;
 
+  /* this ugly block of code brought to you by the lack of plot-level stages */
+  for (GList *sl = splist; sl; sl = sl->next) {
+    sp = (splotd *) sl->data;
+    if (sp != NULL)
+      splot_points_realloc (sp);
+    /*-- this is only necessary if there are variables, I think --*/
+    if (GGOBI_IS_EXTENDED_SPLOT (sp)) {
+      GGobiExtendedSPlotClass *klass = GGOBI_EXTENDED_SPLOT_GET_CLASS (sp);
+      if (klass->alloc_whiskers)
+        sp->whiskers = klass->alloc_whiskers (sp->whiskers, sp);
+      /*-- each plot type should have its own realloc routines --*/
+      if (GGOBI_IS_BARCHART_SPLOT (sp)) {
+        barchartSPlotd *bsp = GGOBI_BARCHART_SPLOT (sp);
+        barchart_clean_init (bsp);
+        barchart_recalc_counts (bsp, display->d, gg);
+      }
+    }
+  }
+  
   while (splist) {
     sp = (splotd *) splist->data;
     cpanel = &display->cpanel;

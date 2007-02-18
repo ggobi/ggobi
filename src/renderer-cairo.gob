@@ -154,7 +154,7 @@ class GGobi:Renderer:Cairo from GGobi:Renderer
     cairo_save(cr);
     cairo_translate (cr, x + width / 2., y + height / 2.);
     cairo_scale (cr, (width / 2.), (height / 2.));
-    //g_debug("drawing arc from: %f to %f", CAIRO_ANGLE(angle2), CAIRO_ANGLE(angle1));
+    //g_debug("drawing arc at: %d %d", x, y);
     cairo_arc_negative (cr, 0., 0., 1., CAIRO_ANGLE(angle1), CAIRO_ANGLE(angle2));
     cairo_restore(cr);
     self_stroke(SELF(self), gc, filled);

@@ -424,7 +424,7 @@ splotd*    splot_new (displayd *, gint, gint, GGobiSession *);
 void       splot_pixmap0_to_pixmap1 (splotd *, gboolean, GGobiSession *);
 void       splot_plane_to_screen (displayd *, cpaneld *, splotd *, GGobiSession *);
 gboolean   splot_plot_case (gint m, GGobiStage *, splotd *, displayd *, GGobiSession *);
-void       splot_points_realloc (gint, splotd *, GGobiStage *);
+void       splot_points_realloc (splotd *);
 void       splot_redraw (splotd *sp, RedrawStyle, GGobiSession *);
 void       splot_set_current (splotd *, gboolean, GGobiSession *);
 void       splot_world_to_plane (cpaneld *, splotd *, GGobiSession *);

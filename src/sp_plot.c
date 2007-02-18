@@ -220,7 +220,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, GGobiSession *
              * coordinates and time series displays, because we have
              * to ignore points_show_p in order to draw the whiskers
              * but not the points.
-            */
+             */
             if (display->options.points_show_p)
               draw_glyph (sp->pixmap0, GGOBI_STAGE_GET_ATTR_GLYPH(d, i), sp->screen,
                 i, gg);

@@ -64,8 +64,8 @@ class GGobi:Stage:Transform from GGobi:Stage {
     for (guint j = self->n_cols - n_refresh; j < self->n_cols; j++)
       self_transform(SELF(self), 0, j);
 
-     /* don't refresh if no columns (reparenting) */
-     /* this is a temporary hack until the pipeline and displays are completed */
+    /* don't refresh if no columns (reparenting) */
+    /* this is a temporary hack until the pipeline and displays are completed */
     if (self->gg && self->n_cols)
       displays_tailpipe (FULL, self->gg);
     

@@ -353,19 +353,12 @@ splot_set_current_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 /* --------------------------------------------------------------- */
 
 void
-splot_points_realloc (gint nrows_prev, splotd *sp, GGobiStage *d)
+splot_points_realloc (splotd *sp)
 {
-  gint i;
-g_debug("reallocing for %d rows", d->n_rows);
+  GGobiStage *d = sp->displayptr->d;
   vectorf_realloc (&sp->p1d.spread_data, d->n_rows);
-
   sp->planar = (gcoords *) g_renew(gcoords, sp->planar, d->n_rows);
   sp->screen = (icoords *) g_renew(icoords, sp->screen, d->n_rows);
-g_debug("finished");
-  for (i=nrows_prev; i<d->n_rows; i++) {
-    sp->planar[i].x = sp->planar[i].y = 0.0;
-    sp->screen[i].x = sp->screen[i].y = 0;
-  }
 }
 
 void
@@ -406,7 +399,7 @@ splot_alloc (splotd *sp, displayd *display, GGobiSession *gg)
     GGobiExtendedSPlotClass *klass;
     klass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);
     if(klass->alloc_whiskers)
-      sp->whiskers = klass->alloc_whiskers(sp->whiskers, sp, nr, d);
+      sp->whiskers = klass->alloc_whiskers(sp->whiskers, sp);
   }
 }
 
@@ -615,7 +608,6 @@ splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp,
     sp->screen[k].x = (gint) (gtmp * sp->iscale.x / precis);
     gtmp = sp->planar[k].y - sp->pmid.y;
     sp->screen[k].y = (gint) (gtmp * sp->iscale.y / precis);
-
     /*-- shift into middle of plot window --*/
     sp->screen[k].x += (sp->max.x / 2);
     sp->screen[k].y += (sp->max.y / 2);

@@ -195,7 +195,7 @@ typedef struct
   gint (*active_paint_points)(splotd *, GGobiStage *, GGobiSession *);
 
 
-  GdkSegment *(*alloc_whiskers)(GdkSegment *, splotd *sp, gint nrows, GGobiStage *d);
+  GdkSegment *(*alloc_whiskers)(GdkSegment *, splotd *sp);
 
   /** called from splot_plot_edge */
   gboolean (*draw_edge_p)(splotd *sp, gint m, GGobiStage *d, GGobiStage *e, GGobiSession *gg);

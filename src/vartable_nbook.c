@@ -607,8 +607,8 @@ vartable_limits_set_by_var (GGobiStage *d, guint j)
 
       case GGOBI_VARIABLE_CATEGORICAL:
 	gtk_tree_store_set(GTK_TREE_STORE(model), &iter, 
-		VT_CAT_DATA_MIN, ggobi_variable_get_display_min((gint)var),
-		VT_CAT_DATA_MAX, ggobi_variable_get_display_max((gint)var), -1); 
+		VT_CAT_DATA_MIN, ggobi_variable_get_display_min(var),
+		VT_CAT_DATA_MAX, ggobi_variable_get_display_max(var), -1); 
         if (var->lim_specified_p) {
 		gtk_tree_store_set(GTK_TREE_STORE(model), &iter, 
 	  	  VT_CAT_USER_MIN, (gint)var->lim_specified.min,

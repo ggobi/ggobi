@@ -52,7 +52,7 @@ record_add (eeMode mode, gint a, gint b, gchar * lbl, gchar * id,
       ggobi_stage_get_row_for_id(dtarget, id));
     return false;
   }
-
+  
   i = ggobi_data_add_rows(GGOBI_DATA(dtarget), 1);
   ggobi_stage_set_row_id(dtarget, i, lbl);
 
@@ -136,38 +136,8 @@ DTL: So need to call unresolveEdgePoints(e, d) to remove it from the
         }
       }
     }
+    displays_tailpipe (FULL, gg);
   }
-
-  if (ggobi_stage_has_vars(dtarget)) {
-    for (l = gg->displays; l; l = l->next) {
-      dsp = (displayd *) l->data;
-      if (dsp->d == ggobi_stage_find(dtarget, GGOBI_MAIN_STAGE_TRANSFORM)) {
-        for (sl = dsp->splots; sl; sl = sl->next) {
-          sp = (splotd *) sl->data;
-          if (sp != NULL)
-            splot_points_realloc (dtarget->n_rows - 1, sp, d);
-
-          /*-- this is only necessary if there are variables, I think --*/
-          if (GGOBI_IS_EXTENDED_SPLOT (sp)) {
-            GGobiExtendedSPlotClass *klass;
-            klass = GGOBI_EXTENDED_SPLOT_GET_CLASS (sp);
-            if (klass->alloc_whiskers)
-              sp->whiskers = klass->alloc_whiskers (sp->whiskers, sp,
-                                                    d->n_rows, d);
-
-            /*-- each plot type should have its own realloc routines --*/
-            if (GGOBI_IS_BARCHART_SPLOT (sp)) {
-              barchartSPlotd *bsp = GGOBI_BARCHART_SPLOT (sp);
-              barchart_clean_init (bsp);
-              barchart_recalc_counts (bsp, d, gg);
-            }
-          }
-        }
-      }
-    }
-  }
-
-  displays_tailpipe (FULL, gg);
 
   return true;
 }
