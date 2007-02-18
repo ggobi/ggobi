@@ -180,11 +180,11 @@ get_level_for_name(self, const gchar *name)
 }
 
 /* Every variable must be associated with the same stage for its lifetime */
-public GObject *
+public GGobiVariable *
 new(GGobiStage *stage)
 {
-  GObject *o = G_OBJECT(GET_NEW_VARG("stage", stage, NULL));
-  return(o);
+  GObject *o = (GObject *)GET_NEW_VARG("stage", stage, NULL);
+  return(GGOBI_VARIABLE(o));
 }
 
 public void
@@ -486,10 +486,12 @@ refresh_stats(self)
   }
   selfp->mean = sum / n_row;
   selfp->variance = (sum_squares / n_row) - (selfp->mean * selfp->mean);
-  qsort(x, n_row, sizeof (gfloat), fcompare);
-  selfp->median = ((n_row % 2) != 0) ? x[(n_row - 1) / 2] : 
-    (x[n_row / 2 - 1] + x[n_row / 2]) / 2.;
-  g_free(x);
+  if (n_row) {
+    qsort(x, n_row, sizeof (gfloat), fcompare);
+    selfp->median = ((n_row % 2) != 0) ? x[(n_row - 1) / 2] : 
+      (x[n_row / 2 - 1] + x[n_row / 2]) / 2.;
+    g_free(x);
+  } else selfp->median = selfp->mean; /* NaN */
   selfp->dirty_stats = FALSE;
 }
 
@@ -538,7 +540,7 @@ clone(self)
   self_set_vartype(self_new, self_get_vartype(self));
   if (GGOBI_VARIABLE_IS_CATEGORICAL(self)) {
     gint *values = self_get_level_values(self);
-    for (gint k=0; k<self_get_n_levels(self); k++) {
+    for (gint k=0; k < self_get_n_levels(self); k++) {
       level_t *level;
       self_add_level(self_new, self_get_level_name(self, values[k]), values[k]);
       /* this part is a bit ugly */

@@ -37,6 +37,7 @@ property STRING nickname
    default_value = "dataset", link, export);
 
 /* A description of the source of the GGobiData */
+// FIXME: should probably be CONSTRUCT_ONLY - why change the source?
 private GGobiInputSource *source;
 property OBJECT source
   (nick = "origin", blurb = "A representation of the source of this dataset",
@@ -130,7 +131,7 @@ add_attribute(self, const gchar* name, gdouble value) {
 
   if (ggobi_stage_get_col_index_for_name(stage, name) != -1)
     return;
-  
+  // FIXME: inefficient..
   guint j = self_add_cols(self, 1);
   stage->n_attributes += 1;
 
@@ -319,8 +320,7 @@ get_row_for_id(GGobi:Stage *self, gchar *id) {
  *
  * Returns: index of first new row
  **/
- // FIXME: This code should be the default handler for the n_rows property.
- // Then this function would just increment that property.
+// FIXME: Most of this should happen in the outgoing message handler
 public guint
 add_rows(self, guint n) {
   guint i, nprev = GGOBI_STAGE(self)->n_rows;
@@ -377,9 +377,7 @@ reset_rows(self, guint start, guint end) {
  * Add n empty columns to the dataset.
  * Returns: index of first new column
  **/ 
- // FIXME: This code should be the default handler for the n_cols property.
- // Then this function would just increment that property.
- // -- or not, see above
+ // FIXME: Most of this should happen in the outgoing message handler
 public guint 
 add_cols(self, guint n) {
   guint nprev = GGOBI_STAGE(self)->n_cols;

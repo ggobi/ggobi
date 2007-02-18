@@ -966,9 +966,11 @@ translate_var_to_col(self) {
 virtual GGobiVariable*
 create_variable (self, guint j)
 {
+  GGobiVariable *var;
   if (self->parent && j < self->parent->n_cols)
-    return ggobi_variable_clone(self_get_variable(self->parent, j));
-  return GGOBI_VARIABLE(ggobi_variable_new(self));
+    var = ggobi_variable_clone(self_get_variable(self->parent, j));
+  else var = ggobi_variable_new(self);
+  return var;
 }
 
 /**
@@ -1276,7 +1278,7 @@ set_rows_in_plot(self)
  * listening to the correct signals.  This function still needs a lot of
  * work.
  **/
- // FIXME: This should not exist.. we need a ggobi_main_add_data()
+ // FIXME: This should not exist.. we need a ggobi_session_add_data()
 public void 
 attach (self, GGobiSession *gg, gboolean cleanup)
 {
@@ -1290,16 +1292,16 @@ attach (self, GGobiSession *gg, gboolean cleanup)
   
   if (gg->data_source)
     g_object_unref(gg->data_source);
-  g_object_ref(source);
+  if (source)
+    g_object_ref(source);
   gg->data_source = source;
-
+  
   self->brush.bin0.x = self->brush.bin1.x = BRUSH_NBINS;
   self->brush.bin0.y = self->brush.bin1.y = BRUSH_NBINS;
 
   gint iv, ih;
   self->brush.nbins = BRUSH_NBINS;
 
-  edgeedit_init (self->gg);
   if (ggobi_stage_get_n_edges(GGOBI_STAGE(self)))
     vectorb_realloc (&GGOBI_DATA(d)->edge.xed_by_brush, GGOBI_DATA(d)->edge.n);
 

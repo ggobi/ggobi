@@ -324,21 +324,9 @@ motion_notify_cb (GtkWidget * w, GdkEventMotion * event, splotd * sp)
     mousepos_get_motion (w, event, &button1_p, &button2_p, sp);
     k = find_nearest_point (&sp->mousepos, sp, d, gg);
     d->nearest_point = k;
-
-    if (k != d->nearest_point_prev) {
-
-      if (gg->edgeedit.a == -1) {  /*-- looking for starting point --*/
-        if (k != d->nearest_point_prev)
-          displays_plot (NULL, QUICK, gg);
-      }
-      else {    /*-- found starting point; looking for ending point --*/
-
-        displays_plot (NULL, QUICK, gg);
-        /*-- add a dotted line from gg->edgeedit.a to gg->nearest_point --*/
-      }
-    }
+    if (k != d->nearest_point_prev)
+      displays_plot (NULL, QUICK, gg);
     d->nearest_point_prev = d->nearest_point;
-
   }
   else if (cpanel->ee_mode == ADDING_POINTS) {
     ;
@@ -401,7 +389,9 @@ button_release_cb (GtkWidget * w, GdkEventButton * event, gpointer user_data)
 
       if (e == NULL) {
         /*-- initialize e, the new datad --*/
-        e = GGOBI_STAGE(ggobi_data_new (0, 0));
+        GGobiData *ed = ggobi_data_new (0, 0);
+        ggobi_data_add_attributes(ed);
+        e = GGOBI_STAGE(ed);
         ggobi_pipeline_factory_build(gg->pipeline_factory, e);
         ggobi_stage_attach(ggobi_stage_find(e, GGOBI_MAIN_STAGE_TRANSFORM), gg, FALSE);
         ggobi_stage_set_name(e, "edges");
@@ -440,6 +430,7 @@ edgeedit_event_handlers_toggle (splotd * sp, gboolean state)
   displayd *display = sp->displayptr;
 
   if (state == on) {
+    edgeedit_init(display->ggobi);
     if (GGOBI_IS_WINDOW_DISPLAY (display))
       sp->key_press_id =
         g_signal_connect (G_OBJECT (GGOBI_WINDOW_DISPLAY (display)->window),

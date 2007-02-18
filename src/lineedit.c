@@ -73,7 +73,6 @@ record_add (eeMode mode, gint a, gint b, gchar * lbl, gchar * id,
     ggobi_stage_flush_changes(d);
   }
 
-
   if (mode == ADDING_EDGES) {
     GGOBI_STAGE_ATTR_INIT_ALL(dtarget);  
     GGOBI_STAGE_SET_ATTR_COLOR(dtarget, i, GGOBI_STAGE_GET_ATTR_COLOR(dtarget, i), ATTR_SET_PERSISTENT);
