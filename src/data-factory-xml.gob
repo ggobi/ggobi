@@ -1513,16 +1513,13 @@ class GGobi:Data:Factory:XML from GGobi:Data:Factory
     self_set_glyph (attrs, data, i);
     self_set_hidden (attrs, data, i);
 
-/*
- * Probably something's missing here:  if any record has an
- * id, then does every record need one?  I think so.  -- dfs
- */
-
     tmp = self_get_attribute (attrs, "id");
     if (tmp)
       {
         gint m = ggobi_stage_get_row_for_id (d, (gchar *) tmp);
-        if (m != -1)
+        /* every row has an id now - if 'tmp' is the same as the default id,
+           we should not report an error */
+        if (m != data->current_record)
           self_error_handler (data,
                          "duplicated id (%s) in records %d and %d of dataset %s\n",
                          (gchar *) tmp,
