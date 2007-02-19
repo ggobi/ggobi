@@ -29,11 +29,11 @@
 
 enum { 
   VT_VARNAME, VT_TFORM,
-  VT_REAL_USER_MIN, VT_REAL_USER_MAX,
+  /*VT_REAL_USER_MIN, VT_REAL_USER_MAX,*/
   VT_REAL_DATA_MIN, VT_REAL_DATA_MAX,
   VT_MEAN, VT_MEDIAN,
   VT_NLEVELS, VT_LEVEL_NAME, VT_LEVEL_VALUE, VT_LEVEL_COUNT,
-  VT_CAT_USER_MIN, VT_CAT_USER_MAX,
+  /*VT_CAT_USER_MIN, VT_CAT_USER_MAX,*/
   VT_CAT_DATA_MIN, VT_CAT_DATA_MAX,
   VT_NMISSING,
   NCOLS_VT
@@ -336,19 +336,19 @@ vartable_subwindow_init (GGobiStage *d, GGobiSession *gg)
   static gchar *titles[] = {
     "Variable",
     "Transform",
-    "Min (user)", "Max (user)",
+    /*"Min (user)", "Max (user)",*/
     "Min (data)", "Max (data)",
     "Mean", "Median",
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+	NULL, NULL, NULL, NULL,/* NULL, NULL,*/ NULL, NULL,
     "N NAs"};
   static gchar *titles_cat[] = {
     "Variable",
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+	NULL, /*NULL, NULL,*/ NULL, NULL, NULL, NULL,
     "N Levels",
     "Level",
     "Value",
     "Count",
-    "Min (user)", "Max (user)",
+    /*"Min (user)", "Max (user)",*/
     "Min (data)", "Max (data)",
     "N NAs",
   };
@@ -380,9 +380,9 @@ vartable_subwindow_init (GGobiStage *d, GGobiSession *gg)
  * Page for real, counter and integer variables
 */
   model = gtk_tree_store_new(NCOLS_VT, G_TYPE_STRING, G_TYPE_STRING,
-    G_TYPE_DOUBLE, G_TYPE_DOUBLE, G_TYPE_DOUBLE, G_TYPE_DOUBLE, G_TYPE_DOUBLE, 
-    G_TYPE_DOUBLE, G_TYPE_UINT, G_TYPE_STRING, G_TYPE_INT, G_TYPE_UINT, G_TYPE_INT, 
-    G_TYPE_INT, G_TYPE_INT, G_TYPE_INT, G_TYPE_UINT);
+    /*G_TYPE_DOUBLE, G_TYPE_DOUBLE, */G_TYPE_DOUBLE, G_TYPE_DOUBLE, G_TYPE_DOUBLE, 
+    G_TYPE_DOUBLE, G_TYPE_UINT, G_TYPE_STRING, G_TYPE_INT, G_TYPE_UINT, /*G_TYPE_INT, 
+    G_TYPE_INT, */G_TYPE_INT, G_TYPE_INT, G_TYPE_UINT);
 	
   d->vartable_tree_model = GTK_TREE_MODEL(model);
   
@@ -476,7 +476,7 @@ vartable_open (GGobiSession *gg)
   }
 
   gg->vartable_ui.window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-  gtk_window_set_default_size(GTK_WINDOW(gg->vartable_ui.window), 750, 300);
+  gtk_window_set_default_size(GTK_WINDOW(gg->vartable_ui.window), 700, 300);
   g_signal_connect (G_OBJECT (gg->vartable_ui.window),
     "delete_event", G_CALLBACK (close_wmgr_cb), gg);
   gtk_window_set_title (GTK_WINDOW (gg->vartable_ui.window),
@@ -598,22 +598,22 @@ vartable_limits_set_by_var (GGobiStage *d, guint j)
 	gtk_tree_store_set(GTK_TREE_STORE(model), &iter,
 	 	VT_REAL_DATA_MIN, ggobi_variable_get_display_min(var),
 		VT_REAL_DATA_MAX, ggobi_variable_get_display_max(var), -1);
-	if (var->lim_specified_p) {
+	/*if (var->lim_specified_p) {
 		gtk_tree_store_set(GTK_TREE_STORE(model), &iter, 
 	  	  VT_REAL_USER_MIN, var->lim_specified.min,
 		  VT_REAL_USER_MAX, var->lim_specified.max, -1);
-        }
+        }*/
       break;
 
       case GGOBI_VARIABLE_CATEGORICAL:
 	gtk_tree_store_set(GTK_TREE_STORE(model), &iter, 
-		VT_CAT_DATA_MIN, ggobi_variable_get_display_min(var),
-		VT_CAT_DATA_MAX, ggobi_variable_get_display_max(var), -1); 
-        if (var->lim_specified_p) {
+		VT_CAT_DATA_MIN, (gint)ggobi_variable_get_display_min(var),
+		VT_CAT_DATA_MAX, (gint)ggobi_variable_get_display_max(var), -1); 
+        /*if (var->lim_specified_p) {
 		gtk_tree_store_set(GTK_TREE_STORE(model), &iter, 
 	  	  VT_CAT_USER_MIN, (gint)var->lim_specified.min,
 		  VT_CAT_USER_MAX, (gint)var->lim_specified.max, -1);
-        }
+        }*/
       break;
       case GGOBI_VARIABLE_ALL_VARTYPES:
         g_printerr ("(vartable_limits_set_by_var) %d: illegal variable type %d\n",

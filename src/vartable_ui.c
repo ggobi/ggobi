@@ -63,6 +63,9 @@ delete_vars_cb (GtkWidget *w, GGobiSession *gg)
 /*--------------- Setting and clearing variable ranges --------------------*/
 /*-------------------------------------------------------------------------*/
 
+/* disabled while we move to new limits system */
+#if 0
+
 static void
 limits_type_cb (GtkToggleButton *w, GGobiSession *gg) 
 {
@@ -148,7 +151,7 @@ range_unset_cb (GtkWidget *w, GGobiSession *gg)
   range_unset (gg);
 }
 
-static void rescale_cb (GtkWidget *w, GGobiSession *gg) {
+/*static void rescale_cb (GtkWidget *w, GGobiSession *gg) {*/
   /*GGobiStage *d = datad_get_from_notebook(gg->vartable_ui.notebook);*/
 
   /*limits_set (d, true, true, gg->lims_use_visible);  
@@ -157,7 +160,7 @@ static void rescale_cb (GtkWidget *w, GGobiSession *gg) {
 
   tform_to_world(d);
   displays_tailpipe (FULL, gg);*/
-}
+/*}*/
 
 
 /*
@@ -165,6 +168,7 @@ static void rescale_cb (GtkWidget *w, GGobiSession *gg) {
  * and fetch the range for the selected variables in
  * dialog_range_set.
 */
+
 static void
 open_range_set_dialog (GtkWidget *w, GGobiSession *gg)
 {
@@ -288,6 +292,7 @@ open_range_set_dialog (GtkWidget *w, GGobiSession *gg)
 
   gtk_widget_destroy(dialog);
 }
+#endif
 
 void range_unset (GGobiSession *gg)
 {
@@ -337,7 +342,10 @@ typedef enum {ADDVAR_ROWNOS, ADDVAR_BGROUP} NewVariableType;
 static guint
 create_explicit_variable (GGobiStage * d, gchar * vname, NewVariableType vartype)
 {
-  guint jvar = ggobi_data_add_cols(GGOBI_DATA(d), 1);
+  guint jvar;
+  
+  d = ggobi_stage_get_root(d);
+  jvar = ggobi_data_add_cols(GGOBI_DATA(d), 1);
   ggobi_stage_set_col_name(d, jvar, vname);
 
   GGOBI_STAGE_ATTR_INIT(d, cluster);
@@ -579,25 +587,25 @@ vartable_buttonbox_build (GGobiSession *gg) {
   /*-- --*/
 
   /*-- Set and apply limits --*/
-  hb = gtk_hbox_new (false, 2);
+  /*hb = gtk_hbox_new (false, 2);*/
 
   /*-- set and clear variable ranges --*/
-  btn = gtk_button_new_with_mnemonic ("_Limits ... ");
+  /*btn = gtk_button_new_with_mnemonic ("_Limits ... ");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Set user min and max for the selected variable(s), and define rescaling behavior", NULL);
   gtk_box_pack_start (GTK_BOX (hb), btn, true, false, 1);
   g_signal_connect (G_OBJECT (btn), "clicked",
-                      G_CALLBACK (open_range_set_dialog), gg);
+                      G_CALLBACK (open_range_set_dialog), gg);*/
 
   /*-- rescale after resetting variable ranges --*/
-  btn = gtk_button_new_with_mnemonic ("Resc_ale");
+  /*btn = gtk_button_new_with_mnemonic ("Resc_ale");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
     "Rescale plots using specified limits and scaling behavior", NULL);
   gtk_box_pack_start (GTK_BOX (hb), btn, false, false, 1);
   g_signal_connect (G_OBJECT (btn), "clicked",
                       G_CALLBACK (rescale_cb), gg);
 
-  gtk_box_pack_start (GTK_BOX (hbox), hb, true, false, 1);
+  gtk_box_pack_start (GTK_BOX (hbox), hb, true, false, 1);*/
   /*--  --*/
 
   /*-- Clone, new, delete ... --*/

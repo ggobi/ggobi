@@ -53,18 +53,14 @@ tour_realloc_up (GGobiStage *d, gint nc)
   }
 }
 
-/* How to fix this function: 
-  Instead of cloning the variable, just set the column name and everything else
-  should flow from the col_data_changed signal */
 void
 clone_vars (gint * cols, gint ncols, GGobiStage * d)
 {
   gint i, k, jfrom, jto;
-  gint nprev = ggobi_data_add_cols(GGOBI_DATA(d), ncols);
+  GGobiStage *root = ggobi_stage_get_root(d);
+  gint nprev = ggobi_data_add_cols(GGOBI_DATA(root), ncols);
   
   for (k = 0; k < ncols; k++) {
-    GGobiVariable *clone;
-    
     jfrom = cols[k];        
     jto = nprev + k; 
 
@@ -75,8 +71,9 @@ clone_vars (gint * cols, gint ncols, GGobiStage * d)
         ggobi_stage_set_missing(d, i, jto);
     }
 
-    clone = ggobi_variable_clone(ggobi_stage_get_variable(d, jfrom));
-    ggobi_stage_set_variable(d, jto, clone);
+    /*clone = ggobi_variable_clone(ggobi_stage_get_variable(d, jfrom));
+    ggobi_stage_set_variable(d, jto, clone);*/
+    ggobi_stage_set_col_name(d, jto, ggobi_stage_get_col_name(d, jfrom));
     ggobi_stage_update_col(d, (guint) jto);
   }
   ggobi_stage_flush_changes(d);
