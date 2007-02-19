@@ -1178,7 +1178,7 @@ remove_child(self, GGobi:Stage *child  (check null type))
 public gboolean
 set_attr(self, guint i, guint j, guint j_now, guint j_prev, gdouble value, GGobiAttrSetMethod method)
 {
-  //g_debug("(%i,%i %i %i) -> %g %s", i, j, j_now, j_prev, value, brush == ATTR_SET_TRANSIENT ? "t" : "p");
+  //g_debug("(%d,%d %d %d) -> %f %s", i, j, j_now, j_prev, value, method == ATTR_SET_TRANSIENT ? "t" : "p");
   if (method == ATTR_SET_TRANSIENT ?
     (self_get_raw_value(self, i, j_now) == value) :
     (self_get_raw_value(self, i, j) == value))

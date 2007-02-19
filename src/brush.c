@@ -481,7 +481,7 @@ update_points_under_brush(GGobiStage *d, splotd *sp)
         /*
          * Ignore hidden cases unless shadow or unshadow brushing.
          */
-        if (GGOBI_STAGE_GET_ATTR_HIDDEN(d, pt) && ttype != br_unshadow)
+        if (GGOBI_STAGE_GET_ATTR_HIDDEN(d, pt) && ttype != br_shadow && ttype != br_unshadow)
           continue;
 
         if (splot_plot_case(pt, d, sp, display, d->gg) && under_brush (pt, sp))
