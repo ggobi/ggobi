@@ -97,6 +97,7 @@ spherize_set_pcvars (GGobiStage * d, GGobiSession * gg)
   /*-- for newvar_add.. the variable notebooks --*/
   gchar *vname;
   gboolean succeeded = true;
+  GGobiStage *root = ggobi_stage_get_root(d);
 
   /*-- for updating the tree view --*/
   GtkWidget *tree_view = gg->sphere_ui.tree_view;
@@ -114,7 +115,7 @@ spherize_set_pcvars (GGobiStage * d, GGobiSession * gg)
 
     vectori_realloc (&d->sphere.pcvars, d->sphere.npcs);
 
-    guint new = ggobi_data_add_cols(GGOBI_DATA(d), d->sphere.npcs);
+    guint new = ggobi_data_add_cols(GGOBI_DATA(root), d->sphere.npcs);
     for (j = 0; j < d->sphere.npcs; j++) {
       vname = g_strdup_printf ("PC%d", j + 1);
       ggobi_stage_set_col_name(d, new+j, vname);

@@ -1388,7 +1388,6 @@ public void
 set_variable (self, guint j, GGobiVariable* value)
 {
   // FIXME: This function should be private
-  // It's only external use is in cloning of vars, which needs to be redone
   if (g_ptr_array_index(selfp->vartable, j))
     g_object_unref(g_ptr_array_index(selfp->vartable, j));
   g_ptr_array_index(selfp->vartable, j) = value;

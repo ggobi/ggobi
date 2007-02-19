@@ -398,14 +398,14 @@ add_cols(self, guint n) {
 public guint
 delete_cols(self, GSList *cols)
 {
-  gint j;
-  guint *keepers, nkeepers, old_ncols = GGOBI_STAGE(self)->n_cols;
+  /*gint j;*/
+  guint /*keepers, nkeepers = 0,*/ old_ncols = GGOBI_STAGE(self)->n_cols;
   guint ncols = g_slist_length(cols);
   GGobiPipelineMessage *msg;
   
   g_return_val_if_fail(ncols <= old_ncols, old_ncols);
 
-  keepers = find_keepers (old_ncols, cols, &nkeepers);
+  /*keepers = find_keepers (old_ncols, cols, &nkeepers);
   if (nkeepers == -1) {
     g_free (keepers);
     g_return_val_if_reached(old_ncols);
@@ -414,7 +414,7 @@ delete_cols(self, GSList *cols)
   for (j = 0; j < nkeepers; j++) {
     GGobiVariable *vt = ggobi_stage_get_variable(GGOBI_STAGE(self), keepers[j]);
     ggobi_stage_set_variable(GGOBI_STAGE(self), j, vt);
-  }
+  }*/
 
   arrayf_delete_cols (&self->raw, cols);
   arrays_delete_cols (&self->missing, cols);
@@ -424,7 +424,7 @@ delete_cols(self, GSList *cols)
   
   ggobi_stage_flush_changes_here(GGOBI_STAGE(self));
 
-  g_free (keepers);
+  /*g_free (keepers);*/
   
   return(GGOBI_STAGE(self)->n_cols);
 }

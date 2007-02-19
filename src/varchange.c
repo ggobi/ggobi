@@ -114,12 +114,14 @@ delete_vars (gint *cols_arr, gint ncols, GGobiStage * d)
 {
   gint j;
   GSList *cols = NULL;
+  d = ggobi_stage_get_root(d);
   
   /*-- don't allow all variables to be deleted --*/
   g_return_val_if_fail(ncols < d->n_cols, d->n_cols);
   
   for (j = 0; j < ncols; j++)
-    cols = g_slist_append(cols, GINT_TO_POINTER(cols_arr[j]));
+    cols = g_slist_prepend(cols, GINT_TO_POINTER(cols_arr[j]));
+  g_slist_reverse(cols);
   
   /*
    * If one of the variables to be deleted is currently plotted,
