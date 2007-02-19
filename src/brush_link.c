@@ -114,7 +114,10 @@ brush_all_matching_cv (cpaneld * cpanel, GGobiStage * d, GGobiSession * gg)
     j = ggobi_stage_get_col_index_for_name(dd, d->linkvar);
     if (j != -1) {
       brush_matching_cv (j, &levelv, cpanel, dd, gg);
-    }
+    } else {
+			/* undo all transient brushing ? */
+		}
+	}
   }
 
   vectorb_free (&levelv);
