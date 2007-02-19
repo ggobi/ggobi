@@ -79,6 +79,7 @@ brush_all_matching_cv (cpaneld * cpanel, GGobiStage * d, GGobiSession * gg)
   gint i, m, j, level_value, level_value_max;
   vector_b levelv;
   GSList *l;
+  GGobiStage *root = ggobi_stage_get_root(d);
 
   if (!d->linkvar)
     return false;
@@ -102,7 +103,7 @@ brush_all_matching_cv (cpaneld * cpanel, GGobiStage * d, GGobiSession * gg)
   /*-- now for the rest of them --*/
   for (l = gg->d; l; l = l->next) {
     GGobiStage *dd = l->data;
-    if (dd == d) continue;
+    if (dd == root) continue;
 
     level_value_max = ggobi_variable_get_max(ggobi_stage_get_variable(dd, j));
     vectorb_init_null (&levelv);
