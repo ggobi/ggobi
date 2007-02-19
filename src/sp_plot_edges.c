@@ -76,11 +76,19 @@ splot_hidden_edge (gint m, GGobiStage * d, GGobiStage * e,
   gboolean hiddenp = false;
   endpointsd *endpoints;
 
-  GGOBI_STAGE_ATTR_INIT_ALL(e);  
   endpoints = resolveEdgePoints (e, d);
-  if (endpoints && edge_endpoints_get (m, &a, &b, d, endpoints, e))
-    if (GGOBI_STAGE_GET_ATTR_HIDDEN(e, m) || GGOBI_STAGE_GET_ATTR_HIDDEN(d, a) || GGOBI_STAGE_GET_ATTR_HIDDEN(d, b))
-      hiddenp = true;
+  if (endpoints && edge_endpoints_get (m, &a, &b, d, endpoints, e)) {
+    {
+      GGOBI_STAGE_BRUSH_ATTR_INIT(e, hidden);  
+      hiddenp = GGOBI_STAGE_GET_ATTR_HIDDEN(e, m);
+    }
+    {
+      GGOBI_STAGE_BRUSH_ATTR_INIT(d, hidden);
+      hiddenp = hiddenp || GGOBI_STAGE_GET_ATTR_HIDDEN(d, a) || 
+        GGOBI_STAGE_GET_ATTR_HIDDEN(d, b);
+    }
+  }
+    
 
   /*-- can prevent drawing of missings for parcoords or scatmat plots --*/
 /*
