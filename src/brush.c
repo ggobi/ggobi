@@ -430,11 +430,11 @@ paint_edges (cpaneld * cpanel, GGobiStage * e, GGobiSession * gg)
 
   GGOBI_STAGE_ATTR_INIT_ALL(e); 
   for (i = 0; i < ggobi_stage_get_n_edges(e); i++) {
-    GGOBI_STAGE_BRUSH_POINT(e, i, ggobi_stage_get_edge_data(e)->xed_by_brush.els[i], 
-      cpanel->br.edge_targets, cpanel->br.mode);
+    gboolean active = ggobi_stage_get_edge_data(e)->xed_by_brush.els[i];
+    GGOBI_STAGE_BRUSH_POINT(e, i, active, cpanel->br.edge_targets, cpanel->br.mode);
 
     if (!gg->linkby_cv && nd > 1)
-      brush_all_matching_id (e, i, true, cpanel->br.edge_targets, cpanel->br.mode);
+      brush_all_matching_id (e, i, active, cpanel->br.edge_targets, cpanel->br.mode);
   }
 
   //FIXME: only return true if there actually has been a change
@@ -508,7 +508,7 @@ update_edges_under_brush(GGobiStage *d, splotd *sp)
   displayd *display = sp->displayptr;
 
   g_assert (ggobi_stage_get_edge_data(d)->xed_by_brush.nels == ggobi_stage_get_n_edges(d));
-
+  ggobi_stage_get_edge_data(d)->nxed_by_brush = 0;
   for (k = 0; k < ggobi_stage_get_n_edges(d); k++) {
     if (xed_by_brush (k, display, d->gg)) {
       ggobi_stage_get_edge_data(d)->nxed_by_brush++;
@@ -526,7 +526,7 @@ edges_update_paint (splotd * sp, GGobiStage * e, GGobiSession * gg)
   displayd *display = sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
     
-  update_points_under_brush(e, sp);
+  update_edges_under_brush(e, sp);
 
   return paint_edges (cpanel, e, gg);
   /*if (gg->linkby_cv) {
