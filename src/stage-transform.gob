@@ -103,6 +103,8 @@ class GGobi:Stage:Transform from GGobi:Stage {
     }
     self_transform(self, 0, j);
     ggobi_stage_flush_changes_here(GGOBI_STAGE(self));
+    // temporary hack
+    displays_tailpipe (FULL, GGOBI_STAGE(self)->gg);
     self_applied(self, j, tform);
   }
   public void
@@ -224,5 +226,7 @@ class GGobi:Stage:Transform from GGobi:Stage {
       if (self_get_transform(self, cols[j]) == tform)
         self_transform(self, 0, cols[j]);
     ggobi_stage_flush_changes_here(GGOBI_STAGE(self));
+    // temporary hack
+    displays_tailpipe (FULL, GGOBI_STAGE(self)->gg);
   }
 }

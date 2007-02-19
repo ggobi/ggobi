@@ -67,7 +67,7 @@ class GGobi:GUI:Transform from GGobi:GUI:Component {
       ggobi_transform_boxcox_set_lambda(GGOBI_TRANSFORM_BOXCOX(tform),
         gtk_adjustment_get_value(selfp->boxcox_adj));
     for (i = 0; i < nvars; i++)
-      ggobi_stage_transform_apply(GGOBI_STAGE_TRANSFORM(stage), i, GGOBI_TRANSFORM(tform));
+      ggobi_stage_transform_apply(GGOBI_STAGE_TRANSFORM(stage), vars[i], GGOBI_TRANSFORM(tform));
   }
   
   /* Convenience methods for getting stuff out of the combo boxes */
@@ -140,7 +140,7 @@ class GGobi:GUI:Transform from GGobi:GUI:Component {
     
     for(j = 0; j < nvars; j++) {
       GGobiTransform *tform;
-      tform = ggobi_stage_transform_get_transform(GGOBI_STAGE_TRANSFORM(stage), j);
+      tform = ggobi_stage_transform_get_transform(GGOBI_STAGE_TRANSFORM(stage), vars[j]);
       ggobi_transform_boxcox_set_lambda(GGOBI_TRANSFORM_BOXCOX(tform), adj->value);
     }
     
@@ -171,9 +171,11 @@ class GGobi:GUI:Transform from GGobi:GUI:Component {
       GSList *types;
       GType tform_type = G_OBJECT_TYPE(tform);
       GGobiTypeRegistry *registry = self_combo_get_registry(combo);
-      if (tform_type == GGOBI_TYPE_TRANSFORM_BOXCOX)
+      if (tform_type == GGOBI_TYPE_TRANSFORM_BOXCOX) {
         gtk_adjustment_set_value(selfp->boxcox_adj, 
           ggobi_transform_boxcox_get_lambda(GGOBI_TRANSFORM_BOXCOX(tform)));
+        gtk_widget_show_all(selfp->boxcox_box);
+      }
       /* ensure that the type exists in our registry */
       ggobi_type_registry_register(registry, tform_type);
       types = ggobi_type_registry_list_registered(registry);

@@ -46,7 +46,7 @@ class GGobi:Type:Registry from G:Object {
   public GSList *
   list_registered(self)
   {
-    return g_slist_copy(selfp->types);
+    return g_slist_reverse(g_slist_copy(selfp->types));
   }
   
   public void
