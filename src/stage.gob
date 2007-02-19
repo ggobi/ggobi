@@ -241,7 +241,8 @@ typedef struct _EdgeData {
 // attributes? Like a transient layer on top of a persistent layer.
 enum ATTR_SET {
   PERSISTENT,
-  TRANSIENT
+  TRANSIENT,
+  SAVE /* cannot undo */
 } GGobi:Attr:Set:Method;
 
 /**
@@ -1184,8 +1185,10 @@ set_attr(self, guint i, guint j, guint j_now, guint j_prev, gdouble value, GGobi
     (self_get_raw_value(self, i, j) == value))
     return false;
 
-  if (method == ATTR_SET_PERSISTENT) {
-    self_set_raw_value(self, i, j_prev, self_get_raw_value(self, i, j));
+  if (method != ATTR_SET_TRANSIENT) {
+    gdouble prev = method == ATTR_SET_PERSISTENT ? 
+      self_get_raw_value(self, i, j) : value;
+    self_set_raw_value(self, i, j_prev, prev);
     self_set_raw_value(self, i, j, value);
   }
 
@@ -1197,12 +1200,10 @@ public gboolean
 reset_attr(self, guint i, guint j, guint j_now, guint j_prev, GGobiAttrSetMethod brush)
 {
   gdouble value;
-  switch(brush) {
-    case ATTR_SET_PERSISTENT:
+  
+  if (brush == ATTR_SET_PERSISTENT)
       value = self_get_raw_value(self, i, j_prev);
-    default:
-      value = self_get_raw_value(self, i, j);
-  }
+  else value = self_get_raw_value(self, i, j);
   
   return self_set_attr(self, i, j, j_now, j_prev, value, brush);
 }

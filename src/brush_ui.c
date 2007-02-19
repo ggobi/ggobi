@@ -69,7 +69,7 @@ brush_undo_cb (GtkToggleButton * button, GGobiSession * gg)
   if (gg->cluster_ui.window != NULL)
     cluster_table_update (d, gg);
 
-  displays_plot (NULL, FULL, gg);
+  //displays_plot (NULL, FULL, gg);
 }
 
 static gchar *point_targets_lbl[] = {

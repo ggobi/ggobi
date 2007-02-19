@@ -1136,7 +1136,7 @@ class GGobi:Data:Factory:XML from GGobi:Data:Factory
             data->defaults.hidden = hidden;
           }
         else
-          GGOBI_STAGE_SET_ATTR_HIDDEN (d, i, hidden, ATTR_SET_PERSISTENT);
+          GGOBI_STAGE_SET_ATTR_HIDDEN (d, i, hidden, ATTR_SET_SAVE);
       }
 
     return (tmp != NULL);
@@ -1167,7 +1167,7 @@ class GGobi:Data:Factory:XML from GGobi:Data:Factory
         if (i < 0)
           data->defaults.color = value;
         else
-          GGOBI_STAGE_SET_ATTR_COLOR (d, i, value, ATTR_SET_PERSISTENT);
+          GGOBI_STAGE_SET_ATTR_COLOR (d, i, value, ATTR_SET_SAVE);
       }
 
     return (value != -1);
@@ -1288,9 +1288,9 @@ class GGobi:Data:Factory:XML from GGobi:Data:Factory
         GGOBI_STAGE_ATTR_INIT_ALL (d);
 
         if (type != -1)
-          GGOBI_STAGE_SET_ATTR_TYPE (d, i, type, ATTR_SET_PERSISTENT);
+          GGOBI_STAGE_SET_ATTR_TYPE (d, i, type, ATTR_SET_SAVE);
         if (size != -1)
-          GGOBI_STAGE_SET_ATTR_SIZE (d, i, size, ATTR_SET_PERSISTENT);
+          GGOBI_STAGE_SET_ATTR_SIZE (d, i, size, ATTR_SET_SAVE);
       }
 
 

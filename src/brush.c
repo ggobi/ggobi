@@ -230,22 +230,6 @@ brush_set_pos (gint x, gint y, splotd * sp)
   brush->y2 = y;
 }
 
-
-void
-brush_undo (GGobiStage * d)
-{
-  gint m;
-  g_return_if_fail(d);
-
-  GGOBI_STAGE_ATTR_INIT_ALL(d);  
-  for (m = 0; m < d->n_rows; m++) {
-    GGOBI_STAGE_RESET_ATTR_COLOR (d, m, ATTR_SET_PERSISTENT);
-    GGOBI_STAGE_RESET_ATTR_TYPE  (d, m, ATTR_SET_PERSISTENT);
-    GGOBI_STAGE_RESET_ATTR_SIZE  (d, m, ATTR_SET_PERSISTENT);
-    GGOBI_STAGE_RESET_ATTR_HIDDEN(d, m, ATTR_SET_PERSISTENT);
-  }
-}
-
 void
 reinit_transient_brushing (displayd * dsp, GGobiSession * gg)
 {
@@ -631,6 +615,22 @@ brush_flush(GGobiStage *d)
   ggobi_stage_update_col(d, ggobi_stage_get_col_index_for_name(d, "_hidden_now"));
   ggobi_stage_update_col(d, ggobi_stage_get_col_index_for_name(d, "_hidden_prev"));
   ggobi_stage_flush_changes(d);
+}
+
+void
+brush_undo (GGobiStage * d)
+{
+  gint m;
+  g_return_if_fail(d);
+
+  GGOBI_STAGE_ATTR_INIT_ALL(d);  
+  for (m = 0; m < d->n_rows; m++) {
+    GGOBI_STAGE_RESET_ATTR_COLOR (d, m, ATTR_SET_PERSISTENT);
+    GGOBI_STAGE_RESET_ATTR_TYPE  (d, m, ATTR_SET_PERSISTENT);
+    GGOBI_STAGE_RESET_ATTR_SIZE  (d, m, ATTR_SET_PERSISTENT);
+    GGOBI_STAGE_RESET_ATTR_HIDDEN(d, m, ATTR_SET_PERSISTENT);
+  }
+  brush_flush(d);
 }
 
 gboolean
