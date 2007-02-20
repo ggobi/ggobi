@@ -323,18 +323,16 @@ class GGobi:Pipeline:Message from G:Object {
     guint over;
     GSList *elements, *elements_shifted;
     
-    elements = self_get_removed_rows(other);
-    elements_shifted = self_shift_indices(elements, selfp->removed_rows, &over);
+    elements_shifted = self_shift_indices(selfp->removed_rows, 
+      other->_priv->removed_rows, &over);
     self_remove_rows(self, elements_shifted);
     selfp->n_added_rows -= over;
-    g_slist_free(elements);
     g_slist_free(elements_shifted);
     
-    elements = self_get_removed_cols(other);
-    elements_shifted = self_shift_indices(elements, selfp->removed_cols, &over);
+    elements_shifted = self_shift_indices(selfp->removed_cols, 
+      other->_priv->removed_cols, &over);
     self_remove_cols(self, elements_shifted);
     selfp->n_added_cols -= over;
-    g_slist_free(elements);
     g_slist_free(elements_shifted);
     
     elements = self_get_changed_cols(other);
@@ -348,19 +346,20 @@ class GGobi:Pipeline:Message from G:Object {
   /* utilities */
   
   private GSList *
-  shift_indices(GSList *indices, GGobiBitset *bs, guint *over)
+  shift_indices(GGobiBitset *first, GGobiBitset *second, guint *over)
   {
-    GSList *sorted = g_slist_sort(g_slist_copy(indices), index_compare), *shifted;
-    guint my_size = ggobi_bitset_get_size(bs);
-    GGobiBitset *clone = ggobi_bitset_clone(bs);
-    ggobi_bitset_insert_indices(clone, sorted);
-    shifted = ggobi_bitset_get_indices(clone);
-    g_slist_free(sorted);
-    g_object_unref(G_OBJECT(clone));
+    GSList *first_ind = ggobi_bitset_get_indices(first), *shifted, *ind;
+    guint my_size = ggobi_bitset_get_size(first);
+    second = ggobi_bitset_clone(second);
+    ggobi_bitset_set_size(second, my_size);
+    ggobi_bitset_insert_indices(second, first_ind);
+    shifted = ggobi_bitset_get_indices(second);
+    g_object_unref(G_OBJECT(second));
     *over = 0;
-    for (; indices; indices = indices->next)
-      if (GPOINTER_TO_INT(indices->data) >= my_size)
+    for (ind = first_ind; ind; ind = ind->next)
+      if (GPOINTER_TO_INT(ind->data) >= my_size)
         (*over)++;
+    g_slist_free(first_ind);
     return shifted;
   }
 }

@@ -145,7 +145,14 @@ hide_cluster_cb (GtkToggleButton * btn, gpointer cbd)
   clusters_set(d);
   cluster_table_labels_update (d, gg);
 
-  displays_plot (NULL, FULL, gg);
+  //if (changed) {
+    ggobi_stage_update_col(d, ggobi_stage_get_col_index_for_name(d, "_hidden"));
+    ggobi_stage_update_col(d, ggobi_stage_get_col_index_for_name(d, "_hidden_prev"));
+    ggobi_stage_update_col(d, ggobi_stage_get_col_index_for_name(d, "_hidden_now"));
+    ggobi_stage_flush_changes(d);
+  //}
+    
+  //displays_plot (NULL, FULL, gg);
 
   return false;
 }

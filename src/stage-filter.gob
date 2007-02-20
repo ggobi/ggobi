@@ -40,11 +40,11 @@ process_incoming(GGobi:Stage *stage, GGobiPipelineMessage *msg)
   guint rows_changed = ggobi_pipeline_message_get_n_added_rows(msg) + 
     ggobi_pipeline_message_get_n_removed_rows(msg);
   ggobi_pipeline_message_consume_rows(msg); /* we ignore any row changes */
-  PARENT_HANDLER(stage, msg);
   // FIXME: need to check whether filter column has been shifted or removed
   /* rows added, rows removed, or filter column changed: update filter */
   if (rows_changed || g_slist_find(changed_cols, GINT_TO_POINTER(filter_col)))
     self_process_filter(SELF(stage));
+  PARENT_HANDLER(stage, msg);
   g_slist_free(changed_cols);
 }
 
@@ -73,7 +73,7 @@ set_included(self, guint i, gboolean val)
 public void
 set_included_all(self, gboolean value) {
   gint i;
-  for (i = 0; i < GGOBI_STAGE(self)->n_rows; i++)
+  for (i = 0; i < GGOBI_STAGE(self)->parent->n_rows; i++)
     self_set_included(self, i, value);
 }
 

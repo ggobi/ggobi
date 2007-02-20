@@ -166,6 +166,8 @@ subset_cb (GtkWidget *w, GtkTreeSelection *tree_sel)
   if (!d)
     return;
 
+  ggobi_stage_subset_reset(d);
+  
   gtk_tree_selection_get_selected(tree_sel, &model, &iter);
   
   subset_type = 
@@ -218,8 +220,7 @@ include_all_cb (GtkWidget *w, GtkTreeSelection *tree_sel) {
   GGobiStageSubset *d = subset_ui_get_selected_stage(tree_sel);
 
   if (d != NULL) {
-    ggobi_stage_filter_set_included_all (GGOBI_STAGE_FILTER(d), true);
-    ggobi_stage_subset_apply (d);
+    ggobi_stage_subset_reset(d);
   }
 }
 
@@ -295,7 +296,6 @@ subset_window_open (GGobiSession *gg) {
         subset_ui_add_data(GTK_TREE_MODEL(model), GGOBI_STAGE(l->data));
       
       gtk_tree_model_iter_nth_child(GTK_TREE_MODEL(model), &first, NULL, 0);
-      gtk_tree_selection_select_iter(tree_sel, &first);
       
       gtk_container_add (GTK_CONTAINER (swin), tree_view);
       gtk_box_pack_start (GTK_BOX (vbox), swin, true, true, 2);
@@ -319,7 +319,7 @@ subset_window_open (GGobiSession *gg) {
       /*-- entry: random sample size --*/
       entry = gtk_entry_new ();
 	    gtk_label_set_mnemonic_widget(GTK_LABEL(label), entry);
-      g_object_set_data(G_OBJECT(gg->subset_ui.window), 
+      g_object_set_data(G_OBJECT(model), 
         "ggobi-subset-random", entry);
       gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), entry,
         "Type in the desired sample size", NULL);
@@ -332,7 +332,7 @@ subset_window_open (GGobiSession *gg) {
       /*-- entry: data size --*/
       entry = gtk_entry_new ();
 	    gtk_label_set_mnemonic_widget(GTK_LABEL(label), entry);
-      g_object_set_data(G_OBJECT(gg->subset_ui.window),
+      g_object_set_data(G_OBJECT(model),
         "ggobi-subset-nrows", entry);
       gtk_editable_set_editable (GTK_EDITABLE (entry), false);
       gtk_box_pack_start (GTK_BOX (hb), entry, true, true, 2);
@@ -398,7 +398,7 @@ subset_window_open (GGobiSession *gg) {
       gtk_container_add (GTK_CONTAINER (frame), vb);
 
       gtk_box_pack_start (GTK_BOX (vb),
-        gtk_label_new ("Exclude data outside the user limits\nin the variable manipulation table"),
+        gtk_label_new ("Currently disabled"),
         false, false, 0);
 
       label = gtk_label_new_with_mnemonic ("_Limits");
@@ -557,10 +557,12 @@ subset_window_open (GGobiSession *gg) {
       /*-- initialize display --*/
       populate_tree_view(tree_view, tree_view_titles, G_N_ELEMENTS(tree_view_titles), 
         true, GTK_SELECTION_BROWSE, G_CALLBACK(subset_ui_datad_set_cb), gg);
-      //subset_ui_display_update (GTK_TREE_MODEL(model), &first);
 
+      gtk_tree_selection_select_iter(tree_sel, &first);
+      
       if (g_slist_length (gg->d) > 1)
         gtk_widget_show_all (swin);
+      
       gtk_widget_show (vbox);
       gtk_widget_show_all (button_hbox);
       gtk_widget_show_all (close_hbox);

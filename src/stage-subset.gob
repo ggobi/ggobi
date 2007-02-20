@@ -29,6 +29,13 @@ apply (self) {
     cluster_table_update (GGOBI_STAGE(self), GGOBI_STAGE(self)->gg);
 }
 
+public void
+reset(self)
+{
+  ggobi_stage_filter_set_included_all(GGOBI_STAGE_FILTER(self), TRUE);
+  self_apply(self);
+}
+
 /*
  * This algorithm taken from Knuth, Seminumerical Algorithms;
  * Vol 2 of his series.
@@ -37,21 +44,24 @@ public gboolean
 random (self, gint n) {
   gint t, m, top = GGOBI_STAGE(self)->n_rows;
   gfloat rrand;
+  gboolean *included = g_new0(gboolean, top);
 
   ggobi_stage_filter_set_included_all(GGOBI_STAGE_FILTER(self), false);
-
+  
   if (n < 0 || n > top) 
     return false;
 
   for (t=0, m=0; t < top && m < n; t++) {
     rrand = (gfloat) randvalue ();
-    if (((top - t) * rrand) < (n - m) && 
-        !ggobi_stage_filter_is_included(GGOBI_STAGE_FILTER(self), t)) {
+    if (((top - t) * rrand) < (n - m) && !included[t]) {
       ggobi_stage_filter_set_included(GGOBI_STAGE_FILTER(self), t, true);
-      m++;            
+      included[t] = true;
+      m++;
     }
   }
 
+  g_free(included);
+  
   return true;
 }
 
@@ -81,7 +91,7 @@ block (self, gint bstart, gint bsize)
 public gboolean
 range (self)
 {
-  gint i, j;
+  /*gint i, j;
   gint subsetsize = 0;
   GGobiVariable *var;
   gboolean add;
@@ -109,7 +119,8 @@ range (self)
   if (subsetsize == 0)
     quick_message ("Use the variable manipulation panel to set ranges.", false);
  
-  return (subsetsize > 0);
+  return (subsetsize > 0);*/
+  return false;
 }
 
 public gboolean
