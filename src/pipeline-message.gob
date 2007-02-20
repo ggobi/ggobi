@@ -175,9 +175,19 @@ class GGobi:Pipeline:Message from G:Object {
     ggobi_bitset_foreach(selfp->removed_cols, func, data);
   }
   public void
+  removed_cols_foreach_reverse(self, GGobiIndexFunc func, gpointer data)
+  {
+    ggobi_bitset_foreach_reverse(selfp->removed_cols, func, data);
+  }
+  public void
   removed_rows_foreach(self, GGobiIndexFunc func, gpointer data)
   {
     ggobi_bitset_foreach(selfp->removed_rows, func, data);
+  }
+  public void
+  removed_rows_foreach_reverse(self, GGobiIndexFunc func, gpointer data)
+  {
+    ggobi_bitset_foreach_reverse(selfp->removed_rows, func, data);
   }
   public void
   added_rows_foreach(self, GGobiIndexFunc func, gpointer data)

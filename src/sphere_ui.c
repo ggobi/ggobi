@@ -166,7 +166,7 @@ sphere_apply_cb (GtkWidget * w, GGobiSession * gg)
     else {
       /*-- set up the variables into which sphered data will be written --*/
       if (spherize_set_pcvars (d, gg)) {
-
+g_debug("sphering");
         /*
          * sphere the variables in d->sphere.vars
          * into the variables in d->sphere.pcvars

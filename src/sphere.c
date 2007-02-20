@@ -565,6 +565,10 @@ spherize_data (vector_i * svars, vector_i * pcvars, GGobiStage * d,
       ggobi_stage_set_raw_value(d, m, pcvars->els[j], b[j]);
   }
 
+  for (j = 0; j < pcvars->nels; j++)
+    ggobi_stage_update_col(d, pcvars->els[j]);
+  ggobi_stage_flush_changes(d);
+    
   g_free (b);
 }
 

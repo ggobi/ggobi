@@ -311,10 +311,20 @@ vartable_removed_col_foreach (guint j, GGobiStage *d)
 {
   GtkTreeModel *model = d->vartable_tree_model;
   GtkTreeIter iter;
+  guint n_rows = gtk_tree_model_iter_n_children(model, NULL);
   GtkTreePath *path = gtk_tree_path_new_from_indices (j, -1);
+  g_debug("removing %d", j);
   gtk_tree_model_get_iter (model, &iter, path);
   gtk_tree_store_remove (GTK_TREE_STORE (model), &iter);
   gtk_tree_path_free (path);
+}
+
+static void
+vartable_added_col_foreach (guint j, GGobiStage *d)
+{
+  g_debug("adding %d", j);
+  vartable_row_append(j, d);
+  vartable_cells_set_by_var(j, d);
 }
 
 static void
@@ -322,8 +332,10 @@ vartable_stage_changed_cb (GGobiStage *s, GGobiPipelineMessage *msg, gpointer us
 {
   ggobi_pipeline_message_changed_cols_foreach(msg, 
     (GGobiIndexFunc)vartable_changed_col_foreach, s);
-  ggobi_pipeline_message_removed_cols_foreach(msg, 
+  ggobi_pipeline_message_removed_cols_foreach_reverse(msg, 
     (GGobiIndexFunc)vartable_removed_col_foreach, s);
+  ggobi_pipeline_message_added_cols_foreach(msg, 
+    (GGobiIndexFunc)vartable_added_col_foreach, s);
 }
 
 static void
