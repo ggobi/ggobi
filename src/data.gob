@@ -377,7 +377,9 @@ reset_rows(self, guint start, guint end) {
  * Add n empty columns to the dataset.
  * Returns: index of first new column
  **/ 
- // FIXME: Most of this should happen in the outgoing message handler
+ // FIXME: This function and its siblings should probably be moved to GGobiStage,
+ // and be written looking to _update_cols(). The function bodies should then
+ // be moved to the outgoing message handler of GGobiData.
 public guint 
 add_cols(self, guint n) {
   guint nprev = GGOBI_STAGE(self)->n_cols;

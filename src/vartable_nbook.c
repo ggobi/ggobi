@@ -309,12 +309,11 @@ vartable_changed_col_foreach (guint j, GGobiStage *s)
 static void
 vartable_removed_col_foreach (guint j, GGobiStage *d)
 {
-  GtkTreeModel *model;
+  GtkTreeModel *model = d->vartable_tree_model;
   GtkTreeIter iter;
   GtkTreePath *path = gtk_tree_path_new_from_indices (j, -1);
-  model = gtk_tree_view_get_model(GTK_TREE_VIEW(d->vartable_tree_view[ggobi_stage_get_col_type(d, j)]));
   gtk_tree_model_get_iter (model, &iter, path);
-  gtk_list_store_remove (GTK_LIST_STORE (model), &iter);
+  gtk_tree_store_remove (GTK_TREE_STORE (model), &iter);
   gtk_tree_path_free (path);
 }
 
