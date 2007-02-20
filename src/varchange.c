@@ -121,7 +121,7 @@ delete_vars (gint *cols_arr, gint ncols, GGobiStage * d)
   
   for (j = 0; j < ncols; j++)
     cols = g_slist_prepend(cols, GINT_TO_POINTER(cols_arr[j]));
-  g_slist_reverse(cols);
+  cols = g_slist_reverse(cols);
   
   /*
    * If one of the variables to be deleted is currently plotted,

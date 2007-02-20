@@ -118,7 +118,6 @@ brush_all_matching_cv (cpaneld * cpanel, GGobiStage * d, GGobiSession * gg)
 			/* undo all transient brushing ? */
 		}
 	}
-  }
 
   vectorb_free (&levelv);
 
