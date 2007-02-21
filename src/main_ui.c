@@ -1323,7 +1323,7 @@ load_previous_file (GtkAction * action, gpointer cbd)
 void
 show_plugin_list (GGobiSession * gg)
 {
-  if (sessionOptions->info && sessionOptions->info->plugins)
+  /*if (sessionOptions->info && sessionOptions->info->plugins)*/
     showPluginInfo (sessionOptions->info->plugins, (GGobiSession *) gg);
 }
 

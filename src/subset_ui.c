@@ -470,7 +470,7 @@ subset_window_open (GGobiSession *gg) {
       /*---------------------------------------------------------*/
       /*-- Cases whose row label includes the specified string --*/
       /*---------------------------------------------------------*/
-      frame = gtk_frame_new ("Cases with specified row label");
+      frame = gtk_frame_new ("Cases with specified row id");
       gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
 
       vb = gtk_vbox_new (false, 5);
@@ -484,8 +484,7 @@ subset_window_open (GGobiSession *gg) {
 
       entry = gtk_entry_new ();
       gtk_label_set_mnemonic_widget(GTK_LABEL(label), entry);
-      g_object_set_data(G_OBJECT(gg->subset_ui.window),
-        "ggobi-filter-rowlab", entry);
+      g_object_set_data(G_OBJECT(model), "ggobi-subset-rowlab", entry);
       gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), entry,
         "Type in a string to specify the cases you want in the subset",
         NULL);
@@ -503,12 +502,11 @@ subset_window_open (GGobiSession *gg) {
         G_CALLBACK(subset_ui_string_pos_cb), tree_sel);
 
       btn = gtk_check_button_new_with_mnemonic ("_Ignore case");
-      g_object_set_data(G_OBJECT(gg->subset_ui.window),
-        "ggobi-subset-casefold", btn);
+      g_object_set_data(G_OBJECT(model), "ggobi-subset-casefold", btn);
       gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(btn), true);
       gtk_box_pack_start (GTK_BOX (hb), btn, false, false, 0);
 
-      label = gtk_label_new_with_mnemonic ("R_ow label");
+      label = gtk_label_new_with_mnemonic ("R_ow id");
       gtk_notebook_append_page (GTK_NOTEBOOK (nbook),
         frame, label);
 

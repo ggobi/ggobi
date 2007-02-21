@@ -149,13 +149,14 @@ sticky (self)
 {
   gint id;
   GSList *l;
+  GGobiStage *last = ggobi_stage_find(GGOBI_STAGE(self), GGOBI_MAIN_STAGE_TRANSFORM);
 
-  if (g_slist_length (GGOBI_STAGE(self)->sticky_ids) == 0)
+  if (g_slist_length (last->sticky_ids) == 0)
     return false;
     
   ggobi_stage_filter_set_included_all(GGOBI_STAGE_FILTER(self), false);
 
-  for (l = GGOBI_STAGE(self)->sticky_ids; l; l = l->next) {
+  for (l = last->sticky_ids; l; l = l->next) {
     id = GPOINTER_TO_INT (l->data);
     if (id < GGOBI_STAGE(self)->n_rows)
       ggobi_stage_filter_set_included(GGOBI_STAGE_FILTER(self), id, true);
