@@ -60,7 +60,10 @@ class GGobi:Renderer:Cairo from GGobi:Renderer
     if (!surf)
       //surf = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, width, height);
       cr = gdk_cairo_create(target);
-    else cr = cairo_create(surf);
+    else {
+      cr = cairo_create(surf);
+      cairo_surface_destroy(surf);
+    }
     return cr;
   }
   
@@ -340,7 +343,7 @@ class GGobi:Renderer:Cairo from GGobi:Renderer
     /* cleanup */
     glitz_drawable_destroy(glitz_d);
     glitz_surface_destroy(glitz_s);
-    
+g_debug("you got da glitz love");    
     return (cairo_s);
     #else
     return NULL;
