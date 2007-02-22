@@ -23,8 +23,8 @@
 #include "ggobi-stage-subset.h"
 
 typedef enum { 
-  GGOBI_SUBSET_RANDOM, GGOBI_SUBSET_BLOCK, GGOBI_SUBSET_RANGE,
-  GGOBI_SUBSET_EVERYN, GGOBI_SUBSET_STICKY, GGOBI_SUBSET_ROWLAB 
+  GGOBI_SUBSET_RANDOM, GGOBI_SUBSET_BLOCK, /*GGOBI_SUBSET_RANGE,*/
+  GGOBI_SUBSET_EVERYN, /*GGOBI_SUBSET_STICKY,*/ GGOBI_SUBSET_ROWLAB 
 } GGobiSubsetType;
 
 static void
@@ -187,17 +187,17 @@ subset_cb (GtkWidget *w, GtkTreeSelection *tree_sel)
       redraw = ggobi_stage_subset_block (d, gtk_adjustment_get_value(bstart)-1, 
         gtk_adjustment_get_value(bsize));
     break;
-    case GGOBI_SUBSET_RANGE:
+    /*case GGOBI_SUBSET_RANGE:
       redraw = ggobi_stage_subset_range (d);
-    break;
+    break;*/
     case GGOBI_SUBSET_EVERYN:
       gtk_tree_model_get(model, &iter, 5, &estart, 6, &estep, -1);
       redraw = ggobi_stage_subset_everyn (d, gtk_adjustment_get_value(estart)-1, 
         gtk_adjustment_get_value(estep));
     break;
-    case GGOBI_SUBSET_STICKY:
+    /*case GGOBI_SUBSET_STICKY:
       redraw = ggobi_stage_subset_sticky (d);
-    break;
+    break;*/
     case GGOBI_SUBSET_ROWLAB:
       /* use a toggle widget to specify whether to ignore case or not */
       entry = (GtkWidget *)
@@ -391,7 +391,7 @@ subset_window_open (GGobiSession *gg) {
       /*---------------------------*/
       /*-- Points within a range --*/
       /*---------------------------*/
-      frame = gtk_frame_new ("Variable limits");
+      /*frame = gtk_frame_new ("Variable limits");
       gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
 
       vb = gtk_vbox_new (false, 2);
@@ -402,7 +402,7 @@ subset_window_open (GGobiSession *gg) {
         false, false, 0);
 
       label = gtk_label_new_with_mnemonic ("_Limits");
-      gtk_notebook_append_page (GTK_NOTEBOOK (nbook), frame, label);
+      gtk_notebook_append_page (GTK_NOTEBOOK (nbook), frame, label);*/
 
       /*--------------------*/
       /*-- Every nth case --*/
@@ -453,7 +453,7 @@ subset_window_open (GGobiSession *gg) {
       /*-------------------------------------------------------*/
       /*-- Cases whose row label is one of the sticky labels --*/
       /*-------------------------------------------------------*/
-      frame = gtk_frame_new ("Cases whose row label is sticky");
+      /*frame = gtk_frame_new ("Cases whose row label is sticky");
       gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
       //gtk_widget_set_usize (frame, 100, 75);
 
@@ -465,7 +465,7 @@ subset_window_open (GGobiSession *gg) {
         false, false, 0);
 
       label = gtk_label_new_with_mnemonic ("S_ticky");
-      gtk_notebook_append_page (GTK_NOTEBOOK (nbook), frame, label);
+      gtk_notebook_append_page (GTK_NOTEBOOK (nbook), frame, label);*/
 
       /*---------------------------------------------------------*/
       /*-- Cases whose row label includes the specified string --*/
