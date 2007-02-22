@@ -782,7 +782,7 @@ display_tailpipe (displayd * display, RedrawStyle type, GGobiSession * gg)
     if (GGOBI_IS_EXTENDED_SPLOT (sp)) {
       GGobiExtendedSPlotClass *klass = GGOBI_EXTENDED_SPLOT_GET_CLASS (sp);
       if (klass->alloc_whiskers)
-        sp->whiskers = klass->alloc_whiskers (sp->whiskers, sp);
+        sp->whiskers = klass->alloc_whiskers (sp->whiskers, display->d);
       /*-- each plot type should have its own realloc routines --*/
       if (GGOBI_IS_BARCHART_SPLOT (sp)) {
         barchartSPlotd *bsp = GGOBI_BARCHART_SPLOT (sp);

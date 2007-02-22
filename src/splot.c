@@ -399,7 +399,7 @@ splot_alloc (splotd *sp, displayd *display, GGobiSession *gg)
     GGobiExtendedSPlotClass *klass;
     klass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);
     if(klass->alloc_whiskers)
-      sp->whiskers = klass->alloc_whiskers(sp->whiskers, sp);
+      sp->whiskers = klass->alloc_whiskers(sp->whiskers, d);
   }
 }
 

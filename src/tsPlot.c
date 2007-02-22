@@ -31,7 +31,7 @@ static gboolean tsDrawCase_p(splotd *sp, gint m, GGobiStage *d, GGobiSession *gg
 static void tsAddPlotLabels(splotd *sp, GdkDrawable *drawable, GGobiSession *gg) ;
 static void tsWithinDrawBinned(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc);
 static void tsShowWhiskers(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc);
-static GdkSegment * tsAllocWhiskers(GdkSegment *, splotd *sp);
+static GdkSegment * tsAllocWhiskers(GdkSegment *, GGobiStage *d);
 static gchar *tsTreeLabel(splotd *sp, GGobiStage *d, GGobiSession *gg);
 
 
@@ -127,9 +127,9 @@ tsShowWhiskers(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc)
 
 
 GdkSegment * 
-tsAllocWhiskers(GdkSegment *whiskers, splotd *sp)
+tsAllocWhiskers(GdkSegment *whiskers, GGobiStage *d)
 {
-  return((GdkSegment *) g_realloc (whiskers, sp->displayptr->d->n_rows-1 * sizeof (GdkSegment)));
+  return((GdkSegment *) g_realloc (whiskers, d->n_rows-1 * sizeof (GdkSegment)));
 }
 
 gchar *

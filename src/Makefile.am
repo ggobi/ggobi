@@ -42,7 +42,7 @@ pkginclude_HEADERS = GGobiAPI.h ggobiClass.h tour1d_pp.h GGobiApp.h \
   barchartDisplay.h plugin.h tsPlot.h brushing.h tsdisplay.h \
   colorscheme.h types.h config.h read_init.h vars.h cpanel.h \
   varseldata.h defines.h scatmatClass.h display.h \
-  scatterplotClass.h display_tree.h splash.h write_xml.h ggobi-intl.h \
+  scatterplotClass.h display_tree.h write_xml.h ggobi-intl.h \
   externs.h splot.h writedata.h fileio.h testEvents.h ggobi.h tour.h \
   $(libggobi_la_GOBHEADERS) GGStructSizes.c marshal.h
 

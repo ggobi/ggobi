@@ -260,9 +260,9 @@ treeLabel (splotd * splot, GGobiStage * d, GGobiSession * gg)
 }
 
 static GdkSegment *
-allocWhiskers (GdkSegment * whiskers, splotd * sp)
+allocWhiskers (GdkSegment * whiskers, GGobiStage *d)
 {
-  return ((GdkSegment *) g_realloc (whiskers, 2 * sp->displayptr->d->n_rows * sizeof (GdkSegment)));
+  return ((GdkSegment *) g_realloc (whiskers, 2 * d->n_rows * sizeof (GdkSegment)));
 }
 
 void

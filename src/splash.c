@@ -20,8 +20,6 @@
 #include "vars.h"
 #include "externs.h"
 
-#include "splash.h"
-
 #include "config.h"
 
 void
@@ -69,6 +67,7 @@ splash_show (GGobiSession * gg)
   GtkWidget *ebox = gtk_event_box_new ();
   GtkWidget *hbox = gtk_vbox_new (false, 0);
   
+  gtk_window_set_title(GTK_WINDOW(window), "About GGobi");
   gtk_window_set_default_size(GTK_WINDOW(window), 300, 300);
   
   gtk_container_add(GTK_CONTAINER(window), ebox);
