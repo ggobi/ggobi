@@ -402,7 +402,7 @@ paint_points (cpaneld * cpanel, GGobiStage * d, GGobiSession * gg)
   }
 
   // FIXME: is there a reason we always return true here? it seems inefficient
-  return true;
+  return d->nrows_under_brush_prev || d->nrows_under_brush;
 }
 
 
