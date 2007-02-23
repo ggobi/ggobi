@@ -4,7 +4,7 @@
 %{
   #define BITS_PER_CHUNK 8
   #define N_BITS self->bits->len * BITS_PER_CHUNK
-  
+
   /* we use these macros internally for speed */
   #define SET_BIT(i, v) \
     self->bits->data[(i) / BITS_PER_CHUNK] |= (v) << ((i) % BITS_PER_CHUNK)
@@ -14,19 +14,33 @@
 /* For storing lists of indices, in addition to pure bit ops */
 /* Some of this code was "inspired" by the bitsets in mono and java.util */
 class GGobi:Bitset from G:Object {
-  
-  protected GByteArray *bits = { g_byte_array_new() } destroy { 
+
+  protected GByteArray *bits = { g_byte_array_new() } destroy {
     g_byte_array_free(VAR, TRUE);
   };
-  
-  /* creation */
-  
+
+  /**
+   * ggobi_bitset_new:
+   *
+   * Create a new, zero-length bitset
+   *
+   * Returns: the newly created bitset
+  */
   public GGobiBitset *
   new(void)
   {
     GObject *obj = (GObject *)GET_NEW;
     return GGOBI_BITSET(obj);
   }
+
+  /**
+   * ggobi_bitset_new_with_size:
+   * @size: the size (in bits) of the bitset
+   *
+   * Create a new bitset of the specified length.
+   *
+   * Returns: the newly created bitset
+  */
   public GGobiBitset *
   new_with_size(guint size)
   {
@@ -34,7 +48,15 @@ class GGobi:Bitset from G:Object {
     self_set_size(bs, size);
     return bs;
   }
-  
+
+  /**
+   * ggobi_bitset_clone:
+   * @self: the bitset to clone
+   *
+   * Create a new bitset with the same length and content as the given bitset
+   *
+   * Returns: a clone of the given bitset
+  */
   public virtual GGobiBitset *
   clone(self)
   {
@@ -43,9 +65,9 @@ class GGobi:Bitset from G:Object {
       other->bits->data[i] = self->bits->data[i];
     return other;
   }
-  
+
   /* size management */
-  
+
   public void
   set_size(self, guint size)
   {
@@ -60,12 +82,12 @@ class GGobi:Bitset from G:Object {
   {
     return self->bits->len * BITS_PER_CHUNK;
   }
-  
+
   /* index operations */
-  
+
   /* the indices must be sorted for insertion and removal */
   // FIXME: Do we want to sort here?
-  
+
   public void
   remove_indices(self, GSList *indices)
   {
@@ -111,7 +133,7 @@ class GGobi:Bitset from G:Object {
         gint msb = g_bit_nth_msf(byte, -1);
         gint lsb = -1;
         while(lsb != msb) {
-          lsb = g_bit_nth_lsf(byte, lsb); 
+          lsb = g_bit_nth_lsf(byte, lsb);
           indices = g_slist_prepend(indices, GINT_TO_POINTER(lsb + i * BITS_PER_CHUNK));
         }
       }
@@ -126,7 +148,7 @@ class GGobi:Bitset from G:Object {
     };
     guint i, count = 0;
     /* there has been talk about to adding this functionality to GLib,
-       except much faster (asm based) 
+       except much faster (asm based)
     */
     for (i = 0; i < self->bits->len; i++) {
       guchar b = self->bits->data[i];
@@ -151,9 +173,9 @@ class GGobi:Bitset from G:Object {
     g_slist_foreach(indices, (GFunc)func, data);
     g_slist_free(indices);
   }
-  
+
   /* pure bit operations */
-  
+
   public void
   clear(self)
   {
@@ -176,7 +198,7 @@ class GGobi:Bitset from G:Object {
   {
     return TEST_BIT(i);
   }
-  
+
   /* set operations */
   // TODO: not, and, or, xor, subtract, subset
 }
