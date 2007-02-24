@@ -1,0 +1,80 @@
+<!-- ##### SECTION Title ##### -->
+GGobiRenderer
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT GGobiRenderer ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG GGobiRenderer:parent ##### -->
+<para>
+
+</para>
+
+<!-- ##### STRUCT GGobiRendererClass ##### -->
+<para>
+
+</para>
+
+@__parent__: 
+@create_target: 
+@buffer: 
+@flush: 
+
+<!-- ##### FUNCTION ggobi_renderer_buffer ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_renderer_flush ##### -->
+<para>
+
+</para>
+
+@self: 
+@gc: 
+@xsrc: 
+@ysrc: 
+@xdest: 
+@ydest: 
+@width: 
+@height: 
+
+
+<!-- ##### MACRO GGOBI_RENDERER_PROP_PARENT ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+
+<!-- ##### MACRO GGOBI_RENDERER_GET_PROP_PARENT ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+

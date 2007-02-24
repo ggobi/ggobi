@@ -51,9 +51,6 @@ typedef struct _GGobiDisplayClass
 
 } GGobiDisplayClass;
 
-/**
-
- */
 struct _displayd {
   GtkVBox vbox;
 
@@ -221,7 +218,7 @@ gboolean isEmbeddedDisplay(displayd *dpy);
 
 
 
-/**
+/*
  This is used as a trivial class for its type information so that we
  can detect whether we have one of the new style classes.  We might
  remove it when we are finished the construction.

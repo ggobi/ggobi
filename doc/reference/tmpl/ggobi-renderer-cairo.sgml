@@ -1,0 +1,60 @@
+<!-- ##### SECTION Title ##### -->
+GGobiRendererCairo
+
+<!-- ##### SECTION Short_Description ##### -->
+Renders using the cairo vector graphics library
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+This renderer uses the cairo library to render antialiased graphics. At the moment,
+it will use the hardware accelerated glitz backend, if the hardware supports
+pbuffers. Unfortunately, cairo rendering is often too slow for interactive graphics.
+However, by specifying a custom cairo surface as #GGobiRendererCairo::cairo, 
+one can render to PDF, PS, SVG, and PNG files, as well as to a printer.
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+Unstable
+
+<!-- ##### STRUCT GGobiRendererCairo ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG GGobiRendererCairo:cairo ##### -->
+<para>
+
+</para>
+
+<!-- ##### STRUCT GGobiRendererCairoClass ##### -->
+<para>
+
+</para>
+
+@__parent__: 
+@create_cairo: 
+
+<!-- ##### FUNCTION ggobi_renderer_cairo_get_cairo ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_renderer_cairo_set_cairo ##### -->
+<para>
+
+</para>
+
+@self: 
+@val: 
+
+

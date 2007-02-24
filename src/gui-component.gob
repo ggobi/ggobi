@@ -12,7 +12,7 @@ class GGobi:GUI:Component from Gtk:VBox {
   //FIXME: just specifying G:Object here until GGobiSession is refactored
   property OBJECT gg
   (nick = "ggobi", blurb = "The context in which this component exists",
-    flags = CONSTRUCT_ONLY, object_type = G:Object)
+    flags = CONSTRUCT_ONLY, object_type = GGobi:Session)
   set {
     GGobiSession *gg = g_value_get_object(VAL);
     g_return_if_fail(gg != NULL);

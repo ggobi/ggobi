@@ -1,0 +1,149 @@
+<!-- ##### SECTION Title ##### -->
+GGobiInputSource
+
+<!-- ##### SECTION Short_Description ##### -->
+Provides a #GsfInput
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+A #GGobiInputSource holds metadata (such as the URI and format) about an external
+source of data and optionally provides a #GsfInput for reading the data. The
+functionality is optional, because data is not always easily translated into
+an input stream. This of course requires that the client be aware of the
+alternative means of retrieving data from the #GGobiInputSource.
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+Unstable
+
+<!-- ##### STRUCT GGobiInputSource ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG GGobiInputSource:display-name ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG GGobiInputSource:logical-mode ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG GGobiInputSource:physical-mode ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG GGobiInputSource:uri ##### -->
+<para>
+
+</para>
+
+<!-- ##### STRUCT GGobiInputSourceClass ##### -->
+<para>
+
+</para>
+
+@__parent__: 
+@get_raw_input: 
+
+<!-- ##### FUNCTION ggobi_input_source_get_uri ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_input_source_set_uri ##### -->
+<para>
+
+</para>
+
+@self: 
+@val: 
+
+
+<!-- ##### FUNCTION ggobi_input_source_get_logical_mode ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_input_source_set_logical_mode ##### -->
+<para>
+
+</para>
+
+@self: 
+@val: 
+
+
+<!-- ##### FUNCTION ggobi_input_source_get_physical_mode ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_input_source_set_physical_mode ##### -->
+<para>
+
+</para>
+
+@self: 
+@val: 
+
+
+<!-- ##### FUNCTION ggobi_input_source_get_display_name ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_input_source_set_display_name ##### -->
+<para>
+
+</para>
+
+@self: 
+@val: 
+
+
+<!-- ##### FUNCTION ggobi_input_source_get_input ##### -->
+<para>
+
+</para>
+
+@self: 
+@error: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_input_source_get_raw_input ##### -->
+<para>
+
+</para>
+
+@self: 
+@error: 
+@Returns: 
+
+

@@ -1,0 +1,41 @@
+<!-- ##### SECTION Title ##### -->
+GGobiDataFactoryXML
+
+<!-- ##### SECTION Short_Description ##### -->
+Create a #GGobiData from GGobi XML data
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+Parses the GGobi XML format and creates a #GGobiData. Please see the GGobi
+manual for an explanation of the format.
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+Unstable
+
+<!-- ##### STRUCT GGobiDataFactoryXML ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT GGobiDataFactoryXMLClass ##### -->
+<para>
+
+</para>
+
+@__parent__: 
+
+<!-- ##### FUNCTION ggobi_data_factory_xml_new ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+

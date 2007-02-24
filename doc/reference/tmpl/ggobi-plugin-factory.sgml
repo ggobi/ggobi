@@ -1,0 +1,55 @@
+<!-- ##### SECTION Title ##### -->
+GGobiPluginFactory
+
+<!-- ##### SECTION Short_Description ##### -->
+Creates a GGobiPlugin from an XML description
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+#GGobiPluginFactory instances encapsulate the logic of parsing an XML description
+and creating a #GGobiPlugin. By default, the GGobi plugin XML format is supported,
+but one can imagine extensions of that format for describing new types of plugins,
+such as those that exist in other languages.
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+Unstable
+
+<!-- ##### STRUCT GGobiPluginFactory ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT GGobiPluginFactoryClass ##### -->
+<para>
+
+</para>
+
+@__parent__: 
+@create: 
+
+<!-- ##### FUNCTION ggobi_plugin_factory_new ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_plugin_factory_create ##### -->
+<para>
+
+</para>
+
+@self: 
+@node: 
+@doc: 
+@Returns: 
+
+

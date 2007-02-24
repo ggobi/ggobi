@@ -1,0 +1,113 @@
+<!-- ##### SECTION Title ##### -->
+GGobiTransform
+
+<!-- ##### SECTION Short_Description ##### -->
+Transforms a vector
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+A #GGobiTransform is given a vector of raw values and returns a vector of 
+transformed values.
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT GGobiTransform ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT GGobiTransformClass ##### -->
+<para>
+
+</para>
+
+@__parent__: 
+@forward: 
+@reverse: 
+@variable_name: 
+@get_name: 
+@get_description: 
+@compare: 
+
+<!-- ##### FUNCTION ggobi_transform_forward ##### -->
+<para>
+
+</para>
+
+@self: 
+@vals: 
+@n: 
+@var: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_transform_reverse ##### -->
+<para>
+
+</para>
+
+@self: 
+@vals: 
+@n: 
+@var: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_transform_variable_name ##### -->
+<para>
+
+</para>
+
+@self: 
+@name: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_transform_column ##### -->
+<para>
+
+</para>
+
+@self: 
+@stage: 
+@first_row: 
+@j: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_transform_get_name ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_transform_get_description ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_transform_compare ##### -->
+<para>
+
+</para>
+
+@self: 
+@other: 
+@Returns: 
+
+

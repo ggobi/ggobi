@@ -4,7 +4,7 @@
 void ggobi_app_class_init (GGobiAppClass * klass);
 void ggobi_app_init (GGobiApp * app);
 
-/**
+/*
   This registers and returns a unique GType representing
   the ggobi app class.
  */

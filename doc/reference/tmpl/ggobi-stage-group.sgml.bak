@@ -1,0 +1,70 @@
+<!-- ##### SECTION Title ##### -->
+GGobiStageGroup
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### MACRO GGOBI_STAGE_GROUP_CONST ##### -->
+<para>
+
+</para>
+
+@obj: 
+
+
+<!-- ##### STRUCT GGobiStageGroupPrivate ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION ggobi_stage_group_new ##### -->
+<para>
+
+</para>
+
+@parent: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_group_get_factors ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_group_insert_factor ##### -->
+<para>
+
+</para>
+
+@self: 
+@factor: 
+@pos: 
+
+
+<!-- ##### FUNCTION ggobi_stage_group_remove_factor ##### -->
+<para>
+
+</para>
+
+@self: 
+@factor: 
+
+

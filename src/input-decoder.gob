@@ -3,9 +3,27 @@
 %}
 class GGobi:Input:Decoder from G:Object (abstract)
 {
+  /**
+   * decode:
+   * @self: a #GGobiInputDecoder
+   * @source: the input stream to decode
+   *
+   * Decodes the given input stream into a new input stream.
+   *
+   * Returns: #GsfInput with decoded data, %NULL if decoding failed.
+   */
   virtual GsfInput *
   decode(self, Gsf:Input *source);
   
+  /**
+   * get_decoded_file_exts:
+   * @self: a #GGobiInputDecoder
+   *
+   * Lists the file extensions corresponding to the encoding types supported
+   * by this decoder.
+   *
+   * Returns: #GSList of extension strings
+   */
   virtual GSList *
   get_decoded_file_exts(self);
 }

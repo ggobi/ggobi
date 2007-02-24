@@ -86,6 +86,13 @@ new(guint nrows, guint ncols)
 // GGobiData that participates in _G_Gobi, regardless of source.
 // Thus, this should probably be done when the GGobiData is added to the 
 // GGobiApp (GGobiSession) object.
+  /**
+   * add_attributes:
+   * @self: a #GGobiData
+   *
+   * Add the default GGobi attributes to a dataset. This will go away soon.
+   *
+   */
 public void
 add_attributes(self) {
   GGobiStage *stage = GGOBI_STAGE(self);
@@ -120,8 +127,8 @@ add_attributes(self) {
 /**
  * add_attribute:
  * @self: GGobiData object
- * @i: attribute name (should begin with _)
- * @j: default value
+ * @name: attribute name (should begin with _)
+ * @value: default value
  *
  * Adds a new attribute column with specified name and default value.
  **/
@@ -146,6 +153,15 @@ add_attribute(self, const gchar* name, gdouble value) {
   vt->is_attribute = true;
 }
 
+  /**
+   * set_col_default_value:
+   * @self: a #GGobiData
+   * @j: column index
+   * @value: default value for the column
+   *
+   * When a new row is added, its column needs a default value.
+   *
+   */
 public void 
 set_col_default_value(self, guint j, gdouble value)
 {
@@ -153,6 +169,15 @@ set_col_default_value(self, guint j, gdouble value)
   ggobi_variable_set_default_value(vt, value);
 }
 
+  /**
+   * get_col_default_value:
+   * @self: a #GGobiData
+   * @j: column index
+   *
+   * Gets the default value for the column.
+   *
+   * Returns: default value
+   */
 public gdouble
 get_col_default_value(self, guint j)
 {
@@ -160,18 +185,6 @@ get_col_default_value(self, guint j)
   return ggobi_variable_get_default_value(vt);
 }
 
-
-
-/**
- * set_missing:
- * @self: GGobiData object
- * @i: row index
- * @j: column index
- *
- * Set specified cell to be a missing value.  
- * If the variable is categorical, a new level value ("MISSING")
- * will be created, and the raw value set to that.
- **/
 override (GGobi:Stage) void
 set_missing(GGobi:Stage *self (check null type), guint i, guint j)
 {
@@ -184,36 +197,12 @@ set_missing(GGobi:Stage *self (check null type), guint i, guint j)
   SELF(self)->missing.vals[i][j] = 1;
 }
 
-
-/**
- * is_missing:
- * @self: GGobiData object
- * @i: row index
- * @j: column index
- *
- * Returns: if value at specified position is missing or not
- **/
 override (GGobi:Stage) gboolean
 is_missing(GGobi:Stage *self, guint i, guint j) 
 {
   return (SELF(self)->missing.vals[i][j] == 1);  
 }
 
-/**
- * set_raw_value:
- * @self: GGobiData object
- * @i: row index
- * @j: column index
- * @values: vector of new values, of length self->nrows
- * 
- * Sets a single value in the specified column.  
- *
- * This will set missing values if necessary and sets
- * tform value as well to keep dataset consistent.
- *
- * You need to manually emits self_col_data_changed() signal after
- * using this function if you want the data to continue down the pipeline.
- **/
 override (GGobi:Stage) void
 set_raw_value(GGobi:Stage *self (check null type), guint i, guint j, gdouble value)
 {
@@ -225,18 +214,21 @@ set_raw_value(GGobi:Stage *self (check null type), guint i, guint j, gdouble val
   }
 }
 
-/** 
- * get_raw_value:
- * @self: #GGobiData
- * @i: row index
- * @j: column index
- **/
 override (GGobi:Stage) gdouble
 get_raw_value(GGobi:Stage *self (check null type), guint i, guint j)
 {
   return SELF(self)->raw.vals[i][j];
 }
 
+  /**
+   * set_col_type:
+   * @self: a #GGobiData
+   * @j: column index
+   * @value: the type of the column
+   *
+   * Sets the column type.
+   *
+   */
 public void 
 set_col_type(self, guint j, GGobiVariableType value)
 {
@@ -256,16 +248,6 @@ get_edge_data (GGobiStage *self)
   return &(SELF(self)->edge);
 }
 
-/** 
- * set_row_id:
- * @self: #GGobiData object
- * @i: row
- * @value: new string value for row id
- *
- * Set the row id (a string) for specified row
- * A row id is a unique string reference to a given row.
- * These are hashed for O(1) lookup.
- **/ 
 override (GGobi:Stage) void
 set_row_id(GGobiStage *self, guint i, gchar* value) {
   if (value == NULL)
@@ -274,14 +256,6 @@ set_row_id(GGobiStage *self, guint i, gchar* value) {
   g_hash_table_replace (SELF(self)->idTable, SELF(self)->rowIds[i], GINT_TO_POINTER(i));
 }
 
-/** 
- * get_row_id:
- * @self: #GGobiData object
- * @i: row
- * 
- * Retrive row id for specified row.
- * Returns: duplicate of row id if present, NULL otherwise
- **/
 override (GGobi:Stage) gchar*
 get_row_id(GGobi:Stage *self, guint i) {
   if (SELF(self)->rowIds[i]) 
@@ -290,15 +264,6 @@ get_row_id(GGobi:Stage *self, guint i) {
     return NULL;
 }
 
-/** 
- * get_row_for_id:
- * @self: #GGobiData object
- * @id: row id string
- * 
- * Get row index corresponding to row id
- *
- * Returns: row index if found, -1 otherwise
- **/
 override (GGobi:Stage) gint
 get_row_for_id(GGobi:Stage *self, gchar *id) {
   gpointer pos, key;
@@ -315,8 +280,7 @@ get_row_for_id(GGobi:Stage *self, gchar *id) {
  * Add n rows to the dataset
  * Adds extra rows, allocating space as needed.
  *
- * This emits the cols_added signal and also runs
- * #set_rows_in_plot which emits the rows_in_plot_changed signal.
+ * For convenience, this registers the row change and flushes the changes.
  *
  * Returns: index of first new row
  **/
@@ -375,6 +339,8 @@ reset_rows(self, guint start, guint end) {
  * @n: number of columns to add
  *
  * Add n empty columns to the dataset.
+ * For convenience, this registers the row change and flushes the changes.
+ *
  * Returns: index of first new column
  **/ 
  // FIXME: This function and its siblings should probably be moved to GGobiStage,
@@ -397,6 +363,16 @@ add_cols(self, guint n) {
   return nprev;
 }
 
+  /**
+   * delete_cols:
+   * @self: a #GGobiData
+   * @cols: the column indices to delete
+   *
+   * Deletes the specified columns from the dataset. Registers and flushes
+   * the change.
+   *
+   * Returns: number of remaining columns.
+   */
 public guint
 delete_cols(self, GSList *cols)
 {

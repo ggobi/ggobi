@@ -1,0 +1,111 @@
+<!-- ##### SECTION Title ##### -->
+GGobiTypeRegistry
+
+<!-- ##### SECTION Short_Description ##### -->
+Set of #GType codes with a common ancestor
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+This may be used in the future for registering types that have a common ancestor.
+The enclosing context may then instantiate a type depending on
+the capabilities required by the situation at hand.
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT GGobiTypeRegistry ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SIGNAL GGobiTypeRegistry::registered ##### -->
+<para>
+
+</para>
+
+@ggobityperegistry: the object which received the signal.
+@arg1: 
+
+<!-- ##### SIGNAL GGobiTypeRegistry::unregistered ##### -->
+<para>
+
+</para>
+
+@ggobityperegistry: the object which received the signal.
+@arg1: 
+
+<!-- ##### ARG GGobiTypeRegistry:type ##### -->
+<para>
+
+</para>
+
+<!-- ##### STRUCT GGobiTypeRegistryClass ##### -->
+<para>
+
+</para>
+
+@__parent__: 
+@registered: 
+@unregistered: 
+
+<!-- ##### FUNCTION ggobi_type_registry_new ##### -->
+<para>
+
+</para>
+
+@type: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_type_registry_register ##### -->
+<para>
+
+</para>
+
+@self: 
+@type: 
+
+
+<!-- ##### FUNCTION ggobi_type_registry_unregister ##### -->
+<para>
+
+</para>
+
+@self: 
+@type: 
+
+
+<!-- ##### FUNCTION ggobi_type_registry_is_registered ##### -->
+<para>
+
+</para>
+
+@self: 
+@type: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_type_registry_list_registered ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_type_registry_register_all ##### -->
+<para>
+
+</para>
+
+@self: 
+
+

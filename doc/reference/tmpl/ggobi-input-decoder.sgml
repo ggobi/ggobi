@@ -1,0 +1,53 @@
+<!-- ##### SECTION Title ##### -->
+GGobiInputDecoder
+
+<!-- ##### SECTION Short_Description ##### -->
+Decodes a #GsfInput
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+Unstable
+
+<!-- ##### STRUCT GGobiInputDecoder ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT GGobiInputDecoderClass ##### -->
+<para>
+
+</para>
+
+@__parent__: 
+@decode: 
+@get_decoded_file_exts: 
+
+<!-- ##### FUNCTION ggobi_input_decoder_decode ##### -->
+<para>
+
+</para>
+
+@self: 
+@source: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_input_decoder_get_decoded_file_exts ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+

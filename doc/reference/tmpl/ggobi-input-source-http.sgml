@@ -1,0 +1,32 @@
+<!-- ##### SECTION Title ##### -->
+GGobiInputSourceHTTP
+
+<!-- ##### SECTION Short_Description ##### -->
+Reads input over an HTTP connection.
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT GGobiInputSourceHTTP ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT GGobiInputSourceHTTPClass ##### -->
+<para>
+
+</para>
+
+@__parent__: 
+

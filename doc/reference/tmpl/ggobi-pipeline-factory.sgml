@@ -1,0 +1,63 @@
+<!-- ##### SECTION Title ##### -->
+GGobiPipelineFactory
+
+<!-- ##### SECTION Short_Description ##### -->
+Builds GGobi pipelines
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+When a new pipeline for a given dataset is requested, this emits the
+#GGobiPipelineFactory::build signal. Handlers of the signal insert stages
+into the nascent pipeline. This allows clients to customize the content
+of the pipeline whenever one is created, instead of explicitly modifying an
+individual pipeline instance.
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+#GGobiStage
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+Unstable
+
+<!-- ##### STRUCT GGobiPipelineFactory ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SIGNAL GGobiPipelineFactory::build ##### -->
+<para>
+Clients should connect to this handler in order to add stages to the pipeline
+while it is being built.
+</para>
+
+@ggobipipelinefactory: the object which received the signal.
+@arg1: root #GGobiStage of the new pipeline
+
+<!-- ##### STRUCT GGobiPipelineFactoryClass ##### -->
+<para>
+
+</para>
+
+@__parent__: 
+@build: 
+
+<!-- ##### FUNCTION ggobi_pipeline_factory_build ##### -->
+<para>
+
+</para>
+
+@self: 
+@root: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_factory_new ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+

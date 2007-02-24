@@ -1,0 +1,36 @@
+<!-- ##### SECTION Title ##### -->
+GGobiDataFactoryCSV
+
+<!-- ##### SECTION Short_Description ##### -->
+Creates datasets from CSV input
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+This factory will parse an input stream containing CSV-formatted data and
+create a #GGobiData. The format is very similar to that of R. Column names
+(first row) are required, and rownames (first column, without a column name) are 
+optional. We try to support the various CSV conventions as best as possible.
+If you find a CSV file that R can read but GGobi cannot, please let us know.
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+Unstable
+
+<!-- ##### STRUCT GGobiDataFactoryCSV ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT GGobiDataFactoryCSVClass ##### -->
+<para>
+
+</para>
+
+@__parent__: 
+

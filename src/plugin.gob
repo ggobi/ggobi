@@ -57,6 +57,13 @@ class GGobi:Plugin from G:Type:Module {
    { g_hash_table_new_full(NULL, NULL, NULL, g_free) }
    destroywith g_hash_table_destroy;
    
+  /**
+   * new:
+   *
+   * Normally plugins are created from an XML description with #GGobiPluginFactory.
+   *
+   * Returns: a new #GGobiPlugin
+   */
   public GGobiPlugin *
   new(void)
   {
@@ -64,16 +71,40 @@ class GGobi:Plugin from G:Type:Module {
     return GGOBI_PLUGIN(plugin);
   }
   
+  /**
+   * has_dependencies:
+   * @self: a #GGobiPlugin
+   *
+   * Does this plugin have any dependencies on other pluginns?
+   *
+   * Returns: TRUE if it has dependencies
+   */
   public gboolean
   has_dependencies(self)
   {
     return g_slist_length(selfp->dependencies) > 0;
   }
+  /**
+   * get_dependencies:
+   * @self: a #GGobiPlugin
+   *
+   * Lists the #GGobiPlugin objects on which this plugin depends. They are
+   * loaded automatically when this plugin is loaded.
+   *
+   * Returns: #GSList of #GGobiPlugin objects.
+   */
   public GSList *
   get_dependencies(self)
   {
     return g_slist_copy(selfp->dependencies);
   }
+  /**
+   * add_dependency:
+   * @self: a #GGobiPlugin
+   * @plugin: a plugin on which this plugin depends
+   *
+   * The dependency will be loaded when this plugin is loaded.
+   */
   public void
   add_dependency(self, GGobi:Plugin *plugin (check null type))
   {
@@ -81,19 +112,33 @@ class GGobi:Plugin from G:Type:Module {
     selfp->dependencies = g_slist_prepend(selfp->dependencies, plugin);
   }
   
-  public GSList *
-  get_arguments(self) 
-  {
-    return g_slist_copy(selfp->args);
-  }
+  /**
+   * get_argument_for_name:
+   * @self: a #GGobiPlugin
+   * @name: the name of an argument (option)
+   *
+   * Gets the value of an argument (or option) specified for this plugin.
+   *
+   * Returns: argument value
+   */
   public const gchar *
   get_argument_for_name(self, const gchar *name (check null))
   {
     return g_hash_table_lookup(selfp->arg_table, name);
   }
+  /**
+   * add_argument:
+   * @self: a #GGobiPlugin
+   * @name: name of argument
+   * @arg: value of argument
+   *
+   * Adds a new argument setting for this plugin. These usually control
+   * optional behavior of a plugin.
+   *
+   */
   public void
   add_argument(self, const gchar *name, const gchar *arg (check null))
-  {
+  { // FIXME: maybe this should be "set_argument"..
     gchar *tmp_arg = g_strdup(arg);
     if (name)
       g_hash_table_insert(selfp->arg_table, g_strdup(name), tmp_arg);
@@ -101,8 +146,19 @@ class GGobi:Plugin from G:Type:Module {
   }
   
   // FIXME: This obviously needs to become a signal handler
-  // FIXME: Shouldn't the plugin return a custom GGobiPluginInstance,
+  // FIXME: Shouldn't the plugin library return a custom GGobiPluginInstance,
   // where GGobiPluginInstance is a GObject class?
+  
+  /**
+   * ggobi_created:
+   * @self: a #GGobiPlugin
+   * @gg: GGobi session
+   *
+   * Informs this plugin that a new session has been created. The plugin should
+   * then associate itself with the session. This will go away in the future.
+   *
+   * Returns: %TRUE if succeeded
+   */
   virtual gboolean
   ggobi_created(self, GGobiSession *gg)
   {
@@ -122,6 +178,17 @@ class GGobi:Plugin from G:Type:Module {
     return success;
   }
   
+  /**
+   * ggobi_destroyed:
+   * @self: a #GGobiPlugin
+   * @gg: a GGobi session
+   *
+   * Informs a plugin that a GGobi session has been closed. The plugin should
+   * then relinquish all of its resources for that session. This function is
+   * only temporary.
+   *
+   * Returns: %TRUE if succeeded
+   */
   virtual gboolean
   ggobi_destroyed(self, GGobiSession *gg)
   {
@@ -149,6 +216,16 @@ class GGobi:Plugin from G:Type:Module {
     return inst;
   }
   
+  /**
+   * get_symbol:
+   * @self: a #GGobiPlugin
+   * @symbol_name: name of symbol in foreign library
+   * @symbol: return location of value for symbol
+   *
+   * This function is on its way out.
+   *
+   * Returns: %TRUE for success
+   */
   virtual gboolean
   get_symbol(self, const gchar *symbol_name (check null), gpointer symbol (check null))
   {
@@ -217,6 +294,14 @@ class GGobi:Plugin from G:Type:Module {
     return (module);
   }
   
+  /**
+   * check_plugin:
+   * @self: a #GGobiPlugin
+   *
+   * This function is probably not necessary and will be removed soon.
+   *
+   * Returns: %TRUE if the plugin is linked against this version of GGobi
+   */
   public gboolean
   check_plugin(self)
   {
@@ -224,7 +309,7 @@ class GGobi:Plugin from G:Type:Module {
     gboolean ok = true;
     if (g_module_symbol(selfp->library, "checkGGobiStructSizes", (gpointer)&f)) {
       if (!(ok = f(self)))
-        g_warning("Problems with plugin %s. Incosistent view of ggobi's data structures.",
+        g_warning("Problems with plugin %s. Inconsistent view of ggobi's data structures.",
           G_TYPE_MODULE(self)->name);
       else if (sessionOptions->verbose == GGOBI_VERBOSE)
         g_message("plugin %s appears consistent with ggobi structures.",

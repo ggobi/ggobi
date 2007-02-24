@@ -29,14 +29,6 @@
    remove or change indices that have been appended, since appending takes
    place after removal and changing.
 
-   HW: will this work in general for merging messages? eg. when merging two
-   messages, the first which creates a column, and the seconding deleting it
-   
-   ML: the indices in the newer message will be relative to the changes made
-   by the previous message. this means that the added elements in the first
-   could be deleted in the second. internally this may work in the same way
-   that filter stages prevent additions that don't pass (by using filter_*()).
-
    When a message is received, usually from the parent staage, its indexing 
    should be compatible with that of the receiver. Some pipeline stages, 
    specifically filters, change the indexing by removing rows and/or columns. 
@@ -52,23 +44,6 @@
    column. This means clearing out all previous events and resetting the
    initial dimension. This is achieved by the reset_*() functions. 
    Redefining both rows and columns warrants the generation of a new message.
-   
-   HW: So filter stages will modify the event and then pass it on?
-   
-   ML: That's correct - all stages will potentially modify the event, but 
-   filter stages (ie anything that deletes elements) are special in that they 
-   modify the indexing. Were you thinking that each stage would produce its
-   own messages and then merge those with a message in the queue? That would 
-   probably work. I was imagining a system where the current event emission
-   functions (like col_data_changed(), cols_added(), etc) are kept, but instead
-   of emitting events they make changes to the current message. This could be
-   a message received from the parent stage, or, if there isn't one of those,
-   a new message could be created. In order to dispatch the message, someone
-   (likely the handler that received the original message or the idle callback
-   in the case of a tour) would need to call a "flush" method. I see message 
-   merging as occurring in some sort of buffering situation, though the same
-   code is used whether the message is directly modified or modified by
-   another message.
 */
 class GGobi:Pipeline:Message from G:Object {
   /* The GGobiBitset is used essentially as a fast set of indices */
@@ -110,6 +85,16 @@ class GGobi:Pipeline:Message from G:Object {
       g_value_set_uint(VAL, selfp->n_rows);
     };
   
+  /**
+   * new:
+   * @nrows: the number of indexed rows
+   * @ncols: the number of indexed columns
+   *
+   * Creates a new message describing changes to a matrix that was originally
+   * of dimensions @nrows by @ncols.
+   *
+   * Returns: a new #GGobiPipelineMessage with the given dimensions
+   */
   public GGobiPipelineMessage *
   new(guint nrows, guint ncols)
   {
@@ -117,16 +102,41 @@ class GGobi:Pipeline:Message from G:Object {
     return GGOBI_PIPELINE_MESSAGE(obj);
   }
   
+  /**
+   * get_changed_cols:
+   * @self: a #GGobiPipelineMessage
+   *
+   * Lists the indices of the changed columns.
+   *
+   * Returns: #GSList of integers
+   */
   public GSList *
   get_changed_cols(self)
   {
     return ggobi_bitset_get_indices(selfp->changed_cols);
   }
+  /**
+   * get_removed_cols:
+   * @self: a #GGobiPipelineMessage
+   *
+   * Lists the indices of the removed columns
+   *
+   * Returns: #GSList of integers
+   */
   public GSList *
   get_removed_cols(self)
   {
     return ggobi_bitset_get_indices(selfp->removed_cols);
   }
+  
+  /**
+   * get_removed_rows:
+   * @self: a #GGobiPipelineMessage
+   *
+   * Lists the indices of the removed rows.
+   *
+   * Returns: #GSList of integers
+   */
   public GSList *
   get_removed_rows(self)
   {
@@ -135,27 +145,65 @@ class GGobi:Pipeline:Message from G:Object {
   
   /* maybe it would be better to also give ranges here just for convenience? */
   
+  /**
+   * get_n_added_cols:
+   * @self: a #GGobiPipelineMessage
+   *
+   *
+   * Returns: the number of added columns.
+   */
   public guint
   get_n_added_cols(self)
   {
     return selfp->n_added_cols;
   }
+  /**
+   * get_n_added_rows:
+   * @self: a #GGobiPipelineMessage
+   *
+   *
+   *
+   * Returns: the number of added rows
+   */
   public guint
   get_n_added_rows(self)
   {
     return selfp->n_added_rows;
   }
   
+  /**
+   * get_n_removed_rows:
+   * @self: a #GGobiPipelineMessage
+   *
+   *
+   * Returns: the number of removed rows
+   */
   public guint
   get_n_removed_rows(self)
   {
     return ggobi_bitset_get_n_indices(selfp->removed_rows);
   }
+  /**
+   * get_n_changed_cols:
+   * @self: a #GGobiPipelineMessage
+   *
+   *
+   *
+   * Returns: the number of changed columns
+   */
   public guint
   get_n_changed_cols(self)
   {
     return ggobi_bitset_get_n_indices(selfp->changed_cols);
   }
+  /**
+   * get_n_removed_cols:
+   * @self: a #GGobiPipelineMessage
+   *
+   *
+   *
+   * Returns: the number of removed columns
+   */
   public guint
   get_n_removed_cols(self)
   {
@@ -164,37 +212,100 @@ class GGobi:Pipeline:Message from G:Object {
   
   /* convenience functions for iterating over changes */
   
+  /**
+   * changed_cols_foreach:
+   * @self: a #GGobiPipelineMessage
+   * @func: function to apply to the increasing indices of the changed columns
+   * @data: user data for the function
+   *
+   *
+   *
+   */
   public void
   changed_cols_foreach(self, GGobiIndexFunc func, gpointer data)
   {
     ggobi_bitset_foreach(selfp->changed_cols, func, data);
   }
+  /**
+   * removed_cols_foreach:
+   * @self: a #GGobiPipelineMessage
+   * @func: function to apply to the increasing indices of the removed columns
+   * @data: user data for the function
+   *
+   *
+   *
+   */
   public void
   removed_cols_foreach(self, GGobiIndexFunc func, gpointer data)
   {
     ggobi_bitset_foreach(selfp->removed_cols, func, data);
   }
+  /**
+   * removed_cols_foreach_decreasing:
+   * @self: a #GGobiPipelineMessage
+   * @func: function to apply to the decreasing indices of removed columns
+   * @data: user data for the function
+   *
+   * This is useful when shrinking another data structure.
+   *
+   */
   public void
-  removed_cols_foreach_reverse(self, GGobiIndexFunc func, gpointer data)
+  removed_cols_foreach_decreasing(self, GGobiIndexFunc func, gpointer data)
   {
-    ggobi_bitset_foreach_reverse(selfp->removed_cols, func, data);
+    ggobi_bitset_foreach_decreasing(selfp->removed_cols, func, data);
   }
+  /**
+   * removed_rows_foreach:
+   * @self: a #GGobiPipelineMessage
+   * @func: function to apply to the increasing indices of removed rows
+   * @data: user data for the function
+   *
+   *
+   *
+   */
   public void
   removed_rows_foreach(self, GGobiIndexFunc func, gpointer data)
   {
     ggobi_bitset_foreach(selfp->removed_rows, func, data);
   }
+  /**
+   * removed_rows_foreach_decreasing:
+   * @self: a #GGobiPipelineMessage
+   * @func: function to apply to the increasing indices of removed rows
+   * @data: user data for the function
+   *
+   *
+   *
+   */
   public void
-  removed_rows_foreach_reverse(self, GGobiIndexFunc func, gpointer data)
+  removed_rows_foreach_decreasing(self, GGobiIndexFunc func, gpointer data)
   {
-    ggobi_bitset_foreach_reverse(selfp->removed_rows, func, data);
+    ggobi_bitset_foreach_decreasing(selfp->removed_rows, func, data);
   }
+  /**
+   * added_rows_foreach:
+   * @self: a #GGobiPipelineMessage
+   * @func: function to apply to the increasing indices of added rows
+   * @data: user data for the function
+   *
+   *
+   *
+   */
   public void
   added_rows_foreach(self, GGobiIndexFunc func, gpointer data)
   {
     for (guint j = selfp->n_rows; j < selfp->n_rows + selfp->n_added_rows; j++)
       func(j, data);
   }
+  /**
+   * added_cols_foreach:
+   * @self: a #GGobiPipelineMessage
+   * @func: function to apply to the increasing indices of added columns
+   * @data: user data for the function
+   *
+   *
+   *
+   */
   public void
   added_cols_foreach(self, GGobiIndexFunc func, gpointer data)
   {
@@ -202,10 +313,17 @@ class GGobi:Pipeline:Message from G:Object {
       func(j, data);
   }
   
-  /* accept only column changes that are not part of the appended set */
-  /* (no one cares that a column has changed if it's new to them) */
-  /* note: unlike the events that change the dimensions, this one takes
-     a single element, not a list */
+  /**
+   * change_col:
+   * @self: a #GGobiPipelineMessage
+   * @j: index of the column that changed
+   *
+   * Registers a change to a specified column. If the column is in the appended
+   * set, this has no effect.
+   * Note: unlike the events that change the dimensions, this one takes
+   * a single element, not a list
+   *
+   */
   public void
   change_col(self, guint j)
   {
@@ -214,6 +332,14 @@ class GGobi:Pipeline:Message from G:Object {
       ggobi_bitset_set(selfp->changed_cols, j);
   }
   
+  /**
+   * change_cols:
+   * @self: a #GGobiPipelineMessage
+   * @cols: list of integer indices for changed columns
+   *
+   * Registers a change to a list of columns. 
+   *
+   */
   public void
   change_cols(self, GSList *cols)
   {
@@ -221,8 +347,15 @@ class GGobi:Pipeline:Message from G:Object {
       self_change_col(self, GPOINTER_TO_INT(cols->data));
   }
   
-  /* Must update column change indices
-  */
+  /**
+   * remove_cols:
+   * @self: a #GGobiPipelineMessage
+   * @cols: list of integer indices for removed columns
+   *
+   * Registers the removal of a list of a columns. Indices of changed columns
+   * are automatically shifted, because they are assumed to occur after removal.
+   *
+   */
   public void
   remove_cols(self, GSList *cols)
   {
@@ -239,6 +372,14 @@ class GGobi:Pipeline:Message from G:Object {
     g_slist_free(sorted_cols);
   }
 
+  /**
+   * remove_rows:
+   * @self: a #GGobiPipelineMessage
+   * @rows: list of integer indices of removed rows
+   *
+   * Registers the removal of a list of rows.
+   *
+   */
   public void
   remove_rows(self, GSList *rows)
   {
@@ -253,11 +394,27 @@ class GGobi:Pipeline:Message from G:Object {
   
   /* easy ones */
   
+  /**
+   * add_cols:
+   * @self: a #GGobiPipelineMessage
+   * @n: the number of columns added
+   *
+   * Registers the appending of @n columns.
+   *
+   */
   public void
   add_cols(self, guint n)
   {
     selfp->n_added_cols += n;
   }
+  /**
+   * add_rows:
+   * @self: a #GGobiPipelineMessage
+   * @n: the number of rows added
+   *
+   * Registers the appending of @n rows.
+   *
+   */
   public void
   add_rows(self, guint n)
   {
@@ -267,6 +424,18 @@ class GGobi:Pipeline:Message from G:Object {
   /* filtering */
   
   /* filter changed_cols and removed_cols */
+  
+  /**
+   * filter_cols:
+   * @self: a #GGobiPipelineMessage
+   * @cols: the columns that are filtered out
+   *
+   * This adjusts the message as if the given columns in the original matrix
+   * never existed. The indices of changed columns and removed columns are
+   * shifted accordingly. This is useful when passing a message through
+   * a filter of the data matrix.
+   *
+   */
   public void
   filter_cols(self, GSList *cols)
   {
@@ -281,7 +450,17 @@ class GGobi:Pipeline:Message from G:Object {
     ggobi_bitset_remove_indices(selfp->removed_cols, sorted_cols);
     g_slist_free(sorted_cols);
   }
-  /* filter removed_rows */
+  /**
+   * filter_rows:
+   * @self: a #GGobiPipelineMessage
+   * @rows: the rows that are filtered out
+   *
+   * This adjusts the message as if the given rows in the original matrix
+   * never existed. The indices of removed rows are
+   * shifted accordingly. This is useful when passing a message through
+   * a filter of the data matrix.
+   *
+   */
   public void
   filter_rows(self, GSList *rows)
   {
@@ -299,12 +478,30 @@ class GGobi:Pipeline:Message from G:Object {
   
   /* consuming events */
   
+  /**
+   * consume_rows:
+   * @self: a #GGobiPipelineMessage
+   *
+   * Erases all row events. This is usually followed by registration of new row
+   * events on different (sorted, shifted, etc) indices. 
+   * Useful when the rows of the data matrix are completely rearranged.
+   *
+   */
   public void
   consume_rows(self)
   {
     ggobi_bitset_clear(selfp->removed_rows);
     selfp->n_added_rows = 0;
   }
+  /**
+   * consume_cols:
+   * @self: a #GGobiPipelineMessage
+   *
+   * Erases all columns events. This is usually followed by registration of new column
+   * events on different (sorted, shifted, etc) indices. 
+   * Useful when the columns of the data matrix are completely rearranged.
+   *
+   */
   public void
   consume_cols(self)
   {
@@ -315,8 +512,16 @@ class GGobi:Pipeline:Message from G:Object {
   
   /* merging messages */
   
-  /* The 'other' message is assumed to contain changes that occurred AFTER
-     the changes in 'self' */
+  /**
+   * merge:
+   * @self: a #GGobiPipelineMessage
+   * @other: the pipeline message to merge
+   *
+   * Translates the events in @other into this message. @other is 
+   * assumed to contain changes that occurred AFTER the changes in this message.
+   * This is important when removal events have occurred in this message.
+   *
+   */
   public void
   merge(self, GGobiPipelineMessage *other)
   {

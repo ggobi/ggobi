@@ -218,17 +218,17 @@ typedef struct _EdgeData {
   gint n;
   /* maps from edge to row in edge dataset (mapping not 1-1 due to polygons) */
   guint *indices;
-  // FIXME: maybe SymbolicEndpoints could become some sort of boxed structure
-  // representing an edge, including its index into the edgeset
+  /* FIXME: maybe SymbolicEndpoints could become some sort of boxed structure
+     representing an edge, including its index into the edgeset */
   SymbolicEndpoints *sym_endpoints;
   
-  // To EDGE-RESOLVER stage
+  /* To EDGE-RESOLVER stage */
   GList *endpointList;   
     /* a list of endpointsd elements corresponding to the resolved 
        record ids relative to a given datad. This is akin to a table
        indexed by datad elements. **/
 
-  // To BRUSH stage
+  /* To BRUSH stage */
   gint nxed_by_brush;
   vector_b xed_by_brush;
 } EdgeData;
@@ -244,22 +244,6 @@ enum ATTR_SET {
   TRANSIENT,
   SAVE /* cannot undo */
 } GGobi:Attr:Set:Method;
-
-/**
- * SECTION:GGobiStage
- * @short_description: The base class of the GGobi pipeline.
- * @stability: Unstable
- *
- * The GGobi pipeline manipulates data so that it becomes suitable for 
- * a certain visualization. The pipeline consists of stages, each performing
- * a specific task on the data.
- *
- * This class only implements the identity transformation. Subclasses are meant
- * override a subset of these operations in order to transform or otherwise 
- * "decorate" the data on the way to its visualization.
- *
- * Optimization possibilities: data caching and signal buffering
- */
  
 class GGobi:Stage from G:Object {
 
@@ -443,6 +427,16 @@ private guint col_name_changed_handler;
    name change signal of each GGobiVariable and responds by emitting the
    col_name_changed signal. The default handler for the signal, below, 
    updates the variable name hash table. */
+
+  /**
+   * col_name_changed:
+   * @self: a #GGobiStage
+   * @old_name: the previous name of the column
+   * @j: the index of the column with the new name
+   *
+   * Emit the column-name-changed signal.
+   *
+   */
 public signal first NONE (STRING, UINT) void 
 col_name_changed(self, const gchar *old_name, guint j)
 {
@@ -475,6 +469,16 @@ changed(self, GGobiPipelineMessage *msg);
 
 /* the messaging system */
 
+  /**
+   * get_message:
+   * @self: a #GGobiStage
+   *
+   * Gets the "working" message. This is the message against which changes
+   * are registered using functions like ggobi_stage_col_data_changed(). Once
+   * it is queued, another working message is created.
+   *
+   * Returns: the "working" #GGobiPipelineMessage
+   */
 public GGobiPipelineMessage *
 get_message(self)
 {
@@ -482,6 +486,17 @@ get_message(self)
     selfp->working_message = ggobi_pipeline_message_new(self->n_rows, self->n_cols);
   return selfp->working_message;
 }
+  /**
+   * queue_message:
+   * @self: a #GGobiStage
+   * @msg: message to queue
+   *
+   * Queues the given message. This processes the message at this stage, but
+   * does not send it on to the others. The message is merged with a previously
+   * queued message after processing, so that when this stage is flushed,
+   * only one message is emitted.
+   *
+   */
 public void
 queue_message(self, GGobiPipelineMessage *msg)
 {
@@ -492,13 +507,27 @@ queue_message(self, GGobiPipelineMessage *msg)
     ggobi_pipeline_message_merge(selfp->queued_message, msg);
   else selfp->queued_message = g_object_ref(G_OBJECT(msg));
 }
+  /**
+   * has_changes:
+   * @self: a #GGobiStage
+   *
+   *
+   * Returns: whether there is a queued or working message available for flushing
+   */
 public gboolean
 has_changes(self)
 {
   return selfp->queued_message || selfp->working_message;
 }
-/* find the stage closest to the root with changes and flush them, then
-   repeat until everything is flushed */
+
+  /**
+   * flush_changes:
+   * @self: a #GGobiStage
+   *
+   * Find the stage closest to the root with changes and flush them, then
+   * repeat if necessary until everything is flushed.
+   *
+   */
 public void
 flush_changes(self)
 {
@@ -513,11 +542,20 @@ flush_changes(self)
       self_flush_changes_here(dirty);
   } while(dirty);
 }
-/* dispatch the changes that have occurred at this stage */
-/* this probably only makes sense from within stage implementations - 
-   pipeline clients would prefer _flush_changes() since they don't know
-   where the changes they are flushing actually occurred.
-*/
+
+  /**
+   * flush_changes_here:
+   * @self: a #GGobiStage
+   *
+   * Dispatch (flush) the changes that have occurred at this stage. Flushing 
+   * changes means queuing the working message, if any, and emitting the 
+   * 'change' signal, informing all listeners, including the child stages, of changes.
+   *
+   * This probably only makes sense from within stage implementations - 
+   * pipeline clients would prefer ggobi_stage_flush_changes() since they do not know
+   * where the changes they are flushing actually occurred.
+   *
+   */
 public void
 flush_changes_here(self)
 {
@@ -535,6 +573,20 @@ flush_changes_here(self)
 
 /* register changes on queued message */
 
+  /**
+   * col_data_changed:
+   * @self: a #GGobiStage
+   * @j: index of the column that changed
+   *
+   * Inform the stage that the column has changed. Note that at this moment,
+   * it is necessary to call this after using ggobi_stage_set_raw_value(),
+   * since, for efficiency reasons, no changes are registered there.
+   * 
+   * This is normally only used from stage implementations. Clients will likely
+   * prefer ggobi_stage_update_col() which calls this function at the stage
+   * where the column is defined - so all interested listeners are informed.
+   *
+   */
 public void 
 col_data_changed(self, guint j) {
   GGobiPipelineMessage *msg = self_get_message(self);
@@ -545,6 +597,9 @@ col_data_changed(self, guint j) {
  * cols_added:
  * @self: #GGobiStage
  * @n: number of new columns
+ *
+ * Inform the stage that the number of columns has increased. This is normally
+ * only used from stage implementations.
  *
  **/
 public void
@@ -558,6 +613,8 @@ cols_added(self, guint n) {
  * @self: #GGobiStage
  * @j: Column deleted
  *
+ * Inform the stage that the column has been deleted. This is normally only
+ * useful from stage implementations.
  **/
 public void
 col_removed(self, guint j) {
@@ -572,6 +629,8 @@ col_removed(self, guint j) {
  * @self: #GGobiStage
  * @n: number of new rows
  *
+ * Inform the stage that rows have been added. This is normally only
+ * useful from stage implementations.
  **/
 public void
 rows_added(self, guint n) {
@@ -579,6 +638,15 @@ rows_added(self, guint n) {
   ggobi_pipeline_message_add_rows(msg, n);
 }
 
+  /**
+   * rows_removed:
+   * @self: a #GGobiStage
+   * @rows: the list of row indices that were removed
+   *
+   * Inform the stage that rows have been removed. This is normally only
+   * useful from stage implementations.
+   *
+   */
 public void
 rows_removed(self, GSList *rows) {
   GGobiPipelineMessage *msg = self_get_message(self);
@@ -663,7 +731,7 @@ get_col_index_for_name(self, const gchar* name) onerror -1
  * Also sets nickname to the first two letters.
  * Emits col_name_changed() signal.
  **/
-public void 
+virtual void 
 set_col_name(self, guint j, const gchar* value) 
 {
   GGobiVariable* vt;
@@ -697,6 +765,9 @@ set_col_name(self, guint j, const gchar* value)
  * @self: GGobiData object
  * @j: column index
  * @value: new column nickname
+ * 
+ * This only applies to the variable at the current stage, and it is not
+ * clear if this functionality will exist in the future.
  **/
 public void 
 set_col_nickname(self, guint j, const gchar* value)
@@ -705,8 +776,15 @@ set_col_nickname(self, guint j, const gchar* value)
   ggobi_variable_set_nickname(vt, g_strdup(value));
 }
 
-/* this recurses up the tree until reaching the root or the stage that
-   appends the column, then registers the column as changed */
+  /**
+   * update_col:
+   * @self: a #GGobiStage
+   * @j: the index of the column that has changed
+   *
+   * Recurses up the pipeline until reaching the root or the stage that
+   * appends the column, then registers the column as changed.
+   *
+   */
 virtual void
 update_col(self, guint j)
 {
@@ -808,7 +886,7 @@ set_raw_values(self, guint j, gdouble *values)
  * @self: GGobiStage object
  * @i: row index
  * @j: column index
- * @values: vector of new values, of length self->nrows
+ * @value: numeric value for cell
  * 
  * Sets a single value in the specified column.  
  *
@@ -822,7 +900,6 @@ virtual void
 set_raw_value(self, guint i, guint j, gdouble value)
 {
   self_set_raw_value(self->parent, i, j, value);
-  //self->tform.vals[i][j] = value;
 }
 
 /**
@@ -849,6 +926,16 @@ set_categorical_value(self, guint i, guint j, const gchar* value)
   }
 }
 
+  /**
+   * get_categorical_value:
+   * @self: a #GGobiStage
+   * @i: row index
+   * @j: column index
+   *
+   *
+   * Returns: The name of the level at the cell, as opposed to
+   * the raw numeric value from ggobi_stage_get_raw_value().
+   */
 virtual const gchar *
 get_categorical_value(self, guint i, guint j)
 {
@@ -893,6 +980,8 @@ set_string_value(self, guint i, guint j, const gchar* value)
  * @self: #GGobiStage
  * @i: row index
  * @j: column index
+ *
+ * Returns: the raw numeric value at the given cell.
  **/
 virtual gdouble
 get_raw_value(self, guint i, guint j)
@@ -904,9 +993,9 @@ get_raw_value(self, guint i, guint j)
  * get_raw_values:
  * @self: GGobiStage object
  * @j: column index
+ *
  * Returns: vector of values, of length self->nrows
- * 
- * Gets all values in the specified column.  
+ *   
  **/
 public gdouble *
 get_raw_values(self, guint j)
@@ -921,6 +1010,14 @@ get_raw_values(self, guint j)
   return values;
 }
 
+  /**
+   * get_col_type:
+   * @self: a #GGobiStage
+   * @j: column index
+   *
+   *
+   * Returns: The type (categorical, quantitative, etc) of the column
+   */
 public GGobiVariableType
 get_col_type(self, guint j)
 {
@@ -964,10 +1061,11 @@ translate_var_to_col(self) {
 }
 
 
-virtual GGobiVariable*
+private virtual GGobiVariable*
 create_variable (self, guint j)
 {
   GGobiVariable *var;
+  // FIXME: broken - cloning variable does not associate it with this stage.
   if (self->parent && j < self->parent->n_cols)
     var = ggobi_variable_clone(self_get_variable(self->parent, j));
   else var = ggobi_variable_new(self);
@@ -992,7 +1090,6 @@ get_variable (self, guint j)
  * @self: #GGobiStage object
  * @i: row index
  * @j: column index
- * @transformed: transformed or raw values?
  *
  * Get string representation of value
  * This currently returns a locale insensitive string, suitable for
@@ -1003,8 +1100,6 @@ public gchar*
 get_string_value(self, guint i, guint j) 
 {
   GGobiVariable *var = self_get_variable(self, j);
-  /*gdouble raw = transformed ? self->tform.vals[i][j] : 
-    GGOBI_DATA(self)->raw.vals[i][j];*/
   gdouble raw = self_get_raw_value(self, i, j);
   
   if (self_is_missing(self, i, j)) 
@@ -1033,6 +1128,15 @@ get_n_edges (self)
 
 // FIXME: dirty hack so that we can keep the edge data in GGobiData where it belongs
 // We need to work out an actual API eventually
+  /**
+   * get_edge_data:
+   * @self: a #GGobiStage
+   *
+   * Note: This API will change dramatically as edges are better factored
+   * into the new pipeline.
+   *
+   * Returns: The #EdgeData structure containing all the edges in the pipeline
+   */
 virtual EdgeData *
 get_edge_data (self)
 {
@@ -1054,6 +1158,15 @@ set_row_id(self, guint i, gchar* value) {
   self_set_row_id(self->parent, i, value);
 }
 
+  /**
+   * set_row_ids:
+   * @self: a #GGobiStage
+   * @ids: a list of character ids for the rows
+   *
+   * Sets all of the row IDs at once for convenience and efficiency from
+   * embedding environments.
+   *
+   */
 public void
 set_row_ids(self, GSList *ids)
 {
@@ -1074,6 +1187,15 @@ get_row_id(self, guint i) {
   return self_get_row_id(self->parent, i);
 }
 
+  /**
+   * get_row_ids:
+   * @self: a #GGobiStage
+   *
+   * Gets all of the row ids at once for convenience and efficiency from
+   * embedding environments.
+   *
+   * Returns: #GSList of the character row ids.
+   */
 public GSList *
 get_row_ids(self) {
   GSList *ids = NULL;
@@ -1101,6 +1223,15 @@ get_row_for_id(self, gchar *id) {
  * ============================================================================
  */
 
+  /**
+   * get_root:
+   * @self: a #GGobiStage
+   *
+   * The pipeline forms a tree structure, with the dataset at the root. This 
+   * retrieves the pointer to the root stage.
+   *
+   * Returns: the root of the pipeline (normally a #GGobiData)
+   */
 public GGobiStage *
 get_root(self)
 {
@@ -1109,6 +1240,14 @@ get_root(self)
   return(stage);
 }
 
+  /**
+   * get_children:
+   * @self: a #GGobiStage
+   *
+   *
+   *
+   * Returns: #GSList of #GGobiStage objects that are children of this stage
+   */
 public GSList *
 get_children(self)
 {
@@ -1131,10 +1270,20 @@ find_recurse(self, const gchar *name)
   return result;
 }
 
-/* Currently, this is the main mechanism for looking up specific stages from
-   the pipeline. The various GGobi GUI components need this so that they 
-   can serve as view/controllers of specific stages. The pipeline factory
-   can provide alternative implementations for the built-in stages. */
+  /**
+   * find:
+   * @self: a #GGobiStage
+   * @name: the name of a stage in the pipeline
+   *
+   * Finds a stage with the given name in the ancestors of this stage.
+   *
+   * Currently, this is the main mechanism for looking up specific stages from
+   * the pipeline. The various GGobi GUI components need this so that they 
+   * can serve as view/controllers of specific stages. The pipeline factory
+   * can provide alternative implementations for the built-in stages.
+   *
+   * Returns: #GGobiStage with the given name.
+   */
 public GGobiStage *
 find(self, const gchar *name  (check null))
 {
@@ -1143,13 +1292,13 @@ find(self, const gchar *name  (check null))
   return self_find_recurse(self, name);
 }
 
-protected void
+private void
 add_child(self, GGobi:Stage *child  (check null type))
 {
   g_object_ref(G_OBJECT(child));
   selfp->children = g_slist_append(selfp->children, child);
 }
-protected void
+private void
 remove_child(self, GGobi:Stage *child  (check null type))
 {
   GSList *el = g_slist_find(selfp->children, child);
@@ -1170,7 +1319,7 @@ remove_child(self, GGobi:Stage *child  (check null type))
  * @j: attribute column
  * @j_now: column index for transient value of attribute
  * @j_prev: column index for previous value of attribute
- * @brush: persistent or transient
+ * @method: persistent or transient
  *
  * Sets attribute to new value. Use with GGOBI_STAGE_ATTR_INIT and
  * GGOBI_STAGE_ATTR_SET
@@ -1196,6 +1345,20 @@ set_attr(self, guint i, guint j, guint j_now, guint j_prev, gdouble value, GGobi
   return true;
 }
 
+  /**
+   * reset_attr:
+   * @self: a #GGobiStage
+   * @i: row index
+   * @j: attribute column
+   * @j_now: column index for transient value of attribute
+   * @j_prev: column index for previous value of attribute
+   * @brush: persistent or transient
+   *
+   * Set the attribute back to the previous value (for persistent brushing) or
+   * persistent value (for transient brushing).
+   *
+   * Returns: %TRUE if there was a change
+   */
 public gboolean
 reset_attr(self, guint i, guint j, guint j_now, guint j_prev, GGobiAttrSetMethod brush)
 {
@@ -1208,6 +1371,18 @@ reset_attr(self, guint i, guint j, guint j_now, guint j_prev, GGobiAttrSetMethod
   return self_set_attr(self, i, j, j_now, j_prev, value, brush);
 }
 
+  /**
+   * get_attr:
+   * @self: a #GGobiStage
+   * @i: row index
+   * @j: attribute column
+   * @j_now: column index for transient value of attribute
+   * @j_prev: column index for previous value of attribute
+   *
+   * Gets the current (possibly transient) attribute value.
+   *
+   * Returns: the current numeric value of the attribute
+   */
 public gdouble
 get_attr(self, guint i, guint j, guint j_now, guint j_prev)
 {
@@ -1231,41 +1406,31 @@ get_attr_glyph(self, guint i, guint j_type, guint j_size)
 }
 
 // FIXME: data/attribute distinction should be made by a pipeline stage
+  /**
+   * get_n_vars:
+   * @self: a #GGobiStage
+   *
+   *
+   *
+   * Returns: the number of actual variables (excluding attributes)
+   */
 public guint
 get_n_vars(self) {
   return self_get_n_cols(self) - self->n_attributes;
 }
 
+  /**
+   * has_vars:
+   * @self: a #GGobiStage
+   *
+   * 
+   *
+   * Returns: %TRUE if this stage has actual variables (excluding attributes)
+   */
 public guint
 has_vars(self) {
   return self_get_n_vars(self) > 0;
 }
-
-/**
- * set_rows_in_plot:
- * @self: #GGobiData object
- *
- * Combine the values in two arrays:
- *   excluded[] (which comes from the exclusion panel or from linking)
- *   sampled[] (which come from the subset panel)
- * to determine which cases should be plotted.
- *
- * rows_in_plot = sampled && !excluded
- **/
- // FIXME: Needs to go bye-bye
-/*public void
-set_rows_in_plot(self)
-{
-  guint i;
-  self->nrows_in_plot = 0;
-
-  GGOBI_STAGE_ATTR_INIT_ALL(self);
-  for (i = 0; i < self->n_rows; i++) 
-    if (!GGOBI_STAGE_GET_ATTR_EXCLUDED(self, i))
-      self->rows_in_plot.els[self->nrows_in_plot++] = i;
-  
-  self_rows_in_plot_changed(self, (guint) self->nrows_in_plot); 
-}*/
 
 /**
  * attach:
@@ -1325,7 +1490,7 @@ attach (self, GGobiSession *gg, gboolean cleanup)
     self_update_col(self, j);
   self_flush_changes(self);
     
-  /**
+  /*
    * If there are missings, they've been initialized with a value
    * of 0.  Here, re-set that value to 15% below the minimum for each
    * variable.  (dfs -- done at Di's request, September 2004)
@@ -1399,7 +1564,7 @@ set_variable (self, guint j, GGobiVariable* value)
 
 /* made this separate from col_name_changed() because we don't want to
    emit that event when the GGobiVariable's name changes */
-protected void
+private void
 update_var_name_hash(self, const gchar *old_name, guint j)
 {
   gchar *name = self_get_col_name(self, j);
@@ -1442,7 +1607,15 @@ varpanel_label_set_cb(GGobi:Stage * d, const gchar *old_name, guint j, gpointer 
 /* message handling */
 
 /* override to process any local, outgoing changes */
-private virtual void
+  /**
+   * process_outgoing:
+   * @self: a #GGobiStage
+   * @msg: the pipeline message to process
+   *
+   * Process changes in a message (when it is queued).
+   *
+   */
+virtual void
 process_outgoing(self, GGobiPipelineMessage *msg)
 /* Here we catch any changes that have occurred to our data matrix and update
    various structures (like GGobiVariable) and fields (like n_rows, n_cols).
@@ -1512,7 +1685,16 @@ removed_col_foreach(guint j, GGobiStage *self)
 }
 
 /* subclasses override this to respond to parent changes */
-private virtual void
+  /**
+   * process_incoming:
+   * @self: a #GGobiStage
+   * @msg: incoming message from parent
+   *
+   * Preprocess (filter indices, etc) incoming message from parent, before
+   * the actual processing occurs.
+   *
+   */
+virtual void
 process_incoming(self, GGobiPipelineMessage *msg)
 {
   self_queue_message(self, msg); /* queue for dispatch */

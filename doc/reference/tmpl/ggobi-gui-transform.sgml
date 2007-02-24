@@ -1,0 +1,62 @@
+<!-- ##### SECTION Title ##### -->
+GGobiGUITransform
+
+<!-- ##### SECTION Short_Description ##### -->
+GUI for applying transforms
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+This is the user interface for applying #GGobiTransform objects to
+variables in a #GGobiStageTransform.
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+Unstable
+
+<!-- ##### STRUCT GGobiGUITransform ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT GGobiGUITransformClass ##### -->
+<para>
+
+</para>
+
+@__parent__: 
+@register_domain_adj_types: 
+@register_transform_types: 
+
+<!-- ##### FUNCTION ggobi_gui_transform_new ##### -->
+<para>
+
+</para>
+
+@gg: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_gui_transform_get_domain_adj_registry ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_gui_transform_get_transform_registry ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+

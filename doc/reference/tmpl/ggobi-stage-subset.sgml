@@ -1,0 +1,113 @@
+<!-- ##### SECTION Title ##### -->
+GGobiStageSubset
+
+<!-- ##### SECTION Short_Description ##### -->
+Filter stage with convenient subsetting methods
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+Provides simple subsetting convenience methods on top of #GGobiStageFilter.
+At the moment, ggobi_stage_subset_apply() must be called to update the filter.
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+Unstable
+
+<!-- ##### STRUCT GGobiStageSubset ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT GGobiStageSubsetClass ##### -->
+<para>
+
+</para>
+
+@__parent__: 
+
+<!-- ##### ENUM GGobiMatchMethod ##### -->
+<para>
+The method for used when matching a string against another.
+</para>
+
+@GGOBI_MATCH_IDENTICAL: Exact match.
+@GGOBI_MATCH_INCLUDES: The query string is inside the subject.
+@GGOBI_MATCH_STARTS_WITH: The subject starts with the query string.
+@GGOBI_MATCH_ENDS_WITH: The subject ends with the query string.
+@GGOBI_MATCH_EXCLUDES: The query string is NOT in the subject.
+
+<!-- ##### FUNCTION ggobi_stage_subset_new ##### -->
+<para>
+
+</para>
+
+@parent: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_subset_apply ##### -->
+<para>
+
+</para>
+
+@self: 
+
+
+<!-- ##### FUNCTION ggobi_stage_subset_reset ##### -->
+<para>
+
+</para>
+
+@self: 
+
+
+<!-- ##### FUNCTION ggobi_stage_subset_random ##### -->
+<para>
+
+</para>
+
+@self: 
+@n: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_subset_block ##### -->
+<para>
+
+</para>
+
+@self: 
+@bstart: 
+@bsize: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_subset_everyn ##### -->
+<para>
+
+</para>
+
+@self: 
+@estart: 
+@estep: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_subset_rowlab ##### -->
+<para>
+
+</para>
+
+@self: 
+@substr: 
+@method: 
+@ignore_case: 
+@Returns: 
+
+

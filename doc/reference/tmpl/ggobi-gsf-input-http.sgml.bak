@@ -1,0 +1,120 @@
+<!-- ##### SECTION Title ##### -->
+GGobiGsfInputHTTP
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT GGobiGsfInputHTTP ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG GGobiGsfInputHTTP:content-type ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG GGobiGsfInputHTTP:url ##### -->
+<para>
+
+</para>
+
+<!-- ##### STRUCT GGobiGsfInputHTTPClass ##### -->
+<para>
+
+</para>
+
+@__parent__: 
+
+<!-- ##### FUNCTION ggobi_gsf_input_http_get_url ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_gsf_input_http_set_url ##### -->
+<para>
+
+</para>
+
+@self: 
+@val: 
+
+
+<!-- ##### FUNCTION ggobi_gsf_input_http_get_content_type ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_gsf_input_http_set_content_type ##### -->
+<para>
+
+</para>
+
+@self: 
+@val: 
+
+
+<!-- ##### FUNCTION ggobi_gsf_input_http_new ##### -->
+<para>
+
+</para>
+
+@url: 
+@error: 
+@Returns: 
+
+
+<!-- ##### MACRO GGOBI_GSF_INPUT_HTTP_PROP_URL ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+
+<!-- ##### MACRO GGOBI_GSF_INPUT_HTTP_GET_PROP_URL ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+
+<!-- ##### MACRO GGOBI_GSF_INPUT_HTTP_PROP_CONTENT_TYPE ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+
+<!-- ##### MACRO GGOBI_GSF_INPUT_HTTP_GET_PROP_CONTENT_TYPE ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+

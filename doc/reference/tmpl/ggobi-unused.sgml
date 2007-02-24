@@ -1,0 +1,1038 @@
+<!-- ##### SECTION ./tmpl/GGobiApp.sgml:Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION ./tmpl/GGobiApp.sgml:See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION ./tmpl/GGobiApp.sgml:Short_Description ##### -->
+
+
+
+<!-- ##### SECTION ./tmpl/GGobiApp.sgml:Stability_Level ##### -->
+
+
+
+<!-- ##### SECTION ./tmpl/GGobiApp.sgml:Title ##### -->
+GGobiApp
+
+
+<!-- ##### MACRO GGOBI_DATA_GET_PROP_NICKNAME ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_DATA_GET_PROP_SOURCE ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_DATA_PROP_NICKNAME ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_DATA_PROP_SOURCE ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_GSF_INPUT_FTP_GET_PROP_URL ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_GSF_INPUT_FTP_PROP_URL ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_GSF_INPUT_HTTP_GET_PROP_CONTENT_TYPE ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_GSF_INPUT_HTTP_GET_PROP_URL ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_GSF_INPUT_HTTP_PROP_CONTENT_TYPE ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_GSF_INPUT_HTTP_PROP_URL ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_GUI_COMPONENT_GET_PROP_GG ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_GUI_COMPONENT_PROP_GG ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_INPUT_SOURCE_GET_PROP_DISPLAY_NAME ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_INPUT_SOURCE_GET_PROP_LOGICAL_MODE ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_INPUT_SOURCE_GET_PROP_PHYSICAL_MODE ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_INPUT_SOURCE_GET_PROP_URI ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_INPUT_SOURCE_PROP_DISPLAY_NAME ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_INPUT_SOURCE_PROP_LOGICAL_MODE ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_INPUT_SOURCE_PROP_PHYSICAL_MODE ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_INPUT_SOURCE_PROP_URI ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_PIPELINE_MESSAGE_GET_PROP_N_COLS ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_PIPELINE_MESSAGE_GET_PROP_N_ROWS ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_PIPELINE_MESSAGE_PROP_N_COLS ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_PIPELINE_MESSAGE_PROP_N_ROWS ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_PLUGIN_GET_PROP_AUTHOR ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_PLUGIN_GET_PROP_DESCRIPTION ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_PLUGIN_GET_PROP_DLL_NAME ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_PLUGIN_GET_PROP_ON_CLOSE_NAME ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_PLUGIN_GET_PROP_ON_CREATE_NAME ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_PLUGIN_GET_PROP_ON_LOAD_NAME ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_PLUGIN_GET_PROP_ON_UNLOAD_NAME ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_PLUGIN_PROP_AUTHOR ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_PLUGIN_PROP_DESCRIPTION ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_PLUGIN_PROP_DLL_NAME ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_PLUGIN_PROP_ON_CLOSE_NAME ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_PLUGIN_PROP_ON_CREATE_NAME ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_PLUGIN_PROP_ON_LOAD_NAME ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_PLUGIN_PROP_ON_UNLOAD_NAME ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_RENDERER_CAIRO_GET_PROP_CAIRO ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_RENDERER_CAIRO_PROP_CAIRO ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_RENDERER_GET_PROP_PARENT ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_RENDERER_PROP_PARENT ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_STAGE_ATTR_INIT ##### -->
+<para>
+Execute this macro before using the %SET_ATTR or %GET_ATTR macros for the
+given attribute.
+</para>
+
+@d: a #GGobiStage
+@attribute: name of attribute
+
+<!-- ##### MACRO GGOBI_STAGE_ATTR_INIT_ALL ##### -->
+<para>
+
+</para>
+
+@d: 
+
+<!-- ##### MACRO GGOBI_STAGE_BRUSH_ATTR_INIT ##### -->
+<para>
+
+</para>
+
+@d: 
+@attribute: 
+
+<!-- ##### MACRO GGOBI_STAGE_BRUSH_POINT ##### -->
+<para>
+
+</para>
+
+@d: 
+@i: 
+@condition: 
+@brush_mode: 
+@brush: 
+
+<!-- ##### MACRO GGOBI_STAGE_FILTER_GET_PROP_FILTER_COLUMN ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_STAGE_FILTER_PROP_FILTER_COLUMN ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_STAGE_GET_ATTR ##### -->
+<para>
+
+</para>
+
+@d: 
+@i: 
+@attribute: 
+
+<!-- ##### MACRO GGOBI_STAGE_GET_ATTR_CLUSTER ##### -->
+<para>
+
+</para>
+
+@d: 
+@i: 
+
+<!-- ##### MACRO GGOBI_STAGE_GET_ATTR_COLOR ##### -->
+<para>
+
+</para>
+
+@d: 
+@i: 
+
+<!-- ##### MACRO GGOBI_STAGE_GET_ATTR_EXCLUDED ##### -->
+<para>
+
+</para>
+
+@d: 
+@i: 
+
+<!-- ##### MACRO GGOBI_STAGE_GET_ATTR_GLYPH ##### -->
+<para>
+
+</para>
+
+@d: 
+@i: 
+
+<!-- ##### MACRO GGOBI_STAGE_GET_ATTR_HIDDEN ##### -->
+<para>
+
+</para>
+
+@d: 
+@i: 
+
+<!-- ##### MACRO GGOBI_STAGE_GET_ATTR_SAMPLED ##### -->
+<para>
+
+</para>
+
+@d: 
+@i: 
+
+<!-- ##### MACRO GGOBI_STAGE_GET_ATTR_SIZE ##### -->
+<para>
+
+</para>
+
+@d: 
+@i: 
+
+<!-- ##### MACRO GGOBI_STAGE_GET_ATTR_TYPE ##### -->
+<para>
+
+</para>
+
+@d: 
+@i: 
+
+<!-- ##### MACRO GGOBI_STAGE_GET_ATTR_VISIBLE ##### -->
+<para>
+
+</para>
+
+@d: 
+@i: 
+
+<!-- ##### MACRO GGOBI_STAGE_GET_PROP_NAME ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_STAGE_GET_PROP_N_COLS ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_STAGE_GET_PROP_N_ROWS ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_STAGE_GET_PROP_PARENT ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_STAGE_GROUP_CONST ##### -->
+<para>
+
+</para>
+
+@obj: 
+
+<!-- ##### MACRO GGOBI_STAGE_PROP_NAME ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_STAGE_PROP_N_COLS ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_STAGE_PROP_N_ROWS ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_STAGE_PROP_PARENT ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_STAGE_RESET_ATTR ##### -->
+<para>
+
+</para>
+
+@d: 
+@i: 
+@attribute: 
+@brush: 
+
+<!-- ##### MACRO GGOBI_STAGE_RESET_ATTR_COLOR ##### -->
+<para>
+
+</para>
+
+@d: 
+@i: 
+@brush: 
+
+<!-- ##### MACRO GGOBI_STAGE_RESET_ATTR_HIDDEN ##### -->
+<para>
+
+</para>
+
+@d: 
+@i: 
+@brush: 
+
+<!-- ##### MACRO GGOBI_STAGE_RESET_ATTR_SIZE ##### -->
+<para>
+
+</para>
+
+@d: 
+@i: 
+@brush: 
+
+<!-- ##### MACRO GGOBI_STAGE_RESET_ATTR_TYPE ##### -->
+<para>
+
+</para>
+
+@d: 
+@i: 
+@brush: 
+
+<!-- ##### MACRO GGOBI_STAGE_SET_ATTR ##### -->
+<para>
+
+</para>
+
+@d: 
+@i: 
+@attribute: 
+@value: 
+@brush: 
+
+<!-- ##### MACRO GGOBI_STAGE_SET_ATTR_CLUSTER ##### -->
+<para>
+
+</para>
+
+@d: 
+@i: 
+@value: 
+
+<!-- ##### MACRO GGOBI_STAGE_SET_ATTR_COLOR ##### -->
+<para>
+
+</para>
+
+@d: 
+@i: 
+@value: 
+@brush: 
+
+<!-- ##### MACRO GGOBI_STAGE_SET_ATTR_EXCLUDED ##### -->
+<para>
+
+</para>
+
+@d: 
+@i: 
+@value: 
+
+<!-- ##### MACRO GGOBI_STAGE_SET_ATTR_HIDDEN ##### -->
+<para>
+
+</para>
+
+@d: 
+@i: 
+@value: 
+@brush: 
+
+<!-- ##### MACRO GGOBI_STAGE_SET_ATTR_SAMPLED ##### -->
+<para>
+
+</para>
+
+@d: 
+@i: 
+@value: 
+
+<!-- ##### MACRO GGOBI_STAGE_SET_ATTR_SIZE ##### -->
+<para>
+
+</para>
+
+@d: 
+@i: 
+@value: 
+@brush: 
+
+<!-- ##### MACRO GGOBI_STAGE_SET_ATTR_TYPE ##### -->
+<para>
+
+</para>
+
+@d: 
+@i: 
+@value: 
+@brush: 
+
+<!-- ##### MACRO GGOBI_STAGE_VARIABLES_ITERATE ##### -->
+<para>
+
+</para>
+
+@stage: 
+
+<!-- ##### MACRO GGOBI_TRANSFORM_BOXCOX_GET_PROP_LAMBDA ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_TRANSFORM_BOXCOX_PROP_LAMBDA ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_TYPE_ATTR_SET_METHOD ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO GGOBI_TYPE_REGISTRY_GET_PROP_TYPE ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_TYPE_REGISTRY_PROP_TYPE ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_TYPE_VARIABLE_TYPE ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO GGOBI_VARIABLE_GET_PROP_DEFAULT_VALUE ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_VARIABLE_GET_PROP_IS_ATTRIBUTE ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_VARIABLE_GET_PROP_NAME ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_VARIABLE_GET_PROP_NICKNAME ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_VARIABLE_GET_PROP_STAGE ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_VARIABLE_GET_PROP_VARTYPE ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_VARIABLE_GROUP_GET_PROP_NAME ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_VARIABLE_GROUP_PROP_NAME ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_VARIABLE_PROP_DEFAULT_VALUE ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_VARIABLE_PROP_IS_ATTRIBUTE ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_VARIABLE_PROP_NAME ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_VARIABLE_PROP_NICKNAME ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_VARIABLE_PROP_STAGE ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### MACRO GGOBI_VARIABLE_PROP_VARTYPE ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+<!-- ##### ENUM GGobiAttrSetMethod ##### -->
+<para>
+
+</para>
+
+@ATTR_SET_PERSISTENT: 
+@ATTR_SET_TRANSIENT: 
+@ATTR_SET_SAVE: 
+
+<!-- ##### STRUCT GGobiStageGroupPrivate ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO N_COLS ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO N_ROWS ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION ggobi_attr_set_method_get_type ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+<!-- ##### MACRO ggobi_pipeline_factory_connect__build ##### -->
+<para>
+
+</para>
+
+@object: 
+@func: 
+@data: 
+
+<!-- ##### MACRO ggobi_pipeline_factory_connect_after__build ##### -->
+<para>
+
+</para>
+
+@object: 
+@func: 
+@data: 
+
+<!-- ##### MACRO ggobi_pipeline_factory_connect_data__build ##### -->
+<para>
+
+</para>
+
+@object: 
+@func: 
+@data: 
+@destroy_data: 
+@flags: 
+
+<!-- ##### MACRO ggobi_stage_connect__changed ##### -->
+<para>
+
+</para>
+
+@object: 
+@func: 
+@data: 
+
+<!-- ##### MACRO ggobi_stage_connect__col_name_changed ##### -->
+<para>
+
+</para>
+
+@object: 
+@func: 
+@data: 
+
+<!-- ##### MACRO ggobi_stage_connect_after__changed ##### -->
+<para>
+
+</para>
+
+@object: 
+@func: 
+@data: 
+
+<!-- ##### MACRO ggobi_stage_connect_after__col_name_changed ##### -->
+<para>
+
+</para>
+
+@object: 
+@func: 
+@data: 
+
+<!-- ##### MACRO ggobi_stage_connect_data__changed ##### -->
+<para>
+
+</para>
+
+@object: 
+@func: 
+@data: 
+@destroy_data: 
+@flags: 
+
+<!-- ##### MACRO ggobi_stage_connect_data__col_name_changed ##### -->
+<para>
+
+</para>
+
+@object: 
+@func: 
+@data: 
+@destroy_data: 
+@flags: 
+
+<!-- ##### FUNCTION ggobi_stage_get_type ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+<!-- ##### FUNCTION ggobi_stage_subset_get_type ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+<!-- ##### MACRO ggobi_stage_transform_connect__applied ##### -->
+<para>
+
+</para>
+
+@object: 
+@func: 
+@data: 
+
+<!-- ##### MACRO ggobi_stage_transform_connect_after__applied ##### -->
+<para>
+
+</para>
+
+@object: 
+@func: 
+@data: 
+
+<!-- ##### MACRO ggobi_stage_transform_connect_data__applied ##### -->
+<para>
+
+</para>
+
+@object: 
+@func: 
+@data: 
+@destroy_data: 
+@flags: 
+
+<!-- ##### MACRO ggobi_type_registry_connect__registered ##### -->
+<para>
+
+</para>
+
+@object: 
+@func: 
+@data: 
+
+<!-- ##### MACRO ggobi_type_registry_connect__unregistered ##### -->
+<para>
+
+</para>
+
+@object: 
+@func: 
+@data: 
+
+<!-- ##### MACRO ggobi_type_registry_connect_after__registered ##### -->
+<para>
+
+</para>
+
+@object: 
+@func: 
+@data: 
+
+<!-- ##### MACRO ggobi_type_registry_connect_after__unregistered ##### -->
+<para>
+
+</para>
+
+@object: 
+@func: 
+@data: 
+
+<!-- ##### MACRO ggobi_type_registry_connect_data__registered ##### -->
+<para>
+
+</para>
+
+@object: 
+@func: 
+@data: 
+@destroy_data: 
+@flags: 
+
+<!-- ##### MACRO ggobi_type_registry_connect_data__unregistered ##### -->
+<para>
+
+</para>
+
+@object: 
+@func: 
+@data: 
+@destroy_data: 
+@flags: 
+
+<!-- ##### MACRO ggobi_variable_connect__name_changed ##### -->
+<para>
+
+</para>
+
+@object: 
+@func: 
+@data: 
+
+<!-- ##### MACRO ggobi_variable_connect_after__name_changed ##### -->
+<para>
+
+</para>
+
+@object: 
+@func: 
+@data: 
+
+<!-- ##### MACRO ggobi_variable_connect_data__name_changed ##### -->
+<para>
+
+</para>
+
+@object: 
+@func: 
+@data: 
+@destroy_data: 
+@flags: 
+
+<!-- ##### FUNCTION ggobi_variable_type_get_type ##### -->
+<para>
+
+</para>
+
+@Returns: 
+

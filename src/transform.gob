@@ -8,12 +8,42 @@
 %}
 class GGobi:Transform from G:Object (abstract) {
 
+  /**
+   * forward:
+   * @self: a #GGobiTransform
+   * @vals: the raw values to transform
+   * @n: the length of the raw values array
+   * @var: the variable with metadata (statistics) about the values
+   *
+   * Performs the (forward) transformation of the values. Raw to Transformed.
+   *
+   * Returns: the transformed values
+   */
   virtual gdouble *
   forward(self, gdouble *vals, guint n, GGobiVariable *var);
   
+  /**
+   * reverse:
+   * @self: a #GGobiTransform
+   * @vals: the transformed values to reverse transform
+   * @n: the number of values
+   * @var: the variable with metadata (statistics) about the values
+   *
+   * Performs the reverse transformation of the values. Transformed to Raw.
+   *
+   * Returns: the reverse transformed values.
+   */
   virtual gdouble *
   reverse(self, gdouble *vals, guint n, GGobiVariable *var);
   
+  /**
+   * variable_name:
+   * @self: a #GGobiTransform
+   * @name: original name of the variable
+   *
+   *
+   * Returns: transformed name (to indicate the current transformation)
+   */
   virtual gchar *
   variable_name(self, const gchar *name);
   
@@ -29,7 +59,17 @@ class GGobi:Transform from G:Object (abstract) {
     return result_limits;
   }*/
   
-  /* convenience wrapper */
+  /**
+   * column:
+   * @self: a #GGobiTransform
+   * @stage: stage holding values to transform
+   * @first_row: start transforming from this row
+   * @j: the column to transform
+   *
+   * Convenience method for transforming a column in a #GGobiStage.
+   *
+   * Returns: transformed values for column @j starting from @first_row in @stage.
+   */
   public gdouble *
   column(self, GGobi:Stage *stage, guint first_row, guint j)
   {
@@ -43,12 +83,38 @@ class GGobi:Transform from G:Object (abstract) {
     return self_forward(self, vals, n, var);
   }
   
+  /**
+   * get_name:
+   * @self: a #GGobiTransform
+   *
+   *
+   *
+   * Returns: allocated name of this transform.
+   */
   virtual gchar *
   get_name(self);
   
+  /**
+   * get_description:
+   * @self: a #GGobiTransform
+   *
+   *
+   *
+   * Returns: allocated description of this transform.
+   */
   virtual gchar *
   get_description(self);
   
+  /**
+   * compare:
+   * @self: a #GGobiTransform
+   * @other: the transform to which this one is compared
+   *
+   * This checks whether this transform has the same behavior as @other.
+   * By default this just checks the GType.
+   *
+   * Returns: %TRUE if the two transforms have the same behavior.
+   */
   virtual gboolean
   compare(self, GGobi:Transform *other  (check null type))
   {

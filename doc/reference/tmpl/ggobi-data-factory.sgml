@@ -1,0 +1,87 @@
+<!-- ##### SECTION Title ##### -->
+GGobiDataFactory
+
+<!-- ##### SECTION Short_Description ##### -->
+Creates a #GGobiData from a #GGobiInputSource
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+The #GGobiDataFactory is responsible for retrieving data from a #GGobiInputSource
+and using the data to create a #GGobiData. Subclasses provide support for
+specific data formats.
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+Unstable
+
+<!-- ##### STRUCT GGobiDataFactory ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT GGobiDataFactoryClass ##### -->
+<para>
+
+</para>
+
+@__parent__: 
+@create: 
+@supports_source: 
+@get_supported_modes: 
+@get_base_file_exts_for_mode: 
+
+<!-- ##### FUNCTION ggobi_data_factory_create ##### -->
+<para>
+
+</para>
+
+@self: 
+@source: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_data_factory_supports_source ##### -->
+<para>
+
+</para>
+
+@self: 
+@source: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_data_factory_get_supported_modes ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_data_factory_get_file_exts_for_mode ##### -->
+<para>
+
+</para>
+
+@self: 
+@mode: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_data_factory_get_base_file_exts_for_mode ##### -->
+<para>
+
+</para>
+
+@self: 
+@mode: 
+@Returns: 
+
+

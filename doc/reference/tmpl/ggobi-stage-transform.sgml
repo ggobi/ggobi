@@ -1,0 +1,109 @@
+<!-- ##### SECTION Title ##### -->
+GGobiStageTransform
+
+<!-- ##### SECTION Short_Description ##### -->
+Stage that transforms variables
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+The transform stage supports the registering #GGobiTransform objects against
+particular columns in the data matrix. This transformation is live, so as the 
+data in the pipeline changes, the transformed values are updated.
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+Unstable
+
+<!-- ##### STRUCT GGobiStageTransform ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SIGNAL GGobiStageTransform::applied ##### -->
+<para>
+Announces that the transform for a given column has changed.
+</para>
+
+@ggobistagetransform: the object which received the signal.
+@arg1: index of column being transformed
+@arg2: the transform now applied to the column
+
+<!-- ##### STRUCT GGobiStageTransformClass ##### -->
+<para>
+
+</para>
+
+@__parent__: 
+@applied: 
+
+<!-- ##### FUNCTION ggobi_stage_transform_new ##### -->
+<para>
+
+</para>
+
+@parent: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_transform_apply ##### -->
+<para>
+
+</para>
+
+@self: 
+@j: 
+@tform: 
+
+
+<!-- ##### FUNCTION ggobi_stage_transform_cancel ##### -->
+<para>
+
+</para>
+
+@self: 
+@j: 
+
+
+<!-- ##### FUNCTION ggobi_stage_transform_cancel_all ##### -->
+<para>
+
+</para>
+
+@self: 
+
+
+<!-- ##### FUNCTION ggobi_stage_transform_get_transform ##### -->
+<para>
+
+</para>
+
+@self: 
+@j: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_transform_get_transformed_cols ##### -->
+<para>
+
+</para>
+
+@self: 
+@ncols: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_transform_get_n_transformed_cols ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+

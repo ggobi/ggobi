@@ -1,0 +1,38 @@
+<!-- ##### SECTION Title ##### -->
+GGobiInputDecoder
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### FUNCTION ggobi_input_decoder_decode ##### -->
+<para>
+
+</para>
+
+@self: 
+@source: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_input_decoder_get_decoded_file_exts ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+

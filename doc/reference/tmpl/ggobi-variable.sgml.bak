@@ -1,0 +1,455 @@
+<!-- ##### SECTION Title ##### -->
+GGobiVariable
+
+<!-- ##### SECTION Short_Description ##### -->
+Holds metadata for a variable in the pipeline
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+This class is responsible for storing metadata about pipeline columns,
+such as the column name. It also calculates and caches statistics, like
+the mean and variance, on the column.
+</para>
+<para>
+#GGobiVariable objects are tied to a #GGobiStage for their lifetime. Each
+#GGobiStage maintains its own set of variables and is responsible for keeping
+them in sync with the parent stage.
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+#GGobiStage
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+Unstable
+
+<!-- ##### STRUCT GGobiVariable ##### -->
+<para>
+
+</para>
+
+@name: 
+@is_attribute: 
+@lim_specified: 
+@lim_specified_p: 
+@jitter_factor: 
+
+<!-- ##### SIGNAL GGobiVariable::name-changed ##### -->
+<para>
+Announces that the name of the variable has changed.
+</para>
+
+@ggobivariable: the object which received the signal.
+@arg1: the old name
+@arg2: the new name
+
+<!-- ##### ARG GGobiVariable:default-value ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG GGobiVariable:is-attribute ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG GGobiVariable:name ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG GGobiVariable:nickname ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG GGobiVariable:stage ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG GGobiVariable:vartype ##### -->
+<para>
+
+</para>
+
+<!-- ##### STRUCT GGobiVariableClass ##### -->
+<para>
+
+</para>
+
+@__parent__: 
+@name_changed: 
+
+<!-- ##### USER_FUNCTION GGobiVariableNameTransformFunc ##### -->
+<para>
+
+</para>
+
+@name: name to transform
+@data: user data
+@Returns: the transformed name
+
+
+<!-- ##### ENUM GGobiVariableType ##### -->
+<para>
+
+</para>
+
+@GGOBI_VARIABLE_REAL: Real-valued variable
+@GGOBI_VARIABLE_CATEGORICAL: Categorical variable
+@GGOBI_VARIABLE_INTEGER: Integer-valued variable
+@GGOBI_VARIABLE_COUNTER: Counting variable (integers above 0)
+@GGOBI_VARIABLE_UNIFORM: Random uniform variable.
+@GGOBI_VARIABLE_ALL_VARTYPES: 
+
+<!-- ##### MACRO GGOBI_TYPE_VARIABLE_TYPE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### FUNCTION ggobi_variable_get_name ##### -->
+<para>
+Get #GGobiVariable::name.
+</para>
+
+@self: a #GGobiVariable
+@Returns: the name of the variable
+
+
+<!-- ##### FUNCTION ggobi_variable_set_name ##### -->
+<para>
+Set #GGobiVariable::name.
+</para>
+
+@self: a #GGobiVariable
+@val: the name of the variable
+
+
+<!-- ##### FUNCTION ggobi_variable_get_nickname ##### -->
+<para>
+Get #GGobiVariablee::nickname.
+</para>
+
+@self: a #GGobiVariable
+@Returns: the nickname (short form) of the variable
+
+
+<!-- ##### FUNCTION ggobi_variable_set_nickname ##### -->
+<para>
+Set #GGobiVariable::nickname.
+</para>
+
+@self: a #GGobiVariable
+@val: the nickname (short form) of the variable
+
+
+<!-- ##### FUNCTION ggobi_variable_get_vartype ##### -->
+<para>
+Get #GGobiVariable::vartype.
+</para>
+
+@self: a #GGobiVariable
+@Returns: the variable type
+
+
+<!-- ##### FUNCTION ggobi_variable_set_vartype ##### -->
+<para>
+Set #GGobiVariable::vartype
+</para>
+
+@self: a #GGobiVariable
+@val: the variable type
+
+
+<!-- ##### FUNCTION ggobi_variable_get_default_value ##### -->
+<para>
+Get #GGobiVariable::default-value.
+</para>
+
+@self: a #GGobiVariable
+@Returns: the default value (when rows are added to pipeline)
+
+
+<!-- ##### FUNCTION ggobi_variable_set_default_value ##### -->
+<para>
+Set #GGobiVariable::default-value
+</para>
+
+@self: a #GGobiVariable
+@val: the default value (when rows are added to pipeline)
+
+
+<!-- ##### FUNCTION ggobi_variable_get_is_attribute ##### -->
+<para>
+Get #GGobiVariable::is-attribute
+</para>
+
+@self: a #GGobiVariable
+@Returns: whether this variable is an attribute (rather than actual variable)
+
+
+<!-- ##### FUNCTION ggobi_variable_set_is_attribute ##### -->
+<para>
+Set #GGobiVariable::is-attribute
+</para>
+
+@self: a #GGobiVariable
+@val: whether this variable is an attribute (rather than actual variable)
+
+
+<!-- ##### FUNCTION ggobi_variable_new ##### -->
+<para>
+
+</para>
+
+@stage: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_variable_set_name_transform_func ##### -->
+<para>
+
+</para>
+
+@self: 
+@func: 
+@user_data: 
+
+
+<!-- ##### FUNCTION ggobi_variable_get_n_levels ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_variable_get_level_name ##### -->
+<para>
+
+</para>
+
+@self: 
+@value: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_variable_get_level_value ##### -->
+<para>
+
+</para>
+
+@self: 
+@name: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_variable_get_level_count ##### -->
+<para>
+
+</para>
+
+@self: 
+@value: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_variable_get_level_values ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_variable_get_level_index ##### -->
+<para>
+
+</para>
+
+@self: 
+@value: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_variable_get_level_index_for_name ##### -->
+<para>
+
+</para>
+
+@self: 
+@name: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_variable_has_level ##### -->
+<para>
+
+</para>
+
+@self: 
+@value: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_variable_has_level_for_name ##### -->
+<para>
+
+</para>
+
+@self: 
+@name: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_variable_get_level_value_closest ##### -->
+<para>
+
+</para>
+
+@self: 
+@value: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_variable_get_max ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_variable_get_min ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_variable_get_display_max ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_variable_get_display_min ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_variable_get_limits ##### -->
+<para>
+
+</para>
+
+@self: 
+@min: 
+@max: 
+
+
+<!-- ##### FUNCTION ggobi_variable_get_range ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_variable_get_mean ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_variable_get_median ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_variable_get_variance ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_variable_has_missings ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_variable_clone ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_variable_add_level ##### -->
+<para>
+
+</para>
+
+@self: 
+@name: 
+@value: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_variable_update ##### -->
+<para>
+
+</para>
+
+@self: 
+
+
+<!-- ##### MACRO GGOBI_VARIABLE_IS_CATEGORICAL ##### -->
+<para>
+Checks whether this variable is categorical (convenience macro).
+</para>
+
+@var: a #GGobiVariable
+
+
+<!-- ##### FUNCTION ggobi_variable_type_get_type ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+

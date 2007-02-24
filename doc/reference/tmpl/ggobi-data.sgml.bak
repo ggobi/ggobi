@@ -1,0 +1,218 @@
+<!-- ##### SECTION Title ##### -->
+GGobiData
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT GGobiData ##### -->
+<para>
+
+</para>
+
+@nickname: 
+
+<!-- ##### ARG GGobiData:nickname ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG GGobiData:source ##### -->
+<para>
+
+</para>
+
+<!-- ##### STRUCT GGobiDataClass ##### -->
+<para>
+
+</para>
+
+@__parent__: 
+
+<!-- ##### ENUM datatyped ##### -->
+<para>
+
+</para>
+
+@no_edgesets: 
+@edgesets_only: 
+@all_datatypes: 
+
+<!-- ##### FUNCTION ggobi_data_get_nickname ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_data_set_nickname ##### -->
+<para>
+
+</para>
+
+@self: 
+@val: 
+
+
+<!-- ##### FUNCTION ggobi_data_get_source ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_data_set_source ##### -->
+<para>
+
+</para>
+
+@self: 
+@val: 
+
+
+<!-- ##### FUNCTION ggobi_data_new ##### -->
+<para>
+
+</para>
+
+@nrows: 
+@ncols: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_data_add_attributes ##### -->
+<para>
+
+</para>
+
+@self: 
+
+
+<!-- ##### FUNCTION ggobi_data_add_attribute ##### -->
+<para>
+
+</para>
+
+@self: 
+@name: 
+@value: 
+
+
+<!-- ##### FUNCTION ggobi_data_set_col_default_value ##### -->
+<para>
+
+</para>
+
+@self: 
+@j: 
+@value: 
+
+
+<!-- ##### FUNCTION ggobi_data_get_col_default_value ##### -->
+<para>
+
+</para>
+
+@self: 
+@j: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_data_set_col_type ##### -->
+<para>
+
+</para>
+
+@self: 
+@j: 
+@value: 
+
+
+<!-- ##### FUNCTION ggobi_data_add_rows ##### -->
+<para>
+
+</para>
+
+@self: 
+@n: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_data_reset_rows ##### -->
+<para>
+
+</para>
+
+@self: 
+@start: 
+@end: 
+
+
+<!-- ##### FUNCTION ggobi_data_add_cols ##### -->
+<para>
+
+</para>
+
+@self: 
+@n: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_data_delete_cols ##### -->
+<para>
+
+</para>
+
+@self: 
+@cols: 
+@Returns: 
+
+
+<!-- ##### MACRO GGOBI_DATA_PROP_NICKNAME ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+
+<!-- ##### MACRO GGOBI_DATA_GET_PROP_NICKNAME ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+
+<!-- ##### MACRO GGOBI_DATA_PROP_SOURCE ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+
+<!-- ##### MACRO GGOBI_DATA_GET_PROP_SOURCE ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+

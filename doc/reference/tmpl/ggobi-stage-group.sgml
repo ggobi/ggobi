@@ -1,0 +1,74 @@
+<!-- ##### SECTION Title ##### -->
+GGobiStageGroup
+
+<!-- ##### SECTION Short_Description ##### -->
+Stage that groups rows according to a list of factors
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+This provides row grouping suitable for area plots. The group assignments
+are communicated as columns appended on the data matrix. Each column
+crosses another factor with the factors of the previous column. For example,
+for factors A, B, and C, the grouping columns would be A, AxB, and AxBxC.
+The counts for each column are easily obtained from the #GGobiVariable.
+</para>
+<para>This stage has not yet been tested.</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+Unstable
+
+<!-- ##### STRUCT GGobiStageGroup ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT GGobiStageGroupClass ##### -->
+<para>
+
+</para>
+
+@__parent__: 
+
+<!-- ##### FUNCTION ggobi_stage_group_new ##### -->
+<para>
+
+</para>
+
+@parent: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_group_get_factors ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_group_insert_factor ##### -->
+<para>
+
+</para>
+
+@self: 
+@factor: 
+@pos: 
+
+
+<!-- ##### FUNCTION ggobi_stage_group_remove_factor ##### -->
+<para>
+
+</para>
+
+@self: 
+@factor: 
+
+

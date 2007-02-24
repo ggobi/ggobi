@@ -56,7 +56,7 @@ edges_free (GGobiStage * d, GGobiSession * gg)
 /* --------------------------------------------------------------- */
 
 
-/**
+/*
   This sets the data set as the source of the edge information
   for all the plots within the display.
  */
@@ -81,7 +81,7 @@ setDisplayEdge (displayd * dpy, GGobiStage * e)
   return (old);
 }
 
-/**
+/*
  Invoked when the user selected an item in the Edges menu 
  on a scatterplot to control whether edges are displayed or not
  on the plot.

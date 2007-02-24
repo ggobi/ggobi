@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd">
+<book id="index" xmlns:xi="http://www.w3.org/2003/XInclude">
+  <bookinfo>
+    <title>GGobi Reference Manual</title>
+  </bookinfo>
+
+  <chapter>
+    <title>Pipeline</title>
+    <xi:include href="xml/ggobi-pipeline-factory.xml"/>
+    <xi:include href="xml/ggobi-stage.xml"/>
+    <xi:include href="xml/ggobi-data.xml"/>
+    <xi:include href="xml/ggobi-stage-filter.xml"/>
+    <xi:include href="xml/ggobi-stage-subset.xml"/>
+    <xi:include href="xml/ggobi-stage-transform.xml"/>
+    <xi:include href="xml/ggobi-stage-group.xml"/>
+    <xi:include href="xml/ggobi-variable.xml"/>
+    <xi:include href="xml/ggobi-variable-group.xml"/>
+    <xi:include href="xml/ggobi-pipeline-message.xml"/>
+  </chapter>
+  <chapter>
+    <title>Input and Output</title>
+    <xi:include href="xml/ggobi-data-factory.xml"/>
+    <xi:include href="xml/ggobi-data-factory-csv.xml"/>
+    <xi:include href="xml/ggobi-data-factory-xml.xml"/>
+    <xi:include href="xml/ggobi-input-source.xml"/>
+    <xi:include href="xml/ggobi-input-source-factory.xml"/>
+    <xi:include href="xml/ggobi-input-source-ftp.xml"/>
+    <xi:include href="xml/ggobi-input-source-file.xml"/>
+    <xi:include href="xml/ggobi-input-source-http.xml"/>
+    <xi:include href="xml/ggobi-input-decoder.xml"/>
+    <xi:include href="xml/ggobi-input-decoder-bgzip.xml"/>
+    <xi:include href="xml/ggobi-gsf-input-ftp.xml"/>
+    <xi:include href="xml/ggobi-gsf-input-http.xml"/>
+  </chapter>
+  <chapter>
+    <title>Transformation</title>
+    <xi:include href="xml/ggobi-transform.xml"/>
+    <xi:include href="xml/ggobi-transform-abs.xml"/>
+    <xi:include href="xml/ggobi-transform-log10.xml"/>
+    <xi:include href="xml/ggobi-transform-min-one.xml"/>
+    <xi:include href="xml/ggobi-transform-boxcox.xml"/>
+  </chapter>
+  <chapter>
+    <title>GUI</title>
+    <xi:include href="xml/ggobi-gui-component.xml"/>
+    <xi:include href="xml/ggobi-gui-transform.xml"/>
+  </chapter>
+  <chapter>
+    <title>Rendering</title>
+    <xi:include href="xml/ggobi-renderer.xml"/>
+    <xi:include href="xml/ggobi-renderer-cairo.xml"/>
+    <xi:include href="xml/ggobi-renderer-factory.xml"/>
+  </chapter>
+  <chapter>
+    <title>Plugins</title>
+    <xi:include href="xml/ggobi-plugin-factory.xml"/>
+    <xi:include href="xml/ggobi-plugin.xml"/>
+  </chapter>
+  <chapter>
+    <title>Utilities</title>
+    <xi:include href="xml/ggobi-type-registry.xml"/>
+    <xi:include href="xml/ggobi-bitset.xml"/>
+  </chapter>
+</book>

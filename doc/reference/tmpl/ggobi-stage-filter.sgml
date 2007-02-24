@@ -1,0 +1,122 @@
+<!-- ##### SECTION Title ##### -->
+GGobiStageFilter
+
+<!-- ##### SECTION Short_Description ##### -->
+Stage that filters by row.
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+By default, the filter is based on a boolean column, GGobiStageFilter::filter-column,
+in the data matrix. If the value in that column for a row is %FALSE, then the 
+row does not pass the filter. Calling ggobi_stage_filter_update() refreshes the
+filter according to the values in the filter column.
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+Unstable
+
+<!-- ##### STRUCT GGobiStageFilter ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG GGobiStageFilter:filter-column ##### -->
+<para>
+
+</para>
+
+<!-- ##### STRUCT GGobiStageFilterClass ##### -->
+<para>
+
+</para>
+
+@__parent__: 
+@included: 
+
+<!-- ##### FUNCTION ggobi_stage_filter_get_filter_column ##### -->
+<para>
+Get #GGobiStageFilter::filter_column.
+</para>
+
+@self: a #GGobiStageFilter
+@Returns: filter column index
+
+
+<!-- ##### FUNCTION ggobi_stage_filter_set_filter_column ##### -->
+<para>
+Set #GGobiStageFilter::filter_column.
+</para>
+
+@self: a #GGobiStageFilter
+@val: filter column index
+
+
+<!-- ##### FUNCTION ggobi_stage_filter_new ##### -->
+<para>
+
+</para>
+
+@parent: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_filter_is_included ##### -->
+<para>
+
+</para>
+
+@self: 
+@i: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_filter_set_included ##### -->
+<para>
+
+</para>
+
+@self: 
+@i: 
+@val: 
+
+
+<!-- ##### FUNCTION ggobi_stage_filter_set_included_all ##### -->
+<para>
+
+</para>
+
+@self: 
+@value: 
+
+
+<!-- ##### FUNCTION ggobi_stage_filter_included ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_filter_update ##### -->
+<para>
+
+</para>
+
+@self: 
+
+
+<!-- ##### FUNCTION ggobi_stage_filter_process_filter ##### -->
+<para>
+
+</para>
+
+@self: 
+
+

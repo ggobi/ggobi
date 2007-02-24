@@ -8,6 +8,11 @@
 
 class GGobi:Plugin:Factory from G:Object {
   
+  /**
+   * new:
+   *
+   * Returns: a new #GGobiPluginFactory
+   */
   public GGobiPluginFactory *
   new(void)
   {
@@ -15,8 +20,20 @@ class GGobi:Plugin:Factory from G:Object {
     return SELF(obj);
   }  
   
+  /**
+   * create:
+   * @self: a #GGobiPluginFactory
+   * @node: libxml2 node
+   * @doc: libxml2 doc
+   *
+   * Marshals a #GGobiPlugin from an XML description. By default, assumes
+   * GGobi plugin XML format. Extending the XML format may be useful
+   * for describing plugins written in other languages, for example.
+   *
+   * Returns: new #GGobiPlugin
+   */
   virtual GGobiPlugin *
-  create(self, xmlNodePtr node (check null), xmlDocPtr doc (check null))
+  create(self, xmlNodePtr node  (check null), xmlDocPtr doc  (check null))
   {
     GGobiPlugin *plugin;
 

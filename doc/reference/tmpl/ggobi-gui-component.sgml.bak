@@ -1,0 +1,54 @@
+<!-- ##### SECTION Title ##### -->
+GGobiGUIComponent
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT GGobiGUIComponent ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG GGobiGUIComponent:gg ##### -->
+<para>
+
+</para>
+
+<!-- ##### STRUCT GGobiGUIComponentClass ##### -->
+<para>
+
+</para>
+
+@__parent__: 
+@initialize: 
+
+<!-- ##### MACRO GGOBI_GUI_COMPONENT_PROP_GG ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+
+<!-- ##### MACRO GGOBI_GUI_COMPONENT_GET_PROP_GG ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+

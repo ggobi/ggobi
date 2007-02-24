@@ -1,0 +1,41 @@
+<!-- ##### SECTION Title ##### -->
+GGobiInputSourceFile
+
+<!-- ##### SECTION Short_Description ##### -->
+Reads input from a local file
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT GGobiInputSourceFile ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT GGobiInputSourceFileClass ##### -->
+<para>
+
+</para>
+
+@__parent__: 
+
+<!-- ##### FUNCTION ggobi_input_source_file_get_filename ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+

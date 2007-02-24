@@ -329,7 +329,7 @@ vartable_stage_changed_cb (GGobiStage *s, GGobiPipelineMessage *msg, gpointer us
 {
   ggobi_pipeline_message_changed_cols_foreach(msg, 
     (GGobiIndexFunc)vartable_changed_col_foreach, s);
-  ggobi_pipeline_message_removed_cols_foreach_reverse(msg, 
+  ggobi_pipeline_message_removed_cols_foreach_decreasing(msg, 
     (GGobiIndexFunc)vartable_removed_col_foreach, s);
   ggobi_pipeline_message_added_cols_foreach(msg, 
     (GGobiIndexFunc)vartable_added_col_foreach, s);

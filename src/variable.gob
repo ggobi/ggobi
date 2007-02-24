@@ -1,12 +1,3 @@
-%privateheader{
-  typedef struct level_s {
-    guint index;
-    guint count;
-    gint value;
-    gchar *name;
-  } level_t;
-%}
-
 %h{
   #include "types.h"
   
@@ -32,7 +23,14 @@
   #include <math.h>
   /* for qsort */
   #include <stdlib.h>
-    
+  
+  typedef struct level_s {
+    guint index;
+    guint count;
+    gint value;
+    gchar *name;
+  } level_t;
+  
   static void
   value_collector_func(gpointer key, gpointer value, gpointer data)
   {
@@ -153,7 +151,7 @@ private gboolean dirty_levels = TRUE;
 private gboolean dirty_stats = TRUE;
 private gboolean dirty_limits = TRUE;
 
-protected level_t *
+private level_t *
 get_level_for_value(self, gint value)
 {
   gpointer key;
@@ -166,7 +164,7 @@ get_level_for_value(self, gint value)
   return(level);
 }
 
-protected level_t *
+private level_t *
 get_level_for_name(self, const gchar *name)
 {
   gpointer key;
@@ -180,6 +178,15 @@ get_level_for_name(self, const gchar *name)
 }
 
 /* Every variable must be associated with the same stage for its lifetime */
+  /**
+   * new:
+   * @stage: the stage to which this variable belongs.
+   *
+   * Creates the variable and attaches it to the given stage. This relationship
+   * must last for the lifetime of the #GGobiVariable.
+   *
+   * Returns: new #GGobiVariable
+   */
 public GGobiVariable *
 new(GGobiStage *stage)
 {
@@ -187,17 +194,28 @@ new(GGobiStage *stage)
   return(GGOBI_VARIABLE(o));
 }
 
+  /**
+   * set_name_transform_func:
+   * @self: a #GGobiVariable
+   * @func: function used for transforming the name of this variable.
+   *
+   * This allows the client to specify a function that transforms the name
+   * of this variable. This is useful, for example, when a variable is
+   * transformed and the name needs to indicate the transformation, 
+   * like "Log(X)" for variable "X".
+   *
+   */
 public void
 set_name_transform_func(self, GGobiVariableNameTransformFunc func,
   gpointer user_data)
-{
+{ // FIXME: this needs to call an update of its name
   selfp->name_transform_func = func;
   selfp->transform_user_data = user_data;
 }
 
 /**
 * get_col_n_levels:
-* @self: #GGobiStage object
+* @self: categorical #GGobiStage object
 * @j: column index
 *
 * Get number of levels in a categorical variable
@@ -210,6 +228,15 @@ get_n_levels(self)
   return(g_hash_table_size(selfp->name_to_level));
 }
 
+  /**
+   * get_level_name:
+   * @self: a categorical #GGobiVariable
+   * @value: the value of the level.
+   *
+   * Get the name of the level with the given value.
+   *
+   * Returns: name of the level
+   */
 public const gchar* 
 get_level_name(self, gint value)
 {
@@ -222,6 +249,15 @@ get_level_name(self, gint value)
   return level->name;
 }
 
+  /**
+   * get_level_value:
+   * @self: a categorical #GGobiVariable
+   * @name: Name of the level.
+   *
+   * Get the value for the level with the given name.
+   *
+   * Returns: Value for the level.
+   */
 public gint
 get_level_value(self, const gchar *name) {
   level_t *level;
@@ -233,6 +269,15 @@ get_level_value(self, const gchar *name) {
   return level->value;
 }
 
+  /**
+   * get_level_count:
+   * @self: a categorical #GGobiVariable
+   * @value: the level value
+   *
+   * Get the number of values with the given level.
+   *
+   * Returns: #guint
+   */
 public guint  
 get_level_count(self, gint value)
 {
@@ -245,6 +290,14 @@ get_level_count(self, gint value)
   return(level->count);
 }
 
+  /**
+   * get_level_values:
+   * @self: a categorical #GGobiVariable
+   *
+   * Gets the values of each level.
+   *
+   * Returns: allocated array of integer level values.
+   */
 public gint *
 get_level_values(self)
 {
@@ -260,6 +313,15 @@ get_level_values(self)
   return(values);
 }
 
+  /**
+   * get_level_index:
+   * @self: a #GGobiVariable
+   * @value: level value
+   *
+   * Gets the index of the level with the value. Useful for some algorithms.
+   *
+   * Returns: level index
+   */
 public gint
 get_level_index(self, gint value)
 {
@@ -268,6 +330,15 @@ get_level_index(self, gint value)
   level = self_get_level_for_value(self, value);
   return(level ? level->index : -1);
 }
+  /**
+   * get_level_index_for_name:
+   * @self: a #GGobiVariable
+   * @name: name of the level
+   *
+   * Gets the level index for the level with the given name.
+   *
+   * Returns: level index
+   */
 public gint
 get_level_index_for_name(self, const gchar *name)
 {
@@ -277,6 +348,15 @@ get_level_index_for_name(self, const gchar *name)
   return(level ? level->index : -1);
 }
   
+  /**
+   * has_level:
+   * @self: a #GGobiVariable
+   * @value: level value
+   *
+   * Whether a level exists with the given value.
+   *
+   * Returns: %TRUE if the level exists.
+   */
 public gboolean
 has_level(self, gint value)
 {
@@ -284,6 +364,15 @@ has_level(self, gint value)
   return(self_get_level_for_value(self, value) != NULL);
 }
 
+  /**
+   * has_level_for_name:
+   * @self: a #GGobiVariable
+   * @name: level name
+   *
+   * Whether a level exists with the given name.
+   *
+   * Returns: %TRUE if the level exists.
+   */
 public gboolean
 has_level_for_name(self, const gchar *name)
 {
@@ -417,8 +506,8 @@ refresh_limits(self)
 * @self: #GGobiStage object
 * 
 * Find the biggest value in the column.
-* For numerical columns, value is cached by limits_set()
-* Does the right thing for categorical variables too.  
+*
+* Returns: the maximum value.
 **/
 public gfloat
 get_max(self)
@@ -432,8 +521,8 @@ get_max(self)
 * @self: #GGobiStage object
 * 
 * Find the smallest value in the column.
-* For numerical columns, value is cached by limits_set()
-* Does the right thing for categorical variables too.
+*
+* Returns: the minimum value.
 **/
 public gfloat
 get_min(self)
@@ -442,6 +531,14 @@ get_min(self)
   return(gfloat) selfp->lim.min;
 }
 
+  /**
+   * get_display_max:
+   * @self: a #GGobiVariable
+   *
+   * Gets the maximum, excluding missings. Temporary function.
+   *
+   * Returns: maximum value, not counting missings.
+   */
 public gfloat
 get_display_max(self)
 {
@@ -449,6 +546,14 @@ get_display_max(self)
   return(gfloat) selfp->lim_display.max;
 }
 
+  /**
+   * get_display_min:
+   * @self: a #GGobiVariable
+   *
+   * Gets the minimum, excluding missings. Temporary function.
+   *
+   * Returns: minimum value, not counting missings
+   */
 public gfloat
 get_display_min(self)
 {
@@ -456,6 +561,15 @@ get_display_min(self)
   return(gfloat) selfp->lim_display.min;
 }
 
+  /**
+   * get_limits:
+   * @self: a #GGobiVariable
+   * @min: return location for minimum
+   * @max: return location for maximum
+   *
+   * Gets the minimum and maximum simultaneously.
+   *
+   */
 public void
 get_limits(self, gfloat *min, gfloat *max)
 {
@@ -463,6 +577,14 @@ get_limits(self, gfloat *min, gfloat *max)
   *max = self_get_max(self);
 }
 
+  /**
+   * get_range:
+   * @self: a #GGobiVariable
+   *
+   * 
+   *
+   * Returns: The difference between the maximum and minimum.
+   */
 public gfloat
 get_range(self)
 {
@@ -495,6 +617,14 @@ refresh_stats(self)
   selfp->dirty_stats = FALSE;
 }
 
+  /**
+   * get_mean:
+   * @self: a #GGobiVariable
+   *
+   *
+   *
+   * Returns: the mean
+   */
 public gfloat
 get_mean(self)
 {
@@ -502,6 +632,14 @@ get_mean(self)
   return selfp->mean;
 }
 
+  /**
+   * get_median:
+   * @self: a #GGobiVariable
+   *
+   *
+   *
+   * Returns: the median
+   */
 public gfloat
 get_median(self)
 {
@@ -509,6 +647,14 @@ get_median(self)
   return selfp->median;
 }
 
+  /**
+   * get_variance:
+   * @self: a #GGobiVariable
+   *
+   *
+   *
+   * Returns: the variance
+   */
 public gfloat
 get_variance(self)
 {
@@ -516,6 +662,14 @@ get_variance(self)
   return selfp->variance;
 }
 
+  /**
+   * has_missings:
+   * @self: a #GGobiVariable
+   *
+   *
+   *
+   * Returns: %TRUE if this variable has missing values.
+   */
 public gboolean
 has_missings(self)
 {
@@ -531,6 +685,14 @@ has_missings(self)
   return selfp->has_missings;
 }
 
+  /**
+   * clone:
+   * @self: a #GGobiVariable
+   *
+   * Makes a copy of this variable.
+   *
+   * Returns: clone of this variable.
+   */
 public GGobiVariable*
 clone(self)
 {
@@ -579,9 +741,11 @@ add_level_instance(self, const gchar *name, gint value)
 /**
 * add_level:
 * @self: #GGobiStage object
-* @j: column index
 * @name: character description of level, if NULL uses value
 * @value: level value, if -1 uses index + 1
+*
+* Adds a level to a categorical variable.
+*
 * Returns: index of new level
 **/
 public guint
@@ -624,6 +788,13 @@ add_level(self, const gchar *name, gint value)
  return n_levels;
 }
 
+  /**
+   * update:
+   * @self: a #GGobiVariable
+   *
+   * Force this variable to update its statistics.
+   *
+   */
 public void
 update(self)
 {
@@ -636,7 +807,7 @@ update(self)
  selfp->dirty_limits = TRUE;
 }
 
-protected void
+private void
 maybe_update_levels(self)
 {
   /* Not sure if lazy caching is worth the trouble for these levels */

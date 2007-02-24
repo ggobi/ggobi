@@ -1,0 +1,135 @@
+<!-- ##### SECTION Title ##### -->
+GGobiStageFilter
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT GGobiStageFilter ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG GGobiStageFilter:filter-column ##### -->
+<para>
+
+</para>
+
+<!-- ##### STRUCT GGobiStageFilterClass ##### -->
+<para>
+
+</para>
+
+@__parent__: 
+@included: 
+
+<!-- ##### FUNCTION ggobi_stage_filter_get_filter_column ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_filter_set_filter_column ##### -->
+<para>
+
+</para>
+
+@self: 
+@val: 
+
+
+<!-- ##### FUNCTION ggobi_stage_filter_new ##### -->
+<para>
+
+</para>
+
+@parent: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_filter_is_included ##### -->
+<para>
+
+</para>
+
+@self: 
+@i: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_filter_set_included ##### -->
+<para>
+
+</para>
+
+@self: 
+@i: 
+@val: 
+
+
+<!-- ##### FUNCTION ggobi_stage_filter_set_included_all ##### -->
+<para>
+
+</para>
+
+@self: 
+@value: 
+
+
+<!-- ##### FUNCTION ggobi_stage_filter_included ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_filter_update ##### -->
+<para>
+
+</para>
+
+@self: 
+
+
+<!-- ##### FUNCTION ggobi_stage_filter_process_filter ##### -->
+<para>
+
+</para>
+
+@self: 
+
+
+<!-- ##### MACRO GGOBI_STAGE_FILTER_PROP_FILTER_COLUMN ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+
+<!-- ##### MACRO GGOBI_STAGE_FILTER_GET_PROP_FILTER_COLUMN ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+

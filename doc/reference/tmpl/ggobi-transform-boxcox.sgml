@@ -1,0 +1,55 @@
+<!-- ##### SECTION Title ##### -->
+GGobiTransformBoxcox
+
+<!-- ##### SECTION Short_Description ##### -->
+Box-Cox transformation
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT GGobiTransformBoxcox ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG GGobiTransformBoxcox:lambda ##### -->
+<para>
+
+</para>
+
+<!-- ##### STRUCT GGobiTransformBoxcoxClass ##### -->
+<para>
+
+</para>
+
+@__parent__: 
+
+<!-- ##### FUNCTION ggobi_transform_boxcox_get_lambda ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_transform_boxcox_set_lambda ##### -->
+<para>
+
+</para>
+
+@self: 
+@val: 
+
+

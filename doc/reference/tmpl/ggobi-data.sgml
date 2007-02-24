@@ -1,0 +1,193 @@
+<!-- ##### SECTION Title ##### -->
+GGobiData
+
+<!-- ##### SECTION Short_Description ##### -->
+Dataset, the root of a pipeline
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+The #GGobiData object holds the data being analyzed. As the root of a pipeline,
+it serves as the source of the data that is transformed by the pipeline into
+various visualizations.
+</para>
+<para>
+It is possible to construct an instance directly, but usually datasets are
+instantiated by #GGobiDataFactory objects that extract data from a file
+or some other external data structure.
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+#GGobiDataFactory
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+Unstable
+
+<!-- ##### STRUCT GGobiData ##### -->
+<para>
+
+</para>
+
+@nickname: 
+
+<!-- ##### ARG GGobiData:nickname ##### -->
+<para>
+The nickname of the dataset, used when a short name is needed in the GUI.
+</para>
+
+<!-- ##### ARG GGobiData:source ##### -->
+<para>
+The raw data source from which this dataset was derived.
+</para>
+
+<!-- ##### STRUCT GGobiDataClass ##### -->
+<para>
+
+</para>
+
+@__parent__: 
+
+<!-- ##### ENUM datatyped ##### -->
+<para>
+
+</para>
+
+@no_edgesets: 
+@edgesets_only: 
+@all_datatypes: 
+
+<!-- ##### FUNCTION ggobi_data_get_nickname ##### -->
+<para>
+Get #GGobiData::nickname.
+</para>
+
+@self: a #GGobiData
+@Returns: the nickname
+
+
+<!-- ##### FUNCTION ggobi_data_set_nickname ##### -->
+<para>
+Set #GGobiData::nickname.
+</para>
+
+@self: a #GGobiData
+@val: the nickname
+
+
+<!-- ##### FUNCTION ggobi_data_get_source ##### -->
+<para>
+Get #GGobiData::source.
+</para>
+
+@self: a #GGobiData
+@Returns: the input source
+
+
+<!-- ##### FUNCTION ggobi_data_set_source ##### -->
+<para>
+Set #GGobiData::source.
+</para>
+
+@self: a #GGobiData
+@val: the input source
+
+
+<!-- ##### FUNCTION ggobi_data_new ##### -->
+<para>
+
+</para>
+
+@nrows: 
+@ncols: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_data_add_attributes ##### -->
+<para>
+
+</para>
+
+@self: 
+
+
+<!-- ##### FUNCTION ggobi_data_add_attribute ##### -->
+<para>
+
+</para>
+
+@self: 
+@name: 
+@value: 
+
+
+<!-- ##### FUNCTION ggobi_data_set_col_default_value ##### -->
+<para>
+
+</para>
+
+@self: 
+@j: 
+@value: 
+
+
+<!-- ##### FUNCTION ggobi_data_get_col_default_value ##### -->
+<para>
+
+</para>
+
+@self: 
+@j: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_data_set_col_type ##### -->
+<para>
+
+</para>
+
+@self: 
+@j: 
+@value: 
+
+
+<!-- ##### FUNCTION ggobi_data_add_rows ##### -->
+<para>
+
+</para>
+
+@self: 
+@n: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_data_reset_rows ##### -->
+<para>
+
+</para>
+
+@self: 
+@start: 
+@end: 
+
+
+<!-- ##### FUNCTION ggobi_data_add_cols ##### -->
+<para>
+
+</para>
+
+@self: 
+@n: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_data_delete_cols ##### -->
+<para>
+
+</para>
+
+@self: 
+@cols: 
+@Returns: 
+
+

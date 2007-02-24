@@ -1,6 +1,9 @@
 %h{
   #include "ggobi-transform.h"
 %}
+%{
+  #include <math.h>
+%}
 class GGobi:Transform:Abs from GGobi:Transform {
   
   override (GGobi:Transform) gchar *

@@ -1,0 +1,368 @@
+<!-- ##### SECTION Title ##### -->
+GGobiPipelineMessage
+
+<!-- ##### SECTION Short_Description ##### -->
+Communicates changes in the pipeline
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+Describes changes in the pipeline data matrix. It communicates five different
+types of changes:
+<itemizedlist>
+  <listitem><para>Remove columns</para></listitem>
+  <listitem><para>Remove rows</para></listitem>
+  <listitem><para>Change data values (by column)</para></listitem>
+  <listitem><para>Add columns</para></listitem>
+  <listitem><para>Add rows</para></listitem>
+</itemizedlist>
+</para><para>
+Note that insertion is not supported; all additions occur at the ends of the
+matrix. Also there is no event for row changes, because it is redundant with
+column changes, which occur more often and are more efficiently handled by
+embedding environments, since there are usually less columns than rows.
+</para><para>
+These changes obviously conflict with each other, so the order in which they
+are considered is important. Changes occur in the following order: deletion,
+update, addition. The reasoning for this is thus: it is wasteful to add or
+change elements that will soon be deleted and we also want to avoid changing
+elements that are still to be added.
+</para><para>
+In the case of columns, this means that the indices of the changed columns
+take into account any removals. It also means that it is not possible to
+remove or change indices that have been appended, since appending takes
+place after removal and changing.
+</para><para>
+When a message is received, usually from the parent staage, its indexing 
+should be compatible with that of the receiver. Some pipeline stages, 
+specifically filters, change the indexing by removing rows and/or columns. 
+It is the responsibility of those stages to use the ggobi_pipeline_message_filter_rows() and
+ggobi_pipeline_message_filter_cols() convenience methods to modify the indexing by providing the
+indices of the hidden rows and columns, respectively. Filtering blocks
+all types of events: removals, changes, and additions.
+</para><para>
+Some stages, which are extensions of filters, essentially replace the data
+matrix by column (like in tours) or row or both (like generating a dataset
+describing the variables, ie an experimental design matrix). In the first
+two cases, it may be simpler to allow resetting the message by row or
+column. This means clearing out all previous events and resetting the
+initial dimension. This is achieved by the ggobi_pipeline_message_reset_rows() 
+and ggobi_pipeline_message_reset_cols() functions. 
+Redefining both rows and columns warrants the generation of a new message.
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+#GGobiStage
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+Unstable
+
+<!-- ##### STRUCT GGobiPipelineMessage ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG GGobiPipelineMessage:n-cols ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG GGobiPipelineMessage:n-rows ##### -->
+<para>
+
+</para>
+
+<!-- ##### STRUCT GGobiPipelineMessageClass ##### -->
+<para>
+
+</para>
+
+@__parent__: 
+
+<!-- ##### FUNCTION ggobi_pipeline_message_get_n_cols ##### -->
+<para>
+Get #GGobiPipelineMessage::n-cols
+</para>
+
+@self: a #GGobiPipelineMessage
+@Returns: the number of indexed columns
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_set_n_cols ##### -->
+<para>
+Set #GGobiPipelineMessage::n-cols
+</para>
+
+@self: a #GGobiPipelineMessage
+@val: the number of indexed columns
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_get_n_rows ##### -->
+<para>
+Get #GGobiPipelineMessage::n-rows
+</para>
+
+@self: a #GGobiPipelineMessage
+@Returns: the number of indexed rows
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_set_n_rows ##### -->
+<para>
+Set #GGobiPipelineMessage::n-rows
+</para>
+
+@self: a #GGobiPipelineMessage
+@val: the number of indexed rows
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_new ##### -->
+<para>
+
+</para>
+
+@nrows: 
+@ncols: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_get_changed_cols ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_get_removed_cols ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_get_removed_rows ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_get_n_added_cols ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_get_n_added_rows ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_get_n_removed_rows ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_get_n_changed_cols ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_get_n_removed_cols ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_changed_cols_foreach ##### -->
+<para>
+
+</para>
+
+@self: 
+@func: 
+@data: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_removed_cols_foreach ##### -->
+<para>
+
+</para>
+
+@self: 
+@func: 
+@data: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_removed_cols_foreach_decreasing ##### -->
+<para>
+
+</para>
+
+@self: 
+@func: 
+@data: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_removed_rows_foreach ##### -->
+<para>
+
+</para>
+
+@self: 
+@func: 
+@data: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_removed_rows_foreach_decreasing ##### -->
+<para>
+
+</para>
+
+@self: 
+@func: 
+@data: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_added_rows_foreach ##### -->
+<para>
+
+</para>
+
+@self: 
+@func: 
+@data: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_added_cols_foreach ##### -->
+<para>
+
+</para>
+
+@self: 
+@func: 
+@data: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_change_col ##### -->
+<para>
+
+</para>
+
+@self: 
+@j: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_change_cols ##### -->
+<para>
+
+</para>
+
+@self: 
+@cols: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_remove_cols ##### -->
+<para>
+
+</para>
+
+@self: 
+@cols: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_remove_rows ##### -->
+<para>
+
+</para>
+
+@self: 
+@rows: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_add_cols ##### -->
+<para>
+
+</para>
+
+@self: 
+@n: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_add_rows ##### -->
+<para>
+
+</para>
+
+@self: 
+@n: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_filter_cols ##### -->
+<para>
+
+</para>
+
+@self: 
+@cols: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_filter_rows ##### -->
+<para>
+
+</para>
+
+@self: 
+@rows: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_consume_rows ##### -->
+<para>
+
+</para>
+
+@self: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_consume_cols ##### -->
+<para>
+
+</para>
+
+@self: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_merge ##### -->
+<para>
+
+</para>
+
+@self: 
+@other: 
+
+

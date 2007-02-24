@@ -1,0 +1,338 @@
+<!-- ##### SECTION Title ##### -->
+GGobiPlugin
+
+<!-- ##### SECTION Short_Description ##### -->
+An external library linked to GGobi at runtime
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+A #GGobiPlugin is the interface through which GGobi interacts with external
+blobs of code. By default, the GModule library is used to load shared object
+files into GGobi. 
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT GGobiPlugin ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG GGobiPlugin:author ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG GGobiPlugin:description ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG GGobiPlugin:dll-name ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG GGobiPlugin:on-close-name ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG GGobiPlugin:on-create-name ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG GGobiPlugin:on-load-name ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG GGobiPlugin:on-unload-name ##### -->
+<para>
+
+</para>
+
+<!-- ##### STRUCT GGobiPluginClass ##### -->
+<para>
+
+</para>
+
+@__parent__: 
+@ggobi_created: 
+@ggobi_destroyed: 
+@get_symbol: 
+
+<!-- ##### FUNCTION ggobi_plugin_get_on_load_name ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_plugin_set_on_load_name ##### -->
+<para>
+
+</para>
+
+@self: 
+@val: 
+
+
+<!-- ##### FUNCTION ggobi_plugin_get_on_unload_name ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_plugin_set_on_unload_name ##### -->
+<para>
+
+</para>
+
+@self: 
+@val: 
+
+
+<!-- ##### FUNCTION ggobi_plugin_get_on_create_name ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_plugin_set_on_create_name ##### -->
+<para>
+
+</para>
+
+@self: 
+@val: 
+
+
+<!-- ##### FUNCTION ggobi_plugin_get_on_close_name ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_plugin_set_on_close_name ##### -->
+<para>
+
+</para>
+
+@self: 
+@val: 
+
+
+<!-- ##### FUNCTION ggobi_plugin_get_author ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_plugin_set_author ##### -->
+<para>
+
+</para>
+
+@self: 
+@val: 
+
+
+<!-- ##### FUNCTION ggobi_plugin_get_description ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_plugin_set_description ##### -->
+<para>
+
+</para>
+
+@self: 
+@val: 
+
+
+<!-- ##### FUNCTION ggobi_plugin_get_dll_name ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_plugin_set_dll_name ##### -->
+<para>
+
+</para>
+
+@self: 
+@val: 
+
+
+<!-- ##### FUNCTION ggobi_plugin_new ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_plugin_has_dependencies ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_plugin_get_dependencies ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_plugin_add_dependency ##### -->
+<para>
+
+</para>
+
+@self: 
+@plugin: 
+
+
+<!-- ##### FUNCTION ggobi_plugin_get_argument_for_name ##### -->
+<para>
+
+</para>
+
+@self: 
+@name: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_plugin_add_argument ##### -->
+<para>
+
+</para>
+
+@self: 
+@name: 
+@arg: 
+
+
+<!-- ##### FUNCTION ggobi_plugin_ggobi_created ##### -->
+<para>
+
+</para>
+
+@self: 
+@gg: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_plugin_ggobi_destroyed ##### -->
+<para>
+
+</para>
+
+@self: 
+@gg: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_plugin_get_symbol ##### -->
+<para>
+
+</para>
+
+@self: 
+@symbol_name: 
+@symbol: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_plugin_check_plugin ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### STRUCT GGobiPluginInstance ##### -->
+<para>
+
+</para>
+
+@plugin: 
+@gg: 
+@data: 
+
+<!-- ##### USER_FUNCTION OnLoadFunc ##### -->
+<para>
+
+</para>
+
+@plugin: 
+@Returns: 
+
+
+<!-- ##### USER_FUNCTION OnCreateFunc ##### -->
+<para>
+
+</para>
+
+@inst: 
+@Returns: 
+
+
+<!-- ##### USER_FUNCTION OnCloseFunc ##### -->
+<para>
+
+</para>
+
+@inst: 
+@Returns: 
+
+
+<!-- ##### USER_FUNCTION OnUnloadFunc ##### -->
+<para>
+
+</para>
+
+@plugin: 
+@Returns: 
+
+

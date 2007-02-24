@@ -1,0 +1,38 @@
+<!-- ##### SECTION Title ##### -->
+GGobiGUIComponent
+
+<!-- ##### SECTION Short_Description ##### -->
+Base class for GGobi GUI components
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+It is not yet clear what role, if any, this class will play in GGobi.
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+Unstable
+
+<!-- ##### STRUCT GGobiGUIComponent ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG GGobiGUIComponent:gg ##### -->
+<para>
+
+</para>
+
+<!-- ##### STRUCT GGobiGUIComponentClass ##### -->
+<para>
+
+</para>
+
+@__parent__: 
+@initialize: 
+

@@ -80,13 +80,32 @@ class GGobi:Stage:Transform from GGobi:Stage {
     self_transform(self, 0, j);
   }
   
+  /**
+   * new:
+   * @parent: the parent stage 
+   *
+   *
+   * Returns: the new transform stage with the given parent
+   */
   public GObject *
   new(GGobiStage *parent)
   {
-    GObject *o = G_OBJECT(GET_NEW_VARG("parent", parent, NULL));
+    GObject *o = (GObject *)GET_NEW_VARG("parent", parent, NULL);
     return(o);
   }
   
+  /**
+   * apply:
+   * @self: a #GGobiStageTransform
+   * @j: column index
+   * @tform: the transform to apply
+   *
+   * Applies the transform to the specified column. The transform is persistent,
+   * so when values in the underlying data change, they are transformed.
+   * It is only possible to register a single transform against a given column,
+   * per transform stage.
+   *
+   */
   public void 
   apply(self, guint j  (check < N_COLS), GGobiTransform *tform)
   {
@@ -107,11 +126,26 @@ class GGobi:Stage:Transform from GGobi:Stage {
     displays_tailpipe (FULL, GGOBI_STAGE(self)->gg);
     self_applied(self, j, tform);
   }
+  /**
+   * cancel:
+   * @self: a #GGobiStageTransform
+   * @j: the column index
+   *
+   * Cancel the transform at the given column.
+   *
+   */
   public void
   cancel(self, guint j  (check < N_COLS))
   {
     self_apply(self, j, NULL);
   }
+  /**
+   * cancel_all:
+   * @self: a #GGobiStageTransform
+   *
+   * Cancel transforms at all columns.
+   *
+   */
   public void
   cancel_all(self)
   {
@@ -121,7 +155,14 @@ class GGobi:Stage:Transform from GGobi:Stage {
       self_cancel(self, cols[j]);
   }
   
-  /* don't modify this value */
+  /**
+   * get_transform:
+   * @self: a #GGobiStageTransform
+   * @j: column index
+   *
+   *
+   * Returns: #GGobiTransform for column @j.
+   */
   public GGobiTransform *
   get_transform(self, guint j (check < N_COLS))
   {
@@ -144,6 +185,14 @@ class GGobi:Stage:Transform from GGobi:Stage {
     return(cols);
   }
   
+  /**
+   * get_n_transformed_cols:
+   * @self: a #GGobiStageTransform
+   *
+   *
+   *
+   * Returns: the number of columns with transforms applied.
+   */
   public guint
   get_n_transformed_cols(self)
   {

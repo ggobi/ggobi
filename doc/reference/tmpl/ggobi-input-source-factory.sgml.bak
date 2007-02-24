@@ -1,0 +1,39 @@
+<!-- ##### SECTION Title ##### -->
+GGobiInputSourceFactory
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### FUNCTION ggobi_input_source_factory_get_supported_schemes ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_input_source_factory_create ##### -->
+<para>
+
+</para>
+
+@self: 
+@uri: 
+@mode: 
+@Returns: 
+
+

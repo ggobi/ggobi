@@ -1,0 +1,825 @@
+<!-- ##### SECTION Title ##### -->
+GGobiStage
+
+<!-- ##### SECTION Short_Description ##### -->
+Base component of the pipeline
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+The GGobi pipeline manipulates data so that it becomes suitable for 
+a certain visualization. The pipeline consists of stages, each performing
+a specific task on the data.
+</para>
+<para>
+This class only implements the identity transformation. Subclasses are meant
+override a subset of these operations in order to transform or otherwise 
+"decorate" the data on the way to its visualization.
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+Unstable
+
+<!-- ##### STRUCT GGobiStage ##### -->
+<para>
+
+</para>
+
+@name: 
+@gg: 
+@n_rows: 
+@n_cols: 
+@vcbox_ui: 
+@vcirc_ui: 
+@varpanel_ui: 
+@vartable_tree_view: 
+@vartable_tree_model: 
+@cluster_table: 
+@clusvui: 
+@jitter: 
+@sphere: 
+@brush: 
+@rows_under_brush: 
+@rows_under_brush_prev: 
+@world: 
+@jitdata: 
+@missings_show_p: 
+@nrows_under_brush: 
+@nrows_under_brush_prev: 
+@symbol_table: 
+@nclusters: 
+@clusv: 
+@sticky_ids: 
+@nearest_point: 
+@nearest_point_prev: 
+@movepts_history: 
+@linkvar: 
+
+<!-- ##### SIGNAL GGobiStage::changed ##### -->
+<para>
+Announces changes to the dimensions or content of the data matrix.
+The changes are aggregated into a #GGobiPipelineMessage.
+</para>
+
+@ggobistage: the object which received the signal.
+@arg1: the #GGobiPipelineMessage holding the changes
+
+<!-- ##### SIGNAL GGobiStage::col-name-changed ##### -->
+<para>
+Announces changes to the name of a column.
+</para>
+
+@ggobistage: the object which received the signal.
+@arg1: the previous name
+@arg2: the column index
+
+<!-- ##### ARG GGobiStage:n-cols ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG GGobiStage:n-rows ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG GGobiStage:name ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG GGobiStage:parent ##### -->
+<para>
+The parent of this stage. Stages act as proxies of their parents and listen
+to changes in their parent in order to remain in sync. It is possible and
+often useful to reparent a stage.
+</para>
+
+<!-- ##### STRUCT GGobiStageClass ##### -->
+<para>
+
+</para>
+
+@__parent__: 
+@col_name_changed: 
+@changed: 
+@set_col_name: 
+@update_col: 
+@set_missing: 
+@is_missing: 
+@set_raw_value: 
+@set_categorical_value: 
+@get_categorical_value: 
+@get_raw_value: 
+@create_variable: 
+@get_n_edges: 
+@get_edge_data: 
+@set_row_id: 
+@get_row_id: 
+@get_row_for_id: 
+@process_outgoing: 
+@process_incoming: 
+
+<!-- ##### FUNCTION ggobi_stage_get_parent ##### -->
+<para>
+Get #GGobiStage::parent.
+</para>
+
+@self: a #GGobiStage
+@Returns: the parent of this stage
+
+
+<!-- ##### FUNCTION ggobi_stage_set_parent ##### -->
+<para>
+Set #GGobiStage::parent. This reparents the stage, possibly transferring
+it to another pipeline.
+</para>
+
+@self: a #GGobiStage
+@val: the new parent for this stage
+
+
+<!-- ##### FUNCTION ggobi_stage_get_name ##### -->
+<para>
+Get #GGobiStage::name.
+</para>
+
+@self: a #GGobiStage
+@Returns: the (unique) identifier of this stage
+
+
+<!-- ##### FUNCTION ggobi_stage_set_name ##### -->
+<para>
+Set #GGobiStage::name.
+</para>
+
+@self: a #GGobiStage
+@val: the new identifier for this stage
+
+
+<!-- ##### FUNCTION ggobi_stage_get_n_rows ##### -->
+<para>
+Get #GGobiStage::n-rows
+</para>
+
+@self: a #GGobiStage
+@Returns: the number of rows in the data matrix
+
+
+<!-- ##### FUNCTION ggobi_stage_set_n_rows ##### -->
+<para>
+Set #GGobiStage::n-rows.
+</para>
+
+@self: a #GGobiStage
+@val: number of rows
+
+
+<!-- ##### FUNCTION ggobi_stage_get_n_cols ##### -->
+<para>
+Get #GGobiStage::n-cols.
+</para>
+
+@self: a #GGobiStage
+@Returns: number of cols in the data matrix
+
+
+<!-- ##### FUNCTION ggobi_stage_set_n_cols ##### -->
+<para>
+Set #GGobiStage::n-cols.
+</para>
+
+@self: a #GGobiStage
+@val: number of cols
+
+
+<!-- ##### FUNCTION ggobi_stage_col_name_changed ##### -->
+<para>
+
+</para>
+
+@self: 
+@old_name: 
+@j: 
+
+
+<!-- ##### FUNCTION ggobi_stage_get_message ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_queue_message ##### -->
+<para>
+
+</para>
+
+@self: 
+@msg: 
+
+
+<!-- ##### FUNCTION ggobi_stage_process_incoming ##### -->
+<para>
+
+</para>
+
+@self: 
+@msg: 
+
+
+<!-- ##### FUNCTION ggobi_stage_process_outgoing ##### -->
+<para>
+
+</para>
+
+@self: 
+@msg: 
+
+
+<!-- ##### FUNCTION ggobi_stage_has_changes ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_flush_changes ##### -->
+<para>
+
+</para>
+
+@self: 
+
+
+<!-- ##### FUNCTION ggobi_stage_flush_changes_here ##### -->
+<para>
+
+</para>
+
+@self: 
+
+
+<!-- ##### FUNCTION ggobi_stage_col_data_changed ##### -->
+<para>
+
+</para>
+
+@self: 
+@j: 
+
+
+<!-- ##### FUNCTION ggobi_stage_cols_added ##### -->
+<para>
+
+</para>
+
+@self: 
+@n: 
+
+
+<!-- ##### FUNCTION ggobi_stage_col_removed ##### -->
+<para>
+
+</para>
+
+@self: 
+@j: 
+
+
+<!-- ##### FUNCTION ggobi_stage_rows_added ##### -->
+<para>
+
+</para>
+
+@self: 
+@n: 
+
+
+<!-- ##### FUNCTION ggobi_stage_rows_removed ##### -->
+<para>
+
+</para>
+
+@self: 
+@rows: 
+
+
+<!-- ##### FUNCTION ggobi_stage_new ##### -->
+<para>
+
+</para>
+
+@name: 
+@parent: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_get_col_name ##### -->
+<para>
+
+</para>
+
+@self: 
+@j: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_get_col_nickname ##### -->
+<para>
+
+</para>
+
+@self: 
+@j: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_get_col_index_for_name ##### -->
+<para>
+
+</para>
+
+@self: 
+@name: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_set_col_name ##### -->
+<para>
+
+</para>
+
+@self: 
+@j: 
+@value: 
+
+
+<!-- ##### FUNCTION ggobi_stage_set_col_nickname ##### -->
+<para>
+
+</para>
+
+@self: 
+@j: 
+@value: 
+
+
+<!-- ##### FUNCTION ggobi_stage_update_col ##### -->
+<para>
+
+</para>
+
+@self: 
+@j: 
+
+
+<!-- ##### FUNCTION ggobi_stage_set_missing ##### -->
+<para>
+
+</para>
+
+@self: 
+@i: 
+@j: 
+
+
+<!-- ##### FUNCTION ggobi_stage_is_missing ##### -->
+<para>
+
+</para>
+
+@self: 
+@i: 
+@j: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_has_missings ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_get_col_n_missing ##### -->
+<para>
+
+</para>
+
+@self: 
+@j: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_set_raw_values ##### -->
+<para>
+
+</para>
+
+@self: 
+@j: 
+@values: 
+
+
+<!-- ##### FUNCTION ggobi_stage_set_raw_value ##### -->
+<para>
+
+</para>
+
+@self: 
+@i: 
+@j: 
+@value: 
+
+
+<!-- ##### FUNCTION ggobi_stage_set_categorical_value ##### -->
+<para>
+
+</para>
+
+@self: 
+@i: 
+@j: 
+@value: 
+
+
+<!-- ##### FUNCTION ggobi_stage_get_categorical_value ##### -->
+<para>
+
+</para>
+
+@self: 
+@i: 
+@j: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_set_string_value ##### -->
+<para>
+
+</para>
+
+@self: 
+@i: 
+@j: 
+@value: 
+
+
+<!-- ##### FUNCTION ggobi_stage_get_raw_value ##### -->
+<para>
+
+</para>
+
+@self: 
+@i: 
+@j: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_get_raw_values ##### -->
+<para>
+
+</para>
+
+@self: 
+@j: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_get_col_type ##### -->
+<para>
+
+</para>
+
+@self: 
+@j: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_col_is_attribute ##### -->
+<para>
+
+</para>
+
+@self: 
+@j: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_translate_var_to_col ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_get_variable ##### -->
+<para>
+
+</para>
+
+@self: 
+@j: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_get_string_value ##### -->
+<para>
+
+</para>
+
+@self: 
+@i: 
+@j: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_get_n_edges ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_get_edge_data ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_set_row_id ##### -->
+<para>
+
+</para>
+
+@self: 
+@i: 
+@value: 
+
+
+<!-- ##### FUNCTION ggobi_stage_set_row_ids ##### -->
+<para>
+
+</para>
+
+@self: 
+@ids: 
+
+
+<!-- ##### FUNCTION ggobi_stage_get_row_id ##### -->
+<para>
+
+</para>
+
+@self: 
+@i: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_get_row_ids ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_get_row_for_id ##### -->
+<para>
+
+</para>
+
+@self: 
+@id: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_get_root ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_get_children ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_find ##### -->
+<para>
+
+</para>
+
+@self: 
+@name: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_set_attr ##### -->
+<para>
+
+</para>
+
+@self: 
+@i: 
+@j: 
+@j_now: 
+@j_prev: 
+@value: 
+@method: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_reset_attr ##### -->
+<para>
+
+</para>
+
+@self: 
+@i: 
+@j: 
+@j_now: 
+@j_prev: 
+@brush: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_get_attr ##### -->
+<para>
+
+</para>
+
+@self: 
+@i: 
+@j: 
+@j_now: 
+@j_prev: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_get_attr_glyph ##### -->
+<para>
+
+</para>
+
+@self: 
+@i: 
+@j_type: 
+@j_size: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_get_n_vars ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_has_vars ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_attach ##### -->
+<para>
+
+</para>
+
+@self: 
+@gg: 
+@cleanup: 
+
+
+<!-- ##### FUNCTION ggobi_stage_set_variable ##### -->
+<para>
+
+</para>
+
+@self: 
+@j: 
+@value: 
+
+
+<!-- ##### MACRO GGOBI_STAGE_IS_COL_CATEGORICAL ##### -->
+<para>
+Checks whether a given column holds a categorical variable.
+</para>
+
+@stage: a #GGobiStage
+@col: the column index
+
+
+<!-- ##### STRUCT Jitterd ##### -->
+<para>
+
+</para>
+
+@factor: 
+@type: 
+@convex: 
+@jitfacv: 
+
+<!-- ##### STRUCT Varpanel_cboxd ##### -->
+<para>
+
+</para>
+
+@ebox: 
+@swin: 
+@vbox: 
+@box: 
+
+<!-- ##### STRUCT Varpanel_circd ##### -->
+<para>
+
+</para>
+
+@ebox: 
+@vbox: 
+@swin: 
+@hbox: 
+@table: 
+@manip_btn: 
+@freeze_btn: 
+@cursor: 
+@jcursor: 
+@vb: 
+@da: 
+@label: 
+@da_pix: 
+@nvars: 
+
+<!-- ##### STRUCT Varpaneld ##### -->
+<para>
+
+</para>
+
+@hpane: 
+
+<!-- ##### STRUCT Sphere_d ##### -->
+<para>
+
+</para>
+
+@vars: 
+@vars_sphered: 
+@npcs: 
+@pcvars: 
+@eigenval: 
+@eigenvec: 
+@vc: 
+@tform_mean: 
+@tform_stddev: 
+@vars_stdized: 
+
+<!-- ##### STRUCT BrushBins ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT EdgeData ##### -->
+<para>
+
+</para>
+
+@n: 
+@indices: 
+@sym_endpoints: 
+@endpointList: 
+@nxed_by_brush: 
+@xed_by_brush: 
+

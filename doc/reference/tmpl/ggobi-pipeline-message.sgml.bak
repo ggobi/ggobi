@@ -1,0 +1,359 @@
+<!-- ##### SECTION Title ##### -->
+GGobiPipelineMessage
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT GGobiPipelineMessage ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG GGobiPipelineMessage:n-cols ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG GGobiPipelineMessage:n-rows ##### -->
+<para>
+
+</para>
+
+<!-- ##### STRUCT GGobiPipelineMessageClass ##### -->
+<para>
+
+</para>
+
+@__parent__: 
+
+<!-- ##### FUNCTION ggobi_pipeline_message_get_n_cols ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_set_n_cols ##### -->
+<para>
+
+</para>
+
+@self: 
+@val: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_get_n_rows ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_set_n_rows ##### -->
+<para>
+
+</para>
+
+@self: 
+@val: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_new ##### -->
+<para>
+
+</para>
+
+@nrows: 
+@ncols: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_get_changed_cols ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_get_removed_cols ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_get_removed_rows ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_get_n_added_cols ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_get_n_added_rows ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_get_n_removed_rows ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_get_n_changed_cols ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_get_n_removed_cols ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_changed_cols_foreach ##### -->
+<para>
+
+</para>
+
+@self: 
+@func: 
+@data: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_removed_cols_foreach ##### -->
+<para>
+
+</para>
+
+@self: 
+@func: 
+@data: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_removed_cols_foreach_decreasing ##### -->
+<para>
+
+</para>
+
+@self: 
+@func: 
+@data: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_removed_rows_foreach ##### -->
+<para>
+
+</para>
+
+@self: 
+@func: 
+@data: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_removed_rows_foreach_decreasing ##### -->
+<para>
+
+</para>
+
+@self: 
+@func: 
+@data: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_added_rows_foreach ##### -->
+<para>
+
+</para>
+
+@self: 
+@func: 
+@data: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_added_cols_foreach ##### -->
+<para>
+
+</para>
+
+@self: 
+@func: 
+@data: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_change_col ##### -->
+<para>
+
+</para>
+
+@self: 
+@j: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_change_cols ##### -->
+<para>
+
+</para>
+
+@self: 
+@cols: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_remove_cols ##### -->
+<para>
+
+</para>
+
+@self: 
+@cols: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_remove_rows ##### -->
+<para>
+
+</para>
+
+@self: 
+@rows: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_add_cols ##### -->
+<para>
+
+</para>
+
+@self: 
+@n: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_add_rows ##### -->
+<para>
+
+</para>
+
+@self: 
+@n: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_filter_cols ##### -->
+<para>
+
+</para>
+
+@self: 
+@cols: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_filter_rows ##### -->
+<para>
+
+</para>
+
+@self: 
+@rows: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_consume_rows ##### -->
+<para>
+
+</para>
+
+@self: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_consume_cols ##### -->
+<para>
+
+</para>
+
+@self: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_message_merge ##### -->
+<para>
+
+</para>
+
+@self: 
+@other: 
+
+
+<!-- ##### MACRO GGOBI_PIPELINE_MESSAGE_PROP_N_COLS ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+
+<!-- ##### MACRO GGOBI_PIPELINE_MESSAGE_GET_PROP_N_COLS ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+
+<!-- ##### MACRO GGOBI_PIPELINE_MESSAGE_PROP_N_ROWS ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+
+<!-- ##### MACRO GGOBI_PIPELINE_MESSAGE_GET_PROP_N_ROWS ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+

@@ -31,6 +31,16 @@ class GGobi:Input:Source from G:Object (abstract) {
       else g_value_take_string(VAL, g_path_get_basename(selfp->uri));
     };
       
+  /**
+   * get_input:
+   * @self: a #GGobiInputSource
+   * @error: if not %NULL, set to any error encoutered when retrieving the data
+   *
+   * Gets the input stream of data. Decodes it using the available
+   * input decoders, if possible.
+   *
+   * Returns: #GsfInput or %NULL if this input source cannot provide an input stream
+   */
   public GsfInput *
   get_input(self, GError **error) {
     GsfInput *decoded, *input = self_get_raw_input(self, error);
@@ -59,6 +69,15 @@ class GGobi:Input:Source from G:Object (abstract) {
   
   /* implementation of this is optional, but necessary if one wishes to 
      provide a GsfInput via get_input() */
+  /**
+   * get_raw_input:
+   * @self: a #GGobiInputSource
+   * @error: if not %NULL, set to any error encoutered when retrieving the data
+   *
+   * Gets the raw data. No decoding is performed.
+   *
+   * Returns: #GsfInput or %NULL if this input source cannot provide an input stream
+   */
   virtual GsfInput *
   get_raw_input(self, GError **error);
 }

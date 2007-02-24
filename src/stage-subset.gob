@@ -12,8 +12,24 @@
   #include "externs.h"
 %}
 
+enum GGOBI_MATCH {
+  IDENTICAL,
+  INCLUDES,
+  STARTS_WITH,
+  ENDS_WITH,
+  EXCLUDES
+} GGobi:Match:Method;
+  
 class GGobi:Stage:Subset from GGobi:Stage:Filter {
 
+  /**
+   * new:
+   * @parent: the parent stage
+   *
+   * Create a new stage subset stage with the given parent.
+   *
+   * Returns: #GObject
+   */
 public GObject *
 new(GGobiStage *parent)
 {
@@ -22,6 +38,15 @@ new(GGobiStage *parent)
 }
 
 // FIXME: this will go away
+
+  /**
+   * apply:
+   * @self: a #GGobiStageSubset
+   *
+   * Update the filter and perform a few other tasks. This function will
+   * disappear soon.
+   *
+   */
 public void
 apply (self) {
   ggobi_stage_filter_update(GGOBI_STAGE_FILTER(self));
@@ -29,6 +54,13 @@ apply (self) {
     cluster_table_update (GGOBI_STAGE(self), GGOBI_STAGE(self)->gg);
 }
 
+  /**
+   * reset:
+   * @self: a #GGobiStageSubset
+   *
+   * Convenience function that includes all parent rows and applies the changes.
+   *
+   */
 public void
 reset(self)
 {
@@ -40,6 +72,15 @@ reset(self)
  * This algorithm taken from Knuth, Seminumerical Algorithms;
  * Vol 2 of his series.
 */
+  /**
+   * random:
+   * @self: a #GGobiStageSubset
+   * @n: the size of the random sample
+   *
+   * Takes a random subset of size @n.
+   *
+   * Returns: %TRUE if subset changed
+   */
 public gboolean
 random (self, gint n) {
   gint t, m, top = GGOBI_STAGE(self)->n_rows;
@@ -65,6 +106,16 @@ random (self, gint n) {
   return true;
 }
 
+  /**
+   * block:
+   * @self: a #GGobiStageSubset
+   * @bstart: starting index of block
+   * @bsize: size of block
+   *
+   * Subsets a contiguous block of the data
+   *
+   * Returns: %TRUE if subset changed
+   */
 public gboolean
 block (self, gint bstart, gint bsize)
 {
@@ -88,10 +139,11 @@ block (self, gint bstart, gint bsize)
 // FIXME: This range used to apply to the transformed values, but subset
 // comes before transform in the pipeline, so it now works on its own
 // values (the raw values, by default).
+/*
 public gboolean
 range (self)
 {
-  /*gint i, j;
+  gint i, j;
   gint subsetsize = 0;
   GGobiVariable *var;
   gboolean add;
@@ -119,10 +171,20 @@ range (self)
   if (subsetsize == 0)
     quick_message ("Use the variable manipulation panel to set ranges.", false);
  
-  return (subsetsize > 0);*/
+  return (subsetsize > 0);
   return false;
-}
+}*/
 
+  /**
+   * everyn:
+   * @self: a #GGobiStageSubset
+   * @estart: first included row
+   * @estep: number of steps till next included row
+   *
+   * This subset includes every @estep point, starting from @estart.
+   *
+   * Returns: %TRUE if subset changed
+   */
 public gboolean
 everyn (self, gint estart, gint estep)
 {
@@ -144,7 +206,7 @@ everyn (self, gint estart, gint estep)
 
 /*-- create a subset of only the points with sticky ids --*/
 /*-- Added by James Brook, Oct 1994 --*/
-public gboolean
+/*public gboolean
 sticky (self)
 {
   gint id;
@@ -163,10 +225,21 @@ sticky (self)
   }
 
   return true;
-}
+}*/
 
+  /**
+   * rowlab:
+   * @self: a #GGobiStageSubset
+   * @substr: substring matched against rownames
+   * @method: matching method
+   * @ignore_case: %TRUE for case insensitive matching
+   *
+   * Subsets records by their row id, according to @method.
+   *
+   * Returns: %TRUE if subset changed
+   */
 public gboolean
-rowlab (self, gchar *substr, gint substr_pos, gboolean ignore_case)
+rowlab (self, gchar *substr, GGobiMatchMethod method, gboolean ignore_case)
 {
   gint i;
   gssize slen;
@@ -188,19 +261,20 @@ rowlab (self, gchar *substr, gint substr_pos, gboolean ignore_case)
       continue;
     
     gint llen = g_utf8_strlen(label, -1);
-    gint start = substr_pos == 3 ? llen - slen : 0;
+    gint start = method == GGOBI_MATCH_ENDS_WITH ? llen - slen : 0;
     gint safe_len = llen < slen ? llen : slen;
 
     if (start < 0)
       continue;
     if (ignore_case)
-      label = g_utf8_strdown(label, substr_pos == 2 ? safe_len : llen);
+      label = g_utf8_strdown(label, method == GGOBI_MATCH_STARTS_WITH ? safe_len : llen);
     else 
-      label = g_strndup(label, substr_pos == 2 ? safe_len : llen);
+      label = g_strndup(label, method == GGOBI_MATCH_STARTS_WITH ? safe_len : llen);
 
-    if (substr_pos == 1 || substr_pos == 4) {
+    if (method == GGOBI_MATCH_INCLUDES || method == GGOBI_MATCH_EXCLUDES) {
       gchar *inside = strstr(label, substr);
-      if ((inside && substr_pos == 1) || (!inside && substr_pos == 4))
+      if ((inside && method == GGOBI_MATCH_INCLUDES) || 
+          (!inside && method == GGOBI_MATCH_EXCLUDES))
         ggobi_stage_filter_set_included(GGOBI_STAGE_FILTER(self), i, true);
     } else if (!g_utf8_collate(g_utf8_offset_to_pointer(label, start), substr))
         ggobi_stage_filter_set_included(GGOBI_STAGE_FILTER(self), i, true);

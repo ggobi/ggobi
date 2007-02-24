@@ -1,0 +1,139 @@
+<!-- ##### SECTION Title ##### -->
+GGobiStageTransform
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT GGobiStageTransform ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SIGNAL GGobiStageTransform::applied ##### -->
+<para>
+
+</para>
+
+@ggobistagetransform: the object which received the signal.
+@arg1: 
+@arg2: 
+
+<!-- ##### STRUCT GGobiStageTransformClass ##### -->
+<para>
+
+</para>
+
+@__parent__: 
+@applied: 
+
+<!-- ##### FUNCTION ggobi_stage_transform_new ##### -->
+<para>
+
+</para>
+
+@parent: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_transform_apply ##### -->
+<para>
+
+</para>
+
+@self: 
+@j: 
+@tform: 
+
+
+<!-- ##### FUNCTION ggobi_stage_transform_cancel ##### -->
+<para>
+
+</para>
+
+@self: 
+@j: 
+
+
+<!-- ##### FUNCTION ggobi_stage_transform_cancel_all ##### -->
+<para>
+
+</para>
+
+@self: 
+
+
+<!-- ##### FUNCTION ggobi_stage_transform_get_transform ##### -->
+<para>
+
+</para>
+
+@self: 
+@j: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_transform_get_transformed_cols ##### -->
+<para>
+
+</para>
+
+@self: 
+@ncols: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_stage_transform_get_n_transformed_cols ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### MACRO ggobi_stage_transform_connect__applied ##### -->
+<para>
+
+</para>
+
+@object: 
+@func: 
+@data: 
+
+
+<!-- ##### MACRO ggobi_stage_transform_connect_after__applied ##### -->
+<para>
+
+</para>
+
+@object: 
+@func: 
+@data: 
+
+
+<!-- ##### MACRO ggobi_stage_transform_connect_data__applied ##### -->
+<para>
+
+</para>
+
+@object: 
+@func: 
+@data: 
+@destroy_data: 
+@flags: 
+
+

@@ -167,7 +167,7 @@ class GGobi:Bitset from G:Object {
     g_slist_free(indices);
   }
   public void
-  foreach_reverse(self, GGobiIndexFunc func, gpointer data)
+  foreach_decreasing(self, GGobiIndexFunc func, gpointer data)
   {
     GSList *indices = g_slist_reverse(self_get_indices(self));
     g_slist_foreach(indices, (GFunc)func, data);

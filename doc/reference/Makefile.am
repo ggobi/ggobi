@@ -47,7 +47,13 @@ CFILE_GLOB=$(top_srcdir)/src/*.c
 
 # Header files to ignore when scanning.
 # e.g. IGNORE_HFILES=gtkdebug.h gtkintl.h
-IGNORE_HFILES=
+IGNORE_HFILES=GGobiAPI.h GGobiApp.h GGobiEvents.h barchartDisplay.h \
+brushing.h colorscheme.h config.h cpanel.h defines.h display.h \
+display_tree.h externs.h fileio.h ggobi-intl.h \
+ggobi.h ggobiClass.h marshal.h noop-toggle.h parcoordsClass.h plugin.h \ 
+read_init.h scatmatClass.h scatterplotClass.h splot.h testEvents.h tour.h \
+tour1d_pp.h tour2d_pp.h tour_pp.h tsPlot.h tsdisplay.h types.h \
+utils.h vars.h varseldata.h write_xml.h writedata.h
 
 # Images to copy into HTML directory.
 # e.g. HTML_IMAGES=$(top_srcdir)/gtk/stock-icons/stock_about_24.png
@@ -67,8 +73,10 @@ expand_content_files=
 # signals and properties.
 # e.g. INCLUDES=-I$(top_srcdir) -I$(top_builddir) $(GTK_DEBUG_FLAGS)
 # e.g. GTKDOC_LIBS=$(top_builddir)/gtk/$(gtktargetlib)
-INCLUDES=
-GTKDOC_LIBS=
+INCLUDES=-I$(top_srcdir)/src @SRC_DEBUG@ @GTK_CFLAGS@ @LIBXML_CFLAGS@ @LIBGSF_CFLAGS@ \
+  @GSL_CFLAGS@ @GLITZ_CFLAGS@ @INCLTDL@
+GTKDOC_LIBS=@GTK_LIBS@ @LIBXML_LIBS@ @LIBGSF_LIBS@ @GSL_LIBS@ @GLITZ_LIBS@ \
+  ../../src/libggobi.la
 
 # This includes the standard gtk-doc make rules, copied by gtkdocize.
 include $(top_srcdir)/gtk-doc.make

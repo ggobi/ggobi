@@ -1,0 +1,170 @@
+<!-- ##### SECTION Title ##### -->
+GGobiBitset
+
+<!-- ##### SECTION Short_Description ##### -->
+Bitset utility
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+This is a conventional bitset implementation. The design allows the client
+to treat a #GGobiBitset as a list of indices or just a vector of bits.
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+Unstable
+
+<!-- ##### STRUCT GGobiBitset ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT GGobiBitsetClass ##### -->
+<para>
+
+</para>
+
+@__parent__: 
+@clone: 
+
+<!-- ##### FUNCTION ggobi_bitset_new ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_bitset_new_with_size ##### -->
+<para>
+
+</para>
+
+@size: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_bitset_clone ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_bitset_set_size ##### -->
+<para>
+
+</para>
+
+@self: 
+@size: 
+
+
+<!-- ##### FUNCTION ggobi_bitset_get_size ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_bitset_remove_indices ##### -->
+<para>
+
+</para>
+
+@self: 
+@indices: 
+
+
+<!-- ##### FUNCTION ggobi_bitset_insert_indices ##### -->
+<para>
+
+</para>
+
+@self: 
+@indices: 
+
+
+<!-- ##### FUNCTION ggobi_bitset_get_indices ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_bitset_get_n_indices ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_bitset_foreach ##### -->
+<para>
+
+</para>
+
+@self: 
+@func: 
+@data: 
+
+
+<!-- ##### FUNCTION ggobi_bitset_foreach_decreasing ##### -->
+<para>
+
+</para>
+
+@self: 
+@func: 
+@data: 
+
+
+<!-- ##### FUNCTION ggobi_bitset_clear ##### -->
+<para>
+
+</para>
+
+@self: 
+
+
+<!-- ##### FUNCTION ggobi_bitset_set ##### -->
+<para>
+
+</para>
+
+@self: 
+@i: 
+
+
+<!-- ##### FUNCTION ggobi_bitset_unset ##### -->
+<para>
+
+</para>
+
+@self: 
+@i: 
+
+
+<!-- ##### FUNCTION ggobi_bitset_test ##### -->
+<para>
+
+</para>
+
+@self: 
+@i: 
+@Returns: 
+
+

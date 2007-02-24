@@ -288,7 +288,7 @@ set_display_option (gboolean active, guint action, displayd * display)
 }
 
 
-/**
+/*
  This is a start at allowing programmatic specification of
  options. Here, we set them in place (i.e. in display->options) and
  then force them to be applied.  This does not update the menus.

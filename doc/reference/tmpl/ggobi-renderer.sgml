@@ -1,0 +1,68 @@
+<!-- ##### SECTION Title ##### -->
+GGobiRenderer
+
+<!-- ##### SECTION Short_Description ##### -->
+Abstract rendering interface
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+#GGobiRenderer objects are #GdkDrawable implementations that draw to buffers
+that are compatible with some target drawable, to which the renderer may be flushed. 
+The default implementation simply passes drawing commands unchanged to
+an underlying pixmap, but subclasses are able to translate drawing commands
+to support alternative surfaces.
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+Unstable
+
+<!-- ##### STRUCT GGobiRenderer ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG GGobiRenderer:parent ##### -->
+<para>
+
+</para>
+
+<!-- ##### STRUCT GGobiRendererClass ##### -->
+<para>
+
+</para>
+
+@__parent__: 
+@create_target: 
+@buffer: 
+@flush: 
+
+<!-- ##### FUNCTION ggobi_renderer_buffer ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_renderer_flush ##### -->
+<para>
+
+</para>
+
+@self: 
+@gc: 
+@xsrc: 
+@ysrc: 
+@xdest: 
+@ydest: 
+@width: 
+@height: 
+
+

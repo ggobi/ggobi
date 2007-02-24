@@ -1,0 +1,74 @@
+#include "ggobi-bitset.h"
+#include "ggobi-data-factory-csv.h"
+#include "ggobi-data-factory-xml.h"
+#include "ggobi-data-factory.h"
+#include "ggobi-data.h"
+#include "ggobi-gsf-input-ftp.h"
+#include "ggobi-gsf-input-http.h"
+#include "ggobi-gui-component.h"
+#include "ggobi-gui-transform.h"
+#include "ggobi-input-decoder-bgzip.h"
+#include "ggobi-input-decoder.h"
+#include "ggobi-input-source-factory.h"
+#include "ggobi-input-source-file.h"
+#include "ggobi-input-source-ftp.h"
+#include "ggobi-input-source-http.h"
+#include "ggobi-input-source.h"
+#include "ggobi-pipeline-factory.h"
+#include "ggobi-pipeline-message.h"
+#include "ggobi-plugin-factory.h"
+#include "ggobi-plugin.h"
+#include "ggobi-renderer-cairo.h"
+#include "ggobi-renderer-factory.h"
+#include "ggobi-renderer.h"
+#include "ggobi-stage-filter.h"
+#include "ggobi-stage-group.h"
+#include "ggobi-stage-subset.h"
+#include "ggobi-stage-transform.h"
+#include "ggobi-stage.h"
+#include "ggobi-transform-abs.h"
+#include "ggobi-transform-boxcox.h"
+#include "ggobi-transform-log10.h"
+#include "ggobi-transform-min-one.h"
+#include "ggobi-transform.h"
+#include "ggobi-type-registry.h"
+#include "ggobi-variable-group.h"
+#include "ggobi-variable.h"
+
+ggobi_bitset_get_type
+ggobi_data_factory_csv_get_type
+ggobi_data_factory_xml_get_type
+ggobi_data_factory_get_type
+ggobi_data_get_type
+ggobi_gsf_input_ftp_get_type
+ggobi_gsf_input_http_get_type
+ggobi_gui_component_get_type
+ggobi_gui_transform_get_type
+ggobi_input_decoder_bgzip_get_type
+ggobi_input_decoder_get_type
+ggobi_input_source_factory_get_type
+ggobi_input_source_file_get_type
+ggobi_input_source_ftp_get_type
+ggobi_input_source_http_get_type
+ggobi_input_source_get_type
+ggobi_pipeline_factory_get_type
+ggobi_pipeline_message_get_type
+ggobi_plugin_factory_get_type
+ggobi_plugin_get_type
+ggobi_renderer_cairo_get_type
+ggobi_renderer_factory_get_type
+ggobi_renderer_get_type
+ggobi_stage_filter_get_type
+ggobi_stage_group_get_type
+ggobi_stage_subset_get_type
+ggobi_stage_transform_get_type
+ggobi_stage_get_type
+ggobi_transform_abs_get_type
+ggobi_transform_boxcox_get_type
+ggobi_transform_log10_get_type
+ggobi_transform_min_one_get_type
+ggobi_transform_get_type
+ggobi_type_registry_get_type
+ggobi_variable_group_get_type
+ggobi_variable_get_type
+

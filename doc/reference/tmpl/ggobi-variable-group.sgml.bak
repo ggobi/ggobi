@@ -1,0 +1,116 @@
+<!-- ##### SECTION Title ##### -->
+GGobiVariableGroup
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT GGobiVariableGroup ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG GGobiVariableGroup:name ##### -->
+<para>
+
+</para>
+
+<!-- ##### STRUCT GGobiVariableGroupClass ##### -->
+<para>
+
+</para>
+
+@__parent__: 
+
+<!-- ##### FUNCTION ggobi_variable_group_get_name ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_variable_group_set_name ##### -->
+<para>
+
+</para>
+
+@self: 
+@val: 
+
+
+<!-- ##### FUNCTION ggobi_variable_group_get_min ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_variable_group_get_max ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_variable_group_get_variables ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_variable_group_add_variable ##### -->
+<para>
+
+</para>
+
+@self: 
+@var: 
+
+
+<!-- ##### FUNCTION ggobi_variable_group_remove_variable ##### -->
+<para>
+
+</para>
+
+@self: 
+@var: 
+
+
+<!-- ##### MACRO GGOBI_VARIABLE_GROUP_PROP_NAME ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+
+<!-- ##### MACRO GGOBI_VARIABLE_GROUP_GET_PROP_NAME ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+

@@ -1,0 +1,72 @@
+<!-- ##### SECTION Title ##### -->
+GGobiRendererCairo
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT GGobiRendererCairo ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG GGobiRendererCairo:cairo ##### -->
+<para>
+
+</para>
+
+<!-- ##### STRUCT GGobiRendererCairoClass ##### -->
+<para>
+
+</para>
+
+@__parent__: 
+@create_cairo: 
+
+<!-- ##### FUNCTION ggobi_renderer_cairo_get_cairo ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_renderer_cairo_set_cairo ##### -->
+<para>
+
+</para>
+
+@self: 
+@val: 
+
+
+<!-- ##### MACRO GGOBI_RENDERER_CAIRO_PROP_CAIRO ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+
+<!-- ##### MACRO GGOBI_RENDERER_CAIRO_GET_PROP_CAIRO ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+

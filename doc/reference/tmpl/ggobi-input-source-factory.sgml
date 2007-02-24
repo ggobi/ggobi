@@ -1,0 +1,55 @@
+<!-- ##### SECTION Title ##### -->
+GGobiInputSourceFactory
+
+<!-- ##### SECTION Short_Description ##### -->
+Creates a #GGobiInputSource
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+Instances of this class attempt to provide a #GGobiInputSource object for
+a given URI, based on its scheme.
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT GGobiInputSourceFactory ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT GGobiInputSourceFactoryClass ##### -->
+<para>
+
+</para>
+
+@__parent__: 
+@get_supported_schemes: 
+@create: 
+
+<!-- ##### FUNCTION ggobi_input_source_factory_get_supported_schemes ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_input_source_factory_create ##### -->
+<para>
+
+</para>
+
+@self: 
+@uri: 
+@mode: 
+@Returns: 
+
+

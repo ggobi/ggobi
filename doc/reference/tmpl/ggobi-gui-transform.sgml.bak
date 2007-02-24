@@ -1,0 +1,46 @@
+<!-- ##### SECTION Title ##### -->
+GGobiGUITransform
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### FUNCTION ggobi_gui_transform_new ##### -->
+<para>
+
+</para>
+
+@gg: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_gui_transform_get_domain_adj_registry ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_gui_transform_get_transform_registry ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+

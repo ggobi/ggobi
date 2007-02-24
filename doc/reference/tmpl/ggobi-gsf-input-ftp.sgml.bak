@@ -1,0 +1,81 @@
+<!-- ##### SECTION Title ##### -->
+GGobiGsfInputFTP
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT GGobiGsfInputFTP ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG GGobiGsfInputFTP:url ##### -->
+<para>
+
+</para>
+
+<!-- ##### STRUCT GGobiGsfInputFTPClass ##### -->
+<para>
+
+</para>
+
+@__parent__: 
+
+<!-- ##### FUNCTION ggobi_gsf_input_ftp_get_url ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_gsf_input_ftp_set_url ##### -->
+<para>
+
+</para>
+
+@self: 
+@val: 
+
+
+<!-- ##### FUNCTION ggobi_gsf_input_ftp_new ##### -->
+<para>
+
+</para>
+
+@url: 
+@error: 
+@Returns: 
+
+
+<!-- ##### MACRO GGOBI_GSF_INPUT_FTP_PROP_URL ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+
+<!-- ##### MACRO GGOBI_GSF_INPUT_FTP_GET_PROP_URL ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+

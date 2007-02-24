@@ -1,0 +1,54 @@
+<!-- ##### SECTION Title ##### -->
+GGobiRendererFactory
+
+<!-- ##### SECTION Short_Description ##### -->
+Creates a #GGobiRenderer for a target #GdkDrawable
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+This encapsulates the logic for creating buffered renderers behind a target
+#GdkDrawable (such as a #GdkWindow). This is useful, because clients often
+need to recreate #GGobiRenderer objects, such as when their target drawable
+is resized.
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT GGobiRendererFactory ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT GGobiRendererFactoryClass ##### -->
+<para>
+
+</para>
+
+@__parent__: 
+@create: 
+
+<!-- ##### FUNCTION ggobi_renderer_factory_new ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_renderer_factory_create ##### -->
+<para>
+
+</para>
+
+@self: 
+@parent: 
+@Returns: 
+
+

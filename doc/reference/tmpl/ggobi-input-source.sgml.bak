@@ -1,0 +1,209 @@
+<!-- ##### SECTION Title ##### -->
+GGobiInputSource
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT GGobiInputSource ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG GGobiInputSource:display-name ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG GGobiInputSource:logical-mode ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG GGobiInputSource:physical-mode ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG GGobiInputSource:uri ##### -->
+<para>
+
+</para>
+
+<!-- ##### STRUCT GGobiInputSourceClass ##### -->
+<para>
+
+</para>
+
+@__parent__: 
+@get_raw_input: 
+
+<!-- ##### FUNCTION ggobi_input_source_get_uri ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_input_source_set_uri ##### -->
+<para>
+
+</para>
+
+@self: 
+@val: 
+
+
+<!-- ##### FUNCTION ggobi_input_source_get_logical_mode ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_input_source_set_logical_mode ##### -->
+<para>
+
+</para>
+
+@self: 
+@val: 
+
+
+<!-- ##### FUNCTION ggobi_input_source_get_physical_mode ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_input_source_set_physical_mode ##### -->
+<para>
+
+</para>
+
+@self: 
+@val: 
+
+
+<!-- ##### FUNCTION ggobi_input_source_get_display_name ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_input_source_set_display_name ##### -->
+<para>
+
+</para>
+
+@self: 
+@val: 
+
+
+<!-- ##### FUNCTION ggobi_input_source_get_input ##### -->
+<para>
+
+</para>
+
+@self: 
+@error: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_input_source_get_raw_input ##### -->
+<para>
+
+</para>
+
+@self: 
+@error: 
+@Returns: 
+
+
+<!-- ##### MACRO GGOBI_INPUT_SOURCE_PROP_URI ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+
+<!-- ##### MACRO GGOBI_INPUT_SOURCE_GET_PROP_URI ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+
+<!-- ##### MACRO GGOBI_INPUT_SOURCE_PROP_LOGICAL_MODE ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+
+<!-- ##### MACRO GGOBI_INPUT_SOURCE_GET_PROP_LOGICAL_MODE ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+
+<!-- ##### MACRO GGOBI_INPUT_SOURCE_PROP_PHYSICAL_MODE ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+
+<!-- ##### MACRO GGOBI_INPUT_SOURCE_GET_PROP_PHYSICAL_MODE ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+
+<!-- ##### MACRO GGOBI_INPUT_SOURCE_PROP_DISPLAY_NAME ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+
+<!-- ##### MACRO GGOBI_INPUT_SOURCE_GET_PROP_DISPLAY_NAME ##### -->
+<para>
+
+</para>
+
+@arg: 
+
+

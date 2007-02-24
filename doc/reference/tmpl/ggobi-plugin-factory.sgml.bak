@@ -1,0 +1,38 @@
+<!-- ##### SECTION Title ##### -->
+GGobiPluginFactory
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### FUNCTION ggobi_plugin_factory_new ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_plugin_factory_create ##### -->
+<para>
+
+</para>
+
+@self: 
+@node: 
+@doc: 
+@Returns: 
+
+

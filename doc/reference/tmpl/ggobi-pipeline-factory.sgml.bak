@@ -1,0 +1,90 @@
+<!-- ##### SECTION Title ##### -->
+GGobiPipelineFactory
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT GGobiPipelineFactory ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SIGNAL GGobiPipelineFactory::build ##### -->
+<para>
+
+</para>
+
+@ggobipipelinefactory: the object which received the signal.
+@arg1: 
+
+<!-- ##### STRUCT GGobiPipelineFactoryClass ##### -->
+<para>
+
+</para>
+
+@__parent__: 
+@build: 
+
+<!-- ##### FUNCTION ggobi_pipeline_factory_build ##### -->
+<para>
+
+</para>
+
+@self: 
+@root: 
+
+
+<!-- ##### FUNCTION ggobi_pipeline_factory_new ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### MACRO ggobi_pipeline_factory_connect__build ##### -->
+<para>
+
+</para>
+
+@object: 
+@func: 
+@data: 
+
+
+<!-- ##### MACRO ggobi_pipeline_factory_connect_after__build ##### -->
+<para>
+
+</para>
+
+@object: 
+@func: 
+@data: 
+
+
+<!-- ##### MACRO ggobi_pipeline_factory_connect_data__build ##### -->
+<para>
+
+</para>
+
+@object: 
+@func: 
+@data: 
+@destroy_data: 
+@flags: 
+
+

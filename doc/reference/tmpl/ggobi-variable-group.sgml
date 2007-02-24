@@ -1,0 +1,101 @@
+<!-- ##### SECTION Title ##### -->
+GGobiVariableGroup
+
+<!-- ##### SECTION Short_Description ##### -->
+Group of #GGobiVariable objects with the same scale
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+This is an experimental mechanism for linking the scales of sets of variables.
+This is untested and likely will not be the eventual solution.
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+Unstable
+
+<!-- ##### STRUCT GGobiVariableGroup ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG GGobiVariableGroup:name ##### -->
+<para>
+
+</para>
+
+<!-- ##### STRUCT GGobiVariableGroupClass ##### -->
+<para>
+
+</para>
+
+@__parent__: 
+
+<!-- ##### FUNCTION ggobi_variable_group_get_name ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_variable_group_set_name ##### -->
+<para>
+
+</para>
+
+@self: 
+@val: 
+
+
+<!-- ##### FUNCTION ggobi_variable_group_get_min ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_variable_group_get_max ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_variable_group_get_variables ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION ggobi_variable_group_add_variable ##### -->
+<para>
+
+</para>
+
+@self: 
+@var: 
+
+
+<!-- ##### FUNCTION ggobi_variable_group_remove_variable ##### -->
+<para>
+
+</para>
+
+@self: 
+@var: 
+
+

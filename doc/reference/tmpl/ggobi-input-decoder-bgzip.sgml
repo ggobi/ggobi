@@ -1,0 +1,32 @@
+<!-- ##### SECTION Title ##### -->
+GGobiInputDecoderBGzip
+
+<!-- ##### SECTION Short_Description ##### -->
+Decodes gzip and bzip2 compressed data
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+This class depends on support for gzip and bzip2 in libgsf, which is optional.
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+Unstable
+
+<!-- ##### STRUCT GGobiInputDecoderBGzip ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT GGobiInputDecoderBGzipClass ##### -->
+<para>
+
+</para>
+
+@__parent__: 
+

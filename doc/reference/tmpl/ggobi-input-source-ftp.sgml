@@ -1,0 +1,32 @@
+<!-- ##### SECTION Title ##### -->
+GGobiInputSourceFTP
+
+<!-- ##### SECTION Short_Description ##### -->
+Reads input over an FTP connection.
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT GGobiInputSourceFTP ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT GGobiInputSourceFTPClass ##### -->
+<para>
+
+</para>
+
+@__parent__: 
+

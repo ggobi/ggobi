@@ -9,6 +9,16 @@
 %}
 class GGobi:Input:Source:Factory from G:Object
 {
+  /**
+   * get_supported_schemes:
+   * @self: a #GGobiInputSourceFactory
+   *
+   * Lists the URI schemes supported by this factory. If a
+   * URI has one of these schemes, this factory can create a #GGobiInputSource
+   * capable of retrieving the data.
+   *
+   * Returns: #GSList of scheme strings, like "http"
+   */
   virtual GSList *
   get_supported_schemes(self)
   {
@@ -20,6 +30,18 @@ class GGobi:Input:Source:Factory from G:Object
     return schemes;
   }
   
+  /**
+   * create:
+   * @self: a #GGobiInputSourceFactory
+   * @uri: a URI identifying the source of the data
+   * @mode: logical mode of the data, if known, otherwise %NULL
+   *
+   * Creates a #GGobiInputSource that is capable of retrieving data from
+   * the given URI. If the mode of the data is known, providing it will
+   * set the mode on the input source, for convenience.
+   *
+   * Returns: #GGobiInputSource for the URI
+   */
   virtual GGobiInputSource *
   create(self, const gchar *uri, const gchar *mode)
   {
