@@ -1,5 +1,13 @@
 %h{
-  #include "utils.h" /* for GGobiIndexFunc */
+  /**
+   * GGobiIndexFunc:
+   * @j: an index
+   * @user_data: user data
+   *
+   * A function that is invoked on one integer index at a time.
+   *
+   */
+  typedef void (*GGobiIndexFunc)(guint j, gpointer user_data);
 %}
 %{
   #define BITS_PER_CHUNK 8

@@ -79,17 +79,17 @@ Announces changes to the name of a column.
 
 <!-- ##### ARG GGobiStage:n-cols ##### -->
 <para>
-Number of columns in the data matrix.
+
 </para>
 
 <!-- ##### ARG GGobiStage:n-rows ##### -->
 <para>
-Number of rows in the data matrix.
+
 </para>
 
 <!-- ##### ARG GGobiStage:name ##### -->
 <para>
-Identifier of this stage. Should be unique.
+
 </para>
 
 <!-- ##### ARG GGobiStage:parent ##### -->
@@ -740,14 +740,6 @@ Checks whether a given column holds a categorical variable.
 
 @stage: a #GGobiStage
 @col: the column index
-
-
-<!-- ##### FUNCTION ggobi_attr_set_method_get_type ##### -->
-<para>
-
-</para>
-
-@Returns: 
 
 
 <!-- ##### STRUCT Jitterd ##### -->

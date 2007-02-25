@@ -323,6 +323,7 @@ GGOBI_DATA_FACTORY_XML_CONST
 <FILE>ggobi-bitset</FILE>
 GGobiBitset
 GGobiBitsetClass
+GGobiIndexFunc
 <TITLE>GGobiBitset</TITLE>
 ggobi_bitset_new
 ggobi_bitset_new_with_size
@@ -910,6 +911,7 @@ ggobi_stage_set_attr
 ggobi_stage_reset_attr
 ggobi_stage_get_attr
 ggobi_stage_get_attr_glyph
+GGobiAttrSetMethod
 ggobi_stage_get_n_vars
 ggobi_stage_has_vars
 ggobi_stage_attach
@@ -976,7 +978,6 @@ GGOBI_STAGE_RESET_ATTR_TYPE
 GGOBI_STAGE_RESET_ATTR_SIZE
 GGOBI_STAGE_RESET_ATTR_HIDDEN
 GGOBI_STAGE_BRUSH_POINT
-GGobiAttrSetMethod
 GGOBI_TYPE_ATTR_SET_METHOD
 ggobi_attr_set_method_get_type
 </SECTION>

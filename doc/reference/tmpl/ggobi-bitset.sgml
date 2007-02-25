@@ -32,6 +32,15 @@ Unstable
 @__parent__: 
 @clone: 
 
+<!-- ##### USER_FUNCTION GGobiIndexFunc ##### -->
+<para>
+
+</para>
+
+@j: 
+@user_data: 
+
+
 <!-- ##### FUNCTION ggobi_bitset_new ##### -->
 <para>
 

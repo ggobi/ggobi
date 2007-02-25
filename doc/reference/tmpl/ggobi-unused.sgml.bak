@@ -1,3 +1,27 @@
+<!-- ##### SECTION ./tmpl/GGobiApp.sgml:Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION ./tmpl/GGobiApp.sgml:See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION ./tmpl/GGobiApp.sgml:Short_Description ##### -->
+
+
+
+<!-- ##### SECTION ./tmpl/GGobiApp.sgml:Stability_Level ##### -->
+
+
+
+<!-- ##### SECTION ./tmpl/GGobiApp.sgml:Title ##### -->
+GGobiApp
+
+
 <!-- ##### MACRO GGOBI_DATA_GET_PROP_NICKNAME ##### -->
 <para>
 
@@ -650,6 +674,12 @@ given attribute.
 
 @arg: 
 
+<!-- ##### MACRO GGOBI_TYPE_VARIABLE_TYPE ##### -->
+<para>
+
+</para>
+
+
 <!-- ##### MACRO GGOBI_VARIABLE_GET_PROP_DEFAULT_VALUE ##### -->
 <para>
 
@@ -876,6 +906,13 @@ given attribute.
 
 @Returns: 
 
+<!-- ##### FUNCTION ggobi_stage_subset_get_type ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
 <!-- ##### MACRO ggobi_stage_transform_connect__applied ##### -->
 <para>
 
@@ -991,4 +1028,11 @@ given attribute.
 @data: 
 @destroy_data: 
 @flags: 
+
+<!-- ##### FUNCTION ggobi_variable_type_get_type ##### -->
+<para>
+
+</para>
+
+@Returns: 
 

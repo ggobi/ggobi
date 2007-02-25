@@ -778,15 +778,6 @@ given attribute.
 
 @arg: 
 
-<!-- ##### ENUM GGobiAttrSetMethod ##### -->
-<para>
-
-</para>
-
-@ATTR_SET_PERSISTENT: 
-@ATTR_SET_TRANSIENT: 
-@ATTR_SET_SAVE: 
-
 <!-- ##### STRUCT GGobiStageGroupPrivate ##### -->
 <para>
 

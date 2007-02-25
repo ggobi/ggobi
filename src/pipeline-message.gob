@@ -1,8 +1,8 @@
-%privateheader{
-  #include "ggobi-bitset.h"
-%}
 %h{
-  #include "utils.h"
+  #include "ggobi-bitset.h" /* for GGobiIndexFunc */
+%}
+%{
+  #include "utils.h" /* for index_compare */
 %}
 /* Describes changes in the pipeline data matrix. It communicates five different
    types of changes:

@@ -695,6 +695,16 @@ Set #GGobiStage::n-cols.
 @Returns: 
 
 
+<!-- ##### ENUM GGobiAttrSetMethod ##### -->
+<para>
+The method for setting data attributes. Indicates how an attribute
+setting persists through calls to ggobi_stage_reset_attr().
+</para>
+
+@ATTR_SET_PERSISTENT: setting persists through transient resets
+@ATTR_SET_TRANSIENT: setting is always reset
+@ATTR_SET_SAVE: setting is permanent - reset has no effect
+
 <!-- ##### FUNCTION ggobi_stage_get_n_vars ##### -->
 <para>
 

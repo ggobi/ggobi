@@ -2,11 +2,12 @@
 GGobiBitset
 
 <!-- ##### SECTION Short_Description ##### -->
-
+Bitset utility
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-
+This is a conventional bitset implementation. The design allows the client
+to treat a #GGobiBitset as a list of indices or just a vector of bits.
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
@@ -15,7 +16,21 @@ GGobiBitset
 </para>
 
 <!-- ##### SECTION Stability_Level ##### -->
+Unstable
 
+<!-- ##### STRUCT GGobiBitset ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT GGobiBitsetClass ##### -->
+<para>
+
+</para>
+
+@__parent__: 
+@clone: 
 
 <!-- ##### FUNCTION ggobi_bitset_new ##### -->
 <para>
