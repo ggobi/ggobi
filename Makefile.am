@@ -1,4 +1,4 @@
-SUBDIRS = libltdl src plugins po doc/reference
+SUBDIRS = libltdl src plugins po doc
 
 EXTRA_DIST = bootstrap CPLicense.txt
 
@@ -50,7 +50,7 @@ dist_datafiles_DATA = \
   data/tmin.csv
 
 docfilesdir = $(datadir)/doc/ggobi
-dist_docfiles_DATA = doc/manual.pdf
+dist_docfiles_DATA = doc/manual/manual.pdf
 
 desktopdir = $(datadir)/applications
 dist_desktop_DATA = xdg/ggobi.desktop
@@ -91,14 +91,14 @@ ggobirc:
 	  echo "" >> $@ ; \
 	  cat plugins/$$i/plugin.xml >> $@ ; \
 	done
-	echo "</plugins>" >> $@ 
+	echo "</plugins>" >> $@
 	echo "</ggobirc>" >> $@
 
 win32-installer: ggobirc
 	makensis //DVERSION="@VERSION@" win32/ggobi.nsi
 
 
-doc/manual.pdf:
-	$(MAKE) $(AM_MAKEFLAGS) -C doc manual.pdf
+doc/manual/manual.pdf:
+	$(MAKE) $(AM_MAKEFLAGS) -C doc/manual manual.pdf
 
 

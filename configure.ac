@@ -68,37 +68,37 @@ PLUGIN_DIRS=""
 AC_ARG_WITH(all-plugins, [--with-all-plugins  Enable all (supported) plugins])
 
 #AC_ARG_WITH(mysql,
-#  --with-mysql        Enable plugin for reading data from MySQL databases, 
+#  --with-mysql        Enable plugin for reading data from MySQL databases,
 #  MYSQL_PLUGIN=1; PLUGIN_DIRS="MySQL")
 
 #AC_ARG_WITH(postgres,
-#  --with-postgres          Enable plugin reading data from Postgres databases., 
+#  --with-postgres          Enable plugin reading data from Postgres databases.,
 #  POSTGRES_PLUGIN=1; PLUGIN_DIRS="${PLUGIN_DIRS} Postgres")
 
 AC_ARG_WITH(dataviewer,
-  --with-dataviewer          Enable plugin for viewing data in a datagrid., 
+  --with-dataviewer          Enable plugin for viewing data in a datagrid.,
   DATAVIEWER_PLUGIN=1;  PLUGIN_DIRS="${PLUGIN_DIRS} DataViewer")
 
 AC_ARG_WITH(describedisplay,
-  --with-describedisplay     Convert GGobi plots to R plots., 
+  --with-describedisplay     Convert GGobi plots to R plots.,
   DESCRIBEDISPLAY_PLUGIN=1;  PLUGIN_DIRS="${PLUGIN_DIRS} DescribeDisplay")
-  
+
 AC_ARG_WITH(graphlayout,
-  [--with-graphlayout          Enable GraphLayout plugin], 
+  [--with-graphlayout          Enable GraphLayout plugin],
   [echo "With graphlayout"; GRAPHLAYOUT_PLUGIN=1;  PLUGIN_DIRS="${PLUGIN_DIRS} GraphLayout"])
 
 AC_ARG_WITH(ggvis,
-  --with-ggvis          Enable ggvis plugin, 
+  --with-ggvis          Enable ggvis plugin,
   [GGVIS_PLUGIN=1;  PLUGIN_DIRS="${PLUGIN_DIRS} ggvis"])
 
 AC_ARG_WITH(graphaction,
-  --with-graphaction          Enable graph operations plugin, 
+  --with-graphaction          Enable graph operations plugin,
   [GRAPHACTION_PLUGIN=1;  PLUGIN_DIRS="${PLUGIN_DIRS} GraphAction"])
 
 AC_ARG_WITH(varcloud,
-  --with-varcloud          Enable variogram cloud plugin, 
+  --with-varcloud          Enable variogram cloud plugin,
   [VARCLOUD_PLUGIN=1;  PLUGIN_DIRS="${PLUGIN_DIRS} VarCloud"])
-  
+
 AC_ARG_WITH(plugins, [--with-plugins          With plugins in a quoted, space-separated list])
 
 if test "$with_plugins" != "" && test "$with_plugins" != "yes" && test "$with_plugins" != "y" &&  test "$with_plugins" != "no" && test "$with_plugins" != "n" ; then
@@ -110,7 +110,7 @@ if test -n "${with_all_plugins}" &&  test "${with_all_plugins}" != "no" ; then
 fi
 
 # This is obviously ugly, but AC_CONFIG_SUBDIRS *requires* a literal
-for p in ${PLUGIN_DIRS} ; do 
+for p in ${PLUGIN_DIRS} ; do
 if test "${p}" = "DataViewer"; then
   AC_CONFIG_SUBDIRS(plugins/DataViewer)
 fi
@@ -137,7 +137,7 @@ AC_SUBST(PLUGIN_DIRS)
 AC_PROG_CC
 AC_PROG_LN_S
 
-# Set up libtool to create only dynamic libraries 
+# Set up libtool to create only dynamic libraries
 # and to support DLLs on Windows. Also build libltdl for loading plugins.
 AC_DISABLE_STATIC
 AC_LIBTOOL_WIN32_DLL
@@ -235,7 +235,7 @@ AC_SUBST(GLITZ_LIBS)
 
  dnl Process the different .in files, substituting the values computed here in the configuration
  dnl script for the corresponding @variable@ in these files.
-AC_CONFIG_FILES(Makefile src/Makefile plugins/Makefile ggobi.pc ggobi-system.pc po/Makefile.in doc/reference/Makefile)
+AC_CONFIG_FILES(Makefile src/Makefile plugins/Makefile ggobi.pc ggobi-system.pc po/Makefile.in doc/Makefile doc/reference/Makefile)
 AC_OUTPUT
 
 echo "*******************************"
