@@ -79,8 +79,12 @@ DISTCHECK_CONFIGURE_FLAGS = --with-all-plugins --enable-gtk-doc
 # We add symlinks for developer convenience
 all-local: ggobi ggobirc
 
+if OS_WIN32
+ggobi:
+else
 ggobi:
 	ln -s src/ggobi ggobi
+endif
 
 # Use this rule to build your ggobirc (for loading plugins)
 ggobirc:
