@@ -5,7 +5,7 @@
  *
  * ggobi is free software; you may use, redistribute, and/or modify it
  * under the terms of the Common Public License, which is distributed
- * with the source code and displayed on the ggobi web site, 
+ * with the source code and displayed on the ggobi web site,
  * www.ggobi.org.  For more information, contact the authors:
  *
  *   Deborah F. Swayne   dfs@research.att.com
@@ -45,7 +45,7 @@ static void build_ash_segs (gint, gint *nsegs, splotd *sp);
 /*
  * ... just noticed these:  should they become part of the splotd
  * instead of sitting here as statics?  I think so.
- * 
+ *
 static gint maxn = 0;
 static GdkPoint   *points;
 static GdkSegment *segs;
@@ -59,7 +59,7 @@ static GdkRectangle       *filled_arcs;
 
 static void
 drawing_arrays_alloc (splotd *sp, GGobiStage *d, GGobiSession *gg) {
-  gint n = d->n_rows
+  gint n = d->n_rows;
 
   if (sp->win32.npoints == 0) {
     sp->win32.points = (GdkPoint *) g_malloc (n * sizeof (GdkPoint));
@@ -261,7 +261,7 @@ build_glyph (glyphd gl, icoords *xypos, gint jpos,
 }
 
 void
-build_whisker_segs (gint j, gint *nwhisker_segs, splotd *sp) 
+build_whisker_segs (gint j, gint *nwhisker_segs, splotd *sp)
 {
   displayd *display = (displayd *) sp->displayptr;
   gint n;
@@ -283,8 +283,8 @@ build_whisker_segs (gint j, gint *nwhisker_segs, splotd *sp)
     sp->win32.whisker_segs[*nwhisker_segs].x1 = sp->whiskers[j].x1;
     sp->win32.whisker_segs[*nwhisker_segs].y1 = sp->whiskers[j].y1;
     sp->win32.whisker_segs[*nwhisker_segs].x2 = sp->whiskers[j].x2;
-    sp->win32.whisker_segs[*nwhisker_segs].y2 = sp->whiskers[j].y2; 
-    *nwhisker_segs += 1; 
+    sp->win32.whisker_segs[*nwhisker_segs].y2 = sp->whiskers[j].y2;
+    *nwhisker_segs += 1;
   }
 }
 
@@ -349,14 +349,14 @@ win32_draw_to_pixmap_unbinned (gint current_color, splotd *sp, gboolean draw_hid
   gint nwhisker_segs = 0;
   gint nash_segs = 0;
 #if OLD
-  gint dtype = display->displaytype; 
+  gint dtype = display->displaytype;
 #endif
   npt = nseg = nr_open = nr_filled = nc_open = nc_filled = 0;
 
-  if (sp->win32.npoints < d->n_rows
+  if (sp->win32.npoints < d->n_rows)
     drawing_arrays_alloc (sp, d, gg);
 
-  GGOBI_STAGE_ATTR_INIT_ALL(d);  
+  GGOBI_STAGE_ATTR_INIT_ALL(d);
   for (i=0; i<d->n_rows; i++) {
     if (splot_plot_case (i, d, sp, display, gg)) {
       if ((draw_hidden && GGOBI_STAGE_GET_ATTR_HIDDEN(d, i)) ||  /*-- drawing hiddens --*/
@@ -409,7 +409,7 @@ win32_draw_to_pixmap_binned (icoords *bin0, icoords *bin1,
   gint nwhisker_segs = 0;
   npt = nseg = nr_open = nr_filled = nc_open = nc_filled = 0;
 
-  GGOBI_STAGE_ATTR_INIT_ALL(d);  
+  GGOBI_STAGE_ATTR_INIT_ALL(d);
   for (ih=bin0->x; ih<=bin1->x; ih++) {
     for (iv=bin0->y; iv<=bin1->y; iv++) {
       for (m=0; m<d->brush.binarray[ih][iv].nels; m++) {
@@ -420,11 +420,11 @@ win32_draw_to_pixmap_binned (icoords *bin0, icoords *bin1,
                   !draw_hidden && !GGOBI_STAGE_GET_ATTR_HIDDEN(d, j)))
           {
             build_glyph (GGOBI_STAGE_GET_ATTR_GLYPH(d, j), sp->screen, j,
-              sp->win32.points, &npt,          
+              sp->win32.points, &npt,
               sp->win32.segs, &nseg,
-              sp->win32.open_rects, &nr_open,  
+              sp->win32.open_rects, &nr_open,
               sp->win32.filled_rects, &nr_filled,
-              sp->win32.open_arcs, &nc_open,   
+              sp->win32.open_arcs, &nc_open,
               sp->win32.filled_arcs, &nc_filled);
 
             if (GGOBI_IS_PAR_COORDS_DISPLAY(display) ||
