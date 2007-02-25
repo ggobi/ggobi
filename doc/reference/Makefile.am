@@ -24,7 +24,7 @@ DOC_SOURCE_DIR=../../src
 SCANGOBJ_OPTIONS=
 
 # Extra options to supply to gtkdoc-scan.
-# e.g. SCAN_OPTIONS=--deprecated-guards="GTK_DISABLE_DEPRECATED" 
+# e.g. SCAN_OPTIONS=--deprecated-guards="GTK_DISABLE_DEPRECATED"
 SCAN_OPTIONS=
 
 # Extra options to supply to gtkdoc-mkdb.
@@ -50,7 +50,7 @@ CFILE_GLOB=$(top_srcdir)/src/*.c
 IGNORE_HFILES=GGobiAPI.h GGobiApp.h GGobiEvents.h barchartDisplay.h \
 brushing.h colorscheme.h config.h cpanel.h defines.h display.h \
 display_tree.h externs.h fileio.h ggobi-intl.h \
-ggobi.h ggobiClass.h marshal.h noop-toggle.h parcoordsClass.h plugin.h \ 
+ggobi.h ggobiClass.h marshal.h noop-toggle.h parcoordsClass.h plugin.h \
 read_init.h scatmatClass.h scatterplotClass.h splot.h testEvents.h tour.h \
 tour1d_pp.h tour2d_pp.h tour_pp.h tsPlot.h tsdisplay.h types.h \
 utils.h vars.h varseldata.h write_xml.h writedata.h
@@ -83,4 +83,4 @@ include $(top_srcdir)/gtk-doc.make
 
 # Other files to distribute
 # e.g. EXTRA_DIST += version.xml.in
-EXTRA_DIST += 
+EXTRA_DIST +=
