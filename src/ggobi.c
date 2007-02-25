@@ -5,7 +5,7 @@
  *
  * ggobi is free software; you may use, redistribute, and/or modify it
  * under the terms of the Common Public License, which is distributed
- * with the source code and displayed on the ggobi web site, 
+ * with the source code and displayed on the ggobi web site,
  * www.ggobi.org.  For more information, contact the authors:
  *
  *   Deborah F. Swayne   dfs@research.att.com
@@ -97,14 +97,14 @@ parse_command_line (gint * argc, gchar ** av[])
   static gboolean quit_with_no_ggobi = true;
   static gint verbosity = GGOBI_CHATTY;
   static gboolean time_ggobi = false;
-  static GOptionEntry entries[] = 
+  static GOptionEntry entries[] =
   {
     {
-      "activeColorScheme", 'c', 0, G_OPTION_ARG_STRING, &active_color_scheme, 
-      "name of the default color scheme to use", "scheme" 
-    }, { 
+      "activeColorScheme", 'c', 0, G_OPTION_ARG_STRING, &active_color_scheme,
+      "name of the default color scheme to use", "scheme"
+    }, {
       "colorSchemes", 's', 0, G_OPTION_ARG_FILENAME, &color_scheme_file,
-      "name of XML file containing color schemes", "file" 
+      "name of XML file containing color schemes", "file"
     }, {
       "dataMode", 'd', 0, G_OPTION_ARG_STRING, &data_mode,
       "mode of data supplied on command line", "mode"
@@ -112,7 +112,7 @@ parse_command_line (gint * argc, gchar ** av[])
       "init", 'i', 0, G_OPTION_ARG_FILENAME, &initialization_file,
       "name of initialization file", "file"
     }, {
-      "keepalive", 'k', G_OPTION_FLAG_HIDDEN | G_OPTION_FLAG_REVERSE, G_OPTION_ARG_NONE, 
+      "keepalive", 'k', G_OPTION_FLAG_HIDDEN | G_OPTION_FLAG_REVERSE, G_OPTION_ARG_NONE,
       &quit_with_no_ggobi, "do not quit GGobi if all windows are closed", NULL,
     }, {
       "verbosity", 'l', 0, G_OPTION_ARG_INT, &verbosity,
@@ -127,23 +127,23 @@ parse_command_line (gint * argc, gchar ** av[])
   };
   GError *error = NULL;
   GOptionContext *ctx = g_option_context_new("- platform for interactive graphics");
-  
+
   /* use the GOptionContext explicity, because GTK+ is already initialized */
   g_option_context_add_main_entries (ctx, entries, PACKAGE);
   g_option_context_add_group (ctx, gtk_get_option_group (TRUE));
   g_option_group_set_translation_domain (g_option_context_get_main_group (ctx), PACKAGE);
   g_option_context_parse (ctx, argc, av, &error);
   /*gtk_init_with_args (argc, av, "- platform for interactive graphics", entries, PACKAGE, &error);*/
-  
+
   if (error) {
     g_error ("Error parsing command line: %s\n", error->message);
   }
-    
+
   if (print_version) {
     g_printerr ("%s\n", ggobi_getVersionString ());
     exit(0);
   }
-  
+
   sessionOptions->activeColorScheme = active_color_scheme;
   if (color_scheme_file)
     sessionOptions->info->colorSchemeFile = color_scheme_file;
@@ -167,7 +167,7 @@ parse_command_line (gint * argc, gchar ** av[])
     sessionOptions->data_in = g_strdup((*av)[0]);
 
   g_option_context_free(ctx);
-  
+
   return 1;
 }
 
@@ -210,7 +210,7 @@ ggobi_remove_by_index (GGobiSession * gg, gint which)
   else
     all_ggobis = NULL;
 
-  /* 
+  /*
      This was crashing in R. Probably because when we exhaust the list
      and remove the final element, we get back garbage.
      This isn't a problem in stand-alone as it never gets called.
@@ -229,7 +229,7 @@ ggobi_remove_by_index (GGobiSession * gg, gint which)
 }
 
 /*
- The code within the TEST_KEYS sections performs a test of handling key presses on 
+ The code within the TEST_KEYS sections performs a test of handling key presses on
  the numbered keys. It registers a function
  */
 #ifdef TEST_KEYS
@@ -361,6 +361,37 @@ static void registerBuiltinTypes()
   GGOBI_TYPE_INPUT_DECODER_BGZIP;
 }
 
+#ifdef WIN32
+G_WIN32_DLLMAIN_FOR_DLL_NAME(static, dll_name)
+
+static gchar*
+ggobi_win32_get_localedir()
+{
+  static char *ggobi_localedir = NULL;
+  if (ggobi_localedir == NULL) {
+    gchar *temp;
+
+    temp = g_win32_get_package_installation_subdirectory (PACKAGE, dll_name, "locale");
+
+    /* ggobi_localedir is passed to bindtextdomain() which isn't
+     * UTF-8-aware.
+     */
+    ggobi_localedir = g_win32_locale_filename_from_utf8 (temp);
+    g_free (temp);
+  }
+  return ggobi_localedir;
+}
+
+static gchar*
+ggobi_win32_get_packagedir()
+{
+  static char *ggobi_datadir = NULL;
+  if (ggobi_datadir == NULL)
+    ggobi_datadir = g_win32_get_package_installation_directory (PACKAGE, dll_name);
+  return(ggobi_datadir);
+}
+#endif
+
   /* Available so that we can call this from R
      without any confusion between which main().
    */
@@ -375,7 +406,7 @@ gint ggobi_init (gint argc, gchar * argv[], gboolean processEvents)
 
   if (!sessionOptions) /* init session options before command line parsing */
     initSessionOptions (argc, argv);
-  
+
   /* this parses command line AND initializes GTK+ */
   parse_command_line (&argc, &argv);
 
@@ -386,14 +417,14 @@ gint ggobi_init (gint argc, gchar * argv[], gboolean processEvents)
     // using g_type_children to get the available display types
     registerDisplayTypes ((GTypeLoad *) typeLoaders, G_N_ELEMENTS(typeLoaders));
   }
-  
+
   /*GGOBI_TYPE_SESSION;*/
-  
+
   process_initialization_files ();
 
   if (sessionOptions->verbose == GGOBI_VERBOSE) {
     g_printerr ("progname = %s\n", g_get_prgname ());
-    g_printerr ("data_in = %s\n", sessionOptions->data_in);    
+    g_printerr ("data_in = %s\n", sessionOptions->data_in);
   }
 
   if (sessionOptions->info->colorSchemeFile
@@ -428,7 +459,7 @@ gint ggobi_init (gint argc, gchar * argv[], gboolean processEvents)
  This might usefully be changed to workd directly from the
  XML tree and avoid having the GGobiDisplayDescription.
  As we include more information (e.g. brushing information)
- we end up copying it for little reason. 
+ we end up copying it for little reason.
  However, this works for the restore file, but not necessarily
  the initialization file as we won't have created the GGobiSession
  when we read that. We could just re-parse the file and find the
@@ -593,7 +624,7 @@ key_get (void)
   Computes the GGobiSession pointer associated with the specified
   widget. It does so by looking in the window associated with the widget
   and then looking for an entry in the window's association table.
-  This assumes that the GGobiSession reference was stored in the window 
+  This assumes that the GGobiSession reference was stored in the window
   when it was created.
  */
 GGobiSession *
@@ -713,7 +744,7 @@ ValidateGGobiRef (GGobiSession * gg, gboolean fatal)
       return (gg);
   }
 
-  if (fatal) 
+  if (fatal)
     g_error (error_msg);
   else g_critical (error_msg);
 
@@ -771,71 +802,40 @@ ggobi_find_file_in_dir(const gchar *name, const gchar *dir, gboolean ggobi)
   return(NULL);
 }
 
-#ifdef WIN32
-G_WIN32_DLLMAIN_FOR_DLL_NAME(static, dll_name)
-
-static gchar*
-ggobi_win32_get_localedir()
-{
-  static char *ggobi_localedir = NULL;
-  if (ggobi_localedir == NULL) {
-    gchar *temp;
-
-    temp = g_win32_get_package_installation_subdirectory (PACKAGE, dll_name, "locale");
-
-    /* ggobi_localedir is passed to bindtextdomain() which isn't
-     * UTF-8-aware.
-     */
-    ggobi_localedir = g_win32_locale_filename_from_utf8 (temp);
-    g_free (temp);
-  }
-  return ggobi_localedir;
-}
-
-static gchar*
-ggobi_win32_get_packagedir()
-{
-  static char *ggobi_datadir = NULL;
-  if (ggobi_datadir == NULL)
-    ggobi_datadir = g_win32_get_package_installation_directory (PACKAGE, dll_name);
-  return(ggobi_datadir);
-}
-#endif
-
-static gchar * 
+static gchar *
 ggobi_find_file(const gchar *name, const gchar* user, const gchar* const *dirs)
 {
   gchar *tmp_name, *cur_dir = g_get_current_dir();
   gint i;
-  
+
   /*g_debug("Looking for %s", name);*/
   if (sessionOptions && sessionOptions->ggobiHome) {
     tmp_name = ggobi_find_file_in_dir(name, sessionOptions->ggobiHome, false);
     if (tmp_name)
       return(tmp_name);
   }
-  
+
   tmp_name = ggobi_find_file_in_dir(name, cur_dir, false);
   g_free(cur_dir);
   if (tmp_name)
     return(tmp_name);
-  
+
   tmp_name = ggobi_find_file_in_dir(name, user, true);
   if (tmp_name)
     return(tmp_name);
-  
+
   for (i = 0; dirs[i]; i++) {
     tmp_name = ggobi_find_file_in_dir(name, dirs[i], true);
     if (tmp_name)
       return(tmp_name);
   }
-  
+
   #ifdef WIN32
   tmp_name = ggobi_find_file_in_dir(name, ggobi_win32_get_packagedir(), false);
   if (tmp_name)
     return(tmp_name);
   #endif
-  
+
   return(NULL);
 }
 
@@ -846,7 +846,7 @@ ggobi_find_file(const gchar *name, const gchar* user, const gchar* const *dirs)
     $prefix/share/ggobi (Windows: GGobi installation directory)
 */
 gchar*
-ggobi_find_data_file(const gchar *name) 
+ggobi_find_data_file(const gchar *name)
 {
   const gchar* data_dirs[] = { GGOBI_DATADIR, NULL };
   gchar *path = ggobi_find_file(name, g_get_user_data_dir(), data_dirs);
@@ -925,7 +925,7 @@ GGOBI_getSessionOptions ()
 }
 
 
-/* This includes code that provides information about the 
+/* This includes code that provides information about the
    sizes of the data structures in GGobi when it was compiled.
 */
 
