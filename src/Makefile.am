@@ -78,7 +78,7 @@ endif
 # ggobi to the point where we can actually maintain the .def file.
 libggobi.def:
 	echo EXPORTS > $@
-	nm -g --defined-only $(libggobi_la_SOURCES:%.c=.libs/%.o) > tmp
+	nm -g --defined-only .libs/*.o > tmp
 	sed -n '/^........ [T|C] _/s/^........ [T|C] _/ /p' tmp >> $@
 	rm tmp
 

@@ -49,8 +49,8 @@ dist_datafiles_DATA = \
   data/sat.xml \
   data/tmin.csv
 
-docfilesdir = $(datadir)/doc/ggobi
-dist_docfiles_DATA = doc/manual/manual.pdf
+#docfilesdir = $(datadir)/doc/ggobi
+#dist_docfiles_DATA = doc/manual/manual.pdf
 
 desktopdir = $(datadir)/applications
 dist_desktop_DATA = xdg/ggobi.desktop
