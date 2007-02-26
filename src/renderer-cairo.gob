@@ -9,9 +9,9 @@
 %}
 %h{
   #include "ggobi-renderer.h"
-  #include <cairo/cairo.h>
+  #include <cairo.h>
   #if CAIRO_HAS_GLITZ_SURFACE
-  #include <cairo/cairo-glitz.h>
+  #include <cairo-glitz.h>
   #ifndef WIN32
   #include <glitz-glx.h>
   #include <gdk/gdkx.h>

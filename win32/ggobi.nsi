@@ -25,13 +25,18 @@ InstallDirRegKey HKLM "Software\ggobi" "InstallationDirectory"
 !insertmacro MUI_LANGUAGE "English"
 
 Section "GGobi"
+
+    Delete "$INSTDIR\*.dll"
+
     SetOutPath $INSTDIR
     File ..\src\.libs\ggobi.exe
     File /r /x .svn /x big* ..\data
     #File /r /x .svn ..\doc
     File ..\share\ggobi.ico
     File ..\ggobirc
-    File ..\src\.libs\libggobi-0.dll
+    File ..\src\.libs\libggobi-2.dll
+    # Could install all dependency dlls like this
+    #File ..\..\..\..\local\bin\*.dll
 
     SetOutPath $INSTDIR\share
     File ..\share\colorschemes.xml

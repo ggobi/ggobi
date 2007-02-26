@@ -41,7 +41,7 @@ property STRING nickname
 private GGobiInputSource *source;
 property OBJECT source
   (nick = "origin", blurb = "A representation of the source of this dataset",
-   object_type = GGobi:Input:Source, link, export);
+   object_type = GGobi:Input:Source, type = GGobiInputSource *, link, export);
 
 /* The actual data in this default implementation */
 protected array_f raw;

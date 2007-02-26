@@ -79,6 +79,6 @@ endif
 libggobi.def:
 	echo EXPORTS > $@
 	nm -g --defined-only .libs/*.o > tmp
-	sed -n '/^........ [T|C] _/s/^........ [T|C] _/ /p' tmp >> $@
+	sed -n '/^........ [T|C|B] _/s/^........ [T|C|B] _/ /p' tmp >> $@
 	rm tmp
 

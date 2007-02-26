@@ -251,7 +251,7 @@ class GGobi:Stage from G:Object {
 protected GGobiStage *parent;
 property OBJECT parent
   (nick = "prev", blurb = "The stage preceeding this one in the pipeline",
-    object_type = GGobi:Stage, export)
+    object_type = GGobi:Stage, type = GGobiStage *, export)
   set {
     GGobiStage *parent = g_value_get_object(VAL);
     GGobiStage *former = self->parent;
