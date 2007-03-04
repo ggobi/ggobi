@@ -20,7 +20,7 @@ class GGobi:Renderer:Factory from G:Object {
   virtual GGobiRenderer *
   create(self, GdkDrawable *parent) 
   {
-    GObject *obj = g_object_new(GGOBI_TYPE_RENDERER_CAIRO, "parent", parent, NULL);
+    GObject *obj = g_object_new(GGOBI_TYPE_RENDERER, "parent", parent, NULL);
     return GGOBI_RENDERER(obj);
   }
 }
