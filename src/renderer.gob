@@ -2,6 +2,13 @@
   #include <gdk/gdk.h>
 %}
 
+%{
+  #include <gtk/gtk.h>
+  #if GTK_CHECK_VERSION(2,8,0)
+  static cairo_surface_t *ref_cairo_surface(GdkDrawable *self);
+  #endif
+%}
+
 /* Transfers logical drawing commands to a physical (screen) device */
 /* The default renderer just passes everything through to GDK */
 /* Since GGobi is an interactive graphics platform, the renderer design
@@ -233,4 +240,21 @@ class GGobi:Renderer from Gdk:Drawable
     return GDK_DRAWABLE_GET_CLASS(SELF(self)->_priv->buffer)->_copy_to_image(
       SELF(self)->_priv->buffer, image, src_x, src_y, dest_x, dest_y, width, height);
   }
+  
+  class_init(self_class) { /* need to do this one manually, to avoid GTK+ 2.8.x dep */
+    #if GTK_CHECK_VERSION(2,8,0)
+    GDK_DRAWABLE_CLASS(self_class)->ref_cairo_surface = ref_cairo_surface;
+    #endif
+  }
 }
+
+%{
+  #if GTK_CHECK_VERSION(2,8,0)
+  static cairo_surface_t *
+  ref_cairo_surface(GdkDrawable *self)
+  {
+    return GDK_DRAWABLE_GET_CLASS(GGOBI_RENDERER(self)->_priv->buffer)->ref_cairo_surface(
+      GGOBI_RENDERER(self)->_priv->buffer);
+  }
+  #endif
+%}
