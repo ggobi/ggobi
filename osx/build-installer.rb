@@ -50,13 +50,13 @@ class Package
   def configure!
     return if File.exist?("#{build_path}/config.status")
     puts "configuring..."
-    `cd #{build_path}; PATH=/usr/local/gcc4.0:$PATH ./configure #{$common_options} #{extraconf} 1>&2` 
+    `cd #{build_path}; PATH=/usr/local/gcc4.0:$PATH ./configure #{$common_options} #{extraconf}` 
     raise "Configure failure" unless $?.exitstatus == 0
   end
 
   def build!
-    `cd #{build_path}; PATH=/usr/local/gcc4.0:$PATH PREFIX=#{$prefix} make 1>&2`  
-    `cd #{build_path}; PATH=/usr/local/gcc4.0:$PATH PREFIX=#{$prefix} #{@makeinst} 1>&2`  
+    `cd #{build_path}; PATH=/usr/local/gcc4.0:$PATH PREFIX=#{$prefix} make`  
+    `cd #{build_path}; PATH=/usr/local/gcc4.0:$PATH PREFIX=#{$prefix} #{@makeinst}`  
     raise "Build failure" unless $?.exitstatus == 0
   end
   
@@ -71,23 +71,24 @@ $packages = Package.load([
   "http://ftp.gnu.org/gnu/autoconf/autoconf-2.59.tar.bz2", 
   "http://ftp.gnu.org/gnu/automake/automake-1.9.6.tar.bz2", 
   "http://heanet.dl.sourceforge.net/sourceforge/libpng/libpng-1.2.12.tar.bz2", 
-  "ftp://ftp.remotesensing.org/pub/libtiff/tiff-3.8.2.tar.gz", 
+   "ftp://ftp.remotesensing.org/pub/libtiff/tiff-3.8.2.tar.gz", 
   "http://people.imendio.com/richard/gtk-osx/files/jpeg-6b.tar.gz", 
   "http://ftp.gnu.org/gnu/gettext/gettext-0.14.5.tar.gz", 
   "http://heanet.dl.sourceforge.net/sourceforge/expat/expat-2.0.0.tar.gz", 
   "http://heanet.dl.sourceforge.net/sourceforge/freetype/freetype-2.1.10.tar.bz2", 
-  "http://fontconfig.org/release/fontconfig-2.3.2.tar.gz", 
+  "http://fontconfig.org/release/fontconfig-2.4.2.tar.gz", 
   "http://people.imendio.com/richard/gtk-osx/files/docbook-files-1.tar.gz", 
   "http://people.imendio.com/richard/gtk-osx/files/gnome-doc-utils-fake-1.tar.gz",
   "http://ftp.gnome.org/pub/GNOME/sources/gtk-doc/1.6/gtk-doc-1.6.tar.bz2",
   "http://ftp.gnome.org/pub/GNOME/sources/intltool/0.35/intltool-0.35.0.tar.bz2", 
   "http://icon-theme.freedesktop.org/releases/hicolor-icon-theme-0.9.tar.gz", 
   "http://ftp.gnome.org/pub/GNOME/sources/gnome-icon-theme/2.14/gnome-icon-theme-2.14.2.tar.bz2",
-  "http://cairographics.org/releases/cairo-1.2.4.tar.gz",
-  "ftp://ftp.gtk.org/pub/glib/2.12/glib-2.12.4.tar.gz", 
+  "http://cairographics.org/releases/cairo-1.4.0.tar.gz",
+  "http://ftp.gnome.org/pub/GNOME/sources/glib/2.12/glib-2.12.4.tar.gz", 
   "http://ftp.gnome.org/pub/GNOME/sources/atk/1.12/atk-1.12.4.tar.gz", 
-  "ftp://ftp.gtk.org/pub/pango/1.14/pango-1.14.7.tar.gz", 
-  "ftp://ftp.gtk.org/pub/gtk/v2.10/gtk+-2.10.9.tar.gz",
+  "http://ftp.gnome.org/pub/GNOME/sources/pango/1.16/pango-1.16.0.tar.bz2", 
+  "http://ftp.gnome.org/pub/GNOME/sources/gtk/v2.10/gtk+-2.10.9.tar.gz",
+  "http://ftp.gnome.org/pub/GNOME/sources/libgsf/1.14/libgsf-1.14.3.tar.gz",
   "http://ftp.gnome.org/pub/GNOME/sources/libxml2/2.6/libxml2-2.6.26.tar.gz"
 ])
 

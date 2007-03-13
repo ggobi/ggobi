@@ -8,7 +8,10 @@
 # Also requires latest version of xcode
 
 # Build prereqs --------------------------------------------
-sudo ruby build-installer.rb
+sudo rm -rf /usr/local/gtk2
+sudo rm -rf build; svn up
+sudo mkdir -p /usr/local/gtk2
+sudo ruby build-installer.rb 2>&1 | grep -v "indirect jmp"
 
 export PATH=/usr/local/gcc4.0/bin:/usr/local/gtk2/bin:/usr/local/ggobi/bin:$PATH
 export LDFLAGS=-L/usr/local/gtk2/lib
@@ -16,40 +19,43 @@ export CFLAGS=-I/usr/local/gtk2/include
 
 # Build and install ggobi binary ---------------------------
 cd ~/ggobi/ggobi-release
-./configure --prefix=/usr/local/ggobi 
+./configure --prefix=/usr/local/ggobi --with-describedisplay --with-ggvis --with-graphaction --with-varcloud
 make
 sudo make install
 
 # Build installer ------------------------------------------
 cd ~/ggobi/ggobi/osx
+sudo rm -rf /usr/local/ggobi
 sudo rm -rf *.{dmg,pkg}
-sudo rm -rf installer/usr/local
+sudo rm -rf installer-`uname -p`/usr/local
 
-sudo mkdir -p installer/usr/local
-sudo rsync -rltz /usr/local/gtk2 installer/usr/local 
-sudo rsync -rltz /usr/local/ggobi installer/usr/local 
-sudo mkdir -p installer/usr/local/gcc4.0/lib/
+sudo mkdir -p installer-`uname -p`/usr/local
+sudo rsync -rltz /usr/local/gtk2 installer-`uname -p`/usr/local 
+sudo rsync -rltz /usr/local/ggobi installer-`uname -p`/usr/local 
+sudo mkdir -p installer/usr/local-`uname -p`/gcc4.0/lib/
 sudo cp /usr/local/gcc4.0/lib/libgcc_s.1.0.dylib installer/usr/local/gcc4.0/lib/ 
 
 # Doesn't seem to work - have to build by hand
 # sudo /Developer/Tools/packagemaker -build -p"Install GGobi".pkg -proj ggobi-installer.pmproj 
 open ggobi-installer.pmproj 
 
-rm *.dmg
 sudo hdiutil create -fs HFS+ -volname GGobi -srcfolder "Install GGobi.pkg" ggobi-2.1.5.dmg
-
 cp ggobi-2.1.5.dmg ~/ggobi/web/v2/downloads/ggobi-2.1.5-`uname -p`.dmg
 
 # Build packages ----------------------------------------------
 export PKG_CONFIG_PATH=/usr/local/gtk2/lib/pkgconfig:/usr/local/ggobi/lib/pkgconfig 
 cd ~/ggobi
 
-rm RGtk2/src/*.{o, so}
+rm RGtk2/src/*.{o,so}
 R CMD install RGtk2
-R CMD build RGtk2
+R CMD build --binary RGtk2
 
-rm rggobi/src/*.{o, so}
+rm cairoDevice/src/*.{o,so}
+R CMD install cairoDevice
+R CMD build --binary cairoDevice
+
+rm rggobi/src/*.{o,so}
 R CMD install rggobi
-R CMD build rggobi
+R CMD build --binary rggobi
 
 mv {RGtk2,rggobi}_*.tar.gz ~/ggobi/web/v2/downloads/
