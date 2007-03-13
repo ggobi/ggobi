@@ -1,4 +1,0 @@
-#!/bin/sh
-
-cd /usr/local/ggobi/share/ggobi/data/
-$1/Contents/Resources/open-xapp.sh /usr/local/ggobi/bin/ggobi $2
