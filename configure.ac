@@ -30,6 +30,9 @@ if test "${prefix}" = "NONE"; then
   prefix=$ac_default_prefix
 fi
 
+# Remember the prefix
+AC_DEFINE_UNQUOTED([GGOBI_PREFIX], "$prefix", [GGobi installation prefix])
+
 # Remember where our GGobi data is installed
 # We evaluate datadir twice to resolve any symbols inside datadir
 GGOBI_DATADIR_TMP=`eval echo "${datadir}"`
@@ -39,6 +42,8 @@ AC_DEFINE_UNQUOTED([GGOBI_DATADIR], "$GGOBI_DATADIR", [Location of GGobi data in
 # Initialize gettext
 AM_GNU_GETTEXT([external])
 AM_GNU_GETTEXT_VERSION(0.14.5)
+MKINSTALLDIRS="../$ac_aux_dir/mkinstalldirs"
+AC_SUBST(MKINSTALLDIRS)
 GGOBI_LOCALEDIR="${GGOBI_DATADIR}/locale"
 AC_DEFINE_UNQUOTED([GGOBI_LOCALEDIR], "$GGOBI_LOCALEDIR", [Location of locale files])
 

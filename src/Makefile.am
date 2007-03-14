@@ -44,7 +44,7 @@ pkginclude_HEADERS = GGobiAPI.h ggobiClass.h tour1d_pp.h GGobiApp.h \
   varseldata.h defines.h scatmatClass.h display.h \
   scatterplotClass.h display_tree.h write_xml.h ggobi-intl.h \
   externs.h splot.h writedata.h fileio.h testEvents.h ggobi.h tour.h \
-  $(libggobi_la_GOBHEADERS) GGStructSizes.c marshal.h
+  $(libggobi_la_GOBHEADERS) GGStructSizes.c marshal.h utils.h
 
 BUILT_SOURCES =  $(libggobi_la_GOBSTAMPS) $(libggobi_la_GOBSOURCES) $(libggobi_la_GOBHEADERS)
 

@@ -836,6 +836,9 @@ ggobi_find_file(const gchar *name, const gchar* user, const gchar* const *dirs)
     return(tmp_name);
   #endif
 
+  /* finally, check the GGobi prefix (for OS X) */
+  tmp_name = ggobi_find_file_in_dir(name, GGOBI_PREFIX, false);
+  
   return(NULL);
 }
 
@@ -844,6 +847,7 @@ ggobi_find_file(const gchar *name, const gchar* user, const gchar* const *dirs)
     Current directory
     $HOME/.local/share/ggobi (Windows: Documents, Application Data for user)
     $prefix/share/ggobi (Windows: GGobi installation directory)
+    Installation prefix (for OS X)
 */
 gchar*
 ggobi_find_data_file(const gchar *name)
@@ -859,6 +863,7 @@ ggobi_find_data_file(const gchar *name)
     $HOME/.config/ggobi (Windows: Documents, Application Data for user)
     /etc/xdg/ggobi (Windows: Documents, Application Data for All Users)
     (Windows: GGobi installation directory)
+    Installation prefix (for OS X)
 */
 gchar*
 ggobi_find_config_file(const gchar *name)
