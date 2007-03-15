@@ -1,4 +1,4 @@
-/* read_xml.c */
+ /* read_xml.c */
 /*
  * ggobi
  * Copyright (C) AT&T, Duncan Temple Lang, Dianne Cook 1999-2005
@@ -82,7 +82,7 @@
 #include "GGobiAPI.h"
 
 
-void setColorScheme (const xmlChar ** attrs, XMLParserData * data);
+void setGGobiColorScheme (const xmlChar ** attrs, XMLParserData * data);
 
 void startXMLElement (void *user_data, const xmlChar * name,
                       const xmlChar ** attrs);
@@ -355,7 +355,7 @@ startXMLElement (void *user_data, const xmlChar * name,
 
   switch (type) {
   case COLORSCHEME:
-    setColorScheme (attrs, data);
+    setGGobiColorScheme (attrs, data);
     break;
   case VARIABLES:
     allocVariables (attrs, data);
@@ -430,7 +430,7 @@ startXMLElement (void *user_data, const xmlChar * name,
 }
 
 void
-setColorScheme (const xmlChar ** attrs, XMLParserData * data)
+setGGobiColorScheme (const xmlChar ** attrs, XMLParserData * data)
 {
   const gchar *tmp;
 
