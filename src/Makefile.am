@@ -14,7 +14,7 @@ libggobi_la_GOBOBJECTS = $(libggobi_la_GOBS:%.gob=ggobi-%.lo)
 libggobi_la_GOBSTAMPS = $(libggobi_la_GOBS:%.gob=.%.gob.stamp)
 libggobi_la_LDFLAGS  = @GTK_LIBS@ @LIBXML_LIBS@ @LIBGSF_LIBS@ @GSL_LIBS@ \
   @GLITZ_LIBS@ -version-info 2
-libggobi_la_SOURCES = array.c ash1d.c barchart.c barchartClass.c \
+libggobi_la_BUILT = array.c ash1d.c barchart.c barchartClass.c \
   barchart_ui.c brush.c brush_api.c brush_bins.c brush_init.c brush_link.c brush_link_ui.c \
   brush_ui.c color.c color_ui.c cpanel.c display.c display_tree.c display_ui.c \
   edges.c cluster.c cluster_ui.c extendedDisplay.c fileio.c ggobi-API.c \
@@ -34,7 +34,8 @@ libggobi_la_SOURCES = array.c ash1d.c barchart.c barchartClass.c \
   utils_pango.c utils_ui.c varchange.c varcircles.c varpanel_ui.c vartable.c \
   vartable_nbook.c vartable_ui.c vector.c win32_draw.c writedata_ui.c \
   write_csv.c write_xml.c wvis.c wvis_ui.c xlines.c xyplot.c \
-  xyplot_ui.c $(libggobi_la_GOBSOURCES) $(libggobi_la_GOBSTAMPS)
+  xyplot_ui.c $(libggobi_la_GOBSOURCES)
+libggobi_la_SOURCES = $(libggobi_la_BUILT) $(libggobi_la_GOBSTAMPS)
 libggobi_la_LIBADD = $(libggobi_la_GOBOBJECTS) @LIBLTDL@
 libggobi_la_DEPENDENCIES = $(libggobi_la_GOBOBJECTS)
 pkginclude_HEADERS = GGobiAPI.h ggobiClass.h tour1d_pp.h GGobiApp.h \
@@ -78,7 +79,7 @@ endif
 # ggobi to the point where we can actually maintain the .def file.
 libggobi.def:
 	echo EXPORTS > $@
-	nm -g --defined-only .libs/*.o > tmp
+	nm -g --defined-only $(libggobi_la_BUILT:%.c=.libs/%.o) > tmp
 	sed -n '/^........ [T|C|B] _/s/^........ [T|C|B] _/ /p' tmp >> $@
 	rm tmp
 
