@@ -1,13 +1,31 @@
 \documentclass[11pt]{article}
+
 \usepackage{fullpage}
 \usepackage{color}
 
 \bibliographystyle{plain}
 
-\input{WebMacros}
-\input{SMacros}
-\input{CMacros}
-\input{XMLMacros}
+\input{pstricks}
+
+% Taken from omegahat/Docs/WebMacros.tex
+\def\strip#1>{}
+\def\Escape#1{\def\next{#1}%
+  {\frenchspacing\expandafter\strip\meaning\next}}
+\def\Env#1{{\gray\texttt{\Escape{#1}}}}
+% I don't know why, but this line is a problem here.  It works
+% in other documents. dfs
+%\def\file#1{\HREF{#1}{\textbf{\Escape{#1}}}}
+\def\file#1{\textsl{#1}}
+\def\dir#1{\textbf{\Escape{#1/}}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Taken from omegahat/Docs/XMLMacros.tex
+\def\XMLTag#1{\textit{#1}}
+\def\XMLAttribute#1{\textsl{#1}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\def\directory#1{\dir{#1}}
+\def\XMLElement#1{\XMLTag{#1}}
 
 \begin{document}
 
