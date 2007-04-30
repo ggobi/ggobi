@@ -320,7 +320,7 @@ GGOBI_DATA_FACTORY_XML_CONST
 </SECTION>
 
 <SECTION>
-<FILE>ggobi-bitset</FILE>
+<FILE>bitset</FILE>
 GGobiBitset
 GGobiBitsetClass
 GGobiIndexFunc
@@ -334,12 +334,12 @@ ggobi_bitset_remove_indices
 ggobi_bitset_insert_indices
 ggobi_bitset_get_indices
 ggobi_bitset_get_n_indices
-ggobi_bitset_foreach
-ggobi_bitset_foreach_decreasing
+ggobi_bitset_apply
+ggobi_bitset_apply_decreasing
 ggobi_bitset_clear
-ggobi_bitset_set
-ggobi_bitset_unset
-ggobi_bitset_test
+ggobi_bitset_set_bit
+ggobi_bitset_unset_bit
+ggobi_bitset_test_bit
 <SUBSECTION Standard>
 GGOBI_BITSET
 GGOBI_IS_BITSET
@@ -347,7 +347,6 @@ GGOBI_TYPE_BITSET
 ggobi_bitset_get_type
 GGOBI_BITSET_CLASS
 GGOBI_BITSET_GET_CLASS
-GGOBI_BITSET_CONST
 </SECTION>
 
 <SECTION>

@@ -62,7 +62,7 @@
 #include "ggobi-type-registry.h"
 #include "ggobi-variable-group.h"
 #include "ggobi-variable.h"
-#include "ggobi-bitset.h"
+#include "bitset.h"
 #include "ggobi-renderer.h"
 #include "ggobi-renderer-cairo.h"
 #include "ggobi-renderer-factory.h"

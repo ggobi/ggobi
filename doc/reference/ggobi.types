@@ -1,4 +1,4 @@
-#include "ggobi-bitset.h"
+#include "bitset.h"
 #include "ggobi-data-factory-csv.h"
 #include "ggobi-data-factory-xml.h"
 #include "ggobi-data-factory.h"

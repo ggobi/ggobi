@@ -22,6 +22,31 @@
 GGobiApp
 
 
+<!-- ##### SECTION ./tmpl/ggobi-bitset.sgml:Long_Description ##### -->
+<para>
+This is a conventional bitset implementation. The design allows the client
+to treat a #GGobiBitset as a list of indices or just a vector of bits.
+</para>
+
+
+<!-- ##### SECTION ./tmpl/ggobi-bitset.sgml:See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION ./tmpl/ggobi-bitset.sgml:Short_Description ##### -->
+Bitset utility
+
+
+<!-- ##### SECTION ./tmpl/ggobi-bitset.sgml:Stability_Level ##### -->
+Unstable
+
+
+<!-- ##### SECTION ./tmpl/ggobi-bitset.sgml:Title ##### -->
+GGobiBitset
+
+
 <!-- ##### MACRO GGOBI_DATA_GET_PROP_NICKNAME ##### -->
 <para>
 
@@ -802,6 +827,49 @@ given attribute.
 </para>
 
 @Returns: 
+
+<!-- ##### FUNCTION ggobi_bitset_foreach ##### -->
+<para>
+
+</para>
+
+@self: 
+@func: 
+@data: 
+
+<!-- ##### FUNCTION ggobi_bitset_foreach_decreasing ##### -->
+<para>
+
+</para>
+
+@self: 
+@func: 
+@data: 
+
+<!-- ##### FUNCTION ggobi_bitset_set ##### -->
+<para>
+
+</para>
+
+@self: 
+@i: 
+
+<!-- ##### FUNCTION ggobi_bitset_test ##### -->
+<para>
+
+</para>
+
+@self: 
+@i: 
+@Returns: 
+
+<!-- ##### FUNCTION ggobi_bitset_unset ##### -->
+<para>
+
+</para>
+
+@self: 
+@i: 
 
 <!-- ##### MACRO ggobi_pipeline_factory_connect__build ##### -->
 <para>

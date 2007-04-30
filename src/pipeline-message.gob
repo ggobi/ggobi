@@ -1,5 +1,5 @@
 %h{
-  #include "ggobi-bitset.h" /* for GGobiIndexFunc */
+  #include "bitset.h" /* for GGobiIndexFunc */
 %}
 %{
   #include "utils.h" /* for index_compare */
@@ -224,7 +224,7 @@ class GGobi:Pipeline:Message from G:Object {
   public void
   changed_cols_foreach(self, GGobiIndexFunc func, gpointer data)
   {
-    ggobi_bitset_foreach(selfp->changed_cols, func, data);
+    ggobi_bitset_apply(selfp->changed_cols, func, data);
   }
   /**
    * removed_cols_foreach:
@@ -238,7 +238,7 @@ class GGobi:Pipeline:Message from G:Object {
   public void
   removed_cols_foreach(self, GGobiIndexFunc func, gpointer data)
   {
-    ggobi_bitset_foreach(selfp->removed_cols, func, data);
+    ggobi_bitset_apply(selfp->removed_cols, func, data);
   }
   /**
    * removed_cols_foreach_decreasing:
@@ -252,7 +252,7 @@ class GGobi:Pipeline:Message from G:Object {
   public void
   removed_cols_foreach_decreasing(self, GGobiIndexFunc func, gpointer data)
   {
-    ggobi_bitset_foreach_decreasing(selfp->removed_cols, func, data);
+    ggobi_bitset_apply_decreasing(selfp->removed_cols, func, data);
   }
   /**
    * removed_rows_foreach:
@@ -266,7 +266,7 @@ class GGobi:Pipeline:Message from G:Object {
   public void
   removed_rows_foreach(self, GGobiIndexFunc func, gpointer data)
   {
-    ggobi_bitset_foreach(selfp->removed_rows, func, data);
+    ggobi_bitset_apply(selfp->removed_rows, func, data);
   }
   /**
    * removed_rows_foreach_decreasing:
@@ -280,7 +280,7 @@ class GGobi:Pipeline:Message from G:Object {
   public void
   removed_rows_foreach_decreasing(self, GGobiIndexFunc func, gpointer data)
   {
-    ggobi_bitset_foreach_decreasing(selfp->removed_rows, func, data);
+    ggobi_bitset_apply_decreasing(selfp->removed_rows, func, data);
   }
   /**
    * added_rows_foreach:
@@ -329,7 +329,7 @@ class GGobi:Pipeline:Message from G:Object {
   {
     g_return_if_fail(j < selfp->n_cols + selfp->n_added_cols);
     if (j < selfp->n_cols)
-      ggobi_bitset_set(selfp->changed_cols, j);
+      ggobi_bitset_set_bit(selfp->changed_cols, j);
   }
   
   /**
@@ -366,7 +366,7 @@ class GGobi:Pipeline:Message from G:Object {
       /* add this index to the set */
       g_return_if_fail(index < selfp->n_cols + selfp->n_added_cols);
       if (index < selfp->n_cols)
-        ggobi_bitset_set(selfp->removed_cols, index);
+        ggobi_bitset_set_bit(selfp->removed_cols, index);
     }
     ggobi_bitset_remove_indices(selfp->changed_cols, sorted_cols);
     g_slist_free(sorted_cols);
@@ -388,7 +388,7 @@ class GGobi:Pipeline:Message from G:Object {
       /* add this index to the set */
       g_return_if_fail(index < selfp->n_rows + selfp->n_added_rows);
       if (index < selfp->n_rows)
-        ggobi_bitset_set(selfp->removed_rows, index);
+        ggobi_bitset_set_bit(selfp->removed_rows, index);
     }
   }
   

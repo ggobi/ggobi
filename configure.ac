@@ -81,7 +81,7 @@ AC_ARG_WITH(all-plugins, [--with-all-plugins  Enable all (supported) plugins])
 #  POSTGRES_PLUGIN=1; PLUGIN_DIRS="${PLUGIN_DIRS} Postgres")
 
 AC_ARG_WITH(dataviewer,
-  --with-dataviewer          Enable plugin for viewing data in a datagrid.,
+  AC_HELP_STRING([--with-dataviewer], [Enable plugin for viewing data in a datagrid.]),
   DATAVIEWER_PLUGIN=1;  PLUGIN_DIRS="${PLUGIN_DIRS} DataViewer")
 
 AC_ARG_WITH(describedisplay,
@@ -178,6 +178,10 @@ AC_SUBST(SRC_DEBUG)
 
 # Find GOB2 (don't fail if not found, not necessary for distributed builds)
 AC_PATH_PROG(GOB2, gob2,,$PATH)
+
+# Find valac (the vala compiler)
+AC_PATH_PROG(VALAC, valac,,$PATH)
+AC_SUBST(VALAC)
 
 # FIND GTK2
 

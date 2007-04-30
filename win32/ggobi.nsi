@@ -69,7 +69,11 @@ Section "GGobi"
     File ..\src\.libs\libggobi.dll.a
     File ..\src\.libs\libggobi.la
 
-    # Shortcut
+    # Shortcut (install for all users if user is an admin)
+    userInfo::getAccountType
+    pop $0
+    StrCmp $0 "Admin" 0 +2
+    SetShellVarContext all
     SetOutPath $INSTDIR\data
     CreateShortCut "$DESKTOP\ggobi.lnk" "$INSTDIR\ggobi.exe" "" "$INSTDIR\ggobi.ico"
 
@@ -95,6 +99,10 @@ Section "Uninstall"
     Push $INSTDIR
     Call un.RemoveFromPath
     # Get rid of shortcut
+    userInfo::getAccountType
+    pop $0
+    StrCmp $0 "Admin" 0 +2
+    SetShellVarContext all
     Delete "$DESKTOP\ggobi.lnk"
     # Finally, get rid of our files
     RMDir /r "$INSTDIR"
