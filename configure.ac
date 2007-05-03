@@ -177,6 +177,8 @@ AC_SUBST(SRC_DEBUG)
 # Find GOB2 (don't fail if not found, not necessary for distributed builds)
 AC_PATH_PROG(GOB2, gob2,,$PATH)
 
+PKG_PROG_PKG_CONFIG(0.21)
+
 # FIND GTK2
 
  echo "Looking for gtk2"
@@ -210,9 +212,9 @@ AM_CONDITIONAL(OS_WIN32, test "$os_win32" = "yes")
 # Find glitz
 
 if test "$os_win32" != "yes" ; then
-  PKG_CHECK_MODULES(GLITZ, [glitz-glx], HAVE_GLITZ = 1, HAVE_GLITZ = 0)
+  PKG_CHECK_MODULES(GLITZ, [glitz-glx], HAVE_GLITZ=1, HAVE_GLITZ=0)
 else
-  PKG_CHECK_MODULES(GLITZ, [glitz-wgl], HAVE_GLITZ = 1, HAVE_GLITZ = 0)
+  PKG_CHECK_MODULES(GLITZ, [glitz-wgl], HAVE_GLITZ=1, HAVE_GLITZ=0)
 fi
 
 AC_SUBST(GLITZ_CFLAGS)
