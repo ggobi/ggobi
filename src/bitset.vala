@@ -8,7 +8,7 @@ using GLib;
  * A function that is invoked on one integer index at a time.
  *
  */
-public callback void GGobi.IndexFunc (uint j, pointer user_data);
+public callback void GGobi.IndexFunc (uint32 j, pointer user_data);
 
 public class GGobi.Bitset {
   
@@ -22,7 +22,7 @@ public class GGobi.Bitset {
   protected uchar[] bits;
   
   // property handling much cleaner vs gob
-  public uint size {
+  public uint32 size {
     get {
       return bits.length * BITS_PER_CHUNK;
     }
@@ -34,7 +34,7 @@ public class GGobi.Bitset {
   
   // these are the _new* functions, much simpler compared to gob
   public Bitset () { }
-  public Bitset.with_size (construct uint size) { }
+  public Bitset.with_size (construct uint32 size) { }
   
   public Bitset clone() {
     Bitset other = new Bitset.with_size(size);
@@ -49,10 +49,10 @@ public class GGobi.Bitset {
   // FIXME: Do we want to sort here?
 
   public void
-  remove_indices(SList<uint> indices)
+  remove_indices(SList<uint32> indices)
   {
-    uint i = indices.length() > 0 ? indices.nth_data(0) : 0, dec = 0;
-    foreach(uint index in indices) {
+    uint32 i = indices.length() > 0 ? indices.nth_data(0) : 0, dec = 0;
+    foreach(uint32 index in indices) {
       /* shift indices */
       while(i < index) {
         assign_bit(i-dec, test_bit(i));
@@ -64,12 +64,12 @@ public class GGobi.Bitset {
     }
   }
   public void /* just the opposite of removal */
-  insert_indices(SList<uint> indices)
+  insert_indices(SList<uint32> indices)
   {
-    SList<uint> rev_indices = indices.copy();
+    SList<uint32> rev_indices = indices.copy();
     rev_indices.reverse();
     uint i = size, inc = indices.length();
-    foreach (uint index in indices) {
+    foreach (uint32 index in indices) {
       /* shift indices */
       while(i > index) {
         assign_bit(i, test_bit(i-inc));
@@ -81,11 +81,11 @@ public class GGobi.Bitset {
     }
     // make sure vala frees rev_indices here
   }
-  public SList<uint>
+  public SList<uint32>
   get_indices()
   {
     uint i;
-    SList<uint> indices = new SList<uint>();
+    SList<uint32> indices = new SList<uint32>();
     foreach(uchar b in bits) {
       // must use logical in if() expressions
       if (b > 0) {
@@ -100,7 +100,7 @@ public class GGobi.Bitset {
     indices.reverse();
     return indices;
   }
-  public uint
+  public uint32
   get_n_indices()
   {
     uint i, count = 0;
@@ -118,16 +118,16 @@ public class GGobi.Bitset {
   public void 
   apply(IndexFunc func, pointer data)
   {
-    SList<uint> indices = get_indices();
-    foreach(uint index in indices)
+    SList<uint32> indices = get_indices();
+    foreach(uint32 index in indices)
       func(index, data);
   }
   public void
   apply_decreasing(IndexFunc func, pointer data)
   {
-    SList<uint> indices = get_indices();
+    SList<uint32> indices = get_indices();
     indices.reverse();
-    foreach(uint index in indices)
+    foreach(uint32 index in indices)
       func(index, data);
   }
 
@@ -141,24 +141,24 @@ public class GGobi.Bitset {
       bits[i] = (uchar)0;
   }
   public void
-  assign_bit(uint i, bool val)
+  assign_bit(uint32 i, bool val)
   {
     if (val)
       set_bit(i);
     else unset_bit(i);
   }
   public void
-  set_bit(uint i)
+  set_bit(uint32 i)
   {
     bits[i / BITS_PER_CHUNK] |= (uchar)(1 << (i % BITS_PER_CHUNK));
   }
   public void
-  unset_bit(uint i)
+  unset_bit(uint32 i)
   {
     bits[i / BITS_PER_CHUNK] &= (uchar)(~(1 << (i % BITS_PER_CHUNK)));
   }
   public bool
-  test_bit(uint i)
+  test_bit(uint32 i)
   {
     return (bits[i / BITS_PER_CHUNK] & (1 << (i % BITS_PER_CHUNK))) > 0;
   }
