@@ -65,6 +65,7 @@ Section "GGobi"
 	File ..\src\.libs\libggobi.la
 	
 	# Shortcut
+  SetShellVarContext all
   SetOutPath $INSTDIR\data
 	CreateShortCut "$DESKTOP\ggobi.lnk" "$INSTDIR\ggobi.exe" "" "$INSTDIR\ggobi.ico"
 
@@ -90,6 +91,7 @@ Section "Uninstall"
 	Push $INSTDIR
 	Call un.RemoveFromPath
 	# Get rid of shortcut
+  SetShellVarContext all
 	Delete "$DESKTOP\ggobi.lnk"
 	# Finally, get rid of our files
 	RMDir /r "$INSTDIR"
