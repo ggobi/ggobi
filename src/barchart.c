@@ -95,13 +95,6 @@ createBarchart (displayd * display, gboolean missing_p, splotd * sp, gint var,
 
   if (!display) {
     if (sp == NULL || sp->displayptr == NULL) {
-      /* Use GGOBI_TYPE_BARCHART_DISPLAY, or the regular extended
-         display and set the titleLabel immediately afterward. If more
-         goes into barchart, we will do the former. And that's what we
-         do.  The alternative is.
-         display = g_object_new(GGOBI_TYPE_EXTENDED_DISPLAY);
-         GGOBI_EXTENDED_DISPLAY(display)->titleLabel = "BarChart";
-       */
       display = g_object_new (GGOBI_TYPE_BARCHART_DISPLAY, NULL);
       display_set_values (display, d, gg);
     }
