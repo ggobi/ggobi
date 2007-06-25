@@ -25,7 +25,7 @@
 #include <string.h>
 
 displayd *
-timeSeriesDisplayCreate(gboolean missing_p, splotd *sp, GGobiData *d, ggobid *gg)
+timeSeriesDisplayCreate(gboolean use_window, gboolean missing_p, splotd *sp, GGobiData *d, ggobid *gg)
 {
   gint *selected_vars, nselected_vars = 0;
   displayd *dpy = NULL;
@@ -33,7 +33,7 @@ timeSeriesDisplayCreate(gboolean missing_p, splotd *sp, GGobiData *d, ggobid *gg
   selected_vars = (gint *) g_malloc (d->ncols * sizeof (gint));
   nselected_vars = selected_cols_get (selected_vars, d, gg);
 
-  dpy = tsplot_new (dpy, false, nselected_vars, selected_vars, d, gg);
+  dpy = tsplot_new (dpy, use_window, false, nselected_vars, selected_vars, d, gg);
 
   g_free(selected_vars);
 

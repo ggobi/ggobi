@@ -124,7 +124,7 @@ extended_display_open_cb (GtkWidget * w, ExtendedDisplayCreateData * data)
 
   splot_set_current (gg->current_splot, off, gg);
   if (data->klass->create) {
-    dpy = data->klass->create (false, NULL, data->d, gg);
+    dpy = data->klass->create (true, false, NULL, data->d, gg);
   }
   else if (data->klass->createWithVars) {
     gint *selected_vars, nselected_vars = 0;
@@ -132,7 +132,7 @@ extended_display_open_cb (GtkWidget * w, ExtendedDisplayCreateData * data)
     selected_vars = (gint *) g_malloc (data->d->ncols * sizeof (gint));
     nselected_vars = selected_cols_get (selected_vars, data->d, gg);
     dpy =
-      data->klass->createWithVars (false, nselected_vars, selected_vars,
+      data->klass->createWithVars (true, false, nselected_vars, selected_vars,
                                    data->d, gg);
     g_free (selected_vars);
   }

@@ -952,15 +952,6 @@ varpanelHighd (displayd * display)
           || proj == COTOUR);
 }
 
-displayd *
-gtk_scatterplot_new (GGobiData * d, ggobid * gg)
-{
-  displayd *display;
-  display = scatterplot_new (false, NULL, d, gg);
-
-  return (display);
-}
-
 void
 scatterplotDisplayInit (scatterplotDisplayd * display)
 {

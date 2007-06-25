@@ -106,6 +106,12 @@ scatterplot_show_rulers (displayd * display, gint projection)
 }
 
 void
+ruler_ranges_set_on_realize (splotd * sp, gpointer user_data)
+{
+  ruler_ranges_set(true, sp->displayptr, sp, sp->displayptr->ggobi);
+}
+
+void
 ruler_ranges_set (gboolean force, displayd * display, splotd * sp,
                   ggobid * gg)
 {
@@ -202,16 +208,16 @@ CHECK_EVENT_SIGNATURE (display_datad_added_cb, datad_added_f)
 }
 
 displayd *
-scatterplot_new_with_vars (gboolean missing_p, gint numVars, gint * vars,
-                           GGobiData * d, ggobid * gg)
+scatterplot_new_with_vars (gboolean use_window, gboolean missing_p, gint numVars,
+                           gint * vars, GGobiData * d, ggobid * gg)
 {
-  return (createScatterplot (NULL, missing_p, NULL, numVars, vars, d, gg));
+  return (createScatterplot (NULL, use_window, missing_p, NULL, numVars, vars, d, gg));
 }
 
 displayd *
-scatterplot_new (gboolean missing_p, splotd * sp, GGobiData * d, ggobid * gg)
+scatterplot_new (gboolean use_window, gboolean missing_p, splotd * sp, GGobiData * d, ggobid * gg)
 {
-  return (createScatterplot (NULL, missing_p, sp, 0, NULL, d, gg));
+  return (createScatterplot (NULL, use_window, missing_p, sp, 0, NULL, d, gg));
 }
 
 
@@ -254,8 +260,8 @@ edge_options_cb (GtkRadioAction * action, GtkRadioAction * current,
 }
 
 displayd *
-createScatterplot (displayd * display, gboolean missing_p, splotd * sp,
-                   gint numVars, gint * vars, GGobiData * d, ggobid * gg)
+createScatterplot (displayd * display, gboolean use_window, gboolean missing_p, 
+                   splotd * sp, gint numVars, gint * vars, GGobiData * d, ggobid * gg)
 {
   GtkWidget *table, *vbox;
   ProjectionMode projection;
@@ -274,6 +280,8 @@ createScatterplot (displayd * display, gboolean missing_p, splotd * sp,
     }
   }
 
+  GGOBI_WINDOW_DISPLAY(display)->useWindow = use_window;
+  
   /* Want to make certain this is true, and perhaps it may be different
      for other plot types and so not be set appropriately in DefaultOptions.
      display->options.axes_center_p = true;
@@ -283,7 +291,8 @@ createScatterplot (displayd * display, gboolean missing_p, splotd * sp,
   scatterplot_cpanel_init (&display->cpanel, projection, DEFAULT_IMODE, gg);
 
   vbox = GTK_WIDGET (display);  /* gtk_vbox_new (false, 1); */
-
+  display->menu_manager = display_menu_manager_create (display);
+  
   if (GGOBI_IS_WINDOW_DISPLAY (display)
       && GGOBI_WINDOW_DISPLAY (display)->useWindow) {
     GtkActionGroup *actions = gtk_action_group_new ("Edge Actions");
@@ -303,7 +312,6 @@ createScatterplot (displayd * display, gboolean missing_p, splotd * sp,
     gtk_container_add (GTK_CONTAINER (GGOBI_WINDOW_DISPLAY (display)->window),
                        vbox);
 
-    display->menu_manager = display_menu_manager_create (display);
     gtk_ui_manager_insert_action_group (display->menu_manager, actions, -1);
     g_object_unref (actions);
     display->menubar = create_menu_bar (display->menu_manager, scatterplot_ui,
@@ -440,15 +448,17 @@ createScatterplot (displayd * display, gboolean missing_p, splotd * sp,
                     (GtkAttachOptions) GTK_FILL,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_SHRINK | GTK_FILL),
                     0, 0);
-
-  if (GGOBI_IS_WINDOW_DISPLAY (display)
-      && GGOBI_WINDOW_DISPLAY (display)->useWindow)
-    gtk_widget_show_all (GGOBI_WINDOW_DISPLAY (display)->window);
-
-   /*-- hide any extraneous rulers --*/
+  
   scatterplot_show_rulers (display, projection);
-  ruler_ranges_set (true, display, sp, gg);
-
+  if (GGOBI_IS_WINDOW_DISPLAY (display)
+      && GGOBI_WINDOW_DISPLAY (display)->useWindow) 
+  {
+    gtk_widget_show_all (GGOBI_WINDOW_DISPLAY (display)->window);
+    /* only set rulers if we know the plot widget has been configured */
+    ruler_ranges_set (true, display, sp, gg);
+  }
+  else gtk_widget_show_all (display);
+    
   g_signal_connect_object (G_OBJECT (gg), "datad_added",
                            G_CALLBACK (display_datad_added_cb),
                            G_OBJECT (display), 0);

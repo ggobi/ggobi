@@ -395,7 +395,7 @@ do_radial(glayoutd *gl, GGobiData *d, GGobiData *e, displayd *dsp, ggobid *gg)
     opts = GGOBI(getDefaultDisplayOptions)();
     opts->axes_show_p = false;
     opts->edges_undirected_show_p = true;
-    dspnew = GGOBI(newScatterplot) (0, 1, dnew, gg);
+    dspnew = GGOBI(newScatterplot) (0, 1, true, dnew, gg);
     opts->axes_show_p = true;  /*-- restore it --*/
     opts->edges_undirected_show_p = false;
 

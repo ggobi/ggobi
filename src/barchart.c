@@ -72,21 +72,21 @@ static GtkToggleActionEntry toggle_entries[] = {
 static guint n_toggle_entries = G_N_ELEMENTS (toggle_entries);
 
 displayd *
-barchart_new (gboolean missing_p, splotd * sp, GGobiData * d, ggobid * gg)
+barchart_new (gboolean use_window, gboolean missing_p, splotd * sp, GGobiData * d, ggobid * gg)
 {
-  return (createBarchart (NULL, missing_p, sp, -1, d, gg));
+  return (createBarchart (NULL, use_window, missing_p, sp, -1, d, gg));
 }
 
 displayd *
-barchart_new_with_vars (gboolean missing_p, gint nvars, gint * vars,
-                        GGobiData * d, ggobid * gg)
+barchart_new_with_vars (gboolean use_window, gboolean missing_p, gint nvars, 
+                        gint * vars, GGobiData * d, ggobid * gg)
 {
-  return (createBarchart (NULL, missing_p, NULL, vars ? vars[0] : 0, d, gg));
+  return (createBarchart (NULL, use_window, missing_p, NULL, vars ? vars[0] : 0, d, gg));
 }
 
 displayd *
-createBarchart (displayd * display, gboolean missing_p, splotd * sp, gint var,
-                GGobiData * d, ggobid * gg)
+createBarchart (displayd * display, gboolean use_window, gboolean missing_p, 
+                splotd * sp, gint var, GGobiData * d, ggobid * gg)
 {
   GtkWidget *table, *vbox;
 
@@ -103,6 +103,8 @@ createBarchart (displayd * display, gboolean missing_p, splotd * sp, gint var,
       display->d = d;
     }
   }
+  
+  GGOBI_WINDOW_DISPLAY(display)->useWindow = use_window;
 
   /* Want to make certain this is true, and perhaps it may be different
      for other plot types and so not be set appropriately in DefaultOptions.
@@ -118,13 +120,13 @@ createBarchart (displayd * display, gboolean missing_p, splotd * sp, gint var,
   /*-- Add the main menu bar --*/
   vbox = GTK_WIDGET (display);
   gtk_container_set_border_width (GTK_CONTAINER (vbox), 1);
+  display->menu_manager = display_menu_manager_create (display);
   if (GGOBI_IS_WINDOW_DISPLAY (display)
       && GGOBI_WINDOW_DISPLAY (display)->window) {
     //gg->app.sp_accel_group = gtk_accel_group_new();
     GtkActionGroup *actions = gtk_action_group_new ("BarchartActions");
     gtk_action_group_add_toggle_actions (actions, toggle_entries,
                                          n_toggle_entries, display);
-    display->menu_manager = display_menu_manager_create (display);
     gtk_ui_manager_insert_action_group (display->menu_manager, actions, 0);
     g_object_unref (G_OBJECT (actions));
     display->menubar =
@@ -216,17 +218,15 @@ createBarchart (displayd * display, gboolean missing_p, splotd * sp, gint var,
                     0, 0);
 
 
-  if (GGOBI_IS_WINDOW_DISPLAY (display)
-      && GGOBI_WINDOW_DISPLAY (display)->useWindow)
-    gtk_widget_show_all (GGOBI_WINDOW_DISPLAY (display)->window);
-  else
-    gtk_widget_show_all (table);
-
-  /*-- hide any extraneous rulers --*/
-
   display->p1d_orientation = VERTICAL;
   scatterplot_show_rulers (display, P1PLOT);  /* put in pmodeSet? */
-  ruler_ranges_set (true, display, sp, gg);
+  
+  if (GGOBI_IS_WINDOW_DISPLAY (display)
+      && GGOBI_WINDOW_DISPLAY (display)->useWindow) 
+  {
+    gtk_widget_show_all (GGOBI_WINDOW_DISPLAY (display)->window);
+    ruler_ranges_set (true, display, sp, gg);
+  } else gtk_widget_show_all (table);
 
   return display;
 }

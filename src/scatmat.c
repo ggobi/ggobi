@@ -40,7 +40,7 @@ static const gchar *scatmat_ui =
 
 
 displayd *
-scatmat_new (displayd * display,
+scatmat_new (displayd * display, gboolean use_window,
              gboolean missing_p, gint numRows, gint * rows,
              gint numCols, gint * cols, GGobiData * d, ggobid * gg)
 {
@@ -55,6 +55,8 @@ scatmat_new (displayd * display,
   if (!display)
     display = g_object_new (GGOBI_TYPE_SCATMAT_DISPLAY, NULL);
 
+  GGOBI_WINDOW_DISPLAY(display)->useWindow = use_window;
+  
   display_set_values (display, d, gg);
   if (GGOBI_IS_WINDOW_DISPLAY (display))
     wdpy = GGOBI_WINDOW_DISPLAY (display);
@@ -139,10 +141,10 @@ scatmat_new (displayd * display,
 */
   vbox = gtk_vbox_new (FALSE, 1);
   gtk_container_set_border_width (GTK_CONTAINER (vbox), 1);
+  display->menu_manager = display_menu_manager_create (display);
   if (wdpy && wdpy->useWindow) {
     gtk_container_add (GTK_CONTAINER (wdpy->window), vbox);
 
-    display->menu_manager = display_menu_manager_create (display);
     display->menubar =
       create_menu_bar (display->menu_manager, scatmat_ui, wdpy->window);
 

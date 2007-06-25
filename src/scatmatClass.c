@@ -165,10 +165,10 @@ plottedVarsGet (displayd * display, gint * vars, GGobiData * d, ggobid * gg)
 }
 
 displayd *
-createWithVars (gboolean missing_p, gint nvars, gint * vars, GGobiData * d,
-                ggobid * gg)
+createWithVars (gboolean use_window, gboolean missing_p, gint nvars, 
+                gint * vars, GGobiData * d, ggobid * gg)
 {
-  return (GGOBI (newScatmat) (vars, vars, nvars, nvars, d, gg));
+  return (GGOBI (newScatmat) (vars, vars, nvars, nvars, use_window, d, gg));
 }
 
 #ifdef STORE_SESSION_ENABLED

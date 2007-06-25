@@ -259,8 +259,8 @@ typedef struct
     gchar * titleLabel;
     gchar const *  (*title_label)(displayd *dpy);
 
-    displayd *(*create)(gboolean missing_p, splotd *sp, GGobiData *d, ggobid *gg);
-    displayd *(*createWithVars)(gboolean missing_p, gint nvars, gint *vars, GGobiData *d, ggobid *gg);
+    displayd *(*create)(gboolean use_window, gboolean missing_p, splotd *sp, GGobiData *d, ggobid *gg);
+    displayd *(*createWithVars)(gboolean use_window, gboolean missing_p, gint nvars, gint *vars, GGobiData *d, ggobid *gg);
 
     gboolean (*variable_select)(GtkWidget *, displayd *, splotd *, gint jvar, gint toggle, gint mouse, cpaneld *cpanel, ggobid *gg);
 

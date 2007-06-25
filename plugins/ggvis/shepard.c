@@ -92,7 +92,7 @@ create_shepard_data_cb (GtkAction *action, PluginInstance *inst)
         dnew->glyph_now.els[i].type = dnew->glyph_now.els[i].size = 
 	dnew->glyph_prev.els[i].type = dnew->glyph_prev.els[i].size = 0;
 
-    dspnew = GGOBI(newScatterplot) (0, 1, dnew, gg); 
+    dspnew = GGOBI(newScatterplot) (0, 1, true, dnew, gg); 
     display_add(dspnew, gg);
     varpanel_refresh(dspnew, gg);
     display_tailpipe (dspnew, FULL, gg);

@@ -108,6 +108,10 @@ splot_configure_cb (GtkWidget *w, GdkEventConfigure *event, splotd *sp)
   sp->redraw_style = FULL;
   gtk_widget_queue_draw (sp->da);
 
+  /* if no window, then the ruler ranges have not yet been set: set them now */
+  if (GGOBI_IS_WINDOW_DISPLAY(display) && !GGOBI_WINDOW_DISPLAY(display)->useWindow)
+    ruler_ranges_set(true, display, sp, gg);
+  
   return false;
 }
 

@@ -87,15 +87,15 @@ tsplot_reset_arrangement (displayd * display, gint arrangement, ggobid * gg)
 #define MAXNTSPLOTS 6
 
 displayd *
-tsplot_new_with_vars (gboolean missing_p, gint nvars, gint * vars,
+tsplot_new_with_vars (gboolean use_window, gboolean missing_p, gint nvars, gint * vars,
                       GGobiData * d, ggobid * gg)
 {
-  return (tsplot_new (NULL, missing_p, nvars, vars, d, gg));
+  return (tsplot_new (NULL, use_window, missing_p, nvars, vars, d, gg));
 }
 
 displayd *
-tsplot_new (displayd * display, gboolean missing_p, gint nvars, gint * vars,
-            GGobiData * d, ggobid * gg)
+tsplot_new (displayd * display, gboolean use_window, gboolean missing_p, 
+            gint nvars, gint * vars, GGobiData * d, ggobid * gg)
 {
   GtkWidget *vbox, *frame;
   gint i, timeVariable, cur;
@@ -105,6 +105,8 @@ tsplot_new (displayd * display, gboolean missing_p, gint nvars, gint * vars,
   if (!display)
     display = g_object_new (GGOBI_TYPE_TIME_SERIES_DISPLAY, NULL);
 
+  GGOBI_WINDOW_DISPLAY(display)->useWindow = use_window;
+  
   display_set_values (display, d, gg);
 
   timeVariable = 0;
@@ -205,11 +207,11 @@ tsplot_new (displayd * display, gboolean missing_p, gint nvars, gint * vars,
 */
   vbox = GTK_WIDGET (display);
   gtk_container_set_border_width (GTK_CONTAINER (vbox), 1);
-
+  display->menu_manager = display_menu_manager_create (display);
+  
   if (GGOBI_WINDOW_DISPLAY (display)->useWindow) {
     gtk_container_add (GTK_CONTAINER (GGOBI_WINDOW_DISPLAY (display)->window),
                        vbox);
-    display->menu_manager = display_menu_manager_create (display);
     display->menubar = create_menu_bar (display->menu_manager, timeplot_ui,
                                         GGOBI_WINDOW_DISPLAY (display)->
                                         window);

@@ -522,7 +522,7 @@ datad_init (GGobiData *d, ggobid *gg, gboolean cleanup)
 /*XXX allow this to be specified as a gtk type name on the command
       line, initialization file, etc.  and invoke the corresponding
       create() method. */
-      display = scatterplot_new (false, NULL, d, gg);
+      display = scatterplot_new (true, false, NULL, d, gg);
         /* Need to make certain this is the only one there. */
 
       if (display != NULL) {

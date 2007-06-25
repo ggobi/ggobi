@@ -1006,7 +1006,7 @@ createExtendedDisplay (const gchar * const type, gint * vars, gint numVars,
                 type);
     return (NULL);
   }
-  dpy = klass->createWithVars (false, numVars, vars, d, gg);
+  dpy = klass->createWithVars (true, false, numVars, vars, d, gg);
   if (!dpy)
     return (NULL);
 

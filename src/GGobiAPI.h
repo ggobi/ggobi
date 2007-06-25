@@ -271,7 +271,7 @@ extern void GGobi_setCaseName(gint pt, const gchar *lbl, GGobiData *d, ggobid *g
 
  @return a new top-level display object.
  */
-extern displayd *GGobi_newScatterplot(gint ix, gint iy, GGobiData *data, ggobid *gg);
+extern displayd *GGobi_newScatterplot(gint ix, gint iy, gboolean use_window, GGobiData *data, ggobid *gg);
 
 /**
 
@@ -285,7 +285,7 @@ extern displayd *GGobi_newScatterplot(gint ix, gint iy, GGobiData *data, ggobid 
  @param nr 
  @param nc
  */
-extern displayd *GGobi_newScatmat(gint *rows, gint *columns, gint nr, gint nc, GGobiData *, ggobid *gg);
+extern displayd *GGobi_newScatmat(gint *rows, gint *columns, gint nr, gint nc, gboolean use_window, GGobiData *, ggobid *gg);
 
 /**
  @ingroup Displays
@@ -296,7 +296,7 @@ extern displayd *GGobi_newScatmat(gint *rows, gint *columns, gint nr, gint nc, G
  The order of the plots is determined by the order
  in which the variables are given in the array.
  */
-extern displayd *GGobi_newParCoords(gint *vars, gint num, GGobiData *, ggobid *gg);
+extern displayd *GGobi_newParCoords(gint *vars, gint num, gboolean use_window, GGobiData *, ggobid *gg);
 
 /**
  @ingroup Displays
@@ -305,7 +305,7 @@ extern displayd *GGobi_newParCoords(gint *vars, gint num, GGobiData *, ggobid *g
  via the argument vars in the specified
  dataset within the GGobi instance.
  */
-extern displayd *GGobi_newTimeSeries(gint *yvars, gint numVars, GGobiData *d, ggobid *gg);
+extern displayd *GGobi_newTimeSeries(gint *yvars, gint numVars, gboolean use_window, GGobiData *d, ggobid *gg);
 
 /**
  @ingroup Displays

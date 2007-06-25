@@ -363,15 +363,15 @@ const gint *GGOBI (getViewTypeIndices) (gint * n)
 }
 
 
-displayd *GGOBI (newScatterplot) (gint ix, gint iy, GGobiData * d,
-                                  ggobid * gg)
+displayd *GGOBI (newScatterplot) (gint ix, gint iy, gboolean use_window, 
+                                  GGobiData * d, ggobid * gg)
 {
   displayd *display = NULL;
   gint vars[2];
 
   vars[0] = ix;
   vars[1] = iy;
-  display = scatterplot_new_with_vars (false, 2, vars, d, gg);
+  display = scatterplot_new_with_vars (use_window, false, 2, vars, d, gg);
 #ifdef FORCE_ADD_DISPLAY
   display_add (display, gg);
 #endif
@@ -381,11 +381,11 @@ displayd *GGOBI (newScatterplot) (gint ix, gint iy, GGobiData * d,
 }
 
 displayd *GGOBI (newScatmat) (gint * rows, gint * columns, gint nr, gint nc,
-                              GGobiData * d, ggobid * gg)
+                              gboolean use_window, GGobiData * d, ggobid * gg)
 {
   displayd *display;
 
-  display = scatmat_new (NULL, false, nr, rows, nc, columns, d, gg);
+  display = scatmat_new (NULL, use_window, false, nr, rows, nc, columns, d, gg);
 #ifdef FORCE_ADD_DISPLAY
   display_add (display, gg);    /*XX  the caller should add this display. */
 #endif
@@ -393,12 +393,12 @@ displayd *GGOBI (newScatmat) (gint * rows, gint * columns, gint nr, gint nc,
   return (display);
 }
 
-displayd *GGOBI (newParCoords) (gint * vars, gint numVars, GGobiData * d,
-                                ggobid * gg)
+displayd *GGOBI (newParCoords) (gint * vars, gint numVars, gboolean use_window, 
+                                GGobiData * d, ggobid * gg)
 {
   displayd *display = NULL;
 
-  display = parcoords_new (display, false, numVars, vars, d, gg);
+  display = parcoords_new (display, use_window, false, numVars, vars, d, gg);
 #ifdef FORCE_ADD_DISPLAY
   display_add (display, gg);    /*XX  the caller should add this display. */
 #endif
@@ -407,12 +407,12 @@ displayd *GGOBI (newParCoords) (gint * vars, gint numVars, GGobiData * d,
   return (display);
 }
 
-displayd *GGOBI (newTimeSeries) (gint * yvars, gint numVars, GGobiData * d,
-                                 ggobid * gg)
+displayd *GGOBI (newTimeSeries) (gint * yvars, gint numVars, gboolean use_window, 
+                                 GGobiData * d, ggobid * gg)
 {
   displayd *display = NULL;
 
-  display = tsplot_new (display, false, numVars, yvars, d, gg);
+  display = tsplot_new (display, use_window, false, numVars, yvars, d, gg);
 #ifdef FORCE_ADD_DISPLAY
   display_add (display, gg);    /*XX  the caller should add this display. */
 #endif

@@ -75,7 +75,7 @@ void scatterplotDisplayClassInit(GGobiScatterplotDisplayClass *display);
 void scatterplotDisplayInit(scatterplotDisplayd *display);
 
 
-displayd *createScatterplot(displayd *, gboolean missing_p, splotd *sp, gint numVars, gint *vars, GGobiData *d, ggobid *gg);
+displayd *createScatterplot(displayd *, gboolean use_window, gboolean missing_p, splotd *sp, gint numVars, gint *vars, GGobiData *d, ggobid *gg);
 
 #endif
 

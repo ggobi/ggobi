@@ -100,15 +100,15 @@ parcoords_reset_arrangement (displayd *display, gint arrangement, ggobid *gg) {
 
 
 displayd *
-parcoords_new_with_vars(gboolean missing_p, gint nvars, gint *vars,
-	       GGobiData *d, ggobid *gg) 
+parcoords_new_with_vars(gboolean use_window, gboolean missing_p, gint nvars, 
+         gint *vars, GGobiData *d, ggobid *gg) 
 {
-	return(parcoords_new(NULL, missing_p, nvars, vars, d, gg));
+	return(parcoords_new(NULL, use_window, missing_p, nvars, vars, d, gg));
 }
 
 displayd *
-parcoords_new (displayd *display, gboolean missing_p, gint nvars, gint *vars,
-	       GGobiData *d, ggobid *gg) 
+parcoords_new (displayd *display, gboolean use_window, gboolean missing_p, 
+         gint nvars, gint *vars, GGobiData *d, ggobid *gg) 
 {
   GtkWidget *vbox, *frame;
   gint i;
@@ -123,6 +123,8 @@ parcoords_new (displayd *display, gboolean missing_p, gint nvars, gint *vars,
 
   display_set_values(display, d, gg);
 
+  GGOBI_WINDOW_DISPLAY(display)->useWindow = use_window;
+  
   if (nvars == 0) {
     nplots = MIN (d->ncols, sessionOptions->info->numParCoordsVars);
     if(nplots < 0) {
@@ -191,11 +193,10 @@ parcoords_new (displayd *display, gboolean missing_p, gint nvars, gint *vars,
 */
   vbox = GTK_WIDGET(display); 
   gtk_container_set_border_width (GTK_CONTAINER (vbox), 1);
-
+  display->menu_manager = display_menu_manager_create(display);
+  
   if(GGOBI_IS_WINDOW_DISPLAY(display) && GGOBI_WINDOW_DISPLAY(display)->window) {
     gtk_container_add (GTK_CONTAINER (GGOBI_WINDOW_DISPLAY(display)->window), vbox);
-
-	display->menu_manager = display_menu_manager_create(display);
     //gg->parcoords.accel_group = gtk_accel_group_new ();
     display->menubar = create_menu_bar(display->menu_manager, parcoords_ui,
 			     GGOBI_WINDOW_DISPLAY(display)->window);

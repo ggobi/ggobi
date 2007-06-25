@@ -356,8 +356,8 @@ gint       p1dcycle_func (ggobid *gg);
 void       pan_by_drag (splotd *, ggobid *);
 void       parcoords_cpanel_init (cpaneld*, ggobid *);
 const gchar *parcoords_mode_ui_get(displayd *dsp);
-displayd*  parcoords_new_with_vars (gboolean, gint, gint *, GGobiData *, ggobid *);
-displayd*  parcoords_new (displayd *dpy, gboolean, gint, gint *, GGobiData *, ggobid *);
+displayd*  parcoords_new_with_vars (gboolean, gboolean, gint, gint *, GGobiData *, ggobid *);
+displayd*  parcoords_new (displayd *dpy, gboolean, gboolean, gint, gint *, GGobiData *, ggobid *);
 void       parcoords_reset_arrangement (displayd *, gint, ggobid *);
 gboolean   parcoords_varsel (cpaneld *, splotd *, gint, gint *, ggobid *);
 void       parcoordsDragAndDropEnable(displayd *dsp, gboolean active);
@@ -394,6 +394,7 @@ void       rowlabels_alloc (GGobiData *d) ;
 void       rowlabels_free (GGobiData *d);
 void       rows_in_plot_set (GGobiData *d, ggobid *);
 void       ruler_ranges_set (gboolean force, displayd *, splotd *, ggobid *);
+void       ruler_ranges_set_on_realize (splotd *sp, gpointer user_data);
 void       scale_event_handlers_toggle (splotd *, gboolean);
 void       scale_set_default_values (GtkScale *scale);
 void	   scale_zoom_reset (displayd *dsp);
@@ -401,7 +402,7 @@ void	   scale_pan_reset (displayd *display);
 void       scale_update_set (gboolean, displayd *, ggobid *);
 void       scaling_visual_cues_draw (splotd *, GdkDrawable *, ggobid *);
 void       scatmat_cpanel_init (cpaneld *, ggobid *);
-displayd*  scatmat_new (displayd *, gboolean, gint, gint *, gint, gint *, GGobiData *, ggobid *);
+displayd*  scatmat_new (displayd *, gboolean, gboolean, gint, gint *, gint, gint *, GGobiData *, ggobid *);
 gboolean   scatmat_varsel (GtkWidget *, cpaneld *, splotd *, gint, gint, gint *, gint, gboolean, ggobid *);
 gboolean   scatmat_varsel_simple (cpaneld *, splotd *, gint, gint *, ggobid *);
 const gchar* scatmat_mode_ui_get(displayd *display);
@@ -410,7 +411,7 @@ void       scatterplot_cpanel_init (cpaneld *, ProjectionMode, InteractionMode, 
 
 void       scatterplot_display_edge_menu_update (displayd *, GtkAccelGroup *accel_group, ggobid *gg);
 const gchar * scatterplot_mode_ui_get(displayd *display);		
-displayd*  scatterplot_new (gboolean, splotd *sp, GGobiData *d, ggobid *);
+displayd*  scatterplot_new (gboolean, gboolean, splotd *sp, GGobiData *d, ggobid *);
 void       scatterplot_show_hrule (displayd *, gboolean show);
 void       scatterplot_show_rulers (displayd *, gint);
 void       scatterplot_show_vrule (displayd *, gboolean show);
@@ -697,8 +698,8 @@ void      cpanel_tsplot_set (displayd *, cpaneld *, GtkWidget *, ggobid *);
 void      tsplot_cpanel_init (cpaneld*, ggobid *);
 
 const gchar* tsplot_mode_ui_get(displayd *display);
-displayd* tsplot_new (displayd *, gboolean, gint, gint *, GGobiData *, ggobid *);
-displayd *tsplot_new_with_vars (gboolean missing_p, gint nvars, gint *vars, GGobiData *d, ggobid *gg) ;
+displayd* tsplot_new (displayd *, gboolean, gboolean, gint, gint *, GGobiData *, ggobid *);
+displayd *tsplot_new_with_vars (gboolean, gboolean missing_p, gint nvars, gint *vars, GGobiData *d, ggobid *gg) ;
 void      tsplot_reset_arrangement (displayd *, gint, ggobid *);
 gboolean  tsplot_varsel (GtkWidget *, displayd *display, splotd *sp, gint jvar, gint toggle, gint mouse, cpaneld *cpanel,  ggobid *gg);
 void      tsplot_whiskers_make (splotd *, displayd *, ggobid *);
@@ -711,7 +712,7 @@ gint      ggobi_remove (ggobid *);
 void      subset_init (GGobiData *d, ggobid *gg);
 
 
-displayd *createBarchart(displayd *display, gboolean missing_p, splotd * sp, gint var, GGobiData * d,  ggobid * gg);
+displayd *createBarchart(displayd *display, gboolean use_window, gboolean missing_p, splotd * sp, gint var, GGobiData * d,  ggobid * gg);
 void      barchart_scaling_visual_cues_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg);
 gboolean  barchart_active_paint_points (splotd *sp, GGobiData *, ggobid *); 
 void      barchart_add_bar_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg);
@@ -722,7 +723,7 @@ void      barchart_free_structure (barchartSPlotd *sp);
 gboolean  barchart_identify_bars (icoords mousepos, splotd *sp, GGobiData *d, ggobid *gg);
 void      barchart_init_vectors(barchartSPlotd *sp);
 const gchar *barchart_mode_ui_get(displayd *display);
-displayd *barchart_new (gboolean missing_p, splotd *sp, GGobiData *d, ggobid *gg);
+displayd *barchart_new (gboolean use_window, gboolean missing_p, splotd *sp, GGobiData *d, ggobid *gg);
 void      barchart_recalc_counts (barchartSPlotd *sp, GGobiData *d, ggobid *gg);
 void      barchart_recalc_dimensions (splotd *sp, GGobiData *d, ggobid *gg);
 void      barchart_recalc_group_dimensions (barchartSPlotd *sp, ggobid *gg);
@@ -733,7 +734,7 @@ void      cpanel_barchart_set (displayd *, cpaneld *, GtkWidget *panel, ggobid *
 
 void      barchart_scale_event_handlers_toggle(splotd *sp, gboolean state);
 
-displayd *barchart_new_with_vars(gboolean missing_p, gint nvars, gint *vars, GGobiData * d, ggobid * gg);
+displayd *barchart_new_with_vars(gboolean use_window, gboolean missing_p, gint nvars, gint *vars, GGobiData * d, ggobid * gg);
 
 #ifdef WIN32
 void      win32_draw_to_pixmap_binned (icoords *, icoords *, gint, splotd *, gboolean draw_hidden, ggobid *gg);
@@ -759,7 +760,7 @@ void       scatter1DAddPlotLabels(splotd *sp, GdkDrawable *drawable, GdkGC *gc);
 gboolean   processRestoreFile(const gchar * const fileName, ggobid *gg);
 void       scatterplotMovePointsMotionCb(displayd *display, splotd *sp, GtkWidget *w, GdkEventMotion *event, ggobid *gg);
 void       scatterplotMovePointsButtonCb(displayd *display, splotd *sp, GtkWidget *w, GdkEventButton *event, ggobid *gg);
-displayd * scatterplot_new_with_vars(gboolean missing_p, gint numVars, gint *vars, GGobiData *d, ggobid *gg);
+displayd * scatterplot_new_with_vars(gboolean use_window, gboolean missing_p, gint numVars, gint *vars, GGobiData *d, ggobid *gg);
 
 gboolean   array_contains (gint* arr, gint n, gint el);
 

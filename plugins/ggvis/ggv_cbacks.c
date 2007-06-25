@@ -127,7 +127,7 @@ ggv_ggobi_data_new (GGobiData *dsrc, GGobiData *e, displayd *dsp, PluginInstance
  * open a new scatterplot with the new data, and display edges
  * as they're displayed in the current datad ... or not
 */
-  dspnew = GGOBI(newScatterplot) (0, 1, dnew, gg);
+  dspnew = GGOBI(newScatterplot) (0, 1, true, dnew, gg);
   
   display_add(dspnew, gg);
   varpanel_refresh(dspnew, gg);
