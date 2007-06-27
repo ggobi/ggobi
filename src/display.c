@@ -458,9 +458,11 @@ display_add (displayd * display, ggobid * gg)
   if (GGOBI_IS_WINDOW_DISPLAY (display)
       && GGOBI_WINDOW_DISPLAY (display)->useWindow) {
     GGobi_widget_set (GGOBI_WINDOW_DISPLAY (display)->window, gg, true);
-    if (g_list_length (display->splots))
-      display_set_current (display, gg);  /*-- this initializes the mode --*/
   }
+  
+  if (g_list_length (display->splots))
+      display_set_current (display, gg);  /*-- this initializes the mode --*/
+  
   gg->displays = g_list_append (gg->displays, (gpointer) display);
 
   /* If the tree of displays is active, add this to it. */
@@ -579,7 +581,7 @@ display_free (displayd * display, gboolean force, ggobid * gg)
 
     count = g_list_length (display->splots);
 
-    if (GGOBI_IS_WINDOW_DISPLAY (display)) {
+    if (GGOBI_IS_WINDOW_DISPLAY (display) && GGOBI_WINDOW_DISPLAY(display)->useWindow) {
 /*XX
       GList *l;
       for (l=display->splots; count > 0 && l; l=l->next, count--) {
@@ -589,7 +591,7 @@ display_free (displayd * display, gboolean force, ggobid * gg)
 */
 
       gtk_widget_destroy (GGOBI_WINDOW_DISPLAY (display)->window);
-    }
+    } else gtk_widget_destroy(GTK_WIDGET(display));
   }
 
   /*-- If there are no longer any displays, set ggobi's mode to NULLMODE --*/

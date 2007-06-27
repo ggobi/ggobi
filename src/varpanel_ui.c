@@ -160,8 +160,8 @@ varsel (GtkWidget * w, cpaneld * cpanel, splotd * sp, gint jvar,
   displayd *display = (displayd *) sp->displayptr;
   gboolean redraw = false;
 
-  if (display == NULL || !GGOBI_IS_WINDOW_DISPLAY (display) ||
-      !GTK_IS_WIDGET (GGOBI_WINDOW_DISPLAY (display)->window)) {
+  if (display == NULL /*|| !GGOBI_IS_WINDOW_DISPLAY (display) ||
+      !GTK_IS_WIDGET (GGOBI_WINDOW_DISPLAY (display)->window)*/) {
     g_printerr ("Bug?  I see no active display\n");
     return;
   }
