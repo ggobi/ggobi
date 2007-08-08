@@ -504,7 +504,7 @@ CHECK_EVENT_SIGNATURE (exclusion_notebook_adddata_cb, datad_added_f)
      void cluster_window_open (ggobid * gg)
 {
   GtkWidget *scrolled_window = NULL;
-  GtkWidget *vbox, *tebox, *btn, *hbox, *lbl;
+  GtkWidget *tebox, *btn, *hbox, *lbl;
   GtkWidget *ebox;
   GtkWidget *dialog;
   gint k;

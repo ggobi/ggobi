@@ -475,26 +475,28 @@ pt_screen_to_plane (icoords * screen, gint id, gboolean horiz, gboolean vert,
   scale_y /= 2;
   sp->iscale.y = -1 * (greal) sp->max.y * scale_y;
 
-  if (id >= 0) {                /* when moving points, initialize new planar values */
+  if (id >= 0) { /* when moving points, initialize new planar values */
     eps->x = 0;
     eps->y = 0;
-    planar->x = prev_planar.x = sp->planar[id].x;
-    planar->y = prev_planar.y = sp->planar[id].y;
+    planar->x = sp->planar[id].x;
+    planar->y = sp->planar[id].y;
+    prev_planar.x = sp->planar[id].x;
+    prev_planar.y = sp->planar[id].y;
   }
 
-  if (horiz) {                  /* relevant distinction for moving points */
+  if (horiz) {   /* relevant distinction for moving points */
     screen->x -= sp->max.x / 2;
     planar->x = (greal) screen->x * precis / sp->iscale.x;
     planar->x += (greal) sp->pmid.x;
   }
 
-  if (vert) {                   /* relevant distinction for moving points */
+  if (vert) {    /* relevant distinction for moving points */
     screen->y -= sp->max.y / 2;
     planar->y = (greal) screen->y * precis / sp->iscale.y;
     planar->y += (greal) sp->pmid.y;
   }
 
-  if (id >= 0) {                /* when moving points */
+  if (id >= 0) {   /* when moving points */
     if (horiz)
       eps->x = planar->x - prev_planar.x;
     if (vert)

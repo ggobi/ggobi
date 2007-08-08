@@ -16,6 +16,8 @@
 
 #include "ggobi.h"
 
+#include <glib/gstdio.h>
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

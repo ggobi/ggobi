@@ -248,6 +248,7 @@ transform1_apply (gint j, GGobiData *d, ggobid *gg)
   gfloat ref, ftmp;
   gboolean tform_ok = true;
   gdouble dtmp;
+  // gcc complains about uninitialized values here, but it's ok.
   lims slim, slim_tform;  /*-- specified limits --*/
   GtkWidget *stage1_cbox;
   gint tform1;
@@ -298,6 +299,7 @@ transform1_apply (gint j, GGobiData *d, ggobid *gg)
           }
         }
         /*-- apply the same domain test to the specified limits --*/
+        // gcc complains about uninitialized values here, but it's ok.
         if (tform_ok && vt->lim_specified_p) {
           if (((*domain_adj)(slim_tform.min, incr) <= 0) ||
               ((*domain_adj)(slim_tform.max, incr) <= 0))

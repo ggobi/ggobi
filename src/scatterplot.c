@@ -457,7 +457,7 @@ createScatterplot (displayd * display, gboolean use_window, gboolean missing_p,
     /* only set rulers if we know the plot widget has been configured */
     ruler_ranges_set (true, display, sp, gg);
   }
-  else gtk_widget_show_all (display);
+  else gtk_widget_show_all (GTK_WIDGET(display));
     
   g_signal_connect_object (G_OBJECT (gg), "datad_added",
                            G_CALLBACK (display_datad_added_cb),
