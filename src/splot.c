@@ -925,6 +925,9 @@ splot_cursor_set (gint jcursor, splotd *sp)
 {
   GdkWindow *window = sp->da->window;
 
+  if (!GTK_WIDGET_REALIZED(sp->da))
+    return;
+  
   if (jcursor == (gint) NULL) {
     if (sp->cursor != NULL)
       gdk_cursor_destroy (sp->cursor);

@@ -228,7 +228,8 @@ void GGOBI (edge_menus_update) (ggobid * gg)
   displayd *display;
   for (dlist = gg->displays; dlist != NULL; dlist = dlist->next) {
     display = (displayd *) dlist->data;
-    if (GTK_WIDGET_REALIZED (GGOBI_WINDOW_DISPLAY (display)->window) &&
+    if (GGOBI_WINDOW_DISPLAY (display)->useWindow && 
+        GTK_WIDGET_REALIZED (GGOBI_WINDOW_DISPLAY (display)->window) &&
         GGOBI_IS_SCATTERPLOT_DISPLAY (display)) {
       scatterplot_display_edge_menu_update (GGOBI_DISPLAY (display),
                                             gg->app.sp_accel_group, gg);
