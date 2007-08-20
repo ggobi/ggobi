@@ -429,6 +429,11 @@ display_alloc_init (gboolean missing_p, GGobiData * d, ggobid * gg)
   return (display);
 }
 
+static void
+display_destroy_cb(displayd *display, ggobid *gg)
+{
+  display_free(display, true, gg);
+}
 
 gint
 display_add (displayd * display, ggobid * gg)
@@ -458,7 +463,10 @@ display_add (displayd * display, ggobid * gg)
   if (GGOBI_IS_WINDOW_DISPLAY (display)
       && GGOBI_WINDOW_DISPLAY (display)->useWindow) {
     GGobi_widget_set (GGOBI_WINDOW_DISPLAY (display)->window, gg, true);
-  }
+  } 
+  
+  g_signal_connect(G_OBJECT(display), "destroy", 
+      G_CALLBACK(display_destroy_cb), gg);
   
   if (g_list_length (display->splots))
       display_set_current (display, gg);  /*-- this initializes the mode --*/
@@ -493,7 +501,6 @@ display_add (displayd * display, ggobid * gg)
 
   return (g_list_length (gg->displays));
 }
-
 
 /*
  * Remove display from the linked list of displays.  Reset
@@ -581,6 +588,9 @@ display_free (displayd * display, gboolean force, ggobid * gg)
 
     count = g_list_length (display->splots);
 
+    g_signal_handlers_disconnect_by_func(G_OBJECT(display), 
+        display_destroy_cb, gg); /* don't recurse */
+
     if (GGOBI_IS_WINDOW_DISPLAY (display) && GGOBI_WINDOW_DISPLAY(display)->useWindow) {
 /*XX
       GList *l;
@@ -589,9 +599,10 @@ display_free (displayd * display, gboolean force, ggobid * gg)
         splot_free (sp, display, gg);
       }
 */
-
       gtk_widget_destroy (GGOBI_WINDOW_DISPLAY (display)->window);
-    } else gtk_widget_destroy(GTK_WIDGET(display));
+    } else {
+      gtk_widget_destroy(GTK_WIDGET(display));
+    }
   }
 
   /*-- If there are no longer any displays, set ggobi's mode to NULLMODE --*/
