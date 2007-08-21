@@ -1,7 +1,7 @@
 dnl This is the configuration script for ggobi
 
 # Configure the version information here
-m4_define([ggobi_release_date], ["Februrary 3 2006"])
+m4_define([ggobi_release_date], ["August 20 2007"])
 m4_define([ggobi_major_version], [2])
 m4_define([ggobi_minor_version], [1])
 m4_define([ggobi_micro_version], [6])
@@ -177,7 +177,7 @@ AC_SUBST(SRC_DEBUG)
 # Find GOB2 (don't fail if not found, not necessary for distributed builds)
 AC_PATH_PROG(GOB2, gob2,,$PATH)
 
-PKG_PROG_PKG_CONFIG(0.21)
+PKG_PROG_PKG_CONFIG(0.20)
 
 # FIND GTK2
 
