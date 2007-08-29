@@ -192,7 +192,7 @@ computeResolvedEdgePoints (GGobiStage * e, GGobiStage * d)
   for (gint i = 0; i < ggobi_stage_get_n_edges(e); i++) {
     gint row_a = ggobi_stage_get_row_for_id(d, ggobi_stage_get_edge_data(e)->sym_endpoints[i].a);
     gint row_b = ggobi_stage_get_row_for_id(d, ggobi_stage_get_edge_data(e)->sym_endpoints[i].b);
-    g_debug("ids %s->%s : rows %i->%i", ggobi_stage_get_edge_data(e)->sym_endpoints[i].a, ggobi_stage_get_edge_data(e)->sym_endpoints[i].b, row_a, row_b);
+    // g_debug("ids %s->%s : rows %i->%i", ggobi_stage_get_edge_data(e)->sym_endpoints[i].a, ggobi_stage_get_edge_data(e)->sym_endpoints[i].b, row_a, row_b);
 
     ans[i].a = (gint) row_a;
     ans[i].b = (gint) row_b;

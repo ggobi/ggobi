@@ -8,7 +8,7 @@ using GLib;
  * A function that is invoked on one integer index at a time.
  *
  */
-public callback void GGobi.IndexFunc (uint j, pointer user_data);
+public delegate void GGobi.IndexFunc (uint j, pointer user_data);
 
 public class GGobi.Bitset {
   
