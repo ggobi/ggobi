@@ -13,7 +13,7 @@ public class GGobi.InputSourceFactory
    *
    * Returns: #GSList of scheme strings, like "http"
    */
-  virtual SList<string>
+  public virtual SList<string>
   get_supported_schemes()
   {
     SList<string> schemes = new SList<string>();
@@ -36,7 +36,7 @@ public class GGobi.InputSourceFactory
    *
    * Returns: #GGobiInputSource for the URI
    */
-  virtual InputSource
+  public virtual InputSource
   create(string uri, string mode)
   {
     InputSource source = null;
