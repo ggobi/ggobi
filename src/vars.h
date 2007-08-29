@@ -12,7 +12,7 @@
 #include "defines.h"
 #include "types.h"
 #include "ggobi-data.h"
-#include "ggobi.h"
+#include "session.h"
 #include "display.h"
 
 #endif

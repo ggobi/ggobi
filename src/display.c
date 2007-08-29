@@ -431,9 +431,11 @@ display_add (displayd * display, GGobiSession * gg)
   if (GGOBI_IS_WINDOW_DISPLAY (display)
       && GGOBI_WINDOW_DISPLAY (display)->useWindow) {
     ggobi_widget_set (GGOBI_WINDOW_DISPLAY (display)->window, gg, true);
-    if (g_list_length (display->splots))
-      display_set_current (display, gg);  /*-- this initializes the mode --*/
   }
+  
+  if (g_list_length (display->splots))
+    display_set_current (display, gg);  /*-- this initializes the mode --*/
+  
   gg->displays = g_list_append (gg->displays, (gpointer) display);
 
   /* If the tree of displays is active, add this to it. */

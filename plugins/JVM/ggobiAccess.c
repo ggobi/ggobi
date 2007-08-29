@@ -1,6 +1,5 @@
 #include "jvm.h"
-#include "ggobi.h"
-#include "ggobi_ggobi.h"
+#include "session.h"
 
 #include "GGobiAPI.h"
 

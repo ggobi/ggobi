@@ -1,7 +1,7 @@
 #ifndef WRITE_STATE_H
 #define WRITE_STATE_H
 
-#include "ggobi.h"
+#include "session.h"
 
 void write_ggobi_as_xml(ggobid *gg, const char *fileName, xmlDocPtr doc);
 

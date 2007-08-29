@@ -22,7 +22,7 @@
  settings that control how printing is done.
  */
 
-#include "ggobi.h"
+#include "session.h"
 #include "types.h"
 
 

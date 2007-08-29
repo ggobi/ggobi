@@ -17,7 +17,7 @@
 #ifndef SCATTERPLOT_CLASS_H
 #define SCATTERPLOT_CLASS_H
 
-#include "ggobi.h"
+#include "session.h"
 
 
 #define GGOBI_TYPE_SCATTER_SPLOT          (ggobi_scatter_splot_get_type())

@@ -1,6 +1,6 @@
 %h{
 
-#include "ggobi-input-source.h"
+#include "input-source.h"
 #include "ggobi-variable.h"
 #include "ggobi-stage.h"
 #include "fileio.h"

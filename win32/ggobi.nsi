@@ -75,7 +75,7 @@ Section "GGobi"
     StrCmp $0 "Admin" 0 +2
     SetShellVarContext all
     SetOutPath $INSTDIR\data
-    CreateShortCut "$DESKTOP\ggobi.lnk" "$INSTDIR\ggobi.exe" "" "$INSTDIR\ggobi.ico"
+    CreateShortCut "$DESKTOP\GGobi.lnk" "$INSTDIR\ggobi.exe" "" "$INSTDIR\ggobi.ico"
 
     Push $INSTDIR
     Call AddToPath

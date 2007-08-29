@@ -16,7 +16,7 @@
 
 #include <string.h>
 
-#include "ggobi.h"
+#include "session.h"
 #include "GGobiAPI.h"
 
 #include "externs.h"

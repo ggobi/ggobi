@@ -28,11 +28,10 @@
 #include "GGobiApp.h"
 
 /* the built-in input classes */
-#include "ggobi-data-factory-csv.h"
+#include "data-factory-csv.h"
 #include "ggobi-data-factory-xml.h"
-#include "ggobi-input-decoder-bgzip.h"
 
-#include "ggobi.h"
+#include "session.h"
 
 #include "vars.h"
 #include "externs.h"
@@ -358,7 +357,6 @@ static void registerBuiltinTypes()
 {
   GGOBI_TYPE_DATA_FACTORY_CSV;
   GGOBI_TYPE_DATA_FACTORY_XML;
-  GGOBI_TYPE_INPUT_DECODER_BGZIP;
 }
 
 #ifdef WIN32
@@ -729,6 +727,22 @@ ggobi_get_data_by_name (const gchar * const name, const GGobiSession * const gg)
       return (d);
   }
   return (NULL);
+}
+
+void
+ggobi_session_register_data_factory (GGobiSession *session, 
+  GGobiDataFactory *factory)
+{
+  session->data_factories = g_slist_prepend(session->data_factories, 
+    g_object_ref(G_OBJECT(factory)));
+}
+void
+ggobi_session_register_input_source_factory (GGobiSession *session, 
+  GGobiInputSourceFactory *factory)
+{
+  session->input_source_factories = 
+    g_slist_prepend(session->input_source_factories, 
+      g_object_ref(G_OBJECT(factory)));
 }
 
 

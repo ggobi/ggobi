@@ -28,7 +28,7 @@
 
 #include "ggobi-stage-subset.h"
 #include "ggobi-stage-transform.h"
-#include "ggobi-input-source-factory.h"
+#include "input-source-factory.h"
 
 #ifdef USE_MYSQL
 #include "read_mysql.h"
@@ -161,23 +161,13 @@ load_data_source (GGobiInputSource *source, GGobiSession * gg)
 GGobiDataFactory *
 create_data_factory (GGobiSession *gg, GGobiInputSource *source)
 {
-  GType *factories;
   GGobiDataFactory *factory = NULL;
-  guint i, n_factories;
-
-  // FIXME: it may be better to make our own registry for GGobiDataFactories
-  // that holds an instance, so that we aren't always instantiating them
-  factories = g_type_children(GGOBI_TYPE_DATA_FACTORY, &n_factories);
-  
-  for (i = 0; i < n_factories && !factory; i++) {
-    GObject *factory_obj = g_object_new(factories[i], NULL);
-    if (ggobi_data_factory_supports_source(GGOBI_DATA_FACTORY(factory_obj), source))
-      factory = GGOBI_DATA_FACTORY(factory_obj);
-    else g_object_unref(factory_obj);
+  GSList *factories = gg->data_factories;
+  for (; factories && !factory; factories = factories->next) {
+    if (ggobi_data_factory_supports_source(GGOBI_DATA_FACTORY(factories->data), 
+        source))
+      factory = GGOBI_DATA_FACTORY(factories->data);
   }
-
-  g_free(factories);
-  
   return (factory);
 }
 
@@ -200,6 +190,26 @@ create_input_source(const gchar *uri, const gchar *mode)
   return source;
 }
 
+static void
+register_default_data_factories(GGobiSession *gg)
+{
+  GObject *factory = g_object_new(GGOBI_TYPE_DATA_FACTORY_XML, NULL);
+  ggobi_session_register_data_factory(gg, GGOBI_DATA_FACTORY(factory));
+  g_object_unref(factory);
+  factory = g_object_new(GGOBI_TYPE_DATA_FACTORY_CSV, NULL);
+  ggobi_session_register_data_factory(gg, GGOBI_DATA_FACTORY(factory));
+  g_object_unref(factory); 
+}
+
+static void
+register_default_input_source_factories(GGobiSession *gg)
+{
+  GObject *factory = g_object_new(GGOBI_TYPE_INPUT_SOURCE_FACTORY, NULL);
+  ggobi_session_register_input_source_factory(gg, 
+    GGOBI_INPUT_SOURCE_FACTORY(factory));
+  g_object_unref(factory);
+}
+
 /*
  * the first display is initialized in datad_attach, so turn on
  * event handlers there as well
@@ -220,6 +230,9 @@ make_ggobi (GGobiOptions * options, gboolean processEvents, GGobiSession * gg)
   svis_init (gg);
   make_ui (gg);
 
+  register_default_data_factories(gg);
+  register_default_input_source_factories(gg);
+  
   /* If the user specified a data file on the command line, then 
      try to load that.
    */

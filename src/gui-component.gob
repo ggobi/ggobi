@@ -1,5 +1,5 @@
 %h{
-  #include "ggobi.h"
+  #include "session.h"
 %}
 /* Handles operations common to all GGobi GUI "components" (like tool dialogs).
    Not sure how useful this one will be yet. Right now it just initializes

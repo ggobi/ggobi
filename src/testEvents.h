@@ -1,7 +1,7 @@
 #ifndef GGOBI_TEST_EVENTS_H
 #define GGOBI_TEST_EVENTS_H
 
-#include "ggobi.h"
+#include "session.h"
 
 void test_variable_select(GGobiSession *gg, GGobiStage *d, gint whichVar, splotd *sp, void *);
 /*void test_variable_select(GtkWidget *w, gint whichVar, GGobiStage *d, splotd *sp, GGobiSession *gg, char *val); */

@@ -1,6 +1,6 @@
 %h{
   // FIXME: should be temporary - need to clean up the "GGobi context"
-  #include "ggobi.h"
+  #include "session.h"
 %}
 class GGobi:Plugin from G:Type:Module {
   

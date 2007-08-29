@@ -11,5 +11,3 @@ Description: GGobi library for dynamic graphics.
 Requires: gtk+-2.0, libxml-2.0, libgsf-1
 Libs: -L${libdir} -lggobi
 Cflags: -I${includedir} -I${prefix}/libltdl
-
-Home: ${prefix}

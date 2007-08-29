@@ -14,7 +14,7 @@
  *   Andreas Buja        andreas.buja@wharton.upenn.edu
 */
 
-#include "ggobi.h"
+#include "session.h"
 #include "scatterplotClass.h"
 #include "externs.h"
 

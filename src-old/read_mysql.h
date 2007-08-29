@@ -19,7 +19,7 @@
 
 #include <mysql.h>
 
-#include "ggobi.h"
+#include "session.h"
 #include "externs.h"
 
 #include <gtk/gtk.h>

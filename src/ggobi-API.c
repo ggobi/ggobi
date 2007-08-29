@@ -21,7 +21,7 @@
 
 #include "GGobiAPI.h"
 
-#include "ggobi.h"
+#include "session.h"
 #include "ggobi-data.h"
 #include "types.h"
 #include "vars.h"
@@ -767,7 +767,7 @@ gint ggobi_nrecords (GGobiStage * data)
  One can specify null values for each of these to remove the handler and have
  these events discarded.
 
- See notes/NumberedKeys.*, splot.c and ggobi.h also for more details 
+ See notes/NumberedKeys.*, splot.c and session.h also for more details 
  */
 KeyEventHandler *ggobi_registerNumberedKeyEventHandler (KeyEventHandlerFunc
                                                           routine,

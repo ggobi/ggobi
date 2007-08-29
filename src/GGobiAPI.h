@@ -22,29 +22,27 @@
 */  /*(for doxygen)*/
 
 #include <gtk/gtk.h>
-#include "ggobi.h"
+#include "session.h"
 #include "defines.h"
 #include "display.h"
 
 // FIXME: we include all GOB-generated public headers here
-// Eventually these will be placed in 'ggobi.h' but that is claimed by
+// Eventually these will be placed in 'session.h' but that is claimed by
 // GGobiSession. That will becomes GGobiApp (or something).
 
-#include "ggobi-data-factory-csv.h"
+#include "data-factory-csv.h"
 #include "ggobi-data-factory-xml.h"
-#include "ggobi-data-factory.h"
+#include "data-factory.h"
 #include "ggobi-data.h"
-#include "ggobi-gsf-input-ftp.h"
-#include "ggobi-gsf-input-http.h"
+#include "input-ftp.h"
+#include "input-http.h"
 #include "ggobi-gui-component.h"
 #include "ggobi-gui-transform.h"
-#include "ggobi-input-decoder-bgzip.h"
-#include "ggobi-input-decoder.h"
-#include "ggobi-input-source-file.h"
-#include "ggobi-input-source-ftp.h"
-#include "ggobi-input-source-http.h"
-#include "ggobi-input-source.h"
-#include "ggobi-input-source-factory.h"
+#include "input-source-file.h"
+#include "input-source-ftp.h"
+#include "input-source-http.h"
+#include "input-source.h"
+#include "input-source-factory.h"
 #include "ggobi-pipeline-factory.h"
 #include "ggobi-pipeline-message.h"
 #include "ggobi-plugin-factory.h"

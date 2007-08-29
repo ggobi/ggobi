@@ -17,7 +17,7 @@
 #ifndef PARCOORDS_CLASS_H
 #define PARCOORDS_CLASS_H
 
-#include "ggobi.h"
+#include "session.h"
 
 #define GGOBI_TYPE_PAR_COORDS_SPLOT          (ggobi_par_coords_splot_get_type())
 #define GGOBI_PAR_COORDS_SPLOT(obj)	        (G_TYPE_CHECK_INSTANCE_CAST ((obj), GGOBI_TYPE_PAR_COORDS_SPLOT, parcoordsSPlotd))

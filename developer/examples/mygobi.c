@@ -2,7 +2,7 @@
 
 #include <math.h>
 #include <gtk/gtk.h>
-#include "ggobi.h"
+#include "session.h"
 #include "GGobiAPI.h"
 #include <stdio.h>
 #include <stdlib.h>

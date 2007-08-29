@@ -270,11 +270,12 @@ class GGobi:Data:Factory:XML from GGobi:Data:Factory
     return (GGOBI_DATA_FACTORY_XML (obj));
   }
 
+  //interface GGobi:Data:Factory private GSList *
   override (GGobi:Data:Factory) GSList *
-  create (GGobi:Data:Factory * self (check null type), 
-    GGobi:Input:Source *source (check null type))
+  create_for_input (GGobi:Data:Factory * self (check null type), 
+    Gsf:Input *input  (check null type))
   {
-    return self_read_xml_data (source);
+    return self_read_xml_data (input);
   }
 
   private gboolean 
@@ -289,12 +290,14 @@ class GGobi:Data:Factory:XML from GGobi:Data:Factory
     return(is_xml);
   }
 
+  //interface GGobi:Data:Factory private GSList *
   override (GGobi:Data:Factory) GSList *
   get_supported_modes (GGobi:Data:Factory *self (check null type))
   {
     return g_slist_append (NULL, g_strdup("xml"));
   }
 
+  //interface GGobi:Data:Factory private GSList *
   override (GGobi:Data:Factory) GSList *
   get_base_file_exts_for_mode(GGobi:Data:Factory *self (check null type), const gchar *mode) 
   {
@@ -304,16 +307,12 @@ class GGobi:Data:Factory:XML from GGobi:Data:Factory
     return exts;
   }
   
-  private GSList *read_xml_data (GGobiInputSource * source)
+  private GSList *read_xml_data (Gsf:Input * input)
   {
     xmlSAXHandlerPtr xmlParserHandler = g_new0(xmlSAXHandler, 1);
     XMLParserData data;
     xmlParserCtxtPtr ctx;
     GSList *dlist;
-
-    GsfInput *input = ggobi_input_source_get_input(source, NULL);
-    if (input == NULL)
-      return (false);
     
     ctx = gsf_xml_parser_context(input);
     
@@ -325,7 +324,7 @@ class GGobi:Data:Factory:XML from GGobi:Data:Factory
     
     self_init_parser_data(&data, xmlParserHandler);
     data.parser = ctx;
-    data.input_source = source;
+    /*data.input_source = source;*/
     data.dlist = NULL;
     
     ctx->sax = xmlParserHandler;
@@ -1452,14 +1451,14 @@ class GGobi:Data:Factory:XML from GGobi:Data:Factory
   {
     GGobiData *data = ggobi_data_new (0, 0);
     const gchar *name, *nickname;
-    gchar *my_name, *my_nickname;
+    gchar /* *my_name, */*my_nickname;
 
     name = self_get_attribute (attrs, "name");
-    if (!name)
+    /*if (!name)
       my_name = ggobi_input_source_get_display_name(parserData->input_source);
-    else my_name = g_strdup(name);
-    ggobi_stage_set_name (GGOBI_STAGE(data), (gchar *) my_name);
-    g_free(my_name);
+    else my_name = g_strdup(name);*/
+    ggobi_stage_set_name (GGOBI_STAGE(data), (gchar *) name);
+    /*g_free(my_name);*/
     
     nickname = self_get_attribute (attrs, "nickname");
     if (!nickname)
@@ -1468,7 +1467,7 @@ class GGobi:Data:Factory:XML from GGobi:Data:Factory
     ggobi_data_set_nickname (data, my_nickname);
     g_free(my_nickname);
     
-    ggobi_data_set_source(data, parserData->input_source);
+    /*ggobi_data_set_source(data, parserData->input_source);*/
     
     parserData->current_data = GGOBI_STAGE(data);
     parserData->counterVariableIndex = -1;
@@ -1490,7 +1489,7 @@ class GGobi:Data:Factory:XML from GGobi:Data:Factory
         data = GGOBI_STAGE (ggobi_data_new (0, 0));
         parserData->current_data = data;
       }
-    ggobi_data_set_source(GGOBI_DATA(data), parserData->input_source);
+    /*ggobi_data_set_source(GGOBI_DATA(data), parserData->input_source);*/
     return (data);
   }
 

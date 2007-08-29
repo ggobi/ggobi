@@ -19,7 +19,7 @@
 
 #include <libxml/tree.h>
 
-#include "ggobi.h"
+#include "session.h"
 #include "ggobi-plugin.h"
 
 gboolean registerPlugins(GGobiSession *gg, GList *plugins);

@@ -17,7 +17,7 @@
 */
 
 
-#include "ggobi.h"
+#include "session.h"
 #include "tsdisplay.h"
 
 #include "externs.h"

@@ -20,7 +20,7 @@
  */
 
 #include <libxml/tree.h>
-#include "ggobi.h"
+#include "session.h"
 
 #include "GGobiAPI.h"
 

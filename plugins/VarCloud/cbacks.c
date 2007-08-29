@@ -4,7 +4,7 @@
 #include <string.h>
 
 #include <gtk/gtk.h>
-#include "ggobi.h"
+#include "session.h"
 #include "externs.h"
 #include "GGobiAPI.h"
 

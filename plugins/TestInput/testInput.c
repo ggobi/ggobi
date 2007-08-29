@@ -1,5 +1,5 @@
 #include "GGobiAPI.h"
-#include "ggobi.h"
+#include "session.h"
 
 #include <stdlib.h>
 

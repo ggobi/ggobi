@@ -29,7 +29,7 @@
 
 #include "writedata.h"
 #include "write_xml.h"
-#include "ggobi-input-source-file.h"
+#include "input-source-file.h"
 
 #include "plugin.h"
 
@@ -37,13 +37,9 @@
 #define EXTEND_FILESET 1
 #define WRITE_FILESET  2
 
-// FIXME: eventually the GGobiDataFactory's should exist within a GGobi context
-// so that we don't have to instantiate them just to check the supported modes
 GSList *
 get_file_filters(GGobiSession *gg)
 {
-  GType *factory_types;
-  guint n_factory_types, i;
   GSList *filters = NULL;
   GtkFileFilter *unknown_filter = gtk_file_filter_new();
   
@@ -51,16 +47,15 @@ get_file_filters(GGobiSession *gg)
   gtk_file_filter_add_pattern(unknown_filter, "*");
   filters = g_slist_append(filters, unknown_filter);
   
-  factory_types = g_type_children(GGOBI_TYPE_DATA_FACTORY, &n_factory_types);
+  GSList *factories = gg->data_factories;
   
-  for (i = 0; i < n_factory_types; i++) {
-    GObject *factory = g_object_new(factory_types[i], NULL);
-    GSList *factory_modes = ggobi_data_factory_get_supported_modes(
-      GGOBI_DATA_FACTORY(factory));
+  for (; factories; factories = factories->next) {
+    GGobiDataFactory *factory = GGOBI_DATA_FACTORY(factories->data);
+    GSList *factory_modes = ggobi_data_factory_get_supported_modes(factory);
     for (GSList *modes = factory_modes; modes; modes = modes->next) {
       GtkFileFilter *filter = gtk_file_filter_new();
       GSList *factory_exts = ggobi_data_factory_get_file_exts_for_mode(
-        GGOBI_DATA_FACTORY(factory), modes->data);
+        factory, modes->data);
       for (GSList *exts = factory_exts; exts; exts = exts->next) {
         gchar *pattern = g_strconcat("*.", exts->data, NULL);
         gtk_file_filter_add_pattern(filter, pattern);
@@ -73,7 +68,6 @@ get_file_filters(GGobiSession *gg)
     }
     g_slist_foreach(factory_modes, (GFunc)g_free, NULL);
     g_slist_free(factory_modes);
-    g_object_unref(factory);
   }
   
   return g_slist_reverse(filters);

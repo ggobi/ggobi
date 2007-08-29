@@ -22,7 +22,7 @@
 #include "splot.h"
 #include "ggobi-data.h"
 
-#include "ggobi.h"
+#include "session.h"
 
 #ifdef __cplusplus
 extern "C" {

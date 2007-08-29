@@ -24,7 +24,7 @@
 #include "vars.h"
 #include "externs.h"
 #include "display_tree.h"
-#include "ggobi-input-source.h"
+#include "input-source.h"
 #include "ggobi-gui-transform.h"
 
 #ifdef STORE_SESSION_ENABLED

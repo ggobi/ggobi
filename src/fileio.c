@@ -14,7 +14,7 @@
  *   Andreas Buja        andreas.buja@wharton.upenn.edu
 */
 
-#include "ggobi.h"
+#include "session.h"
 #include "unistd.h"
 #include <glib/gstdio.h>
 

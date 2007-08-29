@@ -19,7 +19,7 @@
 
 #include <gtk/gtk.h>
 
-#include "ggobi.h"
+#include "session.h"
 #include "vars.h"
 
 /* Global variables for the window containing a tree listing

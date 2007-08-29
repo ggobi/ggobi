@@ -17,7 +17,7 @@
 #ifndef SCATMAT_CLASS_H
 #define SCATMAT_CLASS_H
 
-#include "ggobi.h"
+#include "session.h"
 
 #define GGOBI_TYPE_SCATMAT_SPLOT          (ggobi_scatmat_splot_get_type())
 #define GGOBI_SCATMAT_SPLOT(obj)	        (G_TYPE_CHECK_INSTANCE_CAST ((obj), GGOBI_TYPE_SCATMAT_SPLOT, scatmatSPlotd))

@@ -17,7 +17,7 @@
 #ifndef GGOBI_READ_INIT_H
 #define GGOBI_READ_INIT_H
 
-#include "ggobi.h"
+#include "session.h"
 #include "defines.h"
 #include <gtk/gtk.h>
 #include "fileio.h"

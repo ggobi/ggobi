@@ -3,7 +3,7 @@
 #ifdef CMDS
 
 #include <gtk/gtk.h>
-#include "ggobi.h"
+#include "session.h"
 #include "externs.h"
 
 #include <stdio.h>

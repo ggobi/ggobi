@@ -1,4 +1,4 @@
-#include "ggobi.h"
+#include "session.h"
 
 gint ggobi_init (gint argc, gchar * argv[], gboolean processEvents);
 

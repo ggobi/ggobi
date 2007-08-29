@@ -183,6 +183,10 @@ AC_PATH_PROG(GOB2, gob2,,$PATH)
 AC_PATH_PROG(VALAC, valac,,$PATH)
 AC_SUBST(VALAC)
 
+AM_CONDITIONAL(HAS_VALA, test -n "${VALAC}")
+
+PKG_PROG_PKG_CONFIG(0.21)
+
 # FIND GTK2
 
  echo "Looking for gtk2"
@@ -234,9 +238,9 @@ AM_CONDITIONAL(OS_WIN32, test "$os_win32" = "yes")
 # Find glitz
 
 if test "$os_win32" != "yes" ; then
-  PKG_CHECK_MODULES(GLITZ, [glitz-glx], [HAVE_GLITZ = 1], [HAVE_GLITZ = 0])
+  PKG_CHECK_MODULES(GLITZ, [glitz-glx], [HAVE_GLITZ=1], [HAVE_GLITZ=0])
 else
-  PKG_CHECK_MODULES(GLITZ, [glitz-wgl], [HAVE_GLITZ = 1], [HAVE_GLITZ = 0])
+  PKG_CHECK_MODULES(GLITZ, [glitz-wgl], [HAVE_GLITZ=1], [HAVE_GLITZ=0])
 fi
 
 AC_SUBST(GLITZ_CFLAGS)

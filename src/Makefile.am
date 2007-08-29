@@ -1,22 +1,21 @@
 lib_LTLIBRARIES     = libggobi.la
 libggobi_la_GOBS = variable.gob stage.gob data.gob stage-transform.gob \
-  stage-filter.gob pipeline-factory.gob input-source.gob data-factory.gob \
-  plugin-factory.gob plugin.gob data-factory-csv.gob data-factory-xml.gob \
-  input-source-file.gob input-source-http.gob gsf-input-http.gob \
-  gsf-input-ftp.gob input-source-ftp.gob input-source-factory.gob input-decoder.gob \
-  input-decoder-bgzip.gob stage-subset.gob stage-group.gob transform.gob \
+  stage-filter.gob pipeline-factory.gob \
+  plugin-factory.gob plugin.gob data-factory-xml.gob \
+  stage-subset.gob stage-group.gob transform.gob \
   transform-min-one.gob transform-boxcox.gob transform-abs.gob transform-log10.gob \
   gui-component.gob gui-transform.gob type-registry.gob pipeline-message.gob \
   variable-group.gob renderer.gob renderer-cairo.gob renderer-factory.gob
-libggobi_la_VALAS = bitset.vala
+libggobi_la_VALAS = bitset.vala input-ftp.vala input-http.vala input-source.vala \
+  data-factory.vala data-factory-csv.vala input-source-file.vala \
+  input-source-ftp.vala input-source-factory.vala input-source-http.vala
 libggobi_la_METASOURCES = $(libggobi_la_GOBS:%.gob=ggobi-%.c) \
   $(libggobi_la_VALAS:%.vala=%.c)
 libggobi_la_METAHEADERS = $(libggobi_la_GOBS:%.gob=ggobi-%.h) \
   $(libggobi_la_VALAS:%.vala=%.h)
 libggobi_la_METAOBJECTS = $(libggobi_la_GOBS:%.gob=ggobi-%.lo) \
   $(libggobi_la_VALAS:%.vala=%.lo)
-libggobi_la_METASTAMPS = $(libggobi_la_GOBS:%.gob=.%.gob.stamp) \
-  $(libggobi_la_VALAS:%.vala=.%.vala.stamp)
+libggobi_la_METASTAMPS = $(libggobi_la_GOBS:%.gob=.%.gob.stamp) .vala.stamp
 libggobi_la_LDFLAGS  = @GTK_LIBS@ @LIBXML_LIBS@ @LIBGSF_LIBS@ @GSL_LIBS@ \
   @GLITZ_LIBS@ -version-info 2
 libggobi_la_BUILT = array.c ash1d.c barchart.c barchartClass.c \
@@ -60,9 +59,15 @@ MAINTAINERCLEANFILES = $(BUILT_SOURCES)
 	@GOB2@ --no-touch --no-private-header $<
 	@touch $@
 
-.%.vala.stamp: %.vala
-	@VALAC@ $<
+if HAS_VALA
+.vala.stamp: $(libggobi_la_VALAS)
+	@VALAC@ --vapidir=../vapi --pkg=gsf --pkg=ggobi --pkg=libxml-2.0 $^
 	@touch $@
+else
+.vala.stamp: $(libggobi_la_VALAS)
+	@echo "Either install the Vala compiler or download a GGobi distribution tarball"
+	@exit 2
+endif
 
 bin_PROGRAMS  = ggobi
 ggobi_SOURCES = ggobiMain.c

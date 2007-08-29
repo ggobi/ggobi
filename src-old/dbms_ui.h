@@ -20,7 +20,7 @@
 #include <gtk/gtk.h>
 #include <gtk/gtkdialog.h>
 
-#include "ggobi.h"
+#include "session.h"
 
 #include "dbms.h"
 

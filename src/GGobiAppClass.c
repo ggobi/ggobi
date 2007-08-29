@@ -1,5 +1,5 @@
 #include "GGobiApp.h"
-#include "ggobi.h"
+#include "session.h"
 
 void ggobi_app_class_init (GGobiAppClass * klass);
 void ggobi_app_init (GGobiApp * app);

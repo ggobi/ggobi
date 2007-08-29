@@ -1,5 +1,5 @@
 #include "libpq-fe.h"
-#include "ggobi.h"
+#include "session.h"
 #include "externs.h"
 
 #include "GGobiAPI.h"

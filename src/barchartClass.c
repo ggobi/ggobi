@@ -18,7 +18,7 @@
 
 
 
-#include "ggobi.h"
+#include "session.h"
 #include "barchartDisplay.h"
 
 #include <string.h>

@@ -1,6 +1,6 @@
 #include <mysql.h>
 
-#include "ggobi.h"
+#include "session.h"
 #include "GGobiAPI.h"
 #include "dbms_ui.h"
 #include "externs.h"

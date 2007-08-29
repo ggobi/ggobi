@@ -12,16 +12,13 @@ public delegate void GGobi.IndexFunc (uint j, pointer user_data);
 
 public class GGobi.Bitset {
   
-  // preprocessor constants need to become static constants
   const uint BITS_PER_CHUNK = 8;
   const uchar[] BITS_TABLE = {
     0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4
   };
-  
-  // vala arrays are resizeable, track their lengths, etc :)
+
   protected uchar[] bits;
   
-  // property handling much cleaner vs gob
   public uint size {
     get {
       return bits.length * BITS_PER_CHUNK;
@@ -32,11 +29,10 @@ public class GGobi.Bitset {
     }
   }
   
-  // these are the _new* functions, much simpler compared to gob
   public Bitset () { }
   public Bitset.with_size (construct uint size) { }
   
-  public Bitset clone() {
+  public virtual Bitset clone() {
     Bitset other = new Bitset.with_size(size);
     for (uint i = 0; i < bits.length; i++)
       other.bits[i] = bits[i];
@@ -47,7 +43,6 @@ public class GGobi.Bitset {
 
   /* the indices must be sorted for insertion and removal */
   // FIXME: Do we want to sort here?
-
   public void
   remove_indices(SList<uint> indices)
   {
@@ -79,7 +74,6 @@ public class GGobi.Bitset {
       set_bit(i);
       inc--;
     }
-    // make sure vala frees rev_indices here
   }
   public SList<uint>
   get_indices()
@@ -87,7 +81,6 @@ public class GGobi.Bitset {
     uint i;
     SList<uint> indices = new SList<uint>();
     foreach(uchar b in bits) {
-      // must use logical in if() expressions
       if (b > 0) {
         int msb = Bit.nth_msf(b, -1);
         int lsb = -1;
@@ -96,6 +89,7 @@ public class GGobi.Bitset {
           indices.prepend(lsb + i * BITS_PER_CHUNK);
         }
       }
+      i++;
     }
     indices.reverse();
     return indices;
@@ -115,6 +109,9 @@ public class GGobi.Bitset {
     }
     return count;
   }
+  
+  // FIXME: Should these be called foreach? It's the convention but foreach
+  // is a keyword in Vala...
   public void 
   apply(IndexFunc func, pointer data)
   {
@@ -147,6 +144,7 @@ public class GGobi.Bitset {
       set_bit(i);
     else unset_bit(i);
   }
+  // FIXME: Need to check if 'i' is in range.
   public void
   set_bit(uint i)
   {

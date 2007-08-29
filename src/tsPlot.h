@@ -1,7 +1,7 @@
 #ifndef TS_PLOT_METHODS_H
 #define TS_PLOT_METHODS_H
 
-#include "ggobi.h"
+#include "session.h"
 #include "tsdisplay.h"
 
 void timeSeriesClassInit(GGobiTimeSeriesDisplayClass *klass);

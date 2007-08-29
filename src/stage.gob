@@ -1,6 +1,6 @@
 %{
   // FIXME: temporary
-  #include "ggobi-input-source.h"
+  #include "input-source.h"
   #include "ggobi-data.h"
   #include "vars.h"
   #include "externs.h"

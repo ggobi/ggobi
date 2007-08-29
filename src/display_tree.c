@@ -17,7 +17,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "ggobi.h"
+#include "session.h"
 /* #include "display_tree.h" */
 #include "externs.h"
 #include "vars.h"

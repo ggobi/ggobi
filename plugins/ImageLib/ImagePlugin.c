@@ -1,4 +1,4 @@
-#include "ggobi.h"
+#include "session.h"
 #include "plugin.h"
 
 #include <gdk_imlib.h>
