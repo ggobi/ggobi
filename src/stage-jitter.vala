@@ -39,11 +39,18 @@ public class GGobi.Stage.Jitter : Stage {
 	}
 	
 	override double get_raw_value(uint i, uint j) {
-		original = parent.get_raw_value(i, j);
+	  original = parent.get_raw_value(i, j);
+    if (amount(j) == 0) return original;
+	  
 		return original * (1 - amount[j]) + cache[i][j] * amount(j);
 	}
 
 	override void set_raw_value(uint i, uint j, double value) {
+    if (amount(j) == 0) {
+      parent.set_raw_value(i, j, value);
+      return;
+    }
+
 		double original = (value - cache[i][j] * amount(j)) / (1 - amount[j]);
 		parent.set_raw_value(i, j, original);
 	}	
