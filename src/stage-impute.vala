@@ -11,15 +11,15 @@ transformation function?
 
 There are currently:
 
-	* fixed (user specified, mean, median, % below/above lowest/highest value)
-	* random
+  * fixed (user specified, mean, median, % below/above lowest/highest value)
+  * random
 
 And can be applied either the whole data set, or per symbol/colour group
 
 == To do ==
 
  * convert each imputation type into its own object
-	
+  
 */
 
 public class GGobi.Stage.Impute : Stage {
@@ -35,14 +35,14 @@ public class GGobi.Stage.Impute : Stage {
   }
 
   override double get_raw_value(uint i, uint j) {
-		values[i][j]
-	}
+    values[i][j]
+  }
 
-	override void set_raw_value(uint i, uint j, double value) {
+  override void set_raw_value(uint i, uint j, double value) {
     values[i][j] = value;
     if (!is_missing(i, j)) parent.set_raw_value(i, j, value);
-	}
-	
+  }
+  
 
 }
 
@@ -53,22 +53,42 @@ public class GGobi.Imputation {
   public boolean impute(Stage.Impute stage, uint j) {
     if (!stage.col_has_missings(j)) return(false);
     
+    pre_compute(stage, j);
+    
+    for(uint i = 0; i++; i < nrows) {
+      stage.value[i][j] = stage.is_missing(i, j) ? stage.get_raw_value(i, j) : impute_single();
+    }
     
   }
-	
+  
+  public abstract virtual double impute_single(uint i);
+  public abstract virtual void precompute(Stage.Impute stage, uint j);
 }
 
+/* Replace missing values with a fixed value */
 public class GGobi.Imputation.Fixed : Imputation {
   double fixed_value = 0;
-	
-	
-	double impute_single() {
+  
+  double impute_single(uint i) {
     return fixed_value;
-	}
-	
+  }
 }
 
-public class GGobi.Imputation.Percent : Fixed {
+/* Replace missing values with a column mean */
+public class GGobi.Imputation.Mean : Imputation.Fixed {
+  void pre_compute(Stage.Impute stage, uint j) {
+    fixed_value = stage.get_variable(j).get_mean();
+  }
+}
+/* Replace missing values with a column median */
+public class GGobi.Imputation.Median : Imputation.Fixed {
+  void pre_compute(Stage.Impute stage, uint j) {
+    fixed_value = stage.get_variable(j).get_median();
+  }
+}
+
+/* Impute with jittered values fixed percent above/below lowest/highest value */
+public class GGobi.Imputation.Percent : Imputation {
   /* Percent below/above lowest/highest value - in [-1, 1] */
   double percent = 0.15;
 
@@ -85,20 +105,25 @@ public class GGobi.Imputation.Percent : Fixed {
     range = abs(fixed_value - side) * 0.2;
   }
   
-  double impute_single() {
-    return fixed_value + g_random_double_range(-1, 1) * range;
+  double impute_single(uint i) {
+    return fixed_value + g_random_double_range(-range, range);
   }
-	
 }
 
-public class GGobi.Imputation.Mean : Imputation.Fixed {
-  
-	
-}
-public class GGobi.Imputation.Median : Imputation.Fixed {
-	
-}
-
+/* Impute with randomly selected non-missing value */
 public class GGobi.Imputation.Random : Imputation {
-	
+  gdouble non_missing[];
+  
+  void pre_compute(Stage.Impute stage, uint j) {
+    non_missing.resize(n_rows - col_n_missing(j));
+    
+    present = 0;
+    for (i = 0; i < n_rows; i++) {
+      if (!stage.is_missing(i, j)) non_missing[present++] = stage.get_raw_value(i, j);
+    }
+  }
+
+  double impute_single(uint i) {
+    return non_missing[g_random_int_range(0, non_missing.size)];
+  }
 }
