@@ -255,7 +255,7 @@ textur (gfloat * yy, gfloat * shft, gint ny, gint option, gfloat del,
 */
   if (option == 1) {
     for (i = 0; i < ny; i++) {
-      shft[i] = shft[i] + ((gfloat) randvalue ()) * 4 - 2;
+      shft[i] = shft[i] + ((gfloat) g_random_double ()) * 4 - 2;
     }
   }
 
@@ -356,7 +356,7 @@ myrnd (gint n)
   gfloat rrand;
   nn = MAX (n, 1);
 
-  rrand = (gfloat) randvalue ();
+  rrand = (gfloat) g_random_double ();
   myrndval = MIN (nn, (gint) (rrand * (gfloat) nn) + 1);
   return (myrndval);
 }

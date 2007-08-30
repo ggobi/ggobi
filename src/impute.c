@@ -57,7 +57,7 @@ impute_fixed (ImputeType impute_type, gfloat val, gint nvars, gint * vars,
 
       for (i = 0; i < d->n_rows; i++) {
         if (ggobi_stage_is_missing(d, i, j)) {
-          drand = randvalue ();
+          drand = g_random_double ();
           drand = (drand - .5) * jmult;
           ggobi_stage_set_raw_value(d, i, j, impval + (gfloat) drand);
         }
@@ -184,7 +184,7 @@ impute_single (gint * missv, gint nmissing, gint * presv, gint npresent,
    */
   for (i = 0; i < nmissing; i++) {
     for (k = 0; k < npresent; k++) {
-      rrand = (gfloat) randvalue ();
+      rrand = (gfloat) g_random_double ();
 
       if (((npresent - k) * rrand) < 1.0) {
         ggobi_stage_set_raw_value(d, missv[i], col, ggobi_stage_get_raw_value(d, presv[k], col));

@@ -71,13 +71,6 @@ gboolean as_logical (const gchar * sval)
   return (val);
 }
 
-/* returns a random number on [0.0,1.0] */
-gdouble
-randvalue (void)
-{
-  return g_random_double ();
-}
-
 /*
  * Method suggested by Press, Flannery, Teukolsky, and Vetterling (1986)
  * "Numerical Recipes" p.202-3, for generating random normal variates .
@@ -183,7 +176,7 @@ fshuffle (gfloat * x, gint n)
   gfloat f;
 
   for (i = 0; i < n; i++) {
-    k = (gint) (randvalue () * (gdouble) i);
+    k = (gint) (g_random_double () * (gdouble) i);
     f = x[i];
     x[i] = x[k];
     x[k] = f;

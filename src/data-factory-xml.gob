@@ -1309,7 +1309,7 @@ class GGobi:Data:Factory:XML from GGobi:Data:Factory
     for (j = data->current_element; j < ncols &&
          ggobi_stage_get_col_type (d, j) == GGOBI_VARIABLE_UNIFORM; j++)
       {
-        self_xml_set_value (d, data, randvalue ());
+        self_xml_set_value (d, data, g_random_double ());
       }
   }
 

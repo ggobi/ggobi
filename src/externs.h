@@ -351,7 +351,6 @@ void       procs_activate(gboolean state, ProjectionMode pmode, displayd *displa
 gboolean   projection_ok (ProjectionMode m, displayd *display);
 void       quick_message (const gchar * const, gboolean);
 void       quit_ggobi(GGobiSession *gg);
-gdouble    randvalue (void);
 void       range_unset (GGobiSession *gg);
 gboolean   reached_target(gfloat, gfloat, gint, gfloat *, gfloat *);
 gint       realloc_optimize0_p(optimize0_param *, gint, vector_i);

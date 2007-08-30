@@ -93,7 +93,7 @@ random (self, gint n) {
     return false;
 
   for (t=0, m=0; t < top && m < n; t++) {
-    rrand = (gfloat) randvalue ();
+    rrand = (gfloat) g_random_double ();
     if (((top - t) * rrand) < (n - m) && !included[t]) {
       ggobi_stage_filter_set_included(GGOBI_STAGE_FILTER(self), t, true);
       included[t] = true;
