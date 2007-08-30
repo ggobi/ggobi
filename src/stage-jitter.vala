@@ -5,13 +5,7 @@ When displaying variables with few unique values (eg. discrete) on a scatterplot
 
 In GGobi2, jittering occured after the world transformation, so it could assume that the range of each variable was [0, 1].  This is not the case in GGobi3, so the range of the variable is used explicity. 
 
-== To do ==
-
-To do:
- * extract code for generating a random normal 
- * datastructure to store dist, amount and cache for each variable
-
-Jit value = original * (1 - amount) + random [-1, 1] * range * amount
+Jit value = original * (1 - amount) + random [-range, range] * amount
 
 Note: jittering amounts are not cached, so when modifying jitter points,
 they are not "unjittered" prior to modification.
@@ -29,10 +23,10 @@ public class GGobi.Stage.Jitter : Stage {
 		for (uint j = 0; j++; j < ncol) reset_col(j);
 	}
 	public void reset_col(uint j) {
+	  range = get_variable(j).get_range()
 		for (uint i = 0; i++; i < nrow) {
-				cache[i][j] = rand()
-			}
-		}
+      cache[i][j] = rand() * range;
+    }
 	}
 	
 	/* Generate random number from specified distribution */
@@ -44,17 +38,13 @@ public class GGobi.Stage.Jitter : Stage {
 		}
 	}
 	
-	double jitter_val(uint i, uint j) {
-		return cache[i][j] * range(j) * amount(j);
-	}
-	
 	override double get_raw_value(uint i, uint j) {
 		original = parent.get_raw_value(i, j);
-		return original * (1 - amount[j]) + jitter_val(i, j);
+		return original * (1 - amount[j]) + cache[i][j] * amount(j);
 	}
 
 	override void set_raw_value(uint i, uint j, double value) {
-		double original = (value - jitter_val(i, j)) / (1 - amount[j]);
+		double original = (value - cache[i][j] * amount(j)) / (1 - amount[j]);
 		parent.set_raw_value(i, j, original);
 	}	
 }
