@@ -360,7 +360,7 @@ gboolean   record_add (eeMode, gint a, gint b, gchar *lbl, gchar *id, gchar **va
 void       reinit_transient_brushing (displayd *, GGobiSession *);
 void       rejitter (gint *, gint, GGobiStage *, GGobiSession *);
 void       reset_pp(GGobiStage *, GGobiSession *);
-void       rnorm2 (gdouble *, gdouble *);
+double random_normal();
 void       rotation_event_handlers_toggle (splotd *, gboolean);
 void       ruler_ranges_set (gboolean force, displayd *, splotd *, GGobiSession *);
 void       scale_event_handlers_toggle (splotd *, gboolean);

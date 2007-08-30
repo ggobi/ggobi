@@ -743,9 +743,8 @@ gt_basis (array_d Fz, gint nactive, vector_i active_vars,
  * Generate d random p dimensional vectors to form new ending basis
 */
 {
-  gint i, j, k, check = 1, nvals = nactive*projdim, ntimes;
-  gdouble frunif[2];
-  gdouble r, fac, frnorm[2] = {0, 0};
+  gint i, j, k, nvals = nactive*projdim, ntimes;
+  gdouble frnorm[2] = {0, 0};
   gboolean oddno;
 
   if ((nvals % 2) == 1) 
@@ -757,10 +756,6 @@ gt_basis (array_d Fz, gint nactive, vector_i active_vars,
     ntimes = nvals/2+1;
   else
     ntimes = nvals/2;
-/*
- * Method suggested by Press, Flannery, Teukolsky, and Vetterling (1986)
- * "Numerical Recipes" p.202-3, for generating random normal variates .
-*/
 
   /* Zero out Fz before filling; this might fix a bug we are
      encountering with returning from a receive tour.
@@ -771,20 +766,9 @@ gt_basis (array_d Fz, gint nactive, vector_i active_vars,
 
   if (nactive > projdim) {
     for (j=0; j<ntimes; j++) {
-      while (check) {
- 
-        rnorm2(&frunif[0], &frunif[1]);
-        r = frunif[0] * frunif[0] + frunif[1] * frunif[1];
-   
-        if (r < 1)
-        {
-          check = 0;
-          fac = sqrt(-2. * log(r) / r);
-          frnorm[0] = frunif[0] * fac;
-          frnorm[1] = frunif[1] * fac;
-        }
-      }
-      check = 1;
+      frnorm[0] = random_normal();
+      frnorm[1] = random_normal();
+
       if (projdim == 1) {
         if (oddno && j == ntimes-1) {
           Fz.vals[0][active_vars.els[2*j]] = frnorm[0];

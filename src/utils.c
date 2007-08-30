@@ -78,13 +78,48 @@ randvalue (void)
   return g_random_double ();
 }
 
-/*-- returns two random numbers on [-1,1] --*/
-void
-rnorm2 (gdouble * drand, gdouble * dsave)
-{
-  *drand = g_random_double_range (-1, 1);
-  *dsave = g_random_double_range (-1, 1);
+/*
+ * Method suggested by Press, Flannery, Teukolsky, and Vetterling (1986)
+ * "Numerical Recipes" p.202-3, for generating random normal variates .
+*/
+double
+random_normal() {
+  static gdouble dsave;
+  static gboolean isave = false;
+
+	gboolean check = true;
+  gdouble d, dfac, drand;
+
+  if (isave) {
+    isave = false;
+    /* prepare to return the previously saved value */
+    drand = dsave;
+  }
+  else {
+    isave = true;
+    while (check) {
+
+      drand = g_random_double_range (-1, 1);
+      dsave = g_random_double_range (-1, 1);
+
+      d = drand * drand + dsave * dsave;
+
+      if (d < 1.0) {
+        check = false;
+        dfac = sqrt (-2. * log (d) / d);
+        drand = drand * dfac;
+        dsave = dsave * dfac;
+      }
+    }                         /* end while */
+  }                           /* end else */
+
+  /*
+   * Already centered; scale to approximately [-1, 1]
+   */
+  drand = (drand / 3.0);
+  return drand;
 }
+
 
 gint
 fcompare (const void *x1, const void *x2)

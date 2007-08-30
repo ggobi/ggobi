@@ -26,56 +26,20 @@
 #include "vars.h"
 #include "externs.h"
 
-gfloat
-jitter_randval (gint type)
-{
 /*
  * generate a random value.
 */
-  gdouble drand;
-  static gdouble dsave;
-  static gboolean isave = false;
+gfloat
+jitter_randval (gint type)
+{
+  gdouble drand = 0;
 
   if (type == UNIFORM) {
-    drand = randvalue ();
-    /*
-     * Center and scale to [-1, 1]
-     */
-    drand = (drand - .5) * 2;
-
+    drand = g_random_double_range (-1, 1);
+  } else if (type == NORMAL) {
+    drand = random_normal();
   }
-  else if (type == NORMAL) {
-
-    gboolean check = true;
-    gdouble d, dfac;
-
-    if (isave) {
-      isave = false;
-      /* prepare to return the previously saved value */
-      drand = dsave;
-    }
-    else {
-      isave = true;
-      while (check) {
-
-        rnorm2 (&drand, &dsave);
-        d = drand * drand + dsave * dsave;
-
-        if (d < 1.0) {
-          check = false;
-          dfac = sqrt (-2. * log (d) / d);
-          drand = drand * dfac;
-          dsave = dsave * dfac;
-        }
-      }                         /* end while */
-    }                           /* end else */
-
-    /*
-     * Already centered; scale to approximately [-1, 1]
-     */
-    drand = (drand / 3.0);
-  }
-  return ((gfloat) drand);
+  return (gfloat) drand;
 }
 
 void
