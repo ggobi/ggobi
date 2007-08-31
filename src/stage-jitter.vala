@@ -36,9 +36,9 @@ public class GGobi.StageJitter : Stage {
   /* Generate random number from specified distribution */
   double rand() {
     if (uniformDist) {
-      return g_random_double_range(-1, 1);
+      return Random.double_range(-1, 1);
     } else {
-      return random_normal();
+      return Utils.random_normal();
     }
   }
   

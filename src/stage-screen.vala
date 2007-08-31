@@ -27,8 +27,8 @@ public class GGobi.Stage.Screen : Stage {
 
 	/* Reset data ranges */
 	public void reset() {
-		minx = miny = INF;
-		maxx = maxy = -INF;
+		minx = miny = double.MAX;
+		maxx = maxy = double.MIN;
 	}
 	
 	public void update(Variable x, Variable y) {
