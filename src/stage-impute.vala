@@ -9,6 +9,8 @@ so needs more information.  In general, any imputation for a single column might
 use might use information Could the stage be passed as a parameter to the 
 transformation function?
 
+GGobi3 misses the more complicated imputation schemes of GGobi2 (eg. seperately by group).  The assumptions that if the user wants something more complicated, they can implement it themselves in R.
+
 There are currently:
 
   * fixed (user specified, mean, median, % below/above lowest/highest value)
@@ -18,8 +20,6 @@ And can be applied either the whole data set, or per symbol/colour group
 
 == To do ==
 
- * convert each imputation type into its own object
-  
 */
 
 public class GGobi.Stage.Impute : Stage {
@@ -35,7 +35,7 @@ public class GGobi.Stage.Impute : Stage {
   }
 
   override double get_raw_value(uint i, uint j) {
-    values[i][j]
+    return values[i][j];
   }
 
   override void set_raw_value(uint i, uint j, double value) {

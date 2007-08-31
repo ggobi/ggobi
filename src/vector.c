@@ -15,7 +15,7 @@ vectord_init_null (vector_d *vecp)
   vecp->nels = 0;
   vecp->els = (gdouble *) NULL;
 }
-
+  
 void
 vectord_free (vector_d *vecp)
 {

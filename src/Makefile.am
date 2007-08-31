@@ -8,7 +8,8 @@ libggobi_la_GOBS = variable.gob stage.gob data.gob stage-transform.gob \
   variable-group.gob renderer.gob renderer-cairo.gob renderer-factory.gob
 libggobi_la_VALAS = bitset.vala input-ftp.vala input-http.vala input-source.vala \
   data-factory.vala data-factory-csv.vala input-source-file.vala \
-  input-source-ftp.vala input-source-factory.vala input-source-http.vala
+  input-source-ftp.vala input-source-factory.vala input-source-http.vala \
+	stage-jitter.vala
 libggobi_la_METASOURCES = $(libggobi_la_GOBS:%.gob=ggobi-%.c) \
   $(libggobi_la_VALAS:%.vala=%.c)
 libggobi_la_METAHEADERS = $(libggobi_la_GOBS:%.gob=ggobi-%.h) \
