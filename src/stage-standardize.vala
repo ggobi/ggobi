@@ -2,12 +2,15 @@
 == Comparable ranges ==
 (`tform_to_world`)
 
-In the absence of information to the contrary, it is important to ensure that all
-variables are on a common scale. In GGobi2 this involves rescaling each variable to [0,
-1] (`tform_to_world`). However, there are some cases when that is incorrect, for example
-if we know some variables were measured on the same scale.
+In the absence of information to the contrary, it is important to ensure that
+all variables are on a common scale. In GGobi2 this involves rescaling each
+variable to [0, 1] (`tform_to_world`). However, there are some cases when that
+is incorrect, for example if we know some variables were measured on the same
+scale.
 
-By default, all variables are scaled with f(x) = x - min(x) / (max(x) - min(x)), however, it needs to be possible to override min and max with values set by the user, rather than computed from the data.
+By default, all variables are scaled with f(x) = x - min(x) / (max(x) -
+min(x)), however, it needs to be possible to override min and max with values
+set by the user, rather than computed from the data.
 
 */
 public class GGobi.Stage.Standardize : Stage {

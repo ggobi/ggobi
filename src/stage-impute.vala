@@ -1,18 +1,19 @@
 /* 
 = Imputation =
 
-Imputation is used to replace missing values with plausible numbers. This is particularly
-important for displays such as the tour, as there is no other reasonable way to deal with
-missing values apart from using complete cases.
+Imputation is used to replace missing values with plausible numbers. This is
+particularly important for displays such as the tour, as there is no other
+reasonable way to deal with missing values apart from using complete cases.
 
-Each variable has a imputation type, and various parameters to that type. Almost
-identical to transformation, but random (condition on symbol and colour) so needs more
-information. In general, any imputation for a single column might use might use
-information Could the stage be passed as a parameter to the transformation function?
+Each variable has a imputation type, and various parameters to that type.
+Almost identical to transformation, but random (condition on symbol and
+colour) so needs more information. In general, any imputation for a single
+column might use might use information Could the stage be passed as a
+parameter to the transformation function?
 
-GGobi3 misses the more complicated imputation schemes of GGobi2 (eg. seperately by
-group). The assumptions that if the user wants something more complicated, they can
-implement it themselves in R.
+GGobi3 misses the more complicated imputation schemes of GGobi2 (eg.
+seperately by group). The assumptions that if the user wants something more
+complicated, they can implement it themselves in R.
 
 There are currently:
 

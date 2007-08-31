@@ -1,14 +1,15 @@
 /* 
 = Jittering =
 
-When displaying variables with few unique values (eg. discrete) on a scatterplot, it is
-useful to add a small amount of random jitter.
+When displaying variables with few unique values (eg. discrete) on a
+scatterplot, it is useful to add a small amount of random jitter.
 
-In GGobi2, jittering occured after the world transformation, so it could assume that the
-range of each variable was [0, 1]. This is not the case in GGobi3, so the range of the
-variable is used explicity.
+In GGobi2, jittering occured after the world transformation, so it could
+assume that the range of each variable was [0, 1]. This is not the case in
+GGobi3, so the range of the variable is used explicity.
 
-Jittered value value = original * (1 - amount) + random [-range, range] * amount
+Jittered value value = original * (1 - amount) + random [-range, range] *
+amount
 
 */
 using GLib;
