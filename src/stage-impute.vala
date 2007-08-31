@@ -22,6 +22,8 @@ And can be applied either the whole data set, or per symbol/colour group
 
 */
 
+include Glib;
+
 public class GGobi.Stage.Impute : Stage {
   public Imputation[] imputation;
   public double[0][0] values;
@@ -102,7 +104,7 @@ public class GGobi.Imputation.Percent : Imputation {
 
     side = (percent > 0) ? max : min;
     fixed_value = side + percent * range;
-    range = abs(fixed_value - side) * 0.2;
+    range = Math.abs(fixed_value - side) * 0.2;
   }
   
   double impute_single(uint i) {

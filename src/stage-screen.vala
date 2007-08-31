@@ -32,10 +32,10 @@ public class GGobi.Stage.Screen : Stage {
 	}
 	
 	public void update(Variable x, Variable y) {
-		minx = min(minx, x.min)
-		miny = min(miny, y.min)
-		maxx = max(maxx, x.max)
-		maxy = max(maxy, y.max)
+		minx = Math.min(minx, x.min)
+		miny = Math.min(miny, y.min)
+		maxx = Math.max(maxx, x.max)
+		maxy = Math.max(maxy, y.max)
 	}
 
 	/* Width of margin, in pixels.  
@@ -44,7 +44,13 @@ public class GGobi.Stage.Screen : Stage {
 	It uses the minimum of 10 pixels, or 10% of the smaller of height 
 	or width */
 	uint margin() {
-		max(10, min(height, width) / 100)
+		Math.max(10, Math.min(height, width) / 100)
 	}
+	
+	override double get_raw_value(uint i, uint j) {
+  }
+
+  override void set_raw_value(uint i, uint j, double value) {
+  }
 	
 }
