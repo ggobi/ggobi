@@ -2,7 +2,7 @@ using GLib;
 using Gsf;
 using Xml;
 
-public class GGobi.InputSourceFile:InputSource
+public class GGobi.InputSourceFile : Object, InputSource
 { 
   
   public string uri { get; set construct; }

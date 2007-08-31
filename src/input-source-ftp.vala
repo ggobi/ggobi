@@ -1,7 +1,7 @@
 using GLib;
 using Gsf;
 
-public class GGobi.InputSourceFTP:InputSource
+public class GGobi.InputSourceFTP : Object, InputSource
 {
   
   public string uri { get; set construct; }

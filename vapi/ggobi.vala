@@ -1,5 +1,5 @@
 [CCode (cheader_filename = "ggobi-stage.h")]
-public class GGobi.Stage {
+public class GGobi.Stage : GLib.Object {
   public uint n_rows { get; set construct; }
   public uint n_cols { get; set construct; }
   public string name { get; set construct; }
@@ -23,7 +23,6 @@ public class GGobi.Stage {
   
 }
 
-
 [CCode (cheader_filename = "ggobi-data.h")]
 public class GGobi.Data : GGobi.Stage {
   public GGobi.InputSource source { get; set construct; }
@@ -34,7 +33,7 @@ public class GGobi.Data : GGobi.Stage {
 }
 
 [CCode (cheader_filename = "ggobi-pipeline-message.h")]
-public class GGobi.PipelineMessage {
+public class GGobi.PipelineMessage : GLib.Object{
   public GLib.SList get_changed_cols();
   public GLib.SList get_removed_cols();
   public GLib.SList get_removed_rows();
@@ -49,7 +48,7 @@ public class GGobi.PipelineMessage {
 
 
 [CCode (cheader_filename = "ggobi-variable.h")]
-public class GGobi.Variable {
+public class GGobi.Variable: GLib.Object {
   public float get_range();
   
 

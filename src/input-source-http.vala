@@ -1,7 +1,7 @@
 using GLib;
 using Gsf;
 
-public class GGobi.InputSourceHTTP : InputSource {
+public class GGobi.InputSourceHTTP : Object, InputSource {
   public string uri { get; set construct; }
   public string mode { get; set construct; }
   public string display_name { get; set construct; }

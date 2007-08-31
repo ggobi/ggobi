@@ -26,7 +26,7 @@ public abstract class GGobi.DataFactory {
     //input = decode_input(input);
     
     SList<Data> datasets = create_for_input(input);
-    foreach(Data dataset in datasets) {
+    foreach(weak Data dataset in datasets) {
       if (dataset.name == null)
         dataset.name = source.display_name;
       dataset.source = source;

@@ -37,7 +37,6 @@ public class GGobi.DataFactoryCSV:DataFactory
   create_for_input(Input input)
   {
     Input lines;
-    Stage d;
     List<double[]> rows = new List<double[]>();
     SList<Data> ds = new SList<Data>();
 
@@ -55,12 +54,12 @@ public class GGobi.DataFactoryCSV:DataFactory
     rows.reverse();
     
     /* Load the parsed data into the GGobiStage */
+    Stage d;
     d = create_data(rows);
     ds.append(d);
     
-    // VALABUG: Vala thinks that we don't own 'ds' so it tells us to copy it.
     // VALABUG: Vala fails to correctly free the elements of 'rows'
-    return (ds.copy());
+    return ds;
   }
 
 /* Heuristic: If the first row has an empty in the first column and
@@ -78,7 +77,7 @@ public class GGobi.DataFactoryCSV:DataFactory
     if (first_entry.size() != 0)
       return false;
 
-    foreach(SList<string> row in rows) {
+    foreach(weak SList<string> row in rows) {
       weak string str = row.data;
       if (hash.lookup(str) != null) {
         warning("Duplicate row name: %s - treating rownames as data", str);
@@ -105,13 +104,13 @@ public class GGobi.DataFactoryCSV:DataFactory
     if (!has_labels)
       return;
     int i = 0;
-    foreach(SList row in rows)
+    foreach(weak SList row in rows)
       d.set_row_id(i++, row.data);
   }
 
   private void load_row_values (List<SList> rows, Stage d, bool row_labels) {
     uint i = 0;
-    foreach(SList row in rows) {
+    foreach(weak SList row in rows) {
       uint j = 0;
       SList<string> entries = row_labels ? row : row.next;
       foreach(string entry in row)
