@@ -55,11 +55,9 @@ public class GGobi.Variable {
 
 }
 
-[Import ()]
 [CCode (cprefix = "", lower_case_cprefix = "", cheader_filename = "externs.h")]
 namespace GGobi {
   public struct Utils {
-    [CCode (cname = "random_normal")]
-    public double random_normal();
+    public static double random_normal();
   }
 }

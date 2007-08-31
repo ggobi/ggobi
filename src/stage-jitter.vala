@@ -21,16 +21,16 @@ public class GGobi.StageJitter : Stage {
   public bool uniformDist = true;
   
   /* Cache of random values, with range equal to the range of each column */
-  public double[] cache;
+  public double[,] cache;
   
   /* Recompute cache of random variables */
   public void refresh() {
-    for (uint j = 0; j < n_cols; j++) reset_col(j);
+    for (uint j = 0; j < n_cols; j++) refresh_col(j);
   }
   public void refresh_col(uint j) {
     float range = get_variable(j).get_range();
     for (uint i = 0; i < n_rows; i++) 
-      cache[i][j] = rand() * range;
+      cache[i, j] = rand() * range;
 
     col_data_changed(j);
     flush_changes_here();
@@ -50,7 +50,7 @@ public class GGobi.StageJitter : Stage {
     double original = parent.get_raw_value(i, j);
     if (amount[j] == 0) return original;
     
-    return original * (1 - amount[j]) + cache[i][j] * amount[j];
+    return original * (1 - amount[j]) + cache[i, j] * amount[j];
   }
 
   /* When setting the value of a jittered observation, subtract off the
@@ -62,7 +62,7 @@ public class GGobi.StageJitter : Stage {
     }
 
     double original;
-    original = (value - cache[i][j] * amount[j]) / (1 - amount[j]);
+    original = (value - cache[i, j] * amount[j]) / (1 - amount[j]);
     parent.set_raw_value(i, j, original);
   }  
   
@@ -76,15 +76,13 @@ public class GGobi.StageJitter : Stage {
     
     // PARENT_HANDLER(self, msg); // ?
     
-    
-    
     // Add amounts for new columns (set to zero)
-    amount.resize(amount.size + n_added_cols);
+    amount.resize(amount.length + (int) n_added_cols);
 
     // Add cached jittered values for new column (set to rand())
-    cache.resize(cache.size + n_added_cols);
+    cache.resize(cache.length + (int) n_added_cols);
     for (uint i = 0; i < n_added_cols; i++) {
-      reset_col(cache.size + i);
+      refresh_col(cache.length + i);
     }
   }
 }
