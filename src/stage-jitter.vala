@@ -42,7 +42,7 @@ public class GGobi.StageJitter : Stage {
     if (uniformDist) {
       return Random.double_range(-1, 1);
     } else {
-      return Utils.random_normal();
+      return 0; // Utils.random_normal();
     }
   }
   

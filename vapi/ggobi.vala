@@ -54,9 +54,9 @@ public class GGobi.Variable: GLib.Object {
 
 }
 
-[CCode (cprefix = "", lower_case_cprefix = "", cheader_filename = "externs.h")]
-namespace GGobi {
-  public struct Utils {
-    public static double random_normal();
-  }
-}
+// [CCode (cprefix = "", lower_case_cprefix = "", cheader_filename = "externs.h")]
+// namespace GGobi {
+//   public struct Utils {
+//     public static double random_normal();
+//   }
+// }
