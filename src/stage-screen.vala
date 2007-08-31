@@ -2,14 +2,20 @@
 == Screen scaling ==
 (`plane_to_screen`)
 
-Once data has been flattened on to a plane, it is necessary to scale the x and y positions to fit on a screen.  There are two special considerations here:
+Once data has been flattened on to a plane, it is necessary to scale the x and y
+positions to fit on a screen. There are two special considerations here:
 
-	# Points should not be plotted close to the edges of the plot.
-	# Scales need to be smoothly adaptive as data changes
-	
-Cleveland suggests that points should not be plotted next to the edges of a plot, but there should be a margin between the data and the plot.  (GGobi2 `limits_adjust`, 10% of current plot)
+	# Points should not be plotted close to the edges of the plot. # Scales need to be
+smoothly adaptive as data changes
 
-By default, scales should be adaptive: as points move outside the existing range, they should be rescaled (but it should not automatically rescale if the range decreases).  Also need the option to freeze the current scaling, and to reset it to the current data.  (GGobi2: adhoc solutions in `tour1d_projdata`, `tour2d_projdata`)
+Cleveland suggests that points should not be plotted next to the edges of a plot, but
+there should be a margin between the data and the plot. (GGobi2 `limits_adjust`, 10% of
+current plot)
+
+By default, scales should be adaptive: as points move outside the existing range, they
+should be rescaled (but it should not automatically rescale if the range decreases). Also
+need the option to freeze the current scaling, and to reset it to the current data.
+(GGobi2: adhoc solutions in `tour1d_projdata`, `tour2d_projdata`)
 
 */
 
