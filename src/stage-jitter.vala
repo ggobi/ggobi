@@ -24,10 +24,10 @@ public class GGobi.StageJitter : Stage {
   public double[] cache;
   
   /* Recompute cache of random variables */
-  public void reset() {
+  public void refresh() {
     for (uint j = 0; j < n_cols; j++) reset_col(j);
   }
-  public void reset_col(uint j) {
+  public void refresh_col(uint j) {
     float range = get_variable(j).get_range();
     for (uint i = 0; i < n_rows; i++) 
       cache[i][j] = rand() * range;

@@ -32,10 +32,10 @@ public class GGobi.Stage.Impute : Stage {
   public double[0][0] values;
 
   /* Rerun imputations */
-  public void reset() {
+  public void refresh() {
     for (uint j = 0; j++; j < ncol) reset_col(j);
   }
-  public void reset_col(uint j) {
+  public void refresh_col(uint j) {
     imputation[j].impute(self, j);
   }
 
