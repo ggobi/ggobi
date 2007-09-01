@@ -52,6 +52,8 @@ public class GGobi.PipelineMessage : GLib.Object{
 [CCode (cheader_filename = "ggobi-variable.h")]
 public class GGobi.Variable: GLib.Object {
   public float get_range();
+  public float get_min();
+  public float get_max();
   
 
 }

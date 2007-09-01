@@ -30,26 +30,24 @@ include Glib;
 
 public class GGobi.Stage.Impute : Stage {
   public Imputation[] imputation;
-  public double[0][0] values;
+  public Matrix cache;
 
   /* Rerun imputations */
   public void refresh() {
-    for (uint j = 0; j++; j < ncol) reset_col(j);
+    for (uint j = 0; j++; j < ncol) refresh_col(j);
   }
   public void refresh_col(uint j) {
     imputation[j].impute(self, j);
   }
 
   override double get_raw_value(uint i, uint j) {
-    return values[i][j];
+    return cache.vals[i][j];
   }
 
   override void set_raw_value(uint i, uint j, double value) {
-    values[i][j] = value;
+    cache.vals[i][j] = value;
     if (!is_missing(i, j)) parent.set_raw_value(i, j, value);
   }
-  
-
 }
 
 

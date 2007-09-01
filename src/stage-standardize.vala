@@ -13,23 +13,22 @@ min(x)), however, it needs to be possible to override min and max with values
 set by the user, rather than computed from the data.
 
 */
-public class GGobi.Stage.Standardize : Stage {
-	
-	double standardize(double value, min, max) {
-		value - min / (min - max)
+public class GGobi.StageStandardize : Stage {
+	double standardize(double value, float min, float max) {
+    return (value - min) / (max - min);
 	}
 	
-	double unstandardize(double value, min, max) {
-		value * (min - max) + min
+	double unstandardize(double value, float min, float max) {
+    return value * (max - min) + min;
 	}
 	
 	override double get_raw_value(uint i, uint j) {
-		var = get_variable(j)
-		standardize(parent.get_raw_value(i, j), var.min, var.max)
+    Variable v = get_variable(j);
+    standardize(parent.get_raw_value(i, j), v.get_min(), v.get_max());
 	}
 
 	override void set_raw_value(uint i, uint j, double value) {
-		var = get_variable(j)
-		parent.set_raw_value(i, j, unstandardise(value, var.min, var.max))
+    Variable v = get_variable(j);
+    parent.set_raw_value(i, j, unstandardize(value, v.get_min(), v.get_max()));
 	}
 }
