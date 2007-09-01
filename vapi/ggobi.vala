@@ -1,3 +1,5 @@
+using GLib;
+
 [CCode (cheader_filename = "ggobi-stage.h")]
 public class GGobi.Stage : GLib.Object {
   public uint n_rows { get; set construct; }
@@ -54,26 +56,30 @@ public class GGobi.Variable: GLib.Object {
 
 }
 
-using GLib;
-
 // [CCode (cprefix = "array_d", cheader_filename = "externs.h")]
 public struct GGobi.Matrix {
-  double **vals;
-  uint nrows, ncols;
+  public double[,] vals;
+  public uint nrows;
+  public uint ncols;
   
   [InstanceByReference]
-  public void alloc (int, int);
+  public void alloc (int nr, int nc);
   [InstanceByReference]
-  public void free (int, int);
+  public void free (int nr, int nc);
 
   [InstanceByReference]
-  public void add_cols (int);
+  public void add_cols (int nc);
   [InstanceByReference]
-  public void add_rows (int);
+  public void add_rows (int nr );
   [InstanceByReference]
-  public void copy (GGobi.Matrix);
+  public void copy (GGobi.Matrix arrp_to);
+
   [InstanceByReference]
-  public void delete_cols (SList *);
+  [CCode (cname = "delete_cols")]
+  public void remove_cols (SList cols);
+  [InstanceByReference]
+  [CCode (cname = "delete_rows")]
+  public void remove_rows (SList cols);
   [InstanceByReference]
   public void init_null ();
   [InstanceByReference]
@@ -82,9 +88,9 @@ public struct GGobi.Matrix {
   
 }
 
-// [CCode (cprefix = "", lower_case_cprefix = "", cheader_filename = "externs.h")]
-// namespace GGobi {
-//   public struct Utils {
-//     public static double random_normal();
-//   }
-// }
+[CCode (cprefix = "", lower_case_cprefix = "", cheader_filename = "externs.h")]
+namespace GGobi {
+  public struct Utils {
+    public static double random_normal();
+  }
+}

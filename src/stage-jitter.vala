@@ -22,7 +22,7 @@ public class GGobi.StageJitter : Stage {
   public bool uniformDist = true;
   
   /* Cache of random values, with range equal to the range of each column */
-  public double[,] cache;
+  public Matrix cache;
   
   /* Recompute cache of random variables */
   public void refresh() {
@@ -31,8 +31,8 @@ public class GGobi.StageJitter : Stage {
   public void refresh_col(uint j) {
     float range = get_variable(j).get_range();
     for (uint i = 0; i < n_rows; i++) 
-      cache[i, j] = rand() * range;
-
+      cache.vals[i, j] = rand() * range;
+    
     col_data_changed(j);
     flush_changes_here();
   }
@@ -42,7 +42,7 @@ public class GGobi.StageJitter : Stage {
     if (uniformDist) {
       return Random.double_range(-1, 1);
     } else {
-      return 0; // Utils.random_normal();
+      return Utils.random_normal();
     }
   }
   
@@ -51,7 +51,7 @@ public class GGobi.StageJitter : Stage {
     double original = parent.get_raw_value(i, j);
     if (amount[j] == 0) return original;
     
-    return original * (1 - amount[j]) + cache[i, j] * amount[j];
+    return original * (1 - amount[j]) + cache.vals[i, j] * amount[j];
   }
 
   /* When setting the value of a jittered observation, subtract off the
@@ -63,27 +63,26 @@ public class GGobi.StageJitter : Stage {
     }
 
     double original;
-    original = (value - cache[i, j] * amount[j]) / (1 - amount[j]);
+    original = (value - cache.vals[i, j] * amount[j]) / (1 - amount[j]);
     parent.set_raw_value(i, j, original);
   }  
   
   /* Process incoming change events */
   override void process_incoming(PipelineMessage msg) {
-    SList removed_rows = msg.get_removed_rows();
-    SList removed_cols = msg.get_removed_cols();
-    uint n_added_cols = msg.get_n_added_cols();
-    uint n_added_rows = msg.get_n_added_rows();
-    uint n_refresh = n_added_cols;
-    
-    // PARENT_HANDLER(self, msg); // ?
-    
-    // Add amounts for new columns (set to zero)
-    amount.resize(amount.length + (int) n_added_cols);
+    // Deal with jittering amounts
 
-    // Add cached jittered values for new column (set to rand())
-    cache.resize(cache.length + (int) n_added_cols);
+    // Set up and reinitialise cache matrix    
+    uint n_added_cols = msg.get_n_added_cols();
+    uint current_cols = cache.ncols;
+    cache.add_cols((int) n_added_cols);
+
+    cache.add_rows((int) msg.get_n_added_rows());
+    cache.remove_rows(msg.get_removed_rows());
+
     for (uint i = 0; i < n_added_cols; i++) {
-      refresh_col(cache.length + i);
+      refresh_col(current_cols + i);
     }
+    cache.remove_cols(msg.get_removed_cols());
+
   }
 }
