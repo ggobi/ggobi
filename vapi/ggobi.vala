@@ -54,6 +54,34 @@ public class GGobi.Variable: GLib.Object {
 
 }
 
+using GLib;
+
+// [CCode (cprefix = "array_d", cheader_filename = "externs.h")]
+public struct GGobi.Matrix {
+  double **vals;
+  uint nrows, ncols;
+  
+  [InstanceByReference]
+  public void alloc (int, int);
+  [InstanceByReference]
+  public void free (int, int);
+
+  [InstanceByReference]
+  public void add_cols (int);
+  [InstanceByReference]
+  public void add_rows (int);
+  [InstanceByReference]
+  public void copy (GGobi.Matrix);
+  [InstanceByReference]
+  public void delete_cols (SList *);
+  [InstanceByReference]
+  public void init_null ();
+  [InstanceByReference]
+  public void zero ();
+  
+  
+}
+
 // [CCode (cprefix = "", lower_case_cprefix = "", cheader_filename = "externs.h")]
 // namespace GGobi {
 //   public struct Utils {
