@@ -1,5 +1,6 @@
 using GLib;
 
+[CCode (cname = "arrayf")]
 public class GGobi.Matrix : Object {
   public double[,] vals;
   public uint nrows;
