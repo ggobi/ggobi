@@ -3,7 +3,7 @@ using Gsf;
 using Xml;
 
 // FIXME: make this an interface?
-public abstract class GGobi.DataFactory {
+public abstract class GGobi.DataFactory : GLib.Object {
   
   /**
    * create:

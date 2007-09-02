@@ -10,7 +10,7 @@ using GLib;
  */
 public delegate void GGobi.IndexFunc (uint j, pointer user_data);
 
-public class GGobi.Bitset {
+public class GGobi.Bitset : Object {
   
   const uint BITS_PER_CHUNK = 8;
   const uchar[] BITS_TABLE = {

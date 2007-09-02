@@ -1,7 +1,7 @@
 using GLib;
 using Xml;
 
-public class GGobi.InputSourceFactory
+public class GGobi.InputSourceFactory : GLib.Object
 {
   /**
    * get_supported_schemes:

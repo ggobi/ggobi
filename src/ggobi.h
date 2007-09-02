@@ -5,5 +5,4 @@
 // be installed to /usr/include/ggobi-2.0/ggobi with -I/usr/include/ggobi-2.0
 // provided by pkg-config.
 #include "bitset.h"
-#include "input-decoder.h"
 #include "input-source.h"

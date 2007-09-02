@@ -58,37 +58,6 @@ public class GGobi.Variable: GLib.Object {
 
 }
 
-[CCode (free_function = "array_d_free", cprefix = "array_d", cheader_filename = "ggobi.h")]
-public class GGobi.Matrix {
-  public double[,] vals;
-  public uint nrows;
-  public uint ncols;
-  
-  [InstanceByReference]
-  public void alloc (int nr, int nc);
-  [InstanceByReference]
-  public void free (int nr, int nc);
-
-  [InstanceByReference]
-  public void add_cols (int nc);
-  [InstanceByReference]
-  public void add_rows (int nr );
-  [InstanceByReference]
-  public void copy (GGobi.Matrix arrp_to);
-
-  [InstanceByReference]
-  [CCode (cname = "delete_cols")]
-  public void remove_cols (SList cols);
-  [InstanceByReference]
-  [CCode (cname = "delete_rows")]
-  public void remove_rows (SList cols);
-  [InstanceByReference]
-  public void init_null ();
-  [InstanceByReference]
-  public void zero ();
-  
-  
-}
 
 namespace GGobi {
   [CCode (cprefix = "", lower_case_cprefix = "", cheader_filename = "ggobi.h")]
