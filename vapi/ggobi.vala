@@ -58,8 +58,8 @@ public class GGobi.Variable: GLib.Object {
 
 }
 
-// [CCode (cprefix = "array_d", cheader_filename = "externs.h")]
-public struct GGobi.Matrix {
+[CCode (free_function = "array_d_free", cprefix = "array_d", cheader_filename = "ggobi.h")]
+public class GGobi.Matrix {
   public double[,] vals;
   public uint nrows;
   public uint ncols;
@@ -90,8 +90,8 @@ public struct GGobi.Matrix {
   
 }
 
-[CCode (cprefix = "", lower_case_cprefix = "", cheader_filename = "externs.h")]
 namespace GGobi {
+  [CCode (cprefix = "", lower_case_cprefix = "", cheader_filename = "ggobi.h")]
   public struct Utils {
     public static double random_normal();
   }

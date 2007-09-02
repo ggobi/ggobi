@@ -7,7 +7,7 @@ pipeline.  This will make it easier to implement cold and warm brushing.
 */
 
 
-public class GGobi.StageStandardize : Stage {
+public class GGobi.StageFreeze : Stage {
   public bool freeze = false;
   public Matrix cache;
   

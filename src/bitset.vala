@@ -1,7 +1,7 @@
 using GLib;
 
 /**
- * GGobiIndexFunc:
+ * IndexFunc:
  * @j: an index
  * @user_data: user data
  *

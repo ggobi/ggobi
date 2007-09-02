@@ -1,5 +1,5 @@
 %h{
-  #include "bitset.h" /* for GGobiIndexFunc */
+  #include "bitset.h" /* for IndexFunc */
 %}
 %{
   #include "utils.h" /* for index_compare */
@@ -222,7 +222,7 @@ class GGobi:Pipeline:Message from G:Object {
    *
    */
   public void
-  changed_cols_foreach(self, GGobiIndexFunc func, gpointer data)
+  changed_cols_foreach(self, IndexFunc func, gpointer data)
   {
     ggobi_bitset_apply(selfp->changed_cols, func, data);
   }
@@ -236,7 +236,7 @@ class GGobi:Pipeline:Message from G:Object {
    *
    */
   public void
-  removed_cols_foreach(self, GGobiIndexFunc func, gpointer data)
+  removed_cols_foreach(self, IndexFunc func, gpointer data)
   {
     ggobi_bitset_apply(selfp->removed_cols, func, data);
   }
@@ -250,7 +250,7 @@ class GGobi:Pipeline:Message from G:Object {
    *
    */
   public void
-  removed_cols_foreach_decreasing(self, GGobiIndexFunc func, gpointer data)
+  removed_cols_foreach_decreasing(self, IndexFunc func, gpointer data)
   {
     ggobi_bitset_apply_decreasing(selfp->removed_cols, func, data);
   }
@@ -264,7 +264,7 @@ class GGobi:Pipeline:Message from G:Object {
    *
    */
   public void
-  removed_rows_foreach(self, GGobiIndexFunc func, gpointer data)
+  removed_rows_foreach(self, IndexFunc func, gpointer data)
   {
     ggobi_bitset_apply(selfp->removed_rows, func, data);
   }
@@ -278,7 +278,7 @@ class GGobi:Pipeline:Message from G:Object {
    *
    */
   public void
-  removed_rows_foreach_decreasing(self, GGobiIndexFunc func, gpointer data)
+  removed_rows_foreach_decreasing(self, IndexFunc func, gpointer data)
   {
     ggobi_bitset_apply_decreasing(selfp->removed_rows, func, data);
   }
@@ -292,7 +292,7 @@ class GGobi:Pipeline:Message from G:Object {
    *
    */
   public void
-  added_rows_foreach(self, GGobiIndexFunc func, gpointer data)
+  added_rows_foreach(self, IndexFunc func, gpointer data)
   {
     for (guint j = selfp->n_rows; j < selfp->n_rows + selfp->n_added_rows; j++)
       func(j, data);
@@ -307,7 +307,7 @@ class GGobi:Pipeline:Message from G:Object {
    *
    */
   public void
-  added_cols_foreach(self, GGobiIndexFunc func, gpointer data)
+  added_cols_foreach(self, IndexFunc func, gpointer data)
   {
     for (guint j = selfp->n_cols; j < selfp->n_cols + selfp->n_added_cols; j++)
       func(j, data);
