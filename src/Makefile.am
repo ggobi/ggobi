@@ -1,27 +1,41 @@
 lib_LTLIBRARIES     = libggobi.la
+
 libggobi_la_GOBS = variable.gob stage.gob data.gob stage-transform.gob \
   stage-filter.gob pipeline-factory.gob \
   plugin-factory.gob plugin.gob data-factory-xml.gob \
   stage-subset.gob stage-group.gob transform.gob \
-  transform-min-one.gob transform-boxcox.gob transform-abs.gob transform-log10.gob \
-  gui-component.gob gui-transform.gob type-registry.gob pipeline-message.gob \
-  variable-group.gob renderer.gob renderer-cairo.gob renderer-factory.gob
-libggobi_la_VALAS = bitset.vala input-ftp.vala input-http.vala input-source.vala \
-  data-factory.vala data-factory-csv.vala input-source-file.vala \
-  input-source-ftp.vala input-source-factory.vala input-source-http.vala \
-  stage-jitter.vala stage-standardize.vala matrix.vala
-libggobi_la_METASOURCES = $(libggobi_la_GOBS:%.gob=ggobi-%.c) \
+  transform-min-one.gob transform-boxcox.gob transform-abs.gob \ 
+  transform-log10.gob gui-component.gob gui-transform.gob type-registry.gob \ 
+  pipeline-message.gob variable-group.gob renderer.gob renderer-cairo.gob \
+  renderer-factory.gob
+
+libggobi_la_VALAS = bitset.vala input-ftp.vala input-http.vala \ 
+  input-source.vala data-factory.vala data-factory-csv.vala \
+  input-source-file.vala input-source-ftp.vala input-source-factory.vala \
+  input-source-http.vala stage-jitter.vala stage-standardize.vala matrix.vala
+
+libggobi_la_METASOURCES = \ 
+  $(libggobi_la_GOBS:%.gob=ggobi-%.c) \
   $(libggobi_la_VALAS:%.vala=%.c)
-libggobi_la_METAHEADERS = $(libggobi_la_GOBS:%.gob=ggobi-%.h) \
+
+libggobi_la_METAHEADERS = \
+  $(libggobi_la_GOBS:%.gob=ggobi-%.h) \
   $(libggobi_la_VALAS:%.vala=%.h)
-libggobi_la_METAOBJECTS = $(libggobi_la_GOBS:%.gob=ggobi-%.lo) \
+
+libggobi_la_METAOBJECTS = \ 
+  $(libggobi_la_GOBS:%.gob=ggobi-%.lo) \
   $(libggobi_la_VALAS:%.vala=%.lo)
-libggobi_la_METASTAMPS = $(libggobi_la_GOBS:%.gob=.%.gob.stamp) .vala.stamp
+
+libggobi_la_METASTAMPS = \ 
+  $(libggobi_la_GOBS:%.gob=.%.gob.stamp) .vala.stamp
+
 libggobi_la_LDFLAGS  = @GTK_LIBS@ @LIBXML_LIBS@ @LIBGSF_LIBS@ @GSL_LIBS@ \
   @GLITZ_LIBS@ -version-info 2
+
 libggobi_la_BUILT = array.c ash1d.c barchart.c barchartClass.c \
-  barchart_ui.c brush.c brush_api.c brush_bins.c brush_init.c brush_link.c brush_link_ui.c \
-  brush_ui.c color.c color_ui.c cpanel.c display.c display_tree.c display_ui.c \
+  barchart_ui.c brush.c brush_api.c brush_bins.c brush_init.c brush_link.c \
+  brush_link_ui.c brush_ui.c color.c color_ui.c cpanel.c display.c \
+  display_tree.c display_ui.c \
   edges.c cluster.c cluster_ui.c extendedDisplay.c fileio.c ggobi-API.c \
   ggobi.c GGobiAppClass.c ggobiClass.c identify.c identify_ui.c \
   impute.c impute_ui.c fileio_ui.c jitter.c jitter_ui.c limits.c lineedit.c \
@@ -40,9 +54,13 @@ libggobi_la_BUILT = array.c ash1d.c barchart.c barchartClass.c \
   vartable_nbook.c vartable_ui.c vector.c win32_draw.c writedata_ui.c \
   write_csv.c write_xml.c wvis.c wvis_ui.c xlines.c xyplot.c \
   xyplot_ui.c $(libggobi_la_METASOURCES)
+
 libggobi_la_SOURCES = $(libggobi_la_BUILT) $(libggobi_la_METASTAMPS)
+
 libggobi_la_LIBADD = $(libggobi_la_METAOBJECTS) @LIBLTDL@
+
 libggobi_la_DEPENDENCIES = $(libggobi_la_METAOBJECTS)
+
 pkginclude_HEADERS = GGobiAPI.h ggobiClass.h tour1d_pp.h GGobiApp.h \
   noop-toggle.h tour2d_pp.h GGobiEvents.h parcoordsClass.h tour_pp.h \
   barchartDisplay.h plugin.h tsPlot.h brushing.h tsdisplay.h \
