@@ -14,7 +14,9 @@ public class GGobi.Stage : GLib.Object {
   
   public virtual double get_raw_value(uint i, uint j);
   public virtual void set_raw_value(uint i, uint j, double value);
+  public virtual bool is_missing(uint i, uint j);
   
+  public uint get_col_n_missing(uint j);
   
   public Variable get_variable(uint j);
   
@@ -53,8 +55,11 @@ public class GGobi.PipelineMessage : GLib.Object{
 public class GGobi.Variable: GLib.Object {
   public float get_range();
   public float get_min();
+  public float get_median();
   public float get_max();
   
+  public float get_mean();
+  public bool has_missings();
 
 }
 
