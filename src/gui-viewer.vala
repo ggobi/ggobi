@@ -1,20 +1,25 @@
 /* 
 Provide a very simple spreadsheet-like view of a stage, particularly useful
 for debugging the stages.
+
+Long term this should probably become a custom TreeModel decorating a stage, 
+but this will work for now.
 */
 using GLib;
 using Gtk;
 using GGobi;
 
 public class Viewer : Window {
-  public GGobi.Stage stage; // { 
-   //    get;
-   //    set { 
-   //      _stage = stage;
-   //      stage.col_data_changed += (j) => {load_column(j);};
-   //    }
-   //  };
+  private Stage _stage;
+  public GGobi.Stage stage { 
+    get;
+    set { 
+      _stage = value;
+      initialise_model();
+    }
+  }
   public TreeView table;
+  public ListStore model;
   
   construct {
     title = "Data viewer";
@@ -26,14 +31,24 @@ public class Viewer : Window {
   public Viewer.new_with_stage(GGobi.Stage stage) {}
 
   public void create_widgets () {
+    initialise_model();
+ 
+    table = new TreeView.with_model(model);
+    
+    table.set_headers_visible(true);
+    table.set_headers_clickable(true);
+    add(table);
   }
 
   public void load_data() {
- 
-  }
-  
-  public void load_column(uint j) {
-    
+    TreeIter iter;
+
+    for(uint i = 0; i < stage.n_rows; i++) {
+      model.append(out iter);
+      for(uint j = 0; j < stage.n_cols; j++) {
+        model.set(out iter, j + 1, stage.get_string_value(i, j));
+      }
+    }
   }
   
   public void initialise_model() {
@@ -47,19 +62,19 @@ public class Viewer : Window {
 
     for(uint j = 0; j < stage.n_cols; j++) {
       Variable v = stage.get_variable(j);
-      switch (v.vartype) {
-        case VariableType.INTEGER: col_types[j+1] = typeof(int); break;
-        case VariableType.CATEGORICAL: col_types[j+1] = typeof(string); break;
-        default: col_types[j+1] = typeof(double); break;
-      }
-      col_labels[j+1] = v.name;
+      // switch (v.vartype) {
+      //   case VariableType.INTEGER: col_types[j+1] = typeof(int); break;
+      //   case VariableType.CATEGORICAL: col_types[j+1] = typeof(string); break;
+      //   default: col_types[j+1] = typeof(double); break;
+      // }
+      col_types[j+ 1] = typeof(string);
+      col_labels[j + 1] = v.name;
     }
     
-    ListStore model = new ListStore((int) ncols, col_types);
+    model = new ListStore((int) ncols, col_types);
     // TreeModel sorted = new TreeModel.with_model(model);
-    TreeView view = new TreeView.with_model(model);
+
+    load_data();
     
-    view.set_headers_visible(true);
-    view.set_headers_clickable(true);
   }
 }

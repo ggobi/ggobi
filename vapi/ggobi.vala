@@ -12,6 +12,7 @@ public class GGobi.Stage : GLib.Object {
   public virtual void set_row_id(uint i, string id);
   public void set_string_value(uint i, uint j, string val);
   
+  public string get_string_value(uint i, uint j);
   public virtual double get_raw_value(uint i, uint j);
   public virtual void set_raw_value(uint i, uint j, double value);
   public virtual bool is_missing(uint i, uint j);
