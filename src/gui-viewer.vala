@@ -7,23 +7,22 @@ but this will work for now.
 */
 using GLib;
 using Gtk;
-using GGobi;
 
-public class Viewer : Window {
+public class GGobi.GuiViewer : Window {
   private Stage _stage;
-  public GGobi.Stage stage { 
-    get;
-    set { 
-      _stage = value;
-      initialise_model();
-    }
-  }
+  public Stage stage; // { 
+  //     get;
+  //     set { 
+  //       _stage = value;
+  //       initialise_model();
+  //     }
+  //   }
   public TreeView table;
   public ListStore model;
   
   construct {
     title = "Data viewer";
-    set_default_size(400, 600);
+    set_default_size(200, 300);
     
     create_widgets ();
   }
@@ -37,6 +36,7 @@ public class Viewer : Window {
     
     table.set_headers_visible(true);
     table.set_headers_clickable(true);
+    table.show();
     add(table);
   }
 
@@ -46,12 +46,14 @@ public class Viewer : Window {
     for(uint i = 0; i < stage.n_rows; i++) {
       model.append(out iter);
       for(uint j = 0; j < stage.n_cols; j++) {
-        model.set(out iter, j + 1, stage.get_string_value(i, j));
+        model.set(out iter, j + 1, stage.get_raw_value(i, j));
       }
     }
   }
   
   public void initialise_model() {
+    if (stage == null) return;
+    
     uint ncols = stage.n_cols + 1;
     
     GLib.Type[] col_types = new GLib.Type[ncols];
@@ -61,17 +63,17 @@ public class Viewer : Window {
     col_labels[0] = "Row Label";
 
     for(uint j = 0; j < stage.n_cols; j++) {
-      Variable v = stage.get_variable(j);
+      // Variable v = stage.get_variable(j);
       // switch (v.vartype) {
       //   case VariableType.INTEGER: col_types[j+1] = typeof(int); break;
       //   case VariableType.CATEGORICAL: col_types[j+1] = typeof(string); break;
       //   default: col_types[j+1] = typeof(double); break;
       // }
-      col_types[j+ 1] = typeof(string);
-      col_labels[j + 1] = v.name;
+      col_types[j + 1]  = typeof(double);
+      col_labels[j + 1] = "Test"; //v.name;
     }
     
-    model = new ListStore((int) ncols, col_types);
+    model = new ListStore.newv((int) ncols, col_types);
     // TreeModel sorted = new TreeModel.with_model(model);
 
     load_data();

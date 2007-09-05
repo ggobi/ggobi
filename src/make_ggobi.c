@@ -26,6 +26,7 @@
 #include "externs.h"
 #include "plugin.h"
 
+#include "gui-viewer.h"
 #include "ggobi-stage-subset.h"
 #include "ggobi-stage-transform.h"
 #include "input-source-factory.h"
@@ -41,8 +42,10 @@ pipeline_create_cb(GGobiPipelineFactory *factory, GGobiStage *root, GGobiSession
 {
   GObject *subset, *filter, *domain_adj, *transform;
   
+  
   subset = g_object_new(GGOBI_TYPE_STAGE_SUBSET, 
     "name", GGOBI_MAIN_STAGE_SUBSET, "parent", root, NULL);
+
   
   /* Note: there is no way to control the order of property settings with
      g_object_new, so we have to set the filter col here so that it
@@ -73,6 +76,12 @@ pipeline_create_cb(GGobiPipelineFactory *factory, GGobiStage *root, GGobiSession
   g_object_unref(filter);
   g_object_unref(domain_adj);
   g_object_unref(transform);
+  
+  GGobiGuiViewer *viewer; 
+  viewer = g_object_new(GGOBI_TYPE_GUI_VIEWER, NULL);
+  viewer->stage = GGOBI_STAGE(subset);
+  ggobi_gui_viewer_initialise_model(viewer);
+  gtk_widget_show(GTK_WIDGET(viewer));
 }
 
 GGobiPipelineFactory *
