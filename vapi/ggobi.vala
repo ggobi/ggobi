@@ -11,6 +11,7 @@ public class GGobi.Stage : GLib.Object {
   public virtual void set_col_name(uint j, string name);
   public virtual void set_row_id(uint i, string id);
   public void set_string_value(uint i, uint j, string val);
+  public virtual string get_row_id(uint i);
   
   public string get_string_value(uint i, uint j);
   public virtual double get_raw_value(uint i, uint j);

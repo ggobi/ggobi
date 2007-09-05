@@ -31,13 +31,14 @@ public class GGobi.GuiViewer : Window {
 
   public void create_widgets () {
     initialise_model();
- 
-    table = new TreeView.with_model(model);
     
-    table.set_headers_visible(true);
-    table.set_headers_clickable(true);
-    table.show();
-    add(table);
+    
+    ScrolledWindow scroll = new ScrolledWindow(null, null);
+    scroll.add(table);
+    scroll.show_all();
+    
+    add(scroll);
+    show_all();
   }
 
   public void load_data() {
@@ -45,6 +46,7 @@ public class GGobi.GuiViewer : Window {
 
     for(uint i = 0; i < stage.n_rows; i++) {
       model.append(out iter);
+      model.set(out iter, 0, stage.get_row_id(i));
       for(uint j = 0; j < stage.n_cols; j++) {
         model.set(out iter, j + 1, stage.get_raw_value(i, j));
       }
@@ -63,20 +65,36 @@ public class GGobi.GuiViewer : Window {
     col_labels[0] = "Row Label";
 
     for(uint j = 0; j < stage.n_cols; j++) {
-      // Variable v = stage.get_variable(j);
+      Variable v = stage.get_variable(j);
       // switch (v.vartype) {
       //   case VariableType.INTEGER: col_types[j+1] = typeof(int); break;
       //   case VariableType.CATEGORICAL: col_types[j+1] = typeof(string); break;
       //   default: col_types[j+1] = typeof(double); break;
       // }
       col_types[j + 1]  = typeof(double);
-      col_labels[j + 1] = "Test"; //v.name;
+      col_labels[j + 1] = v.name;
     }
     
     model = new ListStore.newv((int) ncols, col_types);
     // TreeModel sorted = new TreeModel.with_model(model);
 
     load_data();
+    
+    table = new TreeView.with_model(model);
+    
+    for(uint j = 0; j < ncols; j++) {
+      CellRenderer renderer = new CellRendererText();
+
+      TreeViewColumn col = new TreeViewColumn();
+      col.title = col_labels[j];
+      col.pack_start(renderer, true);
+      col.add_attribute(renderer, "text", (int) j);
+      col.resizable = true;
+
+      table.append_column(col);
+    }
+    table.headers_visible = true;
+    table.headers_clickable = true;
     
   }
 }
