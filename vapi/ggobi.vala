@@ -46,13 +46,14 @@ public class GGobi.PipelineMessage : GLib.Object{
   public uint get_n_added_cols();
   public uint get_n_changed_cols();
   public uint get_n_removed_cols();
-  
-
 }
 
 
 [CCode (cheader_filename = "ggobi-variable.h")]
 public class GGobi.Variable: GLib.Object {
+  public VariableType vartype {get; set;}
+  public string name;
+  
   public float get_range();
   public float get_min();
   public float get_median();
@@ -68,6 +69,11 @@ namespace GGobi {
   [CCode (cprefix = "", lower_case_cprefix = "", cheader_filename = "ggobi.h")]
   public struct Utils {
     public static double random_normal();
+  }
+
+  [CCode (cheader_filename = "ggobi-variable.h", cprefix = "GGOBI_VARIABLE_" )]  
+  public enum VariableType {
+    REAL, CATEGORICAL, INTEGER, COUNTER, UNIFORM, ALL_VARTYPES
   }
 }
 
@@ -91,7 +97,5 @@ public class GGobi.Matrix {
   [CCode (cname = "delete_rows")]
   public void remove_rows (SList cols);
   public void init_null ();
-  public void zero ();
-  
-  
+  public void zero (); 
 }
