@@ -70,3 +70,28 @@ namespace GGobi {
     public static double random_normal();
   }
 }
+
+[CCode (cprefix = "arrayd_", cheader_filename = "ggobi.h", cname="array_d")]
+public class GGobi.Matrix {
+  public pointer[] vals;
+  [CCode (cname = "nrows")]
+  public uint n_rows;
+  [CCode (cname = "ncols")]
+  public uint n_cols;
+  
+  public void alloc (int nr, int nc);
+  public void free (int nr, int nc);
+
+  public void add_cols (int nc);
+  public void add_rows (int nr );
+  public void copy (GGobi.Matrix arrp_to);
+
+  [CCode (cname = "delete_cols")]
+  public void remove_cols (SList cols);
+  [CCode (cname = "delete_rows")]
+  public void remove_rows (SList cols);
+  public void init_null ();
+  public void zero ();
+  
+  
+}

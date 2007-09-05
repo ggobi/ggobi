@@ -33,7 +33,7 @@ class GGobi:GuiJitter : Widget {
     dist.append_text("Uniform");
     dist.append_text("Normal");
     dist.set_tool_tips("The jittering is either distributed uniformly or normally");
-    dist.changed += cmb { stage.uniformDist = (cmb.get_active() == 1) }
+    dist.changed += () => { stage.uniformDist = (dist.get_active() == 1) }
     
     amount = new GtkHScale.new(0, 1, 0.01);
     amount.value_changed += rng { update_amounts(rng.get_value()) }

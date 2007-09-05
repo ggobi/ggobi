@@ -31,7 +31,7 @@ public class GGobi.StageJitter : Stage {
   public void refresh_col(uint j) {
     float range = get_variable(j).get_range();
     for (uint i = 0; i < n_rows; i++) 
-      cache.vals[i, j] = rand() * range;
+      ((double[]) cache.vals[i])[j] = rand() * range;
     
     col_data_changed(j);
     flush_changes_here();
@@ -51,7 +51,7 @@ public class GGobi.StageJitter : Stage {
     double original = parent.get_raw_value(i, j);
     if (amount[j] == 0) return original;
     
-    return original * (1 - amount[j]) + cache.vals[i, j] * amount[j];
+    return original * (1 - amount[j]) + ((double[]) cache.vals[i])[j] * amount[j];
   }
 
   /* When setting the value of a jittered observation, subtract off the
@@ -63,7 +63,7 @@ public class GGobi.StageJitter : Stage {
     }
 
     double original;
-    original = (value - cache.vals[i, j] * amount[j]) / (1 - amount[j]);
+    original = (value - ((double[]) cache.vals[i])[j] * amount[j]) / (1 - amount[j]);
     parent.set_raw_value(i, j, original);
   }  
   
@@ -73,7 +73,7 @@ public class GGobi.StageJitter : Stage {
 
     // Set up and reinitialise cache matrix    
     uint n_added_cols = msg.get_n_added_cols();
-    uint current_cols = cache.ncols;
+    uint current_cols = cache.n_cols;
     cache.add_cols((int) n_added_cols);
 
     cache.add_rows((int) msg.get_n_added_rows());

@@ -42,11 +42,11 @@ public class GGobi.StageImpute : Stage {
   }
 
   public override double get_raw_value(uint i, uint j) {
-    return cache.vals[i,j];
+    return ((double[]) cache.vals[i])[j];
   }
 
   public override void set_raw_value(uint i, uint j, double value) {
-    cache.vals[i, j] = value;
+    ((double[]) cache.vals[i])[j] = value;
     if (!is_missing(i, j)) parent.set_raw_value(i, j, value);
   }
 }
@@ -61,7 +61,7 @@ public class GGobi.Imputation : Object {
     pre_compute(stage, j);
     
     for(uint i = 0; i < stage.n_rows; i++) {
-      stage.cache.vals[i,j] = (stage.is_missing(i, j) ? stage.get_raw_value(i, j) : impute_single(i));
+      ((double[]) stage.cache.vals[i])[j] = (stage.is_missing(i, j) ? stage.get_raw_value(i, j) : impute_single(i));
     }
     return true;
   }

@@ -50,8 +50,7 @@ class GGobi.StageGroup : Stage {
     return is_missing(i, j);  
   }
 
-  override void set_raw_value(uint i, uint j, double value)
-  {
+  override void set_raw_value(uint i, uint j, double value) {
     if (j >= parent->n_cols)
       set_levels_for_group(i, j - parent->n_cols, value);
     else parent.set_raw_value(i, j, value)
@@ -65,8 +64,7 @@ class GGobi.StageGroup : Stage {
     return get_raw_value(i, j);
   }
 
-  private void set_levels_for_group(uint i, uint j, double value)
-  {
+  private void set_levels_for_group(uint i, uint j, double value) {
     List factors;
     find_groups();
 
