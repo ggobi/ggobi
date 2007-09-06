@@ -31,28 +31,18 @@ public class GGobi.GuiViewer : Window {
 
   public void create_widgets () {
     initialise_model();
-    
-    
+    load_data();
+
     ScrolledWindow scroll = new ScrolledWindow(null, null);
     scroll.add(table);
+    scroll.set_policy(PolicyType.AUTOMATIC, PolicyType.AUTOMATIC);
     scroll.show_all();
     
     add(scroll);
     show_all();
   }
 
-  public void load_data() {
-    TreeIter iter;
 
-    for(uint i = 0; i < stage.n_rows; i++) {
-      model.append(out iter);
-      model.set(out iter, 0, stage.get_row_id(i));
-      for(uint j = 0; j < stage.n_cols; j++) {
-        model.set(out iter, j + 1, stage.get_raw_value(i, j));
-      }
-    }
-  }
-  
   public void initialise_model() {
     if (stage == null) return;
     
@@ -78,8 +68,6 @@ public class GGobi.GuiViewer : Window {
     model = new ListStore.newv((int) ncols, col_types);
     // TreeModel sorted = new TreeModel.with_model(model);
 
-    load_data();
-    
     table = new TreeView.with_model(model);
     
     for(uint j = 0; j < ncols; j++) {
@@ -94,7 +82,19 @@ public class GGobi.GuiViewer : Window {
       table.append_column(col);
     }
     table.headers_visible = true;
-    table.headers_clickable = true;
-    
+    table.headers_clickable = true;   
   }
+
+  public void load_data() {
+    for(uint i = 0; i < stage.n_rows; i++) {
+      TreeIter iter;
+      
+      model.append(out iter);
+      model.set(out iter, 0, stage.get_row_id(i));
+      for(uint j = 0; j < stage.n_cols; j++) {
+        model.set(out iter, j + 1, stage.get_string_value(i, j));
+      }
+    }
+  }
+
 }
