@@ -464,7 +464,7 @@ col_name_changed(self, const gchar *old_name, guint j)
    queued messages are assumed to be in the index space of the current stage.
 */
 
-private signal NONE (OBJECT) void
+public signal NONE (OBJECT) void
 changed(self, GGobiPipelineMessage *msg);
 
 /* the messaging system */

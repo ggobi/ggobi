@@ -13,18 +13,19 @@ public class GGobi.GuiViewer : Window {
   public TreeView table;
   public ListStore model;
   
+  public Viewer(construct Stage stage) {}
   construct {
     title = "Data viewer";
-    set_default_size(200, 300);
+    set_default_size(300, 500);
     
     create_widgets ();
   }
-
-  public Viewer(construct Stage stage) {}
-
+  
   public void create_widgets () {
     initialise();
     load_data();
+    
+    // stage.changed += (stage, msg) => {process_incoming(msg);};
 
     ScrolledWindow scroll = new ScrolledWindow(null, null);
     scroll.add(table);
@@ -35,7 +36,7 @@ public class GGobi.GuiViewer : Window {
     show_all();
   }
 
-
+  /* Initialise the model and table with columns loaded from the stage */
   public void initialise() {
     uint ncols = stage.n_cols + 1;
     
@@ -57,7 +58,6 @@ public class GGobi.GuiViewer : Window {
     }
     
     model = new ListStore.newv((int) ncols, col_types);
-    // TreeModel sorted = new TreeModel.with_model(model);
 
     table = new TreeView.with_model(model);
     
@@ -76,6 +76,7 @@ public class GGobi.GuiViewer : Window {
     table.rules_hint = true;
   }
 
+  /* Load all data from the stage, appending to current table */
   public void load_data() {
     for(uint i = 0; i < stage.n_rows; i++) {
       TreeIter iter;
@@ -85,6 +86,35 @@ public class GGobi.GuiViewer : Window {
       for(uint j = 0; j < stage.n_cols; j++) {
         model.set(out iter, j + 1, stage.get_string_value(i, j));
       }
+    }
+  }
+  
+  public void process_incoming(PipelineMessage msg) {
+    GLib.debug("Incoming message");
+    
+    /* If any rows or columns added or removed, 
+       rebuild the table from scratch */
+    if (msg.get_n_removed_rows() > 0 || msg.get_n_removed_cols() > 0 ||
+        msg.get_n_added_rows() > 0   || msg.get_n_added_cols() > 0 ) {
+      GLib.debug("Rebuilding table");
+      initialise();
+      load_data();
+      return;
+    }
+    
+    // Update changed columns
+    foreach(uint col in msg.get_changed_cols()) {
+      GLib.debug("Updating column %i", col);
+      update_col(col);
+    }
+  }
+  
+  public void update_col(uint j) {
+    TreeIter iter;
+    model.get_iter_first(out iter);
+    for(uint i = 0; i < stage.n_rows; i++) {
+      model.set(out iter, j + 1, stage.get_string_value(i, j));
+      model.iter_next(out iter);
     }
   }
 
