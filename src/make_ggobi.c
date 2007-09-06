@@ -78,9 +78,7 @@ pipeline_create_cb(GGobiPipelineFactory *factory, GGobiStage *root, GGobiSession
   g_object_unref(transform);
   
   GGobiGuiViewer *viewer; 
-  viewer = g_object_new(GGOBI_TYPE_GUI_VIEWER, NULL);
-  viewer->stage = GGOBI_STAGE(subset);
-  ggobi_gui_viewer_initialise_model(viewer);
+  viewer = g_object_new(GGOBI_TYPE_GUI_VIEWER, "stage", GGOBI_STAGE(subset), NULL);
   gtk_widget_show(GTK_WIDGET(viewer));
 }
 

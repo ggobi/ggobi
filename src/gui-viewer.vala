@@ -9,14 +9,7 @@ using GLib;
 using Gtk;
 
 public class GGobi.GuiViewer : Window {
-  private Stage _stage;
-  public Stage stage; // { 
-  //     get;
-  //     set { 
-  //       _stage = value;
-  //       initialise_model();
-  //     }
-  //   }
+  public Stage stage { construct; get; }
   public TreeView table;
   public ListStore model;
   
@@ -27,10 +20,10 @@ public class GGobi.GuiViewer : Window {
     create_widgets ();
   }
 
-  public Viewer.new_with_stage(GGobi.Stage stage) {}
+  public Viewer(construct Stage stage) {}
 
   public void create_widgets () {
-    initialise_model();
+    initialise();
     load_data();
 
     ScrolledWindow scroll = new ScrolledWindow(null, null);
@@ -43,9 +36,7 @@ public class GGobi.GuiViewer : Window {
   }
 
 
-  public void initialise_model() {
-    if (stage == null) return;
-    
+  public void initialise() {
     uint ncols = stage.n_cols + 1;
     
     GLib.Type[] col_types = new GLib.Type[ncols];
@@ -61,7 +52,7 @@ public class GGobi.GuiViewer : Window {
       //   case VariableType.CATEGORICAL: col_types[j+1] = typeof(string); break;
       //   default: col_types[j+1] = typeof(double); break;
       // }
-      col_types[j + 1]  = typeof(double);
+      col_types[j + 1]  = typeof(string);
       col_labels[j + 1] = v.name;
     }
     
@@ -82,7 +73,7 @@ public class GGobi.GuiViewer : Window {
       table.append_column(col);
     }
     table.headers_visible = true;
-    table.headers_clickable = true;   
+    table.rules_hint = true;
   }
 
   public void load_data() {
