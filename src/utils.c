@@ -390,36 +390,7 @@ print_attachments (GGobiSession * gg)
   }
 }
 
-/* ---------------------------------------------------------------------*/
-/*     Used in deleting: figure out which elements to keep              */
-/* ---------------------------------------------------------------------*/
 
-guint *
-find_keepers (gint ncols_current, GSList *cols, guint * nkeepers)
-{
-  gint j;
-  guint nc = g_slist_length(cols);
-  guint *keepers = g_new(guint, ncols_current - nc);
-
-  j = *nkeepers = 0;
-  for (j = 0; j < ncols_current; j++) {
-    if (cols) {
-      if (GPOINTER_TO_INT(cols->data) != j) {
-        keepers[(*nkeepers)++] = j;
-      }
-      else {
-        cols = cols->next;
-      }
-    }
-    else {
-      keepers[(*nkeepers)++] = j;
-    }
-  }
-
-  g_return_val_if_fail(*nkeepers == ncols_current - nc, NULL);
-
-  return keepers;
-}
 
 static gint
 GGobiSleepTimer (gpointer data)

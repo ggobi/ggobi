@@ -22,6 +22,7 @@
 #include "defines.h"
 #endif
 
+#include "array.h"
 #include "barchartDisplay.h"
 
 #ifdef __cplusplus
@@ -74,48 +75,7 @@ xmlNodePtr XML_addVariable(xmlNodePtr node, gint j, GGobiStage *d);
 void       addvar_propagate (gint ncols_prev, gint ncols_added, GGobiStage *);
 gint       alloc_optimize0_p (optimize0_param *op, gint nrows, gint ncols, gint ndim);
 gint       alloc_pp (pp_param *pp, gint nrows, gint ncols, gint ndim);
-void       arrayd_add_cols (array_d *, gint);
-void       arrayd_add_rows (array_d *, gint);
-void       arrayd_alloc (array_d *, gint, gint);
-void       arrayd_alloc_zero (array_d *, gint, gint);
-void       arrayd_copy (array_d *, array_d *);
-void       arrayd_delete_cols (array_d *, GSList *);
-void       arrayd_free (array_d *, gint, gint);
-void       arrayd_init_null (array_d *);
-void       arrayd_zero (array_d *);
-void       arrayf_add_cols (array_f *, gint);
-void       arrayf_add_rows (array_f *, gint);
-void       arrayf_alloc (array_f *, gint, gint);
-void       arrayf_alloc_zero (array_f *, gint, gint);
-void       arrayf_copy (array_f *, array_f *);
-void       arrayf_delete_cols (array_f *, GSList *);
-void       arrayf_free (array_f *, gint, gint);
-void       arrayf_init_null (array_f *);
-void       arrayf_zero (array_f *);
-void       arrayg_add_cols (array_g *, gint);
-void       arrayg_add_rows (array_g *, gint);
-void       arrayg_alloc (array_g *, gint, gint);
-void       arrayg_alloc_zero (array_g *, gint, gint);
-void       arrayg_delete_cols (array_g *, GSList *);
-void       arrayg_free (array_g *, gint, gint);
-void       arrayg_init_null (array_g *);
-void       arrayg_zero (array_g *);
-void       arrayl_add_cols (array_l *, gint);
-void       arrayl_add_rows (array_l *, gint);
-void       arrayl_alloc (array_l *, gint, gint);
-void       arrayl_alloc_zero (array_l *, gint, gint);
-void       arrayl_delete_cols (array_l *, GSList *);
-void       arrayl_free (array_l *, gint, gint);
-void       arrayl_init_null (array_l *);
-void       arrayl_zero (array_l *);
-void       arrays_add_cols (array_s *, gint);
-void       arrays_add_rows (array_s *, gint);
-void       arrays_alloc (array_s *, gint, gint);
-void       arrays_alloc_zero (array_s *, gint, gint);
-void       arrays_delete_cols (array_s *, GSList *);
-void       arrays_free (array_s *, gint, gint);
-void       arrays_init_null (array_s *);
-void       arrays_zero (array_s *);
+
 void       ash_baseline_set (icoords *, splotd *sp);
 void       assign_points_to_bins (GGobiStage *, splotd *, GGobiSession *);
 gboolean   br_edge_vectors_check_size (gint, GGobiStage *);
@@ -257,7 +217,6 @@ void       eigenvals_get (gfloat *, GGobiStage *);
 gint       fcompare (const void *x1, const void *x2);
 void       filename_get_r (GGobiSession *);
 void       filename_get_w (GtkWidget *, GGobiSession *);
-guint      *find_keepers (gint ncols_current, GSList *cols, guint *nkeepers);
 gint       find_nearest_edge (splotd *sp, displayd *display, GGobiSession *gg);
 gint       find_nearest_point (icoords *, splotd *, GGobiStage *, GGobiSession *);
 gint       free_optimize0_p (optimize0_param *op);

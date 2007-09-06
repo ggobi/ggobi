@@ -80,7 +80,7 @@ namespace GGobi {
   }
 }
 
-[CCode (cprefix = "arrayd_", cheader_filename = "ggobi.h", cname="array_d")]
+[CCode (cprefix = "arrayd_", cheader_filename = "array.h", cname="array_d")]
 public class GGobi.Matrix {
   public pointer[] vals;
   [CCode (cname = "nrows")]

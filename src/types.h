@@ -18,6 +18,7 @@
 #define TYPES_H
 
 #include <gtk/gtk.h>
+#include "array.h"
 
 typedef struct {
   GtkWidget *w;
@@ -30,8 +31,6 @@ typedef struct {
  * to longs.  Defining 'greal' allows us to compare the behavior
  * of floats and doubles for speed and storage.
 */
-typedef gfloat greal;
-
 typedef enum {Sprocess_data, xml_data, mysql_data, url_data, csv_data, unknown_data, num_data_modes} DataMode;
 
 typedef enum {NONE, EXPOSE, QUICK, BINNED, FULL, FULL_1PIXMAP} RedrawStyle;
@@ -97,32 +96,6 @@ typedef struct {
 } DatadEndpoints;
 
 
-/*-- arrays --*/
-/*-- double: some plugins will want these --*/
-typedef struct {
-  gdouble **vals;
-  guint nrows, ncols;
-} array_d;
-/*-- floating point: for gg.raw_data, tform1, tform2 --*/
-typedef struct {
-  gfloat **vals;
-  guint nrows, ncols;
-} array_f;
-/*-- short: for gg.missing --*/
-typedef struct {
-  gshort **vals;
-  guint nrows, ncols;
-} array_s;
-/*-- long: for world, jitdata --*/
-typedef struct {
-  glong **vals;
-  guint nrows, ncols;
-} array_l;
-/*-- real: for the new world, jitdata --*/
-typedef struct {
-  greal **vals;
-  guint nrows, ncols;
-} array_g;
 
 /*-- vectors --*/
 typedef struct {

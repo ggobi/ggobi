@@ -11,6 +11,7 @@
 
 #include "defines.h"
 #include "types.h"
+#include "array.h"
 #include "ggobi-data.h"
 #include "session.h"
 #include "display.h"
