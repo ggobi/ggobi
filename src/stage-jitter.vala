@@ -36,7 +36,7 @@ public class GGobi.StageJitter : Stage {
     col_data_changed(j);
     flush_changes_here();
   }
-  
+   
   /* Generate random number from specified distribution */
   double rand() {
     if (uniformDist) {
@@ -57,18 +57,21 @@ public class GGobi.StageJitter : Stage {
   /* When setting the value of a jittered observation, subtract off the
   jittering first */
   override void set_raw_value(uint i, uint j, double value) {
-    if (amount[j] == 0) {
-      parent.set_raw_value(i, j, value);
-      return;
-    }
-
     double original;
-    original = (value - ((double[]) cache.vals[i])[j] * amount[j]) / (1 - amount[j]);
+    if (amount[j] == 0) {
+      original = value;
+    } else {
+      original = (value - ((double[]) cache.vals[i])[j] * amount[j]) / (1 - amount[j]);
+    }
     parent.set_raw_value(i, j, original);
   }  
   
   /* Process incoming change events */
   override void process_incoming(PipelineMessage msg) {
+    // Pipeline instantiation
+    if (cache == null) {
+      cache = new Matrix(msg.get_n_added_rows(), msg.get_n_added_cols());
+    }
     // Deal with jittering amounts
 
     // Set up and reinitialise cache matrix    

@@ -84,10 +84,13 @@ namespace GGobi {
 public class GGobi.Matrix {
   public pointer[] vals;
   [CCode (cname = "nrows")]
-  public uint n_rows;
+  public uint n_rows {get; construct;}
   [CCode (cname = "ncols")]
-  public uint n_cols;
+  public uint n_cols {get; construct;}
   
+  public Matrix(construct uint n_rows, construct uint n_cols);
+  
+  [CCode (cname = "new")]  
   public void alloc (int nr, int nc);
   public void free (int nr, int nc);
 

@@ -6,3 +6,5 @@
 // provided by pkg-config.
 #include "bitset.h"
 #include "input-source.h"
+#include "vars.h"
+#include "externs.h"
