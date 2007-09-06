@@ -90,7 +90,6 @@ public class GGobi.Matrix {
   
   public Matrix(construct uint n_rows, construct uint n_cols);
   
-  [CCode (cname = "new")]  
   public void alloc (int nr, int nc);
   public void free (int nr, int nc);
 
@@ -98,9 +97,9 @@ public class GGobi.Matrix {
   public void add_rows (int nr );
   public void copy (GGobi.Matrix arrp_to);
 
-  [CCode (cname = "delete_cols")]
+  [CCode (cname = "arrayd_delete_cols")]
   public void remove_cols (SList cols);
-  [CCode (cname = "delete_rows")]
+  [CCode (cname = "arrayd_delete_rows")]
   public void remove_rows (SList cols);
   public void init_null ();
   public void zero (); 

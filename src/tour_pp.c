@@ -558,9 +558,9 @@ gint free_pp (pp_param *pp)
   vectori_free(&pp->group);
   vectori_free(&pp->ngroup);
 
-  arrayd_free(&pp->cov, 0, 0);
-  arrayd_free(&pp->tcov, 0, 0);
-  arrayd_free(&pp->mean, 0, 0);
+  arrayd_free (&pp->cov); 
+  arrayd_free (&pp->tcov); 
+  arrayd_free (&pp->mean); 
   vectord_free(&pp->ovmean);
 
   vectori_free(&pp->index);

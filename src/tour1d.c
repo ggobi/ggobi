@@ -152,19 +152,19 @@ free_tour1d(displayd *dsp)
   vectorf_free(&dsp->t1d.tau);
   vectorf_free(&dsp->t1d.tinc);
 
-  arrayd_free(&dsp->t1d.Fa, 0, 0);
-  arrayd_free(&dsp->t1d.Fz, 0, 0);
-  arrayd_free(&dsp->t1d.F, 0, 0);
+  arrayd_free (&dsp->t1d.Fa); 
+  arrayd_free (&dsp->t1d.Fz); 
+  arrayd_free (&dsp->t1d.F); 
 
-  arrayd_free(&dsp->t1d.Ga, 0, 0);
-  arrayd_free(&dsp->t1d.Gz, 0, 0);
-  arrayd_free(&dsp->t1d.F, 0, 0);
+  arrayd_free (&dsp->t1d.Ga); 
+  arrayd_free (&dsp->t1d.Gz); 
+  arrayd_free (&dsp->t1d.F); 
 
-  arrayd_free(&dsp->t1d.Va, 0, 0);
-  arrayd_free(&dsp->t1d.Vz, 0, 0);
-  arrayd_free(&dsp->t1d.tv, 0, 0);
+  arrayd_free (&dsp->t1d.Va); 
+  arrayd_free (&dsp->t1d.Vz); 
+  arrayd_free (&dsp->t1d.tv); 
 
-  arrayd_free(&dsp->t1d_manbasis, 0, 0);
+  arrayd_free (&dsp->t1d_manbasis); 
 }
 
 void tour1d_snap(GGobiSession *gg)

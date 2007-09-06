@@ -141,22 +141,22 @@ free_tour2d3(displayd *dsp)
   vectorf_free(&dsp->t2d3.tau);
   vectorf_free(&dsp->t2d3.tinc);
 
-  arrayd_free(&dsp->t2d3.Fa, 0, 0);
-  arrayd_free(&dsp->t2d3.Fz, 0, 0);
-  arrayd_free(&dsp->t2d3.F, 0, 0);
+  arrayd_free (&dsp->t2d3.Fa); 
+  arrayd_free (&dsp->t2d3.Fz); 
+  arrayd_free (&dsp->t2d3.F); 
 
-  arrayd_free(&dsp->t2d3.Ga, 0, 0);
-  arrayd_free(&dsp->t2d3.Gz, 0, 0);
-  arrayd_free(&dsp->t2d3.G, 0, 0);
+  arrayd_free (&dsp->t2d3.Ga); 
+  arrayd_free (&dsp->t2d3.Gz); 
+  arrayd_free (&dsp->t2d3.G); 
 
-  arrayd_free(&dsp->t2d3.Va, 0, 0);
-  arrayd_free(&dsp->t2d3.Vz, 0, 0);
-  arrayd_free(&dsp->t2d3.tv, 0, 0);
+  arrayd_free (&dsp->t2d3.Va); 
+  arrayd_free (&dsp->t2d3.Vz); 
+  arrayd_free (&dsp->t2d3.tv); 
 
-  arrayd_free(&dsp->t2d3_Rmat1, 0, 0);
-  arrayd_free(&dsp->t2d3_Rmat2, 0, 0);
-  arrayd_free(&dsp->t2d3_mvar_3dbasis, 0, 0);
-  arrayd_free(&dsp->t2d3_manbasis, 0, 0);
+  arrayd_free (&dsp->t2d3_Rmat1); 
+  arrayd_free (&dsp->t2d3_Rmat2); 
+  arrayd_free (&dsp->t2d3_mvar_3dbasis); 
+  arrayd_free (&dsp->t2d3_manbasis); 
 }
 
 void 

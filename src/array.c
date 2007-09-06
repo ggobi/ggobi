@@ -30,8 +30,10 @@ arrayd_init_null (array_d * arrp)
 }
 
 void
-arrayd_free (array_d * arrp, gint nr, gint nc)
+arrayd_free (array_d * arrp)
 {
+  gint nr = 0;
+  gint nc = 0;
   gint i;
 
   /*-- if nr != 0, free only the last nrows-nr rows --*/
@@ -64,6 +66,12 @@ arrayd_zero (array_d * arrp)
   }
 }
 
+array_d *arrayd_new(gint nr, gint nc) {
+  array_d *arrp = NULL;
+  arrayd_alloc(arrp, nr, nc);
+  return arrp;
+}
+
 /* allocate an array of doubles */
 void
 arrayd_alloc (array_d * arrp, gint nr, gint nc)
@@ -71,7 +79,7 @@ arrayd_alloc (array_d * arrp, gint nr, gint nc)
   gint i;
 
   if ((arrp->nrows != 0) || (arrp->ncols != 0))
-    arrayd_free (arrp, 0, 0);
+    arrayd_free (arrp); 
 
   arrp->vals = (gdouble **) g_malloc (nr * sizeof (gdouble *));
   for (i = 0; i < nr; i++)
@@ -87,7 +95,7 @@ arrayd_alloc_zero (array_d * arrp, gint nr, gint nc)
   gint i;
 
   if ((arrp->nrows != 0) || (arrp->ncols != 0)) {
-    arrayd_free (arrp, 0, 0);
+    arrayd_free (arrp); 
   }
 
   arrp->vals = (gdouble **) g_malloc (nr * sizeof (gdouble *));

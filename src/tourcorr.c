@@ -211,20 +211,20 @@ free_tourcorr(displayd *dsp)
   vectorf_free(&dsp->tcorr1.tau);
   vectorf_free(&dsp->tcorr1.tinc);
 
-  arrayd_free(&dsp->tcorr1.Fa, 0, 0);
-  arrayd_free(&dsp->tcorr1.Fz, 0, 0);
-  arrayd_free(&dsp->tcorr1.F, 0, 0);
+  arrayd_free (&dsp->tcorr1.Fa); 
+  arrayd_free (&dsp->tcorr1.Fz); 
+  arrayd_free (&dsp->tcorr1.F); 
 
-  arrayd_free(&dsp->tcorr1.Ga, 0, 0);
-  arrayd_free(&dsp->tcorr1.Gz, 0, 0);
-  arrayd_free(&dsp->tcorr1.G, 0, 0);
+  arrayd_free (&dsp->tcorr1.Ga); 
+  arrayd_free (&dsp->tcorr1.Gz); 
+  arrayd_free (&dsp->tcorr1.G); 
 
-  arrayd_free(&dsp->tcorr1.Va, 0, 0);
-  arrayd_free(&dsp->tcorr1.Vz, 0, 0);
-  arrayd_free(&dsp->tcorr1.tv, 0, 0);
+  arrayd_free (&dsp->tcorr1.Va); 
+  arrayd_free (&dsp->tcorr1.Vz); 
+  arrayd_free (&dsp->tcorr1.tv); 
 
-  arrayd_free(&dsp->tc1_manbasis, 0, 0);
-  arrayd_free(&dsp->tc2_manbasis, 0, 0);
+  arrayd_free (&dsp->tc1_manbasis); 
+  arrayd_free (&dsp->tc2_manbasis); 
 
   vectori_free(&dsp->tcorr2.subset_vars);
   vectorb_free(&dsp->tcorr2.subset_vars_p);
@@ -235,17 +235,17 @@ free_tourcorr(displayd *dsp)
   vectorf_free(&dsp->tcorr2.tau);
   vectorf_free(&dsp->tcorr2.tinc);
 
-  arrayd_free(&dsp->tcorr2.Fa, 0, 0);
-  arrayd_free(&dsp->tcorr2.Fz, 0, 0);
-  arrayd_free(&dsp->tcorr2.F, 0, 0);
+  arrayd_free (&dsp->tcorr2.Fa); 
+  arrayd_free (&dsp->tcorr2.Fz); 
+  arrayd_free (&dsp->tcorr2.F); 
 
-  arrayd_free(&dsp->tcorr2.Ga, 0, 0);
-  arrayd_free(&dsp->tcorr2.Gz, 0, 0);
-  arrayd_free(&dsp->tcorr2.G, 0, 0);
+  arrayd_free (&dsp->tcorr2.Ga); 
+  arrayd_free (&dsp->tcorr2.Gz); 
+  arrayd_free (&dsp->tcorr2.G); 
 
-  arrayd_free(&dsp->tcorr2.Va, 0, 0);
-  arrayd_free(&dsp->tcorr2.Vz, 0, 0);
-  arrayd_free(&dsp->tcorr2.tv, 0, 0);
+  arrayd_free (&dsp->tcorr2.Va); 
+  arrayd_free (&dsp->tcorr2.Vz); 
+  arrayd_free (&dsp->tcorr2.tv); 
 
 }
 

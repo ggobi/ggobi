@@ -50,7 +50,7 @@ sphere_free (GGobiStage * d)
   vectori_free (&d->sphere.vars);
   vectorf_free (&d->sphere.eigenval);
 
-  arrayd_free (&d->sphere.eigenvec, 0, 0);
+  arrayd_free (&d->sphere.eigenvec); 
   arrayf_free (&d->sphere.vc, 0, 0);
 
   vectorf_free (&d->sphere.tform_mean);

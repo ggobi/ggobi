@@ -71,6 +71,7 @@ public class GGobi.StageJitter : Stage {
     // Pipeline instantiation
     if (cache == null) {
       cache = new Matrix(msg.get_n_added_rows(), msg.get_n_added_cols());
+      amount.resize(msg.get_n_added_cols())
     }
     // Deal with jittering amounts
 

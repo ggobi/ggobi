@@ -39,11 +39,12 @@ typedef struct {
 
 void       arrayd_add_cols (array_d *, gint);
 void       arrayd_add_rows (array_d *, gint);
+array_d  *  arrayd_new (gint, gint);
 void       arrayd_alloc (array_d *, gint, gint);
 void       arrayd_alloc_zero (array_d *, gint, gint);
 void       arrayd_copy (array_d *, array_d *);
 void       arrayd_delete_cols (array_d *, GSList *);
-void       arrayd_free (array_d *, gint, gint);
+void       arrayd_free (array_d *);
 void       arrayd_init_null (array_d *);
 void       arrayd_zero (array_d *);
 void       arrayf_add_cols (array_f *, gint);
