@@ -27,6 +27,7 @@
 #include "plugin.h"
 
 #include "gui-viewer.h"
+#include "stage-jitter.h"
 #include "ggobi-stage-subset.h"
 #include "ggobi-stage-transform.h"
 #include "input-source-factory.h"
@@ -40,18 +41,20 @@ guint GGobiSignals[MAX_GGOBI_SIGNALS];
 static void
 pipeline_create_cb(GGobiPipelineFactory *factory, GGobiStage *root, GGobiSession *gg)
 {
-  GObject *subset, *filter, *domain_adj, *transform;
+  GObject *subset, *filter, *domain_adj, *transform, *jitter;
   
   
   subset = g_object_new(GGOBI_TYPE_STAGE_SUBSET, 
     "name", GGOBI_MAIN_STAGE_SUBSET, "parent", root, NULL);
 
-  
   /* Note: there is no way to control the order of property settings with
      g_object_new, so we have to set the filter col here so that it
      comes after the parent */
   ggobi_stage_filter_set_filter_column(GGOBI_STAGE_FILTER(subset), 
     ggobi_stage_get_col_index_for_name(root, "_sampled"));
+
+  jitter = g_object_new(GGOBI_TYPE_STAGE_JITTER, 
+    "name", GGOBI_MAIN_STAGE_JITTER, "parent", subset, NULL);
   
   // FIXME: 'excluded' is actually 'included' now
   filter = g_object_new(GGOBI_TYPE_STAGE_FILTER, 
@@ -68,17 +71,19 @@ pipeline_create_cb(GGobiPipelineFactory *factory, GGobiStage *root, GGobiSession
   // FIXME: get rid of these lines ASAP
   // There is absolutely no reason for the pipeline to depend on GGobiSession
   GGOBI_STAGE(subset)->gg = gg;
+  GGOBI_STAGE(jitter)->gg = gg;
   GGOBI_STAGE(filter)->gg = gg;
   GGOBI_STAGE(domain_adj)->gg = gg;
   GGOBI_STAGE(transform)->gg = gg;
   
   g_object_unref(subset);
+  g_object_unref(jitter);
   g_object_unref(filter);
   g_object_unref(domain_adj);
   g_object_unref(transform);
   
   GGobiGuiViewer *viewer; 
-  viewer = g_object_new(GGOBI_TYPE_GUI_VIEWER, "stage", GGOBI_STAGE(subset), NULL);
+  viewer = g_object_new(GGOBI_TYPE_GUI_VIEWER, "stage", GGOBI_STAGE(filter), NULL);
   gtk_widget_show(GTK_WIDGET(viewer));
 }
 

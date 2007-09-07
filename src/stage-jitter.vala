@@ -26,15 +26,17 @@ public class GGobi.StageJitter : Stage {
   
   /* Recompute cache of random variables */
   public void refresh() {
+    GLib.debug("Generating jitters for %i cols", n_cols);
     for (uint j = 0; j < n_cols; j++) refresh_col(j);
+    // flush_changes_here();
   }
   public void refresh_col(uint j) {
-    float range = get_variable(j).get_range();
+    GLib.debug("Refreshing column %i", j);
+    float range = 10; //get_variable(j).get_range();
     for (uint i = 0; i < n_rows; i++) 
       ((double[]) cache.vals[i])[j] = rand() * range;
     
-    col_data_changed(j);
-    flush_changes_here();
+    // col_data_changed(j);
   }
    
   /* Generate random number from specified distribution */
@@ -67,26 +69,38 @@ public class GGobi.StageJitter : Stage {
   }  
   
   /* Process incoming change events */
-  override void process_incoming(PipelineMessage msg) {
+  override void process_outgoing(PipelineMessage msg) {
+    GLib.debug("Processing events");
     // Pipeline instantiation
+    uint n_added_cols = msg.get_n_added_cols();
+    uint n_added_rows = msg.get_n_added_rows();
+
+    GLib.debug("Adding %i cols", n_added_rows);
+    GLib.debug("Adding %i rows", n_added_cols);    
+
     if (cache == null) {
-      cache = new Matrix(msg.get_n_added_rows(), msg.get_n_added_cols());
-      amount.resize(msg.get_n_added_cols())
+      GLib.debug("Initialising stage");
+      cache = new Matrix(n_added_rows, n_added_cols);
+      amount.resize((int) n_added_cols);
+      for(uint i = 0; i < n_added_cols; i++) {
+        amount[i] = 0.5;
+      }
+    } else {
+      cache.add_cols((int) n_added_cols);
+      cache.add_rows((int) n_added_rows);
+      
     }
     // Deal with jittering amounts
 
     // Set up and reinitialise cache matrix    
-    uint n_added_cols = msg.get_n_added_cols();
-    uint current_cols = cache.n_cols;
-    cache.add_cols((int) n_added_cols);
+    uint current_cols = n_cols;
 
-    cache.add_rows((int) msg.get_n_added_rows());
     cache.remove_rows(msg.get_removed_rows());
 
     for (uint i = 0; i < n_added_cols; i++) {
       refresh_col(current_cols + i);
     }
     cache.remove_cols(msg.get_removed_cols());
-
+    
   }
 }

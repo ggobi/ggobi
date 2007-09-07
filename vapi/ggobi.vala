@@ -27,6 +27,7 @@ public class GGobi.Stage : GLib.Object {
   public void flush_changes_here();
   
   virtual void process_incoming(PipelineMessage msg);
+  virtual void process_outgoing(PipelineMessage msg);
   
 }
 
@@ -91,7 +92,7 @@ public class GGobi.Matrix {
   public Matrix(construct uint n_rows, construct uint n_cols);
   
   public void alloc (int nr, int nc);
-  public void free (int nr, int nc);
+  public void free ();
 
   public void add_cols (int nc);
   public void add_rows (int nr );

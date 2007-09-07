@@ -39,6 +39,7 @@ public class GGobi.GuiViewer : Window {
   /* Initialise the model and table with columns loaded from the stage */
   public void initialise() {
     uint ncols = stage.n_cols + 1;
+    GLib.debug("Intialising %i cols", ncols);
     
     GLib.Type[] col_types = new GLib.Type[ncols];
     string[] col_labels = new string[ncols];
@@ -78,6 +79,7 @@ public class GGobi.GuiViewer : Window {
 
   /* Load all data from the stage, appending to current table */
   public void load_data() {
+    GLib.debug("Loading %i rows", stage.n_rows);
     for(uint i = 0; i < stage.n_rows; i++) {
       TreeIter iter;
       
@@ -90,7 +92,7 @@ public class GGobi.GuiViewer : Window {
   }
   
   public void process_incoming(PipelineMessage msg) {
-    GLib.debug("Incoming message");
+    GLib.debug("Processing events");
     
     /* If any rows or columns added or removed, 
        rebuild the table from scratch */
@@ -104,12 +106,12 @@ public class GGobi.GuiViewer : Window {
     
     // Update changed columns
     foreach(uint col in msg.get_changed_cols()) {
-      GLib.debug("Updating column %i", col);
       update_col(col);
     }
   }
   
   public void update_col(uint j) {
+    GLib.debug("Updating column %i", j);
     TreeIter iter;
     model.get_iter_first(out iter);
     for(uint i = 0; i < stage.n_rows; i++) {

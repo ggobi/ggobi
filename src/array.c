@@ -67,7 +67,7 @@ arrayd_zero (array_d * arrp)
 }
 
 array_d *arrayd_new(gint nr, gint nc) {
-  array_d *arrp = NULL;
+  array_d *arrp = g_new0(array_d, 1);
   arrayd_alloc(arrp, nr, nc);
   return arrp;
 }

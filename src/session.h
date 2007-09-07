@@ -443,6 +443,7 @@ struct _GGobiSession {
    functions that return a static GQuark, if we move to a GQuark-based ID system */
 
 #define GGOBI_MAIN_STAGE_SUBSET "ggobi-main-subset"
+#define GGOBI_MAIN_STAGE_JITTER "ggobi-main-jitter"
 #define GGOBI_MAIN_STAGE_FILTER "ggobi-main-filter"
 #define GGOBI_MAIN_STAGE_DOMAIN_ADJ "ggobi-main-domain-adj"
 #define GGOBI_MAIN_STAGE_TRANSFORM "ggobi-main-transform"
