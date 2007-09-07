@@ -70,6 +70,7 @@ public class GGobi.StageJitter : Stage {
   
   /* Process incoming change events */
   override void process_outgoing(PipelineMessage msg) {
+    uint current_cols = n_cols;
     GLib.debug("Processing events");
     base.process_outgoing(msg);
     // Pipeline instantiation
@@ -91,7 +92,6 @@ public class GGobi.StageJitter : Stage {
     // Deal with jittering amounts
 
     // Set up and reinitialise cache matrix    
-    uint current_cols = n_cols;
 
     cache.remove_rows(msg.get_removed_rows());
 
