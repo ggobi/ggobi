@@ -31,8 +31,8 @@ public class GGobi.StageJitter : Stage {
     // flush_changes_here();
   }
   public void refresh_col(uint j) {
-    GLib.debug("Refreshing column %i", j);
-    float range = 10; //get_variable(j).get_range();
+    float range = get_variable(j).get_range();
+    GLib.debug("Refreshing column %i.  Range %g", j, range);
     for (uint i = 0; i < n_rows; i++) 
       ((double[]) cache.vals[i])[j] = rand() * range;
     

@@ -27,7 +27,6 @@ And can be applied either the whole data set, or per symbol/colour group
 */
 
 using GLib;
-using Math;
 
 public class GGobi.StageImpute : Stage {
   public Imputation[] imputation;

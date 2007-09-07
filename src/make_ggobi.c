@@ -58,7 +58,7 @@ pipeline_create_cb(GGobiPipelineFactory *factory, GGobiStage *root, GGobiSession
   
   // FIXME: 'excluded' is actually 'included' now
   filter = g_object_new(GGOBI_TYPE_STAGE_FILTER, 
-    "name", GGOBI_MAIN_STAGE_FILTER, "parent", subset, NULL);
+    "name", GGOBI_MAIN_STAGE_FILTER, "parent", jitter, NULL);
   
   ggobi_stage_filter_set_filter_column(GGOBI_STAGE_FILTER(filter),
     ggobi_stage_get_col_index_for_name(root, "_excluded"));
