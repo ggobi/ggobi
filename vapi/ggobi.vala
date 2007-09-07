@@ -27,7 +27,7 @@ public class GGobi.Stage : GLib.Object {
   public void flush_changes_here();
   
   virtual void process_incoming(PipelineMessage msg);
-  virtual void process_outgoing(PipelineMessage msg);
+  public virtual void process_outgoing(PipelineMessage msg);
   
 }
 

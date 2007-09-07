@@ -1615,7 +1615,7 @@ varpanel_label_set_cb(GGobi:Stage * d, const gchar *old_name, guint j, gpointer 
    * Process changes in a message (when it is queued).
    *
    */
-virtual void
+public virtual void
 process_outgoing(self, GGobiPipelineMessage *msg)
 /* Here we catch any changes that have occurred to our data matrix and update
    various structures (like GGobiVariable) and fields (like n_rows, n_cols).
