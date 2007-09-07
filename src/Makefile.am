@@ -4,18 +4,18 @@ libggobi_la_GOBS = variable.gob stage.gob data.gob stage-transform.gob \
   stage-filter.gob pipeline-factory.gob \
   plugin-factory.gob plugin.gob data-factory-xml.gob \
   stage-subset.gob stage-group.gob transform.gob \
-  transform-min-one.gob transform-boxcox.gob transform-abs.gob \ 
-  transform-log10.gob gui-component.gob gui-transform.gob type-registry.gob \ 
+  transform-min-one.gob transform-boxcox.gob transform-abs.gob \
+  transform-log10.gob gui-component.gob gui-transform.gob type-registry.gob \
   pipeline-message.gob variable-group.gob renderer.gob renderer-cairo.gob \
   renderer-factory.gob
 
-libggobi_la_VALAS = bitset.vala input-ftp.vala input-http.vala \ 
+libggobi_la_VALAS = bitset.vala input-ftp.vala input-http.vala \
   input-source.vala data-factory.vala data-factory-csv.vala \
   input-source-file.vala input-source-ftp.vala input-source-factory.vala \
   input-source-http.vala stage-jitter.vala stage-standardize.vala \
   matrix.vala stage-impute.vala gui-viewer.vala
 
-libggobi_la_METASOURCES = \ 
+libggobi_la_METASOURCES = \
   $(libggobi_la_GOBS:%.gob=ggobi-%.c) \
   $(libggobi_la_VALAS:%.vala=%.c)
 
@@ -23,11 +23,11 @@ libggobi_la_METAHEADERS = \
   $(libggobi_la_GOBS:%.gob=ggobi-%.h) \
   $(libggobi_la_VALAS:%.vala=%.h)
 
-libggobi_la_METAOBJECTS = \ 
+libggobi_la_METAOBJECTS = \
   $(libggobi_la_GOBS:%.gob=ggobi-%.lo) \
   $(libggobi_la_VALAS:%.vala=%.lo)
 
-libggobi_la_METASTAMPS = \ 
+libggobi_la_METASTAMPS = \
   $(libggobi_la_GOBS:%.gob=.%.gob.stamp) .vala.stamp
 
 libggobi_la_LDFLAGS  = @GTK_LIBS@ @LIBXML_LIBS@ @LIBGSF_LIBS@ @GSL_LIBS@ \
@@ -80,8 +80,8 @@ MAINTAINERCLEANFILES = $(BUILT_SOURCES)
 	@touch $@
 
 if HAS_VALA
-.vala.stamp: $(libggobi_la_VALAS)
-	@VALAC@ --vapidir=../vapi --pkg=gtk+-2.0 --pkg=gsf --pkg=ggobi --pkg=libxml-2.0 $^
+.vala.stamp: $(libggobi_la_VALAS) ../vapi/ggobi.vala ../vapi/gsf.vala
+	@VALAC@ --vapidir=../vapi --pkg=gtk+-2.0 --pkg=gsf --pkg=ggobi --pkg=libxml-2.0 $(libggobi_la_VALAS)
 	@touch $@
 else
 .vala.stamp: $(libggobi_la_VALAS)

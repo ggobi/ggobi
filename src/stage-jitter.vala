@@ -77,8 +77,8 @@ public class GGobi.StageJitter : Stage {
     uint n_added_cols = msg.get_n_added_cols();
     uint n_added_rows = msg.get_n_added_rows();
 
-    GLib.debug("Adding %i cols", n_added_rows);
-    GLib.debug("Adding %i rows", n_added_cols);    
+    GLib.debug("Adding %i rows", n_added_rows);
+    GLib.debug("Adding %i cols", n_added_cols);    
 
     if (cache == null) {
       GLib.debug("Initialising stage");

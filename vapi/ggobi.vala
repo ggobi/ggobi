@@ -21,7 +21,7 @@ public class GGobi.Stage : GLib.Object {
   
   public uint get_col_n_missing(uint j);
   
-  public Variable get_variable(uint j);
+  public weak Variable get_variable(uint j);
   
   public void col_data_changed(uint j);
   public void flush_changes_here();
