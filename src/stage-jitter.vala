@@ -26,18 +26,26 @@ public class GGobi.StageJitter : Stage {
   
   /* Recompute cache of random variables */
   public void refresh() {
-    GLib.debug("Generating jitters for %i cols", n_cols);
-    for (uint j = 0; j < n_cols; j++) refresh_col(j);
-    // flush_changes_here();
+    _refresh();
+    for (uint j = 0; j < n_cols; j++) col_data_changed(j);    
+    flush_changes_here();
   }
+  private void _refresh() {
+    for (uint j = 0; j < n_cols; j++) _refresh_col(j);    
+  }
+
   public void refresh_col(uint j) {
-    float range = get_variable(j).get_range();
-    GLib.debug("Refreshing column %i.  Range %g", j, range);
-    for (uint i = 0; i < n_rows; i++) 
-      ((double[]) cache.vals[i])[j] = rand() * range;
-    
-    // col_data_changed(j);
+    _refresh_col(j);
+    col_data_changed(j);
+    flush_changes_here();
   }
+  public void _refresh_col(uint j) {
+    float range = get_variable(j).get_range();
+    // GLib.debug("Refreshing column %i.  Range %g", j, range);
+    for (uint i = 0; i < n_rows; i++) 
+      ((double[]) cache.vals[i])[j] = rand() * range;    
+  }
+  
    
   /* Generate random number from specified distribution */
   double rand() {
@@ -71,34 +79,32 @@ public class GGobi.StageJitter : Stage {
   /* Process incoming change events */
   override void process_outgoing(PipelineMessage msg) {
     uint current_cols = n_cols;
-    GLib.debug("Processing events");
     base.process_outgoing(msg);
-    // Pipeline instantiation
+
     uint n_added_cols = msg.get_n_added_cols();
     uint n_added_rows = msg.get_n_added_rows();
-
-    GLib.debug("Adding %i rows", n_added_rows);
-    GLib.debug("Adding %i cols", n_added_cols);    
-
+    
     if (cache == null) {
-      GLib.debug("Initialising stage");
+      // Fresh initialisation
       cache = new Matrix(n_added_rows, n_added_cols);
       amount.resize((int) n_added_cols);
+      _refresh();
     } else {
+      // Update cache matrix
       cache.add_cols((int) n_added_cols);
-      cache.add_rows((int) n_added_rows);
+      for (uint j = 0; j < n_added_cols; j++)
+        _refresh_col(current_cols + j);
       
+      if (n_added_rows > 0) {
+        cache.add_rows((int) n_added_rows);
+        // Need to add generate new jitters
+      }
+      
+      cache.remove_rows(msg.get_removed_rows());
+      cache.remove_cols(msg.get_removed_cols());
+      
+      // Resize amounts vector
+      amount.resize((int) current_cols + (int) n_added_cols); 
     }
-    // Deal with jittering amounts
-
-    // Set up and reinitialise cache matrix    
-
-    cache.remove_rows(msg.get_removed_rows());
-
-    for (uint i = 0; i < n_added_cols; i++) {
-      refresh_col(current_cols + i);
-    }
-    cache.remove_cols(msg.get_removed_cols());
-    
   }
 }

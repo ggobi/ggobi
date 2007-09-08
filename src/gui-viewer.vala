@@ -25,7 +25,7 @@ public class GGobi.GuiViewer : Window {
     initialise();
     load_data();
     
-    // stage.changed += (stage, msg) => {process_incoming(msg);};
+    stage.changed += (stage, msg) => {process_incoming(msg);};
 
     ScrolledWindow scroll = new ScrolledWindow(null, null);
     scroll.add(table);
@@ -59,7 +59,6 @@ public class GGobi.GuiViewer : Window {
     }
     
     model = new ListStore.newv((int) ncols, col_types);
-
     table = new TreeView.with_model(model);
     
     for(uint j = 0; j < ncols; j++) {
@@ -92,8 +91,6 @@ public class GGobi.GuiViewer : Window {
   }
   
   public void process_incoming(PipelineMessage msg) {
-    GLib.debug("Processing events");
-    
     /* If any rows or columns added or removed, 
        rebuild the table from scratch */
     if (msg.get_n_removed_rows() > 0 || msg.get_n_removed_cols() > 0 ||
