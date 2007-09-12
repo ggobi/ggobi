@@ -25,12 +25,12 @@ typedef struct {
   gshort **vals;
   guint nrows, ncols;
 } array_s;
-/*-- long: for world, jitdata --*/
+/*-- long: for world --*/
 typedef struct {
   glong **vals;
   guint nrows, ncols;
 } array_l;
-/*-- real: for the new world, jitdata --*/
+/*-- real: for the new world --*/
 typedef struct {
   greal **vals;
   guint nrows, ncols;

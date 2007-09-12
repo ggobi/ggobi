@@ -226,13 +226,6 @@ typedef enum {ARRANGE_ROW, ARRANGE_COL} ParCoordsArrangeMode;
 enum {ID_RECORD_ID = 1 << 3, ID_RECORD_LABEL = 1 << 2, ID_RECORD_NO = 1 << 1, ID_VAR_LABELS = 1 << 0};
 
 /*
- * jittering
-*/
-#define JITFAC .2
-#define UNIFORM 0
-#define NORMAL  1
-
-/*
  * scaling
 */
 #define SCALE_DEFAULT      0.7

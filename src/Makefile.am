@@ -39,7 +39,7 @@ libggobi_la_BUILT = array.c ash1d.c barchart.c barchartClass.c \
   display_tree.c display_ui.c \
   edges.c cluster.c cluster_ui.c extendedDisplay.c fileio.c ggobi-API.c \
   ggobi.c GGobiAppClass.c ggobiClass.c identify.c identify_ui.c \
-  impute.c impute_ui.c fileio_ui.c jitter.c jitter_ui.c limits.c lineedit.c \
+  impute.c impute_ui.c fileio_ui.c limits.c lineedit.c \
   lineedit_ui.c main_ui.c make_ggobi.c marshal.c menus.c missing.c \
   movepts.c movepts_ui.c noop-toggle.c p1d.c p1d_ui.c parcoords.c \
   parcoordsClass.c parcoords_ui.c plugin.c pipeline.c ppcorr_ui.c \

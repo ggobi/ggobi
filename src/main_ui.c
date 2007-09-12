@@ -806,7 +806,6 @@ action_sphere_cb (GtkAction * action, GGobiSession * gg)
 static void
 action_jitter_cb (GtkAction * action, GGobiSession * gg)
 {
-  jitter_window_open (gg);
 }
 static void
 action_color_schemes_cb (GtkAction * action, GGobiSession * gg)

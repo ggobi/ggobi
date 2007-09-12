@@ -42,15 +42,6 @@ static void stage_set_cb (GtkWidget *w, GGobiSession *gg)
   stage_set (gtk_combo_box_get_active(GTK_COMBO_BOX(w)), gg);
 }
 
-/*
-static gchar *jitter_lbl[] = {"Don't add jitter", "Add jitter"};
-void jitterp_set (gboolean jitterp, GGobiSession *gg) { gg->save.jitter_p = jitterp; }
-static void jitterp_set_cb (GtkWidget *w, gpointer cbd)
-{
-  GGobiSession *gg = GGobiFromWidget (w, true);
-  jitterp_set ((gboolean ) GPOINTER_TO_INT (cbd), gg);
-}
-*/
 
 static gchar *rowdata_lbl[] = {"All cases",
                                "Displayed cases",
@@ -198,24 +189,7 @@ writeall_window_open (GGobiSession *gg) {
   gtk_table_attach (GTK_TABLE (table), opt,
     1, 2, j, j+1, GTK_FILL, GTK_FILL, 5, 0);
 
-  /*-- Jitter? --*/
-/*
-  j++;
-  opt = gtk_option_menu_new ();
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-    "Include any added jitter?",
-    NULL);
-  populate_option_menu (opt, jitter_lbl,
-    sizeof (jitter_lbl) / sizeof (gchar *), jitterp_set_cb, "GGobi", gg);
-  gtk_option_menu_set_history (GTK_OPTION_MENU (opt),
-    true);
 
-  gtk_table_attach (GTK_TABLE (table),
-    gtk_label_new ("Jitter?:"),
-    0, 1, j, j+1, GTK_FILL, GTK_FILL, 5, 0);
-  gtk_table_attach (GTK_TABLE (table), opt,
-    1, 2, j, j+1, GTK_FILL, GTK_FILL, 5, 0);
-*/
 
   /*-- Which rows --*/
   j++;

@@ -27,7 +27,7 @@ typedef struct {
 
 /*
  * greal is at several steps in the pipeline, in particular
- * for world, jitdata, and planar, as we eliminate the conversion
+ * for world, and planar, as we eliminate the conversion
  * to longs.  Defining 'greal' allows us to compare the behavior
  * of floats and doubles for speed and storage.
 */

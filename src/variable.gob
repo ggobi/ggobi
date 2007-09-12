@@ -126,9 +126,6 @@ private signal NONE (STRING, STRING) void
 public lims lim_specified;   /*user specified*/
 public gboolean lim_specified_p;
 
-/*-- jittering --*/
-public gfloat jitter_factor;
-
 /* END PIPELINE */
 
 /*-- categorical stuff --*/

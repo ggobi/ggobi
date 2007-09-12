@@ -150,13 +150,6 @@
     
 /*---- STUFF FROM DATA.GOB ----*/
 
-typedef struct _Jitterd {
-  gfloat factor;
-  gboolean type;
-  gboolean convex;
-  gfloat *jitfacv;
-} Jitterd;
-
 typedef struct _Varpanel_cboxd {
   GtkWidget *ebox;   /*-- child1 of pane widget --*/
   GtkWidget *swin;   /*-- child of ebox --*/
@@ -318,7 +311,6 @@ property UINT n_rows
      guint old_n_rows = self->n_rows;
      self->n_rows = g_value_get_uint(VAL);
      if (old_n_rows < self->n_rows) {
-       arrayg_add_rows (&self->jitdata, self->n_rows);
        arrayg_add_rows (&self->world, self->n_rows);
      }
      if (old_n_rows != self->n_rows) {
@@ -341,7 +333,6 @@ property UINT n_cols
        self_set_variable(self, j, var);
      }
      if (old_n_cols < self->n_cols) {
-       arrayg_add_cols (&self->jitdata, self->n_cols);
        arrayg_add_cols (&self->world, self->n_cols);
        tour_realloc_up (self, self->n_cols);
      }
@@ -361,7 +352,6 @@ public clusteruid *clusvui;
 
 /* PIPELINE AND IMODE OBJECTS */
 
-public Jitterd  jitter;
 public Sphere_d  sphere;
 public BrushBins  brush;
 
@@ -369,7 +359,6 @@ public vector_i rows_under_brush;
 public vector_i rows_under_brush_prev;
 
 public array_g world;
-public array_g jitdata;
 
 public gboolean missings_show_p; /*-- show/hide per datad, not per display --*/
 public gint nrows_under_brush;
@@ -1638,7 +1627,6 @@ process_outgoing(self, GGobiPipelineMessage *msg)
   /* handle column removal */
   if (n_removed_cols) {
     g_slist_foreach(removed_cols, (GFunc)self_removed_col_foreach, self);
-    arrayg_delete_cols (&self->jitdata, removed_cols);
     arrayg_delete_cols (&self->world, removed_cols);
     tour2d_realloc_down (removed_cols, self, self->gg);
     tour1d_realloc_down (removed_cols, self, self->gg);
@@ -1653,7 +1641,6 @@ process_outgoing(self, GGobiPipelineMessage *msg)
   
   if (n_removed_rows) {
     /* row removal */
-    arrayg_delete_rows (&self->jitdata, removed_rows);
     arrayg_delete_rows (&self->world, removed_rows);
   }
 
