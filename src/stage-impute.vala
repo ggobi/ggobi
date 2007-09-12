@@ -81,7 +81,6 @@ public class GGobi.StageImpute : Stage {
       
       if (n_added_rows > 0) {
         cache.add_rows((int) n_added_rows);
-        // Need to add generate new jitters
       }
       
       cache.remove_rows(msg.get_removed_rows());
@@ -104,7 +103,6 @@ public class GGobi.Imputation : Object {
     for(uint i = 0; i < stage.n_rows; i++) {
       ((double[]) stage.cache.vals[i])[j] = (stage.is_missing(i, j) ? stage.get_raw_value(i, j) : impute_single(i));
     }
-    return true;
   }
   
   public abstract double impute_single(uint i);
