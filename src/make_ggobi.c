@@ -28,6 +28,7 @@
 
 #include "gui-viewer.h"
 #include "stage-jitter.h"
+#include "gui-jitter.h"
 #include "ggobi-stage-subset.h"
 #include "ggobi-stage-transform.h"
 #include "input-source-factory.h"
@@ -82,9 +83,14 @@ pipeline_create_cb(GGobiPipelineFactory *factory, GGobiStage *root, GGobiSession
   g_object_unref(domain_adj);
   g_object_unref(transform);
   
-  GGobiGuiViewer *viewer; 
-  viewer = g_object_new(GGOBI_TYPE_GUI_VIEWER, "stage", GGOBI_STAGE(jitter), NULL);
-  gtk_widget_show(GTK_WIDGET(viewer));
+  // GGobiGuiViewer *viewer; 
+  // viewer = g_object_new(GGOBI_TYPE_GUI_VIEWER, "stage", GGOBI_STAGE(jitter), NULL);
+  // gtk_widget_show(GTK_WIDGET(viewer));
+  
+  GGobiGuiJitter *gui_jitter;
+  gui_jitter = g_object_new(GGOBI_TYPE_GUI_JITTER, "stage", GGOBI_STAGE_JITTER(jitter), NULL);
+  gtk_widget_show(GTK_WIDGET(gui_jitter));
+  
 }
 
 GGobiPipelineFactory *

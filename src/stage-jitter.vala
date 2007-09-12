@@ -8,7 +8,7 @@ In GGobi2, jittering occured after the world transformation, so it could
 assume that the range of each variable was [0, 1]. This is not the case in
 GGobi3, so the range of the variable is used explicity.
 
-Jittered value value = original * (1 - amount) + random [-range, range] *
+Jittered value value = original * (1 - amount) + random [-min, max] *
 amount
 
 */
@@ -40,19 +40,22 @@ public class GGobi.StageJitter : Stage {
     flush_changes_here();
   }
   public void _refresh_col(uint j) {
-    float range = get_variable(j).get_range();
-    // GLib.debug("Refreshing column %i.  Range %g", j, range);
+    Variable v = get_variable(j);
+    
+    float range = v.get_range();
+    float mid = (v.get_min() + v.get_max()) / 2;
+    
     for (uint i = 0; i < n_rows; i++) 
-      ((double[]) cache.vals[i])[j] = rand() * range;    
+      ((double[]) cache.vals[i])[j] = mid + rand() * range;
   }
   
    
   /* Generate random number from specified distribution */
   double rand() {
     if (uniformDist) {
-      return Random.double_range(-1, 1);
+      return Random.double_range(-0.5, 0.5);
     } else {
-      return Utils.random_normal();
+      return Utils.random_normal() / 1.5;
     }
   }
   
@@ -107,4 +110,15 @@ public class GGobi.StageJitter : Stage {
       amount.resize((int) current_cols + (int) n_added_cols); 
     }
   }
+  
+  public void update_amounts(SList<uint> cols, double value) {
+    foreach(uint i in cols) {
+      amount[i] = value;
+      col_data_changed(i);
+    }
+    amounts_changed(cols);
+    flush_changes_here();
+  }
+  
+  public signal void amounts_changed(SList<uint> cols);
 }
