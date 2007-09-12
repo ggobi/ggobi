@@ -34,12 +34,23 @@ public class GGobi.StageImpute : Stage {
 
   /* Rerun imputations */
   public void refresh() {
-    for (uint j = 0; j < n_cols; j++) refresh_col(j);
+    _refresh();
+    for (uint j = 0; j < n_cols; j++) col_data_changed(j);    
+    flush_changes_here();
   }
-  public void refresh_col(uint j) {
-    imputation[j].impute(this, j);
+  private void _refresh() {
+    for (uint j = 0; j < n_cols; j++) _refresh_col(j);    
   }
 
+  public void refresh_col(uint j) {
+    _refresh_col(j);
+    col_data_changed(j);
+    flush_changes_here();
+  }
+  public void _refresh_col(uint j) {
+    imputation[j].impute(this, j);
+  }
+  
   public override double get_raw_value(uint i, uint j) {
     return ((double[]) cache.vals[i])[j];
   }
@@ -48,15 +59,46 @@ public class GGobi.StageImpute : Stage {
     ((double[]) cache.vals[i])[j] = value;
     if (!is_missing(i, j)) parent.set_raw_value(i, j, value);
   }
+  
+  override void process_outgoing(PipelineMessage msg) {
+    uint current_cols = n_cols;
+    base.process_outgoing(msg);
+
+    uint n_added_cols = msg.get_n_added_cols();
+    uint n_added_rows = msg.get_n_added_rows();
+    
+    if (cache == null) {
+      // Fresh initialisation
+      cache = new Matrix(n_added_rows, n_added_cols);
+      _refresh();
+    } else {
+      // Need stage+matrix method that wraps all of this up
+      
+      // Update cache matrix
+      cache.add_cols((int) n_added_cols);
+      for (uint j = 0; j < n_added_cols; j++)
+        _refresh_col(current_cols + j);
+      
+      if (n_added_rows > 0) {
+        cache.add_rows((int) n_added_rows);
+        // Need to add generate new jitters
+      }
+      
+      cache.remove_rows(msg.get_removed_rows());
+      cache.remove_cols(msg.get_removed_cols());
+    }
+  }
+  
+  // Need set imputation method which calls impute
+  
+  // Initialise with ImputationPercent
 }
 
 
 public class GGobi.Imputation : Object {
   
   /* Return value indicates if any values were imputed */
-  public bool impute(StageImpute stage, uint j) {
-    if (!stage.get_variable(j).has_missings()) return(false);
-    
+  public void impute(StageImpute stage, uint j) {
     pre_compute(stage, j);
     
     for(uint i = 0; i < stage.n_rows; i++) {

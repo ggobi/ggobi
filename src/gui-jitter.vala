@@ -53,7 +53,6 @@ public class GGobi.GuiJitter : Window {
 
     initialise_varlist();
     
-    
     /* Layout */
     HBox sides = new HBox(false, 3);
     
@@ -146,10 +145,10 @@ public class GGobi.GuiJitter : Window {
       update_jittered_values(); 
     };
     
-    
     // Allow multiple selection
     TreeSelection sel = vartable.get_selection();
     sel.set_mode(SelectionMode.MULTIPLE);
+    // Connect to slide
     sel.changed += sel => {
       update_amount_slider();
     };
