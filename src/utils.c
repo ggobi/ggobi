@@ -75,7 +75,7 @@ gboolean as_logical (const gchar * sval)
  * Method suggested by Press, Flannery, Teukolsky, and Vetterling (1986)
  * "Numerical Recipes" p.202-3, for generating random normal variates .
 */
-double
+gdouble
 random_normal() {
   static gdouble dsave;
   static gboolean isave = false;

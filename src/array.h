@@ -7,6 +7,8 @@
 #define GGOBI_ extern
 #endif
 
+#include "utils.h"
+
 typedef gfloat greal;
 
 /*-- arrays --*/
@@ -84,8 +86,6 @@ void       arrays_delete_rows (array_s *, GSList *);
 void       arrays_free (array_s *, gint, gint);
 void       arrays_init_null (array_s *);
 void       arrays_zero (array_s *);
-
-guint      *find_keepers (gint ncols_current, GSList *cols, guint *nkeepers);
 
 #endif
 

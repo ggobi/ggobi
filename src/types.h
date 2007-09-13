@@ -19,6 +19,7 @@
 
 #include <gtk/gtk.h>
 #include "array.h"
+#include "vector.h"
 
 typedef struct {
   GtkWidget *w;
@@ -97,31 +98,6 @@ typedef struct {
 
 
 
-/*-- vectors --*/
-typedef struct {
-  gdouble *els;
-  guint nels;
-} vector_d;
-typedef struct {
-  gfloat *els;
-  guint nels;
-} vector_f;
-typedef struct {
-  gint *els;
-  guint nels;
-} vector_i;
-typedef struct {
-  gshort *els;
-  guint nels;
-} vector_s;
-typedef struct {
-  gboolean *els;
-  guint nels;
-} vector_b;
-typedef struct {
-  glyphd *els;
-  guint nels;
-} vector_g;
 
 typedef struct {  /*-- used for obtaining ranks --*/
   gfloat f;
