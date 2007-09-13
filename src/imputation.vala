@@ -15,6 +15,7 @@ public class GGobi.Imputation : Object {
   
   public abstract double impute_single(uint i);
   public abstract void pre_compute(StageImpute stage, uint j);
+  public abstract string description();
 }
 
 /* Replace missing values with a fixed value */
@@ -24,6 +25,10 @@ public class GGobi.ImputationFixed : Imputation {
   override double impute_single(uint i) {
     return fixed_value;
   }
+  
+  override string description() {
+    return fixed_value.to_string("Value: %.2f");
+  }
 }
 
 /* Replace missing values with a column mean */
@@ -31,11 +36,17 @@ public class GGobi.ImputationMean : ImputationFixed {
   override void pre_compute(StageImpute stage, uint j) {
     fixed_value = stage.get_variable(j).get_mean();
   }
+  override string description() {
+    return fixed_value.to_string("Mean: %.2f");
+  }
 }
 /* Replace missing values with a column median */
 public class GGobi.ImputationMedian : ImputationFixed {
   override void pre_compute(StageImpute stage, uint j) {
     fixed_value = stage.get_variable(j).get_median();
+  }
+  override string description() {
+    return fixed_value.to_string("Median: %.2f");
   }
 }
 
@@ -61,6 +72,10 @@ public class GGobi.ImputationPercent : Imputation {
   override double impute_single(uint i) {
     return fixed_value + Random.double_range(-range, range);
   }
+  override string description() {
+    return percent.to_string("Percent: %.2f");
+  }
+  
 }
 
 /* Impute with randomly selected non-missing value */
@@ -79,4 +94,8 @@ public class GGobi.ImputationRandom : Imputation {
   override double impute_single(uint i) {
     return non_missing[Random.int_range(0, non_missing.length)];
   }
+  override string description() {
+    return "Random";
+  }
+  
 }
