@@ -62,6 +62,11 @@ public class GGobi.StageImpute : Stage {
     if (!is_missing(i, j)) parent.set_raw_value(i, j, value);
   }
   
+  public void set_imputation(uint j, Imputation imp) {
+    imputation[j] = imp;
+    imputation_changed(j);
+  }
+  
   override void process_outgoing(PipelineMessage msg) {
     uint current_cols = n_cols;
     base.process_outgoing(msg);

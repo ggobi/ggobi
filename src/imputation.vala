@@ -5,7 +5,7 @@ Basic imputation classes used by StageImpute */
 using GLib;
 
 public class GGobi.Imputation : Object {
-  public void impute(StageImpute stage, uint j) {
+  public void impute(weak StageImpute stage, uint j) {
     pre_compute(stage, j);
     
     for(uint i = 0; i < stage.n_rows; i++) {
@@ -53,11 +53,11 @@ public class GGobi.ImputationMedian : ImputationFixed {
 /* Impute with jittered values fixed percent above/below lowest/highest value */
 public class GGobi.ImputationPercent : Imputation {
   /* Percent below/above lowest/highest value - in [-1, 1] */
-  double percent = -0.15;
+  public double percent = -0.15;
   double fixed_value = 0;
 
   /* Range of jittering within band */
-  double range = 0;
+  double jitter = 0;
   
   override void pre_compute(StageImpute stage, uint j) {
     double min = stage.get_variable(j).get_min();
@@ -65,12 +65,12 @@ public class GGobi.ImputationPercent : Imputation {
     double range = max - min;
 
     double side = (percent > 0) ? max : min;
-    fixed_value = side - percent * range;
-    range = Math.fabs(fixed_value - side) * 0.2;
+    fixed_value = side + percent * range;
+    jitter = percent * range * 0.2;
   }
   
   override double impute_single(uint i) {
-    return fixed_value + Random.double_range(-range, range);
+    return fixed_value + Random.double_range(-jitter, jitter);
   }
   override string description() {
     return percent.to_string("Percent: %.2f");

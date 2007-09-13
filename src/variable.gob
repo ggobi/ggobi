@@ -463,7 +463,7 @@ refresh_limits(self)
     
   if (!GGOBI_VARIABLE_IS_CATEGORICAL(self)) {
     for (i = 0; i < s->n_rows; i++) {
-      if (!s->missings_show_p && ggobi_stage_is_missing(s, i,j));
+      if (ggobi_stage_is_missing(s, i,j));
       else {
         if (ggobi_stage_get_raw_value(s, i, j) < min)
           min = ggobi_stage_get_raw_value(s, i, j);
