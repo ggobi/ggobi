@@ -55,16 +55,16 @@ pipeline_create_cb(GGobiPipelineFactory *factory, GGobiStage *root, GGobiSession
   ggobi_stage_filter_set_filter_column(GGOBI_STAGE_FILTER(subset), 
     ggobi_stage_get_col_index_for_name(root, "_sampled"));
 
-  jitter = g_object_new(GGOBI_TYPE_STAGE_JITTER, 
-    "name", GGOBI_MAIN_STAGE_JITTER, "parent", subset, NULL);
-  
   impute = g_object_new(GGOBI_TYPE_STAGE_IMPUTE, 
-    "name", GGOBI_MAIN_STAGE_IMPUTE, "parent", jitter, NULL);
+    "name", GGOBI_MAIN_STAGE_IMPUTE, "parent", subset, NULL);
 
-  // FIXME: 'excluded' is actually 'included' now
-  filter = g_object_new(GGOBI_TYPE_STAGE_FILTER, 
-    "name", GGOBI_MAIN_STAGE_FILTER, "parent", impute, NULL);
+  jitter = g_object_new(GGOBI_TYPE_STAGE_JITTER, 
+    "name", GGOBI_MAIN_STAGE_JITTER, "parent", impute, NULL);
   
+  filter = g_object_new(GGOBI_TYPE_STAGE_FILTER, 
+    "name", GGOBI_MAIN_STAGE_FILTER, "parent", jitter, NULL);
+  
+  // FIXME: 'excluded' is actually 'included' now
   ggobi_stage_filter_set_filter_column(GGOBI_STAGE_FILTER(filter),
     ggobi_stage_get_col_index_for_name(root, "_excluded"));
   
@@ -93,9 +93,9 @@ pipeline_create_cb(GGobiPipelineFactory *factory, GGobiStage *root, GGobiSession
   viewer = g_object_new(GGOBI_TYPE_GUI_VIEWER, "stage", GGOBI_STAGE(impute), NULL);
   gtk_widget_show(GTK_WIDGET(viewer));
   
-  // GGobiGuiJitter *gui_jitter;
-  // gui_jitter = g_object_new(GGOBI_TYPE_GUI_JITTER, "stage", GGOBI_STAGE_JITTER(jitter), NULL);
-  // gtk_widget_show(GTK_WIDGET(gui_jitter));
+  GGobiGuiJitter *gui_jitter;
+  gui_jitter = g_object_new(GGOBI_TYPE_GUI_JITTER, "stage", GGOBI_STAGE_JITTER(jitter), NULL);
+  gtk_widget_show(GTK_WIDGET(gui_jitter));
   
 }
 
