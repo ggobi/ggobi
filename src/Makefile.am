@@ -3,7 +3,7 @@ lib_LTLIBRARIES     = libggobi.la
 libggobi_la_GOBS = variable.gob stage.gob data.gob stage-transform.gob \
   stage-filter.gob pipeline-factory.gob \
   plugin-factory.gob plugin.gob data-factory-xml.gob \
-  stage-subset.gob stage-group.gob transform.gob \
+  stage-subset.gob stage-group.gob \
   transform-min-one.gob transform-boxcox.gob transform-abs.gob \
   transform-log10.gob gui-component.gob gui-transform.gob type-registry.gob \
   pipeline-message.gob variable-group.gob renderer.gob renderer-cairo.gob \
@@ -14,7 +14,7 @@ libggobi_la_VALAS = bitset.vala input-ftp.vala input-http.vala \
   input-source-file.vala input-source-ftp.vala input-source-factory.vala \
   input-source-http.vala stage-jitter.vala stage-standardize.vala \
   matrix.vala stage-impute.vala gui-viewer.vala gui-jitter.vala \
-  imputation.vala gui-varlist.vala gui-impute.vala
+  imputation.vala gui-varlist.vala gui-impute.vala transform.vala
 
 libggobi_la_METASOURCES = \
   $(libggobi_la_GOBS:%.gob=ggobi-%.c) \

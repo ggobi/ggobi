@@ -1,5 +1,5 @@
 %h{
-  #include "ggobi-transform.h"
+  #include "transform.h"
 %}
 class GGobi:Transform:Min:One from GGobi:Transform {
   override (GGobi:Transform) gdouble *

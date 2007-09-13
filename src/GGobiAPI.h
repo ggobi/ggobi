@@ -55,7 +55,7 @@
 #include "ggobi-transform-boxcox.h"
 #include "ggobi-transform-log10.h"
 #include "ggobi-transform-min-one.h"
-#include "ggobi-transform.h"
+#include "transform.h"
 #include "ggobi-type-registry.h"
 #include "ggobi-variable-group.h"
 #include "ggobi-variable.h"

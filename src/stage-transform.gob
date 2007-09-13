@@ -1,6 +1,6 @@
 %h{
   #include "ggobi-stage.h"
-  #include "ggobi-transform.h"
+  #include "transform.h"
 %}
 
 %{

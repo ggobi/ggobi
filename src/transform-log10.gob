@@ -1,5 +1,5 @@
 %h{
-  #include "ggobi-transform.h"
+  #include "transform.h"
 %}
 %{
   #include <math.h>
