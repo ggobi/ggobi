@@ -28,6 +28,7 @@
 
 #include "gui-viewer.h"
 #include "stage-jitter.h"
+#include "stage-impute.h"
 #include "gui-jitter.h"
 #include "ggobi-stage-subset.h"
 #include "ggobi-stage-transform.h"
@@ -42,7 +43,7 @@ guint GGobiSignals[MAX_GGOBI_SIGNALS];
 static void
 pipeline_create_cb(GGobiPipelineFactory *factory, GGobiStage *root, GGobiSession *gg)
 {
-  GObject *subset, *filter, *domain_adj, *transform, *jitter;
+  GObject *subset, *filter, *domain_adj, *transform, *jitter, *impute;
   
   
   subset = g_object_new(GGOBI_TYPE_STAGE_SUBSET, 
@@ -57,9 +58,12 @@ pipeline_create_cb(GGobiPipelineFactory *factory, GGobiStage *root, GGobiSession
   jitter = g_object_new(GGOBI_TYPE_STAGE_JITTER, 
     "name", GGOBI_MAIN_STAGE_JITTER, "parent", subset, NULL);
   
+  impute = g_object_new(GGOBI_TYPE_STAGE_IMPUTE, 
+    "name", GGOBI_MAIN_STAGE_IMPUTE, "parent", jitter, NULL);
+
   // FIXME: 'excluded' is actually 'included' now
   filter = g_object_new(GGOBI_TYPE_STAGE_FILTER, 
-    "name", GGOBI_MAIN_STAGE_FILTER, "parent", jitter, NULL);
+    "name", GGOBI_MAIN_STAGE_FILTER, "parent", impute, NULL);
   
   ggobi_stage_filter_set_filter_column(GGOBI_STAGE_FILTER(filter),
     ggobi_stage_get_col_index_for_name(root, "_excluded"));
@@ -76,20 +80,22 @@ pipeline_create_cb(GGobiPipelineFactory *factory, GGobiStage *root, GGobiSession
   GGOBI_STAGE(filter)->gg = gg;
   GGOBI_STAGE(domain_adj)->gg = gg;
   GGOBI_STAGE(transform)->gg = gg;
+  GGOBI_STAGE(impute)->gg = gg;
   
   g_object_unref(subset);
   g_object_unref(jitter);
   g_object_unref(filter);
   g_object_unref(domain_adj);
   g_object_unref(transform);
+  g_object_unref(impute);
   
-  // GGobiGuiViewer *viewer; 
-  // viewer = g_object_new(GGOBI_TYPE_GUI_VIEWER, "stage", GGOBI_STAGE(jitter), NULL);
-  // gtk_widget_show(GTK_WIDGET(viewer));
+  GGobiGuiViewer *viewer; 
+  viewer = g_object_new(GGOBI_TYPE_GUI_VIEWER, "stage", GGOBI_STAGE(impute), NULL);
+  gtk_widget_show(GTK_WIDGET(viewer));
   
-  GGobiGuiJitter *gui_jitter;
-  gui_jitter = g_object_new(GGOBI_TYPE_GUI_JITTER, "stage", GGOBI_STAGE_JITTER(jitter), NULL);
-  gtk_widget_show(GTK_WIDGET(gui_jitter));
+  // GGobiGuiJitter *gui_jitter;
+  // gui_jitter = g_object_new(GGOBI_TYPE_GUI_JITTER, "stage", GGOBI_STAGE_JITTER(jitter), NULL);
+  // gtk_widget_show(GTK_WIDGET(gui_jitter));
   
 }
 

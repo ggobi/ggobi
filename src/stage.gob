@@ -1485,8 +1485,8 @@ attach (self, GGobiSession *gg, gboolean cleanup)
    * variable.  (dfs -- done at Di's request, September 2004)
    **/
   /*limits_set (self, self->gg->lims_use_visible);*/
-  for (guint j = 0; j < self->n_cols; j++) vars[j] = j;
-  impute_fixed (IMP_BELOW, 15.0, self->n_cols, vars, self);
+  // for (guint j = 0; j < self->n_cols; j++) vars[j] = j;
+  // impute_fixed (IMP_BELOW, 15.0, self->n_cols, vars, self);
   /*limits_set (self, self->gg->lims_use_visible);*/
   g_free(vars);
 

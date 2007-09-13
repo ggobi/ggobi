@@ -447,6 +447,7 @@ struct _GGobiSession {
 #define GGOBI_MAIN_STAGE_FILTER "ggobi-main-filter"
 #define GGOBI_MAIN_STAGE_DOMAIN_ADJ "ggobi-main-domain-adj"
 #define GGOBI_MAIN_STAGE_TRANSFORM "ggobi-main-transform"
+#define GGOBI_MAIN_STAGE_IMPUTE "ggobi-main-impute"
 
 #include "read_init.h"
 

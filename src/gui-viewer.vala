@@ -83,7 +83,7 @@ public class GGobi.GuiViewer : Window {
       model.append(out iter);
       model.set(out iter, 0, stage.get_row_id(i));
       for(uint j = 0; j < stage.n_cols; j++) {
-        model.set(out iter, j + 1, stage.get_string_value(i, j));
+        model.set(out iter, j + 1, stage.get_raw_value(i, j).to_string("%0.2f"));
       }
     }
   }
@@ -109,7 +109,7 @@ public class GGobi.GuiViewer : Window {
     TreeIter iter;
     model.get_iter_first(out iter);
     for(uint i = 0; i < stage.n_rows; i++) {
-      model.set(out iter, j + 1, stage.get_string_value(i, j));
+      model.set(out iter, j + 1, stage.get_raw_value(i, j).to_string("%0.2f"));
       model.iter_next(out iter);
     }
   }
