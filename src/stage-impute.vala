@@ -31,6 +31,8 @@ using GLib;
 public class GGobi.StageImpute : Stage {
   public Imputation[] imputation;
   public Matrix cache;
+  
+  public signal void imputation_changed(uint j);
 
   /* Rerun imputations */
   public void refresh() {

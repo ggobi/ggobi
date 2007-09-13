@@ -30,6 +30,7 @@
 #include "stage-jitter.h"
 #include "stage-impute.h"
 #include "gui-jitter.h"
+#include "gui-impute.h"
 #include "ggobi-stage-subset.h"
 #include "ggobi-stage-transform.h"
 #include "input-source-factory.h"
@@ -93,9 +94,9 @@ pipeline_create_cb(GGobiPipelineFactory *factory, GGobiStage *root, GGobiSession
   viewer = g_object_new(GGOBI_TYPE_GUI_VIEWER, "stage", GGOBI_STAGE(impute), NULL);
   gtk_widget_show(GTK_WIDGET(viewer));
   
-  GGobiGuiJitter *gui_jitter;
-  gui_jitter = g_object_new(GGOBI_TYPE_GUI_JITTER, "stage", GGOBI_STAGE_JITTER(jitter), NULL);
-  gtk_widget_show(GTK_WIDGET(gui_jitter));
+  GGobiGuiImpute *gui_impute;
+  gui_impute = g_object_new(GGOBI_TYPE_GUI_IMPUTE, "stage", GGOBI_STAGE_IMPUTE(impute), NULL);
+  gtk_widget_show(GTK_WIDGET(gui_impute));
   
 }
 

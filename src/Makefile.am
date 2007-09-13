@@ -14,7 +14,7 @@ libggobi_la_VALAS = bitset.vala input-ftp.vala input-http.vala \
   input-source-file.vala input-source-ftp.vala input-source-factory.vala \
   input-source-http.vala stage-jitter.vala stage-standardize.vala \
   matrix.vala stage-impute.vala gui-viewer.vala gui-jitter.vala \
-  imputation.vala gui-varlist.vala
+  imputation.vala gui-varlist.vala gui-impute.vala
 
 libggobi_la_METASOURCES = \
   $(libggobi_la_GOBS:%.gob=ggobi-%.c) \
