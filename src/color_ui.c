@@ -644,9 +644,10 @@ color_changed_cb (GtkWidget * colorsel, ggobid * gg)
 }
 
 static void
-dlg_close_cb (GtkWidget * ok_button, ggobid * gg)
+dlg_response_cb (GtkWidget * dialog, gint id, ggobid * gg)
 {
-  gtk_widget_hide (gg->color_ui.colorseldlg);
+  gg->color_ui.colorseldlg = NULL;
+  gtk_widget_destroy(dialog);
 }
 
 static gint
@@ -682,14 +683,17 @@ open_colorsel_dialog (GtkWidget * w, ggobid * gg)
     /*
      * Connect up the buttons
      */
-    ok_button = colordlg->ok_button;
+    g_signal_connect(G_OBJECT(gg->color_ui.colorseldlg), "response",
+      G_CALLBACK(dlg_response_cb), gg);
+    
+    /*ok_button = colordlg->ok_button;
     cancel_button = colordlg->cancel_button;
     help_button = colordlg->help_button;
     g_signal_connect (G_OBJECT (ok_button), "clicked",
                       G_CALLBACK (dlg_close_cb), gg);
     g_signal_connect (G_OBJECT (cancel_button), "clicked",
                       G_CALLBACK (dlg_close_cb), gg);
-
+    */
   }
   else {
     colorsel =
