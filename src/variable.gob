@@ -719,6 +719,8 @@ clone(self)
 
   self_new->lim_specified_p = self->lim_specified_p;
 
+  self_new->is_attribute = self->is_attribute;
+
   return self_new;
 }
 

@@ -34,7 +34,9 @@
 #include "stage-display.h"
 #include "stage-impute.h"
 #include "stage-jitter.h"
+#include "stage-standardize.h"
 #include "stage-transform.h"
+
 
 #ifdef USE_MYSQL
 #include "read_mysql.h"
@@ -45,8 +47,7 @@ guint GGobiSignals[MAX_GGOBI_SIGNALS];
 static void
 pipeline_create_cb(GGobiPipelineFactory *factory, GGobiStage *root, GGobiSession *gg)
 {
-  GObject *subset, *filter, *domain_adj, *transform, *jitter, *impute, *display;
-  
+  GObject *display, *domain_adj, *filter, *impute, *jitter, *standardize, *subset, *transform;
   
   subset = g_object_new(GGOBI_TYPE_STAGE_SUBSET, 
     "name", GGOBI_MAIN_STAGE_SUBSET, "parent", root, NULL);
@@ -74,6 +75,9 @@ pipeline_create_cb(GGobiPipelineFactory *factory, GGobiStage *root, GGobiSession
     "name", GGOBI_MAIN_STAGE_DOMAIN_ADJ, "parent", filter, NULL);
   transform = g_object_new(GGOBI_TYPE_STAGE_TRANSFORM,
     "name", GGOBI_MAIN_STAGE_TRANSFORM, "parent", domain_adj, NULL);
+
+  standardize = g_object_new(GGOBI_TYPE_STAGE_STANDARDIZE, 
+    "name", GGOBI_MAIN_STAGE_STANDARDIZE, "parent", transform, NULL);
   
   display = g_object_new(GGOBI_TYPE_STAGE_DISPLAY, 
     "name", GGOBI_MAIN_STAGE_DISPLAY, "parent", transform, NULL);
@@ -86,6 +90,7 @@ pipeline_create_cb(GGobiPipelineFactory *factory, GGobiStage *root, GGobiSession
   GGOBI_STAGE(filter)->gg = gg;
   GGOBI_STAGE(impute)->gg = gg;
   GGOBI_STAGE(jitter)->gg = gg;
+  GGOBI_STAGE(standardize)->gg = gg;
   GGOBI_STAGE(subset)->gg = gg;
   GGOBI_STAGE(transform)->gg = gg;
   
@@ -94,11 +99,12 @@ pipeline_create_cb(GGobiPipelineFactory *factory, GGobiStage *root, GGobiSession
   g_object_unref(filter);
   g_object_unref(impute);
   g_object_unref(jitter);
+  g_object_unref(standardize);
   g_object_unref(subset);
   g_object_unref(transform);
   
   GGobiGuiViewer *viewer; 
-  viewer = g_object_new(GGOBI_TYPE_GUI_VIEWER, "stage", GGOBI_STAGE(display), NULL);
+  viewer = g_object_new(GGOBI_TYPE_GUI_VIEWER, "stage", GGOBI_STAGE(standardize), NULL);
   gtk_widget_show(GTK_WIDGET(viewer));
   
   GGobiGuiImpute *gui_impute;

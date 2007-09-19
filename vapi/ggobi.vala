@@ -65,6 +65,7 @@ public class GGobi.Session {
 [CCode (cheader_filename = "ggobi-variable.h")]
 public class GGobi.Variable: GLib.Object {
   public VariableType vartype {get; set;}
+  public bool is_attribute {get; set;}
   public string name;
   
   public float get_range();
@@ -74,7 +75,6 @@ public class GGobi.Variable: GLib.Object {
   
   public float get_mean();
   public bool has_missings();
-    
 
 }
 

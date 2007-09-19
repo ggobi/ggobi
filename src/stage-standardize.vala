@@ -13,24 +13,31 @@ min(x)), however, it needs to be possible to override min and max with values
 set by the user, rather than computed from the data.
 
 */
-public class GGobi.StageStandardize : Stage {
-	double standardize(double value, float min, float max) {
-    if ((min - max) < 0.0000000001) return 0.5;
-    return (value - min) / (max - min);
-	}
-	
-	double unstandardize(double value, float min, float max) {
-    if ((min - max) < 0.0000000001) return min;
-    return value * (max - min) + min;
-	}
-	
-	override double get_raw_value(uint i, uint j) {
-    Variable v = get_variable(j);
-    standardize(parent.get_raw_value(i, j), v.get_min(), v.get_max());
-	}
 
-	override void set_raw_value(uint i, uint j, double value) {
+public class GGobi.StageStandardize : Stage {
+  double standardize(double value, float min, float max) {
+    if ((max - min) < 0.0000000001) return 0.5;
+    return (value - min) / (max - min);
+  }
+  
+  double unstandardize(double value, float min, float max) {
+    if ((max - min) < 0.0000000001) return min;
+    return value * (max - min) + min;
+  }
+  
+  override double get_raw_value(uint i, uint j) {
     Variable v = get_variable(j);
-    parent.set_raw_value(i, j, unstandardize(value, v.get_min(), v.get_max()));
-	}
+    if (v.is_attribute) return(parent.get_raw_value(i, j));
+    
+    return standardize(parent.get_raw_value(i, j), v.get_min(), v.get_max());
+  }
+
+  override void set_raw_value(uint i, uint j, double value) {
+    Variable v = get_variable(j);
+    if (v.is_attribute) {
+      parent.set_raw_value(i, j, value);
+    } else {
+      parent.set_raw_value(i, j, unstandardize(value, v.get_min(), v.get_max()));      
+    }
+  }
 }
