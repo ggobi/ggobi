@@ -65,6 +65,8 @@ public class GGobi.StageImpute : Stage {
   public void set_imputation(uint j, Imputation imp) {
     imputation[j] = imp;
     imputation_changed(j);
+    col_data_changed(j);
+    flush_changes_here();
   }
   
   construct {
