@@ -89,10 +89,10 @@ namespace GGobi {
     NONE, EXPOSE, QUICK, BINNED, FULL, FULL_1PIXMAP
   }
   
-  [CCode (cprefix = "", lower_case_cprefix = "", cheader_filename = "pipeline.h")]
+  [CCode (cheader_filename = "pipeline.h", cname="tform_to_world_by_var")]
   public void tform_to_world_by_var (Stage stage, uint j);
   
-  [CCode (cprefix = "", lower_case_cprefix = "", cheader_filename = "display.h", cname="displays_tailpipe")]
+  [CCode (cheader_filename = "display.h", cname="displays_tailpipe")]
   void       displays_tailpipe (RedrawStyle style, Session stage);
   
 }

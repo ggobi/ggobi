@@ -245,7 +245,6 @@ process_filter(self)
   
   ggobi_stage_rows_removed(GGOBI_STAGE(self), removed_rows);
   g_slist_free(removed_rows);
-  g_debug("added %d past filter", n_added);
   ggobi_stage_rows_added(GGOBI_STAGE(self), n_added);
   
   //g_debug("included: %d", n_included);

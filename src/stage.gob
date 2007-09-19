@@ -310,7 +310,6 @@ property UINT n_rows
    set { 
      guint old_n_rows = self->n_rows;
      self->n_rows = g_value_get_uint(VAL);
-     g_debug("stage %s has %d rows", self->name, self->n_rows);
      if (old_n_rows < self->n_rows) {
        arrayg_add_rows (&self->world, self->n_rows);
      }

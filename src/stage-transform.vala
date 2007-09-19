@@ -32,7 +32,7 @@ public class GGobi.StageTransform : Stage {
     uint n_added_rows = msg.get_n_added_rows();
     uint n_refresh = n_added_cols;
     
-    parent.process_outgoing(msg);
+    base.process_outgoing(msg);
     
     tform.remove_rows(removed_rows);
     tform.add_rows((int) n_rows);
