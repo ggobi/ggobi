@@ -92,7 +92,7 @@ namespace GGobi {
   [CCode (cprefix = "", lower_case_cprefix = "", cheader_filename = "pipeline.h")]
   public void tform_to_world_by_var (Stage stage, uint j);
   
-  [CCode (cprefix = "", lower_case_cprefix = "", cheader_filename = "display.h")]
+  [CCode (cprefix = "", lower_case_cprefix = "", cheader_filename = "display.h", cname="displays_tailpipe")]
   void       displays_tailpipe (RedrawStyle style, Session stage);
   
 }

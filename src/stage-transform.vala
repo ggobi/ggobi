@@ -19,6 +19,11 @@ public class GGobi.StageTransform : Stage {
 
   public StageTransform(construct Stage parent) {}
   
+  construct {
+    tform = new Matrix(0, 0);
+    active_tforms = new HashTable.full(null, null, null, g_object_unref);
+  }
+  
   override void process_outgoing(PipelineMessage msg)  {
     SList changed_cols = msg.get_changed_cols();
     SList removed_rows = msg.get_removed_rows();
