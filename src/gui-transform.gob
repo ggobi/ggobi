@@ -4,10 +4,10 @@
 %}
 %{
   #include "stage-transform.h"
-  #include "ggobi-transform-min-one.h"
-  #include "ggobi-transform-boxcox.h"
-  #include "ggobi-transform-log10.h"
-  #include "ggobi-transform-abs.h"
+  #include "transform-min-one.h"
+  #include "transform-boxcox.h"
+  #include "transform-log10.h"
+  #include "transform-abs.h"
   /* for variable notebook stuff */
   #include "vars.h"
   #include "externs.h"

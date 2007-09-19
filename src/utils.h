@@ -13,6 +13,7 @@ gint       pcompare (const void *, const void *);
 gint       rank_compare (gconstpointer, gconstpointer, gpointer);
 GList*     g_list_remove_nth (GList *, gint);
 GList*     g_list_replace_nth (GList *, gpointer, gint);
+#include <gtk/gtk.h>
 gboolean   widget_initialized (GtkWidget *w);
 void       widget_initialize (GtkWidget *w, gboolean initd);
 GtkWidget* widget_find_by_name (GtkWidget *, gchar *);

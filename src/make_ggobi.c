@@ -91,7 +91,7 @@ pipeline_create_cb(GGobiPipelineFactory *factory, GGobiStage *root, GGobiSession
   g_object_unref(impute);
   
   GGobiGuiViewer *viewer; 
-  viewer = g_object_new(GGOBI_TYPE_GUI_VIEWER, "stage", GGOBI_STAGE(impute), NULL);
+  viewer = g_object_new(GGOBI_TYPE_GUI_VIEWER, "stage", GGOBI_STAGE(jitter), NULL);
   gtk_widget_show(GTK_WIDGET(viewer));
   
   GGobiGuiImpute *gui_impute;
