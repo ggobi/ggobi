@@ -34,21 +34,6 @@ public class GGobi.StageImpute : Stage {
   
   public signal void imputation_changed(uint j);
 
-  /* Rerun imputations */
-  public void refresh() {
-    _refresh();
-    for (uint j = 0; j < n_cols; j++) col_data_changed(j);    
-    flush_changes_here();
-  }
-  private void _refresh() {
-    for (uint j = 0; j < n_cols; j++) refresh_col_(j);    
-  }
-
-  public void refresh_col(uint j) {
-    refresh_col_(j);
-    col_data_changed(j);
-    flush_changes_here();
-  }
   public override void refresh_col_(uint j) {
     imputation[j].impute(this, j);
   }

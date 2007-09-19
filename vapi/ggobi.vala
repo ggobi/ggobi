@@ -31,6 +31,9 @@ public class GGobi.Stage : GLib.Object {
   public virtual void process_outgoing(PipelineMessage msg);
   
   public virtual void refresh_col_(uint j);
+  public virtual void refresh_col(uint j);
+  public virtual void refresh_();
+  public virtual void refresh();
   
 }
 

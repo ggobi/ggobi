@@ -1599,6 +1599,23 @@ refresh_col_(self, guint j) {
   
 }
 
+public virtual void refresh(self) {
+  self_refresh_(self);
+  for (guint j = 0; j < self->n_cols; j++) 
+    self_col_data_changed(self, j);    
+  self_flush_changes_here(self);
+}
+public virtual void refresh_(self) {
+  for (guint j = 0; j < self->n_cols; j++) 
+    self_refresh_col_(self, j);    
+}
+
+public virtual void refresh_col(self, guint j) {
+  self_refresh_col_(self, j);
+  self_col_data_changed(self, j);
+  self_flush_changes_here(self);
+}
+
 /* message handling */
 
 /* override to process any local, outgoing changes */

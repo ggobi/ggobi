@@ -24,20 +24,6 @@ public class GGobi.StageJitter : Stage {
   /* Cache of random values, with range equal to the range of each column */
   public PipelineMatrix cache;
   
-  public void refresh() {
-    _refresh();
-    for (uint j = 0; j < n_cols; j++) col_data_changed(j);    
-    flush_changes_here();
-  }
-  private void _refresh() {
-    for (uint j = 0; j < n_cols; j++) refresh_col_(j);    
-  }
-
-  public void refresh_col(uint j) {
-    refresh_col_(j);
-    col_data_changed(j);
-    flush_changes_here();
-  }
   public override void refresh_col_(uint j) {
     Variable v = get_variable(j);
     

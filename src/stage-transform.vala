@@ -48,9 +48,7 @@ public class GGobi.StageTransform : Stage {
       // v.set_name_transform_func(name_tform_func, tform);
       active_tforms.insert(j, tform);
     }
-    refresh_col_(j);
-    col_data_changed(j);
-    flush_changes_here();
+    refresh_col(j);
     applied(j, tform);
   }
 
@@ -117,7 +115,6 @@ public class GGobi.StageTransform : Stage {
         transform_error(tform, j);
       } 
     }
-    col_data_changed(j);
   }
   
   private void transform_error(Transform tform, uint j)
@@ -130,7 +127,7 @@ public class GGobi.StageTransform : Stage {
   // FIXME: This may be too aggressive...
   private void transform_notify_cb(Transform tf) {
     foreach(uint col in active_tforms.get_keys()) {
-      if (get_transform(col) == tf) refresh_col_(col);
+      if (get_transform(col) == tf) refresh_col(col);
     }
   }
 }
