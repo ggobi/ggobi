@@ -32,8 +32,6 @@ public class GGobi.StageImpute : Stage {
   public Imputation[] imputation;
   public PipelineMatrix cache;
   
-  public signal void imputation_changed(uint j);
-
   public override void refresh_col_(uint j) {
     imputation[j].impute(this, j);
   }
@@ -49,7 +47,7 @@ public class GGobi.StageImpute : Stage {
   
   public void set_imputation(uint j, Imputation imp) {
     imputation[j] = imp;
-    imputation_changed(j);
+    col_parameter_changed(j);
     col_data_changed(j);
     flush_changes_here();
   }

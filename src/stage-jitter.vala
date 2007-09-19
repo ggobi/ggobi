@@ -77,13 +77,11 @@ public class GGobi.StageJitter : Stage {
   }
   
   public void update_amounts(SList<uint> cols, double value) {
-    foreach(uint i in cols) {
-      amount[i] = value;
-      col_data_changed(i);
+    foreach(uint j in cols) {
+      amount[j] = value;
+      col_data_changed(j);
+      col_parameter_changed(j);
     }
-    amounts_changed(cols);
     flush_changes_here();
   }
-  
-  public signal void amounts_changed(SList<uint> cols);
 }

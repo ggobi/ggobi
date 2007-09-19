@@ -38,7 +38,7 @@ public class GGobi.GuiJitter : Window {
     varlist.add_view_col("Jittering", 1);
     
     update_jittered_values();
-    stage.amounts_changed += (stage, cols) => { 
+    stage.col_parameter_changed += (stage, col) => { 
       update_jittered_values(); 
     };
 

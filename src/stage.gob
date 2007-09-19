@@ -240,6 +240,10 @@ enum ATTR_SET {
  
 class GGobi:Stage from G:Object {
 
+public signal NONE (UINT) void 
+  col_parameter_changed(self, const guint j);
+
+
 /*-- this forms the pipeline --*/
 protected GGobiStage *parent;
 property OBJECT parent

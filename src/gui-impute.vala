@@ -37,7 +37,7 @@ public class GGobi.GuiImpute : Window {
     };
     
     update_imputation_col();
-    stage.imputation_changed += (stage, j) => { 
+    stage.col_parameter_changed += (stage, j) => { 
       update_imputation_col();
     };
     varlist.add_view_col("Imputation", 1);

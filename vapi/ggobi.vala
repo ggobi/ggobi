@@ -9,6 +9,7 @@ public class GGobi.Stage : GLib.Object {
   
   public Stage parent {get; set construct; }
   public signal void changed (PipelineMessage msg);
+  public signal void col_parameter_changed (uint j);
   
   public virtual void set_col_name(uint j, string name);
   public virtual void set_row_id(uint i, string id);

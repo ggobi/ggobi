@@ -15,8 +15,6 @@ public class GGobi.StageTransform : Stage {
   private PipelineMatrix cache; 
   private HashTable<uint, Transform> active_tforms;
   
-  private signal void applied(uint j, Transform tform);
-
   public StageTransform(construct Stage parent) {}
   
   construct {
@@ -49,7 +47,7 @@ public class GGobi.StageTransform : Stage {
       active_tforms.insert(j, tform);
     }
     refresh_col(j);
-    applied(j, tform);
+    col_parameter_changed(j);
   }
 
   /* Remove the transform at the given column */
