@@ -28,10 +28,6 @@ public class GGobi.StageTransform : Stage {
     // FIXME: Need to update hash table in response to column deletions 
     base.process_outgoing(msg);
     cache.process_message(msg, this);
-    
-    /* don't refresh if no columns (reparenting) */
-    /* this is a temporary hack until the pipeline and displays are completed */
-    if (gg != null && n_cols > 0) displays_tailpipe (RedrawStyle.FULL, gg);
   }
     
   /**
@@ -42,7 +38,7 @@ public class GGobi.StageTransform : Stage {
    */
   public void apply(uint j, Transform tform) {
     Variable v = get_variable(j);
-    if (tform != null) {
+    if (tform == null) {
       // v.set_name_transform_func(null, null);
       active_tforms.remove(j);
     } else {
@@ -53,9 +49,8 @@ public class GGobi.StageTransform : Stage {
       active_tforms.insert(j, tform);
     }
     refresh_col_(j);
+    col_data_changed(j);
     flush_changes_here();
-    // temporary hack
-    displays_tailpipe(RedrawStyle.FULL, gg);
     applied(j, tform);
   }
 
@@ -122,8 +117,6 @@ public class GGobi.StageTransform : Stage {
         transform_error(tform, j);
       } 
     }
-    // FIXME: world stage should take care of this
-    tform_to_world_by_var(this, j);
     col_data_changed(j);
   }
   
@@ -139,8 +132,5 @@ public class GGobi.StageTransform : Stage {
     foreach(uint col in active_tforms.get_keys()) {
       if (get_transform(col) == tf) refresh_col_(col);
     }
-    flush_changes_here();
-    // temporary hack
-    displays_tailpipe (RedrawStyle.FULL, gg);
   }
 }

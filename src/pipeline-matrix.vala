@@ -31,18 +31,20 @@ public class GGobi.PipelineMatrix : GLib.Object {
   }
 
   public void process_message(PipelineMessage msg, Stage stage) {
-    SList changed_cols = msg.get_changed_cols();
-    SList removed_rows = msg.get_removed_rows();
-    SList removed_cols = msg.get_removed_cols();
-    uint n_added_cols = msg.get_n_added_cols();
-    uint n_added_rows = msg.get_n_added_rows();
-    uint n_refresh = n_added_cols;
     
+    SList removed_rows = msg.get_removed_rows();
     matrix.remove_rows(removed_rows);
     matrix.add_rows((int) stage.n_rows);
+
+    SList removed_cols = msg.get_removed_cols();
     matrix.remove_cols(removed_cols);
     matrix.add_cols((int) stage.n_cols);
         
+    SList changed_cols = msg.get_changed_cols();
+    uint n_added_cols = msg.get_n_added_cols();
+    uint n_added_rows = msg.get_n_added_rows();
+    uint n_refresh = n_added_cols;
+
     if (removed_rows != null || n_added_rows > 0) {
       // if rows changed, update all columns
       n_refresh = n_cols; 

@@ -393,7 +393,7 @@ button_release_cb (GtkWidget * w, GdkEventButton * event, gpointer user_data)
         ggobi_data_add_attributes(ed);
         e = GGOBI_STAGE(ed);
         ggobi_pipeline_factory_build(gg->pipeline_factory, e);
-        ggobi_stage_attach(ggobi_stage_find(e, GGOBI_MAIN_STAGE_TRANSFORM), gg, FALSE);
+        ggobi_stage_attach(ggobi_stage_find(e, GGOBI_MAIN_STAGE_DISPLAY), gg, FALSE);
         ggobi_stage_set_name(e, "edges");
         display->e = e;
         display->options.edges_undirected_show_p = true;

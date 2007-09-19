@@ -266,7 +266,7 @@ write_xml_record (FILE *f, GGobiStage *d, GGobiSession *gg, gint i,
   gint j;
   
   if (gg->save.stage == TFORMDATA)
-    d = ggobi_stage_find(d, GGOBI_MAIN_STAGE_TRANSFORM);
+    d = ggobi_stage_find(d, GGOBI_MAIN_STAGE_DISPLAY);
   
   /*-- ids if present --*/
   fprintf(f, " id=\"%s\"", ggobi_stage_get_row_id(d, i));

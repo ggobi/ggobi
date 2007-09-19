@@ -364,7 +364,7 @@ vartable_subwindow_init (GGobiStage *d, GGobiSession *gg)
   GtkTreeStore *model;
   GtkTreeModel *sort_model, *filter_model;
   
-  d = ggobi_stage_find(d, GGOBI_MAIN_STAGE_TRANSFORM);
+  d = ggobi_stage_find(d, GGOBI_MAIN_STAGE_DISPLAY);
   
   g_signal_connect (G_OBJECT (nbook), "switch-page",
     G_CALLBACK (vartable_switch_page_cb), gg);

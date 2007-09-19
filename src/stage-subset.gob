@@ -211,7 +211,7 @@ sticky (self)
 {
   gint id;
   GSList *l;
-  GGobiStage *last = ggobi_stage_find(GGOBI_STAGE(self), GGOBI_MAIN_STAGE_TRANSFORM);
+  GGobiStage *last = ggobi_stage_find(GGOBI_STAGE(self), GGOBI_MAIN_STAGE_DISPLAY);
 
   if (g_slist_length (last->sticky_ids) == 0)
     return false;

@@ -26,14 +26,15 @@
 #include "externs.h"
 #include "plugin.h"
 
-#include "gui-viewer.h"
-#include "stage-jitter.h"
-#include "stage-impute.h"
-#include "gui-jitter.h"
-#include "gui-impute.h"
 #include "ggobi-stage-subset.h"
-#include "stage-transform.h"
+#include "gui-impute.h"
+#include "gui-jitter.h"
+#include "gui-viewer.h"
 #include "input-source-factory.h"
+#include "stage-display.h"
+#include "stage-impute.h"
+#include "stage-jitter.h"
+#include "stage-transform.h"
 
 #ifdef USE_MYSQL
 #include "read_mysql.h"
@@ -44,7 +45,7 @@ guint GGobiSignals[MAX_GGOBI_SIGNALS];
 static void
 pipeline_create_cb(GGobiPipelineFactory *factory, GGobiStage *root, GGobiSession *gg)
 {
-  GObject *subset, *filter, *domain_adj, *transform, *jitter, *impute;
+  GObject *subset, *filter, *domain_adj, *transform, *jitter, *impute, *display;
   
   
   subset = g_object_new(GGOBI_TYPE_STAGE_SUBSET, 
@@ -74,24 +75,30 @@ pipeline_create_cb(GGobiPipelineFactory *factory, GGobiStage *root, GGobiSession
   transform = g_object_new(GGOBI_TYPE_STAGE_TRANSFORM,
     "name", GGOBI_MAIN_STAGE_TRANSFORM, "parent", domain_adj, NULL);
   
+  display = g_object_new(GGOBI_TYPE_STAGE_DISPLAY, 
+    "name", GGOBI_MAIN_STAGE_DISPLAY, "parent", transform, NULL);
+  
+  
   // FIXME: get rid of these lines ASAP
   // There is absolutely no reason for the pipeline to depend on GGobiSession
-  GGOBI_STAGE(subset)->gg = gg;
-  GGOBI_STAGE(jitter)->gg = gg;
-  GGOBI_STAGE(filter)->gg = gg;
+  GGOBI_STAGE(display)->gg = gg;
   GGOBI_STAGE(domain_adj)->gg = gg;
-  GGOBI_STAGE(transform)->gg = gg;
+  GGOBI_STAGE(filter)->gg = gg;
   GGOBI_STAGE(impute)->gg = gg;
+  GGOBI_STAGE(jitter)->gg = gg;
+  GGOBI_STAGE(subset)->gg = gg;
+  GGOBI_STAGE(transform)->gg = gg;
   
-  g_object_unref(subset);
-  g_object_unref(jitter);
-  g_object_unref(filter);
+  g_object_unref(display);
   g_object_unref(domain_adj);
-  g_object_unref(transform);
+  g_object_unref(filter);
   g_object_unref(impute);
+  g_object_unref(jitter);
+  g_object_unref(subset);
+  g_object_unref(transform);
   
   GGobiGuiViewer *viewer; 
-  viewer = g_object_new(GGOBI_TYPE_GUI_VIEWER, "stage", GGOBI_STAGE(jitter), NULL);
+  viewer = g_object_new(GGOBI_TYPE_GUI_VIEWER, "stage", GGOBI_STAGE(display), NULL);
   gtk_widget_show(GTK_WIDGET(viewer));
   
   GGobiGuiImpute *gui_impute;
@@ -177,7 +184,7 @@ load_data_source (GGobiInputSource *source, GGobiSession * gg)
        dataset is added to the main context. Right now we are sort of hacking
        it by attaching the transform stage rather than the dataset. The _attach()
        method knows when to go back to the root. */
-    ggobi_stage_attach(ggobi_stage_find(dataset, GGOBI_MAIN_STAGE_TRANSFORM), gg, FALSE);
+    ggobi_stage_attach(ggobi_stage_find(dataset, GGOBI_MAIN_STAGE_DISPLAY), gg, FALSE);
   }
   
   return (datasets);

@@ -583,7 +583,7 @@ GtkWidget *create_variable_notebook (GtkWidget * box,
                                      gpointer func_data, GGobiSession * gg)
 {
   GtkWidget *notebook;
-  const gchar *stage_name = GGOBI_MAIN_STAGE_TRANSFORM;
+  const gchar *stage_name = GGOBI_MAIN_STAGE_DISPLAY;
   //gint nd = g_slist_length (gg->d);
   GSList *l;
 

@@ -202,7 +202,7 @@ linkby_notebook_subwindow_add (GGobiStage * d, GtkWidget * notebook,
 {
   GtkWidget *swin, *treeview;
   GtkListStore *list;
-  GGobiStage *s = ggobi_stage_find(d, GGOBI_MAIN_STAGE_TRANSFORM);
+  GGobiStage *s = ggobi_stage_find(d, GGOBI_MAIN_STAGE_DISPLAY);
 
   GtkSelectionMode mode = GTK_SELECTION_SINGLE;
 
