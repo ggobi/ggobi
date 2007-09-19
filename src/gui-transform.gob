@@ -3,7 +3,7 @@
   #include "ggobi-type-registry.h"
 %}
 %{
-  #include "ggobi-stage-transform.h"
+  #include "stage-transform.h"
   #include "ggobi-transform-min-one.h"
   #include "ggobi-transform-boxcox.h"
   #include "ggobi-transform-log10.h"

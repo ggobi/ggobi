@@ -27,6 +27,7 @@ public class GGobi.Transform : Object {
   /* Transformed variable name (to indicate the current transformation) */
   public abstract string variable_name(string name);
   
+  public signal void notify();
   
   /**
    * Convenience method for transforming a column in a #GGobiStage.
@@ -63,6 +64,6 @@ public class GGobi.Transform : Object {
   {
     /* I wanted to do a property-based comparison here, but GValue
        apparently does not support comparisons */
-     return base.get_type() == other.get_type();
+     return this.get_type() == other.get_type();
   }
 }

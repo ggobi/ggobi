@@ -32,7 +32,7 @@
 #include "gui-jitter.h"
 #include "gui-impute.h"
 #include "ggobi-stage-subset.h"
-#include "ggobi-stage-transform.h"
+#include "stage-transform.h"
 #include "input-source-factory.h"
 
 #ifdef USE_MYSQL

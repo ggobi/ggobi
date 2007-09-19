@@ -190,7 +190,6 @@ gboolean     display_type_handles_interaction (displayd *, InteractionMode);
 
 void       display_window_init (windowDisplayd *, gint, gint, gint, GGobiSession *);
 void       displays_plot (splotd *, RedrawStyle, GGobiSession *);
-void       displays_tailpipe (RedrawStyle, GGobiSession *);
 void       set_display_options(displayd *display, GGobiSession *gg);
 void	     set_display_option(gboolean active, guint action, displayd *display);
 void       set_time(GGobiSession *);
@@ -398,8 +397,6 @@ void       t2d_ppcool_set(gfloat, displayd *, GGobiSession *);
 void       t2d_ppdraw (gfloat, displayd *, GGobiSession *);
 void       t2d_pptemp_set(gfloat, displayd *, GGobiSession *);
 void       textur (gfloat *, gfloat *, gint, gint, gfloat, gint, GGobiSession *);
-void       tform_to_world (GGobiStage *);
-void       tform_to_world_by_var (GGobiStage *, guint j);
 void       tooltips_show (gboolean show, GGobiSession *gg);
 void       tour1d_all_vars (displayd *);
 void       tour1d_do_step (displayd *,GGobiSession *);
@@ -629,19 +626,6 @@ cairo_t*   create_cairo_glitz(GdkDrawable *drawable);
 
 #endif
 
-void
-pt_world_to_raw_by_var (gint j, greal * world, greal * raw, GGobiStage * d);
-
-void
-pt_screen_to_raw (icoords * screen, gint id, gboolean horiz, gboolean vert,
-                  greal * raw, gcoords * eps, GGobiStage * d, splotd * sp,
-                  GGobiSession * gg);
-void
-pt_plane_to_world (splotd * sp, gcoords * planar, gcoords * eps,
-                   greal * world);
-void
-pt_screen_to_plane (icoords * screen, gint id, gboolean horiz, gboolean vert,
-                   gcoords * eps, gcoords * planar, splotd * sp);
 endpointsd *
 resolveEdgePoints (GGobiStage * e, GGobiStage * d);
 void

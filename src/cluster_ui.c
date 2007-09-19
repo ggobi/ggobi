@@ -17,6 +17,7 @@
 #include <gtk/gtk.h>
 #include "vars.h"
 #include "externs.h"
+#include "pipeline.h"
 
 #include "ggobi-stage-filter.h"
 

@@ -21,6 +21,7 @@
 
 #include "vars.h"
 #include "externs.h"
+#include "pipeline.h"
 
 
 static void

@@ -18,6 +18,8 @@
 
 #include "vars.h"
 #include "externs.h"
+#include "pipeline.h"
+
 
 static gboolean movepts_history_contains (gint, gint, GGobiStage *, GGobiSession *);
 

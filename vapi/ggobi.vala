@@ -5,8 +5,9 @@ public class GGobi.Stage : GLib.Object {
   public uint n_rows { get; set construct; }
   public uint n_cols { get; set construct; }
   public string name { get; set construct; }
+  public Session gg;
   
-  public Stage parent;
+  public Stage parent {get; set construct; }
   public signal void changed (PipelineMessage msg);
   
   public virtual void set_col_name(uint j, string name);
@@ -52,6 +53,8 @@ public class GGobi.PipelineMessage : GLib.Object{
   public uint get_n_removed_cols();
 }
 
+public class GGobi.Session {
+}
 
 [CCode (cheader_filename = "ggobi-variable.h")]
 public class GGobi.Variable: GLib.Object {
@@ -65,6 +68,7 @@ public class GGobi.Variable: GLib.Object {
   
   public float get_mean();
   public bool has_missings();
+    
 
 }
 
@@ -79,6 +83,18 @@ namespace GGobi {
   public enum VariableType {
     REAL, CATEGORICAL, INTEGER, COUNTER, UNIFORM, ALL_VARTYPES
   }
+  
+  [CCode (cname = "RedrawStyle", cprefix = "", lower_case_cprefix = "", cheader_filename = "pipeline.h")]
+  public enum RedrawStyle {
+    NONE, EXPOSE, QUICK, BINNED, FULL, FULL_1PIXMAP
+  }
+  
+  [CCode (cprefix = "", lower_case_cprefix = "", cheader_filename = "pipeline.h")]
+  public void tform_to_world_by_var (Stage stage, uint j);
+  
+  [CCode (cprefix = "", lower_case_cprefix = "", cheader_filename = "display.h")]
+  void       displays_tailpipe (RedrawStyle style, Session stage);
+  
 }
 
 [CCode (cprefix = "arrayd_", cheader_filename = "array.h", cname="array_d")]

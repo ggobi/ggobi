@@ -14,12 +14,7 @@
  *   Andreas Buja        andreas.buja@wharton.upenn.edu
 */
 
-#include <math.h>
-#include <stdlib.h>
-#include <string.h>
-#include <gtk/gtk.h>
-#include "vars.h"
-#include "externs.h"
+#include "pipeline.h"
 
 
 void

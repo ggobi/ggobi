@@ -24,6 +24,9 @@
 
 #include "session.h"
 
+void       displays_tailpipe (RedrawStyle, GGobiSession *);
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif

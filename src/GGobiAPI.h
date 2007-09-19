@@ -49,7 +49,7 @@
 #include "ggobi-stage-filter.h"
 #include "ggobi-stage-group.h"
 #include "ggobi-stage-subset.h"
-#include "ggobi-stage-transform.h"
+#include "stage-transform.h"
 #include "ggobi-stage.h"
 #include "ggobi-transform-abs.h"
 #include "ggobi-transform-boxcox.h"
