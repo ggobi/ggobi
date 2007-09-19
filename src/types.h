@@ -46,10 +46,6 @@ typedef enum {DOT_GLYPH=0, PLUS, X, OC, OR, FC, FR, UNKNOWN_GLYPH} GlyphType;
 
 typedef enum {ADDING_EDGES=0, ADDING_POINTS} eeMode;
 
-typedef enum {
-  IMP_RANDOM,  IMP_FIXED, IMP_BELOW, IMP_ABOVE, IMP_MEAN, IMP_MEDIAN
-} ImputeType;
-
 typedef struct {
   GlyphType type;
   gint size;

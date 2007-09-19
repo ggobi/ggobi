@@ -1482,16 +1482,8 @@ attach (self, GGobiSession *gg, gboolean cleanup)
   for(guint j = 0; j < self_get_n_vars(self); j++) 
     self_update_col(self, j);
   self_flush_changes(self);
-    
-  /*
-   * If there are missings, they've been initialized with a value
-   * of 0.  Here, re-set that value to 15% below the minimum for each
-   * variable.  (dfs -- done at Di's request, September 2004)
-   **/
-  /*limits_set (self, self->gg->lims_use_visible);*/
-  // for (guint j = 0; j < self->n_cols; j++) vars[j] = j;
-  // impute_fixed (IMP_BELOW, 15.0, self->n_cols, vars, self);
-  /*limits_set (self, self->gg->lims_use_visible);*/
+  
+
   g_free(vars);
 
   clusters_set(self);  /*-- find the clusters for data just read in --*/

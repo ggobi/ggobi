@@ -33,10 +33,12 @@
  * generate a new datad using d->missing.  
  *
 */
+
+//FIXME: make into a stage
 void
 missings_datad_cb (GtkWidget * w, GGobiSession * gg)
 {
-  GObject *obj = G_OBJECT (gg->impute.window);
+  GObject *obj;// = G_OBJECT (gg->impute.window);
   GtkWidget *tree_view = get_tree_view_from_object (obj);
   GGobiStage *d = GGOBI_STAGE(g_object_get_data (G_OBJECT (tree_view), "datad"));
   static gchar *lnames[] = { "present", "missing" };

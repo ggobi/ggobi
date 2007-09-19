@@ -838,7 +838,6 @@ action_smooth_cb (GtkAction * action, GGobiSession * gg)
 static void
 action_impute_cb (GtkAction * action, GGobiSession * gg)
 {
-  impute_window_open (gg);
 }
 static void
 action_about_cb (GtkAction * action, GGobiSession * gg)

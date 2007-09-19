@@ -387,18 +387,6 @@ struct _GGobiSession {
     gint update_method;
   } wvis;
 
-/*-------------------- imputation ------------------------------------*/
-
-  struct _Impute {
-    gboolean bgroup_p;
-    gint whichvars;
-    GtkWidget *window;
-    ImputeType type;
-    /*
-    GtkWidget *notebook;
-    GtkWidget *entry_above, *entry_below, *entry_val;
-    */
-  } impute;
 
 /*-------------------- moving points ---------------------------------*/
 
