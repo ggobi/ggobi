@@ -32,9 +32,9 @@ public class GGobi.GuiImpute : Window {
     
     // Initialise variable list 
     varlist = new Varlist(stage);
-    // varlist.selection_changed += varlist => {
-    //   update_imputation_gui();
-    // };
+    varlist.selection_changed += varlist => {
+      update_imputation_gui();
+    };
     
     update_imputation_col();
     stage.imputation_changed += (stage, j) => { 
@@ -73,18 +73,29 @@ public class GGobi.GuiImpute : Window {
     median = new RadioButton.with_label(null, "Median");
     median.group = fixed.group;
     median.toggled += percent => {
-      if (mean.active) update_imputation(new ImputationMedian());
+      if (median.active) update_imputation(new ImputationMedian());
     };
 
     random = new RadioButton.with_label(null, "Random");
     random.group = fixed.group;
     random.toggled += percent => {
-      if (mean.active) update_imputation(new ImputationRandom());
+      if (random.active) update_imputation(new ImputationRandom());
     };
     
     percent_value = new HScale.with_range(-1, 1, 0.01);
+    percent_value.value_changed += percent_value => {
+      ImputationPercent imp = new ImputationPercent();
+      imp.percent = percent_value.get_value();
+      update_imputation(imp);
+    };
+    
     fixed_value = new SpinButton.with_range(double.MIN, double.MAX, 10);
     fixed_value.sensitive = false;
+    fixed_value.value_changed += fixed_value => {
+      ImputationFixed imp = new ImputationFixed();
+      imp.fixed_value = fixed_value.get_value();
+      update_imputation(imp);
+    };
     
     // Layout -----------------------------------------
     HBox sides = new HBox(false, 3);
