@@ -30,6 +30,8 @@ public class GGobi.Stage : GLib.Object {
   virtual void process_incoming(PipelineMessage msg);
   public virtual void process_outgoing(PipelineMessage msg);
   
+  public virtual void refresh_col_(uint j);
+  
 }
 
 [CCode (cheader_filename = "ggobi-data.h")]

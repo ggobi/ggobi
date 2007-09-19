@@ -22,31 +22,30 @@ public class GGobi.StageJitter : Stage {
   public bool uniformDist = true;
   
   /* Cache of random values, with range equal to the range of each column */
-  public Matrix cache;
+  public PipelineMatrix cache;
   
-  /* Recompute cache of random variables */
   public void refresh() {
     _refresh();
     for (uint j = 0; j < n_cols; j++) col_data_changed(j);    
     flush_changes_here();
   }
   private void _refresh() {
-    for (uint j = 0; j < n_cols; j++) _refresh_col(j);    
+    for (uint j = 0; j < n_cols; j++) refresh_col_(j);    
   }
 
   public void refresh_col(uint j) {
-    _refresh_col(j);
+    refresh_col_(j);
     col_data_changed(j);
     flush_changes_here();
   }
-  public void _refresh_col(uint j) {
+  public override void refresh_col_(uint j) {
     Variable v = get_variable(j);
     
     float range = v.get_range();
     float mid = (v.get_min() + v.get_max()) / 2;
     
     for (uint i = 0; i < n_rows; i++) 
-      ((double[]) cache.vals[i])[j] = mid + rand() * range;
+      cache.set(i, j, mid + rand() * range);
   }
   
    
@@ -64,7 +63,7 @@ public class GGobi.StageJitter : Stage {
     double original = parent.get_raw_value(i, j);
     if (amount[j] == 0) return original;
     
-    return original * (1 - amount[j]) + ((double[]) cache.vals[i])[j] * amount[j];
+    return original * (1 - amount[j]) + cache.get(i, j) * amount[j];
   }
 
   /* When setting the value of a jittered observation, subtract off the
@@ -74,41 +73,21 @@ public class GGobi.StageJitter : Stage {
     if (amount[j] == 0) {
       original = value;
     } else {
-      original = (value - ((double[]) cache.vals[i])[j] * amount[j]) / (1 - amount[j]);
+      original = (value - cache.get(i, j) * amount[j]) / (1 - amount[j]);
     }
     parent.set_raw_value(i, j, original);
   }  
   
+  construct {
+    cache = new PipelineMatrix();
+    amount.resize(0);
+  }
+  
   /* Process incoming change events */
   override void process_outgoing(PipelineMessage msg) {
-    uint current_cols = n_cols;
     base.process_outgoing(msg);
-
-    uint n_added_cols = msg.get_n_added_cols();
-    uint n_added_rows = msg.get_n_added_rows();
-    
-    if (cache == null) {
-      // Fresh initialisation
-      cache = new Matrix(n_added_rows, n_added_cols);
-      amount.resize((int) n_added_cols);
-      _refresh();
-    } else {
-      // Update cache matrix
-      cache.add_cols((int) n_added_cols);
-      for (uint j = 0; j < n_added_cols; j++)
-        _refresh_col(current_cols + j);
-      
-      if (n_added_rows > 0) {
-        cache.add_rows((int) n_added_rows);
-        // Need to add generate new jitters
-      }
-      
-      cache.remove_rows(msg.get_removed_rows());
-      cache.remove_cols(msg.get_removed_cols());
-      
-      // Resize amounts vector
-      amount.resize((int) current_cols + (int) n_added_cols); 
-    }
+    cache.process_message(msg, this);
+    amount.resize((int) n_cols); 
   }
   
   public void update_amounts(SList<uint> cols, double value) {

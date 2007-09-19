@@ -9,7 +9,8 @@ public class GGobi.Imputation : Object {
     pre_compute(stage, j);
     
     for(uint i = 0; i < stage.n_rows; i++) {
-      ((double[]) stage.cache.vals[i])[j] = (!stage.is_missing(i, j) ? stage.parent.get_raw_value(i, j) : impute_single(i));
+      double value = !stage.is_missing(i, j) ? stage.parent.get_raw_value(i, j) : impute_single(i);
+      stage.cache.set(i, j, value);
     }
   }
   

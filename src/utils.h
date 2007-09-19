@@ -1,6 +1,8 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#include <gtk/gtk.h>
+
 gint       index_compare(gconstpointer a, gconstpointer b);
 guint      *find_keepers (gint ncols_current, GSList *cols, guint *nkeepers);
 gint       sqdist (gint, gint, gint, gint);

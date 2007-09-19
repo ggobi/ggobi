@@ -12,7 +12,7 @@
 using GLib;
 
 public class GGobi.StageTransform : Stage {
-  private Matrix tform; 
+  private PipelineMatrix cache; 
   private HashTable<uint, Transform> active_tforms;
   
   private signal void applied(uint j, Transform tform);
@@ -20,36 +20,15 @@ public class GGobi.StageTransform : Stage {
   public StageTransform(construct Stage parent) {}
   
   construct {
-    tform = new Matrix(0, 0);
+    cache = new PipelineMatrix();
     active_tforms = new HashTable.full(null, null, null, g_object_unref);
   }
   
   override void process_outgoing(PipelineMessage msg)  {
-    SList changed_cols = msg.get_changed_cols();
-    SList removed_rows = msg.get_removed_rows();
-    SList removed_cols = msg.get_removed_cols();
-    uint n_added_cols = msg.get_n_added_cols();
-    uint n_added_rows = msg.get_n_added_rows();
-    uint n_refresh = n_added_cols;
-    
+    // FIXME: Need to update hash table in response to column deletions 
     base.process_outgoing(msg);
+    cache.process_message(msg, this);
     
-    tform.remove_rows(removed_rows);
-    tform.add_rows((int) n_rows);
-    tform.remove_cols(removed_cols);
-    tform.add_cols((int) n_cols);
-    
-    // FIXME: Need to update hash table in response to column deletions
-    
-    if (removed_rows != null || n_added_rows > 0) {
-      // if rows changed, refresh all transforms
-      n_refresh = n_cols; 
-    } else {
-      foreach(uint j in changed_cols) transform(0, j);
-    }
-    for (uint j = n_cols - n_refresh; j < n_cols; j++)
-      transform(0, j);
-
     /* don't refresh if no columns (reparenting) */
     /* this is a temporary hack until the pipeline and displays are completed */
     if (gg != null && n_cols > 0) displays_tailpipe (RedrawStyle.FULL, gg);
@@ -73,7 +52,7 @@ public class GGobi.StageTransform : Stage {
       // v.set_name_transform_func(name_tform_func, tform);
       active_tforms.insert(j, tform);
     }
-    transform(0, j);
+    refresh_col_(j);
     flush_changes_here();
     // temporary hack
     displays_tailpipe(RedrawStyle.FULL, gg);
@@ -100,43 +79,47 @@ public class GGobi.StageTransform : Stage {
   }
   
   override double get_raw_value(uint i, uint j) {
-    return ((double[]) tform.vals[i])[j];
+    return cache.get(i, j);
   }
   
   override void set_raw_value(uint i, uint j, double value) {
-    Transform tf = get_transform(j);
+    Transform tform = get_transform(j);
     
     if (tform != null) {
       Variable v = parent.get_variable(j);
       
       double[] input = new double[1]; 
       input[0] = value;
-      double[] res = tf.reverse(input, v);
+      double[] res = tform.reverse(input, v);
       if (res != null) {
         value = res[0];
       } else {
-        transform_error(tf, j);
+        transform_error(tform, j);
         return;
       }
     }
     base.set_raw_value(i, j, value);
-    ((double[]) tform.vals[i])[j] = value;
+    cache.set(i, j, value);
+  }
+  
+  public override void refresh_col_(uint j) {
+    transform(0, j);
   }
   
   private void transform(uint start, uint j) {
     uint i;
-    Transform tf = get_transform(j);
-    if (tform != null) { 
+    Transform tform = get_transform(j);
+    if (tform == null) { 
       // identity transformation
       for (i = 0; i < n_rows; i++)
-        ((double[]) tform.vals[i])[j] = parent.get_raw_value(i, j);
+        cache.set(i, j, parent.get_raw_value(i, j));
     } else {
-      double[] result = tf.column(parent, start, j); 
+      double[] result = tform.column(parent, start, j); 
       if (result != null) {
         for (i = start; i < n_rows; i++)
-          ((double[]) tform.vals[i])[j] = result[i];
+          cache.set(i, j, result[i]);
       } else {
-        transform_error(tf, j);
+        transform_error(tform, j);
       } 
     }
     // FIXME: world stage should take care of this
@@ -154,7 +137,7 @@ public class GGobi.StageTransform : Stage {
   // FIXME: This may be too aggressive...
   private void transform_notify_cb(Transform tf) {
     foreach(uint col in active_tforms.get_keys()) {
-      if (get_transform(col) == tf) transform(0, col);
+      if (get_transform(col) == tf) refresh_col_(col);
     }
     flush_changes_here();
     // temporary hack

@@ -41,7 +41,6 @@ typedef struct {
 
 void       arrayd_add_cols (array_d *, gint);
 void       arrayd_add_rows (array_d *, gint);
-array_d  *  arrayd_new (gint, gint);
 void       arrayd_alloc (array_d *, gint, gint);
 void       arrayd_alloc_zero (array_d *, gint, gint);
 void       arrayd_copy (array_d *, array_d *);
@@ -86,6 +85,13 @@ void       arrays_delete_rows (array_s *, GSList *);
 void       arrays_free (array_s *, gint, gint);
 void       arrays_init_null (array_s *);
 void       arrays_zero (array_s *);
+
+
+// Extras for vala compatability (probably better ways to do this)
+array_d  *  arrayd_new (gint, gint);
+gdouble ggobi_matrix_get_n_cols(array_d * arrp);
+gdouble ggobi_matrix_get_n_rows(array_d * arrp);
+
 
 #endif
 

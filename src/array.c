@@ -29,6 +29,14 @@ arrayd_init_null (array_d * arrp)
   arrp->vals = (gdouble **) NULL;
 }
 
+gdouble ggobi_matrix_get_n_cols(array_d * arrp) {
+  return arrp->ncols;
+}
+gdouble ggobi_matrix_get_n_rows(array_d * arrp) {
+  return arrp->nrows;
+}
+
+
 void
 arrayd_free (array_d * arrp)
 {

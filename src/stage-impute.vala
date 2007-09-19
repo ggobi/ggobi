@@ -30,7 +30,7 @@ using GLib;
 
 public class GGobi.StageImpute : Stage {
   public Imputation[] imputation;
-  public Matrix cache;
+  public PipelineMatrix cache;
   
   public signal void imputation_changed(uint j);
 
@@ -41,24 +41,24 @@ public class GGobi.StageImpute : Stage {
     flush_changes_here();
   }
   private void _refresh() {
-    for (uint j = 0; j < n_cols; j++) _refresh_col(j);    
+    for (uint j = 0; j < n_cols; j++) refresh_col_(j);    
   }
 
   public void refresh_col(uint j) {
-    _refresh_col(j);
+    refresh_col_(j);
     col_data_changed(j);
     flush_changes_here();
   }
-  public void _refresh_col(uint j) {
+  public override void refresh_col_(uint j) {
     imputation[j].impute(this, j);
   }
   
   public override double get_raw_value(uint i, uint j) {
-    return ((double[]) cache.vals[i])[j];
+    return cache.get(i, j);
   }
 
   public override void set_raw_value(uint i, uint j, double value) {
-    ((double[]) cache.vals[i])[j] = value;
+    cache.set(i, j, value);
     if (!is_missing(i, j)) parent.set_raw_value(i, j, value);
   }
   
@@ -67,37 +67,23 @@ public class GGobi.StageImpute : Stage {
     imputation_changed(j);
   }
   
+  construct {
+    cache = new PipelineMatrix();
+    imputation.resize(0);
+  }
+  
   override void process_outgoing(PipelineMessage msg) {
-    uint current_cols = n_cols;
+    uint old_cols = n_cols;
     base.process_outgoing(msg);
 
-    uint n_added_cols = msg.get_n_added_cols();
-    uint n_added_rows = msg.get_n_added_rows();
+    // FIXME: deal with deleted variables too
+    imputation.resize((int) n_cols);
+    for (uint j = old_cols; j < n_cols; j++)
+      imputation[(int) j] = new ImputationPercent();
+
+    // needs to be done second as relies on imputations being set up
+    cache.process_message(msg, this);
     
-    if (cache == null) {
-      // Fresh initialisation
-      cache = new Matrix(n_added_rows, n_added_cols);
-      imputation.resize((int) n_added_cols);
-      for (int j = 0; j < n_added_cols; j++)
-        imputation[j] = new ImputationPercent();
-      
-      _refresh();
-    } else {
-      // Need stage+matrix method that wraps all of this up
-      imputation.resize((int) n_added_cols);
-      
-      // Update cache matrix
-      cache.add_cols((int) n_added_cols);
-      for (uint j = 0; j < n_added_cols; j++)
-        _refresh_col(current_cols + j);
-      
-      if (n_added_rows > 0) {
-        cache.add_rows((int) n_added_rows);
-      }
-      
-      cache.remove_rows(msg.get_removed_rows());
-      cache.remove_cols(msg.get_removed_cols());
-    }
   }
   
   // Need set imputation method which calls impute

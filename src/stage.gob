@@ -1593,6 +1593,12 @@ varpanel_label_set_cb(GGobi:Stage * d, const gchar *old_name, guint j, gpointer 
   varpanel_label_set(d, j);
 }
 
+/* Common method to refresh column of stage */
+public virtual void
+refresh_col_(self, guint j) {
+  
+}
+
 /* message handling */
 
 /* override to process any local, outgoing changes */
