@@ -28,9 +28,6 @@ gint alloc_optimize0_p (optimize0_param *op, gint nrows, gint ncols, gint ndim);
 gint free_optimize0_p (optimize0_param *op);
 gboolean iszero (array_f *data);
 
-void initrandom(gfloat start);
-gfloat uniformrandom(void);
-gfloat normalrandom(void);
 void normal_fill (array_f *data, gfloat delta, array_f *base);
 void orthonormal (array_f *proj);
 gint optimize0 (optimize0_param *op,

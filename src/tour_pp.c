@@ -38,9 +38,6 @@ The authors can be contacted at the following email addresses:
 #include "tour1d_pp.h"
 #include "tour2d_pp.h"
 
-gfloat randomval, nrand;
-gint nset;
-
 /* reset pp variables */
 void reset_pp(GGobiStage *d, GGobiSession *gg)
 {
@@ -136,34 +133,12 @@ gboolean iszero (array_f *data)
   return (sum<1e-6);
 }
 
-gfloat uniformrandom()
-{ 
-  randomval = fmod (27132.0 * randomval + 7.0, 62748517.0);
-  return (randomval / 62748517.0);
-}
-
-gfloat normalrandom()
-{ 
-  gfloat x, y, r;
-  if (nset) { nset = 0; return(nrand); }
-  do
-  { x = 2.0*uniformrandom()-1.0;
-    y = 2.0*uniformrandom()-1.0;
-    r = x*x+y*y;
-  }
-  while (r>=1.0);
-  r = sqrt(-2.0*log(r)/r);
-  nrand = x*r;
-  nset  = 1;
-  return(y*r);
-}
-
 void normal_fill (array_f *data, gfloat delta, array_f *base)
 { 
   int i, j;
   for (i=0; i<data->nrows; i++)
   { for (j=0; j<data->ncols; j++)
-      data->vals[i][j] = base->vals[i][j]+delta*normalrandom();
+      data->vals[i][j] = base->vals[i][j]+delta*random_normal();
   }
 }
 
