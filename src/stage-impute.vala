@@ -46,6 +46,8 @@ public class GGobi.StageImpute : Stage {
   }
   
   public void set_imputation(uint j, Imputation imp) {
+    if (imputation[j].equals(imp)) return;
+    
     imputation[j] = imp;
     col_parameter_changed(j);
     col_data_changed(j);

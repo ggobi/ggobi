@@ -17,6 +17,9 @@ public class GGobi.Imputation : Object {
   public abstract double impute_single(uint i);
   public abstract void pre_compute(StageImpute stage, uint j);
   public abstract string description();
+  public virtual bool equals(Imputation other) {
+    return this.get_type() == other.get_type();
+  }
 }
 
 /* Replace missing values with a fixed value */
@@ -30,6 +33,13 @@ public class GGobi.ImputationFixed : Imputation {
   override string description() {
     return fixed_value.to_string("Value: %.2f");
   }
+  
+  override bool equals(Imputation other) {
+    if (this.get_type() != other.get_type()) return(false);
+    
+    return ((ImputationFixed) other).fixed_value == fixed_value;
+  }
+  
 }
 
 /* Replace missing values with a column mean */
@@ -75,6 +85,12 @@ public class GGobi.ImputationPercent : Imputation {
   }
   override string description() {
     return percent.to_string("Percent: %.2f");
+  }
+  
+  override bool equals(Imputation other) {
+    if (this.get_type() != other.get_type()) return(false);
+    
+    return ((ImputationPercent) other).percent == percent;
   }
   
 }
