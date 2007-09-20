@@ -29,6 +29,14 @@ public class GGobi.PipelineMatrix : GLib.Object {
   public void set(uint i, uint j, double value) {
     ((double[]) matrix.vals[i])[j] = value;
   }
+  
+  public void add_rows(uint nr) {
+    matrix.add_rows((int) nr);
+  }
+  
+  public void add_cols(uint nc) {
+    matrix.add_cols((int) nc);
+  }
 
   public void process_message(PipelineMessage msg, Stage stage) {
     

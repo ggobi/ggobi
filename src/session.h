@@ -433,6 +433,7 @@ struct _GGobiSession {
 #define GGOBI_MAIN_STAGE_DISPLAY "ggobi-main-display"
 #define GGOBI_MAIN_STAGE_DOMAIN_ADJ "ggobi-main-domain-adj"
 #define GGOBI_MAIN_STAGE_FILTER "ggobi-main-filter"
+#define GGOBI_MAIN_STAGE_FREEZE "ggobi-main-freeze"
 #define GGOBI_MAIN_STAGE_IMPUTE "ggobi-main-impute"
 #define GGOBI_MAIN_STAGE_JITTER "ggobi-main-jitter"
 #define GGOBI_MAIN_STAGE_RANDOMIZE "ggobi-main-randomize"

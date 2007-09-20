@@ -16,7 +16,8 @@ libggobi_la_VALAS = bitset.vala input-ftp.vala input-http.vala \
   imputation.vala gui-varlist.vala gui-impute.vala transform.vala \ 
   transform-min-one.vala transform-boxcox.vala transform-abs.vala \
   transform-log10.vala stage-transform.vala pipeline-matrix.vala \ 
-  stage-display.vala stage-randomize.vala gui-randomize.vala
+  stage-display.vala stage-randomize.vala gui-randomize.vala \ 
+  stage-freeze.vala 
 
 libggobi_la_METASOURCES = \
   $(libggobi_la_GOBS:%.gob=ggobi-%.c) \
