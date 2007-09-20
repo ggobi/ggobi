@@ -435,6 +435,7 @@ struct _GGobiSession {
 #define GGOBI_MAIN_STAGE_FILTER "ggobi-main-filter"
 #define GGOBI_MAIN_STAGE_IMPUTE "ggobi-main-impute"
 #define GGOBI_MAIN_STAGE_JITTER "ggobi-main-jitter"
+#define GGOBI_MAIN_STAGE_RANDOMIZE "ggobi-main-randomize"
 #define GGOBI_MAIN_STAGE_STANDARDIZE "ggobi-main-standardize"
 #define GGOBI_MAIN_STAGE_SUBSET "ggobi-main-subset"
 #define GGOBI_MAIN_STAGE_TRANSFORM "ggobi-main-transform"

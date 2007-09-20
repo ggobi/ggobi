@@ -29,11 +29,13 @@
 #include "ggobi-stage-subset.h"
 #include "gui-impute.h"
 #include "gui-jitter.h"
+#include "gui-randomize.h"
 #include "gui-viewer.h"
 #include "input-source-factory.h"
 #include "stage-display.h"
 #include "stage-impute.h"
 #include "stage-jitter.h"
+#include "stage-randomize.h"
 #include "stage-standardize.h"
 #include "stage-transform.h"
 
@@ -47,7 +49,7 @@ guint GGobiSignals[MAX_GGOBI_SIGNALS];
 static void
 pipeline_create_cb(GGobiPipelineFactory *factory, GGobiStage *root, GGobiSession *gg)
 {
-  GObject *display, *domain_adj, *filter, *impute, *jitter, *standardize, *subset, *transform;
+  GObject *display, *domain_adj, *filter, *impute, *jitter, *randomize, *standardize, *subset, *transform;
   
   subset = g_object_new(GGOBI_TYPE_STAGE_SUBSET, 
     "name", GGOBI_MAIN_STAGE_SUBSET, "parent", root, NULL);
@@ -63,9 +65,12 @@ pipeline_create_cb(GGobiPipelineFactory *factory, GGobiStage *root, GGobiSession
 
   jitter = g_object_new(GGOBI_TYPE_STAGE_JITTER, 
     "name", GGOBI_MAIN_STAGE_JITTER, "parent", impute, NULL);
+
+  randomize = g_object_new(GGOBI_TYPE_STAGE_RANDOMIZE, 
+    "name", GGOBI_MAIN_STAGE_RANDOMIZE, "parent", jitter, NULL);
   
   filter = g_object_new(GGOBI_TYPE_STAGE_FILTER, 
-    "name", GGOBI_MAIN_STAGE_FILTER, "parent", jitter, NULL);
+    "name", GGOBI_MAIN_STAGE_FILTER, "parent", randomize, NULL);
   
   // FIXME: 'excluded' is actually 'included' now
   ggobi_stage_filter_set_filter_column(GGOBI_STAGE_FILTER(filter),
@@ -107,9 +112,14 @@ pipeline_create_cb(GGobiPipelineFactory *factory, GGobiStage *root, GGobiSession
   viewer = g_object_new(GGOBI_TYPE_GUI_VIEWER, "stage", GGOBI_STAGE(standardize), NULL);
   gtk_widget_show(GTK_WIDGET(viewer));
   
+  GGobiGuiImpute *gui_randomize;
+  gui_randomize = g_object_new(GGOBI_TYPE_GUI_RANDOMIZE, "stage", GGOBI_STAGE_RANDOMIZE(randomize), NULL);
+  gtk_widget_show(GTK_WIDGET(gui_randomize));
+
   GGobiGuiImpute *gui_impute;
   gui_impute = g_object_new(GGOBI_TYPE_GUI_IMPUTE, "stage", GGOBI_STAGE_IMPUTE(impute), NULL);
   gtk_widget_show(GTK_WIDGET(gui_impute));
+
   
 }
 
