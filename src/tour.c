@@ -236,44 +236,44 @@ void copy_mat(gdouble **ot, gdouble **it, gint nr, gint datadim) {
       ot[k][j] = it[k][j];
 }
 
-/* orthonormalize x2 on x1, just by diagonals should be enough for this
-   tour code */
-void
-matgram_schmidt(gdouble **x1, gdouble **x2, gint nr, gint datadim)
-{
-  gint j, k;
-  gdouble ip;
-
-  for (j=0; j<datadim; j++) {
-    norm(x1[j], nr);
-    norm(x2[j], nr);
-    ip = inner_prod(x1[j], x2[j], nr);
-    for (k=0; k<nr; k++)
-      x2[j][k] = x2[j][k] - ip*x1[j][k];
-    norm(x2[j], nr);
-  }
-
-}
-
-void
-eigen_clear (array_d Ga, array_d Gz, vector_f lambda, vector_f tau, 
-  vector_f tinc, gint datadim)
-{
-  /*  GGobiStage *d = dsp->d;
-  gint datadim = d->n_cols;*/
-  gint j, k;
-
-  for (j=0; j<datadim; j++) {
-    for (k=0; k<datadim; k++) {
-      Ga.vals[j][k] = 0.;
-      Gz.vals[j][k] = 0.;
-    }
-    lambda.els[j] = 0.;
-    tau.els[j] = 0.;
-    tinc.els[j] = 0.;
-  }
-
-}
+// /* orthonormalize x2 on x1, just by diagonals should be enough for this
+//    tour code */
+// void
+// matgram_schmidt(gdouble **x1, gdouble **x2, gint nr, gint datadim)
+// {
+//   gint j, k;
+//   gdouble ip;
+// 
+//   for (j=0; j<datadim; j++) {
+//     norm(x1[j], nr);
+//     norm(x2[j], nr);
+//     ip = inner_prod(x1[j], x2[j], nr);
+//     for (k=0; k<nr; k++)
+//       x2[j][k] = x2[j][k] - ip*x1[j][k];
+//     norm(x2[j], nr);
+//   }
+// 
+// }
+// 
+// void
+// eigen_clear (array_d Ga, array_d Gz, vector_f lambda, vector_f tau, 
+//   vector_f tinc, gint datadim)
+// {
+//   /*  GGobiStage *d = dsp->d;
+//   gint datadim = d->n_cols;*/
+//   gint j, k;
+// 
+//   for (j=0; j<datadim; j++) {
+//     for (k=0; k<datadim; k++) {
+//       Ga.vals[j][k] = 0.;
+//       Gz.vals[j][k] = 0.;
+//     }
+//     lambda.els[j] = 0.;
+//     tau.els[j] = 0.;
+//     tinc.els[j] = 0.;
+//   }
+// 
+// }
 
 /* Fa = starting projection
  * Fz = target projection

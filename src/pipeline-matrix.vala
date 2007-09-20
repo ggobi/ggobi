@@ -23,11 +23,11 @@ public class GGobi.PipelineMatrix : GLib.Object {
   }
   
   public double get(uint i, uint j) {
-    return ((double[]) matrix.vals[i])[j] ;
+    return ((double[]) matrix.vals[j])[i] ;
   }
   
   public void set(uint i, uint j, double value) {
-    ((double[]) matrix.vals[i])[j] = value;
+    ((double[]) matrix.vals[j])[i] = value;
   }
   
   public void add_rows(uint nr) {
