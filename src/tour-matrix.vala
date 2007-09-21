@@ -32,13 +32,15 @@ class GGobi.PipelineMatrix : Object {
     }
     
   }
-  public bool orthogonalise(TourMatrix other) {
+  public bool orthogonalise_by(TourMatrix other) {
     for (uint j = 0; j < n_cols; j++) {
       if (!TourVector.orthongalise(other.col(j), out col(j))) return false;
     }
     return true;
   }
-  public bool orthogonalise_self() {
+  public bool orthogonalise() {
+    if (n_cols == 1) return();
+    
     for (uint j = 0; j < n_cols; j++) {
       for (uint k = j + 1; k < n_cols; j++) {
         if (!TourVector.orthoganalise(col(j), col(k))) return false;
@@ -90,7 +92,7 @@ class GGobi.PipelineMatrix : Object {
     return mat;
   }
   
-  public void svd(out double[] d, out Matrix v) {}
+  public void svd(out TourMatrix U, out double[] d, out TourMatrix V) {}
   
   public bool equivalent(TourMatrix other) {
     for (uint j = 0; j < n_cols; j++) {

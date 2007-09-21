@@ -4,6 +4,9 @@ namespace GGobi {
 
 
 class GGobi.TourVector : Object {
+  public double void norm(double[] x) {
+    return TourVector.inner_product(x, x);
+  }
   
   public static void normalise(out double[] x) {
     double norm = TourVector.inner_product(x, x);
