@@ -668,31 +668,31 @@ reached_target(gfloat tang, gfloat dist_az, gint basmeth,
   return(arewethereyet);
 }
 
-gboolean
-reached_target2(vector_f tinc, vector_f tau, gint basmeth, 
-  gfloat *indxval, gfloat *oindxval, gint projdim) 
-{
-  gboolean arewethereyet = false;
-  gfloat tol=0.01;
-  gint i;
-
-  if (basmeth == 1) {
-    if (*indxval < *oindxval)
-    {
-      arewethereyet = true;
-      *indxval = *oindxval;
-    }
-    else
-      *oindxval = *indxval;
-  }
-  else {
-    for (i=0; i<projdim; i++) 
-    if (fabs(tinc.els[i]-tau.els[i]) < tol) 
-      arewethereyet = true;
-  }
-
-  return(arewethereyet);
-}
+// gboolean
+// reached_target2(vector_f tinc, vector_f tau, gint basmeth, 
+//   gfloat *indxval, gfloat *oindxval, gint projdim) 
+// {
+//   gboolean arewethereyet = false;
+//   gfloat tol=0.01;
+//   gint i;
+// 
+//   if (basmeth == 1) {
+//     if (*indxval < *oindxval)
+//     {
+//       arewethereyet = true;
+//       *indxval = *oindxval;
+//     }
+//     else
+//       *oindxval = *indxval;
+//   }
+//   else {
+//     for (i=0; i<projdim; i++) 
+//     if (fabs(tinc.els[i]-tau.els[i]) < tol) 
+//       arewethereyet = true;
+//   }
+// 
+//   return(arewethereyet);
+// }
 
 void
 do_last_increment(vector_f tinc, vector_f tau, gfloat dist_az, gint projdim)
