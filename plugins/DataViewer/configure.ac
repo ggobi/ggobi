@@ -19,7 +19,7 @@ AC_CONFIG_HEADER([config.h])
 AM_INIT_AUTOMAKE
 
 # Use the custom GGobi macro for configuring the plugin. This provides 
-# GGOBI_CFLAGS, GGOBI_LIBS, and SRC_DEBUG variables.
+# GGOBI_CFLAGS, GGOBI_LIBS, and DEBUG_CFLAGS variables.
 # We ensure that we look in the grandparent directory
 # (since this plugin is bundled with GGobi)
 GGOBI_CONFIG_PLUGIN([../..])

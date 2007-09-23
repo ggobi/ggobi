@@ -64,9 +64,10 @@ AC_DEFINE_UNQUOTED([MAJOR_VERSION], $MAJOR_VERSION, [The major x.*.* version])
 AC_DEFINE_UNQUOTED([MINOR_VERSION], $MINOR_VERSION, [The minor *.x.* version])
 AC_DEFINE_UNQUOTED([MICRO_VERSION], $MICRO_VERSION, [The micro *.*.x version])
 
-# Configure options (debug? local? any plugins?)
+# Configure options (debug? mudflap? any plugins?)
 
 AC_ARG_ENABLE(debug, [--enable-debug          Compile with debugging symbols])
+AC_ARG_ENABLE(mudflap, [--enable-mudflap          Compile with mudflap instrumentation])
 
 PLUGIN_DIRS=""
 
@@ -172,9 +173,17 @@ AC_HEADER_STDBOOL
 
 # Debug?
 if test -n "${enable_debug}" && ! test "${enable_debug}" = "no" ;  then
- SRC_DEBUG="-g -Wall"
+ DEBUG_CFLAGS="-g -Wall -Wextra"
 fi
-AC_SUBST(SRC_DEBUG)
+AC_SUBST(DEBUG_CFLAGS)
+
+# Mudflap?
+if test -n "${enable_mudflap}" && ! test "${enable_mudflap}" = "no" ;  then
+ MUDFLAP_CFLAGS="-fmudflap"
+ MUDFLAP_LDFLAGS="-fmudflap -lmudflap"
+fi
+AC_SUBST(MUDFLAP_CFLAGS)
+AC_SUBST(MUDFLAP_LDFLAGS)
 
 # Find GOB2 (don't fail if not found, not necessary for distributed builds)
 AC_PATH_PROG(GOB2, gob2,,$PATH)

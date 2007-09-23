@@ -29,9 +29,9 @@ AC_SUBST(GGOBI_FLAGS)
 AC_SUBST(GGOBI_LIBS)
 
 if test -n "$enable_debug" && ! test "$enable_debug" = "no" ;  then
- SRC_DEBUG="-g -Wall"
+ DEBUG_CFLAGS="-g -Wall"
 fi
-AC_SUBST(SRC_DEBUG)
+AC_SUBST(DEBUG_CFLAGS)
 
 AC_CANONICAL_HOST
 AC_MSG_CHECKING([for native Win32])

@@ -1,2 +1,3 @@
 #!/bin/sh
+export MUDFLAP_OPTIONS="-viol-segv"
 libtool --mode=execute gdb ggobi

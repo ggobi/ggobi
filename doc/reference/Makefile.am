@@ -73,7 +73,7 @@ expand_content_files=
 # signals and properties.
 # e.g. INCLUDES=-I$(top_srcdir) -I$(top_builddir) $(GTK_DEBUG_FLAGS)
 # e.g. GTKDOC_LIBS=$(top_builddir)/gtk/$(gtktargetlib)
-INCLUDES=-I$(top_srcdir)/src @SRC_DEBUG@ @GTK_CFLAGS@ @LIBXML_CFLAGS@ @LIBGSF_CFLAGS@ \
+INCLUDES=-I$(top_srcdir)/src @DEBUG_CFLAGS@ @GTK_CFLAGS@ @LIBXML_CFLAGS@ @LIBGSF_CFLAGS@ \
   @GSL_CFLAGS@ @GLITZ_CFLAGS@ @INCLTDL@
 GTKDOC_LIBS=@GTK_LIBS@ @LIBXML_LIBS@ @LIBGSF_LIBS@ @GSL_LIBS@ @GLITZ_LIBS@ \
   ../../src/libggobi.la
