@@ -66,8 +66,9 @@ AC_DEFINE_UNQUOTED([MICRO_VERSION], $MICRO_VERSION, [The micro *.*.x version])
 
 # Configure options (debug? mudflap? any plugins?)
 
-AC_ARG_ENABLE(debug, [--enable-debug          Compile with debugging symbols])
-AC_ARG_ENABLE(mudflap, [--enable-mudflap          Compile with mudflap instrumentation])
+AC_ARG_ENABLE(debug, [  --enable-debug          Compile with debugging symbols])
+AC_ARG_ENABLE(debug-extra, [  --enable-debug-extra    Compile with debugging symbols and extra warnings])
+AC_ARG_ENABLE(mudflap, [  --enable-mudflap        Compile with mudflap instrumentation])
 
 PLUGIN_DIRS=""
 
@@ -173,6 +174,9 @@ AC_HEADER_STDBOOL
 
 # Debug?
 if test -n "${enable_debug}" && ! test "${enable_debug}" = "no" ;  then
+ DEBUG_CFLAGS="-g -Wall"
+fi
+if test -n "${enable_debug_extra}" && ! test "${enable_debug_extra}" = "no" ;  then
  DEBUG_CFLAGS="-g -Wall -Wextra"
 fi
 AC_SUBST(DEBUG_CFLAGS)
