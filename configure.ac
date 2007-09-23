@@ -68,7 +68,6 @@ AC_DEFINE_UNQUOTED([MICRO_VERSION], $MICRO_VERSION, [The micro *.*.x version])
 
 AC_ARG_ENABLE(debug, [  --enable-debug          Compile with debugging symbols])
 AC_ARG_ENABLE(debug-extra, [  --enable-debug-extra    Compile with debugging symbols and extra warnings])
-AC_ARG_ENABLE(mudflap, [  --enable-mudflap        Compile with mudflap instrumentation])
 
 PLUGIN_DIRS=""
 
@@ -145,20 +144,11 @@ AC_PROG_CC
 AC_PROG_LN_S
 
 # Set up libtool to create only dynamic libraries
-# and to support DLLs on Windows. Also build libltdl for loading plugins.
+# and to support DLLs on Windows.
 AC_DISABLE_STATIC
 AC_LIBTOOL_WIN32_DLL
-AC_LIBLTDL_CONVENIENCE
 AC_LIBTOOL_DLOPEN
 AC_PROG_LIBTOOL
-
-# Configure libltdl build
-AC_SUBST(INCLTDL)
-AC_SUBST(LIBLTDL)
-AC_CONFIG_SUBDIRS(libltdl)
-
-# Configure for building against local libintl
-AC_SUBST(INCINTL)
 
 # Check for questionable functions (kind of paranoid)
 AC_FUNC_MALLOC
@@ -180,14 +170,6 @@ if test -n "${enable_debug_extra}" && ! test "${enable_debug_extra}" = "no" ;  t
  DEBUG_CFLAGS="-g -Wall -Wextra"
 fi
 AC_SUBST(DEBUG_CFLAGS)
-
-# Mudflap?
-if test -n "${enable_mudflap}" && ! test "${enable_mudflap}" = "no" ;  then
- MUDFLAP_CFLAGS="-fmudflap"
- MUDFLAP_LDFLAGS="-fmudflap -lmudflap"
-fi
-AC_SUBST(MUDFLAP_CFLAGS)
-AC_SUBST(MUDFLAP_LDFLAGS)
 
 # Find GOB2 (don't fail if not found, not necessary for distributed builds)
 AC_PATH_PROG(GOB2, gob2,,$PATH)
@@ -227,12 +209,6 @@ AC_SUBST(LIBXML_LIBS)
 PKG_CHECK_MODULES(LIBGSF, [libgsf-1])
 AC_SUBST(LIBGSF_CFLAGS)
 AC_SUBST(LIBGSF_LIBS)
-
-# Find gsl
-
-#PKG_CHECK_MODULES(GSL, [gsl])
-AC_SUBST(GSL_CFLAGS)
-AC_SUBST(GSL_LIBS)
 
 # Are we on Windows?
 

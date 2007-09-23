@@ -1,6 +1,6 @@
-SUBDIRS = libltdl src plugins po doc
+SUBDIRS = src plugins po doc
 
-EXTRA_DIST = bootstrap CPLicense.txt
+EXTRA_DIST = bootstrap
 
 datafilesdir = $(datadir)/doc/ggobi/examples
 dist_datafiles_DATA = \
