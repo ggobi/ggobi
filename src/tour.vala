@@ -36,6 +36,13 @@ It should probably also check that the matrices are the correct size.
 
 */
 
+namespace GGobi {
+  public enum TourState {
+    IN, OUT, FROZEN
+  }
+  
+}
+
 class GGobi.Tour : Object {
   public Stage stage;
   public TourState[] states;

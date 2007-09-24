@@ -75,9 +75,15 @@ public class GGobi.ImputationPercent : Imputation {
     double max = stage.get_variable(j).get_max();
     double range = max - min;
 
-    double side = (percent > 0) ? max : min;
-    fixed_value = side + percent * range;
-    jitter = percent * range * 0.2;
+    if (range < EPSILON) {
+      fixed_value = 0.5;
+      jitter = 0.2;
+    } else {
+      double side = (percent > 0) ? max : min;
+      fixed_value = side + percent * range;
+      jitter = percent * range * 0.2;      
+    }
+
   }
   
   override double impute_single(uint i) {
@@ -109,6 +115,8 @@ public class GGobi.ImputationRandom : Imputation {
   }
 
   override double impute_single(uint i) {
+    if (non_missing.length == 0) return(0.5);
+    
     return non_missing[Random.int_range(0, non_missing.length)];
   }
   override string description() {

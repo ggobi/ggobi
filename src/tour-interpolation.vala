@@ -31,6 +31,7 @@ class GGobi.TourInterpolation : Object {
   private TourMatrix Gz;
   
   private double current_angle; // in radians
+  private double dist; // in radians?
   
   public double delta = Math.PI / 5;  // in radians
   public double[] tau;  // between 0 and 1
@@ -59,17 +60,16 @@ class GGobi.TourInterpolation : Object {
     TourMatrix Va, Vz;
     FatFz.svd(out Va, out lambda, out Vz);
 
-    /* Check span of <Fa,Fz>
-     If dimension of the intersection is equal to dimension of proj,
-     dI=ndim, we should stop here, and set Ft to be Fa but this never seems to
-     happen.  See page 16 of paper..
-     */
-    uint dI = 0;
-    for (i = 0; i < d; i++) {
-      if (lambda[i] > 1.0 - EPSILON) {
-        dI++;
-        lambda[i] = 1.0;
-      }
+    /* Check span of <Fa,Fz>. If dimension of the intersection is equal to
+    dimension of proj, dI=ndim and we should stop here, setting Ft to Fa;
+    but this never seems to happen. See page 16 of paper.. */
+    
+    uint dI = 0; 
+    for (i = 0; i < d; i++) { 
+     if (lambda[i] > 1.0 - EPSILON) {
+       dI++; 
+       lambda[i] = 1.0; 
+      } 
     }
     
     // Compute frames of principle directions --------------------------------
@@ -80,36 +80,32 @@ class GGobi.TourInterpolation : Object {
     // Form an orthogonal coordinate transformation --------------------------
 
     Ga.orthogonalise();
-    Gz.orthogonalise();
+    // Gz.orthogonalise();
 
     Gz.orthogonalise_by(Ga);
     Gz.normalise();
     Gz.orthogonalise();
 
-    // Compute, standardize and round principal angles
+    // Compute, standardize and round principal angles -----------------------
     for (uint i = 0; i < d; i++) {
       tau[i] = acos(lambda);
       if (tau[i] < EPSILON) tau[i] = 0; 
     }
 
-    dist_az = TourVector.norm(tau);
+    dist = TourVector.norm(tau);
     // if (dist_az < 0.0001) return(3);
+    // Work out relative speeds for each direction
     TourVector.normalise(out tau);
   }
     
   public TourMatrix get_frame(double angle) {
-    TourMatrix R = new TourMatrix(d, p);
-    for (i = 0; i < d; i++) {
-      R.set(0, i, cos(angle * tau[i]);
-      R.set(0, j, sin(angle * tau[i]);
-    }
-
     TourMatrix G = new TourMatrix(d, p);
     for (uint i = 0; i < d; i++) {
       for (uint j = 0; j < p; j++) {
-        G.set(i, j, 
-          Ga.get(i, j) * R.get(0, i) + Gz.get(i, j) * R.get(1, i)
-        );
+        double value = 
+          Ga.get(i, j) * cos(angle * tau[i]) + 
+          Gz.get(i, j) * sin(angle * tau[i]);
+        G.set(i, j, value);
       }
     }
 
@@ -130,13 +126,20 @@ class GGobi.TourInterpolation : Object {
     pre_project();
   }
   
+  public double get_dist() {
+    return dist;
+  }
+  
   public TourMatrix get_next() {
+    TourMatrix result = get_interp(current_angle);
+    // FIXME: should always finish with target
     if (!is_finished()) current_angle += delta;
-    return get_interp(current_angle)
+    
+    return result;
   };
 
   public bool is_finished() {
-    return (current_angle + delta > 2 * pi);
+    return (current_angle + delta > dist);
   };
   
   public void reset() {

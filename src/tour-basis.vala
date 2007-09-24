@@ -24,6 +24,10 @@ Ideas for other methods:
 public class GGobi.TourBasis : Object {
   
   public abstract TourMatrix generate(Stage stage, TourState[] states);
+ 
+  public add_frozen_vars(TourMatrix m, TourState[] states) {
+    
+  }
   
 }
 
