@@ -17,7 +17,7 @@ libggobi_la_VALAS = bitset.vala input-ftp.vala input-http.vala \
   transform-min-one.vala transform-boxcox.vala transform-abs.vala \
   transform-log10.vala stage-transform.vala pipeline-matrix.vala \
   stage-display.vala stage-randomize.vala gui-randomize.vala \
-  stage-freeze.vala 
+  stage-freeze.vala tour-matrix.vala tour-vector.vala
 
 libggobi_la_METASOURCES = \
   $(libggobi_la_GOBS:%.gob=ggobi-%.c) \
@@ -43,7 +43,7 @@ libggobi_la_BUILT = array.c ash1d.c barchart.c barchartClass.c \
   edges.c cluster.c cluster_ui.c extendedDisplay.c fileio.c ggobi-API.c \
   ggobi.c GGobiAppClass.c ggobiClass.c identify.c identify_ui.c \
   fileio_ui.c limits.c lineedit.c \
-  lineedit_ui.c main_ui.c make_ggobi.c marshal.c menus.c missing.c \
+  lineedit_ui.c main_ui.c make_ggobi.c marshal.c menus.c \
   movepts.c movepts_ui.c noop-toggle.c p1d.c p1d_ui.c parcoords.c \
   parcoordsClass.c parcoords_ui.c plugin.c pipeline.c ppcorr_ui.c \
   read_init.c read_color.c scale_api.c scale_drag.c \

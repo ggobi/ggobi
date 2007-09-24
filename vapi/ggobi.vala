@@ -85,6 +85,9 @@ namespace GGobi {
     public static double random_normal();
   }
 
+  public const double EPSILON = 0.001; 
+
+
   [CCode (cheader_filename = "ggobi-variable.h", cprefix = "GGOBI_VARIABLE_" )]  
   public enum VariableType {
     REAL, CATEGORICAL, INTEGER, COUNTER, UNIFORM, ALL_VARTYPES

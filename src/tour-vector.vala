@@ -1,26 +1,32 @@
-namespace GGobi {
-  public static double EPSILON = 0.001;
-}
+/*
+= Tour vector =
 
+Convenience methods common linear algebra operations used by the tour.,
 
-class GGobi.TourVector : Object {
-  public double void norm(double[] x) {
+*/
+using GLib;
+
+public class GGobi.TourVector : Object {
+  public static double norm(double[] x) {
     return TourVector.inner_product(x, x);
   }
   
   public static void normalise(out double[] x) {
     double norm = TourVector.inner_product(x, x);
     
-    for (uint i = 0; i < x.size; i++)
+    for (uint i = 0; i < x.length; i++)
       x[i] = x[i] / norm;
   }
   
   public static double inner_product(double[] a, double[] b) {
+    // FIXME: should return proper error
+    if (a.length != b.length) return(0);
+    
     double ip = 0;
-    for (uint i = 0; i < n_rows; i++)
+    for (uint i = 0; i < a.length; i++)
       ip += ip + a[i] * b[i];
     
-    return sqrt(ip);
+    return Math.sqrt(ip);
   }
   
   // Tests if two normal vectors are equivalent

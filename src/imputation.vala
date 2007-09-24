@@ -76,7 +76,7 @@ public class GGobi.ImputationPercent : Imputation {
     double range = max - min;
 
     if (range < EPSILON) {
-      fixed_value = 0.5;
+      fixed_value = 0;
       jitter = 0.2;
     } else {
       double side = (percent > 0) ? max : min;
@@ -115,7 +115,7 @@ public class GGobi.ImputationRandom : Imputation {
   }
 
   override double impute_single(uint i) {
-    if (non_missing.length == 0) return(0.5);
+    if (non_missing.length == 0) return(0);
     
     return non_missing[Random.int_range(0, non_missing.length)];
   }

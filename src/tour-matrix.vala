@@ -5,28 +5,29 @@ This matrix wrapper implements many of the linear algebra operations needed
 for the tour.
 
 */
+using GLib;
 
-class GGobi.PipelineMatrix : Object {
+public class GGobi.TourMatrix : PipelineMatrix {
+  public TourMatrix(construct uint n_cols, construct uint n_rows) {}
   construct {
     matrix = new Matrix(n_cols, n_rows);
   }
-  public void TourMatrix(construct uint n_cols, construct uint n_rows) {}
   
   // Returns column of matrix
   public weak double[] col(uint j) {
-    return ((double[]) matrix.vals[j]) 
+    return ((double[]) matrix.vals[j]);
   }
   
   // Is this matrix orthonormal?
   public bool is_orthonormal() {
     for(uint j = 0; j < n_cols; j++) {
-      if (Math.fabs(1 - col_norm(j)) > EPSILON ) 
+      if (Math.fabs(1 - col_norm(j)) > EPSILON) 
         return(false);
     }
     
     for (uint j = 0; j < n_cols; j++) {
       for (uint k = j + 1; k < n_cols; j++) {
-        if (col_inner_product(j, k)) > EPSILON 
+        if (col_inner_product(j, k) > EPSILON)
           return(false);
       }
     }
@@ -34,16 +35,17 @@ class GGobi.PipelineMatrix : Object {
   }
   public bool orthogonalise_by(TourMatrix other) {
     for (uint j = 0; j < n_cols; j++) {
-      if (!TourVector.orthongalise(other.col(j), out col(j))) return false;
+      if (!TourVector.orthogonalise(out other.col(j), out col(j))) 
+        return false;
     }
     return true;
   }
   public bool orthogonalise() {
-    if (n_cols == 1) return();
+    if (n_cols == 1) return(true);
     
     for (uint j = 0; j < n_cols; j++) {
       for (uint k = j + 1; k < n_cols; j++) {
-        if (!TourVector.orthoganalise(col(j), col(k))) return false;
+        if (!TourVector.orthogonalise(col(j), col(k))) return false;
       }
     }    
     return true;
@@ -67,7 +69,7 @@ class GGobi.PipelineMatrix : Object {
 
   // Compute inner product between two columns
   public double col_inner_product(uint a, uint b) {
-    TourVector.inner_product(col(a), col(b))
+    TourVector.inner_product(col(a), col(b));
   }
 
   // Return a transposed copy of the matrix
@@ -75,7 +77,7 @@ class GGobi.PipelineMatrix : Object {
     TourMatrix mat = new TourMatrix(n_cols, n_rows);
     for(uint i = 0; i < n_rows; i++) {
       for(uint j = 0; j < n_rows; j++) {
-        mat.set(j, i, get(i, j))
+        mat.set(j, i, get(i, j));
       }
     }
     return mat;
@@ -86,7 +88,7 @@ class GGobi.PipelineMatrix : Object {
     TourMatrix mat = new TourMatrix(n_rows, n_cols);
     for(uint i = 0; i < n_rows; i++) {
       for(uint j = 0; j < n_rows; j++) {
-        mat.set(i, j, get(i, j))
+        mat.set(i, j, get(i, j));
       }
     }
     return mat;

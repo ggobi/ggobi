@@ -40,7 +40,6 @@ namespace GGobi {
   public enum TourState {
     IN, OUT, FROZEN
   }
-  
 }
 
 class GGobi.Tour : Object {

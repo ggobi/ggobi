@@ -29,6 +29,8 @@
 */
 #define ggobi_a ggobi_##a
 
+#define GGOBI_EPSILON 0.000001
+
 #define false 0
 #define true 1
 

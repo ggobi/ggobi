@@ -14,9 +14,9 @@ pure vala code.
 using GLib;
 
 public class GGobi.PipelineMatrix : GLib.Object {
-  public uint n_cols {get {return matrix.n_cols;}}
-  public uint n_rows {get {return matrix.n_rows;}}
-  private Matrix matrix;
+  public uint n_cols {get {return matrix.n_cols;} construct;}
+  public uint n_rows {get {return matrix.n_rows;} construct;}
+  public Matrix matrix;
   
   construct {
     matrix = new Matrix(0, 0);
