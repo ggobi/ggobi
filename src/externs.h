@@ -261,7 +261,6 @@ void       make_symbol_window (GGobiSession *);
 void       make_ui (GGobiSession *);
 GlyphType  mapGlyphName (const gchar *gtype);
 void       missing_arrays_add_cols (GGobiStage *d);
-void       missings_datad_cb (GtkWidget *w, GGobiSession *gg);
 gboolean   mouseinwindow (splotd *);
 void       mousepos_get_motion (GtkWidget *, GdkEventMotion *, gboolean *, gboolean *, splotd *);
 void       mousepos_get_pressed (GtkWidget *, GdkEventButton *, gboolean *, gboolean *, splotd *);
