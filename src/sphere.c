@@ -20,6 +20,7 @@
 #include <gtk/gtk.h>
 #include "vars.h"
 #include "externs.h"
+#include "svd.h"
 
 
 /*-------------------------------------------------------------------------*/

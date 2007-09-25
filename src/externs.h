@@ -198,7 +198,6 @@ gint       do_ash1d (gfloat *, gint, gint, gint, gfloat *, gfloat *, gfloat *, g
 void       do_last_increment (vector_f, vector_f, gfloat, gint);
 void       draw_3drectangle (GtkWidget *w, GdkDrawable *drawable, gint x, gint y, gint width, gint height, GGobiSession *gg);
 void       draw_glyph (GdkDrawable *, glyphd *, icoords *, gint, GGobiSession *);
-gint       dsvd (gdouble **a, gint m, gint n, gfloat *w, gdouble **v);
 
 /* pango utils */
 void layout_text(PangoLayout *layout, const gchar *text, PangoRectangle *rect);

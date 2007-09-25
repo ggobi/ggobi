@@ -15,19 +15,10 @@
  *   v = returns the right orthogonal transformation matrix
 */
 
-#include <math.h>
 #include <gtk/gtk.h>
+#include <math.h>
 
 #define SIGN(a, b) ((b) >= 0.0 ? fabs(a) : -fabs(a))
-
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-gint dsvd (gdouble **a, gint m, gint n, gfloat *w, gdouble **v);
-#ifdef __cplusplus
-}
-#endif
 
 static gdouble PYTHAG (gdouble a, gdouble b)
 {

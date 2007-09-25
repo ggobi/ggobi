@@ -28,6 +28,7 @@
 
 #include "vars.h"
 #include "externs.h"
+#include "svd.h"
 
 void
 zero_tau (vector_f tau, gint projdim) {

@@ -85,7 +85,11 @@ namespace GGobi {
     public static double random_normal();
   }
 
-
+  [CCode (cprefix = "dsvd", lower_case_cprefix = "", cheader_filename = "svd.h")]
+  public struct LinearAlgebra {
+    [NoArrayLength]
+    public static void svd (pointer[] a, int m, int n, out float[] w, out pointer[] v);
+  }
 
   [CCode (cheader_filename = "ggobi-variable.h", cprefix = "GGOBI_VARIABLE_" )]  
   public enum VariableType {

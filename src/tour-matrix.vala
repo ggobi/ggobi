@@ -113,7 +113,12 @@ public class GGobi.TourMatrix : PipelineMatrix {
     return mat;
   }
   
-  public void svd(out TourMatrix U, out double[] d, out TourMatrix V) {}
+  public void svd(out TourMatrix U, out double[] d, out TourMatrix V) {
+    float[] tmpd = new float[U.n_rows];
+    
+    LinearAlgebra.svd(matrix.vals, (int) n_rows, (int) n_cols, out tmpd, out V.matrix.vals);
+    
+  }
   
   public bool equivalent(TourMatrix other) {
     for (uint j = 0; j < n_cols; j++) {

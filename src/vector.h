@@ -63,4 +63,3 @@ void       vectors_realloc (vector_s *, gint);
 void       vectors_realloc_zero (vector_s *, gint);
 
 #endif
-
