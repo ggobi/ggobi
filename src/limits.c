@@ -31,7 +31,7 @@ void
 recenter_data (gint i, GGobiStage * d)
 {
   GGobiVariable *var;
-  greal x;
+  gdouble x;
   gint j;
 
   for (j = 0; j < d->n_cols; j++) {

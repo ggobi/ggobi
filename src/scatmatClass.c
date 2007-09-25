@@ -424,8 +424,8 @@ splotScreenToTform (cpaneld * cpanel, splotd * sp, icoords * scr,
                     fcoords * tfd, GGobiSession * gg)
 {
   gcoords planar, world;
-  greal precis = (greal) PRECISION1;
-  greal ftmp, max, min, rdiff;
+  gdouble precis = (gdouble) PRECISION1;
+  gdouble ftmp, max, min, rdiff;
   displayd *display = (displayd *) sp->displayptr;
   GGobiStage *d = display->d;
   gfloat scale_x, scale_y;
@@ -433,9 +433,9 @@ splotScreenToTform (cpaneld * cpanel, splotd * sp, icoords * scr,
   scale_x = sp->scale.x;
   scale_y = sp->scale.y;
   scale_x /= 2;
-  sp->iscale.x = (greal) sp->max.x * scale_x;
+  sp->iscale.x = (gdouble) sp->max.x * scale_x;
   scale_y /= 2;
-  sp->iscale.y = -1 * (greal) sp->max.y * scale_y;
+  sp->iscale.y = -1 * (gdouble) sp->max.y * scale_y;
 
 /*
  * screen to plane 

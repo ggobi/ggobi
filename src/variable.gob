@@ -403,7 +403,7 @@ get_level_value_closest(self, gint value)
  level_values = self_get_level_values(self);
  
  for (k = 0; k < ggobi_variable_get_n_levels(self); k++) {
-   dist = fabs ((greal) level_values[k] - value);
+   dist = fabs ((gdouble) level_values[k] - value);
    if (dist < ddist) {
      level = k;
      ddist = dist;
@@ -428,7 +428,7 @@ get_level_value_closest(self, gint value)
  *
  */
 private void
-limits_adjust (greal * min, greal * max)
+limits_adjust (gdouble * min, gdouble * max)
 {
   if (*max - *min == 0) {
     if (*min == 0.0) {
@@ -442,7 +442,7 @@ limits_adjust (greal * min, greal * max)
   }
 
   if (*max < *min) {
-    greal ftmp = *max;
+    gdouble ftmp = *max;
     *max = *min;
     *min = ftmp;
   }
@@ -453,7 +453,7 @@ refresh_limits(self)
 {    
   GGobiStage *s = self->stage;
   gint i, j = ggobi_stage_get_col_index_for_name(s, self->name);
-  greal min, max;
+  gdouble min, max;
   
   if (!selfp->dirty_limits)
     return;

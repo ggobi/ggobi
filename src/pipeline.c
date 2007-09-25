@@ -21,15 +21,15 @@ void
 tform_to_world_by_var (GGobiStage * d, guint j)
 {
   gint i;
-  greal max, min, range, ftmp;
+  gdouble max, min, range, ftmp;
   GGobiVariable *var = ggobi_stage_get_variable(d, j);
 
   ggobi_variable_get_limits(var, &min, &max);
   range = max - min;
 
   for (i = 0; i < d->n_rows; i++) {
-    ftmp = -1.0 + 2.0 * ((greal) ggobi_stage_get_raw_value(d, i, j) - min) / range;
-    d->world.vals[i][j] = (greal) (PRECISION1 * ftmp);
+    ftmp = -1.0 + 2.0 * ((gdouble) ggobi_stage_get_raw_value(d, i, j) - min) / range;
+    d->world.vals[i][j] = (gdouble) (PRECISION1 * ftmp);
   }
 }
 
@@ -68,14 +68,14 @@ pt_screen_to_plane (icoords * screen, gint id, gboolean horiz, gboolean vert,
   prev_planar.y = 0;
   
   gfloat scale_x, scale_y;
-  greal precis = (greal) PRECISION1;
+  gdouble precis = (gdouble) PRECISION1;
 
   scale_x = sp->scale.x;
   scale_y = sp->scale.y;
   scale_x /= 2;
-  sp->iscale.x = (greal) sp->max.x * scale_x;
+  sp->iscale.x = (gdouble) sp->max.x * scale_x;
   scale_y /= 2;
-  sp->iscale.y = -1 * (greal) sp->max.y * scale_y;
+  sp->iscale.y = -1 * (gdouble) sp->max.y * scale_y;
 
   if (id >= 0) {                /* when moving points, initialize new planar values */
     eps->x = 0;
@@ -86,14 +86,14 @@ pt_screen_to_plane (icoords * screen, gint id, gboolean horiz, gboolean vert,
 
   if (horiz) {                  /* relevant distinction for moving points */
     screen->x -= sp->max.x / 2;
-    planar->x = (greal) screen->x * precis / sp->iscale.x;
-    planar->x += (greal) sp->pmid.x;
+    planar->x = (gdouble) screen->x * precis / sp->iscale.x;
+    planar->x += (gdouble) sp->pmid.x;
   }
 
   if (vert) {                   /* relevant distinction for moving points */
     screen->y -= sp->max.y / 2;
-    planar->y = (greal) screen->y * precis / sp->iscale.y;
-    planar->y += (greal) sp->pmid.y;
+    planar->y = (gdouble) screen->y * precis / sp->iscale.y;
+    planar->y += (gdouble) sp->pmid.y;
   }
 
   if (id >= 0) {                /* when moving points */
@@ -106,7 +106,7 @@ pt_screen_to_plane (icoords * screen, gint id, gboolean horiz, gboolean vert,
 
 void
 pt_plane_to_world (splotd * sp, gcoords * planar, gcoords * eps,
-                   greal * world)
+                   gdouble * world)
 {
   displayd *display = (displayd *) sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
@@ -127,7 +127,7 @@ pt_plane_to_world (splotd * sp, gcoords * planar, gcoords * eps,
     /*if (!gg->is_pp) { */
     for (j = 0; j < display->t1d.nactive; j++) {
       var = display->t1d.active_vars.els[j];
-      world[var] += (eps->x * (greal) display->t1d.F.vals[0][var]);
+      world[var] += (eps->x * (gdouble) display->t1d.F.vals[0][var]);
     }
     /*} */
     break;
@@ -135,8 +135,8 @@ pt_plane_to_world (splotd * sp, gcoords * planar, gcoords * eps,
     for (j = 0; j < display->t2d3.nactive; j++) {
       var = display->t2d3.active_vars.els[j];
       world[var] +=
-        (eps->x * (greal) display->t2d3.F.vals[0][var] +
-         eps->y * (greal) display->t2d3.F.vals[1][var]);
+        (eps->x * (gdouble) display->t2d3.F.vals[0][var] +
+         eps->y * (gdouble) display->t2d3.F.vals[1][var]);
     }
     break;
   case TOUR2D:
@@ -144,8 +144,8 @@ pt_plane_to_world (splotd * sp, gcoords * planar, gcoords * eps,
     for (j = 0; j < display->t2d.nactive; j++) {
       var = display->t2d.active_vars.els[j];
       world[var] +=
-        (eps->x * (greal) display->t2d.F.vals[0][var] +
-         eps->y * (greal) display->t2d.F.vals[1][var]);
+        (eps->x * (gdouble) display->t2d.F.vals[0][var] +
+         eps->y * (gdouble) display->t2d.F.vals[1][var]);
     }
     /*} */
     break;
@@ -153,11 +153,11 @@ pt_plane_to_world (splotd * sp, gcoords * planar, gcoords * eps,
     /*if (!gg->is_pp) { */
     for (j = 0; j < display->tcorr1.nactive; j++) {
       var = display->tcorr1.active_vars.els[j];
-      world[var] += (eps->x * (greal) display->tcorr1.F.vals[0][var]);
+      world[var] += (eps->x * (gdouble) display->tcorr1.F.vals[0][var]);
     }
     for (j = 0; j < display->tcorr2.nactive; j++) {
       var = display->tcorr2.active_vars.els[j];
-      world[var] += (eps->y * (greal) display->tcorr2.F.vals[0][var]);
+      world[var] += (eps->y * (gdouble) display->tcorr2.F.vals[0][var]);
     }
     /*} */
     break;
@@ -167,7 +167,7 @@ pt_plane_to_world (splotd * sp, gcoords * planar, gcoords * eps,
 }
 
 void
-pt_world_to_raw_by_var (gint j, greal * world, greal * raw, GGobiStage * d)
+pt_world_to_raw_by_var (gint j, gdouble * world, gdouble * raw, GGobiStage * d)
 {
   gfloat precis = PRECISION1;
   gfloat ftmp, rdiff;
@@ -185,12 +185,12 @@ pt_world_to_raw_by_var (gint j, greal * world, greal * raw, GGobiStage * d)
 
 void
 pt_screen_to_raw (icoords * screen, gint id, gboolean horiz, gboolean vert,
-                  greal * raw, gcoords * eps, GGobiStage * d, splotd * sp,
+                  gdouble * raw, gcoords * eps, GGobiStage * d, splotd * sp,
                   GGobiSession * gg)
 {
   gint j;
   gcoords planar;
-  greal *world = (greal *) g_malloc0 (d->n_cols * sizeof (greal));
+  gdouble *world = (gdouble *) g_malloc0 (d->n_cols * sizeof (gdouble));
 
   pt_screen_to_plane (screen, id, horiz, vert, eps, &planar, sp);
   pt_plane_to_world (sp, &planar, &planar, world);

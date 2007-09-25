@@ -120,7 +120,7 @@ p1d_spread_var (displayd * display, gfloat * yy, splotd * sp, GGobiStage * d,
 }
 
 void
-p1d_reproject (splotd * sp, greal ** world_data, GGobiStage * d, GGobiSession * gg)
+p1d_reproject (splotd * sp, gdouble ** world_data, GGobiStage * d, GGobiSession * gg)
 {
 /*
  * Project the y variable down from the ncols-dimensional world_data[]
@@ -210,8 +210,8 @@ p1d_varsel (splotd * sp, gint jvar, gint * jprev, gint toggle, gint mouse)
 void
 ash_baseline_set (icoords * baseline, splotd * sp)
 {
-  greal ftmp, precis = (greal) PRECISION1;
-  greal pl, gtmp;
+  gdouble ftmp, precis = (gdouble) PRECISION1;
+  gdouble pl, gtmp;
   gint iscr;
 
 /*
@@ -219,7 +219,7 @@ ash_baseline_set (icoords * baseline, splotd * sp)
                     (sp->p1d.lim.max - sp->p1d.lim.min);
 */
   ftmp = -1 /* and the rest of the usual expression is 0 now */ ;
-  pl = (greal) (precis * ftmp);
+  pl = (gdouble) (precis * ftmp);
 
 /*-- HORIZONTAL --*/
   gtmp = pl - sp->pmid.y;

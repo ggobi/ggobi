@@ -508,7 +508,7 @@ ruler_shift_cb (GtkWidget * w, GdkEventMotion * event, splotd * sp)
   gboolean button1_p, button2_p;
   gint direction = (w == display->hrule) ? HORIZONTAL : VERTICAL;
   gboolean redraw = false;
-  greal precis = (greal) PRECISION1;
+  gdouble precis = (gdouble) PRECISION1;
 
   /*-- find out if any buttons are pressed --*/
   mousepos_get_motion (w, event, &button1_p, &button2_p, sp);
@@ -516,27 +516,27 @@ ruler_shift_cb (GtkWidget * w, GdkEventMotion * event, splotd * sp)
   if (button1_p) {
 
     if (direction == HORIZONTAL) {
-      greal scale_x;
-      greal dx = (greal) (event->x - display->drag_start.x);
+      gdouble scale_x;
+      gdouble dx = (gdouble) (event->x - display->drag_start.x);
       /*-- exactly as in pan_by_drag --*/
       /*      scale_x = (cpanel->projection == TOUR2D) ? sp->tour_scale.x : sp->scale.x; */
       scale_x = sp->scale.x;
       scale_x /= 2;
-      sp->iscale.x = (greal) sp->max.x * scale_x;
+      sp->iscale.x = (gdouble) sp->max.x * scale_x;
       sp->pmid.x -= (dx * precis / sp->iscale.x);
       /* */
       display->drag_start.x = event->x;
       redraw = true;
     }
     else {
-      greal scale_y;
-      greal dy = -1 * (greal) (event->y - display->drag_start.y);
+      gdouble scale_y;
+      gdouble dy = -1 * (gdouble) (event->y - display->drag_start.y);
 
       /*-- exactly as in pan_by_drag --*/
       /*      scale_y = (cpanel->projection == TOUR2D) ? sp->tour_scale.y : sp->scale.y; */
       scale_y = sp->scale.y;
       scale_y /= 2;
-      sp->iscale.y = (greal) sp->max.y * scale_y;
+      sp->iscale.y = (gdouble) sp->max.y * scale_y;
       sp->pmid.y -= (dy * precis / sp->iscale.y);
       /* */
 

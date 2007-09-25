@@ -88,7 +88,7 @@ xyplot_varsel (splotd *sp, gint jvar, gint *jvar_prev, gint toggle, gint mouse)
 }
 
 void
-xy_reproject (splotd *sp, greal **world_data, GGobiStage *d, GGobiSession *gg)
+xy_reproject (splotd *sp, gdouble **world_data, GGobiStage *d, GGobiSession *gg)
 {
 /*
  * Project the data down from the ncols_used-dimensional world_data[]

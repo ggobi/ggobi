@@ -83,7 +83,7 @@ zoom_cb (GtkAdjustment * adj, GGobiSession * gg)
   splotd *sp = gg->current_splot;
   cpaneld *cpanel = &display->cpanel;
   gchar *name = (gchar *) g_object_get_data (G_OBJECT (adj), "name");
-  greal oscalex = sp->scale.x, oscaley = sp->scale.y;
+  gdouble oscalex = sp->scale.x, oscaley = sp->scale.y;
   GtkAdjustment *adj_other;
   // step and eps are in the space of the adjustment values;
   // exp_eps is in the space of the scaling values.

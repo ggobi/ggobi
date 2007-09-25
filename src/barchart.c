@@ -858,7 +858,7 @@ barchart_recalc_counts (barchartSPlotd * sp, GGobiStage * d, GGobiSession * gg)
         if (GGOBI_STAGE_GET_ATTR_HIDDEN(d, i))
           sp->bar->bins[bin].nhidden++;
       }
-      rawsp->planar[i].x = (greal) sp->bar->bins[bin].value;
+      rawsp->planar[i].x = (gdouble) sp->bar->bins[bin].value;
     }
   } else {                        /* all vartypes but categorical */
     gint index, rank = 0;
@@ -991,9 +991,9 @@ barchart_recalc_dimensions (splotd * rawsp, GGobiStage * d, GGobiSession * gg)
 
     sp->bar->bins[i].planar.x = -1;
     if (GGOBI_STAGE_IS_COL_CATEGORICAL(d, rawsp->p1dvar)) {
-      ftmp = -1.0 + 2.0 * ((greal) bin->value - rawsp->p1d.lim.min)
+      ftmp = -1.0 + 2.0 * ((gdouble) bin->value - rawsp->p1d.lim.min)
         / rdiff;
-      bin->planar.y = (greal) (PRECISION1 * ftmp);
+      bin->planar.y = (gdouble) (PRECISION1 * ftmp);
     }
     else {
       ftmp = -1.0 + 2.0 * (sp->bar->breaks[i] - sp->bar->breaks[0]) / rdiff;
@@ -1003,13 +1003,13 @@ barchart_recalc_dimensions (splotd * rawsp, GGobiStage * d, GGobiSession * gg)
   sp->bar->maxbincounts = maxbincount;
 
   if (!sp->bar->is_spine) {
-    greal precis = (greal) PRECISION1;
-    greal gtmp;
+    gdouble precis = (gdouble) PRECISION1;
+    gdouble gtmp;
     gbind *binminus;
 
     scale_y /= 2;
 
-    rawsp->iscale.y = (greal) (-1 * (gfloat) rawsp->max.y * scale_y);
+    rawsp->iscale.y = (gdouble) (-1 * (gfloat) rawsp->max.y * scale_y);
 
     minwidth = rawsp->max.y;
     for (i = 0; i < sp->bar->nbins; i++) {

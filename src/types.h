@@ -26,12 +26,6 @@ typedef struct {
   gchar *name;
 } modepaneld;
 
-/*
- * greal is at several steps in the pipeline, in particular
- * for world, and planar, as we eliminate the conversion
- * to longs.  Defining 'greal' allows us to compare the behavior
- * of floats and doubles for speed and storage.
-*/
 typedef enum {Sprocess_data, xml_data, mysql_data, url_data, csv_data, unknown_data, num_data_modes} DataMode;
 
 typedef enum {NONE, EXPOSE, QUICK, BINNED, FULL, FULL_1PIXMAP} RedrawStyle;
@@ -54,7 +48,7 @@ typedef struct {
   glong x, y;
 } lcoords;
 typedef struct {
-  greal x, y;
+  gdouble x, y;
 } gcoords;
 typedef struct {
   gint x, y;

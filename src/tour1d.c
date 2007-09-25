@@ -554,7 +554,7 @@ tour1d_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse, GGobiStage *d, 
 }
 
 void
-tour1d_projdata(splotd *sp, greal **world_data, GGobiStage *d, GGobiSession *gg)
+tour1d_projdata(splotd *sp, gdouble **world_data, GGobiStage *d, GGobiSession *gg)
 {
   gint j, m;
   displayd *dsp = (displayd *) sp->displayptr;
@@ -605,11 +605,11 @@ tour1d_projdata(splotd *sp, greal **world_data, GGobiStage *d, GGobiSession *gg)
       }
     }
     for (m=0; m<d->n_rows; m++) {
-      sp->planar[m].x = (greal) (precis*(-1.0+2.0*
+      sp->planar[m].x = (gdouble) (precis*(-1.0+2.0*
         sp->p1d.spread_data.els[m]/max));
         /*(sp->p1d_data.els[i]-min)/(max-min)));*/
       /*      sp->planar[i].y = yy[i];*/
-      sp->planar[m].y = (greal) (precis*(-1.0+2.0*
+      sp->planar[m].y = (gdouble) (precis*(-1.0+2.0*
         ((yy[m]-sp->tour1d.minscreenx)/
         (sp->tour1d.maxscreenx-sp->tour1d.minscreenx))));
     }
@@ -624,11 +624,11 @@ tour1d_projdata(splotd *sp, greal **world_data, GGobiStage *d, GGobiSession *gg)
       }
     }
     for (m=0; m<d->n_rows; m++) {
-      sp->planar[m].x = (greal) (precis*(-1.0+2.0*
+      sp->planar[m].x = (gdouble) (precis*(-1.0+2.0*
         ((yy[m]-sp->tour1d.minscreenx)/
         (sp->tour1d.maxscreenx-sp->tour1d.minscreenx))));
       /*      sp->planar[i].x = yy[i];*/
-      sp->planar[m].y = (greal) (precis*(-1.0+2.0*
+      sp->planar[m].y = (gdouble) (precis*(-1.0+2.0*
         sp->p1d.spread_data.els[m]/max));
         /*(sp->p1d_data.els[i]-min)/(max-min)));*/
     }

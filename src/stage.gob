@@ -315,7 +315,7 @@ property UINT n_rows
      guint old_n_rows = self->n_rows;
      self->n_rows = g_value_get_uint(VAL);
      if (old_n_rows < self->n_rows) {
-       arrayg_add_rows (&self->world, self->n_rows);
+       arrayd_add_rows (&self->world, self->n_rows);
      }
      if (old_n_rows != self->n_rows) {
        vectori_realloc (&self->rows_under_brush, self->n_rows);
@@ -337,7 +337,7 @@ property UINT n_cols
        self_set_variable(self, j, var);
      }
      if (old_n_cols < self->n_cols) {
-       arrayg_add_cols (&self->world, self->n_cols);
+       arrayd_add_cols (&self->world, self->n_cols);
        tour_realloc_up (self, self->n_cols);
      }
    }
@@ -362,7 +362,7 @@ public BrushBins  brush;
 public vector_i rows_under_brush;
 public vector_i rows_under_brush_prev;
 
-public array_g world;
+public array_d world;
 
 public gboolean missings_show_p; /*-- show/hide per datad, not per display --*/
 public gint nrows_under_brush;
@@ -1646,7 +1646,7 @@ process_outgoing(self, GGobiPipelineMessage *msg)
   /* handle column removal */
   if (n_removed_cols) {
     g_slist_foreach(removed_cols, (GFunc)self_removed_col_foreach, self);
-    arrayg_delete_cols (&self->world, removed_cols);
+    arrayd_delete_cols (&self->world, removed_cols);
     tour2d_realloc_down (removed_cols, self, self->gg);
     tour1d_realloc_down (removed_cols, self, self->gg);
     tourcorr_realloc_down (removed_cols, self, self->gg);
@@ -1660,7 +1660,7 @@ process_outgoing(self, GGobiPipelineMessage *msg)
   
   if (n_removed_rows) {
     /* row removal */
-    arrayg_delete_rows (&self->world, removed_rows);
+    arrayd_delete_rows (&self->world, removed_rows);
   }
 
   /* clean up */

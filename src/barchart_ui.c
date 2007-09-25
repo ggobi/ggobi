@@ -288,7 +288,7 @@ barchart_scale (gboolean button1_p, gboolean button2_p, splotd * sp)
   if (bsp->bar->is_histogram &&
       (bsp->bar->anchor_drag || bsp->bar->width_drag)) {
     gint idy = sp->mousepos.y - sp->mousepos_o.y;
-    greal dy = (greal) idy;
+    gdouble dy = (gdouble) idy;
     fcoords pts1, pts2;
 
     if (bsp->bar->anchor_drag) {
@@ -306,7 +306,7 @@ barchart_scale (gboolean button1_p, gboolean button2_p, splotd * sp)
         sp->iscale.y = (gfloat) sp->max.y * scale_y;
 
         klass->screen_to_tform (cpanel, sp, &scr, &pts1, gg);
-        sp->pmid.y -= (dy * (greal) PRECISION1 / sp->iscale.y);
+        sp->pmid.y -= (dy * (gdouble) PRECISION1 / sp->iscale.y);
         klass->screen_to_tform (cpanel, sp, &scr, &pts2, gg);
         bsp->bar->offset += (pts1.y - pts2.y);
 

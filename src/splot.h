@@ -116,7 +116,7 @@ typedef struct
  * tour2d: rescaling so that points don't go outside the planar space
  */
  struct _tour2d {
-   greal maxscreen;
+   gdouble maxscreen;
    gboolean initmax;
  } tour2d;
 
@@ -124,7 +124,7 @@ typedef struct
  * tour2d: rescaling so that points don't go outside the planar space
  */
  struct _tourcorr {
-   greal maxscreen;
+   gdouble maxscreen;
    gboolean initmax;
  } tourcorr;
 
@@ -135,7 +135,7 @@ typedef struct
 
 /*-- rotation implemented as a limited tour2d --*/
  struct _tour2d3 {
-   greal maxscreen;
+   gdouble maxscreen;
    gboolean initmax;
  } tour2d3;
 

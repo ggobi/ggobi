@@ -9,8 +9,6 @@
 
 #include "utils.h"
 
-typedef gfloat greal;
-
 /*-- arrays --*/
 /*-- double: some plugins will want these --*/
 typedef struct {
@@ -32,11 +30,6 @@ typedef struct {
   glong **vals;
   guint nrows, ncols;
 } array_l;
-/*-- real: for the new world --*/
-typedef struct {
-  greal **vals;
-  guint nrows, ncols;
-} array_g;
 
 
 void       arrayd_add_cols (array_d *, gint);
@@ -58,15 +51,6 @@ void       arrayf_delete_cols (array_f *, GSList *);
 void       arrayf_free (array_f *, gint, gint);
 void       arrayf_init_null (array_f *);
 void       arrayf_zero (array_f *);
-void       arrayg_add_cols (array_g *, gint);
-void       arrayg_add_rows (array_g *, gint);
-void       arrayg_alloc (array_g *, gint, gint);
-void       arrayg_alloc_zero (array_g *, gint, gint);
-void       arrayg_delete_cols (array_g *, GSList *);
-void       arrayg_delete_rows (array_g *, GSList *);
-void       arrayg_free (array_g *, gint, gint);
-void       arrayg_init_null (array_g *);
-void       arrayg_zero (array_g *);
 void       arrayl_add_cols (array_l *, gint);
 void       arrayl_add_rows (array_l *, gint);
 void       arrayl_alloc (array_l *, gint, gint);

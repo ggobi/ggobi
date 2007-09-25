@@ -10,15 +10,15 @@ void       tform_to_world_by_var (GGobiStage *, guint j);
 
 
 void
-pt_world_to_raw_by_var (gint j, greal * world, greal * raw, GGobiStage * d);
+pt_world_to_raw_by_var (gint j, gdouble * world, gdouble * raw, GGobiStage * d);
 
 void
 pt_screen_to_raw (icoords * screen, gint id, gboolean horiz, gboolean vert,
-                  greal * raw, gcoords * eps, GGobiStage * d, splotd * sp,
+                  gdouble * raw, gcoords * eps, GGobiStage * d, splotd * sp,
                   GGobiSession * gg);
 void
 pt_plane_to_world (splotd * sp, gcoords * planar, gcoords * eps,
-                   greal * world);
+                   gdouble * world);
 void
 pt_screen_to_plane (icoords * screen, gint id, gboolean horiz, gboolean vert,
                    gcoords * eps, gcoords * planar, splotd * sp);

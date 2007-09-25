@@ -34,7 +34,7 @@ record_add (eeMode mode, gint a, gint b, gchar * lbl, gchar * id,
   splotd *sp;
   displayd *dsp;
   GGobiStage *dtarget = ggobi_stage_get_root(d);
-  greal x;
+  gdouble x;
 
   g_return_val_if_fail(e == NULL || d->gg == e->gg, false);
 
@@ -63,7 +63,7 @@ record_add (eeMode mode, gint a, gint b, gchar * lbl, gchar * id,
         ggobi_stage_set_missing(dtarget, i, j);
       } else {
         GGobiVariable *var = ggobi_stage_get_variable(dtarget, j);
-        x = (greal) atof (vals[j]);
+        x = (gdouble) atof (vals[j]);
         if (GGOBI_VARIABLE_IS_CATEGORICAL(var))
           x = ggobi_variable_get_level_value_closest(var, x);
         else
@@ -320,7 +320,7 @@ fetch_default_record_values (gchar ** vals, GGobiStage * dtarget,
 
   if (dtarget == display->d) {
     /*-- use the screen position --*/
-    greal *raw = (greal *) g_malloc (dtarget->n_cols * sizeof (greal));
+    gdouble *raw = (gdouble *) g_malloc (dtarget->n_cols * sizeof (gdouble));
     pt_screen_to_raw (&gg->current_splot->mousepos, -1, true, true, /* no id, both horiz and vert are true */
                       raw, &eps, dtarget, gg->current_splot, gg);
     for (j = 0; j < dtarget->n_cols; j++) {

@@ -509,11 +509,11 @@ tour2d_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse,
 }
 
 void
-tour2d_projdata(splotd *sp, greal **world_data, GGobiStage *d, GGobiSession *gg) {
+tour2d_projdata(splotd *sp, gdouble **world_data, GGobiStage *d, GGobiSession *gg) {
   gint j, m;
   displayd *dsp = (displayd *) sp->displayptr;
-  greal precis = (greal) PRECISION1;
-  greal tmpf, maxx, maxy;
+  gdouble precis = (gdouble) PRECISION1;
+  gdouble tmpf, maxx, maxy;
 
   if (sp->tour2d.initmax) {
     sp->tour2d.maxscreen = precis;
@@ -529,8 +529,8 @@ tour2d_projdata(splotd *sp, greal **world_data, GGobiStage *d, GGobiSession *gg)
     sp->planar[m].y = 0;
     for (j=0; j<d->n_cols; j++)
     {
-      sp->planar[m].x += (greal)(dsp->t2d.F.vals[0][j]*world_data[m][j]);
-      sp->planar[m].y += (greal)(dsp->t2d.F.vals[1][j]*world_data[m][j]);
+      sp->planar[m].x += (gdouble)(dsp->t2d.F.vals[0][j]*world_data[m][j]);
+      sp->planar[m].y += (gdouble)(dsp->t2d.F.vals[1][j]*world_data[m][j]);
     }
     sp->planar[m].x *= tmpf;
     sp->planar[m].y *= tmpf;
