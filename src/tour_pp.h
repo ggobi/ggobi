@@ -26,10 +26,10 @@ The authors can be contacted at the following email addresses:
 
 gint alloc_optimize0_p (optimize0_param *op, gint nrows, gint ncols, gint ndim);
 gint free_optimize0_p (optimize0_param *op);
-gboolean iszero (array_f *data);
+gboolean iszero (array_d *data);
 
-void normal_fill (array_f *data, gfloat delta, array_f *base);
-void orthonormal (array_f *proj);
+void normal_fill (array_d *data, gfloat delta, array_d *base);
+void orthonormal (array_d *proj);
 gint optimize0 (optimize0_param *op,
                 Tour_PPIndex_f fun,
                 void *param);
@@ -40,14 +40,14 @@ gdouble tour_pp_solve(gdouble *a, gdouble *b, gint n, gint *Pivot);
 void inverse(gdouble *a, gint n);
 
 /* Arbitrary dimensional indices */
-gint holes_raw(array_f *pdata, void *param, gfloat *val, gpointer unused);
-gint central_mass_raw(array_f *pdata, void *param, gfloat *val, gpointer unused);
+gint holes_raw(array_d *pdata, void *param, gfloat *val, gpointer unused);
+gint central_mass_raw(array_d *pdata, void *param, gfloat *val, gpointer unused);
 void zero (gdouble *ptr, gint length);
 void zero_int (gint *mem, gint size);
 gint compute_groups (vector_i group, vector_i ngroup, gint *groups,  gint nrows, gfloat *gdata);
-gint discriminant (array_f *pdata, void *param, gfloat *val, gpointer unused);
-gint cartgini (array_f *pdata, void *param, gfloat *val, gpointer unused);
-gint cartentropy (array_f *pdata, void *param, gfloat *val, gpointer unused);
+gint discriminant (array_d *pdata, void *param, gfloat *val, gpointer unused);
+gint cartgini (array_d *pdata, void *param, gfloat *val, gpointer unused);
+gint cartentropy (array_d *pdata, void *param, gfloat *val, gpointer unused);
 
 
 

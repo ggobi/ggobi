@@ -8,10 +8,6 @@ typedef struct {
   guint nels;
 } vector_d;
 typedef struct {
-  gfloat *els;
-  guint nels;
-} vector_f;
-typedef struct {
   gint *els;
   guint nels;
 } vector_i;
@@ -41,13 +37,6 @@ void       vectord_free (vector_d *);
 void       vectord_init_null (vector_d *);
 void       vectord_realloc (vector_d *, gint);
 void       vectord_zero (vector_d *vecp);
-void       vectorf_alloc (vector_f *, gint);
-void       vectorf_alloc_zero (vector_f *, gint);
-void       vectorf_delete_els (vector_f *vecp, GSList *els);
-void       vectorf_free (vector_f *);
-void       vectorf_init_null (vector_f *);
-void       vectorf_realloc (vector_f *, gint);
-void       vectorf_zero (vector_f *vecp);
 void       vectori_alloc (vector_i *, gint);
 void       vectori_alloc_zero (vector_i *, gint);
 void       vectori_copy (vector_i *, vector_i *);

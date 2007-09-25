@@ -92,7 +92,7 @@ typedef struct
 */
  gint p1dvar;
  struct _p1d {
-   vector_f spread_data; /* the spreading data */
+   vector_d spread_data; /* the spreading data */
    lims lim;      /* limits of the spreading data */
    gfloat mean;
    /*-- line segments in ASHes --*/

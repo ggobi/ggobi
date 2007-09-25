@@ -100,7 +100,7 @@ Purpose        : computes a projection into a normal density fn
 Note           : only works for 2d now, could be generalized
 *********************************************************************/
 
-/* gint holes(array_f *pdata, void *param, gfloat *val)
+/* gint holes(array_d *pdata, void *param, gfloat *val)
 {
   holes_param *hp = (holes_param *) param;
   gint i, m;
@@ -129,7 +129,7 @@ Note           : only works for 2d now, could be generalized
 *********************************************************************/
 
 /* gint
-central_mass(array_f *pdata, void *param, gfloat *val)
+central_mass(array_d *pdata, void *param, gfloat *val)
 {
   holes_param *hp = (holes_param *) param;
   gint i, m;
@@ -154,7 +154,7 @@ central_mass(array_f *pdata, void *param, gfloat *val)
 /*   holes_raw2 : use inverse function             */
 /***************************************************/
 
-/* gint holes_raw1(array_f *pdata, void *param, gfloat *val)
+/* gint holes_raw1(array_d *pdata, void *param, gfloat *val)
 { 
 *
    holes_param *hp = (holes_param *) param;
@@ -203,7 +203,7 @@ central_mass(array_f *pdata, void *param, gfloat *val)
    return(0);
 }
 
-gint holes_raw2( array_f *pdata, void *param, gfloat *val)
+gint holes_raw2( array_d *pdata, void *param, gfloat *val)
 { 
    gint i, p=pdata->ncols, n=pdata->nrows;
    gfloat m1, m2,x1,x2,temp;
@@ -249,7 +249,7 @@ gint holes_raw2( array_f *pdata, void *param, gfloat *val)
 /*   central_mass_raw2 : use inverse function             */
 /**********************************************************/
 
-/* gint central_mass_raw1(array_f *pdata, void *param, gfloat *val)
+/* gint central_mass_raw1(array_d *pdata, void *param, gfloat *val)
 {
 *
    holes_param *hp = (holes_param *) param;
@@ -292,7 +292,7 @@ gint holes_raw2( array_f *pdata, void *param, gfloat *val)
 
 }
 
-gint central_mass_raw2(array_f *pdata, void *param, gfloat *val)
+gint central_mass_raw2(array_d *pdata, void *param, gfloat *val)
 {
    *holes_param *hp = (holes_param *) param;*
    gint i, p=pdata->ncols, n=pdata->nrows;
@@ -604,7 +604,7 @@ void t2d_pp_reinit(displayd *dsp, GGobiSession *gg)
 
 The index function has to be defined as
 
-     gint index (array_f *pdata, void *param, gfloat *val)
+     gint index (array_d *pdata, void *param, gfloat *val)
 
 with   
 
@@ -619,7 +619,7 @@ projection.
 
 *********************************************************************/
 
-gfloat t2d_calc_indx (array_f pd,
+gfloat t2d_calc_indx (array_d pd,
                 Tour_PPIndex_f index,
                 void *param)
 { 

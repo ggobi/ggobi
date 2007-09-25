@@ -101,7 +101,7 @@ typedef struct {
   gfloat val;
 } celld;
 
-typedef gint (*Tour_PPIndex_f)(array_f *pd, void *params, gfloat *val, gpointer userData);
+typedef gint (*Tour_PPIndex_f)(array_d *pd, void *params, gfloat *val, gpointer userData);
 
 typedef struct {
     gchar *ppIndexName;   /* a string that can be used in the GUI to describe this PP index. */
@@ -130,7 +130,7 @@ typedef struct {
   vector_b active_vars_p;
   /* */
   array_d Fa, Fz, F, Ga, Gz, G, Va, Vz, tv;
-  vector_f lambda, tau, tinc;
+  vector_d lambda, tau, tinc;
   gfloat dist_az, delta, tang;
   gint target_selection_method;
   gint idled;
@@ -152,7 +152,7 @@ typedef struct {
 typedef struct
 { gfloat temp_start, temp_end, cooling, heating, temp, index_best;
   gint restart, maxproj, success;
-  array_f proj_best, data, pdata;
+  array_d proj_best, data, pdata;
 } optimize0_param; 
 
 /*

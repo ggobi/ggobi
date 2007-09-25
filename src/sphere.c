@@ -32,13 +32,13 @@ sphere_init (GGobiStage * d)
 {
   vectori_init_null (&d->sphere.vars);
   vectori_init_null (&d->sphere.pcvars);
-  vectorf_init_null (&d->sphere.eigenval);
+  vectord_init_null (&d->sphere.eigenval);
 
   arrayd_init_null (&d->sphere.eigenvec);
-  arrayf_init_null (&d->sphere.vc);
+  arrayd_init_null (&d->sphere.vc);
 
-  vectorf_init_null (&d->sphere.tform_mean);
-  vectorf_init_null (&d->sphere.tform_stddev);
+  vectord_init_null (&d->sphere.tform_mean);
+  vectord_init_null (&d->sphere.tform_stddev);
 
   d->sphere.vars_stdized = TRUE;
 }
@@ -49,13 +49,13 @@ sphere_free (GGobiStage * d)
   /*-- don't free d->sphere.pcvars, because I need it to check history --*/
 
   vectori_free (&d->sphere.vars);
-  vectorf_free (&d->sphere.eigenval);
+  vectord_free (&d->sphere.eigenval);
 
   arrayd_free (&d->sphere.eigenvec); 
-  arrayf_free (&d->sphere.vc, 0, 0);
+  arrayd_free (&d->sphere.vc);
 
-  vectorf_free (&d->sphere.tform_mean);
-  vectorf_free (&d->sphere.tform_stddev);
+  vectord_free (&d->sphere.tform_mean);
+  vectord_free (&d->sphere.tform_stddev);
 }
 
 void
@@ -66,13 +66,13 @@ sphere_malloc (gint nc, GGobiStage * d)
 
   if (nc > 0) {
     vectori_alloc_zero (&d->sphere.vars, nc);
-    vectorf_alloc_zero (&d->sphere.eigenval, nc);
+    vectord_alloc_zero (&d->sphere.eigenval, nc);
 
     arrayd_alloc_zero (&d->sphere.eigenvec, nc, nc);
-    arrayf_alloc_zero (&d->sphere.vc, nc, nc);
+    arrayd_alloc_zero (&d->sphere.vc, nc, nc);
 
-    vectorf_alloc_zero (&d->sphere.tform_mean, nc);
-    vectorf_alloc_zero (&d->sphere.tform_stddev, nc);
+    vectord_alloc_zero (&d->sphere.tform_mean, nc);
+    vectord_alloc_zero (&d->sphere.tform_stddev, nc);
   }
 }
 
@@ -347,7 +347,7 @@ eigenvals_get (gfloat * els, GGobiStage * d)
 void
 eigenval_zero (GGobiStage * d)
 {
-  vectorf_zero (&d->sphere.eigenval);
+  vectord_zero (&d->sphere.eigenval);
 }
 
 void

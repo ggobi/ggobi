@@ -356,7 +356,7 @@ void
 splot_points_realloc (splotd *sp)
 {
   GGobiStage *d = sp->displayptr->d;
-  vectorf_realloc (&sp->p1d.spread_data, d->n_rows);
+  vectord_realloc (&sp->p1d.spread_data, d->n_rows);
   sp->planar = (gcoords *) g_renew(gcoords, sp->planar, d->n_rows);
   sp->screen = (icoords *) g_renew(icoords, sp->screen, d->n_rows);
 }
@@ -392,8 +392,8 @@ splot_alloc (splotd *sp, displayd *display, GGobiSession *gg)
 
   sp->planar = (gcoords *) g_new (gcoords, nr);
   sp->screen = (icoords *) g_new (icoords, nr);
-  vectorf_init_null (&sp->p1d.spread_data);
-  vectorf_alloc (&sp->p1d.spread_data, nr);
+  vectord_init_null (&sp->p1d.spread_data);
+  vectord_alloc (&sp->p1d.spread_data, nr);
 
   if(GGOBI_IS_EXTENDED_SPLOT(sp)) {
     GGobiExtendedSPlotClass *klass;
@@ -410,7 +410,7 @@ splot_free (splotd *sp, displayd *display, GGobiSession *gg)
 
   g_free ((gpointer) sp->planar);
   g_free ((gpointer) sp->screen);
-  vectorf_free (&sp->p1d.spread_data);
+  vectord_free (&sp->p1d.spread_data);
 
 #ifdef WIN32
   win32_drawing_arrays_free (sp);

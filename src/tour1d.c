@@ -67,9 +67,9 @@ display_tour1d_init_null (displayd *dsp, GGobiSession *gg)
   vectori_init_null(&dsp->t1d.active_vars);
   vectorb_init_null(&dsp->t1d.active_vars_p);
 
-  vectorf_init_null(&dsp->t1d.lambda);
-  vectorf_init_null(&dsp->t1d.tau);
-  vectorf_init_null(&dsp->t1d.tinc);
+  vectord_init_null(&dsp->t1d.lambda);
+  vectord_init_null(&dsp->t1d.tau);
+  vectord_init_null(&dsp->t1d.tinc);
 
   /* manipulation controls */
   arrayd_init_null(&dsp->t1d_manbasis);
@@ -99,9 +99,9 @@ alloc_tour1d (displayd *dsp, GGobiSession *gg)
   vectori_alloc(&dsp->t1d.active_vars, nc);
   vectorb_alloc_zero(&dsp->t1d.active_vars_p, nc);
 
-  vectorf_alloc(&dsp->t1d.lambda, nc);
-  vectorf_alloc(&dsp->t1d.tau, nc);
-  vectorf_alloc(&dsp->t1d.tinc, nc);
+  vectord_alloc(&dsp->t1d.lambda, nc);
+  vectord_alloc(&dsp->t1d.tau, nc);
+  vectord_alloc(&dsp->t1d.tinc, nc);
 
   /* manipulation controls */
   arrayd_alloc(&dsp->t1d_manbasis, 2, nc);
@@ -131,9 +131,9 @@ tour1d_realloc_down (GSList *cols, GGobiStage *d, GGobiSession *gg)
       vectori_delete_els (&dsp->t1d.active_vars, cols);
       vectorb_delete_els (&dsp->t1d.active_vars_p, cols);
 
-      vectorf_delete_els (&dsp->t1d.lambda, cols);
-      vectorf_delete_els (&dsp->t1d.tau, cols);
-      vectorf_delete_els (&dsp->t1d.tinc, cols);
+      vectord_delete_els (&dsp->t1d.lambda, cols);
+      vectord_delete_els (&dsp->t1d.tau, cols);
+      vectord_delete_els (&dsp->t1d.tinc, cols);
 
       arrayd_delete_cols (&dsp->t1d_manbasis, cols);
     }
@@ -148,9 +148,9 @@ free_tour1d(displayd *dsp)
   vectori_free(&dsp->t1d.active_vars);
   vectorb_free(&dsp->t1d.active_vars_p);
 
-  vectorf_free(&dsp->t1d.lambda);
-  vectorf_free(&dsp->t1d.tau);
-  vectorf_free(&dsp->t1d.tinc);
+  vectord_free(&dsp->t1d.lambda);
+  vectord_free(&dsp->t1d.tau);
+  vectord_free(&dsp->t1d.tinc);
 
   arrayd_free (&dsp->t1d.Fa); 
   arrayd_free (&dsp->t1d.Fz); 
@@ -566,7 +566,7 @@ tour1d_projdata(splotd *sp, gdouble **world_data, GGobiStage *d, GGobiSession *g
   if (sp == NULL)
     return;
   if (sp->p1d.spread_data.nels != d->n_rows)
-    vectorf_realloc (&sp->p1d.spread_data, d->n_rows);
+    vectord_realloc (&sp->p1d.spread_data, d->n_rows);
 
   yy = (gfloat *) g_malloc (d->n_rows * sizeof (gfloat));
 

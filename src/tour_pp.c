@@ -65,7 +65,7 @@ void reset_pp(GGobiStage *d, GGobiSession *gg)
 
 The index function has to be defined as
 
-     gint index (array_f *pdata, void *param, gfloat *val)
+     gint index (array_d *pdata, void *param, gfloat *val)
 
 with   
 
@@ -82,22 +82,22 @@ assumes an error has occurred during computation of the index.
 
 gint alloc_optimize0_p (optimize0_param *op, gint nrows, gint ncols, gint ndim)
 {
-  arrayf_init_null (&op->proj_best);
-  /*  arrayf_alloc_zero (&op->proj_best, ncols, ndim); *nrows, ncols);*/
-  arrayf_alloc_zero (&op->proj_best, ndim, ncols); /*nrows, ncols);*/
-  arrayf_init_null (&op->data);
-  arrayf_alloc_zero (&op->data, nrows, ncols); 
-  arrayf_init_null (&op->pdata);
-  arrayf_alloc_zero (&op->pdata, nrows, ndim); 
+  arrayd_init_null (&op->proj_best);
+  /*  arrayd_alloc_zero (&op->proj_best, ncols, ndim); *nrows, ncols);*/
+  arrayd_alloc_zero (&op->proj_best, ndim, ncols); /*nrows, ncols);*/
+  arrayd_init_null (&op->data);
+  arrayd_alloc_zero (&op->data, nrows, ncols); 
+  arrayd_init_null (&op->pdata);
+  arrayd_alloc_zero (&op->pdata, nrows, ndim); 
 
   return 0;
 }
 
 gint free_optimize0_p (optimize0_param *op)
 { 
-  arrayf_free (&op->proj_best, 0, 0);
-  arrayf_free (&op->data, 0, 0);
-  arrayf_free(&op->pdata, 0, 0);
+  arrayd_free (&op->proj_best);
+  arrayd_free (&op->data);
+  arrayd_free(&op->pdata);
 
   return 0;
 }
@@ -106,22 +106,22 @@ gint realloc_optimize0_p (optimize0_param *op, gint ncols, vector_i pcols)
 {
 /* pdata doesn't need to be reallocated, since it doesn't depend on ncols */
   if (op->proj_best.ncols < ncols) {
-    arrayf_add_cols(&op->proj_best, ncols);
-    arrayf_add_cols(&op->data, ncols);
+    arrayd_add_cols(&op->proj_best, ncols);
+    arrayd_add_cols(&op->data, ncols);
   }
   else {
     GSList *cols = NULL;
     for (guint i=0; i < op->proj_best.ncols - ncols; i++)
       cols = g_slist_append(cols, GINT_TO_POINTER(ncols - 1 - i));
-    arrayf_delete_cols(&op->proj_best, cols);
-    arrayf_delete_cols(&op->data, cols);
+    arrayd_delete_cols(&op->proj_best, cols);
+    arrayd_delete_cols(&op->data, cols);
     g_slist_free (cols);
   }
 
   return 0;
 }
 
-gboolean iszero (array_f *data)
+gboolean iszero (array_d *data)
 { 
   gfloat sum = 0;
   gint i, j;
@@ -133,7 +133,7 @@ gboolean iszero (array_f *data)
   return (sum<1e-6);
 }
 
-void normal_fill (array_f *data, gfloat delta, array_f *base)
+void normal_fill (array_d *data, gfloat delta, array_d *base)
 { 
   int i, j;
   for (i=0; i<data->nrows; i++)
@@ -142,7 +142,7 @@ void normal_fill (array_f *data, gfloat delta, array_f *base)
   }
 }
 
-void orthonormal (array_f *proj)
+void orthonormal (array_d *proj)
 { 
   gint i, j, k;
   gfloat *ip = g_malloc (proj->ncols*sizeof(gfloat));
@@ -187,15 +187,15 @@ gint optimize0 (optimize0_param *op,
                 void *param)
 { 
   gfloat index_work = 0.0;
-/*  array_f proj_work, pdata, *proj;*/
-  array_f proj_work, *proj;
+/*  array_d proj_work, pdata, *proj;*/
+  array_d proj_work, *proj;
   int i,j, m, k;
 
   proj = &(op->proj_best);
-  arrayf_init_null (&proj_work);
-  arrayf_alloc_zero (&proj_work, proj->nrows, proj->ncols);
-  /*  arrayf_init_null (&pdata);
-      arrayf_alloc_zero (&pdata, op->data.nrows, proj->ncols);*/
+  arrayd_init_null (&proj_work);
+  arrayd_alloc_zero (&proj_work, proj->nrows, proj->ncols);
+  /*  arrayd_init_null (&pdata);
+      arrayd_alloc_zero (&pdata, op->data.nrows, proj->ncols);*/
 
   /*  op->temp_start     =  1; * make this an interactive parameter */
   op->temp_end       =  0.001;
@@ -242,7 +242,7 @@ g_printerr ("\n");*/
 /*  if (index (&op->pdata, param, &index_work)) return(-1);*/
 
   /* fill proj_work */
-  arrayf_copy (proj, &proj_work);
+  arrayd_copy (proj, &proj_work);
 
   op->success = k = 0;
   while (op->restart > 0)
@@ -281,9 +281,9 @@ g_printerr ("\n");
       { /* sprintf (msg, "Success %f", index_work); print(); */
         op->success++;
         /*printf ("Success %f\n", index_work); */
-        arrayf_copy (&proj_work, proj); /*Sigbert's code, I think 
+        arrayd_copy (&proj_work, proj); /*Sigbert's code, I think 
                this should be saving it into the best proj rather than work*/
-        arrayf_copy (&proj_work, &op->proj_best);
+        arrayd_copy (&proj_work, &op->proj_best);
         op->index_best = index_work;
         op->temp *= op->heating;
       }
@@ -552,7 +552,7 @@ Transformation : -
 Purpose        : Looks for the projection with no data in center.
 *********************************************************************/
 
-gint holes_raw(array_f *pdata, void *param, gfloat *val, gpointer unused)
+gint holes_raw(array_d *pdata, void *param, gfloat *val, gpointer unused)
 { 
   pp_param *pp = (pp_param *) param;
   int i, p, n, k,j;
@@ -629,7 +629,7 @@ Transformation : -
 Purpose        : Looks for the projection with lots of data in center.
 *********************************************************************/
 
-gint central_mass_raw(array_f *pdata, void *param, gfloat *val, gpointer unused)
+gint central_mass_raw(array_d *pdata, void *param, gfloat *val, gpointer unused)
 { 
   pp_param *pp = (pp_param *) param;
   int i, p, n,k,j;
@@ -754,7 +754,7 @@ gint compute_groups (vector_i group, vector_i ngroup, gint *numgroups,
   return ((*numgroups==1) || (*numgroups==nrows));
 }
 
-gint discriminant (array_f *pdata, void *param, gfloat *val, gpointer unused)
+gint discriminant (array_d *pdata, void *param, gfloat *val, gpointer unused)
 { 
   pp_param *pp = (pp_param *) param;
   gint i, j, k, l;
@@ -897,7 +897,7 @@ Purpose        : Looks for the best split in 1d-projected data.
 
 *********************************************************************/
 
-void swap_group(array_f *pdata, gint *group, int i, int j)
+void swap_group(array_d *pdata, gint *group, int i, int j)
 {
   int temp1,k; 
   double temp2;
@@ -913,7 +913,7 @@ void swap_group(array_f *pdata, gint *group, int i, int j)
 
 }
 
-void sort_group(array_f *pdata, gint *group, int left, int right)
+void sort_group(array_d *pdata, gint *group, int left, int right)
 {
   int i, last;
                                 
@@ -987,7 +987,7 @@ void countngroup(int *group, int *ngroup, int n)
 
 }
 
-gint cartgini (array_f *pdata, void *param, gfloat *val, gpointer unused)
+gint cartgini (array_d *pdata, void *param, gfloat *val, gpointer unused)
 { 
   pp_param *pp = (pp_param *) param;
   gint i, k, n, p, g = pp->numgroups, left, right, l;
@@ -1050,7 +1050,7 @@ gint cartgini (array_f *pdata, void *param, gfloat *val, gpointer unused)
   return(0);
 }
 
-gint cartentropy (array_f *pdata, void *param, gfloat *val, gpointer unused)
+gint cartentropy (array_d *pdata, void *param, gfloat *val, gpointer unused)
 { 
   pp_param *pp = (pp_param *) param;
   gint i, k, n, p, g = pp->numgroups, left, right,l;

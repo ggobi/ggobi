@@ -86,7 +86,7 @@ free_holes1d_p(holes_param *hp)
 /*  1D Holes index for raw data                    */
 /***************************************************/
 
-/* gint holes1d_raw1(array_f *pdata, void *param, gfloat *val)
+/* gint holes1d_raw1(array_d *pdata, void *param, gfloat *val)
 {  
    gint i, n=pdata->nrows;
    gfloat m1, x1, temp;
@@ -118,7 +118,7 @@ free_holes1d_p(holes_param *hp)
 /*  1D Central Mass index for raw data                    */
 /**********************************************************/
 
-/* gint central_mass1d_raw1(array_f *pdata, void *param, gfloat *val)
+/* gint central_mass1d_raw1(array_d *pdata, void *param, gfloat *val)
 {
    gint i, n=pdata->nrows;
    gfloat m1, x1, temp;
@@ -155,7 +155,7 @@ Note           : Modifies pdata !
 
 *********************************************************************/
 
-void center (array_f *data)
+void center (array_d *data)
 { gint i, j;
   gfloat mean;
   for (i=0; i<data->ncols; i++)
@@ -168,7 +168,7 @@ void center (array_f *data)
   }
 }
 
-gint pca (array_f *pdata, void *param, gfloat *val, gpointer userData)
+gint pca (array_d *pdata, void *param, gfloat *val, gpointer userData)
 { gint i, j;
 
   center (pdata);
@@ -244,7 +244,7 @@ int smallest (const void *left, const void *right)
   return (0);
 }
 
-void distance (array_f *pdata, gint i, gfloat *dist)
+void distance (array_d *pdata, gint i, gfloat *dist)
 { gint j, k;
   for (j=0; j<pdata->nrows; j++)
   { dist[j]  = 0;
@@ -254,7 +254,7 @@ void distance (array_f *pdata, gint i, gfloat *dist)
   }
 }
 
-void mean_min_neighbour (array_f *pdata, gint *index, int min_neighbour, gfloat *nmean)
+void mean_min_neighbour (array_d *pdata, gint *index, int min_neighbour, gfloat *nmean)
 { gint j, k;
   for (k = 0; k<pdata->ncols; k++) nmean[k] = 0;
   for (j = 0; j<min_neighbour; j++)
@@ -263,7 +263,7 @@ void mean_min_neighbour (array_f *pdata, gint *index, int min_neighbour, gfloat 
   }
 }
 
-void covariance (array_f *pdata, gint *index, int j, gfloat *mean, gfloat *cov)
+void covariance (array_d *pdata, gint *index, int j, gfloat *mean, gfloat *cov)
 { gint k, p, q;
   for (p=0; p<pdata->ncols; p++)      
   { for (q=0; q<=p; q++) 
@@ -303,7 +303,7 @@ void eigenvalues (gfloat *cov, gint p, gfloat *ew,
     *    rs_ (&p, &p, cov, ew, &matz, ev, fv1, fv2, &ierr);*
 }      
 
-gint subd (array_f *pdata, void *param, gfloat *val)
+gint subd (array_d *pdata, void *param, gfloat *val)
 { subd_param *sp = (subd_param *) param;
   gfloat varexp, dimmax;
   gint i, j, k, matz = 0, nused;
@@ -341,7 +341,7 @@ gint subd (array_f *pdata, void *param, gfloat *val)
   return (0);
 }
 */
-/*gint cartgini (array_f *pdata, void *param, gfloat *val)
+/*gint cartgini (array_d *pdata, void *param, gfloat *val)
 { 
   cartgini_param *dp = (cartgini_param *) param;
   gint i, k, n, p, g = dp->groups, left, right;
@@ -395,7 +395,7 @@ gint subd (array_f *pdata, void *param, gfloat *val)
 }*/
 
 
-/*gint cartentropy (array_f *pdata, void *param, gfloat *val)
+/*gint cartentropy (array_d *pdata, void *param, gfloat *val)
 { 
   cartentropy_param *dp = (cartentropy_param *) param;
 
@@ -476,7 +476,7 @@ gint free_cartvariance_p (cartvariance_param *dp)
   return 0;
 }
 
-gint cartvariance (array_f *pdata, void *param, gfloat *val)
+gint cartvariance (array_d *pdata, void *param, gfloat *val)
 { cartvariance_param *dp = (cartvariance_param *) param;
   gint i, j;
   gfloat mul, mur, dev;
@@ -706,7 +706,7 @@ void t1d_pp_reinit(displayd *dsp, GGobiSession *gg)
 
 The index function has to be defined as
 
-     gint index (array_f *pdata, void *param, gfloat *val)
+     gint index (array_d *pdata, void *param, gfloat *val)
 
 with   
 
@@ -721,7 +721,7 @@ projection.
 
 *********************************************************************/
 
-gfloat t1d_calc_indx (array_f pd, 
+gfloat t1d_calc_indx (array_d pd, 
                 Tour_PPIndex_f index,
                 void *param)
 { 

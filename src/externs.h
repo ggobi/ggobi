@@ -195,7 +195,7 @@ void	     set_display_option(gboolean active, guint action, displayd *display);
 void       set_time(GGobiSession *);
 void       run_timing_tests(GGobiSession *);
 gint       do_ash1d (gfloat *, gint, gint, gint, gfloat *, gfloat *, gfloat *, gfloat *);
-void       do_last_increment (vector_f, vector_f, gfloat, gint);
+void       do_last_increment (vector_d, vector_d, gfloat, gint);
 void       draw_3drectangle (GtkWidget *w, GdkDrawable *drawable, gint x, gint y, gint width, gint height, GGobiSession *gg);
 void       draw_glyph (GdkDrawable *, glyphd *, icoords *, gint, GGobiSession *);
 
@@ -240,7 +240,7 @@ void       identify_event_handlers_toggle (splotd *, gboolean);
 gchar *    identify_label_fetch (gint k, cpaneld *cpanel, GGobiStage *d, GGobiSession *);
 void       identify_link_by_id (gint k, GGobiStage *source_d, GGobiSession *gg);
 gint       include_hiddens (gboolean include, GGobiStage *d, GGobiSession *gg);
-void       increment_tour(vector_f, vector_f, gfloat, gfloat, gfloat *, gint);
+void       increment_tour(vector_d, vector_d, gfloat, gfloat, gfloat *, gint);
 void       init_plot_GC (GdkWindow *, GGobiSession *);
 void       init_var_GCs (GtkWidget *, GGobiSession *);
 gdouble    inner_prod (gdouble *, gdouble *, gint);
@@ -442,9 +442,9 @@ void       tour2d_video(GGobiSession *);
 void       tour2d_speed_set (gfloat, GGobiSession *);
 gboolean   tour2d_varsel (GtkWidget *, gint jvar, gint toggle, gint btn, GGobiStage *, GGobiSession *);
 void       tour2dpp_window_open (GGobiSession *);
-gint       tour_path (array_d, array_d, array_d, gint, gint, array_d, array_d, array_d, vector_f, array_d, array_d, array_d, vector_f, vector_f, gfloat *, gfloat *);
+gint       tour_path (array_d, array_d, array_d, gint, gint, array_d, array_d, array_d, vector_d, array_d, array_d, array_d, vector_d, vector_d, gfloat *, gfloat *);
 void tour_realloc_up (GGobiStage *d, gint nc);
-void       tour_reproject (vector_f, array_d, array_d, array_d, array_d, array_d, gint, gint);
+void       tour_reproject (vector_d, array_d, array_d, array_d, array_d, array_d, gint, gint);
 void       tourcorr_fade_vars (gboolean, GGobiSession *);
 void       tourcorr_func (gboolean, displayd *, GGobiSession *);
 void       tourcorr_io_cb (GtkWidget *w, gpointer *cbd);
@@ -543,7 +543,7 @@ displayd *tsplot_new_with_vars (gboolean missing_p, gint nvars, gint *vars, GGob
 void      tsplot_reset_arrangement (displayd *, gint, GGobiSession *);
 gboolean  tsplot_varsel (GtkWidget *, displayd *display, splotd *sp, gint jvar, gint toggle, gint mouse, cpaneld *cpanel,  GGobiSession *gg);
 void      tsplot_whiskers_make (splotd *, displayd *, GGobiSession *);
-void      zero_tau(vector_f, gint);
+void      zero_tau(vector_d, gint);
 
 /* The new way of handling window closures, so that we don't just exit. */
 gboolean  ggobi_close (GGobiSession *gg);

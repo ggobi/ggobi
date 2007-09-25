@@ -15,11 +15,7 @@ typedef struct {
   gdouble **vals;
   guint nrows, ncols;
 } array_d;
-/*-- floating point: for gg.raw_data, tform1, tform2 --*/
-typedef struct {
-  gfloat **vals;
-  guint nrows, ncols;
-} array_f;
+
 /*-- short: for gg.missing --*/
 typedef struct {
   gshort **vals;
@@ -42,15 +38,6 @@ void       arrayd_delete_rows (array_d * arrp, GSList *rows);
 void       arrayd_free (array_d *);
 void       arrayd_init_null (array_d *);
 void       arrayd_zero (array_d *);
-void       arrayf_add_cols (array_f *, gint);
-void       arrayf_add_rows (array_f *, gint);
-void       arrayf_alloc (array_f *, gint, gint);
-void       arrayf_alloc_zero (array_f *, gint, gint);
-void       arrayf_copy (array_f *, array_f *);
-void       arrayf_delete_cols (array_f *, GSList *);
-void       arrayf_free (array_f *, gint, gint);
-void       arrayf_init_null (array_f *);
-void       arrayf_zero (array_f *);
 void       arrayl_add_cols (array_l *, gint);
 void       arrayl_add_rows (array_l *, gint);
 void       arrayl_alloc (array_l *, gint, gint);

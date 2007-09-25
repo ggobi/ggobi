@@ -84,7 +84,7 @@ p1d_spread_var (displayd * display, gfloat * yy, splotd * sp, GGobiStage * d,
   cpaneld *cpanel = &display->cpanel;
 
   if (sp->p1d.spread_data.nels != d->n_rows)
-    vectorf_realloc (&sp->p1d.spread_data, d->n_rows);
+    vectord_realloc (&sp->p1d.spread_data, d->n_rows);
 
   switch (cpanel->p1d.type) {
   case TEXTURE:

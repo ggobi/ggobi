@@ -56,9 +56,9 @@ display_tour2d_init_null (displayd *dsp, GGobiSession *gg)
   vectori_init_null(&dsp->t2d.active_vars);
   vectorb_init_null(&dsp->t2d.active_vars_p);
 
-  vectorf_init_null(&dsp->t2d.lambda);
-  vectorf_init_null(&dsp->t2d.tau);
-  vectorf_init_null(&dsp->t2d.tinc);
+  vectord_init_null(&dsp->t2d.lambda);
+  vectord_init_null(&dsp->t2d.tau);
+  vectord_init_null(&dsp->t2d.tinc);
 
   /* manipulation variables */
   arrayd_init_null(&dsp->t2d_Rmat1);
@@ -92,9 +92,9 @@ alloc_tour2d (displayd *dsp, GGobiSession *gg)
   vectori_alloc(&dsp->t2d.active_vars, nc);
   vectorb_alloc_zero(&dsp->t2d.active_vars_p, nc);
 
-  vectorf_alloc(&dsp->t2d.lambda, nc);
-  vectorf_alloc_zero(&dsp->t2d.tau, nc);
-  vectorf_alloc(&dsp->t2d.tinc, nc);
+  vectord_alloc(&dsp->t2d.lambda, nc);
+  vectord_alloc_zero(&dsp->t2d.tau, nc);
+  vectord_alloc(&dsp->t2d.tinc, nc);
 
   /* manipulation variables */
   arrayd_alloc(&dsp->t2d_Rmat1, 3, 3);
@@ -127,9 +127,9 @@ tour2d_realloc_down (GSList *cols, GGobiStage *d, GGobiSession *gg)
       vectori_delete_els (&dsp->t2d.active_vars, cols);
       vectorb_delete_els (&dsp->t2d.active_vars_p, cols);
 
-      vectorf_delete_els (&dsp->t2d.lambda, cols);
-      vectorf_delete_els (&dsp->t2d.tau, cols);
-      vectorf_delete_els (&dsp->t2d.tinc, cols);
+      vectord_delete_els (&dsp->t2d.lambda, cols);
+      vectord_delete_els (&dsp->t2d.tau, cols);
+      vectord_delete_els (&dsp->t2d.tinc, cols);
 
       arrayd_delete_cols (&dsp->t2d_manbasis, cols);
     }
@@ -144,9 +144,9 @@ free_tour2d(displayd *dsp)
   vectori_free(&dsp->t2d.active_vars);
   vectorb_free(&dsp->t2d.active_vars_p);
 
-  vectorf_free(&dsp->t2d.lambda);
-  vectorf_free(&dsp->t2d.tau);
-  vectorf_free(&dsp->t2d.tinc);
+  vectord_free(&dsp->t2d.lambda);
+  vectord_free(&dsp->t2d.tau);
+  vectord_free(&dsp->t2d.tinc);
 
   arrayd_free (&dsp->t2d.Fa); 
   arrayd_free (&dsp->t2d.Fz); 

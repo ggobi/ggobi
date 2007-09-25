@@ -31,7 +31,7 @@
 #include "svd.h"
 
 void
-zero_tau (vector_f tau, gint projdim) {
+zero_tau (vector_d tau, gint projdim) {
 
   gint k;
 
@@ -40,7 +40,7 @@ zero_tau (vector_f tau, gint projdim) {
 }
 
 void
-zero_tinc(vector_f tinc, gint projdim) {
+zero_tinc(vector_d tinc, gint projdim) {
   gint k;
 
   for (k=0; k<projdim; k++) 
@@ -48,7 +48,7 @@ zero_tinc(vector_f tinc, gint projdim) {
 }
 
 void
-zero_lambda(vector_f lambda, gint projdim) {
+zero_lambda(vector_d lambda, gint projdim) {
   gint k;
 
   for (k=0; k<projdim; k++) 
@@ -257,8 +257,8 @@ void copy_mat(gdouble **ot, gdouble **it, gint nr, gint datadim) {
 // }
 // 
 // void
-// eigen_clear (array_d Ga, array_d Gz, vector_f lambda, vector_f tau, 
-//   vector_f tinc, gint datadim)
+// eigen_clear (array_d Ga, array_d Gz, vector_d lambda, vector_d tau, 
+//   vector_d tinc, gint datadim)
 // {
 //   /*  GGobiStage *d = dsp->d;
 //   gint datadim = d->n_cols;*/
@@ -283,8 +283,8 @@ void copy_mat(gdouble **ot, gdouble **it, gint nr, gint datadim) {
  * projdim = proj dim
  */
 gint tour_path(array_d Fa, array_d Fz, array_d F, gint datadim, gint projdim, 
-  array_d Ga, array_d Gz, array_d G, vector_f lambda, array_d tv, 
-  array_d Va, array_d Vz, vector_f tau, vector_f tinc, gfloat *pdist_az, 
+  array_d Ga, array_d Gz, array_d G, vector_d lambda, array_d tv, 
+  array_d Va, array_d Vz, vector_d tau, vector_d tinc, gfloat *pdist_az, 
   gfloat *ptang) 
 {
   gint i, j, k;
@@ -562,7 +562,7 @@ g_printerr ("\n");*/
 } /* path */
 
 /* Generate the interpolation frame. No preprojection is done */
-void tour_reproject(vector_f tinc, array_d G, array_d Ga, array_d Gz, 
+void tour_reproject(vector_d tinc, array_d G, array_d Ga, array_d Gz, 
   array_d F, array_d Va, gint datadim, gint projdim)
 {
   gint i, j, k;
@@ -610,7 +610,7 @@ void tour_reproject(vector_f tinc, array_d G, array_d Ga, array_d Gz,
 
 /* this routine increments the interpolation */
 void
-increment_tour(vector_f tinc, vector_f tau, 
+increment_tour(vector_d tinc, vector_d tau, 
   gfloat dist_az, gfloat delta, gfloat *ptang, gint projdim)
 {
   int i;
@@ -670,7 +670,7 @@ reached_target(gfloat tang, gfloat dist_az, gint basmeth,
 }
 
 // gboolean
-// reached_target2(vector_f tinc, vector_f tau, gint basmeth, 
+// reached_target2(vector_d tinc, vector_d tau, gint basmeth, 
 //   gfloat *indxval, gfloat *oindxval, gint projdim) 
 // {
 //   gboolean arewethereyet = false;
@@ -696,7 +696,7 @@ reached_target(gfloat tang, gfloat dist_az, gint basmeth,
 // }
 
 void
-do_last_increment(vector_f tinc, vector_f tau, gfloat dist_az, gint projdim)
+do_last_increment(vector_d tinc, vector_d tau, gfloat dist_az, gint projdim)
 {
   int j;
 

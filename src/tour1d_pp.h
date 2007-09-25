@@ -19,8 +19,8 @@ The authors can be contacted at the following email addresses:
     dicook@iastate.edu    sigbert@wiwi.hu-berlin.de
 */
 
-void center (array_f *);
-gint pca (array_f *, void *, gfloat *,  gpointer userData);
+void center (array_d *);
+gint pca (array_d *, void *, gfloat *,  gpointer userData);
 
-gfloat t1d_calc_indx(array_f, Tour_PPIndex_f fun, void *param);
+gfloat t1d_calc_indx(array_d, Tour_PPIndex_f fun, void *param);
 gboolean t1d_switch_index(gint, gint, displayd *, GGobiSession *);

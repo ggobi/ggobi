@@ -44,7 +44,7 @@ property OBJECT source
    object_type = GGobi:Input:Source, type = GGobiInputSource *, link, export);
 
 /* The actual data in this default implementation */
-protected array_f raw;
+protected array_d raw;
 /* Tracking missing values per cell */
 protected array_s missing; 
 
@@ -292,7 +292,7 @@ add_rows(self, guint n) {
 
   self->rowIds = (gchar **) g_realloc (self->rowIds, sizeof(gchar *) * nrows);
 
-  arrayf_add_rows (&self->raw, nrows);
+  arrayd_add_rows (&self->raw, nrows);
   arrays_add_rows (&self->missing, nrows);
 
   if (ggobi_stage_get_n_edges(GGOBI_STAGE(self)))
@@ -351,7 +351,7 @@ add_cols(self, guint n) {
   guint nprev = GGOBI_STAGE(self)->n_cols;
   guint ncols = nprev + n;
   
-  arrayf_add_cols (&self->raw, ncols);
+  arrayd_add_cols (&self->raw, ncols);
   arrays_add_cols (&self->missing, ncols);
 
   ggobi_stage_cols_added(GGOBI_STAGE(self), n);
@@ -394,7 +394,7 @@ delete_cols(self, GSList *cols)
     ggobi_stage_set_variable(GGOBI_STAGE(self), j, vt);
   }*/
 
-  arrayf_delete_cols (&self->raw, cols);
+  arrayd_delete_cols (&self->raw, cols);
   arrays_delete_cols (&self->missing, cols);
   
   msg = ggobi_stage_get_message(GGOBI_STAGE(self));

@@ -53,9 +53,9 @@ display_tourcorr_init_null (displayd *dsp, GGobiSession *gg)
   vectori_init_null(&dsp->tcorr1.active_vars);
   vectorb_init_null(&dsp->tcorr1.active_vars_p);
 
-  vectorf_init_null(&dsp->tcorr1.lambda);
-  vectorf_init_null(&dsp->tcorr1.tau);
-  vectorf_init_null(&dsp->tcorr1.tinc);
+  vectord_init_null(&dsp->tcorr1.lambda);
+  vectord_init_null(&dsp->tcorr1.tau);
+  vectord_init_null(&dsp->tcorr1.tinc);
 
   /* manipulation controls */
   arrayd_init_null(&dsp->tc1_manbasis);
@@ -80,9 +80,9 @@ display_tourcorr_init_null (displayd *dsp, GGobiSession *gg)
   vectori_init_null(&dsp->tcorr2.active_vars);
   vectorb_init_null(&dsp->tcorr2.active_vars_p);
 
-  vectorf_init_null(&dsp->tcorr2.lambda);
-  vectorf_init_null(&dsp->tcorr2.tau);
-  vectorf_init_null(&dsp->tcorr2.tinc);
+  vectord_init_null(&dsp->tcorr2.lambda);
+  vectord_init_null(&dsp->tcorr2.tau);
+  vectord_init_null(&dsp->tcorr2.tinc);
 }
 
 void
@@ -110,9 +110,9 @@ alloc_tourcorr (displayd *dsp, GGobiSession *gg)
   vectori_alloc(&dsp->tcorr1.active_vars, nc);
   vectorb_alloc_zero(&dsp->tcorr1.active_vars_p, nc);
 
-  vectorf_alloc(&dsp->tcorr1.lambda, nc);
-  vectorf_alloc_zero(&dsp->tcorr1.tau, nc);
-  vectorf_alloc(&dsp->tcorr1.tinc, nc);
+  vectord_alloc(&dsp->tcorr1.lambda, nc);
+  vectord_alloc_zero(&dsp->tcorr1.tau, nc);
+  vectord_alloc(&dsp->tcorr1.tinc, nc);
 
   /* manipulation controls */
   arrayd_alloc(&dsp->tc1_manbasis, 2, nc);
@@ -137,9 +137,9 @@ alloc_tourcorr (displayd *dsp, GGobiSession *gg)
   vectori_alloc(&dsp->tcorr2.active_vars, nc);
   vectorb_alloc_zero(&dsp->tcorr2.active_vars_p, nc);
 
-  vectorf_alloc(&dsp->tcorr2.lambda, nc);
-  vectorf_alloc_zero(&dsp->tcorr2.tau, nc);
-  vectorf_alloc(&dsp->tcorr2.tinc, nc);
+  vectord_alloc(&dsp->tcorr2.lambda, nc);
+  vectord_alloc_zero(&dsp->tcorr2.tau, nc);
+  vectord_alloc(&dsp->tcorr2.tinc, nc);
 }
 
 /*-- eliminate the nc columns contained in *cols --*/
@@ -166,9 +166,9 @@ tourcorr_realloc_down (GSList *cols, GGobiStage *d, GGobiSession *gg)
       vectori_delete_els (&dsp->tcorr1.active_vars, cols);
       vectorb_delete_els (&dsp->tcorr1.active_vars_p, cols);
 
-      vectorf_delete_els (&dsp->tcorr1.lambda, cols);
-      vectorf_delete_els (&dsp->tcorr1.tau, cols);
-      vectorf_delete_els (&dsp->tcorr1.tinc, cols);
+      vectord_delete_els (&dsp->tcorr1.lambda, cols);
+      vectord_delete_els (&dsp->tcorr1.tau, cols);
+      vectord_delete_els (&dsp->tcorr1.tinc, cols);
 
       arrayd_delete_cols (&dsp->tc1_manbasis, cols);
       arrayd_delete_cols (&dsp->tc2_manbasis, cols);
@@ -188,9 +188,9 @@ tourcorr_realloc_down (GSList *cols, GGobiStage *d, GGobiSession *gg)
       vectori_delete_els (&dsp->tcorr2.active_vars, cols);
       vectorb_delete_els (&dsp->tcorr2.active_vars_p, cols);
 
-      vectorf_delete_els (&dsp->tcorr2.lambda, cols);
-      vectorf_delete_els (&dsp->tcorr2.tau, cols);
-      vectorf_delete_els (&dsp->tcorr2.tinc, cols);
+      vectord_delete_els (&dsp->tcorr2.lambda, cols);
+      vectord_delete_els (&dsp->tcorr2.tau, cols);
+      vectord_delete_els (&dsp->tcorr2.tinc, cols);
     }
   }
 }
@@ -207,9 +207,9 @@ free_tourcorr(displayd *dsp)
   vectori_free(&dsp->tcorr1.active_vars);
   vectorb_free(&dsp->tcorr1.active_vars_p);
 
-  vectorf_free(&dsp->tcorr1.lambda);
-  vectorf_free(&dsp->tcorr1.tau);
-  vectorf_free(&dsp->tcorr1.tinc);
+  vectord_free(&dsp->tcorr1.lambda);
+  vectord_free(&dsp->tcorr1.tau);
+  vectord_free(&dsp->tcorr1.tinc);
 
   arrayd_free (&dsp->tcorr1.Fa); 
   arrayd_free (&dsp->tcorr1.Fz); 
@@ -231,9 +231,9 @@ free_tourcorr(displayd *dsp)
   vectori_free(&dsp->tcorr2.active_vars);
   vectorb_free(&dsp->tcorr2.active_vars_p);
 
-  vectorf_free(&dsp->tcorr2.lambda);
-  vectorf_free(&dsp->tcorr2.tau);
-  vectorf_free(&dsp->tcorr2.tinc);
+  vectord_free(&dsp->tcorr2.lambda);
+  vectord_free(&dsp->tcorr2.tau);
+  vectord_free(&dsp->tcorr2.tinc);
 
   arrayd_free (&dsp->tcorr2.Fa); 
   arrayd_free (&dsp->tcorr2.Fz); 

@@ -457,9 +457,9 @@ tourCorrRealloc (displayd * dsp, gint nc, GGobiStage * d)
       vectori_realloc (&dsp->tcorr1.active_vars, nc);
       vectorb_realloc (&dsp->tcorr1.active_vars_p, nc);
 
-      vectorf_realloc (&dsp->tcorr1.lambda, nc);
-      vectorf_realloc (&dsp->tcorr1.tau, nc);
-      vectorf_realloc (&dsp->tcorr1.tinc, nc);
+      vectord_realloc (&dsp->tcorr1.lambda, nc);
+      vectord_realloc (&dsp->tcorr1.tau, nc);
+      vectord_realloc (&dsp->tcorr1.tinc, nc);
 
       arrayd_add_cols (&dsp->tc1_manbasis, (gint) nc);
       arrayd_add_cols (&dsp->tc2_manbasis, (gint) nc);
@@ -479,9 +479,9 @@ tourCorrRealloc (displayd * dsp, gint nc, GGobiStage * d)
       vectori_realloc (&dsp->tcorr2.active_vars, nc);
       vectorb_realloc (&dsp->tcorr2.active_vars_p, nc);
 
-      vectorf_realloc (&dsp->tcorr2.lambda, nc);
-      vectorf_realloc (&dsp->tcorr2.tau, nc);
-      vectorf_realloc (&dsp->tcorr2.tinc, nc);
+      vectord_realloc (&dsp->tcorr2.lambda, nc);
+      vectord_realloc (&dsp->tcorr2.tau, nc);
+      vectord_realloc (&dsp->tcorr2.tinc, nc);
 
       /* need to zero extra cols */
       for (i = old_ncols; i < nc; i++) {
@@ -557,9 +557,9 @@ tour2d3Realloc (displayd * dsp, gint nc, GGobiStage * d)
       vectori_realloc (&dsp->t2d3.active_vars, nc);
       vectorb_realloc (&dsp->t2d3.active_vars_p, nc);
 
-      vectorf_realloc (&dsp->t2d3.lambda, nc);
-      vectorf_realloc (&dsp->t2d3.tau, nc);
-      vectorf_realloc (&dsp->t2d3.tinc, nc);
+      vectord_realloc (&dsp->t2d3.lambda, nc);
+      vectord_realloc (&dsp->t2d3.tau, nc);
+      vectord_realloc (&dsp->t2d3.tinc, nc);
 
       arrayd_add_cols (&dsp->t2d3_manbasis, (gint) nc);
 
@@ -616,9 +616,9 @@ tour2dRealloc (displayd * dsp, gint nc, GGobiStage * d)
       vectori_realloc (&dsp->t2d.active_vars, nc);
       vectorb_realloc (&dsp->t2d.active_vars_p, nc);
 
-      vectorf_realloc (&dsp->t2d.lambda, nc);
-      vectorf_realloc (&dsp->t2d.tau, nc);
-      vectorf_realloc (&dsp->t2d.tinc, nc);
+      vectord_realloc (&dsp->t2d.lambda, nc);
+      vectord_realloc (&dsp->t2d.tau, nc);
+      vectord_realloc (&dsp->t2d.tinc, nc);
 
       arrayd_add_cols (&dsp->t2d_manbasis, (gint) nc);
 
@@ -675,9 +675,9 @@ tour1dRealloc (displayd * dsp, gint nc, GGobiStage * d)
     vectori_realloc (&dsp->t1d.active_vars, nc);
     vectorb_realloc (&dsp->t1d.active_vars_p, nc);
 
-    vectorf_realloc (&dsp->t1d.lambda, nc);
-    vectorf_realloc (&dsp->t1d.tau, nc);
-    vectorf_realloc (&dsp->t1d.tinc, nc);
+    vectord_realloc (&dsp->t1d.lambda, nc);
+    vectord_realloc (&dsp->t1d.tau, nc);
+    vectord_realloc (&dsp->t1d.tinc, nc);
 
     arrayd_add_cols (&dsp->t1d_manbasis, (gint) nc);
 
