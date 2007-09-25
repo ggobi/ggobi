@@ -282,7 +282,7 @@ scroll_cb (GtkWidget *w, GdkEventScroll *event, splotd *sp)
 {
   /* For now, make this a fixed-ratio zoom. Most people don't have horizontal
      mouse wheels. */
-  gfloat factor = 1.0, xscale = sp->scale.x, yscale = sp->scale.y;
+  gdouble factor = 1.0, xscale = sp->scale.x, yscale = sp->scale.y;
   if (event->direction == GDK_SCROLL_UP)
     factor += SCALE_SCROLL_INC;
   else if (event->direction == GDK_SCROLL_DOWN)

@@ -516,7 +516,7 @@ splotScreenToTform (cpaneld * cpanel, splotd * sp, icoords * scr,
   gdouble ftmp, max, min, rdiff;
   displayd *display = (displayd *) sp->displayptr;
   GGobiStage *d = display->d;
-  gfloat scale_x, scale_y;
+  gdouble scale_x, scale_y;
 
   scale_x = sp->scale.x;
   scale_y = sp->scale.y;

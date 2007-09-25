@@ -209,7 +209,7 @@ write_xml_variable(FILE *f, GGobiStage *d, GGobiSession *gg, gint j,
 }
 
 static void
-writeFloat(FILE *f, double value)
+writeDouble(FILE *f, double value)
 {
   /*fprintf(f, "%.3f", value);*/
   fprintf(f, "%g", value); 
@@ -313,7 +313,7 @@ write_xml_record (FILE *f, GGobiStage *d, GGobiSession *gg, gint i,
           fprintf (f, ". ");
         } 
       } else {  /*-- if not missing, just write the data --*/
-        writeFloat (f, ggobi_stage_get_raw_value(d, i, j));
+        writeDouble (f, ggobi_stage_get_raw_value(d, i, j));
       }
       if (j < d->n_cols-1 )
         fprintf(f, " ");
@@ -337,7 +337,7 @@ write_xml_record (FILE *f, GGobiStage *d, GGobiSession *gg, gint i,
         } 
       } else {
 
-        writeFloat (f, ggobi_stage_get_raw_value(d, i, cols[j]));
+        writeDouble (f, ggobi_stage_get_raw_value(d, i, cols[j]));
       } 
       if (j < ncols-1 )
         fprintf(f, " ");

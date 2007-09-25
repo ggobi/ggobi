@@ -83,7 +83,7 @@ dialog_range_set (GtkWidget *w, GGobiSession *gg)
   gint ncols = selected_cols_get (&cols, d, gg);
   gint j, k;
   gchar *val_str;
-  gfloat min_val = 0, max_val = 0; // compiler pacification
+  gdouble min_val = 0, max_val = 0; // compiler pacification
   gboolean min_p = false, max_p = false;
   GGobiVariable *var;
 
@@ -102,7 +102,7 @@ dialog_range_set (GtkWidget *w, GGobiSession *gg)
   val_str = gtk_editable_get_chars (GTK_EDITABLE (umin_entry),
     0, -1);
   if (val_str != NULL && strlen (val_str) > 0) {
-    min_val = (gfloat) atof (val_str);
+    min_val = (gdouble) atof (val_str);
     g_free (val_str);
     min_p = true;
   }
@@ -111,7 +111,7 @@ dialog_range_set (GtkWidget *w, GGobiSession *gg)
   val_str = gtk_editable_get_chars (GTK_EDITABLE (umax_entry),
     0, -1);
   if (val_str != NULL && strlen (val_str) > 0) {
-    max_val = (gfloat) atof (val_str);
+    max_val = (gdouble) atof (val_str);
     g_free (val_str);
     max_p = true;
   }
@@ -352,10 +352,10 @@ create_explicit_variable (GGobiStage * d, gchar * vname, NewVariableType vartype
   for (guint i = 0; i < d->n_rows; i++) {
     switch(vartype) {
       case ADDVAR_ROWNOS:
-        ggobi_stage_set_raw_value(d, i, jvar, (gfloat) (i + 1));
+        ggobi_stage_set_raw_value(d, i, jvar, (gdouble) (i + 1));
         break;
       case ADDVAR_BGROUP:
-        ggobi_stage_set_raw_value(d, i, jvar, (gfloat) GGOBI_STAGE_GET_ATTR_CLUSTER(d, i));
+        ggobi_stage_set_raw_value(d, i, jvar, (gdouble) GGOBI_STAGE_GET_ATTR_CLUSTER(d, i));
         break;
     }
   }

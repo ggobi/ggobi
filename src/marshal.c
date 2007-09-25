@@ -14,7 +14,7 @@
 #define g_marshal_value_peek_uint64(v)   g_value_get_uint64 (v)
 #define g_marshal_value_peek_enum(v)     g_value_get_enum (v)
 #define g_marshal_value_peek_flags(v)    g_value_get_flags (v)
-#define g_marshal_value_peek_float(v)    g_value_get_float (v)
+#define g_marshal_value_peek_double(v)    g_value_get_double (v)
 #define g_marshal_value_peek_double(v)   g_value_get_double (v)
 #define g_marshal_value_peek_string(v)   (char*) g_value_get_string (v)
 #define g_marshal_value_peek_param(v)    g_value_get_param (v)
@@ -37,7 +37,7 @@
 #define g_marshal_value_peek_uint64(v)   (v)->data[0].v_uint64
 #define g_marshal_value_peek_enum(v)     (v)->data[0].v_long
 #define g_marshal_value_peek_flags(v)    (v)->data[0].v_ulong
-#define g_marshal_value_peek_float(v)    (v)->data[0].v_float
+#define g_marshal_value_peek_double(v)    (v)->data[0].v_double
 #define g_marshal_value_peek_double(v)   (v)->data[0].v_double
 #define g_marshal_value_peek_string(v)   (v)->data[0].v_pointer
 #define g_marshal_value_peek_param(v)    (v)->data[0].v_pointer

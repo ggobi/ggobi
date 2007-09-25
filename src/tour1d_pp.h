@@ -20,7 +20,7 @@ The authors can be contacted at the following email addresses:
 */
 
 void center (array_d *);
-gint pca (array_d *, void *, gfloat *,  gpointer userData);
+gint pca (array_d *, void *, gdouble *,  gpointer userData);
 
-gfloat t1d_calc_indx(array_d, Tour_PPIndex_f fun, void *param);
+gdouble t1d_calc_indx(array_d, Tour_PPIndex_f fun, void *param);
 gboolean t1d_switch_index(gint, gint, displayd *, GGobiSession *);

@@ -54,10 +54,10 @@ typedef struct {
   gint x, y;
 } icoords;
 typedef struct {
-  gfloat x, y;
+  gdouble x, y;
 } fcoords;
 typedef struct {
-  gfloat min, max;
+  gdouble min, max;
 } lims;
 typedef struct {
   gint a, b;
@@ -90,7 +90,7 @@ typedef struct {
 
 
 typedef struct {  /*-- used for obtaining ranks --*/
-  gfloat f;
+  gdouble f;
   gint indx;
 } paird;
 
@@ -98,10 +98,10 @@ typedef struct {  /*-- used for obtaining ranks --*/
 /*-- used to keep track of history in moving points --*/
 typedef struct {
   gint i, j;
-  gfloat val;
+  gdouble val;
 } celld;
 
-typedef gint (*Tour_PPIndex_f)(array_d *pd, void *params, gfloat *val, gpointer userData);
+typedef gint (*Tour_PPIndex_f)(array_d *pd, void *params, gdouble *val, gpointer userData);
 
 typedef struct {
     gchar *ppIndexName;   /* a string that can be used in the GUI to describe this PP index. */
@@ -131,12 +131,12 @@ typedef struct {
   /* */
   array_d Fa, Fz, F, Ga, Gz, G, Va, Vz, tv;
   vector_d lambda, tau, tinc;
-  gfloat dist_az, delta, tang;
+  gdouble dist_az, delta, tang;
   gint target_selection_method;
   gint idled;
   gboolean get_new_target;
   gint index; /* this is for counting planes passed */
-  gfloat ppval, oppval; /* for projection pursuit */
+  gdouble ppval, oppval; /* for projection pursuit */
 
 } tour;
 
@@ -150,7 +150,7 @@ typedef struct {
 } pp_param;
 
 typedef struct
-{ gfloat temp_start, temp_end, cooling, heating, temp, index_best;
+{ gdouble temp_start, temp_end, cooling, heating, temp, index_best;
   gint restart, maxproj, success;
   array_d proj_best, data, pdata;
 } optimize0_param; 
@@ -203,13 +203,13 @@ typedef struct
  gint maxbincounts;
  gbind  *bins;
  gbind  **cbins;
- gfloat *breaks;
+ gdouble *breaks;
 
  GdkPoint anchor_rgn[4];
  GdkPoint offset_rgn[4];
  gboolean anchor_drag;
  gboolean width_drag;
- gfloat offset;
+ gdouble offset;
 
 /* whenever points in histograms "overflow" to the left or right of the first or last bin, they need a place to stay */
  gboolean high_pts_missing;

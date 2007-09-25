@@ -146,8 +146,8 @@ ruler_ranges_set (gboolean force, displayd * display, splotd * sp,
    * ranges have changed.  Force when initializing display.
    */
   if (force || GTK_WIDGET_VISIBLE (display->hrule)) {
-    if (((gfloat) GTK_RULER (display->hrule)->lower != tfmin.x) ||
-        ((gfloat) GTK_RULER (display->hrule)->upper != tfmax.x)) {
+    if (((gdouble) GTK_RULER (display->hrule)->lower != tfmin.x) ||
+        ((gdouble) GTK_RULER (display->hrule)->upper != tfmax.x)) {
       /* What should the final 2 arguments be. */
       gtk_ruler_set_range (GTK_RULER (display->hrule),
                            (gdouble) tfmin.x, (gdouble) tfmax.x,
@@ -157,8 +157,8 @@ ruler_ranges_set (gboolean force, displayd * display, splotd * sp,
   }
 
   if (force || GTK_WIDGET_VISIBLE (display->vrule)) {
-    if (((gfloat) GTK_RULER (display->vrule)->upper != tfmin.y) ||
-        ((gfloat) GTK_RULER (display->vrule)->lower != tfmax.y)) {
+    if (((gdouble) GTK_RULER (display->vrule)->upper != tfmin.y) ||
+        ((gdouble) GTK_RULER (display->vrule)->lower != tfmax.y)) {
       gtk_ruler_set_range (GTK_RULER (display->vrule),
                            (gdouble) tfmin.y, (gdouble) tfmax.y,
                            (gdouble) (tfmax.y - tfmin.y) / 2 + tfmin.y,
@@ -550,7 +550,7 @@ ruler_shift_cb (GtkWidget * w, GdkEventMotion * event, splotd * sp)
 
     /*-- lifting code from zoom_by_drag as much as possible --*/
     if (direction == HORIZONTAL) {
-      gfloat *scale_x;
+      gdouble *scale_x;
       icoords mid;
       fcoords scalefac;
 
@@ -560,8 +560,8 @@ ruler_shift_cb (GtkWidget * w, GdkEventMotion * event, splotd * sp)
          &sp->scale.x; */
       scale_x = &sp->scale.x;
       if (ABS (event->x - mid.x) >= npix) {
-        scalefac.x = (gfloat) (event->x - mid.x) /
-          (gfloat) (display->drag_start.x - mid.x);
+        scalefac.x = (gdouble) (event->x - mid.x) /
+          (gdouble) (display->drag_start.x - mid.x);
         if (*scale_x * scalefac.x >= SCALE_MIN)
           *scale_x = *scale_x * scalefac.x;
 
@@ -571,7 +571,7 @@ ruler_shift_cb (GtkWidget * w, GdkEventMotion * event, splotd * sp)
 
     }
     else {
-      gfloat *scale_y;
+      gdouble *scale_y;
       icoords mid;
       fcoords scalefac;
 
@@ -581,8 +581,8 @@ ruler_shift_cb (GtkWidget * w, GdkEventMotion * event, splotd * sp)
          &sp->scale.y; */
       scale_y = &sp->scale.y;
       if (ABS (event->y - mid.y) >= npix) {
-        scalefac.y = (gfloat) (event->y - mid.y) /
-          (gfloat) (display->drag_start.y - mid.y);
+        scalefac.y = (gdouble) (event->y - mid.y) /
+          (gdouble) (display->drag_start.y - mid.y);
         if (*scale_y * scalefac.y >= SCALE_MIN)
           *scale_y = *scale_y * scalefac.y;
 

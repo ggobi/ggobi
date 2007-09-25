@@ -39,7 +39,7 @@ gint getAnnotationColor (xmlNodePtr node, xmlDocPtr doc,
                          colorschemed * scheme);
 gint getBackgroundColor (xmlNodePtr node, xmlDocPtr doc,
                          colorschemed * scheme);
-gint getColor (xmlNodePtr node, xmlDocPtr doc, gfloat ** original,
+gint getColor (xmlNodePtr node, xmlDocPtr doc, gdouble ** original,
                GdkColor * col);
 
 colorschemed *
@@ -125,11 +125,11 @@ process_colorscheme (xmlNodePtr root, xmlDocPtr doc)
   scheme->system_min = 0.0;
   tmp = xmlGetProp(root, "system_min");
   if(tmp)
-    scheme->system_min = (gfloat) as_number(tmp);
+    scheme->system_min = (gdouble) as_number(tmp);
   scheme->system_max = 1.0;
   tmp = xmlGetProp(root, "system_max");
   if(tmp)
-    scheme->system_max = (gfloat) as_number(tmp);
+    scheme->system_max = (gdouble) as_number(tmp);
 */
 
   tmp = xmlGetProp (root, (xmlChar *) "criticalvalue");
@@ -208,7 +208,7 @@ getForegroundColors (xmlNodePtr node, xmlDocPtr doc, colorschemed * scheme)
   }
 
   scheme->n = n;
-  scheme->data = (gfloat **) g_malloc (n * sizeof (gfloat *));
+  scheme->data = (gdouble **) g_malloc (n * sizeof (gdouble *));
   scheme->rgb = (GdkColor *) g_malloc (n * sizeof (GdkColor));
 
   tmp = XML_CHILDREN (node);
@@ -265,14 +265,14 @@ getAnnotationColor (xmlNodePtr node, xmlDocPtr doc, colorschemed * scheme)
  Puts the actual values into original and fills in the RGB settings for `col'.
  */
 gint
-getColor (xmlNodePtr node, xmlDocPtr doc, gfloat ** original, GdkColor * col)
+getColor (xmlNodePtr node, xmlDocPtr doc, gdouble ** original, GdkColor * col)
 {
   xmlNodePtr tmp;
   gint i = 0, numElements = 3;  /* RGB only at present. */
-  gfloat *vals;
-  gfloat colorsystem_min = 0.0;
-  gfloat colorsystem_max = 1.0;
-  gfloat max = 65535;
+  gdouble *vals;
+  gdouble colorsystem_min = 0.0;
+  gdouble colorsystem_max = 1.0;
+  gdouble max = 65535;
 
   /*-- color values must be scaled onto [0,65535] --*/
   gchar *tmpVal;
@@ -287,7 +287,7 @@ getColor (xmlNodePtr node, xmlDocPtr doc, gfloat ** original, GdkColor * col)
 
   tmp = XML_CHILDREN (node);
 
-  vals = (gfloat *) g_malloc (3 * sizeof (gfloat));
+  vals = (gdouble *) g_malloc (3 * sizeof (gdouble));
   while (tmp) {
     xmlChar *val;
     if (tmp->type != XML_TEXT_NODE) {

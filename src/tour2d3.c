@@ -214,7 +214,7 @@ display_tour2d3_init (displayd *dsp, GGobiSession *gg) {
   dsp->t2d.target_selection_method = 0;
 }
 
-void tour2d3_speed_set(gfloat slidepos, GGobiSession *gg) {
+void tour2d3_speed_set(gdouble slidepos, GGobiSession *gg) {
   displayd *dsp = gg->current_display; 
   cpaneld *cpanel = &dsp->cpanel;
 
@@ -472,7 +472,7 @@ tour2d3_run(displayd *dsp, GGobiSession *gg)
   gint i, nv;
   gint k;
   gboolean chosen;
-  gfloat eps = .01;
+  gdouble eps = .01;
   gint pathprob = 0;
 
   if (!dsp->t2d3.get_new_target && 
@@ -653,7 +653,7 @@ tour2d3_manip_init(gint p1, gint p2, splotd *sp)
   GGobiSession *gg = GGobiFromSPlot(sp);
   gint j, k;
   gint n1vars = dsp->t2d3.nactive;
-  gfloat tol = 0.05; 
+  gdouble tol = 0.05; 
   gdouble dtmp1;
 
   /* need to turn off tour */
@@ -845,8 +845,8 @@ tour2d3_manip_init(gint p1, gint p2, splotd *sp)
       else
       { /* yes: set radial manip direction to be current direction
              of contribution */
-        dsp->t2d3_rx = (gfloat) dsp->t2d3.F.vals[0][dsp->t2d3_manip_var];
-        dsp->t2d3_ry = (gfloat) dsp->t2d3.F.vals[1][dsp->t2d3_manip_var];
+        dsp->t2d3_rx = (gdouble) dsp->t2d3.F.vals[0][dsp->t2d3_manip_var];
+        dsp->t2d3_ry = (gdouble) dsp->t2d3.F.vals[1][dsp->t2d3_manip_var];
         dtmp1 = sqrt(dsp->t2d3_rx*dsp->t2d3_rx+dsp->t2d3_ry*dsp->t2d3_ry);
         dsp->t2d3_rx /= dtmp1;
         dsp->t2d3_ry /= dtmp1;
@@ -864,12 +864,12 @@ tour2d3_manip(gint p1, gint p2, splotd *sp, GGobiSession *gg)
   cpaneld *cpanel = &dsp->cpanel;
   gint actual_nvars = dsp->t2d3.nactive;
   gboolean offscreen = false;
-  gfloat phi, cosphi, sinphi, ca, sa, cosm, cospsi, sinpsi;
-  gfloat distx, disty, x1, x2, y1, y2;
-  gfloat denom = (gfloat) MIN(sp->max.x, sp->max.y)/2.;
-  gfloat tol = 0.01;
+  gdouble phi, cosphi, sinphi, ca, sa, cosm, cospsi, sinpsi;
+  gdouble distx, disty, x1, x2, y1, y2;
+  gdouble denom = (gdouble) MIN(sp->max.x, sp->max.y)/2.;
+  gdouble tol = 0.01;
   gdouble dtmp1, dtmp2;
-  gfloat len_motion;
+  gdouble len_motion;
   gint i,j,k;
 
   /* check if off the plot window */
@@ -924,7 +924,7 @@ tour2d3_manip(gint p1, gint p2, splotd *sp, GGobiSession *gg)
             dsp->t2d3_ry*(dsp->t2d3_pos2_old - dsp->t2d3_pos2))*dsp->t2d3_ry;
         }
         dtmp1 = (gdouble) (distx*distx+disty*disty);
-        len_motion = (gfloat) sqrt(dtmp1);
+        len_motion = (gdouble) sqrt(dtmp1);
 
         if (len_motion < tol) /* just in case, maybe not necessary */
         {
@@ -945,8 +945,8 @@ tour2d3_manip(gint p1, gint p2, splotd *sp, GGobiSession *gg)
           ca = distx/len_motion;
           sa = disty/len_motion;
       
-          cosphi = (gfloat) cos((gdouble) phi);
-          sinphi = (gfloat) sin((gdouble) phi);
+          cosphi = (gdouble) cos((gdouble) phi);
+          sinphi = (gdouble) sin((gdouble) phi);
           cosm = 1.0 - cosphi;
           dsp->t2d3_Rmat2.vals[0][0] = ca*ca*cosphi + sa*sa;
           dsp->t2d3_Rmat2.vals[0][1] = -cosm*ca*sa;

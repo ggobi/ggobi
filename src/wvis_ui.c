@@ -35,9 +35,9 @@ static void
 bin_counts_reset (gint jvar, GGobiStage *d, GGobiSession *gg)
 {
   gint k, m;
-  gfloat val;
+  gdouble val;
   GGobiVariable *var;
-  gfloat min, max;
+  gdouble min, max;
   colorschemed *scheme = gg->activeColorScheme;
 
   if (jvar == -1)
@@ -68,7 +68,7 @@ record_colors_reset (gint selected_var, GGobiStage *d, GGobiSession *gg)
   gint k, m;
   gint nd = g_slist_length(gg->d);
   GGobiVariable *var;
-  gfloat min, max, val;
+  gdouble min, max, val;
   colorschemed *scheme = gg->activeColorScheme;
 
   if (selected_var < 0)
@@ -114,7 +114,7 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, GGobiSession *gg)
   GdkModifierType state;
   icoords pos;
   gboolean rval = false;
-  gfloat val;
+  gdouble val;
 
   GtkWidget *tree_view = get_tree_view_from_object (G_OBJECT (w));
   GGobiStage *d = NULL;
@@ -131,8 +131,8 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, GGobiSession *gg)
   gdk_window_get_pointer (w->window, &pos.x, &pos.y, &state);
 
   if (pos.x != mousepos->x) {
-    val = (gfloat) (pos.x - xmargin) /
-          (gfloat) (w->allocation.width - 2*xmargin);
+    val = (gdouble) (pos.x - xmargin) /
+          (gdouble) (w->allocation.width - 2*xmargin);
 
     /*-- don't allow it to cross its neighbors' boundaries --*/
     if ((color == 0 && val <= gg->wvis.pct[color+1] && val >= 0) ||
@@ -171,7 +171,7 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, GGobiSession *gg)
               w->allocation.height*w->allocation.height;
   colorschemed *scheme = gg->activeColorScheme;
 
-  gfloat *pct = gg->wvis.pct;
+  gdouble *pct = gg->wvis.pct;
   gint *nearest_color = &gg->wvis.nearest_color;
   gint hgt;
 
@@ -258,12 +258,12 @@ bin_boundaries_set (gint selected_var, GGobiStage *d, GGobiSession *gg)
      * By default, they start at .1 and end at 1.0.
     */
     for (k=0; k<gg->wvis.npct; k++) {
-      gg->wvis.pct[k] = (gfloat) (k+1) /  (gfloat) gg->wvis.npct;
+      gg->wvis.pct[k] = (gdouble) (k+1) /  (gdouble) gg->wvis.npct;
       gg->wvis.n[k] = 0;
     }
   } else if (gg->wvis.binning_method == WVIS_EQUAL_COUNT_BINS) {
     gint i, m;
-    gfloat min, max, range, midpt;
+    gdouble min, max, range, midpt;
     GGobiVariable *var = ggobi_stage_get_variable(d, selected_var);
     gint ngroups = gg->wvis.npct;
     gint groupsize = (gint) (d->n_rows / ngroups);
@@ -333,8 +333,8 @@ static void alloc_pct (GGobiSession *gg)
   colorschemed *scheme = gg->activeColorScheme;
   if (gg->wvis.npct != scheme->n) {
     gg->wvis.npct = scheme->n;
-    gg->wvis.pct = (gfloat *) g_realloc (gg->wvis.pct,
-                                         gg->wvis.npct * sizeof (gfloat));
+    gg->wvis.pct = (gdouble *) g_realloc (gg->wvis.pct,
+                                         gg->wvis.npct * sizeof (gdouble));
     gg->wvis.n = (gint *) g_realloc (gg->wvis.n,
                                      gg->wvis.npct * sizeof (gint));
   }
@@ -347,7 +347,7 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, GGobiSession *gg)
   gint x0, x1, k, hgt;
   gint x = xmargin;
   gint y = ymargin;
-  gfloat diff;
+  gdouble diff;
   GGobiVariable *var;
   colorschemed *scheme = gg->activeColorScheme;
 
@@ -374,8 +374,8 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, GGobiSession *gg)
 
   if (gg->wvis.npct != scheme->n) {
     gg->wvis.npct = scheme->n;
-    gg->wvis.pct = (gfloat *) g_realloc (gg->wvis.pct,
-                                         gg->wvis.npct * sizeof (gfloat));
+    gg->wvis.pct = (gdouble *) g_realloc (gg->wvis.pct,
+                                         gg->wvis.npct * sizeof (gdouble));
     gg->wvis.n = (gint *) g_realloc (gg->wvis.n,
                                      gg->wvis.npct * sizeof (gint));
     bin_boundaries_set (selected_var, d, gg);
@@ -417,8 +417,8 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, GGobiSession *gg)
 
   /*-- add the variable limits in the top margin --*/
   if (d && selected_var != -1) {
-    gfloat min, max;
-    gfloat val;
+    gdouble min, max;
+    gdouble val;
     gchar *str;
     PangoRectangle rect;
     PangoLayout *layout = gtk_widget_create_pango_layout(da, NULL);

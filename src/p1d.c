@@ -71,16 +71,16 @@ p1d_activate (gint state, displayd * display, GGobiSession * gg)
 
 
 void
-p1d_spread_var (displayd * display, gfloat * yy, splotd * sp, GGobiStage * d,
+p1d_spread_var (displayd * display, gdouble * yy, splotd * sp, GGobiStage * d,
                 GGobiSession * gg)
 {
 /*
  * Set up the next dot plot.
 */
   gint i;
-  gfloat del = 1.;
+  gdouble del = 1.;
   gint option = 1, stages = 3;
-  gfloat min, max, mean;
+  gdouble min, max, mean;
   cpaneld *cpanel = &display->cpanel;
 
   if (sp->p1d.spread_data.nels != d->n_rows)
@@ -128,15 +128,15 @@ p1d_reproject (splotd * sp, gdouble ** world_data, GGobiStage * d, GGobiSession 
  * from p1d.spread_data[].
 */
   gint i, jvar = 0;
-  gfloat rdiff, ftmp;
-  gfloat precis = PRECISION1;
+  gdouble rdiff, ftmp;
+  gdouble precis = PRECISION1;
   displayd *display = (displayd *) sp->displayptr;
-  gfloat *yy;
+  gdouble *yy;
 
   if (sp == NULL)
     return;
 
-  yy = (gfloat *) g_malloc (d->n_rows * sizeof (gfloat));
+  yy = (gdouble *) g_malloc (d->n_rows * sizeof (gdouble));
   jvar = sp->p1dvar;
 
   /*

@@ -22,7 +22,7 @@ extern "C" {
     and attributes.
     For example, we might add the description text here.
     Also, we might add the precision (number of digits after
-    the decimal point) here and look at it in writeFloat().
+    the decimal point) here and look at it in writeDouble().
     Or we might have an `inline' field to indicate whether the colormap
     should be output directly into the file/stream or separately.
     So basically, this can also hold options.

@@ -23,7 +23,7 @@ reset it to the current data. (GGobi2: adhoc solutions in `tour1d_projdata`,
 public class GGobi.Stage.Screen : Stage {
 	
 	/* Data ranges */
-	float minx, miny, maxx, maxy;
+	double minx, miny, maxx, maxy;
 	
 	/* Dimensions of the screen */
 	uint width;

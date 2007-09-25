@@ -32,7 +32,7 @@ subset_ui_add_data (GtkTreeModel *model, GGobiStage *d)
 {
   GtkTreeIter iter;
   GGobiStage *s = ggobi_stage_find(d, GGOBI_MAIN_STAGE_SUBSET);
-  gfloat fnr = (gfloat) s->n_rows;  
+  gdouble fnr = (gdouble) s->n_rows;  
   gtk_list_store_append(GTK_LIST_STORE(model), &iter);
   gtk_list_store_set(GTK_LIST_STORE(model), &iter, 0, d->name, 1, 0, 2, d->n_rows,
     3, gtk_adjustment_new (1.0, 1.0, (fnr-2.0), 1.0, 5.0, 0.0),

@@ -341,7 +341,7 @@ barchartScreenToTform (cpaneld * cpanel, splotd * sp, icoords * scr,
   displayd *display = (displayd *) sp->displayptr;
   GGobiStage *d = display->d;
   GGobiVariable *var = ggobi_stage_get_variable(d, sp->p1dvar);
-  gfloat scale_x, scale_y;
+  gdouble scale_x, scale_y;
 
   scale_x = sp->scale.x;
   scale_y = sp->scale.y;

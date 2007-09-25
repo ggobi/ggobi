@@ -199,7 +199,7 @@ find_nearest_edge (splotd * sp, displayd * display, GGobiSession * gg)
   gint sqdist, near, j, lineid, xdist;
   gint from, to, yd;
   icoords a, b, distab, distac, c;
-  gfloat proj;
+  gdouble proj;
   gboolean doit;
   GGobiStage *e = display->e;
   GGobiStage *d = display->d;
@@ -247,20 +247,20 @@ find_nearest_edge (splotd * sp, displayd * display, GGobiSession * gg)
         /* horizontal lines */
         else if (distab.y == 0 && distab.x != 0) {
           sqdist = distac.y * distac.y;
-          if (sqdist <= near && (gint) fabs ((gfloat) distac.x) < xdist) {
+          if (sqdist <= near && (gint) fabs ((gdouble) distac.x) < xdist) {
             near = sqdist;
-            xdist = (gint) fabs ((gfloat) distac.x);
+            xdist = (gint) fabs ((gdouble) distac.x);
             lineid = j;
           }
         }
 
         /* other lines */
         else if (distab.x != 0 && distab.y != 0) {
-          proj = ((gfloat) ((distac.x * distab.x) + (distac.y * distab.y))) /
-            ((gfloat) ((distab.x * distab.x) + (distab.y * distab.y)));
+          proj = ((gdouble) ((distac.x * distab.x) + (distac.y * distab.y))) /
+            ((gdouble) ((distab.x * distab.x) + (distab.y * distab.y)));
 
-          c.x = (gint) (proj * (gfloat) (b.x - a.x)) + a.x;
-          c.y = (gint) (proj * (gfloat) (b.y - a.y)) + a.y;
+          c.x = (gint) (proj * (gdouble) (b.x - a.x)) + a.x;
+          c.y = (gint) (proj * (gdouble) (b.y - a.y)) + a.y;
 
           if (BETWEEN (a.x, b.x, c.x) && BETWEEN (a.y, b.y, c.y)) {
             sqdist = (mpos->x - c.x) * (mpos->x - c.x) +

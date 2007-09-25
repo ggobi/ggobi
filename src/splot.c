@@ -77,15 +77,15 @@ splot_configure_cb (GtkWidget *w, GdkEventConfigure *event, splotd *sp)
   g_object_unref(G_OBJECT(factory));
   
   if (cpanel->imode == BRUSH) {
-    sp->brush_pos.x1 = (gint) ((gfloat) sp->brush_pos.x1 *
-      (gfloat) (w->allocation.width) / (gfloat) (sp->max.x));
-    sp->brush_pos.x2 = (gint) ((gfloat) sp->brush_pos.x2 *
-      (gfloat) (w->allocation.width) / (gfloat) (sp->max.x));
+    sp->brush_pos.x1 = (gint) ((gdouble) sp->brush_pos.x1 *
+      (gdouble) (w->allocation.width) / (gdouble) (sp->max.x));
+    sp->brush_pos.x2 = (gint) ((gdouble) sp->brush_pos.x2 *
+      (gdouble) (w->allocation.width) / (gdouble) (sp->max.x));
 
-    sp->brush_pos.y1 = (gint) ((gfloat) sp->brush_pos.y1 *
-      (gfloat) (w->allocation.height)/ (gfloat) (sp->max.y));
-    sp->brush_pos.y2 = (gint) ((gfloat) sp->brush_pos.y2 *
-      (gfloat) (w->allocation.height) / (gfloat) (sp->max.y));
+    sp->brush_pos.y1 = (gint) ((gdouble) sp->brush_pos.y1 *
+      (gdouble) (w->allocation.height)/ (gdouble) (sp->max.y));
+    sp->brush_pos.y2 = (gint) ((gdouble) sp->brush_pos.y2 *
+      (gdouble) (w->allocation.height) / (gdouble) (sp->max.y));
   }
 
   sp->max.x = w->allocation.width;
@@ -631,7 +631,7 @@ splot_screen_to_plane (splotd *sp, gint pt, gcoords *eps,
   gcoords prev_planar;
   gdouble precis = (gdouble) PRECISION1;
 
-  gfloat scale_x, scale_y;
+  gdouble scale_x, scale_y;
   scale_x = sp->scale.x;
   scale_y = sp->scale.y;
   scale_x /= 2;

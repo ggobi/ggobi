@@ -84,7 +84,7 @@ reset(self)
 public gboolean
 random (self, gint n) {
   gint t, m, top = GGOBI_STAGE(self)->n_rows;
-  gfloat rrand;
+  gdouble rrand;
   gboolean *included = g_new0(gboolean, top);
 
   ggobi_stage_filter_set_included_all(GGOBI_STAGE_FILTER(self), false);
@@ -93,7 +93,7 @@ random (self, gint n) {
     return false;
 
   for (t=0, m=0; t < top && m < n; t++) {
-    rrand = (gfloat) g_random_double ();
+    rrand = (gdouble) g_random_double ();
     if (((top - t) * rrand) < (n - m) && !included[t]) {
       ggobi_stage_filter_set_included(GGOBI_STAGE_FILTER(self), t, true);
       included[t] = true;

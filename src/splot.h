@@ -94,7 +94,7 @@ typedef struct
  struct _p1d {
    vector_d spread_data; /* the spreading data */
    lims lim;      /* limits of the spreading data */
-   gfloat mean;
+   gdouble mean;
    /*-- line segments in ASHes --*/
    icoords ash_baseline;  /*-- for drawing segments from point to baseline --*/
  } p1d;
@@ -104,10 +104,10 @@ typedef struct
  * tour1d (variables used to record the state of the 1D tour for this plot)
  */
  struct _tour1d {
-   gfloat mincnt;
-   gfloat maxcnt;
-   gfloat minscreenx;
-   gfloat maxscreenx;
+   gdouble mincnt;
+   gdouble maxcnt;
+   gdouble minscreenx;
+   gdouble maxscreenx;
    gboolean initmax;
    icoords ash_baseline;  /*-- for drawing segments from point to baseline --*/
  } tour1d;

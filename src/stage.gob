@@ -958,7 +958,7 @@ public void
 set_string_value(self, guint i, guint j, const gchar* value) 
 {
   if (is_numeric(value)) {
-    self_set_raw_value(self, i, j, (gfloat) g_strtod (value, NULL));
+    self_set_raw_value(self, i, j, (gdouble) g_strtod (value, NULL));
   } else {
     if (!g_ascii_strcasecmp (value, "na") || !strcmp (value, ".") || !strcmp(value, ""))  
       self_set_missing(self, i, j);

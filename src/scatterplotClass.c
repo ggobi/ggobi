@@ -264,7 +264,7 @@ varcircleDraw (displayd * display, gint jvar, GdkPixmap * da_pix, GGobiSession *
 
   switch (cpanel->pmode) {
   case TOUR1D:
-    x = (gint) (display->t1d.F.vals[0][jvar] * (gfloat) r);
+    x = (gint) (display->t1d.F.vals[0][jvar] * (gdouble) r);
     y = 0;
 #ifndef ENABLE_CAIRO
     gdk_draw_line (da_pix, gg->selvarfg_GC, r, r, r + x, r - y);
@@ -293,8 +293,8 @@ varcircleDraw (displayd * display, gint jvar, GdkPixmap * da_pix, GGobiSession *
     break;
 
   case TOUR2D3:
-    x = (gint) (display->t2d3.F.vals[0][jvar] * (gfloat) r);
-    y = (gint) (display->t2d3.F.vals[1][jvar] * (gfloat) r);
+    x = (gint) (display->t2d3.F.vals[0][jvar] * (gdouble) r);
+    y = (gint) (display->t2d3.F.vals[1][jvar] * (gdouble) r);
 #ifndef ENABLE_CAIRO
     gdk_draw_line (da_pix, gg->selvarfg_GC, r, r, r + x, r - y);
 #endif
@@ -317,8 +317,8 @@ varcircleDraw (displayd * display, gint jvar, GdkPixmap * da_pix, GGobiSession *
     break;
 
   case TOUR2D:
-    x = (gint) (display->t2d.F.vals[0][jvar] * (gfloat) r);
-    y = (gint) (display->t2d.F.vals[1][jvar] * (gfloat) r);
+    x = (gint) (display->t2d.F.vals[0][jvar] * (gdouble) r);
+    y = (gint) (display->t2d.F.vals[1][jvar] * (gdouble) r);
 #ifndef ENABLE_CAIRO
     gdk_draw_line (da_pix, gg->selvarfg_GC, r, r, r + x, r - y);
 #endif
@@ -346,8 +346,8 @@ varcircleDraw (displayd * display, gint jvar, GdkPixmap * da_pix, GGobiSession *
        break;
        } */
     /*          if (xvar) { */
-    x = (gint) (display->tcorr1.F.vals[0][jvar] * (gfloat) r);
-    y = (gint) (display->tcorr2.F.vals[0][jvar] * (gfloat) r);
+    x = (gint) (display->tcorr1.F.vals[0][jvar] * (gdouble) r);
+    y = (gint) (display->tcorr2.F.vals[0][jvar] * (gdouble) r);
 #ifndef ENABLE_CAIRO
     gdk_draw_line (da_pix, gg->selvarfg_GC, r, r, r + x, r - y);
 #endif
@@ -403,7 +403,7 @@ varcircleDraw (displayd * display, gint jvar, GdkPixmap * da_pix, GGobiSession *
        else {
 
        x = 0;
-       y = (gint) (display->tcorr2.F.vals[0][jvar]*(gfloat)r);
+       y = (gint) (display->tcorr2.F.vals[0][jvar]*(gdouble)r);
        gdk_draw_line (da_pix,
        gg->selvarfg_GC, r, r, r+x, r-y);
 
@@ -767,7 +767,7 @@ scatterplotMovePointsButtonCb (displayd * display, splotd * sp, GtkWidget * w,
       clusters_set(d);
       if (d->nclusters > 1) {
         gint i, id = d->nearest_point;
-        gfloat cur_clust = GGOBI_STAGE_GET_ATTR_CLUSTER(d, id);
+        gdouble cur_clust = GGOBI_STAGE_GET_ATTR_CLUSTER(d, id);
         for (i = 0; i < d->n_rows; i++) {
           if (i == id);
           else if (GGOBI_STAGE_GET_ATTR_CLUSTER(d, i) == cur_clust)
@@ -1526,7 +1526,7 @@ splotScreenToTform (cpaneld * cpanel, splotd * sp, icoords * scr,
   gdouble ftmp, max, min, rdiff;
   displayd *display = (displayd *) sp->displayptr;
   GGobiStage *d = display->d;
-  gfloat scale_x, scale_y;
+  gdouble scale_x, scale_y;
   GGobiVariable *var;
 
   scale_x = sp->scale.x;

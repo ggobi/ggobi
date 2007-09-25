@@ -65,7 +65,7 @@ void reset_pp(GGobiStage *d, GGobiSession *gg)
 
 The index function has to be defined as
 
-     gint index (array_d *pdata, void *param, gfloat *val)
+     gint index (array_d *pdata, void *param, gdouble *val)
 
 with   
 
@@ -123,7 +123,7 @@ gint realloc_optimize0_p (optimize0_param *op, gint ncols, vector_i pcols)
 
 gboolean iszero (array_d *data)
 { 
-  gfloat sum = 0;
+  gdouble sum = 0;
   gint i, j;
 
   for (i=0; i<data->nrows; i++)
@@ -133,7 +133,7 @@ gboolean iszero (array_d *data)
   return (sum<1e-6);
 }
 
-void normal_fill (array_d *data, gfloat delta, array_d *base)
+void normal_fill (array_d *data, gdouble delta, array_d *base)
 { 
   int i, j;
   for (i=0; i<data->nrows; i++)
@@ -145,8 +145,8 @@ void normal_fill (array_d *data, gfloat delta, array_d *base)
 void orthonormal (array_d *proj)
 { 
   gint i, j, k;
-  gfloat *ip = g_malloc (proj->ncols*sizeof(gfloat));
-  gfloat norm;
+  gdouble *ip = g_malloc (proj->ncols*sizeof(gdouble));
+  gdouble norm;
 
   /* First norm vector p_i */
   for (i=0; i<proj->nrows; i++)
@@ -186,7 +186,7 @@ gint optimize0 (optimize0_param *op,
                 Tour_PPIndex_f index,
                 void *param)
 { 
-  gfloat index_work = 0.0;
+  gdouble index_work = 0.0;
 /*  array_d proj_work, pdata, *proj;*/
   array_d proj_work, *proj;
   int i,j, m, k;
@@ -327,8 +327,8 @@ pp_deriv_optimization()
 {
 /*
   int i, j;
-  float tmpf1, tmpf2;
-  float eps = 0.5;
+  gdouble tmpf1, tmpf2;
+  gdouble eps = 0.5;
 */
 
   /* calc index first */
@@ -552,7 +552,7 @@ Transformation : -
 Purpose        : Looks for the projection with no data in center.
 *********************************************************************/
 
-gint holes_raw(array_d *pdata, void *param, gfloat *val, gpointer unused)
+gint holes_raw(array_d *pdata, void *param, gdouble *val, gpointer unused)
 { 
   pp_param *pp = (pp_param *) param;
   int i, p, n, k,j;
@@ -629,7 +629,7 @@ Transformation : -
 Purpose        : Looks for the projection with lots of data in center.
 *********************************************************************/
 
-gint central_mass_raw(array_d *pdata, void *param, gfloat *val, gpointer unused)
+gint central_mass_raw(array_d *pdata, void *param, gdouble *val, gpointer unused)
 { 
   pp_param *pp = (pp_param *) param;
   int i, p, n,k,j;
@@ -720,7 +720,7 @@ void zero_int(gint *mem, int size)
 }
   
 gint compute_groups (vector_i group, vector_i ngroup, gint *numgroups, 
-  gint nrows, gfloat *gdata)
+  gint nrows, gdouble *gdata)
 { 
   gint i, j, *groupval;
 
@@ -754,7 +754,7 @@ gint compute_groups (vector_i group, vector_i ngroup, gint *numgroups,
   return ((*numgroups==1) || (*numgroups==nrows));
 }
 
-gint discriminant (array_d *pdata, void *param, gfloat *val, gpointer unused)
+gint discriminant (array_d *pdata, void *param, gdouble *val, gpointer unused)
 { 
   pp_param *pp = (pp_param *) param;
   gint i, j, k, l;
@@ -987,11 +987,11 @@ void countngroup(int *group, int *ngroup, int n)
 
 }
 
-gint cartgini (array_d *pdata, void *param, gfloat *val, gpointer unused)
+gint cartgini (array_d *pdata, void *param, gdouble *val, gpointer unused)
 { 
   pp_param *pp = (pp_param *) param;
   gint i, k, n, p, g = pp->numgroups, left, right, l;
-  gfloat dev, prob, maxindex = 0, index;
+  gdouble dev, prob, maxindex = 0, index;
 
   n = pdata->nrows;
   p = pdata->ncols;
@@ -1050,11 +1050,11 @@ gint cartgini (array_d *pdata, void *param, gfloat *val, gpointer unused)
   return(0);
 }
 
-gint cartentropy (array_d *pdata, void *param, gfloat *val, gpointer unused)
+gint cartentropy (array_d *pdata, void *param, gdouble *val, gpointer unused)
 { 
   pp_param *pp = (pp_param *) param;
   gint i, k, n, p, g = pp->numgroups, left, right,l;
-  gfloat dev, prob, maxindex = 0, index;
+  gdouble dev, prob, maxindex = 0, index;
 
   n = pdata->nrows;
   p = pdata->ncols;

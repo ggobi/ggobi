@@ -18,8 +18,6 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-/*#include <limits.h>
-#include <float.h>*/
 #include <math.h>
 #include <gtk/gtk.h>
 
@@ -164,7 +162,7 @@ next25 (gint * tt, gint * bigt, gint * smallt)
 }
 
 void
-textur (gfloat * yy, gfloat * shft, gint ny, gint option, gfloat del,
+textur (gdouble * yy, gdouble * shft, gint ny, gint option, gdouble del,
         gint stages, GGobiSession * gg)
 {
 /*
@@ -177,14 +175,14 @@ textur (gfloat * yy, gfloat * shft, gint ny, gint option, gfloat del,
  *
  * A bit of work is needed if we want to use option=2.
 */
-  gfloat lohnge, hihnge, delta;
-  gfloat srnge, slo, shi;
+  gdouble lohnge, hihnge, delta;
+  gdouble srnge, slo, shi;
   gint nny, window, mid, k, h, kk, hh;
   gint tmp5x5[25];
   gint tlarge[25], tsmall[25];
   gint i, ii;
   gint *indx;
-  gfloat *xx;
+  gdouble *xx;
 
 
 /*
@@ -198,8 +196,8 @@ textur (gfloat * yy, gfloat * shft, gint ny, gint option, gfloat del,
  * gy is needed solely for the psort routine:  psort is used by
  * qsort to put an index vector in the order that yy will assume.
 */
-  gg->p1d.gy = (gfloat *) g_malloc (ny * sizeof (gfloat));
-  xx = (gfloat *) g_malloc (ny * sizeof (gfloat));
+  gg->p1d.gy = (gdouble *) g_malloc (ny * sizeof (gdouble));
+  xx = (gdouble *) g_malloc (ny * sizeof (gdouble));
 
   for (i = 0; i < ny; i++) {
     indx[i] = i;
@@ -209,7 +207,7 @@ textur (gfloat * yy, gfloat * shft, gint ny, gint option, gfloat del,
   CurrentGGobi = gg;
 
   qsort ((void *) indx, (gsize) ny, sizeof (gint), psort);
-  qsort ((void *) yy, (gsize) ny, sizeof (gfloat), fcompare);
+  qsort ((void *) yy, (gsize) ny, sizeof (gdouble), fcompare);
   CurrentGGobi = NULL;
 /*
  * Bug here:  this is screwy if ny < 4.
@@ -233,9 +231,9 @@ textur (gfloat * yy, gfloat * shft, gint ny, gint option, gfloat del,
       next25 (tsmall, tlarge, tmp5x5);
 
     if (stages >= 2)
-      shft[i] = (gfloat) (20 * tlarge[ii] + 4 * tsmall[ii]) + 2;
+      shft[i] = (gdouble) (20 * tlarge[ii] + 4 * tsmall[ii]) + 2;
     else
-      shft[i] = (gfloat) (20 * tlarge[ii]) + 2;
+      shft[i] = (gdouble) (20 * tlarge[ii]) + 2;
 
     /*
      *  Note: we use the same tlarge 5-string both for gross shift
@@ -255,7 +253,7 @@ textur (gfloat * yy, gfloat * shft, gint ny, gint option, gfloat del,
 */
   if (option == 1) {
     for (i = 0; i < ny; i++) {
-      shft[i] = shft[i] + ((gfloat) g_random_double ()) * 4 - 2;
+      shft[i] = shft[i] + ((gdouble) g_random_double ()) * 4 - 2;
     }
   }
 
@@ -353,10 +351,10 @@ myrnd (gint n)
  * Select a random integer between 1 and n
 */
   gint nn, myrndval;
-  gfloat rrand;
+  gdouble rrand;
   nn = MAX (n, 1);
 
-  rrand = (gfloat) g_random_double ();
-  myrndval = MIN (nn, (gint) (rrand * (gfloat) nn) + 1);
+  rrand = (gdouble) g_random_double ();
+  myrndval = MIN (nn, (gint) (rrand * (gdouble) nn) + 1);
   return (myrndval);
 }

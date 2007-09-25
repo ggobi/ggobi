@@ -87,7 +87,7 @@ colorscheme_init (colorschemed * scheme)
  * neighbors in the GraphAction plugin
 */
   {
-    gfloat red, green, blue;
+    gdouble red, green, blue;
     if (scheme->bg[0] + scheme->bg[1] + scheme->bg[2] > 1.5) {
       red = MAX (0.0, scheme->bg[0] - .3);
       green = MAX (0.0, scheme->bg[1] - .3);
@@ -128,7 +128,7 @@ default_scheme_init ()
   gint i, k;
 
 
-  static gfloat data[][3] = {
+  static gdouble data[][3] = {
     {1.0000, 1.0000, 0.2000},
     {0.8941, 0.1020, 0.1098},
     {0.2157, 0.4941, 0.7216},
@@ -143,8 +143,8 @@ default_scheme_init ()
     "Yellow", "Orange", "Blue", "Green", "Orange", "Brown",
     "Pink", "Gray", "Purple"
   };
-  static gfloat bg[] = { 0.000, 0.000, 0.000 };
-  static gfloat accent[] = { 1.000, 1.000, 1.000 };
+  static gdouble bg[] = { 0.000, 0.000, 0.000 };
+  static gdouble accent[] = { 1.000, 1.000, 1.000 };
   colorschemed *scheme = (colorschemed *) g_malloc (sizeof (colorschemed));
 
   scheme->name = g_strdup ("Set1 9");
@@ -163,18 +163,18 @@ default_scheme_init ()
     g_array_append_val (scheme->colorNames, colorNames[i]);
 
   /*-- allocate and populate data, bg, and accent --*/
-  scheme->data = (gfloat **) g_malloc (scheme->n * sizeof (gfloat *));
+  scheme->data = (gdouble **) g_malloc (scheme->n * sizeof (gdouble *));
   for (k = 0; k < scheme->n; k++) {
-    scheme->data[k] = (gfloat *) g_malloc (3 * sizeof (gfloat));
+    scheme->data[k] = (gdouble *) g_malloc (3 * sizeof (gdouble));
     for (i = 0; i < 3; i++)
       scheme->data[k][i] = data[k][i];
   }
 
-  scheme->bg = (gfloat *) g_malloc (3 * sizeof (gfloat));
+  scheme->bg = (gdouble *) g_malloc (3 * sizeof (gdouble));
   for (i = 0; i < 3; i++)
     scheme->bg[i] = bg[i];
 
-  scheme->accent = (gfloat *) g_malloc (3 * sizeof (gfloat));
+  scheme->accent = (gdouble *) g_malloc (3 * sizeof (gdouble));
   for (i = 0; i < 3; i++)
     scheme->accent[i] = accent[i];
 

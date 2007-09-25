@@ -59,8 +59,8 @@ pan_by_drag (splotd * sp, GGobiSession * gg)
 void
 zoom_by_drag (splotd * sp, GGobiSession * gg)
 {
-  gfloat *scale_x = &sp->scale.x;
-  gfloat *scale_y = &sp->scale.y;
+  gdouble *scale_x = &sp->scale.x;
+  gdouble *scale_y = &sp->scale.y;
   gint npix = 20;  /*-- number of pixels from the crosshair required --*/
   displayd *dsp = sp->displayptr;
   cpaneld *cpanel = &dsp->cpanel;
@@ -76,9 +76,9 @@ zoom_by_drag (splotd * sp, GGobiSession * gg)
       (ABS (sp->mousepos.y - mid.y) >= npix)) {
     /*-- making the behavior identical to click zooming --*/
     scalefac.x =
-      (gfloat) (sp->mousepos.x - mid.x) / (gfloat) (sp->mousepos_o.x - mid.x);
+      (gdouble) (sp->mousepos.x - mid.x) / (gdouble) (sp->mousepos_o.x - mid.x);
     scalefac.y =
-      (gfloat) (sp->mousepos.y - mid.y) / (gfloat) (sp->mousepos_o.y - mid.y);
+      (gdouble) (sp->mousepos.y - mid.y) / (gdouble) (sp->mousepos_o.y - mid.y);
 
 
     if (cpanel->scale.fixAspect_p) {

@@ -15,12 +15,12 @@ set by the user, rather than computed from the data.
 */
 
 public class GGobi.StageStandardize : Stage {
-  double standardize(double value, float min, float max) {
+  double standardize(double value, double min, double max) {
     if ((max - min) < EPSILON) return 0.5;
     return (value - min) / (max - min);
   }
   
-  double unstandardize(double value, float min, float max) {
+  double unstandardize(double value, double min, double max) {
     if ((max - min) < EPSILON) return min;
     return value * (max - min) + min;
   }

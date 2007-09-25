@@ -60,19 +60,19 @@ The authors can be contacted at the following email addresses:
   }
 }*/
 
-void t1d_pptemp_set(gfloat slidepos, displayd *dsp, GGobiSession *gg) {
+void t1d_pptemp_set(gdouble slidepos, displayd *dsp, GGobiSession *gg) {
   dsp->t1d_pp_op.temp_start = slidepos;
 }
 
-void t1d_ppcool_set(gfloat slidepos, displayd *dsp, GGobiSession *gg) {
+void t1d_ppcool_set(gdouble slidepos, displayd *dsp, GGobiSession *gg) {
   dsp->t1d_pp_op.cooling = slidepos;
 }
 
 /* void
 alloc_holes1d_p(holes_param *hp, gint nrows)
 {
-  hp->h0 = (gfloat *) g_malloc(
-    (guint) nrows*sizeof(gfloat *));
+  hp->h0 = (gdouble *) g_malloc(
+    (guint) nrows*sizeof(gdouble *));
 }
 
 void
@@ -86,11 +86,11 @@ free_holes1d_p(holes_param *hp)
 /*  1D Holes index for raw data                    */
 /***************************************************/
 
-/* gint holes1d_raw1(array_d *pdata, void *param, gfloat *val)
+/* gint holes1d_raw1(array_d *pdata, void *param, gdouble *val)
 {  
    gint i, n=pdata->nrows;
-   gfloat m1, x1, temp;
-   gfloat var, acoefs;
+   gdouble m1, x1, temp;
+   gdouble var, acoefs;
 
    m1=0;
    for(i=0; i<n; i++)
@@ -110,7 +110,7 @@ free_holes1d_p(holes_param *hp)
      acoefs +=exp(-temp/2);
    }
 
-   *val = (1.-acoefs/n)/(gfloat) ONEMINUSEXPMINUS1;
+   *val = (1.-acoefs/n)/(gdouble) ONEMINUSEXPMINUS1;
    return(0);
 }
 */
@@ -118,11 +118,11 @@ free_holes1d_p(holes_param *hp)
 /*  1D Central Mass index for raw data                    */
 /**********************************************************/
 
-/* gint central_mass1d_raw1(array_d *pdata, void *param, gfloat *val)
+/* gint central_mass1d_raw1(array_d *pdata, void *param, gdouble *val)
 {
    gint i, n=pdata->nrows;
-   gfloat m1, x1, temp;
-   gfloat var, acoefs;
+   gdouble m1, x1, temp;
+   gdouble var, acoefs;
 
    m1=0;
    for(i=0; i<n; i++)
@@ -142,7 +142,7 @@ free_holes1d_p(holes_param *hp)
      acoefs +=exp(-temp/2);
    }
 
-   *val = (acoefs/n-(gfloat)EXPMINUS1)/(gfloat) ONEMINUSEXPMINUS1;
+   *val = (acoefs/n-(gdouble)EXPMINUS1)/(gdouble) ONEMINUSEXPMINUS1;
    return(0);
 }
 */
@@ -157,7 +157,7 @@ Note           : Modifies pdata !
 
 void center (array_d *data)
 { gint i, j;
-  gfloat mean;
+  gdouble mean;
   for (i=0; i<data->ncols; i++)
   { mean = 0.0;
     for (j=0; j<data->nrows; j++)
@@ -168,7 +168,7 @@ void center (array_d *data)
   }
 }
 
-gint pca (array_d *pdata, void *param, gfloat *val, gpointer userData)
+gint pca (array_d *pdata, void *param, gdouble *val, gpointer userData)
 { gint i, j;
 
   center (pdata);
@@ -207,15 +207,15 @@ Note           : Requires eispack.c
   sp->neighbour_step =  1;
 
   * initialize temporary space *
-  sp->dist  = g_malloc (nrows*sizeof(gfloat));
+  sp->dist  = g_malloc (nrows*sizeof(gdouble));
   sp->index = g_malloc (nrows*sizeof(gint));
-  sp->nmean = g_malloc (ncols*sizeof(gfloat));
-  sp->mean  = g_malloc (ncols*sizeof(gfloat));
-  sp->ew    = g_malloc (ncols*sizeof(gfloat));
-  sp->ev    = g_malloc (ncols*ncols*sizeof(gfloat));
-  sp->fv1   = g_malloc (ncols*sizeof(gfloat));
-  sp->fv2   = g_malloc (ncols*sizeof(gfloat));
-  sp->cov   = g_malloc ((ncols+ncols)*sizeof(gfloat));
+  sp->nmean = g_malloc (ncols*sizeof(gdouble));
+  sp->mean  = g_malloc (ncols*sizeof(gdouble));
+  sp->ew    = g_malloc (ncols*sizeof(gdouble));
+  sp->ev    = g_malloc (ncols*ncols*sizeof(gdouble));
+  sp->fv1   = g_malloc (ncols*sizeof(gdouble));
+  sp->fv2   = g_malloc (ncols*sizeof(gdouble));
+  sp->cov   = g_malloc ((ncols+ncols)*sizeof(gdouble));
 
   return 0;
 }
@@ -235,16 +235,16 @@ gint free_subd_p (subd_param *sp)
   return 0;
 }
 
-gfloat *base;
+gdouble *base;
 
 int smallest (const void *left, const void *right)
-{ gfloat l = base[*((gint *) left)], r = base[*((gint *) right)];
+{ gdouble l = base[*((gint *) left)], r = base[*((gint *) right)];
   if (l<r) return (-1);
   if (l>r) return (1);
   return (0);
 }
 
-void distance (array_d *pdata, gint i, gfloat *dist)
+void distance (array_d *pdata, gint i, gdouble *dist)
 { gint j, k;
   for (j=0; j<pdata->nrows; j++)
   { dist[j]  = 0;
@@ -254,7 +254,7 @@ void distance (array_d *pdata, gint i, gfloat *dist)
   }
 }
 
-void mean_min_neighbour (array_d *pdata, gint *index, int min_neighbour, gfloat *nmean)
+void mean_min_neighbour (array_d *pdata, gint *index, int min_neighbour, gdouble *nmean)
 { gint j, k;
   for (k = 0; k<pdata->ncols; k++) nmean[k] = 0;
   for (j = 0; j<min_neighbour; j++)
@@ -263,7 +263,7 @@ void mean_min_neighbour (array_d *pdata, gint *index, int min_neighbour, gfloat 
   }
 }
 
-void covariance (array_d *pdata, gint *index, int j, gfloat *mean, gfloat *cov)
+void covariance (array_d *pdata, gint *index, int j, gdouble *mean, gdouble *cov)
 { gint k, p, q;
   for (p=0; p<pdata->ncols; p++)      
   { for (q=0; q<=p; q++) 
@@ -278,8 +278,8 @@ void covariance (array_d *pdata, gint *index, int j, gfloat *mean, gfloat *cov)
   }
 }
 
-gfloat variance_explained (gfloat *ew, gint d, gint p)
-{ gfloat ewsum = 0, dimsum = 0;
+gdouble variance_explained (gdouble *ew, gint d, gint p)
+{ gdouble ewsum = 0, dimsum = 0;
   gint k;
   for (k=0; k<p; k++)      
   { ewsum += ew[k];
@@ -288,9 +288,9 @@ gfloat variance_explained (gfloat *ew, gint d, gint p)
   return (dimsum/ewsum);
 }
 
-void eigenvalues (gfloat *cov, gint p, gfloat *ew, 
-                  gint matz, gfloat *ev, gfloat *fv1, gfloat *fv2)
-{ gfloat lp, lq;
+void eigenvalues (gdouble *cov, gint p, gdouble *ew, 
+                  gint matz, gdouble *ev, gdouble *fv1, gdouble *fv2)
+{ gdouble lp, lq;
 
   if (p==2)
   { lp = 0.5*(*(cov+0) + *(cov+3));
@@ -303,9 +303,9 @@ void eigenvalues (gfloat *cov, gint p, gfloat *ew,
     *    rs_ (&p, &p, cov, ew, &matz, ev, fv1, fv2, &ierr);*
 }      
 
-gint subd (array_d *pdata, void *param, gfloat *val)
+gint subd (array_d *pdata, void *param, gdouble *val)
 { subd_param *sp = (subd_param *) param;
-  gfloat varexp, dimmax;
+  gdouble varexp, dimmax;
   gint i, j, k, matz = 0, nused;
 
   *val  = 0;
@@ -341,11 +341,11 @@ gint subd (array_d *pdata, void *param, gfloat *val)
   return (0);
 }
 */
-/*gint cartgini (array_d *pdata, void *param, gfloat *val)
+/*gint cartgini (array_d *pdata, void *param, gdouble *val)
 { 
   cartgini_param *dp = (cartgini_param *) param;
   gint i, k, n, p, g = dp->groups, left, right;
-  gfloat dev, prob;
+  gdouble dev, prob;
 
   n = pdata->nrows;
   p = pdata->ncols;
@@ -395,12 +395,12 @@ gint subd (array_d *pdata, void *param, gfloat *val)
 }*/
 
 
-/*gint cartentropy (array_d *pdata, void *param, gfloat *val)
+/*gint cartentropy (array_d *pdata, void *param, gdouble *val)
 { 
   cartentropy_param *dp = (cartentropy_param *) param;
 
   gint i, k, n, p, g = dp->groups, left, right;
-  gfloat dev, prob;
+  gdouble dev, prob;
 
   n = pdata->nrows;
   p = pdata->ncols;
@@ -452,17 +452,17 @@ gint subd (array_d *pdata, void *param, gfloat *val)
   return(0);
 }
 */
-/*gint alloc_cartvariance_p (cartvariance_param *dp, gint nrows, gfloat *gdata)
+/*gint alloc_cartvariance_p (cartvariance_param *dp, gint nrows, gdouble *gdata)
 { gint i;
   * initialize data *
 
-  dp->y = g_malloc (nrows*sizeof(gfloat));
+  dp->y = g_malloc (nrows*sizeof(gdouble));
 
   for (i=0; i<nrows; i++)
     dp->y[i] = gdata[i];
 
   * initialize temporary space *
-  dp->x        = g_malloc (nrows*sizeof(gfloat));
+  dp->x        = g_malloc (nrows*sizeof(gdouble));
   dp->index    = g_malloc (nrows*sizeof(gint));
 
   return 0;
@@ -476,10 +476,10 @@ gint free_cartvariance_p (cartvariance_param *dp)
   return 0;
 }
 
-gint cartvariance (array_d *pdata, void *param, gfloat *val)
+gint cartvariance (array_d *pdata, void *param, gdouble *val)
 { cartvariance_param *dp = (cartvariance_param *) param;
   gint i, j;
-  gfloat mul, mur, dev;
+  gdouble mul, mur, dev;
  
   if (pdata->ncols!=1) return(-1);
 
@@ -595,9 +595,9 @@ void t1d_ppdraw_all(gint wid, gint hgt, gint margin, displayd *dsp, GGobiSession
   for (i=0; i<dsp->t1d_ppindx_count; i++) 
   {
     pptrace[i].x = margin+i*2;
-    pptrace[i].y = hgt-margin-(gint)((gfloat)((dsp->t1d_ppindx_mat[i]-
-      dsp->t1d_indx_min)/(gfloat) (dsp->t1d_indx_max-dsp->t1d_indx_min)) * 
-      (gfloat) (hgt - 2*margin));
+    pptrace[i].y = hgt-margin-(gint)((gdouble)((dsp->t1d_ppindx_mat[i]-
+      dsp->t1d_indx_min)/(gdouble) (dsp->t1d_indx_max-dsp->t1d_indx_min)) * 
+      (gdouble) (hgt - 2*margin));
   }
   gdk_draw_lines (dsp->t1d_pp_pixmap, gg->plot_GC,
     pptrace, dsp->t1d_ppindx_count);
@@ -632,7 +632,7 @@ void t1d_ppdraw_think(displayd *dsp, GGobiSession *gg)
 }
 
 /* This is the pp index plot drawing routine */ 
-void t1d_ppdraw(gfloat pp_indx_val, displayd *dsp, GGobiSession *gg)
+void t1d_ppdraw(gdouble pp_indx_val, displayd *dsp, GGobiSession *gg)
 {
   colorschemed *scheme = gg->activeColorScheme;
   gint margin=10;
@@ -706,7 +706,7 @@ void t1d_pp_reinit(displayd *dsp, GGobiSession *gg)
 
 The index function has to be defined as
 
-     gint index (array_d *pdata, void *param, gfloat *val)
+     gint index (array_d *pdata, void *param, gdouble *val)
 
 with   
 
@@ -721,11 +721,11 @@ projection.
 
 *********************************************************************/
 
-gfloat t1d_calc_indx (array_d pd, 
+gdouble t1d_calc_indx (array_d pd, 
                 Tour_PPIndex_f index,
                 void *param)
 { 
-  gfloat indexval;
+  gdouble indexval;
 
   index (&pd, param, &indexval, NULL);
 
@@ -737,7 +737,7 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
 {
   GGobiStage *d = dsp->d;
   gint kout, nrows = d->n_rows;
-  gfloat *gdata;
+  gdouble *gdata;
   gint i, j;
 
   if (d->n_rows == 1)  /* can't do pp on no data! */
@@ -763,7 +763,7 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
   }
 
   GGOBI_STAGE_ATTR_INIT(d, cluster);
-  gdata  = g_malloc (nrows*sizeof(gfloat));
+  gdata  = g_malloc (nrows*sizeof(gdouble));
   for (i=0; i<nrows; i++)
   { 
     gdata[i] = GGOBI_STAGE_GET_ATTR_CLUSTER(d, i);

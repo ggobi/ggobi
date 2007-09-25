@@ -137,9 +137,9 @@ private GHashTable *value_to_level = { g_hash_table_new(NULL, NULL) }
 
 private lims lim;             /* limits for this variable */
 private lims lim_display;     /*for vartable, sans missings*/
-private gfloat variance;
-private gfloat mean;
-private gfloat median;
+private gdouble variance;
+private gdouble mean;
+private gdouble median;
 private gboolean has_missings;
 
 /* dirty flags */
@@ -458,8 +458,8 @@ refresh_limits(self)
   if (!selfp->dirty_limits)
     return;
   
-  min = G_MAXFLOAT;
-  max = -G_MAXFLOAT;
+  min = G_MAXDOUBLE;
+  max = -G_MAXDOUBLE;
     
   if (!GGOBI_VARIABLE_IS_CATEGORICAL(self)) {
     for (i = 0; i < s->n_rows; i++) {
@@ -506,11 +506,11 @@ refresh_limits(self)
 *
 * Returns: the maximum value.
 **/
-public gfloat
+public gdouble
 get_max(self)
 {
   self_refresh_limits(self);
-  return(gfloat) selfp->lim.max;
+  return(gdouble) selfp->lim.max;
 }
 
 /**
@@ -521,11 +521,11 @@ get_max(self)
 *
 * Returns: the minimum value.
 **/
-public gfloat
+public gdouble
 get_min(self)
 {
   self_refresh_limits(self);
-  return(gfloat) selfp->lim.min;
+  return(gdouble) selfp->lim.min;
 }
 
   /**
@@ -536,11 +536,11 @@ get_min(self)
    *
    * Returns: maximum value, not counting missings.
    */
-public gfloat
+public gdouble
 get_display_max(self)
 {
   self_refresh_limits(self);
-  return(gfloat) selfp->lim_display.max;
+  return(gdouble) selfp->lim_display.max;
 }
 
   /**
@@ -551,11 +551,11 @@ get_display_max(self)
    *
    * Returns: minimum value, not counting missings
    */
-public gfloat
+public gdouble
 get_display_min(self)
 {
   self_refresh_limits(self);
-  return(gfloat) selfp->lim_display.min;
+  return(gdouble) selfp->lim_display.min;
 }
 
   /**
@@ -568,7 +568,7 @@ get_display_min(self)
    *
    */
 public void
-get_limits(self, gfloat *min, gfloat *max)
+get_limits(self, gdouble *min, gdouble *max)
 {
   *min = self_get_min(self);
   *max = self_get_max(self);
@@ -582,7 +582,7 @@ get_limits(self, gfloat *min, gfloat *max)
    *
    * Returns: The difference between the maximum and minimum.
    */
-public gfloat
+public gdouble
 get_range(self)
 {
   // FIXME: Make work for categorical variables
@@ -595,9 +595,9 @@ refresh_stats(self)
   guint n_row = self->stage->n_rows;
   if (!selfp->dirty_stats)
     return;
-  gfloat sum_squares = 0, sum = 0;
+  gdouble sum_squares = 0, sum = 0;
   guint i, j = ggobi_stage_get_col_index_for_name(self->stage, self->name);
-  gfloat *x = g_new(gfloat, n_row);
+  gdouble *x = g_new(gdouble, n_row);
   for (i = 0; i < n_row; i++) {
     x[i] = ggobi_stage_get_raw_value(self->stage, i, j); 
     sum_squares = sum_squares + (x[i] * x[i]);
@@ -606,7 +606,7 @@ refresh_stats(self)
   selfp->mean = sum / n_row;
   selfp->variance = (sum_squares / n_row) - (selfp->mean * selfp->mean);
   if (n_row) {
-    qsort(x, n_row, sizeof (gfloat), fcompare);
+    qsort(x, n_row, sizeof (gdouble), fcompare);
     selfp->median = ((n_row % 2) != 0) ? x[(n_row - 1) / 2] : 
       (x[n_row / 2 - 1] + x[n_row / 2]) / 2.;
     g_free(x);
@@ -622,7 +622,7 @@ refresh_stats(self)
    *
    * Returns: the mean
    */
-public gfloat
+public gdouble
 get_mean(self)
 {
   self_refresh_stats(self);
@@ -637,7 +637,7 @@ get_mean(self)
    *
    * Returns: the median
    */
-public gfloat
+public gdouble
 get_median(self)
 {
   self_refresh_stats(self);
@@ -652,7 +652,7 @@ get_median(self)
    *
    * Returns: the variance
    */
-public gfloat
+public gdouble
 get_variance(self)
 {
   self_refresh_stats(self);

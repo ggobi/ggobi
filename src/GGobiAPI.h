@@ -241,14 +241,14 @@ extern const gint  *ggobi_getViewTypeIndices(int *n);
   This is not a copy, but the actual data used by the
   internals of GGobi.
  */
-extern const gfloat** ggobi_getRawData(GGobiStage *, GGobiSession *);
+extern const gdouble** ggobi_getRawData(GGobiStage *, GGobiSession *);
 
 /**
   Returns a pointer to the (second) transformation of the raw data.
   This is not a copy, but the actual data used by the
   internals of GGobi.
  */
-extern const gfloat** ggobi_getTFormData(GGobiStage *, GGobiSession *);
+extern const gdouble** ggobi_getTFormData(GGobiStage *, GGobiSession *);
 
 
 /**

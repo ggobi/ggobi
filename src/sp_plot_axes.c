@@ -34,7 +34,7 @@ splot_draw_tour_axes (splotd * sp, GdkDrawable * drawable, GGobiSession * gg)
   cpaneld *cpanel = &dsp->cpanel;
   gint proj = cpanel->pmode;
   GGobiStage *d = dsp->d;
-  gfloat dst, val;
+  gdouble dst, val;
   gint textheight = 0, textheight2;
   gchar *varlab, *varval;
   gint dawidth = sp->da->allocation.width;
@@ -85,7 +85,7 @@ splot_draw_tour_axes (splotd * sp, GdkDrawable * drawable, GGobiSession * gg)
       for (k = 0; k < dsp->t1d.nsubset; k++) {
         j = dsp->t1d.subset_vars.els[k];
         ix =
-          dawidth / 2 + (gint) (dsp->t1d.F.vals[0][j] * (gfloat) dawidth / 4);
+          dawidth / 2 + (gint) (dsp->t1d.F.vals[0][j] * (gdouble) dawidth / 4);
         iy = daheight - 10 - (dsp->t1d.nsubset - 1 - k) * textheight;
         if (j == dsp->t1d_manip_var)
 #ifdef ENABLE_CAIRO
@@ -151,10 +151,10 @@ splot_draw_tour_axes (splotd * sp, GdkDrawable * drawable, GGobiSession * gg)
       for (k = 0; k < dsp->t2d3.nsubset; k++) {
         j = dsp->t2d3.subset_vars.els[k];
         ix = dawidth / 8 + axindent +
-          (gint) (dsp->t2d3.F.vals[0][j] * (gfloat) dawidth / 8);
+          (gint) (dsp->t2d3.F.vals[0][j] * (gdouble) dawidth / 8);
         iy = daheight - axindent - (daheight / 8 +
                                     (gint) (dsp->t2d3.F.vals[1][j] *
-                                            (gfloat) daheight / 8));
+                                            (gdouble) daheight / 8));
         gdk_gc_set_line_attributes (gg->plot_GC, 2, GDK_LINE_SOLID,
                                     GDK_CAP_ROUND, GDK_JOIN_ROUND);
         if (j == dsp->t2d_manip_var)
@@ -194,9 +194,9 @@ splot_draw_tour_axes (splotd * sp, GdkDrawable * drawable, GGobiSession * gg)
           iy = iy - (daheight - daheight / 8 - axindent);
           dst = sqrt (ix * ix + iy * iy);
           ix = axindent + dawidth / 8 +
-            (gint) ((gfloat) ix / dst * (gfloat) dawidth / 8);
+            (gint) ((gdouble) ix / dst * (gdouble) dawidth / 8);
           iy = daheight - axindent -
-            daheight / 8 + (gint) ((gfloat) iy / dst * (gfloat) daheight / 8);
+            daheight / 8 + (gint) ((gdouble) iy / dst * (gdouble) daheight / 8);
           if (ix < dawidth / 8 + axindent)
             ix -= rect.width;
           else
@@ -248,10 +248,10 @@ splot_draw_tour_axes (splotd * sp, GdkDrawable * drawable, GGobiSession * gg)
       for (k = 0; k < dsp->t2d.nsubset; k++) {
         j = dsp->t2d.subset_vars.els[k];
         ix = daheight / 8 + axindent +
-          (gint) (dsp->t2d.F.vals[0][j] * (gfloat) daheight / 8);
+          (gint) (dsp->t2d.F.vals[0][j] * (gdouble) daheight / 8);
         iy = daheight - axindent - (daheight / 8 +
                                     (gint) (dsp->t2d.F.vals[1][j] *
-                                            (gfloat) daheight / 8));
+                                            (gdouble) daheight / 8));
         gdk_gc_set_line_attributes (gg->plot_GC, 2, GDK_LINE_SOLID,
                                     GDK_CAP_ROUND, GDK_JOIN_ROUND);
         if (j == dsp->t2d_manip_var)
@@ -292,9 +292,9 @@ splot_draw_tour_axes (splotd * sp, GdkDrawable * drawable, GGobiSession * gg)
           iy = iy - (daheight - daheight / 8 - axindent);
           dst = sqrt (ix * ix + iy * iy);
           ix = axindent + daheight / 8 +
-            (gint) ((gfloat) ix / dst * (gfloat) daheight / 8);
+            (gint) ((gdouble) ix / dst * (gdouble) daheight / 8);
           iy = daheight - axindent -
-            daheight / 8 + (gint) ((gfloat) iy / dst * (gfloat) daheight / 8);
+            daheight / 8 + (gint) ((gdouble) iy / dst * (gdouble) daheight / 8);
           if (ix < daheight / 8 + axindent)
             ix -= rect.width;
           else
@@ -378,7 +378,7 @@ splot_draw_tour_axes (splotd * sp, GdkDrawable * drawable, GGobiSession * gg)
 
         /* horizontal */
         ix = dawidth / 2 +
-          (gint) (dsp->tcorr1.F.vals[0][j] * (gfloat) dawidth / 4);
+          (gint) (dsp->tcorr1.F.vals[0][j] * (gdouble) dawidth / 4);
         iy = daheight - 10 - (nc - k) * textheight;
         if (j == dsp->tc1_manip_var)
 #ifdef ENABLE_CAIRO
@@ -412,7 +412,7 @@ splot_draw_tour_axes (splotd * sp, GdkDrawable * drawable, GGobiSession * gg)
         ix = 10 + k * textheight;
         iy = daheight - (daheight / 2 +
                          (gint) (dsp->tcorr2.F.vals[0][j] *
-                                 (gfloat) daheight / 4));
+                                 (gdouble) daheight / 4));
         gdk_gc_set_line_attributes (gg->plot_GC, 2, GDK_LINE_SOLID,
                                     GDK_CAP_ROUND, GDK_JOIN_ROUND);
         if (j == dsp->tc2_manip_var)

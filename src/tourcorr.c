@@ -362,7 +362,7 @@ tourcorr_fade_vars (gboolean fade, GGobiSession *gg)
   gg->tourcorr.fade_vars = fade;
 }
 
-void tourcorr_speed_set(gfloat slidepos, GGobiSession *gg) {
+void tourcorr_speed_set(gdouble slidepos, GGobiSession *gg) {
   displayd *dsp = gg->current_display; 
   cpaneld *cpanel = &dsp->cpanel;
 
@@ -1321,9 +1321,9 @@ tourcorr_manip(gint p1, gint p2, splotd *sp, GGobiSession *gg)
   displayd *dsp = (displayd *) sp->displayptr;
   GGobiStage *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
-  gfloat xcosphi=1., xsinphi=0., ycosphi=1., ysinphi=0.;
-  gfloat distx = 0., disty = 0.;
-  gfloat denom = (float) MIN(sp->max.x, sp->max.y)/2.;
+  gdouble xcosphi=1., xsinphi=0., ycosphi=1., ysinphi=0.;
+  gdouble distx = 0., disty = 0.;
+  gdouble denom = (gdouble) MIN(sp->max.x, sp->max.y)/2.;
   gint actual_nxvars = dsp->tcorr1.nactive, actual_nyvars = 
     dsp->tcorr2.nactive;
   gint j;
@@ -1383,8 +1383,8 @@ tourcorr_manip(gint p1, gint p2, splotd *sp, GGobiSession *gg)
       dsp->tc1_phi = dsp->tc1_phi + distx / denom;
       dsp->tc2_phi = dsp->tc2_phi + disty / denom;
   
-      xcosphi = (gfloat) cos((gdouble) dsp->tc1_phi);
-      xsinphi = (gfloat) sin((gdouble) dsp->tc1_phi);
+      xcosphi = (gdouble) cos((gdouble) dsp->tc1_phi);
+      xsinphi = (gdouble) sin((gdouble) dsp->tc1_phi);
       if (xcosphi > 1.0)
       {
         xcosphi = 1.0;
@@ -1395,8 +1395,8 @@ tourcorr_manip(gint p1, gint p2, splotd *sp, GGobiSession *gg)
         xcosphi = -1.0;
         xsinphi = 0.0;
       }
-      ycosphi = (float) cos((double) dsp->tc2_phi);
-      ysinphi = (float) sin((double) dsp->tc2_phi);
+      ycosphi = (gdouble) cos((double) dsp->tc2_phi);
+      ysinphi = (gdouble) sin((double) dsp->tc2_phi);
       if (ycosphi > 1.0)
       {
         ycosphi = 1.0;

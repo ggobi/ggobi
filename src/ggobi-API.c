@@ -624,8 +624,8 @@ ggobi_setPlotRange (double *x, double *y, int plotNum, displayd * display,
      tfmax.y = y[1];
 
      if (GTK_WIDGET_VISIBLE (display->hrule)) {
-     if (((gfloat) GTK_RULER (display->hrule)->lower != tfmin.x) ||
-     ((gfloat) GTK_RULER (display->hrule)->upper != tfmax.x))
+     if (((gdouble) GTK_RULER (display->hrule)->lower != tfmin.x) ||
+     ((gdouble) GTK_RULER (display->hrule)->upper != tfmax.x))
      {
      GTK_RULER_set_range (GTK_RULER (display->hrule),
      (gdouble) tfmin.x, (gdouble) tfmax.x);
@@ -633,8 +633,8 @@ ggobi_setPlotRange (double *x, double *y, int plotNum, displayd * display,
      }
 
      if (GTK_WIDGET_VISIBLE (display->vrule)) {
-     if (((gfloat) GTK_RULER (display->vrule)->upper != tfmin.y) ||
-     ((gfloat) GTK_RULER (display->vrule)->lower != tfmax.y))
+     if (((gdouble) GTK_RULER (display->vrule)->upper != tfmin.y) ||
+     ((gdouble) GTK_RULER (display->vrule)->lower != tfmax.y))
      {
      GTK_RULER_set_range (GTK_RULER (display->vrule),
      (gdouble) tfmax.y, (gdouble) tfmin.y);

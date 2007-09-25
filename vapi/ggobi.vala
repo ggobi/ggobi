@@ -68,12 +68,12 @@ public class GGobi.Variable: GLib.Object {
   public bool is_attribute {get; set;}
   public string name;
   
-  public float get_range();
-  public float get_min();
-  public float get_median();
-  public float get_max();
+  public double get_range();
+  public double get_min();
+  public double get_median();
+  public double get_max();
   
-  public float get_mean();
+  public double get_mean();
   public bool has_missings();
 
 }
@@ -88,7 +88,7 @@ namespace GGobi {
   [CCode (cprefix = "dsvd", lower_case_cprefix = "", cheader_filename = "svd.h")]
   public struct LinearAlgebra {
     [NoArrayLength]
-    public static void svd (pointer[] a, int m, int n, out float[] w, out pointer[] v);
+    public static void svd (pointer[] a, int m, int n, out double[] w, out pointer[] v);
   }
 
   [CCode (cheader_filename = "ggobi-variable.h", cprefix = "GGOBI_VARIABLE_" )]  

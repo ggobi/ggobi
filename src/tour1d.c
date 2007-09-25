@@ -34,7 +34,7 @@
 #define T1DON true
 #define T1DOFF false
 
-static void tour1d_speed_set_display(gfloat slidepos, displayd *dsp); 
+static void tour1d_speed_set_display(gdouble slidepos, displayd *dsp); 
 void tour1d_write_video(GGobiSession *gg);
 
 #ifdef TESTING_TOUR_STEP
@@ -198,7 +198,7 @@ void tour1d_write_video(GGobiSession *gg)
   GGobiStage *d = dsp->d;
   gint j;
   gdouble rnge;
-  gfloat ppval;
+  gdouble ppval;
 
   if (dsp->t1d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t1d_window))
     ppval = dsp->t1d.ppval;
@@ -323,7 +323,7 @@ tour1d_all_vars (displayd *dsp)
 }
 
 static void 
-tour1d_speed_set_display(gfloat slidepos, displayd *dsp) 
+tour1d_speed_set_display(gdouble slidepos, displayd *dsp) 
 {
   cpaneld *cpanel = &dsp->cpanel;
 
@@ -332,7 +332,7 @@ tour1d_speed_set_display(gfloat slidepos, displayd *dsp)
 
 }
 
-void tour1d_speed_set(gfloat slidepos, GGobiSession *gg) 
+void tour1d_speed_set(gdouble slidepos, GGobiSession *gg) 
 {
     tour1d_speed_set_display(slidepos, gg->current_display); 
 }
@@ -558,24 +558,24 @@ tour1d_projdata(splotd *sp, gdouble **world_data, GGobiStage *d, GGobiSession *g
 {
   gint j, m;
   displayd *dsp = (displayd *) sp->displayptr;
-  gfloat min, max, mean;
-  gfloat precis = PRECISION1;
+  gdouble min, max, mean;
+  gdouble precis = PRECISION1;
   cpaneld *cpanel = &dsp->cpanel;
-  gfloat *yy;
+  gdouble *yy;
 
   if (sp == NULL)
     return;
   if (sp->p1d.spread_data.nels != d->n_rows)
     vectord_realloc (&sp->p1d.spread_data, d->n_rows);
 
-  yy = (gfloat *) g_malloc (d->n_rows * sizeof (gfloat));
+  yy = (gdouble *) g_malloc (d->n_rows * sizeof (gdouble));
 
   for (m=0; m < d->n_rows; m++) {
     yy[m] = sp->planar[m].x = 0;
     sp->planar[m].y = 0;
     for (j=0; j<d->n_cols; j++)
     {
-      yy[m] += (gfloat)(dsp->t1d.F.vals[0][j]*world_data[m][j]);
+      yy[m] += (gdouble)(dsp->t1d.F.vals[0][j]*world_data[m][j]);
     }
   }
 
@@ -960,9 +960,9 @@ tour1d_manip(gint p1, gint p2, splotd *sp, GGobiSession *gg)
   displayd *dsp = (displayd *) sp->displayptr;
   GGobiStage *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
-  gfloat xcosphi=1., xsinphi=0.;
-  gfloat distx, disty;
-  gfloat denom = (float) MIN(sp->max.x, sp->max.y)/2.;
+  gdouble xcosphi=1., xsinphi=0.;
+  gdouble distx, disty;
+  gdouble denom = MIN(sp->max.x, sp->max.y)/2.;
   gint actual_nxvars = dsp->t1d.nactive;
   gint j;
   gboolean offscreen = false;
@@ -996,8 +996,8 @@ tour1d_manip(gint p1, gint p2, splotd *sp, GGobiSession *gg)
 
       dsp->t1d_phi = dsp->t1d_phi + distx / denom;
   
-      xcosphi = (gfloat) cos((gdouble) dsp->t1d_phi);
-      xsinphi = (gfloat) sin((gdouble) dsp->t1d_phi);
+      xcosphi = (gdouble) cos((gdouble) dsp->t1d_phi);
+      xsinphi = (gdouble) sin((gdouble) dsp->t1d_phi);
       if (xcosphi > 1.0)
       {
         xcosphi = 1.0;

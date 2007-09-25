@@ -118,8 +118,8 @@ gint
 fcompare (const void *x1, const void *x2)
 {
   gint val = 0;
-  const gfloat *f1 = (const gfloat *) x1;
-  const gfloat *f2 = (const gfloat *) x2;
+  const gdouble *f1 = (const gdouble *) x1;
+  const gdouble *f2 = (const gdouble *) x2;
 
   if (*f1 < *f2)
     val = -1;
@@ -167,13 +167,13 @@ rank_compare (gconstpointer val1, gconstpointer val2, gpointer data)
 
 /* Not used anywhere yet ... */
 void
-fshuffle (gfloat * x, gint n)
+fshuffle (gdouble * x, gint n)
 {
 /*
  * Knuth, Seminumerical Algorithms, Vol2; Algorithm P.
 */
   gint i, k;
-  gfloat f;
+  gdouble f;
 
   for (i = 0; i < n; i++) {
     k = (gint) (g_random_double () * (gdouble) i);

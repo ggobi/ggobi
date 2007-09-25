@@ -67,7 +67,7 @@ pt_screen_to_plane (icoords * screen, gint id, gboolean horiz, gboolean vert,
   prev_planar.x = 0;
   prev_planar.y = 0;
   
-  gfloat scale_x, scale_y;
+  gdouble scale_x, scale_y;
   gdouble precis = (gdouble) PRECISION1;
 
   scale_x = sp->scale.x;
@@ -169,14 +169,14 @@ pt_plane_to_world (splotd * sp, gcoords * planar, gcoords * eps,
 void
 pt_world_to_raw_by_var (gint j, gdouble * world, gdouble * raw, GGobiStage * d)
 {
-  gfloat precis = PRECISION1;
-  gfloat ftmp, rdiff;
-  gfloat x;
+  gdouble precis = PRECISION1;
+  gdouble ftmp, rdiff;
+  gdouble x;
   GGobiVariable *var = ggobi_stage_get_variable(d, j);
 
   rdiff = ggobi_variable_get_range(var);
 
-  ftmp = (gfloat) (world[j]) / precis;
+  ftmp = (gdouble) (world[j]) / precis;
   x = (ftmp + 1.0) * .5 * rdiff;
   x += ggobi_variable_get_min(var);
 

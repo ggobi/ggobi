@@ -136,7 +136,7 @@ bin_boundaries_set (GGobiStage * d, GGobiSession * gg)
    * By default, they start at .1 and end at 1.0.
    */
   for (k = 0; k < gg->svis.npct; k++) {
-    gg->svis.pct[k] = (gfloat) (k + 1) / (gfloat) gg->svis.npct;
+    gg->svis.pct[k] = (gdouble) (k + 1) / (gdouble) gg->svis.npct;
   }
 }
 
@@ -157,8 +157,8 @@ da_expose_cb (GtkWidget * w, GdkEventExpose * event, GGobiSession * gg)
 
   if (gg->svis.npct != scheme->n) {
     gg->svis.npct = scheme->n;
-    gg->svis.pct = (gfloat *) g_realloc (gg->svis.pct,
-                                         gg->svis.npct * sizeof (gfloat));
+    gg->svis.pct = (gdouble *) g_realloc (gg->svis.pct,
+                                         gg->svis.npct * sizeof (gdouble));
     bin_boundaries_set (d, gg);
   }
 

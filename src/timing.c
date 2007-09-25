@@ -33,7 +33,7 @@ print_time_interval(gchar *where, GGobiSession *gg) {
     (G_USEC_PER_SEC*gg->time.tv_sec + gg->time.tv_usec);
 
   g_printerr ("TIME(%s) %.2f msec\n", 
-              where, (gfloat)tdiff_usec/1000);
+              where, (gdouble)tdiff_usec/1000);
   gdk_flush();
 }
 

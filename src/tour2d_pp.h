@@ -18,17 +18,17 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 The authors can be contacted at the following email addresses:
     dicook@iastate.edu    sigbert@wiwi.hu-berlin.de
 */
-gint skewness_raw2(array_d *pdata, void *param, gfloat *val);
-gint skewness_raw1( array_d *pdata, void *param, gfloat *val);
-gint skewness( array_d *pdata, void *param, gfloat *val);
-gint central_mass(array_d *pdata, void *param, gfloat *val);
-gint central_mass_raw1(array_d *pdata, void *param, gfloat *val);
-gint central_mass_raw2(array_d *pdata, void *param, gfloat *val);
-gfloat mean_fn2(gfloat *x1, gfloat *x2, gint n);
+gint skewness_raw2(array_d *pdata, void *param, gdouble *val);
+gint skewness_raw1( array_d *pdata, void *param, gdouble *val);
+gint skewness( array_d *pdata, void *param, gdouble *val);
+gint central_mass(array_d *pdata, void *param, gdouble *val);
+gint central_mass_raw1(array_d *pdata, void *param, gdouble *val);
+gint central_mass_raw2(array_d *pdata, void *param, gdouble *val);
+gdouble mean_fn2(gdouble *x1, gdouble *x2, gint n);
 /*void inverse(double *a, int n);*/
-gint holes( array_d *pdata,void *param, gfloat *val);
-gint holes_raw1(array_d *pdata,void *param, gfloat *val);
-gint holes_raw2(array_d *pdata,void *param, gfloat *val);
+gint holes( array_d *pdata,void *param, gdouble *val);
+gint holes_raw1(array_d *pdata,void *param, gdouble *val);
+gint holes_raw2(array_d *pdata,void *param, gdouble *val);
 
-gfloat t2d_calc_indx(array_d, Tour_PPIndex_f fun,  void *param);
+gdouble t2d_calc_indx(array_d, Tour_PPIndex_f fun,  void *param);
 gboolean t2d_switch_index(Tour2DCPanel, gint, displayd *, GGobiSession *);

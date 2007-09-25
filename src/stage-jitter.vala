@@ -27,8 +27,8 @@ public class GGobi.StageJitter : Stage {
   public override void refresh_col_(uint j) {
     Variable v = get_variable(j);
     
-    float range = v.get_range();
-    float mid = (v.get_min() + v.get_max()) / 2;
+    double range = v.get_range();
+    double mid = (v.get_min() + v.get_max()) / 2;
     
     for (uint i = 0; i < n_rows; i++) 
       cache.set(i, j, mid + rand() * range);

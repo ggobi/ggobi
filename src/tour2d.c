@@ -32,7 +32,7 @@
 #define T2DON true
 #define T2DOFF false
 
-static void tour2d_speed_set_display(gfloat slidepos, displayd *dsp);
+static void tour2d_speed_set_display(gdouble slidepos, displayd *dsp);
 void tour2d_write_video(GGobiSession *gg);
 
 void
@@ -283,13 +283,13 @@ tour2d_all_vars (displayd *dsp)
   //}
 }
 
-void tour2d_speed_set(gfloat slidepos, GGobiSession *gg) {
+void tour2d_speed_set(gdouble slidepos, GGobiSession *gg) {
 
   displayd *dsp = gg->current_display;
   tour2d_speed_set_display(slidepos, dsp);
 }
 
-static void tour2d_speed_set_display(gfloat slidepos, displayd *dsp) 
+static void tour2d_speed_set_display(gdouble slidepos, displayd *dsp) 
 {
   cpaneld *cpanel;
   if (dsp) {
@@ -623,7 +623,7 @@ tour2d_run(displayd *dsp, GGobiSession *gg)
   gboolean revert_random = false;
   gint k;
   gboolean chosen;
-  gfloat eps = .01;
+  gdouble eps = .01;
   gint pathprob = 0;
   extern void t2d_ppdraw_think(displayd *,GGobiSession *);
 
@@ -884,8 +884,8 @@ tour2d_manip_init(gint p1, gint p2, splotd *sp)
   GGobiSession *gg = GGobiFromSPlot(sp);
   gint j, k;
   gint n1vars = dsp->t2d.nactive;
-  /*gfloat ftmp;*/
-  gfloat tol = 0.05; 
+  /*gdouble ftmp;*/
+  gdouble tol = 0.05; 
   gdouble dtmp1;
 
   /* need to turn off tour */
@@ -1071,8 +1071,8 @@ tour2d_manip_init(gint p1, gint p2, splotd *sp)
       else
       { /* yes: set radial manip direction to be current direction
              of contribution */
-        dsp->t2d_rx = (gfloat) dsp->t2d.F.vals[0][dsp->t2d_manip_var];
-        dsp->t2d_ry = (gfloat) dsp->t2d.F.vals[1][dsp->t2d_manip_var];
+        dsp->t2d_rx = (gdouble) dsp->t2d.F.vals[0][dsp->t2d_manip_var];
+        dsp->t2d_ry = (gdouble) dsp->t2d.F.vals[1][dsp->t2d_manip_var];
         dtmp1 = sqrt(dsp->t2d_rx*dsp->t2d_rx+dsp->t2d_ry*dsp->t2d_ry);
         dsp->t2d_rx /= dtmp1;
         dsp->t2d_ry /= dtmp1;
@@ -1090,12 +1090,12 @@ tour2d_manip(gint p1, gint p2, splotd *sp, GGobiSession *gg)
   cpaneld *cpanel = &dsp->cpanel;
   gint actual_nvars = dsp->t2d.nactive;
   gboolean offscreen = false;
-  gfloat phi, cosphi, sinphi, ca, sa, cosm, cospsi, sinpsi;
-  gfloat distx, disty, x1, x2, y1, y2;
-  gfloat denom = (gfloat) MIN(sp->max.x, sp->max.y)/2.;
-  gfloat tol = 0.01;
+  gdouble phi, cosphi, sinphi, ca, sa, cosm, cospsi, sinpsi;
+  gdouble distx, disty, x1, x2, y1, y2;
+  gdouble denom = (gdouble) MIN(sp->max.x, sp->max.y)/2.;
+  gdouble tol = 0.01;
   gdouble dtmp1, dtmp2;
-  gfloat len_motion;
+  gdouble len_motion;
   gint i,j,k;
   gboolean pp_problem = false;
 
@@ -1151,7 +1151,7 @@ tour2d_manip(gint p1, gint p2, splotd *sp, GGobiSession *gg)
             dsp->t2d_ry*(dsp->t2d_pos2_old - dsp->t2d_pos2))*dsp->t2d_ry;
         }
         dtmp1 = (gdouble) (distx*distx+disty*disty);
-        len_motion = (gfloat) sqrt(dtmp1);
+        len_motion = (gdouble) sqrt(dtmp1);
 
         if (len_motion < tol) /* just in case, maybe not necessary */
         {
@@ -1172,8 +1172,8 @@ tour2d_manip(gint p1, gint p2, splotd *sp, GGobiSession *gg)
           ca = distx/len_motion;
           sa = disty/len_motion;
       
-          cosphi = (gfloat) cos((gdouble) phi);
-          sinphi = (gfloat) sin((gdouble) phi);
+          cosphi = (gdouble) cos((gdouble) phi);
+          sinphi = (gdouble) sin((gdouble) phi);
           cosm = 1.0 - cosphi;
           dsp->t2d_Rmat2.vals[0][0] = ca*ca*cosphi + sa*sa;
           dsp->t2d_Rmat2.vals[0][1] = -cosm*ca*sa;
