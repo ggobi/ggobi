@@ -22,13 +22,16 @@ Currently only works for d = {1, 2}.
 
 */
 
-class GGobi.TourInterpolation : Object {
+using GLib;
+public class GGobi.TourInterpolation : Object {
   // Frames
   private TourMatrix Fa {get; construct;}
   private TourMatrix Fz {get; construct;}
   // Planes
   private TourMatrix Ga;
   private TourMatrix Gz;
+  private TourMatrix Va;
+  private TourMatrix Vz;
   
   private double current_angle; // in radians
   private double dist; // in radians?
@@ -55,19 +58,19 @@ class GGobi.TourInterpolation : Object {
     // if (Fa.equivalent(Fz)) return();
 
     // Compute the SVD: Fa'Fz = Va lambda Vz' --------------------------------
-    TourMatrix FatFz = Matrix.multiply_utv(Fa, Fz);
+    TourMatrix FatFz = TourMatrix.multiply_utv(Fa, Fz);
     Svd svd = FatFz.svd();
 
-    double[] lambda = svd.d;
-    TourMatrix Va = svd.U;
-    TourMatrix Vz = svd.V;
+    double[] lambda = new double[d];//svd.d;
+    Va = svd.U;
+    Vz = svd.V;
 
     /* Check span of <Fa,Fz>. If dimension of the intersection is equal to
     dimension of proj, dI=ndim and we should stop here, setting Ft to Fa;
     but this never seems to happen. See page 16 of paper.. */
     
     uint dI = 0; 
-    for (i = 0; i < d; i++) { 
+    for (uint i = 0; i < d; i++) { 
      if (lambda[i] > 1.0 - EPSILON) {
        dI++; 
        lambda[i] = 1.0; 
@@ -76,8 +79,8 @@ class GGobi.TourInterpolation : Object {
     
     // Compute frames of principle directions --------------------------------
 
-    Ga = Matrix.multiply_uv(Fa, Va);
-    Gz = Matrix.multiply_uv(Fz, Vz);
+    Ga = TourMatrix.multiply_uv(Fa, Va);
+    Gz = TourMatrix.multiply_uv(Fz, Vz);
 
     // Form an orthogonal coordinate transformation --------------------------
 
@@ -90,7 +93,7 @@ class GGobi.TourInterpolation : Object {
 
     // Compute, standardize and round principal angles -----------------------
     for (uint i = 0; i < d; i++) {
-      tau[i] = acos(lambda);
+      tau[i] = Math.acos(lambda[i]);
       if (tau[i] < EPSILON) tau[i] = 0; 
     }
 
@@ -105,20 +108,20 @@ class GGobi.TourInterpolation : Object {
     for (uint i = 0; i < d; i++) {
       for (uint j = 0; j < p; j++) {
         double value = 
-          Ga.get(i, j) * cos(angle * tau[i]) + 
-          Gz.get(i, j) * sin(angle * tau[i]);
+          Ga.get(i, j) * Math.cos(angle * tau[i]) + 
+          Gz.get(i, j) * Math.sin(angle * tau[i]);
         G.set(i, j, value);
       }
     }
 
     // rotate plane to match frame Fa
-    TourMatrix F = Matrix.multiply_uv(G, Va);
+    TourMatrix F = TourMatrix.multiply_uv(G, Va);
     // correct round-off errors
     F.normalise(); 
     F.orthogonalise();
     
     return F;
-  };
+  }
 
 
   public void set_target(TourMatrix target) {
@@ -133,31 +136,33 @@ class GGobi.TourInterpolation : Object {
   }
   
   public TourMatrix get_next() {
-    TourMatrix result = get_interp(current_angle);
-    // FIXME: should always finish with target
+    TourMatrix result = get_frame(current_angle);
+    // This doesn't finish with the target, but the when the next target is
+    // set, we start with the old target
     if (!is_finished()) current_angle += delta;
     
     return result;
-  };
+  }
 
   public bool is_finished() {
     return (current_angle + delta > dist);
-  };
+  }
   
   public void reset() {
     current_angle = 0;
-  };
+  }
 
   // Non-linear mapping.  Specify between 0 and 1.
   public void set_speed(double percent) {
+    double step = 0;
     if (percent < 0.05) {
       step = 0;
     } else if (percent < 0.3) {
       step = (percent - 0.05) / 20;
     } else if (percent < 0.9) { 
-      step = pow(percent - 0.3, 1.5) + 0.0125;
+      step = Math.pow(percent - 0.3, 1.5) + 0.0125;
     } else {
-      step = pow(percent - 0.9, 2.0) + 0.477;
+      step = Math.pow(percent - 0.9, 2.0) + 0.477;
     }
 
     delta = step * Math.PI / 2;

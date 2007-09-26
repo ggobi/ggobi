@@ -35,6 +35,7 @@ for maximum conveniece. It will also backtransform moved points as necessary.
 It should probably also check that the matrices are the correct size.
 
 */
+using GLib;
 
 namespace GGobi {
   public enum TourState {
@@ -42,24 +43,33 @@ namespace GGobi {
   }
 }
 
-class GGobi.Tour : Object {
+public class GGobi.Tour : Object {
   public Stage stage;
   public TourState[] states;
   
   public TourBasis basis_generator;
-  public Tour Interpolator interpolator;
+  public TourInterpolation interpolator;
   
-  public SList<TourMatrix> previous;
-  public TourMatrix current;
+  // List of previous target bases
+  public SList<TourMatrix> previous_targets;
+
   public TourMatrix next() {
-    previous.append(current);
-    
     if (interpolator.is_finished()) {
-      interpolator.set_target(generator.generate());
+      TourMatrix target = basis_generator.generate(states);
+      interpolator.set_target(target);
+      previous_targets.append(target);
     }
-    current = interpolator.get_next();
+    
+    return interpolator.get_next();
   }
   
-  public void move(uint j, double[] vals);
+  // Manual controls
+  public void set_position(uint j, double x, double y) {
+    
+
+    // previous_targets.append(current);
+  }
+  
+  
   
 }

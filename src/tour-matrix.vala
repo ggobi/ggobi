@@ -118,14 +118,15 @@ public class GGobi.TourMatrix : PipelineMatrix {
   public Svd svd() {
     TourMatrix U = copy();
     TourMatrix Vt = new TourMatrix(n_rows, n_cols);
-    double[] d = new double[n_rows];
+    double[] d = new double[0];
+    d.resize((int) n_rows);
     
     LinearAlgebra.svd(out U.matrix.vals, (int) n_rows, (int) n_cols, out d, out Vt.matrix.vals);
     
     Svd svd;
     svd.U = U;
     svd.V = Vt.transpose();
-    svd.d = d;
+    // svd.d = d;
     return svd;
   }
   
@@ -170,22 +171,39 @@ public class GGobi.TourMatrix : PipelineMatrix {
     
     return mat;
   } 
-  public static TourMatrix multiply_uvt(TourMatrix u, TourMatrix v) {
-    TourMatrix mat = new TourMatrix(u.n_rows, u.n_cols);
+  // Not currently used:
+  // public static TourMatrix multiply_uvt(TourMatrix u, TourMatrix v) {
+  //   TourMatrix mat = new TourMatrix(u.n_rows, u.n_cols);
+  //   
+  //   if (u.n_cols != v.n_cols) return null;
+  // 
+  //   for (uint j = 0; j < u.n_rows; j++) {
+  //     for (uint k = 0; k < v.n_rows; k++) {
+  //       double value = 0;
+  //       for (uint i = 0; i< u.n_cols ; i++) {
+  //         value += u.get(i, j) * v.get(i, k);
+  //       }
+  //       mat.set(k, j, value);
+  //     }
+  //   }
+  //   
+  //   return mat;
+  // } 
+  
+  public TourMatrix project(Stage stage) {
+    TourMatrix mat = new TourMatrix(stage.n_rows, n_cols);
     
-    if (u.n_cols != v.n_cols) return null;
-
-    for (uint j = 0; j < u.n_rows; j++) {
-      for (uint k = 0; k < v.n_rows; k++) {
+    for (uint i = 0; i < stage.n_rows; i++) {
+      for (uint j = 0; j < n_rows; j++) {
         double value = 0;
-        for (uint i = 0; i< u.n_cols ; i++) {
-          value += u.get(i, j) * v.get(i, k);
+        for (uint k = 0; k < stage.n_cols; k++) {
+          value += stage.get_raw_value(i, k) * get(j, k);
         }
-        mat.set(k, j, value);
+        mat.set(i, j, value);
       }
-    }
-    
+    }    
     return mat;
-  } 
+  }
+  
   
 }
