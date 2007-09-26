@@ -54,12 +54,14 @@ libggobi_la_BUILT = array.c ash1d.c barchart.c barchartClass.c \
   sphere_ui.c splash.c splot.c sp_plot.c sp_plot_axes.c sp_plot_edges.c \
   subset_ui.c svd.c texture.c timeplot.c time_ui.c timing.c tour.c tour1d.c \
   tour1d_pp.c tour1d_pp_ui.c tour1d_ui.c tour2d.c tour2d3.c tour2d3_ui.c \
-  tour2d_pp.c tour2d_pp_ui.c tour2d_ui.c tourcorr.c tourcorr_ui.c tour_pp.c \
+  tour2d_pp.c tour2d_pp_ui.c tour2d_ui.c tourcorr.c tourcorr_ui.c \
   tsdisplay.c tsPlot.c utils.c utils_gdk.c \
   utils_pango.c utils_ui.c varchange.c varcircles.c varpanel_ui.c vartable.c \
   vartable_nbook.c vartable_ui.c vector.c win32_draw.c writedata_ui.c \
   write_csv.c write_xml.c wvis.c wvis_ui.c xlines.c xyplot.c \
-  xyplot_ui.c $(libggobi_la_METASOURCES)
+  xyplot_ui.c \
+  projection-optimisation.c projection-indices.c \
+  $(libggobi_la_METASOURCES)
 
 libggobi_la_SOURCES = $(libggobi_la_BUILT) $(libggobi_la_METASTAMPS)
 
@@ -68,12 +70,13 @@ libggobi_la_LIBADD = $(libggobi_la_METAOBJECTS)
 libggobi_la_DEPENDENCIES = $(libggobi_la_METAOBJECTS)
 
 pkginclude_HEADERS = GGobiAPI.h ggobiClass.h tour1d_pp.h GGobiApp.h \
-  noop-toggle.h tour2d_pp.h GGobiEvents.h parcoordsClass.h tour_pp.h \
+  noop-toggle.h tour2d_pp.h GGobiEvents.h parcoordsClass.h tour_pp_ui.h \
   barchartDisplay.h plugin.h tsPlot.h brushing.h tsdisplay.h \
   colorscheme.h types.h config.h read_init.h vars.h cpanel.h \
   varseldata.h defines.h scatmatClass.h display.h \
   scatterplotClass.h display_tree.h write_xml.h ggobi-intl.h \
   externs.h splot.h writedata.h fileio.h testEvents.h ggobi.h tour.h \
+  projection-optimisation.c projection-indices.c \
   $(libggobi_la_METAHEADERS) GGStructSizes.c marshal.h utils.h
 
 BUILT_SOURCES =  $(libggobi_la_METASTAMPS) $(libggobi_la_METASOURCES) $(libggobi_la_METAHEADERS)

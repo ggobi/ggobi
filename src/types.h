@@ -88,7 +88,6 @@ typedef struct {
 
 
 
-
 typedef struct {  /*-- used for obtaining ranks --*/
   gdouble f;
   gint indx;
@@ -101,14 +100,6 @@ typedef struct {
   gdouble val;
 } celld;
 
-typedef gint (*Tour_PPIndex_f)(array_d *pd, void *params, gdouble *val, gpointer userData);
-
-typedef struct {
-    gchar *ppIndexName;   /* a string that can be used in the GUI to describe this PP index. */
-    Tour_PPIndex_f index_f; /* The C routine that calculates the PP index value.*/
-    gboolean checkGroups; /* Whether we have to call compute_groups and calculate the index only if this returns false(). */
-    gpointer userData;    /* arbitrary data object that is passed in the call to index_f to parameterize it. */
-} TourPPIndex;
 
 /*-- tour elements --*/
 typedef struct {
@@ -140,20 +131,7 @@ typedef struct {
 
 } tour;
 
-typedef struct {
-  vector_i ngroup, group; /* for class indices */
-  gint numgroups; /* previously called groups in class code */
-  array_d cov, tcov, mean; /* for lda, holes, cm */
-  vector_d ovmean; /* for lda, holes, cm */
-  vector_i nright, index; /* for gini, entropy */
-  vector_d x; /* for gini, entropy */
-} pp_param;
 
-typedef struct
-{ gdouble temp_start, temp_end, cooling, heating, temp, index_best;
-  gint restart, maxproj, success;
-  array_d proj_best, data, pdata;
-} optimize0_param; 
 
 /*
  * display options

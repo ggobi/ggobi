@@ -26,8 +26,9 @@
 #include "vars.h"
 #include "externs.h"
 
-#include "tour_pp.h"
+#include "tour_pp_ui.h"
 #include "tour1d_pp.h"
+#include "projection-indices.h"
 
 /* */
 

@@ -21,6 +21,7 @@
 
 typedef struct _displayd displayd;
 
+
 #define GGOBI_TYPE_SPLOT     (ggobi_splot_get_type ())
 #define GGOBI_SPLOT(obj)	 (G_TYPE_CHECK_INSTANCE_CAST ((obj), GGOBI_TYPE_SPLOT, splotd))
 #define GGOBI_SPLOT_CLASS(klass)	 (G_TYPE_CHECK_CLASS_CAST ((klass), GGOBI_TYPE_SPLOT, GGobiSPlotClass))

@@ -1,5 +1,7 @@
-/* tour1d_pp.h */
-/* Copyright (C) 2001 Dianne Cook and Sigbert Klinke and Eun-Kyung Lee
+#ifndef TOUR_PP_H
+#define TOUR_PP_H
+
+/* Copyright (C) 2001 Dianne Cook and Sigbert Klinke
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
@@ -19,7 +21,9 @@ The authors can be contacted at the following email addresses:
     dicook@iastate.edu    sigbert@wiwi.hu-berlin.de
 */
 
-#include "projection-indices.h"
+#include "ggobi-stage.h"
+#include "session.h"
 
-gdouble t1d_calc_indx(array_d, Tour_PPIndex_f fun, void *param);
-gboolean t1d_switch_index(gint, gint, displayd *, GGobiSession *);
+void       reset_pp(GGobiStage *, GGobiSession *);
+
+#endif 

@@ -74,8 +74,6 @@ GGobiSession*    ValidateGGobiRef (GGobiSession *gg, gboolean fatal);
 xmlNodePtr XML_addVariable(xmlNodePtr node, gint j, GGobiStage *d);
 #endif
 void       addvar_propagate (gint ncols_prev, gint ncols_added, GGobiStage *);
-gint       alloc_optimize0_p (optimize0_param *op, gint nrows, gint ncols, gint ndim);
-gint       alloc_pp (pp_param *pp, gint nrows, gint ncols, gint ndim);
 
 void       ash_baseline_set (icoords *, splotd *sp);
 void       assign_points_to_bins (GGobiStage *, splotd *, GGobiSession *);
@@ -217,7 +215,6 @@ void       filename_get_r (GGobiSession *);
 void       filename_get_w (GtkWidget *, GGobiSession *);
 gint       find_nearest_edge (splotd *sp, displayd *display, GGobiSession *gg);
 gint       find_nearest_point (icoords *, splotd *, GGobiStage *, GGobiSession *);
-gint       free_optimize0_p (optimize0_param *op);
 gint       free_pp (pp_param *pp);
 gint       getPreviousDisplays(xmlNodePtr node, GGobiDescription *desc);
 GtkWidget* get_tree_view_from_notebook (GtkWidget *);
@@ -295,11 +292,9 @@ void       quick_message (const gchar * const, gboolean);
 void       quit_ggobi(GGobiSession *gg);
 void       range_unset (GGobiSession *gg);
 gboolean   reached_target(gdouble, gdouble, gint, gdouble *, gdouble *);
-gint       realloc_optimize0_p(optimize0_param *, gint, vector_i);
 void       recenter_data (gint, GGobiStage *);
 gboolean   record_add (eeMode, gint a, gint b, gchar *lbl, gchar *id, gchar **vals, GGobiStage * d, GGobiStage * e, GGobiSession *gg);
 void       reinit_transient_brushing (displayd *, GGobiSession *);
-void       reset_pp(GGobiStage *, GGobiSession *);
 void       rotation_event_handlers_toggle (splotd *, gboolean);
 void       ruler_ranges_set (gboolean force, displayd *, splotd *, GGobiSession *);
 void       scale_event_handlers_toggle (splotd *, gboolean);

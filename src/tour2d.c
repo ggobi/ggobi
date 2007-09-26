@@ -26,8 +26,10 @@
 #include "vars.h"
 #include "externs.h"
 
-#include "tour_pp.h"
+#include "tour_pp_ui.h"
 #include "tour2d_pp.h"
+#include "projection-indices.h"
+
 
 #define T2DON true
 #define T2DOFF false

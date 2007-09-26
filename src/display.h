@@ -21,6 +21,8 @@
 #include "cpanel.h"
 #include "splot.h"
 #include "ggobi-data.h"
+#include "projection-optimisation.h"
+#include "projection-indices.h"
 
 #include "session.h"
 
@@ -165,7 +167,6 @@ struct _displayd {
  struct _GGobiSession *ggobi;
 
 };  /* displayd; */
-
 
 
 

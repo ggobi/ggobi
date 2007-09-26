@@ -244,7 +244,7 @@ ggobi_display_get_type (void)
       NULL, NULL,
       (GClassInitFunc) ggobi_display_class_init,
       NULL, NULL,
-      sizeof (struct _displayd), 0,
+      sizeof (displayd), 0,
       (GInstanceInitFunc) display_init,
       NULL
     };

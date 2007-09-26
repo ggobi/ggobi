@@ -17,6 +17,8 @@
 #include <gtk/gtk.h>
 #include "vars.h"
 #include "externs.h"
+#include "tour_pp_ui.h"
+#include "projection-indices.h"
 
 #define WIDTH   200
 #define HEIGHT  100

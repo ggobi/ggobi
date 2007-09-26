@@ -1,4 +1,4 @@
-/* tour1d_pp.h */
+/* tour_pp.c */
 /* Copyright (C) 2001 Dianne Cook and Sigbert Klinke and Eun-Kyung Lee
 
 This library is free software; you can redistribute it and/or
@@ -19,7 +19,36 @@ The authors can be contacted at the following email addresses:
     dicook@iastate.edu    sigbert@wiwi.hu-berlin.de
 */
 
-#include "projection-indices.h"
+#include <gtk/gtk.h>
+#include "tour_pp_ui.h"
+#include "display.h"
 
-gdouble t1d_calc_indx(array_d, Tour_PPIndex_f fun, void *param);
-gboolean t1d_switch_index(gint, gint, displayd *, GGobiSession *);
+/* reset pp variables */
+void reset_pp(GGobiStage *d, GGobiSession *gg)
+{
+  displayd *dsp;
+  GList *l;
+  for (l=gg->displays; l; l=l->next) {
+    dsp = (displayd *) l->data;
+    if (dsp->t1d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t1d_window)) {
+      free_optimize0_p(&dsp->t1d_pp_op);
+      alloc_optimize0_p(&dsp->t1d_pp_op, d->n_rows, dsp->t1d.nactive, 1);
+      t1d_pp_reinit(dsp, gg);
+    }
+    if (dsp->t2d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t2d_window)) {
+      free_optimize0_p(&dsp->t2d_pp_op);
+      alloc_optimize0_p(&dsp->t2d_pp_op, d->n_rows, dsp->t2d.nactive, 
+        2);
+      t2d_pp_reinit(dsp, gg);
+    }
+  }
+}
+
+
+
+
+
+
+
+
+

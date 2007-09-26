@@ -17,6 +17,7 @@
 #include <gtk/gtk.h>
 #include "vars.h"
 #include "externs.h"
+#include "projection-indices.h"
 
 #define WIDTH   200
 #define HEIGHT  100
@@ -138,7 +139,7 @@ sphere_cb (GtkWidget  *w, GGobiSession *gg) {
 }
 */
 
-#include "tour_pp.h"
+#include "tour_pp_ui.h"
 
 static gchar *t2d_pp_func_lbl[] = {"Holes","Central Mass","LDA","Gini-C","Entropy-C"};
 

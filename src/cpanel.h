@@ -19,7 +19,7 @@
 
 #include <gtk/gtk.h>
 #include "defines.h"  /*-- and defines includes cpanel.h?  weird --*/
-
+#include "projection-indices.h"
 
 typedef struct _Tour2DCPanel {
    gboolean paused;
