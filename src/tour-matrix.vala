@@ -113,11 +113,20 @@ public class GGobi.TourMatrix : PipelineMatrix {
     return mat;
   }
   
-  public void svd(out TourMatrix U, out double[] d, out TourMatrix V) {
-    double[] tmpd = new double[U.n_rows];
+  // Wraps up svd method from svd.c so it doesn't modify anything it shouldn't
+  // and returns everything in a nice little struct.
+  public Svd svd() {
+    TourMatrix U = copy();
+    TourMatrix Vt = new TourMatrix(n_rows, n_cols);
+    double[] d = new double[n_rows];
     
-    LinearAlgebra.svd(matrix.vals, (int) n_rows, (int) n_cols, out tmpd, out V.matrix.vals);
+    LinearAlgebra.svd(out U.matrix.vals, (int) n_rows, (int) n_cols, out d, out Vt.matrix.vals);
     
+    Svd svd;
+    svd.U = U;
+    svd.V = Vt.transpose();
+    svd.d = d;
+    return svd;
   }
   
   public bool equivalent(TourMatrix other) {
@@ -128,15 +137,54 @@ public class GGobi.TourMatrix : PipelineMatrix {
   }
   
   public static TourMatrix multiply_uv(TourMatrix u, TourMatrix v) {
-    TourMatrix mat = new TourMatrix(u.n_rows, u.n_cols);
+    TourMatrix mat = new TourMatrix(v.n_cols, u.n_rows);
+    
+    if (u.n_cols != v.n_rows) return null;
+
+    for (uint j = 0; j < u.n_rows; j++) {
+      for (uint k = 0; k < v.n_cols; k++) {
+        double value = 0;
+        for (uint i = 0; i< u.n_cols; i++) {
+          value += u.get(i, j) * v.get(k, i);
+        }
+        mat.set(k, j, value);
+      }
+    }
+
     return mat;
   } 
   public static TourMatrix multiply_utv(TourMatrix u, TourMatrix v) {
     TourMatrix mat = new TourMatrix(u.n_rows, u.n_cols);
+    
+    if (u.n_rows != v.n_rows) return null;
+
+    for (uint j = 0; j < u.n_cols; j++) {
+      for (uint k = 0; k < v.n_cols; k++) {
+        double value = 0;
+        for (uint i = 0; i< u.n_rows ; i++) {
+          value += u.get(j, i) * v.get(k, i);
+        }
+        mat.set(k, j, value);
+      }
+    }
+    
     return mat;
   } 
   public static TourMatrix multiply_uvt(TourMatrix u, TourMatrix v) {
     TourMatrix mat = new TourMatrix(u.n_rows, u.n_cols);
+    
+    if (u.n_cols != v.n_cols) return null;
+
+    for (uint j = 0; j < u.n_rows; j++) {
+      for (uint k = 0; k < v.n_rows; k++) {
+        double value = 0;
+        for (uint i = 0; i< u.n_cols ; i++) {
+          value += u.get(i, j) * v.get(i, k);
+        }
+        mat.set(k, j, value);
+      }
+    }
+    
     return mat;
   } 
   

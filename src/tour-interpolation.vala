@@ -55,10 +55,12 @@ class GGobi.TourInterpolation : Object {
     // if (Fa.equivalent(Fz)) return();
 
     // Compute the SVD: Fa'Fz = Va lambda Vz' --------------------------------
-
     TourMatrix FatFz = Matrix.multiply_utv(Fa, Fz);
-    TourMatrix Va, Vz;
-    FatFz.svd(out Va, out lambda, out Vz);
+    Svd svd = FatFz.svd();
+
+    double[] lambda = svd.d;
+    TourMatrix Va = svd.U;
+    TourMatrix Vz = svd.V;
 
     /* Check span of <Fa,Fz>. If dimension of the intersection is equal to
     dimension of proj, dI=ndim and we should stop here, setting Ft to Fa;
