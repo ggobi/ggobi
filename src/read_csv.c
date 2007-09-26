@@ -407,7 +407,7 @@ load_row_values (GList * rows, GGobiData * d, gboolean row_labels)
       Row *row = (Row *) cur->data;
       gchar *str = row->src->str + row->entry[j + offset].ofs;
       //fprintf(stderr, "string: %s\n", str);
-      if (is_numeric (str, row->entry[j + offset].len))
+      if (is_numeric (str, row->entry[j + offset].len) && !vt->nlevels)
         ggobi_data_set_raw_value(d, i, j, (gfloat) g_strtod (str, NULL));
       else {
         if (str[0] == '\0' || !g_ascii_strcasecmp (str, "na")

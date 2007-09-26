@@ -54,7 +54,6 @@ splot_draw_tour_axes (splotd * sp, GdkDrawable * drawable, ggobid * gg)
     return;
 
 #ifdef ENABLE_CAIRO
-  //cr = create_cairo_glitz(drawable);
   cr = gdk_cairo_create (drawable);
 #endif
 

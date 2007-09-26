@@ -12,15 +12,6 @@
 %h{
   #include "ggobi-renderer.h"
   #include <cairo/cairo.h>
-  #if CAIRO_HAS_GLITZ_SURFACE
-  #include <cairo/cairo-glitz.h>
-  #ifndef WIN32
-  #include <glitz-glx.h>
-  #include <gdk/gdkx.h>
-  #else
-  #include <glitz-wgl.h>
-  #endif
-  #endif
 %}
 
 class GGobi:Renderer:Cairo from GGobi:Renderer
@@ -57,13 +48,7 @@ class GGobi:Renderer:Cairo from GGobi:Renderer
   private virtual cairo_t *
   create_cairo(self, GdkDrawable *target)
   {
-    cairo_t *cr;
-    cairo_surface_t *surf = self_create_cairo_glitz(target);
-    if (!surf)
-      //surf = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, width, height);
-      cr = gdk_cairo_create(target);
-    else cr = cairo_create(surf);
-    return cr;
+    return gdk_cairo_create(target);
   }
   
   private void
@@ -282,71 +267,6 @@ class GGobi:Renderer:Cairo from GGobi:Renderer
   ref_cairo_surface(GdkDrawable *self)
   {
     return cairo_surface_reference(cairo_get_target(SELF(self)->_priv->cairo));
-  }
-  
-  /* attempt to create a glitz cairo surface, returning NULL on failure */
-  private cairo_surface_t *
-  create_cairo_glitz(GdkDrawable * drawable)
-  {
-    #if CAIRO_HAS_GLITZ_SURFACE
-    gulong mask;
-    gint width, height;
-    cairo_surface_t *cairo_s;
-    glitz_drawable_t *glitz_d = NULL;
-    glitz_surface_t *glitz_s;
-    glitz_format_t *format;
-    glitz_drawable_format_t *d_format, templ = { 0, };
-    
-    gdk_drawable_get_size(drawable, &width, &height);
-    
-    /* ask glitz for a 32 bit rgb drawable, 1 sample, single-buffer */
-    templ.color.red_size = 8;
-    templ.color.green_size = 8;
-    templ.color.blue_size = 8;
-    templ.color.alpha_size = 8;
-    templ.color.fourcc = GLITZ_FOURCC_RGB;
-    templ.samples = 1;
-    
-    mask = GLITZ_FORMAT_SAMPLES_MASK | GLITZ_FORMAT_FOURCC_MASK |
-      GLITZ_FORMAT_RED_SIZE_MASK | GLITZ_FORMAT_GREEN_SIZE_MASK |
-      GLITZ_FORMAT_BLUE_SIZE_MASK | GLITZ_FORMAT_ALPHA_SIZE_MASK |
-      GLITZ_FORMAT_DOUBLEBUFFER_MASK;
-    
-    #ifndef WIN32
-    {
-      GdkDisplay *display = gdk_drawable_get_display(drawable);
-      Display *dpy = gdk_x11_display_get_xdisplay(display);
-      /* First, get drawable format for our pbuffer */
-      d_format = glitz_glx_find_pbuffer_format(dpy, DefaultScreen (dpy), 
-        mask, &templ, 0);
-      if (!d_format) return NULL;
-      /* now create the pbuffer */
-      glitz_d = glitz_glx_create_pbuffer_drawable (dpy, DefaultScreen (dpy),
-        d_format, width, height);
-    }
-    #else
-    d_format = glitz_wgl_find_pbuffer_format (mask, &templ, 0);
-    if (!d_format) return NULL;
-    glitz_d = glitz_wgl_create_pbuffer_drawable (d_format, width, height);
-    #endif
-  
-    /* if we have a glitz drawable, get a glitz format */
-    format = glitz_find_standard_format (glitz_d, GLITZ_STANDARD_ARGB32);
-    /* use the glitz format to create a glitz surface */
-    glitz_s = glitz_surface_create (glitz_d, format, width, height, 0, NULL);
-    /* attach the glitz surface to the glitz drawable */
-    glitz_surface_attach(glitz_s, glitz_d, GLITZ_DRAWABLE_BUFFER_FRONT_COLOR);
-    /* create our cairo_surface */
-    cairo_s = cairo_glitz_surface_create(glitz_s);
-    
-    /* cleanup */
-    glitz_drawable_destroy(glitz_d);
-    glitz_surface_destroy(glitz_s);
-    
-    return (cairo_s);
-    #else
-    return NULL;
-    #endif
   }
 }
 %a{

@@ -1,10 +1,10 @@
 dnl This is the configuration script for ggobi
 
 # Configure the version information here
-m4_define([ggobi_release_date], ["August 20 2007"])
+m4_define([ggobi_release_date], ["September 18 2007"])
 m4_define([ggobi_major_version], [2])
 m4_define([ggobi_minor_version], [1])
-m4_define([ggobi_micro_version], [6])
+m4_define([ggobi_micro_version], [7])
 m4_define([ggobi_version],
           [ggobi_major_version.ggobi_minor_version.ggobi_micro_version])
 
@@ -208,17 +208,6 @@ case "$host" in
 esac
 echo "${os_win32}"
 AM_CONDITIONAL(OS_WIN32, test "$os_win32" = "yes")
-
-# Find glitz
-
-if test "$os_win32" != "yes" ; then
-  PKG_CHECK_MODULES(GLITZ, [glitz-glx >= 0.5.6], HAVE_GLITZ=1, HAVE_GLITZ=0)
-else
-  PKG_CHECK_MODULES(GLITZ, [glitz-wgl >= 0.5.6], HAVE_GLITZ=1, HAVE_GLITZ=0)
-fi
-
-AC_SUBST(GLITZ_CFLAGS)
-AC_SUBST(GLITZ_LIBS)
 
  dnl Process the different .in files, substituting the values computed here in the configuration
  dnl script for the corresponding @variable@ in these files.
