@@ -1,7 +1,7 @@
 dnl This is the configuration script for ggobi
 
 # Configure the version information here
-m4_define([ggobi_release_date], ["September 18 2007"])
+m4_define([ggobi_release_date], ["September 28 2007"])
 m4_define([ggobi_major_version], [2])
 m4_define([ggobi_minor_version], [1])
 m4_define([ggobi_micro_version], [7])
