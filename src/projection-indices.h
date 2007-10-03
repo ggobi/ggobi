@@ -32,6 +32,9 @@ gdouble tour_pp_solve(gdouble *a, gdouble *b, gint n, gint *Pivot);
 void inverse(gdouble *a, gint n);
 
 /* Arbitrary dimensional indices */
+void center (array_d *); 
+gint pca (array_d *, void *, gdouble *,  gpointer userData);
+
 gint holes_raw(array_d *pdata, void *param, gdouble *val, gpointer unused);
 gint central_mass_raw(array_d *pdata, void *param, gdouble *val, gpointer unused);
 void zero (gdouble *ptr, gint length);
