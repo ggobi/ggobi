@@ -243,27 +243,6 @@ void t1d_pp_reinit(displayd *dsp, GGobiSession *gg)
   g_free (label);
 }
 
-/********************************************************************
-
-                             INDEX CALCULATION
-
-The index function has to be defined as
-
-     gint index (array_d *pdata, void *param, gdouble *val)
-
-with   
-
-Input:  pdata   projected data
-        param   additional parameters for the index 
-                (will not be touched by the optimization routine)
-
-Output: val     the index-value
-        
-This function should simply calculate the index value for a provided
-projection.
-
-*********************************************************************/
-
 gdouble t1d_calc_indx (array_d pd, 
                 Tour_PPIndex_f index,
                 void *param)
