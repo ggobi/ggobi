@@ -2,42 +2,6 @@
 #include <math.h>
 #include <string.h>
 
-/********************************************************************
-
-Index          : PCA-d
-Transformation : -
-Purpose        : computes the trace of the cov matrix of pdata
-Note           : Modifies pdata !
-
-*********************************************************************/
-
-void center (array_d *data)
-{ gint i, j;
-  gdouble mean;
-  for (i=0; i<data->ncols; i++)
-  { mean = 0.0;
-    for (j=0; j<data->nrows; j++)
-      mean += data->vals[j][i];
-    mean = mean/data->nrows;
-    for (j=0; j<data->nrows; j++)
-      data->vals[j][i] -= mean;
-  }
-}
-
-gint pca (array_d *pdata, void *param, gdouble *val, gpointer userData)
-{ gint i, j;
-
-  center (pdata);
-
-  *val = 0.0;
-  for (i=0; i<pdata->ncols; i++)
-  { for (j=0; j<pdata->nrows; j++)
-      *val += pdata->vals[j][i]*pdata->vals[j][i];
-  }
-  *val /= (pdata->nrows-1);
-
-  return (0);
-}
 
 /*****************************************************/
 /*               Utility Routines                    */
@@ -660,7 +624,7 @@ gint cartgini (array_d *pdata, void *param, gdouble *val, gpointer unused)
   sort_group(pdata,pp->index.els,left,right);
 
 /* data relocation and make index */ 
-  zero(pp->x.els,n);
+  arrayd_zero(pp->x);
 
 /* Calculate Gini index in each coordinate 
              and find minimum              */
@@ -723,7 +687,7 @@ gint cartentropy (array_d *pdata, void *param, gdouble *val, gpointer unused)
   sort_group(pdata,pp->index.els,left,right);
 
 /* data relocation and make index */ 
-  zero(pp->x.els,n);
+  arrayd_zero(pp->x);
 
 /* Calculate index in each coordinate and find minimum  */
   for(l=0; l<p; l++)

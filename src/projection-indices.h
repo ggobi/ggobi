@@ -26,9 +26,6 @@ typedef struct {
 gint       alloc_pp (pp_param *pp, gint nrows, gint ncols, gint ndim);
 
 
-void center (array_d *);
-gint pca (array_d *, void *, gdouble *,  gpointer userData);
-
 /* Utility routines */
 gdouble ludcmp(gdouble *a, gint n, gint *Pivot); 
 gdouble tour_pp_solve(gdouble *a, gdouble *b, gint n, gint *Pivot); 
