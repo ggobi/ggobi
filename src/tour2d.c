@@ -278,8 +278,6 @@ tour2d_all_vars (displayd *dsp)
       free_optimize0_p(&dsp->t2d_pp_op);
       alloc_optimize0_p(&dsp->t2d_pp_op, d->n_rows, dsp->t2d.nactive, 
         2);
-      free_pp(&dsp->t2d_pp_param);
-      alloc_pp(&dsp->t2d_pp_param, d->n_rows, dsp->t2d.nactive, 2);
       t2d_pp_reinit(dsp, gg);
     }  
   //}
@@ -456,8 +454,6 @@ tour2d_active_var_set (gint jvar, GGobiStage *d, displayd *dsp, GGobiSession *gg
   if (dsp->t2d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t2d_window)) {
     free_optimize0_p(&dsp->t2d_pp_op);
     alloc_optimize0_p(&dsp->t2d_pp_op, d->n_rows, dsp->t2d.nactive, 2);
-    free_pp(&dsp->t2d_pp_param);
-    alloc_pp(&dsp->t2d_pp_param, d->n_rows, dsp->t2d.nactive, 2);
     t2d_pp_reinit(dsp, gg);
   }
 }

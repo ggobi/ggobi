@@ -43,10 +43,6 @@ The authors can be contacted at the following email addresses:
 #define CENTRAL_MASS   1
 #define PCA            2
 #define LDA            3
-#define CGINI          4
-#define CENTROPY       5
-#define CART_VAR       6
-#define SUBD           7
 
 
 void t1d_pptemp_set(gdouble slidepos, displayd *dsp, GGobiSession *gg) {
@@ -243,7 +239,6 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
 {
   GGobiStage *d = dsp->d;
   gint kout, nrows = d->n_rows;
-  gdouble *gdata;
   gint i, j;
 
   if (d->n_rows == 1)  /* can't do pp on no data! */
@@ -269,81 +264,39 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
   }
 
   GGOBI_STAGE_ATTR_INIT(d, cluster);
-  gdata  = g_malloc (nrows*sizeof(gdouble));
-  for (i=0; i<nrows; i++)
-  { 
-    gdata[i] = GGOBI_STAGE_GET_ATTR_CLUSTER(d, i);
+  vector_d groups;
+  vectord_alloc_zero(&groups, nrows);
+  for (i=0; i<nrows; i++) { 
+    groups.els[i] = GGOBI_STAGE_GET_ATTR_CLUSTER(d, i);
   }
 
-  switch (indxtype)
-  { 
+  switch (indxtype) { 
     case HOLES: 
-      dsp->t1d.ppval = ppi_holes(
-        &dsp->t1d_pp_op.pdata,  &dsp->t1d_pp_param
-      );
+      dsp->t1d.ppval = ppi_holes(dsp->t1d_pp_op.pdata, groups);
       if (basismeth == 1)
-        kout = optimize0 (&dsp->t1d_pp_op, ppi_holes, &dsp->t1d_pp_param);
+        kout = optimize0 (&dsp->t1d_pp_op, ppi_holes, groups);
       break;
     case CENTRAL_MASS: 
-      dsp->t1d.ppval = ppi_central_mass(
-        &dsp->t1d_pp_op.pdata,  &dsp->t1d_pp_param
-      );
+      dsp->t1d.ppval = ppi_central_mass(dsp->t1d_pp_op.pdata, groups);
       if (basismeth == 1)
-        kout = optimize0 (&dsp->t1d_pp_op, ppi_central_mass, 
-          &dsp->t1d_pp_param);
+        kout = optimize0 (&dsp->t1d_pp_op, ppi_central_mass, groups);
       break;
     case PCA: 
-      dsp->t1d.ppval = ppi_pca(
-        &dsp->t1d_pp_op.pdata,  &dsp->t1d_pp_param
-      );
+      dsp->t1d.ppval = ppi_pca(dsp->t1d_pp_op.pdata, groups);
       if (basismeth == 1)
-        kout = optimize0 (&dsp->t1d_pp_op, (PPIndex) ppi_pca, NULL);
+        kout = optimize0 (&dsp->t1d_pp_op, ppi_pca, groups);
       break;
     case LDA:
-      if (!compute_groups (dsp->t1d_pp_param.group, dsp->t1d_pp_param.ngroup, 
-          &dsp->t1d_pp_param.numgroups, nrows, gdata)) {
-        dsp->t1d.ppval = ppi_lda(
-          &dsp->t1d_pp_op.pdata,  &dsp->t1d_pp_param
-        );
-        if (basismeth == 1)
-          kout = optimize0 (&dsp->t1d_pp_op, ppi_lda, &dsp->t1d_pp_param);
-      }
-      break;
-    case CGINI: 
-      if (!compute_groups (dsp->t1d_pp_param.group, dsp->t1d_pp_param.ngroup, 
-          &dsp->t1d_pp_param.numgroups, nrows, gdata)) {
-        dsp->t1d.ppval =  ppi_gini(
-          &dsp->t1d_pp_op.pdata,  &dsp->t1d_pp_param
-        );
-        if (basismeth == 1)
-          kout = optimize0 (&dsp->t1d_pp_op, ppi_gini, &dsp->t1d_pp_param);
-      }
-      break;
-   case CENTROPY: 
-      if (!compute_groups (dsp->t1d_pp_param.group, dsp->t1d_pp_param.ngroup, 
-          &dsp->t1d_pp_param.numgroups, nrows, gdata)) {
-        dsp->t1d.ppval =  ppi_entropy(
-          &dsp->t1d_pp_op.pdata,  &dsp->t1d_pp_param
-        );
+      dsp->t1d.ppval = ppi_lda(dsp->t1d_pp_op.pdata, groups);
       if (basismeth == 1)
-        kout = optimize0 (&dsp->t1d_pp_op, ppi_entropy, &dsp->t1d_pp_param);
-      }
-      break;
-
-    default: 
-      g_free (gdata);
-      return(true);
+        kout = optimize0 (&dsp->t1d_pp_op, ppi_lda, groups);
       break;
   }
-  g_free (gdata);
-  return(false);
+  vectord_free(&groups);
+  return(true);
 }
 
-#undef SUBD           
 #undef LDA            
-#undef CGINI      
-#undef CENTROPY   
-#undef CART_VAR       
 #undef PCA            
 #undef HOLES
 #undef CENTRAL_MASS

@@ -43,10 +43,6 @@ static void action_close_cb (GtkAction *action, displayd *dsp) {
   t1d_optimz(0, &dsp->t1d.get_new_target, 
     &dsp->t1d.target_selection_method, dsp);
 
-  /*  free_optimize0_p(&dsp->t1d_pp_op); * should this go here? *
-  free_pp(&dsp->t1d_pp_param); seems not, causes a crash because window
-                               just gets hidden, so shouldn't
-                               free the arrays. */
 }
 /*-- called when destroyed from the window manager --*/
 static void
@@ -56,7 +52,6 @@ close_wmgr_cb (GtkWidget *w, GdkEventButton *event, displayd *dsp) {
     &dsp->t1d.target_selection_method, dsp);
 
   free_optimize0_p(&dsp->t1d_pp_op);
-  free_pp(&dsp->t1d_pp_param);
   gtk_widget_destroy (dsp->t1d_window);
   dsp->t1d_window = NULL;
 }
@@ -489,7 +484,6 @@ tour1dpp_window_open (GGobiSession *gg) {
   }
 
   alloc_optimize0_p(&dsp->t1d_pp_op, d->n_rows, dsp->t1d.nactive, 1);
-  alloc_pp(&dsp->t1d_pp_param, d->n_rows, dsp->t1d.nactive, 1);
 
   gtk_widget_show_all (dsp->t1d_window);
 }

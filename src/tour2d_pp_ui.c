@@ -34,11 +34,6 @@ static void action_close_cb (GtkAction *action, displayd *dsp) {
   gtk_widget_hide (dsp->t2d_window);
   t1d_optimz(0, &dsp->t2d.get_new_target, 
     &dsp->t2d.target_selection_method, dsp);
-
-  /*  free_optimize0_p(&dsp->t2d_pp_op); * should this go here? *
-  free_pp(&dsp->t2d_pp_param); seems not, causes a crash because window
-                               just gets hidden, so shouldn't
-                               free the arrays. */
 }
 
 
@@ -51,17 +46,9 @@ close_wmgr_cb (GtkWidget *w, GdkEventButton *event, displayd *dsp)
     &dsp->t2d.target_selection_method, dsp);
 
   free_optimize0_p(&dsp->t2d_pp_op);
-  free_pp(&dsp->t2d_pp_param);
   gtk_widget_destroy (dsp->t2d_window);
   dsp->t2d_window = NULL;
 }
-
-/*
-static void
-hide_cb (GtkWidget *w) {
-  gtk_widget_hide (w);
-}
-*/
 
 static void
 action_show_controls_cb(GtkToggleAction *action, displayd *dsp) {
@@ -70,45 +57,6 @@ action_show_controls_cb(GtkToggleAction *action, displayd *dsp) {
       else
         gtk_widget_hide (dsp->t1d_control_frame);
 }
-
-/*static void
-line_options_cb(gpointer data, guint action, GtkCheckMenuItem *w) {
-
-  switch (action) {
-    case 0:
-    case 1:
-    case 2:
-    default:
-      fprintf(stderr, "Unhandled switch-case in line_options_cb\n");
-  }
-  }*/
-
-/*static void
-bitmap_size_cb(gpointer data, guint action, GtkCheckMenuItem *w) {
-
-  switch (action) {
-    case 0:
-    case 1:
-    case 2:
-    default:
-      fprintf(stderr, "Unhandled switch-case in bitmap_size_cb\n");
-  }
-  }*/
-
-/*static void
-replot_freq_cb(gpointer data, guint action, GtkCheckMenuItem *w) {
-
-  switch (action) {
-    case 1:
-    case 2:
-    case 4:
-    case 8:
-    case 16:
-      break;
-    default:
-      fprintf(stderr, "Unhandled switch-case in replot_freq_cb\n");
-  }
-  }*/
 
 static void
 t2d_optimz_cb (GtkToggleButton  *w, displayd *dsp) 
@@ -131,24 +79,16 @@ static void t2d_ppcool_set_cb (GtkAdjustment *adj, displayd *dsp) {
   t2d_ppcool_set(adj->value, dsp, dsp->d->gg);
 }
 
-/*
-static void
-sphere_cb (GtkWidget  *w, GGobiSession *gg) {
-
-  sphere_panel_open(gg);
-}
-*/
 
 #include "tour_pp_ui.h"
 
-static gchar *t2d_pp_func_lbl[] = {"Holes","Central Mass","LDA","Gini-C","Entropy-C"};
+static gchar *t2d_pp_func_lbl[] = {"Holes","Central Mass","LDA","PCA"};
 
 TourPPIndex StandardPPIndices[] = {
-    {"Holes", &ppi_holes, false},
-    {"Central Mass", &ppi_central_mass, false},
-    {"LDA", &ppi_lda, true},
-    {"Gini-C", &ppi_gini, true},
-    {"Entropy-C", &ppi_entropy, true},
+    {"Holes", &ppi_holes},
+    {"Central Mass", &ppi_central_mass},
+    {"LDA", &ppi_lda},
+    {"PCA", &ppi_pca}
 };
 
 
@@ -551,7 +491,6 @@ tour2dpp_window_open (GGobiSession *gg) {
     }
 
     alloc_optimize0_p(&dsp->t2d_pp_op, d->n_rows, dsp->t2d.nactive, 2);
-    alloc_pp(&dsp->t2d_pp_param, d->n_rows, dsp->t2d.nactive, 2);
 
     gtk_widget_show_all (dsp->t2d_window);
   }

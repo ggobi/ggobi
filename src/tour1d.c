@@ -316,8 +316,6 @@ tour1d_all_vars (displayd *dsp)
       free_optimize0_p(&dsp->t1d_pp_op);
       alloc_optimize0_p(&dsp->t1d_pp_op, d->n_rows, dsp->t1d.nactive, 
         1);
-      free_pp(&dsp->t1d_pp_param);
-      alloc_pp(&dsp->t1d_pp_param, d->n_rows, dsp->t1d.nactive, 1);
       t1d_pp_reinit(dsp, gg);
     }  
   //}
@@ -476,8 +474,6 @@ tour1d_active_var_set (gint jvar, GGobiStage *d, displayd *dsp, GGobiSession *gg
     free_optimize0_p(&dsp->t1d_pp_op);
     alloc_optimize0_p(&dsp->t1d_pp_op, d->n_rows, dsp->t1d.nactive, 
       1);
-    free_pp(&dsp->t1d_pp_param);
-    alloc_pp(&dsp->t1d_pp_param, d->n_rows, dsp->t1d.nactive, 1);
     t1d_pp_reinit(dsp, gg);
   }  
   dsp->t1d.get_new_target = true;
@@ -524,8 +520,6 @@ tour1d_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse, GGobiStage *d, 
           free_optimize0_p(&dsp->t1d_pp_op);
           alloc_optimize0_p(&dsp->t1d_pp_op, d->n_rows,
             dsp->t1d.nactive, 1);
-          free_pp(&dsp->t1d_pp_param);
-          alloc_pp(&dsp->t1d_pp_param, d->n_rows, dsp->t1d.nactive, 1);
           t1d_pp_reinit(dsp, gg);
         }
       }
@@ -544,8 +538,6 @@ tour1d_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse, GGobiStage *d, 
         free_optimize0_p(&dsp->t1d_pp_op);
         alloc_optimize0_p(&dsp->t1d_pp_op, d->n_rows, dsp->t1d.nactive, 
           1);
-        free_pp(&dsp->t1d_pp_param);
-        alloc_pp(&dsp->t1d_pp_param, d->n_rows, dsp->t1d.nactive, 1);
         t1d_pp_reinit(dsp, gg);
       }
     }

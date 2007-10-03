@@ -13,8 +13,9 @@ typedef struct {
 
 gint alloc_optimize0_p (optimize0_param *op, gint nrows, gint ncols, gint ndim);
 gint free_optimize0_p (optimize0_param *op);
-gint optimize0 (optimize0_param *op, PPIndex fun, void *param);
 gint realloc_optimize0_p (optimize0_param *, gint, vector_i);
+
+gint optimize0 (optimize0_param *op, PPIndex fun, vector_d groups);
 
 gboolean iszero (array_d *data);
 void normal_fill (array_d *data, gdouble delta, array_d *base);

@@ -1,24 +1,45 @@
+/********************************************************************
+             Arbitrary dimensional projection pursuit indices
+*********************************************************************/
+
 #include "defines.h"
 #include "projection-indices.h"
 #include <math.h>
 #include <string.h>
 
-
-void zero (gdouble *ptr, gint length)
-{ 
-  gint i;
-
-  for (i=0; i<length; i++)
-    ptr[i] = 0.0;
-}
-
-void zero_int(gint *mem, int size)
-{
-  gint i;
-  for(i=0; i<size; i++)
-  mem[i] = 0;
-}
+// Compute group counts 
+guint compute_groups(vector_i group, vector_i ngroup, vector_d groups) { 
+  gint i, j;
+  guint numgroups = 0;
+  guint nrows = groups.nels;
   
+  gint* groupval = g_new0(gint, nrows);
+
+  for (i=0; i < nrows; i++) {
+    for (j=0; j < numgroups; j++) { 
+      if (groupval[j] == group.els[i]) { 
+        ngroup.els[j]++;
+        break;
+      }
+    }
+    if (j == numgroups ) { 
+      groupval[j]  = group.els[i];
+      ngroup.els[j] = 1;
+      numgroups++;
+    }
+  }
+
+  for (i=0; i < nrows; i++) { 
+    for (j=0; j < numgroups; j++) { 
+      if (groupval[j] == group.els[i])
+        group.els[i] = j;
+    }
+  }
+
+  g_free(groupval);
+
+  return numgroups;
+}
 
 /*****************************************************/
 /*               Utility Routines                    */
@@ -136,146 +157,122 @@ void inverse(gdouble *a, gint n)
   g_free(b);
 }    
 
+void arrayd_inverse(array_d a) {
+  guint p = a.ncols;
+
+  if (p == 1) {
+    a.vals[0][0] = 1. / MAX(a.vals[0][0], GGOBI_EPSILON);
+    return;
+  }
+  
+  gdouble* temp = (gdouble *) g_new0(gdouble, p * p);
+  
+  // Copy over
+  for (guint i = 0; i<p; i++)
+    for (guint j = 0; j<p; j++)
+      temp[i * p + j] = a.vals[i][j];
+
+  inverse(temp, p);
+
+  // Copy back
+  for (guint i = 0; i<p; i++)
+    for (guint j = 0; j<p; j++)
+      a.vals[i][j] = temp[i*p+j];
+      
+  g_free(temp);
+}
+
+gdouble arrayd_determinant(array_d a) {
+  guint p = a.ncols;
+  
+  if (p == 1) return fabs(a.vals[0][0]);
+
+  gint *pivot = g_new0(gint, p);
+  gdouble* temp = g_new0(gdouble, p * p);
+
+  for (guint i=0; i < p; i++)
+    for (guint j=0; j < p; j++)
+      temp[i*p+j] = a.vals[i][j];
+
+  gdouble det = ludcmp(temp, p, pivot);
+  
+  g_free(pivot);
+  g_free(temp);
+  
+  return det;
+}
 
                               
-/******************************************************************** 
-
-Index          : PCA-d 
-Transformation : - 
-Purpose        : computes the trace of the cov matrix of pdata 
-Note           : Modifies pdata ! 
- 
-*********************************************************************/ 
- 
-void center (array_d *data) { 
+void center (array_d data) { 
   gint i, j; 
   gdouble mean; 
-  for (i=0; i<data->ncols; i++) 
+  for (i=0; i < data.ncols; i++) 
   { mean = 0.0; 
-    for (j=0; j<data->nrows; j++) 
-      mean += data->vals[j][i]; 
-    mean = mean/data->nrows; 
-    for (j=0; j<data->nrows; j++) 
-      data->vals[j][i] -= mean; 
+    for (j=0; j < data.nrows; j++) 
+      mean += data.vals[j][i]; 
+    mean = mean/data.nrows; 
+    for (j=0; j < data.nrows; j++) 
+      data.vals[j][i] -= mean; 
   } 
 } 
- 
-gdouble ppi_pca (array_d *pdata, void *param) { 
- 
-  center (pdata); 
+
+// PCA index
+// Computes traces of covariance matrix  
+gdouble ppi_pca (array_d data, vector_d groups) { 
+  center (data); 
  
   gdouble val = 0.0; 
-  for (guint i = 0; i < pdata->ncols; i++) {
-    for (guint j = 0; j < pdata->nrows; j++) {
-      val += pdata->vals[j][i] * pdata->vals[j][i]; 
+  for (guint i = 0; i < data.ncols; i++) {
+    for (guint j = 0; j < data.nrows; j++) {
+      val += data.vals[j][i] * data.vals[j][i]; 
     }
   } 
-  return val / (pdata->nrows - 1); 
+  return val / (data.nrows - 1); 
 }
-/********************************************************************
-             Arbitrary dimensional pp indices
-*********************************************************************/
-
-gint alloc_pp(pp_param *pp, gint nrows, gint ncols, gint ndim)
-{
-  gint nr = nrows;/* number of cases */
-  gint nc = MAX(ncols,2); /* ncols = number of active vars */
-  gint nd = MAX(ndim,2); /* projection dimension */
-  gint ncolors = 50; /* This is a guess at the max num of colors -
-                        it really shouldn't be hard-coded */
-
-  vectori_alloc_zero(&pp->group, nr);
-  vectori_alloc_zero(&pp->ngroup, nr);
-
-  arrayd_alloc_zero(&pp->cov, nd, nd);
-  arrayd_alloc_zero(&pp->tcov, nd, nd); /* temporary usage in lda */
-  arrayd_alloc_zero(&pp->mean, ncolors, nd); /* means for each group */
-  vectord_alloc_zero(&pp->ovmean, nc); /* mean for each projection */
-
-  vectori_alloc_zero(&pp->index, nr);/* used in gini/entropy */
-  vectori_alloc_zero(&pp->nright, nr);/* used in gini/entropy */
-  vectord_alloc_zero(&pp->x, nr); /* used in gini/entropy */
-
-  return 0;
-}
-
-gint free_pp (pp_param *pp)
-{
-  vectori_free(&pp->group);
-  vectori_free(&pp->ngroup);
-
-  arrayd_free (&pp->cov); 
-  arrayd_free (&pp->tcov); 
-  arrayd_free (&pp->mean); 
-  vectord_free(&pp->ovmean);
-
-  vectori_free(&pp->index);
-  vectori_free(&pp->nright);
-  vectord_free(&pp->x);
-
-  return 0;
-}
-
 
 // Gaussian filter (?) used as basis for hole and central mass indices
-gdouble gaussian_filter(array_d *pdata) { 
+gdouble gaussian_filter(array_d data) { 
   int i, p, n, k,j;
   gdouble tmp,x1,x2;
 
-  p = pdata->ncols; 
-  n = pdata->nrows;
+  p = data.ncols; 
+  n = data.nrows;
   
   // Compute column means
-  vector_d mean;
-  vectord_alloc_zero(&mean, p);
+  vector_d means;
+  vectord_alloc_zero(&means, p);
 
   for(j = 0; j < p; j++) {
-    for(i = 0; i < n; i++) mean.els[j] += pdata->vals[i][j];
-    mean.els[j] /= n;
+    for(i = 0; i < n; i++) means.els[j] += data.vals[i][j];
+    means.els[j] /= n;
   }
 
   // Compute covariance matrix
   array_d cov;
-  arrayd_alloc_zero(&cov, n, p);
+  arrayd_alloc_zero(&cov, p, p);
 
   for (j=0; j<p; j++) { 
     for (k=0; k<=j; k++) { 
       cov.vals[k][j] = 0.0;
       for (i=0; i<n; i++) 
-        cov.vals[k][j] += (((pdata->vals[i][j])-mean.els[j])*
-         ((pdata->vals[i][k])-(mean.els[k])));
+        cov.vals[k][j] += 
+         (data.vals[i][j] - means.els[j]) *
+         (data.vals[i][k] - means.els[k]);
       cov.vals[k][j] /= ((double)(n-1)); 
       if (j != k)
         cov.vals[j][k] = cov.vals[k][j];
       }
   }
 
-  // Standardise variance-covariance matrix (I think)
-  gdouble* cov2 = (gdouble *) g_new0(gdouble, p*p);
-  if (p > 1) {
-    for (i=0; i<p; i++)
-      for (j=0; j<p; j++)
-        cov2[i * p + j] = cov.vals[i][j];
-    inverse(cov2, p);
-    for (i=0; i<p; i++)
-      for (j=0; j<p; j++)
-        cov.vals[i][j] = cov2[i*p+j];
-  } else {
-    if (cov.vals[0][0] > GGOBI_EPSILON) {
-      cov.vals[0][0] = 1./cov.vals[0][0];
-    } else {
-      cov.vals[0][0] = 10000.0;
-    }
-  }
-  g_free(cov2);
+  arrayd_inverse(cov);
 
   gdouble acoefs = 0.0;
   for (i=0; i<n; i++) { 
     tmp = 0.0;  
     for (j=0; j<p; j++) {   
-      x1 = pdata->vals[i][j] - mean.els[j];
+      x1 = data.vals[i][j] - means.els[j];
       for (k=0; k<p; k++) {  
-        x2 = pdata->vals[i][k] - mean.els[k]; 
+        x2 = data.vals[i][k] - means.els[k]; 
         tmp += x1 * x2 * cov.vals[j][k];
       }
     } 
@@ -283,7 +280,7 @@ gdouble gaussian_filter(array_d *pdata) {
   }
 
   arrayd_free(&cov);
-  vectord_free(&mean);
+  vectord_free(&means);
   
   return acoefs;
 }
@@ -291,21 +288,21 @@ gdouble gaussian_filter(array_d *pdata) {
 
 // Holes index
 // Looks for the projection with no data in center.
-gdouble ppi_holes(array_d *pdata, void *param) { 
-  guint p = pdata->ncols; 
-  guint n = pdata->nrows;
+gdouble ppi_holes(array_d data, vector_d groups) { 
+  guint p = data.ncols; 
+  guint n = data.nrows;
   
-  gdouble acoefs = gaussian_filter(pdata);
+  gdouble acoefs = gaussian_filter(data);
   return (1.0 - acoefs / (gdouble) n)/ (1.0 - exp(-p / 2.0));
 }
 
 // Central mass index
 // Looks for the projection with lots of data in the center.
-gdouble ppi_central_mass(array_d *pdata, void *param) { 
-  guint p = pdata->ncols; 
-  guint n = pdata->nrows;
+gdouble ppi_central_mass(array_d data, vector_d groups) { 
+  guint p = data.ncols; 
+  guint n = data.nrows;
 
-  gdouble acoefs = gaussian_filter(pdata);
+  gdouble acoefs = gaussian_filter(data);
   return (acoefs / n - exp(-p / 2.0))/ (1.0 - exp(-p / 2.0));
 }
 
@@ -317,392 +314,64 @@ Purpose        : Looks for the best projection to discriminate
                  between groups.
 *********************************************************************/
 
-gint compute_groups (vector_i group, vector_i ngroup, gint *numgroups, 
-  gint nrows, gdouble *gdata)
-{ 
-  gint i, j, *groupval;
 
-  /* initialize data */
-  groupval = g_malloc (nrows*sizeof(gint));
+gdouble ppi_lda (array_d data, vector_d groups) { 
+  gint i, j, k;
 
-  *numgroups = 0;
-  for (i=0; i<nrows; i++)
-  { for (j=0; j<*numgroups; j++)
-    { if (groupval[j]==gdata[i])
-      { ngroup.els[j]++;
-        break;
-      }
-    }
-    if (j==*numgroups )
-    { groupval[j]  = gdata[i];
-      ngroup.els[j] = 1;
-      (*numgroups)++;
-    }
-  }
+  guint n = data.nrows;
+  guint p = data.ncols;
 
-  for (i=0; i<nrows; i++)
-  { for (j=0; j<*numgroups; j++)
-    { if (groupval[j]==gdata[i])
-        group.els[i] = j;
-    }
-  }
+  vector_i group_lookup, ngroup;
+  vectori_alloc_zero(&group_lookup, n);
+  vectori_alloc_zero(&ngroup, n);
+  guint numgroups = compute_groups(group_lookup, ngroup, groups);
 
-  g_free(groupval);
+  array_d group_means, covW, covWB;
+  arrayd_alloc_zero(&group_means, p, numgroups);
+  arrayd_alloc_zero(&covW, p, p);
+  arrayd_alloc_zero(&covWB, p, p);
 
-  return ((*numgroups==1) || (*numgroups==nrows));
-}
-
-gdouble ppi_lda (array_d *pdata, void *param)
-{ 
-  pp_param *pp = (pp_param *) param;
-  gint i, j, k, l;
-  gint n, p;
-  gdouble det;
-  gint *Pv; /* dummy structure for pivot in ludcmp - not used */
-  gdouble *cov; /* need to get rid of this variable */
-  gdouble val = 0;
-
-  n = pdata->nrows;
-  p = pdata->ncols;
-
-  Pv = (gint *) g_malloc(p*sizeof(gint));
-  cov = (gdouble *) g_malloc(p*p*sizeof(gdouble));
+  vector_d means;
+  vectord_alloc_zero(&means, p);
 
   /* Compute means */
-  for (k=0; k<p; k++) {
-    for (l=0; l<pp->numgroups; l++)
-      pp->mean.vals[l][k] = 0.0;
-    pp->ovmean.els[k] = 0.0;
-  }
-  for (k=0; k<p; k++) {
-    for (i=0; i<n; i++)
-    { 
-      pp->mean.vals[pp->group.els[i]][k] += (gdouble) pdata->vals[i][k]; 
-      pp->ovmean.els[k] += (gdouble) pdata->vals[i][k];
+  for (k=0; k < p; k++) {
+    for (i=0; i < n; i++) { 
+      group_means.vals[group_lookup.els[i]][k] += data.vals[i][k]; 
+      means.els[k] += (gdouble) data.vals[i][k];
     }
   }
 
-  for (k=0; k<p; k++)
-  { 
-    for (i=0; i<pp->numgroups; i++)
-    { 
-      pp->mean.vals[i][k] /= (gdouble) pp->ngroup.els[i];
+  for (k=0; k < p; k++) { 
+    for (i=0; i < numgroups; i++) { 
+      group_means.vals[i][k] /= ngroup.els[i];
     }
-    pp->ovmean.els[k] /= (gdouble) n;
+    means.els[k] /= n;
   }
-
-  /* Compute W */
-  for (j=0; j<p; j++)
-    for (k=0; k<p; k++)
-      pp->cov.vals[j][k] = 0.0;
-  for (i=0; i<n; i++)
-  { 
-    for (j=0; j<p; j++)
-    { 
-      for (k=0; k<=j; k++)
-      { 
-        pp->cov.vals[k][j] += 
-          ((gdouble) pdata->vals[i][j]-pp->mean.vals[pp->group.els[i]][j])*
-          ((gdouble) pdata->vals[i][k]-pp->mean.vals[pp->group.els[i]][k]);
-        pp->cov.vals[j][k] = pp->cov.vals[k][j];
-      }
-    }
-  }
-
-  if (p>1) {
-    for (i=0; i<p; i++)
-      for (j=0; j<p; j++)
-        cov[i*p+j] = pp->cov.vals[i][j];
-    det = ludcmp(cov, p, Pv); 
-    for (i=0; i<p; i++)
-      for (j=0; j<p; j++)
-        pp->cov.vals[i][j] = cov[i*p+j];
-  }
-  else
-    det = fabs((gdouble) pp->cov.vals[0][0]);
-    val = det;
-
-  /* Compute B */
-  /*  for (j=0; j<p; j++)
-    for (k=0; k<p; k++)
-      pp->cov.vals[j][k] = 0.0;
-  for (j=0; j<p; j++) 
-  {	
-    for(k=0; k<p; k++)
-    {
-      for (i=0; i< pp->numgroups; i++)	
-        pp->cov.vals[j][k] += (pp->mean.vals[i][j]-pp->ovmean.els[j])*
-          (pp->mean.vals[i][k]-pp->ovmean.els[k])*(gdouble)(pp->ngroup.els[i]);
-    }
-  }
-
-  if (p>1) {
-    for (i=0; i<p; i++)
-      for (j=0; j<p; j++)
-        cov[i*p+j] = pp->cov.vals[i][j];
-    det = ludcmp(cov, p, Pv); 
-    for (i=0; i<p; i++)
-      for (j=0; j<p; j++)
-        pp->cov.vals[i][j] = cov[i*p+j];
-  }
-  else
-    det = fabs((gdouble) pp->cov.vals[0][0]);
-    *val = det;*/
-
-  /* Compute W+B */
-  for (j=0; j<p; j++)
-    for (k=0; k<p; k++)
-      pp->cov.vals[j][k] = 0.0;
-  for (i=0; i<n; i++)
-  { 
-    for (j=0; j<p; j++)
-    { 
-      for (k=0; k<=j; k++)
-      { 
-        pp->cov.vals[k][j] += 
-          ((gdouble) pdata->vals[i][j]-pp->ovmean.els[j])*
-          ((gdouble) pdata->vals[i][k]-pp->ovmean.els[k]);
-        pp->cov.vals[j][k] = pp->cov.vals[k][j];
-      }
-    }
-  }
-
-  if (p>1) {
-    for (i=0; i<p; i++)
-      for (j=0; j<p; j++)
-        cov[i*p+j] = pp->cov.vals[i][j];
-    det = ludcmp(cov, p, Pv); 
-    for (i=0; i<p; i++)
-      for (j=0; j<p; j++)
-        pp->cov.vals[i][j] = cov[i*p+j];
-  }
-  else
-    det = fabs((gdouble) pp->cov.vals[0][0]);
-
-  g_free(Pv);
-  g_free(cov);
-
-  return 1.0 - val /det; /*1-W/(W+B)*/
-}
-
-/********************************************************************
-
-Index          : Gini, Entropy, Variance
-Transformation : -
-Purpose        : Looks for the best split in 1d-projected data.
-
-*********************************************************************/
-
-void swap_group(array_d *pdata, gint *group, int i, int j)
-{
-  int temp1,k; 
-  double temp2;
-
-  temp1 = group[i];
-  group[i] = group[j];
-  group[j] = temp1;
-  for(k=0; k<pdata->ncols; k++)
-  { temp2 = pdata->vals[i][k];   
-        pdata->vals[i][k] = pdata->vals[j][k];
-        pdata->vals[j][k] = temp2;
-  }
-
-}
-
-void sort_group(array_d *pdata, gint *group, int left, int right)
-{
-  int i, last;
-                                
-  if(left >= right) return;
-  swap_group(pdata, group, left, (left+right)/2);
-  last = left;   
-  for(i=left+1; i<=right; i++)
-    if(group[i] < group[left])
-      swap_group(pdata, group, ++last,i);
-  swap_group(pdata, group, left, last);
-  sort_group(pdata, group, left, last-1);
-  sort_group(pdata, group, last+1,right);
-}       
-
-void swap_data(double *x, int *index,int i, int j)
-{
-  int temp1; double temp2;
   
-  temp1 = index[i];
-  index[i] = index[j];
-  index[j] = temp1;
-  temp2 = x[i];
-  x[i]= x[j];
-  x[j] = temp2;
-}
-
-void sort_data(double *x, int *index,int left, int right)
-{
-  int i, last;
-                                
-  if(left >= right) return;
-  swap_data(x,index,left,(left+right)/2);
-  last = left;   
-  for(i=left+1; i<=right; i++)
-    if(x[i] < x[left])
-      swap_data(x,index,++last,i);
-  swap_data(x,index, left, last);
-  sort_data(x,index, left, last-1);
-  sort_data(x,index,last+1,right);
-}       
-
-void countgroup(int *group, int *gps, int n)
-{
-  int temp,i;
-  int groups = *gps;
-
-  temp = group[0]; 
-  groups=1; 
-
-  for(i=1; i<n; i++) 
-    if (group[i] != temp) 
-      (groups)++; 
-  temp = group[i];
-
-  *gps = groups;
-}
-
-void countngroup(int *group, int *ngroup, int n)
-{
-  int temp,i,j;
-
-  temp= group[0]; 
-  ngroup[0] = 1; 
-  j=0; 
-  for(i=1; i<n; i++) 
-  {	
-    if (group[i] != temp) 
-      temp = group[i]; j++;
-    (ngroup[j]) ++; 
-  } 
-
-}
-
-gdouble ppi_gini (array_d *pdata, void *param)
-{ 
-  pp_param *pp = (pp_param *) param;
-  gint i, k, n, p, g = pp->numgroups, left, right, l;
-  gdouble dev, prob, maxindex = 0, index;
-
-  n = pdata->nrows;
-  p = pdata->ncols;
-
-/* Sort pdata by group */ 
-  right = pdata->nrows-1;
-  left = 0;
-  zero_int(pp->index.els,n);
-  for (i=0; i<n; i++)
-    pp->index.els[i] = pp->group.els[i];
-  sort_group(pdata,pp->index.els,left,right);
-
-/* data relocation and make index */ 
-  arrayd_zero(&pp->x);
-
-/* Calculate Gini index in each coordinate 
-             and find minimum              */
-
-  for (l=0; l<p; l++)
-  {
-    for (i=0; i<n; i++) { 
-      pp->x.els[i] = pdata->vals[i][l];
-      pp->index.els[i] = pp->group.els[i];
-    }
-
-    left=0;
-    right=n-1;
-    sort_data(pp->x.els, pp->index.els, left, right) ;
-
- /* Calculate gini index */
-    zero_int(pp->nright.els,g);
-    index = 1;
-    for (i=0; i<g; i++) { 
-      pp->nright.els[i] = 0;
-      index -= (((gdouble)pp->ngroup.els[i])/((gdouble)n))*
-        (((gdouble)pp->ngroup.els[i])/((gdouble)n));
-    }
-    for (i=0; i<n-1; i++)  {
-      (pp->nright.els[pp->index.els[i]])++;
-      dev=1;
-      for (k=0; k<g; k++) {
-        prob = ((gdouble) pp->nright.els[k])/((gdouble)(i+1));
-        dev -= prob*prob*((gdouble)(i+1)/(gdouble)n);
-        prob = ((gdouble) (pp->ngroup.els[k]-pp->nright.els[k]))/
-          ((gdouble)(n-i-1));
-        dev -= prob*prob*((gdouble)(n-i-1)/(gdouble)n);
+  // Compute W
+  for (i=0; i < n; i++) { 
+    for (j=0; j < p; j++) { 
+      for (k=0; k <= j; k++) { 
+        covW.vals[k][j] += 
+          (data.vals[i][j] - group_means.vals[group_lookup.els[i]][j])*
+          (data.vals[i][k] - group_means.vals[group_lookup.els[i]][k]);
+        covW.vals[j][k] = covW.vals[k][j];
       }
-      if (dev<index) index = dev;
-    }
-    if(l==0) maxindex = index; /* index is between 0 and 1 - need max */
-    else {
-      if(maxindex < index) maxindex = index;
     }
   }
-  return 1 - maxindex;
-}
 
-gdouble ppi_entropy (array_d *pdata, void *param)
-{ 
-  pp_param *pp = (pp_param *) param;
-  gint i, k, n, p, g = pp->numgroups, left, right,l;
-  gdouble dev, prob, maxindex = 0, index;
-
-  n = pdata->nrows;
-  p = pdata->ncols;
-
-/* Sort pdata by group */ 
-  right = pdata->nrows-1;
-  left = 0;
-  zero_int(pp->index.els,n);
-  for (i=0; i<n; i++)
-    pp->index.els[i] = pp->group.els[i];
-  sort_group(pdata,pp->index.els,left,right);
-
-/* data relocation and make index */ 
-  arrayd_zero(&pp->x);
-
-/* Calculate index in each coordinate and find minimum  */
-  for(l=0; l<p; l++)
-  {
-    for (i=0; i<n; i++) { 
-      pp->x.els[i] = pdata->vals[i][l];
-      pp->index.els[i] = pp->group.els[i];
-    }
-
-    left=0;
-    right=n-1;
-    sort_data(pp->x.els, pp->index.els,left,right) ;
-
- /* Calculate index */
-    zero_int(pp->nright.els,g);
-    index = 0;
-    for (i=0; i<g; i++) { 
-      pp->nright.els[i] = 0;
-      index -= (((gdouble)pp->ngroup.els[i])/((gdouble)n))*
-        log(((gdouble)pp->ngroup.els[i])/((gdouble)n));
-    }
-    for (i=0; i<n-1; i++)  {
-      (pp->nright.els[pp->index.els[i]])++;
-      dev=0;
-      for (k=0; k<g; k++) {
-        prob = ((double) pp->nright.els[k])/((double)(i+1));
-        if (prob > 0)
-          dev -= prob*log(prob)*((gdouble)(i+1)/(gdouble)n);
-        prob = ((double) (pp->ngroup.els[k]-pp->nright.els[k]))/
-          ((double)(n-i-1));
-        if (prob > 0)
-          dev -= prob*log(prob)*((gdouble)(n-i-1)/(gdouble)n);
+  // Compute W + B
+  for (i=0; i < n; i++) { 
+    for (j=0; j < p; j++) { 
+      for (k=0; k <= j; k++) { 
+        covWB.vals[k][j] += 
+          (data.vals[i][j] - means.els[j])*
+          (data.vals[i][k] - means.els[k]);
+        covWB.vals[j][k] = covWB.vals[k][j];
       }
-      if (dev<index) index = dev;
     }
-    if(l==0) maxindex=index;
-    else {
-      if(maxindex < index) maxindex = index;
-    }
-  } 
-  return 1 - maxindex / log(g);
+  }
+
+  return 1.0 - arrayd_determinant(covW) / arrayd_determinant(covWB);
 }

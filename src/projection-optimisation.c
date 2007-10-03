@@ -45,26 +45,6 @@ gint realloc_optimize0_p (optimize0_param *op, gint ncols, vector_i pcols)
   return 0;
 }
 
-/********************************************************************
-
-                         OPTIMIZATION
-
-The index function has to be defined as
-
-     gint index (array_d *pdata, void *param, gdouble *val)
-
-with   
-
-Input:  pdata   projected data
-        param   additional parameters for the index 
-                (will not be touched by the optimization routine)
-
-Output: val     the index-value
-        
-The return value should be zero, otherwise the optimization routine
-assumes an error has occurred during computation of the index. 
-
-*********************************************************************/
 
 gboolean iszero (array_d *data)
 { 
@@ -130,10 +110,7 @@ void orthonormal (array_d *proj)
 
 
 
-gint optimize0 (optimize0_param *op,
-                PPIndex index,
-                void *param)
-{ 
+gint optimize0 (optimize0_param *op, PPIndex index, vector_d groups) { 
   gdouble index_work = 0.0;
 /*  array_d proj_work, pdata, *proj;*/
   array_d proj_work, *proj;
@@ -185,7 +162,7 @@ g_printerr ("\n");*/
     }*/
   /* do index calculation, functions return -1 if a problem, which
      is then passed back through optimize0 to tour1d_run */
-  op->index_best = index (&op->pdata, param);
+  op->index_best = index (op->pdata, groups);
 
   /*g_printerr ("index_work %f index_best %f \n",index_work, op->index_best);*/
 /*  if (index (&op->pdata, param, &index_work)) return(-1);*/
@@ -215,7 +192,7 @@ g_printerr ("\n");*/
       }
 
       /* Calculate pp index for current projection */       
-      index_work = index (&op->pdata, param);
+      index_work = index (op->pdata, groups);
 
       /*g_printerr ("index_work %f temp %f \n",index_work, op->temp);
 g_printerr ("proj_work: ");

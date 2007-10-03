@@ -239,7 +239,6 @@ t2d_switch_index(Tour2DCPanel controls, gint basismeth, displayd *dsp,
 {
   GGobiStage *d = dsp->d;
   gint kout, nrows = d->n_rows;
-  gdouble *gdata;
   gint i, j, k;
 
   if (d->n_rows == 1)  /* can't do pp on no data! */
@@ -269,22 +268,17 @@ t2d_switch_index(Tour2DCPanel controls, gint basismeth, displayd *dsp,
     }
 
   GGOBI_STAGE_ATTR_INIT(d, cluster);
-  gdata  = g_malloc (nrows*sizeof(gdouble));
-  for (i = 0 ; i < nrows; i++)
-  { 
-    gdata[i] = GGOBI_STAGE_GET_ATTR_CLUSTER(d, i);
+  vector_d groups;
+  vectord_alloc_zero(&groups, nrows);
+  for (i=0; i<nrows; i++) { 
+    groups.els[i] = GGOBI_STAGE_GET_ATTR_CLUSTER(d, i);
   }
 
   if(controls.ppindex.index_f) {
-      if(controls.ppindex.checkGroups == false || 
-           !compute_groups (dsp->t2d_pp_param.group, dsp->t2d_pp_param.ngroup, &dsp->t2d_pp_param.numgroups, nrows, gdata)) 
-      { 
-	  dsp->t2d.ppval = controls.ppindex.index_f(&dsp->t2d_pp_op.pdata, &dsp->t2d_pp_param);
-	  if(basismeth == 1) 
-	      kout = optimize0 (&dsp->t2d_pp_op, controls.ppindex.index_f, &dsp->t2d_pp_param);
-      }
+    dsp->t2d.ppval = controls.ppindex.index_f(dsp->t2d_pp_op.pdata, groups);
+    if(basismeth == 1) 
+      kout = optimize0 (&dsp->t2d_pp_op, controls.ppindex.index_f, groups);
   }
-
-  g_free (gdata);
-  return(false);
+  vectord_free(&groups);
+  return(true);
 }

@@ -215,7 +215,6 @@ void       filename_get_r (GGobiSession *);
 void       filename_get_w (GtkWidget *, GGobiSession *);
 gint       find_nearest_edge (splotd *sp, displayd *display, GGobiSession *gg);
 gint       find_nearest_point (icoords *, splotd *, GGobiStage *, GGobiSession *);
-gint       free_pp (pp_param *pp);
 gint       getPreviousDisplays(xmlNodePtr node, GGobiDescription *desc);
 GtkWidget* get_tree_view_from_notebook (GtkWidget *);
 GtkWidget* get_tree_view_from_object (GObject *);
