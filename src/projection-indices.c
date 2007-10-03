@@ -1,3 +1,4 @@
+#include "defines.h"
 #include "projection-indices.h"
 #include <math.h>
 #include <string.h>
@@ -215,151 +216,96 @@ gint free_pp (pp_param *pp)
   return 0;
 }
 
-/********************************************************************
 
-Index          : Holes
-Transformation : -
-Purpose        : Looks for the projection with no data in center.
-*********************************************************************/
-
-gdouble ppi_holes(array_d *pdata, void *param)
-{ 
-  pp_param *pp = (pp_param *) param;
+// Gaussian filter (?) used as basis for hole and central mass indices
+gdouble gaussian_filter(array_d *pdata) { 
   int i, p, n, k,j;
   gdouble tmp,x1,x2;
-  gdouble *cov;
-  gdouble acoefs;
-  gdouble tol = 0.0001;
 
   p = pdata->ncols; 
   n = pdata->nrows;
-  cov = (gdouble *) g_malloc(p*p*sizeof(gdouble));
-  zero(cov,p*p);
+  
+  // Compute column means
+  vector_d mean;
+  vectord_alloc_zero(&mean, p);
 
-  for(j=0; j<p; j++) {
-    pp->ovmean.els[j] = 0.0;
-    for(i=0; i<n; i++) 
-      pp->ovmean.els[j] += pdata->vals[i][j];
-    pp->ovmean.els[j] /= ((gdouble)n);
+  for(j = 0; j < p; j++) {
+    for(i = 0; i < n; i++) mean.els[j] += pdata->vals[i][j];
+    mean.els[j] /= n;
   }
+
+  // Compute covariance matrix
+  array_d cov;
+  arrayd_alloc_zero(&cov, n, p);
 
   for (j=0; j<p; j++) { 
     for (k=0; k<=j; k++) { 
-      pp->cov.vals[k][j] = 0.0;
+      cov.vals[k][j] = 0.0;
       for (i=0; i<n; i++) 
-        pp->cov.vals[k][j] += (((pdata->vals[i][j])-pp->ovmean.els[j])*
-         ((pdata->vals[i][k])-(pp->ovmean.els[k])));
-      pp->cov.vals[k][j] /= ((double)(n-1)); 
+        cov.vals[k][j] += (((pdata->vals[i][j])-mean.els[j])*
+         ((pdata->vals[i][k])-(mean.els[k])));
+      cov.vals[k][j] /= ((double)(n-1)); 
       if (j != k)
-        pp->cov.vals[j][k] = pp->cov.vals[k][j];
+        cov.vals[j][k] = cov.vals[k][j];
       }
   }
 
-  /*  g_printerr("cov %f %f %f %f\n",pp->cov.vals[0][0],
-      pp->cov.vals[0][1],pp->cov.vals[1][0],pp->cov.vals[1][1]);*/
-  if (p>1) {
+  // Standardise variance-covariance matrix (I think)
+  gdouble* cov2 = (gdouble *) g_new0(gdouble, p*p);
+  if (p > 1) {
     for (i=0; i<p; i++)
       for (j=0; j<p; j++)
-        cov[i*p+j] = pp->cov.vals[i][j];
-    inverse(cov, p);
+        cov2[i * p + j] = cov.vals[i][j];
+    inverse(cov2, p);
     for (i=0; i<p; i++)
       for (j=0; j<p; j++)
-        pp->cov.vals[i][j] = cov[i*p+j];
+        cov.vals[i][j] = cov2[i*p+j];
+  } else {
+    if (cov.vals[0][0] > GGOBI_EPSILON) {
+      cov.vals[0][0] = 1./cov.vals[0][0];
+    } else {
+      cov.vals[0][0] = 10000.0;
+    }
   }
-  else {
-    if (pp->cov.vals[0][0] > tol)
-      pp->cov.vals[0][0] = 1./pp->cov.vals[0][0];
-    else
-      pp->cov.vals[0][0] = 10000.0;
-  }
+  g_free(cov2);
 
-  acoefs = 0.0;
+  gdouble acoefs = 0.0;
   for (i=0; i<n; i++) { 
     tmp = 0.0;  
     for (j=0; j<p; j++) {   
-      x1 = pdata->vals[i][j]-pp->ovmean.els[j];
+      x1 = pdata->vals[i][j] - mean.els[j];
       for (k=0; k<p; k++) {  
-        x2 = pdata->vals[i][k]-pp->ovmean.els[k]; 
-        tmp += (x1*x2*pp->cov.vals[j][k]);
+        x2 = pdata->vals[i][k] - mean.els[k]; 
+        tmp += x1 * x2 * cov.vals[j][k];
       }
     } 
     acoefs += exp(-tmp/2.0);
   }
-  g_free(cov);
+
+  arrayd_free(&cov);
+  vectord_free(&mean);
   
+  return acoefs;
+}
+
+
+// Holes index
+// Looks for the projection with no data in center.
+gdouble ppi_holes(array_d *pdata, void *param) { 
+  guint p = pdata->ncols; 
+  guint n = pdata->nrows;
+  
+  gdouble acoefs = gaussian_filter(pdata);
   return (1.0 - acoefs / (gdouble) n)/ (1.0 - exp(-p / 2.0));
 }
 
-/********************************************************************
+// Central mass index
+// Looks for the projection with lots of data in the center.
+gdouble ppi_central_mass(array_d *pdata, void *param) { 
+  guint p = pdata->ncols; 
+  guint n = pdata->nrows;
 
-Index          : Central Mass
-Transformation : -
-Purpose        : Looks for the projection with lots of data in center.
-*********************************************************************/
-
-gdouble ppi_central_mass(array_d *pdata, void *param)
-{ 
-  pp_param *pp = (pp_param *) param;
-  int i, p, n,k,j;
-  gdouble tmp,x1,x2;
-  gdouble *cov;
-  gdouble acoefs;
-  gdouble tol = 0.0001;
-
-  p = pdata->ncols; 
-  n = pdata->nrows;
-  cov = (gdouble *) g_malloc(p*p*sizeof(gdouble));
-  zero(cov,p*p);
-
-  for(j=0; j<p; j++) {
-    pp->ovmean.els[j] = 0.0;
-    for(i=0; i<n; i++) 
-      pp->ovmean.els[j] += pdata->vals[i][j];
-    pp->ovmean.els[j] /= ((gdouble)n);
-  }
-
-  for (j=0; j<p; j++) { 
-    for (k=0; k<=j; k++) { 
-      pp->cov.vals[k][j] = 0.0;
-      for (i=0; i<n; i++) 
-        pp->cov.vals[k][j] += (((pdata->vals[i][j])-pp->ovmean.els[j])*
-         ((pdata->vals[i][k])-(pp->ovmean.els[k])));
-      pp->cov.vals[k][j] /= ((double)(n-1)); 
-      if (j != k)
-        pp->cov.vals[j][k] = pp->cov.vals[k][j];
-      }
-  }
-
-  if (p>1) {
-    for (i=0; i<p; i++)
-      for (j=0; j<p; j++)
-        cov[i*p+j] = pp->cov.vals[i][j];
-    inverse(cov, p);
-    for (i=0; i<p; i++)
-      for (j=0; j<p; j++)
-        pp->cov.vals[i][j] = cov[i*p+j];
-  }
-  else {
-    if (pp->cov.vals[0][0] > tol)
-      pp->cov.vals[0][0] = 1./pp->cov.vals[0][0];
-    else
-      pp->cov.vals[0][0] = 10000.0;
-  }
-
-  acoefs = 0.0;
-  for (i=0; i<n; i++) { 
-    tmp = 0.0;  
-    for (j=0; j<p; j++) {   
-      x1 = pdata->vals[i][j]-pp->ovmean.els[j];
-      for (k=0; k<p; k++) {  
-        x2 = pdata->vals[i][k]-pp->ovmean.els[k]; 
-        tmp += (x1*x2*pp->cov.vals[j][k]);
-      }
-    } 
-    acoefs += exp(-tmp/2.0);
-  }
-
-  g_free(cov);
+  gdouble acoefs = gaussian_filter(pdata);
   return (acoefs / n - exp(-p / 2.0))/ (1.0 - exp(-p / 2.0));
 }
 
