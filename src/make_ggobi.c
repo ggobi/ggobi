@@ -60,30 +60,30 @@ pipeline_create_cb(GGobiPipelineFactory *factory, GGobiStage *root, GGobiSession
   ggobi_stage_filter_set_filter_column(GGOBI_STAGE_FILTER(subset), 
     ggobi_stage_get_col_index_for_name(root, "_sampled"));
 
-  // impute = g_object_new(GGOBI_TYPE_STAGE_IMPUTE, 
-  //   "name", GGOBI_MAIN_STAGE_IMPUTE, "parent", subset, NULL);
-  // 
-  // jitter = g_object_new(GGOBI_TYPE_STAGE_JITTER, 
-  //   "name", GGOBI_MAIN_STAGE_JITTER, "parent", impute, NULL);
-  // 
-  // randomize = g_object_new(GGOBI_TYPE_STAGE_RANDOMIZE, 
-  //   "name", GGOBI_MAIN_STAGE_RANDOMIZE, "parent", jitter, NULL);
-  // 
-  // filter = g_object_new(GGOBI_TYPE_STAGE_FILTER, 
-  //   "name", GGOBI_MAIN_STAGE_FILTER, "parent", randomize, NULL);
-  // 
-  // // FIXME: 'excluded' is actually 'included' now
-  // ggobi_stage_filter_set_filter_column(GGOBI_STAGE_FILTER(filter),
-  //   ggobi_stage_get_col_index_for_name(root, "_excluded"));
-  // 
-  // domain_adj = g_object_new(GGOBI_TYPE_STAGE_TRANSFORM,
-  //   "name", GGOBI_MAIN_STAGE_DOMAIN_ADJ, "parent", filter, NULL);
-  // transform = g_object_new(GGOBI_TYPE_STAGE_TRANSFORM,
-  //   "name", GGOBI_MAIN_STAGE_TRANSFORM, "parent", domain_adj, NULL);
-  // 
-  // standardize = g_object_new(GGOBI_TYPE_STAGE_STANDARDIZE, 
-  //   "name", GGOBI_MAIN_STAGE_STANDARDIZE, "parent", transform, NULL);
-  //   
+  impute = g_object_new(GGOBI_TYPE_STAGE_IMPUTE, 
+    "name", GGOBI_MAIN_STAGE_IMPUTE, "parent", subset, NULL);
+
+  jitter = g_object_new(GGOBI_TYPE_STAGE_JITTER, 
+    "name", GGOBI_MAIN_STAGE_JITTER, "parent", impute, NULL);
+
+  randomize = g_object_new(GGOBI_TYPE_STAGE_RANDOMIZE, 
+    "name", GGOBI_MAIN_STAGE_RANDOMIZE, "parent", jitter, NULL);
+  
+  filter = g_object_new(GGOBI_TYPE_STAGE_FILTER, 
+    "name", GGOBI_MAIN_STAGE_FILTER, "parent", randomize, NULL);
+  
+  // FIXME: 'excluded' is actually 'included' now
+  ggobi_stage_filter_set_filter_column(GGOBI_STAGE_FILTER(filter),
+    ggobi_stage_get_col_index_for_name(root, "_excluded"));
+  
+  domain_adj = g_object_new(GGOBI_TYPE_STAGE_TRANSFORM,
+    "name", GGOBI_MAIN_STAGE_DOMAIN_ADJ, "parent", filter, NULL);
+  transform = g_object_new(GGOBI_TYPE_STAGE_TRANSFORM,
+    "name", GGOBI_MAIN_STAGE_TRANSFORM, "parent", domain_adj, NULL);
+
+  standardize = g_object_new(GGOBI_TYPE_STAGE_STANDARDIZE, 
+    "name", GGOBI_MAIN_STAGE_STANDARDIZE, "parent", transform, NULL);
+  
   display = g_object_new(GGOBI_TYPE_STAGE_DISPLAY, 
     "name", GGOBI_MAIN_STAGE_DISPLAY, "parent", subset, NULL);
   
@@ -91,34 +91,34 @@ pipeline_create_cb(GGobiPipelineFactory *factory, GGobiStage *root, GGobiSession
   // FIXME: get rid of these lines ASAP
   // There is absolutely no reason for the pipeline to depend on GGobiSession
   GGOBI_STAGE(display)->gg = gg;
-  // GGOBI_STAGE(domain_adj)->gg = gg;
-  // GGOBI_STAGE(filter)->gg = gg;
-  // GGOBI_STAGE(impute)->gg = gg;
-  // GGOBI_STAGE(jitter)->gg = gg;
-  // GGOBI_STAGE(standardize)->gg = gg;
+  GGOBI_STAGE(domain_adj)->gg = gg;
+  GGOBI_STAGE(filter)->gg = gg;
+  GGOBI_STAGE(impute)->gg = gg;
+  GGOBI_STAGE(jitter)->gg = gg;
+  GGOBI_STAGE(standardize)->gg = gg;
   GGOBI_STAGE(subset)->gg = gg;
-  // GGOBI_STAGE(transform)->gg = gg;
+  GGOBI_STAGE(transform)->gg = gg;
   
   g_object_unref(display);
-  // g_object_unref(domain_adj);
-  // g_object_unref(filter);
-  // g_object_unref(impute);
-  // g_object_unref(jitter);
-  // g_object_unref(standardize);
+  g_object_unref(domain_adj);
+  g_object_unref(filter);
+  g_object_unref(impute);
+  g_object_unref(jitter);
+  g_object_unref(standardize);
   g_object_unref(subset);
-  // g_object_unref(transform);
+  g_object_unref(transform);
   
-  // GGobiGuiViewer *viewer; 
-  // viewer = g_object_new(GGOBI_TYPE_GUI_VIEWER, "stage", GGOBI_STAGE(standardize), NULL);
-  // gtk_widget_show(GTK_WIDGET(viewer));
-  // 
-  // GGobiGuiImpute *gui_randomize;
-  // gui_randomize = g_object_new(GGOBI_TYPE_GUI_RANDOMIZE, "stage", GGOBI_STAGE_RANDOMIZE(randomize), NULL);
-  // gtk_widget_show(GTK_WIDGET(gui_randomize));
-  // 
-  // GGobiGuiImpute *gui_impute;
-  // gui_impute = g_object_new(GGOBI_TYPE_GUI_IMPUTE, "stage", GGOBI_STAGE_IMPUTE(impute), NULL);
-  // gtk_widget_show(GTK_WIDGET(gui_impute));
+  GGobiGuiViewer *viewer; 
+  viewer = g_object_new(GGOBI_TYPE_GUI_VIEWER, "stage", GGOBI_STAGE(standardize), NULL);
+  gtk_widget_show(GTK_WIDGET(viewer));
+  
+  GGobiGuiImpute *gui_randomize;
+  gui_randomize = g_object_new(GGOBI_TYPE_GUI_RANDOMIZE, "stage", GGOBI_STAGE_RANDOMIZE(randomize), NULL);
+  gtk_widget_show(GTK_WIDGET(gui_randomize));
+
+  GGobiGuiImpute *gui_impute;
+  gui_impute = g_object_new(GGOBI_TYPE_GUI_IMPUTE, "stage", GGOBI_STAGE_IMPUTE(impute), NULL);
+  gtk_widget_show(GTK_WIDGET(gui_impute));
 
   
 }
