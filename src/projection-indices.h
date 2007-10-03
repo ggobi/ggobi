@@ -33,15 +33,15 @@ void inverse(gdouble *a, gint n);
 
 /* Arbitrary dimensional indices */
 void center (array_d *); 
-gint pca (array_d *, void *, gdouble *,  gpointer userData);
+gint ppi_pca (array_d *, void *, gdouble *,  gpointer userData);
 
-gint holes_raw(array_d *pdata, void *param, gdouble *val, gpointer unused);
-gint central_mass_raw(array_d *pdata, void *param, gdouble *val, gpointer unused);
+gint ppi_holes(array_d *pdata, void *param, gdouble *val, gpointer unused);
+gint ppi_central_mass(array_d *pdata, void *param, gdouble *val, gpointer unused);
 void zero (gdouble *ptr, gint length);
 void zero_int (gint *mem, gint size);
 gint compute_groups (vector_i group, vector_i ngroup, gint *groups,  gint nrows, gdouble *gdata);
-gint discriminant (array_d *pdata, void *param, gdouble *val, gpointer unused);
-gint cartgini (array_d *pdata, void *param, gdouble *val, gpointer unused);
-gint cartentropy (array_d *pdata, void *param, gdouble *val, gpointer unused);
+gint ppi_lda (array_d *pdata, void *param, gdouble *val, gpointer unused);
+gint ppi_gini (array_d *pdata, void *param, gdouble *val, gpointer unused);
+gint ppi_entropy (array_d *pdata, void *param, gdouble *val, gpointer unused);
 
 #endif 

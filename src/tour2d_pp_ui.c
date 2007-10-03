@@ -144,11 +144,11 @@ sphere_cb (GtkWidget  *w, GGobiSession *gg) {
 static gchar *t2d_pp_func_lbl[] = {"Holes","Central Mass","LDA","Gini-C","Entropy-C"};
 
 TourPPIndex StandardPPIndices[] = {
-    {"Holes", &holes_raw, false, NULL},
-    {"Central Mass", &central_mass_raw, false, NULL},
-    {"LDA", &discriminant, true, NULL},
-    {"Gini-C", &cartgini, true, NULL},
-    {"Entropy-C", &cartentropy, true, NULL},
+    {"Holes", &ppi_holes, false, NULL},
+    {"Central Mass", &ppi_central_mass, false, NULL},
+    {"LDA", &ppi_lda, true, NULL},
+    {"Gini-C", &ppi_gini, true, NULL},
+    {"Entropy-C", &ppi_entropy, true, NULL},
 };
 
 

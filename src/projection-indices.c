@@ -141,7 +141,7 @@ void center (array_d *data) {
   } 
 } 
  
-gint pca (array_d *pdata, void *param, gdouble *val, gpointer userData) { 
+gint ppi_pca (array_d *pdata, void *param, gdouble *val, gpointer userData) { 
   gint i, j; 
  
   center (pdata); 
@@ -206,7 +206,7 @@ Transformation : -
 Purpose        : Looks for the projection with no data in center.
 *********************************************************************/
 
-gint holes_raw(array_d *pdata, void *param, gdouble *val, gpointer unused)
+gint ppi_holes(array_d *pdata, void *param, gdouble *val, gpointer unused)
 { 
   pp_param *pp = (pp_param *) param;
   int i, p, n, k,j;
@@ -283,7 +283,7 @@ Transformation : -
 Purpose        : Looks for the projection with lots of data in center.
 *********************************************************************/
 
-gint central_mass_raw(array_d *pdata, void *param, gdouble *val, gpointer unused)
+gint ppi_central_mass(array_d *pdata, void *param, gdouble *val, gpointer unused)
 { 
   pp_param *pp = (pp_param *) param;
   int i, p, n,k,j;
@@ -408,7 +408,7 @@ gint compute_groups (vector_i group, vector_i ngroup, gint *numgroups,
   return ((*numgroups==1) || (*numgroups==nrows));
 }
 
-gint discriminant (array_d *pdata, void *param, gdouble *val, gpointer unused)
+gint ppi_lda (array_d *pdata, void *param, gdouble *val, gpointer unused)
 { 
   pp_param *pp = (pp_param *) param;
   gint i, j, k, l;
@@ -641,7 +641,7 @@ void countngroup(int *group, int *ngroup, int n)
 
 }
 
-gint cartgini (array_d *pdata, void *param, gdouble *val, gpointer unused)
+gint ppi_gini (array_d *pdata, void *param, gdouble *val, gpointer unused)
 { 
   pp_param *pp = (pp_param *) param;
   gint i, k, n, p, g = pp->numgroups, left, right, l;
@@ -704,7 +704,7 @@ gint cartgini (array_d *pdata, void *param, gdouble *val, gpointer unused)
   return(0);
 }
 
-gint cartentropy (array_d *pdata, void *param, gdouble *val, gpointer unused)
+gint ppi_entropy (array_d *pdata, void *param, gdouble *val, gpointer unused)
 { 
   pp_param *pp = (pp_param *) param;
   gint i, k, n, p, g = pp->numgroups, left, right,l;
@@ -722,7 +722,7 @@ gint cartentropy (array_d *pdata, void *param, gdouble *val, gpointer unused)
   sort_group(pdata,pp->index.els,left,right);
 
 /* data relocation and make index */ 
-  arrayd_zero(pp->x);
+  arrayd_zero(&pp->x);
 
 /* Calculate index in each coordinate and find minimum  */
   for(l=0; l<p; l++)

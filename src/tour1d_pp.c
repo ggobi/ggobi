@@ -295,48 +295,48 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
   { 
     case HOLES: 
       dsp->t1d.ppval = t1d_calc_indx (dsp->t1d_pp_op.pdata, 
-        holes_raw, &dsp->t1d_pp_param);
+        ppi_holes, &dsp->t1d_pp_param);
       if (basismeth == 1)
-        kout = optimize0 (&dsp->t1d_pp_op, holes_raw, &dsp->t1d_pp_param);
+        kout = optimize0 (&dsp->t1d_pp_op, ppi_holes, &dsp->t1d_pp_param);
       break;
     case CENTRAL_MASS: 
       dsp->t1d.ppval = t1d_calc_indx (dsp->t1d_pp_op.pdata, 
-        central_mass_raw, &dsp->t1d_pp_param);
+        ppi_central_mass, &dsp->t1d_pp_param);
       if (basismeth == 1)
-        kout = optimize0 (&dsp->t1d_pp_op, central_mass_raw, 
+        kout = optimize0 (&dsp->t1d_pp_op, ppi_central_mass, 
           &dsp->t1d_pp_param);
       break;
     case PCA: 
       dsp->t1d.ppval = t1d_calc_indx (dsp->t1d_pp_op.pdata, 
-        (Tour_PPIndex_f) pca, NULL);
+        (Tour_PPIndex_f) ppi_pca, NULL);
       if (basismeth == 1)
-        kout = optimize0 (&dsp->t1d_pp_op, (Tour_PPIndex_f) pca, NULL);
+        kout = optimize0 (&dsp->t1d_pp_op, (Tour_PPIndex_f) ppi_pca, NULL);
       break;
     case LDA:
       if (!compute_groups (dsp->t1d_pp_param.group, dsp->t1d_pp_param.ngroup, 
           &dsp->t1d_pp_param.numgroups, nrows, gdata)) {
         dsp->t1d.ppval = t1d_calc_indx (dsp->t1d_pp_op.pdata, 
-          discriminant, &dsp->t1d_pp_param);
+          ppi_lda, &dsp->t1d_pp_param);
         if (basismeth == 1)
-          kout = optimize0 (&dsp->t1d_pp_op, discriminant, &dsp->t1d_pp_param);
+          kout = optimize0 (&dsp->t1d_pp_op, ppi_lda, &dsp->t1d_pp_param);
       }
       break;
     case CGINI: 
       if (!compute_groups (dsp->t1d_pp_param.group, dsp->t1d_pp_param.ngroup, 
           &dsp->t1d_pp_param.numgroups, nrows, gdata)) {
         dsp->t1d.ppval = t1d_calc_indx (dsp->t1d_pp_op.pdata, 
-          cartgini, &dsp->t1d_pp_param);
+          ppi_gini, &dsp->t1d_pp_param);
         if (basismeth == 1)
-          kout = optimize0 (&dsp->t1d_pp_op, cartgini, &dsp->t1d_pp_param);
+          kout = optimize0 (&dsp->t1d_pp_op, ppi_gini, &dsp->t1d_pp_param);
       }
       break;
    case CENTROPY: 
       if (!compute_groups (dsp->t1d_pp_param.group, dsp->t1d_pp_param.ngroup, 
           &dsp->t1d_pp_param.numgroups, nrows, gdata)) {
         dsp->t1d.ppval = t1d_calc_indx (dsp->t1d_pp_op.pdata,
-          cartentropy, &dsp->t1d_pp_param);
+          ppi_entropy, &dsp->t1d_pp_param);
       if (basismeth == 1)
-        kout = optimize0 (&dsp->t1d_pp_op, cartentropy, &dsp->t1d_pp_param);
+        kout = optimize0 (&dsp->t1d_pp_op, ppi_entropy, &dsp->t1d_pp_param);
       }
       break;
 

@@ -325,24 +325,24 @@ t2d_switch_index(Tour2DCPanel controls, gint basismeth, displayd *dsp,
   { 
     case HOLES: 
       dsp->t2d.ppval = t2d_calc_indx (dsp->t2d_pp_op.pdata, 
-				      holes_raw, &dsp->t2d_pp_param);
+				      ppi_holes, &dsp->t2d_pp_param);
       if (basismeth == 1) {
-        kout = optimize0 (&dsp->t2d_pp_op, holes_raw, &dsp->t2d_pp_param);
+        kout = optimize0 (&dsp->t2d_pp_op, ppi_holes, &dsp->t2d_pp_param);
       }
     break;
     case CENTRAL_MASS: 
       dsp->t2d.ppval = t2d_calc_indx (dsp->t2d_pp_op.pdata,
-				      central_mass_raw, &dsp->t2d_pp_param);
+				      ppi_central_mass, &dsp->t2d_pp_param);
       if (basismeth == 1)
-        kout = optimize0 (&dsp->t2d_pp_op, central_mass_raw, &dsp->t2d_pp_param);
+        kout = optimize0 (&dsp->t2d_pp_op, ppi_central_mass, &dsp->t2d_pp_param);
     break;
     case LDA: 
       if (!compute_groups (dsp->t2d_pp_param.group, dsp->t2d_pp_param.ngroup, 
         &dsp->t2d_pp_param.numgroups, nrows, gdata)) {
         dsp->t2d.ppval = t2d_calc_indx (dsp->t2d_pp_op.pdata,
-					discriminant, &dsp->t2d_pp_param);
+					ppi_lda, &dsp->t2d_pp_param);
         if (basismeth == 1)
-          kout = optimize0 (&dsp->t2d_pp_op, discriminant, &dsp->t2d_pp_param);
+          kout = optimize0 (&dsp->t2d_pp_op, ppi_lda, &dsp->t2d_pp_param);
       }
       break;
     case CGINI: 
@@ -350,9 +350,9 @@ t2d_switch_index(Tour2DCPanel controls, gint basismeth, displayd *dsp,
         &dsp->t2d_pp_param.numgroups, nrows, 
 			   gdata)) {
         dsp->t2d.ppval = t2d_calc_indx (dsp->t2d_pp_op.pdata,
-					cartgini, &dsp->t2d_pp_param);
+					ppi_gini, &dsp->t2d_pp_param);
         if (basismeth == 1)
-          kout = optimize0 (&dsp->t2d_pp_op, cartgini, &dsp->t2d_pp_param);
+          kout = optimize0 (&dsp->t2d_pp_op, ppi_gini, &dsp->t2d_pp_param);
       }
       break;
     case CENTROPY: 
@@ -360,9 +360,9 @@ t2d_switch_index(Tour2DCPanel controls, gint basismeth, displayd *dsp,
         &dsp->t2d_pp_param.numgroups, nrows, 
 			   gdata)) {
         dsp->t2d.ppval = t2d_calc_indx (dsp->t2d_pp_op.pdata,
-          cartentropy, &dsp->t2d_pp_param);
+          ppi_entropy, &dsp->t2d_pp_param);
         if (basismeth == 1)
-          kout = optimize0 (&dsp->t2d_pp_op, cartentropy, &dsp->t2d_pp_param);
+          kout = optimize0 (&dsp->t2d_pp_op, ppi_entropy, &dsp->t2d_pp_param);
       }
       break;
     break;
