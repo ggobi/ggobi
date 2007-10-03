@@ -185,7 +185,8 @@ g_printerr ("\n");*/
     }*/
   /* do index calculation, functions return -1 if a problem, which
      is then passed back through optimize0 to tour1d_run */
-  if (index (&op->pdata, param, &op->index_best)) return(-1);
+  op->index_best = index (&op->pdata, param);
+
   /*g_printerr ("index_work %f index_best %f \n",index_work, op->index_best);*/
 /*  if (index (&op->pdata, param, &index_work)) return(-1);*/
 
@@ -214,7 +215,7 @@ g_printerr ("\n");*/
       }
 
       /* Calculate pp index for current projection */       
-      if (index (&op->pdata, param, &index_work)) return(-1);
+      index_work = index (&op->pdata, param);
 
       /*g_printerr ("index_work %f temp %f \n",index_work, op->temp);
 g_printerr ("proj_work: ");

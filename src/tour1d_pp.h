@@ -21,5 +21,4 @@ The authors can be contacted at the following email addresses:
 
 #include "projection-indices.h"
 
-gdouble t1d_calc_indx(array_d, PPIndex fun, void *param);
 gboolean t1d_switch_index(gint, gint, displayd *, GGobiSession *);

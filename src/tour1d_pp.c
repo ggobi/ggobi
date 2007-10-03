@@ -238,17 +238,6 @@ void t1d_pp_reinit(displayd *dsp, GGobiSession *gg)
   g_free (label);
 }
 
-gdouble t1d_calc_indx (array_d pd, 
-                PPIndex index,
-                void *param)
-{ 
-  gdouble indexval;
-
-  index (&pd, param, &indexval);
-
-  return(indexval);
-}
-
 gboolean t1d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
   GGobiSession *gg)
 {
@@ -289,29 +278,33 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
   switch (indxtype)
   { 
     case HOLES: 
-      dsp->t1d.ppval = t1d_calc_indx (dsp->t1d_pp_op.pdata, 
-        ppi_holes, &dsp->t1d_pp_param);
+      dsp->t1d.ppval = ppi_holes(
+        &dsp->t1d_pp_op.pdata,  &dsp->t1d_pp_param
+      );
       if (basismeth == 1)
         kout = optimize0 (&dsp->t1d_pp_op, ppi_holes, &dsp->t1d_pp_param);
       break;
     case CENTRAL_MASS: 
-      dsp->t1d.ppval = t1d_calc_indx (dsp->t1d_pp_op.pdata, 
-        ppi_central_mass, &dsp->t1d_pp_param);
+      dsp->t1d.ppval = ppi_central_mass(
+        &dsp->t1d_pp_op.pdata,  &dsp->t1d_pp_param
+      );
       if (basismeth == 1)
         kout = optimize0 (&dsp->t1d_pp_op, ppi_central_mass, 
           &dsp->t1d_pp_param);
       break;
     case PCA: 
-      dsp->t1d.ppval = t1d_calc_indx (dsp->t1d_pp_op.pdata, 
-        (PPIndex) ppi_pca, NULL);
+      dsp->t1d.ppval = ppi_pca(
+        &dsp->t1d_pp_op.pdata,  &dsp->t1d_pp_param
+      );
       if (basismeth == 1)
         kout = optimize0 (&dsp->t1d_pp_op, (PPIndex) ppi_pca, NULL);
       break;
     case LDA:
       if (!compute_groups (dsp->t1d_pp_param.group, dsp->t1d_pp_param.ngroup, 
           &dsp->t1d_pp_param.numgroups, nrows, gdata)) {
-        dsp->t1d.ppval = t1d_calc_indx (dsp->t1d_pp_op.pdata, 
-          ppi_lda, &dsp->t1d_pp_param);
+        dsp->t1d.ppval = ppi_lda(
+          &dsp->t1d_pp_op.pdata,  &dsp->t1d_pp_param
+        );
         if (basismeth == 1)
           kout = optimize0 (&dsp->t1d_pp_op, ppi_lda, &dsp->t1d_pp_param);
       }
@@ -319,8 +312,9 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
     case CGINI: 
       if (!compute_groups (dsp->t1d_pp_param.group, dsp->t1d_pp_param.ngroup, 
           &dsp->t1d_pp_param.numgroups, nrows, gdata)) {
-        dsp->t1d.ppval = t1d_calc_indx (dsp->t1d_pp_op.pdata, 
-          ppi_gini, &dsp->t1d_pp_param);
+        dsp->t1d.ppval =  ppi_gini(
+          &dsp->t1d_pp_op.pdata,  &dsp->t1d_pp_param
+        );
         if (basismeth == 1)
           kout = optimize0 (&dsp->t1d_pp_op, ppi_gini, &dsp->t1d_pp_param);
       }
@@ -328,8 +322,9 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
    case CENTROPY: 
       if (!compute_groups (dsp->t1d_pp_param.group, dsp->t1d_pp_param.ngroup, 
           &dsp->t1d_pp_param.numgroups, nrows, gdata)) {
-        dsp->t1d.ppval = t1d_calc_indx (dsp->t1d_pp_op.pdata,
-          ppi_entropy, &dsp->t1d_pp_param);
+        dsp->t1d.ppval =  ppi_entropy(
+          &dsp->t1d_pp_op.pdata,  &dsp->t1d_pp_param
+        );
       if (basismeth == 1)
         kout = optimize0 (&dsp->t1d_pp_op, ppi_entropy, &dsp->t1d_pp_param);
       }

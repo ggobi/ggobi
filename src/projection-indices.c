@@ -159,19 +159,17 @@ void center (array_d *data) {
   } 
 } 
  
-gint ppi_pca (array_d *pdata, void *param, gdouble *val) { 
-  gint i, j; 
+gdouble ppi_pca (array_d *pdata, void *param) { 
  
   center (pdata); 
  
-  *val = 0.0; 
-  for (i=0; i<pdata->ncols; i++) 
-  { for (j=0; j<pdata->nrows; j++) 
-      *val += pdata->vals[j][i]*pdata->vals[j][i]; 
+  gdouble val = 0.0; 
+  for (guint i = 0; i < pdata->ncols; i++) {
+    for (guint j = 0; j < pdata->nrows; j++) {
+      val += pdata->vals[j][i] * pdata->vals[j][i]; 
+    }
   } 
-  *val /= (pdata->nrows-1); 
- 
-  return (0); 
+  return val / (pdata->nrows - 1); 
 }
 /********************************************************************
              Arbitrary dimensional pp indices
@@ -224,7 +222,7 @@ Transformation : -
 Purpose        : Looks for the projection with no data in center.
 *********************************************************************/
 
-gint ppi_holes(array_d *pdata, void *param, gdouble *val)
+gdouble ppi_holes(array_d *pdata, void *param)
 { 
   pp_param *pp = (pp_param *) param;
   int i, p, n, k,j;
@@ -287,11 +285,9 @@ gint ppi_holes(array_d *pdata, void *param, gdouble *val)
     } 
     acoefs += exp(-tmp/2.0);
   }
-  *val = (1.0-acoefs/(gdouble)n)/(gdouble) (1.0-exp(-p/2.0));
-
   g_free(cov);
-
-  return(0);
+  
+  return (1.0 - acoefs / (gdouble) n)/ (1.0 - exp(-p / 2.0));
 }
 
 /********************************************************************
@@ -301,7 +297,7 @@ Transformation : -
 Purpose        : Looks for the projection with lots of data in center.
 *********************************************************************/
 
-gint ppi_central_mass(array_d *pdata, void *param, gdouble *val)
+gdouble ppi_central_mass(array_d *pdata, void *param)
 { 
   pp_param *pp = (pp_param *) param;
   int i, p, n,k,j;
@@ -362,10 +358,9 @@ gint ppi_central_mass(array_d *pdata, void *param, gdouble *val)
     } 
     acoefs += exp(-tmp/2.0);
   }
-  *val = (acoefs/n-exp(-p/2.0))/((gdouble) (1-exp(-p/2.0)));
 
   g_free(cov);
-  return(0);
+  return (acoefs / n - exp(-p / 2.0))/ (1.0 - exp(-p / 2.0));
 }
 
 /********************************************************************
@@ -411,7 +406,7 @@ gint compute_groups (vector_i group, vector_i ngroup, gint *numgroups,
   return ((*numgroups==1) || (*numgroups==nrows));
 }
 
-gint ppi_lda (array_d *pdata, void *param, gdouble *val)
+gdouble ppi_lda (array_d *pdata, void *param)
 { 
   pp_param *pp = (pp_param *) param;
   gint i, j, k, l;
@@ -419,6 +414,7 @@ gint ppi_lda (array_d *pdata, void *param, gdouble *val)
   gdouble det;
   gint *Pv; /* dummy structure for pivot in ludcmp - not used */
   gdouble *cov; /* need to get rid of this variable */
+  gdouble val = 0;
 
   n = pdata->nrows;
   p = pdata->ncols;
@@ -478,7 +474,7 @@ gint ppi_lda (array_d *pdata, void *param, gdouble *val)
   }
   else
     det = fabs((gdouble) pp->cov.vals[0][0]);
-    *val = det;
+    val = det;
 
   /* Compute B */
   /*  for (j=0; j<p; j++)
@@ -537,13 +533,10 @@ gint ppi_lda (array_d *pdata, void *param, gdouble *val)
   else
     det = fabs((gdouble) pp->cov.vals[0][0]);
 
-  *val = 1.0-*val/det; /*1-W/(W+B)*/
-/*  *val = *val/det; B/(W+B) */
-
   g_free(Pv);
   g_free(cov);
 
-  return (0);
+  return 1.0 - val /det; /*1-W/(W+B)*/
 }
 
 /********************************************************************
@@ -644,7 +637,7 @@ void countngroup(int *group, int *ngroup, int n)
 
 }
 
-gint ppi_gini (array_d *pdata, void *param, gdouble *val)
+gdouble ppi_gini (array_d *pdata, void *param)
 { 
   pp_param *pp = (pp_param *) param;
   gint i, k, n, p, g = pp->numgroups, left, right, l;
@@ -703,11 +696,10 @@ gint ppi_gini (array_d *pdata, void *param, gdouble *val)
       if(maxindex < index) maxindex = index;
     }
   }
-  *val = 1-maxindex ;
-  return(0);
+  return 1 - maxindex;
 }
 
-gint ppi_entropy (array_d *pdata, void *param, gdouble *val)
+gdouble ppi_entropy (array_d *pdata, void *param)
 { 
   pp_param *pp = (pp_param *) param;
   gint i, k, n, p, g = pp->numgroups, left, right,l;
@@ -766,7 +758,5 @@ gint ppi_entropy (array_d *pdata, void *param, gdouble *val)
       if(maxindex < index) maxindex = index;
     }
   } 
-  *val = 1-maxindex/log(g) ;
-  return(0);
-
+  return 1 - maxindex / log(g);
 }

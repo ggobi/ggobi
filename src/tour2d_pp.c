@@ -228,37 +228,6 @@ void t2d_pp_reinit(displayd *dsp, GGobiSession *gg)
   g_free (label);
 }
 
-/********************************************************************
-
-                         INDEX CALCULATION
-
-The index function has to be defined as
-
-     gint index (array_d *pdata, void *param, gdouble *val)
-
-with   
-
-Input:  pdata   projected data
-        param   additional parameters for the index 
-                (will not be touched by the optimization routine)
-
-Output: val     the index-value
-        
-This function should simply calculate the index value for a provided
-projection.
-
-*********************************************************************/
-
-gdouble t2d_calc_indx (array_d pd,
-                PPIndex index,
-                void *param)
-{ 
-  gdouble indexval;
-
-  index (&pd, param, &indexval);
-
-  return(indexval);
-}
 
 /* 
  We could call this with the tour t2d object rather than the index type
@@ -310,7 +279,7 @@ t2d_switch_index(Tour2DCPanel controls, gint basismeth, displayd *dsp,
       if(controls.ppindex.checkGroups == false || 
            !compute_groups (dsp->t2d_pp_param.group, dsp->t2d_pp_param.ngroup, &dsp->t2d_pp_param.numgroups, nrows, gdata)) 
       { 
-	  controls.ppindex.index_f(&dsp->t2d_pp_op.pdata, &dsp->t2d_pp_param,  &dsp->t2d.ppval);
+	  dsp->t2d.ppval = controls.ppindex.index_f(&dsp->t2d_pp_op.pdata, &dsp->t2d_pp_param);
 	  if(basismeth == 1) 
 	      kout = optimize0 (&dsp->t2d_pp_op, controls.ppindex.index_f, &dsp->t2d_pp_param);
       }
