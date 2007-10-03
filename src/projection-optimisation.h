@@ -13,7 +13,7 @@ typedef struct {
 
 gint alloc_optimize0_p (optimize0_param *op, gint nrows, gint ncols, gint ndim);
 gint free_optimize0_p (optimize0_param *op);
-gint optimize0 (optimize0_param *op, Tour_PPIndex_f fun, void *param);
+gint optimize0 (optimize0_param *op, PPIndex fun, void *param);
 gint realloc_optimize0_p (optimize0_param *, gint, vector_i);
 
 gboolean iszero (array_d *data);

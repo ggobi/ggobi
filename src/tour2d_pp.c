@@ -36,11 +36,7 @@ The authors can be contacted at the following email addresses:
 #include "tour_pp_ui.h"
 
 
-typedef enum {HOLES, CENTRAL_MASS, LDA, CGINI, CENTROPY}  StandardPPIndexTypes;
 
-
-#define EXPMINUS1 0.3678794411714423
-#define ONEMINUSEXPMINUS1 0.63212056
 
 void t2d_pptemp_set(gdouble slidepos, displayd *dsp, GGobiSession *gg) {
   dsp->t2d_pp_op.temp_start = slidepos;
@@ -254,12 +250,12 @@ projection.
 *********************************************************************/
 
 gdouble t2d_calc_indx (array_d pd,
-                Tour_PPIndex_f index,
+                PPIndex index,
                 void *param)
 { 
   gdouble indexval;
 
-  index (&pd, param, &indexval, NULL);
+  index (&pd, param, &indexval);
 
   return(indexval);
 }
@@ -314,69 +310,12 @@ t2d_switch_index(Tour2DCPanel controls, gint basismeth, displayd *dsp,
       if(controls.ppindex.checkGroups == false || 
            !compute_groups (dsp->t2d_pp_param.group, dsp->t2d_pp_param.ngroup, &dsp->t2d_pp_param.numgroups, nrows, gdata)) 
       { 
-	  controls.ppindex.index_f(&dsp->t2d_pp_op.pdata, &dsp->t2d_pp_param,  &dsp->t2d.ppval, controls.ppindex.userData);
+	  controls.ppindex.index_f(&dsp->t2d_pp_op.pdata, &dsp->t2d_pp_param,  &dsp->t2d.ppval);
 	  if(basismeth == 1) 
 	      kout = optimize0 (&dsp->t2d_pp_op, controls.ppindex.index_f, &dsp->t2d_pp_param);
       }
   }
 
-#if 0
-  switch (indxtype)
-  { 
-    case HOLES: 
-      dsp->t2d.ppval = t2d_calc_indx (dsp->t2d_pp_op.pdata, 
-				      ppi_holes, &dsp->t2d_pp_param);
-      if (basismeth == 1) {
-        kout = optimize0 (&dsp->t2d_pp_op, ppi_holes, &dsp->t2d_pp_param);
-      }
-    break;
-    case CENTRAL_MASS: 
-      dsp->t2d.ppval = t2d_calc_indx (dsp->t2d_pp_op.pdata,
-				      ppi_central_mass, &dsp->t2d_pp_param);
-      if (basismeth == 1)
-        kout = optimize0 (&dsp->t2d_pp_op, ppi_central_mass, &dsp->t2d_pp_param);
-    break;
-    case LDA: 
-      if (!compute_groups (dsp->t2d_pp_param.group, dsp->t2d_pp_param.ngroup, 
-        &dsp->t2d_pp_param.numgroups, nrows, gdata)) {
-        dsp->t2d.ppval = t2d_calc_indx (dsp->t2d_pp_op.pdata,
-					ppi_lda, &dsp->t2d_pp_param);
-        if (basismeth == 1)
-          kout = optimize0 (&dsp->t2d_pp_op, ppi_lda, &dsp->t2d_pp_param);
-      }
-      break;
-    case CGINI: 
-      if (!compute_groups (dsp->t2d_pp_param.group, dsp->t2d_pp_param.ngroup, 
-        &dsp->t2d_pp_param.numgroups, nrows, 
-			   gdata)) {
-        dsp->t2d.ppval = t2d_calc_indx (dsp->t2d_pp_op.pdata,
-					ppi_gini, &dsp->t2d_pp_param);
-        if (basismeth == 1)
-          kout = optimize0 (&dsp->t2d_pp_op, ppi_gini, &dsp->t2d_pp_param);
-      }
-      break;
-    case CENTROPY: 
-      if (!compute_groups (dsp->t2d_pp_param.group, dsp->t2d_pp_param.ngroup, 
-        &dsp->t2d_pp_param.numgroups, nrows, 
-			   gdata)) {
-        dsp->t2d.ppval = t2d_calc_indx (dsp->t2d_pp_op.pdata,
-          ppi_entropy, &dsp->t2d_pp_param);
-        if (basismeth == 1)
-          kout = optimize0 (&dsp->t2d_pp_op, ppi_entropy, &dsp->t2d_pp_param);
-      }
-      break;
-    break;
-    default: 
-/* Shouldn't we free gdata. */
-      return(true);
-    break;
-  }
-#endif
-
   g_free (gdata);
   return(false);
 }
-
-
-#undef ONEMINUSEXPMINUS1
-#undef EXPMINUS1

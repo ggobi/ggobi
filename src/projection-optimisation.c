@@ -3,6 +3,69 @@
 #include "vector.h"
 #include <math.h>
 
+
+gint alloc_optimize0_p (optimize0_param *op, gint nrows, gint ncols, gint ndim)
+{
+  arrayd_init_null (&op->proj_best);
+  /*  arrayd_alloc_zero (&op->proj_best, ncols, ndim); *nrows, ncols);*/
+  arrayd_alloc_zero (&op->proj_best, ndim, ncols); /*nrows, ncols);*/
+  arrayd_init_null (&op->data);
+  arrayd_alloc_zero (&op->data, nrows, ncols); 
+  arrayd_init_null (&op->pdata);
+  arrayd_alloc_zero (&op->pdata, nrows, ndim); 
+
+  return 0;
+}
+
+gint free_optimize0_p (optimize0_param *op)
+{ 
+  arrayd_free (&op->proj_best);
+  arrayd_free (&op->data);
+  arrayd_free(&op->pdata);
+
+  return 0;
+}
+
+gint realloc_optimize0_p (optimize0_param *op, gint ncols, vector_i pcols)
+{
+/* pdata doesn't need to be reallocated, since it doesn't depend on ncols */
+  if (op->proj_best.ncols < ncols) {
+    arrayd_add_cols(&op->proj_best, ncols);
+    arrayd_add_cols(&op->data, ncols);
+  }
+  else {
+    GSList *cols = NULL;
+    for (guint i=0; i < op->proj_best.ncols - ncols; i++)
+      cols = g_slist_append(cols, GINT_TO_POINTER(ncols - 1 - i));
+    arrayd_delete_cols(&op->proj_best, cols);
+    arrayd_delete_cols(&op->data, cols);
+    g_slist_free (cols);
+  }
+
+  return 0;
+}
+
+/********************************************************************
+
+                         OPTIMIZATION
+
+The index function has to be defined as
+
+     gint index (array_d *pdata, void *param, gdouble *val)
+
+with   
+
+Input:  pdata   projected data
+        param   additional parameters for the index 
+                (will not be touched by the optimization routine)
+
+Output: val     the index-value
+        
+The return value should be zero, otherwise the optimization routine
+assumes an error has occurred during computation of the index. 
+
+*********************************************************************/
+
 gboolean iszero (array_d *data)
 { 
   gdouble sum = 0;
@@ -64,70 +127,11 @@ void orthonormal (array_d *proj)
   g_free(ip);
 }
 
-/********************************************************************
 
-                         OPTIMIZATION
 
-The index function has to be defined as
-
-     gint index (array_d *pdata, void *param, gdouble *val)
-
-with   
-
-Input:  pdata   projected data
-        param   additional parameters for the index 
-                (will not be touched by the optimization routine)
-
-Output: val     the index-value
-        
-The return value should be zero, otherwise the optimization routine
-assumes an error has occurred during computation of the index. 
-
-*********************************************************************/
-
-gint alloc_optimize0_p (optimize0_param *op, gint nrows, gint ncols, gint ndim)
-{
-  arrayd_init_null (&op->proj_best);
-  /*  arrayd_alloc_zero (&op->proj_best, ncols, ndim); *nrows, ncols);*/
-  arrayd_alloc_zero (&op->proj_best, ndim, ncols); /*nrows, ncols);*/
-  arrayd_init_null (&op->data);
-  arrayd_alloc_zero (&op->data, nrows, ncols); 
-  arrayd_init_null (&op->pdata);
-  arrayd_alloc_zero (&op->pdata, nrows, ndim); 
-
-  return 0;
-}
-
-gint free_optimize0_p (optimize0_param *op)
-{ 
-  arrayd_free (&op->proj_best);
-  arrayd_free (&op->data);
-  arrayd_free(&op->pdata);
-
-  return 0;
-}
-
-gint realloc_optimize0_p (optimize0_param *op, gint ncols, vector_i pcols)
-{
-/* pdata doesn't need to be reallocated, since it doesn't depend on ncols */
-  if (op->proj_best.ncols < ncols) {
-    arrayd_add_cols(&op->proj_best, ncols);
-    arrayd_add_cols(&op->data, ncols);
-  }
-  else {
-    GSList *cols = NULL;
-    for (guint i=0; i < op->proj_best.ncols - ncols; i++)
-      cols = g_slist_append(cols, GINT_TO_POINTER(ncols - 1 - i));
-    arrayd_delete_cols(&op->proj_best, cols);
-    arrayd_delete_cols(&op->data, cols);
-    g_slist_free (cols);
-  }
-
-  return 0;
-}
 
 gint optimize0 (optimize0_param *op,
-                Tour_PPIndex_f index,
+                PPIndex index,
                 void *param)
 { 
   gdouble index_work = 0.0;
@@ -181,7 +185,7 @@ g_printerr ("\n");*/
     }*/
   /* do index calculation, functions return -1 if a problem, which
      is then passed back through optimize0 to tour1d_run */
-  if (index (&op->pdata, param, &op->index_best, NULL)) return(-1);
+  if (index (&op->pdata, param, &op->index_best)) return(-1);
   /*g_printerr ("index_work %f index_best %f \n",index_work, op->index_best);*/
 /*  if (index (&op->pdata, param, &index_work)) return(-1);*/
 
@@ -210,7 +214,7 @@ g_printerr ("\n");*/
       }
 
       /* Calculate pp index for current projection */       
-      if (index (&op->pdata, param, &index_work, NULL)) return(-1);
+      if (index (&op->pdata, param, &index_work)) return(-1);
 
       /*g_printerr ("index_work %f temp %f \n",index_work, op->temp);
 g_printerr ("proj_work: ");

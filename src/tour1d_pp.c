@@ -38,8 +38,6 @@ The authors can be contacted at the following email addresses:
 
 
 
-/*static gchar msg[1024];*/
-
 /*-- projection pursuit indices --*/
 #define HOLES          0
 #define CENTRAL_MASS   1
@@ -49,9 +47,6 @@ The authors can be contacted at the following email addresses:
 #define CENTROPY       5
 #define CART_VAR       6
 #define SUBD           7
-
-#define EXPMINUS1 0.3678794411714423
-#define ONEMINUSEXPMINUS1 0.63212056
 
 
 void t1d_pptemp_set(gdouble slidepos, displayd *dsp, GGobiSession *gg) {
@@ -244,12 +239,12 @@ void t1d_pp_reinit(displayd *dsp, GGobiSession *gg)
 }
 
 gdouble t1d_calc_indx (array_d pd, 
-                Tour_PPIndex_f index,
+                PPIndex index,
                 void *param)
 { 
   gdouble indexval;
 
-  index (&pd, param, &indexval, NULL);
+  index (&pd, param, &indexval);
 
   return(indexval);
 }
@@ -308,9 +303,9 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
       break;
     case PCA: 
       dsp->t1d.ppval = t1d_calc_indx (dsp->t1d_pp_op.pdata, 
-        (Tour_PPIndex_f) ppi_pca, NULL);
+        (PPIndex) ppi_pca, NULL);
       if (basismeth == 1)
-        kout = optimize0 (&dsp->t1d_pp_op, (Tour_PPIndex_f) ppi_pca, NULL);
+        kout = optimize0 (&dsp->t1d_pp_op, (PPIndex) ppi_pca, NULL);
       break;
     case LDA:
       if (!compute_groups (dsp->t1d_pp_param.group, dsp->t1d_pp_param.ngroup, 

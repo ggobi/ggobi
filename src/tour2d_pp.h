@@ -21,5 +21,5 @@ The authors can be contacted at the following email addresses:
 
 #include "projection-indices.h"
 
-gdouble t2d_calc_indx(array_d, Tour_PPIndex_f fun,  void *param);
+gdouble t2d_calc_indx(array_d, PPIndex fun,  void *param);
 gboolean t2d_switch_index(Tour2DCPanel, gint, displayd *, GGobiSession *);

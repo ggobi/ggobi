@@ -3,6 +3,22 @@
 #include <string.h>
 
 
+void zero (gdouble *ptr, gint length)
+{ 
+  gint i;
+
+  for (i=0; i<length; i++)
+    ptr[i] = 0.0;
+}
+
+void zero_int(gint *mem, int size)
+{
+  gint i;
+  for(i=0; i<size; i++)
+  mem[i] = 0;
+}
+  
+
 /*****************************************************/
 /*               Utility Routines                    */
 /*                                                   */
@@ -10,59 +26,6 @@
 /*             - Kendall E. Atkinson                 */
 /*             (p 449 - 450)                         */
 /*****************************************************/
-
-void inverse(gdouble *a, gint n)
-{
-  gdouble *b,*inv,d;
-  gint *P,i,j;
-
-  P = (gint *) g_malloc(n*sizeof(gint));
-  inv = (gdouble *) g_malloc(n*n*sizeof(gdouble));
-  d = ludcmp(a,n,P);
- 
-  b = (gdouble *) g_malloc(n*sizeof(gdouble));
-  for(i=0; i<n; i++)
-  {  
-    for(j=0; j<n; j++)
-    {  
-      if(i == j) b[j] = 1.0; else b[j] = 0.0;
-    }
-    d=tour_pp_solve(a,b,n,P);
-     for(j=0; j<n; j++)
-       inv[j*n+i] = b[j];
-  }
-  memcpy(a,inv,n*n*sizeof(gdouble));
-
-  g_free(P);
-  g_free(inv);
-  g_free(b);
-}    
-
-gdouble
-tour_pp_solve(gdouble *a,gdouble *b,gint n,gint *Pivot) 
-{
-  gint i,j,k;
-  gdouble temp;
-  
-  for(k=0; k<(n-1); k++)
-  {  if(Pivot[k] != k)
-     {  temp = b[Pivot[k]];
-        b[Pivot[k]] = b[k];
-        b[k] = temp;
-     }
-     for(i=(k+1);i<n; i++)
-        b[i] -= a[i*n+k]*b[k];
-  }
-  b[n-1] /= a[n*n-1];
-  for(i=(n-2); i>=0; i--)
-  {  temp=0;
-     for(j=(i+1); j<n; j++)
-       temp += a[i*n+j]*b[j];
-       b[i] = (b[i] -temp)/a[i*n+i];
-  }
-  return(0);
-}
-
 
 gdouble ludcmp(gdouble *a, gint n, gint *Pivot) 
 { 
@@ -118,7 +81,62 @@ gdouble ludcmp(gdouble *a, gint n, gint *Pivot)
   g_free(s);
 
   return(det);
-}                               
+}
+
+gdouble
+inverse_step(gdouble *a,gdouble *b,gint n,gint *Pivot) 
+{
+  gint i,j,k;
+  gdouble temp;
+  
+  for(k=0; k<(n-1); k++)
+  {  if(Pivot[k] != k)
+     {  temp = b[Pivot[k]];
+        b[Pivot[k]] = b[k];
+        b[k] = temp;
+     }
+     for(i=(k+1);i<n; i++)
+        b[i] -= a[i*n+k]*b[k];
+  }
+  b[n-1] /= a[n*n-1];
+  for(i=(n-2); i>=0; i--)
+  {  temp=0;
+     for(j=(i+1); j<n; j++)
+       temp += a[i*n+j]*b[j];
+       b[i] = (b[i] -temp)/a[i*n+i];
+  }
+  return(0);
+}
+
+void inverse(gdouble *a, gint n)
+{
+  gdouble *b,*inv,d;
+  gint *P,i,j;
+
+  P = (gint *) g_malloc(n*sizeof(gint));
+  inv = (gdouble *) g_malloc(n*n*sizeof(gdouble));
+  d = ludcmp(a,n,P);
+ 
+  b = (gdouble *) g_malloc(n*sizeof(gdouble));
+  for(i=0; i<n; i++)
+  {  
+    for(j=0; j<n; j++)
+    {  
+      if(i == j) b[j] = 1.0; else b[j] = 0.0;
+    }
+    d=inverse_step(a,b,n,P);
+     for(j=0; j<n; j++)
+       inv[j*n+i] = b[j];
+  }
+  memcpy(a,inv,n*n*sizeof(gdouble));
+
+  g_free(P);
+  g_free(inv);
+  g_free(b);
+}    
+
+
+                              
 /******************************************************************** 
 
 Index          : PCA-d 
@@ -141,7 +159,7 @@ void center (array_d *data) {
   } 
 } 
  
-gint ppi_pca (array_d *pdata, void *param, gdouble *val, gpointer userData) { 
+gint ppi_pca (array_d *pdata, void *param, gdouble *val) { 
   gint i, j; 
  
   center (pdata); 
@@ -206,7 +224,7 @@ Transformation : -
 Purpose        : Looks for the projection with no data in center.
 *********************************************************************/
 
-gint ppi_holes(array_d *pdata, void *param, gdouble *val, gpointer unused)
+gint ppi_holes(array_d *pdata, void *param, gdouble *val)
 { 
   pp_param *pp = (pp_param *) param;
   int i, p, n, k,j;
@@ -283,7 +301,7 @@ Transformation : -
 Purpose        : Looks for the projection with lots of data in center.
 *********************************************************************/
 
-gint ppi_central_mass(array_d *pdata, void *param, gdouble *val, gpointer unused)
+gint ppi_central_mass(array_d *pdata, void *param, gdouble *val)
 { 
   pp_param *pp = (pp_param *) param;
   int i, p, n,k,j;
@@ -358,21 +376,6 @@ Purpose        : Looks for the best projection to discriminate
                  between groups.
 *********************************************************************/
 
-void zero (gdouble *ptr, gint length)
-{ 
-  gint i;
-
-  for (i=0; i<length; i++)
-    ptr[i] = 0.0;
-}
-
-void zero_int(gint *mem, int size)
-{
-  gint i;
-  for(i=0; i<size; i++)
-  mem[i] = 0;
-}
-  
 gint compute_groups (vector_i group, vector_i ngroup, gint *numgroups, 
   gint nrows, gdouble *gdata)
 { 
@@ -408,7 +411,7 @@ gint compute_groups (vector_i group, vector_i ngroup, gint *numgroups,
   return ((*numgroups==1) || (*numgroups==nrows));
 }
 
-gint ppi_lda (array_d *pdata, void *param, gdouble *val, gpointer unused)
+gint ppi_lda (array_d *pdata, void *param, gdouble *val)
 { 
   pp_param *pp = (pp_param *) param;
   gint i, j, k, l;
@@ -641,7 +644,7 @@ void countngroup(int *group, int *ngroup, int n)
 
 }
 
-gint ppi_gini (array_d *pdata, void *param, gdouble *val, gpointer unused)
+gint ppi_gini (array_d *pdata, void *param, gdouble *val)
 { 
   pp_param *pp = (pp_param *) param;
   gint i, k, n, p, g = pp->numgroups, left, right, l;
@@ -704,7 +707,7 @@ gint ppi_gini (array_d *pdata, void *param, gdouble *val, gpointer unused)
   return(0);
 }
 
-gint ppi_entropy (array_d *pdata, void *param, gdouble *val, gpointer unused)
+gint ppi_entropy (array_d *pdata, void *param, gdouble *val)
 { 
   pp_param *pp = (pp_param *) param;
   gint i, k, n, p, g = pp->numgroups, left, right,l;
