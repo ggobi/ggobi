@@ -280,7 +280,6 @@ t2d_switch_index(Tour2DCPanel controls, gint basismeth, displayd *dsp,
     if(basismeth == 1) 
       dsp->t2d.ppval = optimize0 (&dsp->t2d_pp_op, controls.ppindex.index_f, groups);
   }
-  g_debug("PPI: %f", dsp->t2d.ppval);
   
   vectord_free(&groups);
   return(true);

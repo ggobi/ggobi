@@ -282,7 +282,6 @@ gdouble gaussian_filter(array_d data) {
 
   arrayd_free(&cov);
   vectord_free(&means);
-  g_debug("acoefs: %f", acoefs);
   
   return acoefs;
 }
