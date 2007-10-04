@@ -267,12 +267,12 @@ t2d_switch_index(Tour2DCPanel controls, gint basismeth, displayd *dsp,
           dsp->t2d_pp_op.proj_best.vals[k][j]);
     }
 
-  GGOBI_STAGE_ATTR_INIT(d, cluster);
+  GGOBI_STAGE_ATTR_INIT_ALL(d);
   vector_d groups;
   vectord_init_null(&groups);
   vectord_alloc_zero(&groups, nrows);
   for (i=0; i<nrows; i++) { 
-    groups.els[i] = GGOBI_STAGE_GET_ATTR_CLUSTER(d, i);
+    groups.els[i] = (gdouble) GGOBI_STAGE_GET_ATTR_COLOR(d, i);
   }
 
   if(controls.ppindex.index_f) {

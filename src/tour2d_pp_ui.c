@@ -87,8 +87,7 @@ static gchar *t2d_pp_func_lbl[] = {"Holes","Central Mass","LDA","PCA"};
 TourPPIndex StandardPPIndices[] = {
     {"Holes", &ppi_holes},
     {"Central Mass", &ppi_central_mass},
-    {"LDA", &ppi_lda},
-    {"PCA", &ppi_pca}
+    {"LDA", &ppi_lda}
 };
 
 

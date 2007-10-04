@@ -13,17 +13,17 @@ guint compute_groups(vector_i group, vector_i ngroup, vector_d groups) {
   guint numgroups = 0;
   guint nrows = groups.nels;
   
-  gint* groupval = g_new0(gint, nrows);
+  gdouble* groupval = g_new0(gdouble, nrows);
 
   for (i=0; i < nrows; i++) {
     for (j=0; j < numgroups; j++) { 
-      if (groupval[j] == group.els[i]) { 
+      if (groupval[j] == groups.els[i]) { 
         ngroup.els[j]++;
         break;
       }
     }
     if (j == numgroups ) { 
-      groupval[j]  = group.els[i];
+      groupval[j]  = groups.els[i];
       ngroup.els[j] = 1;
       numgroups++;
     }
@@ -31,13 +31,12 @@ guint compute_groups(vector_i group, vector_i ngroup, vector_d groups) {
 
   for (i=0; i < nrows; i++) { 
     for (j=0; j < numgroups; j++) { 
-      if (groupval[j] == group.els[i])
+      if (groupval[j] == groups.els[i])
         group.els[i] = j;
     }
   }
 
   g_free(groupval);
-
   return numgroups;
 }
 
@@ -217,7 +216,7 @@ void center (array_d data) {
 } 
 
 // PCA index
-// Computes traces of covariance matrix  
+// Computes traces of covariance matrix.  Only works for 1d.
 gdouble ppi_pca (array_d data, vector_d groups) { 
   center (data); 
  
@@ -283,6 +282,7 @@ gdouble gaussian_filter(array_d data) {
 
   arrayd_free(&cov);
   vectord_free(&means);
+  g_debug("acoefs: %f", acoefs);
   
   return acoefs;
 }
@@ -295,7 +295,7 @@ gdouble ppi_holes(array_d data, vector_d groups) {
   guint n = data.nrows;
   
   gdouble acoefs = gaussian_filter(data);
-  return (1.0 - acoefs / (gdouble) n)/ (1.0 - exp(-p / 2.0));
+  return (1.0 - gaussian_filter(data) / n) / (1.0 - exp(-p / 2));
 }
 
 // Central mass index
@@ -334,7 +334,7 @@ gdouble ppi_lda (array_d data, vector_d groups) {
   arrayd_init_null(&group_means);
   arrayd_init_null(&covW);
   arrayd_init_null(&covWB);
-  arrayd_alloc_zero(&group_means, p, numgroups);
+  arrayd_alloc_zero(&group_means, numgroups, p);
   arrayd_alloc_zero(&covW, p, p);
   arrayd_alloc_zero(&covWB, p, p);
 
@@ -343,27 +343,29 @@ gdouble ppi_lda (array_d data, vector_d groups) {
   vectord_alloc_zero(&means, p);
 
   /* Compute means */
-  for (k=0; k < p; k++) {
+  for (j=0; j < p; j++) {
     for (i=0; i < n; i++) { 
-      group_means.vals[group_lookup.els[i]][k] += data.vals[i][k]; 
-      means.els[k] += (gdouble) data.vals[i][k];
+      int g = group_lookup.els[i];
+      group_means.vals[g][j] += data.vals[i][j]; 
+      means.els[j] += data.vals[i][j];
     }
   }
 
-  for (k=0; k < p; k++) { 
-    for (i=0; i < numgroups; i++) { 
-      group_means.vals[i][k] /= ngroup.els[i];
+  for (j=0; j < p; j++) { 
+    for (guint g = 0; g < numgroups; g++) { 
+      group_means.vals[g][j] /= ngroup.els[g];
     }
-    means.els[k] /= n;
+    means.els[j] /= n;
   }
-  
+    
   // Compute W
   for (i=0; i < n; i++) { 
     for (j=0; j < p; j++) { 
       for (k=0; k <= j; k++) { 
+        int g = group_lookup.els[i];
         covW.vals[k][j] += 
-          (data.vals[i][j] - group_means.vals[group_lookup.els[i]][j])*
-          (data.vals[i][k] - group_means.vals[group_lookup.els[i]][k]);
+          (data.vals[i][j] - group_means.vals[g][j]) *
+          (data.vals[i][k] - group_means.vals[g][k]);
         covW.vals[j][k] = covW.vals[k][j];
       }
     }
@@ -381,5 +383,5 @@ gdouble ppi_lda (array_d data, vector_d groups) {
     }
   }
 
-  return 1.0 - arrayd_determinant(covW) / arrayd_determinant(covWB);
+  return 1.0 - (arrayd_determinant(covW) / arrayd_determinant(covWB));
 }
