@@ -336,7 +336,6 @@ class GGobi:Data:Factory:XML from GGobi:Data:Factory
     ctx->sax = NULL;
     xmlFreeParserCtxt(ctx);
     g_free(xmlParserHandler);
-    g_object_unref(G_OBJECT(input));
     
     return (dlist);
   }
