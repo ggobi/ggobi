@@ -291,18 +291,18 @@ gdouble gaussian_filter(array_d data) {
 // Holes index
 // Looks for the projection with no data in center.
 gdouble ppi_holes(array_d data, vector_d groups) { 
-  guint p = data.ncols; 
-  guint n = data.nrows;
+  gdouble p = data.ncols; 
+  gdouble n = data.nrows;
   
   gdouble acoefs = gaussian_filter(data);
-  return (1.0 - gaussian_filter(data) / n) / (1.0 - exp(-p / 2));
+  return (1.0 - acoefs / n) / (1.0 - exp(-p / 2.0));
 }
 
 // Central mass index
 // Looks for the projection with lots of data in the center.
 gdouble ppi_central_mass(array_d data, vector_d groups) { 
-  guint p = data.ncols; 
-  guint n = data.nrows;
+  gdouble p = data.ncols; 
+  gdouble n = data.nrows;
 
   gdouble acoefs = gaussian_filter(data);
   return (acoefs / n - exp(-p / 2.0))/ (1.0 - exp(-p / 2.0));
