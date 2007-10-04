@@ -35,11 +35,11 @@ public class GGobi.GuiJitter : Window {
     varlist.selection_changed += varlist => {
       update_amount_slider();
     };
+
     varlist.add_view_col("Jittering", 2);
-    
-    update_jittered_values();
+    varlist.update_data_column(2, description); 
     stage.col_parameter_changed += (stage, col) => { 
-      update_jittered_values(); 
+      varlist.update_data_column(2, description); 
     };
 
     Label distLabel = new Label("Distribution:");
@@ -84,16 +84,10 @@ public class GGobi.GuiJitter : Window {
     show_all();    
   }
   
-  private void update_jittered_values() {
-    ListStore vars = varlist.vars;
-    TreeIter iter;
-
-    vars.get_iter_first(out iter);
-    for(uint j = 0; j < stage.n_cols; j++) {
-      vars.set(out iter, 2, stage.amount[j].to_string("%0.2f"));
-      vars.iter_next(out iter);
-    }
+  public static string description(Stage stage, uint j) {
+    return ((StageJitter) stage).amount[j].to_string("%0.2f");
   }
+  
   
   private void update_amount_slider() {
     SList<uint> selected = varlist.selected_vars();

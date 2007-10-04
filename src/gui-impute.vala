@@ -36,11 +36,11 @@ public class GGobi.GuiImpute : Window {
       update_imputation_gui();
     };
     
-    update_imputation_col();
-    stage.col_parameter_changed += (stage, j) => { 
-      update_imputation_col();
-    };
     varlist.add_view_col("Imputation", 2);
+    varlist.update_data_column(2, description); 
+    stage.col_parameter_changed += (stage, col) => { 
+      varlist.update_data_column(2, description); 
+    };
 
     // Imputation selection radio buttons
     fixed = new RadioButton.with_label(null, "Fixed value:");
@@ -134,15 +134,8 @@ public class GGobi.GuiImpute : Window {
     }
   }
   
-  private void update_imputation_col() {
-    ListStore vars = varlist.vars;
-    TreeIter iter;
-
-    vars.get_iter_first(out iter);
-    for(uint j = 0; j < stage.n_cols; j++) {
-      vars.set(out iter, 2, stage.imputation[j].description());
-      vars.iter_next(out iter);
-    }
+  public static string description(Stage stage, uint j) {
+    return ((StageImpute) stage).imputation[j].description();
   }
   
   private void update_imputation_gui() {

@@ -13,6 +13,10 @@ be fixed.
 using Gtk;
 using GLib;
 
+namespace GGobi {
+  public delegate string VariableDescription(Stage stage, uint j);
+}
+
 public class GGobi.Varlist : GLib.Object {
   public Stage stage { construct; get; }
   
@@ -66,6 +70,16 @@ public class GGobi.Varlist : GLib.Object {
     col.add_attribute(renderer, "text", position);
     col.set_sort_column_id(position);
     vartable.append_column(col);
+  }
+  
+  public void update_data_column(uint column, VariableDescription f) {
+    TreeIter iter;
+
+    vars.get_iter_first(out iter);
+    for(uint j = 0; j < stage.n_cols; j++) {
+      vars.set(out iter, 2, f(stage, j));
+      vars.iter_next(out iter);
+    }
   }
   
   /* Compute which variables are currently selected */
