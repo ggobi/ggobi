@@ -62,19 +62,16 @@ public class GGobi.StageImpute : Stage {
   override void process_outgoing(PipelineMessage msg) {
     uint old_cols = n_cols;
     base.process_outgoing(msg);
-
+  
     // FIXME: deal with deleted variables too
     imputation.resize((int) n_cols);
     for (uint j = old_cols; j < n_cols; j++)
       imputation[(int) j] = new ImputationPercent();
-
+  
     // needs to be done second as relies on imputations being set up
     cache.process_message(msg, this);
     
   }
-  
-  // Need set imputation method which calls impute
-  
 }
 
 

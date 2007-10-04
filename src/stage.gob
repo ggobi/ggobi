@@ -252,7 +252,6 @@ property OBJECT parent
   set {
     GGobiStage *parent = g_value_get_object(VAL);
     GGobiStage *former = self->parent;
-    GGobiPipelineMessage *msg = ggobi_pipeline_message_new(0, 0);
     
     if (former) {
       g_signal_handler_disconnect(former, selfp->changed_handler);
@@ -275,8 +274,10 @@ property OBJECT parent
     self_add_child(parent, self);
     
     /* pretend like the parent just said "here's some new rows and columns!" */
+    GGobiPipelineMessage *msg = ggobi_pipeline_message_new(0, 0);
     ggobi_pipeline_message_add_rows(msg, self->parent->n_rows);
     ggobi_pipeline_message_add_cols(msg, self->parent->n_cols);
+
     self_changed_handler(self, msg);
     g_object_unref(G_OBJECT(msg));
   }

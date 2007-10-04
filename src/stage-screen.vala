@@ -55,9 +55,11 @@ public class GGobi.Stage.Screen : Stage {
 	}
 	
 	override double get_raw_value(uint i, uint j) {
+    parent.get_raw_value(i, j);
   }
 
   override void set_raw_value(uint i, uint j, double value) {
+    parent.set_raw_value(i, j, value);
   }
 	
 }

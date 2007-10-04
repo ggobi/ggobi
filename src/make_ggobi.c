@@ -65,7 +65,7 @@ pipeline_create_cb(GGobiPipelineFactory *factory, GGobiStage *root, GGobiSession
 
   jitter = g_object_new(GGOBI_TYPE_STAGE_JITTER, 
     "name", GGOBI_MAIN_STAGE_JITTER, "parent", impute, NULL);
-
+  
   randomize = g_object_new(GGOBI_TYPE_STAGE_RANDOMIZE, 
     "name", GGOBI_MAIN_STAGE_RANDOMIZE, "parent", jitter, NULL);
   
@@ -80,12 +80,12 @@ pipeline_create_cb(GGobiPipelineFactory *factory, GGobiStage *root, GGobiSession
     "name", GGOBI_MAIN_STAGE_DOMAIN_ADJ, "parent", filter, NULL);
   transform = g_object_new(GGOBI_TYPE_STAGE_TRANSFORM,
     "name", GGOBI_MAIN_STAGE_TRANSFORM, "parent", domain_adj, NULL);
-
+  
   standardize = g_object_new(GGOBI_TYPE_STAGE_STANDARDIZE, 
     "name", GGOBI_MAIN_STAGE_STANDARDIZE, "parent", transform, NULL);
   
   display = g_object_new(GGOBI_TYPE_STAGE_DISPLAY, 
-    "name", GGOBI_MAIN_STAGE_DISPLAY, "parent", subset, NULL);
+    "name", GGOBI_MAIN_STAGE_DISPLAY, "parent", standardize, NULL);
   
   
   // FIXME: get rid of these lines ASAP
@@ -109,18 +109,16 @@ pipeline_create_cb(GGobiPipelineFactory *factory, GGobiStage *root, GGobiSession
   g_object_unref(transform);
   
   GGobiGuiViewer *viewer; 
-  viewer = g_object_new(GGOBI_TYPE_GUI_VIEWER, "stage", GGOBI_STAGE(standardize), NULL);
+  viewer = g_object_new(GGOBI_TYPE_GUI_VIEWER, "stage", GGOBI_STAGE(display), NULL);
   gtk_widget_show(GTK_WIDGET(viewer));
   
   GGobiGuiImpute *gui_randomize;
   gui_randomize = g_object_new(GGOBI_TYPE_GUI_RANDOMIZE, "stage", GGOBI_STAGE_RANDOMIZE(randomize), NULL);
   gtk_widget_show(GTK_WIDGET(gui_randomize));
-
+  
   GGobiGuiImpute *gui_impute;
   gui_impute = g_object_new(GGOBI_TYPE_GUI_IMPUTE, "stage", GGOBI_STAGE_IMPUTE(impute), NULL);
   gtk_widget_show(GTK_WIDGET(gui_impute));
-
-  
 }
 
 GGobiPipelineFactory *

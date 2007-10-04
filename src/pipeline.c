@@ -20,16 +20,9 @@
 void
 tform_to_world_by_var (GGobiStage * d, guint j)
 {
-  gint i;
-  gdouble max, min, range, ftmp;
-  GGobiVariable *var = ggobi_stage_get_variable(d, j);
-
-  ggobi_variable_get_limits(var, &min, &max);
-  range = max - min;
-
-  for (i = 0; i < d->n_rows; i++) {
-    ftmp = -1.0 + 2.0 * ((gdouble) ggobi_stage_get_raw_value(d, i, j) - min) / range;
-    d->world.vals[i][j] = (gdouble) (PRECISION1 * ftmp);
+  for (guint i = 0; i < d->n_rows; i++) {
+    gdouble ftmp = -1.0 + 2.0 * ggobi_stage_get_raw_value(d, i, j);
+    d->world.vals[i][j] = (PRECISION1 * ftmp);
   }
 }
 

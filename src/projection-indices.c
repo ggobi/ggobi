@@ -240,6 +240,7 @@ gdouble gaussian_filter(array_d data) {
   
   // Compute column means
   vector_d means;
+  vectord_init_null(&means);
   vectord_alloc_zero(&means, p);
 
   for(j = 0; j < p; j++) {
