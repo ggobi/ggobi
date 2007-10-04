@@ -33,7 +33,7 @@ public class GGobi.GuiRandomize : Window {
     stage.col_parameter_changed += (stage, j) => { 
       update_randomization_col();
     };
-    varlist.add_view_col("Randomisation", 1);
+    varlist.add_view_col("Randomisation", 2);
 
     // Imputation selection radio buttons
     none = new RadioButton.with_label(null, "None");
@@ -97,7 +97,7 @@ public class GGobi.GuiRandomize : Window {
         case RandomizationType.REPEAT: label = "Duplicates"; break;
         case RandomizationType.UNIQUE: label = "No duplicates"; break;
       }
-      vars.set(out iter, 1, label);
+      vars.set(out iter, 2, label);
       vars.iter_next(out iter);
     }
   }

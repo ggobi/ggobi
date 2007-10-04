@@ -35,7 +35,7 @@ public class GGobi.GuiJitter : Window {
     varlist.selection_changed += varlist => {
       update_amount_slider();
     };
-    varlist.add_view_col("Jittering", 1);
+    varlist.add_view_col("Jittering", 2);
     
     update_jittered_values();
     stage.col_parameter_changed += (stage, col) => { 
@@ -90,7 +90,7 @@ public class GGobi.GuiJitter : Window {
 
     vars.get_iter_first(out iter);
     for(uint j = 0; j < stage.n_cols; j++) {
-      vars.set(out iter, 1, stage.amount[j].to_string("%0.2f"));
+      vars.set(out iter, 2, stage.amount[j].to_string("%0.2f"));
       vars.iter_next(out iter);
     }
   }

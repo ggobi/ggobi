@@ -24,26 +24,27 @@ public class GGobi.Varlist : GLib.Object {
   public Varlist(construct Stage stage) {}
 
   construct {
-    vars = new ListStore(2, typeof(string), typeof(string));
+    vars = new ListStore(3, typeof(uint), typeof(string), typeof(string));
 
     // Add variables to list store
     for(uint j = 0; j < stage.n_cols; j++) {
       TreeIter iter;
 
       vars.append(out iter);
-      vars.set(out iter, 0, stage.get_variable(j).name);
+      vars.set(out iter, 0, j);
+      vars.set(out iter, 1, stage.get_variable(j).name);
     }
     
     vartable = new TreeView.with_model(vars);
 
     // Add columns to view
-    add_view_col("Variable", 0);
+    add_view_col("#", 0);
+    add_view_col("Variable", 1);
     vartable.rules_hint = true;
     
     // Allow multiple selection
     TreeSelection sel = vartable.get_selection();
     sel.set_mode(SelectionMode.MULTIPLE);
-
 
     sel.changed += sel => {
       selection_changed();
@@ -63,6 +64,7 @@ public class GGobi.Varlist : GLib.Object {
     CellRenderer renderer = new CellRendererText();
     col.pack_start(renderer, true);
     col.add_attribute(renderer, "text", position);
+    col.set_sort_column_id(position);
     vartable.append_column(col);
   }
   
