@@ -44,7 +44,10 @@ public class GGobi.Varlist : GLib.Object {
     // Add columns to view
     add_view_col("#", 0);
     add_view_col("Variable", 1);
+
     vartable.rules_hint = true;
+    vartable.enable_search = true;
+    vartable.search_column = 1;
     
     // Allow multiple selection
     TreeSelection sel = vartable.get_selection();

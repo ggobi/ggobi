@@ -98,6 +98,7 @@ public class GGobi.GuiRandomize : Window {
   
   private void update_randomization_gui() {
     SList<uint> selected = varlist.selected_vars();
+    if (selected.length() == 0) return;
     RandomizationType cur = stage.randomization[(int) selected.data];
     
     switch (cur) {

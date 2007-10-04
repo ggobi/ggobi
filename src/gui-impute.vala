@@ -140,6 +140,7 @@ public class GGobi.GuiImpute : Window {
   
   private void update_imputation_gui() {
     SList<uint> selected = varlist.selected_vars();
+    if (selected.length() == 0) return;
     Imputation cur = stage.imputation[(int) selected.data];
     
     switch (((GLib.Object) cur).get_type()) {

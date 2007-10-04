@@ -91,6 +91,7 @@ public class GGobi.GuiJitter : Window {
   
   private void update_amount_slider() {
     SList<uint> selected = varlist.selected_vars();
+    if (selected.length() == 0) return;
     amount.set_value(stage.amount[(int) selected.data]);
   }
   
