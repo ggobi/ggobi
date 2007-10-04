@@ -569,7 +569,6 @@ splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp,
   GGobiStage *d = display->d;
   gdouble gtmp;
   GGobiExtendedSPlotClass *klass = NULL;
-  gdouble precis = (gdouble) PRECISION1;
 
   if(GGOBI_IS_EXTENDED_SPLOT(sp)) {
      klass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);
@@ -605,9 +604,9 @@ splot_plane_to_screen (displayd *display, cpaneld *cpanel, splotd *sp,
   for (k=0; k<d->n_rows; k++) {
     /*-- scale from world to plot window --*/
     gtmp = sp->planar[k].x - sp->pmid.x;
-    sp->screen[k].x = (gint) (gtmp * sp->iscale.x / precis);
+    sp->screen[k].x = (gint) (gtmp * sp->iscale.x );
     gtmp = sp->planar[k].y - sp->pmid.y;
-    sp->screen[k].y = (gint) (gtmp * sp->iscale.y / precis);
+    sp->screen[k].y = (gint) (gtmp * sp->iscale.y );
     /*-- shift into middle of plot window --*/
     sp->screen[k].x += (sp->max.x / 2);
     sp->screen[k].y += (sp->max.y / 2);
@@ -629,7 +628,6 @@ splot_screen_to_plane (splotd *sp, gint pt, gcoords *eps,
   gboolean horiz, gboolean vert)
 {
   gcoords prev_planar;
-  gdouble precis = (gdouble) PRECISION1;
 
   gdouble scale_x, scale_y;
   scale_x = sp->scale.x;
@@ -643,7 +641,7 @@ splot_screen_to_plane (splotd *sp, gint pt, gcoords *eps,
     sp->screen[pt].x -= sp->max.x/2;
 
     prev_planar.x = sp->planar[pt].x;
-    sp->planar[pt].x = (gdouble) sp->screen[pt].x * precis / sp->iscale.x ;
+    sp->planar[pt].x = (gdouble) sp->screen[pt].x  / sp->iscale.x ;
     sp->planar[pt].x += (gdouble) sp->pmid.x;
 
     eps->x = sp->planar[pt].x - prev_planar.x;
@@ -653,7 +651,7 @@ splot_screen_to_plane (splotd *sp, gint pt, gcoords *eps,
     sp->screen[pt].y -= sp->max.y/2;
 
     prev_planar.y = sp->planar[pt].y;
-    sp->planar[pt].y = (gdouble) sp->screen[pt].y * precis / sp->iscale.y ;
+    sp->planar[pt].y = (gdouble) sp->screen[pt].y  / sp->iscale.y ;
     sp->planar[pt].y += (gdouble) sp->pmid.y;
 
     eps->y = sp->planar[pt].y - prev_planar.y;

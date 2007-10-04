@@ -960,7 +960,6 @@ void
 barchart_recalc_dimensions (splotd * rawsp, GGobiStage * d, GGobiSession * gg)
 {
   gint i, maxbincount = 0, maxbin = -1;
-  gdouble precis = PRECISION1;
 
   gdouble scale_y;
   gint index;
@@ -993,17 +992,16 @@ barchart_recalc_dimensions (splotd * rawsp, GGobiStage * d, GGobiSession * gg)
     if (GGOBI_STAGE_IS_COL_CATEGORICAL(d, rawsp->p1dvar)) {
       ftmp = -1.0 + 2.0 * ((gdouble) bin->value - rawsp->p1d.lim.min)
         / rdiff;
-      bin->planar.y = (gdouble) (PRECISION1 * ftmp);
+      bin->planar.y = ftmp;
     }
     else {
       ftmp = -1.0 + 2.0 * (sp->bar->breaks[i] - sp->bar->breaks[0]) / rdiff;
-      bin->planar.y = (glong) (precis * ftmp);
+      bin->planar.y = (glong) (ftmp);
     }
   }
   sp->bar->maxbincounts = maxbincount;
 
   if (!sp->bar->is_spine) {
-    gdouble precis = (gdouble) PRECISION1;
     gdouble gtmp;
     gbind *binminus;
 
@@ -1017,7 +1015,7 @@ barchart_recalc_dimensions (splotd * rawsp, GGobiStage * d, GGobiSession * gg)
       rect = &sp->bar->bins[i].rect;
 
       gtmp = bin->planar.y - rawsp->pmid.y;
-      rect->y = (gint) (gtmp * rawsp->iscale.y / precis);
+      rect->y = (gint) (gtmp * rawsp->iscale.y);
 
       rect->x = 10;
       rect->y += (rawsp->max.y / 2);

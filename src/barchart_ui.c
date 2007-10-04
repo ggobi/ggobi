@@ -306,7 +306,7 @@ barchart_scale (gboolean button1_p, gboolean button2_p, splotd * sp)
         sp->iscale.y = (gdouble) sp->max.y * scale_y;
 
         klass->screen_to_tform (cpanel, sp, &scr, &pts1, gg);
-        sp->pmid.y -= (dy * (gdouble) PRECISION1 / sp->iscale.y);
+        sp->pmid.y -= (dy / sp->iscale.y);
         klass->screen_to_tform (cpanel, sp, &scr, &pts2, gg);
         bsp->bar->offset += (pts1.y - pts2.y);
 

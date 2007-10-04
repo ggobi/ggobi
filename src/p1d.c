@@ -129,7 +129,6 @@ p1d_reproject (splotd * sp, gdouble ** world_data, GGobiStage * d, GGobiSession 
 */
   gint i, jvar = 0;
   gdouble rdiff, ftmp;
-  gdouble precis = PRECISION1;
   displayd *display = (displayd *) sp->displayptr;
   gdouble *yy;
 
@@ -165,12 +164,12 @@ p1d_reproject (splotd * sp, gdouble ** world_data, GGobiStage * d, GGobiSession 
       -1.0 + 2.0 * (sp->p1d.spread_data.els[i] - sp->p1d.lim.min) / rdiff;
 
     if (display->p1d_orientation == VERTICAL) {
-      sp->planar[i].x = (glong) (precis * ftmp);
+      sp->planar[i].x = (glong) ftmp;
       sp->planar[i].y = (glong) world_data[i][jvar];
     }
     else {
       sp->planar[i].x = (glong) world_data[i][jvar];
-      sp->planar[i].y = (glong) (precis * ftmp);
+      sp->planar[i].y = (glong) ftmp;
     }
   }
 
@@ -210,7 +209,6 @@ p1d_varsel (splotd * sp, gint jvar, gint * jprev, gint toggle, gint mouse)
 void
 ash_baseline_set (icoords * baseline, splotd * sp)
 {
-  gdouble ftmp, precis = (gdouble) PRECISION1;
   gdouble pl, gtmp;
   gint iscr;
 
@@ -218,19 +216,18 @@ ash_baseline_set (icoords * baseline, splotd * sp)
   ftmp = -1 + 2.0 * (0 - sp->p1d.lim.min)/
                     (sp->p1d.lim.max - sp->p1d.lim.min);
 */
-  ftmp = -1 /* and the rest of the usual expression is 0 now */ ;
-  pl = (gdouble) (precis * ftmp);
+  pl = -1 /* and the rest of the usual expression is 0 now */ ;
 
 /*-- HORIZONTAL --*/
   gtmp = pl - sp->pmid.y;
-  iscr = (gint) (gtmp * sp->iscale.y / precis);
+  iscr = (gint) (gtmp * sp->iscale.y);
   iscr += (sp->max.y / 2);
 
   baseline->y = iscr;
 
 /*-- VERTICAL --*/
   gtmp = pl - sp->pmid.x;
-  iscr = (gint) (gtmp * sp->iscale.x / precis);
+  iscr = (gint) (gtmp * sp->iscale.x);
   iscr += (sp->max.x / 2);
 
   baseline->x = iscr;

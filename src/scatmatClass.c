@@ -424,7 +424,6 @@ splotScreenToTform (cpaneld * cpanel, splotd * sp, icoords * scr,
                     fcoords * tfd, GGobiSession * gg)
 {
   gcoords planar, world;
-  gdouble precis = (gdouble) PRECISION1;
   gdouble ftmp, max, min, rdiff;
   displayd *display = (displayd *) sp->displayptr;
   GGobiStage *d = display->d;
@@ -440,9 +439,9 @@ splotScreenToTform (cpaneld * cpanel, splotd * sp, icoords * scr,
 /*
  * screen to plane 
 */
-  planar.x = (scr->x - sp->max.x / 2) * precis / sp->iscale.x;
+  planar.x = (scr->x - sp->max.x / 2) / sp->iscale.x;
   planar.x += sp->pmid.x;
-  planar.y = (scr->y - sp->max.y / 2) * precis / sp->iscale.y;
+  planar.y = (scr->y - sp->max.y / 2) / sp->iscale.y;
   planar.y += sp->pmid.y;
 
 /*
@@ -457,15 +456,13 @@ splotScreenToTform (cpaneld * cpanel, splotd * sp, icoords * scr,
     if (display->p1d_orientation == HORIZONTAL) {
       /* x */
       world.x = planar.x;
-      ftmp = world.x / precis;
-      tfd->x = (ftmp + 1.0) * .5 * rdiff;
+      tfd->x = (world.x + 1.0) * .5 * rdiff;
       tfd->x += min;
     }
     else {
       /* y */
       world.y = planar.y;
-      ftmp = world.y / precis;
-      tfd->y = (ftmp + 1.0) * .5 * rdiff;
+      tfd->y = (world.y + 1.0) * .5 * rdiff;
       tfd->y += min;
     }
   }
@@ -475,7 +472,7 @@ splotScreenToTform (cpaneld * cpanel, splotd * sp, icoords * scr,
     ggobi_variable_get_limits(var, &min, &max);
     rdiff = max - min;
     world.x = planar.x;
-    ftmp = world.x / precis;
+    ftmp = world.x ;
     tfd->x = (ftmp + 1.0) * .5 * rdiff;
     tfd->x += min;
 
@@ -484,7 +481,7 @@ splotScreenToTform (cpaneld * cpanel, splotd * sp, icoords * scr,
     ggobi_variable_get_limits(var, &min, &max);
     rdiff = max - min;
     world.y = planar.y;
-    ftmp = world.y / precis;
+    ftmp = world.y ;
     tfd->y = (ftmp + 1.0) * .5 * rdiff;
     tfd->y += min;
   }

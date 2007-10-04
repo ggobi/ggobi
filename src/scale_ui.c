@@ -447,7 +447,7 @@ cpanel_scale_make (GGobiSession * gg)
 
   /* value, lower, upper, step_increment, page_increment, page_size */
   adjx = (GtkAdjustment *)
-    gtk_adjustment_new (0.0, -2 * PRECISION1, 2 * PRECISION1, 200, 400, 0.0);
+    gtk_adjustment_new (0.0, -2, 2, 200, 400, 0.0);
   g_object_set_data (G_OBJECT (adjx), "name", "SCALE:x_pan_adj");
   g_signal_connect (G_OBJECT (adjx), "value_changed",
                     G_CALLBACK (pan_cb), gg);
@@ -459,7 +459,7 @@ cpanel_scale_make (GGobiSession * gg)
   gtk_box_pack_start (GTK_BOX (vb), sbarx, true, true, 0);
 
   adjy = (GtkAdjustment *)
-    gtk_adjustment_new (0.0, -2 * PRECISION1, 2 * PRECISION1, 200, 400, 0.0);
+    gtk_adjustment_new (0.0, -2, 2, 200, 400, 0.0);
   g_object_set_data (G_OBJECT (adjy), "name", "SCALE:y_pan_adj");
   g_signal_connect (G_OBJECT (adjy), "value_changed",
                     G_CALLBACK (pan_cb), gg);

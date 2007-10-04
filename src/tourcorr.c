@@ -920,15 +920,14 @@ void
 tourcorr_projdata(splotd *sp, gdouble **world_data, GGobiStage *d, GGobiSession *gg) {
   gint j, m;
   displayd *dsp = (displayd *) sp->displayptr;
-  gdouble precis = (gdouble) PRECISION1;
   gdouble tmpf, maxx, maxy;
 
   if (sp->tourcorr.initmax) {
-    sp->tourcorr.maxscreen = precis;
+    sp->tourcorr.maxscreen = 1;
     sp->tourcorr.initmax = false;
   }
 
-  tmpf = precis/sp->tourcorr.maxscreen;
+  tmpf = 1/sp->tourcorr.maxscreen;
   maxx = sp->tourcorr.maxscreen;
   maxy = sp->tourcorr.maxscreen;
   for (m=0; m<d->n_rows; m++)
@@ -948,9 +947,9 @@ tourcorr_projdata(splotd *sp, gdouble **world_data, GGobiStage *d, GGobiSession 
       maxy = fabs(sp->planar[m].y);
   }
 
-  if ((maxx > precis) || (maxy > precis)) {
+  if ((maxx > 1) || (maxy > 1)) {
     sp->tourcorr.maxscreen = (maxx > maxy) ? maxx : maxy;
-    tmpf = precis/tmpf;
+    tmpf = 1/tmpf;
   }
 }
 

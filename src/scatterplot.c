@@ -508,7 +508,6 @@ ruler_shift_cb (GtkWidget * w, GdkEventMotion * event, splotd * sp)
   gboolean button1_p, button2_p;
   gint direction = (w == display->hrule) ? HORIZONTAL : VERTICAL;
   gboolean redraw = false;
-  gdouble precis = (gdouble) PRECISION1;
 
   /*-- find out if any buttons are pressed --*/
   mousepos_get_motion (w, event, &button1_p, &button2_p, sp);
@@ -523,7 +522,7 @@ ruler_shift_cb (GtkWidget * w, GdkEventMotion * event, splotd * sp)
       scale_x = sp->scale.x;
       scale_x /= 2;
       sp->iscale.x = (gdouble) sp->max.x * scale_x;
-      sp->pmid.x -= (dx * precis / sp->iscale.x);
+      sp->pmid.x -= (dx / sp->iscale.x);
       /* */
       display->drag_start.x = event->x;
       redraw = true;
@@ -537,7 +536,7 @@ ruler_shift_cb (GtkWidget * w, GdkEventMotion * event, splotd * sp)
       scale_y = sp->scale.y;
       scale_y /= 2;
       sp->iscale.y = (gdouble) sp->max.y * scale_y;
-      sp->pmid.y -= (dy * precis / sp->iscale.y);
+      sp->pmid.y -= (dy / sp->iscale.y);
       /* */
 
       display->drag_start.y = event->y;

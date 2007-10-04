@@ -122,16 +122,6 @@ typedef enum {NULL_IMODE = -1, DEFAULT_IMODE,
 #define COLLABLEN 25
 #define ROWLABLEN 50
 
-/*
- * EXP1: Raw data are scaled to -2^EXP1, +2^EXP1
- * EXP2: Trigonometric coefficients are scaled up by 2^EXP2 to do
- *       integer math.
- * PRECISION: 2^EXP2
-*/
-#define EXP1 14
-#define EXP2 13
-#define PRECISION1 16384
-#define PRECISION2  8192
 
 /*-- spacing for the control panels --*/
 #define VBOX_SPACING 5

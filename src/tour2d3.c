@@ -407,15 +407,14 @@ tour2d3_projdata(splotd *sp, gdouble **world_data, GGobiStage *d, GGobiSession *
 {
   gint j, m;
   displayd *dsp = (displayd *) sp->displayptr;
-  gdouble precis = (gdouble) PRECISION1;
   gdouble tmpf, maxx, maxy;
 
   if (sp->tour2d3.initmax) {
-    sp->tour2d3.maxscreen = precis;
+    sp->tour2d3.maxscreen = 1;
     sp->tour2d3.initmax = false;
   }
 
-  tmpf = precis/sp->tour2d3.maxscreen;
+  tmpf = 1/sp->tour2d3.maxscreen;
   maxx = sp->tour2d3.maxscreen;
   maxy = sp->tour2d3.maxscreen;
   for (m=0; m<d->n_rows; m++)
@@ -435,9 +434,9 @@ tour2d3_projdata(splotd *sp, gdouble **world_data, GGobiStage *d, GGobiSession *
       maxy = fabs(sp->planar[m].y);
   }
 
-  if ((maxx > precis) || (maxy > precis)) {
+  if ((maxx > 1) || (maxy > 1)) {
     sp->tour2d3.maxscreen = (maxx > maxy) ? maxx : maxy;
-    tmpf = precis/tmpf;
+    tmpf = 1/tmpf;
   }
 }
 

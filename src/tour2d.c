@@ -510,15 +510,14 @@ void
 tour2d_projdata(splotd *sp, gdouble **world_data, GGobiStage *d, GGobiSession *gg) {
   gint j, m;
   displayd *dsp = (displayd *) sp->displayptr;
-  gdouble precis = (gdouble) PRECISION1;
   gdouble tmpf, maxx, maxy;
 
   if (sp->tour2d.initmax) {
-    sp->tour2d.maxscreen = precis;
+    sp->tour2d.maxscreen = 1;
     sp->tour2d.initmax = false;
   }
 
-  tmpf = precis/sp->tour2d.maxscreen;
+  tmpf = 1/sp->tour2d.maxscreen;
   maxx = sp->tour2d.maxscreen;
   maxy = sp->tour2d.maxscreen;
   for (m=0; m<d->n_rows; m++)
@@ -538,9 +537,9 @@ tour2d_projdata(splotd *sp, gdouble **world_data, GGobiStage *d, GGobiSession *g
       maxy = fabs(sp->planar[m].y);
   }
 
-  if ((maxx > precis) || (maxy > precis)) {
+  if ((maxx > 1) || (maxy > 1)) {
     sp->tour2d.maxscreen = (maxx > maxy) ? maxx : maxy;
-    tmpf = precis/tmpf;
+    tmpf = 1/tmpf;
   }
 }
 

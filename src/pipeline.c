@@ -22,7 +22,7 @@ tform_to_world_by_var (GGobiStage * d, guint j)
 {
   for (guint i = 0; i < d->n_rows; i++) {
     gdouble ftmp = -1.0 + 2.0 * ggobi_stage_get_raw_value(d, i, j);
-    d->world.vals[i][j] = (PRECISION1 * ftmp);
+    d->world.vals[i][j] = ftmp;
   }
 }
 
@@ -61,7 +61,6 @@ pt_screen_to_plane (icoords * screen, gint id, gboolean horiz, gboolean vert,
   prev_planar.y = 0;
   
   gdouble scale_x, scale_y;
-  gdouble precis = (gdouble) PRECISION1;
 
   scale_x = sp->scale.x;
   scale_y = sp->scale.y;
@@ -79,13 +78,13 @@ pt_screen_to_plane (icoords * screen, gint id, gboolean horiz, gboolean vert,
 
   if (horiz) {                  /* relevant distinction for moving points */
     screen->x -= sp->max.x / 2;
-    planar->x = (gdouble) screen->x * precis / sp->iscale.x;
+    planar->x = (gdouble) screen->x / sp->iscale.x;
     planar->x += (gdouble) sp->pmid.x;
   }
 
   if (vert) {                   /* relevant distinction for moving points */
     screen->y -= sp->max.y / 2;
-    planar->y = (gdouble) screen->y * precis / sp->iscale.y;
+    planar->y = (gdouble) screen->y / sp->iscale.y;
     planar->y += (gdouble) sp->pmid.y;
   }
 
@@ -162,15 +161,13 @@ pt_plane_to_world (splotd * sp, gcoords * planar, gcoords * eps,
 void
 pt_world_to_raw_by_var (gint j, gdouble * world, gdouble * raw, GGobiStage * d)
 {
-  gdouble precis = PRECISION1;
-  gdouble ftmp, rdiff;
+  gdouble rdiff;
   gdouble x;
   GGobiVariable *var = ggobi_stage_get_variable(d, j);
 
   rdiff = ggobi_variable_get_range(var);
 
-  ftmp = (gdouble) (world[j]) / precis;
-  x = (ftmp + 1.0) * .5 * rdiff;
+  x = (world[j] + 1.0) * .5 * rdiff;
   x += ggobi_variable_get_min(var);
 
   raw[j] = x;

@@ -29,7 +29,6 @@ pan_by_drag (splotd * sp, GGobiSession * gg)
 {
   gdouble dx, dy;
   gdouble scale_x, scale_y;
-  gdouble precis = (gdouble) PRECISION1;
 
   dx = (gdouble) (sp->mousepos.x - sp->mousepos_o.x);
   dy = (gdouble) (sp->mousepos.y - sp->mousepos_o.y);
@@ -46,8 +45,8 @@ pan_by_drag (splotd * sp, GGobiSession * gg)
   scale_y /= 2;
   sp->iscale.y = -1 * (gdouble) sp->max.y * scale_y;
 
-  sp->pmid.x -= (dx * precis / sp->iscale.x);
-  sp->pmid.y -= (dy * precis / sp->iscale.y);
+  sp->pmid.x -= (dx / sp->iscale.x);
+  sp->pmid.y -= (dy / sp->iscale.y);
 }
 
 /*
