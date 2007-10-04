@@ -250,6 +250,7 @@ gdouble gaussian_filter(array_d data) {
 
   // Compute covariance matrix
   array_d cov;
+  arrayd_init_null(&cov);
   arrayd_alloc_zero(&cov, p, p);
 
   for (j=0; j<p; j++) { 
@@ -323,16 +324,22 @@ gdouble ppi_lda (array_d data, vector_d groups) {
   guint p = data.ncols;
 
   vector_i group_lookup, ngroup;
+  vectori_init_null(&group_lookup);
+  vectori_init_null(&ngroup);
   vectori_alloc_zero(&group_lookup, n);
   vectori_alloc_zero(&ngroup, n);
   guint numgroups = compute_groups(group_lookup, ngroup, groups);
 
   array_d group_means, covW, covWB;
+  arrayd_init_null(&group_means);
+  arrayd_init_null(&covW);
+  arrayd_init_null(&covWB);
   arrayd_alloc_zero(&group_means, p, numgroups);
   arrayd_alloc_zero(&covW, p, p);
   arrayd_alloc_zero(&covWB, p, p);
 
   vector_d means;
+  vectord_init_null(&means);
   vectord_alloc_zero(&means, p);
 
   /* Compute means */

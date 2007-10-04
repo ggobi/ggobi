@@ -238,7 +238,7 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
   GGobiSession *gg)
 {
   GGobiStage *d = dsp->d;
-  gint kout, nrows = d->n_rows;
+  gint nrows = d->n_rows;
   gint i, j;
 
   if (d->n_rows == 1)  /* can't do pp on no data! */
@@ -265,6 +265,7 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
 
   GGOBI_STAGE_ATTR_INIT(d, cluster);
   vector_d groups;
+  vectord_init_null(&groups);
   vectord_alloc_zero(&groups, nrows);
   for (i=0; i<nrows; i++) { 
     groups.els[i] = GGOBI_STAGE_GET_ATTR_CLUSTER(d, i);
@@ -274,22 +275,22 @@ gboolean t1d_switch_index(gint indxtype, gint basismeth, displayd *dsp,
     case HOLES: 
       dsp->t1d.ppval = ppi_holes(dsp->t1d_pp_op.pdata, groups);
       if (basismeth == 1)
-        kout = optimize0 (&dsp->t1d_pp_op, ppi_holes, groups);
+        dsp->t1d.ppval = optimize0 (&dsp->t1d_pp_op, ppi_holes, groups);
       break;
     case CENTRAL_MASS: 
       dsp->t1d.ppval = ppi_central_mass(dsp->t1d_pp_op.pdata, groups);
       if (basismeth == 1)
-        kout = optimize0 (&dsp->t1d_pp_op, ppi_central_mass, groups);
+        dsp->t1d.ppval = optimize0 (&dsp->t1d_pp_op, ppi_central_mass, groups);
       break;
     case PCA: 
       dsp->t1d.ppval = ppi_pca(dsp->t1d_pp_op.pdata, groups);
       if (basismeth == 1)
-        kout = optimize0 (&dsp->t1d_pp_op, ppi_pca, groups);
+        dsp->t1d.ppval = optimize0 (&dsp->t1d_pp_op, ppi_pca, groups);
       break;
     case LDA:
       dsp->t1d.ppval = ppi_lda(dsp->t1d_pp_op.pdata, groups);
       if (basismeth == 1)
-        kout = optimize0 (&dsp->t1d_pp_op, ppi_lda, groups);
+        dsp->t1d.ppval = optimize0 (&dsp->t1d_pp_op, ppi_lda, groups);
       break;
   }
   vectord_free(&groups);
