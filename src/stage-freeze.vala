@@ -14,7 +14,7 @@ TODO: ensure variables are frozen as well.
 
 
 public class GGobi.StageFreeze : Stage {
-  private bool _freeze = false;
+  private bool _frozen = false;
   private bool _dirty = false;
   private PipelineMatrix cache;
   
@@ -23,7 +23,7 @@ public class GGobi.StageFreeze : Stage {
   }  
   
   public void freeze() {
-    _freeze = true;
+    _frozen = true;
     _dirty = false;
 
     cache.add_rows(parent.n_rows);
@@ -32,7 +32,7 @@ public class GGobi.StageFreeze : Stage {
   }
   
   public void unfreeze() {
-    _freeze = false;
+    _frozen = false;
     if (!is_dirty()) return;
     
     // If dirty, send change events
@@ -54,7 +54,7 @@ public class GGobi.StageFreeze : Stage {
   }
   
   override double get_raw_value(uint i, uint j) {
-    if (_freeze) {
+    if (_frozen) {
       return cache.get(i, j);
     } else {
       return parent.get_raw_value(i, j);
@@ -62,7 +62,7 @@ public class GGobi.StageFreeze : Stage {
 	}
 
 	override void set_raw_value(uint i, uint j, double value) {
-    if (_freeze) {
+    if (_frozen) {
       cache.set(i, j, value);
     } else {
       parent.set_raw_value(i, j, value);
@@ -70,6 +70,10 @@ public class GGobi.StageFreeze : Stage {
 	}
 
   override void process_outgoing(PipelineMessage msg) {
-    if (_freeze) _dirty = true;
+    if (_frozen) {
+      _dirty = true;
+    } else {
+      base.process_outgoing(msg);
+    }
   }
 }
