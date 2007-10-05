@@ -24,7 +24,7 @@ public class GGobi.GuiRandomize : Window {
   public GuiRandomize(construct StageRandomize stage) {}
   
   public void create_widgets() {
-    varlist = new Varlist(stage);
+    varlist = new Varlist(stage, Varlist.show_all);
     varlist.selection_changed += varlist => {
       update_randomization_gui();
     };

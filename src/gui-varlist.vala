@@ -15,44 +15,47 @@ using GLib;
 
 namespace GGobi {
   public delegate string VariableDescription(Stage stage, uint j);
+  public delegate bool VariableFilter(Variable v);
 }
 
 public class GGobi.Varlist : GLib.Object {
   public Stage stage { construct; get; }
   
+  public VariableFilter include_var { construct; get; }
   public TreeView vartable;
   public ListStore vars;
 
   public signal void selection_changed();
 
-  public Varlist(construct Stage stage) {}
+  public Varlist(construct Stage stage, construct VariableFilter include_var) {}
 
   construct {
     vars = new ListStore(3, typeof(uint), typeof(string), typeof(string));
 
     // Add variables to list store
     for(uint j = 0; j < stage.n_cols; j++) {
+      Variable v = stage.get_variable(j);
+      
+      // if (!include_var(v)) continue;
       TreeIter iter;
 
       vars.append(out iter);
       vars.set(out iter, 0, j);
-      vars.set(out iter, 1, stage.get_variable(j).name);
+      vars.set(out iter, 1, v.name);
     }
     
     vartable = new TreeView.with_model(vars);
+    vartable.rules_hint = true;
+    vartable.enable_search = true;
+    vartable.search_column = 1;
 
     // Add columns to view
     add_view_col("#", 0);
     add_view_col("Variable", 1);
-
-    vartable.rules_hint = true;
-    vartable.enable_search = true;
-    vartable.search_column = 1;
     
     // Allow multiple selection
     TreeSelection sel = vartable.get_selection();
     sel.set_mode(SelectionMode.MULTIPLE);
-
     sel.changed += sel => {
       selection_changed();
     };
@@ -80,6 +83,8 @@ public class GGobi.Varlist : GLib.Object {
 
     vars.get_iter_first(out iter);
     for(uint j = 0; j < stage.n_cols; j++) {
+      // if (!include_var(stage.get_variable(j))) continue;
+
       vars.set(out iter, 2, f(stage, j));
       vars.iter_next(out iter);
     }
@@ -103,5 +108,18 @@ public class GGobi.Varlist : GLib.Object {
     return selected;
   }
   
+  public static bool show_all(Variable v) {
+    return true;
+  }
+
+  // For testing
+  public static bool show_none(Variable v) {
+    return false;
+  }
+
+  
+  public static bool show_variables(Variable v) {
+    return !v.is_attribute;
+  }
   
 }

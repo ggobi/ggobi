@@ -9,7 +9,7 @@ the current projected_data.
 using GLib;
 
 namespace GGobi {
-  public delegate double PursuitIndex(Matrix mat, Stage stage);
+  public delegate double PursuitIndex(Matrix mat, Vector groups);
 }
 
 public class GGobi.TourBasisPursuit : TourBasis {
@@ -44,7 +44,8 @@ public class GGobi.TourBasisPursuit : TourBasis {
   private TourMatrix projected_data;
   
   public double compute_index(TourMatrix mat) {
-    return index_function(mat.matrix, stage);
+    Vector groups = new Vector();
+    return index_function(mat.matrix, groups);
   }
   
   public void reset() {

@@ -54,9 +54,8 @@ public class GGobi.StageRandomize : Stage {
   override void set_raw_value(uint i, uint j, double value) {
     if (randomization[j] == RandomizationType.NONE) {
       parent.set_raw_value(i, j, value);
-    } else {
-      cache.set(i, j, value);  
     }
+    cache.set(i, j, value);  
   }  
   
   construct {

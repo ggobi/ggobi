@@ -133,3 +133,9 @@ public class GGobi.Matrix {
   public void init_null ();
   public void zero (); 
 }
+
+[CCode (cprefix = "vectord_", cheader_filename = "vector.h", cname="vector_d")]
+public class GGobi.Vector {
+  public double[] els;
+  public uint nels;
+}
