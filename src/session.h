@@ -629,9 +629,6 @@ void ggobi_session_register_input_source_factory(GGobiSession *session,
 
 #include "GGobiEvents.h"
 
-#include "GGobiApp.h"
-GGobiApp *getGGobiApp();
-
 #ifdef __cplusplus
 } /* end of extern "C" */
 #endif

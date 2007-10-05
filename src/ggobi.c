@@ -25,8 +25,6 @@
 
 #include "config.h"
 
-#include "GGobiApp.h"
-
 /* the built-in input classes */
 #include "data-factory-csv.h"
 #include "ggobi-data-factory-xml.h"
