@@ -24,9 +24,6 @@
 
 #include "ggobi-variable.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 extern gdouble no_change (gdouble, gdouble);
 
 

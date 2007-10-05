@@ -26,10 +26,6 @@
 #include "vector.h"
 #include "barchartDisplay.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 GtkWidget * mode_panel_get_by_name(const gchar *, GGobiSession *);
 InteractionMode imode_get(GGobiSession *);  /* this should probably also
 					 change */

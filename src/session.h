@@ -24,9 +24,6 @@
 #endif
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 struct _GGobiSession;
 
@@ -589,9 +586,6 @@ gchar *getOptValue(const char *const name, const char *const value);
 const char *getCommandLineArgValue(const char *name);
 void showHelp();
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 void globals_init(GGobiSession * gg);
 
 guint getGGobiSignal(GGobiSignalType);
@@ -625,9 +619,5 @@ void ggobi_session_register_input_source_factory(GGobiSession *session,
   GGobiInputSourceFactory *factory);
 
 #include "GGobiEvents.h"
-
-#ifdef __cplusplus
-} /* end of extern "C" */
-#endif
 
 #endif

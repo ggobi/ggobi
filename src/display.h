@@ -29,10 +29,6 @@
 void       displays_tailpipe (RedrawStyle, GGobiSession *);
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 struct _GGobiSession; 
 
 
@@ -346,9 +342,5 @@ const gchar * /*const*/ ggobi_display_title_label(displayd *dpy);
 
 
 displayd *ggobi_display_new(gboolean missing_p, GGobiStage *d, GGobiSession *gg);
-
-#ifdef __cplusplus
-} /* end of extern "C" */
-#endif
 
 #endif

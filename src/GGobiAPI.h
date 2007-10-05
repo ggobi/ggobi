@@ -73,9 +73,6 @@
  One can programmatically brush regions of a plot.
  */
 
-#ifdef __cplusplus 
-extern "C" {
-#endif
 /*
   The routines that copy values into an array
   may not be suitable for large datasets.

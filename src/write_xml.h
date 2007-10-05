@@ -9,10 +9,6 @@
 
 #include <gtk/gtk.h>
 
-#ifdef __cplusplus 
-extern "C" {
-#endif
-
   /*
     An instance of this structure is passed to all the routines
     that are called when writing the XML representation of a
@@ -59,9 +55,5 @@ gboolean write_xml_edge(FILE *f, GGobiStage *d, GGobiSession *gg, gint i, XmlWri
 
 gboolean write_dataset_header(FILE *f, GGobiStage *, GGobiSession *gg, XmlWriteInfo *xmlWriteInfo);
 gboolean write_dataset_footer(FILE *f, GGobiSession *gg, XmlWriteInfo *xmlWriteInfo);
-
-#ifdef __cplusplus 
-}
-#endif
 
 #endif
