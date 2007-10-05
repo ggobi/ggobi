@@ -28,9 +28,6 @@
 extern "C" {
 #endif
 extern gdouble no_change (gdouble, gdouble);
-#ifdef __cplusplus
-}
-#endif
 
 
 /*-------------------------------------------------------------------------*/

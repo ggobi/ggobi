@@ -576,9 +576,6 @@ void      win32_draw_to_pixmap_unbinned (gint, splotd *, gboolean draw_hidden, G
 void      win32_drawing_arrays_free (splotd *sp);
 #endif
 
-#ifdef __cplusplus
-}
-#endif
 
 #include "GGobiAPI.h"
 

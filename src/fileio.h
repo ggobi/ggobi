@@ -25,9 +25,6 @@ typedef struct _GGobiSession GGobiSession;
 gchar *absolute_path(const gchar *path);
 gboolean file_is_readable(const gchar *fileName);
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif
 

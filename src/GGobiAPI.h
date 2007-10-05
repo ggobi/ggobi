@@ -1035,9 +1035,6 @@ typedef int (*MissingValue_p)(double);
 MissingValue_p ggobi_setMissingValueIdentifier(MissingValue_p f);
 extern MissingValue_p GGobiMissingValue;
 
-#ifdef __cplusplus
-}
-#endif
 
 
 

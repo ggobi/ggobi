@@ -78,8 +78,5 @@ xmlNode *getXMLElement(const xmlNodePtr doc, const gchar *tagName);
 extern "C" {
 #endif
 gint getPreviousDisplays(xmlNodePtr node, GGobiDescription *desc);
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* end of GGOBI_READ_INIT_H */

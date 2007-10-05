@@ -597,9 +597,6 @@ void globals_init(GGobiSession * gg);
 guint getGGobiSignal(GGobiSignalType);
 
 GSList *ggobi_getExtendedDisplayTypes();
-#ifdef __cplusplus
-}
-#endif
 
 void gtk_marshal_NONE__INT_POINTER_POINTER_POINTER(GtkObject * object,
                                                    GtkSignalFunc func,

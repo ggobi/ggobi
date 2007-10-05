@@ -31,17 +31,10 @@
 
 void warning (const char *msg);
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
   void ggobi_displays_release (GGobiSession * gg);
   void ggobi_display_release (displayd * display, GGobiSession * gg);
   void ggobi_splot_release (splotd * sp, displayd * display, GGobiSession * gg);
   /*void ggobi_data_release (GGobiStage *, GGobiSession * gg);*/
-#ifdef __cplusplus
-}
-#endif
 
 /*
   Closes the specified display

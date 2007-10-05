@@ -21,23 +21,16 @@
 #endif
 
 /* functions */
-#ifdef __cplusplus
-extern "C"
-{
-#endif
 
-  gint bin1 (gdouble *, gint, gdouble *, gint, gint *);
-  gint ash1 (gint, gint *, gint, gdouble *, gdouble *, gdouble *,
-             gdouble *, gdouble *);
+gint bin1 (gdouble *, gint, gdouble *, gint, gint *);
+gint ash1 (gint, gint *, gint, gdouble *, gdouble *, gdouble *,
+         gdouble *, gdouble *);
 
-    gint
-    do_ash1d (gdouble * vals, gint nvals, gint nbins, gint n_ashes,
-              gdouble * ashed_vals, gdouble * lims_min, gdouble * lims_max,
-              gdouble * mean);
+gint
+do_ash1d (gdouble * vals, gint nvals, gint nbins, gint n_ashes,
+          gdouble * ashed_vals, gdouble * lims_min, gdouble * lims_max,
+          gdouble * mean);
 
-#ifdef __cplusplus
-}
-#endif
 /* */
 
 gint

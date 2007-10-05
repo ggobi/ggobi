@@ -56,7 +56,4 @@ colorschemed *read_colorscheme(char *fileName, GList **);
 extern "C" {
 #endif
 void colorscheme_init(colorschemed * scheme);
-#ifdef __cplusplus
-}
-#endif
 #endif

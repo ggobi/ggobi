@@ -24,14 +24,7 @@
 #include "vars.h"
 #include "externs.h"
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
 
-#ifdef __cplusplus
-}
-#endif
 
 gint
 sqdist (gint x1, gint y1, gint x2, gint y2)
