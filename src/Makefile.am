@@ -43,7 +43,7 @@ libggobi_la_BUILT = array.c ash1d.c barchart.c barchartClass.c \
   brush_link_ui.c brush_ui.c color.c color_ui.c cpanel.c display.c \
   display_tree.c display_ui.c \
   edges.c cluster.c cluster_ui.c extendedDisplay.c fileio.c ggobi-API.c \
-  ggobi.c GGobiAppClass.c ggobiClass.c identify.c identify_ui.c \
+  ggobi.c ggobiClass.c identify.c identify_ui.c \
   fileio_ui.c limits.c lineedit.c \
   lineedit_ui.c main_ui.c make_ggobi.c marshal.c menus.c \
   movepts.c movepts_ui.c noop-toggle.c p1d.c p1d_ui.c parcoords.c \
@@ -69,7 +69,7 @@ libggobi_la_LIBADD = $(libggobi_la_METAOBJECTS)
 
 libggobi_la_DEPENDENCIES = $(libggobi_la_METAOBJECTS)
 
-pkginclude_HEADERS = GGobiAPI.h ggobiClass.h tour1d_pp.h GGobiApp.h \
+pkginclude_HEADERS = GGobiAPI.h ggobiClass.h tour1d_pp.h \
   noop-toggle.h tour2d_pp.h GGobiEvents.h parcoordsClass.h tour_pp_ui.h \
   barchartDisplay.h plugin.h tsPlot.h brushing.h tsdisplay.h \
   colorscheme.h types.h config.h read_init.h vars.h cpanel.h \
