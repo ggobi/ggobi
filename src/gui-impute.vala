@@ -36,10 +36,9 @@ public class GGobi.GuiImpute : Window {
       update_imputation_gui();
     };
     
-    varlist.add_view_col("Imputation", 2);
-    varlist.update_data_column(2, description); 
+    varlist.add_col(typeof(string), "Imputation", new VariableImputation());
     stage.col_parameter_changed += (stage, col) => { 
-      varlist.update_data_column(2, description); 
+      varlist.update_col(2); 
     };
 
     // Imputation selection radio buttons
@@ -134,10 +133,6 @@ public class GGobi.GuiImpute : Window {
     }
   }
   
-  public static string description(Stage stage, uint j) {
-    return ((StageImpute) stage).imputation[j].description();
-  }
-  
   private void update_imputation_gui() {
     SList<uint> selected = varlist.selected_vars();
     if (selected.length() == 0) return;
@@ -157,5 +152,20 @@ public class GGobi.GuiImpute : Window {
       case typeof(ImputationRandom): random.active = true; break;
       default: break;
     }
+  }
+}
+
+
+public class GGobi.VariableImputation : VariableDescription {
+  override string describe(Stage stage, uint j) {
+    return ((StageImpute) stage).imputation[j].description();
+  }
+}
+
+public class GGobi.VariableMissings : VariableDescription {
+  override string describe(Stage stage, uint j) {
+    Variable v = stage.get_variable(j);
+    return v.name;
+    return ((StageImpute) stage).imputation[j].description();
   }
 }

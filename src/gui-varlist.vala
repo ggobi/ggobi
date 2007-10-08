@@ -13,44 +13,47 @@ be fixed.
 using Gtk;
 using GLib;
 
-namespace GGobi {
-  public delegate string VariableDescription(Stage stage, uint j);
-}
-
 public class GGobi.Varlist : GLib.Object {
   public Stage stage { construct; get; }
   
   public VariableFilter filter { construct; get; }
   public TreeView vartable;
   public ListStore vars;
+  
+  private uint _columns = 0;
+  private GLib.Type[] _coltypes;
+  private string[] _titles;
+  private VariableDescription[] _desc;
+  
+  private bool[] _excluded;
+
+  construct {
+    add_col(typeof(uint), "#", null);
+    add_col(typeof(string), "Variable", new VariableName());
+    
+    _excluded.resize((int) stage.n_cols);
+    for(uint j = 0; j < stage.n_cols; j++) {
+      Variable v = stage.get_variable(j);      
+      _excluded[j] = filter.exclude(v);
+    }
+  }
 
   public signal void selection_changed();
 
   public Varlist(construct Stage stage, construct VariableFilter filter) {}
 
-  construct {
-    vars = new ListStore(3, typeof(uint), typeof(string), typeof(string));
+  public void build() {
+    vars = new ListStore.newv((int) _columns, _coltypes);
 
-    // Add variables to list store
-    for(uint j = 0; j < stage.n_cols; j++) {
-      Variable v = stage.get_variable(j);
-      
-      if (filter.exclude(v)) continue;
-      TreeIter iter;
-
-      vars.append(out iter);
-      vars.set(out iter, 0, j);
-      vars.set(out iter, 1, v.name);
-    }
+    add_rows();
+    update_cols();
     
     vartable = new TreeView.with_model(vars);
     vartable.rules_hint = true;
     vartable.enable_search = true;
     vartable.search_column = 1;
 
-    // Add columns to view
-    add_view_col("#", 0);
-    add_view_col("Variable", 1);
+    add_view_cols();
     
     // Allow multiple selection
     TreeSelection sel = vartable.get_selection();
@@ -61,30 +64,68 @@ public class GGobi.Varlist : GLib.Object {
   }
   
   public Widget get_ui() {
+    build();
     ScrolledWindow scroll = new ScrolledWindow(null, null);
     scroll.add(vartable);
     scroll.set_policy(PolicyType.AUTOMATIC, PolicyType.AUTOMATIC);
     return scroll;
   }
   
-  public void add_view_col(string title, int position) {
+  public uint add_col(GLib.Type type, string title, VariableDescription desc) {
+    _columns++;
+    _coltypes.resize((int) _columns);
+    _coltypes[(int) _columns - 1] = type;
+
+    _titles.resize((int) _columns);
+    _titles[(int) _columns - 1] = title;
+
+    _desc.resize((int) _columns);
+    _desc[(int) _columns - 1] = desc;
+
+    
+    return _columns - 1;
+  }
+  
+  // Add all columns to view
+  private void add_view_cols() {
+    for(int k = 0; k < _columns; k++) add_view_col(k);    
+  }
+  
+  private void add_view_col(int position) {
     TreeViewColumn col = new TreeViewColumn();
-    col.title = title;
+    col.title = _titles[position];
     CellRenderer renderer = new CellRendererText();
     col.pack_start(renderer, true);
     col.add_attribute(renderer, "text", position);
     col.set_sort_column_id(position);
     vartable.append_column(col);
   }
+
+  // Add rows to varlist and initialise first column
+  private void add_rows() {
+    TreeIter iter;
+    for(uint j = 0; j < stage.n_cols; j++) {
+      if (_excluded[j]) continue;
+
+      vars.append(out iter);
+      vars.set(out iter, 0, j);
+    }    
+  }
+
+  // Update all columns of varlist
+  // First column is fixed to be variable position and is not updated
+  public void update_cols() {
+    for(uint k = 1; k < _columns; k++) update_col(k);
+  }
   
-  public void update_data_column(uint column, VariableDescription f) {
+  public void update_col(uint col) {
     TreeIter iter;
 
     vars.get_iter_first(out iter);
     for(uint j = 0; j < stage.n_cols; j++) {
-      if (filter.exclude(stage.get_variable(j))) continue;
+      if (_excluded[j]) continue;
 
-      vars.set(out iter, 2, f(stage, j));
+      vars.set(out iter, col, _desc[col].describe(stage, j));
       vars.iter_next(out iter);
     }
   }

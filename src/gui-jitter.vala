@@ -36,10 +36,9 @@ public class GGobi.GuiJitter : Window {
       update_amount_slider();
     };
 
-    varlist.add_view_col("Jittering", 2);
-    varlist.update_data_column(2, description); 
+    varlist.add_col(typeof(string), "Jittering", new VariableJitter());
     stage.col_parameter_changed += (stage, col) => { 
-      varlist.update_data_column(2, description); 
+      varlist.update_col(2); 
     };
 
     Label distLabel = new Label("Distribution:");
@@ -83,16 +82,17 @@ public class GGobi.GuiJitter : Window {
     add(sides);
     show_all();    
   }
-  
-  public static string description(Stage stage, uint j) {
-    return ((StageJitter) stage).amount[j].to_string("%0.2f");
-  }
-  
-  
+    
   private void update_amount_slider() {
     SList<uint> selected = varlist.selected_vars();
     if (selected.length() == 0) return;
     amount.set_value(stage.amount[(int) selected.data]);
   }
   
+}
+
+public class GGobi.VariableJitter : VariableDescription {
+  override string describe(Stage stage, uint j) {
+    return ((StageJitter) stage).amount[j].to_string("%0.2f");
+  }
 }

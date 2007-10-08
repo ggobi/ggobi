@@ -29,10 +29,9 @@ public class GGobi.GuiRandomize : Window {
       update_randomization_gui();
     };
     
-    varlist.add_view_col("Randomisation", 2);
-    varlist.update_data_column(2, description); 
+    varlist.add_col(typeof(string), "Randomisation", new VariableRandomisation());
     stage.col_parameter_changed += (stage, col) => { 
-      varlist.update_data_column(2, description); 
+      varlist.update_col(2); 
     };
 
     // Imputation selection radio buttons
@@ -84,18 +83,7 @@ public class GGobi.GuiRandomize : Window {
       stage.set_randomization(j, value);
     }
   }
-  
-  
-  public static string description(Stage stage, uint j) {
-    string label;
-    switch (((StageRandomize) stage).randomization[j]) {
-      case RandomizationType.NONE: label = "None"; break;
-      case RandomizationType.REPEAT: label = "Duplicates"; break;
-      case RandomizationType.UNIQUE: label = "No duplicates"; break;
-    }
-    return label;
-  }
-  
+
   private void update_randomization_gui() {
     SList<uint> selected = varlist.selected_vars();
     if (selected.length() == 0) return;
@@ -108,4 +96,15 @@ public class GGobi.GuiRandomize : Window {
     }
   }
   
+}
+public class GGobi.VariableRandomisation : VariableDescription {
+  override string describe(Stage stage, uint j) {
+    string label;
+    switch (((StageRandomize) stage).randomization[j]) {
+      case RandomizationType.NONE: label = "None"; break;
+      case RandomizationType.REPEAT: label = "Duplicates"; break;
+      case RandomizationType.UNIQUE: label = "No duplicates"; break;
+    }
+    return label;
+  }
 }
