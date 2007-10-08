@@ -41,6 +41,12 @@ public class GGobi.GuiImpute : Window {
       varlist.update_col(2); 
     };
 
+    varlist.add_col(typeof(string), "Missings", new VariableMissings());
+    stage.col_parameter_changed += (stage, col) => { 
+      varlist.update_col(3); 
+    };
+
+
     // Imputation selection radio buttons
     fixed = new RadioButton.with_label(null, "Fixed value:");
     fixed.toggled += fixed => {
@@ -165,7 +171,6 @@ public class GGobi.VariableImputation : VariableDescription {
 public class GGobi.VariableMissings : VariableDescription {
   override string describe(Stage stage, uint j) {
     Variable v = stage.get_variable(j);
-    return v.name;
-    return ((StageImpute) stage).imputation[j].description();
+    return v.n_missings().to_string("%i");
   }
 }

@@ -141,9 +141,11 @@ private gdouble variance;
 private gdouble mean;
 private gdouble median;
 private gboolean has_missings;
+private uint n_missings;
 
 /* dirty flags */
 private gboolean dirty_has_missings = TRUE;
+private gboolean dirty_n_missings = TRUE;
 private gboolean dirty_levels = TRUE;
 private gboolean dirty_stats = TRUE;
 private gboolean dirty_limits = TRUE;
@@ -667,19 +669,26 @@ get_variance(self)
    *
    * Returns: %TRUE if this variable has missing values.
    */
-public gboolean
-has_missings(self)
+public guint
+n_missings(self)
 {
-  if (selfp->dirty_has_missings) {
-    gboolean missings = FALSE;
+  if (selfp->dirty_n_missings) {
+    guint missings = 0;
+
     gint j = ggobi_stage_get_col_index_for_name(self->stage, self->name);
-    for (guint i = 0; i < self->stage->n_rows && !missings; i++)
-      missings = ggobi_stage_is_missing(self->stage, i, j);
-    selfp->dirty_has_missings = FALSE;
-    selfp->has_missings = missings;
+    for (guint i = 0; i < self->stage->n_rows; i++)
+      if (ggobi_stage_is_missing(self->stage, i, j)) missings++;
+
+    selfp->dirty_n_missings = FALSE;
+    selfp->n_missings = missings;
   }
   
-  return selfp->has_missings;
+  return selfp->n_missings;
+}
+
+public gboolean
+has_missings(self) {
+  return self_n_missings(self) > 0;
 }
 
   /**
@@ -801,6 +810,7 @@ update(self)
  /* may collapse some dirty flags for simplicity */
  
  selfp->dirty_has_missings = TRUE;
+ selfp->dirty_n_missings = TRUE;
  selfp->dirty_levels = TRUE;
  selfp->dirty_stats = TRUE;
  selfp->dirty_limits = TRUE;

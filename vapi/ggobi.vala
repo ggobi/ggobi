@@ -75,6 +75,8 @@ public class GGobi.Variable: GLib.Object {
   
   public double get_mean();
   public bool has_missings();
+  public uint n_missings();
+  
 
 }
 
