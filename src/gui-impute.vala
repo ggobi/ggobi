@@ -31,7 +31,7 @@ public class GGobi.GuiImpute : Window {
   public void create_widgets() {
     
     // Initialise variable list 
-    varlist = new Varlist(stage, show_missing);
+    varlist = new Varlist(stage, new FilterMissing());
     varlist.selection_changed += varlist => {
       update_imputation_gui();
     };
@@ -158,9 +158,4 @@ public class GGobi.GuiImpute : Window {
       default: break;
     }
   }
-  
-  public bool show_missing(Variable v) {
-    return v.has_missings();
-  }
-  
 }

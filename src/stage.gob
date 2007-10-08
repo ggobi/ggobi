@@ -4,6 +4,7 @@
   #include "ggobi-data.h"
   #include "vars.h"
   #include "externs.h"
+  #include "session.h"
 %}
 
 %h{
