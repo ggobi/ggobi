@@ -10,6 +10,12 @@ public class GGobi.StageSubset : StageFilter  {
 
   public StageSubset(construct Select selection) {}
 
+  construct {
+    selection = new SelectAll();
+  }
+
+  public signal void subset_changed();
+
   public void reset() {
     selection = new SelectAll();
     refresh();

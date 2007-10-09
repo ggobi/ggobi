@@ -20,7 +20,7 @@
 #include <gtk/gtk.h>
 #include "vars.h"
 #include "externs.h"
-#include "ggobi-stage-subset.h"
+#include "stage-subset.h"
 
 typedef enum { 
   GGOBI_SUBSET_RANDOM, GGOBI_SUBSET_BLOCK, /*GGOBI_SUBSET_RANGE,*/

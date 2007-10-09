@@ -24,6 +24,11 @@ public class GGobi.StageFilter : Stage {
     return included[i];
   }
   
+  private bool is_included_raw(uint i) {
+    return (filter_col == -1) ? true : 
+      (bool) parent.get_raw_value(i, filter_col);
+  }
+  
   // This is a convenience function that sets the cell at row @i in the
   // filter column to @val in the parent stage.
   public void set_included(uint i, bool val) {
@@ -79,35 +84,43 @@ public class GGobi.StageFilter : Stage {
 
   // Update the included state of the rows, sending messages as necessary
   public void refresh_() {
-    int parent_nrows = parent != null ? (int) parent.n_rows : 0;
-    SList<uint> removed_rows = new SList<uint>();
+    int n_rows = parent != null ? (int) parent.n_rows : 0;
     int n_included = 0, n_added = 0;
-    bool[] included_prev = new bool[parent_nrows];
+    int n_included_prev = included.length;
 
-    included_rows.resize(parent_nrows);
-    included_rows_rev.resize(parent_nrows);
-    included.resize(parent_nrows);
+    SList<uint> removed_rows = new SList<uint>();
 
-    for (int i = 0; i < parent_nrows; i++) {
-      included_prev[i] = included[i];
-      included[i] = (filter_col == -1) ? true : 
-        (bool) parent.get_raw_value(i, filter_col);
-    }
-  
-    for (int i = 0; i < parent_nrows; i++) {
+    // Guarantee big enough
+    included_rows.resize(n_rows);
+    included_rows_rev.resize(n_rows);
+    included.resize(n_rows);
+
+    for (int i = 0; i < n_rows; i++) {
+      included[i] = is_included_raw((uint) i);
+
       if (included[i]) {
         included_rows_rev[i] = n_included;
         included_rows[n_included++] = i;        
-        
-        // Included now, but wasn't before
-        if (!included_prev[i]) n_added++;
-      } else {
-        // Not included now, but was before
-        if (included_prev[i]) removed_rows.prepend(i);
       }
     }
 
-    rows_removed(removed_rows);
-    rows_added(n_added);
+    // Shrink to correct size
+    included_rows.resize(n_included);
+    included_rows_rev.resize(n_included);
+    included.resize(n_included);
+    
+    if (n_included_prev > n_included) {
+      GLib.debug("More old than new: %i -> %i", n_included_prev, n_included);
+      for(int i = n_included; i < n_included_prev; i++) {
+        removed_rows.prepend(i);
+      }
+      rows_removed(removed_rows);
+
+    } else if (n_included > n_included_prev) {
+      GLib.debug("More new than old: %i -> %i", n_included_prev, n_included);
+
+      rows_added(n_rows - n_included_prev);      
+    } else {
+    }
   }
 }

@@ -45,17 +45,18 @@ public class GGobi.SelectRandom : Select {
   public SelectRandom(construct int n) {}
 
   override void select(StageSubset stage) {
-    bool[] included = new bool[stage.n_rows];
+    uint n_rows = stage.parent.n_rows;
+    bool[] included = new bool[n_rows];
 
-    if (n < 0 || n > stage.n_rows) 
+    if (n < 0 || n > n_rows) 
       return;
 
     stage.set_included_all(false);
 
     int t, m;
-    for (t = 0, m = 0; t < stage.n_rows && m < n; t++) {
+    for (t = 0, m = 0; t < n_rows && m < n; t++) {
       double r = Random.double();
-      if (((stage.n_rows - t) * r) < (n - m) && !included[t]) {
+      if (((n_rows - t) * r) < (n - m) && !included[t]) {
         stage.set_included(t, true);
         included[t] = true;
         m++;
@@ -82,15 +83,16 @@ public class GGobi.SelectBlock : Select {
   public SelectBlock(construct int start, construct int size) {}
   
   override void select(StageSubset stage) {
+    uint n_rows = stage.parent.n_rows;
     int i, k;
 
-    if (start < 0 || start > stage.n_rows || size < 0) {
+    if (start < 0 || start > n_rows || size < 0) {
       GGobi.message("The limits aren't correctly specified.", false);
       return;
     }
 
     stage.set_included_all(false);
-    for (i = start, k = 1; i < stage.n_rows && k <= size; i++, k++) {
+    for (i = start, k = 1; i < n_rows && k <= size; i++, k++) {
       stage.set_included(i, true);
     }
   }
@@ -111,14 +113,17 @@ public class GGobi.SelectEveryN : Select {
   public int start {get; set construct;} 
   public int step  {get; set construct;}
 
+  public SelectEveryN(construct int start, construct int step) {}
+
   override void select(StageSubset stage) {
-    if (start < 0 || start > stage.n_rows - 1 || step < 0 || step > stage.n_rows) {
+    uint n_rows = stage.parent.n_rows;
+    if (start < 0 || start > n_rows - 1 || step < 0 || step > n_rows) {
       GGobi.message ("Interval not correctly specified.", false);
       return;
     }
   
     stage.set_included_all(false);
-    for(uint i = start; i < stage.n_rows; i += step)
+    for(uint i = start; i < n_rows; i += step)
       stage.set_included(i, true);
   }
   
@@ -147,6 +152,7 @@ public class GGobi.SelectLabel : Select {
   public bool ignore_case {get; set construct;}
   
   override void select(StageSubset stage) {
+    uint n_rows = stage.parent.n_rows;
     bool value;
   
     if (substr == null || substr.len() == 0) {
@@ -158,7 +164,7 @@ public class GGobi.SelectLabel : Select {
     string search = substr; // needed for vala
     if (ignore_case) search = search.down();
 
-    for (uint i = 0; i < stage.n_rows; i++) {
+    for (uint i = 0; i < n_rows; i++) {
       string label = stage.get_row_id(i);
     
       if (label == null) continue;

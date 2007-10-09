@@ -20,8 +20,6 @@
 #include "pipeline.h"
 #include "utils_ui.h"
 
-#include "ggobi-stage-filter.h"
-
 static void exclusion_notebook_adddata_cb (GGobiSession *, GGobiStage *,
                                            void *notebook);
 
@@ -163,64 +161,64 @@ hide_cluster_cb (GtkToggleButton * btn, gpointer cbd)
 gint
 include_hiddens (gboolean include, GGobiStage * d, GGobiSession * gg)
 {
-  gint i;
-  displayd *dsp = gg->current_display;
-  cpaneld *cpanel = &dsp->cpanel;
-  gboolean prev, changed = false;
-  GGobiStage *f = ggobi_stage_find(ggobi_stage_get_root(d), GGOBI_MAIN_STAGE_FILTER);
-
-  GGOBI_STAGE_BRUSH_ATTR_INIT(f, hidden);  
-  for (i = 0; i < d->n_rows; i++) {
-    prev = ggobi_stage_filter_is_included(GGOBI_STAGE_FILTER(f), i);
-    ggobi_stage_filter_set_included(GGOBI_STAGE_FILTER(f), i, 
-      (include || !GGOBI_STAGE_GET_ATTR_HIDDEN(d, i)));
-    if ((prev != ggobi_stage_filter_is_included(GGOBI_STAGE_FILTER(f), i)) 
-        && !gg->linkby_cv) 
-      /*-- this doesn't link the value of excluded --*/
-      changed = changed || brush_all_matching_id (d, i, true, 
-        br_include, ATTR_SET_PERSISTENT);
-  }
-  ggobi_stage_filter_update(GGOBI_STAGE_FILTER(f));
-  
-  /*-- make the other datad's update their rows_in_plot, too --*/
-  /* FIXME: Are we sure that this even works? Do we really want to do this? - mfl */
-  if (changed) {
-    GGobiStage *dd;
-    GSList *l;
-    for (l = gg->d; l; l = l->next) {
-      dd = (GGobiStage *) l->data;
-      if (dd == ggobi_stage_get_root(d))
-        continue;
-      clusters_set(d);
-      cluster_table_labels_update (dd, gg);
-      /*limits_set (dd, gg->lims_use_visible);*/
-      vartable_limits_set (dd);
-      vartable_stats_set (dd);
-      tform_to_world(dd);
-    }
-  }
-
-  clusters_set(f);
-  cluster_table_labels_update (f, gg);
-  /*limits_set (f, gg->lims_use_visible);*/
-  vartable_limits_set (f);
-  vartable_stats_set (f);
-  tform_to_world(f);
-
-  if (cpanel->pmode == TOUR1D)
-    dsp->t1d.get_new_target = true;
-  else if (cpanel->pmode == TOUR2D3)
-    dsp->t2d3.get_new_target = true;
-  else if (cpanel->pmode == TOUR2D)
-    dsp->t2d.get_new_target = true;
-  else if (cpanel->pmode == COTOUR) {
-    dsp->tcorr1.get_new_target = true;
-    dsp->tcorr2.get_new_target = true;
-  }
-
-  displays_tailpipe (FULL, gg);
-  displays_plot (NULL, FULL, gg);
-
+  // gint i;
+  // displayd *dsp = gg->current_display;
+  // cpaneld *cpanel = &dsp->cpanel;
+  // gboolean prev, changed = false;
+  // GGobiStage *f = ggobi_stage_find(ggobi_stage_get_root(d), GGOBI_MAIN_STAGE_FILTER);
+  // 
+  // GGOBI_STAGE_BRUSH_ATTR_INIT(f, hidden);  
+  // for (i = 0; i < d->n_rows; i++) {
+  //   prev = ggobi_stage_filter_is_included(GGOBI_STAGE_FILTER(f), i);
+  //   ggobi_stage_filter_set_included(GGOBI_STAGE_FILTER(f), i, 
+  //     (include || !GGOBI_STAGE_GET_ATTR_HIDDEN(d, i)));
+  //   if ((prev != ggobi_stage_filter_is_included(GGOBI_STAGE_FILTER(f), i)) 
+  //       && !gg->linkby_cv) 
+  //     /*-- this doesn't link the value of excluded --*/
+  //     changed = changed || brush_all_matching_id (d, i, true, 
+  //       br_include, ATTR_SET_PERSISTENT);
+  // }
+  // // ggobi_stage_filter_update(GGOBI_STAGE_FILTER(f));
+  // 
+  // /*-- make the other datad's update their rows_in_plot, too --*/
+  // /* FIXME: Are we sure that this even works? Do we really want to do this? - mfl */
+  // if (changed) {
+  //   GGobiStage *dd;
+  //   GSList *l;
+  //   for (l = gg->d; l; l = l->next) {
+  //     dd = (GGobiStage *) l->data;
+  //     if (dd == ggobi_stage_get_root(d))
+  //       continue;
+  //     clusters_set(d);
+  //     cluster_table_labels_update (dd, gg);
+  //     /*limits_set (dd, gg->lims_use_visible);*/
+  //     vartable_limits_set (dd);
+  //     vartable_stats_set (dd);
+  //     tform_to_world(dd);
+  //   }
+  // }
+  // 
+  // clusters_set(f);
+  // cluster_table_labels_update (f, gg);
+  // /*limits_set (f, gg->lims_use_visible);*/
+  // vartable_limits_set (f);
+  // vartable_stats_set (f);
+  // tform_to_world(f);
+  // 
+  // if (cpanel->pmode == TOUR1D)
+  //   dsp->t1d.get_new_target = true;
+  // else if (cpanel->pmode == TOUR2D3)
+  //   dsp->t2d3.get_new_target = true;
+  // else if (cpanel->pmode == TOUR2D)
+  //   dsp->t2d.get_new_target = true;
+  // else if (cpanel->pmode == COTOUR) {
+  //   dsp->tcorr1.get_new_target = true;
+  //   dsp->tcorr2.get_new_target = true;
+  // }
+  // 
+  // displays_tailpipe (FULL, gg);
+  // displays_plot (NULL, FULL, gg);
+  // 
   return false;
 }
 
