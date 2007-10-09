@@ -29,6 +29,8 @@
 #include "externs.h"
 
 #include "colorscheme.h"
+#include "utils_ui.h"
+
 
 static gint xmargin = 20;
 static gint ymargin = 20;

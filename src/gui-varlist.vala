@@ -81,7 +81,6 @@ public class GGobi.Varlist : GLib.Object {
 
     _desc.resize((int) _columns);
     _desc[(int) _columns - 1] = desc;
-
     
     return _columns - 1;
   }

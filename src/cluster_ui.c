@@ -18,6 +18,7 @@
 #include "vars.h"
 #include "externs.h"
 #include "pipeline.h"
+#include "utils_ui.h"
 
 #include "ggobi-stage-filter.h"
 

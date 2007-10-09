@@ -22,6 +22,7 @@
 #include "vars.h"
 #include "externs.h"
 #include "colorscheme.h"
+#include "utils_ui.h"
 
 #undef WIN32
 

@@ -21,6 +21,8 @@
 #include "vars.h"
 #include "externs.h"
 #include "svd.h"
+#include "utils_ui.h"
+
 
 
 /*-------------------------------------------------------------------------*/

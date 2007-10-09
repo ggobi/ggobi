@@ -22,6 +22,7 @@
 
 #include "vars.h"
 #include "externs.h"
+#include "utils_ui.h"
 
 static void notebook_current_page_set (displayd *, GtkWidget *, GGobiSession *);
 

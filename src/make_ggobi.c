@@ -57,7 +57,7 @@ pipeline_create_cb(GGobiPipelineFactory *factory, GGobiStage *root, GGobiSession
   /* Note: there is no way to control the order of property settings with
      g_object_new, so we have to set the filter col here so that it
      comes after the parent */
-  ggobi_stage_filter_set_filter_column(GGOBI_STAGE_FILTER(subset), 
+  ggobi_stage_filter_set_filter_col(GGOBI_STAGE_FILTER(subset), 
     ggobi_stage_get_col_index_for_name(root, "_sampled"));
 
   impute = g_object_new(GGOBI_TYPE_STAGE_IMPUTE, 
@@ -73,7 +73,7 @@ pipeline_create_cb(GGobiPipelineFactory *factory, GGobiStage *root, GGobiSession
     "name", GGOBI_MAIN_STAGE_FILTER, "parent", randomize, NULL);
   
   // FIXME: 'excluded' is actually 'included' now
-  ggobi_stage_filter_set_filter_column(GGOBI_STAGE_FILTER(filter),
+  ggobi_stage_filter_set_filter_col(GGOBI_STAGE_FILTER(filter),
     ggobi_stage_get_col_index_for_name(root, "_excluded"));
   
   domain_adj = g_object_new(GGOBI_TYPE_STAGE_TRANSFORM,

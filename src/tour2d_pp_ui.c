@@ -18,6 +18,7 @@
 #include "vars.h"
 #include "externs.h"
 #include "projection-indices.h"
+#include "utils_ui.h"
 
 #define WIDTH   200
 #define HEIGHT  100

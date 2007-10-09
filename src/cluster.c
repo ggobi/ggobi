@@ -70,6 +70,7 @@ symbol_table_populate (GGobiStage * d)
 void
 clusters_set (GGobiStage * d)
 {
+  return;
   guint i, j, k, m;
   gint n, nclusters;
   colorschemed *scheme;

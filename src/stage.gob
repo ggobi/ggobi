@@ -1642,6 +1642,8 @@ process_outgoing(self, GGobiPipelineMessage *msg)
   guint col_change = n_added_cols - n_removed_cols;
   guint row_change = n_added_rows - n_removed_rows;
   
+  // g_debug("%s: +(%i, %i) -(%i, %i) => (%i, %i)", self->name, n_added_rows, n_added_cols, n_removed_rows, n_removed_cols, self->n_rows + n_added_rows - n_removed_rows, self->n_cols + n_added_cols - n_removed_cols);
+  
   if (col_change)
     self_set_n_cols(self, self->n_cols + col_change);
   

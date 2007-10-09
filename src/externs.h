@@ -283,7 +283,6 @@ void       populate_tree_view(GtkWidget *tree_view, gchar **lbl, gint nitems, gb
 gboolean   processRestoreFile(const gchar * const fileName, GGobiSession *gg);
 void       procs_activate(gboolean state, ProjectionMode pmode, displayd *display, GGobiSession *gg);
 gboolean   projection_ok (ProjectionMode m, displayd *display);
-void       quick_message (const gchar * const, gboolean);
 void       quit_ggobi(GGobiSession *gg);
 void       range_unset (GGobiSession *gg);
 gboolean   reached_target(gdouble, gdouble, gint, gdouble *, gdouble *);
