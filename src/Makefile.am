@@ -21,7 +21,7 @@ libggobi_la_VALAS = bitset.vala input-ftp.vala input-http.vala \
   tourer.vala tour-basis.vala tour-interpolation.vala \
   tour-basis-random.vala tour-basis-list.vala tour-basis-pursuit.vala \
   variable-filter.vala variable-description.vala stage-filter.vala \
-  stage-subset.vala
+  stage-subset.vala select.vala
 
 libggobi_la_METASOURCES = \
   $(libggobi_la_GOBS:%.gob=ggobi-%.c) \

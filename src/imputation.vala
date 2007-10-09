@@ -17,8 +17,8 @@ public class GGobi.Imputation : Object {
   public abstract double impute_single(uint i);
   public abstract void pre_compute(StageImpute stage, uint j);
   public abstract string description();
-  public virtual bool equals(Imputation other) {
-    return this.get_type() == other.get_type();
+  public virtual bool equals(Imputation that) {
+    return that.get_type() == that.get_type();
   }
 }
 
@@ -34,10 +34,10 @@ public class GGobi.ImputationFixed : Imputation {
     return fixed_value.to_string("Value: %.2f");
   }
   
-  override bool equals(Imputation other) {
-    if (this.get_type() != other.get_type()) return(false);
+  override bool equals(Imputation that) {
+    if (this.get_type() != that.get_type()) return(false);
     
-    return ((ImputationFixed) other).fixed_value == fixed_value;
+    return ((ImputationFixed) that).fixed_value == fixed_value;
   }
   
 }
@@ -93,10 +93,10 @@ public class GGobi.ImputationPercent : Imputation {
     return percent.to_string("Percent: %.2f");
   }
   
-  override bool equals(Imputation other) {
-    if (this.get_type() != other.get_type()) return(false);
+  override bool equals(Imputation that) {
+    if (this.get_type() != that.get_type()) return(false);
     
-    return ((ImputationPercent) other).percent == percent;
+    return ((ImputationPercent) that).percent == percent;
   }
   
 }
