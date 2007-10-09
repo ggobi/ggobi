@@ -8,24 +8,12 @@ using GLib;
 public class GGobi.StageFilter : Stage {
   public int filter_col { get; construct set; }
 
-  /* filtered index ==> raw index */
+  /* filtered index => raw index */
   public uint[] included_rows;
-  /* raw index ==> filtered index, -1 = filtered */
+  /* raw index => filtered index, -1 = filtered */
   public int[] included_rows_rev;
   /* whether a (raw) row passes the filter */
   private bool[] included;
-
-  override void process_incoming(PipelineMessage msg) {
-    SList<uint> changed_cols = msg.get_changed_cols();
-    uint rows_changed = msg.get_n_added_rows() + 
-      msg.get_n_removed_rows();
-    msg.consume_rows(); // we ignore any row changes 
-    // FIXME: need to check whether filter column has been shifted or removed
-    /* rows added, rows removed, or filter column changed: update filter */
-    if ((rows_changed > 0) || changed_cols.find(filter_col) != null)
-      process_filter();
-    base.process_incoming(msg);
-  }
 
   construct {
     filter_col = -1;
@@ -48,6 +36,8 @@ public class GGobi.StageFilter : Stage {
       set_included(i, value);
   }
 
+  // Override accessor methods to get unfiltered value
+  
   override void set_missing(uint i, uint j) {
     parent.set_missing(included_rows[i], j);
   }
@@ -74,24 +64,21 @@ public class GGobi.StageFilter : Stage {
   override double get_raw_value(uint i, uint j) {
     return parent.get_raw_value(included_rows[i], j);
   }
-
-  // Convenience method that refreshes the filter and
-  // and flushes the queued changes.
-  public void update() {
-    process_filter();
-    flush_changes_here();
+  
+  override void process_incoming(PipelineMessage msg) {
+    SList<uint> changed_cols = msg.get_changed_cols();
+    uint rows_changed = msg.get_n_added_rows() + 
+      msg.get_n_removed_rows();
+    msg.consume_rows(); // we ignore any row changes 
+    // FIXME: need to check whether filter column has been shifted or removed
+    /* rows added, rows removed, or filter column changed: update filter */
+    if ((rows_changed > 0) || changed_cols.find(filter_col) != null)
+      refresh_();
+    base.process_incoming(msg);
   }
 
-  /**
-   * process_filter:
-   * @self: a #GGobiStageFilter
-   *
-   * Update the included state of the rows, based on the result of 
-   * included(). Most clients will just use
-   * update() which is a higher-level function.
-   *
-   */
-  public void process_filter() {
+  // Update the included state of the rows, sending messages as necessary
+  public void refresh_() {
     int parent_nrows = parent != null ? (int) parent.n_rows : 0;
     SList<uint> removed_rows = new SList<uint>();
     int n_included = 0, n_added = 0;
@@ -123,6 +110,4 @@ public class GGobi.StageFilter : Stage {
     rows_removed(removed_rows);
     rows_added(n_added);
   }
-
-
 }

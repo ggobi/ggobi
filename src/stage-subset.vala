@@ -17,15 +17,9 @@ namespace GGobi {
 
 public class GGobi.StageSubset : StageFilter  {
 
-  // Update the filter, and cluster ui.
-  public void apply() {
-    update();
-    // cluster_table_update(this, gg);
-  }
-
   public void reset() {
     set_included_all(true);
-    apply();
+    refresh();
   }
 
   // Select n random observations
