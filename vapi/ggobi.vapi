@@ -15,11 +15,16 @@ public class GGobi.Stage : GLib.Object {
   public virtual void set_row_id(uint i, string id);
   public void set_string_value(uint i, uint j, string val);
   public virtual string get_row_id(uint i);
+  public virtual int get_row_for_id(string id);
   
+  public void rows_removed(GLib.SList rows);
+  public void rows_added(uint n);
+    
   public string get_string_value(uint i, uint j);
   public virtual double get_raw_value(uint i, uint j);
   public virtual void set_raw_value(uint i, uint j, double value);
   public virtual bool is_missing(uint i, uint j);
+  public virtual void set_missing(uint i, uint j);
   
   public uint get_col_n_missing(uint j);
   
@@ -28,7 +33,7 @@ public class GGobi.Stage : GLib.Object {
   public void col_data_changed(uint j);
   public void flush_changes_here();
   
-  virtual void process_incoming(PipelineMessage msg);
+  public virtual void process_incoming(PipelineMessage msg);
   public virtual void process_outgoing(PipelineMessage msg);
   
   public virtual void refresh_col_(uint j);
@@ -57,6 +62,9 @@ public class GGobi.PipelineMessage : GLib.Object{
   public uint get_n_added_cols();
   public uint get_n_changed_cols();
   public uint get_n_removed_cols();
+  
+  public void consume_rows();
+  
 }
 
 public class GGobi.Session {
@@ -102,6 +110,12 @@ namespace GGobi {
   public enum RedrawStyle {
     NONE, EXPOSE, QUICK, BINNED, FULL, FULL_1PIXMAP
   }
+  
+  [CCode (cname = "quick_message", cprefix = "", lower_case_cprefix = "", cheader_filename = "utils_ui.h")]
+  void message (string message, bool modal);
+  
+  
+  
   
   [CCode (cheader_filename = "pipeline.h", cname="tform_to_world_by_var")]
   public void tform_to_world_by_var (Stage stage, uint j);

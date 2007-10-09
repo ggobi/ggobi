@@ -1,12 +1,9 @@
 using GLib;
 using Gsf;
 
-public class GGobi.InputSourceHTTP : Object, InputSource {
-  public string uri { get; set construct; }
-  public string mode { get; set construct; }
-  public string display_name { get; set construct; }
+public class GGobi.InputSourceHTTP : InputSource {
   
-  public Input
+  override Input
   get_input(out GLib.Error err) 
   {
     InputHTTP input = new InputHTTP(uri);

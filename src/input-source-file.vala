@@ -2,12 +2,8 @@ using GLib;
 using Gsf;
 using Xml;
 
-public class GGobi.InputSourceFile : Object, InputSource
+public class GGobi.InputSourceFile : InputSource
 { 
-  
-  public string uri { get; set construct; }
-  public string mode { get; set construct; }
-  public string display_name { get; set construct; }
   
   /** Get the system locale filename from the URI in this source */
   public string
@@ -28,7 +24,7 @@ public class GGobi.InputSourceFile : Object, InputSource
     return Filename.from_uri(resolved);
   }
   
-  public Input
+  override Input
   get_input(out GLib.Error error) 
   {
     Input input = null;

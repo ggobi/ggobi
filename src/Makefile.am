@@ -90,7 +90,7 @@ MAINTAINERCLEANFILES = $(BUILT_SOURCES)
 	@touch $@
 
 if HAS_VALA
-.vala.stamp: $(libggobi_la_VALAS) ../vapi/ggobi.vala ../vapi/gsf.vala
+.vala.stamp: $(libggobi_la_VALAS) ../vapi/ggobi.vapi ../vapi/gsf.vapi
 	@VALAC@ --vapidir=../vapi --pkg=gtk+-2.0 --pkg=gsf --pkg=ggobi --pkg=libxml-2.0 $(libggobi_la_VALAS)
 	@touch $@
 else

@@ -1,10 +1,10 @@
 using GLib;
 using Gsf;
 
-public interface GGobi.InputSource : Object {
-  public abstract string uri { get; set construct; }
-  public abstract string mode { get; set construct; }
-  public abstract string display_name { get; set construct; }
+public abstract class GGobi.InputSource : Object {
+  public string uri { get; set construct; }
+  public string mode { get; set construct; }
+  public string display_name { get; set construct; }
 
   /**
    * get_input:
