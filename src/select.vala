@@ -21,12 +21,19 @@ public abstract class GGobi.Select : Object {
   //   return true;
   // }
   
+  public abstract string description();
+  
 }
 
 public class GGobi.SelectAll : Select {
   override void select(StageSubset stage) {
     stage.set_included_all(true);
   }
+  
+  override string description() {
+    return "All";
+  }
+  
 }
 
 
@@ -61,6 +68,10 @@ public class GGobi.SelectRandom : Select {
       this.n == ((SelectRandom) that).n;
   }
   
+  override string description() {
+    return n.to_string("Random (%i)");
+  }
+  
 }
 
 // Select a contiguous block of data, from start to start + size
@@ -89,6 +100,10 @@ public class GGobi.SelectBlock : Select {
       this.start == ((SelectBlock) that).start &&
       this.size  == ((SelectBlock) that).size;
   }
+  
+  override string description() {
+    return "Block [%i-%i]".printf(start, start + size);
+  }
 }
 
 // Select every step points, starting from start.
@@ -111,6 +126,10 @@ public class GGobi.SelectEveryN : Select {
     return base.equals(that) && 
       this.start == ((SelectEveryN) that).start &&
       this.step  == ((SelectEveryN) that).step;
+  }
+  
+  override string description() {
+    return "Every %i from %i".printf(step, start);
   }
   
 }
@@ -171,5 +190,9 @@ public class GGobi.SelectLabel : Select {
       this.substr == ((SelectLabel) that).substr &&
       this.method == ((SelectLabel) that).method &&
       this.ignore_case == ((SelectLabel) that).ignore_case;
+  }
+  
+  override string description() {
+    return "Label";
   }
 }
