@@ -30,7 +30,7 @@ public class GGobi.GuiImpute : Window {
   
   public void create_widgets() {
     
-    // Initialise variable list 
+    // Initialize variable list 
     varlist = new Varlist(stage, new FilterMissing());
     varlist.selection_changed += varlist => {
       update_imputation_gui();

@@ -34,7 +34,7 @@ The authors can be contacted at the following email addresses:
 
 #include "tour1d_pp.h"
 #include "tour_pp_ui.h"
-#include "projection-optimisation.h"
+#include "projection-optimization.h"
 
 
 

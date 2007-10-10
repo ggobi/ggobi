@@ -100,7 +100,7 @@ public class GGobi.Varlist : GLib.Object {
     vartable.append_column(col);
   }
 
-  // Add rows to varlist and initialise first column
+  // Add rows to varlist and initialize first column
   private void add_rows() {
     TreeIter iter;
     for(uint j = 0; j < stage.n_cols; j++) {

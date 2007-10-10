@@ -84,12 +84,12 @@ public class GGobi.TourInterpolation : Object {
 
     // Form an orthogonal coordinate transformation --------------------------
 
-    Ga.orthogonalise();
-    // Gz.orthogonalise();
+    Ga.orthogonalize();
+    // Gz.orthogonalize();
 
-    Gz.orthogonalise_by(Ga);
-    Gz.normalise();
-    Gz.orthogonalise();
+    Gz.orthogonalize_by(Ga);
+    Gz.normalize();
+    Gz.orthogonalize();
 
     // Compute, standardize and round principal angles -----------------------
     for (uint i = 0; i < d; i++) {
@@ -100,7 +100,7 @@ public class GGobi.TourInterpolation : Object {
     dist = TourVector.norm(tau);
     // if (dist_az < 0.0001) return(3);
     // Work out relative speeds for each direction
-    TourVector.normalise(out tau);
+    TourVector.normalize(out tau);
   }
     
   public TourMatrix get_frame(double angle) {
@@ -117,8 +117,8 @@ public class GGobi.TourInterpolation : Object {
     // rotate plane to match frame Fa
     TourMatrix F = TourMatrix.multiply_uv(G, Va);
     // correct round-off errors
-    F.normalise(); 
-    F.orthogonalise();
+    F.normalize(); 
+    F.orthogonalize();
     
     return F;
   }

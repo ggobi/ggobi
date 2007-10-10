@@ -21,7 +21,7 @@
 #include "cpanel.h"
 #include "splot.h"
 #include "data.h"
-#include "projection-optimisation.h"
+#include "projection-optimization.h"
 #include "projection-indices.h"
 
 #include "session.h"

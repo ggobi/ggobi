@@ -134,7 +134,7 @@ libggobi_la_BUILT = \
   plugin.c \
   ppcorr_ui.c \
   projection-indices.c \
-  projection-optimisation.c \
+  projection-optimization.c \
   read_color.c \
   read_init.c \
   scale_api.c \
@@ -210,7 +210,7 @@ pkginclude_HEADERS = GGobiAPI.h ggobiClass.h tour1d_pp.h \
   varseldata.h defines.h scatmatClass.h display.h \
   scatterplotClass.h display_tree.h write_xml.h ggobi-intl.h \
   externs.h splot.h writedata.h fileio.h testEvents.h ggobi.h tour.h \
-  projection-optimisation.c projection-indices.c \
+  projection-optimization.c projection-indices.c \
   $(libggobi_la_METAHEADERS) GGStructSizes.c marshal.h utils.h
 
 BUILT_SOURCES =  $(libggobi_la_METASTAMPS) $(libggobi_la_METASOURCES) $(libggobi_la_METAHEADERS)

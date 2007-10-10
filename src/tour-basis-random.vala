@@ -29,8 +29,8 @@ public class GGobi.TourBasisRandom : TourBasis {
         mat.set(i, j, value);
       }
     }
-    mat.orthogonalise();
-    mat.normalise();
+    mat.orthogonalize();
+    mat.normalize();
     return mat;
   }
 }

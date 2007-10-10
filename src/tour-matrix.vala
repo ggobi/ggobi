@@ -40,7 +40,7 @@ public class GGobi.TourMatrix : PipelineMatrix {
     return true;
     
   }
-  public bool orthogonalise_by(TourMatrix other) {
+  public bool orthogonalize_by(TourMatrix other) {
     weak double[] left;
     weak double[] right;
 
@@ -48,12 +48,12 @@ public class GGobi.TourMatrix : PipelineMatrix {
       left = other.col(j);
       right = col(j);
       
-      if (!TourVector.orthogonalise(left, out right)) 
+      if (!TourVector.orthogonalize(left, out right)) 
         return false;
     }
     return true;
   }
-  public bool orthogonalise() {
+  public bool orthogonalize() {
     if (n_cols == 1) return(true);
     
     weak double[] left;
@@ -64,22 +64,22 @@ public class GGobi.TourMatrix : PipelineMatrix {
         left = col(j);
         right = col(k);
         
-        if (!TourVector.orthogonalise(left, out right)) return false;
+        if (!TourVector.orthogonalize(left, out right)) return false;
       }
     }    
     return true;
   }
 
-  // Normalise entire matrix
-  public void normalise() {
+  // Normalize entire matrix
+  public void normalize() {
     for (uint j = 0; j < n_cols; j++)
-      normalise_col(j);
+      normalize_col(j);
   }
 
-  // Normalise given column
-  public void normalise_col(uint j) {
+  // Normalize given column
+  public void normalize_col(uint j) {
     weak double[] tmp = col(j);
-    TourVector.normalise(out tmp);
+    TourVector.normalize(out tmp);
   }
   
   // Calculate norm (length) for specified column

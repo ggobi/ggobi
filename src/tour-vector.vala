@@ -11,7 +11,7 @@ public class GGobi.TourVector : Object {
     return TourVector.inner_product(x, x);
   }
   
-  public static void normalise(out double[] x) {
+  public static void normalize(out double[] x) {
     double norm = TourVector.inner_product(x, x);
     
     for (uint i = 0; i < x.length; i++)
@@ -34,7 +34,7 @@ public class GGobi.TourVector : Object {
     return 1 - inner_product(a, b) < EPSILON;
   }
 
-  public static bool orthogonalise(double[] a, out double[] b) {
+  public static bool orthogonalize(double[] a, out double[] b) {
     if (a.length != b.length) return false;
     if (TourVector.equivalent(a, b)) return false;
       
@@ -43,7 +43,7 @@ public class GGobi.TourVector : Object {
     for (int i = 0; i < a.length; i++) {
       b[i] = b[i] - ip * a[i];
     }
-    TourVector.normalise(out b);
+    TourVector.normalize(out b);
 
     return true;
   }

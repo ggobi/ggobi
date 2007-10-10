@@ -65,8 +65,8 @@ public class GGobi.TourBasisPursuit : TourBasis {
         }
       }
     }
-    mat.orthogonalise();
-    mat.normalise();
+    mat.orthogonalize();
+    mat.normalize();
     add_frozen_vars(out mat, states);
     
     return mat;

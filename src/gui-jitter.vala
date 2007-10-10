@@ -30,7 +30,7 @@ public class GGobi.GuiJitter : Window {
   
   public void create_widgets() {
 
-    // Initialise variable list 
+    // Initialize variable list 
     varlist = new Varlist(stage, new FilterAttributes());
     varlist.selection_changed += varlist => {
       update_amount_slider();

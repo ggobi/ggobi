@@ -29,7 +29,7 @@ public class GGobi.GuiRandomize : Window {
       update_randomization_gui();
     };
     
-    varlist.add_col(typeof(string), "Randomisation", new VariableRandomisation());
+    varlist.add_col(typeof(string), "Randomization", new VariableRandomization());
     stage.col_parameter_changed += (stage, col) => { 
       varlist.update_col(2); 
     };
@@ -97,7 +97,7 @@ public class GGobi.GuiRandomize : Window {
   }
   
 }
-public class GGobi.VariableRandomisation : VariableDescription {
+public class GGobi.VariableRandomization : VariableDescription {
   override string describe(Stage stage, uint j) {
     string label;
     switch (((StageRandomize) stage).randomization[j]) {

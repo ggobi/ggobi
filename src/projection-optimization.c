@@ -1,4 +1,4 @@
-#include "projection-optimisation.h"
+#include "projection-optimization.h"
 #include "utils.h"
 #include "vector.h"
 #include <math.h>

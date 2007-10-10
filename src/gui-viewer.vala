@@ -22,7 +22,7 @@ public class GGobi.GuiViewer : Window {
   }
   
   public void create_widgets () {
-    initialise();
+    initialize();
     load_data();
     
     stage.changed += (stage, msg) => {process_incoming(msg);};
@@ -36,8 +36,8 @@ public class GGobi.GuiViewer : Window {
     show_all();
   }
 
-  /* Initialise the model and table with columns loaded from the stage */
-  public void initialise() {
+  /* Initialize the model and table with columns loaded from the stage */
+  public void initialize() {
     uint ncols = stage.n_cols + 1;
     
     GLib.Type[] col_types = new GLib.Type[ncols];
@@ -94,7 +94,7 @@ public class GGobi.GuiViewer : Window {
     if (msg.get_n_removed_rows() > 0 || msg.get_n_removed_cols() > 0 ||
         msg.get_n_added_rows() > 0   || msg.get_n_added_cols() > 0 ) {
       GLib.debug("Rebuilding table");
-      initialise();
+      initialize();
       load_data();
       return;
     }
