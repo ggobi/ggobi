@@ -123,10 +123,8 @@ public class GGobi.TourMatrix : PipelineMatrix {
     
     LinearAlgebra.svd(out U.matrix.vals, (int) n_rows, (int) n_cols, out d, out Vt.matrix.vals);
     
-    Svd svd;
-    svd.U = U;
-    svd.V = Vt.transpose();
-    // svd.d = d;
+    Svd svd = new Svd(U, Vt.transpose());
+    svd.set_d(d);
     return svd;
   }
   

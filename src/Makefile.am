@@ -17,7 +17,7 @@ libggobi_la_VALAS = bitset.vala input-ftp.vala input-http.vala \
   transform-min-one.vala transform-boxcox.vala transform-abs.vala \
   transform-log10.vala stage-transform.vala pipeline-matrix.vala \
   stage-display.vala stage-randomize.vala gui-randomize.vala \
-  stage-freeze.vala tour-matrix.vala tour-vector.vala svd-struct.vala \
+  stage-freeze.vala tour-matrix.vala tour-vector.vala svd.vala \
   tourer.vala tour-basis.vala tour-interpolation.vala \
   tour-basis-random.vala tour-basis-list.vala tour-basis-pursuit.vala \
   variable-filter.vala variable-description.vala stage-filter.vala \
