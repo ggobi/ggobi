@@ -3,7 +3,6 @@ lib_LTLIBRARIES     = libggobi.la
 
 libggobi_la_GOBS = \
   data-factory-xml.gob \
-  gui-component.gob \
   gui-transform.gob \
   pipeline-factory.gob \
   pipeline-message.gob \
