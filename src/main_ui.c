@@ -825,7 +825,6 @@ action_color_glyph_groups_cb (GtkAction * action, GGobiSession * gg)
 static void
 action_subset_cb (GtkAction * action, GGobiSession * gg)
 {
-  subset_window_open (gg);
 }
 
 #ifdef SMOOTH_IMPLEMENTED

@@ -348,13 +348,6 @@ struct _GGobiSession {
     GGobiStage *d;
   } sphere_ui;
 
-/*-------------------- subsetting ------------------------------------*/
-
-  struct _SubsetUI {
-    GtkWidget *window;
-    GtkWidget *notebook;
-  } subset_ui;
-
 /*---------------- color scheme selection -------------------------------*/
 
   struct _SchemeChooser {

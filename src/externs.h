@@ -363,7 +363,6 @@ void       sticky_id_toggle (GGobiStage *, GGobiSession *);
 void       submenu_destroy (GtkWidget *);
 void       submenu_insert (GtkWidget *, GtkWidget *, gint);
 GtkWidget* submenu_make (gchar *, guint, GtkAccelGroup *);
-void       subset_window_open (GGobiSession *);
 gboolean brush_all_matching_id (GGobiStage * sd, gint k, gboolean condition, BrushTargetType brush_mode, GGobiAttrSetMethod brush);
 gint       symbol_table_populate (GGobiStage *d);
 void       symbol_window_redraw (GGobiSession *);
@@ -538,8 +537,6 @@ void      zero_tau(vector_d, gint);
 gboolean  ggobi_close (GGobiSession *gg);
 gint      ggobi_remove_by_index (GGobiSession *gg, gint which);
 gint      ggobi_remove (GGobiSession *);
-void      subset_init (GGobiStage *d, GGobiSession *gg);
-
 
 displayd *createBarchart(displayd *display, gboolean missing_p, splotd * sp, gint var, GGobiStage * d,  GGobiSession * gg);
 void      barchart_scaling_visual_cues_draw (splotd *sp, GdkDrawable *drawable, GGobiSession *gg);
