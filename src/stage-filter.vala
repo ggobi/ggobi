@@ -110,14 +110,14 @@ public class GGobi.StageFilter : Stage {
     included.resize(n_included);
     
     if (n_included_prev > n_included) {
-      GLib.debug("More old than new: %i -> %i", n_included_prev, n_included);
+      // GLib.debug("More old than new: %i -> %i", n_included_prev, n_included);
       for(int i = n_included; i < n_included_prev; i++) {
         removed_rows.prepend(i);
       }
       rows_removed(removed_rows);
 
     } else if (n_included > n_included_prev) {
-      GLib.debug("More new than old: %i -> %i", n_included_prev, n_included);
+      // GLib.debug("More new than old: %i -> %i", n_included_prev, n_included);
 
       rows_added(n_rows - n_included_prev);      
     } else {
