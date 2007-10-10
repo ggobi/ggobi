@@ -23,6 +23,7 @@
 #include "vars.h"
 #include "externs.h"
 #include "tour.h"
+#include "utils_ui.h"
 
 /* This function initializes the tour variables - it should only be
    called more than once, when a new tour is started since a new

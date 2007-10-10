@@ -1,27 +1,72 @@
+NULL = 
 lib_LTLIBRARIES     = libggobi.la
 
-libggobi_la_GOBS = variable.gob stage.gob \
+libggobi_la_GOBS = \
+  data-factory-xml.gob \
+  gui-component.gob \
+  gui-transform.gob \
   pipeline-factory.gob \
-  plugin-factory.gob plugin.gob data-factory-xml.gob \
+  pipeline-message.gob \
+  plugin-factory.gob \
+  plugin.gob \
+  renderer-cairo.gob \
+  renderer-factory.gob \
+  renderer.gob \
   stage-group.gob \
-  gui-component.gob gui-transform.gob type-registry.gob \
-  pipeline-message.gob variable-group.gob renderer.gob renderer-cairo.gob \
-  renderer-factory.gob
+  stage.gob \
+  type-registry.gob \
+  variable-group.gob \
+  variable.gob \
+  $(NULL)
 
-libggobi_la_VALAS = bitset.vala input-ftp.vala input-http.vala \
-  input-source.vala data-factory.vala data-factory-csv.vala \
-  input-source-file.vala input-source-ftp.vala input-source-factory.vala \
-  input-source-http.vala stage-jitter.vala stage-standardize.vala \
-  matrix.vala stage-impute.vala gui-viewer.vala gui-jitter.vala \
-  imputation.vala gui-varlist.vala gui-impute.vala transform.vala \
-  transform-min-one.vala transform-boxcox.vala transform-abs.vala \
-  transform-log10.vala stage-transform.vala pipeline-matrix.vala \
-  stage-display.vala stage-randomize.vala gui-randomize.vala \
-  stage-freeze.vala tour-matrix.vala tour-vector.vala svd2.vala \
-  tourer.vala tour-basis.vala tour-interpolation.vala \
-  tour-basis-random.vala tour-basis-list.vala tour-basis-pursuit.vala \
-  variable-filter.vala variable-description.vala stage-filter.vala \
-  stage-subset.vala select.vala gui-subset.vala data.vala
+libggobi_la_VALAS = \
+  bitset.vala  \
+  data-factory-csv.vala \
+  data-factory.vala \
+  data.vala \
+  gui-impute.vala \
+  gui-jitter.vala \
+  gui-randomize.vala \
+  gui-subset.vala \
+  gui-varlist.vala \
+  gui-viewer.vala \
+  imputation.vala \
+  input-ftp.vala \
+  input-http.vala \
+  input-source-factory.vala \
+  input-source-file.vala \
+  input-source-ftp.vala \
+  input-source-http.vala \
+  input-source.vala \
+  matrix.vala \
+  pipeline-matrix.vala \
+  select.vala \
+  stage-display.vala \
+  stage-filter.vala \
+  stage-freeze.vala \
+  stage-impute.vala \
+  stage-jitter.vala \
+  stage-randomize.vala \
+  stage-standardize.vala \
+  stage-subset.vala \
+  stage-transform.vala \
+  svd2.vala \
+  tour-basis-list.vala \
+  tour-basis-pursuit.vala \
+  tour-basis-random.vala \
+  tour-basis.vala \
+  tour-interpolation.vala \
+  tour-matrix.vala \
+  tour-vector.vala \
+  tours.vala \
+  transform-abs.vala \
+  transform-boxcox.vala \
+  transform-log10.vala \
+  transform-min-one.vala \
+  transform.vala \
+  variable-description.vala \
+  variable-filter.vala \
+  $(NULL)
 
 libggobi_la_METASOURCES = \
   $(libggobi_la_GOBS:%.gob=ggobi-%.c) \
@@ -40,29 +85,116 @@ libggobi_la_METASTAMPS = \
 
 libggobi_la_LDFLAGS  = @GTK_LIBS@ @LIBXML_LIBS@ @LIBGSF_LIBS@ -version-info 2
 
-libggobi_la_BUILT = array.c ash1d.c barchart.c barchartClass.c \
-  barchart_ui.c brush.c brush_api.c brush_bins.c brush_init.c brush_link.c \
-  brush_link_ui.c brush_ui.c color.c color_ui.c cpanel.c display.c \
-  display_tree.c display_ui.c \
-  edges.c cluster.c cluster_ui.c extendedDisplay.c fileio.c ggobi-API.c \
-  ggobi.c ggobiClass.c identify.c identify_ui.c \
-  fileio_ui.c limits.c lineedit.c \
-  lineedit_ui.c main_ui.c make_ggobi.c marshal.c menus.c \
-  movepts.c movepts_ui.c noop-toggle.c p1d.c p1d_ui.c parcoords.c \
-  parcoordsClass.c parcoords_ui.c plugin.c pipeline.c ppcorr_ui.c \
-  read_init.c read_color.c scale_api.c scale_drag.c \
-  scale_ui.c scatmat.c scatmatClass.c scatmat_ui.c scatterplot.c \
-  scatterplotClass.c scatterplot_ui.c schemes.c schemes_ui.c sphere.c \
-  sphere_ui.c splash.c splot.c sp_plot.c sp_plot_axes.c sp_plot_edges.c \
-  svd.c texture.c timeplot.c time_ui.c timing.c tour.c tour1d.c \
-  tour1d_pp.c tour1d_pp_ui.c tour1d_ui.c tour2d.c tour2d3.c tour2d3_ui.c \
-  tour2d_pp.c tour2d_pp_ui.c tour2d_ui.c tourcorr.c tourcorr_ui.c \
-  tsdisplay.c tsPlot.c utils.c utils_gdk.c \
-  utils_pango.c utils_ui.c varchange.c varcircles.c varpanel_ui.c vartable.c \
-  vartable_nbook.c vartable_ui.c vector.c win32_draw.c writedata_ui.c \
-  write_csv.c write_xml.c wvis.c wvis_ui.c xlines.c xyplot.c \
+libggobi_la_BUILT = \
+  array.c \
+  ash1d.c \
+  barchart.c \
+  barchartClass.c \
+  barchart_ui.c \
+  brush.c \
+  brush_api.c \
+  brush_bins.c \
+  brush_init.c \
+  brush_link.c \
+  brush_link_ui.c \
+  brush_ui.c \
+  cluster.c \
+  cluster_ui.c \
+  color.c \
+  color_ui.c \
+  cpanel.c \
+  display.c \
+  display_tree.c \
+  display_ui.c \
+  edges.c \
+  extendedDisplay.c \
+  fileio.c \
+  fileio_ui.c \
+  ggobi-API.c \
+  ggobi.c \
+  ggobiClass.c \
+  identify.c \
+  identify_ui.c \
+  limits.c \
+  lineedit.c \
+  lineedit_ui.c \
+  main_ui.c \
+  make_ggobi.c \
+  marshal.c \
+  menus.c \
+  movepts.c \
+  movepts_ui.c \
+  noop-toggle.c \
+  p1d.c \
+  p1d_ui.c \
+  parcoords.c \
+  parcoordsClass.c \
+  parcoords_ui.c \
+  pipeline.c \
+  plugin.c \
+  ppcorr_ui.c \
+  projection-indices.c \
+  projection-optimisation.c \
+  read_color.c \
+  read_init.c \
+  scale_api.c \
+  scale_drag.c \
+  scale_ui.c \
+  scatmat.c \
+  scatmatClass.c \
+  scatmat_ui.c \
+  scatterplot.c \
+  scatterplotClass.c \
+  scatterplot_ui.c \
+  schemes.c \
+  schemes_ui.c \
+  sphere.c \
+  sphere_ui.c \
+  splash.c \
+  splot.c \
+  sp_plot.c \
+  sp_plot_axes.c \
+  sp_plot_edges.c \
+  svd.c \
+  texture.c \
+  timeplot.c \
+  time_ui.c \
+  timing.c \
+  tour.c \
+  tour1d.c \
+  tour1d_pp.c \
+  tour1d_pp_ui.c \
+  tour1d_ui.c \
+  tour2d.c \
+  tour2d3.c \
+  tour2d3_ui.c \
+  tour2d_pp.c \
+  tour2d_pp_ui.c \
+  tour2d_ui.c \
+  tourcorr.c \
+  tourcorr_ui.c \
+  tsdisplay.c \
+  tsPlot.c \
+  utils.c \
+  utils_gdk.c \
+  utils_pango.c \
+  utils_ui.c \
+  varchange.c \
+  varcircles.c \
+  varpanel_ui.c \
+  vartable.c \
+  vartable_nbook.c \
+  vartable_ui.c \
+  vector.c \
+  win32_draw.c \
+  writedata_ui.c \
+  write_csv.c \
+  write_xml.c \
+  wvis.c \
+  wvis_ui.c \
+  xlines.c \
+  xyplot.c \
   xyplot_ui.c \
-  projection-optimisation.c projection-indices.c \
   $(libggobi_la_METASOURCES)
 
 libggobi_la_SOURCES = $(libggobi_la_BUILT) $(libggobi_la_METASTAMPS)
