@@ -47,7 +47,7 @@ public class GGobi.Stage.Screen : Stage {
 
 	/* Width of margin, in pixels.  
 	
-	This is a heuristic that Hadley thinks should work well with some
+	This is a heuristic that Hadley thinks should work well.
 	It uses the minimum of 10 pixels, or 10% of the smaller of height 
 	or width */
 	uint margin() {
