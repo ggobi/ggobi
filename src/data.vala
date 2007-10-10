@@ -32,6 +32,7 @@ public class GGobi.Data : Stage {
     name = "unknown"; 
     raw = new Matrix(0, 0);
     missing = new Matrix(0, 0);
+    id_to_row = new HashTable<string, int>(str_hash, direct_equal);
     add_cols(n_cols);
     add_rows(n_rows);
   }
@@ -145,7 +146,7 @@ public class GGobi.Data : Stage {
     string val = value; // needed for vala
     if (val == null)
       val = (i + 1).to_string("%d");
-    row_ids[i] = value;
+    row_ids[i] = val;
     id_to_row.replace(row_ids[i], i);
   }
 
