@@ -38,7 +38,9 @@ public class GGobi.PipelineMatrix : GLib.Object {
     matrix.add_cols((int) nc);
   }
 
-  public void process_message(PipelineMessage msg, Stage stage) {
+  public void process_message(
+    PipelineMessage msg, Stage stage, bool refresh = true
+  ) {
     SList removed_rows = msg.get_removed_rows();
     matrix.remove_rows(removed_rows);
     matrix.add_rows((int) stage.n_rows);
@@ -56,14 +58,19 @@ public class GGobi.PipelineMatrix : GLib.Object {
       // if rows changed, update all columns
       n_refresh = n_cols; 
     } else {
-      foreach(uint j in changed_cols) {
-        // GLib.debug("Updating column %i", j);
-        stage.refresh_col_(j);
+      if (refresh) {
+        foreach(uint j in changed_cols) {
+          // GLib.debug("Updating column %i", j);
+          stage.refresh_col_(j);
+        }
       }
     }
-    for (uint j = n_cols - n_refresh; j < n_cols; j++) {
-      stage.refresh_col_(j);
-      // GLib.debug("Updating column %i", j);     
+    
+    if (refresh) {
+      for (uint j = n_cols - n_refresh; j < n_cols; j++) {
+        stage.refresh_col_(j);
+        // GLib.debug("Updating column %i", j);     
+      }
     }
     
   }

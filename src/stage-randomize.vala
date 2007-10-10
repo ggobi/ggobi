@@ -18,12 +18,11 @@ public class GGobi.StageRandomize : Stage {
   public PipelineMatrix cache;
   
   public override void refresh_col_(uint j) {
+    if (randomization[j] == RandomizationType.NONE) {
+      return;
+    }
+    
     switch (randomization[j]) {
-      case RandomizationType.NONE: 
-        for(uint i = 0; i < n_rows; i++)
-          cache.set(i, j, parent.get_raw_value(i, j));
-        break;
-        
       case RandomizationType.REPEAT:
         for(uint i = 0; i < n_rows; i++)
           cache.set(i, j, parent.get_raw_value(rand_row(), j));
@@ -48,6 +47,9 @@ public class GGobi.StageRandomize : Stage {
   }
   
   override double get_raw_value(uint i, uint j) {
+    if (randomization[j] == RandomizationType.NONE) {
+      return parent.get_raw_value(i, j);
+    }
     return cache.get(i, j);
   }
 
@@ -67,13 +69,13 @@ public class GGobi.StageRandomize : Stage {
   override void process_outgoing(PipelineMessage msg) {
     base.process_outgoing(msg);
     randomization.resize((int) n_cols); 
-    cache.process_message(msg, this);
+    cache.process_message(msg, this, false);
   }
   
   public void set_randomization(uint j, RandomizationType value) {
     if (randomization[j] == value) return;
     randomization[j] = value;
-    col_data_changed(j);
+    refresh_col(j);
     col_parameter_changed(j);
     flush_changes_here();
   }

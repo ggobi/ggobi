@@ -116,6 +116,11 @@ pipeline_create_cb(GGobiPipelineFactory *factory, GGobiStage *root, GGobiSession
   GGobiGuiSubset *gui_subset;
   gui_subset = g_object_new(GGOBI_TYPE_GUI_SUBSET, "stage", GGOBI_STAGE_SUBSET(subset), NULL);
   gtk_widget_show(GTK_WIDGET(gui_subset));
+  
+  GGobiGuiRandomize *gui_randomize;
+  gui_randomize = g_object_new(GGOBI_TYPE_GUI_RANDOMIZE, "stage", GGOBI_STAGE_RANDOMIZE(randomize), NULL);
+  gtk_widget_show(GTK_WIDGET(gui_randomize));
+  
 
 }
 

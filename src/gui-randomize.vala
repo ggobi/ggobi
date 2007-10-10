@@ -37,19 +37,19 @@ public class GGobi.GuiRandomize : Window {
     // Imputation selection radio buttons
     none = new RadioButton.with_label(null, "None");
     none.toggled += fixed => {
-      update_randomization(RandomizationType.NONE);
+      if (none.active) update_randomization(RandomizationType.NONE);
     };
     
     repeat = new RadioButton.with_label(null, "With duplicates");
     repeat.group = none.group;
     repeat.toggled += percent => {
-      update_randomization(RandomizationType.REPEAT);
+      if (repeat.active) update_randomization(RandomizationType.REPEAT);
     };
     
     unique = new RadioButton.with_label(null, "Without duplicates");
     unique.group = none.group;
     unique.toggled += percent => {
-      update_randomization(RandomizationType.UNIQUE);
+      if (unique.active) update_randomization(RandomizationType.UNIQUE);
     };
 
     Button rejitter = new Button.with_label("Re-randomise");
