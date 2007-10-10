@@ -166,7 +166,7 @@ typedef struct
 
 GType ggobi_extended_splot_get_type(void);
 
-#include "ggobi-data.h"
+#include "data.h"
 
 typedef struct 
 {

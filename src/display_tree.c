@@ -21,6 +21,8 @@
 /* #include "display_tree.h" */
 #include "externs.h"
 #include "vars.h"
+#include "utils_ui.h"
+
 
 enum
 { DISPTREE_LABEL, DISPTREE_DATASET, DISPTREE_PMODE, DISPTREE_IMODE,

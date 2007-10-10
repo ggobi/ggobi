@@ -1,10 +1,11 @@
 %{
   // FIXME: temporary
   #include "input-source.h"
-  #include "ggobi-data.h"
+  #include "data.h"
   #include "vars.h"
   #include "externs.h"
   #include "session.h"
+  #include "utils_ui.h"
 %}
 
 %h{
@@ -646,6 +647,12 @@ public void
 rows_removed(self, GSList *rows) {
   GGobiPipelineMessage *msg = self_get_message(self);
   ggobi_pipeline_message_remove_rows(msg, rows);
+}
+
+public void 
+cols_removed (self, GSList *cols) {
+  GGobiPipelineMessage *msg = self_get_message(self);
+  ggobi_pipeline_message_remove_cols(msg, cols);
 }
 
 /* initializer */
@@ -1463,8 +1470,8 @@ attach (self, GGobiSession *gg, gboolean cleanup)
   gint iv, ih;
   self->brush.nbins = BRUSH_NBINS;
 
-  if (ggobi_stage_get_n_edges(GGOBI_STAGE(self)))
-    vectorb_realloc (&GGOBI_DATA(d)->edge.xed_by_brush, GGOBI_DATA(d)->edge.n);
+  // if (ggobi_stage_get_n_edges(GGOBI_STAGE(self)))
+  //   vectorb_realloc (&GGOBI_DATA(d)->edge.xed_by_brush, GGOBI_DATA(d)->edge.n);
 
   /* binning the plot window; no need to realloc these **/
   self->brush.binarray = (bin_struct **)

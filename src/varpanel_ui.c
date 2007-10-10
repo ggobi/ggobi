@@ -26,6 +26,7 @@
 
 #include "vars.h"
 #include "externs.h"
+#include "utils_ui.h"
 
 /*-------------------------------------------------------------------------*/
 /*            Listen for display_selected events                           */

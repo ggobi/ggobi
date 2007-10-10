@@ -19,6 +19,7 @@
 #include <gtk/gtk.h>
 #include "vars.h"
 #include "externs.h"
+#include "utils_ui.h"
 
 
 /*********************************************************************/
@@ -232,8 +233,8 @@ linkby_notebook_subwindow_add (GGobiStage * d, GtkWidget * notebook,
  * argument.
 */
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), swin,
-                            (GGOBI_DATA(d)->nickname != NULL) ?
-                            gtk_label_new (GGOBI_DATA(d)->nickname) : 
+                            (ggobi_data_get_nickname(GGOBI_DATA(d)) != NULL) ?
+                            gtk_label_new (ggobi_data_get_nickname(GGOBI_DATA(d))) : 
                             gtk_label_new (d->name));
 
   /* add the treeview (list) */

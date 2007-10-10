@@ -32,7 +32,7 @@
 
 #include "data-factory-csv.h"
 #include "ggobi-data-factory-xml.h"
-#include "ggobi-data.h"
+#include "data.h"
 #include "input-ftp.h"
 #include "input-http.h"
 #include "ggobi-gui-component.h"

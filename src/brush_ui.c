@@ -25,6 +25,7 @@
 
 #include "vars.h"
 #include "externs.h"
+#include "utils_ui.h"
 
 void
 brush_update_set (gboolean update, displayd * dsp, GGobiSession * gg)

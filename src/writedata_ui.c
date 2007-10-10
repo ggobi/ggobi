@@ -17,6 +17,7 @@
 #include <gtk/gtk.h>
 #include "vars.h"
 #include "externs.h"
+#include "utils_ui.h"
 
 #include "writedata.h"
 

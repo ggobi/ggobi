@@ -25,6 +25,7 @@
 
 #include "scatmatClass.h"
 #include "scatterplotClass.h"
+#include "utils_ui.h"
 
 #define WIDTH 200
 #define HEIGHT 200

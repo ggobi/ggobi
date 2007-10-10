@@ -19,13 +19,13 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include <gtk/gtk.h>
-#include "vars.h"
-#include "externs.h"
+#include "utils_ui.h"
+#include "vartable_nbook.h"
 
-#include "ggobi-variable.h"
-
-#include <string.h> /* for strcmp() */
+// #include <gtk/gtk.h>
+// #include "vars.h"
+// 
+// #include "ggobi-variable.h"
 
 enum { 
   VT_VARNAME, VT_TFORM,
@@ -182,7 +182,7 @@ vartable_tree_view_get (GGobiSession *gg) {
 }
 
 void
-vartable_show_page (GGobiStage *d, GGobiSession *gg)
+vartable_ (GGobiStage *d, GGobiSession *gg)
 {
   GtkNotebook *nb;
   gint page, page_new;

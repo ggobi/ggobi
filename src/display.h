@@ -20,7 +20,7 @@
 #include "defines.h"
 #include "cpanel.h"
 #include "splot.h"
-#include "ggobi-data.h"
+#include "data.h"
 #include "projection-optimisation.h"
 #include "projection-indices.h"
 

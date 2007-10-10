@@ -19,6 +19,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include "utils_ui.h"
 
 /* This file contains utilities and GUI stuff related to plugins */
 

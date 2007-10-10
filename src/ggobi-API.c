@@ -22,7 +22,7 @@
 #include "GGobiAPI.h"
 
 #include "session.h"
-#include "ggobi-data.h"
+#include "data.h"
 #include "types.h"
 #include "vars.h"
 #include "externs.h"

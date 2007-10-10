@@ -22,6 +22,7 @@
 #include "externs.h"
 
 #include "tsdisplay.h"
+#include "utils_ui.h"
 
 /* initial plot sizes */
 #define WIDTH   150

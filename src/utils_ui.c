@@ -18,15 +18,8 @@
 #include <gtk/gtk.h>
 #include "vars.h"
 #include "externs.h"
+#include "utils_ui.h"
 
-
-GtkWidget *CreateMenuItemWithCheck (GtkWidget * menu,
-                                    gchar * szName, gchar * szAccel,
-                                    gchar * szTip, GtkWidget * win_main,
-                                    GtkAccelGroup * accel_group,
-                                    GtkSignalFunc func, gpointer data,
-                                    GGobiSession * gg, GSList * radiogroup,
-                                    gboolean check);
 
 /*
  * Taken from 'Developing Linux Applications with GTK+ and GDK'
@@ -335,8 +328,8 @@ variable_notebook_subwindow_add (GGobiStage * d, GCallback func,
  * argument.
 */
   gtk_notebook_append_page (GTK_NOTEBOOK (notebook), swin,
-                            (GGOBI_DATA(d)->nickname != NULL) ?
-                            gtk_label_new (GGOBI_DATA(d)->nickname) : 
+                            (ggobi_data_get_nickname(GGOBI_DATA(d)) != NULL) ?
+                            gtk_label_new (ggobi_data_get_nickname(GGOBI_DATA(d))) : 
                             gtk_label_new (d->name));
 
   /* add the tree view */

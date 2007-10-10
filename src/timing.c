@@ -1,7 +1,7 @@
 #include <gtk/gtk.h>
 #include "vars.h"
 #include "externs.h"
-#include "ggobi-data.h"
+#include "data.h"
 
 /*
  * t = current_time

@@ -11,6 +11,7 @@
   /* for variable notebook stuff */
   #include "vars.h"
   #include "externs.h"
+  #include "utils_ui.h"
 %}
 
 /* This GUI essentially serves as a factory of GGobiTransform objects. It

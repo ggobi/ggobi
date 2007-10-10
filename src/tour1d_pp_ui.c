@@ -19,6 +19,7 @@
 #include "externs.h"
 #include "tour_pp_ui.h"
 #include "projection-indices.h"
+#include "utils_ui.h"
 
 #define WIDTH   200
 #define HEIGHT  100

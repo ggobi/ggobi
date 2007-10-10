@@ -26,17 +26,11 @@
 #include "display_tree.h"
 #include "input-source.h"
 #include "ggobi-gui-transform.h"
-
-#ifdef STORE_SESSION_ENABLED
-#include "write_state.h"
-#endif
+#include "vartable_nbook.h"
+#include "externs.h"
 
 #include "plugin.h"
-
-
-#ifdef TEST_GGOBI_EVENTS
-#include "testEvents.h"
-#endif
+#include "utils_ui.h"
 
 #include "scatmatClass.h"
 

@@ -18,6 +18,7 @@
 #include <strings.h>
 #endif
 #include <gtk/gtk.h>
+#include "utils_ui.h"
 
 #include "vars.h"
 #include "externs.h"

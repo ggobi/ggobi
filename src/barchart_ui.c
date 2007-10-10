@@ -21,6 +21,8 @@
 
 #include "vars.h"
 #include "externs.h"
+#include "utils_ui.h"
+
 
 static gchar *display_mode_lbl[] = { "Bars", "Spines" };
 

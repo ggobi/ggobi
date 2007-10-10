@@ -18,6 +18,7 @@
 
 #include "vars.h"
 #include "externs.h"
+#include "utils_ui.h"
 
 gint
 find_nearest_point (icoords * lcursor_pos, splotd * splot, GGobiStage * d,

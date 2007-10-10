@@ -20,6 +20,7 @@
 #include "vars.h"
 #include "externs.h"
 #include "utils_ui.h"
+#include "vartable_nbook.h"
 
 
 /*-------------------------------------------------------------------------*/

@@ -23,6 +23,7 @@
 #include "vars.h"
 #include "externs.h"
 #include "tour.h"
+#include "utils_ui.h"
 
 extern TourPPIndex StandardPPIndices[];
 

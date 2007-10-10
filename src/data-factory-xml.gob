@@ -1083,7 +1083,7 @@ class GGobi:Data:Factory:XML from GGobi:Data:Factory
 
     ggobi_data_add_rows (GGOBI_DATA (d), atoi (tmp));
 
-    GGOBI_DATA (d)->edge.n = 0;
+    // GGOBI_DATA (d)->edge.n = 0;
 
     self_set_default_dataset_values (attrs, data);
 
@@ -1555,19 +1555,19 @@ class GGobi:Data:Factory:XML from GGobi:Data:Factory
 
         if (ggobi_stage_get_edge_data (d)->sym_endpoints == NULL)
           {
-            GGOBI_DATA (d)->edge.n = d->n_rows;
+            // GGOBI_DATA (d)->edge.n = d->n_rows;
             //g_debug("no endpoints yet, allocating space for: %d", ggobi_stage_get_n_edges (d));
-            GGOBI_DATA (d)->edge.sym_endpoints = (SymbolicEndpoints *)
-              g_malloc (sizeof (SymbolicEndpoints) *
-                        ggobi_stage_get_n_edges (d));
+            // GGOBI_DATA (d)->edge.sym_endpoints = (SymbolicEndpoints *)
+              // g_malloc (sizeof (SymbolicEndpoints) *
+                        // ggobi_stage_get_n_edges (d));
           }
           //g_debug("setting edge record: %d", data->current_record);
-        ggobi_stage_get_edge_data (d)->sym_endpoints[data->current_record].a =
-          self_intern (data, tmp);
-        ggobi_stage_get_edge_data (d)->sym_endpoints[data->current_record].b =
-          self_intern (data, dest);
-        ggobi_stage_get_edge_data (d)->sym_endpoints[data->current_record].
-          jpartner = -1;
+        // ggobi_stage_get_edge_data (d)->sym_endpoints[data->current_record].a =
+        //   self_intern (data, tmp);
+        // ggobi_stage_get_edge_data (d)->sym_endpoints[data->current_record].b =
+        //   self_intern (data, dest);
+        // ggobi_stage_get_edge_data (d)->sym_endpoints[data->current_record].
+        //   jpartner = -1;
       }
 
     return (true);

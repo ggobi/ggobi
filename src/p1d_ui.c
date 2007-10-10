@@ -21,6 +21,7 @@
 #include <gtk/gtk.h>
 #include "vars.h"
 #include "externs.h"
+#include "utils_ui.h"
 
 static gchar *type_lbl[] = { "Texturing", "ASH" };
 
