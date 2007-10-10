@@ -102,7 +102,7 @@ namespace GGobi {
   [CCode (cprefix = "d", lower_case_cprefix = "", cheader_filename = "svd.h")]
   public struct LinearAlgebra {
     [NoArrayLength]
-    public static void svd (pointer[] a, int m, int n, out double[] w, out pointer[] v);
+    public static void svd (pointer[] a, int m, int n, double[] w, pointer[] v);
   }
 
   [CCode (cheader_filename = "ggobi-variable.h", cprefix = "GGOBI_VARIABLE_" )]  
