@@ -43,7 +43,7 @@
 #include "input-source.h"
 #include "input-source-factory.h"
 #include "ggobi-pipeline-factory.h"
-#include "ggobi-pipeline-message.h"
+#include "pipeline-message.h"
 #include "ggobi-plugin-factory.h"
 #include "ggobi-plugin.h"
 #include "stage-filter.h"

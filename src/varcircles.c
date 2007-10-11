@@ -199,7 +199,7 @@ varcircles_delete_nth_foreach (guint jvar, GGobiStage *d)
 static void
 varcircles_stage_changed_cb (GGobiStage *d, GGobiPipelineMessage *msg, gpointer user_data)
 {
-  ggobi_pipeline_message_removed_cols_foreach(msg, 
+  ggobi_pipeline_message_removed_cols_apply(msg, 
     (GGobiIndexFunc)varcircles_delete_nth_foreach, d);
 }
 

@@ -53,22 +53,6 @@ public class EdgeData {
   public int n;
 }
 
-
-[CCode (cheader_filename = "ggobi-pipeline-message.h")]
-public class GGobi.PipelineMessage : GLib.Object{
-  public GLib.SList get_changed_cols();
-  public GLib.SList get_removed_cols();
-  public GLib.SList get_removed_rows();
-  public uint get_n_added_rows();
-  public uint get_n_removed_rows();
-  public uint get_n_added_cols();
-  public uint get_n_changed_cols();
-  public uint get_n_removed_cols();
-  
-  public void consume_rows();
-  
-}
-
 public class GGobi.Session {
 }
 

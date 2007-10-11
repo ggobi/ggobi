@@ -5,7 +5,6 @@ libggobi_la_GOBS = \
   data-factory-xml.gob \
   gui-transform.gob \
   pipeline-factory.gob \
-  pipeline-message.gob \
   plugin-factory.gob \
   plugin.gob \
   renderer-cairo.gob \
@@ -39,6 +38,7 @@ libggobi_la_VALAS = \
   input-source.vala \
   matrix.vala \
   pipeline-matrix.vala \
+  pipeline-message.vala \
   select.vala \
   stage-display.vala \
   stage-filter.vala \

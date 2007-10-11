@@ -10,7 +10,7 @@
 
 %h{
 #include "ggobi-variable.h"
-#include "ggobi-pipeline-message.h"
+#include "pipeline-message.h"
 #include "utils.h"
 
 /* temporarily */
