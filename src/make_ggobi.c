@@ -196,7 +196,7 @@ load_data_source (GGobiInputSource *source, GGobiSession * gg)
        This will go away once we move to just storing attributes as variables */
     if (!dataset->n_cols)
       ggobi_data_add_attributes (GGOBI_DATA (dataset));
-    ggobi_pipeline_factory_build(gg->pipeline_factory, dataset);
+      g_signal_emit_by_name (G_OBJECT (gg->pipeline_factory), "build", (gpointer) dataset);
     /* eventually ggobi_stage_attach will happen implicitly when the 
        dataset is added to the main context. Right now we are sort of hacking
        it by attaching the transform stage rather than the dataset. The _attach()

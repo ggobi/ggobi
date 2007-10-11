@@ -1,6 +1,7 @@
 %h{
-  #include "ggobi-gui-component.h"
   #include "ggobi-type-registry.h"
+  #include <gtk/gtk.h>
+  #include "session.h"
 %}
 %{
   #include "stage-transform.h"
@@ -21,7 +22,23 @@
    VIEW them, so changes in a transform instance will not be synchronized with 
    the GUI (like the box-cox parameter).
 */
-class GGobi:GUI:Transform from GGobi:GUI:Component {
+class GGobi:GUI:Transform from Gtk:VBox {
+  private GGobiSession *gg;
+  //FIXME: just specifying G:Object here until GGobiSession is refactored
+  property OBJECT gg
+  (nick = "ggobi", blurb = "The context in which this component exists",
+    flags = CONSTRUCT_ONLY, object_type = GGobi:Session)
+  set {
+    GGobiSession *gg = g_value_get_object(VAL);
+    g_return_if_fail(gg != NULL);
+    selfp->gg = gg;
+    /* at construction time, initialize the component with its parent context */
+    self_initialize(self, gg);
+  }
+  get {
+    g_value_set_object(VAL, selfp->gg);
+  };  
+  
   private GtkWidget *var_notebook; 
   private GtkWidget *boxcox_box; /* only shown when box-cox selected */
   private GtkAdjustment *boxcox_adj; /* for getting the parameter value */
@@ -329,8 +346,8 @@ class GGobi:GUI:Transform from GGobi:GUI:Component {
     self_add_data(self, d);
   }
   
-  override (GGobi:GUI:Component) void
-  initialize(GGobi:GUI:Component *self, GGobiSession *gg) 
+  public void
+  initialize(self, GGobiSession *gg) 
   {
     GtkWidget *frame, *hb, *vb, *btn, *lbl, *spinner;
     GtkAdjustment *adj;

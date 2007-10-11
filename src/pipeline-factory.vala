@@ -1,12 +1,8 @@
-%h{
-  #include "ggobi-stage.h"
-%}
+using GLib;
 
-class GGobi:Pipeline:Factory from G:Object {
-  
+public class GGobi.PipelineFactory : Object {
   /**
    * build:
-   * @self: a #GGobiPipelineFactory
    * @root: the root stage (dataset) of the nascent pipeline
    *
    * Creates a pipeline given a root stage. The logic of creating stages,
@@ -18,20 +14,6 @@ class GGobi:Pipeline:Factory from G:Object {
    * is created using this factory.
    *
    */
-  signal NONE (OBJECT) void 
-  build(self, GGobi:Stage *root);
+  public signal void build(Stage root);
   
-  /**
-   * new:
-   *
-   *
-   * Returns: a new #GGobiPipelineFactory
-   */
-  public GObject *
-  new(void)
-  {
-    GObject *o = (GObject *)GET_NEW;
-    return G_OBJECT(o);
-  }
-
 }

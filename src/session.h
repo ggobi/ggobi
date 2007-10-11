@@ -37,7 +37,7 @@ struct _GGobiSession;
 #include "data-factory.h"
 #include "input-source.h"
 #include "read_init.h"
-#include "ggobi-pipeline-factory.h"
+#include "pipeline-factory.h"
 #include "input-source-factory.h"
 
 #include "fileio.h"
