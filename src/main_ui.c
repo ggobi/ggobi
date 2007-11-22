@@ -412,9 +412,9 @@ viewmode_set (ProjectionMode pmode, InteractionMode imode, ggobid * gg)
     gg->current_control_panel = panel;
 
     /*-- avoid increasing the object's ref_count infinitely  --*/
-
-    if (G_OBJECT (panel)->ref_count > 1)
-      gtk_widget_unref (panel);
+    /* wow, super-dangerous - do we really need this? - mfl */
+    /*if (G_OBJECT (panel)->ref_count > 1)
+      gtk_widget_unref (panel);*/
   }
 
   if (pmode != NULL_PMODE && gg->pmode != gg->pmode_prev) {
