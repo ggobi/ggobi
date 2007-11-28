@@ -706,7 +706,9 @@ void vartable_init(GGobiStage *d) {
   GtkWidget *widget = vartable_gui_init(d);
   
   vartable_col_rows_added(d, d->n_cols);
-  for (guint j = 0; j < d->n_cols; j++) {
+  guint j;
+
+  for( j =  0; j < d->n_cols; j++) {
     vartable_col_name_changed(d, j);
     vartable_col_data_changed(d, j);
   }

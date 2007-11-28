@@ -35,7 +35,8 @@ gint realloc_optimize0_p (optimize0_param *op, gint ncols, vector_i pcols)
   }
   else {
     GSList *cols = NULL;
-    for (guint i=0; i < op->proj_best.ncols - ncols; i++)
+    guint i;
+    for (i=0; i < op->proj_best.ncols - ncols; i++)
       cols = g_slist_append(cols, GINT_TO_POINTER(ncols - 1 - i));
     arrayd_delete_cols(&op->proj_best, cols);
     arrayd_delete_cols(&op->data, cols);

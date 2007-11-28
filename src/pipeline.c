@@ -20,7 +20,9 @@
 void
 tform_to_world_by_var (GGobiStage * d, guint j)
 {
-  for (guint i = 0; i < d->n_rows; i++) {
+  guint i;
+
+  for( i =  0; i < d->n_rows; i++) {
     gdouble ftmp = -1.0 + 2.0 * ggobi_stage_get_raw_value(d, i, j);
     d->world.vals[i][j] = ftmp;
   }

@@ -34,7 +34,8 @@ brush_all_matching_id (GGobiStage * sd, gint k, gboolean condition, BrushTargetT
   if (!rowid)
     return false;
 
-  for (GSList* l = sd->gg->d; l; l = l->next) {
+  GSList* l;
+  for (l = sd->gg->d; l; l = l->next) {
     GGobiStage* d = l->data;
     if (d == root)
       continue;        /*-- skip the originating datad --*/

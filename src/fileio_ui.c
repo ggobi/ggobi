@@ -52,11 +52,13 @@ get_file_filters(GGobiSession *gg)
   for (; factories; factories = factories->next) {
     GGobiDataFactory *factory = GGOBI_DATA_FACTORY(factories->data);
     GSList *factory_modes = ggobi_data_factory_get_supported_modes(factory);
-    for (GSList *modes = factory_modes; modes; modes = modes->next) {
+    GSList *modes;
+    for (modes = factory_modes; modes; modes = modes->next) {
       GtkFileFilter *filter = gtk_file_filter_new();
       GSList *factory_exts = ggobi_data_factory_get_file_exts_for_mode(
         factory, modes->data);
-      for (GSList *exts = factory_exts; exts; exts = exts->next) {
+      GSList *exts;
+      for (exts = factory_exts; exts; exts = exts->next) {
         gchar *pattern = g_strconcat("*.", exts->data, NULL);
         gtk_file_filter_add_pattern(filter, pattern);
         g_free(pattern);

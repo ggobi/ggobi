@@ -120,6 +120,15 @@ pipeline_create_cb(GGobiPipelineFactory *factory, GGobiStage *root, GGobiSession
   GGobiGuiRandomize *gui_randomize;
   gui_randomize = g_object_new(GGOBI_TYPE_GUI_RANDOMIZE, "stage", GGOBI_STAGE_RANDOMIZE(randomize), NULL);
   gtk_widget_show(GTK_WIDGET(gui_randomize));
+
+
+  GGobiGuiJitter *gui_jitter;
+  gui_jitter = g_object_new(GGOBI_TYPE_GUI_JITTER, "stage", GGOBI_STAGE_JITTER(jitter), NULL);
+  gtk_widget_show(GTK_WIDGET(gui_jitter));
+
+  GGobiGuiImpute *gui_impute;
+  gui_impute = g_object_new(GGOBI_TYPE_GUI_IMPUTE, "stage", GGOBI_STAGE_IMPUTE(impute), NULL);
+  gtk_widget_show(GTK_WIDGET(gui_impute));
   
 
 }

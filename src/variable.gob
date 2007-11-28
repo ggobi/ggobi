@@ -676,7 +676,9 @@ n_missings(self)
     guint missings = 0;
 
     gint j = ggobi_stage_get_col_index_for_name(self->stage, self->name);
-    for (guint i = 0; i < self->stage->n_rows; i++)
+    guint i;
+
+    for( i =  0; i < self->stage->n_rows; i++)
       if (ggobi_stage_is_missing(self->stage, i, j)) missings++;
 
     selfp->dirty_n_missings = FALSE;
@@ -708,7 +710,8 @@ clone(self)
   self_set_vartype(self_new, self_get_vartype(self));
   if (GGOBI_VARIABLE_IS_CATEGORICAL(self)) {
     gint *values = self_get_level_values(self);
-    for (gint k=0; k < self_get_n_levels(self); k++) {
+    gint k;
+    for (k=0; k < self_get_n_levels(self); k++) {
       level_t *level;
       self_add_level(self_new, self_get_level_name(self, values[k]), values[k]);
       /* this part is a bit ugly */
@@ -832,7 +835,10 @@ maybe_update_levels(self)
   
   g_hash_table_foreach(selfp->name_to_level, level_count_clear_func, NULL);
   
-  for (guint i = 0; i < n; i++) {
+  guint i;
+
+  
+  for( i =  0; i < n; i++) {
     if (!ggobi_stage_is_missing(self->stage, i, j))
       /* if the categorical value is NULL, then we assume the value does not
          correspond to a valid level and so it is not counted */

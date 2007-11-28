@@ -13,7 +13,7 @@ two other parameters, should be feasible here.
 
 */
 
-public abstract class GuiElement : GtkHBox {
+public abstract class GuiComponent : GtkHBox {
   
   // The name of the element.  
   // This will be displayed as (e.g.) the text in combo boxes, the label in
@@ -38,7 +38,7 @@ public abstract class GuiElement : GtkHBox {
   }
   
   construct {
-    build_radio_button();
+    build_box();
   }
   
   // The element needs to be able to respond to the following events:
@@ -47,10 +47,6 @@ public abstract class GuiElement : GtkHBox {
 
   // It also needs to notify the rest of the gui when something changes:
   public signal void updated(); 
-  
-  // The selected event is sent when this element is selected in the full gui.
-  public signal void selected();
-  public signal void deselected();
   
   public abstract Component get_component();
   public virtual void update_component(Component c);
@@ -73,7 +69,7 @@ public class GuiImputationFixed : GuiElement {
   private double percent;
   
   override string get_label() {
-    return "Fixed";
+    return "Percent";
   }
   
   override void build() {
@@ -91,21 +87,16 @@ public class GuiImputationFixed : GuiElement {
     return new imp();
   }
   
-  override void update_component(Component c) {
+  override void update(Component c) {
     percent_widget.value = ((ImputationPercent) c).percent;
   }
-  
-  override void selected() {
-    percent_widget.sensitive = true;
-  }
-  
-  override voide unselected() {
-    percent_widget.sensitive = false;
-  }
+
 }
 
 // Public interface for objects that can be used with GuiElement
 public interface Component {
+  public bool equals(Component that);
+  public string get_name();
   
 }
 

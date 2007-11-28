@@ -350,7 +350,9 @@ create_explicit_variable (GGobiStage * d, gchar * vname, NewVariableType vartype
   ggobi_stage_set_col_name(d, jvar, vname);
 
   GGOBI_STAGE_ATTR_INIT(d, cluster);
-  for (guint i = 0; i < d->n_rows; i++) {
+  guint i;
+
+  for( i =  0; i < d->n_rows; i++) {
     switch(vartype) {
       case ADDVAR_ROWNOS:
         ggobi_stage_set_raw_value(d, i, jvar, (gdouble) (i + 1));

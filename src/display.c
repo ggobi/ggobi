@@ -776,7 +776,8 @@ display_tailpipe (displayd * display, RedrawStyle type, GGobiSession * gg)
   cpaneld *cpanel;
 
   /* this ugly block of code brought to you by the lack of plot-level stages */
-  for (GList *sl = splist; sl; sl = sl->next) {
+  GList *sl;
+  for (sl = splist; sl; sl = sl->next) {
     sp = (splotd *) sl->data;
     if (sp != NULL)
       splot_points_realloc (sp);

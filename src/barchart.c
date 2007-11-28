@@ -1157,7 +1157,7 @@ barchart_active_paint_points (splotd * rawsp, GGobiStage * d, GGobiSession * gg)
   else
     hits[0] = FALSE;
 
-  for(guint i = 0; i < d->nrows_under_brush; i++)
+  for(i = 0; i < d->nrows_under_brush; i++)
     d->rows_under_brush_prev.els[i] = d->rows_under_brush.els[i];
   d->nrows_under_brush_prev = d->nrows_under_brush;
   d->nrows_under_brush = 0;

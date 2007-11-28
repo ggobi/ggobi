@@ -385,7 +385,8 @@ paint_points (cpaneld * cpanel, GGobiStage * d, GGobiSession * gg)
     return f(cpanel, d, gg);
 
   GGOBI_STAGE_ATTR_INIT_ALL(d); 
-  for (guint i = 0; i < d->nrows_under_brush_prev; i++) {
+  guint i;
+  for (i = 0; i < d->nrows_under_brush_prev; i++) {
     GGOBI_STAGE_BRUSH_POINT(d, (guint) d->rows_under_brush_prev.els[i], false,  
       cpanel->br.point_targets, cpanel->br.mode);
 
@@ -393,7 +394,7 @@ paint_points (cpaneld * cpanel, GGobiStage * d, GGobiSession * gg)
       brush_all_matching_id (d, i, false, cpanel->br.point_targets, cpanel->br.mode);
   }
   
-  for (guint i = 0; i < d->nrows_under_brush; i++) {
+  for (i = 0; i < d->nrows_under_brush; i++) {
     GGOBI_STAGE_BRUSH_POINT(d, (guint) d->rows_under_brush.els[i], true,  
       cpanel->br.point_targets, cpanel->br.mode);
 
@@ -451,7 +452,8 @@ update_points_under_brush(GGobiStage *d, splotd *sp)
     return;
   }
 
-  for(guint i = 0; i < d->nrows_under_brush; i++)
+  guint i;
+  for(i = 0; i < d->nrows_under_brush; i++)
     d->rows_under_brush_prev.els[i] = d->rows_under_brush.els[i];
   d->nrows_under_brush_prev = d->nrows_under_brush;
   d->nrows_under_brush = 0;

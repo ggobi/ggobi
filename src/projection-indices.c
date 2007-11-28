@@ -167,15 +167,17 @@ void arrayd_inverse(array_d a) {
   gdouble* temp = (gdouble *) g_new0(gdouble, p * p);
   
   // Copy over
-  for (guint i = 0; i<p; i++)
-    for (guint j = 0; j<p; j++)
+  guint i, j;
+
+  for( i =  0; i<p; i++)
+    for( j =  0; j<p; j++)
       temp[i * p + j] = a.vals[i][j];
 
   inverse(temp, p);
 
   // Copy back
-  for (guint i = 0; i<p; i++)
-    for (guint j = 0; j<p; j++)
+  for( i =  0; i<p; i++)
+    for( j =  0; j<p; j++)
       a.vals[i][j] = temp[i*p+j];
       
   g_free(temp);
@@ -189,8 +191,9 @@ gdouble arrayd_determinant(array_d a) {
   gint *pivot = g_new0(gint, p);
   gdouble* temp = g_new0(gdouble, p * p);
 
-  for (guint i=0; i < p; i++)
-    for (guint j=0; j < p; j++)
+  guint i,j;
+  for (i=0; i < p; i++)
+    for (j=0; j < p; j++)
       temp[i*p+j] = a.vals[i][j];
 
   gdouble det = ludcmp(temp, p, pivot);
@@ -221,8 +224,12 @@ gdouble ppi_pca (array_d data, vector_d groups) {
   center (data); 
  
   gdouble val = 0.0; 
-  for (guint i = 0; i < data.ncols; i++) {
-    for (guint j = 0; j < data.nrows; j++) {
+  guint i;
+ 
+  for( i =  0; i < data.ncols; i++) {
+    guint j;
+
+    for( j =  0; j < data.nrows; j++) {
       val += data.vals[j][i] * data.vals[j][i]; 
     }
   } 
@@ -351,7 +358,9 @@ gdouble ppi_lda (array_d data, vector_d groups) {
   }
 
   for (j=0; j < p; j++) { 
-    for (guint g = 0; g < numgroups; g++) { 
+    guint g;
+ 
+    for( g =  0; g < numgroups; g++) { 
       group_means.vals[g][j] /= ngroup.els[g];
     }
     means.els[j] /= n;

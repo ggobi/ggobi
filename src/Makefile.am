@@ -235,7 +235,7 @@ ggobi_SOURCES = ggobiMain.c
 ggobi_LDADD   = libggobi.la
 
 AM_CPPFLAGS = @DEBUG_CFLAGS@ @GTK_CFLAGS@ @LIBXML_CFLAGS@ @LIBGSF_CFLAGS@
-AM_CFLAGS   = -std=gnu99
+AM_CFLAGS   = -std=gnu89
 
 EXTRA_DIST = $(libggobi_la_METAS)
 
