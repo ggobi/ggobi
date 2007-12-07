@@ -1,4 +1,4 @@
-SUBDIRS = src plugins po doc
+SUBDIRS = src plugins po doc tests
 
 EXTRA_DIST = bootstrap
 

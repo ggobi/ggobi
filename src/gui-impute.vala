@@ -26,7 +26,7 @@ public class GGobi.GuiImpute : Window {
   HScale percent_value;
   SpinButton fixed_value;
   
-  public GuiJitter(construct StageImpute stage) {}
+  public GuiImpute(construct StageImpute stage) {}
   
   public void create_widgets() {
     

@@ -182,7 +182,7 @@ vartable_tree_view_get (GGobiSession *gg) {
 }
 
 void
-vartable_ (GGobiStage *d, GGobiSession *gg)
+vartable_show_page (GGobiStage *d, GGobiSession *gg)
 {
   GtkNotebook *nb;
   gint page, page_new;

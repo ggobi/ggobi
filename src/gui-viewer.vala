@@ -13,7 +13,7 @@ public class GGobi.GuiViewer : Window {
   public TreeView table;
   public ListStore model;
   
-  public Viewer(construct Stage stage) {}
+  public GuiViewer(construct Stage stage) {}
   construct {
     title = "Data viewer";
     set_default_size(300, 500);

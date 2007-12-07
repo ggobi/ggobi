@@ -121,6 +121,9 @@ public class GGobi.PipelineMessage : Object  {
   public void changed_cols_apply(IndexFunc func, pointer data) {
     changed_cols.apply(func, data);
   }
+  public void changed_cols_apply_decreasing(IndexFunc func, pointer data) {
+    changed_cols.apply_decreasing(func, data);
+  }
   public void removed_cols_apply(IndexFunc func, pointer data) {
     removed_cols.apply(func, data);
   }

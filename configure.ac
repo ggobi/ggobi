@@ -141,6 +141,7 @@ AC_SUBST(PLUGIN_DIRS)
 
 # Make sure we a C compiler and symbolic link capability
 AC_PROG_CC
+AC_PROG_INSTALL
 AC_PROG_LN_S
 
 # Set up libtool to create only dynamic libraries
@@ -152,11 +153,11 @@ AC_PROG_LIBTOOL
 
 # Check for questionable functions (kind of paranoid)
 AC_FUNC_MALLOC
-AC_CHECK_FUNCS([pow sqrt strchr strrchr strstr memset])
+AC_CHECK_FUNCS([pow sqrt strrchr strstr memset])
 
 # Check for some non-standard header files
 AC_HEADER_STDC
-AC_CHECK_HEADERS([stdlib.h string.h strings.h unistd.h])
+AC_CHECK_HEADERS([float.h stdlib.h string.h strings.h unistd.h])
 
 # Make sure our compiler doesn't suck
 AC_C_CONST
@@ -237,7 +238,7 @@ AC_SUBST(GLITZ_LIBS)
 
  dnl Process the different .in files, substituting the values computed here in the configuration
  dnl script for the corresponding @variable@ in these files.
-AC_CONFIG_FILES(Makefile src/Makefile plugins/Makefile ggobi.pc ggobi-system.pc po/Makefile.in doc/Makefile doc/reference/Makefile)
+AC_CONFIG_FILES(Makefile src/Makefile plugins/Makefile ggobi.pc ggobi-system.pc po/Makefile.in doc/Makefile doc/reference/Makefile tests/Makefile)
 AC_OUTPUT
 
 echo "*******************************"
