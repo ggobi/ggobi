@@ -32,7 +32,6 @@ gboolean splot_plot_edge (gint m, GGobiData *d, GGobiData *e,
 gboolean splot_hidden_edge (gint m, GGobiData *d, GGobiData *e,
 		   splotd *sp, displayd *display, ggobid *gg);
 
-
 /* c(color.red, color.green, color.blue) */
 void
 describe_color (FILE *fp, GdkColor color)
@@ -725,22 +724,13 @@ describe_scatmat_display (FILE *fp, ggobid *gg, displayd *display,
           sp = (splotd *) g_object_get_data (G_OBJECT (da), "splotd");
           projection = (sp->p1dvar != -1) ? P1PLOT : XYPLOT;
           describe_scatterplot_plot (fp, gg, display, sp, desc, projection);
-          ADD_COMMA(fp);
+          if (i != (nplotted_vars-1) && j != (nplotted_vars-1))
+            ADD_COMMA(fp);
           break;
         }
       }
     }
   }
-
-  /*
-  for (l = display->splots; l; l = l->next) {
-    sp = (splotd *) l->data;
-    projection = (sp->p1dvar != -1) ? P1PLOT : XYPLOT;
-    describe_scatterplot_plot (fp, gg, display, sp, desc, projection);
-    if (l->next)
-      ADD_COMMA(fp);
-  }
-  */
 
   CLOSE_LIST(fp);  /* plots */
   g_free(cols);
@@ -753,7 +743,7 @@ describe_parcoords_display (FILE *fp, ggobid *gg, displayd *display,
 {
   GList *l;
   splotd *sp;
-  gint ncols;
+  gint j, ncols;
 
   ncols = g_list_length (display->splots);
   fprintf (fp, "nplots=%d", ncols);
@@ -765,10 +755,13 @@ describe_parcoords_display (FILE *fp, ggobid *gg, displayd *display,
   the axis labels to figure out which plot belongs where.  Otherwise,
   I'll have to add a position indicator to each plot. */
 
+  j = 0;
   for (l = display->splots; l; l = l->next) {
     sp = (splotd *) l->data;
     describe_scatterplot_plot (fp, gg, display, sp, desc, P1PLOT);
-    ADD_COMMA(fp);
+    j++;
+    if (j < ncols)
+      ADD_COMMA(fp);
   }
 
   CLOSE_LIST(fp);  /* plots */
