@@ -724,7 +724,7 @@ describe_scatmat_display (FILE *fp, ggobid *gg, displayd *display,
           sp = (splotd *) g_object_get_data (G_OBJECT (da), "splotd");
           projection = (sp->p1dvar != -1) ? P1PLOT : XYPLOT;
           describe_scatterplot_plot (fp, gg, display, sp, desc, projection);
-          if (i != (nplotted_vars-1) && j != (nplotted_vars-1))
+          if (i != (nplotted_vars-1) || j != (nplotted_vars-1))
             ADD_COMMA(fp);
           break;
         }
@@ -845,7 +845,9 @@ describe_barchart_plot (FILE *fp, ggobid *gg, displayd *display,
       ADD_COMMA(fp);
     if (counter % MAX_PER_ROW == 0) ADD_CR(fp);
   }
-  CLOSE_C(fp); ADD_COMMA(fp); ADD_CR(fp);
+  CLOSE_C(fp); 
+  // ADD_COMMA(fp); 
+  ADD_CR(fp);
 
   CLOSE_LIST(fp);  /* points */
   ADD_COMMA(fp);
@@ -883,20 +885,24 @@ describe_barchart_plot (FILE *fp, ggobid *gg, displayd *display,
         ADD_COMMA(fp);
       if (i % MAX_PER_ROW == 0) ADD_CR(fp);
     }
-    CLOSE_C(fp); ADD_COMMA(fp); ADD_CR(fp);
+    CLOSE_C(fp); 
+    // ADD_COMMA(fp); 
+    ADD_CR(fp);
   } else {
     /* breaks */
     OPEN_NAMED_C(fp, "breaks");
     for (i = 0; i < bsp->bar->nbins; i++) {
-      if (i < bsp->bar->nbins) 
-        ADD_COMMA(fp);
       fprintf (fp, "%.3f", bsp->bar->breaks[i]);
+      if (i < (bsp->bar->nbins-1))
+        ADD_COMMA(fp);
     }
-    CLOSE_C(fp); ADD_COMMA(fp); ADD_CR(fp);
+    CLOSE_C(fp); 
+    // ADD_COMMA(fp); 
+    ADD_CR(fp);
   }
 
   CLOSE_LIST(fp);  /* params */
-  ADD_COMMA(fp);
+  // ADD_COMMA(fp);
   ADD_CR(fp);
 
   CLOSE_LIST(fp); /* plot */
