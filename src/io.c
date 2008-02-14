@@ -278,7 +278,15 @@ filename_get_w (GtkWidget * w, ggobid * gg)
 
   if (gg->input && gg->input->baseName) {
     gchar *cwd = g_get_current_dir();
-    gchar *dir = g_build_filename(cwd, gg->input->dirName, NULL);
+    gchar *dir;
+
+    // If the input directory is a full path name, be careful
+    // not to concatenate the two strings.  Use the working dir.
+    if (gg->input->dirName[0] == G_DIR_SEPARATOR)
+      dir = g_get_current_dir();
+    else
+      dir = g_build_filename(cwd, gg->input->dirName, NULL);
+
     gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER (chooser), dir);
     g_free(cwd);
     g_free(dir);
