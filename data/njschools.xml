@@ -44,10 +44,10 @@ Percent special education students
 <record label="Atlantic City"> <string>Atlantic</string> <string>K-12</string> <real>14130</real> <real>13291</real> <real>89</real> <real>72</real> <real>10.7</real> <real>13</real></record> 
 <record label="Atlantic Co Special Serv"> <string>Atlantic</string> <string>Sp Serv</string> <real>40065</real> <real>36443</real> <real>5</real> <real>10</real> <real>4.5</real> <real>100</real></record> 
 <record label="Atlantic Co Vocational"> <string>Atlantic</string> <string>Voc</string> <real>15375</real> <real>11504</real> <real>53</real> <real>34</real> <real>10.7</real> <real>14</real></record> 
-<record label="Benchmark Academy Charter"> <string>Atlantic</string> <string>Charter</string> <real>8443</real> <real>na</real> <real>623</real> <real>11</real> <real>0.0</real> <real>0</real></record> 
+<record label="Benchmark Academy Charter"> <string>Atlantic</string> <string>Charter</string> <real>8443</real> <na/> <real>623</real> <real>11</real> <real>0.0</real> <real>0</real></record> 
 <record label="Brigantine City"> <string>Atlantic</string> <string>K-8</string> <real>13642</real> <real>11524</real> <real>114</real> <real>74</real> <real>9.8</real> <real>11</real></record> 
 <record label="Buena Regional"> <string>Atlantic</string> <string>K-12</string> <real>9978</real> <real>9134</real> <real>519</real> <real>35</real> <real>12.2</real> <real>17</real></record> 
-<record label="Charter~Tech High School"> <string>Atlantic</string> <string>Charter</string> <real>10927</real> <real>na</real> <real>399</real> <real>57</real> <real>9.8</real> <real>0</real></record> 
+<record label="Charter~Tech High School"> <string>Atlantic</string> <string>Charter</string> <real>10927</real> <na/> <real>399</real> <real>57</real> <real>9.8</real> <real>0</real></record> 
 <record label="Egg Harbor City"> <string>Atlantic</string> <string>K-8</string> <real>11853</real> <real>11111</real> <real>270</real> <real>22</real> <real>8.7</real> <real>16</real></record> 
 <record label="Egg Harbor Twp"> <string>Atlantic</string> <string>K-12</string> <real>9228</real> <real>8831</real> <real>586</real> <real>58</real> <real>12.0</real> <real>12</real></record> 
 <record label="Estell Manor City"> <string>Atlantic</string> <string>K-8</string> <real>10860</real> <real>10921</real> <real>412</real> <real>48</real> <real>10.6</real> <real>6</real></record> 
@@ -203,7 +203,7 @@ Percent special education students
 <record label="Chesilhurst"> <string>Camden</string> <string>K-6</string> <real>14058</real> <real>14454</real> <real>90</real> <real>22</real> <real>8.9</real> <real>10</real></record> 
 <record label="Clementon Boro"> <string>Camden</string> <string>K-8</string> <real>9059</real> <real>8293</real> <real>599</real> <real>38</real> <real>10.6</real> <real>14</real></record> 
 <record label="Collingswood Boro"> <string>Camden</string> <string>K-12</string> <real>13157</real> <real>12172</real> <real>145</real> <real>44</real> <real>9.8</real> <real>13</real></record> 
-<record label="D.U.E. Season Charter"> <string>Camden</string> <string>Charter</string> <real>10137</real> <real>na</real> <real>504</real> <real>10</real> <real>9.4</real> <real>0</real></record> 
+<record label="D.U.E. Season Charter"> <string>Camden</string> <string>Charter</string> <real>10137</real> <na/> <real>504</real> <real>10</real> <real>9.4</real> <real>0</real></record> 
 <record label="Eastern Camden County Reg"> <string>Camden</string> <string>Middle</string> <real>11586</real> <real>10954</real> <real>295</real> <real>61</real> <real>12.4</real> <real>12</real></record> 
 <record label="Environment Community Charter"> <string>Camden</string> <string>Charter</string> <real>9760</real> <real>6787</real> <real>543</real> <real>8</real> <real>11.6</real> <real>0</real></record> 
 <record label="Freedom Academy Charter"> <string>Camden</string> <string>Charter</string> <real>9143</real> <real>8408</real> <real>593</real> <real>14</real> <real>15.6</real> <real>0</real></record> 
@@ -294,7 +294,7 @@ Percent special education students
 <record label="Roseland Boro"> <string>Essex</string> <string>K-6</string> <real>9924</real> <real>10646</real> <real>530</real> <real>86</real> <real>12.3</real> <real>9</real></record> 
 <record label="South Orange-Maplewood"> <string>Essex</string> <string>K-12</string> <real>12347</real> <real>11366</real> <real>214</real> <real>90</real> <real>11.1</real> <real>11</real></record> 
 <record label="Team Academy Charter School"> <string>Essex</string> <string>Charter</string> <real>8569</real> <real>9984</real> <real>621</real> <real>27</real> <real>15.3</real> <real>0</real></record> 
-<record label="University Heights Charter"> <string>Essex</string> <string>Charter</string> <real>10166</real> <real>na</real> <real>501</real> <real>15</real> <real>0.0</real> <real>0</real></record> 
+<record label="University Heights Charter"> <string>Essex</string> <string>Charter</string> <real>10166</real> <na/> <real>501</real> <real>15</real> <real>0.0</real> <real>0</real></record> 
 <record label="Verona Boro"> <string>Essex</string> <string>K-12</string> <real>10931</real> <real>10337</real> <real>398</real> <real>88</real> <real>11.5</real> <real>15</real></record> 
 <record label="West Essex Regional"> <string>Essex</string> <string>Middle</string> <real>14157</real> <real>13852</real> <real>87</real> <real>91</real> <real>10.7</real> <real>15</real></record> 
 <record label="West Orange Town"> <string>Essex</string> <string>K-12</string> <real>13138</real> <real>13411</real> <real>146</real> <real>89</real> <real>9.0</real> <real>15</real></record> 
@@ -396,7 +396,7 @@ Percent special education students
 <record label="W Windsor-Plainsboro Reg"> <string>Mercer</string> <string>K-12</string> <real>12153</real> <real>11302</real> <real>237</real> <real>89</real> <real>11.9</real> <real>10</real></record> 
 <record label="Washington Twp"> <string>Mercer</string> <string>K-12</string> <real>10581</real> <real>10436</real> <real>448</real> <real>89</real> <real>12.7</real> <real>13</real></record> 
 <record label="Carteret Boro"> <string>Middlesex</string> <string>K-12</string> <real>9134</real> <real>9610</real> <real>595</real> <real>51</real> <real>12.4</real> <real>10</real></record> 
-<record label="Central Jersey College Prep Charter"> <string>Middlesex</string> <string>Charter</string> <real>9384</real> <real>na</real> <real>575</real> <real>54</real> <real>10.4</real> <real>0</real></record> 
+<record label="Central Jersey College Prep Charter"> <string>Middlesex</string> <string>Charter</string> <real>9384</real> <na/> <real>575</real> <real>54</real> <real>10.4</real> <real>0</real></record> 
 <record label="Cranbury Twp"> <string>Middlesex</string> <string>K-8</string> <real>13604</real> <real>12820</real> <real>117</real> <real>93</real> <real>10.1</real> <real>11</real></record> 
 <record label="Dunellen Boro"> <string>Middlesex</string> <string>K-12</string> <real>9398</real> <real>9177</real> <real>573</real> <real>65</real> <real>10.8</real> <real>9</real></record> 
 <record label="East Brunswick Twp"> <string>Middlesex</string> <string>K-12</string> <real>11640</real> <real>10780</real> <real>286</real> <real>78</real> <real>12.5</real> <real>11</real></record> 
@@ -626,7 +626,7 @@ Percent special education students
 <record label="Vernon Twp"> <string>Sussex</string> <string>K-12</string> <real>10944</real> <real>10045</real> <real>395</real> <real>56</real> <real>11.7</real> <real>13</real></record> 
 <record label="Wallkill Valley Regional"> <string>Sussex</string> <string>Middle</string> <real>12413</real> <real>11592</real> <real>205</real> <real>56</real> <real>12.3</real> <real>16</real></record> 
 <record label="Berkeley Heights Twp"> <string>Union</string> <string>K-12</string> <real>11612</real> <real>11308</real> <real>292</real> <real>81</real> <real>10.8</real> <real>8</real></record> 
-<record label="Central Jersey Arts Charter"> <string>Union</string> <string>Charter</string> <real>9312</real> <real>na</real> <real>581</real> <real>56</real> <real>9.1</real> <real>0</real></record> 
+<record label="Central Jersey Arts Charter"> <string>Union</string> <string>Charter</string> <real>9312</real> <na/> <real>581</real> <real>56</real> <real>9.1</real> <real>0</real></record> 
 <record label="Clark Twp"> <string>Union</string> <string>K-12</string> <real>11034</real> <real>9876</real> <real>379</real> <real>85</real> <real>11.5</real> <real>9</real></record> 
 <record label="Cranford Twp"> <string>Union</string> <string>K-12</string> <real>11867</real> <real>11275</real> <real>268</real> <real>84</real> <real>10.6</real> <real>14</real></record> 
 <record label="Elizabeth City"> <string>Union</string> <string>K-12</string> <real>13589</real> <real>13543</real> <real>118</real> <real>10</real> <real>9.0</real> <real>9</real></record> 
