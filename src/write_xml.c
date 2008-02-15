@@ -74,7 +74,7 @@ write_xml_stream (FILE *f, ggobid *gg, const gchar *filename, XmlWriteInfo *xmlW
  gint numDatasets, i;
  GGobiData *d;
  numDatasets = g_slist_length(gg->d);
-g_printerr ("numDatasets %d\n", numDatasets);
+ // g_printerr ("numDatasets %d\n", numDatasets);
 
  write_xml_header (f, -1, gg, xmlWriteInfo);
 
@@ -245,14 +245,41 @@ write_edge_record_p (gint i, GGobiData *e, ggobid *gg)
 static void
 writeFloat(FILE *f, double value)
 {
-  /*fprintf(f, "%.3f", value);*/
-  fprintf(f, "%g", value); 
+  fprintf(f, "<real>%g</real>", value); 
+}
+static void
+writeInt(FILE *f, int value)
+{
+  fprintf(f, "<int>%d</int>", value); 
+}
+
+static void
+writeEntry(FILE *f, vartyped vtype, double value) {
+  switch (vtype) {
+  case categorical:
+  case integer:
+  case counter:
+    writeInt(f, (int) value);
+  break;
+
+  default:
+    writeFloat (f, value);
+  }
 }
 
 gboolean
 write_xml_records(FILE *f, GGobiData *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 {
-  gint i, m, n = 0;
+  gint i, j, m, n = 0;
+  vartyped *vartypes;
+  vartabled *vt;
+
+  vartypes = (vartyped *) g_malloc(d->ncols * sizeof(vartyped));
+  for (j=0; j<d->ncols; j++) {
+    vt = vartable_element_get (j, d);
+    vartypes[j] = vt->vartype;
+  }
+
 
   /*-- figure out how many records we're about to save.  --*/
   if (gg->save.row_ind == ALLROWS)
@@ -276,8 +303,6 @@ write_xml_records(FILE *f, GGobiData *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
   if (ggobi_data_has_missings(d)) {
     if (gg->save.missing_ind == MISSINGSNA)
       fprintf(f, " missingValue=\"%s\"", "na");
-    else if (gg->save.missing_ind == MISSINGSDOT)
-      fprintf(f, " missingValue=\"%s\"", ".");
     /*-- otherwise write the "imputed" value --*/
   }
   fprintf(f, ">\n");
@@ -286,19 +311,20 @@ write_xml_records(FILE *f, GGobiData *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
   if (gg->save.row_ind == ALLROWS) {
     for (i = 0; i < d->nrows; i++) {
       fprintf(f, "<record");
-      write_xml_record (f, d, gg, i, xmlWriteInfo);
+      write_xml_record (f, d, gg, i, vartypes, xmlWriteInfo);
       fprintf(f, "\n</record>\n");
     }
   } else {  /*-- if displaying visible rows only --*/
     for (i=0; i<d->nrows_in_plot; i++) {
       m = d->rows_in_plot.els[i];
       fprintf(f, "<record");
-      write_xml_record (f, d, gg, m, xmlWriteInfo);
+      write_xml_record (f, d, gg, m, vartypes, xmlWriteInfo);
       fprintf(f, "\n</record>\n");
     }
   }
 
   fprintf(f, "</records>\n");
+  g_free (vartypes);
   return(true);
 }
 
@@ -307,8 +333,8 @@ write_xml_records(FILE *f, GGobiData *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
  * I want this to write <edge> records as well as <record> records.
 */
 gboolean
-write_xml_record (FILE *f, GGobiData *d, ggobid *gg, gint i,
-  XmlWriteInfo *xmlWriteInfo)
+write_xml_record (FILE *f, GGobiData *d, ggobid *gg, gint i, 
+  vartyped *vartypes, XmlWriteInfo *xmlWriteInfo)
 {
   gint j;
   gchar *gstr, *gtypestr = NULL;
@@ -391,14 +417,11 @@ write_xml_record (FILE *f, GGobiData *d, ggobid *gg, gint i,
           ggobi_data_is_missing(d, i, j) && 
           gg->save.missing_ind != MISSINGSIMPUTED)
       {
-          if (gg->save.missing_ind == MISSINGSNA) {
-            fprintf (f, "na ");
-          }  else if (gg->save.missing_ind == MISSINGSDOT) {
-            fprintf (f, ". ");
-          } 
+          fprintf (f, "<na/>");
       } else {  /*-- if not missing, just write the data --*/
-        writeFloat (f, (gg->save.stage == TFORMDATA) ? d->tform.vals[i][j] :
-                                                       d->raw.vals[i][j]);
+        writeEntry (f, vartypes[j],
+          (gg->save.stage == TFORMDATA) ? d->tform.vals[i][j] :
+                                          d->raw.vals[i][j]);
       }
       if (j < d->ncols-1 )
         fprintf(f, " ");
@@ -406,22 +429,20 @@ write_xml_record (FILE *f, GGobiData *d, ggobid *gg, gint i,
   } else if (gg->save.column_ind == SELECTEDCOLS && d->ncols > 0) {
     /*-- work out which columns to save --*/
     gint *cols = (gint *) g_malloc (d->ncols * sizeof (gint));
-    gint ncols = selected_cols_get (cols, d, gg);
+    gint k, ncols = selected_cols_get (cols, d, gg);
     if (ncols == 0)
       ncols = plotted_cols_get (cols, d, gg);
-    for(j = 0; j < ncols; j++) {
+    for(k = 0; k < ncols; k++) {
+      j = cols[k];
       if (ggobi_data_is_missing(d, i, j) &&
         gg->save.missing_ind != MISSINGSIMPUTED)
       {
-        if (gg->save.missing_ind == MISSINGSNA) {
-          fprintf (f, "NA ");
-        }  else if (gg->save.missing_ind == MISSINGSDOT) {
-          fprintf (f, ". ");
-        } 
+          fprintf (f, "<na/>");
       } else {
 
-        writeFloat (f, (gg->save.stage == TFORMDATA) ? d->tform.vals[i][j] :
-                                                       d->raw.vals[i][cols[j]]);
+        writeEntry (f, vartypes[j],
+          (gg->save.stage == TFORMDATA) ? d->tform.vals[i][j] :
+                                          d->raw.vals[i][cols[j]]);
       } 
       if (j < ncols-1 )
         fprintf(f, " ");
@@ -435,7 +456,10 @@ write_xml_record (FILE *f, GGobiData *d, ggobid *gg, gint i,
 gboolean
 write_xml_edges (FILE *f, GGobiData *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 {
-  gint i;
+  gint i, j;
+  vartyped *vartypes;
+  vartabled *vt;
+
   if (d->edge.n < 1)
     return(true);
   /*
@@ -452,14 +476,20 @@ write_xml_edges (FILE *f, GGobiData *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
     xmlWriteInfo->defaultGlyphTypeName, 
     xmlWriteInfo->defaultGlyphSizeName);
 
+  vartypes = (vartyped *) g_malloc(d->ncols * sizeof(vartyped));
+  for (j=0; j<d->ncols; j++) {
+    vt = vartable_element_get (j, d);
+    vartypes[j] = vt->vartype;
+  }
 
   for(i = 0; i < d->edge.n; i++) {
     fprintf(f, "<edge");
-    write_xml_record (f, d, gg, i, xmlWriteInfo);
+    write_xml_record (f, d, gg, i, vartypes, xmlWriteInfo);
     fprintf(f, "</edge>\n");
   }
   fprintf(f, "</edges>\n");
 
+  g_free (vartypes);
  return(true);
 }
 

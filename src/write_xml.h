@@ -52,7 +52,7 @@ gboolean write_xml_description (FILE *f, ggobid *gg, XmlWriteInfo *xmlWriteInfo)
 gboolean write_xml_variables (FILE *f, GGobiData *, ggobid *gg, XmlWriteInfo *xmlWriteInfo);
 gboolean write_xml_variable (FILE *f, GGobiData *, ggobid *gg, gint i, XmlWriteInfo *xmlWriteInfo);
 gboolean write_xml_records (FILE *f, GGobiData *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo);
-gboolean write_xml_record (FILE *f, GGobiData *d, ggobid *gg, gint i, XmlWriteInfo *xmlWriteInfo);
+  gboolean write_xml_record (FILE *, GGobiData *, ggobid *, gint, vartyped *, XmlWriteInfo *xmlWriteInfo);
 
 gboolean write_xml_edges(FILE *f, GGobiData *d, ggobid *gg, XmlWriteInfo *xmlWriteInfo);
 gboolean write_xml_edge(FILE *f, GGobiData *d, ggobid *gg, gint i, XmlWriteInfo *xmlWriteInfo);
