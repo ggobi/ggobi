@@ -104,10 +104,10 @@ filesel_ok (GtkWidget * chooser)
        * full_viewmode_set to initialize the mode and projection,
        * and to make the Options menu appear.
        */
-      if (firsttime) {
+      /*if (firsttime) {
         gg->pmode = XYPLOT;
         GGOBI (full_viewmode_set) (XYPLOT, DEFAULT_IMODE, gg);
-      }
+        }*/
     }
     break;
   case EXTEND_FILESET:  /*-- not yet enabled --*/
