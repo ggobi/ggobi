@@ -11,6 +11,8 @@
 #include "dspdesc.h"
 #include "macros.h"
 
+#include "config.h"
+
 #define MAX_PER_ROW 100
 
 /*
@@ -965,6 +967,8 @@ desc_write (PluginInstance *inst)
 
   /* Just handle a single display, the current one */
   OPEN_NAMED_LIST (fp, "display");
+
+  fprintf (fp, "version='%s',", VERSION);
 
   /* describe the colorscheme here, once for all (potential) displays */
   describe_colorscheme (fp, gg);
