@@ -23,7 +23,9 @@ public class GGobi.GuiSubset : Window {
   RadioButton every_n;
   RadioButton label;
   
-  public GuiSubset(construct StageSubset stage) {}
+  public GuiSubset(StageSubset stage) {
+    this.stage = stage;
+  }
   
   public void create_widgets() {
     // Subset selection radio buttons
@@ -32,26 +34,22 @@ public class GGobi.GuiSubset : Window {
       if (all.active) update_selection(new SelectAll());
     };
         
-    random = new RadioButton.with_label(null, "Randomly");
-    random.group = all.group;
+    random = new RadioButton.with_label_from_widget(all, "Randomly");
     random.toggled += percent => {
       if (random.active) update_selection(new SelectRandom(10));
     };
 
-    block = new RadioButton.with_label(null, "A block");
-    block.group = all.group;
+    block = new RadioButton.with_label_from_widget(all, "A block");
     block.toggled += percent => {
       if (block.active) update_selection(new SelectBlock(1, 10));
     };
 
-    every_n = new RadioButton.with_label(null, "Every n");
-    every_n.group = all.group;
+    every_n = new RadioButton.with_label_from_widget(all, "Every n");
     every_n.toggled += percent => {
       if (every_n.active) update_selection(new SelectEveryN(0, 5));
     };
 
-    label = new RadioButton.with_label(null, "By label");
-    label.group = all.group;
+    label = new RadioButton.with_label_from_widget(all, "By label");
     label.toggled += percent => {
       if (label.active) update_selection(new SelectLabel());
     };

@@ -40,7 +40,10 @@ public class GGobi.Varlist : GLib.Object {
 
   public signal void selection_changed();
 
-  public Varlist(construct Stage stage, construct VariableFilter filter) {}
+  public Varlist(Stage stage, VariableFilter filter) {
+    this.stage = stage;
+    this.filter = filter;
+  }
 
   public void build() {
     vars = new ListStore.newv((int) _columns, _coltypes);
@@ -71,7 +74,7 @@ public class GGobi.Varlist : GLib.Object {
     return scroll;
   }
   
-  public uint add_col(GLib.Type type, string title, VariableDescription desc) {
+  public uint add_col(GLib.Type type, string title, VariableDescription? desc) {
     _columns++;
     _coltypes.resize((int) _columns);
     _coltypes[(int) _columns - 1] = type;
@@ -107,7 +110,7 @@ public class GGobi.Varlist : GLib.Object {
       if (_excluded[j]) continue;
 
       vars.append(out iter);
-      vars.set(out iter, 0, j);
+      vars.set(iter, 0, j);
     }    
   }
 
@@ -124,24 +127,24 @@ public class GGobi.Varlist : GLib.Object {
     for(uint j = 0; j < stage.n_cols; j++) {
       if (_excluded[j]) continue;
 
-      vars.set(out iter, col, _desc[col].describe(stage, j));
-      vars.iter_next(out iter);
+      vars.set(iter, col, _desc[col].describe(stage, j));
+      vars.iter_next(ref iter);
     }
   }
   
   /* Compute which variables are currently selected */
   public SList<uint> selected_vars() {
-    SList<uint> selected = new SList();
+    SList<uint> selected = new SList<uint>();
 
     TreeSelection sel = vartable.get_selection();
     TreeIter iter;
 
     vars.get_iter_first(out iter);
     for(uint j = 0; j < stage.n_cols; j++) {
-      if (sel.iter_is_selected(out iter)) {
+      if (sel.iter_is_selected(iter)) {
         selected.append(j);
       }
-      vars.iter_next(out iter);
+      vars.iter_next(ref iter);
     }
     
     return selected;

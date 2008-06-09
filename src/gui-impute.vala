@@ -26,7 +26,9 @@ public class GGobi.GuiImpute : Window {
   HScale percent_value;
   SpinButton fixed_value;
   
-  public GuiImpute(construct StageImpute stage) {}
+  public GuiImpute(StageImpute stage) {
+    this.stage = stage;
+  }
   
   public void create_widgets() {
     
@@ -58,8 +60,7 @@ public class GGobi.GuiImpute : Window {
       }
     };
     
-    percent = new RadioButton.with_label(null, "Percent:");
-    percent.group = fixed.group;
+    percent = new RadioButton.with_label_from_widget(fixed, "Percent:");
     percent.toggled += percent => {
       percent_value.sensitive = percent.active;
       if (percent.active) {
@@ -69,20 +70,17 @@ public class GGobi.GuiImpute : Window {
       }
     };
     
-    mean = new RadioButton.with_label(null, "Mean");
-    mean.group = fixed.group;
+    mean = new RadioButton.with_label_from_widget(fixed, "Mean");
     mean.toggled += percent => {
       if (mean.active) update_imputation(new ImputationMean());
     };
         
-    median = new RadioButton.with_label(null, "Median");
-    median.group = fixed.group;
+    median = new RadioButton.with_label_from_widget(fixed, "Median");
     median.toggled += percent => {
       if (median.active) update_imputation(new ImputationMedian());
     };
 
-    random = new RadioButton.with_label(null, "Random");
-    random.group = fixed.group;
+    random = new RadioButton.with_label_from_widget(fixed, "Random");
     random.toggled += percent => {
       if (random.active) update_imputation(new ImputationRandom());
     };

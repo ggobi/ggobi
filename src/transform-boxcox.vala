@@ -12,7 +12,7 @@ public class GGobi.TransformBoxcox : Transform {
     return name.printf("B-C(%s,%.2f)", lambda);
   }
   
-  override double[] forward (double[] vals, Variable v) 
+  override double[]? forward (double[] vals, Variable v) 
   { 
     uint i;
     double[] results = new double[vals.length];
@@ -20,7 +20,7 @@ public class GGobi.TransformBoxcox : Transform {
     if (Math.fabs(lambda - 0) < 0.001) {       /* Natural log */
       for (i=0; i < results.length; i++) {
         if (vals[i] <= 0)
-          return null;
+          return null; // FIXME: throw exception?
       }
       /*-- if all values are in the domain of log --*/
       for (i=0; i < results.length; i++) {
@@ -31,14 +31,14 @@ public class GGobi.TransformBoxcox : Transform {
         double dtmp = (Math.pow(vals[i], lambda) - 1.0) / lambda;
         /* If dtmp no good, return */
         if (!dtmp.is_finite())
-          return null;
+          return null; // FIXME: throw exception?
         else results[i] = dtmp;
       }
     }
     return results;
   }
   
-  override double[] reverse (double[] vals, Variable v) 
+  override double[]? reverse (double[] vals, Variable v) 
   {
     uint i;
     double[] results = new double[vals.length];
@@ -51,7 +51,7 @@ public class GGobi.TransformBoxcox : Transform {
         double dtmp = vals[i] * lambda + 1.0;
         /* If domain resultsside of log, return */
         if (dtmp <= 0)
-          return null;
+          return null; // FIXME: throw exception?
         else results[i] = Math.log(dtmp) / Math.log(lambda);
       }
     }

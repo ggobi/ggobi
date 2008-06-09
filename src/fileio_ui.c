@@ -250,8 +250,8 @@ createInputFileSelectionDialog (gchar * title, GGobiSession * gg)
 void configure_file_chooser(GtkWidget *chooser, GGobiSession *gg)
 {
   if (GGOBI_IS_INPUT_SOURCE_FILE(gg->data_source)) {
-    gchar *filename = ggobi_input_source_file_get_filename(
-      GGOBI_INPUT_SOURCE_FILE(gg->data_source));
+    GGobiInputSourceFile *file = GGOBI_INPUT_SOURCE_FILE(gg->data_source);
+    gchar *filename = ggobi_input_source_file_get_filename(file, NULL);
     if (filename) {
       gchar *dir = g_path_get_dirname(filename);
       gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER (chooser), dir);

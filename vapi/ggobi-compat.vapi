@@ -21,7 +21,7 @@ public class GGobi.Stage : GLib.Object {
   public virtual void process_incoming(PipelineMessage msg);
   public virtual void process_outgoing(PipelineMessage msg);
   
-  public virtual void set_row_id(uint i, string id);
+  public virtual void set_row_id(uint i, string? id);
   public virtual string get_row_id(uint i);
   public virtual int get_row_for_id(string id);
   
@@ -36,11 +36,11 @@ public class GGobi.Stage : GLib.Object {
   
   public weak Variable get_variable(uint j);
   public uint get_col_n_missing(uint j);
-  public virtual void set_col_name(uint j, string name);
+  public virtual void set_col_name(uint j, string? name);
   public int get_col_index_for_name(string name);
   
   public virtual uint get_n_edges();
-  public virtual EdgeData get_edge_data();
+  public virtual EdgeData? get_edge_data();
   
   public virtual void refresh_col_(uint j);
   public virtual void refresh_col(uint j);
@@ -49,6 +49,7 @@ public class GGobi.Stage : GLib.Object {
   
 }
 
+[Compact]
 public class EdgeData {
   public int n;
 }
@@ -60,7 +61,7 @@ public class GGobi.Session {
 public class GGobi.Variable: GLib.Object {
   public VariableType vartype {get; set;}
   public bool is_attribute {get; set;}
-  private double default_value {get; set;}
+  public double default_value {get; set;}
 
   public string name;
   
@@ -78,6 +79,10 @@ public class GGobi.Variable: GLib.Object {
 
 
 namespace GGobi {
+
+  [CCode (cheader_filename = "defines.h")]
+  public const double EPSILON;
+  
   [CCode (cprefix = "", lower_case_cprefix = "", cheader_filename = "ggobi.h")]
   public struct Utils {
     public static double random_normal();
@@ -86,7 +91,7 @@ namespace GGobi {
   [CCode (cprefix = "d", lower_case_cprefix = "", cheader_filename = "svd.h")]
   public struct LinearAlgebra {
     [NoArrayLength]
-    public static void svd (pointer[] a, int m, int n, double[] w, pointer[] v);
+    public static void svd (void** a, int m, int n, double[] w, void** v);
   }
 
   [CCode (cheader_filename = "ggobi-variable.h", cprefix = "GGOBI_VARIABLE_" )]  
@@ -115,15 +120,16 @@ namespace GGobi {
   
 }
 
+[Compact]
 [CCode (cprefix = "arrayd_", cheader_filename = "array.h", cname="array_d")]
 public class GGobi.Matrix {
-  public pointer[] vals;
+  public void** vals;
   [CCode (cname = "nrows")]
-  public uint n_rows {get; construct;}
+  public uint n_rows;
   [CCode (cname = "ncols")]
-  public uint n_cols {get; construct;}
+  public uint n_cols;
   
-  public Matrix(construct uint n_rows, construct uint n_cols);
+  public Matrix(uint n_rows, uint n_cols);
   
   public void alloc (int nr, int nc);
   public void free ();
@@ -140,6 +146,7 @@ public class GGobi.Matrix {
   public void zero (); 
 }
 
+[Compact]
 [CCode (cprefix = "vectord_", cheader_filename = "vector.h", cname="vector_d")]
 public class GGobi.Vector {
   public double[] els;

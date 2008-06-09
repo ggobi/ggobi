@@ -19,8 +19,8 @@ LDADD       = ../src/libggobi.la
 
 if HAS_VALA
 %.stamp: %.vala
-	@VALAC@ --vapidir=../vapi --vapidir=../src \
-    --pkg=gtk+-2.0 --pkg=gsf --pkg=ggobi-compat --pkg=ggobi --pkg=libxml-2.0 $<
+	@VALAC@ -C --vapidir=../vapi --vapidir=../src \
+    --pkg=gtk+-2.0 --pkg=libgsf-1 --pkg=ggobi-compat --pkg=ggobi --pkg=libxml-2.0 $<
 	@touch $@
 else
 %.stamp: %.vala

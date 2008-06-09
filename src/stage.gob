@@ -1163,7 +1163,7 @@ get_edge_data (self)
  * These are hashed for O(1) lookup.
  **/ 
 virtual void
-set_row_id(self, guint i, gchar* value) {
+set_row_id(self, guint i, const gchar* value) {
   self_set_row_id(self->parent, i, value);
 }
 
@@ -1227,7 +1227,7 @@ get_row_ids(self) {
  * Returns: row index if found, -1 otherwise
  **/
 virtual gint
-get_row_for_id(self, gchar *id) {
+get_row_for_id(self, const gchar *id) {
   return self_get_row_for_id(self->parent, id);
 }
 

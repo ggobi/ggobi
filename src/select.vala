@@ -42,7 +42,9 @@ public class GGobi.SelectAll : Select {
 public class GGobi.SelectRandom : Select {
   public int n {get; set construct;}
 
-  public SelectRandom(construct int n) {}
+  public SelectRandom(int n) {
+    this.n = n;
+  }
 
   override void select(StageSubset stage) {
     uint n_rows = stage.parent.n_rows;
@@ -55,7 +57,7 @@ public class GGobi.SelectRandom : Select {
 
     int t, m;
     for (t = 0, m = 0; t < n_rows && m < n; t++) {
-      double r = Random.double();
+      double r = Random.next_double();
       if (((n_rows - t) * r) < (n - m) && !included[t]) {
         stage.set_included(t, true);
         included[t] = true;
@@ -80,7 +82,10 @@ public class GGobi.SelectBlock : Select {
   public int start {get; set construct;}
   public int size {get; set construct;}
   
-  public SelectBlock(construct int start, construct int size) {}
+  public SelectBlock(int start, int size) {
+    this.start = start;
+    this.size = size;
+  }
   
   override void select(StageSubset stage) {
     uint n_rows = stage.parent.n_rows;
@@ -113,7 +118,10 @@ public class GGobi.SelectEveryN : Select {
   public int start {get; set construct;} 
   public int step  {get; set construct;}
 
-  public SelectEveryN(construct int start, construct int step) {}
+  public SelectEveryN(int start, int step) {
+    this.start = start;
+    this.step = step;
+  }
 
   override void select(StageSubset stage) {
     uint n_rows = stage.parent.n_rows;

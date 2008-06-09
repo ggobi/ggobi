@@ -20,13 +20,25 @@ Ideas for other methods:
 
 */
 using GLib;
-public class GGobi.TourBasis : Object {
+
+// FIXME: Had to move this here due to a (reported) vala bug.
+// But this should become a high-level data model for view/controllers
+// that manage the modes of tour variables. The fact that TourState is
+// currently always used as an array testifies to this.
+public enum GGobi.TourState {
+  IN, OUT, FROZEN
+}
+
+public abstract class GGobi.TourBasis : Object {
   public uint d {construct; get;}
   public uint p = 0; 
   public Stage stage {construct; get;}
   public TourMatrix last_basis;
   
-  public TourBasis(construct Stage stage, construct uint d) {}
+  public TourBasis(Stage stage, uint d) {
+    this.stage = stage;
+    this.d = d;
+  }
   construct {
     p = stage.n_cols;
   }  
@@ -35,7 +47,7 @@ public class GGobi.TourBasis : Object {
   // This convenience function takes a generated matrix and combines it with
   // any frozen variables.  It is the responsibility of concrete subclasses
   // to deal with frozen variables correctly.
-  public void add_frozen_vars(out TourMatrix mat, TourState[] states) {
+  public void add_frozen_vars(TourMatrix mat, TourState[] states) {
     for(uint j = 0; j < mat.n_cols; j++) {
 
       // Calculate norm of frozen values

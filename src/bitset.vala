@@ -8,7 +8,9 @@ using GLib;
  * A function that is invoked on one integer index at a time.
  *
  */
-public delegate void GGobi.IndexFunc (uint j, pointer user_data);
+// VALABUG: user_data is added automatically, but no error emitted
+// when explicitly specified
+public static delegate void GGobi.IndexFunc (uint j, void *user_data);
 
 public class GGobi.Bitset : Object {
   
@@ -24,13 +26,15 @@ public class GGobi.Bitset : Object {
       return bits.length * BITS_PER_CHUNK;
     }
     set construct {
-      int size_uchars = (value + BITS_PER_CHUNK - 1) / BITS_PER_CHUNK;
-      bits.resize(size_uchars);
+      uint size_uchars = (value + BITS_PER_CHUNK - 1) / BITS_PER_CHUNK;
+      bits.resize((int)size_uchars);
     }
   }
   
   public Bitset () { }
-  public Bitset.with_size (construct uint size) { }
+  public Bitset.with_size (uint size) {
+    this.size = size;
+  }
   
   public virtual Bitset clone() {
     Bitset other = new Bitset.with_size(size);
@@ -113,14 +117,14 @@ public class GGobi.Bitset : Object {
   // FIXME: Should these be called foreach? It's the convention but foreach
   // is a keyword in Vala...
   public void 
-  apply(IndexFunc func, pointer data)
+  apply(IndexFunc func, void* data)
   {
     SList<uint> indices = get_indices();
     foreach(uint index in indices)
       func(index, data);
   }
   public void
-  apply_decreasing(IndexFunc func, pointer data)
+  apply_decreasing(IndexFunc func, void* data)
   {
     SList<uint> indices = get_indices();
     indices.reverse();

@@ -9,7 +9,7 @@ public class GGobi.TourBasisRandom : TourBasis {
 
   override TourMatrix generate(TourState[] states) {
     TourMatrix mat = raw_matrix(states);
-    add_frozen_vars(out mat, states);
+    add_frozen_vars(mat, states);
     
     last_basis = mat;
     return mat;

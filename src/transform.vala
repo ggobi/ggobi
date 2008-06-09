@@ -1,6 +1,6 @@
 using GLib;
 
-public class GGobi.Transform : Object {
+public abstract class GGobi.Transform : Object {
 
   /**
    * forward:
@@ -11,7 +11,7 @@ public class GGobi.Transform : Object {
    *
    * Returns: the transformed values
    */
-  public abstract double[] forward(double[] vals, Variable v);
+  public abstract double[]? forward(double[] vals, Variable v);
   
   /**
    * reverse:
@@ -22,7 +22,7 @@ public class GGobi.Transform : Object {
    *
    * Returns: the reverse transformed values.
    */
-  public abstract double[] reverse(double[] vals, Variable v);
+  public abstract double[]? reverse(double[] vals, Variable v);
   
   /* Transformed variable name (to indicate the current transformation) */
   public abstract string variable_name(string name);

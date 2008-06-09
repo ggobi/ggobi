@@ -14,8 +14,14 @@ pure vala code.
 using GLib;
 
 public class GGobi.PipelineMatrix : GLib.Object {
-  public uint n_cols {get {return matrix.n_cols;} construct;}
-  public uint n_rows {get {return matrix.n_rows;} construct;}
+  public uint n_cols {
+    get { return matrix.n_cols; }
+    construct { matrix.n_cols = value; }
+  }
+  public uint n_rows {
+    get { return matrix.n_rows; }
+    construct { matrix.n_rows = value; }
+  }
   public Matrix matrix;
   
   construct {
@@ -41,15 +47,15 @@ public class GGobi.PipelineMatrix : GLib.Object {
   public void process_message(
     PipelineMessage msg, Stage stage, bool refresh = true
   ) {
-    SList removed_rows = msg.get_removed_rows();
+    SList<uint> removed_rows = msg.get_removed_rows();
     matrix.remove_rows(removed_rows);
     matrix.add_rows((int) stage.n_rows);
 
-    SList removed_cols = msg.get_removed_cols();
+    SList<uint> removed_cols = msg.get_removed_cols();
     matrix.remove_cols(removed_cols);
     matrix.add_cols((int) stage.n_cols);
         
-    SList changed_cols = msg.get_changed_cols();
+    SList<uint> changed_cols = msg.get_changed_cols();
     uint n_added_cols = msg.get_n_added_cols();
     uint n_added_rows = msg.get_n_added_rows();
     uint n_refresh = n_added_cols;

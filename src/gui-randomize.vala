@@ -21,7 +21,9 @@ public class GGobi.GuiRandomize : Window {
     create_widgets();
   }
   
-  public GuiRandomize(construct StageRandomize stage) {}
+  public GuiRandomize(StageRandomize stage) {
+    this.stage = stage;
+  }
   
   public void create_widgets() {
     varlist = new Varlist(stage, new FilterNone());
@@ -40,14 +42,12 @@ public class GGobi.GuiRandomize : Window {
       if (none.active) update_randomization(RandomizationType.NONE);
     };
     
-    repeat = new RadioButton.with_label(null, "With duplicates");
-    repeat.group = none.group;
+    repeat = new RadioButton.with_label_from_widget(none, "With duplicates");
     repeat.toggled += percent => {
       if (repeat.active) update_randomization(RandomizationType.REPEAT);
     };
     
-    unique = new RadioButton.with_label(null, "Without duplicates");
-    unique.group = none.group;
+    unique = new RadioButton.with_label_from_widget(none, "Without duplicates");
     unique.toggled += percent => {
       if (unique.active) update_randomization(RandomizationType.UNIQUE);
     };

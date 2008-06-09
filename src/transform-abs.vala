@@ -7,7 +7,7 @@ public class GGobi.TransformAbs : Transform {
     return name.printf("abs(%s)");
   }
   
-  override double[] forward (double[] vals, Variable v) 
+  override double[]? forward (double[] vals, Variable v) 
   { 
     double[] results = new double[vals.length];
     for (uint i = 0; i < results.length; i++)
@@ -16,7 +16,7 @@ public class GGobi.TransformAbs : Transform {
   }
   
   /* we just use identity transformation for the reverse */
-  override double[] reverse (double[] vals, Variable v) 
+  override double[]? reverse (double[] vals, Variable v) 
   {
     double[] results = new double[vals.length];
     for (uint i = 0; i < results.length; i++)

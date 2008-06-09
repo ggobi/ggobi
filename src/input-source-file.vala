@@ -7,9 +7,9 @@ public class GGobi.InputSourceFile : InputSource
   
   /** Get the system locale filename from the URI in this source */
   public string
-  get_filename()
+  get_filename() throws GLib.ConvertError
   {
-    URI parsed = new URI.parse(uri);
+    URI parsed = URI.parse(uri);
     string resolved = null;
     if (parsed != null && parsed.scheme == null) {
       /* we have a relative URI, resolve against current working dir file:// uri
@@ -25,15 +25,17 @@ public class GGobi.InputSourceFile : InputSource
   }
   
   override Input
-  get_input(out GLib.Error error) 
+  get_input() throws GLib.Error
   {
     Input input = null;
     string filename = get_filename();
     if (filename == null) {
       critical("Cannot get filename for URI: %s", uri);
-    } else input = new InputStdio(filename, out error);
+    } else input = new InputStdio(filename);
     return input;
   }
   
-  public InputSourceFile(construct string uri) { }
+  public InputSourceFile(string uri) {
+    this.uri = uri;
+  }
 }

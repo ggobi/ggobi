@@ -1,6 +1,1 @@
-
-namespace GGobi {
-  public enum TourState {
-    IN, OUT, FROZEN
-  }
-}
+/* Place-holder for general tour stuff */

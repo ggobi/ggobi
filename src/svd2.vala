@@ -9,7 +9,10 @@ public class GGobi.Svd : Object {
   public TourMatrix V {construct; get;}
   public double[] d;
   
-  public Svd(construct TourMatrix U, construct TourMatrix V) {}
+  public Svd(TourMatrix U, TourMatrix V) {
+    this.U = U;
+    this.V = V;
+  }
   
   public void set_d(double[] value) {
     d.resize(value.length);

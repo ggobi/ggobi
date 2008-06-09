@@ -26,7 +26,9 @@ public class GGobi.GuiJitter : Window {
     create_widgets();
   }
   
-  public GuiJitter(construct StageJitter stage) {}
+  public GuiJitter(StageJitter stage) {
+    this.stage = stage;
+  }
   
   public void create_widgets() {
 

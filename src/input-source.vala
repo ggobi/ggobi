@@ -16,5 +16,5 @@ public abstract class GGobi.InputSource : Object {
    * Returns: #GsfInput or %NULL if this input source cannot provide an input stream
    */
   public abstract Input
-  get_input(out GLib.Error err);
+  get_input() throws GLib.Error;
 }

@@ -66,7 +66,7 @@ public class GGobi.PipelineMessage : Object  {
   */
   private uint _n_cols;
   public uint n_cols {
-    get;
+    get { return _n_cols; }
     set {
       _n_cols = value;
       changed_cols.size = _n_cols;
@@ -76,14 +76,17 @@ public class GGobi.PipelineMessage : Object  {
 
   private uint _n_rows;
   public uint n_rows {
-    get;
+    get { return _n_rows; }
     set {
       _n_rows = value;
       removed_rows.size = _n_rows;
     }
   }     
 
-  public PipelineMessage(construct uint n_rows, construct uint n_cols) {}
+  public PipelineMessage(uint n_rows, uint n_cols) {
+    this.n_rows = n_rows;
+    this.n_cols = n_cols;
+  }
   
   // Lists the indices of the changed columns.
   public SList<uint> get_changed_cols() {
@@ -118,30 +121,30 @@ public class GGobi.PipelineMessage : Object  {
   
   /* convenience functions for iterating over changes */
   
-  public void changed_cols_apply(IndexFunc func, pointer data) {
+  public void changed_cols_apply(IndexFunc func, void* data) {
     changed_cols.apply(func, data);
   }
-  public void changed_cols_apply_decreasing(IndexFunc func, pointer data) {
+  public void changed_cols_apply_decreasing(IndexFunc func, void* data) {
     changed_cols.apply_decreasing(func, data);
   }
-  public void removed_cols_apply(IndexFunc func, pointer data) {
+  public void removed_cols_apply(IndexFunc func, void* data) {
     removed_cols.apply(func, data);
   }
-  public void removed_cols_apply_decreasing(IndexFunc func, pointer data) {
+  public void removed_cols_apply_decreasing(IndexFunc func, void* data) {
     removed_cols.apply_decreasing(func, data);
   }
-  public void removed_rows_apply(IndexFunc func, pointer data) {
+  public void removed_rows_apply(IndexFunc func, void* data) {
     removed_rows.apply(func, data);
   }
-  public void removed_rows_apply_decreasing(IndexFunc func, pointer data)   {
+  public void removed_rows_apply_decreasing(IndexFunc func, void* data)   {
     removed_rows.apply_decreasing(func, data);
   }
-  public void added_rows_apply(IndexFunc func, pointer data)
+  public void added_rows_apply(IndexFunc func, void* data)
   {
     for (uint j = n_rows; j < n_rows + n_added_rows; j++)
       func(j, data);
   }
-  public void added_cols_apply(IndexFunc func, pointer data) {
+  public void added_cols_apply(IndexFunc func, void* data) {
     for (uint j = n_cols; j < n_cols + n_added_cols; j++)
       func(j, data);
   }
@@ -171,9 +174,9 @@ public class GGobi.PipelineMessage : Object  {
   
   // Registers the removal of a list of a columns. Indices of changed columns
   // are automatically shifted, because they are assumed to occur after removal.
-  public void remove_cols(SList cols) {
+  public void remove_cols(SList<uint> cols) {
     /* ensure sorted for index updating */
-    SList sorted_cols = cols.copy();
+    SList<uint> sorted_cols = cols.copy();
     sorted_cols.sort(PipelineMessage.index_compare);
     
     foreach(uint index in cols) {
@@ -325,7 +328,7 @@ public class GGobi.PipelineMessage : Object  {
     return shifted;
   }
   
-  public static int index_compare(pointer a, pointer b) {
-    return a.to_int() - b.to_int();
+  public static int index_compare(void* a, void* b) {
+    return (int)a - (int)b;
   }
 }

@@ -13,7 +13,9 @@ public class GGobi.GuiViewer : Window {
   public TreeView table;
   public ListStore model;
   
-  public GuiViewer(construct Stage stage) {}
+  public GuiViewer(Stage stage) {
+    this.stage = stage;
+  }
   construct {
     title = "Data viewer";
     set_default_size(300, 500);
@@ -81,9 +83,9 @@ public class GGobi.GuiViewer : Window {
       TreeIter iter;
       
       model.append(out iter);
-      model.set(out iter, 0, stage.get_row_id(i));
+      model.set(iter, 0, stage.get_row_id(i));
       for(uint j = 0; j < stage.n_cols; j++) {
-        model.set(out iter, j + 1, stage.get_raw_value(i, j).to_string("%0.2f"));
+        model.set(iter, j + 1, stage.get_raw_value(i, j).to_string("%0.2f"));
       }
     }
   }
@@ -109,8 +111,8 @@ public class GGobi.GuiViewer : Window {
     TreeIter iter;
     model.get_iter_first(out iter);
     for(uint i = 0; i < stage.n_rows; i++) {
-      model.set(out iter, j + 1, stage.get_raw_value(i, j).to_string("%0.2f"));
-      model.iter_next(out iter);
+      model.set(iter, j + 1, stage.get_raw_value(i, j).to_string("%0.2f"));
+      model.iter_next(ref iter);
     }
   }
 

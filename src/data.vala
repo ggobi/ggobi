@@ -15,7 +15,7 @@ using GLib;
 public class GGobi.Data : Stage {
 
   public string nickname {get; set;}
-  public InputSource source {get; construct;}
+  public InputSource source {get; set construct;}
 
   // The actual data
   private Matrix raw;
@@ -23,7 +23,7 @@ public class GGobi.Data : Stage {
   private Matrix missing; 
 
   /* Maps row labels to row indices */
-  private HashTable<string,int> id_to_row;
+  private HashTable<string,uint> id_to_row;
 
   /* The row ids */
   private string[] row_ids;
@@ -37,7 +37,9 @@ public class GGobi.Data : Stage {
     add_rows(n_rows);
   }
 
-  public Data(construct uint n_rows, construct uint n_cols) {
+  public Data(uint n_rows, uint n_cols) {
+    this.n_rows = n_rows;
+    this.n_cols = n_cols;
   }
 
   // FIXME: this stuff is _G_Gobi-specific, so it has to be added to every
@@ -138,11 +140,11 @@ public class GGobi.Data : Stage {
     return 0;
   }
 
-  override EdgeData get_edge_data () {
+  override EdgeData? get_edge_data () {
     return null;
   }
 
-  override void set_row_id(uint i, string value) {
+  override void set_row_id(uint i, string? value) {
     string val = value; // needed for vala
     if (val == null)
       val = (i + 1).to_string("%d");
@@ -154,8 +156,10 @@ public class GGobi.Data : Stage {
     return row_ids[i];
   }
 
-  override int get_row_for_id(string id) { 
-    return id_to_row.lookup(id);
+  override int get_row_for_id(string id) {
+    // FIXME: need to call lookup_extended here to check for hit
+    // Return -1 if no such id
+    return (int)id_to_row.lookup(id);
   }
 
   /**

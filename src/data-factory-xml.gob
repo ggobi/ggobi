@@ -87,7 +87,7 @@
 
     /* A set of values that apply to records when an attribute
        is not specified for that specific record but is set
-       in the GGobiSessionata tag.
+       in the ggobiata tag.
      */
     DataOptions defaults;
 
@@ -507,6 +507,7 @@ class GGobi:Data:Factory:XML from GGobi:Data:Factory
       case INTEGER:
       case STRING:
         /* This is the individual set_record_value(), i.e. with no 's' at the end. */
+        // NOTE: for strings, we need to make sure variable is categorical
         self_set_record_value ((const char *) data->recordString,
                           data->current_data, data);
         data->current_element++;
@@ -1050,7 +1051,7 @@ class GGobi:Data:Factory:XML from GGobi:Data:Factory
 
 
 /**
-  Called in response to a GGobiSessionata tag which contains
+  Called in response to a ggobidata tag which contains
   the different datasets. The count element here is the
   number of datasets to expect.
  */

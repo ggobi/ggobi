@@ -25,8 +25,8 @@ Currently only works for d = {1, 2}.
 using GLib;
 public class GGobi.TourInterpolation : Object {
   // Frames
-  private TourMatrix Fa {get; construct;}
-  private TourMatrix Fz {get; construct;}
+  public TourMatrix Fa {get; construct;}
+  public TourMatrix Fz {get; set construct;}
   // Planes
   private TourMatrix Ga;
   private TourMatrix Gz;
@@ -42,7 +42,10 @@ public class GGobi.TourInterpolation : Object {
   public uint d {get; construct;}
   public uint p {get; construct;}
   
-  public TourInterpolation(construct TourMatrix Fa, construct TourMatrix Fz) { }
+  public TourInterpolation(TourMatrix Fa, TourMatrix Fz) {
+    this.Fa = Fa;
+    this.Fz = Fz;
+  }
   
   construct {
     d = Fa.n_cols;
@@ -100,7 +103,7 @@ public class GGobi.TourInterpolation : Object {
     dist = TourVector.norm(tau);
     // if (dist_az < 0.0001) return(3);
     // Work out relative speeds for each direction
-    TourVector.normalize(out tau);
+    TourVector.normalize(tau);
   }
     
   public TourMatrix get_frame(double angle) {

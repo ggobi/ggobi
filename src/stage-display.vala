@@ -14,8 +14,8 @@ public class GGobi.StageDisplay : Stage {
     base.process_outgoing(msg);
     
     // FIXME: common method for this and PipelineMatrix.process_message
-    SList removed_rows = msg.get_removed_rows();
-    SList changed_cols = msg.get_changed_cols();
+    SList<uint> removed_rows = msg.get_removed_rows();
+    SList<uint> changed_cols = msg.get_changed_cols();
     uint n_added_cols = msg.get_n_added_cols();
     uint n_added_rows = msg.get_n_added_rows();
     uint n_refresh = n_added_cols;

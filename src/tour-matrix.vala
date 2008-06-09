@@ -7,12 +7,11 @@ for the tour.
 */
 using GLib;
 
-namespace GGobi {
-  public const double EPSILON = 0.001; 
-}
-
 public class GGobi.TourMatrix : PipelineMatrix {
-  public TourMatrix(construct uint n_cols, construct uint n_rows) {}
+  public TourMatrix(uint n_cols, uint n_rows) {
+    this.n_cols = n_cols;
+    this.n_rows = n_rows;
+  }
   construct {
     matrix = new Matrix(n_cols, n_rows);
   }
@@ -48,7 +47,7 @@ public class GGobi.TourMatrix : PipelineMatrix {
       left = other.col(j);
       right = col(j);
       
-      if (!TourVector.orthogonalize(left, out right)) 
+      if (!TourVector.orthogonalize(left, right))
         return false;
     }
     return true;
@@ -64,7 +63,7 @@ public class GGobi.TourMatrix : PipelineMatrix {
         left = col(j);
         right = col(k);
         
-        if (!TourVector.orthogonalize(left, out right)) return false;
+        if (!TourVector.orthogonalize(left, right)) return false;
       }
     }    
     return true;
@@ -79,7 +78,7 @@ public class GGobi.TourMatrix : PipelineMatrix {
   // Normalize given column
   public void normalize_col(uint j) {
     weak double[] tmp = col(j);
-    TourVector.normalize(out tmp);
+    TourVector.normalize(tmp);
   }
   
   // Calculate norm (length) for specified column
@@ -135,9 +134,10 @@ public class GGobi.TourMatrix : PipelineMatrix {
     return true;
   }
   
-  public static TourMatrix multiply_uv(TourMatrix u, TourMatrix v) {
+  public static TourMatrix? multiply_uv(TourMatrix u, TourMatrix v) {
     TourMatrix mat = new TourMatrix(v.n_cols, u.n_rows);
-    
+
+    // FIXME: throw exception?
     if (u.n_cols != v.n_rows) return null;
 
     for (uint j = 0; j < u.n_rows; j++) {
@@ -152,9 +152,10 @@ public class GGobi.TourMatrix : PipelineMatrix {
 
     return mat;
   } 
-  public static TourMatrix multiply_utv(TourMatrix u, TourMatrix v) {
+  public static TourMatrix? multiply_utv(TourMatrix u, TourMatrix v) {
     TourMatrix mat = new TourMatrix(u.n_rows, u.n_cols);
-    
+
+    // FIXME: throw exception?
     if (u.n_rows != v.n_rows) return null;
 
     for (uint j = 0; j < u.n_cols; j++) {

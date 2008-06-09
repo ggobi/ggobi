@@ -1,16 +1,21 @@
 using GLib;
 using Gsf;
 
-private enum ParserState {
-  START,
-  COLLECT,
-  TAILSPACE,
-  END_QUOTE
-}
-
 public class GGobi.DataFactoryCSV:DataFactory
 { 
-  
+
+  private enum ParserState {
+    START,
+    COLLECT,
+    TAILSPACE,
+    END_QUOTE,
+    INVALID
+  }
+
+  private class ParserContext {
+    public Data data;
+  }
+
   private static uint ROW_SIZE_INC = 4;
   
   override SList<string>
@@ -37,28 +42,19 @@ public class GGobi.DataFactoryCSV:DataFactory
   create_for_input(Input input)
   {
     Input lines;
-    List<double[]> rows = new List<double[]>();
+    ParserContext ctx = new ParserContext();
     SList<Data> ds = new SList<Data>();
+    string[] row;
 
     /* Open the file */
     lines = new InputTextline(input);
 
-    do { /* parse each row */
-      /*cur = ;
-      if (cur != null)*/
-        rows.prepend(parse_row((InputTextline)lines, ','));
-    } while (rows.data != null);
-
-    /* clean up the last bogus entry and reverse */
-    rows.remove(rows.data);
-    rows.reverse();
+    while((row = parse_row((InputTextline)lines, ',')) != null)
+      /*process_row(row, ctx)... someday */;
     
     /* Load the parsed data into the GGobiStage */
-    Stage d;
-    d = create_data(rows);
-    ds.append(d);
+    ds.append(ctx.data);
     
-    // VALABUG: Vala fails to correctly free the elements of 'rows'
     return ds;
   }
 
@@ -69,8 +65,8 @@ public class GGobi.DataFactoryCSV:DataFactory
   {
     // VALABUG: always use Hashtable.full and give finalizers - otherwise
     // memory is leaked - this looks like it would be tough to fix
-    HashTable<string,string> hash = new HashTable.full<string,string>(str_hash, 
-      str_equal, g_free, g_free);
+    HashTable<string,string> hash
+      = new HashTable<string,string>.full(str_hash, str_equal, g_free, g_free);
     weak SList<weak string> first = rows.data;
     weak string first_entry = first.data;
 
@@ -91,8 +87,8 @@ public class GGobi.DataFactoryCSV:DataFactory
   private void load_column_labels (SList row, Stage d, bool row_labels)
   {
     uint j = 0;
-    SList<string> entries = row_labels ? row : row.next;
-    foreach(string entry in entries) {
+    weak SList<string> entries = row_labels ? row : row.next;
+    foreach(weak string entry in entries) {
       if (entry.size() == 0)
         d.set_col_name(j++, null);
       else d.set_col_name(j++, entry);
@@ -104,16 +100,16 @@ public class GGobi.DataFactoryCSV:DataFactory
     if (!has_labels)
       return;
     int i = 0;
-    foreach(weak SList row in rows)
+    foreach(weak SList<string> row in rows)
       d.set_row_id(i++, row.data);
   }
 
   private void load_row_values (List<SList> rows, Stage d, bool row_labels) {
     uint i = 0;
-    foreach(weak SList row in rows) {
+    foreach(weak SList<string> row in rows) {
       uint j = 0;
-      SList<string> entries = row_labels ? row : row.next;
-      foreach(string entry in row)
+      weak SList<string> entries = row_labels ? row : row.next;
+      foreach(weak string entry in row)
         d.set_string_value(i++, j++, entry);
     }
   }
@@ -172,13 +168,14 @@ public class GGobi.DataFactoryCSV:DataFactory
    * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
    * OTHER DEALINGS IN THE SOFTWARE.
    */
-  
-  private string[]
-  parse_row(InputTextline input,	char sep)
+  // FIXME: should throw an exception on errors
+  private string[]?
+  parse_row(InputTextline input, char sep)
   {
     bool quotes = true; /* pay attention to quotes */
     bool inquotes = false;
     bool finished = false, eol = false;
+    bool skip_read = false;
     /* offsets in characters, lengths in bytes */
     uint r = 0, ofs = 0, entry_ofs, entry_len, len;
     ParserState state = ParserState.START;
@@ -190,34 +187,39 @@ public class GGobi.DataFactoryCSV:DataFactory
       return null;
     long total_len = src.len(); /* in characters */
     string line = src;
-    
+
+    unichar ch, skip;
     while (!finished) {
-      unichar ch = src.get_char();
-      uint skip = string.skip[(uchar)ch];
+      if (!skip_read) {
+        ch = src.get_char();
+        skip = string.skip[(uchar)ch];
+      } else skip_read = false;
       switch (state) {
-        case ParserState.START:
-          len = entry_len = entry_ofs = 0;
-          if (!eol && ch != sep && ch.isspace()) {
-            break; /* skip whitespace */
-          } else if (quotes && ch == '"') {
-            state = ParserState.COLLECT;
-            inquotes = true;
-            entry_ofs = ofs + 1;
-            break; /* skip initial quote */
-          }
-          entry_ofs = ofs;
+      case ParserState.START:
+        len = entry_len = entry_ofs = 0;
+        if (!eol && ch != sep && ch.isspace()) {
+          break; /* skip whitespace */
+        } else if (quotes && ch == '"') {
           state = ParserState.COLLECT;
-        case ParserState.COLLECT:
-          if (inquotes) {
-            if (ch == '"') { /* potential end quote encountered */
-              state = ParserState.END_QUOTE;
-              break;
-            }
-          } else if (ch == sep || eol) { /* end of entry */
-            if (r == row.length)
-              row.resize((int)(r + ROW_SIZE_INC));
-            // VALABUG: Need to r++ after indexing into array; vala repeats it
-            row[r] = line.offset(entry_ofs).ndup(entry_len);
+          inquotes = true;
+          entry_ofs = ofs + 1;
+          break; /* skip initial quote */
+        }
+        entry_ofs = ofs;
+        state = ParserState.COLLECT;
+        skip_read = true;
+        continue;
+      case ParserState.COLLECT:
+        if (inquotes) {
+          if (ch == '"') { /* potential end quote encountered */
+            state = ParserState.END_QUOTE;
+            break;
+          }
+        } else if (ch == sep || eol) { /* end of entry */
+          if (r == row.length)
+            row.resize((int)(r + ROW_SIZE_INC));
+          // VALABUG: Need to r++ after indexing into array; vala repeats it
+          row[r] = line.offset(entry_ofs).ndup(entry_len);
             r++;
             //row.prepend(line.offset(entry_ofs).ndup(entry_len));
             state = ParserState.START;
@@ -228,51 +230,51 @@ public class GGobi.DataFactoryCSV:DataFactory
               finished = true;
             }
             break;
-          } else if (quotes && ch == '"') {
-            /*PMNF(errno = EILSEQ, ": unexpected quote in element %d", (r + 1));*/
-            critical("unexpected quote in element %d", (r + 1));
+        } else if (quotes && ch == '"') {
+          /*PMNF(errno = EILSEQ, ": unexpected quote in element %d", (r + 1));*/
+          critical("unexpected quote in element %d", (r + 1));
+          return null;
+        }
+        if (eol) { /* \n inside quotes, embedded newline, need to read more */
+          src = (string)input.utf8_gets();
+          if (src == null) {
+            critical("expected more lines in element: %d", (r + 1));
             return null;
           }
-          if (eol) { /* \n inside quotes, embedded newline, need to read more */
-            src = (string)input.utf8_gets();
-            if (src == null) {
-              critical("expected more lines in element: %d", (r + 1));
-              return null;
-            }
-            line = line.concat("\n", src);
-            total_len += src.len() + 1;
-          }
-          len += skip;
-          if (inquotes || !ch.isspace()) { /* ignore trailing whitespace */
-            entry_len = len; /* store data */
+          line = line.concat("\n", src);
+          total_len += src.len() + 1;
+        }
+        len += skip;
+        if (inquotes || !ch.isspace()) { /* ignore trailing whitespace */
+          entry_len = len; /* store data */
+        }
+        break;
+      case ParserState.TAILSPACE:
+      case ParserState.END_QUOTE:
+        if (ch == sep || eol) { /* entry finished */
+          if (r == row.length)
+            row.resize((int)(r + ROW_SIZE_INC));
+          row[r] = line.offset(entry_ofs).ndup(entry_len);
+          r++;
+          //row.prepend(line.offset(entry_ofs).ndup(entry_len));
+          state = ParserState.START;
+          inquotes = false;
+          if (eol) { /* \n outside of quote, row finished */
+            finished = true;
           }
           break;
-        case ParserState.TAILSPACE:
-        case ParserState.END_QUOTE:
-          if (ch == sep || eol) { /* entry finished */
-            if (r == row.length)
-              row.resize((int)(r + ROW_SIZE_INC));
-            row[r] = line.offset(entry_ofs).ndup(entry_len);
-            r++;
-            //row.prepend(line.offset(entry_ofs).ndup(entry_len));
-            state = ParserState.START;
-            inquotes = false;
-            if (eol) { /* \n outside of quote, row finished */
-              finished = true;
-            }
-            break;
-          } else if (quotes && ch == '"' && state != ParserState.TAILSPACE) {
-            entry_len++; /* nope, just an escaped quote */
-            state = ParserState.COLLECT;
-            break;
-          } else if (ch.isspace()) { /* space after end quote */
-            state = ParserState.TAILSPACE;
-            break;
-          }
-          /*errno = EILSEQ;
+        } else if (quotes && ch == '"' && state != ParserState.TAILSPACE) {
+          entry_len++; /* nope, just an escaped quote */
+          state = ParserState.COLLECT;
+          break;
+        } else if (ch.isspace()) { /* space after end quote */
+          state = ParserState.TAILSPACE;
+          break;
+        }
+        /*errno = EILSEQ;
           PMNF(errno, ": bad end quote in element %d", (r + 1));*/
-          critical("garbage after end quote in element %d", (r + 1));
-          return null;
+        critical("garbage after end quote in element %d", (r + 1));
+        return null;
       }
       if (!eol) /* don't skip first character of new line */
         src = src.next_char();

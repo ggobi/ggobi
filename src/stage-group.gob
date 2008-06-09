@@ -97,7 +97,7 @@ get_row_id(GGobi:Stage *self  (check null type), guint i  (check < N_ROWS)) {
 }
 
 override (GGobi:Stage) gint
-get_row_for_id(GGobi:Stage *self  (check null type), gchar *id  (check null)) {
+get_row_for_id(GGobi:Stage *self  (check null type), const gchar *id  (check null)) {
   gint row = PARENT_HANDLER(self, id);
   return(row);
 }

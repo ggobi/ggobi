@@ -6,9 +6,11 @@
 using GLib;
 
 public class GGobi.StageSubset : StageFilter  {
-  public Select selection {construct; get;}
+  public Select selection { set construct; get;}
 
-  public StageSubset(construct Select selection) {}
+  public StageSubset(Select selection) {
+    this.selection = selection;
+  }
 
   construct {
     selection = new SelectAll();

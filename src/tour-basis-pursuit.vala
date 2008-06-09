@@ -67,7 +67,7 @@ public class GGobi.TourBasisPursuit : TourBasis {
     }
     mat.orthogonalize();
     mat.normalize();
-    add_frozen_vars(out mat, states);
+    add_frozen_vars(mat, states);
     
     return mat;
   }
@@ -85,7 +85,7 @@ public class GGobi.TourBasisPursuit : TourBasis {
 
     if (worsen) {
       double value = (current_index - new_index) / temp * Math.log(steps + 1);
-      return Random.double() > value;
+      return Random.next_double() > value;
     } else {
       return false;  
     }

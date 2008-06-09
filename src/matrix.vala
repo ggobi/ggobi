@@ -8,7 +8,9 @@ public class GGobi.Matrix2 : Object {
   public uint n_rows {get; construct;}
   public uint n_cols {get; construct;}
   
-  public Matrix2.with_size (construct uint n_rows, construct uint n_cols) {
+  public Matrix2.with_size (uint n_rows, uint n_cols) {
+    this.n_rows = n_rows;
+    this.n_cols = n_cols;
   }  
   
   construct {    
@@ -36,7 +38,8 @@ public class GGobi.Matrix2 : Object {
       for(uint j = 0; j < n_cols; j++) {
         copy.vals[i, j] = vals[i, j];
       }
-    }    
+    }
+    return copy;
   }
   
   public void remove_cols (SList cols) {

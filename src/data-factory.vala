@@ -15,11 +15,18 @@ public abstract class GGobi.DataFactory : GLib.Object {
    *
    * Returns: #GSList of #GGobiData objects
    */
-  public virtual SList<Data>
+  public virtual SList<Data>?
   create(InputSource source)
   {
-    Input input = source.get_input(null);
-    
+    Input input;
+
+    try {
+      input = source.get_input();
+    } catch(GLib.Error err) {
+      return null; // FIXME: should not catch this error (propagate)
+    }
+
+    // FIXME: InputSource.get_input should really throw an error here.
     if (input == null)
       return null;
     
@@ -40,15 +47,7 @@ public abstract class GGobi.DataFactory : GLib.Object {
   private Input
   decode_input(Input input)
   {
-    Input decoded;
-    /* we have to explicitly ref 'input' because Gsf for some reason thinks
-       it's a good idea to take ownership of parameters */
-    if((decoded = ((Input)input.@ref()).uncompress()) != input)
-      return decoded;
-    else {
-      input.unref();
-      return input;
-    }
+    return Input.uncompress(input);
   }
   
   private static int
@@ -77,7 +76,7 @@ public abstract class GGobi.DataFactory : GLib.Object {
       supports = get_supported_modes().find_custom(mode, strcmp) != null;
     else { /* check file extensions for NULL mode */
       string uri = source.uri;
-      URI parsed_uri = new URI.parse(uri);
+      URI parsed_uri = URI.parse(uri);
       if (parsed_uri != null && parsed_uri.path != null) {
         uint len, read;
         SList<string> exts = get_file_exts_for_mode(mode);
@@ -86,7 +85,7 @@ public abstract class GGobi.DataFactory : GLib.Object {
         string utf8_path = unescaped.locale_to_utf8(-1, out read, out len, null);
         if (utf8_path != null) {
           string path = utf8_path.casefold();
-          supports = exts.find_custom(path, is_ext) != null;
+          supports = exts.find_custom(path, (GLib.CompareFunc)is_ext) != null;
         } else warning("Could not convert path '%s' to UTF8", unescaped);
       }
       if (parsed_uri == null)

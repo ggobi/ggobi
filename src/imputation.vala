@@ -4,8 +4,8 @@ Basic imputation classes used by StageImpute */
 
 using GLib;
 
-public class GGobi.Imputation : Object {
-  public void impute(weak StageImpute stage, uint j) {
+public abstract class GGobi.Imputation : Object {
+  public void impute(StageImpute stage, uint j) {
     pre_compute(stage, j);
     
     for(uint i = 0; i < stage.n_rows; i++) {
@@ -15,7 +15,7 @@ public class GGobi.Imputation : Object {
   }
   
   public abstract double impute_single(uint i);
-  public abstract void pre_compute(StageImpute stage, uint j);
+  public virtual void pre_compute(StageImpute stage, uint j) { }
   public abstract string description();
   public virtual bool equals(Imputation that) {
     return that.get_type() == that.get_type();

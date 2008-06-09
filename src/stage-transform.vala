@@ -1,7 +1,7 @@
 
 // FIXME: Add names transformation back in
 
-// static string name_tform_func(string name, pointer data)
+// static string name_tform_func(string name, void* data)
 // {
 //   Transform tform = GGOBI_TRANSFORM(data);
 //   return(ggobi_transform_variable_name(tform, name));
@@ -15,11 +15,14 @@ public class GGobi.StageTransform : Stage {
   private PipelineMatrix cache; 
   private HashTable<uint, Transform> active_tforms;
   
-  public StageTransform(construct Stage parent) {}
+  public StageTransform(Stage parent) {
+    this.parent = parent;
+  }
   
   construct {
     cache = new PipelineMatrix();
-    active_tforms = new HashTable.full(null, null, null, g_object_unref);
+    active_tforms = new HashTable<uint, Transform>.full(int_hash, int_equal,
+                                                        null, g_object_unref);
   }
   
   override void process_outgoing(PipelineMessage msg)  {
@@ -34,7 +37,7 @@ public class GGobi.StageTransform : Stage {
    * transformed.  It is only possible to register a single transform 
    * against a given column, per transform stage.
    */
-  public void apply(uint j, Transform tform) {
+  public void apply(uint j, Transform? tform) {
     Variable v = get_variable(j);
     if (tform == null) {
       // v.set_name_transform_func(null, null);

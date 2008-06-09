@@ -28,12 +28,8 @@ libggobi_la_VALAS = \
   gui-varlist.vala \
   gui-viewer.vala \
   imputation.vala \
-  input-ftp.vala \
-  input-http.vala \
   input-source-factory.vala \
   input-source-file.vala \
-  input-source-ftp.vala \
-  input-source-http.vala \
   input-source.vala \
   matrix.vala \
   pipeline-factory.vala \
@@ -230,9 +226,9 @@ MAINTAINERCLEANFILES = $(BUILT_SOURCES)
 	@touch $@
 
 if HAS_VALA
-.vala.stamp: $(libggobi_la_VALAS) ../vapi/ggobi-compat.vapi ../vapi/gsf.vapi
-	@VALAC@ --basedir=. --library=ggobi --vapidir=../vapi \ 
-    --pkg=gtk+-2.0 --pkg=gsf --pkg=ggobi-compat --pkg=libxml-2.0 \
+.vala.stamp: $(libggobi_la_VALAS) ../vapi/ggobi-compat.vapi ../vapi/libgsf-1.vapi
+	@VALAC@ -C --basedir=. --library=ggobi --vapidir=../vapi \ 
+    --pkg=gtk+-2.0 --pkg=libgsf-1 --pkg=ggobi-compat --pkg=libxml-2.0 \
     $(libggobi_la_VALAS)
 	@touch $@
 else
