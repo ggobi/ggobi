@@ -23,8 +23,6 @@
 #include "vars.h"
 #include "externs.h"
 
-#include "ggobi-renderer-factory.h"
-
 /*--------------------------------------------------------------------*/
 /*                             Events                                 */
 /*--------------------------------------------------------------------*/
@@ -36,8 +34,6 @@ splot_configure_cb (GtkWidget *w, GdkEventConfigure *event, splotd *sp)
   displayd *display = (displayd *) sp->displayptr; 
   cpaneld *cpanel = &display->cpanel;
   GGobiStage *d = display->d;
-  GGobiRendererFactory *factory = ggobi_renderer_factory_new();
-  GGobiRenderer *renderer; 
 
   /*
    * Somehow when a new splot is added to a table, the initial
@@ -63,19 +59,12 @@ splot_configure_cb (GtkWidget *w, GdkEventConfigure *event, splotd *sp)
     g_object_unref (G_OBJECT(sp->pixmap0));
   if (sp->pixmap1 != NULL)
     g_object_unref (G_OBJECT(sp->pixmap1));
-/*
+
   sp->pixmap0 = gdk_pixmap_new (w->window,
     w->allocation.width, w->allocation.height, -1);
   sp->pixmap1 = gdk_pixmap_new (w->window,
     w->allocation.width, w->allocation.height, -1);
-*/
-  
-  renderer = ggobi_renderer_factory_create(factory, w->window);
-  sp->pixmap0 = GDK_DRAWABLE(renderer);
-  renderer = ggobi_renderer_factory_create(factory, w->window);
-  sp->pixmap1 = GDK_DRAWABLE(renderer);
-  g_object_unref(G_OBJECT(factory));
-  
+
   if (cpanel->imode == BRUSH) {
     sp->brush_pos.x1 = (gint) ((gdouble) sp->brush_pos.x1 *
       (gdouble) (w->allocation.width) / (gdouble) (sp->max.x));

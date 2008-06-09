@@ -1,5 +1,7 @@
 SUBDIRS = src plugins po doc tests
 
+ACLOCAL_AMFLAGS = -I m4
+
 EXTRA_DIST = bootstrap
 
 datafilesdir = $(datadir)/doc/ggobi/examples

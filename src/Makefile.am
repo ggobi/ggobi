@@ -6,9 +6,6 @@ libggobi_la_GOBS = \
   gui-transform.gob \
   plugin-factory.gob \
   plugin.gob \
-  renderer-cairo.gob \
-  renderer-factory.gob \
-  renderer.gob \
   stage-group.gob \
   stage.gob \
   type-registry.gob \

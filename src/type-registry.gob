@@ -1,3 +1,4 @@
+// FIXME: rewrite this (in Vala) using design of GIOExtensionPoint
 class GGobi:Type:Registry from G:Object {
   private GType type;
   property UINT type

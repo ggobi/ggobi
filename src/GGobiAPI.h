@@ -51,9 +51,6 @@
 #include "ggobi-variable-group.h"
 #include "ggobi-variable.h"
 #include "bitset.h"
-#include "ggobi-renderer.h"
-#include "ggobi-renderer-cairo.h"
-#include "ggobi-renderer-factory.h"
 
 /**
  This is the publically accessible set of routines that allow a developer

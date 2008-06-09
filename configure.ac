@@ -151,6 +151,9 @@ AC_LIBTOOL_WIN32_DLL
 AC_LIBTOOL_DLOPEN
 AC_PROG_LIBTOOL
 
+## Experiment: DOLT libtool bypass
+DOLT
+
 # Check for questionable functions (kind of paranoid)
 AC_FUNC_MALLOC
 AC_CHECK_FUNCS([pow sqrt strrchr strstr memset])
