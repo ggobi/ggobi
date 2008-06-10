@@ -116,16 +116,16 @@ filesel_ok (GtkWidget * chooser)
       if (load_data (uri, mode_name, gg))
       /*-- destroy and rebuild the menu every time data is read in --*/
         display_menu_build (gg);
-
+      
       /*
        * If this is the first data read in, we need a call to
        * full_viewmode_set to initialize the mode and projection,
        * and to make the Options menu appear.
        */
-      if (firsttime) {
+      /*if (firsttime) {
         gg->pmode = XYPLOT;
         ggobi_full_viewmode_set (XYPLOT, DEFAULT_IMODE, gg);
-      }
+        }*/
       
       g_free(combo_text);
     }

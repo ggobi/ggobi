@@ -21,8 +21,9 @@ public class GGobi.StageTransform : Stage {
   
   construct {
     cache = new PipelineMatrix();
-    active_tforms = new HashTable<uint, Transform>.full(int_hash, int_equal,
-                                                        null, g_object_unref);
+    active_tforms =
+      new HashTable<uint, Transform>.full(direct_hash, direct_equal, null,
+                                          g_object_unref);
   }
   
   override void process_outgoing(PipelineMessage msg)  {

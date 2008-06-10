@@ -89,15 +89,15 @@ public class GGobi.PipelineMessage : Object  {
   }
   
   // Lists the indices of the changed columns.
-  public SList<uint> get_changed_cols() {
+  public SList<uint>? get_changed_cols() {
     return changed_cols.get_indices();
   }
   // Lists the indices of the removed columns
-  public SList<uint> get_removed_cols() {
+  public SList<uint>? get_removed_cols() {
     return removed_cols.get_indices();
   }
   // Lists the indices of the removed columns
-  public SList<uint> get_removed_rows() {
+  public SList<uint>? get_removed_rows() {
     return removed_rows.get_indices();
   }
   
@@ -167,14 +167,14 @@ public class GGobi.PipelineMessage : Object  {
   }
   
   // Registers a change to a list of columns. 
-  public void change_cols(SList<uint> cols) {
+  public void change_cols(SList<uint>? cols) {
     foreach(uint j in cols) 
       change_col(j);
   }
   
   // Registers the removal of a list of a columns. Indices of changed columns
   // are automatically shifted, because they are assumed to occur after removal.
-  public void remove_cols(SList<uint> cols) {
+  public void remove_cols(SList<uint>? cols) {
     /* ensure sorted for index updating */
     SList<uint> sorted_cols = cols.copy();
     sorted_cols.sort(PipelineMessage.index_compare);
@@ -188,7 +188,7 @@ public class GGobi.PipelineMessage : Object  {
   }
 
   // Registers the removal of a list of rows.
-  public void remove_rows(SList<uint> rows) {
+  public void remove_rows(SList<uint>? rows) {
     foreach(uint index in rows) {
       // g_return_if_fail(index < n_rows + n_added_rows);
       if (index < n_cols)
@@ -214,7 +214,7 @@ public class GGobi.PipelineMessage : Object  {
    * a filter of the data matrix.
    *
    */
-  public void filter_cols(SList<uint> cols) {
+  public void filter_cols(SList<uint>? cols) {
     SList<uint> sorted_cols = cols.copy();
     sorted_cols.sort(index_compare);
     uint new_cols = n_cols;
@@ -239,7 +239,7 @@ public class GGobi.PipelineMessage : Object  {
    * a filter of the data matrix.
    *
    */
-  public void filter_rows(SList<uint> rows) {
+  public void filter_rows(SList<uint>? rows) {
     SList<uint> sorted_rows = rows.copy();
     sorted_rows.sort(index_compare);
 
@@ -308,7 +308,7 @@ public class GGobi.PipelineMessage : Object  {
   
   /* utilities */
   
-  private SList<uint> shift_indices(
+  private SList<uint>? shift_indices(
     Bitset first, Bitset second, out uint over
   ) {
     SList<uint> first_ind = first.get_indices(), shifted, ind;

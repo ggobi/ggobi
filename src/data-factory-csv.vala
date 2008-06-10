@@ -27,7 +27,7 @@ public class GGobi.DataFactoryCSV:DataFactory
   }
   
   override SList<string>
-  get_base_file_exts_for_mode(string mode) 
+  get_base_file_exts_for_mode(string? mode) 
   {
     SList<string> exts = null;
     if (mode == null || mode == "csv") {

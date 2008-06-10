@@ -81,7 +81,7 @@ public class GGobi.InputSourceFactory : GLib.Object
    * Returns: #GGobiInputSource for the URI
    */
   public virtual InputSource? // FIXME: throw an exception, not null
-  create(string uri, string mode)
+  create(string uri, string? mode)
   {
     InputSource source = null;
     string source_type = null;

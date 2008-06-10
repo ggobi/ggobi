@@ -48,7 +48,7 @@ public class GGobi.Bitset : Object {
   /* the indices must be sorted for insertion and removal */
   // FIXME: Do we want to sort here?
   public void
-  remove_indices(SList<uint> indices)
+  remove_indices(SList<uint>? indices)
   {
     uint i = indices.length() > 0 ? indices.nth_data(0) : 0, dec = 0;
     foreach(uint index in indices) {
@@ -63,7 +63,7 @@ public class GGobi.Bitset : Object {
     }
   }
   public void /* just the opposite of removal */
-  insert_indices(SList<uint> indices)
+  insert_indices(SList<uint>? indices)
   {
     SList<uint> rev_indices = indices.copy();
     rev_indices.reverse();
@@ -79,7 +79,7 @@ public class GGobi.Bitset : Object {
       inc--;
     }
   }
-  public SList<uint>
+  public SList<uint>?
   get_indices()
   {
     uint i;

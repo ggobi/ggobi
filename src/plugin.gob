@@ -2,6 +2,26 @@
   // FIXME: should be temporary - need to clean up the "GGobi context"
   #include "session.h"
 %}
+
+/** Comments:
+    Need to refactor plugin framework to move beyond XML metadata.
+    
+    Refactorings:
+
+    Plugin -> interface Plugin
+
+    Plugin should be an abstract class or interface that allows plugin
+    modules to report metadata to GGobi. It should also help with
+    loading the plugins, synchronizing them with GGobi state,
+    etc. Implementations will handle a particular type of module. The
+    default implementation will be GModulePlugin (loading using GModule).
+    
+    PluginFactory -> interface PluginRegistry
+
+    Lists plugins available at a given source and creates Plugin
+    objects from them. XMLPluginRegistry will be one implementation.
+*/
+
 class GGobi:Plugin from G:Type:Module {
   
   /* The underlying library object */

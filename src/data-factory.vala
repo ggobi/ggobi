@@ -123,7 +123,7 @@ public abstract class GGobi.DataFactory : GLib.Object {
    * Returns: #GSList of file extension strings
    */
   public SList<string>
-  get_file_exts_for_mode(string mode)
+  get_file_exts_for_mode(string? mode)
   {
     SList<string> decoded_exts = new SList<string>();
     
@@ -153,5 +153,5 @@ public abstract class GGobi.DataFactory : GLib.Object {
    * Returns: #GSList of file extension strings
    */
   public abstract SList<string>
-  get_base_file_exts_for_mode(string mode);
+  get_base_file_exts_for_mode(string? mode);
 }

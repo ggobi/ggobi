@@ -129,7 +129,6 @@ pipeline_create_cb(GGobiPipelineFactory *factory, GGobiStage *root, GGobiSession
   GGobiGuiImpute *gui_impute;
   gui_impute = g_object_new(GGOBI_TYPE_GUI_IMPUTE, "stage", GGOBI_STAGE_IMPUTE(impute), NULL);
   gtk_widget_show(GTK_WIDGET(gui_impute));
-  
 
 }
 

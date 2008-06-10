@@ -14,18 +14,20 @@ pure vala code.
 using GLib;
 
 public class GGobi.PipelineMatrix : GLib.Object {
+  private uint _n_cols;
   public uint n_cols {
     get { return matrix.n_cols; }
-    construct { matrix.n_cols = value; }
+    construct { _n_cols = value; }
   }
+  private uint _n_rows;
   public uint n_rows {
     get { return matrix.n_rows; }
-    construct { matrix.n_rows = value; }
+    construct { _n_rows = value; }
   }
   public Matrix matrix;
   
   construct {
-    matrix = new Matrix(0, 0);
+    matrix = new Matrix(_n_rows, _n_cols);
   }
   
   public double get(uint i, uint j) {
