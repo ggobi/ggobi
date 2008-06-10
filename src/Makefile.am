@@ -38,6 +38,7 @@ libggobi_la_VALAS = \
   stage-freeze.vala \
   stage-impute.vala \
   stage-jitter.vala \
+  stage-missing.vala \
   stage-randomize.vala \
   stage-standardize.vala \
   stage-subset.vala \
@@ -224,7 +225,7 @@ MAINTAINERCLEANFILES = $(BUILT_SOURCES)
 
 if HAS_VALA
 .vala.stamp: $(libggobi_la_VALAS) ../vapi/ggobi-compat.vapi ../vapi/libgsf-1.vapi
-	@VALAC@ -C --basedir=. --library=ggobi --vapidir=../vapi \ 
+	@VALAC@ -C --basedir=. --library=ggobi --vapidir=../vapi \
     --pkg=gtk+-2.0 --pkg=libgsf-1 --pkg=ggobi-compat --pkg=libxml-2.0 \
     $(libggobi_la_VALAS)
 	@touch $@

@@ -9,13 +9,13 @@ TODO: Return categorical variables with values present and missing.
 */
 using GLib;
 
-public class GGobi.StageJitter : Stage {
+public class GGobi.StageMissing : Stage {
   
   override double get_raw_value(uint i, uint j) {
     Variable v = get_variable(j);
-    if (v.is_attribute()) return parent.get_raw_value(i, j);
+    if (v.is_attribute) return parent.get_raw_value(i, j);
     
-    return parent.is_missing(i, j);
+    return (double) parent.is_missing(i, j);
   }
 
   override void set_raw_value(uint i, uint j, double value) {
