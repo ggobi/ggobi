@@ -40,6 +40,7 @@ libggobi_la_VALAS = \
   stage-jitter.vala \
   stage-missing.vala \
   stage-randomize.vala \
+  stage-screen.vala \
   stage-standardize.vala \
   stage-subset.vala \
   stage-transform.vala \
