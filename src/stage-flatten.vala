@@ -15,14 +15,14 @@ There are currently four flattenning stages:
 	
 */
 
-public class GGobi.Stage.Flatten : Stage {
+public class GGobi.StageFlatten : Stage {
 	
 }
 
-public class GGobi.Stage.Project : Stage.Flatten {}
-public class GGobi.Stage.Project1d : Stage.Project {}
-public class GGobi.Stage.Project2d : Stage.Project {}
+public class GGobi.StageProject : StageFlatten {}
+public class GGobi.StageProject1d : StageProject {}
+public class GGobi.StageProject2d : StageProject {}
 
-public class GGobi.Stage.Select : Stage.Flatten {}
-public class GGobi.Stage.Select1d : Stage.Select {}
-public class GGobi.Stage.Select2d : Stage.Select {}
+public class GGobi.StageSelect : StageFlatten {}
+public class GGobi.StageSelect1d : StageSelect {}
+public class GGobi.StageSelect2d : StageSelect {}

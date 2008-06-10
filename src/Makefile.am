@@ -36,6 +36,7 @@ libggobi_la_VALAS = \
   stage-ash.vala \
   stage-display.vala \
   stage-filter.vala \
+  stage-flatten.vala \
   stage-freeze.vala \
   stage-impute.vala \
   stage-jitter.vala \
