@@ -33,6 +33,7 @@ libggobi_la_VALAS = \
   pipeline-matrix.vala \
   pipeline-message.vala \
   select.vala \
+  stage-ash.vala \
   stage-display.vala \
   stage-filter.vala \
   stage-freeze.vala \
@@ -43,6 +44,7 @@ libggobi_la_VALAS = \
   stage-screen.vala \
   stage-standardize.vala \
   stage-subset.vala \
+  stage-texture.vala \
   stage-transform.vala \
   svd2.vala \
   tour-basis-list.vala \

@@ -10,6 +10,6 @@ appropriate for dynamic displays.
 
 */
 
-public class GGobi.Stage.Texture : Stage {
+public class GGobi.StageTexture : Stage {
 	
 }

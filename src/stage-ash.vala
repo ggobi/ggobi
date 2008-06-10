@@ -8,6 +8,6 @@ represents the estimated 1d density at each point of the input.
 
 */
 
-public class GGobi.Stage.Ash : Stage {
+public class GGobi.StageAsh : Stage {
 	
 }
