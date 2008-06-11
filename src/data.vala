@@ -162,8 +162,23 @@ public class GGobi.Data : Stage {
   override int get_row_for_id(string id) {
     // FIXME: need to call lookup_extended here to check for hit
     // Return -1 if no such id
-    // VALABUG: not clear how to do this with vala, glib binding problem?
-    return (int)id_to_row.lookup(id);
+    // VALABUG: not clear how to do this with vala, glib binding
+    // problem?
+    /*string key;
+    int val;
+    uint get_val;
+    bool found = id_to_row.lookup_extended(id, out key, out get_val);
+    if (!found)
+      val = -1;
+    else val = (int)get_val;
+    return val;
+    */
+    int row = -1;
+    uint val = (int)id_to_row.lookup(id);
+    if (val == 0 && n_rows > 0 && strcmp(row_ids[0], id) == 0)
+      row = 0;
+    else if (val != 0) row = (int)val;
+    return row;
   }
 
   /**

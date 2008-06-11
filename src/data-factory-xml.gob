@@ -1518,8 +1518,7 @@ class GGobi:Data:Factory:XML from GGobi:Data:Factory
         gint m = ggobi_stage_get_row_for_id (d, (gchar *) tmp);
         /* every row has an id now - if 'tmp' is the same as the default id,
            we should not report an error */
-        // FIXME: **HACK** m!=0 because get_row_for_id is broken
-        if (m != 0 && m != data->current_record)
+        if (m >= 0)
           self_error_handler (data,
                          "duplicated id (%s) in records %d and %d of dataset %s\n",
                          (gchar *) tmp,
