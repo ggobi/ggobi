@@ -41,14 +41,20 @@ edges_alloc (gint nsegs, GGobiStage * d)
 }
 
 void
-edges_free (GGobiStage * d, GGobiSession * gg)
+edge_data_free(EdgeData *ed)
 {
   gpointer ptr;
 
-  vectorb_free (&ggobi_stage_get_edge_data(d)->xed_by_brush);
-  ptr = (gpointer) ggobi_stage_get_edge_data(d)->sym_endpoints;
+  vectorb_free (&ed->xed_by_brush);
+  ptr = (gpointer) ed->sym_endpoints;
   g_free (ptr);
-  ggobi_stage_get_edge_data(d)->n = 0;
+  ed->n = 0;
+}
+
+void
+edges_free (GGobiStage * d, GGobiSession * gg)
+{
+  edge_data_free(ggobi_stage_get_edge_data(d));
 }
 
 /* --------------------------------------------------------------- */

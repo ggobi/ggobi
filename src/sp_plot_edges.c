@@ -269,7 +269,6 @@ splot_edges_draw (splotd * sp, gboolean draw_hidden, GdkDrawable * drawable,
                                             (gint) ltype, GDK_CAP_BUTT,
                                             GDK_JOIN_ROUND);
               }
-
               gdk_draw_segments (drawable, gg->plot_GC, sp->edges, nl);
             }
 

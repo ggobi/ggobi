@@ -40,7 +40,7 @@ public class GGobi.Stage : GLib.Object {
   public int get_col_index_for_name(string name);
   
   public virtual uint get_n_edges();
-  public virtual EdgeData? get_edge_data();
+  public virtual weak EdgeData get_edge_data();
   
   public virtual void refresh_col_(uint j);
   public virtual void refresh_col(uint j);

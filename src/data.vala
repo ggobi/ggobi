@@ -28,6 +28,9 @@ public class GGobi.Data : Stage {
   /* The row ids */
   private string[] row_ids;
 
+  /* Edge data */
+  private EdgeData edge_data = new EdgeData();
+  
   construct {
     name = "unknown"; 
     raw = new Matrix(0, 0);
@@ -137,11 +140,11 @@ public class GGobi.Data : Stage {
   }
 
   override uint get_n_edges() {
-    return 0;
+    return edge_data.n;
   }
 
-  override EdgeData? get_edge_data () {
-    return null;
+  override weak EdgeData get_edge_data () {
+    return edge_data;
   }
 
   override void set_row_id(uint i, string? value) {
@@ -159,6 +162,7 @@ public class GGobi.Data : Stage {
   override int get_row_for_id(string id) {
     // FIXME: need to call lookup_extended here to check for hit
     // Return -1 if no such id
+    // VALABUG: not clear how to do this with vala, glib binding problem?
     return (int)id_to_row.lookup(id);
   }
 

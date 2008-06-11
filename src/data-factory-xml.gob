@@ -1518,7 +1518,8 @@ class GGobi:Data:Factory:XML from GGobi:Data:Factory
         gint m = ggobi_stage_get_row_for_id (d, (gchar *) tmp);
         /* every row has an id now - if 'tmp' is the same as the default id,
            we should not report an error */
-        if (m != data->current_record)
+        // FIXME: **HACK** m!=0 because get_row_for_id is broken
+        if (m != 0 && m != data->current_record)
           self_error_handler (data,
                          "duplicated id (%s) in records %d and %d of dataset %s\n",
                          (gchar *) tmp,
@@ -1556,19 +1557,19 @@ class GGobi:Data:Factory:XML from GGobi:Data:Factory
 
         if (ggobi_stage_get_edge_data (d)->sym_endpoints == NULL)
           {
-            // GGOBI_DATA (d)->edge.n = d->n_rows;
+            ggobi_stage_get_edge_data(d)->n = d->n_rows;
             //g_debug("no endpoints yet, allocating space for: %d", ggobi_stage_get_n_edges (d));
-            // GGOBI_DATA (d)->edge.sym_endpoints = (SymbolicEndpoints *)
-              // g_malloc (sizeof (SymbolicEndpoints) *
-                        // ggobi_stage_get_n_edges (d));
+            ggobi_stage_get_edge_data(d)->sym_endpoints = (SymbolicEndpoints *)
+              g_malloc (sizeof (SymbolicEndpoints) *
+                        ggobi_stage_get_n_edges (d));
           }
           //g_debug("setting edge record: %d", data->current_record);
-        // ggobi_stage_get_edge_data (d)->sym_endpoints[data->current_record].a =
-        //   self_intern (data, tmp);
-        // ggobi_stage_get_edge_data (d)->sym_endpoints[data->current_record].b =
-        //   self_intern (data, dest);
-        // ggobi_stage_get_edge_data (d)->sym_endpoints[data->current_record].
-        //   jpartner = -1;
+        ggobi_stage_get_edge_data (d)->sym_endpoints[data->current_record].a =
+        self_intern (data, tmp);
+        ggobi_stage_get_edge_data (d)->sym_endpoints[data->current_record].b =
+        self_intern (data, dest);
+        ggobi_stage_get_edge_data (d)->sym_endpoints[data->current_record].
+          jpartner = -1;
       }
 
     return (true);
