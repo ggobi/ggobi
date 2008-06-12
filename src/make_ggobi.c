@@ -108,11 +108,11 @@ pipeline_create_cb(GGobiPipelineFactory *factory, GGobiStage *root, GGobiSession
   g_object_unref(standardize);
   g_object_unref(subset);
   g_object_unref(transform);
-  /*  
+    
   GGobiGuiViewer *viewer; 
   viewer = g_object_new(GGOBI_TYPE_GUI_VIEWER, "stage", GGOBI_STAGE(display), NULL);
   gtk_widget_show(GTK_WIDGET(viewer));
-  
+  /*
   GGobiGuiSubset *gui_subset;
   gui_subset = g_object_new(GGOBI_TYPE_GUI_SUBSET, "stage", GGOBI_STAGE_SUBSET(subset), NULL);
   gtk_widget_show(GTK_WIDGET(gui_subset));

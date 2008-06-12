@@ -35,7 +35,7 @@ public class GGobi.Data : Stage {
     name = "unknown"; 
     raw = new Matrix(0, 0);
     missing = new Matrix(0, 0);
-    id_to_row = new HashTable<string, int>(str_hash, direct_equal);
+    id_to_row = new HashTable<string, uint>(str_hash, str_equal);
     add_cols(n_cols);
     add_rows(n_rows);
   }
@@ -152,7 +152,7 @@ public class GGobi.Data : Stage {
     if (val == null)
       val = (i + 1).to_string("%d");
     row_ids[i] = val;
-    id_to_row.replace(row_ids[i], i);
+    id_to_row.replace(row_ids[i], i + 1);
   }
 
   override string get_row_id(uint i) {
@@ -160,25 +160,8 @@ public class GGobi.Data : Stage {
   }
 
   override int get_row_for_id(string id) {
-    // FIXME: need to call lookup_extended here to check for hit
-    // Return -1 if no such id
-    // VALABUG: not clear how to do this with vala, glib binding
-    // problem?
-    /*string key;
-    int val;
-    uint get_val;
-    bool found = id_to_row.lookup_extended(id, out key, out get_val);
-    if (!found)
-      val = -1;
-    else val = (int)get_val;
-    return val;
-    */
-    int row = -1;
-    uint val = (int)id_to_row.lookup(id);
-    if (val == 0 && n_rows > 0 && strcmp(row_ids[0], id) == 0)
-      row = 0;
-    else if (val != 0) row = (int)val;
-    return row;
+    /* rows are 1-based in id_to_row, to identify missed hits */
+    return (int)id_to_row.lookup(id) - 1;
   }
 
   /**

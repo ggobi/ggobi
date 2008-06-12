@@ -26,7 +26,7 @@
 #define GGOBI_STAGE_IS_COL_CATEGORICAL(stage, col) \
   ggobi_stage_get_col_type((stage), (col)) == GGOBI_VARIABLE_CATEGORICAL
 
-// FIXME: do we really need this? macros that declare variables are messy...
+// FIXME: perhaps rename var_to_col to get_var_cols and use Vala foreach
 #define GGOBI_STAGE_VARIABLES_ITERATE(stage) \
   guint* var_to_col = ggobi_stage_translate_var_to_col((stage)); \
   guint jj = 0; \
@@ -35,16 +35,12 @@
 // Macros for getting and setting attribute values
 // -----------------------------------------------
 
-/* FIXME: Is there some way around having macros that declare variables
-   in the current scope? What about storing the attribute index inside the 
-   stage via methods named get/set_active_col(). There could be macros for
-   setting the active col for a particular attribute. Then get/set_active_value()
-   would modify the values. This might not work well when setting multiple
-   attributes at once. One way to solve this problem and the one above
-   (iterating only over the variables) is to make it easy to create different
-   "views" of a stage with regard to column indexing. This could be done
-   with additional pipeline stages, but that may be overkill.
-*/
+/* FIXME: Macros (which are really just for performance) won't fly in
+   Vala, so we probably need to convert these to functions of some
+   kind. For performance, it's worth thinking about some sort of
+   vectorization of the pipeline (like PipelineMessage except in
+   reverse). Also, attribute names should probably be namespaced like
+   the stage names.  */
 
 #define GGOBI_STAGE_ATTR_INIT(d, attribute) \
   guint attr_ ## attribute; \
