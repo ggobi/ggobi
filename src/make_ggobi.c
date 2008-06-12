@@ -96,6 +96,7 @@ pipeline_create_cb(GGobiPipelineFactory *factory, GGobiStage *root, GGobiSession
   GGOBI_STAGE(filter)->gg = gg;
   GGOBI_STAGE(impute)->gg = gg;
   GGOBI_STAGE(jitter)->gg = gg;
+  GGOBI_STAGE(randomize)->gg = gg;
   GGOBI_STAGE(standardize)->gg = gg;
   GGOBI_STAGE(subset)->gg = gg;
   GGOBI_STAGE(transform)->gg = gg;
@@ -105,6 +106,7 @@ pipeline_create_cb(GGobiPipelineFactory *factory, GGobiStage *root, GGobiSession
   g_object_unref(filter);
   g_object_unref(impute);
   g_object_unref(jitter);
+  g_object_unref(randomize);
   g_object_unref(standardize);
   g_object_unref(subset);
   g_object_unref(transform);
@@ -135,7 +137,7 @@ pipeline_create_cb(GGobiPipelineFactory *factory, GGobiStage *root, GGobiSession
 GGobiPipelineFactory *
 ggobi_create_pipeline_factory(GGobiSession *gg)
 {
-  GObject *factory = ggobi_pipeline_factory_new();
+  GObject *factory = (GObject *)ggobi_pipeline_factory_new();
   g_signal_connect(factory, "build", G_CALLBACK(pipeline_create_cb), gg);
   return(GGOBI_PIPELINE_FACTORY(factory));
 }
