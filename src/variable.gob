@@ -213,7 +213,7 @@ set_name_transform_func(self, GGobiVariableNameTransformFunc func,
 }
 
 /**
-* get_col_n_levels:
+* get_n_levels:
 * @self: categorical #GGobiStage object
 * @j: column index
 *

@@ -95,7 +95,6 @@ public class GGobi.GuiViewer : Window {
        rebuild the table from scratch */
     if (msg.get_n_removed_rows() > 0 || msg.get_n_removed_cols() > 0 ||
         msg.get_n_added_rows() > 0   || msg.get_n_added_cols() > 0 ) {
-      GLib.debug("Rebuilding table");
       initialize();
       load_data();
       return;
