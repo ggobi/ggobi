@@ -60,7 +60,9 @@ public class GGobi.StageTransform : Stage {
   }
   /* Cancel transforms at all columns. */
   public void cancel_all() {
-    foreach(uint col in active_tforms.get_keys()) cancel(col);
+    // NOTE: commented out all HashTable.get_keys() for Debby and her
+    // GLib 2.12.
+    /*foreach(uint col in active_tforms.get_keys()) cancel(col);*/
   }
   
   /* #Transform for column @j */
@@ -70,7 +72,8 @@ public class GGobi.StageTransform : Stage {
   
   /* The number of columns with transforms applied. */
   public uint get_n_transformed_cols() {
-    return active_tforms.get_keys().length();
+    /*return active_tforms.get_keys().length();*/
+    return 0;
   }
   
   override double get_raw_value(uint i, uint j) {
@@ -128,8 +131,9 @@ public class GGobi.StageTransform : Stage {
   /* whenever a property of the transform changes, assume we need to update */
   // FIXME: This may be too aggressive...
   private void transform_notify_cb(Transform tf) {
-    foreach(uint col in active_tforms.get_keys()) {
+    /*foreach(uint col in active_tforms.get_keys()) {
       if (get_transform(col) == tf) refresh_col(col);
-    }
+      }
+    */
   }
 }
