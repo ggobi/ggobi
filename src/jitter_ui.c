@@ -199,6 +199,8 @@ jitter_window_open (ggobid * gg)
 
       g_object_set_data (G_OBJECT (gg->jitter_ui.window), "notebook", notebook);
       gtk_widget_show_all (gg->jitter_ui.window);
+    } else {
+      gtk_widget_show(gg->jitter_ui.window);
     }
   }
 
