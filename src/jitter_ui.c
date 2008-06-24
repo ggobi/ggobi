@@ -69,14 +69,16 @@ degree_cb (GtkAdjustment * adj, ggobid * gg)
 static void
 close_btn_cb (GtkWidget * w, ggobid * gg)
 {
-  gtk_widget_hide (gg->jitter_ui.window);
+  gtk_widget_destroy (gg->jitter_ui.window);
+  gg->jitter_ui.window = NULL;
 }
 
 /*-- called when closed from the window manager --*/
 static void
 close_wmgr_cb (GtkWidget * w, GdkEvent * event, ggobid * gg)
 {
-  gtk_widget_hide (gg->jitter_ui.window);
+  gtk_widget_destroy (gg->jitter_ui.window);
+  gg->jitter_ui.window = NULL;
 }
 
 static gchar *type_lbl[] = { "Uniform", "Normal" };
@@ -199,8 +201,6 @@ jitter_window_open (ggobid * gg)
 
       g_object_set_data (G_OBJECT (gg->jitter_ui.window), "notebook", notebook);
       gtk_widget_show_all (gg->jitter_ui.window);
-    } else {
-      gtk_widget_show(gg->jitter_ui.window);
     }
   }
 
