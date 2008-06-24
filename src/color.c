@@ -346,6 +346,7 @@ datad_colors_used_get (gint * ncolors_used, gushort * colors_used,
   gboolean new_color;
   gint i, k, m, n;
   gushort colorid, maxcolorid = 0;
+  gushort *tmp;
 
   if (d == NULL || d->nrows == 0)
     /**/ return -1;
@@ -382,9 +383,18 @@ datad_colors_used_get (gint * ncolors_used, gushort * colors_used,
 
   /* Reorder the values in colors_used so that they are along
    * the order used in the color scheme.  Hey, that's simply
-   * a matter of putting them in numerical order.
+   * a matter of putting them in numerical order.  ... reverse
+   * numerical order works better.
   */
+
   qsort ((void *) colors_used, n, sizeof (gushort), scompare);
+  tmp = (gushort *) g_malloc(n * sizeof(gushort));
+  for (i=0; i<n; i++) 
+    tmp[n-i-1] = colors_used[i];
+  for (i=0; i<n; i++) 
+    colors_used[i] = tmp[i];
+  g_free(tmp);
+
 
 
   /*
