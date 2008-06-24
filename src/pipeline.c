@@ -176,19 +176,6 @@ pipeline_arrays_check_dimensions (GGobiData * d)
 /*                       pipeline                                          */
 /*-------------------------------------------------------------------------*/
 
-gint
-icompare (gint * x1, gint * x2)
-{
-  gint val = 0;
-
-  if (*x1 < *x2)
-    val = -1;
-  else if (*x1 > *x2)
-    val = 1;
-
-  return (val);
-}
-
 gfloat
 median_largest_dist (gfloat ** vals, gint * cols, gint ncols,
                      gfloat * min, gfloat * max, GGobiData * d, ggobid * gg)

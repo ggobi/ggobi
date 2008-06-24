@@ -272,6 +272,8 @@ gint       edgesets_count (ggobid *gg);
 void       eigenvals_get (gfloat *, GGobiData *);
 gboolean   exclude_link_by_id (gint k, GGobiData *source_d, ggobid *gg);
 gint       fcompare (const void *x1, const void *x2);
+gint       icompare (const void *x1, const void *x2);
+gint       scompare (const void *x1, const void *x2);
 void       filename_get_r (ggobid *);
 void       filename_get_w (GtkWidget *, ggobid *);
 GSList*    fileset_read (const gchar *, const gchar *modeName, GGobiPluginInfo *, ggobid *);

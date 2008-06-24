@@ -380,6 +380,13 @@ datad_colors_used_get (gint * ncolors_used, gushort * colors_used,
     }
   }
 
+  /* Reorder the values in colors_used so that they are along
+   * the order used in the color scheme.  Hey, that's simply
+   * a matter of putting them in numerical order.
+  */
+  qsort ((void *) colors_used, n, sizeof (gushort), scompare);
+
+
   /*
    * Make sure that the current brushing color is
    * last in the list, so that it is drawn on top of

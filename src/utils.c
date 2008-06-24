@@ -70,6 +70,37 @@ fcompare (const void *x1, const void *x2)
   return (val);
 }
 
+gint
+icompare (const void * x1, const void * x2)
+{
+  gint val = 0;
+  const gint *i1 = (const gint *) x1;
+  const gint *i2 = (const gint *) x2;
+
+  if (*i1 < *i2)
+    val = -1;
+  else if (*i1 > *i2)
+    val = 1;
+
+  return (val);
+}
+
+gint
+scompare (const void * x1, const void * x2)
+{
+  gint val = 0;
+  const gushort *i1 = (const gushort *) x1;
+  const gushort *i2 = (const gushort *) x2;
+
+  if (*i1 < *i2)
+    val = -1;
+  else if (*i1 > *i2)
+    val = 1;
+
+  return (val);
+}
+
+
 /*-- used to find ranks --*/
 gint
 pcompare (const void *val1, const void *val2)
