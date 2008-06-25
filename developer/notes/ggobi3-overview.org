@@ -1,0 +1,104 @@
+* GGobi Application (3.0)
+** Plugin registries
+*** Duties
+  * List plugins from a particular source
+  * Load a plugin
+  * Unload a plugin
+*** Types
+  * XML files (original)
+  * R session via rggobi (treating R packages as plugins)
+** Extension points
+  * Data factories (input different formats)
+** GGobi sessions
+*** Plots
+**** Types
+ * 1d point (dot plot)
+ * 1d area (histogram/bar chart)
+ * 2d point (scatterplot)
+ * nd area (mosaic plot)
+ * parallel coordinates plot
+ * matrix 
+ * time series
+**** Template
+***** variable selection model
+How many variables, order, etc
+***** set of layers, composed of:
+****** local pipeline
+****** set of possible interactions
+******* types
+  * brush
+  * identify
+  * pan/zoom
+  * edit points/edges
+  * plot manipulations (manual tour controls)
+******* requirements
+  * canvas
+****** geom
+******* types
+  * points
+  * lines
+  * segments
+  * polygons
+******* functions
+  * draws data
+  * maps data coordinates to data points
+***** one or two guides
+  * axes (XY, tour, categorical)
+***** canvas
+**** Concrete
+***** input pipeline + variable selection
+***** facetting specification
+****** variable selection model
+****** plot layout
+***** current interaction
+**** Drawing order (for each layer)
+  * Geom
+  * Guide
+  * Interaction mode (e.g. brush rectangle)
+*** Datasets (pipeline roots)
+*** Motions
+**** Provide
+  * Dynamic variables (e.g. tour1.1, tour1.2, ... tour2.3)
+  * Parameters (e.g. for guides and interaction modes)
+**** Types
+***** projections
+ * little tour
+ * grand tour (1d, 2d, 2x1d)
+ * guided tour
+ * cycling
+ * rocking
+***** sections (dynamic facetting)
+Needs:
+  * variable selection model
+  * range to section across
+  * speed
+  * boundary behaviour (bounce or cycle)
+*** GUI
+**** Main menus
+***** Plot
+Lists all plot types (live)
+**** Plot window menus
+***** Plot
+Allows changing plot type in window
+* Canvas library
+** Canvas
+*** Mapping between data and screen coordinates
+*** Surfaces
+**** Types
+***** Buffers
+***** Physical surface
+**** Functions
+  * Drawing target (COGL/cairo API)
+  * Events (from a widget)
+**** Implementation
+***** Drawing: OpenGL
+***** Events
+  * GTK+
+  * Clutter
+  * Qt
+** Glyph shaper
+*** Clutter/Pango/Cairo
+Plot glyphs are drawn as glyphs using cairo "user" font
+backend. Clutter pango cairo renderer caches the glyphs.
+*** Custom solution
+Roll our own glyph cache if Pango has too much overhead..
