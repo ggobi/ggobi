@@ -210,8 +210,13 @@ barchartWorldToPlane (splotd * sp, GGobiData * d, ggobid * gg)
 {
   barchartSPlotd *bsp = GGOBI_BARCHART_SPLOT (sp);
 
+/* Commenting these two lines out to fix this bug:  After
+   dragging to reset the number of bars, leaving the barplot
+   interaction mode sets the number of bars.  Question:  Will
+   this introduce new bugs????   dfs, June 2008
   barchart_clean_init(bsp);
   barchart_recalc_counts(bsp, d, gg);
+*/
 }
 
 
