@@ -285,9 +285,9 @@ motion_notify_cb (GtkWidget * w, GdkEventMotion * event, cpaneld * cpanel)
     fflush (stderr);
 #endif
 /*XX is this the correct source object? */
-    if (changed)
-      g_signal_emit (G_OBJECT (gg), GGobiSignals[BRUSH_MOTION_SIGNAL], 0,
-                     sp, event, sp->displayptr->d);
+    /*if (changed)*/ /* MFL: emit signal whenever brush moves */
+    g_signal_emit (G_OBJECT (gg), GGobiSignals[BRUSH_MOTION_SIGNAL], 0,
+                   sp, event, sp->displayptr->d);
   }
   return true;
 }

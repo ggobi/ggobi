@@ -151,7 +151,7 @@ brush_once (gboolean force, splotd * sp, ggobid * gg)
 /*
  * Now paint.
 */
-  if (cpanel->br.point_targets) {
+  if (!cpanel->br.edge_targets /*cpanel->br.point_targets*/) {
     changed = active_paint_points (sp, d, gg);
   }
 
@@ -425,11 +425,12 @@ brush_draw_brush (splotd * sp, GdkDrawable * drawable, GGobiData * d,
 {
 /*
  * Use brush_pos to draw the brush.
-*/
+ */
   displayd *display = sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
   gboolean point_painting_p = (cpanel->br.point_targets != br_off);
   gboolean edge_painting_p = (cpanel->br.edge_targets != br_off);
+  gboolean selection_p = !point_painting_p && !edge_painting_p;
   colorschemed *scheme = gg->activeColorScheme;
 
   brush_coords *brush_pos = &sp->brush_pos;
@@ -438,12 +439,23 @@ brush_draw_brush (splotd * sp, GdkDrawable * drawable, GGobiData * d,
   gint y1 = MIN (brush_pos->y1, brush_pos->y2);
   gint y2 = MAX (brush_pos->y1, brush_pos->y2);
 
-  if (cpanel->br.mode == BR_TRANSIENT)
+  if (cpanel->br.mode == BR_TRANSIENT) {
+    gint8 dash_list[2];
     gdk_gc_set_line_attributes (gg->plot_GC,
                                 0, GDK_LINE_ON_OFF_DASH, GDK_CAP_ROUND,
                                 GDK_JOIN_ROUND);
-
-  if (point_painting_p) {
+    /* just selection: set special dash pattern and draw like points */
+    if (selection_p) {
+      dash_list[0] = 2;
+      dash_list[1] = 2;
+    } else { /* otherwise set to default */
+      dash_list[0] = 4;
+      dash_list[1] = 4;
+    }
+    gdk_gc_set_dashes(gg->plot_GC, 0, dash_list, 2);
+  }
+  
+  if (point_painting_p || selection_p) {
 
     /* set brush color for points */
     if (cpanel->br.point_targets == br_shadow) {
@@ -452,13 +464,14 @@ brush_draw_brush (splotd * sp, GdkDrawable * drawable, GGobiData * d,
     else if (cpanel->br.point_targets == br_unshadow) {
       gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
     }
-    else if ((scheme->rgb[gg->color_id].red != scheme->rgb_bg.red) ||
-             (scheme->rgb[gg->color_id].blue != scheme->rgb_bg.blue) ||
-             (scheme->rgb[gg->color_id].green != scheme->rgb_bg.green)) {
+    else if ((scheme->rgb[gg->color_id].red != scheme->rgb_bg.red ||
+              scheme->rgb[gg->color_id].blue != scheme->rgb_bg.blue ||
+              scheme->rgb[gg->color_id].green != scheme->rgb_bg.green) &&
+             !selection_p) {
       gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[gg->color_id]);
     }
     else {
-      /* I don't remember what this is for ... -- dfs */
+      /* for selection (at least) */
       gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
     }
 
@@ -516,6 +529,7 @@ brush_draw_brush (splotd * sp, GdkDrawable * drawable, GGobiData * d,
     }
 
   }
+
   if (cpanel->br.mode == BR_TRANSIENT)
     gdk_gc_set_line_attributes (gg->plot_GC,
                                 0, GDK_LINE_SOLID, GDK_CAP_ROUND,
