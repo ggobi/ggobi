@@ -23,8 +23,8 @@
 ***** variable selection model
 How many variables, order, etc
 ***** set of layers, composed of:
-****** local pipeline
-****** set of possible interactions
+****** local pipeline (flatten stage)
+****** set of possible interaction modes
 ******* types
   * brush
   * identify

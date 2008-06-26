@@ -1,0 +1,53 @@
+Plots ------------------------------------------------------------------------
+
+A plot combines all the pieces to make a GGobi plot.  Each plot is composed of:
+
+  * a set of layers (one of which is active), each having
+    * link to the pipeline (generally through stage-flatten)
+    * set of interaction modes (one of which is active)
+    * a geom
+  * a canvas/surface
+  * guides (e.g. tour axis, variable circles, axis labels)
+  * a gui
+
+Existing types
+  * 1d point (dot plot)
+  * 1d area (histogram/bar chart)
+  * 2d point (scatterplot)
+  * nd area (mosaic plot)
+  * parallel coordinates plot
+  * matrix 
+  * time series
+
+
+Interaction modes ------------------------------------------------------------
+
+An interaction mode turns plot events into data events.  It is composed of:
+
+  * a link to the plot canvas/surface
+  * a rendering layer for its visual representation 
+  
+An interaction mode can either be active or inactive.  Only a single interaction mode is active at a time (GGobi-wide).  
+
+Existing modes:
+  * brush: changes colour, size and shape attributes
+  * identify: changes sticky label attribute; displays text on screen
+  * pan/zoom: changes viewport properties of canvas
+  * edit points/edges: changes data 
+  * manual tour controls: changes projection matrix in stage-project
+
+New modes:
+  * axis identify: draws on screen
+
+
+Geom -------------------------------------------------------------------------
+
+A geom (geometric element) is responsible for turning data into a visual representation, and mapping from locations in the data space to observations (rows in the data matrix).
+
+Existing geoms:
+  * points
+  * segments
+  * bars
+New geoms:
+  * lines
+  * polygons
