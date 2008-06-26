@@ -9,39 +9,46 @@ Transforms data to screen (and vice versa)
 class Canvas {
   
   List<surface> surfaces;
-  Surface result_surface;
-  SurfaceFactory factory;
+  Surface buffer;
   
-  limits screen_x;
-  limits screen_y;
+  // Store screen and data limits
+  int width {get;};
+  int height {get;};
 
-  limits data_x;
-  limits data_y;
+  Limits data_x;
+  Limits data_y;
   
   Surface create_surface() {
-    s = factory.create();
-    s.canvas = self;
-    return(s);
-  }
-  
-  int get_width() {
-    return xlim.max - xlim.min;
-  }
-  int get_height() {
-    return ylim.max - ylim.min;
+    return new Surface(this);
   }
   
   int transform_x(double x) { 
-    return (x - xlim.min) / xlim.max;
+    return (int) ((x - xlim.min) / xlim.max * width);
   }
   int transform_y(double y) {
-    return (y - ylim.min) / ylim.max;
+    return (int) ((y - ylim.min) / ylim.max * height);
+  }
+  
+  void resize(int width, int height) {
+    this.width = width;
+    this.height = height;
+    
+    foreach(surface in surfaces) {
+      surface.resize();
+    }
   }
   
   // Build single layer that has all layers composited
   // Responsibility of each layer to call as needed
   void recomposite() {
-    
+    buffer.clear();
+    foreach(surface in surfaces) {
+      surface.render(buffer);
+    }
+  }
+  
+  void render(GdkDrawable target) {
+    buffer.render_to_drawable(target)
   }
   
   

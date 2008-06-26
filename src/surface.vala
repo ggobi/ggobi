@@ -15,7 +15,16 @@ class Surface {
   }
   
   void resize() {
-    buffer = new GdkPixmap(NULL, canvas.get_width(), canvas.get_height(), 8);
+    buffer = new GdkPixmap(NULL, canvas.width, canvas.height, 8);
+  }
+  
+  // Render the contents of this surface onto another
+  void render(Surface surface) {
+    
+  }
+  
+  void render_to_drawable(GdkDrawable drawable) {
+    
   }
   
   // Each gdk method delegated to original method, with
