@@ -24,10 +24,17 @@ class Canvas {
     return(s);
   }
   
-  double transform_x(x) { 
+  int get_width() {
+    return xlim.max - xlim.min;
+  }
+  int get_height() {
+    return ylim.max - ylim.min;
+  }
+  
+  int transform_x(double x) { 
     return (x - xlim.min) / xlim.max;
   }
-  double transform_y(y) {
+  int transform_y(double y) {
     return (y - ylim.min) / ylim.max;
   }
   
