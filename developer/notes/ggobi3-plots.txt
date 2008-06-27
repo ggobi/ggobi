@@ -22,10 +22,11 @@ Existing types
 
 Interaction modes ------------------------------------------------------------
 
-An interaction mode turns plot events into data events.  It is composed of:
+An interaction mode turns plot events into data events.  It:
 
-  * a link to the plot canvas/surface
-  * a rendering layer for its visual representation 
+  * modifies properties of plot components
+  * receives events from the the plot canvas
+  * has layer(s) for visual representation 
   
 An interaction mode can either be active or inactive.  Only a single interaction mode is active at a time (GGobi-wide).  
 
@@ -39,6 +40,7 @@ Existing modes:
 New modes:
   * axis identify: draws on screen
 
+Interaction modes should have as little optimisation as possible - most of the complex data structures should be wrapped in convenient interfaces elsewhere.  Needs to be easy to experiment with new interaction types. 
 
 Geom -------------------------------------------------------------------------
 
