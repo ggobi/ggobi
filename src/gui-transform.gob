@@ -1,7 +1,7 @@
 %h{
-  #include "ggobi-type-registry.h"
   #include <gtk/gtk.h>
   #include "session.h"
+  #include <gio/gio.h>
 %}
 %{
   #include "stage-transform.h"
@@ -55,22 +55,22 @@ class GGobi:GUI:Transform from Gtk:VBox {
   }
   
   /* Registries of the available transform types in each stage */
-  private GGobiTypeRegistry *domain_adj_registry = {
-    ggobi_type_registry_new(GGOBI_TYPE_TRANSFORM)
-  } unrefwith g_object_unref;
-  private GGobiTypeRegistry *tform_registry = {
-    ggobi_type_registry_new(GGOBI_TYPE_TRANSFORM)
-  } unrefwith g_object_unref;
+  private GIOExtensionPoint *domain_adj_point = {
+    g_io_extension_point_register("ggobi-transform-domain-adj")
+  };
+  private GIOExtensionPoint *tform_point = {
+    g_io_extension_point_register("ggobi-transform-tform");
+  };
   
-  public GGobiTypeRegistry *
+  public GIOExtensionPoint *
   get_domain_adj_registry(self)
   {
-    return selfp->domain_adj_registry;
+    return selfp->domain_adj_point;
   }
-  public GGobiTypeRegistry *
+  public GIOExtensionPoint *
   get_transform_registry(self)
   {
-    return selfp->tform_registry;
+    return selfp->tform_point;
   }
   
   /* creates and applies an instance of the specified transform type */
@@ -94,13 +94,13 @@ class GGobi:GUI:Transform from Gtk:VBox {
   private GType
   combo_get_transform_type(GtkComboBox *combo)
   {
-    GGobiTypeRegistry *registry = self_combo_get_registry(combo);
-    GSList *types = ggobi_type_registry_list_registered(registry);
+    GIOExtensionPoint *registry = self_combo_get_registry(combo);
+    GList *extensions = g_io_extension_point_get_extensions(registry);
     gint index = gtk_combo_box_get_active(combo);
     GType type = G_TYPE_NONE;
     if (index)
-      type = GPOINTER_TO_INT(g_slist_nth_data(types, index - 1));
-    g_slist_free(types);
+      type = g_io_extension_get_type(g_list_nth_data(extensions, index - 1));
+    g_list_free(extensions);
     return type;
   }
   
@@ -113,7 +113,7 @@ class GGobi:GUI:Transform from Gtk:VBox {
       g_object_get_data(G_OBJECT (combo), "ggobi-gui-tform-stage-name")));
   }
   /* The registry holding the types presented by this combobox */
-  private GGobiTypeRegistry *
+  private GIOExtensionPoint *
   combo_get_registry(GtkComboBox *combo)
   {
     return(g_object_get_data(G_OBJECT(combo), "ggobi-gui-tform-registry"));
@@ -186,19 +186,20 @@ class GGobi:GUI:Transform from Gtk:VBox {
     if (!tform)
       index = 0;
     else {
-      GSList *types;
+      GIOExtension *ext;
+      GList *types;
       GType tform_type = G_OBJECT_TYPE(tform);
-      GGobiTypeRegistry *registry = self_combo_get_registry(combo);
+      GIOExtensionPoint *registry = self_combo_get_registry(combo);
       if (tform_type == GGOBI_TYPE_TRANSFORM_BOXCOX) {
         gtk_adjustment_set_value(selfp->boxcox_adj, 
           ggobi_transform_boxcox_get_lambda(GGOBI_TRANSFORM_BOXCOX(tform)));
         gtk_widget_show_all(selfp->boxcox_box);
       }
-      /* ensure that the type exists in our registry */
-      ggobi_type_registry_register(registry, tform_type);
-      types = ggobi_type_registry_list_registered(registry);
-      index = g_slist_index(types, GINT_TO_POINTER(tform_type)) + 1;
-      g_slist_free(types);
+      ext = g_io_extension_point_get_extension_by_name(registry,
+                                                       g_type_name(tform_type));
+      types = g_io_extension_point_get_extensions(registry);
+      index = g_list_index(types, ext) + 1;
+      g_list_free(types);
     }
     /*if (gtk_combo_box_get_active(combo) != index)*/
     gtk_combo_box_set_active(combo, index);
@@ -252,31 +253,42 @@ class GGobi:GUI:Transform from Gtk:VBox {
   }
   
   private virtual void
-  register_domain_adj_types(self, GGobiTypeRegistry *registry)
+  register_domain_adj_types(self, GIOExtensionPoint *registry)
   {
-    ggobi_type_registry_register(registry, GGOBI_TYPE_TRANSFORM_MIN_ONE);
+    g_io_extension_point_implement("ggobi-transform-domain-adj",
+                                   GGOBI_TYPE_TRANSFORM_MIN_ONE,
+                                   "GGobiTransformMinOne", 0);
   }
   
   private virtual void
-  register_transform_types(self, GGobiTypeRegistry *registry)
+  register_transform_types(self, GIOExtensionPoint *registry)
   {
-    ggobi_type_registry_register(registry, GGOBI_TYPE_TRANSFORM_BOXCOX);
-    ggobi_type_registry_register(registry, GGOBI_TYPE_TRANSFORM_LOG10);
-    ggobi_type_registry_register(registry, GGOBI_TYPE_TRANSFORM_ABS);
+    g_io_extension_point_implement("ggobi-transform-tform",
+                                   GGOBI_TYPE_TRANSFORM_BOXCOX,
+                                   "GGobiTransformBoxcox", 0);
+    g_io_extension_point_implement("ggobi-transform-tform",
+                                   GGOBI_TYPE_TRANSFORM_LOG10,
+                                   "GGobiTransformLog10", 0);
+    g_io_extension_point_implement("ggobi-transform-tform",
+                                   GGOBI_TYPE_TRANSFORM_ABS,
+                                   "GGobiTransformAbs", 0);
   }
   
   private void
-  tform_type_unregister_cb(GGobiTypeRegistry *registry, GType type, GtkComboBox *combo)
+  tform_type_unregister_cb(GIOExtensionPoint* registry, GType type, GtkComboBox *combo)
   {
-    GSList *types = ggobi_type_registry_list_registered(registry);
-    gint index = g_slist_index(types, GINT_TO_POINTER(type)) + 1;
+    GList *types = g_io_extension_point_get_extensions(registry);
+    GIOExtension *ext;
+    ext = g_io_extension_point_get_extension_by_name(registry,
+                                                     g_type_name(type));
+    gint index = g_list_index(types, ext) + 1;
     if (index)
       gtk_combo_box_remove_text(combo, index);
-    g_slist_free(types);
+    g_list_free(types);
   }
   
   private void
-  tform_type_register_cb(GGobiTypeRegistry *registry, GType type, GtkComboBox *combo)
+  tform_type_register_cb(GIOExtensionPoint *registry, GType type, GtkComboBox *combo)
   {
     GGobiTransform *tform = g_object_new(type, NULL);
     gchar *name = ggobi_transform_get_name(tform);
@@ -287,16 +299,16 @@ class GGobi:GUI:Transform from Gtk:VBox {
   
   /* create a combobox tied to the given registry and pipeline stage */
   private GtkWidget *
-  combo_create(self, GGobiTypeRegistry *registry, gchar *stage_name)
+  combo_create(self, GIOExtensionPoint *registry, gchar *stage_name)
   {
     GtkWidget *combo = gtk_combo_box_new_text();
     gtk_combo_box_append_text(GTK_COMBO_BOX(combo), "Identity");
     gtk_combo_box_set_active(GTK_COMBO_BOX(combo), 0);
     g_signal_connect (G_OBJECT (combo), "changed", G_CALLBACK (self_combo_cb), self);
-    g_signal_connect(G_OBJECT(registry), "registered", 
+    /*g_signal_connect(G_OBJECT(registry), "registered", 
       G_CALLBACK(self_tform_type_register_cb), combo);
-    g_signal_connect(G_OBJECT(registry), "unregistered",
-      G_CALLBACK(self_tform_type_unregister_cb), combo);
+      g_signal_connect(G_OBJECT(registry), "unregistered",
+      G_CALLBACK(self_tform_type_unregister_cb), combo);*/
     g_object_set_data(G_OBJECT(combo), "ggobi-gui-tform-registry", registry);
     /* please be sure that 'stage_name' will survive as long as the combo box */
     /* right now it's always statically allocated */
@@ -375,11 +387,11 @@ class GGobi:GUI:Transform from Gtk:VBox {
     gtk_container_add (GTK_CONTAINER (frame), vb);
     
     SELF(self)->_priv->domain_adj_combo = self_combo_create(SELF(self), 
-      SELF(self)->_priv->domain_adj_registry, GGOBI_MAIN_STAGE_DOMAIN_ADJ);
+      SELF(self)->_priv->domain_adj_point, GGOBI_MAIN_STAGE_DOMAIN_ADJ);
     gtk_container_add (GTK_CONTAINER (vb), SELF(self)->_priv->domain_adj_combo);
       
     self_register_domain_adj_types(SELF(self), 
-      SELF(self)->_priv->domain_adj_registry);
+      SELF(self)->_priv->domain_adj_point);
 
     /*
      * Stage 1: Power transformations et al
@@ -391,7 +403,7 @@ class GGobi:GUI:Transform from Gtk:VBox {
     gtk_container_add (GTK_CONTAINER (frame), vb);
     
     SELF(self)->_priv->tform_combo = self_combo_create(SELF(self),
-      SELF(self)->_priv->tform_registry, GGOBI_MAIN_STAGE_TRANSFORM);
+      SELF(self)->_priv->tform_point, GGOBI_MAIN_STAGE_TRANSFORM);
     gtk_box_pack_start (GTK_BOX (vb), SELF(self)->_priv->tform_combo, true, false, 1);
 
     /*
@@ -435,7 +447,7 @@ class GGobi:GUI:Transform from Gtk:VBox {
       G_CALLBACK (self_boxcox_cb), self);
 
     self_register_transform_types(SELF(self), 
-      SELF(self)->_priv->tform_registry);
+      SELF(self)->_priv->tform_point);
   }
 
 }

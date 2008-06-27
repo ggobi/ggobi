@@ -17,7 +17,6 @@
 #include <gtk/gtk.h>
 #include "vars.h"
 #include "externs.h"
-#include "plugin.h"
 #include "utils_ui.h"
 
 void buildExtendedDisplayMenu (GGobiSession * gg, int nd, GGobiStage * d0);

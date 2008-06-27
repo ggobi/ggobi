@@ -20,7 +20,7 @@
 #include <libxml/tree.h>
 
 #include "session.h"
-#include "ggobi-plugin.h"
+#include "plugin.h"
 
 gboolean registerPlugins(GGobiSession *gg, GList *plugins);
 GtkWidget * showPluginInfo (GList * plugins, GGobiSession * gg);

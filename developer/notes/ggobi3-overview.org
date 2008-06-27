@@ -80,25 +80,12 @@ Lists all plot types (live)
 **** Plot window menus
 ***** Plot
 Allows changing plot type in window
-* Canvas library
-** Canvas
-*** Mapping between data and screen coordinates
-*** Surfaces
-**** Types
-***** Buffers
-***** Physical surface
-**** Functions
-  * Drawing target (COGL/cairo API)
-  * Events (from a widget)
-**** Implementation
-***** Drawing: OpenGL
-***** Events
-  * GTK+
-  * Clutter
-  * Qt
-** Glyph shaper
-*** Clutter/Pango/Cairo
-Plot glyphs are drawn as glyphs using cairo "user" font
-backend. Clutter pango cairo renderer caches the glyphs.
-*** Custom solution
-Roll our own glyph cache if Pango has too much overhead..
+* Dependencies
+  * libp3g
+  * GTK+ 2.8.x
+  * Pango 1.22.x (not there yet)
+  * GLib 2.16.x
+  * Cairo 1.8.x (svn)
+  * Clutter 0.8.x (svn)
+  * Gsf 1.14.9 (svn)
+  * libxml2

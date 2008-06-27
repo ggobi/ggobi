@@ -31,8 +31,6 @@
 #include "write_xml.h"
 #include "input-source-file.h"
 
-#include "plugin.h"
-
 #define READ_FILESET   0
 #define EXTEND_FILESET 1
 #define WRITE_FILESET  2

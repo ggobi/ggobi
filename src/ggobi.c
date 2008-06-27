@@ -37,9 +37,9 @@
 #include "read_init.h"
 #include "colorscheme.h"
 
-#include "plugin.h"             /* For registerDefaultPlugin. */
-
 #include "ggobi-intl.h"
+
+#include "plugin-old.h"
 
 #ifdef WIN32
 #undef GGOBI_LOCALEDIR
@@ -569,9 +569,6 @@ gboolean ggobi_close2 (GGobiSession * gg, gboolean closeWindow)
 
   gg->close_pending = true;
 
-  /* close plugin instances */
-  closePlugins (gg);
-
   procs_activate (off, gg->pmode, gg->current_display, gg);
 
   display_free_all (gg);
@@ -924,14 +921,6 @@ process_initialization_files ()
     info = read_init_file (fileName, sessionOptions->info);
     g_free (fileName);
     /* sessionOptions->info = info; */
-  }
-
-  if (sessionOptions->pluginFiles) {
-    GSList *el = sessionOptions->pluginFiles;
-    while (el) {
-      readPluginFile ((char *) el->data, sessionOptions->info);
-      el = el->next;
-    }
   }
 }
 

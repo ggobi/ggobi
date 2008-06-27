@@ -14,7 +14,7 @@
  *   Andreas Buja        andreas.buja@wharton.upenn.edu
 */
 
-#include "plugin.h"
+#include "plugin-old.h"
 #include "externs.h"
 
 #include <stdio.h>
@@ -34,8 +34,6 @@ registerPlugin (GGobiSession * gg, GGobiPlugin * plugin)
   if (!g_type_module_use(G_TYPE_MODULE(plugin))) {
     return false;
   }
-  
-  ok = ggobi_plugin_ggobi_created(plugin, gg);
   
   g_type_module_unuse(G_TYPE_MODULE(plugin));
   
@@ -150,39 +148,12 @@ addPlugin (GGobiPlugin * plugin, GtkWidget * list, GGobiSession * gg)
 {
   GtkTreeModel *model = gtk_tree_view_get_model (GTK_TREE_VIEW (list));
   GtkTreeIter iter;
-  gchar *description = ggobi_plugin_get_description(plugin);
-  gchar *author = ggobi_plugin_get_author(plugin);
-  gchar *dll_name = ggobi_plugin_get_dll_name(plugin);
+  GGobiPluginDescription *description = ggobi_plugin_get_description(plugin);
+  const gchar *name = ggobi_plugin_description_get_name(description);
+  const gchar *desc = ggobi_plugin_description_get_description(description);
+  const gchar *author = ggobi_plugin_description_get_author(description);
+  const gchar *dll_name = ggobi_plugin_description_get_uri(description);
   gtk_list_store_append (GTK_LIST_STORE (model), &iter);
   gtk_list_store_set (GTK_LIST_STORE (model), &iter, 
-    0, G_TYPE_MODULE(plugin)->name, 1, description, 2, author, 3, dll_name, -1);
-  g_free(description);
-  g_free(author);
-  g_free(dll_name);
+    0, name, 1, description, 2, author, 3, dll_name, -1);
 }
-
-/**
-  Close each of the plugins within the specified GGobi instance.
-  This doesn't unload the plugin.
- */
- // FIXME: This also must be done via signals
-void
-closePlugins (GGobiSession * gg)
-{
-  GList *el, *tmp;
-  GGobiPlugin *plugin;
-
-  tmp = el = sessionOptions->info->plugins;
-  if (!el || g_list_length (el) == 0) {
-    return;
-  }
-
-  while (el) {
-    plugin = (GGobiPlugin *) el->data;
-    ggobi_plugin_ggobi_destroyed(plugin, gg);
-    el = el->next;
-  }
-  
-  g_list_free(tmp);
-}
-

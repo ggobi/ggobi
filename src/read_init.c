@@ -25,14 +25,10 @@
 
 #include <string.h>
 
-#include "plugin.h"
-
 #include "GGobiAPI.h"
 
 #include "externs.h"
 #include "tour.h"
-
-#include "ggobi-plugin-factory.h"
 
 const gchar *const GlyphNames[] = {
   /*        ".", "+", "x", "or", "fr", "oc", "fc", "" */
@@ -53,6 +49,9 @@ gint getPreviousGGobiDisplays (const xmlDocPtr doc, GGobiInitInfo * info);
 GGobiDisplayDescription *getDisplayDescription (xmlNodePtr node);
 gint getPreferences (const xmlDocPtr doc, GGobiInitInfo * info);
 
+// TODO: init file should include:
+// - URIs to plugin descriptions (possibly specifying registry type)
+// - plugins to load at startup
 
 GGobiInitInfo *
 read_init_file (const gchar * filename, GGobiInitInfo * info)
@@ -82,9 +81,7 @@ read_init_file (const gchar * filename, GGobiInitInfo * info)
   getPreferences (doc, info);
   getPreviousFiles (doc, info);
   getPreviousGGobiDisplays (doc, info);
-  info->plugins = NULL;
-  getPlugins (doc, info);
-
+  
   xmlDoValidityCheckingDefaultValue = oldValiditySetting;
 
   /* Causes a crash when started with -init notes/ggobirc,
@@ -439,62 +436,6 @@ getDisplayDescription (xmlNodePtr node)
   return (dpy);
 }
 
-
-
-
-/*****************************************************************/
-
-/*
- Handle the plugins section, looping over each <plugin>
- tag and passing it the appropriate factory.
-*/
-gint
-processPluginNodes (xmlNode * el, GGobiInitInfo * info, xmlDocPtr doc)
-{
-  GGobiPluginFactory *factory;
-  
-  if (el == NULL)
-    return (-1);
-
-  factory = ggobi_plugin_factory_new();
-  
-  while (el) {
-    GGobiPlugin *plugin;
-    if (el->type != XML_TEXT_NODE) {
-      if (strcmp ((char *) el->name, "plugin") == 0) {
-        if ((plugin = ggobi_plugin_factory_create(factory, el, doc))) {
-          if (!g_type_module_use(G_TYPE_MODULE(plugin))) {
-            g_critical("Failed to load plugin '%s'", G_TYPE_MODULE(plugin)->name);
-            g_object_unref(G_OBJECT(plugin));
-          } else {
-            g_type_module_unuse(G_TYPE_MODULE(plugin));
-            info->plugins = g_list_append (info->plugins, plugin);
-          }
-        }
-      } else 
-        g_warning("Element with invalid name '%s' within a 'plugins' element", el->name);
-    }
-    el = el->next;
-  }
-  
-  g_object_unref(factory);
-  
-  return (g_list_length(info->plugins));
-}
-
-gint
-getPlugins (xmlDocPtr doc, GGobiInitInfo * info)
-{
-  xmlNode *pluginsNode, *pluginNodes = NULL;
-  
-  pluginsNode = getXMLDocElement (doc, "plugins");
-  if (pluginsNode)
-     pluginNodes = XML_CHILDREN (pluginsNode);
-  else pluginNodes = getXMLDocElement(doc, "plugin");
-    
-  return (processPluginNodes (pluginNodes, info, doc));
-}
-
 /************************************************************************/
 
 gint resolveVariableName (const gchar * name, GGobiStage * d);
@@ -583,23 +524,6 @@ resolveVariableName (const gchar * name, GGobiStage * d)
 
   return (-1);
 }
-
-void
-readPluginFile (const char *const fileName, GGobiInitInfo * info)
-{
-  xmlDocPtr doc;
-  
-  doc = xmlParseFile (fileName);
-  if (doc == NULL) {
-    g_critical("Failed to parse the xml file `%s'", fileName);
-    return;
-  }
-
-  getPlugins (doc, sessionOptions->info);
-
-  xmlFreeDoc (doc);
-}
-
 
 GlyphType
 mapGlyphName (const gchar * gtype)

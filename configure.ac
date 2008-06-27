@@ -186,9 +186,17 @@ AM_CONDITIONAL(HAS_VALA, test -n "${VALAC}")
 
 PKG_PROG_PKG_CONFIG(0.21)
 
+# FIND GIO
+
+PKG_CHECK_MODULES(GIO, [gio-2.0 >= 2.16.0])
+
+AC_SUBST(GIO_CFLAGS)
+AC_SUBST(GIO_LIBS)
+
+
 # FIND GTK2
 
- echo "Looking for gtk2"
+echo "Looking for gtk2"
 
 PKG_CHECK_MODULES(GTK, [gtk+-2.0 >= 2.6.0])
 

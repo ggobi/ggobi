@@ -232,13 +232,13 @@ public class GGobi.DataFactoryCSV:DataFactory
             break;
         } else if (quotes && ch == '"') {
           /*PMNF(errno = EILSEQ, ": unexpected quote in element %d", (r + 1));*/
-          critical("unexpected quote in element %d", (r + 1));
+          critical("unexpected quote in element %u", (r + 1));
           return null;
         }
         if (eol) { /* \n inside quotes, embedded newline, need to read more */
           src = (string)input.utf8_gets();
           if (src == null) {
-            critical("expected more lines in element: %d", (r + 1));
+            critical("expected more lines in element: %u", (r + 1));
             return null;
           }
           line = line.concat("\n", src);
@@ -273,7 +273,7 @@ public class GGobi.DataFactoryCSV:DataFactory
         }
         /*errno = EILSEQ;
           PMNF(errno, ": bad end quote in element %d", (r + 1));*/
-        critical("garbage after end quote in element %d", (r + 1));
+        critical("garbage after end quote in element %u", (r + 1));
         return null;
       }
       if (!eol) /* don't skip first character of new line */
@@ -283,7 +283,7 @@ public class GGobi.DataFactoryCSV:DataFactory
     }
     
     if (inquotes && state != ParserState.END_QUOTE) {
-      critical("missing end quote in element %d", (r + 1));
+      critical("missing end quote in element %u", (r + 1));
       return null;
     }
     

@@ -27,7 +27,6 @@
 #include "vars.h"
 #include "externs.h"
 #include "display.h"
-#include "plugin.h"
 
 void warning (const char *msg);
 

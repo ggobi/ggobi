@@ -61,7 +61,8 @@ public class GGobi.StageTransform : Stage {
   /* Cancel transforms at all columns. */
   public void cancel_all() {
     // NOTE: commented out all HashTable.get_keys() for Debby and her
-    // GLib 2.12.
+    // GLib 2.12. This and other calls to get_keys should be
+    // uncommented for the transform stage to work.
     /*foreach(uint col in active_tforms.get_keys()) cancel(col);*/
   }
   
@@ -125,7 +126,8 @@ public class GGobi.StageTransform : Stage {
   private void transform_error(Transform tform, uint j)
   {
      string name = tform.get_name();
-     GLib.critical("Data outside the domain of transform %s at col %d.", name, j);
+     GLib.critical("Data outside the domain of transform %s at col %u.",
+                   name, j);
   }
   
   /* whenever a property of the transform changes, assume we need to update */

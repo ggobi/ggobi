@@ -80,6 +80,9 @@ public class GGobi.Variable: GLib.Object {
 
 namespace GGobi {
 
+  [CCode (cheader_filename = "session.h")]
+  public static string find_data_file(string name);
+  
   [CCode (cheader_filename = "defines.h")]
   public const double EPSILON;
   

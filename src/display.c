@@ -734,7 +734,8 @@ computeTitle (gboolean current_p, displayd * display, GGobiSession * gg)
       description = g_strdup (d->name);
   }
   else {
-    description = ggobi_input_source_get_display_name(gg->data_source);
+    description =
+      g_strdup(ggobi_input_source_get_display_name(gg->data_source));
   }
 
   n = strlen (tmp) + strlen (description) + 5 +

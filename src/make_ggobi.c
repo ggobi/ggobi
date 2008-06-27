@@ -24,7 +24,6 @@
 
 #include "vars.h"
 #include "externs.h"
-#include "plugin.h"
 
 #include "gui-impute.h"
 #include "gui-jitter.h"
@@ -40,6 +39,7 @@
 #include "stage-standardize.h"
 #include "stage-transform.h"
 
+#include "plugin-old.h"
 
 #ifdef USE_MYSQL
 #include "read_mysql.h"

@@ -4,11 +4,8 @@ lib_LTLIBRARIES     = libggobi.la
 libggobi_la_GOBS = \
   data-factory-xml.gob \
   gui-transform.gob \
-  plugin-factory.gob \
-  plugin.gob \
   stage-group.gob \
   stage.gob \
-  type-registry.gob \
   variable-group.gob \
   variable.gob \
   $(NULL)
@@ -32,6 +29,11 @@ libggobi_la_VALAS = \
   pipeline-factory.vala \
   pipeline-matrix.vala \
   pipeline-message.vala \
+  plugin.vala \
+  plugin-dll.vala \
+  plugin-description.vala \
+  plugin-registry.vala \
+  plugin-registry-xml.vala \
   select.vala \
   stage-ash.vala \
   stage-display.vala \
@@ -80,7 +82,8 @@ libggobi_la_METAOBJECTS = \
 libggobi_la_METASTAMPS = \
   $(libggobi_la_GOBS:%.gob=.%.gob.stamp) .vala.stamp
 
-libggobi_la_LDFLAGS  = @GTK_LIBS@ @LIBXML_LIBS@ @LIBGSF_LIBS@ -version-info 2
+libggobi_la_LDFLAGS  = @GTK_LIBS@ @LIBXML_LIBS@ @LIBGSF_LIBS@ @GIO_LIBS@ \
+  -version-info 2
 
 libggobi_la_BUILT = \
   array.c \
@@ -128,7 +131,7 @@ libggobi_la_BUILT = \
   parcoordsClass.c \
   parcoords_ui.c \
   pipeline.c \
-  plugin.c \
+  plugin-old.c \
   ppcorr_ui.c \
   projection-indices.c \
   projection-optimization.c \
@@ -203,7 +206,7 @@ libggobi_la_DEPENDENCIES = $(libggobi_la_METAOBJECTS)
 
 pkginclude_HEADERS = GGobiAPI.h ggobiClass.h tour1d_pp.h \
   noop-toggle.h tour2d_pp.h GGobiEvents.h parcoordsClass.h tour_pp_ui.h \
-  barchartDisplay.h plugin.h tsPlot.h brushing.h tsdisplay.h \
+  barchartDisplay.h plugin-old.h tsPlot.h brushing.h tsdisplay.h \
   colorscheme.h types.h config.h read_init.h vars.h cpanel.h \
   varseldata.h defines.h scatmatClass.h display.h \
   scatterplotClass.h display_tree.h write_xml.h ggobi-intl.h \
@@ -228,9 +231,10 @@ MAINTAINERCLEANFILES = $(BUILT_SOURCES)
 	@touch $@
 
 if HAS_VALA
-.vala.stamp: $(libggobi_la_VALAS) ../vapi/ggobi-compat.vapi ../vapi/libgsf-1.vapi
+.vala.stamp: $(libggobi_la_VALAS) ../vapi/ggobi-compat.vapi
 	@VALAC@ -C --basedir=. --library=ggobi --vapidir=../vapi \
     --pkg=gtk+-2.0 --pkg=libgsf-1 --pkg=ggobi-compat --pkg=libxml-2.0 \
+    --pkg=gmodule-2.0 \
     $(libggobi_la_VALAS)
 	@touch $@
 else
