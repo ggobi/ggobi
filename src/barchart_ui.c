@@ -377,7 +377,7 @@ barchart_scale (gboolean button1_p, gboolean button2_p, splotd * sp)
 
         /*-- redisplay this plot --*/
     splot_plane_to_screen (display, &display->cpanel, sp, gg);
-    ruler_ranges_set (false, gg->current_display, sp, gg);
+//    ruler_ranges_set (false, gg->current_display, sp, gg);
     splot_redraw (sp, FULL, gg);
 #endif
 

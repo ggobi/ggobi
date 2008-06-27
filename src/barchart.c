@@ -48,6 +48,7 @@ gboolean pt_in_rect (icoords pt, GdkRectangle rect);
 /*                          Options section                             */
 /*----------------------------------------------------------------------*/
 
+/*
 static const gchar *menu_ui =
   "<ui>"
   "	<menubar>"
@@ -55,6 +56,12 @@ static const gchar *menu_ui =
   "			<menuitem action='ShowPoints'/>"
   "			<separator/>"
   "			<menuitem action='ShowAxes'/>" "		</menu>" "	</menubar>" "</ui>";
+*/
+
+static const gchar *menu_ui =
+  "<ui>"
+  "	<menubar>"
+  "	</menubar>" "</ui>";
 
 static void
 action_toggle_show_bars (GtkToggleAction * action, displayd * display)
@@ -123,7 +130,6 @@ createBarchart (displayd * display, gboolean use_window, gboolean missing_p,
   display->menu_manager = display_menu_manager_create (display);
   if (GGOBI_IS_WINDOW_DISPLAY (display)
       && GGOBI_WINDOW_DISPLAY (display)->window) {
-    //gg->app.sp_accel_group = gtk_accel_group_new();
     GtkActionGroup *actions = gtk_action_group_new ("BarchartActions");
     gtk_action_group_add_toggle_actions (actions, toggle_entries,
                                          n_toggle_entries, display);
@@ -132,12 +138,6 @@ createBarchart (displayd * display, gboolean use_window, gboolean missing_p,
     display->menubar =
       create_menu_bar (display->menu_manager, menu_ui,
                        GGOBI_WINDOW_DISPLAY (display)->window);
-    /*
-     * After creating the menubar, and populating the file menu,
-     * add the other menus manually
-     */
-    //barchart_display_menus_make(display, gg->app.sp_accel_group,
-    //      G_CALLBACK(display_options_cb), gg);
 
     gtk_container_add (GTK_CONTAINER (GGOBI_WINDOW_DISPLAY (display)->window),
                        vbox);
@@ -195,12 +195,14 @@ createBarchart (displayd * display, gboolean use_window, gboolean missing_p,
    * drawing area, a motion_notify_event is passed to the
    * appropriate event handler for the ruler.
    */
-  display->hrule = gtk_hruler_new ();
 
+  display->hrule = gtk_hruler_new ();
+/*
   gtk_table_attach (GTK_TABLE (table),
                     display->hrule, 1, 2, 1, 2,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_SHRINK | GTK_FILL),
                     (GtkAttachOptions) GTK_FILL, 0, 0);
+*/
 
 
   /*
@@ -209,23 +211,24 @@ createBarchart (displayd * display, gboolean use_window, gboolean missing_p,
    * appropriate event handler for the ruler.
    */
 
-  display->vrule = gtk_vruler_new ();
 
+  display->vrule = gtk_vruler_new ();
+/*
   gtk_table_attach (GTK_TABLE (table),
                     display->vrule, 0, 1, 0, 1,
                     (GtkAttachOptions) GTK_FILL,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_SHRINK | GTK_FILL),
                     0, 0);
 
-
   display->p1d_orientation = VERTICAL;
-  scatterplot_show_rulers (display, P1PLOT);  /* put in pmodeSet? */
+  scatterplot_show_rulers (display, P1PLOT);  
+*/
   
   if (GGOBI_IS_WINDOW_DISPLAY (display)
       && GGOBI_WINDOW_DISPLAY (display)->useWindow) 
   {
     gtk_widget_show_all (GGOBI_WINDOW_DISPLAY (display)->window);
-    ruler_ranges_set (true, display, sp, gg);
+    // ruler_ranges_set (true, display, sp, gg);
   } else gtk_widget_show_all (table);
 
   return display;
@@ -1633,4 +1636,9 @@ barchart_cpanel_init (cpaneld * cpanel, ggobid * gg)
   /*-- available modes --*/
   cpanel_brush_init (cpanel, gg);
   cpanel_identify_init (cpanel, gg);
+}
+
+void
+barchartRulerRangesSet ( ) {
+  // Do nothing!
 }

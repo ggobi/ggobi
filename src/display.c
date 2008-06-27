@@ -849,7 +849,6 @@ display_tailpipe (displayd * display, RedrawStyle type, ggobid * gg)
       }
     }
 
-
     splot_redraw (sp, type, gg);
     splist = splist->next;
   }

@@ -71,9 +71,6 @@ scatterplot_show_rulers (displayd * display, gint projection)
  * plots that have been reduced in size from suddenly being resized
  * up to the original default size.
 */
-  //splotd *sp = display->splots->data;
-  //gint width = sp->da->allocation.width;
-  //gint height = sp->da->allocation.height;
 
   switch (projection) {
   case P1PLOT:

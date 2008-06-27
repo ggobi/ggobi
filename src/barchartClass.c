@@ -53,16 +53,18 @@ static gint barchartPlottedColsGet (displayd * display, gint * cols,
                                     GGobiData * d, ggobid * gg);
 static GtkWidget *barchartCPanelWidget (displayd * dpy,
                                         gchar ** modeName, ggobid * gg);
-//static GtkWidget *barchartMenusMake(displayd * dpy, ggobid * gg);
 static gboolean barchartEventHandlersToggle (displayd * dpy, splotd * sp,
                                              gboolean state, ProjectionMode,
                                              InteractionMode);
 static gboolean barchartKeyEventHandled (GtkWidget *, displayd *, splotd *,
                                          GdkEventKey *, ggobid *);
+void barchartRulerRangesSet (gboolean, displayd *, splotd *, ggobid *);
 
 static void
 setShowAxesOption (displayd * display, gboolean active)
 {
+
+g_printerr("(setShowAxesOption) active %d\n", active);
   switch (display->cpanel.pmode) {
   case EXTENDED_DISPLAY_PMODE:
     scatterplot_show_vrule (display, active);
@@ -114,7 +116,6 @@ barchartVarSel (GtkWidget * w, displayd * display, splotd * sp, gint jvar,
 {
   gint jvar_prev = -1;
   gboolean redraw = false;
-  /*  displayd *display = (displayd *) sp->displayptr;*/
   GGobiData *d = display->d;
 
   switch (cpanel->pmode) {
@@ -495,7 +496,12 @@ barchartDisplayClassInit (GGobiBarChartDisplayClass * klass)
 
   klass->parent_class.build_symbol_vectors = barchart_build_symbol_vectors;
 
-  klass->parent_class.ruler_ranges_set = ruler_ranges_set;
+/* Because of the kludgey implementation of the barchart class, I can't
+   make this quit trying to set ruler ranges.  Instead, I'm going to
+   create a function that's simply a noop.  dfs June 2008
+*/
+//  klass->parent_class.ruler_ranges_set = ruler_ranges_set;
+  klass->parent_class.ruler_ranges_set = barchartRulerRangesSet;
 
   klass->parent_class.varpanel_highd = varpanelHighd;
   klass->parent_class.varpanel_refresh = barchartVarpanelRefresh;
@@ -507,8 +513,6 @@ barchartDisplayClassInit (GGobiBarChartDisplayClass * klass)
   klass->parent_class.varpanel_tooltips_set = barchartVarpanelTooltipsSet;
 
   klass->parent_class.plotted_vars_get = barchartPlottedColsGet;
-
-  //klass->parent_class.menus_make = barchartMenusMake;
 
   klass->parent_class.imode_control_box = barchartCPanelWidget;
 
