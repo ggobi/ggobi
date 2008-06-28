@@ -1,6 +1,5 @@
 %{
   // FIXME: temporary
-  #include "input-source.h"
   #include "data.h"
   #include "vars.h"
   #include "externs.h"
@@ -1460,7 +1459,7 @@ attach (self, GGobiSession *gg, gboolean cleanup)
   displayd *display = NULL;
   GGobiStage *d = self_get_root(self);
   gint *vars = (gint *) g_malloc(GGOBI_STAGE(self)->n_cols * sizeof(gint));
-  GGobiInputSource *source = ggobi_data_get_source(GGOBI_DATA(d));
+  GFile *source = ggobi_data_get_source(GGOBI_DATA(d));
 
   d->gg = gg;
   gg->d = g_slist_append (gg->d, GGOBI_DATA(d));

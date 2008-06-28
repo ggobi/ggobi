@@ -320,14 +320,10 @@ getPreviousFiles (const xmlDocPtr doc, GGobiInitInfo * info)
 void
 parsePreviousInput (xmlNode * node, GGobiDescription *desc)
 {
-  GGobiInputSource *source;
-  
-  xmlChar *mode = xmlGetProp (node, (xmlChar *) "mode");
   xmlChar *uri = xmlGetProp (node, (xmlChar *) "name");
   
-  source = create_input_source((const gchar *)uri, (const gchar *)mode);
+  GFile *source = create_file((const gchar *)uri);
   
-  xmlFree(mode);
   xmlFree(uri);
   
   desc->source = source;

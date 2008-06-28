@@ -17,39 +17,23 @@ public class GGobi.DataFactoryCSV:DataFactory
   }
 
   private static uint ROW_SIZE_INC = 4;
-  
-  override SList<string>
-  get_supported_modes() 
-  {
-    SList<string> modes = new SList<string>();
-    modes.append("csv");
-    return modes;
+
+  override string# mime_type {
+    get { return "text/csv"; }
   }
-  
-  override SList<string>
-  get_base_file_exts_for_mode(string? mode) 
-  {
-    SList<string> exts = null;
-    if (mode == null || mode == "csv") {
-      exts.prepend("asc".casefold());
-      exts.prepend("txt".casefold());
-      exts.prepend("csv".casefold());
-    }
-    return exts;
-  }
-  
+
   override SList<Data>
-  create_for_input(Input input)
+  create_for_stream(InputStream input)
   {
-    Input lines;
+    DataInputStream lines;
     ParserContext ctx = new ParserContext();
     SList<Data> ds = new SList<Data>();
     string[] row;
 
     /* Open the file */
-    lines = new InputTextline(input);
+    lines = new DataInputStream(input);
 
-    while((row = parse_row((InputTextline)lines, ',')) != null)
+    while((row = parse_row(lines, ',')) != null)
       /*process_row(row, ctx)... someday */;
     
     /* Load the parsed data into the GGobiStage */
@@ -170,7 +154,7 @@ public class GGobi.DataFactoryCSV:DataFactory
    */
   // FIXME: should throw an exception on errors
   private string[]?
-  parse_row(InputTextline input, char sep)
+  parse_row(DataInputStream input, char sep)
   {
     bool quotes = true; /* pay attention to quotes */
     bool inquotes = false;
@@ -178,14 +162,14 @@ public class GGobi.DataFactoryCSV:DataFactory
     bool skip_read = false;
     /* offsets in characters, lengths in bytes */
     uint r = 0, ofs = 0, entry_ofs, entry_len, len;
+    size_t total_len;
     ParserState state = ParserState.START;
     
     string[] row = new string[ROW_SIZE_INC];
     
-    weak string src = (string)input.utf8_gets();
+    weak string src = (string)input.read_line(out total_len, null);
     if (src == null)
       return null;
-    long total_len = src.len(); /* in characters */
     string line = src;
 
     unichar ch, skip;
@@ -236,13 +220,14 @@ public class GGobi.DataFactoryCSV:DataFactory
           return null;
         }
         if (eol) { /* \n inside quotes, embedded newline, need to read more */
-          src = (string)input.utf8_gets();
+          size_t partial_len;
+          src = (string)input.read_line(out partial_len, null);
           if (src == null) {
             critical("expected more lines in element: %u", (r + 1));
             return null;
           }
           line = line.concat("\n", src);
-          total_len += src.len() + 1;
+          total_len += partial_len + 1;
         }
         len += skip;
         if (inquotes || !ch.isspace()) { /* ignore trailing whitespace */

@@ -39,7 +39,7 @@ typedef struct {
 } GGobiDisplayDescription;
 
 typedef struct {
-  GGobiInputSource *source;
+  GFile *source;
   GList *displays;
 } GGobiDescription;
 

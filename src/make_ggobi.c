@@ -30,7 +30,6 @@
 #include "gui-randomize.h"
 #include "gui-subset.h"
 #include "gui-viewer.h"
-#include "input-source-factory.h"
 #include "stage-subset.h"
 #include "stage-display.h"
 #include "stage-impute.h"
@@ -171,13 +170,13 @@ globals_init (GGobiSession * gg)
 
 
 GSList *
-load_data (const gchar * uri, const gchar * mode_name, GGobiSession * gg)
+load_data (const gchar * uri, GGobiSession * gg)
 {
-  GGobiInputSource *source = create_input_source(uri, mode_name);
+  GFile *file = create_file(uri);
   GSList *ds = NULL;
-  if (source) { // FIXME: report this error in gg->io_context
-    ds = load_data_source(source, gg);
-    g_object_unref(G_OBJECT(source));
+  if (file) { // FIXME: report this error in gg->io_context
+    ds = load_data_source(file, gg);
+    g_object_unref(G_OBJECT(file));
   }
   return (ds);
 }
@@ -185,12 +184,12 @@ load_data (const gchar * uri, const gchar * mode_name, GGobiSession * gg)
 // returns a list of datasets (some input types (eg. xml) may return 
 // multiple data types)
 GSList *
-load_data_source (GGobiInputSource *source, GGobiSession * gg)
+load_data_source (GFile *file, GGobiSession * gg)
 {
   GGobiDataFactory *factory;
   GSList *datasets = NULL;
   
-  factory = create_data_factory(gg, source);
+  factory = create_data_factory(gg, file);
   if (factory == NULL) {
     // FIXME: we should have some unified way of graphically reporting errors
     // from some sort of IO context
@@ -198,7 +197,7 @@ load_data_source (GGobiInputSource *source, GGobiSession * gg)
     return NULL;
   }
   
-  datasets = ggobi_data_factory_create(factory, source);
+  datasets = ggobi_data_factory_create(factory, file);
   for (; datasets; datasets = datasets->next) {
     GGobiStage *dataset = GGOBI_STAGE(datasets->data);
     /* hack: if there are no variables in the dataset (ie an edge set)
@@ -218,13 +217,13 @@ load_data_source (GGobiInputSource *source, GGobiSession * gg)
 }
 
 GGobiDataFactory *
-create_data_factory (GGobiSession *gg, GGobiInputSource *source)
+create_data_factory (GGobiSession *gg, GFile *file)
 {
   GGobiDataFactory *factory = NULL;
   GSList *factories = gg->data_factories;
   for (; factories && !factory; factories = factories->next) {
-    if (ggobi_data_factory_supports_source(GGOBI_DATA_FACTORY(factories->data), 
-        source))
+    if (ggobi_data_factory_supports_file(GGOBI_DATA_FACTORY(factories->data), 
+                                         file, NULL))
       factory = GGOBI_DATA_FACTORY(factories->data);
   }
   return (factory);
@@ -239,14 +238,23 @@ scheme_compare_func(gconstpointer list_scheme, gconstpointer scheme)
     g_ascii_strcasecmp(list_scheme, scheme));
 }
 
-GGobiInputSource *
-create_input_source(const gchar *uri, const gchar *mode)
+gchar *
+get_file_description(GFile *file)
 {
-  // FIXME: eventually we should have a registry of factory instances
-  GGobiInputSourceFactory *factory = g_object_new(GGOBI_TYPE_INPUT_SOURCE_FACTORY, NULL);
-  GGobiInputSource *source = ggobi_input_source_factory_create(factory, uri, mode);
-  g_object_unref(G_OBJECT(factory));
-  return source;
+  GFileInfo *info = g_file_query_info(file,
+                                      G_FILE_ATTRIBUTE_STANDARD_DESCRIPTION,
+                                      G_FILE_QUERY_INFO_NONE, NULL, NULL);
+  gchar *desc = 
+    g_file_info_get_attribute_as_string(info,
+                                        G_FILE_ATTRIBUTE_STANDARD_DESCRIPTION);
+  g_object_unref(G_OBJECT(info));
+  return desc;
+}
+
+GFile *
+create_file(const gchar *uri)
+{
+  return g_file_new_for_uri(uri);
 }
 
 static void
@@ -258,15 +266,6 @@ register_default_data_factories(GGobiSession *gg)
   factory = g_object_new(GGOBI_TYPE_DATA_FACTORY_CSV, NULL);
   ggobi_session_register_data_factory(gg, GGOBI_DATA_FACTORY(factory));
   g_object_unref(factory); 
-}
-
-static void
-register_default_input_source_factories(GGobiSession *gg)
-{
-  GObject *factory = g_object_new(GGOBI_TYPE_INPUT_SOURCE_FACTORY, NULL);
-  ggobi_session_register_input_source_factory(gg, 
-    GGOBI_INPUT_SOURCE_FACTORY(factory));
-  g_object_unref(factory);
 }
 
 /*
@@ -290,13 +289,12 @@ make_ggobi (GGobiOptions * options, gboolean processEvents, GGobiSession * gg)
   make_ui (gg);
 
   register_default_data_factories(gg);
-  register_default_input_source_factories(gg);
   
   /* If the user specified a data file on the command line, then 
      try to load that.
    */
   if (options->data_in || options->data_type) {
-    if (load_data (options->data_in, options->data_type, gg)) {
+    if (load_data (options->data_in, gg)) {
       init_data = true;
     }
   }

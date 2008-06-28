@@ -35,10 +35,8 @@ struct _GGobiSession;
 #include "display.h"
 #include "display_tree.h"
 #include "data-factory.h"
-#include "input-source.h"
 #include "read_init.h"
 #include "pipeline-factory.h"
-#include "input-source-factory.h"
 
 #include "fileio.h"
 
@@ -168,7 +166,7 @@ struct _GGobiSession {
 /*                      reading in the data                           */
 /*--------------------------------------------------------------------*/
   
-  GGobiInputSource *data_source;/* Information about input files for the current
+  GFile *data_source;/* Information about input files for the current
                                    data source, such as the display name, uri, etc
                                  */
 
@@ -413,8 +411,6 @@ struct _GGobiSession {
   GGobiPipelineFactory *pipeline_factory;
   
   GSList *data_factories;
-  GSList *input_source_factories;
-  
 }; /*  GGobiSession; */
 
 /* the keys for the built-in stages. eventually these might become
@@ -601,15 +597,15 @@ GList *getInputPluginSelections(GGobiSession *gg);
 
 extern const gchar *DefaultUnknownInputModeName;
 	
-GSList*    load_data (const gchar *, const gchar *modeName, GGobiSession *);
-GSList*    load_data_source (GGobiInputSource *, GGobiSession *);
+GSList*    load_data (const gchar *, GGobiSession *);
+GSList*    load_data_source (GFile *, GGobiSession *);
 
-GGobiInputSource *create_input_source(const gchar *uri, const gchar *mode);
-GGobiDataFactory *create_data_factory(GGobiSession *gg, GGobiInputSource *source);
+GFile *create_file(const gchar *uri);
+gchar *get_file_description(GFile *file);
+
+GGobiDataFactory *create_data_factory(GGobiSession *gg, GFile *source);
 
 void ggobi_session_register_data_factory(GGobiSession *session, GGobiDataFactory *factory);
-void ggobi_session_register_input_source_factory(GGobiSession *session, 
-  GGobiInputSourceFactory *factory);
 
 #include "GGobiEvents.h"
 

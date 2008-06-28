@@ -84,7 +84,7 @@ Allows changing plot type in window
   * libp3g
   * GTK+ 2.8.x
   * Pango 1.22.x (not there yet)
-  * GLib 2.16.x
+  * GLib 2.18.x
   * Cairo 1.8.x (svn)
   * Clutter 0.8.x (svn)
   * Gsf 1.14.9 (svn)

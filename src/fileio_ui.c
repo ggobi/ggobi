@@ -29,7 +29,6 @@
 
 #include "writedata.h"
 #include "write_xml.h"
-#include "input-source-file.h"
 
 #define READ_FILESET   0
 #define EXTEND_FILESET 1
@@ -49,25 +48,14 @@ get_file_filters(GGobiSession *gg)
   
   for (; factories; factories = factories->next) {
     GGobiDataFactory *factory = GGOBI_DATA_FACTORY(factories->data);
-    GSList *factory_modes = ggobi_data_factory_get_supported_modes(factory);
-    GSList *modes;
-    for (modes = factory_modes; modes; modes = modes->next) {
-      GtkFileFilter *filter = gtk_file_filter_new();
-      GSList *factory_exts = ggobi_data_factory_get_file_exts_for_mode(
-        factory, modes->data);
-      GSList *exts;
-      for (exts = factory_exts; exts; exts = exts->next) {
-        gchar *pattern = g_strconcat("*.", exts->data, NULL);
-        gtk_file_filter_add_pattern(filter, pattern);
-        g_free(pattern);
-      }
-      gtk_file_filter_set_name(filter, modes->data);
-      filters = g_slist_prepend(filters, filter);
-      g_slist_foreach(factory_exts, (GFunc)g_free, NULL);
-      g_slist_free(factory_exts);
-    }
-    g_slist_foreach(factory_modes, (GFunc)g_free, NULL);
-    g_slist_free(factory_modes);
+    const gchar* mime_type = ggobi_data_factory_get_mime_type(factory);
+    //const gchar* content_type = g_content_type_from_mime_type(mime_type);
+    GtkFileFilter *filter = gtk_file_filter_new();
+    gtk_file_filter_add_mime_type(filter, mime_type);
+    gtk_file_filter_set_name(filter, mime_type);
+    // FIXME: above should set name to:
+    //g_content_type_get_description(content_type));
+    filters = g_slist_prepend(filters, filter);
   }
   
   return g_slist_reverse(filters);
@@ -80,8 +68,7 @@ filesel_ok (GtkWidget * chooser)
   GGobiSession *gg;
   guint action, len;
   gchar *uri, *filename;
-  gboolean firsttime;
-
+  
   gg = (GGobiSession *) g_object_get_data (G_OBJECT (chooser), key_get ());
   uri = gtk_file_chooser_get_uri (GTK_FILE_CHOOSER (chooser));
   action = GPOINTER_TO_INT (g_object_get_data (G_OBJECT (chooser), "action"));
@@ -90,42 +77,9 @@ filesel_ok (GtkWidget * chooser)
   switch (action) {
   case READ_FILESET:
     {
-      gchar *combo_text, *mode_name;
-      GtkWidget *combo;
-      GtkFileFilter *filter;
-      // FIXME: GTK+ 2.10 has a built-in entry, but it's not labeled "URL" like ours...
-      GtkWidget *entry = g_object_get_data(G_OBJECT (chooser), "URLEntry");
-      const gchar *url = gtk_entry_get_text(GTK_ENTRY(entry));
-      
-      if (url && strlen(url)) {
-        g_free(uri);
-        uri = g_strdup(url);
-      }
-      
-      combo = (GtkWidget *) g_object_get_data (G_OBJECT (chooser),
-                                         "InputTypeCombo");
-      filter = gtk_file_chooser_get_filter(GTK_FILE_CHOOSER(chooser));
-      //mode_name = gtk_file_filter_get_name(filter);
-      combo_text = mode_name = gtk_combo_box_get_active_text(GTK_COMBO_BOX(combo));
-      if (!strcmp(mode_name, "any"))
-        mode_name = NULL;
-
-      firsttime = (g_slist_length (gg->d) == 0);
-      if (load_data (uri, mode_name, gg))
+      if (load_data (uri, gg))
       /*-- destroy and rebuild the menu every time data is read in --*/
         display_menu_build (gg);
-      
-      /*
-       * If this is the first data read in, we need a call to
-       * full_viewmode_set to initialize the mode and projection,
-       * and to make the Options menu appear.
-       */
-      /*if (firsttime) {
-        gg->pmode = XYPLOT;
-        ggobi_full_viewmode_set (XYPLOT, DEFAULT_IMODE, gg);
-        }*/
-      
-      g_free(combo_text);
     }
     break;
   case EXTEND_FILESET:  /*-- not yet enabled --*/
@@ -195,7 +149,7 @@ createOutputFileSelectionDialog (const gchar * title)
 GtkWidget *
 createInputFileSelectionDialog (gchar * title, GGobiSession * gg)
 {
-  GtkWidget *chooser, *combo, *hbox, *lbl;
+  GtkWidget *chooser;
   GSList *filters, *l;
 
   filters = get_file_filters(gg);
@@ -205,56 +159,24 @@ createInputFileSelectionDialog (gchar * title, GGobiSession * gg)
                                  GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                  GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
 
-  hbox = gtk_hbox_new (false, 5);
-
-  lbl = gtk_label_new_with_mnemonic ("Input _Type:");
-  gtk_box_pack_start (GTK_BOX (hbox), lbl, false, false, 0);
-
-  combo = gtk_combo_box_new_text ();
-  gtk_label_set_mnemonic_widget (GTK_LABEL (lbl), combo);
   for (l = filters; l; l = l->next) {
     GtkFileFilter *filter = l->data;
     gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(chooser), filter);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (combo), gtk_file_filter_get_name(filter));
   }
   g_slist_free (filters);
-  gtk_combo_box_set_active (GTK_COMBO_BOX (combo), 0);
-  gtk_box_pack_start (GTK_BOX (hbox), combo, false, false, 0);
-  g_object_set_data (G_OBJECT (chooser), "InputTypeCombo", combo);
-
-  { // Testing URL reading interface
-  GtkWidget *entry;
-
-  lbl = gtk_label_new_with_mnemonic ("_URI:"); 
-  gtk_box_pack_start (GTK_BOX (hbox), lbl, false, false, 0);
-  entry = gtk_entry_new();
-  gtk_entry_set_width_chars(GTK_ENTRY(entry), 20);
-  gtk_label_set_mnemonic_widget (GTK_LABEL (lbl), entry);
-  gtk_box_pack_start (GTK_BOX (hbox), entry, true, true, 0);
-  g_object_set_data (G_OBJECT (chooser), "URLEntry", entry);
-  }
-
-  /*button = gtk_button_new_with_mnemonic("Enter _Location");
-    gtk_box_pack_start(GTK_BOX(hbox), button, false, false, 0);
-     g_signal_connect(G_OBJECT(button), "clicked", 
-     G_CALLBACK(location_button_clicked_cb), chooser); */
-
-  gtk_file_chooser_set_extra_widget (GTK_FILE_CHOOSER (chooser), hbox);
-  gtk_widget_show_all (hbox);
-
+  
   return (chooser);
 }
 
 void configure_file_chooser(GtkWidget *chooser, GGobiSession *gg)
 {
-  if (GGOBI_IS_INPUT_SOURCE_FILE(gg->data_source)) {
-    GGobiInputSourceFile *file = GGOBI_INPUT_SOURCE_FILE(gg->data_source);
-    gchar *filename = ggobi_input_source_file_get_filename(file, NULL);
+  if (G_IS_FILE(gg->data_source)) {
+    GFile *file = gg->data_source;
+    GFile *parent = g_file_get_parent(file);
+    gchar *filename = g_file_get_path(parent);
     if (filename) {
-      gchar *dir = g_path_get_dirname(filename);
-      gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER (chooser), dir);
+      gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER (chooser), filename);
       g_free(filename);
-      g_free(dir);
     } else g_warning("Could not get filename from file input source");
   }
 }

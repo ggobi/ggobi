@@ -2,18 +2,17 @@ using GLib;
 using Xml;
 using Gsf;
 
-public class GGobi.DataFactoryXML : DataFactory {
+public class GGobi.DataFactoryXML : DataFactory, Object {
 
-  override SList<Data>? create_for_input(Input input) {
+  override SList<Data>? create_for_stream(InputStream input) {
     return read_xml_data(input);
   }
   
-  private InputMode _mode = new InputMode("xml", new string[] { "xml" });
-  override InputMode mode {
-    get { return _mode; }
+  override string mime_type {
+    get { return "application/xml"; }
   }
 
-  private SList<Data>? read_xml_data(Input input) {
+  private SList<Data>? read_xml_data(InputStream input) {
     ParserState state = new ParserState();
     XMLIn handlers = new XMLIn(nodes, ns);
     bool result = handlers.parse(input, context, state);

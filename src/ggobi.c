@@ -731,15 +731,6 @@ ggobi_session_register_data_factory (GGobiSession *session,
   session->data_factories = g_slist_prepend(session->data_factories, 
     g_object_ref(G_OBJECT(factory)));
 }
-void
-ggobi_session_register_input_source_factory (GGobiSession *session, 
-  GGobiInputSourceFactory *factory)
-{
-  session->input_source_factories = 
-    g_slist_prepend(session->input_source_factories, 
-      g_object_ref(G_OBJECT(factory)));
-}
-
 
 GGobiSession *
 ValidateGGobiRef (GGobiSession * gg, gboolean fatal)

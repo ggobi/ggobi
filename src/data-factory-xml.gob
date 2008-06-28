@@ -121,11 +121,6 @@
      */
     int expectedDatasetCount;
     
-    /*
-      The source of the data
-    */
-    GGobiInputSource *input_source;
-
     xmlParserCtxtPtr parser;
 
   } XMLParserData;
@@ -272,8 +267,8 @@ class GGobi:Data:Factory:XML from GGobi:Data:Factory
 
   //interface GGobi:Data:Factory private GSList *
   override (GGobi:Data:Factory) GSList *
-  create_for_input (GGobi:Data:Factory * self (check null type), 
-    Gsf:Input *input  (check null type))
+    create_for_stream(GGobi:Data:Factory * self (check null type), 
+                      G:Input:Stream *input  (check null type))
   {
     return self_read_xml_data (input);
   }
@@ -291,30 +286,25 @@ class GGobi:Data:Factory:XML from GGobi:Data:Factory
   }
 
   //interface GGobi:Data:Factory private GSList *
-  override (GGobi:Data:Factory) GSList *
-  get_supported_modes (GGobi:Data:Factory *self (check null type))
-  {
-    return g_slist_append (NULL, g_strdup("xml"));
-  }
-
-  //interface GGobi:Data:Factory private GSList *
-  override (GGobi:Data:Factory) GSList *
-  get_base_file_exts_for_mode(GGobi:Data:Factory *self (check null type), const gchar *mode) 
-  {
-    GSList *exts = NULL;
-    if (!mode || !strcmp(mode, "xml"))
-      exts = g_slist_append(exts, g_utf8_casefold("xml", -1));
-    return exts;
-  }
+  property STRING mime_type
+    (override)
+    get { g_value_set_string (VAL, "application/xml"); };
   
-  private GSList *read_xml_data (Gsf:Input * input)
+  
+  private GSList *read_xml_data (GInputStream * input)
   {
     xmlSAXHandlerPtr xmlParserHandler = g_new0(xmlSAXHandler, 1);
     XMLParserData data;
     xmlParserCtxtPtr ctx;
     GSList *dlist;
-    
-    ctx = gsf_xml_parser_context(input);
+
+    // FIXME: temporary until libgsf 1.14.9 is released
+    GFileInputStream *file_input = G_FILE_INPUT_STREAM(input);
+    GFileInfo *info = g_file_input_stream_query_info(file_input,
+                                                     G_FILE_ATTRIBUTE_STANDARD_NAME,
+                                                     NULL, NULL);
+    ctx = xmlCreateFileParserCtxt(g_file_info_get_name(info));
+    //ctx = gsf_xml_parser_context(input);
     
     xmlParserHandler->startElement = self_start_xml_element;
     xmlParserHandler->endElement = self_end_xml_element;

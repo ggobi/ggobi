@@ -24,7 +24,6 @@
 #include "vars.h"
 #include "externs.h"
 #include "display_tree.h"
-#include "input-source.h"
 #include "ggobi-gui-transform.h"
 #include "vartable_nbook.h"
 #include "externs.h"
@@ -154,14 +153,14 @@ gg_write_to_statusbar (gchar * message, GGobiSession * gg)
     /*-- by default, describe the current datad --*/
     GGobiStage *d = ggobi_stage_get_root(datad_get_from_notebook(gg->varpanel_ui.notebook));
     if (d) {
-      GGobiInputSource *source = ggobi_data_get_source(GGOBI_DATA(d));
-      const gchar *display_name = ggobi_input_source_get_display_name(source);
+      GFile *file = ggobi_data_get_source(GGOBI_DATA(d));
+      gchar *display_name = get_file_description(file);
       gchar *msg = g_strdup_printf ("%s: %d x %d  (%s)",
                                     d->name, d->n_rows, d->n_cols,
                                     display_name);
       gtk_statusbar_push (GTK_STATUSBAR (statusbar), 0, msg);
       g_free(msg);
-      g_object_unref(G_OBJECT(source));
+      g_free(display_name);
     }
   }
 }
@@ -1237,16 +1236,16 @@ void
 addPreviousFilesMenu (GGobiInitInfo * info, GGobiSession * gg)
 {
   gint i;
-  GGobiInputSource *source;
+  GFile *file;
   if (info) {
     GtkUIManager *manager = gg->main_menu_manager;
     GtkActionGroup *actions = gtk_action_group_new ("Shortcuts");
     guint merge_id = gtk_ui_manager_new_merge_id (manager);
     gtk_ui_manager_insert_action_group (manager, actions, -1);
     for (i = 0; i < info->numInputs; i++) {
-      source = info->descriptions[i].source;
-      if (source) {
-        const gchar *uri = ggobi_input_source_get_uri(source);
+      file = info->descriptions[i].source;
+      if (file) {
+        const gchar *uri = g_file_get_uri(file);
         if (!uri) {
           g_warning("Previous data source is missing its URI");
           continue;

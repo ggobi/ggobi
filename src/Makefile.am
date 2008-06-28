@@ -22,9 +22,6 @@ libggobi_la_VALAS = \
   gui-varlist.vala \
   gui-viewer.vala \
   imputation.vala \
-  input-source-factory.vala \
-  input-source-file.vala \
-  input-source.vala \
   matrix.vala \
   pipeline-factory.vala \
   pipeline-matrix.vala \

@@ -15,7 +15,7 @@ using GLib;
 public class GGobi.Data : Stage {
 
   public string nickname {get; set;}
-  public InputSource source {get; set construct;}
+  public File source {get; set construct;}
 
   // The actual data
   private Matrix raw;
