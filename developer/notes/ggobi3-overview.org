@@ -9,6 +9,8 @@
   * R session via rggobi (treating R packages as plugins)
 ** Extension points
   * Data factories (input different formats)
+  * Transforms
+  * etc
 ** GGobi sessions
 *** Plots
 **** Types
