@@ -4,7 +4,7 @@ using Gsf;
 
 public class GGobi.DataFactoryXML : DataFactory, Object {
 
-  override SList<Data>? create_for_stream(InputStream input) {
+  override SList<Data>? read_from_stream(InputStream input) {
     return read_xml_data(input);
   }
   

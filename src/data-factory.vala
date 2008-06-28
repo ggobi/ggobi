@@ -16,15 +16,14 @@ public abstract class GGobi.DataFactory : GLib.Object {
   public virtual SList<Data>?
   create(File source)
   {
-    FileInputStream input;
+    SList<Data> datasets = null;
 
     try {
-      input = source.read(null);
+      datasets = read_from_file(source);
     } catch(GLib.Error err) {
       return null; // FIXME: should not catch this error (propagate)
     }
 
-    SList<Data> datasets = create_for_stream(input);
     foreach(weak Data dataset in datasets) {
       if (dataset.name == null)
         dataset.name = source.get_parse_name();
@@ -40,8 +39,17 @@ public abstract class GGobi.DataFactory : GLib.Object {
     string type = g_content_type_get_mime_type(info.get_content_type());
     return strcmp(mime_type, type) == 0;
   }
+
+  public virtual SList<Data> read_from_file(File file) throws GLib.Error {
+    InputStream input = file.read(null);
+    return read_from_stream(input);
+  }
   
-  public abstract SList<Data> create_for_stream(InputStream input);
+  public virtual SList<Data>
+  read_from_stream(InputStream input) throws GLib.Error
+  {
+    return null;
+  }
   
   public abstract string# mime_type { get; }
 }

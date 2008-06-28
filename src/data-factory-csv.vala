@@ -18,12 +18,12 @@ public class GGobi.DataFactoryCSV:DataFactory
 
   private static uint ROW_SIZE_INC = 4;
 
-  override string# mime_type {
+  public override string# mime_type {
     get { return "text/csv"; }
   }
 
   override SList<Data>
-  create_for_stream(InputStream input)
+  read_from_stream(InputStream input)
   {
     DataInputStream lines;
     ParserContext ctx = new ParserContext();

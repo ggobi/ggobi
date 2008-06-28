@@ -137,6 +137,7 @@
 
   #include "externs.h"
   #include "GGobiAPI.h"
+  #include "gsf-input-gio.h"
 
   /*
      The different XML element names we recognize in the input format.
@@ -267,10 +268,10 @@ class GGobi:Data:Factory:XML from GGobi:Data:Factory
 
   //interface GGobi:Data:Factory private GSList *
   override (GGobi:Data:Factory) GSList *
-    create_for_stream(GGobi:Data:Factory * self (check null type), 
-                      G:Input:Stream *input  (check null type))
+    read_from_file(GGobi:Data:Factory * self (check null type), 
+                   G:File *file  (check null type), G:Error **error)
   {
-    return self_read_xml_data (input);
+    return self_read_xml_data (file);
   }
 
   private gboolean 
@@ -286,25 +287,21 @@ class GGobi:Data:Factory:XML from GGobi:Data:Factory
   }
 
   //interface GGobi:Data:Factory private GSList *
+  /* NOTE: due to an apparent bug in GLib, you'll need to change
+     "mime_type" in ggobi-data-factory-xml.c to "mime-type" */
   property STRING mime_type
     (override)
     get { g_value_set_string (VAL, "application/xml"); };
   
   
-  private GSList *read_xml_data (GInputStream * input)
+  private GSList *read_xml_data (GFile * file)
   {
     xmlSAXHandlerPtr xmlParserHandler = g_new0(xmlSAXHandler, 1);
     XMLParserData data;
     xmlParserCtxtPtr ctx;
     GSList *dlist;
 
-    // FIXME: temporary until libgsf 1.14.9 is released
-    GFileInputStream *file_input = G_FILE_INPUT_STREAM(input);
-    GFileInfo *info = g_file_input_stream_query_info(file_input,
-                                                     G_FILE_ATTRIBUTE_STANDARD_NAME,
-                                                     NULL, NULL);
-    ctx = xmlCreateFileParserCtxt(g_file_info_get_name(info));
-    //ctx = gsf_xml_parser_context(input);
+    ctx = gsf_xml_parser_context(gsf_input_gio_new(file, NULL));
     
     xmlParserHandler->startElement = self_start_xml_element;
     xmlParserHandler->endElement = self_end_xml_element;

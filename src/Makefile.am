@@ -193,6 +193,7 @@ libggobi_la_BUILT = \
   xlines.c \
   xyplot.c \
   xyplot_ui.c \
+  gsf-input-gio.c \
   $(libggobi_la_METASOURCES)
 
 libggobi_la_SOURCES = $(libggobi_la_BUILT) $(libggobi_la_METASTAMPS)
