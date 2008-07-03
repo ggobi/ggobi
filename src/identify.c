@@ -291,3 +291,29 @@ identify_label_fetch (gint k, cpaneld * cpanel, GGobiStage * d, GGobiSession * g
   return g_strdup("");
 }
 
+/*  Recenter the data using the current sticky point */
+// FIXME: This should probably just operate at the plot/viewport level, especially
+// since specified limits are going away
+void
+recenter_data (gint i, GGobiStage * d)
+{
+  GGobiVariable *var;
+  gdouble x;
+  gint j;
+
+  for (j = 0; j < d->n_cols; j++) {
+    var = ggobi_stage_get_variable(d, j);
+    if (i >= 0) {
+      x = ggobi_variable_get_range(var) / 2;
+      var->lim_specified_p = true;
+      var->lim_specified.min = ggobi_stage_get_raw_value(d, i, j) - x;
+      var->lim_specified.max = ggobi_stage_get_raw_value(d, i, j) + x;
+    }
+    else {
+      /*-- if no point was specified, recenter using defaults --*/
+      var->lim_specified_p = false;
+    }
+    
+    //g_signal_emit_by_name(d, "col_data_changed", (guint) j);
+  }
+}
