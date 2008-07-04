@@ -1,7 +1,7 @@
 /* Implement GGobi.Surface with a Clutter.Actor
 */
 
-public class GGobi.SurfaceClutter : Clutter.Actor, Surface {
+public abstract class GGobi.SurfaceClutter : Clutter.Actor, Surface {
   
   /* The parent */
   public Surface parent {

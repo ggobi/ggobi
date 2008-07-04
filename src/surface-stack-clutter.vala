@@ -66,10 +66,10 @@ public class GGobi.SurfaceStackClutter : SurfaceClutter, Surface,
     group.add_actor(buffer);
     return buffer;
   }
-  public SurfaceContainer create_container() {
-    SurfaceContainer container = new SurfaceContainerClutter(this);
-    group.add_actor(container);
-    return container;
+  public SurfaceStack create_stack() {
+    SurfaceStack stack = new SurfaceStackClutter(this);
+    group.add_actor(stack);
+    return stack;
   }
   public SurfaceMatrix create_matrix(int n_rows, int n_cols) {
     SurfaceMatrix matrix = new SurfaceMatrixClutter(this, n_rows, n_cols);
