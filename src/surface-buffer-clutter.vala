@@ -1,6 +1,8 @@
 /* Implement GGobi.SurfaceBuffer using a ClutterTexture */
 
-public class GGobi.SurfaceBufferClutter : SurfaceClutter, SurfaceBuffer {
+public class GGobi.SurfaceBufferClutter : SurfaceClutter, Surface,
+  SurfaceBuffer
+{
   private bool dirty; /* do we need to redraw? */
   
   private Clutter.Texture texture_actor = new Clutter.Texture();

@@ -28,6 +28,9 @@ public interface GGobi.Surface : Object {
     public int width;
     public int height;
   }
+
+  /* Destroy surface (remove from container) */
+  public abstract void destroy();
   
   /* Events */
   public signal bool button_press(ButtonEvent e);

@@ -25,7 +25,7 @@ public class GGobi.SurfaceClutter : Clutter.Actor, Surface {
 
   /* Events */
     
-  private ButtonEvent convert_button_event(Clutter.ButtonEvent ce) {
+  private static ButtonEvent convert_button_event(Clutter.ButtonEvent ce) {
     ButtonEvent e = new ButtonEvent();
     e.type = ce.type == Clutter.EventType.BUTTON_PRESS ?
       EventType.BUTTON_PRESS : EventType.BUTTON_RELEASE;
@@ -37,7 +37,7 @@ public class GGobi.SurfaceClutter : Clutter.Actor, Surface {
     return e;
   }
 
-  private MotionEvent convert_motion_event(Clutter.MotionEvent ce) {
+  private static MotionEvent convert_motion_event(Clutter.MotionEvent ce) {
     MotionEvent e = new MotionEvent();
     e.type = EventType.MOTION;
     e.x = ce.x;
@@ -46,7 +46,7 @@ public class GGobi.SurfaceClutter : Clutter.Actor, Surface {
     return e;
   }
   
-  private KeyEvent convert_key_event(Clutter.KeyEvent ce) {
+  private static KeyEvent convert_key_event(Clutter.KeyEvent ce) {
     KeyEvent e = new KeyEvent();
     e.type = ce.type == Clutter.EventType.KEY_PRESS ?
       EventType.KEY_PRESS : EventType.KEY_RELEASE;

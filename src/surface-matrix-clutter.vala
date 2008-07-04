@@ -1,9 +1,9 @@
-/* Impements GGobi.SurfaceContainer using Clutter.Group */
-
-public class GGobi.SurfaceContainerClutter : SurfaceClutter, SurfaceContainer {
+public class GGobi.SurfaceMatrixClutter : SurfaceClutter, Surface,
+  SurfaceContainer, SurfaceMatrix
+{
   private Clutter.Group group = new Clutter.Group();
 
-  public SurfaceContainerClutter(Surface parent) {
+  public SurfaceMatrixClutter(Surface parent) {
     this.parent = parent;
   }
   
@@ -11,25 +11,6 @@ public class GGobi.SurfaceContainerClutter : SurfaceClutter, SurfaceContainer {
   public List<Surface> get_children() {
     group.get_children();
   }
-  
-  public void add_child(Surface surface) {
-    group.add_actor(surface as SurfaceClutter);
-  }
-  
-  public void remove_child(Surface surface) {
-    group.remove_actor(surface as SurfaceClutter);
-  }
-  
-  /* Depth order */
-  public void raise_child(Surface child, Surface? sibling) {
-    group.raise_child(child as SurfaceClutter, sibling as SurfaceClutter);
-  }
-    
-  public void lower_child(Surface child, Surface? sibling) {
-    group.lower_child(child as SurfaceClutter, sibling as SurfaceClutter);
-  }
-
-  /* Delegating to ClutterGroup */
   
   override void paint() {
     group.paint();
@@ -61,19 +42,9 @@ public class GGobi.SurfaceContainerClutter : SurfaceClutter, SurfaceContainer {
   {
     group.get_preferred_height(for_width, min_height_p, natural_height_p);
   }
+
+  /* This is where we will put the layout logic */
   override void allocate(Clutter.ActorBox box, bool absolute_origin_changed) {
     group.allocate(box, absolute_origin_changed);
-  }
-
-  /* Child factory methods */
-
-  public SurfaceBuffer create_buffer() {
-    return new SurfaceBufferClutter(this);
-  }
-  public SurfaceContainer create_container() {
-    return new SurfaceContainerClutter(this);
-  }
-  public SurfaceMatrix create_matrix(int n_rows, int n_cols) {
-    return new SurfaceMatrixClutter(this, n_rows, n_cols);
   }
 }
