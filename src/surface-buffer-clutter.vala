@@ -28,6 +28,8 @@ public class GGobi.SurfaceBufferClutter : SurfaceClutter, Surface,
     resize();
   }
 
+  private static Drawable drawable = new DrawableCogl();
+  
   private void resize() {
     /* create a Cogl texture */
     Cogl.Handle tex = new Cogl.Texture.with_size(viewport.width,
@@ -38,7 +40,7 @@ public class GGobi.SurfaceBufferClutter : SurfaceClutter, Surface,
     /* cache a framebuffer object to direct drawing to the texture */
     fbo = new Cogl.Offscreen.to_texture(tex);
     /* force a redraw */
-    repaint();
+    repaint(drawable);
   }
 
   /* For saving texture memory */
