@@ -13,9 +13,10 @@
 */
 public interface GGobi.Drawable {
 
-  /* configure color */
-  public abstract void set_color(Color color);
-
+  /* configure colors */
+  public abstract void set_stroke_color(Color? color);
+  public abstract void set_fill_color(Color? color);
+  
   /* configure line parameters */
   public abstract void set_line_width(int width);
   public abstract void set_line_cap(LineCap cap);
@@ -27,22 +28,29 @@ public interface GGobi.Drawable {
   public abstract void set_clip(int x0, int x1, int y0, int y1);
   
   /* draw stuff */
-  public abstract void draw_rectangle(int x, int y, int width, int height, 
-                                      bool filled);
+  public abstract void draw_rectangle(int x, int y, int width, int height);
   public abstract void draw_circle(int x, int y, int r);
   public abstract void draw_line(int x1, int y1, int x2, int y2);
   public abstract void draw_polyline(int[] x, int[] y);
-  public abstract void draw_polygon(int[] x, int[] y, bool filled);
+  public abstract void draw_polygon(int[] x, int[] y);
 
   /* fast paths */
   public abstract void draw_points(int[] x, int[] y);
   public abstract void draw_segments(int[] x, int[] y);
-  
-  /* text handling */
-  public abstract void draw_text(int x, int y, string str, double rot);
-  public abstract void font_extents(out double ascent, out double descent);
-  public abstract void text_extents(out double width, out double height);
 
+  /* configure font */
+  public abstract void set_font_family(string family);
+  public abstract void set_font_size(int size);
+  public abstract void set_font_style(FontStyle style);
+  public abstract void set_font_weight(FontWeight weight);
+
+  /* querying font */
+  public abstract void font_extents(out int ascent, out int descent);
+  public abstract void text_extents(out int width, out int height);
+
+  /* draw text */
+  public abstract void draw_text(int x, int y, string str, double rot);
+  
   /* get size */
   public abstract void get_size(out int width, out int height);
 
@@ -51,24 +59,35 @@ public interface GGobi.Drawable {
   public abstract Pattern finish_pattern();
   public abstract void draw_pattern(Pattern pattern, int[] x, int[] y);
 }
+  
+public struct GGobi.Pattern : uint;
 
-public struct Pattern : uint;
-
-public struct Color {
+public struct GGobi.Color {
   public int red;
   public int green;
   public int blue;
   public int alpha;
 }
 
-public enum LineCap {
+public enum GGobi.LineCap {
   ROUND,
   BUTT,
   SQUARE
 }
 
-public enum LineJoin {
+public enum GGobi.LineJoin {
   ROUND,
   MITER,
   BEVEL
+}
+
+public enum GGobi.FontStyle {
+  NORMAL,
+  OBLIQUE,
+  ITALIC
+}
+
+public enum GGobi.FontWeight {
+  NORMAL,
+  BOLD
 }
