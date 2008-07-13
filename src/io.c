@@ -160,6 +160,18 @@ filename_get_configure (GtkWidget * chooser, guint type, ggobid * gg)
   const gchar *key = key_get ();
   g_object_set_data (G_OBJECT (chooser), "action", GINT_TO_POINTER (type));
   g_object_set_data (G_OBJECT (chooser), key, gg);
+
+  if (gg->input && gg->input->baseName) {
+    gchar *cwd = g_get_current_dir();
+    gchar *dir;
+    if (g_path_is_absolute(gg->input->dirName))
+      dir = g_strdup(gg->input->dirName);
+    else
+      dir = g_build_filename(cwd, gg->input->dirName, NULL);
+    gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER (chooser), dir);
+    g_free(dir);
+    g_free(cwd);
+  }
 }
 
 GtkWidget *
@@ -236,14 +248,6 @@ filename_get_r (ggobid * gg)
   GtkWidget *chooser;
   chooser = createInputFileSelectionDialog ("Read ggobi data", gg);
 
-  if (gg->input && gg->input->baseName) {
-    gchar *cwd = g_get_current_dir();
-    gchar *dir = g_build_filename(cwd, gg->input->dirName, NULL);
-    gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER (chooser), dir);
-    g_free(cwd);
-    g_free(dir);
-  }
-
   filename_get_configure (chooser, READ_FILESET, gg);
 
   if (gtk_dialog_run (GTK_DIALOG (chooser)) == GTK_RESPONSE_ACCEPT)
@@ -275,22 +279,6 @@ filename_get_w (GtkWidget * w, ggobid * gg)
    */
 
   chooser = createOutputFileSelectionDialog (title);
-
-  if (gg->input && gg->input->baseName) {
-    gchar *cwd = g_get_current_dir();
-    gchar *dir;
-
-    // If the input directory is a full path name, be careful
-    // not to concatenate the two strings.  Use the working dir.
-    if (gg->input->dirName[0] == G_DIR_SEPARATOR)
-      dir = g_get_current_dir();
-    else
-      dir = g_build_filename(cwd, gg->input->dirName, NULL);
-
-    gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER (chooser), dir);
-    g_free(cwd);
-    g_free(dir);
-  }
 
   filename_get_configure (chooser, WRITE_FILESET, gg);
 
