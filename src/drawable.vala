@@ -8,7 +8,7 @@ public interface GGobi.Drawable {
   public abstract int height { get; construct; }
   
   /* configure colors */
-  public abstract void set_stroke_color(Color? color);
+  public abstract void set_stroke_color(Color color);
   public abstract void set_fill_color(Color? color);
   
   /* configure line parameters */
@@ -16,9 +16,9 @@ public interface GGobi.Drawable {
   public abstract void set_dashes(int[] dashes, int offset);
 
   /* optional line aesthetics */
-  public void set_line_cap(LineCap cap) { }
-  public void set_line_join(LineJoin join) { }
-  public void set_miter_limit(double limit) { }
+  public virtual void set_line_cap(LineCap cap) { }
+  public virtual void set_line_join(LineJoin join) { }
+  public virtual void set_miter_limit(double limit) { }
 
   /* set clip */
   public abstract void set_clip(int x, int y, int width, int height);
@@ -31,7 +31,7 @@ public interface GGobi.Drawable {
   public abstract void draw_polygon(int[] x, int[] y);
   public abstract void draw_points(int[] x, int[] y);
   public abstract void draw_segments(int[] x, int[] y);
-  public void draw_line(int x1, int y1, int x2, int y2) {
+  public virtual void draw_line(int x1, int y1, int x2, int y2) {
     draw_segments(new int[] { x1, x2 }, new int[] { y1, y2 });
   }
   
@@ -47,15 +47,9 @@ public interface GGobi.Drawable {
 
   /* draw text */
   public abstract void set_text_rotation(double rot);
-  public abstract void draw_text(int x, int y, string str);
-  
-  /* patterns */
-  public abstract void start_pattern();
-  public abstract Pattern finish_pattern();
-  public abstract void draw_pattern(Pattern pattern, int[] x, int[] y);
+  public abstract void draw_text(string str, int x, int y);
+  public abstract void draw_glyphs(string str, int[] x, int[] y);
 }
-  
-public struct GGobi.Pattern;
 
 /* Channel values range from 0 to 1. */
 public struct GGobi.Color {

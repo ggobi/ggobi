@@ -5,8 +5,6 @@ using Pango;
 
 public class GGobi.DrawableCogl : Drawable {
 
-  public Cogl.Handle handle { construct; }
-  
   public int width { get; construct; }
   public int height { get; construct; }
 
@@ -14,8 +12,7 @@ public class GGobi.DrawableCogl : Drawable {
     Enable(VERTEX_ARRAY | LINE_SMOOTH);
   }
   
-  public DrawableCogl(Cogl.Handle handle, int width, int height) {
-    this.handle = handle;
+  public DrawableCogl(int width, int height) {
     this.width = width;
     this.height = height;
   }
@@ -38,14 +35,12 @@ public class GGobi.DrawableCogl : Drawable {
     } else need_outline = false;
   }
   
-  public void set_stroke_color(Color? color) {
+  public void set_stroke_color(Color color) {
     stroke = color;
     check_need_outline();
-    if (stroke != null) {
-      if (fill == null)
-        PolygonMode(FRONT_AND_BACK, LINE);
-      set_color(stroke); /* stroke is the default color */
-    }
+    if (fill == null)
+      PolygonMode(FRONT_AND_BACK, LINE);
+    set_color(stroke); /* stroke is the default color */
   }
   public void set_fill_color(Color? color) {
     fill = color;
@@ -105,9 +100,7 @@ public class GGobi.DrawableCogl : Drawable {
              new int[] { x, x, x + width, x + width },
              new int[] { y, y + height, y, y + height });
   }
-
-  private static const int DEG2CLT = 1024/360;
-    
+  
   public void draw_circle(int x, int y, int r) {
     float cx = x, cy = y;
     int[] vx = new int[r*4];
@@ -206,48 +199,26 @@ public class GGobi.DrawableCogl : Drawable {
     pango_context.set_matrix(matrix);
   }
   
-  public void draw_text(int x, int y, string str) {
+  public void draw_text(string str, int x, int y) {
     /* using a PangoLayout */
     Layout layout = layout_text(str);
     PangoClutter.render_layout(layout, x, y, stroke, 0);
+  }
+
+  public void draw_glyphs(string glyph, int[] x, int[] y) {
+    Layout layout = layout_text(glyph);
+    Clutter.Color text_color = to_clutter_color(stroke);
+    /* get glyph out of layout, lookup texture in cache, draw it all over */
+    // NOTE: this is pretty inefficient, but we lack low-level access
+    // to the clutter glyph cache. Might need to roll our own.
+    for (int i = 0; i < x.length; i++)
+      pango_clutter_render_layout(layout, x[i], y[i], text_color, 0);
   }
 
   private Layout layout_text(string str) {
     Layout layout = new Layout(pango_context);
     layout.set_text(str);
     return layout;
-  }
-
-  private Cogl.Handle texture;
-  private Cogl.Handle offscreen;
-  
-  /* patterns */
-
-  private struct PatternCogl : Pattern {
-    public Cogl.Handle handle;
-  }
-
-  // Not sure about width/height here...
-  public void start_pattern(int width, int height) {
-    texture = Cogl.texture_new_with_size(width, height, 16, false,
-                                         Cogl.PixelFormat.RGBA_8888);
-    offscreen = Cogl.offscreen_new_to_texture(texture);
-    Cogl.draw_buffer(Cogl.BufferTarget.OFFSCREEN_BUFFER, offscreen);
-  }
-  public Pattern finish_pattern() {
-    Pattern pattern = new PatternCogl();
-    pattern.handle = texture;
-    texture = null;
-    Cogl.draw_buffer(Cogl.BufferTarget.OFFSCREEN_BUFFER, handle);
-    offscreen = null;
-    return pattern;
-  }
-  public void draw_pattern(Pattern pattern, int[] x, int[] y) {
-    Cogl.Handle texture = pattern.handle;
-    int width = texture.get_width(), height = texture.get_height();
-    for (int i = 0; i < x.length; i++)
-      Cogl.texture_rectangle(texture, x[i], y[i], x[i] + width, y[i] + height,
-                             0, 0, 1., 1.);
   }
   
   private void vertices(GLenum mode, int[] x, int[] y) {
