@@ -40,6 +40,8 @@ public interface GGobi.Drawable {
   public abstract void set_font_family(string family);
   public abstract void set_font_style(FontStyle style);
   public abstract void set_font_weight(FontWeight weight);
+  /* for asymmetric scaling - do we really need this? */
+  /*public abstract void set_font_matrix();*/
 
   /* querying font */
   public abstract void font_extents(out int ascent, out int descent);
