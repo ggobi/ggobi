@@ -24,7 +24,19 @@ public abstract class GGobi.SurfaceClutter : Clutter.Actor, Surface {
   }
 
   /* Events */
-    
+
+  public bool sensitive { /* can receive events */
+    get { return get_reactive(); }
+    construct set { set_reactive(value); }
+  }
+
+  public void grab_key_focus() {
+    get_stage().set_key_focus(this);
+  }
+  public void has_key_focus() {
+    get_stage().get_key_focus() == this;
+  }
+  
   private static ButtonEvent convert_button_event(Clutter.ButtonEvent ce) {
     ButtonEvent e = new ButtonEvent();
     e.type = ce.type == Clutter.EventType.BUTTON_PRESS ?

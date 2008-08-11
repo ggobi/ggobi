@@ -10,8 +10,9 @@
    
    The drawing actually occurs in the leaves at SurfaceBuffers.
    
-   If an event occurs within the region of the surface (or if there is
-   a key event), the corresponding signal is emitted.
+   If an event occurs within the region of a sensitive surface (or if
+   there is a key event and it has focus), the corresponding signal is
+   emitted.
 */
 public interface GGobi.Surface : Object {
 
@@ -33,6 +34,14 @@ public interface GGobi.Surface : Object {
   public abstract void destroy();
   
   /* Events */
+
+  /* can receive events */
+  public abstract bool sensitive { get; construct set; }
+
+  /* only one surface can have the key focus */
+  public abstract void grab_key_focus();
+  public abstract void has_key_focus();
+  
   public signal bool button_press(ButtonEvent e);
   public signal bool button_release(ButtonEvent e);
   public signal bool pointer_move(MotionEvent e);
