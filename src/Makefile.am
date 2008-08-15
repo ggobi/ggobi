@@ -236,7 +236,7 @@ if HAS_VALA
 .vala.stamp: $(libggobi_la_VALAS) ../vapi/ggobi-compat.vapi
 	@VALAC@ -C --basedir=. --library=ggobi --vapidir=../vapi \
     --pkg=gtk+-2.0 --pkg=libgsf-1 --pkg=ggobi-compat --pkg=libxml-2.0 \
-    --pkg=gmodule-2.0 --pkg=clutter-0.8 --pkg=cogl-0.8 \
+    --pkg=gmodule-2.0 --pkg=clutter-0.8 --pkg=cogl-0.8 --pkg=gl \
     $(libggobi_la_VALAS)
 	@touch $@
 else
