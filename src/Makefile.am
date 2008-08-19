@@ -47,7 +47,7 @@ MAINTAINERCLEANFILES = $(BUILT_SOURCES)
 .%.gob.stamp: %.gob
 	@GOB2@ --no-touch --no-private-header $<
 	@touch $@
-          
+
 bin_PROGRAMS  = ggobi
 ggobi_SOURCES = ggobiMain.c
 ggobi_LDADD   = libggobi.la

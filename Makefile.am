@@ -1,4 +1,4 @@
-SUBDIRS = libltdl src plugins po
+SUBDIRS = libltdl src plugins po doc
 
 EXTRA_DIST = bootstrap CPLicense.txt
 

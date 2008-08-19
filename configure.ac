@@ -195,6 +195,10 @@ PKG_CHECK_MODULES(LIBXML, [libxml-2.0])
 AC_SUBST(LIBXML_CFLAGS)
 AC_SUBST(LIBXML_LIBS)
 
+# Find pdflatex and bibtex for building the manual
+AC_PATH_PROGS(PDFLATEX, [${PDFLATEX} pdflatex], false)
+AC_PATH_PROGS(BIBTEX, [${BIBTEX} bibtex], false)
+
 # Are we on Windows?
 
 AC_MSG_CHECKING([for native Win32])
@@ -211,7 +215,7 @@ AM_CONDITIONAL(OS_WIN32, test "$os_win32" = "yes")
 
  dnl Process the different .in files, substituting the values computed here in the configuration
  dnl script for the corresponding @variable@ in these files.
-AC_CONFIG_FILES(Makefile src/Makefile plugins/Makefile ggobi.pc ggobi-system.pc po/Makefile.in)
+AC_CONFIG_FILES(Makefile src/Makefile plugins/Makefile ggobi.pc ggobi-system.pc po/Makefile.in doc/Makefile)
 AC_OUTPUT
 
 echo "*******************************"
