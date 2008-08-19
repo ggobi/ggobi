@@ -222,6 +222,10 @@ PKG_CHECK_MODULES(LIBGSF, [libgsf-1])
 AC_SUBST(LIBGSF_CFLAGS)
 AC_SUBST(LIBGSF_LIBS)
 
+# Find pdflatex and bibtex for building the manual
+AC_PATH_PROGS(PDFLATEX, [${PDFLATEX} pdflatex], false)
+AC_PATH_PROGS(BIBTEX, [${BIBTEX} bibtex], false)
+
 # Are we on Windows?
 
 AC_MSG_CHECKING([for native Win32])
@@ -249,7 +253,7 @@ AC_SUBST(GLITZ_LIBS)
 
  dnl Process the different .in files, substituting the values computed here in the configuration
  dnl script for the corresponding @variable@ in these files.
-AC_CONFIG_FILES(Makefile src/Makefile plugins/Makefile ggobi.pc ggobi-system.pc po/Makefile.in doc/Makefile doc/reference/Makefile tests/Makefile)
+AC_CONFIG_FILES(Makefile src/Makefile plugins/Makefile ggobi.pc ggobi-system.pc po/Makefile.in doc/Makefile doc/reference/Makefile doc/manual/Makefile tests/Makefile)
 AC_OUTPUT
 
 echo "*******************************"

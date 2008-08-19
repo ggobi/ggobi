@@ -16,7 +16,7 @@ libggobi_la_VALAS = \
   data-factory.vala \
   data.vala \
   drawable.vala \
-  drawable-cogl.vala \
+  cogl-drawable.vala \
   gui-impute.vala \
   gui-jitter.vala \
   gui-randomize.vala \
@@ -49,7 +49,7 @@ libggobi_la_VALAS = \
   stage-texture.vala \
   stage-transform.vala \
   surface.vala \
-  surface-clutter.vala \
+  clutter-surface.vala \
   svd2.vala \
   tour-basis-list.vala \
   tour-basis-pursuit.vala \
@@ -235,9 +235,9 @@ MAINTAINERCLEANFILES = $(BUILT_SOURCES)
 if HAS_VALA
 .vala.stamp: $(libggobi_la_VALAS) ../vapi/ggobi-compat.vapi
 	@VALAC@ -C --basedir=. --library=ggobi --vapidir=../vapi \
-    --pkg=gtk+-2.0 --pkg=libgsf-1 --pkg=ggobi-compat --pkg=libxml-2.0 \
-    --pkg=gmodule-2.0 --pkg=clutter-0.8 --pkg=cogl-0.8 --pkg=gl \
-    $(libggobi_la_VALAS)
+          --pkg=gtk+-2.0 --pkg=libgsf-1 --pkg=ggobi-compat --pkg=libxml-2.0 \
+          --pkg=gmodule-2.0 --pkg=clutter-0.8 \
+          --pkg=cogl-0.8 --pkg=gl $(libggobi_la_VALAS)
 	@touch $@
 else
 .vala.stamp: $(libggobi_la_VALAS)
