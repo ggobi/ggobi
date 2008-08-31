@@ -40,16 +40,14 @@ public abstract class GGobi.DataFactory : GLib.Object {
     return strcmp(mime_type, type) == 0;
   }
 
+  // FIXME: temporarily virtual for XML stuff until Gsf catches up
   public virtual SList<Data> read_from_file(File file) throws GLib.Error {
     InputStream input = file.read(null);
     return read_from_stream(input);
   }
   
-  public virtual SList<Data>
-  read_from_stream(InputStream input) throws GLib.Error
-  {
-    return null;
-  }
+  public abstract SList<Data>
+  read_from_stream(InputStream input) throws GLib.Error;
   
   public abstract string# mime_type { get; }
 }

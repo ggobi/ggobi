@@ -23,7 +23,7 @@ public class GGobi.DataFactoryCSV:DataFactory
   }
 
   override SList<Data>
-  read_from_stream(InputStream input)
+  read_from_stream(InputStream input) throws GLib.Error
   {
     DataInputStream lines;
     ParserContext ctx = new ParserContext();

@@ -2,10 +2,51 @@
 /* Graphics primitive API containing a minimal context.
 */
 
-public interface GGobi.Drawable {
+//VALABUG: these need to be defined prior to the Drawable interface
+namespace GGobi.Surface {
+/* Channel values range from 0 to 1. */
+  public struct Color {
+    public float red;
+    public float green;
+    public float blue;
+    public float alpha = 1;
+    
+    public bool equal(Color color) {
+      return red == color.red && green == color.green && blue == color.blue &&
+        alpha == color.alpha;
+    }
+  }
 
-  public abstract int width { get; construct; }
-  public abstract int height { get; construct; }
+  public enum LineCap {
+    ROUND,
+    BUTT,
+    SQUARE
+  }
+
+  public enum LineJoin {
+    ROUND,
+    MITER,
+    BEVEL
+  }
+
+  public enum FontStyle {
+    NORMAL,
+    OBLIQUE,
+    ITALIC
+  }
+
+  public enum FontWeight {
+    NORMAL,
+    BOLD
+  }
+}
+
+public interface GGobi.Surface.Drawable {
+
+  //VALABUG: it seems interface properties cannot be construct-only
+  // We don't want the width and height to be settable after construction
+  public abstract int width { get; set construct; }
+  public abstract int height { get; set construct; }
   
   /* configure colors */
   public abstract void set_stroke_color(Color color);
@@ -45,41 +86,10 @@ public interface GGobi.Drawable {
 
   /* querying font */
   public abstract void font_extents(out int ascent, out int descent);
-  public abstract void text_extents(out int width, out int height);
+  public abstract void text_extents(string str, out int width, out int height);
 
   /* draw text */
   public abstract void set_text_rotation(double rot);
   public abstract void draw_text(string str, int x, int y);
   public abstract void draw_glyphs(string str, int[] x, int[] y);
-}
-
-/* Channel values range from 0 to 1. */
-public struct GGobi.Color {
-  public float red;
-  public float green;
-  public float blue;
-  public float alpha;
-}
-
-public enum GGobi.LineCap {
-  ROUND,
-  BUTT,
-  SQUARE
-}
-
-public enum GGobi.LineJoin {
-  ROUND,
-  MITER,
-  BEVEL
-}
-
-public enum GGobi.FontStyle {
-  NORMAL,
-  OBLIQUE,
-  ITALIC
-}
-
-public enum GGobi.FontWeight {
-  NORMAL,
-  BOLD
 }
