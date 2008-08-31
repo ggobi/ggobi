@@ -179,48 +179,21 @@ AC_SUBST(DEBUG_CFLAGS)
 AC_PATH_PROG(GOB2, gob2,,$PATH)
 
 # Find valac (the vala compiler)
-AC_PATH_PROG(VALAC, valac,,$PATH)
-AC_SUBST(VALAC)
+AC_PROG_VALAC([0.3.5])
 
-AM_CONDITIONAL(HAS_VALA, test -n "${VALAC}")
-
+# pkg-config
 PKG_PROG_PKG_CONFIG(0.21)
 
-# FIND GIO
+# FIND GIO, GTK+, libxml2, libgsf-1, and clutter (for now)
 
-PKG_CHECK_MODULES(GIO, [gio-2.0 >= 2.16.0])
+PKG_CHECK_MODULES(DEP, [gio-2.0 >= 2.16.0 gtk+-2.0 >= 2.8.0 libxml-2.0 libgsf-1 clutter-0.8])
 
-AC_SUBST(GIO_CFLAGS)
-AC_SUBST(GIO_LIBS)
-
-
-# FIND GTK2
-
-echo "Looking for gtk2"
-
-PKG_CHECK_MODULES(GTK, [gtk+-2.0 >= 2.6.0])
-
-AC_SUBST(GTK_CFLAGS)
-AC_SUBST(GTK_LIBS)
+AC_SUBST(DEP_CFLAGS)
+AC_SUBST(DEP_LIBS)
 
 # Stuff for gtk doc
 GTK_DOC_CHECK(1.4)
 AC_CONFIG_MACRO_DIR(m4)
-
-echo "Setting gtk flags: cflags=$GTK_CFLAGS, libs=$GTK_LIBS"
-
-# Find libxml2
-
-PKG_CHECK_MODULES(LIBXML, [libxml-2.0])
-
-AC_SUBST(LIBXML_CFLAGS)
-AC_SUBST(LIBXML_LIBS)
-
-# Find gsf
-
-PKG_CHECK_MODULES(LIBGSF, [libgsf-1])
-AC_SUBST(LIBGSF_CFLAGS)
-AC_SUBST(LIBGSF_LIBS)
 
 # Find pdflatex and bibtex for building the manual
 AC_PATH_PROGS(PDFLATEX, [${PDFLATEX} pdflatex], false)
@@ -239,17 +212,6 @@ case "$host" in
 esac
 echo "${os_win32}"
 AM_CONDITIONAL(OS_WIN32, test "$os_win32" = "yes")
-
-# Find glitz
-
-if test "$os_win32" != "yes" ; then
-  PKG_CHECK_MODULES(GLITZ, [glitz-glx], [HAVE_GLITZ=1], [HAVE_GLITZ=0])
-else
-  PKG_CHECK_MODULES(GLITZ, [glitz-wgl], [HAVE_GLITZ=1], [HAVE_GLITZ=0])
-fi
-
-AC_SUBST(GLITZ_CFLAGS)
-AC_SUBST(GLITZ_LIBS)
 
  dnl Process the different .in files, substituting the values computed here in the configuration
  dnl script for the corresponding @variable@ in these files.

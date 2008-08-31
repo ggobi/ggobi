@@ -83,8 +83,7 @@ libggobi_la_METAOBJECTS = \
 libggobi_la_METASTAMPS = \
   $(libggobi_la_GOBS:%.gob=.%.gob.stamp) .vala.stamp
 
-libggobi_la_LDFLAGS  = @GTK_LIBS@ @LIBXML_LIBS@ @LIBGSF_LIBS@ @GIO_LIBS@ \
-  -version-info 2
+libggobi_la_LDFLAGS  = @DEP_LIBS@ -version-info 2
 
 libggobi_la_BUILT = \
   array.c \
@@ -232,7 +231,7 @@ MAINTAINERCLEANFILES = $(BUILT_SOURCES)
 	@GOB2@ --no-touch --no-private-header $<
 	@touch $@
 
-if HAS_VALA
+if USE_VALAC
 .vala.stamp: $(libggobi_la_VALAS) ../vapi/ggobi-compat.vapi
 	@VALAC@ -C --basedir=. --library=ggobi --vapidir=../vapi \
           --pkg=gtk+-2.0 --pkg=libgsf-1 --pkg=ggobi-compat --pkg=libxml-2.0 \
@@ -241,7 +240,7 @@ if HAS_VALA
 	@touch $@
 else
 .vala.stamp: $(libggobi_la_VALAS)
-	@echo "Either install the Vala compiler or download a GGobi distribution tarball"
+	@echo "C code out of date; either install the Vala compiler or download a GGobi distribution tarball"
 	@exit 2
 endif
 
@@ -253,7 +252,7 @@ bin_PROGRAMS  = ggobi
 ggobi_SOURCES = ggobiMain.c
 ggobi_LDADD   = libggobi.la
 
-AM_CPPFLAGS = @DEBUG_CFLAGS@ @GTK_CFLAGS@ @LIBXML_CFLAGS@ @LIBGSF_CFLAGS@
+AM_CPPFLAGS = @DEBUG_CFLAGS@ @DEP_CFLAGS@
 AM_CFLAGS   = -std=gnu99
 
 # Since the Vala files are not actually sources, we specify them in EXTRA_DIST

@@ -12,15 +12,17 @@ EXTRA_DIST = $(VALAS) $(VALAHEADERS) $(VALASTAMPS)
 
 TESTS = $(check_PROGRAMS)
 
-AM_CPPFLAGS = @DEBUG_CFLAGS@ @GTK_CFLAGS@ @LIBXML_CFLAGS@ @LIBGSF_CFLAGS@
+AM_CPPFLAGS = @DEBUG_CFLAGS@ @DEP_CFLAGS@
 AM_CFLAGS   = -std=gnu99
-AM_LDFLAGS  = @GTK_LIBS@ @LIBXML_LIBS@ @LIBGSF_LIBS@
+AM_LDFLAGS  = @DEP_LIBS@
 LDADD       = ../src/libggobi.la
 
-if HAS_VALA
+if USE_VALAC
 %.stamp: %.vala
 	@VALAC@ -C --vapidir=../vapi --vapidir=../src \
-    --pkg=gtk+-2.0 --pkg=libgsf-1 --pkg=ggobi-compat --pkg=ggobi --pkg=libxml-2.0 $<
+          --pkg=gtk+-2.0 --pkg=libgsf-1 --pkg=ggobi-compat --pkg=ggobi \
+          --pkg=libxml-2.0 --pkg=gmodule-2.0 --pkg=clutter-0.8 --pkg=cogl-0.8 \
+          --pkg=gl $<
 	@touch $@
 else
 %.stamp: %.vala
