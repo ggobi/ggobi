@@ -1,5 +1,5 @@
 # ADD NEW TESTS HERE (root name of vala file)
-check_PROGRAMS = dummy
+check_PROGRAMS = dummy surface
 
 VALAS = $(check_PROGRAMS:%=%.vala)
 VALASOURCES = $(VALAS:%.vala=%.c)
@@ -22,7 +22,7 @@ if USE_VALAC
 	@VALAC@ -C --vapidir=../vapi --vapidir=../src \
           --pkg=gtk+-2.0 --pkg=libgsf-1 --pkg=ggobi-compat --pkg=ggobi \
           --pkg=libxml-2.0 --pkg=gmodule-2.0 --pkg=clutter-0.8 --pkg=cogl-0.8 \
-          --pkg=gl $<
+          --pkg=gl --pkg=clutter-gtk-0.8 $<
 	@touch $@
 else
 %.stamp: %.vala
