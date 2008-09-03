@@ -50,7 +50,7 @@ namespace GGobi.Surface {
     public uint height;
   }
 
-  public class Event {
+  public class Event : Boxed {
     public EventType type;
   }
     
@@ -79,12 +79,15 @@ namespace GGobi.Surface {
 public interface GGobi.Surface.Surface : Object {
 
   /* The parent */
-  public abstract Surface? parent { get; construct set; }
+  public abstract Surface? parent { get; }
 
   /* Physical manifestation */
   /* VALABUG: 'visible' renamed to 'shown' due to conflicts with clutter */
   public abstract bool shown { get; construct set; }
-  public abstract Viewport viewport { get; }
+
+  /* Not really possible in GObject to have value-typed properties */
+  /*public abstract Viewport viewport { get; }*/
+  public abstract Viewport get_viewport();
   
   /* Destroy surface (remove from container) */
   public abstract void destroy();

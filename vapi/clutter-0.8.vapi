@@ -207,7 +207,7 @@ namespace Clutter {
 		public int get_depth ();
 		public Clutter.Unit get_depthu ();
 		public bool get_fixed_position_set ();
-		public void get_geometry (Clutter.Geometry geometry);
+		public void get_geometry (out Clutter.Geometry geometry);
 		public uint get_gid ();
 		public uint get_height ();
 		public Clutter.Unit get_heightu ();
@@ -955,10 +955,8 @@ namespace Clutter {
 	public abstract class ModelIter : GLib.Object {
                 [CCode (sentinel = "-1")]
 		public void @get (...);
-		public void get_valist (void* args);
-                [CCode (sentinel = "-1")]
+		[CCode (sentinel = "-1")]
 		public void @set (...);
-		public void set_valist (void* args);
 		public virtual weak Clutter.ModelIter copy ();
 		public virtual weak Clutter.Model get_model ();
 		public virtual uint get_row ();
@@ -1216,7 +1214,6 @@ namespace Clutter {
 	[CCode (cheader_filename = "clutter/clutter.h")]
 	public interface Container : GLib.Object {
 		public void add_actor (Clutter.Actor actor);
-		public void add_valist (Clutter.Actor first_actor, void* var_args);
 		public void child_get (Clutter.Actor actor, ...);
 		public void child_get_property (Clutter.Actor child, string property, GLib.Value value);
 		public void child_set (Clutter.Actor actor, ...);
@@ -1231,8 +1228,7 @@ namespace Clutter {
 		public void lower_child (Clutter.Actor actor, Clutter.Actor sibling);
 		public void raise_child (Clutter.Actor actor, Clutter.Actor sibling);
 		public void remove_actor (Clutter.Actor actor);
-		public void remove_valist (Clutter.Actor first_actor, void* var_args);
-		public abstract void add (Clutter.Actor actor);
+		public abstract void add (Clutter.Actor actor, ...);
 		[NoWrapper]
 		public abstract void create_child_meta (Clutter.Actor actor);
 		[NoWrapper]
@@ -1243,7 +1239,7 @@ namespace Clutter {
 		public abstract void lower (Clutter.Actor actor, Clutter.Actor? sibling);
 		[NoWrapper]
 		public abstract void raise (Clutter.Actor actor, Clutter.Actor? sibling);
-		public abstract void remove (Clutter.Actor actor);
+		public abstract void remove (Clutter.Actor actor, ...);
 		public abstract void sort_depth_order ();
 		public virtual signal void actor_added (Clutter.Actor actor);
 		public virtual signal void actor_removed (Clutter.Actor actor);
@@ -1596,4 +1592,22 @@ namespace Clutter {
                 public void set_fixed (Clutter.Fixed fixed_);
                 public void set_unit (Clutter.Unit units);
         }
+}
+
+[CCode (cprefix="PangoClutter", lower_case_cprefix="pango_clutter_",
+        cheader_filename="clutter/pangoclutter.h")]
+namespace Pango.Clutter {
+	public class FontMap : Pango.CairoFontMap, Pango.FontMap {
+		public FontMap();
+		public Pango.Context create_context();
+		public void set_resolution(double dpi);
+		public void clear_glyph_cache();
+		public void set_use_mipmapping(bool value);
+		public bool get_use_mipmapping();
+	}
+
+	public static void ensure_glyph_cache_for_layout (Pango.Layout layout);
+	public static void render_layout_subpixel (Pango.Layout layout, int x, int y, global::Clutter.Color color, int flags);
+	public static void render_layout (Pango.Layout layout, int x, int y, global::Clutter.Color color, int flags);
+	public static void render_layout_line (Pango.LayoutLine line, int x, int y, global::Clutter.Color color);
 }

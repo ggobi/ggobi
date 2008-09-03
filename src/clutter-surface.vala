@@ -11,17 +11,14 @@ public class GGobi.Surface.ClutterSurface : Clutter.Actor, Surface {
         return actor as Surface;
       else return null;
     }
-    set construct { set_parent((ClutterSurface)value); }
   }
 
   /* Physical manifestation */
-  public Viewport viewport {
-    get {
-      Clutter.Geometry geometry;
-      get_geometry(out geometry);
-      return Viewport() { x = geometry.x, y = geometry.y,
-          width = geometry.width, height = geometry.height };
-    }
+  public Viewport get_viewport() {
+    Clutter.Geometry geometry;
+    get_geometry(out geometry);
+    return Viewport() { x = geometry.x, y = geometry.y,
+        width = geometry.width, height = geometry.height };
   }
 
   public bool shown {
