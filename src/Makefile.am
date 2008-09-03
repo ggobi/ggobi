@@ -49,6 +49,13 @@ libggobi_la_VALAS = \
   stage-texture.vala \
   stage-transform.vala \
   surface.vala \
+  surface-buffer.vala \
+  surface-container.vala \
+  surface-matrix.vala \
+  surface-stack.vala \
+  clutter-buffer.vala \
+  clutter-matrix.vala \
+  clutter-stack.vala \
   clutter-surface.vala \
   svd2.vala \
   tour-basis-list.vala \

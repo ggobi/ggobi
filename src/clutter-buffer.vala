@@ -1,18 +1,13 @@
 /* Implement GGobi.SurfaceBuffer using a ClutterTexture */
 
-public class GGobi.SurfaceBufferClutter : SurfaceClutter, Surface,
-  SurfaceBuffer
+public class GGobi.Surface.ClutterBuffer : ClutterSurface, Buffer
 {
   private bool dirty; /* do we need to redraw? */
   
   private Clutter.Texture texture_actor = new Clutter.Texture();
   private Cogl.Handle fbo;
 
-  public SurfaceBufferClutter(Surface parent) {
-    this.parent = parent;
-  }
-  
-  private void on_size_change(Object obj, ParamSpec pspec) {
+  private void on_size_change(ClutterBuffer obj, ParamSpec pspec) {
     resize();
   }
   
@@ -28,40 +23,45 @@ public class GGobi.SurfaceBufferClutter : SurfaceClutter, Surface,
     resize();
   }
 
-  private static Drawable drawable = new DrawableCogl();
+  private Drawable drawable;
   
   private void resize() {
     /* create a Cogl texture */
-    Cogl.Handle tex = new Cogl.Texture.with_size(viewport.width,
+    Viewport viewport = get_viewport();
+    Cogl.Handle tex = Cogl.Texture.new_with_size(viewport.width,
                                                  viewport.height, 32,
-                                                 false, PixelFormat.RGBA_8888);
+                                                 false,
+                                                 Cogl.PixelFormat.RGBA_8888);
     /* hand it to the actor for drawing */
     texture_actor.set_cogl_texture(tex);
     /* cache a framebuffer object to direct drawing to the texture */
-    fbo = new Cogl.Offscreen.to_texture(tex);
+    fbo = Cogl.Offscreen.new_to_texture(tex);
+    /* update the drawable for the new size */
+    drawable = new CoglDrawable(viewport.width, viewport.height);
     /* force a redraw */
-    repaint(drawable);
+    repaint();
   }
 
   /* For saving texture memory */
-  override void realize() {
+  public override void realize() {
     texture_actor.realize();
   }
-  override void unrealize() {
+  public override void unrealize() {
     texture_actor.unrealize();
   }
   
   /* Drawing */
   
-  override void paint() {
+  public override void paint() {
     if (dirty) {
       /* Redirect output to our texture */
       Cogl.draw_buffer(Cogl.BufferTarget.OFFSCREEN_BUFFER, fbo);
-      Cogl.paint_init(new Clutter.Color { 0, 0, 0, 0 }); /* clear */
+      Cogl.paint_init(Clutter.Color() { red = 0, blue = 0, green = 0,
+            alpha = 0 }); /* clear */
       /* Render out actor scene to fbo */
-      paint_buffer();
+      paint_buffer(drawable);
       /* Restore drawing to the frame buffer */
-      Cogl.draw_buffer(Cogl.BufferTarget.WINDOW_BUFFER, COGL_INVALID_HANDLE);
+      Cogl.draw_buffer(Cogl.BufferTarget.WINDOW_BUFFER, Cogl.Handle.INVALID);
       dirty = false;
     }
     texture_actor.paint();

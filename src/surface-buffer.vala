@@ -7,7 +7,7 @@
    buffer.
 */
 
-public interface GGobi.SurfaceBuffer : Surface {
+public interface GGobi.Surface.Buffer : Surface {
   public abstract void repaint(); /* force a redraw */
   /* redraw the dirty buffer */
   public signal void paint_buffer(Drawable drawable); 

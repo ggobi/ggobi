@@ -165,14 +165,23 @@ namespace Cogl {
                 public bool is_program ();
                 [CCode (cname = "cogl_is_offscreen")]
                 public bool is_offscreen ();
+
+                [CCode (cname = "COGL_INVALID_HANDLE")]
+                public const Handle INVALID;
         }
 
         namespace Texture {
                 public static Handle new_from_file (string filename, int max_waste, bool auto_mipmap, PixelFormat internal_format) throws GLib.Error;
-
+                public static Handle new_with_size (uint width, uint height, int max_waste, bool auto_mipmap, PixelFormat internal_format);
                 public static void rectangle (Handle handle, Clutter.Fixed x1, Clutter.Fixed y1, Clutter.Fixed x2, Clutter.Fixed y2, Clutter.Fixed tx1, Clutter.Fixed ty1, Clutter.Fixed tx2, Clutter.Fixed ty2);
 
                 [NoArrayLength]
                 public static void polygon (Handle handle, uint n_vertices, TextureVertex[] vertices, bool use_color);
         }
+
+        namespace Offscreen {
+                public static Handle new_to_texture (Handle texhandle);
+        }
+
+        public static void draw_buffer (BufferTarget target, Handle offscreen);
 }

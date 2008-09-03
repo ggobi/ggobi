@@ -1126,7 +1126,7 @@ namespace Clutter {
 		public Texture.from_actor (Clutter.Actor actor);
 		public Texture.from_file (string filename) throws GLib.Error;
 		public bool set_area_from_rgb_data (uchar[] data, bool has_alpha, int x, int y, int width, int height, int rowstride, int bpp, Clutter.TextureFlags flags) throws GLib.Error;
-		public void set_cogl_texture (void* cogl_tex);
+		public void set_cogl_texture (Cogl.Handle cogl_tex);
 		public void set_filter_quality (Clutter.TextureQuality filter_quality);
 		public bool set_from_file (string filename) throws GLib.Error;
 		public bool set_from_rgb_data (uchar[] data, bool has_alpha, int width, int height, int rowstride, int bpp, Clutter.TextureFlags flags) throws GLib.Error;

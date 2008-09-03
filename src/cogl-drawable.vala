@@ -3,16 +3,16 @@
 using GL;
 using Pango;
 
-public class GGobi.Surface.CoglDrawable : Drawable {
+public class GGobi.Surface.CoglDrawable : Drawable, Object {
   
-  public int width { get; set construct; }
-  public int height { get; set construct; }
+  public uint width { get; set construct; }
+  public uint height { get; set construct; }
 
   construct {
     Enable(Consts.VERTEX_ARRAY | Consts.LINE_SMOOTH);
   }
   
-  public CoglDrawable(int width, int height) {
+  public CoglDrawable(uint width, uint height) {
     this.width = width;
     this.height = height;
   }
@@ -51,13 +51,13 @@ public class GGobi.Surface.CoglDrawable : Drawable {
   }
   
   /* configure line parameters */
-  public void set_line_width(int width) {
+  public void set_line_width(uint width) {
     LineWidth(width);
   }
   // NOTE: this is very approximate
-  public void set_dashes(int[] dashes, int offset) {
+  public void set_dashes(uint[] dashes, uint offset) {
     ushort pattern = 0;
-    int i, dashed = 0;
+    uint i, dashed = 0;
     if (dashes.length == 0) {
       Disable(Consts.LINE_STIPPLE);
       return;
@@ -85,23 +85,23 @@ public class GGobi.Surface.CoglDrawable : Drawable {
   /* note that setting line join, cap and miter not supported */
 
   /* set clip */
-  public void set_clip(int x, int y, int width, int height) {
-    Cogl.Clip.set(x, y, width, height);
+  public void set_clip(int x, int y, uint width, uint height) {
+    Cogl.Clip.set(x, y, (int)width, (int)height);
   }
   public void unset_clip() {
     Cogl.Clip.unset();
   }
   
   /* draw stuff */
-  public void draw_rectangle(int x, int y, int width, int height) {
+  public void draw_rectangle(int x, int y, uint width, uint height) {
     //g_debug("drawing rect: %d %d %d %d", x, y, width, height);
     // FIXME: direct use of glRecti() would be more efficient...
     vertices(Consts.POLYGON,
-             new int[] { x, x, x + width, x + width },
-             new int[] { y, y + height, y, y + height });
+             new int[] { x, x, x + (int)width, x + (int)width },
+             new int[] { y, y + (int)height, y, y + (int)height });
   }
   
-  public void draw_circle(int x, int y, int r) {
+  public void draw_circle(int x, int y, uint r) {
     int[] vx = new int[r*4];
     int[] vy = new int[r*4];
     float step = (float) Math.PI / (2*r);
@@ -143,9 +143,9 @@ public class GGobi.Surface.CoglDrawable : Drawable {
     weak FontDescription desc = pango_context.get_font_description();
     desc.set_family(family);
   }
-  public void set_font_size(int size) {
+  public void set_font_size(uint size) {
     weak FontDescription desc = pango_context.get_font_description();
-    desc.set_size(Pango.SCALE*size);
+    desc.set_size(Pango.SCALE*(int)size);
   }
   public void set_font_style(FontStyle style) {
     weak FontDescription desc = pango_context.get_font_description();
@@ -184,7 +184,7 @@ public class GGobi.Surface.CoglDrawable : Drawable {
     ascent = metrics.get_ascent();
     descent = metrics.get_descent();
   }
-  public void text_extents(string str, out int width, out int height) {
+  public void text_extents(string str, out uint width, out uint height) {
     Layout layout = layout_text(str);
     Rectangle extents;
     layout.get_line(0).get_pixel_extents(null, out extents);

@@ -41,20 +41,20 @@ namespace GGobi.Surface {
   }
 }
 
-public interface GGobi.Surface.Drawable {
+public interface GGobi.Surface.Drawable : Object {
 
   //VALABUG: it seems interface properties cannot be construct-only
   // We don't want the width and height to be settable after construction
-  public abstract int width { get; set construct; }
-  public abstract int height { get; set construct; }
+  public abstract uint width { get; set construct; }
+  public abstract uint height { get; set construct; }
   
   /* configure colors */
   public abstract void set_stroke_color(Color color);
   public abstract void set_fill_color(Color? color);
   
   /* configure line parameters */
-  public abstract void set_line_width(int width);
-  public abstract void set_dashes(int[] dashes, int offset);
+  public abstract void set_line_width(uint width);
+  public abstract void set_dashes(uint[] dashes, uint offset);
 
   /* optional line aesthetics */
   public virtual void set_line_cap(LineCap cap) { }
@@ -62,12 +62,12 @@ public interface GGobi.Surface.Drawable {
   public virtual void set_miter_limit(double limit) { }
 
   /* set clip */
-  public abstract void set_clip(int x, int y, int width, int height);
+  public abstract void set_clip(int x, int y, uint width, uint height);
   public abstract void unset_clip();
   
   /* draw stuff */
-  public abstract void draw_rectangle(int x, int y, int width, int height);
-  public abstract void draw_circle(int x, int y, int r);
+  public abstract void draw_rectangle(int x, int y, uint width, uint height);
+  public abstract void draw_circle(int x, int y, uint r);
   public abstract void draw_polyline(int[] x, int[] y);
   public abstract void draw_polygon(int[] x, int[] y);
   public abstract void draw_points(int[] x, int[] y);
@@ -77,7 +77,7 @@ public interface GGobi.Surface.Drawable {
   }
   
   /* configure font */
-  public abstract void set_font_size(int size);  
+  public abstract void set_font_size(uint size);  
   public abstract void set_font_family(string family);
   public abstract void set_font_style(FontStyle style);
   public abstract void set_font_weight(FontWeight weight);
@@ -86,7 +86,8 @@ public interface GGobi.Surface.Drawable {
 
   /* querying font */
   public abstract void font_extents(out int ascent, out int descent);
-  public abstract void text_extents(string str, out int width, out int height);
+  public abstract void text_extents(string str, out uint width,
+                                    out uint height);
 
   /* draw text */
   public abstract void set_text_rotation(double rot);
