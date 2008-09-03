@@ -186,7 +186,7 @@ PKG_PROG_PKG_CONFIG(0.21)
 
 # FIND GIO, GTK+, libxml2, libgsf-1, and clutter (for now)
 
-PKG_CHECK_MODULES(DEP, [gio-2.0 >= 2.16.0 gtk+-2.0 >= 2.8.0 libxml-2.0 libgsf-1 clutter-0.8])
+PKG_CHECK_MODULES(DEP, [gio-2.0 >= 2.16.0 gtk+-2.0 >= 2.8.0 libxml-2.0 libgsf-1 clutter-0.8 clutter-gtk-0.8])
 
 AC_SUBST(DEP_CFLAGS)
 AC_SUBST(DEP_LIBS)
