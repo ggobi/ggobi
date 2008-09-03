@@ -43,16 +43,16 @@ How many variables, order, etc
   * polygons
 ******* functions
   * draws data
-  * maps data coordinates to data points
+  * maps screen coordinates to data points
 ***** one or two guides
   * axes (XY, tour, categorical)
-***** canvas
 **** Concrete
 ***** input pipeline + variable selection
 ***** facetting specification
 ****** variable selection model
 ****** plot layout
 ***** current interaction
+***** surface
 **** Drawing order (for each layer)
   * Geom
   * Guide
@@ -83,11 +83,10 @@ Lists all plot types (live)
 ***** Plot
 Allows changing plot type in window
 * Dependencies
-  * libp3g
   * GTK+ 2.8.x
   * Pango 1.22.x (not there yet)
   * GLib 2.18.x
   * Cairo 1.8.x (svn)
-  * Clutter 0.8.x (svn)
+  * Clutter 0.8.x
   * Gsf 1.14.9 (svn)
   * libxml2
