@@ -5,7 +5,8 @@ public class GGobi.Test.Surface {
   {
     GGobi.Surface.Color black = { 0, 0, 0, 1 };
     drawable.set_stroke(black);
-    drawable.draw_circle(10, 10, 10);
+    for (int i = 5; i <= 100; i+=5)
+      drawable.draw_circle(100, 100, i);
   }
 
   private static const int WINWIDTH = 400;

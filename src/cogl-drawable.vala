@@ -11,7 +11,7 @@ public class GGobi.Surface.CoglDrawable : Drawable, Object {
   construct {
     /* save state here */
     EnableClientState(Consts.VERTEX_ARRAY);
-    Enable(Consts.LINE_SMOOTH);
+    //Enable(Consts.LINE_SMOOTH);
   }
 
   public override void finalize() {
@@ -108,21 +108,52 @@ public class GGobi.Surface.CoglDrawable : Drawable, Object {
              new int[] { x, x, x + (int)width, x + (int)width },
              new int[] { y, y + (int)height, y, y + (int)height });
   }
-  
-  public void draw_circle(int x, int y, uint r) {
-    int[] vx = new int[r*4];
-    int[] vy = new int[r*4];
-    float step = (float) Math.PI / (2*r);
-    int i = 0;
-    for(float theta = 0; theta < Math.PI/2; i += 4, theta += step) {
-      int xmod = (int)(Math.cosf(theta) * r);
-      int ymod = (int)(Math.sinf(theta) * r);
-      vx[i] = vx[i+1] = x + xmod;
-      vy[i] = vy[i+2] = y - ymod;
-      vy[i+1] = vy[i+3] = y + ymod;
-      vx[i+2] = vx[i+3] = x - xmod;
+
+  /* inspired by: http://slabode.exofire.net/circle_draw.shtml */
+  public void draw_circle(int cx, int cy, uint r) {
+    int num_segments = (int)(2.0f * (float)Math.PI / Math.acosf(1 - 0.25f / r));
+    float[] v = new float[2*num_segments];
+    float theta = 2 * (float)Math.PI / num_segments; 
+    float tangetial_factor = Math.tanf(theta);//calculate the tangential factor 
+    float radial_factor = Math.cosf(theta);//calculate the radial factor 
+    float x = r;//we start at angle = 0 
+    float y = 0; 
+    
+    for(int i = 0; i < num_segments; i++) {
+      v[2*i] = x + cx;
+      v[2*i+1] = y + cy;
+
+      //calculate the tangential vector 
+      //remember, the radial vector is (x, y) 
+      //to get the tangential vector we flip those coordinates and
+      // negate one of them 
+
+      float tx = -y; 
+      float ty = x; 
+        
+      //add the tangential vector 
+
+      x += tx * tangetial_factor; 
+      y += ty * tangetial_factor; 
+        
+      //correct using the radial factor 
+      
+      x *= radial_factor; 
+      y *= radial_factor; 
     }
-    vertices(Consts.POLYGON, vx, vy);
+
+    VertexPointer(2, Consts.FLOAT, 0, v);
+    if (need_outline)
+      set_color(fill);
+    DrawArrays(Consts.LINE_LOOP, 0, (GLsizei)num_segments);
+    if (need_outline) {
+      PolygonMode(Consts.FRONT, Consts.LINE);
+      set_color(stroke);
+      DrawArrays(Consts.POLYGON, 0, (GLsizei)num_segments);
+      PolygonMode(Consts.FRONT, Consts.FILL);
+    }
+    
+    //vertices(Consts.POLYGON, vx, vy);
   }
   public void draw_polyline(int[] x, int[] y) {
     vertices(Consts.LINE_STRIP, x, y);
@@ -141,9 +172,10 @@ public class GGobi.Surface.CoglDrawable : Drawable, Object {
 
   /* hopefully PangoClutter stuff is temporary -
      Cairo needs a working OpenGL backend */
-  private static Pango.Clutter.FontMap font_map = new Pango.Clutter.FontMap();
+  private static Pango.FontMap font_map = new Pango.Clutter.FontMap();
   
-  private Context pango_context = font_map.create_context();
+  private Context pango_context =
+    ((Pango.Clutter.FontMap)font_map).create_context();
   
   /* configure font */
   /* these will be set on PangoContext */
@@ -241,13 +273,15 @@ public class GGobi.Surface.CoglDrawable : Drawable, Object {
     return layout;
   }
   
-  private void vertices(GLenum mode, int[] x, int[] y) {
+  private void vertices(GLenum mode, int[] x, int[] y)
+  {
     if (stroke.alpha == 0)
       return;
     int[] vertices = new int[x.length*2];
     for (int i = 0; i < x.length; i++) {
       vertices[i*2] = x[i];
       vertices[i*2+1] = y[i];
+      debug("%d, %d", x[i], y[i]);
     }
     VertexPointer(2, Consts.INT, 0, vertices);
     if (need_outline)
