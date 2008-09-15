@@ -165,7 +165,7 @@ namespace Cogl {
                 public bool is_program ();
                 [CCode (cname = "cogl_is_offscreen")]
                 public bool is_offscreen ();
-
+                
                 [CCode (cname = "COGL_INVALID_HANDLE")]
                 public const Handle INVALID;
         }
@@ -177,10 +177,13 @@ namespace Cogl {
 
                 [NoArrayLength]
                 public static void polygon (Handle handle, uint n_vertices, TextureVertex[] vertices, bool use_color);
+
+                public void unref(Handle handle);
         }
 
         namespace Offscreen {
                 public static Handle new_to_texture (Handle texhandle);
+                public void unref(Handle handle);
         }
 
         public static void draw_buffer (BufferTarget target, Handle offscreen);

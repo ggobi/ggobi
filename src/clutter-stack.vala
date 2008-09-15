@@ -20,40 +20,43 @@ public class GGobi.Surface.ClutterStack : ClutterSurface, Container, Stack
   /* Delegating to Clutter.Group */
   // FIXME: would be nice to share this with ClutterMatrix
   // But we probably don't want to expose the Clutter.Group
-  override void paint() {
+  public override void paint() {
     group.paint();
   }
-  override void pick(Clutter.Color color) {
+  public override void pick(Clutter.Color color) {
     group.pick(color);
   }
-  override void realize() {
+  public override void realize() {
     group.realize();
   }
-  override void unrealize() {
+  public override void unrealize() {
     group.unrealize();
   }
-  override void hide_all() {
+  public override void hide_all() {
     group.hide_all();
   }
-  override void show_all() {
+  public override void show_all() {
     group.show_all();
   }
-  override void get_preferred_width(Clutter.Unit for_height,
-                                    out Clutter.Unit min_width_p,
-                                    out Clutter.Unit natural_width_p)
+  /*
+  public override void get_preferred_width(Clutter.Unit for_height,
+                                           out Clutter.Unit min_width_p,
+                                           out Clutter.Unit natural_width_p)
   {
     group.get_preferred_width(for_height, out min_width_p, out natural_width_p);
   }
-  override void get_preferred_height(Clutter.Unit for_width,
-                                     out Clutter.Unit min_height_p,
-                                     out Clutter.Unit natural_height_p)
+  public override void get_preferred_height(Clutter.Unit for_width,
+                                            out Clutter.Unit min_height_p,
+                                            out Clutter.Unit natural_height_p)
   {
     group.get_preferred_height(for_width, out min_height_p,
                                out natural_height_p);
   }
+  */
   
   /* This is where we will "stack" the children, eventually */
-  override void allocate(Clutter.ActorBox box, bool absolute_origin_changed) {
+  public override void allocate(Clutter.ActorBox box,
+                                bool absolute_origin_changed) {
     group.allocate(box, absolute_origin_changed);
   }
 

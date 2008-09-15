@@ -49,8 +49,8 @@ public interface GGobi.Surface.Drawable : Object {
   public abstract uint height { get; set construct; }
   
   /* configure colors */
-  public abstract void set_stroke_color(Color color);
-  public abstract void set_fill_color(Color? color);
+  public abstract void set_stroke(Color color);
+  public abstract void set_fill(Color? color);
   
   /* configure line parameters */
   public abstract void set_line_width(uint width);

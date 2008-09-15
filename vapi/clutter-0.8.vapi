@@ -374,7 +374,7 @@ namespace Clutter {
 		public virtual signal bool motion_event (Clutter.MotionEvent event);
 		[HasEmitter]
 		public virtual signal void paint ();
-		public virtual signal void parent_set (Clutter.Actor old_parent);
+		public virtual signal void parent_set (Clutter.Actor? old_parent);
 		[HasEmitter]
 		public virtual signal void realize ();
 		public virtual signal bool scroll_event (Clutter.ScrollEvent event);

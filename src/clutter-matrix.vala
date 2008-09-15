@@ -37,6 +37,8 @@ public class GGobi.Surface.ClutterMatrix : ClutterSurface, Container, Matrix
   public override void show_all() {
     group.show_all();
   }
+
+  /*
   public override void get_preferred_width(Clutter.Unit for_height,
                                            out Clutter.Unit min_width_p,
                                            out Clutter.Unit natural_width_p)
@@ -50,7 +52,8 @@ public class GGobi.Surface.ClutterMatrix : ClutterSurface, Container, Matrix
     group.get_preferred_height(for_width, out min_height_p,
                                out natural_height_p);
   }
-
+  */
+  
   /* This is where we will put the layout logic */
   public override void allocate(Clutter.ActorBox box,
                                 bool absolute_origin_changed) {

@@ -9,7 +9,14 @@ public class GGobi.Surface.CoglDrawable : Drawable, Object {
   public uint height { get; set construct; }
 
   construct {
-    Enable(Consts.VERTEX_ARRAY | Consts.LINE_SMOOTH);
+    /* save state here */
+    EnableClientState(Consts.VERTEX_ARRAY);
+    Enable(Consts.LINE_SMOOTH);
+  }
+
+  public override void finalize() {
+    /* restore state here */
+    base.finalize();
   }
   
   public CoglDrawable(uint width, uint height) {
@@ -35,14 +42,14 @@ public class GGobi.Surface.CoglDrawable : Drawable, Object {
     } else need_outline = false;
   }
   
-  public void set_stroke_color(Color color) {
+  public void set_stroke(Color color) {
     stroke = color;
     check_need_outline();
     if (fill.alpha == 0)
       PolygonMode(Consts.FRONT, Consts.LINE);
     set_color(stroke); /* stroke is the default color */
   }
-  public void set_fill_color(Color? color) {
+  public void set_fill(Color? color) {
     fill = color;
     if (fill.alpha != 0)
       PolygonMode(Consts.FRONT, Consts.FILL);
@@ -85,6 +92,7 @@ public class GGobi.Surface.CoglDrawable : Drawable, Object {
   /* note that setting line join, cap and miter not supported */
 
   /* set clip */
+  // NOTE: clipping is the only part that depends on Cogl
   public void set_clip(int x, int y, uint width, uint height) {
     Cogl.Clip.set(x, y, (int)width, (int)height);
   }

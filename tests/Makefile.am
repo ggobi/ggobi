@@ -1,5 +1,5 @@
 # ADD NEW TESTS HERE (root name of vala file)
-check_PROGRAMS = dummy surface
+check_PROGRAMS = surfaces
 
 VALAS = $(check_PROGRAMS:%=%.vala)
 VALASOURCES = $(VALAS:%.vala=%.c)
