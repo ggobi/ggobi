@@ -10,7 +10,7 @@ m4_define([ggobi_version],
 
 # Initialize autoconf
 AC_INIT(ggobi, ggobi_version, ggobi-help@lists.ggobi.org)
-AC_PREREQ(2.59)
+AC_PREREQ(2.60)
 
 # Tell autoconf where our sources are
 AC_CONFIG_SRCDIR([src/transform_ui.c])
@@ -23,7 +23,7 @@ AC_CONFIG_AUX_DIR(config)
 AC_SUBST(ac_aux_dir)
 
 # Initialize automake
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([1.10])
 
 # Figure out where we are installing immediately
 if test "${prefix}" = "NONE"; then
