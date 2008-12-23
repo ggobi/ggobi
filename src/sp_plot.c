@@ -270,13 +270,13 @@ splot_clear_pixmap0_binned (splotd *sp, ggobid *gg)
  * lower right edge of loc1.
 */
   loc0->x = (gint)
-    ((gfloat) bin0->x / (gfloat) d->brush.nbins * (sp->max.x+1.0));
+    ((gdouble) bin0->x / (gdouble) d->brush.nbins * (sp->max.x+1.0));
   loc0->y = (gint)
-    ((gfloat) bin0->y / (gfloat) d->brush.nbins * (sp->max.y+1.0));
+    ((gdouble) bin0->y / (gdouble) d->brush.nbins * (sp->max.y+1.0));
   loc1->x = (gint)
-    ((gfloat) (bin1->x+1) / (gfloat) d->brush.nbins * (sp->max.x+1.0));
+    ((gdouble) (bin1->x+1) / (gdouble) d->brush.nbins * (sp->max.x+1.0));
   loc1->y = (gint)
-    ((gfloat) (bin1->y+1) / (gfloat) d->brush.nbins * (sp->max.y+1.0));
+    ((gdouble) (bin1->y+1) / (gdouble) d->brush.nbins * (sp->max.y+1.0));
 
 /*
  * Clear an area a few pixels inside that region.  Watch out

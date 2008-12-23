@@ -125,7 +125,7 @@ jitter_window_open (ggobid * gg)
       gg->jitter_ui.window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
 
 
-      gtk_window_set_transient_for(GTK_WINDOW(gg->jitter_ui.window), gg->main_window);
+      gtk_window_set_transient_for(GTK_WINDOW(gg->jitter_ui.window), GTK_WINDOW(gg->main_window));
       gtk_window_set_destroy_with_parent(GTK_WINDOW(gg->jitter_ui.window), true);
 
 

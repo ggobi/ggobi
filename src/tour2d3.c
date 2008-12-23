@@ -49,9 +49,9 @@ display_tour2d3_init_null (displayd *dsp, ggobid *gg)
   vectori_init_null(&dsp->t2d3.active_vars);
   vectorb_init_null(&dsp->t2d3.active_vars_p);
 
-  vectorf_init_null(&dsp->t2d3.lambda);
-  vectorf_init_null(&dsp->t2d3.tau);
-  vectorf_init_null(&dsp->t2d3.tinc);
+  vectord_init_null(&dsp->t2d3.lambda);
+  vectord_init_null(&dsp->t2d3.tau);
+  vectord_init_null(&dsp->t2d3.tinc);
 
   /* manipulation variables */
   arrayd_init_null(&dsp->t2d3_Rmat1);
@@ -85,9 +85,9 @@ alloc_tour2d3 (displayd *dsp, ggobid *gg)
   vectori_alloc(&dsp->t2d3.active_vars, nc);
   vectorb_alloc_zero(&dsp->t2d3.active_vars_p, nc);
 
-  vectorf_alloc(&dsp->t2d3.lambda, nc);
-  vectorf_alloc_zero(&dsp->t2d3.tau, nc);
-  vectorf_alloc(&dsp->t2d3.tinc, nc);
+  vectord_alloc(&dsp->t2d3.lambda, nc);
+  vectord_alloc_zero(&dsp->t2d3.tau, nc);
+  vectord_alloc(&dsp->t2d3.tinc, nc);
 
   /* manipulation variables */
   arrayd_alloc(&dsp->t2d3_Rmat1, 3, 3);
@@ -120,9 +120,9 @@ tour2d3_realloc_down (gint nc, gint *cols, GGobiData *d, ggobid *gg)
       vectori_delete_els (&dsp->t2d3.active_vars, nc, cols);
       vectorb_delete_els (&dsp->t2d3.active_vars_p, nc, cols);
 
-      vectorf_delete_els (&dsp->t2d3.lambda, nc, cols);
-      vectorf_delete_els (&dsp->t2d3.tau, nc, cols);
-      vectorf_delete_els (&dsp->t2d3.tinc, nc, cols);
+      vectord_delete_els (&dsp->t2d3.lambda, nc, cols);
+      vectord_delete_els (&dsp->t2d3.tau, nc, cols);
+      vectord_delete_els (&dsp->t2d3.tinc, nc, cols);
 
       arrayd_delete_cols (&dsp->t2d3_manbasis, (gint) nc, cols);
     }
@@ -137,9 +137,9 @@ free_tour2d3(displayd *dsp)
   vectori_free(&dsp->t2d3.active_vars);
   vectorb_free(&dsp->t2d3.active_vars_p);
 
-  vectorf_free(&dsp->t2d3.lambda);
-  vectorf_free(&dsp->t2d3.tau);
-  vectorf_free(&dsp->t2d3.tinc);
+  vectord_free(&dsp->t2d3.lambda);
+  vectord_free(&dsp->t2d3.tau);
+  vectord_free(&dsp->t2d3.tinc);
 
   arrayd_free(&dsp->t2d3.Fa, 0, 0);
   arrayd_free(&dsp->t2d3.Fz, 0, 0);
@@ -214,7 +214,7 @@ display_tour2d3_init (displayd *dsp, ggobid *gg) {
   dsp->t2d.target_selection_method = 0;
 }
 
-void tour2d3_speed_set(gfloat slidepos, ggobid *gg) {
+void tour2d3_speed_set(gdouble slidepos, ggobid *gg) {
   displayd *dsp = gg->current_display; 
   cpaneld *cpanel = &dsp->cpanel;
 
@@ -393,12 +393,12 @@ tour2d3_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse, GGobiData *d,
 }
 
 void
-tour2d3_projdata(splotd *sp, greal **world_data, GGobiData *d, ggobid *gg)
+tour2d3_projdata(splotd *sp, gdouble **world_data, GGobiData *d, ggobid *gg)
 {
   gint i, j, m;
   displayd *dsp = (displayd *) sp->displayptr;
-  greal precis = (greal) PRECISION1;
-  greal tmpf, maxx, maxy;
+  gdouble precis = (gdouble) PRECISION1;
+  gdouble tmpf, maxx, maxy;
 
   if (sp->tour2d3.initmax) {
     sp->tour2d3.maxscreen = precis;
@@ -415,8 +415,8 @@ tour2d3_projdata(splotd *sp, greal **world_data, GGobiData *d, ggobid *gg)
     sp->planar[i].y = 0;
     for (j=0; j<d->ncols; j++)
     {
-      sp->planar[i].x += (greal)(dsp->t2d3.F.vals[0][j]*world_data[i][j]);
-      sp->planar[i].y += (greal)(dsp->t2d3.F.vals[1][j]*world_data[i][j]);
+      sp->planar[i].x += (gdouble)(dsp->t2d3.F.vals[0][j]*world_data[i][j]);
+      sp->planar[i].y += (gdouble)(dsp->t2d3.F.vals[1][j]*world_data[i][j]);
     }
     sp->planar[i].x *= tmpf;
     sp->planar[i].y *= tmpf;
@@ -463,7 +463,7 @@ tour2d3_run(displayd *dsp, ggobid *gg)
   gint i, nv;
   gint k;
   gboolean chosen;
-  gfloat eps = .01;
+  gdouble eps = .01;
   gint pathprob = 0;
 
   if (!dsp->t2d3.get_new_target && 
@@ -623,7 +623,7 @@ tour2d3_manip_init(gint p1, gint p2, splotd *sp)
   ggobid *gg = GGobiFromSPlot(sp);
   gint j, k;
   gint n1vars = dsp->t2d3.nactive;
-  gfloat tol = 0.05; 
+  gdouble tol = 0.05; 
   gdouble dtmp1;
 
   /* need to turn off tour */
@@ -815,8 +815,8 @@ tour2d3_manip_init(gint p1, gint p2, splotd *sp)
       else
       { /* yes: set radial manip direction to be current direction
              of contribution */
-        dsp->t2d3_rx = (gfloat) dsp->t2d3.F.vals[0][dsp->t2d3_manip_var];
-        dsp->t2d3_ry = (gfloat) dsp->t2d3.F.vals[1][dsp->t2d3_manip_var];
+        dsp->t2d3_rx = (gdouble) dsp->t2d3.F.vals[0][dsp->t2d3_manip_var];
+        dsp->t2d3_ry = (gdouble) dsp->t2d3.F.vals[1][dsp->t2d3_manip_var];
         dtmp1 = sqrt(dsp->t2d3_rx*dsp->t2d3_rx+dsp->t2d3_ry*dsp->t2d3_ry);
         dsp->t2d3_rx /= dtmp1;
         dsp->t2d3_ry /= dtmp1;
@@ -834,12 +834,12 @@ tour2d3_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
   cpaneld *cpanel = &dsp->cpanel;
   gint actual_nvars = dsp->t2d3.nactive;
   gboolean offscreen = false;
-  gfloat phi, cosphi, sinphi, ca, sa, cosm, cospsi, sinpsi;
-  gfloat distx, disty, x1, x2, y1, y2;
-  gfloat denom = (gfloat) MIN(sp->max.x, sp->max.y)/2.;
-  gfloat tol = 0.01;
+  gdouble phi, cosphi, sinphi, ca, sa, cosm, cospsi, sinpsi;
+  gdouble distx, disty, x1, x2, y1, y2;
+  gdouble denom = (gdouble) MIN(sp->max.x, sp->max.y)/2.;
+  gdouble tol = 0.01;
   gdouble dtmp1, dtmp2;
-  gfloat len_motion;
+  gdouble len_motion;
   gint i,j,k;
 
   /* check if off the plot window */
@@ -894,7 +894,7 @@ tour2d3_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
             dsp->t2d3_ry*(dsp->t2d3_pos2_old - dsp->t2d3_pos2))*dsp->t2d3_ry;
         }
         dtmp1 = (gdouble) (distx*distx+disty*disty);
-        len_motion = (gfloat) sqrt(dtmp1);
+        len_motion = (gdouble) sqrt(dtmp1);
 
         if (len_motion < tol) /* just in case, maybe not necessary */
         {
@@ -915,8 +915,8 @@ tour2d3_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
           ca = distx/len_motion;
           sa = disty/len_motion;
       
-          cosphi = (gfloat) cos((gdouble) phi);
-          sinphi = (gfloat) sin((gdouble) phi);
+          cosphi = (gdouble) cos((gdouble) phi);
+          sinphi = (gdouble) sin((gdouble) phi);
           cosm = 1.0 - cosphi;
           dsp->t2d3_Rmat2.vals[0][0] = ca*ca*cosphi + sa*sa;
           dsp->t2d3_Rmat2.vals[0][1] = -cosm*ca*sa;

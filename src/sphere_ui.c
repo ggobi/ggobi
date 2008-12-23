@@ -51,7 +51,7 @@ sphere_enable (gboolean sens, ggobid * gg)
 }
 
 void
-sphere_condnum_set (gfloat x, ggobid * gg)
+sphere_condnum_set (gdouble x, ggobid * gg)
 {
   if (gg->sphere_ui.condnum_entry != NULL) {
     gchar *lbl = g_strdup_printf ("%5.1f", x);
@@ -61,7 +61,7 @@ sphere_condnum_set (gfloat x, ggobid * gg)
 }
 
 void
-sphere_variance_set (gfloat x, GGobiData * d, ggobid * gg)
+sphere_variance_set (gdouble x, GGobiData * d, ggobid * gg)
 {
   if (gg->sphere_ui.variance_entry != NULL) {
     gchar *lbl = g_strdup_printf ("%.2e", x);
@@ -75,9 +75,9 @@ void
 sphere_npcs_range_set (gint n, ggobid * gg)
 {
   if (gg->sphere_ui.npcs_adj != NULL) {
-    GTK_ADJUSTMENT (gg->sphere_ui.npcs_adj)->upper = (gfloat) n;
+    GTK_ADJUSTMENT (gg->sphere_ui.npcs_adj)->upper = (gdouble) n;
     gtk_adjustment_set_value (GTK_ADJUSTMENT (gg->sphere_ui.npcs_adj),
-                              (gfloat) n);
+                              (gdouble) n);
   }
 }
 
@@ -147,7 +147,7 @@ sphere_apply_cb (GtkWidget * w, ggobid * gg)
  * finally, sphere the number of principal components selected;
  * executed when the apply button is pressed
 */
-  gfloat firstpc, lastpc;
+  gdouble firstpc, lastpc;
   GGobiData *d = datad_get_from_window (gg->sphere_ui.window);
 
   if (d == NULL)
@@ -273,7 +273,7 @@ scree_expose_cb (GtkWidget * w, GdkEventConfigure * event, ggobid * gg)
   GGobiData *d = datad_get_from_window (gg->sphere_ui.window);
   gint wid = w->allocation.width, hgt = w->allocation.height;
   gint *sphvars, nels;
-  gfloat *evals;
+  gdouble *evals;
   colorschemed *scheme = gg->activeColorScheme;
   PangoLayout *layout;
 
@@ -293,7 +293,7 @@ scree_expose_cb (GtkWidget * w, GdkEventConfigure * event, ggobid * gg)
   if (d != NULL) {
 
     sphvars = (gint *) g_malloc (d->ncols * sizeof (gint));
-    evals = (gfloat *) g_malloc (d->ncols * sizeof (gfloat));
+    evals = (gdouble *) g_malloc (d->ncols * sizeof (gdouble));
 
     eigenvals_get (evals, d);
 
@@ -301,10 +301,10 @@ scree_expose_cb (GtkWidget * w, GdkEventConfigure * event, ggobid * gg)
     for (j = 0; j < nels; j++) {
       PangoRectangle rect;
       xpos =
-        (gint) (((gfloat) (wid - 2 * margin)) / (gfloat) (nels - 1) * j +
+        (gint) (((gdouble) (wid - 2 * margin)) / (gdouble) (nels - 1) * j +
                 margin);
       ypos =
-        (gint) (((gfloat) (hgt - margin)) -
+        (gint) (((gdouble) (hgt - margin)) -
                 evals[j] / evals[0] * (hgt - 2 * margin));
       tickmk = g_strdup_printf ("%d", j + 1);
       layout = gtk_widget_create_pango_layout (gg->sphere_ui.scree_da, NULL);
@@ -473,9 +473,9 @@ sphere_panel_open (ggobid * gg)
 
     /* Spinner: number of principal components */
     /*-- the parameters of the adjustment should be reset each time --*/
-    gg->sphere_ui.npcs_adj = gtk_adjustment_new ((gfloat) d->sphere.vars.nels,
+    gg->sphere_ui.npcs_adj = gtk_adjustment_new ((gdouble) d->sphere.vars.nels,
                                                  1.0,
-                                                 (gfloat) d->sphere.vars.nels,
+                                                 (gdouble) d->sphere.vars.nels,
                                                  1.0, 5.0, 0.0);
 
     g_signal_connect (G_OBJECT (gg->sphere_ui.npcs_adj),

@@ -48,7 +48,7 @@ typedef struct {
  gchar **level_names;  /*-- strings --*/
 
  /*-- unadjusted, unaffected by imputation --*/
- gfloat mean, median;
+ gdouble mean, median;
 
  lims lim_raw;       /*-- range of the raw data          --*/
  lims lim_tform;     /*-- range of d->tform              --*/
@@ -71,15 +71,15 @@ typedef struct {
 
  /*-- transformations --*/
  gint tform0;
- gfloat domain_incr;  /*-- stage 0 --*/
- gfloat (*domain_adj) (gfloat x, gfloat incr);
- gfloat (*inv_domain_adj) (gfloat x, gfloat incr);
+ gdouble domain_incr;  /*-- stage 0 --*/
+ gdouble (*domain_adj) (gdouble x, gdouble incr);
+ gdouble (*inv_domain_adj) (gdouble x, gdouble incr);
  gint tform1;
- gfloat param;
+ gdouble param;
  gint tform2;
 
  /*-- jittering --*/
- gfloat jitter_factor;
+ gdouble jitter_factor;
 
  /*-- in variable table --*/
  gboolean selected;

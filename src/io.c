@@ -76,6 +76,7 @@ filesel_ok (GtkWidget * chooser)
         entry = (GtkWidget *) g_object_get_data (G_OBJECT (chooser),
                                                            "URLEntry");
         if (entry) {
+          g_printerr ("** url text entry widget\n");
           url = gtk_editable_get_chars (GTK_EDITABLE (entry), 0, -1);
           if (g_utf8_strlen(url, -1) > 0) {
             fname = url; // Reset fname

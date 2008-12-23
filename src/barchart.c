@@ -32,7 +32,7 @@
 #define WIDTH   370
 #define HEIGHT  370
 
-gfloat barchart_sort_index (gfloat * yy, gint ny, ggobid * gg,
+gdouble barchart_sort_index (gdouble * yy, gint ny, ggobid * gg,
                             barchartSPlotd * sp);
 void barchart_init_categorical (barchartSPlotd * sp, GGobiData * d);
 void barchart_set_initials (barchartSPlotd * sp, GGobiData * d);
@@ -341,7 +341,7 @@ barchart_recalc_group_dimensions (barchartSPlotd * sp, ggobid * gg)
     colorwidth = 1;
     if (sp->bar->bins[i].count > 0)
       colorwidth =
-        (gint) ((gfloat) sp->bar->cbins[i][j].count /
+        (gint) ((gdouble) sp->bar->cbins[i][j].count /
                 sp->bar->bins[i].count * sp->bar->bins[i].rect.width);
     sp->bar->cbins[i][j].rect.x = xoffset;
     sp->bar->cbins[i][j].rect.y = sp->bar->bins[i].rect.y;
@@ -360,7 +360,7 @@ barchart_recalc_group_dimensions (barchartSPlotd * sp, ggobid * gg)
         colorwidth = 0;
         if (sp->bar->bins[i].count > 0)
           colorwidth =
-            (gint) ((gfloat) sp->bar->cbins[i][j].count /
+            (gint) ((gdouble) sp->bar->cbins[i][j].count /
                     sp->bar->bins[i].count * sp->bar->bins[i].rect.width);
         sp->bar->cbins[i][j].rect.x = xoffset;
         sp->bar->cbins[i][j].rect.y = sp->bar->bins[i].rect.y;
@@ -402,7 +402,7 @@ barchart_recalc_group_dimensions (barchartSPlotd * sp, ggobid * gg)
     j = gg->color_id;
     xoffset = sp->bar->high_bin->rect.x;
     colorwidth =
-      (gint) ((gfloat) sp->bar->col_high_bin[j].count /
+      (gint) ((gdouble) sp->bar->col_high_bin[j].count /
               sp->bar->high_bin->count * sp->bar->high_bin->rect.width);
     sp->bar->col_high_bin[j].rect.x = xoffset;
     sp->bar->col_high_bin[j].rect.y = sp->bar->high_bin->rect.y;
@@ -417,7 +417,7 @@ barchart_recalc_group_dimensions (barchartSPlotd * sp, ggobid * gg)
     for (j = 0; j < sp->bar->ncolors; j++) {
       if (j != gg->color_id) {
         colorwidth =
-          (gint) ((gfloat) sp->bar->col_high_bin[j].count /
+          (gint) ((gdouble) sp->bar->col_high_bin[j].count /
                   sp->bar->high_bin->count * sp->bar->high_bin->rect.width);
         sp->bar->col_high_bin[j].rect.x = xoffset;
         sp->bar->col_high_bin[j].rect.y = sp->bar->high_bin->rect.y;
@@ -436,7 +436,7 @@ barchart_recalc_group_dimensions (barchartSPlotd * sp, ggobid * gg)
     j = gg->color_id;
     xoffset = sp->bar->low_bin->rect.x;
     colorwidth =
-      (gint) ((gfloat) sp->bar->col_low_bin[j].count /
+      (gint) ((gdouble) sp->bar->col_low_bin[j].count /
               sp->bar->low_bin->count * sp->bar->low_bin->rect.width);
     sp->bar->col_low_bin[j].rect.x = xoffset;
     sp->bar->col_low_bin[j].rect.y = sp->bar->low_bin->rect.y;
@@ -451,7 +451,7 @@ barchart_recalc_group_dimensions (barchartSPlotd * sp, ggobid * gg)
     for (j = 0; j < sp->bar->ncolors; j++) {
       if (j != gg->color_id) {
         colorwidth =
-          (gint) ((gfloat) sp->bar->col_low_bin[j].count /
+          (gint) ((gdouble) sp->bar->col_low_bin[j].count /
                   sp->bar->low_bin->count * sp->bar->low_bin->rect.width);
         sp->bar->col_low_bin[j].rect.x = xoffset;
         sp->bar->col_low_bin[j].rect.y = sp->bar->low_bin->rect.y;
@@ -607,7 +607,7 @@ barchart_allocate_structure (barchartSPlotd * sp, GGobiData * d)
       (gbind *) g_malloc (sp->bar->ncolors * sizeof (gbind));
   }
 
-  sp->bar->breaks = (gfloat *) g_malloc ((nbins + 1) * sizeof (nbins));
+  sp->bar->breaks = (gdouble *) g_malloc ((nbins + 1) * sizeof (nbins));
 }
 
 void
@@ -619,11 +619,11 @@ barchart_init_categorical (barchartSPlotd * sp, GGobiData * d)
   gint i, j, m, jvar = rawsp->p1dvar;
   ggobid *gg = GGobiFromSPlot (rawsp);
   vartabled *vtx = vartable_element_get (rawsp->p1dvar, d);
-  gfloat mindist, maxheight;
-  gfloat min, max;
+  gdouble mindist, maxheight;
+  gdouble min, max;
 
-  gfloat *yy;
-  yy = (gfloat *) g_malloc (d->nrows_in_plot * sizeof (gfloat));
+  gdouble *yy;
+  yy = (gdouble *) g_malloc (d->nrows_in_plot * sizeof (gdouble));
 
   if (proj == TOUR1D) {
     for (m=0; m < d->nrows_in_plot; m++) {
@@ -632,7 +632,7 @@ barchart_init_categorical (barchartSPlotd * sp, GGobiData * d)
       rawsp->planar[i].y = 0;
       for (j=0; j<d->ncols; j++)
       {
-        yy[m] += (gfloat)(display->t1d.F.vals[0][j]*d->world.vals[i][j]);
+        yy[m] += (gdouble)(display->t1d.F.vals[0][j]*d->world.vals[i][j]);
       }
     }    
   } 
@@ -802,9 +802,9 @@ barchart_splot_add_plot_labels (splotd * sp, GdkDrawable * drawable,
 }
 
 void
-barchart_set_breakpoints (gfloat width, barchartSPlotd * sp, GGobiData * d)
+barchart_set_breakpoints (gdouble width, barchartSPlotd * sp, GGobiData * d)
 {
-  gfloat rdiff;
+  gdouble rdiff;
   gint i, nbins;
   splotd *rawsp = GGOBI_SPLOT (sp);
 
@@ -833,7 +833,7 @@ barchart_set_initials (barchartSPlotd * sp, GGobiData * d)
   if (vtx->vartype == categorical) {
     if (vtx->nlevels > 1) {
       gint i, level;
-      gfloat missing_val;
+      gdouble missing_val;
       gboolean add_level = false;
       if (ggobi_data_get_col_n_missing(d, rawsp->p1dvar)) {
         for (i = 0; i < d->nrows_in_plot; i++) {
@@ -893,7 +893,7 @@ barchart_set_initials (barchartSPlotd * sp, GGobiData * d)
   }
   else {
     gint i;
-    gfloat rdiff = rawsp->p1d.lim.max - rawsp->p1d.lim.min;
+    gdouble rdiff = rawsp->p1d.lim.max - rawsp->p1d.lim.min;
 
     for (i = 0; i < sp->bar->nbins; i++) {
       sp->bar->breaks[i] = rawsp->p1d.lim.min + rdiff / sp->bar->nbins * i;
@@ -905,7 +905,7 @@ barchart_set_initials (barchartSPlotd * sp, GGobiData * d)
 void
 barchart_recalc_counts (barchartSPlotd * sp, GGobiData * d, ggobid * gg)
 {
-  gfloat yy;
+  gdouble yy;
   gint i, bin, m;
   splotd *rawsp = GGOBI_SPLOT (sp);
   vartabled *vtx = vartable_element_get (rawsp->p1dvar, d);
@@ -939,7 +939,7 @@ barchart_recalc_counts (barchartSPlotd * sp, GGobiData * d, ggobid * gg)
         if (d->hidden_now.els[m])
           sp->bar->bins[bin].nhidden++;
       }
-      rawsp->planar[m].x = (greal) sp->bar->bins[bin].value;
+      rawsp->planar[m].x = (gdouble) sp->bar->bins[bin].value;
     }
   }
   else {                        /* all vartypes but categorical */
@@ -1047,13 +1047,13 @@ void
 barchart_recalc_dimensions (splotd * rawsp, GGobiData * d, ggobid * gg)
 {
   gint i, maxbincount = 0, maxbin = -1;
-  gfloat precis = PRECISION1;
+  gdouble precis = PRECISION1;
   vartabled *vtx;
 
-  gfloat scale_y;
+  gdouble scale_y;
   gint index;
   gint minwidth;
-  gfloat rdiff, ftmp;
+  gdouble rdiff, ftmp;
   gbind *bin;
 
   GdkRectangle *rect;
@@ -1079,9 +1079,9 @@ barchart_recalc_dimensions (splotd * rawsp, GGobiData * d, ggobid * gg)
 
     sp->bar->bins[i].planar.x = -1;
     if (vtx->vartype == categorical) {
-      ftmp = -1.0 + 2.0 * ((greal) bin->value - rawsp->p1d.lim.min)
+      ftmp = -1.0 + 2.0 * ((gdouble) bin->value - rawsp->p1d.lim.min)
         / rdiff;
-      bin->planar.y = (greal) (PRECISION1 * ftmp);
+      bin->planar.y = (gdouble) (PRECISION1 * ftmp);
     }
     else {
       ftmp = -1.0 + 2.0 * (sp->bar->breaks[i] - sp->bar->breaks[0]) / rdiff;
@@ -1091,13 +1091,13 @@ barchart_recalc_dimensions (splotd * rawsp, GGobiData * d, ggobid * gg)
   sp->bar->maxbincounts = maxbincount;
 
   if (!sp->bar->is_spine) {
-    greal precis = (greal) PRECISION1;
-    greal gtmp;
+    gdouble precis = (gdouble) PRECISION1;
+    gdouble gtmp;
     gbind *binminus;
 
     scale_y /= 2;
 
-    rawsp->iscale.y = (greal) (-1 * (gfloat) rawsp->max.y * scale_y);
+    rawsp->iscale.y = (gdouble) (-1 * (gdouble) rawsp->max.y * scale_y);
 
     minwidth = rawsp->max.y;
     for (i = 0; i < sp->bar->nbins; i++) {
@@ -1117,7 +1117,7 @@ barchart_recalc_dimensions (splotd * rawsp, GGobiData * d, ggobid * gg)
         binminus->rect.height = binminus->rect.y - rect->y - 2;
       }
 
-      rect->width = MAX (1, (gint) ((gfloat) (rawsp->max.x - 2 * rect->x)
+      rect->width = MAX (1, (gint) ((gdouble) (rawsp->max.x - 2 * rect->x)
                                     * bin->count / sp->bar->maxbincounts));
 
     }
@@ -1130,7 +1130,7 @@ barchart_recalc_dimensions (splotd * rawsp, GGobiData * d, ggobid * gg)
       gbind *lbin = sp->bar->low_bin;
       lbin->rect.height = minwidth;
       lbin->rect.x = 10;
-      lbin->rect.width = MAX (1, (gint) ((gfloat)
+      lbin->rect.width = MAX (1, (gint) ((gdouble)
                                          (rawsp->max.x - 2 * lbin->rect.x)
                                          * lbin->count /
                                          sp->bar->maxbincounts));
@@ -1141,7 +1141,7 @@ barchart_recalc_dimensions (splotd * rawsp, GGobiData * d, ggobid * gg)
       gbind *hbin = sp->bar->high_bin;
       hbin->rect.height = sp->bar->bins[0].rect.height;
       hbin->rect.x = 10;
-      hbin->rect.width = MAX (1, (gint) ((gfloat)
+      hbin->rect.width = MAX (1, (gint) ((gdouble)
                                          (rawsp->max.x - 2 * hbin->rect.x)
                                          * hbin->count /
                                          sp->bar->maxbincounts));
@@ -1176,7 +1176,7 @@ barchart_recalc_dimensions (splotd * rawsp, GGobiData * d, ggobid * gg)
       rect->x = 10;
       rect->width = rawsp->max.x - 2 * rect->x;
 
-      rect->height = (gint) ((gfloat) sp->bar->bins[i].count / n * maxheight);
+      rect->height = (gint) ((gdouble) sp->bar->bins[i].count / n * maxheight);
       rect->y = yoffset;
       yoffset -= (rect->height + bindist);
     }
@@ -1192,7 +1192,7 @@ barchart_recalc_dimensions (splotd * rawsp, GGobiData * d, ggobid * gg)
       sp->bar->high_bin->rect.width = rawsp->max.x - 2 * 10; //10=rect->x;
       sp->bar->high_bin->rect.x = 10;
       sp->bar->high_bin->rect.height =
-        (gint) ((gfloat) sp->bar->high_bin->count / n * maxheight);
+        (gint) ((gdouble) sp->bar->high_bin->count / n * maxheight);
       i = sp->bar->nbins - 1;
       sp->bar->high_bin->rect.y =
         (gint) (rawsp->max.y * .5 * (1 - scale_y)) -
@@ -1202,7 +1202,7 @@ barchart_recalc_dimensions (splotd * rawsp, GGobiData * d, ggobid * gg)
       sp->bar->low_bin->rect.x = 10;
       sp->bar->low_bin->rect.width = rawsp->max.x - 2 * 10; //10=rect->x;
       sp->bar->low_bin->rect.height =
-        (gint) ((gfloat) sp->bar->low_bin->count / n * maxheight);
+        (gint) ((gdouble) sp->bar->low_bin->count / n * maxheight);
       sp->bar->low_bin->rect.y =
         (gint) (rawsp->max.y * .5 * (1 + scale_y)) + 2;
     }
@@ -1311,12 +1311,12 @@ barpsort (const void *arg1, const void *arg2)
 }
 
 
-gfloat
-barchart_sort_index (gfloat * yy, gint ny, ggobid * gg, barchartSPlotd * sp)
+gdouble
+barchart_sort_index (gdouble * yy, gint ny, ggobid * gg, barchartSPlotd * sp)
 {
   gint i, *indx;
   gint rank;
-  gfloat mindist = 0.0;
+  gdouble mindist = 0.0;
 
   indx = (gint *) g_malloc (ny * sizeof (gint));
 
@@ -1324,7 +1324,7 @@ barchart_sort_index (gfloat * yy, gint ny, ggobid * gg, barchartSPlotd * sp)
  * gy is needed solely for the psort routine:  psort is used by
  * qsort to put an index vector in the order that yy will assume.
 */
-  gg->p1d.gy = (gfloat *) g_malloc (ny * sizeof (gfloat));
+  gg->p1d.gy = (gdouble *) g_malloc (ny * sizeof (gdouble));
   for (i = 0; i < ny; i++) {
     indx[i] = i;
     gg->p1d.gy[i] = yy[i];

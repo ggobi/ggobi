@@ -116,8 +116,8 @@ point_in_which_bin (gint x, gint y, gint * ih, gint * iv, GGobiData * d,
 {
   gboolean inwindow = true;
 
-  *ih = (gint) ((gfloat) d->brush.nbins * (gfloat) x / (sp->max.x + 1.0));
-  *iv = (gint) ((gfloat) d->brush.nbins * (gfloat) y / (sp->max.y + 1.0));
+  *ih = (gint) ((gdouble) d->brush.nbins * (gdouble) x / (sp->max.x + 1.0));
+  *iv = (gint) ((gdouble) d->brush.nbins * (gdouble) y / (sp->max.y + 1.0));
 
   if (*ih < 0 ||
       *ih > d->brush.nbins - 1 || *iv < 0 || *iv > d->brush.nbins - 1) {

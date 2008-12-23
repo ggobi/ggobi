@@ -97,17 +97,17 @@ void boxcox_cb (GtkAdjustment *adj, ggobid *gg)
   }
 }
 
-gfloat
+gdouble
 scale_get_a (ggobid *gg) {
   gchar *val_str;
-  gfloat val = 0;  /*-- default value --*/
+  gdouble val = 0;  /*-- default value --*/
   GtkWidget *entry_a;
   entry_a = widget_find_by_name (gg->tform_ui.window, "TFORM:entry_a");
 
   if (entry_a) {
     val_str = gtk_editable_get_chars (GTK_EDITABLE (entry_a), 0, -1);
     if (val_str != NULL && strlen (val_str) > 0) {
-      val = (gfloat) atof (val_str);
+      val = (gdouble) atof (val_str);
       g_free (val_str);
     }
   } else {
@@ -116,17 +116,17 @@ scale_get_a (ggobid *gg) {
 
   return val;
 }
-gfloat
+gdouble
 scale_get_b (ggobid *gg) {
   gchar *val_str;
-  gfloat val = 1;  /*-- default value --*/
+  gdouble val = 1;  /*-- default value --*/
   GtkWidget *entry_b;
   entry_b = widget_find_by_name (gg->tform_ui.window, "TFORM:entry_b");
 
   if (entry_b) {
     val_str = gtk_editable_get_chars (GTK_EDITABLE (entry_b), 0, -1);
     if (val_str != NULL && strlen (val_str) > 0) {
-      val = (gfloat) atof (val_str);
+      val = (gdouble) atof (val_str);
       g_free (val_str);
     }
   } else {

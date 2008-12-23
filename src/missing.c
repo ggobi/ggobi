@@ -90,7 +90,7 @@ missings_datad_cb (GtkWidget * w, ggobid * gg)
   for (i = 0; i < d->nrows; i++) {
     for (j = 0; j < ncols_with_missings; j++) {
       k = cols_with_missings[j];
-      dnew->raw.vals[i][j] = (gfloat) ggobi_data_is_missing(d, i, k);
+      dnew->raw.vals[i][j] = (gdouble) ggobi_data_is_missing(d, i, k);
     }
   }
 

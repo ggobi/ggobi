@@ -3,8 +3,6 @@
 */
 
 #include <math.h>
-/*#include <limits.h>
-#include <float.h>*/
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -28,14 +26,14 @@ extern "C"
 {
 #endif
 
-  gint bin1 (gfloat *, gint, gfloat *, gint, gint *);
-  gint ash1 (gint, gint *, gint, gfloat *, gfloat *, gfloat *,
-             gfloat *, gfloat *);
+  gint bin1 (gdouble *, gint, gdouble *, gint, gint *);
+  gint ash1 (gint, gint *, gint, gdouble *, gdouble *, gdouble *,
+             gdouble *, gdouble *);
 
     gint
-    do_ash1d (gfloat * vals, gint nvals, gint nbins, gint n_ashes,
-              gfloat * ashed_vals, gfloat * lims_min, gfloat * lims_max,
-              gfloat * mean);
+    do_ash1d (gdouble * vals, gint nvals, gint nbins, gint n_ashes,
+              gdouble * ashed_vals, gdouble * lims_min, gdouble * lims_max,
+              gdouble * mean);
 
 #ifdef __cplusplus
 }
@@ -43,26 +41,26 @@ extern "C"
 /* */
 
 gint
-do_ash1d (gfloat * vals, gint nvals, gint nbins, gint n_ashes,
-          gfloat * ashed_vals, gfloat * lims_min, gfloat * lims_max,
-          gfloat * mean)
+do_ash1d (gdouble * vals, gint nvals, gint nbins, gint n_ashes,
+          gdouble * ashed_vals, gdouble * lims_min, gdouble * lims_max,
+          gdouble * mean)
 {
   gint i, k, icheck;
   gint *bins;
-  gfloat min, max, ab[2];
-  gfloat sum;
+  gdouble min, max, ab[2];
+  gdouble sum;
 
   /* for computing nicerange -- extending the range */
-  gfloat del, beta = 0.2;
+  gdouble del, beta = 0.2;
 
   /* for ash1 */
   gint ash_return;
-  gfloat *f, *t, *w;            /* w = weights */
-  gfloat kopt[] = { 2.0, 2.0 }; /* S function default values for kernel options */
-  gfloat binwidth;
+  gdouble *f, *t, *w;            /* w = weights */
+  gdouble kopt[] = { 2.0, 2.0 }; /* S function default values for kernel options */
+  gdouble binwidth;
 
   /* for generating the interpolated values to plot */
-  gfloat ti;
+  gdouble ti;
 
   bins = (gint *) g_malloc (nbins * sizeof (gint));
 
@@ -78,12 +76,12 @@ do_ash1d (gfloat * vals, gint nvals, gint nbins, gint n_ashes,
 
   icheck = bin1 (vals, nvals, ab, nbins, bins);
 
-  w = (gfloat *) g_malloc (n_ashes * sizeof (gfloat));  /* weights */
-  t = (gfloat *) g_malloc (nbins * sizeof (gfloat));
-  f = (gfloat *) g_malloc (nbins * sizeof (gfloat));
+  w = (gdouble *) g_malloc (n_ashes * sizeof (gdouble));  /* weights */
+  t = (gdouble *) g_malloc (nbins * sizeof (gdouble));
+  f = (gdouble *) g_malloc (nbins * sizeof (gdouble));
   ash_return = ash1 (n_ashes, bins, nbins, ab, kopt, t, f, w);
 
-  binwidth = (ab[1] - ab[0]) / (gfloat) nbins;
+  binwidth = (ab[1] - ab[0]) / (gdouble) nbins;
 
   *lims_min = INT_MAX;
   *lims_max = -1 * INT_MAX;
@@ -92,7 +90,7 @@ do_ash1d (gfloat * vals, gint nvals, gint nbins, gint n_ashes,
     ti = (vals[i] - ab[0]) / binwidth - .5;
     k = (gint) ti;
     ashed_vals[i] =
-      f[k + 1] * (ti - (gfloat) k) + f[k] * ((gfloat) k + 1 - ti);
+      f[k + 1] * (ti - (gdouble) k) + f[k] * ((gdouble) k + 1 - ti);
 
     /* without interpolation */
     /* ashed_vals[i] = f[(int) ffloor((vals[i] - ab[0]) / binwidth)]; */
@@ -101,7 +99,7 @@ do_ash1d (gfloat * vals, gint nvals, gint nbins, gint n_ashes,
     *lims_max = MAX (ashed_vals[i], *lims_max);
     sum += ashed_vals[i];
   }
-  *mean = sum / (gfloat) nvals;
+  *mean = sum / (gdouble) nvals;
 
                                                   /* Scale onto [0,100] *//*-- ggobi will handle the scaling --*/
 /*
@@ -131,7 +129,7 @@ c  ##### Copyright 1986 David W. Scott
 */
 
 gint
-bin1 (gfloat * x, gint n, gfloat * ab, gint nbin, gint * nc)
+bin1 (gdouble * x, gint n, gdouble * ab, gint nbin, gint * nc)
 {
 
 /*
@@ -140,7 +138,7 @@ bin1 (gfloat * x, gint n, gfloat * ab, gint nbin, gint * nc)
   nc[nbin]
 */
   gint i, k, nskip;
-  gfloat a, b, d;
+  gdouble a, b, d;
 
   nskip = 0;
   a = ab[0];
@@ -149,7 +147,7 @@ bin1 (gfloat * x, gint n, gfloat * ab, gint nbin, gint * nc)
   for (i = 0; i < nbin; i++)
     nc[i] = 0;
 
-  d = (b - a) / (gfloat) nbin;
+  d = (b - a) / (gdouble) nbin;
 
   for (i = 0; i < n; i++) {
     k = (gint) ((x[i] - a) / d) + 1;
@@ -184,14 +182,14 @@ c ##### Copyright 1986 David W. Scott
 
 
 gint
-ash1 (gint m, gint * nc, gint nbin, gfloat * ab, gfloat * kopt, gfloat * t,
-      gfloat * f, gfloat * w)
+ash1 (gint m, gint * nc, gint nbin, gdouble * ab, gdouble * kopt, gdouble * t,
+      gdouble * f, gdouble * w)
 {
 
 /*
   nc(nbin), ab(2), t(nbin), f(nbin), w(m), kopt(2)
 */
-  gfloat a, b, delta, cons, c, h;
+  gdouble a, b, delta, cons, c, h;
   gint i, k, n;
 
   gint ier = 0;
@@ -215,12 +213,12 @@ ash1 (gint m, gint * nc, gint nbin, gfloat * ab, gfloat * kopt, gfloat * t,
 
   for (i = 1; i < m; i++) {
     gdouble dtmp = pow ((gdouble) i / (gdouble) m, (gdouble) kopt[0]);
-    w[i] = (gfloat) pow (1.0 - dtmp, (gdouble) kopt[1]);
+    w[i] = (gdouble) pow (1.0 - dtmp, (gdouble) kopt[1]);
     cons += 2 * w[i];
   }
 
 
-  cons = (gfloat) m / cons;
+  cons = (gdouble) m / cons;
   for (i = 0; i < m; i++) {
     w[i] *= cons;
   }
@@ -239,12 +237,12 @@ ash1 (gint m, gint * nc, gint nbin, gfloat * ab, gfloat * kopt, gfloat * t,
  * compute ash(m) estimate
 */
 
-  delta = (b - a) / (gfloat) nbin;
-  h = (gfloat) m *delta;
+  delta = (b - a) / (gdouble) nbin;
+  h = (gdouble) m *delta;
 
 
   for (i = 0; i < nbin; i++) {
-    t[i] = a + ((gfloat) i + 0.5) * delta;
+    t[i] = a + ((gdouble) i + 0.5) * delta;
     f[i] = 0.0;
     n += nc[i];
   }
@@ -252,7 +250,7 @@ ash1 (gint m, gint * nc, gint nbin, gfloat * ab, gfloat * kopt, gfloat * t,
   for (i = 0; i < nbin; i++) {
     if (nc[i] == 0)
       continue;
-    c = (gfloat) nc[i] / ((gfloat) n * h);
+    c = (gdouble) nc[i] / ((gdouble) n * h);
     for (k = MAX (0, i - (m - 1)); k < MIN (nbin - 1, i + m); k++) {
       f[k] += (c * w[iabs (k - i)]);
     }

@@ -35,7 +35,7 @@
 #define T1DON true
 #define T1DOFF false
 
-static void tour1d_speed_set_display(gfloat slidepos, displayd *dsp); 
+static void tour1d_speed_set_display(gdouble slidepos, displayd *dsp); 
 void tour1d_write_video(ggobid *gg);
 
 #ifdef TESTING_TOUR_STEP
@@ -68,9 +68,9 @@ display_tour1d_init_null (displayd *dsp, ggobid *gg)
   vectori_init_null(&dsp->t1d.active_vars);
   vectorb_init_null(&dsp->t1d.active_vars_p);
 
-  vectorf_init_null(&dsp->t1d.lambda);
-  vectorf_init_null(&dsp->t1d.tau);
-  vectorf_init_null(&dsp->t1d.tinc);
+  vectord_init_null(&dsp->t1d.lambda);
+  vectord_init_null(&dsp->t1d.tau);
+  vectord_init_null(&dsp->t1d.tinc);
 
   /* manipulation controls */
   arrayd_init_null(&dsp->t1d_manbasis);
@@ -100,9 +100,9 @@ alloc_tour1d (displayd *dsp, ggobid *gg)
   vectori_alloc(&dsp->t1d.active_vars, nc);
   vectorb_alloc_zero(&dsp->t1d.active_vars_p, nc);
 
-  vectorf_alloc(&dsp->t1d.lambda, nc);
-  vectorf_alloc(&dsp->t1d.tau, nc);
-  vectorf_alloc(&dsp->t1d.tinc, nc);
+  vectord_alloc(&dsp->t1d.lambda, nc);
+  vectord_alloc(&dsp->t1d.tau, nc);
+  vectord_alloc(&dsp->t1d.tinc, nc);
 
   /* manipulation controls */
   arrayd_alloc(&dsp->t1d_manbasis, 2, nc);
@@ -132,9 +132,9 @@ tour1d_realloc_down (gint nc, gint *cols, GGobiData *d, ggobid *gg)
       vectori_delete_els (&dsp->t1d.active_vars, nc, cols);
       vectorb_delete_els (&dsp->t1d.active_vars_p, nc, cols);
 
-      vectorf_delete_els (&dsp->t1d.lambda, nc, cols);
-      vectorf_delete_els (&dsp->t1d.tau, nc, cols);
-      vectorf_delete_els (&dsp->t1d.tinc, nc, cols);
+      vectord_delete_els (&dsp->t1d.lambda, nc, cols);
+      vectord_delete_els (&dsp->t1d.tau, nc, cols);
+      vectord_delete_els (&dsp->t1d.tinc, nc, cols);
 
       arrayd_delete_cols (&dsp->t1d_manbasis, (gint) nc, cols);
     }
@@ -149,9 +149,9 @@ free_tour1d(displayd *dsp)
   vectori_free(&dsp->t1d.active_vars);
   vectorb_free(&dsp->t1d.active_vars_p);
 
-  vectorf_free(&dsp->t1d.lambda);
-  vectorf_free(&dsp->t1d.tau);
-  vectorf_free(&dsp->t1d.tinc);
+  vectord_free(&dsp->t1d.lambda);
+  vectord_free(&dsp->t1d.tau);
+  vectord_free(&dsp->t1d.tinc);
 
   arrayd_free(&dsp->t1d.Fa, 0, 0);
   arrayd_free(&dsp->t1d.Fz, 0, 0);
@@ -202,7 +202,7 @@ void tour1d_write_video(ggobid *gg)
   gint j;
   gdouble rnge;
   vartabled *vt;
-  gfloat ppval;
+  gdouble ppval;
 
   if (dsp->t1d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t1d_window))
     ppval = dsp->t1d.ppval;
@@ -328,7 +328,7 @@ tour1d_all_vars (displayd *dsp)
 }
 
 static void 
-tour1d_speed_set_display(gfloat slidepos, displayd *dsp) 
+tour1d_speed_set_display(gdouble slidepos, displayd *dsp) 
 {
   cpaneld *cpanel = &dsp->cpanel;
 
@@ -337,7 +337,7 @@ tour1d_speed_set_display(gfloat slidepos, displayd *dsp)
 
 }
 
-void tour1d_speed_set(gfloat slidepos, ggobid *gg) 
+void tour1d_speed_set(gdouble slidepos, ggobid *gg) 
 {
     tour1d_speed_set_display(slidepos, gg->current_display); 
 }
@@ -559,21 +559,21 @@ tour1d_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse, GGobiData *d, g
 }
 
 void
-tour1d_projdata(splotd *sp, greal **world_data, GGobiData *d, ggobid *gg)
+tour1d_projdata(splotd *sp, gdouble **world_data, GGobiData *d, ggobid *gg)
 {
   gint i, j, m;
   displayd *dsp = (displayd *) sp->displayptr;
-  gfloat min, max, mean;
-  gfloat precis = PRECISION1;
+  gdouble min, max, mean;
+  gdouble precis = PRECISION1;
   cpaneld *cpanel = &dsp->cpanel;
-  gfloat *yy;
+  gdouble *yy;
 
   if (sp == NULL)
     return;
   if (sp->p1d.spread_data.nels != d->nrows)
-    vectorf_realloc (&sp->p1d.spread_data, d->nrows);
+    vectord_realloc (&sp->p1d.spread_data, d->nrows);
 
-  yy = (gfloat *) g_malloc (d->nrows_in_plot * sizeof (gfloat));
+  yy = (gdouble *) g_malloc (d->nrows_in_plot * sizeof (gdouble));
 
   for (m=0; m < d->nrows_in_plot; m++) {
     i = d->rows_in_plot.els[m];
@@ -581,7 +581,7 @@ tour1d_projdata(splotd *sp, greal **world_data, GGobiData *d, ggobid *gg)
     sp->planar[i].y = 0;
     for (j=0; j<d->ncols; j++)
     {
-      yy[m] += (gfloat)(dsp->t1d.F.vals[0][j]*world_data[i][j]);
+      yy[m] += (gdouble)(dsp->t1d.F.vals[0][j]*world_data[i][j]);
     }
   }
 
@@ -612,11 +612,11 @@ tour1d_projdata(splotd *sp, greal **world_data, GGobiData *d, ggobid *gg)
     }
     for (m=0; m<d->nrows_in_plot; m++) {
       i = d->rows_in_plot.els[m];
-      sp->planar[i].x = (greal) (precis*(-1.0+2.0*
+      sp->planar[i].x = (gdouble) (precis*(-1.0+2.0*
         sp->p1d.spread_data.els[m]/max));
         /*(sp->p1d_data.els[i]-min)/(max-min)));*/
       /*      sp->planar[i].y = yy[i];*/
-      sp->planar[i].y = (greal) (precis*(-1.0+2.0*
+      sp->planar[i].y = (gdouble) (precis*(-1.0+2.0*
         ((yy[m]-sp->tour1d.minscreenx)/
         (sp->tour1d.maxscreenx-sp->tour1d.minscreenx))));
     }
@@ -632,11 +632,11 @@ tour1d_projdata(splotd *sp, greal **world_data, GGobiData *d, ggobid *gg)
     }
     for (m=0; m<d->nrows_in_plot; m++) {
       i = d->rows_in_plot.els[m];
-      sp->planar[i].x = (greal) (precis*(-1.0+2.0*
+      sp->planar[i].x = (gdouble) (precis*(-1.0+2.0*
         ((yy[m]-sp->tour1d.minscreenx)/
         (sp->tour1d.maxscreenx-sp->tour1d.minscreenx))));
       /*      sp->planar[i].x = yy[i];*/
-      sp->planar[i].y = (greal) (precis*(-1.0+2.0*
+      sp->planar[i].y = (gdouble) (precis*(-1.0+2.0*
         sp->p1d.spread_data.els[m]/max));
         /*(sp->p1d_data.els[i]-min)/(max-min)));*/
     }
@@ -968,9 +968,9 @@ tour1d_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
   displayd *dsp = (displayd *) sp->displayptr;
   GGobiData *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
-  gfloat xcosphi=1., xsinphi=0.;
-  gfloat distx, disty;
-  gfloat denom = (float) MIN(sp->max.x, sp->max.y)/2.;
+  gdouble xcosphi=1., xsinphi=0.;
+  gdouble distx, disty;
+  gdouble denom = (gdouble) MIN(sp->max.x, sp->max.y)/2.;
   gint actual_nxvars = dsp->t1d.nactive;
   gint j;
   gboolean offscreen = false;
@@ -1004,8 +1004,8 @@ tour1d_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
 
       dsp->t1d_phi = dsp->t1d_phi + distx / denom;
   
-      xcosphi = (gfloat) cos((gdouble) dsp->t1d_phi);
-      xsinphi = (gfloat) sin((gdouble) dsp->t1d_phi);
+      xcosphi = (gdouble) cos((gdouble) dsp->t1d_phi);
+      xsinphi = (gdouble) sin((gdouble) dsp->t1d_phi);
       if (xcosphi > 1.0)
       {
         xcosphi = 1.0;

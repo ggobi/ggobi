@@ -23,11 +23,11 @@
 
 
 gboolean
-impute_fixed (ImputeType impute_type, gfloat val, gint nvars, gint * vars,
+impute_fixed (ImputeType impute_type, gdouble val, gint nvars, gint * vars,
               GGobiData * d, ggobid * gg)
 {
   gint i, j, k, m;
-  gfloat maxval, minval, range, impval = 0;
+  gdouble maxval, minval, range, impval = 0;
   gboolean ok = true;
   vartabled *vt;
 
@@ -60,7 +60,7 @@ impute_fixed (ImputeType impute_type, gfloat val, gint nvars, gint * vars,
         if (ggobi_data_is_missing(d, m, j)) {
           drand = randvalue ();
           drand = (drand - .5) * jmult;
-          d->raw.vals[m][j] = d->tform.vals[m][j] = impval + (gfloat) drand;
+          d->raw.vals[m][j] = d->tform.vals[m][j] = impval + (gdouble) drand;
         }
       }
     }
@@ -86,8 +86,8 @@ impute_mean_or_median (gint type, gint nvars, gint * vars,
 {
   gint i, j, k, m, n;
   gint np, nmissing;
-  greal sum, val;
-  greal *x;
+  gdouble sum, val;
+  gdouble *x;
   gint *missv;
   vartabled *vt;
   gboolean redraw = false;
@@ -100,7 +100,7 @@ impute_mean_or_median (gint type, gint nvars, gint * vars,
   if (gg->impute.bgroup_p && d->nclusters > 1) {
 
     missv = (gint *) g_malloc (d->nrows_in_plot * sizeof (gint));
-    x = (greal *) g_malloc (d->nrows_in_plot * sizeof (greal));
+    x = (gdouble *) g_malloc (d->nrows_in_plot * sizeof (gdouble));
 
     /* Loop over the number of brushing groups */
     for (n = 0; n < d->nclusters; n++) {
@@ -130,10 +130,10 @@ impute_mean_or_median (gint type, gint nvars, gint * vars,
         }
         if (np && nmissing) {
           if (gg->impute.type == IMP_MEAN) {
-            val = sum / (greal) np;
+            val = sum / (gdouble) np;
           }
           else { // if (gg->impute.type == IMP_MEDIAN) {
-            qsort ((void *) x, np, sizeof (gfloat), fcompare);
+            qsort ((void *) x, np, sizeof (gdouble), fcompare);
             val =
               ((np % 2) !=
                0) ? x[(np - 1) / 2] : (x[np / 2 - 1] + x[np / 2]) / 2.;
@@ -174,7 +174,7 @@ impute_single (gint * missv, gint nmissing, gint * presv, gint npresent,
                gint col, GGobiData * d, ggobid * gg)
 {
   gint i, k;
-  gfloat rrand;
+  gdouble rrand;
 
   /*
    * Then loop over the missing values, plugging in some value
@@ -182,7 +182,7 @@ impute_single (gint * missv, gint nmissing, gint * presv, gint npresent,
    */
   for (i = 0; i < nmissing; i++) {
     for (k = 0; k < npresent; k++) {
-      rrand = (gfloat) randvalue ();
+      rrand = (gdouble) randvalue ();
 
       if (((npresent - k) * rrand) < 1.0) {
         d->raw.vals[missv[i]][col] = d->raw.vals[presv[k]][col];

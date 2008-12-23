@@ -221,14 +221,14 @@ extern const gint  *GGobi_getViewTypeIndices(int *n);
   This is not a copy, but the actual data used by the
   internals of GGobi.
  */
-extern const gfloat** GGobi_getRawData(GGobiData *, ggobid *);
+extern const gdouble** GGobi_getRawData(GGobiData *, ggobid *);
 
 /**
   Returns a pointer to the (second) transformation of the raw data.
   This is not a copy, but the actual data used by the
   internals of GGobi.
  */
-extern const gfloat** GGobi_getTFormData(GGobiData *, ggobid *);
+extern const gdouble** GGobi_getTFormData(GGobiData *, ggobid *);
 
 
 /**

@@ -29,7 +29,7 @@ static gboolean barchart_scale (gboolean button1_p, gboolean button2_p,
 
 void barchart_set_initials (splotd * sp, GGobiData * d);
 void barchart_allocate_structure (splotd * sp, GGobiData * d);
-extern void barchart_set_breakpoints (gfloat width, splotd * sp,
+extern void barchart_set_breakpoints (gdouble width, splotd * sp,
                                       GGobiData * d);
 
 static void
@@ -291,25 +291,25 @@ barchart_scale (gboolean button1_p, gboolean button2_p, splotd * sp)
   if (bsp->bar->is_histogram &&
       (bsp->bar->anchor_drag || bsp->bar->width_drag)) {
     gint idy = sp->mousepos.y - sp->mousepos_o.y;
-    greal dy = (greal) idy;
+    gdouble dy = (gdouble) idy;
     fcoords pts1, pts2;
 
     if (bsp->bar->anchor_drag) {
-      gfloat scale_y;
+      gdouble scale_y;
       icoords scr;
 
       if (idy != 0) {
         gboolean set_anchor = TRUE;
-        gfloat offset_old = bsp->bar->offset;
+        gdouble offset_old = bsp->bar->offset;
         gint pmid_old = sp->pmid.y;
 
         scr.x = scr.y = 0;
         scale_y = sp->scale.y;
         scale_y /= 2;
-        sp->iscale.y = (gfloat) sp->max.y * scale_y;
+        sp->iscale.y = (gdouble) sp->max.y * scale_y;
 
         klass->screen_to_tform (cpanel, sp, &scr, &pts1, gg);
-        sp->pmid.y -= (dy * (greal) PRECISION1 / sp->iscale.y);
+        sp->pmid.y -= (dy * (gdouble) PRECISION1 / sp->iscale.y);
         klass->screen_to_tform (cpanel, sp, &scr, &pts2, gg);
         bsp->bar->offset += (pts1.y - pts2.y);
 
@@ -339,7 +339,7 @@ barchart_scale (gboolean button1_p, gboolean button2_p, splotd * sp)
     else {                      /* if (bsp->bar->width_drag) */
 
       if (idy != 0) {
-        gfloat width, oldwidth;
+        gdouble width, oldwidth;
 
         klass->screen_to_tform (cpanel, sp, &sp->mousepos_o, &pts1, gg);
         klass->screen_to_tform (cpanel, sp, &sp->mousepos, &pts2, gg);

@@ -244,7 +244,7 @@ struct _ggobid {
     gint cycle_id;
     GtkAdjustment *cycle_delay_adj;
    /*-- texture --*/
-    gfloat *gy;
+    gdouble *gy;
   } p1d;
 
 /*-------------------- 2d plotting -----------------------------------*/
@@ -366,7 +366,7 @@ struct _ggobid {
     GdkPixmap *pix;
     colorschemed *scheme; /*-- current color scheme --*/
     GdkGC *GC;
-    gfloat *pct;
+    gdouble *pct;
     gint npct;
   } svis;
 
@@ -377,7 +377,7 @@ struct _ggobid {
     GdkPixmap *pix;
     GdkGC *GC;
 
-    gfloat *pct;
+    gdouble *pct;
     gint npct;
     gint *n;   /*-- number of points that will take on each color --*/
     gint nearest_color;
@@ -528,8 +528,8 @@ typedef struct {
       */
   gchar *ggobiHome;
 
-  gfloat defaultTourSpeed;
-  gfloat defaultTour1dSpeed;
+  gdouble defaultTourSpeed;
+  gdouble defaultTour1dSpeed;
 
   gboolean useRadioMenuItems;
 

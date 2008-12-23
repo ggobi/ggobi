@@ -17,10 +17,10 @@ typedef struct _Subset {
 
 
 typedef struct _Jitterd {
-  gfloat factor;
+  gdouble factor;
   gboolean type;
   gboolean convex;
-  gfloat *jitfacv;
+  gdouble *jitfacv;
 } Jitterd;
 
 typedef struct _Varpanel_cboxd {
@@ -59,11 +59,11 @@ typedef struct _Sphere_d {
   gint npcs;      /*-- the first npcs vars of vars will be sphered --*/
   vector_i pcvars;/*-- vars into which sphered data is written --*/
 
-  vector_f eigenval;
+  vector_d  eigenval;
   array_d eigenvec;
-  array_f vc;
-  vector_f tform_mean;
-  vector_f tform_stddev;
+  array_d vc;
+  vector_d tform_mean;
+  vector_d tform_stddev;
 
   gboolean vars_stdized;
 } Sphere_d;
@@ -130,10 +130,10 @@ public GSList *vartable;
 public GtkWidget *vartable_tree_view[all_vartypes];
 public GtkTreeModel *vartable_tree_model; /* the root model, with all vars */
 
-public array_f raw;
-public array_f tform;
-public array_g world;
-public array_g jitdata;
+public array_d raw;
+public array_d tform;
+public array_d world;
+public array_d jitdata;
 
 /*----------------------- missing values ---------------------------*/
 
@@ -210,7 +210,7 @@ constructor (GType type, guint n_construct_properties, GObjectConstructParam *co
   
   d->nrows_in_plot = d->nrows;  /*-- for now --*/
 
-  arrayf_alloc (&d->raw, d->nrows, d->ncols); //FIXME: probably leaks memory
+  arrayd_alloc (&d->raw, d->nrows, d->ncols); //FIXME: probably leaks memory
   //arrays_alloc (&d->missing, d->nrows, d->ncols);
   arrays_alloc_zero (&d->missing, d->nrows, d->ncols);
 
@@ -406,7 +406,7 @@ public void
 set_string_value(self, guint i, guint j, gchar* value) 
 {
   if (FALSE) {//FIXME: should be is_numeric
-    self_set_raw_value(self, i, j, (gfloat) g_strtod (value, NULL));
+    self_set_raw_value(self, i, j, (gdouble) g_strtod (value, NULL));
   } else {
     if (value[0] == '\0' || !g_ascii_strcasecmp (value, "na") || !strcmp (value, "."))  
       self_set_missing(self, i, j);
@@ -476,7 +476,7 @@ void ggobi_data_set_row_labels(GGobiData *d, gchar **labels);
 void
 datad_free (GGobiData *d, ggobid *gg) 
 {
-  arrayf_free (&d->raw, 0, 0);
+  arrayd_free (&d->raw, 0, 0);
   pipeline_arrays_free (d, gg);
 
   arrays_free (&d->missing, 0, 0);

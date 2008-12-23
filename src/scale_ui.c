@@ -83,7 +83,7 @@ zoom_cb (GtkAdjustment * adj, ggobid * gg)
   splotd *sp = gg->current_splot;
   cpaneld *cpanel = &display->cpanel;
   gchar *name = (gchar *) g_object_get_data (G_OBJECT (adj), "name");
-  greal oscalex = sp->scale.x, oscaley = sp->scale.y;
+  gdouble oscalex = sp->scale.x, oscaley = sp->scale.y;
   GtkAdjustment *adj_other;
   // step and eps are in the space of the adjustment values;
   // exp_eps is in the space of the scaling values.
@@ -282,7 +282,7 @@ scroll_cb (GtkWidget *w, GdkEventScroll *event, splotd *sp)
 {
   /* For now, make this a fixed-ratio zoom. Most people don't have horizontal
      mouse wheels. */
-  gfloat factor = 1.0, xscale = sp->scale.x, yscale = sp->scale.y;
+  gdouble factor = 1.0, xscale = sp->scale.x, yscale = sp->scale.y;
   if (event->direction == GDK_SCROLL_UP)
     factor += SCALE_SCROLL_INC;
   else if (event->direction == GDK_SCROLL_DOWN)

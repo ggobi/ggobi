@@ -44,33 +44,33 @@ typedef enum {HOLES, CENTRAL_MASS, LDA, CGINI, CENTROPY}  StandardPPIndexTypes;
 #define EXPMINUS1 0.3678794411714423
 #define ONEMINUSEXPMINUS1 0.63212056
 
-void t2d_pptemp_set(gfloat slidepos, displayd *dsp, ggobid *gg) {
+void t2d_pptemp_set(gdouble slidepos, displayd *dsp, ggobid *gg) {
   dsp->t2d_pp_op.temp_start = slidepos;
 }
 
-void t2d_ppcool_set(gfloat slidepos, displayd *dsp, ggobid *gg) {
+void t2d_ppcool_set(gdouble slidepos, displayd *dsp, ggobid *gg) {
   dsp->t2d_pp_op.cooling = slidepos;
 }
 
-gfloat mean_fn2(gfloat *x1, gfloat *x2, gint n)
+gdouble mean_fn2(gdouble *x1, gdouble *x2, gint n)
 {
   gint i;
-  gfloat tmean, tmpf1;
-  gfloat mean1, mean2;
+  gdouble tmean, tmpf1;
+  gdouble mean1, mean2;
 
   tmpf1 = 0.;
   for (i=0; i<n; i++)
     tmpf1 += x1[i];
-  mean1 = tmpf1 / (gfloat)n;
+  mean1 = tmpf1 / (gdouble)n;
   tmpf1 = 0.;
   for (i=0; i<n; i++)
     tmpf1 += x2[i];
-  mean2 = tmpf1 / (gfloat)n;
+  mean2 = tmpf1 / (gdouble)n;
   tmean = 0.;
   for (i=0; i<n; i++) {
     tmean += ((x1[i]-mean1)*(x2[i]-mean2));
   }
-  tmean /= ((gfloat)n);
+  tmean /= ((gdouble)n);
   tmean += (mean1*mean2);
 
   return(tmean);
@@ -80,10 +80,10 @@ gfloat mean_fn2(gfloat *x1, gfloat *x2, gint n)
 void
 alloc_holes_p(holes_param *hp, gint nrows)
 {
-  hp->h0 = (gfloat *) g_malloc(
-    (guint) nrows*sizeof(gfloat *));
-  hp->h1 = (gfloat *) g_malloc(
-    (guint) nrows*sizeof(gfloat *));
+  hp->h0 = (gdouble *) g_malloc(
+    (guint) nrows*sizeof(gdouble *));
+  hp->h1 = (gdouble *) g_malloc(
+    (guint) nrows*sizeof(gdouble *));
 }
 
 void
@@ -100,7 +100,7 @@ Purpose        : computes a projection into a normal density fn
 Note           : only works for 2d now, could be generalized
 *********************************************************************/
 
-/* gint holes(array_f *pdata, void *param, gfloat *val)
+/* gint holes(array_d*pdata, void *param, gdouble *val)
 {
   holes_param *hp = (holes_param *) param;
   gint i, m;
@@ -115,7 +115,7 @@ Note           : only works for 2d now, could be generalized
 
   * Calculate index *
   hp->acoefs = mean_fn2(hp->h0,hp->h1,pdata->nrows);
-  *val = (1. - hp->acoefs)/(gfloat) ONEMINUSEXPMINUS1 ;
+  *val = (1. - hp->acoefs)/(gdouble) ONEMINUSEXPMINUS1 ;
   return(0);
 }
 */
@@ -129,7 +129,7 @@ Note           : only works for 2d now, could be generalized
 *********************************************************************/
 
 /* gint
-central_mass(array_f *pdata, void *param, gfloat *val)
+central_mass(array_d*pdata, void *param, gdouble *val)
 {
   holes_param *hp = (holes_param *) param;
   gint i, m;
@@ -144,7 +144,7 @@ central_mass(array_f *pdata, void *param, gfloat *val)
 
   * Calculate index *
   hp->acoefs = mean_fn2(hp->h0,hp->h1,pdata->nrows);
-  *val = (hp->acoefs - (gfloat)EXPMINUS1)/(float)ONEMINUSEXPMINUS1 ;
+  *val = (hp->acoefs - (gdouble)EXPMINUS1)/(float)ONEMINUSEXPMINUS1 ;
   return(0);
 }
 */
@@ -154,15 +154,15 @@ central_mass(array_f *pdata, void *param, gfloat *val)
 /*   holes_raw2 : use inverse function             */
 /***************************************************/
 
-/* gint holes_raw1(array_f *pdata, void *param, gfloat *val)
+/* gint holes_raw1(array_d*pdata, void *param, gdouble *val)
 { 
 *
    holes_param *hp = (holes_param *) param;
 *
    gint i, p=pdata->ncols, n=pdata->nrows;
-   gfloat m1, m2, x1, x2, temp;
+   gdouble m1, m2, x1, x2, temp;
    gdouble *cov;
-   gfloat det,acoefs;
+   gdouble det,acoefs;
 
    cov = (gdouble *) g_malloc(p*p*sizeof(gdouble));
    for(i=0; i<(p*p); i++) 
@@ -197,22 +197,22 @@ central_mass(array_f *pdata, void *param, gfloat *val)
      acoefs += exp(-temp/2);
    }
 
-   *val = (1.-acoefs/n)/(gfloat) ONEMINUSEXPMINUS1;
+   *val = (1.-acoefs/n)/(gdouble) ONEMINUSEXPMINUS1;
 
    g_free(cov);
    return(0);
 }
 
-gint holes_raw2( array_f *pdata, void *param, gfloat *val)
+gint holes_raw2( array_d*pdata, void *param, gdouble *val)
 { 
    gint i, p=pdata->ncols, n=pdata->nrows;
-   gfloat m1, m2,x1,x2,temp;
+   gdouble m1, m2,x1,x2,temp;
    gdouble *cov;
 *
    holes_param *hp = (holes_param *) param;
-   gfloat det;
+   gdouble det;
 *
-   gfloat acoefs;
+   gdouble acoefs;
 
    cov = (gdouble *) g_malloc(p*p*sizeof(gdouble));
    for(i=0; i<(p*p); i++) cov[i] = 0;
@@ -237,7 +237,7 @@ gint holes_raw2( array_f *pdata, void *param, gfloat *val)
         acoefs +=exp(-temp/2);
    }
 
-   *val = (1.-acoefs/n)/(gfloat) ONEMINUSEXPMINUS1;
+   *val = (1.-acoefs/n)/(gdouble) ONEMINUSEXPMINUS1;
    free(cov);
    return(0);
 }
@@ -249,15 +249,15 @@ gint holes_raw2( array_f *pdata, void *param, gfloat *val)
 /*   central_mass_raw2 : use inverse function             */
 /**********************************************************/
 
-/* gint central_mass_raw1(array_f *pdata, void *param, gfloat *val)
+/* gint central_mass_raw1(array_d*pdata, void *param, gdouble *val)
 {
 *
    holes_param *hp = (holes_param *) param;
 *
    gint i, p=pdata->ncols, n=pdata->nrows;
-   gfloat m1, m2,x1,x2,temp;
+   gdouble m1, m2,x1,x2,temp;
    gdouble *cov;
-   gfloat det,acoefs;
+   gdouble det,acoefs;
 
    cov = (gdouble *) g_malloc(p*p*sizeof(gdouble));
    for(i=0; i<(p*p); i++) cov[i] = 0;
@@ -286,19 +286,19 @@ gint holes_raw2( array_f *pdata, void *param, gfloat *val)
         acoefs +=exp(-temp/2);
    }
 
-   *val = (acoefs/n-(gfloat)EXPMINUS1)/(gfloat) ONEMINUSEXPMINUS1;
+   *val = (acoefs/n-(gdouble)EXPMINUS1)/(gdouble) ONEMINUSEXPMINUS1;
    free(cov);
    return(0);
 
 }
 
-gint central_mass_raw2(array_f *pdata, void *param, gfloat *val)
+gint central_mass_raw2(array_d*pdata, void *param, gdouble *val)
 {
    *holes_param *hp = (holes_param *) param;*
    gint i, p=pdata->ncols, n=pdata->nrows;
-   gfloat m1, m2,x1,x2,temp;
+   gdouble m1, m2,x1,x2,temp;
    gdouble *cov;
-   gfloat acoefs;
+   gdouble acoefs;
 
    cov = (gdouble *) g_malloc(p*p*sizeof(gdouble));
    for(i=0; i<(p*p); i++) cov[i] = 0;
@@ -322,17 +322,17 @@ gint central_mass_raw2(array_f *pdata, void *param, gfloat *val)
         temp= cov[0]*x1*x1-(cov[1]+cov[2])*x1*x2+cov[3]*x2*x2;
         acoefs +=exp(-temp/2);
    }
-   *val = (acoefs/n-(gfloat)EXPMINUS1)/(gfloat) ONEMINUSEXPMINUS1;
+   *val = (acoefs/n-(gdouble)EXPMINUS1)/(gdouble) ONEMINUSEXPMINUS1;
    free(cov);
    return(0);
 
 }
 */
 /*void
-holes_deriv(holes_param *hp, gfloat **data, gfloat **pdata)
+holes_deriv(holes_param *hp, gdouble **data, gdouble **pdata)
 {
   gint i, k, m;
-  gfloat tmpf;
+  gdouble tmpf;
 
   for (i=0; i<2; i++)
     for (k=0; k<hp->ncols; k++)
@@ -492,9 +492,9 @@ void t2d_ppdraw_all(gint wid, gint hgt, gint margin, displayd *dsp, ggobid *gg)
   for (i=0; i<dsp->t2d_ppindx_count; i++) 
   {
     pptrace[i].x = margin+i*2;
-    pptrace[i].y = hgt-margin-(gint)((gfloat)((dsp->t2d_ppindx_mat[i]-
-      dsp->t2d_indx_min)/(gfloat) (dsp->t2d_indx_max-dsp->t2d_indx_min)) * 
-      (gfloat) (hgt - 2*margin));
+    pptrace[i].y = hgt-margin-(gint)((gdouble)((dsp->t2d_ppindx_mat[i]-
+      dsp->t2d_indx_min)/(gdouble) (dsp->t2d_indx_max-dsp->t2d_indx_min)) * 
+      (gdouble) (hgt - 2*margin));
   }
   gdk_draw_lines (dsp->t2d_pp_pixmap, gg->plot_GC,
     pptrace, dsp->t2d_ppindx_count);
@@ -529,7 +529,7 @@ void t2d_ppdraw_think(displayd *dsp, ggobid *gg)
 }
 
 /* This is the pp index plot drawing routine */ 
-void t2d_ppdraw(gfloat pp_indx_val, displayd *dsp, ggobid *gg)
+void t2d_ppdraw(gdouble pp_indx_val, displayd *dsp, ggobid *gg)
 {
   colorschemed *scheme = gg->activeColorScheme;
   gint margin=10;
@@ -604,7 +604,7 @@ void t2d_pp_reinit(displayd *dsp, ggobid *gg)
 
 The index function has to be defined as
 
-     gint index (array_f *pdata, void *param, gfloat *val)
+     gint index (array_d*pdata, void *param, gdouble *val)
 
 with   
 
@@ -619,11 +619,11 @@ projection.
 
 *********************************************************************/
 
-gfloat t2d_calc_indx (array_f pd,
+gdouble t2d_calc_indx (array_d pd,
                 Tour_PPIndex_f index,
                 void *param)
 { 
-  gfloat indexval;
+  gdouble indexval;
 
   index (&pd, param, &indexval, NULL);
 
@@ -640,7 +640,7 @@ t2d_switch_index(Tour2DCPanel controls, gint basismeth, displayd *dsp,
 {
   GGobiData *d = dsp->d;
   gint kout, nrows = d->nrows_in_plot;
-  gfloat *gdata;
+  gdouble *gdata;
   gint i, j, k;
 
   if (d->nrows_in_plot == 1)  /* can't do pp on no data! */
@@ -669,7 +669,7 @@ t2d_switch_index(Tour2DCPanel controls, gint basismeth, displayd *dsp,
           dsp->t2d_pp_op.proj_best.vals[k][j]);
     }
 
-  gdata  = g_malloc (nrows*sizeof(gfloat));
+  gdata  = g_malloc (nrows*sizeof(gdouble));
   if (d->clusterid.els==NULL) printf ("No cluster information found\n");
   for (i = 0 ; i < nrows; i++)
   { 

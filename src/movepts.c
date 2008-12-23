@@ -110,9 +110,9 @@ movept_screen_to_raw (splotd * sp, gint ipt, gcoords * eps,
   gcoords planar;
   displayd *display = (displayd *) sp->displayptr;
   GGobiData *d = display->d;
-  greal *world = (greal *) g_malloc0 (d->ncols * sizeof (greal));
+  gdouble *world = (gdouble *) g_malloc0 (d->ncols * sizeof (gdouble));
   icoords pos;
-  greal *raw = (greal *) g_malloc (d->ncols * sizeof (greal));
+  gdouble *raw = (gdouble *) g_malloc (d->ncols * sizeof (gdouble));
 
   pos.x = sp->screen[ipt].x;
   pos.y = sp->screen[ipt].y;
@@ -142,8 +142,8 @@ movept_plane_to_raw (splotd * sp, gint ipt, gcoords * eps, GGobiData * d,
 {
   gint j;
   gcoords planar;
-  greal *world = (greal *) g_malloc0 (d->ncols * sizeof (greal));
-  greal *raw = (greal *) g_malloc (d->ncols * sizeof (greal));
+  gdouble *world = (gdouble *) g_malloc0 (d->ncols * sizeof (gdouble));
+  gdouble *raw = (gdouble *) g_malloc (d->ncols * sizeof (gdouble));
 
   planar.x = sp->planar[ipt].x;
   planar.y = sp->planar[ipt].y;

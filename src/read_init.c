@@ -152,12 +152,12 @@ getXMLElement (xmlNodePtr node, const char *tagName)
 
 static void
 getTourSpeedValue (xmlNodePtr node, const xmlDocPtr doc, const gchar * name,
-                   gfloat * value)
+                   gdouble * value)
 {
   xmlNodePtr el = getXMLElement (node, name);
   if (el) {
     xmlChar *tmp;
-    gfloat val;
+    gdouble val;
     tmp = xmlNodeListGetString (doc, XML_CHILDREN (el), 1);
     val = atof ((char *) tmp);
     if (val > 0 && val < MAX_TOUR_SPEED)

@@ -24,7 +24,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-gint dsvd (gdouble **a, gint m, gint n, gfloat *w, gdouble **v);
+gint dsvd (gdouble **a, gint m, gint n, gdouble *w, gdouble **v);
 #ifdef __cplusplus
 }
 #endif
@@ -40,7 +40,7 @@ static gdouble PYTHAG (gdouble a, gdouble b)
 }
 
 gint
-dsvd (gdouble **a, gint m, gint n, gfloat *w, gdouble **v)
+dsvd (gdouble **a, gint m, gint n, gdouble *w, gdouble **v)
 {
   gint flag, i, its, j, jj, k, l = 0, nm = 0;  // compiler pacification
   gdouble c, f, h, s, x, y, z;
@@ -92,7 +92,7 @@ dsvd (gdouble **a, gint m, gint n, gfloat *w, gdouble **v)
           a[k][i] = (a[k][i]*scale);
       }
     }
-    w[i] = (gfloat)(scale * g);
+    w[i] = (gdouble)(scale * g);
 
     /* right-hand reduction */
     g = s = scale = 0.0;
@@ -217,7 +217,7 @@ dsvd (gdouble **a, gint m, gint n, gfloat *w, gdouble **v)
           {
             g = (gdouble)w[i];
             h = PYTHAG(f, g);
-            w[i] = (gfloat)h;
+            w[i] = (gdouble)h;
             h = 1.0 / h;
             c = g * h;
             s = (- f * h);
@@ -236,7 +236,7 @@ dsvd (gdouble **a, gint m, gint n, gfloat *w, gdouble **v)
       {          /* convergence */
         if (z < 0.0)
         {        /* make singular value nonnegative */
-          w[k] = (gfloat)(-z);
+          w[k] = (gdouble)(-z);
           for (j = 0; j < n; j++)
             v[j][k] = (-v[j][k]);
         }
@@ -279,11 +279,11 @@ dsvd (gdouble **a, gint m, gint n, gfloat *w, gdouble **v)
         {
           x = (gdouble)v[jj][j];
           z = (gdouble)v[jj][i];
-          v[jj][j] = (gfloat)(x * c + z * s);
-          v[jj][i] = (gfloat)(z * c - x * s);
+          v[jj][j] = (gdouble)(x * c + z * s);
+          v[jj][i] = (gdouble)(z * c - x * s);
         }
         z = PYTHAG (f, h);
-        w[j] = (gfloat)z;
+        w[j] = (gdouble)z;
         if (z)
         {
           z = 1.0 / z;
@@ -302,7 +302,7 @@ dsvd (gdouble **a, gint m, gint n, gfloat *w, gdouble **v)
       }
       rv1[l] = 0.0;
       rv1[k] = f;
-      w[k] = (gfloat)x;
+      w[k] = (gdouble)x;
     }
   }
   g_free (rv1);

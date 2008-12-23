@@ -21,9 +21,9 @@
 #include "vars.h"
 #include "externs.h"
 
-gfloat mean_largest_dist (gfloat **, gint *, gint, gfloat *, gfloat *,
+gdouble mean_largest_dist (gdouble **, gint *, gint, gdouble *, gdouble *,
                           GGobiData *, ggobid *);
-gfloat median_largest_dist (gfloat **, gint *, gint, gfloat *, gfloat *,
+gdouble median_largest_dist (gdouble **, gint *, gint, gdouble *, gdouble *,
                             GGobiData *, ggobid *);
 
 /* ------------ Dynamic allocation, freeing section --------- */
@@ -48,7 +48,7 @@ pipeline_init (GGobiData * d, ggobid * gg)
 
 
   /*-- run the first half of the pipeline --*/
-  arrayf_copy (&d->raw, &d->tform);
+  arrayd_copy (&d->raw, &d->tform);
 
   limits_set (d, true, true, gg->lims_use_visible);
 
@@ -82,10 +82,10 @@ pipeline_init (GGobiData * d, ggobid * gg)
 void
 pipeline_arrays_free (GGobiData * d, ggobid * gg)
 {
-  arrayf_free (&d->tform, 0, 0);
+  arrayd_free (&d->tform, 0, 0);
 
-  arrayg_free (&d->world, 0, 0);
-  arrayg_free (&d->jitdata, 0, 0);
+  arrayd_free (&d->world, 0, 0);
+  arrayd_free (&d->jitdata, 0, 0);
 
   /*-- should these be freed here as well? --*/
   vectori_free (&d->clusterid);
@@ -106,10 +106,10 @@ pipeline_arrays_alloc (GGobiData * d, ggobid * gg)
   if (d->tform.vals != NULL)
     pipeline_arrays_free (d, gg);
 
-  arrayf_alloc (&d->tform, nr, nc);
+  arrayd_alloc (&d->tform, nr, nc);
 
-  arrayg_alloc (&d->world, nr, nc);
-  arrayg_alloc_zero (&d->jitdata, nr, nc);
+  arrayd_alloc (&d->world, nr, nc);
+  arrayd_alloc_zero (&d->jitdata, nr, nc);
 
   vectori_alloc (&d->rows_in_plot, nr);
   vectorb_alloc (&d->sampled, nr);
@@ -123,33 +123,33 @@ pipeline_arrays_check_dimensions (GGobiData * d)
 
   /*-- d->raw --*/
   if (d->raw.ncols < d->ncols)
-    arrayf_add_cols (&d->raw, d->ncols);
+    arrayd_add_cols (&d->raw, d->ncols);
   if (d->raw.nrows < d->nrows)
-    arrayf_add_rows (&d->raw, d->nrows);
+    arrayd_add_rows (&d->raw, d->nrows);
 
   /*-- d->tform --*/
   if (d->tform.ncols < d->ncols)
-    arrayf_add_cols (&d->tform, d->ncols);
+    arrayd_add_cols (&d->tform, d->ncols);
   if (d->tform.nrows < d->nrows)
-    arrayf_add_rows (&d->tform, d->nrows);
+    arrayd_add_rows (&d->tform, d->nrows);
 
   /*-- d->world --*/
   if (d->world.ncols < d->ncols)
-    arrayg_add_cols (&d->world, d->ncols);
+    arrayd_add_cols (&d->world, d->ncols);
   if (d->world.nrows < d->nrows)
-    arrayg_add_rows (&d->world, d->nrows);
+    arrayd_add_rows (&d->world, d->nrows);
 
   /*-- d->jitdata --*/
   if (d->jitdata.ncols < d->ncols) {
     gint i, j, nc = d->jitdata.ncols;
-    arrayg_add_cols (&d->jitdata, d->ncols);
+    arrayd_add_cols (&d->jitdata, d->ncols);
     for (j = nc; j < d->ncols; j++) {
       for (i = 0; i < d->nrows; i++)
         d->jitdata.vals[i][j] = 0;
     }
   }
   if (d->jitdata.nrows < d->nrows)
-    arrayg_add_rows (&d->jitdata, d->nrows);
+    arrayd_add_rows (&d->jitdata, d->nrows);
 
   if ((n = d->sampled.nels) < d->nrows) {
     gint i;
@@ -176,9 +176,9 @@ pipeline_arrays_check_dimensions (GGobiData * d)
 /*                       pipeline                                          */
 /*-------------------------------------------------------------------------*/
 
-gfloat
-median_largest_dist (gfloat ** vals, gint * cols, gint ncols,
-                     gfloat * min, gfloat * max, GGobiData * d, ggobid * gg)
+gdouble
+median_largest_dist (gdouble ** vals, gint * cols, gint ncols,
+                     gdouble * min, gdouble * max, GGobiData * d, ggobid * gg)
 {
 /*
  * Find the minimum and maximum values of each variable,
@@ -186,11 +186,11 @@ median_largest_dist (gfloat ** vals, gint * cols, gint ncols,
 */
   gint i, j, k, n, np;
   gdouble dx, sumdist, lgdist = 0.0;
-  gfloat *x, fmedian;
+  gdouble *x, fmedian;
   gdouble dmedian = 0;
 
   np = ncols * d->nrows_in_plot;
-  x = (gfloat *) g_malloc (np * sizeof (gfloat));
+  x = (gdouble *) g_malloc (np * sizeof (gdouble));
   for (n = 0; n < ncols; n++) {
     j = cols[n];
     for (i = 0; i < d->nrows_in_plot; i++) {
@@ -199,7 +199,7 @@ median_largest_dist (gfloat ** vals, gint * cols, gint ncols,
     }
   }
 
-  qsort ((void *) x, np, sizeof (gfloat), fcompare);
+  qsort ((void *) x, np, sizeof (gdouble), fcompare);
   dmedian =
     ((np % 2) != 0) ? x[(np - 1) / 2] : (x[np / 2 - 1] + x[np / 2]) / 2.;
 
@@ -222,16 +222,16 @@ median_largest_dist (gfloat ** vals, gint * cols, gint ncols,
 
   g_free ((gchar *) x);
 
-  fmedian = (gfloat) dmedian;
+  fmedian = (gdouble) dmedian;
   *min = fmedian - lgdist;
   *max = fmedian + lgdist;
 
   return fmedian;
 }
 
-gfloat
-mean_largest_dist (gfloat ** vals, gint * cols, gint ncols,
-                   gfloat * min, gfloat * max, GGobiData * d, ggobid * gg)
+gdouble
+mean_largest_dist (gdouble ** vals, gint * cols, gint ncols,
+                   gdouble * min, gdouble * max, GGobiData * d, ggobid * gg)
 {
 /*
  * Find the minimum and maximum values of each variable,
@@ -279,8 +279,8 @@ void
 tform_to_world_by_var (gint j, GGobiData * d, ggobid * gg)
 {
   gint i, m;
-  greal max, min, range, ftmp;
-  gfloat precis = PRECISION1;
+  gdouble max, min, range, ftmp;
+  gdouble precis = PRECISION1;
   vartabled *vt = vartable_element_get (j, d);
 
   pipeline_arrays_check_dimensions (d);  /*-- realloc as necessary --*/
@@ -290,14 +290,14 @@ tform_to_world_by_var (gint j, GGobiData * d, ggobid * gg)
  * scaling, but we do want for display, so some more thought
  * is needed, or maybe another set of limits.
 */
-  max = (greal) vt->lim.max;
-  min = (greal) vt->lim.min;
+  max = (gdouble) vt->lim.max;
+  min = (gdouble) vt->lim.min;
   range = max - min;
 
   for (i = 0; i < d->nrows_in_plot; i++) {
     m = d->rows_in_plot.els[i];
-    ftmp = -1.0 + 2.0 * ((greal) d->tform.vals[m][j] - min) / range;
-    d->world.vals[m][j] = (greal) (precis * ftmp);
+    ftmp = -1.0 + 2.0 * ((gdouble) d->tform.vals[m][j] - min) / range;
+    d->world.vals[m][j] = (gdouble) (precis * ftmp);
 
     /* Add in the jitter values */
     d->world.vals[m][j] += d->jitdata.vals[m][j];
@@ -356,14 +356,14 @@ rows_in_plot_set (GGobiData * d, ggobid * gg)
 void
 world_to_raw_by_var (gint pt, gint j, displayd *display, GGobiData *d, ggobid *gg)
 {
-  gfloat precis = PRECISION1;
-  gfloat ftmp, rdiff;
-  gfloat x;
+  gdouble precis = PRECISION1;
+  gdouble ftmp, rdiff;
+  gdouble x;
   vartabled *vt = vartable_element_get (j, d);
 
   rdiff = vt->lim.max - vt->lim.min;
 
-  ftmp = (gfloat) (d->world.vals[pt][j] - d->jitdata.vals[pt][j]) / precis;
+  ftmp = (gdouble) (d->world.vals[pt][j] - d->jitdata.vals[pt][j]) / precis;
   x = (ftmp + 1.0) * .5 * rdiff;
   x += vt->lim.min;
 

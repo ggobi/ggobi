@@ -316,7 +316,7 @@ void
 recenter_data (gint i, GGobiData * d, ggobid * gg)
 {
   vartabled *vt;
-  greal x;
+  gdouble x;
   gint j;
 
   g_assert (d->tform.nrows == d->nrows);

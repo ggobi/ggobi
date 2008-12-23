@@ -264,7 +264,7 @@ varcircleDraw (displayd * display, gint jvar, GdkPixmap * da_pix, ggobid * gg)
 
   switch (cpanel->pmode) {
   case TOUR1D:
-    x = (gint) (display->t1d.F.vals[0][jvar] * (gfloat) r);
+    x = (gint) (display->t1d.F.vals[0][jvar] * (gdouble) r);
     y = 0;
 #ifndef ENABLE_CAIRO
     gdk_draw_line (da_pix, gg->selvarfg_GC, r, r, r + x, r - y);
@@ -293,8 +293,8 @@ varcircleDraw (displayd * display, gint jvar, GdkPixmap * da_pix, ggobid * gg)
     break;
 
   case TOUR2D3:
-    x = (gint) (display->t2d3.F.vals[0][jvar] * (gfloat) r);
-    y = (gint) (display->t2d3.F.vals[1][jvar] * (gfloat) r);
+    x = (gint) (display->t2d3.F.vals[0][jvar] * (gdouble) r);
+    y = (gint) (display->t2d3.F.vals[1][jvar] * (gdouble) r);
 #ifndef ENABLE_CAIRO
     gdk_draw_line (da_pix, gg->selvarfg_GC, r, r, r + x, r - y);
 #endif
@@ -317,8 +317,8 @@ varcircleDraw (displayd * display, gint jvar, GdkPixmap * da_pix, ggobid * gg)
     break;
 
   case TOUR2D:
-    x = (gint) (display->t2d.F.vals[0][jvar] * (gfloat) r);
-    y = (gint) (display->t2d.F.vals[1][jvar] * (gfloat) r);
+    x = (gint) (display->t2d.F.vals[0][jvar] * (gdouble) r);
+    y = (gint) (display->t2d.F.vals[1][jvar] * (gdouble) r);
 #ifndef ENABLE_CAIRO
     gdk_draw_line (da_pix, gg->selvarfg_GC, r, r, r + x, r - y);
 #endif
@@ -346,8 +346,8 @@ varcircleDraw (displayd * display, gint jvar, GdkPixmap * da_pix, ggobid * gg)
        break;
        } */
     /*          if (xvar) { */
-    x = (gint) (display->tcorr1.F.vals[0][jvar] * (gfloat) r);
-    y = (gint) (display->tcorr2.F.vals[0][jvar] * (gfloat) r);
+    x = (gint) (display->tcorr1.F.vals[0][jvar] * (gdouble) r);
+    y = (gint) (display->tcorr2.F.vals[0][jvar] * (gdouble) r);
 #ifndef ENABLE_CAIRO
     gdk_draw_line (da_pix, gg->selvarfg_GC, r, r, r + x, r - y);
 #endif
@@ -403,7 +403,7 @@ varcircleDraw (displayd * display, gint jvar, GdkPixmap * da_pix, ggobid * gg)
        else {
 
        x = 0;
-       y = (gint) (display->tcorr2.F.vals[0][jvar]*(gfloat)r);
+       y = (gint) (display->tcorr2.F.vals[0][jvar]*(gdouble)r);
        gdk_draw_line (da_pix,
        gg->selvarfg_GC, r, r, r+x, r-y);
 
@@ -457,9 +457,9 @@ tourCorrRealloc (displayd * dsp, gint nc, GGobiData * d)
       vectori_realloc (&dsp->tcorr1.active_vars, nc);
       vectorb_realloc (&dsp->tcorr1.active_vars_p, nc);
 
-      vectorf_realloc (&dsp->tcorr1.lambda, nc);
-      vectorf_realloc (&dsp->tcorr1.tau, nc);
-      vectorf_realloc (&dsp->tcorr1.tinc, nc);
+      vectord_realloc (&dsp->tcorr1.lambda, nc);
+      vectord_realloc (&dsp->tcorr1.tau, nc);
+      vectord_realloc (&dsp->tcorr1.tinc, nc);
 
       arrayd_add_cols (&dsp->tc1_manbasis, (gint) nc);
       arrayd_add_cols (&dsp->tc2_manbasis, (gint) nc);
@@ -479,9 +479,9 @@ tourCorrRealloc (displayd * dsp, gint nc, GGobiData * d)
       vectori_realloc (&dsp->tcorr2.active_vars, nc);
       vectorb_realloc (&dsp->tcorr2.active_vars_p, nc);
 
-      vectorf_realloc (&dsp->tcorr2.lambda, nc);
-      vectorf_realloc (&dsp->tcorr2.tau, nc);
-      vectorf_realloc (&dsp->tcorr2.tinc, nc);
+      vectord_realloc (&dsp->tcorr2.lambda, nc);
+      vectord_realloc (&dsp->tcorr2.tau, nc);
+      vectord_realloc (&dsp->tcorr2.tinc, nc);
 
       /* need to zero extra cols */
       for (i = old_ncols; i < nc; i++) {
@@ -557,9 +557,9 @@ tour2d3Realloc (displayd * dsp, gint nc, GGobiData * d)
       vectori_realloc (&dsp->t2d3.active_vars, nc);
       vectorb_realloc (&dsp->t2d3.active_vars_p, nc);
 
-      vectorf_realloc (&dsp->t2d3.lambda, nc);
-      vectorf_realloc (&dsp->t2d3.tau, nc);
-      vectorf_realloc (&dsp->t2d3.tinc, nc);
+      vectord_realloc (&dsp->t2d3.lambda, nc);
+      vectord_realloc (&dsp->t2d3.tau, nc);
+      vectord_realloc (&dsp->t2d3.tinc, nc);
 
       arrayd_add_cols (&dsp->t2d3_manbasis, (gint) nc);
 
@@ -616,9 +616,9 @@ tour2dRealloc (displayd * dsp, gint nc, GGobiData * d)
       vectori_realloc (&dsp->t2d.active_vars, nc);
       vectorb_realloc (&dsp->t2d.active_vars_p, nc);
 
-      vectorf_realloc (&dsp->t2d.lambda, nc);
-      vectorf_realloc (&dsp->t2d.tau, nc);
-      vectorf_realloc (&dsp->t2d.tinc, nc);
+      vectord_realloc (&dsp->t2d.lambda, nc);
+      vectord_realloc (&dsp->t2d.tau, nc);
+      vectord_realloc (&dsp->t2d.tinc, nc);
 
       arrayd_add_cols (&dsp->t2d_manbasis, (gint) nc);
 
@@ -675,9 +675,9 @@ tour1dRealloc (displayd * dsp, gint nc, GGobiData * d)
     vectori_realloc (&dsp->t1d.active_vars, nc);
     vectorb_realloc (&dsp->t1d.active_vars_p, nc);
 
-    vectorf_realloc (&dsp->t1d.lambda, nc);
-    vectorf_realloc (&dsp->t1d.tau, nc);
-    vectorf_realloc (&dsp->t1d.tinc, nc);
+    vectord_realloc (&dsp->t1d.lambda, nc);
+    vectord_realloc (&dsp->t1d.tau, nc);
+    vectord_realloc (&dsp->t1d.tinc, nc);
 
     arrayd_add_cols (&dsp->t1d_manbasis, (gint) nc);
 
@@ -768,7 +768,7 @@ scatterplotMovePointsButtonCb (displayd * display, splotd * sp, GtkWidget * w,
       clusters_set (d, gg);
       if (d->nclusters > 1) {
         gint i, k, id = d->nearest_point;
-        gfloat cur_clust = d->clusterid.els[id];
+        gdouble cur_clust = d->clusterid.els[id];
         for (i = 0; i < d->nrows_in_plot; i++) {
           k = d->rows_in_plot.els[i];
           if (k == id);
@@ -1540,19 +1540,19 @@ splotScreenToTform (cpaneld * cpanel, splotd * sp, icoords * scr,
                     fcoords * tfd, ggobid * gg)
 {
   gcoords planar, world;
-  greal precis = (greal) PRECISION1;
-  greal ftmp, max, min, rdiff;
+  gdouble precis = (gdouble) PRECISION1;
+  gdouble ftmp, max, min, rdiff;
   displayd *display = (displayd *) sp->displayptr;
   GGobiData *d = display->d;
-  gfloat scale_x, scale_y;
+  gdouble scale_x, scale_y;
   vartabled *vt, *vtx, *vty;
 
   scale_x = sp->scale.x;
   scale_y = sp->scale.y;
   scale_x /= 2;
-  sp->iscale.x = (greal) sp->max.x * scale_x;
+  sp->iscale.x = (gdouble) sp->max.x * scale_x;
   scale_y /= 2;
-  sp->iscale.y = -1 * (greal) sp->max.y * scale_y;
+  sp->iscale.y = -1 * (gdouble) sp->max.y * scale_y;
 
 /*
  * screen to plane 

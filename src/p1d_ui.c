@@ -48,7 +48,7 @@ ash_smoothness_cb (GtkAdjustment * adj, ggobid * gg)
 
   /*-- adj->value ranges from .01 to .5; min value for nASHes = 1 --*/
   cpanel->p1d.nASHes = (gint)
-    ((gfloat) cpanel->p1d.nbins * (adj->value / 2.0));
+    ((gdouble) cpanel->p1d.nbins * (adj->value / 2.0));
 
   if (cpanel->p1d.type == ASH)
     display_tailpipe (gg->current_display, FULL, gg);
@@ -318,11 +318,11 @@ cpanel_p1d_set (displayd * display, cpaneld * cpanel, ggobid * gg)
   w = widget_find_by_name (pnl, "P1PLOT:ASH_smooth");
   adj = gtk_range_get_adjustment (GTK_RANGE (w));
   gtk_adjustment_set_value (GTK_ADJUSTMENT (adj),
-                            2 * (gfloat) cpanel->p1d.nASHes /
-                            (gfloat) cpanel->p1d.nbins);
+                            2 * (gdouble) cpanel->p1d.nASHes /
+                            (gdouble) cpanel->p1d.nbins);
 /*
   gtk_adjustment_set_value (GTK_ADJUSTMENT (gg->ash.smoothness_adj),
-    2 * (gfloat) cpanel->p1d.nASHes / (gfloat) cpanel->p1d.nbins);
+    2 * (gdouble) cpanel->p1d.nASHes / (gdouble) cpanel->p1d.nbins);
 */
 
   /*-- Cycling on or off --*/
@@ -331,5 +331,5 @@ cpanel_p1d_set (displayd * display, cpaneld * cpanel, ggobid * gg)
 
   /*-- Cycling speed --*/
   gtk_adjustment_set_value (GTK_ADJUSTMENT (gg->p1d.cycle_delay_adj),
-                            -1 * (gfloat) cpanel->p1d.cycle_delay);
+                            -1 * (gdouble) cpanel->p1d.cycle_delay);
 }

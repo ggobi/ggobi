@@ -47,8 +47,8 @@ static void
 addvar_pipeline_realloc (GGobiData * d)
 {
   /*-- realloc pipeline arrays --*/
-  arrayf_add_cols (&d->raw, d->ncols);
-  arrayf_add_cols (&d->tform, d->ncols);
+  arrayd_add_cols (&d->raw, d->ncols);
+  arrayd_add_cols (&d->tform, d->ncols);
 
   tour_realloc_up (d, d->ncols);
 
@@ -158,16 +158,16 @@ newvar_add_with_values (gdouble * vals, gint nvals, gchar * vname,
 
   for (i = 0; i < d->nrows; i++) {
     if (vals == &AddVarRowNumbers) {
-      d->raw.vals[i][jvar] = d->tform.vals[i][jvar] = (gfloat) (i + 1);
+      d->raw.vals[i][jvar] = d->tform.vals[i][jvar] = (gdouble) (i + 1);
     }
     else if (vals == &AddVarBrushGroup) {
       d->raw.vals[i][jvar] = d->tform.vals[i][jvar] =
-        (gfloat) d->clusterid.els[i];
+        (gdouble) d->clusterid.els[i];
     }
     else if (GGobiMissingValue && GGobiMissingValue (vals[i]))
       ggobi_data_set_missing(d, i, jvar);
     else
-      d->raw.vals[i][jvar] = d->tform.vals[i][jvar] = (gfloat) vals[i];
+      d->raw.vals[i][jvar] = d->tform.vals[i][jvar] = (gdouble) vals[i];
   }
 
 
@@ -324,16 +324,16 @@ delete_vars (gint * cols, gint ncols, GGobiData * d)
   }
 
   /*-- delete columns from pipeline arrays --*/
-  arrayf_delete_cols (&d->raw, ncols, cols);
-  arrayf_delete_cols (&d->tform, ncols, cols);
+  arrayd_delete_cols (&d->raw, ncols, cols);
+  arrayd_delete_cols (&d->tform, ncols, cols);
   tour2d_realloc_down (ncols, cols, d, d->gg);
   tour1d_realloc_down (ncols, cols, d, d->gg);
   tourcorr_realloc_down (ncols, cols, d, d->gg);
   arrays_delete_cols (&d->missing, ncols, cols);
-  arrayg_delete_cols (&d->jitdata, ncols, cols);
+  arrayd_delete_cols (&d->jitdata, ncols, cols);
 
   /*-- reallocate the rest of the arrays --*/
-  arrayg_alloc (&d->world, d->nrows, nkeepers);
+  arrayd_alloc (&d->world, d->nrows, nkeepers);
 
 
   /*-- delete checkboxes --*/
