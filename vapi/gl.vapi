@@ -1571,5 +1571,9 @@ namespace GL
 	public static void MultiTexCoord4sARB (GLenum target, GLshort s, GLshort t, GLshort r, GLshort q);
 	[NoArrayLength]
 	public static void MultiTexCoord4svARB (GLenum target, GLshort[] v);
+
+  // OpenGL 1.4 (added by GGobi team)
+  public static void BlendFuncSeparate (GLenum srcRGB, GLenum dstRGB,
+                                        GLenum srcAlpha, GLenum dstAlpha);
 }
 

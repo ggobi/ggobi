@@ -49,7 +49,11 @@ public interface GGobi.Surface.Drawable : Object {
   public abstract uint height { get; set construct; }
   
   /* configure colors */
-  public abstract void set_stroke(Color color);
+  /* Sets the color for stroking lines, including the borders of
+     shapes. If NULL, lines are not drawn. */
+  public abstract void set_stroke(Color? color);
+  /* Sets the color for filling shapes and displaying text. If NULL,
+     shapes are not filled and text is invisible. */
   public abstract void set_fill(Color? color);
   
   /* configure line parameters */

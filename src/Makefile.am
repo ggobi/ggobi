@@ -259,7 +259,7 @@ bin_PROGRAMS  = ggobi
 ggobi_SOURCES = ggobiMain.c
 ggobi_LDADD   = libggobi.la
 
-AM_CPPFLAGS = @DEBUG_CFLAGS@ @DEP_CFLAGS@
+AM_CPPFLAGS = @DEBUG_CFLAGS@ @DEP_CFLAGS@ -DGL_GLEXT_PROTOTYPES
 AM_CFLAGS   = -std=gnu99
 
 # Since the Vala files are not actually sources, we specify them in EXTRA_DIST

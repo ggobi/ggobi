@@ -187,4 +187,37 @@ namespace Cogl {
         }
 
         public static void draw_buffer (BufferTarget target, Handle offscreen);
+
+  namespace Shader {
+    [CCode (cprefix = "CGL_", cname="COGLenum", has_type_id = false)]
+    public enum Type {
+      VERTEX_SHADER,
+      FRAGMENT_SHADER
+    }
+    [CCode (cname = "cogl_create_shader")]
+    public Handle create (Type shader_type);
+    public Handle @ref (Handle handle);
+    public void unref (Handle handle);
+    public void source (Handle shader, string source);
+    public void compile (Handle handle);
+    public void get_info_log (Handle handle,
+                              [CCode (array_length_pos = 1.0)] char[] buffer);
+    [CCode (cprefix = "CGL_", cname="COGLenum", has_type_id = false)]
+    public enum Parameter {
+      OBJECT_COMPILE_STATUS
+    }
+    public void get_parameteriv (Handle handle, Parameter pname, out int dest);
+  }
+  
+  namespace Program {
+    [CCode (cname = "cogl_create_program")]
+    public Handle create ();
+    public Handle @ref (Handle handle);
+    public void unref (Handle handle);
+    public void attach_shader (Handle program_handle, Handle shader_handle);
+    public void link (Handle handle);
+    public void use (Handle handle);
+    public int get_uniform_location (Handle handle, string uniform_name);
+    public void uniform_1f (int uniform_no, float value);
+  }
 }

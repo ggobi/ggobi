@@ -3,15 +3,47 @@ public class GGobi.Test.Surface {
   private static void paint_buffer(GGobi.Surface.ClutterBuffer buffer,
                                    GGobi.Surface.Drawable drawable)
   {
-    GGobi.Surface.Color black = { 0, 0, 0, 1 };
-    drawable.set_stroke(black);
-    for (int i = 5; i <= 100; i+=5)
-      drawable.draw_circle(100, 100, i);
+    int r = 5;
+    GGobi.Surface.Color color = { 0, 0, 0, 1 };
+    int cx = 100, cy = 100;
+    drawable.set_fill(color);
+    TimeVal before = TimeVal();
+    for (int j = 0; j < 30000; j++) {
+      drawable.draw_circle(cx, cy, r);
+    }
+    TimeVal after = TimeVal();
+    debug("opengl: %f", after.tv_sec + (float)after.tv_usec/1000000 -
+          (before.tv_sec + (float)before.tv_usec/1000000));
+
+    Gdk.Pixmap pixmap = new Gdk.Pixmap(null, WINWIDTH, WINHEIGHT, 24);
+    Gdk.GC gc = new Gdk.GC(pixmap);
+    before = TimeVal();
+    for (int j = 0; j < 30000; j++) {
+      Gdk.draw_arc (pixmap, gc, false, cx - r, cy - r, 2 * r, 2 * r, 0, 23040);
+      Gdk.draw_arc (pixmap, gc, true, cx - r, cy - r, 2 * r, 2 * r, 0, 23040);
+    }
+    after = TimeVal();
+    debug("gdk: %f", after.tv_sec + (float)after.tv_usec/1000000 -
+          (before.tv_sec + (float)before.tv_usec/1000000));
+
+    Gdk.Pixbuf target = new Gdk.Pixbuf(Gdk.Colorspace.RGB, true, 8, WINWIDTH,
+                                       WINHEIGHT);
+    Gdk.Pixbuf glyph = new Gdk.Pixbuf(Gdk.Colorspace.RGB, true, 8, 2*r, 2*r);
+    Gdk.pixbuf_get_from_drawable(glyph, pixmap, null, cx - r, cy - r, 0, 0, 2*r,
+                                 2*r);
+    before = TimeVal();
+    for (int j = 0; j < 30000; j++) {
+      glyph.composite(target, 0, 0, 2*r, 2*r, 0, 0, 1, 1,
+                      Gdk.InterpType.NEAREST, 255);
+    }
+    after = TimeVal();
+    debug("pixbuf: %f", after.tv_sec + (float)after.tv_usec/1000000 -
+          (before.tv_sec + (float)before.tv_usec/1000000));
+    
   }
 
   private static const int WINWIDTH = 400;
   private static const int WINHEIGHT = 400;
-
   
   public static void main(string[] args) {
     Clutter.Color stage_color = { 0x61, 0x64, 0x8c, 0xff };
