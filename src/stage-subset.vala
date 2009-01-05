@@ -23,7 +23,7 @@ public class GGobi.StageSubset : StageFilter  {
     refresh();
   }
 
-  override void refresh_() {
+  public override void refresh_() {
     selection.select(this);
     base.refresh_();
   }

@@ -10,7 +10,7 @@ using GLib;
 
 public class GGobi.StageDisplay : Stage {
 
-  override void process_outgoing(PipelineMessage msg)  {
+  public override void process_outgoing(PipelineMessage msg)  {
     base.process_outgoing(msg);
     
     // FIXME: common method for this and PipelineMatrix.process_message
@@ -34,7 +34,7 @@ public class GGobi.StageDisplay : Stage {
     }
   }
   
-  override void refresh_col_(uint j) {
+  public override void refresh_col_(uint j) {
     tform_to_world_by_var(this, j);    
   }  
 

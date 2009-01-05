@@ -7,12 +7,12 @@ public class GGobi.TransformBoxcox : Transform {
   //   minimum = GGOBI_NEG_MAXDOUBLE, maximum = G_MAXDOUBLE, default_value = 0,
   //   export, link);
   
-  override string variable_name(string name)
+  public override string variable_name(string name)
   {
     return name.printf("B-C(%s,%.2f)", lambda);
   }
   
-  override double[]? forward (double[] vals, Variable v) 
+  public override double[]? forward (double[] vals, Variable v) 
   { 
     uint i;
     double[] results = new double[vals.length];
@@ -38,7 +38,7 @@ public class GGobi.TransformBoxcox : Transform {
     return results;
   }
   
-  override double[]? reverse (double[] vals, Variable v) 
+  public override double[]? reverse (double[] vals, Variable v) 
   {
     uint i;
     double[] results = new double[vals.length];
@@ -58,16 +58,16 @@ public class GGobi.TransformBoxcox : Transform {
     return results;
   }
   
-  override string get_name()
+  public override string get_name()
   {
     return "Box-Cox transformation";
   }
-  override string get_description()
+  public override string get_description()
   {
     return "Flexible transformation to improve normality";
   }
   
-  override bool compare(Transform other)
+  public override bool compare(Transform other)
   {
     return base.compare(other) && lambda == ((TransformBoxcox) other).lambda;
   }

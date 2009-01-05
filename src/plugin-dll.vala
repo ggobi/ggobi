@@ -16,7 +16,16 @@ public class GGobi.PluginDll : Plugin {
   public override bool load() 
   {
     load_dependencies();
-    
+
+    // FIXME: plugins are libraries, not data files
+    string filename = find_data_file(description.uri);
+    if (filename != null) {
+      module = Module.open(filename, ModuleFlags.BIND_LAZY);
+      if (module == null)
+        critical("Error on loading plugin module %s: %s",
+                 filename, Module.error());
+    } else critical("Could not find dll '%s'", description.uri);
+
     if (module != null) {
       void *function;
       if (get_symbol("ggobi_plugin_on_load", out function)) {
@@ -33,19 +42,6 @@ public class GGobi.PluginDll : Plugin {
     return (false);
   }
   
-  private void
-  load_module()
-  {
-    // FIXME: plugins are libraries, not data files
-    string filename = find_data_file(description.uri);
-    if (filename != null) {
-      module = Module.open(filename, ModuleFlags.BIND_LAZY);
-      if (module == null)
-        critical("Error on loading plugin module %s: %s",
-                 filename, Module.error());
-    } else critical("Could not find dll '%s'", description.uri);
-  }
-
   public override void unload() {
     if (module != null) {
       void *function;

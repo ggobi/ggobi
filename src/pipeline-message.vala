@@ -308,10 +308,9 @@ public class GGobi.PipelineMessage : Object  {
   
   /* utilities */
   
-  private SList<uint>? shift_indices(
-    Bitset first, Bitset second, out uint over
-  ) {
-    SList<uint> first_ind = first.get_indices(), shifted, ind;
+  private SList<uint>? shift_indices(Bitset first, Bitset second, out uint over)
+  {
+    SList<uint> first_ind = first.get_indices(), shifted;
     uint my_size = first.size;
 
     Bitset secondc = second.clone();

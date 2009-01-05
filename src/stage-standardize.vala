@@ -25,14 +25,14 @@ public class GGobi.StageStandardize : Stage {
     return value * (max - min) + min;
   }
   
-  override double get_raw_value(uint i, uint j) {
+  public override double get_raw_value(uint i, uint j) {
     Variable v = get_variable(j);
     if (v.is_attribute) return(parent.get_raw_value(i, j));
     
     return standardize(parent.get_raw_value(i, j), v.get_min(), v.get_max());
   }
 
-  override void set_raw_value(uint i, uint j, double value) {
+  public override void set_raw_value(uint i, uint j, double value) {
     Variable v = get_variable(j);
     if (v.is_attribute) {
       parent.set_raw_value(i, j, value);

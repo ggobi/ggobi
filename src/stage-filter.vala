@@ -43,11 +43,11 @@ public class GGobi.StageFilter : Stage {
 
   // Override accessor methods to get unfiltered value
   
-  override void set_missing(uint i, uint j) {
+  public override void set_missing(uint i, uint j) {
     parent.set_missing(included_rows[i], j);
   }
 
-  override bool is_missing(uint i, uint j) {
+  public override bool is_missing(uint i, uint j) {
     return parent.is_missing(included_rows[i], j);  
   }
 
@@ -55,22 +55,22 @@ public class GGobi.StageFilter : Stage {
     return parent.get_row_id(included_rows[i]);  
   }
 
-  override int get_row_for_id(string id) {
+  public override int get_row_for_id(string id) {
     int row = parent.get_row_for_id(id);
     if (row == -1)
       return -1;
     return included_rows_rev[row];
   }
 
-  override void set_raw_value(uint i, uint j, double value) {
+  public override void set_raw_value(uint i, uint j, double value) {
     parent.set_raw_value(included_rows[i], j, value);
   }
 
-  override double get_raw_value(uint i, uint j) {
+  public override double get_raw_value(uint i, uint j) {
     return parent.get_raw_value(included_rows[i], j);
   }
   
-  override void process_incoming(PipelineMessage msg) {
+  public override void process_incoming(PipelineMessage msg) {
     SList<uint> changed_cols = msg.get_changed_cols();
     uint rows_changed = msg.get_n_added_rows() + 
       msg.get_n_removed_rows();
@@ -85,7 +85,7 @@ public class GGobi.StageFilter : Stage {
   // Update the included state of the rows, sending messages as necessary
   public void refresh_() {
     int n_rows = parent != null ? (int) parent.n_rows : 0;
-    int n_included = 0, n_added = 0;
+    int n_included = 0;
     int n_included_prev = included.length;
 
     SList<uint> removed_rows = new SList<uint>();

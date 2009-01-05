@@ -94,7 +94,7 @@ public class GGobi.GuiJitter : Window {
 }
 
 public class GGobi.VariableJitter : VariableDescription {
-  override string describe(Stage stage, uint j) {
+  public override string describe(Stage stage, uint j) {
     return ((StageJitter) stage).amount[j].to_string("%0.2f");
   }
 }

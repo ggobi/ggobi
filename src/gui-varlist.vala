@@ -46,7 +46,7 @@ public class GGobi.Varlist : GLib.Object {
   }
 
   public void build() {
-    vars = new ListStore.newv((int) _columns, _coltypes);
+    vars = new ListStore.newv(_coltypes);
 
     add_rows();
     update_cols();

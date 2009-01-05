@@ -97,14 +97,7 @@ public class GGobi.PluginRegistryXml : PluginRegistry, Object {
     
     return(true);
   }
- 
-  private int
-  plugin_has_name(void* plugin, void* name)
-  {
-    string plugin_name = ((PluginDescription)plugin).name;
-    return strcmp(plugin_name, name);
-  }
- 
+  
   private PluginDescription
   parse_plugin(Xml.Node* node, Xml.Doc* doc)
   {

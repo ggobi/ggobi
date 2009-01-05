@@ -92,7 +92,7 @@ public class GGobi.TourBasisPursuit : TourBasis {
     
   }
   
-  override TourMatrix generate(TourState[] states) {
+  public override TourMatrix generate(TourState[] states) {
     // Limit number of iterations
     for(uint i = 0; i < max_iter; i++) {
       if (step(states)) break;

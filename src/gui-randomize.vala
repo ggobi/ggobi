@@ -98,12 +98,21 @@ public class GGobi.GuiRandomize : Window {
   
 }
 public class GGobi.VariableRandomization : VariableDescription {
-  override string describe(Stage stage, uint j) {
-    string label;
+  public override string describe(Stage stage, uint j) {
+    string label = null;
     switch (((StageRandomize) stage).randomization[j]) {
-      case RandomizationType.NONE: label = "None"; break;
-      case RandomizationType.REPEAT: label = "Duplicates"; break;
-      case RandomizationType.UNIQUE: label = "No duplicates"; break;
+    case RandomizationType.NONE:
+      label = "None";
+      break;
+    case RandomizationType.REPEAT:
+      label = "Duplicates";
+      break;
+    case RandomizationType.UNIQUE:
+      label = "No duplicates";
+      break;
+    default:
+      critical("Unknown variable randomization type");
+      break;
     }
     return label;
   }

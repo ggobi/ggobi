@@ -46,14 +46,14 @@ public class GGobi.StageRandomize : Stage {
     return (uint) Random.int_range(0, (int32) n_rows - 1);
   }
   
-  override double get_raw_value(uint i, uint j) {
+  public override double get_raw_value(uint i, uint j) {
     if (randomization[j] == RandomizationType.NONE) {
       return parent.get_raw_value(i, j);
     }
     return cache.get(i, j);
   }
 
-  override void set_raw_value(uint i, uint j, double value) {
+  public override void set_raw_value(uint i, uint j, double value) {
     if (randomization[j] == RandomizationType.NONE) {
       parent.set_raw_value(i, j, value);
     }
@@ -66,7 +66,7 @@ public class GGobi.StageRandomize : Stage {
   }
   
   /* Process incoming change events */
-  override void process_outgoing(PipelineMessage msg) {
+  public override void process_outgoing(PipelineMessage msg) {
     base.process_outgoing(msg);
     randomization.resize((int) n_cols); 
     cache.process_message(msg, this, false);

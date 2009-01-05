@@ -13,7 +13,7 @@ public class GGobi.TourBasisList : TourBasis {
   private SList<TourMatrix> bases;
   private weak SList<TourMatrix> current_basis;
 
-  override TourMatrix generate(TourState[] states) {
+  public override TourMatrix generate(TourState[] states) {
     current_basis = current_basis.next;
     if (current_basis == null) {
       current_basis = bases;

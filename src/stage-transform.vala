@@ -26,7 +26,7 @@ public class GGobi.StageTransform : Stage {
                                           g_object_unref);
   }
   
-  override void process_outgoing(PipelineMessage msg)  {
+  public override void process_outgoing(PipelineMessage msg)  {
     // FIXME: Need to update hash table in response to column deletions 
     base.process_outgoing(msg);
     cache.process_message(msg, this);
@@ -39,7 +39,7 @@ public class GGobi.StageTransform : Stage {
    * against a given column, per transform stage.
    */
   public void apply(uint j, Transform? tform) {
-    Variable v = get_variable(j);
+    //Variable v = get_variable(j);
     if (tform == null) {
       // v.set_name_transform_func(null, null);
       active_tforms.remove(j);
@@ -77,11 +77,11 @@ public class GGobi.StageTransform : Stage {
     return 0;
   }
   
-  override double get_raw_value(uint i, uint j) {
+  public override double get_raw_value(uint i, uint j) {
     return cache.get(i, j);
   }
   
-  override void set_raw_value(uint i, uint j, double value) {
+  public override void set_raw_value(uint i, uint j, double value) {
     Transform tform = get_transform(j);
     
     if (tform != null) {

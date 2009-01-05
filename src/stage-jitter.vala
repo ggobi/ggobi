@@ -45,7 +45,7 @@ public class GGobi.StageJitter : Stage {
   }
   
   /* Jitter values are the original value + jittering */
-  override double get_raw_value(uint i, uint j) {
+  public override double get_raw_value(uint i, uint j) {
     double original = parent.get_raw_value(i, j);
     if (amount[j] == 0) return original;
     
@@ -54,7 +54,7 @@ public class GGobi.StageJitter : Stage {
 
   /* When setting the value of a jittered observation, subtract off the
   jittering first */
-  override void set_raw_value(uint i, uint j, double value) {
+  public override void set_raw_value(uint i, uint j, double value) {
     double original;
     if (amount[j] == 0) {
       original = value;
@@ -70,7 +70,7 @@ public class GGobi.StageJitter : Stage {
   }
   
   /* Process incoming change events */
-  override void process_outgoing(PipelineMessage msg) {
+  public override void process_outgoing(PipelineMessage msg) {
     base.process_outgoing(msg);
     cache.process_message(msg, this);
     amount.resize((int) n_cols); 

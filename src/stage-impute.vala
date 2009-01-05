@@ -59,7 +59,7 @@ public class GGobi.StageImpute : Stage {
     imputation.resize(0);
   }
   
-  override void process_outgoing(PipelineMessage msg) {
+  public override void process_outgoing(PipelineMessage msg) {
     uint old_cols = n_cols;
     base.process_outgoing(msg);
   

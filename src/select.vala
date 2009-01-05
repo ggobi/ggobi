@@ -26,11 +26,11 @@ public abstract class GGobi.Select : Object {
 }
 
 public class GGobi.SelectAll : Select {
-  override void select(StageSubset stage) {
+  public override void select(StageSubset stage) {
     stage.set_included_all(true);
   }
   
-  override string description() {
+  public override string description() {
     return "All";
   }
   
@@ -46,7 +46,7 @@ public class GGobi.SelectRandom : Select {
     this.n = n;
   }
 
-  override void select(StageSubset stage) {
+  public override void select(StageSubset stage) {
     uint n_rows = stage.parent.n_rows;
     bool[] included = new bool[n_rows];
 
@@ -66,12 +66,12 @@ public class GGobi.SelectRandom : Select {
     }
   }
   
-  override bool equals(Select that) {
+  public override bool equals(Select that) {
     return base.equals(that) && 
       this.n == ((SelectRandom) that).n;
   }
   
-  override string description() {
+  public override string description() {
     return n.to_string("Random (%i)");
   }
   
@@ -87,7 +87,7 @@ public class GGobi.SelectBlock : Select {
     this.size = size;
   }
   
-  override void select(StageSubset stage) {
+  public override void select(StageSubset stage) {
     uint n_rows = stage.parent.n_rows;
     int i, k;
 
@@ -102,13 +102,13 @@ public class GGobi.SelectBlock : Select {
     }
   }
   
-  override bool equals(Select that) {
+  public override bool equals(Select that) {
     return base.equals(that) && 
       this.start == ((SelectBlock) that).start &&
       this.size  == ((SelectBlock) that).size;
   }
   
-  override string description() {
+  public override string description() {
     return "Block [%i-%i]".printf(start, start + size);
   }
 }
@@ -123,7 +123,7 @@ public class GGobi.SelectEveryN : Select {
     this.step = step;
   }
 
-  override void select(StageSubset stage) {
+  public override void select(StageSubset stage) {
     uint n_rows = stage.parent.n_rows;
     if (start < 0 || start > n_rows - 1 || step < 0 || step > n_rows) {
       GGobi.message ("Interval not correctly specified.", false);
@@ -135,13 +135,13 @@ public class GGobi.SelectEveryN : Select {
       stage.set_included(i, true);
   }
   
-  override bool equals(Select that) {
+  public override bool equals(Select that) {
     return base.equals(that) && 
       this.start == ((SelectEveryN) that).start &&
       this.step  == ((SelectEveryN) that).step;
   }
   
-  override string description() {
+  public override string description() {
     return "Every %i from %i".printf(step, start);
   }
   
@@ -159,9 +159,9 @@ public class GGobi.SelectLabel : Select {
   //  TRUE for case insensitive matching
   public bool ignore_case {get; set construct;}
   
-  override void select(StageSubset stage) {
+  public override void select(StageSubset stage) {
     uint n_rows = stage.parent.n_rows;
-    bool value;
+    bool value = false;
   
     if (substr == null || substr.len() == 0) {
       stage.set_included_all(true);
@@ -179,34 +179,37 @@ public class GGobi.SelectLabel : Select {
       if (ignore_case) label = label.down();
     
       switch(method) {
-        case MatchMethod.INCLUDES:
-          value = label.str(search) != null;
-          break;
-        case MatchMethod.EXCLUDES:
-          value = label.str(search) == null;
-          break;
-        case MatchMethod.IDENTICAL:
-          value = (label == search);
-          break;
-        case MatchMethod.ENDS_WITH:
-          value = label.has_suffix(search);
-          break;
-        case MatchMethod.STARTS_WITH:
-          value = label.has_prefix(search);        
-          break;
-      }   
+      case MatchMethod.INCLUDES:
+        value = label.str(search) != null;
+        break;
+      case MatchMethod.EXCLUDES:
+        value = label.str(search) == null;
+        break;
+      case MatchMethod.IDENTICAL:
+        value = (label == search);
+        break;
+      case MatchMethod.ENDS_WITH:
+        value = label.has_suffix(search);
+        break;
+      case MatchMethod.STARTS_WITH:
+        value = label.has_prefix(search);        
+        break;
+      default:
+        critical("unknown match method in selection");
+        break;
+      }
       stage.set_included(i, value);
     }
   }
   
-  override bool equals(Select that) {
+  public override bool equals(Select that) {
     return base.equals(that) && 
       this.substr == ((SelectLabel) that).substr &&
       this.method == ((SelectLabel) that).method &&
       this.ignore_case == ((SelectLabel) that).ignore_case;
   }
   
-  override string description() {
+  public override string description() {
     return "Label";
   }
 }

@@ -11,33 +11,31 @@ public class GGobi.DataFactoryCSV:DataFactory
     END_QUOTE,
     INVALID
   }
-
-  private class ParserContext {
-    public Data data;
-  }
-
-  private static uint ROW_SIZE_INC = 4;
-
+  
   public override string# mime_type {
     get { return "text/csv"; }
   }
 
-  override SList<Data>
+  public override SList<Data>
   read_from_stream(InputStream input) throws GLib.Error
   {
     DataInputStream lines;
-    ParserContext ctx = new ParserContext();
+    Data data;
     SList<Data> ds = new SList<Data>();
-    string[] row;
+    SList<string> row;
+    SList<SList<string>> rows = new SList<SList<string>>();
 
     /* Open the file */
     lines = new DataInputStream(input);
 
     while((row = parse_row(lines, ',')) != null)
-      /*process_row(row, ctx)... someday */;
+      rows.prepend((owned)row);
+    rows.reverse();
+
+    data = create_data(rows);
     
     /* Load the parsed data into the GGobiStage */
-    ds.append(ctx.data);
+    ds.append(data);
     
     return ds;
   }
@@ -45,7 +43,7 @@ public class GGobi.DataFactoryCSV:DataFactory
 /* Heuristic: If the first row has an empty in the first column and
    and all the values in the first column are unique, we have row names.
 */
-  private bool has_row_labels (List<SList> rows)
+  private bool has_row_labels (SList<SList<string>> rows)
   {
     // VALABUG: always use Hashtable.full and give finalizers - otherwise
     // memory is leaked - this looks like it would be tough to fix
@@ -79,7 +77,8 @@ public class GGobi.DataFactoryCSV:DataFactory
     }
   }
 
-  private void load_row_labels (List<SList> rows, Stage d, bool has_labels)
+  private void load_row_labels (SList<SList<string>> rows, Stage d,
+                                bool has_labels)
   {
     if (!has_labels)
       return;
@@ -88,17 +87,19 @@ public class GGobi.DataFactoryCSV:DataFactory
       d.set_row_id(i++, row.data);
   }
 
-  private void load_row_values (List<SList> rows, Stage d, bool row_labels) {
+  private void load_row_values (SList<SList<string>> rows, Stage d,
+                                bool row_labels)
+  {
     uint i = 0;
     foreach(weak SList<string> row in rows) {
       uint j = 0;
       weak SList<string> entries = row_labels ? row : row.next;
-      foreach(weak string entry in row)
+      foreach(weak string entry in entries)
         d.set_string_value(i++, j++, entry);
     }
   }
 
-  private Stage create_data (List<SList> rows) {
+  private Data create_data (SList<SList<string>> rows) {
     Data d;
     uint nrows = rows.length(), ncols = 0;
 
@@ -153,7 +154,7 @@ public class GGobi.DataFactoryCSV:DataFactory
    * OTHER DEALINGS IN THE SOFTWARE.
    */
   // FIXME: should throw an exception on errors
-  private string[]?
+  private SList<string>?
   parse_row(DataInputStream input, char sep)
   {
     bool quotes = true; /* pay attention to quotes */
@@ -161,18 +162,18 @@ public class GGobi.DataFactoryCSV:DataFactory
     bool finished = false, eol = false;
     bool skip_read = false;
     /* offsets in characters, lengths in bytes */
-    uint r = 0, ofs = 0, entry_ofs, entry_len, len;
+    uint r = 0, ofs = 0, entry_ofs = 0, entry_len = 0, len = 0;
     size_t total_len;
     ParserState state = ParserState.START;
     
-    string[] row = new string[ROW_SIZE_INC];
+    SList<string> row = new SList<string>();
     
     weak string src = (string)input.read_line(out total_len, null);
     if (src == null)
       return null;
     string line = src;
 
-    unichar ch, skip;
+    unichar ch = 0, skip = 0;
     while (!finished) {
       if (!skip_read) {
         ch = src.get_char();
@@ -200,12 +201,8 @@ public class GGobi.DataFactoryCSV:DataFactory
             break;
           }
         } else if (ch == sep || eol) { /* end of entry */
-          if (r == row.length)
-            row.resize((int)(r + ROW_SIZE_INC));
-          // VALABUG: Need to r++ after indexing into array; vala repeats it
-          row[r] = line.offset(entry_ofs).ndup(entry_len);
             r++;
-            //row.prepend(line.offset(entry_ofs).ndup(entry_len));
+            row.prepend(line.offset(entry_ofs).ndup(entry_len));
             state = ParserState.START;
             inquotes = false;
             if (eol) { /* \n outside of quote, row finished */
@@ -237,11 +234,8 @@ public class GGobi.DataFactoryCSV:DataFactory
       case ParserState.TAILSPACE:
       case ParserState.END_QUOTE:
         if (ch == sep || eol) { /* entry finished */
-          if (r == row.length)
-            row.resize((int)(r + ROW_SIZE_INC));
-          row[r] = line.offset(entry_ofs).ndup(entry_len);
           r++;
-          //row.prepend(line.offset(entry_ofs).ndup(entry_len));
+          row.prepend(line.offset(entry_ofs).ndup(entry_len));
           state = ParserState.START;
           inquotes = false;
           if (eol) { /* \n outside of quote, row finished */
@@ -272,7 +266,7 @@ public class GGobi.DataFactoryCSV:DataFactory
       return null;
     }
     
-    //row.reverse();
+    row.reverse();
     return row;
   }
 }

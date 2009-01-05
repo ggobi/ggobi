@@ -53,23 +53,23 @@ public class GGobi.StageFreeze : Stage {
     }
   }
   
-  override double get_raw_value(uint i, uint j) {
+  public override double get_raw_value(uint i, uint j) {
     if (_frozen) {
       return cache.get(i, j);
     } else {
       return parent.get_raw_value(i, j);
     }
-	}
-
-	override void set_raw_value(uint i, uint j, double value) {
+  }
+  
+  public override void set_raw_value(uint i, uint j, double value) {
     if (_frozen) {
       cache.set(i, j, value);
     } else {
       parent.set_raw_value(i, j, value);
     }
-	}
+  }
 
-  override void process_outgoing(PipelineMessage msg) {
+  public override void process_outgoing(PipelineMessage msg) {
     if (_frozen) {
       _dirty = true;
     } else {

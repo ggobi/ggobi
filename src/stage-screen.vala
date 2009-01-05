@@ -36,7 +36,7 @@ public class GGobi.StageScreen : Stage {
      uint height;
 	
      /* Is the scaling currently fixed, or free? */
-     bool fixed;
+     //bool fixed;
 
      /* Reset data ranges */
      public void reset() {
@@ -56,15 +56,15 @@ public class GGobi.StageScreen : Stage {
 	This is a heuristic that Hadley thinks should work well.
 	It uses the minimum of 10 pixels, or 10% of the smaller of height 
 	or width */
-     uint margin() {
+     public uint margin() {
        return (uint) Math.fmax(10, Math.fmin(height, width) / 100);
      }
      
-     override double get_raw_value(uint i, uint j) {
+     public override double get_raw_value(uint i, uint j) {
        return parent.get_raw_value(i, j);
      }
 
-     override void set_raw_value(uint i, uint j, double value) {
+     public override void set_raw_value(uint i, uint j, double value) {
        parent.set_raw_value(i, j, value);
      }
 }

@@ -142,32 +142,38 @@ public class GGobi.GuiImpute : Window {
     if (selected.length() == 0) return;
     Imputation cur = stage.imputation[(int) selected.data];
     
-    switch (((GLib.Object) cur).get_type()) {
-      case typeof(ImputationPercent): 
+    // VALABUG: switch() would not work at the C level, because the
+    // type IDs are not C constants. Vala would have to use an if-else
+    // block like this one.
+
+    // As a separate note, isn't there a better way? This does not
+    // seem very modular.
+    if (cur is ImputationPercent) {
         percent.active = true; 
         percent_value.set_value(((ImputationPercent) cur).percent);
-        break;
-      case typeof(ImputationFixed): 
+    } else if (cur is ImputationFixed) { 
         fixed.active = true; 
         fixed_value.set_value(((ImputationFixed) cur).fixed_value);        
-        break;
-      case typeof(ImputationMean): mean.active = true; break;
-      case typeof(ImputationMedian): median.active = true; break;
-      case typeof(ImputationRandom): random.active = true; break;
-      default: break;
+    } else if (cur is ImputationMean) {
+        mean.active = true;
+    } else if (cur is ImputationMedian) {
+        median.active = true;
+    } else if (cur is ImputationRandom) {
+        random.active = true;
     }
+    
   }
 }
 
 
 public class GGobi.VariableImputation : VariableDescription {
-  override string describe(Stage stage, uint j) {
+  public override string describe(Stage stage, uint j) {
     return ((StageImpute) stage).imputation[j].description();
   }
 }
 
 public class GGobi.VariableMissings : VariableDescription {
-  override string describe(Stage stage, uint j) {
+  public override string describe(Stage stage, uint j) {
     Variable v = stage.get_variable(j);
     return v.n_missings().to_string("%i");
   }

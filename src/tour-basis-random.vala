@@ -7,7 +7,7 @@ Generate new random bases for the grand tour.
 
 public class GGobi.TourBasisRandom : TourBasis {
 
-  override TourMatrix generate(TourState[] states) {
+  public override TourMatrix generate(TourState[] states) {
     TourMatrix mat = raw_matrix(states);
     add_frozen_vars(mat, states);
     

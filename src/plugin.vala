@@ -11,15 +11,14 @@ public abstract class GGobi.Plugin : TypeModule {
     if (description.has_dependencies()) {
       SList<string> deps = description.get_dependencies();
       foreach (string dep in deps) {
-        PluginDescription dep_desc;
         // TODO: uncomment after GGobiApplication exists
         /*
-        dep_desc =
-        GGobiApplication.get_instance().get_plugin_description(dep);
+          PluginDescription dep_desc =
+          GGobiApplication.get_instance().get_plugin_description(dep);
+          Plugin dep_plugin = Plugin.create(dep_desc);
+          dep_plugin.use();
+          dep_plugin.unuse();
         */
-        Plugin dep_plugin = Plugin.create(dep_desc);
-        dep_plugin.use();
-        dep_plugin.unuse();
       }
     }
   }

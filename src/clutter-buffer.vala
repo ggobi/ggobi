@@ -22,8 +22,6 @@ public class GGobi.Surface.ClutterBuffer : ClutterSurface, Buffer
     resize();
   }
 
-  private Drawable drawable;
-  
   private void resize() {
     /* create a Cogl texture */
     Viewport viewport = get_viewport();
@@ -34,7 +32,9 @@ public class GGobi.Surface.ClutterBuffer : ClutterSurface, Buffer
                                                  false,
                                                  Cogl.PixelFormat.RGBA_8888);
     /* hand it to the actor for drawing */
-    texture_actor.set_cogl_texture(tex);
+    // VALABUG: does not seem to be a way to tell Vala that Cogl.Handle is
+    // is a void *
+    texture_actor.set_cogl_texture((void *)tex);
     Cogl.Texture.unref(tex); /* will be destroyed with texture_actor */
     /* cache a framebuffer object to direct drawing to the texture */
     if (fbo != Cogl.Handle.INVALID)
@@ -65,7 +65,6 @@ public class GGobi.Surface.ClutterBuffer : ClutterSurface, Buffer
   // We may need some sort of pixmap-based drawable as a fallback
   public override void paint() {
     if (dirty) {
-      Clutter.Color black = { 0, 0, 0, 0xff };
       // FIXME: need to save and restore GL state here
       /* Redirect output to our texture */
       Cogl.draw_buffer(Cogl.BufferTarget.OFFSCREEN_BUFFER, fbo);

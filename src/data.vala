@@ -110,7 +110,7 @@ public class GGobi.Data : Stage {
 
   // Set missing value.  For categorical variables, this creates a new
   // value, MISSING.  This makes GGobi act a little more like MANET.
-  override void set_missing(uint i, uint j) {
+  public override void set_missing(uint i, uint j) {
     Variable vt = get_variable(j);
     if (vt.vartype == VariableType.CATEGORICAL) {
       set_categorical_value(i, j, "MISSING");
@@ -121,16 +121,16 @@ public class GGobi.Data : Stage {
     ((double[]) missing.vals[i])[j] = 1;
   }
 
-  override bool is_missing(uint i, uint j) {
+  public override bool is_missing(uint i, uint j) {
     return ((double[]) missing.vals[i])[j] == 1;  
   }
 
-  override void set_raw_value(uint i, uint j, double value) {
+  public override void set_raw_value(uint i, uint j, double value) {
     ((double[]) raw.vals[i])[j] = value;
     ((double[]) missing.vals[i])[j] = 0;
   }
-
-  override double get_raw_value(uint i, uint j) {
+  
+  public override double get_raw_value(uint i, uint j) {
     return ((double[]) raw.vals[i])[j];
   }
 
@@ -139,15 +139,15 @@ public class GGobi.Data : Stage {
     vt.vartype = value;
   }
 
-  override uint get_n_edges() {
+  public override uint get_n_edges() {
     return edge_data.n;
   }
 
-  override weak EdgeData get_edge_data () {
+  public override weak EdgeData get_edge_data () {
     return edge_data;
   }
 
-  override void set_row_id(uint i, string? value) {
+  public override void set_row_id(uint i, string? value) {
     string val = value; // needed for vala
     if (val == null)
       val = (i + 1).to_string("%d");
@@ -155,11 +155,11 @@ public class GGobi.Data : Stage {
     id_to_row.replace(row_ids[i], i + 1);
   }
 
-  override string get_row_id(uint i) {
+  public override string get_row_id(uint i) {
     return row_ids[i];
   }
 
-  override int get_row_for_id(string id) {
+  public override int get_row_for_id(string id) {
     /* rows are 1-based in id_to_row, to identify missed hits */
     return (int)id_to_row.lookup(id) - 1;
   }
@@ -231,7 +231,7 @@ public class GGobi.Data : Stage {
    * the change.
    */
   public uint delete_cols(SList<uint> cols) {
-    uint old_n_cols = n_cols;
+    //uint old_n_cols = n_cols;
     uint n_cols = cols.length();
   
     // g_return_val_if_fail(n_cols <= old_n_cols, old_n_cols);

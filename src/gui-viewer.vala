@@ -59,7 +59,7 @@ public class GGobi.GuiViewer : Window {
       col_labels[j + 1] = v.name;
     }
     
-    model = new ListStore.newv((int) ncols, col_types);
+    model = new ListStore.newv(col_types);
     table = new TreeView.with_model(model);
     
     for(uint j = 0; j < ncols; j++) {

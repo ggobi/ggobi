@@ -16,31 +16,31 @@ public abstract class GGobi.VariableFilter : Object {
 }
 
 public class GGobi.FilterNone : VariableFilter {
-  override bool exclude(Variable v) {
+  public override bool exclude(Variable v) {
     return false;
   }
 }
 
 public class GGobi.FilterAll : VariableFilter {
-  override bool exclude(Variable v) {
+  public override bool exclude(Variable v) {
     return true;
   }
 }
 
 public class GGobi.FilterAttributes : VariableFilter {
-  override bool exclude(Variable v) {
+  public override bool exclude(Variable v) {
     return v.is_attribute;
   }
 }
 
 public class GGobi.FilterContinuous : VariableFilter {
-  override bool exclude(Variable v) {
+  public override bool exclude(Variable v) {
     return v.vartype != VariableType.CATEGORICAL;
   }
 }
 
 public class GGobi.FilterMissing : VariableFilter {
-  override bool exclude(Variable v) {
+  public override bool exclude(Variable v) {
     return !v.has_missings();
   }
 }

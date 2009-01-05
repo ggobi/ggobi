@@ -26,15 +26,15 @@ public abstract class GGobi.Imputation : Object {
 public class GGobi.ImputationFixed : Imputation {
   public double fixed_value = 0;
   
-  override double impute_single(uint i) {
+  public override double impute_single(uint i) {
     return fixed_value;
   }
   
-  override string description() {
+  public override string description() {
     return fixed_value.to_string("Value: %.2f");
   }
   
-  override bool equals(Imputation that) {
+  public override bool equals(Imputation that) {
     if (this.get_type() != that.get_type()) return(false);
     
     return ((ImputationFixed) that).fixed_value == fixed_value;
@@ -44,19 +44,19 @@ public class GGobi.ImputationFixed : Imputation {
 
 /* Replace missing values with a column mean */
 public class GGobi.ImputationMean : ImputationFixed {
-  override void pre_compute(StageImpute stage, uint j) {
+  public override void pre_compute(StageImpute stage, uint j) {
     fixed_value = stage.get_variable(j).get_mean();
   }
-  override string description() {
+  public override string description() {
     return fixed_value.to_string("Mean: %.2f");
   }
 }
 /* Replace missing values with a column median */
 public class GGobi.ImputationMedian : ImputationFixed {
-  override void pre_compute(StageImpute stage, uint j) {
+  public override void pre_compute(StageImpute stage, uint j) {
     fixed_value = stage.get_variable(j).get_median();
   }
-  override string description() {
+  public override string description() {
     return fixed_value.to_string("Median: %.2f");
   }
 }
@@ -70,7 +70,7 @@ public class GGobi.ImputationPercent : Imputation {
   /* Range of jittering within band */
   double jitter = 0;
   
-  override void pre_compute(StageImpute stage, uint j) {
+  public override void pre_compute(StageImpute stage, uint j) {
     double min = stage.get_variable(j).get_min();
     double max = stage.get_variable(j).get_max();
     double range = max - min;
@@ -86,14 +86,14 @@ public class GGobi.ImputationPercent : Imputation {
 
   }
   
-  override double impute_single(uint i) {
+  public override double impute_single(uint i) {
     return fixed_value + Random.double_range(-jitter, jitter);
   }
-  override string description() {
+  public override string description() {
     return percent.to_string("Percent: %.2f");
   }
   
-  override bool equals(Imputation that) {
+  public override bool equals(Imputation that) {
     if (this.get_type() != that.get_type()) return(false);
     
     return ((ImputationPercent) that).percent == percent;
@@ -105,7 +105,7 @@ public class GGobi.ImputationPercent : Imputation {
 public class GGobi.ImputationRandom : Imputation {
   public double[] non_missing;
   
-  override void pre_compute(StageImpute stage, uint j) {
+  public override void pre_compute(StageImpute stage, uint j) {
     non_missing.resize((int) stage.n_rows - (int) stage.get_col_n_missing(j));
     
     uint present = 0;
@@ -114,12 +114,12 @@ public class GGobi.ImputationRandom : Imputation {
     }
   }
 
-  override double impute_single(uint i) {
+  public override double impute_single(uint i) {
     if (non_missing.length == 0) return(0);
     
     return non_missing[Random.int_range(0, non_missing.length)];
   }
-  override string description() {
+  public override string description() {
     return "Random";
   }
   

@@ -82,7 +82,7 @@ public class GGobi.Bitset : Object {
   public SList<uint>?
   get_indices()
   {
-    uint i;
+    uint i = 0;
     SList<uint> indices = new SList<uint>();
     foreach(uchar b in bits) {
       if (b > 0) {
@@ -101,7 +101,7 @@ public class GGobi.Bitset : Object {
   public uint
   get_n_indices()
   {
-    uint i, count = 0;
+    uint count = 0;
     /* there has been talk about to adding this functionality to GLib,
        except much faster (asm based)
     */
