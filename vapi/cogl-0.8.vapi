@@ -136,11 +136,11 @@ namespace Cogl {
                 [CCode (cname = "cogl_path_line")]
                 public static void line (Clutter.Fixed x1, Clutter.Fixed y1, Clutter.Fixed x2, Clutter.Fixed y2);
 
-                [NoArrayLength]
+                [CCode (array_length = false)]
                 [CCode (cname = "cogl_path_polyline")]
                 public static void polyline (Clutter.Fixed[] coords, int n_points);
 
-                [NoArrayLength]
+                [CCode (array_length = false)]
                 [CCode (cname = "cogl_path_polygon")]
                 public static void polygon (Clutter.Fixed[] coords, int n_points);
 
@@ -175,7 +175,7 @@ namespace Cogl {
                 public static Handle new_with_size (uint width, uint height, int max_waste, bool auto_mipmap, PixelFormat internal_format);
                 public static void rectangle (Handle handle, Clutter.Fixed x1, Clutter.Fixed y1, Clutter.Fixed x2, Clutter.Fixed y2, Clutter.Fixed tx1, Clutter.Fixed ty1, Clutter.Fixed tx2, Clutter.Fixed ty2);
 
-                [NoArrayLength]
+                [CCode (array_length = false)]
                 public static void polygon (Handle handle, uint n_vertices, TextureVertex[] vertices, bool use_color);
 
           public static bool get_gl_texture(Handle handle, out uint? out_gl_handle, out int? out_gl_target);

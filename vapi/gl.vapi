@@ -925,14 +925,14 @@ namespace GL
 	public static void LineStipple (GLint factor, GLushort pattern);
 	public static void PolygonMode (GLenum face, GLenum mode);
 	public static void PolygonOffset (GLfloat factor, GLfloat units);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void PolygonStipple (GLubyte[] mask);
 	public static void GetPolygonStipple (out GLubyte mask);
 	public static void EdgeFlag (GLboolean flag);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void EdgeFlagv (GLboolean[] flag);
 	public static void Scissor (GLint x, GLint y, GLsizei width, GLsizei height);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void ClipPlane (GLenum plane, GLdouble[] equation);
 	public static void GetClipPlane (GLenum plane, out GLdouble equation);
 	public static void DrawBuffer (GLenum mode);
@@ -942,13 +942,13 @@ namespace GL
 	public static GLboolean IsEnabled (GLenum cap);
 	public static void EnableClientState (GLenum cap);
 	public static void DisableClientState (GLenum cap);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void GetBooleanv (GLenum pname, GLboolean[] params);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void GetDoublev (GLenum pname, GLdouble[] params);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void GetFloatv (GLenum pname, GLfloat[] params);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void GetIntegerv (GLenum pname, GLint[] params);
 	public static void PushAttrib (GLbitfield mask);
 	public static void PopAttrib ();
@@ -979,13 +979,13 @@ namespace GL
 	public static void PushMatrix ();
 	public static void PopMatrix ();
 	public static void LoadIdentity ();
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void LoadMatrixd (GLdouble[] m);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void LoadMatrixf (GLfloat[] m);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void MultMatrixd (GLdouble[] m);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void MultMatrixf (GLfloat[] m);
 	public static void Rotated (GLdouble angle, GLdouble x, GLdouble y, GLdouble z);
 	public static void Rotatef (GLfloat angle, GLfloat x, GLfloat y, GLfloat z);
@@ -1001,7 +1001,7 @@ namespace GL
 	public static void NewList (GLuint list, GLenum mode);
 	public static void EndList ();
 	public static void CallList (GLuint list);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void CallLists (GLsizei n, GLenum type, GLvoid[] lists);
 	public static void ListBase (GLuint @base);
 
@@ -1020,59 +1020,59 @@ namespace GL
 	public static void Vertex4f (GLfloat x, GLfloat y, GLfloat z, GLfloat w);
 	public static void Vertex4i (GLint x, GLint y, GLint z, GLint w);
 	public static void Vertex4s (GLshort x, GLshort y, GLshort z, GLshort w);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Vertex2dv (GLdouble[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Vertex2fv (GLfloat[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Vertex2iv (GLint[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Vertex2sv (GLshort[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Vertex3dv (GLdouble[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Vertex3fv (GLfloat[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Vertex3iv (GLint[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Vertex3sv (GLshort[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Vertex4dv (GLdouble[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Vertex4fv (GLfloat[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Vertex4iv (GLint[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Vertex4sv (GLshort[] v);
 	public static void Normal3b (GLbyte nx, GLbyte ny, GLbyte nz);
 	public static void Normal3d (GLdouble nx, GLdouble ny, GLdouble nz);
 	public static void Normal3f (GLfloat nx, GLfloat ny, GLfloat nz);
 	public static void Normal3i (GLint nx, GLint ny, GLint nz);
 	public static void Normal3s (GLshort nx, GLshort ny, GLshort nz);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Normal3bv (GLbyte[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Normal3dv (GLdouble[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Normal3fv (GLfloat[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Normal3iv (GLint[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Normal3sv (GLshort[] v);
 	public static void Indexd (GLdouble c);
 	public static void Indexf (GLfloat c);
 	public static void Indexi (GLint c);
 	public static void Indexs (GLshort c);
 	public static void Indexub (GLubyte c);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Indexdv (GLdouble[] c);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Indexfv (GLfloat[] c);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Indexiv (GLint[] c);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Indexsv (GLshort[] c);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Indexubv (GLubyte[] c);
 	public static void Color3b (GLbyte red, GLbyte green, GLbyte blue);
 	public static void Color3d (GLdouble red, GLdouble green, GLdouble blue);
@@ -1090,37 +1090,37 @@ namespace GL
 	public static void Color4ub (GLubyte red, GLubyte green, GLubyte blue, GLubyte alpha);
 	public static void Color4ui (GLuint red, GLuint green, GLuint blue, GLuint alpha);
 	public static void Color4us (GLushort red, GLushort green, GLushort blue, GLushort alpha);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Color3bv (GLbyte[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Color3dv (GLdouble[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Color3fv (GLfloat[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Color3iv (GLint[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Color3sv (GLshort[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Color3ubv (GLubyte[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Color3uiv (GLuint[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Color3usv (GLushort[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Color4bv (GLbyte[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Color4dv (GLdouble[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Color4fv (GLfloat[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Color4iv (GLint[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Color4sv (GLshort[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Color4ubv (GLubyte[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Color4uiv (GLuint[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Color4usv (GLushort[] v);
 	public static void TexCoord1d (GLdouble s);
 	public static void TexCoord1f (GLfloat s);
@@ -1138,37 +1138,37 @@ namespace GL
 	public static void TexCoord4f (GLfloat s, GLfloat t, GLfloat r, GLfloat q);
 	public static void TexCoord4i (GLint s, GLint t, GLint r, GLint q);
 	public static void TexCoord4s (GLshort s, GLshort t, GLshort r, GLshort q);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void TexCoord1dv (GLdouble[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void TexCoord1fv (GLfloat[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void TexCoord1iv (GLint[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void TexCoord1sv (GLshort[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void TexCoord2dv (GLdouble[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void TexCoord2fv (GLfloat[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void TexCoord2iv (GLint[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void TexCoord2sv (GLshort[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void TexCoord3dv (GLdouble[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void TexCoord3fv (GLfloat[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void TexCoord3iv (GLint[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void TexCoord3sv (GLshort[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void TexCoord4dv (GLdouble[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void TexCoord4fv (GLfloat[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void TexCoord4iv (GLint[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void TexCoord4sv (GLshort[] v);
 	public static void RasterPos2d (GLdouble x, GLdouble y);
 	public static void RasterPos2f (GLfloat x, GLfloat y);
@@ -1182,41 +1182,41 @@ namespace GL
 	public static void RasterPos4f (GLfloat x, GLfloat y, GLfloat z, GLfloat w);
 	public static void RasterPos4i (GLint x, GLint y, GLint z, GLint w);
 	public static void RasterPos4s (GLshort x, GLshort y, GLshort z, GLshort w);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void RasterPos2dv (GLdouble[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void RasterPos2fv (GLfloat[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void RasterPos2iv (GLint[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void RasterPos2sv (GLshort[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void RasterPos3dv (GLdouble[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void RasterPos3fv (GLfloat[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void RasterPos3iv (GLint[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void RasterPos3sv (GLshort[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void RasterPos4dv (GLdouble[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void RasterPos4fv (GLfloat[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void RasterPos4iv (GLint[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void RasterPos4sv (GLshort[] v);
 	public static void Rectd (GLdouble x1, GLdouble y1, GLdouble x2, GLdouble y2);
 	public static void Rectf (GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2);
 	public static void Recti (GLint x1, GLint y1, GLint x2, GLint y2);
 	public static void Rects (GLshort x1, GLshort y1, GLshort x2, GLshort y2);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Rectdv (GLdouble[] v1, GLdouble[] v2);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Rectfv (GLfloat[] v1, GLfloat[] v2);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Rectiv (GLint[] v1, GLint[] v2);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Rectsv (GLshort[] v1, GLshort[] v2);
 
 	// Vertex Arrays  (1.1)
@@ -1236,29 +1236,29 @@ namespace GL
 	public static void ShadeModel (GLenum mode);
 	public static void Lightf (GLenum light, GLenum pname, GLfloat param);
 	public static void Lighti (GLenum light, GLenum pname, GLint param);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Lightfv (GLenum light, GLenum pname, GLfloat[] params);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Lightiv (GLenum light, GLenum pname, GLint[] params);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void GetLightfv (GLenum light, GLenum pname, GLfloat[] params);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void GetLightiv (GLenum light, GLenum pname, GLint[] params);
 	public static void LightModelf (GLenum pname, GLfloat param);
 	public static void LightModeli (GLenum pname, GLint param);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void LightModelfv (GLenum pname, GLfloat[] params);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void LightModeliv (GLenum pname, GLint[] params);
 	public static void Materialf (GLenum face, GLenum pname, GLfloat param);
 	public static void Materiali (GLenum face, GLenum pname, GLint param);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Materialfv (GLenum face, GLenum pname, GLfloat[] params);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Materialiv (GLenum face, GLenum pname, GLint[] params);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void GetMaterialfv (GLenum face, GLenum pname, GLfloat[] params);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void GetMaterialiv (GLenum face, GLenum pname, GLint[] params);
 	public static void ColorMaterial (GLenum face, GLenum mode);
 
@@ -1268,17 +1268,17 @@ namespace GL
 	public static void PixelStorei (GLenum pname, GLint param);
 	public static void PixelTransferf (GLenum pname, GLfloat param);
 	public static void PixelTransferi (GLenum pname, GLint param);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void PixelMapfv (GLenum map, GLsizei mapsize, GLfloat[] values);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void PixelMapuiv (GLenum map, GLsizei mapsize, GLuint[] values);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void PixelMapusv (GLenum map, GLsizei mapsize, GLushort[] values);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void GetPixelMapfv (GLenum map, GLfloat[] values);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void GetPixelMapuiv (GLenum map, GLuint[] values);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void GetPixelMapusv (GLenum map, GLushort[] values);
 	public static void Bitmap (GLsizei width, GLsizei height, GLfloat xorig, GLfloat yorig, GLfloat xmove, GLfloat ymove, GLubyte* bitmap);
 	public static void ReadPixels (GLint x, GLint y, GLsizei width, GLsizei height, GLenum format, GLenum type, GLvoid* pixels);
@@ -1295,55 +1295,55 @@ namespace GL
 	public static void TexGend (GLenum coord, GLenum pname, GLdouble param);
 	public static void TexGenf (GLenum coord, GLenum pname, GLfloat param);
 	public static void TexGeni (GLenum coord, GLenum pname, GLint param);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void TexGendv (GLenum coord, GLenum pname, GLdouble[] params);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void TexGenfv (GLenum coord, GLenum pname, GLfloat[] params);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void TexGeniv (GLenum coord, GLenum pname, GLint[] params);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void GetTexGendv (GLenum coord, GLenum pname, GLdouble[] params);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void GetTexGenfv (GLenum coord, GLenum pname, GLfloat[] params);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void GetTexGeniv (GLenum coord, GLenum pname, GLint[] params);
 	public static void TexEnvf (GLenum target, GLenum pname, GLfloat param);
 	public static void TexEnvi (GLenum target, GLenum pname, GLint param);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void TexEnvfv (GLenum target, GLenum pname, GLfloat[] params);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void TexEnviv (GLenum target, GLenum pname, GLint[] params);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void GetTexEnvfv (GLenum target, GLenum pname, GLfloat[] params);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void GetTexEnviv (GLenum target, GLenum pname, GLint[] params);
 	public static void TexParameterf (GLenum target, GLenum pname, GLfloat param);
 	public static void TexParameteri (GLenum target, GLenum pname, GLint param);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void TexParameterfv (GLenum target, GLenum pname, GLfloat[] params);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void TexParameteriv (GLenum target, GLenum pname, GLint[] params);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void GetTexParameterfv (GLenum target, GLenum pname, GLfloat[] params);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void GetTexParameteriv (GLenum target, GLenum pname, GLint[] params);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void GetTexLevelParameterfv (GLenum target, GLint level, GLenum pname, GLfloat[] params);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void GetTexLevelParameteriv (GLenum target, GLint level, GLenum pname, GLint[] params);
 	public static void TexImage1D (GLenum target, GLint level, GLint internalFormat, GLsizei width, GLint border, GLenum format, GLenum type, GLvoid* pixels);
 	public static void TexImage2D (GLenum target, GLint level, GLint internalFormat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, GLvoid* pixels);
 	public static void GetTexImage (GLenum target, GLint level, GLenum format, GLenum type, GLvoid* pixels);
 
 	// 1.1 functions
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void GenTextures (GLsizei n, GLuint[] textures);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void DeleteTextures (GLsizei n, GLuint[] textures);
 	public static void BindTexture (GLenum target, GLuint texture);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void PrioritizeTextures (GLsizei n, GLuint[] textures, GLclampf[] priorities);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static GLboolean AreTexturesResident (GLsizei n, GLuint[] textures, GLboolean[] residences);
 	public static GLboolean IsTexture (GLuint texture);
 	public static void TexSubImage1D (GLenum target, GLint level, GLint xoffset, GLsizei width, GLenum format, GLenum type, GLvoid* pixels);
@@ -1354,31 +1354,31 @@ namespace GL
 	public static void CopyTexSubImage2D (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint x, GLint y, GLsizei width, GLsizei height);
 
 	// Evaluators
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Map1d (GLenum target, GLdouble u1, GLdouble u2, GLint stride, GLint order, GLdouble[] points);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Map1f (GLenum target, GLfloat u1, GLfloat u2, GLint stride, GLint order, GLfloat[] points);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Map2d (GLenum target, GLdouble u1, GLdouble u2, GLint ustride, GLint uorder, GLdouble v1, GLdouble v2, GLint vstride, GLint vorder, GLdouble[] points);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Map2f (GLenum target, GLfloat u1, GLfloat u2, GLint ustride, GLint uorder, GLfloat v1, GLfloat v2, GLint vstride, GLint vorder, GLfloat[] points);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void GetMapdv (GLenum target, GLenum query, GLdouble[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void GetMapfv (GLenum target, GLenum query, GLfloat[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void GetMapiv (GLenum target, GLenum query, GLint[] v);
 	public static void EvalCoord1d (GLdouble u);
 	public static void EvalCoord1f (GLfloat u);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void EvalCoord1dv (GLdouble[] u);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void EvalCoord1fv (GLfloat[] u);
 	public static void EvalCoord2d (GLdouble u, GLdouble v);
 	public static void EvalCoord2f (GLfloat u, GLfloat v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void EvalCoord2dv (GLdouble[] u);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void EvalCoord2fv (GLfloat[] u);
 	public static void MapGrid1d (GLint un, GLdouble u1, GLdouble u2);
 	public static void MapGrid1f (GLint un, GLfloat u1, GLfloat u2);
@@ -1392,9 +1392,9 @@ namespace GL
 	// Fog
 	public static void Fogf (GLenum pname, GLfloat param);
 	public static void Fogi (GLenum pname, GLint param);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Fogfv (GLenum pname, GLfloat[] params);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void Fogiv (GLenum pname, GLint[] params);
 
 	// Selection and Feedback
@@ -1415,9 +1415,9 @@ namespace GL
 	// GL_ARB_imaging
 	public static void ColorTable (GLenum target, GLenum internalformat, GLsizei width, GLenum format, GLenum type, GLvoid* table);
 	public static void ColorSubTable (GLenum target, GLsizei start, GLsizei count, GLenum format, GLenum type, GLvoid* data);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void ColorTableParameteriv (GLenum target, GLenum pname, GLint[] params);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void ColorTableParameterfv (GLenum target, GLenum pname, GLfloat[] params);
 	public static void CopyColorSubTable (GLenum target, GLsizei start, GLint x, GLint y, GLsizei width);
 	public static void CopyColorTable (GLenum target, GLenum internalformat, GLint x, GLint y, GLsizei width);
@@ -1434,24 +1434,24 @@ namespace GL
 	public static void Minmax (GLenum target, GLenum internalformat, GLboolean sink);
 	public static void ResetMinmax (GLenum target);
 	public static void GetMinmax (GLenum target, GLboolean reset, GLenum format, GLenum types, out GLvoid values);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void GetMinmaxParameterfv (GLenum target, GLenum pname, GLfloat[] params);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void GetMinmaxParameteriv (GLenum target, GLenum pname, GLint[] params);
 	public static void ConvolutionFilter1D (GLenum target, GLenum internalformat, GLsizei width, GLenum format, GLenum type, GLvoid* image);
 	public static void ConvolutionFilter2D (GLenum target, GLenum internalformat, GLsizei width, GLsizei height, GLenum format, GLenum type, GLvoid* image);
 	public static void ConvolutionParameterf (GLenum target, GLenum pname, GLfloat params);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void ConvolutionParameterfv (GLenum target, GLenum pname, GLfloat[] params);
 	public static void ConvolutionParameteri (GLenum target, GLenum pname, GLint params);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void ConvolutionParameteriv (GLenum target, GLenum pname, GLint[] params);
 	public static void CopyConvolutionFilter1D (GLenum target, GLenum internalformat, GLint x, GLint y, GLsizei width);
 	public static void CopyConvolutionFilter2D (GLenum target, GLenum internalformat, GLint x, GLint y, GLsizei width, GLsizei height);
 	public static void GetConvolutionFilter (GLenum target, GLenum format, GLenum type, GLvoid *image);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void GetConvolutionParameterfv (GLenum target, GLenum pname, GLfloat[] params);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void GetConvolutionParameteriv (GLenum target, GLenum pname, GLint[] params);
 	public static void SeparableFilter2D (GLenum target, GLenum internalformat, GLsizei width, GLsizei height, GLenum format, GLenum type, GLvoid* row, GLvoid* column);
 	public static void GetSeparableFilter (GLenum target, GLenum format, GLenum type, out GLvoid row, out GLvoid column, out GLvoid span);
@@ -1467,60 +1467,60 @@ namespace GL
 	public static void CompressedTexSubImage3D (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLsizei imageSize, GLvoid* data);
 	public static void GetCompressedTexImage (GLenum target, GLint lod, out GLvoid img);
 	public static void MultiTexCoord1d (GLenum target, GLdouble s);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void MultiTexCoord1dv (GLenum target, GLdouble[] v);
 	public static void MultiTexCoord1f (GLenum target, GLfloat s);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void MultiTexCoord1fv (GLenum target, GLfloat[] v);
 	public static void MultiTexCoord1i (GLenum target, GLint s);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void MultiTexCoord1iv (GLenum target, GLint[] v);
 	public static void MultiTexCoord1s (GLenum target, GLshort s);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void MultiTexCoord1sv (GLenum target, GLshort[] v);
 	public static void MultiTexCoord2d (GLenum target, GLdouble s, GLdouble t);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void MultiTexCoord2dv (GLenum target, GLdouble[] v);
 	public static void MultiTexCoord2f (GLenum target, GLfloat s, GLfloat t);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void MultiTexCoord2fv (GLenum target, GLfloat[] v);
 	public static void MultiTexCoord2i (GLenum target, GLint s, GLint t);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void MultiTexCoord2iv (GLenum target, GLint[] v);
 	public static void MultiTexCoord2s (GLenum target, GLshort s, GLshort t);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void MultiTexCoord2sv (GLenum target, GLshort[] v);
 	public static void MultiTexCoord3d (GLenum target, GLdouble s, GLdouble t, GLdouble r);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void MultiTexCoord3dv (GLenum target, GLdouble[] v);
 	public static void MultiTexCoord3f (GLenum target, GLfloat s, GLfloat t, GLfloat r);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void MultiTexCoord3fv (GLenum target, GLfloat[] v);
 	public static void MultiTexCoord3i (GLenum target, GLint s, GLint t, GLint r);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void MultiTexCoord3iv (GLenum target, GLint[] v);
 	public static void MultiTexCoord3s (GLenum target, GLshort s, GLshort t, GLshort r);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void MultiTexCoord3sv (GLenum target, GLshort[] v);
 	public static void MultiTexCoord4d (GLenum target, GLdouble s, GLdouble t, GLdouble r, GLdouble q);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void MultiTexCoord4dv (GLenum target, GLdouble[] v);
 	public static void MultiTexCoord4f (GLenum target, GLfloat s, GLfloat t, GLfloat r, GLfloat q);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void MultiTexCoord4fv (GLenum target, GLfloat[] v);
 	public static void MultiTexCoord4i (GLenum target, GLint s, GLint t, GLint r, GLint q);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void MultiTexCoord4iv (GLenum target, GLint[] v);
 	public static void MultiTexCoord4s (GLenum target, GLshort s, GLshort t, GLshort r, GLshort q);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void MultiTexCoord4sv (GLenum target, GLshort[] v);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void LoadTransposeMatrixd (GLdouble[16] m);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void LoadTransposeMatrixf (GLfloat[16] m);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void MultTransposeMatrixd (GLdouble[16] m);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void MultTransposeMatrixf (GLfloat[16] m);
 	public static void SampleCoverage (GLclampf @value, GLboolean invert);
 	
@@ -1528,52 +1528,52 @@ namespace GL
 	public static void ActiveTextureARB (GLenum texture);
 	public static void ClientActiveTextureARB (GLenum texture);
 	public static void MultiTexCoord1dARB (GLenum target, GLdouble s);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void MultiTexCoord1dvARB (GLenum target, GLdouble[] v);
 	public static void MultiTexCoord1fARB (GLenum target, GLfloat s);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void MultiTexCoord1fvARB (GLenum target, GLfloat[] v);
 	public static void MultiTexCoord1iARB (GLenum target, GLint s);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void MultiTexCoord1ivARB (GLenum target, GLint[] v);
 	public static void MultiTexCoord1sARB (GLenum target, GLshort s);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void MultiTexCoord1svARB (GLenum target, GLshort[] v);
 	public static void MultiTexCoord2dARB (GLenum target, GLdouble s, GLdouble t);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void MultiTexCoord2dvARB (GLenum target, GLdouble[] v);
 	public static void MultiTexCoord2fARB (GLenum target, GLfloat s, GLfloat t);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void MultiTexCoord2fvARB (GLenum target, GLfloat[] v);
 	public static void MultiTexCoord2iARB (GLenum target, GLint s, GLint t);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void MultiTexCoord2ivARB (GLenum target, GLint[] v);
 	public static void MultiTexCoord2sARB (GLenum target, GLshort s, GLshort t);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void MultiTexCoord2svARB (GLenum target, GLshort[] v);
 	public static void MultiTexCoord3dARB (GLenum target, GLdouble s, GLdouble t, GLdouble r);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void MultiTexCoord3dvARB (GLenum target, GLdouble[] v);
 	public static void MultiTexCoord3fARB (GLenum target, GLfloat s, GLfloat t, GLfloat r);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void MultiTexCoord3fvARB (GLenum target, GLfloat[] v);
 	public static void MultiTexCoord3iARB (GLenum target, GLint s, GLint t, GLint r);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void MultiTexCoord3ivARB (GLenum target, GLint[] v);
 	public static void MultiTexCoord3sARB (GLenum target, GLshort s, GLshort t, GLshort r);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void MultiTexCoord3svARB (GLenum target, GLshort[] v);
 	public static void MultiTexCoord4dARB (GLenum target, GLdouble s, GLdouble t, GLdouble r, GLdouble q);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void MultiTexCoord4dvARB (GLenum target, GLdouble[] v);
 	public static void MultiTexCoord4fARB (GLenum target, GLfloat s, GLfloat t, GLfloat r, GLfloat q);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void MultiTexCoord4fvARB (GLenum target, GLfloat[] v);
 	public static void MultiTexCoord4iARB (GLenum target, GLint s, GLint t, GLint r, GLint q);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void MultiTexCoord4ivARB (GLenum target, GLint[] v);
 	public static void MultiTexCoord4sARB (GLenum target, GLshort s, GLshort t, GLshort r, GLshort q);
-	[NoArrayLength]
+	[CCode (array_length = false)]
 	public static void MultiTexCoord4svARB (GLenum target, GLshort[] v);
   
   // OpenGL 1.4 (added by GGobi team)

@@ -1108,7 +1108,7 @@ namespace Clutter {
                 [CCode (type = "ClutterActor*", has_construct_function = false)]
 		public Stage ();
 		public void queue_redraw ();
-                [NoArrayLength]
+                [CCode (array_length = false)]
 		public weak uchar[] read_pixels (int x, int y, int width, int height);
 		public void set_color (Clutter.Color color);
 		public void set_fog (double density, double z_near, double z_far);
@@ -1164,9 +1164,9 @@ namespace Clutter {
 		public void set_cogl_texture (void* cogl_tex);
 		public void set_filter_quality (Clutter.TextureQuality filter_quality);
 		public bool set_from_file (string filename) throws GLib.Error;
-                [NoArrayLength]
+                [CCode (array_length = false)]
 		public bool set_from_rgb_data (uchar[] data, bool has_alpha, int width, int height, int rowstride, int bpp, Clutter.TextureFlags flags) throws GLib.Error;
-                [NoArrayLength]
+                [CCode (array_length = false)]
 		public bool set_from_yuv_data (uchar[] data, int width, int height, Clutter.TextureFlags flags) throws GLib.Error;
 		public void set_max_tile_waste (int max_tile_waste);
 		public Clutter.TextureHandle cogl_texture { get; set; }
