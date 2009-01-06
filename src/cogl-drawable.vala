@@ -8,12 +8,9 @@
    (via ClutterPango).
 */
 
+/* note that setting line join, cap and miter not supported */
+
 /* Ideas:
-   - occlusion query to test whether a glyph needs to be drawn (1.5),
-     probably a lot more work than it saves
-   - VBO for caching, instead of display lists (1.5), probably no benefit
-   - point sprites for faster drawing of textures (1.5)
-     http://www.informit.com/articles/article.aspx?p=770639&seqNum=7
 */
 
 using GL;
@@ -24,33 +21,23 @@ public class GGobi.Surface.CoglDrawable : Drawable, Object {
   public uint width { get; set construct; }
   public uint height { get; set construct; }
 
-  private GLuint fc_dl;
-  private GLuint oc_dl;
-
-  private Cogl.Handle clutter_texture;
-  private GLuint dummy_texture; 
-  
   construct {
-    /* TOOD: save state here */
+    PushClientAttrib(Consts.CLIENT_VERTEX_ARRAY_BIT);
     EnableClientState(Consts.VERTEX_ARRAY);
-    Enable(Consts.TEXTURE_2D);
     /* OGL 1.4 */
     /* The ordinary BlendFunc() applies the same blending to the
        alpha channel as the RGB channels. The below emulates Cairo. */
+    PushAttrib(Consts.COLOR_BUFFER_BIT);
     BlendFuncSeparate(Consts.SRC_ALPHA, Consts.ONE_MINUS_SRC_ALPHA,
                       Consts.ONE, Consts.ONE_MINUS_SRC_ALPHA);
-    clutter_texture = Cogl.Texture.new_from_file("/usr/share/gtk-2.0/demo/apple-red.png", 0, false, Cogl.PixelFormat.ANY);
-    Cogl.Texture.get_gl_texture(clutter_texture, out dummy_texture, null);
-    BindTexture(Consts.TEXTURE_2D, dummy_texture);
-    Enable(Consts.POINT_SPRITE);
-    TexEnvi(Consts.POINT_SPRITE, Consts.COORD_REPLACE, 1);
-    PointSize(10);
-    PointParameteri(Consts.POINT_SPRITE_COORD_ORIGIN, Consts.LOWER_LEFT);
-    //Enable(Consts.POINT_SMOOTH);
+    Enable(Consts.POINT_SMOOTH);
+    Enable(Consts.STENCIL_TEST);
+    StencilOp(Consts.KEEP, Consts.KEEP, Consts.REPLACE);
   }
   
   public override void finalize() {
-    /* restore state here */
+    PopClientAttrib();
+    PopAttrib();
     base.finalize();
   }
   
@@ -86,7 +73,7 @@ public class GGobi.Surface.CoglDrawable : Drawable, Object {
   public void set_line_width(uint width) {
     LineWidth(width);
   }
-  // NOTE: this is very approximate
+  
   public void set_dashes(uint[] dashes, uint offset) {
     ushort pattern = 0;
     uint i, dashed = 0;
@@ -114,11 +101,7 @@ public class GGobi.Surface.CoglDrawable : Drawable, Object {
     LineStipple(1, (GLushort)pattern);
   }
 
-  /* note that setting line join, cap and miter not supported */
-
   /* set clip */
-  // NOTE: not sure if this will work, since it probably uses the
-  // stencil buffer, which has issues with FBOs
   public void set_clip(int x, int y, uint width, uint height) {
     Cogl.Clip.set(x, y, (int)width, (int)height);
   }
@@ -139,88 +122,73 @@ public class GGobi.Surface.CoglDrawable : Drawable, Object {
   }
 
   public void draw_circle(int cx, int cy, uint r) {
-    //FIXME: obviously need to setup the transformation matrix here if
-    //we are going to use display lists.
-    /*    
+
+    
+    /* Optimization:
+       If radius is within point size range:
+         If circle is only filled draw a size 2(r-1) anti-aliased point.
+         If circle is only stroked draw filled circle to stencil
+         buffer, then draw a size 2r point using stencil test.
+         If circle is stroked and filled, draw 2r point, then filled point.
+    */
+    
+    if (stroke.alpha > 0) {
+      
+      if (fill.alpha == 0) {
+        ClearStencil(0);
+        //Clear(Consts.STENCIL_BUFFER_BIT);
+        StencilFunc(Consts.ALWAYS, 1, 0xFFFF);     
+        set_color(fill);
+        PointSize(2*(r-1));
+        Begin(Consts.POINTS);
+        Vertex2f(cx, cy);
+        End();
+        StencilFunc(Consts.NOTEQUAL, 1, 0xFFFF);
+        //StencilOp(Consts.KEEP, Consts.KEEP, Consts.REPLACE);
+      }
+      
+      
+      set_color(stroke);
+      PointSize(2*r);
+      Begin(Consts.POINTS);
+      Vertex2f(cx, cy);
+      End();
+      
+    }
+    //Disable(Consts.STENCIL_TEST);
+    
     if (fill.alpha > 0) {
       set_color(fill);
-      if (fc_dl == 0) {
-        fc_dl = midpoint_circle(cx, cy, r - 1, true);
-      }
-      CallList(fc_dl);
+      PointSize(2*(r-1));
+      Begin(Consts.POINTS);
+      Vertex2f(cx, cy);
+      End();
+    }
+    /*
+    if (fill.alpha > 0) {
+      set_color(fill);
+      midpoint_circle(cx, cy, r - 1, true);
     }
     if (stroke.alpha > 0) {
+      // FIXME: does not obey line width
       set_color(stroke);
       midpoint_circle(cx, cy, r, false);
     }
     */
-    if (fill.alpha > 0) {
-      set_color(fill);
-      //  Cogl.Program.use(fc_program);
-      draw_dummy_texture(cx, cy, r - 1);
-    }
-    if (stroke.alpha > 0) {
-      set_color(stroke);
-      //Cogl.Program.use(oc_program);
-      //int loc = Cogl.Program.get_uniform_location(oc_program, "halfwidth");
-      //float halfwidth = 1/(4.0f*r);
-      //Cogl.Program.uniform_1f(loc, halfwidth);
-      draw_dummy_texture(cx, cy, r);
-    }
-    
-    //Cogl.Program.use(Cogl.Handle.INVALID);
-
+    /* Point sprite stuff
+       Enable(Consts.TEXTURE_2D);
+       Enable(Consts.POINT_SPRITE);
+       TexEnvi(Consts.POINT_SPRITE, Consts.COORD_REPLACE, 1);
+       PointSize(10);
+       PointParameteri(Consts.POINT_SPRITE_COORD_ORIGIN, Consts.LOWER_LEFT);
+       //Enable(Consts.POINT_SMOOTH);
+    */
   }
 
-  private void draw_dummy_texture(int cx, int cy, uint r) {
-    /*
-      Cogl.Texture.rectangle(clutter_texture,
-                           Clutter.Fixed.from_int((int)(cx - r)),
-                           Clutter.Fixed.from_int((int)(cy - r)),
-                           Clutter.Fixed.from_int((int)(cx + r)),
-                           Clutter.Fixed.from_int((int)(cy + r)),
-                           Clutter.Fixed.from_int(0),
-                           Clutter.Fixed.from_int(0),
-                           Clutter.Fixed.from_float(1),
-                           Clutter.Fixed.from_float(1));
-    */
-    
-    //BindTexture(Consts.TEXTURE_2D, dummy_texture);
-    /*
-    Begin(Consts.QUADS);
-    TexCoord2f(0, 0);
-    Vertex2f(cx - r, cx - r);
-    TexCoord2f(1, 0);
-    Vertex2f(cx + r, cy - r);
-    TexCoord2f(1, 1);
-    Vertex2f(cx + r, cy + r);
-    TexCoord2f(0, 1);
-    Vertex2f(cx - r, cy + r);
-    End();
-    */
-    
-    int x = 300000;
-    /*
-    float[] v = new float[x*2];
-
-    for (int i = 0; i < x*2; i+=2) {
-      v[i] = cx;
-      v[i+1] = cy; // + 400*(i/300000.0f);
-    }
-    VertexPointer(2, Consts.FLOAT, 0, v);
-    DrawArrays(Consts.POINTS, 0, (GLsizei)(v.length/2.0));
-*/
-    Begin(Consts.POINTS);
-    for (int i = 0; i < x; i++) {
-      Vertex2f(cx, cy);
-    }
-    End();
-  }
-
-  private GLuint midpoint_circle(int cx, int cy, uint r, bool fill) {
+  private void midpoint_circle(int cx, int cy, uint r, bool fill) {
     /* midpoint circle algorithm, implementation adapted from:
        http://en.wikipedia.org/wiki/Midpoint_circle_algorithm */
-    /* TODO: some way to guess final value of 'x' to allocate an array */
+    /* WISH: some way to guess final value of 'x' to allocate an array */
     
     int f = 1 - (int)r;
     int ddF_x = 1;
@@ -304,15 +272,10 @@ public class GGobi.Surface.CoglDrawable : Drawable, Object {
     }
     
     VertexPointer(2, Consts.INT, 0, v);
-
-    GLuint dl = GenLists(1);
-    NewList(dl, Consts.COMPILE);
+    
     if (fill)
       DrawArrays(Consts.LINES, 0, (GLsizei)(v.length/2.0));
     else DrawArrays(Consts.POINTS, 0, (GLsizei)(v.length/2.0));
-    EndList();
-    
-    return(dl);
   }
   
   public void draw_polyline(int[] x, int[] y) {

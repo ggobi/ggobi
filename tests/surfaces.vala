@@ -5,42 +5,20 @@ public class GGobi.Test.Surface {
   {
     int r = 5;
     GGobi.Surface.Color color = { 1, 0, 0, 1 };
-    int cx = 100, cy = 100;
+    int cx = 10, cy = 10;
     int x = 300000;
-    drawable.set_fill(color);
+
+    //drawable.set_fill(color);
+    //drawable.draw_circle(cx, cy, r);
+    drawable.set_stroke(color);
+    //drawable.draw_circle(cx + 3*r, cy, r);
+    //drawable.set_fill(null);
     TimeVal before = TimeVal();
-    //for (int j = 0; j < x; j++) {
-      drawable.draw_circle(cx, cy, r+1);
-      //}
+    for (int i = 0; i < x; i++)
+      drawable.draw_circle(cx + 6*r, cy, r);
     TimeVal after = TimeVal();
-    debug("opengl: %f", after.tv_sec + (float)after.tv_usec/1000000 -
+    debug("stencil: %f", after.tv_sec + (float)after.tv_usec/1000000 -
           (before.tv_sec + (float)before.tv_usec/1000000));
-
-    Gdk.Pixmap pixmap = new Gdk.Pixmap(null, WINWIDTH, WINHEIGHT, 24);
-    Gdk.GC gc = new Gdk.GC(pixmap);
-    before = TimeVal();
-    for (int j = 0; j < x; j++) {
-      Gdk.draw_arc (pixmap, gc, false, cx - r, cy - r, 2 * r, 2 * r, 0, 23040);
-      Gdk.draw_arc (pixmap, gc, true, cx - r, cy - r, 2 * r, 2 * r, 0, 23040);
-    }
-    after = TimeVal();
-    debug("gdk: %f", after.tv_sec + (float)after.tv_usec/1000000 -
-          (before.tv_sec + (float)before.tv_usec/1000000));
-
-    Gdk.Pixbuf target = new Gdk.Pixbuf(Gdk.Colorspace.RGB, true, 8, WINWIDTH,
-                                       WINHEIGHT);
-    Gdk.Pixbuf glyph = new Gdk.Pixbuf(Gdk.Colorspace.RGB, true, 8, 2*r, 2*r);
-    Gdk.pixbuf_get_from_drawable(glyph, pixmap, null, cx - r, cy - r, 0, 0, 2*r,
-                                 2*r);
-    before = TimeVal();
-    for (int j = 0; j < x; j++) {
-      glyph.composite(target, 0, 0, 2*r, 2*r, 0, 0, 1, 1,
-                      Gdk.InterpType.NEAREST, 255);
-    }
-    after = TimeVal();
-    debug("pixbuf: %f", after.tv_sec + (float)after.tv_usec/1000000 -
-          (before.tv_sec + (float)before.tv_usec/1000000));
-    
   }
 
   private static const int WINWIDTH = 400;
