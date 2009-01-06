@@ -178,6 +178,7 @@ namespace Cogl {
                 [NoArrayLength]
                 public static void polygon (Handle handle, uint n_vertices, TextureVertex[] vertices, bool use_color);
 
+          public static bool get_gl_texture(Handle handle, out uint? out_gl_handle, out int? out_gl_target);
                 public void unref(Handle handle);
         }
 

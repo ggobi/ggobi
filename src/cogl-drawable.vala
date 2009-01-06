@@ -1,12 +1,21 @@
 /* Implement Drawable with Cogl and OpenGL */
 
-/* Cogl is an abstraction over OpenGL and OpenGL ES. This is not
-   useful to GGobi, as it does not target embedded systems. However,
-   Cogl does offer some utilities on top of OpenGL, although most of
-   them are aimed at eye candy apps, like media centers. Currently,
-   Cogl is used for clipping, shaders and text rendering (via
-   ClutterPango).
+/* Cogl is an abstraction over OpenGL and OpenGL ES. The abstraction
+   is not useful to GGobi, as it does not target embedded
+   systems. However, Cogl does offer some utilities on top of OpenGL,
+   although most of them are aimed at eye candy apps, like media
+   centers. Currently, Cogl is used for clipping and text rendering
+   (via ClutterPango).
 */
+
+/* Ideas:
+   - occlusion query to test whether a glyph needs to be drawn (1.5),
+     probably a lot more work than it saves
+   - VBO for caching, instead of display lists (1.5), probably no benefit
+   - point sprites for faster drawing of textures (1.5)
+     http://www.informit.com/articles/article.aspx?p=770639&seqNum=7
+*/
+
 using GL;
 using Pango;
 
@@ -15,133 +24,32 @@ public class GGobi.Surface.CoglDrawable : Drawable, Object {
   public uint width { get; set construct; }
   public uint height { get; set construct; }
 
-  private Cogl.Handle dummy_texture;
   private GLuint fc_dl;
+  private GLuint oc_dl;
+
+  private Cogl.Handle clutter_texture;
+  private GLuint dummy_texture; 
   
   construct {
     /* TOOD: save state here */
     EnableClientState(Consts.VERTEX_ARRAY);
-    /* NOTE: this depends on OpenGL 1.4, which hopefully is widespread */
+    Enable(Consts.TEXTURE_2D);
+    /* OGL 1.4 */
     /* The ordinary BlendFunc() applies the same blending to the
        alpha channel as the RGB channels. The below emulates Cairo. */
     BlendFuncSeparate(Consts.SRC_ALPHA, Consts.ONE_MINUS_SRC_ALPHA,
                       Consts.ONE, Consts.ONE_MINUS_SRC_ALPHA);
-    
-    dummy_texture = Cogl.Texture.new_with_size(width, height, 32, false,
-                                               Cogl.PixelFormat.A_8);
-  }
-  
-  private static Cogl.Handle fc_program;
-  private static Cogl.Handle oc_program;
-  
-  static construct {
-    Cogl.Handle frag, vert;
-    
-    string def_vert_shader = /* a pass-through vertex shader */
-      """void main() {
-	   gl_Position = ftransform();
-	   gl_TexCoord[0] = gl_MultiTexCoord0;
-	   gl_FrontColor = gl_Color;
-      }""";
-
-    /* NOTE: could use OpenGL directly, but it's a bit complicated,
-       due to the need to access ARB extensions pre OpenGL 2.0 */
-
-    vert = compile_shader(def_vert_shader, Cogl.Shader.Type.VERTEX_SHADER);
-
-    /** circle drawing shaders */
-    
-    /* in texture coordinates, (0.5, 0.5) is center, r = 0.5 */
-    /* drawing/managing a texture is more work, but works even when
-       projected into the Z dimension */
-
-    /* simplest algorithm, non-AA filled circle, from Apple ML */
-    string fc_frag_shader = 
-      """
-      void main() {
-        vec2 dXdY = gl_TexCoord[0].st - 0.5;
-        if(dot(dXdY, dXdY) > 0.25)
-          discard;
-        gl_FragColor = gl_Color;
-      }""";
-
-    /* extend the above with anti-aliasing */
-    string afc_frag_shader =
-      """
-      uniform float low;
-      uniform float high;
-      void main() {
-        vec2 dXdY = gl_TexCoord[0].st - 0.5;
-        vec2 dXdY2 = dot(dXdY, dXdY);
-        float gradient = smoothstep(low, high, dXdY2);
-        gl_FragColor = mix(gl_Color, vec4(gl_Color.rgb,0.0), gradient);
-      }""";
-
-    /* adapt above for open circles */
-    string aoc_frag_shader =
-      """
-      uniform float halfwidth;
-      uniform float r2;
-      void main() {
-        vec2 dXdY = gl_TexCoord[0].st - 0.5;
-        float dXdY2 = dot(dXdY, dXdY);
-        float gradient = smoothstep(0.0, halfwidth, abs(r2 - dXdY2));
-        gl_FragColor = mix(gl_Color, vec4(gl_Color.rgb,0.0), gradient);
-      }""";
-
-    /* like above, but no antialiasing */
-    string oc_frag_shader =
-      """
-      uniform float halfwidth;
-      void main() {
-        vec2 dXdY = gl_TexCoord[0].st - 0.5;
-        if(abs(0.25 - dot(dXdY, dXdY)) > halfwidth)
-          discard;
-        gl_FragColor = gl_Color;
-      }""";
-
-    /* we are not currently using anti-aliasing */
-    frag = compile_shader(oc_frag_shader, Cogl.Shader.Type.FRAGMENT_SHADER);
-    oc_program = build_program(frag, vert);
-    Cogl.Shader.unref(frag);
-
-    frag = compile_shader(fc_frag_shader, Cogl.Shader.Type.FRAGMENT_SHADER);
-    fc_program = build_program(frag, vert);
-    Cogl.Shader.unref(frag);
-
-    Cogl.Shader.unref(vert);
-  }
-
-  private static Cogl.Handle build_program(Cogl.Handle frag, Cogl.Handle vert) {
-    Cogl.Handle program = Cogl.Program.create();
-    Cogl.Program.attach_shader(program, vert);
-    Cogl.Program.attach_shader(program, frag);
-    Cogl.Program.link(program);
-    return(program);
-  }
-  
-  private static Cogl.Handle compile_shader(string source,
-                                            Cogl.Shader.Type type)
-  {
-    Cogl.Handle shader = Cogl.Shader.create(type);
-    Cogl.Shader.source(shader, source);
-    Cogl.Shader.compile(shader);
-
-    int code;
-    Cogl.Shader.get_parameteriv(shader,
-                                Cogl.Shader.Parameter.OBJECT_COMPILE_STATUS,
-                                out code);
-    if (code != 1) {
-      char[] log = new char[1000];
-      Cogl.Shader.get_info_log(shader, log);
-      critical("shader compile error: %s", (string)log);
-    }
-
-    return(shader);
+    clutter_texture = Cogl.Texture.new_from_file("/usr/share/gtk-2.0/demo/apple-red.png", 0, false, Cogl.PixelFormat.ANY);
+    Cogl.Texture.get_gl_texture(clutter_texture, out dummy_texture, null);
+    BindTexture(Consts.TEXTURE_2D, dummy_texture);
+    Enable(Consts.POINT_SPRITE);
+    TexEnvi(Consts.POINT_SPRITE, Consts.COORD_REPLACE, 1);
+    PointSize(10);
+    PointParameteri(Consts.POINT_SPRITE_COORD_ORIGIN, Consts.LOWER_LEFT);
+    //Enable(Consts.POINT_SMOOTH);
   }
   
   public override void finalize() {
-    Cogl.Texture.unref(dummy_texture);
     /* restore state here */
     base.finalize();
   }
@@ -231,64 +139,9 @@ public class GGobi.Surface.CoglDrawable : Drawable, Object {
   }
 
   public void draw_circle(int cx, int cy, uint r) {
-    
-    //End();
-    /*
-    /* inspired by: http://slabode.exofire.net/circle_draw.shtml */
-    /*
-    int num_segments = (int)(2.0f * (float)Math.PI / Math.acosf(1 - 0.25f/r));
-    int[] v = new int[2*num_segments];
-    float theta = 2 * (float)Math.PI / num_segments; 
-    float tangential_factor = Math.tanf(theta);//calculate the tangential factor
-    float radial_factor = Math.cosf(theta);//calculate the radial factor 
-    float x = r;//we start at angle = 0 
-    float y = 0;
-    
-    for(int i = 0; i < num_segments; i++) {
-      v[2*i] = (int)x + cx;
-      v[2*i+1] = (int)y + cy;
-
-      //calculate the tangential vector 
-      //remember, the radial vector is (x, y) 
-      //to get the tangential vector we flip those coordinates and
-      // negate one of them 
-
-      float tx = -y; 
-      float ty = x; 
-        
-      //add the tangential vector 
-
-      x += tx * tangential_factor; 
-      y += ty * tangential_factor; 
-        
-      //correct using the radial factor 
-      
-      x *= radial_factor; 
-      y *= radial_factor; 
-    }
-    */
-    //float theta_step = Math.acosf(1 - 0.25f/r);
-    //int num_segments = (int)(2*Math.PI/theta_step);
-
-    /*
-    float step = (float) Math.PI / (4*r);
-    int n = (int)(2/step)*2;
-    int[] v = new int[n*4];
-
-    float theta = 0;
-    for(int i = 0; i < n; i += 2, theta += step) {
-      int xmod = (int)(Math.cosf(theta) * r);
-      int ymod = (int)(Math.sinf(theta) * r);
-      v[i] = v[4*n-i-2] = cx + xmod;
-      v[i+1] = v[2*n-i-1] = cy - ymod;
-      v[4*n-i-1] = v[2*n+i+1] = cy + ymod;
-      v[2*n-i-2] = v[2*n+i] = cx - xmod;
-    }
-    */  
-
     //FIXME: obviously need to setup the transformation matrix here if
     //we are going to use display lists.
-    
+    /*    
     if (fill.alpha > 0) {
       set_color(fill);
       if (fc_dl == 0) {
@@ -300,61 +153,7 @@ public class GGobi.Surface.CoglDrawable : Drawable, Object {
       set_color(stroke);
       midpoint_circle(cx, cy, r, false);
     }
-    
-    //vertices(Consts.POLYGON, vx, vy);
-
-    /* or use Cogl */
-    /* FIXME: filling does not seem to work */
-    /*    
-    if (fill.alpha > 0) {
-      Cogl.Path.ellipse(Clutter.Fixed.from_int(cx), Clutter.Fixed.from_int(cy),
-                        Clutter.Fixed.from_int((int)r),
-                        Clutter.Fixed.from_int((int)r));
-      Cogl.color(to_clutter_color(fill));
-      Cogl.Path.fill();
-    }
-    if (stroke.alpha > 0) {
-      Cogl.Path.ellipse(Clutter.Fixed.from_int(cx), Clutter.Fixed.from_int(cy),
-                        Clutter.Fixed.from_int((int)r),
-                        Clutter.Fixed.from_int((int)r));
-      Cogl.color(to_clutter_color(stroke));
-      Cogl.Path.stroke();
-    }
     */
-    /* Notes:
-       1) The midpoint algorithm draws the cleanest circles, but they
-       are not anti-aliased and filling would require
-       modification. Could draw with LINE_LOOP, but that does not work
-       well with small circles. Very fast though.
-       2) About as fast as midpoint. Circles look.. hand drawn.. though
-       3) The naive approach using cosf/sinf is slow, does not work
-       well with antialiasing and small circles are malformed.
-       4) The Cogl approach is faster, and the circles
-       look as good. Could accelerate by drawing only a quarter arc, then
-       mirroring. Hmm.. filling just draws a filled
-       square... apparently Cogl uses the stencil buffer for filling,
-       which may need EXT_packed_depth_stencil to work with FBOs.
-    */
-    
-    /* perhaps use the GPU?
-    http://my.opera.com/Vorlath/blog/2008/10/29/gpu-antialiased-circle-drawing
-    http://gamedusa.blogspot.com/2007/05/drawing-circle-primitives-using.html
-    http://www.lighthouse3d.com/opengl/ledshader/index.php?page2
-    http://lists.apple.com/archives/mac-opengl/2007/Aug/msg00150.html
-    */
-
-    /* Without anti-aliasing, the shaders are almost as fast as the
-       midpoint algorithm for open circles. They look great and are
-       actually faster (and about twice as fast as midpoint) when
-       filling. But for small circles (r=3), the midpoint is about 3
-       times faster for filled circles. The texture drawing overhead
-       is high, probably because we don't know what we're doing. */
-    
-    /*
-    int r2_loc = Cogl.Program.get_uniform_location(circle_program, "r2");
-    Cogl.Program.uniform_1f(r2_loc, (0.5f-halfwidth)*(0.5f-halfwidth));
-    */
-    /*
     if (fill.alpha > 0) {
       set_color(fill);
       //  Cogl.Program.use(fc_program);
@@ -362,19 +161,20 @@ public class GGobi.Surface.CoglDrawable : Drawable, Object {
     }
     if (stroke.alpha > 0) {
       set_color(stroke);
-      Cogl.Program.use(oc_program);
-      int loc = Cogl.Program.get_uniform_location(oc_program, "halfwidth");
-      float halfwidth = 1/(4.0f*r);
-      Cogl.Program.uniform_1f(loc, halfwidth);
+      //Cogl.Program.use(oc_program);
+      //int loc = Cogl.Program.get_uniform_location(oc_program, "halfwidth");
+      //float halfwidth = 1/(4.0f*r);
+      //Cogl.Program.uniform_1f(loc, halfwidth);
       draw_dummy_texture(cx, cy, r);
     }
-    */
-    //Cogl.Program.use(Cogl.Handle.INVALID);
     
+    //Cogl.Program.use(Cogl.Handle.INVALID);
+
   }
 
   private void draw_dummy_texture(int cx, int cy, uint r) {
-    Cogl.Texture.rectangle(dummy_texture,
+    /*
+      Cogl.Texture.rectangle(clutter_texture,
                            Clutter.Fixed.from_int((int)(cx - r)),
                            Clutter.Fixed.from_int((int)(cy - r)),
                            Clutter.Fixed.from_int((int)(cx + r)),
@@ -383,6 +183,38 @@ public class GGobi.Surface.CoglDrawable : Drawable, Object {
                            Clutter.Fixed.from_int(0),
                            Clutter.Fixed.from_float(1),
                            Clutter.Fixed.from_float(1));
+    */
+    
+    //BindTexture(Consts.TEXTURE_2D, dummy_texture);
+    /*
+    Begin(Consts.QUADS);
+    TexCoord2f(0, 0);
+    Vertex2f(cx - r, cx - r);
+    TexCoord2f(1, 0);
+    Vertex2f(cx + r, cy - r);
+    TexCoord2f(1, 1);
+    Vertex2f(cx + r, cy + r);
+    TexCoord2f(0, 1);
+    Vertex2f(cx - r, cy + r);
+    End();
+    */
+    
+    int x = 300000;
+    /*
+    float[] v = new float[x*2];
+
+    for (int i = 0; i < x*2; i+=2) {
+      v[i] = cx;
+      v[i+1] = cy; // + 400*(i/300000.0f);
+    }
+    VertexPointer(2, Consts.FLOAT, 0, v);
+    DrawArrays(Consts.POINTS, 0, (GLsizei)(v.length/2.0));
+*/
+    Begin(Consts.POINTS);
+    for (int i = 0; i < x; i++) {
+      Vertex2f(cx, cy);
+    }
+    End();
   }
 
   private GLuint midpoint_circle(int cx, int cy, uint r, bool fill) {
@@ -397,7 +229,7 @@ public class GGobi.Surface.CoglDrawable : Drawable, Object {
     int y = (int)r, fy;
     int tx = 0;
     int[] v = null;
-    int i = 0, j = 0;
+    int j = 0;
 
     if (fill) { // not clear why this correction is needed
       cy++;
@@ -418,11 +250,6 @@ public class GGobi.Surface.CoglDrawable : Drawable, Object {
       tx = 2*x;
       v = new int[8*(tx+1)];
       v[0] = cx; v[1] = cy + (int)r;
-      /*
-      v[4*tx+4] = cx; v[4*tx+5] = cy - (int)r;
-      v[2*tx+2] = cx + (int)r; v[2*tx+3] = cy;
-      v[6*tx+6] = cx - (int)r; v[6*tx+7] = cy;
-      */
       v[2] = cx; v[3] = cy - (int)r;
       v[4] = cx + (int)r; v[5] = cy;
       v[6] = cx - (int)r; v[7] = cy;
@@ -440,15 +267,6 @@ public class GGobi.Surface.CoglDrawable : Drawable, Object {
     ddF_x = 1;
     ddF_y = -2 * (int)r;
     x = 0;
-    
-    /* Filled midpoint */
-    /* Draw lines when 'y' changes from:
-       8*tx-i+6,7 to i+2,3
-       4*tx+i+6,7 to 4*tx-i+2,3
-       6*tx+i+8,9 to 2*tx-i+0,1
-       6*tx-i+4,5 to 2*tx+i+4,5
-       Also from 6*tx+6,7 to 2*tx+2,3
-    */
     
     while(x < y) {
       if(f >= 0) {
@@ -474,24 +292,6 @@ public class GGobi.Surface.CoglDrawable : Drawable, Object {
         v[j++] = cx - x; v[j++] = cy - y;
         v[j++] = cx + x; v[j++] = cy - y;
       }
-      /*
-      if (fill) {
-        v[j++] = cx - y; v[j++] = cy + x;
-        v[j++] = cx + y; v[j++] = cy + x;
-        v[j++] = cx - y; v[j++] = cy - x;
-        v[j++] = cx + y; v[j++] = cy - x;
-      } else {
-        v[i+2] = cx + x; v[i+3] = cy + y;
-        v[8*tx-i+6] = cx - x; v[8*tx-i+7] = cy + y;
-        v[4*tx-i+2] = cx + x; v[4*tx-i+3] = cy - y;
-        v[4*tx+i+6] = cx - x; v[4*tx+i+7] = cy - y;
-        v[2*tx-i] = cx + y; v[2*tx-i+1] = cy + x;
-        v[6*tx+i+8] = cx - y; v[6*tx+i+9] = cy + x;
-        v[2*tx+i+4] = cx + y; v[2*tx+i+5] = cy - x;
-        v[6*tx-i+4] = cx - y; v[6*tx-i+5] = cy - x;
-        i+=2;
-      }
-      */
       ddF_x += 2;
       f += ddF_x;
     }

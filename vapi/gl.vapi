@@ -942,10 +942,14 @@ namespace GL
 	public static GLboolean IsEnabled (GLenum cap);
 	public static void EnableClientState (GLenum cap);
 	public static void DisableClientState (GLenum cap);
-	public static void GetBooleanv (GLenum pname, out GLboolean params);
-	public static void GetDoublev (GLenum pname, out GLdouble params);
-	public static void GetFloatv (GLenum pname, out GLfloat params);
-	public static void GetIntegerv (GLenum pname, out GLint params);
+	[NoArrayLength]
+	public static void GetBooleanv (GLenum pname, GLboolean[] params);
+	[NoArrayLength]
+	public static void GetDoublev (GLenum pname, GLdouble[] params);
+	[NoArrayLength]
+	public static void GetFloatv (GLenum pname, GLfloat[] params);
+	[NoArrayLength]
+	public static void GetIntegerv (GLenum pname, GLint[] params);
 	public static void PushAttrib (GLbitfield mask);
 	public static void PopAttrib ();
 	public static void PushClientAttrib (GLbitfield mask);
@@ -1571,9 +1575,18 @@ namespace GL
 	public static void MultiTexCoord4sARB (GLenum target, GLshort s, GLshort t, GLshort r, GLshort q);
 	[NoArrayLength]
 	public static void MultiTexCoord4svARB (GLenum target, GLshort[] v);
-
+  
   // OpenGL 1.4 (added by GGobi team)
   public static void BlendFuncSeparate (GLenum srcRGB, GLenum dstRGB,
                                         GLenum srcAlpha, GLenum dstAlpha);
+
+  // OpenGL 1.5
+  namespace Consts {
+    public const GLenum COORD_REPLACE;
+    public const GLenum POINT_SPRITE;
+    public const GLenum POINT_SPRITE_COORD_ORIGIN;
+    public const GLenum LOWER_LEFT;
+  }
+  public static void PointParameteri ( GLenum name, GLint param );
 }
 

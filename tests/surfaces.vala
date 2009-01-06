@@ -4,13 +4,14 @@ public class GGobi.Test.Surface {
                                    GGobi.Surface.Drawable drawable)
   {
     int r = 5;
-    GGobi.Surface.Color color = { 0, 0, 0, 1 };
+    GGobi.Surface.Color color = { 1, 0, 0, 1 };
     int cx = 100, cy = 100;
+    int x = 300000;
     drawable.set_fill(color);
     TimeVal before = TimeVal();
-    for (int j = 0; j < 30000; j++) {
-      drawable.draw_circle(cx, cy, r);
-    }
+    //for (int j = 0; j < x; j++) {
+      drawable.draw_circle(cx, cy, r+1);
+      //}
     TimeVal after = TimeVal();
     debug("opengl: %f", after.tv_sec + (float)after.tv_usec/1000000 -
           (before.tv_sec + (float)before.tv_usec/1000000));
@@ -18,7 +19,7 @@ public class GGobi.Test.Surface {
     Gdk.Pixmap pixmap = new Gdk.Pixmap(null, WINWIDTH, WINHEIGHT, 24);
     Gdk.GC gc = new Gdk.GC(pixmap);
     before = TimeVal();
-    for (int j = 0; j < 30000; j++) {
+    for (int j = 0; j < x; j++) {
       Gdk.draw_arc (pixmap, gc, false, cx - r, cy - r, 2 * r, 2 * r, 0, 23040);
       Gdk.draw_arc (pixmap, gc, true, cx - r, cy - r, 2 * r, 2 * r, 0, 23040);
     }
@@ -32,7 +33,7 @@ public class GGobi.Test.Surface {
     Gdk.pixbuf_get_from_drawable(glyph, pixmap, null, cx - r, cy - r, 0, 0, 2*r,
                                  2*r);
     before = TimeVal();
-    for (int j = 0; j < 30000; j++) {
+    for (int j = 0; j < x; j++) {
       glyph.composite(target, 0, 0, 2*r, 2*r, 0, 0, 1, 1,
                       Gdk.InterpType.NEAREST, 255);
     }
