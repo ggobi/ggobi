@@ -13,6 +13,10 @@
 /* Ideas:
 */
 
+/* Issues:
+   - the stencil buffer does not work on the FBO. Should we try
+   packing the stencil into the depth buffer?
+*/
 using GL;
 using Pango;
 
@@ -21,18 +25,28 @@ public class GGobi.Surface.CoglDrawable : Drawable, Object {
   public uint width { get; set construct; }
   public uint height { get; set construct; }
 
+  private float max_point_size;
+  
   construct {
+    // FIXME: this will be run every draw, so this should only change
+    // state for the majority of the operations. Special case state
+    // tweaks belong elsewhere. Much of this should be moved.
+    // FIXME: do we really want to change state at
+    // construction/deconstruction? maybe we need a start_drawing(),
+    // end_drawing() type of thing, which would be called by the
+    // surface for the geom's convenience
     PushClientAttrib(Consts.CLIENT_VERTEX_ARRAY_BIT);
     EnableClientState(Consts.VERTEX_ARRAY);
     /* OGL 1.4 */
     /* The ordinary BlendFunc() applies the same blending to the
        alpha channel as the RGB channels. The below emulates Cairo. */
-    PushAttrib(Consts.COLOR_BUFFER_BIT);
+    PushAttrib(Consts.COLOR_BUFFER_BIT | Consts.ENABLE_BIT);
     BlendFuncSeparate(Consts.SRC_ALPHA, Consts.ONE_MINUS_SRC_ALPHA,
                       Consts.ONE, Consts.ONE_MINUS_SRC_ALPHA);
+    GLfloat[] p = new GLfloat[2];
+    GetFloatv(Consts.POINT_SIZE_RANGE, p);
+    max_point_size = p[1];
     Enable(Consts.POINT_SMOOTH);
-    Enable(Consts.STENCIL_TEST);
-    StencilOp(Consts.KEEP, Consts.KEEP, Consts.REPLACE);
   }
   
   public override void finalize() {
@@ -74,31 +88,11 @@ public class GGobi.Surface.CoglDrawable : Drawable, Object {
     LineWidth(width);
   }
   
-  public void set_dashes(uint[] dashes, uint offset) {
-    ushort pattern = 0;
-    uint i, dashed = 0;
-    if (dashes.length == 0) {
+  public void set_dashes(int factor, ushort pattern) {
+    if (factor == 0)
       Disable(Consts.LINE_STIPPLE);
-      return;
-    }
-    for (i = dashes.length - 1; dashed < 16; i--) {
-      if (i < 0)
-        i = dashes.length - 1;
-      pattern <<= (ushort)dashes[i];
-      if (i % 2 == 0) { /* on bits */
-        ushort mask = ushort.MAX;
-        mask <<= (ushort)dashes[i];
-        pattern |= ~mask;
-      }
-      dashed += dashes[i];
-    }
-    ushort mask = ushort.MAX;
-    mask <<= (ushort)offset;
-    mask = ~mask & pattern;
-    pattern >>= (ushort)offset;
-    pattern |= mask << (16 - offset);
     Enable(Consts.LINE_STIPPLE);
-    LineStipple(1, (GLushort)pattern);
+    LineStipple(factor, pattern);
   }
 
   /* set clip */
@@ -112,77 +106,54 @@ public class GGobi.Surface.CoglDrawable : Drawable, Object {
   /* draw stuff */
   public void draw_rectangle(int x, int y, uint width, uint height) {
     //g_debug("drawing rect: %d %d %d %d", x, y, width, height);
-    if (fill.alpha > 0)
+    if (fill.alpha > 0) {
+      set_color(fill);
       Recti((GLint)(x - 1), (GLint)(y - 1), (GLint)(x + width - 2),
             (GLint)(y + height - 2));
-    if (stroke.alpha > 0)
-      vertices(Consts.LINE_LOOP,
-               new int[] { x, x, x + (int)width, x + (int)width },
-               new int[] { y, y + (int)height, y, y + (int)height });
+    }
+    if (stroke.alpha > 0) {
+      set_color(stroke);
+      Begin(Consts.LINE_LOOP);
+      Vertex2f(x, y);
+      Vertex2f(x, y + (int)height);
+      Vertex2f(x + (int)width, y + (int)height);
+      Vertex2f(x + (int)width, y);
+      End();
+    }
   }
 
   public void draw_circle(int cx, int cy, uint r) {
-
     
     /* Optimization:
-       If radius is within point size range:
-         If circle is only filled draw a size 2(r-1) anti-aliased point.
-         If circle is only stroked draw filled circle to stencil
-         buffer, then draw a size 2r point using stencil test.
-         If circle is stroked and filled, draw 2r point, then filled point.
+       If radius is within point size range and circle is filled:
+         Draw a size 2(r-1) anti-aliased point.
+       This takes about half the time as drawing the circle from
+       scratch, and it looks prettier. There is a lot of overhead that
+       could be avoided if many circles were drawn with the same
+       radius, but that is the domain of the glyph rendering.
     */
     
-    if (stroke.alpha > 0) {
-      
-      if (fill.alpha == 0) {
-        ClearStencil(0);
-        //Clear(Consts.STENCIL_BUFFER_BIT);
-        StencilFunc(Consts.ALWAYS, 1, 0xFFFF);     
+    if (max_point_size >= 2*(r-1)) {
+      if (fill.alpha > 0) {
+        //Enable(Consts.POINT_SMOOTH);
         set_color(fill);
         PointSize(2*(r-1));
         Begin(Consts.POINTS);
         Vertex2f(cx, cy);
         End();
-        StencilFunc(Consts.NOTEQUAL, 1, 0xFFFF);
-        //StencilOp(Consts.KEEP, Consts.KEEP, Consts.REPLACE);
+        //Disable(Consts.POINT_SMOOTH);
       }
-      
-      
-      set_color(stroke);
-      PointSize(2*r);
-      Begin(Consts.POINTS);
-      Vertex2f(cx, cy);
-      End();
-      
-    }
-    //Disable(Consts.STENCIL_TEST);
-    
-    if (fill.alpha > 0) {
-      set_color(fill);
-      PointSize(2*(r-1));
-      Begin(Consts.POINTS);
-      Vertex2f(cx, cy);
-      End();
-    }
-    /*
-    if (fill.alpha > 0) {
-      set_color(fill);
-      midpoint_circle(cx, cy, r - 1, true);
-    }
-    if (stroke.alpha > 0) {
+    } else {
+      if (fill.alpha > 0) {
+        set_color(fill);
+        midpoint_circle(cx, cy, r - 1, true);
+      }
+      if (stroke.alpha > 0) {
       // FIXME: does not obey line width
-      set_color(stroke);
-      midpoint_circle(cx, cy, r, false);
+        set_color(stroke);
+        midpoint_circle(cx, cy, r, false);
+      }
     }
-    */
-    /* Point sprite stuff
-       Enable(Consts.TEXTURE_2D);
-       Enable(Consts.POINT_SPRITE);
-       TexEnvi(Consts.POINT_SPRITE, Consts.COORD_REPLACE, 1);
-       PointSize(10);
-       PointParameteri(Consts.POINT_SPRITE_COORD_ORIGIN, Consts.LOWER_LEFT);
-       //Enable(Consts.POINT_SMOOTH);
-    */
   }
 
   private void midpoint_circle(int cx, int cy, uint r, bool fill) {
@@ -380,23 +351,27 @@ public class GGobi.Surface.CoglDrawable : Drawable, Object {
     return clutter;
   }
 
-  /* Perhaps there is too much overhead to texture mapping. Consider
-     VBOs or display lists (probably better supported and a bit
-     faster). Just translate the transformation matrix and call list. */
+  // Plan: write a simple glyph -> texture translator and cache. Use
+  // point sprites to blit the textures on screen.
   public void draw_glyphs(string glyph, int[] x, int[] y) {
+    /* no glyphs are drawn if there is no fill */
     if (fill.alpha == 0)
       return;
     Layout layout = layout_text(glyph);
     Clutter.Color text_color = to_clutter_color(fill);
     /* get glyph out of layout, lookup texture in cache, draw it all over */
-    // NOTE: this is pretty inefficient, but we lack low-level access
-    // to the clutter glyph cache. One idea is to cheat and get the
-    // PangoClutterRenderer from the PangoClutterFontMap and use it.
-    // GOOD NEWS -- Clutter now has official API for getting its
-    // PangoRenderer, so this issue can now be resolved for Clutter 1.0
     
     for (int i = 0; i < x.length; i++)
       Pango.Clutter.render_layout(layout, x[i], y[i], text_color, 0);
+    /* Point sprite stuff
+       Enable(Consts.TEXTURE_2D);
+       Enable(Consts.POINT_SPRITE);
+       TexEnvi(Consts.POINT_SPRITE, Consts.COORD_REPLACE, 1);
+       PointSize(10);
+       PointParameteri(Consts.POINT_SPRITE_COORD_ORIGIN, Consts.LOWER_LEFT);
+       //Enable(Consts.POINT_SMOOTH);
+    */
+
   }
 
   private Layout layout_text(string str) {
@@ -407,6 +382,15 @@ public class GGobi.Surface.CoglDrawable : Drawable, Object {
   
   private void vertices(GLenum mode, int[] x, int[] y)
   {
+    /*
+    set_color(stroke);
+    Begin(mode);
+    for (int i = 0; i < x.length; i++) {
+      Vertex2f(x[i], y[i]);
+    }
+    End();
+    */
+    
     int[] vertices = new int[x.length*2];
     for (int i = 0; i < x.length; i++) {
       vertices[i*2] = x[i];
@@ -425,5 +409,6 @@ public class GGobi.Surface.CoglDrawable : Drawable, Object {
       set_color(stroke);
       DrawArrays(mode, 0, (GLsizei)(x.length));
     }
+    
   }
 }
