@@ -501,7 +501,7 @@ mds_reset_params_cb (GtkAction *action, PluginInstance *inst)
 
   ggv->KruskalShepard_classic = KruskalShepard;  /*-- an option menu --*/
   w = widget_find_by_name (window, "kruskalshepard_classic_opt");
-  gtk_option_menu_set_history (GTK_OPTION_MENU(w),
+  gtk_combo_box_set_active (GTK_COMBO_BOX(w),
     (gint) ggv->KruskalShepard_classic);
   
   ggv->stepsize = 0.02;     /*-- reset a slider --*/
@@ -515,20 +515,15 @@ mds_reset_params_cb (GtkAction *action, PluginInstance *inst)
   gtk_adjustment_set_value (GTK_ADJUSTMENT(adj), ggv->dist_power);
 
 /*
- * an option menu, which has control over a slider behaves,
+ * a combo box, which has control over a slider behaves,
  * because it determines which adjustment is attached to it.
  * That's the Dtarget_power_scale.
 */
   ggv->metric_nonmetric = metric;
   w = widget_find_by_name (window, "metric_opt");
-  gtk_option_menu_set_history (GTK_OPTION_MENU(w),
+  gtk_combo_box_set_active (GTK_COMBO_BOX(w),
     (gint) ggv->metric_nonmetric);
-{  /*-- make sure the appropriate adjustment is attached to the hscale --*/
-  GtkWidget *menu = gtk_option_menu_get_menu (GTK_OPTION_MENU(w));
-  GList *children = gtk_container_get_children (GTK_CONTAINER(menu));
-  GtkWidget *item = (GtkWidget *) children->data;  /*-- first one --*/
-  ggv_metric (item, inst, 0);
-}
+  ggv_metric (w, inst, 0);
 
 /*
    We don't reset the other adjustment that may be associated
